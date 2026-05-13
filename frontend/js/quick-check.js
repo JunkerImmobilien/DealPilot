@@ -2390,6 +2390,8 @@
     // V63.31: hg_ul und hg_nul IMMER setzen (auch wenn 0), damit der Workflow den
     // Bewirtschaftungs-Tab als ausgefüllt erkennt (Pflichtfeld 'hg_ul' im einfach-Modus).
     set('hg_ul',  String(Math.round(ulY  || 0)));
+    // V187: auch in Miete-Tab #umlagef schreiben (Monatswert)
+    if (ulY > 0) set('umlagef', (ulY / 12).toFixed(2).replace('.', ','));
     set('hg_nul', String(Math.round(nulY || 0)));
     // V63.31 KRITISCHER FIX: Alle anderen BWK-Felder müssen auf 0 gesetzt werden,
     // sonst summiert calc.js sie zu hg_ul/hg_nul dazu → andere BWK → andere NMR/Cashflow.

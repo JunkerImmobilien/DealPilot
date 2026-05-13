@@ -436,4 +436,167 @@ router.post('/qc-suggest', authenticate, /* V186: kein requireUnderLimit, AI-Cre
   }
 });
 
+
+
+
+
+/**
+ * V187 Hotfix: POST /ai/bodenrichtwert
+ * Schätzt den Bodenrichtwert anhand der Adresse via OpenAI.
+ * Body: { str?, plz, ort, userApiKey? }
+ * Returns: { value: number, confidence: 'niedrig'|'mittel'|'hoch', reasoning: string }
+ *
+ * Implementiert wie /lage: nutzt openaiService.callOpenAI() als rohen Call
+ * mit eigenem Prompt + JSON-Response-Parsing.
+ */
+router.post('/bodenrichtwert', authenticate, async (req, res, next) => {
+  try {
+    const payload = req.body || {};
+    const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
+      ? payload.userApiKey
+      : null;
+
+    if (!config.openai.apiKey && !userApiKey) {
+      return res.status(503).json({
+        error: 'Kein OpenAI-API-Key verfügbar.',
+        needs_user_key: true
+      });
+    }
+    if (!payload.plz || !payload.ort) {
+      return res.status(400).json({ error: 'plz und ort sind erforderlich' });
+    }
+
+    // Credit-Pre-Check (nur wenn Server-Key)
+    if (!userApiKey) {
+      const status = await aiCreditsService.getStatus(req.user.id);
+      if (status.total_remaining < 1) {
+        return res.status(402).json({
+          error: 'Keine KI-Credits mehr verfügbar.',
+          credits: status,
+          needs_credits: true
+        });
+      }
+    }
+
+    // Adresse zusammenbauen
+    const address = [payload.str, payload.plz, payload.ort].filter(Boolean).join(', ');
+
+    // Prompt
+    const prompt = [
+      'Du bist Immobilien-Experte fuer Deutschland und kennst die Bodenrichtwerte (BORIS-Portale der Bundeslaender).',
+      '',
+      'Aufgabe: Schaetze fuer folgende Adresse den aktuellen Bodenrichtwert in EUR/m^2:',
+      '  ' + address,
+      '',
+      'Beruecksichtige: Region (Stadt vs Land), Bundesland, typische BORIS-Werte fuer aehnliche Lagen.',
+      '',
+      'Antworte AUSSCHLIESSLICH als JSON-Objekt OHNE Markdown-Backticks, ohne Text drumherum:',
+      '{"value": 250, "confidence": "mittel", "reasoning": "Wohnstrasse mittlere Lage, BORIS-Vergleich 200-300"}',
+      '',
+      'Regeln:',
+      '- value: Zahl in EUR/m^2 (ohne Tausendertrennung, ohne Einheit, ohne Anfuehrungszeichen)',
+      '- confidence: "niedrig" | "mittel" | "hoch"',
+      '- reasoning: kurze Begruendung (1 Satz, max 100 Zeichen)',
+      '- Bei Unsicherheit: value = realistische Schaetzung, confidence = niedrig',
+      '- NICHT antworten mit Markdown-Codeblock oder Erklaerungen drumherum.'
+    ].join('\n');
+
+    // OpenAI-Call (roher Call wie in analyze/analyzeLage)
+    const raw = await openaiService.callOpenAI(prompt, {
+      userApiKey: userApiKey,
+      temperature: 0.2,
+      maxTokens: 250
+    });
+
+    // Response parsen (kann String mit Markdown sein)
+    let parsed = null;
+    let rawText = '';
+    try {
+      // callOpenAI kann String oder Object zurückgeben — robust extrahieren
+      if (typeof raw === 'string') {
+        rawText = raw;
+      } else if (raw && typeof raw.text === 'string') {
+        rawText = raw.text;
+      } else if (raw && typeof raw.output_text === 'string') {
+        rawText = raw.output_text;
+      } else if (raw && typeof raw.content === 'string') {
+        rawText = raw.content;
+      } else if (raw && raw.choices && raw.choices[0] && raw.choices[0].message) {
+        rawText = raw.choices[0].message.content || '';
+      } else if (raw && Array.isArray(raw.output)) {
+        try {
+          for (const blk of raw.output) {
+            if (blk.content && Array.isArray(blk.content)) {
+              for (const it of blk.content) {
+                if (typeof it.text === 'string') { rawText += it.text; }
+              }
+            }
+          }
+        } catch (e) { rawText = JSON.stringify(raw); }
+      } else {
+        rawText = JSON.stringify(raw);
+      }
+      console.log('[ai/bodenrichtwert] Raw-Text length:', rawText.length, 'preview:', rawText.substring(0, 300));
+      if (rawText) {
+        parsed = openaiService.extractJson(rawText);
+      }
+    } catch (e) {
+      console.warn('[ai/bodenrichtwert] JSON-Parse failed:', e.message, '— rawText len:', rawText.length);
+    }
+
+    if (!parsed || typeof parsed !== 'object') {
+      return res.status(502).json({
+        error: 'KI-Antwort konnte nicht als JSON gelesen werden.',
+        raw: rawText ? rawText.substring(0, 500) : 'leer',
+        rawType: typeof raw,
+        rawKeys: (raw && typeof raw === 'object') ? Object.keys(raw).slice(0, 10) : null
+      });
+    }
+
+    const value = parseFloat(parsed.value);
+    const confidence = ['niedrig', 'mittel', 'hoch'].includes(parsed.confidence)
+      ? parsed.confidence
+      : 'niedrig';
+    const reasoning = String(parsed.reasoning || '').substring(0, 200);
+
+    if (isNaN(value) || value <= 0) {
+      return res.json({
+        value: 0,
+        confidence: 'niedrig',
+        reasoning: reasoning || 'Keine sinnvolle Schaetzung moeglich.',
+        source: 'openai'
+      });
+    }
+
+    // Credits verbrauchen (nur wenn Server-Key)
+    if (!userApiKey) {
+      try {
+        await aiCreditsService.consume(req.user.id, 1, 'bodenrichtwert');
+      } catch (e) {
+        console.warn('[ai/bodenrichtwert] Credits consume failed:', e.message);
+      }
+    }
+
+    try { await usageService.incrementUsage(req.user.id, 'ai_analysis'); } catch (e) {}
+
+    res.json({
+      value: Math.round(value),
+      confidence: confidence,
+      reasoning: reasoning,
+      source: 'openai-' + (config.openai.defaultModel || 'gpt-4o-mini')
+    });
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') {
+      return res.status(503).json({ error: 'OpenAI-API-Key nicht konfiguriert.' });
+    }
+    if (err.status === 401) {
+      return res.status(401).json({
+        error: err.message || 'OpenAI-Authentifizierung fehlgeschlagen.',
+        keySource: err.keySource || 'server'
+      });
+    }
+    next(err);
+  }
+});
+
 module.exports = router;

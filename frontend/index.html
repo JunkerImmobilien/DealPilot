@@ -27,6 +27,7 @@
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
 <link rel="stylesheet" href="css/rnd-styles.css?v=150">
 <link rel="stylesheet" href="css/select-fix.css?v=150">
+    <link rel="stylesheet" href="css/v187-additions.css?v=187hotfix">
 </head>
 <body>
 
@@ -645,7 +646,19 @@
         <div class="f"><label>Zusätzliche Notizen</label><textarea id="notizen" placeholder="Weitere Hinweise..."></textarea></div>
       </div>
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-land"/></svg></span>Grund &amp; Boden</div><div class="g2">
-        <div class="f"><label>Bodenrichtwert (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="brw" type="text" inputmode="decimal" placeholder="150" class="trl" oninput="calc()"></div></div>
+        <div class="f">
+              <label>Bodenrichtwert (€/m²)</label>
+              <div class="iw"><span class="pfx">€</span><input id="brw" type="text" inputmode="decimal" placeholder="150" class="trl" oninput="calc()"></div>
+              <div class="brw-helpers">
+                <button type="button" class="btn-brw" onclick="DealPilotBrw.openBoris()" title="Öffnet BORIS-Portal des passenden Bundeslandes">
+                  <span class="btn-brw-icon">🔗</span> BORIS-Portal
+                </button>
+                <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="KI schätzt Bodenrichtwert anhand der Adresse">
+                  <span class="btn-brw-icon">✨</span> KI versuchen
+                </button>
+                <span id="brw-ai-status" class="brw-ai-status"></span>
+              </div>
+            </div>
         <div class="f"><label>Miteigentumsanteil (%)</label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7.06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
         <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
@@ -1005,7 +1018,13 @@
         <option value="2.5">2,5 % (Baujahr vor 1925)</option>
         <option value="3.0">3,0 % (Wohnzwecke ab 2023)</option>
       </select></div>
-      <div class="f"><label>Gebäudeanteil am KP (%)</label><div class="iw"><input id="geb_ant" type="text" inputmode="decimal" value="80" class="tr" oninput="calc()"><span class="sfx">%</span></div><span class="hint">Rest = Grundstücksanteil</span></div>
+      <div class="f">
+              <label>Gebäudeanteil am KP (%)</label>
+              <div class="iw"><input id="geb_ant" type="text" inputmode="decimal" value="80" class="tr" oninput="calc()"><span class="sfx">%</span></div>
+              <span class="hint">Rest = Grundstücksanteil</span>
+              <div id="geb-ant-banner" class="geb-ant-banner"></div>
+            </div>
+            </div>
     </div>
     <div class="f"><label>AfA / Jahr (berechnet)</label><div class="cf" id="afa_kalk">—</div></div>
   </div>
@@ -2249,7 +2268,9 @@
 <script src="js/financing-pdf.js?v=166"></script>
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=124"></script>
-<script src="js/quick-check.js?v=160"></script>
+<script src="js/quick-check.js?v=187"></script>
+<script src="js/bodenrichtwert.js?v=187hotfix"></script>
+<script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/quick-check-tab.js?v=166"></script>
 <script src="js/ai-credits.js?v=124"></script>
 <script src="js/workflow.js?v=124"></script>
@@ -2275,7 +2296,7 @@
 <script src="js/rnd-wizard.js?v=160"></script>
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=124"></script>
-<script src="js/main.js?v=185"></script>
+<script src="js/main.js?v=187"></script>
   <script src="js/autocomplete.js?v=160" defer></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
