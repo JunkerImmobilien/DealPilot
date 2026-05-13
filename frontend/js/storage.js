@@ -40,6 +40,12 @@ function collectData() {
     var e = document.getElementById(id);
     if (e) d[id] = e.value;
   });
+  // V187-h2: KI-Lage-Cache aus currentDeal mit speichern (falls vorhanden)
+  try {
+    if (typeof window.currentDeal === 'object' && window.currentDeal && window.currentDeal.ai_lage_cache) {
+      d.ai_lage_cache = window.currentDeal.ai_lage_cache;
+    }
+  } catch(e){}
   // Checkboxes
   var d2enable = document.getElementById('d2_enable');
   if (d2enable) d['_d2_enabled'] = d2enable.checked;
@@ -140,6 +146,15 @@ function loadData(d) {
     var e = document.getElementById(id);
     if (e && d[id] !== undefined) e.value = d[id];
   });
+  // V187-h2: KI-Lage-Cache aus data ins currentDeal-Object übernehmen
+  try {
+    if (typeof window.currentDeal !== 'object' || !window.currentDeal) window.currentDeal = {};
+    if (d.ai_lage_cache && typeof d.ai_lage_cache === 'object') {
+      window.currentDeal.ai_lage_cache = d.ai_lage_cache;
+    } else {
+      delete window.currentDeal.ai_lage_cache;
+    }
+  } catch(e){}
   if (d._d2_enabled !== undefined) {
     var cb = document.getElementById('d2_enable');
     if (cb) { cb.checked = d._d2_enabled; if (typeof toggleD2 === 'function') toggleD2(); }

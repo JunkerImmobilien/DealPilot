@@ -409,3 +409,49 @@ function onLoginSuccess(session) {
     refresh: _syncBwkToMiete
   };
 })();
+
+
+// ═══════════════════════════════════════════════════════════════
+// V187-h2: KI-Lage Cache-Hydration beim Object-Switch
+// Wraps loadSaved() so that after loading data, KiLage gets hydrated.
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  'use strict';
+  function _hookKiLage() {
+    if (typeof window.loadSaved !== 'function') {
+      setTimeout(_hookKiLage, 200);
+      return;
+    }
+    if (window._kiLageHooked) return;
+    var origLoadSaved = window.loadSaved;
+    window.loadSaved = async function() {
+      var result = await origLoadSaved.apply(this, arguments);
+      try {
+        var deal = window.currentDeal;
+        if (deal && deal.ai_lage_cache) {
+          // Hydrate mit cached result
+          setTimeout(function() {
+            if (window.KiLage && typeof window.KiLage.hydrate === 'function') {
+              window.KiLage.hydrate(deal.ai_lage_cache);
+            }
+          }, 100);
+        } else {
+          // Object hat keinen Cache → leere Anzeige
+          setTimeout(function() {
+            if (window.KiLage && typeof window.KiLage.clearResult === 'function') {
+              window.KiLage.clearResult();
+            }
+          }, 100);
+        }
+      } catch (e) { console.warn('[V187-h2] KiLage hydrate fail:', e); }
+      return result;
+    };
+    window._kiLageHooked = true;
+    console.log('[V187-h2] loadSaved gewrappt für KiLage-Cache');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(_hookKiLage, 500); });
+  } else {
+    setTimeout(_hookKiLage, 500);
+  }
+})();

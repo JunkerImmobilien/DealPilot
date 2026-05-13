@@ -498,6 +498,24 @@ async function analyze(payload, opts) {
 async function analyzeLage(payload, opts) {
   const adresse = payload.adresse || [payload.str, payload.hnr, payload.plz, payload.ort].filter(Boolean).join(' ');
   if (!adresse) throw new Error('Keine Adresse übergeben');
+  
+  // V187-h2: Adress-Genauigkeits-Kontext für die KI
+  const hasStr = !!(payload.str && String(payload.str).trim());
+  const hasHnr = !!(payload.hnr && String(payload.hnr).trim());
+  const hasPlz = !!(payload.plz && String(payload.plz).trim());
+  const hasOrt = !!(payload.ort && String(payload.ort).trim());
+  let addressContext = '';
+  if (hasStr && hasHnr && hasPlz && hasOrt) {
+    addressContext = 'Du hast die VOLLSTÄNDIGE Adresse (Straße, Hausnummer, PLZ, Ort). Liefere eine PRÄZISE Mikrolagen-Analyse auf Straßenebene: konkrete Nachbarschafts-Charakteristik, fußläufige Infrastruktur, Quartierscharakter. Nutze die Straße als Anker für deine Recherche.';
+  } else if (hasStr && hasPlz && hasOrt) {
+    addressContext = 'Du hast Straße + PLZ + Ort (keine Hausnummer). Liefere eine detaillierte Straßenebene-Analyse. Erwähne kurz dass für noch präzisere Aussagen (z.B. konkrete Lärmbelastung, Hausnummer-genaue Lage) die Hausnummer hilfreich wäre.';
+  } else if (hasPlz && hasOrt) {
+    addressContext = 'Du hast NUR PLZ + Ort (keine Straße). Liefere eine generelle Lage-Einschätzung für das Quartier/den Stadtteil. Wichtig: Sei vorsichtig mit straßenspezifischen Aussagen — du kennst die konkrete Straße nicht. Mache stattdessen Aussagen über das PLZ-Gebiet und den Stadtteil. Erwähne im Mikrolagen-Block dass eine straßengenaue Analyse erst mit Adresse möglich wäre.';
+  } else if (hasOrt) {
+    addressContext = 'Du hast NUR den Ort (keine PLZ, keine Straße). Liefere nur eine sehr generelle Stadt-/Gemeinde-Einschätzung. Sei explizit dass die Analyse ohne PLZ und Straße nur grobe Hinweise liefern kann.';
+  }
+  payload._addressContext = addressContext;
+
 
   // V63.21: Style-Hinweis aus aiOptions zusammenbauen (Detailgrad, Tonalität, Fokus, Custom-Instructions)
   function _buildStyleBlock(aiOpts) {
@@ -541,6 +559,7 @@ async function analyzeLage(payload, opts) {
     'Du bist Immobilien-Marktexperte. Bewerte umfassend die Lage und das Marktumfeld für folgendes Objekt:',
     '',
     'Adresse: ' + adresse + kpInfo + wflInfo + nkmInfo,
+    (payload._addressContext ? '\n## ADRESS-GENAUIGKEIT\n' + payload._addressContext : ''),
     styleBlock,
     '## AUFGABE',
     'Recherchiere und liefere eine fundierte Lage-Analyse mit 6 Dimensionen + Quellen + Deal-Bewertung.',

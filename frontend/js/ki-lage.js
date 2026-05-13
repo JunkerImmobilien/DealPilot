@@ -41,6 +41,8 @@ function runKiLage() {
     '<div class="ki-lage-spinner"></div>' +
     'KI recherchiert Makro- und Mikrolage…' +
   '</div>';
+  // V187-h2: merken welche Adresse benutzt wurde (für Cache + Banner)
+  window._kiLageCurrentRequest = { adresse: adresse, str: str, hnr: hnr, plz: plz, ort: ort, ts: Date.now() };
 
   // User-Key aus Settings (falls gesetzt) als Fallback mitgeben
   var userApiKey = '';
@@ -206,6 +208,8 @@ function _renderKiLage(data) {
   }
 
   body.innerHTML =
+    (typeof window.KiLage !== 'undefined' && typeof window.KiLage.getAccuracyBanner === 'function'
+      ? window.KiLage.getAccuracyBanner() : '') +
     '<div class="ki-lage-grid">' +
       renderBox('Makrolage', 'makro', data.makro) +
       renderBox('Mikrolage', 'mikro', data.mikro) +
@@ -221,6 +225,8 @@ function _renderKiLage(data) {
 
   // V63.6: Daten zwischenspeichern für späteres "In Felder übernehmen"
   window._lastKiLageData = data;
+  // V187-h2: Cache in currentDeal speichern
+  try { if (window.KiLage && typeof window.KiLage.cacheResult === 'function') window.KiLage.cacheResult(); } catch(e){}
 }
 
 /**
@@ -278,3 +284,166 @@ function _escKi(s) {
 })();
 
 window.runKiLage = runKiLage;
+
+
+// ═══════════════════════════════════════════════════════════════
+// V187-h2: KI-Lage API für Object-Switch + Cache + Kontext-Banner
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  'use strict';
+  
+  function _getBody() { return document.getElementById('ki-lage-body'); }
+  function _getBtn() { return document.getElementById('ki-lage-btn'); }
+  
+  function _getCurrentAddress() {
+    var str = (document.getElementById('str') || {}).value || '';
+    var hnr = (document.getElementById('hnr') || {}).value || '';
+    var plz = (document.getElementById('plz') || {}).value || '';
+    var ort = (document.getElementById('ort') || {}).value || '';
+    return { str: str.trim(), hnr: hnr.trim(), plz: plz.trim(), ort: ort.trim() };
+  }
+  
+  function _buildAccuracyBanner(addr) {
+    if (!addr) addr = _getCurrentAddress();
+    var hasStrasse = addr.str && addr.str.length > 0;
+    var hasHnr = addr.hnr && addr.hnr.length > 0;
+    var hasPlzOrt = addr.plz && addr.ort;
+    
+    var cls, icon, title, text;
+    if (hasStrasse && hasHnr && hasPlzOrt) {
+      cls = 'high';
+      icon = '✓';
+      title = 'Detailanalyse';
+      text = 'Mit Straße + Hausnummer + PLZ/Ort — die KI liefert eine Mikrolagen-Analyse auf Straßenebene.';
+    } else if (hasStrasse && hasPlzOrt) {
+      cls = 'medium';
+      icon = '◐';
+      title = 'Detaillierte Analyse';
+      text = 'Mit Straße + PLZ/Ort — die KI bewertet die Straßenebene. Für noch präzisere Ergebnisse die Hausnummer ergänzen.';
+    } else if (hasPlzOrt) {
+      cls = 'low';
+      icon = 'ℹ';
+      title = 'Generelle Lage-Einschätzung';
+      text = 'Nur PLZ + Ort vorhanden — die Analyse ist generisch für das Quartier/die Stadt. Für eine präzisere Mikrolagen-Bewertung Straße und Hausnummer im Tab Objekt ergänzen.';
+    } else {
+      cls = 'low';
+      icon = '⚠';
+      title = 'Wenig Daten';
+      text = 'Die Adressdaten sind unvollständig. Bitte PLZ und Ort eintragen.';
+    }
+    
+    var bgColor, textColor, borderColor;
+    if (cls === 'high') {
+      bgColor = 'rgba(63, 165, 108, 0.08)';
+      borderColor = 'rgba(63, 165, 108, 0.35)';
+      textColor = '#2a6e48';
+    } else if (cls === 'medium') {
+      bgColor = 'rgba(201, 168, 76, 0.08)';
+      borderColor = 'rgba(201, 168, 76, 0.35)';
+      textColor = '#8b7330';
+    } else {
+      bgColor = 'rgba(201, 168, 76, 0.06)';
+      borderColor = 'rgba(0, 0, 0, 0.10)';
+      textColor = '#5f5e5a';
+    }
+    
+    return (
+      '<div style="background:' + bgColor + ';border:0.5px solid ' + borderColor + ';' +
+      'border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;display:flex;' +
+      'gap:8px;align-items:flex-start;color:' + textColor + ';">' +
+        '<div style="font-size:14px;line-height:1;margin-top:2px">' + icon + '</div>' +
+        '<div>' +
+          '<div style="font-weight:600;margin-bottom:2px">' + title + '</div>' +
+          '<div style="line-height:1.4">' + text + '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+  
+  // Public API
+  window.KiLage = {
+    // Beim Object-Switch: Anzeige zurücksetzen auf Initial-Stand
+    clearResult: function() {
+      var body = _getBody();
+      var btn = _getBtn();
+      if (body) {
+        body.innerHTML = '<div class="ki-lage-empty" style="color:#888780;font-size:13px;padding:14px 0">' +
+          'Klicke "Lage analysieren" für eine KI-gestützte Makro- und Mikrolagen-Bewertung.' +
+        '</div>';
+      }
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Lage analysieren';
+      }
+      window._kiLageCurrentRequest = null;
+    },
+    
+    // Beim Object-Load: Cache hydrieren wenn vorhanden
+    hydrate: function(cache) {
+      if (!cache || !cache.html) {
+        this.clearResult();
+        return;
+      }
+      var body = _getBody();
+      var btn = _getBtn();
+      if (!body) return;
+      
+      var ageMs = cache.ts ? (Date.now() - cache.ts) : 0;
+      var ageDays = Math.round(ageMs / 86400000);
+      var ageTxt = ageDays === 0 ? 'heute' : ageDays === 1 ? 'gestern' : 'vor ' + ageDays + ' Tagen';
+      
+      var addrTxt = cache.address || '(unbekannte Adresse)';
+      
+      var cacheBanner = 
+        '<div style="background:rgba(63,165,108,0.06);border:0.5px solid rgba(63,165,108,0.30);' +
+        'border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;display:flex;' +
+        'gap:8px;align-items:center;justify-content:space-between;color:#2a6e48;">' +
+          '<div>' +
+            '<strong>Gespeicherte KI-Analyse</strong> für ' + addrTxt + ' · ' + ageTxt +
+          '</div>' +
+          '<button type="button" onclick="if(typeof runKiLage===\'function\')runKiLage()" ' +
+          'style="background:transparent;border:0.5px solid rgba(63,165,108,0.4);' +
+          'border-radius:6px;padding:4px 10px;font-size:11px;color:#2a6e48;cursor:pointer;white-space:nowrap">' +
+          '↻ Neu analysieren</button>' +
+        '</div>';
+      
+      body.innerHTML = cacheBanner + cache.html;
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Lage neu analysieren';
+      }
+    },
+    
+    // Nach erfolgreicher Analyse: Cache in currentDeal speichern
+    cacheResult: function() {
+      try {
+        if (typeof window.currentDeal !== 'object' || !window.currentDeal) return;
+        var body = _getBody();
+        if (!body) return;
+        var req = window._kiLageCurrentRequest;
+        if (!req) return;
+        
+        // HTML im Body merken (ohne Banner — die werden bei Hydrate neu gemacht)
+        var html = body.innerHTML;
+        // Falls Loading/Empty/Error noch drin: nicht speichern
+        if (html.indexOf('ki-lage-loading') >= 0 || html.indexOf('ki-lage-err') >= 0 || html.indexOf('ki-lage-empty') >= 0) {
+          return;
+        }
+        
+        window.currentDeal.ai_lage_cache = {
+          html: html,
+          ts: Date.now(),
+          address: req.adresse,
+          str: req.str, hnr: req.hnr, plz: req.plz, ort: req.ort
+        };
+        // Trigger save (debounced via storage.js)
+        if (typeof scheduleSave === 'function') scheduleSave();
+      } catch (e) {
+        console.warn('[KiLage] cacheResult fail:', e);
+      }
+    },
+    
+    // Genauigkeits-Banner für Anzeige
+    getAccuracyBanner: _buildAccuracyBanner
+  };
+})();
