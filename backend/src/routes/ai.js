@@ -108,7 +108,7 @@ router.get('/status', (req, res) => {
  * Priorität: Server-Key (.env) > User-Key (Body) > 503-Fehler.
  * User-Keys werden NICHT geloggt.
  */
-router.post('/analyze', authenticate, requireUnderLimit('ai_analyses_monthly'), async (req, res, next) => {
+router.post('/analyze', authenticate, /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const payload = req.body || {};
     const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
@@ -187,7 +187,7 @@ router.post('/analyze', authenticate, requireUnderLimit('ai_analyses_monthly'), 
  * Body: { adresse: "Dresdenstraße 116, 32052 Herford", plz, ort, str, hnr }
  * Response: { makro: {score, label, text, factors[]}, mikro: {...} }
  */
-router.post('/lage', authenticate, requireUnderLimit('ai_analyses_monthly'), async (req, res, next) => {
+router.post('/lage', authenticate, /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const payload = req.body || {};
     const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
@@ -264,7 +264,7 @@ router.post('/lage', authenticate, requireUnderLimit('ai_analyses_monthly'), asy
  *
  * Response: { suggestions: { fieldId: { value, reasoning } } }
  */
-router.post('/ds2-suggest', authenticate, requireUnderLimit('ai_analyses_monthly'), async (req, res, next) => {
+router.post('/ds2-suggest', authenticate, /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const payload = req.body || {};
     const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
@@ -410,7 +410,7 @@ router.post('/extract-market-data', authenticate, extractLimiter, async (req, re
  *
  * Response: { suggestions: { fieldName: { value, source, reasoning } } }
  */
-router.post('/qc-suggest', authenticate, requireUnderLimit('ai_analyses_monthly'), async (req, res, next) => {
+router.post('/qc-suggest', authenticate, /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const { group, context, userApiKey: rawUserKey } = req.body || {};
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;

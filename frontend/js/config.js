@@ -458,11 +458,17 @@ window.DealPilotConfig = (function() {
       // V63.82: Behandelt jetzt auch String-Modi: 'demo', 'simplified', 'full' = aktiv
       // Für den Demo-/Simplified-Modus wird zusätzlich featureMode() genutzt.
       hasFeature: function(featureKey) {
+        // V186: Backend-Cache (DB) ist Quelle der Wahrheit.
+        // Frontend config.js dient nur als Fallback wenn Sub noch nicht geladen.
+        if (typeof Sub !== 'undefined' && typeof Sub.hasCachedFeature === 'function') {
+          var backendValue = Sub.hasCachedFeature(featureKey);
+          if (backendValue !== null) return backendValue;
+        }
+        // Fallback: alte config.js-Logik
         var p = getCurrentPlan();
         if (!p || !p.features) return false;
         var v = p.features[featureKey];
         if (v === true) return true;
-        // String-Modi gelten als "aktiv aber eingeschränkt" → true
         if (typeof v === 'string' && v.length > 0) return true;
         return false;
       },
