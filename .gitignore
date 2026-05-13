@@ -52,7 +52,6 @@ logs/
 
 # Backup-Verzeichnisse + DB-Dumps
 backups/
-*.sql
 *.sql.gz
 
 # Test outputs
@@ -69,3 +68,7 @@ caddy_config/
 
 # SSL / Certs
 letsencrypt/
+
+# DealPilot Migration-SQL-Files dürfen ins Repo
+!backend/migrations/
+!backend/migrations/*.sql
