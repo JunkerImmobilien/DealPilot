@@ -1,155 +1,367 @@
-# DealPilot — Deployment-Hinweise
+# DealPilot — Deployment-Workflow
 
-Diese Datei beschreibt, wie DealPilot auf einen eigenen Server deployt wird.
-Die App besteht aus drei Teilen:
+**Stand: 13.05.2026** · Siehe auch [README.md](README.md) für Architektur-Übersicht.
 
-1. **Frontend** — statische Files (HTML/CSS/JS) im Verzeichnis `frontend/`
-2. **Backend** — Node.js + Express + Postgres im Verzeichnis `backend/`
-3. **Datenbank** — PostgreSQL (per Docker oder nativ)
+Diese Datei beschreibt **wie du Updates ausrollst** von Code-Änderung bis Live.
 
 ---
 
-## 1. Architektur-Trennung
+## Der Standard-Workflow
+---
 
-| Komponente | Pfad | Aufgabe |
+## Die 4 Update-Typen
+
+Je nach Art der Änderung sind unterschiedliche Schritte nötig. Identifiziere zuerst was du änderst:
+
+| Typ | Was | Deploy-Methode |
 |---|---|---|
-| Frontend | `frontend/` | Statische Auslieferung (Caddy / Nginx / serve) |
-| Backend  | `backend/`  | REST-API, Auth, DB, Stripe, KI-Proxy |
-| DB       | `backend/migrations/` | SQL-Schema-Versionierung |
-| Konfig   | `backend/.env` | Geheime Werte — **niemals committen** |
-
-Frontend und Backend können auf demselben Host laufen (Reverse-Proxy) oder getrennt.
+| 1 | Frontend (HTML/CSS/JS) | Volume-Mount → sofort live, nur Caddy reload |
+| 2 | Backend (Node-Code) | Image rebuild + recreate Container |
+| 3 | Migration (neue SQL) | Backend restart (Migrations laufen beim Start) |
+| 4 | .env (Secrets/Config) | force-recreate Container |
 
 ---
 
-## 2. Environment Variables
+## Typ 1: Frontend-Änderung (HTML/CSS/JS)
 
-Kopiere `backend/.env.example` nach `backend/.env` und fülle die Werte:
+**Was zählt dazu:** Änderungen in `frontend/js/*.js`, `frontend/css/*.css`, `frontend/index.html`
+
+### Workflow
 
 ```bash
-cp backend/.env.example backend/.env
+# ─── AUF STAGING-SERVER ───
+ssh root@116.203.214.11
+cd /opt/dealpilot
+
+# 1. Code ändern
+nano frontend/js/SOMEFILE.js
+
+# 2. Cache-Bump (sonst lädt Browser alte Datei aus Cache!)
+sed -i 's|SOMEFILE\.js?v=[0-9]\+|SOMEFILE.js?v=NEUE_VERSION|g' frontend/index.html
+
+# 3. Im Browser testen
+# https://staging.dealpilot.junker-immobilien.io (Strg+Shift+R)
+
+# 4. Wenn OK: commit + push
+git add frontend/
+git commit -m "feat(frontend): WAS DU GEMACHT HAST"
+git push origin staging
+
+# ─── AUF PROD-SERVER ───
+ssh root@157.90.117.167
+cd /opt/dealpilot
+
+# 5. Merge staging → main
+git fetch origin
+git merge origin/staging --no-ff -m "Merge staging into main: WAS DU GEMACHT HAST"
+git push origin main
+
+# 6. Caddy reload (volume-mount = eigentlich sofort live, restart sicherheitshalber)
+docker compose -f docker-compose.prod.yml restart caddy
+
+# 7. Browser-Test: https://dealpilot.junker-immobilien.io (Strg+Shift+R)
 ```
 
-Wichtigste Variablen:
-
-| Variable | Bedeutung |
-|---|---|
-| `DATABASE_URL`         | Postgres-Connection-String |
-| `JWT_SECRET`           | 64-stelliger Hex-String — **immer ändern** |
-| `CORS_ORIGINS`         | Komma-Liste erlaubter Frontend-Domains |
-| `FRONTEND_BASE_URL`    | Wird für Stripe-Redirects und E-Mail-Links benutzt |
-| `UPLOAD_DIR`           | Pfad für User-Uploads (Logos), absolut in Prod |
-| `OPENAI_API_KEY`       | Optional — wenn gesetzt, läuft KI über Server statt Client |
-| `STRIPE_*`             | Für Plan-Abos (optional) |
-
-> **Hinweis Uploads:** Stelle sicher, dass `UPLOAD_DIR` ein **persistentes Volume** ist (Docker-Volume oder gemounteter Disk-Bereich). Beim Container-Rebuild dürfen die Dateien nicht verloren gehen.
+**Dauer:** 2-5 Minuten
 
 ---
 
-## 3. Docker-Compose-Setup
+## Typ 2: Backend-Änderung (Node.js-Code)
 
-Der mitgelieferte `backend/docker-compose.yml` startet:
-- Postgres (mit benanntem Volume)
-- Backend-Container
-- Optional: pgweb für DB-Browsing
+**Was zählt dazu:** Änderungen in `backend/src/**`
+
+### Workflow
 
 ```bash
-cd backend
-docker compose up -d --build
+# ─── AUF STAGING ───
+ssh root@116.203.214.11
+cd /opt/dealpilot
+
+# 1. Code ändern
+nano backend/src/routes/SOMEFILE.js
+
+# 2. Image neu bauen + Container ersetzen
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+
+# 3. Logs prüfen
+docker compose -f docker-compose.prod.yml logs --tail=20 backend
+# Server sollte starten ohne Errors
+
+# 4. Im Browser/API testen
+
+# 5. Commit + push
+git add backend/
+git commit -m "feat(backend): WAS DU GEMACHT HAST"
+git push origin staging
+
+# ─── AUF PROD ───
+ssh root@157.90.117.167
+cd /opt/dealpilot
+
+# 6. DB-Backup (immer vor Backend-Update auf Prod!)
+docker compose -f docker-compose.prod.yml exec -T postgres pg_dump -U dealpilot dealpilot_db | gzip > /root/db-backup-$(date +%Y%m%d-%H%M%S).sql.gz
+
+# 7. Merge + Pull
+git fetch origin
+git merge origin/staging --no-ff -m "Merge: WAS DU GEMACHT HAST"
+git push origin main
+
+# 8. Image neu bauen + Container ersetzen
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+
+# 9. Logs prüfen
+docker compose -f docker-compose.prod.yml logs --tail=20 backend
 ```
 
-Frontend separat:
+**Dauer:** 5-10 Minuten (wegen Build)
+
+---
+
+## Typ 3: Migration (neue SQL-Datei)
+
+**Was zählt dazu:** Neue Datei in `backend/migrations/NNN_*.sql`
+
+### Workflow
 
 ```bash
-cd frontend
-npx serve -l 8080      # Dev
-# oder Caddy/Nginx vor das Verzeichnis hängen für Produktion
+# ─── AUF STAGING ───
+ssh root@116.203.214.11
+cd /opt/dealpilot
+
+# 1. SQL-File erstellen mit nächster Nummer
+# Aktuelle Migrations checken:
+ls backend/migrations/ | tail -3
+# z.B. letzte ist 019, neue wird 020:
+nano backend/migrations/020_neues_feature.sql
+
+# 2. Backend restart → Migrations laufen automatisch beim Start
+docker compose -f docker-compose.prod.yml restart backend
+
+# 3. Logs checken — Migration sollte applied werden
+docker compose -f docker-compose.prod.yml logs --tail=20 backend
+# Suche nach: "✓ Migration 020_neues_feature.sql applied"
+
+# 4. App testen
+
+# 5. Commit + push
+git add backend/migrations/
+git commit -m "feat(db): Migration 020 — was sie macht"
+git push origin staging
+
+# ─── AUF PROD ───
+ssh root@157.90.117.167
+cd /opt/dealpilot
+
+# 6. DB-BACKUP IST PFLICHT!
+docker compose -f docker-compose.prod.yml exec -T postgres pg_dump -U dealpilot dealpilot_db | gzip > /root/db-backup-pre-mig020-$(date +%Y%m%d-%H%M%S).sql.gz
+
+# 7. Merge + Pull
+git fetch origin
+git merge origin/staging --no-ff -m "Merge: Migration 020"
+git push origin main
+
+# 8. Restart (Migration läuft beim Start)
+docker compose -f docker-compose.prod.yml restart backend
+
+# 9. Logs prüfen
+docker compose -f docker-compose.prod.yml logs --tail=20 backend
 ```
 
----
-
-## 4. Reverse-Proxy (Beispiel Caddy)
-
-Schlankste Lösung mit automatischem HTTPS:
-
-```caddyfile
-dealpilot.example.com {
-  # API
-  handle /api/* {
-    reverse_proxy backend:3001
-  }
-  # Frontend (statische Files)
-  handle {
-    root * /var/www/dealpilot
-    try_files {path} /index.html
-    file_server
-  }
-}
-```
+**Dauer:** 5-10 Minuten
 
 ---
 
-## 5. Pricing & Usage serverseitig
+## Typ 4: `.env`-Änderung (Secrets, Config)
 
-Die aktuelle Free-Plan-Logik liegt **client-seitig** (`localStorage`).
-Für Server-Mode siehst du im `backend/src/services/`:
+**Was zählt dazu:** Änderungen an Stripe-Keys, JWT-Secret, neue ENV-Variable, etc.
 
-- `subscription` (Plan-Status pro User)
-- `usage`-Tabelle (planmäßig — Migration vorzubereiten)
+### Wichtig
 
-Architektur-Idee:
-- Client ruft `/api/v1/subscription/me` → bekommt aktiven Plan + verbleibende Limits
-- Vor jeder kostenpflichtigen Aktion: `/api/v1/usage/check` (DB-Lookup)
-- Stripe-Webhook → updated `subscriptions`-Tabelle
+- `.env` ist **NICHT** im Git
+- Jeder Server hat seine **eigene `.env`**
+- Wenn du eine Variable auf beiden Servern willst, musst du sie auf beiden **manuell** setzen
+- `restart` reicht **NICHT** für ENV-Änderungen — du brauchst `up -d --force-recreate`!
 
----
-
-## 6. KI-Analyse über Backend (optional)
-
-Heute: Client hält OpenAI-Key in localStorage und ruft OpenAI direkt.
-Empfehlung Produktion:
-
-1. `OPENAI_API_KEY` im Server hinterlegen
-2. Endpoint `POST /api/v1/ai/analyze` anlegen — Server schickt Request
-3. Frontend ruft nur `/api/v1/ai/analyze` mit Calc-Payload
-4. Vorteil: Key niemals im Browser, zentrales Rate-Limiting möglich
-
----
-
-## 7. Auth-Konzept
-
-JWT-basiert, Backend stellt Token bei Login aus, Frontend speichert in localStorage.
-Migrationen 001–006 enthalten:
-- `users`
-- `objects`
-- `subscriptions`
-- `email_tokens` (für Verifikation/Reset)
-- `tax_records` + `tax_bemerkungen`
-
----
-
-## 8. Backups
+### Workflow
 
 ```bash
-docker exec <db-container> pg_dump -U dealpilot dealpilot_db > backup_$(date +%F).sql
+# Auf jedem Server separat:
+cd /opt/dealpilot
+
+# 1. .env bearbeiten
+nano .env
+
+# 2. Container neu erstellen (NICHT nur restart!)
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+
+# 3. Verify: Container sieht die neue Variable
+docker compose -f docker-compose.prod.yml exec backend printenv | grep VARIABLE_NAME
+
+# 4. Logs prüfen
+docker compose -f docker-compose.prod.yml logs --tail=10 backend
 ```
 
-Empfohlen: täglich automatisiert per Cron + Off-Site-Storage.
+---
+
+## Konkrete Beispiele
+
+### Beispiel A: Button-Text ändern (Typ 1)
+
+```bash
+# Staging
+ssh root@116.203.214.11
+cd /opt/dealpilot
+sed -i 's|"Investor-Plan starten"|"Investor jetzt buchen"|g' frontend/js/pricing-modal.js
+sed -i 's|pricing-modal\.js?v=181|pricing-modal.js?v=182|g' frontend/index.html
+# Browser-Test
+git add . && git commit -m "feat(ui): Button-Text Investor angepasst" && git push origin staging
+
+# Prod
+ssh root@157.90.117.167
+cd /opt/dealpilot
+git fetch && git merge origin/staging --no-ff -m "Merge: Button-Text" && git push origin main
+docker compose -f docker-compose.prod.yml restart caddy
+```
+
+### Beispiel B: Backend-Endpoint anpassen (Typ 2)
+
+```bash
+# Staging
+ssh root@116.203.214.11
+cd /opt/dealpilot
+nano backend/src/services/planService.js
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+docker compose -f docker-compose.prod.yml logs -f backend
+# testen
+git add . && git commit -m "feat(plans): neues Feature X" && git push origin staging
+
+# Prod
+ssh root@157.90.117.167
+cd /opt/dealpilot
+docker compose -f docker-compose.prod.yml exec -T postgres pg_dump -U dealpilot dealpilot_db | gzip > /root/db-backup-$(date +%Y%m%d-%H%M%S).sql.gz
+git fetch && git merge origin/staging --no-ff -m "Merge: Plan-Feature X" && git push origin main
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+docker compose -f docker-compose.prod.yml logs --tail=20 backend
+```
+
+### Beispiel C: Stripe-Webhook-Secret rotieren (Typ 4)
+
+```bash
+# Auf Prod (oder Staging — beide haben eigene Secrets):
+cd /opt/dealpilot
+sed -i 's|^STRIPE_WEBHOOK_SECRET=.*|STRIPE_WEBHOOK_SECRET=whsec_NEW_KEY|' .env
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+docker compose -f docker-compose.prod.yml exec backend printenv | grep STRIPE_WEBHOOK_SECRET
+```
 
 ---
 
-## 9. Health-Checks
+## Hotfix-Workflow (Notfall direkt auf Prod)
 
-Backend stellt `/api/v1/health` bereit — stündlich pingen, Alarm bei 5xx.
+Wenn Prod brennt und Staging-Test zu lange dauert:
+
+```bash
+# Direkt auf Prod fixen
+ssh root@157.90.117.167
+cd /opt/dealpilot
+nano DATEI
+git add . && git commit -m "hotfix: WAS WAR DAS PROBLEM" && git push origin main
+
+# Container neu (je nach Typ)
+docker compose -f docker-compose.prod.yml build backend && \
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+
+# Danach Staging mit Prod syncen!
+ssh root@116.203.214.11
+cd /opt/dealpilot
+git fetch && git merge origin/main --no-ff -m "Sync: Hotfix vom Prod" && git push origin staging
+```
 
 ---
 
-## 10. Versionierung
+## Vor jedem Deploy auf Prod (Checkliste)
 
-Beim Update:
-1. DB-Backup
-2. `docker compose down`
-3. Code-Update (ZIP entpacken oder git pull)
-4. `.env` zurückkopieren / migrieren
-5. `docker compose up -d --build`
-6. Migrations laufen automatisch beim Backend-Start
+```bash
+# 1. DB-Backup
+docker compose -f docker-compose.prod.yml exec -T postgres pg_dump -U dealpilot dealpilot_db | \
+  gzip > /root/db-backup-$(date +%Y%m%d-%H%M%S).sql.gz
+
+# 2. Aktuellen Stand notieren (für Rollback)
+docker compose -f docker-compose.prod.yml ps
+git log --oneline -3
+```
+
+---
+
+## Rollback
+
+Wenn nach Deploy was kaputt ist:
+
+### Code rollbacken
+
+```bash
+# Letzten guten Commit finden
+git log --oneline -10
+
+# Code zurücksetzen
+git reset --hard LETZTER_GUTER_COMMIT_HASH
+
+# Backend: rebuilden mit altem Code
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+
+# Frontend: Caddy restart (volume-mount lädt automatisch)
+docker compose -f docker-compose.prod.yml restart caddy
+```
+
+### DB rollbacken
+
+```bash
+# Backup-Datei finden
+ls -lt /root/db-backup-*.sql.gz | head -5
+
+# Restore
+gunzip -c /root/db-backup-XXX.sql.gz | \
+  docker compose -f docker-compose.prod.yml exec -T postgres psql -U dealpilot -d dealpilot_db
+```
+
+---
+
+## Was du **NIE** tun solltest
+
+❌ Direkt auf Prod entwickeln ohne Staging-Test (außer echte Hotfixes)
+❌ `.env` ins Git committen (Secrets würden geleakt)
+❌ `git push --force` auf shared Branches (überschreibt History)
+❌ Migration auf Prod ohne DB-Backup
+❌ `docker volume rm` (DB-Daten sind drin!)
+❌ Cache-Bumps vergessen (Browser zeigt alte JS-Datei)
+
+---
+
+## Häufige Befehle Spickzettel
+
+```bash
+# Container-Status
+docker compose -f docker-compose.prod.yml ps
+
+# Logs ansehen
+docker compose -f docker-compose.prod.yml logs --tail=30 backend
+docker compose -f docker-compose.prod.yml logs -f backend  # live
+
+# Backend rebuild + restart
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+
+# DB-Konsole
+docker compose -f docker-compose.prod.yml exec postgres psql -U dealpilot dealpilot_db
+
+# Git-Status
+git status
+git log --oneline -5
+git branch --show-current
+```
+

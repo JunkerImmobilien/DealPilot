@@ -107,6 +107,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loggedIn && typeof renderSubscriptionBadge === 'function') {
       setTimeout(renderSubscriptionBadge, 300);
     }
+    // V185: Bei eingeloggtem User Sub + Feature-Gates beim Init laden (für F5/Reload)
+    if (loggedIn && typeof Sub !== 'undefined' && typeof Sub.getCurrent === 'function') {
+      setTimeout(function() {
+        Sub.getCurrent(true).catch(function(e) {
+          console.warn('[main V185] Sub-Init fehlgeschlagen:', e);
+        });
+      }, 100);
+    }
   }
 
   setDefaults();

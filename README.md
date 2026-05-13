@@ -1,114 +1,136 @@
-# DealPilot — Investmentanalyse für Profis
+# DealPilot — Operations & Architecture
 
-Web-App für Immobilien-Investmentanalyse: Cashflow, Steuer, DSCR, IRR, Investment-Case-PDF, KI-Analyse mit Web-Recherche, aktuelle Marktzinsen.
+**Stand: 13.05.2026** · Wartung: Marcel Junker · info@junker-immobilien.io
 
-## Was ist neu in V26
+## Was ist DealPilot?
 
-**1. KI-Analyse — Server-Key + User-Key Fallback:**
-- Server-Key aus `.env` (`OPENAI_API_KEY`) hat Priorität
-- User-Key aus Settings als Fallback (wird in localStorage gespeichert, vom Backend nicht geloggt)
-- Klare Fehlermeldungen mit Direkt-Link in die Settings ("→ Jetzt in Einstellungen hinterlegen")
-- Backend `GET /api/v1/ai/status` liefert jetzt `{available, server_key_configured, accepts_user_key}`
+SaaS-Web-App für Immobilien-Investmentanalyse. Vanilla JS Frontend + Node/Express Backend + PostgreSQL. Stripe im Test-Mode.
 
-**2. Sidebar mit Mockup-Cards:**
-- Sidebar 380px breit
-- Foto-Thumbnail mit Gold-Hauskreis
-- Objektnummer-Badge + Straße fett + Stadt + Datum
-- Kaufpreis groß in Gold (22px)
-- 3 Mini-Cards pro Objekt:
-  - DSCR mit Slider 0–2+ und Marker, farbcodiert (rot/gelb/grün)
-  - CF/M mit Sparkline-Trendkurve
-  - BMR mit Bar 0–10%, blau
-- Hover zeigt Action-Buttons (Kopieren/Löschen)
-- "+ Neues Objekt hinzufügen" als Dashed-Button am Ende der Liste
+## Hosts & URLs
 
-**3. Sidebar aufgeräumt:**
-- Free-Plan-Badge bleibt unten beim User
-- Import/Export aus Sidebar entfernt → in Settings → Tab "💾 Daten"
-- Bankexport + Track Record bleiben als Sidebar-Buttons
+| Was | URL | Server | Pfad |
+|---|---|---|---|
+| **Production** | https://dealpilot.junker-immobilien.io | `157.90.117.167` | `/opt/dealpilot` |
+| **Staging** | https://staging.dealpilot.junker-immobilien.io | `116.203.214.11` | `/opt/dealpilot` |
+| **Repo** | https://github.com/JunkerImmobilien/DealPilot | privat | — |
+| **Stripe** | https://dashboard.stripe.com/test/ | Sandbox | — |
 
-**4. Settings ohne Datenverlust:**
-- Modul-globaler Draft-State (`window._SetDraft`)
-- Eingaben überleben Tab-Wechsel und Logo-Upload
-- "● ungespeicherte Änderungen"-Hinweis im Footer
-- Abbrechen-Bestätigung wenn Dirty
-- Logo-Upload und Plan-Wechsel bewahren andere Tab-Eingaben
-- Save liest aus Draft, nicht direkt vom DOM
+## Stack
 
-**5. Steuer-Detail Werbungskosten:**
-- Tooltip am Label erklärt: NK ist Werbungskosten UND Einnahme (durchlaufender Posten, neutralisiert sich)
+- **Frontend:** Vanilla JS, von Caddy als statische Files serviert. Volume-mounted → sofort live nach `git pull`
+- **Backend:** Node 20 + Express. Code im Docker-Image gebacken → braucht `docker compose build backend` bei Änderung
+- **DB:** PostgreSQL 16
+- **Reverse Proxy:** Caddy 2-alpine, Let's Encrypt
+- **Container:** `dealpilot-backend` · `dealpilot-caddy` · `dealpilot-postgres`
 
-**6. "Alle Objekte" als Hauptview:**
-- Toggle im Header: "📋 Einzelobjekt / 📂 Alle Objekte"
-- Sortier- und filterbare Tabelle (Kürzel, Adresse, KP, GI, BMR, DSCR, LTV)
-- Live-Suche
-- "Laden →" springt zurück zur Einzelansicht
-- Sidebar-Button für Alle Objekte ist weg (wäre redundant)
+Compose-Project-Name in `.env`:
+- Prod: `COMPOSE_PROJECT_NAME=dealpilot-v124`
+- Staging: `COMPOSE_PROJECT_NAME=dealpilot-staging`
 
-**7. Marktzinsen verbessert:**
-- Korrekte BBIM1-Series-Keys von der Bundesbank-API (war seit V25.1)
-- Loading-State (`···`-Animation während des Ladens)
-- Fehler-Anzeige wenn API komplett ausfällt
-- Vergleichslinks zu Interhyp / Dr. Klein / Baufi24 / Bundesbank-Statistik direkt
+## Git-Branches
 
-**8. GitHub-Workflow (Variante A):**
-- `.gitignore` mitgeliefert
-- `.env.production.example` enthält PGSSLMODE-Hinweis
-- `GITHUB_WORKFLOW.md` mit Schritt-für-Schritt-Anleitung
-- Update-Routine: `git push` lokal → `git pull && docker compose up -d --build` auf dem Server
+- `main` — Production
+- `staging` — Entwicklung/Test
 
-## Architektur
+## Standard-Deploy
 
-```
-dealpilot/
-├── frontend/
-│   ├── index.html              ← V26: View-Switcher Header, All-Objects-Container
-│   ├── css/style.css           ← V26: Sidebar 380px, Mockup-Cards CSS
-│   └── js/
-│       ├── config.js           ← Pricing-Config
-│       ├── settings.js         ← V26: Draft-State + Daten-Tab
-│       ├── ui.js               ← V26: setMainView, _buildAIPayload, _formatAIError
-│       ├── storage.js          ← V26: Mockup-Cards (Foto + Mini-Cards)
-│       ├── all-objects.js      ← V26: Inline-View statt Modal
-│       ├── market-rates.js     ← V25.1: BBIM1-Series, V26: Loading-State
-│       └── …
-├── backend/
-│   ├── src/
-│   │   ├── routes/
-│   │   │   ├── ai.js           ← V26: User-Key Fallback aus Body
-│   │   │   ├── marketRates.js
-│   │   │   └── …
-│   │   ├── services/
-│   │   │   ├── marketRatesService.js  ← V25.1: BBIM1-Keys
-│   │   │   ├── openaiService.js       ← V26: User-Key + 401-Handling
-│   │   │   └── …
-│   │   └── db/
-│   │       ├── pool.js         ← V25.1: PGSSLMODE-gesteuert
-│   │       └── seed-demo.js
-│   └── migrations/
-├── docker-compose.prod.yml
-├── Caddyfile
-├── deploy.sh
-├── upgrade.sh
-├── backup.sh
-├── .gitignore                  ← V26: NEU
-├── .env.production.example     ← V25.1: PGSSLMODE-Hinweis
-├── GITHUB_WORKFLOW.md          ← V26: Variante A
-├── HETZNER_SETUP.md
-└── UPDATE_HETZNER_V25_TO_V26.md
+```bash
+# Frontend-Änderung
+git pull
+# sofort live (volume-mount)
+
+# Backend-Änderung
+git pull
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+
+# Migrations
+git pull
+docker compose -f docker-compose.prod.yml restart backend
+
+# .env-Änderung
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
 ```
 
-## Pricing-Pläne (Default)
+## Stripe (Test-Mode aktiv)
 
-| Plan       | Monatlich | Jährlich  | Objekte | KI/Monat | Watermark |
-|------------|-----------|-----------|---------|----------|-----------|
-| Free       | 0 €       | 0 €       | 1       | 2        | ja        |
-| Investor   | 19 €      | 190 €     | 10      | 10       | nein      |
-| Pro        | 29 €      | 290 €     | ∞       | 20       | nein      |
-| Business   | 59 €      | 590 €     | ∞       | ∞        | nein      |
+**Test-Karte:** `4242 4242 4242 4242`, 12/30, 123, 32609
 
-Konfig in `frontend/js/config.js` (`DealPilotConfig.pricing`). Backend-Sync via Migration 008.
+**Keys in `.env`:** `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
 
----
+**Webhook-Pfad:** `POST /api/v1/webhooks/stripe`
 
-V26 · Stand 29.04.2026
+### Stripe-Produkte (Test-Mode, in DB-Tabelle `plans`)
+
+| Plan | Product-ID | Monthly | Yearly |
+|---|---|---|---|
+| Starter | `prod_UVZEGHdNAurZqc` | `price_1TWYAsKEjyPDo0woEGBhBfKR` | `price_1TWY5lKEjyPDo0woGmRmfCIj` |
+| Investor | `prod_UVZG7q4Hcnb81e` | `price_1TWYAdKEjyPDo0wod4nboi5k` | `price_1TWY7WKEjyPDo0wowRN0yUbD` |
+| Pro | `prod_UVZG7e1bPNMBgm` | `price_1TWYAIKEjyPDo0woadC7NZOe` | `price_1TWY8JKEjyPDo0woUJZjYdwk` |
+
+### Frontend-Module
+- `subscription.js` — `Sub`-Modul (startCheckout, openPortal)
+- `pricing-modal.js` — F/S/I/P Stepper
+- `settings.js` — Plan-Tab
+- `stripe-success.js` (V183) — Auto-Refresh nach Stripe-Redirect
+
+### Backend
+- `routes/subscription.js` — POST /checkout, /portal
+- `routes/stripeWebhook.js` — Webhook-Handler mit V184 Race-Schutz
+- `services/stripeService.js` — Stripe-API-Calls
+
+### V184 Race-Condition-Fix
+Stripe schickt `created` (incomplete) + `updated` (active) parallel. Falls `created` zuletzt ankommt würde es Status zurückwerfen → User wird Free. Fix: skip wenn DB schon active.
+
+### V183 Auto-Refresh
+Erkennt Stripe-Return über `?subscription=success` ODER `/subscription/success` ODER referrer = stripe.com. Macht `Sub.invalidateCache()` + Toast.
+
+## DB-Wartung
+
+```bash
+# Backup
+docker compose -f docker-compose.prod.yml exec -T postgres pg_dump -U dealpilot dealpilot_db | gzip > /root/db-backup-$(date +%Y%m%d-%H%M%S).sql.gz
+
+# Restore
+gunzip -c BACKUP.sql.gz | docker compose -f docker-compose.prod.yml exec -T postgres psql -U dealpilot -d dealpilot_db
+```
+
+### Häufige Queries
+
+```sql
+-- User-Plan
+SELECT u.email, s.plan_id, s.status, s.billing_interval
+FROM users u JOIN subscriptions s ON s.user_id=u.id WHERE u.email='...';
+
+-- Webhook-Events
+SELECT type, processed_at IS NOT NULL AS ok, received_at
+FROM stripe_webhook_events ORDER BY received_at DESC LIMIT 20;
+
+-- Test-User reset auf Free
+UPDATE subscriptions SET plan_id='free', status='active', stripe_subscription_id=NULL
+WHERE user_id=(SELECT id FROM users WHERE email='...');
+```
+
+## Cache-Bumps Frontend
+
+```bash
+sed -i 's|FILE\.js?v=[0-9]\+|FILE.js?v=NEUE_NR|g' frontend/index.html
+```
+
+## Offene Themen
+
+- Stripe Live-Mode (Account-Verifikation, Live-Produkte, AGB)
+- Customer-Portal-Test (`Sub.openPortal()`)
+- Plan-Upgrade Starter→Pro mit Proration
+- Webhook-Idempotenz-Test
+
+## Lessons Learned 13.05.2026
+
+1. Backend-Code im Docker-Image → `build` nötig, nicht nur `restart`
+2. Frontend volume-mounted → sofort live
+3. Stripe-Webhooks parallel → Race-Schutz V184
+4. `.env`-Änderung braucht `up -d --force-recreate`
+5. `COMPOSE_PROJECT_NAME` über ENV → kein Git-Drift
+6. Webhook-Secrets pro Endpunkt unterschiedlich
+7. Browser-Cache: Strg+Shift+R oder Inkognito beim Testen
+
