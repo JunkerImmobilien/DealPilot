@@ -238,6 +238,27 @@ var Sub = (function() {
       if (_cache && _cache.plan_id) return _cache.plan_id;
       return null;
     },
+    /**
+     * V186: Synchroner Lookup auf cached Backend-Features.
+     */
+    getCachedFeatures: function() {
+      if (_cache && _cache.plan_features) return _cache.plan_features;
+      return null;
+    },
+    hasCachedFeature: function(featureKey) {
+      if (!_cache || !_cache.plan_features) return null;
+      var v = _cache.plan_features[featureKey];
+      if (v === true) return true;
+      if (typeof v === 'string' && v.length > 0) return true;
+      return false;
+    },
+    getCachedFeatureMode: function(featureKey) {
+      if (!_cache || !_cache.plan_features) return null;
+      var v = _cache.plan_features[featureKey];
+      if (typeof v === 'string') return v;
+      if (v === true) return 'full';
+      return null;
+    },
     clearCache: clearCache,
     invalidateCache: invalidateCache,
     listPlans: listPlans,
@@ -825,7 +846,7 @@ async function applyFeatureGates() {
     '· TrackRecord:', has('track_record_pdf'),
     '· BMF:', has('bmf_calc_export'),
     '· KI-Markt:', has('ai_market_analysis'),
-    '· Bauspar:', has('bauspar'));
+    '· Bauspar:', has('custom_finance_models'));
 }
 
 window.applyFeatureGates = applyFeatureGates;
