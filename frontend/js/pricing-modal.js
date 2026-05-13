@@ -524,12 +524,12 @@
   function _onPlanSelect(planKey, period) {
     if (!window.DealPilotConfig || !DealPilotConfig.pricing) return;
 
-    // Stripe-Mode (Live): Checkout-Session erstellen
-    if (DealPilotConfig.pricing.payment && DealPilotConfig.pricing.payment().stripe_enabled) {
-      _startStripeCheckout(planKey, period);
-      return;
-    }
+    // V181: Stripe-Checkout ist jetzt der einzige Flow (kein Demo-Switch mehr).
+    _startStripeCheckout(planKey, period);
+    return;
 
+    // ──────────────────────────────────────────────────────────────────
+    // Folgender Code ist V181 deaktiviert — nur als Fallback aufgehoben:
     // Dev-Mode: Plan-Override setzen
     DealPilotConfig.pricing.setOverride(planKey);
     if (typeof toast === 'function') {
@@ -558,14 +558,28 @@
    * Stripe-Checkout starten (Stub für später).
    */
   async function _startStripeCheckout(planKey, period) {
-    // TODO: Implement when Stripe is enabled
-    // var resp = await Auth.apiCall('/stripe/create-checkout-session', {
-    //   method: 'POST',
-    //   body: JSON.stringify({ plan: planKey, period: period })
-    // });
-    // window.location = resp.url;
-    if (typeof toast === 'function') {
-      toast('⏳ Stripe-Checkout noch nicht aktiv — wird beim Live-Launch verfügbar.');
+    // V181: Stripe-Checkout aktiviert.
+    console.log('[pricing-modal stripe-checkout] starting:', planKey, period);
+
+    if (typeof Sub === 'undefined' || typeof Sub.startCheckout !== 'function') {
+      console.error('[pricing-modal] Sub-Modul nicht geladen');
+      if (typeof toast === 'function') toast('❌ Stripe-Modul nicht geladen — Seite neu laden');
+      return;
+    }
+
+    // billingInterval: pricing-modal nutzt 'monthly'/'yearly', Sub erwartet auch das
+    var interval = (period === 'yearly') ? 'yearly' : 'monthly';
+
+    try {
+      await Sub.startCheckout(planKey, interval);
+      // Erfolg: Browser redirected zu Stripe — falls hier ankommen, ist was schiefgelaufen
+    } catch (e) {
+      console.error('[pricing-modal stripe-checkout] error:', e);
+      var msg = (e && e.message) ? e.message : 'Stripe-Checkout fehlgeschlagen';
+      if (msg.indexOf('not yet available') >= 0 || msg.indexOf('503') >= 0) {
+        msg = 'Dieser Plan kann aktuell nicht online abonniert werden. Bitte info@junker-immobilien.io kontaktieren.';
+      }
+      if (typeof toast === 'function') toast('❌ ' + msg);
     }
   }
 

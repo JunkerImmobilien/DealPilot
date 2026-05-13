@@ -1345,13 +1345,15 @@ function _renderPlanPane() {
     });
     html += '</ul>';
 
-    if (allowSwitch) {
-      html += '<button class="btn ' + (isCurrent ? 'btn-outline' : 'btn-gold') + ' btn-sm" ' +
-              'onclick="_switchPlan(\'' + key + '\')" ' + (isCurrent ? 'disabled' : '') + '>' +
-              (isCurrent ? '✓ Aktiv' : (price === 0 ? 'Aktivieren' : 'Wechseln')) + '</button>';
+    // V180: Stripe-Checkout aktiviert für ALLE (kein allowSwitch-Demo-Switch mehr).
+    // Free bleibt deaktiviert (Downgrade läuft separat per Mail).
+    if (isCurrent) {
+      html += '<button class="btn btn-outline btn-sm" disabled>✓ Aktueller Plan</button>';
+    } else if (key === 'free') {
+      html += '<button class="btn btn-outline btn-sm" disabled title="Downgrade per Mail: info@junker-immobilien.io">Downgrade auf Anfrage</button>';
     } else {
-      html += '<button class="btn btn-outline btn-sm" disabled>' +
-              (isCurrent ? '✓ Aktueller Plan' : 'Im Live-Mode via Stripe') + '</button>';
+      html += '<button class="btn btn-gold btn-sm" onclick="_startStripeCheckout(\'' + key + '\')">' +
+              (billingCycle === 'yearly' ? 'Jährlich abonnieren' : 'Monatlich abonnieren') + '</button>';
     }
     html += '</div>';
   });
@@ -1370,18 +1372,13 @@ function _renderPlanPane() {
         '<div class="plan-credit-label">Credits</div>' +
         '<div class="plan-credit-price">' + pack.price_eur + ' €</div>' +
         '<div class="plan-credit-sub">≈ ' + pack.per_credit.toFixed(2).replace('.', ',') + ' € / Credit</div>' +
-        (allowSwitch
-          ? '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + pack.key + '\')">Dazubuchen</button>'
-          : '<button class="btn btn-outline btn-sm" disabled>Im Live-Mode aktiv</button>') +
+        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + pack.key + '\')">Dazubuchen</button>' +
       '</div>';
     });
     html += '</div></div>';
   }
 
-  if (allowSwitch) {
-    html += '<p class="hint" style="margin-top:14px"><strong>Hinweis:</strong> Plan-Switcher nur im Entwicklungsmodus aktiv. ' +
-            'In Produktion erfolgt der Wechsel via Stripe-Checkout.</p>';
-  }
+  // V180: Stripe-Hinweis entfernt — Stripe ist jetzt der einzige Flow.
   return html;
 }
 
@@ -1403,6 +1400,42 @@ function _buyCreditPack(packKey) {
     toast('💳 Credit-Pack "' + pack.label + '" — ' + pack.price_eur + ' € (Stripe-Checkout im Live-Mode)');
   }
 }
+
+// V179: Stripe-Checkout-Wrapper. Liest aktuellen billingCycle aus window-Variable.
+async function _startStripeCheckout(planKey) {
+  var cycle = window._planBillingCycle || 'monthly';
+  console.log('[stripe-checkout] starting:', planKey, cycle);
+
+  if (typeof Sub === 'undefined' || typeof Sub.startCheckout !== 'function') {
+    if (typeof toast === 'function') toast('❌ Stripe-Modul nicht geladen');
+    return;
+  }
+
+  // Button im DOM während Request deaktivieren
+  var btn = event && event.target;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Wird geladen…';
+  }
+
+  try {
+    await Sub.startCheckout(planKey, cycle);
+    // Erfolg: Browser redirected zu Stripe — falls wir hier ankommen, ist was schiefgelaufen
+  } catch (e) {
+    console.error('[stripe-checkout] error:', e);
+    var msg = e && e.message ? e.message : 'Stripe-Checkout fehlgeschlagen';
+    if (msg.indexOf('not yet available') >= 0 || msg.indexOf('503') >= 0) {
+      msg = 'Dieser Plan kann aktuell nicht online abonniert werden. Bitte info@junker-immobilien.io kontaktieren.';
+    }
+    if (typeof toast === 'function') toast('❌ ' + msg);
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = (cycle === 'yearly' ? 'Jährlich abonnieren' : 'Monatlich abonnieren');
+    }
+  }
+}
+window._startStripeCheckout = _startStripeCheckout;
+
 window._buyCreditPack = _buyCreditPack;
 
 function _switchPlan(key) {
