@@ -293,3 +293,119 @@ function onLoginSuccess(session) {
     }
   }, 800);
 }
+
+// ═══════════════════════════════════════════════════════════════
+// V187: Umlagefähige Kosten — bidirektionaler Sync zwischen
+// Tab Miete (#umlagef, monatlich) und Tab Bewirtschaftung
+// (#hg_ul + #grundsteuer + #ul_sonst + #kp1..4, jährlich)
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  'use strict';
+
+  var _syncInProgress = false;  // Anti-Loop-Flag
+
+  // Bewirtschaftungs-Felder die zur Summe beitragen
+  var BWK_UL_FIELDS = ['hg_ul', 'grundsteuer', 'ul_sonst', 'kp1', 'kp2', 'kp3', 'kp4'];
+
+  function _parseDe(s) {
+    if (s == null) return 0;
+    s = String(s).replace(/\./g, '').replace(',', '.').replace(/[^\d.\-]/g, '');
+    return parseFloat(s) || 0;
+  }
+
+  function _getEl(id) { return document.getElementById(id); }
+
+  function _bwkSum() {
+    var sum = 0;
+    BWK_UL_FIELDS.forEach(function(id) {
+      var el = _getEl(id);
+      if (el) sum += _parseDe(el.value);
+    });
+    return sum;
+  }
+
+  // Trigger: Miete → Bewirtschaftung
+  // User ändert #umlagef (€/Monat) → schreibe (umlagef × 12) in #hg_ul
+  // Setze andere UL-Felder NICHT zurück (User-Werte respektieren)
+  // Wenn andere UL-Felder schon Werte haben: nur Differenz in hg_ul
+  function _syncMieteToBwk() {
+    if (_syncInProgress) return;
+    _syncInProgress = true;
+    try {
+      var ufEl = _getEl('umlagef');
+      if (!ufEl) return;
+      var ufMonthly = _parseDe(ufEl.value);
+      var ulYear = ufMonthly * 12;
+
+      // Strategie: Wenn Bewirtschaftung leer ist (alle UL=0):
+      //   Setze hg_ul = ulYear (User hat Miete-Wert eingegeben, Bewirt. ist neu)
+      // Wenn Bewirtschaftung schon ausgefüllt:
+      //   Anpassen so dass Summe = ulYear (skaliere hg_ul = ulYear - (sonstige))
+      var hgUlEl = _getEl('hg_ul');
+      if (!hgUlEl) return;
+
+      var sonstige = 0;
+      ['grundsteuer', 'ul_sonst', 'kp1', 'kp2', 'kp3', 'kp4'].forEach(function(id) {
+        var el = _getEl(id);
+        if (el) sonstige += _parseDe(el.value);
+      });
+
+      var newHgUl = Math.max(0, ulYear - sonstige);
+      hgUlEl.value = Math.round(newHgUl);
+    } finally {
+      _syncInProgress = false;
+    }
+  }
+
+  // Trigger: Bewirtschaftung → Miete
+  // User ändert eines der UL-Felder → Summe / 12 in #umlagef
+  function _syncBwkToMiete() {
+    if (_syncInProgress) return;
+    _syncInProgress = true;
+    try {
+      var ufEl = _getEl('umlagef');
+      if (!ufEl) return;
+      var sum = _bwkSum();
+      var monthly = sum / 12;
+      ufEl.value = monthly > 0 ? monthly.toFixed(2).replace('.', ',') : '';
+    } finally {
+      _syncInProgress = false;
+    }
+  }
+
+  function _attachListeners() {
+    var ufEl = _getEl('umlagef');
+    if (ufEl) {
+      ufEl.addEventListener('input', _syncMieteToBwk);
+    }
+    BWK_UL_FIELDS.forEach(function(id) {
+      var el = _getEl(id);
+      if (el) {
+        el.addEventListener('input', _syncBwkToMiete);
+      }
+    });
+    console.log('[umlagef-sync V187] Listeners attached: umlagef + ' + BWK_UL_FIELDS.length + ' BWK-Felder');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _attachListeners);
+  } else {
+    setTimeout(_attachListeners, 100);
+  }
+
+  // Public API für QuickCheck-Übernahme
+  window.DealPilotUmlagefSync = {
+    fromYearly: function(ulYear) {
+      _syncInProgress = true;
+      try {
+        var ufEl = _getEl('umlagef');
+        if (ufEl) ufEl.value = (ulYear / 12).toFixed(2).replace('.', ',');
+        var hgUl = _getEl('hg_ul');
+        if (hgUl) hgUl.value = Math.round(ulYear);
+      } finally {
+        _syncInProgress = false;
+      }
+    },
+    refresh: _syncBwkToMiete
+  };
+})();

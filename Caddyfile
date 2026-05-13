@@ -19,6 +19,9 @@
 
     # API → Backend
     handle /api/* {
+        request_body {
+            max_size 50MB
+        }
         reverse_proxy backend:3001 {
             header_up X-Forwarded-Proto https
             header_up X-Forwarded-Host {host}
