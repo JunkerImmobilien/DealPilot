@@ -1,4 +1,4 @@
-name: dealpilot-v124
+name: ${COMPOSE_PROJECT_NAME:-dealpilot}
 # ════════════════════════════════════════════════════
 # DealPilot — Production Compose für Hetzner
 # ════════════════════════════════════════════════════
