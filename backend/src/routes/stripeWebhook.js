@@ -130,6 +130,22 @@ async function handleEvent(event) {
         return;
       }
 
+      // V184: Race-Condition-Schutz. Stripe sendet 'created' (incomplete) und
+      // 'updated' (active) parallel — manchmal kommt 'created' zuletzt an und
+      // wuerde 'active' auf 'incomplete' zurueckwerfen. Skip dann das Downgrade.
+      const existing = await query(
+        'SELECT status FROM subscriptions WHERE stripe_subscription_id = $1',
+        [sub.id]
+      );
+      const dbStatus = existing.rows[0]?.status;
+      const incomingStatus = sub.status;
+      const isDowngrade = (dbStatus === 'active' || dbStatus === 'trialing')
+                       && (incomingStatus === 'incomplete' || incomingStatus === 'incomplete_expired');
+      if (isDowngrade) {
+        console.log(`✓ Subscription ${event.type} SKIPPED (race-protection): DB=${dbStatus}, incoming=${incomingStatus}`);
+        break;
+      }
+
       await subscriptionService.upsertFromStripe({
         userId,
         stripeSubscription: sub,
