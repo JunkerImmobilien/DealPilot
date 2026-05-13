@@ -1,0 +1,111 @@
+name: dealpilot-v124
+# ════════════════════════════════════════════════════
+# DealPilot — Production Compose für Hetzner
+# ════════════════════════════════════════════════════
+# Setup: kopiere .env.example → .env, fülle DOMAIN + Secrets, dann:
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Caddy übernimmt: TLS automatisch (Let's Encrypt), Reverse-Proxy,
+# Frontend-Static-Files. Backend läuft intern auf 3001, ist von außen
+# nur über /api/* erreichbar.
+
+services:
+
+  # ── Postgres (intern, kein Port nach außen) ──
+  postgres:
+    image: postgres:16-alpine
+    container_name: dealpilot-postgres
+    environment:
+      POSTGRES_DB: dealpilot_db
+      POSTGRES_USER: dealpilot
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD muss in .env gesetzt sein}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dealpilot -d dealpilot_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - dealpilot-net
+
+  # ── Backend (intern, nur via Caddy erreichbar) ──
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dealpilot-backend
+    # V43: env_file ist PERMANENT — Lehre aus V42-Debug
+    # Ohne diese Zeile sieht der Container keine BETA_*-Variablen.
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://dealpilot:${DB_PASSWORD}@postgres:5432/dealpilot_db
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET muss in .env gesetzt sein}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-11}
+      CORS_ORIGINS: https://${DOMAIN}
+      FRONTEND_BASE_URL: https://${DOMAIN}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
+      RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-200}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@dealpilot.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_NAME: ${ADMIN_NAME:-Administrator}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_DEFAULT_MODEL: ${OPENAI_DEFAULT_MODEL:-gpt-4o-mini}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-0}
+    volumes:
+      - backend_uploads:/app/uploads
+    # Erst Migrations, optional Demo-Seed, dann Server starten
+    command: sh -c "node src/db/migrate.js && (test \"$$SEED_DEMO_DATA\" = \"1\" && node src/db/seed-demo.js || true) && node src/index.js"
+    restart: unless-stopped
+    networks:
+      - dealpilot-net
+
+  # ── Caddy (Reverse-Proxy + TLS + Static Frontend) ──
+  caddy:
+    image: caddy:2-alpine
+    container_name: dealpilot-caddy
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./frontend:/srv/frontend:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN muss in .env gesetzt sein}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL muss in .env gesetzt sein (für Let's Encrypt)}
+    restart: unless-stopped
+    networks:
+      - dealpilot-net
+
+volumes:
+  postgres_data:
+    name: dealpilot_postgres_data
+    external: true
+  backend_uploads:
+    name: dealpilot_backend_uploads
+    external: true
+  caddy_data:
+    name: dealpilot_caddy_data
+    external: true
+  caddy_config:
+    name: dealpilot_caddy_config
+    external: true
+
+networks:
+  dealpilot-net:
+    name: dealpilot-net
+    external: true

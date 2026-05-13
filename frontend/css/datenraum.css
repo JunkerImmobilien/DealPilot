@@ -1,0 +1,768 @@
+/* ═══════════════════════════════════════════════════════════════════
+   DealPilot V140 — Datenraum-Modul Styles
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Settings-Tab ───────────────────────────────────────────── */
+.dr-settings { max-width: 100%; }
+.dr-intro {
+  background: var(--surface, #F8F6F1);
+  border-left: 4px solid var(--gold, #C9A84C);
+  padding: 14px 18px;
+  border-radius: 4px;
+  margin-bottom: 18px;
+}
+.dr-privacy {
+  background: rgba(63, 165, 108, 0.08);
+  border: 1px solid rgba(63, 165, 108, 0.3);
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text, #2A2727);
+}
+.dr-privacy strong { color: #2A9A5A; }
+
+/* Slot-Card */
+.dr-slot {
+  background: #fff;
+  border: 1px solid var(--border, #DCD7C8);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  transition: border-color .15s ease;
+}
+.dr-slot.dr-slot-active {
+  border-color: var(--gold, #C9A84C);
+  background: var(--gold-bg, #FAF6E8);
+}
+.dr-slot-head {
+  margin-bottom: 10px;
+}
+.dr-slot-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.dr-slot-icon { font-size: 18px; }
+.dr-slot-status {
+  margin-left: auto;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+.dr-slot-status-active {
+  background: rgba(63, 165, 108, 0.15);
+  color: #2A9A5A;
+}
+.dr-slot-status-empty {
+  background: rgba(184, 98, 92, 0.1);
+  color: #8c4843;
+}
+.dr-slot-hint {
+  font-size: 12px;
+  color: var(--muted, #7A7370);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+.dr-slot-body { }
+.dr-slot-link-row {
+  font-size: 12px;
+  color: var(--ch, #2A2727);
+  margin-bottom: 4px;
+}
+.dr-provider-label {
+  font-weight: 600;
+}
+.dr-link-label {
+  color: var(--muted, #7A7370);
+}
+.dr-slot-url {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 11px;
+  color: var(--muted, #7A7370);
+  background: rgba(0, 0, 0, 0.03);
+  padding: 6px 10px;
+  border-radius: 4px;
+  word-break: break-all;
+  margin-bottom: 10px;
+  max-height: 60px;
+  overflow-y: auto;
+}
+.dr-slot-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.dr-slot-empty {
+  padding: 8px 0;
+}
+
+/* Buttons */
+.dr-btn {
+  font-family: inherit;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid var(--border, #DCD7C8);
+  background: #fff;
+  color: var(--text, #2A2727);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.dr-btn:hover { border-color: var(--gold, #C9A84C); }
+.dr-btn-primary,
+button.dr-btn-primary,
+.dr-btn.dr-btn-primary {
+  background: var(--gold, #C9A84C) !important;
+  color: #fff !important;
+  border-color: var(--gold, #C9A84C) !important;
+  font-weight: 700;
+}
+.dr-btn-primary:hover,
+button.dr-btn-primary:hover {
+  background: #b59238 !important;
+  border-color: #b59238 !important;
+  color: #fff !important;
+}
+.dr-btn-outline {
+  background: transparent;
+}
+.dr-btn-danger {
+  color: #B8625C;
+  border-color: rgba(184, 98, 92, 0.3);
+}
+.dr-btn-danger:hover {
+  background: rgba(184, 98, 92, 0.08);
+  border-color: #B8625C;
+}
+
+/* How-to-Sektion */
+.dr-howto {
+  background: var(--surface, #F8F6F1);
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin-top: 18px;
+}
+
+/* ── Edit-Modal ───────────────────────────────────────────── */
+.dr-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dr-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+.dr-modal-panel {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px 28px;
+  max-width: 540px;
+  width: calc(100% - 40px);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+.dr-input-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--gold, #C9A84C);
+  margin-bottom: 6px;
+}
+.dr-input {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  border: 1px solid var(--border, #DCD7C8);
+  border-radius: 4px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.dr-input:focus {
+  outline: none;
+  border-color: var(--gold, #C9A84C);
+}
+.dr-input-hint {
+  font-size: 11.5px;
+  color: var(--muted, #7A7370);
+  margin-top: 4px;
+}
+.dr-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border, #DCD7C8);
+}
+
+/* ── Deal-Aktion-Panel ───────────────────────────────────────── */
+.dr-da-panel {
+  background: var(--surface, #F8F6F1);
+  border: 1px solid var(--border, #DCD7C8);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 12px 0;
+}
+.dr-da-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+.dr-da-provider {
+  font-size: 12px;
+  color: var(--muted, #7A7370);
+}
+.dr-da-empty {
+  color: #8c4843;
+  font-size: 12px;
+  font-style: italic;
+}
+.dr-mini-btn {
+  font-family: inherit;
+  font-size: 11.5px;
+  padding: 4px 10px;
+  background: #fff;
+  border: 1px solid var(--border, #DCD7C8);
+  color: var(--text, #2A2727);
+  border-radius: 3px;
+  cursor: pointer;
+  margin-left: auto;
+}
+.dr-mini-btn:hover { border-color: var(--gold, #C9A84C); }
+.dr-mini-btn-primary {
+  background: var(--gold, #C9A84C);
+  color: #fff;
+  border-color: var(--gold, #C9A84C);
+}
+.dr-da-progress {
+  margin-bottom: 10px;
+}
+.dr-da-progress-label {
+  font-size: 11px;
+  color: var(--muted, #7A7370);
+  margin-top: 4px;
+}
+.dr-da-doclist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dr-da-doc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12.5px;
+  transition: all .15s ease;
+}
+.dr-da-doc:hover {
+  border-color: var(--gold, #C9A84C);
+}
+.dr-da-doc.dr-da-doc-checked {
+  background: rgba(63, 165, 108, 0.05);
+  border-color: rgba(63, 165, 108, 0.3);
+}
+.dr-da-doc input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold, #C9A84C);
+  flex-shrink: 0;
+}
+.dr-da-complete {
+  margin-top: 10px;
+  background: rgba(63, 165, 108, 0.1);
+  color: #2A9A5A;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dr-da-warn {
+  margin-top: 10px;
+  background: rgba(201, 168, 76, 0.1);
+  color: #8c6e2c;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  border-left: 3px solid var(--gold, #C9A84C);
+}
+
+/* ── Quick-Access-Bar in Deal-Aktion ────────────────────────── */
+.da-dr-quick {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--surface, #F8F6F1);
+  border: 1px solid var(--border, #DCD7C8);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin: 12px 0 16px 0;
+}
+.da-dr-quick-empty {
+  border-style: dashed;
+  background: transparent;
+  align-items: stretch;
+}
+.da-dr-quick-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  flex: 1;
+  min-width: 0;
+}
+.da-dr-quick-text strong { color: var(--ch, #2A2727); }
+.da-dr-quick-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--gold, #C9A84C);
+  margin-right: 4px;
+}
+.da-dr-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  background: #fff;
+  border: 1px solid var(--border, #DCD7C8);
+  border-radius: 99px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text, #2A2727);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.da-dr-chip:hover {
+  border-color: var(--gold, #C9A84C);
+  background: var(--gold-bg, #FAF6E8);
+}
+.da-dr-chip-icon {
+  width: 18px;
+  height: 18px;
+  background: var(--gold, #C9A84C);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.da-dr-quick-edit {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border, #DCD7C8);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--muted, #7A7370);
+  font-family: inherit;
+}
+.da-dr-quick-edit:hover {
+  border-color: var(--gold, #C9A84C);
+  color: var(--gold, #C9A84C);
+}
+
+/* ═══ V141 — Pro-Objekt-Architektur ═══════════════════════════ */
+
+/* Sections */
+.dr-section {
+  margin-bottom: 28px;
+}
+.dr-section-h {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ch, #2A2727);
+  margin: 0 0 6px 0;
+  border-bottom: 2px solid var(--gold, #C9A84C);
+  padding-bottom: 6px;
+  display: inline-block;
+}
+.dr-section-desc {
+  font-size: 13px;
+  color: var(--muted, #7A7370);
+  margin: 0 0 14px 0;
+  line-height: 1.5;
+}
+
+/* Objekt-Selector */
+.dr-obj-selector {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dr-empty-state {
+  background: var(--surface, #F8F6F1);
+  padding: 18px 22px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted, #7A7370);
+  font-style: italic;
+}
+
+/* Doc-Checkliste */
+.dr-doc-details {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+  padding: 10px 14px;
+}
+.dr-doc-details summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ch, #2A2727);
+  user-select: none;
+}
+.dr-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+.dr-doc-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid var(--border, #DCD7C8);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all .15s ease;
+}
+.dr-doc-item:hover { border-color: var(--gold, #C9A84C); }
+.dr-doc-item.dr-doc-item-checked {
+  background: rgba(63, 165, 108, 0.05);
+  border-color: rgba(63, 165, 108, 0.3);
+}
+.dr-doc-item input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--gold, #C9A84C);
+  flex-shrink: 0;
+}
+.dr-doc-label {
+  flex: 1;
+}
+.dr-doc-marker {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: rgba(201, 168, 76, 0.15);
+  color: #8c6e2c;
+  padding: 1px 5px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Deal-Aktion-Panel V141 — Blocks für Persönlich + Objekt */
+.dr-da-block {
+  background: #fff;
+  border: 1px solid var(--border, #DCD7C8);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+.dr-da-block-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+}
+.dr-da-block-title {
+  font-weight: 600;
+  color: var(--ch, #2A2727);
+}
+.dr-da-progress-mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--muted, #7A7370);
+}
+.dr-da-bar {
+  flex: 1;
+  height: 4px;
+  background: #eee;
+  border-radius: 2px;
+  overflow: hidden;
+  max-width: 200px;
+}
+.dr-da-bar > div {
+  height: 100%;
+  transition: width .3s ease;
+}
+.dr-da-missing-list {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #8c4843;
+  line-height: 1.5;
+}
+
+/* V179: Klickbare Pflicht-Doc-Checkliste im Bank/FB-Modal */
+.dr-da-checklist {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dr-da-checklist[data-disabled="1"] {
+  opacity: 0.55;
+}
+.dr-da-check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  font-size: 12px;
+  color: var(--ch, #2A2727);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.dr-da-check-item:hover {
+  background: rgba(201, 168, 76, 0.08);
+}
+.dr-da-check-item.is-checked .dr-da-check-lbl {
+  color: var(--green, #3FA56C);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(63, 165, 108, 0.5);
+}
+.dr-da-check-item.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.dr-da-check-item input[type="checkbox"] {
+  flex: 0 0 auto;
+  margin: 0;
+  accent-color: var(--green, #3FA56C);
+  cursor: inherit;
+}
+.dr-da-check-lbl {
+  flex: 1;
+  line-height: 1.4;
+}
+
+/* Empty-Chip */
+.da-dr-chip-empty {
+  background: rgba(201, 168, 76, 0.05);
+  border-style: dashed;
+  color: var(--gold, #C9A84C);
+}
+.da-dr-chip-empty .da-dr-chip-icon {
+  background: var(--gold, #C9A84C);
+}
+
+/* ============================================================
+   V188 — Deal-Action Workflow Polish
+   ============================================================ */
+
+/* Kompakter Datenraum-Status-Banner (oben in Doc-Step) */
+.da-dr-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.da-dr-banner-ic {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+.da-dr-banner-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.da-dr-banner-body strong {
+  font-weight: 600;
+  font-size: 13px;
+}
+.da-dr-banner-body span {
+  font-size: 11.5px;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+.da-dr-banner-link {
+  background: transparent;
+  border: 1px solid currentColor;
+  color: inherit;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.da-dr-banner-link:hover {
+  background: currentColor;
+}
+.da-dr-banner-link:hover {
+  color: #fff;
+}
+.da-dr-banner-ok {
+  background: var(--green-bg, #EAF7F0);
+  color: var(--green, #3FA56C);
+  border: 1px solid rgba(63, 165, 108, 0.25);
+}
+.da-dr-banner-ok .da-dr-banner-ic {
+  background: var(--green, #3FA56C);
+  color: #fff;
+}
+.da-dr-banner-warn {
+  background: var(--gold-dim, rgba(201,168,76,0.12));
+  color: #8e6e1f;
+  border: 1px solid var(--gold-dim2, rgba(201,168,76,0.22));
+}
+.da-dr-banner-warn .da-dr-banner-ic {
+  background: var(--gold, #C9A84C);
+  color: #fff;
+}
+
+/* Doc-Zeile: zwei Action-Buttons nebeneinander */
+.da-doc-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.da-doc-btn-link,
+.da-doc-btn-file {
+  font-size: 11.5px !important;
+  padding: 6px 11px !important;
+  min-width: 152px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.da-doc-btn-link:not(:disabled) {
+  border-color: var(--gold-dim2, rgba(201,168,76,0.3)) !important;
+}
+.da-doc-btn-link:not(:disabled):hover {
+  border-color: var(--gold, #C9A84C) !important;
+  color: var(--gold, #C9A84C) !important;
+  background: var(--gold-dim, rgba(201,168,76,0.08)) !important;
+}
+.da-doc-btn-link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.da-doc-btn-done {
+  background: var(--green-bg, #EAF7F0) !important;
+  border-color: rgba(63, 165, 108, 0.3) !important;
+  color: var(--green, #3FA56C) !important;
+}
+.da-doc-btn-done:hover {
+  background: rgba(63, 165, 108, 0.15) !important;
+}
+.da-doc-btn-done-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--green, #3FA56C);
+  background: var(--green-bg, #EAF7F0);
+  border: 1px solid rgba(63, 165, 108, 0.3);
+  border-radius: 6px;
+}
+.da-doc-reset {
+  background: transparent;
+  border: 1px solid var(--border, #E0DBD3);
+  color: var(--muted, #7A7370);
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.da-doc-reset:hover {
+  border-color: var(--red, #B8625C);
+  color: var(--red, #B8625C);
+}
+
+/* Done-Zeile: leicht grün eingefärbt */
+.da-doc.da-doc-done {
+  background: rgba(63, 165, 108, 0.04);
+  border-left: 3px solid var(--green, #3FA56C);
+}
+.da-doc.da-doc-done .da-doc-status {
+  color: var(--green, #3FA56C);
+}
+
+/* Privacy-Hint (Datenschutz-Box am Ende der Liste) */
+.da-privacy-hint {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--surface, #F8F6F1);
+  border: 1px solid var(--border, #E0DBD3);
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--muted, #7A7370);
+  line-height: 1.5;
+}
+.da-privacy-hint strong {
+  color: var(--ch, #2A2727);
+}
+
+/* Mobile responsive */
+@media (max-width: 760px) {
+  .da-doc-actions {
+    width: 100%;
+  }
+  .da-doc-btn-link,
+  .da-doc-btn-file {
+    flex: 1;
+    min-width: 0;
+  }
+}

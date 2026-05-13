@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+  <!-- ═══════════════════════════════════════════════════
+       BACKEND CONFIGURATION
+       Default: relative URL "/api/v1" — funktioniert wenn Backend
+       hinter demselben Reverse-Proxy (Caddy/Nginx) läuft wie das Frontend.
+       Production-Setup mit Hetzner+Caddy aus dem Repo: einfach so lassen.
+
+       Wenn du nur das Frontend lokal startest und KEIN Backend hast,
+       diesen Tag auskommentieren — dann läuft die App im localStorage-
+       only Mode (keine Auth, alles bleibt im Browser).
+
+       Wenn dein Backend auf einem anderen Host läuft:
+         <meta name="ji-api-base" content="http://localhost:3001/api/v1">
+         <meta name="ji-api-base" content="https://api.deinedomain.de/api/v1">
+  ═══════════════════════════════════════════════════ -->
+  <meta name="ji-api-base" content="/api/v1">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Dealpilot · Junker Immobilien</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=110">
+<link rel="stylesheet" href="css/portfolio-strategy.css?v=144">
+<link rel="stylesheet" href="css/pricing-modal.css?v=124">
+<!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
+<link rel="stylesheet" href="css/rnd-styles.css?v=150">
+<link rel="stylesheet" href="css/select-fix.css?v=150">
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     V64.0: SVG-Icon-Sprite (Pure-Obsidian)
+     28 Lucide-Style-Icons — referenziert via <use href="#i-name"/>
+     ════════════════════════════════════════════════════════════════════════ -->
+<svg width="0" height="0" style="position:absolute;visibility:hidden" aria-hidden="true">
+  <defs>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="i-portfolio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><path d="M2 13h20"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="i-hash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M10 22v-4h4v4"/></symbol>
+    <symbol id="i-door" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"/><polyline points="14 16 18 12 14 8"/><line x1="18" y1="12" x2="9" y2="12"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="M16.71 13.88l.7.71-2.82 2.82"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <!-- V114: Feedback-Modal-Icons (Glassmorphic Luxe) -->
+    <symbol id="i-bulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21h6"/><path d="M12 17v4"/><path d="M7.5 12.5A5.5 5.5 0 1 1 17 9c0 2-1 3.5-2.5 5h-5C8 12.5 7.5 11 7.5 9.5z"/></symbol>
+    <symbol id="i-life" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="14.83" y1="9.17" x2="18.36" y2="5.64"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <!-- V117: Sanierungs-Tile-Icons (professionell, Lucide-Style) -->
+    <symbol id="i-window" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="12" y1="3" x2="12" y2="21"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="i-droplet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+    <symbol id="i-bath" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-2.121 0L4 4"/><line x1="22" y1="12" x2="2" y2="12"/><path d="M6 12V5a2 2 0 0 1 2-2h3v3"/><line x1="6" y1="16" x2="6" y2="18"/><line x1="18" y1="16" x2="18" y2="18"/><path d="M2 12v4a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4v-4"/></symbol>
+    <symbol id="i-chef" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/></symbol>
+    <symbol id="i-hammer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"/></symbol>
+    <!-- V120: Hilfe-Topic-Icons (Lucide-Style) -->
+    <symbol id="i-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></symbol>
+    <symbol id="i-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></symbol>
+    <symbol id="i-question" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="4"/><line x1="15" y1="2" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="22"/><line x1="15" y1="20" x2="15" y2="22"/><line x1="20" y1="9" x2="22" y2="9"/><line x1="20" y1="14" x2="22" y2="14"/><line x1="2" y1="9" x2="4" y2="9"/><line x1="2" y1="14" x2="4" y2="14"/></symbol>
+    <symbol id="i-trending-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="11.49"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="i-brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+    <symbol id="i-arrows" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 21 7 17 3"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 21 3 17 7 13"/><line x1="15" y1="17" x2="3" y2="17"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="i-bar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17l-2-2-2 2-3-3 7-7 3 3-2 2 2 2"/><path d="M14 14l4-4"/><path d="M9 5l3 3"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8 22 9 2 9 2 8 12 2"/><line x1="5" y1="11" x2="5" y2="18"/><line x1="9" y1="11" x2="9" y2="18"/><line x1="15" y1="11" x2="15" y2="18"/><line x1="19" y1="11" x2="19" y2="18"/><line x1="2" y1="22" x2="22" y2="22"/></symbol>
+    <symbol id="i-euro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12"/><path d="M4 14h9"/><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12a7.9 7.9 0 0 0 7.8 8 7.7 7.7 0 0 0 5.2-2"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></symbol>
+    <symbol id="i-chevup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0l2.5 7.5L22 10l-7.5 2.5L12 20l-2.5-7.5L2 10l7.5-2.5z" fill-opacity=".9"/><circle cx="19" cy="3" r="1.5"/><circle cx="3" cy="19" r="1.2"/></symbol>
+    <!-- V87: Icons für Settings-Modal Cream-Classic -->
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></symbol>
+    <symbol id="i-chevr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></symbol>
+    <!-- V94: Icons für Tab-Section-Headlines (Cream-Classic-Veredelung) -->
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></symbol>
+    <symbol id="i-land" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22l5-9 4 5 4-7 7 11z"/><circle cx="17" cy="6" r="2"/></symbol>
+    <symbol id="i-quality" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  </defs>
+</svg>
+<!-- V102+V106: Toolbar-Höhe für iPad/iPhone-Safari als CSS-Variable bestimmen.
+     V106-Fix: iPad-Safari mit oberer Tab-Leiste (mehrere Tabs sichtbar) liefert
+     visualViewport oft mit voller Höhe → Inset = 0. Wir erkennen iPad explizit
+     und setzen einen Mindest-Inset von 50px der die Browser-Tab-Bar abdeckt. -->
+<script>
+(function() {
+  // iPad/iPhone-Detection — iPadOS 13+ meldet sich als Mac mit Touchpoints
+  var ua = navigator.userAgent;
+  var isIPhone = /iPhone|iPod/.test(ua);
+  var isIPad   = /iPad/.test(ua) ||
+                 (ua.indexOf('Mac') > -1 && navigator.maxTouchPoints > 1);
+  var isIOS    = isIPhone || isIPad;
+
+  function updateToolbarHeight() {
+    var vv = window.visualViewport;
+    var topInset = 0;
+    if (vv) {
+      // Differenz zwischen Layout-Viewport und visual-Viewport = überdeckter Bereich oben
+      topInset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      // Wenn visualViewport.offsetTop > 0 → Browser-UI sitzt darüber
+      if (vv.offsetTop > topInset) topInset = vv.offsetTop;
+    }
+    // V106: Geräte-spezifische Mindest-Insets (visualViewport reicht auf iOS-Safari nicht aus)
+    if (isIPad && topInset < 50) {
+      // iPad: Browser-Tab-Bar ist ~44-50px hoch → Mindestabstand erzwingen
+      topInset = 50;
+    } else if (isIPhone && topInset < 12) {
+      // iPhone: URL-Bar ist meist eingeklappt, aber 12px Sicherheitsabstand
+      topInset = 12;
+    }
+    document.documentElement.style.setProperty('--dp-toolbar-top', topInset + 'px');
+  }
+  updateToolbarHeight();
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateToolbarHeight);
+    window.visualViewport.addEventListener('scroll', updateToolbarHeight);
+  }
+  window.addEventListener('orientationchange', function() {
+    setTimeout(updateToolbarHeight, 300);
+  });
+  window.addEventListener('resize', updateToolbarHeight);
+})();
+</script>
+<!-- V63.85: Mobile-Hamburger zum Öffnen der Sidebar auf Smartphones -->
+<button class="mobile-hamburger" id="mobile-hamburger-btn" onclick="document.querySelector('.sidebar')?.classList.toggle('mobile-open')" aria-label="Menü">☰</button>
+<!-- V32: autocomplete=off auf Body-Ebene unterdrückt Browser-Adress-Speichern-Popup -->
+<form id="dp-noform" autocomplete="off" onsubmit="return false" style="display:contents">
+<div class="app-wrap">
+
+<!-- ═══════════ SIDEBAR: GESPEICHERTE OBJEKTE ═══════════ -->
+<!-- V35: Backdrop für Mobile-Sidebar (Off-Canvas) -->
+<div class="sb-backdrop" id="sb-backdrop" onclick="toggleMobileSidebar()" style="display:none"></div>
+
+<aside class="sidebar" id="sidebar">
+  <!-- V42: Toggle-Button schwebt am rechten Sidebar-Rand (raus aus dem Logo) -->
+  <!-- V61: sb-toggle-v42 entfernt — Sidebar lässt sich nicht mehr einklappen -->
+  <div class="sb-header">
+    <!-- V65.1: Pure-Obsidian-Logo aus HTML+CSS (statt PNG mit eingebrannter Border).
+         "Deal" weiß, "Pilot" mit Gold-Verlauf via background-clip:text.
+         "by Junker Immobilien" zentriert darunter in Gold. -->
+    <div class="sb-logo-shimmer">
+      <div class="sb-logo-deal">Deal<span class="sb-logo-pilot">Pilot</span></div>
+      <div class="sb-logo-by">by Junker Immobilien</div>
+    </div>
+  </div>
+
+  <!-- Free-Plan Badge slot (rendered by demo-paywall.js) -->
+
+  <div class="sb-section-title sb-section-title-with-sort">
+    <span><svg width="13" height="13"><use href="#i-portfolio"/></svg>Portfolio</span>
+    <div class="sb-sort-toggle">
+      <button type="button" class="sb-sort-btn active" data-sort="recent" onclick="setSidebarSort('recent')" title="Zuletzt bearbeitet zuerst"><svg width="11" height="11"><use href="#i-clock"/></svg></button>
+      <button type="button" class="sb-sort-btn" data-sort="id" onclick="setSidebarSort('id')" title="Nach ID sortieren"><svg width="11" height="11"><use href="#i-hash"/></svg></button>
+    </div>
+  </div>
+  <div class="sb-list sb-list-grow" id="sb-list">
+    <div class="sb-empty">Noch keine Objekte gespeichert.</div>
+  </div>
+
+  <!-- V63.57: Aktionen-Akkordeon mit neuer Reihenfolge + Import/Export-Sektionen -->
+  <div class="sb-actions-accordion" id="sb-actions-accordion">
+    <div class="sb-actions-accordion-inner">
+      <!-- Hauptaktionen -->
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('new')">
+        <span class="sb-act-ico" data-icon="new"></span><span class="sb-act-l">Neues Objekt</span>
+      </button>
+      <button class="sb-act-item sb-act-accent" type="button" onclick="sbActionsAction('quickcheck')">
+        <span class="sb-act-ico" data-icon="quickcheck"></span><span class="sb-act-l">Quick Check</span>
+      </button>
+      <button class="sb-act-item" type="button" data-act="view-single" onclick="sbActionsAction('view-single')">
+        <span class="sb-act-ico" data-icon="single"></span><span class="sb-act-l">Einzelobjekt</span>
+      </button>
+      <button class="sb-act-item" type="button" data-act="view-all" onclick="sbActionsAction('view-all')">
+        <span class="sb-act-ico" data-icon="all"></span><span class="sb-act-l">Alle Objekte</span>
+      </button>
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('trackrec')" data-feature="track_record_pdf">
+        <span class="sb-act-ico" data-icon="trackrec"></span><span class="sb-act-l">Track Record</span>
+      </button>
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('bankexport')" data-feature="bank_pdf_a3">
+        <span class="sb-act-ico" data-icon="bankexport"></span><span class="sb-act-l">Bankexport</span>
+      </button>
+
+      <!-- V63.57: Import & Export jeweils EIN Hub-Button — öffnen Modal mit Karten -->
+      <div class="sb-act-section-title">Daten</div>
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('hub-import')">
+        <span class="sb-act-ico" data-icon="import-hub"></span><span class="sb-act-l">Import</span>
+      </button>
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('hub-export')">
+        <span class="sb-act-ico" data-icon="export-hub"></span><span class="sb-act-l">Export</span>
+      </button>
+
+      <!-- V63.73: App-Bereich — Einstellungen, Hilfe, Feedback -->
+      <div class="sb-act-section-title">App</div>
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('settings')">
+        <span class="sb-act-ico" data-icon="settings"></span><span class="sb-act-l">Einstellungen</span>
+      </button>
+      <button class="sb-act-item sb-act-help" type="button" onclick="sbActionsAction('help')">
+        <span class="sb-act-ico" data-icon="help"></span><span class="sb-act-l">Hilfe</span>
+      </button>
+      <button class="sb-act-item sb-act-feedback" type="button" onclick="sbActionsAction('feedback')">
+        <span class="sb-act-ico" data-icon="feedback"></span><span class="sb-act-l">Feedback &amp; Support</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- V90: Portfolio-Übersicht ist jetzt UNTEN, direkt vor dem Aktionen-Trigger -->
+  <div id="sb-portfolio" class="sb-portfolio sb-portfolio-collapsible" style="display:none">
+    <button type="button" class="sb-section-title sb-collapsible-header" onclick="togglePortfolio()">
+      <span><svg width="13" height="13"><use href="#i-bar"/></svg>Portfolio-Übersicht</span>
+      <span class="sb-toggle-arrow" id="sb-port-arrow">▴</span>
+    </button>
+    <div class="sb-portfolio-content" id="sb-portfolio-content" style="display:none">
+      <div class="port-row"><span>Anzahl Objekte</span><span class="port-v" id="port-count">—</span></div>
+      <div class="port-row"><span>Gesamt-Investment</span><span class="port-v" id="port-invest">—</span></div>
+      <div class="port-row"><span>Mieteinnahmen / Mon.</span><span class="port-v" id="port-miete">—</span></div>
+      <div class="port-row"><span>Cashflow / Mon. (n.St.)</span><span class="port-v port-cf" id="port-cf">—</span></div>
+      <div class="port-row"><span>Ø Bruttomietrendite</span><span class="port-v" id="port-bmr">—</span></div>
+      <div class="port-row"><span>Ø DSCR</span><span class="port-v" id="port-dscr">—</span></div>
+      <div class="port-row"><span>Gesamt-Restschuld</span><span class="port-v" id="port-rest">—</span></div>
+    </div>
+  </div>
+
+  <!-- V46: Trigger jetzt mit Akkordeon-Toggle (war vorher Bottom-Sheet) -->
+  <button class="sb-actions-trigger" type="button" id="sb-actions-trigger-btn" onclick="sbActionsToggle()" aria-label="Aktionen-Menü öffnen" aria-expanded="false" title="Aktionen-Menü öffnen">
+    <span class="sb-actions-icon">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <line x1="4" y1="6" x2="20" y2="6"/>
+        <line x1="4" y1="12" x2="20" y2="12"/>
+        <line x1="4" y1="18" x2="20" y2="18"/>
+      </svg>
+    </span>
+    <span class="sb-actions-l">Aktionen</span>
+    <span class="sb-actions-arrow">▲</span>
+  </button>
+
+  <!-- V26: Import/Export sind in Settings → Daten umgezogen -->
+  <div class="sb-footer" id="sb-footer-spacer"></div>
+</aside>
+
+<!-- V43: Bottom-Sheet-Overlay (klappt von unten hoch) -->
+<div class="bsheet-overlay" id="bsheet-overlay" onclick="if(event.target===this)bsheetToggle()" aria-hidden="true">
+  <div class="bsheet-panel" role="dialog" aria-label="Aktionen">
+    <div class="bsheet-handle"></div>
+    <div class="bsheet-head">
+      <h3>Aktionen</h3>
+      <button class="bsheet-close" onclick="bsheetToggle()" aria-label="Schließen" type="button">×</button>
+    </div>
+    <div class="bsheet-grid">
+      <!-- Ansichten -->
+      <button class="bsheet-tile bsheet-tile-active" data-bsheet-view="single" onclick="bsheetAction('view-single')">
+        <span class="bsheet-tile-ico" data-icon="single"></span>
+        <span class="bsheet-tile-l">Einzelobjekt</span>
+      </button>
+      <button class="bsheet-tile" data-bsheet-view="all" onclick="bsheetAction('view-all')">
+        <span class="bsheet-tile-ico" data-icon="all"></span>
+        <span class="bsheet-tile-l">Alle Objekte</span>
+      </button>
+      <button class="bsheet-tile bsheet-tile-accent" onclick="bsheetAction('quickcheck')">
+        <span class="bsheet-tile-ico" data-icon="quickcheck"></span>
+        <span class="bsheet-tile-l">Quick Check</span>
+      </button>
+      <button class="bsheet-tile" onclick="bsheetAction('new')">
+        <span class="bsheet-tile-ico" data-icon="new"></span>
+        <span class="bsheet-tile-l">Neues Objekt</span>
+      </button>
+      <button class="bsheet-tile" onclick="bsheetAction('trackrec')" data-feature="track_record_pdf">
+        <span class="bsheet-tile-ico" data-icon="trackrec"></span>
+        <span class="bsheet-tile-l">Track Record</span>
+      </button>
+      <button class="bsheet-tile" onclick="bsheetAction('bankexport')" data-feature="bank_pdf_a3">
+        <span class="bsheet-tile-ico" data-icon="bankexport"></span>
+        <span class="bsheet-tile-l">Bankexport</span>
+      </button>
+      <button class="bsheet-tile" onclick="bsheetAction('pdf')">
+        <span class="bsheet-tile-ico" data-icon="pdf"></span>
+        <span class="bsheet-tile-l">PDF Export</span>
+      </button>
+      <button class="bsheet-tile" onclick="bsheetAction('csv')">
+        <span class="bsheet-tile-ico" data-icon="csv"></span>
+        <span class="bsheet-tile-l">CSV Export</span>
+      </button>
+      <button class="bsheet-tile" onclick="bsheetAction('settings')">
+        <span class="bsheet-tile-ico" data-icon="settings"></span>
+        <span class="bsheet-tile-l">Einstellungen</span>
+      </button>
+      <button class="bsheet-tile bsheet-tile-help" onclick="bsheetAction('help')">
+        <span class="bsheet-tile-ico" data-icon="help"></span>
+        <span class="bsheet-tile-l">Hilfe</span>
+      </button>
+      <button class="bsheet-tile" onclick="bsheetAction('feedback')">
+        <span class="bsheet-tile-ico" data-icon="feedback"></span>
+        <span class="bsheet-tile-l">Feedback</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ HAUPT-BEREICH ═══════════ -->
+<div class="main-col">
+
+
+<header class="hdr">
+  <!-- V61: Neue Header-Struktur mit Score-Donut + 5 KPI-Pills (charcoal-Hintergrund) -->
+  <div class="hdr-v61-row1">
+    <button class="hdr-mobile-menu" id="hdr-mobile-menu" onclick="toggleMobileSidebar()" aria-label="Menü öffnen" type="button">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="hdr-obj-num" id="hdr-obj-num">2026-001</span>
+    <span class="hdr-sep">›</span>
+    <div class="hdr-obj-name" id="hdr-obj">Neues Objekt</div>
+    <div class="hdr-autosave" id="hdr-autosave" style="display:none">
+      <span class="hdr-autosave-dot"></span>
+      <span class="hdr-autosave-text">Auto-saved</span>
+    </div>
+    <!-- V63: Globale KPI-Vollständigkeit -->
+    <div class="hdr-completeness" id="hdr-completeness" style="display:none"></div>
+    <div class="hdr-spacer"></div>
+    <div class="hdr-actions-v61">
+      <button class="hdr-icon-btn" type="button" title="Hilfe" onclick="if(typeof showHelp==='function')showHelp()" style="color:var(--gold)">
+        <svg width="14" height="14"><use href="#i-help"/></svg>
+      </button>
+      <!-- V108: Verlauf + Teilen Buttons entfernt (Marcels Wunsch) -->
+      <button class="hdr-icon-btn" type="button" title="Duplizieren" onclick="if(typeof duplicateObj==='function')duplicateObj()">
+        <svg width="14" height="14"><use href="#i-copy"/></svg>
+      </button>
+      <!-- V63.86: KI-Credits-Pill — Live-Status, klickt zu Settings → KI -->
+      <button class="hdr-credits-pill" id="hdr-credits-pill" type="button"
+              title="KI-Credits — klicken für Details"
+              onclick="if(typeof showSettings==='function')showSettings('api')"
+              style="display:none">
+        <svg width="13" height="13"><use href="#i-brain"/></svg>
+        <span id="hdr-credits-pill-label">KI</span>
+      </button>
+      <button class="hdr-pdf-btn" type="button" onclick="if(typeof exportPDF==='function')exportPDF()">
+        <svg width="14" height="14"><use href="#i-download"/></svg>
+        <span>Investment-PDF</span>
+      </button>
+      <button class="hdr-save-btn" type="button" onclick="if(typeof saveObj==='function')saveObj()">
+        <svg width="14" height="14"><use href="#i-check"/></svg>
+        <span>Speichern</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Reihe 2: Score-Donut links + 5 KPI-Pills (Rendite/Finanz./Risiko/Lage/Upside) -->
+  <div class="hdr-v61-row2" id="hdr-badges">
+    <!-- Wird von updHeaderBadges() befüllt -->
+  </div>
+  <!-- V63.20: Reiner Chevron-Pfeil ohne Beschriftung (User-Wunsch V22) -->
+  <button class="hdr-toggle-btn hdr-toggle-btn-chevron" id="hdr-toggle-btn" type="button" onclick="toggleHdrScore()" title="Investor Deal Score ein-/ausblenden" style="display:none">
+    <svg class="hdr-toggle-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </button>
+</header>
+
+<nav class="tabs">
+  <!-- V63.76: Quick-Check ist KEIN Tab mehr — wird über Sidebar-Aktion "Quick Check" als Standalone-View geöffnet -->
+  <button class="tab active" data-wf-key="objekt"><span class="tab-ico" data-ico="house"></span><span class="tab-lbl">Objekt</span></button>
+  <button class="tab" data-wf-key="investition"><span class="tab-ico" data-ico="coins"></span><span class="tab-lbl">Investition</span></button>
+  <button class="tab" data-wf-key="miete"><span class="tab-ico" data-ico="euro"></span><span class="tab-lbl">Miete</span></button>
+  <button class="tab" data-wf-key="steuer"><span class="tab-ico" data-ico="fileText"></span><span class="tab-lbl">Steuer-Details</span></button>
+  <button class="tab" data-wf-key="finanzierung"><span class="tab-ico" data-ico="bank"></span><span class="tab-lbl">Finanzierung</span></button>
+  <button class="tab" data-wf-key="bewirtschaftung"><span class="tab-ico" data-ico="settings"></span><span class="tab-lbl">Bewirtschaftung</span></button>
+  <button class="tab"><span class="tab-ico" data-ico="brain"></span><span class="tab-lbl">KI-Analyse</span></button>
+  <button class="tab"><span class="tab-ico" data-ico="barChart"></span><span class="tab-lbl">Kennzahlen</span></button>
+  <button class="tab"><span class="tab-ico" data-ico="handshake"></span><span class="tab-lbl">Deal-Aktion</span></button>
+  <div class="tabs-spacer"></div>
+  <!-- V75: Status-Badge in der Tab-Bar (statt Workflow-Bar darunter) -->
+  <div class="tabs-status-badge" id="tabs-status-badge" title="Workflow-Fortschritt">
+    <span class="tabs-status-text" id="tabs-status-text">0 / 6 · 0 %</span>
+    <div class="tabs-status-bar"><div class="tabs-status-fill" id="tabs-status-fill" style="width:0%"></div></div>
+  </div>
+  <!-- V75: Versions-Badge ist umgezogen in die Sidebar User-Box -->
+</nav>
+
+<!-- V75: Workflow-Bar entfernt — Steps + Status sind jetzt in der Tab-Bar oben.
+     Hidden-Stub bleibt damit JS-Code (workflow.js, ui.js) nicht crasht. -->
+<div class="tabs-workflow-bar" style="display:none">
+  <div class="wf-tab-title" id="wf-current-tab-title">Objekt</div>
+  <div class="wf-tab-sub" id="wf-current-tab-sub">Grunddaten, Lage und Objektfotos für den Bankexport.</div>
+  <div class="wf-tab-steps" id="wf-tab-steps"></div>
+  <div class="wf-tab-progress">
+    <span class="wf-tab-progress-text" id="wf-progress-pct">0 % vollständig</span>
+    <div class="wf-tab-progress-bar"><div class="wf-tab-progress-fill" id="wf-progress-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="body">
+
+<!-- V63.57: Mobile-Topbar (nur < 768px sichtbar) — Hamburger öffnet Sidebar als Drawer -->
+<div class="mobile-topbar" id="mobile-topbar">
+  <button class="mt-btn" type="button" onclick="toggleMobileSidebar()" aria-label="Menü öffnen" id="mt-menu-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <line x1="4" y1="6" x2="20" y2="6"/>
+      <line x1="4" y1="12" x2="20" y2="12"/>
+      <line x1="4" y1="18" x2="20" y2="18"/>
+    </svg>
+  </button>
+  <span class="mt-title">DealPilot</span>
+  <span class="mt-spacer"></span>
+</div>
+<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileSidebar()"></div>
+
+<!-- ═══════════ STANDALONE QUICK-CHECK VIEW (V63.76) ═══════════
+     Wird per Sidebar-Aktion "Quick Check" geöffnet (enterQuickCheckMode()).
+     Ist .sec-hidden, damit switchTab() es nicht als Tab zählt.
+     -->
+<div class="sec sec-hidden" id="s-quick" data-qc-standalone="1">
+  <!-- V53: Container wird beim Tab-Aktivieren von showQuickCheck() befüllt -->
+  <div id="qc-tab-host">
+    <p class="hint" style="text-align:center;padding:60px 20px;color:var(--muted)">Lade Quick-Check…</p>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 1: OBJEKT ═══════════ -->
+<div class="sec active" id="s0">
+  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p>
+
+  <!-- V53: Top-Reihe — Objektdaten links + Qualität & Zustand rechts (bündig, gleiche Höhe) -->
+  <div class="col2 col2-stretch">
+    <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div><div class="g2">
+      <div class="f"><label>PLZ</label><input id="plz" type="text" placeholder="z.B. 12345" autocomplete="off" data-form-type="other"></div>
+      <div class="f"><label>Ort *</label><input id="ort" type="text" placeholder="z.B. Musterstadt" oninput="upd()" autocomplete="off" data-form-type="other"></div>
+      <div class="f"><label>Straße</label><input id="str" type="text" placeholder="z.B. Musterstraße" oninput="upd()" autocomplete="off" data-form-type="other"></div>
+      <div class="f"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
+      <div class="f"><label>Objektart</label><select id="objart"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
+      <div class="f"><label>Wohnfläche (m²)</label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+      <div class="f"><label>Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
+      <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
+      <div class="f"><label>Kürzel</label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
+      <div class="f"><label>Ausstattung</label><select id="ausst"><option>Einfach</option><option selected>Normal</option><option>Gehoben</option><option>Luxus</option></select></div>
+      <div class="f s2"><label>Investitionsthese</label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
+      <div class="f s2"><label>Bekannte Risiken</label><textarea id="risiken" placeholder="Bekannte Risiken und Maßnahmen..."></textarea></div>
+    </div></div>
+
+    <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-quality"/></svg></span>Qualität &amp; Zustand</div>
+      <div class="g2">
+        <div class="f"><label>Energieklasse <span class="ds2-tag">DS2</span></label>
+          <select id="ds2_energie" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+            <option value="">– keine Angabe –</option>
+            <option value="A+">A+</option><option value="A">A</option><option value="B">B</option>
+            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
+            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
+          </select>
+        </div>
+        <div class="f"><label>Zustand der Wohnung <span class="ds2-tag">DS2</span></label>
+          <select id="ds2_zustand" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+            <option value="">– bitte wählen –</option>
+            <option value="neubau">Neubau / kernsaniert</option>
+            <option value="gut">Guter Zustand</option>
+            <option value="normal">Normaler Zustand</option>
+            <option value="renovierungsbeduerftig">Renovierungsbedürftig</option>
+            <option value="stark_sanierungsbeduerftig">Stark sanierungsbedürftig</option>
+          </select>
+        </div>
+        <div class="f"><label>Vermietungsstand</label><select id="vermstand"><option selected>Vollvermietet</option><option>Teilweise leer</option><option>Leer</option></select></div>
+        <div class="f"><label>Exitstrategie</label><select id="exitstr"><option selected>Langfristig halten</option><option>Verkauf nach 10 Jahren</option><option>Verkauf nach 20 Jahren</option><option>Aufwertung &amp; Verkauf</option></select></div>
+      </div>
+      <div class="qz-divider"></div>
+      <div class="qz-rows">
+        <div class="qz-row" data-qz-row="kueche">
+          <div class="qz-row-name">
+            <span class="qz-icon" data-qz-icon="kueche"></span>
+            <span class="qz-name">Küche</span>
+          </div>
+          <div class="qz-stars" data-qz-target="rate_kueche" role="radiogroup" aria-label="Küche bewerten"></div>
+          <div class="qz-label" data-qz-label="rate_kueche">– keine Bewertung –</div>
+          <input type="hidden" id="rate_kueche" value="0">
+        </div>
+        <div class="qz-row" data-qz-row="bad">
+          <div class="qz-row-name">
+            <span class="qz-icon" data-qz-icon="bad"></span>
+            <span class="qz-name">Badezimmer</span>
+          </div>
+          <div class="qz-stars" data-qz-target="rate_bad" role="radiogroup" aria-label="Badezimmer bewerten"></div>
+          <div class="qz-label" data-qz-label="rate_bad">– keine Bewertung –</div>
+          <input type="hidden" id="rate_bad" value="0">
+        </div>
+        <div class="qz-row" data-qz-row="boden">
+          <div class="qz-row-name">
+            <span class="qz-icon" data-qz-icon="boden"></span>
+            <span class="qz-name">Fußboden</span>
+          </div>
+          <div class="qz-stars" data-qz-target="rate_boden" role="radiogroup" aria-label="Fußboden bewerten"></div>
+          <div class="qz-label" data-qz-label="rate_boden">– keine Bewertung –</div>
+          <input type="hidden" id="rate_boden" value="0">
+        </div>
+        <div class="qz-row" data-qz-row="fenster">
+          <div class="qz-row-name">
+            <span class="qz-icon" data-qz-icon="fenster"></span>
+            <span class="qz-name">Fenster</span>
+          </div>
+          <div class="qz-stars" data-qz-target="rate_fenster" role="radiogroup" aria-label="Fenster bewerten"></div>
+          <div class="qz-label" data-qz-label="rate_fenster">– keine Bewertung –</div>
+          <input type="hidden" id="rate_fenster" value="0">
+        </div>
+      </div>
+      <div class="qz-footer">
+        <span class="qz-footer-l">Durchschnitt:</span>
+        <span class="qz-footer-stars" id="qz_avg_stars">– – – – –</span>
+        <span class="qz-footer-v" id="qz_avg_label">noch keine Bewertung</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- V53: Wertpuffer-Bar (volle Breite) -->
+  <div class="wert-puffer" id="wert-puffer" style="display:none"><span>Sofortiger Wertpuffer / Equity</span><span id="wert-puffer-val" class="c-green fw6"></span></div>
+
+  <!-- V53: Lage- & Markt-Indikatoren — ALLES drin: Bewertung, Makro/Mikro, DS2-Felder -->
+  <div class="card lage-markt-card">
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-pin"/></svg></span>Lage- &amp; Markt-Indikatoren <span class="ds2-tag">DS2</span></div>
+    <p class="hint">Werte fließen in DealScore 2.0 (Lage 10% + Upside 10%) ein.</p>
+
+    <!-- V206: Marktbericht-PDF Import — Coming Soon (ausgegraut, Button disabled) -->
+    <div class="market-import-row" style="opacity:.6;pointer-events:none;position:relative">
+      <div class="market-import-info">
+        <span class="market-import-icon" aria-hidden="true">
+          <!-- Lucide briefcase — professionelles Aktentaschen-Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </span>
+        <div>
+          <div class="market-import-title">Marktbericht-PDF importieren
+            <span style="display:inline-block;margin-left:8px;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:600;letter-spacing:.4px;background:linear-gradient(135deg,#C9A84C 0%,#D4B45C 100%);color:#1A1818">COMING SOON</span>
+          </div>
+          <div class="market-import-sub">PriceHubble, Sprengnetter oder Maklergutachten — die KI füllt Verkehrswert, Lage-Scores und Wertentwicklung automatisch aus.</div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" disabled aria-disabled="true" style="cursor:not-allowed">📁 PDF wählen</button>
+    </div>
+
+    <div class="g2">
+      <div class="f"><label>Bankbewertung</label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label title="Verkehrswert nach § 194 BauGB / ImmoWertV — durch Sachwert-, Ertragswert- oder Vergleichswertverfahren ermittelt">Verkehrswert <span class="cf-hint">(§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)</span></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label>Makrolage</label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
+      <div class="f"><label>Mikrolage</label><select id="mikrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
+      <div class="f">
+        <label>Bevölkerungsentwicklung</label>
+        <select id="ds2_bevoelkerung" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+          <option value="">– keine Angabe –</option>
+          <option value="stark_wachsend">Stark wachsend</option>
+          <option value="wachsend">Wachsend</option>
+          <option value="stabil">Stabil</option>
+          <option value="leicht_fallend">Leicht fallend</option>
+          <option value="stark_fallend">Stark fallend</option>
+        </select>
+      </div>
+      <div class="f">
+        <label>Nachfrage-Indikatoren</label>
+        <select id="ds2_nachfrage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+          <option value="">– keine Angabe –</option>
+          <option value="sehr_stark">Sehr stark (Uni, ÖPNV, Top-Arbeitgeber)</option>
+          <option value="stark">Stark</option>
+          <option value="mittel">Mittel</option>
+          <option value="schwach">Schwach</option>
+          <option value="sehr_schwach">Sehr schwach</option>
+        </select>
+      </div>
+      <div class="f">
+        <label>Wertsteigerungs-Potenzial</label>
+        <select id="ds2_wertsteigerung" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+          <option value="">– keine Angabe –</option>
+          <option value="sehr_hoch">Sehr hoch</option>
+          <option value="hoch">Hoch</option>
+          <option value="mittel">Mittel</option>
+          <option value="niedrig">Niedrig</option>
+          <option value="keines">Keines</option>
+        </select>
+      </div>
+      <div class="f">
+        <label>Entwicklungsmöglichkeiten</label>
+        <select id="ds2_entwicklung" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+          <option value="">– keine Angabe –</option>
+          <option value="mehrere">Mehrere klare Möglichkeiten</option>
+          <option value="eine_starke">Eine starke Möglichkeit</option>
+          <option value="begrenzt">Begrenzt</option>
+          <option value="kaum">Kaum</option>
+          <option value="keine">Keine</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- V53: KI-Lage-Bewertung UNTEN — bewertet ALLE Lage-Felder gemeinsam -->
+    <div class="ki-lage-box ki-lage-box-bottom" id="ki-lage-box">
+      <div class="ki-lage-header">
+        <div class="ki-lage-title">
+          <span id="ki-lage-icon" class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
+          <span>KI-Lage-Bewertung</span>
+          <span class="ki-lage-tag">alle 8 Felder</span>
+        </div>
+        <button class="btn btn-gold btn-sm" id="ki-lage-btn" onclick="runKiLage()" type="button">
+          <span data-ico="sparkles" data-ico-size="14"></span> Komplette Lage analysieren
+        </button>
+      </div>
+      <div class="ki-lage-body" id="ki-lage-body">
+        <div class="ki-lage-empty">Adresse oben eintragen, dann Button klicken — die KI bewertet Makro/Mikro, Bevölkerung, Nachfrage, Wertsteigerung &amp; Entwicklung in einem Aufruf mit Quellen.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V53: Untere Reihe — Fotos + Bemerkungen + Grund & Boden -->
+  <div class="col2">
+    <div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-camera"/></svg></span>Objektfotos (erscheinen im PDF · bis zu 6)</div>
+        <div class="drop-zone" id="dz" onclick="document.getElementById('img-inp').click()">
+          <input type="file" id="img-inp" accept="image/*,application/pdf" multiple style="display:none" onchange="handleImgs(this.files)">
+          <div class="dz-icon" data-ico="image" data-ico-size="32"></div>
+          <div>Fotos oder PDF hochladen / hierher ziehen</div>
+          <div class="dz-sub">Mehrseitige PDFs werden automatisch in Einzelfotos zerlegt · Erstes Foto = Titelbild</div>
+        </div>
+        <div class="img-grid" id="img-grid"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-note"/></svg></span>Sonstige Bemerkungen</div>
+        <div class="f"><label>Zusätzliche Notizen</label><textarea id="notizen" placeholder="Weitere Hinweise..."></textarea></div>
+      </div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-land"/></svg></span>Grund &amp; Boden</div><div class="g2">
+        <div class="f"><label>Bodenrichtwert (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="brw" type="text" inputmode="decimal" placeholder="150" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Miteigentumsanteil (%)</label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7.06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+        <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+        <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
+        <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 1: INVESTITION ═══════════ -->
+<div class="sec" id="s1">
+  <h2 class="sec-title">Kaufpreis &amp; Investition</h2><p class="sec-desc">Kaufpreis, Nebenkosten, Gesamtinvestition und Prognose-Annahmen</p>
+  <div class="col2">
+    <div>
+      <div class="card"><div class="ct">Kaufpreis &amp; Nebenkosten</div>
+        <div class="f mb12"><label>Kaufpreis *</label><div class="iw"><span class="pfx">€</span><input id="kp" type="text" inputmode="decimal" placeholder="180000" class="trl" oninput="calc()"></div></div>
+
+        <!-- V112: Bewegliche Wirtschaftsgüter im Kaufpreis (z.B. Küche) — direkt unter Kaufpreis,
+             damit User es früh sieht und gleich zuordnet. Im Steuermodul wird der Wert separat
+             als 10-Jahre-AfA aufgeführt (sonst_bewegl_wg) und nicht der 15%-Grenze zugerechnet. -->
+        <div class="f mb12">
+          <label class="kueche-toggle-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500">
+            <input type="checkbox" id="kueche_im_kp" oninput="toggleKuecheKp(); calc()">
+            <span>Bewegliche Wirtschaftsgüter im Kaufpreis enthalten <span class="hint" style="font-weight:400">(z.B. Küche)</span></span>
+          </label>
+          <span class="hint" style="display:block;margin-top:4px;margin-left:24px">Sind bewegliche Wirtschaftsgüter (z.B. Einbauküche, Möblierung) separat im Kaufvertrag ausgewiesen, werden sie nicht der 15%-Grenze des Gebäudes zugerechnet (eigene 10-Jahre-AfA, Ansatz unter Punkt 6 im Steuerformular).</span>
+          <div id="kueche_kp_wrap" style="display:none;margin-top:10px;margin-left:24px">
+            <label>Wert beweglicher Wirtschaftsgüter (im Gesamt-Kaufpreis enthalten)</label>
+            <div class="iw" style="max-width:220px"><span class="pfx">€</span><input id="kp_kueche" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="syncKuecheToMoebl(); calc()"></div>
+          </div>
+        </div>
+        <hr class="dvd">
+        <div class="g2">
+          <div class="f"><label>Makler (%)</label><div class="iw"><input id="makler_p" type="text" inputmode="decimal" placeholder="0" step="0.01" class="tr" oninput="syncCostPct('makler')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Makler (€)</label><div class="iw"><span class="pfx">€</span><input id="makler_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('makler')"></div></div>
+          <div class="f"><label>Notar (%)</label><div class="iw"><input id="notar_p" type="text" inputmode="decimal" value="2.20" step="0.01" class="tr" oninput="syncCostPct('notar')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Notar (€)</label><div class="iw"><span class="pfx">€</span><input id="notar_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('notar')"></div></div>
+          <div class="f"><label>Grundbuchamt (%)</label><div class="iw"><input id="gba_p" type="text" inputmode="decimal" placeholder="0" step="0.01" class="tr" oninput="syncCostPct('gba')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Grundbuchamt (€)</label><div class="iw"><span class="pfx">€</span><input id="gba_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gba')"></div></div>
+          <div class="f"><label>Grunderwerbsteuer (%)</label><div class="iw"><input id="gest_p" type="text" inputmode="decimal" value="6.50" step="0.01" class="tr" oninput="syncCostPct('gest')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Grunderwerbsteuer (€)</label><div class="iw"><span class="pfx">€</span><input id="gest_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gest')"></div></div>
+          <div class="f"><label>Junker Immobilien (%)</label><div class="iw"><input id="ji_p" type="text" inputmode="decimal" value="1.50" step="0.01" class="tr" oninput="syncCostPct('ji')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Junker Immobilien (€)</label><div class="iw"><span class="pfx">€</span><input id="ji_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('ji')"></div></div>
+        </div>
+        <hr class="dvd">
+        <div class="f mb8"><label>Summe Nebenkosten</label><div class="cf" id="nk_sum">—</div></div>
+        <div class="total-bar"><span>Gesamtinvestition</span><span class="total-val" id="gi_val">€ —</span></div>
+
+        <!-- V36: Quadratmeterpreis -->
+        <div class="qm-prices" id="qm-prices">
+          <div class="qm-price-row"><span>Kaufpreis / m²</span><span class="qm-price-val" id="qm_kp">—</span></div>
+          <div class="qm-price-row"><span>Gesamtinvestition / m²</span><span class="qm-price-val" id="qm_gi">—</span></div>
+        </div>
+        <!-- V40: Markt-Faktor wird automatisch berechnet (KP / Jahres-NKM) -->
+        <div class="f" style="margin-top:12px">
+          <label>Markt-Faktor (KP / Jahres-NKM) <span class="ds2-tag">DS2</span> <span class="hint" style="font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em">auto</span></label>
+          <div class="cf" id="qm_marktfaktor">—</div>
+          <input type="hidden" id="ds2_marktfaktor" value="">
+          <span class="hint">Wird automatisch berechnet aus Kaufpreis ÷ Jahres-Nettokaltmiete. Wert fließt in den DealScore 2.0 Upside-Score.</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-top:10px">
+          <div class="ct">Sanierungsbedarf einschätzen</div>
+          <p class="hint" style="margin-bottom:8px">Welche Bereiche der Immobilie sind sanierungsbedürftig? Klick zum Aktivieren — die geschätzten Kosten fließen in die Sanierungskostenkalkulation ein.</p>
+          <div class="fesh-grid">
+            <label class="fesh-tile"><input type="checkbox" id="fesh_f" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-window"/></svg></span><span class="fesh-name">Fenster</span><span class="fesh-cost"><input id="fesh_f_cost" type="text" inputmode="decimal" value="8000" placeholder="0" oninput="updateFESH()"> €</span></label>
+            <label class="fesh-tile"><input type="checkbox" id="fesh_e" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-zap"/></svg></span><span class="fesh-name">Elektrik</span><span class="fesh-cost"><input id="fesh_e_cost" type="text" inputmode="decimal" value="6000" placeholder="0" oninput="updateFESH()"> €</span></label>
+            <label class="fesh-tile"><input type="checkbox" id="fesh_s" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-droplet"/></svg></span><span class="fesh-name">Sanitär</span><span class="fesh-cost"><input id="fesh_s_cost" type="text" inputmode="decimal" value="7000" placeholder="0" oninput="updateFESH()"> €</span></label>
+            <label class="fesh-tile"><input type="checkbox" id="fesh_h" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-flame"/></svg></span><span class="fesh-name">Heizung</span><span class="fesh-cost"><input id="fesh_h_cost" type="text" inputmode="decimal" value="12000" placeholder="0" oninput="updateFESH()"> €</span></label>
+            <label class="fesh-tile"><input type="checkbox" id="fesh_d" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-layers"/></svg></span><span class="fesh-name">Dach/Fassade</span><span class="fesh-cost"><input id="fesh_d_cost" type="text" inputmode="decimal" value="15000" placeholder="0" oninput="updateFESH()"> €</span></label>
+            <label class="fesh-tile"><input type="checkbox" id="fesh_b" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-bath"/></svg></span><span class="fesh-name">Bäder</span><span class="fesh-cost"><input id="fesh_b_cost" type="text" inputmode="decimal" value="10000" placeholder="0" oninput="updateFESH()"> €</span></label>
+            <label class="fesh-tile"><input type="checkbox" id="fesh_k" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-chef"/></svg></span><span class="fesh-name">Küche</span><span class="fesh-cost"><input id="fesh_k_cost" type="text" inputmode="decimal" value="8000" placeholder="0" oninput="updateFESH()"> €</span></label>
+            <label class="fesh-tile"><input type="checkbox" id="fesh_o" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-hammer"/></svg></span><span class="fesh-name">Sonstiges</span><span class="fesh-cost"><input id="fesh_o_cost" type="text" inputmode="decimal" value="0" placeholder="0" oninput="updateFESH()"> €</span></label>
+          </div>
+          <div class="fesh-summary">
+            <div class="kv kv-hl"><span><b>Summe Sanierung</b></span><span class="kv-v c-gold" id="fesh_total">— €</span></div>
+            <button class="fesh-apply-btn" onclick="applyFESHToSanierung()">→ In Sanierungskosten übernehmen</button>
+          </div>
+          <div id="fesh_kfw_recommendation" class="info-box info-blue" style="margin-top:10px;display:none">
+            <div class="info-box-title">💡 KfW-Förderempfehlung</div>
+            <div class="info-box-content" id="fesh_kfw_text"></div>
+          </div>
+        </div>
+
+        <!-- Sanierung & Möblierung -->
+        <div class="card" style="margin-top:14px"><div class="ct">Sanierung & Möblierung</div>
+          <div class="g2">
+            <div class="f">
+              <label>Sanierungskosten</label>
+              <div class="iw"><span class="pfx">€</span><input id="san" type="text" inputmode="decimal" placeholder="" class="trl" oninput="syncSanTaxOnSanInput(); calc()"></div>
+              <span class="hint" id="san_limit_hint">Grenze wird berechnet...</span>
+
+              <!-- V32: Steuerliche Verteilung — Checkbox + Jahre-Auswahl -->
+              <div class="san-tax-options">
+                <label class="san-tax-checkbox">
+                  <input type="checkbox" id="san_tax_active" oninput="calc()">
+                  <span>In Steuer-Werbungskosten übernehmen</span>
+                </label>
+                <div class="san-tax-years" id="san_tax_years_wrap">
+                  <label>Verteilung über</label>
+                  <select id="san_tax_years" oninput="calc()">
+                    <option value="auto" selected>Automatisch (15%-Regel)</option>
+                    <option value="1">1 Jahr (sofort)</option>
+                    <option value="2">2 Jahre</option>
+                    <option value="3">3 Jahre</option>
+                    <option value="4">4 Jahre</option>
+                    <option value="5">5 Jahre (Standard §82b)</option>
+                    <option value="50">Über AfA-Satz (anschaffungsnah)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="f">
+              <label>Möblierung</label>
+              <div class="iw"><span class="pfx">€</span><input id="moebl" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div>
+              <span class="hint">Möblierung wird linear über 10 Jahre abgeschrieben</span>
+
+              <!-- V32: Möbel — analog Checkbox -->
+              <div class="san-tax-options">
+                <label class="san-tax-checkbox">
+                  <input type="checkbox" id="moebl_tax_active" oninput="calc()">
+                  <span>In Steuer-Werbungskosten übernehmen</span>
+                </label>
+                <div class="san-tax-years">
+                  <label>Verteilung über</label>
+                  <select id="moebl_tax_years" oninput="calc()">
+                    <option value="5">5 Jahre</option>
+                    <option value="8">8 Jahre</option>
+                    <option value="10" selected>10 Jahre (Standard)</option>
+                    <option value="15">15 Jahre</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 15%-Grenze -->
+        <div class="info-box info-gold" style="margin-top:14px">
+          <div class="info-box-title">📐 15%-Grenze (§ 6 Abs. 1 Nr. 1a EStG)</div>
+          <div class="info-box-content">
+            <div class="kv"><span>Max. Sanierungskosten in 3 Jahren</span><span class="kv-v c-gold" id="san_limit_max">—</span></div>
+            <div class="kv"><span>Ihre Sanierungskosten</span><span class="kv-v" id="san_limit_actual">—</span></div>
+            <div class="kv"><span>Status</span><span class="kv-v" id="san_limit_status">—</span></div>
+
+            <!-- V63.99: Aufschlüsselung der Berechnung — wird nur gezeigt wenn Küche aktiviert oder bei größeren Beträgen -->
+            <div id="ahk_detail_block" style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(201,168,76,0.30);display:none">
+              <div class="hint" style="font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;font-size:10px;margin-bottom:6px">So wird die Grenze berechnet</div>
+              <div class="kv" style="font-size:12px"><span>Gebäudeanteil (Standard 80%)</span><span class="kv-v" id="ahk_geb_anteil">—</span></div>
+              <div class="kv" style="font-size:12px"><span id="ahk_geb_label">Gebäude (vor Küchen-Abzug)</span><span class="kv-v" id="ahk_geb_brutto">—</span></div>
+              <div class="kv" style="font-size:12px;display:none" id="ahk_kueche_row"><span>− Küche (separates Wirtschaftsgut)</span><span class="kv-v" id="ahk_kueche_val">—</span></div>
+              <div class="kv" style="font-size:12px;display:none" id="ahk_geb_netto_row"><span>= Gebäude ohne Küche</span><span class="kv-v" id="ahk_geb_netto">—</span></div>
+              <div class="kv" style="font-size:12px"><span>+ Anteilige Nebenkosten (Gebäudeanteil)</span><span class="kv-v" id="ahk_nk_anteil">—</span></div>
+              <div class="kv" style="font-size:12px;font-weight:600;border-top:1px dashed rgba(201,168,76,0.30);padding-top:5px;margin-top:5px"><span>= Gebäude-Anschaffungskosten</span><span class="kv-v" id="ahk_basis">—</span></div>
+              <div class="kv" style="font-size:12px;font-weight:600;color:var(--gold)"><span>× 15%</span><span class="kv-v c-gold" id="ahk_15pct">—</span></div>
+            </div>
+
+            <div class="hint" style="margin-top:10px">
+              Werden innerhalb der ersten 3 Jahre nach Kauf mehr als 15&nbsp;% der Gebäude-Anschaffungskosten für Sanierung aufgewendet,
+              gelten diese als <b>anschaffungsnahe Herstellkosten</b> und müssen über 50 Jahre abgeschrieben werden (statt sofort als Werbungskosten).
+            </div>
+            <div class="hint" style="margin-top:6px;padding:8px 10px;background:rgba(70,130,180,0.08);border-left:3px solid #4682B4;border-radius:4px">
+              <b>ℹ Gebäudeanteil:</b> Standardmäßig wird 80&nbsp;% Gebäudeanteil angenommen. Im Tab <b>Steuer-Details</b> kannst du den exakten Gebäudeanteil über den BMF-Rechner ermitteln — das wirkt sich rückwirkend auf die 15&nbsp;%-Grenze aus.
+              Wenn du eine Küche im Kaufpreis ausweist, gilt sie als <b>separates Wirtschaftsgut</b> mit eigener AfA über 10 Jahre und zählt nicht zum Gebäude.
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 2: MIETE ═══════════ -->
+<div class="sec" id="s2">
+  <h2 class="sec-title">Miete</h2><p class="sec-desc">Mietstruktur, Nettokaltmiete und Warmmiete</p>
+  <div class="col2">
+    <div><div class="card"><div class="ct">Mietstruktur</div>
+      <div class="f"><label>Nettokaltmiete / Monat *</label><div class="iw"><span class="pfx">€</span><input id="nkm" type="text" inputmode="decimal" placeholder="850" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label>Zusätzliche Einnahmen / Monat</label><div class="iw"><span class="pfx">€</span><input id="ze" type="text" inputmode="decimal" placeholder="90" class="trl" oninput="calc()"></div><span class="hint">Stellplatz, Garage etc. – fließt in Nettokaltmiete + Steuerberechnung ein</span></div>
+      <div class="f"><label>Umlagefähige Kosten / Monat</label><div class="iw"><span class="pfx">€</span><input id="umlagef" type="text" inputmode="decimal" placeholder="144" class="trl" oninput="calc()"></div></div>
+      <hr class="dvd">
+      <div class="f"><label>= Warmmiete / Monat</label><div class="cf" id="wm_m">—</div></div>
+      <div class="f"><label>= Warmmiete / Jahr</label><div class="cf" id="wm_j">—</div></div>
+      <div class="f"><label>= Nettokaltmiete / Jahr</label><div class="cf" id="nkm_j_out">—</div></div>
+    </div>
+      <div class="card" style="margin-top:14px"><div class="ct">Mietpreis-Analyse</div>
+      <p class="hint">Bezogen auf die Wohnfläche aus Tab "Objekt".</p>
+      <div class="f"><label>Aktuelle Miete pro m²</label><div class="cf" id="miete_qm">—</div></div>
+      <div class="f"><label>Aktuelle Miete pro m² (warm)</label><div class="cf" id="miete_qm_warm">—</div></div>
+      <hr class="dvd">
+      <!-- V40: Mietspiegel-Vergleich entfernt — DS2-Marktmiete (unten) erfüllt diese Funktion -->
+      <hr class="dvd">
+      <!-- V38: ds2_marktmiete + ds2_mietausfall verschoben aus Kennzahlen-Card -->
+      <!-- V63.29: ✨-Buttons entfernt — KI-Recherche läuft über die KI-Mietpreis-Analyse-Box unten -->
+      <div class="f">
+        <label>Marktmiete (€/m²) <span class="ds2-tag">DS2</span></label>
+        <div class="iw"><span class="pfx">€</span><input id="ds2_marktmiete" type="text" inputmode="decimal" placeholder="9,00" class="trl" oninput="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"></div>
+        <span class="hint">Markt-üblich für die Region — wird mit Ist-Miete verglichen für Upside-Score.</span>
+      </div>
+      <div class="f">
+        <label>Mietausfall-Risiko <span class="ds2-tag">DS2</span></label>
+        <select id="ds2_mietausfall" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+          <option value="">– keine Angabe –</option>
+          <option value="sehr_niedrig">Sehr niedrig</option>
+          <option value="niedrig">Niedrig</option>
+          <option value="mittel">Mittel</option>
+          <option value="erhoeht">Erhöht</option>
+          <option value="hoch">Hoch</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- V63.26: KI-Mietpreis-Analyse — analog zur KI-Lage-Bewertung in Tab Objekt -->
+    <div class="ki-lage-box ki-lage-box-bottom" id="ki-miete-box" style="margin-top:14px">
+      <div class="ki-lage-header">
+        <div class="ki-lage-title">
+          <span class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
+          <span>KI-Mietpreis-Analyse</span>
+          <span class="ki-lage-tag">Marktmiete + Mietausfall</span>
+        </div>
+        <button class="btn btn-gold btn-sm" id="ki-miete-btn" onclick="runKiMiete()" type="button">
+          <span data-ico="sparkles" data-ico-size="14"></span> Mietpreis recherchieren
+        </button>
+      </div>
+      <div class="ki-lage-body" id="ki-miete-body">
+        <div class="ki-lage-empty">Die KI recherchiert die marktübliche Miete für deine Adresse + Wohnfläche und schätzt das Mietausfall-Risiko ein. Werte können per Klick übernommen werden.</div>
+      </div>
+    </div>
+    </div>
+    <div>
+      <div class="card"><div class="ct" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <span>Mietentwicklung</span>
+          <div class="me-mode-toggle" role="tablist" aria-label="Mietentwicklungs-Modus">
+            <button type="button" class="me-mode-btn active" id="me-mode-prog" onclick="setMietModus('prog')">Prognose</button>
+            <button type="button" class="me-mode-btn" id="me-mode-detail" onclick="setMietModus('detail')">Detail</button>
+          </div>
+        </div>
+
+        <!-- Hidden field: speichert den Modus pro Objekt (wird über loadData/saveObj persistiert) -->
+        <input type="hidden" id="me_modus" value="prog">
+
+        <!-- Toggle: NKM vs NKM+zE — gilt für beide Modi -->
+        <div class="me-incze-row">
+          <label class="me-incze-label">
+            <input type="checkbox" id="me_inc_ze" onchange="setMietInclZE(this.checked)">
+            <span class="me-incze-text">
+              <strong>Erhöhung gilt auch für zusätzliche Einnahmen</strong>
+              <span class="me-incze-desc">
+                Wenn aktiv, wachsen Stellplatz, Garage und sonstige zusätzliche Einnahmen
+                im selben Verhältnis wie die Nettokaltmiete. Standardmäßig (deaktiviert)
+                bleibt nur die NKM dynamisch — zusätzliche Einnahmen bleiben über alle
+                Jahre konstant.
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <!-- MODUS A: Prognose (einfache Mietsteigerung %) -->
+        <div id="me-block-prog">
+          <p class="hint">Konstante Mietsteigerung pro Jahr (Standard).</p>
+          <div class="ass-row"><span class="ass-l">Mietsteigerung p.a.</span>
+            <div class="ass-inp"><input id="mietstg" type="text" inputmode="decimal" value="3.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div>
+          </div>
+        </div>
+
+        <!-- MODUS B: Detail (Erhöhungs-Treppe wie in der Excel-Vorlage) -->
+        <div id="me-block-detail" style="display:none">
+          <p class="hint">Diskrete Mieterhöhungen — z.B. bei Staffelmieten oder geplanten Anpassungen.</p>
+          <div class="g2">
+            <div class="f"><label>Soll-Mietspiegel (€/m²)</label>
+              <div class="iw"><span class="pfx">€</span><input id="me_soll" type="text" inputmode="decimal" step="0.10" placeholder="9.50" class="trl" oninput="calc()"></div>
+              <span class="hint">Marktmiete laut lokalem Mietspiegel</span>
+            </div>
+            <div class="f"><label>Anzahl Erhöhungen</label>
+              <div class="iw"><input id="me_anz" type="text" inputmode="decimal" min="0" max="10" step="1" value="3" class="tr" oninput="calc()"><span class="sfx">×</span></div>
+            </div>
+            <div class="f"><label>Intervall</label>
+              <div class="iw"><input id="me_int" type="text" inputmode="decimal" min="1" max="10" step="1" value="3" class="tr" oninput="calc()"><span class="sfx">Jahre</span></div>
+            </div>
+            <div class="f"><label>Angestrebte Entwicklung</label>
+              <div class="iw"><input id="me_pct" type="text" inputmode="decimal" step="0.1" value="18.0" class="tr" oninput="calc()"><span class="sfx">%</span></div>
+              <span class="hint">Gesamt über alle Erhöhungen verteilt</span>
+            </div>
+            <div class="f s2"><label>Entwicklungs-Opportunität</label><div class="cf" id="me_opp">—</div>
+              <span class="hint">IST-Miete vs. Soll-Mietspiegel — negativ = unter Markt</span>
+            </div>
+          </div>
+          <div id="me_table_wrap" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px"><div class="ct">Prognose-Annahmen</div>
+        <div class="ass-row"><span class="ass-l">Wertsteigerung p.a.</span><div class="ass-inp"><input id="wertstg" type="text" inputmode="decimal" value="1.5" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
+        <div class="ass-row"><span class="ass-l">Kostensteigerung p.a.</span><div class="ass-inp"><input id="kostenstg" type="text" inputmode="decimal" value="1.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
+        <div class="ass-row"><span class="ass-l">Leerstand p.a.</span><div class="ass-inp"><input id="leerstand" type="text" inputmode="decimal" value="0.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
+        <div class="ass-row"><span class="ass-l">Betrachtungszeitraum</span><div class="ass-inp"><input id="btj" type="text" inputmode="decimal" value="15" min="5" max="50" step="1" oninput="calc()"><span class="unit">Jahre</span></div></div>
+        <div class="ass-row"><span class="ass-l">Exit-Rendite (Verkauf %)</span><div class="ass-inp"><input id="exit_bmy" type="text" inputmode="decimal" value="5.0" step="0.1" oninput="calc()"><span class="unit">%</span></div></div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- ═══════════ TAB 4: STEUER-DETAILS (vorher Teil von Tab 3) ═══════════ -->
+<div class="sec" id="s3-tax">
+  <h2 class="sec-title">Steuer-Details</h2><p class="sec-desc">Vollständige Steuerlogik – AfA, Progression, jährliche Werbungskosten und Finanzamt-PDFs</p>
+
+  <div class="disclaimer-box">
+    <strong>⚠ Hinweis · Keine Steuerberatung:</strong> Diese Anwendung bietet lediglich allgemeine Rechenhilfen
+    und stellt keine steuerliche oder rechtliche Beratung dar. Für individuelle steuerliche Einschätzungen
+    wenden Sie sich bitte an eine Steuerberaterin oder einen Steuerberater. Die Nutzung der App ersetzt
+    keine fachliche Beratung. Alle Berechnungen basieren auf den eingegebenen Daten und erheben keinen
+    Anspruch auf Richtigkeit oder Vollständigkeit. <strong>§ 6 StBerG (Deutschland)</strong> weist darauf
+    hin, dass Steuerberatung nur von dazu befugten Personen geleistet werden darf. DealPilot fällt nicht
+    unter diesen Bereich.
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="ct">Persönliche Steuer</div>
+    <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
+    <div class="g2">
+      <div class="f"><label>zvE vor Immobilie / Jahr</label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label>Persönl. Grenzsteuersatz (%)</label><div class="iw"><input id="grenz" type="text" inputmode="decimal" value="40.45" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+    </div>
+    <div class="f checkbox-row">
+      <label class="cb-label" title="Wenn aktiv, wird der Grenzsteuersatz automatisch aus deinem zvE nach §32a EStG (Tarif 2026) berechnet.">
+        <input id="grenz_auto" type="checkbox" onchange="onGrenzAutoToggle()">
+        <span>Grenzsteuersatz automatisch aus zvE berechnen</span>
+      </label>
+    </div>
+    <hr class="dvd">
+    <div class="g2">
+      <div class="f"><label>EStG (vor Immobilie) / Jahr</label><div class="cf" id="estg_view">—</div><span class="hint">Wird nach §32a aus zvE berechnet</span></div>
+      <div class="f"><label>Hilfreiche Links</label>
+        <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+          <a class="btn btn-outline btn-sm" href="https://www.elster.de/" target="_blank" rel="noopener" style="flex:1 1 100px;min-width:100px;text-align:center">↗ ELSTER</a>
+          <a class="btn btn-outline btn-sm" href="https://www.bmf-steuerrechner.de/ekst/eingabeformekst.xhtml" target="_blank" rel="noopener" style="flex:1 1 100px;min-width:100px;text-align:center">↗ BMF-Rechner</a>
+          <a class="btn btn-outline btn-sm" href="https://www.lohn-info.de/lohnsteuertabellen.html" target="_blank" rel="noopener" style="flex:1 1 100px;min-width:100px;text-align:center">↗ Lohn-Info.de</a>
+        </div>
+        <span class="hint">ELSTER für die Steuererklärung · BMF/Lohn-Info zum Vergleich</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct-row">
+      <div class="ct" style="margin:0;border:none;padding:0">AfA-Konfiguration</div>
+      <button class="btn btn-outline btn-sm" onclick="openBMFRechner()" type="button" data-feature="bmf_calc_export">📐 BMF-AfA-Rechner</button>
+    </div>
+    <p class="hint" style="margin-top:6px">Mit dem BMF-Rechner kannst du Gebäude- und Bodenanteil sowie den AfA-Satz nach amtlicher Methode (Sachwertverfahren) ermitteln.</p>
+    <div class="g2">
+      <div class="f"><label>AfA-Satz</label><select id="afa_satz" onchange="calc()">
+        <option value="2.0">2,0 % (Standard ab 1925)</option>
+        <option value="2.5">2,5 % (Baujahr vor 1925)</option>
+        <option value="3.0">3,0 % (Wohnzwecke ab 2023)</option>
+      </select></div>
+      <div class="f"><label>Gebäudeanteil am KP (%)</label><div class="iw"><input id="geb_ant" type="text" inputmode="decimal" value="80" class="tr" oninput="calc()"><span class="sfx">%</span></div><span class="hint">Rest = Grundstücksanteil</span></div>
+    </div>
+    <div class="f"><label>AfA / Jahr (berechnet)</label><div class="cf" id="afa_kalk">—</div></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="ct-row">
+      <div class="ct" style="margin:0;border:none;padding:0">📈 Steuerprogression-Chart</div>
+      <button class="btn btn-outline btn-sm" onclick="showProgressionChart()">Chart öffnen</button>
+    </div>
+    <p class="hint">Vergleicht Einkommensteuer vor und nach Investition über die zvE-Bandbreite.</p>
+  </div>
+
+  <!-- Steuer-Modul (Live-Berechnung) -->
+  <div class="card tax-module-card" style="margin-top:14px">
+    <div class="ct-row">
+      <div class="ct" style="margin:0;border:none;padding:0">💰 Steuer-Modul · Echte Progression 2026</div>
+      <button class="btn btn-outline btn-sm" onclick="renderTaxModule()">↻ Neu berechnen</button>
+    </div>
+    <p class="hint" style="margin-bottom:10px">
+      Berechnet die jährliche Steuerwirkung der Immobilie nach offiziellem EStG-Tarif 2026 mit echter Progression.
+      Die Felder oben (zvE, AfA, Sanierung) gehen automatisch ein.
+    </p>
+    <div id="tax-result-box">
+      <div style="text-align:center;color:var(--muted);padding:20px">Bitte erst Werte oben ausfüllen</div>
+    </div>
+  </div>
+
+  <!-- Steuerverlauf über die Jahre -->
+  <div class="card tax-module-card" style="margin-top:14px">
+    <div class="ct">📅 Steuerverlauf · Erstattung (grün) vs. Nachzahlung (rot)</div>
+    <p class="hint" style="margin-bottom:10px">
+      Verlauf über die ersten 15 Jahre. Verluste aus V+V mindern dein zvE → Erstattung. Mit fortschreitender Tilgung sinken die Schuldzinsen → irgendwann positives Ergebnis → Nachzahlung.
+    </p>
+    <div id="tax-timeline-box">
+      <div style="text-align:center;color:var(--muted);padding:20px">Wird automatisch berechnet sobald Daten eingegeben sind</div>
+    </div>
+  </div>
+
+  <!-- Steuerformular pro Jahr (Quick + Detail) -->
+  <div class="card tax-module-card" style="margin-top:14px">
+    <div class="ct-row">
+      <div class="ct" style="margin:0;border:none;padding:0">📋 Steuerformular pro Jahr · individuelle Werte</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF('single-year')" title="PDF nur für das aktuelle Jahr">📄 Finanzamt-PDF (1 Jahr)</button>
+        <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF('all-years')" title="PDF mit allen 15 Jahren + Gesamtübersicht">📑 Finanzamt-PDF (alle Jahre)</button>
+      </div>
+    </div>
+    <p class="hint" style="margin-bottom:10px">
+      Hier kannst du pro Jahr Verluste/Werbungskosten manuell überschreiben. Der App-Vorschlag basiert auf deinen Eingaben (Mietsteigerung, Tilgungsplan, AfA). Manuelle Änderungen fließen in die Cashflow-Projektion und in den Steuerverlauf oben ein.
+    </p>
+    <div id="yearly-tax-form-box">
+      <div style="text-align:center;color:var(--muted);padding:20px">Wird automatisch befüllt sobald Daten eingegeben sind</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ TAB 3: FINANZIERUNG ═══════════ -->
+<div class="sec" id="s3">
+  <h2 class="sec-title">Finanzierung</h2><p class="sec-desc">Darlehensstruktur, Zinsbindung, Restschuld und Anschlussfinanzierung</p>
+
+  <!-- V213: HAUPT-CARD — Zinsannahme für dieses Objekt (IMMER offen, nicht collapsible) -->
+  <!-- V1.0: KOMPAKTE Zinsannahme-Card (2 Zeilen) — Details im Modal -->
+  <div class="card v10-zins-compact" id="v10-zins-compact">
+    <div class="v10-zc-row1">
+      <div class="v10-zc-recommend">
+        <span class="v10-zc-label">Empfohlen für Ihr Objekt</span>
+        <span class="v10-zc-text" id="v10-zc-text">Lade aktuelle Marktdaten…</span>
+      </div>
+      <button type="button" class="v10-zc-btn" onclick="V10.openMarketModal()" aria-label="Marktdaten ansehen">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Marktdaten ansehen
+      </button>
+    </div>
+    <div class="v10-zc-row2">
+      <span class="v10-zc-rate" data-mat="var"><span class="v10-zc-rate-label">Variabel</span> <b id="v10-rate-var">–</b></span>
+      <span class="v10-zc-rate" data-mat="10"><span class="v10-zc-rate-label">10 Jahre</span> <b id="v10-rate-10">–</b></span>
+      <span class="v10-zc-rate" data-mat="15"><span class="v10-zc-rate-label">15 Jahre</span> <b id="v10-rate-15">–</b></span>
+      <span class="v10-zc-rate" data-mat="20"><span class="v10-zc-rate-label">20 Jahre</span> <b id="v10-rate-20">–</b></span>
+      <span class="v10-zc-stand" id="v10-zc-stand">…</span>
+    </div>
+  </div>
+
+  <!-- V1.0: Markt-Daten-Modal (versteckt, öffnet durch Button-Klick) -->
+  <div class="v10-modal-overlay" id="v10-market-modal" style="display:none" onclick="V10.handleOverlayClick(event)">
+    <div class="v10-modal-content">
+      <button type="button" class="v10-modal-close" onclick="V10.closeMarketModal()" aria-label="Schließen" title="Schließen (ESC)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="v10-modal-header">
+        <h2 class="v10-modal-title">Marktdaten & Konditionen</h2>
+        <p class="v10-modal-sub">Aktuelle Zinslage am Markt — alle Details zur Empfehlung</p>
+      </div>
+      <div class="v10-modal-body" id="v10-modal-body">
+        <!-- Hier hinein werden die 3 Markt-Cards verschoben (im JS init) -->
+      </div>
+    </div>
+  </div>
+
+  <!-- V1.0: Hidden Container für die 3 Markt-Cards (werden ins Modal verschoben) -->
+  <div class="v10-cards-source" id="v10-cards-source" style="display:none">
+  <div class="card market-rates-card mr-ctx-card" data-collapsible="mr-ctx" data-collapse-title="Markt-Kontext (EZB &amp; Geldmarkt)">
+    <div class="ct-row">
+      <div class="ct" style="margin:0;border:none;padding:0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Markt-Kontext (EZB &amp; Geldmarkt)
+        <span class="info-tag" id="mr-ctx-source-badge">ECB Data Portal</span>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="refreshMarketContext()" title="Daten aktualisieren" aria-label="Aktualisieren">↻</button>
+    </div>
+
+    <p class="mr-ctx-intro">Diese beiden Werte sind die Hebel, an denen die Bauzinsen hängen. Der EZB-Leitzins steuert kurzfristige Refinanzierung, EURIBOR 3M ist der Geldmarkt-Referenzzins.</p>
+
+    <div class="mr-ctx-grid">
+      <div class="mr-ctx-tile" data-key="ecb_mrr">
+        <div class="mr-ctx-tile-head">
+          <span class="mr-ctx-tile-label">EZB-Leitzins (Hauptrefi)</span>
+          <span class="mr-ctx-tile-src" id="mr-ctx-src-mrr">…</span>
+        </div>
+        <div class="mr-ctx-tile-rate" id="mr-ctx-rate-mrr">–</div>
+        <div class="mr-ctx-tile-detail">
+          <span id="mr-ctx-trend-mrr" class="mr-ctx-trend">●</span>
+          <span id="mr-ctx-period-mrr">–</span>
+        </div>
+        <div class="mr-ctx-tile-explain">Zinssatz zu dem Banken bei der EZB Geld holen.<br>Trend: ↑ teurer für Banken → höhere Bauzinsen.</div>
+      </div>
+
+      <div class="mr-ctx-tile" data-key="euribor_3m">
+        <div class="mr-ctx-tile-head">
+          <span class="mr-ctx-tile-label">EURIBOR 3 Monate</span>
+          <span class="mr-ctx-tile-src" id="mr-ctx-src-eu">…</span>
+        </div>
+        <div class="mr-ctx-tile-rate" id="mr-ctx-rate-eu">–</div>
+        <div class="mr-ctx-tile-detail">
+          <span id="mr-ctx-trend-eu" class="mr-ctx-trend">●</span>
+          <span id="mr-ctx-period-eu">–</span>
+        </div>
+        <div class="mr-ctx-tile-explain">Zinssatz für 3-Monats-Geldmarkt. Basis variabler Bauzinsen.<br>Trend: ↑ teurer kurzfristig.</div>
+      </div>
+    </div>
+
+    <div class="mr-ctx-source" id="mr-ctx-source"></div>
+  </div>
+
+  <!-- V209: Markt-Zinsen-Modul — Multi-Line + Bar + Empfehlung -->
+  <div class="card market-rates-card mr-v209-card" data-collapsible="mr-v209" data-collapse-title="Aktuelle Marktzinsen (Bundesbank)">
+    <div class="ct-row">
+      <div class="ct" style="margin:0;border:none;padding:0">📊 Aktuelle Marktzinsen <span class="info-tag" id="mr-source-badge">Live · Bundesbank</span></div>
+      <button class="btn btn-outline btn-sm" onclick="refreshMarketRates()" title="Zinsdaten aktualisieren" aria-label="Aktualisieren">↻</button>
+    </div>
+
+    <!-- 4 Tiles für aktuelle Werte (bleiben oben, leicht aufgehübscht) -->
+    <div class="rates-grid" id="rates-grid">
+      <div class="rate-tile" data-bucket="var">
+        <div class="rate-label">variabel / bis 1 Jahr</div>
+        <div class="rate-val" id="rate-var">–</div>
+        <div class="rate-sub">Effektivzins p.a.</div>
+        <div class="rate-delta" id="rate-var-delta"></div>
+      </div>
+      <div class="rate-tile" data-bucket="1_5">
+        <div class="rate-label">1 bis 5 Jahre</div>
+        <div class="rate-val" id="rate-1_5">–</div>
+        <div class="rate-sub">Effektivzins p.a.</div>
+        <div class="rate-delta" id="rate-1_5-delta"></div>
+      </div>
+      <div class="rate-tile" data-bucket="5_10">
+        <div class="rate-label">5 bis 10 Jahre</div>
+        <div class="rate-val" id="rate-5_10">–</div>
+        <div class="rate-sub">Effektivzins p.a.</div>
+        <div class="rate-delta" id="rate-5_10-delta"></div>
+      </div>
+      <div class="rate-tile" data-bucket="over10">
+        <div class="rate-label">über 10 Jahre</div>
+        <div class="rate-val" id="rate-over10">–</div>
+        <div class="rate-sub">Effektivzins p.a.</div>
+        <div class="rate-delta" id="rate-over10-delta"></div>
+      </div>
+    </div>
+
+    <!-- V209: Toggle-Bar für Chart-Linien -->
+    <div class="mr-chart-controls" id="mr-chart-controls" style="margin-top:16px">
+      <div class="mr-chart-title">
+        <span class="mr-chart-title-text">Zinsentwicklung · letzte 12 Monate</span>
+        <span class="mr-chart-hint" id="mr-chart-hint">Tippen zum Ein-/Ausblenden einer Linie</span>
+      </div>
+      <div class="mr-chart-toggles" role="group" aria-label="Zinsbindungs-Linien">
+        <button type="button" class="mr-toggle active" data-bucket="var"    style="--mr-color:#7C8EA3" onclick="toggleRateLine('var')">variabel/1J</button>
+        <button type="button" class="mr-toggle active" data-bucket="1_5"    style="--mr-color:#5BA89F" onclick="toggleRateLine('1_5')">1–5 J</button>
+        <button type="button" class="mr-toggle active" data-bucket="5_10"   style="--mr-color:#C9A84C" onclick="toggleRateLine('5_10')">5–10 J</button>
+        <button type="button" class="mr-toggle active" data-bucket="over10" style="--mr-color:#B8625C" onclick="toggleRateLine('over10')">über 10 J</button>
+      </div>
+    </div>
+
+    <!-- Multi-Line-Chart -->
+    <div class="rates-trend mr-trend-v209">
+      <div class="rates-chart-wrap" style="height:240px">
+        <canvas id="ratesChart"></canvas>
+      </div>
+    </div>
+
+    <!-- V209: Bar-Vergleich aktuelle Werte -->
+    <div class="mr-bar-section">
+      <div class="mr-bar-title">Vergleich aktuell · alle Zinsbindungen</div>
+      <div class="mr-bar-wrap" style="height:140px">
+        <canvas id="ratesBarChart"></canvas>
+      </div>
+    </div>
+
+    <!-- V209: Empfehlungs-Card (kontextbezogen) -->
+    <div class="mr-recommendation" id="mr-recommendation">
+      <div class="mr-rec-header">
+        <span class="mr-rec-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.74V17h8v-2.26A7 7 0 0 0 12 2z"/></svg>
+        </span>
+        <span class="mr-rec-label">Zinsbindungs-Empfehlung</span>
+        <span class="mr-rec-tag" id="mr-rec-tag">Orientierungshilfe</span>
+      </div>
+      <div class="mr-rec-body" id="mr-rec-body">
+        <div class="mr-rec-empty">Erst ein Objekt eingeben (Kennzahlen oder Quick-Check) — dann zeige ich eine kontextbezogene Empfehlung anhand der aktuellen Marktlage und deiner Finanzierung.</div>
+      </div>
+    </div>
+
+    <!-- Quelle + Disclaimer -->
+    <div id="rates-source" class="rates-source-box"></div>
+    <div class="mr-disclaimer">
+      <strong>Hinweis:</strong> Diese Daten zeigen den durchschnittlichen Markt-Effektivzins der MFI-Statistik der Deutschen Bundesbank — keine Konditions-Quote.
+      Bank-individuelle Angebote (z.B. bei Interhyp, Dr. Klein, Baufi24) hängen von Bonität, LTV, Lage und Bankpartner ab und können abweichen.
+      Diese Empfehlung ist kein Finanzberatungs-Ersatz nach § 34c GewO.
+    </div>
+  </div>
+
+  <!-- V210: Indikative Konditionen nach Zinsbindung (Pfandbrief-Rendite + Marge) -->
+  <div class="card market-rates-card mr-pf-card" data-collapsible="mr-pf" data-collapse-title="Indikative Konditionen nach Zinsbindung">
+    <div class="ct-row">
+      <div class="ct" style="margin:0;border:none;padding:0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+        Indikative Konditionen nach Zinsbindung
+        <span class="info-tag" id="mr-pf-source-badge">Pfandbrief + Marge</span>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="refreshPfandbriefRates()" title="Pfandbrief-Daten aktualisieren" aria-label="Aktualisieren">↻</button>
+    </div>
+
+    <p class="mr-pf-intro">Banken refinanzieren Wohnungsbau-Darlehen über Pfandbriefe. Der Bauzins ergibt sich aus Pfandbrief-Rendite plus Bank-Marge — abhängig von Beleihung (LTV) und Bonität.</p>
+
+    <!-- Marge-Stufen-Picker -->
+    <div class="mr-pf-margin-picker" role="group" aria-label="Bonitäts-Szenario">
+      <span class="mr-pf-margin-label">Ihr Szenario:</span>
+      <button type="button" class="mr-pf-margin-btn" data-margin="premium"            onclick="setPfandbriefMargin('premium')">
+        <span class="mr-pf-margin-btn-title">Premium</span>
+        <span class="mr-pf-margin-btn-hint">LTV ≤ 60% · Top-Bonität · +0,8%</span>
+      </button>
+      <button type="button" class="mr-pf-margin-btn active" data-margin="standard"   onclick="setPfandbriefMargin('standard')">
+        <span class="mr-pf-margin-btn-title">Standard</span>
+        <span class="mr-pf-margin-btn-hint">LTV 60–80% · normale Bonität · +1,2%</span>
+      </button>
+      <button type="button" class="mr-pf-margin-btn" data-margin="schwach"            onclick="setPfandbriefMargin('schwach')">
+        <span class="mr-pf-margin-btn-title">Risiko-Aufschlag</span>
+        <span class="mr-pf-margin-btn-hint">LTV > 90% oder Bonität mittel · +1,8%</span>
+      </button>
+    </div>
+
+    <!-- 4 Tiles für 5/10/15/20J -->
+    <div class="mr-pf-grid" id="mr-pf-grid">
+      <div class="mr-pf-tile" data-maturity="5">
+        <div class="mr-pf-tile-head">
+          <span class="mr-pf-tile-label">5 Jahre</span>
+          <span class="mr-pf-tile-src" id="mr-pf-src-5">…</span>
+        </div>
+        <div class="mr-pf-tile-rate" id="mr-pf-rate-5">–</div>
+        <div class="mr-pf-tile-detail" id="mr-pf-detail-5">Pfandbrief + Marge</div>
+      </div>
+      <div class="mr-pf-tile" data-maturity="10">
+        <div class="mr-pf-tile-head">
+          <span class="mr-pf-tile-label">10 Jahre</span>
+          <span class="mr-pf-tile-src" id="mr-pf-src-10">…</span>
+        </div>
+        <div class="mr-pf-tile-rate" id="mr-pf-rate-10">–</div>
+        <div class="mr-pf-tile-detail" id="mr-pf-detail-10">Pfandbrief + Marge</div>
+      </div>
+      <div class="mr-pf-tile" data-maturity="15">
+        <div class="mr-pf-tile-head">
+          <span class="mr-pf-tile-label">15 Jahre</span>
+          <span class="mr-pf-tile-src" id="mr-pf-src-15">…</span>
+        </div>
+        <div class="mr-pf-tile-rate" id="mr-pf-rate-15">–</div>
+        <div class="mr-pf-tile-detail" id="mr-pf-detail-15">Pfandbrief + Marge</div>
+      </div>
+      <div class="mr-pf-tile" data-maturity="20">
+        <div class="mr-pf-tile-head">
+          <span class="mr-pf-tile-label">20 Jahre</span>
+          <span class="mr-pf-tile-src" id="mr-pf-src-20">…</span>
+        </div>
+        <div class="mr-pf-tile-rate" id="mr-pf-rate-20">–</div>
+        <div class="mr-pf-tile-detail" id="mr-pf-detail-20">Pfandbrief + Marge</div>
+      </div>
+    </div>
+
+    <!-- Bar-Chart: Indikative Bauzinsen pro Laufzeit -->
+    <div class="mr-pf-chart-section">
+      <div class="mr-pf-chart-title">Indikativer Bauzins pro Zinsbindung</div>
+      <div class="mr-pf-chart-wrap" style="height:160px">
+        <canvas id="mr-pf-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Quelle + Disclaimer -->
+    <div class="mr-pf-source" id="mr-pf-source"></div>
+    <div class="mr-disclaimer">
+      <strong>Hinweis:</strong> Diese Werte sind <strong>indikative Schätzungen</strong> basierend auf der Bundesbank-Pfandbrief-Zinsstruktur (BBSIS) plus einer typischen Bank-Marge.
+      Sie ersetzen <strong>kein</strong> konkretes Bankangebot. Tatsächliche Konditionen variieren je nach Bank, regionaler Lage, individueller Bonität, Beleihungswert und Auszahlungszeitpunkt.
+      Konkrete Angebote über Vermittler wie Interhyp, Dr. Klein, Baufi24 oder direkt bei der Hausbank.
+    </div>
+  </div>
+  </div>
+
+  <div class="col2">
+    <div>
+      <div class="card"><div class="ct">Darlehen I – Hauptdarlehen</div>
+        <div class="g2">
+          <div class="f"><label>Institution</label><input id="bank_inst" type="text" placeholder="Bank / Kreditinstitut"></div>
+          <div class="f"><label>Vertragsnummer</label><input id="d1_vertrag" type="text" placeholder="z.B. KD-2025-001"></div>
+        </div>
+        <!-- V63.57: Darlehenstyp-Auswahl für D1 -->
+        <div class="g2">
+          <div class="f"><label>Art des Darlehens</label>
+            <select id="d1_type" onchange="onD1TypeChange()">
+              <option value="annuitaet">Annuitätendarlehen</option>
+              <option value="tilgungsaussetzung">Tilgungsaussetzungsdarlehen (mit Bausparvertrag)</option>
+            </select>
+          </div>
+          <div class="f"><label>Auszahlungsdatum</label><input id="d1_auszahl" type="text" placeholder="z.B. 05.2025" oninput="calcD1Volltilgung()"></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Eigenkapital *</label><div class="iw"><span class="pfx">€</span><input id="ek" type="text" inputmode="decimal" placeholder="17905" class="trl" oninput="calc()"></div></div>
+        </div>
+        <div class="f checkbox-row">
+          <label class="cb-label" title="LTV-Bezugsgröße: AUS = LTV gegen Kaufpreis (Standard-Bankenpraxis, Beleihungsbasis ≈ KP). AN = LTV gegen Gesamtinvestition inkl. Erwerbsnebenkosten (konservativere Sicht — strenger, da KNK nicht als Sicherheit zählen).">
+            <input id="ek_inkl_nk" type="checkbox" onchange="calc()">
+            <span>LTV inkl. Erwerbsnebenkosten berechnen <span class="cf-hint">(strenger, GI-Bezug)</span></span>
+            <span class="info-tag">ℹ</span>
+          </label>
+        </div>
+        <div class="f"><label>Anfängl. Darlehenssumme *</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
+        <div class="g2">
+          <div class="f"><label>Zinssatz nominal (% p.a.)</label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f" id="d1t_field"><label>Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+        </div>
+        <div class="f"><label>Monatliche Rate (berechnet)</label><div class="cf" id="d1_rate">—</div></div>
+        <div class="g2">
+          <div class="f"><label>davon Zinsen / Monat</label><div class="cf" id="d1_zm">—</div></div>
+          <div class="f"><label>davon Tilgung / Monat</label><div class="cf" id="d1_tm">—</div></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Zinsbindung (Jahre)</label><div class="iw"><input id="d1_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc(); calcD1Volltilgung()"><span class="sfx">J.</span></div></div>
+          <div class="f"><label>Restschuld Ende Zinsbindung</label><div class="cf" id="restschuld">—</div></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Zinsbindung bis (auto)</label><div class="cf" id="bindend">—</div></div>
+          <div class="f"><label>Volltilgung (ca. Jahr)</label><div class="cf" id="volltilg">—</div></div>
+        </div>
+        <!-- V63.57: Tilgungsplan-Anzeige — V63.57: jetzt als Modal -->
+        <div class="f" style="margin-top:8px">
+          <button type="button" class="btn-ghost btn-sm" onclick="openTilgungsplanModal()" id="tilg_toggle_btn">
+            <span>📋 Tilgungsplan ansehen &amp; bearbeiten</span>
+          </button>
+        </div>
+        <!-- V63.57: PDF-Import-Trigger speziell für D1 -->
+        <div class="f" style="margin-top:8px">
+          <button type="button" class="btn-ghost btn-sm" onclick="triggerPdfImportTo('d1')">
+            <span>📄 Daten aus Bank-PDF importieren</span>
+          </button>
+          <span class="hint" style="margin-left:8px">Bankvertrag scannen — Werte werden automatisch übernommen</span>
+        </div>
+      </div>
+
+      <!-- V63.57/54: BAUSPARVERTRAG (für Tilgungsaussetzung) — erweitert um Zuteilungs-Mechanik -->
+      <div class="card" id="bspar_card" style="display:none">
+        <div class="ct-row">
+          <div class="ct" style="margin:0;border:none;padding:0">Bausparvertrag <span class="ds2-tag">Tilgungsaussetzung</span></div>
+          <span class="hint">Sparphase + Zuteilung + Bauspardarlehen-Phase werden separat modelliert.</span>
+        </div>
+        <div class="g2" style="margin-top:12px">
+          <div class="f"><label>Bausparkasse</label><input id="bspar_inst" type="text" placeholder="z.B. Wüstenrot, Schwäbisch Hall"></div>
+          <div class="f"><label>Vertragsnummer</label><input id="bspar_vertrag" type="text" placeholder="z.B. BSV-12345678"></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Bausparsumme</label><div class="iw"><span class="pfx">€</span><input id="bspar_sum" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
+          <div class="f"><label>Sparrate / Monat</label><div class="iw"><span class="pfx">€</span><input id="bspar_rate" type="text" inputmode="decimal" placeholder="350" class="trl" oninput="calc()"></div></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Mindestsparquote für Zuteilung (%)</label><div class="iw"><input id="bspar_quote_min" type="text" inputmode="decimal" value="40" step="1" class="tr" oninput="calc()"><span class="sfx">%</span></div><div class="hint" style="font-size:11px;margin-top:4px">Wüstenrot/SchwäbHall typ. 40-50%, manche Tarife ab 25%</div></div>
+          <div class="f"><label>Guthaben-Zinssatz (%)</label><div class="iw"><input id="bspar_zins" type="text" inputmode="decimal" value="0.10" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+        </div>
+
+        <!-- V63.57: Auto-berechnete Zuteilungs-Empfehlung -->
+        <div class="info-box" id="bspar_zuteilung_box" style="margin-top:14px; display:none">
+          <div class="info-box-content">
+            <div style="font-weight:600; font-size:13px; margin-bottom:6px" id="bspar_zuteil_status">Berechne Zuteilung…</div>
+            <div class="hint" style="font-size:12px" id="bspar_zuteil_detail">—</div>
+          </div>
+        </div>
+
+        <!-- V63.57: Bauspardarlehens-Konditionen — kommen nach Zuteilung zum Tragen -->
+        <div class="ct" style="margin-top:18px; font-size:13px; padding-top:14px; border-top:1px solid rgba(42,39,39,0.1)">Bauspardarlehen-Konditionen <span class="cf-hint" style="font-weight:400">(ab Zuteilung)</span></div>
+        <div class="g2">
+          <div class="f"><label>Zinssatz Bauspardarlehen (%)</label><div class="iw"><input id="bspar_dar_z" type="text" inputmode="decimal" value="2.5" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div><div class="hint" style="font-size:11px;margin-top:4px">Tariflich festgelegt, oft 1,5-3 %</div></div>
+          <div class="f"><label>Tilgung Bauspardarlehen (%)</label><div class="iw"><input id="bspar_dar_t" type="text" inputmode="decimal" value="6" step="0.1" class="tr" oninput="calc()"><span class="sfx">%</span></div><div class="hint" style="font-size:11px;margin-top:4px">Hohe Tilgung typisch (5-7 %)</div></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Zuteilungsdatum (auto berechnet)</label><div class="cf" id="bspar_zuteil_auto" style="background:rgba(201,168,76,0.08); color:var(--ch); font-weight:600">—</div></div>
+          <div class="f"><label>Rate Bauspardarlehen / Monat (auto)</label><div class="cf" id="bspar_dar_rate" style="background:rgba(201,168,76,0.08); color:var(--ch); font-weight:600">—</div></div>
+        </div>
+
+        <div class="info-box info-gold" style="margin-top:12px">
+          <div class="info-box-content">
+            <div class="hint">
+              <b>Wie das funktioniert</b>: In der <b>Sparphase</b> zahlst du nur Zinsen aufs Hauptdarlehen + Bausparrate.
+              Bei Erreichen der Mindestquote wird der Vertrag <b>zuteilungsreif</b>: Sparguthaben + Bauspardarlehen
+              lösen die Restschuld ab. Anschließend läuft das <b>Bauspardarlehen</b> mit fester Tilgung weiter.
+            </div>
+          </div>
+        </div>
+        <div class="f" style="margin-top:8px">
+          <button type="button" class="btn-ghost btn-sm" onclick="triggerPdfImportTo('bspar')">
+            <span>📄 Daten aus Bausparvertrag-PDF importieren</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- DARLEHEN II (optional) -->
+      <div class="card">
+        <div class="ct-row">
+          <div class="ct" style="margin:0;border:none;padding:0">Darlehen II – Zusatzdarlehen</div>
+          <label class="toggle-slim"><input type="checkbox" id="d2_enable" onchange="toggleD2()"> <span>Hinzufügen</span></label>
+        </div>
+        <div id="d2_content" style="display:none; padding-top:12px">
+          <div class="g2">
+            <div class="f"><label>Art des Darlehens</label>
+              <select id="d2_type" onchange="calc()">
+                <option value="annuitaet">Annuitätendarlehen</option>
+                <option value="tilgungsaussetzung">Tilgungsaussetzungsdarlehen</option>
+                <option value="kfw">KfW-Darlehen</option>
+              </select>
+            </div>
+            <div class="f"><label>Institution</label><input id="d2_inst" type="text" placeholder="Bank / KfW" oninput="calc()"></div>
+          </div>
+          <div class="g2">
+            <div class="f"><label>Vertragsnummer</label><input id="d2_vertrag" type="text" placeholder="z.B. KfW-1234567"></div>
+            <div class="f"><label>Bausparvertrag (optional)</label><input id="d2_bspar" type="text" placeholder="Bausparvertragsnr."></div>
+          </div>
+          <div class="f"><label>Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d2" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+          <div class="g2">
+            <div class="f"><label>Zinssatz nominal (%)</label><div class="iw"><input id="d2z" type="text" inputmode="decimal" value="2.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+            <div class="f"><label>Tilgung (%)</label><div class="iw"><input id="d2t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div>
+              <span class="hint" id="d2t_hint">Bei Tilgungsaussetzung: 0</span>
+            </div>
+          </div>
+          <div class="f"><label>Zinsbindung (Jahre)</label><div class="iw"><input id="d2_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
+          <div class="f"><label>Monatliche Rate</label><div class="cf" id="d2_rate">—</div></div>
+          <div class="info-box info-blue" id="d2_kfw_box" style="display:none; margin-top:10px">
+            <div class="info-box-title">🏛️ KfW-Förderprogramme</div>
+            <div class="info-box-content">
+              <div class="hint">Beliebte KfW-Programme für Immobilien-Investoren:</div>
+              <ul class="kfw-links">
+                <li><a href="https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Wohngebäude-Kredit-(261)/" target="_blank" rel="noopener">KfW 261 – Wohngebäude (Sanierung) →</a></li>
+                <li><a href="https://www.kfw.de/inlandsfoerderung/Privatpersonen/Neubau/Förderprodukte/Wohneigentum-für-Familien-(300)/" target="_blank" rel="noopener">KfW 300 – Wohneigentum für Familien →</a></li>
+                <li><a href="https://www.kfw.de/inlandsfoerderung/Privatpersonen/Bestehende-Immobilie/Förderprodukte/Heizungsförderung-für-Privatpersonen-(458)/" target="_blank" rel="noopener">KfW 458 – Heizungsförderung →</a></li>
+                <li><a href="https://www.kfw.de/inlandsfoerderung/Unternehmen/Wohnwirtschaft/" target="_blank" rel="noopener">Alle KfW-Programme (Wohnwirtschaft) →</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-box info-muted" id="d2_tad_box" style="display:none; margin-top:10px">
+            <div class="info-box-title">ℹ️ Tilgungsaussetzungsdarlehen</div>
+            <div class="info-box-content">
+              <div class="hint">Bei einem Tilgungsaussetzungsdarlehen zahlen Sie während der Laufzeit nur Zinsen. Die Tilgung erfolgt am Ende über einen Tilgungsträger (z.B. Bausparvertrag, Lebensversicherung, Fonds-Sparplan). Steuerlich vorteilhaft, da Zinskosten konstant hoch bleiben (= mehr abzugsfähige Werbungskosten).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card"><div class="ct">Anschlussfinanzierung (Prognose)</div>
+        <p class="hint" style="margin-top:-4px">
+          <b>Empfehlung:</b> Konservativ rechnen mit <b>5,0 % Zins</b> und <b>1,0 % Tilgung</b>.
+          So hast du einen Puffer wenn die Zinsen bis zur Anschlussfinanzierung steigen.
+          Diese Werte fließen in die 3-Phasen-Berechnung und 15-Jahres-Projektion ein.
+        </p>
+        <div class="g2">
+          <div class="f"><label>Zinssatz Anschluss (%)</label><div class="iw"><input id="anschl_z" type="text" inputmode="decimal" value="5.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Tilgung Anschluss (%)</label><div class="iw"><input id="anschl_t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Rate Anschluss / Monat</label><div class="cf" id="anschl_rate">—</div></div>
+          <div class="f"><label>Zinsbindung Anschluss (J.)</label><div class="iw"><input id="anschl_bj" type="text" inputmode="decimal" value="15" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
+          <div class="f"><label>Zinsrisiko (auto berechnet)</label><div class="cf" id="zaer_display" style="font-size:12px;color:var(--muted)">—</div></div>
+          <input type="hidden" id="zaer" value="0"><div class="f"><label>Mehrkosten Anschluss / Monat</label><div class="cf" id="zaer_m">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card"><div class="ct">Finanzierungsübersicht</div>
+        <div class="kv"><span>Darlehenssumme</span><span class="kv-v c-gold" id="r-darl">—</span></div>
+        <div class="kv"><span>Eigenkapital</span><span class="kv-v c-green" id="r-ek">—</span></div>
+        <div class="kv"><span>LTV (Loan to Value)</span><span class="kv-v" id="r-ltv">—</span></div>
+        <!-- V63.8: Erklärung zur Beleihung -->
+        <div class="ltv-explanation" id="ltv-explanation">
+          <div class="ltv-explanation-head">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>Wie setzt sich die Beleihung zusammen?</span>
+          </div>
+          <div class="ltv-explanation-body" id="ltv-explanation-body">
+            <span id="ltv-exp-darl">Darlehenssumme</span> ÷ <span id="ltv-exp-basislabel">Kaufpreis</span> (<span id="ltv-exp-kp">—</span>) = <span id="ltv-exp-ltv">LTV</span>.<br>
+            <span class="ltv-explanation-detail" id="ltv-exp-hint">Standard-Bankenpraxis: Beleihungsbasis = Kaufpreis. Aktuell: EK <span id="ltv-exp-ek">—</span> | Darlehen <span id="ltv-exp-d">—</span> | KP <span id="ltv-exp-kp2">—</span></span>
+          </div>
+        </div>
+        <div class="kv"><span>Monatliche Rate</span><span class="kv-v c-gold" id="r-rate">—</span></div>
+        <div class="kv"><span>Zinssatz nominal</span><span class="kv-v" id="r-zins">—</span></div>
+        <div class="kv"><span>Zinsbindung bis</span><span class="kv-v" id="r-bindend">—</span></div>
+        <div class="kv"><span>Restschuld EZB</span><span class="kv-v" id="r-rs">—</span></div>
+        <div class="kv"><span>Anschlussrate / Monat</span><span class="kv-v" id="r-anschl">—</span></div>
+        <hr class="dvd">
+        <div class="ltv-labels"><span>Eigenkapital</span><span>Fremdkapital</span></div>
+        <div class="ltv-bg"><div class="ltv-fill" id="ek-bar" style="width:16%"></div></div>
+        <div class="ltv-labels"><span class="c-gold fw5" id="ek-pct">16%</span><span id="fk-pct">84%</span></div>
+      </div>
+      <div class="card"><div class="ct">Bankargumente</div>
+        <div class="bank-item ok" id="bi-grundschuld"><div class="bank-dot green"></div><div><div class="bank-title">Erstrangige Grundschuld</div><div class="bank-desc">Immobilie als Sicherheit – stabile werthaltige Beleihung</div></div></div>
+        <div class="bank-item ok" id="bi-dscr"><div class="bank-dot"></div><div><div class="bank-title" id="bank-dscr-t">DSCR – Schuldendeckung</div><div class="bank-desc" id="bank-dscr-d">Mieteinnahmen decken Kapitaldienst</div></div></div>
+        <div class="bank-item ok" id="bi-verm"><div class="bank-dot green"></div><div><div class="bank-title" id="bi-verm-t">Vollständig vermietet</div><div class="bank-desc" id="bi-verm-d">Nachgewiesene Mieterträge als stabile Einnahmebasis</div></div></div>
+        <div class="bank-item ok" id="bi-ltv"><div class="bank-dot green"></div><div><div class="bank-title" id="bank-ltv-t">LTV – Beleihungsquote</div><div class="bank-desc" id="bank-ltv-d">Beleihungsauslauf liegt im Rahmen</div></div></div>
+        <div class="bank-item warn" id="bi-zaer"><div class="bank-dot"></div><div><div class="bank-title">Zinsänderungsrisiko</div><div class="bank-desc" id="bank-zaer-d">Anschlussfinanzierung kalkuliert</div></div></div>
+      </div>
+    </div>
+  </div>
+  <!-- V63.57: Finanzierungs-Empfehlungen — automatisch generiert -->
+  <div class="card" id="fin_recommend_card" style="margin-top:14px">
+    <div class="ct">💡 Empfehlungen zur Finanzierung</div>
+    <p class="hint">Automatische Hinweise zur Optimierung — basierend auf LTV, DSCR, Tilgung &amp; Zinsbindung.</p>
+    <div id="fin_recommend_list"></div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 4: BWK ═══════════ -->
+<div class="sec" id="s4">
+  <h2 class="sec-title">Bewirtschaftungskosten</h2><p class="sec-desc">Alle laufenden Kosten – umlagefähig und nicht umlagefähig pro Jahr</p>
+
+  <!-- BWK Mode Switcher -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ct-row" style="padding:2px 0">
+      <div style="flex:1">
+        <div class="ct" style="margin:0;padding:0;border:none">Eingabe-Modus</div>
+        <div class="hint" style="margin-top:4px">Wähle, ob du BWK detailliert pro Position oder als Prozentsatz der Kaltmiete eingeben möchtest.</div>
+      </div>
+      <div class="bwk-mode-btns">
+        <button class="mode-btn active" data-mode="detail" onclick="switchBwkMode('detail')">Detailliert</button>
+        <button class="mode-btn" data-mode="percent" onclick="switchBwkMode('percent')">% der NKM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Percent Mode (simple) -->
+  <div id="bwk-percent-mode" style="display:none; margin-bottom:16px">
+    <div class="col2">
+      <div class="card">
+        <div class="ct-row" style="padding:0 0 10px 0">
+          <div class="ct" style="margin:0;padding:0;border:none">BWK – Quick-Eingabe</div>
+          <div class="bwk-mode-btns" style="font-size:10.5px">
+            <button class="mode-btn active" data-pmode="nkm" onclick="switchBwkPctMode('nkm')">% der NKM</button>
+            <button class="mode-btn" data-pmode="kp" onclick="switchBwkPctMode('kp')">% vom Kaufpreis</button>
+          </div>
+        </div>
+
+        <!-- NKM-Modus (Default) -->
+        <div id="bwk-pct-nkm-block">
+          <div class="f"><label>Umlagefähig (% der NKM)</label>
+            <div class="iw"><input id="bwk_ul_pct" type="text" inputmode="decimal" value="17" step="0.5" class="tr" oninput="calc()"><span class="sfx">%</span></div>
+            <span class="hint">Typisch: 15–20% (Hausgeld umlagefähig, Grundsteuer, etc.)</span>
+          </div>
+          <div class="f"><label>Nicht umlagefähig (% der NKM)</label>
+            <div class="iw"><input id="bwk_nul_pct" type="text" inputmode="decimal" value="16" step="0.5" class="tr" oninput="calc()"><span class="sfx">%</span></div>
+            <span class="hint">Typisch: 15–22% (Verwaltung, Rücklagen, Mietausfall)</span>
+          </div>
+          <div class="f"><label>Gesamt (% der NKM)</label><div class="cf" id="bwk_total_pct">—</div></div>
+        </div>
+
+        <!-- KP-Modus -->
+        <div id="bwk-pct-kp-block" style="display:none">
+          <div class="f"><label>BWK gesamt (% vom Kaufpreis)</label>
+            <div class="iw"><input id="bwk_kp_pct" type="text" inputmode="decimal" value="0.75" step="0.05" class="tr" oninput="calc()"><span class="sfx">%</span></div>
+            <span class="hint">Bewährter Erfahrungswert: <b>0,5 – 1,0% des Kaufpreises p.a.</b></span>
+          </div>
+          <div class="info-box info-blue" style="margin-top:8px">
+            <div class="info-box-title">📊 Erfahrungswerte – % vom Kaufpreis</div>
+            <div class="info-box-content">
+              • <b>0,5 %</b> – Sehr gute Bauqualität, kaum Sanierungsbedarf, junges Hausgeld<br>
+              • <b>0,7 – 0,8 %</b> – ETW Standard, gepflegte Anlage<br>
+              • <b>1,0 %</b> – Älterer Bestand, normaler Sanierungsstau<br>
+              • <b>1,5 %+</b> – Sanierungsbedürftig oder Mehrfamilienhaus
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Berechnete BWK</div>
+        <div class="kv"><span>Nettokaltmiete / Jahr</span><span class="kv-v" id="bwk_pct_nkm">—</span></div>
+        <div class="kv"><span>Umlagefähig / Jahr</span><span class="kv-v" id="bwk_pct_ul">—</span></div>
+        <div class="kv"><span>Nicht umlagefähig / Jahr</span><span class="kv-v" id="bwk_pct_nul">—</span></div>
+        <div class="kv kv-hl"><span><b>BWK Gesamt / Jahr</b></span><span class="kv-v c-gold" id="bwk_pct_total">—</span></div>
+        <div class="hint" style="margin-top:8px">
+          <b>Referenzwerte aus dem Markt:</b><br>
+          • ETW Standard: 15–25% der NKM<br>
+          • Altbau mit Sanierungsstau: 25–40%<br>
+          • Neubau/Top-Ausstattung: 10–18%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Mode (default) -->
+  <div id="bwk-detail-mode" class="col2">
+    <div>
+      <div class="card"><div class="ct">Umlagefähige Kosten / Jahr</div>
+        <div class="f"><label>Hausgeld (umlagefähig) / Jahr</label><div class="iw"><span class="pfx">€</span><input id="hg_ul" type="text" inputmode="decimal" placeholder="1391" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Grundsteuer / Jahr</label><div class="iw"><span class="pfx">€</span><input id="grundsteuer" type="text" inputmode="decimal" placeholder="336" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Sonstiges umlagefähig / Jahr</label><div class="iw"><span class="pfx">€</span><input id="ul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Summe umlagefähig</label><div class="cf" id="ul_sum">—</div></div>
+      </div>
+      <div class="card"><div class="ct">Nicht umlagefähige Kosten / Jahr</div>
+        <div class="f"><label>Hausgeld (nicht umlagefähig)</label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
+        <div class="f"><label>Eigene Instandhaltungsrücklage</label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Kalkulat. Mietausfall / Jahr</label><div class="iw"><span class="pfx">€</span><input id="mietausfall" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Sonderverwaltung / Jahr</label><div class="iw"><span class="pfx">€</span><input id="nul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Summe nicht umlagefähig</label><div class="cf" id="nul_sum">—</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card"><div class="ct">BWK Zusammenfassung</div>
+        <div class="kv"><span>Umlagefähig / Jahr</span><span class="kv-v" id="r-ul">—</span></div>
+        <div class="kv"><span>Nicht umlagefähig / Jahr</span><span class="kv-v" id="r-nul">—</span></div>
+        <div class="kv kv-hl"><span><b>BWK Gesamt / Jahr</b></span><span class="kv-v c-gold" id="r-bwk">—</span></div>
+        <div class="kv"><span>BWK als % der NKM</span><span class="kv-v" id="r-bwk-pct">—</span></div>
+        <div class="kv"><span>Hausgeld gesamt</span><span class="kv-v" id="r-hg-ges">—</span></div>
+      </div>
+      <div class="card"><div class="ct">Detailpositionen (optional)</div>
+        <div class="g2">
+          <div class="f"><label>Kostenposition I (€)</label><div class="iw"><span class="pfx">€</span><input id="kp1" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+          <div class="f"><label>Bezeichnung</label><input id="kp1l" type="text" placeholder="z.B. Hausverwaltung"></div>
+          <div class="f"><label>Kostenposition II (€)</label><div class="iw"><span class="pfx">€</span><input id="kp2" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+          <div class="f"><label>Bezeichnung</label><input id="kp2l" type="text" placeholder=""></div>
+          <div class="f"><label>Kostenposition III (€)</label><div class="iw"><span class="pfx">€</span><input id="kp3" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+          <div class="f"><label>Bezeichnung</label><input id="kp3l" type="text" placeholder=""></div>
+          <div class="f"><label>Kostenposition IV (€)</label><div class="iw"><span class="pfx">€</span><input id="kp4" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+          <div class="f"><label>Bezeichnung</label><input id="kp4l" type="text" placeholder=""></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /bwk-detail-mode -->
+
+<!-- ═══════════ TAB 5: KI ═══════════ -->
+<div class="sec" id="s5">
+  <div class="sec-title">KI-Investment-Analyse</div>
+  <div class="sec-desc">DealPilot KI bewertet deine Zahlen — Bewertung, Stärken, Risiken, Verhandlungsempfehlung, Bankargumente, Fazit</div>
+
+  <div class="ai-box">
+    <div class="ai-hdr">
+      <div class="ai-icon ai-icon-brain" id="ai-icon-main"></div>
+      <div>
+        <div class="ai-title">Investment-Analyse</div>
+        <div class="ai-sub">DealPilot KI · Junker Immobilien</div>
+      </div>
+    </div>
+
+    <div id="ai-content" class="ai-body">
+      Eine KI-gestützte Investment-Analyse mit konkreten Zahlen und klarer Kaufempfehlung — basierend auf allen Eingaben dieses Objekts.
+    </div>
+
+    <button class="ai-btn" id="ai-btn" onclick="runAI()">✦ KI-Analyse starten</button>
+
+    <div class="ai-pdf-toggle">
+      <label class="ji-switch">
+        <input type="checkbox" id="ai-in-pdf" checked>
+        <span class="ji-slider"></span>
+        <span class="ji-switch-label">KI-Analyse im PDF-Export einschließen</span>
+      </label>
+      <div class="ai-pdf-hint">Deaktiviere diese Option, wenn du das PDF ohne die KI-Seite exportieren möchtest.</div>
+    </div>
+  </div>
+
+  <!-- V63.96/98: Analyse-Parameter wandern in Settings → KI-Tab.
+       Marcels Wunsch: einmal als Standard einstellen, im KI-Tab nur ein Hinweis-Button. -->
+  <div class="card" id="ai-params-link-card">
+    <div class="card-title">Analyse-Parameter</div>
+    <p class="hint" style="margin:6px 0 12px">Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und Marktphase werden in den Einstellungen unter <b>KI</b> gepflegt — die KI-Analyse nutzt diese Werte automatisch.</p>
+    <div class="ai-params-current" id="ai-params-current">
+      <div class="ai-params-row"><span class="ai-params-label">Strategie</span><span class="ai-params-val" id="ai-param-strat-display">—</span></div>
+      <div class="ai-params-row"><span class="ai-params-label">Verkäuferbereitschaft</span><span class="ai-params-val" id="ai-param-verk-display">—</span></div>
+      <div class="ai-params-row"><span class="ai-params-label">Eigene Risikotoleranz</span><span class="ai-params-val" id="ai-param-risk-display">—</span></div>
+      <div class="ai-params-row"><span class="ai-params-label">Marktphase</span><span class="ai-params-val" id="ai-param-markt-display">—</span></div>
+    </div>
+    <button type="button" class="btn btn-outline" style="margin-top:12px" onclick="if(typeof showSettings==='function') showSettings('api');">⚙ Analyse-Parameter einstellen</button>
+    <!-- Hidden Inputs für Backwards-Compatibility mit ui.js _buildAIPrompt (Werte aus Profil) -->
+    <input type="hidden" id="ai_strat">
+    <input type="hidden" id="ai_verk">
+    <input type="hidden" id="ai_risk">
+    <input type="hidden" id="ai_markt">
+  </div>
+</div>
+
+<!-- ═══════════ TAB 6: KENNZAHLEN ═══════════ -->
+<div class="sec" id="s6">
+  <h2 class="sec-title">Kennzahlen &amp; Ergebnis</h2><p class="sec-desc">Alle KPIs, Szenarien, Charts und Projektion</p>
+
+  <!-- V46: Alter Deal Score → kollabierbar mit Toggle, Standard minimiert -->
+  <div class="card dealscore-card dealscore-card-v46-collapsed" id="dealscore-card">
+    <button class="ds-collapse-toggle" type="button" onclick="toggleDsCollapse()" aria-expanded="false">
+      <span class="ds-collapse-l">📊 DealPilot Score</span>
+      <span class="ds-collapse-summary" id="ds-collapse-summary">Klicken zum Anzeigen</span>
+      <span class="ds-collapse-arrow">▼</span>
+    </button>
+    <!-- V63.3: Klarstellung dass DealPilot Score = Quick-Check Score (außerhalb der Box damit nicht überschrieben) -->
+    <div class="ds-score-hint ds-score-hint-classic">
+      <span class="ds-score-hint-icon">ℹ</span>
+      <span class="ds-score-hint-text">
+        <strong>DealPilot Score</strong> entspricht exakt dem <strong>Quick-Check Score</strong> —
+        basiert auf Cashflow, Rendite, LTV, Risiko und Potenzial.
+      </span>
+    </div>
+    <div id="dealscore-box">
+      <div style="text-align:center;color:var(--muted);padding:30px">Deal Score wird berechnet sobald Werte eingegeben sind...</div>
+    </div>
+  </div>
+
+  <!-- V63.8: QC-Empfehlung im Tab Kennzahlen ENTFERNT — User-Wunsch -->
+
+  <!-- V46: DealScore 2.0 / Investor Deal Score — Standard offen, kein Toggle mehr -->
+  <div class="card dealscore-card ds2-card" id="dealscore2-card">
+    <!-- V63.3: Klarstellung was der Investor Deal Score ist (außerhalb der Box) -->
+    <div class="ds-score-hint ds-score-hint-investor">
+      <span class="ds-score-hint-icon">✨</span>
+      <span class="ds-score-hint-text">
+        <strong>Investor Deal Score</strong> = erweiterter Deal Score mit zusätzlichen 24 KPIs
+        für detaillierte Investorenbewertung (Lage, Substanz, Upside-Potenzial).
+      </span>
+    </div>
+    <div id="dealscore2-box">
+      <div style="text-align:center;color:var(--muted);padding:30px">Investor Deal Score wird berechnet…</div>
+    </div>
+  </div>
+
+  <!-- V38: Investor-Score Werte (read-only Übersicht — Eingabe in den jeweiligen Tabs) -->
+  <div class="card ds2-readonly-card" id="ds2-readonly-card">
+    <div class="ct-row">
+      <div class="ct" style="margin:0;border:none;padding:0">Investor-Score Zusatzangaben</div>
+      <div class="ds2-readonly-actions">
+        <!-- V44: KI-Button entfernt (Code bleibt — ds2AiFillAll() weiter aufrufbar via Konsole oder andere Trigger) -->
+      </div>
+    </div>
+    <p class="hint" style="margin-top:6px;margin-bottom:10px">Diese Werte fließen in den DealScore 2.0 ein. Eingabe direkt in den jeweiligen Tabs (Objekt, Investition, Miete) — hier nur die Übersicht.</p>
+    <div class="ds2-readonly-grid" id="ds2-readonly-grid">
+      <!-- wird per JS aus den Original-Feldern gefüllt -->
+    </div>
+  </div>
+
+  <!-- V28: Lokale Kennzahlen-Bewertung (kein KI-Aufruf, sofort verfügbar) -->
+  <div class="card kpi-eval-card" id="kpi-eval-card">
+    <div class="kpi-eval-header">
+      <div class="kpi-eval-title">
+        <span class="kpi-eval-icon">📊</span>
+        <span>Kennzahlen-Bewertung</span>
+        <span class="kpi-eval-tag">lokal · ohne KI</span>
+      </div>
+    </div>
+    <div class="kpi-eval-body" id="kpi-eval-body">
+      <div class="kpi-eval-empty">Sobald Werte eingegeben sind, erscheint hier eine Ampel-Bewertung der wichtigsten Kennzahlen.</div>
+    </div>
+  </div>
+
+  <!-- V25: KI-Investment-Analyse — kompakt unter dem DealScore -->
+  <div class="card ai-mini-card" id="ai-mini-card">
+    <div class="ai-mini-header">
+      <div class="ai-mini-title">
+        <span class="ai-mini-icon ai-mini-icon-svg" id="ai-mini-icon-svg"></span>
+        <span>KI-Investment-Analyse</span>
+        <span class="ai-mini-tag">basiert auf DealScore</span>
+      </div>
+      <div class="ai-mini-actions">
+        <button class="btn btn-outline btn-sm" id="ai-mini-run" onclick="runMiniAI()">Analyse starten</button>
+        <button class="btn btn-link btn-sm ai-mini-link" id="ai-mini-detail" onclick="switchTab(4)" title="Vollständige Analyse im Tab KI-Analyse">Vollständige Analyse →</button>
+      </div>
+    </div>
+    <div class="ai-mini-body" id="ai-mini-body">
+      <div class="ai-mini-empty">
+        Klicke <strong>„Analyse starten"</strong>, um eine professionelle Investment-Bewertung deines Deals zu erhalten —
+        inkl. Stärken, Risiken, Szenarien und Empfehlung.
+      </div>
+    </div>
+  </div>
+  <!-- ═══ Cashflow VOR Steuern · 3 Phasen ═══ -->
+  <div class="cf-phase-block">
+    <div class="cf-phase-title">Cashflow VOR Steuern · pro Monat</div>
+    <div class="cf-phase-grid">
+      <div class="cf-phase-card cf-phase-now"><div class="cf-phase-label">Heute</div><div class="cf-phase-val" id="cf-vst-now">—</div><div class="cf-phase-sub">€ / Monat</div></div>
+      <div class="cf-phase-card cf-phase-ezb"><div class="cf-phase-label">Ende Zinsbindung</div><div class="cf-phase-val" id="cf-vst-ezb">—</div><div class="cf-phase-sub">€ / Monat</div></div>
+      <div class="cf-phase-card cf-phase-an"><div class="cf-phase-label">Anschluss</div><div class="cf-phase-val" id="cf-vst-an">—</div><div class="cf-phase-sub">€ / Monat</div></div>
+    </div>
+  </div>
+
+  <div class="cf-phase-block cf-phase-block-tax">
+    <div class="cf-phase-title">Cashflow NACH Steuern · pro Monat</div>
+    <div class="cf-phase-grid">
+      <div class="cf-phase-card cf-phase-now"><div class="cf-phase-label">Heute</div><div class="cf-phase-val" id="cf-nst-now">—</div><div class="cf-phase-sub">€ / Monat</div></div>
+      <div class="cf-phase-card cf-phase-ezb"><div class="cf-phase-label">Ende Zinsbindung</div><div class="cf-phase-val" id="cf-nst-ezb">—</div><div class="cf-phase-sub">€ / Monat</div></div>
+      <div class="cf-phase-card cf-phase-an"><div class="cf-phase-label">Anschluss</div><div class="cf-phase-val" id="cf-nst-an">—</div><div class="cf-phase-sub">€ / Monat</div></div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Bruttomietrendite</div><div class="kpi-val gn" id="kpi-bmy">—</div><div class="kpi-sub">p.a. auf Kaufpreis</div></div>
+    <div class="kpi"><div class="kpi-label">Nettomietrendite</div><div class="kpi-val gn" id="kpi-nmy">—</div><div class="kpi-sub">p.a. auf Gesamtinvest</div></div>
+    <div class="kpi"><div class="kpi-label">LTV</div><div class="kpi-val" id="kpi-ltv">—</div><div class="kpi-sub">Fremdfinanzierungsquote</div></div>
+    <div class="kpi"><div class="kpi-label">DSCR <span class="hint" style="font-size:10px;color:var(--muted);cursor:help" title="Debt Service Coverage Ratio: Mieteinnahmen / (Zins+Tilgung). Bank-Kennzahl — Bewirtschaftungskosten und Steuern sind hier NICHT berücksichtigt. Daher kann der DSCR &gt; 1 sein, obwohl der monatliche Cashflow negativ ist (z.B. wenn die nicht-umlagefähige Bewirtschaftung den DSCR-Puffer aufzehrt).">ⓘ</span></div><div class="kpi-val" id="kpi-dscr">—</div><div class="kpi-sub">Schuldendeckung</div></div>
+    <div class="kpi"><div class="kpi-label">Faktor</div><div class="kpi-val" id="kpi-fak">—</div><div class="kpi-sub">Jahresmieten</div></div>
+    <div class="kpi"><div class="kpi-label">Equity Multiple</div><div class="kpi-val" id="kpi-em">—</div><div class="kpi-sub">geschätzt</div></div>
+  </div>
+  <div class="col2">
+    <div class="card">
+      <div class="cf-switcher">
+        <div class="ct" id="cr-title" style="margin:0;padding:0;border:none;">Cashflow – Korrekte Berechnung</div>
+        <div class="cf-mode-btns">
+          <button class="cf-mode-btn active" data-mode="heute" onclick="switchCFMode('heute')">Heute</button>
+          <button class="cf-mode-btn" data-mode="ezb" onclick="switchCFMode('ezb')">Ende Zinsbindung</button>
+          <button class="cf-mode-btn" data-mode="anschluss" onclick="switchCFMode('anschluss')">Anschluss</button>
+        </div>
+      </div>
+      <div class="kv"><span><b>Warmmiete / Jahr</b> <span class="cf-hint">(Kalt + umlagefähige Erstattung Mieter)</span></span><span class="kv-v" id="cr-wm">—</span></div>
+      <div class="kv"><span>– Umlagefähige BWK <span class="cf-hint">(durchlaufend an Verwaltung)</span></span><span class="kv-v c-muted" id="cr-bwk-ul">—</span></div>
+      <div class="kv kv-step"><span><b>= Kaltmiete (NKM + ZE) / Jahr</b></span><span class="kv-v c-blue" id="cr-kaltmiete">—</span></div>
+      <div class="kv"><span>– Nicht umlagefähige BWK / Jahr</span><span class="kv-v c-red" id="cr-bwk-nul">—</span></div>
+      <div class="kv kv-step"><span><b>= NOI (Net Operating Income) / Jahr</b></span><span class="kv-v c-blue" id="cr-noi">—</span></div>
+      <div class="kv"><span>– Zinsen / Jahr</span><span class="kv-v c-red" id="cr-zins">—</span></div>
+      <div class="kv kv-step"><span><b>= CF nach Zinsen (vor Tilgung)</b></span><span class="kv-v c-green" id="cr-cfop">—</span></div>
+      <div class="kv"><span data-cr-tilg-label>– Tilgung / Jahr</span><span class="kv-v" id="cr-tilg">—</span></div>
+      <div class="kv kv-step"><span><b>= CF vor Steuern (nach Tilgung)</b></span><span class="kv-v c-gold" id="cr-cfvst">—</span></div>
+      <div class="kv"><span>± Steuern / Jahr <span class="cf-hint">(– bei Belastung, + bei Erstattung)</span></span><span class="kv-v" id="cr-st">—</span></div>
+      <div class="kv kv-result"><span><b>= CF nach Steuern / Jahr <span class="cf-hint">(nach Tilgung)</span></b></span><span class="kv-v c-gold" id="cr-cfns">—</span></div>
+      <div class="kv kv-result"><span><b>= CF nach Steuern / Monat</b></span><span class="kv-v c-gold" id="cr-cfm">—</span></div>
+      <hr class="dvd">
+      <div class="kv"><span>AfA (steuerl. Wirkung) / Jahr</span><span class="kv-v" id="cr-afa">—</span></div>
+      <div class="kv"><span>Zu versteuernder CF / Jahr</span><span class="kv-v" id="cr-zve">—</span></div>
+      <div class="dscr-box" id="cr-dscr-box">
+        <div class="dscr-icon">📊</div>
+        <div class="dscr-content">
+          <div class="dscr-title">DSCR (Debt Service Coverage Ratio)</div>
+          <div class="dscr-sub">Brutto: NKM/Schulden · Netto: (NKM−NUL)/Schulden</div>
+        </div>
+        <div class="dscr-result">
+          <div class="dscr-formula" id="cr-dscr-formula">— € / — € =</div>
+          <div class="dscr-val" id="cr-dscr-val">—</div>
+          <div class="dscr-sub" style="margin-top:4px;font-size:.78em">Netto-DSCR: <span id="cr-dscr-netto-val" style="font-weight:700">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card"><div class="ct">Alle Kennzahlen</div>
+      <div class="kv"><span>Bruttomietrendite</span><span class="kv-v c-green" id="r-bmy">—</span></div>
+      <div class="kv"><span>Nettomietrendite</span><span class="kv-v c-green" id="r-nmy">—</span></div>
+      <div class="kv"><span>Faktor (KP / Jahresmiete)</span><span class="kv-v" id="r-fak">—</span></div>
+      <div class="kv"><span>EK-Rendite p.a.</span><span class="kv-v c-gold" id="r-ekr">—</span></div>
+      <div class="kv"><span>Equity Multiple <span class="cf-hint">(Vermögenszuwachs / EK)</span></span><span class="kv-v" id="r-em">—</span></div>
+      <div class="kv"><span>DSCR Brutto</span><span class="kv-v" id="r-dscr2">—</span></div>
+      <div class="kv"><span>DSCR Netto <span class="cf-hint">(nach NUL)</span></span><span class="kv-v" id="r-dscr-netto">—</span></div>
+      <div class="kv"><span>LTV</span><span class="kv-v" id="r-ltv2">—</span></div>
+      <div class="kv"><span>Wertpuffer / Equity</span><span class="kv-v c-green" id="r-wpuff">—</span></div>
+      <div class="kv"><span>Zinsrisiko / Mon.</span><span class="kv-v c-red" id="r-zaer-kpi">—</span></div>
+    </div>
+  </div>
+
+  <!-- V63.57: Vermögenszuwachs-Aufschlüsselung (wie Excel ImmoKalk) -->
+  <!-- V63.57: Bausparvertrag-Übersicht (nur bei Tilgungsaussetzung sichtbar) -->
+  <div class="card" id="bsv-summary-card" style="display:none">
+    <div class="ct">🏦 Bausparvertrag · Vollständiger Lebenszyklus</div>
+    <p class="hint">Bei Tilgungsaussetzung läuft das Hauptdarlehen mit reinen Zinsen. Parallel sparst du in den Bausparvertrag ein, bis das Mindestguthaben für die Zuteilung erreicht ist. Bei Zuteilung lösen Sparguthaben + Bauspardarlehen das Hauptdarlehen ab.</p>
+    <div class="kv"><span>Bausparsumme</span><span class="kv-v" id="bsv-ziel">—</span></div>
+    <div class="kv"><span>Sparrate / Monat</span><span class="kv-v" id="bsv-rate-m">—</span></div>
+    <div class="kv"><span>Sparrate / Jahr</span><span class="kv-v" id="bsv-rate-j">—</span></div>
+    <hr class="dvd">
+    <div class="kv"><span><b>Phase 1 — Sparphase</b> <span class="cf-hint">(bis Zuteilung in <span id="bsv-jahre">—</span> Jahren)</span></span><span class="kv-v"></span></div>
+    <div class="kv"><span>… Eingezahlt bis Zuteilung</span><span class="kv-v c-green" id="bsv-eingez-ezb">—</span></div>
+    <div class="kv"><span>… Sparguthaben inkl. Zinsen <span class="cf-hint">(<span id="bsv-zins-pct">0,1</span> % Guthabenzins)</span></span><span class="kv-v c-green" id="bsv-guth-ezb">—</span></div>
+    <hr class="dvd">
+    <div class="kv"><span><b>Phase 2 — Bei Zuteilung</b></span><span class="kv-v"></span></div>
+    <div class="kv"><span>Restschuld Hauptdarlehen</span><span class="kv-v" id="bsv-rs-ezb">—</span></div>
+    <div class="kv kv-result"><span><b>Status</b></span><span class="kv-v" id="bsv-deckung">—</span></div>
+  </div>
+
+  <div class="card vermoegen-card" id="card-vermoegen-zuwachs">
+    <div class="ct">Vermögenszuwachs · <span id="vz-jahre">10</span> Jahre nach Kauf</div>
+    <p class="hint">Wie setzt sich dein Vermögenszuwachs nach <span id="vz-jahre2">10</span> Jahren zusammen? Wir betrachten Tilgung, Cashflow und Wertsteigerung — und ziehen den Eigenanteil ab, den du aus eigener Tasche zugeschossen hast (bei negativem Cashflow).</p>
+    <div class="kv"><span>… durch Tilgung <span class="cf-hint">(Schulden abgebaut, brutto)</span></span><span class="kv-v" id="vz-tilgung">—</span></div>
+    <div class="kv" style="padding-left:14px;border-left:2px solid var(--green);margin-left:6px"><span class="cf-hint">… davon vom Mieter <i>(durch Mieteinnahmen finanziert)</i></span><span class="kv-v c-green" id="vz-mieter">—</span></div>
+    <div class="kv" style="padding-left:14px;border-left:2px solid var(--gold);margin-left:6px"><span class="cf-hint">… davon Eigenanteil <i>(aus eigener Tasche zugeschossen, da CF negativ war)</i></span><span class="kv-v" id="vz-eigen">—</span></div>
+    <div class="kv"><span>+ Cashflow-Überschuss <span class="cf-hint">(was nach Tilgung &amp; Steuer auf Konto bleibt)</span></span><span class="kv-v c-green" id="vz-cf">—</span></div>
+    <div class="kv"><span>+ Steuervorteil <span class="cf-hint">(kumulierte Erstattung aus V+V-Verlusten)</span></span><span class="kv-v c-green" id="vz-steuer">—</span></div>
+    <!-- V63.58: Wenn Tilgungsaussetzung mit BSV — Sparguthaben separat ausweisen,
+         damit User es nicht mit "freiem Cashflow" verwechselt -->
+    <div class="kv" id="vz-bspar-row" style="display:none"><span>+ Bausparguthaben aufgebaut <span class="cf-hint">(Sparbeitrag · gebunden im Bausparvertrag)</span></span><span class="kv-v c-green" id="vz-bspar">—</span></div>
+    <div class="kv"><span>+ Wertsteigerung <span class="cf-hint">(Marktwert minus Kaufpreis)</span></span><span class="kv-v c-green" id="vz-wert">—</span></div>
+    <div class="kv kv-result"><span><b>Netto-Vermögenszuwachs <span class="cf-hint">(Tilgung-vom-Mieter + CF-Überschuss + Steuervorteil + Wertsteigerung)</span></b></span><span class="kv-v c-gold" id="vz-gesamt">—</span></div>
+    <div class="kv"><span>Equity Multiple <span class="cf-hint">(Netto-Vermögenszuwachs / eingesetztes EK)</span></span><span class="kv-v c-gold" id="vz-em">—</span></div>
+
+    <!-- V63.57: Aufstellung Cashflow-Überschuss — einklappbar -->
+    <details class="vz-explainer" style="margin-top:18px">
+      <summary style="cursor:pointer;padding:10px 14px;background:var(--surface);border-radius:8px;border:1px solid rgba(201,168,76,.25);font-weight:600;font-size:.9em;color:var(--ch);list-style:none;display:flex;align-items:center;justify-content:space-between">
+        <span><span class="vz-arrow">▶</span> Wie der Cashflow-Überschuss entsteht (kumuliert über <span id="vz-jahre3">10</span> Jahre)</span>
+        <span class="cf-hint" style="font-weight:400">klick zum Aufklappen</span>
+      </summary>
+      <div style="margin-top:6px;padding:12px 14px;background:var(--surface);border-radius:8px;border:1px solid rgba(201,168,76,.25)">
+        <div class="kv" style="font-size:.86em"><span>Kumulierte Mieteinnahmen <span class="cf-hint">(NKM + Zus.Einn., mit <span id="vz-info-mstg-pct">1,5</span> % p.a. Mietsteigerung)</span></span><span class="kv-v" id="vz-info-miete">—</span></div>
+        <div class="kv" style="font-size:.86em"><span>– Bewirtschaftung n.uml. <span class="cf-hint">(eigene Kosten, mit <span id="vz-info-kstg-pct">1,0</span> % p.a. Kostensteigerung)</span></span><span class="kv-v c-red" id="vz-info-bwk">—</span></div>
+        <div class="kv" style="font-size:.86em"><span>– Zinsen <span class="cf-hint">(über die Laufzeit)</span></span><span class="kv-v c-red" id="vz-info-zins">—</span></div>
+        <div class="kv" style="font-size:.86em"><span>– Tilgung <span class="cf-hint">(über die Laufzeit, Schulden abgebaut)</span></span><span class="kv-v c-red" id="vz-info-tilg">—</span></div>
+        <div class="kv" style="font-size:.86em;display:none" id="vz-info-bspar-row"><span>– Bausparrate <span class="cf-hint">(kumuliert, gebunden im Bausparvertrag)</span></span><span class="kv-v c-red" id="vz-info-bspar">—</span></div>
+        <div class="kv" style="font-size:.86em"><span>± Steuern <span class="cf-hint">(Belastung/Erstattung kumuliert)</span></span><span class="kv-v" id="vz-info-tax">—</span></div>
+        <div class="kv kv-result" style="font-size:.9em"><span><b>= Kumulierter CF-Überschuss <span class="cf-hint">(Konto-Reserve nach Tilgung &amp; Steuer)</span></b></span><span class="kv-v c-gold" id="vz-info-summe">—</span></div>
+        <div class="hint" style="font-size:.78em;margin-top:8px">
+          <b>Plausi-Check Mieten:</b> Aktuelle NKM <span id="vz-plausi-nkm">—</span>/J × <span id="vz-plausi-jahre">15</span> Jahre = <span id="vz-plausi-statisch">—</span> (ohne Steigerung). Mit <span id="vz-plausi-mstg">1,5</span> % p.a. wächst die Miete jedes Jahr → Summe = <span id="vz-plausi-mit">—</span>.<br>
+          <b>Hinweis:</b> Die Tilgung wird hier abgezogen, weil sie kein Geld auf dem Konto ist — sie ist gebundenes Eigenkapital im Objekt. Sie taucht oben separat als <i>„Tilgung-vom-Mieter"</i> auf. <b>Konto-Reserve + Tilgung-vom-Mieter</b> = liquider und gebundener Vermögenszuwachs.
+        </div>
+      </div>
+    </details>
+
+    <!-- V63.57: Aufstellung Wertsteigerung — einklappbar -->
+    <details class="vz-explainer" style="margin-top:10px">
+      <summary style="cursor:pointer;padding:10px 14px;background:var(--surface);border-radius:8px;border:1px solid rgba(63,165,108,.30);font-weight:600;font-size:.9em;color:var(--ch);list-style:none;display:flex;align-items:center;justify-content:space-between">
+        <span><span class="vz-arrow">▶</span> Wie die Wertsteigerung berechnet wird (über <span id="vz-jahre4">10</span> Jahre)</span>
+        <span class="cf-hint" style="font-weight:400">klick zum Aufklappen</span>
+      </summary>
+      <div style="margin-top:6px;padding:12px 14px;background:var(--surface);border-radius:8px;border:1px solid rgba(63,165,108,.30)">
+        <div class="kv" style="font-size:.86em"><span>Wert-Anker (Heute) <span class="cf-hint">(Verkehrswert / Bankbewertung / Kaufpreis)</span></span><span class="kv-v" id="vz-info-kp">—</span></div>
+        <div class="kv" style="font-size:.86em"><span>× Wertsteigerungs-Annahme p.a. <span class="cf-hint">(aus Tab Annahmen)</span></span><span class="kv-v" id="vz-info-wstg">—</span></div>
+        <div class="kv" style="font-size:.86em"><span>Wachstumsfaktor <span class="cf-hint">(1 + p.a.)<sup id="vz-info-jahre-pow">10</sup></span></span><span class="kv-v" id="vz-info-faktor">—</span></div>
+        <div class="kv" style="font-size:.86em"><span>= Marktwert nach <span id="vz-jahre5">10</span> Jahren</span><span class="kv-v" id="vz-info-endwert">—</span></div>
+        <div class="kv" style="font-size:.86em"><span>– Wert-Anker (Heute)</span><span class="kv-v c-red" id="vz-info-kp2">—</span></div>
+        <div class="kv kv-result" style="font-size:.9em"><span><b>= Wertsteigerung</b></span><span class="kv-v c-green" id="vz-info-wstgkum">—</span></div>
+        <div class="hint" style="font-size:.78em;margin-top:6px">Formel: <code>Wertsteigerung = Wert-Anker × ((1 + p.a.)<sup>Jahre</sup> − 1)</code><br>Wert-Anker ist der Verkehrswert wenn vorhanden, sonst die Bankbewertung wenn höher als der Kaufpreis, sonst der Kaufpreis selbst.<br>Standard-Annahme: 1,5 % p.a. (in den Annahmen änderbar). Konservative Werte für stabile Lagen: 0–2 %, Wachstumsregionen 2–4 %.</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- ── Detail-Card: Zinsänderungsrisiko ─────────────────────────────── -->
+  <div class="card zaer-card">
+    <div class="ct">Zinsänderungsrisiko · Detail</div>
+    <p class="hint">Vergleich zwischen aktueller Phase, Ende der Zinsbindung und der Anschlussfinanzierung.</p>
+    <table class="phase-table zaer-table">
+      <thead>
+        <tr>
+          <th>Kennzahl</th>
+          <th class="phase-h-now">Heute</th>
+          <th class="phase-h-ezb">Ende Zinsbindung</th>
+          <th class="phase-h-an">Anschluss</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Zinssatz</td>
+          <td class="num" id="zaer-zins-now">—</td>
+          <td class="num" id="zaer-zins-ezb">—</td>
+          <td class="num" id="zaer-zins-an">—</td></tr>
+        <tr><td>Bank-Rate / Monat <span class="cf-hint">(Zins + Tilgung)</span></td>
+          <td class="num" id="zaer-rate-now">—</td>
+          <td class="num" id="zaer-rate-ezb">—</td>
+          <td class="num" id="zaer-rate-an">—</td></tr>
+        <!-- V63.60: BSV-Sparrate als eigene Zeile (zwangsweise gebunden bei Tilgungsaussetzung) -->
+        <tr id="zaer-bspar-row" style="display:none"><td>BSV-Sparrate / Monat <span class="cf-hint">(zwangsweise an Vertrag gebunden)</span></td>
+          <td class="num" id="zaer-bspar-now">—</td>
+          <td class="num" id="zaer-bspar-ezb">—</td>
+          <td class="num" id="zaer-bspar-an">—</td></tr>
+        <tr id="zaer-total-row" style="display:none" class="phase-row-hl"><td><b>Liquiditätsbelastung / Monat <span class="cf-hint">(Bank + BSV)</span></b></td>
+          <td class="num" id="zaer-total-now">—</td>
+          <td class="num" id="zaer-total-ezb">—</td>
+          <td class="num" id="zaer-total-an">—</td></tr>
+        <tr><td>Cashflow / Monat <span class="cf-hint">(vor Steuer, nach Tilgung)</span></td>
+          <td class="num" id="zaer-cfvst-now">—</td>
+          <td class="num" id="zaer-cfvst-ezb">—</td>
+          <td class="num" id="zaer-cfvst-an">—</td></tr>
+        <tr><td>Cashflow / Monat <span class="cf-hint">(nach Steuer)</span></td>
+          <td class="num" id="zaer-cf-now">—</td>
+          <td class="num" id="zaer-cf-ezb">—</td>
+          <td class="num" id="zaer-cf-an">—</td></tr>
+        <tr><td>DSCR <span class="cf-hint">(inkl. BSV-Sparrate als Tilgungsersatz)</span></td>
+          <td class="num" id="zaer-dscr-now">—</td>
+          <td class="num" id="zaer-dscr-ezb">—</td>
+          <td class="num" id="zaer-dscr-an">—</td></tr>
+        <tr class="phase-row-hl"><td><b>Δ Rate ggü. Heute</b></td>
+          <td class="num">—</td>
+          <td class="num" id="zaer-drate-ezb">—</td>
+          <td class="num" id="zaer-drate-an">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3-Phasen-KPI-Vergleich -->
+  <div class="card phase-compare-card">
+    <div class="ct">Kennzahlen-Vergleich · Heute · Ende Zinsbindung · Anschluss</div>
+    <table class="phase-table">
+      <thead>
+        <tr>
+          <th>Kennzahl</th>
+          <th class="phase-h-now">Heute</th>
+          <th class="phase-h-ezb">Ende Zinsbindung</th>
+          <th class="phase-h-an">Anschluss</th>
+        </tr>
+      </thead>
+      <tbody id="phase-tbody">
+        <tr><td>Mieteinnahmen / Jahr <span class="cf-hint">(NKM + ZE)</span></td><td class="num" id="ph-wm-now">—</td><td class="num" id="ph-wm-ezb">—</td><td class="num" id="ph-wm-an">—</td></tr>
+        <tr><td>Bewirt. nicht-umlagefähig / Jahr <span class="cf-hint">(umlagef. ist durchlaufend)</span></td><td class="num" id="ph-bwk-now">—</td><td class="num" id="ph-bwk-ezb">—</td><td class="num" id="ph-bwk-an">—</td></tr>
+        <tr><td>Zinsen / Jahr</td><td class="num" id="ph-zins-now">—</td><td class="num" id="ph-zins-ezb">—</td><td class="num" id="ph-zins-an">—</td></tr>
+        <tr><td data-phase-tilg-label>Tilgung / Jahr</td><td class="num" id="ph-tilg-now">—</td><td class="num" id="ph-tilg-ezb">—</td><td class="num" id="ph-tilg-an">—</td></tr>
+        <tr class="phase-row-hl"><td><b>CF vor Steuern / Jahr</b></td><td class="num" id="ph-cfvst-now">—</td><td class="num" id="ph-cfvst-ezb">—</td><td class="num" id="ph-cfvst-an">—</td></tr>
+        <tr class="phase-row-hl"><td><b>CF vor Steuern / Monat</b></td><td class="num" id="ph-cfvstm-now">—</td><td class="num" id="ph-cfvstm-ezb">—</td><td class="num" id="ph-cfvstm-an">—</td></tr>
+        <tr><td>± Steuern / Jahr</td><td class="num" id="ph-st-now">—</td><td class="num" id="ph-st-ezb">—</td><td class="num" id="ph-st-an">—</td></tr>
+        <tr class="phase-row-hl"><td><b>CF nach Steuern / Jahr</b></td><td class="num" id="ph-cfns-now">—</td><td class="num" id="ph-cfns-ezb">—</td><td class="num" id="ph-cfns-an">—</td></tr>
+        <tr><td>CF nach Steuern / Monat</td><td class="num" id="ph-cfnsm-now">—</td><td class="num" id="ph-cfnsm-ezb">—</td><td class="num" id="ph-cfnsm-an">—</td></tr>
+        <tr><td colspan="4" class="phase-divider">Renditen & Sicherheits-Kennzahlen</td></tr>
+        <!-- V63.61: span.hint führte zu höheren Zeilen (display:block). cf-hint ist inline. -->
+        <tr><td>Bruttomietrendite <span class="cf-hint">(statisch · NKM/KP)</span></td><td class="num" id="ph-bmr-now">—</td><td class="num" id="ph-bmr-ezb">—</td><td class="num" id="ph-bmr-an">—</td></tr>
+        <tr><td>Cashflow-Rendite <span class="cf-hint">(CF n.St. / Immo-Wert)</span></td><td class="num" id="ph-cfy-now">—</td><td class="num" id="ph-cfy-ezb">—</td><td class="num" id="ph-cfy-an">—</td></tr>
+        <tr><td>EK-Rendite im Objekt <span class="cf-hint">(CF n.St. / EK im Objekt)</span></td><td class="num" id="ph-ekr-now">—</td><td class="num" id="ph-ekr-ezb">—</td><td class="num" id="ph-ekr-an">—</td></tr>
+        <tr><td>DSCR (Schuldendeckung) <span class="cf-hint" title="Bank-Sicht: Mieten / (Zins+Tilgung). Bewirtschaftungskosten und Steuern sind hier NICHT enthalten — daher kann DSCR &gt; 1 sein, obwohl der Cashflow negativ ist.">ⓘ</span></td><td class="num" id="ph-dscr-now">—</td><td class="num" id="ph-dscr-ezb">—</td><td class="num" id="ph-dscr-an">—</td></tr>
+        <tr><td>LTV (Restschuld / Wert)</td><td class="num" id="ph-ltv-now">—</td><td class="num" id="ph-ltv-ezb">—</td><td class="num" id="ph-ltv-an">—</td></tr>
+        <tr><td>Restschuld</td><td class="num" id="ph-rs-now">—</td><td class="num" id="ph-rs-ezb">—</td><td class="num" id="ph-rs-an">—</td></tr>
+        <tr><td>Immobilienwert</td><td class="num" id="ph-wert-now">—</td><td class="num" id="ph-wert-ezb">—</td><td class="num" id="ph-wert-an">—</td></tr>
+        <tr><td>Eigenkapital im Objekt</td><td class="num" id="ph-eq-now">—</td><td class="num" id="ph-eq-ezb">—</td><td class="num" id="ph-eq-an">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- V63.63: V25-Bank-Charts integriert (Equity-Aufbau, Cockpit, Waterfall, Stress-Matrix) -->
+  <div class="bc-section-header">
+    <div class="bc-section-eyebrow">— BANK-PRÄSENTATION</div>
+    <h3 class="bc-section-title">Charts für Bank-Termine &amp; Investor-Pitches</h3>
+  </div>
+  <div id="bc-equity"></div>
+  <div id="bc-cockpit"></div>
+  <div id="bc-waterfall"></div>
+  <div id="bc-stress"></div>
+
+  <!-- V63.64: Alte Chart.js-Canvas (Immobilienschere, CF-Verlauf, Vermögensaufbau, Wert vs. Restschuld)
+       wurden entfernt — die V25-Bank-Charts oben decken alle Inhalte besser ab und sind PDF-ready. -->
+  <div class="card" id="card-cashflow-projektion">
+    <div class="ct">Cashflow-Projektion <span id="proj-lbl" style="font-size:10px;color:var(--muted)"></span><span id="proj-mstg-hint" style="font-size:10px;color:var(--muted);margin-left:8px"></span></div>
+    <div style="overflow-x:auto">
+      <table class="cft">
+        <thead><tr>
+          <th class="tal">Jahr</th>
+          <th>NKM/Mon.</th>
+          <th>Warmm./Mon.</th>
+          <th title="Nicht-umlagefähige Bewirtschaftung. Umlagefähige Kosten sind durchlaufend (Mieter zahlt → Verwaltung)">BWK n.uml./J.</th>
+          <th>Zinsen/J.</th>
+          <th>Tilgung/J.</th>
+          <th title="Cashflow vor Steuern, nach Tilgung — was nach Bedienung der Bank am Konto bleibt (Banker-CF)">CF v.St./J.</th>
+          <th title="Banker-CF / 12 — was monatlich nach Bank-Bedienung übrig bleibt">CF v.St./Mon.</th>
+          <th>± Steuer/J.</th>
+          <th title="CF nach Steuern, operativ (vor Tilgung) — Excel-Definition">CF n.St./J.</th>
+          <th title="Operativer CF nach Steuer / Monat">CF n.St./Mon.</th>
+          <th>Restschuld</th>
+          <th>Immo-Wert</th>
+          <th>EK im Obj.</th>
+          <th>LTV</th>
+        </tr></thead>
+        <tbody id="proj-body"></tbody>
+      </table>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:8px">
+      ★ Goldene Zeile = Ende der Zinsbindung · Alle Werte in EUR<br>
+      <b>CF v.St./J.</b> = NKM − BWK n.uml. − Zinsen − Tilgung (Banker-Cashflow, was wirklich am Konto bleibt vor Steuer).
+      <b>CF n.St./J.</b> = NKM − BWK n.uml. − Zinsen ± Steuer (operativ, ohne Tilgung — wie Excel-Definition).
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB 9 (Deal-Aktion): wird per deal-action.js befüllt — DOM-Index 9 ═══════════ -->
+<div class="sec" id="s8">
+  <!-- Inhalt wird von DealPilotDealAction.renderTab() gerendert -->
+</div>
+
+<!-- ═══════════ TAB 7: GESPEICHERTE ═══════════ -->
+<div class="sec sec-hidden" id="s7">
+  <h2 class="sec-title">Gespeicherte Objekte</h2><p class="sec-desc">Lokal gespeicherte Kalkulationen – kein Server nötig</p>
+  <div class="card" id="saved-list"><div style="color:var(--muted);text-align:center;padding:24px;font-size:13px">Noch keine Objekte gespeichert.</div></div>
+  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+    <button class="btn btn-outline" onclick="newObj()" style="flex:1;justify-content:center;padding:10px">➕ Neues Objekt</button>
+    <button class="btn btn-outline" onclick="exportAllJSON()" style="flex:1;justify-content:center;padding:10px">📤 Alle exportieren (JSON)</button>
+    <button class="btn btn-outline" onclick="document.getElementById('imp-file').click()" style="flex:1;justify-content:center;padding:10px">📥 Importieren (JSON)</button>
+    <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importJSON(this)">
+  </div>
+</div>
+
+</div><!-- /body -->
+
+<!-- V26: Alle-Objekte-Hauptview (per setMainView('all') sichtbar) -->
+<div id="all-objects-main" class="ao-main" style="display:none">
+  <div class="ao-toolbar">
+    <input type="search" class="ao-search" id="ao-search" placeholder="🔍 Suche nach Kürzel oder Adresse..." oninput="_aoSetFilter(this.value)">
+    <div class="ao-stats" id="ao-stats">– Objekte</div>
+  </div>
+  <div id="ao-content"></div>
+</div>
+<div id="toast"></div>
+<div id="pdf-overlay"><div class="pdf-modal"><h3>PDF wird erstellt</h3><p>Bitte warten...</p><div class="pdf-progress"><div class="pdf-progress-fill" id="pdf-progress-fill" style="width:0%"></div></div></div></div>
+
+<!-- V35: BMF-AfA-Rechner Modal -->
+<div id="bmf-overlay" class="bmf-overlay" style="display:none" onclick="if(event.target===this)closeBMFRechner()">
+  <div class="bmf-modal" role="dialog" aria-labelledby="bmf-title">
+    <div class="bmf-header">
+      <div>
+        <h3 id="bmf-title">BMF-AfA-Rechner</h3>
+        <div class="bmf-sub">Kaufpreisaufteilung nach Sachwertverfahren · BMF Fassung Juni 2023</div>
+      </div>
+      <button class="bmf-close" onclick="closeBMFRechner()" type="button" aria-label="Schließen">×</button>
+    </div>
+
+    <div class="bmf-body">
+      <!-- Eingaben -->
+      <div class="bmf-form">
+        <div class="bmf-row">
+          <label>Grundstücksart</label>
+          <select id="bmf_art" onchange="bmfRecalc()">
+            <option value="">– bitte wählen –</option>
+          </select>
+        </div>
+        <div class="bmf-row">
+          <label>Standardstufe (Ausstattung)</label>
+          <select id="bmf_stufe" onchange="bmfRecalc()">
+            <option value="1">1 — sehr einfach</option>
+            <option value="2">2 — einfach</option>
+            <option value="3" selected>3 — mittel (Standard)</option>
+            <option value="4">4 — gehoben</option>
+            <option value="5">5 — sehr gehoben</option>
+          </select>
+        </div>
+        <div class="bmf-grid2">
+          <div class="bmf-row"><label>Kaufpreis (€)</label><input id="bmf_kp" type="text" inputmode="decimal" placeholder="190000" oninput="bmfRecalc()"></div>
+          <div class="bmf-row"><label>Anschaffungsjahr</label><input id="bmf_anschj" type="text" inputmode="decimal" oninput="bmfRecalc()"></div>
+          <div class="bmf-row"><label>Baujahr</label><input id="bmf_bj" type="text" inputmode="decimal" placeholder="1994" oninput="bmfRecalc()"></div>
+          <div class="bmf-row"><label>Wohnfläche (m²)</label><input id="bmf_wfl" type="text" inputmode="decimal" placeholder="96" oninput="bmfRecalc()"></div>
+          <div class="bmf-row"><label>Grundstück (m²)</label><input id="bmf_gst" type="text" inputmode="decimal" placeholder="1570" oninput="bmfRecalc()"></div>
+          <div class="bmf-row"><label>Bodenrichtwert (€/m²)</label><input id="bmf_brw" type="text" inputmode="decimal" placeholder="120" oninput="bmfRecalc()"></div>
+          <div class="bmf-row"><label>MEA Zähler</label><input id="bmf_mea_z" type="text" inputmode="decimal" placeholder="71" oninput="bmfRecalc()"><span class="bmf-hint">bei Wohnungseigentum</span></div>
+          <div class="bmf-row"><label>MEA Nenner</label><input id="bmf_mea_n" type="text" inputmode="decimal" placeholder="1000" oninput="bmfRecalc()"></div>
+        </div>
+
+        <details class="bmf-modern">
+          <summary>Modernisierungs-Punkte (für fiktives Baujahr) — optional</summary>
+          <div class="bmf-modern-grid">
+            <div class="bmf-mod-row"><span>Dacherneuerung inkl. Dämmung</span><select id="bmf_mod_1" onchange="bmfRecalc()"><option value="0">nein</option><option value="2">teilweise</option><option value="4">ja</option></select></div>
+            <div class="bmf-mod-row"><span>Fenster + Außentüren</span><select id="bmf_mod_2" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
+            <div class="bmf-mod-row"><span>Leitungssysteme (Strom/Gas/Wasser)</span><select id="bmf_mod_3" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
+            <div class="bmf-mod-row"><span>Heizungsanlage</span><select id="bmf_mod_4" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
+            <div class="bmf-mod-row"><span>Wärmedämmung Außenwände</span><select id="bmf_mod_5" onchange="bmfRecalc()"><option value="0">nein</option><option value="2">teilweise</option><option value="4">ja</option></select></div>
+            <div class="bmf-mod-row"><span>Bäder</span><select id="bmf_mod_6" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
+            <div class="bmf-mod-row"><span>Innenausbau (Decken/Böden/Treppen)</span><select id="bmf_mod_7" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
+            <div class="bmf-mod-row"><span>Grundrissgestaltung</span><select id="bmf_mod_8" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
+          </div>
+          <div class="bmf-mod-sum" id="bmf_mod_sum">Summe: 0 / 20 Punkte · keine Modernisierung</div>
+        </details>
+      </div>
+
+      <!-- Ergebnis -->
+      <div class="bmf-result" id="bmf_result">
+        <div class="bmf-empty">Bitte alle Pflichtfelder ausfüllen — die Berechnung erfolgt automatisch.</div>
+      </div>
+    </div>
+
+    <div class="bmf-footer">
+      <input type="file" id="bmf-xlsx-upload" accept=".xlsx,.xls" style="display:none" onchange="if(this.files[0])_bmfHandleFile(this.files[0]); this.value='';">
+      <button class="btn btn-ghost" onclick="exportBMFExcel()" type="button">📊 In BMF-Excel eintragen</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-ghost" onclick="closeBMFRechner()" type="button">Abbrechen</button>
+      <button class="btn btn-gold" id="bmf_apply_btn" onclick="applyBMFResult()" type="button" disabled>→ AfA-Satz und Gebäudeanteil übernehmen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Libraries via CDN (cached after first load, works offline too) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="js/deal-kpis.js?v=124"></script>
+<script src="js/calc.js?v=166"></script>
+<script src="js/d1-type-handler.js?v=160"></script>
+<script src="js/icons.js?v=166"></script>
+<script src="js/obj-numbering.js?v=166"></script>
+<script src="js/mietentwicklung.js?v=166"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/tax.js?v=166"></script>
+<script src="js/config.js?v=102"></script>
+  <script src="js/legal-links.js?v=174" defer></script>
+  <script src="js/upgrade-cta.js?v=176" defer></script>
+  <script src="js/autocomplete-debug.js?v=174" defer></script>
+  <script src="js/plan-visibility.js?v=173" defer></script>
+  <script src="js/plan-audit.js?v=160" defer></script>
+  <script src="js/ui-audit.js?v=167" defer></script>
+<script src="js/dealscore.js?v=166"></script>
+<link rel="stylesheet" href="css/datenraum.css?v=144">
+<script src="js/datenraum.js?v=160"></script>
+<script src="js/settings.js?v=176"></script>
+<script src="js/pricing-modal.js?v=124"></script>
+<script src="js/demo-paywall.js?v=160"></script>
+<script src="js/werbungskosten-pdf.js?v=166"></script>
+<script src="js/charts.js?v=166"></script>
+<script src="js/market-rates.js?v=100"></script>
+<script src="js/market-rates-pf.js?v=100"></script>
+<script src="js/market-context.js?v=100"></script>
+<script src="js/zinsannahme.js?v=100"></script>
+<script src="js/collapsible-cards.js?v=100"></script>
+<script src="js/v10.js?v=110"></script>
+<script src="js/ui.js?v=166"></script>
+<script src="js/storage.js?v=166"></script>
+<script src="js/all-objects.js?v=166"></script>
+<script src="js/portfolio-strategy.js?v=144"></script>
+<script src="js/portfolio-strategy-ui.js?v=166"></script>
+<script src="js/portfolio-strategy-pdf.js?v=166"></script>
+<script src="js/bank-negotiation-pdf.js?v=166"></script>
+<script src="js/track-record.js?v=166"></script>
+<script src="js/pdf.js?v=166"></script>
+<script src="js/auth.js?v=101"></script>
+  <script src="js/auth-401-handler.js?v=160" defer></script>
+<script src="js/subscription.js?v=166"></script>
+<script src="js/bmf-data.js?v=166"></script>
+<script src="js/bmf-afa.js?v=166"></script>
+<script src="js/bmf-ui.js?v=166"></script>
+<script src="js/dealscore2.js?v=166"></script>
+<script src="js/dealscore2-ui.js?v=166"></script>
+<script src="js/ds2-ai.js?v=166"></script>
+<script src="js/ki-lage.js?v=166"></script>
+<script src="js/ki-miete.js?v=124"></script>
+<script src="js/star-rating.js?v=166"></script>
+<script src="js/pdf-import.js?v=166"></script>
+<script src="js/financing.js?v=124"></script>
+<script src="js/financing-pdf.js?v=166"></script>
+<script src="js/immokalk-import.js?v=124"></script>
+<script src="js/import-export-modal.js?v=124"></script>
+<script src="js/quick-check.js?v=160"></script>
+<script src="js/quick-check-tab.js?v=166"></script>
+<script src="js/ai-credits.js?v=124"></script>
+<script src="js/workflow.js?v=124"></script>
+<!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
+<script src="js/bank-charts.js?v=166"></script>
+<script src="js/bank-pdf.js?v=166"></script>
+<!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
+<script src="js/help.js?v=124"></script>
+<!-- V63.73: Feedback & Support Modal -->
+<script src="js/feedback-modal.js?v=124"></script>
+<!-- V63.74: Deal-Aktion Tab (10. Tab) -->
+<script src="js/deal-action.js?v=160"></script>
+  <script src="js/deal-action-bootstrap.js?v=166" defer></script>
+<!-- V63.75: Selbstauskunft-PDF-Generator -->
+<script src="js/selbstauskunft.js?v=124"></script>
+<!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
+<script src="js/rnd-gnd-table.js?v=142"></script>
+<script src="js/rnd-bte-katalog.js?v=142"></script>
+<script src="js/rnd-calc.js?v=166"></script>
+<script src="js/rnd-pdf.js?v=166"></script>
+<script src="js/rnd-docx.js?v=142"></script>
+<script src="js/rnd-ui.js?v=166"></script>
+<script src="js/rnd-wizard.js?v=160"></script>
+<!-- V63.76: Investmentprofil (Settings-Tab) -->
+<script src="js/investment-profile.js?v=124"></script>
+<script src="js/main.js?v=172"></script>
+  <script src="js/autocomplete.js?v=160" defer></script>
+</div><!-- .main-col --></div><!-- .app-wrap -->
+</form><!-- V32 dp-noform -->
+<!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->
+
+
+  <script src="js/register-easter-egg.js?v=101" defer></script>
+</body>
+</html>

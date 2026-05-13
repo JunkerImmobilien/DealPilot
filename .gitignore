@@ -1,0 +1,71 @@
+# ────────────────────────────────────────────────
+# DealPilot — .gitignore
+# ────────────────────────────────────────────────
+
+# Node
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files (SECRETS!)
+.env
+.env.*
+!.env.example
+!backend/.env.example
+backend/.env
+backend/.env.local
+backend/.env.production
+
+# Backend uploads (gehören in Docker-Volume)
+backend/uploads/
+backend/src/uploads/
+
+# Backups (.bak-Files aus Deployments)
+**/*.bak-*
+**/*.broken*
+**/*.bak
+docker-compose.prod.yml.bak-*
+
+# Frontend Pre-Versions
+frontend.bak-*
+frontend.v*-broken*
+
+# ZIPs (nutzen jetzt Git)
+*.zip
+dealpilot-v*.zip
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+.history/
+
+# Logs
+*.log
+logs/
+
+# Backup-Verzeichnisse + DB-Dumps
+backups/
+*.sql
+*.sql.gz
+
+# Test outputs
+coverage/
+.nyc_output/
+
+# Temp
+tmp/
+.tmp/
+
+# Docker-Volume-Mounts (lokal, falls jemals als bind mount)
+caddy_data/
+caddy_config/
+
+# SSL / Certs
+letsencrypt/

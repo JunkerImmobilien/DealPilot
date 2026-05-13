@@ -1,0 +1,40 @@
+/* ═══════════════════════════════════════════════════════════════
+   V149 — Select-Fix für d1_type (Bug-Fix)
+   ═══════════════════════════════════════════════════════════════
+   In V148 wurde festgestellt dass das d1_type-Dropdown technisch
+   alle Optionen hatte (annuitaet, tilgungsaussetzung), aber beim
+   User-Klick nicht aufklappte. Die appearance:none-Regel aus
+   style.css blockierte das native Dropdown-Verhalten.
+
+   Dieser Override stellt das native Select-Verhalten für die
+   wichtigsten Dropdowns wieder her — sie sehen weiterhin gut aus,
+   aber öffnen wieder beim Klick.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* d1_type: Native Pfeil-Funktion zurück */
+#d1_type,
+#d2_type,
+#objart,
+#d1t_field select,
+.card select {
+  appearance: auto !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+  background-image: none !important;
+  padding-right: 11px !important;
+  cursor: pointer !important;
+}
+
+/* Beim Focus: Border-Highlight bleibt, aber kein zusätzlicher Pfeil-Override */
+#d1_type:focus,
+#d2_type:focus {
+  outline: none !important;
+  border-color: var(--gold, #C9A84C) !important;
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.15) !important;
+}
+
+/* Sicherheits-Reset: falls inheritende Höhe-Regeln das Select kaputt machen */
+#d1_type, #d2_type {
+  min-height: 38px !important;
+  font-size: 13px !important;
+}

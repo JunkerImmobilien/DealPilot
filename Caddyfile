@@ -1,0 +1,60 @@
+# DealPilot Caddyfile — automatisches HTTPS via Let's Encrypt
+# Alle ENV-Variablen kommen aus dem caddy-Container (siehe docker-compose.prod.yml)
+
+{$DOMAIN} {
+    # ACME-Email für Let's Encrypt
+    tls {$ACME_EMAIL}
+
+    # Sicherheits-Header
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Nur HTTPS-Resourcen von eigenem Origin + CDNs
+        # CSP nur kommentiert, weil DealPilot zur Laufzeit CDN-Skripte lädt.
+        # Wenn die mal nicht mehr nötig sind, einkommentieren:
+        # Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:;"
+    }
+
+    # API → Backend
+    handle /api/* {
+        reverse_proxy backend:3001 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+        }
+    }
+
+    # Health-Endpoint
+    handle /health* {
+        reverse_proxy backend:3001
+    }
+
+    # Stripe-Webhooks
+    handle /webhooks/* {
+        reverse_proxy backend:3001
+    }
+
+    # Frontend (statische Dateien)
+    handle {
+        root * /srv/frontend
+        try_files {path} /index.html
+        encode zstd gzip
+
+        # Cache statische Assets aggressiv (Logos, Fonts)
+        @static path *.png *.jpg *.jpeg *.svg *.woff *.woff2 *.ico
+        header @static Cache-Control "public, max-age=31536000, immutable"
+
+        # JS/CSS: kürzer, weil DealPilot aktive Entwicklung
+        @code path *.js *.css
+        header @code Cache-Control "public, max-age=300, must-revalidate"
+
+        file_server
+    }
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+}
