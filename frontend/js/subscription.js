@@ -78,6 +78,32 @@ var Sub = (function() {
       var resp = await Auth.apiCall('/subscription');
       _cache = resp.subscription;
       _cacheTime = Date.now();
+
+      // V185: Frontend-Override mit Backend-Plan syncen (sonst zeigt UI 'free')
+      // Nur wenn KEIN lokaler Override gesetzt ist (Dev-Mode-Override hat Vorrang).
+      try {
+        var localOverride = localStorage.getItem('dp_plan_override');
+        if (!localOverride && _cache && _cache.plan_id && window.DealPilotConfig
+            && window.DealPilotConfig.pricing
+            && typeof window.DealPilotConfig.pricing.setOverride === 'function') {
+          window.DealPilotConfig.pricing.setOverride(_cache.plan_id);
+          // Override entfernen sobald gesetzt — wir nutzen den 'Sync'-Wert nur kurz
+          // damit applyFeatureGates den richtigen Plan sieht.
+          // ABER: localStorage soll nicht gesetzt werden — daher direkt wieder weg.
+          try { localStorage.removeItem('dp_plan_override'); } catch(e) {}
+        }
+      } catch(e) { console.warn('[Sub V185] Override-Sync fehlgeschlagen:', e); }
+
+      // V185: Feature-Gates neu rendern wenn Plan sich geändert hat oder erstmals geladen
+      try {
+        if (typeof window.applyFeatureGates === 'function') {
+          window.applyFeatureGates();
+        }
+        if (typeof window.renderSubscriptionBadge === 'function') {
+          window.renderSubscriptionBadge();
+        }
+      } catch(e) { console.warn('[Sub V185] FeatureGate-Refresh fehlgeschlagen:', e); }
+
       return _cache;
     } catch (e) {
       console.warn('Subscription endpoint not available:', e.message);

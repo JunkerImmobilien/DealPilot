@@ -383,6 +383,17 @@ async function handleAuthSubmit(mode) {
     }
     document.getElementById('auth-modal').remove();
     if (typeof toast === 'function') toast('✓ Willkommen, ' + session.name);
+
+    // V185: Plan + Feature-Gates SOFORT nach Login laden (sonst zeigt UI free für 1-2 Sek)
+    if (typeof Sub !== 'undefined' && typeof Sub.getCurrent === 'function') {
+      try {
+        await Sub.getCurrent(true);  // forceFresh
+      } catch(e) { console.warn('[auth V185] Sub.getCurrent fehlgeschlagen:', e); }
+    }
+    if (typeof window.AiCredits !== 'undefined' && typeof window.AiCredits.refresh === 'function') {
+      try { window.AiCredits.refresh(true); } catch(e) {}
+    }
+
     if (typeof onLoginSuccess === 'function') onLoginSuccess(session);
   } catch(e) {
     errEl.textContent = '⚠ ' + e.message;
