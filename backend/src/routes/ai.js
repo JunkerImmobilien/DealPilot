@@ -481,31 +481,54 @@ router.post('/bodenrichtwert', authenticate, async (req, res, next) => {
     // Adresse zusammenbauen
     const address = [payload.str, payload.plz, payload.ort].filter(Boolean).join(', ');
 
-    // Prompt
+    // V187-h3: Prompt OHNE konkretes Zahlen-Beispiel (vermeidet Few-Shot-Bias auf 250)
+    // Web-Search ist ueber callOpenAI/Responses-API standardmaessig aktiv (web_search_preview tool)
+    const hasStreet = !!(payload.str && String(payload.str).trim());
+    const addressInfo = hasStreet 
+      ? 'Strasse + PLZ + Ort vorhanden'
+      : 'NUR PLZ + Ort (keine Strasse) - schaetze den durchschnittlichen Bodenrichtwert fuer das PLZ-Gebiet';
+
     const prompt = [
-      'Du bist Immobilien-Experte fuer Deutschland und kennst die Bodenrichtwerte (BORIS-Portale der Bundeslaender).',
+      'Du bist Sachverstaendiger fuer Immobilienbewertung in Deutschland und kennst die BORIS-Portale aller Bundeslaender.',
       '',
-      'Aufgabe: Schaetze fuer folgende Adresse den aktuellen Bodenrichtwert in EUR/m^2:',
-      '  ' + address,
+      'AUFGABE: Recherchiere mit der Web-Suche den AKTUELLEN Bodenrichtwert fuer:',
+      '  Adresse: ' + address,
+      '  Datenlage: ' + addressInfo,
       '',
-      'Beruecksichtige: Region (Stadt vs Land), Bundesland, typische BORIS-Werte fuer aehnliche Lagen.',
+      'VORGEHEN:',
+      '1. Suche im Web nach dem zustaendigen BORIS-Portal des Bundeslandes / der Stadt.',
+      '2. Suche nach typischen Bodenrichtwerten fuer diese PLZ / diesen Stadtteil.',
+      '3. Beruecksichtige Wohnbauflaeche (W) vs Mischgebiet (M) - wir bewerten Wohnen.',
+      '4. Nimm wenn moeglich das aktuelle BORIS-Datum.',
       '',
-      'Antworte AUSSCHLIESSLICH als JSON-Objekt OHNE Markdown-Backticks, ohne Text drumherum:',
-      '{"value": 250, "confidence": "mittel", "reasoning": "Wohnstrasse mittlere Lage, BORIS-Vergleich 200-300"}',
+      'WICHTIGE REGELN:',
+      '- Erfinde KEINE Werte. Wenn die Recherche keine belastbare Quelle ergibt: confidence = niedrig und value = best-guess basierend auf Region.',
+      '- Realistische Bandbreiten Deutschland (Wohnen):',
+      '    laendlich        20 - 80 EUR/m^2',
+      '    Kleinstadt       80 - 250 EUR/m^2',
+      '    Mittelstadt     200 - 600 EUR/m^2',
+      '    Grossstadt      400 - 2000 EUR/m^2',
+      '    Top-Lagen (Muenchen / Frankfurt / Hamburg / Berlin Mitte) 2000 - 10000+ EUR/m^2',
+      '- Die Zahl im value-Feld MUSS zur konkreten Region passen. Beispiel: 250 EUR/m^2 sind FALSCH fuer Muenchen-Innenstadt und FALSCH fuer ein Dorf in Mecklenburg.',
+      '- confidence hoch = echte BORIS-Quelle gefunden.',
+      '- confidence mittel = Vergleichswerte fuer das Gebiet, aber keine exakte BORIS-Karte.',
+      '- confidence niedrig = nur Schaetzung aus Bundesland-Durchschnitt.',
       '',
-      'Regeln:',
-      '- value: Zahl in EUR/m^2 (ohne Tausendertrennung, ohne Einheit, ohne Anfuehrungszeichen)',
-      '- confidence: "niedrig" | "mittel" | "hoch"',
-      '- reasoning: kurze Begruendung (1 Satz, max 100 Zeichen)',
-      '- Bei Unsicherheit: value = realistische Schaetzung, confidence = niedrig',
-      '- NICHT antworten mit Markdown-Codeblock oder Erklaerungen drumherum.'
+      'OUTPUT-FORMAT (NUR dieses JSON, keine Markdown-Backticks, kein Drumherum):',
+      '{',
+      '  "value": <Zahl_EUR_pro_m2>,',
+      '  "confidence": "niedrig" | "mittel" | "hoch",',
+      '  "reasoning": "<konkrete_Begruendung_mit_Quelle_und_Region_max_150_Zeichen>",',
+      '  "source_url": "<BORIS_URL_falls_gefunden_sonst_leer>"',
+      '}',
+      '',
+      'KRITISCH: Die Zahl im value-Feld MUSS aus deiner Web-Recherche stammen und regional plausibel sein. NICHT die Platzhalter-Schreibweise wiederholen.'
     ].join('\n');
 
-    // OpenAI-Call (roher Call wie in analyze/analyzeLage)
+    // OpenAI-Call mit Web-Search (callOpenAI nutzt Responses-API mit web_search_preview standardmaessig)
     const raw = await openaiService.callOpenAI(prompt, {
       userApiKey: userApiKey,
-      temperature: 0.2,
-      maxTokens: 250
+      aiOptions: { temperature: 0.3 }
     });
 
     // Response parsen (kann String mit Markdown sein)

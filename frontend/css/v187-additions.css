@@ -193,3 +193,109 @@
 .geb-ant-banner .btn-jump:active {
   transform: translateY(0);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   V187-h4: Bodenrichtwert KI-Result-Box
+═══════════════════════════════════════════════════════════════ */
+.brw-ki-result {
+  margin-top: 10px;
+}
+.brw-ki-card {
+  background: rgba(201, 168, 76, 0.04);
+  border: 0.5px solid rgba(201, 168, 76, 0.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink, #2a2a28);
+}
+.brw-ki-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.brw-ki-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2a2a28;
+  letter-spacing: -0.5px;
+}
+.brw-ki-value .brw-ki-unit {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b6a66;
+  margin-left: 2px;
+}
+.brw-ki-conf {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+.brw-ki-conf-ico {
+  font-size: 13px;
+  line-height: 1;
+}
+.brw-ki-reasoning,
+.brw-ki-source {
+  margin-bottom: 8px;
+  font-size: 12.5px;
+  color: #3a3a36;
+}
+.brw-ki-label {
+  font-weight: 600;
+  color: #5f5e5a;
+  margin-right: 4px;
+}
+.brw-ki-srclink {
+  color: #2a6e48;
+  text-decoration: none;
+  border-bottom: 0.5px dotted rgba(63,165,108,0.4);
+  transition: all 0.15s ease;
+}
+.brw-ki-srclink:hover {
+  color: #1a5e38;
+  border-bottom-color: #2a6e48;
+}
+.brw-ki-hint {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.03);
+  border-left: 2px solid rgba(201, 168, 76, 0.4);
+  border-radius: 4px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #5f5e5a;
+  font-style: italic;
+}
+.brw-ki-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.brw-ki-verify-btn {
+  background: transparent;
+  border: 0.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #3a3a36;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.brw-ki-verify-btn:hover {
+  background: rgba(201, 168, 76, 0.08);
+  border-color: rgba(201, 168, 76, 0.4);
+  color: #8b7330;
+}
