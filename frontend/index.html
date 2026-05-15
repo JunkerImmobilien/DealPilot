@@ -27,7 +27,7 @@
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
 <link rel="stylesheet" href="css/rnd-styles.css?v=150">
 <link rel="stylesheet" href="css/select-fix.css?v=150">
-    <link rel="stylesheet" href="css/v187-additions.css?v=190">
+    <link rel="stylesheet" href="css/v187-additions.css?v=191">
 </head>
 <body>
 
@@ -2104,8 +2104,25 @@
   </div>
 </div>
 
-<!-- ═══════════ TAB 9 (Deal-Aktion): wird per deal-action.js befüllt — DOM-Index 9 ═══════════ -->
+<!-- V191: TAB Deal-Aktion mit Junker-Branding-Banner -->
 <div class="sec" id="s8">
+  <!-- V191: Junker-Banner statisch im HTML — wird von renderTab() bewahrt -->
+  <div class="junker-action-banner">
+    <div class="junker-action-banner-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+    </div>
+    <div class="junker-action-banner-text">
+      <div class="junker-action-banner-title">Junker Immobilien · Dein Partner für die nächsten Schritte</div>
+      <div class="junker-action-banner-sub">Bankanfragen, Gutachten, Restnutzungsdauer, Sanierungskonzept — alles aus einer Hand. <strong>Marcel Junker</strong> übernimmt persönlich.</div>
+    </div>
+    <div class="junker-action-banner-contact">
+      <a href="tel:+4915129820057" class="junker-action-banner-phone">📞 +49 151 298 200 57</a>
+      <a href="mailto:info@junker-immobilien.io" class="junker-action-banner-email">✉ info@junker-immobilien.io</a>
+    </div>
+  </div>
   <!-- Inhalt wird von DealPilotDealAction.renderTab() gerendert -->
 </div>
 
@@ -2245,7 +2262,7 @@
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=189"></script>
-<script src="js/storage.js?v=187h2"></script>
+<script src="js/storage.js?v=191"></script>
 <script src="js/all-objects.js?v=166"></script>
 <script src="js/portfolio-strategy.js?v=144"></script>
 <script src="js/portfolio-strategy-ui.js?v=189"></script>
@@ -2271,7 +2288,7 @@
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=124"></script>
 <script src="js/quick-check.js?v=187"></script>
-<script src="js/bodenrichtwert.js?v=190"></script>
+<script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/quick-check-tab.js?v=166"></script>
 <script src="js/ai-credits.js?v=124"></script>
@@ -2284,7 +2301,7 @@
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=124"></script>
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
-<script src="js/deal-action.js?v=160"></script>
+<script src="js/deal-action.js?v=191"></script>
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=124"></script>

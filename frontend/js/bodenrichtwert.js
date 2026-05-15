@@ -215,6 +215,18 @@
       return;
     }
     
+    // V191: Result-Daten in currentDeal speichern damit sie pro Objekt persistiert werden
+    try {
+      if (typeof window.currentDeal !== 'object' || !window.currentDeal) window.currentDeal = {};
+      window.currentDeal.brw_ki_result = {
+        value: data.value,
+        confidence: data.confidence || 'niedrig',
+        reasoning: data.reasoning || '',
+        source: data.source || '',
+        source_url: data.source_url || ''
+      };
+    } catch(e) { console.warn('[brw] persist failed:', e); }
+    
     var conf = (data.confidence || 'niedrig').toLowerCase();
     var confColor, confBg, confLabel, confIcon;
     if (conf === 'hoch') {
@@ -298,6 +310,12 @@
   }
   
   function _clearResult() {
+    // V191: Auch aus currentDeal löschen
+    try {
+      if (window.currentDeal && window.currentDeal.brw_ki_result) {
+        delete window.currentDeal.brw_ki_result;
+      }
+    } catch(e) {}
     var box = _el('brw-ki-result');
     if (box) {
       box.innerHTML = '';
@@ -309,6 +327,8 @@
   window.DealPilotBrw = {
     openBoris: openBoris,
     askAi: askAi,
+    renderResult: _renderResult,
+    clearResult: _clearResult,
     _debug: { plzToBundesland: _plzToBundesland, BORIS_URLS: BORIS_URLS }
   };
 })();

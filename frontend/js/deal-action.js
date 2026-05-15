@@ -383,71 +383,111 @@ window.DealPilotDealAction = (function() {
     var sec = $('s8');
     if (!sec) return;
 
-    sec.innerHTML = [
+    // V191: Junker-Banner statisch im HTML bewahren falls vorhanden
+    var existingBanner = sec.querySelector('.junker-action-banner');
+    var bannerHtml = existingBanner ? existingBanner.outerHTML : '';
+
+    sec.innerHTML = bannerHtml + [
+      // V191: Sec-Title unverändert
       '<h2 class="sec-title">Deal-Aktion</h2>',
       '<p class="sec-desc">Was möchtest du als Nächstes tun? Die Objektdaten werden automatisch übergeben.</p>',
-      // V138: RND-Empfehlung — zeigt sich nur wenn lohnend
+      
+      // V191: Banner-Sektion (Empfehlungen + KP-Aufteilung) ganz oben
       renderRndRecommendation(),
-      // V139: KP-Aufteilung-Empfehlung — zeigt sich nur wenn Optimierung lohnt
       renderKpAufteilungBanner(),
-      // V104: Won-Status oben
-      renderWonCard(),
-      // V140: Datenraum-Quick-Access (verlinkt zu Cloud-Ordnern)
-      _renderDatenraumQuickAccess(),
-      '<div class="da-grid">',
-        renderCard({
-          id: 'da-card-bank',
-          icon: ico('bank', 26),
-          title: 'Bankanfrage',
-          subtitle: 'An den Finanzierungspartner senden',
-          desc: 'Komplettpaket: Objektanalyse + Bankunterlagen. KI prüft Vollständigkeit vor dem Versand.',
-          status: '<span id="da-bank-progress">0 / 2 Pflicht-Dokumente</span>',
-          cta: 'Anfrage starten',
-          onclick: 'DealPilotDealAction.openBank()'
-        }),
-        renderCard({
-          id: 'da-card-fb',
-          icon: ico('shieldCheck', 26),
-          title: 'Finanzierungs&shy;bestätigung',
-          subtitle: 'Verbindliche FB anfragen',
-          desc: 'Schlanker Prozess für die FB. 2 Pflichtdokumente — Versand direkt an die Bank.',
-          status: '<span id="da-fb-progress">0 / 2 Pflicht-Dokumente</span>',
-          cta: 'Anfrage starten',
-          onclick: 'DealPilotDealAction.openFB()'
-        }),
-        renderCard({
-          id: 'da-card-expert',
-          icon: ico('clipboard', 26),
-          title: 'Gutachten & Expertise',
-          subtitle: 'Sachverständigen-Leistungen',
-          desc: 'Verkehrswert · Restnutzungsdauer · Sanierungskonzept · Projektentwicklung — durch Junker Immobilien.',
-          status: '<span style="color:var(--muted)">Anfrage per E-Mail</span>',
-          cta: 'Anfrage stellen',
-          onclick: 'DealPilotDealAction.openExpert()'
-        }),
-        renderCard({
-          id: 'da-card-consult',
-          icon: ico('lifebuoy', 26),
-          title: 'Beratung & Zweite Meinung',
-          subtitle: 'Schnell-Check oder Termin buchen',
-          desc: 'Fotos hochladen + Frage stellen ODER Termin online buchen — direkt im Kalender.',
-          status: '<span style="color:var(--muted)">Schnell-Check oder Termin</span>',
-          cta: 'Auswählen',
-          onclick: 'DealPilotDealAction.openConsult()'
-        }),
-        // V142: Portfolio-Strategieanalyse — V201: ausgegraut als Coming Soon.
-        // Plan-Hinweis (Pro/Business) entfernt — perspektivisch kommt das wieder.
-        renderCard({
-          id: 'da-card-strategy',
-          icon: ico('compass', 26),
-          title: 'Portfolio-Strategie&shy;analyse',
-          subtitle: '17 Strategien · 12 Diagnose-Karten',
-          desc: 'Anlage-Ziel, Bestand und Marktlage in einer ganzheitlichen Strategie. RND, KP-Aufteilung, GmbH-Verkauf, Eigenheim­schaukel, Familien­stiftung u.v.m.',
-          status: '<span style="color:#C9A84C;font-weight:600">🚀 Coming Soon</span>',
-          cta: 'Coming Soon',
-          onclick: 'event.preventDefault();event.stopPropagation();if(typeof toast===\'function\')toast(\'🚀 Portfolio-Strategie kommt in einer der nächsten Versionen\');return false;',
-          disabled: true
-        }),
+      
+      // V191: ═══════ STAGE 1: DEAL PRÜFEN ═══════
+      '<div class="da-stage da-stage-1">',
+        '<div class="da-stage-head">',
+          '<span class="da-stage-ico">①</span>',
+          '<div class="da-stage-title">Deal prüfen</div>',
+          '<div class="da-stage-sub">Bonität klären, Bankanfrage starten, Beratung holen</div>',
+        '</div>',
+        '<div class="da-grid">',
+          renderCard({
+            id: 'da-card-bank',
+            icon: ico('bank', 26),
+            title: 'Bankanfrage',
+            subtitle: 'An den Finanzierungspartner senden',
+            desc: 'Komplettpaket: Objektanalyse + Bankunterlagen. KI prüft Vollständigkeit vor dem Versand.',
+            status: '<span id="da-bank-progress">0 / 2 Pflicht-Dokumente</span>',
+            cta: 'Anfrage starten',
+            onclick: 'DealPilotDealAction.openBank()'
+          }),
+          renderCard({
+            id: 'da-card-fb',
+            icon: ico('shieldCheck', 26),
+            title: 'Finanzierungs&shy;bestätigung',
+            subtitle: 'Verbindliche FB anfragen',
+            desc: 'Schlanker Prozess für die FB. 2 Pflichtdokumente — Versand direkt an die Bank.',
+            status: '<span id="da-fb-progress">0 / 2 Pflicht-Dokumente</span>',
+            cta: 'Anfrage starten',
+            onclick: 'DealPilotDealAction.openFB()'
+          }),
+          renderCard({
+            id: 'da-card-consult',
+            icon: ico('lifebuoy', 26),
+            title: 'Beratung & Zweite Meinung',
+            subtitle: 'Schnell-Check oder Termin buchen',
+            desc: 'Fotos hochladen + Frage stellen ODER Termin online buchen — direkt im Kalender.',
+            status: '<span style="color:var(--muted)">Schnell-Check oder Termin</span>',
+            cta: 'Auswählen',
+            onclick: 'DealPilotDealAction.openConsult()'
+          }),
+        '</div>',
+      '</div>',
+      
+      // V191: ═══════ STAGE 2: DEAL ABSICHERN ═══════
+      '<div class="da-stage da-stage-2">',
+        '<div class="da-stage-head">',
+          '<span class="da-stage-ico">②</span>',
+          '<div class="da-stage-title">Deal absichern</div>',
+          '<div class="da-stage-sub">Gutachten, Restnutzungsdauer, Aufteilung KP/Boden</div>',
+        '</div>',
+        '<div class="da-grid">',
+          renderCard({
+            id: 'da-card-expert',
+            icon: ico('clipboard', 26),
+            title: 'Gutachten & Expertise',
+            subtitle: 'Sachverständigen-Leistungen',
+            desc: 'Verkehrswert · Restnutzungsdauer · Sanierungskonzept · Projektentwicklung — durch Junker Immobilien.',
+            status: '<span style="color:var(--muted)">Anfrage per E-Mail</span>',
+            cta: 'Anfrage stellen',
+            onclick: 'DealPilotDealAction.openExpert()'
+          }),
+        '</div>',
+      '</div>',
+      
+      // V191: ═══════ STAGE 3: DEAL ABSCHLIESSEN ═══════
+      '<div class="da-stage da-stage-3">',
+        '<div class="da-stage-head">',
+          '<span class="da-stage-ico">③</span>',
+          '<div class="da-stage-title">Deal abschließen</div>',
+          '<div class="da-stage-sub">Won-Status setzen, Datenraum nutzen</div>',
+        '</div>',
+        renderWonCard(),
+        _renderDatenraumQuickAccess(),
+      '</div>',
+      
+      // V191: Coming Soon ans Ende — separat, klein
+      '<div class="da-coming-soon">',
+        '<div class="da-stage-head" style="margin-bottom:8px">',
+          '<span class="da-stage-ico" style="background:rgba(201,168,76,0.10);color:#9a7f33">✨</span>',
+          '<div class="da-stage-title" style="font-size:14px">Kommt bald</div>',
+        '</div>',
+        '<div class="da-grid">',
+          renderCard({
+            id: 'da-card-strategy',
+            icon: ico('compass', 26),
+            title: 'Portfolio-Strategie&shy;analyse',
+            subtitle: '17 Strategien · 12 Diagnose-Karten',
+            desc: 'Anlage-Ziel, Bestand und Marktlage in einer ganzheitlichen Strategie. RND, KP-Aufteilung, GmbH-Verkauf, Eigenheim­schaukel, Familien­stiftung u.v.m.',
+            status: '<span style="color:#C9A84C;font-weight:600">🚀 Coming Soon</span>',
+            cta: 'Coming Soon',
+            onclick: 'event.preventDefault();event.stopPropagation();if(typeof toast===\'function\')toast(\'🚀 Portfolio-Strategie kommt in einer der nächsten Versionen\');return false;',
+            disabled: true
+          }),
+        '</div>',
       '</div>',
       '<div class="da-foot" style="margin-top:18px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:12px;color:var(--muted);line-height:1.5">',
       '  <strong style="color:var(--ch)">Hinweis:</strong> Alle Anfragen werden mit deinen aktuellen Objektdaten + der PDF-Investmentanalyse versendet. ',
