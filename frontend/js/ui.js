@@ -130,9 +130,28 @@ function switchTab(i) {
     setTimeout(window._updateWfTop, 30);
     setTimeout(window._updateWfTop, 200);
   }
-  // Only consider visible/tab-bound sections (skip .sec-hidden like Gespeicherte Objekte)
-  document.querySelectorAll('.sec:not(.sec-hidden)').forEach(function(s, j) { s.classList.toggle('active', j === i); });
-  document.querySelectorAll('.sec-hidden').forEach(function(s) { s.classList.remove('active'); });
+  
+  // V189: data-target-sec Mechanik — Tab-Bar-Reihenfolge unabhängig von DOM-Reihenfolge
+  // Wenn der i-te Tab-Button ein data-target-sec hat, nutze das. Sonst alter Fallback (Index→DOM-Position).
+  var tabs = document.querySelectorAll('.tab');
+  var targetSecId = null;
+  if (tabs[i] && tabs[i].getAttribute('data-target-sec')) {
+    targetSecId = tabs[i].getAttribute('data-target-sec');
+  }
+  
+  if (targetSecId) {
+    // Neue Logik: schalte gezielt nur die ID-passende Section auf .active
+    document.querySelectorAll('.sec').forEach(function(s) { s.classList.remove('active'); });
+    var target = document.getElementById(targetSecId);
+    if (target && !target.classList.contains('sec-hidden')) {
+      target.classList.add('active');
+    }
+  } else {
+    // Alter Pfad (Backwards-Compat)
+    document.querySelectorAll('.sec:not(.sec-hidden)').forEach(function(s, j) { s.classList.toggle('active', j === i); });
+    document.querySelectorAll('.sec-hidden').forEach(function(s) { s.classList.remove('active'); });
+  }
+  
   document.querySelectorAll('.tab').forEach(function(t, j) { t.classList.toggle('active', j === i); });
 
   // V62: Workflow-Bar Titel + Beschreibung pro Tab aktualisieren

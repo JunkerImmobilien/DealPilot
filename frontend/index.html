@@ -27,7 +27,7 @@
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
 <link rel="stylesheet" href="css/rnd-styles.css?v=150">
 <link rel="stylesheet" href="css/select-fix.css?v=150">
-    <link rel="stylesheet" href="css/v187-additions.css?v=187hotfix">
+    <link rel="stylesheet" href="css/v187-additions.css?v=190">
 </head>
 <body>
 
@@ -383,15 +383,16 @@
 
 <nav class="tabs">
   <!-- V63.76: Quick-Check ist KEIN Tab mehr — wird über Sidebar-Aktion "Quick Check" als Standalone-View geöffnet -->
-  <button class="tab active" data-wf-key="objekt"><span class="tab-ico" data-ico="house"></span><span class="tab-lbl">Objekt</span></button>
-  <button class="tab" data-wf-key="investition"><span class="tab-ico" data-ico="coins"></span><span class="tab-lbl">Investition</span></button>
-  <button class="tab" data-wf-key="miete"><span class="tab-ico" data-ico="euro"></span><span class="tab-lbl">Miete</span></button>
-  <button class="tab" data-wf-key="steuer"><span class="tab-ico" data-ico="fileText"></span><span class="tab-lbl">Steuer-Details</span></button>
-  <button class="tab" data-wf-key="finanzierung"><span class="tab-ico" data-ico="bank"></span><span class="tab-lbl">Finanzierung</span></button>
-  <button class="tab" data-wf-key="bewirtschaftung"><span class="tab-ico" data-ico="settings"></span><span class="tab-lbl">Bewirtschaftung</span></button>
-  <button class="tab"><span class="tab-ico" data-ico="brain"></span><span class="tab-lbl">KI-Analyse</span></button>
-  <button class="tab"><span class="tab-ico" data-ico="barChart"></span><span class="tab-lbl">Kennzahlen</span></button>
-  <button class="tab"><span class="tab-ico" data-ico="handshake"></span><span class="tab-lbl">Deal-Aktion</span></button>
+  <!-- V189: Tab-Bar mit data-target-sec — Reihenfolge unabhängig von DOM! -->
+  <button class="tab active" data-target-sec="s0" data-wf-key="objekt"><span class="tab-ico" data-ico="house"></span><span class="tab-lbl">Objekt</span></button>
+  <button class="tab" data-target-sec="s1" data-wf-key="investition"><span class="tab-ico" data-ico="coins"></span><span class="tab-lbl">Investition</span></button>
+  <button class="tab" data-target-sec="s2" data-wf-key="miete"><span class="tab-ico" data-ico="euro"></span><span class="tab-lbl">Miete</span></button>
+  <button class="tab" data-target-sec="s3" data-wf-key="finanzierung"><span class="tab-ico" data-ico="bank"></span><span class="tab-lbl">Finanzierung</span></button>
+  <button class="tab" data-target-sec="s4" data-wf-key="bewirtschaftung"><span class="tab-ico" data-ico="settings"></span><span class="tab-lbl">Bewirtschaftung</span></button>
+  <button class="tab" data-target-sec="s3-tax" data-wf-key="steuer"><span class="tab-ico" data-ico="fileText"></span><span class="tab-lbl">Steuer</span></button>
+  <button class="tab" data-target-sec="s5"><span class="tab-ico" data-ico="brain"></span><span class="tab-lbl">KI-Analyse</span></button>
+  <button class="tab" data-target-sec="s6"><span class="tab-ico" data-ico="barChart"></span><span class="tab-lbl">Kennzahlen</span></button>
+  <button class="tab" data-target-sec="s8"><span class="tab-ico" data-ico="handshake"></span><span class="tab-lbl">Deal-Aktion</span></button>
   <div class="tabs-spacer"></div>
   <!-- V75: Status-Badge in der Tab-Bar (statt Workflow-Bar darunter) -->
   <div class="tabs-status-badge" id="tabs-status-badge" title="Workflow-Fortschritt">
@@ -653,11 +654,13 @@
                 <button type="button" class="btn-brw" onclick="DealPilotBrw.openBoris()" title="Öffnet BORIS-Portal des passenden Bundeslandes">
                   <span class="btn-brw-icon">🔗</span> BORIS-Portal
                 </button>
-                <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="KI schätzt Bodenrichtwert anhand der Adresse">
-                  <span class="btn-brw-icon">✨</span> KI versuchen
+                <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="KI schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren">
+                  <span class="btn-brw-icon">✨</span> Bodenrichtwert schätzen
                 </button>
                 <span id="brw-ai-status" class="brw-ai-status"></span>
               </div>
+              <!-- V190: Container für KI-Result-Card mit Confidence/Begründung/BORIS-Verify -->
+              <div id="brw-ki-result" class="brw-ki-result" style="display:none"></div>
             </div>
         <div class="f"><label>Miteigentumsanteil (%)</label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7.06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
         <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
@@ -2241,11 +2244,11 @@
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=166"></script>
+<script src="js/ui.js?v=189"></script>
 <script src="js/storage.js?v=187h2"></script>
 <script src="js/all-objects.js?v=166"></script>
 <script src="js/portfolio-strategy.js?v=144"></script>
-<script src="js/portfolio-strategy-ui.js?v=166"></script>
+<script src="js/portfolio-strategy-ui.js?v=189"></script>
 <script src="js/portfolio-strategy-pdf.js?v=166"></script>
 <script src="js/bank-negotiation-pdf.js?v=166"></script>
 <script src="js/track-record.js?v=166"></script>
@@ -2255,9 +2258,9 @@
 <script src="js/subscription.js?v=186"></script>
 <script src="js/bmf-data.js?v=166"></script>
 <script src="js/bmf-afa.js?v=166"></script>
-<script src="js/bmf-ui.js?v=166"></script>
+<script src="js/bmf-ui.js?v=189"></script>
 <script src="js/dealscore2.js?v=166"></script>
-<script src="js/dealscore2-ui.js?v=166"></script>
+<script src="js/dealscore2-ui.js?v=189"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=124"></script>
@@ -2268,7 +2271,7 @@
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=124"></script>
 <script src="js/quick-check.js?v=187"></script>
-<script src="js/bodenrichtwert.js?v=187hotfix"></script>
+<script src="js/bodenrichtwert.js?v=190"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/quick-check-tab.js?v=166"></script>
 <script src="js/ai-credits.js?v=124"></script>
@@ -2291,7 +2294,7 @@
 <script src="js/rnd-calc.js?v=166"></script>
 <script src="js/rnd-pdf.js?v=166"></script>
 <script src="js/rnd-docx.js?v=142"></script>
-<script src="js/rnd-ui.js?v=166"></script>
+<script src="js/rnd-ui.js?v=189"></script>
 <script src="js/rnd-wizard.js?v=160"></script>
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=124"></script>

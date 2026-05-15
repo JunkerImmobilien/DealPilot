@@ -1,6 +1,6 @@
 'use strict';
 /* ═══════════════════════════════════════════════════════════════
-   V187 — Bodenrichtwert-Helper
+   V187-h4 — Bodenrichtwert-Helper (erweiterte Result-Box)
    
    - BORIS-Link pro Bundesland (PLZ-Erkennung)
    - KI-Button: schickt Adresse an Backend /ai/bodenrichtwert
@@ -182,21 +182,126 @@
           var ev = new Event('input', { bubbles: true });
           brwEl.dispatchEvent(ev);
         }
-        var confTxt = data.confidence ? ' · ' + data.confidence : '';
-        _setStatus('✓ KI: ' + data.value + ' €/m²' + confTxt, 'ok');
+        // V187-h4: kurzer Status + ausführliche Result-Box
+        _setStatus('✓ KI-Schätzung übernommen', 'ok');
+        _renderResult(data);
         if (typeof toast === 'function') {
           toast('✓ Bodenrichtwert übernommen: ' + data.value + ' €/m²');
         }
       } else {
         _setStatus('⚠ Keine sinnvolle Schätzung möglich', 'err');
+        _clearResult();
         if (typeof toast === 'function') toast('⚠ KI konnte keinen Wert ermitteln');
       }
     } catch (err) {
       console.error('[brw-ai]', err);
       _setStatus('⚠ ' + (err.message || 'Fehler'), 'err');
+      _clearResult();
       if (typeof toast === 'function') toast('⚠ ' + (err.message || 'KI-Fehler'));
     } finally {
       if (btn) { btn.disabled = false; btn.innerHTML = '<span class="btn-brw-icon">✨</span> KI versuchen'; }
+    }
+  }
+
+
+  // ── V187-h4: Erweiterte Result-Box mit Kontext + Quelle ─────
+  function _renderResult(data) {
+    var box = _el('brw-ki-result');
+    if (!box) return;
+    
+    if (!data || !data.value || data.value <= 0) {
+      box.innerHTML = '';
+      box.style.display = 'none';
+      return;
+    }
+    
+    var conf = (data.confidence || 'niedrig').toLowerCase();
+    var confColor, confBg, confLabel, confIcon;
+    if (conf === 'hoch') {
+      confColor = '#2a6e48'; confBg = 'rgba(63,165,108,0.10)';
+      confLabel = 'Hohe Konfidenz'; confIcon = '✓';
+    } else if (conf === 'mittel') {
+      confColor = '#8b7330'; confBg = 'rgba(201,168,76,0.10)';
+      confLabel = 'Mittlere Konfidenz'; confIcon = '◐';
+    } else {
+      confColor = '#8b5a3c'; confBg = 'rgba(184,98,92,0.10)';
+      confLabel = 'Niedrige Konfidenz'; confIcon = 'ℹ';
+    }
+    
+    var srcUrl = (data.source_url && /^https?:\/\//.test(data.source_url)) ? data.source_url : '';
+    var srcText = data.source || 'KI-Schätzung';
+    
+    // Plausibilität-Hinweis je nach confidence
+    var plausHint = '';
+    if (conf === 'hoch') {
+      plausHint = 'Auf BORIS recherchierte oder mit hoher Sicherheit eingeschätzt. Trotzdem zur Sicherheit auf dem Bundesland-Portal verifizieren.';
+    } else if (conf === 'mittel') {
+      plausHint = 'Vergleichswerte für das Gebiet vorhanden, aber keine exakte BORIS-Karte. Bitte auf dem BORIS-Portal des Bundeslandes verifizieren.';
+    } else {
+      plausHint = 'Nur grobe Schätzung basierend auf Bundesland-Durchschnitt. Echte BORIS-Werte können erheblich abweichen — bitte Portal aufrufen!';
+    }
+    
+    var html = '';
+    html += '<div class="brw-ki-card">';
+    
+    // Header: Wert + Confidence
+    html += '<div class="brw-ki-head">';
+    html += '<div class="brw-ki-value">' + data.value.toLocaleString('de-DE') + ' <span class="brw-ki-unit">€/m²</span></div>';
+    html += '<div class="brw-ki-conf" style="color:' + confColor + ';background:' + confBg + '">';
+    html += '<span class="brw-ki-conf-ico">' + confIcon + '</span>' + confLabel;
+    html += '</div>';
+    html += '</div>';
+    
+    // Reasoning (Begründung)
+    if (data.reasoning) {
+      html += '<div class="brw-ki-reasoning">';
+      html += '<span class="brw-ki-label">Begründung:</span> ';
+      html += _escHtml(data.reasoning);
+      html += '</div>';
+    }
+    
+    // Quelle
+    html += '<div class="brw-ki-source">';
+    html += '<span class="brw-ki-label">Quelle:</span> ';
+    if (srcUrl) {
+      html += '<a href="' + _escAttr(srcUrl) + '" target="_blank" rel="noopener noreferrer" class="brw-ki-srclink">';
+      html += _escHtml(srcText) + ' ↗';
+      html += '</a>';
+    } else {
+      html += _escHtml(srcText);
+    }
+    html += '</div>';
+    
+    // Plausibilitäts-Hinweis
+    html += '<div class="brw-ki-hint">' + _escHtml(plausHint) + '</div>';
+    
+    // BORIS-Verify-Button
+    html += '<div class="brw-ki-actions">';
+    html += '<button type="button" class="brw-ki-verify-btn" onclick="DealPilotBrw.openBoris()">';
+    html += '🔗 Auf BORIS verifizieren';
+    html += '</button>';
+    html += '</div>';
+    
+    html += '</div>';
+    
+    box.innerHTML = html;
+    box.style.display = 'block';
+  }
+  
+  function _escHtml(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function _escAttr(s) {
+    return _escHtml(s);
+  }
+  
+  function _clearResult() {
+    var box = _el('brw-ki-result');
+    if (box) {
+      box.innerHTML = '';
+      box.style.display = 'none';
     }
   }
 
