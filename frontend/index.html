@@ -2107,7 +2107,8 @@
 <!-- V191: TAB Deal-Aktion mit Junker-Branding-Banner -->
 <div class="sec" id="s8">
   <!-- V191: Junker-Banner statisch im HTML — wird von renderTab() bewahrt -->
-  <div class="junker-action-banner">
+  <!-- V192: Banner wird dynamisch von deal-action.js gefüllt — basierend auf getBranding() -->
+  <div class="junker-action-banner" id="junker-action-banner-host" data-v192-dynamic="1">
     <div class="junker-action-banner-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 11l3 3L22 4"/>
@@ -2115,12 +2116,12 @@
       </svg>
     </div>
     <div class="junker-action-banner-text">
-      <div class="junker-action-banner-title">Junker Immobilien · Dein Partner für die nächsten Schritte</div>
-      <div class="junker-action-banner-sub">Bankanfragen, Gutachten, Restnutzungsdauer, Sanierungskonzept — alles aus einer Hand. <strong>Marcel Junker</strong> übernimmt persönlich.</div>
+      <div class="junker-action-banner-title" id="dp-banner-title">Junker Immobilien · Dein Partner für die nächsten Schritte</div>
+      <div class="junker-action-banner-sub" id="dp-banner-sub">Bankanfragen, Gutachten, Restnutzungsdauer, Sanierungskonzept — alles aus einer Hand.</div>
     </div>
     <div class="junker-action-banner-contact">
-      <a href="tel:+4915129820057" class="junker-action-banner-phone">📞 +49 151 298 200 57</a>
-      <a href="mailto:info@junker-immobilien.io" class="junker-action-banner-email">✉ info@junker-immobilien.io</a>
+      <a href="tel:+4915129820057" class="junker-action-banner-phone" id="dp-banner-phone">📞 +49 151 298 200 57</a>
+      <a href="mailto:info@junker-immobilien.io" class="junker-action-banner-email" id="dp-banner-email">✉ info@junker-immobilien.io</a>
     </div>
   </div>
   <!-- Inhalt wird von DealPilotDealAction.renderTab() gerendert -->
@@ -2239,7 +2240,7 @@
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=166"></script>
-<script src="js/config.js?v=186"></script>
+<script src="js/config.js?v=193"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -2249,8 +2250,8 @@
 <script src="js/dealscore.js?v=166"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=144">
 <script src="js/datenraum.js?v=160"></script>
-<script src="js/settings.js?v=181"></script>
-<script src="js/pricing-modal.js?v=181"></script>
+<script src="js/settings.js?v=193"></script>
+<script src="js/pricing-modal.js?v=192"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=160"></script>
 <script src="js/werbungskosten-pdf.js?v=166"></script>
@@ -2301,7 +2302,7 @@
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=124"></script>
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
-<script src="js/deal-action.js?v=191"></script>
+<script src="js/deal-action.js?v=193"></script>
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=124"></script>

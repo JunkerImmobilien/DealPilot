@@ -42,13 +42,97 @@ window.DealPilotDealAction = (function() {
   }
 
   function cfg() {
-    return (window.DealPilotConfig && window.DealPilotConfig.dealAction) || {};
+    var base = (window.DealPilotConfig && window.DealPilotConfig.dealAction) || {};
+    // V193: Bei Pro-Plan User-Custom-Routing einblenden
+    return _v193ApplyProOverride(base);
+  }
+  
+  // V193: Pro-User-Override für cfg() — liest aus Settings.get()
+  function _v193ApplyProOverride(base) {
+    try {
+      // Plan-Check
+      var isPro = false;
+      if (window.DealPilotConfig && window.DealPilotConfig.pricing &&
+          typeof window.DealPilotConfig.pricing.currentKey === 'function') {
+        isPro = (window.DealPilotConfig.pricing.currentKey() === 'pro');
+      }
+      if (!isPro) return base;
+      
+      // Settings holen
+      var s = (typeof Settings !== 'undefined' && Settings.get) ? Settings.get() : {};
+      
+      // Deep-Clone von base damit wir nicht den Original-Config mutieren
+      var c = JSON.parse(JSON.stringify(base));
+      var defaultEmail = s.pdf_email || (c.brand && c.brand.centralEmail) || 'info@junker-immobilien.io';
+      
+      // Brand-Name (für Submit-Buttons "An [Firma] senden")
+      if (s.user_company) {
+        if (!c.brand) c.brand = {};
+        c.brand.name = s.user_company;
+        c.brand.centralEmail = defaultEmail;
+        if (s.pdf_website) c.brand.website = s.pdf_website;
+      }
+      
+      // Bank-Partner Override
+      if (!c.bankPartner) c.bankPartner = {};
+      if (s.branding_bank_name) c.bankPartner.name = s.branding_bank_name;
+      else if (s.user_company) c.bankPartner.name = s.user_company + ' — Finanzierung';
+      
+      if (s.branding_email_bank) {
+        c.bankPartner.email = s.branding_email_bank;
+      } else {
+        c.bankPartner.email = defaultEmail;
+      }
+      
+      if (s.branding_email_fb) {
+        c.bankPartner.fbEmail = s.branding_email_fb;
+      } else if (s.branding_email_bank) {
+        c.bankPartner.fbEmail = s.branding_email_bank;
+      } else {
+        c.bankPartner.fbEmail = defaultEmail;
+      }
+      
+      // Expert (Gutachten)
+      if (!c.expert) c.expert = {};
+      if (s.user_company) c.expert.name = s.user_company;
+      if (s.branding_email_expert) c.expert.email = s.branding_email_expert;
+      else c.expert.email = defaultEmail;
+      
+      // Consult (Beratung)
+      if (!c.consult) c.consult = {};
+      if (s.user_company) c.consult.name = s.user_company;
+      if (s.branding_email_consult) c.consult.email = s.branding_email_consult;
+      else c.consult.email = defaultEmail;
+      if (s.branding_consult_price && !isNaN(parseFloat(s.branding_consult_price))) {
+        c.consult.price60 = parseFloat(s.branding_consult_price);
+      }
+      
+      // Calendly
+      if (!c.calendly) c.calendly = {};
+      if (s.branding_calendly_url) c.calendly.url = s.branding_calendly_url;
+      
+      return c;
+    } catch(e) {
+      console.warn('[v193] cfg-override failed:', e);
+      return base;
+    }
   }
 
   // V63.75: Brand-Empfänger / Webseite zentral abrufen
   function brand() {
     var c = cfg();
     return (c.brand) || { name: 'Junker Immobilien', website: 'https://www.junker-immobilien.io', centralEmail: 'info@junker-immobilien.io' };
+  }
+  
+  // V192: Helper für aktuellen Firmennamen (aus Branding) — fallback Junker
+  function _brandCompany() {
+    try {
+      var b = (window.DealPilotConfig && window.DealPilotConfig.branding && window.DealPilotConfig.branding.get)
+        ? window.DealPilotConfig.branding.get()
+        : null;
+      if (b && b.company) return b.company;
+    } catch(e) {}
+    return 'Junker Immobilien';
   }
 
   // V63.75: Aktueller Plan-Key (für bankExport-Anhang)
@@ -450,7 +534,7 @@ window.DealPilotDealAction = (function() {
             icon: ico('clipboard', 26),
             title: 'Gutachten & Expertise',
             subtitle: 'Sachverständigen-Leistungen',
-            desc: 'Verkehrswert · Restnutzungsdauer · Sanierungskonzept · Projektentwicklung — durch Junker Immobilien.',
+            desc: 'Verkehrswert · Restnutzungsdauer · Sanierungskonzept · Projektentwicklung — durch ' + _brandCompany() + '.',
             status: '<span style="color:var(--muted)">Anfrage per E-Mail</span>',
             cta: 'Anfrage stellen',
             onclick: 'DealPilotDealAction.openExpert()'
@@ -507,6 +591,33 @@ window.DealPilotDealAction = (function() {
       if (el) el.value = won ? 'true' : 'false';
       refreshDealWonUI();
     } catch(e) {}
+    
+    // V192: Banner mit aktuellen Branding-Daten füllen
+    try { _updateBanner(); } catch(e) { console.warn('[v192] banner update:', e); }
+  }
+  
+  // V192: Banner dynamisch aus getBranding() befüllen
+  function _updateBanner() {
+    var b = (window.DealPilotConfig && window.DealPilotConfig.branding && window.DealPilotConfig.branding.get)
+      ? window.DealPilotConfig.branding.get()
+      : null;
+    if (!b) return;
+    
+    var titleEl = document.getElementById('dp-banner-title');
+    var subEl = document.getElementById('dp-banner-sub');
+    var phoneEl = document.getElementById('dp-banner-phone');
+    var emailEl = document.getElementById('dp-banner-email');
+    
+    if (titleEl) titleEl.textContent = (b.company || 'DealPilot') + ' · Dein Partner für die nächsten Schritte';
+    if (subEl) subEl.textContent = 'Bankanfragen, Gutachten, Restnutzungsdauer, Sanierungskonzept — alles aus einer Hand.';
+    if (phoneEl && b.phone) {
+      phoneEl.textContent = '📞 ' + b.phone;
+      phoneEl.setAttribute('href', 'tel:' + b.phone.replace(/[^+0-9]/g, ''));
+    }
+    if (emailEl && b.email) {
+      emailEl.textContent = '✉ ' + b.email;
+      emailEl.setAttribute('href', 'mailto:' + b.email);
+    }
   }
 
   function renderCard(o) {
@@ -973,7 +1084,7 @@ window.DealPilotDealAction = (function() {
       foot.innerHTML = [
         '<button class="btn btn-outline" onclick="DealPilotDealAction.gotoStep(\'', kind, '\',2)">← Zurück</button>',
         '<button class="btn btn-primary" id="da-', kind, '-send" ',
-        '        onclick="DealPilotDealAction.submit(\'', kind, '\')">' + ico('upload', 14) + ' An Junker Immobilien senden</button>'
+        '        onclick="DealPilotDealAction.submit(\'', kind, '\')">' + ico('upload', 14) + ' An ' + _brandCompany() + ' senden</button>'
       ].join('');
       runAICheck(kind);
     }
@@ -1053,7 +1164,7 @@ window.DealPilotDealAction = (function() {
         if (success) {
           showSuccess(kind, to, mode);
         } else {
-          if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = ico('upload', 14) + ' An Junker Immobilien senden'; }
+          if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = ico('upload', 14) + ' An ' + _brandCompany() + ' senden'; }
           alert('Versand fehlgeschlagen. Bitte E-Mail-Programm prüfen oder später erneut versuchen.');
         }
       });
@@ -2076,7 +2187,7 @@ window.DealPilotDealAction = (function() {
       '<div style="background:#fff;border-radius:12px;max-width:520px;width:100%;padding:32px;text-align:center;border:1px solid #C9A84C;box-shadow:0 30px 80px rgba(0,0,0,0.5)">' +
       '  <div id="rnd-anfrage-spinner" style="width:48px;height:48px;border:4px solid #FAF6E8;border-top-color:#C9A84C;border-radius:50%;margin:0 auto 20px;animation:rnd-spin 0.8s linear infinite"></div>' +
       '  <h3 style="margin:0 0 8px;font-family:\'Cormorant Garamond\',serif;font-size:22px;color:#2A2727;font-weight:600">Anfrage wird gesendet…</h3>' +
-      '  <p style="margin:0;font-size:13px;color:#7A7370;line-height:1.6">Die Wizard-Daten werden übermittelt für die Erstellung eines vollständigen RND-Gutachtens durch Junker Immobilien.</p>' +
+      '  <p style="margin:0;font-size:13px;color:#7A7370;line-height:1.6">Die Wizard-Daten werden übermittelt für die Erstellung eines vollständigen RND-Gutachtens durch ' + _brandCompany() + '.</p>' +
       '  <style>@keyframes rnd-spin { to { transform: rotate(360deg) } }</style>' +
       '</div>';
     document.body.appendChild(confirmModal);
@@ -2106,7 +2217,7 @@ window.DealPilotDealAction = (function() {
       '<div style="background:#fff;border-radius:12px;max-width:520px;width:100%;padding:32px;text-align:center;border:1px solid #3FA56C;box-shadow:0 30px 80px rgba(0,0,0,0.5)">' +
       '  <div style="width:56px;height:56px;background:#3FA56C;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff">✓</div>' +
       '  <h3 style="margin:0 0 12px;font-family:\'Cormorant Garamond\',serif;font-size:24px;color:#2A2727;font-weight:600">Anfrage erfolgreich übermittelt</h3>' +
-      '  <p style="margin:0 0 20px;font-size:13px;color:#7A7370;line-height:1.6">Ihre RND-Gutachten-Anfrage wurde an Junker Immobilien gesendet.' +
+      '  <p style="margin:0 0 20px;font-size:13px;color:#7A7370;line-height:1.6">Ihre RND-Gutachten-Anfrage wurde an ' + _brandCompany() + ' gesendet.' +
             (requestId ? ' Referenz-Nr.: <strong style="color:#2A2727">' + requestId + '</strong>' : '') +
       '    <br><br>Sie erhalten in Kürze eine Bestätigung per E-Mail.' +
       '  </p>' +
@@ -2128,7 +2239,7 @@ window.DealPilotDealAction = (function() {
       '  <div style="width:56px;height:56px;background:#E8B84F;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff">!</div>' +
       '  <h3 style="margin:0 0 12px;font-family:\'Cormorant Garamond\',serif;font-size:22px;color:#2A2727;font-weight:600;text-align:center">Server zurzeit nicht erreichbar</h3>' +
       '  <p style="margin:0 0 18px;font-size:13px;color:#7A7370;line-height:1.6;text-align:center">' +
-      '    Die Anfrage konnte nicht direkt an Junker Immobilien gesendet werden ' +
+      '    Die Anfrage konnte nicht direkt an ' + _brandCompany() + ' gesendet werden ' +
       '    <span style="color:#a04943">(' + (err && err.message ? err.message : 'Verbindungsfehler') + ')</span>.<br><br>' +
       '    <strong style="color:#2A2727">Alternative:</strong> Bitte laden Sie die Daten herunter und senden sie per E-Mail an ' +
       '    <a href="mailto:info@junker-immobilien.io" style="color:#C9A84C;text-decoration:none;font-weight:600">info@junker-immobilien.io</a>.' +

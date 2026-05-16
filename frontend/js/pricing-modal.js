@@ -240,20 +240,12 @@
         '</div>' +
       '</div>' +
 
-      // V63.82: Service-Levels (Silver / Gold / Platinum) — buchbar zu jedem Plan
-      '<div class="dp-container dp-services">' +
-        '<h3 class="dp-services-h">Service & Support — zubuchbar</h3>' +
-        '<p class="dp-services-sub">Brauchst du schnellere Antworten oder einen persönlichen Ansprechpartner? Erweitere deinen Plan um eine Service-Stufe.</p>' +
-        '<div class="dp-services-grid">' +
-          _serviceCard('silver',   '🥈', 'Silver Support',     '19 €/Mon.',  ['Antwort < 24 h', 'Hilfe bei Objekten & PDFs', 'E-Mail-Priorisierung'],                                                false) +
-          _serviceCard('gold',     '🥇', 'Gold Service',       '49 €/Mon.',  ['Antwort < 6 h (werktags)', 'Persönlicher Ansprechpartner', '1× 30-Min-Call / Monat', 'Hilfe bei Score- & KI-Ergebnissen'], true) +
-          _serviceCard('platinum', '💎', 'Platinum Setup',     '249 € einmalig', ['2–3 h Setup-Call', 'Migration aus Excel/Listen', 'Branding-Einrichtung'],                                       false) +
-        '</div>' +
-      '</div>' +
+      // V192: Service & Support-Block entfernt (auf User-Wunsch)
+
 
       // Footer-Hinweise
       '<div class="dp-container dp-footer-note">' +
-        '<p>Alle Preise zzgl. gesetzl. USt. Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. KI-Credits verfallen nicht.</p>' +
+        '<p>Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. KI-Credits verfallen nicht.</p>' +
       '</div>';
   }
 
