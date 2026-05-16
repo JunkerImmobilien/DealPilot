@@ -299,3 +299,158 @@
   border-color: rgba(201, 168, 76, 0.4);
   color: #8b7330;
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   V191 — Deal-Aktion Stage-Layout + Junker-Banner
+   ═══════════════════════════════════════════════════════════ */
+
+/* Junker-Banner oben in Deal-Aktion */
+.junker-action-banner {
+  background: linear-gradient(135deg, #2A2727 0%, #1f1c1c 100%);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 18px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.junker-action-banner-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(201, 168, 76, 0.15);
+  border: 1px solid rgba(201, 168, 76, 0.40);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.junker-action-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+.junker-action-banner-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #C9A84C;
+  line-height: 1.15;
+  margin-bottom: 2px;
+}
+.junker-action-banner-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.4;
+}
+.junker-action-banner-sub strong {
+  color: #E8C964;
+}
+.junker-action-banner-contact {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+.junker-action-banner-phone {
+  color: #C9A84C;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.junker-action-banner-phone:hover {
+  color: #E8C964;
+}
+.junker-action-banner-email {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.junker-action-banner-email:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+@media (max-width: 768px) {
+  .junker-action-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .junker-action-banner-contact {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 12px;
+  }
+}
+
+/* Stage-Sektionen */
+.da-stage {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(42, 39, 39, 0.08);
+}
+.da-stage:first-of-type {
+  margin-top: 16px;
+  padding-top: 0;
+  border-top: none;
+}
+.da-stage-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.da-stage-ico {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(201, 168, 76, 0.12);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  color: #9a7f33;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.da-stage-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2A2727;
+  line-height: 1;
+}
+.da-stage-sub {
+  font-size: 12px;
+  color: rgba(42, 39, 39, 0.6);
+  margin-left: 8px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(42, 39, 39, 0.15);
+}
+@media (max-width: 600px) {
+  .da-stage-sub {
+    border-left: none;
+    padding-left: 0;
+    margin-left: 0;
+    width: 100%;
+    margin-top: 2px;
+  }
+  .da-stage-head {
+    flex-wrap: wrap;
+  }
+}
+
+/* Coming Soon Sektion — gedämpfter */
+.da-coming-soon {
+  margin-top: 32px;
+  padding: 18px;
+  background: rgba(42, 39, 39, 0.02);
+  border-radius: 10px;
+  border: 1px dashed rgba(42, 39, 39, 0.12);
+}

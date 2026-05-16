@@ -46,6 +46,12 @@ function collectData() {
       d.ai_lage_cache = window.currentDeal.ai_lage_cache;
     }
   } catch(e){}
+  // V191: BRW-KI-Result pro Objekt speichern (Confidence/Begründung/Quelle/URL)
+  try {
+    if (typeof window.currentDeal === 'object' && window.currentDeal && window.currentDeal.brw_ki_result) {
+      d.brw_ki_result = window.currentDeal.brw_ki_result;
+    }
+  } catch(e){}
   // Checkboxes
   var d2enable = document.getElementById('d2_enable');
   if (d2enable) d['_d2_enabled'] = d2enable.checked;
@@ -155,6 +161,22 @@ function loadData(d) {
       delete window.currentDeal.ai_lage_cache;
     }
   } catch(e){}
+  // V191: BRW-KI-Result pro Objekt wiederherstellen (oder clearen wenn neues Objekt ohne)
+  try {
+    if (d.brw_ki_result && typeof d.brw_ki_result === 'object' && d.brw_ki_result.value) {
+      window.currentDeal.brw_ki_result = d.brw_ki_result;
+      // UI-Update — Result-Card mit alten Daten rendern
+      if (window.DealPilotBrw && typeof window.DealPilotBrw.renderResult === 'function') {
+        window.DealPilotBrw.renderResult(d.brw_ki_result);
+      }
+    } else {
+      // Kein Result gespeichert → Card clearen (sonst zeigt sich altes Objekt)
+      delete window.currentDeal.brw_ki_result;
+      if (window.DealPilotBrw && typeof window.DealPilotBrw.clearResult === 'function') {
+        window.DealPilotBrw.clearResult();
+      }
+    }
+  } catch(e){ console.warn('[brw] load failed:', e); }
   if (d._d2_enabled !== undefined) {
     var cb = document.getElementById('d2_enable');
     if (cb) { cb.checked = d._d2_enabled; if (typeof toggleD2 === 'function') toggleD2(); }
