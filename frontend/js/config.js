@@ -41,23 +41,65 @@ window.DealPilotConfig = (function() {
    *  2) sonst → DealPilot-Defaults
    * Custom-Logo (settings.pdf_logo_b64) hat Vorrang vor dem DealPilot-Logo.
    */
+  // V192: Junker-Defaults als zentrale Konstante — werden für alle Pläne außer Pro genutzt
+  var JUNKER_DEFAULTS = {
+    company: 'Junker Immobilien',
+    name: '',
+    role: '',
+    address: 'Hermannstr. 9',
+    plz: '32609',
+    city: 'Hüllhorst',
+    phone: '+49 151 298 200 57',
+    email: 'info@junker-immobilien.io',
+    website: 'https://www.junker-immobilien.io'
+  };
+
   function getBranding() {
     var s = (typeof Settings !== 'undefined') ? Settings.get() : {};
+    
+    // V192: Plan-Gating — nur Pro-Plan-User dürfen eigenes Branding nutzen
+    var isPro = false;
+    try {
+      var planKey = getCurrentPlanKey();
+      isPro = (planKey === 'pro');
+    } catch(e) { /* Falls Pricing-Modul noch nicht geladen → Default Junker */ }
+    
+    if (!isPro) {
+      // Free, Starter, Investor → IMMER Junker-Defaults zurückgeben (ignoriert User-Settings)
+      return {
+        product_name: BRANDING_DEFAULTS.product_name,
+        tagline: BRANDING_DEFAULTS.tagline,
+        logo_b64: '',
+        logo_path: BRANDING_DEFAULTS.logo_path,
+        company: JUNKER_DEFAULTS.company,
+        name: JUNKER_DEFAULTS.name,
+        role: JUNKER_DEFAULTS.role,
+        address: JUNKER_DEFAULTS.address,
+        plz: JUNKER_DEFAULTS.plz,
+        city: JUNKER_DEFAULTS.city,
+        phone: JUNKER_DEFAULTS.phone,
+        email: JUNKER_DEFAULTS.email,
+        website: JUNKER_DEFAULTS.website,
+        is_custom: false
+      };
+    }
+    
+    // Pro-Plan: User-Custom-Branding wenn gesetzt, sonst Junker-Defaults als Fallback
     return {
       product_name: BRANDING_DEFAULTS.product_name,
       tagline: BRANDING_DEFAULTS.tagline,
-      logo_b64: s.pdf_logo_b64 || '',  // leer → Loader nutzt logo_path
+      logo_b64: s.pdf_logo_b64 || '',
       logo_path: BRANDING_DEFAULTS.logo_path,
-      // Footer / Kontaktdaten
-      company: s.user_company || s.user_name || BRANDING_DEFAULTS.footer_company,
+      company: s.user_company || JUNKER_DEFAULTS.company,
       name: s.user_name || '',
       role: s.user_role || '',
-      address: s.pdf_address || BRANDING_DEFAULTS.footer_address,
-      plz: s.pdf_plz || BRANDING_DEFAULTS.footer_plz,
-      city: s.pdf_city || BRANDING_DEFAULTS.footer_city,
-      phone: s.pdf_phone || BRANDING_DEFAULTS.footer_phone,
-      email: s.pdf_email || BRANDING_DEFAULTS.footer_email,
-      website: s.pdf_website || BRANDING_DEFAULTS.footer_website
+      address: s.pdf_address || JUNKER_DEFAULTS.address,
+      plz: s.pdf_plz || JUNKER_DEFAULTS.plz,
+      city: s.pdf_city || JUNKER_DEFAULTS.city,
+      phone: s.pdf_phone || JUNKER_DEFAULTS.phone,
+      email: s.pdf_email || JUNKER_DEFAULTS.email,
+      website: s.pdf_website || JUNKER_DEFAULTS.website,
+      is_custom: !!(s.user_company || s.pdf_phone || s.pdf_email)
     };
   }
 
@@ -273,7 +315,7 @@ window.DealPilotConfig = (function() {
     pro: {
       key: 'pro',
       label: 'Pro',
-      tagline: 'Profis · Sachverständige',
+      tagline: 'Profis · Sachverständige · White-Label',
       price_monthly_eur: 99,
       price_yearly_eur: 990,             // 2 Monate gratis
       sort_order: 4,

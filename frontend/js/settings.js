@@ -16,6 +16,9 @@ var Settings = (function() {
   var DEFAULTS = {
     user_name: '', user_company: '', user_role: '', user_steuernummer: '', user_uid: '',
     pdf_address: '', pdf_plz: '', pdf_city: '', pdf_phone: '', pdf_email: '', pdf_website: '',
+    // V193: Pro-Anfrage-Routing — leere Werte = Junker-Defaults nutzen
+    branding_email_bank: '', branding_email_fb: '', branding_email_expert: '', branding_email_consult: '',
+    branding_bank_name: '', branding_calendly_url: '', branding_consult_price: '',
     pdf_logo_b64: '',
     openai_api_key: '',
     openai_model: 'gpt-4o-mini',
@@ -82,6 +85,11 @@ function _setCollectFormIntoDraft() {
     ['user_steuernummer','set_user_steuernummer'], ['user_uid','set_user_uid'],
     ['pdf_address','set_pdf_address'], ['pdf_plz','set_pdf_plz'], ['pdf_city','set_pdf_city'],
     ['pdf_phone','set_pdf_phone'], ['pdf_email','set_pdf_email'], ['pdf_website','set_pdf_website'],
+    // V193: Pro-Anfrage-Routing Mappings
+    ['branding_email_bank','set_branding_email_bank'], ['branding_email_fb','set_branding_email_fb'],
+    ['branding_email_expert','set_branding_email_expert'], ['branding_email_consult','set_branding_email_consult'],
+    ['branding_bank_name','set_branding_bank_name'], ['branding_calendly_url','set_branding_calendly_url'],
+    ['branding_consult_price','set_branding_consult_price'],
     ['openai_api_key','set_openai_api_key'], ['openai_model','set_openai_model'],
     // V51 — KI-Determinismus + Stil
     ['ai_temperature','set_ai_temperature'], ['ai_seed','set_ai_seed'],
@@ -298,6 +306,25 @@ function showSettings(initialTab) {
           '<div class="f"><label>E-Mail</label><input id="set_pdf_email" type="email" value="' + _esc(view.pdf_email) + '" placeholder="info@firma.de"></div>' +
         '</div>' +
         '<div class="f"><label>Webseite</label><input id="set_pdf_website" type="text" value="' + _esc(view.pdf_website) + '" placeholder="www.firma.de"></div>' +
+
+        // V193: Anfrage-Routing Sektion (nur Pro sichtbar — wird per JS ein-/ausgeblendet)
+        '<div class="branding-routing-section" id="branding-routing-section" data-v193="1" style="display:none">' +
+          '<hr class="dvd"><h3 style="font-size:14px;margin:8px 0">📨 Anfrage-Routing <span style="font-size:11px;color:rgba(42,39,39,0.55);font-weight:400">— wer empfängt die Anfragen aus dem Deal-Aktion-Tab</span></h3>' +
+          '<p class="hint">Lass ein Feld leer um die zentrale E-Mail oben zu nutzen. Pro-Funktion: deine Anfragen werden direkt an deine Geschäftsadresse geleitet statt an Junker Immobilien.</p>' +
+          '<div class="g2">' +
+            '<div class="f"><label>Firmenname Finanzierungspartner</label><input id="set_branding_bank_name" type="text" value="' + _esc(view.branding_bank_name) + '" placeholder="z.B. Müller Finanzberatung"><span class="hint" style="font-size:11px">Erscheint im Submit-Button "An [Name] senden"</span></div>' +
+            '<div class="f"><label>Bank-Anfrage E-Mail</label><input id="set_branding_email_bank" type="email" value="' + _esc(view.branding_email_bank) + '" placeholder="leer = zentrale E-Mail oben"></div>' +
+          '</div>' +
+          '<div class="g2">' +
+            '<div class="f"><label>Finanzierungsbestätigung E-Mail</label><input id="set_branding_email_fb" type="email" value="' + _esc(view.branding_email_fb) + '" placeholder="leer = wie Bank-Anfrage"></div>' +
+            '<div class="f"><label>Gutachten/Expertise E-Mail</label><input id="set_branding_email_expert" type="email" value="' + _esc(view.branding_email_expert) + '" placeholder="leer = zentrale E-Mail"></div>' +
+          '</div>' +
+          '<div class="g2">' +
+            '<div class="f"><label>Beratungs-Anfrage E-Mail</label><input id="set_branding_email_consult" type="email" value="' + _esc(view.branding_email_consult) + '" placeholder="leer = zentrale E-Mail"></div>' +
+            '<div class="f"><label>60-Min-Beratungspreis (€)</label><input id="set_branding_consult_price" type="number" value="' + _esc(view.branding_consult_price) + '" placeholder="leer = 89 €"></div>' +
+          '</div>' +
+          '<div class="f"><label>Calendly-URL für Termine</label><input id="set_branding_calendly_url" type="url" value="' + _esc(view.branding_calendly_url) + '" placeholder="https://calendly.com/deine-firma/kennenlernen — leer = Junker-Calendly"></div>' +
+        '</div>' +
 
         '<hr class="dvd"><h3 style="font-size:14px;margin:8px 0">Eigenes Logo für PDFs</h3>' +
         // V63.5: Hartes Feature-Gating — Logo-Upload nur bei custom_logo-Feature
@@ -799,6 +826,11 @@ function _doLogout() {
 window._doLogout = _doLogout;
 
 function _swSet(btn) {
+  // V192: Pro-Hinweis im Kontakt-Tab anzeigen wenn Plan != Pro
+  try {
+    var tab = btn && btn.getAttribute ? btn.getAttribute('data-tab') : null;
+    if (tab === 'contact') setTimeout(_v192ShowProHintIfNeeded, 30);
+  } catch(e){}
   // V26: Vor Tab-Wechsel aktuellen Form-Stand in Draft übernehmen
   _setCollectFormIntoDraft();
   var pane = btn.dataset.tab;
@@ -1095,6 +1127,50 @@ function _saveSettings() {
 }
 
 window.Settings = Settings;
+// V192: Pro-Hinweis-Banner im Kontakt-Tab anzeigen wenn nicht Pro-Plan
+function _v192ShowProHintIfNeeded() {
+  try {
+    var pane = document.querySelector('.st-pane[data-pane="contact"]');
+    if (!pane) return;
+    
+    // Bestehenden Hint entfernen
+    var existing = pane.querySelector('.v192-pro-hint');
+    if (existing) existing.parentNode.removeChild(existing);
+    
+    // Plan checken
+    var isPro = false;
+    try {
+      if (window.DealPilotConfig && window.DealPilotConfig.pricing) {
+        isPro = (window.DealPilotConfig.pricing.currentKey() === 'pro');
+      }
+    } catch(e){}
+    
+    if (isPro) {
+      // Pro-User: Routing-Section sichtbar machen
+      var rs = document.getElementById('branding-routing-section');
+      if (rs) rs.style.display = '';
+      return; // keinen Hint
+    }
+    // Nicht-Pro: Routing-Section verstecken (default ist style="display:none")
+    var rs2 = document.getElementById('branding-routing-section');
+    if (rs2) rs2.style.display = 'none';
+    
+    // Hint einfügen ganz oben in der Pane
+    var hint = document.createElement('div');
+    hint.className = 'v192-pro-hint';
+    hint.style.cssText = 'background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05));border:1px solid rgba(201,168,76,0.40);border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px';
+    hint.innerHTML = 
+      '<div style="font-size:22px">✨</div>' +
+      '<div style="flex:1">' +
+      '<div style="font-weight:600;color:#9a7f33;font-size:13px;margin-bottom:2px">Eigenes Branding nur im Pro-Plan</div>' +
+      '<div style="font-size:12px;color:rgba(42,39,39,0.7);line-height:1.4">Im Pro-Plan kannst du deine eigenen Firmen- und Kontaktdaten hinterlegen — sie erscheinen dann im <strong>Deal-Aktion-Banner</strong>, den <strong>Anfrage-Karten</strong> und in <strong>PDF-Exports</strong>. Aktuell wird Junker Immobilien angezeigt.</div>' +
+      '</div>' +
+      '<button type="button" onclick="closeSettings(); if(typeof openPricingModal===\'function\') openPricingModal();" style="background:#C9A84C;color:#2A2727;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-size:12px;white-space:nowrap">Pro ansehen</button>';
+    pane.insertBefore(hint, pane.firstChild);
+  } catch(e) { console.warn('[v192] pro-hint:', e); }
+}
+window._v192ShowProHintIfNeeded = _v192ShowProHintIfNeeded;
+
 window.showSettings = showSettings;
 window.closeSettings = closeSettings;
 window._swSet = _swSet;
