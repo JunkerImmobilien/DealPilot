@@ -38,6 +38,14 @@
         reverse_proxy backend:3001
     }
 
+    # V194: Admin-Dashboard (eigener Pfad mit eigenem index.html)
+    handle /admin* {
+        root * /srv/frontend
+        try_files {path} {path}/ /admin/index.html
+        encode zstd gzip
+        file_server
+    }
+
     # Frontend (statische Dateien)
     handle {
         root * /srv/frontend
