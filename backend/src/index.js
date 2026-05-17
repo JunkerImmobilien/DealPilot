@@ -24,6 +24,7 @@ const dealActionRoutes = require('./routes/dealAction');
 const feedbackRoutes = require('./routes/feedback');
 const scrapeRoutes = require('./routes/scrape');
 const rndRequestRoutes = require('./routes/rndRequest');  // V186: RND-Anfrage-Endpoint
+const adminRoutes = require('./routes/admin');  // V194: Admin-Dashboard
 
 const app = express();
 
@@ -92,6 +93,10 @@ app.use('/api/v1/deal-action', dealActionRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/listing', scrapeRoutes);  // V63.85: URL-Scraper für Quick-Check
 app.use('/api/v1/rnd-request', rndRequestRoutes);  // V186: RND-Wizard-Anfrage
+
+// V194: Admin-Dashboard
+app.use('/api/v1/admin', adminRoutes);
+app.set('db', pool);
 
 // API root info
 app.get('/api/v1', (req, res) => {
