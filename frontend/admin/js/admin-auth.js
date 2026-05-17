@@ -1,4 +1,4 @@
-// DealPilot Admin V195 — Login-Logik
+// DealPilot Admin V196 — Login-Logik (unverändert von V195)
 'use strict';
 
 const Auth = (function() {

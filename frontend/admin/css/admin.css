@@ -1,6 +1,4 @@
-/* DealPilot Admin V195 — Charcoal + Gold Theme
-   Bug-Fix V195: kpi-value nutzt jetzt DM Sans für Zahlen, nicht Cormorant (Bug: "1" sah aus wie "I")
-*/
+/* DealPilot Admin V196 — Charcoal + Gold Theme + Charts + Filter */
 
 :root {
   --gold: #c9a042;
@@ -41,6 +39,7 @@ h1, h2, h3 {
 
 h2 { font-size: 1.8em; }
 h3 { font-size: 1.3em; }
+h4 { margin: 0 0 8px 0; font-size: 1.05em; }
 
 /* ─── Login Screen ─────────────────────────────────────── */
 .login-screen {
@@ -206,7 +205,6 @@ h3 { font-size: 1.3em; }
   margin-bottom: 8px;
 }
 
-/* V195-FIX: Zahlen brauchen sans-serif damit "1" lesbar bleibt */
 .kpi-value {
   font-family: 'DM Sans', sans-serif !important;
   font-weight: 700;
@@ -221,6 +219,58 @@ h3 { font-size: 1.3em; }
   font-size: 0.8em;
   color: var(--text-muted);
   margin-top: 4px;
+}
+
+/* ─── V196: Range-Bar für Charts ─────────────────────────── */
+.range-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px 20px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.range-label {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin-right: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.range-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.85em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text-muted);
+}
+
+.range-btn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.range-btn.active {
+  background: var(--gold);
+  color: var(--charcoal);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+
+/* ─── V196: Chart-Container ─────────────────────────────── */
+.chart-container {
+  width: 100%;
+  min-height: 220px;
 }
 
 /* ─── Cards ─────────────────────────────────────────────── */
@@ -243,7 +293,7 @@ h3 { font-size: 1.3em; }
   .two-col { grid-template-columns: 1fr; }
 }
 
-/* ─── Plan Distribution Balken ─────────────────────────── */
+/* ─── Plan Distribution Balken (legacy) ────────────────── */
 .plan-list { display: flex; flex-direction: column; gap: 12px; }
 
 .plan-item {
@@ -323,15 +373,17 @@ h3 { font-size: 1.3em; }
 .pill-plan { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
 .pill-plan-paid { background: var(--gold); color: var(--charcoal); }
 
-/* ─── Search Row ─────────────────────────────────────────── */
+/* ─── Search Row + V196 Filter ─────────────────────────── */
 .search-row {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .search-input {
   flex: 1;
+  min-width: 200px;
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -345,10 +397,25 @@ h3 { font-size: 1.3em; }
   box-shadow: 0 0 0 3px rgba(201, 160, 66, 0.15);
 }
 
-/* ─── Forms ─────────────────────────────────────────────── */
-.form-row {
-  margin-bottom: 16px;
+.filter-select {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9em;
+  background: white;
+  cursor: pointer;
+  min-width: 140px;
 }
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 160, 66, 0.15);
+}
+
+/* ─── Forms ─────────────────────────────────────────────── */
+.form-row { margin-bottom: 16px; }
 
 .form-row label {
   display: block;

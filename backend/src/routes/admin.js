@@ -1,19 +1,13 @@
 'use strict';
 /**
- * V195.1: Admin-Dashboard — Hotfix für falsche Spaltennamen aus V195
+ * V196: Admin-Dashboard mit Charts + CSV-Export + Filter
  *
- * Fix gegenüber V195 (echte DB-Spalten aus Diagnose):
- *   admin_login_attempts:
- *     - succeeded     → success
- *     - attempted_at  → created_at
- *     - email         → email_attempted
- *   admin_users:
- *     - totp_secret_enc → totp_secret (Klartext base32, nicht verschlüsselt)
- *   admin_audit_log:
- *     - admin_id        → admin_user_id
- *     - target_user_id  → target_type + target_id (UUID als text)
- *     - meta            → payload
- *     - + Spalten: admin_email, success, error_message
+ * NEU gegenüber V195:
+ *   GET /admin/charts/users-trend?days=30   — User-Wachstum-Daten
+ *   GET /admin/charts/mrr-trend?days=30     — MRR-Daten (geschätzt aus aktiven Subs)
+ *   GET /admin/users.csv?q=...&plan=...     — User-Liste als CSV
+ *   GET /admin/audit-log.csv?action=...     — Audit-Log als CSV
+ *   GET /admin/users — neue Filter: plan_id, status (active/inactive)
  */
 
 const express = require('express');
@@ -23,6 +17,9 @@ const speakeasy = require('speakeasy');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
+
+// Auth-Middleware aus existierender adminAuth.js (V194)
+const { requireAdmin, requireRole, signAdminToken } = require('../middleware/adminAuth');
 
 // ──────────────────────────────────────────────────────────────
 // HELPERS
@@ -54,11 +51,22 @@ async function logLoginAttempt(db, ip, email, success) {
   }
 }
 
-// Auth-Middleware aus existierender adminAuth.js (V194)
-const { requireAdmin, requireRole, signAdminToken } = require('../middleware/adminAuth');
+/** Escape CSV-Felder gemäß RFC 4180 */
+function csvEscape(v) {
+  if (v == null) return '';
+  const s = String(v);
+  if (s.includes('"') || s.includes(',') || s.includes('\n') || s.includes('\r')) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function csvRow(arr) {
+  return arr.map(csvEscape).join(',') + '\r\n';
+}
 
 // ──────────────────────────────────────────────────────────────
-// AUTH
+// AUTH (unverändert von V195.2)
 // ──────────────────────────────────────────────────────────────
 
 router.post('/auth/login', async (req, res) => {
@@ -71,7 +79,6 @@ router.post('/auth/login', async (req, res) => {
   }
 
   try {
-    // Rate-Limit
     const attemptsResult = await db.query(
       `SELECT COUNT(*) AS cnt FROM admin_login_attempts
        WHERE ip = $1 AND success = false AND created_at > NOW() - INTERVAL '15 minutes'`,
@@ -111,13 +118,11 @@ router.post('/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'invalid_credentials' });
     }
 
-    // TOTP
     if (admin.totp_enabled) {
       if (!totpCode) {
         return res.status(200).json({ requires_totp: true });
       }
       let totpSecret = admin.totp_secret;
-      // Falls verschlüsselt (Format "iv:tag:cipher") → über totpService entschlüsseln
       if (totpSecret && totpSecret.includes(':') && totpSecret.split(':').length === 3) {
         try {
           const totpService = require('../services/totpService');
@@ -138,7 +143,6 @@ router.post('/auth/login', async (req, res) => {
       }
     }
 
-    // Erfolg
     await db.query('UPDATE admin_users SET failed_attempts=0, locked_until=NULL, last_login_at=NOW(), last_login_ip=$1 WHERE id=$2', [ip, admin.id]);
     await logLoginAttempt(db, ip, email, true);
     await audit(db, admin.id, admin.email, 'admin.login', null, null, null, ip, req.headers['user-agent']);
@@ -160,7 +164,7 @@ router.get('/auth/me', requireAdmin, async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────
-// DASHBOARD
+// DASHBOARD (unverändert von V195.2)
 // ──────────────────────────────────────────────────────────────
 
 router.get('/dashboard', requireAdmin, async (req, res) => {
@@ -209,18 +213,14 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
 
     const recentSignups = await db.query(`
       SELECT id, email, name, created_at, is_active
-      FROM users
-      WHERE deleted_at IS NULL
-      ORDER BY created_at DESC
-      LIMIT 5
+      FROM users WHERE deleted_at IS NULL
+      ORDER BY created_at DESC LIMIT 5
     `);
 
     const recentLogins = await db.query(`
       SELECT id, email, name, last_login_at
-      FROM users
-      WHERE last_login_at IS NOT NULL AND deleted_at IS NULL
-      ORDER BY last_login_at DESC
-      LIMIT 5
+      FROM users WHERE last_login_at IS NOT NULL AND deleted_at IS NULL
+      ORDER BY last_login_at DESC LIMIT 5
     `);
 
     res.json({
@@ -250,12 +250,119 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────
-// USERS
+// V196 NEU: CHARTS — Trend-Daten
+// ──────────────────────────────────────────────────────────────
+
+/**
+ * GET /admin/charts/users-trend?days=30
+ * Liefert für jeden Tag der letzten N Tage:
+ *  - new_users:  Anzahl der an dem Tag registrierten User
+ *  - cumulative: Gesamtzahl der bis zu diesem Tag registrierten User
+ */
+router.get('/charts/users-trend', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const days = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 7), 365);
+  try {
+    const result = await db.query(`
+      WITH date_series AS (
+        SELECT generate_series(
+          (CURRENT_DATE - INTERVAL '${days - 1} days')::date,
+          CURRENT_DATE::date,
+          INTERVAL '1 day'
+        )::date AS day
+      ),
+      daily_signups AS (
+        SELECT DATE(created_at) AS day, COUNT(*) AS new_count
+        FROM users
+        WHERE created_at >= CURRENT_DATE - INTERVAL '${days} days'
+          AND deleted_at IS NULL
+        GROUP BY DATE(created_at)
+      ),
+      cumulative AS (
+        SELECT ds.day,
+               COALESCE(s.new_count, 0)::int AS new_users,
+               (SELECT COUNT(*)::int FROM users
+                WHERE created_at <= ds.day + INTERVAL '1 day'
+                AND deleted_at IS NULL) AS cumulative
+        FROM date_series ds
+        LEFT JOIN daily_signups s ON s.day = ds.day
+      )
+      SELECT day, new_users, cumulative
+      FROM cumulative
+      ORDER BY day
+    `);
+
+    res.json({
+      series: result.rows.map(r => ({
+        day: r.day,
+        new_users: r.new_users,
+        cumulative: r.cumulative
+      }))
+    });
+  } catch (err) {
+    console.error('[admin/charts/users-trend] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+/**
+ * GET /admin/charts/mrr-trend?days=30
+ * MRR-Verlauf der letzten N Tage. Wir nehmen die *active* Subscriptions
+ * deren period den jeweiligen Tag enthält. Approximation, weil wir keine
+ * Snapshot-Tabelle haben.
+ */
+router.get('/charts/mrr-trend', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const days = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 7), 365);
+  try {
+    const result = await db.query(`
+      WITH date_series AS (
+        SELECT generate_series(
+          (CURRENT_DATE - INTERVAL '${days - 1} days')::date,
+          CURRENT_DATE::date,
+          INTERVAL '1 day'
+        )::date AS day
+      )
+      SELECT
+        ds.day,
+        COALESCE(SUM(
+          CASE
+            WHEN s.billing_interval = 'monthly' THEN p.price_monthly_cents
+            WHEN s.billing_interval = 'yearly' THEN p.price_yearly_cents / 12
+            ELSE 0
+          END
+        ), 0)::bigint AS mrr_cents,
+        COUNT(s.id) FILTER (WHERE p.id != 'free') AS paying_users
+      FROM date_series ds
+      LEFT JOIN subscriptions s
+        ON s.current_period_start <= (ds.day + INTERVAL '1 day')
+        AND (s.ended_at IS NULL OR s.ended_at > ds.day)
+        AND s.status IN ('active', 'canceled')
+      LEFT JOIN plans p ON p.id = s.plan_id
+      GROUP BY ds.day
+      ORDER BY ds.day
+    `);
+
+    res.json({
+      series: result.rows.map(r => ({
+        day: r.day,
+        mrr_cents: parseInt(r.mrr_cents, 10) || 0,
+        paying_users: parseInt(r.paying_users, 10) || 0
+      }))
+    });
+  } catch (err) {
+    console.error('[admin/charts/mrr-trend] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+// USERS (mit erweitertem Filter in V196)
 // ──────────────────────────────────────────────────────────────
 
 router.get('/users', requireAdmin, async (req, res) => {
   const db = req.app.get('db');
-  const { q = '', limit = 50, offset = 0 } = req.query;
+  const { q = '', limit = 50, offset = 0, plan = '', status = '' } = req.query;
   try {
     let where = "u.deleted_at IS NULL";
     const params = [];
@@ -263,6 +370,15 @@ router.get('/users', requireAdmin, async (req, res) => {
       params.push(`%${q.trim().toLowerCase()}%`);
       where += ` AND (LOWER(u.email) LIKE $${params.length} OR LOWER(u.name) LIKE $${params.length})`;
     }
+    if (plan === 'free') {
+      where += ` AND s.id IS NULL`;
+    } else if (plan && ['starter', 'investor', 'pro'].includes(plan)) {
+      params.push(plan);
+      where += ` AND p.id = $${params.length}`;
+    }
+    if (status === 'active') where += ` AND u.is_active = true`;
+    if (status === 'inactive') where += ` AND u.is_active = false`;
+
     params.push(parseInt(limit, 10) || 50);
     params.push(parseInt(offset, 10) || 0);
 
@@ -288,6 +404,154 @@ router.get('/users', requireAdmin, async (req, res) => {
   }
 });
 
+// ──────────────────────────────────────────────────────────────
+// V196 NEU: CSV-EXPORTS
+// ──────────────────────────────────────────────────────────────
+
+router.get('/users.csv', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const { q = '', plan = '', status = '' } = req.query;
+  try {
+    let where = "u.deleted_at IS NULL";
+    const params = [];
+    if (q && q.trim()) {
+      params.push(`%${q.trim().toLowerCase()}%`);
+      where += ` AND (LOWER(u.email) LIKE $${params.length} OR LOWER(u.name) LIKE $${params.length})`;
+    }
+    if (plan === 'free') {
+      where += ` AND s.id IS NULL`;
+    } else if (plan && ['starter', 'investor', 'pro'].includes(plan)) {
+      params.push(plan);
+      where += ` AND p.id = $${params.length}`;
+    }
+    if (status === 'active') where += ` AND u.is_active = true`;
+    if (status === 'inactive') where += ` AND u.is_active = false`;
+
+    const result = await db.query(`
+      SELECT
+        u.id, u.email, u.name, u.role,
+        u.is_active, u.email_verified_at, u.totp_enabled,
+        u.created_at, u.last_login_at,
+        COALESCE(p.id, 'free') AS plan_id,
+        COALESCE(p.name, 'Free') AS plan_name,
+        s.billing_interval,
+        s.current_period_end,
+        s.stripe_subscription_id,
+        (SELECT COUNT(*) FROM objects WHERE user_id = u.id) AS object_count,
+        cu.current_period_used AS credits_used,
+        cu.bonus_credits
+      FROM users u
+      LEFT JOIN subscriptions s ON s.user_id = u.id AND s.status = 'active'
+      LEFT JOIN plans p ON p.id = s.plan_id
+      LEFT JOIN ai_credits_user cu ON cu.user_id = u.id
+      WHERE ${where}
+      ORDER BY u.created_at DESC
+    `, params);
+
+    let csv = '\uFEFF' + csvRow([
+      'ID', 'Email', 'Name', 'Rolle',
+      'Aktiv', 'Email-Verifiziert', 'TOTP-Aktiv',
+      'Registriert', 'Letzter Login',
+      'Plan-ID', 'Plan-Name', 'Billing', 'Period-End', 'Stripe-Sub',
+      'Objekte', 'Credits-Verbraucht', 'Bonus-Credits'
+    ]);
+
+    for (const r of result.rows) {
+      csv += csvRow([
+        r.id, r.email, r.name, r.role,
+        r.is_active ? 'Ja' : 'Nein',
+        r.email_verified_at ? 'Ja' : 'Nein',
+        r.totp_enabled ? 'Ja' : 'Nein',
+        r.created_at ? new Date(r.created_at).toISOString() : '',
+        r.last_login_at ? new Date(r.last_login_at).toISOString() : '',
+        r.plan_id, r.plan_name,
+        r.billing_interval || '',
+        r.current_period_end ? new Date(r.current_period_end).toISOString() : '',
+        r.stripe_subscription_id || '',
+        r.object_count || 0,
+        r.credits_used || 0,
+        r.bonus_credits || 0
+      ]);
+    }
+
+    await audit(db, req.adminUser.id, req.adminUser.email, 'export.users.csv', null, null,
+                { count: result.rowCount, filters: { q, plan, status } },
+                req.ip, req.headers['user-agent']);
+
+    const filename = `dealpilot-users-${new Date().toISOString().slice(0, 10)}.csv`;
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csv);
+  } catch (err) {
+    console.error('[admin/users.csv] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.get('/audit-log.csv', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const { action = '', limit = 5000 } = req.query;
+  try {
+    let where = '1=1';
+    const params = [];
+    if (action) {
+      params.push(`%${action}%`);
+      where += ` AND a.action LIKE $${params.length}`;
+    }
+    params.push(Math.min(parseInt(limit, 10) || 5000, 10000));
+
+    const result = await db.query(`
+      SELECT
+        a.created_at, a.admin_email, a.action,
+        a.target_type, a.target_id,
+        u.email AS target_user_email,
+        a.ip, a.user_agent, a.success, a.payload
+      FROM admin_audit_log a
+      LEFT JOIN users u ON a.target_type = 'user' AND u.id::text = a.target_id
+      WHERE ${where}
+      ORDER BY a.created_at DESC
+      LIMIT $${params.length}
+    `, params);
+
+    let csv = '\uFEFF' + csvRow([
+      'Zeit', 'Admin-Email', 'Aktion',
+      'Ziel-Typ', 'Ziel-ID', 'Ziel-User-Email',
+      'IP', 'User-Agent', 'Erfolg', 'Payload'
+    ]);
+
+    for (const r of result.rows) {
+      csv += csvRow([
+        r.created_at ? new Date(r.created_at).toISOString() : '',
+        r.admin_email || '',
+        r.action,
+        r.target_type || '',
+        r.target_id || '',
+        r.target_user_email || '',
+        r.ip || '',
+        r.user_agent || '',
+        r.success ? 'Ja' : 'Nein',
+        r.payload ? JSON.stringify(r.payload) : ''
+      ]);
+    }
+
+    await audit(db, req.adminUser.id, req.adminUser.email, 'export.audit.csv', null, null,
+                { count: result.rowCount, action_filter: action },
+                req.ip, req.headers['user-agent']);
+
+    const filename = `dealpilot-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csv);
+  } catch (err) {
+    console.error('[admin/audit-log.csv] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+// USERS / ACTIONS (unverändert von V195.2)
+// ──────────────────────────────────────────────────────────────
+
 router.post('/users', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
   const db = req.app.get('db');
   const { email, name, plan_id = 'free' } = req.body || {};
@@ -298,9 +562,7 @@ router.post('/users', requireAdmin, requireRole('owner', 'support'), async (req,
 
   try {
     const dup = await db.query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
-    if (dup.rowCount > 0) {
-      return res.status(409).json({ error: 'email_exists' });
-    }
+    if (dup.rowCount > 0) return res.status(409).json({ error: 'email_exists' });
 
     const tempPassword = crypto.randomBytes(9).toString('base64').slice(0, 12);
     const passwordHash = await bcrypt.hash(tempPassword, 10);
@@ -362,8 +624,7 @@ router.get('/users/:id', requireAdmin, async (req, res) => {
       SELECT action, ip, created_at, payload AS meta, success
       FROM admin_audit_log
       WHERE target_type = 'user' AND target_id = $1
-      ORDER BY created_at DESC
-      LIMIT 20
+      ORDER BY created_at DESC LIMIT 20
     `, [req.params.id]);
 
     res.json({ user: result.rows[0], audit: auditRows.rows });
@@ -572,8 +833,7 @@ router.get('/plans', requireAdmin, async (req, res) => {
   try {
     const result = await db.query(`
       SELECT id, name, price_monthly_cents, price_yearly_cents
-      FROM plans
-      WHERE is_active = true
+      FROM plans WHERE is_active = true
       ORDER BY price_monthly_cents
     `);
     res.json({ plans: result.rows });

@@ -1,4 +1,4 @@
-// DealPilot Admin V195 — Hauptanwendung
+// DealPilot Admin V196 — Hauptanwendung
 'use strict';
 
 (function() {
@@ -17,6 +17,12 @@
     return new Date(d).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
   }
 
+  function fmtDay(d) {
+    if (!d) return '';
+    const dt = new Date(d);
+    return dt.getDate() + '.' + (dt.getMonth() + 1) + '.';
+  }
+
   function fmtNum(n) {
     if (n == null || isNaN(n)) return '–';
     return Number(n).toLocaleString('de-DE');
@@ -28,13 +34,6 @@
     t.textContent = msg;
     $('#toast-container').appendChild(t);
     setTimeout(() => t.remove(), 4000);
-  }
-
-  function showError(elId, msg) {
-    const el = $('#' + elId);
-    el.textContent = msg;
-    el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 6000);
   }
 
   function escapeHtml(s) {
@@ -58,7 +57,6 @@
         errEl.style.display = 'none';
         return;
       }
-      // Erfolg → App laden
       mountApp(r.admin);
     } catch (err) {
       errEl.textContent = err.data?.message || err.data?.error || err.message || 'Login fehlgeschlagen';
@@ -73,7 +71,6 @@
     $('#user-email').textContent = admin.email;
     $('#user-role').textContent = admin.role;
 
-    // Nav-Click-Handler
     $$('.nav-link').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -98,11 +95,25 @@
 
     $('#user-search-btn').addEventListener('click', loadUsers);
     $('#user-search').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadUsers(); });
+    $('#filter-plan').addEventListener('change', loadUsers);
+    $('#filter-status').addEventListener('change', loadUsers);
+    $('#export-users-csv').addEventListener('click', exportUsersCsv);
+
     $('#audit-filter-btn').addEventListener('click', loadAudit);
     $('#audit-filter').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadAudit(); });
+    $('#export-audit-csv').addEventListener('click', exportAuditCsv);
+
     $('#back-to-users').addEventListener('click', (e) => { e.preventDefault(); switchView('users'); });
 
-    // Plans für Dropdown laden
+    // Chart-Time-Range-Buttons
+    $$('.range-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $$('.range-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadCharts(parseInt(btn.dataset.days, 10));
+      });
+    });
+
     try {
       const plansRes = await API.listPlans();
       window._plans = plansRes.plans || [];
@@ -136,19 +147,16 @@
       $('#kpi-arr').textContent = fmtMoney(k.arr_cents);
       $('#kpi-paying').textContent = k.paying_users + ' zahlende User';
 
-      // Plan-Verteilung
-      const maxCount = Math.max(...d.plan_distribution.map(p => p.user_count), 1);
-      $('#plan-distribution').innerHTML = d.plan_distribution.map(p => `
-        <div class="plan-item">
-          <div class="plan-item-name">${escapeHtml(p.plan_name)}</div>
-          <div class="plan-item-bar">
-            <div class="plan-item-bar-fill" style="width: ${(p.user_count / maxCount * 100)}%"></div>
-          </div>
-          <div class="plan-item-count">${fmtNum(p.user_count)}</div>
-        </div>
-      `).join('') || '<div style="color:var(--text-muted)">Keine Daten</div>';
+      // V196: Donut für Plan-Verteilung
+      const planColors = { free: '#94a3b8', starter: '#10b981', investor: '#3b82f6', pro: '#c9a042' };
+      const donutData = d.plan_distribution.map(p => ({
+        label: p.plan_name,
+        value: p.user_count,
+        color: planColors[p.plan_id] || '#666'
+      }));
+      Charts.renderDonut($('#plan-donut'), donutData);
 
-      // Recent Signups
+      // V196: Recent-Listen
       $('#recent-signups').innerHTML = d.recent_signups.length
         ? d.recent_signups.map(s => `
             <tr>
@@ -158,7 +166,6 @@
           `).join('')
         : '<tr><td colspan="2" style="color:var(--text-muted)">Keine Daten</td></tr>';
 
-      // Recent Logins
       $('#recent-logins').innerHTML = d.recent_logins.length
         ? d.recent_logins.map(l => `
             <tr>
@@ -168,26 +175,60 @@
           `).join('')
         : '<tr><td colspan="2" style="color:var(--text-muted)">Keine Daten</td></tr>';
 
-      // User-Klick-Handler
       $$('.row-link[data-user-id]').forEach(a => {
         a.addEventListener('click', (e) => {
           e.preventDefault();
           showUserDetail(a.dataset.userId);
         });
       });
+
+      // Charts (Default 30 Tage)
+      const activeRange = document.querySelector('.range-btn.active');
+      const days = activeRange ? parseInt(activeRange.dataset.days, 10) : 30;
+      loadCharts(days);
+
     } catch (err) {
       toast('Dashboard-Fehler: ' + (err.message || 'unbekannt'), 'error');
+    }
+  }
+
+  async function loadCharts(days) {
+    days = days || 30;
+    const usersChartEl = $('#chart-users-trend');
+    const mrrChartEl = $('#chart-mrr-trend');
+    usersChartEl.innerHTML = '<div style="padding:40px;color:var(--text-muted);">Lädt…</div>';
+    mrrChartEl.innerHTML = '<div style="padding:40px;color:var(--text-muted);">Lädt…</div>';
+
+    try {
+      const [usersR, mrrR] = await Promise.all([API.usersTrend(days), API.mrrTrend(days)]);
+
+      Charts.renderLineChart(
+        usersChartEl,
+        usersR.series.map(p => ({ label: fmtDay(p.day), value: p.cumulative })),
+        { color: '#c9a042', valueFormat: v => fmtNum(Math.round(v)), height: 220 }
+      );
+
+      Charts.renderLineChart(
+        mrrChartEl,
+        mrrR.series.map(p => ({ label: fmtDay(p.day), value: p.mrr_cents / 100 })),
+        { color: '#3b82f6', valueFormat: v => v.toLocaleString('de-DE', { maximumFractionDigits: 0 }) + ' €', height: 220 }
+      );
+    } catch (err) {
+      usersChartEl.innerHTML = `<div class="error-msg">${escapeHtml(err.message || 'Fehler')}</div>`;
+      mrrChartEl.innerHTML = '';
     }
   }
 
   // ── User-Liste ─────────────────────────────────────────
   async function loadUsers() {
     const q = $('#user-search').value.trim();
+    const plan = $('#filter-plan').value;
+    const status = $('#filter-status').value;
     const tbody = $('#users-list');
     tbody.innerHTML = '<tr><td colspan="7">Lädt…</td></tr>';
     $('#users-error').style.display = 'none';
     try {
-      const r = await API.listUsers(q, 100, 0);
+      const r = await API.listUsers({ q, plan, status, limit: 100, offset: 0 });
       if (!r.users || r.users.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted)">Keine User gefunden</td></tr>';
         return;
@@ -215,7 +256,31 @@
     }
   }
 
-  // ── User-Detail-Page ───────────────────────────────────
+  async function exportUsersCsv() {
+    const q = $('#user-search').value.trim();
+    const plan = $('#filter-plan').value;
+    const status = $('#filter-status').value;
+    try {
+      toast('CSV wird generiert…', 'info');
+      await API.exportUsersCsv({ q, plan, status });
+      toast('✓ CSV heruntergeladen', 'success');
+    } catch (err) {
+      toast('Export-Fehler: ' + (err.message || 'unbekannt'), 'error');
+    }
+  }
+
+  async function exportAuditCsv() {
+    const filter = $('#audit-filter').value.trim();
+    try {
+      toast('CSV wird generiert…', 'info');
+      await API.exportAuditCsv(filter);
+      toast('✓ CSV heruntergeladen', 'success');
+    } catch (err) {
+      toast('Export-Fehler: ' + (err.message || 'unbekannt'), 'error');
+    }
+  }
+
+  // ── User-Detail-Page (unverändert von V195) ───────────────
   async function showUserDetail(id) {
     switchView('users');
     $('#view-users').style.display = 'none';
@@ -309,7 +374,6 @@
         ` : ''}
       `;
 
-      // Action-Handler
       $$('[data-action="change-plan"]')[0].addEventListener('click', () => handleChangePlan(id));
       $$('[data-action="grant-credits"]')[0].addEventListener('click', () => handleGrantCredits(id));
       $$('[data-action="reset-password"]')[0].addEventListener('click', () => handleResetPassword(id, u.email));
@@ -321,7 +385,6 @@
     }
   }
 
-  // ── User-Actions ────────────────────────────────────────
   async function handleChangePlan(id) {
     const plan_id = $('#action-plan').value;
     const interval = $('#action-interval').value;
@@ -417,7 +480,6 @@
       $('#reveal-message').textContent = `Initial-Passwort für ${r.user.email} — wird nur einmal angezeigt:`;
       $('#reveal-value').textContent = r.temp_password;
       $('#modal-reveal').style.display = 'flex';
-      // Refresh listings
       loadUsers();
       loadDashboard();
     } catch (err) {
@@ -434,6 +496,14 @@
     sel.innerHTML = '<option value="free">Free</option>' + plans.map(p =>
       `<option value="${p.id}">${escapeHtml(p.name)} – ${fmtMoney(p.price_monthly_cents)}/Monat</option>`
     ).join('');
+
+    // Plan-Filter im User-Tab auch befüllen
+    const filterSel = $('#filter-plan');
+    if (filterSel) {
+      filterSel.innerHTML = '<option value="">Alle Pläne</option>'
+        + '<option value="free">Free</option>'
+        + plans.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    }
   }
 
   // ── Audit-Log ──────────────────────────────────────────
@@ -485,11 +555,9 @@
         const r = await API.me();
         mountApp(r.admin);
       } catch {
-        // Token ungültig → Login zeigen
         Auth.logout();
       }
     }
-    // Sonst bleibt Login-Screen sichtbar (Default)
   }
 
   boot();

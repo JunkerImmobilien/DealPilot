@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DealPilot · Admin</title>
-  <link rel="stylesheet" href="css/admin.css?v=195">
+  <link rel="stylesheet" href="css/admin.css?v=196">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -93,10 +93,32 @@
         </div>
       </div>
 
+      <!-- V196: Time-Range-Buttons für Charts -->
+      <div class="range-bar">
+        <span class="range-label">Zeitraum:</span>
+        <button class="range-btn" data-days="7">7 Tage</button>
+        <button class="range-btn active" data-days="30">30 Tage</button>
+        <button class="range-btn" data-days="90">90 Tage</button>
+        <button class="range-btn" data-days="365">365 Tage</button>
+      </div>
+
+      <!-- V196: Charts -->
+      <div class="two-col">
+        <div class="card">
+          <h3>User-Wachstum</h3>
+          <div id="chart-users-trend" class="chart-container">Lädt…</div>
+        </div>
+        <div class="card">
+          <h3>MRR-Verlauf</h3>
+          <div id="chart-mrr-trend" class="chart-container">Lädt…</div>
+        </div>
+      </div>
+
+      <!-- V196: Donut für Plan-Verteilung -->
       <div class="two-col">
         <div class="card">
           <h3>Plan-Verteilung</h3>
-          <div id="plan-distribution" class="plan-list">Lädt…</div>
+          <div id="plan-donut">Lädt…</div>
         </div>
 
         <div class="card">
@@ -121,11 +143,27 @@
     <section id="view-users" class="view" style="display:none;">
       <div class="view-header">
         <h2>User-Verwaltung</h2>
-        <button class="btn btn-primary" id="open-create-user-2">+ User anlegen</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" id="export-users-csv">⬇ CSV-Export</button>
+          <button class="btn btn-primary" id="open-create-user-2">+ User anlegen</button>
+        </div>
       </div>
 
+      <!-- V196: Erweiterte Filter -->
       <div class="search-row">
         <input type="text" id="user-search" placeholder="Suche nach Email oder Name…" class="search-input">
+        <select id="filter-plan" class="filter-select">
+          <option value="">Alle Pläne</option>
+          <option value="free">Free</option>
+          <option value="starter">Starter</option>
+          <option value="investor">Investor</option>
+          <option value="pro">Pro</option>
+        </select>
+        <select id="filter-status" class="filter-select">
+          <option value="">Alle Status</option>
+          <option value="active">Nur Aktive</option>
+          <option value="inactive">Nur Gesperrte</option>
+        </select>
         <button class="btn" id="user-search-btn">Suchen</button>
       </div>
 
@@ -152,6 +190,7 @@
     <section id="view-audit" class="view" style="display:none;">
       <div class="view-header">
         <h2>Audit-Log</h2>
+        <button class="btn" id="export-audit-csv">⬇ CSV-Export</button>
       </div>
 
       <div class="search-row">
@@ -218,8 +257,9 @@
 <!-- ─── Toast Container ─── -->
 <div id="toast-container" class="toast-container"></div>
 
-<script src="js/admin-api.js?v=195-2"></script>
-<script src="js/admin-auth.js?v=195"></script>
-<script src="js/admin-app.js?v=195"></script>
+<script src="js/admin-api.js?v=196"></script>
+<script src="js/admin-auth.js?v=196"></script>
+<script src="js/admin-charts.js?v=196"></script>
+<script src="js/admin-app.js?v=196"></script>
 </body>
 </html>
