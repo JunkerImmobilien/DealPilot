@@ -1,0 +1,586 @@
+'use strict';
+/**
+ * V195.1: Admin-Dashboard — Hotfix für falsche Spaltennamen aus V195
+ *
+ * Fix gegenüber V195 (echte DB-Spalten aus Diagnose):
+ *   admin_login_attempts:
+ *     - succeeded     → success
+ *     - attempted_at  → created_at
+ *     - email         → email_attempted
+ *   admin_users:
+ *     - totp_secret_enc → totp_secret (Klartext base32, nicht verschlüsselt)
+ *   admin_audit_log:
+ *     - admin_id        → admin_user_id
+ *     - target_user_id  → target_type + target_id (UUID als text)
+ *     - meta            → payload
+ *     - + Spalten: admin_email, success, error_message
+ */
+
+const express = require('express');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const speakeasy = require('speakeasy');
+const jwt = require('jsonwebtoken');
+
+const router = express.Router();
+
+// ──────────────────────────────────────────────────────────────
+// HELPERS
+// ──────────────────────────────────────────────────────────────
+
+async function audit(db, adminId, adminEmail, action, targetType, targetId, payload, ip, userAgent, success = true) {
+  try {
+    await db.query(
+      `INSERT INTO admin_audit_log
+       (admin_user_id, admin_email, action, target_type, target_id, payload, ip, user_agent, success)
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9)`,
+      [adminId, adminEmail, action, targetType, targetId,
+       payload ? JSON.stringify(payload) : null,
+       ip, userAgent, success]
+    );
+  } catch (e) {
+    console.warn('[audit] failed:', e.message);
+  }
+}
+
+async function logLoginAttempt(db, ip, email, success) {
+  try {
+    await db.query(
+      `INSERT INTO admin_login_attempts (ip, email_attempted, success) VALUES ($1, $2, $3)`,
+      [ip || 'unknown', email || null, !!success]
+    );
+  } catch (e) {
+    console.warn('[login-attempt] failed:', e.message);
+  }
+}
+
+// Auth-Middleware aus existierender adminAuth.js (V194)
+const { requireAdmin, requireRole, signAdminToken } = require('../middleware/adminAuth');
+
+// ──────────────────────────────────────────────────────────────
+// AUTH
+// ──────────────────────────────────────────────────────────────
+
+router.post('/auth/login', async (req, res) => {
+  const db = req.app.get('db');
+  const { email, password, totpCode } = req.body || {};
+  const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'email_and_password_required' });
+  }
+
+  try {
+    // Rate-Limit
+    const attemptsResult = await db.query(
+      `SELECT COUNT(*) AS cnt FROM admin_login_attempts
+       WHERE ip = $1 AND success = false AND created_at > NOW() - INTERVAL '15 minutes'`,
+      [ip]
+    );
+    if (parseInt(attemptsResult.rows[0].cnt, 10) >= 5) {
+      return res.status(429).json({ error: 'too_many_attempts', message: 'Zu viele Login-Versuche. Bitte 15 Minuten warten.' });
+    }
+
+    const adminResult = await db.query(
+      `SELECT id, email, role, password_hash, totp_secret, totp_enabled,
+              failed_attempts, locked_until, is_active
+       FROM admin_users WHERE email = $1`,
+      [email.toLowerCase()]
+    );
+    if (!adminResult.rowCount) {
+      await logLoginAttempt(db, ip, email, false);
+      return res.status(401).json({ error: 'invalid_credentials' });
+    }
+    const admin = adminResult.rows[0];
+
+    if (!admin.is_active) {
+      await logLoginAttempt(db, ip, email, false);
+      return res.status(403).json({ error: 'account_disabled' });
+    }
+
+    if (admin.locked_until && new Date(admin.locked_until) > new Date()) {
+      return res.status(423).json({ error: 'account_locked', locked_until: admin.locked_until });
+    }
+
+    const pwOk = await bcrypt.compare(password, admin.password_hash);
+    if (!pwOk) {
+      const newFails = (admin.failed_attempts || 0) + 1;
+      const lockUntil = newFails >= 5 ? new Date(Date.now() + 30 * 60 * 1000) : null;
+      await db.query('UPDATE admin_users SET failed_attempts=$1, locked_until=$2 WHERE id=$3', [newFails, lockUntil, admin.id]);
+      await logLoginAttempt(db, ip, email, false);
+      return res.status(401).json({ error: 'invalid_credentials' });
+    }
+
+    // TOTP
+    if (admin.totp_enabled) {
+      if (!totpCode) {
+        return res.status(200).json({ requires_totp: true });
+      }
+      let totpSecret = admin.totp_secret;
+      // Falls verschlüsselt (Format "iv:tag:cipher") → über totpService entschlüsseln
+      if (totpSecret && totpSecret.includes(':') && totpSecret.split(':').length === 3) {
+        try {
+          const totpService = require('../services/totpService');
+          if (totpService && typeof totpService.decryptSecret === 'function') {
+            totpSecret = totpService.decryptSecret(admin.totp_secret);
+          }
+        } catch (e) { /* nicht kritisch */ }
+      }
+      const totpOk = speakeasy.totp.verify({
+        secret: totpSecret,
+        encoding: 'base32',
+        token: String(totpCode).replace(/\s/g, ''),
+        window: 1
+      });
+      if (!totpOk) {
+        await logLoginAttempt(db, ip, email, false);
+        return res.status(401).json({ error: 'invalid_totp' });
+      }
+    }
+
+    // Erfolg
+    await db.query('UPDATE admin_users SET failed_attempts=0, locked_until=NULL, last_login_at=NOW(), last_login_ip=$1 WHERE id=$2', [ip, admin.id]);
+    await logLoginAttempt(db, ip, email, true);
+    await audit(db, admin.id, admin.email, 'admin.login', null, null, null, ip, req.headers['user-agent']);
+
+    const token = signAdminToken({ id: admin.id, email: admin.email, role: admin.role });
+
+    res.json({
+      token,
+      admin: { id: admin.id, email: admin.email, role: admin.role }
+    });
+  } catch (err) {
+    console.error('[admin/login] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.get('/auth/me', requireAdmin, async (req, res) => {
+  res.json({ admin: req.adminUser });
+});
+
+// ──────────────────────────────────────────────────────────────
+// DASHBOARD
+// ──────────────────────────────────────────────────────────────
+
+router.get('/dashboard', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const usersAgg = await db.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE deleted_at IS NULL) AS total,
+        COUNT(*) FILTER (WHERE is_active = true AND deleted_at IS NULL) AS active,
+        COUNT(*) FILTER (WHERE last_login_at > NOW() - INTERVAL '30 days') AS active_30d,
+        COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days') AS new_7d,
+        COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '30 days') AS new_30d
+      FROM users
+    `);
+    const stats = usersAgg.rows[0];
+
+    const planDist = await db.query(`
+      SELECT
+        COALESCE(p.id, 'free') AS plan_id,
+        COALESCE(p.name, 'Free') AS plan_name,
+        COALESCE(p.price_monthly_cents, 0) AS price_monthly_cents,
+        COUNT(u.id) AS user_count
+      FROM users u
+      LEFT JOIN subscriptions s ON s.user_id = u.id AND s.status = 'active'
+      LEFT JOIN plans p ON p.id = s.plan_id
+      WHERE u.deleted_at IS NULL
+      GROUP BY p.id, p.name, p.price_monthly_cents
+      ORDER BY price_monthly_cents NULLS FIRST
+    `);
+
+    const revenue = await db.query(`
+      SELECT
+        COALESCE(SUM(
+          CASE
+            WHEN s.billing_interval = 'monthly' THEN p.price_monthly_cents
+            WHEN s.billing_interval = 'yearly' THEN p.price_yearly_cents / 12
+            ELSE 0
+          END
+        ), 0) AS mrr_cents,
+        COUNT(*) FILTER (WHERE s.status = 'active' AND p.id != 'free') AS paying_users
+      FROM subscriptions s
+      JOIN plans p ON p.id = s.plan_id
+      WHERE s.status = 'active'
+    `);
+    const rev = revenue.rows[0];
+
+    const recentSignups = await db.query(`
+      SELECT id, email, name, created_at, is_active
+      FROM users
+      WHERE deleted_at IS NULL
+      ORDER BY created_at DESC
+      LIMIT 5
+    `);
+
+    const recentLogins = await db.query(`
+      SELECT id, email, name, last_login_at
+      FROM users
+      WHERE last_login_at IS NOT NULL AND deleted_at IS NULL
+      ORDER BY last_login_at DESC
+      LIMIT 5
+    `);
+
+    res.json({
+      kpis: {
+        total_users: parseInt(stats.total, 10) || 0,
+        active_users: parseInt(stats.active, 10) || 0,
+        active_30d: parseInt(stats.active_30d, 10) || 0,
+        new_7d: parseInt(stats.new_7d, 10) || 0,
+        new_30d: parseInt(stats.new_30d, 10) || 0,
+        mrr_cents: parseInt(rev.mrr_cents, 10) || 0,
+        arr_cents: (parseInt(rev.mrr_cents, 10) || 0) * 12,
+        paying_users: parseInt(rev.paying_users, 10) || 0
+      },
+      plan_distribution: planDist.rows.map(r => ({
+        plan_id: r.plan_id,
+        plan_name: r.plan_name,
+        user_count: parseInt(r.user_count, 10),
+        price_monthly_cents: parseInt(r.price_monthly_cents, 10)
+      })),
+      recent_signups: recentSignups.rows,
+      recent_logins: recentLogins.rows
+    });
+  } catch (err) {
+    console.error('[admin/dashboard] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+// USERS
+// ──────────────────────────────────────────────────────────────
+
+router.get('/users', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const { q = '', limit = 50, offset = 0 } = req.query;
+  try {
+    let where = "u.deleted_at IS NULL";
+    const params = [];
+    if (q && q.trim()) {
+      params.push(`%${q.trim().toLowerCase()}%`);
+      where += ` AND (LOWER(u.email) LIKE $${params.length} OR LOWER(u.name) LIKE $${params.length})`;
+    }
+    params.push(parseInt(limit, 10) || 50);
+    params.push(parseInt(offset, 10) || 0);
+
+    const result = await db.query(`
+      SELECT
+        u.id, u.email, u.name, u.role, u.is_active,
+        u.last_login_at, u.created_at, u.email_verified_at,
+        COALESCE(p.id, 'free') AS plan_id,
+        COALESCE(p.name, 'Free') AS plan_name,
+        (SELECT COUNT(*) FROM objects WHERE user_id = u.id) AS object_count
+      FROM users u
+      LEFT JOIN subscriptions s ON s.user_id = u.id AND s.status = 'active'
+      LEFT JOIN plans p ON p.id = s.plan_id
+      WHERE ${where}
+      ORDER BY u.created_at DESC
+      LIMIT $${params.length - 1} OFFSET $${params.length}
+    `, params);
+
+    res.json({ users: result.rows, count: result.rowCount });
+  } catch (err) {
+    console.error('[admin/users] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.post('/users', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  const { email, name, plan_id = 'free' } = req.body || {};
+
+  if (!email || !name) {
+    return res.status(400).json({ error: 'email_and_name_required' });
+  }
+
+  try {
+    const dup = await db.query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
+    if (dup.rowCount > 0) {
+      return res.status(409).json({ error: 'email_exists' });
+    }
+
+    const tempPassword = crypto.randomBytes(9).toString('base64').slice(0, 12);
+    const passwordHash = await bcrypt.hash(tempPassword, 10);
+
+    const result = await db.query(`
+      INSERT INTO users (email, name, password_hash, role, is_active, email_verified_at)
+      VALUES ($1, $2, $3, 'user', true, NOW())
+      RETURNING id, email, name, created_at
+    `, [email.toLowerCase(), name, passwordHash]);
+
+    const newUser = result.rows[0];
+
+    if (plan_id && plan_id !== 'free') {
+      await db.query(`
+        INSERT INTO subscriptions (user_id, plan_id, billing_interval, status, current_period_start, current_period_end)
+        VALUES ($1, $2, 'monthly', 'active', NOW(), NOW() + INTERVAL '1 year')
+      `, [newUser.id, plan_id]);
+    }
+
+    await audit(db, req.adminUser.id, req.adminUser.email, 'user.created', 'user', newUser.id,
+                { email, plan_id }, req.ip, req.headers['user-agent']);
+
+    res.json({
+      user: newUser,
+      temp_password: tempPassword,
+      message: 'User angelegt. Initial-Passwort einmalig anzeigen, dann nie wieder zugänglich!'
+    });
+  } catch (err) {
+    console.error('[admin/users/create] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.get('/users/:id', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const result = await db.query(`
+      SELECT
+        u.id, u.email, u.name, u.role, u.is_active,
+        u.last_login_at, u.created_at, u.email_verified_at, u.totp_enabled,
+        COALESCE(p.id, 'free') AS plan_id,
+        COALESCE(p.name, 'Free') AS plan_name,
+        s.billing_interval, s.current_period_end, s.cancel_at_period_end,
+        s.stripe_subscription_id,
+        (SELECT COUNT(*) FROM objects WHERE user_id = u.id) AS object_count,
+        cu.current_period_used AS credits_used,
+        cu.bonus_credits,
+        cu.current_period_start AS credits_period_start
+      FROM users u
+      LEFT JOIN subscriptions s ON s.user_id = u.id AND s.status = 'active'
+      LEFT JOIN plans p ON p.id = s.plan_id
+      LEFT JOIN ai_credits_user cu ON cu.user_id = u.id
+      WHERE u.id = $1 AND u.deleted_at IS NULL
+    `, [req.params.id]);
+
+    if (!result.rowCount) return res.status(404).json({ error: 'user_not_found' });
+
+    const auditRows = await db.query(`
+      SELECT action, ip, created_at, payload AS meta, success
+      FROM admin_audit_log
+      WHERE target_type = 'user' AND target_id = $1
+      ORDER BY created_at DESC
+      LIMIT 20
+    `, [req.params.id]);
+
+    res.json({ user: result.rows[0], audit: auditRows.rows });
+  } catch (err) {
+    console.error('[admin/users/:id] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.post('/users/:id/change-plan', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  const { plan_id, billing_interval = 'monthly', reason = '' } = req.body || {};
+
+  if (!plan_id) return res.status(400).json({ error: 'plan_id_required' });
+  if (!['monthly', 'yearly'].includes(billing_interval)) {
+    return res.status(400).json({ error: 'invalid_billing_interval' });
+  }
+
+  try {
+    const planCheck = await db.query('SELECT id FROM plans WHERE id = $1', [plan_id]);
+    if (!planCheck.rowCount && plan_id !== 'free') {
+      return res.status(404).json({ error: 'plan_not_found' });
+    }
+
+    await db.query(`UPDATE subscriptions SET status='canceled', ended_at=NOW() WHERE user_id=$1 AND status='active'`, [req.params.id]);
+
+    if (plan_id !== 'free') {
+      await db.query(`
+        INSERT INTO subscriptions (user_id, plan_id, billing_interval, status, current_period_start, current_period_end)
+        VALUES ($1, $2, $3, 'active', NOW(), NOW() + INTERVAL '1 year')
+      `, [req.params.id, plan_id, billing_interval]);
+    }
+
+    await audit(db, req.adminUser.id, req.adminUser.email, 'user.plan_change', 'user', req.params.id,
+                { plan_id, billing_interval, reason }, req.ip, req.headers['user-agent']);
+
+    res.json({ success: true, plan_id, billing_interval });
+  } catch (err) {
+    console.error('[admin/users/change-plan] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.post('/users/:id/grant-credits', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  const { amount, reason = '' } = req.body || {};
+  const amt = parseInt(amount, 10);
+  if (!amt || amt < 1 || amt > 10000) {
+    return res.status(400).json({ error: 'invalid_amount' });
+  }
+
+  try {
+    await db.query(`
+      INSERT INTO ai_credits_user (user_id, bonus_credits)
+      VALUES ($1, $2)
+      ON CONFLICT (user_id) DO UPDATE SET
+        bonus_credits = ai_credits_user.bonus_credits + EXCLUDED.bonus_credits,
+        updated_at = NOW()
+    `, [req.params.id, amt]);
+
+    await db.query(`
+      INSERT INTO ai_credits_log (user_id, endpoint, cost, source, meta)
+      VALUES ($1, 'admin-grant', $2, 'admin', $3::jsonb)
+    `, [req.params.id, -amt, JSON.stringify({ admin_id: req.adminUser.id, reason })]);
+
+    await audit(db, req.adminUser.id, req.adminUser.email, 'user.credits_grant', 'user', req.params.id,
+                { amount: amt, reason }, req.ip, req.headers['user-agent']);
+
+    const newState = await db.query('SELECT bonus_credits, current_period_used FROM ai_credits_user WHERE user_id = $1', [req.params.id]);
+    res.json({ success: true, granted: amt, balance: newState.rows[0] });
+  } catch (err) {
+    console.error('[admin/users/grant-credits] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.post('/users/:id/reset-password', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  const { reason = '' } = req.body || {};
+  try {
+    const userCheck = await db.query('SELECT email FROM users WHERE id = $1 AND deleted_at IS NULL', [req.params.id]);
+    if (!userCheck.rowCount) return res.status(404).json({ error: 'user_not_found' });
+
+    const newPassword = crypto.randomBytes(9).toString('base64').slice(0, 12);
+    const newHash = await bcrypt.hash(newPassword, 10);
+
+    await db.query('UPDATE users SET password_hash=$1, updated_at=NOW() WHERE id=$2', [newHash, req.params.id]);
+
+    await audit(db, req.adminUser.id, req.adminUser.email, 'user.password_reset', 'user', req.params.id,
+                { reason }, req.ip, req.headers['user-agent']);
+
+    res.json({
+      success: true,
+      email: userCheck.rows[0].email,
+      new_password: newPassword,
+      warning: 'Dieses Passwort wird nur EINMAL angezeigt. Sofort sicher an den User übermitteln!'
+    });
+  } catch (err) {
+    console.error('[admin/users/reset-password] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.post('/users/:id/toggle-active', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  const { reason = '' } = req.body || {};
+  try {
+    const result = await db.query(`UPDATE users SET is_active = NOT is_active, updated_at=NOW() WHERE id=$1 AND deleted_at IS NULL RETURNING is_active, email`, [req.params.id]);
+    if (!result.rowCount) return res.status(404).json({ error: 'user_not_found' });
+
+    const action = result.rows[0].is_active ? 'user.unsuspend' : 'user.suspend';
+    await audit(db, req.adminUser.id, req.adminUser.email, action, 'user', req.params.id,
+                { reason }, req.ip, req.headers['user-agent']);
+
+    res.json({ success: true, is_active: result.rows[0].is_active, email: result.rows[0].email });
+  } catch (err) {
+    console.error('[admin/users/toggle-active] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.delete('/users/:id', requireAdmin, requireRole('owner'), async (req, res) => {
+  const db = req.app.get('db');
+  const { confirm_email, reason = '' } = req.body || {};
+
+  try {
+    const userCheck = await db.query('SELECT email FROM users WHERE id = $1 AND deleted_at IS NULL', [req.params.id]);
+    if (!userCheck.rowCount) return res.status(404).json({ error: 'user_not_found' });
+    if (confirm_email !== userCheck.rows[0].email) {
+      return res.status(400).json({ error: 'confirmation_mismatch', message: 'confirm_email muss die Email des Users sein' });
+    }
+
+    await db.query(`
+      UPDATE users
+      SET deleted_at=NOW(),
+          email=CONCAT('deleted-', id, '@deleted.local'),
+          name='[gelöscht]',
+          password_hash='[deleted]',
+          is_active=false,
+          totp_secret=NULL,
+          totp_enabled=false
+      WHERE id=$1
+    `, [req.params.id]);
+
+    await db.query(`UPDATE subscriptions SET status='canceled', ended_at=NOW() WHERE user_id=$1`, [req.params.id]);
+
+    await audit(db, req.adminUser.id, req.adminUser.email, 'user.delete_dsgvo', 'user', req.params.id,
+                { email: userCheck.rows[0].email, reason }, req.ip, req.headers['user-agent']);
+
+    res.json({ success: true, deleted: userCheck.rows[0].email });
+  } catch (err) {
+    console.error('[admin/users/delete] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+// AUDIT-LOG
+// ──────────────────────────────────────────────────────────────
+
+router.get('/audit-log', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const { action = '', limit = 100, offset = 0 } = req.query;
+  try {
+    let where = '1=1';
+    const params = [];
+    if (action) {
+      params.push(`%${action}%`);
+      where += ` AND a.action LIKE $${params.length}`;
+    }
+    params.push(parseInt(limit, 10) || 100);
+    params.push(parseInt(offset, 10) || 0);
+
+    const result = await db.query(`
+      SELECT
+        a.id, a.action, a.ip, a.user_agent, a.created_at,
+        a.payload AS meta,
+        a.target_type, a.target_id,
+        a.admin_email,
+        u.email AS target_user_email
+      FROM admin_audit_log a
+      LEFT JOIN users u ON a.target_type = 'user' AND u.id::text = a.target_id
+      WHERE ${where}
+      ORDER BY a.created_at DESC
+      LIMIT $${params.length - 1} OFFSET $${params.length}
+    `, params);
+
+    res.json({
+      entries: result.rows.map(r => ({
+        ...r,
+        target_user_id: r.target_type === 'user' ? r.target_id : null
+      }))
+    });
+  } catch (err) {
+    console.error('[admin/audit-log] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+// PLANS-LIST
+// ──────────────────────────────────────────────────────────────
+
+router.get('/plans', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const result = await db.query(`
+      SELECT id, name, price_monthly_cents, price_yearly_cents
+      FROM plans
+      WHERE is_active = true
+      ORDER BY price_monthly_cents
+    `);
+    res.json({ plans: result.rows });
+  } catch (err) {
+    console.error('[admin/plans] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+module.exports = router;

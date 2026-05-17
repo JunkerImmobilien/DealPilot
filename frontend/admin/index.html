@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DealPilot · Admin</title>
+  <link rel="stylesheet" href="css/admin.css?v=195">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+
+<!-- ─── Login-Screen ─────────────────────────────────────────── -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <h1 class="login-title">DealPilot · Admin</h1>
+    <div class="login-sub">Bitte anmelden</div>
+    <form id="login-form">
+      <div class="form-row">
+        <label>E-Mail</label>
+        <input type="email" id="login-email" required autocomplete="username">
+      </div>
+      <div class="form-row">
+        <label>Passwort</label>
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </div>
+      <div class="form-row" id="totp-row" style="display:none;">
+        <label>6-stelliger Code (Google Authenticator)</label>
+        <input type="text" id="login-totp" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code">
+      </div>
+      <div id="login-error" class="error-msg" style="display:none;"></div>
+      <button type="submit" class="btn btn-primary btn-block">Anmelden</button>
+    </form>
+    <div class="login-footer">
+      <a href="/">← Zurück zur App</a>
+    </div>
+  </div>
+</div>
+
+<!-- ─── App-Shell ──────────────────────────────────────────── -->
+<div id="app-shell" class="app-shell" style="display:none;">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="brand">⚙ DealPilot Admin</span>
+      <nav class="nav">
+        <a href="#" data-view="dashboard" class="nav-link active">Dashboard</a>
+        <a href="#" data-view="users" class="nav-link">User</a>
+        <a href="#" data-view="audit" class="nav-link">Audit-Log</a>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <span id="user-email" class="user-email"></span>
+      <span id="user-role" class="user-role"></span>
+      <a href="#" id="logout-link" class="logout">Logout</a>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- ─── Dashboard ─── -->
+    <section id="view-dashboard" class="view">
+      <div class="view-header">
+        <h2>Dashboard</h2>
+        <button class="btn btn-primary" id="open-create-user">+ User anlegen</button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Gesamt-User</div>
+          <div class="kpi-value" id="kpi-total">–</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Aktive (30 Tage)</div>
+          <div class="kpi-value" id="kpi-active-30d">–</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Neu (7 Tage)</div>
+          <div class="kpi-value" id="kpi-new-7d">–</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Neu (30 Tage)</div>
+          <div class="kpi-value" id="kpi-new-30d">–</div>
+        </div>
+        <div class="kpi-card kpi-card--gold">
+          <div class="kpi-label">MRR (Monatsumsatz)</div>
+          <div class="kpi-value" id="kpi-mrr">–</div>
+          <div class="kpi-sub" id="kpi-paying">– zahlende User</div>
+        </div>
+        <div class="kpi-card kpi-card--gold">
+          <div class="kpi-label">ARR (Jahres-Run-Rate)</div>
+          <div class="kpi-value" id="kpi-arr">–</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3>Plan-Verteilung</h3>
+          <div id="plan-distribution" class="plan-list">Lädt…</div>
+        </div>
+
+        <div class="card">
+          <h3>Letzte Anmeldungen</h3>
+          <table class="data-table">
+            <thead><tr><th>E-Mail</th><th>Datum</th></tr></thead>
+            <tbody id="recent-signups"><tr><td colspan="2">Lädt…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Letzte Logins</h3>
+        <table class="data-table">
+          <thead><tr><th>E-Mail</th><th>Letzter Login</th></tr></thead>
+          <tbody id="recent-logins"><tr><td colspan="2">Lädt…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─── User-Liste ─── -->
+    <section id="view-users" class="view" style="display:none;">
+      <div class="view-header">
+        <h2>User-Verwaltung</h2>
+        <button class="btn btn-primary" id="open-create-user-2">+ User anlegen</button>
+      </div>
+
+      <div class="search-row">
+        <input type="text" id="user-search" placeholder="Suche nach Email oder Name…" class="search-input">
+        <button class="btn" id="user-search-btn">Suchen</button>
+      </div>
+
+      <div id="users-error" class="error-msg" style="display:none;"></div>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>E-Mail</th><th>Name</th><th>Plan</th><th>Status</th><th>Objekte</th><th>Letzter Login</th><th></th></tr>
+        </thead>
+        <tbody id="users-list"><tr><td colspan="7">Klicke auf Suchen oder lass das Feld leer für alle.</td></tr></tbody>
+      </table>
+    </section>
+
+    <!-- ─── User-Detail ─── -->
+    <section id="view-user-detail" class="view" style="display:none;">
+      <div class="view-header">
+        <h2>User-Details</h2>
+        <a href="#" class="back-link" id="back-to-users">← Zurück zur Liste</a>
+      </div>
+      <div id="user-detail-content">Lädt…</div>
+    </section>
+
+    <!-- ─── Audit-Log ─── -->
+    <section id="view-audit" class="view" style="display:none;">
+      <div class="view-header">
+        <h2>Audit-Log</h2>
+      </div>
+
+      <div class="search-row">
+        <input type="text" id="audit-filter" placeholder="Filter Aktion (z.B. user.plan_change)" class="search-input">
+        <button class="btn" id="audit-filter-btn">Filtern</button>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>Zeit</th><th>Admin</th><th>Aktion</th><th>Ziel</th><th>IP</th><th>Details</th></tr>
+        </thead>
+        <tbody id="audit-list"><tr><td colspan="6">Lädt…</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+</div>
+
+<!-- ─── Modal: User anlegen ─── -->
+<div id="modal-create-user" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Neuen User anlegen</h3>
+    <form id="create-user-form">
+      <div class="form-row">
+        <label>E-Mail</label>
+        <input type="email" id="cu-email" required>
+      </div>
+      <div class="form-row">
+        <label>Name</label>
+        <input type="text" id="cu-name" required>
+      </div>
+      <div class="form-row">
+        <label>Initialer Plan</label>
+        <select id="cu-plan">
+          <option value="free">Free</option>
+          <option value="starter">Starter</option>
+          <option value="investor">Investor</option>
+          <option value="pro">Pro</option>
+        </select>
+      </div>
+      <div id="cu-error" class="error-msg" style="display:none;"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="cu-cancel">Abbrechen</button>
+        <button type="submit" class="btn btn-primary">Anlegen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ─── Modal: Generic Reveal (Passwort, etc.) ─── -->
+<div id="modal-reveal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3 id="reveal-title">Information</h3>
+    <p id="reveal-message"></p>
+    <div class="reveal-box">
+      <code id="reveal-value"></code>
+      <button class="btn btn-sm" id="reveal-copy">Kopieren</button>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-primary" id="reveal-close">Verstanden, ich habe es notiert</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Toast Container ─── -->
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/admin-api.js?v=195-2"></script>
+<script src="js/admin-auth.js?v=195"></script>
+<script src="js/admin-app.js?v=195"></script>
+</body>
+</html>
