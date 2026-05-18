@@ -245,25 +245,15 @@ function showAuthModal(mode) {
 
     // ── Login-Card ────────────────────────────────
     '<div class="auth-card-v39" role="dialog" aria-labelledby="auth-title">' +
-      // Logo-Kopf mit goldener Welle
-      '<div class="auth-logo-v39">' +
-        '<div class="auth-logo-wave">' +
-          '<svg viewBox="0 0 320 100" preserveAspectRatio="none" aria-hidden="true">' +
-            '<defs>' +
-              '<linearGradient id="logoWaveGrad" x1="0" y1="0" x2="1" y2="0">' +
-                '<stop offset="0%" stop-color="#C9A84C" stop-opacity="0"/>' +
-                '<stop offset="50%" stop-color="#E0BB5C" stop-opacity="0.95"/>' +
-                '<stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>' +
-              '</linearGradient>' +
-            '</defs>' +
-            '<path d="M0,50 C 60,20 110,80 160,50 C 210,20 260,80 320,50" stroke="url(#logoWaveGrad)" stroke-width="2" fill="none"/>' +
-            '<path d="M0,55 C 70,30 120,80 160,55 C 200,30 260,75 320,55" stroke="url(#logoWaveGrad)" stroke-width="1" fill="none" opacity="0.6"/>' +
-          '</svg>' +
-        '</div>' +
-        '<div class="auth-logo-text">' +
-          '<span class="auth-logo-deal">Deal</span><span class="auth-logo-pilot">Pilot</span>' +
-        '</div>' +
-        '<div class="auth-logo-by">by Junker Immobilien</div>' +
+      // V216: Bewegliche Goldkugeln im Hintergrund (nur Login, nicht Reset)
+      '<div class="auth-bg-orbs" aria-hidden="true">' +
+        '<div class="auth-bg-orb auth-bg-orb-1"></div>' +
+        '<div class="auth-bg-orb auth-bg-orb-2"></div>' +
+        '<div class="auth-bg-orb auth-bg-orb-3"></div>' +
+      '</div>' +
+      // V213/V215/V216: App-Logo HD-PNG, zentriert
+      '<div class="auth-logo-simple-wrap">' +
+        '<img class="app-logo-simple app-logo-simple-auth" src="assets/dealpilot-logo-app.png" alt="DealPilot by Junker Immobilien" />' +
       '</div>' +
 
       '<h2 id="auth-title" class="auth-title-v39">Willkommen zurück</h2>' +
@@ -681,8 +671,9 @@ function showPasswordReset() {
   modal.style.zIndex = '10100';
   modal.innerHTML =
     '<div class="auth-card-v39" style="max-width:380px;animation:none">' +
-      '<div class="app-logo-hero app-logo-auth">' +
-      '<img class="app-logo-img" src="assets/dealpilot-logo.png" alt="DealPilot" />' +
+      // V213/V215: Simples App-Logo
+      '<div class="auth-logo-simple-wrap">' +
+        '<img class="app-logo-simple app-logo-simple-auth" src="assets/dealpilot-logo-app.png" alt="DealPilot by Junker Immobilien" />' +
       '</div>' +
       '<h2 class="auth-title-v39" style="font-size:18px">Passwort zurücksetzen</h2>' +
       '<p class="auth-sub-v39" style="font-size:12.5px">Trag deine E-Mail-Adresse ein. Wir schicken dir einen Reset-Link.</p>' +
@@ -763,9 +754,10 @@ window.handlePwReset = handlePwReset;
     modal.style.zIndex = '10100';
     modal.innerHTML =
       '<div class="auth-card-v39" style="max-width:380px;animation:none">' +
-        '<div class="app-logo-hero app-logo-auth">' +
-      '<img class="app-logo-img" src="assets/dealpilot-logo.png" alt="DealPilot" />' +
-      '</div>' +
+        // V213/V215: Simples App-Logo
+        '<div class="auth-logo-simple-wrap">' +
+          '<img class="app-logo-simple app-logo-simple-auth" src="assets/dealpilot-logo-app.png" alt="DealPilot by Junker Immobilien" />' +
+        '</div>' +
         '<h2 class="auth-title-v39" style="font-size:18px">Neues Passwort setzen</h2>' +
         '<p class="auth-sub-v39" style="font-size:12.5px">Trag dein neues Passwort ein. Mindestens 10 Zeichen.</p>' +
         '<div class="auth-form-v39">' +
