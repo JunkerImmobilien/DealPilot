@@ -28168,80 +28168,69 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 
 
 /* ═══════════════════════════════════════════════════════════
-   V221 — Goldkreise IN der Auth-Card (3 Orbs, kräftig sichtbar)
-   Größer als V216-Werte, opacity höher, gut wahrnehmbarer Effekt.
-   .auth-card-v39 hat schon position:relative + overflow:hidden (V216).
+   V222 — Auth-Cards: SCHWARZER Hintergrund + Staubschwarm
+   Überschreibt V217's var(--ch) Card-Background mit #0A0808.
+   Auf schwarzem Hintergrund sind die goldenen Staubpunkte
+   deutlich sichtbar.
    ═══════════════════════════════════════════════════════════ */
-.auth-card-orbs {
+
+/* Override V217-Background — höchste Spezifität, last-wins */
+.auth-card-v39 {
+  background: #0A0808 !important;
+}
+
+/* Staub-Wrapper */
+.auth-stardust {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
   overflow: hidden;
   border-radius: inherit;
+  z-index: 0;
 }
 
-.auth-card-orb {
+.auth-stardust-dot {
   position: absolute;
+  background: rgba(232, 200, 120, 0.8);
   border-radius: 50%;
-  will-change: transform;
-  pointer-events: none;
+  will-change: transform, opacity;
 }
 
-.auth-card-orb-1 {
-  width: 280px;
-  height: 280px;
-  background: radial-gradient(circle, rgba(201, 168, 76, 0.45), transparent 70%);
-  filter: blur(35px);
-  opacity: 0.75;
-  top: -50px;
-  left: -70px;
-  animation: auth-card-orb1 14s ease-in-out infinite alternate;
+/* 16 Punkte — verteilt + zwei Animationen */
+.auth-stardust-d1  { width: 2px; height: 2px; top: 15%; left: 12%; animation: v222-f1  8s ease-in-out infinite; }
+.auth-stardust-d2  { width: 3px; height: 3px; top: 25%; left: 78%; animation: v222-f2 11s ease-in-out infinite; }
+.auth-stardust-d3  { width: 2px; height: 2px; top: 45%; left: 18%; animation: v222-f1  9s ease-in-out infinite reverse; }
+.auth-stardust-d4  { width: 4px; height: 4px; top: 35%; left: 88%; animation: v222-f2 14s ease-in-out infinite; }
+.auth-stardust-d5  { width: 2px; height: 2px; top: 65%; left: 30%; animation: v222-f1 12s ease-in-out infinite; }
+.auth-stardust-d6  { width: 3px; height: 3px; top: 75%; left: 65%; animation: v222-f2  9s ease-in-out infinite reverse; }
+.auth-stardust-d7  { width: 2px; height: 2px; top: 85%; left: 22%; animation: v222-f1 13s ease-in-out infinite; }
+.auth-stardust-d8  { width: 3px; height: 3px; top: 18%; left: 52%; animation: v222-f2 10s ease-in-out infinite reverse; }
+.auth-stardust-d9  { width: 2px; height: 2px; top: 38%; left: 58%; animation: v222-f1 11s ease-in-out infinite; }
+.auth-stardust-d10 { width: 2px; height: 2px; top: 70%; left:  8%; animation: v222-f2 13s ease-in-out infinite; }
+.auth-stardust-d11 { width: 3px; height: 3px; top: 50%; left: 72%; animation: v222-f1  8s ease-in-out infinite reverse; }
+.auth-stardust-d12 { width: 2px; height: 2px; top: 88%; left: 88%; animation: v222-f2 12s ease-in-out infinite; }
+.auth-stardust-d13 { width: 2px; height: 2px; top:  5%; left: 32%; animation: v222-f1  9s ease-in-out infinite; }
+.auth-stardust-d14 { width: 3px; height: 3px; top: 92%; left: 45%; animation: v222-f2 11s ease-in-out infinite reverse; }
+.auth-stardust-d15 { width: 2px; height: 2px; top: 28%; left:  8%; animation: v222-f1 13s ease-in-out infinite; }
+.auth-stardust-d16 { width: 4px; height: 4px; top: 60%; left: 88%; animation: v222-f2 14s ease-in-out infinite; }
+
+@keyframes v222-f1 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.8; }
+  50%      { transform: translate(-15px, -25px); opacity: 0.4; }
+}
+@keyframes v222-f2 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.7; }
+  50%      { transform: translate(20px, -30px); opacity: 1; }
 }
 
-.auth-card-orb-2 {
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, rgba(201, 168, 76, 0.38), transparent 70%);
-  filter: blur(30px);
-  opacity: 0.65;
-  bottom: -40px;
-  right: -60px;
-  animation: auth-card-orb2 18s ease-in-out infinite alternate;
-}
-
-.auth-card-orb-3 {
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(circle, rgba(168, 134, 30, 0.32), transparent 70%);
-  filter: blur(25px);
-  opacity: 0.55;
-  top: 45%;
-  left: 35%;
-  animation: auth-card-orb3 16s ease-in-out infinite alternate;
-}
-
-@keyframes auth-card-orb1 {
-  0%   { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(90px, 50px) scale(1.18); }
-}
-@keyframes auth-card-orb2 {
-  0%   { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-70px, -60px) scale(1.12); }
-}
-@keyframes auth-card-orb3 {
-  0%   { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-50px, 40px) scale(1.22); }
-}
-
-/* Form-Elemente über den Orbs */
-.auth-card-v39 > *:not(.auth-card-orbs):not(.auth-bg-orbs):not(.auth-stardust) {
+/* Form-Elemente über dem Staub */
+.auth-card-v39 > *:not(.auth-stardust):not(.auth-bg-orbs):not(.auth-card-orbs) {
   position: relative;
   z-index: 2;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .auth-card-orb { animation: none; }
+  .auth-stardust-dot { animation: none; }
 }
 
-/* V221-Marker */
+/* V222-Marker */

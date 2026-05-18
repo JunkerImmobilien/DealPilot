@@ -847,59 +847,49 @@ function _v10OpenRegister() {
 
 
 /* ═══════════════════════════════════════════════════════════
-   V221 — Auto-Injection: 3 Goldkreise in jede .auth-card-v39
-   Gilt für Login, Reset, Neues-Passwort, Konto-erstellen, Beta-Tester
+   V222 — Auto-Injection: 16 Staubpunkte in jede .auth-card-v39
    ═══════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-
-  function injectCardOrbs(card) {
-    if (!card || card.dataset.cardOrbs === '1') return;
-    card.dataset.cardOrbs = '1';
-    var orbsWrap = document.createElement('div');
-    orbsWrap.className = 'auth-card-orbs';
-    orbsWrap.setAttribute('aria-hidden', 'true');
-    for (var i = 1; i <= 3; i++) {
-      var orb = document.createElement('div');
-      orb.className = 'auth-card-orb auth-card-orb-' + i;
-      orbsWrap.appendChild(orb);
+  function injectV222(card) {
+    if (!card || card.dataset.v222 === '1') return;
+    card.dataset.v222 = '1';
+    var dust = document.createElement('div');
+    dust.className = 'auth-stardust';
+    dust.setAttribute('aria-hidden', 'true');
+    for (var i = 1; i <= 16; i++) {
+      var dot = document.createElement('span');
+      dot.className = 'auth-stardust-dot auth-stardust-d' + i;
+      dust.appendChild(dot);
     }
     if (card.firstChild) {
-      card.insertBefore(orbsWrap, card.firstChild);
+      card.insertBefore(dust, card.firstChild);
     } else {
-      card.appendChild(orbsWrap);
+      card.appendChild(dust);
     }
   }
-
-  function scanAndInject() {
+  function scanV222() {
     var cards = document.querySelectorAll('.auth-card-v39');
-    for (var i = 0; i < cards.length; i++) {
-      injectCardOrbs(cards[i]);
-    }
+    for (var i = 0; i < cards.length; i++) injectV222(cards[i]);
   }
-
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', scanAndInject);
+    document.addEventListener('DOMContentLoaded', scanV222);
   } else {
-    scanAndInject();
+    scanV222();
   }
-
-  // MutationObserver für später eingefügte Auth-Karten
-  var observer = new MutationObserver(function (mutations) {
-    for (var m = 0; m < mutations.length; m++) {
-      var added = mutations[m].addedNodes;
+  var obs = new MutationObserver(function (muts) {
+    for (var m = 0; m < muts.length; m++) {
+      var added = muts[m].addedNodes;
       for (var n = 0; n < added.length; n++) {
         var node = added[n];
         if (node.nodeType !== 1) continue;
-        if (node.classList && node.classList.contains('auth-card-v39')) {
-          injectCardOrbs(node);
-        }
+        if (node.classList && node.classList.contains('auth-card-v39')) injectV222(node);
         if (node.querySelectorAll) {
           var subs = node.querySelectorAll('.auth-card-v39');
-          for (var s = 0; s < subs.length; s++) injectCardOrbs(subs[s]);
+          for (var s = 0; s < subs.length; s++) injectV222(subs[s]);
         }
       }
     }
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  obs.observe(document.body, { childList: true, subtree: true });
 })();
