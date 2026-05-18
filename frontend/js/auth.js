@@ -844,3 +844,62 @@ function _v10OpenRegister() {
     else if (typeof showRegisterModal === 'function') showRegisterModal();
   }, 80);
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   V221 — Auto-Injection: 3 Goldkreise in jede .auth-card-v39
+   Gilt für Login, Reset, Neues-Passwort, Konto-erstellen, Beta-Tester
+   ═══════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  function injectCardOrbs(card) {
+    if (!card || card.dataset.cardOrbs === '1') return;
+    card.dataset.cardOrbs = '1';
+    var orbsWrap = document.createElement('div');
+    orbsWrap.className = 'auth-card-orbs';
+    orbsWrap.setAttribute('aria-hidden', 'true');
+    for (var i = 1; i <= 3; i++) {
+      var orb = document.createElement('div');
+      orb.className = 'auth-card-orb auth-card-orb-' + i;
+      orbsWrap.appendChild(orb);
+    }
+    if (card.firstChild) {
+      card.insertBefore(orbsWrap, card.firstChild);
+    } else {
+      card.appendChild(orbsWrap);
+    }
+  }
+
+  function scanAndInject() {
+    var cards = document.querySelectorAll('.auth-card-v39');
+    for (var i = 0; i < cards.length; i++) {
+      injectCardOrbs(cards[i]);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scanAndInject);
+  } else {
+    scanAndInject();
+  }
+
+  // MutationObserver für später eingefügte Auth-Karten
+  var observer = new MutationObserver(function (mutations) {
+    for (var m = 0; m < mutations.length; m++) {
+      var added = mutations[m].addedNodes;
+      for (var n = 0; n < added.length; n++) {
+        var node = added[n];
+        if (node.nodeType !== 1) continue;
+        if (node.classList && node.classList.contains('auth-card-v39')) {
+          injectCardOrbs(node);
+        }
+        if (node.querySelectorAll) {
+          var subs = node.querySelectorAll('.auth-card-v39');
+          for (var s = 0; s < subs.length; s++) injectCardOrbs(subs[s]);
+        }
+      }
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+})();

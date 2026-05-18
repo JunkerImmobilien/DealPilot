@@ -28165,3 +28165,83 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 }
 
 /* V217-Marker */
+
+
+/* ═══════════════════════════════════════════════════════════
+   V221 — Goldkreise IN der Auth-Card (3 Orbs, kräftig sichtbar)
+   Größer als V216-Werte, opacity höher, gut wahrnehmbarer Effekt.
+   .auth-card-v39 hat schon position:relative + overflow:hidden (V216).
+   ═══════════════════════════════════════════════════════════ */
+.auth-card-orbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.auth-card-orb {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.auth-card-orb-1 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.45), transparent 70%);
+  filter: blur(35px);
+  opacity: 0.75;
+  top: -50px;
+  left: -70px;
+  animation: auth-card-orb1 14s ease-in-out infinite alternate;
+}
+
+.auth-card-orb-2 {
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.38), transparent 70%);
+  filter: blur(30px);
+  opacity: 0.65;
+  bottom: -40px;
+  right: -60px;
+  animation: auth-card-orb2 18s ease-in-out infinite alternate;
+}
+
+.auth-card-orb-3 {
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(168, 134, 30, 0.32), transparent 70%);
+  filter: blur(25px);
+  opacity: 0.55;
+  top: 45%;
+  left: 35%;
+  animation: auth-card-orb3 16s ease-in-out infinite alternate;
+}
+
+@keyframes auth-card-orb1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(90px, 50px) scale(1.18); }
+}
+@keyframes auth-card-orb2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-70px, -60px) scale(1.12); }
+}
+@keyframes auth-card-orb3 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-50px, 40px) scale(1.22); }
+}
+
+/* Form-Elemente über den Orbs */
+.auth-card-v39 > *:not(.auth-card-orbs):not(.auth-bg-orbs):not(.auth-stardust) {
+  position: relative;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-card-orb { animation: none; }
+}
+
+/* V221-Marker */
