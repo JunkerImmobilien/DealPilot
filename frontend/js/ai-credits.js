@@ -110,45 +110,13 @@
   }
 
   function _buyClick() {
-    // V63.91: Demo-Kauf-Modal mit echtem Backend-Endpoint
-    // Stripe wird später eingebaut, bis dahin können Marcel + Tester echte Bonus-Credits
-    // hinzufügen um Workflows durchzuspielen.
-    var existing = document.getElementById('credit-buy-modal');
-    if (existing) existing.remove();
-    var s = _cache || { bonus_credits: 0, total_remaining: 0 };
-    var ov = document.createElement('div');
-    ov.id = 'credit-buy-modal';
-    ov.className = 'pdfi-overlay';
-    ov.innerHTML =
-      '<div class="pdfi-modal credit-buy-modal">' +
-        '<div class="pdfi-header">' +
-          '<div class="pdfi-icon">✨</div>' +
-          '<div class="pdfi-title-block">' +
-            '<h3>KI-Credits dazukaufen</h3>' +
-            '<div class="pdfi-sub">Bonus-Credits werden zuerst verbraucht und übertragen sich in den nächsten Monat. ' +
-            '<span class="cb-demo-badge">DEMO-MODUS</span></div>' +
-          '</div>' +
-          '<button class="bmf-close" type="button" onclick="document.getElementById(\'credit-buy-modal\').remove()">×</button>' +
-        '</div>' +
-        '<div class="pdfi-body">' +
-          '<div class="cb-current">Aktuell: <b>' + s.bonus_credits + '</b> Bonus-Credits · Gesamt verfügbar: <b>' + s.total_remaining + '</b></div>' +
-          '<div class="cb-packs">' +
-            _packCard(5,  '4,90 €',  'Klein',     'Für 1 zusätzliche Detail-Analyse + ein paar Lage-Recherchen.') +
-            _packCard(10, '8,90 €',  'Mittel',    'Reicht für 2-3 vollständige Investment-Analysen mit Lage.', true) +
-            _packCard(25, '19,90 €', 'Groß',      'Für ein ganzes Quartal an intensiver Nutzung. Bestes €/Credit-Verhältnis.') +
-          '</div>' +
-          '<div class="cb-info">' +
-            '<b>Hinweis Demo-Modus:</b> Stripe-Zahlungsabwicklung ist vorbereitet, aber noch nicht freigeschaltet. ' +
-            'Mit dem Demo-Kauf werden die Credits sofort gutgeschrieben — ohne Zahlung. Sobald Stripe live ist, ' +
-            'wird dieser Dialog automatisch durch den echten Checkout ersetzt.' +
-          '</div>' +
-        '</div>' +
-        '<div class="pdfi-footer">' +
-          '<button type="button" class="btn btn-ghost" onclick="document.getElementById(\'credit-buy-modal\').remove()">Abbrechen</button>' +
-        '</div>' +
-      '</div>';
-    ov.addEventListener('click', function(e){ if (e.target === ov) ov.remove(); });
-    document.body.appendChild(ov);
+    // V197: redirect zu CreditsModal (neues Stripe-System ersetzt Demo-Stub)
+    if (typeof window.CreditsModal === 'object' && typeof window.CreditsModal.open === 'function') {
+      window.CreditsModal.open();
+      return;
+    }
+    // Fallback falls credits-modal.js nicht geladen ist
+    alert('Credit-Modal konnte nicht geladen werden. Bitte Seite neu laden.');
   }
 
   function _packCard(amount, price, label, desc, recommended) {

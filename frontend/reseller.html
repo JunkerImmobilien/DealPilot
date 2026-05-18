@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partner-Programm · DealPilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-l: #E2C97E;
+    --gold-bg: #FAF5E8;
+    --gold-dim: rgba(201,168,76,.12);
+    --gold-dim2: rgba(201,168,76,.22);
+    --ch: #2A2727;
+    --ch2: #3D3A3A;
+    --surface: #F8F6F1;
+    --surface2: #F0ECE4;
+    --white: #fff;
+    --border: #E0DBD3;
+    --border-g: rgba(201,168,76,.3);
+    --text: #2A2727;
+    --muted: #7A7370;
+    --muted2: #9A9390;
+    --green: #3FA56C;
+    --green-bg: #EAF7F0;
+    --red: #B8625C;
+    --r: 8px;
+    --r2: 12px;
+    --shadow: 0 2px 12px rgba(42,39,39,.08);
+    --shadow-md: 0 4px 24px rgba(42,39,39,.12);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); line-height: 1.5; -webkit-font-smoothing: antialiased; font-size: 14px; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, var(--ch) 0%, #1A1818 100%); color: #fff; padding: 80px 24px 100px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -50px; right: -50px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(201,168,76,.08) 0%, transparent 70%); pointer-events: none; }
+  .hero-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-back { color: rgba(255,255,255,.5); text-decoration: none; font-size: 13px; margin-bottom: 40px; display: inline-block; transition: color .15s; }
+  .hero-back:hover { color: var(--gold); }
+  .hero-pill { display: inline-block; padding: 6px 14px; background: var(--gold-dim2); color: var(--gold); border-radius: 99px; font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 20px; border: 1px solid rgba(201,168,76,.4); }
+  .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 600; line-height: 1.1; margin: 0 0 24px; letter-spacing: -.02em; }
+  .hero h1 .gold { color: var(--gold); }
+  .hero .lead { font-size: 18px; color: rgba(255,255,255,.75); max-width: 680px; line-height: 1.6; margin-bottom: 32px; }
+  .trust-bar { display: flex; gap: 32px; flex-wrap: wrap; margin-top: 40px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,.08); }
+  .trust-item { color: rgba(255,255,255,.6); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .trust-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
+
+  /* SECTIONS */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .section { padding: 80px 0; }
+  .section-pill { display: inline-block; font-size: 10px; font-weight: 600; color: var(--gold); letter-spacing: .15em; text-transform: uppercase; padding-bottom: 8px; border-bottom: 2px solid var(--gold); margin-bottom: 16px; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 600; color: var(--ch); margin: 0 0 16px; letter-spacing: -.01em; }
+  .section-sub { color: var(--muted); font-size: 16px; max-width: 640px; margin: 0 0 48px; line-height: 1.6; }
+
+  /* PROVISIONS-STAFFEL */
+  .commission-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 800px) { .commission-grid { grid-template-columns: 1fr; } }
+  .commission-card { background: var(--white); padding: 36px 28px; border-radius: var(--r2); border: 1px solid var(--border); position: relative; transition: all .2s; }
+  .commission-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--border-g); }
+  .commission-card.premium { background: linear-gradient(135deg, var(--ch) 0%, #1A1818 100%); color: #fff; border-color: var(--gold); }
+  .commission-card.premium::before { content: 'BESTSELLER'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--ch); padding: 4px 14px; border-radius: 99px; font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+  .commission-label { font-size: 10px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .commission-card.premium .commission-label { color: rgba(255,255,255,.6); }
+  .commission-pct { font-family: 'Cormorant Garamond', serif; font-size: 72px; font-weight: 600; line-height: 1; color: var(--gold); margin-bottom: 8px; letter-spacing: -.02em; }
+  .commission-stage { font-size: 15px; font-weight: 600; color: var(--ch); margin-bottom: 16px; }
+  .commission-card.premium .commission-stage { color: #fff; }
+  .commission-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .commission-card.premium .commission-desc { color: rgba(255,255,255,.7); }
+  .commission-note { margin-top: 32px; padding: 16px 20px; background: var(--gold-dim); border-left: 3px solid var(--gold); border-radius: var(--r); font-size: 13px; color: var(--ch); }
+
+  /* MODELL-AUSWAHL */
+  .models-section { background: var(--ch); color: #fff; }
+  .models-section .section-title { color: #fff; }
+  .models-section .section-sub { color: rgba(255,255,255,.65); }
+  .models-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 800px) { .models-grid { grid-template-columns: 1fr; } }
+  .model-card { background: var(--ch2); padding: 40px 32px; border-radius: var(--r2); border: 1px solid rgba(255,255,255,.08); transition: all .2s; }
+  .model-card:hover { border-color: var(--gold); }
+  .model-icon { width: 48px; height: 48px; background: var(--gold-dim2); border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 20px; }
+  .model-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--gold); margin-bottom: 8px; }
+  .model-tagline { color: rgba(255,255,255,.6); font-size: 14px; margin-bottom: 24px; }
+  .model-features { list-style: none; padding: 0; margin: 0; }
+  .model-features li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.06); color: rgba(255,255,255,.85); font-size: 14px; display: flex; align-items: flex-start; gap: 10px; }
+  .model-features li:last-child { border-bottom: none; }
+  .model-features li::before { content: '→'; color: var(--gold); font-weight: 600; flex-shrink: 0; }
+
+  /* BENEFITS */
+  .benefits-section { background: var(--surface2); }
+  .benefits-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 40px; margin-top: 24px; }
+  @media (max-width: 800px) { .benefits-list { grid-template-columns: 1fr; } }
+  .benefit-row { display: flex; gap: 16px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .benefit-num { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--gold); line-height: 1; flex-shrink: 0; width: 40px; }
+  .benefit-content h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--ch); }
+  .benefit-content p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* FORM */
+  .form-section { background: var(--surface); padding: 100px 24px; }
+  .form-card { max-width: 760px; margin: 0 auto; background: var(--white); padding: 48px 56px; border-radius: var(--r2); box-shadow: var(--shadow-md); border: 1px solid var(--border); }
+  @media (max-width: 600px) { .form-card { padding: 32px 24px; } }
+  .form-card .section-pill { margin-bottom: 12px; }
+  .form-card .section-title { font-size: 32px; margin-bottom: 8px; }
+  .form-card .section-sub { font-size: 14px; margin-bottom: 32px; }
+  .form-row { margin-bottom: 18px; }
+  .form-row.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .form-row.two-col { grid-template-columns: 1fr; } }
+  .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .08em; }
+  .form-label.req::after { content: ' *'; color: var(--gold); }
+  .form-row input, .form-row select, .form-row textarea { height: 42px; width: 100%; padding: 0 14px; border: 1.5px solid var(--border); border-radius: var(--r); font-size: 14px; color: var(--text); font-family: inherit; background: var(--white); outline: none; transition: border .15s, box-shadow .15s; }
+  .form-row textarea { height: auto; padding: 12px 14px; resize: vertical; min-height: 100px; }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.12); }
+  .radio-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 700px) { .radio-group { grid-template-columns: 1fr; } }
+  .radio-card { position: relative; cursor: pointer; }
+  .radio-card input { position: absolute; opacity: 0; }
+  .radio-card .radio-box { padding: 14px 16px; border: 1.5px solid var(--border); border-radius: var(--r); transition: all .15s; }
+  .radio-card .radio-title { font-size: 13px; font-weight: 600; color: var(--ch); margin-bottom: 2px; }
+  .radio-card .radio-desc { font-size: 11px; color: var(--muted); }
+  .radio-card input:checked + .radio-box { border-color: var(--gold); background: var(--gold-dim); }
+  .radio-card input:checked + .radio-box .radio-title { color: var(--gold); }
+  .submit-btn { width: 100%; padding: 16px; background: var(--gold); color: #fff; border: none; border-radius: var(--r); font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s; margin-top: 12px; }
+  .submit-btn:hover:not(:disabled) { background: var(--gold-l); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .honeypot { position: absolute; left: -9999px; opacity: 0; pointer-events: none; }
+  .alert { padding: 16px 20px; border-radius: var(--r); margin-bottom: 24px; font-size: 14px; }
+  .alert-success { background: var(--green-bg); color: #2A5E3A; border-left: 3px solid var(--green); }
+  .alert-error { background: #FBF1F0; color: #8B3D37; border-left: 3px solid var(--red); }
+  .privacy-note { font-size: 11px; color: var(--muted2); margin-top: 16px; line-height: 1.6; text-align: center; }
+  .privacy-note a { color: var(--gold); }
+
+  /* FOOTER */
+  .footer { background: var(--ch); color: rgba(255,255,255,.5); padding: 32px 24px; text-align: center; font-size: 12px; }
+  .footer a { color: rgba(255,255,255,.7); text-decoration: none; margin: 0 12px; transition: color .15s; }
+  .footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <a href="/" class="hero-back">← Zurück zur App</a>
+    <div class="hero-pill">Partner-Programm</div>
+    <h1>Werden Sie <span class="gold">DealPilot-Partner</span></h1>
+    <p class="lead">
+      Bieten Sie Ihren Kunden die führende Investmentanalyse für Immobilien — und profitieren Sie als Partner mit attraktiven Provisionen oder eigenem White-Label-Branding.
+    </p>
+    <div class="trust-bar">
+      <div class="trust-item"><span class="trust-dot"></span>DSGVO-konform</div>
+      <div class="trust-item"><span class="trust-dot"></span>Server in Deutschland</div>
+      <div class="trust-item"><span class="trust-dot"></span>Made in Germany</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROVISIONS-STAFFEL -->
+<section class="section">
+  <div class="container">
+    <div class="section-pill">Vergütungsmodell</div>
+    <h2 class="section-title">Provisionsstaffel — fair und transparent</h2>
+    <p class="section-sub">
+      Je mehr Kunden Sie vermitteln, desto höher Ihre Provision. Einmalig vom ersten Jahresumsatz Ihrer geworbenen Kunden.
+    </p>
+
+    <div class="commission-grid">
+      <div class="commission-card">
+        <div class="commission-label">Stufe 1 · Einstieg</div>
+        <div class="commission-pct">20%</div>
+        <div class="commission-stage">1–9 vermittelte Kunden</div>
+        <div class="commission-desc">
+          Ihre ersten Schritte als Partner. Provision auf den ersten Jahresumsatz jedes geworbenen Kunden.
+        </div>
+      </div>
+
+      <div class="commission-card">
+        <div class="commission-label">Stufe 2 · Aktiv</div>
+        <div class="commission-pct">30%</div>
+        <div class="commission-stage">10–24 vermittelte Kunden</div>
+        <div class="commission-desc">
+          Sie bauen aktiv Kunden auf. Erhöhte Provision rückwirkend ab dem 10. Kunden.
+        </div>
+      </div>
+
+      <div class="commission-card premium">
+        <div class="commission-label">Stufe 3 · Premium</div>
+        <div class="commission-pct">50%</div>
+        <div class="commission-stage">Ab 25 vermittelten Kunden</div>
+        <div class="commission-desc">
+          Premium-Partner-Status. Maximale Provision plus persönlicher Account-Manager und priorisierter Support.
+        </div>
+      </div>
+    </div>
+
+    <div class="commission-note">
+      <strong>Berechnung:</strong> Provision wird jeweils einmalig vom Erstjahresumsatz fällig — also dem ersten 12 Monaten den der geworbene Kunde bei DealPilot zahlt. Auszahlung quartalsweise per Überweisung.
+    </div>
+  </div>
+</section>
+
+<!-- MODELL-AUSWAHL -->
+<section class="section models-section">
+  <div class="container">
+    <div class="section-pill">Zwei Wege zur Partnerschaft</div>
+    <h2 class="section-title">Empfehlung oder White-Label</h2>
+    <p class="section-sub">
+      Wählen Sie das Modell, das zu Ihrem Geschäft passt — oder kombinieren Sie beides.
+    </p>
+
+    <div class="models-grid">
+      <div class="model-card">
+        <div class="model-icon">🤝</div>
+        <h3 class="model-name">Empfehlungspartner</h3>
+        <p class="model-tagline">Sie empfehlen — wir kümmern uns um Vertrag, Support und Abrechnung.</p>
+        <ul class="model-features">
+          <li>Persönlicher Empfehlungs-Link für jeden Kunden-Tracker</li>
+          <li>Provision nach Staffel (20% / 30% / 50%)</li>
+          <li>Marketing-Material (Logo-Pack, One-Pager-PDF)</li>
+          <li>Schulungsmaterial für Ihr Team</li>
+          <li>Geringster Aufwand — schnellster Start</li>
+        </ul>
+      </div>
+
+      <div class="model-card">
+        <div class="model-icon">⚡</div>
+        <h3 class="model-name">White-Label-Lizenz</h3>
+        <p class="model-tagline">DealPilot in Ihrem Branding — eigene Domain, eigenes Logo, eigene Preise.</p>
+        <ul class="model-features">
+          <li>Eigene Subdomain (z.B. <em>analyse.ihre-firma.de</em>)</li>
+          <li>Eigenes Logo, eigene Farben im PDF</li>
+          <li>Eigene Preisgestaltung gegenüber Endkunden</li>
+          <li>Volle Kontrolle über Kunden-Daten und Branding</li>
+          <li>Voraussetzung: Pro-Plan + Lizenz-Vereinbarung</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="section benefits-section">
+  <div class="container">
+    <div class="section-pill">Inklusive für alle Partner</div>
+    <h2 class="section-title">Was Sie als Partner bekommen</h2>
+
+    <div class="benefits-list">
+      <div class="benefit-row">
+        <div class="benefit-num">01</div>
+        <div class="benefit-content">
+          <h4>Persönliches Onboarding</h4>
+          <p>Direkter Kontakt mit Marcel Junker für eine Stunde Einführungs-Call und Strategie-Abstimmung.</p>
+        </div>
+      </div>
+
+      <div class="benefit-row">
+        <div class="benefit-num">02</div>
+        <div class="benefit-content">
+          <h4>Schulungsmaterial</h4>
+          <p>Video-Tutorials, Cheat-Sheets und ein One-Pager-PDF zum Weiterverwenden.</p>
+        </div>
+      </div>
+
+      <div class="benefit-row">
+        <div class="benefit-num">03</div>
+        <div class="benefit-content">
+          <h4>Direkter Support-Draht</h4>
+          <p>Eigene Partner-E-Mail mit Antwort innerhalb 24h für Sie und Ihre Kunden.</p>
+        </div>
+      </div>
+
+      <div class="benefit-row">
+        <div class="benefit-num">04</div>
+        <div class="benefit-content">
+          <h4>Schnelle Umsetzung</h4>
+          <p>Vertragsabschluss meist innerhalb von 2 Wochen — Sie sind ohne lange Wartezeiten startklar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section">
+  <div class="form-card">
+    <div class="section-pill">Jetzt loslegen</div>
+    <h2 class="section-title">Anfrage senden</h2>
+    <p class="section-sub">
+      Wir melden uns innerhalb von 2 Werktagen mit einer ersten Einschätzung und einem Vorschlag für einen kurzen Call.
+    </p>
+
+    <div id="form-alert"></div>
+
+    <form id="reseller-form">
+      <div class="form-row two-col">
+        <div>
+          <label class="form-label req">Ihr Name</label>
+          <input type="text" name="contact_name" required maxlength="200" autocomplete="name">
+        </div>
+        <div>
+          <label class="form-label">Firma</label>
+          <input type="text" name="company" maxlength="200" autocomplete="organization">
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div>
+          <label class="form-label req">E-Mail</label>
+          <input type="email" name="email" required maxlength="200" autocomplete="email">
+        </div>
+        <div>
+          <label class="form-label">Telefon</label>
+          <input type="tel" name="phone" maxlength="50" autocomplete="tel">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Webseite</label>
+        <input type="url" name="website" maxlength="300" placeholder="https://" autocomplete="url">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label req">Interesse</label>
+        <div class="radio-group">
+          <label class="radio-card">
+            <input type="radio" name="target_market" value="referral" required>
+            <div class="radio-box">
+              <div class="radio-title">Empfehlungspartner</div>
+              <div class="radio-desc">Provision pro Kunde</div>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="target_market" value="whitelabel">
+            <div class="radio-box">
+              <div class="radio-title">White-Label</div>
+              <div class="radio-desc">Eigenes Branding</div>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="target_market" value="both">
+            <div class="radio-box">
+              <div class="radio-title">Beides</div>
+              <div class="radio-desc">Lasst uns reden</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div>
+          <label class="form-label">Team-Größe</label>
+          <select name="team_size">
+            <option value="">— bitte wählen —</option>
+            <option value="solo">Solo (nur ich)</option>
+            <option value="2-5">2–5 Personen</option>
+            <option value="6-20">6–20 Personen</option>
+            <option value="21+">21+ Personen</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Volumen pro Jahr</label>
+          <input type="text" name="current_volume" maxlength="100" placeholder="z.B. 50–100 Objekte">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Ihre Ziele oder Fragen</label>
+        <textarea name="goals" maxlength="2000" placeholder="Was möchten Sie mit DealPilot erreichen? Welche Fragen haben Sie?"></textarea>
+      </div>
+
+      <!-- Honeypot -->
+      <div class="honeypot" aria-hidden="true">
+        <label>Webseite (nicht ausfüllen)</label>
+        <input type="text" name="website_url" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">Partner werden →</button>
+
+      <p class="privacy-note">
+        Mit dem Absenden willigen Sie in die Verarbeitung Ihrer Daten zur Bearbeitung Ihrer Anfrage ein.
+        Details in unserer <a href="/datenschutz.html">Datenschutzerklärung</a>.
+      </p>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <a href="/impressum.html">Impressum</a> ·
+  <a href="/datenschutz.html">Datenschutz</a> ·
+  <a href="/legal/agb.html">AGB</a>
+  <div style="margin-top:12px;">© 2026 DealPilot</div>
+</footer>
+
+<script>
+(function() {
+  const form = document.getElementById('reseller-form');
+  const btn = document.getElementById('submit-btn');
+  const alertEl = document.getElementById('form-alert');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    alertEl.innerHTML = '';
+    btn.disabled = true;
+    btn.textContent = 'Wird gesendet…';
+
+    const data = {};
+    new FormData(form).forEach((v, k) => { data[k] = v; });
+    data.source = 'landing-v200';
+
+    try {
+      const r = await fetch('/api/v1/reseller-inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await r.json();
+      if (r.ok) {
+        alertEl.innerHTML = `
+          <div class="alert alert-success">
+            <strong>✓ Vielen Dank!</strong> ${result.message || 'Ihre Anfrage ist eingegangen — wir melden uns innerhalb von 2 Werktagen.'}
+          </div>
+        `;
+        form.style.display = 'none';
+        window.scrollTo({ top: alertEl.offsetTop - 100, behavior: 'smooth' });
+      } else {
+        alertEl.innerHTML = `<div class="alert alert-error">${result.message || 'Etwas ist schiefgelaufen — bitte versuchen Sie es nochmal.'}</div>`;
+        btn.disabled = false;
+        btn.textContent = 'Partner werden →';
+      }
+    } catch (err) {
+      alertEl.innerHTML = `<div class="alert alert-error">Netzwerkfehler. Bitte versuchen Sie es erneut oder schreiben Sie uns an support@junker-immobilien.io</div>`;
+      btn.disabled = false;
+      btn.textContent = 'Partner werden →';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

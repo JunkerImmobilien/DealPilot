@@ -1,0 +1,196 @@
+'use strict';
+/**
+ * V198: Welcome-Mails nach Stripe-Checkout
+ *
+ * Nutzt den bestehenden mailerService (BETA_SMTP_* Variablen).
+ * Idempotent über welcome_mails-Tabelle.
+ *
+ * Exports:
+ *   sendSubscriptionWelcome(db, { userId, planName, planId, amountCents, billingInterval, sessionId })
+ *   sendCreditPackConfirmation(db, { userId, packLabel, creditsGranted, requestsGranted, amountCents, sessionId })
+ */
+
+const path = require('path');
+const fs = require('fs');
+const { sendMail } = require('./mailerService');
+
+// ─── Mail-Settings ─────────────────────────────────────────
+
+function getMailFrom() {
+  const name = process.env.MAIL_FROM_NAME || 'DealPilot';
+  const addr = process.env.MAIL_FROM_ADDRESS || process.env.BETA_SMTP_USER || 'dealpilot@junker-immobilien.io';
+  return `"${name}" <${addr}>`;
+}
+
+// ─── Template-Helpers ──────────────────────────────────────
+
+function loadTemplate(name) {
+  const tmplPath = path.join(__dirname, '../../templates', name + '.html');
+  try {
+    return fs.readFileSync(tmplPath, 'utf-8');
+  } catch (err) {
+    console.error('[welcome-mail] Template fehlt:', tmplPath);
+    return null;
+  }
+}
+
+function fillTemplate(tmpl, vars) {
+  return tmpl.replace(/\{\{(\w+)\}\}/g, (m, key) =>
+    vars[key] != null ? String(vars[key]) : ''
+  );
+}
+
+function fmtMoney(cents, currency = 'EUR') {
+  return (cents / 100).toLocaleString('de-DE', {
+    style: 'currency',
+    currency
+  });
+}
+
+// ─── DB: Idempotenz-Log ────────────────────────────────────
+
+async function ensureLogTable(db) {
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS welcome_mails (
+      id bigserial PRIMARY KEY,
+      user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      mail_type text NOT NULL,
+      reference_id text,
+      sent_at timestamptz NOT NULL DEFAULT now(),
+      message_id text,
+      error text
+    )
+  `);
+  await db.query(`CREATE INDEX IF NOT EXISTS idx_welcome_mails_user ON welcome_mails(user_id, mail_type)`);
+  await db.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_welcome_mails_ref ON welcome_mails(reference_id) WHERE reference_id IS NOT NULL`);
+}
+
+async function hasBeenSent(db, userId, mailType, referenceId) {
+  if (referenceId) {
+    const r = await db.query(
+      'SELECT 1 FROM welcome_mails WHERE reference_id = $1 LIMIT 1',
+      [referenceId]
+    );
+    return r.rowCount > 0;
+  }
+  const r = await db.query(
+    'SELECT 1 FROM welcome_mails WHERE user_id = $1 AND mail_type = $2 LIMIT 1',
+    [userId, mailType]
+  );
+  return r.rowCount > 0;
+}
+
+async function logSent(db, userId, mailType, referenceId, messageId, error) {
+  try {
+    await db.query(`
+      INSERT INTO welcome_mails (user_id, mail_type, reference_id, message_id, error)
+      VALUES ($1, $2, $3, $4, $5)
+    `, [userId, mailType, referenceId, messageId, error]);
+  } catch (e) {
+    console.warn('[welcome-mail-log] failed:', e.message);
+  }
+}
+
+// ─── 1) Subscription-Welcome ──────────────────────────────────
+
+async function sendSubscriptionWelcome(db, { userId, planName, planId, amountCents, billingInterval, sessionId }) {
+  await ensureLogTable(db);
+
+  if (await hasBeenSent(db, userId, 'subscription_welcome', sessionId)) {
+    console.log('[welcome-mail] sub-welcome bereits gesendet:', sessionId);
+    return { ok: true, reason: 'already_sent' };
+  }
+
+  const u = await db.query('SELECT email, name FROM users WHERE id = $1 AND deleted_at IS NULL', [userId]);
+  if (!u.rowCount) return { ok: false, reason: 'user_not_found' };
+  const user = u.rows[0];
+
+  const tmpl = loadTemplate('subscription-welcome');
+  if (!tmpl) return { ok: false, reason: 'template_missing' };
+
+  const appUrl = process.env.APP_URL || 'https://dealpilot.junker-immobilien.io';
+  const intervalLabel = billingInterval === 'yearly' ? 'jährlich' : 'monatlich';
+
+  const html = fillTemplate(tmpl, {
+    user_name: user.name || user.email.split('@')[0],
+    plan_name: planName,
+    plan_price: fmtMoney(amountCents),
+    billing_interval: intervalLabel,
+    app_url: appUrl,
+    support_email: process.env.SUPPORT_MAIL_TO || 'support@junker-immobilien.io',
+    current_year: new Date().getFullYear()
+  });
+
+  try {
+    const result = await sendMail({
+      from: getMailFrom(),
+      replyTo: process.env.MAIL_REPLY_TO || undefined,
+      to: user.email,
+      subject: `Willkommen bei DealPilot ${planName}`,
+      html,
+      text: `Willkommen bei DealPilot ${planName}! Dein Abo ist aktiv. App: ${appUrl}`
+    });
+    await logSent(db, userId, 'subscription_welcome', sessionId, result.messageId);
+    console.log('[welcome-mail] ✓ Subscription-Welcome an', user.email);
+    return { ok: true, messageId: result.messageId };
+  } catch (err) {
+    console.error('[welcome-mail] sub-welcome failed:', err.message);
+    await logSent(db, userId, 'subscription_welcome', sessionId, null, err.message);
+    return { ok: false, reason: 'send_failed', error: err.message };
+  }
+}
+
+// ─── 2) Credit-Pack-Confirmation ──────────────────────────────
+
+async function sendCreditPackConfirmation(db, { userId, packLabel, creditsGranted, requestsGranted, amountCents, sessionId }) {
+  await ensureLogTable(db);
+
+  if (await hasBeenSent(db, userId, 'credit_pack_confirmation', sessionId)) {
+    console.log('[welcome-mail] credit-pack bereits gesendet:', sessionId);
+    return { ok: true, reason: 'already_sent' };
+  }
+
+  const u = await db.query('SELECT email, name FROM users WHERE id = $1 AND deleted_at IS NULL', [userId]);
+  if (!u.rowCount) return { ok: false, reason: 'user_not_found' };
+  const user = u.rows[0];
+
+  const tmpl = loadTemplate('credit-pack-confirmation');
+  if (!tmpl) return { ok: false, reason: 'template_missing' };
+
+  const appUrl = process.env.APP_URL || 'https://dealpilot.junker-immobilien.io';
+
+  const html = fillTemplate(tmpl, {
+    user_name: user.name || user.email.split('@')[0],
+    credits_granted: creditsGranted,
+    requests_granted: requestsGranted,
+    pack_label: packLabel || '',
+    amount: fmtMoney(amountCents),
+    app_url: appUrl,
+    support_email: process.env.SUPPORT_MAIL_TO || 'support@junker-immobilien.io',
+    current_year: new Date().getFullYear()
+  });
+
+  try {
+    const result = await sendMail({
+      from: getMailFrom(),
+      replyTo: process.env.MAIL_REPLY_TO || undefined,
+      to: user.email,
+      subject: `Deine ${creditsGranted} KI-Credits sind aufgeladen`,
+      html,
+      text: `Deine ${creditsGranted} KI-Credits (${requestsGranted} Anfragen) wurden gutgeschrieben. App: ${appUrl}`
+    });
+    await logSent(db, userId, 'credit_pack_confirmation', sessionId, result.messageId);
+    console.log('[welcome-mail] ✓ Credit-Pack-Confirmation an', user.email);
+    return { ok: true, messageId: result.messageId };
+  } catch (err) {
+    console.error('[welcome-mail] credit-pack failed:', err.message);
+    await logSent(db, userId, 'credit_pack_confirmation', sessionId, null, err.message);
+    return { ok: false, reason: 'send_failed', error: err.message };
+  }
+}
+
+module.exports = {
+  sendSubscriptionWelcome,
+  sendCreditPackConfirmation,
+  ensureLogTable
+};

@@ -1797,6 +1797,33 @@ function _renderRechtlichesPane() {
         '<h4>11. Datensicherheit</h4>' +
         '<p>Wir verwenden technische und organisatorische Sicherheitsmaßnahmen gegen Manipulation, Verlust oder unbefugten Zugriff.</p>' +
 
+        '<h4>Auftragsverarbeiter und Empfänger</h4>' +
+        '<p>Wir setzen folgende Dienstleister ein, die personenbezogene Daten in unserem Auftrag verarbeiten:</p>' +
+        '<div style="overflow-x:auto;margin:12px 0;">' +
+          '<table style="width:100%;border-collapse:collapse;font-size:13px;">' +
+            '<thead><tr style="background:#fafafa;">' +
+              '<th style="padding:8px;border-bottom:1px solid #ECE7DC;text-align:left;">Dienstleister</th>' +
+              '<th style="padding:8px;border-bottom:1px solid #ECE7DC;text-align:left;">Zweck</th>' +
+              '<th style="padding:8px;border-bottom:1px solid #ECE7DC;text-align:left;">Sitz</th>' +
+            '</tr></thead>' +
+            '<tbody>' +
+              '<tr><td style="padding:8px;border-bottom:1px solid #ECE7DC;"><b>Hetzner Online GmbH</b></td><td style="padding:8px;border-bottom:1px solid #ECE7DC;">Hosting (Server &amp; DB)</td><td style="padding:8px;border-bottom:1px solid #ECE7DC;">Deutschland</td></tr>' +
+              '<tr><td style="padding:8px;border-bottom:1px solid #ECE7DC;"><b>Stripe Payments Europe Ltd.</b></td><td style="padding:8px;border-bottom:1px solid #ECE7DC;">Zahlungsabwicklung</td><td style="padding:8px;border-bottom:1px solid #ECE7DC;">Irland</td></tr>' +
+              '<tr><td style="padding:8px;border-bottom:1px solid #ECE7DC;"><b>OpenAI Ireland Ltd.</b></td><td style="padding:8px;border-bottom:1px solid #ECE7DC;">KI-Lage-Analyse (auf Anfrage)</td><td style="padding:8px;border-bottom:1px solid #ECE7DC;">Irland</td></tr>' +
+              '<tr><td style="padding:8px;border-bottom:1px solid #ECE7DC;"><b>Alfahosting GmbH</b></td><td style="padding:8px;border-bottom:1px solid #ECE7DC;">SMTP / Transaktionsmails</td><td style="padding:8px;border-bottom:1px solid #ECE7DC;">Deutschland</td></tr>' +
+              '<tr><td style="padding:8px;"><b>Nominatim/OpenStreetMap</b></td><td style="padding:8px;">Adress-Vervollständigung</td><td style="padding:8px;">EU</td></tr>' +
+            '</tbody>' +
+          '</table>' +
+        '</div>' +
+        '<p><b>Zahlungsdaten</b> werden ausschließlich auf PCI-DSS-zertifizierten Servern von Stripe verarbeitet. Wir selbst speichern keine Kreditkarten- oder Bankdaten.</p>' +
+        '<p><b>KI-Analysen:</b> Bei Nutzung der KI-Lage-Analyse werden vom Nutzer eingegebene Adress- und Objektdaten an OpenAI Ireland Ltd. (Sitz EU) übermittelt — nur auf aktive Auslösung. Keine personenbezogenen Daten Dritter (Mieter, Eigentümer) werden übermittelt.</p>' +
+
+        '<h4>Beschwerderecht bei der Aufsichtsbehörde</h4>' +
+        '<p>Sie haben das Recht auf Beschwerde bei einer Datenschutz-Aufsichtsbehörde. Zuständig:</p>' +
+        '<p><b>Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen</b><br>' +
+        'Kavalleriestraße 2-4, 40213 Düsseldorf<br>' +
+        '<a href="https://www.ldi.nrw.de" target="_blank" rel="noopener">www.ldi.nrw.de</a></p>' +
+
         '<h4>12. Änderungen dieser Datenschutzerklärung</h4>' +
         '<p>Anpassungen behalten wir uns bei Bedarf vor, um stets den aktuellen rechtlichen Anforderungen zu entsprechen.</p>' +
 

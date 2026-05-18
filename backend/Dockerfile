@@ -8,6 +8,7 @@ RUN npm install --omit=dev
 
 # Copy source
 COPY src ./src
+COPY templates ./templates
 COPY migrations ./migrations
 COPY seed-data ./seed-data
 COPY scripts ./scripts

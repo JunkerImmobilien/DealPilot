@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DealPilot · Admin</title>
-  <link rel="stylesheet" href="css/admin.css?v=196">
+  <link rel="stylesheet" href="css/admin.css?v=197">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,7 +12,6 @@
 </head>
 <body>
 
-<!-- ─── Login-Screen ─────────────────────────────────────────── -->
 <div id="login-screen" class="login-screen">
   <div class="login-card">
     <h1 class="login-title">DealPilot · Admin</h1>
@@ -39,7 +38,6 @@
   </div>
 </div>
 
-<!-- ─── App-Shell ──────────────────────────────────────────── -->
 <div id="app-shell" class="app-shell" style="display:none;">
   <header class="topbar">
     <div class="topbar-left">
@@ -58,7 +56,6 @@
   </header>
 
   <main class="main">
-    <!-- ─── Dashboard ─── -->
     <section id="view-dashboard" class="view">
       <div class="view-header">
         <h2>Dashboard</h2>
@@ -69,6 +66,7 @@
         <div class="kpi-card">
           <div class="kpi-label">Gesamt-User</div>
           <div class="kpi-value" id="kpi-total">–</div>
+          <div class="kpi-sub" id="kpi-test-users-count" style="display:none;font-size:0.7em;font-style:italic;"></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Aktive (30 Tage)</div>
@@ -93,7 +91,6 @@
         </div>
       </div>
 
-      <!-- V196: Time-Range-Buttons für Charts -->
       <div class="range-bar">
         <span class="range-label">Zeitraum:</span>
         <button class="range-btn" data-days="7">7 Tage</button>
@@ -102,7 +99,6 @@
         <button class="range-btn" data-days="365">365 Tage</button>
       </div>
 
-      <!-- V196: Charts -->
       <div class="two-col">
         <div class="card">
           <h3>User-Wachstum</h3>
@@ -114,7 +110,6 @@
         </div>
       </div>
 
-      <!-- V196: Donut für Plan-Verteilung -->
       <div class="two-col">
         <div class="card">
           <h3>Plan-Verteilung</h3>
@@ -139,7 +134,6 @@
       </div>
     </section>
 
-    <!-- ─── User-Liste ─── -->
     <section id="view-users" class="view" style="display:none;">
       <div class="view-header">
         <h2>User-Verwaltung</h2>
@@ -149,7 +143,6 @@
         </div>
       </div>
 
-      <!-- V196: Erweiterte Filter -->
       <div class="search-row">
         <input type="text" id="user-search" placeholder="Suche nach Email oder Name…" class="search-input">
         <select id="filter-plan" class="filter-select">
@@ -161,6 +154,8 @@
         </select>
         <select id="filter-status" class="filter-select">
           <option value="">Alle Status</option>
+          <option value="real">Nur echte User (ohne Test)</option>
+          <option value="test">🧪 Nur Test-User</option>
           <option value="active">Nur Aktive</option>
           <option value="inactive">Nur Gesperrte</option>
         </select>
@@ -177,7 +172,6 @@
       </table>
     </section>
 
-    <!-- ─── User-Detail ─── -->
     <section id="view-user-detail" class="view" style="display:none;">
       <div class="view-header">
         <h2>User-Details</h2>
@@ -186,7 +180,6 @@
       <div id="user-detail-content">Lädt…</div>
     </section>
 
-    <!-- ─── Audit-Log ─── -->
     <section id="view-audit" class="view" style="display:none;">
       <div class="view-header">
         <h2>Audit-Log</h2>
@@ -208,7 +201,7 @@
   </main>
 </div>
 
-<!-- ─── Modal: User anlegen ─── -->
+<!-- Modal: User anlegen — V197 mit is_test_user Checkbox -->
 <div id="modal-create-user" class="modal" style="display:none;">
   <div class="modal-content">
     <h3>Neuen User anlegen</h3>
@@ -230,6 +223,10 @@
           <option value="pro">Pro</option>
         </select>
       </div>
+      <div class="form-row" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="cu-is-test" style="width:auto;margin:0;">
+        <label for="cu-is-test" style="margin:0;text-transform:none;letter-spacing:0;font-size:0.95em;cursor:pointer;">🧪 Als Test-User anlegen (wird in MRR/Wachstum ignoriert)</label>
+      </div>
       <div id="cu-error" class="error-msg" style="display:none;"></div>
       <div class="modal-actions">
         <button type="button" class="btn" id="cu-cancel">Abbrechen</button>
@@ -239,7 +236,6 @@
   </div>
 </div>
 
-<!-- ─── Modal: Generic Reveal (Passwort, etc.) ─── -->
 <div id="modal-reveal" class="modal" style="display:none;">
   <div class="modal-content">
     <h3 id="reveal-title">Information</h3>
@@ -254,12 +250,11 @@
   </div>
 </div>
 
-<!-- ─── Toast Container ─── -->
 <div id="toast-container" class="toast-container"></div>
 
-<script src="js/admin-api.js?v=196"></script>
-<script src="js/admin-auth.js?v=196"></script>
-<script src="js/admin-charts.js?v=196"></script>
-<script src="js/admin-app.js?v=196"></script>
+<script src="js/admin-api.js?v=197"></script>
+<script src="js/admin-auth.js?v=197"></script>
+<script src="js/admin-charts.js?v=197"></script>
+<script src="js/admin-app.js?v=197"></script>
 </body>
 </html>

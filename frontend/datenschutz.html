@@ -131,6 +131,78 @@
       <li><strong>Hetzner Online GmbH</strong> (Hosting) — Server in Deutschland, DSGVO-konform</li>
     </ul>
 
+    <h2>Auftragsverarbeiter und Empfänger</h2>
+    <p>
+      Wir setzen folgende externe Dienstleister ein, die personenbezogene Daten in unserem Auftrag verarbeiten:
+    </p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+      <thead>
+        <tr style="background:#fafafa;">
+          <th style="padding:10px;border-bottom:1px solid #ECE7DC;text-align:left;">Dienstleister</th>
+          <th style="padding:10px;border-bottom:1px solid #ECE7DC;text-align:left;">Zweck</th>
+          <th style="padding:10px;border-bottom:1px solid #ECE7DC;text-align:left;">Sitz</th>
+          <th style="padding:10px;border-bottom:1px solid #ECE7DC;text-align:left;">Garantien</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;"><strong>Hetzner Online GmbH</strong></td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">Hosting der Server und Datenbank</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">Deutschland</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">AVV abgeschlossen, Server in EU</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;"><strong>Stripe Payments Europe Ltd.</strong></td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">Zahlungsabwicklung</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">Irland</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">AVV, Standardvertragsklauseln</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;"><strong>OpenAI Ireland Limited</strong></td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">KI-Lage-Analyse (auf Anfrage des Nutzers)</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">Irland</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">AVV, Standardvertragsklauseln, keine Verwendung zu Trainingszwecken (API-Mode)</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;"><strong>Alfahosting GmbH</strong></td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">SMTP-E-Mail-Versand (Transaktions-Mails)</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">Deutschland</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">AVV</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;"><strong>Nominatim/OpenStreetMap</strong></td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">Adress-Vervollständigung</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">EU</td>
+          <td style="padding:10px;border-bottom:1px solid #ECE7DC;vertical-align:top;">Nur Eingabewerte aus Adress-Feld</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>Zahlungsdaten</h3>
+    <p>
+      Zahlungsdaten (Kreditkartennummer etc.) werden ausschließlich auf den PCI-DSS-zertifizierten
+      Servern von Stripe verarbeitet. Wir selbst speichern keine Kreditkarten- oder Bankdaten.
+      Es wird lediglich eine pseudonyme Customer-ID von Stripe in unserer Datenbank vorgehalten.
+    </p>
+    <h3>KI-Analysen</h3>
+    <p>
+      Bei Nutzung der KI-Lage-Analyse werden vom Nutzer eingegebene Adress- und Objektdaten
+      an OpenAI Ireland Ltd. (Sitz EU) übermittelt. Die Übermittlung erfolgt nur auf aktive Auslösung
+      durch den Nutzer. <strong>Es werden keine personenbezogenen Daten Dritter wie Mieter- oder
+      Eigentümerdaten übermittelt.</strong>
+    </p>
+
+    <h2>Beschwerderecht bei der Aufsichtsbehörde</h2>
+    <p>
+      Unbeschadet anderweitiger Rechtsbehelfe steht Ihnen das Recht auf Beschwerde bei einer
+      Aufsichtsbehörde zu, insbesondere in dem Mitgliedstaat Ihres Aufenthaltsorts, Ihres
+      Arbeitsplatzes oder des Orts des mutmaßlichen Verstoßes. Zuständige Behörde:
+    </p>
+    <p>
+      <strong>Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen</strong><br>
+      Kavalleriestraße 2-4, 40213 Düsseldorf<br>
+      <a href="https://www.ldi.nrw.de" target="_blank" rel="noopener">www.ldi.nrw.de</a>
+    </p>
+
     <h2>Zugriffsdaten / Server-Logfiles</h2>
     <p>
       Beim Besuch dieser Website werden durch den Hostinganbieter automatisch folgende

@@ -1,0 +1,234 @@
+/* V197: Credits-Kauf-Modal — Styles passend zum Screenshot */
+
+.credits-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.credits-modal-content {
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 1200px;
+  width: 100%;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6);
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.credits-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.credits-modal-header h2 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2em;
+  font-weight: 700;
+  color: #c9a042;
+}
+
+.credits-modal-close {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 2em;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 8px;
+  transition: color 0.15s;
+}
+
+.credits-modal-close:hover { color: #fff; }
+
+.credits-modal-sub {
+  color: #aaa;
+  font-size: 0.95em;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.credits-packs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .credits-packs { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 500px) {
+  .credits-packs { grid-template-columns: 1fr; }
+}
+
+.credit-pack {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 28px 20px 20px 20px;
+  text-align: center;
+  position: relative;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.credit-pack:hover {
+  transform: translateY(-2px);
+  border-color: #c9a042;
+}
+
+.credit-pack--popular {
+  border: 2px solid #c9a042;
+  background: #2f2620;
+}
+
+.credit-pack-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #c9a042;
+  color: #1a1a1a;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.credit-pack-credits {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 3.5em;
+  font-weight: 700;
+  color: #c9a042;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.credit-pack-label {
+  font-size: 0.7em;
+  letter-spacing: 1.2px;
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.credit-pack-divider {
+  height: 1px;
+  background: #3a3a3a;
+  margin: 12px auto;
+  width: 60%;
+}
+
+.credit-pack-price {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.8em;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 8px;
+}
+
+.credit-pack-perrequest {
+  font-size: 0.8em;
+  color: #888;
+  margin: 4px 0 12px 0;
+}
+
+.credit-pack-sublabel {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #c9a042;
+  margin-bottom: 16px;
+}
+
+.credit-pack-buy {
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid #c9a042;
+  color: #c9a042;
+  padding: 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.credit-pack-buy:hover:not(:disabled) {
+  background: #c9a042;
+  color: #1a1a1a;
+}
+
+.credit-pack-buy:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.credits-modal-footer {
+  color: #888;
+  font-size: 0.85em;
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a2a;
+}
+
+/* ─── Result-Toast (Success/Cancel nach Stripe-Redirect) ─── */
+.credits-result-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #fff;
+  color: #1a1a1a;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  z-index: 10000;
+  border-left: 4px solid #c9a042;
+  animation: credit-toast-in 0.3s ease-out;
+}
+
+.credits-result-success { border-left-color: #4a7c59; }
+.credits-result-info { border-left-color: #c9a042; }
+.credits-result-error { border-left-color: #b94f3a; }
+
+.credits-result-title {
+  font-weight: 700;
+  font-size: 1.1em;
+  margin-bottom: 6px;
+}
+
+.credits-result-msg {
+  color: #555;
+  font-size: 0.92em;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.credits-result-close {
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+@keyframes credit-toast-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}

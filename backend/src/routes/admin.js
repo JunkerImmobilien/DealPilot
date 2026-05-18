@@ -1,13 +1,13 @@
 'use strict';
 /**
- * V196: Admin-Dashboard mit Charts + CSV-Export + Filter
+ * V197: Admin-Dashboard mit Test-User-Filter
  *
- * NEU gegenüber V195:
- *   GET /admin/charts/users-trend?days=30   — User-Wachstum-Daten
- *   GET /admin/charts/mrr-trend?days=30     — MRR-Daten (geschätzt aus aktiven Subs)
- *   GET /admin/users.csv?q=...&plan=...     — User-Liste als CSV
- *   GET /admin/audit-log.csv?action=...     — Audit-Log als CSV
- *   GET /admin/users — neue Filter: plan_id, status (active/inactive)
+ * NEU gegenüber V196:
+ *   - Dashboard/Users/Charts filtern is_test_user=false aus den KPIs
+ *   - Neuer Endpoint: POST /admin/users/:id/toggle-test
+ *   - POST /admin/users akzeptiert is_test_user
+ *   - GET /admin/users gibt is_test_user zurück
+ *   - User-Filter: status=test um Test-User zu sehen
  */
 
 const express = require('express');
@@ -17,8 +17,6 @@ const speakeasy = require('speakeasy');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
-
-// Auth-Middleware aus existierender adminAuth.js (V194)
 const { requireAdmin, requireRole, signAdminToken } = require('../middleware/adminAuth');
 
 // ──────────────────────────────────────────────────────────────
@@ -51,7 +49,6 @@ async function logLoginAttempt(db, ip, email, success) {
   }
 }
 
-/** Escape CSV-Felder gemäß RFC 4180 */
 function csvEscape(v) {
   if (v == null) return '';
   const s = String(v);
@@ -60,13 +57,10 @@ function csvEscape(v) {
   }
   return s;
 }
-
-function csvRow(arr) {
-  return arr.map(csvEscape).join(',') + '\r\n';
-}
+function csvRow(arr) { return arr.map(csvEscape).join(',') + '\r\n'; }
 
 // ──────────────────────────────────────────────────────────────
-// AUTH (unverändert von V195.2)
+// AUTH
 // ──────────────────────────────────────────────────────────────
 
 router.post('/auth/login', async (req, res) => {
@@ -148,7 +142,6 @@ router.post('/auth/login', async (req, res) => {
     await audit(db, admin.id, admin.email, 'admin.login', null, null, null, ip, req.headers['user-agent']);
 
     const token = signAdminToken({ id: admin.id, email: admin.email, role: admin.role });
-
     res.json({
       token,
       admin: { id: admin.id, email: admin.email, role: admin.role }
@@ -164,23 +157,26 @@ router.get('/auth/me', requireAdmin, async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────
-// DASHBOARD (unverändert von V195.2)
+// DASHBOARD (V197: is_test_user=false in MRR/User-Counts)
 // ──────────────────────────────────────────────────────────────
 
 router.get('/dashboard', requireAdmin, async (req, res) => {
   const db = req.app.get('db');
   try {
+    // KPIs schließen Test-User aus
     const usersAgg = await db.query(`
       SELECT
-        COUNT(*) FILTER (WHERE deleted_at IS NULL) AS total,
-        COUNT(*) FILTER (WHERE is_active = true AND deleted_at IS NULL) AS active,
-        COUNT(*) FILTER (WHERE last_login_at > NOW() - INTERVAL '30 days') AS active_30d,
-        COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days') AS new_7d,
-        COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '30 days') AS new_30d
+        COUNT(*) FILTER (WHERE deleted_at IS NULL AND is_test_user = false) AS total,
+        COUNT(*) FILTER (WHERE is_active = true AND deleted_at IS NULL AND is_test_user = false) AS active,
+        COUNT(*) FILTER (WHERE last_login_at > NOW() - INTERVAL '30 days' AND is_test_user = false) AS active_30d,
+        COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days' AND is_test_user = false) AS new_7d,
+        COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '30 days' AND is_test_user = false) AS new_30d,
+        COUNT(*) FILTER (WHERE is_test_user = true AND deleted_at IS NULL) AS test_users
       FROM users
     `);
     const stats = usersAgg.rows[0];
 
+    // Plan-Verteilung schließt Test-User aus
     const planDist = await db.query(`
       SELECT
         COALESCE(p.id, 'free') AS plan_id,
@@ -190,11 +186,12 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
       FROM users u
       LEFT JOIN subscriptions s ON s.user_id = u.id AND s.status = 'active'
       LEFT JOIN plans p ON p.id = s.plan_id
-      WHERE u.deleted_at IS NULL
+      WHERE u.deleted_at IS NULL AND u.is_test_user = false
       GROUP BY p.id, p.name, p.price_monthly_cents
       ORDER BY price_monthly_cents NULLS FIRST
     `);
 
+    // MRR schließt Test-User aus
     const revenue = await db.query(`
       SELECT
         COALESCE(SUM(
@@ -207,18 +204,19 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
         COUNT(*) FILTER (WHERE s.status = 'active' AND p.id != 'free') AS paying_users
       FROM subscriptions s
       JOIN plans p ON p.id = s.plan_id
-      WHERE s.status = 'active'
+      JOIN users u ON u.id = s.user_id
+      WHERE s.status = 'active' AND u.is_test_user = false
     `);
     const rev = revenue.rows[0];
 
     const recentSignups = await db.query(`
-      SELECT id, email, name, created_at, is_active
+      SELECT id, email, name, created_at, is_active, is_test_user
       FROM users WHERE deleted_at IS NULL
       ORDER BY created_at DESC LIMIT 5
     `);
 
     const recentLogins = await db.query(`
-      SELECT id, email, name, last_login_at
+      SELECT id, email, name, last_login_at, is_test_user
       FROM users WHERE last_login_at IS NOT NULL AND deleted_at IS NULL
       ORDER BY last_login_at DESC LIMIT 5
     `);
@@ -230,6 +228,7 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
         active_30d: parseInt(stats.active_30d, 10) || 0,
         new_7d: parseInt(stats.new_7d, 10) || 0,
         new_30d: parseInt(stats.new_30d, 10) || 0,
+        test_users: parseInt(stats.test_users, 10) || 0,
         mrr_cents: parseInt(rev.mrr_cents, 10) || 0,
         arr_cents: (parseInt(rev.mrr_cents, 10) || 0) * 12,
         paying_users: parseInt(rev.paying_users, 10) || 0
@@ -250,15 +249,9 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────
-// V196 NEU: CHARTS — Trend-Daten
+// CHARTS (V197: ohne Test-User)
 // ──────────────────────────────────────────────────────────────
 
-/**
- * GET /admin/charts/users-trend?days=30
- * Liefert für jeden Tag der letzten N Tage:
- *  - new_users:  Anzahl der an dem Tag registrierten User
- *  - cumulative: Gesamtzahl der bis zu diesem Tag registrierten User
- */
 router.get('/charts/users-trend', requireAdmin, async (req, res) => {
   const db = req.app.get('db');
   const days = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 7), 365);
@@ -275,7 +268,7 @@ router.get('/charts/users-trend', requireAdmin, async (req, res) => {
         SELECT DATE(created_at) AS day, COUNT(*) AS new_count
         FROM users
         WHERE created_at >= CURRENT_DATE - INTERVAL '${days} days'
-          AND deleted_at IS NULL
+          AND deleted_at IS NULL AND is_test_user = false
         GROUP BY DATE(created_at)
       ),
       cumulative AS (
@@ -283,13 +276,11 @@ router.get('/charts/users-trend', requireAdmin, async (req, res) => {
                COALESCE(s.new_count, 0)::int AS new_users,
                (SELECT COUNT(*)::int FROM users
                 WHERE created_at <= ds.day + INTERVAL '1 day'
-                AND deleted_at IS NULL) AS cumulative
+                AND deleted_at IS NULL AND is_test_user = false) AS cumulative
         FROM date_series ds
         LEFT JOIN daily_signups s ON s.day = ds.day
       )
-      SELECT day, new_users, cumulative
-      FROM cumulative
-      ORDER BY day
+      SELECT day, new_users, cumulative FROM cumulative ORDER BY day
     `);
 
     res.json({
@@ -305,12 +296,6 @@ router.get('/charts/users-trend', requireAdmin, async (req, res) => {
   }
 });
 
-/**
- * GET /admin/charts/mrr-trend?days=30
- * MRR-Verlauf der letzten N Tage. Wir nehmen die *active* Subscriptions
- * deren period den jeweiligen Tag enthält. Approximation, weil wir keine
- * Snapshot-Tabelle haben.
- */
 router.get('/charts/mrr-trend', requireAdmin, async (req, res) => {
   const db = req.app.get('db');
   const days = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 7), 365);
@@ -339,8 +324,9 @@ router.get('/charts/mrr-trend', requireAdmin, async (req, res) => {
         AND (s.ended_at IS NULL OR s.ended_at > ds.day)
         AND s.status IN ('active', 'canceled')
       LEFT JOIN plans p ON p.id = s.plan_id
-      GROUP BY ds.day
-      ORDER BY ds.day
+      LEFT JOIN users u ON u.id = s.user_id
+      WHERE u.id IS NULL OR u.is_test_user = false
+      GROUP BY ds.day ORDER BY ds.day
     `);
 
     res.json({
@@ -357,7 +343,7 @@ router.get('/charts/mrr-trend', requireAdmin, async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────
-// USERS (mit erweitertem Filter in V196)
+// USERS
 // ──────────────────────────────────────────────────────────────
 
 router.get('/users', requireAdmin, async (req, res) => {
@@ -376,15 +362,17 @@ router.get('/users', requireAdmin, async (req, res) => {
       params.push(plan);
       where += ` AND p.id = $${params.length}`;
     }
-    if (status === 'active') where += ` AND u.is_active = true`;
+    if (status === 'active') where += ` AND u.is_active = true AND u.is_test_user = false`;
     if (status === 'inactive') where += ` AND u.is_active = false`;
+    if (status === 'test') where += ` AND u.is_test_user = true`;
+    if (status === 'real') where += ` AND u.is_test_user = false`;
 
     params.push(parseInt(limit, 10) || 50);
     params.push(parseInt(offset, 10) || 0);
 
     const result = await db.query(`
       SELECT
-        u.id, u.email, u.name, u.role, u.is_active,
+        u.id, u.email, u.name, u.role, u.is_active, u.is_test_user,
         u.last_login_at, u.created_at, u.email_verified_at,
         COALESCE(p.id, 'free') AS plan_id,
         COALESCE(p.name, 'Free') AS plan_name,
@@ -405,7 +393,33 @@ router.get('/users', requireAdmin, async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────
-// V196 NEU: CSV-EXPORTS
+// V197 NEU: Test-User-Toggle
+// ──────────────────────────────────────────────────────────────
+
+router.post('/users/:id/toggle-test', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  const { reason = '' } = req.body || {};
+  try {
+    const result = await db.query(`
+      UPDATE users SET is_test_user = NOT is_test_user, updated_at=NOW()
+      WHERE id=$1 AND deleted_at IS NULL
+      RETURNING is_test_user, email
+    `, [req.params.id]);
+    if (!result.rowCount) return res.status(404).json({ error: 'user_not_found' });
+
+    const action = result.rows[0].is_test_user ? 'user.mark_as_test' : 'user.unmark_test';
+    await audit(db, req.adminUser.id, req.adminUser.email, action, 'user', req.params.id,
+                { reason }, req.ip, req.headers['user-agent']);
+
+    res.json({ success: true, is_test_user: result.rows[0].is_test_user, email: result.rows[0].email });
+  } catch (err) {
+    console.error('[admin/users/toggle-test] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+// CSV-EXPORTS (V197: enthält is_test_user)
 // ──────────────────────────────────────────────────────────────
 
 router.get('/users.csv', requireAdmin, async (req, res) => {
@@ -424,13 +438,15 @@ router.get('/users.csv', requireAdmin, async (req, res) => {
       params.push(plan);
       where += ` AND p.id = $${params.length}`;
     }
-    if (status === 'active') where += ` AND u.is_active = true`;
+    if (status === 'active') where += ` AND u.is_active = true AND u.is_test_user = false`;
     if (status === 'inactive') where += ` AND u.is_active = false`;
+    if (status === 'test') where += ` AND u.is_test_user = true`;
+    if (status === 'real') where += ` AND u.is_test_user = false`;
 
     const result = await db.query(`
       SELECT
         u.id, u.email, u.name, u.role,
-        u.is_active, u.email_verified_at, u.totp_enabled,
+        u.is_active, u.is_test_user, u.email_verified_at, u.totp_enabled,
         u.created_at, u.last_login_at,
         COALESCE(p.id, 'free') AS plan_id,
         COALESCE(p.name, 'Free') AS plan_name,
@@ -450,7 +466,7 @@ router.get('/users.csv', requireAdmin, async (req, res) => {
 
     let csv = '\uFEFF' + csvRow([
       'ID', 'Email', 'Name', 'Rolle',
-      'Aktiv', 'Email-Verifiziert', 'TOTP-Aktiv',
+      'Aktiv', 'Test-User', 'Email-Verifiziert', 'TOTP-Aktiv',
       'Registriert', 'Letzter Login',
       'Plan-ID', 'Plan-Name', 'Billing', 'Period-End', 'Stripe-Sub',
       'Objekte', 'Credits-Verbraucht', 'Bonus-Credits'
@@ -460,6 +476,7 @@ router.get('/users.csv', requireAdmin, async (req, res) => {
       csv += csvRow([
         r.id, r.email, r.name, r.role,
         r.is_active ? 'Ja' : 'Nein',
+        r.is_test_user ? 'Ja' : 'Nein',
         r.email_verified_at ? 'Ja' : 'Nein',
         r.totp_enabled ? 'Ja' : 'Nein',
         r.created_at ? new Date(r.created_at).toISOString() : '',
@@ -549,12 +566,12 @@ router.get('/audit-log.csv', requireAdmin, async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────
-// USERS / ACTIONS (unverändert von V195.2)
+// USERS / ACTIONS — POST /users akzeptiert is_test_user
 // ──────────────────────────────────────────────────────────────
 
 router.post('/users', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
   const db = req.app.get('db');
-  const { email, name, plan_id = 'free' } = req.body || {};
+  const { email, name, plan_id = 'free', is_test_user = false } = req.body || {};
 
   if (!email || !name) {
     return res.status(400).json({ error: 'email_and_name_required' });
@@ -568,10 +585,10 @@ router.post('/users', requireAdmin, requireRole('owner', 'support'), async (req,
     const passwordHash = await bcrypt.hash(tempPassword, 10);
 
     const result = await db.query(`
-      INSERT INTO users (email, name, password_hash, role, is_active, email_verified_at)
-      VALUES ($1, $2, $3, 'user', true, NOW())
-      RETURNING id, email, name, created_at
-    `, [email.toLowerCase(), name, passwordHash]);
+      INSERT INTO users (email, name, password_hash, role, is_active, email_verified_at, is_test_user)
+      VALUES ($1, $2, $3, 'user', true, NOW(), $4)
+      RETURNING id, email, name, created_at, is_test_user
+    `, [email.toLowerCase(), name, passwordHash, !!is_test_user]);
 
     const newUser = result.rows[0];
 
@@ -583,7 +600,7 @@ router.post('/users', requireAdmin, requireRole('owner', 'support'), async (req,
     }
 
     await audit(db, req.adminUser.id, req.adminUser.email, 'user.created', 'user', newUser.id,
-                { email, plan_id }, req.ip, req.headers['user-agent']);
+                { email, plan_id, is_test_user: !!is_test_user }, req.ip, req.headers['user-agent']);
 
     res.json({
       user: newUser,
@@ -601,7 +618,7 @@ router.get('/users/:id', requireAdmin, async (req, res) => {
   try {
     const result = await db.query(`
       SELECT
-        u.id, u.email, u.name, u.role, u.is_active,
+        u.id, u.email, u.name, u.role, u.is_active, u.is_test_user,
         u.last_login_at, u.created_at, u.email_verified_at, u.totp_enabled,
         COALESCE(p.id, 'free') AS plan_id,
         COALESCE(p.name, 'Free') AS plan_name,
