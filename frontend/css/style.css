@@ -28131,3 +28131,37 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 }
 
 /* V216-Marker */
+
+
+/* ═══════════════════════════════════════════════════════════
+   V217 — Login-Card Background var(--ch) + Logo zentriert erzwungen
+   Diese Regeln stehen am Ende der CSS — last-wins, höchste Spezifität.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Login-Card-Background = Sidebar-Farbe (warmes Dunkelbraun) statt schwarzes Gradient */
+.auth-card-v39 {
+  background: var(--ch) !important;
+}
+
+/* Logo-Wrapper im Login: garantiert zentriert (hohe Spezifität) */
+.auth-card-v39 .auth-logo-simple-wrap {
+  display: flex !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* Logo-img selbst zentriert (falls Flex-Layout-Issue) */
+.auth-card-v39 .auth-logo-simple-wrap .app-logo-simple {
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+/* V217-Marker */
