@@ -7,13 +7,17 @@
    - Dev-Flags
 ═══════════════════════════════════════════════════ */
 
-// V1.0: Erster offizieller Production-Release (intern: build v1.0.0)
-// Vorher: V215 als Build-Stamp. Ab jetzt V1.x für externe Kommunikation.
+// V1.1: Logo-Saga abgeschlossen + Auth-Style überarbeitet (intern: 1.1.222)
+// Versionierungs-Strategie: Major.Minor.Patch (siehe CHANGELOG.md)
 window.DealPilotVersion = {
-  label:   'V1.0',
-  build:   '2026-05-12',
-  channel: 'stable',
-  tagline: 'Investmentanalyse für Profis'
+  label:    'V1.1',
+  major:    1,
+  minor:    1,
+  patch:    222,
+  semver:   '1.1.222',
+  build:    '2026-05-18',
+  channel:  'stable',
+  tagline:  'Investmentanalyse für Profis'
 };
 
 window.DealPilotConfig = (function() {
