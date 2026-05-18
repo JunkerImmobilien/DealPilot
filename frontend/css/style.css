@@ -27805,9 +27805,11 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 
 /* Override Container: Padding raus, klare Border, kleiner Border-Radius */
 /* V208: alpha 0.5 → 0.22 (dezenter Saum, keine konkurrierende 2. Linie) */
+/* V210: padding 16px allseitig (vorher 0 → Logo klebte am Saum, optisch unbalanciert) */
+/* V211: padding 30px allseitig (mehr Atemraum, balancedere Optik) */
 .app-logo-hero {
-  padding: 0 !important;
-  border-radius: 12px !important;
+  padding: 30px !important;
+  border-radius: 18px !important;
   border: 1.5px solid rgba(201, 168, 76, 0.22) !important;
   background: linear-gradient(135deg, #0d0a04 0%, #1a1408 100%) !important;
   overflow: visible !important;
@@ -27820,32 +27822,36 @@ aside.sidebar .sb-logo-shimmer:hover::after {
   display: block !important;
 }
 
-/* V209: Breite-Constraint statt Höhe (PNG 477×123 = 3.88:1, würde sonst rausragen) */
-/* Sidebar: max-width 260px → resultiert in ca. 67px Höhe */
+/* V210: Logo-Größen rauf — Sidebar 260→310, Auth 280→340 (Mobile entsprechend) */
+/* Sidebar: max-width 310px → resultiert in ca. 80px Höhe */
 .app-logo-sidebar .app-logo-img {
   height: auto !important;
   width: auto !important;
-  max-width: 260px !important;
-  max-height: 80px !important;
-}
-
-/* Auth (Login/Register): max-width 280px → resultiert in ca. 72px Höhe */
-.app-logo-auth .app-logo-img {
-  height: auto !important;
-  width: auto !important;
-  max-width: 280px !important;
+  max-width: 310px !important;
   max-height: 90px !important;
 }
 
-/* Mobile: kleiner */
+/* Auth (Login/Register): max-width 340px → resultiert in ca. 88px Höhe */
+.app-logo-auth .app-logo-img {
+  height: auto !important;
+  width: auto !important;
+  max-width: 340px !important;
+  max-height: 100px !important;
+}
+
+/* Mobile */
 @media (max-width: 768px) {
   .app-logo-sidebar .app-logo-img {
-    max-width: 220px !important;
-    max-height: 68px !important;
+    max-width: 260px !important;
+    max-height: 75px !important;
   }
   .app-logo-auth .app-logo-img {
-    max-width: 240px !important;
-    max-height: 75px !important;
+    max-width: 290px !important;
+    max-height: 85px !important;
+  }
+  /* V211: Mobile-Padding 20px (V210 hatte 12px, V211 zieht App-Padding hoch) */
+  .app-logo-hero {
+    padding: 20px !important;
   }
 }
 
@@ -27958,21 +27964,21 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 /* V207-Größen wurden in V209 außer Kraft gesetzt (siehe V206-Block oben mit max-width-Constraint).
    Diese Höhe-only-Regeln machten das Logo bei Aspect 3.88:1 zu breit für den Sidebar-Container. */
 
-/* V209: Orbit-Radius an neue max-width-260px-Logos angepasst.
-   Logo Sidebar ~260×67 → Halb-Breite 130 → Orbit 140 (etwas außen)
-   Logo Auth    ~280×72 → Halb-Breite 140 → Orbit 150
-   Mobile entsprechend kleiner. */
+/* V211: Orbit-Radius an Padding 30px nachgezogen.
+   Sidebar Container ~370×140 → Halb-Breite 185 → Orbit 190
+   Auth    Container ~400×148 → Halb-Breite 200 → Orbit 205
+   Mobile (Padding 20px) entsprechend. */
 .app-logo-sidebar::after {
-  --orbit-radius: 140px !important;
+  --orbit-radius: 190px !important;
 }
 
 .app-logo-auth::after {
-  --orbit-radius: 150px !important;
+  --orbit-radius: 205px !important;
 }
 
 @media (max-width: 768px) {
-  .app-logo-sidebar::after { --orbit-radius: 118px !important; }
-  .app-logo-auth::after { --orbit-radius: 128px !important; }
+  .app-logo-sidebar::after { --orbit-radius: 160px !important; }
+  .app-logo-auth::after { --orbit-radius: 175px !important; }
 }
 
 
@@ -27989,3 +27995,139 @@ aside.sidebar .sb-logo-shimmer:hover::after {
    - Mobile entsprechend
    - Orbit-Radius an neue Größen angepasst
    Fix für: Logo ragte links aus Sidebar raus (V208-Screenshot). */
+
+
+/* V210-Marker — Logo-Container-Balance:
+   - Container: padding 0 → 16px allseitig (Mobile 12px)
+   - Container: border-radius 12 → 14px
+   - Sidebar-Logo: max-width 260 → 310px
+   - Auth-Logo: max-width 280 → 340px
+   - Mobile: 220→260 / 240→290
+   - Orbit-Radius: 140/150 → 175/190 (Sidebar/Auth)
+   Fix für: Logo zu klein, Saum unbalanciert (oben/unten 0, seitlich Luft). */
+
+
+/* V211-Marker — App-Logo Padding 30 + Border-Radius 18 + Orbit nachgezogen */
+
+
+/* ═══════════════════════════════════════════════════════════
+   V216 — Logo zentriert + Sidebar 160 + Margin 8 + Login-Goldkugeln
+   PNG: dealpilot-logo-app.png (HD, eingebackener Rahmen)
+   ═══════════════════════════════════════════════════════════ */
+
+/* Container: Layout, kein Background/Border. V216: zentriert via width:100% */
+.app-logo-simple-wrap {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2; /* über den Orbs */
+}
+
+.app-logo-simple {
+  width: auto;
+  max-width: 100%;
+  display: block;
+  transition: filter 0.4s ease;
+}
+
+.app-logo-simple:hover {
+  filter: drop-shadow(0 0 18px rgba(201, 168, 76, 0.45));
+}
+
+/* Login + Passwort-Reset: 90px Höhe */
+.app-logo-simple-auth {
+  height: 90px;
+}
+
+/* V216: Sidebar 130 → 160px */
+.app-logo-simple-sidebar {
+  height: 160px;
+}
+
+/* V216: Sidebar-Wrapper margin-top 14 → 8 */
+.app-logo-simple-wrap-sidebar {
+  margin: 8px auto;
+  display: flex;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .app-logo-simple-auth {
+    height: 60px;
+  }
+  .app-logo-simple-sidebar {
+    height: 110px;
+  }
+}
+
+/* ─── V216: Auth-Card bekommt position:relative damit Orbs gecroppt werden ─── */
+.auth-card-v39 {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Form-Elemente über den Orbs */
+.auth-card-v39 > *:not(.auth-bg-orbs) {
+  position: relative;
+  z-index: 2;
+}
+
+/* ─── V216: Bewegliche Goldkugeln im Login-Hintergrund ─── */
+.auth-bg-orbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.auth-bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.55;
+  will-change: transform;
+}
+
+.auth-bg-orb-1 {
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.38), transparent 70%);
+  top: -40px; left: -60px;
+  animation: auth-orb1 14s ease-in-out infinite alternate;
+}
+
+.auth-bg-orb-2 {
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.28), transparent 70%);
+  bottom: -30px; right: -50px;
+  animation: auth-orb2 18s ease-in-out infinite alternate;
+}
+
+.auth-bg-orb-3 {
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(168, 134, 30, 0.22), transparent 70%);
+  top: 40%; left: 30%;
+  animation: auth-orb3 16s ease-in-out infinite alternate;
+}
+
+@keyframes auth-orb1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(80px, 40px) scale(1.15); }
+}
+@keyframes auth-orb2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-60px, -50px) scale(1.10); }
+}
+@keyframes auth-orb3 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-40px, 30px) scale(1.20); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-bg-orb { animation: none; }
+}
+
+/* V216-Marker */
