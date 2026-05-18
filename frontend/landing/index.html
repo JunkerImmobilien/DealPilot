@@ -1,0 +1,2992 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealPilot · Immobilien-Investmentanalyse · by Junker Immobilien</title>
+<meta name="description" content="DealPilot zeigt die Wahrheit hinter jeder Immobilie. Cashflow, Deal Score 2.0, Werbungskostenrechner, KI-Recherche und Bankexport in Minuten.">
+<meta name="theme-color" content="#0a0a0a">
+<meta property="og:title" content="DealPilot · Immobilien-Investmentanalyse">
+<meta property="og:description" content="Datenbasiert. Klar. Bankfähig.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="assets/dealpilot-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/pricing-plugin.css">
+<style>
+:root {
+  --bg-obsidian: #0a0a0a;
+  --bg-steel: #14110f;
+  --bg-charcoal: #2A2727;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-glass: rgba(255, 255, 255, 0.06);
+  --gold: #C9A84C;
+  --gold-bright: #e8c878;
+  --gold-strong: #A8861E;
+  --gold-soft: rgba(201, 168, 76, 0.14);
+  --gold-border: rgba(201, 168, 76, 0.25);
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.68);
+  --dim: rgba(255, 255, 255, 0.42);
+  --border: rgba(255, 255, 255, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-obsidian);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 400;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+.container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+/* ANIMATED BACKGROUND */
+.bg-animated { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.45; will-change: transform; }
+.bg-orb-1 {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.32), transparent 70%);
+  top: 40%; left: -200px;
+  animation: orb1 24s ease-in-out infinite alternate;
+}
+.bg-orb-2 {
+  width: 580px; height: 580px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.22), transparent 70%);
+  top: 70%; right: -180px;
+  animation: orb2 32s ease-in-out infinite alternate;
+}
+.bg-orb-3 {
+  width: 520px; height: 520px;
+  background: radial-gradient(circle, rgba(168, 134, 30, 0.18), transparent 70%);
+  bottom: 0; left: 40%;
+  animation: orb3 28s ease-in-out infinite alternate;
+}
+@keyframes orb1 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(200px,-120px) scale(1.15); } }
+@keyframes orb2 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-220px,180px) scale(0.85); } }
+@keyframes orb3 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-150px,-100px) scale(1.2); } }
+@media (prefers-reduced-motion: reduce) { .bg-orb { animation: none; } }
+
+.page-content { position: relative; z-index: 1; }
+
+/* NAV — V4: Logo größer */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; max-width: 1240px; margin: 0 auto;
+}
+.nav-brand {
+  position: relative;
+  display: flex; align-items: center; gap: 14px;
+  padding: 6px;
+  border-radius: 14px;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 1;
+}
+/* Sehr dezenter, statischer Gold-Border zur Abgrenzung */
+.nav-brand {
+  border: 1px solid rgba(201, 168, 76, 0.18);
+}
+/* Sternschnuppe: kleiner Punkt mit Schweif, huscht um den Rahmen */
+.nav-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  /* Schweif: ~60° lang mit Fade, heller Kopf */
+  background: conic-gradient(
+    from var(--shooter-angle, 0deg),
+    transparent 0deg,
+    rgba(201, 168, 76, 0.08) 305deg,
+    rgba(232, 200, 120, 0.55) 335deg,
+    rgba(255, 235, 180, 1) 355deg,
+    rgba(255, 250, 220, 1) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 1.5px;
+  animation: shooter-orbit 6s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 235, 180, 0.8));
+}
+@property --shooter-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes shooter-orbit {
+  /* Sternschnuppe läuft ca. 1,8s sichtbar, dann 4,2s Pause */
+  0% { --shooter-angle: 0deg; opacity: 1; }
+  30% { opacity: 1; }
+  31% { opacity: 0; }
+  99% { opacity: 0; }
+  100% { --shooter-angle: 360deg; opacity: 1; }
+}
+/* Fallback ohne @property */
+@supports not (background: conic-gradient(from var(--shooter-angle, 0deg), red, blue)) {
+  .nav-brand::before {
+    background: none;
+    border: 1.5px solid transparent;
+    border-top-color: rgba(255, 235, 180, 0.85);
+    border-right-color: rgba(232, 200, 120, 0.5);
+    border-radius: 14px;
+    inset: -1px;
+    animation: shooter-fallback 8s linear infinite;
+  }
+  @keyframes shooter-fallback {
+    0%, 74% { opacity: 0; transform: rotate(0deg); }
+    75% { opacity: 1; }
+    100% { opacity: 1; transform: rotate(360deg); }
+  }
+}
+
+.nav-brand:hover { transform: scale(1.03); }
+.nav-brand:hover::before {
+  animation-duration: 4s;
+}
+.nav-logo {
+  height: 112px; width: auto; display: block;
+  border-radius: 10px;
+  transition: filter 0.4s ease;
+  position: relative;
+}
+.nav-brand:hover .nav-logo {
+  filter: drop-shadow(0 0 18px rgba(201, 168, 76, 0.45));
+}
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a { font-size: 14px; color: var(--muted); transition: color 0.2s; font-weight: 500; }
+.nav-links a:hover { color: var(--gold); }
+.nav-cta {
+  background: var(--gold);
+  color: var(--bg-obsidian) !important;
+  padding: 11px 22px; border-radius: 100px;
+  font-weight: 600; font-size: 13px;
+  transition: all 0.25s;
+}
+.nav-cta:hover { background: #fff; transform: translateX(2px); }
+
+/* HERO mit Werbung sichtbar — V4: deutlich kräftiger */
+.hero {
+  position: relative;
+  padding: 110px 0 130px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero-bg-image {
+  position: absolute; inset: 0;
+  background-image: url('assets/hero-werbung.jpg');
+  background-size: cover; background-position: right center;
+  opacity: 0.55; z-index: -2;
+}
+.hero-bg-overlay {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.55) 50%, rgba(10,10,10,0.25) 100%),
+    linear-gradient(180deg, rgba(10,10,10,0.3) 0%, transparent 40%, rgba(10,10,10,0.6) 100%);
+  z-index: -1;
+}
+.hero-content { position: relative; max-width: 880px; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--gold-border);
+  padding: 8px 18px; border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.2em;
+  color: var(--gold); font-weight: 500;
+  text-transform: uppercase; margin-bottom: 32px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.hero-eyebrow .dot {
+  width: 6px; height: 6px; background: var(--gold);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+.hero-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(44px, 7vw, 84px);
+  font-weight: 500; letter-spacing: -0.038em;
+  line-height: 0.96; margin: 0 0 28px;
+  text-shadow: 0 4px 24px rgba(0,0,0,0.6);
+}
+.hero-title .accent {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: italic; font-weight: 600;
+}
+.hero-lead {
+  font-size: 20px; color: rgba(255,255,255,0.85);
+  max-width: 620px; margin-bottom: 40px; line-height: 1.55;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+.hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.btn-primary {
+  background: var(--gold);
+  color: var(--bg-obsidian) !important;
+  padding: 17px 34px; border-radius: 100px;
+  font-weight: 600; font-size: 15px; letter-spacing: 0.03em;
+  display: inline-flex; align-items: center; gap: 10px;
+  transition: all 0.25s; border: none; cursor: pointer;
+  box-shadow: 0 6px 24px rgba(201, 168, 76, 0.25);
+}
+.btn-primary:hover {
+  background: #fff; transform: translateX(3px);
+  box-shadow: 0 12px 32px rgba(201, 168, 76, 0.35);
+}
+.btn-secondary {
+  background: rgba(255,255,255,0.06); color: var(--text) !important;
+  padding: 17px 34px; border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  font-weight: 500; font-size: 15px; letter-spacing: 0.03em;
+  display: inline-flex; align-items: center; gap: 10px;
+  transition: all 0.25s; cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.btn-secondary:hover {
+  border-color: var(--gold); color: var(--gold) !important;
+  background: var(--gold-soft);
+}
+
+/* SECTION COMMON */
+.section { position: relative; padding: 100px 0; }
+.section-head { text-align: center; max-width: 720px; margin: 0 auto 72px; }
+.section-eyebrow {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.22em;
+  color: var(--gold); font-weight: 500;
+  text-transform: uppercase; margin-bottom: 18px;
+}
+.section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(34px, 5vw, 52px);
+  font-weight: 500; letter-spacing: -0.028em;
+  line-height: 1.05; margin: 0 0 18px;
+}
+.section-title .accent {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: italic; font-weight: 600;
+}
+.section-lead { font-size: 17px; color: var(--muted); line-height: 1.6; }
+
+/* 3-WEGE EINSTIEG */
+.entrypoints { background: var(--bg-steel); }
+.entry-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.entry-card {
+  background: var(--bg-card); border: 1px solid var(--gold-border);
+  border-radius: 18px; padding: 36px 30px;
+  position: relative; overflow: hidden; transition: all 0.3s;
+}
+.entry-card:hover {
+  background: var(--bg-glass);
+  border-color: rgba(201, 168, 76, 0.45);
+  transform: translateY(-4px);
+}
+.entry-card::before {
+  content: ''; position: absolute;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.18), transparent 65%);
+  top: -80px; right: -80px; filter: blur(40px);
+  opacity: 0; transition: opacity 0.3s;
+}
+.entry-card:hover::before { opacity: 1; }
+.entry-card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; letter-spacing: 0.18em;
+  color: var(--gold); font-weight: 500;
+  margin-bottom: 14px; position: relative;
+}
+.entry-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px; font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-bottom: 12px; position: relative;
+}
+.entry-card p { color: var(--muted); font-size: 14px; line-height: 1.6; position: relative; }
+.entry-card-time {
+  display: inline-block; margin-top: 18px;
+  background: var(--gold-soft); color: var(--gold);
+  padding: 4px 11px; border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.04em; position: relative;
+}
+
+/* WORKFLOW — V11 Cool */
+.workflow {
+  background: var(--bg-obsidian);
+  position: relative;
+  padding-top: 80px;
+}
+/* Connector-Linie zwischen allen Steps */
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  position: relative;
+  margin-top: 40px;
+}
+.workflow-grid::before {
+  content: '';
+  position: absolute;
+  top: -8px; left: 10%; right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(201,168,76,0.55) 10%,
+    rgba(232,200,120,0.85) 50%,
+    rgba(201,168,76,0.55) 90%,
+    transparent 100%);
+  z-index: 0;
+  box-shadow: 0 0 10px rgba(201, 168, 76, 0.35);
+}
+/* Card-Container für jeden Step */
+.workflow-step {
+  position: relative;
+  padding: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+  border: 1px solid var(--gold-border);
+  border-radius: 16px;
+  overflow: visible;
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  backdrop-filter: blur(8px);
+  z-index: 1;
+}
+.workflow-step:hover {
+  transform: translateY(-6px);
+  border-color: var(--gold);
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(201, 168, 76, 0.3),
+    0 0 50px rgba(201, 168, 76, 0.18);
+}
+/* Glow-Pin als Markierung über der Connector-Linie */
+.workflow-step::after {
+  content: '';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow:
+    0 0 0 4px rgba(10,10,10,1),
+    0 0 14px rgba(201, 168, 76, 0.9);
+  z-index: 3;
+  transition: all 0.3s;
+}
+.workflow-step:hover::after {
+  background: var(--gold-bright);
+  box-shadow:
+    0 0 0 4px rgba(10,10,10,1),
+    0 0 24px rgba(232, 200, 120, 1),
+    0 0 50px rgba(201, 168, 76, 0.6);
+}
+.workflow-step::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 0;
+  background: none;
+}
+/* Riesen-Nummer als visueller Anker */
+.workflow-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 56px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 50%, var(--gold) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0;
+  padding: 32px 24px 8px;
+  display: block;
+  transition: background-position 0.6s ease;
+}
+.workflow-step:hover .workflow-num {
+  background-position: 100% 0;
+}
+.workflow-num-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 0 24px 18px;
+  margin-top: -2px;
+  opacity: 0.85;
+}
+.workflow-step h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 12px;
+  padding: 0 24px;
+  color: var(--text);
+}
+.workflow-step p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0 24px 28px;
+}
+/* Subtiler Spotlight innen */
+.workflow-step {
+  background-image:
+    radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(201,168,76,0.10),
+      transparent 65%);
+}
+
+/* FEATURES */
+.features { background: var(--bg-steel); }
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.feature {
+  background: var(--bg-card); border: 1px solid var(--gold-border);
+  border-radius: 16px; padding: 30px 26px;
+  transition: all 0.25s;
+}
+.feature:hover {
+  background: var(--bg-glass);
+  border-color: rgba(201, 168, 76, 0.45);
+  transform: translateY(-3px);
+}
+.feature-icon {
+  width: 50px; height: 50px;
+  border-radius: 12px;
+  background: var(--gold-soft);
+  color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+}
+.feature-icon svg { width: 26px; height: 26px; }
+.feature h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 19px; font-weight: 600;
+  letter-spacing: -0.01em; color: var(--gold);
+  margin-bottom: 10px;
+}
+.feature p { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+.feature ul { list-style: none; margin-top: 12px; padding: 0; }
+.feature ul li {
+  font-size: 12.5px; color: var(--dim);
+  padding-left: 18px; position: relative;
+  margin-bottom: 5px; line-height: 1.5;
+}
+.feature ul li::before {
+  content: '✓'; position: absolute; left: 0; top: 0;
+  color: var(--gold); font-weight: 600;
+}
+
+/* LIVE-DATEN */
+.livedata { background: var(--bg-obsidian); }
+.livedata-card {
+  background: var(--bg-card); border: 1px solid var(--gold-border);
+  border-radius: 20px; padding: 36px 32px;
+  max-width: 900px; margin: 0 auto;
+  position: relative; overflow: hidden;
+}
+.livedata-card::before {
+  content: ''; position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.16), transparent 65%);
+  top: -150px; right: -100px; filter: blur(60px);
+}
+.livedata-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 22px; position: relative;
+  flex-wrap: wrap; gap: 12px;
+}
+.livedata-header h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px; font-weight: 600;
+}
+.livedata-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--gold-soft); color: var(--gold);
+  padding: 5px 12px; border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+}
+.livedata-badge .dot {
+  width: 6px; height: 6px; background: var(--gold);
+  border-radius: 50%; animation: pulse 2s infinite;
+}
+.rates-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  position: relative;
+}
+.rate-tile {
+  background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px 16px; text-align: center;
+}
+.rate-label {
+  font-size: 11px; color: var(--muted);
+  letter-spacing: 0.04em; margin-bottom: 10px; text-transform: uppercase;
+}
+.rate-val {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 30px; font-weight: 600;
+  color: var(--gold); margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+.rate-sub { font-size: 11px; color: var(--dim); }
+
+/* ═══════════ PRICING (V4 — kompletter Re-Build) ═══════════ */
+.pricing { background: var(--bg-steel); }
+.pricing-toggle {
+  display: flex; gap: 4px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  padding: 4px; border-radius: 100px;
+  margin: 0 auto 48px; width: fit-content;
+}
+.pricing-toggle button {
+  background: transparent; border: none; color: var(--muted);
+  padding: 11px 24px; border-radius: 100px;
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.25s;
+  display: inline-flex; align-items: center;
+}
+.pricing-toggle button.active {
+  background: var(--gold); color: var(--bg-obsidian);
+  font-weight: 600;
+}
+.pricing-toggle .save-badge {
+  display: inline-block;
+  background: rgba(0,0,0,0.20);
+  color: inherit;
+  font-size: 10px; font-weight: 600;
+  margin-left: 8px;
+  padding: 2px 8px; border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+.pricing-toggle button:not(.active) .save-badge {
+  background: rgba(201,168,76,0.15);
+  color: var(--gold);
+}
+
+.pricing-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
+}
+.plan {
+  background: var(--bg-card); border: 1px solid var(--gold-border);
+  border-radius: 18px; padding: 32px 26px;
+  position: relative; transition: all 0.3s;
+  display: flex; flex-direction: column;
+}
+.plan:hover { background: var(--bg-glass); transform: translateY(-3px); }
+.plan.highlight {
+  border: 2px solid var(--gold);
+  background: linear-gradient(180deg, rgba(201,168,76,0.12) 0%, var(--bg-card) 50%);
+  box-shadow: 0 12px 32px rgba(201,168,76,0.15);
+}
+.plan-ribbon {
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  background: var(--gold); color: var(--bg-obsidian);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; padding: 6px 16px; border-radius: 100px;
+  box-shadow: 0 6px 18px rgba(201,168,76,0.40);
+  white-space: nowrap;
+}
+.plan-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px; font-weight: 700;
+  margin-bottom: 6px;
+}
+.plan-tag {
+  font-size: 12.5px; color: var(--muted);
+  margin-bottom: 20px;
+  min-height: 36px;
+  line-height: 1.4;
+}
+.plan-price-wrap {
+  margin-bottom: 8px;
+}
+.plan-price {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 40px; font-weight: 700;
+  letter-spacing: -0.025em; line-height: 1;
+  color: var(--text);
+}
+.plan-price .unit {
+  font-size: 13px; font-weight: 400; color: var(--muted);
+}
+.plan-yearly-hint {
+  font-size: 11.5px; color: var(--dim);
+  margin-top: 6px; min-height: 18px;
+}
+.plan.highlight .plan-yearly-hint {
+  color: var(--gold);
+}
+.plan-divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+.plan-features { list-style: none; padding: 0; flex: 1; margin: 0; }
+.plan-features li {
+  font-size: 12.5px; color: var(--muted);
+  padding: 7px 0 7px 22px; position: relative;
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.plan-features li:last-child { border-bottom: none; }
+.plan-features li::before {
+  content: '✓'; position: absolute; left: 0; top: 7px;
+  color: var(--gold); font-weight: 700;
+}
+.plan-features li.no { color: var(--dim); }
+.plan-features li.no::before { content: '×'; color: rgba(255,255,255,0.25); }
+.plan-features li.strong { color: var(--text); font-weight: 500; }
+.plan-features li.strong::before { color: var(--gold-bright); }
+.plan-features li .feature-detail {
+  display: block;
+  font-size: 11px; color: var(--dim);
+  margin-top: 2px;
+}
+.plan-features li.section-head {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--gold);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 16px 0 6px;
+  border-bottom: 1px solid var(--gold-border);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.plan-features li.section-head::before { content: ''; }
+.plan-features li.section-head:first-child {
+  padding-top: 0;
+}
+
+.plan-btn {
+  display: block; width: 100%;
+  margin-top: 24px; padding: 14px;
+  background: transparent; color: var(--text);
+  border: 1px solid var(--gold-border);
+  border-radius: 100px;
+  font-family: inherit; font-weight: 600; font-size: 13px;
+  cursor: pointer; transition: all 0.25s;
+  text-align: center; text-decoration: none;
+}
+.plan-btn:hover {
+  background: var(--gold); color: var(--bg-obsidian);
+  border-color: var(--gold);
+}
+.plan.highlight .plan-btn {
+  background: var(--gold); color: var(--bg-obsidian); border-color: var(--gold);
+  box-shadow: 0 6px 18px rgba(201,168,76,0.30);
+}
+.plan.highlight .plan-btn:hover { background: #fff; }
+
+/* Extras: Service-Levels + KI-Credits */
+.pricing-extras {
+  margin-top: 60px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.pricing-extra {
+  background: var(--bg-card); border: 1px solid var(--gold-border);
+  border-radius: 16px; padding: 28px 26px;
+}
+.pricing-extra-head {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 6px;
+}
+.pricing-extra h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 600;
+  color: var(--gold);
+}
+.pricing-extra-sub {
+  font-size: 11px; color: var(--dim);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.pricing-extra > p {
+  font-size: 13px; color: var(--muted);
+  margin-bottom: 18px; line-height: 1.55;
+}
+.pricing-extra-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.pricing-extra-tile {
+  background: rgba(0,0,0,0.30); border: 1px solid var(--border);
+  border-radius: 11px; padding: 14px 14px;
+  display: flex; flex-direction: column;
+}
+.pricing-extra-tile.highlight {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.08);
+}
+.pricing-extra-tile strong {
+  color: var(--gold); font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; display: block;
+  margin-bottom: 4px;
+}
+.pricing-extra-tile-price {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.pricing-extra-tile-price .small {
+  font-size: 12px; color: var(--muted); font-weight: 400;
+}
+.pricing-extra-tile-desc {
+  font-size: 11.5px; color: var(--dim);
+  line-height: 1.4;
+  margin-top: auto;
+}
+
+.pricing-extra-bullets {
+  list-style: none; padding: 0; margin: 0;
+}
+.pricing-extra-bullets li {
+  font-size: 12px; color: var(--muted);
+  padding: 4px 0 4px 18px; position: relative;
+  line-height: 1.5;
+}
+.pricing-extra-bullets li::before {
+  content: '✓'; position: absolute; left: 0; top: 4px;
+  color: var(--gold); font-weight: 600;
+}
+
+.yearly-bonus {
+  margin-top: 32px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(201,168,76,0.04));
+  border: 1px solid var(--gold-border);
+  border-radius: 14px;
+  padding: 24px 28px;
+  display: grid; grid-template-columns: auto 1fr; gap: 22px;
+  align-items: center;
+}
+.yearly-bonus-icon {
+  width: 56px; height: 56px;
+  background: var(--gold);
+  color: var(--bg-obsidian);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 22px;
+  flex-shrink: 0;
+}
+.yearly-bonus h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px; font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.yearly-bonus-list {
+  display: flex; gap: 22px; flex-wrap: wrap;
+  font-size: 13px; color: var(--muted);
+  margin-top: 6px;
+}
+.yearly-bonus-list span strong {
+  color: var(--text); font-weight: 600;
+}
+
+.pricing-note {
+  text-align: center; margin-top: 40px;
+  font-size: 13px; color: var(--muted);
+  max-width: 760px; margin-left: auto; margin-right: auto;
+  line-height: 1.6;
+}
+.pricing-note .gold { color: var(--gold); font-weight: 600; }
+.pricing-disclaimer {
+  margin-top: 18px; padding: 16px 22px;
+  background: rgba(0,0,0,0.30); border-left: 3px solid var(--gold);
+  border-radius: 6px; font-size: 12px; color: var(--dim);
+  text-align: left; max-width: 760px; margin-left: auto; margin-right: auto;
+  line-height: 1.6;
+}
+
+/* CTA */
+.cta-final {
+  background: var(--bg-obsidian);
+  padding: 120px 0;
+  position: relative; overflow: hidden;
+}
+.cta-final::before {
+  content: ''; position: absolute;
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.20), transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%); filter: blur(100px);
+}
+.cta-final-inner {
+  position: relative; text-align: center;
+  max-width: 720px; margin: 0 auto;
+}
+.cta-final h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(36px, 5.5vw, 60px);
+  font-weight: 500; letter-spacing: -0.03em;
+  line-height: 1.02; margin: 0 0 24px;
+}
+.cta-final h2 .accent {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: italic; font-weight: 600;
+}
+.cta-final p {
+  font-size: 18px; color: var(--muted);
+  margin-bottom: 36px; line-height: 1.55;
+}
+
+/* FOOTER */
+.footer {
+  background: var(--bg-steel);
+  border-top: 1px solid var(--border);
+  padding: 56px 0 32px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr 0.9fr 0.9fr 1.1fr;
+  gap: 36px; margin-bottom: 40px;
+}
+.footer-logo { height: 68px; width: auto; margin-bottom: 16px; }
+.footer-tagline {
+  font-size: 13px; color: var(--muted);
+  line-height: 1.6; max-width: 320px;
+}
+.footer-col h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--gold);
+  font-weight: 500; margin-bottom: 16px;
+}
+.footer-col a {
+  display: block; font-size: 13px; color: var(--muted);
+  margin-bottom: 8px; transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--gold); }
+
+/* Footer-Mail-Cards mit Label + Adresse */
+.footer-mail {
+  display: block !important;
+  padding: 10px 12px;
+  margin-bottom: 10px !important;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--border);
+  transition: all 0.25s !important;
+  text-decoration: none;
+}
+.footer-mail:hover {
+  background: var(--gold-soft);
+  border-color: var(--gold-border);
+  transform: translateX(2px);
+}
+.footer-mail .footer-mail-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+.footer-mail .footer-mail-addr {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+  word-break: break-all;
+}
+.footer-mail:hover .footer-mail-addr {
+  color: var(--gold-bright);
+}
+/* Pfeil-Slide-In NICHT für footer-mail */
+.footer-mail::before {
+  display: none !important;
+}
+.footer-mail:hover {
+  padding-left: 12px !important;
+}
+.footer-bottom {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: var(--dim);
+  flex-wrap: wrap; gap: 12px;
+}
+
+/* ═══════════════════════════════════════════════════
+   PARTICLES + CURSOR-GLOW (V9 Effekte)
+═══════════════════════════════════════════════════ */
+.bg-particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  opacity: 0.65;
+}
+.cursor-glow {
+  position: fixed;
+  width: 480px; height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.16), transparent 65%);
+  pointer-events: none;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s;
+  opacity: 0;
+  mix-blend-mode: screen;
+  filter: blur(40px);
+}
+body.has-cursor .cursor-glow { opacity: 1; }
+@media (max-width: 720px) {
+  .cursor-glow { display: none; }
+  .bg-particles { opacity: 0.45; }
+}
+
+/* ═══════════════════════════════════════════════════
+   STORY-SLIDER (V9)
+═══════════════════════════════════════════════════ */
+.story-slider-section {
+  position: relative;
+  padding: 90px 0 60px;
+}
+.story-slider-head {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 40px;
+}
+.story-slider-eyebrow {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.22em;
+  color: var(--gold); font-weight: 500;
+  text-transform: uppercase; margin-bottom: 18px;
+}
+.story-slider-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(34px, 5vw, 52px);
+  font-weight: 500; letter-spacing: -0.028em;
+  line-height: 1.05; margin: 0 0 18px;
+}
+.story-slider-title .accent {
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: italic; font-weight: 600;
+}
+.story-slider-lead {
+  font-size: 17px; color: var(--muted);
+  line-height: 1.6;
+}
+
+.story-slider {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+  border: 1px solid var(--gold-border);
+  border-radius: 22px;
+  padding: 48px 56px 28px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow: hidden;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 80px rgba(201, 168, 76, 0.08) inset;
+}
+.story-slider::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(201,168,76,0.15), transparent 50%);
+  pointer-events: none;
+  animation: story-glow-spin 30s linear infinite;
+}
+@keyframes story-glow-spin {
+  to { transform: rotate(360deg); }
+}
+.story-slide-track {
+  position: relative;
+  min-height: 580px;
+}
+.story-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events: none;
+}
+.story-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.story-slide.exit-left {
+  transform: translateX(-40px);
+}
+.story-slide-meta {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 22px;
+}
+.story-slide-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 38px; font-weight: 700;
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.story-slide-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; letter-spacing: 0.15em;
+  color: var(--gold);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.story-slide-scene {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 400; line-height: 1.45;
+  color: var(--text);
+  margin: 0 0 24px;
+  letter-spacing: -0.01em;
+  font-style: italic;
+  position: relative;
+  padding-left: 24px;
+  border-left: 2px solid var(--gold);
+}
+/* Power-Pitch: fett, groß, hart */
+.story-slide-scene.story-slide-scene-bold {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, var(--text), var(--gold-bright));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border-left-width: 3px;
+}
+/* Founder-Voice: serif, kursiv, intim */
+.story-slide-scene.story-slide-scene-serif {
+  font-family: 'Cormorant Garamond', 'Space Grotesk', serif;
+  font-size: clamp(22px, 2.7vw, 30px);
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: -0.005em;
+  line-height: 1.5;
+}
+/* Power-Pitch Slide-Hintergrund: leicht stärker getönt */
+.story-slide.power-pitch {
+  background: radial-gradient(ellipse at top right, rgba(201,168,76,0.04), transparent 60%);
+}
+/* Founder-Voice Slide: warmer, intimer Hintergrund */
+.story-slide.founder-voice {
+  background: radial-gradient(ellipse at top left, rgba(201,168,76,0.05), transparent 60%);
+}
+.story-slide.founder-voice .story-slide-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+}
+.story-slide-scene em {
+  color: var(--gold-bright);
+  font-style: italic;
+  font-weight: 500;
+}
+.story-slide-body {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 24px;
+}
+.story-slide-body strong { color: var(--text); font-weight: 600; }
+.story-slide-payoff {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  padding: 7px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+
+/* Controls */
+.story-slider-controls {
+  display: flex; align-items: center; gap: 18px;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.story-arrow {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all 0.25s;
+  flex-shrink: 0;
+}
+.story-arrow:hover {
+  background: var(--gold);
+  color: var(--bg-obsidian);
+  transform: scale(1.05);
+  border-color: var(--gold);
+}
+.story-arrow:active { transform: scale(0.95); }
+.story-progress {
+  flex: 1;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.story-progress-bar {
+  height: 2px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.story-progress-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(201, 168, 76, 0.6);
+}
+.story-dots {
+  display: flex; gap: 8px; justify-content: center;
+}
+.story-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  cursor: pointer;
+  transition: all 0.25s;
+  border: none;
+  padding: 0;
+}
+.story-dot:hover { background: rgba(255,255,255,0.35); }
+.story-dot.active {
+  background: var(--gold);
+  width: 28px; border-radius: 100px;
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.5);
+}
+
+/* Compact section-head (für Workflow-Sektion) */
+.section-head-compact {
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════
+   PREMIUM FX (V9)
+═══════════════════════════════════════════════════ */
+/* Reveal-on-Scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.10s; }
+.reveal-delay-2 { transition-delay: 0.20s; }
+.reveal-delay-3 { transition-delay: 0.30s; }
+.reveal-delay-4 { transition-delay: 0.40s; }
+
+/* Tilt Cards (Workflow + Features) */
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+/* Magnetic Buttons */
+.magnetic { transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+/* Number-Counter Hero Stat */
+.hero-stat-strip {
+  display: flex; gap: 0;
+  margin-top: 56px;
+  padding: 22px 0 0;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.hero-stat {
+  flex: 1; min-width: 130px;
+  padding: 0 18px;
+  border-right: 1px solid var(--border);
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.hero-stat-num .small { font-size: 14px; opacity: 0.7; }
+.hero-stat-label {
+  font-size: 11.5px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Gold Shimmer on emphasised text */
+.shimmer-gold {
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-bright) 25%, #fff 50%, var(--gold-bright) 75%, var(--gold) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-flow 4s linear infinite;
+}
+@keyframes shimmer-flow {
+  to { background-position: 200% 0; }
+}
+
+/* Smooth fade on hover for feature cards */
+.feature {
+  position: relative;
+  overflow: hidden;
+}
+.feature::before {
+  content: '';
+  position: absolute;
+  top: var(--mouse-y, 50%);
+  left: var(--mouse-x, 50%);
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(201,168,76,0.16), transparent 65%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.feature:hover::before { opacity: 1; }
+.feature > * { position: relative; z-index: 1; }
+
+/* ═══════════════════════════════════════════════════
+   THREE WAYS SECTION (V10) — unter dem Slider
+═══════════════════════════════════════════════════ */
+.three-ways-section {
+  position: relative;
+  padding: 80px 0 30px;
+  text-align: center;
+}
+.three-ways-section .section-head {
+  max-width: 720px; margin: 0 auto;
+}
+.three-ways-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 60px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* ═══════════════════════════════════════════════════
+   LOGO EFFECTS (V10)
+═══════════════════════════════════════════════════ */
+
+.nav-logo {
+  position: relative;
+  transition: filter 0.4s ease;
+}
+
+/* Footer-Logo — ähnlicher Effekt aber dezenter */
+.footer-logo {
+  transition: filter 0.4s ease, transform 0.4s ease;
+  filter: brightness(0.95) saturate(0.95);
+}
+.footer-logo:hover {
+  filter: brightness(1.08) saturate(1.05);
+  transform: scale(1.03);
+}
+
+/* ═══════════════════════════════════════════════════
+   STORY-SLIDER VERBESSERUNGEN (V10)
+═══════════════════════════════════════════════════ */
+.story-slide {
+  overflow-y: auto;
+  padding-right: 12px;
+}
+.story-slide::-webkit-scrollbar { width: 4px; }
+.story-slide::-webkit-scrollbar-track { background: transparent; }
+.story-slide::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.4); border-radius: 2px; }
+.story-slide::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ═══════════════════════════════════════════════════
+   PRICING SECTION — animierter Border-Glow (V10)
+═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   PRICING SECTION — V11 Cool
+═══════════════════════════════════════════════════ */
+/* Plugin-internen Header (.dp-header) ausblenden — wird durch eigenen Section-Header ersetzt */
+#pricing-host .dp-header { display: none !important; }
+#pricing-host .dp-pricing { padding-top: 0 !important; }
+.section.pricing {
+  position: relative;
+  padding-top: 100px;
+  overflow: hidden;
+}
+.section.pricing > .container:first-child {
+  position: relative;
+  z-index: 2;
+}
+.section.pricing::before {
+  content: '';
+  position: absolute;
+  top: 40px; left: 5%; right: 5%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.55), transparent);
+  background-size: 200% 100%;
+  animation: pricing-line-flow 6s linear infinite;
+}
+.section.pricing::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px; height: 900px;
+  background: radial-gradient(circle, rgba(201,168,76,0.06), transparent 60%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  animation: pricing-pulse 8s ease-in-out infinite;
+}
+@keyframes pricing-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+/* Plugin-Cards (dp-card) Hover-Glow */
+#pricing-host .dp-card {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.4s ease,
+              border-color 0.4s ease;
+}
+#pricing-host .dp-card:hover {
+  transform: translateY(-4px) scale(1.005);
+  border-color: rgba(201,168,76,0.55) !important;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(201, 168, 76, 0.18),
+    inset 0 0 0 1px rgba(201, 168, 76, 0.3);
+}
+
+/* Credit-Cards Hover */
+#pricing-host .dp-credit {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.35s ease,
+              border-color 0.35s ease !important;
+  position: relative;
+}
+#pricing-host .dp-credit:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4),
+              0 0 36px rgba(201, 168, 76, 0.15) !important;
+}
+
+/* Plugin-CTA-Buttons goldener Pulse */
+#pricing-host .dp-card-cta {
+  position: relative;
+  overflow: hidden;
+}
+#pricing-host .dp-card-cta::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.6s ease;
+}
+#pricing-host .dp-card-cta:hover::before {
+  left: 100%;
+}
+@keyframes pricing-line-flow {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════
+   FEATURE-CARD SPOTLIGHT (V10)
+   Zusätzlich zum Tilt — Spotlight folgt dem Cursor
+═══════════════════════════════════════════════════ */
+.feature {
+  background: var(--bg-card);
+  background-image:
+    radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(201,168,76,0.10),
+      transparent 65%);
+  transition: background-color 0.3s, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Feature-Border-Glow auf Hover */
+.feature {
+  position: relative;
+}
+.feature::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--gold), transparent 40%, transparent 60%, var(--gold));
+  border-radius: 16px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s;
+  pointer-events: none;
+}
+.feature:hover::after { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════
+   FOOTER STAR-FIELD (V10)
+   Kleine glitzernde Punkte im Footer-Hintergrund
+═══════════════════════════════════════════════════ */
+.footer {
+  position: relative;
+  overflow: hidden;
+}
+.footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 12% 22%, rgba(201,168,76,0.7) 0.5px, transparent 1px),
+    radial-gradient(circle at 28% 65%, rgba(201,168,76,0.5) 0.5px, transparent 1px),
+    radial-gradient(circle at 45% 18%, rgba(201,168,76,0.8) 0.5px, transparent 1px),
+    radial-gradient(circle at 62% 78%, rgba(201,168,76,0.6) 0.5px, transparent 1px),
+    radial-gradient(circle at 78% 35%, rgba(201,168,76,0.7) 0.5px, transparent 1px),
+    radial-gradient(circle at 91% 60%, rgba(201,168,76,0.5) 0.5px, transparent 1px),
+    radial-gradient(circle at 8% 82%, rgba(201,168,76,0.4) 0.5px, transparent 1px),
+    radial-gradient(circle at 55% 45%, rgba(201,168,76,0.65) 0.5px, transparent 1px),
+    radial-gradient(circle at 35% 88%, rgba(201,168,76,0.55) 0.5px, transparent 1px),
+    radial-gradient(circle at 72% 12%, rgba(201,168,76,0.5) 0.5px, transparent 1px);
+  background-size: 100% 100%;
+  animation: stars-twinkle 8s ease-in-out infinite alternate;
+  pointer-events: none;
+  opacity: 0.6;
+}
+@keyframes stars-twinkle {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.75; }
+}
+
+/* Aurora-Ribbon oben am Footer */
+.footer::after {
+  content: '';
+  position: absolute;
+  top: -1px; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(201,168,76,0.4) 25%,
+    rgba(232,200,120,0.7) 50%,
+    rgba(201,168,76,0.4) 75%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: aurora-flow 8s linear infinite;
+}
+@keyframes aurora-flow {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Footer-Tagline mit dezentem Hover-Effekt */
+.footer-tagline {
+  transition: color 0.3s;
+}
+
+.footer-col a {
+  position: relative;
+  padding-left: 0;
+  transition: color 0.2s, padding-left 0.25s;
+}
+.footer-col a::before {
+  content: '→';
+  position: absolute;
+  left: -16px; top: 0;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.25s, left 0.25s;
+}
+.footer-col a:hover {
+  padding-left: 6px;
+}
+.footer-col a:hover::before {
+  opacity: 1;
+  left: -4px;
+}
+
+/* ═══════════════════════════════════════════════════
+   GLITCH-FREE SMOOTH SCROLLBAR (V10)
+═══════════════════════════════════════════════════ */
+html { scroll-behavior: smooth; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-obsidian); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--gold), var(--gold-bright));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gold-bright); }
+
+/* ═══════════════════════════════════════════════════
+   SECTION-TRANSITIONS (V10)
+═══════════════════════════════════════════════════ */
+.section, .three-ways-section, .story-slider-section {
+  position: relative;
+}
+
+/* Workflow steps: pulse-glow on number */
+.workflow-num {
+  position: relative;
+  display: inline-block;
+}
+.workflow-step::before {
+  background: linear-gradient(90deg, var(--gold), rgba(201,168,76,0.1));
+  background-size: 200% 100%;
+}
+.workflow-step:hover::before {
+  animation: workflow-line-glow 1.5s linear infinite;
+}
+@keyframes workflow-line-glow {
+  0% { background-position: 0% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════
+   RATE-TILES — Glow on Hover (V10)
+═══════════════════════════════════════════════════ */
+.rate-tile {
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: default;
+}
+.rate-tile:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  box-shadow: 0 8px 24px rgba(201,168,76,0.20),
+              0 0 40px rgba(201,168,76,0.08);
+}
+.rate-tile:hover .rate-val {
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* RESPONSIVE */
+@media (max-width: 720px) {
+  .story-slider { padding: 32px 24px 20px; }
+  .story-slide-scene { font-size: 17px; padding-left: 16px; }
+  .story-slide-num { font-size: 30px; }
+  .story-slider-controls { gap: 10px; }
+  .story-arrow { width: 38px; height: 38px; }
+  .hero-stat { min-width: 50%; padding: 12px; }
+  .hero-stat-num { font-size: 24px; }
+}
+@media (max-width: 1024px) {
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .entry-grid { grid-template-columns: 1fr; gap: 16px; }
+  .workflow-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 18px; }
+  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+  .pricing-extras { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+@media (max-width: 720px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .workflow-grid { grid-template-columns: 1fr; gap: 24px; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .pricing-extra-grid { grid-template-columns: 1fr; }
+  .rates-grid { grid-template-columns: 1fr 1fr; }
+  .nav-links a:not(.nav-cta) { display: none; }
+  .nav-logo { height: 56px; }
+  .section { padding: 72px 0; }
+  .hero { padding: 64px 0 80px; }
+  .hero-bg-image { background-position: center; opacity: 0.40; }
+  .cta-final { padding: 80px 0; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-logo { height: 44px; }
+  .hero-ctas { flex-direction: column; align-items: stretch; }
+  .btn-primary, .btn-secondary { justify-content: center; }
+  .yearly-bonus { grid-template-columns: 1fr; gap: 14px; text-align: center; }
+  .yearly-bonus-icon { margin: 0 auto; }
+  .yearly-bonus-list { justify-content: center; }
+}
+
+
+/* V203: WOW-Effekt Premium für Hero-Section (Gold-Orb + Blitz hinter Logo + Partikel) */
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.wow-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wow-glow-orb {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+              rgba(201, 168, 76, 0.35) 0%,
+              rgba(201, 168, 76, 0.12) 35%,
+              transparent 70%);
+  opacity: 0;
+  filter: blur(20px);
+  animation: wow-orb-pulse 7s ease-out infinite;
+}
+
+@keyframes wow-orb-pulse {
+  0%, 88%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  3% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+  10% { opacity: 0.6; }
+  20% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+.wow-bolt {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%) rotate(3deg);
+  width: 4px;
+  height: 70%;
+  background: linear-gradient(180deg,
+              transparent 0%,
+              rgba(255, 250, 240, 1) 20%,
+              rgba(255, 235, 180, 1) 50%,
+              rgba(201, 168, 76, 0.6) 80%,
+              transparent 100%);
+  filter: drop-shadow(0 0 16px rgba(255, 250, 240, 1))
+          drop-shadow(0 0 32px rgba(201, 168, 76, 0.8));
+  opacity: 0;
+  border-radius: 2px;
+  animation: wow-bolt-strike 7s ease-out infinite;
+}
+
+@keyframes wow-bolt-strike {
+  0%, 88%, 100% { opacity: 0; }
+  2% { opacity: 1; transform: translateX(-50%) rotate(3deg) scaleY(0.3); }
+  4% { opacity: 1; transform: translateX(-50%) rotate(3deg) scaleY(1); }
+  7% { opacity: 0.7; }
+  10% { opacity: 0; }
+}
+
+.wow-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 235, 180, 1);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 6px rgba(255, 235, 180, 1));
+  opacity: 0;
+}
+
+.wow-particle.p1 { top: 35%; left: 22%; animation: wow-particle 6s ease-out infinite; animation-delay: 0.8s; }
+.wow-particle.p2 { top: 55%; left: 78%; animation: wow-particle 6s ease-out infinite; animation-delay: 2.1s; }
+.wow-particle.p3 { top: 70%; left: 30%; animation: wow-particle 6s ease-out infinite; animation-delay: 3.4s; }
+.wow-particle.p4 { top: 28%; left: 72%; animation: wow-particle 6s ease-out infinite; animation-delay: 4.7s; }
+.wow-particle.p5 { top: 60%; left: 50%; animation: wow-particle 6s ease-out infinite; animation-delay: 1.4s; }
+
+@keyframes wow-particle {
+  0%, 92%, 100% { opacity: 0; transform: scale(0); }
+  10% { opacity: 1; transform: scale(2); }
+  50% { opacity: 0.5; transform: translateY(-40px) scale(1); }
+  92% { opacity: 0; transform: translateY(-60px) scale(0.3); }
+}
+
+/* Hero-Content über alle WOW-Layer */
+.hero-content,
+.hero-stat-strip,
+.nav-brand {
+  position: relative;
+  z-index: 10;
+}
+
+
+
+/* V206: Cinematic-Intro mit Single-Container Logo (PNG bis Rahmen) */
+
+@property --shooter-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+#dp-intro-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, #1a1408 0%, #0a0a0a 60%, #050505 100%);
+  z-index: 99999;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#dp-intro-overlay.dp-intro-done {
+  animation: dp-intro-fadeout 1s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes dp-intro-fadeout {
+  0% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+.dp-intro-skip {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: rgba(255,255,255,0.6);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 100010;
+  transition: all 0.3s ease;
+  opacity: 0;
+  animation: dp-skip-in 0.5s ease-out 1.5s forwards;
+}
+
+.dp-intro-skip:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+@keyframes dp-skip-in {
+  to { opacity: 1; }
+}
+
+/* === Logo-Container im Intro: GLEICHER LOOK wie App === */
+/* PNG bis zum Rahmen, EIN Border, Sternschnuppe + Sparkle drauf */
+.dp-intro-logo-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.2) rotate(-90deg);
+  opacity: 0;
+  filter: blur(20px);
+  z-index: 100000;
+  pointer-events: none;
+}
+
+.dp-intro-logo {
+  position: relative;
+  border: 1.5px solid rgba(201, 168, 76, 0.5);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0d0a04 0%, #1a1408 100%);
+  overflow: visible;
+}
+
+.dp-intro-logo img {
+  height: 240px;
+  width: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+/* Sternschnuppe direkt auf der Border */
+.dp-intro-logo::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 14px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--shooter-angle, 0deg),
+    transparent 0deg,
+    rgba(168, 134, 30, 0.2) 200deg,
+    rgba(232, 200, 120, 0.7) 290deg,
+    rgba(255, 240, 200, 1) 340deg,
+    rgba(255, 255, 240, 1) 355deg,
+    rgba(255, 240, 200, 1) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  filter: drop-shadow(0 0 10px rgba(255, 250, 240, 1))
+          drop-shadow(0 0 24px rgba(232, 200, 120, 0.8));
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Sparkle ✦ am Kopf */
+.dp-intro-logo::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  top: 50%;
+  left: 50%;
+  margin: -11px 0 0 -11px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 0 L13 11 L24 12 L13 13 L12 24 L11 13 L0 12 L11 11 Z' fill='%23fff8e0'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  --orbit-radius: 200px;
+  transform: rotate(var(--shooter-angle, 0deg)) translate(var(--orbit-radius), 0) rotate(calc(-1 * var(--shooter-angle, 0deg)));
+  transform-origin: center;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 1))
+          drop-shadow(0 0 14px rgba(255, 235, 180, 1));
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+}
+
+/* === Animation-Phasen === */
+
+/* Logo-Crash 2.8s → 4.3s */
+#dp-intro-overlay.dp-intro-play .dp-intro-logo-wrap {
+  animation: dp-intro-logo-arrival 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) 2.8s forwards;
+}
+
+@keyframes dp-intro-logo-arrival {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-90deg); filter: blur(20px); }
+  60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(0deg); filter: blur(0); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); filter: blur(0); }
+}
+
+/* Phase 1 (4.3-7.3s): Schnelle Sternschnuppe + Sparkle, 3s pro Runde × 2 Runden */
+#dp-intro-overlay.dp-intro-phase-1 .dp-intro-logo::before,
+#dp-intro-overlay.dp-intro-phase-1 .dp-intro-logo::after {
+  opacity: 1;
+  animation: dp-intro-orbit-fast 3s linear infinite;
+}
+
+@keyframes dp-intro-orbit-fast {
+  0%   { --shooter-angle: 0deg; }
+  100% { --shooter-angle: 360deg; }
+}
+
+/* Phase 2 (7.3-8.3s): Mini-Blitz Crossfade */
+.dp-intro-mini-bolt {
+  position: absolute;
+  top: -5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 110%;
+  background: linear-gradient(180deg, transparent, #fff 40%, var(--gold-bright) 60%, transparent);
+  filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 40px var(--gold-bright));
+  opacity: 0;
+  z-index: 100006;
+  pointer-events: none;
+}
+
+#dp-intro-overlay.dp-intro-phase-2 .dp-intro-mini-bolt {
+  animation: dp-intro-mini-bolt 0.6s ease-out forwards;
+}
+
+@keyframes dp-intro-mini-bolt {
+  0%   { opacity: 0; transform: translateX(-50%) scaleY(0.1); }
+  40%  { opacity: 1; transform: translateX(-50%) scaleY(1); }
+  100% { opacity: 0; }
+}
+
+/* === Side-Bolts, Shockwave, Flash, Mega-Bolt === */
+.dp-intro-bolt-side {
+  position: absolute;
+  top: -5%;
+  width: 3px;
+  height: 110%;
+  background: linear-gradient(180deg, transparent, #fff 30%, var(--gold-bright) 60%, transparent);
+  filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 40px var(--gold-bright));
+  opacity: 0;
+  z-index: 100002;
+  pointer-events: none;
+}
+
+.dp-intro-bolt-1 { left: 18%; transform: rotate(-8deg); }
+.dp-intro-bolt-2 { left: 60%; transform: rotate(5deg); }
+.dp-intro-bolt-3 { left: 85%; transform: rotate(-3deg); }
+
+#dp-intro-overlay.dp-intro-play .dp-intro-bolt-side {
+  animation: dp-intro-side-bolt 0.6s ease-out forwards;
+}
+
+#dp-intro-overlay.dp-intro-play .dp-intro-bolt-2 { animation-delay: 0.6s; }
+#dp-intro-overlay.dp-intro-play .dp-intro-bolt-3 { animation-delay: 1.2s; }
+
+@keyframes dp-intro-side-bolt {
+  0%   { opacity: 0; transform: scaleY(0.1); }
+  30%  { opacity: 1; transform: scaleY(1); }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.dp-intro-shockwave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  border: 4px solid var(--gold);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  box-shadow: 0 0 40px var(--gold), inset 0 0 30px var(--gold);
+  opacity: 0;
+  z-index: 100003;
+  pointer-events: none;
+}
+
+#dp-intro-overlay.dp-intro-play .dp-intro-shockwave {
+  animation: dp-intro-shockwave 2.2s ease-out 2.3s forwards;
+}
+
+@keyframes dp-intro-shockwave {
+  0%   { transform: translate(-50%, -50%) scale(0); opacity: 1; border-width: 6px; }
+  100% { transform: translate(-50%, -50%) scale(8); opacity: 0; border-width: 1px; }
+}
+
+.dp-intro-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, #fff 0%, var(--gold-bright) 30%, transparent 70%);
+  opacity: 0;
+  z-index: 100004;
+  pointer-events: none;
+}
+
+#dp-intro-overlay.dp-intro-play .dp-intro-flash {
+  animation: dp-intro-flash 0.6s ease-out 2.5s forwards;
+}
+
+@keyframes dp-intro-flash {
+  0% { opacity: 0; }
+  40% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.dp-intro-mega-bolt {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%) rotate(2deg);
+  width: 6px;
+  height: 120%;
+  background: linear-gradient(180deg, transparent, #fff 20%, var(--gold-bright) 50%, #fff 80%, transparent);
+  filter: drop-shadow(0 0 30px #fff) drop-shadow(0 0 60px var(--gold-bright));
+  opacity: 0;
+  z-index: 100005;
+  pointer-events: none;
+}
+
+#dp-intro-overlay.dp-intro-play .dp-intro-mega-bolt {
+  animation: dp-intro-mega-bolt 0.7s ease-out 2.6s forwards;
+}
+
+@keyframes dp-intro-mega-bolt {
+  0%   { opacity: 0; transform: translateX(-50%) rotate(2deg) scaleY(0.1); }
+  30%  { opacity: 1; transform: translateX(-50%) rotate(2deg) scaleY(1); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Vortex-Partikel (per JS spawned) */
+.dp-intro-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 6px var(--gold));
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  z-index: 100001;
+  pointer-events: none;
+}
+
+#dp-intro-overlay.dp-intro-play .dp-intro-particle {
+  animation: dp-intro-vortex 3.5s ease-in-out forwards;
+}
+
+@keyframes dp-intro-vortex {
+  0%   { opacity: 0; transform: translate(var(--sx, 0), var(--sy, 0)) scale(0) rotate(0deg); }
+  15%  { opacity: 1; transform: translate(var(--sx), var(--sy)) scale(2) rotate(0deg); }
+  70%  { opacity: 1; transform: translate(0, 0) scale(0.5) rotate(540deg); }
+  100% { opacity: 0; transform: translate(0, 0) scale(0); }
+}
+
+/* Reduced-Motion */
+@media (prefers-reduced-motion: reduce) {
+  #dp-intro-overlay { display: none !important; }
+}
+
+</style>
+</head>
+<body>
+<!-- V206: Cinematic-Intro mit Single-Container Logo -->
+<div id="dp-intro-overlay" aria-hidden="true">
+  <!-- Phase 1 Effekte: Vortex + Blitze + Shockwave + Flash + Mega-Bolt -->
+  <div class="dp-intro-bolt-side dp-intro-bolt-1"></div>
+  <div class="dp-intro-bolt-side dp-intro-bolt-2"></div>
+  <div class="dp-intro-bolt-side dp-intro-bolt-3"></div>
+  <div class="dp-intro-shockwave"></div>
+  <div class="dp-intro-flash"></div>
+  <div class="dp-intro-mega-bolt"></div>
+
+  <!-- Logo (Single-Container, PNG bis Rahmen, Sternschnuppe + Sparkle direkt drauf) -->
+  <div class="dp-intro-logo-wrap">
+    <div class="dp-intro-logo">
+      <img src="assets/dealpilot-logo.png" alt="DealPilot" />
+    </div>
+  </div>
+
+  <!-- Phase 2 Mini-Blitz -->
+  <div class="dp-intro-mini-bolt"></div>
+
+  <button class="dp-intro-skip" type="button" onclick="dpIntroSkip()">Skip ›</button>
+</div>
+<script>
+(function() {
+  try {
+    if (sessionStorage.getItem('dp_intro_shown') === '1') {
+      var ov = document.getElementById('dp-intro-overlay');
+      if (ov) ov.style.display = 'none';
+      return;
+    }
+  } catch(e) {}
+
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var ov = document.getElementById('dp-intro-overlay');
+    if (ov) ov.style.display = 'none';
+    return;
+  }
+
+  var overlay = document.getElementById('dp-intro-overlay');
+  if (!overlay) return;
+
+  // 100 Vortex-Partikel
+  for (var i = 0; i < 100; i++) {
+    var p = document.createElement('div');
+    p.className = 'dp-intro-particle';
+    var angle = (Math.PI * 2 * i) / 100 + Math.random() * 0.6;
+    var dist = 300 + Math.random() * 400;
+    p.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+    p.style.animationDelay = (Math.random() * 0.6) + 's';
+    overlay.insertBefore(p, overlay.firstChild);
+  }
+
+  function ended() {
+    overlay.classList.add('dp-intro-done');
+    try { sessionStorage.setItem('dp_intro_shown', '1'); } catch(e) {}
+    setTimeout(function() { overlay.style.display = 'none'; }, 1100);
+  }
+
+  // Phase 0: Sequenz startet
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      overlay.classList.add('dp-intro-play');
+    });
+  });
+
+  // Phase 1: Sternschnuppe + Sparkle ab 4.3s (nach Logo-Bounce)
+  setTimeout(function() {
+    overlay.classList.add('dp-intro-phase-1');
+  }, 4300);
+
+  // Phase 2: Mini-Blitz ab 7.3s (Sternschnuppe lief 3s = 1 Runde, schnell)
+  setTimeout(function() {
+    overlay.classList.add('dp-intro-phase-2');
+  }, 7300);
+
+  // Ende bei 8.0s
+  setTimeout(ended, 8000);
+
+  window.dpIntroSkip = function() { ended(); };
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target.classList.contains('dp-intro-skip')) return;
+    window.dpIntroSkip();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') window.dpIntroSkip();
+  });
+})();
+</script>
+
+
+<div class="bg-animated" aria-hidden="true">
+  <canvas class="bg-particles" id="bg-particles"></canvas>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+
+<!-- Cursor-Follow-Glow -->
+<div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
+
+<div class="page-content">
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="assets/dealpilot-logo.png" alt="DealPilot by Junker Immobilien" class="nav-logo">
+    </a>
+    <div class="nav-links">
+      <a href="#workflow">So funktioniert's</a>
+      <a href="#features">Features</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a>
+      <a href="#pricing">Preise</a>
+      <a href="https://app.staging.dealpilot.junker-immobilien.io/">Login</a>
+      <a href="https://app.staging.dealpilot.junker-immobilien.io/?register=1" class="nav-cta">Kostenlos starten →</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+    <!-- V203: WOW-Effekt Layer (Gold-Orb + Blitz + Partikel) -->
+  <div class="wow-layer" aria-hidden="true">
+    <div class="wow-glow-orb"></div>
+    <div class="wow-bolt"></div>
+    <div class="wow-particle p1"></div>
+    <div class="wow-particle p2"></div>
+    <div class="wow-particle p3"></div>
+    <div class="wow-particle p4"></div>
+    <div class="wow-particle p5"></div>
+  </div>
+<div class="hero-bg-image" aria-hidden="true"></div>
+  <div class="hero-bg-overlay" aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-content">
+      <span class="hero-eyebrow">
+        <span class="dot"></span>
+        Immobilien-Investmentanalyse · Coming Soon
+      </span>
+      <h1 class="hero-title">
+        Immobilienentscheidungen<br>
+        sind zu groß für<br>
+        <span class="accent">ein Bauchgefühl.</span>
+      </h1>
+      <p class="hero-lead">
+        DealPilot zeigt dir in Minuten, was bei jeder Immobilie wirklich zählt:
+        Cashflow, Rendite, Werbungskosten, Risiko und die Argumente für die Bank.
+        Datenbasiert. Klar. Bankfähig.
+      </p>
+      <div class="hero-ctas">
+        <a href="https://app.staging.dealpilot.junker-immobilien.io/?register=1" class="btn-primary magnetic">Kostenlos starten →</a>
+        <a href="#workflow" class="btn-secondary magnetic">So funktioniert's</a>
+      </div>
+
+      <!-- Hero Stat Strip mit Number-Countern -->
+      <div class="hero-stat-strip">
+        <div class="hero-stat reveal">
+          <div class="hero-stat-num"><span data-count="30">0</span><span class="small">s</span></div>
+          <div class="hero-stat-label">Vom Exposé zur Bewertung</div>
+        </div>
+        <div class="hero-stat reveal reveal-delay-1">
+          <div class="hero-stat-num"><span data-count="24">0</span></div>
+          <div class="hero-stat-label">KPIs hinter jedem Score</div>
+        </div>
+        <div class="hero-stat reveal reveal-delay-2">
+          <div class="hero-stat-num"><span data-count="15">0</span><span class="small">J.</span></div>
+          <div class="hero-stat-label">Cashflow-Projektion</div>
+        </div>
+        <div class="hero-stat reveal reveal-delay-3">
+          <div class="hero-stat-num"><span data-count="100">0</span><span class="small">%</span></div>
+          <div class="hero-stat-label">Bankfähige Unterlagen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ═══════════════════════════════════════════════════
+     STORY-SLIDER — Geschichten aus dem Investor-Alltag
+     Auto-Advance alle 2 Min, klick zum Skippen, Fortschrittsanzeige
+═══════════════════════════════════════════════════ -->
+<section class="story-slider-section" id="stories">
+  <div class="container-wide">
+    <div class="story-slider-head">
+      <span class="story-slider-eyebrow">// Aus dem Investor-Alltag</span>
+      <h2 class="story-slider-title">Geschichten, die <span class="accent">jeder Investor kennt.</span></h2>
+      <p class="story-slider-lead">Sechzehn Situationen aus dem Investor-Alltag. Auto-Advance alle 60 Sekunden — bei Hover pausiert es, damit du Zeit zum Lesen hast.</p>
+    </div>
+
+    <div class="story-slider" id="story-slider">
+      <div class="story-slide-track" id="story-track">
+
+        <article class="story-slide" data-idx="0">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">01</span>
+            <span class="story-slide-tag">// Der Anruf am Donnerstagabend</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Donnerstag, 19:42 Uhr. Du bist gerade beim Abendessen mit deiner Familie. Dein Bekannter schreibt: Drei-Familien-Haus, Vor-Ort-Termin am Samstag um zehn — und vor dir liegt ein 18-seitiges Exposé."
+          </blockquote>
+          <p class="story-slide-body">
+            Du kennst diese Situation. Jeder, der ernsthaft in Immobilien investiert, kennt sie. Du hast 36 Stunden, um zu wissen, ob du Samstag früh in dein Auto steigst und 280 km zur Besichtigung fährst — oder ob du höflich absagst.
+          </p>
+          <p class="story-slide-body">
+            Vor DealPilot hieß das: Excel auf, 90 Minuten konzentriert tippen, vier Browsertabs mit Mietspiegel, Zinsrechner, AfA-Hilfe und Bundesbank-Zinsstatistik. <strong>Drei Stunden später</strong> hast du eine Excel-Datei, der du nicht ganz vertraust, und ein Bauchgefühl.
+          </p>
+          <p class="story-slide-body">
+            Mit DealPilot ziehst du das Exposé in den <em>PDF-Import</em>. Die KI extrahiert Kaufpreis, Wohnfläche, Baujahr, Adresse, Miete und Hausgeld — in unter 30 Sekunden. Im <em>Quick-Check</em> tippst du deine Finanzierungsannahmen. <strong>Faktor 18,2 — Bruttomietrendite 5,5 % — Cashflow nach Werbungskosten plus 187 € — LTV 87 %.</strong>
+          </p>
+          <p class="story-slide-body">
+            Du gehst zurück zum Tisch. Sagst „Ja, gern noch ein Glas". Und am Samstag stehst du rechtzeitig auf dem Hof — mit einem informierten Bauchgefühl, nicht einem blinden.
+          </p>
+          <div class="story-slide-payoff">PDF-Import + Quick-Check · 4 Minuten statt 3 Stunden</div>
+        </article>
+
+        <article class="story-slide" data-idx="1">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">02</span>
+            <span class="story-slide-tag">// Die 15-%-Falle</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Im ersten Jahr: 24.000 € fürs Dach, 12.000 € neue Heizung, 18.000 € drei Bäder. Du freust dich, das alles im ersten Jahr als Werbungskosten absetzen zu können."
+          </blockquote>
+          <p class="story-slide-body">
+            Sechs Monate später sitzt dein Steuerberater dir gegenüber und sagt den Satz, den kein Investor hören will: <em>„Das müssen wir aktivieren. Sie sind über der 15-%-Grenze."</em>
+          </p>
+          <p class="story-slide-body">
+            <strong>Anschaffungsnahe Herstellungskosten.</strong> Wenn du in den ersten drei Jahren nach Kauf mehr als 15 % der Gebäude-Anschaffungskosten in Instandsetzung steckst, gelten die Beträge nicht mehr als sofort absetzbare Werbungskosten — sie werden über die Restnutzungsdauer abgeschrieben. Aus 54.000 € sofortigem Werbungskostenabzug werden über 40 Jahre verteilt. Das frisst deinen Cashflow im ersten Jahr — und du hast es schlicht nicht gewusst.
+          </p>
+          <p class="story-slide-body">
+            DealPilot kennt diese Falle. Während du Sanierungsbeträge im Investitionsmodul eingibst, läuft im Hintergrund ein Balken, der dir <em>live</em> zeigt: „Du bist bei 11 % deiner Gebäude-AK. Spielraum: 13.400 €." Überschreitest du die Grenze, springt die Anzeige auf Rot.
+          </p>
+          <p class="story-slide-body">
+            Ein einziger Hinweis. Ein roter Balken. Und du sparst dir den Termin mit dem Steuerberater, bei dem dir <strong>fünfstellige Liquidität durch die Lappen gehen</strong>.
+          </p>
+          <div class="story-slide-payoff">Live-Balken im Investitionsmodul · Fünfstellige Steuerfalle vermieden</div>
+        </article>
+
+        <article class="story-slide" data-idx="2">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">03</span>
+            <span class="story-slide-tag">// Das Bankgespräch</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Mittwochabend, 21:14 Uhr. Mail von deiner Filialleiterin. Sie braucht den vollständigen Investment-Case bis morgen 9 Uhr — sonst rutscht dein Termin am Freitag aus dem Ressort."
+          </blockquote>
+          <p class="story-slide-body">
+            Du hast noch keine einzige Seite formatiert. Banker brauchen <strong>strukturierte Unterlagen</strong> — nicht eine Excel mit 20 Tabs und drei Farbschemata. Nicht eine handgetippte Word-Datei. Sondern eine ordentlich gegliederte Vorlage, in der die Bank in unter zehn Minuten sieht: Was wird gekauft, was kostet's, wie ist es finanziert, wie sieht der Cashflow aus, was passiert am Ende der Zinsbindung — und warum ist das Risiko vertretbar.
+          </p>
+          <p class="story-slide-body">
+            DealPilot baut diese Vorlage automatisch. Sobald du alle Module ausgefüllt hast, bekommst du mit einem Klick einen vollständigen <em>Investment-Case</em>: Deckblatt mit Titelfoto und vier Cover-KPIs. Executive Summary mit Cashflow-Szenario heute, Ende Zinsbindung und Anschluss. Eine Seite Objekt &amp; Finanzierungsstruktur. 15-Jahres-Cashflow-Projektion. KI-Analyse als Fließtext. Annahmen und Disclaimer.
+          </p>
+          <p class="story-slide-body">
+            <strong>Sechs Seiten. Vollständig. Bankfähig.</strong> Du klickst, du lädst hoch, du gehst ins Bett. Am Donnerstag 8:53 Uhr versendet. Am Freitag im Termin: die Beraterin hat schon Notizen am Rand. Das ist der Unterschied zwischen einem Kunden, der vorbereitet kommt, und einem, der drei Termine später noch verhandeln muss.
+          </p>
+          <div class="story-slide-payoff">Investment-Case mit einem Klick · 6 Seiten bankfähig</div>
+        </article>
+
+        <article class="story-slide" data-idx="3">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">04</span>
+            <span class="story-slide-tag">// Die Verhandlung</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Du hast ein Objekt gefunden, das passt. Der Eigentümer verlangt 485.000 €. Dein Bauchgefühl sagt: zu teuer. Aber wie viel zu teuer? Und mit welcher Begründung verhandelst du, ohne gleich rausgeschmissen zu werden?"
+          </blockquote>
+          <p class="story-slide-body">
+            Verhandlung ohne Daten ist Pokern. Verhandlung mit Daten ist Schach. DealPilot rechnet dir aus, welcher Kaufpreis bei deinen Annahmen welche Rendite ergibt. Du siehst sofort: Bei 485.000 € landest du bei 4,2 % Bruttomietrendite und einem Cashflow von minus 87 €. Bei 455.000 € sind es 4,5 % und plus 34 €. Bei 425.000 € sind es 4,8 % und plus 156 €.
+          </p>
+          <p class="story-slide-body">
+            Mit dieser Information startest du die <em>KI-Investment-Analyse</em>. Die KI nimmt deine Zahlen, recherchiert die Lage im Web, vergleicht mit ähnlichen Verkäufen und sagt dir: <strong>Erstangebot 410.000 € — Zielpreis 430.000 € — Schmerzgrenze 455.000 €.</strong> Plus eine fertige Kaufpreis-Offerte als Text, formell gehalten, mit Begründungen für die E-Mail an den Verkäufer. Plus fünf Argumente für die Bank, warum dein Angebot vertretbar ist.
+          </p>
+          <p class="story-slide-body">
+            Du verhandelst nicht mehr aus dem Bauch. Du verhandelst mit Zahlen, die du belegen kannst. Verkäufer respektieren begründete Argumente. <strong>Du fängst die Verhandlung mit drei Schritten Vorsprung an.</strong>
+          </p>
+          <div class="story-slide-payoff">KI-Verhandlungsempfehlung · konkrete Euro-Beträge</div>
+        </article>
+
+        <article class="story-slide" data-idx="4">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">05</span>
+            <span class="story-slide-tag">// Ende der Zinsbindung</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Zehn Jahre nach Kauf. Du sitzt mit deinem Berater zusammen. Die Bank schlägt 5,2 % für die Anschlussfinanzierung vor — du hattest 2,1 % bei Abschluss. Du fragst dich: Hält mein Cashflow das aus? Oder muss ich verkaufen?"
+          </blockquote>
+          <p class="story-slide-body">
+            Das ist <strong>die wichtigste Frage, die die wenigsten Investoren rechtzeitig stellen.</strong> Wer 2015 mit 1,8 % gekauft hat, wer 2017 mit 1,4 % refinanziert hat, wer 2019 das Maximaltilgungspaket gewählt hat — der kann 2026 in eine Anschlussfinanzierung rutschen, bei der die monatliche Rate sich verdoppelt. Wer das nicht durchgerechnet hat, schaut blass auf die Zahlen.
+          </p>
+          <p class="story-slide-body">
+            DealPilot rechnet diesen Stresstest <em>von Anfang an</em> mit. Du gibst eine Annahme für den Anschlusszins ein — etwa „aktueller Marktzins plus 1,5 %" — und siehst sofort: Wie hoch ist die neue Rate? Wie verändert sich der Cashflow? Trägt die aktuelle Miete die Belastung? Rutscht das Objekt in den negativen Bereich?
+          </p>
+          <p class="story-slide-body">
+            Wenn der Stresstest zeigt, dass dein Objekt eine Anschlussfinanzierung bei 5 oder 6 % nicht überlebt: weißt du es <strong>zehn Jahre vorher.</strong> Du hast Zeit zu reagieren — Sondertilgung erhöhen, Miete anpassen, Bausparvertrag einrichten, notfalls vor der Anschlussfinanzierung verkaufen. Das ist kein Pessimismus. Das ist Risikomanagement, das die Bank von dir erwartet.
+          </p>
+          <div class="story-slide-payoff">Anschluss-Stresstest · Tilgungsplan über volle Laufzeit</div>
+        </article>
+
+        <article class="story-slide" data-idx="5">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">06</span>
+            <span class="story-slide-tag">// 24 KPIs. Eine Zahl.</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Du hast drei Objekte zur Auswahl. Alle drei sehen auf den ersten Blick okay aus. Alle drei haben Stärken, alle drei haben Risiken. Aber welches ist objektiv das beste?"
+          </blockquote>
+          <p class="story-slide-body">
+            Hier kommt der <em>Investor Deal Score 2.0</em> ins Spiel. Eine Bewertung von 0 bis 100, basierend auf <strong>24 Einzelkennzahlen</strong> aus fünf Bereichen — Rendite, Cashflow, Finanzierung, Risiko und Potenzial. Jede Kennzahl mit Schwellenwerten kalibriert aus der Praxis institutioneller Investoren. Jede gibt Punkte. Die Punkte werden mit Bereichs-Gewichten verrechnet. Heraus kommt: <strong>eine Zahl, die du vergleichen kannst.</strong>
+          </p>
+          <p class="story-slide-body">
+            Objekt A: 73 Punkte. Stärken: starke Rendite, niedriger Kaufpreis-pro-Quadratmeter, gute Lage. Schwäche: kritischer DSCR (1,05). Objekt B: 67 Punkte. Stärken: Top-Lage, niedriger Leerstand. Schwäche: hoher Kaufpreis-Faktor, magere Rendite. Objekt C: <strong>81 Punkte.</strong> Stärken: ausgewogen über alle Bereiche, gute Finanzierungsstruktur, klares Wertsteigerungs-Potenzial.
+          </p>
+          <p class="story-slide-body">
+            Klare Sache — bis du das Kleingedruckte liest. Objekt A punktet genau in dem Bereich, der dir als Cashflow-Investor wichtig ist. Du gewichtest neu. Live-Anzeige aktualisiert sich. Objekt A: 78. Objekt C: 79. <em>Hart umkämpft — aber jetzt begründet.</em>
+          </p>
+          <div class="story-slide-payoff">Deal Score 2.0 · 24 KPIs · Anpassbare Gewichte</div>
+        </article>
+
+        <article class="story-slide" data-idx="6">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">07</span>
+            <span class="story-slide-tag">// Die Folgefinanzierung</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Du betrittst die Bankfiliale für eine Folgefinanzierung. Die Beraterin reicht dir Kaffee und fragt: ‚Wie sieht Ihr Bestand derzeit aus?' Du beginnst, in deinem Kopf zu rechnen — wann hattest du das letzte Mal alle Cashflows zusammengezählt?"
+          </blockquote>
+          <p class="story-slide-body">
+            Wer mehr als zwei Objekte besitzt, kennt diese Frage. Und wer sie ein paarmal bekommen hat, weiß, wie peinlich es ist, wenn man die Antwort schuldig bleibt — oder schlimmer: wenn man eine Antwort gibt und sie sich später als falsch herausstellt.
+          </p>
+          <p class="story-slide-body">
+            DealPilot kennt dein Portfolio. In der Portfolio-Übersicht liegen alle deine Objekte als suchbare, sortierbare Tabelle — Kürzel, Adresse, Kaufpreis, Gesamtinvestition, Rendite, DSCR, LTV, Cashflow, Deal Score. Eine Sidebar zeigt dir auf einen Blick die Highlights jedes Objekts.
+          </p>
+          <p class="story-slide-body">
+            Und das <em>Track-Record-PDF</em>: Ein Bestandsnachweis, den du der Bank in die Hand drückst. Jedes Objekt mit Foto, Kaufpreis, Cashflow, Rendite und Deal Score auf einer kompakten Seite. Plus Portfolio-Aggregate. Statt nervös im Kopf zu rechnen, sagst du: <strong>„Hier ist mein aktueller Track-Record."</strong> Die Beraterin blättert. Lächelt. Du hast die Folgefinanzierung schon zur Hälfte gewonnen.
+          </p>
+          <div class="story-slide-payoff">Portfolio-Übersicht · Track-Record für die Bank</div>
+        </article>
+
+        <article class="story-slide" data-idx="7">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">08</span>
+            <span class="story-slide-tag">// Live-Marktzinsen</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Du sprichst mit deiner Hausbank über die Konditionen. Sie nennt dir 4,1 %. Klingt fair? Oder klingt nur fair, weil du keinen Vergleich hast?"
+          </blockquote>
+          <p class="story-slide-body">
+            DealPilot zeigt dir direkt im Finanzierungs-Tab die <em>aktuellen Effektivzinsen für Wohnungsbaukredite</em> — variabel, 1–5 Jahre, 5–10 Jahre, über 10 Jahre. Daten kommen aus der ECB-MFI-Statistik der Bundesbank, monatlich aktualisiert. Mit Stand-Datum, mit Quelle, ohne Hokuspokus.
+          </p>
+          <p class="story-slide-body">
+            Plus: Vergleichslinks zu Interhyp, Dr. Klein und Baufi24 — damit du deine eigene Konditionen-Anfrage direkt machen kannst und siehst, ob die <strong>4,1 % deiner Hausbank am Markt liegen oder ob du nochmal verhandeln solltest</strong>.
+          </p>
+          <p class="story-slide-body">
+            Eine kleine Funktion. Aber eine, die dich pro Finanzierung mehrere hundert Euro pro Jahr kosten kann, wenn du sie nicht hast. Über zehn Jahre Zinsbindung summiert sich das schnell zu fünfstelligen Beträgen.
+          </p>
+          <div class="story-slide-payoff">Live-Marktzinsen Bundesbank · ECB-MFI-Statistik</div>
+        </article>
+
+        <article class="story-slide" data-idx="8">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">09</span>
+            <span class="story-slide-tag">// Das Steuergespräch</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Mai. Du sitzt beim Steuerberater. Er fragt: ‚Können Sie mir die Werbungskosten für Ihr Mehrfamilienhaus aufschlüsseln? AfA, Schuldzinsen, Bewirtschaftung, Sanierung — alles?'"
+          </blockquote>
+          <p class="story-slide-body">
+            Du beginnst, in deinen Ordnern zu kramen. Belege suchen, Excel öffnen, Schuldzinsen aus dem Tilgungsplan abschreiben, AfA neu berechnen. Eine Stunde Termin, davon 30 Minuten mit dem Aktenkoffer beschäftigt.
+          </p>
+          <p class="story-slide-body">
+            DealPilot generiert dir auf Knopfdruck ein <em>Werbungskosten-PDF</em>: Alle Positionen, sortiert und summiert. <strong>AfA, Schuldzinsen, Bewirtschaftungskosten, Sanierungskosten, Möblierung, Fahrtkosten</strong> — über 15 Jahre projiziert. Mit Tabelle für das aktuelle Jahr, mit Verlaufsdiagramm für die Folgejahre.
+          </p>
+          <p class="story-slide-body">
+            Du legst das PDF auf den Tisch. Steuerberater scannt zwei Minuten durch. „Sehr gut. Den Rest übernehme ich." Dein Termin ist 40 Minuten kürzer — und die <em>Beratungsrechnung entsprechend günstiger.</em>
+          </p>
+          <div class="story-slide-payoff">Werbungskosten-PDF · Belegübersicht für den Steuerberater</div>
+        </article>
+
+        <article class="story-slide" data-idx="9">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">10</span>
+            <span class="story-slide-tag">// Der Bausparvertrag</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Du finanzierst dein nächstes Objekt mit Tilgungsaussetzung über Bausparvertrag. Klingt clever — niedrige Raten, Steuervorteil. Aber: Reicht die Bausparsumme am Ende wirklich, um das Tilgungsaussetzungsdarlehen abzulösen?"
+          </blockquote>
+          <p class="story-slide-body">
+            Das ist die <strong>kritische Lücke, die viele Investoren übersehen.</strong> Wer Tilgungsaussetzungs-Darlehen mit Bausparverträgen kombiniert, fährt einen Zeitstrahl mit zwei Bewegungen: Das Tilgungsaussetzungsdarlehen wächst nicht, der Bausparvertrag spart langsam an. Wenn die Mindest-Quote bei Zuteilung erreicht ist und die Bausparsumme das Hauptdarlehen exakt deckt — perfekt. Wenn nicht — Lücke. Eine Lücke, die du erst in zehn Jahren bemerkst.
+          </p>
+          <p class="story-slide-body">
+            DealPilot bildet den vollen Bausparvertrag-Lebenszyklus ab. <em>Ansparphase, Zuteilungszeitpunkt, Darlehensphase</em> mit dem zugesagten Sollzins. Während du die Werte eingibst, läuft eine Plausibilitätsprüfung im Hintergrund. <strong>Wenn die Bausparsumme nicht reicht, warnt die App.</strong>
+          </p>
+          <p class="story-slide-body">
+            Du gehst nicht mit einem Wunschdenken ins Bankgespräch. Du gehst mit einem durchgerechneten Konzept, das auch in zehn Jahren noch trägt.
+          </p>
+          <div class="story-slide-payoff">Bausparvertrag-Lebenszyklus · Plausibilitätsprüfung</div>
+        </article>
+
+        <article class="story-slide" data-idx="10">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">11</span>
+            <span class="story-slide-tag">// Die KI-Investment-These</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Du hast deine Zahlen. Du hast deinen Score. Aber: Was würde ein erfahrener Investment-Manager dazu sagen? Einer, der nicht müde wird, der nicht höflich ist, der dir alles sagt — auch das, was wehtut?"
+          </blockquote>
+          <p class="story-slide-body">
+            Mit einem Klick startet die <em>KI-Investment-Analyse</em>. Die KI nimmt alle deine Daten — alle Zahlen, alle Kennzahlen, alle Lage-Selbsteinschätzungen — und schickt sie zusammen mit einer Web-Recherche zur Lage an ChatGPT.
+          </p>
+          <p class="story-slide-body">
+            Was du zurückbekommst, ist <strong>strukturierte Investment-Bewertung mit echten Argumenten:</strong> Gesamtbewertung mit klarem Rating („Sehr attraktiv" bis „Ungeeignet"). Stärken und Risiken jeweils 4–5 nummerierte Punkte, ausführlich begründet mit Bezug auf <em>deine echten Zahlen</em>. Risikoanalyse für Finanzierung, Cashflow-Stabilität, Annahmen-Abhängigkeit. Szenario-Analyse Worst Case (Miete −10 %, Zins +1 %) und Best Case durchgerechnet. Investor-Fit-Einschätzung. Klare Empfehlung „Kaufen" / „Prüfen" / „Nicht kaufen" — mit Begründung.
+          </p>
+          <p class="story-slide-body">
+            Plus: <strong>eine konkrete Verhandlungsempfehlung mit Erstangebot, Zielpreis, Schmerzgrenze</strong> — jeweils mit Euro-Betrag. Plus eine fertige Kaufpreis-Offerte als kopierbarer Text. Plus fünf bis sieben Argumente für die Bank. Ein Berater, der in zwei Minuten liefert, wofür du sonst eine Woche Recherche bräuchtest.
+          </p>
+          <div class="story-slide-payoff">KI-Analyse · 9 Output-Sektionen · 1 Credit = 2 Analysen</div>
+        </article>
+
+        <article class="story-slide" data-idx="11">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">12</span>
+            <span class="story-slide-tag">// Das Mieter-Gespräch</span>
+          </div>
+          <blockquote class="story-slide-scene">
+            „Du hast eine Wohnung neu vermietet. 7,80 € pro Quadratmeter. Klingt vernünftig. Aber: Würde der Markt mehr hergeben? Lässt du gerade Geld liegen?"
+          </blockquote>
+          <p class="story-slide-body">
+            Die <em>Mietpreis-Analyse</em> zeigt dir, wie sich deine Miete in € pro Quadratmeter zur lokalen Marktmiete verhält. Sind die 7,80 €/m² in einer Stadt mit Mietspiegel 9,20 €/m² ein Schnäppchen für den Mieter, also Mietsteigerungs-Potenzial? Oder einfach zu niedrig kalkuliert?
+          </p>
+          <p class="story-slide-body">
+            Im Investor- und Pro-Plan kommt die <em>KI-Marktmieten-Recherche</em> dazu: Die KI sucht im Web nach aktuellen Vergleichsangeboten in deiner Lage, schätzt eine plausible Mietbandbreite und nennt dir Quellen. So weißt du nicht nur, was der Mietspiegel sagt — sondern was Vermieter <strong>tatsächlich aktuell verlangen</strong>.
+          </p>
+          <p class="story-slide-body">
+            Bei 84 m² und einer realistischen Marktmiete von 9,00 statt 7,80 €/m² sind das 1.200 € mehr Jahresmiete pro Jahr. <em>Über zehn Jahre 12.000 € — bei verkaufsorientierter Bewertung sogar mehr.</em> Aus „klingt vernünftig" wird „auf dem Tisch."
+          </p>
+          <div class="story-slide-payoff">Mietpreis-Analyse · KI-Marktmieten-Recherche</div>
+        </article>
+
+        <article class="story-slide power-pitch" data-idx="12">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">13</span>
+            <span class="story-slide-tag">// Power-Pitch · Excel vs. DealPilot</span>
+          </div>
+          <blockquote class="story-slide-scene story-slide-scene-bold">
+            „Schluss mit Excel-Voodoo."
+          </blockquote>
+          <p class="story-slide-body">
+            Vor DealPilot: Drei Tabs offen. Mietspiegel googeln. AfA per Hand. Schuldzinsen aus dem Tilgungsplan abschreiben. Hausgeld vergessen, korrigieren. Mietausfall? Vergessen. <strong>Drei Stunden später hast du eine Excel-Datei, der du nicht ganz traust.</strong>
+          </p>
+          <p class="story-slide-body">
+            Mit DealPilot: PDF reinziehen. Sechs Felder prüfen. Übernehmen. <em>Cashflow steht. Score steht. Investment-Case steht.</em> In der Zeit, in der du vorher den Mietspiegel gegoogelt hast, bist du fertig.
+          </p>
+          <p class="story-slide-body">
+            <strong>Eine Plattform. Sieben Module. Null Bauchgefühl.</strong> Das ist der Unterschied zwischen Hobby und Profi.
+          </p>
+          <div class="story-slide-payoff">7 Module verknüpft · keine Excel-Vorlagen mehr</div>
+        </article>
+
+        <article class="story-slide founder-voice" data-idx="13">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">14</span>
+            <span class="story-slide-tag">// Founder-Voice · Warum wir DealPilot gebaut haben</span>
+          </div>
+          <blockquote class="story-slide-scene story-slide-scene-serif">
+            „Vor drei Jahren saß ich an einem Samstagnachmittag in meinem Büro und rechnete mein siebtes Mehrfamilienhaus durch. Sechs Stunden. Für ein Objekt, das ich am Ende nicht gekauft habe."
+          </blockquote>
+          <p class="story-slide-body">
+            Ich bin Immobilien-Sachverständiger. Ich kenne die Zahlen, die zählen. Ich kenne die Stolperfallen. Aber jedes Mal aufs Neue im Excel anfangen, jedes Mal wieder die gleichen Formeln tippen — <em>das ist Zeitverschwendung auf hohem Niveau.</em>
+          </p>
+          <p class="story-slide-body">
+            Also habe ich mir mein eigenes Tool gebaut. Erst nur für mich. Dann für meine Beratungskunden. Irgendwann wurde mir klar: <strong>andere Investoren brauchen das auch.</strong> So entstand DealPilot.
+          </p>
+          <p class="story-slide-body">
+            Was du in der App siehst, ist kein theoretisches Modell. Es sind die Module, mit denen ich heute selbst arbeite — und mit denen ich Kunden bei Junker Immobilien durch ihre Investments begleite.
+          </p>
+          <div class="story-slide-payoff" style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px;">— Marcel Junker · Junker Immobilien</div>
+        </article>
+
+        <article class="story-slide power-pitch" data-idx="14">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">15</span>
+            <span class="story-slide-tag">// Power-Pitch · 30 Sekunden zur Wahrheit</span>
+          </div>
+          <blockquote class="story-slide-scene story-slide-scene-bold">
+            „Sechs Zahlen. Eine Wahrheit."
+          </blockquote>
+          <p class="story-slide-body">
+            Kaufpreis. Wohnfläche. Miete. Eigenkapital. Zins. Tilgung. <strong>Mehr brauchst du nicht.</strong>
+          </p>
+          <p class="story-slide-body">
+            Bruttomietrendite, Faktor, monatliche Rate, Cashflow, LTV, Kaufpreis pro Quadratmeter — live, während du tippst. <em>Keine „Berechnen"-Buttons. Kein Warten.</em> Eine Ampel sagt dir auf den ersten Blick: lohnenswert oder Zeitfresser.
+          </p>
+          <p class="story-slide-body">
+            Was passt? Übernimm es mit einem Klick in die Vollberechnung. Was nicht passt? <strong>Nächstes Exposé.</strong> Schlechte Deals in 30 Sekunden aussortieren — das ist der einzige Weg, mit dem du als Privatinvestor je in die Nähe eines Profi-Workflows kommst.
+          </p>
+          <div class="story-slide-payoff">Quick-Check · Live-Berechnung · 30 Sekunden</div>
+        </article>
+
+        <article class="story-slide founder-voice" data-idx="15">
+          <div class="story-slide-meta">
+            <span class="story-slide-num">16</span>
+            <span class="story-slide-tag">// Founder-Voice · Die 15-%-Lektion</span>
+          </div>
+          <blockquote class="story-slide-scene story-slide-scene-serif">
+            „2019 habe ich mit meinem Steuerberater eine sehr unangenehme Stunde verbracht. Ich hatte gerade ein Objekt gekauft und im ersten Jahr 64.000 € in Sanierung gesteckt — Dach, Heizung, drei Bäder."
+          </blockquote>
+          <p class="story-slide-body">
+            Mein Steuerberater hat mich angeschaut und gesagt: <em>„Marcel, Sie sind über der 15-%-Grenze. Wir müssen aktivieren."</em> Aus 64.000 € sofortigem Werbungskosten-Abzug wurde eine Aktivierung über 40 Jahre. <strong>Im ersten Jahr ein Liquiditätsverlust im hohen vierstelligen Bereich.</strong>
+          </p>
+          <p class="story-slide-body">
+            An dem Abend habe ich beschlossen: Das passiert mir nie wieder. Und es passiert auch meinen Beratungskunden nicht. Im Investitionsmodul läuft seitdem ein Live-Balken, der dir bei jeder Sanierungsposition zeigt, wo du stehst. <em>Wenn du über die Grenze gehst, springt die Anzeige auf Rot.</em>
+          </p>
+          <p class="story-slide-body">
+            Das ist keine Feature-Erfindung. Das ist eine Lektion aus eigenem Schaden, gegossen in Code, damit niemand anders sie nochmal lernen muss.
+          </p>
+          <div class="story-slide-payoff" style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px;">— Aus eigener Erfahrung in Code gegossen</div>
+        </article>
+
+      </div>
+
+      <!-- Controls -->
+      <div class="story-slider-controls">
+        <button class="story-arrow story-arrow-prev" type="button" aria-label="Vorherige Geschichte" id="story-prev">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="story-progress" id="story-progress">
+          <div class="story-progress-bar"><div class="story-progress-fill" id="story-fill"></div></div>
+          <div class="story-dots" id="story-dots"></div>
+        </div>
+        <button class="story-arrow story-arrow-next" type="button" aria-label="Nächste Geschichte" id="story-next">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Drei Wege zur Analyse — JETZT UNTER dem Slider -->
+<section class="three-ways-section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">// Drei Wege zur Analyse</span>
+      <h2 class="section-title">Vom ersten Klick bis zur <span class="accent">Bankunterlage.</span></h2>
+      <p class="section-lead">Egal ob du eine Immobilie im Vorbeigehen einschätzen oder strukturiert in den Banktermin gehen willst — du bestimmst die Tiefe.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section workflow" id="workflow">
+  <div class="container">
+    <div class="section-head section-head-compact">
+      <span class="section-eyebrow">// In fünf Schritten</span>
+    </div>
+
+    <div class="workflow-grid">
+      <div class="workflow-step">
+        <div class="workflow-num">01</div>
+        <div class="workflow-num-label">// IMPORT</div>
+        <h3>Objekt erfassen</h3>
+        <p>Lage, Kaufpreis, Miete, Finanzierung — manuell, per PDF-Import oder als Quick-Check übernommen.</p>
+      </div>
+      <div class="workflow-step">
+        <div class="workflow-num">02</div>
+        <div class="workflow-num-label">// ANALYSE</div>
+        <h3>Kennzahlen prüfen</h3>
+        <p>Cashflow, DSCR, LTV, IRR, Equity Multiple — heute, Ende Zinsbindung, Anschluss.</p>
+      </div>
+      <div class="workflow-step">
+        <div class="workflow-num">03</div>
+        <div class="workflow-num-label">// KI-LAGE</div>
+        <h3>Lage recherchieren</h3>
+        <p>KI bewertet Makro/Mikro, Demografie, Nachfrage und Wertsteigerungs-Potenzial mit Web-Quellen.</p>
+      </div>
+      <div class="workflow-step">
+        <div class="workflow-num">04</div>
+        <div class="workflow-num-label">// BEWERTEN</div>
+        <h3>Investor Deal Score</h3>
+        <p>0-100 Punkte aus 5 Bereichen. Stärken, Risiken, Verhandlungsempfehlung und Kaufpreis-Offerte als Text.</p>
+      </div>
+      <div class="workflow-step">
+        <div class="workflow-num">05</div>
+        <div class="workflow-num-label">// EXPORT</div>
+        <h3>Bankexport-PDF</h3>
+        <p>Investment-Case-PDF für die Bank — Charts, Tilgungsplan, KI-Analyse. Plus Track-Record und Werbungskosten-PDF.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section features" id="features">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">// Funktionsumfang</span>
+      <h2 class="section-title">Alle Zahlen, die <span class="accent">zählen.</span></h2>
+      <p class="section-lead">Das Tool, das wir bei Junker Immobilien selbst täglich für unsere Investments und Beratungen nutzen — strukturiert in klar abgegrenzten Bereichen.</p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>Quick-Check</h3>
+        <p>Schnellbewertung mit den wichtigsten Zahlen.</p>
+        <ul>
+          <li>Live-Berechnung beim Tippen</li>
+          <li>BMR, Faktor, Cashflow, LTV</li>
+          <li>Übernahme in Vollberechnung</li>
+          <li>Erweitert: PDF-Import + KI</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <h3>Objekt &amp; Lage</h3>
+        <p>Grunddaten, Fotos und Lageparameter für den Deal Score.</p>
+        <ul>
+          <li>Bis zu 30 Objektfotos für Bankexport</li>
+          <li>Makro/Mikro/Demografie/Nachfrage</li>
+          <li>Energieklasse, Zustand, Vermietung</li>
+          <li>AfA-Rechner für Gebäudeanteil</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h3>Investition</h3>
+        <p>Kaufpreis, Nebenkosten, Sanierung, 15%-Grenze.</p>
+        <ul>
+          <li>Notar, Grundbuch, Grunderwerbsteuer</li>
+          <li>Sanierungsbedarf-Schätzer (8 Gewerke)</li>
+          <li>15%-Regel mit Live-Vorschau</li>
+          <li>AfA-Verteilung Möblierung</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg>
+        </div>
+        <h3>Miete &amp; Markt</h3>
+        <p>Mietstruktur und Markt-Vergleich.</p>
+        <ul>
+          <li>Nettokaltmiete + zusätzliche Einnahmen</li>
+          <li>Mietpreis-Analyse €/m²</li>
+          <li>KI-Marktmieten-Recherche</li>
+          <li>Staffelmiete und Mietspiegel-Soll</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="13" y2="14"/></svg>
+        </div>
+        <h3>Werbungskostenrechner</h3>
+        <p>Wirtschaftliche Auswirkungen transparent darstellen.</p>
+        <ul>
+          <li>AfA, Schuldzinsen, laufende Kosten</li>
+          <li>15-Jahres-Verlauf der Werbungskosten</li>
+          <li>Werbungskosten-PDF als Beleg</li>
+          <li>Cashflow-Effekt berechnet</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+        </div>
+        <h3>Finanzierung</h3>
+        <p>Annuität, Tilgungsaussetzung, Bausparvertrag.</p>
+        <ul>
+          <li>Live-Marktzinsen Bundesbank-API</li>
+          <li>Tilgungsplan und Anschluss-Phase</li>
+          <li>Bausparvertrag-Lebenszyklus</li>
+          <li>KfW-Programm-Empfehlungen</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+        <h3>Bewirtschaftung</h3>
+        <p>Umlagefähig und nicht-umlagefähig getrennt.</p>
+        <ul>
+          <li>Hausgeld, Verwaltung, Rücklage</li>
+          <li>Detail-Modus oder %-der-NKM</li>
+          <li>Mietausfall-Risiko in Cashflow</li>
+          <li>Quick-Eingabe nach Erfahrungswerten</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-3.16 19.5"/><path d="M12 2a10 10 0 0 1 7.4 16.4"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <h3>KI-Investment-Analyse</h3>
+        <p>ChatGPT mit Web-Recherche zu Lage und Markt.</p>
+        <ul>
+          <li>Stärken, Risiken, Investor-Fit</li>
+          <li>Verhandlungsempfehlung mit Zielpreis</li>
+          <li>Kaufpreis-Offerte als kopierbarer Text</li>
+          <li>Bankargumente für Finanzierungsanfrage</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        </div>
+        <h3>Investor Deal Score 2.0</h3>
+        <p>0-100 Punkte aus über 20 Kennzahlen.</p>
+        <ul>
+          <li>5 Bereiche: Rendite, Cashflow, Risiko</li>
+          <li>Finanzierung und Potenzial</li>
+          <li>LTV/DSCR-Interaktions-Bonus</li>
+          <li>Lokale Ampel-Bewertung ohne KI</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <h3>Bankexport &amp; Track Record</h3>
+        <p>Bankfähige Unterlagen in Sekunden.</p>
+        <ul>
+          <li>Investment-Case-PDF mit Charts</li>
+          <li>Premium-Layout für Investor &amp; Pro</li>
+          <li>Track-Record über alle Objekte</li>
+          <li>Excel/CSV-Bankexport (25 Spalten)</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <h3>Portfolio &amp; Mehrobjekt</h3>
+        <p>Alle Objekte in einer Übersicht.</p>
+        <ul>
+          <li>Suchbare, sortierbare Tabelle</li>
+          <li>Portfolio-Kennzahlen aggregiert</li>
+          <li>Strategie-Modul mit Bausparung</li>
+          <li>JSON-Export für Backup</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><polyline points="8 13 12 17 16 13"/><line x1="12" y1="11" x2="12" y2="17"/></svg>
+        </div>
+        <h3>Auto-Save &amp; Cloud</h3>
+        <p>Daten sicher und immer aktuell.</p>
+        <ul>
+          <li>Auto-Save beim Feld-Verlassen</li>
+          <li>Cloud-Sync (Server-Modus)</li>
+          <li>Lokal-Modus ohne Account möglich</li>
+          <li>Versionierte JSON-Backups</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section livedata">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">// Live-Daten</span>
+      <h2 class="section-title">Aktuelle Marktzinsen <span class="accent">direkt in der App.</span></h2>
+      <p class="section-lead">Wohnungsbaukredite Effektivzinsen Deutschland — automatisch aktuell, kein manuelles Suchen mehr.</p>
+    </div>
+
+    <div class="livedata-card">
+      <div class="livedata-header">
+        <h3>Wohnungsbaukredite an Privathaushalte</h3>
+        <span class="livedata-badge"><span class="dot"></span>Live</span>
+      </div>
+      <div class="rates-grid">
+        <div class="rate-tile">
+          <div class="rate-label">variabel / bis 1 J.</div>
+          <div class="rate-val">3,48 %</div>
+          <div class="rate-sub">Effektivzins p.a.</div>
+        </div>
+        <div class="rate-tile">
+          <div class="rate-label">1 bis 5 Jahre</div>
+          <div class="rate-val">3,37 %</div>
+          <div class="rate-sub">Effektivzins p.a.</div>
+        </div>
+        <div class="rate-tile">
+          <div class="rate-label">5 bis 10 Jahre</div>
+          <div class="rate-val">3,55 %</div>
+          <div class="rate-sub">Effektivzins p.a.</div>
+        </div>
+        <div class="rate-tile">
+          <div class="rate-label">über 10 Jahre</div>
+          <div class="rate-val">3,26 %</div>
+          <div class="rate-sub">Effektivzins p.a.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     PRICING — vollständige Plan-Vergleich-Tabelle
+     1:1 aus DealPilotConfig.pricing (V146)
+═══════════════════════════════════════════════════ -->
+<section class="section pricing" id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">// Pläne &amp; Preise</span>
+      <h2 class="section-title">Vier Pläne. <span class="accent">Vier Credit-Pakete.</span></h2>
+      <p class="section-lead">Starte kostenlos. Upgrade wenn du mehr Objekte brauchst. KI-Credits kaufst du nach Bedarf nach — sie verfallen nicht.</p>
+    </div>
+  </div>
+  <!-- Pricing-Plugin (übernommen 1:1 aus DealPilot App V146 pricing-modal) -->
+  <!-- Plugin-CSS in <head> · Plugin-JS am Ende der Seite -->
+  <div id="pricing-host"></div>
+
+  <div class="container">
+    <p class="pricing-note">
+      <span class="gold">Hinweis:</span> Du buchst erst <strong>nach Registrierung direkt in der App</strong>.
+      Plan-Wechsel jederzeit möglich · Kündigung monatsweise · keine versteckten Kosten.
+    </p>
+    <p class="pricing-disclaimer">
+      <strong>Wichtiger Hinweis:</strong> DealPilot ist ein Analyse- und Kalkulationstool, das Ihnen Werbungskosten,
+      Cashflow und Investitions-Kennzahlen transparent darstellt. Es ersetzt <strong>keine Steuer- oder Finanzberatung</strong>.
+      Für individuelle steuerliche und finanzielle Fragen wenden Sie sich bitte an einen Steuerberater oder Finanzdienstleister.
+    </p>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="container">
+    <div class="cta-final-inner">
+      <h2>Bereit für deinen <span class="accent">ersten DealCheck?</span></h2>
+      <p>Starte kostenlos. Lade dein Exposé hoch oder mach den Quick-Check. Du brauchst keine Kreditkarte für den Anfang.</p>
+      <div class="hero-ctas" style="justify-content: center;">
+        <a href="https://app.staging.dealpilot.junker-immobilien.io/?register=1" class="btn-primary">Kostenlos registrieren →</a>
+        <a href="https://app.staging.dealpilot.junker-immobilien.io/" class="btn-secondary">Schon dabei? Login</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img src="assets/dealpilot-logo.png" alt="DealPilot by Junker Immobilien" class="footer-logo">
+        <p class="footer-tagline">
+          Immobilien-Investmentanalyse für strukturierte Entscheidungen.
+          Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Produkt</h4>
+        <a href="#workflow">So funktioniert's</a>
+        <a href="#features">Features</a>
+        <a href="leistungsumfang.html">Leistungsumfang</a>
+        <a href="#pricing">Preise</a>
+        <a href="https://app.staging.dealpilot.junker-immobilien.io/">Login</a>
+        <a href="https://app.staging.dealpilot.junker-immobilien.io/?register=1">Registrieren</a>
+      </div>
+      <div class="footer-col">
+        <h4>Junker Immobilien</h4>
+        <a href="https://junker-immobilien.io">Hauptseite</a>
+        <a href="https://junker-immobilien.io/kapitalanlageimmobilien/">Kapitalanlage</a>
+        <a href="https://junker-immobilien.io/projektentwicklung/">Projektentwicklung</a>
+        <a href="https://junker-immobilien.io/sachverstaendigenbuero/">Sachverständigenbüro</a>
+        <a href="https://junker-immobilien.io/kontakt/">Kontakt</a>
+      </div>
+      <div class="footer-col">
+        <h4>Rechtliches</h4>
+        <a href="https://junker-immobilien.io/i/">Impressum</a>
+        <a href="https://junker-immobilien.io/datenschutzerklaerung/">Datenschutz</a>
+        <a href="https://junker-immobilien.io/barrierefreiheitserklaerung/">Barrierefreiheit</a>
+        <a href="https://junker-immobilien.io/cookie-richtlinie-eu/">Cookie-Richtlinie</a>
+      </div>
+      <div class="footer-col">
+        <h4>Kontakt</h4>
+        <a href="mailto:support@junker-immobilien.io" class="footer-mail">
+          <span class="footer-mail-label">Support</span>
+          <span class="footer-mail-addr">support@junker-immobilien.io</span>
+        </a>
+        <a href="mailto:dealpilot@junker-immobilien.io" class="footer-mail">
+          <span class="footer-mail-label">Allgemeine Anfragen</span>
+          <span class="footer-mail-addr">dealpilot@junker-immobilien.io</span>
+        </a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 Junker Immobilien · Hermannstr. 9 · 32609 Hüllhorst</div>
+      <div>Keine Steuer- oder Finanzberatung. Analyse-Tool für eigene Kalkulationen.</div>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /page-content -->
+
+<script src="assets/pricing-plugin.js"></script>
+<script src="assets/effects.js"></script>
+
+</body>
+</html>

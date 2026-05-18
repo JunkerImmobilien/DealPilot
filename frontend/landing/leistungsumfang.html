@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leistungsumfang · DealPilot · by Junker Immobilien</title>
+<meta name="description" content="DealPilot im Detail: Von Quick-Check über KI-Analyse bis Investment-Case. Alle Module ausführlich erklärt.">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="assets/dealpilot-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-obsidian: #0a0a0a;
+  --bg-steel: #14110f;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-glass: rgba(255, 255, 255, 0.06);
+  --gold: #C9A84C;
+  --gold-bright: #e8c878;
+  --gold-soft: rgba(201, 168, 76, 0.14);
+  --gold-border: rgba(201, 168, 76, 0.25);
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.72);
+  --dim: rgba(255, 255, 255, 0.45);
+  --green: #3FA56C;
+  --red: #B8625C;
+  --border: rgba(255, 255, 255, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-obsidian);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 400;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+.container { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+.container-wide { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+/* Background */
+.bg-animated { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.bg-particles { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; opacity: 0.50; }
+.bg-orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.40; will-change: transform; }
+.bg-orb-1 {
+  width: 640px; height: 640px;
+  background: radial-gradient(circle, rgba(201,168,76,0.30), transparent 70%);
+  top: 5%; left: -200px;
+  animation: orb1 30s ease-in-out infinite alternate;
+}
+.bg-orb-2 {
+  width: 520px; height: 520px;
+  background: radial-gradient(circle, rgba(201,168,76,0.20), transparent 70%);
+  bottom: 5%; right: -180px;
+  animation: orb2 34s ease-in-out infinite alternate;
+}
+@keyframes orb1 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(150px,200px) scale(1.1); } }
+@keyframes orb2 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-180px,-100px) scale(0.9); } }
+@media (prefers-reduced-motion: reduce) { .bg-orb { animation: none; } }
+
+.page-content { position: relative; z-index: 1; }
+
+/* NAV */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px; max-width: 1240px; margin: 0 auto;
+}
+.nav-logo { height: 88px; width: auto; display: block; }
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a { font-size: 14px; color: var(--muted); transition: color 0.2s; font-weight: 500; }
+.nav-links a:hover, .nav-links a.active { color: var(--gold); }
+.nav-cta {
+  background: var(--gold);
+  color: var(--bg-obsidian) !important;
+  padding: 11px 22px; border-radius: 100px;
+  font-weight: 600; font-size: 13px;
+  transition: all 0.25s;
+}
+.nav-cta:hover { background: #fff; }
+
+/* PAGE-HEAD */
+.page-head { padding: 96px 0 56px; text-align: center; }
+.page-head .eyebrow {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.22em;
+  color: var(--gold); font-weight: 500;
+  text-transform: uppercase; margin-bottom: 22px;
+}
+.page-head h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(38px, 5.5vw, 60px);
+  font-weight: 500; letter-spacing: -0.03em;
+  line-height: 1.05; margin: 0 0 22px;
+  max-width: 780px; margin-left: auto; margin-right: auto;
+}
+.page-head h1 .accent {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: italic; font-weight: 600;
+}
+.page-head .lead {
+  font-size: 18px; color: var(--muted);
+  max-width: 660px; margin: 0 auto;
+  line-height: 1.65;
+}
+
+/* TOC */
+.toc {
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  border-radius: 16px;
+  padding: 28px 36px;
+  margin: 24px auto 64px;
+  max-width: 800px;
+  backdrop-filter: blur(10px);
+}
+.toc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.18em;
+  color: var(--gold); font-weight: 500;
+  text-transform: uppercase; margin-bottom: 18px;
+}
+.toc ul { list-style: none; padding: 0; columns: 2; column-gap: 32px; }
+.toc ul li { font-size: 14px; padding: 7px 0; break-inside: avoid; }
+.toc ul li a {
+  color: var(--muted); transition: color 0.2s;
+  display: inline-flex; align-items: baseline; gap: 10px;
+}
+.toc ul li a:hover { color: var(--gold); }
+.toc ul li a span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--gold); font-weight: 500;
+}
+@media (max-width: 600px) { .toc ul { columns: 1; } }
+
+/* CONTENT */
+.content { padding: 0 0 80px; }
+article.section {
+  margin: 0 auto 80px;
+  scroll-margin-top: 110px;
+}
+article.section .eyebrow {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.22em;
+  color: var(--gold); font-weight: 500;
+  text-transform: uppercase; margin-bottom: 14px;
+}
+article.section .eyebrow .anchor {
+  display: inline-block; margin-right: 10px;
+  font-weight: 500;
+}
+article.section h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 600; letter-spacing: -0.022em;
+  line-height: 1.12; margin: 0 0 22px;
+}
+article.section h2 .gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: italic;
+}
+article.section h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px; font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 36px 0 14px;
+  color: var(--gold);
+}
+article.section p {
+  font-size: 16px; color: var(--muted);
+  margin: 0 0 20px; line-height: 1.75;
+}
+article.section p:last-child { margin-bottom: 0; }
+article.section strong { color: var(--text); font-weight: 600; }
+article.section em { color: var(--gold-bright); font-style: italic; font-weight: 500; }
+article.section ul, article.section ol { margin: 0 0 22px 0; padding-left: 22px; }
+article.section ul li, article.section ol li {
+  font-size: 15.5px; color: var(--muted);
+  margin: 10px 0; line-height: 1.7;
+  padding-left: 8px;
+}
+article.section ul li::marker { color: var(--gold); }
+
+article.section .pull {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; color: var(--text);
+  font-style: italic; line-height: 1.5;
+  margin: 28px 0;
+  padding: 24px 32px;
+  border-left: 3px solid var(--gold);
+  background: linear-gradient(90deg, rgba(201,168,76,0.07), transparent);
+  border-radius: 4px;
+}
+
+article.section .info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  border-radius: 14px;
+  padding: 22px 28px;
+  margin: 28px 0;
+}
+article.section .info-card h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--gold); text-transform: uppercase;
+  margin: 0 0 10px;
+}
+article.section .info-card p {
+  font-size: 14.5px; color: var(--muted);
+  margin: 0; line-height: 1.65;
+}
+
+article.section .stat-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin: 32px 0;
+}
+.stat-tile {
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  border-radius: 12px;
+  padding: 22px 20px;
+  text-align: center;
+}
+.stat-tile-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 30px; font-weight: 700;
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.025em; line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-tile-lbl {
+  font-size: 12px; color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+/* CTA */
+.cta-block {
+  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(201,168,76,0.04));
+  border: 1px solid var(--gold-border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  margin: 70px auto 0;
+  text-align: center;
+  max-width: 760px;
+}
+.cta-block h3 {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: clamp(28px, 4vw, 38px) !important;
+  font-weight: 600; letter-spacing: -0.02em;
+  margin: 0 0 14px !important;
+  line-height: 1.15;
+}
+.cta-block h3 em {
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: italic;
+}
+.cta-block p {
+  font-size: 16px !important;
+  color: var(--muted) !important;
+  margin: 0 0 28px !important;
+  max-width: 540px; margin-left: auto !important; margin-right: auto !important;
+}
+.btn-primary {
+  background: var(--gold);
+  color: var(--bg-obsidian) !important;
+  padding: 16px 32px; border-radius: 100px;
+  font-weight: 600; font-size: 14px;
+  letter-spacing: 0.03em;
+  display: inline-flex; align-items: center; gap: 10px;
+  transition: all 0.25s;
+  text-decoration: none;
+  box-shadow: 0 6px 24px rgba(201, 168, 76, 0.25);
+}
+.btn-primary:hover {
+  background: #fff;
+  transform: translateX(3px);
+  box-shadow: 0 12px 32px rgba(201, 168, 76, 0.35);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--text) !important;
+  padding: 16px 32px; border-radius: 100px;
+  border: 1px solid var(--gold-border);
+  font-weight: 500; font-size: 14px;
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none;
+  transition: all 0.25s;
+  margin-left: 8px;
+}
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold) !important; }
+
+/* FOOTER */
+.footer {
+  background: var(--bg-steel);
+  border-top: 1px solid var(--border);
+  padding: 56px 0 32px;
+  margin-top: 70px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr 0.9fr 0.9fr 1.1fr;
+  gap: 36px; margin-bottom: 40px;
+}
+.footer-logo { height: 68px; width: auto; margin-bottom: 16px; }
+.footer-tagline {
+  font-size: 13px; color: var(--muted);
+  line-height: 1.6; max-width: 320px;
+}
+.footer-col h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--gold);
+  font-weight: 500; margin-bottom: 16px;
+}
+.footer-col a {
+  display: block; font-size: 13px; color: var(--muted);
+  margin-bottom: 8px; transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--gold); }
+
+.footer-mail {
+  display: block !important;
+  padding: 10px 12px;
+  margin-bottom: 10px !important;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--border);
+  transition: all 0.25s !important;
+  text-decoration: none;
+}
+.footer-mail:hover {
+  background: var(--gold-soft);
+  border-color: var(--gold-border);
+  transform: translateX(2px);
+}
+.footer-mail .footer-mail-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+.footer-mail .footer-mail-addr {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+  word-break: break-all;
+}
+.footer-mail:hover .footer-mail-addr { color: var(--gold-bright); }
+.footer-bottom {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: var(--dim);
+  flex-wrap: wrap; gap: 12px;
+}
+
+/* Reveal */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 1024px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  article.section .stat-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .nav-links a:not(.nav-cta) { display: none; }
+  .nav-logo { height: 56px; }
+  .page-head { padding: 56px 0 40px; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-logo { height: 50px; }
+  .cta-block { padding: 36px 24px; }
+  .btn-secondary { margin-left: 0; margin-top: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-animated" aria-hidden="true">
+  <canvas class="bg-particles" id="bg-particles"></canvas>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+</div>
+
+<div class="page-content">
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/dealpilot-logo.png" alt="DealPilot by Junker Immobilien" class="nav-logo">
+    </a>
+    <div class="nav-links">
+      <a href="index.html#workflow">So funktioniert's</a>
+      <a href="leistungsumfang.html" class="active">Leistungsumfang</a>
+      <a href="index.html#pricing">Preise</a>
+      <a href="https://app.staging.dealpilot.junker-immobilien.io/">Login</a>
+      <a href="https://app.staging.dealpilot.junker-immobilien.io/?register=1" class="nav-cta">Kostenlos starten →</a>
+    </div>
+  </div>
+</nav>
+
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">// Leistungsumfang im Detail</span>
+    <h1>Was DealPilot <span class="accent">wirklich kann.</span></h1>
+    <p class="lead">
+      Jedes Modul, jede Berechnung, jede Annahme — ausführlich erklärt, mit Praxisbezug.
+      Damit du <strong>vor</strong> der Registrierung weißt, was du bekommst.
+    </p>
+  </div>
+</section>
+
+<section class="container">
+  <div class="toc">
+    <div class="toc-title">Inhaltsverzeichnis</div>
+    <ul>
+      <li><a href="#warum"><span>01</span> Warum DealPilot existiert</a></li>
+      <li><a href="#einstieg"><span>02</span> Drei Wege zur Analyse</a></li>
+      <li><a href="#quick-check"><span>03</span> Quick-Check im Detail</a></li>
+      <li><a href="#pdf-import"><span>04</span> PDF-Import &amp; KI-Extraktion</a></li>
+      <li><a href="#objekt"><span>05</span> Objekt-Erfassung &amp; Lage</a></li>
+      <li><a href="#investition"><span>06</span> Investitionsmodul &amp; 15-%-Regel</a></li>
+      <li><a href="#miete"><span>07</span> Miete &amp; Marktvergleich</a></li>
+      <li><a href="#werbungskosten"><span>08</span> Werbungskostenrechner</a></li>
+      <li><a href="#finanzierung"><span>09</span> Finanzierung &amp; Anschlusstest</a></li>
+      <li><a href="#bewirtschaftung"><span>10</span> Bewirtschaftungskosten</a></li>
+      <li><a href="#dealscore"><span>11</span> Investor Deal Score 2.0</a></li>
+      <li><a href="#ki-analyse"><span>12</span> KI-Investment-Analyse</a></li>
+      <li><a href="#exports"><span>13</span> Bankexport &amp; Investment-Case</a></li>
+      <li><a href="#portfolio"><span>14</span> Portfolio &amp; Track-Record</a></li>
+      <li><a href="#daten"><span>15</span> Datensicherheit &amp; Hosting</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container">
+
+    <article class="section reveal" id="warum">
+      <span class="eyebrow"><span class="anchor">01</span>Warum DealPilot existiert</span>
+      <h2>Bauchgefühl ist ein guter Anfang. Aber <span class="gold">kein Schluss.</span></h2>
+      <p>
+        DealPilot ist aus einem persönlichen Frust entstanden. Wer in Deutschland Immobilien als Kapitalanlage prüft, jongliert in der Regel mit drei bis fünf verschiedenen Excel-Vorlagen, einer Handvoll PDF-Exposés, einem Steuerrechner aus dem Internet und einer handgeschriebenen Cashflow-Rechnung auf der Rückseite eines Notizblocks. Am Ende kommt eine grobe Einschätzung dabei heraus — aber nichts, was man einem Bankberater, Steuerberater oder Geschäftspartner in die Hand drücken könnte.
+      </p>
+      <p>
+        Wir bei <strong>Junker Immobilien</strong> prüfen jede Woche mehrere Objekte — für unsere eigenen Investments und für unsere Beratungskunden. Aus diesem Alltag heraus ist DealPilot entstanden: ein Werkzeug, das alle relevanten Kennzahlen einer Immobilien-Investition strukturiert sammelt, sauber berechnet und in einer Form ausgibt, mit der eine Bank, ein Steuerberater oder ein Geschäftspartner tatsächlich arbeiten kann.
+      </p>
+      <p>
+        DealPilot ist <em>kein Anlagevermittler</em>, <em>kein Steuerberater</em>, <em>kein Finanzdienstleister</em>. Es ist ein Analyse- und Kalkulationstool. Es zeigt dir die wirtschaftlichen Auswirkungen einer Investitionsentscheidung — auf Basis deiner Eingaben und deiner Annahmen. Die Entscheidung selbst triffst du.
+      </p>
+      <div class="info-card">
+        <h4>Wichtiger Hinweis</h4>
+        <p>DealPilot ersetzt keine Steuer- oder Finanzberatung. Für individuelle steuerliche und finanzielle Fragen wende dich bitte an einen Steuerberater oder Finanzdienstleister. Alle Berechnungen sind Annahmen auf Basis deiner Eingaben.</p>
+      </div>
+    </article>
+
+    <article class="section reveal" id="einstieg">
+      <span class="eyebrow"><span class="anchor">02</span>Drei Wege zur Analyse</span>
+      <h2>Du bestimmst die <span class="gold">Tiefe.</span></h2>
+      <p>
+        Nicht jede Immobilie verdient eine 20-seitige Vollanalyse. Manche willst du in einer Minute einschätzen, andere strukturiert für das Bankgespräch vorbereiten. DealPilot kennt drei Einstiegswege — du wählst je nach Situation.
+      </p>
+
+      <h3>Quick-Check — 30 Sekunden</h3>
+      <p>
+        Du tippst sechs Zahlen ein: Kaufpreis, Wohnfläche, Nettokaltmiete, Eigenkapital, Zinssatz, Tilgung. DealPilot rechnet sofort: Bruttomietrendite, Faktor, monatliche Rate, Cashflow vor Steuern, LTV auf den Kaufpreis, Kaufpreis pro Quadratmeter. Eine Ampel-Bewertung zeigt dir auf den ersten Blick, ob die Eckwerte solide sind oder Schwächen haben.
+      </p>
+      <p>
+        Wenn dir das Ergebnis gefällt, übernimmst du die Eingaben mit einem Klick in die Vollberechnung. Wenn nicht, war es <em>eine Minute investierte Zeit</em> — und du weißt, dass dieses Objekt nicht funktioniert.
+      </p>
+
+      <h3>PDF-Import — eine Minute</h3>
+      <p>
+        Du lädst ein Exposé hoch — egal ob ImmoScout, Kleinanzeigen, ImmoWelt, Maklerexposé oder ein eigener Marktbericht. Die KI liest die strukturierten Felder aus: Adresse, PLZ, Ort, Straße, Hausnummer, Kaufpreis, Wohnfläche, Baujahr, Nettokaltmiete, Hausgeld, Nebenkosten, Energieklasse, Heizungsart. Du bekommst eine Liste extrahierter Werte mit Checkboxen und übernimmst sie per Klick.
+      </p>
+      <p>
+        Auch Bilder aus dem Exposé werden ausgelesen und automatisch als Objektfotos vorgeschlagen — bis zu 30 Stück, zugeschnitten und bereit für deinen späteren Investment-Case.
+      </p>
+
+      <h3>Vollanalyse — 15 Minuten</h3>
+      <p>
+        Wenn du ein Objekt ernsthaft prüfen willst, gehst du alle Module der Reihe nach durch: Objekt, Investition, Miete, Werbungskosten, Finanzierung, Bewirtschaftung. Am Ende hast du eine 15-Jahres-Cashflow-Projektion, einen Investor Deal Score 2.0 aus 24 Kennzahlen, eine KI-Investment-Analyse mit Verhandlungsempfehlung und ein bankfähiges Investment-Case-PDF.
+      </p>
+    </article>
+
+    <article class="section reveal" id="quick-check">
+      <span class="eyebrow"><span class="anchor">03</span>Quick-Check im Detail</span>
+      <h2>Sechs Zahlen. <span class="gold">Eine fundierte Sofort-Bewertung.</span></h2>
+      <p>
+        Der Quick-Check ist nicht die abgespeckte Version der Vollanalyse — er ist eine eigenständige Methode, in unter einer Minute die Tragfähigkeit eines Deals zu bewerten. Sechs Eingabefelder, alles wird <em>live während der Eingabe</em> berechnet. Kein Klick auf „Berechnen", kein Warten.
+      </p>
+
+      <h3>Was du eingibst</h3>
+      <ul>
+        <li><strong>Kaufpreis</strong> — der reine Erwerbspreis ohne Nebenkosten</li>
+        <li><strong>Wohnfläche</strong> — Quadratmeter laut Exposé</li>
+        <li><strong>Nettokaltmiete</strong> — monatlich, ohne Nebenkosten</li>
+        <li><strong>Eigenkapital</strong> — als Euro-Betrag oder als Prozentsatz</li>
+        <li><strong>Zinssatz</strong> — Sollzins der Finanzierung in % p.a.</li>
+        <li><strong>Tilgung</strong> — Anfangstilgung in % p.a.</li>
+      </ul>
+
+      <h3>Was du sofort siehst</h3>
+      <ul>
+        <li><strong>Bruttomietrendite</strong> — Jahresmiete dividiert durch Kaufpreis</li>
+        <li><strong>Faktor</strong> — Kaufpreis dividiert durch Jahresmiete (Maklersprache: das 18-Fache, das 22-Fache)</li>
+        <li><strong>Monatliche Rate</strong> — Annuität aus Zins und Tilgung</li>
+        <li><strong>Cashflow vor Steuern</strong> — Miete minus Rate, monatlich</li>
+        <li><strong>LTV (Loan to Value)</strong> — wie viel Prozent des Kaufpreises sind fremdfinanziert</li>
+        <li><strong>Kaufpreis pro Quadratmeter</strong> — wichtige Vergleichsgröße zur Lage</li>
+      </ul>
+
+      <div class="pull">
+        Eine Ampel sagt dir auf den ersten Blick: rot (passt nicht), gold (lohnt einen zweiten Blick), grün (Vollanalyse machen).
+      </div>
+
+      <h3>Erweiterter Quick-Check</h3>
+      <p>
+        Im erweiterten Modus kannst du zusätzlich ein PDF importieren und die Werte direkt aus der KI-Extraktion übernehmen. Auch optionale Bilder-Uploads für eine erste Visualisierung sind möglich. Damit erledigst du nicht nur die Eckdaten-Prüfung schnell, sondern legst direkt den Grundstein für eine spätere Vollanalyse.
+      </p>
+    </article>
+
+    <article class="section reveal" id="pdf-import">
+      <span class="eyebrow"><span class="anchor">04</span>PDF-Import &amp; KI-Extraktion</span>
+      <h2>Vom Exposé zur Kalkulation in <span class="gold">60 Sekunden.</span></h2>
+      <p>
+        Das aufwändigste am Beginn einer Objektprüfung ist meistens nicht das Rechnen — es ist das <strong>Abtippen.</strong> Kaufpreis aus dem Exposé, Wohnfläche aus den Plänen, Miete aus dem Mietvertrag, Adresse, Baujahr, Energieklasse, Nebenkosten. Alles steht in PDFs, alles muss von Hand in Felder kopiert werden.
+      </p>
+      <p>
+        DealPilot übernimmt das. Du lädst ein PDF hoch — egal ob ImmoScout, Kleinanzeigen, ImmoWelt, Maklerexposé oder ein eigener Marktbericht — und die KI liest die strukturierten Felder aus.
+      </p>
+
+      <h3>Was die KI extrahiert</h3>
+      <ul>
+        <li>Adresse (Straße, Hausnummer)</li>
+        <li>PLZ und Ort</li>
+        <li>Kaufpreis</li>
+        <li>Wohnfläche, Nutzfläche, Grundstücksfläche</li>
+        <li>Anzahl Zimmer, Etagen, Wohneinheiten</li>
+        <li>Baujahr und Letzte Sanierung</li>
+        <li>Nettokaltmiete und Mietverhältnis (vermietet / leerstehend)</li>
+        <li>Hausgeld und Heizkosten</li>
+        <li>Energieklasse und Heizungsart</li>
+        <li>Objektart (ETW, MFH, EFH, Reihenhaus etc.)</li>
+        <li>Zustand und Sanierungsbedarf</li>
+      </ul>
+
+      <p>
+        Du bekommst eine Liste extrahierter Werte mit Checkboxen — du wählst aus, was du übernehmen willst, und ein Klick reicht. Die Werte landen in deinem Objekt.
+      </p>
+
+      <h3>Bilder aus dem Exposé</h3>
+      <p>
+        Auch die <strong>Bilder im Exposé</strong> kann die KI extrahieren und direkt als Objektfotos vorschlagen — bis zu 30 Stück, automatisch zugeschnitten und für den späteren Investment-Case vorbereitet. Du wählst per Checkbox aus, welche Fotos in dein Objekt sollen.
+      </p>
+
+      <div class="info-card">
+        <h4>Datenschutz beim PDF-Import</h4>
+        <p>Das PDF wird an unsere Server gesendet, dort wird der Text extrahiert und zur Strukturierung an die KI weitergereicht. Wir speichern weder das PDF noch die extrahierten Werte langfristig — sobald du sie in dein Objekt übernommen hast, sind sie nur noch in deinem persönlichen Account. Die KI-Antworten werden nicht für Training verwendet (Enterprise-API ohne Opt-In).</p>
+      </div>
+    </article>
+
+    <article class="section reveal" id="objekt">
+      <span class="eyebrow"><span class="anchor">05</span>Objekt-Erfassung &amp; Lage</span>
+      <h2>Mehr als nur <span class="gold">Adresse und Fläche.</span></h2>
+      <p>
+        Wenn du ein Objekt in DealPilot anlegst, sammelst du nicht nur die offensichtlichen Eckdaten — PLZ, Ort, Straße, Hausnummer, Objektart, Wohnfläche, Baujahr, Kaufdatum. Du erfasst auch die <em>weichen Faktoren</em>, die später in den Investor Deal Score einfließen.
+      </p>
+
+      <h3>Lage-Bewertung</h3>
+      <ul>
+        <li><strong>Makrolage</strong> — wie steht die Region demografisch und wirtschaftlich da? Wachstum oder Schrumpfung? Beschäftigungslage? Kaufkraftindex?</li>
+        <li><strong>Mikrolage</strong> — Stadtteil-Reputation, Infrastruktur, Anbindung an ÖPNV, Einkaufsmöglichkeiten, Schulen, Ärzte</li>
+        <li><strong>Bevölkerungs-Entwicklung</strong> — wachsender Markt? Stagnation? Strukturwandel?</li>
+        <li><strong>Mietnachfrage</strong> — Selbsteinschätzung von „sehr hoch" bis „kritisch"</li>
+        <li><strong>Wertsteigerungs-Potenzial</strong> — wo siehst du das Objekt in zehn Jahren?</li>
+      </ul>
+
+      <h3>Substanz und Zustand</h3>
+      <ul>
+        <li><strong>Energieklasse</strong> — A bis H mit Auswirkung auf Heizkosten und zukünftige Sanierungskosten</li>
+        <li><strong>Heizungsart</strong> — Gas, Öl, Fernwärme, Wärmepumpe, Pellets</li>
+        <li><strong>Zustand</strong> — von „unsaniert" bis „kernsaniert mit Energieausweis"</li>
+        <li><strong>Sanierungsbedarf-Schätzung</strong> nach Gewerken (Dach, Fassade, Fenster, Heizung, Elektrik, Bäder, Böden, Innenwände)</li>
+        <li><strong>Mietausfall-Risiko</strong> als Prozentsatz der Jahresmiete (typisch 2–5 %)</li>
+      </ul>
+
+      <h3>BMF-AfA-Rechner integriert</h3>
+      <p>
+        Für die spätere AfA-Berechnung musst du die Kaufpreisaufteilung zwischen Grundstück und Gebäude kennen. DealPilot hat den <em>BMF-Sachwertverfahren-Rechner</em> direkt integriert — du gibst Grundstücksart, Standardstufe, Baujahr und Größe ein, und bekommst eine plausible Aufteilung. Quelle: BMF-Arbeitshilfe (Fassung Juni 2023).
+      </p>
+
+      <h3>Objektfotos</h3>
+      <p>
+        Bis zu 30 Fotos pro Objekt — automatisch komprimiert, in einer übersichtlichen Galerie verwaltet. Sie tauchen später im Investment-Case auf dem Deckblatt und in der Objektübersicht auf.
+      </p>
+    </article>
+
+    <article class="section reveal" id="investition">
+      <span class="eyebrow"><span class="anchor">06</span>Investitionsmodul &amp; 15-%-Regel</span>
+      <h2>Kaufpreis ist nur <span class="gold">der Anfang.</span></h2>
+      <p>
+        Im Investitionsmodul rechnest du die <strong>echte Gesamtinvestition</strong> zusammen — den Betrag, den du tatsächlich bewegen musst, um die Immobilie zu erwerben und in einen vermietbaren Zustand zu bringen.
+      </p>
+
+      <h3>Erwerbsnebenkosten</h3>
+      <p>
+        DealPilot kennt die typischen Sätze und schlägt sie dir als Default vor — du kannst sie anpassen:
+      </p>
+      <ul>
+        <li><strong>Notar &amp; Grundbuch</strong> — typisch 1,5 bis 2,0 % vom Kaufpreis</li>
+        <li><strong>Grunderwerbsteuer</strong> — je nach Bundesland 3,5 bis 6,5 %</li>
+        <li><strong>Maklerprovision</strong> — typisch 3,57 bis 7,14 % je nach Region und Aufteilung</li>
+        <li><strong>Sonstige Erwerbsnebenkosten</strong> — Gutachten, Beratung, Behördengebühren</li>
+      </ul>
+
+      <h3>Sanierungsbedarf nach Gewerken</h3>
+      <p>
+        Du erfasst den Sanierungsbedarf gewerkeweise — Dach, Fassade, Fenster, Heizung, Elektrik, Bäder, Böden, Innenwände. Für jedes Gewerk gibst du einen Betrag ein. DealPilot hat Erfahrungswerte pro Quadratmeter hinterlegt — als Orientierung, nicht als Vorschrift.
+      </p>
+
+      <h3>Die 15-%-Regel transparent dargestellt</h3>
+      <p>
+        Wenn du innerhalb der ersten drei Jahre nach Anschaffung mehr als 15 % der Gebäude-Anschaffungskosten in Instandsetzung investierst, gelten diese Kosten steuerlich als <em>anschaffungsnahe Herstellungskosten</em> und müssen über die Restnutzungsdauer abgeschrieben werden — sie sind dann <strong>nicht sofort als Werbungskosten abzugsfähig.</strong>
+      </p>
+
+      <div class="pull">
+        Während du Sanierungsbeträge eingibst, läuft im Hintergrund ein Balken, der die 15-%-Grenze live visualisiert. Bei Überschreitung springt die Anzeige auf Rot.
+      </div>
+
+      <p>
+        So weißt du sofort, wie viel Spielraum dir noch bleibt — und kannst entweder die Sanierung über zwei Jahre splitten oder bewusst akzeptieren, sie zu aktivieren. Diese eine Funktion hat in unseren Beratungsfällen schon mehrfach <em>vier- bis fünfstellige Liquiditätsverluste</em> verhindert.
+      </p>
+
+      <h3>Möblierung separat</h3>
+      <p>
+        Möblierte Vermietung wird steuerlich über zehn Jahre abgeschrieben (linear). Du gibst den Anschaffungspreis ein, DealPilot rechnet automatisch die jährliche Abschreibung und integriert sie in die Werbungskosten-Projektion.
+      </p>
+    </article>
+
+    <article class="section reveal" id="miete">
+      <span class="eyebrow"><span class="anchor">07</span>Miete &amp; Marktvergleich</span>
+      <h2>Was Vermietung <span class="gold">wirklich bringt.</span></h2>
+      <p>
+        Die Miete ist die Einnahmenseite — und je sauberer du sie aufschlüsselst, desto realistischer wird dein Cashflow. DealPilot trennt klar zwischen:
+      </p>
+      <ul>
+        <li><strong>Nettokaltmiete</strong> — der reine Mietzins ohne Nebenkosten</li>
+        <li><strong>Umlagefähige Nebenkosten</strong> — Heizung, Wasser, Müll, Hausmeister (trägt der Mieter)</li>
+        <li><strong>Nicht-umlagefähige Kosten</strong> — Hausgeld-Verwaltungsanteil (trägst du)</li>
+        <li><strong>Zusätzliche Einnahmen</strong> — Stellplatz, Garten, Garage, Werbeflächen</li>
+      </ul>
+
+      <h3>Mietpreis-Analyse direkt unter der Mietstruktur</h3>
+      <p>
+        Sobald du Wohnfläche und Nettokaltmiete eingegeben hast, zeigt DealPilot dir den Quadratmeterpreis und legt ihn neben den lokalen Mietspiegel — wenn vorhanden. Sind deine 7,80 €/m² in einer Stadt mit Mietspiegel 9,20 €/m² ein Schnäppchen für den Mieter, also Mietsteigerungs-Potenzial? Oder einfach zu niedrig kalkuliert?
+      </p>
+
+      <h3>KI-Marktmieten-Recherche (Investor &amp; Pro)</h3>
+      <p>
+        Im Investor- und Pro-Plan kannst du eine <em>KI-gestützte Mietmarkt-Recherche</em> starten. Die KI sucht im Web nach aktuellen Vergleichsangeboten in deiner Lage, schätzt eine plausible Mietbandbreite und nennt dir die Quellen. So weißt du, ob deine Miete unter, am oder über Markt liegt — wichtig für die Cashflow-Projektion und die Verhandlungsstrategie.
+      </p>
+
+      <h3>Staffelmiete und Mieterhöhungen</h3>
+      <p>
+        Mieterhöhungs-Annahmen über 15 Jahre fließen automatisch in die Cashflow-Projektion ein. Du kannst entweder eine konstante prozentuale Steigerung pro Jahr annehmen (typisch 1–2 %) oder Staffelmieten manuell eintragen. DealPilot rechnet dann die exakte Mieteinnahme pro Jahr durch.
+      </p>
+    </article>
+
+    <article class="section reveal" id="werbungskosten">
+      <span class="eyebrow"><span class="anchor">08</span>Werbungskostenrechner</span>
+      <h2>Was die Vermietung an <span class="gold">Werbungskosten erzeugt.</span></h2>
+      <p>
+        Werbungskosten sind alle Kosten, die im Zusammenhang mit den Mieteinnahmen anfallen — sie reduzieren die Bemessungsgrundlage für die Einkommensteuer und damit den Liquiditätsabfluss. DealPilot zeigt dir transparent, welche Werbungskosten deine Vermietung erzeugt und wie sich diese über 15 Jahre entwickeln.
+      </p>
+
+      <h3>Positionen im Werbungskostenmodul</h3>
+      <ul>
+        <li><strong>Absetzung für Abnutzung (AfA)</strong> — linear über 50 Jahre für Gebäude ab Baujahr 1925; 40 Jahre für Baujahr vor 1925; 33 Jahre für Gebäude ab Baujahr 2023. Sonderabschreibungen für Denkmäler und Sanierungsgebiete kannst du manuell eintragen.</li>
+        <li><strong>Schuldzinsen</strong> — automatisch aus dem Finanzierungsmodul übernommen, über die gesamte Zinsbindung und in der Anschlussphase</li>
+        <li><strong>Bewirtschaftungskosten</strong> — nicht-umlagefähige Anteile (Verwaltung, Instandhaltung, Hausgeld-Verwalteranteil)</li>
+        <li><strong>Sanierungskosten</strong> — vollständig abzugsfähig, wenn sie unter der 15-%-Grenze bleiben; sonst über die Restnutzungsdauer verteilt</li>
+        <li><strong>Möblierung</strong> — linear über zehn Jahre</li>
+        <li><strong>Fahrtkosten, Beratung, Kontoführung</strong> — als Pauschalen oder Einzelpositionen</li>
+      </ul>
+
+      <h3>15-Jahres-Verlauf</h3>
+      <p>
+        Das Modul zeigt dir den <strong>15-Jahres-Verlauf aller Werbungskosten</strong> als Tabelle und als Diagramm. Du siehst, wann die AfA-Effekte abnehmen, wann die Schuldzinsen am höchsten sind, wann sich Sanierungskosten amortisiert haben. Ein eigenständiges <em>Werbungskosten-PDF</em> kannst du als Belegübersicht nutzen — etwa um deinem Steuerberater einen sauberen Überblick über die geplante Vermietung zu geben.
+      </p>
+
+      <div class="info-card">
+        <h4>Keine Steuerberatung</h4>
+        <p>Das Werbungskostenmodul zeigt nur die <em>wirtschaftlichen Auswirkungen</em> der eingegebenen Positionen. Es ersetzt keine steuerliche Würdigung deiner individuellen Situation. Für die tatsächliche Anerkennung von Werbungskosten ist immer der Steuerberater zuständig.</p>
+      </div>
+    </article>
+
+    <article class="section reveal" id="finanzierung">
+      <span class="eyebrow"><span class="anchor">09</span>Finanzierung &amp; Anschlusstest</span>
+      <h2>Von Annuität bis <span class="gold">Tilgungsaussetzung.</span></h2>
+      <p>
+        Die Finanzierung ist der Hebel — sie macht aus 30.000 € Eigenkapital ein Investment von 300.000 € möglich. DealPilot kennt alle gängigen Darlehensarten und bildet sie korrekt ab.
+      </p>
+
+      <h3>Darlehensarten</h3>
+      <ul>
+        <li><strong>Annuitätendarlehen</strong> — gleichbleibende Rate, Tilgung steigt mit der Zeit (Standard für Wohnimmobilien)</li>
+        <li><strong>Volltilgerdarlehen</strong> — kein Tilgungsrest am Ende der Zinsbindung</li>
+        <li><strong>Tilgungsaussetzungsdarlehen mit Bausparvertrag</strong> — Zinsen während der Laufzeit, Tilgung über Bausparsumme</li>
+        <li><strong>KfW-Förderdarlehen</strong> — als zweites Darlehen kombinierbar mit dem Hauptdarlehen</li>
+        <li><strong>Kombinationen</strong> aus mehreren Darlehen mit unterschiedlichen Zinsbindungen</li>
+      </ul>
+
+      <h3>Live-Marktzinsen aus der Bundesbank-Statistik</h3>
+      <p>
+        Statt dir die Zinsen aus dem Internet zusammensuchen zu müssen, zeigt dir DealPilot direkt im Finanzierungs-Tab die <strong>aktuellen Effektivzinsen für Wohnungsbaukredite an Privathaushalte</strong> — variabel, 1–5 Jahre, 5–10 Jahre, über 10 Jahre. Daten kommen aus der ECB-MFI-Statistik, monatlich aktualisiert. Plus Vergleichslinks zu Interhyp, Dr. Klein und Baufi24, damit du deine eigene Konditionen-Anfrage direkt machen kannst.
+      </p>
+
+      <h3>Tilgungsplan über die gesamte Laufzeit</h3>
+      <p>
+        DealPilot rechnet dir den vollständigen Tilgungsplan aus — Jahr für Jahr, Restschuld, gezahlte Zinsen, gezahlte Tilgung. Du siehst, wie viel Eigenkapital du am Ende der Zinsbindung aufgebaut hast und wie hoch die Restschuld ist, mit der du in die Anschlussfinanzierung gehst.
+      </p>
+
+      <h3>Anschlussfinanzierungs-Stresstest</h3>
+      <p>
+        Ende der Zinsbindung — und plötzlich liegt der Markt bei 5 % statt 3,5 %? <strong>DealPilot rechnet das für dich durch.</strong> Du gibst eine Annahme für den Anschlusszins ein (etwa „aktueller Marktzins + 1,5 %") und siehst sofort, wie sich die monatliche Rate ändert und ob dein Cashflow das verträgt.
+      </p>
+
+      <div class="pull">
+        Das ist der Stresstest, den jede Bank von dir erwartet — und den die meisten Investoren in ihren Excel-Tabellen vergessen.
+      </div>
+
+      <h3>Bausparvertrag-Lebenszyklus</h3>
+      <p>
+        Wer mit Tilgungsaussetzung arbeitet, hat in der Regel einen Bausparvertrag als Tilgungsträger. DealPilot bildet den vollen Bausparvertrag-Lebenszyklus ab: Ansparphase, Zuteilungs-Zeitpunkt (auf Basis der Mindest-Quote), Darlehensphase mit dem zugesagten Sollzins. <strong>Wenn die Bausparsumme nicht reicht, um das Tilgungsaussetzungsdarlehen abzulösen, warnt dich die App</strong> — das ist die kritische Lücke, die viele Investoren übersehen.
+      </p>
+    </article>
+
+    <article class="section reveal" id="bewirtschaftung">
+      <span class="eyebrow"><span class="anchor">10</span>Bewirtschaftungskosten</span>
+      <h2>Was die Vermietung <span class="gold">wirklich kostet.</span></h2>
+      <p>
+        Die Bewirtschaftungskosten sind der Bereich, in dem die meisten Hobby-Investoren danebenliegen — entweder weil sie zu niedrig ansetzen („Hausgeld wird ja umgelegt"), oder weil sie Positionen vergessen, die sich später als unangenehme Überraschung entpuppen.
+      </p>
+
+      <h3>Umlagefähig vs. nicht-umlagefähig</h3>
+      <p>
+        DealPilot trennt sauber zwischen den beiden Welten. Umlagefähig sind Heizung, Warmwasser, Wasser, Abwasser, Müll, Hausmeister-Dienstleistungen, Gartenpflege — diese trägt der Mieter. Nicht-umlagefähig sind Verwaltergebühren, Instandhaltungs-Rücklage, Reparaturen, Vermietungs-Aufwand, Mietausfall-Risiko, eigene Kontoführung — diese trägst du.
+      </p>
+
+      <h3>Zwei Erfassungs-Modi</h3>
+      <ul>
+        <li><strong>Detail-Modus</strong> — du gibst jede Position einzeln ein, in € pro Jahr. Sinnvoll für laufende Vermietungen mit echten Zahlen aus der WEG-Abrechnung.</li>
+        <li><strong>Quick-Modus</strong> — du gibst die Bewirtschaftung als Prozentsatz der Nettokaltmiete ein (IVD-Richtwert: 18–35 %). Sinnvoll für Erstprüfungen, wenn du noch keine genauen Zahlen hast.</li>
+      </ul>
+
+      <h3>Mietausfall-Risiko separat</h3>
+      <p>
+        Für Mietausfall gibt es einen separaten Risikoaufschlag (typisch 2–5 % der Jahresmiete), der direkt in die Cashflow-Projektion einfließt. So sind 1–2 Monate Leerstand pro Mieterwechsel realistisch eingepreist — etwas, das in der Excel-Welt oft komplett übersehen wird.
+      </p>
+    </article>
+
+    <article class="section reveal" id="dealscore">
+      <span class="eyebrow"><span class="anchor">11</span>Investor Deal Score 2.0</span>
+      <h2>24 KPIs <span class="gold">auf einer Skala.</span></h2>
+      <p>
+        Der Investor Deal Score 2.0 ist das Herzstück von DealPilot. Eine Bewertung des Deals auf einer Skala von 0 bis 100, basierend auf <strong>24 Einzelkennzahlen</strong> aus fünf Bereichen. Vergleichbar, sortierbar, professionell — wie es institutionelle Investoren machen.
+      </p>
+
+      <div class="stat-row">
+        <div class="stat-tile">
+          <div class="stat-tile-num">24</div>
+          <div class="stat-tile-lbl">Einzelkennzahlen</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-num">5</div>
+          <div class="stat-tile-lbl">Bereiche</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-num">0–100</div>
+          <div class="stat-tile-lbl">Skala</div>
+        </div>
+      </div>
+
+      <h3>Die fünf Bereiche</h3>
+      <ul>
+        <li><strong>Rendite</strong> — Bruttomietrendite, Nettomietrendite, Cash-on-Cash, Eigenkapitalrendite, IRR über 15 Jahre, Equity Multiple</li>
+        <li><strong>Cashflow</strong> — Monatlicher Cashflow vor und nach Werbungskosten, Cashflow-Stabilität über die Laufzeit, Pufferkapazität, Mietausfall-Toleranz</li>
+        <li><strong>Finanzierung</strong> — DSCR (Debt Service Coverage Ratio), LTV (Loan to Value), Zinssatz, Tilgung, Eigenkapitalquote, Anschlussfinanzierungs-Risiko</li>
+        <li><strong>Risiko</strong> — Leerstand, Instandhaltungsbedarf, Energieklasse, Baujahr/Zustand, Mietausfall-Risiko, Energie-Risiken</li>
+        <li><strong>Potenzial</strong> — Marktfaktor, Wertsteigerungs-Potenzial, Mietsteigerungs-Möglichkeiten, Wertpuffer (Marktwert vs. Kaufpreis)</li>
+      </ul>
+
+      <h3>Wie die Bewertung funktioniert</h3>
+      <p>
+        Für jede der 24 KPIs gibt es <em>Schwellenwerte</em>, die aus der institutionellen Investment-Praxis kalibriert sind. Ein Wert wird linear oder über Stufen in einen Punktwert von 0 bis 100 übersetzt. Die Punkte werden dann mit den Gewichten der jeweiligen Kategorie verrechnet.
+      </p>
+
+      <h3>LTV/DSCR-Interaktions-Bonus</h3>
+      <p>
+        Eine Besonderheit des Scores: Wenn du mit hohem LTV (≥ 95 %) und gleichzeitig starkem DSCR (≥ 1,20) finanzierst, bekommst du einen <strong>Bonus</strong> — das ist eine professionelle Hebel-Struktur. Umgekehrt: Hoher LTV (≥ 95 %) mit schwachem DSCR (&lt; 1,00) gibt einen <strong>Malus</strong>, weil das eine riskante Finanzierungsstruktur ist.
+      </p>
+
+      <h3>Anpassbare Gewichtungen</h3>
+      <p>
+        Die Gewichtungen der fünf Kategorien sind in den Einstellungen anpassbar — wenn du als Cashflow-Investor arbeitest, kannst du Cashflow höher gewichten; wenn du auf Wertsteigerung optimierst, das Potenzial. <strong>Du baust deine Bewertung nach deiner Strategie.</strong> Nicht eine pauschale Wahrheit für alle.
+      </p>
+
+      <div class="info-card">
+        <h4>Free vs. Bezahl-Pläne</h4>
+        <p>Im Free-Plan siehst du eine Demo-Version des Deal Score 2.0 (mit Beispielwerten). Der volle Score mit echten Werten aus deinem Objekt ist ab dem Investor-Plan verfügbar. Im Starter-Plan gibt es einen reduzierten 5-Faktoren-Score.</p>
+      </div>
+    </article>
+
+    <article class="section reveal" id="ki-analyse">
+      <span class="eyebrow"><span class="anchor">12</span>KI-Investment-Analyse</span>
+      <h2>Ein erfahrener Berater, <span class="gold">der nie müde wird.</span></h2>
+      <p>
+        Sobald deine Eingaben vollständig sind, kannst du die KI-Investment-Analyse starten. Sie nimmt alle Zahlen aus deinem Objekt (Kaufpreis, Miete, Finanzierung, Werbungskosten, Lage), die berechneten Kennzahlen (Cashflow, DSCR, LTV, Deal Score) und deine Selbsteinschätzungen (Strategie, Verkäufer-Situation, Risikotoleranz, Marktphase) — und schickt sie zusammen mit einem strukturierten Analyse-Auftrag an ChatGPT.
+      </p>
+      <p>
+        Die KI macht zusätzlich <strong>Web-Recherche zu deiner Lage</strong>: aktueller Mietmarkt, Bevölkerungs-Entwicklung, wirtschaftliche Situation, Stadtteil-Reputation, vergleichbare Verkäufe. Diese Informationen fließen in die Analyse ein.
+      </p>
+
+      <h3>Was du zurückbekommst</h3>
+      <ul>
+        <li><strong>Gesamtbewertung</strong> — eine 4–6 Sätze umfassende Bewertung mit konkreten Zahlen und einem klaren Investment-Rating („Sehr attraktiv", „Attraktiv", „Neutral", „Kritisch", „Ungeeignet")</li>
+        <li><strong>Stärken &amp; Risiken</strong> — jeweils 4–5 nummerierte Punkte, jeweils ausführlich begründet mit Bezug auf die echten Zahlen aus deinem Objekt</li>
+        <li><strong>Risikoanalyse</strong> — Finanzierungsrisiko (LTV + DSCR), Cashflow-Stabilität, Annahmen-Abhängigkeit</li>
+        <li><strong>Szenario-Analyse</strong> — Worst Case (Miete −10 %, Zins +1 %) und Best Case durchgerechnet, jeweils mit beschriebenen Auswirkungen</li>
+        <li><strong>Investor-Fit</strong> — passt der Deal zum Cashflow-Investor, zum Wertsteigerungs-Investor oder zum sicherheitsorientierten Investor?</li>
+        <li><strong>Empfehlung</strong> — klar „Kaufen", „Prüfen" oder „Nicht kaufen", mit Begründung und gegebenenfalls Bedingungen</li>
+        <li><strong>Verhandlungsempfehlung</strong> — Erstangebot, Zielpreis, Schmerzgrenze, jeweils mit konkretem Euro-Betrag und ausführlicher Begründung</li>
+        <li><strong>Kaufpreis-Offerte</strong> — ein vorgefertigter, formell gehaltener Text als Vorlage für deine schriftliche Kaufpreis-Offerte an den Verkäufer (ca. 200–300 Wörter, direkt kopierbar)</li>
+        <li><strong>Bankargumente</strong> — 5–7 ausführliche, fundierte Argumente für die Finanzierungsanfrage, mit konkreten Zahlen und Bezug auf den Deal</li>
+      </ul>
+
+      <h3>Wie das Credit-System funktioniert</h3>
+      <p>
+        Jede vollständige KI-Analyse verbraucht <strong>einen halben Credit</strong> (1 Credit = 2 Analysen). Wir nutzen ein Credit-System statt einer Flatrate, weil KI-Aufrufe für uns echte Kosten bedeuten — und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
+      </p>
+      <p>
+        In jedem Bezahl-Plan sind monatliche Credits inklusive (Starter: 5, Investor: 15, Pro: 40). Sind die aufgebraucht, kannst du Credit-Pakete nachkaufen: 5 für 2 €, 15 für 5 €, 40 für 12 €, 100 für 25 €. <strong>Zugekaufte Credits verfallen nicht.</strong>
+      </p>
+    </article>
+
+    <article class="section reveal" id="exports">
+      <span class="eyebrow"><span class="anchor">13</span>Bankexport &amp; Investment-Case</span>
+      <h2>Bankfähig in <span class="gold">unter einer Minute.</span></h2>
+      <p>
+        Am Ende einer Vollanalyse hast du eine vollständige Datengrundlage — und genau die brauchst du, um bei der Bank einen souveränen Eindruck zu hinterlassen. DealPilot bietet mehrere Export-Formate.
+      </p>
+
+      <h3>Investment-Case-PDF</h3>
+      <p>
+        Sechs Seiten, professionelles Layout in deinem oder unserem Branding:
+      </p>
+      <ol>
+        <li><strong>Deckblatt</strong> — dunkles Design mit Gold-Akzenten, Titelfoto, vier Cover-KPIs (Score, Cashflow, Rendite, LTV)</li>
+        <li><strong>Executive Summary</strong> — Übersicht aller wichtigen Kennzahlen, Szenarien (heute / Ende Zinsbindung / Anschluss), Cashflow-Aufschlüsselung</li>
+        <li><strong>Objekt &amp; Finanzierung</strong> — Erwerbsnebenkosten-Aufstellung, Wertpuffer-Visualisierung, Darlehensstruktur, Bewirtschaftungskosten</li>
+        <li><strong>Cashflow-Projektion</strong> — 15-Jahres-Tabelle mit Goldzeile am Ende der Zinsbindung als Markierung</li>
+        <li><strong>KI-Analyse</strong> — die strukturierte KI-Bewertung als Volltext, mit allen Sektionen (falls eine KI-Analyse vorliegt)</li>
+        <li><strong>Annahmen &amp; Disclaimer</strong> — alle eingegebenen Prognose-Parameter zur Nachvollziehbarkeit, plus rechtlicher Disclaimer</li>
+      </ol>
+
+      <h3>Premium-Layout (Investor &amp; Pro)</h3>
+      <p>
+        Im Investor- und Pro-Plan kannst du ein <em>Premium-Layout</em> für den Investment-Case wählen — mit erweiterten Charts, höherer Informationsdichte und eigenem Logo + Footer. Geeignet für anspruchsvolle Bankgespräche und institutionelle Investorenmeetings.
+      </p>
+
+      <h3>Werbungskosten-PDF</h3>
+      <p>
+        Eigenständiges PDF mit allen Werbungskosten-Positionen, sortiert und summiert — geeignet als Übersicht für deinen Steuerberater. Du kannst einzelne Jahre oder den 15-Jahres-Verlauf exportieren.
+      </p>
+
+      <h3>Track-Record-PDF</h3>
+      <p>
+        Wenn du mehrere Objekte besitzt, kannst du einen Track-Record über dein gesamtes Portfolio erstellen — mit kompakter Übersicht jedes Objekts (Foto, Kaufpreis, Miete, Cashflow, Rendite), Portfolio-Aggregaten und Entwicklungsprognose. Wichtig für Folgefinanzierungen, neue Bankgespräche oder Investoren-Pitches.
+      </p>
+
+      <h3>Excel-Bankexport (25 Spalten)</h3>
+      <p>
+        Wer mit eigenen Excel-Tools weiterarbeiten will, kann jedes Objekt als CSV oder XLSX exportieren. Der <strong>Bankexport</strong> ist ein spezielles Format mit 25 Spalten pro Objekt — Datum, Adresse, Bank, Vertragsnummer, Darlehenssumme, Zins, Tilgung, Kapitaldienst, Zinsbindung, Restschuld etc. — im Format, das die meisten Banken in Deutschland zur Aufstellung von Immobilien-Engagements erwarten.
+      </p>
+    </article>
+
+    <article class="section reveal" id="portfolio">
+      <span class="eyebrow"><span class="anchor">14</span>Portfolio &amp; Track-Record</span>
+      <h2>Vom Einzelobjekt <span class="gold">zum Bestand.</span></h2>
+      <p>
+        Sobald du mehr als ein Objekt analysierst, willst du die Übersicht behalten — und vergleichen können. DealPilot bietet eine <strong>Portfolio-Übersicht</strong>, in der alle deine Objekte als suchbare, sortierbare Tabelle erscheinen.
+      </p>
+
+      <h3>Portfolio-Tabelle</h3>
+      <p>
+        Spalten: Kürzel, Adresse, Kaufpreis, Gesamtinvestition, Bruttomietrendite, DSCR, LTV, Cashflow, Deal Score. Du kannst nach jeder Spalte sortieren, nach Adresse oder Kürzel suchen und einzelne Objekte in die Detailansicht laden.
+      </p>
+
+      <h3>Sidebar mit Live-KPIs</h3>
+      <p>
+        Eine kompakte Sidebar mit Mockup-Karten zeigt dir die wichtigsten Werte jedes Objekts auf einen Blick — Foto, Adresse, Kaufpreis, DSCR mit Ampel-Slider, Cashflow mit Trendkurve, Bruttomietrendite mit Bar. Perfekt für den schnellen Status-Check beim Vorbeischauen.
+      </p>
+
+      <h3>Strategie-Modul (Investor &amp; Pro)</h3>
+      <p>
+        Im Strategie-Modul aggregiert DealPilot dein gesamtes Portfolio: Gesamt-Cashflow, Portfolio-Rendite, durchschnittlicher LTV, gewichtete DSCR, Gesamt-Restschuld. Plus eine Übersicht für <strong>Bausparverträge und Tilgungsaussetzungs-Darlehen</strong>, die dir für jedes betroffene Objekt anzeigt, wie es mit der Anschlussfinanzierung aussieht: Bausparsumme vs. Hauptdarlehen, Jahre bis zur Zuteilung, Status-Ampel.
+      </p>
+    </article>
+
+    <article class="section reveal" id="daten">
+      <span class="eyebrow"><span class="anchor">15</span>Datensicherheit &amp; Hosting</span>
+      <h2>Deutsche Daten. <span class="gold">Deutsche Server.</span></h2>
+      <p>
+        DealPilot wird in Deutschland (Hetzner Cloud) betrieben. Alle Daten — deine Objektkalkulationen, hochgeladenen PDFs, Berechnungsergebnisse, Auth-Daten — liegen auf Servern in der EU. Wir nutzen verschlüsselte Verbindungen (TLS) zwischen Browser und Server. Die Datenbank ist nicht öffentlich erreichbar.
+      </p>
+      <p>
+        Die KI-Aufrufe gehen über OpenAI (ChatGPT) — diese Daten verlassen die EU für die Dauer der Anfrage. Wir nutzen das <strong>Enterprise-API ohne Training-Opt-In</strong>, das heißt: deine Inhalte werden nicht für das Training der KI-Modelle verwendet.
+      </p>
+
+      <h3>Lokal-Modus ohne Account</h3>
+      <p>
+        Wenn du DealPilot ohne Account testen willst, gibt es einen Lokal-Modus: Alle Daten bleiben in deinem Browser (localStorage), nichts wird an Server übertragen. Nützlich für ein erstes Ausprobieren — hat aber keinen Cloud-Sync und keine KI-Analyse (für die brauchst du einen Account, weil die KI-Aufrufe über unseren Server laufen).
+      </p>
+
+      <h3>JSON-Export für Backup</h3>
+      <p>
+        Du kannst jederzeit dein gesamtes Portfolio als JSON-Datei exportieren — als Backup oder zum Übertragen in eine andere Installation. Der Import funktioniert genauso einfach: JSON-Datei reinziehen, Objekte werden übernommen.
+      </p>
+    </article>
+
+    <div class="cta-block">
+      <h3>Bereit, das in der <em>Praxis</em> zu sehen?</h3>
+      <p>Starte mit dem kostenlosen Plan — kein Kreditkarten-Zwang, kein Verkaufsgespräch. Du kannst innerhalb von Minuten dein erstes Objekt durchrechnen.</p>
+      <a href="https://app.staging.dealpilot.junker-immobilien.io/?register=1" class="btn-primary">Kostenlos registrieren →</a>
+      <a href="index.html#pricing" class="btn-secondary">Pläne ansehen</a>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container-wide">
+    <div class="footer-grid">
+      <div>
+        <img src="assets/dealpilot-logo.png" alt="DealPilot by Junker Immobilien" class="footer-logo">
+        <p class="footer-tagline">
+          Immobilien-Investmentanalyse für strukturierte Entscheidungen.
+          Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Produkt</h4>
+        <a href="index.html#workflow">So funktioniert's</a>
+        <a href="leistungsumfang.html">Leistungsumfang</a>
+        <a href="index.html#pricing">Preise</a>
+        <a href="https://app.staging.dealpilot.junker-immobilien.io/">Login</a>
+        <a href="https://app.staging.dealpilot.junker-immobilien.io/?register=1">Registrieren</a>
+      </div>
+      <div class="footer-col">
+        <h4>Junker Immobilien</h4>
+        <a href="https://junker-immobilien.io">Hauptseite</a>
+        <a href="https://junker-immobilien.io/kapitalanlageimmobilien/">Kapitalanlage</a>
+        <a href="https://junker-immobilien.io/projektentwicklung/">Projektentwicklung</a>
+        <a href="https://junker-immobilien.io/sachverstaendigenbuero/">Sachverständigenbüro</a>
+        <a href="https://junker-immobilien.io/kontakt/">Kontakt</a>
+      </div>
+      <div class="footer-col">
+        <h4>Rechtliches</h4>
+        <a href="https://junker-immobilien.io/i/">Impressum</a>
+        <a href="https://junker-immobilien.io/datenschutzerklaerung/">Datenschutz</a>
+        <a href="https://junker-immobilien.io/barrierefreiheitserklaerung/">Barrierefreiheit</a>
+        <a href="https://junker-immobilien.io/cookie-richtlinie-eu/">Cookie-Richtlinie</a>
+      </div>
+      <div class="footer-col">
+        <h4>Kontakt</h4>
+        <a href="mailto:support@junker-immobilien.io" class="footer-mail">
+          <span class="footer-mail-label">Support</span>
+          <span class="footer-mail-addr">support@junker-immobilien.io</span>
+        </a>
+        <a href="mailto:dealpilot@junker-immobilien.io" class="footer-mail">
+          <span class="footer-mail-label">Allgemeine Anfragen</span>
+          <span class="footer-mail-addr">dealpilot@junker-immobilien.io</span>
+        </a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 Junker Immobilien · Hermannstr. 9 · 32609 Hüllhorst</div>
+      <div>Keine Steuer- oder Finanzberatung. Analyse-Tool für eigene Kalkulationen.</div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script src="assets/effects.js"></script>
+</body>
+</html>

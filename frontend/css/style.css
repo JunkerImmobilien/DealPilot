@@ -27559,3 +27559,433 @@ aside.sidebar .sb-card.deal-won.active {
     height: 16px;
   }
 }
+
+
+/* V202: Sternschnuppe-Ring um DealPilot-Logo
+   Wirkt auf .sb-logo-shimmer (Sidebar) + .auth-logo-v39 (Login)
+   Inkl. Hover-Boost (schneller + stärkerer Glow) */
+
+@property --shooter-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes dpV202ShooterOrbit {
+  0%   { --shooter-angle: 0deg; opacity: 1; }
+  30%  { opacity: 1; }
+  31%  { opacity: 0; }
+  99%  { opacity: 0; }
+  100% { --shooter-angle: 360deg; opacity: 1; }
+}
+
+@keyframes dpV202ShooterFallback {
+  0%, 74% { opacity: 0; transform: rotate(0deg); }
+  75%     { opacity: 1; }
+  100%    { opacity: 1; transform: rotate(360deg); }
+}
+
+/* Sidebar-Logo: Sternschnuppe als ::after */
+aside.sidebar .sb-logo-shimmer {
+  transition: transform 0.3s ease;
+}
+
+aside.sidebar .sb-logo-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--shooter-angle, 0deg),
+    transparent 0deg,
+    rgba(201, 168, 76, 0.08) 305deg,
+    rgba(232, 200, 120, 0.55) 335deg,
+    rgba(255, 235, 180, 1) 355deg,
+    rgba(255, 250, 220, 1) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: dpV202ShooterOrbit 6s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 235, 180, 0.8));
+  pointer-events: none;
+  z-index: 3;
+}
+
+aside.sidebar .sb-logo-shimmer:hover {
+  transform: scale(1.02);
+}
+aside.sidebar .sb-logo-shimmer:hover::after {
+  animation-duration: 3s;
+  filter: drop-shadow(0 0 12px rgba(255, 235, 180, 1));
+}
+
+@supports not (background: conic-gradient(from var(--shooter-angle, 0deg), red, blue)) {
+  aside.sidebar .sb-logo-shimmer::after {
+    background: none;
+    border: 1.5px solid transparent;
+    border-top-color: rgba(255, 235, 180, 0.85);
+    border-right-color: rgba(232, 200, 120, 0.5);
+    animation: dpV202ShooterFallback 8s linear infinite;
+  }
+}
+
+/* Login-Logo: Sternschnuppe als ::after */
+.auth-logo-v39 {
+  transition: transform 0.3s ease;
+}
+
+.auth-logo-v39::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--shooter-angle, 0deg),
+    transparent 0deg,
+    rgba(201, 168, 76, 0.08) 305deg,
+    rgba(232, 200, 120, 0.55) 335deg,
+    rgba(255, 235, 180, 1) 355deg,
+    rgba(255, 250, 220, 1) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: dpV202ShooterOrbit 6s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 235, 180, 0.8));
+  pointer-events: none;
+  z-index: 3;
+}
+
+.auth-logo-v39:hover {
+  transform: scale(1.02);
+}
+.auth-logo-v39:hover::after {
+  animation-duration: 3s;
+  filter: drop-shadow(0 0 12px rgba(255, 235, 180, 1));
+}
+
+@supports not (background: conic-gradient(from var(--shooter-angle, 0deg), red, blue)) {
+  .auth-logo-v39::after {
+    background: none;
+    border: 1.5px solid transparent;
+    border-top-color: rgba(255, 235, 180, 0.85);
+    border-right-color: rgba(232, 200, 120, 0.5);
+    animation: dpV202ShooterFallback 8s linear infinite;
+  }
+}
+
+
+/* V203: App-Logo komplett im Landing-Hero-Look — PNG + Sternschnuppe-Ring */
+
+@property --shooter-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes dpV203ShooterOrbit {
+  0%   { --shooter-angle: 0deg; opacity: 1; }
+  30%  { opacity: 1; }
+  31%  { opacity: 0; }
+  99%  { opacity: 0; }
+  100% { --shooter-angle: 360deg; opacity: 1; }
+}
+
+@keyframes dpV203ShooterFallback {
+  0%, 74% { opacity: 0; transform: rotate(0deg); }
+  75%     { opacity: 1; }
+  100%    { opacity: 1; transform: rotate(360deg); }
+}
+
+/* Basis-Logo-Container — transparent, mit Sternschnuppe drumrum */
+.app-logo-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(201, 168, 76, 0.18);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  background: transparent;
+}
+
+.app-logo-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1.5px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--shooter-angle, 0deg),
+    transparent 0deg,
+    rgba(201, 168, 76, 0.08) 305deg,
+    rgba(232, 200, 120, 0.55) 335deg,
+    rgba(255, 235, 180, 1) 355deg,
+    rgba(255, 250, 220, 1) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: dpV203ShooterOrbit 6s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 235, 180, 0.8));
+  z-index: 2;
+}
+
+.app-logo-hero:hover {
+  transform: scale(1.03);
+}
+.app-logo-hero:hover::before {
+  animation-duration: 3s;
+  filter: drop-shadow(0 0 12px rgba(255, 235, 180, 1));
+}
+
+@supports not (background: conic-gradient(from var(--shooter-angle, 0deg), red, blue)) {
+  .app-logo-hero::before {
+    background: none;
+    border: 1.5px solid transparent;
+    border-top-color: rgba(255, 235, 180, 0.85);
+    border-right-color: rgba(232, 200, 120, 0.5);
+    animation: dpV203ShooterFallback 8s linear infinite;
+  }
+}
+
+/* Logo-Bild — sitzt zentriert in der Box */
+.app-logo-hero .app-logo-img {
+  display: block;
+  height: 88px;
+  width: auto;
+  border-radius: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Variante Sidebar — leicht kleiner */
+.app-logo-sidebar {
+  margin: 14px;
+}
+.app-logo-sidebar .app-logo-img {
+  height: 76px;
+}
+
+/* Variante Login/Register/Reset — größer, zentriert */
+.app-logo-auth {
+  margin: 0 auto 24px;
+  max-width: 220px;
+}
+.app-logo-auth .app-logo-img {
+  height: 96px;
+}
+
+/* Mobile-Override */
+@media (max-width: 768px) {
+  .app-logo-sidebar .app-logo-img { height: 64px; }
+  .app-logo-auth .app-logo-img { height: 80px; }
+}
+
+/* sb-header transparenter machen damit Sternschnuppe sichtbar bleibt */
+.sb-header:has(.app-logo-hero) {
+  background: transparent;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.12);
+  overflow: visible;
+}
+
+
+/* V206: Single-Container Logo (PNG bis Rahmen, Sparkle dauerhaft) */
+
+/* Override Container: Padding raus, klare Border, kleiner Border-Radius */
+/* V208: alpha 0.5 → 0.22 (dezenter Saum, keine konkurrierende 2. Linie) */
+.app-logo-hero {
+  padding: 0 !important;
+  border-radius: 12px !important;
+  border: 1.5px solid rgba(201, 168, 76, 0.22) !important;
+  background: linear-gradient(135deg, #0d0a04 0%, #1a1408 100%) !important;
+  overflow: visible !important;
+}
+
+/* Logo-Img Standardgröße rauf */
+.app-logo-hero .app-logo-img {
+  height: 140px !important;
+  border-radius: 11px !important;
+  display: block !important;
+}
+
+/* V209: Breite-Constraint statt Höhe (PNG 477×123 = 3.88:1, würde sonst rausragen) */
+/* Sidebar: max-width 260px → resultiert in ca. 67px Höhe */
+.app-logo-sidebar .app-logo-img {
+  height: auto !important;
+  width: auto !important;
+  max-width: 260px !important;
+  max-height: 80px !important;
+}
+
+/* Auth (Login/Register): max-width 280px → resultiert in ca. 72px Höhe */
+.app-logo-auth .app-logo-img {
+  height: auto !important;
+  width: auto !important;
+  max-width: 280px !important;
+  max-height: 90px !important;
+}
+
+/* Mobile: kleiner */
+@media (max-width: 768px) {
+  .app-logo-sidebar .app-logo-img {
+    max-width: 220px !important;
+    max-height: 68px !important;
+  }
+  .app-logo-auth .app-logo-img {
+    max-width: 240px !important;
+    max-height: 75px !important;
+  }
+}
+
+/* V208: Sternschnuppe EXAKT auf Container-Border (inset: 0 + mask-composite).
+   inset: 0 = sitzt auf der Border-Position, nicht 1.5px außerhalb.
+   mask-composite = Conic-Gradient wird zur Border-LINIE, nicht zur Vollfläche.
+   Resultat: EINE Linie — der dezente 0.22-Saum + die laufende Sternschnuppe direkt drauf. */
+.app-logo-hero::before {
+  border-radius: 12px !important;
+  padding: 1.5px !important;
+  inset: 0 !important;
+  background: conic-gradient(
+    from var(--shooter-angle, 0deg),
+    transparent 0deg,
+    rgba(168, 134, 30, 0.2) 200deg,
+    rgba(232, 200, 120, 0.7) 290deg,
+    rgba(255, 240, 200, 1) 340deg,
+    rgba(255, 255, 240, 1) 355deg,
+    rgba(255, 240, 200, 1) 360deg
+  ) !important;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0) !important;
+  -webkit-mask-composite: xor !important;
+          mask-composite: exclude !important;
+  animation: dpV203ShooterOrbit 6s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  filter: drop-shadow(0 0 8px rgba(255, 250, 240, 0.9))
+          drop-shadow(0 0 20px rgba(232, 200, 120, 0.6)) !important;
+  z-index: 3 !important;
+}
+
+/* Sparkle ✦ als ::after — sitzt am Kopf der Sternschnuppe, dauerhaft sichtbar */
+.app-logo-hero::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 14px !important;
+  height: 14px !important;
+  top: 50% !important;
+  left: 50% !important;
+  margin: -7px 0 0 -7px !important;
+  background: none !important;
+  /* SVG Sparkle als data-URI */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 0 L13 11 L24 12 L13 13 L12 24 L11 13 L0 12 L11 11 Z' fill='%23fff8e0'/></svg>") !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  /* Position auf Kreisbahn — Radius muss zur Logo-Größe passen */
+  --orbit-radius: 95px;
+  transform: rotate(var(--shooter-angle, 0deg)) translate(var(--orbit-radius), 0) rotate(calc(-1 * var(--shooter-angle, 0deg))) !important;
+  transform-origin: center !important;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1))
+          drop-shadow(0 0 12px rgba(255, 235, 180, 0.9)) !important;
+  pointer-events: none !important;
+  z-index: 4 !important;
+  /* Animation: nutzt gleichen --shooter-angle wie Sternschnuppe — bewegt sich synchron */
+  animation: dpV206SparkleOrbit 6s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+
+@keyframes dpV206SparkleOrbit {
+  0%   { --shooter-angle: 0deg; }
+  100% { --shooter-angle: 360deg; }
+}
+
+/* Auth-Variante: größerer Orbit-Radius wegen größerem Logo */
+.app-logo-auth::after {
+  --orbit-radius: 108px !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: -8px 0 0 -8px !important;
+}
+
+/* Mobile-Override für Sparkle-Radius */
+@media (max-width: 768px) {
+  .app-logo-sidebar::after {
+    --orbit-radius: 76px !important;
+    width: 12px !important;
+    height: 12px !important;
+    margin: -6px 0 0 -6px !important;
+  }
+  .app-logo-auth::after {
+    --orbit-radius: 90px !important;
+    width: 13px !important;
+    height: 13px !important;
+    margin: -6.5px 0 0 -6.5px !important;
+  }
+}
+
+/* Hover-Boost: Sternschnuppe schneller, Sparkle synchron */
+.app-logo-hero:hover {
+  transform: scale(1.02);
+}
+.app-logo-hero:hover::before {
+  animation-duration: 3s !important;
+  filter: drop-shadow(0 0 14px rgba(255, 250, 240, 1))
+          drop-shadow(0 0 32px rgba(232, 200, 120, 0.8)) !important;
+}
+.app-logo-hero:hover::after {
+  animation-duration: 3s !important;
+}
+
+/* sb-header transparent so Sternschnuppe sichtbar bleibt */
+.sb-header:has(.app-logo-hero) {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.12) !important;
+  overflow: visible !important;
+}
+
+/* V206-Marker */
+
+
+/* V207-Größen wurden in V209 außer Kraft gesetzt (siehe V206-Block oben mit max-width-Constraint).
+   Diese Höhe-only-Regeln machten das Logo bei Aspect 3.88:1 zu breit für den Sidebar-Container. */
+
+/* V209: Orbit-Radius an neue max-width-260px-Logos angepasst.
+   Logo Sidebar ~260×67 → Halb-Breite 130 → Orbit 140 (etwas außen)
+   Logo Auth    ~280×72 → Halb-Breite 140 → Orbit 150
+   Mobile entsprechend kleiner. */
+.app-logo-sidebar::after {
+  --orbit-radius: 140px !important;
+}
+
+.app-logo-auth::after {
+  --orbit-radius: 150px !important;
+}
+
+@media (max-width: 768px) {
+  .app-logo-sidebar::after { --orbit-radius: 118px !important; }
+  .app-logo-auth::after { --orbit-radius: 128px !important; }
+}
+
+
+/* V208-Marker — Logo-Doppellinie-Fix:
+   - Container-Border alpha 0.5 → 0.22
+   - ::before inset -1.5px → 0
+   - ::before mask-composite ergänzt
+   Resultat: 1 Linie statt 2. */
+
+
+/* V209-Marker — Sidebar/Auth-Logo-Fit:
+   - Sidebar: max-width 260px (statt height 160px) → passt in Sidebar
+   - Auth: max-width 280px (statt height 180px)
+   - Mobile entsprechend
+   - Orbit-Radius an neue Größen angepasst
+   Fix für: Logo ragte links aus Sidebar raus (V208-Screenshot). */

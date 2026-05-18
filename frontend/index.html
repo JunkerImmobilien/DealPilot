@@ -21,7 +21,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=110">
+<link rel="stylesheet" href="css/style.css?v=209">
 <link rel="stylesheet" href="css/portfolio-strategy.css?v=144">
 <link rel="stylesheet" href="css/pricing-modal.css?v=197">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
@@ -163,12 +163,9 @@
   <!-- V42: Toggle-Button schwebt am rechten Sidebar-Rand (raus aus dem Logo) -->
   <!-- V61: sb-toggle-v42 entfernt — Sidebar lässt sich nicht mehr einklappen -->
   <div class="sb-header">
-    <!-- V65.1: Pure-Obsidian-Logo aus HTML+CSS (statt PNG mit eingebrannter Border).
-         "Deal" weiß, "Pilot" mit Gold-Verlauf via background-clip:text.
-         "by Junker Immobilien" zentriert darunter in Gold. -->
-    <div class="sb-logo-shimmer">
-      <div class="sb-logo-deal">Deal<span class="sb-logo-pilot">Pilot</span></div>
-      <div class="sb-logo-by">by Junker Immobilien</div>
+    <!-- V203: Landing-Hero-Look — PNG mit Sternschnuppe-Ring -->
+    <div class="app-logo-hero app-logo-sidebar">
+      <img class="app-logo-img" src="assets/dealpilot-logo.png" alt="DealPilot" />
     </div>
   </div>
 
@@ -392,7 +389,7 @@
   <button class="tab" data-target-sec="s4" data-wf-key="bewirtschaftung"><span class="tab-ico" data-ico="settings"></span><span class="tab-lbl">Bewirtschaftung</span></button>
   <button class="tab" data-target-sec="s3-tax" data-wf-key="steuer"><span class="tab-ico" data-ico="fileText"></span><span class="tab-lbl">Steuer</span></button>
   <button class="tab" data-target-sec="s5"><span class="tab-ico" data-ico="brain"></span><span class="tab-lbl">KI-Analyse</span></button>
-  <button class="tab" data-target-sec="s6"><span class="tab-ico" data-ico="barChart"></span><span class="tab-lbl">Kennzahlen</span></button>
+  <button class="tab" data-target-sec="s6"><span class="tab-ico" data-ico="barChart"></span><span class="tab-lbl">Bewertung</span></button>
   <button class="tab" data-target-sec="s8"><span class="tab-ico" data-ico="handshake"></span><span class="tab-lbl">Deal-Aktion</span></button>
   <div class="tabs-spacer"></div>
   <!-- V75: Status-Badge in der Tab-Bar (statt Workflow-Bar darunter) -->
@@ -2272,7 +2269,7 @@
 <script src="js/bank-negotiation-pdf.js?v=166"></script>
 <script src="js/track-record.js?v=166"></script>
 <script src="js/pdf.js?v=166"></script>
-<script src="js/auth.js?v=185"></script>
+<script src="js/auth.js?v=203"></script>
   <script src="js/auth-401-handler.js?v=160" defer></script>
 <script src="js/subscription.js?v=186"></script>
 <script src="js/bmf-data.js?v=166"></script>
@@ -2324,7 +2321,7 @@
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->
 
 
-  <script src="js/register-easter-egg.js?v=101" defer></script>
+  <script src="js/register-easter-egg.js?v=203" defer></script>
   <script src="credits-modal.js?v=197"></script>
 </body>
 </html>

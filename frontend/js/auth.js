@@ -681,7 +681,9 @@ function showPasswordReset() {
   modal.style.zIndex = '10100';
   modal.innerHTML =
     '<div class="auth-card-v39" style="max-width:380px;animation:none">' +
-      '<div class="auth-logo-v39"><div class="auth-logo-text"><span class="auth-logo-deal">Deal</span><span class="auth-logo-pilot">Pilot</span></div></div>' +
+      '<div class="app-logo-hero app-logo-auth">' +
+      '<img class="app-logo-img" src="assets/dealpilot-logo.png" alt="DealPilot" />' +
+      '</div>' +
       '<h2 class="auth-title-v39" style="font-size:18px">Passwort zurücksetzen</h2>' +
       '<p class="auth-sub-v39" style="font-size:12.5px">Trag deine E-Mail-Adresse ein. Wir schicken dir einen Reset-Link.</p>' +
       '<div class="auth-form-v39">' +
@@ -761,7 +763,9 @@ window.handlePwReset = handlePwReset;
     modal.style.zIndex = '10100';
     modal.innerHTML =
       '<div class="auth-card-v39" style="max-width:380px;animation:none">' +
-        '<div class="auth-logo-v39"><div class="auth-logo-text"><span class="auth-logo-deal">Deal</span><span class="auth-logo-pilot">Pilot</span></div></div>' +
+        '<div class="app-logo-hero app-logo-auth">' +
+      '<img class="app-logo-img" src="assets/dealpilot-logo.png" alt="DealPilot" />' +
+      '</div>' +
         '<h2 class="auth-title-v39" style="font-size:18px">Neues Passwort setzen</h2>' +
         '<p class="auth-sub-v39" style="font-size:12.5px">Trag dein neues Passwort ein. Mindestens 10 Zeichen.</p>' +
         '<div class="auth-form-v39">' +
