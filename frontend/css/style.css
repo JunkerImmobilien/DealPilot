@@ -28234,3 +28234,32 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 }
 
 /* V222-Marker */
+
+
+/* ═══════════════════════════════════════════════════════════
+   V223 — Version-Badge in Sidebar-User-Icons
+   Dezenter Text, links neben Plan/Logout-Buttons.
+   ═══════════════════════════════════════════════════════════ */
+.sb-version-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(201, 168, 76, 0.7);
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(201, 168, 76, 0.08);
+  border: 1px solid rgba(201, 168, 76, 0.18);
+  cursor: help;
+  user-select: none;
+  letter-spacing: 0.3px;
+  transition: color 0.2s ease, background 0.2s ease;
+  white-space: nowrap;
+}
+
+.sb-version-badge:hover {
+  color: rgba(232, 200, 120, 0.95);
+  background: rgba(201, 168, 76, 0.15);
+}
+
+/* V223-Marker */

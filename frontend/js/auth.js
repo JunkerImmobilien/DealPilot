@@ -431,8 +431,12 @@ function updateUserDisplay(session) {
           '<div class="sb-user-email">' + session.email + '</div>' +
         '</div>' +
 
-        // V178: 2 Icon-Buttons direkt nebeneinander (wie im Original-Bild)
+        // V178/V223: Version-Badge + 2 Icon-Buttons direkt nebeneinander
         '<div class="sb-user-icons" style="display:flex;gap:6px;align-items:center;flex-shrink:0">' +
+          // V223: Version-Badge — Hover zeigt vollen semver
+          '<span class="sb-version-badge" title="' + (window.DealPilotVersion && window.DealPilotVersion.semver ? window.DealPilotVersion.semver : 'V1.1') + '">' +
+            (window.DealPilotVersion && window.DealPilotVersion.label ? window.DealPilotVersion.label : 'V1.1') +
+          '</span>' +
 
           // Icon 1: Aktueller Plan (Häkchen im Kreis) → öffnet Settings → Plan-Tab
           '<button type="button" class="sb-user-icon-btn" ' +
