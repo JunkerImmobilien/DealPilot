@@ -1468,12 +1468,70 @@ function _setBillingCycle(cycle) {
 window._setBillingCycle = _setBillingCycle;
 
 // V63.1: Credit-Pack kaufen (Demo — nur Toast)
-function _buyCreditPack(packKey) {
-  var packs = DealPilotConfig.pricing.aiCreditPackages || [];
+// V224: Echter Stripe-Checkout (vorher V197-Toast-Stub).
+// Identische Logik wie _buyCreditPackDirect in pricing-modal.js.
+async function _buyCreditPack(packKey) {
+  var packs = (DealPilotConfig.pricing && DealPilotConfig.pricing.aiCreditPackages) || [];
   var pack = packs.find(function(p){ return p.key === packKey; });
-  if (!pack) return;
-  if (typeof toast === 'function') {
-    toast('💳 Credit-Pack "' + pack.label + '" — ' + pack.price_eur + ' € (Stripe-Checkout im Live-Mode)');
+  if (!pack) {
+    if (typeof toast === 'function') toast('❌ Credit-Pack nicht gefunden');
+    return;
+  }
+
+  // Button-State (event.target falls vorhanden, sonst kein Loading-State)
+  var btn = (typeof event !== 'undefined' && event && event.target) ? event.target : null;
+  var origText = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Wird gestartet…';
+  }
+
+  try {
+    var token = localStorage.getItem('ji_token') || '';
+    var apiBase = (window.JI_API_BASE || '/api/v1');
+    var r = await fetch(apiBase + '/credits/checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ pack_id: packKey })
+    });
+    var data = null;
+    try { data = await r.json(); } catch (e) {}
+
+    if (r.ok && data && data.url) {
+      // Erfolgreich — redirect zu Stripe Checkout
+      window.location.href = data.url;
+      return;
+    }
+
+    // Fehler-Pfad: Button zurücksetzen
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = origText;
+    }
+
+    // Spezialfall: Free-User → upgrade_required
+    if (r.status === 403 && data && data.error === 'upgrade_required') {
+      var msg = data.message || 'Credits können nur ab dem Starter-Plan zugebucht werden. Bitte upgrade dein Abo.';
+      if (typeof toast === 'function') toast('⚠ ' + msg);
+      else alert(msg);
+      return;
+    }
+
+    // Sonstiger Fehler
+    var errMsg = (data && (data.message || data.error)) || 'Checkout konnte nicht gestartet werden';
+    if (typeof toast === 'function') toast('❌ ' + errMsg);
+    else alert('Fehler: ' + errMsg);
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = origText;
+    }
+    console.error('[_buyCreditPack] error:', err);
+    if (typeof toast === 'function') toast('❌ Netzwerkfehler: ' + err.message);
+    else alert('Netzwerkfehler: ' + err.message);
   }
 }
 
