@@ -1,16 +1,8 @@
-// DealPilot Admin V196 — Vanilla SVG Line Chart
-// Keine externen Libraries — pure SVG, ~150 LOC.
+// DealPilot Admin V197 — Vanilla SVG Line Chart (unverändert von V196)
 'use strict';
 
 const Charts = (function() {
 
-  /**
-   * Rendert ein einfaches Liniendiagramm in einen Container.
-   *
-   * @param {HTMLElement} container - Ziel-Element (wird geleert)
-   * @param {Array} data - [{label, value}, ...]
-   * @param {Object} opts - { color, valueFormat, title, height }
-   */
   function renderLineChart(container, data, opts) {
     opts = opts || {};
     const color = opts.color || '#c9a042';
@@ -31,7 +23,7 @@ const Charts = (function() {
 
     const values = data.map(d => d.value);
     const max = Math.max(...values, 1);
-    const min = 0; // immer ab 0
+    const min = 0;
     const range = max - min || 1;
 
     const xStep = data.length > 1 ? chartW / (data.length - 1) : 0;
@@ -39,22 +31,18 @@ const Charts = (function() {
     function xCoord(i) { return padding.left + i * xStep; }
     function yCoord(v) { return padding.top + chartH - ((v - min) / range) * chartH; }
 
-    // Polyline-Pfad
     const points = data.map((d, i) => `${xCoord(i)},${yCoord(d.value)}`).join(' ');
 
-    // Area-Fill (unter Linie)
     let areaPath = `M ${xCoord(0)} ${yCoord(0)} `;
     data.forEach((d, i) => { areaPath += `L ${xCoord(i)} ${yCoord(d.value)} `; });
     areaPath += `L ${xCoord(data.length - 1)} ${yCoord(0)} Z`;
 
-    // Y-Achsen-Labels (5 Ticks)
     const yTicks = [];
     for (let i = 0; i <= 4; i++) {
       const v = min + (range / 4) * i;
       yTicks.push({ v, y: yCoord(v) });
     }
 
-    // X-Achsen-Labels (max 7 — Auto-Skip)
     const xLabelStep = Math.max(1, Math.floor(data.length / 7));
     const xLabels = [];
     for (let i = 0; i < data.length; i += xLabelStep) {
@@ -63,7 +51,6 @@ const Charts = (function() {
 
     const svg = `
       <svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:${height}px;">
-        <!-- Gridlines + Y-Labels -->
         ${yTicks.map(t => `
           <line x1="${padding.left}" y1="${t.y}" x2="${width - padding.right}" y2="${t.y}"
                 stroke="#e5dfd2" stroke-width="1" stroke-dasharray="${t.v === 0 ? '0' : '3,3'}"/>
@@ -71,22 +58,14 @@ const Charts = (function() {
             ${fmt(t.v)}
           </text>
         `).join('')}
-
-        <!-- X-Labels -->
         ${xLabels.map(l => `
           <text x="${l.x}" y="${height - padding.bottom + 20}" text-anchor="middle" font-size="10" fill="#6a6a6a" font-family="DM Sans, sans-serif">
             ${l.label}
           </text>
         `).join('')}
-
-        <!-- Area fill -->
         <path d="${areaPath}" fill="${color}" opacity="0.12"/>
-
-        <!-- Line -->
         <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2.5"
                   stroke-linecap="round" stroke-linejoin="round"/>
-
-        <!-- Punkte (nur falls wenige) -->
         ${data.length <= 31 ? data.map((d, i) => `
           <circle cx="${xCoord(i)}" cy="${yCoord(d.value)}" r="3" fill="${color}">
             <title>${d.label}: ${fmt(d.value)}</title>
@@ -94,16 +73,9 @@ const Charts = (function() {
         `).join('') : ''}
       </svg>
     `;
-
     container.innerHTML = svg;
   }
 
-  /**
-   * Donut Chart für Plan-Verteilung.
-   *
-   * @param {HTMLElement} container
-   * @param {Array} data - [{label, value, color}, ...]
-   */
   function renderDonut(container, data, opts) {
     opts = opts || {};
     const size = opts.size || 220;
@@ -124,7 +96,7 @@ const Charts = (function() {
     const r = size / 2 - 20;
     const innerR = r * 0.65;
 
-    let angle = -Math.PI / 2; // Start oben
+    let angle = -Math.PI / 2;
     const arcs = data.map((d, i) => {
       const pct = d.value / total;
       const a1 = angle;

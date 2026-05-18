@@ -223,10 +223,11 @@
           '</p>' +
         '</div>' +
         '<div class="dp-credits-grid">' +
-          _creditCard(5, 5, '1,00 €', 'Mal schnell prüfen', false) +
-          _creditCard(15, 12, '0,80 €', 'Mehrere Deals', false) +
-          _creditCard(40, 29, '0,72 €', 'Aktiver Investor', true) +
-          _creditCard(100, 59, '0,59 €', 'Profi / Sachverständiger', false) +
+          // V197: pack_5/15/40/100 mit korrekten Stripe-Preisen
+          _creditCard(5, 2, 'pack_5', 'Mal schnell prüfen', false) +
+          _creditCard(15, 5, 'pack_15', 'Mehrere Deals', false) +
+          _creditCard(40, 12, 'pack_40', 'Aktiver Investor', true) +
+          _creditCard(100, 25, 'pack_100', 'Profi / Sachverständiger', false) +
         '</div>' +
         '<p class="dp-note" style="text-align:center;margin-top:14px">Credits sind ab dem Starter-Plan zubuchbar und verfallen nicht.</p>' +
       '</div>' +
@@ -342,8 +343,9 @@
     // Für jetzt: einfach toasten — Marcel sieht's beim Plan-Wechsel-Workflow.
   };
 
-  function _creditCard(credits, price, perUnit, target, best) {
-    // V63.6: 1 Credit = 2 Anfragen — also doppelte Anfragen-Anzahl + halbierter Preis pro Anfrage
+  function _creditCard(credits, price, packId, target, best) {
+    // V197.2: Direkt zu Stripe, ohne Zwischenmodal.
+    // 1 Credit = 2 Anfragen → Anfragen-Anzahl + Preis pro Anfrage berechnet.
     var anfragen = credits * 2;
     var perAnfrage = (price / anfragen);
     var perAnfrageStr = perAnfrage.toFixed(2).replace('.', ',') + ' €';
@@ -355,9 +357,47 @@
       '<div class="dp-credits-price">' + price + ' €</div>' +
       '<div class="dp-credits-perunit">' + perAnfrageStr + ' / Anfrage</div>' +
       '<div class="dp-credits-target">' + target + '</div>' +
-      '<a class="dp-credits-cta" href="#" data-credits-cta="' + credits + '">Credits kaufen</a>' +
+      '<a class="dp-credits-cta" href="#" data-pack-id="' + packId + '" onclick="window._buyCreditPackDirect(this); return false;">Credits kaufen</a>' +
     '</div>';
   }
+
+  // V197.2: Direkter Checkout-Aufruf — Stripe ohne Zwischenmodal
+  window._buyCreditPackDirect = async function(el) {
+    var packId = el.dataset.packId;
+    var origText = el.textContent;
+    el.style.pointerEvents = 'none';
+    el.textContent = 'Wird gestartet…';
+    try {
+      var token = localStorage.getItem('ji_token') || '';
+      var apiBase = (window.JI_API_BASE || '/api/v1');
+      var r = await fetch(apiBase + '/credits/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ pack_id: packId })
+      });
+      var data = null;
+      try { data = await r.json(); } catch (e) {}
+      if (r.ok && data && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      el.style.pointerEvents = '';
+      el.textContent = origText;
+      // Spezialbehandlung Free-User
+      if (r.status === 403 && data && data.error === 'upgrade_required') {
+        alert(data.message || 'Credits können nur ab dem Starter-Plan zugebucht werden. Bitte upgrade dein Abo.');
+        return;
+      }
+      alert('Fehler: ' + ((data && (data.message || data.error)) || 'Checkout konnte nicht gestartet werden'));
+    } catch (err) {
+      el.style.pointerEvents = '';
+      el.textContent = origText;
+      alert('Netzwerkfehler: ' + err.message);
+    }
+  };
 
   // ═══════════════════════════════════════════════════════════════
   // TIMELINE (Plan-Steps)

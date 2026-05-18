@@ -1,4 +1,4 @@
-// DealPilot Admin V196 — API-Wrapper
+// DealPilot Admin V197 — API-Wrapper
 'use strict';
 
 const API = (function() {
@@ -29,10 +29,6 @@ const API = (function() {
     return data;
   }
 
-  /**
-   * CSV-Download — öffnet Datei direkt zum Speichern.
-   * Wir nutzen fetch() statt window.open() weil wir den X-Admin-Token brauchen.
-   */
   async function downloadCsv(path, filename) {
     const token = getToken();
     const r = await fetch(BASE + path, {
@@ -54,18 +50,14 @@ const API = (function() {
   }
 
   return {
-    // Auth
     login: (email, password, totpCode) => call('POST', '/auth/login', { email, password, totpCode }),
     me: () => call('GET', '/auth/me'),
 
-    // Dashboard
     dashboard: () => call('GET', '/dashboard'),
 
-    // V196: Charts
     usersTrend: (days) => call('GET', `/charts/users-trend?days=${days || 30}`),
     mrrTrend: (days) => call('GET', `/charts/mrr-trend?days=${days || 30}`),
 
-    // Users (mit erweiterten Filtern)
     listUsers: (params) => {
       params = params || {};
       const usp = new URLSearchParams();
@@ -77,14 +69,22 @@ const API = (function() {
       return call('GET', '/users?' + usp.toString());
     },
     getUser: (id) => call('GET', `/users/${id}`),
-    createUser: (email, name, plan_id) => call('POST', '/users', { email, name, plan_id }),
-    changePlan: (id, plan_id, billing_interval, reason) => call('POST', `/users/${id}/change-plan`, { plan_id, billing_interval, reason }),
-    grantCredits: (id, amount, reason) => call('POST', `/users/${id}/grant-credits`, { amount, reason }),
-    resetPassword: (id, reason) => call('POST', `/users/${id}/reset-password`, { reason }),
-    toggleActive: (id, reason) => call('POST', `/users/${id}/toggle-active`, { reason }),
-    deleteUser: (id, confirm_email, reason) => call('DELETE', `/users/${id}`, { confirm_email, reason }),
+    createUser: (email, name, plan_id, is_test_user) =>
+      call('POST', '/users', { email, name, plan_id, is_test_user: !!is_test_user }),
+    changePlan: (id, plan_id, billing_interval, reason) =>
+      call('POST', `/users/${id}/change-plan`, { plan_id, billing_interval, reason }),
+    grantCredits: (id, amount, reason) =>
+      call('POST', `/users/${id}/grant-credits`, { amount, reason }),
+    resetPassword: (id, reason) =>
+      call('POST', `/users/${id}/reset-password`, { reason }),
+    toggleActive: (id, reason) =>
+      call('POST', `/users/${id}/toggle-active`, { reason }),
+    // V197: NEU
+    toggleTestUser: (id, reason) =>
+      call('POST', `/users/${id}/toggle-test`, { reason }),
+    deleteUser: (id, confirm_email, reason) =>
+      call('DELETE', `/users/${id}`, { confirm_email, reason }),
 
-    // V196: CSV-Exports
     exportUsersCsv: (params) => {
       params = params || {};
       const usp = new URLSearchParams();
@@ -100,10 +100,8 @@ const API = (function() {
       return downloadCsv('/audit-log.csv' + (action ? '?action=' + encodeURIComponent(action) : ''), filename);
     },
 
-    // Audit
     auditLog: (action) => call('GET', '/audit-log' + (action ? `?action=${encodeURIComponent(action)}` : '')),
 
-    // Plans
     listPlans: () => call('GET', '/plans')
   };
 })();

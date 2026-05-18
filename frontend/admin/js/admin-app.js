@@ -1,4 +1,4 @@
-// DealPilot Admin V196 — Hauptanwendung
+// DealPilot Admin V197 — Hauptanwendung mit Test-User-Flag
 'use strict';
 
 (function() {
@@ -11,23 +11,19 @@
     if (cents == null || isNaN(cents)) return '–';
     return (cents / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
   }
-
   function fmtDate(d) {
     if (!d) return '–';
     return new Date(d).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
   }
-
   function fmtDay(d) {
     if (!d) return '';
     const dt = new Date(d);
     return dt.getDate() + '.' + (dt.getMonth() + 1) + '.';
   }
-
   function fmtNum(n) {
     if (n == null || isNaN(n)) return '–';
     return Number(n).toLocaleString('de-DE');
   }
-
   function toast(msg, type = 'info') {
     const t = document.createElement('div');
     t.className = `toast toast-${type}`;
@@ -35,7 +31,6 @@
     $('#toast-container').appendChild(t);
     setTimeout(() => t.remove(), 4000);
   }
-
   function escapeHtml(s) {
     if (s == null) return '';
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -105,7 +100,6 @@
 
     $('#back-to-users').addEventListener('click', (e) => { e.preventDefault(); switchView('users'); });
 
-    // Chart-Time-Range-Buttons
     $$('.range-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         $$('.range-btn').forEach(b => b.classList.remove('active'));
@@ -123,12 +117,10 @@
     loadDashboard();
   }
 
-  // ── View-Switching ─────────────────────────────────────
   function switchView(view) {
     $$('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.view === view));
     $$('.view').forEach(v => v.style.display = 'none');
     $('#view-' + view).style.display = 'block';
-
     if (view === 'dashboard') loadDashboard();
     if (view === 'users') loadUsers();
     if (view === 'audit') loadAudit();
@@ -147,7 +139,12 @@
       $('#kpi-arr').textContent = fmtMoney(k.arr_cents);
       $('#kpi-paying').textContent = k.paying_users + ' zahlende User';
 
-      // V196: Donut für Plan-Verteilung
+      // V197: Test-User-Count anzeigen falls vorhanden
+      if (k.test_users > 0 && $('#kpi-test-users-count')) {
+        $('#kpi-test-users-count').textContent = `(zzgl. ${k.test_users} Test-User ausgeblendet)`;
+        $('#kpi-test-users-count').style.display = 'block';
+      }
+
       const planColors = { free: '#94a3b8', starter: '#10b981', investor: '#3b82f6', pro: '#c9a042' };
       const donutData = d.plan_distribution.map(p => ({
         label: p.plan_name,
@@ -156,11 +153,11 @@
       }));
       Charts.renderDonut($('#plan-donut'), donutData);
 
-      // V196: Recent-Listen
+      // V197: 🧪-Badge bei Test-Usern in Recent-Listen
       $('#recent-signups').innerHTML = d.recent_signups.length
         ? d.recent_signups.map(s => `
             <tr>
-              <td><a href="#" class="row-link" data-user-id="${s.id}">${escapeHtml(s.email)}</a></td>
+              <td>${s.is_test_user ? '🧪 ' : ''}<a href="#" class="row-link" data-user-id="${s.id}">${escapeHtml(s.email)}</a></td>
               <td>${fmtDate(s.created_at)}</td>
             </tr>
           `).join('')
@@ -169,7 +166,7 @@
       $('#recent-logins').innerHTML = d.recent_logins.length
         ? d.recent_logins.map(l => `
             <tr>
-              <td><a href="#" class="row-link" data-user-id="${l.id}">${escapeHtml(l.email)}</a></td>
+              <td>${l.is_test_user ? '🧪 ' : ''}<a href="#" class="row-link" data-user-id="${l.id}">${escapeHtml(l.email)}</a></td>
               <td>${fmtDate(l.last_login_at)}</td>
             </tr>
           `).join('')
@@ -182,7 +179,6 @@
         });
       });
 
-      // Charts (Default 30 Tage)
       const activeRange = document.querySelector('.range-btn.active');
       const days = activeRange ? parseInt(activeRange.dataset.days, 10) : 30;
       loadCharts(days);
@@ -201,13 +197,11 @@
 
     try {
       const [usersR, mrrR] = await Promise.all([API.usersTrend(days), API.mrrTrend(days)]);
-
       Charts.renderLineChart(
         usersChartEl,
         usersR.series.map(p => ({ label: fmtDay(p.day), value: p.cumulative })),
         { color: '#c9a042', valueFormat: v => fmtNum(Math.round(v)), height: 220 }
       );
-
       Charts.renderLineChart(
         mrrChartEl,
         mrrR.series.map(p => ({ label: fmtDay(p.day), value: p.mrr_cents / 100 })),
@@ -219,7 +213,7 @@
     }
   }
 
-  // ── User-Liste ─────────────────────────────────────────
+  // ── User-Liste mit Test-Badge ─────────────────────────
   async function loadUsers() {
     const q = $('#user-search').value.trim();
     const plan = $('#filter-plan').value;
@@ -235,7 +229,7 @@
       }
       tbody.innerHTML = r.users.map(u => `
         <tr>
-          <td><a href="#" class="row-link" data-user-id="${u.id}">${escapeHtml(u.email)}</a></td>
+          <td>${u.is_test_user ? '<span title="Test-User" style="margin-right:4px;">🧪</span>' : ''}<a href="#" class="row-link" data-user-id="${u.id}">${escapeHtml(u.email)}</a></td>
           <td>${escapeHtml(u.name || '–')}</td>
           <td><span class="pill ${u.plan_id === 'free' ? 'pill-plan' : 'pill-plan-paid'}">${escapeHtml(u.plan_name)}</span></td>
           <td><span class="pill ${u.is_active ? 'pill-active' : 'pill-inactive'}">${u.is_active ? 'Aktiv' : 'Gesperrt'}</span></td>
@@ -280,7 +274,7 @@
     }
   }
 
-  // ── User-Detail-Page (unverändert von V195) ───────────────
+  // ── User-Detail-Page (V197: Test-User-Toggle) ─────────────
   async function showUserDetail(id) {
     switchView('users');
     $('#view-users').style.display = 'none';
@@ -301,11 +295,12 @@
           <div class="user-info">
             <h3>Stammdaten</h3>
             <div class="user-info-row"><div class="user-info-label">User-ID</div><div class="user-info-value" style="font-family:monospace;font-size:0.85em">${u.id}</div></div>
-            <div class="user-info-row"><div class="user-info-label">E-Mail</div><div class="user-info-value">${escapeHtml(u.email)}</div></div>
+            <div class="user-info-row"><div class="user-info-label">E-Mail</div><div class="user-info-value">${u.is_test_user ? '🧪 ' : ''}${escapeHtml(u.email)}</div></div>
             <div class="user-info-row"><div class="user-info-label">Name</div><div class="user-info-value">${escapeHtml(u.name || '–')}</div></div>
             <div class="user-info-row"><div class="user-info-label">Rolle</div><div class="user-info-value">${escapeHtml(u.role)}</div></div>
             <div class="user-info-row"><div class="user-info-label">Plan</div><div class="user-info-value"><span class="pill ${u.plan_id === 'free' ? 'pill-plan' : 'pill-plan-paid'}">${escapeHtml(u.plan_name)}</span> ${u.billing_interval ? `(${u.billing_interval})` : ''}</div></div>
             <div class="user-info-row"><div class="user-info-label">Status</div><div class="user-info-value"><span class="pill ${u.is_active ? 'pill-active' : 'pill-inactive'}">${u.is_active ? 'Aktiv' : 'Gesperrt'}</span></div></div>
+            <div class="user-info-row"><div class="user-info-label">Test-User</div><div class="user-info-value">${u.is_test_user ? '<span class="pill pill-test">🧪 Ja</span> <span style="font-size:0.85em;color:var(--text-muted);">(MRR/Wachstum ignoriert)</span>' : '<span class="pill pill-plan">Nein</span>'}</div></div>
             <div class="user-info-row"><div class="user-info-label">Email verifiziert</div><div class="user-info-value">${u.email_verified_at ? '✓ ' + fmtDate(u.email_verified_at) : '✗ Nein'}</div></div>
             <div class="user-info-row"><div class="user-info-label">2FA aktiv</div><div class="user-info-value">${u.totp_enabled ? '✓ Ja' : '✗ Nein'}</div></div>
             <div class="user-info-row"><div class="user-info-label">Registriert</div><div class="user-info-value">${fmtDate(u.created_at)}</div></div>
@@ -334,6 +329,14 @@
                 <input type="number" id="action-credits" placeholder="Anzahl (z.B. 10)" min="1" max="10000">
                 <button class="btn btn-primary btn-sm" data-action="grant-credits">Gutschreiben</button>
               </div>
+            </div>
+
+            <div class="action-section">
+              <h4>Test-User-Flag</h4>
+              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">${u.is_test_user ? 'Aktuell als Test-User markiert — wird in MRR/Wachstum/Charts ignoriert.' : 'Aktueller User zählt zu MRR/Wachstum. Beta/Test-User hier markieren.'}</p>
+              <button class="btn btn-sm ${u.is_test_user ? '' : 'btn-primary'}" data-action="toggle-test">
+                ${u.is_test_user ? '🧪 Test-Flag ENTFERNEN' : '🧪 Als Test-User markieren'}
+              </button>
             </div>
 
             <div class="action-section">
@@ -376,6 +379,7 @@
 
       $$('[data-action="change-plan"]')[0].addEventListener('click', () => handleChangePlan(id));
       $$('[data-action="grant-credits"]')[0].addEventListener('click', () => handleGrantCredits(id));
+      $$('[data-action="toggle-test"]')[0].addEventListener('click', () => handleToggleTest(id, u.is_test_user, u.email));
       $$('[data-action="reset-password"]')[0].addEventListener('click', () => handleResetPassword(id, u.email));
       $$('[data-action="toggle-active"]')[0].addEventListener('click', () => handleToggleActive(id, u.is_active, u.email));
       $$('[data-action="delete-dsgvo"]')[0].addEventListener('click', () => handleDeleteDsgvo(id, u.email));
@@ -405,6 +409,21 @@
     try {
       const r = await API.grantCredits(id, amount, reason);
       toast(`✓ ${r.granted} Credits gutgeschrieben. Bonus jetzt: ${r.balance?.bonus_credits || '?'}`, 'success');
+      showUserDetail(id);
+    } catch (err) {
+      toast('Fehler: ' + (err.message || 'unbekannt'), 'error');
+    }
+  }
+
+  async function handleToggleTest(id, isTestUser, email) {
+    const action = isTestUser ? 'aus Test-Status entfernen' : 'als Test-User markieren';
+    if (!confirm(`${email} ${action}?\n\n${isTestUser
+        ? 'User wird wieder zu MRR/Wachstum gezählt.'
+        : 'User wird AUS MRR/Wachstum/Charts ausgeblendet (für Beta-Tester, etc.).'}`)) return;
+    const reason = prompt('Grund (optional, z.B. "Beta-Tester"):') || '';
+    try {
+      const r = await API.toggleTestUser(id, reason);
+      toast(`✓ ${r.is_test_user ? 'als Test-User markiert' : 'Test-Flag entfernt'}`, 'success');
       showUserDetail(id);
     } catch (err) {
       toast('Fehler: ' + (err.message || 'unbekannt'), 'error');
@@ -456,11 +475,12 @@
     }
   }
 
-  // ── User anlegen ───────────────────────────────────────
+  // ── User anlegen (V197: mit is_test_user-Checkbox) ───────
   function openCreateUser() {
     $('#cu-email').value = '';
     $('#cu-name').value = '';
     $('#cu-plan').value = 'free';
+    if ($('#cu-is-test')) $('#cu-is-test').checked = false;
     $('#cu-error').style.display = 'none';
     updatePlanDropdowns();
     $('#modal-create-user').style.display = 'flex';
@@ -472,12 +492,13 @@
     const email = $('#cu-email').value.trim();
     const name = $('#cu-name').value.trim();
     const plan_id = $('#cu-plan').value;
+    const is_test_user = $('#cu-is-test') ? $('#cu-is-test').checked : false;
     $('#cu-error').style.display = 'none';
     try {
-      const r = await API.createUser(email, name, plan_id);
+      const r = await API.createUser(email, name, plan_id, is_test_user);
       $('#modal-create-user').style.display = 'none';
       $('#reveal-title').textContent = '✓ User angelegt';
-      $('#reveal-message').textContent = `Initial-Passwort für ${r.user.email} — wird nur einmal angezeigt:`;
+      $('#reveal-message').textContent = `Initial-Passwort für ${r.user.email} ${r.user.is_test_user ? '(🧪 Test-User)' : ''} — wird nur einmal angezeigt:`;
       $('#reveal-value').textContent = r.temp_password;
       $('#modal-reveal').style.display = 'flex';
       loadUsers();
@@ -497,7 +518,6 @@
       `<option value="${p.id}">${escapeHtml(p.name)} – ${fmtMoney(p.price_monthly_cents)}/Monat</option>`
     ).join('');
 
-    // Plan-Filter im User-Tab auch befüllen
     const filterSel = $('#filter-plan');
     if (filterSel) {
       filterSel.innerHTML = '<option value="">Alle Pläne</option>'
@@ -559,6 +579,5 @@
       }
     }
   }
-
   boot();
 })();
