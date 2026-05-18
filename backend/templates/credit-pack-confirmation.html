@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deine KI-Credits sind aufgeladen</title>
+</head>
+<body style="margin:0;padding:0;background:#f8f4ed;font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;">
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f8f4ed;">
+  <tr>
+    <td align="center" style="padding:40px 20px;">
+
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+
+        <tr><td style="background:#c9a042;height:6px;"></td></tr>
+
+        <!-- Header mit Riesen-Zahl -->
+        <tr>
+          <td style="padding:48px 48px 8px 48px;text-align:center;">
+            <div style="color:#6a6a6a;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Aufgeladen</div>
+            <div style="font-family:Georgia,serif;font-size:72px;color:#c9a042;font-weight:700;line-height:1;">
+              +{{credits_granted}}
+            </div>
+            <div style="color:#6a6a6a;font-size:14px;letter-spacing:0.8px;margin-top:8px;">
+              CREDITS = {{requests_granted}} KI-ANFRAGEN
+            </div>
+          </td>
+        </tr>
+
+        <!-- Anrede -->
+        <tr>
+          <td style="padding:32px 48px 24px 48px;color:#444;font-size:16px;line-height:1.6;">
+            Hallo {{user_name}},<br><br>
+            danke für deinen Kauf! Deine <strong>{{credits_granted}} KI-Credits</strong> wurden deinem Konto gutgeschrieben — das entspricht <strong>{{requests_granted}} KI-Anfragen</strong> für Lage-Analyse, DealScore und mehr.
+          </td>
+        </tr>
+
+        <!-- Bestelldetails -->
+        <tr>
+          <td style="padding:0 48px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f8f4ed;border-radius:8px;border-left:3px solid #c9a042;">
+              <tr>
+                <td style="padding:20px 24px;">
+                  <div style="font-size:12px;font-weight:600;color:#6a6a6a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">
+                    Deine Bestellung
+                  </div>
+                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                    <tr>
+                      <td style="padding:6px 0;color:#6a6a6a;font-size:14px;width:140px;">Pack</td>
+                      <td style="padding:6px 0;color:#1a1a1a;font-size:14px;font-weight:600;">{{credits_granted}} Credits — "{{pack_label}}"</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;color:#6a6a6a;font-size:14px;">Anfragen</td>
+                      <td style="padding:6px 0;color:#1a1a1a;font-size:14px;font-weight:600;">{{requests_granted}}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;color:#6a6a6a;font-size:14px;">Preis</td>
+                      <td style="padding:6px 0;color:#1a1a1a;font-size:14px;font-weight:600;">{{amount}}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;color:#6a6a6a;font-size:14px;">Rechnung</td>
+                      <td style="padding:6px 0;color:#1a1a1a;font-size:14px;">Erhältst du separat von Stripe</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Wichtiger Hinweis -->
+        <tr>
+          <td style="padding:24px 48px 0 48px;">
+            <div style="background:#fff8e1;border-radius:6px;padding:14px 18px;color:#7a5c00;font-size:14px;line-height:1.5;">
+              ✓ <strong>Credits verfallen nicht</strong> — du kannst sie nutzen wann immer du willst.
+            </div>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:32px 48px 16px 48px;text-align:center;">
+            <a href="{{app_url}}" style="display:inline-block;background:#c9a042;color:#1a1a1a;text-decoration:none;padding:14px 32px;border-radius:6px;font-weight:600;font-size:16px;">
+              → Jetzt KI-Anfragen starten
+            </a>
+          </td>
+        </tr>
+
+        <!-- Support -->
+        <tr>
+          <td style="padding:24px 48px 16px 48px;border-top:1px solid #e5dfd2;color:#6a6a6a;font-size:14px;line-height:1.6;">
+            <strong>Probleme oder Fragen?</strong> Wir helfen gerne: <a href="mailto:{{support_email}}" style="color:#c9a042;text-decoration:none;font-weight:600;">{{support_email}}</a>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding:24px 48px 32px 48px;background:#fafafa;border-top:1px solid #e5dfd2;text-align:center;color:#6a6a6a;font-size:12px;line-height:1.6;">
+            <strong style="color:#1a1a1a;">DealPilot</strong> — Investmentanalyse für Profis<br>
+            <a href="{{app_url}}/impressum" style="color:#6a6a6a;text-decoration:underline;">Impressum</a> ·
+            <a href="{{app_url}}/datenschutz" style="color:#6a6a6a;text-decoration:underline;">Datenschutz</a> ·
+            <a href="{{app_url}}/agb" style="color:#6a6a6a;text-decoration:underline;">AGB</a>
+            <br><br>
+            © {{current_year}} Junker Immobilien
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

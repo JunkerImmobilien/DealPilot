@@ -122,6 +122,24 @@ async function handleEvent(event) {
       });
 
       console.log(`✓ Subscription created for user ${userId}: ${planMap.plan_id} (${planMap.billing_interval})`);
+
+      // V198: Sub-Welcome-Mail asynchron schicken (non-blocking)
+      setImmediate(async () => {
+        try {
+          const { sendSubscriptionWelcome } = require('../services/welcomeMail');
+          const { pool } = require('../db/pool');
+          await sendSubscriptionWelcome(pool, {
+            userId,
+            planName: planMap.plan_name || planMap.plan_id,
+            planId: planMap.plan_id,
+            amountCents: session.amount_total || 0,
+            billingInterval: planMap.billing_interval,
+            sessionId: session.id
+          });
+        } catch (e) {
+          console.error('[stripe-webhook] sub-welcome-mail failed (non-fatal):', e.message);
+        }
+      });
       break;
     }
 

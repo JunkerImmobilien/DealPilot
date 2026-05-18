@@ -97,6 +97,23 @@ async function handleCreditPackPaid(db, session) {
     await client.query('COMMIT');
     console.log(`[credits-webhook] ✓ ${pack.credits} Credits (${pack.bonus_credits_units} Anfragen) gutgeschrieben an User ${userId}`);
 
+    // V198: Credit-Pack-Bestätigungs-Mail asynchron (non-blocking)
+    setImmediate(async () => {
+      try {
+        const { sendCreditPackConfirmation } = require('./welcomeMail');
+        await sendCreditPackConfirmation(db, {
+          userId,
+          packLabel: pack.label || pack.id,
+          creditsGranted: pack.credits,
+          requestsGranted: pack.bonus_credits_units,
+          amountCents: session.amount_total || pack.amount_cents,
+          sessionId: session.id
+        });
+      } catch (e) {
+        console.error('[credits-webhook] mail-confirmation failed (non-fatal):', e.message);
+      }
+    });
+
     return { ok: true, credits_added: pack.credits, requests_added: pack.bonus_credits_units };
   } catch (err) {
     await client.query('ROLLBACK');

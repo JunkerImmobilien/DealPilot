@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Willkommen bei DealPilot</title>
+</head>
+<body style="margin:0;padding:0;background:#f8f4ed;font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;">
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f8f4ed;">
+  <tr>
+    <td align="center" style="padding:40px 20px;">
+
+      <!-- Hauptkarte -->
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+
+        <!-- Goldener Top-Bar -->
+        <tr>
+          <td style="background:#c9a042;height:6px;"></td>
+        </tr>
+
+        <!-- Header -->
+        <tr>
+          <td style="padding:48px 48px 24px 48px;text-align:center;">
+            <h1 style="margin:0;font-family:Georgia,serif;font-size:32px;color:#1a1a1a;font-weight:700;letter-spacing:-0.5px;">
+              Willkommen bei DealPilot
+            </h1>
+            <div style="margin-top:8px;color:#c9a042;font-size:18px;font-weight:600;">
+              {{plan_name}}
+            </div>
+          </td>
+        </tr>
+
+        <!-- Anrede -->
+        <tr>
+          <td style="padding:0 48px 24px 48px;color:#444;font-size:16px;line-height:1.6;">
+            Hallo {{user_name}},<br><br>
+            schön, dass du dich für DealPilot entschieden hast. Dein Abo ist aktiv — du hast jetzt Zugriff auf alle Funktionen des <strong>{{plan_name}}</strong>-Plans.
+          </td>
+        </tr>
+
+        <!-- Bestelldetails-Box -->
+        <tr>
+          <td style="padding:0 48px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f8f4ed;border-radius:8px;border-left:3px solid #c9a042;">
+              <tr>
+                <td style="padding:20px 24px;">
+                  <div style="font-size:12px;font-weight:600;color:#6a6a6a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">
+                    Dein Abo
+                  </div>
+                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                    <tr>
+                      <td style="padding:6px 0;color:#6a6a6a;font-size:14px;width:140px;">Plan</td>
+                      <td style="padding:6px 0;color:#1a1a1a;font-size:14px;font-weight:600;">{{plan_name}}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;color:#6a6a6a;font-size:14px;">Preis</td>
+                      <td style="padding:6px 0;color:#1a1a1a;font-size:14px;font-weight:600;">{{plan_price}} / {{billing_interval}}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;color:#6a6a6a;font-size:14px;">Rechnung</td>
+                      <td style="padding:6px 0;color:#1a1a1a;font-size:14px;">Erhältst du separat von Stripe per Mail</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- CTA-Button -->
+        <tr>
+          <td style="padding:32px 48px 16px 48px;text-align:center;">
+            <a href="{{app_url}}" style="display:inline-block;background:#c9a042;color:#1a1a1a;text-decoration:none;padding:14px 32px;border-radius:6px;font-weight:600;font-size:16px;">
+              → Jetzt zur App
+            </a>
+          </td>
+        </tr>
+
+        <!-- Quickstart -->
+        <tr>
+          <td style="padding:24px 48px;">
+            <h3 style="font-family:Georgia,serif;font-size:20px;color:#1a1a1a;margin:0 0 12px 0;">
+              So geht's weiter
+            </h3>
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="color:#444;font-size:15px;line-height:1.6;">
+              <tr>
+                <td style="padding:8px 0;width:32px;vertical-align:top;color:#c9a042;font-weight:700;">1.</td>
+                <td style="padding:8px 0;">Im Dashboard ein neues Objekt anlegen oder PDF-Exposé hochladen</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0;width:32px;vertical-align:top;color:#c9a042;font-weight:700;">2.</td>
+                <td style="padding:8px 0;">QuickCheck nutzen — DealScore in 30 Sekunden</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0;width:32px;vertical-align:top;color:#c9a042;font-weight:700;">3.</td>
+                <td style="padding:8px 0;">KI-Lage-Analyse für jedes Objekt einholen</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0;width:32px;vertical-align:top;color:#c9a042;font-weight:700;">4.</td>
+                <td style="padding:8px 0;">PDF-Reports generieren und mit Kunden/Partnern teilen</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Support -->
+        <tr>
+          <td style="padding:24px 48px 16px 48px;border-top:1px solid #e5dfd2;color:#6a6a6a;font-size:14px;line-height:1.6;">
+            <strong>Fragen?</strong> Schreib uns einfach an <a href="mailto:{{support_email}}" style="color:#c9a042;text-decoration:none;font-weight:600;">{{support_email}}</a>. Wir antworten typischerweise innerhalb von 24h.
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding:24px 48px 32px 48px;background:#fafafa;border-top:1px solid #e5dfd2;text-align:center;color:#6a6a6a;font-size:12px;line-height:1.6;">
+            <strong style="color:#1a1a1a;">DealPilot</strong> — Investmentanalyse für Profis<br>
+            <a href="{{app_url}}/impressum" style="color:#6a6a6a;text-decoration:underline;">Impressum</a> ·
+            <a href="{{app_url}}/datenschutz" style="color:#6a6a6a;text-decoration:underline;">Datenschutz</a> ·
+            <a href="{{app_url}}/agb" style="color:#6a6a6a;text-decoration:underline;">AGB</a>
+            <br><br>
+            © {{current_year}} Junker Immobilien
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
