@@ -1,19 +1,12 @@
 /**
- * DealPilot V238.1 — First-Start-Tour Engine (Premium-Redesign)
+ * DealPilot V238.2 — Tour Engine mit Smart-Placement-Hard-Fallback
  *
- * Dunkler Premium-Look wie Feedback-Modal.
- * Mit ausklappbarem "Mehr erfahren"-Bereich.
- *
- * Public API:
- *   window.DpTour.start()        — startet Tour
- *   window.DpTour.next() / prev() — Navigation
- *   window.DpTour.skip()         — alle weiteren Steps überspringen
- *   window.DpTour.exit()         — schließen (kommt nächstes Mal wieder)
- *   window.DpTour.complete()     — als abgeschlossen markieren
- *   window.DpTour.isComplete()
- *   window.DpTour.reset()
- *
- * Tour-Steps werden via window.DpTourSteps (tour-content.js) geladen.
+ * V238.2 Fixes:
+ * - Hard-Fallback: wenn placement (right/left/top/bottom) keinen Platz hat,
+ *   wird automatisch eine andere Seite gewaehlt oder zentriert
+ * - Bubble ist auf engen Screens schmaler (380px)
+ * - Spotlight + Bubble haben min. 24px Abstand
+ * - "Tour ueberspringen" ist immer im Viewport
  */
 (function() {
   'use strict';
@@ -24,15 +17,13 @@
     steps: [],
     idx: 0,
     active: false,
-    expanded: false,  // V238.1: ist "Mehr erfahren" aufgeklappt?
+    expanded: false,
     overlay: null,
     spotlight: null,
     bubble: null,
     onResize: null,
     onKeydown: null
   };
-
-  // ─── Utility ─────────────────────────────────────────────────────────
 
   function _wait(ms) {
     return new Promise(function(r) { setTimeout(r, ms); });
@@ -42,8 +33,14 @@
     return new Promise(function(resolve) {
       var attempts = 0;
       function tryFind() {
-        var el = document.querySelector(selector);
-        if (el && _isVisible(el)) return resolve(el);
+        // V238.2: bei kommasepariertem Selektor jedes Element einzeln pruefen
+        var selectors = selector.split(',').map(function(s) { return s.trim(); });
+        for (var i = 0; i < selectors.length; i++) {
+          try {
+            var el = document.querySelector(selectors[i]);
+            if (el && _isVisible(el)) return resolve(el);
+          } catch(e) {}
+        }
         attempts++;
         if (attempts >= retries) return resolve(null);
         setTimeout(tryFind, intervalMs);
@@ -98,15 +95,12 @@
     return false;
   }
 
-  // ─── Overlay-Erstellung ──────────────────────────────────────────────
-
   function _createOverlay() {
     if (state.overlay) return;
     var o = document.createElement('div');
     o.className = 'dp-tour-overlay';
     o.setAttribute('role', 'dialog');
     o.setAttribute('aria-modal', 'true');
-    o.setAttribute('aria-label', 'DealPilot Einführungstour');
     document.body.appendChild(o);
     state.overlay = o;
 
@@ -133,8 +127,6 @@
     document.body.classList.remove('dp-tour-active');
   }
 
-  // ─── Spotlight-Position ──────────────────────────────────────────────
-
   function _positionSpotlight(el) {
     if (!state.spotlight || !el) return;
     var rect = el.getBoundingClientRect();
@@ -150,17 +142,37 @@
     if (state.spotlight) state.spotlight.style.display = 'none';
   }
 
-  // ─── Bubble-Position (smart placement) ───────────────────────────────
+  // ─── V238.2: Hart-Fallback bei Smart-Placement ───────────────────────
+
+  function _hasSpaceForPlacement(rect, bw, bh, placement, margin) {
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    switch (placement) {
+      case 'bottom': return (rect.bottom + bh + margin) <= vh;
+      case 'top':    return (rect.top - bh - margin) >= 0;
+      case 'right':  return (rect.right + bw + margin) <= vw;
+      case 'left':   return (rect.left - bw - margin) >= 0;
+      default:       return false;
+    }
+  }
+
+  function _autoPickPlacement(rect, bw, bh, margin) {
+    // Versuch in dieser Reihenfolge: bottom, top, right, left, center
+    var candidates = ['bottom', 'top', 'right', 'left'];
+    for (var i = 0; i < candidates.length; i++) {
+      if (_hasSpaceForPlacement(rect, bw, bh, candidates[i], margin)) {
+        return candidates[i];
+      }
+    }
+    return 'center';
+  }
 
   function _positionBubble(el, preferredPlacement) {
     if (!state.bubble) return;
 
+    // Center-Modus: Bubble in Bildschirmmitte
     if (!el || preferredPlacement === 'center') {
-      state.bubble.style.top = '50%';
-      state.bubble.style.left = '50%';
-      state.bubble.style.transform = 'translate(-50%, -50%)';
-      state.bubble.classList.remove('dp-tour-bubble-top', 'dp-tour-bubble-bottom', 'dp-tour-bubble-left', 'dp-tour-bubble-right');
-      state.bubble.classList.add('dp-tour-bubble-center');
+      _setBubbleCenter();
       return;
     }
 
@@ -171,16 +183,22 @@
     var bh = state.bubble.offsetHeight || 280;
     var vw = window.innerWidth;
     var vh = window.innerHeight;
-    var margin = 20;
+    var margin = 24;  // V238.2: war 20, jetzt 24 fuer Spotlight-Abstand
 
     var placement = preferredPlacement || 'auto';
 
+    // V238.2 HARD-FALLBACK: hat das preferred placement wirklich Platz?
+    if (placement !== 'auto' && !_hasSpaceForPlacement(rect, bw, bh, placement, margin)) {
+      placement = 'auto';
+    }
+
     if (placement === 'auto') {
-      if (rect.bottom + bh + margin < vh)      placement = 'bottom';
-      else if (rect.top - bh - margin > 0)     placement = 'top';
-      else if (rect.right + bw + margin < vw)  placement = 'right';
-      else if (rect.left - bw - margin > 0)    placement = 'left';
-      else                                     placement = 'center';
+      placement = _autoPickPlacement(rect, bw, bh, margin);
+    }
+
+    if (placement === 'center') {
+      _setBubbleCenter();
+      return;
     }
 
     var top, left;
@@ -203,9 +221,6 @@
         top  = Math.max(margin, Math.min(vh - bh - margin, rect.top + rect.height / 2 - bh / 2));
         left = rect.left - bw - 16;
         break;
-      default:
-        state.bubble.classList.add('dp-tour-bubble-center');
-        return _positionBubble(null, 'center');
     }
 
     state.bubble.style.top  = top  + 'px';
@@ -214,7 +229,16 @@
     state.bubble.classList.add('dp-tour-bubble-' + placement);
   }
 
-  // ─── Bubble-Content (Premium-Redesign) ───────────────────────────────
+  function _setBubbleCenter() {
+    if (!state.bubble) return;
+    state.bubble.style.top = '50%';
+    state.bubble.style.left = '50%';
+    state.bubble.style.transform = 'translate(-50%, -50%)';
+    state.bubble.classList.remove('dp-tour-bubble-top', 'dp-tour-bubble-bottom', 'dp-tour-bubble-left', 'dp-tour-bubble-right');
+    state.bubble.classList.add('dp-tour-bubble-center');
+  }
+
+  // ─── Bubble-Content ──────────────────────────────────────────────────
 
   function _renderBubbleContent(step) {
     if (!state.bubble) return;
@@ -225,20 +249,16 @@
     var isFirst = state.idx === 0;
     var isLast = state.idx === total - 1;
 
-    // Icon — SVG-Sprite-Reference
     var iconId = step.icon || 'i-bulb';
     var hasMore = !!step.bodyMore;
 
     var html = '';
-    
-    // Glow-Halo (CSS-pseudo)
     html += '<div class="dp-tour-close-wrap">';
-    html += '  <button class="dp-tour-close" type="button" aria-label="Tour schließen">';
+    html += '  <button class="dp-tour-close" type="button" aria-label="Tour schliessen">';
     html += '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     html += '  </button>';
     html += '</div>';
 
-    // Header — Eyebrow + Serif-Title
     html += '<div class="dp-tour-head">';
     html += '  <div class="dp-tour-eyebrow">';
     html += '    <span class="dp-tour-eyebrow-ic"><svg><use href="#' + iconId + '"/></svg></span>';
@@ -247,36 +267,32 @@
     html += '  <h2 class="dp-tour-title">' + _escapeHtml(step.title || '') + '</h2>';
     html += '</div>';
 
-    // Body
     html += '<div class="dp-tour-body">';
     html += '  <div class="dp-tour-text dp-tour-text-short">' + _renderMarkdown(step.body || '') + '</div>';
-    
+
     if (hasMore) {
       var expandedClass = state.expanded ? 'dp-tour-expanded' : '';
       html += '  <button class="dp-tour-more-toggle ' + expandedClass + '" type="button" data-action="toggle-more">';
       html += '    <span class="dp-tour-more-text">' + (state.expanded ? 'Weniger anzeigen' : 'Mehr erfahren') + '</span>';
       html += '    <svg class="dp-tour-more-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
       html += '  </button>';
-      
       if (state.expanded) {
         html += '  <div class="dp-tour-text dp-tour-text-more">' + _renderMarkdown(step.bodyMore) + '</div>';
       }
     }
     html += '</div>';
 
-    // Progress
     html += '<div class="dp-tour-progress">';
     html += '  <div class="dp-tour-progress-bar"><div class="dp-tour-progress-fill" style="width:' + progressPct + '%"></div></div>';
     html += '</div>';
 
-    // Footer
     html += '<div class="dp-tour-foot">';
-    html += '  <button type="button" class="dp-tour-btn dp-tour-btn-ghost" data-action="skip">Tour überspringen</button>';
+    html += '  <button type="button" class="dp-tour-btn dp-tour-btn-ghost" data-action="skip">Tour ueberspringen</button>';
     html += '  <div class="dp-tour-nav">';
     if (!isFirst) {
       html += '    <button type="button" class="dp-tour-btn dp-tour-btn-secondary" data-action="prev">';
       html += '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
-      html += '      Zurück';
+      html += '      Zurueck';
       html += '    </button>';
     }
     if (isLast) {
@@ -295,7 +311,6 @@
 
     state.bubble.innerHTML = html;
 
-    // Event-Handlers
     var closeBtn = state.bubble.querySelector('.dp-tour-close');
     if (closeBtn) closeBtn.addEventListener('click', function() { Tour.exit(); });
     var btnNext = state.bubble.querySelector('[data-action="next"]');
@@ -316,7 +331,6 @@
 
   function _renderMarkdown(s) {
     s = String(s);
-    // Whitelist HTML: b, strong, i, em, br
     var allowed = /<\/?(?:b|strong|i|em|br|u)\s*\/?>/gi;
     var placeholders = [];
     s = s.replace(allowed, function(m) {
@@ -325,31 +339,26 @@
     });
     s = _escapeHtml(s);
     s = s.replace(/\u0001(\d+)\u0001/g, function(m, i) { return placeholders[+i]; });
-    // Mini-Markdown
     s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    // Listen mit • Bullet bekommen Wrapper
     s = s.replace(/\n\n/g, '<br><br>');
     s = s.replace(/\n/g, '<br>');
     return s;
   }
 
-  // ─── Step rendern ────────────────────────────────────────────────────
-
   function _renderStep() {
     var step = state.steps[state.idx];
     if (!step) return;
 
-    // V238.1: bei Step-Wechsel das "Mehr erfahren" wieder einklappen
     state.expanded = false;
 
     _ensureCorrectTab(step, function() {
-      _findElementWithRetry(step.selector, 8, 150).then(function(el) {
+      _findElementWithRetry(step.selector, 10, 200).then(function(el) {
         if (!el) {
           console.warn('[DpTour] Element nicht gefunden: ' + step.selector);
           if (step.placement === 'center') {
             _createOverlay();
             _hideSpotlight();
-            _positionBubble(null, 'center');
+            _setBubbleCenter();
             _renderBubbleContent(step);
             return;
           }
@@ -369,8 +378,8 @@
           _renderBubbleContent(step);
           setTimeout(function() {
             _positionBubble(el, step.placement);
-          }, 10);
-        }, 400);
+          }, 30);
+        }, 450);
       });
     });
   }
@@ -384,7 +393,7 @@
     if (!ok) {
       console.warn('[DpTour] Tab-Switch fehlgeschlagen: ' + step.tab);
     }
-    setTimeout(callback, 350);
+    setTimeout(callback, 400);
   }
 
   // ─── Public API ──────────────────────────────────────────────────────
@@ -404,7 +413,7 @@
       state.onResize = function() {
         var step = state.steps[state.idx];
         if (!step) return;
-        var el = document.querySelector(step.selector);
+        var el = document.querySelector(step.selector.split(',')[0].trim());
         if (el) {
           _positionSpotlight(el);
           _positionBubble(el, step.placement);
@@ -462,17 +471,15 @@
       try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
     },
 
-    // V238.1: Mehr-erfahren-Aufklapp
     toggleMore: function() {
       state.expanded = !state.expanded;
       var step = state.steps[state.idx];
       if (!step) return;
       _renderBubbleContent(step);
-      // Re-positionieren weil Bubble jetzt höher/niedriger
       setTimeout(function() {
-        var el = document.querySelector(step.selector);
+        var el = document.querySelector(step.selector.split(',')[0].trim());
         if (el) _positionBubble(el, step.placement);
-      }, 20);
+      }, 30);
     }
   };
 
@@ -492,7 +499,6 @@
 
   window.DpTour = Tour;
 
-  // ─── Auto-Start ──────────────────────────────────────────────────────
   function _maybeAutoStart() {
     try {
       var token = localStorage.getItem('ji_token');
