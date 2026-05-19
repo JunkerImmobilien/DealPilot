@@ -1,5 +1,53 @@
 # DealPilot Changelog
 
+## V1.1.231 — 2026-05-19
+
+### Bug-Fix: DSCR-Konsistenz (B8.15)
+
+**Problem:** Drei verschiedene Stellen im Code rechneten DSCR mit leicht
+abweichenden Formeln:
+- `calc.js` (UI-Hauptberechnung): KD = Zins + Tilgung + BSV-Sparrate
+- `calc.js` (Cashflow-Box, phase-aware): KD inkl. BSV nur in Sparphase
+- `deal-kpis.js` (DealScore): KD = Zins + Tilgung (**OHNE BSV** — Bug!)
+
+→ Bei Tilgungsaussetzungsdarlehen mit Bausparvertrag wich der DealScore-
+DSCR vom UI-DSCR ab. User sah verschiedene Werte für die gleiche Kennzahl.
+
+**Lösung — neue Datei `frontend/js/dscr-engine.js`:**
+
+Single Source of Truth via `window.Dscr.compute({nkm_j, ze_j, zins_j,
+tilg_j, bsv_j, bwk_cf})`. Returnt {brutto, netto, kd, schwelle} mit
+identischer Formel überall:
+- **Brutto:** (NKM+ZE) / (Zins+Tilgung+BSV)
+- **Netto:** (NKM+ZE-BWK_NUL) / (Zins+Tilgung+BSV)
+- Klassifizierung: ≥1.2 good, 1.0-1.2 warn, <1.0 bad
+
+**3 Patches stellen die Aufrufer um:**
+- `deal-kpis.js` Z. 134-139 → ruft `Dscr.compute()` mit BSV-Sparrate
+- `calc.js` Z. 1107-1111 → ruft `Dscr.compute()`
+- `calc.js` Z. 2440-2444 (Cashflow-Box) → ruft `Dscr.compute()` phase-aware
+
+**Script-Reihenfolge in index.html angepasst:**
+`dscr-engine.js` wird VOR `deal-kpis.js` und `calc.js` geladen.
+
+**Unit-getestet:** 6 Szenarien (Standard, mit BSV, kritisch, Bar-Kauf,
+String/null/NaN-Robustheit, Klassifizierungs-Schwellen).
+
+### Code-Quality-Vorteile
+- ~10 Code-Smells entfernt (var dscr-Schatten, doppelte Formeln, etc.)
+- DSCR-Berechnung ist jetzt deterministic und debuggable
+- Neue DSCR-Konsumenten (Portfolio, Reports) können `Dscr.compute()`
+  wiederverwenden statt eigene Formel zu schreiben
+- Bei künftigen Änderungen der Bewertungs-Schwellen: ein zentraler Ort
+
+### Bei der Gelegenheit gefixt
+- Brutto-Zähler nutzte `(nkm+ze)*12`, Netto-Zähler nutzte nur `nkm_j` →
+  jetzt beide auf konsistenter Basis `(NKM+ZE)*12`. Im typischen Deal
+  ohne Zuschläge (ZE=0) keine Änderung. Bei Deals mit Stellplatz-
+  Zuschlag liefert der Netto-DSCR jetzt einen leicht höheren Wert
+  (was korrekt ist).
+
+
 ## V1.1.230 — 2026-05-19
 
 ### Quick-Win-Sammelpatch: Audit-Fixes (B8.16 + B8.29) + V228.4 Tooltip-Rest
