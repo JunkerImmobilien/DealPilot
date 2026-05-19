@@ -1761,7 +1761,7 @@ body.dp-tt-off .dp-tip-infobox {
       <!-- V63.57/54: BAUSPARVERTRAG (für Tilgungsaussetzung) — erweitert um Zuteilungs-Mechanik -->
       <div class="card" id="bspar_card" style="display:none">
         <div class="ct-row">
-          <div class="ct" style="margin:0;border:none;padding:0">Bausparvertrag <span class="ds2-tag">Tilgungsaussetzung</span></div>
+          <div class="ct" style="margin:0;border:none;padding:0">Bausparvertrag <span class="ds2-tag">Tilgungsaussetzung</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgungsaussetzung" tabindex="-1" aria-label="Hilfe zu Tilgungsaussetzung"></button></div>
           <span class="hint">Sparphase + Zuteilung + Bauspardarlehen-Phase werden separat modelliert.</span>
         </div>
         <div class="g2" style="margin-top:12px">
@@ -1843,7 +1843,7 @@ body.dp-tt-off .dp-tip-infobox {
           <div class="f"><label>Zinsbindung (Jahre)</label><div class="iw"><input id="d2_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
           <div class="f"><label>Monatliche Rate</label><div class="cf" id="d2_rate">—</div></div>
           <div class="info-box info-blue" id="d2_kfw_box" style="display:none; margin-top:10px">
-            <div class="info-box-title">🏛️ KfW-Förderprogramme</div>
+            <div class="info-box-title">🏛️ KfW-Förderprogramme <button type="button" class="dp-tip" data-tip-id="tab5.kfw" tabindex="-1" aria-label="Hilfe zu KfW-Förderdarlehen"></button></div>
             <div class="info-box-content">
               <div class="hint">Beliebte KfW-Programme für Immobilien-Investoren:</div>
               <ul class="kfw-links">
@@ -1910,7 +1910,7 @@ body.dp-tt-off .dp-tip-infobox {
         <div class="bank-item ok" id="bi-dscr"><div class="bank-dot"></div><div><div class="bank-title" id="bank-dscr-t">DSCR – Schuldendeckung</div><div class="bank-desc" id="bank-dscr-d">Mieteinnahmen decken Kapitaldienst</div></div></div>
         <div class="bank-item ok" id="bi-verm"><div class="bank-dot green"></div><div><div class="bank-title" id="bi-verm-t">Vollständig vermietet</div><div class="bank-desc" id="bi-verm-d">Nachgewiesene Mieterträge als stabile Einnahmebasis</div></div></div>
         <div class="bank-item ok" id="bi-ltv"><div class="bank-dot green"></div><div><div class="bank-title" id="bank-ltv-t">LTV – Beleihungsquote</div><div class="bank-desc" id="bank-ltv-d">Beleihungsauslauf liegt im Rahmen</div></div></div>
-        <div class="bank-item warn" id="bi-zaer"><div class="bank-dot"></div><div><div class="bank-title">Zinsänderungsrisiko</div><div class="bank-desc" id="bank-zaer-d">Anschlussfinanzierung kalkuliert</div></div></div>
+        <div class="bank-item warn" id="bi-zaer"><div class="bank-dot"></div><div><div class="bank-title">Zinsänderungsrisiko <button type="button" class="dp-tip" data-tip-id="tab5.zinsaenderungsrisiko" tabindex="-1" aria-label="Hilfe zu Zinsänderungsrisiko"></button></div><div class="bank-desc" id="bank-zaer-d">Anschlussfinanzierung kalkuliert</div></div></div>
       </div>
     </div>
   </div>
@@ -2001,13 +2001,13 @@ body.dp-tt-off .dp-tip-infobox {
   <div id="bwk-detail-mode" class="col2">
     <div>
       <div class="card"><div class="ct">Umlagefähige Kosten / Jahr</div>
-        <div class="f"><label>Hausgeld (umlagefähig) / Jahr</label><div class="iw"><span class="pfx">€</span><input id="hg_ul" type="text" inputmode="decimal" placeholder="1391" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Hausgeld (umlagefähig) / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.hg_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_ul" type="text" inputmode="decimal" placeholder="1391" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Grundsteuer / Jahr</label><div class="iw"><span class="pfx">€</span><input id="grundsteuer" type="text" inputmode="decimal" placeholder="336" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Sonstiges umlagefähig / Jahr</label><div class="iw"><span class="pfx">€</span><input id="ul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Summe umlagefähig</label><div class="cf" id="ul_sum">—</div></div>
       </div>
       <div class="card"><div class="ct">Nicht umlagefähige Kosten / Jahr</div>
-        <div class="f"><label>Hausgeld (nicht umlagefähig)</label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Hausgeld (nicht umlagefähig) <button type="button" class="dp-tip" data-tip-id="tab6.hg_nicht_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld nicht umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
         <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Kalkulat. Mietausfall / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.kalkulat_mietausfall" tabindex="-1" aria-label="Hilfe zu tab6.kalkulat_mietausfall"></button></label><div class="iw"><span class="pfx">€</span><input id="mietausfall" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
@@ -2096,7 +2096,7 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- V46: Alter Deal Score → kollabierbar mit Toggle, Standard minimiert -->
   <div class="card dealscore-card dealscore-card-v46-collapsed" id="dealscore-card">
     <button class="ds-collapse-toggle" type="button" onclick="toggleDsCollapse()" aria-expanded="false">
-      <span class="ds-collapse-l">📊 DealPilot Score</span>
+      <span class="ds-collapse-l">📊 DealPilot Score <button type="button" class="dp-tip" data-tip-id="tab8.dealpilot_score" tabindex="-1" aria-label="Hilfe zu DealPilot Score"></button></span>
       <span class="ds-collapse-summary" id="ds-collapse-summary">Klicken zum Anzeigen</span>
       <span class="ds-collapse-arrow">▼</span>
     </button>
@@ -2121,7 +2121,7 @@ body.dp-tt-off .dp-tip-infobox {
     <div class="ds-score-hint ds-score-hint-investor">
       <span class="ds-score-hint-icon">✨</span>
       <span class="ds-score-hint-text">
-        <strong>Investor Deal Score</strong> = erweiterter Deal Score mit zusätzlichen 24 KPIs
+        <strong>Investor Deal Score <button type="button" class="dp-tip" data-tip-id="tab8.investor_score" tabindex="-1" aria-label="Hilfe zu Investor Deal Score"></button></strong> = erweiterter Deal Score mit zusätzlichen 24 KPIs
         für detaillierte Investorenbewertung (Lage, Substanz, Upside-Potenzial).
       </span>
     </div>
@@ -2203,7 +2203,7 @@ body.dp-tt-off .dp-tip-infobox {
     <div class="kpi"><div class="kpi-label">LTV <button type="button" class="dp-tip" data-tip-id="tab5.ltv" tabindex="-1" aria-label="Hilfe zu LTV"></button></div><div class="kpi-val" id="kpi-ltv">—</div><div class="kpi-sub">Fremdfinanzierungsquote</div></div>
     <div class="kpi"><div class="kpi-label">DSCR <button type="button" class="dp-tip" data-tip-id="tab5.dscr" tabindex="-1" aria-label="Hilfe zu DSCR"></button></div><div class="kpi-val" id="kpi-dscr">—</div><div class="kpi-sub">Schuldendeckung</div></div>
     <div class="kpi"><div class="kpi-label">Faktor</div><div class="kpi-val" id="kpi-fak">—</div><div class="kpi-sub">Jahresmieten</div></div>
-    <div class="kpi"><div class="kpi-label">Equity Multiple <button type="button" class="dp-tip" data-tip-id="tab8.equity_multiple" tabindex="-1" aria-label="Hilfe zu Equity Multiple"></button></div><div class="kpi-val" id="kpi-em">—</div><div class="kpi-sub">geschätzt</div></div>
+    <div class="kpi"><div class="kpi-label">Equity Multiple <button type="button" class="dp-tip" data-tip-id="tab8.equity_multiple" tabindex="-1" aria-label="Hilfe zu Equity Multiple"></button></div><div class="kpi-val" id="kpi-em">—</div><div class="kpi-sub" id="kpi-em-sub">geschätzt</div></div>
   </div>
   <div class="col2">
     <div class="card">
@@ -2405,7 +2405,7 @@ body.dp-tt-off .dp-tip-infobox {
         <tr><td colspan="4" class="phase-divider">Renditen & Sicherheits-Kennzahlen</td></tr>
         <!-- V63.61: span.hint führte zu höheren Zeilen (display:block). cf-hint ist inline. -->
         <tr><td>Bruttomietrendite <span class="cf-hint">(statisch · NKM/KP)</span></td><td class="num" id="ph-bmr-now">—</td><td class="num" id="ph-bmr-ezb">—</td><td class="num" id="ph-bmr-an">—</td></tr>
-        <tr><td>Cashflow-Rendite <span class="cf-hint">(CF n.St. / Immo-Wert)</span></td><td class="num" id="ph-cfy-now">—</td><td class="num" id="ph-cfy-ezb">—</td><td class="num" id="ph-cfy-an">—</td></tr>
+        <tr><td>Cashflow-Rendite <span class="cf-hint">(CF n.St. / Immo-Wert)</span> <button type="button" class="dp-tip" data-tip-id="tab8.cashflow_rendite" tabindex="-1" aria-label="Hilfe zu Cashflow-Rendite"></button></td><td class="num" id="ph-cfy-now">—</td><td class="num" id="ph-cfy-ezb">—</td><td class="num" id="ph-cfy-an">—</td></tr>
         <tr><td>EK-Rendite im Objekt <span class="cf-hint">(CF n.St. / EK im Objekt)</span></td><td class="num" id="ph-ekr-now">—</td><td class="num" id="ph-ekr-ezb">—</td><td class="num" id="ph-ekr-an">—</td></tr>
         <tr><td>DSCR (Schuldendeckung) <span class="cf-hint" title="Bank-Sicht: Mieten / (Zins+Tilgung). Bewirtschaftungskosten und Steuern sind hier NICHT enthalten — daher kann DSCR &gt; 1 sein, obwohl der Cashflow negativ ist.">ⓘ</span></td><td class="num" id="ph-dscr-now">—</td><td class="num" id="ph-dscr-ezb">—</td><td class="num" id="ph-dscr-an">—</td></tr>
         <tr><td>LTV (Restschuld / Wert)</td><td class="num" id="ph-ltv-now">—</td><td class="num" id="ph-ltv-ezb">—</td><td class="num" id="ph-ltv-an">—</td></tr>
@@ -2591,7 +2591,7 @@ body.dp-tt-off .dp-tip-infobox {
 <script src="js/deal-kpis.js?v=124"></script>
 <script src="js/afa-engine.js?v=227"></script>
   <script src="js/afa-ui.js?v=2271"></script>
-  <script src="js/calc.js?v=227"></script>
+  <script src="js/calc.js?v=230"></script>
 <script src="js/d1-type-handler.js?v=160"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>

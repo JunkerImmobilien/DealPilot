@@ -1449,7 +1449,9 @@ function _calcImmediate(){
   st('kpi-dscr',fN(dscr,2));setKpiColor('kpi-dscr',dscr,1.2,1.0);  // ≥1.2 green, 1.0-1.2 gold, <1.0 red
   st('kpi-fak',fN(fak,1));
   // V63.62: Equity Multiple zeigt ∞ wenn kein EK eingesetzt (Vollfinanzierung)
+  // V230 (B8.29): Sub-Text dynamisch — bei ∞ ist es kein Schätzwert
   st('kpi-em', (ekv <= 100) ? '∞' : fX(em));
+  st('kpi-em-sub', (ekv <= 100) ? 'max. Hebel' : 'geschätzt');
   st('sc-today',fE(cf_ns,0,true));st('sc-ezb',fE(cf_ezb,0,true));
   st('sc-exit',fE(exit_vkp-Math.max(0,rs),0,true));
   // V63.35: Initial-Setter für Cashflow-Box (renderCFCalc überschreibt mit Phase-Werten)
