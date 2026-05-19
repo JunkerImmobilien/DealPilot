@@ -702,8 +702,8 @@
           <div class="f"><label>Grundbuchamt (€)</label><div class="iw"><span class="pfx">€</span><input id="gba_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gba')"></div></div>
           <div class="f"><label>Grunderwerbsteuer (%)</label><div class="iw"><input id="gest_p" type="text" inputmode="decimal" value="6.50" step="0.01" class="tr" oninput="syncCostPct('gest')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Grunderwerbsteuer (€)</label><div class="iw"><span class="pfx">€</span><input id="gest_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gest')"></div></div>
-          <div class="f"><label>Junker Immobilien (%)</label><div class="iw"><input id="ji_p" type="text" inputmode="decimal" value="1.50" step="0.01" class="tr" oninput="syncCostPct('ji')"><span class="sfx">%</span></div></div>
-          <div class="f"><label>Junker Immobilien (€)</label><div class="iw"><span class="pfx">€</span><input id="ji_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('ji')"></div></div>
+          <div class="f"><label>Sonstige (%)</label><div class="iw"><input id="ji_p" type="text" inputmode="decimal" value="0" step="0.01" class="tr" oninput="syncCostPct('ji')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Sonstige (€)</label><div class="iw"><span class="pfx">€</span><input id="ji_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('ji')"></div></div>
         </div>
         <hr class="dvd">
         <div class="f mb8"><label>Summe Nebenkosten</label><div class="cf" id="nk_sum">—</div></div>
@@ -770,7 +770,7 @@
                     <option value="3">3 Jahre</option>
                     <option value="4">4 Jahre</option>
                     <option value="5">5 Jahre (Standard §82b)</option>
-                    <option value="50">Über AfA-Satz (anschaffungsnah)</option>
+                    <option value="50">Über AfA-Satz · 50 J. Altbau / 33 J. Neubau · anschaffungsnah</option>
                   </select>
                 </div>
               </div>
@@ -986,11 +986,11 @@
     <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
     <div class="g2">
       <div class="f"><label>zvE vor Immobilie / Jahr</label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="calc()"></div></div>
-      <div class="f"><label>Persönl. Grenzsteuersatz (%)</label><div class="iw"><input id="grenz" type="text" inputmode="decimal" value="40.45" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+      <div class="f"><label>Persönl. Grenzsteuersatz (%)</label><div class="iw"><input id="grenz" type="text" inputmode="decimal" placeholder="42.00" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
     </div>
     <div class="f checkbox-row">
       <label class="cb-label" title="Wenn aktiv, wird der Grenzsteuersatz automatisch aus deinem zvE nach §32a EStG (Tarif 2026) berechnet.">
-        <input id="grenz_auto" type="checkbox" onchange="onGrenzAutoToggle()">
+        <input id="grenz_auto" type="checkbox" checked onchange="onGrenzAutoToggle()">
         <span>Grenzsteuersatz automatisch aus zvE berechnen</span>
       </label>
     </div>
@@ -1371,7 +1371,7 @@
         <div class="f"><label>Anfängl. Darlehenssumme *</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
         <div class="g2">
           <div class="f"><label>Zinssatz nominal (% p.a.)</label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-          <div class="f" id="d1t_field"><label>Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f" id="d1t_field"><label>Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
         </div>
         <div class="f"><label>Monatliche Rate (berechnet)</label><div class="cf" id="d1_rate">—</div></div>
         <div class="g2">
@@ -1684,15 +1684,15 @@
 
 <!-- ═══════════ TAB 5: KI ═══════════ -->
 <div class="sec" id="s5">
-  <div class="sec-title">KI-Investment-Analyse</div>
-  <div class="sec-desc">DealPilot KI bewertet deine Zahlen — Bewertung, Stärken, Risiken, Verhandlungsempfehlung, Bankargumente, Fazit</div>
+  <h2 class="sec-title">KI-Investment-Analyse</h2>
+  <p class="sec-desc">DealPilot KI bewertet deine Zahlen — Bewertung, Stärken, Risiken, Verhandlungsempfehlung, Bankargumente, Fazit</p>
 
   <div class="ai-box">
     <div class="ai-hdr">
       <div class="ai-icon ai-icon-brain" id="ai-icon-main"></div>
       <div>
         <div class="ai-title">Investment-Analyse</div>
-        <div class="ai-sub">DealPilot KI · Junker Immobilien</div>
+        <div class="ai-sub">DealPilot KI</div>
       </div>
     </div>
 
@@ -2232,14 +2232,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="js/deal-kpis.js?v=124"></script>
-<script src="js/calc.js?v=166"></script>
+<script src="js/calc.js?v=226"></script>
 <script src="js/d1-type-handler.js?v=160"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=166"></script>
-<script src="js/config.js?v=223"></script>
+<script src="js/config.js?v=226"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -2249,7 +2249,7 @@
 <script src="js/dealscore.js?v=166"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=144">
 <script src="js/datenraum.js?v=160"></script>
-<script src="js/settings.js?v=224"></script>
+<script src="js/settings.js?v=226"></script>
 <script src="js/pricing-modal.js?v=197-2"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=160"></script>
@@ -2261,7 +2261,7 @@
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=189"></script>
+<script src="js/ui.js?v=226"></script>
 <script src="js/storage.js?v=191"></script>
 <script src="js/all-objects.js?v=166"></script>
 <script src="js/portfolio-strategy.js?v=144"></script>
@@ -2270,13 +2270,13 @@
 <script src="js/bank-negotiation-pdf.js?v=166"></script>
 <script src="js/track-record.js?v=166"></script>
 <script src="js/pdf.js?v=166"></script>
-<script src="js/auth.js?v=223"></script>
+<script src="js/auth.js?v=225"></script>
   <script src="js/auth-401-handler.js?v=160" defer></script>
 <script src="js/subscription.js?v=186"></script>
 <script src="js/bmf-data.js?v=166"></script>
 <script src="js/bmf-afa.js?v=166"></script>
 <script src="js/bmf-ui.js?v=189"></script>
-<script src="js/dealscore2.js?v=166"></script>
+<script src="js/dealscore2.js?v=226"></script>
 <script src="js/dealscore2-ui.js?v=189"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
@@ -2291,7 +2291,7 @@
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/quick-check-tab.js?v=166"></script>
-<script src="js/ai-credits.js?v=197"></script>
+<script src="js/ai-credits.js?v=225"></script>
 <script src="js/workflow.js?v=124"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=166"></script>
@@ -2324,5 +2324,6 @@
 
   <script src="js/register-easter-egg.js?v=203" defer></script>
   <script src="credits-modal.js?v=197"></script>
+  <script src="js/grest-plz-lookup.js?v=226"></script>
 </body>
 </html>
