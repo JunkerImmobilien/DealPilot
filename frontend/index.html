@@ -2685,8 +2685,8 @@ body.dp-tt-off .dp-tip-infobox {
 <script src="js/dealscore.js?v=166"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=144">
 <script src="js/datenraum.js?v=160"></script>
-<script src="js/tooltip-content.js?v=235"></script>
-  <script src="js/tooltip-engine.js?v=228"></script>
+<script src="js/tooltip-content.js?v=2351"></script>
+  <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/settings.js?v=2342"></script>
 <script src="js/pricing-modal.js?v=197-2"></script>
 <script src="js/stripe-success.js?v=183"></script>
@@ -2904,13 +2904,25 @@ body.dp-tt-off .dp-tip-infobox {
 })();
 </script>
 
-<!-- V235: Scroll-to-Top bei Tab-Wechsel + Weiter-Button-Logik -->
+<!-- V235.1: Scroll-to-Top bei Tab-Wechsel + Weiter-Button-Logik (Fix für scrollTo) -->
 <script id="v235-helpers">
 (function () {
   'use strict';
 
-  // V235.1: Scroll-to-Top bei JEDEM Tab-Klick
-  // Wird ergänzend zur bestehenden ui.js Tab-Click-Handler aufgehängt
+  // V235.1: Robustes Scroll-to-Top mit 3-fach-Fallback
+  function _v235ScrollTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+    // Fallbacks für ältere Browser & iOS Safari
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+  }
+
+  // V235.1: Scroll-to-Top bei JEDEM Tab-Klick (längeres Delay damit Section-Switch
+  // in ui.js zuerst durchläuft und das Layout neu berechnet ist).
   function _v235AttachScrollToTop() {
     var tabs = document.querySelectorAll('.tabs .tab, .tab[data-target-sec]');
     if (!tabs || !tabs.length) return;
@@ -2918,22 +2930,14 @@ body.dp-tt-off .dp-tip-infobox {
       if (btn._v235ScrollAttached) return;
       btn._v235ScrollAttached = true;
       btn.addEventListener('click', function () {
-        // Kleiner Delay damit der Section-Switch zuerst durchläuft
-        setTimeout(function () {
-          // Smooth scroll to top
-          try {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          } catch (e) {
-            window.scrollTo(0, 0);
-          }
-        }, 50);
+        // 2-stufiger Delay: einmal sofort (für instant), einmal nach Section-Animation
+        setTimeout(_v235ScrollTop, 30);
+        setTimeout(_v235ScrollTop, 200);
       });
     });
   }
 
   // V235.2: Weiter-Button-Logik
-  // Wird vom Weiter-Button am Ende einer Sektion aufgerufen
-  // Findet die Tab-Reihenfolge anhand der DOM-Ordnung der .tab-Buttons
   window._v235GoToNextTab = function (currentSecId) {
     var tabs = Array.from(document.querySelectorAll('.tabs .tab[data-target-sec]'));
     if (!tabs.length) return;
@@ -2941,7 +2945,6 @@ body.dp-tt-off .dp-tip-infobox {
       return t.getAttribute('data-target-sec') === currentSecId;
     });
     if (currentIdx < 0 || currentIdx >= tabs.length - 1) {
-      // Letzter Tab oder unbekannter Tab — nichts zu tun
       if (typeof toast === 'function') {
         toast('🎉 Das war der letzte Tab — alle Eingaben sind erfasst!');
       }
@@ -2950,17 +2953,20 @@ body.dp-tt-off .dp-tip-infobox {
     var nextTab = tabs[currentIdx + 1];
     if (nextTab) {
       nextTab.click(); // simulate click — triggert auch scroll-to-top
+      // Zusätzlich direkt scrollen falls Click-Event nicht greift
+      setTimeout(_v235ScrollTop, 100);
+      setTimeout(_v235ScrollTop, 300);
     }
   };
 
-  // Init: erstes Mal aufhängen
+  // Init
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _v235AttachScrollToTop);
   } else {
     _v235AttachScrollToTop();
   }
-  // Sicherheitshalber nochmal nach 1s (für asynchrone Tab-Renders)
-  setTimeout(_v235AttachScrollToTop, 1000);
+  setTimeout(_v235AttachScrollToTop, 500);
+  setTimeout(_v235AttachScrollToTop, 1500);
 })();
 </script>
 </body>
