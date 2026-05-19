@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
   <!-- ═══════════════════════════════════════════════════
        BACKEND CONFIGURATION
-       Default: relative URL "/api/v1" — funktioniert wenn Backend
+       Default: relative URL"/api/v1" — funktioniert wenn Backend
        hinter demselben Reverse-Proxy (Caddy/Nginx) läuft wie das Frontend.
        Production-Setup mit Hetzner+Caddy aus dem Repo: einfach so lassen.
 
@@ -127,8 +127,8 @@
   outline-offset: 1px;
 }
 .dp-tip::before {
-  content: "ⓘ";
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  content:"ⓘ";
+  font-family: -apple-system, BlinkMacSystemFont,"Segoe UI", sans-serif;
   font-weight: 600;
 }
 
@@ -368,7 +368,7 @@ textarea.v236-qc-loaded {
   position: relative;
 }
 
-/* Badge "aus Quick-Check" rechts an QC-Feldern */
+/* Badge"aus Quick-Check" rechts an QC-Feldern */
 .v236-qc-loaded-wrap {
   position: relative;
 }
@@ -411,6 +411,17 @@ textarea.v236-qc-loaded {
 @keyframes v236pulse {
   0%, 100% { opacity: 0.7; }
   50% { opacity: 1; }
+}
+
+/* V236.2: Doppelte Sternchen verhindern wenn beide Klassen (qc-required + dp-required) */
+label.qc-required.dp-required::after,
+label.dp-required.qc-required::after {
+  content: '' !important;
+}
+
+/* V236.3: Tab-Indikator entfernt — V75 macht das schon */
+.v236-tab-status {
+  display: none !important;
 }
 </style>
 </head>
@@ -772,7 +783,7 @@ textarea.v236-qc-loaded {
 </header>
 
 <nav class="tabs">
-  <!-- V63.76: Quick-Check ist KEIN Tab mehr — wird über Sidebar-Aktion "Quick Check" als Standalone-View geöffnet -->
+  <!-- V63.76: Quick-Check ist KEIN Tab mehr — wird über Sidebar-Aktion"Quick Check" als Standalone-View geöffnet -->
   <!-- V189: Tab-Bar mit data-target-sec — Reihenfolge unabhängig von DOM! -->
   <button class="tab active" data-target-sec="s0" data-wf-key="objekt"><span class="tab-ico" data-ico="house"></span><span class="tab-lbl">Objekt</span></button>
   <button class="tab" data-target-sec="s1" data-wf-key="investition"><span class="tab-ico" data-ico="coins"></span><span class="tab-lbl">Investition</span></button>
@@ -821,7 +832,7 @@ textarea.v236-qc-loaded {
 <div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileSidebar()"></div>
 
 <!-- ═══════════ STANDALONE QUICK-CHECK VIEW (V63.76) ═══════════
-     Wird per Sidebar-Aktion "Quick Check" geöffnet (enterQuickCheckMode()).
+     Wird per Sidebar-Aktion"Quick Check" geöffnet (enterQuickCheckMode()).
      Ist .sec-hidden, damit switchTab() es nicht als Tab zählt.
      -->
 <div class="sec sec-hidden" id="s-quick" data-qc-standalone="1">
@@ -1245,7 +1256,7 @@ textarea.v236-qc-loaded {
       <div class="f"><label>= Nettokaltmiete / Jahr</label><div class="cf" id="nkm_j_out">—</div></div>
     </div>
       <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bar"/></svg></span>Mietpreis-Analyse</div>
-      <p class="hint">Bezogen auf die Wohnfläche aus Tab "Objekt".</p>
+      <p class="hint">Bezogen auf die Wohnfläche aus Tab"Objekt".</p>
       <div class="f"><label>Aktuelle Miete pro m²</label><div class="cf" id="miete_qm">—</div></div>
       <div class="f"><label>Aktuelle Miete pro m² (warm)</label><div class="cf" id="miete_qm_warm">—</div></div>
       <hr class="dvd">
@@ -1442,7 +1453,7 @@ textarea.v236-qc-loaded {
         <strong>Neubau-Hinweis:</strong> Bei Neubauten (Bauantrag 10/2023–09/2029) ist auch
         <strong>degressive AfA mit 5 %</strong> nach § 7 Abs. 5a EStG möglich.
         In den ersten Jahren deutlich höhere AfA, später Wechsel auf 3 % linear empfohlen.
-        Wähle dazu oben "<em>5,0 % degressiv mit Wechsel auf 3 % linear (empfohlen)</em>".
+        Wähle dazu oben"<em>5,0 % degressiv mit Wechsel auf 3 % linear (empfohlen)</em>".
       </div>
     </div>
       <div class="f">
@@ -2433,7 +2444,7 @@ textarea.v236-qc-loaded {
     <div class="kv"><span>+ Cashflow-Überschuss <span class="cf-hint">(was nach Tilgung &amp; Steuer auf Konto bleibt)</span></span><span class="kv-v c-green" id="vz-cf">—</span></div>
     <div class="kv"><span>+ Steuervorteil <span class="cf-hint">(kumulierte Erstattung aus V+V-Verlusten)</span></span><span class="kv-v c-green" id="vz-steuer">—</span></div>
     <!-- V63.58: Wenn Tilgungsaussetzung mit BSV — Sparguthaben separat ausweisen,
-         damit User es nicht mit "freiem Cashflow" verwechselt -->
+         damit User es nicht mit"freiem Cashflow" verwechselt -->
     <div class="kv" id="vz-bspar-row" style="display:none"><span>+ Bausparguthaben aufgebaut <span class="cf-hint">(Sparbeitrag · gebunden im Bausparvertrag)</span></span><span class="kv-v c-green" id="vz-bspar">—</span></div>
     <div class="kv"><span>+ Wertsteigerung <span class="cf-hint">(Marktwert minus Kaufpreis)</span></span><span class="kv-v c-green" id="vz-wert">—</span></div>
     <div class="kv kv-result"><span><b>Netto-Vermögenszuwachs <span class="cf-hint">(Tilgung-vom-Mieter + CF-Überschuss + Steuervorteil + Wertsteigerung)</span></b></span><span class="kv-v c-gold" id="vz-gesamt">—</span></div>
@@ -2896,7 +2907,7 @@ textarea.v236-qc-loaded {
   'use strict';
 
   /**
-   * V234: Bei Auswahl von "Neubau / kernsaniert" im Tab Objekt:
+   * V234: Bei Auswahl von"Neubau / kernsaniert" im Tab Objekt:
    * - Setze AfA-Satz auf 3.0% linear (Standard für Wohnzwecke ab 2023)
    * - Zeige Hinweis-Banner zur degressiven AfA (5%, § 7 Abs. 5a EStG)
    */
@@ -2926,7 +2937,7 @@ textarea.v236-qc-loaded {
   };
 
   /**
-   * V234: Init beim Laden — prüfe ob ds2_zustand schon auf "neubau" steht
+   * V234: Init beim Laden — prüfe ob ds2_zustand schon auf"neubau" steht
    * (z.B. nach PDF-Import oder geladenem Deal) und blende Banner ein.
    */
   function _v234InitNeubauBanner() {
@@ -3050,13 +3061,11 @@ textarea.v236-qc-loaded {
 })();
 </script>
 
-<!-- V236.1: Pflichtfeld-Validierung + Tab-Indikator + QC-Übernahme (korrigierte Field-IDs) -->
+<!-- V236.3: Pflichtfeld-Validierung + QC-Übernahme (Tab-Indikator entfernt — V75-Workflow macht das schon) -->
 <script id="v236-helpers">
 (function () {
   'use strict';
 
-  // ─── Konfiguration ──────────────────────────────────────────────────
-  // V236.1: Korrigierte Field-IDs basierend auf qcSaveAsObject() Analyse
   var REQUIRED_BY_TAB = {
     's0':     ['str', 'plz', 'ort', 'wfl', 'baujahr', 'objektart', 'ds2_zustand'],
     's1':     ['kp'],
@@ -3065,16 +3074,13 @@ textarea.v236-qc-loaded {
     's3-tax': ['gst'],
   };
 
-  // V236.1: Felder die qcSaveAsObject() in die Vollanalyse-Felder kopiert
-  // (für QC-Übernahme-Markierung)
   var QC_TARGET_FIELDS = [
-    'str', 'hnr', 'plz', 'ort',         // Adresse
-    'kp', 'nkm', 'ze',                  // Kaufpreis & Miete
-    'wfl', 'baujahr',                   // Objekt
-    'ek', 'd1', 'd1z', 'd1t', 'ji_p'    // Finanzierung
+    'str', 'hnr', 'plz', 'ort',
+    'kp', 'nkm', 'ze',
+    'wfl', 'baujahr',
+    'ek', 'd1', 'd1z', 'd1t', 'ji_p'
   ];
 
-  // ─── Helpers ────────────────────────────────────────────────────────
   function _fieldHasValue(id) {
     var el = document.getElementById(id);
     if (!el) return false;
@@ -3083,49 +3089,18 @@ textarea.v236-qc-loaded {
     return v.length > 0;
   }
 
-  function _tabRequiredStatus(secId) {
-    var fields = REQUIRED_BY_TAB[secId] || [];
-    if (!fields.length) return 'none';
-    var filled = 0;
-    var total = fields.length;
-    fields.forEach(function (id) {
-      if (_fieldHasValue(id)) filled++;
-    });
-    if (filled === 0) return 'none';
-    if (filled === total) return 'complete';
-    return 'partial';
+  // V236.3: Tab-Indikator komplett entfernt — V75 macht das schon via .tab-wf-check
+  // Wir entfernen nur noch alle vorhandenen .v236-tab-status-Spans aus dem DOM.
+  function _v236RemoveAllTabIndicators() {
+    document.querySelectorAll('.v236-tab-status').forEach(function (el) { el.remove(); });
   }
-
-  // ─── Tab-Status-Indikator updaten ───────────────────────────────────
+  // Kompatibilität: Funktion bleibt definiert, macht aber nichts mehr
   function _v236UpdateTabIndicators() {
-    var tabs = document.querySelectorAll('.tab[data-target-sec]');
-    tabs.forEach(function (tabBtn) {
-      var secId = tabBtn.getAttribute('data-target-sec');
-      if (!secId || !REQUIRED_BY_TAB[secId]) return;
-
-      var status = _tabRequiredStatus(secId);
-      var existing = tabBtn.querySelector('.v236-tab-status');
-      if (existing) existing.remove();
-
-      if (status === 'none') return;
-
-      var ind = document.createElement('span');
-      ind.className = 'v236-tab-status';
-      if (status === 'complete') {
-        ind.classList.add('is-complete');
-        ind.textContent = '✓';
-        ind.title = 'Alle Pflichtfelder ausgefüllt';
-      } else {
-        ind.classList.add('is-incomplete');
-        ind.textContent = '!';
-        ind.title = 'Pflichtfelder fehlen';
-      }
-      tabBtn.appendChild(ind);
-    });
+    _v236RemoveAllTabIndicators();
   }
   window._v236UpdateTabIndicators = _v236UpdateTabIndicators;
 
-  // ─── Pflichtfeld-Validierung ────────────────────────────────────────
+  // Pflichtfeld-Validierung (rote Border bei Submit)
   function _v236ValidateRequired() {
     var allFields = [];
     Object.keys(REQUIRED_BY_TAB).forEach(function (sec) {
@@ -3159,14 +3134,13 @@ textarea.v236-qc-loaded {
         if (_fieldHasValue(id)) {
           el.classList.remove('dp-required-error');
         }
-        _v236UpdateTabIndicators();
       };
       el.addEventListener('input', handler);
       el.addEventListener('change', handler);
     });
   }
 
-  // ─── Quick-Check-Übernahme-Markierung ──────────────────────────────
+  // Quick-Check-Übernahme-Markierung (gold border-left)
   function _v236MarkQcLoaded(fieldIds) {
     if (!fieldIds) return;
     fieldIds.forEach(function (id) {
@@ -3186,13 +3160,12 @@ textarea.v236-qc-loaded {
   }
   window._v236MarkQcLoaded = _v236MarkQcLoaded;
 
-  // V236.1: ECHTER Hook auf qcSaveAsObject (die Funktion die QC → Vollanalyse kopiert)
+  // qcSaveAsObject-Wrapper mit Tab-Switch zu s0 + Scroll
   function _v236WrapQcSave() {
     if (window.qcSaveAsObject && !window.qcSaveAsObject._v236Wrapped) {
       var orig = window.qcSaveAsObject;
       window.qcSaveAsObject = function () {
         var result = orig.apply(this, arguments);
-        // Nach erfolgreicher Übernahme: alle QC-Ziel-Felder markieren die jetzt Wert haben
         setTimeout(function () {
           var marked = [];
           QC_TARGET_FIELDS.forEach(function (id) {
@@ -3200,10 +3173,19 @@ textarea.v236-qc-loaded {
           });
           if (marked.length > 0) {
             _v236MarkQcLoaded(marked);
-            _v236UpdateTabIndicators();
             if (typeof toast === 'function') {
               toast('📋 ' + marked.length + ' Felder aus Quick-Check übernommen — gold markiert');
             }
+          }
+          // Wechsel zu Tab Objekt (s0)
+          var s0Tab = document.querySelector('.tab[data-target-sec="s0"]');
+          if (s0Tab && !s0Tab.classList.contains('active')) {
+            s0Tab.click();
+          }
+          // Scroll-to-Top
+          if (typeof window._v236ScrollTop === 'function') {
+            setTimeout(window._v236ScrollTop, 50);
+            setTimeout(window._v236ScrollTop, 250);
           }
         }, 100);
         return result;
@@ -3212,10 +3194,9 @@ textarea.v236-qc-loaded {
     }
   }
 
-  // ─── Init ───────────────────────────────────────────────────────────
   function _v236Init() {
+    _v236RemoveAllTabIndicators();  // alte Indikatoren entfernen
     _v236AttachErrorClear();
-    _v236UpdateTabIndicators();
     _v236WrapQcSave();
   }
   if (document.readyState === 'loading') {
