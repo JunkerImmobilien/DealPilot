@@ -1191,6 +1191,24 @@ function _v192ShowProHintIfNeeded() {
 }
 window._v192ShowProHintIfNeeded = _v192ShowProHintIfNeeded;
 
+// V228.3 HOTFIX: Helper-Funktionen für Tooltip-Toggle in Profil-&-Anzeige
+function _v228TipMode() {
+  try {
+    if (window.DpTip && typeof DpTip.getMode === 'function') return DpTip.getMode();
+  } catch (e) {}
+  return 'beginner';
+}
+function _v228RefreshTipButtons() {
+  var mode = _v228TipMode();
+  document.querySelectorAll('.dp-tt-mode-btn').forEach(function (btn) {
+    var btnMode = btn.getAttribute('data-tt-mode') || '';
+    if (btnMode === mode) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+}
+window._v228TipMode = _v228TipMode;
+window._v228RefreshTipButtons = _v228RefreshTipButtons;
+
 window.showSettings = showSettings;
 window.closeSettings = closeSettings;
 window._swSet = _swSet;
