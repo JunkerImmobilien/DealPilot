@@ -19,6 +19,7 @@ const { requireUnderLimit } = require('../middleware/planLimits');
 const usageService = require('../services/usageService');
 const openaiService = require('../services/openaiService');
 const aiCreditsService = require('../services/aiCreditsService');  // V63.86
+const plzValidator = require('../services/plzValidator');  // V229: PLZ-Halluzinationsschutz
 
 const router = express.Router();
 
@@ -108,7 +109,7 @@ router.get('/status', (req, res) => {
  * Priorität: Server-Key (.env) > User-Key (Body) > 503-Fehler.
  * User-Keys werden NICHT geloggt.
  */
-router.post('/analyze', authenticate, /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
+router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzinationsschutz */ /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const payload = req.body || {};
     const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
@@ -187,7 +188,7 @@ router.post('/analyze', authenticate, /* V186: kein requireUnderLimit, AI-Credit
  * Body: { adresse: "Dresdenstraße 116, 32052 Herford", plz, ort, str, hnr }
  * Response: { makro: {score, label, text, factors[]}, mikro: {...} }
  */
-router.post('/lage', authenticate, /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
+router.post('/lage', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzinationsschutz */ /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const payload = req.body || {};
     const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
@@ -410,7 +411,7 @@ router.post('/extract-market-data', authenticate, extractLimiter, async (req, re
  *
  * Response: { suggestions: { fieldName: { value, source, reasoning } } }
  */
-router.post('/qc-suggest', authenticate, /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
+router.post('/qc-suggest', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzinationsschutz */ /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const { group, context, userApiKey: rawUserKey } = req.body || {};
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
@@ -449,7 +450,7 @@ router.post('/qc-suggest', authenticate, /* V186: kein requireUnderLimit, AI-Cre
  * Implementiert wie /lage: nutzt openaiService.callOpenAI() als rohen Call
  * mit eigenem Prompt + JSON-Response-Parsing.
  */
-router.post('/bodenrichtwert', authenticate, async (req, res, next) => {
+router.post('/bodenrichtwert', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzinationsschutz */ async (req, res, next) => {
   try {
     const payload = req.body || {};
     const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')

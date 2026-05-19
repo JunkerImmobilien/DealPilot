@@ -447,3 +447,38 @@ window.runKiLage = runKiLage;
     getAccuracyBanner: _buildAccuracyBanner
   };
 })();
+
+
+// V229: PLZ-Halluzinationsschutz — Frontend-Helper.
+// Wird bei 422-Response von /api/v1/ai/lage oder /miete oder /bodenrichtwert aufgerufen.
+window._v229ShowPlzError = function(errorBody, targetEl) {
+  if (!targetEl) return;
+  var reason = (errorBody && errorBody.reason) || 'invalid_plz';
+  var plz = (errorBody && errorBody.plz) || (document.getElementById('plz') || {}).value || '';
+  var icon = '⚠';
+  var title = 'PLZ-Problem';
+  var hint = '';
+  if (reason === 'test_plz') {
+    icon = '🤖';
+    title = 'PLZ sieht nach Test-Eingabe aus';
+    hint = 'Die PLZ "' + plz + '" wird häufig als Demo-Wert verwendet. Damit die KI keine ' +
+           'erfundenen Lage-Bewertungen liefert, ist sie geblockt. Bitte echte PLZ eintragen.';
+  } else if (reason === 'out_of_range') {
+    icon = '📮';
+    title = 'PLZ außerhalb des deutschen Bereichs';
+    hint = 'Die PLZ "' + plz + '" liegt nicht im gültigen deutschen Bereich (01067–99998).';
+  } else if (reason === 'invalid_format') {
+    icon = '✏';
+    title = 'Ungültiges PLZ-Format';
+    hint = 'Eine deutsche Postleitzahl hat genau 5 Ziffern (z.B. 32049).';
+  } else {
+    hint = (errorBody && errorBody.error) || 'Die KI-Analyse wurde aus PLZ-Gründen geblockt.';
+  }
+  targetEl.innerHTML =
+    '<div class="ki-lage-err" style="text-align:left;padding:16px;background:rgba(245,180,40,0.10);border-left:3px solid #E5A847;border-radius:6px">' +
+      '<div style="font-size:24px;margin-bottom:4px">' + icon + '</div>' +
+      '<div style="font-weight:600;color:#9C7223;margin-bottom:6px">' + title + '</div>' +
+      '<div style="font-size:13px;color:var(--muted)">' + hint + '</div>' +
+      '<div style="margin-top:10px"><button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById(\'plz\').focus();document.getElementById(\'plz\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">PLZ-Feld öffnen →</button></div>' +
+    '</div>';
+};
