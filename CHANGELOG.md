@@ -1,5 +1,20 @@
 # DealPilot Changelog
 
+## V1.1.234.2 — 2026-05-19
+
+### Hotfix: Plan-Pane leerer Bereich (V234.1 Folgefix)
+
+**Problem:** V234.1 hat Plan-Tab-Routing auf `_swSet(this)` umgestellt, aber
+der zugehörige DOM-Container `<div class="st-pane" data-pane="plan">`
+existierte nicht im Settings-Modal-Markup. V63.5 hatte ihn entfernt mit
+Kommentar "Plan-Tab raus aus Settings". Folge: Klick auf Plan-Tab →
+Button highlighted, aber Inhaltsbereich blieb leer.
+
+**Fix:** Pane-Container wieder eingebaut, direkt nach dem V63.5/V51-Anker.
+`_renderPlanPane()` wird beim initialen Modal-Aufbau gerendert, V234.1
+Status-Header erscheint jetzt korrekt.
+
+
 ## V1.1.234.1 — 2026-05-19
 
 ### Hotfix: Settings → Plan-Tab zeigt eigenes Pane statt Pricing-Modal
