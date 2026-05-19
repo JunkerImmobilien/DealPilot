@@ -1,5 +1,30 @@
 # DealPilot Changelog
 
+## V1.1.239.10 - 2026-05-19
+
+### Tour: Accordion-Lifecycle praezisiert
+
+**Verhalten optimiert:**
+
+Vorher (V239.9):
+- Bei JEDEM `tab: 'sidebar'`-Step wurde das Aktions-Accordion geoeffnet
+- Steps 1+2 (Sidebar Overview, Objekt-Auswahl) hatten daher unnoetig
+  offenes Accordion, was Portfolio-Karten ueberlagerte
+
+Nachher (V239.10):
+- Accordion oeffnet sich NUR wenn der Step-Selektor wirklich auf das
+  Accordion zielt (`needsAccordion = step.selector enthaelt sb-actions-accordion`)
+- Steps 1+2: Accordion bleibt zu, Portfolio sichtbar
+- Step 3: Accordion oeffnet sich (Quick-Check-Button)
+- Steps 4+ (s-quick, s0-s8): Accordion schliesst sich automatisch
+- Step 22 (Tool-Tips): Accordion oeffnet sich erneut (Selektor zielt drauf)
+
+### Geaenderte Dateien
+- `frontend/js/tour-engine.js` - needsAccordion-Pruefung
+- `frontend/index.html` - Cache v=239_10
+- `frontend/js/config.js` - V1.1.239.10
+
+
 ## V1.1.239.8 - 2026-05-19
 
 ### Tour Hotfix: Accordion-MutationObserver + Step 20 Header-PDF
