@@ -1,5 +1,55 @@
 # DealPilot Changelog
 
+## V1.1.236 — 2026-05-19
+
+### UX-Sammel-Paket: Scroll-Fix definitiv + Pflichtfelder + Tab-Indikator + QC-Übernahme
+
+**1. Scroll-to-Top — endgültiger Fix:**
+Diagnose hat aus style.css Z. 11716 enthüllt: `html, body { overflow: hidden; }`
+und `.main-col { overflow-y: auto; }`. Der Scroll-Container ist NICHT `window`
+sondern `.main-col`. V235.1 hat auf falsches Element gescrollt.
+
+Fix: V236-Helper zielt direkt auf `.main-col.scrollTo({top:0})`. Funktioniert
+jetzt zuverlässig bei Tab-Klick und Weiter-Button.
+
+**2. Pflichtfeld-Markierung (12 Felder):**
+Felder definiert als Finanzprofi-Standard für Bewertungs-Berechnung:
+
+- Tab Objekt: `addr`, `plz`, `ort`, `wfl`, `bj`, `objart`, `ds2_zustand`
+- Tab Investition: `kp`
+- Tab Miete: `nkm_m`
+- Tab Finanzierung: `d1_kapital`, `d1_zins`, `d1_tilg`
+- Tab Steuer: `gst`
+
+Labels bekommen `.dp-required` Klasse → rotes Sternchen `*`.
+Bei leerem Pflichtfeld + Validierung → rote Border + heller-roter Background.
+Klasse `.dp-required-error` wird automatisch entfernt sobald User tippt.
+
+**3. Tab-Status-Indikator in der Tab-Bar:**
+Pro Tab mit Pflichtfeldern wird neben dem Label ein Status-Icon angezeigt:
+- ✓ (grün) — alle Pflichtfelder ausgefüllt
+- ! (orange, pulsierend) — mind. 1 Pflichtfeld fehlt
+- (nichts) — Tab noch nicht angefasst
+
+Update-Trigger: nach jeder Eingabe in einem Pflichtfeld neu berechnen.
+
+**4. Quick-Check-Übernahme-Markierung:**
+Wenn ein Deal aus Quick-Check importiert wird (`_qcApplyImported`), bekommen
+die übernommenen Felder eine goldene Border-Left + leichten Gradient-Background.
+Sobald User das Feld manuell editiert, verschwindet die Markierung.
+
+**Architektur-Notiz:**
+Alles in einem konsolidierten V236-Block (`#v236-helpers` Script +
+`#v236-styles` CSS) am Ende von index.html. Keine JS-Datei-Modifikation —
+wrapper-Pattern um existierende Funktionen (`_qcApplyImported`).
+
+**Was V236 NICHT macht:**
+- Welcome-Mail nach Stripe-Checkout (V237)
+- Glossar im Hilfe-Modal (V237 oder V238)
+- Plausibilitäts-Hints
+- Onboarding-Wizard
+
+
 ## V1.1.235.1 — 2026-05-19
 
 ### Hotfix: Tooltips zeigen HTML-Tags als Text + Scroll-to-Top ohne Wirkung
