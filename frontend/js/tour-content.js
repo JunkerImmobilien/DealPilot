@@ -235,8 +235,18 @@
       placement: 'auto'
     },
 
-    // ═══ Phase 6: Hilfe ═══════════════════════════════════════════════
+    // ═══ Phase 6: Tool-Tips + Hilfe ════════════════════════════════════
     
+    {
+      tab: 'sidebar',
+      selector: 'button[onclick*="sbActionsAction(\'settings\')"], .sb-act-item[onclick*="settings"]',
+      icon: 'i-help',
+      title: 'Tool-Tips: An oder Aus?',
+      body: 'DealPilot zeigt **Tool-Tips** bei vielen Feldern (kleines ?-Symbol). Magst du sie eingeblendet oder lieber aus?',
+      bodyMore: 'Den Schalter findest du in den **Einstellungen** unter "Profil & Anzeige" → "Tool-Tips anzeigen".\n\n**Tool-Tips AN** (Standard):\n• Schwebende Erklaerungen bei jedem Feld\n• Beispiele und Standardwerte\n• Ideal beim Einarbeiten\n\n**Tool-Tips AUS:**\n• Kompakter Look\n• Schnelleres Arbeiten wenn du DealPilot schon kennst\n• Du kannst sie spaeter jederzeit wieder aktivieren\n\nNach dieser Tour ist ein guter Zeitpunkt um zu entscheiden. Probiere beides aus.',
+      placement: 'auto'
+    },
+
     {
       tab: 'header',
       selector: 'button.hdr-icon-btn[title="Hilfe"], button[onclick*="showHelp"]',
