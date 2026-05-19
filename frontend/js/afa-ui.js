@@ -161,11 +161,21 @@
     var b = $('afa_sonder7b_basis');
     var j = $('afa_sonder7b_jaehrlich');
     var w = $('afa_sonder7b_warning');
+    var wflWarn = $('afa_sonder7b_wfl_warning');
     if (b) b.textContent = info.basis != null ? fE(info.basis, 0) : '—';
     if (j) j.textContent = info.jaehrlich != null ? fE(info.jaehrlich, 0) : '—';
+    // V227.1: Spezialfall — Bedingungen alle ✓ aber Wfl fehlt
+    var aktiv = ($('afa_sonder7b_aktiv') || {}).checked || false;
+    var wflFehlt = false;
+    if (aktiv) {
+      var wfl = parseFloat(($('wfl') || {}).value) || 0;
+      var allOk = (typeof window.afaSonder7bIsValid === 'function') ? window.afaSonder7bIsValid() : false;
+      wflFehlt = allOk && wfl <= 0;
+    }
+    if (wflWarn) wflWarn.style.display = wflFehlt ? 'block' : 'none';
     if (w) {
-      var aktiv = ($('afa_sonder7b_aktiv') || {}).checked || false;
-      w.style.display = (aktiv && !info.gueltig) ? 'block' : 'none';
+      // Generelle Warnung NUR zeigen wenn nicht alle Bedingungen ✓ — und nicht der Wfl-Spezialfall
+      w.style.display = (aktiv && !info.gueltig && !wflFehlt) ? 'block' : 'none';
     }
   };
 
@@ -258,6 +268,13 @@
         el.dataset.v227Bound = '1';
       }
     });
+
+    // V227.1: wfl-Input triggert calc() damit § 7b-Basis live updated
+    var wflEl = $('wfl');
+    if (wflEl && !wflEl.dataset.v227bound) {
+      wflEl.addEventListener('input', function () { safeCalc(); });
+      wflEl.dataset.v227bound = '1';
+    }
   }
 
   if (document.readyState === 'loading') {

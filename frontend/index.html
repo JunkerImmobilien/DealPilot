@@ -1172,6 +1172,11 @@
               <b>Wirkung:</b> +5% pro Jahr in den ersten 4 Jahren (= 20% zusätzliche Abschreibung).
             </div>
           </div>
+          <!-- V227.1: Wfl-Missing-Warnung — wird per JS gezeigt wenn Wfl=0 aber § 7b aktiv -->
+          <div id="afa_sonder7b_wfl_warning" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(245,180,40,0.10);border-left:3px solid #E5A847;border-radius:4px;font-size:12.5px">
+            <strong style="color:#9C7223">⚠ Wohnfläche fehlt</strong><br>
+            <span style="color:var(--muted)">Um die § 7b-Förderfähigkeit zu berechnen, brauchen wir die Wohnfläche (Cap: 4.000 €/m²). Bitte im Tab <a href="#" onclick="switchTab(0);return false" style="color:var(--gold);font-weight:600">Objekt → Wohnfläche (m²)</a> eintragen.</span>
+          </div>
           <div class="f" style="margin-top:10px"><label>§ 7b Förderfähige Basis (berechnet)</label><div class="cf" id="afa_sonder7b_basis">—</div></div>
           <div class="f"><label>§ 7b Zusätzliche AfA / Jahr (J. 1–4)</label><div class="cf" id="afa_sonder7b_jaehrlich">—</div></div>
         </div>
@@ -2385,7 +2390,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="js/deal-kpis.js?v=124"></script>
 <script src="js/afa-engine.js?v=227"></script>
-  <script src="js/afa-ui.js?v=227"></script>
+  <script src="js/afa-ui.js?v=2271"></script>
   <script src="js/calc.js?v=227"></script>
 <script src="js/d1-type-handler.js?v=160"></script>
 <script src="js/icons.js?v=166"></script>
