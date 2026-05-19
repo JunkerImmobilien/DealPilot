@@ -266,11 +266,11 @@
     
     {
       tab: 'header',
-      selector: '#tabs-status-badge',
+      selector: 'button.hdr-icon-btn[title="Hilfe"], button[onclick*="showHelp"]',
       icon: 'i-bulb',
       title: 'Hilfe immer dabei',
-      body: 'Du hast es geschafft! Im **Hilfe-Menue** (oben rechts, gespotlightet) findest du jederzeit alles was du brauchst.',
-      bodyMore: '**Tour nochmal starten:**\n• Klicke auf das gelbe Badge oben rechts\n• Im Hilfe-Modal links unten: "Einfuehrungs-Tour"\n• Oder Tastatur-Shortcut: ESC dann erneut auf das Badge\n\n**Was du im Hilfe-Modal findest:**\n\n• **Glossar** mit 29 Finanzbegriffen (DSCR, AfA, BSV, IRR, Sonder-§7b ...)\n• **KI-Assistent** fuer DealPilot-Fragen und Investment-Beratung\n• **Anleitungen** fuer PDF-Export, Stripe-Setup, Plan-Wechsel\n• **Tipps & Tricks** zur schnelleren Bewertung\n• **Kontakt** zu Junker Immobilien\n\nViel Erfolg mit deinen Investments — und denk dran: **ein guter Deal ist halb verhandelt, der Rest ist Bewertung.**',
+      body: 'Du hast es geschafft! Klick auf das **Hilfe-Icon oben rechts** (gespotlightet) — dort findest du alles was du brauchst.',
+      bodyMore: '**Tour nochmal starten:**\n• Klicke auf das Hilfe-Icon oben rechts (Fragezeichen in Gold)\n• Im Hilfe-Modal findest du unten links den Button "Einfuehrungs-Tour starten"\n• Tastatur: ESC zum Schliessen\n\n**Was du im Hilfe-Modal findest:**\n\n• **Glossar** mit 29 Finanzbegriffen (DSCR, AfA, BSV, IRR, Sonder-§7b ...)\n• **KI-Assistent** fuer DealPilot-Fragen und Investment-Beratung\n• **Anleitungen** fuer PDF-Export, Stripe-Setup, Plan-Wechsel\n• **Tipps & Tricks** zur schnelleren Bewertung\n• **Kontakt** zu Junker Immobilien\n\n**Hinweis:** Das gelbe Badge mit Prozent-Anzeige daneben ist der **Workflow-Fortschritt** — zeigt wie viele Tabs du schon ausgefuellt hast.\n\nViel Erfolg mit deinen Investments — und denk dran: **ein guter Deal ist halb verhandelt, der Rest ist Bewertung.**',
       placement: 'auto'
     }
   ];
