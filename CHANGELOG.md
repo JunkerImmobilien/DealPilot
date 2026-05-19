@@ -1,5 +1,56 @@
 # DealPilot Changelog
 
+## V1.1.228 — 2026-05-19
+
+### Major Feature: Tooltip-System mit 3-Stufen-Toggle
+
+**Neues Tooltip-System** mit zentraler Content-Library und intelligenten
+Severity-Filtern:
+
+- **69 Tooltips** verteilt über alle 8 Tabs (Objekt, Investition, Miete,
+  Steuer-Details, Finanzierung, Bewirtschaftung, KI-Analyse, Bewertung)
+- Lehrerhaft-ausführliche Erklärungen für beide Zielgruppen (Anfänger + Profi)
+- Mit Beispielen, Paragraphen-Quellen und Best-Practice-Hinweisen
+
+**3-Stufen-Toggle** in Settings → Profil & Anzeige:
+
+- **Anfänger** (Default): alle Tooltips sichtbar
+- **Profi**: nur 'pro' und 'critical' Tooltips (keine Anfänger-Krimskrams)
+- **Aus**: alle Tooltips komplett ausgeblendet
+
+**Zwei Darstellungsformen:**
+
+- **ⓘ-Popup** (Standard): kleines Icon neben dem Feld, Klick öffnet Popup
+  mit Titel, Erklärung, Beispiel und ggf. Paragraphen-Quelle
+- **InfoBox** (für 4 kritische Themen): permanente Box unter dem Feld
+  - 15%-Grenze (§ 6 Abs. 1 Nr. 1a EStG)
+  - WEG-Rücklage (NICHT doppelt einrechnen)
+  - Degressive AfA (§ 7 Abs. 5a EStG) — schon in V227 als eigener Block
+  - § 7b Sonder-AfA — schon in V227 als eigener Block
+
+### Architektur
+
+- Neue Datei `frontend/js/tooltip-content.js` (~580 Z., 69 Tooltips)
+- Neue Datei `frontend/js/tooltip-engine.js` (~250 Z., Engine + Popup-Render + Storage)
+- CSS direkt in index.html injiziert (`<style id="v228-tooltip-styles">`)
+- Mode-State in localStorage (`dp_tooltip_mode`)
+- MutationObserver für dynamisch eingefügte ⓘ-Icons (Tab-Wechsel etc.)
+
+### Settings-Integration
+
+- Neue Sektion "💡 Tooltip-Hilfe" im Tab "Profil & Anzeige"
+- Direkt unter dem V213-Block ("Markt-Daten-Cards")
+- 3 große Buttons (Aus / Profi / Anfänger) mit Beschreibungstext
+- Erklärungs-Hint unten was die Modi bewirken
+
+### Was NICHT in V228 ist
+
+- Tooltips für alle Tab-3-Felder (10 Felder gepatched, ~3-5 weitere möglich)
+- KI-Halluzinationsschutz (B7.6/B7.19) — V229
+- Tab-8-Polish (DSCR Brutto/Netto, ∞-Display) — V229
+- Mobile-Responsiveness der Popups (Desktop-optimiert)
+
+
 ## V1.1.227 — 2026-05-19
 
 ### Major Feature: Degressive AfA + § 7b Sonder-AfA (B4.1)

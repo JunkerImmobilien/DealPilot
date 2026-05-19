@@ -630,6 +630,26 @@ function showSettings(initialTab) {
           '</div>' +
         '</div>' +
         /* === V213 collapse-toggle profilanzeige END === */
+        /* === V228 tooltip-mode-toggle START === */
+        '<hr class="dvd">' +
+        '<h3 class="set-section-h">Tooltip-Hilfe</h3>' +
+        '<p class="hint" style="margin-bottom:10px">In der App siehst du an vielen Stellen kleine i-Icons mit Erklärungen zu Fachbegriffen, Formeln und Best Practices. Hier kannst du den Detailgrad einstellen.</p>' +
+        '<div class="dp-tt-mode-toggle">' +
+          '<button type="button" class="dp-tt-mode-btn' + (_v228TipMode()==='off'?' active':'') + '" data-tt-mode="off" onclick="DpTip.setMode(\'off\'); _v228RefreshTipButtons();">' +
+            'Aus' +
+            '<span class="dp-tt-mode-btn-label">Keine Tooltips</span>' +
+          '</button>' +
+          '<button type="button" class="dp-tt-mode-btn' + (_v228TipMode()==='pro'?' active':'') + '" data-tt-mode="pro" onclick="DpTip.setMode(\'pro\'); _v228RefreshTipButtons();">' +
+            'Profi' +
+            '<span class="dp-tt-mode-btn-label">Nur wichtige</span>' +
+          '</button>' +
+          '<button type="button" class="dp-tt-mode-btn' + (_v228TipMode()==='beginner'?' active':'') + '" data-tt-mode="beginner" onclick="DpTip.setMode(\'beginner\'); _v228RefreshTipButtons();">' +
+            'Anfänger' +
+            '<span class="dp-tt-mode-btn-label">Alle anzeigen</span>' +
+          '</button>' +
+        '</div>' +
+        '<p class="hint" style="margin-top:8px;font-size:11px;color:var(--muted)">Anfänger-Modus zeigt alle Tooltips (Default). Profi-Modus blendet Anfänger-Erklärungen aus, behält aber kritische Hinweise (§ 7b, 15%-Regel etc.). Aus = komplett aus.</p>' +
+        /* === V228 tooltip-mode-toggle END === */
       '</div>' +
       '</div>' +    // pane-wrap Ende
       '<div class="settings-footer save-row">' +
