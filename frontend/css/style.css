@@ -28589,3 +28589,90 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 }
 
 /* ════ Ende V234.1 ════ */
+
+
+/* ════════════════════════════════════════════════════════════════════════
+ * V235: Weiter-Button-Footer am Ende jeder Tab-Sektion
+ * ════════════════════════════════════════════════════════════════════════ */
+
+.v235-tab-nav-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding: 20px 0 8px;
+  border-top: 1px solid rgba(201,168,76,0.18);
+}
+
+.v235-tab-nav-hint {
+  font-size: 12px;
+  color: var(--muted, #6e6e6e);
+  margin-right: auto;
+}
+
+.v235-next-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, var(--gold, #C9A84C) 0%, var(--gold-d, #8a6f27) 100%);
+  color: #fff;
+  border: 1px solid var(--gold-d, #8a6f27);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(201,168,76,0.25);
+}
+
+.v235-next-btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201,168,76,0.35);
+}
+
+.v235-next-btn:active {
+  transform: translateY(0);
+}
+
+.v235-next-btn-arrow {
+  font-size: 16px;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.v235-next-btn:hover .v235-next-btn-arrow {
+  transform: translateX(3px);
+}
+
+/* Letzter Tab — kein Pfeil, sondern Häkchen */
+.v235-next-btn.is-last {
+  background: linear-gradient(135deg, #2FBE6E 0%, #1f9e58 100%);
+  border-color: #1f9e58;
+  box-shadow: 0 2px 6px rgba(47,190,110,0.25);
+}
+
+/* Mobile: Button volle Breite */
+@media (max-width: 600px) {
+  .v235-tab-nav-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .v235-tab-nav-hint {
+    margin-right: 0;
+    text-align: center;
+    font-size: 11px;
+  }
+  .v235-next-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+  }
+}
+
+/* ════ Ende V235 ════ */

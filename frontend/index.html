@@ -21,7 +21,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2341">
+<link rel="stylesheet" href="css/style.css?v=235">
 <link rel="stylesheet" href="css/portfolio-strategy.css?v=144">
 <link rel="stylesheet" href="css/pricing-modal.css?v=197">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
@@ -982,6 +982,8 @@ body.dp-tt-off .dp-tip-infobox {
       </div></div>
     </div>
   </div>
+
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Investition</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s0');return false;">Weiter: Investition<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
 <!-- ═══════════ TAB 1: INVESTITION ═══════════ -->
@@ -1148,6 +1150,8 @@ body.dp-tt-off .dp-tip-infobox {
         </div>
     </div>
   </div>
+
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Miete</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s1');return false;">Weiter: Miete<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
 <!-- ═══════════ TAB 2: MIETE ═══════════ -->
@@ -1280,6 +1284,8 @@ body.dp-tt-off .dp-tip-infobox {
   </div>
 
 
+
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Finanzierung</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s2');return false;">Weiter: Finanzierung<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
 <!-- ═══════════ TAB 4: STEUER-DETAILS (vorher Teil von Tab 3) ═══════════ -->
@@ -1496,6 +1502,8 @@ body.dp-tt-off .dp-tip-infobox {
     </div>
   </div>
 
+
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>KI-Analyse</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s3-tax');return false;">Weiter: KI-Analyse<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
 <!-- ═══════════ TAB 3: FINANZIERUNG ═══════════ -->
@@ -1978,6 +1986,8 @@ body.dp-tt-off .dp-tip-infobox {
     <p class="hint">Automatische Hinweise zur Optimierung — basierend auf LTV, DSCR, Tilgung &amp; Zinsbindung.</p>
     <div id="fin_recommend_list"></div>
   </div>
+
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Bewirtschaftung</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s3');return false;">Weiter: Bewirtschaftung<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
 <!-- ═══════════ TAB 4: BWK ═══════════ -->
@@ -2061,7 +2071,7 @@ body.dp-tt-off .dp-tip-infobox {
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Umlagefähige Kosten / Jahr</div>
         <div class="f"><label>Hausgeld (umlagefähig) / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.hg_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_ul" type="text" inputmode="decimal" placeholder="1391" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Grundsteuer / Jahr</label><div class="iw"><span class="pfx">€</span><input id="grundsteuer" type="text" inputmode="decimal" placeholder="336" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Sonstiges umlagefähig / Jahr</label><div class="iw"><span class="pfx">€</span><input id="ul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Sonstiges umlagefähig / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonstiges_umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab6.sonstiges_umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="ul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Summe umlagefähig</label><div class="cf" id="ul_sum">—</div></div>
       </div>
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-arrow-down"/></svg></span>Nicht umlagefähige Kosten / Jahr</div>
@@ -2069,7 +2079,7 @@ body.dp-tt-off .dp-tip-infobox {
         <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
         <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Kalkulat. Mietausfall / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.kalkulat_mietausfall" tabindex="-1" aria-label="Hilfe zu tab6.kalkulat_mietausfall"></button></label><div class="iw"><span class="pfx">€</span><input id="mietausfall" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>Sonderverwaltung / Jahr</label><div class="iw"><span class="pfx">€</span><input id="nul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Sonderverwaltung / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonderverwaltung" tabindex="-1" aria-label="Hilfe zu tab6.sonderverwaltung"></button></label><div class="iw"><span class="pfx">€</span><input id="nul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Summe nicht umlagefähig</label><div class="cf" id="nul_sum">—</div></div>
       </div>
     </div>
@@ -2095,6 +2105,8 @@ body.dp-tt-off .dp-tip-infobox {
       </div>
     </div>
   </div>
+
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Steuer</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s4');return false;">Weiter: Steuer<span class="v235-next-btn-arrow">→</span></button></div>
 </div><!-- /bwk-detail-mode -->
 
 <!-- ═══════════ TAB 5: KI ═══════════ -->
@@ -2145,6 +2157,8 @@ body.dp-tt-off .dp-tip-infobox {
     <input type="hidden" id="ai_risk">
     <input type="hidden" id="ai_markt">
   </div>
+
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Bewertung</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s5');return false;">Weiter: Bewertung<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
 <!-- ═══════════ TAB 6: KENNZAHLEN ═══════════ -->
@@ -2466,7 +2480,7 @@ body.dp-tt-off .dp-tip-infobox {
         <tr><td>Cashflow-Rendite <span class="cf-hint">(CF n.St. / Immo-Wert)</span> <button type="button" class="dp-tip" data-tip-id="tab8.cashflow_rendite" tabindex="-1" aria-label="Hilfe zu Cashflow-Rendite"></button></td><td class="num" id="ph-cfy-now">—</td><td class="num" id="ph-cfy-ezb">—</td><td class="num" id="ph-cfy-an">—</td></tr>
         <tr><td>EK-Rendite im Objekt <span class="cf-hint">(CF n.St. / EK im Objekt)</span></td><td class="num" id="ph-ekr-now">—</td><td class="num" id="ph-ekr-ezb">—</td><td class="num" id="ph-ekr-an">—</td></tr>
         <tr><td>DSCR (Schuldendeckung) <span class="cf-hint" title="Bank-Sicht: Mieten / (Zins+Tilgung). Bewirtschaftungskosten und Steuern sind hier NICHT enthalten — daher kann DSCR &gt; 1 sein, obwohl der Cashflow negativ ist.">ⓘ</span></td><td class="num" id="ph-dscr-now">—</td><td class="num" id="ph-dscr-ezb">—</td><td class="num" id="ph-dscr-an">—</td></tr>
-        <tr><td>LTV (Restschuld / Wert)</td><td class="num" id="ph-ltv-now">—</td><td class="num" id="ph-ltv-ezb">—</td><td class="num" id="ph-ltv-an">—</td></tr>
+        <tr><td>LTV (Restschuld / Wert) <button type="button" class="dp-tip" data-tip-id="tab8.ltv_basis" tabindex="-1" aria-label="Hilfe zu tab8.ltv_basis"></button></td><td class="num" id="ph-ltv-now">—</td><td class="num" id="ph-ltv-ezb">—</td><td class="num" id="ph-ltv-an">—</td></tr>
         <tr><td>Restschuld</td><td class="num" id="ph-rs-now">—</td><td class="num" id="ph-rs-ezb">—</td><td class="num" id="ph-rs-an">—</td></tr>
         <tr><td>Immobilienwert</td><td class="num" id="ph-wert-now">—</td><td class="num" id="ph-wert-ezb">—</td><td class="num" id="ph-wert-an">—</td></tr>
         <tr><td>Eigenkapital im Objekt</td><td class="num" id="ph-eq-now">—</td><td class="num" id="ph-eq-ezb">—</td><td class="num" id="ph-eq-an">—</td></tr>
@@ -2477,7 +2491,7 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- V63.63: V25-Bank-Charts integriert (Equity-Aufbau, Cockpit, Waterfall, Stress-Matrix) -->
   <div class="bc-section-header">
     <div class="bc-section-eyebrow">— BANK-PRÄSENTATION</div>
-    <h3 class="bc-section-title">Charts für Bank-Termine &amp; Investor-Pitches</h3>
+    <h3 class="bc-section-title">Charts für Bank-Termine &amp; Investor-Pitches <button type="button" class="dp-tip" data-tip-id="tab8.stress_matrix" tabindex="-1" aria-label="Hilfe zu tab8.stress_matrix"></button></h3>
   </div>
   <div id="bc-equity"></div>
   <div id="bc-cockpit"></div>
@@ -2516,6 +2530,8 @@ body.dp-tt-off .dp-tip-infobox {
       <b>CF n.St./J.</b> = NKM − BWK n.uml. − Zinsen ± Steuer (operativ, ohne Tilgung — wie Excel-Definition).
     </div>
   </div>
+
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Deal-Aktion</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s6');return false;">Weiter: Deal-Aktion<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
 <!-- V191: TAB Deal-Aktion mit Junker-Branding-Banner -->
@@ -2539,6 +2555,8 @@ body.dp-tt-off .dp-tip-infobox {
     </div>
   </div>
   <!-- Inhalt wird von DealPilotDealAction.renderTab() gerendert -->
+
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Du hast alle Tabs durchlaufen — Daten erfasst.</span><button type="button" class="v235-next-btn is-last" onclick="if(typeof toast==='function')toast('🎉 Alle Tabs durchlaufen!');return false;">Fertig ✓</button></div>
 </div>
 
 <!-- ═══════════ TAB 7: GESPEICHERTE ═══════════ -->
@@ -2667,7 +2685,7 @@ body.dp-tt-off .dp-tip-infobox {
 <script src="js/dealscore.js?v=166"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=144">
 <script src="js/datenraum.js?v=160"></script>
-<script src="js/tooltip-content.js?v=2281"></script>
+<script src="js/tooltip-content.js?v=235"></script>
   <script src="js/tooltip-engine.js?v=228"></script>
   <script src="js/settings.js?v=2342"></script>
 <script src="js/pricing-modal.js?v=197-2"></script>
@@ -2883,6 +2901,66 @@ body.dp-tt-off .dp-tip-infobox {
     }
   };
 
+})();
+</script>
+
+<!-- V235: Scroll-to-Top bei Tab-Wechsel + Weiter-Button-Logik -->
+<script id="v235-helpers">
+(function () {
+  'use strict';
+
+  // V235.1: Scroll-to-Top bei JEDEM Tab-Klick
+  // Wird ergänzend zur bestehenden ui.js Tab-Click-Handler aufgehängt
+  function _v235AttachScrollToTop() {
+    var tabs = document.querySelectorAll('.tabs .tab, .tab[data-target-sec]');
+    if (!tabs || !tabs.length) return;
+    tabs.forEach(function (btn) {
+      if (btn._v235ScrollAttached) return;
+      btn._v235ScrollAttached = true;
+      btn.addEventListener('click', function () {
+        // Kleiner Delay damit der Section-Switch zuerst durchläuft
+        setTimeout(function () {
+          // Smooth scroll to top
+          try {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } catch (e) {
+            window.scrollTo(0, 0);
+          }
+        }, 50);
+      });
+    });
+  }
+
+  // V235.2: Weiter-Button-Logik
+  // Wird vom Weiter-Button am Ende einer Sektion aufgerufen
+  // Findet die Tab-Reihenfolge anhand der DOM-Ordnung der .tab-Buttons
+  window._v235GoToNextTab = function (currentSecId) {
+    var tabs = Array.from(document.querySelectorAll('.tabs .tab[data-target-sec]'));
+    if (!tabs.length) return;
+    var currentIdx = tabs.findIndex(function (t) {
+      return t.getAttribute('data-target-sec') === currentSecId;
+    });
+    if (currentIdx < 0 || currentIdx >= tabs.length - 1) {
+      // Letzter Tab oder unbekannter Tab — nichts zu tun
+      if (typeof toast === 'function') {
+        toast('🎉 Das war der letzte Tab — alle Eingaben sind erfasst!');
+      }
+      return;
+    }
+    var nextTab = tabs[currentIdx + 1];
+    if (nextTab) {
+      nextTab.click(); // simulate click — triggert auch scroll-to-top
+    }
+  };
+
+  // Init: erstes Mal aufhängen
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _v235AttachScrollToTop);
+  } else {
+    _v235AttachScrollToTop();
+  }
+  // Sicherheitshalber nochmal nach 1s (für asynchrone Tab-Renders)
+  setTimeout(_v235AttachScrollToTop, 1000);
 })();
 </script>
 </body>

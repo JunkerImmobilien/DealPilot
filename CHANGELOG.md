@@ -1,5 +1,40 @@
 # DealPilot Changelog
 
+## V1.1.235 — 2026-05-19
+
+### Quick-Win-Sammelpatch: Tooltips komplett + Tab-Navigation
+
+**1. Letzte 5 Tooltips ausgerollt — Tooltip-Coverage jetzt 100%:**
+- `tab8.stress_matrix` — Stress-Test-Erklärung mit Zins-/Mietausfall-Szenarien
+- `tab6.sonderverwaltung` — Mietsonderverwaltung (NICHT umlagefähig)
+- `tab6.sonstiges_umlagefaehig` — Beispiele für umlagefähige Sonder-Kosten
+- `tab8.ltv_basis` — LTV-Berechnungsgrundlage (SVW vs. KP vs. GI) + Stufen
+- `tab8.tilgung_vom_mieter` — Steuerfreier Vermögensaufbau-Mechanismus
+
+**2. Scroll-to-Top bei Tab-Wechsel:**
+- Jeder Klick auf einen Tab-Button scrollt automatisch nach oben
+- Smooth-Scroll-Animation für angenehmes UX
+- Funktioniert auch bei Aufruf via `_v235GoToNextTab()` (Weiter-Button)
+
+**3. "Weiter"-Button am Ende jedes Tabs:**
+- 8 Sektionen bekommen einen goldenen "Weiter: [nächster Tab]"-Button
+- Reihenfolge: Objekt → Investition → Miete → Finanzierung → Bewirtschaftung
+  → Steuer → KI-Analyse → Bewertung → Deal-Aktion
+- Letzter Tab (Deal-Aktion): grüner "Fertig ✓"-Button mit Toast-Bestätigung
+- Mobile-Variante: Vollbreite-Button, Hinweis darüber
+
+### Architektur
+- `window._v235GoToNextTab(secId)` — sucht nächsten Tab anhand DOM-Reihenfolge
+- Helper-Script in index.html (id="v235-helpers") — keine JS-File-Änderung
+- CSS-Block in style.css mit eigener Klasse `.v235-tab-nav-footer`
+- Idempotent: alle Patches skippen wenn schon angewendet
+
+### Was V235 NICHT macht
+- Tooltip-Toggle in Settings (existiert schon aus V228)
+- Scroll-to-Top als Setting ein/aus (default an — kann später opt-out werden)
+- First-Start-Tour, Onboarding-Wizard (eigene größere Versionen)
+
+
 ## V1.1.234.2 — 2026-05-19
 
 ### Hotfix: Plan-Pane leerer Bereich (V234.1 Folgefix)
