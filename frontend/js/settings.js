@@ -567,7 +567,12 @@ function showSettings(initialTab) {
 
       // V63.57: Daten-Tab entfernt — Import/Export jetzt direkt aus der Sidebar
 
-      // V63.5: Plan-Tab raus aus Settings — geöffnet wird über User-Submenü als eigenständiges Modal (pricing-modal.js)
+      // V63.5: Plan-Tab raus aus Settings — V234.1: wieder reingenommen mit eigenem Status-Header-Pane
+      // V234.2: Plan-Pane Container wieder hinzugefügt (V63.5-Cleanup hatte ihn entfernt)
+      '<div class="st-pane" data-pane="plan" style="display:none">' +
+        _renderPlanPane() +
+      '</div>' +
+
       // V51 — Tab 7: Info
       '<div class="st-pane" data-pane="info" style="display:none">' +
         _renderInfoPane() +
