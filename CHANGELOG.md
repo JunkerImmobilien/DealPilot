@@ -1,5 +1,79 @@
 # DealPilot Changelog
 
+## V1.1.238.4 - 2026-05-19
+
+### Tour Erweiterung 23 Steps + prev-Bug-Fix
+
+**Bug 1 GEFIXT: Zurueck-Button-Navigation kaputt**
+
+V238.3 hatte einen Auto-Skip-Bug in `_renderStep()`: wenn ein Element nicht
+gefunden wurde, sprang die Tour IMMER nach VORN — auch wenn der User Zurueck
+gedrueckt hatte. Folge: prev() war praktisch nutzlos bei fehlenden Elementen.
+
+Fix: neue Variable `state.direction` ('next' / 'prev') wird in next()/prev()
+gesetzt. Im Auto-Skip wird die Richtung respektiert:
+- Bei 'prev': state.idx-- (bzw. bei 0 zentriert anzeigen)
+- Bei 'next': state.idx++ (bzw. Tour.complete())
+
+**Bug 2 GEFIXT: Spotlight zu klein bei 3 Steps**
+
+- DealScore: Selektor war `#bc-cockpit .ds-donut, #bc-cockpit` — der zweite
+  match (Cockpit-Container) zeigte DSCR&LTV-Card statt DealScore.
+  V238.4: `#bc-cockpit svg.ds-donut, #bc-cockpit .ds-donut` — praezise auf
+  den DealScore-Donut.
+
+- Kontakt-Step: Selektor `#da-bank-progress` (nur "0/10 Pflicht"-Counter)
+  war zu klein. V238.4: `.da-stage-1, .da-stage` ZUERST — komplette Stage.
+
+- Won-Star: Komma-Liste `#da-won-star, #da-won-card` hatte den Button ZUERST.
+  Komma-Split-Logik nahm den Star (zu klein). V238.4: `.da-won-card,
+  #da-won-card, #da-won-star` — Container zuerst.
+
+**Tour-Erweiterung: 17 -> 23 Steps**
+
+Alle 8 Tabs werden jetzt einzeln vorgestellt (vorher: Tab-Bar in 1 Step):
+
+1-3. Quick-Check (3 Steps wie vorher)
+4. Tab-Bar Overview (kurz, mit Liste aller 8 Tabs)
+5. Tab Objekt + Pflichtfelder
+6. Pflichtfelder (Detail-Step)
+7. Tab Investition
+8. Tab Miete
+9. Tab Finanzierung
+10. Tab Bewirtschaftung
+11. Tab KI-Analyse
+12. Tab Bewertung
+13. Bewertungs-Cockpit Detail
+14. DealScore 0-100
+15. Investor-Profil
+16. Stress-Test
+17. Tab Deal-Aktion
+18. Kontakt aufnehmen (Stage 1)
+19. Business-Case-PDF (mit Wo/Wie/Tipp-Erklaerung)
+20. Deal abschliessen (Won-Card)
+21. Sidebar / Portfolio
+22. Hilfe immer dabei (Hilfe-Badge gespotlightet)
+
+Die Tab-Steps zeigen jeweils:
+- Was im Tab eingegeben wird
+- Welche Felder Pflicht sind
+- Welche typischen Werte (Default %)
+- Tipps zur Bewertung
+
+**Wichtig: NUR 8 Tabs!**
+
+Diagnose ergab: in der Tab-Bar gibt es s0-s6 + s8 (kein s7-Tab — s7 ist
+intern fuer "Gespeicherte Objekte" als Sidebar-View). Tour-Overview im Step
+4 wurde entsprechend angepasst auf 8 Tabs.
+
+**Geaenderte Dateien**
+- `frontend/js/tour-engine.js` — state.direction + Auto-Skip-Richtung
+- `frontend/js/tour-content.js` — 23 Steps, alle Tabs einzeln, Container-
+  Selektoren fuer DealScore/Kontakt/Won-Card
+- `frontend/index.html` — Cache-Bump v=238_4
+- `frontend/js/config.js` — V1.1.238.4
+
+
 ## V1.1.238.3 - 2026-05-19
 
 ### Tour SVG-Mask + 17 Steps
