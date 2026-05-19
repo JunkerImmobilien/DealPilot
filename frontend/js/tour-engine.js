@@ -1,11 +1,13 @@
 /**
- * DealPilot V238.4 — Tour Engine
+ * DealPilot V239 — Tour Engine mit Conditional Logic
  *
- * V238.4 Fixes:
- * - prev()-Bug: Auto-Skip respektiert jetzt Richtung (state.direction)
- *   -> Zurueck-Navigation funktioniert auch wenn Element fehlt
- * - clip-path Loch im Overlay (V238.3)
- * - Hard-Fallback Smart-Placement (V238.2)
+ * V239 Aenderungen:
+ * - Tour erkennt automatisch ob User Objekte hat
+ * - Bei Objekten: Variante "withObjects" (24 Steps)
+ * - Ohne Objekte: Variante "empty" (Onboarding-Variante)
+ * - Quick-Check Steps mit laengeren Retries und mehr Fallbacks
+ * - Bug 1 GEFIXT: Tour startet immer bei Step 1
+ * - prev()-Bug GEFIXT (state.direction)
  */
 (function() {
   'use strict';
@@ -17,13 +19,16 @@
     idx: 0,
     active: false,
     expanded: false,
-    direction: 'next',  // V238.4: Richtung fuer Auto-Skip
+    direction: 'next',
+    variant: null,  // 'withObjects' | 'empty'
     overlay: null,
     spotlight: null,
     bubble: null,
     onResize: null,
     onKeydown: null
   };
+
+  // ─── Helpers ─────────────────────────────────────────────────────────
 
   function _findElementWithRetry(selector, retries, intervalMs) {
     return new Promise(function(resolve) {
@@ -71,12 +76,27 @@
     return active ? active.id : null;
   }
 
+  // V239: Robuste Quick-Check-Oeffnung mit Multi-Strategy
   function _switchToTab(targetSec) {
     if (targetSec === 's-quick') {
-      if (typeof window.showQuickCheck === 'function') {
-        window.showQuickCheck();
+      // 1) Schon offen?
+      if (document.querySelector('#qc-tab-host .ds-donut, #qc-score-circle, #qc-score-kpis')) {
         return true;
       }
+      // 2) Funktion direkt aufrufen
+      if (typeof window.showQuickCheck === 'function') {
+        try { window.showQuickCheck(); return true; } catch(e) {
+          console.warn('[DpTour] showQuickCheck() failed:', e);
+        }
+      }
+      // 3) Sidebar-Action
+      if (typeof window.sbActionsAction === 'function') {
+        try { window.sbActionsAction('quickcheck'); return true; } catch(e) {}
+      }
+      // 4) Notfall: Button anklicken
+      var btn = document.querySelector('[onclick*="sbActionsAction(\'quickcheck\')"], .sb-act-accent[onclick*="quickcheck"]');
+      if (btn) { btn.click(); return true; }
+      console.warn('[DpTour] Quick-Check konnte nicht geoeffnet werden');
       return false;
     }
     if (targetSec === 'sidebar' || targetSec === 'header' || targetSec === 'settings') {
@@ -89,6 +109,30 @@
     }
     return false;
   }
+
+  // V239: Conditional Logic - hat User Objekte?
+  function _hasUserObjects() {
+    var sbList = document.querySelector('#sb-list');
+    if (!sbList) return false;
+    // sb-list enthaelt Objekt-Cards als direkte Kinder
+    var cards = sbList.querySelectorAll('button, a, .sb-card, [data-obj-id], .sidebar-obj-card');
+    if (cards.length > 0) return true;
+    // Fallback: irgendein <div> mit Inhalt
+    var children = sbList.children;
+    return children && children.length > 0;
+  }
+
+  // V239: Plan-Check
+  function _getCurrentPlan() {
+    try {
+      if (window.DealPilotConfig && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.currentKey === 'function') {
+        return DealPilotConfig.pricing.currentKey() || 'free';
+      }
+    } catch(e) {}
+    return 'free';
+  }
+
+  // ─── Overlay ─────────────────────────────────────────────────────────
 
   function _createOverlay() {
     if (state.overlay) return;
@@ -165,6 +209,8 @@
       state.overlay.style.webkitClipPath = '';
     }
   }
+
+  // ─── Placement ───────────────────────────────────────────────────────
 
   function _hasSpaceForPlacement(rect, bw, bh, placement, margin) {
     var vw = window.innerWidth;
@@ -256,6 +302,8 @@
     state.bubble.classList.remove('dp-tour-bubble-top', 'dp-tour-bubble-bottom', 'dp-tour-bubble-left', 'dp-tour-bubble-right');
     state.bubble.classList.add('dp-tour-bubble-center');
   }
+
+  // ─── Content rendern ─────────────────────────────────────────────────
 
   function _renderBubbleContent(step) {
     if (!state.bubble) return;
@@ -362,6 +410,8 @@
     return s;
   }
 
+  // ─── Step rendern (mit V239 robusten Retries) ────────────────────────
+
   function _renderStep() {
     var step = state.steps[state.idx];
     if (!step) return;
@@ -369,9 +419,17 @@
     state.expanded = false;
 
     _ensureCorrectTab(step, function() {
-      _findElementWithRetry(step.selector, 10, 200).then(function(el) {
+      // V239: Laengere Retries fuer s-quick und s8 (dynamisch gerendert)
+      var retries = 10;
+      var interval = 200;
+      if (step.tab === 's-quick' || step.tab === 's8') {
+        retries = 15;
+        interval = 300;
+      }
+
+      _findElementWithRetry(step.selector, retries, interval).then(function(el) {
         if (!el) {
-          console.warn('[DpTour] Element nicht gefunden: ' + step.selector);
+          console.warn('[DpTour V239] Element nicht gefunden: ' + step.selector + ' (Step ' + (state.idx + 1) + ')');
           if (step.placement === 'center') {
             _createOverlay();
             _hideSpotlight();
@@ -379,10 +437,9 @@
             _renderBubbleContent(step);
             return;
           }
-          // V238.4: Auto-Skip respektiert state.direction
+          // V238.4: Auto-Skip respektiert Richtung
           if (state.direction === 'prev') {
             if (state.idx <= 0) {
-              // Erster Step nicht gefunden -> in der Mitte zeigen
               state.idx = 0;
               _createOverlay();
               _hideSpotlight();
@@ -422,19 +479,35 @@
     if (current === step.tab) return callback();
     var ok = _switchToTab(step.tab);
     if (!ok) {
-      console.warn('[DpTour] Tab-Switch fehlgeschlagen: ' + step.tab);
+      console.warn('[DpTour V239] Tab-Switch fehlgeschlagen: ' + step.tab);
     }
-    setTimeout(callback, 400);
+    // V239: Laengere Pause fuer s-quick/s8 die dynamisch rendern
+    var pause = (step.tab === 's-quick' || step.tab === 's8') ? 800 : 400;
+    setTimeout(callback, pause);
   }
+
+  // ─── Public API ──────────────────────────────────────────────────────
 
   var Tour = {
     start: function() {
-      var steps = window.DpTourSteps;
-      if (!Array.isArray(steps) || steps.length === 0) {
-        console.warn('[DpTour] Keine Steps geladen');
+      // V239: Variant Selector
+      var variants = window.DpTourVariants;
+      if (!variants || (!variants.withObjects && !variants.empty)) {
+        console.warn('[DpTour V239] Keine Varianten geladen');
         return false;
       }
-      state.steps = steps;
+
+      var hasObjects = _hasUserObjects();
+      state.variant = hasObjects ? 'withObjects' : 'empty';
+      state.steps = variants[state.variant] || variants.withObjects || variants.empty;
+
+      console.log('[DpTour V239] Variante:', state.variant, '|', state.steps.length, 'Steps');
+
+      if (!Array.isArray(state.steps) || state.steps.length === 0) {
+        console.warn('[DpTour V239] Steps leer');
+        return false;
+      }
+
       state.idx = 0;
       state.expanded = false;
       state.direction = 'next';
@@ -470,14 +543,14 @@
         Tour.complete();
         return;
       }
-      state.direction = 'next';  // V238.4
+      state.direction = 'next';
       state.idx++;
       _renderStep();
     },
 
     prev: function() {
       if (!state.active || state.idx <= 0) return;
-      state.direction = 'prev';  // V238.4
+      state.direction = 'prev';
       state.idx--;
       _renderStep();
     },
@@ -512,7 +585,11 @@
         var el = document.querySelector(step.selector.split(',')[0].trim());
         if (el) _positionBubble(el, step.placement);
       }, 30);
-    }
+    },
+
+    // V239: Plan-Check fuer Tour-Inhalte
+    getPlan: function() { return _getCurrentPlan(); },
+    hasUserObjects: function() { return _hasUserObjects(); }
   };
 
   function _cleanup() {
@@ -536,18 +613,19 @@
       var token = localStorage.getItem('ji_token');
       if (!token) return;
       if (Tour.isComplete()) return;
-      if (!Array.isArray(window.DpTourSteps) || !window.DpTourSteps.length) return;
+      if (!window.DpTourVariants) return;
+      // V239: Laengere Wartezeit damit Sidebar fertig rendert
       setTimeout(function() {
         if (!Tour.isComplete()) Tour.start();
-      }, 1800);
+      }, 2500);
     } catch(e) {
-      console.warn('[DpTour] Auto-Start fehlgeschlagen:', e.message);
+      console.warn('[DpTour V239] Auto-Start fehlgeschlagen:', e.message);
     }
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _maybeAutoStart);
   } else {
-    setTimeout(_maybeAutoStart, 2500);
+    setTimeout(_maybeAutoStart, 3000);
   }
 })();
