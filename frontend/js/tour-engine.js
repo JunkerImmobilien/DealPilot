@@ -193,32 +193,58 @@
     return 'free';
   }
 
-  // V239.4: Sidebar-Aktionen-Accordion aufklappen wenn collapsed
+  // V239.4/.5: Sidebar-Aktionen-Accordion aufklappen wenn collapsed
+  // V239.5: CSS-Override per !important auf OUTER-Accordion-Element
+  //         (CSS macht .sb-actions-accordion { max-height: 0; overflow: hidden })
   function _expandSidebarActionsIfCollapsed() {
     try {
       var accordion = document.getElementById('sb-actions-accordion');
       if (!accordion) return;
+      if (accordion.offsetHeight >= 100) return;  // schon offen
+      
+      console.log('[DpTour V239.5] Brute-force expand accordion (was:', accordion.offsetHeight + 'px)');
+      
+      // Brute-Force CSS-Override per !important (CSS hat max-height: 0)
+      accordion.style.cssText += 
+        '; height: auto !important' +
+        '; min-height: 400px !important' +
+        '; max-height: none !important' +
+        '; overflow: visible !important' +
+        '; display: block !important';
+      
+      // Inner auch
       var inner = accordion.querySelector('.sb-actions-accordion-inner');
-      if (!inner) return;
-      var rect = inner.getBoundingClientRect();
-      // Wenn Accordion klein/zugeklappt
-      if (rect.height < 100) {
-        console.log('[DpTour V239.4] Sidebar-Aktionen aufklappen');
-        // 1) Klick auf Accordion-Header (typische Toggle-Implementierung)
-        var header = accordion.querySelector('.sb-actions-header, .sb-actions-toggle, [data-toggle="sb-actions"]');
-        if (header) { header.click(); return; }
-        // 2) Klick auf accordion selbst
-        var toggleable = accordion.querySelector('[onclick]:not(.sb-act-item)');
-        if (toggleable) { toggleable.click(); return; }
-        // 3) Notfall: Inner direkt aufklappen via Style
-        inner.style.maxHeight = 'none';
-        inner.style.display = 'block';
-        inner.style.overflow = 'visible';
-        accordion.classList.remove('collapsed', 'sb-collapsed');
+      if (inner) {
+        inner.style.cssText += 
+          '; height: auto !important' +
+          '; max-height: none !important' +
+          '; overflow: visible !important' +
+          '; display: block !important';
       }
+      
+      // Scroll Sidebar zur Accordion damit User es sieht
+      var sidebar = document.querySelector('aside.sidebar');
+      if (sidebar) {
+        var accTop = accordion.offsetTop;
+        sidebar.scrollTop = Math.max(0, accTop - 50);
+      }
+      
+      // Markiere fuer cleanup
+      accordion.setAttribute('data-tour-expanded', '1');
+      if (inner) inner.setAttribute('data-tour-expanded', '1');
     } catch(e) {
-      console.warn('[DpTour V239.4] _expandSidebar error:', e);
+      console.warn('[DpTour V239.5] _expandSidebar error:', e);
     }
+  }
+
+  // V239.5: Cleanup nach Tour - Style-Overrides entfernen
+  function _restoreSidebarAccordion() {
+    try {
+      document.querySelectorAll('[data-tour-expanded="1"]').forEach(function(el) {
+        el.style.cssText = '';
+        el.removeAttribute('data-tour-expanded');
+      });
+    } catch(e) {}
   }
 
   // ─── Overlay ─────────────────────────────────────────────────────────
@@ -727,6 +753,8 @@
       state.onKeydown = null;
     }
     _destroyOverlay();
+    // V239.5: Sidebar-Accordion Style-Overrides entfernen
+    _restoreSidebarAccordion();
   }
 
   window.DpTour = Tour;

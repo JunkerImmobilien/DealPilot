@@ -1,5 +1,35 @@
 # DealPilot Changelog
 
+## V1.1.239.5 - 2026-05-19
+
+### Tour Hotfix: Sidebar-Accordion echtes Brute-Force
+
+**Bug GEFIXT: Sidebar-Accordion blieb auf Hoehe 0 trotz V239.4-Expander**
+
+Diagnose via Console:
+- Accordion-Inner-Element war 0px hoch
+- CSS-Computed-Styles: max-height: 0px, height: 0px, overflow: hidden
+- Mein V239.4 setzte nur INNER-Style.maxHeight - die OUTER-CSS-Regel
+  hat das ueberstimmt (CSS war staerker als inline-style ohne !important)
+
+V239.5 Fix:
+- Brute-Force CSS-Override per `!important` auf das OUTER-Accordion-Element
+- height: auto !important; min-height: 400px !important;
+  max-height: none !important; overflow: visible !important
+- Plus INNER auch mit !important
+- Plus Sidebar wird gescrollt damit Accordion in den Sichtbereich kommt
+
+**Cleanup nach Tour-Ende:**
+- Style-Overrides werden in _cleanup() rueckgaengig gemacht
+- Markierung via `data-tour-expanded="1"` -> nach Tour entfernt
+- Sidebar verhaelt sich danach normal
+
+### Geaenderte Dateien
+- `frontend/js/tour-engine.js` - Brute-Force-Expander + restoreSidebar
+- `frontend/index.html` - Cache-Bump v=239_5
+- `frontend/js/config.js` - V1.1.239.5
+
+
 ## V1.1.239.4 - 2026-05-19
 
 ### Tour Hotfix: Sidebar-Accordion + gated-Selektoren + Bank-PDF-Step
