@@ -424,26 +424,10 @@
       body: 'DSCR-Werte für 25 Szenarien: 5 Stufen Mietausfall (−20% bis +20%) × 5 Stufen Zinsänderung (−2pp bis +5pp). Grün = Bank-OK (DSCR ≥ 1,2). Gelb = Achtung (1,0-1,2). Rot = Stresszone (< 1,0). Zeigt wie robust dein Deal ist.',
       severity: 'pro'
     },
-  // ─── V235: 5 letzte Tooltips ───────────────────────────────────
-  'tab6.sonstiges_umlagefaehig': {
-    title: 'Sonstiges umlagefähig',
-    body: 'Weitere umlagefähige Sondereinheits-Kosten die nicht in den Standard-Kategorien stehen — zum Beispiel: außerordentliche Treppenhausreinigung, Wartung Tiefgarage, Lüftungsanlage, regelmäßige Schornsteinfeger-Termine, oder Brand-/Rauchmelder-Wartung. Diese kannst du vollständig auf den Mieter umlegen.<br><br><b>Faustregel:</b> Wenn die Kosten regelmäßig anfallen und in der Betriebskostenverordnung (BetrKV § 2) gelistet sind, sind sie umlagefähig.'
-  },
-  'tab6.sonderverwaltung': {
-    title: 'Sonderverwaltung / Mietsonderverwaltung',
-    body: 'Kosten der professionellen <b>Hausverwaltung</b> oder <b>Mietsonderverwaltung</b> (z.B. WEG-Verwalter, externe Hausverwaltung). Wichtig: das ist <b>NICHT umlagefähig</b> auf den Mieter — diese Kosten musst du als Vermieter selbst tragen.<br><br><b>Typische Größen:</b> ETW 250-450 €/Jahr/Wohnung; Mehrfamilienhäuser 20-40 €/Monat/Einheit. Du kannst diese Kosten aber als Werbungskosten in der Steuererklärung absetzen.'
-  },
+  // ─── V235.1: tab8.ltv_basis (rest waren Duplikate) ──────────────
   'tab8.ltv_basis': {
     title: 'LTV — Loan-to-Value',
     body: 'Das <b>Loan-to-Value</b>-Verhältnis zeigt wie hoch deine Restschuld im Verhältnis zum Immobilien-Wert ist. Die Bank nutzt das als wichtigstes Risikomaß.<br><br><b>Welcher Wert ist die Basis?</b><br>• <b>Wenn Sachverständigenwert vorhanden</b>: dieser wird genutzt<br>• <b>Sonst</b>: Kaufpreis<br>• <b>Optional bei Setup</b>: Gesamtinvestition (KP + Nebenkosten) — strenger<br><br><b>LTV-Stufen:</b><br>• Unter 60 % — Tier 1 (beste Konditionen)<br>• 60-80 % — Standard<br>• 80-95 % — Risikoaufschlag<br>• Über 95 % — Vollfinanzierung, höchste Zinsen<br><br><b>Im Zeitverlauf</b> sinkt der LTV durch Tilgung und Wertsteigerung — wichtig für Anschlussfinanzierung.'
-  },
-  'tab8.stress_matrix': {
-    title: 'Stress-Test / Sensitivitätsanalyse',
-    body: 'Was passiert wenn die Zinsen steigen oder Mieter ausfallen? Die Stress-Matrix zeigt deine Cashflow-Resilienz unter <b>3 Stress-Szenarien</b>:<br><br>• <b>Zins +1 % / +2 % / +3 %</b>: simuliert höhere Anschlussfinanzierungs-Zinsen<br>• <b>Mietausfall 1-3 Monate</b>: simuliert Leerstand bei Mieterwechsel<br>• <b>BWK-Steigerung +20 %</b>: simuliert höhere Bewirtschaftungskosten<br><br><b>Worauf achten?</b><br>• Cashflow sollte auch bei +2 % Zins noch über null bleiben<br>• DSCR sollte über 1,0 bleiben<br>• Mit 3 Monaten Mietausfall sollte die Reserve nicht ins Negative laufen<br><br><b>Für Bank-Termine wichtig:</b> Stresstests zeigen Banken dass du Risiken kennst und einkalkulierst. Hilft bei der Zinsverhandlung.'
-  },
-  'tab8.tilgung_vom_mieter': {
-    title: 'Tilgung-vom-Mieter',
-    body: 'Der Anteil der <b>jährlichen Tilgung</b> der durch die Mieteinnahmen finanziert wird — nicht aus deiner eigenen Tasche. Praktisch: <i>der Mieter zahlt dein Darlehen ab</i>.<br><br><b>Formel:</b> Tilgung-vom-Mieter = MIN(Tilgung gesamt; Mieteinnahmen netto). Wenn dein Cashflow nach Bewirtschaftung positiv ist, wird die volle Tilgung aus Mieten finanziert. Wenn negativ, musst du den Differenzbetrag zusätzlich einzahlen.<br><br><b>Warum wichtig?</b> Die Tilgung-vom-Mieter ist <b>steuerfreier Vermögensaufbau</b> — denn die Tilgung mindert nicht deine zu versteuernden Einkünfte, baut aber Eigenkapital auf. Über 30 Jahre kann das einen erheblichen Vermögensanteil ausmachen.'
   },
 
   };

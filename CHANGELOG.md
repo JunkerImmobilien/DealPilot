@@ -1,5 +1,59 @@
 # DealPilot Changelog
 
+## V1.1.235.1 — 2026-05-19
+
+### Hotfix: Tooltips zeigen HTML-Tags als Text + Scroll-to-Top ohne Wirkung
+
+**Problem 1: HTML-Tags als Text angezeigt**
+
+Bestehende Tooltips mit `<b>`, `<br>` etc. wurden falsch gerendert — die
+HTML-Tags erschienen wörtlich im Tooltip-Popup statt als Formatierung.
+Grund: tooltip-engine.js `esc()`-Funktion wandelte `<` → `&lt;` für ALLE
+Body-Inhalte, ohne Whitelist für erlaubte Format-Tags.
+
+Beispiel-Bug (sichtbar in Sonderverwaltung-Tooltip):
+> "Kosten der professionellen <b>Hausverwaltung</b> oder ..."
+
+**Fix:** Neue `escSafe()`-Funktion in tooltip-engine.js:
+1. Escapt zuerst alles (XSS-Schutz)
+2. Wandelt dann erlaubte Tags zurück: `<b>`, `<strong>`, `<i>`, `<em>`, `<u>`, `<br>`
+3. Markdown-mini-Support: `*fett*`, `_kursiv_`, `||` als doppelter Zeilenumbruch
+4. Wird für `t.body`, `t.example`, `t.paragraph` verwendet (Title bleibt mit
+   strenger `esc()` für maximale Sicherheit)
+
+**Problem 2: V235 Tooltip-Duplikate**
+
+4 von 5 V235-Tooltips waren Duplikate bestehender Einträge:
+- `tab6.sonderverwaltung` (existierte seit V228)
+- `tab6.sonstiges_umlagefaehig` (existierte seit V228)
+- `tab8.stress_matrix` (existierte seit V228)
+- `tab8.tilgung_vom_mieter` (existierte seit V228)
+
+JS-Object-Literals erlauben Duplicate-Keys, das zweite überschreibt das erste.
+Mein V235-Patch hat also versehentlich die alten kuratierten Texte überschrieben
+und gleichzeitig HTML-Tags eingeschmuggelt die nicht rendern.
+
+**Fix:** 4 V235-Duplikate aus tooltip-content.js entfernt. Nur `tab8.ltv_basis`
+behalten (war kein Duplikat — alter Eintrag fehlte tatsächlich).
+
+**Problem 3: Scroll-to-Top funktioniert nicht**
+
+V235-Helper-Script nutzte `window.scrollTo` mit nur 50ms Delay. Das war zu kurz:
+- Section-Switch in ui.js noch nicht abgeschlossen
+- iOS Safari ignoriert `window.scrollTo` manchmal
+
+**Fix:**
+1. Längere Delays (30ms + 200ms doppelt)
+2. 3-fach-Fallback: `window`, `document.documentElement.scrollTop`, `document.body.scrollTop`
+3. Bei Weiter-Button: zusätzlicher Scroll nach 100ms + 300ms
+
+### Was bleibt unverändert
+- Weiter-Button am Tab-Ende (V235 — funktioniert wie geplant)
+- tab8.ltv_basis Tooltip (V235 — bester Text mit LTV-Tier-Stufen)
+- Alle anderen Tooltips (V228+, V230) bleiben unangetastet — werden jetzt aber
+  korrekt mit `<b>`/`<br>` gerendert dank escSafe()
+
+
 ## V1.1.235 — 2026-05-19
 
 ### Quick-Win-Sammelpatch: Tooltips komplett + Tab-Navigation

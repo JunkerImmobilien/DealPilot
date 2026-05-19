@@ -69,6 +69,39 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+  /**
+   * V235.1: Safe-HTML-Renderer für Tooltip-Bodies.
+   * Escapt zuerst alles, wandelt dann erlaubte Tags + Markdown-mini zurück.
+   * - <b>, <strong>     → Fettdruck
+   * - <i>, <em>         → Kursiv
+   * - <u>               → Unterstrichen
+   * - <br>, <br/>, <br /> → Zeilenumbruch
+   * - *text*            → Fettdruck (Markdown-mini)
+   * - _text_            → Kursiv (Markdown-mini)
+   * - ||                → Doppelter Zeilenumbruch
+   * Alles andere bleibt escaped (XSS-Schutz).
+   */
+  function escSafe(s) {
+    if (s == null) return '';
+    var t = String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+    // Erlaubte Tags zurückwandeln
+    t = t.replace(/&lt;b&gt;/g, '<strong>').replace(/&lt;\/b&gt;/g, '</strong>');
+    t = t.replace(/&lt;strong&gt;/g, '<strong>').replace(/&lt;\/strong&gt;/g, '</strong>');
+    t = t.replace(/&lt;i&gt;/g, '<em>').replace(/&lt;\/i&gt;/g, '</em>');
+    t = t.replace(/&lt;em&gt;/g, '<em>').replace(/&lt;\/em&gt;/g, '</em>');
+    t = t.replace(/&lt;u&gt;/g, '<u>').replace(/&lt;\/u&gt;/g, '</u>');
+    t = t.replace(/&lt;br\s*\/?&gt;/g, '<br>');
+    // Markdown-mini (nach Tag-Rückwandlung um Konflikte zu vermeiden)
+    t = t.replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>');
+    t = t.replace(/(?:^|[\s.,;:!?])_([^_\n]+)_(?=[\s.,;:!?]|$)/g, function(m, inner) {
+      return m.replace('_' + inner + '_', '<em>' + inner + '</em>');
+    });
+    t = t.replace(/\|\|/g, '<br><br>');
+    return t;
+  }
+
 
   // ───── Mode anwenden — Tooltips anzeigen/verstecken ────────────────────
   /**
@@ -150,12 +183,12 @@
                '<span class="dp-tip-popup-title">' + esc(t.title) + '</span>' +
                '<button type="button" class="dp-tip-popup-close" aria-label="Schließen" onclick="DpTip.close()">✕</button>' +
                '</div>' +
-               '<div class="dp-tip-popup-body">' + esc(t.body) + '</div>';
+               '<div class="dp-tip-popup-body">' + escSafe(t.body) + '</div>';
     if (t.example) {
-      html += '<div class="dp-tip-popup-example">' + esc(t.example) + '</div>';
+      html += '<div class="dp-tip-popup-example">' + escSafe(t.example) + '</div>';
     }
     if (t.paragraph) {
-      html += '<div class="dp-tip-popup-paragraph">' + esc(t.paragraph) + '</div>';
+      html += '<div class="dp-tip-popup-paragraph">' + escSafe(t.paragraph) + '</div>';
     }
     return html;
   }
@@ -165,12 +198,12 @@
                '<span class="dp-infobox-icon">ⓘ</span>' +
                '<span class="dp-infobox-title">' + esc(t.title) + '</span>' +
                '</div>' +
-               '<div class="dp-infobox-body">' + esc(t.body) + '</div>';
+               '<div class="dp-infobox-body">' + escSafe(t.body) + '</div>';
     if (t.example) {
-      html += '<div class="dp-infobox-example">' + esc(t.example) + '</div>';
+      html += '<div class="dp-infobox-example">' + escSafe(t.example) + '</div>';
     }
     if (t.paragraph) {
-      html += '<div class="dp-infobox-paragraph">' + esc(t.paragraph) + '</div>';
+      html += '<div class="dp-infobox-paragraph">' + escSafe(t.paragraph) + '</div>';
     }
     return html;
   }
