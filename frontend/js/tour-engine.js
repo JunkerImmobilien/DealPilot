@@ -25,7 +25,8 @@
     spotlight: null,
     bubble: null,
     onResize: null,
-    onKeydown: null
+    onKeydown: null,
+    accordionWatcher: null  // V239.8: MutationObserver
   };
 
   // ─── Helpers ─────────────────────────────────────────────────────────
@@ -196,58 +197,94 @@
     return 'free';
   }
 
-  // V239.4/.5: Sidebar-Aktionen-Accordion aufklappen wenn collapsed
-  // V239.5: CSS-Override per !important auf OUTER-Accordion-Element
-  //         (CSS macht .sb-actions-accordion { max-height: 0; overflow: hidden })
+  // V239.4/.5/.9: Sidebar-Aktionen-Accordion aufklappen
+  // V239.9: ECHTER Toggle via window.sbActionsToggle() — CSS hat
+  //         opacity:0 + pointer-events:none ohne .sb-actions-open
+  //         Brute-Force-Style hat das NICHT geloest!
   function _expandSidebarActionsIfCollapsed() {
     try {
       var accordion = document.getElementById('sb-actions-accordion');
       if (!accordion) return;
-      if (accordion.offsetHeight >= 100) return;  // schon offen
       
-      console.log('[DpTour V239.5] Brute-force expand accordion (was:', accordion.offsetHeight + 'px)');
+      // Schon offen via Klasse?
+      if (accordion.classList.contains('sb-actions-open')) return;
       
-      // Brute-Force CSS-Override per !important (CSS hat max-height: 0)
-      accordion.style.cssText += 
-        '; height: auto !important' +
-        '; min-height: 400px !important' +
-        '; max-height: none !important' +
-        '; overflow: visible !important' +
-        '; display: block !important';
+      console.log('[DpTour V239.9] Open accordion via sbActionsToggle()');
       
-      // Inner auch
-      var inner = accordion.querySelector('.sb-actions-accordion-inner');
-      if (inner) {
-        inner.style.cssText += 
-          '; height: auto !important' +
-          '; max-height: none !important' +
-          '; overflow: visible !important' +
-          '; display: block !important';
+      // 1) PRIORITY: echte Toggle-Funktion rufen
+      if (typeof window.sbActionsToggle === 'function') {
+        try {
+          window.sbActionsToggle();
+          accordion.setAttribute('data-tour-expanded', '1');
+          return;
+        } catch(e) {
+          console.warn('[DpTour V239.9] sbActionsToggle() failed:', e);
+        }
       }
       
-      // Scroll Sidebar zur Accordion damit User es sieht
-      var sidebar = document.querySelector('aside.sidebar');
-      if (sidebar) {
-        var accTop = accordion.offsetTop;
-        sidebar.scrollTop = Math.max(0, accTop - 50);
-      }
-      
-      // Markiere fuer cleanup
+      // 2) Fallback: Klasse direkt setzen
+      accordion.classList.add('sb-actions-open');
       accordion.setAttribute('data-tour-expanded', '1');
-      if (inner) inner.setAttribute('data-tour-expanded', '1');
     } catch(e) {
-      console.warn('[DpTour V239.5] _expandSidebar error:', e);
+      console.warn('[DpTour V239.9] _expandSidebar error:', e);
     }
   }
 
-  // V239.5: Cleanup nach Tour - Style-Overrides entfernen
+  // V239.5/.9: Cleanup - Accordion wieder schliessen
   function _restoreSidebarAccordion() {
     try {
+      var accordion = document.getElementById('sb-actions-accordion');
+      if (accordion && accordion.getAttribute('data-tour-expanded') === '1') {
+        // V239.9: echte Toggle-Funktion zum Schliessen
+        if (typeof window.sbActionsToggle === 'function' && accordion.classList.contains('sb-actions-open')) {
+          try { window.sbActionsToggle(); } catch(e) {
+            accordion.classList.remove('sb-actions-open');
+          }
+        } else {
+          accordion.classList.remove('sb-actions-open');
+        }
+        accordion.removeAttribute('data-tour-expanded');
+      }
+      // Style-Overrides von V239.5 entfernen falls vorhanden
       document.querySelectorAll('[data-tour-expanded="1"]').forEach(function(el) {
         el.style.cssText = '';
         el.removeAttribute('data-tour-expanded');
       });
     } catch(e) {}
+  }
+
+  // V239.8/.9: MutationObserver der Accordion offen haelt
+  //   Falls die App das Accordion waehrend Tour zuklappt, wird es sofort
+  //   wieder aufgemacht. Wird nur aktiv waehrend Sidebar-Steps.
+  //   V239.9: Prueft .sb-actions-open Klasse statt offsetHeight
+  function _startAccordionWatcher() {
+    if (state.accordionWatcher) return;  // schon aktiv
+    var accordion = document.getElementById('sb-actions-accordion');
+    if (!accordion) return;
+    
+    _expandSidebarActionsIfCollapsed();
+    
+    try {
+      state.accordionWatcher = new MutationObserver(function() {
+        if (!accordion.classList.contains('sb-actions-open')) {
+          console.log('[DpTour V239.9] Accordion geschlossen -> re-open');
+          _expandSidebarActionsIfCollapsed();
+        }
+      });
+      state.accordionWatcher.observe(accordion, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+    } catch(e) {
+      console.warn('[DpTour V239.8] MutationObserver init failed:', e);
+    }
+  }
+
+  function _stopAccordionWatcher() {
+    if (state.accordionWatcher) {
+      try { state.accordionWatcher.disconnect(); } catch(e) {}
+      state.accordionWatcher = null;
+    }
   }
 
   // ─── Overlay ─────────────────────────────────────────────────────────
@@ -637,10 +674,16 @@
     if (!step.tab) return callback();
     var current = _currentSection();
     
-    // V239.7: Bei Sidebar-Steps: Accordion aufklappen + WARTEN bis Render
+    // V239.8: Wenn weg von Sidebar -> Watcher stoppen, Accordion wieder normal
+    if (step.tab !== 'sidebar' && state.accordionWatcher) {
+      _stopAccordionWatcher();
+      _restoreSidebarAccordion();
+    }
+    
+    // V239.7/.8: Bei Sidebar-Steps: Accordion permanent offen halten via MutationObserver
     if (step.tab === 'sidebar') {
-      _expandSidebarActionsIfCollapsed();
-      // Doppel-Expand: einmal sofort, einmal nach 200ms (CSS-Animation)
+      _startAccordionWatcher();
+      // Doppel-Expand: einmal sofort (im Watcher), einmal nach 300ms (CSS-Animation)
       setTimeout(function() {
         _expandSidebarActionsIfCollapsed();
         callback();
@@ -829,6 +872,8 @@
     }
     _destroyOverlay();
     // V239.5: Sidebar-Accordion Style-Overrides entfernen
+    // V239.8: Plus Watcher stoppen
+    _stopAccordionWatcher();
     _restoreSidebarAccordion();
   }
 

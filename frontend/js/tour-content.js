@@ -216,11 +216,11 @@
     },
     
     {
-      tab: 'sidebar',
-      selector: '#sb-actions-accordion button[data-feature="bank_pdf_a3"], #sb-actions-accordion button[onclick*="bankexport"]',
+      tab: 'header',
+      selector: '.hdr-pdf-btn, button[onclick*="exportPDF"]',
       icon: 'i-file-text',
-      title: 'Business-Case-PDF',
-      body: 'Der **Bankexport-Button** in der Sidebar (gespotlightet) erstellt das bank-fertige Investment-PDF mit allen aktuellen Daten.',
+      title: 'Investment-PDF',
+      body: 'Der **Investment-PDF-Button oben rechts im Header** (gespotlightet) erstellt das bank-fertige Investment-PDF mit allen aktuellen Daten.',
       bodyMore: '**Wo finden:** Sidebar links unter "Aktionen" -> "Business-Case-PDF". Oder direkt im Deal-Aktion-Tab.\n\n**Wie generieren:** Ein Klick. DealPilot baut das PDF mit allen aktuellen Daten und oeffnet einen Download-Link. Dauer 5-30 Sekunden.\n\n**Was drin ist:**\n• Deckblatt mit Objektfotos + Eckdaten\n• Investitionsuebersicht\n• Cashflow-Tabelle ueber 10 Jahre\n• DSCR + LTV + Wertpuffer als Cockpit\n• Stress-Test-Szenarien\n• KI-Lagebewertung als Volltext\n• Werbungskosten-Anlage fuer Finanzamt\n\n**Tipp vor PDF-Export:** Alle Pflichtfelder checken (rot markiert).\n\nPro-Plan: **eigenes Logo + Footer + Impressum**.',
       placement: 'auto'
     },
