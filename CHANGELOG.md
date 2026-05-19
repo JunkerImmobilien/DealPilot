@@ -1,5 +1,43 @@
 # DealPilot Changelog
 
+## V1.1.234.1 — 2026-05-19
+
+### Hotfix: Settings → Plan-Tab zeigt eigenes Pane statt Pricing-Modal
+
+**Problem:** In V234 wurde "Abo verwalten"-Block in `_renderPlanPane()` eingefügt,
+aber der Plan-Tab in Settings rief `closeSettings(); openPricingModal();` —
+das alte _renderPlanPane wurde nie angezeigt. User landeten beim Klick auf
+"Plan" direkt im Pricing-Modal ohne Portal-Button zu sehen.
+
+**Fix:** Plan-Tab-onclick auf `_swSet(this)` umgestellt (wie alle anderen Tabs).
+Das existierende `st-pane-plan` DOM-Element wird jetzt korrekt angezeigt.
+
+**Plus: Komplettes Redesign des Plan-Panes:**
+
+**Bezahlte Kunden (Pro/Investor/Starter) sehen:**
+- Premium-Status-Header mit goldenem Plan-Icon
+- Plan-Name groß ("Pro"), Preis und Meta-Info (KI-Credits, Objekt-Limit)
+- 2 Aktions-Buttons:
+  - **🔧 Abo verwalten** (gold-Verlauf-Primary) → öffnet Stripe-Kundenportal
+  - **Plan wechseln →** (Secondary) → öffnet Pricing-Modal
+- Hinweis-Box: "Im Kundenportal kannst du Plan ändern, kündigen, Zahlungsmethode anpassen, Rechnungen herunterladen"
+- **Keine Plan-Cards mehr** (clean, fokussiert auf Verwaltung)
+
+**Free-Kunden sehen:**
+- Status-Header "Du bist auf Free"
+- Hinweis: "Aktiviere einen bezahlten Plan für mehr KI-Credits..."
+- Darunter alle 4 Plan-Cards zum Auswählen/Abschließen (wie bisher)
+
+### Architektur
+- Neue Funktion `_v234_1RenderPlanStatusHeader()` vor _renderPlanPane
+- Bei bezahltem Plan: early-return mit nur Header-HTML
+- Bei Free: Header wird vor das existierende Plan-Card-HTML prependet
+- Alter V234-Portal-Block am Ende von _renderPlanPane entfernt (obsolet)
+- ~140 Zeilen neues CSS für `.v234-status-header` mit Mobile-Variante
+
+### Kein Backend-Rebuild nötig
+
+
 ## V1.1.234 — 2026-05-19
 
 ### Quick-Win-Sammelpatch: Neubau-Auto-AfA + Stripe-Plan-Logik

@@ -171,7 +171,7 @@ function showSettings(initialTab) {
         '<button class="st-tab ms-tab" data-tab="profilanzeige" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-target"/></svg></span>Profil &amp; Anzeige</button>' +
         '<button class="st-tab ms-tab" data-tab="datenraum" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-share"/></svg></span>Datenraum</button>' +
         // V63.57: Daten-Tab entfernt — Import/Export jetzt direkt aus der Sidebar
-        '<button class="st-tab ms-tab" data-tab="plan" onclick="closeSettings(); if(typeof openPricingModal===\'function\') openPricingModal();"><span class="ic"><svg width="15" height="15"><use href="#i-star"/></svg></span>Plan</button>' +
+        '<button class="st-tab ms-tab" data-tab="plan" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-star"/></svg></span>Plan</button>' +
         '<button class="st-tab ms-tab" data-tab="info" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-info"/></svg></span>Info</button>' +
         '<button class="st-tab ms-tab" data-tab="rechtliches" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-book"/></svg></span>Rechtliches</button>' +
         '<button class="st-tab ms-tab" data-tab="help" onclick="closeSettings(); if(typeof showHelp===\'function\') showHelp();"><span class="ic"><svg width="15" height="15"><use href="#i-help"/></svg></span>Hilfe</button>' +
@@ -1350,7 +1350,104 @@ window._resetDsWeights = _resetDsWeights;
 window._saveSettings = _saveSettings;
 
 
+
+// V234.1: Status-Header für Plan-Pane — zeigt aktuellen Plan + Aktions-Buttons
+function _v234_1RenderPlanStatusHeader() {
+  var planKey = 'free';
+  var planName = 'Free';
+  var planPrice = '0 € / Monat';
+  var planMeta = '10 KI-Credits einmalig · 1 Objekt';
+  var isPaid = false;
+
+  try {
+    if (typeof DealPilotConfig !== 'undefined' && DealPilotConfig.pricing) {
+      planKey = DealPilotConfig.pricing.currentKey() || 'free';
+      var plan = DealPilotConfig.pricing.plans && DealPilotConfig.pricing.plans[planKey];
+      if (plan) {
+        planName = plan.name || planKey.charAt(0).toUpperCase() + planKey.slice(1);
+        isPaid = (planKey !== 'free');
+        // Preis
+        if (plan.priceMonthly && plan.priceMonthly > 0) {
+          planPrice = plan.priceMonthly + ' € / Monat';
+        }
+        // Meta-Info: Credits + Objekt-Limit
+        var metaParts = [];
+        if (plan.aiCreditsPerMonth) metaParts.push(plan.aiCreditsPerMonth + ' KI-Credits / Monat');
+        if (plan.maxObjects === Infinity || plan.maxObjects === -1) {
+          metaParts.push('Unbegrenzte Objekte');
+        } else if (plan.maxObjects) {
+          metaParts.push(plan.maxObjects + ' Objekte');
+        }
+        if (metaParts.length) planMeta = metaParts.join(' · ');
+      }
+    }
+  } catch (e) {
+    console.warn('[v234.1] Plan-Header-Render-Fehler:', e);
+  }
+
+  var iconMap = { free: 'i-spark', starter: 'i-rocket', investor: 'i-trend', pro: 'i-star' };
+  var icoId = iconMap[planKey] || 'i-star';
+
+  var html =
+    '<div class="v234-status-header v234-status-' + (isPaid ? 'paid' : 'free') + '">' +
+      '<div class="v234-status-row">' +
+        '<div class="v234-status-icon">' +
+          '<svg width="32" height="32"><use href="#' + icoId + '"/></svg>' +
+        '</div>' +
+        '<div class="v234-status-text">' +
+          '<div class="v234-status-label">DEIN AKTUELLER PLAN</div>' +
+          '<div class="v234-status-name">' + planName + '</div>' +
+          '<div class="v234-status-meta">' + planPrice + (isPaid ? ' · ' + planMeta : '') + '</div>' +
+        '</div>' +
+      '</div>';
+
+  if (isPaid) {
+    html +=
+      '<div class="v234-status-actions">' +
+        '<button class="v234-btn v234-btn-primary" onclick="if(typeof Sub!==\'undefined\'&&Sub.openPortal)Sub.openPortal();return false">' +
+          '<span class="v234-btn-icon">🔧</span> Abo verwalten' +
+        '</button>' +
+        '<button class="v234-btn v234-btn-secondary" onclick="closeSettings();if(typeof openPricingModal===\'function\')openPricingModal();return false">' +
+          'Plan wechseln →' +
+        '</button>' +
+      '</div>' +
+      '<div class="v234-status-hint">' +
+        '<strong>Im Stripe-Kundenportal:</strong> Plan ändern, Abo kündigen, Zahlungsmethode anpassen, Rechnungen herunterladen.' +
+      '</div>';
+  } else {
+    html +=
+      '<div class="v234-status-hint v234-status-hint-free">' +
+        '<strong>Aktiviere einen bezahlten Plan</strong> für mehr KI-Credits, unbegrenzte Objekte und Premium-Features. Wähle unten den passenden Plan.' +
+      '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+window._v234_1RenderPlanStatusHeader = _v234_1RenderPlanStatusHeader;
+
 function _renderPlanPane() {
+
+  // V234.1: Status-Header oben anzeigen — bei bezahltem Plan reicht das
+  var _v234_1Header = '';
+  var _v234_1CurrentPlan = 'free';
+  try {
+    if (typeof _v234_1RenderPlanStatusHeader === 'function') {
+      _v234_1Header = _v234_1RenderPlanStatusHeader();
+    }
+    if (typeof DealPilotConfig !== 'undefined' && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.currentKey === 'function') {
+      _v234_1CurrentPlan = DealPilotConfig.pricing.currentKey() || 'free';
+    }
+  } catch (e) {}
+
+  // Bei bezahltem Plan: nur Status-Header zurückgeben (keine Plan-Cards)
+  if (_v234_1CurrentPlan !== 'free') {
+    return _v234_1Header;
+  }
+
+  // Free-User: Status-Header + bisherige Plan-Card-Logik (siehe unten)
+  // Wir prependieren den Header an das HTML — der Rest läuft normal durch.
+
   if (!window.DealPilotConfig || !DealPilotConfig.pricing) {
     return '<p class="hint">Pricing-Konfiguration nicht geladen.</p>';
   }
@@ -1492,40 +1589,9 @@ function _renderPlanPane() {
     html += '</div></div>';
   }
 
-  // V234: Customer-Portal-Block — nur sichtbar wenn Plan != free
-  // Defensiv: currentPlanKey aus DealPilotConfig holen falls nicht im Scope
-  var _v234CurrentPlan = 'free';
-  try {
-    if (typeof currentPlanKey !== 'undefined' && currentPlanKey) {
-      _v234CurrentPlan = currentPlanKey;
-    } else if (typeof DealPilotConfig !== 'undefined' && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.currentKey === 'function') {
-      _v234CurrentPlan = DealPilotConfig.pricing.currentKey() || 'free';
-    }
-  } catch (e) {}
-
-  if (_v234CurrentPlan !== 'free') {
-    html +=
-      '<div class="v234-portal-block" style="margin-top:24px;padding:18px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.20);border-radius:8px">' +
-        '<div style="font-size:13px;font-weight:600;color:var(--gold-d,#8a6f27);margin-bottom:6px">' +
-          '🔧 Abo verwalten' +
-        '</div>' +
-        '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">' +
-          'Plan wechseln, kündigen, Zahlungsmethode ändern, Rechnungen einsehen — alles über das Stripe-Kundenportal.' +
-        '</div>' +
-        '<a href="#" class="v234-customer-portal-link" onclick="if(typeof Sub!==\'undefined\'&&Sub.openPortal)Sub.openPortal();return false">' +
-          '→ Zum Kundenportal' +
-        '</a>' +
-      '</div>';
-  } else {
-    html +=
-      '<div style="margin-top:24px;padding:14px;background:rgba(201,168,76,0.04);border:1px dashed rgba(201,168,76,0.20);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.5">' +
-        '<strong style="color:var(--gold-d,#8a6f27)">Hinweis:</strong> Du bist aktuell auf dem kostenlosen Plan. ' +
-        'Sobald du ein Abo abschließt, kannst du es hier jederzeit verwalten oder kündigen.' +
-      '</div>';
-  }
-
   // V180: Stripe-Hinweis entfernt — Stripe ist jetzt der einzige Flow.
-  return html;
+  // V234.1: Status-Header vor das Free-HTML prependen
+  return _v234_1Header + html;
 }
 
 // V63.1: Toggle für Monatlich/Jährlich
