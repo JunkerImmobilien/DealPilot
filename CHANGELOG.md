@@ -1,5 +1,52 @@
 # DealPilot Changelog
 
+## V1.1.238 - 2026-05-19
+
+### First-Start-Tour mit Glassmorphism-Overlay
+
+**Neu: Interaktive 12-Schritte-Tour fuer neue User**
+
+Bei erstem Login (oder via Hilfe-Modal -> "Tour starten"-Button) startet automatisch
+eine Einfuehrungstour, die durch die gesamte App fuehrt:
+
+1. Quick-Check (Standalone-View) - schnellste Bewertung
+2. KI-Recherche im Quick-Check
+3. Als Objekt speichern -> Vollanalyse
+4. Tab-Bar mit 9 Analyse-Schritten
+5. Pflichtfelder mit roten Sternchen
+6. Darlehensstrukturierung (Tab Finanzierung)
+7. KI-Lagebewertung (Tab Steuer & KI)
+8. Bewertungs-Cockpit (DSCR, LTV, Wertpuffer)
+9. Stress-Test (Zins-Szenarien)
+10. Investment-PDF (Tab Aktion)
+11. Sidebar mit gespeicherten Objekten
+12. Hilfe-Menue mit Glossar + KI-Assistent
+
+**Visual-Design:** Modernes Glassmorphism-Overlay (Backdrop-Blur) mit gold-pulsierendem
+Spotlight-Highlight und Bubble-Tooltip. Smart-Positioning passt sich automatisch an
+Bildschirmgroesse + Element-Position an.
+
+**Persistenz:** localStorage-Key `dp_tour_completed_v1`. Nach erstem Abschluss kommt
+die Tour nicht mehr automatisch - kann aber jederzeit ueber das Hilfe-Modal neu
+gestartet werden.
+
+**Keyboard-Nav:** Escape = schliessen (kommt naechstes Mal wieder), -> /Enter = weiter,
+<- = zurueck.
+
+**Mobile-Anpassung:** Auf kleinen Bildschirmen wird die Bubble immer zentriert
+angezeigt, der Spotlight ist deaktiviert.
+
+**Auto-Skip:** Wenn ein erwartetes UI-Element nicht gefunden wird (z.B. plan-abhaengige
+Buttons), springt die Tour automatisch zum naechsten Schritt - kein Haengen.
+
+### Dateien
+- NEU: `frontend/js/tour-engine.js` (~400 Zeilen) - Tour-Engine
+- NEU: `frontend/js/tour-content.js` (~250 Zeilen) - 12 Schritt-Definitionen
+- NEU: `frontend/css/tour.css` (~250 Zeilen) - Glassmorphism + Spotlight + Bubble
+- PATCH: `frontend/index.html` - script + link tags
+- PATCH: `frontend/js/help.js` - "Tour starten"-Button im Modal-Footer
+
+
 ## V1.1.237 — 2026-05-19
 
 ### Glossar-Erweiterung + Doppelte-Sternchen-FINAL-Fix
