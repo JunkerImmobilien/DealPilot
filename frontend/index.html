@@ -727,7 +727,7 @@ body.dp-tt-off .dp-tip-infobox {
 
     <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-quality"/></svg></span>Qualität &amp; Zustand</div>
       <div class="g2">
-        <div class="f"><label>Energieklasse <span class="ds2-tag">DS2</span></label>
+        <div class="f"><label>Energieklasse <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
           <select id="ds2_energie" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
             <option value="">– keine Angabe –</option>
             <option value="A+">A+</option><option value="A">A</option><option value="B">B</option>
@@ -735,7 +735,7 @@ body.dp-tt-off .dp-tip-infobox {
             <option value="F">F</option><option value="G">G</option><option value="H">H</option>
           </select>
         </div>
-        <div class="f"><label>Zustand der Wohnung <span class="ds2-tag">DS2</span></label>
+        <div class="f"><label>Zustand der Wohnung <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
           <select id="ds2_zustand" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
             <option value="">– bitte wählen –</option>
             <option value="neubau">Neubau / kernsaniert</option>
@@ -825,7 +825,7 @@ body.dp-tt-off .dp-tip-infobox {
 
     <div class="g2">
       <div class="f"><label>Bankbewertung <button type="button" class="dp-tip" data-tip-id="tab1.bankbewertung" tabindex="-1" aria-label="Hilfe zu tab1.bankbewertung"></button></label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
-      <div class="f"><label title="Verkehrswert nach § 194 BauGB / ImmoWertV — durch Sachwert-, Ertragswert- oder Vergleichswertverfahren ermittelt">Verkehrswert <span class="cf-hint">(§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)</span></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label title="Verkehrswert nach § 194 BauGB / ImmoWertV — durch Sachwert-, Ertragswert- oder Vergleichswertverfahren ermittelt">Verkehrswert <span class="cf-hint">(§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div></div>
       <div class="f"><label>Makrolage</label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f"><label>Mikrolage</label><select id="mikrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f">
@@ -948,7 +948,7 @@ body.dp-tt-off .dp-tip-infobox {
         <div class="f mb12">
           <label class="kueche-toggle-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500">
             <input type="checkbox" id="kueche_im_kp" oninput="toggleKuecheKp(); calc()">
-            <span>Bewegliche Wirtschaftsgüter im Kaufpreis enthalten <span class="hint" style="font-weight:400">(z.B. Küche)</span></span>
+            <span>Bewegliche Wirtschaftsgüter im Kaufpreis enthalten <span class="hint" style="font-weight:400">(z.B. Küche)</span> <button type="button" class="dp-tip" data-tip-id="tab2.kueche_im_kp" tabindex="-1" aria-label="Hilfe zu Bewegliche Wirtschaftsgüter"></button></span>
           </label>
           <span class="hint" style="display:block;margin-top:4px;margin-left:24px">Sind bewegliche Wirtschaftsgüter (z.B. Einbauküche, Möblierung) separat im Kaufvertrag ausgewiesen, werden sie nicht der 15%-Grenze des Gebäudes zugerechnet (eigene 10-Jahre-AfA, Ansatz unter Punkt 6 im Steuerformular).</span>
           <div id="kueche_kp_wrap" style="display:none;margin-top:10px;margin-left:24px">
@@ -958,13 +958,13 @@ body.dp-tt-off .dp-tip-infobox {
         </div>
         <hr class="dvd">
         <div class="g2">
-          <div class="f"><label>Makler (%)</label><div class="iw"><input id="makler_p" type="text" inputmode="decimal" placeholder="0" step="0.01" class="tr" oninput="syncCostPct('makler')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Makler (%) <button type="button" class="dp-tip" data-tip-id="tab2.makler" tabindex="-1" aria-label="Hilfe zu Maklerprovision"></button></label><div class="iw"><input id="makler_p" type="text" inputmode="decimal" placeholder="0" step="0.01" class="tr" oninput="syncCostPct('makler')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Makler (€)</label><div class="iw"><span class="pfx">€</span><input id="makler_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('makler')"></div></div>
-          <div class="f"><label>Notar (%)</label><div class="iw"><input id="notar_p" type="text" inputmode="decimal" value="2.20" step="0.01" class="tr" oninput="syncCostPct('notar')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Notar (%) <button type="button" class="dp-tip" data-tip-id="tab2.notar" tabindex="-1" aria-label="Hilfe zu Notarkosten"></button></label><div class="iw"><input id="notar_p" type="text" inputmode="decimal" value="2.20" step="0.01" class="tr" oninput="syncCostPct('notar')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Notar (€)</label><div class="iw"><span class="pfx">€</span><input id="notar_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('notar')"></div></div>
-          <div class="f"><label>Grundbuchamt (%)</label><div class="iw"><input id="gba_p" type="text" inputmode="decimal" placeholder="0" step="0.01" class="tr" oninput="syncCostPct('gba')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Grundbuchamt (%) <button type="button" class="dp-tip" data-tip-id="tab2.grundbuchamt" tabindex="-1" aria-label="Hilfe zu Grundbuchamt"></button></label><div class="iw"><input id="gba_p" type="text" inputmode="decimal" placeholder="0" step="0.01" class="tr" oninput="syncCostPct('gba')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Grundbuchamt (€)</label><div class="iw"><span class="pfx">€</span><input id="gba_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gba')"></div></div>
-          <div class="f"><label>Grunderwerbsteuer (%)</label><div class="iw"><input id="gest_p" type="text" inputmode="decimal" value="6.50" step="0.01" class="tr" oninput="syncCostPct('gest')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Grunderwerbsteuer (%) <button type="button" class="dp-tip" data-tip-id="tab2.grunderwerbsteuer" tabindex="-1" aria-label="Hilfe zu Grunderwerbsteuer"></button></label><div class="iw"><input id="gest_p" type="text" inputmode="decimal" value="6.50" step="0.01" class="tr" oninput="syncCostPct('gest')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Grunderwerbsteuer (€)</label><div class="iw"><span class="pfx">€</span><input id="gest_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gest')"></div></div>
           <div class="f"><label>Sonstige (%)</label><div class="iw"><input id="ji_p" type="text" inputmode="decimal" value="0" step="0.01" class="tr" oninput="syncCostPct('ji')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Sonstige (€)</label><div class="iw"><span class="pfx">€</span><input id="ji_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('ji')"></div></div>
@@ -980,7 +980,7 @@ body.dp-tt-off .dp-tip-infobox {
         </div>
         <!-- V40: Markt-Faktor wird automatisch berechnet (KP / Jahres-NKM) -->
         <div class="f" style="margin-top:12px">
-          <label>Markt-Faktor (KP / Jahres-NKM) <span class="ds2-tag">DS2</span> <span class="hint" style="font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em">auto</span></label>
+          <label>Markt-Faktor (KP / Jahres-NKM) <span class="ds2-tag">DS2</span> <span class="hint" style="font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em">auto</span> <button type="button" class="dp-tip" data-tip-id="tab2.markt_faktor" tabindex="-1" aria-label="Hilfe zu Markt-Faktor"></button></label>
           <div class="cf" id="qm_marktfaktor">—</div>
           <input type="hidden" id="ds2_marktfaktor" value="">
           <span class="hint">Wird automatisch berechnet aus Kaufpreis ÷ Jahres-Nettokaltmiete. Wert fließt in den DealScore 2.0 Upside-Score.</span>
@@ -1026,7 +1026,7 @@ body.dp-tt-off .dp-tip-infobox {
                   <span>In Steuer-Werbungskosten übernehmen</span>
                 </label>
                 <div class="san-tax-years" id="san_tax_years_wrap">
-                  <label>Verteilung über</label>
+                  <label>Verteilung über <button type="button" class="dp-tip" data-tip-id="tab2.san_taxoption" tabindex="-1" aria-label="Hilfe zu Sanierungs-Steueroption"></button></label>
                   <select id="san_tax_years" oninput="calc()">
                     <option value="auto" selected>Automatisch (15%-Regel)</option>
                     <option value="1">1 Jahr (sofort)</option>
@@ -1066,6 +1066,7 @@ body.dp-tt-off .dp-tip-infobox {
         </div>
 
         <!-- 15%-Grenze -->
+        <div class="dp-tip-infobox" data-tip-id="tab2.15prozent_grenze"></div>
         <div class="info-box info-gold" style="margin-top:14px">
           <div class="info-box-title">📐 15%-Grenze (§ 6 Abs. 1 Nr. 1a EStG)</div>
           <div class="info-box-content">
@@ -1122,12 +1123,12 @@ body.dp-tt-off .dp-tip-infobox {
       <!-- V38: ds2_marktmiete + ds2_mietausfall verschoben aus Kennzahlen-Card -->
       <!-- V63.29: ✨-Buttons entfernt — KI-Recherche läuft über die KI-Mietpreis-Analyse-Box unten -->
       <div class="f">
-        <label>Marktmiete (€/m²) <span class="ds2-tag">DS2</span></label>
+        <label>Marktmiete (€/m²) <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.marktmiete" tabindex="-1" aria-label="Hilfe zu Marktmiete"></button></label>
         <div class="iw"><span class="pfx">€</span><input id="ds2_marktmiete" type="text" inputmode="decimal" placeholder="9,00" class="trl" oninput="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"></div>
         <span class="hint">Markt-üblich für die Region — wird mit Ist-Miete verglichen für Upside-Score.</span>
       </div>
       <div class="f">
-        <label>Mietausfall-Risiko <span class="ds2-tag">DS2</span></label>
+        <label>Mietausfall-Risiko <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.mietausfall_risiko" tabindex="-1" aria-label="Hilfe zu Mietausfall-Risiko"></button></label>
         <select id="ds2_mietausfall" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
           <option value="">– keine Angabe –</option>
           <option value="sehr_niedrig">Sehr niedrig</option>
@@ -1249,7 +1250,7 @@ body.dp-tt-off .dp-tip-infobox {
     <div class="ct">Persönliche Steuer</div>
     <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
     <div class="g2">
-      <div class="f"><label>zvE vor Immobilie / Jahr</label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label>zvE vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="calc()"></div></div>
       <div class="f"><label>Persönl. Grenzsteuersatz (%) <button type="button" class="dp-tip" data-tip-id="tab4.grenzsteuersatz" tabindex="-1" aria-label="Hilfe zu tab4.grenzsteuersatz"></button></label><div class="iw"><input id="grenz" type="text" inputmode="decimal" placeholder="42.00" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
     </div>
     <div class="f checkbox-row">
@@ -1727,7 +1728,7 @@ body.dp-tt-off .dp-tip-infobox {
         <div class="f"><label>Anfängl. Darlehenssumme *</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
         <div class="g2">
           <div class="f"><label>Zinssatz nominal (% p.a.) <button type="button" class="dp-tip" data-tip-id="tab5.zinsbindung" tabindex="-1" aria-label="Hilfe zu tab5.zinsbindung"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-          <div class="f" id="d1t_field"><label>Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f" id="d1t_field"><label>Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
         </div>
         <div class="f"><label>Monatliche Rate (berechnet)</label><div class="cf" id="d1_rate">—</div></div>
         <div class="g2">
@@ -2607,7 +2608,7 @@ body.dp-tt-off .dp-tip-infobox {
 <script src="js/dealscore.js?v=166"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=144">
 <script src="js/datenraum.js?v=160"></script>
-<script src="js/tooltip-content.js?v=228"></script>
+<script src="js/tooltip-content.js?v=2281"></script>
   <script src="js/tooltip-engine.js?v=228"></script>
   <script src="js/settings.js?v=228"></script>
 <script src="js/pricing-modal.js?v=197-2"></script>
