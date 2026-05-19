@@ -28285,3 +28285,145 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 }
 
 /* V223-Marker */
+
+
+/* ════════════════════════════════════════════════════════════════════════
+ * V233: Mobile-Fixes (iPhone-Safari)
+ * Konsolidierter Block — alle Fixes in @media-Queries, Desktop unverändert.
+ * Behandelt 6 Probleme aus User-Feedback / Screenshots.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* BILD 1+3: Score-Chevron rechts oben überlappt auf Mobile mit anderen
+   Header-Elementen (KI-Credits-Pill, Aktionen-Menü). Auf Mobile redundant
+   weil der Score eh in voller Breite sichtbar ist. */
+@media (max-width: 768px) {
+  .hdr-toggle-btn,
+  .hdr-toggle-btn-chevron {
+    display: none !important;
+  }
+}
+
+/* BILD 2: dp-tip Tooltip-Buttons (V228 Help-System) — die ::before-Pseudo
+   die als Bubble dient ist auf Mobile zu groß. Wir kleinern den Button
+   und entfernen die Hover-Bubble (auf Touch-Geräten irrelevant). */
+@media (max-width: 768px) {
+  .dp-tip {
+    width: 18px !important;
+    height: 18px !important;
+    margin-left: 4px !important;
+    font-size: 11px !important;
+  }
+  .dp-tip::before {
+    display: none !important;
+  }
+}
+
+/* BILD 4: Settings-Modal-Header — der ".st-tab" Account-Button im Header
+   bricht aus. Wir lassen die Tabs in zweiter Zeile umbrechen. */
+@media (max-width: 600px) {
+  .settings-modal .settings-tabs,
+  .ds2-settings-modal .settings-tabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 0 8px !important;
+  }
+  .settings-modal .st-tab,
+  .ds2-settings-modal .st-tab {
+    flex-shrink: 0 !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+  .settings-modal .st-tab .ic,
+  .ds2-settings-modal .st-tab .ic {
+    margin-right: 4px !important;
+  }
+  /* Settings-Header (Titel + Untertitel) bricht auf Mobile in eigene Zeile */
+  .settings-modal .settings-header,
+  .ds2-settings-modal .ds2-settings-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 12px 16px !important;
+  }
+}
+
+/* BILD 5: Portfolio-Tabelle (.ao-table) — hat schon overflow-x:auto am
+   Wrap aber min-width fehlt, daher wird Tabelle gequetscht statt zu
+   scrollen. Wir setzen min-width und sticky-Spalte für Kürzel. */
+@media (max-width: 900px) {
+  .ao-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .ao-table {
+    min-width: 700px !important;
+  }
+  /* Kürzel-Spalte sticky links damit User beim Scrollen Bezug behält */
+  .ao-table th:first-child,
+  .ao-table .ao-kz {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 2 !important;
+    background: inherit;
+  }
+  .ao-table thead th:first-child {
+    background: var(--card, #1A1818) !important;
+  }
+  .ao-table tbody td:first-child {
+    background: var(--surface, #fafafa) !important;
+  }
+  /* Scrollbar-Hinweis: dezent goldener Schatten am rechten Rand bei Overflow */
+  .ao-table-wrap {
+    background:
+      linear-gradient(to right, transparent 70%, rgba(201,168,76,0.10) 100%);
+    background-attachment: local;
+  }
+}
+
+/* BILD 6: Hilfe-Modal Foot-Bereich (Input "Frag den DealPilot" + Button) — 
+   auf Mobile ist das Input + Button-Layout gequetscht und ein Element
+   überlappt. Wir stacken vertikal bei < 600px. */
+@media (max-width: 600px) {
+  .help-modal-foot,
+  .help-ai-foot {
+    padding: 10px 14px !important;
+  }
+  .help-modal-foot > *,
+  .help-ai-foot > * {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .help-modal-foot input[type="text"],
+  .help-ai-foot input[type="text"] {
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+  .help-modal-foot button,
+  .help-ai-foot button {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  /* Falls innerhalb des Foots ein Flex/Grid-Container ist: auf 1 Spalte */
+  .help-modal-foot > div,
+  .help-ai-foot > div {
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+/* BONUS: bei sehr schmalen iPhones (< 380px, z.B. iPhone SE) — Header-Pill
+   für KI-Credits zeigt nur Label "KI" damit es nicht zu Aktionen-Pfeil
+   und Hamburger kollidiert. */
+@media (max-width: 380px) {
+  .hdr-credits-pill {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+  .hdr-credits-pill #hdr-credits-pill-label {
+    display: none !important;
+  }
+}
+
+/* ════ Ende V233 Mobile-Fixes ════ */

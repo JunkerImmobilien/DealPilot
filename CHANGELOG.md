@@ -1,5 +1,51 @@
 # DealPilot Changelog
 
+## V1.1.233 — 2026-05-19
+
+### Mobile-Fixes für iPhone-Safari (Marcel-Feedback)
+
+Aus User-Screenshots wurden 6 Mobile-Layout-Probleme identifiziert und
+in einem konsolidierten CSS-Block am Ende von style.css gefixt.
+Desktop-Layout bleibt 100% unverändert (alles in @media-Queries gewickelt).
+
+**Bild 1 + 3 — Header-Score-Chevron überlappt:**
+- `.hdr-toggle-btn` war `position:absolute; z-index:305` und überlappte
+  auf Mobile mit KI-Credits-Pill, Aktionen-Menü-Pfeil und Theme-Toggle
+- Fix: `display:none` ab `≤ 768px` (auf Mobile redundant)
+
+**Bild 2 — dp-tip-Tooltip-Button-Bubble:**
+- Die V228-Hilfe-Buttons hatten eine ::before Hover-Bubble die auf Mobile
+  zu groß rendert und über Eingabefelder rüberhängt
+- Fix: Button kleiner (18px statt 22px), Hover-Bubble auf Touch ausgeblendet
+  (auf Touch-Geräten gibt's keinen Hover, daher nutzlos)
+
+**Bild 4 — Settings-Modal-Header Account-Tab bricht aus:**
+- Settings-Header war `flex-direction: row` und kollidierte mit den Tabs
+- Fix: bei `≤ 600px` Header in Spalten, Tabs in eigener Zeile mit
+  horizontal-scroll, kleinerer Padding/Font
+
+**Bild 5 — Portfolio-Tabelle abgeschnitten:**
+- `.ao-table-wrap` hatte schon `overflow-x: auto`, aber kein `min-width`
+  am `.ao-table` → Tabelle wurde gequetscht statt zu scrollen
+- Fix: `min-width: 700px` ab `≤ 900px` damit horizontaler Scroll greift
+- Bonus: Kürzel-Spalte `position: sticky; left: 0` damit User beim
+  Scrollen Bezug behält
+- Gold-Gradient am rechten Rand als Scroll-Hinweis
+
+**Bild 6 — Hilfe-Modal Foot-Layout:**
+- Input "Frag den DealPilot" + "Fragen"-Button waren auf Mobile zu eng
+- Fix: bei `≤ 600px` Input + Button vertikal stacken, jeweils 100% Breite
+
+**Bonus für iPhone SE / sehr schmale Phones (< 380px):**
+- KI-Credits-Pill-Label "KI" wird ausgeblendet, nur Icon bleibt
+- Spart 30-40px im engsten Header-Bereich
+
+### Architektur
+Alles in **einem konsolidierten Block** am Ende von style.css. Bei künftigen
+Mobile-Fixes können dort weitere Regeln angehängt werden. Bei Bedarf
+komplett entfernbar (Block-Marker: `/* V233: Mobile-Fixes */`).
+
+
 ## V1.1.232 — 2026-05-19
 
 ### UX-Polish: Card-Header-Icons konsequent über alle 8 Tabs ausgerollt
