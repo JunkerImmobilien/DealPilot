@@ -450,6 +450,22 @@
     html += '<div class="dp-tour-body">';
     html += '  <div class="dp-tour-text dp-tour-text-short">' + _renderMarkdown(step.body || '') + '</div>';
 
+    // V239.6: Custom-Action — Tool-Tip-Mode Toggle direkt in der Bubble
+    if (step.customAction === 'tooltip-mode') {
+      var currentMode = 'beginner';
+      try {
+        if (window.DpTip && typeof window.DpTip.getMode === 'function') {
+          currentMode = window.DpTip.getMode() || 'beginner';
+        }
+      } catch(e) {}
+      html += '  <div class="dp-tour-toggle-row">';
+      html += '    <button class="dp-tour-toggle-btn ' + (currentMode === 'off' ? 'active' : '') + '" data-tt-mode="off">Aus</button>';
+      html += '    <button class="dp-tour-toggle-btn ' + (currentMode === 'pro' ? 'active' : '') + '" data-tt-mode="pro">Profi</button>';
+      html += '    <button class="dp-tour-toggle-btn ' + (currentMode === 'beginner' ? 'active' : '') + '" data-tt-mode="beginner">Anfaenger</button>';
+      html += '  </div>';
+      html += '  <div class="dp-tour-toggle-status" id="dp-tour-tt-status">Aktueller Modus: <strong>' + (currentMode === 'off' ? 'Aus' : currentMode === 'pro' ? 'Profi' : 'Anfaenger') + '</strong></div>';
+    }
+
     if (hasMore) {
       var expandedClass = state.expanded ? 'dp-tour-expanded' : '';
       html += '  <button class="dp-tour-more-toggle ' + expandedClass + '" type="button" data-action="toggle-more">';
@@ -503,6 +519,28 @@
     if (btnDone) btnDone.addEventListener('click', function() { Tour.complete(); });
     var btnMore = state.bubble.querySelector('[data-action="toggle-more"]');
     if (btnMore) btnMore.addEventListener('click', function() { Tour.toggleMore(); });
+    
+    // V239.6: Tool-Tip-Mode Toggle-Buttons
+    var ttBtns = state.bubble.querySelectorAll('.dp-tour-toggle-btn[data-tt-mode]');
+    ttBtns.forEach(function(b) {
+      b.addEventListener('click', function() {
+        var mode = b.getAttribute('data-tt-mode');
+        try {
+          if (window.DpTip && typeof window.DpTip.setMode === 'function') {
+            window.DpTip.setMode(mode);
+          }
+        } catch(e) { console.warn('[DpTour V239.6] DpTip.setMode error:', e); }
+        // UI: active-Klasse umsetzen
+        ttBtns.forEach(function(o) { o.classList.remove('active'); });
+        b.classList.add('active');
+        // Status-Text updaten
+        var status = state.bubble.querySelector('#dp-tour-tt-status');
+        if (status) {
+          var label = mode === 'off' ? 'Aus' : mode === 'pro' ? 'Profi' : 'Anfaenger';
+          status.innerHTML = 'Aktueller Modus: <strong>' + label + '</strong> ✓';
+        }
+      });
+    });
   }
 
   function _escapeHtml(s) {
