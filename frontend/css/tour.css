@@ -399,3 +399,44 @@ body.dp-tour-active {
   color: #E8C964;
   border-color: #E8C964;
 }
+
+/* V239.6: Tool-Tip-Mode Toggle-Buttons in Tour-Bubble */
+.dp-tour-toggle-row {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 8px;
+}
+.dp-tour-toggle-btn {
+  flex: 1;
+  background: rgba(40, 32, 18, 0.6);
+  border: 1.5px solid rgba(201, 168, 76, 0.3);
+  color: rgba(232, 220, 190, 0.85);
+  padding: 10px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.dp-tour-toggle-btn:hover {
+  background: rgba(60, 48, 24, 0.8);
+  border-color: rgba(201, 168, 76, 0.55);
+  color: #E8C964;
+}
+.dp-tour-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.85), rgba(180, 144, 58, 0.85));
+  border-color: #E8C964;
+  color: #1a140a;
+  box-shadow: 0 2px 8px rgba(201, 168, 76, 0.25);
+}
+.dp-tour-toggle-status {
+  font-size: 12px;
+  color: rgba(232, 220, 190, 0.7);
+  margin-top: 6px;
+  padding: 6px 0;
+  text-align: center;
+}
+.dp-tour-toggle-status strong {
+  color: #E8C964;
+}

@@ -41,10 +41,10 @@
     
     {
       tab: 'sidebar',
-      selector: '.sb-act-accent[onclick*="quickcheck"], button[onclick*="sbActionsAction(\'quickcheck\')"]',
+      selector: '#sb-actions-accordion .sb-act-accent[onclick*="quickcheck"], #sb-actions-accordion button[onclick*="sbActionsAction(\'quickcheck\')"]',
       icon: 'i-flame',
       title: 'Neues Objekt? Quick-Check!',
-      body: 'Fuer **neue Objekte** ist der **Quick-Check** dein schnellster Einstieg — 60 Sekunden Bewertung.',
+      body: 'Der **goldene Quick-Check-Button** in der Sidebar (gespotlightet) startet eine 60-Sekunden-Bewertung fuer neue Objekte.',
       bodyMore: 'Wann du den Quick-Check nutzt:\n\n• **Inseraten-Sichten** auf Immo-Plattformen\n• **Mailings vom Makler** schnell einschaetzen\n• **Erste Sondierung** ob ein Objekt tiefer-pruefenswert ist\n\n**Was du brauchst:**\n• PLZ + Strasse\n• Wohnflaeche\n• Kaufpreis\n• Nettokaltmiete\n\n**Was du sofort bekommst:**\n• Bruttomietrendite\n• Vorlaeufigen DealScore\n• Erste Lage-Einschaetzung\n\nVielversprechende Objekte uebernimmst du dann mit einem Klick in die Vollanalyse — alle Daten werden automatisch in die 8 Tabs uebertragen.',
       placement: 'right'
     },
@@ -217,10 +217,10 @@
     
     {
       tab: 'sidebar',
-      selector: '.sb-act-item[data-feature="bank_pdf_a3"], [data-feature="bank_pdf_a3"], button[onclick*="bankexport"]',
+      selector: '#sb-actions-accordion button[data-feature="bank_pdf_a3"], #sb-actions-accordion button[onclick*="bankexport"]',
       icon: 'i-file-text',
       title: 'Business-Case-PDF',
-      body: 'Das **bank-fertige Investment-PDF** — der Business Case fuer deinen Deal.',
+      body: 'Der **Bankexport-Button** in der Sidebar (gespotlightet) erstellt das bank-fertige Investment-PDF mit allen aktuellen Daten.',
       bodyMore: '**Wo finden:** Sidebar links unter "Aktionen" -> "Business-Case-PDF". Oder direkt im Deal-Aktion-Tab.\n\n**Wie generieren:** Ein Klick. DealPilot baut das PDF mit allen aktuellen Daten und oeffnet einen Download-Link. Dauer 5-30 Sekunden.\n\n**Was drin ist:**\n• Deckblatt mit Objektfotos + Eckdaten\n• Investitionsuebersicht\n• Cashflow-Tabelle ueber 10 Jahre\n• DSCR + LTV + Wertpuffer als Cockpit\n• Stress-Test-Szenarien\n• KI-Lagebewertung als Volltext\n• Werbungskosten-Anlage fuer Finanzamt\n\n**Tipp vor PDF-Export:** Alle Pflichtfelder checken (rot markiert).\n\nPro-Plan: **eigenes Logo + Footer + Impressum**.',
       placement: 'auto'
     },
@@ -239,12 +239,13 @@
     
     {
       tab: 'sidebar',
-      selector: 'button[onclick*="sbActionsAction(\'settings\')"], .sb-act-item[onclick*="settings"]',
+      selector: '#sb-actions-accordion',
       icon: 'i-help',
-      title: 'Tool-Tips: An oder Aus?',
-      body: 'DealPilot zeigt **Tool-Tips** bei vielen Feldern (kleines ?-Symbol). Magst du sie eingeblendet oder lieber aus?',
-      bodyMore: 'Den Schalter findest du in den **Einstellungen** unter "Profil & Anzeige" → "Tool-Tips anzeigen".\n\n**Tool-Tips AN** (Standard):\n• Schwebende Erklaerungen bei jedem Feld\n• Beispiele und Standardwerte\n• Ideal beim Einarbeiten\n\n**Tool-Tips AUS:**\n• Kompakter Look\n• Schnelleres Arbeiten wenn du DealPilot schon kennst\n• Du kannst sie spaeter jederzeit wieder aktivieren\n\nNach dieser Tour ist ein guter Zeitpunkt um zu entscheiden. Probiere beides aus.',
-      placement: 'auto'
+      title: 'Tool-Tips: Anfaenger, Profi oder Aus?',
+      body: 'DealPilot zeigt **Tool-Tips** bei vielen Feldern (kleine ?-Icons). Welcher Modus passt zu dir? **Probier es direkt aus:**',
+      bodyMore: 'Den Schalter findest du jederzeit in den Einstellungen unter "Profil & Anzeige".\n\n**Anfaenger** (Standard):\n• ALLE Tooltips eingeblendet\n• Inkl. Erklaerungen fuer DSCR, AfA, BSV, IRR\n• Beispiele und Standardwerte\n• Ideal beim Einarbeiten\n\n**Profi:**\n• Nur kritische Hinweise (z.B. § 7b Sonder-AfA, 15%-Regel)\n• Anfaenger-Erklaerungen ausgeblendet\n• Kompakter Look\n\n**Aus:**\n• Keine Tooltips\n• Maximal aufgeraeumte UI\n• Du kennst alles auswendig\n\nDu kannst jederzeit zwischen den Modi wechseln.',
+      placement: 'center',
+      customAction: 'tooltip-mode'
     },
 
     {

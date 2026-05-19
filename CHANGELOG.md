@@ -1,5 +1,40 @@
 # DealPilot Changelog
 
+## V1.1.239.6 - 2026-05-19
+
+### Tour Hotfix: Tool-Tips-Toggle + klarere Body-Texte
+
+**Neu: Tool-Tips-Step mit echtem Toggle**
+
+Der User kann jetzt direkt in der Tour zwischen 3 Tooltip-Modi waehlen:
+- **Aus** - keine Tooltips
+- **Profi** - nur kritische Hinweise (§7b, 15%-Regel etc.)
+- **Anfaenger** (Standard) - alle Tooltips angezeigt
+
+Implementiert ueber:
+- `customAction: 'tooltip-mode'` in Step-Definition
+- Engine rendert 3 Toggle-Buttons in der Bubble
+- Klick ruft `window.DpTip.setMode(mode)` (existierende V228-API)
+- Status-Indikator zeigt aktuellen Modus + Bestaetigung nach Wechsel
+
+**Step 3 (Quick-Check) Body klarer:**
+- Vorher: generischer Text zum Quick-Check
+- Jetzt: "Der **goldene Quick-Check-Button** in der Sidebar (gespotlightet)..."
+- User versteht sofort WO der Spotlight zeigt
+
+**Step 20 (Bank-PDF) Body klarer:**
+- Vorher: "Das bank-fertige Investment-PDF"
+- Jetzt: "Der **Bankexport-Button** in der Sidebar (gespotlightet)..."
+- Selektor verschaerft auf #sb-actions-accordion-Kontext
+
+### Geaenderte Dateien
+- `frontend/js/tour-engine.js` - customAction-Rendering + Toggle-Handler
+- `frontend/js/tour-content.js` - Step 3+20 Bodies + Step 22 customAction
+- `frontend/css/tour.css` - .dp-tour-toggle-btn Styling
+- `frontend/index.html` - Cache-Bump v=239_6
+- `frontend/js/config.js` - V1.1.239.6
+
+
 ## V1.1.239.5 - 2026-05-19
 
 ### Tour Hotfix: Sidebar-Accordion echtes Brute-Force
