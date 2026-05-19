@@ -1,5 +1,56 @@
 # DealPilot Changelog
 
+## V1.1.234 — 2026-05-19
+
+### Quick-Win-Sammelpatch: Neubau-Auto-AfA + Stripe-Plan-Logik
+
+**Feature 1: Neubau-Erkennung → AfA automatisch auf 3 %**
+
+Wenn User im Tab Objekt unter "Zustand der Wohnung" *Neubau / kernsaniert*
+auswählt, wird der AfA-Satz im Tab Steuer automatisch auf **3,0 % linear**
+gesetzt (Standard für Neubau-Wohnzwecke ab 2023).
+
+- Auto-Update nur wenn aktueller AfA-Satz noch auf Default 2,0 % steht
+  (User-Eingaben werden nicht überschrieben)
+- Toast-Benachrichtigung: "🏗️ Neubau erkannt — AfA-Satz auf 3,0 % linear gesetzt"
+- Goldener Hinweis-Banner unter AfA-Satz-Select erscheint bei Neubau:
+  Erinnert an Option "5,0 % degressiv mit Wechsel" nach § 7 Abs. 5a EStG
+
+**Feature 2: Stripe-Plan-Doppelklick-Schutz**
+
+Vorher: User klickt im Pricing-Modal auf seinen aktuellen Plan → wird zu
+Stripe Checkout geschickt und zahlt nochmal / kommt in einen kaputten Flow.
+
+Jetzt: Vor `Sub.startCheckout()` wird geprüft ob User schon auf diesem Plan
+ist. Wenn ja → Confirm-Dialog: "Du bist bereits auf dem X-Plan. Möchtest
+du dein Abo verwalten?" → Klick auf JA öffnet Customer-Portal.
+
+**Feature 3: Customer-Portal prominenter in Settings**
+
+Vorher: "Abo verwalten →" Link war nur in pricing-modal versteckt unter
+den Plan-Cards, und nur wenn Plan != free.
+
+Jetzt: Im Settings-Modal → Plan-Tab gibt es eine eigene "🔧 Abo verwalten"
+Card mit Button "→ Zum Kundenportal". Funktioniert für alle bezahlten Pläne.
+Für Free-User: Hinweis dass Verwaltung erst nach Abo-Abschluss verfügbar.
+
+Über das Stripe-Kundenportal kann User:
+- Plan upgraden / downgraden (mit Proration)
+- Abo kündigen (zum Periodenende)
+- Zahlungsmethode ändern
+- Rechnungen einsehen / herunterladen
+
+### Architektur-Notiz
+Backend (`POST /api/v1/subscription/portal`) existiert und funktioniert
+seit V181 — V234 macht es nur sichtbar und schaltet den Doppelklick-Bug
+ab. Kein Backend-Rebuild nötig.
+
+### Was NICHT in V234 ist
+- Welcome-Mail nach Stripe-Checkout (für V235)
+- Stripe Live-Mode-Vorbereitung (AGB, Datenschutz, Live-Keys)
+- Onboarding-Wizard, First-Start-Tour (eigene größere Versionen)
+
+
 ## V1.1.233 — 2026-05-19
 
 ### Mobile-Fixes für iPhone-Safari (Marcel-Feedback)

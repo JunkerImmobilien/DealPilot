@@ -1492,6 +1492,38 @@ function _renderPlanPane() {
     html += '</div></div>';
   }
 
+  // V234: Customer-Portal-Block — nur sichtbar wenn Plan != free
+  // Defensiv: currentPlanKey aus DealPilotConfig holen falls nicht im Scope
+  var _v234CurrentPlan = 'free';
+  try {
+    if (typeof currentPlanKey !== 'undefined' && currentPlanKey) {
+      _v234CurrentPlan = currentPlanKey;
+    } else if (typeof DealPilotConfig !== 'undefined' && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.currentKey === 'function') {
+      _v234CurrentPlan = DealPilotConfig.pricing.currentKey() || 'free';
+    }
+  } catch (e) {}
+
+  if (_v234CurrentPlan !== 'free') {
+    html +=
+      '<div class="v234-portal-block" style="margin-top:24px;padding:18px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.20);border-radius:8px">' +
+        '<div style="font-size:13px;font-weight:600;color:var(--gold-d,#8a6f27);margin-bottom:6px">' +
+          '🔧 Abo verwalten' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">' +
+          'Plan wechseln, kündigen, Zahlungsmethode ändern, Rechnungen einsehen — alles über das Stripe-Kundenportal.' +
+        '</div>' +
+        '<a href="#" class="v234-customer-portal-link" onclick="if(typeof Sub!==\'undefined\'&&Sub.openPortal)Sub.openPortal();return false">' +
+          '→ Zum Kundenportal' +
+        '</a>' +
+      '</div>';
+  } else {
+    html +=
+      '<div style="margin-top:24px;padding:14px;background:rgba(201,168,76,0.04);border:1px dashed rgba(201,168,76,0.20);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.5">' +
+        '<strong style="color:var(--gold-d,#8a6f27)">Hinweis:</strong> Du bist aktuell auf dem kostenlosen Plan. ' +
+        'Sobald du ein Abo abschließt, kannst du es hier jederzeit verwalten oder kündigen.' +
+      '</div>';
+  }
+
   // V180: Stripe-Hinweis entfernt — Stripe ist jetzt der einzige Flow.
   return html;
 }

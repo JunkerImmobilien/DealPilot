@@ -293,6 +293,49 @@ body.dp-tt-off .dp-tip-infobox {
   font-weight: 400;
 }
 </style>
+
+<style id="v234-styles">
+.v234-neubau-banner {
+  display: none;
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(245,236,208,0.50));
+  border: 1px solid rgba(201,168,76,0.30);
+  border-left: 3px solid var(--gold, #C9A84C);
+  border-radius: 6px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--gold-3, #9a7f33);
+}
+.v234-neubau-banner strong { color: var(--gold-d, #8a6f27); }
+.v234-neubau-banner .v234-banner-icon {
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 14px;
+  vertical-align: -1px;
+}
+.v234-customer-portal-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(201,168,76,0.10);
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 6px;
+  color: var(--gold-3, #9a7f33);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.v234-customer-portal-link:hover {
+  background: rgba(201,168,76,0.18);
+  border-color: var(--gold, #C9A84C);
+  color: var(--gold-d, #8a6f27);
+}
+</style>
 </head>
 <body>
 
@@ -743,7 +786,7 @@ body.dp-tt-off .dp-tip-infobox {
           </select>
         </div>
         <div class="f"><label>Zustand der Wohnung <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
-          <select id="ds2_zustand" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+          <select id="ds2_zustand" onchange="if(typeof window._v234OnZustandChange==='function')window._v234OnZustandChange(this);if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
             <option value="">– bitte wählen –</option>
             <option value="neubau">Neubau / kernsaniert</option>
             <option value="gut">Guter Zustand</option>
@@ -1310,7 +1353,15 @@ body.dp-tt-off .dp-tip-infobox {
           <option value="5.0_deg">5,0 % degressiv — ohne Wechsel</option>
           <option value="5.0_deg_wechsel">5,0 % degressiv mit Wechsel auf 3% linear (empfohlen)</option>
         </optgroup>
-      </select></div>
+      </select>
+      <div id="v234-neubau-afa-banner" class="v234-neubau-banner">
+        <span class="v234-banner-icon">🏗️</span>
+        <strong>Neubau-Hinweis:</strong> Bei Neubauten (Bauantrag 10/2023–09/2029) ist auch
+        <strong>degressive AfA mit 5 %</strong> nach § 7 Abs. 5a EStG möglich.
+        In den ersten Jahren deutlich höhere AfA, später Wechsel auf 3 % linear empfohlen.
+        Wähle dazu oben "<em>5,0 % degressiv mit Wechsel auf 3 % linear (empfohlen)</em>".
+      </div>
+    </div>
       <div class="f">
               <label>Gebäudeanteil am KP (%) <button type="button" class="dp-tip" data-tip-id="tab4.geb_anteil" tabindex="-1" aria-label="Hilfe zu tab4.geb_anteil"></button></label>
               <div class="iw"><input id="geb_ant" type="text" inputmode="decimal" value="80" class="tr" oninput="calc()"><span class="sfx">%</span></div>
@@ -2618,7 +2669,7 @@ body.dp-tt-off .dp-tip-infobox {
 <script src="js/datenraum.js?v=160"></script>
 <script src="js/tooltip-content.js?v=2281"></script>
   <script src="js/tooltip-engine.js?v=228"></script>
-  <script src="js/settings.js?v=2283"></script>
+  <script src="js/settings.js?v=234"></script>
 <script src="js/pricing-modal.js?v=197-2"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=160"></script>
@@ -2741,6 +2792,97 @@ body.dp-tt-off .dp-tip-infobox {
       return resp;
     });
   };
+})();
+</script>
+
+<!-- V234: Neubau-Erkennung Auto-AfA + Stripe-Doppelklick-Schutz -->
+<script id="v234-helpers">
+(function () {
+  'use strict';
+
+  /**
+   * V234: Bei Auswahl von "Neubau / kernsaniert" im Tab Objekt:
+   * - Setze AfA-Satz auf 3.0% linear (Standard für Wohnzwecke ab 2023)
+   * - Zeige Hinweis-Banner zur degressiven AfA (5%, § 7 Abs. 5a EStG)
+   */
+  window._v234OnZustandChange = function (selectEl) {
+    var zustand = selectEl && selectEl.value ? selectEl.value : '';
+    var afaSelect = document.getElementById('afa_satz');
+    var banner = document.getElementById('v234-neubau-afa-banner');
+
+    if (zustand === 'neubau') {
+      // Nur setzen wenn aktuell auf 2.0 (Default) — nicht überschreiben falls User schon was anderes wählte
+      if (afaSelect && (afaSelect.value === '2.0' || afaSelect.value === '')) {
+        afaSelect.value = '3.0';
+        // onchange triggern damit AfA-Berechnung neu läuft
+        if (typeof window.onAfaSatzChange === 'function') {
+          window.onAfaSatzChange();
+        }
+        if (typeof toast === 'function') {
+          toast('🏗️ Neubau erkannt — AfA-Satz auf 3,0 % linear gesetzt');
+        }
+      }
+      // Banner einblenden
+      if (banner) banner.style.display = 'block';
+    } else {
+      // Banner ausblenden wenn nicht-Neubau
+      if (banner) banner.style.display = 'none';
+    }
+  };
+
+  /**
+   * V234: Init beim Laden — prüfe ob ds2_zustand schon auf "neubau" steht
+   * (z.B. nach PDF-Import oder geladenem Deal) und blende Banner ein.
+   */
+  function _v234InitNeubauBanner() {
+    var zustand = (document.getElementById('ds2_zustand') || {}).value || '';
+    var banner = document.getElementById('v234-neubau-afa-banner');
+    if (banner && zustand === 'neubau') {
+      banner.style.display = 'block';
+    }
+  }
+  // Beim Document-Ready + nach kurzem Delay (für asynchrone Loads)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _v234InitNeubauBanner);
+  } else {
+    _v234InitNeubauBanner();
+  }
+  setTimeout(_v234InitNeubauBanner, 500);
+  setTimeout(_v234InitNeubauBanner, 1500);
+
+  /**
+   * V234: Stripe-Plan-Doppelklick-Schutz.
+   * Wird VOR Sub.startCheckout() aufgerufen — prüft ob User schon auf dem
+   * geklickten Plan ist und bietet stattdessen Customer-Portal an.
+   *
+   * @param {string} planKey - Geklickter Plan (free/starter/investor/pro)
+   * @returns {Promise<boolean>} true wenn Checkout fortsetzen, false wenn abgebrochen
+   */
+  window._v234CheckPlanBeforeCheckout = async function (planKey) {
+    if (typeof Sub === 'undefined' || typeof Sub.getCurrent !== 'function') {
+      return true; // Sub nicht da — Checkout normal weitermachen
+    }
+    try {
+      var current = await Sub.getCurrent();
+      if (!current || !current.plan_id) return true;
+      if (current.plan_id !== planKey) return true;
+
+      // User klickt auf seinen aktuellen Plan
+      var planLabel = planKey.charAt(0).toUpperCase() + planKey.slice(1);
+      var msg = 'Du bist bereits auf dem ' + planLabel + '-Plan.\n\n' +
+                'Möchtest du dein Abo verwalten (kündigen, Zahlungsmethode ändern, Rechnungen einsehen)?';
+      if (confirm(msg)) {
+        if (typeof Sub.openPortal === 'function') {
+          await Sub.openPortal();
+        }
+      }
+      return false; // Checkout NICHT fortsetzen
+    } catch (e) {
+      console.warn('[v234] Plan-Check fehlgeschlagen:', e);
+      return true; // Fail-Safe: Checkout zulassen
+    }
+  };
+
 })();
 </script>
 </body>

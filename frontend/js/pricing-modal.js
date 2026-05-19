@@ -603,6 +603,15 @@
     var interval = (period === 'yearly') ? 'yearly' : 'monthly';
 
     try {
+      // V234: Doppelklick-Schutz — wenn User schon auf diesem Plan ist,
+      // biete Customer-Portal statt erneutem Checkout an.
+      if (typeof window._v234CheckPlanBeforeCheckout === 'function') {
+        var shouldContinue = await window._v234CheckPlanBeforeCheckout(planKey);
+        if (!shouldContinue) {
+          console.log('[pricing-modal V234] Checkout abgebrochen — User bereits auf', planKey);
+          return;
+        }
+      }
       await Sub.startCheckout(planKey, interval);
       // Erfolg: Browser redirected zu Stripe — falls hier ankommen, ist was schiefgelaufen
     } catch (e) {
