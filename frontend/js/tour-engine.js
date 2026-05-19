@@ -155,28 +155,31 @@
   }
 
   // V239.1: Stelle sicher, dass ein Objekt geladen ist (sonst leere Donuts)
+  // V239.7: MouseEvent statt .click() weil Sidebar-Cards Event-Delegation nutzen
   function _ensureObjectLoaded() {
     return new Promise(function(resolve) {
-      // Schon Daten vorhanden?
+      // Schon ein Objekt aktiv?
+      var hdrObj = document.querySelector('#hdr-obj');
+      if (hdrObj && hdrObj.textContent && hdrObj.textContent.trim() !== 'Neues Objekt') {
+        return resolve(true);
+      }
       var kp = document.querySelector('#kp');
       if (kp && kp.value && kp.value.length > 0) {
         return resolve(true);
       }
-      var donut = document.querySelector('#bc-cockpit .ds-donut, #dealscore-card .ds-donut');
-      if (donut) {
-        return resolve(true);
-      }
-      // Erstes Sidebar-Element klicken
-      var firstItem = document.querySelector('#sb-list > *:first-child');
+      // Erstes Sidebar-Element klicken via MouseEvent
+      var firstItem = document.querySelector('#sb-list > .sb-card, #sb-list > *:first-child');
       if (firstItem) {
-        if (firstItem.tagName === 'BUTTON' || firstItem.tagName === 'A') {
-          try { firstItem.click(); } catch(e) { console.warn('[DpTour V239.1] sidebar-click error:', e); }
-        } else {
-          var clickable = firstItem.querySelector('button, a, [onclick]') || firstItem;
-          try { clickable.click(); } catch(e) {}
+        try {
+          firstItem.dispatchEvent(new MouseEvent('click', {
+            bubbles: true, cancelable: true, view: window
+          }));
+        } catch(e) {
+          try { firstItem.click(); } catch(e2) {
+            console.warn('[DpTour V239.7] click failed:', e2);
+          }
         }
-        // Warten bis Render fertig
-        setTimeout(function() { resolve(true); }, 1500);
+        setTimeout(function() { resolve(true); }, 1800);
       } else {
         resolve(false);
       }
@@ -633,22 +636,56 @@
   function _ensureCorrectTab(step, callback) {
     if (!step.tab) return callback();
     var current = _currentSection();
-    if (step.tab === 'sidebar' || step.tab === 'header' || step.tab === 'settings') {
-      // V239.4: Bei Sidebar-Steps: Aktionen-Accordion aufklappen
-      if (step.tab === 'sidebar') {
+    
+    // V239.7: Bei Sidebar-Steps: Accordion aufklappen + WARTEN bis Render
+    if (step.tab === 'sidebar') {
+      _expandSidebarActionsIfCollapsed();
+      // Doppel-Expand: einmal sofort, einmal nach 200ms (CSS-Animation)
+      setTimeout(function() {
         _expandSidebarActionsIfCollapsed();
-      }
+        callback();
+      }, 300);
+      return;
+    }
+    
+    if (step.tab === 'header' || step.tab === 'settings') {
       return callback();
     }
+    
+    // V239.7: Vor Tab-Steps (s0-s8, ausser s-quick): Stelle sicher dass ein
+    //   Objekt aktiv ist. User kann nach Step 6 (QC-Save) ein neues Objekt
+    //   angelegt haben, aber das Original-Demo-Objekt sollte fuer die
+    //   Tab-Tour wieder aktiv sein.
+    if (step.tab && step.tab.indexOf('s') === 0 && step.tab !== 's-quick') {
+      var hdrObj = document.querySelector('#hdr-obj');
+      var noObject = !hdrObj || !hdrObj.textContent || hdrObj.textContent.trim() === 'Neues Objekt';
+      if (noObject) {
+        console.log('[DpTour V239.7] Kein Objekt aktiv -> erstes Sidebar-Item klicken');
+        var firstCard = document.querySelector('#sb-list > .sb-card, #sb-list > *:first-child');
+        if (firstCard) {
+          try {
+            firstCard.dispatchEvent(new MouseEvent('click', {
+              bubbles: true, cancelable: true, view: window
+            }));
+          } catch(e) {
+            try { firstCard.click(); } catch(e2) {}
+          }
+          // Warten bis Objekt geladen, DANN Tab-Switch
+          setTimeout(function() {
+            if (current !== step.tab) _switchToTab(step.tab);
+            setTimeout(callback, 600);
+          }, 1500);
+          return;
+        }
+      }
+    }
+    
     if (current === step.tab) return callback();
     var ok = _switchToTab(step.tab);
     if (!ok) {
       console.warn('[DpTour V239] Tab-Switch fehlgeschlagen: ' + step.tab);
     }
     // V239: Laengere Pause fuer s-quick/s8 die dynamisch rendern
-    // V239.1: s8 braucht noch mehr Zeit (deal-action.js rendert ganzen Tab)
-    // V239.2: s-quick auch auf 1500ms (enterQuickCheckMode + show braucht Zeit)
-    // V239.3: bei QC-Exit Uebergang auch 900ms warten
     var pause = 400;
     if (step.tab === 's-quick') pause = 1500;
     if (step.tab === 's8') pause = 1500;
