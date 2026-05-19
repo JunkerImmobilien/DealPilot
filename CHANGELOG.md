@@ -1,5 +1,73 @@
 # DealPilot Changelog
 
+## V1.1.238.1 - 2026-05-19
+
+### Tour Premium-Redesign (Feedback-Modal-Style)
+
+**Problem mit V238:**
+Tour-Overlay zu milchig (Blur 6px) - App nicht mehr erkennbar.
+Emoji-Icons unprofessionell, Bubble-Design zu schmucklos.
+Texte zu kurz fuer Finanzprofi-Kontext.
+
+**V238.1 Loesung - kompletter Redesign:**
+
+1. **Overlay-Blur reduziert** (6px -> 2px) + dunkler Background statt Goldton.
+   App bleibt erkennbar, Spotlight funktioniert weiter.
+
+2. **Bubble komplett neu:** dunkles Glass-Theme wie Feedback-Modal:
+   - Schwarzer Background `linear-gradient(135deg, rgba(15,12,5,1), rgba(8,6,4,1))`
+   - 1.5px Gold-Border (#C9A84C)
+   - Gold-Glow-Halo oben
+   - Box-Shadow mit Tiefe (30px / 80px)
+   - Inset-Highlight oben (Glass-Effect)
+
+3. **Serif-Headlines:** Cormorant Garamond fuer Titel (wie .fb-head-title).
+   28px, Weight 600, Letterspacing -0.01em.
+
+4. **SVG-Icons statt Emojis:** Bestehende Sprite-IDs aus index.html verwendet:
+   - Step 1: `#i-flame` (Quick-Check)
+   - Step 2: `#i-brain` (KI-Recherche)
+   - Step 3: `#i-piggy-bank` (Speichern)
+   - Step 4: `#i-layers` (Tab-Bar)
+   - Step 5: `#i-flag` (Pflichtfelder)
+   - Step 6: `#i-bank` (Finanzierung)
+   - Step 7: `#i-pin` (KI-Lage)
+   - Step 8: `#i-gauge` (Bewertung)
+   - Step 9: `#i-cpu` (Stress-Test)
+   - Step 10: `#i-file-text` (PDF)
+   - Step 11: `#i-portfolio` (Sidebar)
+   - Step 12: `#i-bulb` (Hilfe)
+
+5. **"Mehr erfahren"-Aufklapper:** Kurzer Body (1-2 Saetze) default sichtbar.
+   Button "Mehr erfahren" mit Chevron klappt detaillierten Text auf:
+   - Konkrete Zahlen und Beispiele
+   - Bullet-Listen mit allen Features
+   - Plan-spezifische Limits
+   - Pro-Tipps
+   Bei Step-Wechsel automatisch wieder eingeklappt.
+
+6. **Eyebrow-Pill** "SCHRITT X VON 12" wie .fb-head-eyebrow:
+   10px, Letterspacing 0.18em, Caps, Gold-Color, mit SVG-Icon-Pill links.
+
+7. **Buttons im Dark-Theme:**
+   - Primary: Gold-Gradient mit Box-Shadow
+   - Secondary: Glass mit White-Border-Hover
+   - Ghost: Transparent, Gold on Hover
+   - SVG-Pfeile in den Buttons (chevron-left/right, checkmark)
+
+### Geaenderte Dateien
+- `frontend/css/tour.css` - komplett neu, ~370 Zeilen
+- `frontend/js/tour-engine.js` - V238.1-Header + toggleMore() + Markup
+- `frontend/js/tour-content.js` - alle 12 Steps mit body + bodyMore + icon
+- `frontend/index.html` - Cache-Bump v=238_1
+- `frontend/js/config.js` - V1.1.238.1
+
+### Was V238.1 NICHT macht
+- Animationen sind subtil gehalten - keine ueberladenen Effekte
+- Particles-Backdrop wie Feedback-Modal nicht uebernommen (zu viel fuer Tour)
+- Keyboard-Shortcuts unveraendert (ESC, Pfeile, Enter)
+
+
 ## V1.1.238 - 2026-05-19
 
 ### First-Start-Tour mit Glassmorphism-Overlay

@@ -1,18 +1,17 @@
 /**
- * DealPilot V238 — First-Start-Tour Engine
+ * DealPilot V238.1 — First-Start-Tour Engine (Premium-Redesign)
  *
- * Modernes Glassmorphism-Overlay mit Spotlight-Highlight.
- * 12 Schritte führen Neukunden durch alle wichtigen Bereiche der App.
+ * Dunkler Premium-Look wie Feedback-Modal.
+ * Mit ausklappbarem "Mehr erfahren"-Bereich.
  *
  * Public API:
- *   window.DpTour.start()        — startet Tour (auch wieder bei nochmal-Aufruf)
- *   window.DpTour.next()         — nächster Schritt
- *   window.DpTour.prev()         — voriger Schritt
- *   window.DpTour.skip()         — alle weiteren Schritte überspringen (markiert als completed)
- *   window.DpTour.exit()         — Tour schließen (markiert NICHT als completed → kommt nächstes Mal wieder)
- *   window.DpTour.complete()     — Tour als abgeschlossen markieren
- *   window.DpTour.isComplete()   — checkt ob User Tour schon gemacht hat
- *   window.DpTour.reset()        — löscht Completed-Marker (für "Tour nochmal starten")
+ *   window.DpTour.start()        — startet Tour
+ *   window.DpTour.next() / prev() — Navigation
+ *   window.DpTour.skip()         — alle weiteren Steps überspringen
+ *   window.DpTour.exit()         — schließen (kommt nächstes Mal wieder)
+ *   window.DpTour.complete()     — als abgeschlossen markieren
+ *   window.DpTour.isComplete()
+ *   window.DpTour.reset()
  *
  * Tour-Steps werden via window.DpTourSteps (tour-content.js) geladen.
  */
@@ -21,11 +20,11 @@
 
   var STORAGE_KEY = 'dp_tour_completed_v1';
 
-  // ─── State ────────────────────────────────────────────────────────────
   var state = {
     steps: [],
     idx: 0,
     active: false,
+    expanded: false,  // V238.1: ist "Mehr erfahren" aufgeklappt?
     overlay: null,
     spotlight: null,
     bubble: null,
@@ -33,7 +32,7 @@
     onKeydown: null
   };
 
-  // ─── Utility-Funktionen ───────────────────────────────────────────────
+  // ─── Utility ─────────────────────────────────────────────────────────
 
   function _wait(ms) {
     return new Promise(function(r) { setTimeout(r, ms); });
@@ -62,7 +61,6 @@
   }
 
   function _scrollIntoView(el) {
-    // V236-Lesson: scrollen muss via .main-col, nicht window
     try {
       var mainCol = document.querySelector('.main-col');
       if (mainCol) {
@@ -82,7 +80,6 @@
   }
 
   function _switchToTab(targetSec) {
-    // Quick-Check ist Standalone-View
     if (targetSec === 's-quick') {
       if (typeof window.showQuickCheck === 'function') {
         window.showQuickCheck();
@@ -90,11 +87,9 @@
       }
       return false;
     }
-    // Sidebar/Header sind keine Tabs
     if (targetSec === 'sidebar' || targetSec === 'header') {
       return true;
     }
-    // Standard-Tabs s0-s8
     var tab = document.querySelector('.tab[data-target-sec="' + targetSec + '"]');
     if (tab) {
       tab.click();
@@ -103,7 +98,7 @@
     return false;
   }
 
-  // ─── Glassmorphism-Overlay-Erstellung ─────────────────────────────────
+  // ─── Overlay-Erstellung ──────────────────────────────────────────────
 
   function _createOverlay() {
     if (state.overlay) return;
@@ -125,7 +120,6 @@
     document.body.appendChild(b);
     state.bubble = b;
 
-    // Sofort body-Klasse für UI-Sperren (kein Scroll der Hauptseite)
     document.body.classList.add('dp-tour-active');
   }
 
@@ -139,7 +133,7 @@
     document.body.classList.remove('dp-tour-active');
   }
 
-  // ─── Spotlight-Positionierung ─────────────────────────────────────────
+  // ─── Spotlight-Position ──────────────────────────────────────────────
 
   function _positionSpotlight(el) {
     if (!state.spotlight || !el) return;
@@ -156,12 +150,11 @@
     if (state.spotlight) state.spotlight.style.display = 'none';
   }
 
-  // ─── Bubble-Positionierung (smart placement) ──────────────────────────
+  // ─── Bubble-Position (smart placement) ───────────────────────────────
 
   function _positionBubble(el, preferredPlacement) {
     if (!state.bubble) return;
 
-    // Falls kein Element: Bubble zentriert anzeigen
     if (!el || preferredPlacement === 'center') {
       state.bubble.style.top = '50%';
       state.bubble.style.left = '50%';
@@ -174,15 +167,14 @@
     state.bubble.classList.remove('dp-tour-bubble-center');
 
     var rect = el.getBoundingClientRect();
-    var bw = state.bubble.offsetWidth || 360;
-    var bh = state.bubble.offsetHeight || 200;
+    var bw = state.bubble.offsetWidth || 460;
+    var bh = state.bubble.offsetHeight || 280;
     var vw = window.innerWidth;
     var vh = window.innerHeight;
     var margin = 20;
 
     var placement = preferredPlacement || 'auto';
 
-    // Auto-Erkennung wenn nichts vorgegeben
     if (placement === 'auto') {
       if (rect.bottom + bh + margin < vh)      placement = 'bottom';
       else if (rect.top - bh - margin > 0)     placement = 'top';
@@ -211,7 +203,7 @@
         top  = Math.max(margin, Math.min(vh - bh - margin, rect.top + rect.height / 2 - bh / 2));
         left = rect.left - bw - 16;
         break;
-      default: // center
+      default:
         state.bubble.classList.add('dp-tour-bubble-center');
         return _positionBubble(null, 'center');
     }
@@ -222,7 +214,7 @@
     state.bubble.classList.add('dp-tour-bubble-' + placement);
   }
 
-  // ─── Bubble-Content-Rendering ─────────────────────────────────────────
+  // ─── Bubble-Content (Premium-Redesign) ───────────────────────────────
 
   function _renderBubbleContent(step) {
     if (!state.bubble) return;
@@ -233,28 +225,70 @@
     var isFirst = state.idx === 0;
     var isLast = state.idx === total - 1;
 
+    // Icon — SVG-Sprite-Reference
+    var iconId = step.icon || 'i-bulb';
+    var hasMore = !!step.bodyMore;
+
     var html = '';
-    html += '<div class="dp-tour-bubble-header">';
-    html += '  <div class="dp-tour-step-counter">Schritt ' + stepNo + ' von ' + total + '</div>';
-    html += '  <button class="dp-tour-close" type="button" aria-label="Tour schließen">×</button>';
+    
+    // Glow-Halo (CSS-pseudo)
+    html += '<div class="dp-tour-close-wrap">';
+    html += '  <button class="dp-tour-close" type="button" aria-label="Tour schließen">';
+    html += '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    html += '  </button>';
     html += '</div>';
-    html += '<div class="dp-tour-bubble-body">';
-    html += '  <div class="dp-tour-title">' + _escapeHtml(step.title || '') + '</div>';
-    html += '  <div class="dp-tour-text">' + _renderMarkdown(step.body || '') + '</div>';
+
+    // Header — Eyebrow + Serif-Title
+    html += '<div class="dp-tour-head">';
+    html += '  <div class="dp-tour-eyebrow">';
+    html += '    <span class="dp-tour-eyebrow-ic"><svg><use href="#' + iconId + '"/></svg></span>';
+    html += '    Schritt ' + stepNo + ' von ' + total;
+    html += '  </div>';
+    html += '  <h2 class="dp-tour-title">' + _escapeHtml(step.title || '') + '</h2>';
     html += '</div>';
+
+    // Body
+    html += '<div class="dp-tour-body">';
+    html += '  <div class="dp-tour-text dp-tour-text-short">' + _renderMarkdown(step.body || '') + '</div>';
+    
+    if (hasMore) {
+      var expandedClass = state.expanded ? 'dp-tour-expanded' : '';
+      html += '  <button class="dp-tour-more-toggle ' + expandedClass + '" type="button" data-action="toggle-more">';
+      html += '    <span class="dp-tour-more-text">' + (state.expanded ? 'Weniger anzeigen' : 'Mehr erfahren') + '</span>';
+      html += '    <svg class="dp-tour-more-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+      html += '  </button>';
+      
+      if (state.expanded) {
+        html += '  <div class="dp-tour-text dp-tour-text-more">' + _renderMarkdown(step.bodyMore) + '</div>';
+      }
+    }
+    html += '</div>';
+
+    // Progress
     html += '<div class="dp-tour-progress">';
     html += '  <div class="dp-tour-progress-bar"><div class="dp-tour-progress-fill" style="width:' + progressPct + '%"></div></div>';
     html += '</div>';
-    html += '<div class="dp-tour-bubble-footer">';
+
+    // Footer
+    html += '<div class="dp-tour-foot">';
     html += '  <button type="button" class="dp-tour-btn dp-tour-btn-ghost" data-action="skip">Tour überspringen</button>';
     html += '  <div class="dp-tour-nav">';
     if (!isFirst) {
-      html += '    <button type="button" class="dp-tour-btn dp-tour-btn-secondary" data-action="prev">← Zurück</button>';
+      html += '    <button type="button" class="dp-tour-btn dp-tour-btn-secondary" data-action="prev">';
+      html += '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+      html += '      Zurück';
+      html += '    </button>';
     }
     if (isLast) {
-      html += '    <button type="button" class="dp-tour-btn dp-tour-btn-primary" data-action="complete">Fertig ✓</button>';
+      html += '    <button type="button" class="dp-tour-btn dp-tour-btn-primary" data-action="complete">';
+      html += '      Fertig';
+      html += '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      html += '    </button>';
     } else {
-      html += '    <button type="button" class="dp-tour-btn dp-tour-btn-primary" data-action="next">Weiter →</button>';
+      html += '    <button type="button" class="dp-tour-btn dp-tour-btn-primary" data-action="next">';
+      html += '      Weiter';
+      html += '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+      html += '    </button>';
     }
     html += '  </div>';
     html += '</div>';
@@ -262,7 +296,8 @@
     state.bubble.innerHTML = html;
 
     // Event-Handlers
-    state.bubble.querySelector('.dp-tour-close').addEventListener('click', function() { Tour.exit(); });
+    var closeBtn = state.bubble.querySelector('.dp-tour-close');
+    if (closeBtn) closeBtn.addEventListener('click', function() { Tour.exit(); });
     var btnNext = state.bubble.querySelector('[data-action="next"]');
     if (btnNext) btnNext.addEventListener('click', function() { Tour.next(); });
     var btnPrev = state.bubble.querySelector('[data-action="prev"]');
@@ -271,6 +306,8 @@
     if (btnSkip) btnSkip.addEventListener('click', function() { Tour.skip(); });
     var btnDone = state.bubble.querySelector('[data-action="complete"]');
     if (btnDone) btnDone.addEventListener('click', function() { Tour.complete(); });
+    var btnMore = state.bubble.querySelector('[data-action="toggle-more"]');
+    if (btnMore) btnMore.addEventListener('click', function() { Tour.toggleMore(); });
   }
 
   function _escapeHtml(s) {
@@ -278,12 +315,9 @@
   }
 
   function _renderMarkdown(s) {
-    // Whitelist-Approach: bestehender HTML im Body wird durchgereicht, aber nur
-    // sichere Tags. Plus Markdown-mini: *fett* und ||Sektion||
     s = String(s);
-    // Erlaubt: <b>, <strong>, <i>, <em>, <br>
-    // Alles andere: escape
-    var allowed = /<\/?(?:b|strong|i|em|br)\s*\/?>/gi;
+    // Whitelist HTML: b, strong, i, em, br
+    var allowed = /<\/?(?:b|strong|i|em|br|u)\s*\/?>/gi;
     var placeholders = [];
     s = s.replace(allowed, function(m) {
       placeholders.push(m);
@@ -293,24 +327,25 @@
     s = s.replace(/\u0001(\d+)\u0001/g, function(m, i) { return placeholders[+i]; });
     // Mini-Markdown
     s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    // Listen mit • Bullet bekommen Wrapper
     s = s.replace(/\n\n/g, '<br><br>');
     s = s.replace(/\n/g, '<br>');
     return s;
   }
 
-  // ─── Tour-Step ausführen ──────────────────────────────────────────────
+  // ─── Step rendern ────────────────────────────────────────────────────
 
   function _renderStep() {
     var step = state.steps[state.idx];
     if (!step) return;
 
+    // V238.1: bei Step-Wechsel das "Mehr erfahren" wieder einklappen
+    state.expanded = false;
+
     _ensureCorrectTab(step, function() {
-      // Element finden mit Retries (Tab-Wechsel braucht Zeit)
       _findElementWithRetry(step.selector, 8, 150).then(function(el) {
         if (!el) {
-          // Element nicht gefunden — Schritt überspringen
-          console.warn('[DpTour] Element nicht gefunden für Step ' + (state.idx + 1) + ': ' + step.selector);
-          // Falls placement='center' war, ist das gewollt (Step ohne Spotlight)
+          console.warn('[DpTour] Element nicht gefunden: ' + step.selector);
           if (step.placement === 'center') {
             _createOverlay();
             _hideSpotlight();
@@ -318,7 +353,6 @@
             _renderBubbleContent(step);
             return;
           }
-          // Sonst: Auto-Skip zum nächsten Step
           state.idx++;
           if (state.idx >= state.steps.length) {
             Tour.complete();
@@ -329,12 +363,10 @@
 
         _scrollIntoView(el);
 
-        // Kurz warten bis Scroll fertig, dann Spotlight setzen
         setTimeout(function() {
           _createOverlay();
           _positionSpotlight(el);
           _renderBubbleContent(step);
-          // Bubble nach Render positionieren (braucht offsetWidth/Height)
           setTimeout(function() {
             _positionBubble(el, step.placement);
           }, 10);
@@ -346,31 +378,29 @@
   function _ensureCorrectTab(step, callback) {
     if (!step.tab) return callback();
     var current = _currentSection();
-    // Sidebar/Header sind keine Tabs
     if (step.tab === 'sidebar' || step.tab === 'header') return callback();
     if (current === step.tab) return callback();
     var ok = _switchToTab(step.tab);
     if (!ok) {
       console.warn('[DpTour] Tab-Switch fehlgeschlagen: ' + step.tab);
     }
-    // Tab-Wechsel-Animation abwarten
     setTimeout(callback, 350);
   }
 
-  // ─── Public API ───────────────────────────────────────────────────────
+  // ─── Public API ──────────────────────────────────────────────────────
 
   var Tour = {
     start: function() {
       var steps = window.DpTourSteps;
       if (!Array.isArray(steps) || steps.length === 0) {
-        console.warn('[DpTour] Keine Steps geladen (window.DpTourSteps fehlt)');
+        console.warn('[DpTour] Keine Steps geladen');
         return false;
       }
       state.steps = steps;
       state.idx = 0;
+      state.expanded = false;
       state.active = true;
 
-      // Resize-Handler für Re-Positionierung
       state.onResize = function() {
         var step = state.steps[state.idx];
         if (!step) return;
@@ -383,7 +413,6 @@
       window.addEventListener('resize', state.onResize);
       window.addEventListener('scroll', state.onResize, true);
 
-      // Keyboard-Nav: ESC=exit, Enter/→=next, ←=prev
       state.onKeydown = function(e) {
         if (!state.active) return;
         if (e.key === 'Escape') { e.preventDefault(); Tour.exit(); }
@@ -417,7 +446,6 @@
     },
 
     exit: function() {
-      // Schließen ohne als completed zu markieren — Tour kommt nächstes Mal wieder
       _cleanup();
     },
 
@@ -432,6 +460,19 @@
 
     reset: function() {
       try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    },
+
+    // V238.1: Mehr-erfahren-Aufklapp
+    toggleMore: function() {
+      state.expanded = !state.expanded;
+      var step = state.steps[state.idx];
+      if (!step) return;
+      _renderBubbleContent(step);
+      // Re-positionieren weil Bubble jetzt höher/niedriger
+      setTimeout(function() {
+        var el = document.querySelector(step.selector);
+        if (el) _positionBubble(el, step.placement);
+      }, 20);
     }
   };
 
@@ -451,15 +492,13 @@
 
   window.DpTour = Tour;
 
-  // ─── Auto-Start nach Login (falls noch nicht abgeschlossen) ───────────
+  // ─── Auto-Start ──────────────────────────────────────────────────────
   function _maybeAutoStart() {
     try {
       var token = localStorage.getItem('ji_token');
-      if (!token) return; // Nicht eingeloggt
-      if (Tour.isComplete()) return; // Schon gemacht
-      // Tour-Content muss geladen sein
+      if (!token) return;
+      if (Tour.isComplete()) return;
       if (!Array.isArray(window.DpTourSteps) || !window.DpTourSteps.length) return;
-      // Verzögerung: warten bis App fertig gerendert ist
       setTimeout(function() {
         if (!Tour.isComplete()) Tour.start();
       }, 1800);
@@ -471,9 +510,6 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _maybeAutoStart);
   } else {
-    // Doppel-Schutz: kurz warten falls andere Skripte noch laufen
     setTimeout(_maybeAutoStart, 2500);
   }
-
-  // Auch nach Login-Reload: location.reload() in auth.js Z. 411 → DOM neu, Trigger feuert
 })();
