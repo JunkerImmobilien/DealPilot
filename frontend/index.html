@@ -840,11 +840,11 @@ textarea.v236-qc-loaded {
     <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div><div class="g2">
       <div class="f"><label class="dp-required" data-v236-required-set="1">PLZ</label><input id="plz" type="text" placeholder="z.B. 12345" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Ort *</label><input id="ort" type="text" placeholder="z.B. Musterstadt" oninput="upd()" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label>Straße</label><input id="str" type="text" placeholder="z.B. Musterstraße" oninput="upd()" autocomplete="off" data-form-type="other"></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Straße</label><input id="str" type="text" placeholder="z.B. Musterstraße" oninput="upd()" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1">Objektart</label><select id="objart"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
+      <div class="f"><label>Objektart</label><select id="objart"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
-      <div class="f"><label>Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
       <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
       <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
       <div class="f"><label>Ausstattung</label><select id="ausst"><option>Einfach</option><option selected>Normal</option><option>Gehoben</option><option>Luxus</option></select></div>
@@ -1236,7 +1236,7 @@ textarea.v236-qc-loaded {
   <h2 class="sec-title">Miete</h2><p class="sec-desc">Mietstruktur, Nettokaltmiete und Warmmiete</p>
   <div class="col2">
     <div><div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-key"/></svg></span>Mietstruktur</div>
-      <div class="f"><label>Nettokaltmiete / Monat * <button type="button" class="dp-tip" data-tip-id="tab3.nkm" tabindex="-1" aria-label="Hilfe zu tab3.nkm"></button></label><div class="iw"><span class="pfx">€</span><input id="nkm" type="text" inputmode="decimal" placeholder="850" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Nettokaltmiete / Monat * <button type="button" class="dp-tip" data-tip-id="tab3.nkm" tabindex="-1" aria-label="Hilfe zu tab3.nkm"></button></label><div class="iw"><span class="pfx">€</span><input id="nkm" type="text" inputmode="decimal" placeholder="850" class="trl" oninput="calc()"></div></div>
       <div class="f"><label>Zusätzliche Einnahmen / Monat <button type="button" class="dp-tip" data-tip-id="tab3.ze" tabindex="-1" aria-label="Hilfe zu tab3.ze"></button></label><div class="iw"><span class="pfx">€</span><input id="ze" type="text" inputmode="decimal" placeholder="90" class="trl" oninput="calc()"></div><span class="hint">Stellplatz, Garage etc. – fließt in Nettokaltmiete + Steuerberechnung ein</span></div>
       <div class="f"><label>Umlagefähige Kosten / Monat <button type="button" class="dp-tip" data-tip-id="tab3.umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab3.umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="umlagef" type="text" inputmode="decimal" placeholder="144" class="trl" oninput="calc()"></div></div>
       <hr class="dvd">
@@ -1868,10 +1868,10 @@ textarea.v236-qc-loaded {
             <span class="info-tag">ℹ</span>
           </label>
         </div>
-        <div class="f"><label>Anfängl. Darlehenssumme *</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme *</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
         <div class="g2">
-          <div class="f"><label>Zinssatz nominal (% p.a.) <button type="button" class="dp-tip" data-tip-id="tab5.zinsbindung" tabindex="-1" aria-label="Hilfe zu tab5.zinsbindung"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-          <div class="f" id="d1t_field"><label>Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f"><label class="dp-required" data-v236-required-set="1">Zinssatz nominal (% p.a.) <button type="button" class="dp-tip" data-tip-id="tab5.zinsbindung" tabindex="-1" aria-label="Hilfe zu tab5.zinsbindung"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1">Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
         </div>
         <div class="f"><label>Monatliche Rate (berechnet)</label><div class="cf" id="d1_rate">—</div></div>
         <div class="g2">
@@ -3050,20 +3050,29 @@ textarea.v236-qc-loaded {
 })();
 </script>
 
-<!-- V236: Pflichtfeld-Validierung + Tab-Indikator + QC-Übernahme-Markierung -->
+<!-- V236.1: Pflichtfeld-Validierung + Tab-Indikator + QC-Übernahme (korrigierte Field-IDs) -->
 <script id="v236-helpers">
 (function () {
   'use strict';
 
   // ─── Konfiguration ──────────────────────────────────────────────────
-  // Pflichtfelder pro Tab (sec-id → [field-ids])
+  // V236.1: Korrigierte Field-IDs basierend auf qcSaveAsObject() Analyse
   var REQUIRED_BY_TAB = {
-    's0':     ['addr', 'plz', 'ort', 'wfl', 'bj', 'objart', 'ds2_zustand'],
+    's0':     ['str', 'plz', 'ort', 'wfl', 'baujahr', 'objektart', 'ds2_zustand'],
     's1':     ['kp'],
-    's2':     ['nkm_m'],
-    's3':     ['d1_kapital', 'd1_zins', 'd1_tilg'],
+    's2':     ['nkm'],
+    's3':     ['d1', 'd1z', 'd1t'],
     's3-tax': ['gst'],
   };
+
+  // V236.1: Felder die qcSaveAsObject() in die Vollanalyse-Felder kopiert
+  // (für QC-Übernahme-Markierung)
+  var QC_TARGET_FIELDS = [
+    'str', 'hnr', 'plz', 'ort',         // Adresse
+    'kp', 'nkm', 'ze',                  // Kaufpreis & Miete
+    'wfl', 'baujahr',                   // Objekt
+    'ek', 'd1', 'd1z', 'd1t', 'ji_p'    // Finanzierung
+  ];
 
   // ─── Helpers ────────────────────────────────────────────────────────
   function _fieldHasValue(id) {
@@ -3098,7 +3107,7 @@ textarea.v236-qc-loaded {
       var existing = tabBtn.querySelector('.v236-tab-status');
       if (existing) existing.remove();
 
-      if (status === 'none') return; // nichts anzeigen wenn nicht angefasst
+      if (status === 'none') return;
 
       var ind = document.createElement('span');
       ind.className = 'v236-tab-status';
@@ -3116,7 +3125,7 @@ textarea.v236-qc-loaded {
   }
   window._v236UpdateTabIndicators = _v236UpdateTabIndicators;
 
-  // ─── Pflichtfeld-Validierung (Visual-Feedback bei Submit/Tab-Wechsel) ─
+  // ─── Pflichtfeld-Validierung ────────────────────────────────────────
   function _v236ValidateRequired() {
     var allFields = [];
     Object.keys(REQUIRED_BY_TAB).forEach(function (sec) {
@@ -3137,7 +3146,6 @@ textarea.v236-qc-loaded {
   }
   window._v236ValidateRequired = _v236ValidateRequired;
 
-  // Clear error wenn User in das Feld tippt
   function _v236AttachErrorClear() {
     var allFields = [];
     Object.keys(REQUIRED_BY_TAB).forEach(function (sec) {
@@ -3147,32 +3155,24 @@ textarea.v236-qc-loaded {
       var el = document.getElementById(id);
       if (!el || el._v236ErrorClearAttached) return;
       el._v236ErrorClearAttached = true;
-      el.addEventListener('input', function () {
+      var handler = function () {
         if (_fieldHasValue(id)) {
           el.classList.remove('dp-required-error');
         }
         _v236UpdateTabIndicators();
-      });
-      el.addEventListener('change', function () {
-        if (_fieldHasValue(id)) {
-          el.classList.remove('dp-required-error');
-        }
-        _v236UpdateTabIndicators();
-      });
+      };
+      el.addEventListener('input', handler);
+      el.addEventListener('change', handler);
     });
   }
 
   // ─── Quick-Check-Übernahme-Markierung ──────────────────────────────
-  // Hook in _qcApplyImported (oder ähnlich) — wenn QC Felder befüllt,
-  // markieren wir sie mit .v236-qc-loaded.
-  // Cleanup: bei erstem manuellen Edit wieder entfernen.
   function _v236MarkQcLoaded(fieldIds) {
     if (!fieldIds) return;
     fieldIds.forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
       el.classList.add('v236-qc-loaded');
-      // Cleanup-Listener: beim ersten User-Edit Markierung entfernen
       if (el._v236QcMarked) return;
       el._v236QcMarked = true;
       var clear = function () {
@@ -3186,30 +3186,29 @@ textarea.v236-qc-loaded {
   }
   window._v236MarkQcLoaded = _v236MarkQcLoaded;
 
-  // Wrapper für die existierende QC-Apply-Funktion
-  // Wenn _qcApplyImported existiert, hängen wir uns dran:
-  function _v236WrapQcApply() {
-    if (window._qcApplyImported && !window._qcApplyImported._v236Wrapped) {
-      var orig = window._qcApplyImported;
-      window._qcApplyImported = function (d) {
-        var result = orig.call(this, d);
-        // Nach orig-Aufruf: alle Pflichtfelder die jetzt Wert haben markieren
-        var ids = [];
-        Object.keys(REQUIRED_BY_TAB).forEach(function (sec) {
-          REQUIRED_BY_TAB[sec].forEach(function (id) {
-            if (_fieldHasValue(id)) ids.push(id);
+  // V236.1: ECHTER Hook auf qcSaveAsObject (die Funktion die QC → Vollanalyse kopiert)
+  function _v236WrapQcSave() {
+    if (window.qcSaveAsObject && !window.qcSaveAsObject._v236Wrapped) {
+      var orig = window.qcSaveAsObject;
+      window.qcSaveAsObject = function () {
+        var result = orig.apply(this, arguments);
+        // Nach erfolgreicher Übernahme: alle QC-Ziel-Felder markieren die jetzt Wert haben
+        setTimeout(function () {
+          var marked = [];
+          QC_TARGET_FIELDS.forEach(function (id) {
+            if (_fieldHasValue(id)) marked.push(id);
           });
-        });
-        // Auch typische QC-Mapping-Felder
-        var qcFields = ['addr', 'plz', 'ort', 'wfl', 'bj', 'kp', 'nkm_m', 'mt_mietfl'];
-        qcFields.forEach(function (id) {
-          if (_fieldHasValue(id) && ids.indexOf(id) < 0) ids.push(id);
-        });
-        _v236MarkQcLoaded(ids);
-        _v236UpdateTabIndicators();
+          if (marked.length > 0) {
+            _v236MarkQcLoaded(marked);
+            _v236UpdateTabIndicators();
+            if (typeof toast === 'function') {
+              toast('📋 ' + marked.length + ' Felder aus Quick-Check übernommen — gold markiert');
+            }
+          }
+        }, 100);
         return result;
       };
-      window._qcApplyImported._v236Wrapped = true;
+      window.qcSaveAsObject._v236Wrapped = true;
     }
   }
 
@@ -3217,14 +3216,13 @@ textarea.v236-qc-loaded {
   function _v236Init() {
     _v236AttachErrorClear();
     _v236UpdateTabIndicators();
-    _v236WrapQcApply();
+    _v236WrapQcSave();
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _v236Init);
   } else {
     _v236Init();
   }
-  // Retries für asynchrone DOM-Loads
   setTimeout(_v236Init, 500);
   setTimeout(_v236Init, 1500);
   setTimeout(_v236Init, 3000);

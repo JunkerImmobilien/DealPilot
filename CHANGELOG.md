@@ -1,5 +1,41 @@
 # DealPilot Changelog
 
+## V1.1.236.1 — 2026-05-19
+
+### Hotfix: V236 Pflichtfelder + QC-Übernahme funktionierten nicht
+
+**Problem 1: Falsche Field-IDs**
+
+V236 hat versucht 12 Pflichtfelder zu markieren, aber 6 IDs waren falsch:
+- `addr` → richtig: `str` (Straße)
+- `bj` → richtig: `baujahr`
+- `nkm_m` → richtig: `nkm` (Kaltmiete)
+- `d1_kapital` → richtig: `d1` (Darlehen-Volumen)
+- `d1_zins` → richtig: `d1z`
+- `d1_tilg` → richtig: `d1t`
+
+Erst nach Analyse der `qcSaveAsObject()` Funktion (quick-check.js Z. 2225-2310)
+wurde klar welche Field-IDs die Vollanalyse wirklich nutzt.
+
+Resultat in V236: nur 6/12 Pflichtfeld-Labels markiert, Tab-Indikator zeigte
+keine Status weil 6 Pflichtfelder gar nicht existierten (wurden nie gefüllt).
+
+**Problem 2: QC-Übernahme-Markierung — falscher Hook**
+
+V236 hookte `_qcApplyImported()` — das ist aber nur die PDF-Import-Funktion
+die `qc_*`-Modal-Felder befüllt, NICHT die Vollanalyse-Felder.
+
+Die echte Übernahme passiert in `qcSaveAsObject()` (Z. 2164): Snapshot aller
+`qc_*` Werte → Schreibe zurück in Vollanalyse-Felder (`str`, `kp`, `nkm`, etc.)
+
+**Fix V236.1:**
+1. Field-IDs in REQUIRED_BY_TAB und QC_TARGET_FIELDS korrigiert
+2. Hook von `_qcApplyImported` auf `qcSaveAsObject` umgestellt
+3. Toast: "📋 X Felder aus Quick-Check übernommen — gold markiert"
+4. Falsche V236-Pflichtfeld-Markierungen (an `addr`, `bj`, etc.) entfernt
+5. Korrekte Pflichtfeld-Markierungen an `str`, `baujahr`, `nkm`, `d1`, `d1z`, `d1t` gesetzt
+
+
 ## V1.1.236 — 2026-05-19
 
 ### UX-Sammel-Paket: Scroll-Fix definitiv + Pflichtfelder + Tab-Indikator + QC-Übernahme
