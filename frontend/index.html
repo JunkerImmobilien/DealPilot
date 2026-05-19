@@ -850,7 +850,7 @@ label.dp-required.qc-required::after {
   <div class="col2 col2-stretch">
     <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div><div class="g2">
       <div class="f"><label class="dp-required" data-v236-required-set="1">PLZ</label><input id="plz" type="text" placeholder="z.B. 12345" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1">Ort *</label><input id="ort" type="text" placeholder="z.B. Musterstadt" oninput="upd()" autocomplete="off" data-form-type="other"></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Ort</label><input id="ort" type="text" placeholder="z.B. Musterstadt" oninput="upd()" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Straße</label><input id="str" type="text" placeholder="z.B. Musterstraße" oninput="upd()" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Objektart</label><select id="objart"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
@@ -1080,7 +1080,7 @@ label.dp-required.qc-required::after {
   <div class="col2">
     <div>
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-euro"/></svg></span>Kaufpreis &amp; Nebenkosten</div>
-        <div class="f mb12"><label class="dp-required" data-v236-required-set="1">Kaufpreis * <button type="button" class="dp-tip" data-tip-id="tab2.kp" tabindex="-1" aria-label="Hilfe zu tab2.kp"></button></label><div class="iw"><span class="pfx">€</span><input id="kp" type="text" inputmode="decimal" placeholder="180000" class="trl" oninput="calc()"></div></div>
+        <div class="f mb12"><label class="dp-required" data-v236-required-set="1">Kaufpreis <button type="button" class="dp-tip" data-tip-id="tab2.kp" tabindex="-1" aria-label="Hilfe zu tab2.kp"></button></label><div class="iw"><span class="pfx">€</span><input id="kp" type="text" inputmode="decimal" placeholder="180000" class="trl" oninput="calc()"></div></div>
 
         <!-- V112: Bewegliche Wirtschaftsgüter im Kaufpreis (z.B. Küche) — direkt unter Kaufpreis,
              damit User es früh sieht und gleich zuordnet. Im Steuermodul wird der Wert separat
@@ -1247,7 +1247,7 @@ label.dp-required.qc-required::after {
   <h2 class="sec-title">Miete</h2><p class="sec-desc">Mietstruktur, Nettokaltmiete und Warmmiete</p>
   <div class="col2">
     <div><div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-key"/></svg></span>Mietstruktur</div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1">Nettokaltmiete / Monat * <button type="button" class="dp-tip" data-tip-id="tab3.nkm" tabindex="-1" aria-label="Hilfe zu tab3.nkm"></button></label><div class="iw"><span class="pfx">€</span><input id="nkm" type="text" inputmode="decimal" placeholder="850" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Nettokaltmiete / Monat <button type="button" class="dp-tip" data-tip-id="tab3.nkm" tabindex="-1" aria-label="Hilfe zu tab3.nkm"></button></label><div class="iw"><span class="pfx">€</span><input id="nkm" type="text" inputmode="decimal" placeholder="850" class="trl" oninput="calc()"></div></div>
       <div class="f"><label>Zusätzliche Einnahmen / Monat <button type="button" class="dp-tip" data-tip-id="tab3.ze" tabindex="-1" aria-label="Hilfe zu tab3.ze"></button></label><div class="iw"><span class="pfx">€</span><input id="ze" type="text" inputmode="decimal" placeholder="90" class="trl" oninput="calc()"></div><span class="hint">Stellplatz, Garage etc. – fließt in Nettokaltmiete + Steuerberechnung ein</span></div>
       <div class="f"><label>Umlagefähige Kosten / Monat <button type="button" class="dp-tip" data-tip-id="tab3.umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab3.umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="umlagef" type="text" inputmode="decimal" placeholder="144" class="trl" oninput="calc()"></div></div>
       <hr class="dvd">
@@ -1879,7 +1879,7 @@ label.dp-required.qc-required::after {
             <span class="info-tag">ℹ</span>
           </label>
         </div>
-        <div class="f"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme *</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label class="dp-required" data-v236-required-set="1">Anfängl. Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d1" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
         <div class="g2">
           <div class="f"><label class="dp-required" data-v236-required-set="1">Zinssatz nominal (% p.a.) <button type="button" class="dp-tip" data-tip-id="tab5.zinsbindung" tabindex="-1" aria-label="Hilfe zu tab5.zinsbindung"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
           <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1">Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
@@ -2823,7 +2823,7 @@ label.dp-required.qc-required::after {
 <script src="js/bank-charts.js?v=166"></script>
 <script src="js/bank-pdf.js?v=166"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=124"></script>
+<script src="js/help.js?v=237"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=124"></script>
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->

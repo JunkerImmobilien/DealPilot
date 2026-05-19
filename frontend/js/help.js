@@ -275,7 +275,100 @@
         {
           h: 'ZE (Zusatz-Erträge)',
           body: 'Erträge außer Kaltmiete: Stellplätze, Werbeflächen, Antennen-Vermietung etc. Werden zu NKM addiert.'
+        },
+        {
+          h: 'Annuitätendarlehen',
+          body: 'Standard-Immobilienkredit in Deutschland. <strong>Konstante monatliche Rate</strong> (Annuität) über die ganze Laufzeit — innerhalb der Rate verschiebt sich nur das Verhältnis zwischen Zins-Anteil und Tilgungs-Anteil: am Anfang viel Zins und wenig Tilgung, am Ende umgekehrt.\n\n<strong>Vorteil:</strong> Planbarkeit, du weißt genau was monatlich abgeht.\n<strong>Typische Zinsbindung:</strong> 10, 15 oder 20 Jahre. Danach beginnt die Anschlussfinanzierung.'
+        },
+        {
+          h: 'Anschlussfinanzierung',
+          body: 'Wenn die Zinsbindung deines Darlehens endet, ist meist noch eine <strong>Restschuld</strong> offen. Diese muss neu finanziert werden — zu den dann aktuellen Marktkonditionen. Das nennt sich Anschlussfinanzierung.\n\n<strong>Risiko:</strong> Die Zinsen können sich erhöht haben. Wer 2014 für 1,5 % finanziert hat und 2024 die Anschlussfinanzierung braucht, zahlt plötzlich 4 % — die monatliche Rate kann sich verdoppeln.\n\n<strong>Forward-Darlehen:</strong> 3–5 Jahre vorm Ende der Zinsbindung kannst du die Konditionen der Anschlussfinanzierung bereits jetzt fest abschließen. Kostet einen kleinen Aufschlag, aber sichert dich gegen Zinsanstieg ab.'
+        },
+        {
+          h: 'Beleihungswert',
+          body: 'Der von der Bank intern angesetzte Wert deiner Immobilie — Basis für die <strong>LTV-Berechnung</strong>. Banken setzen ihn oft konservativer an als der Marktwert: meist 80–90 % des Verkehrswerts oder des Kaufpreises, je nachdem welcher niedriger ist.\n\n<strong>Warum konservativ?</strong> Im Insolvenzfall muss die Bank die Immobilie schnell verkaufen können — meist mit Abschlag zum Marktwert. Der Beleihungswert ist also der „sicher erzielbare Wert" in einer Notlage.\n\nDer Beleihungswert ist NICHT öffentlich kommuniziert — er ist Bank-intern. Du erfährst ihn meist nur indirekt über die Höhe der Finanzierungs-Zusage.'
+        },
+        {
+          h: 'BMR (Bruttomietrendite)',
+          body: 'Jahres-Kaltmiete / Kaufpreis × 100. <strong>Unbereinigte Rendite</strong> — gut für schnellen Vergleich, aber nicht aussagekräftig für tatsächlichen Ertrag.\n\nTypische Werte (Deutschland): A-Lagen 2,5–3,5 %, B-/C-Lagen 5–7 %, D-Lagen 7–9 %. Ausführliche Erklärung im Tab „Kennzahlen".'
+        },
+        {
+          h: 'Cashflow',
+          body: 'Was nach Abzug aller laufenden Kosten von der Miete übrig bleibt — pro Monat. Stufen: Bruttomiete → Kaltmiete → NOI → CF nach Zinsen → CF vor Steuern → CF nach Steuern.\n\n<strong>Faustregeln:</strong> Negativ = kritisch (zuzuschießen), 0–50 €/M = knapp, 50–150 €/M = solide, über 150 €/M = stark. Ausführliche Erklärung im Tab „Kennzahlen".'
+        },
+        {
+          h: 'DealScore (0–100)',
+          body: 'Zusammengefasste Bewertung aller wichtigen Kennzahlen: Cashflow, NMR, BMR, DSCR, LTV, EK-Rendite, Vermögenszuwachs, Wertpuffer. Gewichtung in Settings → „Investor Deal Score 2.0" anpassbar.\n\n<strong>Skala:</strong> 80–100 ausgezeichnet, 60–79 gut, 40–59 mittel, unter 40 schwach.'
+        },
+        {
+          h: 'DSCR (Debt Service Coverage Ratio)',
+          body: 'Wichtigste Bank-Kennzahl: Verhältnis von operativem Ertrag zu Kapitaldienst (Zins + Tilgung + BSV-Rate). Antwortet die Frage: „Reicht die Miete um Zins und Tilgung zu bezahlen?"\n\n<strong>Skala:</strong> 🟢 ≥ 1,2 solide · 🟡 1,0–1,2 knapp · 🔴 < 1,0 du musst zuzahlen. Ausführliche Erklärung im Tab „Kennzahlen".'
+        },
+        {
+          h: 'EK-Rendite (p.a.)',
+          body: 'Jährliche Rendite auf dein eingesetztes Eigenkapital über 10 Jahre — berücksichtigt Cashflow, Tilgung, Wertsteigerung, Steuervorteil.\n\n<strong>Typisch:</strong> 4–8 % solide, 8–15 % attraktiv, > 15 % starker Hebel-Effekt (meist niedriger EK-Einsatz). Bei Vollfinanzierung wird sie mathematisch unendlich — dann absoluter Vermögenszuwachs aussagekräftiger.'
+        },
+        {
+          h: 'EM (Equity Multiple)',
+          body: 'Wie oft sich dein Eigenkapital nach 10 Jahren zurückgespielt hat. EM 2,0x = aus 1 € EK sind 2 € geworden (EK + Gewinn).\n\n<strong>Skala:</strong> < 1,5x schwach, 1,5–2,5x solide, 2,5–4,0x stark, > 4,0x sehr stark.'
+        },
+        {
+          h: 'Faktor (Vervielfältiger)',
+          body: 'Kaufpreis / Jahres-Kaltmiete. Spiegelbild der BMR.\n\n<strong>Faktor 20 = ca. 5 % BMR, Faktor 25 = 4 %, Faktor 30 = 3,3 %.</strong>\n\nIn Deutschland: A-Lagen 30–40, B-/C-Lagen 15–22, D-Lagen 12–18.'
+        },
+        {
+          h: 'GrESt (Grunderwerbsteuer)',
+          body: 'Bundeslandsabhängige Steuer beim Immobilienkauf. <strong>Sätze 2025:</strong>\n\n• Bayern, Sachsen: 3,5 %\n• Hamburg: 4,5 %\n• Berlin, Hessen, Niedersachsen, Bremen, Rheinland-Pfalz: 5,0 %\n• Mecklenburg-Vorpommern, Saarland, Schleswig-Holstein: 6,5 %\n• NRW, Brandenburg, Thüringen: 6,5 %\n\nFällig direkt nach Notarvertrag. Wird vom Finanzamt per Bescheid eingefordert. Kein Recht auf Ratenzahlung — am besten von Anfang in Eigenkapital einplanen.'
+        },
+        {
+          h: 'Hausgeld',
+          body: 'Monatliche Zahlung der Eigentümer an die WEG-Hausverwaltung — deckt Betriebskosten, Verwaltung und Rücklagenbildung des Gemeinschaftseigentums ab.\n\n<strong>Zwei Teile:</strong>\n• <strong>Umlagefähiger Anteil</strong> (ca. 60–70 %): Heizung, Wasser, Müll, Strom Allgemeinflächen, Treppenhausreinigung — wird auf Mieter umgelegt\n• <strong>Nicht-umlagefähiger Anteil</strong> (ca. 30–40 %): WEG-Verwaltung, Instandhaltungsrücklage, Kontoführung — trägt der Vermieter\n\nTypisch: 250–450 €/Monat für eine 70 m² ETW.'
+        },
+        {
+          h: 'Instandhaltungsrücklage',
+          body: 'Geld, das die Eigentümergemeinschaft aufbaut für künftige Reparaturen am Gemeinschaftseigentum: Dach, Fassade, Heizungsanlage, Aufzug.\n\n<strong>Empfohlen:</strong> 1,00–1,50 €/m²/Monat (Faustregel). Bei einer 70 m² Wohnung also 70–105 €/Monat. Bei älteren Gebäuden oder hohem Reparaturstau höher.\n\nDie Rücklage gehört formell zur WEG, nicht zum einzelnen Eigentümer. Verkaufst du die Wohnung, geht dein Anteil zur Käuferin über — der Kaufpreis wird oft entsprechend gemindert oder erhöht je nach Rücklagen-Stand.'
+        },
+        {
+          h: 'IRR (Internal Rate of Return)',
+          body: 'Interner Zinsfuß. Komplexe Kennzahl die berechnet welche jährliche Rendite das Investment <strong>insgesamt</strong> erwirtschaftet, wenn alle Cashflows über die Haltedauer einbezogen werden — inklusive Schlussverkauf.\n\n<strong>Vorteil:</strong> Erlaubt fair Vergleich von Immobilie mit anderen Investments (ETF, Aktien, etc).\n\n<strong>Daumenregel:</strong> Über 8 % p.a. ist bei Wohnimmobilien sehr gut. Unter 4 % p.a. eher schwach — da könnten Tagesgeld + ETF mehr bringen ohne den Aufwand.'
+        },
+        {
+          h: 'LTV (Loan-to-Value, Beleihungsauslauf)',
+          body: 'Verhältnis von Restschuld zu Immobilienwert. Wichtigste Risikokennzahl der Bank.\n\n<strong>DealPilot-Skala (D-Markt):</strong>\n• 🟢 < 85 % SOLIDE\n• 🟡 85–100 % ERHÖHT\n• 🔴 > 100 % KRITISCH\n\nAusführliche Erklärung im Tab „Kennzahlen".'
+        },
+        {
+          h: 'Mietausfallwagnis',
+          body: 'Kalkulatorischer Puffer für unvorhergesehenen Mietausfall: Leerstand bei Mieterwechsel, säumige Zahler, Mietminderungen. <strong>Standard-Ansatz: 2 % der Jahres-Kaltmiete.</strong>\n\nBei einer Wohnung mit 800 € Kaltmiete (= 9.600 €/Jahr) wären das 192 €/Jahr Puffer. Das entspricht etwa <strong>3 Wochen Leerstand</strong> pro Jahr.\n\nIn ländlichen Gegenden oder bei einkommensschwachen Mietern manchmal höher (3–5 %).'
+        },
+        {
+          h: 'Restschuld',
+          body: 'Wie viel vom Darlehen am Ende der Zinsbindung noch übrig ist. Beispiel: Darlehen 200.000 €, Zinsbindung 10 Jahre bei 3,5 % Zins / 2 % Anfangstilgung → Restschuld nach 10 Jahren ca. 152.000 €.\n\n<strong>Höhere Tilgung = niedrigere Restschuld.</strong> Bei 3 % Anfangstilgung wären es nach 10 Jahren nur noch 128.000 € statt 152.000 €. Das reduziert auch das Zinsrisiko bei der Anschlussfinanzierung.'
+        },
+        {
+          h: 'Sonder-AfA § 7b EStG (Neubau-Förderung)',
+          body: 'Zusätzliche AfA für förderfähige Neubauten ab 2023. <strong>5 % p.a. über 4 Jahre</strong> = 20 % zusätzlicher Abschreibungs-Effekt OBEN drauf zur regulären 3 %-Neubau-AfA.\n\n<strong>Voraussetzungen (kumulativ):</strong>\n• Wohngebäude (keine Gewerbe-Einheiten)\n• Bauantrag/Bauanzeige zwischen 1.1.2023 und 30.9.2029\n• Effizienzhaus 40 mit Nachhaltigkeits-Klasse (QNG-Siegel)\n• Anschaffungs-/Herstellungskosten ≤ 5.200 €/m² (Wfl-Cap, DealPilot-Default 4.000 €/m²)\n• Erwerb im Jahr der Fertigstellung oder davor\n\n<strong>Steuerwirkung:</strong> Auf 30 Jahre gerechnet einer der stärksten Steuer-Hebel im Immobilienmarkt. Bei einem Neubau für 300k EUR mit Sonder-AfA = ca. 60k EUR steuerliche Werbungskosten zusätzlich verteilt auf 4 Jahre.'
+        },
+        {
+          h: 'Tilgung-vom-Mieter',
+          body: 'Anteil der Tilgung der durch die Mieteinnahmen finanziert wird — nicht aus deiner eigenen Tasche. Praktisch: <em>der Mieter zahlt dein Darlehen ab</em>.\n\n<strong>Formel:</strong> MIN(Tilgung gesamt; Cashflow nach Bewirtschaftung). Bei positivem Cashflow = volle Tilgung. Bei negativem = Differenzbetrag musst du zusätzlich aufbringen.\n\n<strong>Warum wichtig?</strong> Tilgung-vom-Mieter ist <strong>steuerfreier Vermögensaufbau</strong> — sie mindert nicht das zu versteuernde Einkommen aber baut Eigenkapital auf.'
+        },
+        {
+          h: 'Tilgungssatz',
+          body: 'Anfänglicher Tilgungsanteil als Prozentsatz der Darlehenssumme p.a. Standard in Deutschland 2025: <strong>2–3 % p.a.</strong>\n\n<strong>Höhere Tilgung = schnellere Schuldenfreiheit, aber höhere monatliche Rate.</strong>\n\nBeispiel 200.000 € Darlehen, 3,5 % Zins:\n• 1 % Tilgung: 750 €/M, schuldenfrei nach ca. 50 Jahren\n• 2 % Tilgung: 917 €/M, schuldenfrei nach ca. 30 Jahren\n• 3 % Tilgung: 1.083 €/M, schuldenfrei nach ca. 22 Jahren\n\nFaustregel: bei Kapitalanlage 2 % als Default, bei Eigennutzung 3 % oder mehr.'
+        },
+        {
+          h: 'Wertgutachten / Verkehrswertgutachten',
+          body: 'Schriftliche Bewertung einer Immobilie durch öffentlich bestellten und vereidigten Sachverständigen — nach gesetzlichen Vorgaben (ImmoWertV). Ermittelt den Verkehrswert nach § 194 BauGB.\n\n<strong>Methoden:</strong>\n• Vergleichswertverfahren (am häufigsten bei ETW)\n• Ertragswertverfahren (bei MFH / Renditeobjekten)\n• Sachwertverfahren (bei EFH)\n\n<strong>Kosten:</strong> 0,5–1,5 % vom Verkehrswert, mindestens 1.000–1.500 €.\n\n<strong>Wann sinnvoll?</strong> Bei Kreditverhandlungen, Erbschaftsstreit, Scheidung, Verkauf an Familie, oder wenn der Verkehrswert deutlich höher liegen könnte als der Kaufpreis (Wertpuffer dokumentieren).'
+        },
+        {
+          h: 'Wertpuffer',
+          body: 'Differenz zwischen Verkehrswert/Bankbewertung und Kaufpreis. Sicherheitsreserve gegen Marktwertverlust.\n\n<strong>Daumenregel:</strong> ≥ 10 % angemessen, ≥ 15 % komfortabel. Ausführliche Erklärung im Tab „Kennzahlen".'
+        },
+        {
+          h: 'Zinsrisiko',
+          body: 'Differenz zwischen heutiger Rate und hochgerechneter Rate nach Ablauf der Zinsbindung — bei einem konservativen Anschlusszins-Szenario (DealPilot-Default 5,0 %).\n\n<strong>Reduzieren:</strong> Längere Zinsbindung (15–20 Jahre), höhere Tilgung, Sondertilgungen, Forward-Darlehen.'
         }
+
       ]
     }
   ];
