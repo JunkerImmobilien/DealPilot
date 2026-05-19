@@ -1,5 +1,60 @@
 # DealPilot Changelog
 
+## V1.1.239.1 - 2026-05-19
+
+### Tour Hotfix: Auto-Load Objekt + echte DealScore-Anker + Step 22 Doppel-Render-Fix
+
+**Bug 1 GEFIXT: Tour startete bei Step 7 (Quick-Check skipped)**
+Steps 3-6 fanden ihre Elemente nicht weil kein Objekt aktiv war.
+
+V239.1 Fix:
+- Neue Funktion `_ensureObjectLoaded()` klickt vor Tour-Start
+  automatisch das erste Sidebar-Item an
+- Wartet 1500ms auf Render-Completion
+- Wenn schon Daten in #kp oder #bc-cockpit: kein Click noetig
+
+**Bug 2 GEFIXT: DealScore-Step zeigte DSCR/LTV-Card statt Donut**
+Selektor war `#bc-cockpit svg.ds-donut, #bc-cockpit` — Fallback matched
+das Cockpit-Element (= DSCR/LTV-Card).
+
+V239.1 Fix:
+- Neuer Selektor: `#dealscore-card, #bc-cockpit svg.ds-donut`
+- Die echte DealScore-Card hat ID `#dealscore-card` (in index.html Z. 2258)
+- Bei Fehlen: Step skippt sich (kein falsches Fallback-Element)
+
+**Bug 3 GEFIXT: Investor-Score zeigte Minimieren-Symbol**
+`#hdr-toggle-btn` ist genau dieses Toggle-Symbol — versteckt bei Free-Plan.
+
+V239.1 Fix:
+- Neuer Selektor: `#dealscore2-card, .ds2-card`
+- Echte Investor-Deal-Score-Card existiert in index.html Z. 2280
+- Placement: 'center' (zentriert anzeigen, sicherer als Spotlight)
+- Body angepasst: "Im Tab Bewertung gerade gespotlightet"
+
+**Bug 4 GEFIXT: PDF/Won-Star-Steps geskippt (Step 19 -> 22)**
+s8-Tab wurde nicht schnell genug gerendert.
+
+V239.1 Fix:
+- s8-Pause erhoeht: 800ms -> 1500ms
+- (s-quick bleibt 800ms, alle anderen 400ms)
+
+**Bug 5 GEFIXT: Step 22 Doppel-Render**
+`Tour.complete()` konnte mehrfach aufgerufen werden, bevor cleanup
+fertig war.
+
+V239.1 Fix:
+- Tour.complete() prueft `state.active` und bricht ab wenn schon false
+- state.active wird SOFORT auf false gesetzt (vor cleanup)
+- _renderStep() prueft state.active am Anfang
+- Tour.next() Last-Step-Branch unveraendert (war schon OK)
+
+### Geaenderte Dateien
+- `frontend/js/tour-engine.js` - _ensureObjectLoaded, state-guards
+- `frontend/js/tour-content.js` - Selektoren DealScore + Investor + placement
+- `frontend/index.html` - Cache-Bump v=239_1
+- `frontend/js/config.js` - V1.1.239.1
+
+
 ## V1.1.239 - 2026-05-19
 
 ### Tour Vollumbau: Sidebar-First + Conditional Logic

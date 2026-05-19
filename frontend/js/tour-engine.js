@@ -114,12 +114,39 @@
   function _hasUserObjects() {
     var sbList = document.querySelector('#sb-list');
     if (!sbList) return false;
-    // sb-list enthaelt Objekt-Cards als direkte Kinder
     var cards = sbList.querySelectorAll('button, a, .sb-card, [data-obj-id], .sidebar-obj-card');
     if (cards.length > 0) return true;
-    // Fallback: irgendein <div> mit Inhalt
     var children = sbList.children;
     return children && children.length > 0;
+  }
+
+  // V239.1: Stelle sicher, dass ein Objekt geladen ist (sonst leere Donuts)
+  function _ensureObjectLoaded() {
+    return new Promise(function(resolve) {
+      // Schon Daten vorhanden?
+      var kp = document.querySelector('#kp');
+      if (kp && kp.value && kp.value.length > 0) {
+        return resolve(true);
+      }
+      var donut = document.querySelector('#bc-cockpit .ds-donut, #dealscore-card .ds-donut');
+      if (donut) {
+        return resolve(true);
+      }
+      // Erstes Sidebar-Element klicken
+      var firstItem = document.querySelector('#sb-list > *:first-child');
+      if (firstItem) {
+        if (firstItem.tagName === 'BUTTON' || firstItem.tagName === 'A') {
+          try { firstItem.click(); } catch(e) { console.warn('[DpTour V239.1] sidebar-click error:', e); }
+        } else {
+          var clickable = firstItem.querySelector('button, a, [onclick]') || firstItem;
+          try { clickable.click(); } catch(e) {}
+        }
+        // Warten bis Render fertig
+        setTimeout(function() { resolve(true); }, 1500);
+      } else {
+        resolve(false);
+      }
+    });
   }
 
   // V239: Plan-Check
@@ -413,6 +440,7 @@
   // ─── Step rendern (mit V239 robusten Retries) ────────────────────────
 
   function _renderStep() {
+    if (!state.active) return;  // V239.1: kein Render wenn cleanup laeuft
     var step = state.steps[state.idx];
     if (!step) return;
 
@@ -482,7 +510,10 @@
       console.warn('[DpTour V239] Tab-Switch fehlgeschlagen: ' + step.tab);
     }
     // V239: Laengere Pause fuer s-quick/s8 die dynamisch rendern
-    var pause = (step.tab === 's-quick' || step.tab === 's8') ? 800 : 400;
+    // V239.1: s8 braucht noch mehr Zeit (deal-action.js rendert ganzen Tab)
+    var pause = 400;
+    if (step.tab === 's-quick') pause = 800;
+    if (step.tab === 's8') pause = 1500;
     setTimeout(callback, pause);
   }
 
@@ -501,7 +532,7 @@
       state.variant = hasObjects ? 'withObjects' : 'empty';
       state.steps = variants[state.variant] || variants.withObjects || variants.empty;
 
-      console.log('[DpTour V239] Variante:', state.variant, '|', state.steps.length, 'Steps');
+      console.log('[DpTour V239.1] Variante:', state.variant, '|', state.steps.length, 'Steps');
 
       if (!Array.isArray(state.steps) || state.steps.length === 0) {
         console.warn('[DpTour V239] Steps leer');
@@ -533,12 +564,21 @@
       };
       document.addEventListener('keydown', state.onKeydown);
 
-      _renderStep();
+      // V239.1: Erst Objekt laden, dann Tour starten
+      if (hasObjects) {
+        _ensureObjectLoaded().then(function() {
+          console.log('[DpTour V239.1] Object load attempt finished, rendering Step 1');
+          _renderStep();
+        });
+      } else {
+        _renderStep();
+      }
       return true;
     },
 
     next: function() {
       if (!state.active) return;
+      // V239.1: Bei letztem Step direkt komplettieren, kein weiterer Render
       if (state.idx >= state.steps.length - 1) {
         Tour.complete();
         return;
@@ -564,6 +604,8 @@
     },
 
     complete: function() {
+      if (!state.active) return;  // V239.1: doppel-Aufrufe schlucken
+      state.active = false;  // V239.1: SOFORT deaktivieren
       try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}
       _cleanup();
     },
