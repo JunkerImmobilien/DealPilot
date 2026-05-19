@@ -1,5 +1,34 @@
 # DealPilot Changelog
 
+## V1.1.239.3 - 2026-05-19
+
+### Tour Hotfix: Tab-Steps nach Quick-Check geskippt (Sprung Step 6 -> 14)
+
+**Bug GEFIXT: Steps 7-13 (alle 8 Tabs) wurden geskippt**
+
+Diagnose:
+- Quick-Check setzt Body-Klasse `qc-standalone-active`
+- Diese Klasse versteckt via CSS die Tab-Bar (.tabs + .sec)
+- Mein V239.2 rief beim Wechsel zu s0/s1/s2/... nicht `exitQuickCheckMode()`
+- Folge: Tab-Bar bleibt versteckt -> .tab[data-target-sec="s0"] ist
+  nicht sichtbar (_isVisible() returnt false) -> alle 8 Tab-Steps
+  werden geskippt
+- Tour landet bei Step 14 (Bewertungs-Cockpit), das ist innerhalb von
+  s6 aber direkt findbar durch #bc-cockpit (das war sichtbar trotz QC-Modus)
+
+V239.3 Fix in `_switchToTab()`:
+- Wenn Body-Klasse `qc-standalone-active` aktiv UND Ziel kein QC und
+  keine Sidebar ist -> exitQuickCheckMode() rufen
+- Wenn Ziel header/settings: zusaetzlich s0-Tab aktivieren (sonst sieht
+  User nichts)
+- Plus: Pause bei QC->Tab-Uebergang auf 900ms erhoeht (CSS-Animation)
+
+### Geaenderte Dateien
+- `frontend/js/tour-engine.js` - QC-Exit-Logic + Pause-Anpassung
+- `frontend/index.html` - Cache-Bump v=239_3
+- `frontend/js/config.js` - V1.1.239.3
+
+
 ## V1.1.239.2 - 2026-05-19
 
 ### Tour Hotfix: Quick-Check-Sprung gefixt + Tool-Tips-Tour-Step

@@ -78,14 +78,36 @@
 
   // V239: Robuste Quick-Check-Oeffnung mit Multi-Strategy
   // V239.2: PRIORITY auf echten Sidebar-Btn-Click — enterQuickCheckMode statt showQuickCheck
+  // V239.3: QC-Modus verlassen wenn von s-quick weg zu regulaeren Tabs
   function _switchToTab(targetSec) {
+    // V239.3: Wenn wir vom QC-Standalone-Modus weggehen (Body-Klasse aktiv)
+    //   UND Ziel kein QC und keine Sidebar ist -> erst QC verlassen
+    if (document.body.classList.contains('qc-standalone-active') &&
+        targetSec !== 's-quick' &&
+        targetSec !== 'sidebar') {
+      console.log('[DpTour V239.3] Exit QC-Standalone-Mode for', targetSec);
+      if (typeof window.exitQuickCheckMode === 'function') {
+        try { window.exitQuickCheckMode(); } catch(e) {
+          document.body.classList.remove('qc-standalone-active');
+        }
+      } else {
+        document.body.classList.remove('qc-standalone-active');
+      }
+      // Nach exit: Standard-Tab aktivieren (sonst sieht User nichts)
+      // Bei targetSec='s0' bis 's8' wird das gleich passieren
+      // Bei header/settings: aktiviere s0 als Default
+      if (targetSec === 'header' || targetSec === 'settings') {
+        var s0Tab = document.querySelector('.tab[data-target-sec="s0"]');
+        if (s0Tab) s0Tab.click();
+      }
+    }
+
     if (targetSec === 's-quick') {
       // 1) Schon offen?
       if (document.querySelector('#qc-score-circle, #qc-tab-host .ds-donut')) {
         return true;
       }
       // 2) PRIORITY V239.2: echten Sidebar-Button klicken (simuliert User)
-      //    Das ruft enterQuickCheckMode() + showQuickCheck() korrekt auf
       var sidebarBtn = document.querySelector(
         '.sb-act-accent[onclick*="quickcheck"], ' +
         'button[onclick*="sbActionsAction(\'quickcheck\')"]'
@@ -95,7 +117,7 @@
           console.warn('[DpTour V239.2] sidebarBtn.click failed:', e);
         }
       }
-      // 3) enterQuickCheckMode direkt (in ui.js definiert)
+      // 3) enterQuickCheckMode direkt
       if (typeof window.enterQuickCheckMode === 'function') {
         try { window.enterQuickCheckMode(); return true; } catch(e) {}
       }
@@ -103,8 +125,7 @@
       if (typeof window.sbActionsAction === 'function') {
         try { window.sbActionsAction('quickcheck'); return true; } catch(e) {}
       }
-      // 5) Letzter Notfall: showQuickCheck (befuellt qc-tab-host aber schaltet
-      //    Section nicht sichtbar — nur als Last-Resort)
+      // 5) Letzter Notfall
       if (typeof window.showQuickCheck === 'function') {
         try { window.showQuickCheck(); return true; } catch(e) {}
       }
@@ -528,9 +549,17 @@
     // V239: Laengere Pause fuer s-quick/s8 die dynamisch rendern
     // V239.1: s8 braucht noch mehr Zeit (deal-action.js rendert ganzen Tab)
     // V239.2: s-quick auch auf 1500ms (enterQuickCheckMode + show braucht Zeit)
+    // V239.3: bei QC-Exit Uebergang auch 900ms warten
     var pause = 400;
     if (step.tab === 's-quick') pause = 1500;
     if (step.tab === 's8') pause = 1500;
+    // V239.3: Wenn vorheriger Step in QC war und jetzt rauswechseln -> mehr Zeit
+    if (document.body.classList.contains('qc-standalone-active') === false &&
+        step.tab && step.tab.indexOf('s') === 0 && step.tab !== 's-quick' &&
+        state.idx > 0 &&
+        state.steps[state.idx - 1] && state.steps[state.idx - 1].tab === 's-quick') {
+      pause = 900;
+    }
     setTimeout(callback, pause);
   }
 
