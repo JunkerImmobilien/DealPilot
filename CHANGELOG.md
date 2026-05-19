@@ -1,5 +1,75 @@
 # DealPilot Changelog
 
+## V1.1.239.4 - 2026-05-19
+
+### Tour Hotfix: Sidebar-Accordion + gated-Selektoren + Bank-PDF-Step
+
+**Bug 1 GEFIXT: Steps 3-6 (Quick-Check) wurden geskippt (Step 2 -> 7)**
+
+Diagnose:
+- Quick-Check-Button ist in `.sb-actions-accordion-inner`
+- Accordion ist nach Objekt-Auto-Load typischerweise kollabiert
+- Inner-Element hat Hoehe nahe 0 -> _isVisible() returnt false fuer
+  alle Sidebar-Action-Buttons darin
+- Auto-Skip ueberspringt Steps 3-6
+
+V239.4 Fix:
+- Neue Funktion _expandSidebarActionsIfCollapsed()
+- Wird vor jedem `tab: 'sidebar'`-Step gerufen
+- Prueft Accordion-Inner-Hoehe; wenn < 100px -> aufklappen
+- 3-stufige Strategie: Header-Klick, Toggle-Klick, Style-Override
+
+**Bug 2 GEFIXT: Step 19 (Kontakt) -> springt zu Step 21 (Won)**
+
+Diagnose:
+- Step 20 war Bank-PDF mit `[data-feature="bank_pdf_a3"]`
+- Bei Free/Starter-Plan ist das Element gated mit opacity ~0.4
+- Mein _isVisible() Check `s.opacity !== '0'` lehnt das nicht ab
+- ABER: tab war 's8' und der Button ist gar nicht im s8-Tab
+  sondern in der Sidebar -> Button wurde nicht gesucht im s8-Bereich
+
+V239.4 Fix:
+- Bank-PDF-Step: tab='s8' -> tab='sidebar' (korrekte Position)
+- Selektor erweitert: `.sb-act-item[data-feature="bank_pdf_a3"],
+  button[onclick*="bankexport"]`
+- _isVisible() akzeptiert nun opacity >= 0.25 (gated-Elemente)
+
+**Geaenderte Dateien:**
+- `frontend/js/tour-engine.js` - _expandSidebar + _isVisible-Update
+- `frontend/js/tour-content.js` - Bank-PDF-Step sidebar + Selektor
+- `frontend/index.html` - Cache-Bump v=239_4
+- `frontend/js/config.js` - V1.1.239.4
+
+
+## V1.1.239.3 - 2026-05-19
+
+### Tour Hotfix: Tab-Steps nach Quick-Check geskippt (Sprung Step 6 -> 14)
+
+**Bug GEFIXT: Steps 7-13 (alle 8 Tabs) wurden geskippt**
+
+Diagnose:
+- Quick-Check setzt Body-Klasse `qc-standalone-active`
+- Diese Klasse versteckt via CSS die Tab-Bar (.tabs + .sec)
+- Mein V239.2 rief beim Wechsel zu s0/s1/s2/... nicht `exitQuickCheckMode()`
+- Folge: Tab-Bar bleibt versteckt -> .tab[data-target-sec="s0"] ist
+  nicht sichtbar (_isVisible() returnt false) -> alle 8 Tab-Steps
+  werden geskippt
+- Tour landet bei Step 14 (Bewertungs-Cockpit), das ist innerhalb von
+  s6 aber direkt findbar durch #bc-cockpit (das war sichtbar trotz QC-Modus)
+
+V239.3 Fix in `_switchToTab()`:
+- Wenn Body-Klasse `qc-standalone-active` aktiv UND Ziel kein QC und
+  keine Sidebar ist -> exitQuickCheckMode() rufen
+- Wenn Ziel header/settings: zusaetzlich s0-Tab aktivieren (sonst sieht
+  User nichts)
+- Plus: Pause bei QC->Tab-Uebergang auf 900ms erhoeht (CSS-Animation)
+
+### Geaenderte Dateien
+- `frontend/js/tour-engine.js` - QC-Exit-Logic + Pause-Anpassung
+- `frontend/index.html` - Cache-Bump v=239_3
+- `frontend/js/config.js` - V1.1.239.3
+
+
 ## V1.1.239.2 - 2026-05-19
 
 ### Tour Hotfix: Quick-Check-Sprung gefixt + Tool-Tips-Tour-Step

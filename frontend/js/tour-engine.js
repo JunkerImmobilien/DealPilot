@@ -54,7 +54,8 @@
     var rect = el.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) return false;
     var s = window.getComputedStyle(el);
-    return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+    // V239.4: gated/disabled-Elemente (typisch opacity 0.4-0.5) trotzdem akzeptieren
+    return s.display !== 'none' && s.visibility !== 'hidden' && parseFloat(s.opacity) >= 0.25;
   }
 
   function _scrollIntoView(el) {
@@ -78,14 +79,36 @@
 
   // V239: Robuste Quick-Check-Oeffnung mit Multi-Strategy
   // V239.2: PRIORITY auf echten Sidebar-Btn-Click — enterQuickCheckMode statt showQuickCheck
+  // V239.3: QC-Modus verlassen wenn von s-quick weg zu regulaeren Tabs
   function _switchToTab(targetSec) {
+    // V239.3: Wenn wir vom QC-Standalone-Modus weggehen (Body-Klasse aktiv)
+    //   UND Ziel kein QC und keine Sidebar ist -> erst QC verlassen
+    if (document.body.classList.contains('qc-standalone-active') &&
+        targetSec !== 's-quick' &&
+        targetSec !== 'sidebar') {
+      console.log('[DpTour V239.3] Exit QC-Standalone-Mode for', targetSec);
+      if (typeof window.exitQuickCheckMode === 'function') {
+        try { window.exitQuickCheckMode(); } catch(e) {
+          document.body.classList.remove('qc-standalone-active');
+        }
+      } else {
+        document.body.classList.remove('qc-standalone-active');
+      }
+      // Nach exit: Standard-Tab aktivieren (sonst sieht User nichts)
+      // Bei targetSec='s0' bis 's8' wird das gleich passieren
+      // Bei header/settings: aktiviere s0 als Default
+      if (targetSec === 'header' || targetSec === 'settings') {
+        var s0Tab = document.querySelector('.tab[data-target-sec="s0"]');
+        if (s0Tab) s0Tab.click();
+      }
+    }
+
     if (targetSec === 's-quick') {
       // 1) Schon offen?
       if (document.querySelector('#qc-score-circle, #qc-tab-host .ds-donut')) {
         return true;
       }
       // 2) PRIORITY V239.2: echten Sidebar-Button klicken (simuliert User)
-      //    Das ruft enterQuickCheckMode() + showQuickCheck() korrekt auf
       var sidebarBtn = document.querySelector(
         '.sb-act-accent[onclick*="quickcheck"], ' +
         'button[onclick*="sbActionsAction(\'quickcheck\')"]'
@@ -95,7 +118,7 @@
           console.warn('[DpTour V239.2] sidebarBtn.click failed:', e);
         }
       }
-      // 3) enterQuickCheckMode direkt (in ui.js definiert)
+      // 3) enterQuickCheckMode direkt
       if (typeof window.enterQuickCheckMode === 'function') {
         try { window.enterQuickCheckMode(); return true; } catch(e) {}
       }
@@ -103,8 +126,7 @@
       if (typeof window.sbActionsAction === 'function') {
         try { window.sbActionsAction('quickcheck'); return true; } catch(e) {}
       }
-      // 5) Letzter Notfall: showQuickCheck (befuellt qc-tab-host aber schaltet
-      //    Section nicht sichtbar — nur als Last-Resort)
+      // 5) Letzter Notfall
       if (typeof window.showQuickCheck === 'function') {
         try { window.showQuickCheck(); return true; } catch(e) {}
       }
@@ -169,6 +191,34 @@
       }
     } catch(e) {}
     return 'free';
+  }
+
+  // V239.4: Sidebar-Aktionen-Accordion aufklappen wenn collapsed
+  function _expandSidebarActionsIfCollapsed() {
+    try {
+      var accordion = document.getElementById('sb-actions-accordion');
+      if (!accordion) return;
+      var inner = accordion.querySelector('.sb-actions-accordion-inner');
+      if (!inner) return;
+      var rect = inner.getBoundingClientRect();
+      // Wenn Accordion klein/zugeklappt
+      if (rect.height < 100) {
+        console.log('[DpTour V239.4] Sidebar-Aktionen aufklappen');
+        // 1) Klick auf Accordion-Header (typische Toggle-Implementierung)
+        var header = accordion.querySelector('.sb-actions-header, .sb-actions-toggle, [data-toggle="sb-actions"]');
+        if (header) { header.click(); return; }
+        // 2) Klick auf accordion selbst
+        var toggleable = accordion.querySelector('[onclick]:not(.sb-act-item)');
+        if (toggleable) { toggleable.click(); return; }
+        // 3) Notfall: Inner direkt aufklappen via Style
+        inner.style.maxHeight = 'none';
+        inner.style.display = 'block';
+        inner.style.overflow = 'visible';
+        accordion.classList.remove('collapsed', 'sb-collapsed');
+      }
+    } catch(e) {
+      console.warn('[DpTour V239.4] _expandSidebar error:', e);
+    }
   }
 
   // ─── Overlay ─────────────────────────────────────────────────────────
@@ -519,7 +569,13 @@
   function _ensureCorrectTab(step, callback) {
     if (!step.tab) return callback();
     var current = _currentSection();
-    if (step.tab === 'sidebar' || step.tab === 'header' || step.tab === 'settings') return callback();
+    if (step.tab === 'sidebar' || step.tab === 'header' || step.tab === 'settings') {
+      // V239.4: Bei Sidebar-Steps: Aktionen-Accordion aufklappen
+      if (step.tab === 'sidebar') {
+        _expandSidebarActionsIfCollapsed();
+      }
+      return callback();
+    }
     if (current === step.tab) return callback();
     var ok = _switchToTab(step.tab);
     if (!ok) {
@@ -528,9 +584,17 @@
     // V239: Laengere Pause fuer s-quick/s8 die dynamisch rendern
     // V239.1: s8 braucht noch mehr Zeit (deal-action.js rendert ganzen Tab)
     // V239.2: s-quick auch auf 1500ms (enterQuickCheckMode + show braucht Zeit)
+    // V239.3: bei QC-Exit Uebergang auch 900ms warten
     var pause = 400;
     if (step.tab === 's-quick') pause = 1500;
     if (step.tab === 's8') pause = 1500;
+    // V239.3: Wenn vorheriger Step in QC war und jetzt rauswechseln -> mehr Zeit
+    if (document.body.classList.contains('qc-standalone-active') === false &&
+        step.tab && step.tab.indexOf('s') === 0 && step.tab !== 's-quick' &&
+        state.idx > 0 &&
+        state.steps[state.idx - 1] && state.steps[state.idx - 1].tab === 's-quick') {
+      pause = 900;
+    }
     setTimeout(callback, pause);
   }
 
