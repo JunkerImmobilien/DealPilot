@@ -1,5 +1,48 @@
 # DealPilot Changelog
 
+## V1.1.230 — 2026-05-19
+
+### Quick-Win-Sammelpatch: Audit-Fixes (B8.16 + B8.29) + V228.4 Tooltip-Rest
+
+**B8.29 — Equity Multiple ∞-Display Fix:**
+- Bei Vollfinanzierung (EK = 0) zeigt Equity Multiple ∞ — der Untertitel
+  zeigte aber weiterhin "geschätzt", was widersprüchlich war.
+- Fix: kpi-em-sub wird jetzt dynamisch gesetzt — "max. Hebel" bei ∞,
+  "geschätzt" sonst.
+
+**B8.16 — Threshold-Marker auf Score-Bars:**
+- DealScore-Bars zeigen jetzt visuelle Linien bei 60% (akzeptabel→gut)
+  und 85% (gut→sehr gut) als CSS-Pseudo-Elements.
+- Subtil (1.5px breit, leicht durchsichtig, Gold-Akzent bei 85%) —
+  hilft User die Score-Übergänge visuell zu verorten ohne aufdringlich
+  zu sein.
+- Implementiert via .ds-bar::before / ::after — keine JS-Änderung nötig.
+
+**V228.4 — Tooltip-System Komplettierung (9 weitere Stellen):**
+- tab8.dealpilot_score (Score-Header in Tab Bewertung)
+- tab8.investor_score (Investor Deal Score Header)
+- tab8.cashflow_rendite (Tabelle "Alle Kennzahlen")
+- tab8.equity_multiple (KPI-Header) — schon V228.2
+- tab5.tilgungsaussetzung (Bausparvertrag-Card)
+- tab5.zinsaenderungsrisiko (Bank-Cockpit-Item)
+- tab5.kfw (KfW-InfoBox-Titel)
+- tab6.hg_umlagefaehig (Hausgeld-Feld)
+- tab6.hg_nicht_umlagefaehig (Hausgeld-Feld)
+
+### Übersprungen (für V228.5 falls relevant)
+- tab8.stress_matrix — Container-Card-Titel braucht weiteren Kontext
+- tab8.tilgung_vom_mieter — kein Label gefunden
+- tab5.ltv_basis — Checkbox-Sondercase
+- tab6.sonderverwaltung / sonstiges_umlagefaehig — keine eindeutigen Anker
+- tab7.ki_credits / analyse_parameter / empfehlungs_skala — Settings-Tab
+  (Pill / Settings-KI-Tab statt regulärem Tab 7)
+
+### Coverage nach V230
+- 60+ Tooltips deployed (von 69 in tooltip-content.js)
+- Tooltip-System nahezu vollständig — die verbleibenden 8 sind Sondercases
+  die separat geplant werden müssen.
+
+
 ## V1.1.229 — 2026-05-19
 
 ### Major Feature: KI-Halluzinationsschutz (B7.6/B7.19)

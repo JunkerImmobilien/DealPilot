@@ -3706,8 +3706,30 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   height: 6px;
   background: rgba(0,0,0,0.06);
   border-radius: 3px;
-  overflow: hidden;
+  overflow: visible;  /* V230: für Threshold-Marker außerhalb des Balkens */
+  position: relative;
 }
+/* V230 (B8.16): Threshold-Marker bei 60% (akzeptabel/gut) und 85% (gut/sehr gut) */
+.ds-bar::before,
+.ds-bar::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 1.5px;
+  background: rgba(0,0,0,0.18);
+  pointer-events: none;
+  z-index: 1;
+}
+.ds-bar::before {
+  left: 60%;  /* "akzeptabel" → "gut" */
+}
+.ds-bar::after {
+  left: 85%;  /* "gut" → "sehr gut" */
+  background: rgba(201,168,76,0.45);  /* Gold-Akzent für die "sehr gut"-Schwelle */
+}
+/* Tooltip via title-Attribut auf .ds-bar — JS hängt es bei Bedarf an */
+
 .ds-bar-fill {
   height: 100%;
   border-radius: 3px;
