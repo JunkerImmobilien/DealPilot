@@ -1,5 +1,52 @@
 # DealPilot Changelog
 
+## V1.1.232 — 2026-05-19
+
+### UX-Polish: Card-Header-Icons konsequent über alle 8 Tabs ausgerollt
+
+**Vorher:** Tab Objekt (s0) hatte schon 6 Cards mit Premium-Icons (.ct ct-pro
+mit Lucide-SVG in cremegolde-Box). Die anderen 7 Tabs hatten 51 Cards ohne
+Icons oder mit unprofessionellen Emojis (📈 💰 📅 📋 📊 💡 🏦).
+
+**Nachher:** Alle 51 Card-Titel über die App nutzen jetzt das gleiche
+Premium-Pattern: Lucide-SVG-Icon in cremegolde-Box mit Goldverlaufslinie.
+
+**SVG-Symbol-Library erweitert um 7 neue Icons:**
+- `i-percent` — AfA-Konfiguration
+- `i-calculator` — Steuer-Modul
+- `i-calendar` — Steuerverlauf
+- `i-piggy-bank` — Bausparvertrag (Tab Finanzierung + Tab Bewertung)
+- `i-arrow-down` — Nicht umlagefähige Kosten
+- `i-search` — Detailpositionen
+- `i-gauge` — Alle Kennzahlen
+
+**Bereits existierende Icons reused** (54 vorhanden, davon hier verwendet):
+i-euro, i-hammer, i-bath, i-key, i-bar, i-pin, i-trend, i-user, i-trending-up,
+i-receipt, i-bank, i-clock, i-portfolio, i-check, i-bulb, i-settings, i-zap,
+i-window, i-file-text, i-star, i-coins, i-warn
+
+**Emojis aus 7 Card-Titeln entfernt** zugunsten konsistenter SVG-Icons.
+
+### Coverage
+- 33 reguläre Cards (mit `<div class="ct">`)
+- 10 Sub-Cards (mit inline `margin:0;border:none;padding:0`)
+- 6 schon vorhandene Cards in Tab Objekt — automatisch konsistent via gleiche CSS
+- 1 cr-title Sondercase
+- 1 Bauspardarlehen-Konditionen mit komplexem inline style
+- = 51 Patches durchgeführt, plus 6 bereits da
+
+### Was bewusst NICHT geändert wurde
+- `.ct-row`-Klasse (10x): das sind Row-Layouts ohne Title-Konzept
+- Settings-Modal Tab-Header (`data-tab="..."`): separate Komponente
+- Score-Bars und KPI-Header (Tab Bewertung): haben eigene Layouts
+
+### Risiko-Hinweis
+Das CSS-System ist bereits production-tested (Tab Objekt seit Wochen live).
+V232 rollt nur das existierende Pattern auf weitere 51 Stellen aus.
+Bei visuellen Regressionen: kleines Inline-`style="..."` an einzelnen
+Cards prüfen — die könnten mit ct-pro kollidieren.
+
+
 ## V1.1.231 — 2026-05-19
 
 ### Bug-Fix: DSCR-Konsistenz (B8.15)

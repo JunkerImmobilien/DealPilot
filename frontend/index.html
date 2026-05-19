@@ -368,6 +368,13 @@ body.dp-tt-off .dp-tip-infobox {
     <symbol id="i-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></symbol>
     <symbol id="i-land" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22l5-9 4 5 4-7 7 11z"/><circle cx="17" cy="6" r="2"/></symbol>
     <symbol id="i-quality" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+    <symbol id="i-percent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+    <symbol id="i-calculator" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="8" y2="18.01"/><line x1="12" y1="18" x2="16" y2="18"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="i-piggy-bank" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><circle cx="16" cy="9" r="0.5"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></symbol>
   </defs>
 </svg>
 <!-- V102+V106: Toolbar-Höhe für iPad/iPhone-Safari als CSS-Variable bestimmen.
@@ -939,7 +946,7 @@ body.dp-tt-off .dp-tip-infobox {
   <h2 class="sec-title">Kaufpreis &amp; Investition</h2><p class="sec-desc">Kaufpreis, Nebenkosten, Gesamtinvestition und Prognose-Annahmen</p>
   <div class="col2">
     <div>
-      <div class="card"><div class="ct">Kaufpreis &amp; Nebenkosten</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-euro"/></svg></span>Kaufpreis &amp; Nebenkosten</div>
         <div class="f mb12"><label>Kaufpreis * <button type="button" class="dp-tip" data-tip-id="tab2.kp" tabindex="-1" aria-label="Hilfe zu tab2.kp"></button></label><div class="iw"><span class="pfx">€</span><input id="kp" type="text" inputmode="decimal" placeholder="180000" class="trl" oninput="calc()"></div></div>
 
         <!-- V112: Bewegliche Wirtschaftsgüter im Kaufpreis (z.B. Küche) — direkt unter Kaufpreis,
@@ -989,7 +996,7 @@ body.dp-tt-off .dp-tip-infobox {
     </div>
     <div>
       <div class="card" style="margin-top:10px">
-          <div class="ct">Sanierungsbedarf einschätzen</div>
+          <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-hammer"/></svg></span>Sanierungsbedarf einschätzen</div>
           <p class="hint" style="margin-bottom:8px">Welche Bereiche der Immobilie sind sanierungsbedürftig? Klick zum Aktivieren — die geschätzten Kosten fließen in die Sanierungskostenkalkulation ein.</p>
           <div class="fesh-grid">
             <label class="fesh-tile"><input type="checkbox" id="fesh_f" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-window"/></svg></span><span class="fesh-name">Fenster</span><span class="fesh-cost"><input id="fesh_f_cost" type="text" inputmode="decimal" value="8000" placeholder="0" oninput="updateFESH()"> €</span></label>
@@ -1012,7 +1019,7 @@ body.dp-tt-off .dp-tip-infobox {
         </div>
 
         <!-- Sanierung & Möblierung -->
-        <div class="card" style="margin-top:14px"><div class="ct">Sanierung & Möblierung</div>
+        <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bath"/></svg></span>Sanierung & Möblierung</div>
           <div class="g2">
             <div class="f">
               <label>Sanierungskosten</label>
@@ -1104,7 +1111,7 @@ body.dp-tt-off .dp-tip-infobox {
 <div class="sec" id="s2">
   <h2 class="sec-title">Miete</h2><p class="sec-desc">Mietstruktur, Nettokaltmiete und Warmmiete</p>
   <div class="col2">
-    <div><div class="card"><div class="ct">Mietstruktur</div>
+    <div><div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-key"/></svg></span>Mietstruktur</div>
       <div class="f"><label>Nettokaltmiete / Monat * <button type="button" class="dp-tip" data-tip-id="tab3.nkm" tabindex="-1" aria-label="Hilfe zu tab3.nkm"></button></label><div class="iw"><span class="pfx">€</span><input id="nkm" type="text" inputmode="decimal" placeholder="850" class="trl" oninput="calc()"></div></div>
       <div class="f"><label>Zusätzliche Einnahmen / Monat <button type="button" class="dp-tip" data-tip-id="tab3.ze" tabindex="-1" aria-label="Hilfe zu tab3.ze"></button></label><div class="iw"><span class="pfx">€</span><input id="ze" type="text" inputmode="decimal" placeholder="90" class="trl" oninput="calc()"></div><span class="hint">Stellplatz, Garage etc. – fließt in Nettokaltmiete + Steuerberechnung ein</span></div>
       <div class="f"><label>Umlagefähige Kosten / Monat <button type="button" class="dp-tip" data-tip-id="tab3.umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab3.umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="umlagef" type="text" inputmode="decimal" placeholder="144" class="trl" oninput="calc()"></div></div>
@@ -1113,7 +1120,7 @@ body.dp-tt-off .dp-tip-infobox {
       <div class="f"><label>= Warmmiete / Jahr</label><div class="cf" id="wm_j">—</div></div>
       <div class="f"><label>= Nettokaltmiete / Jahr</label><div class="cf" id="nkm_j_out">—</div></div>
     </div>
-      <div class="card" style="margin-top:14px"><div class="ct">Mietpreis-Analyse</div>
+      <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bar"/></svg></span>Mietpreis-Analyse</div>
       <p class="hint">Bezogen auf die Wohnfläche aus Tab "Objekt".</p>
       <div class="f"><label>Aktuelle Miete pro m²</label><div class="cf" id="miete_qm">—</div></div>
       <div class="f"><label>Aktuelle Miete pro m² (warm)</label><div class="cf" id="miete_qm_warm">—</div></div>
@@ -1219,7 +1226,7 @@ body.dp-tt-off .dp-tip-infobox {
         </div>
       </div>
 
-      <div class="card" style="margin-top:14px"><div class="ct">Prognose-Annahmen</div>
+      <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trend"/></svg></span>Prognose-Annahmen</div>
         <div class="ass-row"><span class="ass-l">Wertsteigerung p.a.</span><div class="ass-inp"><input id="wertstg" type="text" inputmode="decimal" value="1.5" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
         <div class="ass-row"><span class="ass-l">Kostensteigerung p.a. <button type="button" class="dp-tip" data-tip-id="tab3.kostensteigerung" tabindex="-1" aria-label="Hilfe zu Kostensteigerung"></button></span><div class="ass-inp"><input id="kostenstg" type="text" inputmode="decimal" value="1.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
         <div class="ass-row"><span class="ass-l">Leerstand p.a. <button type="button" class="dp-tip" data-tip-id="tab3.leerstand" tabindex="-1" aria-label="Hilfe zu Leerstand"></button></span><div class="ass-inp"><input id="leerstand" type="text" inputmode="decimal" value="0.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
@@ -1247,7 +1254,7 @@ body.dp-tt-off .dp-tip-infobox {
   </div>
 
   <div class="card" style="margin-top:14px">
-    <div class="ct">Persönliche Steuer</div>
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-user"/></svg></span>Persönliche Steuer</div>
     <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
     <div class="g2">
       <div class="f"><label>zvE vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="calc()"></div></div>
@@ -1275,7 +1282,7 @@ body.dp-tt-off .dp-tip-infobox {
 
   <div class="card">
     <div class="ct-row">
-      <div class="ct" style="margin:0;border:none;padding:0">AfA-Konfiguration</div>
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-percent"/></svg></span>AfA-Konfiguration</div>
       <button class="btn btn-outline btn-sm" onclick="openBMFRechner()" type="button" data-feature="bmf_calc_export">📐 BMF-AfA-Rechner</button>
     </div>
     <p class="hint" style="margin-top:6px">Mit dem BMF-Rechner kannst du Gebäude- und Bodenanteil sowie den AfA-Satz nach amtlicher Methode (Sachwertverfahren) ermitteln.</p>
@@ -1389,7 +1396,7 @@ body.dp-tt-off .dp-tip-infobox {
 
   <div class="card" style="margin-top:14px">
     <div class="ct-row">
-      <div class="ct" style="margin:0;border:none;padding:0">📈 Steuerprogression-Chart</div>
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Steuerprogression-Chart</div>
       <button class="btn btn-outline btn-sm" onclick="showProgressionChart()">Chart öffnen</button>
     </div>
     <p class="hint">Vergleicht Einkommensteuer vor und nach Investition über die zvE-Bandbreite.</p>
@@ -1398,7 +1405,7 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- Steuer-Modul (Live-Berechnung) -->
   <div class="card tax-module-card" style="margin-top:14px">
     <div class="ct-row">
-      <div class="ct" style="margin:0;border:none;padding:0">💰 Steuer-Modul · Echte Progression 2026</div>
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-calculator"/></svg></span>Steuer-Modul · Echte Progression 2026</div>
       <button class="btn btn-outline btn-sm" onclick="renderTaxModule()">↻ Neu berechnen</button>
     </div>
     <p class="hint" style="margin-bottom:10px">
@@ -1412,7 +1419,7 @@ body.dp-tt-off .dp-tip-infobox {
 
   <!-- Steuerverlauf über die Jahre -->
   <div class="card tax-module-card" style="margin-top:14px">
-    <div class="ct">📅 Steuerverlauf · Erstattung (grün) vs. Nachzahlung (rot)</div>
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>Steuerverlauf · Erstattung (grün) vs. Nachzahlung (rot)</div>
     <p class="hint" style="margin-bottom:10px">
       Verlauf über die ersten 15 Jahre. Verluste aus V+V mindern dein zvE → Erstattung. Mit fortschreitender Tilgung sinken die Schuldzinsen → irgendwann positives Ergebnis → Nachzahlung.
     </p>
@@ -1424,7 +1431,7 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- Steuerformular pro Jahr (Quick + Detail) -->
   <div class="card tax-module-card" style="margin-top:14px">
     <div class="ct-row">
-      <div class="ct" style="margin:0;border:none;padding:0">📋 Steuerformular pro Jahr · individuelle Werte</div>
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-receipt"/></svg></span>Steuerformular pro Jahr · individuelle Werte</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF('single-year')" title="PDF nur für das aktuelle Jahr">📄 Finanzamt-PDF (1 Jahr)</button>
         <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF('all-years')" title="PDF mit allen 15 Jahren + Gesamtübersicht">📑 Finanzamt-PDF (alle Jahre)</button>
@@ -1530,7 +1537,7 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- V209: Markt-Zinsen-Modul — Multi-Line + Bar + Empfehlung -->
   <div class="card market-rates-card mr-v209-card" data-collapsible="mr-v209" data-collapse-title="Aktuelle Marktzinsen (Bundesbank)">
     <div class="ct-row">
-      <div class="ct" style="margin:0;border:none;padding:0">📊 Aktuelle Marktzinsen <span class="info-tag" id="mr-source-badge">Live · Bundesbank</span></div>
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bar"/></svg></span>Aktuelle Marktzinsen <span class="info-tag" id="mr-source-badge">Live · Bundesbank</span></div>
       <button class="btn btn-outline btn-sm" onclick="refreshMarketRates()" title="Zinsdaten aktualisieren" aria-label="Aktualisieren">↻</button>
     </div>
 
@@ -1700,7 +1707,7 @@ body.dp-tt-off .dp-tip-infobox {
 
   <div class="col2">
     <div>
-      <div class="card"><div class="ct">Darlehen I – Hauptdarlehen</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bank"/></svg></span>Darlehen I – Hauptdarlehen</div>
         <div class="g2">
           <div class="f"><label>Institution</label><input id="bank_inst" type="text" placeholder="Bank / Kreditinstitut"></div>
           <div class="f"><label>Vertragsnummer</label><input id="d1_vertrag" type="text" placeholder="z.B. KD-2025-001"></div>
@@ -1761,7 +1768,7 @@ body.dp-tt-off .dp-tip-infobox {
       <!-- V63.57/54: BAUSPARVERTRAG (für Tilgungsaussetzung) — erweitert um Zuteilungs-Mechanik -->
       <div class="card" id="bspar_card" style="display:none">
         <div class="ct-row">
-          <div class="ct" style="margin:0;border:none;padding:0">Bausparvertrag <span class="ds2-tag">Tilgungsaussetzung</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgungsaussetzung" tabindex="-1" aria-label="Hilfe zu Tilgungsaussetzung"></button></div>
+          <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-piggy-bank"/></svg></span>Bausparvertrag <span class="ds2-tag">Tilgungsaussetzung</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgungsaussetzung" tabindex="-1" aria-label="Hilfe zu Tilgungsaussetzung"></button></div>
           <span class="hint">Sparphase + Zuteilung + Bauspardarlehen-Phase werden separat modelliert.</span>
         </div>
         <div class="g2" style="margin-top:12px">
@@ -1786,7 +1793,7 @@ body.dp-tt-off .dp-tip-infobox {
         </div>
 
         <!-- V63.57: Bauspardarlehens-Konditionen — kommen nach Zuteilung zum Tragen -->
-        <div class="ct" style="margin-top:18px; font-size:13px; padding-top:14px; border-top:1px solid rgba(42,39,39,0.1)">Bauspardarlehen-Konditionen <span class="cf-hint" style="font-weight:400">(ab Zuteilung)</span></div>
+        <div class="ct ct-pro" style="margin-top:18px; font-size:13px; padding-top:14px; border-top:1px solid rgba(42,39,39,0.1)"><span class="ct-ico"><svg width="22" height="22"><use href="#i-receipt"/></svg></span>Bauspardarlehen-Konditionen <span class="cf-hint" style="font-weight:400">(ab Zuteilung)</span></div>
         <div class="g2">
           <div class="f"><label>Zinssatz Bauspardarlehen (%)</label><div class="iw"><input id="bspar_dar_z" type="text" inputmode="decimal" value="2.5" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div><div class="hint" style="font-size:11px;margin-top:4px">Tariflich festgelegt, oft 1,5-3 %</div></div>
           <div class="f"><label>Tilgung Bauspardarlehen (%)</label><div class="iw"><input id="bspar_dar_t" type="text" inputmode="decimal" value="6" step="0.1" class="tr" oninput="calc()"><span class="sfx">%</span></div><div class="hint" style="font-size:11px;margin-top:4px">Hohe Tilgung typisch (5-7 %)</div></div>
@@ -1815,7 +1822,7 @@ body.dp-tt-off .dp-tip-infobox {
       <!-- DARLEHEN II (optional) -->
       <div class="card">
         <div class="ct-row">
-          <div class="ct" style="margin:0;border:none;padding:0">Darlehen II – Zusatzdarlehen</div>
+          <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bank"/></svg></span>Darlehen II – Zusatzdarlehen</div>
           <label class="toggle-slim"><input type="checkbox" id="d2_enable" onchange="toggleD2()"> <span>Hinzufügen</span></label>
         </div>
         <div id="d2_content" style="display:none; padding-top:12px">
@@ -1863,7 +1870,7 @@ body.dp-tt-off .dp-tip-infobox {
         </div>
       </div>
 
-      <div class="card"><div class="ct">Anschlussfinanzierung (Prognose)</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-clock"/></svg></span>Anschlussfinanzierung (Prognose)</div>
         <p class="hint" style="margin-top:-4px">
           <b>Empfehlung:</b> Konservativ rechnen mit <b>5,0 % Zins</b> und <b>1,0 % Tilgung</b>.
           So hast du einen Puffer wenn die Zinsen bis zur Anschlussfinanzierung steigen.
@@ -1880,7 +1887,7 @@ body.dp-tt-off .dp-tip-infobox {
       </div>
     </div>
     <div>
-      <div class="card"><div class="ct">Finanzierungsübersicht</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-portfolio"/></svg></span>Finanzierungsübersicht</div>
         <div class="kv"><span>Darlehenssumme</span><span class="kv-v c-gold" id="r-darl">—</span></div>
         <div class="kv"><span>Eigenkapital</span><span class="kv-v c-green" id="r-ek">—</span></div>
         <div class="kv"><span>LTV (Loan to Value)</span><span class="kv-v" id="r-ltv">—</span></div>
@@ -1905,7 +1912,7 @@ body.dp-tt-off .dp-tip-infobox {
         <div class="ltv-bg"><div class="ltv-fill" id="ek-bar" style="width:16%"></div></div>
         <div class="ltv-labels"><span class="c-gold fw5" id="ek-pct">16%</span><span id="fk-pct">84%</span></div>
       </div>
-      <div class="card"><div class="ct">Bankargumente</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-check"/></svg></span>Bankargumente</div>
         <div class="bank-item ok" id="bi-grundschuld"><div class="bank-dot green"></div><div><div class="bank-title">Erstrangige Grundschuld</div><div class="bank-desc">Immobilie als Sicherheit – stabile werthaltige Beleihung</div></div></div>
         <div class="bank-item ok" id="bi-dscr"><div class="bank-dot"></div><div><div class="bank-title" id="bank-dscr-t">DSCR – Schuldendeckung</div><div class="bank-desc" id="bank-dscr-d">Mieteinnahmen decken Kapitaldienst</div></div></div>
         <div class="bank-item ok" id="bi-verm"><div class="bank-dot green"></div><div><div class="bank-title" id="bi-verm-t">Vollständig vermietet</div><div class="bank-desc" id="bi-verm-d">Nachgewiesene Mieterträge als stabile Einnahmebasis</div></div></div>
@@ -1916,7 +1923,7 @@ body.dp-tt-off .dp-tip-infobox {
   </div>
   <!-- V63.57: Finanzierungs-Empfehlungen — automatisch generiert -->
   <div class="card" id="fin_recommend_card" style="margin-top:14px">
-    <div class="ct">💡 Empfehlungen zur Finanzierung</div>
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bulb"/></svg></span>Empfehlungen zur Finanzierung</div>
     <p class="hint">Automatische Hinweise zur Optimierung — basierend auf LTV, DSCR, Tilgung &amp; Zinsbindung.</p>
     <div id="fin_recommend_list"></div>
   </div>
@@ -1930,7 +1937,7 @@ body.dp-tt-off .dp-tip-infobox {
   <div class="card" style="margin-bottom:14px">
     <div class="ct-row" style="padding:2px 0">
       <div style="flex:1">
-        <div class="ct" style="margin:0;padding:0;border:none">Eingabe-Modus</div>
+        <div class="ct ct-pro" style="margin:0;padding:0;border:none"><span class="ct-ico"><svg width="22" height="22"><use href="#i-settings"/></svg></span>Eingabe-Modus</div>
         <div class="hint" style="margin-top:4px">Wähle, ob du BWK detailliert pro Position oder als Prozentsatz der Kaltmiete eingeben möchtest.</div>
       </div>
       <div class="bwk-mode-btns">
@@ -1945,7 +1952,7 @@ body.dp-tt-off .dp-tip-infobox {
     <div class="col2">
       <div class="card">
         <div class="ct-row" style="padding:0 0 10px 0">
-          <div class="ct" style="margin:0;padding:0;border:none">BWK – Quick-Eingabe</div>
+          <div class="ct ct-pro" style="margin:0;padding:0;border:none"><span class="ct-ico"><svg width="22" height="22"><use href="#i-zap"/></svg></span>BWK – Quick-Eingabe</div>
           <div class="bwk-mode-btns" style="font-size:10.5px">
             <button class="mode-btn active" data-pmode="nkm" onclick="switchBwkPctMode('nkm')">% der NKM</button>
             <button class="mode-btn" data-pmode="kp" onclick="switchBwkPctMode('kp')">% vom Kaufpreis</button>
@@ -1982,7 +1989,7 @@ body.dp-tt-off .dp-tip-infobox {
           </div>
         </div>
       </div>
-      <div class="card"><div class="ct">Berechnete BWK</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-window"/></svg></span>Berechnete BWK</div>
         <div class="kv"><span>Nettokaltmiete / Jahr</span><span class="kv-v" id="bwk_pct_nkm">—</span></div>
         <div class="kv"><span>Umlagefähig / Jahr</span><span class="kv-v" id="bwk_pct_ul">—</span></div>
         <div class="kv"><span>Nicht umlagefähig / Jahr</span><span class="kv-v" id="bwk_pct_nul">—</span></div>
@@ -2000,13 +2007,13 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- Detail Mode (default) -->
   <div id="bwk-detail-mode" class="col2">
     <div>
-      <div class="card"><div class="ct">Umlagefähige Kosten / Jahr</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Umlagefähige Kosten / Jahr</div>
         <div class="f"><label>Hausgeld (umlagefähig) / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.hg_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_ul" type="text" inputmode="decimal" placeholder="1391" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Grundsteuer / Jahr</label><div class="iw"><span class="pfx">€</span><input id="grundsteuer" type="text" inputmode="decimal" placeholder="336" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Sonstiges umlagefähig / Jahr</label><div class="iw"><span class="pfx">€</span><input id="ul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Summe umlagefähig</label><div class="cf" id="ul_sum">—</div></div>
       </div>
-      <div class="card"><div class="ct">Nicht umlagefähige Kosten / Jahr</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-arrow-down"/></svg></span>Nicht umlagefähige Kosten / Jahr</div>
         <div class="f"><label>Hausgeld (nicht umlagefähig) <button type="button" class="dp-tip" data-tip-id="tab6.hg_nicht_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld nicht umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
         <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
@@ -2016,14 +2023,14 @@ body.dp-tt-off .dp-tip-infobox {
       </div>
     </div>
     <div>
-      <div class="card"><div class="ct">BWK Zusammenfassung</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-file-text"/></svg></span>BWK Zusammenfassung</div>
         <div class="kv"><span>Umlagefähig / Jahr</span><span class="kv-v" id="r-ul">—</span></div>
         <div class="kv"><span>Nicht umlagefähig / Jahr</span><span class="kv-v" id="r-nul">—</span></div>
         <div class="kv kv-hl"><span><b>BWK Gesamt / Jahr</b></span><span class="kv-v c-gold" id="r-bwk">—</span></div>
         <div class="kv"><span>BWK als % der NKM</span><span class="kv-v" id="r-bwk-pct">—</span></div>
         <div class="kv"><span>Hausgeld gesamt</span><span class="kv-v" id="r-hg-ges">—</span></div>
       </div>
-      <div class="card"><div class="ct">Detailpositionen (optional)</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-search"/></svg></span>Detailpositionen (optional)</div>
         <div class="g2">
           <div class="f"><label>Kostenposition I (€)</label><div class="iw"><span class="pfx">€</span><input id="kp1" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
           <div class="f"><label>Bezeichnung</label><input id="kp1l" type="text" placeholder="z.B. Hausverwaltung"></div>
@@ -2133,7 +2140,7 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- V38: Investor-Score Werte (read-only Übersicht — Eingabe in den jeweiligen Tabs) -->
   <div class="card ds2-readonly-card" id="ds2-readonly-card">
     <div class="ct-row">
-      <div class="ct" style="margin:0;border:none;padding:0">Investor-Score Zusatzangaben</div>
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-star"/></svg></span>Investor-Score Zusatzangaben</div>
       <div class="ds2-readonly-actions">
         <!-- V44: KI-Button entfernt (Code bleibt — ds2AiFillAll() weiter aufrufbar via Konsole oder andere Trigger) -->
       </div>
@@ -2208,7 +2215,7 @@ body.dp-tt-off .dp-tip-infobox {
   <div class="col2">
     <div class="card">
       <div class="cf-switcher">
-        <div class="ct" id="cr-title" style="margin:0;padding:0;border:none;">Cashflow – Korrekte Berechnung</div>
+        <div class="ct ct-pro" id="cr-title" style="margin:0;padding:0;border:none;"><span class="ct-ico"><svg width="22" height="22"><use href="#i-coins"/></svg></span>Cashflow – Korrekte Berechnung</div>
         <div class="cf-mode-btns">
           <button class="cf-mode-btn active" data-mode="heute" onclick="switchCFMode('heute')">Heute</button>
           <button class="cf-mode-btn" data-mode="ezb" onclick="switchCFMode('ezb')">Ende Zinsbindung</button>
@@ -2243,7 +2250,7 @@ body.dp-tt-off .dp-tip-infobox {
         </div>
       </div>
     </div>
-    <div class="card"><div class="ct">Alle Kennzahlen</div>
+    <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-gauge"/></svg></span>Alle Kennzahlen</div>
       <div class="kv"><span>Bruttomietrendite <button type="button" class="dp-tip" data-tip-id="tab8.bruttomietrendite" tabindex="-1" aria-label="Hilfe zu Bruttomietrendite"></button></span><span class="kv-v c-green" id="r-bmy">—</span></div>
       <div class="kv"><span>Nettomietrendite <button type="button" class="dp-tip" data-tip-id="tab8.nettomietrendite" tabindex="-1" aria-label="Hilfe zu Nettomietrendite"></button></span><span class="kv-v c-green" id="r-nmy">—</span></div>
       <div class="kv"><span>Faktor (KP / Jahresmiete)</span><span class="kv-v" id="r-fak">—</span></div>
@@ -2260,7 +2267,7 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- V63.57: Vermögenszuwachs-Aufschlüsselung (wie Excel ImmoKalk) -->
   <!-- V63.57: Bausparvertrag-Übersicht (nur bei Tilgungsaussetzung sichtbar) -->
   <div class="card" id="bsv-summary-card" style="display:none">
-    <div class="ct">🏦 Bausparvertrag · Vollständiger Lebenszyklus</div>
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-piggy-bank"/></svg></span>Bausparvertrag · Vollständiger Lebenszyklus</div>
     <p class="hint">Bei Tilgungsaussetzung läuft das Hauptdarlehen mit reinen Zinsen. Parallel sparst du in den Bausparvertrag ein, bis das Mindestguthaben für die Zuteilung erreicht ist. Bei Zuteilung lösen Sparguthaben + Bauspardarlehen das Hauptdarlehen ab.</p>
     <div class="kv"><span>Bausparsumme</span><span class="kv-v" id="bsv-ziel">—</span></div>
     <div class="kv"><span>Sparrate / Monat</span><span class="kv-v" id="bsv-rate-m">—</span></div>
@@ -2276,7 +2283,7 @@ body.dp-tt-off .dp-tip-infobox {
   </div>
 
   <div class="card vermoegen-card" id="card-vermoegen-zuwachs">
-    <div class="ct">Vermögenszuwachs · <span id="vz-jahre">10</span> Jahre nach Kauf</div>
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Vermögenszuwachs · <span id="vz-jahre">10</span> Jahre nach Kauf</div>
     <p class="hint">Wie setzt sich dein Vermögenszuwachs nach <span id="vz-jahre2">10</span> Jahren zusammen? Wir betrachten Tilgung, Cashflow und Wertsteigerung — und ziehen den Eigenanteil ab, den du aus eigener Tasche zugeschossen hast (bei negativem Cashflow).</p>
     <div class="kv"><span>… durch Tilgung <span class="cf-hint">(Schulden abgebaut, brutto)</span></span><span class="kv-v" id="vz-tilgung">—</span></div>
     <div class="kv" style="padding-left:14px;border-left:2px solid var(--green);margin-left:6px"><span class="cf-hint">… davon vom Mieter <i>(durch Mieteinnahmen finanziert)</i></span><span class="kv-v c-green" id="vz-mieter">—</span></div>
@@ -2331,7 +2338,7 @@ body.dp-tt-off .dp-tip-infobox {
 
   <!-- ── Detail-Card: Zinsänderungsrisiko ─────────────────────────────── -->
   <div class="card zaer-card">
-    <div class="ct">Zinsänderungsrisiko · Detail</div>
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-warn"/></svg></span>Zinsänderungsrisiko · Detail</div>
     <p class="hint">Vergleich zwischen aktueller Phase, Ende der Zinsbindung und der Anschlussfinanzierung.</p>
     <table class="phase-table zaer-table">
       <thead>
@@ -2382,7 +2389,7 @@ body.dp-tt-off .dp-tip-infobox {
 
   <!-- 3-Phasen-KPI-Vergleich -->
   <div class="card phase-compare-card">
-    <div class="ct">Kennzahlen-Vergleich · Heute · Ende Zinsbindung · Anschluss</div>
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-window"/></svg></span>Kennzahlen-Vergleich · Heute · Ende Zinsbindung · Anschluss</div>
     <table class="phase-table">
       <thead>
         <tr>
@@ -2429,7 +2436,7 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- V63.64: Alte Chart.js-Canvas (Immobilienschere, CF-Verlauf, Vermögensaufbau, Wert vs. Restschuld)
        wurden entfernt — die V25-Bank-Charts oben decken alle Inhalte besser ab und sind PDF-ready. -->
   <div class="card" id="card-cashflow-projektion">
-    <div class="ct">Cashflow-Projektion <span id="proj-lbl" style="font-size:10px;color:var(--muted)"></span><span id="proj-mstg-hint" style="font-size:10px;color:var(--muted);margin-left:8px"></span></div>
+    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trend"/></svg></span>Cashflow-Projektion <span id="proj-lbl" style="font-size:10px;color:var(--muted)"></span><span id="proj-mstg-hint" style="font-size:10px;color:var(--muted);margin-left:8px"></span></div>
     <div style="overflow-x:auto">
       <table class="cft">
         <thead><tr>
