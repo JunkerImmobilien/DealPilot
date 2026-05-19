@@ -796,42 +796,95 @@ function _calcImmediate(){
   var nkm=v('nkm'),ze=v('ze'),uf=v('umlagef');
   var wm_m=nkm+ze+uf,wm_j=wm_m*12,nkm_j=(nkm+ze)*12;
   st('wm_m',fE(wm_m,2));st('wm_j',fE(wm_j,2));st('nkm_j_out',fE(nkm_j));
-  var afa_r=parseDe((el('afa_satz')||{}).value||2);
-  // V63.99: AfA-Berechnung mit Küchen-Korrektur.
-  // Wenn Küche im KP enthalten ist, wird sie als separates Wirtschaftsgut behandelt:
-  //  - Gebäude-AfA = (Gebäude ohne Küche + anteilige Nebenkosten) × afa_satz
-  //  - Küche-AfA   = Küchenwert / 10 Jahre (linear, § 7 EStG für Wirtschaftsgüter unter 10 Jahre Nutzungsdauer)
-  // Wenn keine Küche: Standard-Berechnung KP × Gebäudeanteil × afa_satz (Backward-Compat)
-  // V113: Wenn kueche_im_kp aktiv ist, läuft der Küchenwert per UI-Sync (syncKuecheToMoebl)
-  //       in das Möblierung-Feld → tax.js verarbeitet ihn dort über moeblPerYear mit der
-  //       User-konfigurierbaren Laufzeit. afa_kueche bleibt 0 damit keine Doppelung in Feld 6.
-  var afa_geb, afa_kueche = 0;
+  // V227: AfA mit linear ODER degressiv ODER degressiv-mit-Wechsel, optional + § 7b
+  var afaSelVal = (el('afa_satz') || {}).value || '2.0';
+  var afaParsed = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(afaSelVal) : { methode: 'linear', satzPct: parseDe(afaSelVal) || 2 };
+  // Backward-Compat: afa_r ist der Erst-Jahres-Prozentsatz für UI-Texte
+  var afa_r = afaParsed.satzPct;
+
+  // V63.99 + V227: Bemessungsgrundlage (Gebäude-AHK) wie gehabt
+  // V113: Küche läuft per UI-Sync ins Möblierung-Feld → afa_kueche bleibt 0
+  var afa_geb_basis;
+  var afa_kueche = 0;
   if (window.State && State._ahk && State._ahk.kuecheActive && State._ahk.kuecheVal > 0) {
-    // Marcels Logik: AfA-Basis = Gebäude-AHK (= Gebäude ohne Küche + anteilige Nebenkosten)
-    afa_geb = State._ahk.gebAhk * (afa_r/100);
-    // V113: KEIN afa_kueche mehr hier — läuft jetzt über das Möblierung-Feld (Sync in ui.js).
-    //       Damit nutzt der User die Laufzeit-Auswahl (5/8/10/15 Jahre) und der Wert erscheint
-    //       sauber in Feld 6 "Bewegliche Wirtschaftsgüter" — ohne Doppelung.
-    afa_kueche = 0;
+    afa_geb_basis = State._ahk.gebAhk;
   } else {
-    // Standard ohne Küche
-    afa_geb = kp * (v('geb_ant')/100) * (afa_r/100);
+    afa_geb_basis = kp * (v('geb_ant') / 100);
   }
-  var afa = afa_geb + afa_kueche;
-  // V63.99: Anzeige — bei aktiver Küche Aufteilung sichtbar machen
-  if (afa_kueche > 0) {
-    st('afa_kalk', fE(afa, 2) + ' (Gebäude: ' + fE(afa_geb, 0) + ' + Küche 10J: ' + fE(afa_kueche, 0) + ')');
+
+  // V227: § 7b Eligibility prüfen
+  var sonder7bGueltig = (typeof window.afaSonder7bIsValid === 'function') ? window.afaSonder7bIsValid() : false;
+  var sonder7bBasis = 0;
+  if (sonder7bGueltig && window.Afa && Afa.sonder7bBasis) {
+    sonder7bBasis = Afa.sonder7bBasis(afa_geb_basis, v('wfl'));
+  }
+
+  // V227: Engine aufrufen — liefert ein Array über 50 Jahre
+  var afaResult;
+  if (window.Afa && Afa.computeSeries) {
+    afaResult = Afa.computeSeries({
+      methode: afaParsed.methode,
+      satzPct: afaParsed.satzPct,
+      ahk: afa_geb_basis,
+      jahre: 50,
+      sonder7bAktiv: sonder7bGueltig,
+      sonder7bBasis: sonder7bBasis,
+      linearFallback: 3.0
+    });
   } else {
-    st('afa_kalk', fE(afa, 2));
+    // Fallback wenn Engine nicht geladen ist (sollte nicht passieren)
+    var fallbackArr = [];
+    for (var _i = 0; _i < 50; _i++) fallbackArr.push(afa_geb_basis * (afa_r / 100));
+    afaResult = { series: fallbackArr, normal: fallbackArr, sonder: fallbackArr.map(function () { return 0; }), wechselJahr: null };
   }
-  // V63.99: Küchen-AfA in State für Steuer-Modul + Anzeige bereitstellen
+
+  // Jahr-1-AfA für Anzeige
+  var afa_geb = afaResult.normal[0] || 0;
+  var afa_geb_sonder = afaResult.sonder[0] || 0;
+  var afa = afa_geb + afa_kueche + afa_geb_sonder;
+
+  // Anzeige
+  var anzeige = fE(afa, 2);
+  var methodHint = '';
+  if (afaParsed.methode === 'degressiv' || afaParsed.methode === 'degressiv_wechsel') {
+    methodHint = ' (degressiv, Jahr 1)';
+  }
+  if (afa_geb_sonder > 0) {
+    anzeige += ' (Normal ' + fE(afa_geb, 0) + ' + § 7b ' + fE(afa_geb_sonder, 0) + ')';
+  } else if (afa_kueche > 0) {
+    anzeige += ' (Gebäude: ' + fE(afa_geb, 0) + ' + Küche 10J: ' + fE(afa_kueche, 0) + ')';
+  } else if (methodHint) {
+    anzeige += methodHint;
+  }
+  st('afa_kalk', anzeige);
+
+  // V227: State befüllen — alle relevanten AfA-Daten
   if (window.State) {
     State._afaBreakdown = {
       gebaeude: afa_geb,
-      kueche:   afa_kueche,
-      gesamt:   afa
+      kueche: afa_kueche,
+      sonder7b: afa_geb_sonder,
+      gesamt: afa
     };
+    State._afaSeries = afaResult.series;          // Gesamt-Reihe (Normal + § 7b)
+    State._afaSeriesNormal = afaResult.normal;    // Nur Normal-AfA
+    State._afaSeriesSonder = afaResult.sonder;    // Nur § 7b
+    State._afaWechselJahr = afaResult.wechselJahr;
+    State._afaMethode = afaParsed.methode;
   }
+
+  // § 7b UI-Display updaten
+  if (typeof window.afaSonder7bUpdateDisplay === 'function') {
+    window.afaSonder7bUpdateDisplay({
+      basis: sonder7bBasis,
+      jaehrlich: sonder7bGueltig ? (sonder7bBasis * 0.05) : 0,
+      gueltig: sonder7bGueltig
+    });
+  }
+  // Neubau-Banner prüfen
+  if (typeof window.afaCheckNeubauHint === 'function') window.afaCheckNeubauHint();
+  // Vorschau-Tabelle aktualisieren
+  if (typeof window.afaUpdatePreview === 'function') window.afaUpdatePreview();
   // BWK: Entweder detailliert ODER als % der NKM
   var bwkMode = window._bwkMode || 'detail';
   var ul, nul, bwk;

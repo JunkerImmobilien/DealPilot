@@ -117,11 +117,17 @@ var Tax = (function() {
                    parseFloat(fields.mietausfall || 0) +
                    parseFloat(fields.nul_sonst || 0);
 
-    // AfA: 2% vom Gebäudeanteil (Standard linear)
+    // V227: AfA aus State._afaBreakdown (Jahr 1, inkl. § 7b wenn aktiv)
+    // Fallback auf alte Logik wenn Breakdown nicht da (z.B. erste Berechnung)
     var kp = parseFloat(fields.kp) || 0;
-    var afa_satz = (parseFloat(fields.afa_satz) || 2) / 100;
     var geb_anteil = (parseFloat(fields.geb_ant) || 80) / 100;
-    var afa = kp * geb_anteil * afa_satz;
+    var afa;
+    if (window.State && State._afaBreakdown && State._afaBreakdown.gesamt) {
+      afa = State._afaBreakdown.gesamt;
+    } else {
+      var afa_satz = (parseFloat(fields.afa_satz) || 2) / 100;
+      afa = kp * geb_anteil * afa_satz;
+    }
 
     // Erhaltungsaufwendungen (Sanierung) - nur wenn unter 15%-Grenze
     var san = parseFloat(fields.san) || 0;
@@ -359,7 +365,16 @@ function _computeAutoForYear(yearIdx, year) {
   var afaBd = (State._afaBreakdown) ? State._afaBreakdown : null;
   var afaGesamt = State.kpis ? (State.kpis.afa || 0) : 0;
   var afaKueche = (afaBd && afaBd.kueche) ? afaBd.kueche : 0;
-  var afaGebaeude = afaBd && (afaBd.gebaeude != null) ? afaBd.gebaeude : (afaGesamt - afaKueche);
+  // V227: Jahresgenaue Gebäude-AfA (degressive AfA fällt jedes Jahr, § 7b wirkt nur J. 1-4)
+  // Fallback auf Jahr-1-Wert wenn Series nicht verfügbar (z.B. wenn Engine noch nicht initialisiert)
+  var afaGebaeude;
+  var afaSonder7bJahr = 0;
+  if (State._afaSeriesNormal && State._afaSeriesNormal.length > yearIdx) {
+    afaGebaeude = State._afaSeriesNormal[yearIdx];
+    afaSonder7bJahr = (State._afaSeriesSonder && State._afaSeriesSonder[yearIdx]) || 0;
+  } else {
+    afaGebaeude = afaBd && (afaBd.gebaeude != null) ? afaBd.gebaeude : (afaGesamt - afaKueche);
+  }
 
   // V31/V32: Sanierung + Möblierung steuerlich korrekt verteilen
   // ───────────────────────────────────────────────────────
@@ -374,7 +389,19 @@ function _computeAutoForYear(yearIdx, year) {
   var moeblYearsChoice = parseInt((document.getElementById('moebl_tax_years') || {}).value || '10');
 
   // SANIERUNG
-  var afa_satz_pct = parseDe((document.getElementById('afa_satz') || {}).value) || 2;
+  // V227: Methode-aware AfA-Satz-Bestimmung für Sanierungs-Laufzeit.
+  // Bei degressiv ist der "AfA-Satz" für die Nutzungsdauer-Logik anders:
+  //   linear 2.0% → 50 Jahre Nutzungsdauer
+  //   linear 2.5% → 40 J.
+  //   linear 3.0% → 33 J. (Wohnzwecke ab 2023, Neubau)
+  //   degressiv 5%  → effektive Nutzungsdauer ist 33 J. (Neubau, Wohnbau)
+  var afa_sel_val = (document.getElementById('afa_satz') || {}).value || '2.0';
+  var afa_parsed_for_san = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(afa_sel_val) : { methode: 'linear', satzPct: parseDe(afa_sel_val) || 2 };
+  var afa_satz_pct = afa_parsed_for_san.satzPct;
+  // Effektive Nutzungsdauer für anschaffungsnahe HK:
+  var afa_nutzungsdauer = (afa_parsed_for_san.methode === 'linear')
+    ? Math.round(100 / afa_satz_pct)
+    : 33;  // Degressiv → Wohnbau-Neubau-Nutzungsdauer
   var sanGrenze15 = kp_inp * 0.15;
   var sanAnschaffungsnah, sanLaufzeit, sanAfaJaehrlich;
 
@@ -385,12 +412,12 @@ function _computeAutoForYear(yearIdx, year) {
   } else if (sanYearsChoice === 'auto') {
     // Automatik: 15%-Regel
     sanAnschaffungsnah = san_inp > sanGrenze15;
-    sanLaufzeit = sanAnschaffungsnah ? Math.round(100 / afa_satz_pct) : 5;
+    sanLaufzeit = sanAnschaffungsnah ? afa_nutzungsdauer : 5;
     sanAfaJaehrlich = san_inp / sanLaufzeit;
   } else if (sanYearsChoice === '50') {
-    // Manuell: anschaffungsnah, also Gebäude-AfA-Satz
+    // Manuell: anschaffungsnah, also Gebäude-AfA-Nutzungsdauer
     sanAnschaffungsnah = true;
-    sanLaufzeit = Math.round(100 / afa_satz_pct);
+    sanLaufzeit = afa_nutzungsdauer;
     sanAfaJaehrlich = san_inp / sanLaufzeit;
   } else {
     // Manuell: feste Jahresanzahl als Erhaltungsaufwand
@@ -470,8 +497,9 @@ function _computeAutoForYear(yearIdx, year) {
     telefon: 10,
     sonst_kosten: 0,
 
-    // 5.0 AfA Gebäude — V112 nur noch reine Gebäude-AfA (ohne Küche)
-    afa: afaGebaeude,
+    // 5.0 AfA Gebäude — V112 reine Gebäude-AfA (ohne Küche)
+    // V227: + § 7b Sonder-AfA (wirkt nur in den ersten 4 Jahren)
+    afa: afaGebaeude + afaSonder7bJahr,
 
     // 6.0 AfA bewegliche Wirtschaftsgüter
     // V31: Möblierung → 10 Jahre AfA
