@@ -1,5 +1,41 @@
 # DealPilot Changelog
 
+## V1.1.236.2 — 2026-05-19
+
+### Hotfix: V236.1 — Doppelte Sternchen + Tab-Indikator-Bug + Scroll bei QC-Übernahme
+
+**Problem 1: Doppelte Sternchen ' * *' bei Pflichtfeldern**
+
+Mehrere Labels (z.B. `Ort`, `Wohnfläche`, `Zustand`) hatten 2 Sternchen
+weil sie sowohl `qc-required` (Original) als auch `dp-required` (V236)
+Klassen hatten. Beide CSS-Regeln rendern `::after { content: ' *' }`.
+
+**Fix:**
+- CSS-Override: bei Doppel-Klasse wird `dp-required::after` unterdrückt
+- HTML-Cleanup: bei Labels mit beiden Klassen wird `dp-required` entfernt
+  (qc-required ist Original und bleibt)
+- Plus `data-v236-required-set` Attribut von solchen Labels entfernt
+
+**Problem 2: Tab Objekt zeigt "! ✓" gleichzeitig**
+
+V236.1-Helper läuft via 3 setTimeout-Retries (500ms, 1500ms, 3000ms).
+Bei jedem Run wurde versucht den alten Indikator zu entfernen via
+`querySelector('.v236-tab-status').remove()` — entfernt aber nur das
+ERSTE Element. Bei Race-Condition entstanden 2 Indikatoren parallel.
+
+**Fix:** `querySelectorAll('.v236-tab-status').forEach(remove)` —
+entfernt alle vorhandenen Indikatoren bevor neuer angehängt wird.
+
+**Problem 3: Kein Scroll-to-Top nach QC-Übernahme**
+
+`qcSaveAsObject()` schreibt Felder, macht aber keinen Tab-Switch oder
+Scroll. Mein V236.1-Wrapper hat nur Toast + Markierung gemacht.
+
+**Fix:** Im Wrapper nach Toast:
+1. Wechsel zu Tab Objekt (s0) damit User die markierten Felder sieht
+2. `_v236ScrollTop()` aufrufen (smooth nach oben in .main-col)
+
+
 ## V1.1.236.1 — 2026-05-19
 
 ### Hotfix: V236 Pflichtfelder + QC-Übernahme funktionierten nicht
