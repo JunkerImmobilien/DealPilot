@@ -409,6 +409,7 @@
             '<main class="help-content" id="help-content"></main>' +
           '</div>' +
           '<div class="help-modal-foot help-ai-foot">' +
+            '<button type="button" class="dp-tour-restart-btn" onclick="window.helpStartTour()" title="Einfuehrungstour erneut anzeigen">🎯 Tour starten</button>' +
             '<div class="help-ai-bar" id="help-ai-bar">' +
               '<input type="text" id="help-ai-input" placeholder="✦ Frag den DealPilot-Assistenten — z.B. ‚Wann lohnt sich Tilgungsaussetzung?‘">' +
               '<button class="help-ai-btn" type="button" id="help-ai-btn" onclick="helpAskAI()">Fragen</button>' +
@@ -673,3 +674,18 @@
   window.hideHelp = hideHelp;
   window.helpAskAI = helpAskAI;
 })();
+
+  // V238: Tour-Restart-Handler
+  window.helpStartTour = function() {
+    if (!window.DpTour) {
+      console.warn('[help] DpTour nicht geladen');
+      return;
+    }
+    var modal = document.getElementById('help-modal');
+    if (modal) modal.classList.remove('help-modal-open');
+    setTimeout(function() {
+      window.DpTour.reset();
+      window.DpTour.start();
+    }, 300);
+  };
+

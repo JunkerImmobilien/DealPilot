@@ -1,0 +1,252 @@
+/**
+ * DealPilot V238 — First-Start-Tour CSS
+ * Glassmorphism-Overlay + Spotlight-Highlight + Bubble-Tooltip
+ */
+
+body.dp-tour-active {
+  overflow: hidden;
+}
+
+.dp-tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  background: linear-gradient(135deg, rgba(42,39,39,0.55), rgba(42,39,39,0.65));
+  backdrop-filter: blur(6px) saturate(110%);
+  -webkit-backdrop-filter: blur(6px) saturate(110%);
+  animation: dp-tour-overlay-in 0.4s ease;
+  pointer-events: auto;
+}
+
+@keyframes dp-tour-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.dp-tour-spotlight {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: none;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 3px rgba(201,168,76,0.85),
+    0 0 0 9999px rgba(42,39,39,0.55),
+    0 0 60px rgba(201,168,76,0.4);
+  transition: top 0.35s ease, left 0.35s ease, width 0.35s ease, height 0.35s ease;
+  animation: dp-tour-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes dp-tour-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px rgba(201,168,76,0.85),
+      0 0 0 9999px rgba(42,39,39,0.55),
+      0 0 60px rgba(201,168,76,0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 5px rgba(201,168,76,1),
+      0 0 0 9999px rgba(42,39,39,0.55),
+      0 0 100px rgba(201,168,76,0.6);
+  }
+}
+
+.dp-tour-bubble {
+  position: fixed;
+  z-index: 100000;
+  width: 380px;
+  max-width: calc(100vw - 40px);
+  background: rgba(255, 250, 240, 0.97);
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  border: 1.5px solid rgba(201,168,76,0.6);
+  border-radius: 16px;
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.4),
+    inset 0 0 0 1px rgba(255,255,255,0.6);
+  padding: 0;
+  animation: dp-tour-bubble-in 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #2a2727;
+  transition: top 0.3s ease, left 0.3s ease;
+}
+
+@keyframes dp-tour-bubble-in {
+  from { opacity: 0; transform: scale(0.85) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.dp-tour-bubble-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 8px;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+
+.dp-tour-step-counter {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8a7e60;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.dp-tour-close {
+  background: transparent;
+  border: none;
+  color: #8a7e60;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.dp-tour-close:hover {
+  background: rgba(201,168,76,0.15);
+  color: #c9a84c;
+}
+
+.dp-tour-bubble-body {
+  padding: 14px 22px 18px;
+}
+
+.dp-tour-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #2a2727;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.dp-tour-text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #4a4540;
+}
+.dp-tour-text strong {
+  color: #2a2727;
+  font-weight: 600;
+}
+
+.dp-tour-progress {
+  padding: 0 22px 12px;
+}
+.dp-tour-progress-bar {
+  height: 3px;
+  background: rgba(201,168,76,0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.dp-tour-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c9a84c, #d4b85f);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.dp-tour-bubble-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px 16px;
+  border-top: 1px solid rgba(201,168,76,0.15);
+  gap: 12px;
+}
+
+.dp-tour-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.dp-tour-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.dp-tour-btn-primary {
+  background: linear-gradient(135deg, #c9a84c, #b8964a);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(201,168,76,0.4);
+}
+.dp-tour-btn-primary:hover {
+  background: linear-gradient(135deg, #d4b85f, #c9a84c);
+  box-shadow: 0 4px 12px rgba(201,168,76,0.6);
+  transform: translateY(-1px);
+}
+
+.dp-tour-btn-secondary {
+  background: rgba(201,168,76,0.12);
+  color: #8a7e60;
+}
+.dp-tour-btn-secondary:hover {
+  background: rgba(201,168,76,0.22);
+  color: #2a2727;
+}
+
+.dp-tour-btn-ghost {
+  background: transparent;
+  color: #8a7e60;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+.dp-tour-btn-ghost:hover {
+  color: #c9a84c;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .dp-tour-bubble {
+    width: calc(100vw - 32px);
+    max-width: 380px;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  .dp-tour-spotlight {
+    display: none !important;
+  }
+  .dp-tour-overlay {
+    background: rgba(42,39,39,0.8);
+  }
+  .dp-tour-title {
+    font-size: 17px;
+  }
+  .dp-tour-text {
+    font-size: 13.5px;
+  }
+}
+
+.dp-tour-restart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.08));
+  border: 1px solid rgba(201,168,76,0.4);
+  color: #8a6f30;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  margin-right: 10px;
+}
+.dp-tour-restart-btn:hover {
+  background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.15));
+  color: #c9a84c;
+  border-color: #c9a84c;
+}
