@@ -674,21 +674,31 @@
     if (!step.tab) return callback();
     var current = _currentSection();
     
-    // V239.8: Wenn weg von Sidebar -> Watcher stoppen, Accordion wieder normal
-    if (step.tab !== 'sidebar' && state.accordionWatcher) {
+    // V239.10: Prueft ob Step das Aktions-Accordion braucht
+    var needsAccordion = step.tab === 'sidebar' && 
+        step.selector && 
+        step.selector.indexOf('sb-actions-accordion') !== -1;
+    
+    // Wenn weg von Sidebar ODER zur Sidebar aber OHNE Accordion-Bedarf
+    // -> Watcher stoppen, Accordion wieder zu
+    if (!needsAccordion && state.accordionWatcher) {
       _stopAccordionWatcher();
       _restoreSidebarAccordion();
     }
     
-    // V239.7/.8: Bei Sidebar-Steps: Accordion permanent offen halten via MutationObserver
-    if (step.tab === 'sidebar') {
+    // V239.10: Accordion nur oeffnen wenn dieser Step es WIRKLICH braucht
+    if (needsAccordion) {
       _startAccordionWatcher();
-      // Doppel-Expand: einmal sofort (im Watcher), einmal nach 300ms (CSS-Animation)
       setTimeout(function() {
         _expandSidebarActionsIfCollapsed();
         callback();
       }, 300);
       return;
+    }
+    
+    // Sonstige sidebar-Steps (z.B. #sb-list) -> direkt weiter
+    if (step.tab === 'sidebar') {
+      return callback();
     }
     
     if (step.tab === 'header' || step.tab === 'settings') {
