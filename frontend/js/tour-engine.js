@@ -77,26 +77,38 @@
   }
 
   // V239: Robuste Quick-Check-Oeffnung mit Multi-Strategy
+  // V239.2: PRIORITY auf echten Sidebar-Btn-Click — enterQuickCheckMode statt showQuickCheck
   function _switchToTab(targetSec) {
     if (targetSec === 's-quick') {
       // 1) Schon offen?
-      if (document.querySelector('#qc-tab-host .ds-donut, #qc-score-circle, #qc-score-kpis')) {
+      if (document.querySelector('#qc-score-circle, #qc-tab-host .ds-donut')) {
         return true;
       }
-      // 2) Funktion direkt aufrufen
-      if (typeof window.showQuickCheck === 'function') {
-        try { window.showQuickCheck(); return true; } catch(e) {
-          console.warn('[DpTour] showQuickCheck() failed:', e);
+      // 2) PRIORITY V239.2: echten Sidebar-Button klicken (simuliert User)
+      //    Das ruft enterQuickCheckMode() + showQuickCheck() korrekt auf
+      var sidebarBtn = document.querySelector(
+        '.sb-act-accent[onclick*="quickcheck"], ' +
+        'button[onclick*="sbActionsAction(\'quickcheck\')"]'
+      );
+      if (sidebarBtn) {
+        try { sidebarBtn.click(); return true; } catch(e) {
+          console.warn('[DpTour V239.2] sidebarBtn.click failed:', e);
         }
       }
-      // 3) Sidebar-Action
+      // 3) enterQuickCheckMode direkt (in ui.js definiert)
+      if (typeof window.enterQuickCheckMode === 'function') {
+        try { window.enterQuickCheckMode(); return true; } catch(e) {}
+      }
+      // 4) sbActionsAction Fallback
       if (typeof window.sbActionsAction === 'function') {
         try { window.sbActionsAction('quickcheck'); return true; } catch(e) {}
       }
-      // 4) Notfall: Button anklicken
-      var btn = document.querySelector('[onclick*="sbActionsAction(\'quickcheck\')"], .sb-act-accent[onclick*="quickcheck"]');
-      if (btn) { btn.click(); return true; }
-      console.warn('[DpTour] Quick-Check konnte nicht geoeffnet werden');
+      // 5) Letzter Notfall: showQuickCheck (befuellt qc-tab-host aber schaltet
+      //    Section nicht sichtbar — nur als Last-Resort)
+      if (typeof window.showQuickCheck === 'function') {
+        try { window.showQuickCheck(); return true; } catch(e) {}
+      }
+      console.warn('[DpTour V239.2] Quick-Check konnte nicht geoeffnet werden');
       return false;
     }
     if (targetSec === 'sidebar' || targetSec === 'header' || targetSec === 'settings') {
@@ -448,9 +460,13 @@
 
     _ensureCorrectTab(step, function() {
       // V239: Laengere Retries fuer s-quick und s8 (dynamisch gerendert)
+      // V239.2: s-quick auf 20x300ms = 6s erhoeht
       var retries = 10;
       var interval = 200;
-      if (step.tab === 's-quick' || step.tab === 's8') {
+      if (step.tab === 's-quick') {
+        retries = 20;
+        interval = 300;
+      } else if (step.tab === 's8') {
         retries = 15;
         interval = 300;
       }
@@ -511,8 +527,9 @@
     }
     // V239: Laengere Pause fuer s-quick/s8 die dynamisch rendern
     // V239.1: s8 braucht noch mehr Zeit (deal-action.js rendert ganzen Tab)
+    // V239.2: s-quick auch auf 1500ms (enterQuickCheckMode + show braucht Zeit)
     var pause = 400;
-    if (step.tab === 's-quick') pause = 800;
+    if (step.tab === 's-quick') pause = 1500;
     if (step.tab === 's8') pause = 1500;
     setTimeout(callback, pause);
   }

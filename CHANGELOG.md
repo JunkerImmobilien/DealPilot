@@ -1,5 +1,52 @@
 # DealPilot Changelog
 
+## V1.1.239.2 - 2026-05-19
+
+### Tour Hotfix: Quick-Check-Sprung gefixt + Tool-Tips-Tour-Step
+
+**Bug GEFIXT: Tour sprang von Step 2 zu Step 7**
+
+Server-Diagnose ergab:
+- Quick-Check ist eine versteckte Sektion `<div class="sec sec-hidden" id="s-quick">`
+- Sie wird erst sichtbar durch `enterQuickCheckMode()` (in ui.js), die
+  die Body-Klasse `qc-standalone-active` setzt
+- Mein V239.1 rief direkt `showQuickCheck()` — das befuellt nur
+  #qc-tab-host aber schaltet die Section nicht sichtbar
+- Folge: _isVisible() returnte false fuer alle QC-Elemente -> Auto-Skip
+
+V239.2 Fix in `_switchToTab('s-quick')`:
+- PRIORITY: echten Sidebar-Button klicken (.sb-act-accent[onclick*=quickcheck])
+  Das simuliert echten User und ruft enterQuickCheckMode + showQuickCheck
+- Fallback: window.enterQuickCheckMode() direkt
+- Fallback: window.sbActionsAction('quickcheck')
+- Last-Resort: showQuickCheck (befuellt nur, schaltet nicht sichtbar)
+
+Plus:
+- s-quick Pause: 800ms -> 1500ms
+- s-quick Retries: 15x300ms -> 20x300ms (= 6s)
+
+**Neuer Tour-Step: Tool-Tips: An oder Aus?**
+
+User-Anfrage: Tour soll auf den existierenden Tool-Tips-Toggle in
+Settings -> Profil & Anzeige hinweisen.
+
+V239.2 Implementierung:
+- Neuer Step VOR dem Hilfe-Step (jetzt Step 23 von 24 in withObjects)
+- Anker: Settings-Button via sbActionsAction('settings')
+- Body erklaert Toggle-Position + Vor-/Nachteile
+- Plan-agnostisch (alle User koennen das einstellen)
+
+**Step-Counts:**
+- withObjects: 23 Steps (vorher 22)
+- empty: 22 Steps (vorher 21)
+
+### Geaenderte Dateien
+- `frontend/js/tour-engine.js` - Sidebar-Btn-Priority + 20 retries + 1500ms pause
+- `frontend/js/tour-content.js` - Tool-Tips-Step + neuer Step-Counter
+- `frontend/index.html` - Cache-Bump v=239_2
+- `frontend/js/config.js` - V1.1.239.2
+
+
 ## V1.1.239.1 - 2026-05-19
 
 ### Tour Hotfix: Auto-Load Objekt + echte DealScore-Anker + Step 22 Doppel-Render-Fix
