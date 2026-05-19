@@ -1,5 +1,61 @@
 # DealPilot Changelog
 
+## V1.1.238.3 - 2026-05-19
+
+### Tour SVG-Mask + 17 Steps
+
+**Bug 1 GEFIXT: Element im Spotlight selbst milchig**
+
+V238.1/2 hatten ein dunkles Overlay mit `box-shadow: 0 0 0 9999px` Trick um
+das Element herum zu dimmen. Problem: das Overlay liegt TROTZDEM ueber dem
+Element, somit wird das Element vom Blur und vom Box-Shadow ueberdeckt.
+
+**Fix:** Overlay nutzt jetzt **clip-path mit echtem Loch** an der Spotlight-
+Position. Das Element darunter ist nicht mehr unter dem Overlay — somit
+**gestochen scharf, kein Blur, kein Dim**.
+
+Implementierung in tour-engine.js `_positionSpotlight()`:
+```
+var path = 'polygon(' +
+  '0 0, vw 0, vw vh, 0 vh, 0 0, ' +              // Aussenrand
+  'x y, x (y+h), (x+w) (y+h), (x+w) y, x y, ' +  // Loch
+  '0 0' +
+')';
+overlay.style.clipPath = path;
+```
+
+Spotlight reduziert auf reinen Gold-Border um das Loch (kein box-shadow-Trick
+mehr).
+
+**Neue Steps gegenueber V238.2 (12 -> 17):**
+
+9. **DealScore 0-100** — die Gesamtbewertung erklaert (8 Bausteine, Ampel-Skala)
+10. **Investor-Profil** — DealScore-Gewichtung in Settings, 3 Profile (Cashflow/
+    Wertsteigerung/Sicherheit)
+12. **Deal-Aktion-Tab Uebersicht** — die 3 Stages (pruefen/verhandeln/abschliessen)
+13. **Business-Case-PDF** (umbenannt von "Investment-PDF") mit erweitertem Wording
+14. **Kontakt aufnehmen** — Mail-Templates an Bank/Steuerberater/Anwalt
+15. **Deal abschliessen** — Won-Star fuer "Zuschlag bekommen", Status auf gekauft
+
+**Geaenderte Dateien**
+- `frontend/js/tour-engine.js` — clip-path Logic, neue Funktion `_hideSpotlight`
+  cleart Overlay-clip
+- `frontend/js/tour-content.js` — 17 Steps mit body + bodyMore
+- `frontend/css/tour.css` — Overlay-Background ohne box-shadow-Trick,
+  Spotlight als reiner Border + Glow
+- `frontend/index.html` — Cache-Bump v=238_3
+- `frontend/js/config.js` — V1.1.238.3
+
+**Wichtig: Tab-Switch zu Settings**
+Neuer 'settings'-Tab-Identifier in `_ensureCorrectTab()`. Der DOM-Selektor zeigt
+auf den Sidebar-Settings-Button — bei Klick oeffnet sich das Settings-Modal.
+Tour positioniert die Bubble auf dem Button.
+
+**Mobile-Anpassung**
+clip-path wird auf Mobile mit `clip-path: none !important` ueberschrieben —
+auf engen Touchscreens ist Spotlight ohnehin deaktiviert, Bubble zentriert.
+
+
 ## V1.1.238.2 - 2026-05-19
 
 ### Tour Layout-Fixes
