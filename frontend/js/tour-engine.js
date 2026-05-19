@@ -1,11 +1,11 @@
 /**
- * DealPilot V238.3 — Tour Engine
+ * DealPilot V238.4 — Tour Engine
  *
- * V238.3 Fixes:
- * - SVG-Mask via clip-path: Overlay hat ECHTES LOCH an Spotlight-Position
- *   -> markiertes Element ist gestochen scharf, kein Blur drüber
+ * V238.4 Fixes:
+ * - prev()-Bug: Auto-Skip respektiert jetzt Richtung (state.direction)
+ *   -> Zurueck-Navigation funktioniert auch wenn Element fehlt
+ * - clip-path Loch im Overlay (V238.3)
  * - Hard-Fallback Smart-Placement (V238.2)
- * - Komma-Selektor-Split (V238.2)
  */
 (function() {
   'use strict';
@@ -17,6 +17,7 @@
     idx: 0,
     active: false,
     expanded: false,
+    direction: 'next',  // V238.4: Richtung fuer Auto-Skip
     overlay: null,
     spotlight: null,
     bubble: null,
@@ -121,8 +122,6 @@
     document.body.classList.remove('dp-tour-active');
   }
 
-  // ─── V238.3: Echtes Loch im Overlay via clip-path ────────────────────
-
   function _positionSpotlight(el) {
     if (!state.spotlight || !el) return;
     var rect = el.getBoundingClientRect();
@@ -134,15 +133,12 @@
     var vw = window.innerWidth;
     var vh = window.innerHeight;
 
-    // Spotlight = Gold-Border um das Loch
     state.spotlight.style.top    = y + 'px';
     state.spotlight.style.left   = x + 'px';
     state.spotlight.style.width  = w + 'px';
     state.spotlight.style.height = h + 'px';
     state.spotlight.style.display = 'block';
 
-    // V238.3: Overlay bekommt clip-path mit Loch an Spotlight-Position
-    // Polygon: außen rechteck, dann hineingehen, Loch rechteck, wieder raus
     if (state.overlay) {
       var path = 'polygon(' +
         '0 0, ' +
@@ -150,7 +146,6 @@
         vw + 'px ' + vh + 'px, ' +
         '0 ' + vh + 'px, ' +
         '0 0, ' +
-        // Brücke zum Loch
         x + 'px ' + y + 'px, ' +
         x + 'px ' + (y + h) + 'px, ' +
         (x + w) + 'px ' + (y + h) + 'px, ' +
@@ -165,14 +160,11 @@
 
   function _hideSpotlight() {
     if (state.spotlight) state.spotlight.style.display = 'none';
-    // Overlay-Loch entfernen (full coverage)
     if (state.overlay) {
       state.overlay.style.clipPath = '';
       state.overlay.style.webkitClipPath = '';
     }
   }
-
-  // ─── Smart-Placement mit Hard-Fallback ───────────────────────────────
 
   function _hasSpaceForPlacement(rect, bw, bh, placement, margin) {
     var vw = window.innerWidth;
@@ -264,8 +256,6 @@
     state.bubble.classList.remove('dp-tour-bubble-top', 'dp-tour-bubble-bottom', 'dp-tour-bubble-left', 'dp-tour-bubble-right');
     state.bubble.classList.add('dp-tour-bubble-center');
   }
-
-  // ─── Bubble-Content (Premium) ────────────────────────────────────────
 
   function _renderBubbleContent(step) {
     if (!state.bubble) return;
@@ -389,10 +379,24 @@
             _renderBubbleContent(step);
             return;
           }
-          state.idx++;
-          if (state.idx >= state.steps.length) {
-            Tour.complete();
-            return;
+          // V238.4: Auto-Skip respektiert state.direction
+          if (state.direction === 'prev') {
+            if (state.idx <= 0) {
+              // Erster Step nicht gefunden -> in der Mitte zeigen
+              state.idx = 0;
+              _createOverlay();
+              _hideSpotlight();
+              _setBubbleCenter();
+              _renderBubbleContent(step);
+              return;
+            }
+            state.idx--;
+          } else {
+            state.idx++;
+            if (state.idx >= state.steps.length) {
+              Tour.complete();
+              return;
+            }
           }
           return _renderStep();
         }
@@ -433,6 +437,7 @@
       state.steps = steps;
       state.idx = 0;
       state.expanded = false;
+      state.direction = 'next';
       state.active = true;
 
       state.onResize = function() {
@@ -465,12 +470,14 @@
         Tour.complete();
         return;
       }
+      state.direction = 'next';  // V238.4
       state.idx++;
       _renderStep();
     },
 
     prev: function() {
       if (!state.active || state.idx <= 0) return;
+      state.direction = 'prev';  // V238.4
       state.idx--;
       _renderStep();
     },
