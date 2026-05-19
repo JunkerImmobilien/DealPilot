@@ -1,5 +1,50 @@
 # DealPilot Changelog
 
+## V1.1.227 — 2026-05-19
+
+### Major Feature: Degressive AfA + § 7b Sonder-AfA (B4.1)
+
+**Neue AfA-Methoden im Tab Steuer-Details:**
+- **5,0 % degressiv** (§ 7 Abs. 5a EStG) — vom Restbuchwert, ohne Wechsel
+- **5,0 % degressiv mit Wechsel** auf 3 % linear (empfohlen, klassische Steueroptimierung)
+
+**Neue § 7b Sonder-AfA** (collapsible Block):
+- Zusätzliche 5 % p.a. in den ersten 4 Jahren
+- Eligibility-Checks (Effizienzhaus 40 NH, Baukosten-Cap, Vermietungspflicht)
+- Förderfähige Basis automatisch berechnet (Cap 4.000 €/m² Wohnfläche)
+
+**Auto-Hinweis-Banner bei Neubau** (weicher Switch nach Marcels Spezifikation):
+- Wenn `ds2_zustand=neubau` UND `Baujahr ≥ 2023` UND lineare AfA gewählt
+- Banner zeigt: "💡 Degressive AfA möglich" mit Direkt-Wechseln-Button
+- Per X-Button dismissable
+
+**Vorschau-Tabelle bei degressiv:**
+- Erste 10 Jahre detailliert (Normal-AfA / § 7b / Gesamt)
+- Wechseljahr markiert wenn "degressiv mit Wechsel" aktiv
+
+**Backend bleibt unberührt** — alle Berechnungen im Frontend
+(keine DB-Migration, keine API-Änderung).
+
+### Architektur
+- Neue Datei `frontend/js/afa-engine.js` — Reine Compute-Library (testbar, unit-tested)
+- Neue Datei `frontend/js/afa-ui.js` — UI-Glue zwischen Engine und Tab Steuer
+- `frontend/js/calc.js` — AfA-Block ersetzt durch Engine-Call, State._afaSeries befüllt
+- `frontend/js/tax.js` — `_computeAutoForYear` nutzt jahresgenaue Series statt Jahr-1-Wert
+
+### Bugfixes
+- **B2.10 (V226-Followup)**: Sanierungs-Nutzungsdauer für anschaffungsnahe HK
+  ist jetzt methode-aware (33 J. bei degressiv, sonst 100 / linearSatz).
+- AfA-Option-Label im Tab Investition vereinfacht
+
+### Tests
+- Unit-Tests für afa-engine.js (Linear, Degressiv, Wechsel-Logik, § 7b)
+- Excel-Abgleich für klassische Reihen erfolgreich
+
+### Was NICHT in V227 ist
+- Finanzamt-PDF-Export-Update auf degressive Reihe (kommt in V228)
+- DB-Persistierung der AfA-Methode (derzeit reicht JSONB `data`-Spalte)
+
+
 ## V1.1.226 — 2026-05-19
 
 ### Fixes (Pre-Pro Bug-Fixes nach Tab-Audit)

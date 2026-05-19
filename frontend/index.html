@@ -29,6 +29,71 @@
 <link rel="stylesheet" href="css/select-fix.css?v=150">
     <link rel="stylesheet" href="css/v187-additions.css?v=191">
   <link rel="stylesheet" href="credits-modal.css?v=197">
+
+<!-- V227: AfA-Neubau-Hinweis Styles -->
+<style id="v227-afa-styles">
+.afa-neubau-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 0 14px 0;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(201,168,76,0.04));
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 8px;
+  position: relative;
+}
+.afa-neubau-hint-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.afa-neubau-hint-body {
+  flex: 1;
+}
+.afa-neubau-hint-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ch, #2a2727);
+  margin-bottom: 4px;
+}
+.afa-neubau-hint-text {
+  font-size: 12.5px;
+  color: var(--muted, #6b6b6b);
+  line-height: 1.4;
+}
+.afa-neubau-hint-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+  min-width: 200px;
+}
+@media (max-width: 720px) {
+  .afa-neubau-hint { flex-direction: column; }
+  .afa-neubau-hint-actions { min-width: 0; }
+}
+
+#afa_deg_preview_wrap[open] summary { background: rgba(201,168,76,0.16); }
+
+#afa_deg_preview_body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+#afa_deg_preview_body th,
+#afa_deg_preview_body td {
+  padding: 4px 8px;
+  text-align: right;
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+}
+#afa_deg_preview_body th { font-weight: 600; color: var(--ch); }
+#afa_deg_preview_body td.tal { text-align: left; }
+#afa_deg_preview_body tr.afa-wechsel { background: rgba(70,130,180,0.06); }
+#afa_deg_preview_body tr.afa-sonder { color: var(--green, #2a9a5a); }
+#afa_deg_preview_body tr.afa-total td { font-weight: 600; border-top: 2px solid var(--gold, #c9a84c); }
+</style>
 </head>
 <body>
 
@@ -770,7 +835,7 @@
                     <option value="3">3 Jahre</option>
                     <option value="4">4 Jahre</option>
                     <option value="5">5 Jahre (Standard §82b)</option>
-                    <option value="50">Über AfA-Satz · 50 J. Altbau / 33 J. Neubau · anschaffungsnah</option>
+                    <option value="50">Über AfA-Nutzungsdauer (anschaffungsnahe HK)</option>
                   </select>
                 </div>
               </div>
@@ -1014,11 +1079,30 @@
       <button class="btn btn-outline btn-sm" onclick="openBMFRechner()" type="button" data-feature="bmf_calc_export">📐 BMF-AfA-Rechner</button>
     </div>
     <p class="hint" style="margin-top:6px">Mit dem BMF-Rechner kannst du Gebäude- und Bodenanteil sowie den AfA-Satz nach amtlicher Methode (Sachwertverfahren) ermitteln.</p>
+    <!-- V227: Hinweis-Banner für Neubau-Degressiv-AfA (versteckt by default, befüllt via JS) -->
+    <div id="afa-neubau-hint" class="afa-neubau-hint" style="display:none">
+      <span class="afa-neubau-hint-icon">💡</span>
+      <div class="afa-neubau-hint-body">
+        <div class="afa-neubau-hint-title">Degressive AfA möglich</div>
+        <div class="afa-neubau-hint-text" id="afa-neubau-hint-text">Bei Neubau mit Bauantrag/Kaufvertrag ab 10/2023 erlaubt § 7 Abs. 5a EStG eine degressive AfA mit 5% vom Restbuchwert. Vorteil: deutlich höhere Abschreibung in den ersten Jahren.</div>
+      </div>
+      <div class="afa-neubau-hint-actions">
+        <button type="button" class="btn btn-gold btn-sm" onclick="afaSwitchToDegressiv()">Auf degressiv 5% wechseln</button>
+        <button type="button" class="btn btn-link btn-sm" onclick="afaDismissNeubauHint()" title="Hinweis ausblenden">✕</button>
+      </div>
+    </div>
+
     <div class="g2">
-      <div class="f"><label>AfA-Satz</label><select id="afa_satz" onchange="calc()">
-        <option value="2.0">2,0 % (Standard ab 1925)</option>
-        <option value="2.5">2,5 % (Baujahr vor 1925)</option>
-        <option value="3.0">3,0 % (Wohnzwecke ab 2023)</option>
+      <div class="f"><label>AfA-Satz</label><select id="afa_satz" onchange="onAfaSatzChange()">
+        <optgroup label="Linear (§ 7 Abs. 4 EStG)">
+          <option value="2.0">2,0 % linear — Standard ab 1925</option>
+          <option value="2.5">2,5 % linear — Baujahr vor 1925</option>
+          <option value="3.0">3,0 % linear — Wohnzwecke ab 2023</option>
+        </optgroup>
+        <optgroup label="Degressiv (§ 7 Abs. 5a EStG, Neubau 10/2023–09/2029)">
+          <option value="5.0_deg">5,0 % degressiv — ohne Wechsel</option>
+          <option value="5.0_deg_wechsel">5,0 % degressiv mit Wechsel auf 3% linear (empfohlen)</option>
+        </optgroup>
       </select></div>
       <div class="f">
               <label>Gebäudeanteil am KP (%)</label>
@@ -1027,7 +1111,75 @@
               <div id="geb-ant-banner" class="geb-ant-banner"></div>
             </div>
     </div>
-    <div class="f"><label>AfA / Jahr (berechnet)</label><div class="cf" id="afa_kalk">—</div></div>
+    <div class="f"><label>AfA / Jahr (berechnet) <span class="hint" id="afa_methode_label" style="font-size:11px;color:var(--muted)"></span></label><div class="cf" id="afa_kalk">—</div></div>
+
+    <!-- V227: Wenn degressiv aktiv: kleine Vorschau-Tabelle erste 10 Jahre -->
+    <details id="afa_deg_preview_wrap" style="margin-top:10px;display:none">
+      <summary style="cursor:pointer;padding:8px 12px;background:rgba(201,168,76,0.08);border-radius:6px;font-size:13px;font-weight:600;color:var(--ch)">
+        <span>📅 AfA-Verlauf erste 10 Jahre ansehen</span>
+      </summary>
+      <div id="afa_deg_preview_body" style="margin-top:8px;padding:10px;background:rgba(201,168,76,0.04);border-radius:6px;font-size:12px">
+        <!-- befüllt via JS -->
+      </div>
+    </details>
+
+    <!-- V227: § 7b Sonder-AfA Block (collapsible) -->
+    <details id="afa_sonder7b_wrap" style="margin-top:14px;border:1px solid rgba(201,168,76,0.25);border-radius:8px;padding:10px 14px;background:rgba(201,168,76,0.04)">
+      <summary style="cursor:pointer;font-weight:600;font-size:13px;color:var(--ch);list-style:none;display:flex;justify-content:space-between;align-items:center">
+        <span>🏗️ Sonder-AfA § 7b EStG (zusätzlich +5% in den ersten 4 Jahren)</span>
+        <span class="cf-hint" style="font-weight:400;font-size:11px">klick zum Aufklappen</span>
+      </summary>
+      <div style="margin-top:12px">
+        <p class="hint" style="margin-top:0">
+          Die Sonder-AfA nach <b>§ 7b EStG</b> erlaubt zusätzliche 5% AfA jährlich in den ersten 4 Jahren — <b>obendrauf</b> zur regulären linearen oder degressiven AfA. Bedingungen sind streng (siehe unten).
+        </p>
+        <div class="f checkbox-row">
+          <label class="cb-label">
+            <input type="checkbox" id="afa_sonder7b_aktiv" onchange="onAfaSonder7bToggle()">
+            <span>§ 7b Sonder-AfA aktivieren</span>
+          </label>
+        </div>
+        <div id="afa_sonder7b_details" style="display:none;margin-top:10px;padding:10px;background:white;border-radius:6px;border:1px solid rgba(201,168,76,0.2)">
+          <p class="hint" style="font-weight:600;color:var(--ch);margin-bottom:8px">Voraussetzungen bestätigen:</p>
+          <div class="f checkbox-row">
+            <label class="cb-label">
+              <input type="checkbox" id="afa_sonder7b_eh40">
+              <span>Effizienzhaus 40 NH (QNG-Siegel)</span>
+            </label>
+          </div>
+          <div class="f checkbox-row">
+            <label class="cb-label">
+              <input type="checkbox" id="afa_sonder7b_baukosten">
+              <span>Baukosten ≤ 5.200 €/m² Wohnfläche</span>
+            </label>
+          </div>
+          <div class="f checkbox-row">
+            <label class="cb-label">
+              <input type="checkbox" id="afa_sonder7b_vermietung">
+              <span>10 Jahre Vermietung verbindlich</span>
+            </label>
+          </div>
+          <div class="f checkbox-row">
+            <label class="cb-label">
+              <input type="checkbox" id="afa_sonder7b_neubau">
+              <span>Neubau mit Bauantrag/Kaufvertrag 01.01.2023 – 30.09.2029</span>
+            </label>
+          </div>
+          <div class="info-box" style="margin-top:10px;background:rgba(70,130,180,0.06);border-left:3px solid #4682B4;padding:10px;border-radius:4px">
+            <div class="hint" style="font-size:11.5px">
+              <b>Förderfähige Basis (Cap):</b> max. 4.000 €/m² Wohnfläche.<br>
+              Bei Wohnfläche × 4.000 € liegt unter den AHK, wird gekappt.<br>
+              <b>Wirkung:</b> +5% pro Jahr in den ersten 4 Jahren (= 20% zusätzliche Abschreibung).
+            </div>
+          </div>
+          <div class="f" style="margin-top:10px"><label>§ 7b Förderfähige Basis (berechnet)</label><div class="cf" id="afa_sonder7b_basis">—</div></div>
+          <div class="f"><label>§ 7b Zusätzliche AfA / Jahr (J. 1–4)</label><div class="cf" id="afa_sonder7b_jaehrlich">—</div></div>
+        </div>
+        <div id="afa_sonder7b_warning" style="display:none;margin-top:10px;padding:8px 12px;background:rgba(201,76,76,0.08);border-left:3px solid var(--red);border-radius:4px;font-size:12px;color:var(--red)">
+          ⚠ Nicht alle Bedingungen bestätigt — § 7b wird in der Berechnung NICHT angesetzt.
+        </div>
+      </div>
+    </details>
   </div>
 
   <div class="card" style="margin-top:14px">
@@ -2232,14 +2384,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="js/deal-kpis.js?v=124"></script>
-<script src="js/calc.js?v=226"></script>
+<script src="js/afa-engine.js?v=227"></script>
+  <script src="js/afa-ui.js?v=227"></script>
+  <script src="js/calc.js?v=227"></script>
 <script src="js/d1-type-handler.js?v=160"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=166"></script>
-<script src="js/config.js?v=226"></script>
+<script src="js/tax.js?v=227"></script>
+<script src="js/config.js?v=227"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
