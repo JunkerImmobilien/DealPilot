@@ -1,5 +1,86 @@
 # DealPilot Changelog
 
+## V1.1.239 - 2026-05-19
+
+### Tour Vollumbau: Sidebar-First + Conditional Logic
+
+**Neues Konzept (User-Feedback):**
+Tour startet jetzt **bei der Sidebar** und folgt dem realistischen Workflow:
+Sidebar -> Objekt-Auswahl ODER Quick-Check -> Vollanalyse -> Tabs -> Bewertung -> Deal.
+
+**Bug 1 GEFIXT: Tour startete bei Step 4 (Tab-Bar)**
+Die Quick-Check-Steps wurden geskippt weil:
+- Retries zu kurz (10x200ms = 2s)
+- Tab-Switch-Pause zu kurz (400ms)
+- Nur 1 Fallback-Strategy fuer showQuickCheck
+
+V239 Fix:
+- Retries fuer s-quick und s8 erhoeht auf 15x300ms (4.5s)
+- Tab-Switch-Pause fuer dynamisch gerenderte Tabs auf 800ms
+- 4 Fallback-Strategien in _switchToTab('s-quick'):
+  1. Schon offen? -> return
+  2. window.showQuickCheck() Direktaufruf
+  3. window.sbActionsAction('quickcheck')
+  4. Notfall: Button anklicken
+- Auto-Start-Delay erhoeht auf 2.5-3 Sekunden (Sidebar muss erst rendern)
+
+**Bug 2 GEFIXT: prev() respektiert state.direction (war schon in V238.4)**
+
+**Bug 3 GEFIXT: Hilfe-Selektor (war schon in V238.5)**
+
+**Conditional Logic:**
+Engine erkennt automatisch ob User Objekte hat:
+- _hasUserObjects() prueft #sb-list auf Inhalt
+- DpTourVariants.withObjects: 24 Steps (User hat schon Objekte)
+- DpTourVariants.empty: 20 Steps (Onboarding, Quick-Check zuerst)
+- Bei Tour.start() wird die richtige Variante automatisch geladen
+
+**Neuer Step: Investor Deal Score**
+Wird IMMER gezeigt (auch bei Free) mit Hinweis "Verfuegbar ab Starter-Plan".
+Erklaert:
+- 32 KPIs statt 8 (Equity Multiple, Cap Rate, NOI, Cash-on-Cash, etc.)
+- Wo finden: Header-Toggle "Investor Deal Score ein/aus"
+- Plan-Verfuegbarkeit pro Plan
+
+**Tour-Struktur (Variante withObjects, 24 Steps):**
+
+Phase 1: Sidebar Overview (3 Steps)
+1. Sidebar - Willkommen
+2. Objekt auswaehlen (klick auf Card)
+3. Quick-Check fuer neue Objekte
+
+Phase 2: Quick-Check (3 Steps)
+4. Quick-Check Score
+5. KI-Recherche
+6. Als Objekt speichern
+
+Phase 3: 8 Tabs einzeln (7 Steps)
+7-13. Objekt -> Investition -> Miete -> Finanzierung -> Bewirtschaftung -> KI -> Bewertung
+
+Phase 4: Bewertungs-Cockpit-Details (4 Steps)
+14. Bewertungs-Cockpit (DSCR + LTV)
+15. DealScore 0-100
+16. Investor Deal Score (Plan-Hinweis)
+17. Stress-Test
+
+Phase 5: Deal-Aktion (4 Steps)
+18. Tab Deal-Aktion Uebersicht
+19. Kontakt aufnehmen
+20. Business-Case-PDF
+21. Deal abschliessen (Won-Star)
+
+Phase 6: Hilfe (1 Step)
+22. Hilfe-Icon (korrekter Selektor button.hdr-icon-btn[title=Hilfe])
+
+(In Variante "empty" entfaellt Step 2 "Objekt auswaehlen" -> 20 Steps total)
+
+### Geaenderte Dateien
+- `frontend/js/tour-engine.js` - Conditional Logic + robuste Retries
+- `frontend/js/tour-content.js` - 2 Varianten (withObjects + empty)
+- `frontend/index.html` - Cache-Bump v=239
+- `frontend/js/config.js` - V1.1.239
+
+
 ## V1.1.238.5 - 2026-05-19
 
 ### Tour Hotfix: Hilfe-Step Selektor korrigiert
