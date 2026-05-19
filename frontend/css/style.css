@@ -28427,3 +28427,165 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 }
 
 /* ════ Ende V233 Mobile-Fixes ════ */
+
+
+/* ════════════════════════════════════════════════════════════════════════
+ * V234.1: Plan-Status-Header (Settings → Plan-Tab)
+ * Premium-Goldakzentuierte Card mit Plan-Info + Aktions-Buttons
+ * ════════════════════════════════════════════════════════════════════════ */
+
+.v234-status-header {
+  margin-bottom: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, rgba(245,236,208,0.30) 100%);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-left: 4px solid var(--gold, #C9A84C);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(201,168,76,0.06);
+}
+
+.v234-status-header.v234-status-paid {
+  background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, rgba(245,236,208,0.45) 100%);
+  border-left-color: var(--gold-d, #8a6f27);
+}
+
+.v234-status-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.v234-status-icon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fdf9ef, #f5ecd0);
+  border: 1px solid rgba(201,168,76,0.40);
+  border-radius: 10px;
+  color: var(--gold-d, #8a6f27);
+  box-shadow: 0 2px 6px rgba(201,168,76,0.20), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.v234-status-icon svg {
+  display: block;
+  color: var(--gold-d, #8a6f27);
+}
+
+.v234-status-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.v234-status-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--gold-3, #9a7f33);
+  margin-bottom: 4px;
+}
+
+.v234-status-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold-d, #8a6f27);
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.15;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+
+.v234-status-meta {
+  font-size: 13px;
+  color: var(--muted, #6e6e6e);
+  line-height: 1.5;
+}
+
+.v234-status-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.v234-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  font-family: 'DM Sans', sans-serif;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.v234-btn-primary {
+  background: linear-gradient(135deg, var(--gold, #C9A84C) 0%, var(--gold-d, #8a6f27) 100%);
+  color: #fff;
+  border-color: var(--gold-d, #8a6f27);
+  box-shadow: 0 2px 6px rgba(201,168,76,0.30);
+}
+
+.v234-btn-primary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(201,168,76,0.40);
+}
+
+.v234-btn-secondary {
+  background: transparent;
+  color: var(--gold-d, #8a6f27);
+  border-color: rgba(201,168,76,0.40);
+}
+
+.v234-btn-secondary:hover {
+  background: rgba(201,168,76,0.08);
+  border-color: var(--gold, #C9A84C);
+}
+
+.v234-btn-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.v234-status-hint {
+  font-size: 12px;
+  color: var(--muted, #6e6e6e);
+  line-height: 1.6;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.40);
+  border-radius: 6px;
+  border-left: 2px solid rgba(201,168,76,0.30);
+}
+
+.v234-status-hint strong {
+  color: var(--gold-d, #8a6f27);
+}
+
+.v234-status-hint-free {
+  background: rgba(201,168,76,0.08);
+  border-left-color: var(--gold, #C9A84C);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .v234-status-header { padding: 18px; }
+  .v234-status-row { gap: 14px; margin-bottom: 14px; }
+  .v234-status-icon { width: 44px; height: 44px; }
+  .v234-status-icon svg { width: 24px; height: 24px; }
+  .v234-status-name { font-size: 22px; }
+  .v234-status-actions { flex-direction: column; }
+  .v234-btn { width: 100%; }
+}
+
+/* ════ Ende V234.1 ════ */
