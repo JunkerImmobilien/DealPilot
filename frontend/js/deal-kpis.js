@@ -131,11 +131,33 @@ window.DealKpis = (function() {
     var cf_full_j = cf_ns;
     var cf_full_m = cf_ns_m;
 
-    // ═════ DSCR (brutto + netto) ═════
-    var kd_dscr     = zins_j + tilg_j;
-    var dscr        = kd_dscr > 0 ? (nkm_j / kd_dscr) : 0;
-    var dscr_netto  = kd_dscr > 0 ? ((nkm_j - bwk_cf) / kd_dscr) : 0;
-    var noi_dscr    = nkm_j;
+    // ═════ DSCR (brutto + netto) ═════ V231: zentral via Dscr.compute()
+    // BSV-Sparrate wird als wirtschaftlicher Tilgungsersatz mit eingerechnet
+    // (konsistent mit calc.js und Cashflow-Box). bspar_y kommt aus input,
+    // Fallback 0 wenn nicht geliefert (Bar-Kauf oder normaler Annuitätenkredit).
+    var _dscrR = (typeof window.Dscr !== 'undefined' && window.Dscr)
+      ? window.Dscr.compute({
+          nkm_j:  nkm_j,
+          ze_j:   0,           // ZE ist hier schon in nkm_j enthalten (Service-Layer ohne ZE-Trennung)
+          zins_j: zins_j,
+          tilg_j: tilg_j,
+          bsv_j:  (typeof bspar_y === 'number' ? bspar_y : 0),
+          bwk_cf: bwk_cf
+        })
+      : (function () {
+          // Fallback wenn Engine nicht geladen — alte Formel mit BSV erweitert
+          var _kd = zins_j + tilg_j + (typeof bspar_y === 'number' ? bspar_y : 0);
+          return {
+            brutto: _kd > 0 ? nkm_j / _kd : 0,
+            netto:  _kd > 0 ? (nkm_j - bwk_cf) / _kd : 0,
+            kd:     _kd,
+            noi_brutto: nkm_j
+          };
+        })();
+    var kd_dscr     = _dscrR.kd;
+    var dscr        = _dscrR.brutto;
+    var dscr_netto  = _dscrR.netto;
+    var noi_dscr    = _dscrR.noi_brutto;
 
     // ═════ Renditen ═════
     var bmy = kp > 0 ? (nkm_j / kp * 100) : 0;

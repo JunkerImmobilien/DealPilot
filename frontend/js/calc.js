@@ -1101,14 +1101,22 @@ function _calcImmediate(){
   var cf_ns_m = cf_ns / 12;
   st('zve_cf',fE(zve_immo,0,true));
   st('steuer_j',fE(-steuer,0)+(steuer<0?' (Erstattung)':' (Belastung)'));
-  // DSCR = Mieteinnahmen (NKM+ZE) / Kapitaldienst (Zins+Tilgung)
-  // V63.57: Bei Tilgungsaussetzung wird die BSV-Sparrate als wirtschaftlicher
-  // Tilgungsersatz mit eingerechnet (so wie es Banken in der Praxis tun)
-  var noi_dscr=(nkm+ze)*12; // Nettomieteinnahmen (ohne Betriebskosten)
-  var bsv_in_kd = _d1IsAussetzung ? bspar_y : 0;  // BSV-Sparrate als wirtschaftl. Tilgungsersatz
-  var kd_dscr=zins_j+tilg_j+bsv_in_kd;
-  var dscr=kd_dscr>0?noi_dscr/kd_dscr:0;
-  var dscr_netto=kd_dscr>0?(nkm_j-bwk_cf)/kd_dscr:0; // V63.35: NOI = NKM − NUL (Excel-Logik)
+  // V231: DSCR zentral via Dscr.compute() — Single Source of Truth
+  // BSV-Sparrate fließt als wirtschaftlicher Tilgungsersatz in den Schuldendienst
+  // (konsistent mit deal-kpis.js und Cashflow-Box).
+  var bsv_in_kd = _d1IsAussetzung ? bspar_y : 0;
+  var _dscrMain = window.Dscr.compute({
+    nkm_j:  nkm * 12,    // NKM × 12 = Jahres-Kaltmiete
+    ze_j:   ze  * 12,    // Zuschläge × 12 (Stellplatz etc.)
+    zins_j: zins_j,
+    tilg_j: tilg_j,
+    bsv_j:  bsv_in_kd,
+    bwk_cf: bwk_cf
+  });
+  var noi_dscr    = _dscrMain.noi_brutto;
+  var kd_dscr     = _dscrMain.kd;
+  var dscr        = _dscrMain.brutto;
+  var dscr_netto  = _dscrMain.netto;
   // Einheitliche DSCR-Schwellen: <1.0 kritisch · 1.0–1.2 ausreichend · ≥1.2 standard
   var dscrLabel = dscr >= 1.2 ? '✓ Standard (≥1,2)' : dscr >= 1.0 ? '⚠ Ausreichend (1,0–1,2)' : '✗ Kritisch (<1,0)';
   var dscrCls   = dscr >= 1.2 ? 'dscr-good' : dscr >= 1.0 ? 'dscr-warn' : 'dscr-bad';
@@ -2437,10 +2445,21 @@ function renderCFCalc(mode){
   // Tilgungsersatz mit in den Schuldendienst eingerechnet (so wie es Banken
   // auch in der Praxis handhaben) — sofern die Sparphase noch läuft.
   // _showBsparInPhase wurde oben in der Phase-Logik gesetzt
+  // V231: DSCR zentral via Dscr.compute() — Cashflow-Box-Variante
+  // Phase-aware: data.zins/tilg/nkm_phase/noi werden je nach Mode unterschiedlich gesetzt.
+  // BSV-Sparrate fließt nur ein wenn _showBsparInPhase (Sparphase aktiv).
   var bsv_in_dscr = (_showBsparInPhase ? _bsparPhase : 0);
-  var schuldendienst = data.zins + data.tilg + bsv_in_dscr;
-  var dscrBrutto = schuldendienst > 0 ? nkm_phase / schuldendienst : 0;
-  var dscrNetto  = schuldendienst > 0 ? noi / schuldendienst : 0;
+  var _dscrCf = window.Dscr.compute({
+    nkm_j:  nkm_phase,                 // bereits Brutto (NKM+ZE in der Phase)
+    ze_j:   0,
+    zins_j: data.zins,
+    tilg_j: data.tilg,
+    bsv_j:  bsv_in_dscr,
+    bwk_cf: nkm_phase - noi            // bwk_cf = NKM - NOI (Definition NOI = NKM - BWK_NUL)
+  });
+  var schuldendienst = _dscrCf.kd;
+  var dscrBrutto     = _dscrCf.brutto;
+  var dscrNetto      = _dscrCf.netto;
   var dscrFormula = document.getElementById('cr-dscr-formula');
   var dscrVal = document.getElementById('cr-dscr-val');
   var dscrSubVal = document.getElementById('cr-dscr-netto-val');
