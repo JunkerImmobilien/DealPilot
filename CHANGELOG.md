@@ -1,5 +1,70 @@
 # DealPilot Changelog
 
+## V1.1.237 — 2026-05-19
+
+### Glossar-Erweiterung + Doppelte-Sternchen-FINAL-Fix
+
+**Problem 1: Doppelte Sternchen ** trotz V236.2-Fix**
+
+V236.2-Cleanup hat den Bug nicht behoben — Root-Cause war anders als gedacht.
+Im HTML-Quellcode hatten 6 Labels das Sternchen ZWEIMAL drin:
+- Im Label-Text selbst: `<label>Ort *</label>`
+- Plus via CSS `.dp-required::after { content: ' *' }`
+
+V236.2 suchte nach `qc-required + dp-required` Doppel-Klassen, fand aber nichts —
+weil's gar nicht die Klassen-Doppel waren, sondern Text-`*` + CSS-`*`.
+
+**Fix:** Bei allen Labels mit `class="dp-required"` das Text-` *` aus dem Label-
+Inhalt entfernen. Das CSS-Sternchen bleibt — somit nur EIN Sternchen pro Pflichtfeld.
+
+Betroffene 6 Labels: Ort, Kaufpreis, Nettokaltmiete, Eigenkapital, Anfängl. Darlehenssumme,
+und das weitere `Ort *` (Quick-Check-Modal).
+
+**Problem 2: Glossar nur 11 Begriffe**
+
+Bestehender Glossar (Hilfe-Modal → Tab Glossar) hatte 11 Einträge: AfA, BWK, BSV,
+EZB, GI, KNK, NKM, NOI, NMR, Verkehrswert, ZE.
+
+**Lösung:** 18 zusätzliche Begriffe ergänzt — jetzt 29 Glossar-Einträge:
+- Annuitätendarlehen
+- Anschlussfinanzierung
+- BMR (Bruttomietrendite)
+- Beleihungswert
+- Cashflow
+- DealScore
+- DSCR
+- EK-Rendite p.a.
+- EM (Equity Multiple)
+- Faktor (Vervielfältiger)
+- GrESt (Grunderwerbsteuer)
+- Hausgeld
+- Instandhaltungsrücklage
+- IRR (Internal Rate of Return)
+- LTV (Beleihungsauslauf)
+- Mietausfallwagnis
+- Restschuld
+- Sonder-AfA §7b EStG
+- Tilgung-vom-Mieter
+- Tilgungssatz
+- Wertgutachten / Verkehrswertgutachten
+- Wertpuffer
+- Zinsrisiko
+
+Jeder Eintrag mit ausführlicher Erklärung, typischen Werten, Faustregeln und
+Praxis-Beispielen — als Finanzprofi-Referenz im Browser-Modal.
+
+### Geprüft aber nicht angefasst
+- **Welcome-Mail-System** (V198) ist komplett funktional: `welcomeMail.js`,
+  Templates in `backend/templates/`, Webhook-Integration in `stripeWebhook.js`.
+  Falls Welcome-Mail nicht ankommt nach Stripe-Checkout → V237.1 als Diagnose-Hotfix.
+
+### Was V237 NICHT macht
+- Welcome-Mail-Debugging (separat falls nötig)
+- Plausibilitäts-Hints
+- Onboarding-Wizard
+- Stripe Live-Mode-Vorbereitung
+
+
 ## V1.1.236.2 — 2026-05-19
 
 ### Hotfix: V236.1 — Doppelte Sternchen + Tab-Indikator-Bug + Scroll bei QC-Übernahme
