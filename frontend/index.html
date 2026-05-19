@@ -336,6 +336,83 @@ body.dp-tt-off .dp-tip-infobox {
   color: var(--gold-d, #8a6f27);
 }
 </style>
+
+<style id="v236-styles">
+/* ════════════════════════════════════════════════════════════════════════
+ * V236: Pflichtfelder + Tab-Status-Indikator + QC-Übernahme-Markierung
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* Pflichtfeld-Sternchen im Label */
+.dp-required::after {
+  content: ' *';
+  color: var(--red, #B8625C);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+/* Pflichtfeld leer + validiert → rote Border */
+.dp-required-error,
+input.dp-required-error,
+select.dp-required-error {
+  border-color: var(--red, #B8625C) !important;
+  background: var(--red-bg, #FBF1F0) !important;
+  box-shadow: 0 0 0 2px rgba(184,98,92,0.15) !important;
+}
+
+/* Quick-Check-Übernahme-Markierung */
+input.v236-qc-loaded,
+select.v236-qc-loaded,
+textarea.v236-qc-loaded {
+  border-left: 3px solid var(--gold, #C9A84C) !important;
+  background: linear-gradient(90deg, rgba(201,168,76,0.05), transparent 30%) !important;
+  position: relative;
+}
+
+/* Badge "aus Quick-Check" rechts an QC-Feldern */
+.v236-qc-loaded-wrap {
+  position: relative;
+}
+.v236-qc-badge {
+  position: absolute;
+  top: -8px;
+  right: 6px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--gold-3, #9a7f33);
+  background: var(--gold-bg, #FAF5E8);
+  border: 1px solid rgba(201,168,76,0.30);
+  border-radius: 10px;
+  padding: 1px 7px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Tab-Status-Indikator (✅ / 🟡) */
+.tab .v236-tab-status {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 11px;
+  line-height: 1;
+  vertical-align: middle;
+  opacity: 0.9;
+}
+
+.tab .v236-tab-status.is-complete {
+  color: var(--green, #3FA56C);
+}
+
+.tab .v236-tab-status.is-incomplete {
+  color: #E8A93C;
+  animation: v236pulse 2s ease-in-out infinite;
+}
+
+@keyframes v236pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+</style>
 </head>
 <body>
 
@@ -761,12 +838,12 @@ body.dp-tt-off .dp-tip-infobox {
   <!-- V53: Top-Reihe — Objektdaten links + Qualität & Zustand rechts (bündig, gleiche Höhe) -->
   <div class="col2 col2-stretch">
     <div class="card card-stretch"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Objektdaten</div><div class="g2">
-      <div class="f"><label>PLZ</label><input id="plz" type="text" placeholder="z.B. 12345" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label>Ort *</label><input id="ort" type="text" placeholder="z.B. Musterstadt" oninput="upd()" autocomplete="off" data-form-type="other"></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">PLZ</label><input id="plz" type="text" placeholder="z.B. 12345" autocomplete="off" data-form-type="other"></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Ort *</label><input id="ort" type="text" placeholder="z.B. Musterstadt" oninput="upd()" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Straße</label><input id="str" type="text" placeholder="z.B. Musterstraße" oninput="upd()" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
-      <div class="f"><label>Objektart</label><select id="objart"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
-      <div class="f"><label>Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Objektart</label><select id="objart"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
       <div class="f"><label>Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
       <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
       <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
@@ -785,7 +862,7 @@ body.dp-tt-off .dp-tip-infobox {
             <option value="F">F</option><option value="G">G</option><option value="H">H</option>
           </select>
         </div>
-        <div class="f"><label>Zustand der Wohnung <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
+        <div class="f"><label class="dp-required" data-v236-required-set="1">Zustand der Wohnung <span class="ds2-tag">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
           <select id="ds2_zustand" onchange="if(typeof window._v234OnZustandChange==='function')window._v234OnZustandChange(this);if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
             <option value="">– bitte wählen –</option>
             <option value="neubau">Neubau / kernsaniert</option>
@@ -992,7 +1069,7 @@ body.dp-tt-off .dp-tip-infobox {
   <div class="col2">
     <div>
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-euro"/></svg></span>Kaufpreis &amp; Nebenkosten</div>
-        <div class="f mb12"><label>Kaufpreis * <button type="button" class="dp-tip" data-tip-id="tab2.kp" tabindex="-1" aria-label="Hilfe zu tab2.kp"></button></label><div class="iw"><span class="pfx">€</span><input id="kp" type="text" inputmode="decimal" placeholder="180000" class="trl" oninput="calc()"></div></div>
+        <div class="f mb12"><label class="dp-required" data-v236-required-set="1">Kaufpreis * <button type="button" class="dp-tip" data-tip-id="tab2.kp" tabindex="-1" aria-label="Hilfe zu tab2.kp"></button></label><div class="iw"><span class="pfx">€</span><input id="kp" type="text" inputmode="decimal" placeholder="180000" class="trl" oninput="calc()"></div></div>
 
         <!-- V112: Bewegliche Wirtschaftsgüter im Kaufpreis (z.B. Küche) — direkt unter Kaufpreis,
              damit User es früh sieht und gleich zuordnet. Im Steuermodul wird der Wert separat
@@ -2904,40 +2981,45 @@ body.dp-tt-off .dp-tip-infobox {
 })();
 </script>
 
-<!-- V235.1: Scroll-to-Top bei Tab-Wechsel + Weiter-Button-Logik (Fix für scrollTo) -->
+<!-- V236: Scroll-to-Top via .main-col Container (FINAL FIX) -->
 <script id="v235-helpers">
 (function () {
   'use strict';
 
-  // V235.1: Robustes Scroll-to-Top mit 3-fach-Fallback
-  function _v235ScrollTop() {
+  // V236: Der ECHTE Scroll-Container ist .main-col (style.css Z. 11716)
+  // html/body haben overflow:hidden, daher window.scrollTo NIE funktioniert.
+  function _v236ScrollTop() {
+    var mainCol = document.querySelector('.main-col');
+    if (mainCol) {
+      try {
+        mainCol.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {
+        mainCol.scrollTop = 0;
+      }
+    }
+    // Fallbacks für andere Container (Modals, etc.)
     try {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (e) {
-      window.scrollTo(0, 0);
-    }
-    // Fallbacks für ältere Browser & iOS Safari
+    } catch (e) {}
     if (document.documentElement) document.documentElement.scrollTop = 0;
     if (document.body) document.body.scrollTop = 0;
   }
+  window._v236ScrollTop = _v236ScrollTop;
 
-  // V235.1: Scroll-to-Top bei JEDEM Tab-Klick (längeres Delay damit Section-Switch
-  // in ui.js zuerst durchläuft und das Layout neu berechnet ist).
-  function _v235AttachScrollToTop() {
+  function _v236AttachScrollToTop() {
     var tabs = document.querySelectorAll('.tabs .tab, .tab[data-target-sec]');
     if (!tabs || !tabs.length) return;
     tabs.forEach(function (btn) {
-      if (btn._v235ScrollAttached) return;
-      btn._v235ScrollAttached = true;
+      if (btn._v236ScrollAttached) return;
+      btn._v236ScrollAttached = true;
       btn.addEventListener('click', function () {
-        // 2-stufiger Delay: einmal sofort (für instant), einmal nach Section-Animation
-        setTimeout(_v235ScrollTop, 30);
-        setTimeout(_v235ScrollTop, 200);
+        setTimeout(_v236ScrollTop, 30);
+        setTimeout(_v236ScrollTop, 200);
       });
     });
   }
 
-  // V235.2: Weiter-Button-Logik
+  // V236: Weiter-Button-Logik (übernommen aus V235)
   window._v235GoToNextTab = function (currentSecId) {
     var tabs = Array.from(document.querySelectorAll('.tabs .tab[data-target-sec]'));
     if (!tabs.length) return;
@@ -2952,21 +3034,200 @@ body.dp-tt-off .dp-tip-infobox {
     }
     var nextTab = tabs[currentIdx + 1];
     if (nextTab) {
-      nextTab.click(); // simulate click — triggert auch scroll-to-top
-      // Zusätzlich direkt scrollen falls Click-Event nicht greift
-      setTimeout(_v235ScrollTop, 100);
-      setTimeout(_v235ScrollTop, 300);
+      nextTab.click();
+      setTimeout(_v236ScrollTop, 100);
+      setTimeout(_v236ScrollTop, 300);
     }
   };
 
-  // Init
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _v235AttachScrollToTop);
+    document.addEventListener('DOMContentLoaded', _v236AttachScrollToTop);
   } else {
-    _v235AttachScrollToTop();
+    _v236AttachScrollToTop();
   }
-  setTimeout(_v235AttachScrollToTop, 500);
-  setTimeout(_v235AttachScrollToTop, 1500);
+  setTimeout(_v236AttachScrollToTop, 500);
+  setTimeout(_v236AttachScrollToTop, 1500);
+})();
+</script>
+
+<!-- V236: Pflichtfeld-Validierung + Tab-Indikator + QC-Übernahme-Markierung -->
+<script id="v236-helpers">
+(function () {
+  'use strict';
+
+  // ─── Konfiguration ──────────────────────────────────────────────────
+  // Pflichtfelder pro Tab (sec-id → [field-ids])
+  var REQUIRED_BY_TAB = {
+    's0':     ['addr', 'plz', 'ort', 'wfl', 'bj', 'objart', 'ds2_zustand'],
+    's1':     ['kp'],
+    's2':     ['nkm_m'],
+    's3':     ['d1_kapital', 'd1_zins', 'd1_tilg'],
+    's3-tax': ['gst'],
+  };
+
+  // ─── Helpers ────────────────────────────────────────────────────────
+  function _fieldHasValue(id) {
+    var el = document.getElementById(id);
+    if (!el) return false;
+    if (el.type === 'checkbox' || el.type === 'radio') return el.checked;
+    var v = (el.value || '').trim();
+    return v.length > 0;
+  }
+
+  function _tabRequiredStatus(secId) {
+    var fields = REQUIRED_BY_TAB[secId] || [];
+    if (!fields.length) return 'none';
+    var filled = 0;
+    var total = fields.length;
+    fields.forEach(function (id) {
+      if (_fieldHasValue(id)) filled++;
+    });
+    if (filled === 0) return 'none';
+    if (filled === total) return 'complete';
+    return 'partial';
+  }
+
+  // ─── Tab-Status-Indikator updaten ───────────────────────────────────
+  function _v236UpdateTabIndicators() {
+    var tabs = document.querySelectorAll('.tab[data-target-sec]');
+    tabs.forEach(function (tabBtn) {
+      var secId = tabBtn.getAttribute('data-target-sec');
+      if (!secId || !REQUIRED_BY_TAB[secId]) return;
+
+      var status = _tabRequiredStatus(secId);
+      var existing = tabBtn.querySelector('.v236-tab-status');
+      if (existing) existing.remove();
+
+      if (status === 'none') return; // nichts anzeigen wenn nicht angefasst
+
+      var ind = document.createElement('span');
+      ind.className = 'v236-tab-status';
+      if (status === 'complete') {
+        ind.classList.add('is-complete');
+        ind.textContent = '✓';
+        ind.title = 'Alle Pflichtfelder ausgefüllt';
+      } else {
+        ind.classList.add('is-incomplete');
+        ind.textContent = '!';
+        ind.title = 'Pflichtfelder fehlen';
+      }
+      tabBtn.appendChild(ind);
+    });
+  }
+  window._v236UpdateTabIndicators = _v236UpdateTabIndicators;
+
+  // ─── Pflichtfeld-Validierung (Visual-Feedback bei Submit/Tab-Wechsel) ─
+  function _v236ValidateRequired() {
+    var allFields = [];
+    Object.keys(REQUIRED_BY_TAB).forEach(function (sec) {
+      REQUIRED_BY_TAB[sec].forEach(function (id) { allFields.push(id); });
+    });
+    var missing = [];
+    allFields.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (_fieldHasValue(id)) {
+        el.classList.remove('dp-required-error');
+      } else {
+        el.classList.add('dp-required-error');
+        missing.push(id);
+      }
+    });
+    return missing;
+  }
+  window._v236ValidateRequired = _v236ValidateRequired;
+
+  // Clear error wenn User in das Feld tippt
+  function _v236AttachErrorClear() {
+    var allFields = [];
+    Object.keys(REQUIRED_BY_TAB).forEach(function (sec) {
+      REQUIRED_BY_TAB[sec].forEach(function (id) { allFields.push(id); });
+    });
+    allFields.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el || el._v236ErrorClearAttached) return;
+      el._v236ErrorClearAttached = true;
+      el.addEventListener('input', function () {
+        if (_fieldHasValue(id)) {
+          el.classList.remove('dp-required-error');
+        }
+        _v236UpdateTabIndicators();
+      });
+      el.addEventListener('change', function () {
+        if (_fieldHasValue(id)) {
+          el.classList.remove('dp-required-error');
+        }
+        _v236UpdateTabIndicators();
+      });
+    });
+  }
+
+  // ─── Quick-Check-Übernahme-Markierung ──────────────────────────────
+  // Hook in _qcApplyImported (oder ähnlich) — wenn QC Felder befüllt,
+  // markieren wir sie mit .v236-qc-loaded.
+  // Cleanup: bei erstem manuellen Edit wieder entfernen.
+  function _v236MarkQcLoaded(fieldIds) {
+    if (!fieldIds) return;
+    fieldIds.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('v236-qc-loaded');
+      // Cleanup-Listener: beim ersten User-Edit Markierung entfernen
+      if (el._v236QcMarked) return;
+      el._v236QcMarked = true;
+      var clear = function () {
+        el.classList.remove('v236-qc-loaded');
+        el.removeEventListener('input', clear);
+        el.removeEventListener('change', clear);
+      };
+      el.addEventListener('input', clear);
+      el.addEventListener('change', clear);
+    });
+  }
+  window._v236MarkQcLoaded = _v236MarkQcLoaded;
+
+  // Wrapper für die existierende QC-Apply-Funktion
+  // Wenn _qcApplyImported existiert, hängen wir uns dran:
+  function _v236WrapQcApply() {
+    if (window._qcApplyImported && !window._qcApplyImported._v236Wrapped) {
+      var orig = window._qcApplyImported;
+      window._qcApplyImported = function (d) {
+        var result = orig.call(this, d);
+        // Nach orig-Aufruf: alle Pflichtfelder die jetzt Wert haben markieren
+        var ids = [];
+        Object.keys(REQUIRED_BY_TAB).forEach(function (sec) {
+          REQUIRED_BY_TAB[sec].forEach(function (id) {
+            if (_fieldHasValue(id)) ids.push(id);
+          });
+        });
+        // Auch typische QC-Mapping-Felder
+        var qcFields = ['addr', 'plz', 'ort', 'wfl', 'bj', 'kp', 'nkm_m', 'mt_mietfl'];
+        qcFields.forEach(function (id) {
+          if (_fieldHasValue(id) && ids.indexOf(id) < 0) ids.push(id);
+        });
+        _v236MarkQcLoaded(ids);
+        _v236UpdateTabIndicators();
+        return result;
+      };
+      window._qcApplyImported._v236Wrapped = true;
+    }
+  }
+
+  // ─── Init ───────────────────────────────────────────────────────────
+  function _v236Init() {
+    _v236AttachErrorClear();
+    _v236UpdateTabIndicators();
+    _v236WrapQcApply();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _v236Init);
+  } else {
+    _v236Init();
+  }
+  // Retries für asynchrone DOM-Loads
+  setTimeout(_v236Init, 500);
+  setTimeout(_v236Init, 1500);
+  setTimeout(_v236Init, 3000);
 })();
 </script>
 </body>
