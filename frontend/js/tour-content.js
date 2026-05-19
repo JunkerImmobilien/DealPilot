@@ -165,7 +165,7 @@
     
     {
       tab: 's6',
-      selector: '#bc-cockpit svg.ds-donut, #bc-cockpit .ds-donut, #bc-cockpit',
+      selector: '#dealscore-card, #bc-cockpit svg.ds-donut',
       icon: 'i-percent',
       title: 'DealScore 0-100',
       body: 'Der **DealScore** fasst alle 8 Kennzahlen in einer Zahl zusammen — schnellster Vergleichswert.',
@@ -175,12 +175,12 @@
     
     {
       tab: 's6',
-      selector: '#hdr-toggle-btn, #bc-cockpit',
+      selector: '#dealscore2-card, .ds2-card',
       icon: 'i-cpu',
       title: 'Investor Deal Score',
       body: 'Der **Investor Deal Score** ist die erweiterte Bewertung mit **32 statt 8 KPIs** — verfuegbar ab **Starter-Plan**.',
-      bodyMore: '**Was der Investor Score zusaetzlich prueft:**\n\n• Vermoegens-Multiplikator (Equity Multiple)\n• Cash-on-Cash-Return\n• Net Operating Income (NOI)\n• Cap Rate\n• Sensitivitaeten (Zins, Miete, Marktwert)\n• 19 weitere Kennzahlen\n\n**Wo finden:**\n• Im Header oben rechts: Toggle-Button "Investor Deal Score" ein/aus\n• Im Tab Bewertung: Eigene Cockpit-Karte\n\n**Plan-Verfuegbarkeit:**\n• **Free**: Nur Basis-DealScore (8 Kennzahlen)\n• **Starter & hoeher**: Investor Score mit 32 Kennzahlen\n• **Pro**: Plus Custom-Gewichtungen + Profile speichern\n\nFuer Banker und ernsthafte Investoren ist der Investor Deal Score Pflicht — er zeigt Aspekte die der Basis-Score nicht abdeckt.',
-      placement: 'auto'
+      bodyMore: '**Was der Investor Score zusaetzlich prueft:**\n\n• Vermoegens-Multiplikator (Equity Multiple)\n• Cash-on-Cash-Return\n• Net Operating Income (NOI)\n• Cap Rate\n• Sensitivitaeten (Zins, Miete, Marktwert)\n• 19 weitere Kennzahlen\n\n**Wo finden:**\n• Im Tab Bewertung als eigene Cockpit-Karte (gerade gespotlightet)\n• Im Header oben rechts: Toggle-Button "Investor Deal Score" ein/aus\n\n**Plan-Verfuegbarkeit:**\n• **Free**: Nur Basis-DealScore (8 Kennzahlen)\n• **Starter & hoeher**: Investor Score mit 32 Kennzahlen\n• **Pro**: Plus Custom-Gewichtungen + Profile speichern\n\nFuer Banker und ernsthafte Investoren ist der Investor Deal Score Pflicht — er zeigt Aspekte die der Basis-Score nicht abdeckt.',
+      placement: 'center'
     },
     
     {
