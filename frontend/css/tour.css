@@ -1,25 +1,27 @@
 /**
- * DealPilot V238.2 — Tour CSS
- * V238.2 Fixes:
- * - Bubble auf engen Screens schmaler (1280px Breakpoint)
- * - bessere Mobile-Anpassung
- * - Spotlight-Abstand erhoeht (24px)
+ * DealPilot V238.3 — Tour CSS
+ *
+ * V238.3 Aenderungen:
+ * - .dp-tour-overlay nutzt clip-path (von JS gesetzt) fuer echtes Loch
+ * - Spotlight ist nur noch Gold-Border (kein box-shadow-Trick mehr)
+ * - Element im Loch ist gestochen scharf (kein Blur, kein Dim)
  */
 
 body.dp-tour-active {
   overflow: hidden;
 }
 
+/* ─── Overlay (mit clip-path-Loch, JS-gesteuert) ─────────────────────── */
 .dp-tour-overlay {
   position: fixed;
   inset: 0;
   z-index: 99998;
-  background: radial-gradient(ellipse at center,
-    rgba(20,15,5,0.42) 0%,
-    rgba(0,0,0,0.55) 80%);
+  background: rgba(15, 12, 8, 0.75);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   animation: dp-tour-overlay-in 0.3s ease;
+  /* clip-path wird von JS dynamisch gesetzt */
+  transition: clip-path 0.3s ease;
 }
 
 @keyframes dp-tour-overlay-in {
@@ -27,15 +29,17 @@ body.dp-tour-active {
   to   { opacity: 1; }
 }
 
+/* ─── Spotlight (nur Gold-Border + Glow ums Loch, kein box-shadow-Trick) */
 .dp-tour-spotlight {
   position: fixed;
   z-index: 99999;
   pointer-events: none;
   border-radius: 12px;
+  border: 2px solid #C9A84C;
   box-shadow:
-    0 0 0 2px rgba(201,168,76,0.85),
-    0 0 0 9999px rgba(0,0,0,0.35),
-    0 0 50px rgba(201,168,76,0.35);
+    0 0 0 1px rgba(0,0,0,0.3),
+    0 0 60px rgba(201,168,76,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.1);
   transition: top 0.35s ease, left 0.35s ease, width 0.35s ease, height 0.35s ease;
   animation: dp-tour-pulse 2.4s ease-in-out infinite;
 }
@@ -43,18 +47,19 @@ body.dp-tour-active {
 @keyframes dp-tour-pulse {
   0%, 100% {
     box-shadow:
-      0 0 0 2px rgba(201,168,76,0.85),
-      0 0 0 9999px rgba(0,0,0,0.35),
-      0 0 50px rgba(201,168,76,0.35);
+      0 0 0 1px rgba(0,0,0,0.3),
+      0 0 60px rgba(201,168,76,0.55),
+      inset 0 0 0 1px rgba(255,255,255,0.1);
   }
   50% {
     box-shadow:
-      0 0 0 3px rgba(201,168,76,1),
-      0 0 0 9999px rgba(0,0,0,0.35),
-      0 0 80px rgba(201,168,76,0.55);
+      0 0 0 1px rgba(0,0,0,0.3),
+      0 0 100px rgba(201,168,76,0.75),
+      inset 0 0 0 1px rgba(255,255,255,0.15);
   }
 }
 
+/* ─── Bubble (Dark Premium-Glass) ──────────────────────────────────────── */
 .dp-tour-bubble {
   position: fixed;
   z-index: 100000;
@@ -85,8 +90,7 @@ body.dp-tour-active {
   inset: 0;
   border-radius: 16px;
   background: radial-gradient(ellipse 400px 150px at 50% 0%,
-    rgba(201,168,76,0.18) 0%,
-    transparent 70%);
+    rgba(201,168,76,0.18) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -100,6 +104,7 @@ body.dp-tour-active {
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+/* ─── Close-Button ──────────────────────────────────────────────────────── */
 .dp-tour-close-wrap {
   position: absolute;
   top: 12px;
@@ -131,6 +136,7 @@ body.dp-tour-active {
   height: 16px;
 }
 
+/* ─── Header ──────────────────────────────────────────────────────────── */
 .dp-tour-head {
   padding: 28px 30px 18px;
   border-bottom: 1px solid rgba(201,168,76,0.15);
@@ -328,7 +334,6 @@ body.dp-tour-active {
   color: #C9A84C;
 }
 
-/* ─── V238.2: Schmaler Bubble auf mittleren Screens ─────────────────── */
 @media (max-width: 1400px) {
   .dp-tour-bubble {
     width: 400px;
@@ -356,6 +361,8 @@ body.dp-tour-active {
     background: rgba(0,0,0,0.75);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
   }
   .dp-tour-title {
     font-size: 24px;

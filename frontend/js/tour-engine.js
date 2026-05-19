@@ -1,12 +1,11 @@
 /**
- * DealPilot V238.2 — Tour Engine mit Smart-Placement-Hard-Fallback
+ * DealPilot V238.3 — Tour Engine
  *
- * V238.2 Fixes:
- * - Hard-Fallback: wenn placement (right/left/top/bottom) keinen Platz hat,
- *   wird automatisch eine andere Seite gewaehlt oder zentriert
- * - Bubble ist auf engen Screens schmaler (380px)
- * - Spotlight + Bubble haben min. 24px Abstand
- * - "Tour ueberspringen" ist immer im Viewport
+ * V238.3 Fixes:
+ * - SVG-Mask via clip-path: Overlay hat ECHTES LOCH an Spotlight-Position
+ *   -> markiertes Element ist gestochen scharf, kein Blur drüber
+ * - Hard-Fallback Smart-Placement (V238.2)
+ * - Komma-Selektor-Split (V238.2)
  */
 (function() {
   'use strict';
@@ -25,15 +24,10 @@
     onKeydown: null
   };
 
-  function _wait(ms) {
-    return new Promise(function(r) { setTimeout(r, ms); });
-  }
-
   function _findElementWithRetry(selector, retries, intervalMs) {
     return new Promise(function(resolve) {
       var attempts = 0;
       function tryFind() {
-        // V238.2: bei kommasepariertem Selektor jedes Element einzeln pruefen
         var selectors = selector.split(',').map(function(s) { return s.trim(); });
         for (var i = 0; i < selectors.length; i++) {
           try {
@@ -84,7 +78,7 @@
       }
       return false;
     }
-    if (targetSec === 'sidebar' || targetSec === 'header') {
+    if (targetSec === 'sidebar' || targetSec === 'header' || targetSec === 'settings') {
       return true;
     }
     var tab = document.querySelector('.tab[data-target-sec="' + targetSec + '"]');
@@ -127,22 +121,58 @@
     document.body.classList.remove('dp-tour-active');
   }
 
+  // ─── V238.3: Echtes Loch im Overlay via clip-path ────────────────────
+
   function _positionSpotlight(el) {
     if (!state.spotlight || !el) return;
     var rect = el.getBoundingClientRect();
     var pad = 8;
-    state.spotlight.style.top    = (rect.top - pad) + 'px';
-    state.spotlight.style.left   = (rect.left - pad) + 'px';
-    state.spotlight.style.width  = (rect.width + pad * 2) + 'px';
-    state.spotlight.style.height = (rect.height + pad * 2) + 'px';
+    var x = rect.left - pad;
+    var y = rect.top - pad;
+    var w = rect.width + pad * 2;
+    var h = rect.height + pad * 2;
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+
+    // Spotlight = Gold-Border um das Loch
+    state.spotlight.style.top    = y + 'px';
+    state.spotlight.style.left   = x + 'px';
+    state.spotlight.style.width  = w + 'px';
+    state.spotlight.style.height = h + 'px';
     state.spotlight.style.display = 'block';
+
+    // V238.3: Overlay bekommt clip-path mit Loch an Spotlight-Position
+    // Polygon: außen rechteck, dann hineingehen, Loch rechteck, wieder raus
+    if (state.overlay) {
+      var path = 'polygon(' +
+        '0 0, ' +
+        vw + 'px 0, ' +
+        vw + 'px ' + vh + 'px, ' +
+        '0 ' + vh + 'px, ' +
+        '0 0, ' +
+        // Brücke zum Loch
+        x + 'px ' + y + 'px, ' +
+        x + 'px ' + (y + h) + 'px, ' +
+        (x + w) + 'px ' + (y + h) + 'px, ' +
+        (x + w) + 'px ' + y + 'px, ' +
+        x + 'px ' + y + 'px, ' +
+        '0 0' +
+        ')';
+      state.overlay.style.clipPath = path;
+      state.overlay.style.webkitClipPath = path;
+    }
   }
 
   function _hideSpotlight() {
     if (state.spotlight) state.spotlight.style.display = 'none';
+    // Overlay-Loch entfernen (full coverage)
+    if (state.overlay) {
+      state.overlay.style.clipPath = '';
+      state.overlay.style.webkitClipPath = '';
+    }
   }
 
-  // ─── V238.2: Hart-Fallback bei Smart-Placement ───────────────────────
+  // ─── Smart-Placement mit Hard-Fallback ───────────────────────────────
 
   function _hasSpaceForPlacement(rect, bw, bh, placement, margin) {
     var vw = window.innerWidth;
@@ -157,7 +187,6 @@
   }
 
   function _autoPickPlacement(rect, bw, bh, margin) {
-    // Versuch in dieser Reihenfolge: bottom, top, right, left, center
     var candidates = ['bottom', 'top', 'right', 'left'];
     for (var i = 0; i < candidates.length; i++) {
       if (_hasSpaceForPlacement(rect, bw, bh, candidates[i], margin)) {
@@ -170,7 +199,6 @@
   function _positionBubble(el, preferredPlacement) {
     if (!state.bubble) return;
 
-    // Center-Modus: Bubble in Bildschirmmitte
     if (!el || preferredPlacement === 'center') {
       _setBubbleCenter();
       return;
@@ -183,11 +211,10 @@
     var bh = state.bubble.offsetHeight || 280;
     var vw = window.innerWidth;
     var vh = window.innerHeight;
-    var margin = 24;  // V238.2: war 20, jetzt 24 fuer Spotlight-Abstand
+    var margin = 24;
 
     var placement = preferredPlacement || 'auto';
 
-    // V238.2 HARD-FALLBACK: hat das preferred placement wirklich Platz?
     if (placement !== 'auto' && !_hasSpaceForPlacement(rect, bw, bh, placement, margin)) {
       placement = 'auto';
     }
@@ -238,7 +265,7 @@
     state.bubble.classList.add('dp-tour-bubble-center');
   }
 
-  // ─── Bubble-Content ──────────────────────────────────────────────────
+  // ─── Bubble-Content (Premium) ────────────────────────────────────────
 
   function _renderBubbleContent(step) {
     if (!state.bubble) return;
@@ -387,7 +414,7 @@
   function _ensureCorrectTab(step, callback) {
     if (!step.tab) return callback();
     var current = _currentSection();
-    if (step.tab === 'sidebar' || step.tab === 'header') return callback();
+    if (step.tab === 'sidebar' || step.tab === 'header' || step.tab === 'settings') return callback();
     if (current === step.tab) return callback();
     var ok = _switchToTab(step.tab);
     if (!ok) {
@@ -395,8 +422,6 @@
     }
     setTimeout(callback, 400);
   }
-
-  // ─── Public API ──────────────────────────────────────────────────────
 
   var Tour = {
     start: function() {
