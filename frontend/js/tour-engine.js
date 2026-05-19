@@ -25,7 +25,8 @@
     spotlight: null,
     bubble: null,
     onResize: null,
-    onKeydown: null
+    onKeydown: null,
+    accordionWatcher: null  // V239.8: MutationObserver
   };
 
   // ─── Helpers ─────────────────────────────────────────────────────────
@@ -237,6 +238,48 @@
       if (inner) inner.setAttribute('data-tour-expanded', '1');
     } catch(e) {
       console.warn('[DpTour V239.5] _expandSidebar error:', e);
+    }
+  }
+
+  // V239.8: MutationObserver der Accordion offen haelt
+  //   Falls die App das Accordion waehrend Tour zuklappt, wird es sofort
+  //   wieder aufgemacht. Wird nur aktiv waehrend Sidebar-Steps.
+  function _startAccordionWatcher() {
+    if (state.accordionWatcher) return;  // schon aktiv
+    var accordion = document.getElementById('sb-actions-accordion');
+    if (!accordion) return;
+    
+    _expandSidebarActionsIfCollapsed();
+    
+    try {
+      state.accordionWatcher = new MutationObserver(function() {
+        if (accordion.offsetHeight < 100) {
+          console.log('[DpTour V239.8] Accordion kollabiert -> re-expand');
+          _expandSidebarActionsIfCollapsed();
+        }
+      });
+      state.accordionWatcher.observe(accordion, {
+        attributes: true,
+        attributeFilter: ['style', 'class']
+      });
+      // Auch Parent beobachten falls die App von oben triggert
+      var parent = accordion.parentElement;
+      if (parent) {
+        state.accordionWatcher.observe(parent, {
+          attributes: true,
+          attributeFilter: ['style', 'class'],
+          subtree: false
+        });
+      }
+    } catch(e) {
+      console.warn('[DpTour V239.8] MutationObserver init failed:', e);
+    }
+  }
+
+  function _stopAccordionWatcher() {
+    if (state.accordionWatcher) {
+      try { state.accordionWatcher.disconnect(); } catch(e) {}
+      state.accordionWatcher = null;
     }
   }
 
@@ -637,10 +680,16 @@
     if (!step.tab) return callback();
     var current = _currentSection();
     
-    // V239.7: Bei Sidebar-Steps: Accordion aufklappen + WARTEN bis Render
+    // V239.8: Wenn weg von Sidebar -> Watcher stoppen, Accordion wieder normal
+    if (step.tab !== 'sidebar' && state.accordionWatcher) {
+      _stopAccordionWatcher();
+      _restoreSidebarAccordion();
+    }
+    
+    // V239.7/.8: Bei Sidebar-Steps: Accordion permanent offen halten via MutationObserver
     if (step.tab === 'sidebar') {
-      _expandSidebarActionsIfCollapsed();
-      // Doppel-Expand: einmal sofort, einmal nach 200ms (CSS-Animation)
+      _startAccordionWatcher();
+      // Doppel-Expand: einmal sofort (im Watcher), einmal nach 300ms (CSS-Animation)
       setTimeout(function() {
         _expandSidebarActionsIfCollapsed();
         callback();
@@ -829,6 +878,8 @@
     }
     _destroyOverlay();
     // V239.5: Sidebar-Accordion Style-Overrides entfernen
+    // V239.8: Plus Watcher stoppen
+    _stopAccordionWatcher();
     _restoreSidebarAccordion();
   }
 

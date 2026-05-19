@@ -1,5 +1,45 @@
 # DealPilot Changelog
 
+## V1.1.239.8 - 2026-05-19
+
+### Tour Hotfix: Accordion-MutationObserver + Step 20 Header-PDF
+
+**Bug GEFIXT: Accordion klappte sich waehrend Tour wieder zu**
+
+Diagnose:
+- V239.7 Doppel-Expand lief 1x pro Step (sofort + nach 300ms)
+- Aber: App-Logic schloss das Accordion zwischen Steps wieder zu
+- Folge: Step 3+20 Spotlight zeigte auf falsche Stelle
+
+V239.8 Fix - MutationObserver:
+- `_startAccordionWatcher()` startet bei Sidebar-Steps einen Observer
+- Observer prueft alle Style/Class-Aenderungen am Accordion
+- Wenn Hoehe < 100px -> SOFORT wieder Brute-Force-Expand
+- Stoppt automatisch wenn Tour zu Tab-Step wechselt oder endet
+
+**Bug GEFIXT: Step 20 Bank-PDF -> Header Investment-PDF**
+
+User-Anforderung: "Bei Schritt 20 sollte der Spotlight auf dem
+Header oben rechts Investment-PDF liegen"
+
+Diagnose:
+- Im Header gibt es `.hdr-pdf-btn` mit Text "Investment-PDF"
+  (onclick: exportPDF())
+- Das ist der primaere PDF-Export-Button fuer Banker
+- Der Sidebar-Bankexport ist Plan-gated und versteckt bei Free
+
+V239.8 Fix:
+- Step 20: tab='sidebar' -> tab='header'
+- Selektor: '.hdr-pdf-btn, button[onclick*="exportPDF"]'
+- Body: "Der Investment-PDF-Button oben rechts im Header..."
+
+### Geaenderte Dateien
+- `frontend/js/tour-engine.js` - MutationObserver + state.accordionWatcher
+- `frontend/js/tour-content.js` - Step 20 -> Header .hdr-pdf-btn
+- `frontend/index.html` - Cache-Bump v=239_8
+- `frontend/js/config.js` - V1.1.239.8
+
+
 ## V1.1.239.6 - 2026-05-19
 
 ### Tour Hotfix: Tool-Tips-Toggle + klarere Body-Texte
