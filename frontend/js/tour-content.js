@@ -216,8 +216,8 @@
     },
     
     {
-      tab: 's8',
-      selector: '[data-feature="bank_pdf_a3"], .sb-act-item[data-feature="bank_pdf_a3"]',
+      tab: 'sidebar',
+      selector: '.sb-act-item[data-feature="bank_pdf_a3"], [data-feature="bank_pdf_a3"], button[onclick*="bankexport"]',
       icon: 'i-file-text',
       title: 'Business-Case-PDF',
       body: 'Das **bank-fertige Investment-PDF** — der Business Case fuer deinen Deal.',

@@ -54,7 +54,8 @@
     var rect = el.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) return false;
     var s = window.getComputedStyle(el);
-    return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+    // V239.4: gated/disabled-Elemente (typisch opacity 0.4-0.5) trotzdem akzeptieren
+    return s.display !== 'none' && s.visibility !== 'hidden' && parseFloat(s.opacity) >= 0.25;
   }
 
   function _scrollIntoView(el) {
@@ -190,6 +191,34 @@
       }
     } catch(e) {}
     return 'free';
+  }
+
+  // V239.4: Sidebar-Aktionen-Accordion aufklappen wenn collapsed
+  function _expandSidebarActionsIfCollapsed() {
+    try {
+      var accordion = document.getElementById('sb-actions-accordion');
+      if (!accordion) return;
+      var inner = accordion.querySelector('.sb-actions-accordion-inner');
+      if (!inner) return;
+      var rect = inner.getBoundingClientRect();
+      // Wenn Accordion klein/zugeklappt
+      if (rect.height < 100) {
+        console.log('[DpTour V239.4] Sidebar-Aktionen aufklappen');
+        // 1) Klick auf Accordion-Header (typische Toggle-Implementierung)
+        var header = accordion.querySelector('.sb-actions-header, .sb-actions-toggle, [data-toggle="sb-actions"]');
+        if (header) { header.click(); return; }
+        // 2) Klick auf accordion selbst
+        var toggleable = accordion.querySelector('[onclick]:not(.sb-act-item)');
+        if (toggleable) { toggleable.click(); return; }
+        // 3) Notfall: Inner direkt aufklappen via Style
+        inner.style.maxHeight = 'none';
+        inner.style.display = 'block';
+        inner.style.overflow = 'visible';
+        accordion.classList.remove('collapsed', 'sb-collapsed');
+      }
+    } catch(e) {
+      console.warn('[DpTour V239.4] _expandSidebar error:', e);
+    }
   }
 
   // ─── Overlay ─────────────────────────────────────────────────────────
@@ -540,7 +569,13 @@
   function _ensureCorrectTab(step, callback) {
     if (!step.tab) return callback();
     var current = _currentSection();
-    if (step.tab === 'sidebar' || step.tab === 'header' || step.tab === 'settings') return callback();
+    if (step.tab === 'sidebar' || step.tab === 'header' || step.tab === 'settings') {
+      // V239.4: Bei Sidebar-Steps: Aktionen-Accordion aufklappen
+      if (step.tab === 'sidebar') {
+        _expandSidebarActionsIfCollapsed();
+      }
+      return callback();
+    }
     if (current === step.tab) return callback();
     var ok = _switchToTab(step.tab);
     if (!ok) {
