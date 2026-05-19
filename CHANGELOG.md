@@ -1,5 +1,64 @@
 # DealPilot Changelog
 
+## V1.1.238.2 - 2026-05-19
+
+### Tour Layout-Fixes
+
+**Bug 1: Bubble landet ausserhalb des Viewports**
+
+Bei Steps mit `placement: 'right'` und breiten Element-Containern (z.B. Quick-Check)
+war rechts kein Platz fuer die 460px-breite Bubble. Mein V238.1-Code respektierte das
+explizite Placement und positionierte die Bubble teils ausserhalb des Bildschirms.
+
+Fix: Hard-Fallback in `_positionBubble()`:
+- Wenn `preferredPlacement` keinen Platz hat (gemessen mit `getBoundingClientRect`),
+  wird `_autoPickPlacement()` aufgerufen
+- Probiert: bottom -> top -> right -> left -> center
+- Erstes Placement das passt wird genommen
+- Wenn nichts passt: zentriert in der Bildschirmmitte
+
+**Bug 2: Spotlight zu gross (umfasst riesigen Container statt relevantem Element)**
+
+In V238.1 hatte Step 1 den Selektor `#qc-modal-card, #s-quick .qc-card, #s-quick`.
+Der dritte Treffer (`#s-quick`) ist die gesamte Quick-Check-Sektion und wurde
+markiert - statt nur dem Score-Block.
+
+Fix: Praezise Selektoren in tour-content.js:
+- Step 1: `#qc-score-circle, .ds-donut, #qc-tab-host .qc-score-kpis` (Score-Donut)
+- Step 2: `#qc-ai-research-btn` (KI-Recherche-Button)
+- Step 3: `#qc-save-btn` (Speichern-Button)
+- Step 4: `.tab[data-target-sec="s0"]` (Objekt-Tab statt nicht-existenter `.tabs`)
+- Step 5: `#str` (Strasse als Pflichtfeld-Beispiel)
+- Step 6: `#d1` (Hauptdarlehen)
+- Step 7: `.tab[data-target-sec="s5"]` (KI-Tab als Anker)
+- Step 8: `#bc-cockpit` (Bewertungs-Cockpit)
+- Step 9: `#bc-stress` (Stress-Test)
+- Step 10: `[data-feature="bank_pdf_a3"]` (PDF-Button via data-feature)
+- Step 11: `#sidebar` (Sidebar)
+- Step 12: `#tabs-status-badge` (Workflow-Badge im Header)
+
+**Bug 3: Bubble zu breit auf mittleren Screens**
+
+Auf 1400px-Browser-Breite war Bubble (460px) + Sidebar (350px) + Content zu eng.
+
+Fix: Media-Query `max-width: 1400px` -> Bubble 400px statt 460px,
+plus reduzierte Innenpaddings.
+
+**Bug 4: Komma-separierte Selektoren wurden nicht einzeln geprueft**
+
+`_findElementWithRetry` rief `document.querySelector(selector)` mit der ganzen
+Komma-Liste auf - was zwar funktioniert, aber nicht die einzelnen Selektoren
+prueft. V238.2 splittet jetzt am Komma und probiert jeden Selektor einzeln.
+
+### Geaenderte Dateien
+- `frontend/js/tour-content.js` - alle 12 Selektoren ueberarbeitet
+- `frontend/js/tour-engine.js` - Hard-Fallback in `_positionBubble`,
+  komma-Split in `_findElementWithRetry`, `_autoPickPlacement` Helper
+- `frontend/css/tour.css` - Media-Query 1400px fuer schmalere Bubble
+- `frontend/index.html` - Cache-Bump v=238_2
+- `frontend/js/config.js` - V1.1.238.2
+
+
 ## V1.1.238.1 - 2026-05-19
 
 ### Tour Premium-Redesign (Feedback-Modal-Style)

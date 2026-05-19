@@ -1,20 +1,15 @@
 /**
- * DealPilot V238.1 — First-Start-Tour CSS (Premium-Redesign)
- * 
- * Inspiriert vom Feedback-Modal (.fb-modal):
- * - Dunkler Background mit Gold-Akzenten
- * - Cormorant Garamond Serif für Headlines
- * - Inline-SVG-Icons aus Sprite (#i-bank, #i-bulb etc.)
- * - Blur reduziert: App bleibt erkennbar
- * - Ausklappbarer "Mehr erfahren"-Bereich
+ * DealPilot V238.2 — Tour CSS
+ * V238.2 Fixes:
+ * - Bubble auf engen Screens schmaler (1280px Breakpoint)
+ * - bessere Mobile-Anpassung
+ * - Spotlight-Abstand erhoeht (24px)
  */
 
-/* ─── Body wenn Tour aktiv ─────────────────────────────────────── */
 body.dp-tour-active {
   overflow: hidden;
 }
 
-/* ─── Overlay (subtil — App erkennbar lassen) ─────────────────── */
 .dp-tour-overlay {
   position: fixed;
   inset: 0;
@@ -32,7 +27,6 @@ body.dp-tour-active {
   to   { opacity: 1; }
 }
 
-/* ─── Spotlight (Gold-Pulse um Element) ───────────────────────── */
 .dp-tour-spotlight {
   position: fixed;
   z-index: 99999;
@@ -61,7 +55,6 @@ body.dp-tour-active {
   }
 }
 
-/* ─── Bubble (Dark Glass im Feedback-Modal-Stil) ──────────────── */
 .dp-tour-bubble {
   position: fixed;
   z-index: 100000;
@@ -86,7 +79,6 @@ body.dp-tour-active {
   transition: top 0.3s ease, left 0.3s ease;
 }
 
-/* Gold-Glow-Halo oben */
 .dp-tour-bubble::before {
   content: "";
   position: absolute;
@@ -108,7 +100,6 @@ body.dp-tour-active {
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* ─── Close-Button (oben rechts, dezent) ──────────────────────── */
 .dp-tour-close-wrap {
   position: absolute;
   top: 12px;
@@ -140,7 +131,6 @@ body.dp-tour-active {
   height: 16px;
 }
 
-/* ─── Header (Eyebrow + Serif-Title) ──────────────────────────── */
 .dp-tour-head {
   padding: 28px 30px 18px;
   border-bottom: 1px solid rgba(201,168,76,0.15);
@@ -186,7 +176,6 @@ body.dp-tour-active {
   line-height: 1.18;
 }
 
-/* ─── Body ────────────────────────────────────────────────────── */
 .dp-tour-body {
   padding: 18px 30px 12px;
 }
@@ -213,7 +202,6 @@ body.dp-tour-active {
   color: rgba(255,255,255,0.85);
 }
 
-/* ─── "Mehr erfahren"-Toggle ──────────────────────────────────── */
 .dp-tour-more-toggle {
   margin-top: 14px;
   background: transparent;
@@ -259,7 +247,6 @@ body.dp-tour-active {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Progress-Bar ────────────────────────────────────────────── */
 .dp-tour-progress {
   padding: 0 30px 14px;
 }
@@ -276,7 +263,6 @@ body.dp-tour-active {
   transition: width 0.4s ease;
 }
 
-/* ─── Footer (Buttons) ────────────────────────────────────────── */
 .dp-tour-foot {
   display: flex;
   align-items: center;
@@ -342,11 +328,22 @@ body.dp-tour-active {
   color: #C9A84C;
 }
 
-/* ─── Mobile ──────────────────────────────────────────────────── */
+/* ─── V238.2: Schmaler Bubble auf mittleren Screens ─────────────────── */
+@media (max-width: 1400px) {
+  .dp-tour-bubble {
+    width: 400px;
+  }
+  .dp-tour-head { padding: 24px 26px 14px; }
+  .dp-tour-body { padding: 16px 26px 10px; }
+  .dp-tour-progress { padding: 0 26px 12px; }
+  .dp-tour-foot { padding: 14px 26px 18px; }
+  .dp-tour-title { font-size: 25px; }
+}
+
 @media (max-width: 768px) {
   .dp-tour-bubble {
     width: calc(100vw - 24px);
-    max-width: 460px;
+    max-width: 420px;
     position: fixed !important;
     top: 50% !important;
     left: 50% !important;
@@ -374,7 +371,6 @@ body.dp-tour-active {
   }
 }
 
-/* ─── "Tour starten"-Button im Hilfe-Modal ────────────────────── */
 .dp-tour-restart-btn {
   display: inline-flex;
   align-items: center;
