@@ -185,10 +185,18 @@ var Paywall = (function() {
     var usage = { objects: 0, calculations: 0, ai_calls: 0, exports: 0 };
     try {
       if (typeof Auth !== 'undefined' && Auth.isApiMode()) {
-        // Backend usage
+        // V240 Bug-A-Fix: /users/me/usage war admin-only → 403 für normale User.
+        // Stattdessen /subscription nutzen, das liefert subscription.usage bereits.
         try {
-          var resp = await Auth.apiCall('/users/me/usage');
-          usage = Object.assign(usage, resp || {});
+          var resp = await Auth.apiCall('/subscription');
+          var u = (resp && resp.subscription && resp.subscription.usage) || {};
+          // Backend-Feldnamen auf Frontend-Schema mappen
+          usage = Object.assign(usage, {
+            calculations: u.calculations || u.calc_count || usage.calculations,
+            ai_calls:     u.ai_analysis  || u.ai_calls   || usage.ai_calls,
+            exports:      u.pdf_export   || u.exports    || usage.exports,
+            objects:      u.objects      || usage.objects
+          });
         } catch (e) {}
       }
     } catch (e) {}
@@ -235,16 +243,11 @@ var Paywall = (function() {
     localStorage.setItem(key, current + 1);
 
     // Backend
-    try {
-      if (typeof Auth !== 'undefined' && Auth.isApiMode()) {
-        await Auth.apiCall('/users/me/usage', {
-          method: 'POST',
-          body: { metric: metric, increment: 1 }
-        });
-      }
-    } catch (e) {
-      // Backend may not have endpoint yet, OK
-    }
+    // V240 Bug-A-Fix: POST /users/me/usage war admin-only — 403 für normale User.
+    // Server-Side-Tracking läuft sowieso über /objects/track-usage + AI-Routes,
+    // nicht über diesen Paywall-Counter. Local-Counter (oben) ist authoritativ
+    // für die Free-Plan-Anzeige.
+    // Kein Backend-Call mehr von hier.
 
     setTimeout(renderUsageBadge, 200);
   }

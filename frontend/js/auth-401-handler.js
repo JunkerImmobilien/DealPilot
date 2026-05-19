@@ -135,8 +135,15 @@
       return await originalApiCall(path, options);
     } catch (err) {
       // Nur bei 401, und nicht bei Auth-Endpoints selbst
-      var is401 = err && (err.status === 401 ||
-        (err.message && /HTTP 401|401/.test(err.message)));
+      // V240 Bug-C-Fix: strenge Prüfung, NIE auf 403 reagieren.
+      var status = err && err.status;
+      var msg = (err && err.message) || '';
+      var is401 = (status === 401) || /\bHTTP 401\b|\b401\b/.test(msg);
+      var is403 = (status === 403) || /\bHTTP 403\b|\b403\b/.test(msg);
+      if (is403) {
+        console.warn('[401-handler] 403 (Forbidden) für', path, '— KEIN Re-Login (Permission-Issue, kein Token-Issue):', msg);
+        throw err;
+      }
       if (!is401 || isAuthEndpoint(path) || options.noAuth) {
         throw err;
       }
