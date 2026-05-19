@@ -1,5 +1,53 @@
 # DealPilot Changelog
 
+## V1.1.229 — 2026-05-19
+
+### Major Feature: KI-Halluzinationsschutz (B7.6/B7.19)
+
+**Problem:** Bei Test-PLZ wie `12345`, `00000`, `99999` halluzinierte die KI
+Bodenrichtwerte, Mietspiegel und Lage-Bewertungen als wären sie echte Werte.
+Folge: Der DealScore wurde mit erfundenen Zahlen befüllt — und Nutzer
+hätten Investmentenscheidungen darauf basieren können.
+
+**Lösung — Doppelsicherung im Backend:**
+
+- Neue Datei `backend/src/services/plzValidator.js`
+- Express-Middleware in 4 PLZ-konsumierenden Routes registriert:
+  - `POST /api/v1/ai/analyze` (DealPilot-Analyse)
+  - `POST /api/v1/ai/lage` (KI-Lage-Bewertung)
+  - `POST /api/v1/ai/qc-suggest` (Quick-Check)
+  - `POST /api/v1/ai/bodenrichtwert` (KI-BRW-Schätzung)
+- Bei ungültiger PLZ: HTTP 422 mit code='INVALID_PLZ' + reason
+
+**Blockierte Test-PLZ (25 Stück):**
+00000, 11111, 22222, …, 99999, 12345, 54321, 01234, 98765, 12321,
+23456, 34567, 45678, 56789, 67890, 10101, 20202, 30303, 40404, 50505
+
+**Validation-Regeln:**
+- Format: exakt 5 Ziffern (kein Auto-Padding mehr)
+- Range: 01067–99998 (deutscher PLZ-Bereich)
+- Test-PLZ-Blacklist (s.o.)
+
+**Frontend — freundliche Fehlermeldungen:**
+- Globaler Fetch-Interceptor in index.html erkennt 422+INVALID_PLZ
+- Zeigt im richtigen Result-Container (ki-lage-body, ki-miete-body, brw-ki-result)
+  einen klaren Hinweis mit Icon, Erklärung und Button "PLZ-Feld öffnen →"
+- 3 unterschiedliche Texte je nach reason:
+  - `test_plz`: 🤖 "Sieht nach Test-Eingabe aus"
+  - `out_of_range`: 📮 "Außerhalb des deutschen Bereichs"
+  - `invalid_format`: ✏ "5 Ziffern (z.B. 32049)"
+
+**Architektur-Vorteile:**
+- Single Source of Truth für PLZ-Validation
+- Middleware → 1 Eingriffspunkt pro Route, keine Duplication
+- KI wird gar nicht erst aufgerufen → spart Credits + verhindert Halluzination
+
+### Was NICHT in V229 ist
+- PLZ-Override für Edge-Cases (z.B. User wohnt wirklich in 12345 Berlin-Adlershof)
+- Erweiterte PLZ-Lücken-Liste (Nicht-existente PLZ wie 02000-02999) — TBD
+- Server-seitige Telemetrie über Häufigkeit der Blocks
+
+
 ## V1.1.228 — 2026-05-19
 
 ### Major Feature: Tooltip-System mit 3-Stufen-Toggle

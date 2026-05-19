@@ -2686,5 +2686,54 @@ body.dp-tt-off .dp-tip-infobox {
   <script src="js/register-easter-egg.js?v=203" defer></script>
   <script src="credits-modal.js?v=197"></script>
   <script src="js/grest-plz-lookup.js?v=226"></script>
+
+<!-- V229: globaler PLZ-Fehler-Interceptor -->
+<script id="v229-plz-interceptor">
+(function () {
+  'use strict';
+  // Wrappe fetch() um Reaktion auf 422+INVALID_PLZ.
+  // Wir leiten den Original-Response weiter — die fetch-Caller können
+  // ihren normalen .json()-Workflow nutzen.
+  var _origFetch = window.fetch;
+  window.fetch = function (input, init) {
+    return _origFetch.call(this, input, init).then(function (resp) {
+      // Nur auf POST AI-Routes reagieren
+      var url = typeof input === 'string' ? input : (input && input.url) || '';
+      var isAiRoute = url.indexOf('/api/v1/ai/') !== -1;
+      if (resp.status === 422 && isAiRoute) {
+        // Body klonen damit der Caller auch lesen kann
+        return resp.clone().json().then(function (body) {
+          if (body && body.code === 'INVALID_PLZ') {
+            // Container finden und Toast zeigen
+            var targets = [
+              document.getElementById('ki-lage-body'),
+              document.getElementById('ki-miete-body'),
+              document.getElementById('brw-ki-result')
+            ];
+            var target = targets.find(function (el) { return el && el.offsetParent !== null; });
+            if (!target) target = targets.find(function (el) { return el != null; });
+            if (target && typeof window._v229ShowPlzError === 'function') {
+              window._v229ShowPlzError(body, target);
+            } else if (target) {
+              // Fallback wenn Helper nicht da
+              target.innerHTML = '<div style="padding:14px;background:rgba(245,180,40,0.10);border-left:3px solid #E5A847;border-radius:6px;color:#9C7223"><strong>⚠ ' + (body.error || 'PLZ-Problem') + '</strong></div>';
+              target.style.display = '';
+            }
+            // KI-Lage-Button zurücksetzen falls noch im Loading-State
+            var kiBtn = document.getElementById('ki-lage-btn');
+            if (kiBtn) { kiBtn.disabled = false; kiBtn.textContent = 'Lage analysieren'; }
+            var kiMieteBtn = document.getElementById('ki-miete-btn');
+            if (kiMieteBtn) { kiMieteBtn.disabled = false; }
+            var brwBtn = document.getElementById('brw-ai-btn');
+            if (brwBtn) { brwBtn.disabled = false; }
+          }
+          return resp;
+        }).catch(function () { return resp; });
+      }
+      return resp;
+    });
+  };
+})();
+</script>
 </body>
 </html>
