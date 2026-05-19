@@ -1,5 +1,37 @@
 # DealPilot Changelog
 
+## V1.1.238.5 - 2026-05-19
+
+### Tour Hotfix: Hilfe-Step Selektor korrigiert
+
+**Bug GEFIXT: Hilfe-Step zeigte falsches Element**
+
+V238.4 hatte als Selektor `#tabs-status-badge` — das ist aber der
+**Workflow-Fortschritts-Indikator** ("0 / 6 · 0 %"), nicht der Hilfe-Button.
+Der echte Hilfe-Button ist:
+
+```html
+<button class="hdr-icon-btn" type="button" title="Hilfe"
+        onclick="if(typeof showHelp==='function')showHelp()"
+        style="color:var(--gold)">
+```
+
+**Fix:** Selektor in Step 22 (Hilfe immer dabei) geaendert auf:
+`button.hdr-icon-btn[title="Hilfe"], button[onclick*="showHelp"]`
+
+**Body-Text auch angepasst:**
+- "Klicke auf das gelbe Badge oben rechts" entfernt
+- Ersetzt durch: "Klick auf das Hilfe-Icon oben rechts (Fragezeichen in Gold)"
+- Hinweis hinzugefuegt: "Das gelbe Badge daneben ist der Workflow-Fortschritt"
+
+### Geaenderte Dateien
+- `frontend/js/tour-content.js` — Step 22 Selektor + Body/bodyMore
+- `frontend/index.html` — Cache-Bump v=238_5
+- `frontend/js/config.js` — V1.1.238.5
+
+Engine + CSS unveraendert von V238.4.
+
+
 ## V1.1.238.4 - 2026-05-19
 
 ### Tour Erweiterung 23 Steps + prev-Bug-Fix
