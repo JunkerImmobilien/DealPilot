@@ -1188,7 +1188,7 @@ body.dp-tt-off .dp-tip-infobox {
         <!-- MODUS A: Prognose (einfache Mietsteigerung %) -->
         <div id="me-block-prog">
           <p class="hint">Konstante Mietsteigerung pro Jahr (Standard).</p>
-          <div class="ass-row"><span class="ass-l">Mietsteigerung p.a.</span>
+          <div class="ass-row"><span class="ass-l">Mietsteigerung p.a. <button type="button" class="dp-tip" data-tip-id="tab3.mietsteigerung" tabindex="-1" aria-label="Hilfe zu Mietsteigerung"></button></span>
             <div class="ass-inp"><input id="mietstg" type="text" inputmode="decimal" value="3.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div>
           </div>
         </div>
@@ -1221,10 +1221,10 @@ body.dp-tt-off .dp-tip-infobox {
 
       <div class="card" style="margin-top:14px"><div class="ct">Prognose-Annahmen</div>
         <div class="ass-row"><span class="ass-l">Wertsteigerung p.a.</span><div class="ass-inp"><input id="wertstg" type="text" inputmode="decimal" value="1.5" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
-        <div class="ass-row"><span class="ass-l">Kostensteigerung p.a.</span><div class="ass-inp"><input id="kostenstg" type="text" inputmode="decimal" value="1.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
-        <div class="ass-row"><span class="ass-l">Leerstand p.a.</span><div class="ass-inp"><input id="leerstand" type="text" inputmode="decimal" value="0.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
-        <div class="ass-row"><span class="ass-l">Betrachtungszeitraum</span><div class="ass-inp"><input id="btj" type="text" inputmode="decimal" value="15" min="5" max="50" step="1" oninput="calc()"><span class="unit">Jahre</span></div></div>
-        <div class="ass-row"><span class="ass-l">Exit-Rendite (Verkauf %)</span><div class="ass-inp"><input id="exit_bmy" type="text" inputmode="decimal" value="5.0" step="0.1" oninput="calc()"><span class="unit">%</span></div></div>
+        <div class="ass-row"><span class="ass-l">Kostensteigerung p.a. <button type="button" class="dp-tip" data-tip-id="tab3.kostensteigerung" tabindex="-1" aria-label="Hilfe zu Kostensteigerung"></button></span><div class="ass-inp"><input id="kostenstg" type="text" inputmode="decimal" value="1.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
+        <div class="ass-row"><span class="ass-l">Leerstand p.a. <button type="button" class="dp-tip" data-tip-id="tab3.leerstand" tabindex="-1" aria-label="Hilfe zu Leerstand"></button></span><div class="ass-inp"><input id="leerstand" type="text" inputmode="decimal" value="0.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
+        <div class="ass-row"><span class="ass-l">Betrachtungszeitraum <button type="button" class="dp-tip" data-tip-id="tab3.btj" tabindex="-1" aria-label="Hilfe zu Betrachtungszeitraum"></button></span><div class="ass-inp"><input id="btj" type="text" inputmode="decimal" value="15" min="5" max="50" step="1" oninput="calc()"><span class="unit">Jahre</span></div></div>
+        <div class="ass-row"><span class="ass-l">Exit-Rendite (Verkauf %) <button type="button" class="dp-tip" data-tip-id="tab3.exit_bmy" tabindex="-1" aria-label="Hilfe zu Exit-Rendite"></button></span><div class="ass-inp"><input id="exit_bmy" type="text" inputmode="decimal" value="5.0" step="0.1" oninput="calc()"><span class="unit">%</span></div></div>
       </div>
     </div>
   </div>
@@ -2200,10 +2200,10 @@ body.dp-tt-off .dp-tip-infobox {
   <div class="kpi-grid">
     <div class="kpi"><div class="kpi-label">Bruttomietrendite</div><div class="kpi-val gn" id="kpi-bmy">—</div><div class="kpi-sub">p.a. auf Kaufpreis</div></div>
     <div class="kpi"><div class="kpi-label">Nettomietrendite</div><div class="kpi-val gn" id="kpi-nmy">—</div><div class="kpi-sub">p.a. auf Gesamtinvest</div></div>
-    <div class="kpi"><div class="kpi-label">LTV</div><div class="kpi-val" id="kpi-ltv">—</div><div class="kpi-sub">Fremdfinanzierungsquote</div></div>
-    <div class="kpi"><div class="kpi-label">DSCR <span class="hint" style="font-size:10px;color:var(--muted);cursor:help" title="Debt Service Coverage Ratio: Mieteinnahmen / (Zins+Tilgung). Bank-Kennzahl — Bewirtschaftungskosten und Steuern sind hier NICHT berücksichtigt. Daher kann der DSCR &gt; 1 sein, obwohl der monatliche Cashflow negativ ist (z.B. wenn die nicht-umlagefähige Bewirtschaftung den DSCR-Puffer aufzehrt).">ⓘ</span></div><div class="kpi-val" id="kpi-dscr">—</div><div class="kpi-sub">Schuldendeckung</div></div>
+    <div class="kpi"><div class="kpi-label">LTV <button type="button" class="dp-tip" data-tip-id="tab5.ltv" tabindex="-1" aria-label="Hilfe zu LTV"></button></div><div class="kpi-val" id="kpi-ltv">—</div><div class="kpi-sub">Fremdfinanzierungsquote</div></div>
+    <div class="kpi"><div class="kpi-label">DSCR <button type="button" class="dp-tip" data-tip-id="tab5.dscr" tabindex="-1" aria-label="Hilfe zu DSCR"></button></div><div class="kpi-val" id="kpi-dscr">—</div><div class="kpi-sub">Schuldendeckung</div></div>
     <div class="kpi"><div class="kpi-label">Faktor</div><div class="kpi-val" id="kpi-fak">—</div><div class="kpi-sub">Jahresmieten</div></div>
-    <div class="kpi"><div class="kpi-label">Equity Multiple</div><div class="kpi-val" id="kpi-em">—</div><div class="kpi-sub">geschätzt</div></div>
+    <div class="kpi"><div class="kpi-label">Equity Multiple <button type="button" class="dp-tip" data-tip-id="tab8.equity_multiple" tabindex="-1" aria-label="Hilfe zu Equity Multiple"></button></div><div class="kpi-val" id="kpi-em">—</div><div class="kpi-sub">geschätzt</div></div>
   </div>
   <div class="col2">
     <div class="card">
@@ -2244,15 +2244,15 @@ body.dp-tt-off .dp-tip-infobox {
       </div>
     </div>
     <div class="card"><div class="ct">Alle Kennzahlen</div>
-      <div class="kv"><span>Bruttomietrendite</span><span class="kv-v c-green" id="r-bmy">—</span></div>
-      <div class="kv"><span>Nettomietrendite</span><span class="kv-v c-green" id="r-nmy">—</span></div>
+      <div class="kv"><span>Bruttomietrendite <button type="button" class="dp-tip" data-tip-id="tab8.bruttomietrendite" tabindex="-1" aria-label="Hilfe zu Bruttomietrendite"></button></span><span class="kv-v c-green" id="r-bmy">—</span></div>
+      <div class="kv"><span>Nettomietrendite <button type="button" class="dp-tip" data-tip-id="tab8.nettomietrendite" tabindex="-1" aria-label="Hilfe zu Nettomietrendite"></button></span><span class="kv-v c-green" id="r-nmy">—</span></div>
       <div class="kv"><span>Faktor (KP / Jahresmiete)</span><span class="kv-v" id="r-fak">—</span></div>
-      <div class="kv"><span>EK-Rendite p.a.</span><span class="kv-v c-gold" id="r-ekr">—</span></div>
+      <div class="kv"><span>EK-Rendite p.a. <button type="button" class="dp-tip" data-tip-id="tab8.ek_rendite" tabindex="-1" aria-label="Hilfe zu EK-Rendite"></button></span><span class="kv-v c-gold" id="r-ekr">—</span></div>
       <div class="kv"><span>Equity Multiple <span class="cf-hint">(Vermögenszuwachs / EK)</span></span><span class="kv-v" id="r-em">—</span></div>
       <div class="kv"><span>DSCR Brutto</span><span class="kv-v" id="r-dscr2">—</span></div>
       <div class="kv"><span>DSCR Netto <span class="cf-hint">(nach NUL)</span></span><span class="kv-v" id="r-dscr-netto">—</span></div>
       <div class="kv"><span>LTV</span><span class="kv-v" id="r-ltv2">—</span></div>
-      <div class="kv"><span>Wertpuffer / Equity</span><span class="kv-v c-green" id="r-wpuff">—</span></div>
+      <div class="kv"><span>Wertpuffer / Equity <button type="button" class="dp-tip" data-tip-id="tab8.wertpuffer" tabindex="-1" aria-label="Hilfe zu Wertpuffer"></button></span><span class="kv-v c-green" id="r-wpuff">—</span></div>
       <div class="kv"><span>Zinsrisiko / Mon.</span><span class="kv-v c-red" id="r-zaer-kpi">—</span></div>
     </div>
   </div>
