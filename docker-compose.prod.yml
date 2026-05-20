@@ -49,8 +49,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET muss in .env gesetzt sein}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-11}
-      CORS_ORIGINS: https://${DOMAIN}
-      FRONTEND_BASE_URL: https://${DOMAIN}
+      CORS_ORIGINS: https://${LANDING_DOMAIN},https://${APP_DOMAIN}
+      FRONTEND_BASE_URL: https://${APP_DOMAIN}
       RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
       RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-200}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@dealpilot.local}
@@ -82,10 +82,12 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./frontend:/srv/frontend:ro
+      - ./frontend/landing:/srv/landing:ro
       - caddy_data:/data
       - caddy_config:/config
     environment:
-      DOMAIN: ${DOMAIN:?DOMAIN muss in .env gesetzt sein}
+      LANDING_DOMAIN: ${LANDING_DOMAIN:?LANDING_DOMAIN muss in .env gesetzt sein}
+      APP_DOMAIN: ${APP_DOMAIN:?APP_DOMAIN muss in .env gesetzt sein}
       ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL muss in .env gesetzt sein (für Let's Encrypt)}
     restart: unless-stopped
     networks:

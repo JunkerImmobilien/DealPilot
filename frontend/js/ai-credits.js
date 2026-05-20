@@ -104,7 +104,7 @@
         '</div>' +
         '<div class="ai-credits-meta">' +
           '<span>Reset am ' + resetDate + ' (1. des Monats, 00:00 UTC)</span>' +
-          '<button class="btn btn-outline btn-sm" type="button" onclick="window.AiCredits._buyClick()">Credits dazukaufen</button>' +
+          '<button class="btn btn-outline btn-sm" type="button" onclick="if(typeof showSettings===\'function\')showSettings(\'plan\');">Credits dazukaufen</button>' +  // V225: öffnet Plan-Tab statt eigenes Modal
         '</div>' +
       '</div>';
   }

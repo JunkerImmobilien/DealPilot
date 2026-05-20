@@ -133,7 +133,7 @@ router.post('/track-usage', validate({ body: trackUsageSchema }), async (req, re
     const usage = await usageService.getCurrentMonthUsage(req.user.id);
     const current = usage[req.body.metric] || 0;
 
-    if (limit != null && current >= limit) {
+    if (limit != null && limit >= 0 && current >= limit) { // V225: -1 = unlimited
       return res.status(403).json({
         error: 'Plan limit reached',
         metric: req.body.metric,

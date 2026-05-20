@@ -38,17 +38,17 @@ function requireUnderLimit(metric) {
       let limit, current;
       if (metric === 'objects') {
         limit = plan.max_objects;
-        if (limit == null) return next(); // unlimited
+        if (limit == null || limit < 0) return next(); // V225: unlimited (NULL oder -1)
         const r = await query('SELECT COUNT(*) AS cnt FROM objects WHERE user_id = $1', [req.user.id]);
         current = parseInt(r.rows[0].cnt, 10);
       } else if (metric === 'ai_analyses_monthly') {
         limit = plan.max_ai_analyses_monthly;
-        if (limit == null) return next();
+        if (limit == null || limit < 0) return next(); // V225
         const usage = await usageService.getCurrentMonthUsage(req.user.id);
         current = usage.ai_analysis || 0;
       } else if (metric === 'pdf_exports_monthly') {
         limit = plan.max_pdf_exports_monthly;
-        if (limit == null) return next();
+        if (limit == null || limit < 0) return next(); // V225
         const usage = await usageService.getCurrentMonthUsage(req.user.id);
         current = usage.pdf_export || 0;
       } else {

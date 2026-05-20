@@ -385,6 +385,18 @@ async function handleAuthSubmit(mode) {
     }
 
     if (typeof onLoginSuccess === 'function') onLoginSuccess(session);
+
+    // V225: Quick-Check automatisch öffnen nach erfolgreicher Anmeldung
+    // (nicht für Registrierung — nur bei mode === 'login')
+    if (mode === 'login') {
+      setTimeout(function() {
+        try {
+          if (typeof window.enterQuickCheckMode === 'function') {
+            window.enterQuickCheckMode();
+          }
+        } catch (qcErr) { console.warn('[v225] Quick-Check auto-open failed:', qcErr); }
+      }, 400);
+    }
   } catch(e) {
     errEl.textContent = '⚠ ' + e.message;
     errEl.style.display = 'block';
