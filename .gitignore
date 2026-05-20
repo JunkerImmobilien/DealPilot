@@ -73,6 +73,6 @@ letsencrypt/
 !backend/migrations/
 !backend/migrations/*.sql
 
-# DB-Backups (V246-Prod hinzugefügt)
+# DB-Backups (V225 + V246-Prod)
 backup_*.sql
 *.sql.bak

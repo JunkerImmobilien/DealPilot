@@ -173,9 +173,22 @@ var Paywall = (function() {
       // V27: An User-Box im Footer einhängen (statt oben in der Sidebar).
       var sbUser = document.getElementById('sb-user');
       if (!sbUser) {
+        // V243: Retry-Limit gegen Endlosschleife — nach 10 Versuchen aufgeben.
+        // Vorher: setTimeout(renderUsageBadge, 800) ohne Limit → blockierte den
+        // Tab bei jedem Aufruf mit Sub.getCurrent(), wenn sb-user nie erschien.
+        if (typeof renderUsageBadge._retryCount === 'undefined') {
+          renderUsageBadge._retryCount = 0;
+        }
+        renderUsageBadge._retryCount++;
+        if (renderUsageBadge._retryCount > 10) {
+          console.warn('[V243] renderUsageBadge: sb-user nach 10 Versuchen nicht gefunden — gebe auf');
+          return;
+        }
         setTimeout(renderUsageBadge, 800);
         return;
       }
+      // sb-user gefunden → Counter zurücksetzen für künftige Aufrufe (z.B. nach Logout)
+      renderUsageBadge._retryCount = 0;
       container = document.createElement('div');
       container.id = 'paywall-usage';
       sbUser.parentNode.insertBefore(container, sbUser);
@@ -185,10 +198,18 @@ var Paywall = (function() {
     var usage = { objects: 0, calculations: 0, ai_calls: 0, exports: 0 };
     try {
       if (typeof Auth !== 'undefined' && Auth.isApiMode()) {
-        // Backend usage
+        // V240 Bug-A-Fix: /users/me/usage war admin-only → 403 für normale User.
+        // Stattdessen /subscription nutzen, das liefert subscription.usage bereits.
         try {
-          var resp = await Auth.apiCall('/users/me/usage');
-          usage = Object.assign(usage, resp || {});
+          var resp = await Auth.apiCall('/subscription');
+          var u = (resp && resp.subscription && resp.subscription.usage) || {};
+          // Backend-Feldnamen auf Frontend-Schema mappen
+          usage = Object.assign(usage, {
+            calculations: u.calculations || u.calc_count || usage.calculations,
+            ai_calls:     u.ai_analysis  || u.ai_calls   || usage.ai_calls,
+            exports:      u.pdf_export   || u.exports    || usage.exports,
+            objects:      u.objects      || usage.objects
+          });
         } catch (e) {}
       }
     } catch (e) {}
@@ -235,16 +256,11 @@ var Paywall = (function() {
     localStorage.setItem(key, current + 1);
 
     // Backend
-    try {
-      if (typeof Auth !== 'undefined' && Auth.isApiMode()) {
-        await Auth.apiCall('/users/me/usage', {
-          method: 'POST',
-          body: { metric: metric, increment: 1 }
-        });
-      }
-    } catch (e) {
-      // Backend may not have endpoint yet, OK
-    }
+    // V240 Bug-A-Fix: POST /users/me/usage war admin-only — 403 für normale User.
+    // Server-Side-Tracking läuft sowieso über /objects/track-usage + AI-Routes,
+    // nicht über diesen Paywall-Counter. Local-Counter (oben) ist authoritativ
+    // für die Free-Plan-Anzeige.
+    // Kein Backend-Call mehr von hier.
 
     setTimeout(renderUsageBadge, 200);
   }

@@ -1587,7 +1587,7 @@ function _renderPlanPane() {
         '<div class="plan-credit-num">' + pack.credits + '</div>' +
         '<div class="plan-credit-label">Credits</div>' +
         '<div class="plan-credit-price">' + pack.price_eur + ' €</div>' +
-        '<div class="plan-credit-sub">≈ ' + pack.per_credit.toFixed(2).replace('.', ',') + ' € / Credit</div>' +
+        '<div class="plan-credit-sub">≈ ' + pack.per_anfrage.toFixed(2).replace('.', ',') + ' € / Anfrage</div>' +
         '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + pack.key + '\')">Dazubuchen</button>' +
       '</div>';
     });

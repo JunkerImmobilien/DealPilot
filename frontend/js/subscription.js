@@ -107,11 +107,18 @@ var Sub = (function() {
       return _cache;
     } catch (e) {
       console.warn('Subscription endpoint not available:', e.message);
-      return {
+      // V242: synthetisches free in _cache schreiben, damit weitere
+      // getCurrent()-Calls den Cache-Hit nehmen und keine Endlosschleife
+      // von /subscription-Requests entsteht. Wird beim Login via
+      // Sub.invalidateCache() durch das echte Backend-Sub ersetzt.
+      _cache = {
         plan_id: 'free', plan_name: 'Free',
-        is_active: true, synthetic: true,
+        plan_features: {},
+        is_active: true, synthetic: true, _fallback: true,
         limits: {}, usage: {}
       };
+      _cacheTime = Date.now();
+      return _cache;
     }
   }
 

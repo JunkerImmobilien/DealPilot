@@ -385,6 +385,18 @@ async function handleAuthSubmit(mode) {
     }
 
     if (typeof onLoginSuccess === 'function') onLoginSuccess(session);
+
+    // V225: Quick-Check automatisch öffnen nach erfolgreicher Anmeldung
+    // (nicht für Registrierung — nur bei mode === 'login')
+    if (mode === 'login') {
+      setTimeout(function() {
+        try {
+          if (typeof window.enterQuickCheckMode === 'function') {
+            window.enterQuickCheckMode();
+          }
+        } catch (qcErr) { console.warn('[v225] Quick-Check auto-open failed:', qcErr); }
+      }, 400);
+    }
   } catch(e) {
     errEl.textContent = '⚠ ' + e.message;
     errEl.style.display = 'block';
@@ -414,7 +426,21 @@ function initAuth() {
 
 function updateUserDisplay(session) {
   var footer = document.querySelector('.sb-footer');
+  // V244: Retry wenn Footer noch nicht im DOM (Race-Condition bei Login)
+  // Vorher: kein Retry — sb-user wurde nie erstellt → renderUsageBadge in Endlosschleife
+  if (!footer) {
+    updateUserDisplay._retries = (updateUserDisplay._retries || 0) + 1;
+    if (updateUserDisplay._retries > 20) {
+      console.warn('[V244] updateUserDisplay: .sb-footer nach 20 Versuchen nicht da — gebe auf');
+      return;
+    }
+    setTimeout(function() { updateUserDisplay(session); }, 100);
+    return;
+  }
+  updateUserDisplay._retries = 0;
   if (footer && !document.getElementById('sb-user')) {
+    // V245: try/catch um sb-user-Insert — sonst crash silent + renderUsageBadge endlos
+    try {
     var userBox = document.createElement('div');
     userBox.id = 'sb-user';
     userBox.className = 'sb-user-box';
@@ -479,6 +505,20 @@ function updateUserDisplay(session) {
         btn.style.background = 'transparent';
       });
     });
+    console.log('[V245] updateUserDisplay: sb-user erfolgreich erstellt');
+    } catch (e) {
+      console.error('[V245] updateUserDisplay CRASH:', e.message, e.stack);
+      // Notfall-Fallback: minimaler sb-user damit renderUsageBadge nicht endlos läuft
+      try {
+        var fb = document.createElement('div');
+        fb.id = 'sb-user';
+        fb.className = 'sb-user-box';
+        fb.style.cssText = 'padding:10px;color:#fff;font-size:11px';
+        fb.textContent = (session && session.name) || 'User';
+        footer.parentNode.insertBefore(fb, footer);
+        console.warn('[V245] Notfall-sb-user erstellt nach Crash');
+      } catch (e2) { console.error('[V245] Auch Notfall-Insert fehlgeschlagen:', e2.message); }
+    }
   }
 }
 

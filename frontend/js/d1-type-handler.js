@@ -418,9 +418,11 @@
           }
         } else {
           // Starter → bleiben sperren, mit klarem Hinweis statt unsichtbar
-          opt.disabled = true;
-          opt.hidden = false;          // sichtbar lassen (greyed)
-          opt.style.display = '';
+          // V246: Idempotent — nur ändern wenn Wert sich tatsächlich unterscheidet.
+          // Sonst triggert der MutationObserver unten endlos sich selbst → Tab tot.
+          if (opt.disabled !== true) opt.disabled = true;
+          if (opt.hidden !== false) opt.hidden = false;
+          if (opt.style.display !== '') opt.style.display = '';
           if (opt.textContent.indexOf('🔒') === -1) {
             opt.textContent = '🔒 ' + opt.textContent.replace(/^🔒\s*/, '') + ' — ab Investor-Plan';
           }

@@ -131,18 +131,41 @@
   // Gewrappte apiCall
   window.Auth.apiCall = async function patchedApiCall(path, options) {
     options = options || {};
+    // V241: Token-State VOR dem Call merken, um zwischen "expired" und
+    // "nie eingeloggt" zu unterscheiden. Bei Retry nach Re-Login wird
+    // _hadTokenAtCall NICHT überschrieben (bleibt false beim ersten Versuch).
+    if (typeof options._hadTokenAtCall === 'undefined') {
+      try {
+        options._hadTokenAtCall = !!localStorage.getItem('ji_token');
+      } catch (e) { options._hadTokenAtCall = false; }
+    }
     try {
       return await originalApiCall(path, options);
     } catch (err) {
       // Nur bei 401, und nicht bei Auth-Endpoints selbst
-      var is401 = err && (err.status === 401 ||
-        (err.message && /HTTP 401|401/.test(err.message)));
+      // V240 Bug-C-Fix: strenge Prüfung, NIE auf 403 reagieren.
+      var status = err && err.status;
+      var msg = (err && err.message) || '';
+      var is401 = (status === 401) || /\bHTTP 401\b|\b401\b/.test(msg);
+      var is403 = (status === 403) || /\bHTTP 403\b|\b403\b/.test(msg);
+      if (is403) {
+        console.warn('[401-handler] 403 (Forbidden) für', path, '— KEIN Re-Login (Permission-Issue, kein Token-Issue):', msg);
+        throw err;
+      }
       if (!is401 || isAuthEndpoint(path) || options.noAuth) {
         throw err;
       }
       // Anti-Doppel-Retry: einmal ist genug
       if (options._v156_retried) {
         console.warn('[401-handler] Auch nach Re-Login wieder 401 — gebe auf');
+        throw err;
+      }
+
+      // V241: Wenn kein Token vor dem Call vorhanden war, ist 401 erwartet
+      // (User war einfach nicht eingeloggt). NICHT Re-Login triggern, sonst
+      // öffnen wir auf der Login-Page das Login-Modal als zweites Overlay.
+      if (!options._hadTokenAtCall) {
+        console.log('[401-handler] 401 für', path, '— aber Aufrufer hatte vor dem Request keinen Token. Kein Re-Login (User war nicht eingeloggt).');
         throw err;
       }
 
