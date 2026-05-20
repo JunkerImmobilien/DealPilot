@@ -131,6 +131,14 @@
   // Gewrappte apiCall
   window.Auth.apiCall = async function patchedApiCall(path, options) {
     options = options || {};
+    // V241: Token-State VOR dem Call merken, um zwischen "expired" und
+    // "nie eingeloggt" zu unterscheiden. Bei Retry nach Re-Login wird
+    // _hadTokenAtCall NICHT überschrieben (bleibt false beim ersten Versuch).
+    if (typeof options._hadTokenAtCall === 'undefined') {
+      try {
+        options._hadTokenAtCall = !!localStorage.getItem('ji_token');
+      } catch (e) { options._hadTokenAtCall = false; }
+    }
     try {
       return await originalApiCall(path, options);
     } catch (err) {
@@ -150,6 +158,14 @@
       // Anti-Doppel-Retry: einmal ist genug
       if (options._v156_retried) {
         console.warn('[401-handler] Auch nach Re-Login wieder 401 — gebe auf');
+        throw err;
+      }
+
+      // V241: Wenn kein Token vor dem Call vorhanden war, ist 401 erwartet
+      // (User war einfach nicht eingeloggt). NICHT Re-Login triggern, sonst
+      // öffnen wir auf der Login-Page das Login-Modal als zweites Overlay.
+      if (!options._hadTokenAtCall) {
+        console.log('[401-handler] 401 für', path, '— aber Aufrufer hatte vor dem Request keinen Token. Kein Re-Login (User war nicht eingeloggt).');
         throw err;
       }
 
