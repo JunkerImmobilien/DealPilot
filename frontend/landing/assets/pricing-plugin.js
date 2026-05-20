@@ -5,7 +5,7 @@
  * Anpassungen gegenüber dem App-Original:
  * - Kein Modal-Overlay (wird direkt in #pricing-host eingebettet)
  * - Kein "Aktueller Plan"-Check (User ist Neukunde)
- * - Alle CTAs zeigen auf https://app.staging.dealpilot.junker-immobilien.io/?register=1&plan=KEY
+ * - Alle CTAs zeigen auf https://app.dealpilot.junker-immobilien.io/?register=1&plan=KEY
  * - Service-CTAs zeigen auf Kontakt-Mailto
  * - Credit-CTAs zeigen auf Registration mit Hinweis
  */
@@ -165,7 +165,7 @@
                 '<div class="dp-card-notincl-label">Nicht enthalten:</div>' +
                 '<ul class="dp-card-notincl-list" data-field="notincl"></ul>' +
               '</div>' +
-              '<a class="dp-cta" href="https://app.staging.dealpilot.junker-immobilien.io/?register=1" data-field="cta-link">' +
+              '<a class="dp-cta" href="https://app.dealpilot.junker-immobilien.io/?register=1" data-field="cta-link">' +
                 '<span data-field="cta-text">Plan wählen</span>' +
                 '<span class="dp-cta-arrow" aria-hidden="true">⟶</span>' +
               '</a>' +
@@ -302,7 +302,7 @@
       '<div class="dp-credits-price">' + price + ' €</div>' +
       '<div class="dp-credits-perunit">' + perAnfrageStr + ' / Anfrage</div>' +
       '<div class="dp-credits-target">' + target + '</div>' +
-      '<a class="dp-credits-cta" href="https://app.staging.dealpilot.junker-immobilien.io/?register=1&credits=' + credits + '">Credits kaufen</a>' +
+      '<a class="dp-credits-cta" href="https://app.dealpilot.junker-immobilien.io/?register=1&credits=' + credits + '">Credits kaufen</a>' +
     '</div>';
   }
 
@@ -415,7 +415,7 @@
     if (ctaText) ctaText.textContent = plan.ctaText;
     if (ctaLink) {
       ctaLink.classList.remove('dp-cta-current');
-      ctaLink.setAttribute('href', 'https://app.staging.dealpilot.junker-immobilien.io/?register=1&plan=' + key + '&period=' + STATE.period);
+      ctaLink.setAttribute('href', 'https://app.dealpilot.junker-immobilien.io/?register=1&plan=' + key + '&period=' + STATE.period);
     }
   }
 

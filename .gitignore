@@ -72,3 +72,7 @@ letsencrypt/
 # DealPilot Migration-SQL-Files dürfen ins Repo
 !backend/migrations/
 !backend/migrations/*.sql
+
+# DB-Backups (V246-Prod hinzugefügt)
+backup_*.sql
+*.sql.bak
