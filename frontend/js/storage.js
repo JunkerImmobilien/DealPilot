@@ -1332,7 +1332,7 @@ async function exportAllJSON() {
   var blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'Junker_Kalkulationen_' + new Date().toISOString().slice(0, 10) + '.json';
+  a.download = 'DealPilot_Objekte_' + new Date().toISOString().replace(/[:T.]/g, '-').slice(0, 17) + '.dpkt';  // V251-05
   a.click();
   toast('✓ ' + all.length + ' Objekte exportiert');
 }
@@ -1378,7 +1378,7 @@ async function exportSingleObjectJson(objId) {
   var blob = new Blob([JSON.stringify([single], null, 2)], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'DealPilot_' + nameSlug + '_' + new Date().toISOString().slice(0, 10) + '.json';
+  a.download = 'DealPilot_Objekte_' + nameSlug + '_' + new Date().toISOString().replace(/[:T.]/g, '-').slice(0, 17) + '.dpkt';  // V251-05
   a.click();
   toast('✓ Objekt "' + (single.name || nameSlug) + '" als JSON gesichert');
 }
@@ -3057,3 +3057,61 @@ window.setSidebarSort = setSidebarSort;
     }, 200);
   });
 })();
+
+
+// ═══════════════════════════════════════════════════════════════════
+// V251-05: Encrypted Export Helper
+// ═══════════════════════════════════════════════════════════════════
+async function _encryptForExport(payload) {
+  // Ruft Backend-Endpoint, gibt verschluesselten Blob zurueck.
+  const token = localStorage.getItem('ji_token');
+  if (!token) {
+    console.warn('[V251-05] Kein Token — Export bleibt unverschluesselt');
+    return null;
+  }
+  try {
+    const resp = await fetch('/api/v1/export/encrypt', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({ payload: payload }),
+    });
+    if (!resp.ok) {
+      console.warn('[V251-05] Encrypt-API Status', resp.status);
+      return null;
+    }
+    return await resp.json();
+  } catch (e) {
+    console.warn('[V251-05] Encrypt-Call fehlgeschlagen:', e.message);
+    return null;
+  }
+}
+
+// Wrapper: nimmt ein Original-JSON-Payload, gibt entweder verschluesselt
+// (wenn Backend erreichbar) oder Plain zurueck. Plus aussagekraeftiger
+// Default-Filename.
+async function exportWithEncryption(payload, baseFilename) {
+  const encrypted = await _encryptForExport(payload);
+  const finalPayload = encrypted || payload;
+  const ts = new Date().toISOString().replace(/[:T.]/g, '-').slice(0, 17);
+  const ext = encrypted ? '.dpkt' : '.json';
+  const filename = (baseFilename || 'DealPilot_Objekte') + '_' + ts + ext;
+
+  const blob = new Blob(
+    [JSON.stringify(finalPayload, null, 2)],
+    { type: encrypted ? 'application/octet-stream' : 'application/json' }
+  );
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+
+  if (encrypted) {
+    if (typeof toast === 'function') toast('✓ Verschluesselter Export: ' + filename);
+  } else {
+    if (typeof toast === 'function') toast('⚠ Klartext-Export (Server nicht erreichbar): ' + filename);
+  }
+}
+window.exportWithEncryption = exportWithEncryption;

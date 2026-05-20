@@ -448,8 +448,53 @@ window.DealPilotDealAction = (function() {
     ].join('');
   }
 
+
+  // V252-01: Bankgespräch-Vorbereiten-Card
+  function renderBankgespraechCard() {
+    return [
+      '<div class="da-bank-card">',
+      '  <div class="da-bank-head">',
+      '    <div class="da-bank-title">Bankgespräch vorbereiten</div>',
+      '    <div class="da-bank-sub">Alle Unterlagen griffbereit haben — das spart Termine und stärkt deine Verhandlungsposition.</div>',
+      '  </div>',
+      '  <div class="da-bank-cols">',
+      '    <div class="da-bank-col">',
+      '      <div class="da-bank-col-title">Persönliche Unterlagen</div>',
+      '      <ul class="da-bank-list">',
+      '        <li>Personalausweis / Reisepass (Kopie)</li>',
+      '        <li>Letzte 3 Gehaltsabrechnungen</li>',
+      '        <li>Steuerbescheide der letzten 2 Jahre</li>',
+      '        <li>SCHUFA-Selbstauskunft (max. 3 Monate)</li>',
+      '        <li>Vermögenswerte und Verbindlichkeiten</li>',
+      '      </ul>',
+      '    </div>',
+      '    <div class="da-bank-col">',
+      '      <div class="da-bank-col-title">Objekt-Unterlagen</div>',
+      '      <ul class="da-bank-list">',
+      '        <li>Exposé / Verkaufsanzeige</li>',
+      '        <li>Aktueller Grundbuchauszug</li>',
+      '        <li>Wohnflächenberechnung</li>',
+      '        <li>Letzte Nebenkostenabrechnungen</li>',
+      '        <li>Bei WEG: Teilungserklärung + Protokolle</li>',
+      '      </ul>',
+      '    </div>',
+      '  </div>',
+      '  <div class="da-bank-pdf-row">',
+      '    <div class="da-bank-pdf-text">',
+      '      <div class="da-bank-pdf-title">DealPilot Investment-PDF</div>',
+      '      <div class="da-bank-pdf-desc">Kaufpreis, Finanzierungsstruktur, Cashflow, Rendite, Risiken — bank-fertig aufbereitet.</div>',
+      '    </div>',
+      '    <button type="button" class="da-bank-pdf-btn" onclick="if(typeof exportPDF===\'function\')exportPDF()">',
+      '      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:-3px"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>',
+      '      Investment-PDF generieren',
+      '    </button>',
+      '  </div>',
+      '</div>'
+    ].join('');
+  }
+
   function renderWonCard() {
-    // V248-03: Drei-Status statt Stern-Toggle
+    // V252-01: Drei-Status mit Heroicons (Frage / Daumen-hoch / Daumen-runter)
     return [
       '<div class="da-status-card" id="da-status-card">',
       '  <div class="da-status-head">',
@@ -457,9 +502,15 @@ window.DealPilotDealAction = (function() {
       '    <div class="da-status-sub" id="da-status-sub">Markiere den Deal als gewonnen oder verloren.</div>',
       '  </div>',
       '  <div class="da-status-btns">',
-      '    <button type="button" class="da-status-btn da-status-open"  data-status="open"  onclick="DealPilotDealAction.setStatus(\'open\')">Offen</button>',
-      '    <button type="button" class="da-status-btn da-status-won"   data-status="won"   onclick="DealPilotDealAction.setStatus(\'won\')">Gewonnen</button>',
-      '    <button type="button" class="da-status-btn da-status-lost"  data-status="lost"  onclick="DealPilotDealAction.setStatus(\'lost\')">Verloren</button>',
+      '    <button type="button" class="da-status-btn da-status-open active" data-status="open" onclick="DealPilotDealAction.setStatus(\'open\')">',
+      '      <span class="da-stat-ico">' + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.5"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>' + '</span><span>Offen</span>',
+      '    </button>',
+      '    <button type="button" class="da-status-btn da-status-won" data-status="won" onclick="DealPilotDealAction.setStatus(\'won\')">',
+      '      <span class="da-stat-ico">' + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V3a.75.75 0 0 1 .75-.75A2.25 2.25 0 0 1 16.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z"/></svg>' + '</span><span>Gewonnen</span>',
+      '    </button>',
+      '    <button type="button" class="da-status-btn da-status-lost" data-status="lost" onclick="DealPilotDealAction.setStatus(\'lost\')">',
+      '      <span class="da-stat-ico">' + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54"/></svg>' + '</span><span>Verloren</span>',
+      '    </button>',
       '  </div>',
       '  <input type="hidden" id="_deal_won_state" value="false">',
       '  <input type="hidden" id="_deal_won_at_state" value="">',
@@ -483,6 +534,26 @@ window.DealPilotDealAction = (function() {
       '<p class="sec-desc">Was möchtest du als Nächstes tun? Die Objektdaten werden automatisch übergeben.</p>',
       
       // V191: Banner-Sektion (Empfehlungen + KP-Aufteilung) ganz oben
+      // V252-01: NEUE REIHENFOLGE — Deal-Status + Bankgespräch ZUERST
+      '<div class="da-stage da-stage-status">',
+        '<div class="da-stage-head">',
+          '<span class="da-stage-ico">①</span>',
+          '<div class="da-stage-title">Deal abschließen</div>',
+          '<div class="da-stage-sub">Status setzen — Markierung an der Objekt-Kartei in der Sidebar</div>',
+        '</div>',
+        renderWonCard(),
+      '</div>',
+
+      '<div class="da-stage da-stage-bank">',
+        '<div class="da-stage-head">',
+          '<span class="da-stage-ico">②</span>',
+          '<div class="da-stage-title">Bankgespräch</div>',
+          '<div class="da-stage-sub">Vorbereitung mit Unterlagen-Checkliste + Investment-PDF</div>',
+        '</div>',
+        renderBankgespraechCard(),
+      '</div>',
+
+      // Bestehende Banner danach
       renderRndRecommendation(),
       renderKpAufteilungBanner(),
       
@@ -548,42 +619,7 @@ window.DealPilotDealAction = (function() {
         '</div>',
       '</div>',
       
-      // V191: ═══════ STAGE 3: DEAL ABSCHLIESSEN ═══════
-      '<div class="da-stage da-stage-3">',
-        '<div class="da-stage-head">',
-          '<span class="da-stage-ico">③</span>',
-          '<div class="da-stage-title">Deal abschließen</div>',
-          '<div class="da-stage-sub">Won-Status setzen, Datenraum nutzen</div>',
-        '</div>',
-        renderWonCard(),
-        _renderDatenraumQuickAccess(),
-      '</div>',
-      
-      // V191: Coming Soon ans Ende — separat, klein
-      '<div class="da-coming-soon">',
-        '<div class="da-stage-head" style="margin-bottom:8px">',
-          '<span class="da-stage-ico" style="background:rgba(201,168,76,0.10);color:#9a7f33">✨</span>',
-          '<div class="da-stage-title" style="font-size:14px">Kommt bald</div>',
-        '</div>',
-        '<div class="da-grid">',
-          renderCard({
-            id: 'da-card-strategy',
-            icon: ico('compass', 26),
-            title: 'Portfolio-Strategie&shy;analyse',
-            subtitle: '17 Strategien · 12 Diagnose-Karten',
-            desc: 'Anlage-Ziel, Bestand und Marktlage in einer ganzheitlichen Strategie. RND, KP-Aufteilung, GmbH-Verkauf, Eigenheim­schaukel, Familien­stiftung u.v.m.',
-            status: '<span style="color:#C9A84C;font-weight:600">🚀 Coming Soon</span>',
-            cta: 'Coming Soon',
-            onclick: 'event.preventDefault();event.stopPropagation();if(typeof toast===\'function\')toast(\'🚀 Portfolio-Strategie kommt in einer der nächsten Versionen\');return false;',
-            disabled: true
-          }),
-        '</div>',
-      '</div>',
-      '<div class="da-foot" style="margin-top:18px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:12px;color:var(--muted);line-height:1.5">',
-      '  <strong style="color:var(--ch)">Hinweis:</strong> Alle Anfragen werden mit deinen aktuellen Objektdaten + der PDF-Investmentanalyse versendet. ',
-      '  Du erhältst eine Bestätigungskopie an deine in den Settings hinterlegte E-Mail-Adresse. ',
-      '  Die hochgeladenen Dokumente werden ausschließlich für die jeweilige Anfrage genutzt und nicht dauerhaft gespeichert.',
-      '</div>'
+      // V252-01: STAGE 3 (Won-Card + Portfolio-Strategie-Banner) entfernt — Won ist jetzt oben
     ].join('');
 
     refreshProgressLabels();
@@ -2362,6 +2398,88 @@ window.DealPilotDealAction = (function() {
     }, 300);
   }
 
+  // ════════════════════════════════════════════════════════════════
+  // V252-02b: Drei-Status (open / won / lost) — Wrapper um setDealWon
+  // ════════════════════════════════════════════════════════════════
+  function setStatus(status) {
+    var validStatuses = ['open', 'won', 'lost'];
+    if (validStatuses.indexOf(status) === -1) {
+      console.warn('[V252-02b] Ungueltiger Status:', status);
+      return;
+    }
+    console.log('[V252-02b] setStatus →', status);
+
+    // 1) Lost-Flag in Hidden-Input + currentObjData pflegen (V248-03 Schema)
+    var lostEl = document.getElementById('_deal_lost_state');
+    if (lostEl) lostEl.value = (status === 'lost') ? 'true' : 'false';
+    if (window._currentObjData) {
+      window._currentObjData._deal_lost = (status === 'lost');
+    }
+
+    // 2) Won-Flag via existierende V104-Logik (setDealWon kümmert sich um Save + Sync)
+    try {
+      setDealWon(status === 'won', true);  // true = propagate (Sidebar refresh)
+    } catch(e) {
+      console.warn('[V252-02b] setDealWon-Aufruf fehlgeschlagen:', e.message);
+    }
+
+    // 3) UI-Update sofort
+    try { updateStatusUI(status); } catch(e) {
+      console.warn('[V252-02b] updateStatusUI fehlgeschlagen:', e.message);
+    }
+
+    // 4) Wenn Status="lost", müssen wir noch separat speichern (setDealWon
+    //    speichert nur den Won-Flag; das Lost-Flag wird über collectData()
+    //    via Hidden-Input mitgenommen, ABER nur wenn ein Save getriggert wird)
+    if (status === 'lost' || status === 'open') {
+      try {
+        if (typeof window.saveCurrentObject === 'function') {
+          window.saveCurrentObject();
+        } else if (typeof window.autoSave === 'function') {
+          window.autoSave();
+        }
+      } catch(e) {}
+    }
+
+    // 5) Sidebar-Refresh mit forceFresh damit Badge-State neu aus DB kommt
+    try {
+      if (typeof window.renderSaved === 'function') {
+        window.renderSaved({forceFresh: true, _immediate: true});
+      }
+    } catch(e) {}
+
+    // 6) Toast-Feedback
+    try {
+      if (typeof toast === 'function') {
+        var label = status === 'won' ? 'Gewonnen ✓'
+                  : status === 'lost' ? 'Verloren'
+                  : 'Offen';
+        toast('Status: ' + label);
+      }
+    } catch(e) {}
+  }
+
+  function updateStatusUI(status) {
+    var label = document.getElementById('da-status-label');
+    var sub   = document.getElementById('da-status-sub');
+    if (label) {
+      label.textContent = status === 'won'  ? 'Status: Gewonnen ✓'
+                       : status === 'lost' ? 'Status: Verloren'
+                                           : 'Status: Offen';
+    }
+    if (sub) {
+      sub.textContent = status === 'won'  ? 'Deal als gewonnen markiert.'
+                     : status === 'lost' ? 'Deal als verloren markiert.'
+                                         : 'Markiere den Deal als gewonnen oder verloren.';
+    }
+    // Active-Klassen auf den 3 Buttons
+    document.querySelectorAll('.da-status-btn').forEach(function(btn) {
+      var s = btn.getAttribute('data-status');
+      if (s === status) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+  }
+
   return {
     init: init,
     openBank: openBank,
@@ -2388,6 +2506,9 @@ window.DealPilotDealAction = (function() {
     gotoStep: gotoStep,
     closeModal: closeModal,
     _onPhotos: _onPhotos,
+    // V252-02b: Drei-Status
+    setStatus: setStatus,
+    refreshStatusUI: updateStatusUI,
     // V104: Deal-Won-Status
     toggleWon: function() { setDealWon(!isDealWon(), true); },
     isWon: isDealWon,

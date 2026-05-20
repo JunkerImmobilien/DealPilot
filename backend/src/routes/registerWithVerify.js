@@ -228,6 +228,15 @@ router.get('/verify-email', async (req, res) => {
       console.warn('[verify-email] Free-Plan-Zuweisung fehlgeschlagen (nicht kritisch):', e.message);
     }
 
+    // V251-04: Demo-Objekt fuer neuen Free-Plan-User anlegen
+    // Einmalig beim Verify. Wenn User es loescht, wird es NICHT wieder angelegt.
+    try {
+      const demoObjectService = require('../services/demoObjectService');
+      await demoObjectService.assignDemoObject(userId);
+    } catch (e) {
+      console.warn('[verify-email] Demo-Objekt-Anlage fehlgeschlagen (nicht kritisch):', e.message);
+    }
+
     // User-Daten holen + JWT erstellen
     const user = await userService.getById(userId);
     if (!user) {
