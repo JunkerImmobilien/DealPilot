@@ -895,12 +895,30 @@
       if (!token) return;
       if (Tour.isComplete()) return;
       if (!window.DpTourVariants) return;
-      // V239: Laengere Wartezeit damit Sidebar fertig rendert
+      // V247: NICHT starten wenn Auth-Modal noch offen (Verify-Email → Passwort setzen)
+      // oder wenn URL einen ?token=/?verify=/?register=-Param hat
+      var qs = window.location.search || '';
+      if (/[?&](token|verify|verify_error|register)=/.test(qs)) {
+        console.log('[DpTour V247] Auto-Start unterdrueckt: URL-Param signalisiert Auth-Flow');
+        return;
+      }
+      // V247: Laengere Wartezeit damit Sidebar fertig rendert + Auth-Modal-Check
       setTimeout(function() {
-        if (!Tour.isComplete()) Tour.start();
+        if (Tour.isComplete()) return;
+        // V247: Modal-Check direkt vor Start (nicht nur beim DOMContentLoaded)
+        if (document.getElementById('auth-modal')) {
+          console.log('[DpTour V247] Auto-Start unterdrueckt: Auth-Modal noch offen');
+          return;
+        }
+        // V247: Session muss aktiv sein
+        if (typeof Auth !== 'undefined' && typeof Auth.isLoggedIn === 'function' && !Auth.isLoggedIn()) {
+          console.log('[DpTour V247] Auto-Start unterdrueckt: User nicht eingeloggt');
+          return;
+        }
+        Tour.start();
       }, 2500);
     } catch(e) {
-      console.warn('[DpTour V239] Auto-Start fehlgeschlagen:', e.message);
+      console.warn('[DpTour V247] Auto-Start fehlgeschlagen:', e.message);
     }
   }
 
