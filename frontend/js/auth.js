@@ -426,6 +426,18 @@ function initAuth() {
 
 function updateUserDisplay(session) {
   var footer = document.querySelector('.sb-footer');
+  // V244: Retry wenn Footer noch nicht im DOM (Race-Condition bei Login)
+  // Vorher: kein Retry — sb-user wurde nie erstellt → renderUsageBadge in Endlosschleife
+  if (!footer) {
+    updateUserDisplay._retries = (updateUserDisplay._retries || 0) + 1;
+    if (updateUserDisplay._retries > 20) {
+      console.warn('[V244] updateUserDisplay: .sb-footer nach 20 Versuchen nicht da — gebe auf');
+      return;
+    }
+    setTimeout(function() { updateUserDisplay(session); }, 100);
+    return;
+  }
+  updateUserDisplay._retries = 0;
   if (footer && !document.getElementById('sb-user')) {
     var userBox = document.createElement('div');
     userBox.id = 'sb-user';
