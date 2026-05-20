@@ -28676,3 +28676,175 @@ aside.sidebar .sb-logo-shimmer:hover::after {
 }
 
 /* ════ Ende V235 ════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V248-03 CSS — Deal-Status (Offen / Gewonnen / Verloren)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Container */
+.da-status-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin: 8px 0 12px;
+}
+.da-status-head { margin-bottom: 12px; }
+.da-status-label {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink, #2A2727);
+  margin-bottom: 4px;
+}
+.da-status-sub {
+  font-size: 13px;
+  color: var(--muted, #7A7370);
+}
+
+/* Buttons */
+.da-status-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.da-status-btn {
+  flex: 1 1 0;
+  min-width: 110px;
+  padding: 10px 14px;
+  border: 1px solid rgba(201,168,76,0.28);
+  background: transparent;
+  border-radius: 8px;
+  color: var(--ink, #2A2727);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.da-status-btn:hover {
+  background: rgba(201,168,76,0.08);
+  border-color: rgba(201,168,76,0.45);
+}
+.da-status-btn.active {
+  background: rgba(201,168,76,0.18);
+  border-color: #C9A84C;
+  font-weight: 600;
+}
+.da-status-btn.da-status-won.active {
+  background: rgba(42,154,90,0.18);
+  border-color: #2A9A5A;
+  color: #1F7244;
+}
+.da-status-btn.da-status-lost.active {
+  background: rgba(201,76,76,0.16);
+  border-color: #C94C4C;
+  color: #913232;
+}
+
+/* Sidebar-Card: deal-lost Marker (analog deal-won) */
+aside.sidebar .sb-card.deal-lost {
+  position: relative;
+  opacity: 0.65;
+}
+aside.sidebar .sb-card.deal-lost::before {
+  content: 'VERLOREN';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(201,76,76,0.92);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  z-index: 5;
+  pointer-events: none;
+}
+aside.sidebar .sb-card.deal-lost:not(.active) {
+  background: rgba(201,76,76,0.05);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V248-04 Typography — IBM Plex Sans als Hauptschrift
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --font-main: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace;
+}
+
+/* Globale Typografie — gilt für alle Elemente die nicht explizit überschrieben werden */
+html, body {
+  font-family: var(--font-main);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Inputs, Buttons, Selects erben die Schrift NICHT automatisch in vielen Browsern */
+input, button, select, textarea {
+  font-family: var(--font-main);
+}
+
+/* Code/pre bleibt mono */
+code, pre, kbd, samp {
+  font-family: var(--font-mono);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V248-05 Icons — Heroicons inline SVG für ersetzte Emojis
+   ═══════════════════════════════════════════════════════════════════ */
+.hi-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  margin-right: 0.3em;
+}
+.hi-icon-lg { width: 1.4em; height: 1.4em; vertical-align: -0.3em; }
+
+/* Stage-Icons (waren ①②③) — nutzen jetzt klare Kreise mit Zahl */
+.da-stage-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.18);
+  color: #8B7220;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  font-family: var(--font-main, system-ui);
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V248-06 Readonly-Felder — visuell deutlich als "berechnet" markieren
+   ═══════════════════════════════════════════════════════════════════ */
+input[readonly],
+input[disabled].calc-output,
+.calc-output,
+input.computed-value {
+  background: rgba(0,0,0,0.025) !important;
+  border: 1px dashed rgba(201,168,76,0.20) !important;
+  color: var(--ink, #2A2727) !important;
+  font-weight: 500;
+  cursor: default;
+  box-shadow: none !important;
+}
+input[readonly]:focus,
+input[disabled].calc-output:focus {
+  outline: none !important;
+}
+
+/* Damit der User klar sieht: das ist ein Resultat, kein Input */
+input[readonly]::placeholder {
+  color: rgba(122,115,112,0.45);
+}

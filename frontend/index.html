@@ -425,7 +425,11 @@ label.dp-required.qc-required::after {
 }
 </style>
   <link rel="stylesheet" href="css/tour.css?v=239_10">
-</head>
+    <!-- V248-04: IBM Plex Sans als Hauptschrift -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
+  </head>
 <body>
 
 <!-- ════════════════════════════════════════════════════════════════════════
@@ -1540,13 +1544,7 @@ label.dp-required.qc-required::after {
     </details>
   </div>
 
-  <div class="card" style="margin-top:14px">
-    <div class="ct-row">
-      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Steuerprogression-Chart</div>
-      <button class="btn btn-outline btn-sm" onclick="showProgressionChart()">Chart öffnen</button>
-    </div>
-    <p class="hint">Vergleicht Einkommensteuer vor und nach Investition über die zvE-Bandbreite.</p>
-  </div>
+  <!-- V248-02: Steuerprogression-Chart entfernt (Modul echte Progression bleibt) -->
 
   <!-- Steuer-Modul (Live-Berechnung) -->
   <div class="card tax-module-card" style="margin-top:14px">
@@ -2228,26 +2226,7 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
-  <!-- V63.96/98: Analyse-Parameter wandern in Settings → KI-Tab.
-       Marcels Wunsch: einmal als Standard einstellen, im KI-Tab nur ein Hinweis-Button. -->
-  <div class="card" id="ai-params-link-card">
-    <div class="card-title">Analyse-Parameter</div>
-    <p class="hint" style="margin:6px 0 12px">Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und Marktphase werden in den Einstellungen unter <b>KI</b> gepflegt — die KI-Analyse nutzt diese Werte automatisch.</p>
-    <div class="ai-params-current" id="ai-params-current">
-      <div class="ai-params-row"><span class="ai-params-label">Strategie</span><span class="ai-params-val" id="ai-param-strat-display">—</span></div>
-      <div class="ai-params-row"><span class="ai-params-label">Verkäuferbereitschaft</span><span class="ai-params-val" id="ai-param-verk-display">—</span></div>
-      <div class="ai-params-row"><span class="ai-params-label">Eigene Risikotoleranz</span><span class="ai-params-val" id="ai-param-risk-display">—</span></div>
-      <div class="ai-params-row"><span class="ai-params-label">Marktphase</span><span class="ai-params-val" id="ai-param-markt-display">—</span></div>
-    </div>
-    <button type="button" class="btn btn-outline" style="margin-top:12px" onclick="if(typeof showSettings==='function') showSettings('api');">⚙ Analyse-Parameter einstellen</button>
-    <!-- Hidden Inputs für Backwards-Compatibility mit ui.js _buildAIPrompt (Werte aus Profil) -->
-    <input type="hidden" id="ai_strat">
-    <input type="hidden" id="ai_verk">
-    <input type="hidden" id="ai_risk">
-    <input type="hidden" id="ai_markt">
-  </div>
-
-  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Bewertung</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s5');return false;">Weiter: Bewertung<span class="v235-next-btn-arrow">→</span></button></div>
+  <!-- V248-01: Analyse-Parameter-Box entfernt — siehe Settings → KI-Tab -->
 </div>
 
 <!-- ═══════════ TAB 6: KENNZAHLEN ═══════════ -->
