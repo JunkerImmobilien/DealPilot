@@ -173,9 +173,22 @@ var Paywall = (function() {
       // V27: An User-Box im Footer einhängen (statt oben in der Sidebar).
       var sbUser = document.getElementById('sb-user');
       if (!sbUser) {
+        // V243: Retry-Limit gegen Endlosschleife — nach 10 Versuchen aufgeben.
+        // Vorher: setTimeout(renderUsageBadge, 800) ohne Limit → blockierte den
+        // Tab bei jedem Aufruf mit Sub.getCurrent(), wenn sb-user nie erschien.
+        if (typeof renderUsageBadge._retryCount === 'undefined') {
+          renderUsageBadge._retryCount = 0;
+        }
+        renderUsageBadge._retryCount++;
+        if (renderUsageBadge._retryCount > 10) {
+          console.warn('[V243] renderUsageBadge: sb-user nach 10 Versuchen nicht gefunden — gebe auf');
+          return;
+        }
         setTimeout(renderUsageBadge, 800);
         return;
       }
+      // sb-user gefunden → Counter zurücksetzen für künftige Aufrufe (z.B. nach Logout)
+      renderUsageBadge._retryCount = 0;
       container = document.createElement('div');
       container.id = 'paywall-usage';
       sbUser.parentNode.insertBefore(container, sbUser);
