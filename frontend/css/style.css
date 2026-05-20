@@ -28848,3 +28848,196 @@ input[disabled].calc-output:focus {
 input[readonly]::placeholder {
   color: rgba(122,115,112,0.45);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V249 Typography-Cleanup
+   — Computed-Felder + Buttons konsistent in IBM Plex Sans
+   — Farben bleiben (Branding-Gold etc.)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1) Computed/Berechnete Felder
+   Diese Klassen nutzten zuvor Cormorant Garamond (Serif) — sah
+   inkonsistent neben den DM-Sans-Inputs aus. Schrift wird auf
+   IBM Plex Sans gestellt, Farbe (Gold) und Größe bleiben. */
+.cf,
+.total-val,
+.wp-val,
+.scen-val,
+.kpi-v,
+.kv-val,
+.kv-val.gold,
+.kv .kv-val,
+.ytf-table td.ytf-computed,
+input[readonly],
+input[disabled].calc-output,
+.calc-output,
+input.computed-value {
+  font-family: var(--font-main, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  font-feature-settings: 'tnum' on, 'lnum' on;  /* tabellarische Zahlen */
+  letter-spacing: 0;
+  font-weight: 600;  /* leicht kräftiger damit Werte gut lesbar */
+}
+
+/* ── 2) Buttons — einheitliche Schrift + Weight
+   Hintergrundfarben/Padding/Borders bleiben (Branding).
+   NUR Typografie wird unifiziert. */
+.btn,
+.btn-gold,
+.btn-ghost,
+.btn-outline,
+.btn-gold-outline,
+.btn-primary,
+.btn-danger,
+.btn-link,
+.btn-sm,
+.btn-quickcheck,
+.ai-btn,
+.da-status-btn,
+.hdr-pdf-btn,
+.hdr-save-btn,
+.hdr-icon-btn,
+.mode-btn,
+.cf-mode-btn,
+.me-mode-btn,
+.bwk-mode-btn,
+.mt-btn,
+.sb-sort-btn,
+button.btn-brw,
+.btn-brw-icon,
+.fesh-apply-btn,
+.dp-tour-restart-btn {
+  font-family: var(--font-main, 'IBM Plex Sans', system-ui, sans-serif) !important;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  font-feature-settings: 'tnum' on;
+}
+
+/* Etwas dezenter für die ai-btn (war 600 fett) */
+.ai-btn {
+  font-weight: 600;
+}
+
+/* ── 3) Section-Titles bleiben Cormorant Garamond (Branding)
+   Aber wir machen sie etwas konsistenter mit dem Body-Layout */
+.sec-title {
+  letter-spacing: 0.01em;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V250-01 — Schriftgrößen Computed-Felder = Input-Größe (13px)
+   ═══════════════════════════════════════════════════════════════════ */
+.cf,
+.kv-val,
+.kv-val.gold,
+.kv .kv-val,
+.kv.hl-d .kv-val,
+.ytf-table td.ytf-computed,
+.calc-output,
+input[readonly],
+input[disabled].calc-output,
+input.computed-value {
+  font-size: 13px !important;
+  line-height: 1.4;
+}
+
+/* Nur .wp-val (Wertpapier-Highlight KPIs) und .total-val bleiben etwas
+   größer — aber nicht so dramatisch wie zuvor (20px → 15px) */
+.wp-val,
+.total-val {
+  font-size: 15px !important;
+}
+
+/* .scen-val und .kpi-v in Bewertung-Karten ebenfalls reduziert */
+.scen-val {
+  font-size: 16px !important;  /* von 24px */
+}
+.kpi-v {
+  font-size: 18px !important;  /* von 26px — bleibt KPI-prominent aber nicht riesig */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V250-03 — Layout-Lücke Objekt-Tab + Heroicons-Inline-Styling
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Layout-Fix: rechte Card "Qualität & Zustand" soll nicht strecken
+   sondern nur Inhalt-Höhe einnehmen. */
+.qz-card {
+  align-self: start !important;
+}
+
+/* Heroicons als Inline-SVG */
+.h-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;  /* leicht runter damit's mit Text aligned */
+  margin-right: 6px;
+  flex-shrink: 0;
+  color: currentColor;
+}
+
+/* Container für "Icon + Text" Buttons/Headers */
+.card-h-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Spezial-Container für DSCR-Icon, KPI-Eval, etc */
+.dscr-icon .h-icon,
+.kpi-eval-icon .h-icon,
+.ds-score-hint-icon .h-icon,
+.v234-banner-icon .h-icon,
+.btn-brw-icon .h-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0;
+  vertical-align: middle;
+}
+
+/* Info-Box-Titles mit Icon */
+.info-box-title .h-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  vertical-align: -3px;
+}
+
+/* DS-Collapse-Header (DealPilot Score) — Icon nicht zu klein */
+.ds-collapse-l .h-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  vertical-align: -3px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V250-04 — Tab-Bar Polish
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tab {
+  padding: 14px 16px !important;  /* von 14px 14px — etwas mehr horizontal */
+  font-size: 12.5px !important;   /* von 12px — minimal größer für Lesbarkeit */
+  gap: 6px !important;
+}
+
+.tab:hover {
+  background: rgba(201, 168, 76, 0.06) !important;
+  color: var(--ch) !important;
+}
+
+.tab.active {
+  font-weight: 600 !important;  /* von 500 — Active-Tab deutlicher */
+  color: var(--gold) !important;
+}
+
+.tab-num {
+  width: 18px !important;        /* von 17px */
+  height: 18px !important;
+  font-size: 9.5px !important;   /* von 9px */
+  font-weight: 700 !important;   /* von 600 */
+}
