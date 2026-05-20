@@ -439,6 +439,8 @@ function updateUserDisplay(session) {
   }
   updateUserDisplay._retries = 0;
   if (footer && !document.getElementById('sb-user')) {
+    // V245: try/catch um sb-user-Insert — sonst crash silent + renderUsageBadge endlos
+    try {
     var userBox = document.createElement('div');
     userBox.id = 'sb-user';
     userBox.className = 'sb-user-box';
@@ -503,6 +505,20 @@ function updateUserDisplay(session) {
         btn.style.background = 'transparent';
       });
     });
+    console.log('[V245] updateUserDisplay: sb-user erfolgreich erstellt');
+    } catch (e) {
+      console.error('[V245] updateUserDisplay CRASH:', e.message, e.stack);
+      // Notfall-Fallback: minimaler sb-user damit renderUsageBadge nicht endlos läuft
+      try {
+        var fb = document.createElement('div');
+        fb.id = 'sb-user';
+        fb.className = 'sb-user-box';
+        fb.style.cssText = 'padding:10px;color:#fff;font-size:11px';
+        fb.textContent = (session && session.name) || 'User';
+        footer.parentNode.insertBefore(fb, footer);
+        console.warn('[V245] Notfall-sb-user erstellt nach Crash');
+      } catch (e2) { console.error('[V245] Auch Notfall-Insert fehlgeschlagen:', e2.message); }
+    }
   }
 }
 
