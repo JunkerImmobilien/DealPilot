@@ -377,6 +377,9 @@
 
   // ── (6) Empfehlungs-Engine ───────────────────────────────────────
   function _renderRecommendations() {
+  // V252-04: Empfehlungen-Card entfernt — Render skipped
+  return;
+
     var listEl = document.getElementById('fin_recommend_list');
     if (!listEl) return;
     var K = window.State && State.kpis;

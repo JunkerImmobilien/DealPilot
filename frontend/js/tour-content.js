@@ -1,3 +1,4 @@
+// V251-03: Tour-Reihenfolge — DealScore + Investor Deal Score vor Bewertungs-Cockpit
 /**
  * DealPilot V239 — Tour Steps (2 Varianten)
  *
@@ -155,16 +156,6 @@
     
     {
       tab: 's6',
-      selector: '#bc-cockpit',
-      icon: 'i-gauge',
-      title: 'Bewertungs-Cockpit',
-      body: '**DSCR & LTV im 15-Jahres-Verlauf** — was die Bank zuerst sieht.',
-      bodyMore: '**DSCR (Schuldendienstdeckung):**\n• ueber 1,2 = solide\n• 1,0-1,2 = knapp\n• unter 1,0 = kritisch\n\n**LTV (Beleihungsauslauf):**\n• unter 85% = solide, beste Konditionen\n• 85-100% = erhoehter Zins\n• ueber 100% = Vollfinanzierung, schwierig\n\n**Wertpuffer:** Differenz Verkehrswert vs. Kaufpreis. Je groesser, desto mehr Sicherheit.\n\nDie Bank schaut sich zuerst diese Zahlen an, bevor sie ueberhaupt das Objekt anschaut.',
-      placement: 'auto'
-    },
-    
-    {
-      tab: 's6',
       selector: '#dealscore-card, #bc-cockpit svg.ds-donut',
       icon: 'i-percent',
       title: 'DealScore 0-100',
@@ -181,6 +172,16 @@
       body: 'Der **Investor Deal Score** ist die erweiterte Bewertung mit **32 statt 8 KPIs** — verfuegbar ab **Starter-Plan**.',
       bodyMore: '**Was der Investor Score zusaetzlich prueft:**\n\n• Vermoegens-Multiplikator (Equity Multiple)\n• Cash-on-Cash-Return\n• Net Operating Income (NOI)\n• Cap Rate\n• Sensitivitaeten (Zins, Miete, Marktwert)\n• 19 weitere Kennzahlen\n\n**Wo finden:**\n• Im Tab Bewertung als eigene Cockpit-Karte (gerade gespotlightet)\n• Im Header oben rechts: Toggle-Button "Investor Deal Score" ein/aus\n\n**Plan-Verfuegbarkeit:**\n• **Free**: Nur Basis-DealScore (8 Kennzahlen)\n• **Starter & hoeher**: Investor Score mit 32 Kennzahlen\n• **Pro**: Plus Custom-Gewichtungen + Profile speichern\n\nFuer Banker und ernsthafte Investoren ist der Investor Deal Score Pflicht — er zeigt Aspekte die der Basis-Score nicht abdeckt.',
       placement: 'center'
+    },
+    
+    {
+      tab: 's6',
+      selector: '#bc-cockpit',
+      icon: 'i-gauge',
+      title: 'Bewertungs-Cockpit',
+      body: '**DSCR & LTV im 15-Jahres-Verlauf** — was die Bank zuerst sieht.',
+      bodyMore: '**DSCR (Schuldendienstdeckung):**\n• ueber 1,2 = solide\n• 1,0-1,2 = knapp\n• unter 1,0 = kritisch\n\n**LTV (Beleihungsauslauf):**\n• unter 85% = solide, beste Konditionen\n• 85-100% = erhoehter Zins\n• ueber 100% = Vollfinanzierung, schwierig\n\n**Wertpuffer:** Differenz Verkehrswert vs. Kaufpreis. Je groesser, desto mehr Sicherheit.\n\nDie Bank schaut sich zuerst diese Zahlen an, bevor sie ueberhaupt das Objekt anschaut.',
+      placement: 'auto'
     },
     
     {

@@ -95,6 +95,7 @@ app.use('/api/v1/deal-action', dealActionRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/listing', scrapeRoutes);  // V63.85: URL-Scraper für Quick-Check
 app.use('/api/v1/rnd-request', rndRequestRoutes);  // V186: RND-Wizard-Anfrage
+app.use('/api/v1/export', require('./routes/exportEncrypt'));  // V251-05: Encrypted Export
 
 // V194: Admin-Dashboard
 app.use('/api/v1/admin', adminRoutes);

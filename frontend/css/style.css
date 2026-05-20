@@ -29041,3 +29041,314 @@ input.computed-value {
   font-size: 9.5px !important;   /* von 9px */
   font-weight: 700 !important;   /* von 600 */
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V251-01 — Buttons einheitlich (Marktdaten-Style)
+   Alle Action-Buttons in den Tabs sollen wie der
+   "Marktdaten ansehen"-Button aussehen: heller Hintergrund,
+   gold-Border, klare Schrift, optional Icon-Slot.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Generische helle Outline-Button-Klasse — kann auf jeden Button */
+.btn-light,
+.btn-light-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: var(--white, #ffffff);
+  color: var(--ink, #2A2727);
+  border: 1.5px solid var(--border, rgba(201,168,76,0.25));
+  border-radius: 8px;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+  text-decoration: none;
+}
+.btn-light:hover,
+.btn-light-outline:hover {
+  border-color: var(--gold, #C9A84C);
+  color: var(--gold, #C9A84C);
+  background: rgba(201,168,76,0.04);
+  transform: translateY(-1px);
+}
+
+/* Existierende Action-Button-Klassen angleichen
+   (gleiche Optik, ohne Klassennamen ändern zu müssen) */
+.btn.btn-outline,
+.v10-zc-btn,
+.btn-quickcheck,
+button.btn-gold-outline {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 9px 16px !important;
+  background: var(--white, #ffffff) !important;
+  color: var(--ink, #2A2727) !important;
+  border: 1.5px solid var(--border, rgba(201,168,76,0.25)) !important;
+  border-radius: 8px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all .15s ease !important;
+}
+.btn.btn-outline:hover,
+.v10-zc-btn:hover,
+.btn-quickcheck:hover,
+button.btn-gold-outline:hover {
+  border-color: var(--gold, #C9A84C) !important;
+  color: var(--gold, #C9A84C) !important;
+  background: rgba(201,168,76,0.04) !important;
+  transform: translateY(-1px);
+}
+
+/* Primary-Buttons (gold-gefüllt) bleiben, aber einheitliches Padding */
+.btn.btn-gold,
+.btn-primary,
+.ai-btn {
+  padding: 9px 16px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+/* .btn-sm bleibt klein für Inline-Aktionen */
+.btn-sm {
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V251-02 — Tab-Bar: alle Tabs gleich lesbar
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Inaktive Tabs: heller als --muted, damit sie lesbar bleiben */
+nav.tabs .tab,
+.tabs .tab {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+/* Hover bleibt deutlich (etwas heller) */
+nav.tabs .tab:hover,
+.tabs .tab:hover {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Active-Tab bleibt gold (Branding) */
+nav.tabs .tab.active,
+.tabs .tab.active {
+  color: var(--gold, #C9A84C) !important;
+}
+
+/* Tab mit Workflow-Check (✓) — Schriftfarbe gleich wie andere
+   Das ✓-Element rendert separat, Farbe der Schrift bleibt konsistent */
+nav.tabs .tab.wf-done,
+.tabs .tab.wf-done {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+nav.tabs .tab.wf-done.active,
+.tabs .tab.wf-done.active {
+  color: var(--gold, #C9A84C) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V252-03 CSS — Deal-Aktion umstrukturiert
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Status-Buttons (Offen/Gewonnen/Verloren) mit Icons ── */
+.da-status-card .da-status-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.da-status-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px !important;
+  background: var(--white, #fff);
+  border: 1.5px solid rgba(201,168,76,0.22);
+  border-radius: 10px;
+  color: var(--ink, #2A2727);
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.da-status-btn .da-stat-ico {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(122,115,112,0.6);
+}
+.da-status-btn:hover {
+  border-color: rgba(201,168,76,0.55);
+  background: rgba(201,168,76,0.04);
+  transform: translateY(-1px);
+}
+
+/* Active-States nach Status (Farbcodierung) */
+.da-status-btn.active.da-status-open {
+  background: rgba(201,168,76,0.10);
+  border-color: #C9A84C;
+  color: #8B7220;
+  font-weight: 600 !important;
+}
+.da-status-btn.active.da-status-open .da-stat-ico { color: #8B7220; }
+
+.da-status-btn.active.da-status-won {
+  background: rgba(42,154,90,0.12);
+  border-color: #2A9A5A;
+  color: #1F7244;
+  font-weight: 600 !important;
+}
+.da-status-btn.active.da-status-won .da-stat-ico { color: #1F7244; }
+
+.da-status-btn.active.da-status-lost {
+  background: rgba(201,76,76,0.10);
+  border-color: #C94C4C;
+  color: #913232;
+  font-weight: 600 !important;
+}
+.da-status-btn.active.da-status-lost .da-stat-ico { color: #913232; }
+
+/* Status-Card-Frame */
+.da-status-card {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+.da-status-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink, #2A2727);
+  margin-bottom: 2px;
+}
+.da-status-sub {
+  font-size: 12.5px;
+  color: var(--muted, #7A7370);
+}
+
+/* ── Bankgespräch-Card ── */
+.da-bank-card {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.da-bank-head { margin-bottom: 14px; }
+.da-bank-title {
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink, #2A2727);
+  margin-bottom: 4px;
+}
+.da-bank-sub {
+  font-size: 12.5px;
+  color: var(--muted, #7A7370);
+  line-height: 1.5;
+}
+.da-bank-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+@media (max-width: 760px) {
+  .da-bank-cols { grid-template-columns: 1fr; }
+}
+.da-bank-col-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink, #2A2727);
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(201,168,76,0.18);
+}
+.da-bank-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.da-bank-list li {
+  font-size: 13px;
+  color: var(--ink, #2A2727);
+  padding: 6px 0 6px 22px;
+  position: relative;
+  line-height: 1.45;
+}
+.da-bank-list li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #C9A84C;
+}
+
+/* PDF-Row (CTA + Beschreibung) */
+.da-bank-pdf-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  background: rgba(201,168,76,0.06);
+  border: 1px dashed rgba(201,168,76,0.30);
+  border-radius: 10px;
+  margin-top: 8px;
+}
+@media (max-width: 600px) {
+  .da-bank-pdf-row { flex-direction: column; align-items: stretch; }
+}
+.da-bank-pdf-text { flex: 1; }
+.da-bank-pdf-title {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--ink, #2A2727);
+  margin-bottom: 2px;
+}
+.da-bank-pdf-desc {
+  font-size: 12.5px;
+  color: var(--muted, #7A7370);
+  line-height: 1.4;
+}
+.da-bank-pdf-btn {
+  background: var(--gold, #C9A84C);
+  color: #fff;
+  border: 1.5px solid var(--gold, #C9A84C);
+  border-radius: 8px;
+  padding: 10px 18px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s ease;
+  display: inline-flex;
+  align-items: center;
+}
+.da-bank-pdf-btn:hover {
+  background: #b8973d;
+  transform: translateY(-1px);
+}
+
+/* ── Stage-Frames ── */
+.da-stage-status, .da-stage-bank {
+  margin-bottom: 18px;
+}
