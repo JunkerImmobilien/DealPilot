@@ -105,6 +105,9 @@ function collectData() {
   var wonEl = document.getElementById('_deal_won_state');
   if (wonEl) {
     d._deal_won = (wonEl.value === 'true');
+    // V248-03: Lost-Flag analog
+    var lostEl = document.getElementById('_deal_lost_state');
+    if (lostEl) d._deal_lost = (lostEl.value === 'true');
     var wonAtEl = document.getElementById('_deal_won_at_state');
     if (wonAtEl && wonAtEl.value) d._deal_won_at = wonAtEl.value;
   } else if (window._currentObjData && typeof window._currentObjData._deal_won !== 'undefined') {
@@ -818,7 +821,7 @@ async function renderSaved(opts) {
         '</div>'
       : '';
 
-    return '<div class="sb-card' + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + '" data-key="' + _esc(opts.key) + '">' +
+    return '<div class="sb-card' + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '">' +
       investorRibbon +
       wonRibbon +
       scoreOverlay +
@@ -1038,6 +1041,8 @@ async function renderSaved(opts) {
           showInvestor: showInvestor,         // V63.25 NEU
           canDs2: hasDs2Feature,              // V63.25: Plan kann DS2
           dealWon: !!o.deal_won,              // V104: Won-Flag aus DB
+          dealLost: !!(o.data && o.data._deal_lost), // V248-03: Lost-Flag aus data
+
           photoSrc: o.thumbnail || null,
           hasAi: o.has_ai,
           isActive: (o.id === _currentObjKey),

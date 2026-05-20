@@ -958,6 +958,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // Steuerprogression-Chart (vor / nach Investition)
 // ═══════════════════════════════════════════════════
 function showProgressionChart() {
+  // V248-02: Funktion deaktiviert (Card aus HTML entfernt)
+  return;
+
   // Remove existing if any
   var existing = document.getElementById('progression-modal');
   if (existing) existing.remove();

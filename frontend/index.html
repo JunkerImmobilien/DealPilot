@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <!-- V250-02: Emoji-Icons durch Heroicons ersetzt -->
 <meta charset="UTF-8">
   <!-- ═══════════════════════════════════════════════════
        BACKEND CONFIGURATION
@@ -21,7 +22,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=235">
+<link rel="stylesheet" href="css/style.css?v=237">
 <link rel="stylesheet" href="css/portfolio-strategy.css?v=144">
 <link rel="stylesheet" href="css/pricing-modal.css?v=197">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
@@ -425,7 +426,11 @@ label.dp-required.qc-required::after {
 }
 </style>
   <link rel="stylesheet" href="css/tour.css?v=239_10">
-</head>
+    <!-- V248-04: IBM Plex Sans als Hauptschrift -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
+  </head>
 <body>
 
 <!-- ════════════════════════════════════════════════════════════════════════
@@ -1057,7 +1062,7 @@ label.dp-required.qc-required::after {
                   <span class="btn-brw-icon">🔗</span> BORIS-Portal
                 </button>
                 <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="KI schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren">
-                  <span class="btn-brw-icon">✨</span> Bodenrichtwert schätzen
+                  <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></span> Bodenrichtwert schätzen
                 </button>
                 <span id="brw-ai-status" class="brw-ai-status"></span>
               </div>
@@ -1450,7 +1455,7 @@ label.dp-required.qc-required::after {
         </optgroup>
       </select>
       <div id="v234-neubau-afa-banner" class="v234-neubau-banner">
-        <span class="v234-banner-icon">🏗️</span>
+        <span class="v234-banner-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/></svg></span>
         <strong>Neubau-Hinweis:</strong> Bei Neubauten (Bauantrag 10/2023–09/2029) ist auch
         <strong>degressive AfA mit 5 %</strong> nach § 7 Abs. 5a EStG möglich.
         In den ersten Jahren deutlich höhere AfA, später Wechsel auf 3 % linear empfohlen.
@@ -1469,7 +1474,7 @@ label.dp-required.qc-required::after {
     <!-- V227: Wenn degressiv aktiv: kleine Vorschau-Tabelle erste 10 Jahre -->
     <details id="afa_deg_preview_wrap" style="margin-top:10px;display:none">
       <summary style="cursor:pointer;padding:8px 12px;background:rgba(201,168,76,0.08);border-radius:6px;font-size:13px;font-weight:600;color:var(--ch)">
-        <span>📅 AfA-Verlauf erste 10 Jahre ansehen</span>
+        <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg> AfA-Verlauf erste 10 Jahre ansehen</span>
       </summary>
       <div id="afa_deg_preview_body" style="margin-top:8px;padding:10px;background:rgba(201,168,76,0.04);border-radius:6px;font-size:12px">
         <!-- befüllt via JS -->
@@ -1479,7 +1484,7 @@ label.dp-required.qc-required::after {
     <!-- V227: § 7b Sonder-AfA Block (collapsible) -->
     <details id="afa_sonder7b_wrap" style="margin-top:14px;border:1px solid rgba(201,168,76,0.25);border-radius:8px;padding:10px 14px;background:rgba(201,168,76,0.04)">
       <summary style="cursor:pointer;font-weight:600;font-size:13px;color:var(--ch);list-style:none;display:flex;justify-content:space-between;align-items:center">
-        <span>🏗️ Sonder-AfA § 7b EStG (zusätzlich +5% in den ersten 4 Jahren)</span>
+        <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg> Sonder-AfA § 7b EStG (zusätzlich +5% in den ersten 4 Jahren)</span>
         <span class="cf-hint" style="font-weight:400;font-size:11px">klick zum Aufklappen</span>
       </summary>
       <div style="margin-top:12px">
@@ -1540,13 +1545,7 @@ label.dp-required.qc-required::after {
     </details>
   </div>
 
-  <div class="card" style="margin-top:14px">
-    <div class="ct-row">
-      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Steuerprogression-Chart</div>
-      <button class="btn btn-outline btn-sm" onclick="showProgressionChart()">Chart öffnen</button>
-    </div>
-    <p class="hint">Vergleicht Einkommensteuer vor und nach Investition über die zvE-Bandbreite.</p>
-  </div>
+  <!-- V248-02: Steuerprogression-Chart entfernt (Modul echte Progression bleibt) -->
 
   <!-- Steuer-Modul (Live-Berechnung) -->
   <div class="card tax-module-card" style="margin-top:14px">
@@ -1579,7 +1578,7 @@ label.dp-required.qc-required::after {
     <div class="ct-row">
       <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-receipt"/></svg></span>Steuerformular pro Jahr · individuelle Werte</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF('single-year')" title="PDF nur für das aktuelle Jahr">📄 Finanzamt-PDF (1 Jahr)</button>
+        <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF('single-year')" title="PDF nur für das aktuelle Jahr"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg> Finanzamt-PDF (1 Jahr)</button>
         <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF('all-years')" title="PDF mit allen 15 Jahren + Gesamtübersicht">📑 Finanzamt-PDF (alle Jahre)</button>
       </div>
     </div>
@@ -1901,13 +1900,13 @@ label.dp-required.qc-required::after {
         <!-- V63.57: Tilgungsplan-Anzeige — V63.57: jetzt als Modal -->
         <div class="f" style="margin-top:8px">
           <button type="button" class="btn-ghost btn-sm" onclick="openTilgungsplanModal()" id="tilg_toggle_btn">
-            <span>📋 Tilgungsplan ansehen &amp; bearbeiten</span>
+            <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg> Tilgungsplan ansehen & bearbeiten</span>
           </button>
         </div>
         <!-- V63.57: PDF-Import-Trigger speziell für D1 -->
         <div class="f" style="margin-top:8px">
           <button type="button" class="btn-ghost btn-sm" onclick="triggerPdfImportTo('d1')">
-            <span>📄 Daten aus Bank-PDF importieren</span>
+            <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Daten aus Bank-PDF importieren</span>
           </button>
           <span class="hint" style="margin-left:8px">Bankvertrag scannen — Werte werden automatisch übernommen</span>
         </div>
@@ -1962,7 +1961,7 @@ label.dp-required.qc-required::after {
         </div>
         <div class="f" style="margin-top:8px">
           <button type="button" class="btn-ghost btn-sm" onclick="triggerPdfImportTo('bspar')">
-            <span>📄 Daten aus Bausparvertrag-PDF importieren</span>
+            <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Daten aus Bausparvertrag-PDF importieren</span>
           </button>
         </div>
       </div>
@@ -1998,7 +1997,7 @@ label.dp-required.qc-required::after {
           <div class="f"><label>Zinsbindung (Jahre)</label><div class="iw"><input id="d2_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
           <div class="f"><label>Monatliche Rate</label><div class="cf" id="d2_rate">—</div></div>
           <div class="info-box info-blue" id="d2_kfw_box" style="display:none; margin-top:10px">
-            <div class="info-box-title">🏛️ KfW-Förderprogramme <button type="button" class="dp-tip" data-tip-id="tab5.kfw" tabindex="-1" aria-label="Hilfe zu KfW-Förderdarlehen"></button></div>
+            <div class="info-box-title"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"/></svg> KfW-Förderprogramme <button type="button" class="dp-tip" data-tip-id="tab5.kfw" tabindex="-1" aria-label="Hilfe zu KfW-Förderdarlehen"></button></div>
             <div class="info-box-content">
               <div class="hint">Beliebte KfW-Programme für Immobilien-Investoren:</div>
               <ul class="kfw-links">
@@ -2010,7 +2009,7 @@ label.dp-required.qc-required::after {
             </div>
           </div>
           <div class="info-box info-muted" id="d2_tad_box" style="display:none; margin-top:10px">
-            <div class="info-box-title">ℹ️ Tilgungsaussetzungsdarlehen</div>
+            <div class="info-box-title"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg> Tilgungsaussetzungsdarlehen</div>
             <div class="info-box-content">
               <div class="hint">Bei einem Tilgungsaussetzungsdarlehen zahlen Sie während der Laufzeit nur Zinsen. Die Tilgung erfolgt am Ende über einen Tilgungsträger (z.B. Bausparvertrag, Lebensversicherung, Fonds-Sparplan). Steuerlich vorteilhaft, da Zinskosten konstant hoch bleiben (= mehr abzugsfähige Werbungskosten).</div>
             </div>
@@ -2129,7 +2128,7 @@ label.dp-required.qc-required::after {
             <span class="hint">Bewährter Erfahrungswert: <b>0,5 – 1,0% des Kaufpreises p.a.</b></span>
           </div>
           <div class="info-box info-blue" style="margin-top:8px">
-            <div class="info-box-title">📊 Erfahrungswerte – % vom Kaufpreis</div>
+            <div class="info-box-title"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg> Erfahrungswerte – % vom Kaufpreis</div>
             <div class="info-box-content">
               • <b>0,5 %</b> – Sehr gute Bauqualität, kaum Sanierungsbedarf, junges Hausgeld<br>
               • <b>0,7 – 0,8 %</b> – ETW Standard, gepflegte Anlage<br>
@@ -2228,26 +2227,7 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
-  <!-- V63.96/98: Analyse-Parameter wandern in Settings → KI-Tab.
-       Marcels Wunsch: einmal als Standard einstellen, im KI-Tab nur ein Hinweis-Button. -->
-  <div class="card" id="ai-params-link-card">
-    <div class="card-title">Analyse-Parameter</div>
-    <p class="hint" style="margin:6px 0 12px">Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und Marktphase werden in den Einstellungen unter <b>KI</b> gepflegt — die KI-Analyse nutzt diese Werte automatisch.</p>
-    <div class="ai-params-current" id="ai-params-current">
-      <div class="ai-params-row"><span class="ai-params-label">Strategie</span><span class="ai-params-val" id="ai-param-strat-display">—</span></div>
-      <div class="ai-params-row"><span class="ai-params-label">Verkäuferbereitschaft</span><span class="ai-params-val" id="ai-param-verk-display">—</span></div>
-      <div class="ai-params-row"><span class="ai-params-label">Eigene Risikotoleranz</span><span class="ai-params-val" id="ai-param-risk-display">—</span></div>
-      <div class="ai-params-row"><span class="ai-params-label">Marktphase</span><span class="ai-params-val" id="ai-param-markt-display">—</span></div>
-    </div>
-    <button type="button" class="btn btn-outline" style="margin-top:12px" onclick="if(typeof showSettings==='function') showSettings('api');">⚙ Analyse-Parameter einstellen</button>
-    <!-- Hidden Inputs für Backwards-Compatibility mit ui.js _buildAIPrompt (Werte aus Profil) -->
-    <input type="hidden" id="ai_strat">
-    <input type="hidden" id="ai_verk">
-    <input type="hidden" id="ai_risk">
-    <input type="hidden" id="ai_markt">
-  </div>
-
-  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Bewertung</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s5');return false;">Weiter: Bewertung<span class="v235-next-btn-arrow">→</span></button></div>
+  <!-- V248-01: Analyse-Parameter-Box entfernt — siehe Settings → KI-Tab -->
 </div>
 
 <!-- ═══════════ TAB 6: KENNZAHLEN ═══════════ -->
@@ -2257,7 +2237,7 @@ label.dp-required.qc-required::after {
   <!-- V46: Alter Deal Score → kollabierbar mit Toggle, Standard minimiert -->
   <div class="card dealscore-card dealscore-card-v46-collapsed" id="dealscore-card">
     <button class="ds-collapse-toggle" type="button" onclick="toggleDsCollapse()" aria-expanded="false">
-      <span class="ds-collapse-l">📊 DealPilot Score <button type="button" class="dp-tip" data-tip-id="tab8.dealpilot_score" tabindex="-1" aria-label="Hilfe zu DealPilot Score"></button></span>
+      <span class="ds-collapse-l"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg> DealPilot Score <button type="button" class="dp-tip" data-tip-id="tab8.dealpilot_score" tabindex="-1" aria-label="Hilfe zu DealPilot Score"></button></span>
       <span class="ds-collapse-summary" id="ds-collapse-summary">Klicken zum Anzeigen</span>
       <span class="ds-collapse-arrow">▼</span>
     </button>
@@ -2280,7 +2260,7 @@ label.dp-required.qc-required::after {
   <div class="card dealscore-card ds2-card" id="dealscore2-card">
     <!-- V63.3: Klarstellung was der Investor Deal Score ist (außerhalb der Box) -->
     <div class="ds-score-hint ds-score-hint-investor">
-      <span class="ds-score-hint-icon">✨</span>
+      <span class="ds-score-hint-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></span>
       <span class="ds-score-hint-text">
         <strong>Investor Deal Score <button type="button" class="dp-tip" data-tip-id="tab8.investor_score" tabindex="-1" aria-label="Hilfe zu Investor Deal Score"></button></strong> = erweiterter Deal Score mit zusätzlichen 24 KPIs
         für detaillierte Investorenbewertung (Lage, Substanz, Upside-Potenzial).
@@ -2309,7 +2289,7 @@ label.dp-required.qc-required::after {
   <div class="card kpi-eval-card" id="kpi-eval-card">
     <div class="kpi-eval-header">
       <div class="kpi-eval-title">
-        <span class="kpi-eval-icon">📊</span>
+        <span class="kpi-eval-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M12 12c0-.621.504-1.125 1.125-1.125M12 12v1.5m0 1.5v-1.5"/></svg></span>
         <span>Kennzahlen-Bewertung</span>
         <span class="kpi-eval-tag">lokal · ohne KI</span>
       </div>
@@ -2392,7 +2372,7 @@ label.dp-required.qc-required::after {
       <div class="kv"><span>AfA (steuerl. Wirkung) / Jahr</span><span class="kv-v" id="cr-afa">—</span></div>
       <div class="kv"><span>Zu versteuernder CF / Jahr</span><span class="kv-v" id="cr-zve">—</span></div>
       <div class="dscr-box" id="cr-dscr-box">
-        <div class="dscr-icon">📊</div>
+        <div class="dscr-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z"/></svg></div>
         <div class="dscr-content">
           <div class="dscr-title">DSCR (Debt Service Coverage Ratio)</div>
           <div class="dscr-sub">Brutto: NKM/Schulden · Netto: (NKM−NUL)/Schulden</div>
@@ -2738,7 +2718,7 @@ label.dp-required.qc-required::after {
 
     <div class="bmf-footer">
       <input type="file" id="bmf-xlsx-upload" accept=".xlsx,.xls" style="display:none" onchange="if(this.files[0])_bmfHandleFile(this.files[0]); this.value='';">
-      <button class="btn btn-ghost" onclick="exportBMFExcel()" type="button">📊 In BMF-Excel eintragen</button>
+      <button class="btn btn-ghost" onclick="exportBMFExcel()" type="button"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M12 12c0-.621.504-1.125 1.125-1.125M12 12v1.5m0 1.5v-1.5"/></svg> In BMF-Excel eintragen</button>
       <div style="flex:1"></div>
       <button class="btn btn-ghost" onclick="closeBMFRechner()" type="button">Abbrechen</button>
       <button class="btn btn-gold" id="bmf_apply_btn" onclick="applyBMFResult()" type="button" disabled>→ AfA-Satz und Gebäudeanteil übernehmen</button>

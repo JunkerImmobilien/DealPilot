@@ -449,15 +449,21 @@ window.DealPilotDealAction = (function() {
   }
 
   function renderWonCard() {
+    // V248-03: Drei-Status statt Stern-Toggle
     return [
-      '<div class="da-won-card" id="da-won-card">',
-      '  <button type="button" class="da-won-star" id="da-won-star" onclick="DealPilotDealAction.toggleWon()" title="Zuschlag bekommen umschalten" aria-label="Won-Status umschalten"></button>',
-      '  <div class="da-won-text">',
-      '    <div class="da-won-label" id="da-won-label">Noch kein Zuschlag</div>',
-      '    <div class="da-won-sub" id="da-won-sub">Klicke auf den Stern wenn du den Zuschlag bekommen hast.</div>',
+      '<div class="da-status-card" id="da-status-card">',
+      '  <div class="da-status-head">',
+      '    <div class="da-status-label" id="da-status-label">Status: Offen</div>',
+      '    <div class="da-status-sub" id="da-status-sub">Markiere den Deal als gewonnen oder verloren.</div>',
+      '  </div>',
+      '  <div class="da-status-btns">',
+      '    <button type="button" class="da-status-btn da-status-open"  data-status="open"  onclick="DealPilotDealAction.setStatus(\'open\')">Offen</button>',
+      '    <button type="button" class="da-status-btn da-status-won"   data-status="won"   onclick="DealPilotDealAction.setStatus(\'won\')">Gewonnen</button>',
+      '    <button type="button" class="da-status-btn da-status-lost"  data-status="lost"  onclick="DealPilotDealAction.setStatus(\'lost\')">Verloren</button>',
       '  </div>',
       '  <input type="hidden" id="_deal_won_state" value="false">',
       '  <input type="hidden" id="_deal_won_at_state" value="">',
+      '  <input type="hidden" id="_deal_lost_state" value="false">',
       '</div>'
     ].join('');
   }
