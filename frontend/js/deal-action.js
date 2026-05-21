@@ -575,16 +575,8 @@ window.DealPilotDealAction = (function() {
             cta: 'Anfrage starten',
             onclick: 'DealPilotDealAction.openBank()'
           }),
-          renderCard({
-            id: 'da-card-fb',
-            icon: ico('shieldCheck', 26),
-            title: 'Finanzierungs&shy;bestätigung',
-            subtitle: 'Verbindliche FB anfragen',
-            desc: 'Schlanker Prozess für die FB. 2 Pflichtdokumente — Versand direkt an die Bank.',
-            status: '<span id="da-fb-progress">0 / 2 Pflicht-Dokumente</span>',
-            cta: 'Anfrage starten',
-            onclick: 'DealPilotDealAction.openFB()'
-          }),
+/* V256-04: FB-Box entfernt */
+
           renderCard({
             id: 'da-card-consult',
             icon: ico('lifebuoy', 26),
@@ -663,6 +655,20 @@ window.DealPilotDealAction = (function() {
   }
 
   function renderCard(o) {
+    // V256-01: Guard gegen undefined Card-Objekt (verhindert renderTab-Crash)
+    if (!o || typeof o !== 'object') {
+      console.warn('[V256-01] renderCard mit ungueltigem Argument aufgerufen:', o);
+      return '';
+    }
+    // V256-01: Defaults fuer Pflichtfelder
+    o.id       = o.id       || 'da-card-unknown';
+    o.icon     = o.icon     || '';
+    o.title    = o.title    || '';
+    o.subtitle = o.subtitle || '';
+    o.desc     = o.desc     || '';
+    o.status   = o.status   || '';
+    o.cta      = o.cta      || 'Auswaehlen';
+    o.onclick  = o.onclick  || '';
     var disabledClass = o.disabled ? ' da-card-disabled' : '';
     var btnClass = o.disabled ? 'btn btn-disabled da-card-cta' : 'btn btn-primary da-card-cta';
     var btnDisabledAttr = o.disabled ? ' disabled' : '';
