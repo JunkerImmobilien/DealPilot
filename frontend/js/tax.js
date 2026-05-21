@@ -277,14 +277,78 @@ function renderTaxTimeline() {
     };
   });
 
+  // V266-02: Berechnung pro Jahr mit tax_periods + WK-Aggregation
+  if (window.DealPilotSteuer && window.DealPilotTaxPeriods) {
+    var _taxPeriodsCache = window._dpTaxPeriodsCache || [];
+    var _wkAggCache = window._dpWkAggCache || null;
+    
+    // Async-load wenn noch nicht da (laeuft im Hintergrund — beim naechsten Render greift's)
+    if (!window._dpTaxPeriodsLoading) {
+      window._dpTaxPeriodsLoading = true;
+      Promise.all([
+        DealPilotTaxPeriods.loadAll().then(function(p) { window._dpTaxPeriodsCache = p; }).catch(function(){}),
+        window.DealPilotWKAggregator ? DealPilotWKAggregator.loadAll(true).catch(function(){}) : Promise.resolve()
+      ]).then(function() {
+        window._dpTaxPeriodsLoading = false;
+        // Re-Render nach Daten-Load
+        if (typeof renderTaxTimeline === 'function') {
+          setTimeout(renderTaxTimeline, 50);
+        }
+      });
+    }
+    
+    // Aktueller Objekt-ID
+    var _objId = (window._currentObjData && (window._currentObjData.id || window._currentObjData._id)) || null;
+    
+    timeline.forEach(function(t) {
+      // zvE aus tax_periods fuer dieses Jahr
+      var zveYear = DealPilotSteuer.zveForYear(t.year, _taxPeriodsCache);
+      
+      // WK-self: aus totals.ergebnis (V+V Ueberschuss/Verlust)
+      // Wenn Verlust (negativ) -> WK ist positiv (mindert zvE)
+      var wkSelf = -t.immoResult;  // V+V Verlust = WK
+      
+      // WK andere Won-Objekte fuer dieses Jahr
+      var wkOthers = 0;
+      if (window.DealPilotWKAggregator) {
+        wkOthers = DealPilotWKAggregator.getWKForOtherObjects(_objId, t.year) || 0;
+      }
+      
+      // Wenn zvE 0 (kein Steuerzeitraum fuer dieses Jahr) -> fallback alte Berechnung
+      if (zveYear > 0) {
+        var result = DealPilotSteuer.computeForYear(t.year, {
+          taxPeriods: _taxPeriodsCache,
+          wkSelf: wkSelf,
+          wkOthers: wkOthers
+        });
+        t.refund = result.erstattung;
+        t.zve_year = result.zve_year;
+        t.wk_others = result.wk_others;
+        t.zve_mit_immo = result.zve_mit_immo;
+        t.steuer_ohne = result.steuer_ohne;
+        t.steuer_mit = result.steuer_mit;
+      }
+    });
+  }
+
   // Render as visual timeline
   var html = '<div class="tax-tl-grid">';
-  timeline.forEach(function(t) {
+  timeline.forEach(function(t, ti) {
     var positive = t.refund > 0;
     var color = positive ? 'var(--green)' : 'var(--red)';
     var bgcolor = positive ? 'rgba(42,154,90,0.1)' : 'rgba(201,76,76,0.1)';
     var sign = positive ? '+' : '';
-    html += '<div class="tax-tl-bar" style="background:' + bgcolor + ';border-left-color:' + color + '">' +
+    var tooltipParts = ['Jahr ' + t.year];
+    if (t.zve_year) tooltipParts.push('zvE: ' + Math.round(t.zve_year).toLocaleString('de-DE') + ' €');
+    if (typeof t.wk_others === 'number') tooltipParts.push('WK andere Objekte: ' + Math.round(t.wk_others).toLocaleString('de-DE') + ' €');
+    if (t.steuer_ohne) tooltipParts.push('EStG ohne Immo: ' + Math.round(t.steuer_ohne).toLocaleString('de-DE') + ' €');
+    if (t.steuer_mit) tooltipParts.push('EStG mit Immo: ' + Math.round(t.steuer_mit).toLocaleString('de-DE') + ' €');
+    var tooltip = tooltipParts.join('\n');
+    
+    html += '<div class="tax-tl-bar" data-year="' + t.year + '" data-tl-idx="' + ti + '" ' +
+            'style="background:' + bgcolor + ';border-left-color:' + color + '" ' +
+            'title="' + tooltip.replace(/"/g, '&quot;') + '" ' +
+            'onclick="window.dpSelectTaxYear && dpSelectTaxYear(' + ti + ')">' +
       '<div class="tax-tl-year">' + t.year + '</div>' +
       '<div class="tax-tl-amount" style="color:' + color + '">' +
         sign + Math.round(Math.abs(t.refund)).toLocaleString('de-DE') + ' €' +

@@ -1805,6 +1805,12 @@ function _calcImmediate(){
     var thisYearWK = (typeof K.cf_op === 'number' && typeof K.afa === 'number') ? (K.cf_op - K.afa) : 0;
     var snapshot = { wk_per_year: {} };
     snapshot.wk_per_year[String(thisYear)] = Math.round(thisYearWK);
+    // V265-04: 10 Jahres-Snapshots fuer Cross-Object-Aggregation
+    for (var _yi = 1; _yi < 10; _yi++) {
+      var _futureYear = thisYear + _yi;
+      // Vereinfacht: gleicher WK ueber 10 Jahre (bessere Naeherung via Tilgungsplan TODO)
+      snapshot.wk_per_year[String(_futureYear)] = Math.round(thisYearWK);
+    }
     // Mehrjahres-Projektion (falls vorhanden in State)
     if (window.State && Array.isArray(State.steuer_rows)) {
       State.steuer_rows.forEach(function(r) {

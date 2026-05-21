@@ -128,6 +128,14 @@ router.post('/', authenticate, async (req, res) => {
     );
     res.status(201).json({ period: rowToPeriod(r.rows[0]) });
   } catch(e) {
+    // V264-03: Duplikat-Erkennung -> 409 statt 500
+    if (e.code === '23505' || /duplicate|unique/i.test(e.message || '')) {
+      console.log('[V264-03] Duplikat erkannt - 409 zurueck');
+      return res.status(409).json({ 
+        error: 'already-exists', 
+        message: 'Steuerzeitraum mit diesem Datum existiert bereits' 
+      });
+    }
     console.error('[V259-02] POST tax-periods error:', e);
     res.status(500).json({ error: 'create-failed', message: e.message });
   }

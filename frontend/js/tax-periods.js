@@ -99,6 +99,13 @@
       headers: authHeaders(),
       body: JSON.stringify(period)
     });
+    // V264-03: 409 = bereits vorhanden, still behandeln
+    if (res.status === 409) {
+      console.log('[V264-03] Steuerzeitraum existiert bereits, skip');
+      STATE.loaded = false;
+      await loadAll(true);
+      return null;
+    }
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || ('HTTP ' + res.status));
@@ -330,20 +337,77 @@
     if (host) host.innerHTML = '';
   }
 
+  /* V263-04: Voll editierbares Modal fuer Zeitraum-Bearbeitung */
   async function editPeriod(id) {
     const p = STATE.periods.find(x => x.id === id);
     if (!p) return;
-    const newZve = prompt('Neues zvE für ' + fmtDate(p.valid_from) + ' – ' + (p.valid_to ? fmtDate(p.valid_to) : 'laufend') + ':', String(p.zve));
-    if (newZve === null) return;
-    const zve = parseDe(newZve);
-    if (zve <= 0) return alert('Ungültiger Wert');
-    try {
-      await update(id, { valid_from: p.valid_from, valid_to: p.valid_to, zve, reason: p.reason, note: p.note });
-      refreshList();
-      if (typeof toast === 'function') toast('Aktualisiert');
-    } catch(e) {
-      alert('Fehler: ' + e.message);
-    }
+    
+    // Edit-Modal-Overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'tp-edit-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;font-family:var(--font-main,\'IBM Plex Sans\',sans-serif)';
+    overlay.innerHTML = 
+      '<div style="background:#fff;border-radius:14px;max-width:560px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.30)">' +
+        '<div style="font-size:17px;font-weight:600;color:var(--ch,#2A2727);margin-bottom:6px">Steuerzeitraum bearbeiten</div>' +
+        '<div style="font-size:13px;color:var(--muted,#7A7370);margin-bottom:18px">Alle Felder können geändert werden. Überschneidungen mit anderen Zeiträumen werden geprüft.</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">' +
+          '<div><label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Gültig von</label><input id="tp-edit-from" type="date" value="' + (p.valid_from || '') + '" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:7px;font-size:13px;width:100%;font-family:inherit" /></div>' +
+          '<div><label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Gültig bis (leer = laufend)</label><input id="tp-edit-to" type="date" value="' + (p.valid_to || '') + '" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:7px;font-size:13px;width:100%;font-family:inherit" /></div>' +
+        '</div>' +
+        '<div style="margin-bottom:10px">' +
+          '<label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">zvE / Jahr (€)</label>' +
+          '<input id="tp-edit-zve" type="text" inputmode="decimal" value="' + (p.zve ? p.zve.toLocaleString('de-DE') : '') + '" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:7px;font-size:13px;width:100%;font-family:inherit" />' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">' +
+          '<div><label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Grund</label><input id="tp-edit-reason" type="text" value="' + (p.reason || '').replace(/"/g, '&quot;') + '" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:7px;font-size:13px;width:100%;font-family:inherit" /></div>' +
+          '<div><label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Notiz</label><input id="tp-edit-note" type="text" value="' + (p.note || '').replace(/"/g, '&quot;') + '" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:7px;font-size:13px;width:100%;font-family:inherit" /></div>' +
+        '</div>' +
+        '<div id="tp-edit-conflict" style="margin-bottom:14px"></div>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+          '<button id="tp-edit-cancel" type="button" style="padding:9px 16px;background:#fff;color:var(--muted,#7A7370);border:1.5px solid rgba(201,168,76,0.25);border-radius:8px;font-size:13px;cursor:pointer">Abbrechen</button>' +
+          '<button id="tp-edit-save" type="button" style="padding:9px 16px;background:var(--gold,#C9A84C);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Speichern</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    
+    document.getElementById('tp-edit-cancel').onclick = function() {
+      overlay.remove();
+    };
+    
+    document.getElementById('tp-edit-save').onclick = async function() {
+      const from = document.getElementById('tp-edit-from').value;
+      const to = document.getElementById('tp-edit-to').value || null;
+      const zve = parseDe(document.getElementById('tp-edit-zve').value);
+      const reason = document.getElementById('tp-edit-reason').value;
+      const note = document.getElementById('tp-edit-note').value;
+      
+      if (!from) return alert('Bitte gültig-von eintragen');
+      if (zve <= 0) return alert('Bitte gültigen zvE eintragen');
+      if (to && to < from) return alert('Bis-Datum muss nach Von-Datum liegen');
+      
+      // Konflikt-Check (ohne den aktuellen Eintrag selbst)
+      const overlap = await checkOverlap(from, to, id);
+      const conflictHost = document.getElementById('tp-edit-conflict');
+      
+      if (overlap.overlapping && overlap.overlapping.length > 0) {
+        // Konflikt — Anzeige + Frage
+        const msg = 'Überschneidung mit ' + overlap.overlapping.length + ' anderem Zeitraum erkannt:\n\n' +
+          overlap.overlapping.map(o => '· ' + (o.valid_from || '?') + ' – ' + (o.valid_to || 'laufend') + ' · ' + (o.zve ? o.zve.toLocaleString('de-DE') : '0') + ' € (' + (o.reason || 'ohne Grund') + ')').join('\n') +
+          '\n\nDie anderen Zeiträume bleiben bestehen. Möchtest du diesen Zeitraum trotzdem so speichern?';
+        if (!confirm(msg)) {
+          return; // Modal bleibt offen
+        }
+      }
+      
+      try {
+        await update(id, { valid_from: from, valid_to: to, zve, reason, note });
+        if (typeof toast === 'function') toast('Aktualisiert');
+        overlay.remove();
+        refreshList();
+      } catch(e) {
+        alert('Fehler: ' + e.message);
+      }
+    };
   }
 
   async function removePeriod(id) {
@@ -373,4 +437,39 @@
   } else {
     setTimeout(() => loadAll(), 600);
   }
+})();
+
+
+/* V266-04: Nach jeder tax_periods-Aenderung Steuerverlauf neu rendern */
+(function() {
+  if (!window.DealPilotTaxPeriods) return;
+  
+  function reloadDownstream() {
+    window._dpTaxPeriodsCache = null;
+    window._dpTaxPeriodsLoading = false;
+    
+    if (typeof renderTaxTimeline === 'function') {
+      try { renderTaxTimeline(); } catch(e) {}
+    }
+    if (typeof calc === 'function') {
+      try { calc(); } catch(e) {}
+    }
+  }
+  
+  // Wrap create/update/delete
+  ['create', 'update', 'remove', 'del'].forEach(function(method) {
+    if (typeof DealPilotTaxPeriods[method] !== 'function') return;
+    var orig = DealPilotTaxPeriods[method];
+    DealPilotTaxPeriods[method] = function() {
+      var ret = orig.apply(this, arguments);
+      if (ret && typeof ret.then === 'function') {
+        return ret.then(function(r) {
+          setTimeout(reloadDownstream, 100);
+          return r;
+        });
+      }
+      setTimeout(reloadDownstream, 100);
+      return ret;
+    };
+  });
 })();

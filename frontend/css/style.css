@@ -30341,21 +30341,6 @@ html[data-bg="white"] .modal-content,
 html[data-bg="white"] .settings-modal,
 html[data-bg="white"] #settings-modal,
 html[data-bg="white"] .iexp-modal,
-html[data-bg="white"] .help-modal,
-html[data-bg="white"] #all-objects-main,
-html[data-bg="white"] .dp-v260-allobjects,
-html[data-bg="white"] #portfolio-strategy-main,
-html[data-bg="white"] #qc-main,
-html[data-bg="white"] #s-quick,
-html[data-bg="white"] .qc-result-card,
-html[data-bg="white"] .qc-card,
-html[data-bg="white"] .submenu,
-html[data-bg="white"] .sidebar-submenu,
-html[data-bg="white"] .sb-actions-accordion,
-html[data-bg="white"] .sb-actions-accordion-inner {
-  background: #ffffff !important;
-}
-
 /* Creme-Modus: alle obigen Container creme */
 html[data-bg="cream"] #all-objects-main,
 html[data-bg="cream"] .dp-v260-allobjects,
@@ -30570,113 +30555,6 @@ body.dp-tour-active header.hdr {
 }
 
 
-/* ═══════════════════════════════════════════════════════════════════
-   V261-02 — Hilfe-Modal: Cream-Hintergrund + Groesser + Gold-Scrollbar
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* Modal groesser */
-.help-modal-inner,
-#help-modal .help-modal-inner {
-  width: 92vw !important;
-  max-width: 1400px !important;
-  height: 88vh !important;
-  max-height: 88vh !important;
-  display: flex !important;
-  flex-direction: row !important;
-}
-
-.help-modal-side {
-  flex-shrink: 0 !important;
-  width: 280px !important;
-  overflow-y: auto !important;
-  max-height: 88vh !important;
-}
-
-.help-modal-content,
-.set-modal-content.help-modal-content {
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 0 !important;
-}
-
-.pane-wrap.help-content-wrap {
-  flex: 1 1 auto !important;
-  overflow-y: auto !important;
-  min-height: 0 !important;
-}
-
-.help-content {
-  min-height: 100% !important;
-}
-
-/* Gold-Scrollbar fuer Hilfe-Modal */
-.help-modal-side::-webkit-scrollbar,
-.pane-wrap.help-content-wrap::-webkit-scrollbar,
-.help-content::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.help-modal-side::-webkit-scrollbar-track,
-.pane-wrap.help-content-wrap::-webkit-scrollbar-track,
-.help-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-.help-modal-side::-webkit-scrollbar-thumb,
-.pane-wrap.help-content-wrap::-webkit-scrollbar-thumb,
-.help-content::-webkit-scrollbar-thumb {
-  background: rgba(201,168,76,0.40);
-  border-radius: 8px;
-}
-.help-modal-side::-webkit-scrollbar-thumb:hover,
-.pane-wrap.help-content-wrap::-webkit-scrollbar-thumb:hover,
-.help-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(201,168,76,0.65);
-}
-
-/* Firefox */
-.help-modal-side,
-.pane-wrap.help-content-wrap,
-.help-content {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(201,168,76,0.40) transparent;
-}
-
-/* Tour-Tab im Hilfe-Sidebar */
-.help-sidebar-item[data-v261-tour] {
-  border-top: 1px dashed rgba(201,168,76,0.20);
-  margin-top: 8px;
-  padding-top: 12px;
-}
-.help-sidebar-item[data-v261-tour] .help-sidebar-item-icon {
-  font-size: 18px;
-}
-
-/* Horizontale Scrollbar in Hilfe-Sidebar verbergen */
-.help-modal-side {
-  overflow-x: hidden !important;
-}
-
-
-/* V261-03: tabs-workflow-bar wirklich aus */
-.tabs-workflow-bar,
-.tabs-workflow-bar * {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-
-/* V261-04: zvE-Feld read-only Styling */
-#zve[readonly] {
-  background: rgba(201,168,76,0.06) !important;
-  cursor: default !important;
-  font-weight: 600 !important;
-  color: var(--ch, #2A2727) !important;
-}
-.dp-zve-period-hint a:hover {
-  text-decoration: none !important;
-}
-
 
 /* ═══════════════════════════════════════════════════════════════════
    V261-08 — Cleanup: Sidebar-Akkordeon zurueck auf normal
@@ -30704,44 +30582,6 @@ button.dp-tour-restart-btn,
   visibility: hidden !important;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════════
-   V262-02 — Hintergrund-Toggle greift wirklich ÜBERALL
-   ═══════════════════════════════════════════════════════════════════ */
-
-html[data-bg="white"] .help-modal-inner,
-html[data-bg="white"] #help-modal .set-modal-cream,
-html[data-bg="white"] #help-modal .help-modal-inner,
-html[data-bg="white"] .help-modal-side,
-html[data-bg="white"] .help-modal-content,
-html[data-bg="white"] .set-modal-content,
-html[data-bg="white"] .help-content,
-html[data-bg="white"] .pane-wrap,
-html[data-bg="white"] .help-modal-foot,
-html[data-bg="white"] .help-ai-foot,
-html[data-bg="white"] .help-modal-search {
-  background: #ffffff !important;
-}
-
-/* Cards/Items innerhalb Hilfe-Modal: subtiler Gold-Touch im Weiss-Modus */
-html[data-bg="white"] .help-modal-side .help-sidebar-item {
-  background: #ffffff !important;
-  border-color: rgba(201,168,76,0.15) !important;
-}
-html[data-bg="white"] .help-modal-side .help-sidebar-item:hover {
-  background: rgba(201,168,76,0.04) !important;
-}
-
-/* Alle Objekte / Portfolio Strategy / QuickCheck — sicherheitshalber */
-html[data-bg="white"] #all-objects-main,
-html[data-bg="white"] .dp-v260-allobjects,
-html[data-bg="white"] #portfolio-strategy-main,
-html[data-bg="white"] #qc-main,
-html[data-bg="white"] #s-quick,
-html[data-bg="white"] .submenu,
-html[data-bg="white"] .sidebar-submenu {
-  background: #ffffff !important;
-}
 
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -30784,4 +30624,104 @@ input[data-v262-03-required="1"] {
 input[data-v262-03-required="1"]:invalid {
   border-color: rgba(184,98,92,0.50) !important;
   background: rgba(184,98,92,0.04) !important;
+}
+
+
+
+
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V266-01 — Hilfe-Modal: NUR Groesse + Scrollbar (KEIN BG-Override)
+   
+   Sidebar bekommt ihre Farbe aus den ORIGINAL-CSS-Regeln:
+   - .set-modal-cream .modal-side  (Z.25900)  -> Settings-Look
+   - .help-modal .help-modal-side  (Z.18570)  -> Hilfe-Original
+   Da Hilfe-Modal beide Klassen hat (set-modal-cream + help-modal-side),
+   gewinnt die spezifischere Regel — beide sind dunkel mit Gradient.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Modal-Groesse */
+.help-modal-inner,
+#help-modal .help-modal-inner {
+  width: 92vw !important;
+  max-width: 1400px !important;
+  height: 88vh !important;
+  max-height: 88vh !important;
+  display: flex !important;
+  flex-direction: row !important;
+}
+.help-modal-side {
+  flex-shrink: 0 !important;
+  width: 280px !important;
+  max-height: 88vh !important;
+  overflow-x: hidden !important;
+}
+.help-modal-content,
+.set-modal-content.help-modal-content {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+.pane-wrap.help-content-wrap {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+}
+
+/* Gold-Scrollbar */
+.help-modal-side::-webkit-scrollbar,
+.pane-wrap.help-content-wrap::-webkit-scrollbar,
+.help-content::-webkit-scrollbar {
+  width: 8px;
+}
+.help-modal-side::-webkit-scrollbar-track,
+.pane-wrap.help-content-wrap::-webkit-scrollbar-track,
+.help-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.help-modal-side::-webkit-scrollbar-thumb,
+.pane-wrap.help-content-wrap::-webkit-scrollbar-thumb,
+.help-content::-webkit-scrollbar-thumb {
+  background: rgba(201,168,76,0.40);
+  border-radius: 8px;
+}
+.help-modal-side::-webkit-scrollbar-thumb:hover,
+.pane-wrap.help-content-wrap::-webkit-scrollbar-thumb:hover,
+.help-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(201,168,76,0.65);
+}
+.help-modal-side,
+.pane-wrap.help-content-wrap,
+.help-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,168,76,0.40) transparent;
+}
+
+/* Footer-Tour-Button bleibt versteckt (V262-01) */
+.dp-tour-restart-btn,
+button.dp-tour-restart-btn {
+  display: none !important;
+}
+
+/* Tabs-Workflow-Bar bleibt versteckt (V261-03) */
+.tabs-workflow-bar,
+.tabs-workflow-bar * {
+  display: none !important;
+}
+
+/* Steuerverlauf Jahr-Click Selection (V265-03 erhalten) */
+.tax-tl-bar.tl-selected {
+  outline: 2px solid var(--gold, #C9A84C) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 4px 12px rgba(201,168,76,0.20) !important;
+}
+.tax-tl-bar {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.tax-tl-bar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }

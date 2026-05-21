@@ -687,103 +687,54 @@
       window.DpTour.start();
     }, 300);
   };
+/* V263-01: V261-01-Hook entfernt — Tour kommt jetzt im Einstieg-Topic */
 
-
-
-/* ═══════════════════════════════════════════════════════════════════
-   V261-01: Tour-Tab im Hilfe-Modal links integriert
-   ═══════════════════════════════════════════════════════════════════ */
+/* V263-01: Tour-Block in Einstieg-Topic via DOM-Hook */
 (function() {
-  'use strict';
-  
-  function injectTourTab() {
-    const sidebar = document.querySelector('.help-modal-side, .help-modal-sidebar');
-    if (!sidebar) return;
-    if (sidebar.querySelector('[data-v261-tour]')) return;
+  function injectTourBlock() {
+    const content = document.getElementById('help-content');
+    if (!content) return;
+    if (content.querySelector('.help-tour-cta')) return;
+    // Pruefe ob Einstieg-Topic aktiv (Marker: "Was ist DealPilot?")
+    const txt = content.textContent || '';
+    if (!txt.includes('Was ist DealPilot')) return;
     
-    // Suche Item-Container (typisch .help-sidebar-list oder direkte Children)
-    let list = sidebar.querySelector('.help-sidebar-list, .help-sidebar-items, .help-side-list');
-    if (!list) {
-      // Fallback: erstes mehrfaches Element (die Items)
-      const items = sidebar.querySelectorAll('.help-sidebar-item, [class*="help-sidebar"][role="button"], [class*="help-side-item"]');
-      if (items.length > 0 && items[0].parentNode) list = items[0].parentNode;
-    }
-    if (!list) return;
-    
-    // Neues Tour-Item
-    const tourItem = document.createElement('div');
-    tourItem.className = 'help-sidebar-item';
-    tourItem.setAttribute('data-v261-tour', '1');
-    tourItem.style.cursor = 'pointer';
-    tourItem.innerHTML = 
-      '<span class="help-sidebar-item-icon">🎓</span>' +
-      '<div class="help-sidebar-item-text">' +
-        '<div class="help-sidebar-item-title">Tour starten</div>' +
-        '<div class="help-sidebar-item-sub">Interaktive App-Einführung</div>' +
-      '</div>';
-    
-    tourItem.onclick = function() {
-      startTour();
-    };
-    
-    list.appendChild(tourItem);
-  }
-  
-  function startTour() {
-    document.body.classList.add('dp-tour-active');
-    
-    // Hilfe-Modal schliessen
-    const modal = document.getElementById('help-modal');
-    if (modal) modal.classList.remove('open');
-    
-    // Bestehende Tour-Funktionen versuchen
-    const candidates = [
-      () => window.startTour && window.startTour(),
-      () => window.DpTour && window.DpTour.start && window.DpTour.start(),
-      () => window.dpTourStart && window.dpTourStart(),
-      () => window.tourStart && window.tourStart()
-    ];
-    let started = false;
-    for (const fn of candidates) {
-      try { 
-        const r = fn(); 
-        if (r !== undefined) { started = true; break; }
-      } catch(e) {}
-    }
-    if (!started) {
-      console.warn('[V261-01] Keine Tour-Start-Funktion gefunden');
-    }
-  }
-  
-  // Tour-End-Watch
-  function watchTourEnd() {
-    document.addEventListener('tour:end', function() {
-      document.body.classList.remove('dp-tour-active');
-    });
-    setInterval(() => {
-      if (document.body.classList.contains('dp-tour-active')) {
-        const tourEl = document.querySelector('.tour-tooltip, .dp-tour-tooltip, [class*="tour-step-visible"]');
-        if (!tourEl) {
-          document.body.classList.remove('dp-tour-active');
-        }
+    // Suche das Element mit "Schnellstart" und fuege davor ein
+    const allHeaders = content.querySelectorAll('h3, h2, h4, .help-card-title, .help-card h3');
+    let anchor = null;
+    for (const h of allHeaders) {
+      if (/Schnellstart/i.test(h.textContent || '')) {
+        anchor = h.closest('.help-card, .help-section') || h;
+        break;
       }
-    }, 1500);
-  }
-  
-  // Inject when help modal opens
-  const obs = new MutationObserver(() => {
-    const modal = document.getElementById('help-modal');
-    if (modal && modal.classList.contains('open')) {
-      setTimeout(injectTourTab, 50);
     }
-  });
-  obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', watchTourEnd);
-  } else {
-    watchTourEnd();
+    if (!anchor) return;
+    
+    const block = document.createElement('div');
+    block.className = 'help-card help-tour-cta';
+    block.style.cssText = 'border:1.5px solid var(--gold,#C9A84C);background:rgba(201,168,76,0.06);padding:14px 18px;border-radius:12px;margin-bottom:16px';
+    block.innerHTML = 
+      '<h3 style="display:flex;align-items:center;gap:8px;color:var(--gold,#C9A84C);font-size:15px;font-weight:600;margin:0 0 8px 0">🎓 Interaktive App-Tour</h3>' +
+      '<p style="margin:0 0 12px 0;font-size:13px;color:var(--ch,#2A2727);line-height:1.5">Lass dich Schritt-für-Schritt durch DealPilot führen — alle wichtigen Tabs, Felder und Funktionen werden direkt in der App erklärt.</p>' +
+      '<button type="button" onclick="window.helpStartTour && window.helpStartTour()" style="padding:10px 18px;background:var(--gold,#C9A84C);color:#fff;border:none;border-radius:8px;font-family:var(--font-main,\'IBM Plex Sans\',sans-serif);font-size:13px;font-weight:600;cursor:pointer">🚀 Tour jetzt starten</button>';
+    
+    anchor.parentNode.insertBefore(block, anchor);
   }
   
-  window.DpTourFromHelp = { injectTourTab, startTour };
+  // Observe help-content for changes (topic-switches)
+  const obs = new MutationObserver(() => setTimeout(injectTourBlock, 50));
+  const startObs = () => {
+    const content = document.getElementById('help-content');
+    if (content) {
+      obs.observe(content, { childList: true, subtree: true });
+      injectTourBlock();
+    } else {
+      setTimeout(startObs, 500);
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startObs);
+  } else {
+    startObs();
+  }
 })();

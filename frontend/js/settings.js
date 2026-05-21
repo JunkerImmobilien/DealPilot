@@ -917,10 +917,10 @@ function _swSet(btn) {
       if (window.DealPilotZvE) {
         // Override renderHistoryEditor mit Hinweis-Stub
         window.DealPilotZvE.renderHistoryEditor = function() {
-          return '<div style="margin-top:22px;padding:14px 16px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.22);border-radius:10px;font-family:var(--font-main,\'IBM Plex Sans\',sans-serif)">' +
-            '<div style="font-weight:600;font-size:14px;color:var(--ch,#2A2727);margin-bottom:4px">Zu versteuerndes Einkommen (zvE)</div>' +
-            '<div style="font-size:12.5px;color:var(--muted,#7A7370);margin-bottom:8px">Die zvE-Verwaltung ist jetzt verlaufsbasiert mit Steuerzeitraeumen. Du findest sie im Steuer-Tab.</div>' +
-            '<button type="button" onclick="if(window.DealPilotTaxPeriods)DealPilotTaxPeriods.openModal()" style="padding:10px 16px;background:#fff;color:var(--ch,#2A2727);border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer">Steuerzeitraeume verwalten →</button>' +
+          return '<div style="margin-top:22px;padding:20px 24px;background:rgba(201,168,76,0.08);border:1.5px solid var(--gold,#C9A84C);border-radius:12px;font-family:var(--font-main,\'IBM Plex Sans\',sans-serif)">' +
+            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="font-size:20px">📅</span><div style="font-weight:600;font-size:15px;color:var(--ch,#2A2727)">Steuerzeiträume verwalten</div></div>' +
+            '<div style="font-size:12.5px;color:var(--muted,#7A7370);margin-bottom:14px;line-height:1.5">Dein zu versteuerndes Einkommen (zvE) wird zeitraumbasiert verwaltet. Damit kannst du Lohnerhöhungen, Jobwechsel und historische Werte sauber abbilden. Die Werte fließen automatisch in alle Steuer-Berechnungen ein.</div>' +
+            '<button type="button" onclick="if(window.DealPilotTaxPeriods)DealPilotTaxPeriods.openModal()" style="padding:11px 18px;background:var(--gold,#C9A84C);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px">📅 Steuerzeiträume öffnen →</button>' +
             '</div>';
         };
       }

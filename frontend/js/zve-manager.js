@@ -235,6 +235,9 @@
 
   // V259-12: Migration bestehender zve_history aus InvestmentProfile in tax_periods
   async function migrateToTaxPeriods() {
+    // V264-02: Session-Lock - laeuft nur einmal pro Tab
+    if (window._tax_migration_done) return false;
+    window._tax_migration_done = true;
     try {
       if (!window.DealPilotTaxPeriods) return false;
       const p = getProfile();
@@ -265,6 +268,14 @@
           validTo = d.toISOString().split('T')[0];
         }
         try {
+          // V264-02: Pre-Check - existiert schon eine Periode mit diesem valid_from?
+          const existsCheck = (await DealPilotTaxPeriods.loadAll()).find(
+            p => p.valid_from === entry.valid_from
+          );
+          if (existsCheck) {
+            console.log('[V264-02] Skip Migration - Periode existiert:', entry.valid_from);
+            continue;
+          }
           await DealPilotTaxPeriods.create({
             valid_from: entry.valid_from,
             valid_to: validTo,
@@ -273,7 +284,10 @@
             note: ''
           });
         } catch(e) {
-          console.warn('[V259-12] Migration-Eintrag fehlgeschlagen:', e.message);
+          // V264-02: Duplikat-Fehler still ignorieren
+          if (!/already exists|duplicate|409/i.test(e.message || '')) {
+            console.warn('[V259-12] Migration-Eintrag fehlgeschlagen:', e.message);
+          }
         }
       }
       
@@ -281,15 +295,23 @@
       if (sorted.length === 0 && typeof current === 'number' && current > 0) {
         const today = todayISO();
         try {
-          await DealPilotTaxPeriods.create({
-            valid_from: today,
-            valid_to: null,
-            zve: current,
-            reason: 'Migriert aus Profil',
-            note: 'Initialer Eintrag aus DealPilotZvE-Profil'
-          });
+          // V264-02: Pre-Check
+          const existsCheck = (await DealPilotTaxPeriods.loadAll()).find(
+            p => p.valid_from === today
+          );
+          if (!existsCheck) {
+            await DealPilotTaxPeriods.create({
+              valid_from: today,
+              valid_to: null,
+              zve: current,
+              reason: 'Migriert aus Profil',
+              note: 'Initialer Eintrag aus DealPilotZvE-Profil'
+            });
+          }
         } catch(e) {
-          console.warn('[V259-12] Initial-Eintrag fehlgeschlagen:', e.message);
+          if (!/already exists|duplicate|409/i.test(e.message || '')) {
+            console.warn('[V259-12] Initial-Eintrag fehlgeschlagen:', e.message);
+          }
         }
       }
       
