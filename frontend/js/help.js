@@ -1,3 +1,4 @@
+/* V262-01: Footer-Tour-Button entfernt */
 /**
  * help.js — DealPilot User-Hilfe-System V63.70
  *
@@ -408,9 +409,7 @@
           '<div class="pane-wrap help-content-wrap">' +
             '<main class="help-content" id="help-content"></main>' +
           '</div>' +
-          '<div class="help-modal-foot help-ai-foot">' +
-            '<button type="button" class="dp-tour-restart-btn" onclick="window.helpStartTour()" title="Einfuehrungstour erneut anzeigen">🎯 Tour starten</button>' +
-            '<div class="help-ai-bar" id="help-ai-bar">' +
+          '<div class="help-modal-foot help-ai-foot">' +            '<div class="help-ai-bar" id="help-ai-bar">' +
               '<input type="text" id="help-ai-input" placeholder="✦ Frag den DealPilot-Assistenten — z.B. ‚Wann lohnt sich Tilgungsaussetzung?‘">' +
               '<button class="help-ai-btn" type="button" id="help-ai-btn" onclick="helpAskAI()">Fragen</button>' +
             '</div>' +
@@ -689,3 +688,102 @@
     }, 300);
   };
 
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V261-01: Tour-Tab im Hilfe-Modal links integriert
+   ═══════════════════════════════════════════════════════════════════ */
+(function() {
+  'use strict';
+  
+  function injectTourTab() {
+    const sidebar = document.querySelector('.help-modal-side, .help-modal-sidebar');
+    if (!sidebar) return;
+    if (sidebar.querySelector('[data-v261-tour]')) return;
+    
+    // Suche Item-Container (typisch .help-sidebar-list oder direkte Children)
+    let list = sidebar.querySelector('.help-sidebar-list, .help-sidebar-items, .help-side-list');
+    if (!list) {
+      // Fallback: erstes mehrfaches Element (die Items)
+      const items = sidebar.querySelectorAll('.help-sidebar-item, [class*="help-sidebar"][role="button"], [class*="help-side-item"]');
+      if (items.length > 0 && items[0].parentNode) list = items[0].parentNode;
+    }
+    if (!list) return;
+    
+    // Neues Tour-Item
+    const tourItem = document.createElement('div');
+    tourItem.className = 'help-sidebar-item';
+    tourItem.setAttribute('data-v261-tour', '1');
+    tourItem.style.cursor = 'pointer';
+    tourItem.innerHTML = 
+      '<span class="help-sidebar-item-icon">🎓</span>' +
+      '<div class="help-sidebar-item-text">' +
+        '<div class="help-sidebar-item-title">Tour starten</div>' +
+        '<div class="help-sidebar-item-sub">Interaktive App-Einführung</div>' +
+      '</div>';
+    
+    tourItem.onclick = function() {
+      startTour();
+    };
+    
+    list.appendChild(tourItem);
+  }
+  
+  function startTour() {
+    document.body.classList.add('dp-tour-active');
+    
+    // Hilfe-Modal schliessen
+    const modal = document.getElementById('help-modal');
+    if (modal) modal.classList.remove('open');
+    
+    // Bestehende Tour-Funktionen versuchen
+    const candidates = [
+      () => window.startTour && window.startTour(),
+      () => window.DpTour && window.DpTour.start && window.DpTour.start(),
+      () => window.dpTourStart && window.dpTourStart(),
+      () => window.tourStart && window.tourStart()
+    ];
+    let started = false;
+    for (const fn of candidates) {
+      try { 
+        const r = fn(); 
+        if (r !== undefined) { started = true; break; }
+      } catch(e) {}
+    }
+    if (!started) {
+      console.warn('[V261-01] Keine Tour-Start-Funktion gefunden');
+    }
+  }
+  
+  // Tour-End-Watch
+  function watchTourEnd() {
+    document.addEventListener('tour:end', function() {
+      document.body.classList.remove('dp-tour-active');
+    });
+    setInterval(() => {
+      if (document.body.classList.contains('dp-tour-active')) {
+        const tourEl = document.querySelector('.tour-tooltip, .dp-tour-tooltip, [class*="tour-step-visible"]');
+        if (!tourEl) {
+          document.body.classList.remove('dp-tour-active');
+        }
+      }
+    }, 1500);
+  }
+  
+  // Inject when help modal opens
+  const obs = new MutationObserver(() => {
+    const modal = document.getElementById('help-modal');
+    if (modal && modal.classList.contains('open')) {
+      setTimeout(injectTourTab, 50);
+    }
+  });
+  obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', watchTourEnd);
+  } else {
+    watchTourEnd();
+  }
+  
+  window.DpTourFromHelp = { injectTourTab, startTour };
+})();

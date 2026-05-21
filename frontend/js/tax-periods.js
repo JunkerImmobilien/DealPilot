@@ -137,6 +137,20 @@
   }
 
   // ─── Modal-UI ──────────────────────────────────────────────────
+  function getDefaultYearDate() {
+    // V261-07: Jahr aus Kaufdatum/wirtschaftlicher Uebergang
+    const wuEl = document.getElementById('wirtschaftlicher_uebergang');
+    const kdEl = document.getElementById('kaufdat') || document.getElementById('purchase_date') || document.getElementById('kaufdatum');
+    const ref = (wuEl && wuEl.value) || (kdEl && kdEl.value) || null;
+    let year;
+    if (ref) {
+      year = ref.split('-')[0];
+    } else {
+      year = String(new Date().getFullYear());
+    }
+    return { from: year + '-01-01', to: year + '-12-31' };
+  }
+  
   function openModal() {
     let modal = document.getElementById('tax-periods-modal');
     if (modal) modal.remove();
@@ -190,6 +204,14 @@
     `;
     document.body.appendChild(modal);
     refreshList();
+    // V261-07: Default-Jahr aus Kaufdatum
+    try {
+      const def = getDefaultYearDate();
+      const fromEl = document.getElementById('tp-from');
+      const toEl = document.getElementById('tp-to');
+      if (fromEl && !fromEl.value) fromEl.value = def.from;
+      if (toEl && !toEl.value) toEl.value = def.to;
+    } catch(e) {}
   }
 
   function closeModal() {

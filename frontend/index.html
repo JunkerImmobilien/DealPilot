@@ -825,15 +825,7 @@ label.dp-required.qc-required::after {
 
 <!-- V75: Workflow-Bar entfernt — Steps + Status sind jetzt in der Tab-Bar oben.
      Hidden-Stub bleibt damit JS-Code (workflow.js, ui.js) nicht crasht. -->
-<div class="tabs-workflow-bar" style="display:none">
-  <div class="wf-tab-title" id="wf-current-tab-title">Objekt</div>
-  <div class="wf-tab-sub" id="wf-current-tab-sub">Grunddaten, Lage und Objektfotos für den Bankexport.</div>
-  <div class="wf-tab-steps" id="wf-tab-steps"></div>
-  <div class="wf-tab-progress">
-    <span class="wf-tab-progress-text" id="wf-progress-pct">0 % vollständig</span>
-    <div class="wf-tab-progress-bar"><div class="wf-tab-progress-fill" id="wf-progress-fill" style="width:0%"></div></div>
-  </div>
-</div>
+<!-- V261-03: tabs-workflow-bar entfernt -->
 
 <div class="body">
 
@@ -876,7 +868,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Objektart</label><select id="objart"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
-      <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
+      <div class="f"><label>Kaufdatum / geplant <span style="color:var(--red,#B8625C)">*</span> <button type="button" class="dp-tip" data-tip-text="Kaufdatum oder geplantes Kaufdatum. Bestimmt das Steuerjahr und den aktiven Steuerzeitraum." tabindex="-1" aria-label="Hilfe"></button></label><input id="kaufdat" type="date" required data-v262-03-required="1"></div>
       <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
       <div class="f"><label>Ausstattung</label><select id="ausst"><option>Einfach</option><option selected>Normal</option><option>Gehoben</option><option>Luxus</option></select></div>
       <div class="f s2"><label>Investitionsthese <button type="button" class="dp-tip" data-tip-id="tab1.investitionsthese" tabindex="-1" aria-label="Hilfe zu tab1.investitionsthese"></button></label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
@@ -1422,7 +1414,7 @@ label.dp-required.qc-required::after {
     <a href="#" onclick="if(window.DealPilotTaxPeriods)DealPilotTaxPeriods.openModal();return false" style="color:var(--gold,#C9A84C);font-weight:600;text-decoration:underline;margin-left:4px">📅 Steuerzeiträume verwalten →</a> <!-- V259-06 -->
   </div>
 </div>
-<div class="f"><label>zvE vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="if(window.DealPilotZvE)DealPilotZvE.onObjectInput(this.value);calc()"></div></div>
+<div class="f"><label>zvE vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" readonly data-v261-04="readonly" oninput="calc()"></div></div>
       <div class="f"><label>Persönl. Grenzsteuersatz (%) <button type="button" class="dp-tip" data-tip-id="tab4.grenzsteuersatz" tabindex="-1" aria-label="Hilfe zu tab4.grenzsteuersatz"></button></label><div class="iw"><input id="grenz" type="text" inputmode="decimal" placeholder="42.00" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
     </div>
     <div class="f checkbox-row">
@@ -2759,12 +2751,13 @@ label.dp-required.qc-required::after {
   <script src="js/tax-periods.js?v=1"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
   <script src="js/zve-smart.js?v=1"></script>
+  <script src="js/zve-readonly-display.js?v=1"></script>
   <script src="js/wk-aggregator.js?v=1"></script>
   <script src="js/wk-dashboard.js?v=1"></script>
   <script src="js/all-objects-views.js?v=1"></script>
-  <script src="js/tour-sidebar.js?v=1"></script>
   <script src="js/wirtschaftlicher-uebergang.js?v=1"></script>
   <script src="js/multi-year-steuer.js?v=1"></script>
+  <script src="js/wk-other-objects.js?v=1"></script>
   <script src="js/calc.js?v=231"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>

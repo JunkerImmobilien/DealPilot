@@ -16,7 +16,7 @@
       const wuEl = document.getElementById('wirtschaftlicher_uebergang');
       if (wuEl && wuEl.value) return resolve(true);
       
-      const kdEl = document.getElementById('purchase_date') || document.getElementById('kaufdatum');
+      const kdEl = document.getElementById('kaufdat') || document.getElementById('purchase_date') || document.getElementById('kaufdatum');
       const defaultDate = (kdEl && kdEl.value) || todayISO();
       
       const overlay = document.createElement('div');
@@ -55,7 +55,7 @@
   /** Banner im Steuer-Tab wenn weder wirtschaftlicher_uebergang noch kaufdatum gesetzt */
   function injectWarningIfNeeded() {
     const wu = document.getElementById('wirtschaftlicher_uebergang');
-    const kd = document.getElementById('purchase_date') || document.getElementById('kaufdatum');
+    const kd = document.getElementById('kaufdat') || document.getElementById('purchase_date') || document.getElementById('kaufdatum');
     
     const existing = document.getElementById('dp-wu-warning');
     

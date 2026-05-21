@@ -13,7 +13,7 @@
   function getRelevantDate() {
     // Bevorzugt wirtschaftlicher Uebergang, sonst Kaufdatum, sonst heute
     const wuEl = document.getElementById('wirtschaftlicher_uebergang');
-    const kdEl = document.getElementById('purchase_date') || document.getElementById('kaufdatum');
+    const kdEl = document.getElementById('kaufdat') || document.getElementById('purchase_date') || document.getElementById('kaufdatum');
     if (wuEl && wuEl.value) return wuEl.value;
     if (kdEl && kdEl.value) return kdEl.value;
     const t = new Date();

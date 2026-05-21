@@ -569,7 +569,7 @@ function calc() {
   try {
     if (window.DealPilotTaxPeriods) {
       var _wuEl = document.getElementById('wirtschaftlicher_uebergang');
-      var _kdEl = document.getElementById('purchase_date') || document.getElementById('kaufdatum');
+      var _kdEl = document.getElementById('kaufdat') || document.getElementById('purchase_date') || document.getElementById('kaufdatum');
       var _refDate = (_wuEl && _wuEl.value) ? _wuEl.value : ((_kdEl && _kdEl.value) ? _kdEl.value : null);
       if (_refDate) {
         var _period = DealPilotTaxPeriods.getForDateSync(_refDate);
