@@ -1,3 +1,4 @@
+/* BlockA: Hilfe-Modal Fixes */
 /**
  * help.js — DealPilot User-Hilfe-System V63.70
  *
@@ -23,6 +24,10 @@
         {
           h: 'Was ist DealPilot?',
           body: 'DealPilot ist eine professionelle Investmentanalyse-App für Immobilien. Du gibst Kaufpreis, Miete, Finanzierung und Annahmen ein — DealPilot rechnet vollständige Cashflows über 10–30 Jahre, vergleicht 3 Phasen (Heute / Ende Zinsbindung / Anschluss), bewertet das Investment per DealScore (0–100) und erstellt Bank-taugliche PDF-Reports.'
+        },
+        {
+          h: '🎓 Interaktive App-Tour',
+          t: 'Lass dich Schritt-für-Schritt durch DealPilot führen — alle wichtigen Tabs, Felder und Funktionen werden direkt in der App erklärt.<br><br><button type="button" onclick="window.helpStartTour && window.helpStartTour()" style="padding:10px 18px;background:var(--gold,#C9A84C);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">🚀 Tour jetzt starten</button>'
         },
         {
           h: 'Schnellstart in 4 Schritten',
@@ -408,9 +413,7 @@
           '<div class="pane-wrap help-content-wrap">' +
             '<main class="help-content" id="help-content"></main>' +
           '</div>' +
-          '<div class="help-modal-foot help-ai-foot">' +
-            '<button type="button" class="dp-tour-restart-btn" onclick="window.helpStartTour()" title="Einfuehrungstour erneut anzeigen">🎯 Tour starten</button>' +
-            '<div class="help-ai-bar" id="help-ai-bar">' +
+          '<div class="help-modal-foot help-ai-foot">' +            '<div class="help-ai-bar" id="help-ai-bar">' +
               '<input type="text" id="help-ai-input" placeholder="✦ Frag den DealPilot-Assistenten — z.B. ‚Wann lohnt sich Tilgungsaussetzung?‘">' +
               '<button class="help-ai-btn" type="button" id="help-ai-btn" onclick="helpAskAI()">Fragen</button>' +
             '</div>' +

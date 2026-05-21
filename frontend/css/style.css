@@ -30568,3 +30568,92 @@ body.dp-tour-active header.hdr {
   text-decoration: underline;
   margin-left: 4px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   BlockA — Hilfe-Modal: Hintergrund-Toggle + Größe + Scrollbar
+   
+   Sidebar (.help-modal-side) bleibt IMMER dunkel via Original-Regel
+   .help-modal.global-view-overlay .help-modal-side (Z.18570).
+   Hier definieren wir NUR Content-Bereich + Modal-Geometrie.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* A4: Modal-Größe — keine horizontale Scrollbar */
+.help-modal-inner,
+#help-modal .help-modal-inner {
+  width: 92vw !important;
+  max-width: 1400px !important;
+  height: 88vh !important;
+  max-height: 88vh !important;
+  display: flex !important;
+  flex-direction: row !important;
+}
+.help-modal-side {
+  flex-shrink: 0 !important;
+  width: 280px !important;
+  max-height: 88vh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+.help-modal-content,
+.set-modal-content.help-modal-content {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+.pane-wrap.help-content-wrap {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+}
+
+/* A4: Gold-Scrollbar */
+.help-modal-side::-webkit-scrollbar,
+.pane-wrap.help-content-wrap::-webkit-scrollbar,
+.help-content::-webkit-scrollbar {
+  width: 8px;
+}
+.help-modal-side::-webkit-scrollbar-track,
+.pane-wrap.help-content-wrap::-webkit-scrollbar-track,
+.help-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.help-modal-side::-webkit-scrollbar-thumb,
+.pane-wrap.help-content-wrap::-webkit-scrollbar-thumb,
+.help-content::-webkit-scrollbar-thumb {
+  background: rgba(201,168,76,0.40);
+  border-radius: 8px;
+}
+.help-modal-side::-webkit-scrollbar-thumb:hover,
+.pane-wrap.help-content-wrap::-webkit-scrollbar-thumb:hover,
+.help-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(201,168,76,0.65);
+}
+.help-modal-side,
+.pane-wrap.help-content-wrap,
+.help-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,168,76,0.40) transparent;
+}
+
+/* A3: Content folgt Weiss/Creme-Toggle (Sidebar bleibt dunkel via Original) */
+html[data-bg="white"] .help-modal-content,
+html[data-bg="white"] .set-modal-content,
+html[data-bg="white"] .help-content,
+html[data-bg="white"] .pane-wrap.help-content-wrap,
+html[data-bg="white"] .help-modal-foot,
+html[data-bg="white"] .help-ai-foot {
+  background: #ffffff !important;
+}
+html[data-bg="cream"] .help-modal-content,
+html[data-bg="cream"] .set-modal-content,
+html[data-bg="cream"] .help-content,
+html[data-bg="cream"] .pane-wrap.help-content-wrap,
+html[data-bg="cream"] .help-modal-foot,
+html[data-bg="cream"] .help-ai-foot {
+  background: var(--surface, #F8F6F1) !important;
+}
+
+/* Footer-Tour-Button-Fallback falls noch irgendwo gerendert */
+.dp-tour-restart-btn { display: none !important; }
