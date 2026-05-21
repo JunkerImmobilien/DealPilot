@@ -96,7 +96,8 @@ app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/listing', scrapeRoutes);  // V63.85: URL-Scraper für Quick-Check
 app.use('/api/v1/rnd-request', rndRequestRoutes);  // V186: RND-Wizard-Anfrage
 app.use('/api/v1/export', require('./routes/exportEncrypt'));
-// V258-DISABLED app.use('/api/v1/objects', require('./routes/wkAggregate'));  // V258-04: WK-Aggregation  // V251-05: Encrypted Export
+// V258-DISABLED app.use('/api/v1/objects', require('./routes/wkAggregate'));
+app.use('/api/v1/tax-periods', require('./routes/taxPeriods'));  // V259-02: Steuerzeitraeume  // V258-04: WK-Aggregation  // V251-05: Encrypted Export
 
 // V194: Admin-Dashboard
 app.use('/api/v1/admin', adminRoutes);

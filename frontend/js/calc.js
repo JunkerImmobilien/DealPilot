@@ -565,6 +565,30 @@ function _computeBsvLifecycle() {
 var _calcDebounceTimer = null;
 var _calcLastImmediate = 0;
 function calc() {
+  // V259-09: zvE aus Steuerzeitraeumen ermitteln (nach wirtschaftlichem Uebergang oder Kaufdatum)
+  try {
+    if (window.DealPilotTaxPeriods) {
+      var _wuEl = document.getElementById('wirtschaftlicher_uebergang');
+      var _kdEl = document.getElementById('purchase_date') || document.getElementById('kaufdatum');
+      var _refDate = (_wuEl && _wuEl.value) ? _wuEl.value : ((_kdEl && _kdEl.value) ? _kdEl.value : null);
+      if (_refDate) {
+        var _period = DealPilotTaxPeriods.getForDateSync(_refDate);
+        if (_period && _period.zve > 0) {
+          var _zveEl = document.getElementById('zve');
+          if (_zveEl && !_zveEl.dataset.userOverride) {
+            // Nur ueberschreiben wenn kein manueller User-Wert vorhanden (oder identisch)
+            var _currentNum = parseFloat(String(_zveEl.value).replace(/\./g, '').replace(',', '.')) || 0;
+            if (_currentNum === 0 || Math.abs(_currentNum - _period.zve) < 0.5) {
+              _zveEl.value = _period.zve.toLocaleString('de-DE');
+            }
+          }
+        }
+      }
+    }
+  } catch(_e) {
+    console.warn('[V259-09]', _e.message);
+  }
+
   // Wenn länger als 1.5s nichts mehr getriggert wurde → sofort rechnen
   // (gefühlt direktes Feedback bei normalem Tipp-Verhalten)
   var now = Date.now();
