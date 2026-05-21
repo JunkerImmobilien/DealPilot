@@ -29352,3 +29352,620 @@ nav.tabs .tab.wf-done.active,
 .da-stage-status, .da-stage-bank {
   margin-bottom: 18px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V256-02 — Buttons in Tabs (.sec) einheitlich 10/16px
+   Gold-CTAs gefuellt, Outline-Buttons hell mit Gold-Border, Toggle-Pairs
+   identische Geometrie.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Outline-Buttons */
+.sec .btn,
+.sec .btn-outline,
+.sec .btn-ghost,
+.sec .v10-zc-btn,
+.sec button.btn-brw,
+.sec .btn-quickcheck,
+.sec .btn-gold-outline,
+.sec .btn-light,
+.sec .btn-light-outline,
+.sec .fesh-apply-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 10px 16px !important;
+  background: #ffffff !important;
+  color: var(--ch, #2A2727) !important;
+  border: 1.5px solid rgba(201,168,76,0.30) !important;
+  border-radius: 8px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.005em !important;
+  cursor: pointer !important;
+  transition: all .15s ease !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+  white-space: nowrap;
+}
+.sec .btn:hover,
+.sec .btn-outline:hover,
+.sec .btn-ghost:hover,
+.sec .v10-zc-btn:hover,
+.sec button.btn-brw:hover,
+.sec .btn-quickcheck:hover,
+.sec .btn-gold-outline:hover {
+  border-color: var(--gold, #C9A84C) !important;
+  color: var(--gold, #C9A84C) !important;
+  background: rgba(201,168,76,0.04) !important;
+  transform: translateY(-1px);
+}
+
+/* Toggle-Pairs (Mode-Switcher) */
+.sec .me-mode-btn,
+.sec .cf-mode-btn,
+.sec .bwk-mode-btn,
+.sec .mode-btn,
+.sec .mt-btn,
+.sec .mr-pf-margin-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px 16px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  border: 1.5px solid rgba(201,168,76,0.30) !important;
+  background: #ffffff !important;
+  color: var(--ch, #2A2727) !important;
+  cursor: pointer !important;
+  transition: all .15s ease !important;
+  min-width: 110px;
+}
+.sec .me-mode-btn.active,
+.sec .cf-mode-btn.active,
+.sec .bwk-mode-btn.active,
+.sec .mode-btn.active,
+.sec .mr-pf-margin-btn.active {
+  background: var(--gold, #C9A84C) !important;
+  color: #fff !important;
+  border-color: var(--gold, #C9A84C) !important;
+  font-weight: 600 !important;
+}
+
+/* Gold-CTAs */
+.sec .btn-gold,
+.sec .btn-primary,
+.sec .ai-btn,
+.sec .da-card-cta {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  background: var(--gold, #C9A84C) !important;
+  color: #fff !important;
+  border: 1.5px solid var(--gold, #C9A84C) !important;
+  padding: 10px 16px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  letter-spacing: 0.005em !important;
+  cursor: pointer !important;
+  transition: all .15s ease !important;
+  white-space: nowrap !important;
+}
+.sec .btn-gold:hover,
+.sec .btn-primary:hover,
+.sec .ai-btn:hover,
+.sec .da-card-cta:hover {
+  background: #b8973d !important;
+  border-color: #b8973d !important;
+  transform: translateY(-1px);
+}
+
+/* Danger */
+.sec .btn-danger {
+  background: #fff !important;
+  color: var(--red, #B8625C) !important;
+  border: 1.5px solid rgba(184,98,92,0.35) !important;
+  padding: 10px 16px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+}
+
+/* Small */
+.sec .btn-sm {
+  padding: 7px 12px !important;
+  font-size: 12px !important;
+  min-width: auto !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V256-03 — Zinsrisiko-Feld: konsistente Schrift wie andere readonly-Felder
+   ═══════════════════════════════════════════════════════════════════ */
+
+#zaer_display,
+#zaer_display * {
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  color: var(--ch, #2A2727) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Falls JS <strong> oder <b> injiziert: keine fette Schrift */
+#zaer_display strong,
+#zaer_display b {
+  font-weight: 500 !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V256-05 — Tab-Bar: ALLE Tabs GOLD
+   Schlaegt has-v64-score-Block mit gleicher Spezifitaet + !important.
+   ═══════════════════════════════════════════════════════════════════ */
+
+header.hdr + nav.tabs .tab,
+header.hdr.has-v64-score + nav.tabs .tab,
+nav.tabs .tab,
+header.hdr + nav.tabs .tab .tab-lbl,
+header.hdr.has-v64-score + nav.tabs .tab .tab-lbl,
+nav.tabs .tab .tab-lbl {
+  color: var(--gold, #C9A84C) !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-weight: 500 !important;
+}
+
+/* Inactive: weniger satt */
+header.hdr + nav.tabs .tab:not(.active),
+header.hdr.has-v64-score + nav.tabs .tab:not(.active),
+nav.tabs .tab:not(.active) {
+  opacity: 0.75;
+}
+
+/* Hover inactive */
+header.hdr + nav.tabs .tab:not(.active):hover,
+header.hdr.has-v64-score + nav.tabs .tab:not(.active):hover,
+nav.tabs .tab:not(.active):hover {
+  opacity: 1;
+  background: rgba(201, 168, 76, 0.08) !important;
+}
+
+/* Active: voll, bold */
+header.hdr + nav.tabs .tab.active,
+header.hdr.has-v64-score + nav.tabs .tab.active,
+nav.tabs .tab.active {
+  opacity: 1 !important;
+  font-weight: 600 !important;
+  border-bottom-color: var(--gold, #C9A84C) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V257-02 — ALLE Buttons in Tabs sehen aus wie "Marktdaten ansehen"
+   Heller Hintergrund, kleine Schrift, Outline-Stil, 10/16px.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* === UNIVERSAL Button-Reset in .sec === */
+.sec .btn,
+.sec .btn-outline,
+.sec .btn-ghost,
+.sec .btn-gold,
+.sec .btn-primary,
+.sec .btn-secondary,
+.sec .ai-btn,
+.sec .v10-zc-btn,
+.sec button.btn-brw,
+.sec .btn-quickcheck,
+.sec .btn-gold-outline,
+.sec .btn-light,
+.sec .btn-light-outline,
+.sec .fesh-apply-btn,
+.sec .da-card-cta,
+.sec .da-bank-pdf-btn,
+.sec .me-mode-btn,
+.sec .cf-mode-btn,
+.sec .bwk-mode-btn,
+.sec .mode-btn,
+.sec .mt-btn,
+.sec .mr-pf-margin-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 10px 16px !important;
+  background: #ffffff !important;
+  color: var(--ch, #2A2727) !important;
+  border: 1.5px solid rgba(201,168,76,0.30) !important;
+  border-radius: 8px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.005em !important;
+  cursor: pointer !important;
+  transition: all .15s ease !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  min-width: auto !important;
+  height: auto !important;
+  width: auto !important;
+}
+
+/* Hover universell */
+.sec .btn:hover,
+.sec .btn-outline:hover,
+.sec .btn-ghost:hover,
+.sec .btn-gold:hover,
+.sec .btn-primary:hover,
+.sec .ai-btn:hover,
+.sec .v10-zc-btn:hover,
+.sec button.btn-brw:hover,
+.sec .btn-quickcheck:hover,
+.sec .btn-gold-outline:hover,
+.sec .da-card-cta:hover,
+.sec .da-bank-pdf-btn:hover,
+.sec .mode-btn:hover,
+.sec .me-mode-btn:hover,
+.sec .cf-mode-btn:hover,
+.sec .bwk-mode-btn:hover,
+.sec .mt-btn:hover,
+.sec .mr-pf-margin-btn:hover {
+  border-color: var(--gold, #C9A84C) !important;
+  color: var(--gold, #C9A84C) !important;
+  background: rgba(201,168,76,0.04) !important;
+  transform: translateY(-1px);
+}
+
+/* === Active-Toggle (mode-btn.active, etc.) === */
+.sec .me-mode-btn.active,
+.sec .cf-mode-btn.active,
+.sec .bwk-mode-btn.active,
+.sec .mode-btn.active,
+.sec .mr-pf-margin-btn.active {
+  background: var(--gold, #C9A84C) !important;
+  color: #fff !important;
+  border-color: var(--gold, #C9A84C) !important;
+  font-weight: 600 !important;
+}
+.sec .me-mode-btn.active:hover,
+.sec .cf-mode-btn.active:hover,
+.sec .bwk-mode-btn.active:hover,
+.sec .mode-btn.active:hover,
+.sec .mr-pf-margin-btn.active:hover {
+  background: #b8973d !important;
+  color: #fff !important;
+}
+
+/* === Danger bleibt rot === */
+.sec .btn-danger {
+  background: #fff !important;
+  color: var(--red, #B8625C) !important;
+  border: 1.5px solid rgba(184,98,92,0.35) !important;
+}
+.sec .btn-danger:hover {
+  background: rgba(184,98,92,0.06) !important;
+  border-color: var(--red, #B8625C) !important;
+  color: var(--red, #B8625C) !important;
+}
+
+/* === Status-Buttons (Deal-Aktion: Offen/Gewonnen/Verloren) === */
+/* Bleiben mit ihrem Status-Color-Coding aber gleicher Geometrie */
+.sec .da-status-btn {
+  padding: 10px 16px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+/* === Small-Buttons === */
+.sec .btn-sm {
+  padding: 7px 12px !important;
+  font-size: 12px !important;
+}
+
+/* === Schalter (Toggle-Switches mit Slider) NICHT anfassen === */
+.sec .switch,
+.sec .switch input,
+.sec .switch .slider {
+  /* Diese sind Toggle-Switches, nicht Buttons */
+}
+
+
+/* Falls JS <strong> oder <b> injiziert — keine fette Schrift */
+#zaer_display strong,
+#zaer_display b {
+  font-weight: 500 !important;
+  font-family: inherit !important;
+  color: inherit !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V257-05 — Tab-Bar: ALLE Tabs GOLD
+   ═══════════════════════════════════════════════════════════════════ */
+
+header.hdr + nav.tabs .tab,
+header.hdr.has-v64-score + nav.tabs .tab,
+nav.tabs .tab,
+header.hdr + nav.tabs .tab .tab-lbl,
+header.hdr.has-v64-score + nav.tabs .tab .tab-lbl,
+nav.tabs .tab .tab-lbl {
+  color: var(--gold, #C9A84C) !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-weight: 500 !important;
+}
+
+header.hdr + nav.tabs .tab:not(.active),
+header.hdr.has-v64-score + nav.tabs .tab:not(.active),
+nav.tabs .tab:not(.active) {
+  opacity: 0.75;
+}
+
+header.hdr + nav.tabs .tab:not(.active):hover,
+header.hdr.has-v64-score + nav.tabs .tab:not(.active):hover,
+nav.tabs .tab:not(.active):hover {
+  opacity: 1;
+  background: rgba(201, 168, 76, 0.08) !important;
+}
+
+header.hdr + nav.tabs .tab.active,
+header.hdr.has-v64-score + nav.tabs .tab.active,
+nav.tabs .tab.active {
+  opacity: 1 !important;
+  font-weight: 600 !important;
+  border-bottom-color: var(--gold, #C9A84C) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V257-06 CSS — Hintergrund-Modi (white / cream)
+   Default = white. Toggle in Settings → Profil & Anzeige.
+   ═══════════════════════════════════════════════════════════════════ */
+
+html[data-bg="white"],
+html[data-bg="white"] body,
+html[data-bg="white"] .main-col,
+html[data-bg="white"] .sec {
+  background: #ffffff !important;
+}
+
+html[data-bg="cream"],
+html[data-bg="cream"] body,
+html[data-bg="cream"] .main-col,
+html[data-bg="cream"] .sec {
+  background: var(--surface, #F8F6F1) !important;
+}
+
+/* Toggle-UI */
+.dp-bg-toggle-wrap {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(201,168,76,0.18);
+}
+.dp-bg-toggle-title {
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ch, #2A2727);
+  margin-bottom: 4px;
+}
+.dp-bg-toggle-desc {
+  font-size: 12.5px;
+  color: var(--muted, #7A7370);
+  margin-bottom: 12px;
+}
+.dp-bg-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-width: 360px;
+}
+.dp-bg-option {
+  cursor: pointer;
+  border: 2px solid rgba(201,168,76,0.22);
+  border-radius: 10px;
+  padding: 14px 10px;
+  text-align: center;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all .15s ease;
+  background: #fff;
+  color: #2A2727;
+}
+.dp-bg-option:hover {
+  border-color: var(--gold, #C9A84C);
+  transform: translateY(-1px);
+}
+.dp-bg-option.active {
+  border-color: var(--gold, #C9A84C);
+  background: rgba(201,168,76,0.10);
+  font-weight: 600;
+}
+.dp-bg-option-preview {
+  display: block;
+  height: 36px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(0,0,0,0.10);
+}
+.dp-bg-option[data-bg="white"] .dp-bg-option-preview { background: #ffffff; }
+.dp-bg-option[data-bg="cream"] .dp-bg-option-preview { background: #F8F6F1; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V258-02 — ALLE Buttons in .sec gleich (Marktdaten-Stil)
+   Erweitert V257-02 um .v235-next-btn und CHILDS (span, svg).
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Universeller Reset — extra spezifisch */
+.sec button:not(.dp-tip):not(.tab):not(.sb-action-btn):not(.fb-modal-close):not(.modal-close):not(.btn-clean):not(.fab-btn),
+.sec .v235-next-btn,
+.sec .da-card-cta,
+.sec .da-bank-pdf-btn,
+.sec .btn-gold,
+.sec .btn-primary,
+.sec .ai-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 10px 16px !important;
+  background: #ffffff !important;
+  color: var(--ch, #2A2727) !important;
+  border: 1.5px solid rgba(201,168,76,0.30) !important;
+  border-radius: 8px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.005em !important;
+  cursor: pointer !important;
+  transition: all .15s ease !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  min-width: auto !important;
+  height: auto !important;
+  width: auto !important;
+  background-image: none !important;
+}
+
+/* Childs in den Buttons (Pfeile, Spans) gleiche Farbe */
+.sec .v235-next-btn span,
+.sec .v235-next-btn .v235-next-btn-arrow,
+.sec .da-card-cta span,
+.sec .btn-gold span,
+.sec .btn-primary span,
+.sec .ai-btn span {
+  color: var(--ch, #2A2727) !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+}
+
+/* SVGs in Buttons */
+.sec button svg,
+.sec .v235-next-btn svg {
+  stroke: currentColor !important;
+}
+
+/* Hover universell */
+.sec button:not(.dp-tip):not(.tab):not(.sb-action-btn):not(.fb-modal-close):not(.modal-close):not(.btn-clean):not(.fab-btn):hover,
+.sec .v235-next-btn:hover,
+.sec .da-card-cta:hover,
+.sec .da-bank-pdf-btn:hover,
+.sec .btn-gold:hover,
+.sec .btn-primary:hover,
+.sec .ai-btn:hover {
+  border-color: var(--gold, #C9A84C) !important;
+  color: var(--gold, #C9A84C) !important;
+  background: rgba(201,168,76,0.04) !important;
+  transform: translateY(-1px);
+}
+.sec .v235-next-btn:hover span,
+.sec .v235-next-btn:hover .v235-next-btn-arrow,
+.sec button:hover span {
+  color: var(--gold, #C9A84C) !important;
+}
+
+/* Active-Toggle (mode-btn.active etc.) bleiben gold gefuellt */
+.sec .me-mode-btn.active,
+.sec .cf-mode-btn.active,
+.sec .bwk-mode-btn.active,
+.sec .mode-btn.active,
+.sec .mr-pf-margin-btn.active {
+  background: var(--gold, #C9A84C) !important;
+  color: #fff !important;
+  border-color: var(--gold, #C9A84C) !important;
+  font-weight: 600 !important;
+}
+.sec .me-mode-btn.active:hover,
+.sec .cf-mode-btn.active:hover,
+.sec .mode-btn.active:hover {
+  background: #b8973d !important;
+  color: #fff !important;
+}
+
+/* Danger rot */
+.sec .btn-danger {
+  background: #fff !important;
+  color: var(--red, #B8625C) !important;
+  border-color: rgba(184,98,92,0.35) !important;
+}
+.sec .btn-danger:hover {
+  background: rgba(184,98,92,0.06) !important;
+  border-color: var(--red, #B8625C) !important;
+  color: var(--red, #B8625C) !important;
+}
+
+/* Status-Buttons Deal-Aktion */
+.sec .da-status-btn {
+  padding: 10px 16px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+/* Small */
+.sec .btn-sm {
+  padding: 7px 12px !important;
+  font-size: 12px !important;
+}
+
+/* V235-Tab-Nav-Footer — Container nicht broken */
+.sec .v235-tab-nav-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0;
+  margin-top: 12px;
+  border-top: 1px solid rgba(201,168,76,0.20);
+}
+.sec .v235-tab-nav-hint {
+  font-size: 12.5px;
+  color: var(--muted, #7A7370);
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V258-03 — Zinsrisiko-Feld: identische Optik wie Zuteilungsdatum
+   ═══════════════════════════════════════════════════════════════════ */
+
+div.f div.cf#zaer_display,
+.sec div.f div.cf#zaer_display,
+#s2 .cf#zaer_display,
+#zaer_display[data-v257-03],
+#zaer_display {
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--ch, #2A2727) !important;
+  background: rgba(201, 168, 76, 0.08) !important;
+  letter-spacing: 0 !important;
+  padding: 10px 11px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid transparent !important;
+  height: auto !important;
+  min-height: 38px !important;
+  line-height: 1.4 !important;
+  display: block !important;
+}
+
+#zaer_display *,
+#zaer_display strong,
+#zaer_display b,
+#zaer_display span {
+  font-family: inherit !important;
+  font-weight: 500 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  background: transparent !important;
+}

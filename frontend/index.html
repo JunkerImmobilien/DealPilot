@@ -432,6 +432,20 @@ label.dp-required.qc-required::after {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
   </head>
 <body>
+<!-- V257-06: Hintergrund-Modus (Bootstrap, kein Flash) -->
+<script>
+(function() {
+  try {
+    var s = JSON.parse(localStorage.getItem('dp_user_settings') || '{}');
+    var mode = s.bg_mode || 'white';  // V257: Default = weiss
+    if (['white','cream'].indexOf(mode) === -1) mode = 'white';
+    document.documentElement.setAttribute('data-bg', mode);
+  } catch(e) {
+    document.documentElement.setAttribute('data-bg', 'white');
+  }
+})();
+</script>
+
 
 <!-- ════════════════════════════════════════════════════════════════════════
      V64.0: SVG-Icon-Sprite (Pure-Obsidian)
@@ -1400,7 +1414,15 @@ label.dp-required.qc-required::after {
     <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-user"/></svg></span>Persönliche Steuer</div>
     <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
     <div class="g2">
-      <div class="f"><label>zvE vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="calc()"></div></div>
+      <div class="zve-banner" style="grid-column:1/-1;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:start;gap:12px;font-family:var(--font-main,'IBM Plex Sans',sans-serif)">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--gold,#C9A84C);flex-shrink:0;margin-top:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.5" fill="currentColor"/></svg>
+  <div style="flex:1;font-size:12.5px;line-height:1.5">
+    <strong style="font-weight:600">Dein zvE wird zentral im Profil gespeichert.</strong>
+    Änderungen hier werden in dein Profil übernommen. Für historische Jahre (z.B. vor einer Lohnerhöhung) kannst du im Profil eigene Einträge hinterlegen. <!-- V258-01 -->
+    <a href="#" onclick="if(window.showSettings)showSettings('profilanzeige');return false" style="color:var(--gold,#C9A84C);font-weight:600;text-decoration:underline;margin-left:4px">Profil bearbeiten →</a>
+  </div>
+</div>
+<div class="f"><label>zvE vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="if(window.DealPilotZvE)DealPilotZvE.onObjectInput(this.value);calc()"></div></div>
       <div class="f"><label>Persönl. Grenzsteuersatz (%) <button type="button" class="dp-tip" data-tip-id="tab4.grenzsteuersatz" tabindex="-1" aria-label="Hilfe zu tab4.grenzsteuersatz"></button></label><div class="iw"><input id="grenz" type="text" inputmode="decimal" placeholder="42.00" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
     </div>
     <div class="f checkbox-row">
@@ -2028,7 +2050,7 @@ label.dp-required.qc-required::after {
           <div class="f"><label>Tilgung Anschluss (%)</label><div class="iw"><input id="anschl_t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
           <div class="f"><label>Rate Anschluss / Monat</label><div class="cf" id="anschl_rate">—</div></div>
           <div class="f"><label>Zinsbindung Anschluss (J.)</label><div class="iw"><input id="anschl_bj" type="text" inputmode="decimal" value="15" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
-          <div class="f"><label>Zinsrisiko (auto berechnet)</label><div class="cf" id="zaer_display" style="font-size:12px;color:var(--muted)">—</div></div>
+          <div class="f"><label>Zinsrisiko (auto berechnet)</label><div class="cf" id="zaer_display" data-v257-03="1">—</div></div>
           <input type="hidden" id="zaer" value="0"><div class="f"><label>Mehrkosten Anschluss / Monat</label><div class="cf" id="zaer_m">—</div></div>
         </div>
       </div>
@@ -2733,6 +2755,9 @@ label.dp-required.qc-required::after {
 <script src="js/deal-kpis.js?v=231"></script>
 <script src="js/afa-engine.js?v=227"></script>
   <script src="js/afa-ui.js?v=2271"></script>
+  <script src="js/zve-manager.js?v=1"></script>
+  <script src="js/wk-aggregator.js?v=1"></script>
+  <script src="js/wk-dashboard.js?v=1"></script>
   <script src="js/calc.js?v=231"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>

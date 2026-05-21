@@ -912,6 +912,36 @@ function _swSet(btn) {
         sel.value = current;
       } catch (e) {}
     }
+    // V257-08: zvE-Editor einfuegen
+    try {
+      if (window.DealPilotZvE) {
+        var ipHost2 = document.getElementById('ip-pane-host');
+        var zveHost = document.getElementById('dp-zve-editor-host');
+        if (!zveHost && ipHost2 && ipHost2.parentNode) {
+          zveHost = document.createElement('div');
+          zveHost.id = 'dp-zve-editor-host';
+          ipHost2.parentNode.insertBefore(zveHost, ipHost2.nextSibling);
+        }
+        if (zveHost) zveHost.innerHTML = window.DealPilotZvE.renderHistoryEditor();
+      }
+    } catch (e) {
+      console.warn('[V257-08] zvE-Editor-Inject fehlgeschlagen:', e.message);
+    }
+    // V257-06: Hintergrund-Toggle einfuegen
+    try {
+      if (window.DealPilotBgMode) {
+        var ipHost = document.getElementById('ip-pane-host');
+        var bgHost = document.getElementById('dp-bg-toggle-host');
+        if (!bgHost && ipHost && ipHost.parentNode) {
+          bgHost = document.createElement('div');
+          bgHost.id = 'dp-bg-toggle-host';
+          ipHost.parentNode.insertBefore(bgHost, ipHost.nextSibling);
+        }
+        if (bgHost) bgHost.innerHTML = window.DealPilotBgMode.renderToggle();
+      }
+    } catch (e) {
+      console.warn('[V257-06] BgMode-Toggle-Inject fehlgeschlagen:', e.message);
+    }
   }
   _setUpdateDirtyHint();
 }
@@ -2699,3 +2729,56 @@ function _v213ResetCards() {
   }
 }
 /* === V213 collapse-toggle helpers (global) END === */
+
+
+// ═══════════════════════════════════════════════════════════════════
+// V257-06 BgMode — Hintergrund-Modus (Weiss/Creme, Default: Weiss)
+// ═══════════════════════════════════════════════════════════════════
+(function() {
+  function getMode() {
+    try {
+      var s = JSON.parse(localStorage.getItem('dp_user_settings') || '{}');
+      return s.bg_mode || 'white';
+    } catch(e) { return 'white'; }
+  }
+  function setMode(mode) {
+    if (['white','cream'].indexOf(mode) === -1) return;
+    var s = {};
+    try { s = JSON.parse(localStorage.getItem('dp_user_settings') || '{}'); } catch(e) {}
+    s.bg_mode = mode;
+    localStorage.setItem('dp_user_settings', JSON.stringify(s));
+    document.documentElement.setAttribute('data-bg', mode);
+    document.querySelectorAll('.dp-bg-option').forEach(function(el) {
+      el.classList.toggle('active', el.getAttribute('data-bg') === mode);
+    });
+    if (typeof toast === 'function') {
+      toast('Hintergrund: ' + (mode === 'white' ? 'Weiss' : 'Creme'));
+    }
+  }
+  function renderToggleHtml() {
+    var modes = [
+      { key: 'white', label: 'Weiss (Standard)' },
+      { key: 'cream', label: 'Creme' }
+    ];
+    var current = getMode();
+    return '<div class="dp-bg-toggle-wrap">' +
+      '<div class="dp-bg-toggle-title">Hintergrund</div>' +
+      '<div class="dp-bg-toggle-desc">Waehle das visuelle Theme der App.</div>' +
+      '<div class="dp-bg-toggle">' +
+      modes.map(function(m) {
+        return '<div class="dp-bg-option' + (m.key === current ? ' active' : '') + '" ' +
+               'data-bg="' + m.key + '" ' +
+               'onclick="DealPilotBgMode.set(\'' + m.key + '\')">' +
+               '<span class="dp-bg-option-preview"></span>' +
+               '<span>' + m.label + '</span>' +
+               '</div>';
+      }).join('') +
+      '</div></div>';
+  }
+  window.DealPilotBgMode = {
+    get: getMode,
+    set: setMode,
+    renderToggle: renderToggleHtml
+  };
+  document.documentElement.setAttribute('data-bg', getMode());
+})();
