@@ -30657,3 +30657,16 @@ html[data-bg="cream"] .help-ai-foot {
 
 /* Footer-Tour-Button-Fallback falls noch irgendwo gerendert */
 .dp-tour-restart-btn { display: none !important; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   BlockA2 — Modal-Overlay: App im Hintergrund sichtbar
+   Original (Z.18538): rgba(42,39,39,0.55) + blur(4px) -> macht App unleserlich
+   Neu: weniger transparent + kein blur -> App-Hintergrund klar erkennbar
+   ═══════════════════════════════════════════════════════════════════ */
+
+.help-modal.global-view-overlay {
+  background: rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
