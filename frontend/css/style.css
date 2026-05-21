@@ -29969,3 +29969,602 @@ div.f div.cf#zaer_display,
   color: inherit !important;
   background: transparent !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V260-01 — Alle Objekte: 3 Ansichten (Karten / Liste / Kanban)
+   DealPilot Gold/Creme angepasst (Mockup-Inspiriert)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dp-v260-allobjects {
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+}
+
+/* KPI-Cards */
+.ao-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.ao-kpi {
+  background: #fff;
+  border: 1px solid rgba(201,168,76,0.22);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.ao-kpi-label {
+  color: var(--muted, #7A7370);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+.ao-kpi-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ch, #2A2727);
+  line-height: 1.1;
+}
+.ao-kpi-value.ao-kpi-gold { color: var(--gold, #C9A84C); }
+.ao-kpi-sub {
+  color: var(--muted, #7A7370);
+  font-size: 11.5px;
+  margin-top: 6px;
+}
+
+/* Controls (View-Switch + Filter) */
+.ao-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.ao-view-switch {
+  display: inline-flex;
+  background: #fff;
+  border: 1px solid rgba(201,168,76,0.22);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 2px;
+}
+.ao-view-btn {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: var(--muted, #7A7370);
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 7px;
+  transition: all .15s ease;
+}
+.ao-view-btn:hover { color: var(--ch, #2A2727); }
+.ao-view-btn.active {
+  background: var(--gold, #C9A84C);
+  color: #fff;
+  font-weight: 600;
+}
+
+.ao-filter-pills {
+  display: inline-flex;
+  gap: 6px;
+}
+.ao-filter-pill {
+  padding: 7px 14px;
+  background: #fff;
+  border: 1.5px solid rgba(201,168,76,0.25);
+  color: var(--ch, #2A2727);
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: all .15s ease;
+}
+.ao-filter-pill:hover { border-color: var(--gold, #C9A84C); }
+.ao-filter-pill.active {
+  background: rgba(201,168,76,0.12);
+  border-color: var(--gold, #C9A84C);
+  color: var(--gold, #C9A84C);
+  font-weight: 600;
+}
+
+/* Karten-Grid */
+.ao-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.ao-card {
+  background: #fff;
+  border: 1px solid rgba(201,168,76,0.22);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all .15s ease;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.ao-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  border-color: var(--gold, #C9A84C);
+}
+.ao-card-status-strip {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+}
+.ao-card.ao-status-open .ao-card-status-strip   { background: var(--gold, #C9A84C); }
+.ao-card.ao-status-won .ao-card-status-strip    { background: var(--green, #3FA56C); }
+.ao-card.ao-status-lost .ao-card-status-strip   { background: var(--red, #B8625C); }
+.ao-card-body {
+  padding: 14px 16px;
+  padding-top: 18px;
+}
+.ao-card-status-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.ao-card.ao-status-open .ao-card-status-badge {
+  background: rgba(201,168,76,0.12);
+  color: var(--gold, #C9A84C);
+}
+.ao-card.ao-status-won .ao-card-status-badge {
+  background: rgba(63,165,108,0.12);
+  color: var(--green, #3FA56C);
+}
+.ao-card.ao-status-lost .ao-card-status-badge {
+  background: rgba(184,98,92,0.12);
+  color: var(--red, #B8625C);
+}
+.ao-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ch, #2A2727);
+  margin-bottom: 3px;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+}
+.ao-card-addr {
+  font-size: 12px;
+  color: var(--muted, #7A7370);
+  margin-bottom: 10px;
+}
+.ao-card-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11.5px;
+  color: var(--muted, #7A7370);
+  margin-bottom: 8px;
+}
+.ao-card-price {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold, #C9A84C);
+}
+
+/* Liste */
+.ao-list {
+  background: #fff;
+  border: 1px solid rgba(201,168,76,0.22);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.ao-list-head {
+  display: grid;
+  grid-template-columns: 100px 1.5fr 2fr 80px 80px 110px 30px;
+  gap: 12px;
+  padding: 10px 16px;
+  background: rgba(201,168,76,0.06);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ch, #2A2727);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(201,168,76,0.18);
+}
+.ao-list-row {
+  display: grid;
+  grid-template-columns: 100px 1.5fr 2fr 80px 80px 110px 30px;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(201,168,76,0.10);
+  cursor: pointer;
+  align-items: center;
+  transition: background .12s ease;
+}
+.ao-list-row:hover { background: rgba(201,168,76,0.03); }
+.ao-list-row:last-child { border-bottom: none; }
+.ao-list-name { font-weight: 600; color: var(--ch, #2A2727); }
+.ao-list-addr { color: var(--muted, #7A7370); }
+.ao-list-price { text-align: right; font-weight: 600; color: var(--gold, #C9A84C); }
+.ao-list-arrow { color: var(--muted, #7A7370); text-align: right; }
+
+/* Status-Pill */
+.ao-status-pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ao-status-pill.ao-status-open  { background: rgba(201,168,76,0.12); color: var(--gold, #C9A84C); }
+.ao-status-pill.ao-status-won   { background: rgba(63,165,108,0.12); color: var(--green, #3FA56C); }
+.ao-status-pill.ao-status-lost  { background: rgba(184,98,92,0.12); color: var(--red, #B8625C); }
+
+/* Kanban */
+.ao-kanban {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.ao-kanban-col {
+  background: rgba(201,168,76,0.03);
+  border: 1px solid rgba(201,168,76,0.22);
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 400px;
+}
+.ao-kanban-col-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(201,168,76,0.20);
+}
+.ao-kanban-col-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+}
+.ao-kanban-col-open .ao-kanban-col-title  { color: var(--gold, #C9A84C); }
+.ao-kanban-col-won .ao-kanban-col-title   { color: var(--green, #3FA56C); }
+.ao-kanban-col-lost .ao-kanban-col-title  { color: var(--red, #B8625C); }
+.ao-kanban-count {
+  background: #fff;
+  color: var(--ch, #2A2727);
+  padding: 2px 9px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(201,168,76,0.20);
+}
+.ao-kanban-col-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ao-kanban-card {
+  background: #fff;
+  border: 1px solid rgba(201,168,76,0.18);
+  border-left: 3px solid;
+  border-radius: 7px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.ao-kanban-card:hover {
+  transform: translateX(2px);
+  border-color: var(--gold, #C9A84C);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.ao-kanban-card.ao-kanban-status-open  { border-left-color: var(--gold, #C9A84C); }
+.ao-kanban-card.ao-kanban-status-won   { border-left-color: var(--green, #3FA56C); }
+.ao-kanban-card.ao-kanban-status-lost  { border-left-color: var(--red, #B8625C); }
+.ao-kanban-card-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ch, #2A2727);
+  margin-bottom: 3px;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+}
+.ao-kanban-card-addr {
+  font-size: 11px;
+  color: var(--muted, #7A7370);
+  margin-bottom: 8px;
+}
+.ao-kanban-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ao-kanban-card-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold, #C9A84C);
+}
+.ao-kanban-card-meta {
+  font-size: 10.5px;
+  color: var(--muted, #7A7370);
+}
+.ao-kanban-empty {
+  font-size: 12px;
+  color: var(--muted, #7A7370);
+  font-style: italic;
+  padding: 16px;
+  text-align: center;
+}
+
+.ao-empty {
+  padding: 40px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted, #7A7370);
+  background: #fff;
+  border: 1px dashed rgba(201,168,76,0.30);
+  border-radius: 10px;
+}
+.ao-loading {
+  padding: 40px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted, #7A7370);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .ao-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .ao-kanban { grid-template-columns: 1fr; }
+  .ao-list-head, .ao-list-row { grid-template-columns: 80px 1fr 80px; }
+  .ao-list-head > *:nth-child(3), .ao-list-row > *:nth-child(3),
+  .ao-list-head > *:nth-child(4), .ao-list-row > *:nth-child(4),
+  .ao-list-head > *:nth-child(5), .ao-list-row > *:nth-child(5),
+  .ao-list-head > *:nth-child(7), .ao-list-row > *:nth-child(7) { display: none; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V260-03 + V260-06 — Hintergrund Weiss global + Settings-Style
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Weiss-Modus: alles weiss inkl. Untermenues/Modals/Containers */
+html[data-bg="white"] .modal-overlay,
+html[data-bg="white"] .modal-content,
+html[data-bg="white"] .settings-modal,
+html[data-bg="white"] #settings-modal,
+html[data-bg="white"] .iexp-modal,
+html[data-bg="white"] .help-modal,
+html[data-bg="white"] #all-objects-main,
+html[data-bg="white"] .dp-v260-allobjects,
+html[data-bg="white"] #portfolio-strategy-main,
+html[data-bg="white"] #qc-main,
+html[data-bg="white"] #s-quick,
+html[data-bg="white"] .qc-result-card,
+html[data-bg="white"] .qc-card,
+html[data-bg="white"] .submenu,
+html[data-bg="white"] .sidebar-submenu,
+html[data-bg="white"] .sb-actions-accordion,
+html[data-bg="white"] .sb-actions-accordion-inner {
+  background: #ffffff !important;
+}
+
+/* Creme-Modus: alle obigen Container creme */
+html[data-bg="cream"] #all-objects-main,
+html[data-bg="cream"] .dp-v260-allobjects,
+html[data-bg="cream"] #portfolio-strategy-main,
+html[data-bg="cream"] #qc-main,
+html[data-bg="cream"] #s-quick {
+  background: var(--surface, #F8F6F1) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   V260-06 — Settings-Modal-Style native (wie Haupt-Tabs)
+   ═══════════════════════════════════════════════════════════════════ */
+
+#settings-modal,
+.settings-modal,
+.set-modal {
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+}
+
+/* Settings-Tab-Bar nativer Style */
+.set-tabs,
+.settings-tabs {
+  display: flex !important;
+  gap: 0 !important;
+  border-bottom: 1px solid rgba(201,168,76,0.20) !important;
+  margin-bottom: 18px !important;
+  flex-wrap: wrap !important;
+}
+.set-tab,
+.settings-tab {
+  padding: 12px 18px !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  color: var(--muted, #7A7370) !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all .15s ease !important;
+  letter-spacing: 0.005em !important;
+}
+.set-tab:hover,
+.settings-tab:hover {
+  color: var(--ch, #2A2727) !important;
+}
+.set-tab.active,
+.settings-tab.active {
+  color: var(--gold, #C9A84C) !important;
+  border-bottom-color: var(--gold, #C9A84C) !important;
+  font-weight: 600 !important;
+}
+
+/* Settings-Pane Inhalt: gleiche Typographie wie Haupt-Tabs */
+.set-pane,
+.settings-pane {
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  color: var(--ch, #2A2727) !important;
+}
+
+.set-pane h3,
+.settings-pane h3 {
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--ch, #2A2727) !important;
+  margin: 0 0 10px 0 !important;
+}
+
+.set-pane label,
+.settings-pane label {
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  color: var(--muted, #7A7370) !important;
+}
+
+.set-pane input[type="text"],
+.set-pane input[type="email"],
+.set-pane input[type="date"],
+.set-pane input[type="number"],
+.set-pane select,
+.settings-pane input[type="text"],
+.settings-pane input[type="email"],
+.settings-pane input[type="date"],
+.settings-pane input[type="number"],
+.settings-pane select {
+  height: 38px !important;
+  padding: 0 11px !important;
+  border: 1.5px solid rgba(201,168,76,0.25) !important;
+  border-radius: 8px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  background: #fff !important;
+  color: var(--ch, #2A2727) !important;
+}
+
+.set-pane input:focus,
+.set-pane select:focus,
+.settings-pane input:focus,
+.settings-pane select:focus {
+  outline: none !important;
+  border-color: var(--gold, #C9A84C) !important;
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.10) !important;
+}
+
+/* Settings-Buttons im selben Stil wie Tab-Buttons */
+.set-pane button:not(.dp-tip):not(.modal-close):not(.dp-bg-option):not(.set-tab):not(.settings-tab),
+.settings-pane button:not(.dp-tip):not(.modal-close):not(.dp-bg-option):not(.set-tab):not(.settings-tab) {
+  padding: 10px 16px !important;
+  background: #ffffff !important;
+  color: var(--ch, #2A2727) !important;
+  border: 1.5px solid rgba(201,168,76,0.30) !important;
+  border-radius: 8px !important;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all .15s ease !important;
+}
+.set-pane button:hover,
+.settings-pane button:hover {
+  border-color: var(--gold, #C9A84C) !important;
+  background: rgba(201,168,76,0.04) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V260-04 — Tour-Start: Investor-Score zwangs-aus + Sidebar-Integration
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Wenn Tour aktiv: Investor-Score-Header verstecken */
+body.dp-tour-active header.hdr.has-v64-score::before,
+body.dp-tour-active header.hdr.has-v64-score::after {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+body.dp-tour-active header.hdr.has-v64-score #hdr-completeness,
+body.dp-tour-active header.hdr.has-v64-score .hdr-incomplete-banner {
+  display: none !important;
+}
+body.dp-tour-active header.hdr {
+  background: var(--surface, #F8F6F1) !important;
+}
+
+/* Sidebar-Aktionen-Akkordeon: kompakter, keine unnoetige Scrollbar */
+.sb-actions-accordion-inner {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  padding-bottom: 8px;
+}
+.sb-actions-accordion-inner::-webkit-scrollbar {
+  width: 4px;
+}
+.sb-actions-accordion-inner::-webkit-scrollbar-thumb {
+  background: rgba(201,168,76,0.20);
+  border-radius: 4px;
+}
+
+/* Tour-Eintrag im Sidebar-Akkordeon stylen */
+.sb-tour-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ch, #2A2727);
+  border-radius: 7px;
+  margin: 2px 6px;
+  transition: all .12s ease;
+}
+.sb-tour-item:hover {
+  background: rgba(201,168,76,0.06);
+}
+.sb-tour-item-icon {
+  font-size: 14px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   V260-05 — Fallback-Warning fuer fehlenden wirtschaftlichen Uebergang
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dp-wu-warning {
+  background: rgba(252, 191, 73, 0.12);
+  border: 1.5px solid rgba(252, 191, 73, 0.40);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ch, #2A2727);
+}
+.dp-wu-warning-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.dp-wu-warning a {
+  color: var(--gold, #C9A84C);
+  font-weight: 600;
+  text-decoration: underline;
+  margin-left: 4px;
+}
