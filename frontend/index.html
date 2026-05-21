@@ -1419,7 +1419,7 @@ label.dp-required.qc-required::after {
   <div style="flex:1;font-size:12.5px;line-height:1.5">
     <strong style="font-weight:600">Dein zvE wird zentral im Profil gespeichert.</strong>
     Änderungen hier werden in dein Profil übernommen. Für historische Jahre (z.B. vor einer Lohnerhöhung) kannst du im Profil eigene Einträge hinterlegen. <!-- V258-01 -->
-    <a href="#" onclick="if(window.showSettings)showSettings('profilanzeige');return false" style="color:var(--gold,#C9A84C);font-weight:600;text-decoration:underline;margin-left:4px">Profil bearbeiten →</a>
+    <a href="#" onclick="if(window.DealPilotTaxPeriods)DealPilotTaxPeriods.openModal();return false" style="color:var(--gold,#C9A84C);font-weight:600;text-decoration:underline;margin-left:4px">📅 Steuerzeiträume verwalten →</a> <!-- V259-06 -->
   </div>
 </div>
 <div class="f"><label>zvE vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="if(window.DealPilotZvE)DealPilotZvE.onObjectInput(this.value);calc()"></div></div>
@@ -2756,6 +2756,8 @@ label.dp-required.qc-required::after {
 <script src="js/afa-engine.js?v=227"></script>
   <script src="js/afa-ui.js?v=2271"></script>
   <script src="js/zve-manager.js?v=1"></script>
+  <script src="js/tax-periods.js?v=1"></script>
+  <script src="js/tax-periods-sync.js?v=1"></script>
   <script src="js/wk-aggregator.js?v=1"></script>
   <script src="js/wk-dashboard.js?v=1"></script>
   <script src="js/calc.js?v=231"></script>

@@ -232,4 +232,82 @@
   } else {
     setTimeout(syncFromProfile, 200);
   }
+
+  // V259-12: Migration bestehender zve_history aus InvestmentProfile in tax_periods
+  async function migrateToTaxPeriods() {
+    try {
+      if (!window.DealPilotTaxPeriods) return false;
+      const p = getProfile();
+      const history = Array.isArray(p.zve_history) ? p.zve_history : [];
+      const current = p.zve_current;
+      const flag = p._zve_migrated_to_tax_periods;
+      if (flag) return false; // bereits migriert
+      
+      // Existieren schon tax_periods?
+      const existing = await DealPilotTaxPeriods.loadAll(true);
+      if (existing.length > 0) {
+        // Markiere als migriert, ohne Daten zu duplizieren
+        p._zve_migrated_to_tax_periods = true;
+        saveProfile(p);
+        return false;
+      }
+      
+      // Migration: jeden History-Eintrag in tax_periods kopieren
+      const sorted = history.slice().sort((a,b) => (a.valid_from||'').localeCompare(b.valid_from||''));
+      for (let i = 0; i < sorted.length; i++) {
+        const entry = sorted[i];
+        const nextFrom = sorted[i+1] ? sorted[i+1].valid_from : null;
+        let validTo = null;
+        if (nextFrom) {
+          // valid_to = day before next valid_from
+          const d = new Date(nextFrom);
+          d.setDate(d.getDate() - 1);
+          validTo = d.toISOString().split('T')[0];
+        }
+        try {
+          await DealPilotTaxPeriods.create({
+            valid_from: entry.valid_from,
+            valid_to: validTo,
+            zve: entry.amount,
+            reason: 'Migriert aus History',
+            note: ''
+          });
+        } catch(e) {
+          console.warn('[V259-12] Migration-Eintrag fehlgeschlagen:', e.message);
+        }
+      }
+      
+      // Wenn keine History aber aktueller Wert → einen Eintrag heute
+      if (sorted.length === 0 && typeof current === 'number' && current > 0) {
+        const today = todayISO();
+        try {
+          await DealPilotTaxPeriods.create({
+            valid_from: today,
+            valid_to: null,
+            zve: current,
+            reason: 'Migriert aus Profil',
+            note: 'Initialer Eintrag aus DealPilotZvE-Profil'
+          });
+        } catch(e) {
+          console.warn('[V259-12] Initial-Eintrag fehlgeschlagen:', e.message);
+        }
+      }
+      
+      p._zve_migrated_to_tax_periods = true;
+      saveProfile(p);
+      console.log('[V259-12] Migration zu tax_periods abgeschlossen');
+      return true;
+    } catch(e) {
+      console.warn('[V259-12] Migration:', e.message);
+      return false;
+    }
+  }
+
+  window.DealPilotZvE.migrateToTaxPeriods = migrateToTaxPeriods;
+  
+  // Auto-Migration 2 Sekunden nach Init
+  setTimeout(() => {
+    if (window.DealPilotTaxPeriods) migrateToTaxPeriods();
+  }, 2000);
+
 })();

@@ -912,8 +912,18 @@ function _swSet(btn) {
         sel.value = current;
       } catch (e) {}
     }
-    // V257-08: zvE-Editor einfuegen
+    // V257-08 → V259-11: zvE-Editor durch Hinweis ersetzt
     try {
+      if (window.DealPilotZvE) {
+        // Override renderHistoryEditor mit Hinweis-Stub
+        window.DealPilotZvE.renderHistoryEditor = function() {
+          return '<div style="margin-top:22px;padding:14px 16px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.22);border-radius:10px;font-family:var(--font-main,\'IBM Plex Sans\',sans-serif)">' +
+            '<div style="font-weight:600;font-size:14px;color:var(--ch,#2A2727);margin-bottom:4px">Zu versteuerndes Einkommen (zvE)</div>' +
+            '<div style="font-size:12.5px;color:var(--muted,#7A7370);margin-bottom:8px">Die zvE-Verwaltung ist jetzt verlaufsbasiert mit Steuerzeitraeumen. Du findest sie im Steuer-Tab.</div>' +
+            '<button type="button" onclick="if(window.DealPilotTaxPeriods)DealPilotTaxPeriods.openModal()" style="padding:10px 16px;background:#fff;color:var(--ch,#2A2727);border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer">Steuerzeitraeume verwalten →</button>' +
+            '</div>';
+        };
+      }
       if (window.DealPilotZvE) {
         var ipHost2 = document.getElementById('ip-pane-host');
         var zveHost = document.getElementById('dp-zve-editor-host');
