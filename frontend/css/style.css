@@ -30670,3 +30670,92 @@ html[data-bg="cream"] .help-ai-foot {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   BlockA3 — Tour-Banner OBEN im Einstieg-Topic
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dp-tour-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px;
+  margin: 18px 0 24px 0;
+  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(201,168,76,0.04));
+  border: 1.5px solid rgba(201,168,76,0.35);
+  border-radius: 14px;
+  font-family: var(--font-main, 'IBM Plex Sans', sans-serif);
+  box-shadow: 0 2px 12px rgba(201,168,76,0.08);
+}
+
+.dp-tour-banner-icon {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gold, #C9A84C);
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(201,168,76,0.25);
+}
+
+.dp-tour-banner-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dp-tour-banner-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ch, #2A2727);
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
+}
+
+.dp-tour-banner-desc {
+  font-size: 13px;
+  color: var(--muted, #5F5854);
+  line-height: 1.5;
+}
+
+.dp-tour-banner-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  background: var(--gold, #C9A84C);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(201,168,76,0.25);
+}
+
+.dp-tour-banner-btn:hover {
+  background: var(--gold-2, #D4B055);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201,168,76,0.35);
+}
+
+.dp-tour-banner-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsive */
+@media (max-width: 720px) {
+  .dp-tour-banner {
+    flex-wrap: wrap;
+  }
+  .dp-tour-banner-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

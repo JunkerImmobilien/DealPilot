@@ -1,3 +1,4 @@
+/* BlockA3: Tour-Banner */
 /* BlockA2: Korrekturen */
 /* BlockA: Hilfe-Modal Fixes */
 /**
@@ -25,10 +26,6 @@
         {
           h: 'Was ist DealPilot?',
           body: 'DealPilot ist eine professionelle Investmentanalyse-App für Immobilien. Du gibst Kaufpreis, Miete, Finanzierung und Annahmen ein — DealPilot rechnet vollständige Cashflows über 10–30 Jahre, vergleicht 3 Phasen (Heute / Ende Zinsbindung / Anschluss), bewertet das Investment per DealScore (0–100) und erstellt Bank-taugliche PDF-Reports.'
-        },
-        {
-          h: 'Interaktive App-Tour',
-          body: '<div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:8px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold,#C9A84C)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg><div>Lass dich Schritt-für-Schritt durch DealPilot führen — alle wichtigen Tabs, Felder und Funktionen werden direkt in der App erklärt.</div></div><br><button type="button" onclick="window.helpStartTour && window.helpStartTour()" style="padding:10px 20px;background:var(--gold,#C9A84C);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>Tour jetzt starten</button>'
         },
         {
           h: 'Schnellstart in 4 Schritten',
@@ -511,6 +508,28 @@
       '</div>' +
       '<p class="help-topic-desc">' + _escHtml(topic.desc) + '</p>' +
     '</div>';
+    // BlockA3: Tour-Banner OBEN im Einstieg-Topic — direkter innerHTML, kein Filter
+    if (topic.id === 'einstieg') {
+      html +=
+        '<div class="dp-tour-banner">' +
+          '<div class="dp-tour-banner-icon">' +
+            '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+              '<circle cx="12" cy="12" r="10"/>' +
+              '<polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>' +
+            '</svg>' +
+          '</div>' +
+          '<div class="dp-tour-banner-text">' +
+            '<div class="dp-tour-banner-title">Interaktive App-Tour</div>' +
+            '<div class="dp-tour-banner-desc">Lass dich Schritt-für-Schritt durch DealPilot führen — alle wichtigen Tabs, Felder und Funktionen werden direkt in der App erklärt.</div>' +
+          '</div>' +
+          '<button type="button" class="dp-tour-banner-btn" onclick="window.helpStartTour && window.helpStartTour()">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+              '<polygon points="5 3 19 12 5 21 5 3"/>' +
+            '</svg>' +
+            '<span>Tour starten</span>' +
+          '</button>' +
+        '</div>';
+    }
     topic.sections.forEach(function(s) {
       html += '<div class="help-section">' +
         '<h3>' + _escHtml(s.h) + '</h3>' +
