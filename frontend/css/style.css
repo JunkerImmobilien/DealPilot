@@ -30759,3 +30759,27 @@ html[data-bg="cream"] .help-ai-foot {
     justify-content: center;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   BlockB2.02 — Steuerverlauf-Streifen Klick + Selection
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tax-tl-bar {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.tax-tl-bar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+.tax-tl-bar.tl-selected {
+  outline: 2px solid var(--gold, #C9A84C) !important;
+  outline-offset: 2px;
+  box-shadow: 0 6px 18px rgba(201,168,76,0.25) !important;
+}
+
+.dp-year-preview-hint button:hover {
+  background: var(--gold, #C9A84C) !important;
+  color: #fff !important;
+}

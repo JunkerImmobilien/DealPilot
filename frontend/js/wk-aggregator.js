@@ -124,3 +124,30 @@
     setTimeout(loadAll, 500);
   }
 })();
+
+
+/* BlockB4: kaufdat-Filter fuer getWKForOtherObjects */
+(function() {
+  if (!window.DealPilotWKAggregator) return;
+  var orig = window.DealPilotWKAggregator.getWKForOtherObjects;
+  window.DealPilotWKAggregator.getWKForOtherObjects = function(currentObjectId, year) {
+    var cache = window.DealPilotWKAggregator._cache;
+    // Fallback: wenn _cache nicht zugaenglich, original-Funktion aufrufen
+    if (!cache || !Array.isArray(cache.objects)) {
+      return orig.call(this, currentObjectId, year);
+    }
+    var yearEnd = String(year) + '-12-31';
+    var sum = 0;
+    cache.objects.forEach(function(obj) {
+      if (obj.id === currentObjectId) return;
+      // BlockB4: kaufdat-Filter — nur Objekte die vor/im Zieljahr gekauft wurden
+      var kaufdat = obj.kaufdat || (obj.snapshot && obj.snapshot.kaufdat);
+      if (!kaufdat) return; // ohne kaufdat: skip (sicherer Default)
+      if (kaufdat > yearEnd) return; // spaeter gekauft -> ignorieren
+      var wk = obj.wk_per_year && obj.wk_per_year[String(year)];
+      if (typeof wk === 'number') sum += wk;
+    });
+    return sum;
+  };
+  console.log('[BlockB4] WKAggregator.getWKForOtherObjects mit kaufdat-Filter');
+})();

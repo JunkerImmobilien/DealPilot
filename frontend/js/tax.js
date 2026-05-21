@@ -1,3 +1,5 @@
+/* BlockB4: Reload + V+V-Andere */
+/* BlockB2.02: Streifen pro Jahr + Klick-Sync */
 'use strict';
 /* ═══════════════════════════════════════════════════
    JUNKER IMMOBILIEN – tax.js V12
@@ -203,26 +205,98 @@ function renderTaxModule() {
     return;
   }
 
-  var startYear = new Date().getFullYear();
-  var totals = _computeYearTotal(startYear, 0);
+  // BlockB2: Async Load tax_periods mit Cache + Trigger Re-Render
+  if (window.DealPilotTaxPeriods && !window._dpTaxPeriodsCache && !window._dpTaxPeriodsLoading) {
+    window._dpTaxPeriodsLoading = true;
+    DealPilotTaxPeriods.loadAll().then(function(periods) {
+      window._dpTaxPeriodsCache = periods || [];
+      window._dpTaxPeriodsLoading = false;
+      // Re-render mit Cache
+      if (typeof renderTaxModule === 'function') setTimeout(renderTaxModule, 0);
+    }).catch(function(e) {
+      window._dpTaxPeriodsCache = [];
+      window._dpTaxPeriodsLoading = false;
+      console.warn('[BlockB2] tax_periods load:', e);
+    });
+  }
+  // WK-Aggregator auch async laden (falls noch nicht geladen)
+  if (window.DealPilotWKAggregator && !window._dpWkAggLoaded && typeof DealPilotWKAggregator.loadAll === 'function') {
+    window._dpWkAggLoaded = true;
+    try { DealPilotWKAggregator.loadAll(); } catch(e) {}
+  }
 
-  var baseIncome = parseDe((document.getElementById('zve') || {}).value) || 65891;
-  var impact = Tax.calcImmoTaxImpact(baseIncome, totals.ergebnis);
+  // BlockB2.02: selectedYear aus Klick auf Streifen oder aktuelles Jahr
+  var thisYear = new Date().getFullYear();
+  var selectedYear = window._dpSelectedTaxYear || thisYear;
+  var isPreviewMode = (selectedYear !== thisYear);
+  var startYear = selectedYear;
+  
+  // yearIdx fuer _computeYearTotal: cfRows-Index
+  var yearIdx = selectedYear - thisYear;
+  if (yearIdx < 0) yearIdx = 0;
+  if (State.cfRows && yearIdx >= State.cfRows.length) yearIdx = State.cfRows.length - 1;
+  
+  var totals = _computeYearTotal(startYear, yearIdx);
+
+  // BlockB2: baseIncome aus tax_periods (mit Fallback auf #zve-Feld)
+  var baseIncome;
+  var taxPeriods = window._dpTaxPeriodsCache || [];
+  if (window.DealPilotSteuer && taxPeriods.length > 0) {
+    var zveFromPeriods = DealPilotSteuer.zveForYear(startYear, taxPeriods);
+    baseIncome = zveFromPeriods > 0 ? zveFromPeriods : (parseDe((document.getElementById('zve') || {}).value) || 65891);
+  } else {
+    baseIncome = parseDe((document.getElementById('zve') || {}).value) || 65891;
+  }
+  
+  // BlockB2: WK aus anderen gewonnenen Objekten fuer dieses Jahr
+  var wkOthers = 0;
+  if (window.DealPilotWKAggregator && typeof DealPilotWKAggregator.getWKForOtherObjects === 'function') {
+    var objId = (window._currentObjData && (window._currentObjData.id || window._currentObjData._id)) || null;
+    try { wkOthers = DealPilotWKAggregator.getWKForOtherObjects(objId, startYear) || 0; } catch(e) {}
+  }
+  
+  // BlockB2: Combined Delta = eigenes V+V + andere Objekte
+  var combinedDelta = totals.ergebnis + wkOthers;
+  var impact = Tax.calcImmoTaxImpact(baseIncome, combinedDelta);
 
   var refundColor = impact.refund > 0 ? 'var(--green)' : 'var(--red)';
   var refundLabel = impact.refund > 0 ? 'Steuer-Erstattung' : 'Steuer-Nachzahlung';
   var refundAbs = Math.abs(impact.refund);
   var isProfit = totals.ergebnis > 0;
+  
+  // BlockB4: V+V-Andere-Zeile IMMER sichtbar mit kaufdat-Filter
+  var wkOtherColor = wkOthers < 0 ? 'var(--green)' : (wkOthers > 0 ? 'var(--red)' : 'var(--muted)');
+  var wkOtherSign = wkOthers > 0 ? '+' : (wkOthers < 0 ? '' : '+'); // bei 0: +0 €
+  var wkOtherRow =
+    '<div class="tax-item" style="background:rgba(201,168,76,0.06);border-left:3px solid var(--gold,#C9A84C)">' +
+      '<div class="tax-label">Überschuss / Verlust V+V aus anderen Objekten <span style="font-size:10px;color:var(--muted)">(kaufdat ≤ ' + selectedYear + ', nur gewonnene)</span></div>' +
+      '<div class="tax-val" style="color:' + wkOtherColor + ';font-weight:600">' + wkOtherSign + fE(Math.abs(wkOthers), 0) + '</div>' +
+    '</div>';
+  
+  // BlockB2: Label "zvE mit Immobilie" — Hinweis wenn andere Objekte einfliessen
+  var zveMitLabel = Math.abs(wkOthers) > 0.5
+    ? 'zvE mit Immobilie (inkl. andere Objekte)'
+    : 'zvE mit Immobilie';
+
+  // BlockB2.02: Vorschau-Header wenn isPreviewMode
+  var previewHint = '';
+  if (isPreviewMode) {
+    previewHint = 
+      '<div class="dp-year-preview-hint" style="margin:0 0 14px 0;padding:11px 16px;background:rgba(201,168,76,0.10);border-left:3px solid var(--gold,#C9A84C);border-radius:6px;font-size:13px;color:var(--ch,#2A2727);display:flex;align-items:center;justify-content:space-between;gap:10px">' +
+        '<span><strong>Vorschau Jahr ' + selectedYear + '</strong> · zvE aus Steuerzeitraum, WK andere Objekte aggregiert</span>' +
+        '<button type="button" onclick="window._dpSelectedTaxYear=null;renderTaxModule();renderTaxTimeline()" style="padding:6px 12px;background:transparent;color:var(--gold,#C9A84C);border:1.5px solid var(--gold,#C9A84C);border-radius:6px;font-size:12.5px;cursor:pointer;font-weight:600;white-space:nowrap">↶ Aktuelles Jahr</button>' +
+      '</div>';
+  }
 
   box.innerHTML =
+    previewHint +
     '<div class="tax-grid">' +
       '<div class="tax-item"><div class="tax-label">Einnahmen V+V (Kaltmiete + zus. Einnahmen + umlf. NK)</div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
-      '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt <span class="tax-info" title="Schuldzinsen + Bewirtschaftung + AfA + alle übrigen abziehbaren Kosten. Umlagefähige NK sind Werbungskosten UND Einnahme — sie heben sich auf (durchlaufender Posten) und beeinflussen den Steuer-Effekt nicht.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
-      // V63.58 BUGFIX: fE() schluckt das Minuszeichen ohne sgn=true → mit sgn=true
-      // wird Vorzeichen korrekt mit angezeigt; bei Verlust steht jetzt richtigerweise "-1.701 €"
+      '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt <span class="tax-info" title="Schuldzinsen + Bewirtschaftung + AfA + alle übrigen abziehbaren Kosten.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
       '<div class="tax-item tax-highlight"><div class="tax-label">Überschuss / Verlust V+V</div><div class="tax-val" style="color:' + (isProfit ? 'var(--gold-d)' : 'var(--green)') + '">' + fE(totals.ergebnis, 0, true) + '</div></div>' +
+      wkOtherRow +
       '<div class="tax-item"><div class="tax-label">zvE ohne Immobilie</div><div class="tax-val">' + fE(baseIncome, 0) + '</div></div>' +
-      '<div class="tax-item"><div class="tax-label">zvE mit Immobilie</div><div class="tax-val">' + fE(baseIncome + totals.ergebnis, 0) + '</div></div>' +
+      '<div class="tax-item"><div class="tax-label">' + zveMitLabel + '</div><div class="tax-val">' + fE(baseIncome + combinedDelta, 0) + '</div></div>' +
       '<div class="tax-item"><div class="tax-label">EStG ohne Immo</div><div class="tax-val">' + fE(impact.taxBefore, 0) + '</div></div>' +
       '<div class="tax-item"><div class="tax-label">EStG mit Immo</div><div class="tax-val">' + fE(impact.taxAfter, 0) + '</div></div>' +
       '<div class="tax-item tax-result"><div class="tax-label">' + refundLabel + ' (jährlich)</div><div class="tax-val" style="color:' + refundColor + ';font-size:20px">' + (impact.refund >= 0 ? '+' : '') + fE(refundAbs, 0) + '</div></div>' +
@@ -233,11 +307,12 @@ function renderTaxModule() {
   // Cache for PDF export
   State.taxResult = {
     immoResult: totals.ergebnis, isProfit: isProfit,
-    baseIncome: baseIncome, newZvE: baseIncome + totals.ergebnis,
+    baseIncome: baseIncome, newZvE: baseIncome + combinedDelta,
     taxBefore: impact.taxBefore, taxAfter: impact.taxAfter,
     taxDelta: impact.taxDelta, refund: impact.refund,
     grenzsteuersatzAfter: impact.grenzsteuersatzAfter,
-    avgAfter: impact.avgAfter
+    avgAfter: impact.avgAfter,
+    wkOthers: wkOthers
   };
 
   // EStG view in Persönliche Steuer card
@@ -265,26 +340,73 @@ function renderTaxTimeline() {
 
   var years = State.cfRows.slice(0, 15);  // first 15 years
 
+  // BlockB2.02: Pro Jahr richtigen zvE aus tax_periods + WK aller alteren Objekte
+  var _taxPeriods = window._dpTaxPeriodsCache || [];
+  var _currentObjId = (window._currentObjData && (window._currentObjData.id || window._currentObjData._id)) || null;
+  var _currentKaufdat = (window._currentObjData && window._currentObjData.kaufdat) || null;
+  
   var timeline = years.map(function(r, i) {
     var totals = _computeYearTotal(r.cal, i);
-    return {
-      year: r.cal,
+    var year = r.cal;
+    
+    // Default-Werte aus _computeYearTotal
+    var result = {
+      year: year,
       einnahmen: totals.einnahmen,
       werbungskosten: totals.werbungskosten,
       immoResult: totals.ergebnis,
       taxDelta: totals.taxDelta,
-      refund: totals.refund
+      refund: totals.refund,
+      zve_year: 0,
+      wk_others: 0,
+      steuer_ohne: 0,
+      steuer_mit: 0,
+      zve_mit: 0
     };
+    
+    // Wenn DealPilotSteuer + Tax verfuegbar: neu berechnen mit Jahres-zvE + WK aelterer Objekte
+    if (window.DealPilotSteuer && typeof Tax !== 'undefined' && _taxPeriods.length > 0) {
+      var zveYear = DealPilotSteuer.zveForYear(year, _taxPeriods);
+      
+      // WK aller anderen Won-Objekte die VOR oder GLEICH diesem Jahr gekauft wurden
+      var wkOthers = 0;
+      if (window.DealPilotWKAggregator && typeof DealPilotWKAggregator.getWKForOtherObjects === 'function') {
+        try { wkOthers = DealPilotWKAggregator.getWKForOtherObjects(_currentObjId, year) || 0; } catch(e) {}
+      }
+      
+      if (zveYear > 0) {
+        var combinedDelta = totals.ergebnis + wkOthers;
+        var impact = Tax.calcImmoTaxImpact(zveYear, combinedDelta);
+        result.zve_year = zveYear;
+        result.wk_others = wkOthers;
+        result.steuer_ohne = impact.taxBefore;
+        result.steuer_mit = impact.taxAfter;
+        result.zve_mit = zveYear + combinedDelta;
+        result.refund = impact.refund;
+        result.taxDelta = impact.taxDelta;
+      }
+    }
+    
+    return result;
   });
 
-  // Render as visual timeline
+  // Render as visual timeline (BlockB2.02: klickbar + Tooltip + data-tl-idx)
   var html = '<div class="tax-tl-grid">';
-  timeline.forEach(function(t) {
+  timeline.forEach(function(t, ti) {
     var positive = t.refund > 0;
     var color = positive ? 'var(--green)' : 'var(--red)';
     var bgcolor = positive ? 'rgba(42,154,90,0.1)' : 'rgba(201,76,76,0.1)';
     var sign = positive ? '+' : '';
-    html += '<div class="tax-tl-bar" style="background:' + bgcolor + ';border-left-color:' + color + '">' +
+    
+    var tooltipLines = ['Jahr ' + t.year];
+    if (t.zve_year) tooltipLines.push('zvE (aus Steuerzeitraum): ' + Math.round(t.zve_year).toLocaleString('de-DE') + ' €');
+    if (typeof t.wk_others === 'number' && Math.abs(t.wk_others) > 0.5) {
+      tooltipLines.push('WK andere Objekte: ' + (t.wk_others < 0 ? '-' : '+') + Math.abs(Math.round(t.wk_others)).toLocaleString('de-DE') + ' €');
+    }
+    tooltipLines.push('Klick: Card oben mit ' + t.year + '-Werten laden');
+    var tooltip = tooltipLines.join('\n').replace(/"/g, '&quot;');
+    
+    html += '<div class="tax-tl-bar" data-tl-idx="' + ti + '" data-year="' + t.year + '" title="' + tooltip + '" onclick="window.dpSelectTaxYear && dpSelectTaxYear(' + ti + ')" style="background:' + bgcolor + ';border-left-color:' + color + ';cursor:pointer;transition:transform 0.1s">' +
       '<div class="tax-tl-year">' + t.year + '</div>' +
       '<div class="tax-tl-amount" style="color:' + color + '">' +
         sign + Math.round(Math.abs(t.refund)).toLocaleString('de-DE') + ' €' +
@@ -1103,3 +1225,83 @@ function updateTaxBemerkung(input) {
   if (!window._taxYearlyBemerkungen[key]) window._taxYearlyBemerkungen[key] = {};
   window._taxYearlyBemerkungen[key][field] = input.value;
 }
+
+
+// ═══════════════════════════════════════════════════════════════════
+// BlockB3: dpSelectTaxYear + Reset + Crash-Safety
+// ═══════════════════════════════════════════════════════════════════
+
+// A) Klick-Handler auf Jahres-Card im Steuerverlauf
+window.dpSelectTaxYear = function(idx) {
+  try {
+    var timeline = State && State.taxTimeline;
+    if (!timeline || !timeline[idx]) {
+      console.warn('[BlockB3] dpSelectTaxYear: timeline[' + idx + '] missing');
+      return;
+    }
+    var t = timeline[idx];
+    
+    // Markiere geklickte Card visuell
+    document.querySelectorAll('.tax-tl-bar.tl-selected').forEach(function(el) {
+      el.classList.remove('tl-selected');
+    });
+    var sel = document.querySelector('.tax-tl-bar[data-tl-idx="' + idx + '"]');
+    if (sel) sel.classList.add('tl-selected');
+    
+    // Setze Selected-Year und rendere Card oben neu
+    window._dpSelectedTaxYear = t.year;
+    if (typeof renderTaxModule === 'function') {
+      renderTaxModule();
+    }
+    
+    // Sanft hochscrollen zur Card
+    var box = document.getElementById('tax-result-box');
+    if (box) {
+      try { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+    }
+    
+    console.log('[BlockB3] dpSelectTaxYear: Jahr ' + t.year + ' selektiert (zvE=' + (t.zve_year||'-') + ')');
+  } catch(e) {
+    console.warn('[BlockB3] dpSelectTaxYear Fehler:', e);
+  }
+};
+
+// B) Reset bei Objekt-Wechsel (window.loadObject Wrapper)
+(function() {
+  function wrapLoadObject() {
+    if (typeof window.loadObject === 'function' && !window.loadObject._dpYearWrapped) {
+      var orig = window.loadObject;
+      window.loadObject = function() {
+        window._dpSelectedTaxYear = null;
+        return orig.apply(this, arguments);
+      };
+      window.loadObject._dpYearWrapped = true;
+    }
+  }
+  wrapLoadObject();
+  setTimeout(wrapLoadObject, 1000);
+  setTimeout(wrapLoadObject, 3000);
+})();
+
+// C) Crash-Safety: renderTaxTimeline + renderTaxModule wrappen
+(function() {
+  if (typeof renderTaxTimeline === 'function' && !renderTaxTimeline._dpSafeWrapped) {
+    var origTL = renderTaxTimeline;
+    renderTaxTimeline = function() {
+      try { return origTL.apply(this, arguments); }
+      catch(e) { console.warn('[BlockB3] renderTaxTimeline crash:', e); }
+    };
+    renderTaxTimeline._dpSafeWrapped = true;
+  }
+  if (typeof renderTaxModule === 'function' && !renderTaxModule._dpSafeWrapped) {
+    var origTM = renderTaxModule;
+    renderTaxModule = function() {
+      try { return origTM.apply(this, arguments); }
+      catch(e) { console.warn('[BlockB3] renderTaxModule crash:', e); }
+    };
+    renderTaxModule._dpSafeWrapped = true;
+  }
+})();
+
+// D) Verifikations-Log
+console.log('[BlockB3] tax.js loaded — dpSelectTaxYear=' + typeof window.dpSelectTaxYear);

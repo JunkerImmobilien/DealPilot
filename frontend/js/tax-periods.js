@@ -352,3 +352,96 @@
     setTimeout(() => loadAll(), 600);
   }
 })();
+
+
+/* BlockB4: Reload-Trigger nach Tax-Periode CRUD */
+(function() {
+  function reloadAll() {
+    try {
+      // Cache invalidieren
+      window._dpTaxPeriodsCache = null;
+      window._dpTaxPeriodsLoading = false;
+      window._dpWkAggLoaded = false;
+      
+      // WKAggregator-Cache leer
+      if (window.DealPilotWKAggregator && typeof DealPilotWKAggregator.clearCache === 'function') {
+        try { DealPilotWKAggregator.clearCache(); } catch(e) {}
+      }
+      
+      // Periods + WK neu laden, dann rendern
+      var loadPromises = [];
+      if (window.DealPilotTaxPeriods && typeof DealPilotTaxPeriods.loadAll === 'function') {
+        loadPromises.push(DealPilotTaxPeriods.loadAll().then(function(p) {
+          window._dpTaxPeriodsCache = p || [];
+        }).catch(function(){}));
+      }
+      if (window.DealPilotWKAggregator && typeof DealPilotWKAggregator.loadAll === 'function') {
+        loadPromises.push(Promise.resolve(DealPilotWKAggregator.loadAll()).catch(function(){}));
+      }
+      
+      Promise.all(loadPromises).then(function() {
+        if (typeof calc === 'function') {
+          try { calc(); } catch(e) { console.warn('[BlockB4] calc:', e); }
+        }
+        if (typeof renderTaxModule === 'function') {
+          try { renderTaxModule(); } catch(e) { console.warn('[BlockB4] renderTaxModule:', e); }
+        }
+        if (typeof renderTaxTimeline === 'function') {
+          try { renderTaxTimeline(); } catch(e) { console.warn('[BlockB4] renderTaxTimeline:', e); }
+        }
+        console.log('[BlockB4] Reload nach Tax-Periode-Aenderung abgeschlossen');
+      });
+    } catch(e) {
+      console.warn('[BlockB4] reloadAll:', e);
+    }
+  }
+  
+  function wrap(methodName) {
+    if (!window.DealPilotTaxPeriods) return;
+    if (typeof DealPilotTaxPeriods[methodName] !== 'function') return;
+    if (DealPilotTaxPeriods['_orig_' + methodName]) return; // schon wrapped
+    
+    var orig = DealPilotTaxPeriods[methodName];
+    DealPilotTaxPeriods['_orig_' + methodName] = orig;
+    DealPilotTaxPeriods[methodName] = function() {
+      var ret = orig.apply(this, arguments);
+      if (ret && typeof ret.then === 'function') {
+        return ret.then(function(r) {
+          setTimeout(reloadAll, 100);
+          return r;
+        }).catch(function(e) {
+          setTimeout(reloadAll, 100); // auch bei Error reload
+          throw e;
+        });
+      }
+      setTimeout(reloadAll, 100);
+      return ret;
+    };
+  }
+  
+  function init() {
+    if (!window.DealPilotTaxPeriods) {
+      return setTimeout(init, 500);
+    }
+    ['create', 'update', 'remove', 'del'].forEach(wrap);
+    
+    // closeModal soll auch reload triggern (User schliesst nach Bearbeitung)
+    if (DealPilotTaxPeriods.closeModal && !DealPilotTaxPeriods._closeModalWrapped) {
+      var origClose = DealPilotTaxPeriods.closeModal;
+      DealPilotTaxPeriods.closeModal = function() {
+        var ret = origClose.apply(this, arguments);
+        setTimeout(reloadAll, 50);
+        return ret;
+      };
+      DealPilotTaxPeriods._closeModalWrapped = true;
+    }
+    
+    console.log('[BlockB4] tax-periods.js Reload-Hooks installiert');
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
