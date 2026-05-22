@@ -892,7 +892,36 @@ function _calcImmediate(){
     };
     State._afaSeries = afaResult.series;          // Gesamt-Reihe (Normal + § 7b)
     State._afaSeriesNormal = afaResult.normal;    // Nur Normal-AfA
-    State._afaSeriesSonder = afaResult.sonder;    // Nur § 7b
+    State._afaSeriesSonder = afaResult.sonder;
+
+    // V268-05: AfA Erstjahr monatsanteilig (§7 Abs.1 EStG)
+    // WU führend, kaufdat fallback (via DealPilotAnteilig.getRelevantDate)
+    try {
+      if (window.DealPilotAnteilig) {
+        var _v268_rd = DealPilotAnteilig.getRelevantDate();
+        if (_v268_rd) {
+          var _v268_y1 = parseInt(_v268_rd.split('-')[0], 10);
+          var _v268_mf = DealPilotAnteilig.startFactorMonths(_v268_rd, _v268_y1);
+          if (_v268_mf < 1 && _v268_mf > 0) {
+            if (State._afaSeriesNormal && State._afaSeriesNormal.length > 0) {
+              State._afaSeriesNormal[0] = Math.round(State._afaSeriesNormal[0] * _v268_mf);
+            }
+            if (State._afaSeriesSonder && State._afaSeriesSonder.length > 0 && State._afaSeriesSonder[0]) {
+              State._afaSeriesSonder[0] = Math.round(State._afaSeriesSonder[0] * _v268_mf);
+            }
+            if (State._afaSeries && State._afaSeries.length > 0) {
+              var _v268_n = (State._afaSeriesNormal && State._afaSeriesNormal[0]) || 0;
+              var _v268_s = (State._afaSeriesSonder && State._afaSeriesSonder[0]) || 0;
+              State._afaSeries[0] = _v268_n + _v268_s;
+            }
+            State._afa_year1_factor = _v268_mf;
+            State._afa_year1_relDate = _v268_rd;
+          }
+        }
+      }
+    } catch(_v268_e) {
+      console.warn('[V268-05] AfA Erstjahr-Anteil:', _v268_e.message);
+    }    // Nur § 7b
     State._afaWechselJahr = afaResult.wechselJahr;
     State._afaMethode = afaParsed.methode;
   }
@@ -1844,7 +1873,17 @@ function _calcImmediate(){
   }
 
   State.cfRows=[];var rs3=d1;
-  st('proj-lbl','('+btj+' Jahre · '+new Date().getFullYear()+'–'+(new Date().getFullYear()+btj-1)+')');
+  // V268-06: Anzeige-Basisjahr aus Kaufjahr (WU/kaufdat), Fallback heute
+  var _v268_baseYear = (function(){
+    try {
+      if (window.DealPilotAnteilig && typeof DealPilotAnteilig.getBaseYear === 'function') {
+        var by = DealPilotAnteilig.getBaseYear();
+        if (by) return by;
+      }
+    } catch(_){}
+    return new Date().getFullYear();
+  })();
+  st('proj-lbl','('+btj+' Jahre · '+_v268_baseYear+'–'+(_v268_baseYear+btj-1)+')');
   // V63.58: Hinweis wenn Mietsteigerung 0 — User merkt sonst nicht, dass NKM konstant bleibt
   var _mstgHint = document.getElementById('proj-mstg-hint');
   if (_mstgHint) {
@@ -1868,7 +1907,7 @@ function _calcImmediate(){
   var bspar_kum_proj = 0;
 
   for(var y=1;y<=btj;y++){
-    var cal=new Date().getFullYear()+y-1;
+    var cal=_v268_baseYear+y-1; // V268-06: Kaufjahr-basiert
     // V63.35: Excel-Logik — CF auf NKM gegen NUL (UL durchlaufend)
     // V63.61 BUGFIX: Off-by-One in Mietsteigerung. Jahr 1 (= heute, aktuelles Kalenderjahr)
     // soll mit den AKTUELLEN Mieten arbeiten, nicht schon mit 1 Jahr Steigerung.

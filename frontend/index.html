@@ -877,6 +877,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
       <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
+      <div class="f"><label>Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div>
       <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
       <div class="f"><label>Ausstattung</label><select id="ausst"><option>Einfach</option><option selected>Normal</option><option>Gehoben</option><option>Luxus</option></select></div>
       <div class="f s2"><label>Investitionsthese <button type="button" class="dp-tip" data-tip-id="tab1.investitionsthese" tabindex="-1" aria-label="Hilfe zu tab1.investitionsthese"></button></label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
@@ -2763,8 +2764,10 @@ label.dp-required.qc-required::after {
   <script src="js/wk-dashboard.js?v=1"></script>
   <script src="js/all-objects-views.js?v=1"></script>
   <script src="js/tour-sidebar.js?v=1"></script>
-  <script src="js/wirtschaftlicher-uebergang.js?v=1"></script>
-  <script src="js/calc.js?v=231"></script>
+  <script src="js/anteilig.js?v=1"></script>
+  <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
+  <script src="js/anteilig-recalc.js?v=233"></script>
+  <script src="js/calc.js?v=233"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -2796,7 +2799,7 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=226"></script>
-<script src="js/storage.js?v=191"></script>
+<script src="js/storage.js?v=193"></script>
 <script src="js/all-objects.js?v=166"></script>
 <script src="js/portfolio-strategy.js?v=144"></script>
 <script src="js/portfolio-strategy-ui.js?v=189"></script>
@@ -2844,7 +2847,7 @@ label.dp-required.qc-required::after {
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=142"></script>
 <script src="js/rnd-bte-katalog.js?v=142"></script>
-<script src="js/rnd-calc.js?v=166"></script>
+<script src="js/rnd-calc.js?v=233"></script>
 <script src="js/rnd-pdf.js?v=166"></script>
 <script src="js/rnd-docx.js?v=142"></script>
 <script src="js/rnd-ui.js?v=189"></script>

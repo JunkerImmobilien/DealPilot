@@ -5,7 +5,7 @@
 ═══════════════════════════════════════════════════ */
 
 var FIELDS = [
-  'plz','ort','str','hnr','objart','wfl','baujahr','kaufdat','kuerzel','ausst',
+  'plz','ort','str','hnr','objart','wfl','baujahr','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
   'thesis','risiken','notizen','bankval','svwert','makrolage','mikrolage',
   'vermstand','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
   // V63.99: Küche im Kaufpreis als € (kueche_im_kp ist Checkbox → unten separat)
