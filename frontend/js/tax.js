@@ -14,6 +14,27 @@
    Implementiert die offiziellen Formeln für 2026.
 ═══════════════════════════════════════════════════ */
 
+// ═══════════════════════════════════════════════════════════════
+// V269a2-helper-relocated: Helper für Steuer-Startjahr (File-Scope)
+// War in V269a1 innerhalb von Tax-IIFE → ReferenceError bei renderYearlyTaxForm
+// Jetzt File-Scope → für ALLE Funktionen in tax.js erreichbar
+// Cascade: DealPilotAnteilig.getBaseYear() > State.cfRows[0].cal > heute
+// ═══════════════════════════════════════════════════════════════
+function _v269_getStartYear() {
+  try {
+    if (typeof window !== 'undefined' && window.DealPilotAnteilig && window.DealPilotAnteilig.getBaseYear) {
+      var by = window.DealPilotAnteilig.getBaseYear();
+      if (by) return by;
+    }
+  } catch(_) {}
+  try {
+    if (typeof State !== 'undefined' && State.cfRows && State.cfRows[0] && State.cfRows[0].cal) {
+      return State.cfRows[0].cal;
+    }
+  } catch(_) {}
+  return new Date().getFullYear();
+}
+
 var Tax = (function() {
   // Tarif 2026 (§32a EStG)
   function calcEStG(zvE) {
@@ -586,7 +607,7 @@ function renderYearlyTaxForm() {
   }
 
   var mode = window._taxFormMode || 'quick';
-  var startYear = new Date().getFullYear();
+  var startYear = _v269_getStartYear(); // V269a1
   var years = [];
   var nYears = Math.min(15, State.cfRows.length);
   for (var i = 0; i < nYears; i++) years.push({ idx: i, year: startYear + i });
@@ -871,7 +892,7 @@ function updateTaxOverride(input) {
     try {
       // Auto-Wert für dieses Feld neu berechnen
       var yearIdx = -1;
-      var startYear = State.cfRows[0] ? State.cfRows[0].year : new Date().getFullYear();
+      var startYear = _v269_getStartYear(); // V269a1 (Bug: .year war undefined)
       yearIdx = year - startYear;
       if (yearIdx >= 0 && yearIdx < State.cfRows.length) {
         var auto = _computeAutoForYear(yearIdx, year);
