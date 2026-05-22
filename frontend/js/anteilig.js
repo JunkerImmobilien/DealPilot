@@ -176,6 +176,23 @@
     return { zins: sumZ, tilg: 0, restschuld: d };
   }
 
+  /** V269c-getWuMonths: Anzahl aktiver Monate in `year` ab WU/kaufdat.
+   *  Nutzt WU-Cascade (WU > kaufdat), nicht Finanzierungs-Cascade.
+   *  Beispiel: WU=2024-04-01, year=2024 → 9 (Apr-Dez)
+   *           WU=2025-03-01, year=2024 → 0 (WU im Folgejahr)
+   */
+  function getWuMonths(year) {
+    var rd = getRelevantDate();  // WU > kaufdat
+    if (!rd || !year) return 12;
+    var parts = rd.split('-');
+    var sy = parseInt(parts[0], 10);
+    var sm = parseInt(parts[1], 10);
+    if (!sy || !sm) return 12;
+    if (sy < year) return 12;
+    if (sy > year) return 0;
+    return Math.max(0, 13 - sm);
+  }
+
   /** Soft-Validation: d1_auszahl vs. kaufdat. V269a2: gelockerte Schwellen.
    *  Returns: {ok: bool, level: 'info'|'warn'|'error', msg: string|null}
    */
@@ -235,6 +252,7 @@
     computeY1Annuitaet:       computeY1Annuitaet,
     computeY1Aussetzung:      computeY1Aussetzung,
     validateFinanzierungDate: validateFinanzierungDate,
-    _meta: 'V269-01'
+    getWuMonths:              getWuMonths,
+    _meta: 'V269c-01'
   };
 })();

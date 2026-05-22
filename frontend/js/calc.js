@@ -1916,6 +1916,29 @@ function _calcImmediate(){
     var nkm_y2=nkm_j*_mFac(y-1),wm_y2=wm_j*_mFac(y-1),bwk_y2=bwk*Math.pow(1+kstg,y-1);
     var bwk_cf_y2=bwk_cf*Math.pow(1+kstg,y-1);
 
+    // ═══════════════════════════════════════════════════════════════
+    // V269c-mietBwkY1: Mieten + BWK Jahr 1 anteilig nach WU/kaufdat
+    // Wirkt nur bei y===1 UND wenn WU mitten im Jahr liegt (wuMonths<12).
+    // Andere Stichtage als d1_auszahl, deshalb separater Eingriff.
+    // ═══════════════════════════════════════════════════════════════
+    if (y === 1 && typeof window.DealPilotAnteilig === 'object'
+        && typeof window.DealPilotAnteilig.getWuMonths === 'function') {
+      try {
+        var _v269c_wuMonths = window.DealPilotAnteilig.getWuMonths(_v268_baseYear);
+        if (typeof _v269c_wuMonths === 'number' && _v269c_wuMonths >= 0 && _v269c_wuMonths < 12) {
+          var _v269c_factor = _v269c_wuMonths / 12;
+          nkm_y2     *= _v269c_factor;
+          wm_y2      *= _v269c_factor;
+          bwk_y2     *= _v269c_factor;
+          bwk_cf_y2  *= _v269c_factor;
+          State._v269c_wu_months = _v269c_wuMonths;
+        }
+      } catch(_v269c_e) {
+        console.warn('[V269c] Mieten/BWK Y1-Anteil:', _v269c_e.message);
+      }
+    }
+
+
     var zy2, ty2, bspar_y2;
 
     if (_d1IsAussetzung && lc_proj) {
