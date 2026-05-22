@@ -14,6 +14,27 @@
    Implementiert die offiziellen Formeln für 2026.
 ═══════════════════════════════════════════════════ */
 
+// ═══════════════════════════════════════════════════════════════
+// V269a2-helper-relocated: Helper für Steuer-Startjahr (File-Scope)
+// War in V269a1 innerhalb von Tax-IIFE → ReferenceError bei renderYearlyTaxForm
+// Jetzt File-Scope → für ALLE Funktionen in tax.js erreichbar
+// Cascade: DealPilotAnteilig.getBaseYear() > State.cfRows[0].cal > heute
+// ═══════════════════════════════════════════════════════════════
+function _v269_getStartYear() {
+  try {
+    if (typeof window !== 'undefined' && window.DealPilotAnteilig && window.DealPilotAnteilig.getBaseYear) {
+      var by = window.DealPilotAnteilig.getBaseYear();
+      if (by) return by;
+    }
+  } catch(_) {}
+  try {
+    if (typeof State !== 'undefined' && State.cfRows && State.cfRows[0] && State.cfRows[0].cal) {
+      return State.cfRows[0].cal;
+    }
+  } catch(_) {}
+  return new Date().getFullYear();
+}
+
 var Tax = (function() {
   // Tarif 2026 (§32a EStG)
   function calcEStG(zvE) {
@@ -456,6 +477,27 @@ function _computeAutoForYear(yearIdx, year) {
   var kstg = (parseDe((document.getElementById('kostenstg') || {}).value) || 1.0) / 100;
   var einnahmen_nk = nk_umlf_m * 12 * Math.pow(1 + kstg, yearIdx);
 
+  // ═══════════════════════════════════════════════════════════════
+  // V269c1-einnahmen-y1: Einnahmen Jahr 1 anteilig nach WU
+  // Konsistent zu cfRows (V269c) — gleicher wuFactor.
+  // Wirkt nur bei yearIdx === 0 UND WU mitten im Jahr.
+  // ═══════════════════════════════════════════════════════════════
+  if (yearIdx === 0 && typeof window.DealPilotAnteilig === 'object'
+      && typeof window.DealPilotAnteilig.getWuMonths === 'function') {
+    try {
+      var _v269c1_wuMonths = window.DealPilotAnteilig.getWuMonths(year);
+      if (typeof _v269c1_wuMonths === 'number' && _v269c1_wuMonths >= 0 && _v269c1_wuMonths < 12) {
+        var _v269c1_factor = _v269c1_wuMonths / 12;
+        einnahmen_nkm *= _v269c1_factor;
+        einnahmen_ze  *= _v269c1_factor;
+        einnahmen_km  = einnahmen_nkm + einnahmen_ze;
+        einnahmen_nk  *= _v269c1_factor;
+      }
+    } catch(_v269c1_e) {
+      console.warn('[V269c.1] Einnahmen Y1-Anteil:', _v269c1_e.message);
+    }
+  }
+
   // Schuldzinsen aus cfRows
   var schuldzinsen = row ? (row.zy || 0) : 0;
   // Bewirtschaftung
@@ -586,7 +628,7 @@ function renderYearlyTaxForm() {
   }
 
   var mode = window._taxFormMode || 'quick';
-  var startYear = new Date().getFullYear();
+  var startYear = _v269_getStartYear(); // V269a1
   var years = [];
   var nYears = Math.min(15, State.cfRows.length);
   for (var i = 0; i < nYears; i++) years.push({ idx: i, year: startYear + i });
@@ -871,7 +913,7 @@ function updateTaxOverride(input) {
     try {
       // Auto-Wert für dieses Feld neu berechnen
       var yearIdx = -1;
-      var startYear = State.cfRows[0] ? State.cfRows[0].year : new Date().getFullYear();
+      var startYear = _v269_getStartYear(); // V269a1 (Bug: .year war undefined)
       yearIdx = year - startYear;
       if (yearIdx >= 0 && yearIdx < State.cfRows.length) {
         var auto = _computeAutoForYear(yearIdx, year);

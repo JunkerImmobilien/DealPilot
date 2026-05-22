@@ -55,6 +55,14 @@
         wuEl.dataset.v268UserSet = '1';
       });
     }
+
+    // V269-04: d1_auszahl-Listener (Auszahlungsdatum → Anteilig Jahr 1 ändert sich)
+    var auszahlEl = document.getElementById('d1_auszahl');
+    if (auszahlEl && !auszahlEl.dataset.v269Recalc) {
+      auszahlEl.dataset.v269Recalc = '1';
+      auszahlEl.addEventListener('change', function() { recalc(); });
+      auszahlEl.addEventListener('input', function() { recalc(); });
+    }
   }
 
   function recalc() {

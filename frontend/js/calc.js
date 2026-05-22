@@ -1916,6 +1916,29 @@ function _calcImmediate(){
     var nkm_y2=nkm_j*_mFac(y-1),wm_y2=wm_j*_mFac(y-1),bwk_y2=bwk*Math.pow(1+kstg,y-1);
     var bwk_cf_y2=bwk_cf*Math.pow(1+kstg,y-1);
 
+    // ═══════════════════════════════════════════════════════════════
+    // V269c-mietBwkY1: Mieten + BWK Jahr 1 anteilig nach WU/kaufdat
+    // Wirkt nur bei y===1 UND wenn WU mitten im Jahr liegt (wuMonths<12).
+    // Andere Stichtage als d1_auszahl, deshalb separater Eingriff.
+    // ═══════════════════════════════════════════════════════════════
+    if (y === 1 && typeof window.DealPilotAnteilig === 'object'
+        && typeof window.DealPilotAnteilig.getWuMonths === 'function') {
+      try {
+        var _v269c_wuMonths = window.DealPilotAnteilig.getWuMonths(_v268_baseYear);
+        if (typeof _v269c_wuMonths === 'number' && _v269c_wuMonths >= 0 && _v269c_wuMonths < 12) {
+          var _v269c_factor = _v269c_wuMonths / 12;
+          nkm_y2     *= _v269c_factor;
+          wm_y2      *= _v269c_factor;
+          bwk_y2     *= _v269c_factor;
+          bwk_cf_y2  *= _v269c_factor;
+          State._v269c_wu_months = _v269c_wuMonths;
+        }
+      } catch(_v269c_e) {
+        console.warn('[V269c] Mieten/BWK Y1-Anteil:', _v269c_e.message);
+      }
+    }
+
+
     var zy2, ty2, bspar_y2;
 
     if (_d1IsAussetzung && lc_proj) {
@@ -2026,6 +2049,73 @@ function _calcImmediate(){
     // Effektive Restschuld = formal aufgenommen MINUS bereits angespartes BSV-Guthaben.
     // Sinn: User sieht in Charts die "wirtschaftliche" Schuld, die ihn am Ende noch belastet.
     // Bei Standard-Annuität ohne BSV ist eff_rs == rs.
+    // ═══════════════════════════════════════════════════════════════
+    // V269-03: Anteilige Berechnung Jahr 1 (Schuldzinsen + Tilgung)
+    // Exakte Monatsschleife. Wirkt nur wenn d1_auszahl oder WU/kaufdat
+    // ein Startdatum innerhalb von Jahr 1 ergeben (monthsY1 < 12).
+    // ═══════════════════════════════════════════════════════════════
+    if (y === 1 && typeof window.DealPilotAnteilig === 'object') {
+      try {
+        var _v269_startISO = window.DealPilotAnteilig.getFinanzierungStartDate
+          ? window.DealPilotAnteilig.getFinanzierungStartDate() : null;
+        var _v269_baseY = window.DealPilotAnteilig.getFinanzierungBaseYear
+          ? window.DealPilotAnteilig.getFinanzierungBaseYear() : null;
+        // Fallback: WU/kaufdat-Basisjahr (= _v268_baseYear bereits berechnet)
+        if (!_v269_baseY && typeof _v268_baseYear === 'number') {
+          _v269_baseY = _v268_baseYear;
+        }
+        var _v269_monthsY1 = window.DealPilotAnteilig.getFinanzierungMonths
+          ? window.DealPilotAnteilig.getFinanzierungMonths(_v269_startISO, _v269_baseY) : 12;
+
+        // V269a2-monthsY1-zero: monthsY1 === 0 separat behandeln
+        if (_v269_monthsY1 === 0) {
+          // Auszahlung im Folgejahr → keine Zinsen/Tilgung in diesem Jahr
+          zy2 = 0;
+          ty2 = 0;
+          if (typeof bspar_y2 === 'number') bspar_y2 = 0;
+          State._v269_y1_months = 0;
+          State._v269_y1_startDate = _v269_startISO;
+        } else if (_v269_monthsY1 > 0 && _v269_monthsY1 < 12) {
+          // CASE: Aussetzung (D1 ist Tilgungsaussetzungsdarlehen)
+          if (_d1IsAussetzung) {
+            // Aussetzung: nur Zinsen anteilig, keine Tilgung, BSV-Sparrate anteilig
+            var _v269_r = window.DealPilotAnteilig.computeY1Aussetzung(d1, d1z * 100, _v269_monthsY1);
+            zy2 = _v269_r.zins;
+            ty2 = 0;
+            // BSV-Sparrate anteilig (12 Monate Jahres-Sparrate × Anteil)
+            if (typeof bspar_y2 === 'number' && bspar_y2 > 0) {
+              bspar_y2 = (bspar_y2 / 12) * _v269_monthsY1;
+            }
+            // rs3 bleibt: bei Aussetzung wird Y1 nicht getilgt, RS = d1 (oder evtl. schon
+            // reduziert durch BSV-Lifecycle-Logik — wir lassen es wie es ist)
+          } else {
+            // CASE: Standard-Annuität (D1)
+            // d1t kann 0 sein bei Voll-Tilger ohne T-Anteil — dann ist es effektiv Aussetzung
+            // Wir nutzen Annuitaet wenn d1t > 0
+            if (d1t > 0) {
+              var _v269_rA = window.DealPilotAnteilig.computeY1Annuitaet(d1, d1z * 100, d1t * 100, _v269_monthsY1);
+              zy2 = _v269_rA.zins;
+              ty2 = _v269_rA.tilg;
+              // Restschuld korrekt: anstatt komplett getilgt für volles Jahr,
+              // nur _v269_monthsY1 Monate getilgt
+              rs3 = _v269_rA.restschuld;
+            } else {
+              // d1t = 0 (kein Tilgungsanteil): nur Zinsen anteilig
+              var _v269_rZ = window.DealPilotAnteilig.computeY1Aussetzung(d1, d1z * 100, _v269_monthsY1);
+              zy2 = _v269_rZ.zins;
+              ty2 = 0;
+              // rs3 unverändert lassen
+            }
+          }
+          // Marker setzen für State (Debug)
+          State._v269_y1_months = _v269_monthsY1;
+          State._v269_y1_startDate = _v269_startISO;
+        }
+      } catch(_v269_e) {
+        console.warn('[V269-03] Anteilig Jahr 1 Fehler:', _v269_e.message);
+      }
+    }
+
     var eff_rs = Math.max(0, rs3 - bspar_kum_proj);
     State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:wm_y2/12,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:rs3,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y});
   }
