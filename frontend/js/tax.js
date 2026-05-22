@@ -198,12 +198,17 @@ var Tax = (function() {
 // ═══════════════════════════════════════════════════
 // UI: Steuer-Modul anzeigen (im Tab 3 "Miete & Steuern")
 // ═══════════════════════════════════════════════════
-function renderTaxModule() {
+function renderTaxModule(yearOverride) { /* V270-displayYear */
   if (!State.kpis) return;
   if (typeof _computeYearTotal !== 'function') return;
 
   var box = document.getElementById('tax-result-box');
   if (!box) return;
+
+  // V270: Persistiere ausgewähltes Jahr (Klick auf Steuerverlauf-Card)
+  if (typeof yearOverride === 'number' && yearOverride > 1900) {
+    State._taxDisplayYear = yearOverride;
+  }
 
   // V29: Empty-Guard — wenn weder Kaufpreis noch Kaltmiete da sind,
   // zeige einen klaren Empty-State statt verwirrender "Restwerte"
@@ -224,8 +229,22 @@ function renderTaxModule() {
     return;
   }
 
-  var startYear = new Date().getFullYear();
-  var totals = _computeYearTotal(startYear, 0);
+  // V270: Year-Resolver — Cascade State._taxDisplayYear > heute > cfRows[0]
+  var displayYear, yearIdx;
+  var prefYear = State._taxDisplayYear || new Date().getFullYear();
+  if (State.cfRows && State.cfRows.length) {
+    yearIdx = -1;
+    for (var _ti = 0; _ti < State.cfRows.length; _ti++) {
+      if (State.cfRows[_ti].cal === prefYear) { yearIdx = _ti; break; }
+    }
+    if (yearIdx === -1) yearIdx = 0;
+    displayYear = State.cfRows[yearIdx].cal;
+  } else {
+    yearIdx = 0;
+    displayYear = prefYear;
+  }
+  var startYear = displayYear;
+  var totals = _computeYearTotal(displayYear, yearIdx);
 
   var baseIncome = parseDe((document.getElementById('zve') || {}).value) || 65891;
   var impact = Tax.calcImmoTaxImpact(baseIncome, totals.ergebnis);
@@ -234,6 +253,20 @@ function renderTaxModule() {
   var refundLabel = impact.refund > 0 ? 'Steuer-Erstattung' : 'Steuer-Nachzahlung';
   var refundAbs = Math.abs(impact.refund);
   var isProfit = totals.ergebnis > 0;
+
+  // V270: Header-Label aktualisieren (falls Element existiert)
+  var titleEl = document.getElementById('tax-display-year');
+  if (titleEl) titleEl.textContent = displayYear;
+  // Alternativ: alle h2/h3-Headers im Steuer-Tab durchsuchen
+  var taxSection = document.getElementById('s3-tax');
+  if (taxSection) {
+    var headers = taxSection.querySelectorAll('h2, h3, .sec-title, [class*="title"]');
+    headers.forEach(function(h) {
+      if (/echte\s+progression\s+\d{4}/i.test(h.textContent)) {
+        h.textContent = h.textContent.replace(/(echte\s+progression\s+)\d{4}/i, '$1' + displayYear);
+      }
+    });
+  }
 
   box.innerHTML =
     '<div class="tax-grid">' +
@@ -300,12 +333,21 @@ function renderTaxTimeline() {
 
   // Render as visual timeline
   var html = '<div class="tax-tl-grid">';
+  /* V270-cardClick: Klickbare Cards → laden Berechnung in Steuermodul oben */
+  var _activeYear = State._taxDisplayYear || new Date().getFullYear();
   timeline.forEach(function(t) {
     var positive = t.refund > 0;
     var color = positive ? 'var(--green)' : 'var(--red)';
     var bgcolor = positive ? 'rgba(42,154,90,0.1)' : 'rgba(201,76,76,0.1)';
     var sign = positive ? '+' : '';
-    html += '<div class="tax-tl-bar" style="background:' + bgcolor + ';border-left-color:' + color + '">' +
+    var isActive = (t.year === _activeYear);
+    var activeStyle = isActive
+      ? ';outline:2px solid var(--gold,#C9A84C);outline-offset:1px;box-shadow:0 2px 8px rgba(201,168,76,0.3)'
+      : '';
+    html += '<div class="tax-tl-bar tax-tl-clickable" ' +
+      'style="background:' + bgcolor + ';border-left-color:' + color + ';cursor:pointer;transition:all 0.15s' + activeStyle + '" ' +
+      'onclick="if(typeof renderTaxModule===\'function\'){renderTaxModule(' + t.year + ');var b=document.getElementById(\'tax-result-box\');if(b)b.scrollIntoView({behavior:\'smooth\',block:\'center\'});}" ' +
+      'title="Klick: Berechnung für ' + t.year + ' anzeigen">' +
       '<div class="tax-tl-year">' + t.year + '</div>' +
       '<div class="tax-tl-amount" style="color:' + color + '">' +
         sign + Math.round(Math.abs(t.refund)).toLocaleString('de-DE') + ' €' +
@@ -332,8 +374,8 @@ function renderTaxTimeline() {
 
 // Hook into existing renderTaxModule
 var _origRenderTax = renderTaxModule;
-renderTaxModule = function() {
-  _origRenderTax();
+renderTaxModule = function(year) { /* V270.1-hook-passthrough */
+  _origRenderTax(year);
   renderTaxTimeline();
 };
 
