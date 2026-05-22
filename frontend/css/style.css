@@ -18521,6 +18521,24 @@ html body .body {
 /* ═══════════════════════════════════════════════════════════════
    V63.70 — User-Hilfe-Modal
 ═══════════════════════════════════════════════════════════════ */
+/* V270.2-help-modal-bgmode: Hilfe-Modal Hintergrund halbtransparent + Blur
+   Bug-Kette:
+     V270:   .help-modal.help-modal-open existiert nicht als Klasse
+     V270.1: body .help-modal.global-view-overlay matched, ABER
+             html[data-bg="white"] .help-modal { background: #fff }
+             hat höhere Spezifität (Attribut + Klasse)
+   Fix: Für BEIDE BG-Modi explizit überschreiben.
+        Spezifität html[]+.help-modal.global-view-overlay (Attribut + 2 Klassen)
+        ist höher als html[]+.help-modal (Attribut + 1 Klasse). */
+html[data-bg="white"] .help-modal.global-view-overlay,
+html[data-bg="dark"] .help-modal.global-view-overlay,
+html .help-modal.global-view-overlay,
+body .help-modal.global-view-overlay {
+  background: rgba(42, 39, 39, 0.55) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+          backdrop-filter: blur(8px) !important;
+}
+
 .help-modal {
   display: none;
   position: fixed;
