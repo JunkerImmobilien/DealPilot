@@ -165,6 +165,7 @@ function showSettings(initialTab) {
       '<div class="settings-tabs ms-tabs">' +
         '<button class="st-tab ms-tab active" data-tab="account" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-user"/></svg></span>Account</button>' +
         '<button class="st-tab ms-tab" data-tab="security" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-shield"/></svg></span>Sicherheit</button>' +
+        '<button class="st-tab ms-tab" data-tab="rechtliches" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-shield"/></svg></span>Rechtliches</button>' +
         '<button class="st-tab ms-tab" data-tab="contact" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-pin"/></svg></span>Kontakt &amp; Logo</button>' +
         '<button class="st-tab ms-tab" data-tab="api" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-brain"/></svg></span>KI</button>' +
         '<button class="st-tab ms-tab" data-tab="dealscore" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-bar"/></svg></span>Deal Score</button>' +
@@ -2791,4 +2792,127 @@ function _v213ResetCards() {
     renderToggle: renderToggleHtml
   };
   document.documentElement.setAttribute('data-bg', getMode());
+})();
+
+
+/* V271a-settings-rechtliches — Tab "Rechtliches" dynamisch */
+(function() {
+  'use strict';
+
+  // CSS für Hover-Effekte (einmal injizieren)
+  if (!document.getElementById('dp-v271a-style')) {
+    var styleEl = document.createElement('style');
+    styleEl.id = 'dp-v271a-style';
+    styleEl.textContent =
+      '.dp-rechtl-link { display: flex; align-items: center; justify-content: space-between; ' +
+      '  padding: 14px 18px; background: rgba(201,168,76,0.04); ' +
+      '  border: 1px solid rgba(201,168,76,0.20); border-radius: 8px; ' +
+      '  text-decoration: none; color: #2A2727; transition: background 0.15s; } ' +
+      '.dp-rechtl-link:hover { background: rgba(201,168,76,0.10); } ' +
+      '.dp-rechtl-link strong { font-weight: 600; } ' +
+      '.dp-rechtl-link .dp-rechtl-arrow { color: #C9A84C; font-size: 18px; } ' +
+      '.dp-rechtl-link .dp-rechtl-sub { font-size: 12px; color: #888; margin-top: 2px; }';
+    document.head.appendChild(styleEl);
+  }
+
+  function _getConsentStatus() {
+    try {
+      var stored = localStorage.getItem('dp_legal_accepted');
+      if (!stored) {
+        return { accepted: true, version: 'legacy-v0', accepted_at: null, is_legacy: true };
+      }
+      var data = JSON.parse(stored);
+      return {
+        accepted: true,
+        version: data.version || '1.0',
+        accepted_at: data.accepted_at,
+        is_legacy: false
+      };
+    } catch(e) {
+      return { accepted: false, version: null, accepted_at: null, is_legacy: false };
+    }
+  }
+
+  function _injectRechtlichesPanel() {
+    if (document.querySelector('[data-panel="rechtliches"]')) return;
+
+    var modalBody = document.querySelector('.st-tab-panel') ||
+                    document.querySelector('.set-tab-panel') ||
+                    document.querySelector('[data-panel]') ||
+                    document.querySelector('.ms-content');
+    if (!modalBody) return;
+    var parent = modalBody.parentElement;
+    if (!parent) return;
+
+    var status = _getConsentStatus();
+    var legalVer = (window.DealPilotLegal && window.DealPilotLegal.VERSION) || '1.1';
+
+    var statusHtml = '';
+    if (status.is_legacy) {
+      statusHtml = '<div style="padding:10px 14px;background:rgba(201,168,76,0.06);border-left:3px solid #C9A84C;border-radius:4px;font-size:13px;color:#888">' +
+                   'Du bist Bestandsnutzer — die rechtlichen Hinweise wurden als akzeptiert markiert (Legacy).</div>';
+    } else if (status.accepted_at) {
+      var dt = new Date(status.accepted_at);
+      statusHtml = '<div style="padding:10px 14px;background:rgba(63,165,108,0.08);border-left:3px solid #3FA56C;border-radius:4px;font-size:13px;color:#2A2727">' +
+                   '<strong>Akzeptiert:</strong> Version ' + status.version + ' am ' + dt.toLocaleString('de-DE') + '</div>';
+    } else {
+      statusHtml = '<div style="padding:10px 14px;background:#FFF8E1;border-left:3px solid #E0A800;border-radius:4px;font-size:13px;color:#2A2727">' +
+                   'Du hast die rechtlichen Hinweise noch nicht akzeptiert.</div>';
+    }
+
+    var panel = document.createElement('div');
+    panel.className = 'st-tab-panel ms-panel set-tab-panel';
+    panel.setAttribute('data-panel', 'rechtliches');
+    panel.setAttribute('data-tab', 'rechtliches');
+    panel.style.display = 'none';
+
+    var html = '';
+    html += '<h3 class="set-section-h" style="margin-top:0">Rechtliche Dokumente</h3>';
+    html += '<p class="hint">Alle rechtlichen Grundlagen für die Nutzung von DealPilot.</p>';
+    html += '<div style="display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0">';
+    html += '<a href="/agb.html" target="_blank" class="dp-rechtl-link">';
+    html += '<div><strong>Allgemeine Geschäftsbedingungen (AGB)</strong><div class="dp-rechtl-sub">Vertragliche Grundlage · Version 1.0</div></div>';
+    html += '<span class="dp-rechtl-arrow">&rarr;</span></a>';
+    html += '<a href="/datenschutz.html" target="_blank" class="dp-rechtl-link">';
+    html += '<div><strong>Datenschutzerklärung</strong><div class="dp-rechtl-sub">DSGVO-Informationen · Version 1.0</div></div>';
+    html += '<span class="dp-rechtl-arrow">&rarr;</span></a>';
+    html += '<a href="/impressum.html" target="_blank" class="dp-rechtl-link">';
+    html += '<div><strong>Impressum</strong><div class="dp-rechtl-sub">Angaben gemäß § 5 TMG</div></div>';
+    html += '<span class="dp-rechtl-arrow">&rarr;</span></a>';
+    html += '<a href="#" onclick="if(window.DealPilotLegal){DealPilotLegal.showInfo();return false;}" class="dp-rechtl-link">';
+    html += '<div><strong>Nutzungshinweise / Disclaimer</strong><div class="dp-rechtl-sub">12 Sections · Version ' + legalVer + '</div></div>';
+    html += '<span class="dp-rechtl-arrow">&rarr;</span></a>';
+    html += '</div>';
+    html += '<h3 class="set-section-h">Deine Zustimmung</h3>';
+    html += statusHtml;
+    html += '<h3 class="set-section-h" style="margin-top:24px">Datenschutz-Rechte (DSGVO)</h3>';
+    html += '<p class="hint">Du hast folgende Rechte bezüglich deiner Daten:</p>';
+    html += '<ul style="font-size:13px;line-height:1.7;padding-left:20px">';
+    html += '<li>Recht auf Auskunft (Art. 15 DSGVO)</li>';
+    html += '<li>Recht auf Berichtigung (Art. 16 DSGVO)</li>';
+    html += '<li>Recht auf Löschung (Art. 17 DSGVO)</li>';
+    html += '<li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO) — verfügbar im Account-Tab</li>';
+    html += '<li>Recht auf Widerspruch (Art. 21 DSGVO)</li>';
+    html += '<li>Beschwerderecht bei der Aufsichtsbehörde (Art. 77 DSGVO)</li>';
+    html += '</ul>';
+    html += '<p class="hint" style="margin-top:14px">Bei Fragen: <a href="mailto:info@junker-immobilien.io" style="color:#C9A84C">info@junker-immobilien.io</a></p>';
+    panel.innerHTML = html;
+    parent.appendChild(panel);
+  }
+
+  function _watchForSettings() {
+    var mo = new MutationObserver(function() {
+      if (document.querySelector('[data-tab="rechtliches"]') &&
+          !document.querySelector('[data-panel="rechtliches"]')) {
+        setTimeout(_injectRechtlichesPanel, 100);
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _watchForSettings);
+  } else {
+    _watchForSettings();
+  }
 })();

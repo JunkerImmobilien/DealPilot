@@ -24,53 +24,119 @@
 (function(global) {
   'use strict';
 
-  var DISCLAIMER_VERSION = '1.0';
+  // V271a-legal-12-sections: erweiterte rechtssichere Texte (12 Sections)
+  var DISCLAIMER_VERSION = '1.1';
   var STORAGE_KEY = 'dp_legal_accepted';
 
-  // ─── DISCLAIMER-TEXTE (zentral, für Reuse) ──────
+  // ─── DISCLAIMER-TEXTE (zentral, 12 Sections, Stand: 24.05.2026) ──
   var TEXTS = {
     headline: 'Wichtiger Hinweis zur Nutzung von DealPilot',
 
-    intro: 'DealPilot ist ein <strong>Analyse- und Berechnungs-Werkzeug</strong> ' +
-           'für Immobilien-Investments. Es erstellt Modell-Rechnungen auf Basis ' +
-           'deiner Eingaben (Kaufpreis, Miete, Finanzierung, Annahmen) und ' +
-           'visualisiert Cashflows, Renditen und Steuer-Effekte.',
+    intro: 'DealPilot ist ein <strong>Software-as-a-Service-Werkzeug</strong> ' +
+           'zur Modell-Berechnung von Immobilien-Investitionen. Es ermöglicht die ' +
+           'Berechnung von Cashflows, Renditen, Tilgungsplänen und steuerlichen Effekten ' +
+           'auf Basis von Eingaben des Nutzers und liefert KI-gestützte Bewertungen. ' +
+           'Bitte lies die folgenden Hinweise aufmerksam — sie sind wesentliche Grundlage ' +
+           'für die Nutzung der Plattform.',
 
     sections: [
       {
-        titel: 'Keine Beratung im Rechtssinne',
-        text: 'DealPilot leistet <strong>keine Steuer-, Rechts-, Finanz- oder Anlageberatung</strong> ' +
-              'im Sinne des Rechtsdienstleistungsgesetzes (RDG) oder Steuerberatungsgesetzes (StBerG). ' +
-              'Alle ausgegebenen Werte sind Modell-Berechnungen — keine verbindlichen Aussagen.'
+        titel: '1. Keine Rechts-, Steuer-, Finanz- oder Anlageberatung',
+        text: 'DealPilot leistet <strong>keine</strong> Steuer-, Rechts-, Finanz- oder Anlageberatung ' +
+              'im Sinne des Rechtsdienstleistungsgesetzes (RDG), des Steuerberatungsgesetzes (StBerG) ' +
+              'oder des Wertpapierhandelsgesetzes (WpHG). Alle ausgegebenen Werte sind ' +
+              'Modell-Berechnungen — keine verbindlichen Aussagen oder Empfehlungen.'
       },
       {
-        titel: 'Keine Empfehlungen, sondern Diskussionsanstöße',
-        text: 'Die Berechnungen zeigen mögliche Szenarien und Hebel auf. ' +
-              'Was als „Empfehlung" oder „Maßnahme" formuliert ist, ist immer als ' +
-              '<strong>Anreiz für dein nächstes Gespräch mit Steuerberater, Notar oder Finanzierer</strong> zu verstehen — ' +
-              'nicht als individuelle Beratungs-Empfehlung im Sinne des §1 Abs. 1a WpHG.'
+        titel: '2. Diskussionsanstöße statt Empfehlungen',
+        text: 'Die Berechnungen zeigen mögliche Szenarien und Hebel auf. Was als „Empfehlung", ' +
+              '„Maßnahme" oder „Handlungsempfehlung" formuliert ist, ist als ' +
+              '<strong>Anreiz für ein Gespräch mit Steuerberater, Notar oder Finanzierer</strong> ' +
+              'zu verstehen — nicht als individuelle Beratungs-Empfehlung.'
       },
       {
-        titel: 'KI-generierte Inhalte',
-        text: 'Der KI-Stratege (basierend auf GPT-Sprachmodellen) erstellt Texte und Bewertungen auf ' +
-              'statistischer Basis. Diese können <strong>Fehler enthalten oder Sachverhalte falsch darstellen</strong>. ' +
-              'Jede KI-Aussage muss durch einen qualifizierten Berater verifiziert werden.'
+        titel: '3. KI-generierte Inhalte (OpenAI)',
+        text: 'Der KI-Stratege basiert auf Sprachmodellen der <strong>OpenAI, L.L.C.</strong> (USA). ' +
+              'Die generierten Texte und Bewertungen entstehen auf statistischer Basis und können ' +
+              '<strong>Fehler oder ungenaue Darstellungen enthalten</strong>. Jede KI-Aussage muss ' +
+              'durch einen qualifizierten Berater verifiziert werden. Details zur Datenübermittlung ' +
+              'an OpenAI siehe <a href="/datenschutz.html#openai" target="_blank">Datenschutzerklärung Ziffer 6</a>.'
       },
       {
-        titel: 'Pflicht zur Beraterkonsultation',
-        text: 'Vor jeder Entscheidung mit steuerlicher, rechtlicher oder finanzieller Tragweite ' +
-              'konsultiere zwingend einen <strong>Steuerberater, Rechtsanwalt oder Notar</strong>. ' +
-              'Insbesondere bei: AfA-Wahlrechten, Strukturwechsel (z.B. GmbH-Gründung), ' +
-              'Erbschafts-/Schenkungsthemen, Refinanzierungen, Anlage V Einreichung.'
+        titel: '4. Pflicht zur Beraterkonsultation',
+        text: 'Vor jeder Entscheidung mit steuerlicher, rechtlicher oder finanzieller Tragweite ist ' +
+              'zwingend ein <strong>Steuerberater, Rechtsanwalt oder Notar</strong> zu konsultieren. ' +
+              'Dies gilt insbesondere für: AfA-Wahlrechte, § 7b Sonderabschreibung, Strukturwechsel ' +
+              '(GmbH-Gründung, vermögensverwaltende Strukturen), Erbschafts-/Schenkungsthemen, ' +
+              'Refinanzierungen sowie Anlage V und steuerliche Erklärungen.'
       },
       {
-        titel: 'Haftungsausschluss',
-        text: 'Anbieter, Entwickler und Junker Immobilien übernehmen <strong>keine Haftung</strong> ' +
-              'für direkte oder indirekte Schäden, die aus der Nutzung der Modell-Berechnungen ' +
-              'oder daraus abgeleiteten Entscheidungen entstehen. Es gelten ' +
-              '<a href="/impressum.html" target="_blank">Impressum</a>, ' +
-              '<a href="/agb.html" target="_blank">AGB</a> und ' +
-              '<a href="/datenschutz.html" target="_blank">Datenschutzerklärung</a>.'
+        titel: '5. Software-as-a-Service-Lizenz (Vertragstyp)',
+        text: 'Mit der Registrierung schließen Sie einen Software-as-a-Service-Nutzungsvertrag mit ' +
+              '<strong>Junker Immobilien</strong> (Marcel Junker, Hermannstr. 9, 32609 Hüllhorst). ' +
+              'Sie erhalten ein zeitlich befristetes, nicht ausschließliches und nicht übertragbares ' +
+              'Nutzungsrecht an der Plattform. Eigentum oder Lizenzen am Quellcode oder am Design ' +
+              'werden nicht übertragen.'
+      },
+      {
+        titel: '6. Widerrufsrecht für Verbraucher (§ 355 BGB)',
+        text: '<strong>Hinweis für Verbraucher:</strong> Wenn Sie als Verbraucher i.S.d. § 13 BGB ' +
+              'einen kostenpflichtigen Plan buchen, haben Sie ein 14-tägiges Widerrufsrecht ohne ' +
+              'Angabe von Gründen. Das Widerrufsrecht <strong>erlischt vorzeitig</strong>, sobald ' +
+              'Sie der sofortigen Vertragsausführung ausdrücklich zugestimmt haben und die Plattform ' +
+              'aktiv nutzen (§ 356 Abs. 5 BGB). Diese Zustimmung erfolgt im Bestellvorgang über eine ' +
+              'gesonderte Checkbox. Details siehe <a href="/agb.html" target="_blank">AGB Ziffer V</a>.'
+      },
+      {
+        titel: '7. Vertragslaufzeit und Kündigung',
+        text: 'Der unentgeltliche Free-Plan ist jederzeit ohne Frist kündbar (durch Kontolöschung). ' +
+              'Kostenpflichtige Pläne haben eine Mindestlaufzeit von einem Monat (monatliche ' +
+              'Abrechnung) oder einem Jahr (jährliche Abrechnung). Verbraucher können kostenpflichtige ' +
+              'Verträge nach der ersten Mindestlaufzeit jederzeit mit einer Frist von einem Monat ' +
+              'zum Monatsende kündigen. Kündigung über das Stripe-Customer-Portal oder per E-Mail an ' +
+              '<a href="mailto:info@junker-immobilien.io">info@junker-immobilien.io</a>.'
+      },
+      {
+        titel: '8. Datenverarbeitung (DSGVO)',
+        text: 'Junker Immobilien verarbeitet personenbezogene Daten ausschließlich gemäß der ' +
+              '<a href="/datenschutz.html" target="_blank">Datenschutzerklärung</a>. ' +
+              'Es werden <strong>technisch notwendige Cookies</strong> verwendet, keine Tracking-Cookies. ' +
+              'Daten werden in Deutschland gehostet (Hetzner). Eingaben in KI-Funktionen werden an ' +
+              'OpenAI in den USA übermittelt; OpenAI verwendet diese Daten nicht zum Training ihrer Modelle.'
+      },
+      {
+        titel: '9. Haftungsausschluss',
+        text: 'Junker Immobilien übernimmt <strong>keine Haftung</strong> für direkte oder indirekte ' +
+              'Schäden, die aus der Nutzung der Modell-Berechnungen oder daraus abgeleiteten ' +
+              'Entscheidungen entstehen. Die Haftung ist bei leichter Fahrlässigkeit auf den ' +
+              'vorhersehbaren, vertragstypischen Schaden bei Verletzung von Kardinalpflichten ' +
+              'beschränkt. Unberührt bleibt die Haftung bei Vorsatz, grober Fahrlässigkeit, ' +
+              'Verletzung von Leben/Körper/Gesundheit sowie nach dem Produkthaftungsgesetz. ' +
+              'Details siehe <a href="/agb.html" target="_blank">AGB Ziffer X</a>.'
+      },
+      {
+        titel: '10. Verantwortung für eingegebene Daten Dritter',
+        text: 'Falls Sie in DealPilot personenbezogene Daten <strong>Dritter</strong> eingeben ' +
+              '(z.B. potenzielle Mieter, Verkäufer), sind Sie selbst datenschutzrechtlich ' +
+              'Verantwortlicher. Sie müssen sicherstellen, dass Sie zur Verarbeitung dieser Daten ' +
+              'berechtigt sind (Einwilligung oder gesetzliche Erlaubnis).'
+      },
+      {
+        titel: '11. Gerichtsstand und anwendbares Recht',
+        text: 'Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts. ' +
+              'Gerichtsstand für Unternehmer ist der Sitz des Anbieters (Hüllhorst). ' +
+              'Bei Verbrauchern bleibt der Schutz durch zwingende Bestimmungen des Aufenthaltslandes ' +
+              'unberührt.'
+      },
+      {
+        titel: '12. Stand und Versions-Hinweis',
+        text: '<strong>Stand dieser Hinweise:</strong> 24. Mai 2026 · Version ' + '1.1' + '. ' +
+              'Bei wesentlichen Änderungen wirst du per E-Mail informiert und musst die ' +
+              'aktualisierten Hinweise erneut bestätigen. Du kannst diese Hinweise jederzeit in ' +
+              'den Einstellungen unter „Rechtliches" erneut einsehen. ' +
+              'Es gelten zudem die <a href="/agb.html" target="_blank">AGB</a>, die ' +
+              '<a href="/datenschutz.html" target="_blank">Datenschutzerklärung</a> und das ' +
+              '<a href="/impressum.html" target="_blank">Impressum</a>.'
       }
     ]
   };
@@ -246,12 +312,26 @@
   }
 
   function autoCheck() {
-    // Wenn User schon eingeloggt ist (z.B. nach Page-Reload) und noch nicht akzeptiert:
-    // Modal nach 1s zeigen (App-Init abwarten)
+    // V271a-legacy-marker: Wenn eingeloggt und noch kein Eintrag → legacy-v0
+    // → Bestandsuser sehen kein erneutes Modal nach V1.1-Update
     setTimeout(function() {
       if (isAccepted()) return;
       if (global.Auth && global.Auth.isLoggedIn && global.Auth.isLoggedIn()) {
-        showConsentModal();
+        // Eingeloggt + nichts akzeptiert = Bestandsuser
+        // Markiere als legacy-v0 (überspringt das Modal)
+        try {
+          var legacyRecord = {
+            version: 'legacy-v0',
+            accepted_at: new Date().toISOString(),
+            ua: (navigator.userAgent || '').substring(0, 200),
+            legacy: true
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(legacyRecord));
+          if (console && console.info) {
+            console.info('[DealPilotLegal] Bestandsuser als legacy-v0 markiert');
+          }
+        } catch(e) {}
+        // KEIN Modal — Bestandsuser sieht's nicht
       }
       // Wenn nicht eingeloggt → kein Modal. Wird nach Login von auth.js getriggert.
     }, 1000);
