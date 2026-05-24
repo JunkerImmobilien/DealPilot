@@ -128,11 +128,11 @@
     setTimeout(_updateEasterEggVisibility, 50);
 
     // Close-Handler
-    document.getElementById('dp-register-close').addEventListener('click', function () {
+    document.getElementById('dp-register-close').addEventListener('click', function () { if (typeof showAuthModal === 'function') setTimeout(function(){ showAuthModal('login'); }, 50);
       modal.remove();
     });
     modal.addEventListener('click', function (e) {
-      if (e.target === modal) modal.remove();
+      if (e.target === modal) { modal.remove(); if (typeof showAuthModal === 'function') setTimeout(function(){ showAuthModal('login'); }, 50); }
     });
 
     // Submit
