@@ -1,0 +1,272 @@
+/* ═══════════════════════════════════════════════════════════════════
+   portfolio-legal.css                                   (V153.2)
+   ─────────────────────────────────────────────────────────────────
+   Styling für das Disclaimer-Modul (portfolio-legal.js).
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Modal-Overlay ──────────────────────────────────────────── */
+.dp-legal-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: dpLegalFadeIn 0.35s ease;
+}
+
+.dp-legal-modal.dp-legal-closing {
+  animation: dpLegalFadeOut 0.3s ease forwards;
+}
+
+@keyframes dpLegalFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes dpLegalFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.dp-legal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.dp-legal-dialog {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  background: #FAF6E8;
+  border: 1px solid #C9A84C;
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6),
+              0 0 0 1px rgba(201, 168, 76, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: dpLegalSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes dpLegalSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+[data-theme="dark"] .dp-legal-dialog {
+  background: #1c1a1a;
+  border-color: rgba(201, 168, 76, 0.45);
+}
+
+/* ─── Header ────────────────────────────────────────────────── */
+.dp-legal-header {
+  padding: 28px 32px 16px;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+  flex-shrink: 0;
+}
+
+.dp-legal-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #A8861E;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.dp-legal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+  color: #2A2727;
+  line-height: 1.2;
+}
+
+[data-theme="dark"] .dp-legal-title {
+  color: #FAF6E8;
+}
+
+/* ─── Body (scrollbar bei langem Text) ────────────────────────── */
+.dp-legal-body {
+  padding: 22px 32px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dp-legal-intro {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: #2A2727;
+  margin: 0 0 18px;
+}
+
+[data-theme="dark"] .dp-legal-intro {
+  color: rgba(250, 246, 232, 0.92);
+}
+
+.dp-legal-section {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: rgba(201, 168, 76, 0.05);
+  border-left: 3px solid #C9A84C;
+  border-radius: 6px;
+}
+
+[data-theme="dark"] .dp-legal-section {
+  background: rgba(201, 168, 76, 0.10);
+}
+
+.dp-legal-section h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: #A8861E;
+}
+
+[data-theme="dark"] .dp-legal-section h3 {
+  color: #E8C46C;
+}
+
+.dp-legal-section p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #2A2727;
+  margin: 0;
+}
+
+[data-theme="dark"] .dp-legal-section p {
+  color: rgba(250, 246, 232, 0.85);
+}
+
+.dp-legal-section strong {
+  color: #2A2727;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .dp-legal-section strong {
+  color: #FFD96A;
+}
+
+/* ─── Footer mit Checkbox + Button ────────────────────────────── */
+.dp-legal-footer {
+  padding: 18px 32px 24px;
+  border-top: 1px solid rgba(201, 168, 76, 0.25);
+  background: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .dp-legal-footer {
+  background: rgba(28, 26, 26, 0.6);
+}
+
+.dp-legal-checkbox {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #2A2727;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 14px;
+}
+
+[data-theme="dark"] .dp-legal-checkbox {
+  color: rgba(250, 246, 232, 0.92);
+}
+
+.dp-legal-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  accent-color: #C9A84C;
+  cursor: pointer;
+}
+
+.dp-legal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dp-legal-btn {
+  padding: 11px 24px;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  font: 600 13.5px 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dp-legal-btn-primary {
+  background: linear-gradient(135deg, #C9A84C, #A8861E);
+  color: #fff;
+  border-color: #C9A84C;
+}
+
+.dp-legal-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(201, 168, 76, 0.35);
+}
+
+.dp-legal-btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Close-Button (nur in Info-Modal) ────────────────────────── */
+.dp-legal-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(42, 39, 39, 0.15);
+  background: #fff;
+  color: #2A2727;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.15s;
+}
+
+.dp-legal-close:hover {
+  background: #C9A84C;
+  color: #fff;
+  border-color: #C9A84C;
+}
+
+[data-theme="dark"] .dp-legal-close {
+  background: #2A2727;
+  color: #FAF6E8;
+  border-color: rgba(201, 168, 76, 0.30);
+}
+
+/* ─── Persistenter Footer-Banner ──────────────────────────────── */
+
+/* ─── Mobile-Anpassung Dialog ──────────────────────────────── */
+@media (max-width: 640px) {
+  .dp-legal-dialog {
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+  .dp-legal-header,
+  .dp-legal-body,
+  .dp-legal-footer { padding-left: 20px; padding-right: 20px; }
+  .dp-legal-title { font-size: 22px; }
+}
+
+/* ─── Print: alles weg ────────────────────────────────────────── */
+@media print {
+  .dp-legal-modal { display: none !important; }
+}
