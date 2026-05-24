@@ -384,5 +384,9 @@ var mo = new MutationObserver(function () {
     show: showRegisterModal
   };
 
+  // V270.5b-alias: auth.js sucht window.RegisterModal (Legacy-Name)
+  // Wir aliasen damit _v10OpenRegister() auch funktioniert.
+  window.RegisterModal = window.DealPilotRegister;
+
   console.log('[register V169] Easter Egg aktiv — DealPilotRegister.show() zum Öffnen');
 })();

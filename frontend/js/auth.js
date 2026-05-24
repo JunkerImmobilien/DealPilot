@@ -426,8 +426,28 @@ async function logout() {
 function initAuth() {
   var session = Auth.getSession();
   if (!session) {
-    // V37: Konto-Erstellung deaktiviert — immer Login-Modus.
-    // Demo-User existiert über Backend-Seed oder muss vom Admin angelegt werden.
+    // V270.5b-initauth: ?register=1 aus URL → Register-Modal direkt
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('register') === '1') {
+      try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+      // RegisterModal direkt oder mit kleiner Verzögerung (Script-Load-Reihenfolge)
+      var openReg = function() {
+        if (window.RegisterModal && window.RegisterModal.show) {
+          window.RegisterModal.show();
+        } else if (window.DealPilotRegister && window.DealPilotRegister.show) {
+          window.DealPilotRegister.show();
+        } else {
+          // Last-Resort: zeige Login-Modal und User klickt selbst Konto-Erstellen
+          showAuthModal('login');
+        }
+      };
+      // Sofort versuchen + Fallback nach 300ms (falls script noch lädt)
+      openReg();
+      if (!document.querySelector('#dp-register-modal, [data-register-modal]')) {
+        setTimeout(openReg, 300);
+      }
+      return false;
+    }
     showAuthModal('login');
     return false;
   } else {
