@@ -308,7 +308,7 @@ function showAuthModal(mode) {
         // Beta-Tester (prominent goldener Button — keine Durchstreichung mehr)
         '<button type="button" class="auth-beta-v39" onclick="showBetaSignup()">' +
           '<span class="auth-beta-icon">✨</span>' +
-          '<span>Beta-Tester werden</span>' +
+          '<span data-v270-3-hidden>Beta-Tester werden</span>' +  /* V270.3-auth-cleanup */
         '</button>' +
 
         // V42: Registrieren-Button — kommt bald
@@ -368,8 +368,20 @@ async function handleAuthSubmit(mode) {
     if (mode === 'register') {
       var name = document.getElementById('auth-name').value.trim();
       session = await Auth.register(email, password, name);
+      /* V270.3-legal-trigger: Disclaimer-Modal nach Registrierung */
+      try {
+        if (typeof DealPilotLegal !== 'undefined' && DealPilotLegal.maybeShowAfterLogin) {
+          setTimeout(function(){ DealPilotLegal.maybeShowAfterLogin(); }, 800);
+        }
+      } catch(e) { /* non-blocking */ }
     } else {
       session = await Auth.login(email, password);
+      /* V270.3-legal-trigger: Disclaimer-Modal zeigen wenn neuer User */
+      try {
+        if (typeof DealPilotLegal !== 'undefined' && DealPilotLegal.maybeShowAfterLogin) {
+          setTimeout(function(){ DealPilotLegal.maybeShowAfterLogin(); }, 800);
+        }
+      } catch(e) { /* non-blocking */ }
     }
     document.getElementById('auth-modal').remove();
     if (typeof toast === 'function') toast('✓ Willkommen, ' + session.name);

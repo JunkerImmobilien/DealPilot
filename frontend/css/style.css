@@ -30777,3 +30777,71 @@ html[data-bg="cream"] .help-ai-foot {
     justify-content: center;
   }
 }
+
+
+/* ════════════════════════════════════════════════════════════════
+   V270.3-auth-style — Auth-Modal Cleanup
+   1. Beta-Tester-Button ausblenden (Marker auf inner span)
+   2. Konto-Erstellen-Button gold-filled (war outline)
+   3. Disclaimer-Hint unter Auth-Buttons
+   ════════════════════════════════════════════════════════════════ */
+
+/* 1) Beta-Tester-Button verstecken — Selector matched alle Vorfahren */
+[data-v270-3-hidden],
+*:has(> [data-v270-3-hidden]),
+button:has([data-v270-3-hidden]) {
+  display: none !important;
+}
+
+/* Fallback für Browser ohne :has() Support — direkt im JS-Output */
+.auth-modal-betabtn,
+.auth-beta-btn,
+.beta-tester-btn {
+  display: none !important;
+}
+
+/* 2) "Konto erstellen" Button prominenter — gold-filled */
+.auth-register-v39 {
+  background: linear-gradient(135deg, #C9A84C, #B89640) !important;
+  color: #1A1717 !important;
+  border: 1px solid rgba(201, 168, 76, 0.7) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(201, 168, 76, 0.25) !important;
+  transition: all 0.15s !important;
+}
+
+.auth-register-v39:hover {
+  background: linear-gradient(135deg, #D4B65A, #C9A84C) !important;
+  box-shadow: 0 4px 14px rgba(201, 168, 76, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* 3) Disclaimer-Hint Box unter Auth-Modal-Buttons */
+.auth-disclaimer-hint {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(201, 168, 76, 0.06);
+  border: 1px solid rgba(201, 168, 76, 0.18);
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: rgba(250, 246, 232, 0.7);
+  text-align: center;
+}
+
+.auth-disclaimer-hint a {
+  color: #C9A84C;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.auth-disclaimer-hint a:hover {
+  color: #D4B65A;
+}
+
+/* Light-Mode Variante */
+html[data-bg="white"] .auth-disclaimer-hint {
+  background: rgba(201, 168, 76, 0.08);
+  color: #5a534f;
+  border-color: rgba(201, 168, 76, 0.25);
+}
