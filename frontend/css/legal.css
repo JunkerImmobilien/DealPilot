@@ -270,3 +270,129 @@
 @media print {
   .dp-legal-modal { display: none !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   V270.4-dark-theme — Dark+Gold Theme passend zum DealPilot-Auth-Look
+   ════════════════════════════════════════════════════════════════ */
+
+.dp-legal-dialog {
+  background: linear-gradient(180deg, #1A1717 0%, #131010 100%) !important;
+  border: 1px solid rgba(201, 168, 76, 0.40) !important;
+  color: rgba(250, 246, 232, 0.92) !important;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(201, 168, 76, 0.10),
+    0 0 60px rgba(201, 168, 76, 0.08) !important;
+}
+
+.dp-legal-eyebrow {
+  color: rgba(201, 168, 76, 0.85) !important;
+}
+
+.dp-legal-title {
+  color: #FAF6E8 !important;
+  font-family: 'Cormorant Garamond', serif !important;
+}
+
+.dp-legal-intro {
+  color: rgba(250, 246, 232, 0.82) !important;
+}
+
+.dp-legal-section h3 {
+  color: #C9A84C !important;
+  font-family: 'Cormorant Garamond', serif !important;
+}
+
+.dp-legal-section p {
+  color: rgba(250, 246, 232, 0.78) !important;
+}
+
+.dp-legal-section strong {
+  color: #FAF6E8 !important;
+  font-weight: 600;
+}
+
+.dp-legal-section a {
+  color: #C9A84C !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dp-legal-section a:hover {
+  color: #D4B65A !important;
+}
+
+.dp-legal-footer {
+  border-top: 1px solid rgba(201, 168, 76, 0.20) !important;
+  background: rgba(20, 18, 18, 0.5) !important;
+}
+
+.dp-legal-checkbox {
+  color: rgba(250, 246, 232, 0.85) !important;
+}
+
+.dp-legal-checkbox span {
+  color: rgba(250, 246, 232, 0.85) !important;
+}
+
+.dp-legal-checkbox strong {
+  color: #C9A84C !important;
+}
+
+.dp-legal-checkbox input[type="checkbox"] {
+  accent-color: #C9A84C !important;
+}
+
+.dp-legal-btn-primary {
+  background: linear-gradient(135deg, #C9A84C, #B89640) !important;
+  color: #1A1717 !important;
+  border: 1px solid rgba(201, 168, 76, 0.7) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 14px rgba(201, 168, 76, 0.3) !important;
+  transition: all 0.2s !important;
+}
+
+.dp-legal-btn-primary:hover:not([disabled]) {
+  background: linear-gradient(135deg, #D4B65A, #C9A84C) !important;
+  box-shadow: 0 6px 20px rgba(201, 168, 76, 0.45) !important;
+  transform: translateY(-1px) !important;
+}
+
+.dp-legal-btn-primary[disabled] {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Backdrop intensiver für Dark-Mode */
+.dp-legal-backdrop {
+  background: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Close-Button für Info-Reopen */
+.dp-legal-close {
+  color: rgba(250, 246, 232, 0.7) !important;
+  background: transparent !important;
+}
+
+.dp-legal-close:hover {
+  color: #C9A84C !important;
+}
+
+/* Scroll-Bar in Body (modern) */
+.dp-legal-body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 168, 76, 0.4) transparent;
+}
+
+.dp-legal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dp-legal-body::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 76, 0.4);
+  border-radius: 3px;
+}

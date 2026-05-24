@@ -30845,3 +30845,36 @@ html[data-bg="white"] .auth-disclaimer-hint {
   color: #5a534f;
   border-color: rgba(201, 168, 76, 0.25);
 }
+
+/* ════════════════════════════════════════════════════════════════
+   V270.4-register-btn-fix — Roter Kreis beim Hover auf Konto-Erstellen
+   Bug: irgendeine Regel setzte cursor:not-allowed oder ::after mit
+        rotem Border. Wir overridden explizit auf normales Verhalten.
+   ════════════════════════════════════════════════════════════════ */
+
+.auth-register-v39 {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative;
+}
+
+.auth-register-v39::before,
+.auth-register-v39::after {
+  display: none !important;
+  content: none !important;
+}
+
+.auth-register-v39:not([disabled]):hover {
+  cursor: pointer !important;
+}
+
+.auth-register-v39[disabled] {
+  cursor: not-allowed !important;
+}
+
+/* Falls auf Landing-Page versehentlich .auth-register-v39 verwendet wird —
+   das ist eine APP-Klasse, nicht für Landing. Auf Landing kommt
+   ein anderer Button-Style. */
+.landing-page .auth-register-v39 {
+  display: none !important;
+}
