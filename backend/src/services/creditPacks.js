@@ -31,7 +31,7 @@ const CREDIT_PACKS = {
     currency: 'eur',
     price_per_request_cents: 20,
     stripe_product_id: 'prod_UXBhsps2EUMoeL',
-    stripe_price_id:   'price_1TY8E2KEjyPDo0wokbI5oIPV',
+    stripe_price_id:   process.env.STRIPE_PRICE_PACK_5   || 'price_1TY8E2KEjyPDo0wokbI5oIPV',  // Stripe-Live-ENV
     popular: false
   },
   pack_15: {
@@ -44,7 +44,7 @@ const CREDIT_PACKS = {
     currency: 'eur',
     price_per_request_cents: 17,
     stripe_product_id: 'prod_UXCdXtnTCFOnOC',
-    stripe_price_id:   'price_1TY8EFKEjyPDo0wooJK1uioi',
+    stripe_price_id:   process.env.STRIPE_PRICE_PACK_15  || 'price_1TY8EFKEjyPDo0wooJK1uioi',  // Stripe-Live-ENV
     popular: false
   },
   pack_40: {
@@ -57,7 +57,7 @@ const CREDIT_PACKS = {
     currency: 'eur',
     price_per_request_cents: 15,
     stripe_product_id: 'prod_UXCdCcDy70NZF4',
-    stripe_price_id:   'price_1TY8EQKEjyPDo0wo9tRixXAe',
+    stripe_price_id:   process.env.STRIPE_PRICE_PACK_40  || 'price_1TY8EQKEjyPDo0wo9tRixXAe',  // Stripe-Live-ENV
     popular: true
   },
   pack_100: {
@@ -70,7 +70,7 @@ const CREDIT_PACKS = {
     currency: 'eur',
     price_per_request_cents: 13,
     stripe_product_id: 'prod_UXCdQ39azqGjEp',
-    stripe_price_id:   'price_1TY8EcKEjyPDo0wo5DYWZ52I',
+    stripe_price_id:   process.env.STRIPE_PRICE_PACK_100 || 'price_1TY8EcKEjyPDo0wo5DYWZ52I',  // Stripe-Live-ENV
     popular: false
   }
 };
