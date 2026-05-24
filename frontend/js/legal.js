@@ -13,7 +13,7 @@
      3. localStorage-Persistierung (Versions-spezifisch)
 
    STAND
-     - Disclaimer-Version V1.0 (24.05.2026)
+     - Disclaimer-Version V1.1 (24.05.2026) — V271a
      - Bei Änderung der Disclaimer-Texte: Version hochzählen
        → User muss erneut zustimmen.
 
@@ -24,7 +24,7 @@
 (function(global) {
   'use strict';
 
-  // V271a-legal-12-sections: erweiterte rechtssichere Texte (12 Sections)
+  // V271a-legal-12-sections + V272-no-autoshow: rechtssichere Texte + kein Auto-Modal
   var DISCLAIMER_VERSION = '1.1';
   var STORAGE_KEY = 'dp_legal_accepted';
 
@@ -281,12 +281,11 @@
   }
 
   // ─── Trigger nach Login ───────────────────────────────────────
-  // Wird von auth.js nach erfolgreichem Login aufgerufen.
-  // ODER manuell beim Page-Load wenn schon eingeloggt + nicht akzeptiert.
+  // V272-no-autoshow: KEIN Modal mehr automatisch nach Login.
+  // Pflicht-Checkbox bei Registrierung (V271a) ersetzt das Auto-Modal.
+  // Manuell erreichbar via DealPilotLegal.showInfo() aus Settings → Rechtliches.
   function maybeShowAfterLogin() {
-    if (isAccepted()) return;
-    // Kurze Verzögerung damit App-UI da ist
-    setTimeout(showConsentModal, 400);
+    return;
   }
 
   // ─── Public API ────────────────────────────────────────────────
