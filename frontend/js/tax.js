@@ -1,3 +1,34 @@
+/* V279-debounced: Single debounced POST fuer tax-snapshots */
+(function(){
+  var _timer = null;
+  var _pendingPayload = null;
+  window._scheduleTaxSnapshotPost = function(wkPerYear) {
+    if (!window._currentObjKey || !window.Auth || typeof window.Auth.apiCall !== 'function') return;
+    if (!wkPerYear || typeof wkPerYear !== 'object') return;
+    _pendingPayload = wkPerYear;
+    if (_timer) clearTimeout(_timer);
+    _timer = setTimeout(function() {
+      var payload = _pendingPayload;
+      _pendingPayload = null;
+      _timer = null;
+      if (!payload) return;
+      window.Auth.apiCall('/tax-snapshots/' + window._currentObjKey, {
+        method: 'POST',
+        body: { wk_per_year: payload }
+      }).then(function(){
+        // Cache invalidieren - aber NICHT sofort loadAll triggern (verursacht Render-Loop)
+        if (window.DealPilotWKAggregator) {
+          window.DealPilotWKAggregator._cache = null;  // soft-invalidate
+        }
+      }).catch(function(err){
+        if (err && err.message && err.message.indexOf('429') < 0) {
+          console.warn('[V279] snapshot POST failed:', err.message);
+        }
+      });
+    }, 500);
+  };
+})();
+
 'use strict';
 /* ═══════════════════════════════════════════════════
    JUNKER IMMOBILIEN – tax.js V12
@@ -460,6 +491,29 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */
       '<div class="tax-item"><div class="tax-label">Durchschnittssteuersatz</div><div class="tax-val">' + (impact.avgAfter * 100).toFixed(1).replace('.', ',') + ' %</div></div>' +
     '</div>';
 
+  // V279-debounced: renderTaxModule ruft Debouncer mit aktualisierter taxTimeline
+  try {
+    if (window._currentObjKey && typeof displayYear === 'number' && totals && typeof totals.ergebnis === 'number'
+        && typeof window._scheduleTaxSnapshotPost === 'function') {
+      // taxTimeline mit UI-Wert updaten
+      if (Array.isArray(State.taxTimeline)) {
+        var _tlIdx = State.taxTimeline.findIndex(function(t){ return t && t.year === displayYear; });
+        if (_tlIdx >= 0) State.taxTimeline[_tlIdx].immoResult = totals.ergebnis;
+      }
+      // Snapshot zusammenstellen
+      var _newWk = {};
+      if (Array.isArray(State.taxTimeline)) {
+        State.taxTimeline.forEach(function(t){
+          if (t && typeof t.year === 'number' && typeof t.immoResult === 'number') {
+            _newWk[String(t.year)] = Math.round(t.immoResult);
+          }
+        });
+      }
+      _newWk[String(displayYear)] = Math.round(totals.ergebnis);
+      window._scheduleTaxSnapshotPost(_newWk);
+    }
+  } catch (e) { console.warn('[V279] module snapshot error:', e); }
+
   // Cache for PDF export
   State.taxResult = {
     immoResult: totals.ergebnis, isProfit: isProfit,
@@ -547,10 +601,9 @@ function renderTaxTimeline() {
   // Cache for PDF export
   State.taxTimeline = timeline;
 
-  // V277.4-snapshot-from-timeline: Direkt das UI-Result als Snapshot ans Backend
-  // Was der User sieht ist was in der DB landet. Kein Nachberechnen, kein Drift.
+  // V279-debounced: renderTaxTimeline ruft jetzt nur Debouncer (statt direkt POST)
   try {
-    if (window._currentObjKey && window.Auth && typeof window.Auth.apiCall === 'function') {
+    if (window._currentObjKey && Array.isArray(timeline) && typeof window._scheduleTaxSnapshotPost === 'function') {
       var _wkSnap = {};
       timeline.forEach(function(t) {
         if (t && typeof t.year === 'number' && typeof t.immoResult === 'number') {
@@ -558,19 +611,10 @@ function renderTaxTimeline() {
         }
       });
       if (Object.keys(_wkSnap).length > 0) {
-        window.Auth.apiCall('/tax-snapshots/' + window._currentObjKey, {
-          method: 'POST',
-          body: { wk_per_year: _wkSnap }
-        }).then(function() {
-          if (window.DealPilotWKAggregator && typeof window.DealPilotWKAggregator.loadAll === 'function') {
-            window.DealPilotWKAggregator.loadAll(true).catch(function(){});
-          }
-        }).catch(function(err) {
-          console.warn('[V277.4] steuer-snapshot POST failed:', err && err.message);
-        });
+        window._scheduleTaxSnapshotPost(_wkSnap);
       }
     }
-  } catch (e) { console.warn('[V277.4] snapshot persist error:', e); }
+  } catch (e) { console.warn('[V279] timeline snapshot error:', e); }
 }
 
 // Hook into existing renderTaxModule
