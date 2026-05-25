@@ -1831,10 +1831,24 @@ function _calcImmediate(){
   try {
     // a) Snapshot aus aktuellem Objekt: cf_op_ezb - afa = WK-Effekt (Ueberschuss/Verlust V+V)
     var thisYear = new Date().getFullYear();
-    var thisYearWK = (typeof K.cf_op === 'number' && typeof K.afa === 'number') ? (K.cf_op - K.afa) : 0;
+    // V276.3-K-scope-fix: K ist nur in calc() lokal - State.kpis nutzen
+    var _kpis = (window.State && State.kpis) || {};
+    var thisYearWK = (typeof _kpis.cf_op === 'number' && typeof _kpis.afa === 'number') ? (_kpis.cf_op - _kpis.afa) : 0;
     var snapshot = { wk_per_year: {} };
     snapshot.wk_per_year[String(thisYear)] = Math.round(thisYearWK);
-    // Mehrjahres-Projektion (falls vorhanden in State)
+    // V276.5-multi-year: Multi-Year-Snapshot aus State.cfRows
+    // cfop_y = operativer CF des Jahres, _kpis.afa = jaehrliche AfA
+    // V+V-Ueberschuss/Verlust pro Jahr = cfop_y - afa
+    if (window.State && Array.isArray(State.cfRows)) {
+      var _afaConst = (typeof _kpis.afa === 'number') ? _kpis.afa : 0;
+      State.cfRows.forEach(function(r) {
+        if (r && typeof r.cal === 'number' && typeof r.cfop_y === 'number') {
+          var vv_y = r.cfop_y - _afaConst;
+          snapshot.wk_per_year[String(r.cal)] = Math.round(vv_y);
+        }
+      });
+    }
+    // Fallback: State.steuer_rows falls vorhanden (alter Code)
     if (window.State && Array.isArray(State.steuer_rows)) {
       State.steuer_rows.forEach(function(r) {
         if (r.year && typeof r.verlust_ueberschuss === 'number') {

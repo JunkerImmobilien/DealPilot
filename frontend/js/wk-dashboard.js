@@ -1,3 +1,9 @@
+/* V276.2-disabled: Widget komplett ausgeschaltet, Inhalt jetzt im Steuermodul.
+   Original-Code unten als Kommentar erhalten falls Wiederherstellung gewuenscht.
+*/
+(function(){ /* no-op */ })();
+
+/* ORIGINAL-CODE (deaktiviert):
 /* V258-08: WK-Dashboard-Widget
  * Zeigt Gesamt-WK aller Won-Objekte in der Sidebar.
  */
@@ -92,3 +98,5 @@
     if (tab) setTimeout(inject, 100);
   });
 })();
+
+*/

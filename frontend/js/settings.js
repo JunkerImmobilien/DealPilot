@@ -163,8 +163,8 @@ function showSettings(initialTab) {
         '</div>' +
 
       '<div class="settings-tabs ms-tabs">' +
-        '<button class="st-tab ms-tab active" data-tab="account" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-user"/></svg></span>Account</button>' +
-        '<button class="st-tab ms-tab" data-tab="security" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-shield"/></svg></span>Sicherheit</button>' +
+        '<button class="st-tab ms-tab active" data-tab="account" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-user"/></svg></span>Account &amp; Sicherheit</button>' +
+        // V275-2fa-final: Sicherheit-Tab entfernt - alles in Account-Tab
         '<button class="st-tab ms-tab" data-tab="contact" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-pin"/></svg></span>Kontakt &amp; Logo</button>' +
         '<button class="st-tab ms-tab" data-tab="api" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-brain"/></svg></span>KI</button>' +
         '<button class="st-tab ms-tab" data-tab="dealscore" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-bar"/></svg></span>Deal Score</button>' +
@@ -241,6 +241,15 @@ function showSettings(initialTab) {
             '<span id="account-pw-msg" class="account-pw-msg"></span>' +
           '</div>'
         : '') +
+      // V275.1-2fa-fix: 2FA-Sektion VOR Danger-Zone
+      (typeof Auth !== 'undefined' && Auth.isApiMode && Auth.isApiMode() ?
+        '<hr class="dvd">' +
+        '<h3 class="set-section-h">Zwei-Faktor-Authentifizierung (2FA)</h3>' +
+        '<p class="hint">Schuetze deinen Account mit Zwei-Faktor-Authentifizierung. Du brauchst eine Authenticator-App (Google Authenticator, Authy, 1Password, Microsoft Authenticator).</p>' +
+        '<div id="sec-2fa-host"><div class="sec-2fa-loading" style="padding:14px;color:var(--muted)">Lade 2FA-Status...</div></div>'
+      : '') +
+
+
 
         // Logout-Button (nur API-Mode)
         (typeof Auth !== 'undefined' && Auth.isApiMode && Auth.isApiMode() ?
@@ -261,13 +270,8 @@ function showSettings(initialTab) {
           '</div>'
         : '') +
 
-      '</div>' +
-
-      // V63.80: Sicherheit-Tab — Zwei-Faktor-Authentifizierung
-      '<div class="st-pane" data-pane="security" style="display:none">' +
-        '<p class="hint">Schütze deinen Account mit Zwei-Faktor-Authentifizierung. Du brauchst dafür eine Authenticator-App auf deinem Smartphone (Google Authenticator, Authy, 1Password, Microsoft Authenticator).</p>' +
-        '<div id="sec-2fa-host"><!-- wird beim Tab-Wechsel von _renderTwoFactor() befüllt --></div>' +
-      '</div>' +
+'</div>' +
+      // V275-2fa-final: Security-Pane entfernt - sec-2fa-host jetzt im Account-Pane
 
       // Tab 2: Contact & Logo
       '<div class="st-pane" data-pane="contact" style="display:none">' +
@@ -2841,3 +2845,84 @@ function _v213ResetCards() {
   };
   document.documentElement.setAttribute('data-bg', getMode());
 })();
+
+/* V275.1-2fa-fix: Robuster 2FA-Render-Trigger mit Polling und Error-Display */
+(function() {
+  'use strict';
+  var pollHandle = null;
+  var pollCount = 0;
+  var renderAttempted = false;
+
+  function _doRender() {
+    var host = document.getElementById('sec-2fa-host');
+    if (!host) return false;
+    if (typeof window._renderTwoFactor !== 'function') return false;
+    // Schon gerendert? (nicht mehr im Loading-State)
+    var loading = host.querySelector('.sec-2fa-loading');
+    if (!loading && host.innerHTML.trim()) return true;
+
+    renderAttempted = true;
+    Promise.resolve(window._renderTwoFactor()).then(function() {
+      // Verify: nach Render sollte Loading weg sein, sonst Fehler anzeigen
+      setTimeout(function() {
+        var h = document.getElementById('sec-2fa-host');
+        if (!h) return;
+        var stillLoading = h.querySelector('.sec-2fa-loading');
+        if (stillLoading) {
+          // Render hat nichts gemacht - zeige Diagnose-Info
+          h.innerHTML =
+            '<div style="padding:14px;border:1px solid #e0c060;background:#fff8e0;border-radius:8px">' +
+              '<strong>2FA-Status konnte nicht geladen werden.</strong><br>' +
+              '<span style="color:var(--muted);font-size:13px">Bitte Seite neu laden (Strg+F5) und erneut versuchen. Falls das Problem weiter besteht, melde dich beim Support.</span>' +
+              '<div style="margin-top:10px"><button class="btn btn-sm btn-outline" onclick="window._renderTwoFactor && window._renderTwoFactor()">Erneut versuchen</button></div>' +
+            '</div>';
+        }
+      }, 800);
+    }).catch(function(err) {
+      var h = document.getElementById('sec-2fa-host');
+      if (h) {
+        h.innerHTML =
+          '<div style="padding:14px;border:1px solid #B8625C;background:#fef0ef;border-radius:8px;color:#8B3A33">' +
+            '<strong>2FA-Fehler:</strong> ' + (err && err.message ? err.message : 'Unbekannter Fehler') +
+            '<div style="margin-top:10px"><button class="btn btn-sm btn-outline" onclick="window._renderTwoFactor && window._renderTwoFactor()">Erneut versuchen</button></div>' +
+          '</div>';
+      }
+      console.error('[V275.1-2fa] Render-Fehler:', err);
+    });
+    return true;
+  }
+
+  function _startPolling() {
+    pollCount = 0;
+    renderAttempted = false;
+    if (pollHandle) clearInterval(pollHandle);
+    pollHandle = setInterval(function() {
+      pollCount++;
+      if (_doRender() || pollCount > 30) {
+        clearInterval(pollHandle);
+        pollHandle = null;
+      }
+    }, 200);
+  }
+
+  document.addEventListener('click', function(e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('[onclick*="openSettings"]')) {
+      _startPolling();
+    }
+    if (t.closest('.st-tab[data-tab="account"]')) {
+      _startPolling();
+    }
+  }, true);
+
+  // Auch beim Window-Load (falls Modal direkt sichtbar ist)
+  if (document.readyState === 'complete') {
+    setTimeout(_startPolling, 500);
+  } else {
+    window.addEventListener('load', function() {
+      setTimeout(_startPolling, 500);
+    });
+  }
+})();
+

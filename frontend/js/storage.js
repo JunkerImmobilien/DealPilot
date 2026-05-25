@@ -126,6 +126,12 @@ function collectData() {
     d._kpis_dscr = State.kpis.dscr;
     d._kpis_ltv = State.kpis.ltv;       // V110: LTV mitspeichern für Sidebar-Toggle DSCR↔LTV
   }
+  // V276.6-snapshot-in-save: steuer_snapshot mitspeichern damit Backend wk-aggregate ihn sieht
+  try {
+    if (window._currentObjData && window._currentObjData.steuer_snapshot) {
+      d.steuer_snapshot = window._currentObjData.steuer_snapshot;
+    }
+  } catch(_) {}
   return d;
 }
 

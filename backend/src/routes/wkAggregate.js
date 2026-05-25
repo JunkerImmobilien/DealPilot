@@ -17,7 +17,7 @@ router.get('/wk-aggregate', authenticate, async (req, res) => {
       SELECT id, data, updated_at
       FROM objects
       WHERE user_id = $1
-      ORDER BY (data->>'purchase_date') ASC NULLS LAST, created_at ASC
+      ORDER BY COALESCE(data->>'kaufdat', data->>'wirtschaftlicher_uebergang', data->>'purchase_date') ASC NULLS LAST, created_at ASC  -- V276.4-kaufdat-fix
     `, [userId]);
 
     const objects = [];
@@ -46,7 +46,7 @@ router.get('/wk-aggregate', authenticate, async (req, res) => {
       objects.push({
         id: row.id,
         address: d.adresse || d.adresse_text || '(ohne Adresse)',
-        purchase_date: d.purchase_date || null,
+        purchase_date: d.kaufdat || d.wirtschaftlicher_uebergang || d.purchase_date || null,  // V276.4-kaufdat-fix
         status: isWon ? 'won' : 'open',
         wk_per_year: wkPerYear
       });
