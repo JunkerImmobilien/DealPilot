@@ -305,16 +305,30 @@ function _getBestandLossesForYear(displayYear) {
       else if (window.State && State.currentObjectId) currentId = State.currentObjectId;
       else if (window._currentObjKey) currentId = _currentObjKey;
     } catch(_) {}
+    // V280-correct-filter: mein eigenes Kaufdatum holen (kaufdat-Feld oder WUe)
+    var currentObjKaufdat = null;
+    try {
+      var kdEl = document.getElementById('kaufdat');
+      var wuEl = document.getElementById('wirtschaftlicher_uebergang');
+      var raw = (kdEl && kdEl.value) || (wuEl && wuEl.value) || '';
+      if (raw && raw.length >= 10) currentObjKaufdat = raw.substring(0, 10);
+    } catch(_) {}
     // Year-Key als String
     var yearKey = String(displayYear);
     all.forEach(function(obj) {
       if (!obj || !obj.id) return;
       if (currentId && obj.id === currentId) return;  // sich selbst ueberspringen
-      // Kaufdatum-Filter: Kaufdatum/WUe muss < displayYear sein
+      // V280-correct-filter: Anderes Objekt nur wenn dessen Kaufdatum
+      //   1) VOR meinem eigenen Kaufdatum liegt UND
+      //   2) Bis zum Card-Year (displayYear) bereits existierte
       var refDate = obj.purchase_date || obj.kaufdat || obj.wirtschaftlicher_uebergang;
       if (!refDate) return;
-      var refYear = parseInt(String(refDate).substring(0, 4), 10);
-      if (!refYear || refYear >= displayYear) return;
+      var refDateStr = String(refDate).substring(0, 10);
+      // Bedingung 1: anderes Kaufdatum < mein Kaufdatum
+      if (currentObjKaufdat && refDateStr >= currentObjKaufdat) return;
+      // Bedingung 2: anderes Kaufjahr <= displayYear
+      var refYear = parseInt(refDateStr.substring(0, 4), 10);
+      if (!refYear || refYear > displayYear) return;
       // Wert holen
       var val = obj.wk_per_year && obj.wk_per_year[yearKey];
       if (typeof val !== 'number' || val === 0) {
@@ -472,7 +486,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */
   }).join('');
   return '<details class="tax-item-other-objects" style="grid-column:1/-1;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:6px;padding:0;margin:4px 0">'
        +   '<summary style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer;font-weight:500;list-style:none">'
-       +     '<span>V+V andere Bestandsobjekte <span style="color:var(--muted);font-size:12px">(' + _bestandInfo.list.length + ')</span> <span class="tax-info" title="Saldo aus Verlusten und Ueberschuessen anderer gewonnener Objekte mit Kaufdatum vor ' + displayYear + '">\u24D8</span></span>'
+       +     '<span>V+V andere Bestandsobjekte <span style="color:var(--muted);font-size:12px">(' + _bestandInfo.list.length + ')</span> <span class="tax-info" title="Saldo aus Verlusten und Ueberschuessen anderer Bestandsobjekte (mit Kaufdatum vor diesem Objekt). Berechnung fuer Jahr ' + displayYear + '">\u24D8</span></span>'
        +     '<span class="' + sumColor + '" style="font-weight:600">' + fmtVal(_bestandInfo.sum) + '</span>'
        +   '</summary>'
        +   rows
