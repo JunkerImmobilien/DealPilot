@@ -558,7 +558,7 @@ function renderTaxTimeline() {
         }
       });
       if (Object.keys(_wkSnap).length > 0) {
-        window.Auth.apiCall('/objects/' + window._currentObjKey + '/steuer-snapshot', {
+        window.Auth.apiCall('/tax-snapshots/' + window._currentObjKey, {
           method: 'POST',
           body: { wk_per_year: _wkSnap }
         }).then(function() {
