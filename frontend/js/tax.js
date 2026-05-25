@@ -1,3 +1,34 @@
+/* V279-debounced: Single debounced POST fuer tax-snapshots */
+(function(){
+  var _timer = null;
+  var _pendingPayload = null;
+  window._scheduleTaxSnapshotPost = function(wkPerYear) {
+    if (!window._currentObjKey || !window.Auth || typeof window.Auth.apiCall !== 'function') return;
+    if (!wkPerYear || typeof wkPerYear !== 'object') return;
+    _pendingPayload = wkPerYear;
+    if (_timer) clearTimeout(_timer);
+    _timer = setTimeout(function() {
+      var payload = _pendingPayload;
+      _pendingPayload = null;
+      _timer = null;
+      if (!payload) return;
+      window.Auth.apiCall('/tax-snapshots/' + window._currentObjKey, {
+        method: 'POST',
+        body: { wk_per_year: payload }
+      }).then(function(){
+        // Cache invalidieren - aber NICHT sofort loadAll triggern (verursacht Render-Loop)
+        if (window.DealPilotWKAggregator) {
+          window.DealPilotWKAggregator._cache = null;  // soft-invalidate
+        }
+      }).catch(function(err){
+        if (err && err.message && err.message.indexOf('429') < 0) {
+          console.warn('[V279] snapshot POST failed:', err.message);
+        }
+      });
+    }, 500);
+  };
+})();
+
 'use strict';
 /* ═══════════════════════════════════════════════════
    JUNKER IMMOBILIEN – tax.js V12
@@ -198,6 +229,145 @@ var Tax = (function() {
 // ═══════════════════════════════════════════════════
 // UI: Steuer-Modul anzeigen (im Tab 3 "Miete & Steuern")
 // ═══════════════════════════════════════════════════
+// V275.2-helper-fix: Robuster Helper ohne STATE-Zugriff
+// Nutzt nur oeffentliche getForDateSync() API + cached fuer Performance
+var _zveCache = { periods: null, ts: 0 };
+
+function _collectAllPeriodsViaScan() {
+  // Sammelt alle Periods via getForDateSync() Probe-Calls fuer jedes Jahr 2000-2050
+  // Das funktioniert OHNE Internal-STATE Zugriff.
+  if (!window.DealPilotTaxPeriods || typeof DealPilotTaxPeriods.getForDateSync !== 'function') return [];
+  var found = {};  // dedupe by valid_from
+  for (var y = 2000; y <= 2050; y++) {
+    var d = y + '-06-15';
+    try {
+      var p = DealPilotTaxPeriods.getForDateSync(d);
+      if (p && p.valid_from && typeof p.zve === 'number') {
+        found[p.valid_from] = p;
+      }
+    } catch(_) {}
+  }
+  return Object.keys(found).map(function(k){ return found[k]; });
+}
+
+function _getZveForDateWithFallback(yearStr) {
+  if (!window.DealPilotTaxPeriods) return null;
+  var refDate = yearStr + '-06-15';
+  try {
+    // Versuch 1: exakter Match via produktive API
+    if (typeof DealPilotTaxPeriods.getForDateSync === 'function') {
+      var p = DealPilotTaxPeriods.getForDateSync(refDate);
+      if (p && typeof p.zve === 'number' && p.zve > 0) {
+        return { zve: p.zve, source: 'Steuerzeitraum ' + yearStr, exact: true, period: p };
+      }
+    }
+    // Versuch 2: alle Periods sammeln (mit Cache, 5 Sekunden TTL)
+    var now = Date.now();
+    if (!_zveCache.periods || (now - _zveCache.ts) > 5000) {
+      _zveCache.periods = _collectAllPeriodsViaScan();
+      _zveCache.ts = now;
+    }
+    var allPeriods = _zveCache.periods || [];
+    var match = null;
+    allPeriods.forEach(function(per) {
+      if (!per || !per.valid_from || typeof per.zve !== 'number') return;
+      if (per.valid_from <= refDate) {
+        if (!match || per.valid_from > match.valid_from) match = per;
+      }
+    });
+    if (match && typeof match.zve === 'number' && match.zve > 0) {
+      return {
+        zve: match.zve,
+        source: 'letzter bekannter Wert (gueltig ab ' + match.valid_from + ')',
+        exact: false,
+        period: match
+      };
+    }
+  } catch(_) {}
+  return null;
+}
+
+
+// V276-other-objects: Verluste/Ueberschuesse aus anderen Bestandsobjekten
+function _getBestandLossesForYear(displayYear) {
+  // Synchron, nutzt nur Cache. Returns {sum, list, loaded}
+  // loaded=false bedeutet: Cache noch nicht da, sollte Re-Render triggern
+  var result = { sum: 0, list: [], loaded: false };
+  if (!window.DealPilotWKAggregator || !displayYear) return result;
+  try {
+    var all = DealPilotWKAggregator.getAllObjectsWithWK();
+    if (!Array.isArray(all)) return result;
+    result.loaded = true;
+    // currentObjectId ermitteln (verschiedene Wege)
+    var currentId = null;
+    try {
+      if (window._currentObjId) currentId = _currentObjId;
+      else if (window.State && State.currentObjectId) currentId = State.currentObjectId;
+      else if (window._currentObjKey) currentId = _currentObjKey;
+    } catch(_) {}
+    // V280-correct-filter: mein eigenes Kaufdatum holen (kaufdat-Feld oder WUe)
+    var currentObjKaufdat = null;
+    try {
+      var kdEl = document.getElementById('kaufdat');
+      var wuEl = document.getElementById('wirtschaftlicher_uebergang');
+      var raw = (kdEl && kdEl.value) || (wuEl && wuEl.value) || '';
+      if (raw && raw.length >= 10) currentObjKaufdat = raw.substring(0, 10);
+    } catch(_) {}
+    // Year-Key als String
+    var yearKey = String(displayYear);
+    all.forEach(function(obj) {
+      if (!obj || !obj.id) return;
+      if (currentId && obj.id === currentId) return;  // sich selbst ueberspringen
+      // V280-correct-filter: Anderes Objekt nur wenn dessen Kaufdatum
+      //   1) VOR meinem eigenen Kaufdatum liegt UND
+      //   2) Bis zum Card-Year (displayYear) bereits existierte
+      var refDate = obj.purchase_date || obj.kaufdat || obj.wirtschaftlicher_uebergang;
+      if (!refDate) return;
+      var refDateStr = String(refDate).substring(0, 10);
+      // Bedingung 1: anderes Kaufdatum < mein Kaufdatum
+      if (currentObjKaufdat && refDateStr >= currentObjKaufdat) return;
+      // Bedingung 2: anderes Kaufjahr <= displayYear
+      var refYear = parseInt(refDateStr.substring(0, 4), 10);
+      if (!refYear || refYear > displayYear) return;
+      // Wert holen
+      var val = obj.wk_per_year && obj.wk_per_year[yearKey];
+      if (typeof val !== 'number' || val === 0) {
+        // Falls nichts da: trotzdem Objekt mit 0 anzeigen
+        result.list.push({
+          id: obj.id,
+          name: obj.address || obj.kuerzel || obj.name || 'Objekt ' + obj.id.substring(0, 8),
+          value: 0
+        });
+        return;
+      }
+      result.list.push({
+        id: obj.id,
+        name: obj.address || obj.kuerzel || obj.name || 'Objekt ' + obj.id.substring(0, 8),
+        value: val
+      });
+      result.sum += val;
+    });
+  } catch(e) {
+    console.warn('[V276-other-objects]', e.message);
+  }
+  return result;
+}
+
+// Trigger async WK-Aggregator-Load + Re-Render wenn fertig
+function _ensureBestandDataAndRerender() {
+  if (!window.DealPilotWKAggregator) return;
+  var cache = DealPilotWKAggregator.getAllObjectsWithWK();
+  if (Array.isArray(cache) && cache.length > 0) return;  // schon da
+  DealPilotWKAggregator.loadAll(false).then(function() {
+    // Nach Load: Re-Render Tax-Modul
+    setTimeout(function() {
+      if (typeof renderTaxModule === 'function') {
+        try { renderTaxModule(); } catch(_) {}
+      }
+    }, 100);
+  }).catch(function(){});
+}
+
 function renderTaxModule(yearOverride) { /* V270-displayYear */
   if (!State.kpis) return;
   if (typeof _computeYearTotal !== 'function') return;
@@ -246,7 +416,36 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */
   var startYear = displayYear;
   var totals = _computeYearTotal(displayYear, yearIdx);
 
-  var baseIncome = parseDe((document.getElementById('zve') || {}).value) || 65891;
+  // V275.1-zve-gap: nutzt Helper mit Luecken-Fallback
+  var baseIncome = null;
+  var _zveSource = 'aktueller Wert';
+  try {
+    if (displayYear) {
+      var _zveInfo = _getZveForDateWithFallback(String(displayYear));
+      if (_zveInfo) {
+        baseIncome = _zveInfo.zve;
+        _zveSource = _zveInfo.source;
+      }
+    }
+  } catch(_e2751a) {}
+  if (baseIncome === null) {
+    baseIncome = parseDe((document.getElementById('zve') || {}).value) || 65891;
+    _zveSource = 'aktueller zvE-Wert';
+  }
+
+  // V276-other-objects: Saldo aus anderen Bestandsobjekten
+  var _bestandInfo = _getBestandLossesForYear(displayYear);
+  if (!_bestandInfo.loaded) {
+    _ensureBestandDataAndRerender();
+  }
+  var _baseIncomeOrig = baseIncome;
+  baseIncome = baseIncome + _bestandInfo.sum;  // Saldierung (Verluste negativ, Ueberschuesse positiv)
+
+  // Tooltip am zvE-ohne-Wert (falls Element vorhanden)
+  try {
+    var _zveOhneTip = box.querySelector('[data-zve-ohne-tip]') || box.querySelector('.tax-zve-ohne');
+    if (_zveOhneTip) _zveOhneTip.title = 'zvE-Quelle: ' + _zveSource;
+  } catch(_) {}
   var impact = Tax.calcImmoTaxImpact(baseIncome, totals.ergebnis);
 
   var refundColor = impact.refund > 0 ? 'var(--green)' : 'var(--red)';
@@ -271,6 +470,28 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */
   box.innerHTML =
     '<div class="tax-grid">' +
       '<div class="tax-item"><div class="tax-label">Einnahmen V+V (Kaltmiete + zus. Einnahmen + umlf. NK)</div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
+      (function(){ 
+  // V276-other-objects: Aufklappbare Sektion nur wenn Bestand existiert
+  // V276.2-section-always: rendere auch bei leerer Liste mit Hint
+  if (!_bestandInfo) return '';
+  if (_bestandInfo.list.length === 0) return '';  // wirklich keine Bestandsobjekte
+  var fmtVal = function(n) { return (n >= 0 ? '+' : '') + n.toLocaleString('de-DE') + ' \u20AC'; };
+  var sumColor = _bestandInfo.sum < 0 ? 'c-red' : (_bestandInfo.sum > 0 ? 'c-green' : '');
+  var rows = _bestandInfo.list.map(function(o) {
+    var vColor = o.value < 0 ? 'c-red' : (o.value > 0 ? 'c-green' : '');
+    return '<div style="display:flex;justify-content:space-between;padding:6px 12px 6px 24px;border-top:1px solid rgba(201,168,76,0.10);font-size:12.5px">'
+         + '<span style="color:var(--muted)">' + (o.name || "") + '</span>'
+         + '<span class="' + vColor + '">' + fmtVal(o.value) + '</span>'
+         + '</div>';
+  }).join('');
+  return '<details class="tax-item-other-objects" style="grid-column:1/-1;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:6px;padding:0;margin:4px 0">'
+       +   '<summary style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer;font-weight:500;list-style:none">'
+       +     '<span>V+V andere Bestandsobjekte <span style="color:var(--muted);font-size:12px">(' + _bestandInfo.list.length + ')</span> <span class="tax-info" title="Saldo aus Verlusten und Ueberschuessen anderer Bestandsobjekte (mit Kaufdatum vor diesem Objekt). Berechnung fuer Jahr ' + displayYear + '">\u24D8</span></span>'
+       +     '<span class="' + sumColor + '" style="font-weight:600">' + fmtVal(_bestandInfo.sum) + '</span>'
+       +   '</summary>'
+       +   rows
+       + '</details>';
+})() +
       '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt <span class="tax-info" title="Schuldzinsen + Bewirtschaftung + AfA + alle übrigen abziehbaren Kosten. Umlagefähige NK sind Werbungskosten UND Einnahme — sie heben sich auf (durchlaufender Posten) und beeinflussen den Steuer-Effekt nicht.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
       // V63.58 BUGFIX: fE() schluckt das Minuszeichen ohne sgn=true → mit sgn=true
       // wird Vorzeichen korrekt mit angezeigt; bei Verlust steht jetzt richtigerweise "-1.701 €"
@@ -283,6 +504,29 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */
       '<div class="tax-item"><div class="tax-label">Grenzsteuersatz aktuell</div><div class="tax-val">' + (impact.grenzsteuersatzAfter * 100).toFixed(1).replace('.', ',') + ' %</div></div>' +
       '<div class="tax-item"><div class="tax-label">Durchschnittssteuersatz</div><div class="tax-val">' + (impact.avgAfter * 100).toFixed(1).replace('.', ',') + ' %</div></div>' +
     '</div>';
+
+  // V279-debounced: renderTaxModule ruft Debouncer mit aktualisierter taxTimeline
+  try {
+    if (window._currentObjKey && typeof displayYear === 'number' && totals && typeof totals.ergebnis === 'number'
+        && typeof window._scheduleTaxSnapshotPost === 'function') {
+      // taxTimeline mit UI-Wert updaten
+      if (Array.isArray(State.taxTimeline)) {
+        var _tlIdx = State.taxTimeline.findIndex(function(t){ return t && t.year === displayYear; });
+        if (_tlIdx >= 0) State.taxTimeline[_tlIdx].immoResult = totals.ergebnis;
+      }
+      // Snapshot zusammenstellen
+      var _newWk = {};
+      if (Array.isArray(State.taxTimeline)) {
+        State.taxTimeline.forEach(function(t){
+          if (t && typeof t.year === 'number' && typeof t.immoResult === 'number') {
+            _newWk[String(t.year)] = Math.round(t.immoResult);
+          }
+        });
+      }
+      _newWk[String(displayYear)] = Math.round(totals.ergebnis);
+      window._scheduleTaxSnapshotPost(_newWk);
+    }
+  } catch (e) { console.warn('[V279] module snapshot error:', e); }
 
   // Cache for PDF export
   State.taxResult = {
@@ -370,6 +614,21 @@ function renderTaxTimeline() {
 
   // Cache for PDF export
   State.taxTimeline = timeline;
+
+  // V279-debounced: renderTaxTimeline ruft jetzt nur Debouncer (statt direkt POST)
+  try {
+    if (window._currentObjKey && Array.isArray(timeline) && typeof window._scheduleTaxSnapshotPost === 'function') {
+      var _wkSnap = {};
+      timeline.forEach(function(t) {
+        if (t && typeof t.year === 'number' && typeof t.immoResult === 'number') {
+          _wkSnap[String(t.year)] = Math.round(t.immoResult);
+        }
+      });
+      if (Object.keys(_wkSnap).length > 0) {
+        window._scheduleTaxSnapshotPost(_wkSnap);
+      }
+    }
+  } catch (e) { console.warn('[V279] timeline snapshot error:', e); }
 }
 
 // Hook into existing renderTaxModule
@@ -643,7 +902,23 @@ function _computeYearTotal(year, yearIdx) {
   var ergebnis = einnahmen - werbungskosten;
 
   // Steuer: zvE base + ergebnis
-  var baseIncome = parseDe((document.getElementById('zve') || {}).value) || 65891;
+  // V275-tax-cards-zve: Jahr-spezifisches zvE aus DealPilotTaxPeriods
+
+  var baseIncome = null;
+
+  try {
+
+    if (window.DealPilotTaxPeriods && typeof DealPilotTaxPeriods.getForDateSync === 'function' && typeof year === 'number') {
+
+      var _per_v275 = DealPilotTaxPeriods.getForDateSync(year + '-06-15');
+
+      if (_per_v275 && typeof _per_v275.zve === 'number' && _per_v275.zve > 0) baseIncome = _per_v275.zve;
+
+    }
+
+  } catch(_) {}
+
+  if (baseIncome === null) baseIncome = parseDe((document.getElementById('zve') || {}).value) || 65891;
   var impact = Tax.calcImmoTaxImpact(baseIncome, ergebnis);
 
   return {
@@ -1187,3 +1462,9 @@ function updateTaxBemerkung(input) {
   if (!window._taxYearlyBemerkungen[key]) window._taxYearlyBemerkungen[key] = {};
   window._taxYearlyBemerkungen[key][field] = input.value;
 }
+
+// V277.3-expose-yt: _computeYearTotal als window-Funktion verfuegbar fuer calc.js
+if (typeof _computeYearTotal === 'function' && typeof window !== 'undefined') {
+  window._computeYearTotal = _computeYearTotal;
+}
+

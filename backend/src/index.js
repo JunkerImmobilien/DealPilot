@@ -83,6 +83,9 @@ const authLimiter = rateLimit({
 app.use('/health', healthRoutes);
 app.use('/api/v1/auth', authLimiter, authRoutes);
 app.use('/api/v1/auth', registerWithVerifyRoutes);
+// V276.1-route-order: wkAggregate VOR objectRoutes! Sonst matched /:id und Validator wirft 400
+app.use('/api/v1/objects', require('./routes/wkAggregate'));  // V276-wk-enabled
+app.use('/api/v1/tax-snapshots', require('./routes/taxSnapshots'));  // V278-tax-snapshots
 app.use('/api/v1/objects', objectRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/plans', planRoutes);
@@ -96,7 +99,7 @@ app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/listing', scrapeRoutes);  // V63.85: URL-Scraper für Quick-Check
 app.use('/api/v1/rnd-request', rndRequestRoutes);  // V186: RND-Wizard-Anfrage
 app.use('/api/v1/export', require('./routes/exportEncrypt'));
-// V258-DISABLED app.use('/api/v1/objects', require('./routes/wkAggregate'));
+// V276.1-route-order: wkAggregate wurde NACH OBEN verschoben (vor objectRoutes) — siehe oben
 app.use('/api/v1/tax-periods', require('./routes/taxPeriods'));  // V259-02: Steuerzeitraeume  // V258-04: WK-Aggregation  // V251-05: Encrypted Export
 
 // V194: Admin-Dashboard

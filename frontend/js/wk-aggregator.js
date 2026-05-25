@@ -29,7 +29,7 @@
         console.log('[V258-05] Kein Token — keine WK-Aggregation');
         return null;
       }
-      const res = await fetch('/api/v1/objects/wk-aggregate', {
+      const res = await fetch('/api/v1/tax-snapshots', {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Accept': 'application/json'
@@ -40,6 +40,19 @@
         return null;
       }
       _cache = await res.json();
+      // V278: Mapping snapshots[] -> objects[] fuer Backwards-Compat
+      if (_cache && Array.isArray(_cache.snapshots)) {
+        _cache.objects = _cache.snapshots.map(function(s){
+          return { id: s.object_id, address: s.address, purchase_date: s.purchase_date, status: 'won', wk_per_year: s.wk_per_year || {} };
+        });
+        _cache.totals_per_year = {};
+        _cache.snapshots.forEach(function(s){
+          Object.keys(s.wk_per_year || {}).forEach(function(y){
+            var v = Number(s.wk_per_year[y]) || 0;
+            _cache.totals_per_year[y] = (_cache.totals_per_year[y] || 0) + v;
+          });
+        });
+      }
       _cacheTime = Date.now();
       console.log('[V258-05] WK-Aggregation geladen:', _cache.count, 'Objekte');
       return _cache;

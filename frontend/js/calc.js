@@ -1831,10 +1831,16 @@ function _calcImmediate(){
   try {
     // a) Snapshot aus aktuellem Objekt: cf_op_ezb - afa = WK-Effekt (Ueberschuss/Verlust V+V)
     var thisYear = new Date().getFullYear();
-    var thisYearWK = (typeof K.cf_op === 'number' && typeof K.afa === 'number') ? (K.cf_op - K.afa) : 0;
+    // V276.3-K-scope-fix: K ist nur in calc() lokal - State.kpis nutzen
+    var _kpis = (window.State && State.kpis) || {};
+    var thisYearWK = (typeof _kpis.cf_op === 'number' && typeof _kpis.afa === 'number') ? (_kpis.cf_op - _kpis.afa) : 0;
     var snapshot = { wk_per_year: {} };
     snapshot.wk_per_year[String(thisYear)] = Math.round(thisYearWK);
-    // Mehrjahres-Projektion (falls vorhanden in State)
+    // V277.4: Snapshot wird jetzt von tax.js renderTaxTimeline geschrieben
+    // (direkt aus dem UI-Result State.taxTimeline). Kein Drift moeglich.
+    // Dieser calc.js-Code-Pfad ist deaktiviert.
+    // snapshot.wk_per_year bleibt leer hier - wird von tax.js befuellt + gepostet.
+    // Fallback: State.steuer_rows falls vorhanden (alter Code)
     if (window.State && Array.isArray(State.steuer_rows)) {
       State.steuer_rows.forEach(function(r) {
         if (r.year && typeof r.verlust_ueberschuss === 'number') {
@@ -1842,10 +1848,28 @@ function _calcImmediate(){
         }
       });
     }
-    if (window.DealPilotWKAggregator && window._currentObjData) {
-      var oid = window._currentObjData.id || (window._currentObjData._id);
-      window.DealPilotWKAggregator.saveSnapshot(oid, snapshot);
-    }
+    // V277-direct-post: Snapshot direkt ins Backend, kein Cache-Hack mehr
+    try {
+      var _oid = window._currentObjKey || (window._currentObjData && (window._currentObjData.id || window._currentObjData._id));
+      if (_oid && window.Auth && typeof window.Auth.apiCall === 'function') {
+        // Fire-and-forget - blockiert nicht das UI
+        window.Auth.apiCall('/objects/' + _oid + '/steuer-snapshot', {
+          method: 'POST',
+          body: { wk_per_year: snapshot.wk_per_year }
+        }).then(function(){
+          // Cache invalidieren damit getAllObjectsWithWK nachzieht
+          if (window.DealPilotWKAggregator && typeof window.DealPilotWKAggregator.loadAll === 'function') {
+            window.DealPilotWKAggregator.loadAll(true).catch(function(){});
+          }
+        }).catch(function(err){
+          console.warn('[V277] steuer-snapshot POST failed:', err && err.message);
+        });
+      }
+      // Alter Aufruf bleibt als Fallback (schadet nicht)
+      if (window.DealPilotWKAggregator && typeof window.DealPilotWKAggregator.saveSnapshot === 'function' && _oid) {
+        window.DealPilotWKAggregator.saveSnapshot(_oid, snapshot);
+      }
+    } catch(e) { console.warn('[V277] snapshot persist error:', e); }
 
     // b) WK anderer Objekte fuer aktuelles Jahr abfragen + UI aktualisieren
     if (window.DealPilotWKAggregator) {

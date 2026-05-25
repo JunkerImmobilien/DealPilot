@@ -54,6 +54,20 @@ window.StarRating = (function() {
       '</svg>'
   };
 
+
+  // V275-star-inline: Inline-Style-Setter fuer Label-Sichtbarkeit
+  function _applyLabelStyle(labelEl, isEmpty) {
+    if (!labelEl) return;
+    labelEl.style.setProperty('color', '#2A2727', 'important');
+    labelEl.style.setProperty('font-weight', '500', 'important');
+    if (isEmpty) {
+      labelEl.style.setProperty('color', 'rgba(42,39,39,0.55)', 'important');
+      labelEl.style.setProperty('font-style', 'italic', 'important');
+    } else {
+      labelEl.style.removeProperty('font-style');
+    }
+  }
+
   // Stern-SVG: gefüllt vs. leer
   function _starSvg(filled) {
     return '<svg viewBox="0 0 24 24" width="28" height="28" ' +
@@ -95,6 +109,7 @@ window.StarRating = (function() {
     if (label) {
       label.textContent = LABELS[rating];
       label.classList.toggle('qz-label-empty', rating === 0);
+      _applyLabelStyle(label, rating === 0);
     }
     _updateAverage();
     // DealScore 2.0 nach Sterne-Klick refreshen
@@ -177,6 +192,7 @@ window.StarRating = (function() {
       if (labelEl) {
         labelEl.textContent = LABELS[current];
         labelEl.classList.toggle('qz-label-empty', current === 0);
+        _applyLabelStyle(labelEl, current === 0);
       }
 
       // Click-Handler (Event-Delegation auf Container)
@@ -219,6 +235,13 @@ window.StarRating = (function() {
    * Werte werden aus den Hidden-Inputs gelesen und die Sterne neu gerendert.
    */
   function refresh() {
+    // V275-star-inline: Beim Refresh alle Labels stylen
+    try {
+      var _allLabels = document.querySelectorAll('[data-qz-label]');
+      _allLabels.forEach(function(lbl) {
+        _applyLabelStyle(lbl, lbl.classList.contains('qz-label-empty'));
+      });
+    } catch(_) {}
     document.querySelectorAll('[data-qz-target]').forEach(function(container) {
       var targetId = container.getAttribute('data-qz-target');
       var current = getRating(targetId);
@@ -227,6 +250,7 @@ window.StarRating = (function() {
       if (labelEl) {
         labelEl.textContent = LABELS[current];
         labelEl.classList.toggle('qz-label-empty', current === 0);
+        _applyLabelStyle(labelEl, current === 0);
       }
     });
     _updateAverage();
