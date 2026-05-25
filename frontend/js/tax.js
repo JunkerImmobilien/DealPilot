@@ -546,6 +546,31 @@ function renderTaxTimeline() {
 
   // Cache for PDF export
   State.taxTimeline = timeline;
+
+  // V277.4-snapshot-from-timeline: Direkt das UI-Result als Snapshot ans Backend
+  // Was der User sieht ist was in der DB landet. Kein Nachberechnen, kein Drift.
+  try {
+    if (window._currentObjKey && window.Auth && typeof window.Auth.apiCall === 'function') {
+      var _wkSnap = {};
+      timeline.forEach(function(t) {
+        if (t && typeof t.year === 'number' && typeof t.immoResult === 'number') {
+          _wkSnap[String(t.year)] = Math.round(t.immoResult);
+        }
+      });
+      if (Object.keys(_wkSnap).length > 0) {
+        window.Auth.apiCall('/objects/' + window._currentObjKey + '/steuer-snapshot', {
+          method: 'POST',
+          body: { wk_per_year: _wkSnap }
+        }).then(function() {
+          if (window.DealPilotWKAggregator && typeof window.DealPilotWKAggregator.loadAll === 'function') {
+            window.DealPilotWKAggregator.loadAll(true).catch(function(){});
+          }
+        }).catch(function(err) {
+          console.warn('[V277.4] steuer-snapshot POST failed:', err && err.message);
+        });
+      }
+    }
+  } catch (e) { console.warn('[V277.4] snapshot persist error:', e); }
 }
 
 // Hook into existing renderTaxModule
@@ -1379,3 +1404,9 @@ function updateTaxBemerkung(input) {
   if (!window._taxYearlyBemerkungen[key]) window._taxYearlyBemerkungen[key] = {};
   window._taxYearlyBemerkungen[key][field] = input.value;
 }
+
+// V277.3-expose-yt: _computeYearTotal als window-Funktion verfuegbar fuer calc.js
+if (typeof _computeYearTotal === 'function' && typeof window !== 'undefined') {
+  window._computeYearTotal = _computeYearTotal;
+}
+

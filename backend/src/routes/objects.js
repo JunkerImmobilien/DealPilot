@@ -155,4 +155,32 @@ router.post('/track-usage', validate({ body: trackUsageSchema }), async (req, re
 });
 
 
+
+// V277-steuer-snapshot: Dedizierter Endpoint zum Persistieren des Steuer-Snapshots
+// Nutzt JSONB-Merge damit andere Felder in data unberuehrt bleiben.
+router.post('/:id/steuer-snapshot',
+  validate({ params: idParamSchema, body: z.object({
+    wk_per_year: z.record(z.union([z.number(), z.string()]))
+  }).strict() }),
+  async (req, res, next) => {
+    try {
+      const { query } = require('../db/pool');
+      const snapshot = { steuer_snapshot: { wk_per_year: req.body.wk_per_year, updated_at: new Date().toISOString() } };
+      const r = await query(
+        `UPDATE objects
+           SET data = data || $1::jsonb, version = version + 1
+         WHERE id = $2 AND user_id = $3
+         RETURNING id, version, updated_at`,
+        [JSON.stringify(snapshot), req.params.id, req.user.id]
+      );
+      if (r.rowCount === 0) {
+        return res.status(404).json({ error: 'Object not found or not authorized' });
+      }
+      res.json({ ok: true, id: r.rows[0].id, version: r.rows[0].version });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 module.exports = router;

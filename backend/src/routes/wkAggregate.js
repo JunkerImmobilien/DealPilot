@@ -14,8 +14,7 @@ router.get('/wk-aggregate', authenticate, async (req, res) => {
 
     // Alle Objekte des Users mit Status "won" (siehe deal-action _deal_won)
     const result = await query(`
-      SELECT id, data, updated_at
-      FROM objects
+      SELECT id, data, updated_at, name  FROM objects
       WHERE user_id = $1
       ORDER BY COALESCE(data->>'kaufdat', data->>'wirtschaftlicher_uebergang', data->>'purchase_date') ASC NULLS LAST, created_at ASC  -- V276.4-kaufdat-fix
     `, [userId]);
@@ -45,7 +44,7 @@ router.get('/wk-aggregate', authenticate, async (req, res) => {
 
       objects.push({
         id: row.id,
-        address: d.adresse || d.adresse_text || '(ohne Adresse)',
+        address: (row.name || [d.str, d.hnr, d.ort].filter(Boolean).join(' ') || d.adresse || d.adresse_text || '(ohne Adresse)'),  // V277.3-address
         purchase_date: d.kaufdat || d.wirtschaftlicher_uebergang || d.purchase_date || null,  // V276.4-kaufdat-fix
         status: isWon ? 'won' : 'open',
         wk_per_year: wkPerYear
