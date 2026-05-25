@@ -29,6 +29,7 @@ router.get('/', async (req, res, next) => {
        FROM tax_snapshots ts
        JOIN objects o ON o.id = ts.object_id
        WHERE ts.user_id = $1
+         AND COALESCE((o.data->>'_deal_won')::boolean, false) = true  -- V281-won-filter: nur Bestandsobjekte
        ORDER BY o.created_at ASC`,
       [req.user.id]
     );
