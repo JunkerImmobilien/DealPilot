@@ -336,6 +336,9 @@ function _getBestandLossesForYear(displayYear) {
         result.list.push({
           id: obj.id,
           name: obj.address || obj.kuerzel || obj.name || 'Objekt ' + obj.id.substring(0, 8),
+          address: obj.address || '',
+          kaufdat: refDateStr,
+          objName: obj.name || obj.kuerzel || '',
           value: 0
         });
         return;
@@ -343,6 +346,9 @@ function _getBestandLossesForYear(displayYear) {
       result.list.push({
         id: obj.id,
         name: obj.address || obj.kuerzel || obj.name || 'Objekt ' + obj.id.substring(0, 8),
+        address: obj.address || '',
+        kaufdat: refDateStr,
+        objName: obj.name || obj.kuerzel || '',
         value: val
       });
       result.sum += val;
@@ -368,7 +374,7 @@ function _ensureBestandDataAndRerender() {
   }).catch(function(){});
 }
 
-function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-applied */ /* V284-tax-applied */
+function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-applied */ /* V284-tax-applied */ /* V285-tax-applied */ /* V286-tax-applied */
   if (!State.kpis) return;
   if (typeof _computeYearTotal !== 'function') return;
 
@@ -474,30 +480,64 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
       '<div class="tax-item"><div class="tax-label">Ausgangs-zvE <span class="tax-info" title="zvE-Quelle: ' + _zveSource + '">ⓘ</span></div><div class="tax-val">' + fE(_baseIncomeOrig, 0) + '</div></div>' +
       /* ─── RECHTS: Einnahmen V+V ─── */
       '<div class="tax-item"><div class="tax-label">Einnahmen V+V <span class="tax-info" title="Kaltmiete + zus. Einnahmen + umlf. NK">ⓘ</span></div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
-      /* ─── LINKS: Überschuss/Verlust V+V (aktueller Bestand) [V284: normalisiert] ─── */
+      /* ─── LINKS: Überschuss/Verlust V+V (aktueller Bestand) [V286: Hybrid mit Overlay] ─── */
       (function(){
         var fmtVal = function(n) { return (n >= 0 ? '+' : '') + n.toLocaleString('de-DE') + ' €'; };
-        /* Fall 1: keine anderen Bestandsobjekte → einfaches Item mit "—" Wert */
+        var fmtDate = function(s) {
+          if (!s || s.length < 10) return '';
+          /* YYYY-MM-DD → DD.MM.YYYY */
+          var parts = s.substring(0, 10).split('-');
+          if (parts.length !== 3) return s;
+          return parts[2] + '.' + parts[1] + '.' + parts[0];
+        };
+        var escHtml = function(s) {
+          return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        };
+        /* Fall 1: keine anderen Bestandsobjekte */
         if (!_bestandInfo || !_bestandInfo.list || _bestandInfo.list.length === 0) {
           return '<div class="tax-item"><div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) <span class="tax-info" title="Keine anderen Bestandsobjekte mit Kaufdatum vor diesem Objekt">ⓘ</span></div><div class="tax-val" style="color:var(--muted)">—</div></div>';
         }
-        /* Fall 2: aufklappbare Liste, optisch wie .tax-item */
         var sumColor = _bestandInfo.sum < 0 ? 'c-red' : (_bestandInfo.sum > 0 ? 'c-green' : '');
-        var rows = _bestandInfo.list.map(function(o) {
-          var vColor = o.value < 0 ? 'c-red' : (o.value > 0 ? 'c-green' : '');
-          return '<div style="display:flex;justify-content:space-between;padding:6px 14px 6px 28px;border-top:1px solid rgba(201,168,76,0.10);font-size:12.5px">'
-               + '<span style="color:var(--muted)">' + (o.name || "(unbenanntes Objekt)") + '</span>'
-               + '<span class="' + vColor + '">' + fmtVal(o.value) + '</span>'
-               + '</div>';
-        }).join('');
-        /* <details> auf .tax-item-Optik gebracht: gleiche padding, kein gold-Hintergrund */
-        return '<details class="tax-item tax-item-bestand" style="padding:0;cursor:pointer">'
-             +   '<summary style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;list-style:none;cursor:pointer">'
-             +     '<span class="tax-label" style="display:flex;align-items:center;gap:6px">Überschuss/Verlust V+V (aktueller Bestand) <span style="color:var(--muted);font-size:12px">(' + _bestandInfo.list.length + ')</span> <span class="tax-info" title="Summe der Ueberschuesse/Verluste aller anderen Bestandsobjekte mit Kaufdatum vor diesem Objekt. Berechnung fuer Jahr ' + displayYear + '. Klick zum Aufklappen.">ⓘ</span></span>'
-             +     '<span class="tax-val ' + sumColor + '">' + fmtVal(_bestandInfo.sum) + '</span>'
-             +   '</summary>'
-             +   rows
-             + '</details>';
+        var count = _bestandInfo.list.length;
+        /* Sortierung: nach Kaufdatum aufsteigend (älteste zuerst) */
+        var sorted = _bestandInfo.list.slice().sort(function(a, b) {
+          var aD = a.kaufdat || '';
+          var bD = b.kaufdat || '';
+          if (aD < bD) return -1;
+          if (aD > bD) return 1;
+          return 0;
+        });
+        /* Daten in window._taxBestandData speichern für Overlay-Renderer */
+        try { window._taxBestandData = { list: sorted, sum: _bestandInfo.sum, year: displayYear }; } catch(_) {}
+
+        var labelHtml = '<div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) '
+                      + '<span style="color:var(--muted);font-size:11.5px;margin-left:2px">(' + count + ')</span> '
+                      + '<span class="tax-info" title="Summe der Ueberschuesse/Verluste aller anderen Bestandsobjekte (Kaufdatum vor diesem Objekt). Berechnung fuer Jahr ' + displayYear + '. Klick fuer Detailliste.">ⓘ</span></div>';
+
+        /* Fall 2a: ≤5 Objekte → Inline-Liste */
+        if (count <= 5) {
+          var inlineRows = sorted.map(function(o) {
+            var vColor = o.value < 0 ? 'c-red' : (o.value > 0 ? 'c-green' : '');
+            return '<div class="tax-bestand-row">'
+                 + '<span class="tax-bestand-name" title="' + escHtml(o.name) + '">' + escHtml(o.name) + '</span>'
+                 + '<span class="tax-bestand-date">' + escHtml(fmtDate(o.kaufdat)) + '</span>'
+                 + '<span class="tax-bestand-val ' + vColor + '">' + fmtVal(o.value) + '</span>'
+                 + '</div>';
+          }).join('');
+          return '<details class="tax-item-bestand">'
+               +   '<summary class="tax-item">'
+               +     labelHtml
+               +     '<div class="tax-val ' + sumColor + '">' + fmtVal(_bestandInfo.sum) + '</div>'
+               +   '</summary>'
+               +   '<div class="tax-bestand-list tax-bestand-list-inline">' + inlineRows + '</div>'
+               + '</details>';
+        }
+
+        /* Fall 2b: >5 Objekte → Overlay (Klick auf Item öffnet) */
+        return '<div class="tax-item tax-item-bestand-trigger" data-tax-bestand-open="1" role="button" tabindex="0">'
+             +   labelHtml
+             +   '<div class="tax-val ' + sumColor + '">' + fmtVal(_bestandInfo.sum) + ' ▸</div>'
+             + '</div>';
       })() +
       /* ─── RECHTS: Werbungskosten gesamt ─── */
       '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt <span class="tax-info" title="Schuldzinsen + Bewirtschaftung + AfA + alle übrigen abziehbaren Kosten. Umlagefähige NK sind Werbungskosten UND Einnahme — sie heben sich auf (durchlaufender Posten) und beeinflussen den Steuer-Effekt nicht.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
@@ -1484,3 +1524,184 @@ if (typeof _computeYearTotal === 'function' && typeof window !== 'undefined') {
   window._computeYearTotal = _computeYearTotal;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   V286 — Bestand-Overlay (>5 Objekte): Suche, Sortierung, Schließen
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  if (window._taxBestandOverlayInit) return;
+  window._taxBestandOverlayInit = true;
+
+  var fmtVal = function(n) { return (n >= 0 ? '+' : '') + n.toLocaleString('de-DE') + ' €'; };
+  var fmtDate = function(s) {
+    if (!s || s.length < 10) return '';
+    var parts = s.substring(0, 10).split('-');
+    if (parts.length !== 3) return s;
+    return parts[2] + '.' + parts[1] + '.' + parts[0];
+  };
+  var escHtml = function(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  };
+
+  var _state = { sortKey: 'kaufdat', sortDir: 'asc', query: '' };
+
+  function renderRows() {
+    var data = window._taxBestandData;
+    if (!data || !data.list) return '';
+    var list = data.list.slice();
+    /* Filter */
+    var q = _state.query.trim().toLowerCase();
+    if (q) {
+      list = list.filter(function(o) {
+        var hay = (o.name || '') + ' ' + (o.address || '') + ' ' + (o.objName || '') + ' ' + (o.kaufdat || '') + ' ' + (o.value || 0);
+        return hay.toLowerCase().indexOf(q) >= 0;
+      });
+    }
+    /* Sort */
+    list.sort(function(a, b) {
+      var av, bv;
+      if (_state.sortKey === 'value') { av = a.value || 0; bv = b.value || 0; }
+      else if (_state.sortKey === 'kaufdat') { av = a.kaufdat || ''; bv = b.kaufdat || ''; }
+      else if (_state.sortKey === 'address') { av = (a.address || a.name || '').toLowerCase(); bv = (b.address || b.name || '').toLowerCase(); }
+      else { av = (a.name || '').toLowerCase(); bv = (b.name || '').toLowerCase(); }
+      if (av < bv) return _state.sortDir === 'asc' ? -1 : 1;
+      if (av > bv) return _state.sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    if (list.length === 0) {
+      return '<div class="tax-bestand-overlay-empty">Keine Treffer für “' + escHtml(_state.query) + '”</div>';
+    }
+    return list.map(function(o) {
+      var vColor = o.value < 0 ? 'c-red' : (o.value > 0 ? 'c-green' : '');
+      return '<tr>'
+           + '<td class="tax-bo-name">' + escHtml(o.name) + '</td>'
+           + '<td class="tax-bo-date">' + escHtml(fmtDate(o.kaufdat)) + '</td>'
+           + '<td class="tax-bo-addr">' + escHtml(o.address || o.objName || '—') + '</td>'
+           + '<td class="tax-bo-val ' + vColor + '">' + fmtVal(o.value) + '</td>'
+           + '</tr>';
+    }).join('');
+  }
+
+  function updateBody() {
+    var tbody = document.getElementById('tax-bestand-overlay-tbody');
+    if (tbody) tbody.innerHTML = renderRows();
+    var sortArrows = document.querySelectorAll('#tax-bestand-overlay th[data-sort]');
+    sortArrows.forEach(function(th) {
+      var key = th.getAttribute('data-sort');
+      var arrow = th.querySelector('.tax-bo-arrow');
+      if (!arrow) return;
+      if (key === _state.sortKey) {
+        arrow.textContent = _state.sortDir === 'asc' ? ' ▴' : ' ▾';
+      } else {
+        arrow.textContent = '';
+      }
+    });
+  }
+
+  function buildOverlay() {
+    var data = window._taxBestandData;
+    if (!data) return null;
+    var ov = document.createElement('div');
+    ov.id = 'tax-bestand-overlay';
+    ov.className = 'tax-bestand-overlay';
+    ov.innerHTML =
+      '<div class="tax-bestand-overlay-panel" role="dialog" aria-modal="true" aria-label="Liste Bestandsobjekte">'
+      + '<div class="tax-bestand-overlay-head">'
+      +   '<div class="tax-bestand-overlay-title">'
+      +     'Bestandsobjekte <span class="tax-bo-count">' + data.list.length + '</span>'
+      +     '<span class="tax-bo-year">(Berechnung für ' + data.year + ')</span>'
+      +   '</div>'
+      +   '<button class="tax-bestand-overlay-close" type="button" aria-label="Schließen">×</button>'
+      + '</div>'
+      + '<div class="tax-bestand-overlay-search">'
+      +   '<input id="tax-bestand-overlay-q" type="search" placeholder="Suche (Name, Adresse, Datum, Saldo)…" autocomplete="off" />'
+      + '</div>'
+      + '<div class="tax-bestand-overlay-tablewrap">'
+      +   '<table class="tax-bestand-overlay-table">'
+      +     '<thead><tr>'
+      +       '<th data-sort="name">Name<span class="tax-bo-arrow"></span></th>'
+      +       '<th data-sort="kaufdat">Kaufdatum<span class="tax-bo-arrow"></span></th>'
+      +       '<th data-sort="address">Adresse<span class="tax-bo-arrow"></span></th>'
+      +       '<th data-sort="value" class="tax-bo-th-right">Saldo<span class="tax-bo-arrow"></span></th>'
+      +     '</tr></thead>'
+      +     '<tbody id="tax-bestand-overlay-tbody"></tbody>'
+      +   '</table>'
+      + '</div>'
+      + '<div class="tax-bestand-overlay-foot">'
+      +   '<span class="tax-bo-foot-label">Saldo gesamt</span>'
+      +   '<span class="tax-bo-foot-val ' + (data.sum < 0 ? 'c-red' : (data.sum > 0 ? 'c-green' : '')) + '">' + fmtVal(data.sum) + '</span>'
+      + '</div>'
+      + '</div>';
+    document.body.appendChild(ov);
+    /* Initial render */
+    updateBody();
+    /* Event-Wires */
+    var input = ov.querySelector('#tax-bestand-overlay-q');
+    if (input) {
+      input.addEventListener('input', function(e) {
+        _state.query = e.target.value || '';
+        updateBody();
+      });
+      setTimeout(function(){ try { input.focus(); } catch(_) {} }, 50);
+    }
+    ov.querySelectorAll('th[data-sort]').forEach(function(th) {
+      th.addEventListener('click', function() {
+        var key = th.getAttribute('data-sort');
+        if (_state.sortKey === key) {
+          _state.sortDir = _state.sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          _state.sortKey = key;
+          _state.sortDir = (key === 'value') ? 'asc' : 'asc';
+        }
+        updateBody();
+      });
+    });
+    var closeBtn = ov.querySelector('.tax-bestand-overlay-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeOverlay);
+    /* Klick auf Backdrop (außerhalb Panel) schließt */
+    ov.addEventListener('click', function(e) {
+      if (e.target === ov) closeOverlay();
+    });
+    return ov;
+  }
+
+  function openOverlay() {
+    closeOverlay(); /* falls schon offen */
+    /* state default */
+    _state = { sortKey: 'kaufdat', sortDir: 'asc', query: '' };
+    buildOverlay();
+    /* ESC-Listener */
+    document.addEventListener('keydown', escHandler);
+  }
+
+  function closeOverlay() {
+    var ov = document.getElementById('tax-bestand-overlay');
+    if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+    document.removeEventListener('keydown', escHandler);
+  }
+
+  function escHandler(e) {
+    if (e.key === 'Escape' || e.keyCode === 27) closeOverlay();
+  }
+
+  /* Delegated click: Trigger-Item öffnet Overlay */
+  document.addEventListener('click', function(e) {
+    var trigger = e.target.closest && e.target.closest('[data-tax-bestand-open]');
+    if (trigger) {
+      e.preventDefault();
+      openOverlay();
+    }
+  });
+  /* Tastatur: Enter/Space auf Trigger */
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var t = document.activeElement;
+    if (t && t.matches && t.matches('[data-tax-bestand-open]')) {
+      e.preventDefault();
+      openOverlay();
+    }
+  });
+
+  /* Expose für Debug */
+  window._taxBestandOverlay = { open: openOverlay, close: closeOverlay };
+})();

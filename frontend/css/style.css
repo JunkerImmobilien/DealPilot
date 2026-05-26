@@ -30899,11 +30899,260 @@ html[data-bg="white"] .auth-disclaimer-hint {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   V284 — Bestand-Item im Steuermodul (optisch normalisiert)
+   V285 — Bestand-Item Pixel-Alignment mit .tax-item
+   <details class="tax-item-bestand"> ist NUR ein Wrapper, hat keine
+   eigene Höhe/Padding. Das <summary class="tax-item"> erbt automatisch
+   .tax-item-Look (7px 12px padding, flex space-between, gleiche Höhe).
    ═══════════════════════════════════════════════════════════════ */
-.tax-item-bestand { padding: 0 !important; }
-.tax-item-bestand > summary { list-style: none; }
+/* V285-bestand-align */
+.tax-item-bestand {
+  /* kein eigenes Padding/Background — alles vom inneren <summary> */
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+/* Pfeil-Marker des <details> verstecken */
+.tax-item-bestand > summary { list-style: none; cursor: pointer; }
 .tax-item-bestand > summary::-webkit-details-marker { display: none; }
 .tax-item-bestand > summary::marker { display: none; }
-.tax-item-bestand[open] > summary { border-bottom: 1px solid rgba(201,168,76,0.10); }
+/* Wenn aufgeklappt: kleine Trennlinie zwischen Summary und Liste */
+.tax-item-bestand[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 
+/* Aufgeklappte Liste der einzelnen Bestandsobjekte */
+.tax-bestand-list {
+  background: var(--surface2);
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  margin-top: 1px; /* visuelle Trennung zum Summary */
+}
+.tax-bestand-row {
+  /* V286: 3-Spalten-Grid (Name | Kaufdatum | Saldo) */
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 12px 5px 24px;
+  font-size: 11.5px;
+  border-top: 1px solid rgba(201,168,76,0.10);
+}
+.tax-bestand-row > .tax-bestand-name {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0;
+}
+.tax-bestand-row > .tax-bestand-date {
+  color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums;
+}
+.tax-bestand-row > .tax-bestand-val {
+  text-align: right; min-width: 70px;
+}
+.tax-bestand-row:first-child { border-top: 0; }
+.tax-bestand-name { color: var(--muted); }
+.tax-bestand-val { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   V286 — Bestand-Overlay (>5 Objekte): Volltext-Suche + Tabelle
+   ═══════════════════════════════════════════════════════════════ */
+/* V286-bestand-overlay */
+/* Trigger-Item (das geklickt wird) */
+.tax-item-bestand-trigger {
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s ease;
+}
+.tax-item-bestand-trigger:hover {
+  background: rgba(201,168,76,0.10);
+}
+.tax-item-bestand-trigger:focus-visible {
+  outline: 2px solid var(--gold, #C9A84C);
+  outline-offset: 1px;
+}
+.tax-item-bestand-trigger .tax-val {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* Overlay-Backdrop (Fullscreen) */
+.tax-bestand-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(2px);
+  padding: 20px;
+  animation: taxBestandOvFadeIn 0.15s ease-out;
+}
+@keyframes taxBestandOvFadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+/* Overlay-Panel */
+.tax-bestand-overlay-panel {
+  background: var(--surface, #fff);
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 1px var(--gold-2, rgba(201,168,76,0.4));
+  width: 100%;
+  max-width: 780px;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: taxBestandOvPanelIn 0.18s ease-out;
+}
+@keyframes taxBestandOvPanelIn {
+  from { transform: translateY(8px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Header */
+.tax-bestand-overlay-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(201,168,76,0.18);
+  background: linear-gradient(180deg, rgba(201,168,76,0.06), transparent);
+}
+.tax-bestand-overlay-title {
+  font-weight: 600; font-size: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.tax-bestand-overlay-title .tax-bo-count {
+  background: rgba(201,168,76,0.15);
+  color: var(--gold-3, #9a7f33);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.tax-bestand-overlay-title .tax-bo-year {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+.tax-bestand-overlay-close {
+  background: transparent;
+  border: 0;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+.tax-bestand-overlay-close:hover {
+  background: rgba(0,0,0,0.06);
+  color: var(--ch);
+}
+
+/* Search */
+.tax-bestand-overlay-search {
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(201,168,76,0.10);
+}
+.tax-bestand-overlay-search input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--surface2, rgba(0,0,0,0.02));
+  color: var(--ch);
+}
+.tax-bestand-overlay-search input:focus {
+  outline: none;
+  border-color: var(--gold-2, #C9A84C);
+  background: var(--surface, #fff);
+}
+
+/* Tabelle */
+.tax-bestand-overlay-tablewrap {
+  overflow: auto;
+  flex: 1 1 auto;
+  min-height: 100px;
+}
+.tax-bestand-overlay-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12.5px;
+}
+.tax-bestand-overlay-table thead th {
+  position: sticky; top: 0;
+  background: var(--surface2, #f5f3ee);
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid rgba(201,168,76,0.20);
+  white-space: nowrap;
+}
+.tax-bestand-overlay-table thead th:hover {
+  color: var(--ch);
+}
+.tax-bestand-overlay-table thead th.tax-bo-th-right { text-align: right; }
+.tax-bestand-overlay-table .tax-bo-arrow {
+  font-size: 9px;
+  color: var(--gold-2);
+  margin-left: 2px;
+}
+.tax-bestand-overlay-table tbody td {
+  padding: 7px 12px;
+  border-bottom: 1px solid rgba(201,168,76,0.07);
+  vertical-align: middle;
+}
+.tax-bestand-overlay-table tbody tr:hover { background: rgba(201,168,76,0.05); }
+.tax-bestand-overlay-table .tax-bo-name { font-weight: 500; }
+.tax-bestand-overlay-table .tax-bo-date {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tax-bestand-overlay-table .tax-bo-addr {
+  color: var(--muted);
+  font-size: 12px;
+  max-width: 220px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tax-bestand-overlay-table .tax-bo-val {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tax-bestand-overlay-empty {
+  padding: 30px 18px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Footer */
+.tax-bestand-overlay-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 18px;
+  border-top: 1px solid rgba(201,168,76,0.18);
+  background: linear-gradient(180deg, transparent, rgba(201,168,76,0.05));
+}
+.tax-bestand-overlay-foot .tax-bo-foot-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+.tax-bestand-overlay-foot .tax-bo-foot-val {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .tax-bestand-overlay-table .tax-bo-addr { display: none; }
+  .tax-bestand-overlay-panel { max-width: 100%; }
+}
