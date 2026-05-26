@@ -368,7 +368,7 @@ function _ensureBestandDataAndRerender() {
   }).catch(function(){});
 }
 
-function renderTaxModule(yearOverride) { /* V270-displayYear */
+function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-applied */ /* V284-tax-applied */
   if (!State.kpis) return;
   if (typeof _computeYearTotal !== 'function') return;
 
@@ -459,7 +459,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */
   // Alternativ: alle h2/h3-Headers im Steuer-Tab durchsuchen
   var taxSection = document.getElementById('s3-tax');
   if (taxSection) {
-    var headers = taxSection.querySelectorAll('h2, h3, .sec-title, [class*="title"]');
+    var headers = taxSection.querySelectorAll('h2, h3, .sec-title, [class*="title"], .ct, .ct-pro'); /* V283a */
     headers.forEach(function(h) {
       if (/echte\s+progression\s+\d{4}/i.test(h.textContent)) {
         h.textContent = h.textContent.replace(/(echte\s+progression\s+)\d{4}/i, '$1' + displayYear);
@@ -468,40 +468,56 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */
   }
 
   box.innerHTML =
+    /* V283b: Neues Layout — LINKS=OHNE Immobilie, RECHTS=MIT Immobilie */
     '<div class="tax-grid">' +
-      '<div class="tax-item"><div class="tax-label">Einnahmen V+V (Kaltmiete + zus. Einnahmen + umlf. NK)</div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
-      (function(){ 
-  // V276-other-objects: Aufklappbare Sektion nur wenn Bestand existiert
-  // V276.2-section-always: rendere auch bei leerer Liste mit Hint
-  if (!_bestandInfo) return '';
-  if (_bestandInfo.list.length === 0) return '';  // wirklich keine Bestandsobjekte
-  var fmtVal = function(n) { return (n >= 0 ? '+' : '') + n.toLocaleString('de-DE') + ' \u20AC'; };
-  var sumColor = _bestandInfo.sum < 0 ? 'c-red' : (_bestandInfo.sum > 0 ? 'c-green' : '');
-  var rows = _bestandInfo.list.map(function(o) {
-    var vColor = o.value < 0 ? 'c-red' : (o.value > 0 ? 'c-green' : '');
-    return '<div style="display:flex;justify-content:space-between;padding:6px 12px 6px 24px;border-top:1px solid rgba(201,168,76,0.10);font-size:12.5px">'
-         + '<span style="color:var(--muted)">' + (o.name || "") + '</span>'
-         + '<span class="' + vColor + '">' + fmtVal(o.value) + '</span>'
-         + '</div>';
-  }).join('');
-  return '<details class="tax-item-other-objects" style="grid-column:1/-1;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:6px;padding:0;margin:4px 0">'
-       +   '<summary style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer;font-weight:500;list-style:none">'
-       +     '<span>V+V andere Bestandsobjekte <span style="color:var(--muted);font-size:12px">(' + _bestandInfo.list.length + ')</span> <span class="tax-info" title="Saldo aus Verlusten und Ueberschuessen anderer Bestandsobjekte (mit Kaufdatum vor diesem Objekt). Berechnung fuer Jahr ' + displayYear + '">\u24D8</span></span>'
-       +     '<span class="' + sumColor + '" style="font-weight:600">' + fmtVal(_bestandInfo.sum) + '</span>'
-       +   '</summary>'
-       +   rows
-       + '</details>';
-})() +
+      /* ─── LINKS: Ausgangs-zvE ─── */
+      '<div class="tax-item"><div class="tax-label">Ausgangs-zvE <span class="tax-info" title="zvE-Quelle: ' + _zveSource + '">ⓘ</span></div><div class="tax-val">' + fE(_baseIncomeOrig, 0) + '</div></div>' +
+      /* ─── RECHTS: Einnahmen V+V ─── */
+      '<div class="tax-item"><div class="tax-label">Einnahmen V+V <span class="tax-info" title="Kaltmiete + zus. Einnahmen + umlf. NK">ⓘ</span></div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
+      /* ─── LINKS: Überschuss/Verlust V+V (aktueller Bestand) [V284: normalisiert] ─── */
+      (function(){
+        var fmtVal = function(n) { return (n >= 0 ? '+' : '') + n.toLocaleString('de-DE') + ' €'; };
+        /* Fall 1: keine anderen Bestandsobjekte → einfaches Item mit "—" Wert */
+        if (!_bestandInfo || !_bestandInfo.list || _bestandInfo.list.length === 0) {
+          return '<div class="tax-item"><div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) <span class="tax-info" title="Keine anderen Bestandsobjekte mit Kaufdatum vor diesem Objekt">ⓘ</span></div><div class="tax-val" style="color:var(--muted)">—</div></div>';
+        }
+        /* Fall 2: aufklappbare Liste, optisch wie .tax-item */
+        var sumColor = _bestandInfo.sum < 0 ? 'c-red' : (_bestandInfo.sum > 0 ? 'c-green' : '');
+        var rows = _bestandInfo.list.map(function(o) {
+          var vColor = o.value < 0 ? 'c-red' : (o.value > 0 ? 'c-green' : '');
+          return '<div style="display:flex;justify-content:space-between;padding:6px 14px 6px 28px;border-top:1px solid rgba(201,168,76,0.10);font-size:12.5px">'
+               + '<span style="color:var(--muted)">' + (o.name || "(unbenanntes Objekt)") + '</span>'
+               + '<span class="' + vColor + '">' + fmtVal(o.value) + '</span>'
+               + '</div>';
+        }).join('');
+        /* <details> auf .tax-item-Optik gebracht: gleiche padding, kein gold-Hintergrund */
+        return '<details class="tax-item tax-item-bestand" style="padding:0;cursor:pointer">'
+             +   '<summary style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;list-style:none;cursor:pointer">'
+             +     '<span class="tax-label" style="display:flex;align-items:center;gap:6px">Überschuss/Verlust V+V (aktueller Bestand) <span style="color:var(--muted);font-size:12px">(' + _bestandInfo.list.length + ')</span> <span class="tax-info" title="Summe der Ueberschuesse/Verluste aller anderen Bestandsobjekte mit Kaufdatum vor diesem Objekt. Berechnung fuer Jahr ' + displayYear + '. Klick zum Aufklappen.">ⓘ</span></span>'
+             +     '<span class="tax-val ' + sumColor + '">' + fmtVal(_bestandInfo.sum) + '</span>'
+             +   '</summary>'
+             +   rows
+             + '</details>';
+      })() +
+      /* ─── RECHTS: Werbungskosten gesamt ─── */
       '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt <span class="tax-info" title="Schuldzinsen + Bewirtschaftung + AfA + alle übrigen abziehbaren Kosten. Umlagefähige NK sind Werbungskosten UND Einnahme — sie heben sich auf (durchlaufender Posten) und beeinflussen den Steuer-Effekt nicht.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
-      // V63.58 BUGFIX: fE() schluckt das Minuszeichen ohne sgn=true → mit sgn=true
-      // wird Vorzeichen korrekt mit angezeigt; bei Verlust steht jetzt richtigerweise "-1.701 €"
-      '<div class="tax-item tax-highlight"><div class="tax-label">Überschuss / Verlust V+V</div><div class="tax-val" style="color:' + (isProfit ? 'var(--gold-d)' : 'var(--green)') + '">' + fE(totals.ergebnis, 0, true) + '</div></div>' +
-      '<div class="tax-item"><div class="tax-label">zvE ohne Immobilie</div><div class="tax-val">' + fE(baseIncome, 0) + '</div></div>' +
-      '<div class="tax-item"><div class="tax-label">zvE mit Immobilie</div><div class="tax-val">' + fE(baseIncome + totals.ergebnis, 0) + '</div></div>' +
+      /* ─── LINKS: Leerer Platzhalter (Symmetrie) ─── */
+      '<div class="tax-item" style="opacity:.4;background:transparent;border-color:rgba(201,168,76,0.08)"><div class="tax-label" style="font-style:italic">—</div><div class="tax-val">—</div></div>' +
+      /* ─── RECHTS: Überschuss/Verlust V+V (dieses Objekt) ─── */
+      '<div class="tax-item tax-highlight"><div class="tax-label">Überschuss / Verlust V+V (diese Immobilie)</div><div class="tax-val" style="color:' + (isProfit ? 'var(--gold-d)' : 'var(--green)') + '">' + fE(totals.ergebnis, 0, true) + '</div></div>' +
+      /* ─── LINKS: zvE ohne Immobilie ─── */
+      '<div class="tax-item"><div class="tax-label">zvE ohne Immobilie (mit aktuellem Bestand)</div><div class="tax-val">' + fE(baseIncome, 0) + '</div></div>' +
+      /* ─── RECHTS: zvE mit Immobilie ─── */
+      '<div class="tax-item"><div class="tax-label">zvE mit dieser Immobilie</div><div class="tax-val">' + fE(baseIncome + totals.ergebnis, 0) + '</div></div>' +
+      /* ─── LINKS: EStG ohne ─── */
       '<div class="tax-item"><div class="tax-label">EStG ohne Immo</div><div class="tax-val">' + fE(impact.taxBefore, 0) + '</div></div>' +
+      /* ─── RECHTS: EStG mit ─── */
       '<div class="tax-item"><div class="tax-label">EStG mit Immo</div><div class="tax-val">' + fE(impact.taxAfter, 0) + '</div></div>' +
-      '<div class="tax-item tax-result"><div class="tax-label">' + refundLabel + ' (jährlich)</div><div class="tax-val" style="color:' + refundColor + ';font-size:20px">' + (impact.refund >= 0 ? '+' : '') + fE(refundAbs, 0) + '</div></div>' +
+      /* ─── VOLLE BREITE: Erstattung/Nachzahlung ─── */
+      '<div class="tax-item tax-result" style="grid-column:1/-1"><div class="tax-label">' + refundLabel + ' (jährlich)</div><div class="tax-val" style="color:' + refundColor + ';font-size:20px">' + (impact.refund >= 0 ? '+' : '') + fE(refundAbs, 0) + '</div></div>' +
+      /* ─── LINKS: Grenzsteuersatz ─── */
       '<div class="tax-item"><div class="tax-label">Grenzsteuersatz aktuell</div><div class="tax-val">' + (impact.grenzsteuersatzAfter * 100).toFixed(1).replace('.', ',') + ' %</div></div>' +
+      /* ─── RECHTS: Durchschnittssteuersatz ─── */
       '<div class="tax-item"><div class="tax-label">Durchschnittssteuersatz</div><div class="tax-val">' + (impact.avgAfter * 100).toFixed(1).replace('.', ',') + ' %</div></div>' +
     '</div>';
 

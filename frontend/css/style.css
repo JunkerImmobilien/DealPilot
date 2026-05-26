@@ -25895,6 +25895,25 @@ aside.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner 
   pointer-events: none;
 }
 @keyframes dpV87BgPart { to { background-position: 0 -400px, 0 -400px, 0 -400px; } }
+/* ═══════════════════════════════════════════════════════════════
+   V284d — Settings-Modal Inhalt togglet Cream↔Weiß (echte Klassen)
+   Backdrop bleibt App-Hintergrund (V283d-Strategie behalten).
+   ECHTE Container: .set-modal-content (Z.26058) und .pane-wrap (Z.26067).
+   .modal-side (Sidebar) bleibt ABSICHTLICH unberührt — schwarz in beiden Modi.
+   ═══════════════════════════════════════════════════════════════ */
+/* V284-modal-fix */
+/* Cream-Mode (explizit) — Container bleiben cream */
+html[data-bg="cream"] .set-modal-cream,
+html[data-bg="cream"] .set-modal-cream .set-modal-content,
+html[data-bg="cream"] .set-modal-cream .pane-wrap {
+  background: var(--cream, #F8F6F1) !important;
+}
+/* White-Mode — Container wechseln auf #fff */
+html[data-bg="white"] .set-modal-cream,
+html[data-bg="white"] .set-modal-cream .set-modal-content,
+html[data-bg="white"] .set-modal-cream .pane-wrap {
+  background: #ffffff !important;
+}
 
 /* Modal-Container — Split-Grid */
 .set-modal-cream {
@@ -30878,3 +30897,13 @@ html[data-bg="white"] .auth-disclaimer-hint {
 .landing-page .auth-register-v39 {
   display: none !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   V284 — Bestand-Item im Steuermodul (optisch normalisiert)
+   ═══════════════════════════════════════════════════════════════ */
+.tax-item-bestand { padding: 0 !important; }
+.tax-item-bestand > summary { list-style: none; }
+.tax-item-bestand > summary::-webkit-details-marker { display: none; }
+.tax-item-bestand > summary::marker { display: none; }
+.tax-item-bestand[open] > summary { border-bottom: 1px solid rgba(201,168,76,0.10); }
+
