@@ -1,8 +1,24 @@
-FROM node:20-alpine
+# V288-libreoffice-applied
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# Install dependencies first (better layer caching)
+# Install system dependencies: LibreOffice (headless) for BMF-Sandwich-Service
+# + Schriften damit XLSX-Recalc keine Rendering-Probleme hat.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libreoffice-calc \
+    libreoffice-core \
+    fonts-dejavu-core \
+    fonts-liberation \
+    default-jre-headless \
+    wget \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Verify LibreOffice is installed (build-time check, fails build if missing)
+RUN libreoffice --version
+
+# Install Node dependencies first (better layer caching)
 COPY package*.json ./
 RUN npm install --omit=dev
 
@@ -17,10 +33,16 @@ COPY scripts ./scripts
 RUN mkdir -p /app/uploads
 
 # Run as non-root for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S junker -u 1001 -G nodejs && \
-    chown -R junker:nodejs /app
+# WICHTIG: LibreOffice braucht ein beschreibbares /tmp-Verzeichnis + ein
+# HOME-Verzeichnis (für ~/.config/libreoffice). Beides bekommt der junker-User.
+RUN groupadd -g 1001 nodejs && \
+    useradd -u 1001 -g nodejs -m -s /bin/false junker && \
+    chown -R junker:nodejs /app && \
+    mkdir -p /home/junker/.config && \
+    chown -R junker:nodejs /home/junker
 USER junker
+ENV HOME=/home/junker
+ENV BMF_RECALC_TIMEOUT_MS=60000
 
 EXPOSE 3001
 

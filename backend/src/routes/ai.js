@@ -623,4 +623,181 @@ router.post('/bodenrichtwert', authenticate, plzValidator.middleware, /* V229: P
   }
 });
 
+/* V288-bmf-gaa-applied */
+/**
+ * V288: POST /ai/bmf-gaa
+ * Schätzt 4 GAA-Werte (Gutachterausschuss-Werte) für BMF-Kaufpreisaufteilung
+ * via OpenAI in EINEM Call:
+ *   - brw                  (Bodenrichtwert in €/m²)
+ *   - vergleichsmiete_range (Vergleichsmiete in €/m²/Monat, Range low/high)
+ *   - liegenschaftszins    (in %)
+ *   - sachwertfaktor       (Faktor, einheitslos)
+ *   - vergleichsfaktor?    (optional, einheitslos)
+ *
+ * Body: { str?, plz, ort, baujahr, grundstuecksart?, wohnflaeche?, userApiKey? }
+ * Auth: Bearer JWT
+ * Credits: 1 (analog /bodenrichtwert)
+ */
+router.post('/bmf-gaa', authenticate, plzValidator.middleware, async (req, res, next) => {
+  try {
+    const payload = req.body || {};
+    const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
+      ? payload.userApiKey
+      : null;
+
+    if (!config.openai.apiKey && !userApiKey) {
+      return res.status(503).json({
+        error: 'Kein OpenAI-API-Key verfügbar.',
+        needs_user_key: true
+      });
+    }
+    if (!payload.plz || !payload.ort) {
+      return res.status(400).json({ error: 'plz und ort sind erforderlich' });
+    }
+
+    // Credit-Pre-Check (nur wenn Server-Key)
+    if (!userApiKey) {
+      const status = await aiCreditsService.getStatus(req.user.id);
+      if (status.total_remaining < 1) {
+        return res.status(402).json({
+          error: 'Keine KI-Credits mehr verfügbar.',
+          credits: status,
+          needs_credits: true
+        });
+      }
+    }
+
+    // Adresse + Kontext zusammenbauen
+    const address = [payload.str, payload.plz, payload.ort].filter(Boolean).join(', ');
+    const baujahr = parseInt(payload.baujahr) || null;
+    const grundstuecksart = payload.grundstuecksart || 'Wohnimmobilie';
+    const wfl = parseFloat(payload.wohnflaeche) || null;
+
+    const prompt = [
+      'Du bist Gutachter-Experte für deutsche Immobilien-Bewertung nach BMF-Arbeitshilfe (Fassung Juni 2023).',
+      'Schätze für diese Immobilie die 4 wichtigsten GAA-Werte (Gutachterausschuss-Werte):',
+      '',
+      'Adresse: ' + address,
+      'Baujahr: ' + (baujahr || '(unbekannt)'),
+      'Grundstücksart: ' + grundstuecksart,
+      'Wohnfläche: ' + (wfl ? wfl + ' m²' : '(unbekannt)'),
+      '',
+      'GESUCHTE WERTE:',
+      '1) brw — Bodenrichtwert in €/m² Grundstücksfläche (von BORIS-D/Gutachterausschuss)',
+      '2) vergleichsmiete_range — Vergleichsmiete (ortsüblich, kalt) in €/m²/Monat',
+      '     · low: niedriges Quartil',
+      '     · high: hohes Quartil',
+      '3) liegenschaftszins — Liegenschaftszinssatz in % (typisch 3-7% für Wohnimmobilien)',
+      '4) sachwertfaktor — Sachwertfaktor (typisch 0.6-1.4, abhängig vom Markt)',
+      '',
+      'OPTIONAL: vergleichsfaktor (Vergleichswert-Marktanpassungsfaktor, falls Daten existieren)',
+      '',
+      'Antworte AUSSCHLIESSLICH als JSON mit dieser Struktur:',
+      '{',
+      '  "brw": <number>,',
+      '  "vergleichsmiete_range": { "low": <number>, "high": <number> },',
+      '  "liegenschaftszins": <number>,',
+      '  "sachwertfaktor": <number>,',
+      '  "vergleichsfaktor": <number|null>,',
+      '  "confidence": "niedrig"|"mittel"|"hoch",',
+      '  "reasoning": "<kurze Begründung, max 300 Zeichen, welche Quellen/Vergleiche>"',
+      '}',
+      '',
+      'Wichtig: Wenn keine belastbaren Daten vorliegen, gib confidence="niedrig" zurück.',
+      'Niemals raten oder halluzinieren — bei Unsicherheit konservative Werte.'
+    ].join('\n');
+
+    let raw;
+    try {
+      raw = await openaiService.callOpenAI(prompt, {
+        userApiKey,
+        temperature: 0.1,
+        maxTokens: 600,
+        responseFormat: { type: 'json_object' }
+      });
+    } catch (oaErr) {
+      console.warn('[ai/bmf-gaa] OpenAI call failed:', oaErr.message);
+      return res.status(502).json({
+        error: 'OpenAI-Aufruf fehlgeschlagen',
+        detail: oaErr.message
+      });
+    }
+
+    let rawText = '';
+    let parsed = null;
+    try {
+      if (raw && typeof raw === 'object' && typeof raw.content === 'string') {
+        rawText = raw.content;
+      } else if (typeof raw === 'string') {
+        rawText = raw;
+      } else {
+        rawText = JSON.stringify(raw);
+      }
+      console.log('[ai/bmf-gaa] Raw-Text length:', rawText.length, 'preview:', rawText.substring(0, 300));
+      if (rawText) {
+        parsed = openaiService.extractJson(rawText);
+      }
+    } catch (e) {
+      console.warn('[ai/bmf-gaa] JSON-Parse failed:', e.message);
+    }
+
+    if (!parsed || typeof parsed !== 'object') {
+      return res.status(502).json({
+        error: 'KI-Antwort konnte nicht als JSON gelesen werden.',
+        raw: rawText ? rawText.substring(0, 500) : 'leer'
+      });
+    }
+
+    // Validierung der Werte
+    const brw = parseFloat(parsed.brw);
+    const liegZ = parseFloat(parsed.liegenschaftszins);
+    const sachF = parseFloat(parsed.sachwertfaktor);
+    const vergF = parsed.vergleichsfaktor != null ? parseFloat(parsed.vergleichsfaktor) : null;
+
+    let vmRange = null;
+    if (parsed.vergleichsmiete_range && typeof parsed.vergleichsmiete_range === 'object') {
+      const lo = parseFloat(parsed.vergleichsmiete_range.low);
+      const hi = parseFloat(parsed.vergleichsmiete_range.high);
+      if (!isNaN(lo) && !isNaN(hi) && lo > 0 && hi >= lo) {
+        vmRange = { low: lo, high: hi };
+      }
+    }
+
+    const confidence = ['niedrig', 'mittel', 'hoch'].includes(parsed.confidence)
+      ? parsed.confidence
+      : 'niedrig';
+    const reasoning = String(parsed.reasoning || '').substring(0, 300);
+
+    // Sanity-Checks auf realistische Bereiche
+    const warnings = [];
+    if (isNaN(brw) || brw <= 0 || brw > 50000) warnings.push('brw außerhalb plausibler Bereich');
+    if (isNaN(liegZ) || liegZ < 0.5 || liegZ > 15) warnings.push('liegenschaftszins außerhalb plausibler Bereich');
+    if (isNaN(sachF) || sachF < 0.2 || sachF > 3.0) warnings.push('sachwertfaktor außerhalb plausibler Bereich');
+
+    // Credits verbrauchen (nur wenn Server-Key + erfolgreich)
+    if (!userApiKey) {
+      try {
+        await aiCreditsService.consume(req.user.id, 1, 'bmf-gaa');
+      } catch (e) {
+        console.warn('[ai/bmf-gaa] credit-deduct failed:', e.message);
+      }
+    }
+
+    res.json({
+      brw: isNaN(brw) ? null : brw,
+      vergleichsmiete_range: vmRange,
+      liegenschaftszins: isNaN(liegZ) ? null : liegZ,
+      sachwertfaktor: isNaN(sachF) ? null : sachF,
+      vergleichsfaktor: vergF != null && !isNaN(vergF) ? vergF : null,
+      confidence,
+      reasoning: reasoning || 'Keine ausreichenden Daten für belastbare Schätzung.',
+      warnings,
+      source: 'openai',
+      address
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
