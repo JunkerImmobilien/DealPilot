@@ -1,3 +1,4 @@
+/* v287-afa-fix-applied */
 'use strict';
 /* ═══════════════════════════════════════════════════════════════════════════
    DealPilot V35 — BMF-AfA-Rechner (Sachwertverfahren)
@@ -170,9 +171,9 @@ window.BMFAfA = (function() {
     if (baujahr < 1925) {
       afaSatz = 2.5;
       afaSatzBegruendung = 'Baujahr vor 1925 → 2,5% gem. §7 Abs. 4 Nr. 2b EStG';
-    } else if (nutzWohnzwecken && anschJahr > 2022) {
+    } else if (nutzWohnzwecken && baujahr > 2022) { /* v287: §7 Abs.4 Nr.2a EStG — Fertigstellung, nicht Anschaffung */
       afaSatz = 3.0;
-      afaSatzBegruendung = 'Wohnzwecke + Anschaffung nach 31.12.2022 → 3,0% gem. §7 Abs. 4 Nr. 2a EStG';
+      afaSatzBegruendung = 'Wohnzwecke + Fertigstellung nach 31.12.2022 → 3,0% gem. §7 Abs. 4 Nr. 2a EStG';
     } else {
       afaSatz = 2.0;
       afaSatzBegruendung = 'Standard-AfA → 2,0% gem. §7 Abs. 4 Nr. 2a EStG (Bestand)';
