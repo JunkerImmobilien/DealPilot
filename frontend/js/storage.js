@@ -1,3 +1,4 @@
+/* V289-storage-marker */
 'use strict';
 /* ═══════════════════════════════════════════════════
    JUNKER IMMOBILIEN – storage.js V9
@@ -10,7 +11,8 @@ var FIELDS = [
   'vermstand','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
   // V63.99: Küche im Kaufpreis als € (kueche_im_kp ist Checkbox → unten separat)
   'kp_kueche',
-  'san','moebl','brw','mea','gsfl','mietstg','wertstg','kostenstg','leerstand',
+  'san','moebl','inv_kueche','inv_moebel','inv_geraete','inv_pv','inv_stellplatz','inv_sonst', /* V291-inventar-fields-applied */
+  'brw','mea','gsfl','mietstg','wertstg','kostenstg','leerstand',
   'btj','exit_bmy','nkm','ze','umlagef','afa_satz','geb_ant','zve','grenz',
   'ek','d1','d1z','d1t','d1_bindj','anschl_z','anschl_t','anschl_bj',
   'hg_ul','grundsteuer','ul_sonst','hg_nul','weg_r','eigen_r',

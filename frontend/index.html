@@ -433,6 +433,7 @@ label.dp-required.qc-required::after {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
   <!-- V286-cache-applied -->
 <!-- v287-cache-applied -->
+<!-- V291-cache-applied -->
 </head>
 <body>
 <!-- V257-06: Hintergrund-Modus (Bootstrap, kein Flash) -->
@@ -1259,6 +1260,56 @@ label.dp-required.qc-required::after {
               Wenn du eine Küche im Kaufpreis ausweist, gilt sie als <b>separates Wirtschaftsgut</b> mit eigener AfA über 10 Jahre und zählt nicht zum Gebäude.
             </div>
           </div>
+        </div>
+
+        <!-- V291-inventar-detail-applied — Inventar-Detail-Box -->
+        <div class="card" style="margin-top:14px">
+          <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bath"/></svg></span>Inventar · Detail-Aufschlüsselung</div>
+          <p class="hint" style="margin-bottom:10px">
+            Beweglich, NICHT in der 15-%-Grenze. Separat über die Inventar-Nutzungsdauer abgeschrieben
+            (siehe Möblierung-Verteilung oben). Detail-Felder summieren sich automatisch in <em>Möblierung</em>.
+          </p>
+
+          <div class="row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div class="f">
+              <label>Küche</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_kueche" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+            <div class="f">
+              <label>Möbel</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_moebel" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+            <div class="f">
+              <label>Geräte</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_geraete" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+          </div>
+          <div class="row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px">
+            <div class="f">
+              <label>PV-Anlage</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_pv" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+            <div class="f">
+              <label>Stellplatz</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_stellplatz" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+            <div class="f">
+              <label>Sonstiges</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+          </div>
+
+          <div class="dvd" style="margin:14px 0"></div>
+
+          <div class="kv" style="font-size:13px"><span><b>Summe Inventar</b></span><span class="kv-v" id="inv_sum">0 €</span></div>
+          <div class="kv" id="inv_sum_check" style="font-size:11.5px;color:var(--muted);margin-top:4px">
+            <span>↻ Möblierung-Feld wird automatisch synchronisiert</span>
+            <span class="kv-v" id="inv_sync_status" style="color:var(--green)">✓ OK</span>
+          </div>
+          <div class="kv" style="margin-top:8px"><span><b>Immobilien-KP</b> (= Kaufpreis − Inventar)</span><span class="kv-v c-gold" id="inv_immo_kp">—</span></div>
+          <p class="hint" style="margin-top:8px;font-style:normal;font-size:11px">
+            Diese Aufschlüsselung wird vom BMF-Rechner gelesen, um Inventar korrekt vom Immobilien-Kaufpreis zu trennen.
+          </p>
         </div>
     </div>
   </div>
@@ -2803,7 +2854,8 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=226"></script>
-<script src="js/storage.js?v=195"></script>
+<script src="js/storage.js?v=291"></script>
+<script src="js/inventar-sync.js?v=291"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=166"></script>
 <script src="js/portfolio-strategy.js?v=144"></script>
 <script src="js/portfolio-strategy-ui.js?v=189"></script>
