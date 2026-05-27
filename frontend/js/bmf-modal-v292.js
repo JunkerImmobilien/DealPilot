@@ -489,13 +489,34 @@
       g15bar.style.background = p9.status === 'ueberschritten' ? '#B8625C' : (p9.status === 'eng' ? '#E0A030' : '#3FA56C');
     }
 
-    // Inventar-Hint
+    // Inventar-Hint (V292.2-bugfixes-applied — Scope-Fix für afa)
     var invHint = document.getElementById('invDisclaimerText');
     if (invHint) {
+      var selectedAfa = r.phase10_afa[selected] || {};
+      var invYears = selectedAfa.inventar_afa_jahre || 10;
       invHint.textContent = _fmtEur(r.phase2_inventar.inventar_gesamt) +
         ' (aus Inventar-Detail-Box · ' +
-        afa.inventar_afa_jahre + ' Jahre AfA)';
+        invYears + ' Jahre AfA, separat in Pane 4 ausgewiesen)';
     }
+
+    // V292.2 Bug C: bestehende Sanierung-Viz aus V289.2.5 triggern
+    try {
+      if (typeof window._syncSanierungViz === 'function') {
+        window._syncSanierungViz();
+      } else if (typeof _syncSanierungViz === 'function') {
+        _syncSanierungViz();
+      }
+    } catch(e) { console.warn('[v292.2] _syncSanierungViz:', e); }
+
+    // V292.2 Bug D: Klausel initial triggern wenn noch nicht geschehen
+    try {
+      var klauselTextEl = document.getElementById('klauselText');
+      if (klauselTextEl && (!klauselTextEl.innerHTML || klauselTextEl.innerHTML.trim() === '')) {
+        if (typeof window.selectKlausel === 'function') {
+          window.selectKlausel(selected === 'konservativ' ? 'konservativ' : (selected === 'aggressiv' ? 'aggressiv' : 'moderat'));
+        }
+      }
+    } catch(e) { console.warn('[v292.2] selectKlausel:', e); }
   }
 
   function _renderLoading(){
@@ -570,21 +591,13 @@
     // calc() triggern
     if (typeof window.calc === 'function') window.calc();
 
-    // Persistenz: tax_snapshots/bmf-Endpoint befüllen
-    var objId = _currentObjectIdSafe();
-    if (objId) {
-      fetch('/api/v1/tax-snapshots/' + objId + '/bmf', {
-        method: 'POST',
-        headers: _authHeaders(),
-        body: JSON.stringify({
-          variant: selected,
-          gebaeude_pct: v.gebaeude_pct,
-          boden_pct: v.boden_pct,
-          afa_jahr: afa.afa_summe_jahr,
-          pipeline_meta: st.response.meta || {}
-        })
-      }).catch(function(e){ console.warn('[v292] tax-snapshot persist:', e); });
-    }
+    /* V292.2-bugfixes-applied: tax-snapshots-Persistenz entfernt.
+     * Backend-Endpoint POST /api/v1/tax-snapshots/:id/bmf existiert nicht.
+     * Persistenz erfolgt implizit über calc() + Object-Save im Tab.
+     */
+
+    // V292.2 Bonus: Reset-Button hinzufügen
+    _v292InjectResetButton(gebAntEl);
 
     // Toast
     if (typeof toast === 'function') {
@@ -594,6 +607,44 @@
     // Modal schließen
     if (typeof closeBMFModal === 'function') closeBMFModal();
   };
+
+  // V292.2: Reset-Button im AfA-Konfig — erscheint nach Übernehmen
+  function _v292InjectResetButton(gebAntEl){
+    if (!gebAntEl) return;
+    var wrap = gebAntEl.closest('.iw') || gebAntEl.parentElement;
+    if (!wrap) return;
+    if (wrap.querySelector('.v292-reset-btn')) return;  // schon da
+
+    var btn = document.createElement('button');
+    btn.className = 'v292-reset-btn';
+    btn.type = 'button';
+    btn.title = 'BMF-Wert zurücksetzen auf Standard 80 %';
+    btn.innerHTML = '↺';
+    btn.style.cssText = 'margin-left:6px;padding:4px 9px;background:transparent;border:1px solid var(--gold,#C9A84C);color:var(--gold-d,#8A7340);border-radius:4px;cursor:pointer;font-size:14px;font-weight:600;line-height:1;vertical-align:middle';
+    btn.onclick = function(){
+      // Bestätigung
+      if (!confirm('Gebäudeanteil zurücksetzen auf 80 % (Standard)?\nDie BMF-Berechnung bleibt erhalten — du kannst sie wieder übernehmen.')) return;
+      // Wert zurücksetzen
+      gebAntEl.value = '80,00';
+      gebAntEl.classList.remove('from-bmf-v292');
+      gebAntEl.style.background = '';
+      gebAntEl.style.borderColor = '';
+      gebAntEl.title = '';
+      // Badge entfernen
+      var label = gebAntEl.closest('.f') && gebAntEl.closest('.f').querySelector('label');
+      if (label) {
+        var badge = label.querySelector('.v292-bmf-badge');
+        if (badge) badge.remove();
+      }
+      // Reset-Button selbst entfernen
+      btn.remove();
+      // calc() triggern
+      gebAntEl.dispatchEvent(new Event('input', { bubbles: true }));
+      if (typeof window.calc === 'function') window.calc();
+      if (typeof toast === 'function') toast('↺ Gebäudeanteil zurückgesetzt auf 80 %');
+    };
+    wrap.appendChild(btn);
+  }
 
   function _currentObjectIdSafe(){
     try {

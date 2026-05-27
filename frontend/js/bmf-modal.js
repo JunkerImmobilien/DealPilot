@@ -1780,3 +1780,10 @@ try {
   if (typeof _authHeaders === 'function') window.__bmfAuthHeaders = _authHeaders;
   if (typeof _token === 'function') window.__bmfToken = _token;
 } catch(e) { console.warn('[bmf-modal] V292.1 auth-export:', e); }
+
+/* V292.2-export-syncSan: Export für V292-Modul */
+try {
+  if (typeof _syncSanierungViz === 'function') window._syncSanierungViz = _syncSanierungViz;
+  if (typeof updateG15 === 'function') window.__updateG15 = updateG15;
+  if (typeof _renderKlauselText === 'function') window.__renderKlauselText = _renderKlauselText;
+} catch(e) { console.warn('[bmf-modal] V292.2 sync-export:', e); }
