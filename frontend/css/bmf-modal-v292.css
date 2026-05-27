@@ -484,3 +484,53 @@
 /* Aber: "AKTUELLE VARIANTE: XYZ" oben rechts BLEIBT sichtbar
  * Das wird in selectKlausel() per setText('klauselVar', ...) gesetzt
  * — der Container dafür ist NICHT .bmfmo-klausel-tabs sondern eigene Klasse */
+
+/* ════════════════════════════════════════════════════════════════
+ * V292.6.4-ki-vorschlag-hidden — KI-Vorschlag-Block in Pane 2 ausblenden
+ * 
+ * User-Feedback: "Unter BMF-Aufteilung nimm die KI-Vorschlag raus"
+ * 
+ * Block enthält:
+ *   - KI-VORSCHLAG · 1 CREDIT Header
+ *   - Gutachterausschuss-Werte (GAA) Beschreibung
+ *   - btnGaaSuggest Button
+ *   - Confidence Badge
+ *   - BRW/Lzs/Sachwertfaktor/Vergleichsmiete Inputs
+ *   - Buttons "BRW → BMF", "Lzs → BMF"
+ * ════════════════════════════════════════════════════════════════ */
+
+/* Container-Selektoren — decken typische Strukturen ab */
+#p-bmf .gaa-block,
+#p-bmf .bmfmo-gaa,
+#p-bmf .ki-vorschlag,
+#p-bmf .ki-suggestion-box {
+  display: none !important;
+}
+
+/* Fallback: Block der btnGaaSuggest enthält */
+#p-bmf button#btnGaaSuggest {
+  display: none !important;
+}
+
+/* Wenn btnGaaSuggest in einem Card-Container ist: schau hoch zum Parent
+ * via :has() selektor (modern browsers). Fallback ist der direkte Button-Hide oben. */
+#p-bmf :has(> #btnGaaSuggest),
+#p-bmf .card:has(#btnGaaSuggest),
+#p-bmf .bmfmo-card:has(#btnGaaSuggest) {
+  display: none !important;
+}
+
+/* GAA-Input-Felder + Labels — auch hide damit die nicht "abgehängt" rumstehen */
+#p-bmf #gaa_brw,
+#p-bmf #gaa_lzs,
+#p-bmf #gaa_swf,
+#p-bmf #gaa_vm_low,
+#p-bmf #gaa_vm_high,
+#p-bmf #gaaConfidence {
+  display: none !important;
+}
+
+/* Labels die zu den GAA-Feldern gehören */
+#p-bmf label[for^="gaa_"] {
+  display: none !important;
+}

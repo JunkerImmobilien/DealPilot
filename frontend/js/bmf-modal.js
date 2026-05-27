@@ -476,6 +476,7 @@ function downloadXlsx(){
 
     inputs = {
       /* Pflichtfelder */
+      /* V292.6.4-backend-keys: korrekte Backend-Keys aus bmfService.js INPUT_CELLS */
       lage: ((obj.plz || '') + ' ' + (obj.ort || '') + ', ' + (obj.str || '') + ' ' + (obj.hnr || '')).trim(),
       grundstuecksart: obj.objart_bmf || 'Wohnungseigentum [WE]',
       kaufdatum: inv.kaufdat || '',
@@ -493,28 +494,53 @@ function downloadXlsx(){
       wohnflaeche: obj.wfl || 0,
 
       /* Optional — V292.6.2-xlsx-mea-fix: mea aus DOM lesen, nicht hardcoded */
-      grundstuecksflaeche: obj.gsfl || 0,
+      grundstuecksgroesse: obj.gsfl || 0,  /* V292.6.4: Backend-Key = grundstuecksgroesse */
       bodenrichtwert: (gaa.brw_user || obj.brw || 0),
-      miteigentumsanteil_prozent: (function(){
+      /* V292.6.4-backend-keys: MEA als Zähler/Nenner (Backend braucht beide)
+       * Tab Objekt hat mea als Prozent z.B. '7,06' → konvertieren zu 706/10000
+       * Wenn 100 (kein WE) → 1000/1000 = 100% */
+      mea_zaehler: (function(){
         var meaEl = document.getElementById('mea');
-        if (!meaEl || !meaEl.value) return 100;
-        var val = parseFloat(String(meaEl.value).replace(',', '.'));
-        return isFinite(val) && val > 0 ? val : 100;
+        if (!meaEl || !meaEl.value) return 1000;
+        var pct = parseFloat(String(meaEl.value).replace(',', '.'));
+        if (!isFinite(pct) || pct <= 0) return 1000;
+        /* Konvertiere Prozent zu Zähler bei Nenner 10000: 7,06 % → 706 */
+        return Math.round(pct * 100);
+      })(),
+      mea_nenner: (function(){
+        var meaEl = document.getElementById('mea');
+        if (!meaEl || !meaEl.value) return 1000;
+        var pct = parseFloat(String(meaEl.value).replace(',', '.'));
+        if (!isFinite(pct) || pct <= 0) return 1000;
+        return 10000;
       })(),
       /* V292.6.3-nkm-leerstand-fallback: Bei Leerstand Vergleichsmiete nutzen */
-      monatliche_nettokaltmiete: (function(){
+      /* V292.6.4-backend-keys: Backend braucht miete_monatlich + miete_bekannt
+       * miete_bekannt: 'Ja' wenn Miete > 0, sonst 'Nein' */
+      miete_monatlich: (function(){
         var nkmFromDom = parseFloat(String((document.getElementById('nkm') || {}).value || '0').replace(',', '.')) || 0;
         var leerstand = parseFloat(String((document.getElementById('leerstand') || {}).value || '0').replace(',', '.')) || 0;
-        /* Wenn Vermietet: nkm direkt */
         if (nkmFromDom > 0 && leerstand < 100) return nkmFromDom;
-        /* Leerstand: Vergleichsmiete (€/m²/Mo) × Wohnfläche = monatliche Miete */
+        /* Leerstand: Vergleichsmiete (€/m²/Mo) × Wohnfläche */
         var bmfVmLow = parseFloat(String((document.getElementById('bmf_vm_low') || {}).value || '0').replace(',', '.')) || 0;
         var wfl = obj.wfl || 0;
         if (bmfVmLow > 0 && wfl > 0) return Math.round(bmfVmLow * wfl);
-        /* Fallback: was wir aus Pipeline haben */
         return (p1.miete && p1.miete.nkm) || 0;
       })(),
-      liegenschaftszins: gaa.sachwertfaktor && gaa.sachwertfaktor > 0 ? gaa.sachwertfaktor : null,
+      miete_bekannt: (function(){
+        var nkmFromDom = parseFloat(String((document.getElementById('nkm') || {}).value || '0').replace(',', '.')) || 0;
+        var bmfVmLow = parseFloat(String((document.getElementById('bmf_vm_low') || {}).value || '0').replace(',', '.')) || 0;
+        return (nkmFromDom > 0 || bmfVmLow > 0) ? 'Ja' : 'Nein';
+      })(),
+      liegenschaftszinssatz: (function(){
+        /* V292.6.4: aus Pane 2 bmf_lzs (KI/User) */
+        var lzs = parseFloat(String((document.getElementById('bmf_lzs') || {}).value || '0').replace(',', '.')) || 0;
+        return lzs > 0 ? lzs : null;
+      })(),
+      sachwertfaktor: (function(){
+        var swf = parseFloat(String((document.getElementById('bmf_swf') || {}).value || '0').replace(',', '.')) || 0;
+        return swf > 0 ? swf : 1.0;
+      })(),
 
       /* Variant-Hint für Filename */
       _variant: selectedVariant
