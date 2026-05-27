@@ -572,14 +572,19 @@ function updateInv(){
     warnEl.style.display = '';
     warnText.innerHTML = 'Inventaranteil von <strong>' + fmtPct(invQuote,1) + '</strong> ist ungewöhnlich hoch und kann vom Finanzamt hinterfragt werden. Empfohlen: Wertgutachten oder Einzelnachweise (Rechnungen, Kaufbelege) bereithalten.';
   } else if(invQuote > 8){
-    warnEl.style.display = '';
-    warnEl.className = 'banner gold';
-    warnEl.style.marginTop = '10px';
-    warnEl.style.marginBottom = '0';
-    warnEl.style.fontSize = '11.5px';
-    warnText.innerHTML = 'Inventaranteil <strong>' + fmtPct(invQuote,1) + '</strong> — erklärungsbedürftig, aber belegbar. Belege/Wertnachweise empfohlen.';
+    /* V292.4-v289-bugs-5-6: defensive null-checks */
+    if (warnEl) {
+      warnEl.style.display = '';
+      warnEl.className = 'banner gold';
+      warnEl.style.marginTop = '10px';
+      warnEl.style.marginBottom = '0';
+      warnEl.style.fontSize = '11.5px';
+    }
+    if (warnText) {
+      warnText.innerHTML = 'Inventaranteil <strong>' + fmtPct(invQuote,1) + '</strong> — erklärungsbedürftig, aber belegbar. Belege/Wertnachweise empfohlen.';
+    }
   } else {
-    warnEl.style.display = 'none';
+    if (warnEl) warnEl.style.display = 'none';
   }
 
   // Cascading-Render: Varianten + 15% + Risiko + Klausel
@@ -786,7 +791,7 @@ function updateG15(){
   var statusEl = $('g15_status');
   var barEl = $('g15_bar');
 
-  pufferEl.textContent = fmtEur(Math.abs(puffer),2);
+  if (pufferEl) pufferEl.textContent = fmtEur(Math.abs(puffer),2); /* V292.4-v289-bugs-5-6 */
   if(puffer >= max15 * 0.30){
     pufferEl.style.color = 'var(--green)';
     statusEl.textContent = 'Genug Puffer';
@@ -1504,8 +1509,8 @@ function _updateFooterNav(paneId){
     if(el) el.style.display = show ? '' : 'none';
   }
 
-  // Zurück: ab Pane 2
-  _show('btnBmfBack', !isFirst);
+  // V292.4-footer-back-fix: Zurück explizit hidden auf Pane 1 (p-ak)
+  _show('btnBmfBack', paneId !== 'p-ak' && !isFirst);
   // Weiter: bis Pane 3
   _show('btnBmfNext', !isLast);
   // Übernehmen + PDF: nur auf letzter Pane

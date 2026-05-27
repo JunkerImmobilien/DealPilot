@@ -255,23 +255,54 @@
     var oldInputs = document.querySelectorAll('#p-ak .g2, #p-ak .akSection');
     oldInputs.forEach(function(el){ el.style.display = 'none'; });
 
+    /* V292.4-pane1-compact: kompakter + Reisekosten-Zeile */
+    function _domVal(id){
+      var el = document.getElementById(id);
+      if (!el) return 0;
+      var s = (el.value || el.textContent || '').toString();
+      s = s.replace(/\./g,'').replace(',','.').replace(/[^\d.\-]/g,'');
+      var v = parseFloat(s);
+      return isNaN(v) ? 0 : v;
+    }
+    var reiseFahrt   = _domVal('ak_fahrt');
+    var reiseVerpfl  = _domVal('ak_verpfl');
+    var reiseHotel   = _domVal('ak_hotel');
+    var reiseTotal   = reiseFahrt + reiseVerpfl + reiseHotel;
+    var sonstGuta    = _domVal('ak_gutachten');
+    var sonstAnwalt  = _domVal('ak_anwalt');
+    var sonstAndere  = _domVal('ak_sonst');
+    var sonstTotal   = sonstGuta + sonstAnwalt + sonstAndere;
+    var bruttoKp = p2.aufschluesselung.kueche + p2.aufschluesselung.moebel +
+                   p2.aufschluesselung.geraete + p2.aufschluesselung.pv +
+                   p2.aufschluesselung.stellplatz + p2.aufschluesselung.sonstiges +
+                   p2.immobilien_kp;
     box.innerHTML =
-      '<div class="v292-summary-banner">' +
-        '<strong>Aus Tab Investition + Inventar-Detail-Box berechnet.</strong> ' +
-        'Werte sind hier nur zur Anzeige — Änderungen bitte im Tab Investition oder in der Inventar-Detail-Box.' +
+      '<div class="v292-summary-banner v292-compact">' +
+        'Werte aus Tab Investition + Inventar-Detail-Box. Änderungen bitte dort.' +
       '</div>' +
-      '<div class="v292-summary-grid">' +
-        '<div class="v292-row"><span>Brutto-Kaufpreis</span><span>' + _fmtEur(p2.aufschluesselung.kueche + p2.aufschluesselung.moebel + p2.aufschluesselung.geraete + p2.aufschluesselung.pv + p2.aufschluesselung.stellplatz + p2.aufschluesselung.sonstiges + p2.immobilien_kp) + '</span></div>' +
+      '<div class="v292-summary-grid v292-compact">' +
+        '<div class="v292-row"><span>Brutto-Kaufpreis</span><span>' + _fmtEur(bruttoKp) + '</span></div>' +
         '<div class="v292-row v292-row-minus"><span>− Inventar (Detail-Box)</span><span>' + _fmtEur(p2.inventar_gesamt) + '</span></div>' +
         '<div class="v292-row v292-row-result"><span><b>= Immobilien-KP</b> <span class="v292-arrow">→ Basis für BMF</span></span><span><b>' + _fmtEur(p2.immobilien_kp) + '</b></span></div>' +
-        '<div class="v292-row v292-row-plus" style="margin-top:14px"><span>+ Nebenkosten gesamt</span><span>' + _fmtEur(p3.nk_gesamt) + '</span></div>' +
+        '<div class="v292-row v292-row-plus"><span>+ Nebenkosten</span><span>' + _fmtEur(p3.nk_gesamt) + '</span></div>' +
         '<div class="v292-nk-detail">' +
-          '<div>├─ Grunderwerbsteuer: <b>' + _fmtEur(p3.nk_aufschluesselung.grest) + '</b></div>' +
-          '<div>├─ Notar: <b>' + _fmtEur(p3.nk_aufschluesselung.notar) + '</b></div>' +
-          '<div>├─ Grundbuchamt: <b>' + _fmtEur(p3.nk_aufschluesselung.gba) + '</b></div>' +
-          '<div>├─ Makler: <b>' + _fmtEur(p3.nk_aufschluesselung.makler) + '</b></div>' +
-          '<div>└─ Sonstiges: <b>' + _fmtEur(p3.nk_aufschluesselung.ji_sonst) + '</b></div>' +
+          '<div>├ Grunderwerbsteuer: <b>' + _fmtEur(p3.nk_aufschluesselung.grest) + '</b></div>' +
+          '<div>├ Notar: <b>' + _fmtEur(p3.nk_aufschluesselung.notar) + '</b></div>' +
+          '<div>├ Grundbuchamt: <b>' + _fmtEur(p3.nk_aufschluesselung.gba) + '</b></div>' +
+          '<div>├ Makler: <b>' + _fmtEur(p3.nk_aufschluesselung.makler) + '</b></div>' +
+          '<div>└ Sonstiges (ji_e): <b>' + _fmtEur(p3.nk_aufschluesselung.ji_sonst) + '</b></div>' +
         '</div>' +
+        (reiseTotal > 0 ?
+          '<div class="v292-row v292-row-plus"><span>+ Reise & Aufwand <span class="v292-info-tag">in NK enthalten</span></span><span>' + _fmtEur(reiseTotal) + '</span></div>' +
+          '<div class="v292-nk-detail">' +
+            (reiseFahrt > 0 ? '<div>├ Fahrtkosten: <b>' + _fmtEur(reiseFahrt, 2) + '</b></div>' : '') +
+            (reiseVerpfl > 0 ? '<div>├ Verpflegungsmehraufwand: <b>' + _fmtEur(reiseVerpfl, 2) + '</b></div>' : '') +
+            (reiseHotel > 0 ? '<div>└ Unterkunft: <b>' + _fmtEur(reiseHotel, 2) + '</b></div>' : '') +
+          '</div>'
+          : '') +
+        (sonstTotal > 0 ?
+          '<div class="v292-row v292-row-plus"><span>+ Gutachten/Anwalt/Sonstiges <span class="v292-info-tag">in NK enthalten</span></span><span>' + _fmtEur(sonstTotal) + '</span></div>'
+          : '') +
         '<div class="v292-row v292-row-final"><span><b>= Prognose-AK</b> <span class="v292-arrow">→ Basis für AfA</span></span><span class="v292-final-value"><b>' + _fmtEur(p3.prognose_ak) + '</b></span></div>' +
       '</div>';
 

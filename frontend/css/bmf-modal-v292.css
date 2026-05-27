@@ -1,0 +1,352 @@
+/* ════════════════════════════════════════════════════════════════
+   DealPilot V292 — BMF-Modal Pipeline-Refactor Styles
+   ════════════════════════════════════════════════════════════════
+   Klassen-Prefix v292- damit keine Kollision mit V289.2.x bmfmo-
+   ════════════════════════════════════════════════════════════════ */
+
+/* ─── Pane 1: Read-only Anschaffungskosten-Anzeige ───────────────── */
+.v292-summary-box {
+  margin-bottom: 14px;
+}
+
+.v292-summary-banner {
+  background: var(--gold-bg, #FFF7E0);
+  border: 1px solid var(--gold, #C9A84C);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+  color: var(--ch, #2D2622);
+}
+
+.v292-summary-grid {
+  background: var(--surface, #FAF7F2);
+  border: 1px solid var(--border, #E5DCC9);
+  border-radius: 8px;
+  padding: 18px 22px;
+}
+
+.v292-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13.5px;
+  color: var(--ch, #2D2622);
+}
+
+.v292-row-minus { color: #B8625C; }
+.v292-row-plus  { color: var(--muted, #7A7370); }
+
+.v292-row-result {
+  border-top: 2px solid var(--gold, #C9A84C);
+  margin-top: 8px;
+  padding-top: 10px;
+  font-size: 15px;
+}
+
+.v292-row-final {
+  border-top: 2px solid var(--gold, #C9A84C);
+  margin-top: 8px;
+  padding-top: 10px;
+  font-size: 16px;
+  color: var(--gold-d, #8A7340);
+}
+
+.v292-final-value { color: var(--gold-d, #8A7340); font-size: 18px; }
+
+.v292-arrow {
+  font-size: 11px;
+  color: var(--muted, #7A7370);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+.v292-nk-detail {
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--muted, #7A7370);
+  line-height: 1.7;
+}
+
+.v292-inv-hint {
+  margin-top: 14px;
+  padding: 8px 12px;
+  background: rgba(201, 168, 76, 0.08);
+  border-radius: 4px;
+  color: var(--muted, #7A7370);
+}
+
+/* ─── Pane 3: 3-Spalten-Varianten-Vergleichstabelle ──────────────── */
+.v292-pane3-header { margin-bottom: 16px; }
+
+.v292-vergleich-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  background: var(--surface, #FAF7F2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.v292-vergleich-tbl thead th {
+  padding: 12px 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  background: var(--gold-bg, #FFF7E0);
+  border-bottom: 2px solid var(--gold, #C9A84C);
+  color: var(--ch, #2D2622);
+}
+
+.v292-vergleich-tbl thead th:first-child {
+  text-align: left;
+  background: var(--surface2, #F0E8D5);
+  color: var(--muted, #7A7370);
+}
+
+.v292-th-gruen { border-top: 3px solid #3FA56C; }
+.v292-th-gelb  { border-top: 3px solid #E0A030; }
+.v292-th-rot   { border-top: 3px solid #B8625C; }
+
+.v292-th-sub {
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--muted, #7A7370);
+  margin-top: 3px;
+}
+
+.v292-vergleich-tbl tbody td {
+  padding: 9px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--border, #E5DCC9);
+}
+
+.v292-vergleich-tbl tbody td:first-child {
+  text-align: left;
+  font-weight: 500;
+  color: var(--ch, #2D2622);
+}
+
+.v292-vergleich-tbl tbody tr:hover { background: rgba(201, 168, 76, 0.04); }
+
+.v292-row-bold td {
+  font-weight: 700;
+  background: var(--gold-bg, #FFF7E0) !important;
+  color: var(--gold-d, #8A7340);
+}
+
+.v292-row-risiko td {
+  padding-top: 12px !important;
+  vertical-align: top;
+  font-size: 11px;
+  text-align: left !important;
+}
+
+.v292-risk-cell {
+  line-height: 1.45;
+}
+.v292-risk-cell b {
+  color: var(--ch, #2D2622);
+  font-size: 12px;
+}
+
+/* ─── Pane 4: 3 Variant-Cards (Radio-Wahl) ───────────────────────── */
+.bmfmo-var-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.v292-var-card {
+  background: var(--surface, #FAF7F2);
+  border: 2px solid var(--border, #E5DCC9);
+  border-radius: 10px;
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.v292-var-card:hover {
+  border-color: var(--gold, #C9A84C);
+  background: rgba(201, 168, 76, 0.04);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.v292-var-selected {
+  border-color: var(--gold, #C9A84C) !important;
+  border-width: 3px !important;
+  background: var(--gold-bg, #FFF7E0) !important;
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.2);
+}
+
+.v292-var-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.v292-var-radio input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.v292-var-ampel { font-size: 18px; }
+
+.v292-var-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ch, #2D2622);
+}
+
+.v292-var-sub {
+  font-size: 10.5px;
+  color: var(--muted, #7A7370);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border, #E5DCC9);
+}
+
+.v292-var-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--ch, #2D2622);
+}
+
+.v292-var-row b {
+  font-weight: 600;
+  color: var(--ch, #2D2622);
+}
+
+.v292-var-row-hi {
+  background: rgba(201, 168, 76, 0.08);
+  margin: 4px -6px;
+  padding: 6px 6px;
+  border-radius: 4px;
+  font-size: 12.5px;
+}
+
+.v292-var-row-hi b { color: var(--gold-d, #8A7340); font-size: 13px; }
+
+.v292-var-risk {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border, #E5DCC9);
+  font-size: 10.5px;
+  color: var(--muted, #7A7370);
+  text-align: center;
+}
+
+.v292-var-gruen .v292-var-ampel { color: #3FA56C; }
+.v292-var-gelb  .v292-var-ampel { color: #E0A030; }
+.v292-var-rot   .v292-var-ampel { color: #B8625C; }
+
+/* ─── Responsive: kleine Bildschirme ─────────────────────────────── */
+@media (max-width: 900px) {
+  .bmfmo-var-grid { grid-template-columns: 1fr; }
+  .v292-vergleich-tbl { font-size: 11px; }
+  .v292-vergleich-tbl thead th { padding: 8px 6px; font-size: 11.5px; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * V292.4-ui-polish-css — Updates für V292.4
+ * ════════════════════════════════════════════════════════════════ */
+
+/* Kompakte Pane 1 Summary */
+.v292-summary-box.v292-compact,
+.v292-summary-grid.v292-compact {
+  font-size: 12.5px;
+}
+
+.v292-summary-banner.v292-compact {
+  font-size: 11.5px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.v292-summary-grid.v292-compact {
+  padding: 12px 16px;
+}
+
+.v292-summary-grid.v292-compact .v292-row {
+  padding: 3px 0;
+  font-size: 12.5px;
+}
+
+.v292-summary-grid.v292-compact .v292-row-result {
+  margin-top: 4px;
+  padding-top: 6px;
+  font-size: 14px;
+}
+
+.v292-summary-grid.v292-compact .v292-row-final {
+  margin-top: 6px;
+  padding-top: 7px;
+  font-size: 14.5px;
+}
+
+.v292-summary-grid.v292-compact .v292-final-value {
+  font-size: 16px;
+}
+
+.v292-summary-grid.v292-compact .v292-nk-detail {
+  padding-left: 12px;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.v292-summary-grid.v292-compact .v292-row-plus {
+  margin-top: 4px;
+}
+
+/* "in NK enthalten" Info-Tag */
+.v292-info-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  background: rgba(122, 115, 112, 0.12);
+  color: var(--muted, #7A7370);
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* Pane 3 — Spalten-Alignment Fix
+ * Problem: thead Überschriften (Konservativ/Optimiert/Aggressiv) waren nicht
+ * mit gleicher Breite wie tbody-Spalten ausgerichtet.
+ * Fix: table-layout: fixed + erste Spalte fixe Breite, andere gleich
+ */
+.v292-vergleich-tbl {
+  table-layout: fixed;
+}
+
+.v292-vergleich-tbl thead th:first-child,
+.v292-vergleich-tbl tbody td:first-child {
+  width: 32%;
+}
+
+.v292-vergleich-tbl thead th:not(:first-child),
+.v292-vergleich-tbl tbody td:not(:first-child) {
+  width: 22.66%;
+  text-align: right;
+}
+
+.v292-vergleich-tbl thead th:not(:first-child) {
+  text-align: center;
+}
+
+.v292-vergleich-tbl .v292-th-sub {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

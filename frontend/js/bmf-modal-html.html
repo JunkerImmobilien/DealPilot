@@ -277,13 +277,12 @@
           </div>
         </div>
 
-        <div style="display:flex;gap:8px;margin-top:18px">
-          <button class="btn btn-gold" onclick="runBmf()" id="btnBmf" style="display:none">Berechnen</button><span class="hint" id="bmfAutoHint" style="font-style:italic;color:var(--muted)">Berechnung erfolgt automatisch sobald alle Pflichtfelder ausgefüllt sind.</span>
-          <button class="btn btn-outline" onclick="downloadXlsx()" id="btnDl" disabled>BMF-XLSX herunterladen</button>
-        </div>
-
-        <div id="bmfStatus" class="banner info" style="margin-top:18px">
-          <strong>Bereit.</strong> Eingaben sind aus Tab Investition + Objekt auto-übernommen. Auf „Berechnen" tippen.
+        <!-- V292.4-pane2-cleanup: Berechnen-Button, XLSX-Button (Pane 2) und Status-Banner entfernt.
+             - V292 macht Live-Pipeline (kein manueller Berechnen-Button nötig)
+             - XLSX-Download verbleibt in Pane 4 (BMF-Original-Vorlage Sektion)
+             - Status wird über bmfAutoHint im V292-Render gepflegt -->
+        <div style="margin-top:18px;display:flex;align-items:center;gap:10px;min-height:20px">
+          <span class="hint" id="bmfAutoHint" style="font-style:italic;color:var(--muted)">⏳ Pipeline berechnet...</span>
         </div>
 
         <div id="bmfResult" style="display:none">
