@@ -188,12 +188,16 @@ document.addEventListener('keydown', function(e){
 });
 
 function switchPane(id){
-  document.querySelectorAll('.mtab').forEach(function(b){
+  // V289.2.3: Klassen-Fix — beim Mockup-Rename wurden HTML-Klassen .mtab → .bmfmo-tab
+  // umbenannt, aber diese JS-Selektoren nicht mit gefixt → Tabs ohne Funktion.
+  document.querySelectorAll('.bmfmo-tab').forEach(function(b){
     b.classList.toggle('active', b.dataset.pane === id);
   });
-  document.querySelectorAll('.mpane').forEach(function(p){
+  document.querySelectorAll('.bmfmo-pane').forEach(function(p){
     p.classList.toggle('active', p.id === id);
   });
+  // V289.2.3: Footer-Navigation aktualisieren
+  _updateFooterNav(id);
   // Hebel-Tab: bei Aktivierung neu rendern (BMF-Werte könnten sich geändert haben)
   if(id === 'p-hebel'){
     updateInv();  // Triggert Cascade: Varianten, 15%, Risiko, Empfehlung, Klausel
@@ -1346,6 +1350,15 @@ function openBMFModal(){
     // Modal öffnen
     ov.classList.add('open');
 
+    // V289.2.3: Pane 1 als Start aktivieren + Footer initialisieren
+    setTimeout(function(){
+      if(typeof switchPane === 'function'){
+        switchPane('p-ak');
+      } else if(typeof _updateFooterNav === 'function'){
+        _updateFooterNav('p-ak');
+      }
+    }, 10);
+
     // Auto-Sync beim Öffnen
     if(typeof syncFromTabInvest === 'function'){
       setTimeout(syncFromTabInvest, 50);
@@ -1424,6 +1437,65 @@ if(document.readyState === 'complete' || document.readyState === 'interactive'){
 // Sicherheits-Polling: falls Button später ins DOM kommt (z.B. nach Tab-Wechsel)
 setTimeout(_initBmfAdvancedButton, 500);
 setTimeout(_initBmfAdvancedButton, 1500);
+
+// ─────────────────────────────────────────────────────────────────
+// V289.2.3: Pane-Navigation Footer
+// ─────────────────────────────────────────────────────────────────
+var _BMF_PANE_ORDER = ['p-ak', 'p-bmf', 'p-afa', 'p-hebel'];
+
+function _currentPaneId(){
+  var active = document.querySelector('.bmfmo-pane.active');
+  return active ? active.id : 'p-ak';
+}
+
+function _updateFooterNav(paneId){
+  paneId = paneId || _currentPaneId();
+  var idx = _BMF_PANE_ORDER.indexOf(paneId);
+  var isFirst = idx <= 0;
+  var isLast = idx === _BMF_PANE_ORDER.length - 1;
+
+  function _show(id, show){
+    var el = document.getElementById(id);
+    if(el) el.style.display = show ? '' : 'none';
+  }
+
+  // Zurück: ab Pane 2
+  _show('btnBmfBack', !isFirst);
+  // Weiter: bis Pane 3
+  _show('btnBmfNext', !isLast);
+  // Übernehmen + PDF: nur auf letzter Pane
+  _show('btnBmfApply', isLast);
+  _show('btnBmfPdf', isLast);
+  // Abbrechen: immer
+  _show('btnBmfCancel', true);
+
+  // Footer-Hint-Text je Pane
+  var hint = document.getElementById('bmfmoFooterHint');
+  if(hint){
+    var hints = {
+      'p-ak':    '<b>Schritt 1 / 4:</b> Anschaffungskosten prüfen — Werte aus Tab Investition wurden übernommen (gold hinterlegt).',
+      'p-bmf':   '<b>Schritt 2 / 4:</b> Eckdaten für die BMF-Aufteilung ergänzen. Pflichtfelder: Baujahr, Wohnfläche, Bodenrichtwert, Kaufdatum.',
+      'p-afa':   '<b>Schritt 3 / 4:</b> AfA-Vorschau prüfen — Gebäudeanteil und jährliche AfA werden hier hochgerechnet.',
+      'p-hebel': '<b>Beim „Übernehmen":</b> Gebäudeanteil + AfA-Satz wandern ins Steuer-Modul, die geplante Sanierung wird ins <em style="color:var(--gold-d);font-style:normal;font-weight:600">Tab Investition</em> zurückgeschrieben.'
+    };
+    hint.innerHTML = hints[paneId] || hints['p-ak'];
+  }
+}
+
+function bmfPaneNext(){
+  var idx = _BMF_PANE_ORDER.indexOf(_currentPaneId());
+  var nextIdx = Math.min(idx + 1, _BMF_PANE_ORDER.length - 1);
+  switchPane(_BMF_PANE_ORDER[nextIdx]);
+}
+
+function bmfPaneBack(){
+  var idx = _BMF_PANE_ORDER.indexOf(_currentPaneId());
+  var prevIdx = Math.max(idx - 1, 0);
+  switchPane(_BMF_PANE_ORDER[prevIdx]);
+}
+
+window.bmfPaneNext = bmfPaneNext;
+window.bmfPaneBack = bmfPaneBack;
 
 // ESC schließt
 document.addEventListener('keydown', function(e){

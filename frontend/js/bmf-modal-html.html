@@ -477,13 +477,16 @@
     </div><!-- /modal-body -->
 
     <div class="bmfmo-foot">
-      <div class="left">
+      <div class="left" id="bmfmoFooterHint">
         <b>Beim „Übernehmen":</b> Gebäudeanteil + AfA-Satz wandern ins Steuer-Modul,
         die geplante Sanierung wird ins <em style="color:var(--gold-d);font-style:normal;font-weight:600">Tab Investition</em> zurückgeschrieben.
       </div>
-      <button class="btn btn-outline" onclick="exportBmfPdf()" id="btnBmfPdf">📄 PDF-Anlage erstellen</button>
-      <button class="btn btn-outline" onclick="closeBMFModal()">Abbrechen</button>
-      <button class="btn btn-gold" onclick="applyToTax()">✓ Übernehmen</button>
+      <!-- V289.2.3: Pane-Navigation -->
+      <button class="btn btn-outline" onclick="bmfPaneBack()" id="btnBmfBack" style="display:none">← Zurück</button>
+      <button class="btn btn-outline" onclick="exportBmfPdf()" id="btnBmfPdf" style="display:none">📄 PDF-Anlage erstellen</button>
+      <button class="btn btn-outline" onclick="closeBMFModal()" id="btnBmfCancel">Abbrechen</button>
+      <button class="btn btn-gold" onclick="bmfPaneNext()" id="btnBmfNext">Weiter →</button>
+      <button class="btn btn-gold" onclick="applyToTax()" id="btnBmfApply" style="display:none">✓ Übernehmen</button>
     </div>
 
   </div>
