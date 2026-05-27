@@ -1517,11 +1517,11 @@ function _updateFooterNav(paneId){
   var hint = document.getElementById('bmfmoFooterHint');
   if(hint){
     var hints = {
-      'p-ak':    '<b>Schritt 1 / 4:</b> Anschaffungskosten prüfen — Werte aus Tab Investition wurden übernommen (gold hinterlegt).',
-      'p-bmf':   '<b>Schritt 2 / 4:</b> Eckdaten für die BMF-Aufteilung ergänzen. Pflichtfelder: Baujahr, Wohnfläche, Bodenrichtwert, Kaufdatum.',
-      'p-afa':   '<b>Schritt 3 / 4:</b> AfA-Vorschau prüfen — Gebäudeanteil und jährliche AfA werden hier hochgerechnet.',
-      'p-hebel': '<b>Beim „Übernehmen":</b> Gebäudeanteil + AfA-Satz wandern ins Steuer-Modul, die geplante Sanierung wird ins <em style="color:var(--gold-d);font-style:normal;font-weight:600">Tab Investition</em> zurückgeschrieben.'
-    };
+      'p-ak':    '<b>Schritt 1 / 4:</b> Anschaffungskosten — Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
+      'p-bmf':   '<b>Schritt 2 / 4:</b> BMF-Eckdaten + KI-GAA. Änderungen lösen automatisch eine neue Berechnung aus (500ms debounced).',
+      'p-afa':   '<b>Schritt 3 / 4:</b> 3-Spalten-Vergleich der Varianten (Konservativ / Optimiert / Aggressiv) — wählen Sie in Pane 4.',
+      'p-hebel': '<b>Schritt 4 / 4:</b> Wählen Sie die Variante per Klick auf eine Karte. Bei „Übernehmen" wird der Gebäudeanteil ins Steuermodul geschrieben.'
+    }; /* V292-footer-hints */
     hint.innerHTML = hints[paneId] || hints['p-ak'];
   }
 }
@@ -1774,3 +1774,9 @@ document.addEventListener('keydown', function(e){
     if(ov && ov.classList.contains('open')) closeBMFModal();
   }
 });
+
+/* V292.1-auth-export: Export _authHeaders + _token für V292-Modul */
+try {
+  if (typeof _authHeaders === 'function') window.__bmfAuthHeaders = _authHeaders;
+  if (typeof _token === 'function') window.__bmfToken = _token;
+} catch(e) { console.warn('[bmf-modal] V292.1 auth-export:', e); }
