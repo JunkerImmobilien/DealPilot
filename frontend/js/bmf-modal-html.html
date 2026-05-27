@@ -1,0 +1,492 @@
+<div class="bmf-modal-overlay bmfmo-overlay" id="bmfOverlay">
+  <div class="bmfmo-modal" role="dialog" aria-labelledby="modal-ttl">
+
+    <div class="bmfmo-head">
+      <div class="ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7l9-4 9 4M3 7v10l9 4 9-4V7M3 7l9 4 9-4"/></svg>
+      </div>
+      <div class="ttl">
+        <h2 id="modal-ttl">Anschaffungskosten &amp; BMF-Kaufpreisaufteilung</h2>
+        <div class="sub">Detaillierte AK-Aufstellung und Kaufpreisaufteilung nach BMF-Arbeitshilfe (Juni 2023) — übernimmt Werte aus Tab Investition und ermittelt AfA-Bemessungsgrundlage.</div>
+      </div>
+      <button class="bmfmo-close" onclick="closeBMFModal()" aria-label="Schließen">×</button>
+    </div>
+
+    <div class="bmfmo-body">
+
+      <!-- Tab-Strip im Modal -->
+      <div class="bmfmo-tabs">
+        <button class="bmfmo-tab active" data-pane="p-ak" onclick="switchPane('p-ak')"><span class="mtab-num">1</span> Anschaffungskosten</button>
+        <button class="bmfmo-tab" data-pane="p-bmf" onclick="switchPane('p-bmf')"><span class="mtab-num">2</span> BMF-Aufteilung</button>
+        <button class="bmfmo-tab" data-pane="p-afa" onclick="switchPane('p-afa')"><span class="mtab-num">3</span> AfA-Vorschau</button>
+        <button class="bmfmo-tab" data-pane="p-hebel" onclick="switchPane('p-hebel')"><span class="mtab-num">4</span> AfA-Hebel</button>
+      </div>
+
+
+      <!-- ═══ PANE 1: ANSCHAFFUNGSKOSTEN ═══ -->
+      <div class="bmfmo-pane active" id="p-ak">
+
+        <div class="banner info" style="margin-bottom:14px">
+          <strong>Auto-Übernahme aus Tab Investition.</strong> Kaufpreis, GrESt, Notar, Grundbuch, Junker und Makler werden automatisch übernommen (gold hinterlegt). Du kannst sie hier überschreiben — die Änderung gilt dann nur fürs Steuer-Modul.
+        </div>
+
+        <div class="g2">
+          <div class="f">
+            <label>Kaufpreis (aus Notarvertrag) <span class="auto" title="Aus Tab Investition · #kp">Auto</span></label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_kp" type="text" inputmode="decimal" value="87.569,13" class="trl tr from-tab" oninput="calcAk()"></div>
+          </div>
+          <div class="f">
+            <label>Anschaffungsnahe Herstellkosten <span class="badge badge-blue" style="margin-left:6px">§ 6 Abs. 1 Nr. 1a EStG</span></label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_ahk" type="text" inputmode="decimal" value="0,00" class="trl tr" oninput="calcAk()"></div>
+            <span class="hint">15-%-Grenze wird im Sanierungs-Modul geprüft</span>
+          </div>
+        </div>
+
+        <hr class="dvd">
+
+        <div class="g3">
+          <div class="f">
+            <label>Grunderwerbsteuer <span class="auto" title="Aus Tab Investition · #gest_e">Auto</span></label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_grest" type="text" inputmode="decimal" value="4.250,00" class="trl tr from-tab" oninput="calcAk()"></div>
+          </div>
+          <div class="f">
+            <label>Notar <span class="auto" title="Aus Tab Investition · #notar_e">Auto</span></label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_notar" type="text" inputmode="decimal" value="1.492,26" class="trl tr from-tab" oninput="calcAk()"></div>
+          </div>
+          <div class="f">
+            <label>Grundbuchamt <span class="auto" title="Aus Tab Investition · #gba_e">Auto</span></label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_gba" type="text" inputmode="decimal" value="0,00" class="trl tr from-tab" oninput="calcAk()"></div>
+          </div>
+        </div>
+
+        <div class="g2">
+          <div class="f">
+            <label>Maklergebühr <span class="auto" title="Aus Tab Investition · #makler_e">Auto</span></label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_makler" type="text" inputmode="decimal" value="0,00" class="trl tr from-tab" oninput="calcAk()"></div>
+          </div>
+          <div class="f">
+            <label>Junker Immobilien <span class="auto" title="Aus Tab Investition · #ji_e">Auto</span></label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_ji" type="text" inputmode="decimal" value="0,00" class="trl tr from-tab" oninput="calcAk()"></div>
+          </div>
+        </div>
+
+        <hr class="dvd">
+
+        <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:8px">Erwerbskosten Käufer (Reise &amp; Aufwand)</div>
+
+        <div class="g3">
+          <div class="f">
+            <label>Fahrtkosten</label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_fahrt" type="text" inputmode="decimal" value="817,44" class="trl tr" oninput="calcAk()"></div>
+            <span class="hint">0,38 €/km PKW (BMF-Pauschale 2026) oder Beleg</span>
+            <details class="fold" style="margin-top:4px">
+              <summary style="font-size:11px">Fahrtkosten-Helfer</summary>
+              <div class="g2" style="margin-top:6px">
+                <div class="f">
+                  <label style="font-size:10px">Strecke (km gesamt)</label>
+                  <div class="iw"><input id="ak_fahrt_km" type="text" inputmode="decimal" value="2.151" class="tr" oninput="calcFahrt()"><span class="sfx">km</span></div>
+                </div>
+                <div class="f">
+                  <label style="font-size:10px">Satz je km</label>
+                  <div class="iw"><span class="pfx">€</span><input id="ak_fahrt_satz" type="text" inputmode="decimal" value="0,38" class="trl tr" oninput="calcFahrt()"></div>
+                </div>
+              </div>
+            </details>
+          </div>
+          <div class="f">
+            <label>Verpflegungsmehraufwand</label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_verpfl" type="text" inputmode="decimal" value="56,00" class="trl tr" oninput="calcAk()"></div>
+            <span class="hint">14 €/28 € Pauschale je Tag</span>
+          </div>
+          <div class="f">
+            <label>Unterkunft</label>
+            <div class="iw"><span class="pfx">€</span><input id="ak_hotel" type="text" inputmode="decimal" value="40,00" class="trl tr" oninput="calcAk()"></div>
+            <span class="hint">Hotel/Pension mit Beleg</span>
+          </div>
+        </div>
+
+        <details class="fold">
+          <summary>Weitere Positionen (Gutachten, Anwalt, Sonstiges)</summary>
+          <div class="g2" style="margin-top:8px">
+            <div class="f">
+              <label>Wertgutachten / Sachverständige</label>
+              <div class="iw"><span class="pfx">€</span><input id="ak_gutachten" type="text" inputmode="decimal" value="0,00" class="trl tr" oninput="calcAk()"></div>
+            </div>
+            <div class="f">
+              <label>Anwaltskosten (Kaufvorgang)</label>
+              <div class="iw"><span class="pfx">€</span><input id="ak_anwalt" type="text" inputmode="decimal" value="0,00" class="trl tr" oninput="calcAk()"></div>
+            </div>
+            <div class="f" style="grid-column:1/-1">
+              <label>Sonstiges (Vermessung, Energieausweis, etc.)</label>
+              <div class="iw"><span class="pfx">€</span><input id="ak_sonst" type="text" inputmode="decimal" value="0,00" class="trl tr" oninput="calcAk()"></div>
+              <input type="text" placeholder="Bemerkung" style="margin-top:6px">
+            </div>
+          </div>
+        </details>
+
+        <div class="total-bar">
+          <span>Anschaffungskosten insgesamt</span>
+          <span class="total-val" id="ak_total">€ 94.224,83</span>
+        </div>
+
+      </div>
+
+
+      <!-- ═══ PANE 2: BMF-AUFTEILUNG ═══ -->
+      <div class="bmfmo-pane" id="p-bmf">
+
+        <div class="banner info">
+          <strong>Die BMF-Arbeitshilfe rechnet automatisch <em>ein</em> Verfahren als maßgebend</strong> — je nach verfügbaren Daten. Bei Mietobjekten ist das in der Regel der Ertragswert. Hier kannst du das voreingestellte Verfahren manuell überschreiben.
+        </div>
+
+        <div class="bmfmo-verf-toggle">
+          <button class="bmfmo-verf-btn" data-verf="auto" onclick="setVerf('auto')" id="vb-auto">Automatisch</button>
+          <button class="bmfmo-verf-btn active" data-verf="ertrag" onclick="setVerf('ertrag')" id="vb-ertrag">Ertragswert</button>
+          <button class="bmfmo-verf-btn" data-verf="sach" onclick="setVerf('sach')" id="vb-sach">Sachwert</button>
+          <button class="bmfmo-verf-btn" data-verf="vergl" onclick="setVerf('vergl')" id="vb-vergl">Vergleichswert</button>
+        </div>
+        <div class="verf-info" id="verf-info">
+          <strong>Ertragswertverfahren</strong> — Standard für Renditeobjekte mit bekannter Miete. Wird vom Finanzamt anerkannt, wenn ein lokaler Liegenschaftszinssatz vorliegt.
+        </div>
+
+        <!-- Demo-Buttons -->
+        <div class="demo-row">
+          <span class="demo-label">Demo:</span>
+          <button class="btn btn-outline btn-sm" onclick="loadDemo('etw1998')">ETW 1998 (BMF-Vorlage)</button>
+          <button class="btn btn-outline btn-sm" onclick="loadDemo('real1')">G&amp;B (KP 91k)</button>
+          <button class="btn btn-outline btn-sm" onclick="loadDemo('real2')">EH 18 (KP 138,5k)</button>
+          <button class="btn btn-outline btn-sm" onclick="loadDemo('real3')">Sachsenstr. Herford</button>
+        </div>
+
+        <div class="g2">
+          <div class="f">
+            <label>Grundstücksart</label>
+            <select id="bmf_art">
+              <option>Wohnungseigentum [WE]</option>
+              <option>Mietwohngrundstücke (Mehrfamilienhäuser)</option>
+              <option>Ein- und Zweifamilienhäuser [EFH/ZFH]</option>
+              <option>gemischt genutzte Grundstücke (gewerbl. Anteil &lt; 50%)</option>
+              <option>gemischt genutzte Grundstücke (gewerbl. Anteil &gt; 50%)</option>
+              <option>Geschäftsgrundstücke, Geschäftshäuser</option>
+              <option>Geschäftsgrundstücke, Bürogebäude</option>
+            </select>
+          </div>
+          <div class="f">
+            <label>Datum Kaufvertrag <span class="auto" title="Aus Tab Objekt · #kaufdat">Auto</span></label>
+            <input type="date" id="bmf_datum" value="2024-12-18" class="from-tab">
+          </div>
+        </div>
+
+        <div class="g2">
+          <div class="f">
+            <label>Baujahr <span class="auto" title="Aus Tab Objekt · #baujahr">Auto</span></label>
+            <input id="bmf_bj" type="number" value="1994" class="from-tab">
+          </div>
+          <div class="f">
+            <label>Wohn-/Nutzfläche <span class="auto" title="Aus Tab Objekt · #wfl">Auto</span></label>
+            <div class="iw"><input id="bmf_wfl" type="text" inputmode="decimal" value="96,2" class="tr from-tab"><span class="sfx">m²</span></div>
+          </div>
+        </div>
+
+        <div class="g3">
+          <div class="f">
+            <label>Grundstücksfläche <span class="auto" title="Aus Tab Objekt · #gsfl">Auto</span></label>
+            <div class="iw"><input id="bmf_gsfl" type="text" inputmode="decimal" value="1.570" class="tr from-tab"><span class="sfx">m²</span></div>
+          </div>
+          <div class="f">
+            <label>Bodenrichtwert <span class="auto" title="Aus Tab Objekt · #brw">Auto</span></label>
+            <div class="iw"><input id="bmf_brw" type="text" inputmode="decimal" value="120" class="tr from-tab"><span class="sfx">€/m²</span></div>
+          </div>
+          <div class="f">
+            <label>Miteigentumsanteil <span class="auto" title="Aus Tab Objekt · #mea">Auto</span></label>
+            <div class="iw"><input id="bmf_mea" type="text" inputmode="decimal" value="7,10" class="tr from-tab"><span class="sfx">%</span></div>
+          </div>
+        </div>
+
+        <div class="g2">
+          <div class="f">
+            <label>Monatliche Nettokaltmiete <span class="auto" title="Aus Tab Miete · #nkm">Auto</span></label>
+            <div class="iw"><span class="pfx">€</span><input id="bmf_miete" type="text" inputmode="decimal" value="748,80" class="trl tr from-tab"></div>
+          </div>
+          <div class="f">
+            <label>Liegenschaftszins <span class="hint" style="display:inline;font-style:italic">(optional)</span></label>
+            <div class="iw"><input id="bmf_lzs" type="text" inputmode="decimal" placeholder="leer = Modellwert" class="tr"><span class="sfx">%</span></div>
+          </div>
+        </div>
+
+        <details class="fold">
+          <summary>Modernisierungen (für fiktives Baujahr · wichtig bei älteren Gebäuden)</summary>
+          <div class="g2" style="margin-top:8px">
+            <div class="f"><label>Dach inkl. Dämmung</label><select id="mod_dach"><option>nein</option><option>teilweise</option><option>ja</option></select></div>
+            <div class="f"><label>Fenster &amp; Türen</label><select id="mod_fenster"><option>nein</option><option>teilweise</option><option>ja</option></select></div>
+            <div class="f"><label>Leitungssysteme</label><select id="mod_leit"><option>nein</option><option>teilweise</option><option>ja</option></select></div>
+            <div class="f"><label>Heizungsanlage</label><select id="mod_heiz"><option>nein</option><option>teilweise</option><option>ja</option></select></div>
+            <div class="f"><label>Wärmedämmung Außenwände</label><select id="mod_daemm"><option>nein</option><option>teilweise</option><option>ja</option></select></div>
+            <div class="f"><label>Bäder</label><select id="mod_bad"><option>nein</option><option>teilweise</option><option>ja</option></select></div>
+            <div class="f"><label>Innenausbau</label><select id="mod_innen"><option>nein</option><option>teilweise</option><option>ja</option></select></div>
+            <div class="f"><label>Grundriss</label><select id="mod_grdr"><option>nein</option><option>teilweise</option><option>ja</option></select></div>
+          </div>
+        </details>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             V289.3 KI-GAA-Block — Gutachterausschuss-Werte via OpenAI
+             ════════════════════════════════════════════════════════════════ -->
+        <div class="bmfmo-gaa-block" style="margin-top:20px;padding:16px 18px;background:var(--gold-bg);border:1px solid rgba(201,168,76,.4);border-radius:var(--r2)">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+            <div>
+              <div style="font-size:9.5px;color:var(--gold-d);font-weight:600;letter-spacing:.14em;text-transform:uppercase">KI-Vorschlag · 1 Credit</div>
+              <div style="font-size:13px;font-weight:600;color:var(--ch);margin-top:2px">Gutachterausschuss-Werte (GAA)</div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px">Bodenrichtwert, Vergleichsmiete, Liegenschaftszins, Sachwertfaktor — KI schlägt alle 4 in einem Call vor.</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+              <span id="gaa_confidence_badge" style="font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:99px;display:none">Confidence: —</span>
+              <button class="btn btn-outline btn-sm" onclick="suggestGaaBmf()" id="btnGaaSuggest" type="button">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                KI-Vorschlag
+              </button>
+            </div>
+          </div>
+
+          <div class="g3" style="margin-top:10px">
+            <div class="f">
+              <label>BRW <span class="hint" style="display:inline;font-style:italic">aus KI-Vorschlag</span></label>
+              <div class="iw"><input id="gaa_brw" type="text" inputmode="decimal" class="tr" placeholder="—"><span class="sfx">€/m²</span></div>
+            </div>
+            <div class="f">
+              <label>Liegenschaftszins <span class="hint" style="display:inline;font-style:italic">aus KI-Vorschlag</span></label>
+              <div class="iw"><input id="gaa_lzs" type="text" inputmode="decimal" class="tr" placeholder="—"><span class="sfx">%</span></div>
+            </div>
+            <div class="f">
+              <label>Sachwertfaktor <span class="hint" style="display:inline;font-style:italic">aus KI-Vorschlag</span></label>
+              <div class="iw"><input id="gaa_swf" type="text" inputmode="decimal" class="tr" placeholder="—"></div>
+            </div>
+          </div>
+          <div class="g2" style="margin-top:8px">
+            <div class="f">
+              <label>Vergleichsmiete (niedrig)</label>
+              <div class="iw"><span class="pfx">€</span><input id="gaa_vm_low" type="text" inputmode="decimal" class="trl tr" placeholder="—"><span class="sfx">/m²/Mo</span></div>
+            </div>
+            <div class="f">
+              <label>Vergleichsmiete (hoch)</label>
+              <div class="iw"><span class="pfx">€</span><input id="gaa_vm_high" type="text" inputmode="decimal" class="trl tr" placeholder="—"><span class="sfx">/m²/Mo</span></div>
+            </div>
+          </div>
+
+          <div id="gaa_reasoning" style="font-size:11px;font-style:italic;color:var(--muted);margin-top:10px;line-height:1.5"></div>
+
+          <div style="font-size:10.5px;color:var(--muted2);margin-top:8px;border-top:1px dashed rgba(201,168,76,.3);padding-top:8px">
+            <strong style="color:var(--gold-d)">Buttons übernehmen:</strong>
+            <button type="button" onclick="if($('gaa_brw').value){$('bmf_brw').value=$('gaa_brw').value;$('bmf_brw').classList.add('from-tab');_maybeAutoTriggerBmf();}" style="background:none;border:none;color:var(--gold-d);font-size:10.5px;cursor:pointer;text-decoration:underline;padding:2px 4px">BRW → BMF</button>
+            <button type="button" onclick="if($('gaa_lzs').value){$('bmf_lzs').value=$('gaa_lzs').value;$('bmf_lzs').classList.add('from-tab');_maybeAutoTriggerBmf();}" style="background:none;border:none;color:var(--gold-d);font-size:10.5px;cursor:pointer;text-decoration:underline;padding:2px 4px">Lzs → BMF</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:18px">
+          <button class="btn btn-gold" onclick="runBmf()" id="btnBmf" style="display:none">Berechnen</button><span class="hint" id="bmfAutoHint" style="font-style:italic;color:var(--muted)">Berechnung erfolgt automatisch sobald alle Pflichtfelder ausgefüllt sind.</span>
+          <button class="btn btn-outline" onclick="downloadXlsx()" id="btnDl" disabled>BMF-XLSX herunterladen</button>
+        </div>
+
+        <div id="bmfStatus" class="banner info" style="margin-top:18px">
+          <strong>Bereit.</strong> Eingaben sind aus Tab Investition + Objekt auto-übernommen. Auf „Berechnen" tippen.
+        </div>
+
+        <div id="bmfResult" style="display:none">
+          <div class="kpi-grid">
+            <div class="kpi highlight">
+              <div class="kpi-label">Gebäudeanteil</div>
+              <div class="kpi-value" id="r_geb_pct">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Grund &amp; Boden-Anteil</div>
+              <div class="kpi-value" id="r_grund_pct">—</div>
+            </div>
+          </div>
+
+          <div class="split-bar">
+            <div class="grund" id="bar_grund" style="width:0%"></div>
+            <div class="gebaeude" id="bar_geb" style="width:0%"></div>
+          </div>
+          <div class="split-legend">
+            <span><span class="sw" style="background:#7a9ab8"></span>Grund &amp; Boden <span id="leg_grund">—</span></span>
+            <span><span class="sw" style="background:#C9A84C"></span>Gebäude <span id="leg_geb">—</span></span>
+          </div>
+
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin:14px 0 6px">Kaufpreisaufteilung (auf Anschaffungskosten <span id="r_ak_show">94.224,83 €</span>)</div>
+          <div class="kpi-grid">
+            <div class="kpi">
+              <div class="kpi-label">Grund &amp; Boden</div>
+              <div class="kpi-value" id="r_kp_grund">—</div>
+            </div>
+            <div class="kpi highlight">
+              <div class="kpi-label">Gebäude <span style="font-size:9px;letter-spacing:.04em;text-transform:none">(= AfA-Basis)</span></div>
+              <div class="kpi-value" id="r_kp_geb">—</div>
+            </div>
+          </div>
+
+          <details class="fold">
+            <summary>Verprobung mit anderen Verfahren (alle drei wurden gerechnet)</summary>
+            <div style="margin-top:6px">
+              <div class="kpi-grid">
+                <div class="kpi"><div class="kpi-label">Bodenwert</div><div class="kpi-value" id="r_bw">—</div></div>
+                <div class="kpi"><div class="kpi-label">Maßgebender Verkehrswert</div><div class="kpi-value" id="r_vw">—</div></div>
+                <div class="kpi"><div class="kpi-label">Sachwert (marktangepasst)</div><div class="kpi-value" id="r_sw">—</div></div>
+                <div class="kpi"><div class="kpi-label">Ertragswert</div><div class="kpi-value" id="r_ew">—</div></div>
+              </div>
+              <p class="hint" style="margin-top:8px;font-size:11px">Die BMF-Arbeitshilfe nutzt das <strong>Ertragswertverfahren</strong> wenn Miete bekannt ist (Standard). Die anderen Verfahren werden parallel gerechnet, dienen aber nur zur Verprobung. Bei Verkehrswert-Gutachten oder Vergleichsfaktor wird das jeweilige Verfahren maßgebend.</p>
+            </div>
+          </details>
+        </div>
+
+      </div>
+
+
+      <!-- ═══ PANE 3: AfA-VORSCHAU ═══ -->
+      <div class="bmfmo-pane" id="p-afa">
+
+        <div class="banner info">
+          <strong>Aus AK + BMF-Aufteilung wird die AfA-Basis und der jährliche Abschreibungsbetrag synthetisiert.</strong> Beim Speichern werden Gebäudeanteil und AfA-Satz in das Steuermodul übernommen.
+        </div>
+
+        <div class="bmfmo-afa-preview">
+          <div class="afa-tag">Lineare AfA · § 7 Abs. 4 EStG</div>
+          <div class="afa-main"><span class="accent" id="afa_jahr_big">5.135,89 €</span> jährlich</div>
+          <div class="afa-sub">
+            AK <span id="afa_show_ak">94.224,83 €</span> × Gebäudeanteil <span id="afa_show_pct">91,58 %</span> × AfA-Satz <span id="afa_show_satz">3,0 %</span>.
+            Bei Grenzsteuersatz 40,45 % bedeutet das ~<span id="afa_show_save">2.077 €</span> jährliche Steuerersparnis — über 50 Jahre Nutzungsdauer nominal <span id="afa_show_save50">~103.866 €</span>.
+          </div>
+          <div class="afa-grid">
+            <div>
+              <div class="l">AfA-Bemessungsgrundlage</div>
+              <div class="v" id="afa_basis">86.291 €</div>
+            </div>
+            <div>
+              <div class="l">Restnutzungsdauer (linear)</div>
+              <div class="v">33,3 Jahre</div>
+            </div>
+            <div>
+              <div class="l">Gesamtwirkung über RND</div>
+              <div class="v" id="afa_total">171.196 €</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="hint" style="font-size:11.5px;font-style:normal;color:var(--muted);margin-top:14px;line-height:1.55">
+          <strong style="color:var(--ch)">Hinweis zur Bemessungsgrundlage:</strong> Die AfA-Basis besteht aus dem Gebäude-Anteil am Kaufpreis <em>plus</em> anteilig zugerechneten Nebenkosten (GrESt, Notar, Makler, Fahrt, Verpflegung, Unterkunft) im Verhältnis des Gebäudeanteils. Anschaffungsnahe Herstellkosten werden nur dann hinzugerechnet, wenn die 15-%-Grenze (§ 6 Abs. 1 Nr. 1a EStG) überschritten ist — dies wird im Sanierungs-Modul geprüft.
+        </p>
+
+      </div>
+      <!-- ═══ PANE 4: AfA-OPTIMIERUNG (V282 v3 — kompakt, neutral) ═══ -->
+      <div class="bmfmo-pane" id="p-hebel">
+
+        <!-- ─── SEKTION 1: Aufteilungs-Varianten ─── -->
+        <div class="p4-info">
+          <strong>Inventar:</strong> <span id="invDisclaimerText">0,00 € (aus Tab Investition)</span> · wird separat über 10 Jahre abgeschrieben.
+          <span style="color:var(--muted);font-style:italic">Immobilien-KP = Brutto − Inventar.</span>
+        </div>
+
+        <div class="bmfmo-var-grid" id="varGrid">
+          <!-- per JS gerendert -->
+        </div>
+
+        <details class="fold" style="margin-top:6px;margin-bottom:14px">
+          <summary>Inventar manuell anpassen (Küche, Möbel, PV, Sonstiges)</summary>
+          <div class="g2" style="margin-top:8px">
+            <div class="f">
+              <label>Küche</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_kueche" type="text" inputmode="decimal" value="0" class="trl tr" oninput="updateInv()"></div>
+              <span class="hint">Auto aus Tab Investition · #kp_kueche</span>
+            </div>
+            <div class="f">
+              <label>Möblierung</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_moebl" type="text" inputmode="decimal" value="0" class="trl tr" oninput="updateInv()"></div>
+              <span class="hint">Auto aus Tab Investition · #moebl</span>
+            </div>
+            <div class="f">
+              <label>PV-Anlage</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_pv" type="text" inputmode="decimal" value="0" class="trl tr" oninput="updateInv()"></div>
+            </div>
+            <div class="f">
+              <label>Geräte, sonstiges Inventar</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_sonst" type="text" inputmode="decimal" value="0" class="trl tr" oninput="updateInv()"></div>
+            </div>
+          </div>
+        </details>
+
+
+        <!-- ─── SEKTION 2: 15-%-Grenze (verlinkt mit Tab Investition) ─── -->
+        <div class="p4-section">
+          <div class="p4-section-head">
+            <span class="p4-section-bullet"></span>
+            15-%-Grenze · Sanierung
+            <span class="p4-sync-badge" id="g15SyncBadge" title="Wird mit Tab Investition synchronisiert">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+              Tab Investition
+            </span>
+          </div>
+          <div class="p4-grid3" style="margin-top:10px">
+            <div>
+              <div class="p4-l">Max. Renovierung netto</div>
+              <div class="p4-v p4-v-gold" id="g15_max">12.937,93 €</div>
+              <div class="p4-sub">Gebäude-AK <span id="g15_basis">86.252,86 €</span> × 15 %</div>
+            </div>
+            <div>
+              <div class="p4-l">Geplant (3 Jahre, netto)</div>
+              <div class="iw"><span class="pfx">€</span><input id="g15_geplant" type="text" inputmode="decimal" value="0" class="trl tr" oninput="updateG15()"></div>
+              <div class="p4-sub">Aus Tab Investition · <a href="#" onclick="event.preventDefault();toast('In der App: Sprung zu Tab Investition');return false" style="color:var(--gold-d);text-decoration:none">→ dort bearbeiten</a></div>
+            </div>
+            <div>
+              <div class="p4-l">Status</div>
+              <div class="p4-v" id="g15_puffer">12.937,93 €</div>
+              <div class="p4-sub" id="g15_status">Puffer</div>
+            </div>
+          </div>
+          <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:8px">
+            <div id="g15_bar" style="height:100%;background:var(--green);width:0%;transition:all .4s"></div>
+          </div>
+        </div>
+
+
+        <!-- ─── SEKTION 3: Notarvertrag-Klausel ─── -->
+        <div class="p4-section">
+          <div class="p4-section-head">
+            <span class="p4-section-bullet"></span>
+            Notarvertrag-Klausel
+            <span style="margin-left:auto;font-size:10.5px;color:var(--muted);font-weight:400">Aktuelle Variante: <strong id="klauselVar" style="color:var(--gold-d);font-weight:600">Konservativ</strong></span>
+          </div>
+          <div class="klausel-box" id="klauselBox" style="margin-top:10px">
+            <button class="bmfmo-klausel-copy" onclick="copyKlausel()" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Kopieren
+            </button>
+            <div id="klauselText" class="bmfmo-klausel-text">
+              <!-- per JS gerendert -->
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ─── Disclaimer (klein, unten) ─── -->
+        <p class="hint" style="margin-top:12px;font-size:10px;line-height:1.55">
+          <strong style="color:var(--ch);font-weight:600">Hinweis nach § 6 StBerG:</strong> Keine Steuerberatung. Die Anerkennung der Aufteilung hängt von der wirtschaftlichen Plausibilität und Prüfung durch das Finanzamt ab. Bei Abweichungen über 25 % zum BMF-Standard ist ein Sachverständigengutachten (Restnutzungsdauer + Kaufpreisaufteilung) sinnvoll. FG Düsseldorf 12.03.2024 (13 K 1262/21 E) hat 30 % Abweichung ohne Gutachten als „nicht mehr geringfügig" verworfen.
+        </p>
+
+      </div><!-- /p-hebel -->
+
+
+
+    </div><!-- /modal-body -->
+
+    <div class="bmfmo-foot">
+      <div class="left">
+        <b>Beim „Übernehmen":</b> Gebäudeanteil + AfA-Satz wandern ins Steuer-Modul,
+        die geplante Sanierung wird ins <em style="color:var(--gold-d);font-style:normal;font-weight:600">Tab Investition</em> zurückgeschrieben.
+      </div>
+      <button class="btn btn-outline" onclick="exportBmfPdf()" id="btnBmfPdf">📄 PDF-Anlage erstellen</button>
+      <button class="btn btn-outline" onclick="closeBMFModal()">Abbrechen</button>
+      <button class="btn btn-gold" onclick="applyToTax()">✓ Übernehmen</button>
+    </div>
+
+  </div>
+</div>
+
+
