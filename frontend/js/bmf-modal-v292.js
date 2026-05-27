@@ -720,6 +720,33 @@
       var ov = document.getElementById('bmfOverlay');
       if (!ov || !ov.classList.contains('open')) return;
 
+      /* V292.6.2-flicker-fix: SOFORT V289-Banner ausblenden + V292-Skeleton
+       * Vorher: User sah 3-4s das alte V289-Layout während Pipeline läuft.
+       */
+      var bannerInfo = document.querySelector('#p-ak .banner.info');
+      if (bannerInfo) bannerInfo.style.display = 'none';
+
+      var paneAk = document.getElementById('p-ak');
+      var skeleton = document.getElementById('v292_ak_summary');
+      if (paneAk && !skeleton) {
+        skeleton = document.createElement('div');
+        skeleton.id = 'v292_ak_summary';
+        skeleton.className = 'v292-summary-box';
+        skeleton.innerHTML =
+          '<div class="v292-summary-banner v292-compact">' +
+            '⏳ <strong>Pipeline berechnet...</strong> ' +
+            'Werte aus Tab Investition + Inventar-Detail-Box werden zusammengeführt.' +
+          '</div>' +
+          '<div class="v292-summary-grid v292-compact" style="opacity:0.4">' +
+            '<div class="v292-row"><span>Brutto-Kaufpreis</span><span>...</span></div>' +
+            '<div class="v292-row v292-row-minus"><span>− Inventar (Detail-Box)</span><span>...</span></div>' +
+            '<div class="v292-row v292-row-result"><span><b>= Immobilien-KP</b></span><span>...</span></div>' +
+            '<div class="v292-row v292-row-plus"><span>+ Nebenkosten</span><span>...</span></div>' +
+            '<div class="v292-row v292-row-final"><span><b>= Prognose-AK</b></span><span><b>...</b></span></div>' +
+          '</div>';
+        paneAk.insertBefore(skeleton, paneAk.firstChild);
+      }
+
       // V292 Banner: zeigt dass Pipeline läuft
       _renderLoading();
 

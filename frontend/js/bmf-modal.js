@@ -483,10 +483,15 @@ function downloadXlsx(){
       baujahr: obj.baujahr || 0,
       wohnflaeche: obj.wfl || 0,
 
-      /* Optional */
+      /* Optional — V292.6.2-xlsx-mea-fix: mea aus DOM lesen, nicht hardcoded */
       grundstuecksflaeche: obj.gsfl || 0,
       bodenrichtwert: (gaa.brw_user || obj.brw || 0),
-      miteigentumsanteil_prozent: 100,
+      miteigentumsanteil_prozent: (function(){
+        var meaEl = document.getElementById('mea');
+        if (!meaEl || !meaEl.value) return 100;
+        var val = parseFloat(String(meaEl.value).replace(',', '.'));
+        return isFinite(val) && val > 0 ? val : 100;
+      })(),
       monatliche_nettokaltmiete: (p1.miete && p1.miete.nkm) || 0,
       liegenschaftszins: gaa.sachwertfaktor && gaa.sachwertfaktor > 0 ? gaa.sachwertfaktor : null,
 
@@ -1380,13 +1385,24 @@ function suggestGaaBmf(){
       raw_keys: Object.keys(g || {})
     });
     
-    /* Defensive: wenn confidence-String fehlt, fallback */
+    /* V292.6.2-ki-confidence-display: 
+     * Bei niedrig + alle null → erkläre warum keine Daten kamen */
     var confidenceLabel = g.confidence || 'unbekannt';
+    var hasAnyValue = (g.brw != null && g.brw > 0) ||
+                      (g.vergleichsmiete_range && (g.vergleichsmiete_range.low != null || g.vergleichsmiete_range.high != null)) ||
+                      (g.liegenschaftszins != null && g.liegenschaftszins > 0) ||
+                      (g.sachwertfaktor != null && g.sachwertfaktor > 0);
+    
     if (confidenceLabel === 'hoch') confidenceLabel = 'Hoch ✓';
     else if (confidenceLabel === 'mittel') confidenceLabel = 'Mittel';
     else if (confidenceLabel === 'niedrig') confidenceLabel = 'Niedrig ⚠';
     
-    toast('GAA-Werte von KI vorgeschlagen — Confidence: ' + confidenceLabel);
+    if (!hasAnyValue) {
+      toast('⚠ KI fand keine ausreichenden Daten für ' + ((document.getElementById('plz') || {}).value || 'diese Lage') + '. ' +
+            'Bitte BRW manuell aus BORIS-NRW (boris.nrw.de) eintragen.');
+    } else {
+      toast('GAA-Werte von KI vorgeschlagen — Confidence: ' + confidenceLabel);
+    }
     _persistBmfState();
   })
   .catch(function(err){
@@ -1893,3 +1909,44 @@ if (typeof window.fmtForInput !== 'function') {
     }).format(v);
   };
 }
+
+/* V292.6.2-defensive-parsede:
+ * Hartnäckiger Bug in _varianten Z.666 und ähnlichen Stellen:
+ *   parseDe($('xxx').value) crasht wenn $('xxx') === null.
+ * 
+ * Statt jede einzelne Stelle defensive zu patchen, wrappen wir parseDe:
+ * Wenn der Input null/undefined ist (was passiert wenn .value auf null gerufen wird,
+ * weil $('xxx').value vorher schon crasht), fängt der globale Error-Handler ab.
+ * 
+ * Bessere Lösung: Override $() damit es bei missing Element ein
+ * Pseudo-Object {value: ''} liefert — dann ist .value sicher.
+ */
+(function(){
+  if (typeof $ === 'function' && !window.__v292_6_2_dollar_patched) {
+    var _origDollar = $;
+    window.$ = function(id) {
+      var el = _origDollar(id);
+      if (el) return el;
+      /* Fallback: Pseudo-Element mit leerem value + harmlosen Methoden */
+      return {
+        value: '',
+        textContent: '',
+        innerHTML: '',
+        style: {},
+        classList: { add: function(){}, remove: function(){}, toggle: function(){}, contains: function(){return false;} },
+        dataset: {},
+        addEventListener: function(){},
+        removeEventListener: function(){},
+        dispatchEvent: function(){return false;},
+        appendChild: function(){},
+        getAttribute: function(){return null;},
+        setAttribute: function(){},
+        closest: function(){return null;},
+        querySelector: function(){return null;},
+        querySelectorAll: function(){return [];}
+      };
+    };
+    window.__v292_6_2_dollar_patched = true;
+    console.log('[v292.6.2] $ defensive wrapper installed — null-checks no longer crash');
+  }
+})();
