@@ -529,11 +529,22 @@ var _varChoice = 'konservativ';   // Default: BMF-Standard
 
 // ── 1) Inventar ──────────────────────────────────────────
 function updateInv(){
-  var k = parseDe($('inv_kueche').value);
-  var m = parseDe($('inv_moebl').value);
-  var p = parseDe($('inv_pv').value);
-  var s = parseDe($('inv_sonst').value);
-  var total = k + m + p + s;
+  /* V292.3-v289-bugfixes: defensive Null-Checks + V291-Field-Mapping
+   * Vorher: $('inv_moebl').value (gibts nicht; heißt 'inv_moebel')
+   * Vorher: Crash wenn Element null
+   * Jetzt: alle 6 V291-Felder, mit Null-Safe Pattern
+   */
+  function _safeVal(id){
+    var el = document.getElementById(id);
+    return (el && el.value) ? parseDe(el.value) : 0;
+  }
+  var k  = _safeVal('inv_kueche');
+  var m  = _safeVal('inv_moebel') || _safeVal('inv_moebl'); /* V291 hat 'moebel', V289 Bug nutzte 'moebl' */
+  var g  = _safeVal('inv_geraete');
+  var p  = _safeVal('inv_pv');
+  var sp = _safeVal('inv_stellplatz');
+  var s  = _safeVal('inv_sonst');
+  var total = k + m + g + p + sp + s;
 
   // Brutto-KP (laut Notarvertrag, aus ak_kp Tab oder Default)
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
@@ -1221,21 +1232,11 @@ window.addEventListener('DOMContentLoaded', function(){
 // ═══════════════════════════════════════════════════════════════
 var _persistTimer = null;
 function _persistBmfState(){
-  clearTimeout(_persistTimer);
-  _persistTimer = setTimeout(function(){
-    var objId = _currentObjectId();
-    if(!objId) return;
-    var state = {
-      results: window._lastBmfResults || null,
-      gaa: window._lastGaa || null,
-      ts: Date.now()
-    };
-    fetch('/api/v1/tax-snapshots/' + objId + '/bmf', {
-      method: 'PUT',
-      headers: _authHeaders(),
-      body: JSON.stringify({ bmf_advanced: state })
-    }).catch(function(e){ console.warn('[bmf] persist failed:', e.message); });
-  }, 800);
+  /* V292.3-v289-bugfixes: No-Op
+   * Original rief POST /api/v1/tax-snapshots/:id/bmf — Endpoint existiert nicht (404).
+   * Persistenz erfolgt implizit über calc() + normaler Object-Save im Tab.
+   */
+  return;
 }
 
 function suggestGaaBmf(){
@@ -1723,7 +1724,7 @@ function _renderKlauselText(){
   };
 
   var el = document.getElementById('klauselText');
-  if(el) el.innerHTML = texts[variant] || texts.konservativ;
+  if(el) el.innerHTML = texts[_currentKlauselVariant] || texts.konservativ; /* V292.3-v289-bugfixes: 'variant' nicht im Scope, nutze _currentKlauselVariant */
 }
 
 function copyKlausel_unused_v292(){
@@ -1787,3 +1788,18 @@ try {
   if (typeof updateG15 === 'function') window.__updateG15 = updateG15;
   if (typeof _renderKlauselText === 'function') window.__renderKlauselText = _renderKlauselText;
 } catch(e) { console.warn('[bmf-modal] V292.2 sync-export:', e); }
+
+/* V292.3-v289-bugfixes: Globaler Helper fmtForInput
+ * V289 _syncSanierungViz nutzt fmtForInput aber Funktion war nie definiert.
+ * Definition: wie fmtEur, aber ohne €-Symbol (für Input-Feld-Anzeige).
+ */
+if (typeof window.fmtForInput !== 'function') {
+  window.fmtForInput = function(v, decimals){
+    if (decimals == null) decimals = 2;
+    if (typeof v !== 'number' || !isFinite(v)) return '0,00';
+    return new Intl.NumberFormat('de-DE', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(v);
+  };
+}
