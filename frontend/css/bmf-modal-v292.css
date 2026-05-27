@@ -389,3 +389,69 @@
   color: var(--ch, #2D2622);
   font-weight: 600;
 }
+
+/* ════════════════════════════════════════════════════════════════
+ * V292.6.1-fonts-harmonized — €-Beträge in Cormorant Garamond (wie restliche App)
+ * ════════════════════════════════════════════════════════════════ */
+
+/* Pane 1: Final-Wert (Prognose-AK) in Serif wie .total-val */
+.v292-summary-grid .v292-row-final .v292-final-value,
+.v292-summary-grid .v292-row-final span:last-child b {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px !important;
+  font-weight: 600;
+  color: var(--gold-d, #8A7340);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pane 1: Immobilien-KP-Zwischenergebnis in Serif aber kleiner */
+.v292-summary-grid .v292-row-result span:last-child b {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ch, #2D2622);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pane 3 Vergleichstabelle: Σ AfA pro Jahr (hervorgehobene Zeile) */
+.v292-vergleich-tbl .v292-row-bold td:not(:first-child) {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pane 4 Variant-Cards: AfA / Jahr (Hi-Row Hauptwert) in Serif */
+.v292-var-card .v292-var-row-hi b {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px !important;
+  font-weight: 600;
+  color: var(--gold-d, #8A7340);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* Pane 4 Variant-Cards: €-Werte in 2-line (€-Werte als Sub-Info) */
+.v292-var-2line small {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pane 4 Hint (Anteilig-Rechnung) */
+.v292-pane4-hint {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: rgba(122, 115, 112, 0.06);
+  border-left: 3px solid var(--gold, #C9A84C);
+  border-radius: 4px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--muted, #7A7370);
+}
+
+.v292-pane4-hint strong {
+  color: var(--ch, #2D2622);
+  font-weight: 600;
+}

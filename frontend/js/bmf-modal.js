@@ -454,28 +454,87 @@ function _mockupRenderBmfResult(r, demoLabel){
 }
 
 function downloadXlsx(){
-  // V289.2: Echter Backend-Call mit include_file:true
-  var inputs = window._lastBmfInputs;
-  if(!inputs){ toast('Bitte erst Berechnen'); return; }
-  toast('XLSX wird generiert...');
+  /* V292.6.1-xlsx-flat: Variant-spezifischer Excel mit FLAT Backend-Format.
+   *
+   * Backend /bmf/aufteilung erwartet:
+   *   { lage, grundstuecksart, kaufdatum, kaufpreis, baujahr, wohnflaeche, ... }
+   * NICHT nested wie V292-Pipeline.
+   *
+   * Strategie: Wenn V292-State da, mappe NESTED → FLAT.
+   * Sonst Fallback auf V289 _lastBmfInputs.
+   */
+  var inputs;
+  var selectedVariant = (window._v292State && window._v292State.selectedVariant) || 'konservativ';
+
+  if (window._v292State && window._v292State.lastInputs && window._v292State.lastInputs.phase1_inputs) {
+    /* V292-Pfad: NESTED → FLAT mappen */
+    var p1 = window._v292State.lastInputs.phase1_inputs;
+    var obj = p1.objekt || {};
+    var inv = p1.investition || {};
+    var gaa = p1.gaa || {};
+    var ren = p1.renovierung || {};
+
+    inputs = {
+      /* Pflichtfelder */
+      lage: ((obj.plz || '') + ' ' + (obj.ort || '') + ', ' + (obj.str || '') + ' ' + (obj.hnr || '')).trim(),
+      grundstuecksart: obj.objart_bmf || 'Wohnungseigentum [WE]',
+      kaufdatum: inv.kaufdat || '',
+      kaufpreis: (inv.kp_brutto || 0) - ((p1.inventar && (p1.inventar.kueche + p1.inventar.moebel + p1.inventar.geraete + p1.inventar.pv + p1.inventar.stellplatz + p1.inventar.sonstiges)) || 0),
+      baujahr: obj.baujahr || 0,
+      wohnflaeche: obj.wfl || 0,
+
+      /* Optional */
+      grundstuecksflaeche: obj.gsfl || 0,
+      bodenrichtwert: (gaa.brw_user || obj.brw || 0),
+      miteigentumsanteil_prozent: 100,
+      monatliche_nettokaltmiete: (p1.miete && p1.miete.nkm) || 0,
+      liegenschaftszins: gaa.sachwertfaktor && gaa.sachwertfaktor > 0 ? gaa.sachwertfaktor : null,
+
+      /* Variant-Hint für Filename */
+      _variant: selectedVariant
+    };
+  } else if (window._lastBmfInputs) {
+    inputs = window._lastBmfInputs;
+  } else {
+    toast('Bitte erst BMF-Berechnung durchführen');
+    return;
+  }
+
+  toast('Excel wird generiert (Variante: ' + selectedVariant + ')...');
+
   fetch('/api/v1/bmf/aufteilung', {
     method: 'POST',
     headers: _authHeaders(),
     body: JSON.stringify({ inputs: inputs, include_file: true })
   })
-  .then(function(r){ return r.json(); })
+  .then(function(r){
+    if (!r.ok) {
+      return r.json().then(function(err){
+        console.error('[v292.6.1 xlsx] Backend-Error:', err);
+        throw new Error(err.error || ('HTTP ' + r.status));
+      });
+    }
+    return r.json();
+  })
   .then(function(data){
-    if(!data.ok || !data.file_base64){ throw new Error('Kein File in Antwort'); }
+    if(!data.ok || !data.file_base64){
+      console.error('[v292.6.1 xlsx] Response ohne file_base64:', data);
+      throw new Error('Backend lieferte kein File');
+    }
     var bytes = atob(data.file_base64);
     var buf = new Uint8Array(bytes.length);
     for(var i = 0; i < bytes.length; i++){ buf[i] = bytes.charCodeAt(i); }
     var blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url; a.download = data.file_name || 'BMF_Aufteilung.xlsx';
+    var fname = data.file_name || ('BMF_Aufteilung_' + selectedVariant + '.xlsx');
+    if (fname === 'BMF_Aufteilung.xlsx') {
+      fname = 'BMF_Aufteilung_' + selectedVariant + '.xlsx';
+    }
+    a.href = url; a.download = fname;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('XLSX heruntergeladen');
+    toast('Excel "' + fname + '" heruntergeladen');
   })
   .catch(function(err){ toast('Download-Fehler: ' + err.message); });
 }
@@ -1310,7 +1369,24 @@ function suggestGaaBmf(){
       rEl.textContent = '💡 ' + g.reasoning;
     }
 
-    toast('GAA-Werte von KI vorgeschlagen — Confidence: ' + (g.confidence || '?'));
+    /* V292.6.1-ki-debug: Diagnose-Hook für Pkt 5 (Konfidenz niedrig Bug) */
+    console.log('[v292.6 KI-GAA Response]', {
+      confidence: g.confidence,
+      brw: g.brw,
+      vergleichsmiete_range: g.vergleichsmiete_range,
+      liegenschaftszins: g.liegenschaftszins,
+      sachwertfaktor: g.sachwertfaktor,
+      reasoning_length: g.reasoning ? g.reasoning.length : 0,
+      raw_keys: Object.keys(g || {})
+    });
+    
+    /* Defensive: wenn confidence-String fehlt, fallback */
+    var confidenceLabel = g.confidence || 'unbekannt';
+    if (confidenceLabel === 'hoch') confidenceLabel = 'Hoch ✓';
+    else if (confidenceLabel === 'mittel') confidenceLabel = 'Mittel';
+    else if (confidenceLabel === 'niedrig') confidenceLabel = 'Niedrig ⚠';
+    
+    toast('GAA-Werte von KI vorgeschlagen — Confidence: ' + confidenceLabel);
     _persistBmfState();
   })
   .catch(function(err){

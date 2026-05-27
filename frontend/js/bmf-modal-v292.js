@@ -507,6 +507,19 @@
     });
     varGrid.innerHTML = html;
 
+    /* V292.6.1-pane4-hint: Anteilig-Rechnung im Steuermodul */
+    var hintWrap = document.getElementById('v292_pane4_hint');
+    if (!hintWrap) {
+      hintWrap = document.createElement('div');
+      hintWrap.id = 'v292_pane4_hint';
+      hintWrap.className = 'v292-pane4-hint';
+      hintWrap.innerHTML =
+        'ⓘ <strong>AfA-Werte zeigen das volle Jahr</strong> nach BMF-Berechnung. ' +
+        'Bei unterjährigem Kauf rechnet das Steuermodul anteilig ab Kaufmonat ' +
+        '(§ 7 Abs. 1 EStG: AfA ab Anschaffungsmonat).';
+      varGrid.parentNode.insertBefore(hintWrap, varGrid.nextSibling);
+    }
+
     // 15-%-Grenze für gewählte Variante
     var p9 = r.phase9_15pct[selected];
     var p8 = r.phase8_finale_ak[selected];

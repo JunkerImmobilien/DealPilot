@@ -737,9 +737,31 @@ function _calcImmediate(){
   var gebBruttoMax = kp * gebAnt;
   if (kuecheVal > gebBruttoMax) kuecheVal = gebBruttoMax;
 
-  var gebOhneK = gebBruttoMax - kuecheVal;
+  /* V292.6.1-afa-basis-fix-correct: AfA-Basis nach BMF Pipeline Phase 8
+   * 
+   * WICHTIG: gebAnt ist BEREITS Dezimal (Z.729: v('geb_ant')/100 = 0.9092 für 90,92%)
+   *          Deshalb hier NICHT nochmal /100 — sonst Faktor-100-Bug!
+   * 
+   * Vorher (steuerlich falsch): 
+   *   gebOhneK = (kp × gebAnt) − kueche = 163.656 − 7.000 = 156.656 €
+   *   gebQuoteOhneK = gebOhneK / kpOhneK = 156656 / 173000 = 0.9055
+   *   → Inventar wurde anteilig auch aus Gebäude UND Boden gerechnet
+   *   → Effektive Gebäude-Quote 90,55 % statt 90,92 %
+   * 
+   * Jetzt (BMF-konform): Küche zuerst vom KP abziehen, dann Gebäudeanteil
+   *   kpOhneK = kp − kueche = 173.000
+   *   gebOhneK = kpOhneK × gebAnt = 173000 × 0.9092 = 157.292 €
+   *   nkGebAnteil = nkGesamt × gebAnt = 15660 × 0.9092 = 14.238 €
+   *   gebAHK = 157292 + 14238 = 171.530 € (deckt sich mit Pipeline)
+   * 
+   * Beispiel Sachsenstr Aggressiv:
+   *   Alt: gebAHK = 170.836,54 € → AfA 3.416,73 €
+   *   Neu: gebAHK = 171.529,67 € → AfA 3.430,59 €
+   *   Pipeline:    171.530 € →    3.431 €  ✓ synchron
+   */
   var kpOhneK  = kp - kuecheVal;
-  var gebQuoteOhneK = kpOhneK > 0 ? (gebOhneK / kpOhneK) : gebAnt;
+  var gebOhneK = kpOhneK * gebAnt;
+  var gebQuoteOhneK = gebAnt;
   var nkGesamt = nk; // Summe aller Nebenkosten aus Z.610 (m_e+n_e+g_e+ge_e+ji_e)
   var nkGebAnteil = nkGesamt * gebQuoteOhneK;
   var gebAHK = gebOhneK + nkGebAnteil;
