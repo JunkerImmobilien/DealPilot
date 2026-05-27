@@ -197,7 +197,16 @@ function switchPane(id){
     p.classList.toggle('active', p.id === id);
   });
   // V289.2.3: Footer-Navigation aktualisieren
-  _updateFooterNav(id);
+  if(typeof _updateFooterNav === 'function') _updateFooterNav(id);
+
+  // V289.2.5: Pane-spezifische Render-Funktionen
+  if(id === 'p-afa' && typeof _renderVergleich === 'function'){
+    setTimeout(_renderVergleich, 30);
+  }
+  if(id === 'p-hebel'){
+    if(typeof _syncSanierungViz === 'function') setTimeout(_syncSanierungViz, 30);
+    if(typeof _renderKlauselText === 'function') setTimeout(_renderKlauselText, 30);
+  }
   // Hebel-Tab: bei Aktivierung neu rendern (BMF-Werte könnten sich geändert haben)
   if(id === 'p-hebel'){
     updateInv();  // Triggert Cascade: Varianten, 15%, Risiko, Empfehlung, Klausel
@@ -304,21 +313,24 @@ function loadDemo(key){
 
 function runBmf(){
   // V289.2: Echter Backend-Call statt Mock
+  // V289.2.5 Issue #5/6: Lage aus echten DealPilot-Feldern (plz/ort/str/hnr) statt ak_plz/etc.
+  //                       + _lastBmfInputs persistieren für XLSX-Download
   var btn = $('btnBmf');
   var hint = $('bmfAutoHint');
   if(btn){ btn.disabled = true; }
   if(hint){ hint.textContent = 'Berechnung läuft...'; }
 
+  function _v(id){ var e = document.getElementById(id); return e ? (e.value || '').trim() : ''; }
   var inputs = {
-    lage: ($('ak_str') ? $('ak_str').value : '') + ', ' + ($('ak_plz') ? $('ak_plz').value : '') + ' ' + ($('ak_ort') ? $('ak_ort').value : ''),
+    lage: (_v('str') + ' ' + _v('hnr')).trim() + ', ' + (_v('plz') + ' ' + _v('ort')).trim(),
     grundstuecksart: ($('bmf_art') || {}).value || 'Wohnungseigentum [WE]',
-    kaufdatum: ($('bmf_datum') || {}).value || '',
-    kaufpreis: parseDe(($('ak_kp') || {}).value),
-    baujahr: parseInt(($('bmf_bj') || {}).value) || 0,
-    wohnflaeche: parseDe(($('bmf_wfl') || {}).value),
-    grundstuecksgroesse: parseDe(($('bmf_gsfl') || {}).value),
-    bodenrichtwert: parseDe(($('bmf_brw') || {}).value),
-    mea_zaehler: 0,  // Mockup nutzt einzelnen MEA-%-Wert, nicht Z/N
+    kaufdatum: ($('bmf_datum') || {}).value || _v('kaufdat') || '',
+    kaufpreis: parseDe(($('ak_kp') || {}).value) || parseDe(_v('kp')),
+    baujahr: parseInt(($('bmf_bj') || {}).value || _v('baujahr')) || 0,
+    wohnflaeche: parseDe(($('bmf_wfl') || {}).value || _v('wfl')),
+    grundstuecksgroesse: parseDe(($('bmf_gsfl') || {}).value || _v('gsfl')),
+    bodenrichtwert: parseDe(($('bmf_brw') || {}).value || _v('brw')),
+    mea_zaehler: 0,
     mea_nenner: 0,
     miete_bekannt: ($('bmf_miete') && parseDe($('bmf_miete').value) > 0) ? 'Ja' : 'Nein',
     miete_monatlich: parseDe(($('bmf_miete') || {}).value),
@@ -326,6 +338,9 @@ function runBmf(){
     regionalfaktor: 1,
     sachwertfaktor: parseDe(($('bmf_lzs') || {}).value) > 0 ? parseDe(($('bmf_lzs') || {}).value) : 1
   };
+
+  // V289.2.5 Issue #6: für späteren XLSX-Download
+  window._lastBmfInputs = inputs;
 
   fetch('/api/v1/bmf/aufteilung', {
     method: 'POST',
@@ -1227,14 +1242,24 @@ function suggestGaaBmf(){
   var btn = $('btnGaaSuggest');
   if(btn){ btn.disabled = true; btn.textContent = 'KI fragt...'; }
 
+  // V289.2.5 Issue #5: Adresse direkt aus Tab Objekt (das Modal hat keine ak_plz/ak_ort Felder)
+  function _val(id){ var e = document.getElementById(id); return e ? (e.value || '').trim() : ''; }
   var payload = {
-    plz: ($('ak_plz') || {}).value || '',
-    ort: ($('ak_ort') || {}).value || '',
-    str: ($('ak_str') || {}).value || '',
-    baujahr: parseInt(($('bmf_bj') || {}).value) || null,
-    wohnflaeche: parseDe(($('bmf_wfl') || {}).value),
+    plz: _val('plz'),
+    ort: _val('ort'),
+    str: _val('str'),
+    hnr: _val('hnr'),
+    baujahr: parseInt(_val('bmf_bj') || _val('baujahr')) || null,
+    wohnflaeche: parseDe(_val('bmf_wfl') || _val('wfl')),
     grundstuecksart: ($('bmf_art') || {}).value || ''
   };
+
+  // Vorab-Validierung: ohne PLZ + Ort macht's keinen Sinn
+  if(!payload.plz || !payload.ort){
+    toast('KI-Vorschlag braucht PLZ und Ort — bitte erst im Tab Objekt eintragen');
+    if(btn){ btn.disabled = false; btn.textContent = 'KI-Vorschlag (1 Credit)'; }
+    return;
+  }
 
   fetch('/api/v1/ai/bmf-gaa', {
     method: 'POST',
@@ -1397,14 +1422,29 @@ function closeBMFModal(){
 }
 
 function applyToTax(){
-  // Sanierung zurück ins Tab Investition
+  // V289.2.5 Issue #10: BMF-Ergebnisse in AfA-Konfig-Card schreiben
+  //   - Gebäudeanteil → #geb_ant
+  //   - AfA-Satz NICHT überschreiben (bleibt gesetzlich 2,0/3,0 %)
+  //   - Auto-Badge ins Label
+  //   - Hover-Tooltip "Aus BMF-Berechnung übernommen"
+  var bmfApplied = _applyBmfToAfaConfig();
+
+  // Bestehende Logik: Sanierung zurück ins Tab Investition (nur falls AHK > 0)
   var ahk = parseDe(($('ak_ahk') || {}).value);
   var sanField = $('san');
-  if(sanField && ahk > 0){
+  if(sanField && ahk > 0 && ahk !== parseDe(sanField.value)){
     sanField.value = ahk.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     if(typeof window.syncSanTaxOnSanInput === 'function') window.syncSanTaxOnSanInput();
-    if(typeof window.calc === 'function') window.calc();
-    toast('Sanierungskosten in Tab Investition aktualisiert');
+  }
+
+  // calc() neu triggern damit AfA-Vorschau + Gesamtberechnung aktualisiert wird
+  if(typeof window.calc === 'function') window.calc();
+
+  if(bmfApplied){
+    toast('✓ BMF-Werte übernommen — Gebäudeanteil ' + (window._lastBmfResults.gebaeudeanteil_prozent.value.toFixed(1) + ' %').replace('.', ',') + ' im Steuermodul');
+  } else {
+    toast('Bitte erst Berechnung in Pane 2 durchführen');
+    return;  // nicht schließen wenn nichts zu übernehmen
   }
   closeBMFModal();
 }
@@ -1416,6 +1456,10 @@ window.closeBMFModal = closeBMFModal;
 window.applyToTax = applyToTax;
 window.suggestGaaBmf = suggestGaaBmf;
 window.exportBmfPdf = exportBmfPdf;
+// V289.2.5: neue Funktionen
+window.selectKlausel = selectKlausel;
+window.copyKlausel = copyKlausel;
+window.downloadXlsx = downloadXlsx;
 
 // AfA-Card-Button initialisieren beim DOM-Load
 function _initBmfAdvancedButton(){
@@ -1498,9 +1542,235 @@ window.bmfPaneNext = bmfPaneNext;
 window.bmfPaneBack = bmfPaneBack;
 
 // ESC schließt
+// ═════════════════════════════════════════════════════════════════
+// V289.2.5: Issue #7,9,10,12 — Sync, Vergleich, Übernehmen
+// ═════════════════════════════════════════════════════════════════
+
+// Issue #7: Sanierung-Visualisierung in Pane 4 aus Tab Investition
+function _syncSanierungViz(){
+  function _v(id){ var e = document.getElementById(id); return e ? (e.value || '') : ''; }
+  var san = parseDe(_v('san'));
+  var moebl = parseDe(_v('moebl'));
+
+  // Verteilung-Selects in Tab Investition haben keine festen IDs — wir suchen sie strukturell.
+  // Aus Diagnose: 2 selects, erstes hat option "5 Jahre (Standard §82b)" → Sanierung
+  //               zweites hat option "15 Jahre" → Möblierung
+  var sanDist = 5, moeblDist = 10;
+  var selects = document.querySelectorAll('#s5 select, #s_invest select, select');
+  for(var i = 0; i < selects.length; i++){
+    var s = selects[i];
+    var optsText = Array.from(s.options || []).map(function(o){ return o.text; }).join('|');
+    if(/§82b/i.test(optsText) || /5 Jahre.*Standard/i.test(optsText)){
+      sanDist = parseInt(s.value) || 5;
+    } else if(/15 Jahre/i.test(optsText) && /10 Jahre/i.test(optsText) && /Möbl|Inventar|gerin/i.test(optsText)){
+      moeblDist = parseInt(s.value) || 10;
+    }
+  }
+
+  // g15_geplant befüllen mit san
+  var g15 = $('g15_geplant');
+  if(g15){
+    g15.value = san > 0 ? fmtForInput(san, 2) : '0,00';
+  }
+
+  // Verteilung anzeigen
+  setText('san_dist_view', sanDist + ' Jahre');
+  setText('moebl_dist_view', moebl > 0 ? moeblDist + ' Jahre' : '— Jahre');
+
+  if(san > 0 && sanDist > 0){
+    var wkPa = san / sanDist;
+    setText('san_wk_pa', fmtEur(wkPa, 0));
+    setText('san_wk_calc', fmtEur(san, 0) + ' ÷ ' + sanDist + ' Jahre');
+  } else {
+    setText('san_wk_pa', '— €');
+    setText('san_wk_calc', 'Keine Sanierung im Tab Investition');
+  }
+
+  // Trigger Cascade (g15 puffer etc)
+  if(typeof updateG15 === 'function') updateG15();
+}
+
+// Issue #9: 3-Spalten-Vergleich Standard 80/20 vs BMF
+function _renderVergleich(){
+  function _v(id){ var e = document.getElementById(id); return e ? (e.value || '') : ''; }
+  var kp = parseDe(_v('ak_kp')) || parseDe(_v('kp'));
+  var bmfPct = window._lastBmfResults && window._lastBmfResults.gebaeudeanteil_prozent
+    && window._lastBmfResults.gebaeudeanteil_prozent.value;
+  var afaSatz = parseFloat((($('afa_satz') || {}).value || '2').replace(',', '.')) || 2;
+  if(!bmfPct){ bmfPct = 88; }  // Fallback
+
+  // Standard 80/20
+  var basis80 = kp * 0.80;
+  var afa80 = basis80 * afaSatz / 100;
+  var save80 = afa80 * 0.4045;  // ~40,45 % Grenzsteuersatz
+
+  // BMF
+  var basisBmf = kp * bmfPct / 100;
+  var afaBmf = basisBmf * afaSatz / 100;
+  var saveBmf = afaBmf * 0.4045;
+
+  // Diff
+  function diff(v1, v2, unit){
+    var d = v2 - v1;
+    var sign = d > 0 ? '+' : '';
+    var clr = d > 0 ? 'var(--green,#3FA56C)' : (d < 0 ? 'var(--red,#B8625C)' : 'var(--muted)');
+    if(unit === '€'){
+      return '<span style="color:' + clr + '">' + sign + new Intl.NumberFormat('de-DE',{maximumFractionDigits:0}).format(d) + ' €</span>';
+    } else if(unit === '%'){
+      return '<span style="color:' + clr + '">' + sign + d.toFixed(2).replace('.', ',') + ' %-Pkt.</span>';
+    }
+    return d.toFixed(0);
+  }
+
+  setText('cmp_pct_std', '80,00 %');
+  document.getElementById('cmp_pct_bmf').textContent = bmfPct.toFixed(2).replace('.', ',') + ' %';
+  document.getElementById('cmp_pct_diff').innerHTML = diff(80, bmfPct, '%');
+
+  setText('cmp_basis_std', fmtEur(basis80, 0));
+  setText('cmp_basis_bmf', fmtEur(basisBmf, 0));
+  document.getElementById('cmp_basis_diff').innerHTML = diff(basis80, basisBmf, '€');
+
+  setText('cmp_afa_std', fmtEur(afa80, 0));
+  setText('cmp_afa_bmf', fmtEur(afaBmf, 0));
+  document.getElementById('cmp_afa_diff').innerHTML = diff(afa80, afaBmf, '€');
+
+  setText('cmp_save_std', fmtEur(save80, 0));
+  setText('cmp_save_bmf', fmtEur(saveBmf, 0));
+  document.getElementById('cmp_save_diff').innerHTML = diff(save80, saveBmf, '€');
+
+  // Empfehlung
+  var diffEur = saveBmf - save80;
+  var rec = '';
+  if(diffEur > 200){
+    rec = '<strong style="color:var(--green,#3FA56C)">✓ Empfehlung: BMF-Berechnung anwenden.</strong> Die BMF-Aufteilung bringt dir ~' + Math.round(diffEur) + ' € mehr Steuerersparnis pro Jahr (' + Math.round(diffEur * 50) + ' € über 50 J).';
+  } else if(diffEur < -200){
+    rec = '<strong style="color:var(--muted)">Hinweis: Standard 80/20 wäre günstiger.</strong> BMF rechnet ~' + Math.abs(Math.round(diffEur)) + ' € weniger AfA pro Jahr — selten der Fall, prüfe deine Eingaben.';
+  } else {
+    rec = '<strong style="color:var(--muted)">Hinweis:</strong> Beide Methoden liegen sehr nah beieinander (~' + Math.round(Math.abs(diffEur)) + ' € Diff). Standard 80/20 ist FA-freundlicher und einfacher.';
+  }
+  var recEl = document.getElementById('cmp_recommendation');
+  if(recEl) recEl.innerHTML = rec;
+
+  // Issue #12: Vergleichsbalken
+  var gebPctRounded = Math.round(bmfPct);
+  var grundPct = 100 - gebPctRounded;
+  var barGeb = document.getElementById('cmp_bar_geb');
+  var barGrund = document.getElementById('cmp_bar_grund');
+  if(barGeb && barGrund){
+    barGeb.style.width = gebPctRounded + '%';
+    barGeb.textContent = 'Gebäude ' + gebPctRounded + ' %';
+    barGrund.style.width = grundPct + '%';
+    barGrund.textContent = 'Boden ' + grundPct + ' %';
+  }
+  setText('cmp_kp_eur', fmtEur(kp, 0));
+  setText('cmp_geb_eur', fmtEur(basisBmf, 0));
+  setText('cmp_grund_eur', fmtEur(kp - basisBmf, 0));
+}
+
+// Issue #8: 3 Notarvertrag-Klausel-Varianten
+var _currentKlauselVariant = 'konservativ';
+function selectKlausel(variant){
+  _currentKlauselVariant = variant;
+  document.querySelectorAll('[data-klausel]').forEach(function(b){
+    b.classList.toggle('active', b.dataset.klausel === variant);
+  });
+  setText('klauselVar', variant.charAt(0).toUpperCase() + variant.slice(1));
+  _renderKlauselText();
+}
+
+function _renderKlauselText(){
+  function _v(id){ var e = document.getElementById(id); return e ? (e.value || '') : ''; }
+  var kp = parseDe(_v('ak_kp')) || parseDe(_v('kp'));
+  var bmfPct = (window._lastBmfResults && window._lastBmfResults.gebaeudeanteil_prozent
+    && window._lastBmfResults.gebaeudeanteil_prozent.value) || 0;
+  var basisGeb = kp * bmfPct / 100;
+  var basisGrund = kp - basisGeb;
+
+  var addr = (_v('str') + ' ' + _v('hnr')).trim() + ', ' + (_v('plz') + ' ' + _v('ort')).trim();
+  var datum = new Date().toLocaleDateString('de-DE');
+
+  function _eur(v){ return new Intl.NumberFormat('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v) + ' €'; }
+  function _pct(v){ return v.toFixed(2).replace('.', ',') + ' %'; }
+
+  var texts = {
+    konservativ:
+      '<p><strong>Kaufpreisaufteilung (Konservativ — FA-freundlich)</strong></p>' +
+      '<p>Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> ' +
+      'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> wie folgt auf:</p>' +
+      '<ul style="margin:8px 0;padding-left:22px"><li>Auf den Grund und Boden entfallen <strong>' + _eur(basisGrund) + '</strong> (' + _pct(100 - bmfPct) + ').</li>' +
+      '<li>Auf das Gebäude entfallen <strong>' + _eur(basisGeb) + '</strong> (' + _pct(bmfPct) + ').</li></ul>' +
+      '<p>Die Aufteilung wurde anhand der BMF-Arbeitshilfe (Juni 2023) ermittelt und gilt vorbehaltlich abweichender Feststellung durch das Finanzamt. Sie ist Grundlage für die Absetzung für Abnutzung (AfA) nach § 7 Abs. 4 EStG.</p>',
+
+    moderat:
+      '<p><strong>Kaufpreisaufteilung (Moderat — empfohlen)</strong></p>' +
+      '<p>Die Vertragsparteien sind sich darüber einig, dass sich der vereinbarte Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> ' +
+      'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> aus folgenden Komponenten zusammensetzt:</p>' +
+      '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong> (' + _pct(100 - bmfPct) + ')</li>' +
+      '<li>Gebäudesubstanz (abnutzbares Wirtschaftsgut): <strong>' + _eur(basisGeb) + '</strong> (' + _pct(bmfPct) + ')</li></ul>' +
+      '<p>Die Aufteilung berücksichtigt den nach BMF-Arbeitshilfe (Juni 2023) ermittelten Sachwertanteil unter Beachtung von Baujahr, Wohnfläche, Bodenrichtwert und Lage. ' +
+      'Die Vertragsparteien sind übereingekommen, dass diese Aufteilung der wirtschaftlichen Wertverteilung entspricht und der steuerlichen Behandlung — insbesondere der AfA-Berechnung — zugrunde gelegt wird. ' +
+      'Stand: ' + datum + '.</p>',
+
+    aggressiv:
+      '<p><strong>Kaufpreisaufteilung (Aggressiv — max. AfA)</strong></p>' +
+      '<p>Hiermit erklären die Vertragsparteien rechtsverbindlich: Der vereinbarte Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> für das in der Vertragsurkunde näher bezeichnete Objekt <em>' + (addr || '[Objektadresse]') + '</em> entfällt nach übereinstimmender Bewertung wie folgt:</p>' +
+      '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong> (entspricht ' + _pct(100 - bmfPct) + ' des Gesamtkaufpreises)</li>' +
+      '<li>Gebäude inkl. wesentlicher Gebäudeteile: <strong>' + _eur(basisGeb) + '</strong> (entspricht ' + _pct(bmfPct) + ')</li></ul>' +
+      '<p>Diese Aufteilung wurde im Rahmen einer Sachwertermittlung nach BMF-Arbeitshilfe (Juni 2023) unter Heranziehung lagespezifischer Bodenrichtwerte, der tatsächlichen Restnutzungsdauer des Gebäudes sowie ggf. vorgenommener Modernisierungen erstellt. ' +
+      '<strong>Sie hat verbindlichen Charakter</strong> und gilt insbesondere als wirtschaftlich angemessen i.S.d. BFH-Rechtsprechung (BFH IX R 26/19 v. 21.07.2020). ' +
+      'Die Parteien sind sich einig, dass eine pauschale 80/20-Aufteilung im konkreten Fall nicht sachgerecht wäre. ' +
+      'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG). Stand: ' + datum + '.</p>'
+  };
+
+  var el = document.getElementById('klauselText');
+  if(el) el.innerHTML = texts[variant] || texts.konservativ;
+}
+
+function copyKlausel_unused_v292(){
+  // V289.2.5: hier durch Mockup-Original (Z.1051) ersetzt — bessere Animation
+  console.warn('Call to copyKlausel_unused — using Mockup-Original');
+}
+
+// Issue #10: Übernehmen schreibt Gebäudeanteil + AfA-Satz in AfA-Konfig-Card
+//             + AUTO-Badge + Tooltip
+function _applyBmfToAfaConfig(){
+  var bmfPct = window._lastBmfResults && window._lastBmfResults.gebaeudeanteil_prozent
+    && window._lastBmfResults.gebaeudeanteil_prozent.value;
+  if(!bmfPct){ return false; }
+
+  // Gebäudeanteil in #geb_ant überschreiben
+  var gebEl = document.getElementById('geb_ant');
+  if(gebEl){
+    gebEl.value = bmfPct.toFixed(0);
+    gebEl.classList.add('from-bmf');
+    gebEl.setAttribute('title', 'Aus BMF-Berechnung übernommen · ' + bmfPct.toFixed(2) + ' %');
+    gebEl.style.borderColor = 'var(--gold)';
+    gebEl.style.background = 'var(--gold-bg)';
+
+    // Auto-Badge ins Label hängen
+    var lbl = gebEl.closest('.f') && gebEl.closest('.f').querySelector('label');
+    if(lbl && !lbl.querySelector('.bmf-auto-badge')){
+      var badge = document.createElement('span');
+      badge.className = 'auto bmf-auto-badge';
+      badge.title = 'Aus BMF-Berechnung übernommen';
+      badge.style.cssText = 'margin-left:8px;font-size:9.5px;padding:2px 6px;background:var(--gold-bg);border:1px solid var(--gold);color:var(--gold-d);border-radius:99px;font-weight:600;letter-spacing:.05em';
+      badge.textContent = '🤖 BMF';
+      lbl.appendChild(badge);
+    }
+  }
+
+  // AfA-Satz NICHT überschreiben — der bleibt gesetzlich (2,0 / 3,0 %)
+  // Wir triggern aber calc() damit die Anzeige neu berechnet wird
+  if(typeof window.calc === 'function') window.calc();
+
+  return true;
+}
+
+
+// V289.2.5: ESC-Listener (Sicherheit — falls Mockup-Listener nicht greift)
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
-    var ov = $('bmfOverlay');
+    var ov = document.getElementById('bmfOverlay');
     if(ov && ov.classList.contains('open')) closeBMFModal();
   }
 });
