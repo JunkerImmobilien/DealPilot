@@ -1509,8 +1509,17 @@ function _updateFooterNav(paneId){
     if(el) el.style.display = show ? '' : 'none';
   }
 
-  // V292.4-footer-back-fix: Zurück explizit hidden auf Pane 1 (p-ak)
-  _show('btnBmfBack', paneId !== 'p-ak' && !isFirst);
+  // V292.5-back-robust: Zurück auf Pane 1 verlässlich verstecken
+  // - paneId kann leer/null sein → resolveTo 'p-ak'
+  // - Check beide: idx === 0 oder paneId === 'p-ak' oder leer
+  var _pid = paneId || 'p-ak';
+  var _backShow = (_pid !== 'p-ak') && !isFirst;
+  _show('btnBmfBack', _backShow);
+  // Zusätzlich harter visibility-Hide damit kein anderer Code es überschreiben kann
+  var _backBtn = document.getElementById('btnBmfBack');
+  if (_backBtn) {
+    _backBtn.style.visibility = _backShow ? '' : 'hidden';
+  }
   // Weiter: bis Pane 3
   _show('btnBmfNext', !isLast);
   // Übernehmen + PDF: nur auf letzter Pane

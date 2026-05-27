@@ -252,8 +252,12 @@
     // im DOM für Rückwärtskompatibilität, sind aber visuell ausgeblendet)
     var bannerInfo = document.querySelector('#p-ak .banner.info');
     if (bannerInfo) bannerInfo.style.display = 'none';
-    var oldInputs = document.querySelectorAll('#p-ak .g2, #p-ak .akSection');
-    oldInputs.forEach(function(el){ el.style.display = 'none'; });
+    /* V292.5-accordion-fix: ENTFERNT — alte Inputs bleiben sichtbar.
+     * Vorher: blendete <div class="g2"> INSIDE <details class="fold"> mit aus
+     *         → Fahrtkosten-Helfer + Weitere Positionen liessen sich nicht öffnen.
+     * Jetzt: Summary-Box oben dient als Übersicht,
+     *        Eingabefelder bleiben darunter editierbar verfügbar.
+     */
 
     /* V292.4-pane1-compact: kompakter + Reisekosten-Zeile */
     function _domVal(id){
@@ -477,6 +481,7 @@
       var afa = p10[name];
       var risk = p11[name];
       var isSelected = name === selected;
+      /* V292.5-variant-eur: €-Werte zusätzlich neben % anzeigen */
       var card =
         '<div class="v292-var-card v292-var-' + risk.ampel + (isSelected ? ' v292-var-selected' : '') + '" ' +
              'onclick="window._v292SelectVariant(\'' + name + '\')">' +
@@ -486,8 +491,14 @@
             '<span class="v292-var-name">' + labels[name] + '</span>' +
           '</div>' +
           '<div class="v292-var-sub">' + subLabels[name] + '</div>' +
-          '<div class="v292-var-row"><span>Gebäude</span><b>' + _fmtPct(v.gebaeude_pct) + '</b></div>' +
-          '<div class="v292-var-row"><span>Boden</span><b>' + _fmtPct(v.boden_pct) + '</b></div>' +
+          '<div class="v292-var-row v292-var-row-2line">' +
+            '<span>Gebäude</span>' +
+            '<span class="v292-var-2line"><b>' + _fmtPct(v.gebaeude_pct) + '</b><small>' + _fmtEur(v.gebaeude_eur_vertrag) + '</small></span>' +
+          '</div>' +
+          '<div class="v292-var-row v292-var-row-2line">' +
+            '<span>Boden</span>' +
+            '<span class="v292-var-2line"><b>' + _fmtPct(v.boden_pct) + '</b><small>' + _fmtEur(v.boden_eur_vertrag) + '</small></span>' +
+          '</div>' +
           '<div class="v292-var-row v292-var-row-hi"><span>AfA / Jahr</span><b>' + _fmtEur(afa.afa_summe_jahr) + '</b></div>' +
           '<div class="v292-var-row"><span>Steuerersparnis</span><b>~' + _fmtEur(afa.steuerersparnis_jahr) + '</b></div>' +
           '<div class="v292-var-risk"><small>Risiko Score ' + risk.score + '</small></div>' +

@@ -350,3 +350,42 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ════════════════════════════════════════════════════════════════
+ * V292.5-variant-eur-css — €-Werte in Variant-Cards
+ * ════════════════════════════════════════════════════════════════ */
+
+.v292-var-row-2line {
+  align-items: flex-start !important;
+  padding: 6px 0 !important;
+}
+
+.v292-var-2line {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  line-height: 1.25;
+}
+
+.v292-var-2line b {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ch, #2D2622);
+}
+
+.v292-var-2line small {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--muted, #7A7370);
+  margin-top: 1px;
+}
+
+/* Selected-State: € auch in Gold */
+.v292-var-selected .v292-var-2line b {
+  color: var(--gold-d, #8A7340);
+}
+.v292-var-selected .v292-var-2line small {
+  color: var(--ch, #2D2622);
+  font-weight: 600;
+}
