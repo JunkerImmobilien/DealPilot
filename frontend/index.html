@@ -434,6 +434,7 @@ label.dp-required.qc-required::after {
   <!-- V286-cache-applied -->
 <!-- v287-cache-applied -->
 <!-- V291-cache-applied -->
+<!-- V291.1-cache-applied -->
 </head>
 <body>
 <!-- V257-06: Hintergrund-Modus (Bootstrap, kein Flash) -->
@@ -1107,20 +1108,8 @@ label.dp-required.qc-required::after {
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-euro"/></svg></span>Kaufpreis &amp; Nebenkosten</div>
         <div class="f mb12"><label class="dp-required" data-v236-required-set="1">Kaufpreis <button type="button" class="dp-tip" data-tip-id="tab2.kp" tabindex="-1" aria-label="Hilfe zu tab2.kp"></button></label><div class="iw"><span class="pfx">€</span><input id="kp" type="text" inputmode="decimal" placeholder="180000" class="trl" oninput="calc()"></div></div>
 
-        <!-- V112: Bewegliche Wirtschaftsgüter im Kaufpreis (z.B. Küche) — direkt unter Kaufpreis,
-             damit User es früh sieht und gleich zuordnet. Im Steuermodul wird der Wert separat
-             als 10-Jahre-AfA aufgeführt (sonst_bewegl_wg) und nicht der 15%-Grenze zugerechnet. -->
-        <div class="f mb12">
-          <label class="kueche-toggle-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500">
-            <input type="checkbox" id="kueche_im_kp" oninput="toggleKuecheKp(); calc()">
-            <span>Bewegliche Wirtschaftsgüter im Kaufpreis enthalten <span class="hint" style="font-weight:400">(z.B. Küche)</span> <button type="button" class="dp-tip" data-tip-id="tab2.kueche_im_kp" tabindex="-1" aria-label="Hilfe zu Bewegliche Wirtschaftsgüter"></button></span>
-          </label>
-          <span class="hint" style="display:block;margin-top:4px;margin-left:24px">Sind bewegliche Wirtschaftsgüter (z.B. Einbauküche, Möblierung) separat im Kaufvertrag ausgewiesen, werden sie nicht der 15%-Grenze des Gebäudes zugerechnet (eigene 10-Jahre-AfA, Ansatz unter Punkt 6 im Steuerformular).</span>
-          <div id="kueche_kp_wrap" style="display:none;margin-top:10px;margin-left:24px">
-            <label>Wert beweglicher Wirtschaftsgüter (im Gesamt-Kaufpreis enthalten)</label>
-            <div class="iw" style="max-width:220px"><span class="pfx">€</span><input id="kp_kueche" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="syncKuecheToMoebl(); calc()"></div>
-          </div>
-        </div>
+        <!-- V291.1-kpkueche-removed: Checkbox+Input "Bewegliche Wirtschaftsgüter im KP" entfernt -->
+        <!-- Eingabe wandert komplett in Inventar-Detail-Box weiter unten -->
         <hr class="dvd">
         <div class="g2">
           <div class="f"><label>Makler (%) <button type="button" class="dp-tip" data-tip-id="tab2.makler" tabindex="-1" aria-label="Hilfe zu Maklerprovision"></button></label><div class="iw"><input id="makler_p" type="text" inputmode="decimal" placeholder="0" step="0.01" class="tr" oninput="syncCostPct('makler')"><span class="sfx">%</span></div></div>
@@ -2809,7 +2798,7 @@ label.dp-required.qc-required::after {
 <script src="js/dscr-engine.js?v=231"></script>
 <script src="js/deal-kpis.js?v=231"></script>
 <script src="js/afa-engine.js?v=227"></script>
-  <script src="js/afa-ui.js?v=2271"></script>
+  <script src="js/afa-ui.js?v=291.1"></script>
   <script src="js/zve-manager.js?v=1"></script>
   <script src="js/tax-periods.js?v=1"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
@@ -2820,9 +2809,9 @@ label.dp-required.qc-required::after {
   <script src="js/tour-sidebar.js?v=2"></script>
   <script src="js/anteilig.js?v=5"></script>
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
-  <script src="js/anteilig-recalc.js?v=250"></script>
+  <script src="js/anteilig-recalc.js?v=291.1"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=250"></script>
+  <script src="js/calc.js?v=291.1"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -2853,12 +2842,12 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=226"></script>
-<script src="js/storage.js?v=291"></script>
-<script src="js/inventar-sync.js?v=291"></script><!-- V291-inv-sync-applied -->
+<script src="js/ui.js?v=291.1"></script>
+<script src="js/storage.js?v=291.1"></script>
+<script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=166"></script>
 <script src="js/portfolio-strategy.js?v=144"></script>
-<script src="js/portfolio-strategy-ui.js?v=189"></script>
+<script src="js/portfolio-strategy-ui.js?v=291.1"></script>
 <script src="js/portfolio-strategy-pdf.js?v=166"></script>
 <script src="js/bank-negotiation-pdf.js?v=166"></script>
 <script src="js/track-record.js?v=166"></script>
@@ -2868,9 +2857,9 @@ label.dp-required.qc-required::after {
 <script src="js/subscription.js?v=187"></script>
 <script src="js/bmf-data.js?v=166"></script>
 <script src="js/bmf-afa.js?v=287"></script>
-<script src="js/bmf-ui.js?v=189"></script>
+<script src="js/bmf-ui.js?v=291.1"></script>
 <script src="js/dealscore2.js?v=226"></script>
-<script src="js/dealscore2-ui.js?v=189"></script>
+<script src="js/dealscore2-ui.js?v=291.1"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=124"></script>
@@ -2903,10 +2892,10 @@ label.dp-required.qc-required::after {
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=142"></script>
 <script src="js/rnd-bte-katalog.js?v=142"></script>
-<script src="js/rnd-calc.js?v=250"></script>
+<script src="js/rnd-calc.js?v=291.1"></script>
 <script src="js/rnd-pdf.js?v=166"></script>
 <script src="js/rnd-docx.js?v=142"></script>
-<script src="js/rnd-ui.js?v=189"></script>
+<script src="js/rnd-ui.js?v=291.1"></script>
 <script src="js/rnd-wizard.js?v=160"></script>
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=124"></script>

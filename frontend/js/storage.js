@@ -9,8 +9,8 @@ var FIELDS = [
   'plz','ort','str','hnr','objart','wfl','baujahr','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
   'thesis','risiken','notizen','bankval','svwert','makrolage','mikrolage',
   'vermstand','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
-  // V63.99: Küche im Kaufpreis als € (kueche_im_kp ist Checkbox → unten separat)
-  'kp_kueche',
+  // V291.1-storage-cleanup: kp_kueche deprecated — Eingabe komplett über inv_* Felder
+  // (Migration bei Load: alte kp_kueche-Werte werden in inv_kueche kopiert)
   'san','moebl','inv_kueche','inv_moebel','inv_geraete','inv_pv','inv_stellplatz','inv_sonst', /* V291-inventar-fields-applied */
   'brw','mea','gsfl','mietstg','wertstg','kostenstg','leerstand',
   'btj','exit_bmy','nkm','ze','umlagef','afa_satz','geb_ant','zve','grenz',
@@ -61,8 +61,7 @@ function collectData() {
   var meIncZe = document.getElementById('me_inc_ze');
   if (meIncZe) d['_me_inc_ze'] = meIncZe.checked;
   // V63.99: Küche-im-Kaufpreis-Checkbox
-  var kuecheImKp = document.getElementById('kueche_im_kp');
-  if (kuecheImKp) d['_kueche_im_kp'] = kuecheImKp.checked;
+  /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
   // BWK mode
   d['_bwk_mode'] = window._bwkMode || 'detail';
   d['_bwk_pct_mode'] = window._bwkPctMode || 'nkm';
@@ -198,11 +197,21 @@ function loadData(d) {
     if (meCb) meCb.checked = !!d._me_inc_ze;
   }
   // V63.99: Küche-im-Kaufpreis-Toggle wiederherstellen + Wrap-Sichtbarkeit
-  if (d._kueche_im_kp !== undefined) {
-    var kuCb = document.getElementById('kueche_im_kp');
-    if (kuCb) {
-      kuCb.checked = !!d._kueche_im_kp;
-      if (typeof toggleKuecheKp === 'function') toggleKuecheKp();
+/* V291.1-storage-cleanup: kueche_im_kp-Checkbox-Restore entfernt.
+     Stattdessen: One-Way-Migration aus kp_kueche → inv_kueche bei Bestandsobjekten. */
+  if (d.kp_kueche && parseFloat(String(d.kp_kueche).replace(',','.')) > 0) {
+    var invKuEl = document.getElementById('inv_kueche');
+    var invKuVal = invKuEl ? parseFloat(String(invKuEl.value).replace(',','.')) : 0;
+    // Migration nur wenn inv_kueche leer (keine Doppel-Migration)
+    if (!isNaN(invKuVal) && invKuVal <= 0) {
+      if (invKuEl) {
+        invKuEl.value = String(d.kp_kueche);
+        console.log('[storage.js V291.1] Migration: kp_kueche=' + d.kp_kueche + ' → inv_kueche');
+        // Sync-Trigger damit moebl auch befüllt wird
+        if (typeof window._syncInventarToMoebl === 'function') {
+          setTimeout(window._syncInventarToMoebl, 10);
+        }
+      }
     }
   }
   // V23: Objekt-Sequenznummer wiederherstellen (oder neu vergeben falls fehlt)

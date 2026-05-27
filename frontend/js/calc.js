@@ -727,9 +727,12 @@ function _calcImmediate(){
   // (mathematisch identisch zu kp × geb_ant × 0,15 wenn man nur den KP betrachtet, aber
   //  korrekter mit anteiligen Nebenkosten als Marcels alte Vereinfachung).
   var gebAnt = v('geb_ant')/100 || 0.80;
-  var kuecheCheckEl = document.getElementById('kueche_im_kp');
-  var kuecheActive = !!(kuecheCheckEl && kuecheCheckEl.checked);
-  var kuecheVal = kuecheActive ? Math.max(0, v('kp_kueche') || 0) : 0;
+  /* V291.1-calc-kueche-migrated: kuecheVal jetzt direkt aus #inv_kueche
+   * (V291 Inventar-Detail-Box ist Single Source of Truth).
+   * kuecheActive wird abgeleitet von kuecheVal > 0 — bleibt erhalten
+   * weil mehrere Folge-Stellen (15%-Grenze, AfA-Label, State-Export) sie nutzen. */
+  var kuecheVal = Math.max(0, v('inv_kueche') || 0);
+  var kuecheActive = kuecheVal > 0;
   // Sicherheit: Küche kann nicht > Gebäudeanteil sein
   var gebBruttoMax = kp * gebAnt;
   if (kuecheVal > gebBruttoMax) kuecheVal = gebBruttoMax;

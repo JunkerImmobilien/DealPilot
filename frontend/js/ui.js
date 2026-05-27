@@ -1554,3 +1554,31 @@ function syncKuecheToMoebl() {
 }
 window.toggleKuecheKp = toggleKuecheKp;
 window.syncKuecheToMoebl = syncKuecheToMoebl;
+
+/* ─────────────────────────────────────────────────────────────────
+ * V291.1-ui-noops-applied
+ *
+ * Die alten Funktionen toggleKuecheKp() und syncKuecheToMoebl()
+ * werden hier als No-Ops überschrieben.
+ *
+ * Hintergrund: Bis V291 wurden Bewegliche Wirtschaftsgüter über eine
+ * Checkbox + Input (#kueche_im_kp / #kp_kueche) eingegeben. Ab V291.1
+ * gibt es nur noch die Inventar-Detail-Box (#inv_kueche etc.).
+ * Die alten DOM-Elemente existieren nicht mehr, also würden die
+ * Original-Funktionen TypeErrors werfen.
+ *
+ * Falls diese Funktionen woanders aufgerufen werden (PDF-Generator,
+ * alte Event-Handler), passiert hier einfach nichts — keine Errors.
+ * ───────────────────────────────────────────────────────────────── */
+window.toggleKuecheKp = function(){
+  /* No-Op — Checkbox+Input wurden in V291.1 entfernt.
+     Eingabe erfolgt jetzt direkt in der Inventar-Detail-Box. */
+};
+
+window.syncKuecheToMoebl = function(){
+  /* No-Op — Sync-Logik ist in V291 inventar-sync.js (window._syncInventarToMoebl).
+     Wir delegieren defensiv falls jemand das hier noch aufruft: */
+  if (typeof window._syncInventarToMoebl === 'function') {
+    try { window._syncInventarToMoebl(); } catch(e) {}
+  }
+};
