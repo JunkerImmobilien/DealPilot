@@ -227,6 +227,13 @@
     if (!['konservativ', 'optimiert', 'aggressiv'].includes(name)) return;
     window._v292State.selectedVariant = name;
     window._v292RenderAll();
+    /* V292.6.3-variant-klausel-sync: Klauseltext auch updaten
+     * (selectKlausel updated 'AKTUELLE VARIANTE: XYZ' + Klauseltext-Box) */
+    try {
+      if (typeof window.selectKlausel === 'function') {
+        window.selectKlausel(name);
+      }
+    } catch(e) { console.warn('[v292.6.3] selectKlausel sync:', e.message); }
   };
 
   // ─── Render: Pane 1 (Anschaffungskosten) ─────────────────────────────

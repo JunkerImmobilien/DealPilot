@@ -479,7 +479,16 @@ function downloadXlsx(){
       lage: ((obj.plz || '') + ' ' + (obj.ort || '') + ', ' + (obj.str || '') + ' ' + (obj.hnr || '')).trim(),
       grundstuecksart: obj.objart_bmf || 'Wohnungseigentum [WE]',
       kaufdatum: inv.kaufdat || '',
-      kaufpreis: (inv.kp_brutto || 0) - ((p1.inventar && (p1.inventar.kueche + p1.inventar.moebel + p1.inventar.geraete + p1.inventar.pv + p1.inventar.stellplatz + p1.inventar.sonstiges)) || 0),
+      /* V292.6.3-xlsx-kp-prognose: BMF Z.4 'Kaufpreis incl. Nebenkosten'
+       * = Prognose-AK aus Pipeline = Brutto-KP + NK − Inventar */
+      kaufpreis: (function(){
+        var p3 = window._v292State && window._v292State.response && window._v292State.response.phase3_prognose_ak;
+        if (p3 && p3.prognose_ak > 0) return Math.round(p3.prognose_ak);
+        /* Fallback wenn Pipeline nicht da */
+        var kp = inv.kp_brutto || 0;
+        var inv_sum = (p1.inventar && (p1.inventar.kueche + p1.inventar.moebel + p1.inventar.geraete + p1.inventar.pv + p1.inventar.stellplatz + p1.inventar.sonstiges)) || 0;
+        return Math.round(kp - inv_sum);
+      })(),
       baujahr: obj.baujahr || 0,
       wohnflaeche: obj.wfl || 0,
 
@@ -492,7 +501,19 @@ function downloadXlsx(){
         var val = parseFloat(String(meaEl.value).replace(',', '.'));
         return isFinite(val) && val > 0 ? val : 100;
       })(),
-      monatliche_nettokaltmiete: (p1.miete && p1.miete.nkm) || 0,
+      /* V292.6.3-nkm-leerstand-fallback: Bei Leerstand Vergleichsmiete nutzen */
+      monatliche_nettokaltmiete: (function(){
+        var nkmFromDom = parseFloat(String((document.getElementById('nkm') || {}).value || '0').replace(',', '.')) || 0;
+        var leerstand = parseFloat(String((document.getElementById('leerstand') || {}).value || '0').replace(',', '.')) || 0;
+        /* Wenn Vermietet: nkm direkt */
+        if (nkmFromDom > 0 && leerstand < 100) return nkmFromDom;
+        /* Leerstand: Vergleichsmiete (€/m²/Mo) × Wohnfläche = monatliche Miete */
+        var bmfVmLow = parseFloat(String((document.getElementById('bmf_vm_low') || {}).value || '0').replace(',', '.')) || 0;
+        var wfl = obj.wfl || 0;
+        if (bmfVmLow > 0 && wfl > 0) return Math.round(bmfVmLow * wfl);
+        /* Fallback: was wir aus Pipeline haben */
+        return (p1.miete && p1.miete.nkm) || 0;
+      })(),
       liegenschaftszins: gaa.sachwertfaktor && gaa.sachwertfaktor > 0 ? gaa.sachwertfaktor : null,
 
       /* Variant-Hint für Filename */

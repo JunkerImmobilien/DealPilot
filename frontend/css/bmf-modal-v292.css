@@ -455,3 +455,32 @@
   color: var(--ch, #2D2622);
   font-weight: 600;
 }
+
+/* ════════════════════════════════════════════════════════════════
+ * V292.6.3-klausel-buttons-hidden — Klausel-Buttons-Reihe ausblenden
+ * 
+ * User-Feedback: Variant-Cards in Pane 4 oben sind die Hauptauswahl.
+ * Die zusätzlichen Buttons Konservativ/Moderat/Aggressiv unter der
+ * Überschrift "Notarvertrag-Klausel" sind redundant.
+ * 
+ * Mechanik: Buttons sind in einem .bmfmo-klausel-tabs Container in
+ * bmf-modal-html.html Z.500-525. Komplett ausblenden.
+ * selectKlausel(name) wird weiterhin via Variant-Card-Klick aufgerufen
+ * (V292.6.3 Patch 04), schreibt aktuelle Variante via data-klausel auf
+ * unsichtbare Buttons + setText('klauselVar') + _renderKlauselText() —
+ * der Klauseltext zeigt also weiter korrekt was gewählt ist.
+ * ════════════════════════════════════════════════════════════════ */
+
+/* Klausel-Buttons-Container hiden — passt zu .bmfmo-klausel-tabs */
+.bmfmo-klausel-tabs {
+  display: none !important;
+}
+
+/* Auch alternative Klassen-Namen abdecken */
+#p-hebel [data-klausel] {
+  display: none !important;
+}
+
+/* Aber: "AKTUELLE VARIANTE: XYZ" oben rechts BLEIBT sichtbar
+ * Das wird in selectKlausel() per setText('klauselVar', ...) gesetzt
+ * — der Container dafür ist NICHT .bmfmo-klausel-tabs sondern eigene Klasse */
