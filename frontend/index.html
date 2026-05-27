@@ -23,6 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=286">
+<link rel="stylesheet" href="css/bmf-modal.css?v=289.2">  <!-- V289 -->
   <link rel="stylesheet" href="css/legal.css?v=3">
 <link rel="stylesheet" href="css/portfolio-strategy.css?v=144">
 <link rel="stylesheet" href="css/pricing-modal.css?v=197">
@@ -433,6 +434,15 @@ label.dp-required.qc-required::after {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
   <!-- V286-cache-applied -->
 <!-- v287-cache-applied -->
+<!-- V289-bmf-modal-applied -->
+<!-- V289.1-cache-applied -->
+<!-- V289.2-cache-applied -->
+<!-- V289.2.1-button-visible -->
+<!-- V289.2.1-cache-applied -->
+<!-- V289.2.2-cache-applied -->
+<!-- V289.2.3-cache-applied -->
+<!-- V289.2.4-cache-applied -->
+<!-- V289.2.5-cache-applied -->
 <!-- V291-cache-applied -->
 <!-- V291.1-cache-applied -->
 </head>
@@ -1491,8 +1501,18 @@ label.dp-required.qc-required::after {
 
   <div class="card">
     <div class="ct-row">
-      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-percent"/></svg></span>AfA-Konfiguration</div>
-      <button class="btn btn-outline btn-sm" onclick="openBMFRechner()" type="button" data-feature="bmf_calc_export">📐 BMF-AfA-Rechner</button>
+      <div class="ct-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:0">
+  <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-percent"/></svg></span>AfA-Konfiguration</div>
+  <button class="btn btn-outline btn-sm afa-detail-btn" id="btnBmfAdvanced" type="button" onclick="openBMFModal()" title="Pro-Plan · BMF-Kaufpreisaufteilung · 3 Verfahren · KI-GAA · PDF-Anlage Finanzamt" style="margin-left:auto">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+  BMF-Rechner
+  <span class="plan-badge plan-badge-gold" style="margin-left:6px">Pro</span>
+</button>
+<!-- V289.2.5-button-rename -->
+<!-- V289.2.4-button-rename -->
+<!-- V289.1-button-improved -->
+</div>
+      <!-- V289.1-old-bmf-removed -->
     </div>
     <p class="hint" style="margin-top:6px">Mit dem BMF-Rechner kannst du Gebäude- und Bodenanteil sowie den AfA-Satz nach amtlicher Methode (Sachwertverfahren) ermitteln.</p>
     <!-- V227: Hinweis-Banner für Neubau-Degressiv-AfA (versteckt by default, befüllt via JS) -->
@@ -2792,6 +2812,8 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="js/pdf-anlage-bmf.js?v=289.2"></script>
+<script src="js/bmf-modal.js?v=289.2.5"></script>
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
