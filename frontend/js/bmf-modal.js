@@ -711,8 +711,9 @@ function updateInv(){
     if (warnEl) warnEl.style.display = 'none';
   }
 
-  // Cascading-Render: Varianten + 15% + Risiko + Klausel
-  renderVarGrid();
+  // Cascading-Render: 15% + Risiko + Klausel
+  // V292.7: renderVarGrid() entfernt — Pane 4 rendert ausschliesslich via
+  // Pipeline (_renderPane4, bmf-modal-v292.js Z.209/232). Behebt Doppel-Render-Flacker.
   updateG15();
   renderRiskGrid();
   renderEmpfehlung();
