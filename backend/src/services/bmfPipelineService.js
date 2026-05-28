@@ -134,8 +134,17 @@ async function _phase4_bmf(inputs, phase3) {
     wohnflaeche: Number(objekt.wfl) || 0,
     grundstuecksgroesse: Number(objekt.gsfl) || 0,
     bodenrichtwert: Number(gaa.brw_user || objekt.brw) || 0,
-    mea_zaehler: 0,
-    mea_nenner: 0,
+    /* V292.6.7-pipeline-mea: MEA-Anteil aus objekt.mea (war hardcoded 0 → negativer Gebäudeanteil!)
+     * objekt.mea ist Prozent (z.B. 7.06) → Zähler 706 bei Nenner 10000.
+     * Bei leer/0 → 1000/1000 (=100%, kein WE-Anteil). */
+    mea_zaehler: (function(){
+      var pct = Number(String(objekt.mea || '').replace(',', '.')) || 0;
+      return pct > 0 ? Math.round(pct * 100) : 1000;
+    })(),
+    mea_nenner: (function(){
+      var pct = Number(String(objekt.mea || '').replace(',', '.')) || 0;
+      return pct > 0 ? 10000 : 1000;
+    })(),
     miete_bekannt: miete_monatlich > 0 ? 'Ja' : 'Nein',
     miete_monatlich,
     vergleichsfaktor_vorhanden: gaa.vergleichsmiete_low ? 'Ja' : 'Nein',

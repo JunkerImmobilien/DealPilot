@@ -118,7 +118,10 @@
       wfl:        _parseDe(_v('wfl')),
       baujahr:    parseInt(_v('baujahr'), 10) || 0,
       gsfl:       _parseDe(_v('gsfl')),
-      brw:        _parseDe(_v('brw'))
+      brw:        _parseDe(_v('brw')),
+      /* V292.6.9-objekt-mea: MEA ins Pipeline-objekt (fehlte → Fallback 100% → negativer Gebäudeanteil!).
+       * Tab Objekt #mea, Fallback Pane-2 #bmf_mea. Pipeline rechnet daraus 706/10000. */
+      mea:        _parseDe(_v('mea')) || _parseDe(_v('bmf_mea'))
     };
 
     // Miete (Tab Miete)

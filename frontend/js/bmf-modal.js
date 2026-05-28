@@ -126,29 +126,24 @@ function syncFromTabInvest(){
     if(v > 0) _setField(p[1], _formatEur(v), true);
   });
 
-  // Eckdaten aus Tab Objekt (BMF-Aufteilung)
+  // V292.6.6-pane2-force-fresh: Eckdaten aus Tab Objekt ERZWINGEN.
+  // Vorher: Felder behielten HTML-Defaults (96,2 etc.) oder KI-Werte (brw 160)
+  // wenn der Tab-Objekt-Wert 0 war. Jetzt: IMMER aus Tab Objekt setzen,
+  // bei 0 leeren statt Default/KI-Wert behalten.
   _setField('bmf_bj', _val('baujahr'), true);
   _setField('bmf_datum', _val('kaufdat'), true);
-  // Wohnfläche mit Komma-Format
+  // Wohnfläche mit Komma-Format — IMMER setzen (auch leeren bei 0)
   var wfl = parseDe(_val('wfl'));
-  if(wfl > 0){
-    _setField('bmf_wfl', wfl.toString().replace('.', ','), true);
-  }
-  // Grundstücksfläche
+  _setField('bmf_wfl', wfl > 0 ? wfl.toString().replace('.', ',') : '', true);
+  // Grundstücksfläche — IMMER setzen
   var gsfl = parseDe(_val('gsfl'));
-  if(gsfl > 0){
-    _setField('bmf_gsfl', new Intl.NumberFormat('de-DE').format(gsfl), true);
-  }
-  // Bodenrichtwert
+  _setField('bmf_gsfl', gsfl > 0 ? new Intl.NumberFormat('de-DE').format(gsfl) : '', true);
+  // Bodenrichtwert — IMMER setzen (überschreibt stale KI-Wert)
   var brw = parseDe(_val('brw'));
-  if(brw > 0){
-    _setField('bmf_brw', brw.toString().replace('.', ','), true);
-  }
-  // MEA (Prozent als String wie "7,10")
+  _setField('bmf_brw', brw > 0 ? brw.toString().replace('.', ',') : '', true);
+  // MEA — IMMER setzen
   var mea = parseDe(_val('mea'));
-  if(mea > 0){
-    _setField('bmf_mea', mea.toString().replace('.', ','), true);
-  }
+  _setField('bmf_mea', mea > 0 ? mea.toString().replace('.', ',') : '', true);
 
   // Cascade
   if(typeof calcAk === 'function') setTimeout(calcAk, 50);
@@ -330,8 +325,15 @@ function runBmf(){
     wohnflaeche: parseDe(($('bmf_wfl') || {}).value || _v('wfl')),
     grundstuecksgroesse: parseDe(($('bmf_gsfl') || {}).value || _v('gsfl')),
     bodenrichtwert: parseDe(($('bmf_brw') || {}).value || _v('brw')),
-    mea_zaehler: 0,
-    mea_nenner: 0,
+    /* V292.6.8-runbmf-mea: MEA aus bmf_mea (war hardcoded 0 → negativer Gebäudeanteil in Pane 3!) */
+    mea_zaehler: (function(){
+      var pct = parseDe(($('bmf_mea') || {}).value || _v('mea'));
+      return pct > 0 ? Math.round(pct * 100) : 1000;
+    })(),
+    mea_nenner: (function(){
+      var pct = parseDe(($('bmf_mea') || {}).value || _v('mea'));
+      return pct > 0 ? 10000 : 1000;
+    })(),
     miete_bekannt: ($('bmf_miete') && parseDe($('bmf_miete').value) > 0) ? 'Ja' : 'Nein',
     miete_monatlich: parseDe(($('bmf_miete') || {}).value),
     vergleichsfaktor_vorhanden: 'Nein',
@@ -474,12 +476,24 @@ function downloadXlsx(){
     var gaa = p1.gaa || {};
     var ren = p1.renovierung || {};
 
-    inputs = {
+/* V292.6.5-xlsx-pane2-source: Helper für Pane-2-Lesen */
+    function _v292_5_pane2(id) {
+      var el = document.getElementById(id);
+      if (!el || !el.value) return '';
+      return String(el.value).trim();
+    }
+    function _v292_5_parseDe(s) {
+      if (!s) return 0;
+      var str = String(s).replace(/\./g, '').replace(',', '.');
+      var n = parseFloat(str);
+      return isFinite(n) ? n : 0;
+    }
+        inputs = {
       /* Pflichtfelder */
       /* V292.6.4-backend-keys: korrekte Backend-Keys aus bmfService.js INPUT_CELLS */
       lage: ((obj.plz || '') + ' ' + (obj.ort || '') + ', ' + (obj.str || '') + ' ' + (obj.hnr || '')).trim(),
-      grundstuecksart: obj.objart_bmf || 'Wohnungseigentum [WE]',
-      kaufdatum: inv.kaufdat || '',
+      grundstuecksart: _v292_5_pane2('bmf_art') || obj.objart_bmf || 'Wohnungseigentum [WE]',
+      kaufdatum: _v292_5_pane2('bmf_datum') || inv.kaufdat || '',
       /* V292.6.3-xlsx-kp-prognose: BMF Z.4 'Kaufpreis incl. Nebenkosten'
        * = Prognose-AK aus Pipeline = Brutto-KP + NK − Inventar */
       kaufpreis: (function(){
@@ -490,47 +504,46 @@ function downloadXlsx(){
         var inv_sum = (p1.inventar && (p1.inventar.kueche + p1.inventar.moebel + p1.inventar.geraete + p1.inventar.pv + p1.inventar.stellplatz + p1.inventar.sonstiges)) || 0;
         return Math.round(kp - inv_sum);
       })(),
-      baujahr: obj.baujahr || 0,
-      wohnflaeche: obj.wfl || 0,
+      baujahr: parseInt(_v292_5_pane2('bmf_bj'), 10) || obj.baujahr || 0,
+      wohnflaeche: _v292_5_parseDe(_v292_5_pane2('bmf_wfl')) || obj.wfl || 0,
 
       /* Optional — V292.6.2-xlsx-mea-fix: mea aus DOM lesen, nicht hardcoded */
-      grundstuecksgroesse: obj.gsfl || 0,  /* V292.6.4: Backend-Key = grundstuecksgroesse */
-      bodenrichtwert: (gaa.brw_user || obj.brw || 0),
+      grundstuecksgroesse: _v292_5_parseDe(_v292_5_pane2('bmf_gsfl')) || obj.gsfl || 0,
+      bodenrichtwert: _v292_5_parseDe(_v292_5_pane2('bmf_brw')) || (gaa.brw_user || obj.brw || 0),
       /* V292.6.4-backend-keys: MEA als Zähler/Nenner (Backend braucht beide)
        * Tab Objekt hat mea als Prozent z.B. '7,06' → konvertieren zu 706/10000
        * Wenn 100 (kein WE) → 1000/1000 = 100% */
       mea_zaehler: (function(){
-        var meaEl = document.getElementById('mea');
-        if (!meaEl || !meaEl.value) return 1000;
-        var pct = parseFloat(String(meaEl.value).replace(',', '.'));
-        if (!isFinite(pct) || pct <= 0) return 1000;
-        /* Konvertiere Prozent zu Zähler bei Nenner 10000: 7,06 % → 706 */
+        /* V292.6.5: liest Pane 2 bmf_mea, fallback Tab Objekt #mea */
+        var pct = _v292_5_parseDe(_v292_5_pane2('bmf_mea'));
+        if (pct <= 0) {
+          pct = _v292_5_parseDe((document.getElementById('mea') || {}).value);
+        }
+        if (pct <= 0) return 1000;
         return Math.round(pct * 100);
       })(),
       mea_nenner: (function(){
-        var meaEl = document.getElementById('mea');
-        if (!meaEl || !meaEl.value) return 1000;
-        var pct = parseFloat(String(meaEl.value).replace(',', '.'));
-        if (!isFinite(pct) || pct <= 0) return 1000;
+        var pct = _v292_5_parseDe(_v292_5_pane2('bmf_mea'));
+        if (pct <= 0) {
+          pct = _v292_5_parseDe((document.getElementById('mea') || {}).value);
+        }
+        if (pct <= 0) return 1000;
         return 10000;
       })(),
       /* V292.6.3-nkm-leerstand-fallback: Bei Leerstand Vergleichsmiete nutzen */
       /* V292.6.4-backend-keys: Backend braucht miete_monatlich + miete_bekannt
        * miete_bekannt: 'Ja' wenn Miete > 0, sonst 'Nein' */
       miete_monatlich: (function(){
-        var nkmFromDom = parseFloat(String((document.getElementById('nkm') || {}).value || '0').replace(',', '.')) || 0;
-        var leerstand = parseFloat(String((document.getElementById('leerstand') || {}).value || '0').replace(',', '.')) || 0;
-        if (nkmFromDom > 0 && leerstand < 100) return nkmFromDom;
-        /* Leerstand: Vergleichsmiete (€/m²/Mo) × Wohnfläche */
-        var bmfVmLow = parseFloat(String((document.getElementById('bmf_vm_low') || {}).value || '0').replace(',', '.')) || 0;
-        var wfl = obj.wfl || 0;
-        if (bmfVmLow > 0 && wfl > 0) return Math.round(bmfVmLow * wfl);
-        return (p1.miete && p1.miete.nkm) || 0;
+        /* V292.6.5: liest Pane 2 bmf_miete (Single Source of Truth) */
+        var bmfMiete = _v292_5_parseDe(_v292_5_pane2('bmf_miete'));
+        if (bmfMiete > 0) return Math.round(bmfMiete);
+        var nkmDom = _v292_5_parseDe((document.getElementById('nkm') || {}).value);
+        return Math.round(nkmDom);
       })(),
       miete_bekannt: (function(){
-        var nkmFromDom = parseFloat(String((document.getElementById('nkm') || {}).value || '0').replace(',', '.')) || 0;
-        var bmfVmLow = parseFloat(String((document.getElementById('bmf_vm_low') || {}).value || '0').replace(',', '.')) || 0;
-        return (nkmFromDom > 0 || bmfVmLow > 0) ? 'Ja' : 'Nein';
+        var bmfMiete = _v292_5_parseDe(_v292_5_pane2('bmf_miete'));
+        var nkmDom = _v292_5_parseDe((document.getElementById('nkm') || {}).value);
+        return (bmfMiete > 0 || nkmDom > 0) ? 'Ja' : 'Nein';
       })(),
       liegenschaftszinssatz: (function(){
         /* V292.6.4: aus Pane 2 bmf_lzs (KI/User) */
@@ -803,6 +816,15 @@ function renderVarGrid(){
   // BMF-Variante als Referenz für Delta
   var bmfAfa = (varianten[0].gebEur + nkImmo * varianten[0].gebPct/100) * afaSatz/100;
 
+  // V292.6.6-pane4-afa-split: Inventar-AfA berechnen (bewegliche WG, linear 10 J)
+  var _invSumP4 = 0;
+  ['inv_kueche','inv_moebel','inv_geraete','inv_pv','inv_stellplatz','inv_sonst'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) _invSumP4 += parseDe(el.value) || 0;
+  });
+  var _moeblYearsP4 = parseInt((document.getElementById('moebl_tax_years') || {}).value, 10) || 10;
+  var _invAfaP4 = _invSumP4 > 0 ? _invSumP4 / _moeblYearsP4 : 0;
+
   var html = '';
   varianten.forEach(function(va){
     var gebAk = va.gebEur + (nkImmo * va.gebPct/100);
@@ -816,7 +838,9 @@ function renderVarGrid(){
       '<div class="var-pct-row"><span>Grund &amp; Boden</span><span class="v">' + fmtPct(va.bodenPct,1) + '</span></div>' +
       '<div class="var-pct-row"><span>Gebäude</span><span class="v">' + fmtPct(va.gebPct,1) + '</span></div>' +
       '<div class="var-divider"></div>' +
-      '<div class="var-afa"><span>AfA / Jahr</span><span class="v">' + fmtEur(afaJahr,0) + '</span></div>' +
+      '<div class="var-afa"><span>AfA / Jahr (Gebäude)</span><span class="v">' + fmtEur(afaJahr,0) + '</span></div>' +
+      (_invAfaP4 > 0 ? '<div class="var-afa-inv" style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:2px"><span>+ Inventar-AfA</span><span>' + fmtEur(_invAfaP4,0) + '</span></div>' +
+        '<div class="var-afa-sum" style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--ch);margin-top:3px;padding-top:3px;border-top:1px dotted rgba(0,0,0,.12)"><span>Σ AfA / Jahr</span><span>' + fmtEur(afaJahr + _invAfaP4,0) + '</span></div>' : '') +
       (delta > 0 ? '<div class="var-delta">▲ +' + fmtEur(delta,0).replace('€','').trim() + ' €/J vs. BMF</div>'
                  : (delta < 0 ? '<div class="var-delta neg">▼ ' + fmtEur(delta,0) + '/J vs. BMF</div>'
                               : '<div class="var-delta neg">Basis-Variante</div>')) +
