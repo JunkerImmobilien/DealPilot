@@ -534,3 +534,95 @@
 #p-bmf label[for^="gaa_"] {
   display: none !important;
 }
+
+/* ════════════════════════════════════════════════════════════════
+ * V292.6.5-ki-block-final — KI-Block ZUVERLÄSSIG ausblenden
+ * 
+ * V292.6.4 nutzte falsche Klassennamen (#p-bmf .bmfmo-gaa).
+ * Echter Container-Klassenname aus Diagnose: .bmfmo-gaa-block
+ * ════════════════════════════════════════════════════════════════ */
+
+.bmfmo-gaa-block {
+  display: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * V292.6.5-tab-bewertung-fix — Tab Bewertung (#s6) KPI-Cards lesbar machen
+ * 
+ * Bug: nach V292.6.x sehen Bruttomietrendite/LTV/Faktor/DSCR/Equity Multiple
+ * grau/transparent aus. Cashflow-Box oben (schwarz) ist OK.
+ * 
+ * Defensive Lösung: explizite opacity + color für KPI-Cards in #s6.
+ * ════════════════════════════════════════════════════════════════ */
+
+#s6 .scen-val,
+#s6 .kpi-val,
+#s6 .kv-val,
+#s6 .kv-v {
+  opacity: 1 !important;
+  color: var(--ch, #2D2622) !important;
+}
+
+/* Werte die als positiv/negativ markiert sind */
+#s6 .scen-val.c-green,
+#s6 .kv-v.c-green,
+#s6 .pos-val {
+  color: var(--green, #4A8B6E) !important;
+}
+
+#s6 .scen-val.c-red,
+#s6 .kv-v.c-red,
+#s6 .neg-val {
+  color: var(--red, #B8625C) !important;
+}
+
+#s6 .scen-val.c-gold,
+#s6 .kv-v.c-gold {
+  color: var(--gold-d, #8A7340) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * V292.6.5-from-tab-style — AUTO-Badge + hellgolden Hintergrund (wie BMF)
+ * 
+ * User-Feedback Pkt E: Quick-Check übernommene Werte sollen wie BMF
+ * formatiert sein.
+ * 
+ * BMF Pane 2 nutzt:
+ *   <input class="from-tab"> + <span class="auto">Auto</span>
+ * 
+ * Wir definieren CSS für 'from-tab' UND 'from-quickcheck' (idempotent
+ * falls schon definiert in style.css).
+ * ════════════════════════════════════════════════════════════════ */
+
+input.from-tab,
+input.from-quickcheck,
+select.from-tab,
+select.from-quickcheck {
+  background: rgba(201, 168, 76, 0.08) !important;
+  border-color: rgba(201, 168, 76, 0.35) !important;
+}
+
+input.from-tab:focus,
+input.from-quickcheck:focus,
+select.from-tab:focus,
+select.from-quickcheck:focus {
+  background: var(--white, #FFF) !important;
+  border-color: var(--gold, #C9A84C) !important;
+}
+
+/* AUTO-Badge */
+span.auto,
+span.auto-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-d, #8A7340);
+  background: rgba(201, 168, 76, 0.12);
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  padding: 1px 6px;
+  border-radius: 99px;
+  margin-left: 6px;
+  vertical-align: middle;
+}

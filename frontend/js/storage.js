@@ -30,7 +30,9 @@ var FIELDS = [
   'ds2_bevoelkerung','ds2_nachfrage','ds2_marktfaktor',
   'ds2_wertsteigerung','ds2_entwicklung',
   // V37: Qualität & Zustand Sterne-Bewertung
-  'rate_kueche','rate_bad','rate_boden','rate_fenster'
+  'rate_kueche','rate_bad','rate_boden','rate_fenster',
+  /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
+  'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years'
 ];
 
 var _currentObjKey = null;  // Local mode key OR API object id

@@ -138,6 +138,26 @@ function recalcWithLibreOffice(xlsxPath) {
     const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bmf-out-'));
     const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lo-profile-'));
 
+    // V292.6.6-force-recalc-xcu: LibreOffice ZWINGEN, Formeln neu zu rechnen.
+    // Ohne dieses Setting behält LibreOffice die gecachten Formel-Ergebnisse
+    // der Vorlage (Bug: J122 blieb 139178 statt neuem K9-Wert).
+    // ODFRecalcMode=0 + OOXMLRecalcMode=0 = "immer neu berechnen beim Laden".
+    // Live-bewiesen: MIT diesem Setting rechnet LibreOffice korrekt neu.
+    try {
+      const xcuUserDir = path.join(profileDir, 'user');
+      fs.mkdirSync(xcuUserDir, { recursive: true });
+      const xcuContent = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+        '<oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema">' +
+        '<item oor:path="/org.openoffice.Office.Calc/Formula/Load">' +
+        '<prop oor:name="ODFRecalcMode" oor:op="fuse"><value>0</value></prop></item>' +
+        '<item oor:path="/org.openoffice.Office.Calc/Formula/Load">' +
+        '<prop oor:name="OOXMLRecalcMode" oor:op="fuse"><value>0</value></prop></item>' +
+        '</oor:items>';
+      fs.writeFileSync(path.join(xcuUserDir, 'registrymodifications.xcu'), xcuContent, 'utf8');
+    } catch (xcuErr) {
+      console.error('[BMF] XCU-Write fehlgeschlagen (Recalc evtl. stale):', xcuErr.message);
+    }
+
     // soffice braucht: kein UI, eigenes Profil (sonst Lock-Konflikte),
     // separates outDir (sonst 0x4c0c-Fehler beim Überschreiben der Quelldatei)
     const args = [
