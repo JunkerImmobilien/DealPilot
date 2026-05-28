@@ -2763,78 +2763,7 @@ label.dp-required.qc-required::after {
 <div id="toast"></div>
 <div id="pdf-overlay"><div class="pdf-modal"><h3>PDF wird erstellt</h3><p>Bitte warten...</p><div class="pdf-progress"><div class="pdf-progress-fill" id="pdf-progress-fill" style="width:0%"></div></div></div></div>
 
-<!-- V35: BMF-AfA-Rechner Modal -->
-<div id="bmf-overlay" class="bmf-overlay" style="display:none" onclick="if(event.target===this)closeBMFRechner()">
-  <div class="bmf-modal" role="dialog" aria-labelledby="bmf-title">
-    <div class="bmf-header">
-      <div>
-        <h3 id="bmf-title">BMF-AfA-Rechner</h3>
-        <div class="bmf-sub">Kaufpreisaufteilung nach Sachwertverfahren · BMF Fassung Juni 2023</div>
-      </div>
-      <button class="bmf-close" onclick="closeBMFRechner()" type="button" aria-label="Schließen">×</button>
-    </div>
-
-    <div class="bmf-body">
-      <!-- Eingaben -->
-      <div class="bmf-form">
-        <div class="bmf-row">
-          <label>Grundstücksart</label>
-          <select id="bmf_art" onchange="bmfRecalc()">
-            <option value="">– bitte wählen –</option>
-          </select>
-        </div>
-        <div class="bmf-row">
-          <label>Standardstufe (Ausstattung)</label>
-          <select id="bmf_stufe" onchange="bmfRecalc()">
-            <option value="1">1 — sehr einfach</option>
-            <option value="2">2 — einfach</option>
-            <option value="3" selected>3 — mittel (Standard)</option>
-            <option value="4">4 — gehoben</option>
-            <option value="5">5 — sehr gehoben</option>
-          </select>
-        </div>
-        <div class="bmf-grid2">
-          <div class="bmf-row"><label>Kaufpreis (€)</label><input id="bmf_kp" type="text" inputmode="decimal" placeholder="190000" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Anschaffungsjahr</label><input id="bmf_anschj" type="text" inputmode="decimal" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Baujahr <button type="button" class="dp-tip" data-tip-id="tab1.baujahr" tabindex="-1" aria-label="Hilfe zu tab1.baujahr"></button></label><input id="bmf_bj" type="text" inputmode="decimal" placeholder="1994" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Wohnfläche (m²)</label><input id="bmf_wfl" type="text" inputmode="decimal" placeholder="96" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Grundstück (m²)</label><input id="bmf_gst" type="text" inputmode="decimal" placeholder="1570" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Bodenrichtwert (€/m²)</label><input id="bmf_brw" type="text" inputmode="decimal" placeholder="120" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>MEA Zähler</label><input id="bmf_mea_z" type="text" inputmode="decimal" placeholder="71" oninput="bmfRecalc()"><span class="bmf-hint">bei Wohnungseigentum</span></div>
-          <div class="bmf-row"><label>MEA Nenner</label><input id="bmf_mea_n" type="text" inputmode="decimal" placeholder="1000" oninput="bmfRecalc()"></div>
-        </div>
-
-        <details class="bmf-modern">
-          <summary>Modernisierungs-Punkte (für fiktives Baujahr) — optional</summary>
-          <div class="bmf-modern-grid">
-            <div class="bmf-mod-row"><span>Dacherneuerung inkl. Dämmung</span><select id="bmf_mod_1" onchange="bmfRecalc()"><option value="0">nein</option><option value="2">teilweise</option><option value="4">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Fenster + Außentüren</span><select id="bmf_mod_2" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Leitungssysteme (Strom/Gas/Wasser)</span><select id="bmf_mod_3" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Heizungsanlage</span><select id="bmf_mod_4" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Wärmedämmung Außenwände</span><select id="bmf_mod_5" onchange="bmfRecalc()"><option value="0">nein</option><option value="2">teilweise</option><option value="4">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Bäder</span><select id="bmf_mod_6" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Innenausbau (Decken/Böden/Treppen)</span><select id="bmf_mod_7" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Grundrissgestaltung</span><select id="bmf_mod_8" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-          </div>
-          <div class="bmf-mod-sum" id="bmf_mod_sum">Summe: 0 / 20 Punkte · keine Modernisierung</div>
-        </details>
-      </div>
-
-      <!-- Ergebnis -->
-      <div class="bmf-result" id="bmf_result">
-        <div class="bmf-empty">Bitte alle Pflichtfelder ausfüllen — die Berechnung erfolgt automatisch.</div>
-      </div>
-    </div>
-
-    <div class="bmf-footer">
-      <input type="file" id="bmf-xlsx-upload" accept=".xlsx,.xls" style="display:none" onchange="if(this.files[0])_bmfHandleFile(this.files[0]); this.value='';">
-      <button class="btn btn-ghost" onclick="exportBMFExcel()" type="button"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M12 12c0-.621.504-1.125 1.125-1.125M12 12v1.5m0 1.5v-1.5"/></svg> In BMF-Excel eintragen</button>
-      <div style="flex:1"></div>
-      <button class="btn btn-ghost" onclick="closeBMFRechner()" type="button">Abbrechen</button>
-      <button class="btn btn-gold" id="bmf_apply_btn" onclick="applyBMFResult()" type="button" disabled>→ AfA-Satz und Gebäudeanteil übernehmen</button>
-    </div>
-  </div>
-</div>
+<!-- V294-old-bmf-overlay-removed: alter #bmf-overlay BMF-Rechner entfernt (Doppel-IDs) -->
 
 <!-- Libraries via CDN (cached after first load, works offline too) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
