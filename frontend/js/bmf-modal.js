@@ -320,7 +320,21 @@ function runBmf(){
     lage: (_v('str') + ' ' + _v('hnr')).trim() + ', ' + (_v('plz') + ' ' + _v('ort')).trim(),
     grundstuecksart: ($('bmf_art') || {}).value || 'Wohnungseigentum [WE]',
     kaufdatum: ($('bmf_datum') || {}).value || _v('kaufdat') || '',
-    kaufpreis: parseDe(($('ak_kp') || {}).value) || parseDe(_v('kp')),
+    /* V293-A-prognose-ak: BMF-Eingabe = PROGNOSE-AK (nicht Brutto-KP), gemaess Doku Phase 3->4.
+     * Identische Formel wie Backend-Pipeline (phase2+phase3):
+     *   immobilien_kp = kp_brutto - inventar ; prognose_ak = immobilien_kp + NK.
+     * Macht _lastBmfResults-Quote == Pipeline-Quote (z.B. 90,53%). Betraege bleiben Phase-6. */
+    kaufpreis: (function(){
+      var kpBrutto = parseDe(($('ak_kp') || {}).value) || parseDe(_v('kp'));
+      var invSum = (parseDe(_v('inv_kueche')) || 0) + (parseDe(_v('inv_moebel')) || 0)
+                 + (parseDe(_v('inv_geraete')) || 0) + (parseDe(_v('inv_pv')) || 0)
+                 + (parseDe(_v('inv_stellplatz')) || 0) + (parseDe(_v('inv_sonst')) || 0);
+      var immoKp = Math.max(0, kpBrutto - invSum);
+      var nk = (parseDe(_v('gest_e')) || 0) + (parseDe(_v('notar_e')) || 0)
+             + (parseDe(_v('gba_e')) || 0) + (parseDe(_v('makler_e')) || 0)
+             + (parseDe(_v('ji_e')) || 0);
+      return immoKp + nk;
+    })(),
     baujahr: parseInt(($('bmf_bj') || {}).value || _v('baujahr')) || 0,
     wohnflaeche: parseDe(($('bmf_wfl') || {}).value || _v('wfl')),
     grundstuecksgroesse: parseDe(($('bmf_gsfl') || {}).value || _v('gsfl')),
@@ -1857,13 +1871,31 @@ function selectKlausel(variant){
   _renderKlauselText();
 }
 
-function _renderKlauselText(){
+function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur Euro */
   function _v(id){ var e = document.getElementById(id); return e ? (e.value || '') : ''; }
+  /* V293c-klausel-variant-quote: Quote der GEWAEHLTEN Variante (Pane-4) aus der Pipeline.
+   * Beträge = Quote × immoKp (Kaufpreis − Inventar, Phase 6). Aenderung bei Variantenwechsel. */
   var kp = parseDe(_v('ak_kp')) || parseDe(_v('kp'));
-  var bmfPct = (window._lastBmfResults && window._lastBmfResults.gebaeudeanteil_prozent
-    && window._lastBmfResults.gebaeudeanteil_prozent.value) || 0;
-  var basisGeb = kp * bmfPct / 100;
-  var basisGrund = kp - basisGeb;
+  /* Immobilien-KP (Phase 6): Kaufpreis minus Inventar — das wird im Vertrag aufgeteilt */
+  var _invSum = (parseDe(_v('inv_kueche')) || 0) + (parseDe(_v('inv_moebel')) || 0)
+              + (parseDe(_v('inv_geraete')) || 0) + (parseDe(_v('inv_pv')) || 0)
+              + (parseDe(_v('inv_stellplatz')) || 0) + (parseDe(_v('inv_sonst')) || 0);
+  var immoKp = Math.max(0, kp - _invSum);
+  /* Variante aus Pane-4-Wahl; Namens-Mapping moderat->optimiert (Backend kennt nur konserv/optim/aggr) */
+  var _selVar = (window._v292State && window._v292State.selectedVariant) || _currentKlauselVariant || 'konservativ';
+  if (_selVar === 'moderat') _selVar = 'optimiert';
+  /* Quote bevorzugt aus Pipeline-Variante, Fallback _lastBmfResults (konservativ) */
+  var _p5 = window._v292State && window._v292State.response && window._v292State.response.phase5_varianten;
+  var gebPctVar;
+  if (_p5 && _p5[_selVar] && typeof _p5[_selVar].gebaeude_pct === 'number') {
+    gebPctVar = _p5[_selVar].gebaeude_pct;
+  } else {
+    gebPctVar = (window._lastBmfResults && window._lastBmfResults.gebaeudeanteil_prozent
+      && window._lastBmfResults.gebaeudeanteil_prozent.value) || 0;
+  }
+  var bmfPct = gebPctVar;  /* fuer evtl. weitere Referenzen im Funktionskoerper */
+  var basisGeb = immoKp * gebPctVar / 100;
+  var basisGrund = immoKp - basisGeb;
 
   var addr = (_v('str') + ' ' + _v('hnr')).trim() + ', ' + (_v('plz') + ' ' + _v('ort')).trim();
   var datum = new Date().toLocaleDateString('de-DE');
@@ -1876,16 +1908,16 @@ function _renderKlauselText(){
       '<p><strong>Kaufpreisaufteilung (Konservativ — FA-freundlich)</strong></p>' +
       '<p>Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> ' +
       'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> wie folgt auf:</p>' +
-      '<ul style="margin:8px 0;padding-left:22px"><li>Auf den Grund und Boden entfallen <strong>' + _eur(basisGrund) + '</strong> (' + _pct(100 - bmfPct) + ').</li>' +
-      '<li>Auf das Gebäude entfallen <strong>' + _eur(basisGeb) + '</strong> (' + _pct(bmfPct) + ').</li></ul>' +
+      '<ul style="margin:8px 0;padding-left:22px"><li>Auf den Grund und Boden entfallen <strong>' + _eur(basisGrund) + '</strong>.</li>' +
+      '<li>Auf das Gebäude entfallen <strong>' + _eur(basisGeb) + '</strong>.</li></ul>' +
       '<p>Die Aufteilung wurde anhand der BMF-Arbeitshilfe (Juni 2023) ermittelt und gilt vorbehaltlich abweichender Feststellung durch das Finanzamt. Sie ist Grundlage für die Absetzung für Abnutzung (AfA) nach § 7 Abs. 4 EStG.</p>',
 
     moderat:
       '<p><strong>Kaufpreisaufteilung (Moderat — empfohlen)</strong></p>' +
       '<p>Die Vertragsparteien sind sich darüber einig, dass sich der vereinbarte Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> ' +
       'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> aus folgenden Komponenten zusammensetzt:</p>' +
-      '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong> (' + _pct(100 - bmfPct) + ')</li>' +
-      '<li>Gebäudesubstanz (abnutzbares Wirtschaftsgut): <strong>' + _eur(basisGeb) + '</strong> (' + _pct(bmfPct) + ')</li></ul>' +
+      '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong></li>' +
+      '<li>Gebäudesubstanz (abnutzbares Wirtschaftsgut): <strong>' + _eur(basisGeb) + '</strong></li></ul>' +
       '<p>Die Aufteilung berücksichtigt den nach BMF-Arbeitshilfe (Juni 2023) ermittelten Sachwertanteil unter Beachtung von Baujahr, Wohnfläche, Bodenrichtwert und Lage. ' +
       'Die Vertragsparteien sind übereingekommen, dass diese Aufteilung der wirtschaftlichen Wertverteilung entspricht und der steuerlichen Behandlung — insbesondere der AfA-Berechnung — zugrunde gelegt wird. ' +
       'Stand: ' + datum + '.</p>',
@@ -1893,8 +1925,8 @@ function _renderKlauselText(){
     aggressiv:
       '<p><strong>Kaufpreisaufteilung (Aggressiv — max. AfA)</strong></p>' +
       '<p>Hiermit erklären die Vertragsparteien rechtsverbindlich: Der vereinbarte Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> für das in der Vertragsurkunde näher bezeichnete Objekt <em>' + (addr || '[Objektadresse]') + '</em> entfällt nach übereinstimmender Bewertung wie folgt:</p>' +
-      '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong> (entspricht ' + _pct(100 - bmfPct) + ' des Gesamtkaufpreises)</li>' +
-      '<li>Gebäude inkl. wesentlicher Gebäudeteile: <strong>' + _eur(basisGeb) + '</strong> (entspricht ' + _pct(bmfPct) + ')</li></ul>' +
+      '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong></li>' +
+      '<li>Gebäude inkl. wesentlicher Gebäudeteile: <strong>' + _eur(basisGeb) + '</strong></li></ul>' +
       '<p>Diese Aufteilung wurde im Rahmen einer Sachwertermittlung nach BMF-Arbeitshilfe (Juni 2023) unter Heranziehung lagespezifischer Bodenrichtwerte, der tatsächlichen Restnutzungsdauer des Gebäudes sowie ggf. vorgenommener Modernisierungen erstellt. ' +
       '<strong>Sie hat verbindlichen Charakter</strong> und gilt insbesondere als wirtschaftlich angemessen i.S.d. BFH-Rechtsprechung (BFH IX R 26/19 v. 21.07.2020). ' +
       'Die Parteien sind sich einig, dass eine pauschale 80/20-Aufteilung im konkreten Fall nicht sachgerecht wäre. ' +

@@ -115,18 +115,21 @@
       str:        _v('str'),
       hnr:        _v('hnr'),
       objart_bmf: 'Wohnungseigentum [WE]',
-      wfl:        _parseDe(_v('wfl')),
-      baujahr:    parseInt(_v('baujahr'), 10) || 0,
-      gsfl:       _parseDe(_v('gsfl')),
-      brw:        _parseDe(_v('brw')),
-      /* V292.6.9-objekt-mea: MEA ins Pipeline-objekt (fehlte → Fallback 100% → negativer Gebäudeanteil!).
-       * Tab Objekt #mea, Fallback Pane-2 #bmf_mea. Pipeline rechnet daraus 706/10000. */
-      mea:        _parseDe(_v('mea')) || _parseDe(_v('bmf_mea'))
+      /* V293d-pane2-bevorzugt: Pane-2-Felder (bmf_*) BEVORZUGT vor Tab-Quellen.
+       * Grund: Listener haengen auf bmf_* — Aenderung dort muss in die Berechnung.
+       * Fallback auf Tab-Quelle, falls Pane-2-Feld leer. */
+      wfl:        _parseDe(_v('bmf_wfl')) || _parseDe(_v('wfl')),
+      baujahr:    parseInt(_v('bmf_bj'), 10) || parseInt(_v('baujahr'), 10) || 0,
+      gsfl:       _parseDe(_v('bmf_gsfl')) || _parseDe(_v('gsfl')),
+      brw:        _parseDe(_v('bmf_brw')) || _parseDe(_v('brw')),
+      mea:        _parseDe(_v('bmf_mea')) || _parseDe(_v('mea'))
     };
 
     // Miete (Tab Miete)
     var miete = {
-      nkm:           _parseDe(_v('nkm')),
+      /* V293-C-miete-pane2: bmf_miete (Pane-2-Feld) bevorzugt, Fallback nkm (Tab).
+       * Vorher nur nkm -> Aenderung im bmf_miete-Feld wirkte nicht auf die Berechnung. */
+      nkm:           _parseDe(_v('bmf_miete')) || _parseDe(_v('nkm')),
       marktmiete_qm: _parseDe(_v('ds2_marktmiete')),
       leerstand:     (document.getElementById('leerstand') || {}).checked === true
     };

@@ -626,3 +626,35 @@ span.auto-tag {
   margin-left: 6px;
   vertical-align: middle;
 }
+
+/* ════════════════════════════════════════════════════════════════
+ * V292.9-input-text-color — Input-Text explizit dunkel.
+ * Behebt unsichtbare Felder (Baujahr/Wfl/Miete): die Textfarbe wurde
+ * als rgba(255,255,255,.92) von einem darueberliegenden Container
+ * vererbt -> weiss auf hell -> unleserlich. Console-bewiesen.
+ * Betrifft ALLE Eingabefelder im BMF-Modal, unabhaengig von .tr/.from-tab.
+ * ════════════════════════════════════════════════════════════════ */
+.bmf-modal input,
+.bmf-modal select,
+.bmf-modal textarea {
+  color: var(--text, #2A2727) !important;
+}
+.bmf-modal input::placeholder {
+  color: var(--muted, #9A958F) !important;
+  opacity: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════
+ * V293f-readonly-style — Auto-Felder (aus Tabs) sind readonly.
+ * Klar als "uebernommen" erkennbar, Wert gut lesbar, kein Tipp-Cursor.
+ * ════════════════════════════════════════════════════════════════ */
+.bmf-modal input[readonly][data-auto] {
+  background: rgba(201, 168, 76, 0.06) !important;
+  color: var(--text, #2A2727) !important;
+  cursor: default !important;
+  border-color: rgba(201, 168, 76, 0.25) !important;
+}
+.bmf-modal input[readonly][data-auto]:focus {
+  box-shadow: none !important;
+  border-color: rgba(201, 168, 76, 0.25) !important;
+}

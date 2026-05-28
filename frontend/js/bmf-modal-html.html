@@ -140,20 +140,19 @@
           <strong>Die BMF-Arbeitshilfe rechnet automatisch <em>ein</em> Verfahren als maßgebend</strong> — je nach verfügbaren Daten. Bei Mietobjekten ist das in der Regel der Ertragswert. Hier kannst du das voreingestellte Verfahren manuell überschreiben.
         </div>
 
-        <div class="bmfmo-verf-toggle">
-          <button class="bmfmo-verf-btn" data-verf="auto" onclick="setVerf('auto')" id="vb-auto">Automatisch</button>
-          <button class="bmfmo-verf-btn active" data-verf="ertrag" onclick="setVerf('ertrag')" id="vb-ertrag">Ertragswert</button>
-          <button class="bmfmo-verf-btn" data-verf="sach" onclick="setVerf('sach')" id="vb-sach">Sachwert</button>
-          <button class="bmfmo-verf-btn" data-verf="vergl" onclick="setVerf('vergl')" id="vb-vergl">Vergleichswert</button>
+        <!-- V293e-verf-readonly: reine Anzeige des massgebenden Verfahrens.
+             onclick entfernt (setVerf bewirkte nichts — kein Backend-Override).
+             _renderPane2 markiert .active dynamisch aus phase4_bmf.verfahren. -->
+        <div class="bmfmo-verf-toggle" style="pointer-events:none;opacity:1" aria-readonly="true" title="Das massgebende Verfahren wird automatisch nach BMF-Logik gewaehlt.">
+          <button type="button" class="bmfmo-verf-btn" data-verf="ertrag" id="vb-ertrag" tabindex="-1" style="cursor:default">Ertragswert</button>
+          <button type="button" class="bmfmo-verf-btn" data-verf="sach" id="vb-sach" tabindex="-1" style="cursor:default">Sachwert</button>
+          <button type="button" class="bmfmo-verf-btn" data-verf="vergl" id="vb-vergl" tabindex="-1" style="cursor:default">Vergleichswert</button>
         </div>
         <div class="verf-info" id="verf-info">
-          <strong>Ertragswertverfahren</strong> — Standard für Renditeobjekte mit bekannter Miete. Wird vom Finanzamt anerkannt, wenn ein lokaler Liegenschaftszinssatz vorliegt.
+          Das <strong>maßgebende Verfahren</strong> wird automatisch nach BMF-Logik gewählt (bekannte Miete → Ertragswert, Vergleichsfaktor → Vergleichswert, sonst Sachwert). <strong>Alle drei werden berechnet</strong>; das hervorgehobene ist maßgebend für AfA und Klausel.
         </div>
 
-        <!-- Demo-Buttons -->
-        <div class="demo-row">
-          <span class="demo-label">Demo:</span>
-        </div>
+        <!-- V293e-demo-removed: Demo-Row entfernt -->
 
         <div class="g2">
           <div class="f">
@@ -170,33 +169,33 @@
           </div>
           <div class="f">
             <label>Datum Kaufvertrag <span class="auto" title="Aus Tab Objekt · #kaufdat">Auto</span></label>
-            <input type="date" id="bmf_datum" class="from-tab">
+            <input type="date" id="bmf_datum" class="from-tab" readonly data-auto title="Wird aus Tab Investition uebernommen — dort aendern"><!-- V293f-readonly -->
           </div>
         </div>
 
         <div class="g2">
           <div class="f">
             <label>Baujahr <span class="auto" title="Aus Tab Objekt · #baujahr">Auto</span></label>
-            <input id="bmf_bj" type="number" class="from-tab">
+            <input id="bmf_bj" type="text" inputmode="numeric" class="from-tab" readonly data-auto title="Wird aus Tab Objekt uebernommen — dort aendern"><!-- V292.9-bj-nospinner V293f-readonly -->
           </div>
           <div class="f">
             <label>Wohn-/Nutzfläche <span class="auto" title="Aus Tab Objekt · #wfl">Auto</span></label>
-            <div class="iw"><input id="bmf_wfl" type="text" inputmode="decimal" class="tr from-tab"><span class="sfx">m²</span></div>
+            <div class="iw"><input id="bmf_wfl" type="text" inputmode="decimal" class="tr from-tab" readonly data-auto title="Wird aus Tab Objekt uebernommen — dort aendern"><span class="sfx">m²</span></div>
           </div>
         </div>
 
         <div class="g3">
           <div class="f">
             <label>Grundstücksfläche <span class="auto" title="Aus Tab Objekt · #gsfl">Auto</span></label>
-            <div class="iw"><input id="bmf_gsfl" type="text" inputmode="decimal" class="tr from-tab"><span class="sfx">m²</span></div>
+            <div class="iw"><input id="bmf_gsfl" type="text" inputmode="decimal" class="tr from-tab" readonly data-auto title="Wird aus Tab Objekt uebernommen — dort aendern"><span class="sfx">m²</span></div>
           </div>
           <div class="f">
             <label>Bodenrichtwert <span class="auto" title="Aus Tab Objekt · #brw">Auto</span></label>
-            <div class="iw"><input id="bmf_brw" type="text" inputmode="decimal" class="tr from-tab"><span class="sfx">€/m²</span></div>
+            <div class="iw"><input id="bmf_brw" type="text" inputmode="decimal" class="tr from-tab" readonly data-auto title="Wird aus Tab Objekt uebernommen — dort aendern"><span class="sfx">€/m²</span></div>
           </div>
           <div class="f">
             <label>Miteigentumsanteil <span class="auto" title="Aus Tab Objekt · #mea">Auto</span></label>
-            <div class="iw"><input id="bmf_mea" type="text" inputmode="decimal" class="tr from-tab"><span class="sfx">%</span></div>
+            <div class="iw"><input id="bmf_mea" type="text" inputmode="decimal" class="tr from-tab" readonly data-auto title="Wird aus Tab Objekt uebernommen — dort aendern"><span class="sfx">%</span></div>
           </div>
         </div>
 
