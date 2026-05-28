@@ -14,7 +14,8 @@
 
     <div class="bmfmo-body">
 
-      <!-- Tab-Strip im Modal -->
+      <!-- V292.6.6-defaults-removed -->
+        <!-- Tab-Strip im Modal -->
       <div class="bmfmo-tabs">
         <button class="bmfmo-tab active" data-pane="p-ak" onclick="switchPane('p-ak')"><span class="mtab-num">1</span> Anschaffungskosten</button>
         <button class="bmfmo-tab" data-pane="p-bmf" onclick="switchPane('p-bmf')"><span class="mtab-num">2</span> BMF-Aufteilung</button>
@@ -169,40 +170,40 @@
           </div>
           <div class="f">
             <label>Datum Kaufvertrag <span class="auto" title="Aus Tab Objekt · #kaufdat">Auto</span></label>
-            <input type="date" id="bmf_datum" value="2024-12-18" class="from-tab">
+            <input type="date" id="bmf_datum" class="from-tab">
           </div>
         </div>
 
         <div class="g2">
           <div class="f">
             <label>Baujahr <span class="auto" title="Aus Tab Objekt · #baujahr">Auto</span></label>
-            <input id="bmf_bj" type="number" value="1994" class="from-tab">
+            <input id="bmf_bj" type="number" class="from-tab">
           </div>
           <div class="f">
             <label>Wohn-/Nutzfläche <span class="auto" title="Aus Tab Objekt · #wfl">Auto</span></label>
-            <div class="iw"><input id="bmf_wfl" type="text" inputmode="decimal" value="96,2" class="tr from-tab"><span class="sfx">m²</span></div>
+            <div class="iw"><input id="bmf_wfl" type="text" inputmode="decimal" class="tr from-tab"><span class="sfx">m²</span></div>
           </div>
         </div>
 
         <div class="g3">
           <div class="f">
             <label>Grundstücksfläche <span class="auto" title="Aus Tab Objekt · #gsfl">Auto</span></label>
-            <div class="iw"><input id="bmf_gsfl" type="text" inputmode="decimal" value="1.570" class="tr from-tab"><span class="sfx">m²</span></div>
+            <div class="iw"><input id="bmf_gsfl" type="text" inputmode="decimal" class="tr from-tab"><span class="sfx">m²</span></div>
           </div>
           <div class="f">
             <label>Bodenrichtwert <span class="auto" title="Aus Tab Objekt · #brw">Auto</span></label>
-            <div class="iw"><input id="bmf_brw" type="text" inputmode="decimal" value="120" class="tr from-tab"><span class="sfx">€/m²</span></div>
+            <div class="iw"><input id="bmf_brw" type="text" inputmode="decimal" class="tr from-tab"><span class="sfx">€/m²</span></div>
           </div>
           <div class="f">
             <label>Miteigentumsanteil <span class="auto" title="Aus Tab Objekt · #mea">Auto</span></label>
-            <div class="iw"><input id="bmf_mea" type="text" inputmode="decimal" value="7,10" class="tr from-tab"><span class="sfx">%</span></div>
+            <div class="iw"><input id="bmf_mea" type="text" inputmode="decimal" class="tr from-tab"><span class="sfx">%</span></div>
           </div>
         </div>
 
         <div class="g2">
           <div class="f">
             <label>Monatliche Nettokaltmiete <span class="auto" title="Aus Tab Miete · #nkm">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="bmf_miete" type="text" inputmode="decimal" value="748,80" class="trl tr from-tab"></div>
+            <div class="iw"><span class="pfx">€</span><input id="bmf_miete" type="text" inputmode="decimal" class="trl tr from-tab"></div>
           </div>
           <div class="f">
             <label>Liegenschaftszins <span class="hint" style="display:inline;font-style:italic">(optional)</span></label>
@@ -277,13 +278,12 @@
           </div>
         </div>
 
-        <div style="display:flex;gap:8px;margin-top:18px">
-          <button class="btn btn-gold" onclick="runBmf()" id="btnBmf" style="display:none">Berechnen</button><span class="hint" id="bmfAutoHint" style="font-style:italic;color:var(--muted)">Berechnung erfolgt automatisch sobald alle Pflichtfelder ausgefüllt sind.</span>
-          <button class="btn btn-outline" onclick="downloadXlsx()" id="btnDl" disabled>BMF-XLSX herunterladen</button>
-        </div>
-
-        <div id="bmfStatus" class="banner info" style="margin-top:18px">
-          <strong>Bereit.</strong> Eingaben sind aus Tab Investition + Objekt auto-übernommen. Auf „Berechnen" tippen.
+        <!-- V292.4-pane2-cleanup: Berechnen-Button, XLSX-Button (Pane 2) und Status-Banner entfernt.
+             - V292 macht Live-Pipeline (kein manueller Berechnen-Button nötig)
+             - XLSX-Download verbleibt in Pane 4 (BMF-Original-Vorlage Sektion)
+             - Status wird über bmfAutoHint im V292-Render gepflegt -->
+        <div style="margin-top:18px;display:flex;align-items:center;gap:10px;min-height:20px">
+          <span class="hint" id="bmfAutoHint" style="font-style:italic;color:var(--muted)">⏳ Pipeline berechnet...</span>
         </div>
 
         <div id="bmfResult" style="display:none">

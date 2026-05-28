@@ -23,7 +23,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=286">
-<link rel="stylesheet" href="css/bmf-modal.css?v=289.2">  <!-- V289 -->
+<link rel="stylesheet" href="css/bmf-modal.css?v=292.6.6">  <!-- V289 -->
+<link rel="stylesheet" href="css/bmf-modal-v292.css?v=292.6.6"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
 <link rel="stylesheet" href="css/portfolio-strategy.css?v=144">
 <link rel="stylesheet" href="css/pricing-modal.css?v=197">
@@ -443,6 +444,21 @@ label.dp-required.qc-required::after {
 <!-- V289.2.3-cache-applied -->
 <!-- V289.2.4-cache-applied -->
 <!-- V289.2.5-cache-applied -->
+<!-- V291-cache-applied -->
+<!-- V291.1-cache-applied -->
+<!-- V292-cache-applied -->
+<!-- V292.1-cache-applied -->
+<!-- V292.2-cache-applied -->
+<!-- V292.3-cache-applied -->
+<!-- V292.4-cache-applied -->
+<!-- V292.5-cache-applied -->
+<!-- V292.6.1-cache-applied -->
+<!-- V292.6.2-cache-applied -->
+<!-- V292.6.3-cache-applied -->
+<!-- V292.6.4-cache-applied -->
+<!-- V292.6.5-cache-applied -->
+<!-- V292.6.6-cache-applied -->
+<!-- V292.6.8-cache-applied -->
 </head>
 <body>
 <!-- V257-06: Hintergrund-Modus (Bootstrap, kein Flash) -->
@@ -1116,20 +1132,8 @@ label.dp-required.qc-required::after {
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-euro"/></svg></span>Kaufpreis &amp; Nebenkosten</div>
         <div class="f mb12"><label class="dp-required" data-v236-required-set="1">Kaufpreis <button type="button" class="dp-tip" data-tip-id="tab2.kp" tabindex="-1" aria-label="Hilfe zu tab2.kp"></button></label><div class="iw"><span class="pfx">€</span><input id="kp" type="text" inputmode="decimal" placeholder="180000" class="trl" oninput="calc()"></div></div>
 
-        <!-- V112: Bewegliche Wirtschaftsgüter im Kaufpreis (z.B. Küche) — direkt unter Kaufpreis,
-             damit User es früh sieht und gleich zuordnet. Im Steuermodul wird der Wert separat
-             als 10-Jahre-AfA aufgeführt (sonst_bewegl_wg) und nicht der 15%-Grenze zugerechnet. -->
-        <div class="f mb12">
-          <label class="kueche-toggle-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500">
-            <input type="checkbox" id="kueche_im_kp" oninput="toggleKuecheKp(); calc()">
-            <span>Bewegliche Wirtschaftsgüter im Kaufpreis enthalten <span class="hint" style="font-weight:400">(z.B. Küche)</span> <button type="button" class="dp-tip" data-tip-id="tab2.kueche_im_kp" tabindex="-1" aria-label="Hilfe zu Bewegliche Wirtschaftsgüter"></button></span>
-          </label>
-          <span class="hint" style="display:block;margin-top:4px;margin-left:24px">Sind bewegliche Wirtschaftsgüter (z.B. Einbauküche, Möblierung) separat im Kaufvertrag ausgewiesen, werden sie nicht der 15%-Grenze des Gebäudes zugerechnet (eigene 10-Jahre-AfA, Ansatz unter Punkt 6 im Steuerformular).</span>
-          <div id="kueche_kp_wrap" style="display:none;margin-top:10px;margin-left:24px">
-            <label>Wert beweglicher Wirtschaftsgüter (im Gesamt-Kaufpreis enthalten)</label>
-            <div class="iw" style="max-width:220px"><span class="pfx">€</span><input id="kp_kueche" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="syncKuecheToMoebl(); calc()"></div>
-          </div>
-        </div>
+        <!-- V291.1-kpkueche-removed: Checkbox+Input "Bewegliche Wirtschaftsgüter im KP" entfernt -->
+        <!-- Eingabe wandert komplett in Inventar-Detail-Box weiter unten -->
         <hr class="dvd">
         <div class="g2">
           <div class="f"><label>Makler (%) <button type="button" class="dp-tip" data-tip-id="tab2.makler" tabindex="-1" aria-label="Hilfe zu Maklerprovision"></button></label><div class="iw"><input id="makler_p" type="text" inputmode="decimal" placeholder="0" step="0.01" class="tr" oninput="syncCostPct('makler')"><span class="sfx">%</span></div></div>
@@ -1185,65 +1189,44 @@ label.dp-required.qc-required::after {
           </div>
         </div>
 
-        <!-- Sanierung & Möblierung -->
-        <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bath"/></svg></span>Sanierung & Möblierung</div>
-          <div class="g2">
-            <div class="f">
-              <label>Sanierungskosten</label>
-              <div class="iw"><span class="pfx">€</span><input id="san" type="text" inputmode="decimal" placeholder="" class="trl" oninput="syncSanTaxOnSanInput(); calc()"></div>
-              <span class="hint" id="san_limit_hint">Grenze wird berechnet...</span>
+        <!-- V292.6.6-san-schlank: Sanierung-Card einspaltig + kompakt -->
+        <!-- Sanierung -->
+        <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bath"/></svg></span>Sanierung</div>
+          <div class="f">
+            <label>Sanierungskosten</label>
+            <div class="iw"><span class="pfx">€</span><input id="san" type="text" inputmode="decimal" placeholder="" class="trl" oninput="syncSanTaxOnSanInput(); calc(); _v292_6_toggle15pct();"></div>
+            <span class="hint" id="san_limit_hint">Grenze wird berechnet...</span>
 
-              <!-- V32: Steuerliche Verteilung — Checkbox + Jahre-Auswahl -->
-              <div class="san-tax-options">
-                <label class="san-tax-checkbox">
-                  <input type="checkbox" id="san_tax_active" oninput="calc()">
-                  <span>In Steuer-Werbungskosten übernehmen</span>
-                </label>
-                <div class="san-tax-years" id="san_tax_years_wrap">
-                  <label>Verteilung über <button type="button" class="dp-tip" data-tip-id="tab2.san_taxoption" tabindex="-1" aria-label="Hilfe zu Sanierungs-Steueroption"></button></label>
-                  <select id="san_tax_years" oninput="calc()">
-                    <option value="auto" selected>Automatisch (15%-Regel)</option>
-                    <option value="1">1 Jahr (sofort)</option>
-                    <option value="2">2 Jahre</option>
-                    <option value="3">3 Jahre</option>
-                    <option value="4">4 Jahre</option>
-                    <option value="5">5 Jahre (Standard §82b)</option>
-                    <option value="50">Über AfA-Nutzungsdauer (anschaffungsnahe HK)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="f">
-              <label>Möblierung</label>
-              <div class="iw"><span class="pfx">€</span><input id="moebl" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div>
-              <span class="hint">Möblierung wird linear über 10 Jahre abgeschrieben</span>
-
-              <!-- V32: Möbel — analog Checkbox -->
-              <div class="san-tax-options">
-                <label class="san-tax-checkbox">
-                  <input type="checkbox" id="moebl_tax_active" oninput="calc()">
-                  <span>In Steuer-Werbungskosten übernehmen</span>
-                </label>
-                <div class="san-tax-years">
-                  <label>Verteilung über</label>
-                  <select id="moebl_tax_years" oninput="calc()">
-                    <option value="5">5 Jahre</option>
-                    <option value="8">8 Jahre</option>
-                    <option value="10" selected>10 Jahre (Standard)</option>
-                    <option value="15">15 Jahre</option>
-                  </select>
-                </div>
+            <!-- V32: Steuerliche Verteilung — kompakt nebeneinander -->
+            <div class="san-tax-options" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:8px">
+              <label class="san-tax-checkbox" style="margin:0">
+                <input type="checkbox" id="san_tax_active" oninput="calc()">
+                <span>In Steuer-Werbungskosten übernehmen</span>
+              </label>
+              <div class="san-tax-years" id="san_tax_years_wrap" style="display:flex;align-items:center;gap:6px;margin:0">
+                <label style="margin:0;white-space:nowrap">Verteilung über <button type="button" class="dp-tip" data-tip-id="tab2.san_taxoption" tabindex="-1" aria-label="Hilfe zu Sanierungs-Steueroption"></button></label>
+                <select id="san_tax_years" oninput="calc()" style="width:auto">
+                  <option value="auto" selected>Automatisch (15%-Regel)</option>
+                  <option value="1">1 Jahr (sofort)</option>
+                  <option value="2">2 Jahre</option>
+                  <option value="3">3 Jahre</option>
+                  <option value="4">4 Jahre</option>
+                  <option value="5">5 Jahre (Standard §82b)</option>
+                  <option value="50">Über AfA-Nutzungsdauer (anschaffungsnahe HK)</option>
+                </select>
               </div>
             </div>
           </div>
+          <!-- hidden Möblierung-Inputs (Werte via Inventar-Card synchronisiert) -->
+          <input type="hidden" id="moebl" value="">
+          <input type="hidden" id="moebl_tax_active" value="">
+          <input type="hidden" id="moebl_tax_years" value="10">
         </div>
 
-        <!-- 15%-Grenze -->
-        <div class="dp-tip-infobox" data-tip-id="tab2.15prozent_grenze"></div>
-        <div class="info-box info-gold" style="margin-top:14px">
-          <div class="info-box-title">📐 15%-Grenze (§ 6 Abs. 1 Nr. 1a EStG)</div>
-          <div class="info-box-content">
+        <!-- V292.6.6-15pct-merge: 15%-Grenze aufklappbar, nur offen wenn Sanierung eingegeben -->
+        <details class="info-box info-gold" id="san_15pct_details" style="margin-top:14px">
+          <summary class="info-box-title" style="cursor:pointer;list-style:none">📐 15%-Grenze (§ 6 Abs. 1 Nr. 1a EStG) <span class="hint" style="font-size:10px;font-weight:400;color:var(--muted)">— klick für Details</span></summary>
+          <div class="info-box-content" style="margin-top:10px">
             <div class="kv"><span>Max. Sanierungskosten in 3 Jahren</span><span class="kv-v c-gold" id="san_limit_max">—</span></div>
             <div class="kv"><span>Ihre Sanierungskosten</span><span class="kv-v" id="san_limit_actual">—</span></div>
             <div class="kv"><span>Status</span><span class="kv-v" id="san_limit_status">—</span></div>
@@ -1269,6 +1252,82 @@ label.dp-required.qc-required::after {
               Wenn du eine Küche im Kaufpreis ausweist, gilt sie als <b>separates Wirtschaftsgut</b> mit eigener AfA über 10 Jahre und zählt nicht zum Gebäude.
             </div>
           </div>
+        </details>
+
+        <!-- V292.6.6-inventar-toggle: Inventar-Detail-Card aufklappbar via Checkbox -->
+        <div class="card" style="margin-top:14px">
+          <div class="ct ct-pro" style="display:flex;align-items:center;gap:10px">
+            <span class="ct-ico"><svg width="22" height="22"><use href="#i-bath"/></svg></span>
+            <span style="flex:1">Inventar · Detail-Aufschlüsselung</span>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:400;color:var(--muted);cursor:pointer">
+              <input type="checkbox" id="inv_detail_toggle" onchange="document.getElementById('inv_detail_body').style.display = this.checked ? 'block' : 'none';">
+              <span>Inventar erfassen</span>
+            </label>
+          </div>
+          <div id="inv_detail_body" style="display:none">
+          <p class="hint" style="margin-bottom:10px">
+            Beweglich, NICHT in der 15-%-Grenze. Separat über die Inventar-Nutzungsdauer abgeschrieben. Detail-Felder summieren sich automatisch.
+          </p>
+
+          <div class="row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div class="f">
+              <label>Küche</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_kueche" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+            <div class="f">
+              <label>Möbel</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_moebel" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+            <div class="f">
+              <label>Geräte</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_geraete" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+          </div>
+          <div class="row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px">
+            <div class="f">
+              <label>PV-Anlage</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_pv" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+            <div class="f">
+              <label>Stellplatz</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_stellplatz" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+            <div class="f">
+              <label>Sonstiges</label>
+              <div class="iw"><span class="pfx">€</span><input id="inv_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="_syncInventarToMoebl();calc()"></div>
+            </div>
+          </div>
+
+          <div class="dvd" style="margin:14px 0"></div>
+
+          <div class="kv" style="font-size:13px"><span><b>Summe Inventar</b></span><span class="kv-v" id="inv_sum">0 €</span></div>
+          <div class="kv" id="inv_sum_check" style="font-size:11.5px;color:var(--muted);margin-top:4px">
+            <span>↻ Wird automatisch über die Inventar-Verteilung abgeschrieben</span>
+            <span class="kv-v" id="inv_sync_status" style="color:var(--green)">✓ OK</span>
+          </div>
+
+          <!-- V292.6.5-moebl-relocation: Steuer-Verteilung für Inventar (war vorher in Sanierung-Card) -->
+          <div class="san-tax-options" style="margin-top:14px;padding-top:12px;border-top:1px dashed rgba(201,168,76,.3)">
+            <label class="san-tax-checkbox">
+              <input type="checkbox" id="inv_tax_active" oninput="document.getElementById('moebl_tax_active').checked=this.checked; calc()">
+              <span>In Steuer-Werbungskosten übernehmen</span>
+            </label>
+            <div class="san-tax-years">
+              <label>Verteilung über</label>
+              <select id="inv_tax_years" oninput="document.getElementById('moebl_tax_years').value=this.value; calc()">
+                <option value="5">5 Jahre</option>
+                <option value="8">8 Jahre</option>
+                <option value="10" selected>10 Jahre (Standard)</option>
+                <option value="15">15 Jahre</option>
+              </select>
+            </div>
+          </div>
+          <!-- V292.6.5 ende moebl-relocation -->
+          <div class="kv" style="margin-top:8px"><span><b>Immobilien-KP</b> (= Kaufpreis − Inventar)</span><span class="kv-v c-gold" id="inv_immo_kp">—</span></div>
+          <p class="hint" style="margin-top:8px;font-style:normal;font-size:11px">
+            Diese Aufschlüsselung wird vom BMF-Rechner gelesen, um Inventar korrekt vom Immobilien-Kaufpreis zu trennen.
+          </p>
+          </div><!-- /inv_detail_body V292.6.6 -->
         </div>
     </div>
   </div>
@@ -1515,7 +1574,16 @@ label.dp-required.qc-required::after {
               <div id="geb-ant-banner" class="geb-ant-banner"></div>
             </div>
     </div>
-    <div class="f"><label>AfA / Jahr (berechnet) <span class="hint" id="afa_methode_label" style="font-size:11px;color:var(--muted)"></span></label><div class="cf" id="afa_kalk">—</div></div>
+    <div class="f"><label>AfA / Jahr (berechnet) <span class="hint" id="afa_methode_label" style="font-size:11px;color:var(--muted)"></span></label><div class="cf" id="afa_kalk">—</div>
+      <!-- V292.6.6-afa-zusammensetzung: Zeigt wie sich die AfA zusammensetzt -->
+      <div class="hint" id="afa_zusammensetzung" style="font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.5;display:none">
+        <span style="color:var(--gold-d);font-weight:600">Zusammensetzung:</span>
+        <span id="afa_zus_geb">Gebäude-AfA —</span>
+        <span id="afa_zus_inv_wrap" style="display:none"> · <span id="afa_zus_inv">bewegliche WG —</span></span>
+      </div>
+      <p class="hint" style="font-size:10px;color:var(--muted2);margin-top:3px;font-style:italic">
+        Gebäude wird über die Nutzungsdauer (Standard 50 J), bewegliche Wirtschaftsgüter (Küche, Möbel, Geräte) separat über die Inventar-Nutzungsdauer abgeschrieben.
+      </p></div>
 
     <!-- V227: Wenn degressiv aktiv: kleine Vorschau-Tabelle erste 10 Jahre -->
     <details id="afa_deg_preview_wrap" style="margin-top:10px;display:none">
@@ -2772,15 +2840,16 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="js/pdf-anlage-bmf.js?v=289.2"></script>
-<script src="js/bmf-modal.js?v=289.2.5"></script>
+<script src="js/pdf-anlage-bmf.js?v=292"></script>
+<script src="js/bmf-modal.js?v=293.6.8"></script>
+<script src="js/bmf-modal-v292.js?v=292.6.8"></script><!-- V292-modal-refactor -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="js/dscr-engine.js?v=231"></script>
 <script src="js/deal-kpis.js?v=231"></script>
 <script src="js/afa-engine.js?v=227"></script>
-  <script src="js/afa-ui.js?v=2271"></script>
+  <script src="js/afa-ui.js?v=291.1"></script>
   <script src="js/zve-manager.js?v=1"></script>
   <script src="js/tax-periods.js?v=1"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
@@ -2791,9 +2860,9 @@ label.dp-required.qc-required::after {
   <script src="js/tour-sidebar.js?v=2"></script>
   <script src="js/anteilig.js?v=5"></script>
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
-  <script src="js/anteilig-recalc.js?v=250"></script>
+  <script src="js/anteilig-recalc.js?v=292.6.8"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=250"></script>
+  <script src="js/calc.js?v=292.6.8"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -2824,11 +2893,12 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=226"></script>
-<script src="js/storage.js?v=195"></script>
+<script src="js/ui.js?v=291.1"></script>
+<script src="js/storage.js?v=292.6.6"></script>
+<script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=166"></script>
 <script src="js/portfolio-strategy.js?v=144"></script>
-<script src="js/portfolio-strategy-ui.js?v=189"></script>
+<script src="js/portfolio-strategy-ui.js?v=291.1"></script>
 <script src="js/portfolio-strategy-pdf.js?v=166"></script>
 <script src="js/bank-negotiation-pdf.js?v=166"></script>
 <script src="js/track-record.js?v=166"></script>
@@ -2838,9 +2908,9 @@ label.dp-required.qc-required::after {
 <script src="js/subscription.js?v=187"></script>
 <script src="js/bmf-data.js?v=166"></script>
 <script src="js/bmf-afa.js?v=287"></script>
-<script src="js/bmf-ui.js?v=189"></script>
+<script src="js/bmf-ui.js?v=291.1"></script>
 <script src="js/dealscore2.js?v=226"></script>
-<script src="js/dealscore2-ui.js?v=189"></script>
+<script src="js/dealscore2-ui.js?v=291.1"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=124"></script>
@@ -2873,10 +2943,10 @@ label.dp-required.qc-required::after {
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=142"></script>
 <script src="js/rnd-bte-katalog.js?v=142"></script>
-<script src="js/rnd-calc.js?v=250"></script>
+<script src="js/rnd-calc.js?v=292.6.8"></script>
 <script src="js/rnd-pdf.js?v=166"></script>
 <script src="js/rnd-docx.js?v=142"></script>
-<script src="js/rnd-ui.js?v=189"></script>
+<script src="js/rnd-ui.js?v=291.1"></script>
 <script src="js/rnd-wizard.js?v=160"></script>
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=124"></script>
@@ -3249,5 +3319,22 @@ label.dp-required.qc-required::after {
 })();
 </script>
   <script src="js/legal.js?v=3" defer></script>
+
+<!-- V292.6.6-15pct-autoopen: 15%-Grenze details öffnen wenn Sanierungskosten eingegeben -->
+<script>
+function _v292_6_toggle15pct(){
+  try {
+    var det = document.getElementById('san_15pct_details');
+    var sanEl = document.getElementById('san');
+    if (!det || !sanEl) return;
+    var val = parseFloat(String(sanEl.value || '0').replace(/\./g,'').replace(',','.')) || 0;
+    det.open = val > 0;
+  } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(_v292_6_toggle15pct, 500);
+});
+</script>
+
 </body>
 </html>

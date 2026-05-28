@@ -126,29 +126,24 @@ function syncFromTabInvest(){
     if(v > 0) _setField(p[1], _formatEur(v), true);
   });
 
-  // Eckdaten aus Tab Objekt (BMF-Aufteilung)
+  // V292.6.6-pane2-force-fresh: Eckdaten aus Tab Objekt ERZWINGEN.
+  // Vorher: Felder behielten HTML-Defaults (96,2 etc.) oder KI-Werte (brw 160)
+  // wenn der Tab-Objekt-Wert 0 war. Jetzt: IMMER aus Tab Objekt setzen,
+  // bei 0 leeren statt Default/KI-Wert behalten.
   _setField('bmf_bj', _val('baujahr'), true);
   _setField('bmf_datum', _val('kaufdat'), true);
-  // Wohnfläche mit Komma-Format
+  // Wohnfläche mit Komma-Format — IMMER setzen (auch leeren bei 0)
   var wfl = parseDe(_val('wfl'));
-  if(wfl > 0){
-    _setField('bmf_wfl', wfl.toString().replace('.', ','), true);
-  }
-  // Grundstücksfläche
+  _setField('bmf_wfl', wfl > 0 ? wfl.toString().replace('.', ',') : '', true);
+  // Grundstücksfläche — IMMER setzen
   var gsfl = parseDe(_val('gsfl'));
-  if(gsfl > 0){
-    _setField('bmf_gsfl', new Intl.NumberFormat('de-DE').format(gsfl), true);
-  }
-  // Bodenrichtwert
+  _setField('bmf_gsfl', gsfl > 0 ? new Intl.NumberFormat('de-DE').format(gsfl) : '', true);
+  // Bodenrichtwert — IMMER setzen (überschreibt stale KI-Wert)
   var brw = parseDe(_val('brw'));
-  if(brw > 0){
-    _setField('bmf_brw', brw.toString().replace('.', ','), true);
-  }
-  // MEA (Prozent als String wie "7,10")
+  _setField('bmf_brw', brw > 0 ? brw.toString().replace('.', ',') : '', true);
+  // MEA — IMMER setzen
   var mea = parseDe(_val('mea'));
-  if(mea > 0){
-    _setField('bmf_mea', mea.toString().replace('.', ','), true);
-  }
+  _setField('bmf_mea', mea > 0 ? mea.toString().replace('.', ',') : '', true);
 
   // Cascade
   if(typeof calcAk === 'function') setTimeout(calcAk, 50);
@@ -330,8 +325,15 @@ function runBmf(){
     wohnflaeche: parseDe(($('bmf_wfl') || {}).value || _v('wfl')),
     grundstuecksgroesse: parseDe(($('bmf_gsfl') || {}).value || _v('gsfl')),
     bodenrichtwert: parseDe(($('bmf_brw') || {}).value || _v('brw')),
-    mea_zaehler: 0,
-    mea_nenner: 0,
+    /* V292.6.8-runbmf-mea: MEA aus bmf_mea (war hardcoded 0 → negativer Gebäudeanteil in Pane 3!) */
+    mea_zaehler: (function(){
+      var pct = parseDe(($('bmf_mea') || {}).value || _v('mea'));
+      return pct > 0 ? Math.round(pct * 100) : 1000;
+    })(),
+    mea_nenner: (function(){
+      var pct = parseDe(($('bmf_mea') || {}).value || _v('mea'));
+      return pct > 0 ? 10000 : 1000;
+    })(),
     miete_bekannt: ($('bmf_miete') && parseDe($('bmf_miete').value) > 0) ? 'Ja' : 'Nein',
     miete_monatlich: parseDe(($('bmf_miete') || {}).value),
     vergleichsfaktor_vorhanden: 'Nein',
@@ -454,28 +456,150 @@ function _mockupRenderBmfResult(r, demoLabel){
 }
 
 function downloadXlsx(){
-  // V289.2: Echter Backend-Call mit include_file:true
-  var inputs = window._lastBmfInputs;
-  if(!inputs){ toast('Bitte erst Berechnen'); return; }
-  toast('XLSX wird generiert...');
+  /* V292.6.1-xlsx-flat: Variant-spezifischer Excel mit FLAT Backend-Format.
+   *
+   * Backend /bmf/aufteilung erwartet:
+   *   { lage, grundstuecksart, kaufdatum, kaufpreis, baujahr, wohnflaeche, ... }
+   * NICHT nested wie V292-Pipeline.
+   *
+   * Strategie: Wenn V292-State da, mappe NESTED → FLAT.
+   * Sonst Fallback auf V289 _lastBmfInputs.
+   */
+  var inputs;
+  var selectedVariant = (window._v292State && window._v292State.selectedVariant) || 'konservativ';
+
+  if (window._v292State && window._v292State.lastInputs && window._v292State.lastInputs.phase1_inputs) {
+    /* V292-Pfad: NESTED → FLAT mappen */
+    var p1 = window._v292State.lastInputs.phase1_inputs;
+    var obj = p1.objekt || {};
+    var inv = p1.investition || {};
+    var gaa = p1.gaa || {};
+    var ren = p1.renovierung || {};
+
+/* V292.6.5-xlsx-pane2-source: Helper für Pane-2-Lesen */
+    function _v292_5_pane2(id) {
+      var el = document.getElementById(id);
+      if (!el || !el.value) return '';
+      return String(el.value).trim();
+    }
+    function _v292_5_parseDe(s) {
+      if (!s) return 0;
+      var str = String(s).replace(/\./g, '').replace(',', '.');
+      var n = parseFloat(str);
+      return isFinite(n) ? n : 0;
+    }
+        inputs = {
+      /* Pflichtfelder */
+      /* V292.6.4-backend-keys: korrekte Backend-Keys aus bmfService.js INPUT_CELLS */
+      lage: ((obj.plz || '') + ' ' + (obj.ort || '') + ', ' + (obj.str || '') + ' ' + (obj.hnr || '')).trim(),
+      grundstuecksart: _v292_5_pane2('bmf_art') || obj.objart_bmf || 'Wohnungseigentum [WE]',
+      kaufdatum: _v292_5_pane2('bmf_datum') || inv.kaufdat || '',
+      /* V292.6.3-xlsx-kp-prognose: BMF Z.4 'Kaufpreis incl. Nebenkosten'
+       * = Prognose-AK aus Pipeline = Brutto-KP + NK − Inventar */
+      kaufpreis: (function(){
+        var p3 = window._v292State && window._v292State.response && window._v292State.response.phase3_prognose_ak;
+        if (p3 && p3.prognose_ak > 0) return Math.round(p3.prognose_ak);
+        /* Fallback wenn Pipeline nicht da */
+        var kp = inv.kp_brutto || 0;
+        var inv_sum = (p1.inventar && (p1.inventar.kueche + p1.inventar.moebel + p1.inventar.geraete + p1.inventar.pv + p1.inventar.stellplatz + p1.inventar.sonstiges)) || 0;
+        return Math.round(kp - inv_sum);
+      })(),
+      baujahr: parseInt(_v292_5_pane2('bmf_bj'), 10) || obj.baujahr || 0,
+      wohnflaeche: _v292_5_parseDe(_v292_5_pane2('bmf_wfl')) || obj.wfl || 0,
+
+      /* Optional — V292.6.2-xlsx-mea-fix: mea aus DOM lesen, nicht hardcoded */
+      grundstuecksgroesse: _v292_5_parseDe(_v292_5_pane2('bmf_gsfl')) || obj.gsfl || 0,
+      bodenrichtwert: _v292_5_parseDe(_v292_5_pane2('bmf_brw')) || (gaa.brw_user || obj.brw || 0),
+      /* V292.6.4-backend-keys: MEA als Zähler/Nenner (Backend braucht beide)
+       * Tab Objekt hat mea als Prozent z.B. '7,06' → konvertieren zu 706/10000
+       * Wenn 100 (kein WE) → 1000/1000 = 100% */
+      mea_zaehler: (function(){
+        /* V292.6.5: liest Pane 2 bmf_mea, fallback Tab Objekt #mea */
+        var pct = _v292_5_parseDe(_v292_5_pane2('bmf_mea'));
+        if (pct <= 0) {
+          pct = _v292_5_parseDe((document.getElementById('mea') || {}).value);
+        }
+        if (pct <= 0) return 1000;
+        return Math.round(pct * 100);
+      })(),
+      mea_nenner: (function(){
+        var pct = _v292_5_parseDe(_v292_5_pane2('bmf_mea'));
+        if (pct <= 0) {
+          pct = _v292_5_parseDe((document.getElementById('mea') || {}).value);
+        }
+        if (pct <= 0) return 1000;
+        return 10000;
+      })(),
+      /* V292.6.3-nkm-leerstand-fallback: Bei Leerstand Vergleichsmiete nutzen */
+      /* V292.6.4-backend-keys: Backend braucht miete_monatlich + miete_bekannt
+       * miete_bekannt: 'Ja' wenn Miete > 0, sonst 'Nein' */
+      miete_monatlich: (function(){
+        /* V292.6.5: liest Pane 2 bmf_miete (Single Source of Truth) */
+        var bmfMiete = _v292_5_parseDe(_v292_5_pane2('bmf_miete'));
+        if (bmfMiete > 0) return Math.round(bmfMiete);
+        var nkmDom = _v292_5_parseDe((document.getElementById('nkm') || {}).value);
+        return Math.round(nkmDom);
+      })(),
+      miete_bekannt: (function(){
+        var bmfMiete = _v292_5_parseDe(_v292_5_pane2('bmf_miete'));
+        var nkmDom = _v292_5_parseDe((document.getElementById('nkm') || {}).value);
+        return (bmfMiete > 0 || nkmDom > 0) ? 'Ja' : 'Nein';
+      })(),
+      liegenschaftszinssatz: (function(){
+        /* V292.6.4: aus Pane 2 bmf_lzs (KI/User) */
+        var lzs = parseFloat(String((document.getElementById('bmf_lzs') || {}).value || '0').replace(',', '.')) || 0;
+        return lzs > 0 ? lzs : null;
+      })(),
+      sachwertfaktor: (function(){
+        var swf = parseFloat(String((document.getElementById('bmf_swf') || {}).value || '0').replace(',', '.')) || 0;
+        return swf > 0 ? swf : 1.0;
+      })(),
+
+      /* Variant-Hint für Filename */
+      _variant: selectedVariant
+    };
+  } else if (window._lastBmfInputs) {
+    inputs = window._lastBmfInputs;
+  } else {
+    toast('Bitte erst BMF-Berechnung durchführen');
+    return;
+  }
+
+  toast('Excel wird generiert (Variante: ' + selectedVariant + ')...');
+
   fetch('/api/v1/bmf/aufteilung', {
     method: 'POST',
     headers: _authHeaders(),
     body: JSON.stringify({ inputs: inputs, include_file: true })
   })
-  .then(function(r){ return r.json(); })
+  .then(function(r){
+    if (!r.ok) {
+      return r.json().then(function(err){
+        console.error('[v292.6.1 xlsx] Backend-Error:', err);
+        throw new Error(err.error || ('HTTP ' + r.status));
+      });
+    }
+    return r.json();
+  })
   .then(function(data){
-    if(!data.ok || !data.file_base64){ throw new Error('Kein File in Antwort'); }
+    if(!data.ok || !data.file_base64){
+      console.error('[v292.6.1 xlsx] Response ohne file_base64:', data);
+      throw new Error('Backend lieferte kein File');
+    }
     var bytes = atob(data.file_base64);
     var buf = new Uint8Array(bytes.length);
     for(var i = 0; i < bytes.length; i++){ buf[i] = bytes.charCodeAt(i); }
     var blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url; a.download = data.file_name || 'BMF_Aufteilung.xlsx';
+    var fname = data.file_name || ('BMF_Aufteilung_' + selectedVariant + '.xlsx');
+    if (fname === 'BMF_Aufteilung.xlsx') {
+      fname = 'BMF_Aufteilung_' + selectedVariant + '.xlsx';
+    }
+    a.href = url; a.download = fname;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('XLSX heruntergeladen');
+    toast('Excel "' + fname + '" heruntergeladen');
   })
   .catch(function(err){ toast('Download-Fehler: ' + err.message); });
 }
@@ -529,11 +653,22 @@ var _varChoice = 'konservativ';   // Default: BMF-Standard
 
 // ── 1) Inventar ──────────────────────────────────────────
 function updateInv(){
-  var k = parseDe($('inv_kueche').value);
-  var m = parseDe($('inv_moebl').value);
-  var p = parseDe($('inv_pv').value);
-  var s = parseDe($('inv_sonst').value);
-  var total = k + m + p + s;
+  /* V292.3-v289-bugfixes: defensive Null-Checks + V291-Field-Mapping
+   * Vorher: $('inv_moebl').value (gibts nicht; heißt 'inv_moebel')
+   * Vorher: Crash wenn Element null
+   * Jetzt: alle 6 V291-Felder, mit Null-Safe Pattern
+   */
+  function _safeVal(id){
+    var el = document.getElementById(id);
+    return (el && el.value) ? parseDe(el.value) : 0;
+  }
+  var k  = _safeVal('inv_kueche');
+  var m  = _safeVal('inv_moebel') || _safeVal('inv_moebl'); /* V291 hat 'moebel', V289 Bug nutzte 'moebl' */
+  var g  = _safeVal('inv_geraete');
+  var p  = _safeVal('inv_pv');
+  var sp = _safeVal('inv_stellplatz');
+  var s  = _safeVal('inv_sonst');
+  var total = k + m + g + p + sp + s;
 
   // Brutto-KP (laut Notarvertrag, aus ak_kp Tab oder Default)
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
@@ -561,18 +696,24 @@ function updateInv(){
     warnEl.style.display = '';
     warnText.innerHTML = 'Inventaranteil von <strong>' + fmtPct(invQuote,1) + '</strong> ist ungewöhnlich hoch und kann vom Finanzamt hinterfragt werden. Empfohlen: Wertgutachten oder Einzelnachweise (Rechnungen, Kaufbelege) bereithalten.';
   } else if(invQuote > 8){
-    warnEl.style.display = '';
-    warnEl.className = 'banner gold';
-    warnEl.style.marginTop = '10px';
-    warnEl.style.marginBottom = '0';
-    warnEl.style.fontSize = '11.5px';
-    warnText.innerHTML = 'Inventaranteil <strong>' + fmtPct(invQuote,1) + '</strong> — erklärungsbedürftig, aber belegbar. Belege/Wertnachweise empfohlen.';
+    /* V292.4-v289-bugs-5-6: defensive null-checks */
+    if (warnEl) {
+      warnEl.style.display = '';
+      warnEl.className = 'banner gold';
+      warnEl.style.marginTop = '10px';
+      warnEl.style.marginBottom = '0';
+      warnEl.style.fontSize = '11.5px';
+    }
+    if (warnText) {
+      warnText.innerHTML = 'Inventaranteil <strong>' + fmtPct(invQuote,1) + '</strong> — erklärungsbedürftig, aber belegbar. Belege/Wertnachweise empfohlen.';
+    }
   } else {
-    warnEl.style.display = 'none';
+    if (warnEl) warnEl.style.display = 'none';
   }
 
-  // Cascading-Render: Varianten + 15% + Risiko + Klausel
-  renderVarGrid();
+  // Cascading-Render: 15% + Risiko + Klausel
+  // V292.7: renderVarGrid() entfernt — Pane 4 rendert ausschliesslich via
+  // Pipeline (_renderPane4, bmf-modal-v292.js Z.209/232). Behebt Doppel-Render-Flacker.
   updateG15();
   renderRiskGrid();
   renderEmpfehlung();
@@ -676,6 +817,15 @@ function renderVarGrid(){
   // BMF-Variante als Referenz für Delta
   var bmfAfa = (varianten[0].gebEur + nkImmo * varianten[0].gebPct/100) * afaSatz/100;
 
+  // V292.6.6-pane4-afa-split: Inventar-AfA berechnen (bewegliche WG, linear 10 J)
+  var _invSumP4 = 0;
+  ['inv_kueche','inv_moebel','inv_geraete','inv_pv','inv_stellplatz','inv_sonst'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) _invSumP4 += parseDe(el.value) || 0;
+  });
+  var _moeblYearsP4 = parseInt((document.getElementById('moebl_tax_years') || {}).value, 10) || 10;
+  var _invAfaP4 = _invSumP4 > 0 ? _invSumP4 / _moeblYearsP4 : 0;
+
   var html = '';
   varianten.forEach(function(va){
     var gebAk = va.gebEur + (nkImmo * va.gebPct/100);
@@ -689,7 +839,9 @@ function renderVarGrid(){
       '<div class="var-pct-row"><span>Grund &amp; Boden</span><span class="v">' + fmtPct(va.bodenPct,1) + '</span></div>' +
       '<div class="var-pct-row"><span>Gebäude</span><span class="v">' + fmtPct(va.gebPct,1) + '</span></div>' +
       '<div class="var-divider"></div>' +
-      '<div class="var-afa"><span>AfA / Jahr</span><span class="v">' + fmtEur(afaJahr,0) + '</span></div>' +
+      '<div class="var-afa"><span>AfA / Jahr (Gebäude)</span><span class="v">' + fmtEur(afaJahr,0) + '</span></div>' +
+      (_invAfaP4 > 0 ? '<div class="var-afa-inv" style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:2px"><span>+ Inventar-AfA</span><span>' + fmtEur(_invAfaP4,0) + '</span></div>' +
+        '<div class="var-afa-sum" style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--ch);margin-top:3px;padding-top:3px;border-top:1px dotted rgba(0,0,0,.12)"><span>Σ AfA / Jahr</span><span>' + fmtEur(afaJahr + _invAfaP4,0) + '</span></div>' : '') +
       (delta > 0 ? '<div class="var-delta">▲ +' + fmtEur(delta,0).replace('€','').trim() + ' €/J vs. BMF</div>'
                  : (delta < 0 ? '<div class="var-delta neg">▼ ' + fmtEur(delta,0) + '/J vs. BMF</div>'
                               : '<div class="var-delta neg">Basis-Variante</div>')) +
@@ -775,7 +927,7 @@ function updateG15(){
   var statusEl = $('g15_status');
   var barEl = $('g15_bar');
 
-  pufferEl.textContent = fmtEur(Math.abs(puffer),2);
+  if (pufferEl) pufferEl.textContent = fmtEur(Math.abs(puffer),2); /* V292.4-v289-bugs-5-6 */
   if(puffer >= max15 * 0.30){
     pufferEl.style.color = 'var(--green)';
     statusEl.textContent = 'Genug Puffer';
@@ -1221,21 +1373,11 @@ window.addEventListener('DOMContentLoaded', function(){
 // ═══════════════════════════════════════════════════════════════
 var _persistTimer = null;
 function _persistBmfState(){
-  clearTimeout(_persistTimer);
-  _persistTimer = setTimeout(function(){
-    var objId = _currentObjectId();
-    if(!objId) return;
-    var state = {
-      results: window._lastBmfResults || null,
-      gaa: window._lastGaa || null,
-      ts: Date.now()
-    };
-    fetch('/api/v1/tax-snapshots/' + objId + '/bmf', {
-      method: 'PUT',
-      headers: _authHeaders(),
-      body: JSON.stringify({ bmf_advanced: state })
-    }).catch(function(e){ console.warn('[bmf] persist failed:', e.message); });
-  }, 800);
+  /* V292.3-v289-bugfixes: No-Op
+   * Original rief POST /api/v1/tax-snapshots/:id/bmf — Endpoint existiert nicht (404).
+   * Persistenz erfolgt implizit über calc() + normaler Object-Save im Tab.
+   */
+  return;
 }
 
 function suggestGaaBmf(){
@@ -1304,7 +1446,35 @@ function suggestGaaBmf(){
       rEl.textContent = '💡 ' + g.reasoning;
     }
 
-    toast('GAA-Werte von KI vorgeschlagen — Confidence: ' + (g.confidence || '?'));
+    /* V292.6.1-ki-debug: Diagnose-Hook für Pkt 5 (Konfidenz niedrig Bug) */
+    console.log('[v292.6 KI-GAA Response]', {
+      confidence: g.confidence,
+      brw: g.brw,
+      vergleichsmiete_range: g.vergleichsmiete_range,
+      liegenschaftszins: g.liegenschaftszins,
+      sachwertfaktor: g.sachwertfaktor,
+      reasoning_length: g.reasoning ? g.reasoning.length : 0,
+      raw_keys: Object.keys(g || {})
+    });
+    
+    /* V292.6.2-ki-confidence-display: 
+     * Bei niedrig + alle null → erkläre warum keine Daten kamen */
+    var confidenceLabel = g.confidence || 'unbekannt';
+    var hasAnyValue = (g.brw != null && g.brw > 0) ||
+                      (g.vergleichsmiete_range && (g.vergleichsmiete_range.low != null || g.vergleichsmiete_range.high != null)) ||
+                      (g.liegenschaftszins != null && g.liegenschaftszins > 0) ||
+                      (g.sachwertfaktor != null && g.sachwertfaktor > 0);
+    
+    if (confidenceLabel === 'hoch') confidenceLabel = 'Hoch ✓';
+    else if (confidenceLabel === 'mittel') confidenceLabel = 'Mittel';
+    else if (confidenceLabel === 'niedrig') confidenceLabel = 'Niedrig ⚠';
+    
+    if (!hasAnyValue) {
+      toast('⚠ KI fand keine ausreichenden Daten für ' + ((document.getElementById('plz') || {}).value || 'diese Lage') + '. ' +
+            'Bitte BRW manuell aus BORIS-NRW (boris.nrw.de) eintragen.');
+    } else {
+      toast('GAA-Werte von KI vorgeschlagen — Confidence: ' + confidenceLabel);
+    }
     _persistBmfState();
   })
   .catch(function(err){
@@ -1503,8 +1673,17 @@ function _updateFooterNav(paneId){
     if(el) el.style.display = show ? '' : 'none';
   }
 
-  // Zurück: ab Pane 2
-  _show('btnBmfBack', !isFirst);
+  // V292.5-back-robust: Zurück auf Pane 1 verlässlich verstecken
+  // - paneId kann leer/null sein → resolveTo 'p-ak'
+  // - Check beide: idx === 0 oder paneId === 'p-ak' oder leer
+  var _pid = paneId || 'p-ak';
+  var _backShow = (_pid !== 'p-ak') && !isFirst;
+  _show('btnBmfBack', _backShow);
+  // Zusätzlich harter visibility-Hide damit kein anderer Code es überschreiben kann
+  var _backBtn = document.getElementById('btnBmfBack');
+  if (_backBtn) {
+    _backBtn.style.visibility = _backShow ? '' : 'hidden';
+  }
   // Weiter: bis Pane 3
   _show('btnBmfNext', !isLast);
   // Übernehmen + PDF: nur auf letzter Pane
@@ -1517,11 +1696,11 @@ function _updateFooterNav(paneId){
   var hint = document.getElementById('bmfmoFooterHint');
   if(hint){
     var hints = {
-      'p-ak':    '<b>Schritt 1 / 4:</b> Anschaffungskosten prüfen — Werte aus Tab Investition wurden übernommen (gold hinterlegt).',
-      'p-bmf':   '<b>Schritt 2 / 4:</b> Eckdaten für die BMF-Aufteilung ergänzen. Pflichtfelder: Baujahr, Wohnfläche, Bodenrichtwert, Kaufdatum.',
-      'p-afa':   '<b>Schritt 3 / 4:</b> AfA-Vorschau prüfen — Gebäudeanteil und jährliche AfA werden hier hochgerechnet.',
-      'p-hebel': '<b>Beim „Übernehmen":</b> Gebäudeanteil + AfA-Satz wandern ins Steuer-Modul, die geplante Sanierung wird ins <em style="color:var(--gold-d);font-style:normal;font-weight:600">Tab Investition</em> zurückgeschrieben.'
-    };
+      'p-ak':    '<b>Schritt 1 / 4:</b> Anschaffungskosten — Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
+      'p-bmf':   '<b>Schritt 2 / 4:</b> BMF-Eckdaten + KI-GAA. Änderungen lösen automatisch eine neue Berechnung aus (500ms debounced).',
+      'p-afa':   '<b>Schritt 3 / 4:</b> 3-Spalten-Vergleich der Varianten (Konservativ / Optimiert / Aggressiv) — wählen Sie in Pane 4.',
+      'p-hebel': '<b>Schritt 4 / 4:</b> Wählen Sie die Variante per Klick auf eine Karte. Bei „Übernehmen" wird der Gebäudeanteil ins Steuermodul geschrieben.'
+    }; /* V292-footer-hints */
     hint.innerHTML = hints[paneId] || hints['p-ak'];
   }
 }
@@ -1723,7 +1902,7 @@ function _renderKlauselText(){
   };
 
   var el = document.getElementById('klauselText');
-  if(el) el.innerHTML = texts[variant] || texts.konservativ;
+  if(el) el.innerHTML = texts[_currentKlauselVariant] || texts.konservativ; /* V292.3-v289-bugfixes: 'variant' nicht im Scope, nutze _currentKlauselVariant */
 }
 
 function copyKlausel_unused_v292(){
@@ -1774,3 +1953,72 @@ document.addEventListener('keydown', function(e){
     if(ov && ov.classList.contains('open')) closeBMFModal();
   }
 });
+
+/* V292.1-auth-export: Export _authHeaders + _token für V292-Modul */
+try {
+  if (typeof _authHeaders === 'function') window.__bmfAuthHeaders = _authHeaders;
+  if (typeof _token === 'function') window.__bmfToken = _token;
+} catch(e) { console.warn('[bmf-modal] V292.1 auth-export:', e); }
+
+/* V292.2-export-syncSan: Export für V292-Modul */
+try {
+  if (typeof _syncSanierungViz === 'function') window._syncSanierungViz = _syncSanierungViz;
+  if (typeof updateG15 === 'function') window.__updateG15 = updateG15;
+  if (typeof _renderKlauselText === 'function') window.__renderKlauselText = _renderKlauselText;
+} catch(e) { console.warn('[bmf-modal] V292.2 sync-export:', e); }
+
+/* V292.3-v289-bugfixes: Globaler Helper fmtForInput
+ * V289 _syncSanierungViz nutzt fmtForInput aber Funktion war nie definiert.
+ * Definition: wie fmtEur, aber ohne €-Symbol (für Input-Feld-Anzeige).
+ */
+if (typeof window.fmtForInput !== 'function') {
+  window.fmtForInput = function(v, decimals){
+    if (decimals == null) decimals = 2;
+    if (typeof v !== 'number' || !isFinite(v)) return '0,00';
+    return new Intl.NumberFormat('de-DE', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(v);
+  };
+}
+
+/* V292.6.2-defensive-parsede:
+ * Hartnäckiger Bug in _varianten Z.666 und ähnlichen Stellen:
+ *   parseDe($('xxx').value) crasht wenn $('xxx') === null.
+ * 
+ * Statt jede einzelne Stelle defensive zu patchen, wrappen wir parseDe:
+ * Wenn der Input null/undefined ist (was passiert wenn .value auf null gerufen wird,
+ * weil $('xxx').value vorher schon crasht), fängt der globale Error-Handler ab.
+ * 
+ * Bessere Lösung: Override $() damit es bei missing Element ein
+ * Pseudo-Object {value: ''} liefert — dann ist .value sicher.
+ */
+(function(){
+  if (typeof $ === 'function' && !window.__v292_6_2_dollar_patched) {
+    var _origDollar = $;
+    window.$ = function(id) {
+      var el = _origDollar(id);
+      if (el) return el;
+      /* Fallback: Pseudo-Element mit leerem value + harmlosen Methoden */
+      return {
+        value: '',
+        textContent: '',
+        innerHTML: '',
+        style: {},
+        classList: { add: function(){}, remove: function(){}, toggle: function(){}, contains: function(){return false;} },
+        dataset: {},
+        addEventListener: function(){},
+        removeEventListener: function(){},
+        dispatchEvent: function(){return false;},
+        appendChild: function(){},
+        getAttribute: function(){return null;},
+        setAttribute: function(){},
+        closest: function(){return null;},
+        querySelector: function(){return null;},
+        querySelectorAll: function(){return [];}
+      };
+    };
+    window.__v292_6_2_dollar_patched = true;
+    console.log('[v292.6.2] $ defensive wrapper installed — null-checks no longer crash');
+  }
+})();
