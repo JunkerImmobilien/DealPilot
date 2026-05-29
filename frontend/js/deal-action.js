@@ -250,6 +250,13 @@ window.DealPilotDealAction = (function() {
     if (typeof renderSaved === 'function') {
       try { renderSaved({_immediate: true}); } catch(e) {}
     }
+    // V322-refresh-status-tiles: auch die 3-Tile-Statusanzeige synchronisieren
+    try {
+      var lostEl = document.getElementById('_deal_lost_state');
+      var lost = lostEl ? (lostEl.value === 'true') : false;
+      var status = lost ? 'lost' : (won ? 'won' : 'open');
+      updateStatusUI(status);
+    } catch(e) {}
   }
   // ───────────────────── V138: RND-Empfehlung ────────────────────
   // Berechnet RND auf Basis der aktuellen Objekt-Eingaben und zeigt eine
@@ -494,23 +501,30 @@ window.DealPilotDealAction = (function() {
   }
 
   function renderWonCard() {
-    // V252-01: Drei-Status mit Heroicons (Frage / Daumen-hoch / Daumen-runter)
+    // V322-status-tiles: Drei grosse Icon-Tiles statt Buttons.
+    // Icons ~64px, Active-Highlight mit Farb-Glow (gelb/gruen/rot).
+    var icoOpen = '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.5"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>';
+    var icoWon = '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V3a.75.75 0 0 1 .75-.75A2.25 2.25 0 0 1 16.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z"/></svg>';
+    var icoLost = '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54"/></svg>';
     return [
       '<div class="da-status-card" id="da-status-card">',
       '  <div class="da-status-head">',
       '    <div class="da-status-label" id="da-status-label">Status: Offen</div>',
       '    <div class="da-status-sub" id="da-status-sub">Markiere den Deal als gewonnen oder verloren.</div>',
       '  </div>',
-      '  <div class="da-status-btns">',
-      '    <button type="button" class="da-status-btn da-status-open active" data-status="open" onclick="DealPilotDealAction.setStatus(\'open\')">',
-      '      <span class="da-stat-ico">' + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.5"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>' + '</span><span>Offen</span>',
-      '    </button>',
-      '    <button type="button" class="da-status-btn da-status-won" data-status="won" onclick="DealPilotDealAction.setStatus(\'won\')">',
-      '      <span class="da-stat-ico">' + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V3a.75.75 0 0 1 .75-.75A2.25 2.25 0 0 1 16.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z"/></svg>' + '</span><span>Gewonnen</span>',
-      '    </button>',
-      '    <button type="button" class="da-status-btn da-status-lost" data-status="lost" onclick="DealPilotDealAction.setStatus(\'lost\')">',
-      '      <span class="da-stat-ico">' + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54"/></svg>' + '</span><span>Verloren</span>',
-      '    </button>',
+      '  <div class="da-status-tiles">',
+      '    <div class="da-status-tile da-status-open active" data-status="open" role="button" tabindex="0" onclick="DealPilotDealAction.setStatus(\'open\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \')DealPilotDealAction.setStatus(\'open\')">',
+      '      <span class="da-stat-ico">' + icoOpen + '</span>',
+      '      <span class="da-stat-lbl">Offen</span>',
+      '    </div>',
+      '    <div class="da-status-tile da-status-won" data-status="won" role="button" tabindex="0" onclick="DealPilotDealAction.setStatus(\'won\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \')DealPilotDealAction.setStatus(\'won\')">',
+      '      <span class="da-stat-ico">' + icoWon + '</span>',
+      '      <span class="da-stat-lbl">Gewonnen</span>',
+      '    </div>',
+      '    <div class="da-status-tile da-status-lost" data-status="lost" role="button" tabindex="0" onclick="DealPilotDealAction.setStatus(\'lost\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \')DealPilotDealAction.setStatus(\'lost\')">',
+      '      <span class="da-stat-ico">' + icoLost + '</span>',
+      '      <span class="da-stat-lbl">Verloren</span>',
+      '    </div>',
       '  </div>',
       '  <input type="hidden" id="_deal_won_state" value="false">',
       '  <input type="hidden" id="_deal_won_at_state" value="">',

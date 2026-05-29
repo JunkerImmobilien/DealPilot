@@ -714,7 +714,7 @@ async function renderSaved(opts) {
     var lostRibbon = opts.dealLost ?
       '<div class="sbc-lost-ribbon" title="Deal als verloren markiert">' +
         '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-        '<span>Lose</span>' +
+        '<span>LOST</span>' + /* V322-lost-text */
       '</div>' : '';
     // V63.25: Hinweis "DS2 ergänzen" wenn der Plan das Feature hat aber dieses
     // Objekt es noch nicht berechnet hat (= Upgrade-Pfad sichtbar).
@@ -854,6 +854,7 @@ async function renderSaved(opts) {
     return '<div class="sb-card' + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '">' +
       investorRibbon +
       wonRibbon +
+      lostRibbon + /* V322-lost-ribbon-html */
       scoreOverlay +
       '<div class="sbc-top">' +
         thumb +
