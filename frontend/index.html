@@ -23,8 +23,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=286">
-<link rel="stylesheet" href="css/bmf-modal.css?v=292.6.6">  <!-- V289 -->
-<link rel="stylesheet" href="css/bmf-modal-v292.css?v=292.6.6"><!-- V292-modal-refactor -->
+<link rel="stylesheet" href="css/bmf-modal.css?v=293f">  <!-- V289 -->
+<link rel="stylesheet" href="css/bmf-modal-v292.css?v=303"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
 <link rel="stylesheet" href="css/portfolio-strategy.css?v=144">
 <link rel="stylesheet" href="css/pricing-modal.css?v=197">
@@ -1166,9 +1166,18 @@ label.dp-required.qc-required::after {
       </div>
     </div>
     <div>
+      <!-- V304-sanierung-kombiniert: Sanierungsbedarf + Sanierung in EINER Card -->
       <div class="card" style="margin-top:10px">
-          <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-hammer"/></svg></span>Sanierungsbedarf einschätzen</div>
-          <p class="hint" style="margin-bottom:8px">Welche Bereiche der Immobilie sind sanierungsbedürftig? Klick zum Aktivieren — die geschätzten Kosten fließen in die Sanierungskostenkalkulation ein.</p>
+          <div class="ct ct-pro" style="display:flex;align-items:center;gap:10px">
+            <span class="ct-ico"><svg width="22" height="22"><use href="#i-bath"/></svg></span>
+            <span style="flex:1">Sanierung</span>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:400;color:var(--muted);cursor:pointer">
+              <input type="checkbox" id="sanbedarf_toggle" onchange="document.getElementById('sanbedarf_body').style.display = this.checked ? 'block' : 'none';">
+              <span>Sanierungsbedarf einschätzen</span>
+            </label>
+          </div>
+          <div id="sanbedarf_body" style="display:none">
+          <p class="hint" style="margin-bottom:8px;margin-top:4px">Welche Bereiche der Immobilie sind sanierungsbedürftig? Klick zum Aktivieren — die geschätzten Kosten fließen in die Sanierungskostenkalkulation ein.</p>
           <div class="fesh-grid">
             <label class="fesh-tile"><input type="checkbox" id="fesh_f" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-window"/></svg></span><span class="fesh-name">Fenster</span><span class="fesh-cost"><input id="fesh_f_cost" type="text" inputmode="decimal" value="8000" placeholder="0" oninput="updateFESH()"> €</span></label>
             <label class="fesh-tile"><input type="checkbox" id="fesh_e" onchange="updateFESH()"><span class="fesh-icon"><svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-zap"/></svg></span><span class="fesh-name">Elektrik</span><span class="fesh-cost"><input id="fesh_e_cost" type="text" inputmode="decimal" value="6000" placeholder="0" oninput="updateFESH()"> €</span></label>
@@ -1187,25 +1196,23 @@ label.dp-required.qc-required::after {
             <div class="info-box-title">💡 KfW-Förderempfehlung</div>
             <div class="info-box-content" id="fesh_kfw_text"></div>
           </div>
-        </div>
-
-        <!-- V292.6.6-san-schlank: Sanierung-Card einspaltig + kompakt -->
-        <!-- Sanierung -->
-        <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bath"/></svg></span>Sanierung</div>
-          <div class="f">
+          </div><!-- /sanbedarf_body -->
+          <!-- Sanierungskosten-Betrag: direkt in derselben Card -->
+          <div class="f" style="margin-top:14px">
             <label>Sanierungskosten</label>
             <div class="iw"><span class="pfx">€</span><input id="san" type="text" inputmode="decimal" placeholder="" class="trl" oninput="syncSanTaxOnSanInput(); calc(); _v292_6_toggle15pct();"></div>
             <span class="hint" id="san_limit_hint">Grenze wird berechnet...</span>
 
             <!-- V32: Steuerliche Verteilung — kompakt nebeneinander -->
-            <div class="san-tax-options" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:8px">
+            <!-- V301-san-verteilung-kompakt: inline-styles raus, nutzt jetzt .san-tax-options wie Inventar-Detail -->
+            <div class="san-tax-options" style="margin-top:8px">
               <label class="san-tax-checkbox" style="margin:0">
                 <input type="checkbox" id="san_tax_active" oninput="calc()">
                 <span>In Steuer-Werbungskosten übernehmen</span>
               </label>
-              <div class="san-tax-years" id="san_tax_years_wrap" style="display:flex;align-items:center;gap:6px;margin:0">
-                <label style="margin:0;white-space:nowrap">Verteilung über <button type="button" class="dp-tip" data-tip-id="tab2.san_taxoption" tabindex="-1" aria-label="Hilfe zu Sanierungs-Steueroption"></button></label>
-                <select id="san_tax_years" oninput="calc()" style="width:auto">
+              <div class="san-tax-years" id="san_tax_years_wrap">
+                <label>Verteilung über <button type="button" class="dp-tip" data-tip-id="tab2.san_taxoption" tabindex="-1" aria-label="Hilfe zu Sanierungs-Steueroption"></button></label>
+                <select id="san_tax_years" oninput="calc()">
                   <option value="auto" selected>Automatisch (15%-Regel)</option>
                   <option value="1">1 Jahr (sofort)</option>
                   <option value="2">2 Jahre</option>
@@ -1217,14 +1224,13 @@ label.dp-required.qc-required::after {
               </div>
             </div>
           </div>
-          <!-- hidden Möblierung-Inputs (Werte via Inventar-Card synchronisiert) -->
-          <input type="hidden" id="moebl" value="">
+          <!-- V309: moebl ist jetzt sichtbares Inventarkosten-Feld in der Inventar-Card -->
           <input type="hidden" id="moebl_tax_active" value="">
           <input type="hidden" id="moebl_tax_years" value="10">
         </div>
 
         <!-- V292.6.6-15pct-merge: 15%-Grenze aufklappbar, nur offen wenn Sanierung eingegeben -->
-        <details class="info-box info-gold" id="san_15pct_details" style="margin-top:14px">
+        <details class="info-box info-gold" id="san_15pct_details" style="margin-top:-2px;border-top-left-radius:0;border-top-right-radius:0"><!-- V305-15pct-optisch: schliesst direkt an Sanierung-Card an -->
           <summary class="info-box-title" style="cursor:pointer;list-style:none">📐 15%-Grenze (§ 6 Abs. 1 Nr. 1a EStG) <span class="hint" style="font-size:10px;font-weight:400;color:var(--muted)">— klick für Details</span></summary>
           <div class="info-box-content" style="margin-top:10px">
             <div class="kv"><span>Max. Sanierungskosten in 3 Jahren</span><span class="kv-v c-gold" id="san_limit_max">—</span></div>
@@ -1258,15 +1264,36 @@ label.dp-required.qc-required::after {
         <div class="card" style="margin-top:14px">
           <div class="ct ct-pro" style="display:flex;align-items:center;gap:10px">
             <span class="ct-ico"><svg width="22" height="22"><use href="#i-bath"/></svg></span>
-            <span style="flex:1">Inventar · Detail-Aufschlüsselung</span>
+            <span style="flex:1">Inventar</span><!-- V308-inventar-titel-kurz: einzeilig wie Sanierung-Card -->
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:400;color:var(--muted);cursor:pointer">
               <input type="checkbox" id="inv_detail_toggle" onchange="document.getElementById('inv_detail_body').style.display = this.checked ? 'block' : 'none';">
               <span>Inventar erfassen</span>
             </label>
           </div>
-          <div id="inv_detail_body" style="display:none">
+          <!-- V309-inventar-umbau: Inventarkosten + Steuer/Verteilung IMMER sichtbar (wie Sanierung-Card) -->
+          <div class="f">
+            <label>Inventarkosten</label>
+            <div class="iw"><span class="pfx">€</span><input id="moebl" type="text" inputmode="decimal" placeholder="0,00" class="trl" oninput="if(typeof window._syncInventarToMoebl==='function')window._syncInventarToMoebl();calc()"></div>
+            <span class="hint" style="font-size:11px">Beweglich, NICHT in der 15-%-Grenze. Separat über die Inventar-Nutzungsdauer abgeschrieben.</span>
+          </div>
+          <div class="san-tax-options" style="margin-top:8px">
+            <label class="san-tax-checkbox" style="margin:0">
+              <input type="checkbox" id="inv_tax_active" oninput="document.getElementById('moebl_tax_active').checked=this.checked; calc()">
+              <span>In Steuer-Werbungskosten übernehmen</span>
+            </label>
+            <div class="san-tax-years">
+              <label>Verteilung über</label>
+              <select id="inv_tax_years" oninput="document.getElementById('moebl_tax_years').value=this.value; calc()">
+                <option value="5">5 Jahre</option>
+                <option value="8">8 Jahre</option>
+                <option value="10" selected>10 Jahre (Standard)</option>
+                <option value="15">15 Jahre</option>
+              </select>
+            </div>
+          </div>
+          <div id="inv_detail_body" style="display:none;margin-top:12px;padding-top:12px;border-top:1px dashed rgba(201,168,76,.3)">
           <p class="hint" style="margin-bottom:10px">
-            Beweglich, NICHT in der 15-%-Grenze. Separat über die Inventar-Nutzungsdauer abgeschrieben. Detail-Felder summieren sich automatisch.
+            Detaillierte Aufschlüsselung — die Felder summieren sich automatisch und füllen die Inventarkosten oben.
           </p>
 
           <div class="row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
@@ -1306,23 +1333,7 @@ label.dp-required.qc-required::after {
             <span class="kv-v" id="inv_sync_status" style="color:var(--green)">✓ OK</span>
           </div>
 
-          <!-- V292.6.5-moebl-relocation: Steuer-Verteilung für Inventar (war vorher in Sanierung-Card) -->
-          <div class="san-tax-options" style="margin-top:14px;padding-top:12px;border-top:1px dashed rgba(201,168,76,.3)">
-            <label class="san-tax-checkbox">
-              <input type="checkbox" id="inv_tax_active" oninput="document.getElementById('moebl_tax_active').checked=this.checked; calc()">
-              <span>In Steuer-Werbungskosten übernehmen</span>
-            </label>
-            <div class="san-tax-years">
-              <label>Verteilung über</label>
-              <select id="inv_tax_years" oninput="document.getElementById('moebl_tax_years').value=this.value; calc()">
-                <option value="5">5 Jahre</option>
-                <option value="8">8 Jahre</option>
-                <option value="10" selected>10 Jahre (Standard)</option>
-                <option value="15">15 Jahre</option>
-              </select>
-            </div>
-          </div>
-          <!-- V292.6.5 ende moebl-relocation -->
+          <!-- V309: Steuer-Verteilung nach oben verschoben (immer sichtbar) -->
           <div class="kv" style="margin-top:8px"><span><b>Immobilien-KP</b> (= Kaufpreis − Inventar)</span><span class="kv-v c-gold" id="inv_immo_kp">—</span></div>
           <p class="hint" style="margin-top:8px;font-style:normal;font-size:11px">
             Diese Aufschlüsselung wird vom BMF-Rechner gelesen, um Inventar korrekt vom Immobilien-Kaufpreis zu trennen.
@@ -1520,7 +1531,7 @@ label.dp-required.qc-required::after {
 
   <div class="card">
     <div class="ct-row">
-      <div class="ct-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:0">
+      <div class="ct-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:0;width:100%"><!-- V304-bmf-btn-rechts: width:100% damit Button ganz rechts -->
   <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-percent"/></svg></span>AfA-Konfiguration</div>
   <button class="btn btn-outline btn-sm afa-detail-btn" id="btnBmfAdvanced" type="button" onclick="openBMFModal()" title="Pro-Plan · BMF-Kaufpreisaufteilung · 3 Verfahren · KI-GAA · PDF-Anlage Finanzamt" style="margin-left:auto">
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -2763,86 +2774,15 @@ label.dp-required.qc-required::after {
 <div id="toast"></div>
 <div id="pdf-overlay"><div class="pdf-modal"><h3>PDF wird erstellt</h3><p>Bitte warten...</p><div class="pdf-progress"><div class="pdf-progress-fill" id="pdf-progress-fill" style="width:0%"></div></div></div></div>
 
-<!-- V35: BMF-AfA-Rechner Modal -->
-<div id="bmf-overlay" class="bmf-overlay" style="display:none" onclick="if(event.target===this)closeBMFRechner()">
-  <div class="bmf-modal" role="dialog" aria-labelledby="bmf-title">
-    <div class="bmf-header">
-      <div>
-        <h3 id="bmf-title">BMF-AfA-Rechner</h3>
-        <div class="bmf-sub">Kaufpreisaufteilung nach Sachwertverfahren · BMF Fassung Juni 2023</div>
-      </div>
-      <button class="bmf-close" onclick="closeBMFRechner()" type="button" aria-label="Schließen">×</button>
-    </div>
-
-    <div class="bmf-body">
-      <!-- Eingaben -->
-      <div class="bmf-form">
-        <div class="bmf-row">
-          <label>Grundstücksart</label>
-          <select id="bmf_art" onchange="bmfRecalc()">
-            <option value="">– bitte wählen –</option>
-          </select>
-        </div>
-        <div class="bmf-row">
-          <label>Standardstufe (Ausstattung)</label>
-          <select id="bmf_stufe" onchange="bmfRecalc()">
-            <option value="1">1 — sehr einfach</option>
-            <option value="2">2 — einfach</option>
-            <option value="3" selected>3 — mittel (Standard)</option>
-            <option value="4">4 — gehoben</option>
-            <option value="5">5 — sehr gehoben</option>
-          </select>
-        </div>
-        <div class="bmf-grid2">
-          <div class="bmf-row"><label>Kaufpreis (€)</label><input id="bmf_kp" type="text" inputmode="decimal" placeholder="190000" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Anschaffungsjahr</label><input id="bmf_anschj" type="text" inputmode="decimal" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Baujahr <button type="button" class="dp-tip" data-tip-id="tab1.baujahr" tabindex="-1" aria-label="Hilfe zu tab1.baujahr"></button></label><input id="bmf_bj" type="text" inputmode="decimal" placeholder="1994" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Wohnfläche (m²)</label><input id="bmf_wfl" type="text" inputmode="decimal" placeholder="96" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Grundstück (m²)</label><input id="bmf_gst" type="text" inputmode="decimal" placeholder="1570" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>Bodenrichtwert (€/m²)</label><input id="bmf_brw" type="text" inputmode="decimal" placeholder="120" oninput="bmfRecalc()"></div>
-          <div class="bmf-row"><label>MEA Zähler</label><input id="bmf_mea_z" type="text" inputmode="decimal" placeholder="71" oninput="bmfRecalc()"><span class="bmf-hint">bei Wohnungseigentum</span></div>
-          <div class="bmf-row"><label>MEA Nenner</label><input id="bmf_mea_n" type="text" inputmode="decimal" placeholder="1000" oninput="bmfRecalc()"></div>
-        </div>
-
-        <details class="bmf-modern">
-          <summary>Modernisierungs-Punkte (für fiktives Baujahr) — optional</summary>
-          <div class="bmf-modern-grid">
-            <div class="bmf-mod-row"><span>Dacherneuerung inkl. Dämmung</span><select id="bmf_mod_1" onchange="bmfRecalc()"><option value="0">nein</option><option value="2">teilweise</option><option value="4">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Fenster + Außentüren</span><select id="bmf_mod_2" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Leitungssysteme (Strom/Gas/Wasser)</span><select id="bmf_mod_3" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Heizungsanlage</span><select id="bmf_mod_4" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Wärmedämmung Außenwände</span><select id="bmf_mod_5" onchange="bmfRecalc()"><option value="0">nein</option><option value="2">teilweise</option><option value="4">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Bäder</span><select id="bmf_mod_6" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Innenausbau (Decken/Böden/Treppen)</span><select id="bmf_mod_7" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-            <div class="bmf-mod-row"><span>Grundrissgestaltung</span><select id="bmf_mod_8" onchange="bmfRecalc()"><option value="0">nein</option><option value="1">teilweise</option><option value="2">ja</option></select></div>
-          </div>
-          <div class="bmf-mod-sum" id="bmf_mod_sum">Summe: 0 / 20 Punkte · keine Modernisierung</div>
-        </details>
-      </div>
-
-      <!-- Ergebnis -->
-      <div class="bmf-result" id="bmf_result">
-        <div class="bmf-empty">Bitte alle Pflichtfelder ausfüllen — die Berechnung erfolgt automatisch.</div>
-      </div>
-    </div>
-
-    <div class="bmf-footer">
-      <input type="file" id="bmf-xlsx-upload" accept=".xlsx,.xls" style="display:none" onchange="if(this.files[0])_bmfHandleFile(this.files[0]); this.value='';">
-      <button class="btn btn-ghost" onclick="exportBMFExcel()" type="button"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M12 12c0-.621.504-1.125 1.125-1.125M12 12v1.5m0 1.5v-1.5"/></svg> In BMF-Excel eintragen</button>
-      <div style="flex:1"></div>
-      <button class="btn btn-ghost" onclick="closeBMFRechner()" type="button">Abbrechen</button>
-      <button class="btn btn-gold" id="bmf_apply_btn" onclick="applyBMFResult()" type="button" disabled>→ AfA-Satz und Gebäudeanteil übernehmen</button>
-    </div>
-  </div>
-</div>
+<!-- V294-old-bmf-overlay-removed: alter #bmf-overlay BMF-Rechner entfernt (Doppel-IDs) -->
 
 <!-- Libraries via CDN (cached after first load, works offline too) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="js/pdf-anlage-bmf.js?v=292"></script>
-<script src="js/bmf-modal.js?v=293.6.8"></script>
-<script src="js/bmf-modal-v292.js?v=292.6.8"></script><!-- V292-modal-refactor -->
+<script src="js/pdf-anlage-bmf.js?v=310"></script>
+<script src="js/bmf-modal.js?v=306"></script>
+<script src="js/bmf-modal-v292.js?v=297"></script><!-- V292-modal-refactor -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>

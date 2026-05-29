@@ -4,7 +4,6 @@
    Generiert eine 2-seitige PDF-Anlage mit:
    - Adresse, Eckdaten, AK-Aufstellung
    - BMF-Berechnungs-Ergebnisse (3 Verfahren)
-   - Empfohlene Notarvertrag-Klausel zur Aufteilung
    ════════════════════════════════════════════════════════════════ */
 (function(){
 'use strict';
@@ -42,7 +41,7 @@ window.generateBmfPdfAnlage = function(state){
   // Branding (falls vorhanden)
   var brand = (window.DealPilotConfig && DealPilotConfig.branding && typeof DealPilotConfig.branding.get === 'function')
     ? DealPilotConfig.branding.get()
-    : { name: 'DealPilot', firma: 'Junker Immobilien' };
+    : { company: 'Junker Immobilien', name: '', address: '', plz: '', city: '', phone: '', email: '', website: '' };
 
   // ──────────────────────────────────────────────────────────
   // KOPF
@@ -54,6 +53,27 @@ window.generateBmfPdfAnlage = function(state){
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.text('nach BMF-Arbeitshilfe (Fassung Juni 2023)', marginL, y);
+
+  /* V310-pdf-branding: Absenderblock rechtsbuendig (wer das PDF erstellt hat) */
+  (function(){
+    var bx = pageW - marginR;
+    var by = marginT;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(60, 60, 60);
+    if(brand.company) { doc.text(String(brand.company), bx, by, { align: 'right' }); by += 4.2; }
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(110, 110, 110);
+    if(brand.name) { doc.text(String(brand.name) + (brand.role ? ', ' + brand.role : ''), bx, by, { align: 'right' }); by += 3.8; }
+    if(brand.address) { doc.text(String(brand.address), bx, by, { align: 'right' }); by += 3.8; }
+    var loc = ((brand.plz || '') + ' ' + (brand.city || '')).trim();
+    if(loc) { doc.text(loc, bx, by, { align: 'right' }); by += 3.8; }
+    if(brand.phone) { doc.text('Tel: ' + String(brand.phone), bx, by, { align: 'right' }); by += 3.8; }
+    if(brand.email) { doc.text(String(brand.email), bx, by, { align: 'right' }); by += 3.8; }
+    if(brand.website) { doc.text(String(brand.website), bx, by, { align: 'right' }); by += 3.8; }
+    doc.setTextColor(0, 0, 0);
+  })();
   y += 10;
 
   // ──────────────────────────────────────────────────────────
@@ -89,11 +109,60 @@ window.generateBmfPdfAnlage = function(state){
   y = doc.lastAutoTable.finalY + 8;
 
   // ──────────────────────────────────────────────────────────
-  // BERECHNUNGSERGEBNIS
+  // V306-pdf-ak-sektion: ANSCHAFFUNGSKOSTEN (Bemessungsgrundlage)
   // ──────────────────────────────────────────────────────────
+  var ak = inputs.anschaffung || {};
+  if(y > 215){ doc.addPage(); y = marginT; }
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('2. Ergebnis der Kaufpreisaufteilung', marginL, y);
+  doc.text('2. Anschaffungskosten (Bemessungsgrundlage)', marginL, y);
+  y += 5;
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+
+  var akRows = [
+    ['Kaufpreis (laut Notarvertrag):', fmtEur(ak.kp, 2)],
+    ['Grunderwerbsteuer:', fmtEur(ak.grest, 2)],
+    ['Notar- und Gerichtskosten:', fmtEur(ak.notar, 2)],
+    ['Grundbuchamt:', fmtEur(ak.gba, 2)],
+    ['Maklergebühr:', fmtEur(ak.makler, 2)]
+  ];
+  if(ak.ji && ak.ji > 0) akRows.push(['Sonstige Erwerbsnebenkosten:', fmtEur(ak.ji, 2)]);
+  if(ak.fahrt && ak.fahrt > 0) akRows.push(['Fahrtkosten:', fmtEur(ak.fahrt, 2)]);
+  if(ak.verpfl && ak.verpfl > 0) akRows.push(['Verpflegungsmehraufwand:', fmtEur(ak.verpfl, 2)]);
+  if(ak.hotel && ak.hotel > 0) akRows.push(['Unterkunft:', fmtEur(ak.hotel, 2)]);
+  if(ak.gutachten && ak.gutachten > 0) akRows.push(['Wertgutachten / Sachverständige:', fmtEur(ak.gutachten, 2)]);
+  if(ak.anwalt && ak.anwalt > 0) akRows.push(['Anwaltskosten (Kaufvorgang):', fmtEur(ak.anwalt, 2)]);
+  if(ak.sonst && ak.sonst > 0) akRows.push(['Sonstiges (Vermessung, Energieausweis):', fmtEur(ak.sonst, 2)]);
+  if(ak.ahk && ak.ahk > 0) akRows.push(['Anschaffungsnahe Herstellkosten:', fmtEur(ak.ahk, 2)]);
+  akRows.push(['Anschaffungskosten gesamt:', fmtEur(ak.total, 2)]);
+
+  doc.autoTable({
+    startY: y,
+    head: [['Position', 'Betrag']],
+    body: akRows,
+    theme: 'plain',
+    margin: { left: marginL, right: marginR },
+    styles: { fontSize: 9.5, cellPadding: 1.5 },
+    headStyles: { fillColor: [201, 168, 76], textColor: [255, 255, 255], fontStyle: 'bold' },
+    columnStyles: { 0: { cellWidth: 90, fontStyle: 'bold' }, 1: { cellWidth: contentW - 90, halign: 'right' } },
+    didParseCell: function(d){
+      // Summenzeile hervorheben
+      if(d.row.index === akRows.length - 1){
+        d.cell.styles.fontStyle = 'bold';
+        d.cell.styles.fillColor = [245, 240, 225];
+      }
+    }
+  });
+  y = doc.lastAutoTable.finalY + 8;
+
+  // ──────────────────────────────────────────────────────────
+  // BERECHNUNGSERGEBNIS
+  // ──────────────────────────────────────────────────────────
+  if(y > 220){ doc.addPage(); y = marginT; }
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('3. Ergebnis der Kaufpreisaufteilung', marginL, y);
   y += 5;
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
@@ -130,7 +199,7 @@ window.generateBmfPdfAnlage = function(state){
 
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('3. Lineare AfA (§ 7 Abs. 4 EStG)', marginL, y);
+  doc.text('4. Lineare AfA (§ 7 Abs. 4 EStG)', marginL, y);
   y += 5;
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
@@ -159,28 +228,7 @@ window.generateBmfPdfAnlage = function(state){
   });
   y = doc.lastAutoTable.finalY + 10;
 
-  // ──────────────────────────────────────────────────────────
-  // KLAUSEL
-  // ──────────────────────────────────────────────────────────
-  if(y > 240){ doc.addPage(); y = marginT; }
-
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('4. Empfohlene Notarvertrag-Klausel', marginL, y);
-  y += 5;
-  doc.setFontSize(9);
-  doc.setFont('times', 'italic');
-
-  var klauselText =
-    'Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von ' + fmtEur(inputs.kaufpreis, 2) + ' wie folgt auf:\n\n' +
-    '• Auf den Grund und Boden entfallen ' + fmtEur(grundAnteil, 2) + '\n' +
-    '• Auf das Gebäude entfallen ' + fmtEur(afaBasis, 2) + ' (' + fmtPct(gebanteil, 2) + ' des Kaufpreises)\n\n' +
-    'Die Aufteilung wurde nach der BMF-Arbeitshilfe (Fassung Juni 2023) ermittelt und ist sowohl bei der Bewertung ' +
-    'der gesonderten Steuerbilanz als auch zur Berechnung der jährlichen Absetzung für Abnutzung (AfA) heranzuziehen.';
-
-  var splitText = doc.splitTextToSize(klauselText, contentW - 4);
-  doc.text(splitText, marginL + 2, y);
-  y += splitText.length * 4.3;
+  // V307-klausel-removed: Notarvertrag-Klausel-Sektion entfernt (auf Wunsch).
 
   // ──────────────────────────────────────────────────────────
   // FOOTER auf jeder Seite
@@ -192,8 +240,11 @@ window.generateBmfPdfAnlage = function(state){
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(120);
     var footerY = pageH - 12;
+    var _footTxt = (window.DealPilotConfig && DealPilotConfig.branding && typeof DealPilotConfig.branding.formatFooter === 'function')
+      ? DealPilotConfig.branding.formatFooter(brand)
+      : (brand.company || 'Junker Immobilien');
     doc.text(
-      'Erstellt mit DealPilot · BMF-Arbeitshilfe Juni 2023 · ' + (brand.firma || 'Junker Immobilien'),
+      'Erstellt mit DealPilot · BMF-Arbeitshilfe Juni 2023 · ' + _footTxt,
       marginL,
       footerY
     );
