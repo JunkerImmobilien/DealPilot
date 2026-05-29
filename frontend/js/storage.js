@@ -710,6 +710,12 @@ async function renderSaved(opts) {
         '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
         '<span>Won</span>' +
       '</div>' : '';
+    // V321-lost-ribbon: rotes X + "Lose" wenn dealLost=true (analog Won, oben links)
+    var lostRibbon = opts.dealLost ?
+      '<div class="sbc-lost-ribbon" title="Deal als verloren markiert">' +
+        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '<span>Lose</span>' +
+      '</div>' : '';
     // V63.25: Hinweis "DS2 ergänzen" wenn der Plan das Feature hat aber dieses
     // Objekt es noch nicht berechnet hat (= Upgrade-Pfad sichtbar).
     var ds2HintBadge = opts.canDs2 && !opts.showInvestor ?
