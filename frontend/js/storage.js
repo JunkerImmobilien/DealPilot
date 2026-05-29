@@ -1629,7 +1629,9 @@ function exportCSV() {
 async function getAllObjectsData() {
   var objects = [];
 
-  if (Auth.isApiMode()) {
+  // V315-getall-token-check: Vor Login KEIN /objects-Fetch.
+  // Faellt direkt zum localStorage-Pfad durch (else-Zweig unten).
+  if (Auth.isApiMode() && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn()) {
     try {
       var resp = await Auth.apiCall('/objects?limit=500');
       // For each summary, fetch full data
