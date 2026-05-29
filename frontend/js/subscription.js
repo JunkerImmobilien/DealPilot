@@ -29,6 +29,19 @@ var Sub = (function() {
    * In local mode: always returns synthetic Free plan.
    */
   async function getCurrent(forceFresh) {
+    // V314-token-check: Vor Login KEIN /subscription-Fetch → spart 401-Noise.
+    // Synthetisches 'free' zurueckgeben (gleiches Pattern wie Catch-Block Z.111).
+    if (!window.Auth || typeof window.Auth.isLoggedIn !== 'function' || !window.Auth.isLoggedIn()) {
+      if (_cache && _cache._fallback) return _cache;
+      _cache = {
+        plan_id: 'free', plan_name: 'Free',
+        plan_features: {},
+        is_active: true, synthetic: true, _fallback: true,
+        limits: {}, usage: {}
+      };
+      _cacheTime = Date.now();
+      return _cache;
+    }
     // V63.2: Im Dev-Mode (oder wenn Plan-Override gesetzt) → direkt aus DealPilotConfig.pricing lesen
     // (sonst zeigt die Sidebar-Pill den DB-Plan, nicht den lokal überschriebenen)
     if (window.DealPilotConfig && window.DealPilotConfig.pricing) {

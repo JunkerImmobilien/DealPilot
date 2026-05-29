@@ -22,7 +22,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=286">
+<link rel="stylesheet" href="css/style.css?v=323">
 <link rel="stylesheet" href="css/bmf-modal.css?v=293f">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=303"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
@@ -1404,8 +1404,8 @@ label.dp-required.qc-required::after {
     </div>
     </div>
     <div>
-      <div class="card"><div class="ct" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-          <span>Mietentwicklung</span>
+      <div class="card"><div class="ct ct-pro me-header"><!-- V316-miete-header -->
+          <span class="ct-ico"><svg width="22" height="22"><use href="#i-bar"/></svg></span>Mietentwicklung
           <div class="me-mode-toggle" role="tablist" aria-label="Mietentwicklungs-Modus">
             <button type="button" class="me-mode-btn active" id="me-mode-prog" onclick="setMietModus('prog')">Prognose</button>
             <button type="button" class="me-mode-btn" id="me-mode-detail" onclick="setMietModus('detail')">Detail</button>
@@ -2459,7 +2459,7 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
-  <div class="kpi-grid">
+  <div class="kpi-grid kpi-grid-eval"><!-- V318-eval -->
     <div class="kpi"><div class="kpi-label">Bruttomietrendite</div><div class="kpi-val gn" id="kpi-bmy">—</div><div class="kpi-sub">p.a. auf Kaufpreis</div></div>
     <div class="kpi"><div class="kpi-label">Nettomietrendite</div><div class="kpi-val gn" id="kpi-nmy">—</div><div class="kpi-sub">p.a. auf Gesamtinvest</div></div>
     <div class="kpi"><div class="kpi-label">LTV <button type="button" class="dp-tip" data-tip-id="tab5.ltv" tabindex="-1" aria-label="Hilfe zu LTV"></button></div><div class="kpi-val" id="kpi-ltv">—</div><div class="kpi-sub">Fremdfinanzierungsquote</div></div>
@@ -2800,9 +2800,9 @@ label.dp-required.qc-required::after {
   <script src="js/tour-sidebar.js?v=2"></script>
   <script src="js/anteilig.js?v=5"></script>
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
-  <script src="js/anteilig-recalc.js?v=292.6.8"></script>
+  <script src="js/anteilig-recalc.js?v=318"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=292.6.8"></script>
+  <script src="js/calc.js?v=318"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -2834,7 +2834,7 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=291.1"></script>
-<script src="js/storage.js?v=292.6.6"></script>
+<script src="js/storage.js?v=325"></script>
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=166"></script>
 <script src="js/portfolio-strategy.js?v=144"></script>
@@ -2860,7 +2860,7 @@ label.dp-required.qc-required::after {
 <script src="js/financing-pdf.js?v=166"></script>
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=124"></script>
-<script src="js/quick-check.js?v=187"></script>
+<script src="js/quick-check.js?v=317"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/quick-check-tab.js?v=166"></script>
@@ -2876,14 +2876,14 @@ label.dp-required.qc-required::after {
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=124"></script>
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
-<script src="js/deal-action.js?v=197"></script>
+<script src="js/deal-action.js?v=324"></script>
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=124"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=142"></script>
 <script src="js/rnd-bte-katalog.js?v=142"></script>
-<script src="js/rnd-calc.js?v=292.6.8"></script>
+<script src="js/rnd-calc.js?v=318"></script>
 <script src="js/rnd-pdf.js?v=166"></script>
 <script src="js/rnd-docx.js?v=142"></script>
 <script src="js/rnd-ui.js?v=291.1"></script>

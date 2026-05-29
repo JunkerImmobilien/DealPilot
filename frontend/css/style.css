@@ -28784,20 +28784,10 @@ aside.sidebar .sb-card.deal-lost {
   position: relative;
   opacity: 0.65;
 }
+/* V322: altes ::before-VERLOREN-Pseudo deaktiviert. Stattdessen .sbc-lost-ribbon
+   (rotes Ribbon oben links analog Won) am Ende der Datei. */
 aside.sidebar .sb-card.deal-lost::before {
-  content: 'VERLOREN';
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(201,76,76,0.92);
-  color: white;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 3px 7px;
-  border-radius: 4px;
-  z-index: 5;
-  pointer-events: none;
+  content: none !important;
 }
 aside.sidebar .sb-card.deal-lost:not(.active) {
   background: rgba(201,76,76,0.05);
@@ -31155,4 +31145,235 @@ html[data-bg="white"] .auth-disclaimer-hint {
 @media (max-width: 700px) {
   .tax-bestand-overlay-table .tax-bo-addr { display: none; }
   .tax-bestand-overlay-panel { max-width: 100%; }
+}
+
+/* V316-me-header: Mietentwicklung nutzt ct-pro fuer Icon+Typografie, hat aber
+   rechts den Mode-Toggle (Prognose/Detail) statt der ::after-Trennlinie. */
+.ct-pro.me-header::after { display: none !important; }
+.ct-pro.me-header .me-mode-toggle { margin-left: auto !important; }
+
+/* V318-eval-cards: Tab Bewertung KPI-Cards dunkel + farbige Akzent-Border links.
+   Ueberschreibt das helle .kpi aus bmf-modal.css mit hoeherer Spezifitaet via
+   .kpi-grid-eval-Parent. Border-Color reagiert auf .kpi-val-Status (gn/rd/leer).
+   Vorbild: .cf-phase-card (Cashflow-Phase-Cards). */
+/* V318b-specificity: #s6-Prefix gegen aelteren Override '#s6 .kpi-val'. */
+#s6 .kpi-grid-eval .kpi {
+  background: linear-gradient(135deg, #1A1818 0%, #1F1D1D 100%) !important;
+  border: 1px solid rgba(201,168,76,0.20) !important;
+  border-left: 3px solid var(--gold, #C9A84C) !important;
+  border-radius: 12px !important;
+  padding: 18px 20px !important;
+  position: relative;
+  overflow: hidden;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+#s6 .kpi-grid-eval .kpi:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #1F1D1D 0%, #242121 100%) !important;
+}
+#s6 .kpi-grid-eval .kpi:has(.kpi-val.gn) {
+  border-left-color: #2FBE6E !important;
+}
+#s6 .kpi-grid-eval .kpi:has(.kpi-val.rd) {
+  border-left-color: #D55B5B !important;
+}
+#s6 .kpi-grid-eval .kpi-label {
+  color: rgba(255,255,255,0.55) !important;
+  font-size: 10.5px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+#s6 .kpi-grid-eval .kpi-val {
+  color: #fff !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 30px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -.01em !important;
+  font-variant-numeric: tabular-nums;
+  margin-top: 0 !important;
+  opacity: 1 !important;
+}
+#s6 .kpi-grid-eval .kpi-val.gn { color: #2FBE6E !important; }
+#s6 .kpi-grid-eval .kpi-val.rd { color: #D55B5B !important; }
+#s6 .kpi-grid-eval .kpi-sub {
+  color: rgba(255,255,255,0.45) !important;
+  font-size: 11px !important;
+  margin-top: 6px !important;
+  letter-spacing: 0.02em;
+}
+#s6 .kpi-grid-eval .kpi-label .dp-tip {
+  filter: brightness(1.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   V322-sbc-lost-ribbon — Lost-Ribbon oben links + roter Card-Border
+   analog .sb-card.deal-won
+   ═══════════════════════════════════════════════════════════════ */
+aside.sidebar .sb-card .sbc-lost-ribbon {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: auto;
+  background: linear-gradient(135deg, #C8423D, #8E2A26);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 3px 8px 3px 6px;
+  border-radius: 9px 0 9px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(200,66,61,0.50);
+  z-index: 5;
+  pointer-events: none;
+}
+aside.sidebar .sb-card .sbc-lost-ribbon svg { flex-shrink: 0; }
+aside.sidebar .sb-card.has-investor-ribbon .sbc-lost-ribbon {
+  top: -1px;
+  left: -1px;
+}
+/* Roter Border + Glow analog .deal-won */
+aside.sidebar .sb-card.deal-lost {
+  border-color: rgba(200,66,61,0.65) !important;
+  border-width: 2.5px !important;
+}
+aside.sidebar .sb-card.deal-lost:not(.active) {
+  box-shadow:
+    0 6px 22px rgba(0,0,0,0.45),
+    0 0 22px rgba(200,66,61,0.28),
+    inset 0 0 0 1px rgba(200,66,61,0.20) !important;
+}
+aside.sidebar .sb-card.deal-lost.active {
+  border-color: rgba(200,66,61,0.65) !important;
+  border-width: 2.5px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   V322-status-tiles-css — 3 grosse Status-Tiles im Tab Deal-Aktion
+   (Offen=gelb, Gewonnen=gruen, Verloren=rot). Keine Button-Optik.
+   ═══════════════════════════════════════════════════════════════ */
+.da-status-card .da-status-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 14px;
+}
+/* V323-tile-light-colors: Default-Farben fuer helles Tab-Theme */
+.da-status-card .da-status-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px 16px;
+  min-height: 156px;
+  background: rgba(42,39,39,0.02);
+  border: 1.5px solid rgba(201,168,76,0.25);
+  border-radius: 14px;
+  cursor: pointer;
+  color: rgba(42,39,39,0.55);
+  transition: transform .18s ease, border-color .18s ease, background .18s ease,
+              color .18s ease, box-shadow .25s ease;
+  user-select: none;
+}
+.da-status-card .da-status-tile:hover {
+  transform: translateY(-2px);
+  background: rgba(42,39,39,0.04);
+  border-color: rgba(201,168,76,0.55);
+  color: rgba(42,39,39,0.85);
+}
+.da-status-card .da-status-tile .da-stat-ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(42,39,39,0.04);
+  transition: background .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.da-status-card .da-status-tile .da-stat-ico svg {
+  width: 56px;
+  height: 56px;
+}
+.da-status-card .da-status-tile .da-stat-lbl {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Active-Zustand pro Status (gelb/gruen/rot) — mit Glow + farbigem Icon */
+.da-status-card .da-status-tile.active.da-status-open {
+  border-color: #E2B43B;
+  background: rgba(226,180,59,0.10);
+  color: #E2B43B;
+  box-shadow: 0 6px 28px rgba(226,180,59,0.28), inset 0 0 0 1px rgba(226,180,59,0.30);
+}
+.da-status-card .da-status-tile.active.da-status-open .da-stat-ico {
+  background: rgba(226,180,59,0.15);
+  box-shadow: 0 0 0 1px rgba(226,180,59,0.45);
+  animation: daTileGlowGold 1.8s ease-in-out infinite alternate;
+}
+.da-status-card .da-status-tile.active.da-status-won {
+  border-color: #2FBE6E;
+  background: rgba(47,190,110,0.10);
+  color: #2FBE6E;
+  box-shadow: 0 6px 28px rgba(47,190,110,0.28), inset 0 0 0 1px rgba(47,190,110,0.30);
+}
+.da-status-card .da-status-tile.active.da-status-won .da-stat-ico {
+  background: rgba(47,190,110,0.15);
+  box-shadow: 0 0 0 1px rgba(47,190,110,0.45);
+  animation: daTileGlowGreen 1.8s ease-in-out infinite alternate;
+}
+.da-status-card .da-status-tile.active.da-status-lost {
+  border-color: #D55B5B;
+  background: rgba(213,91,91,0.10);
+  color: #D55B5B;
+  box-shadow: 0 6px 28px rgba(213,91,91,0.28), inset 0 0 0 1px rgba(213,91,91,0.30);
+}
+.da-status-card .da-status-tile.active.da-status-lost .da-stat-ico {
+  background: rgba(213,91,91,0.15);
+  box-shadow: 0 0 0 1px rgba(213,91,91,0.45);
+  animation: daTileGlowRed 1.8s ease-in-out infinite alternate;
+}
+
+/* Sanfte Puls-Animation pro Status-Farbe */
+@keyframes daTileGlowGold {
+  from { box-shadow: 0 0 0 1px rgba(226,180,59,0.45), 0 0 14px rgba(226,180,59,0.12); }
+  to   { box-shadow: 0 0 0 1px rgba(226,180,59,0.60), 0 0 22px rgba(226,180,59,0.30); }
+}
+@keyframes daTileGlowGreen {
+  from { box-shadow: 0 0 0 1px rgba(47,190,110,0.45), 0 0 14px rgba(47,190,110,0.12); }
+  to   { box-shadow: 0 0 0 1px rgba(47,190,110,0.60), 0 0 22px rgba(47,190,110,0.30); }
+}
+@keyframes daTileGlowRed {
+  from { box-shadow: 0 0 0 1px rgba(213,91,91,0.45), 0 0 14px rgba(213,91,91,0.12); }
+  to   { box-shadow: 0 0 0 1px rgba(213,91,91,0.60), 0 0 22px rgba(213,91,91,0.30); }
+}
+
+/* Mobile: Tiles untereinander */
+@media (max-width: 640px) {
+  .da-status-card .da-status-tiles {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .da-status-card .da-status-tile {
+    flex-direction: row;
+    justify-content: flex-start;
+    min-height: 88px;
+    padding: 14px 18px;
+    gap: 16px;
+  }
+  .da-status-card .da-status-tile .da-stat-ico {
+    width: 56px;
+    height: 56px;
+  }
+  .da-status-card .da-status-tile .da-stat-ico svg {
+    width: 36px;
+    height: 36px;
+  }
 }

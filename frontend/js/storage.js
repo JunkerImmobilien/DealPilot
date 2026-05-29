@@ -284,6 +284,10 @@ function loadData(d) {
       if (window.DealPilotDealAction && typeof DealPilotDealAction.refreshWonUI === 'function') {
         DealPilotDealAction.refreshWonUI();
       }
+      // V323-trigger-initsync: 3-Tile-Highlight nach Objekt-Load syncen
+      if (window.DealPilotDealAction && typeof DealPilotDealAction.initStatusSync === 'function') {
+        try { DealPilotDealAction.initStatusSync(); } catch(e) {}
+      }
     }
   } catch(e) {}
 }
@@ -619,6 +623,11 @@ function invalidateRenderCache() {
 window.invalidateRenderCache = invalidateRenderCache;
 
 async function renderSaved(opts) {
+  // V314b-rendersaved-token-check: Vor Login KEIN /objects-Fetch.
+  // Stille Rueckkehr — Sidebar bleibt im natuerlichen Zustand.
+  if (!window.Auth || typeof window.Auth.isLoggedIn !== 'function' || !window.Auth.isLoggedIn()) {
+    return;
+  }
   // Debounce: wenn schon ein Aufruf in 80ms ansteht, brechen ab und merken
   opts = opts || {};
   if (_renderTimer && !opts._immediate) {
@@ -704,6 +713,12 @@ async function renderSaved(opts) {
       '<div class="sbc-won-ribbon" title="Zuschlag erhalten — landet im Track Record + Bankexport">' +
         '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
         '<span>Won</span>' +
+      '</div>' : '';
+    // V321-lost-ribbon: rotes X + "Lose" wenn dealLost=true (analog Won, oben links)
+    var lostRibbon = opts.dealLost ?
+      '<div class="sbc-lost-ribbon" title="Deal als verloren markiert">' +
+        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '<span>LOST</span>' + /* V322-lost-text */
       '</div>' : '';
     // V63.25: Hinweis "DS2 ergänzen" wenn der Plan das Feature hat aber dieses
     // Objekt es noch nicht berechnet hat (= Upgrade-Pfad sichtbar).
@@ -843,6 +858,7 @@ async function renderSaved(opts) {
     return '<div class="sb-card' + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '">' +
       investorRibbon +
       wonRibbon +
+      lostRibbon + /* V322-lost-ribbon-html */
       scoreOverlay +
       '<div class="sbc-top">' +
         thumb +
@@ -1060,7 +1076,7 @@ async function renderSaved(opts) {
           showInvestor: showInvestor,         // V63.25 NEU
           canDs2: hasDs2Feature,              // V63.25: Plan kann DS2
           dealWon: !!o.deal_won,              // V104: Won-Flag aus DB
-          dealLost: !!(o.data && o.data._deal_lost), // V248-03: Lost-Flag aus data
+          dealLost: !!o.deal_lost,            // V320-deallost-from-summary: Lost-Flag aus Backend-Summary (vorher .data._deal_lost, aber data ist in list-API nicht da)
 
           photoSrc: o.thumbnail || null,
           hasAi: o.has_ai,
@@ -1229,6 +1245,12 @@ async function dupSaved(k) {
       // V27: Kein "(Kopie)"-Suffix mehr — Marcel will saubere Anzeige.
       // Falls der User unterschiedliche Namen will, kann er sie nach dem Speichern selbst anpassen.
       newData._name = newData._name || obj.name || 'Unbenannt';
+      // V325-dup-clear-seq: alte Objektnummer + _won/_lost-Flags raus, sonst
+      // versucht das Backend mit alter seq_no zu inserten (409 'Resource already exists').
+      delete newData._obj_seq;
+      delete newData._deal_won;
+      delete newData._deal_won_at;
+      delete newData._deal_lost;
       await Auth.apiCall('/objects', {
         method: 'POST',
         body: { data: newData, aiAnalysis: obj.ai_analysis, photos: obj.photos || [] }
@@ -1624,7 +1646,9 @@ function exportCSV() {
 async function getAllObjectsData() {
   var objects = [];
 
-  if (Auth.isApiMode()) {
+  // V315-getall-token-check: Vor Login KEIN /objects-Fetch.
+  // Faellt direkt zum localStorage-Pfad durch (else-Zweig unten).
+  if (Auth.isApiMode() && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn()) {
     try {
       var resp = await Auth.apiCall('/objects?limit=500');
       // For each summary, fetch full data

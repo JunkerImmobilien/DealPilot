@@ -35,6 +35,11 @@
   async function loadAll(force) {
     if (!force && STATE.loaded) return STATE.periods;
     if (STATE.loading) return STATE.loading;
+    // V314-token-check: Vor Login KEIN Fetch (spart Console-401-Noise)
+    if (!window.Auth || typeof window.Auth.isLoggedIn !== 'function' || !window.Auth.isLoggedIn()) {
+      STATE.periods = [];
+      return [];
+    }
     STATE.loading = (async () => {
       try {
         const res = await fetch('/api/v1/tax-periods', { headers: authHeaders() });
