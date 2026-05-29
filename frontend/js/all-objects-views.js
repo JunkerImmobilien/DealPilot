@@ -68,6 +68,10 @@
   async function loadObjects(force) {
     if (_loading) return _objects;
     if (!force && _objects.length > 0) return _objects;
+    // V314-token-check: Vor Login KEIN Fetch (spart Console-401-Noise)
+    if (!window.Auth || typeof window.Auth.isLoggedIn !== 'function' || !window.Auth.isLoggedIn()) {
+      return [];
+    }
     _loading = true;
     try {
       const res = await fetch('/api/v1/objects?limit=500', { headers: authHeaders() });
