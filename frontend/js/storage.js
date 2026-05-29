@@ -1245,6 +1245,12 @@ async function dupSaved(k) {
       // V27: Kein "(Kopie)"-Suffix mehr — Marcel will saubere Anzeige.
       // Falls der User unterschiedliche Namen will, kann er sie nach dem Speichern selbst anpassen.
       newData._name = newData._name || obj.name || 'Unbenannt';
+      // V325-dup-clear-seq: alte Objektnummer + _won/_lost-Flags raus, sonst
+      // versucht das Backend mit alter seq_no zu inserten (409 'Resource already exists').
+      delete newData._obj_seq;
+      delete newData._deal_won;
+      delete newData._deal_won_at;
+      delete newData._deal_lost;
       await Auth.apiCall('/objects', {
         method: 'POST',
         body: { data: newData, aiAnalysis: obj.ai_analysis, photos: obj.photos || [] }
