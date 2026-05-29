@@ -31156,3 +31156,8 @@ html[data-bg="white"] .auth-disclaimer-hint {
   .tax-bestand-overlay-table .tax-bo-addr { display: none; }
   .tax-bestand-overlay-panel { max-width: 100%; }
 }
+
+/* V316-me-header: Mietentwicklung nutzt ct-pro fuer Icon+Typografie, hat aber
+   rechts den Mode-Toggle (Prognose/Detail) statt der ::after-Trennlinie. */
+.ct-pro.me-header::after { display: none !important; }
+.ct-pro.me-header .me-mode-toggle { margin-left: auto !important; }
