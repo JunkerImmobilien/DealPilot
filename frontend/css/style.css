@@ -31166,7 +31166,8 @@ html[data-bg="white"] .auth-disclaimer-hint {
    Ueberschreibt das helle .kpi aus bmf-modal.css mit hoeherer Spezifitaet via
    .kpi-grid-eval-Parent. Border-Color reagiert auf .kpi-val-Status (gn/rd/leer).
    Vorbild: .cf-phase-card (Cashflow-Phase-Cards). */
-.kpi-grid-eval .kpi {
+/* V318b-specificity: #s6-Prefix gegen aelteren Override '#s6 .kpi-val'. */
+#s6 .kpi-grid-eval .kpi {
   background: linear-gradient(135deg, #1A1818 0%, #1F1D1D 100%) !important;
   border: 1px solid rgba(201,168,76,0.20) !important;
   border-left: 3px solid var(--gold, #C9A84C) !important;
@@ -31176,19 +31177,17 @@ html[data-bg="white"] .auth-disclaimer-hint {
   overflow: hidden;
   transition: transform .15s ease, border-color .15s ease, background .15s ease;
 }
-.kpi-grid-eval .kpi:hover {
+#s6 .kpi-grid-eval .kpi:hover {
   transform: translateY(-2px);
   background: linear-gradient(135deg, #1F1D1D 0%, #242121 100%) !important;
 }
-/* Akzent-Border + leichter Bg-Tint je nach KPI-Status (gruen/rot/default=gold) */
-.kpi-grid-eval .kpi:has(.kpi-val.gn) {
+#s6 .kpi-grid-eval .kpi:has(.kpi-val.gn) {
   border-left-color: #2FBE6E !important;
 }
-.kpi-grid-eval .kpi:has(.kpi-val.rd) {
+#s6 .kpi-grid-eval .kpi:has(.kpi-val.rd) {
   border-left-color: #D55B5B !important;
 }
-/* Label-Text + Sub-Text hell auf dunklem Hintergrund */
-.kpi-grid-eval .kpi-label {
+#s6 .kpi-grid-eval .kpi-label {
   color: rgba(255,255,255,0.55) !important;
   font-size: 10.5px !important;
   text-transform: uppercase;
@@ -31196,7 +31195,7 @@ html[data-bg="white"] .auth-disclaimer-hint {
   font-weight: 600;
   margin-bottom: 8px;
 }
-.kpi-grid-eval .kpi-val {
+#s6 .kpi-grid-eval .kpi-val {
   color: #fff !important;
   font-family: 'DM Sans', sans-serif !important;
   font-size: 30px !important;
@@ -31205,16 +31204,16 @@ html[data-bg="white"] .auth-disclaimer-hint {
   letter-spacing: -.01em !important;
   font-variant-numeric: tabular-nums;
   margin-top: 0 !important;
+  opacity: 1 !important;
 }
-.kpi-grid-eval .kpi-val.gn { color: #2FBE6E !important; }
-.kpi-grid-eval .kpi-val.rd { color: #D55B5B !important; }
-.kpi-grid-eval .kpi-sub {
+#s6 .kpi-grid-eval .kpi-val.gn { color: #2FBE6E !important; }
+#s6 .kpi-grid-eval .kpi-val.rd { color: #D55B5B !important; }
+#s6 .kpi-grid-eval .kpi-sub {
   color: rgba(255,255,255,0.45) !important;
   font-size: 11px !important;
   margin-top: 6px !important;
   letter-spacing: 0.02em;
 }
-/* Tooltip-Buttons im dunklen Header sichtbar machen */
-.kpi-grid-eval .kpi-label .dp-tip {
+#s6 .kpi-grid-eval .kpi-label .dp-tip {
   filter: brightness(1.4);
 }
