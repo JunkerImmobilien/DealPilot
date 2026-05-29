@@ -2438,13 +2438,11 @@ window.DealPilotDealAction = (function() {
     //    speichert nur den Won-Flag; das Lost-Flag wird über collectData()
     //    via Hidden-Input mitgenommen, ABER nur wenn ein Save getriggert wird)
     if (status === 'lost' || status === 'open') {
+      // V319-setstatus-save-fix: window.saveCurrentObject/autoSave existieren nicht.
+      // Nutze saveObj() — gleicher Aufruf-Stil wie setDealWon V104.
       try {
-        if (typeof window.saveCurrentObject === 'function') {
-          window.saveCurrentObject();
-        } else if (typeof window.autoSave === 'function') {
-          window.autoSave();
-        }
-      } catch(e) {}
+        if (typeof saveObj === 'function') { saveObj(true); }
+      } catch(e) { console.warn('[V319] save fail:', e); }
     }
 
     // 5) Sidebar-Refresh mit forceFresh damit Badge-State neu aus DB kommt
