@@ -1610,29 +1610,9 @@ function openBMFModal(){
       setTimeout(syncFromTabInvest, 50);
     }
 
-    // Persistenten State laden
-    var objId = _currentObjectId();
-    if(objId){
-      fetch('/api/v1/tax-snapshots/' + objId + '/bmf', { headers: _authHeaders() })
-        .then(function(r){ return r.ok ? r.json() : null; })
-        .then(function(d){
-          if(d && d.bmf_advanced){
-            if(d.bmf_advanced.results){
-              window._lastBmfResults = d.bmf_advanced.results;
-              renderBmfResult(d.bmf_advanced.results, null);
-            }
-            if(d.bmf_advanced.gaa){
-              window._lastGaa = d.bmf_advanced.gaa;
-              var g = d.bmf_advanced.gaa;
-              function fill(id, v){ var e = $(id); if(e && v != null) e.value = v; }
-              fill('gaa_brw', g.brw);
-              fill('gaa_lzs', g.liegenschaftszins);
-              fill('gaa_swf', g.sachwertfaktor);
-            }
-          }
-        })
-        .catch(function(){});
-    }
+    // V312-dead-get-removed: GET /api/v1/tax-snapshots/:id/bmf entfernt
+    // Endpoint existiert nicht (404), Block lief nie erfolgreich.
+    // Siehe Kommentare Z.667 + Z.1428 derselben Datei (bekannt seit V292.2).
   });  // _ensureModalLoaded callback ende
 }
 
