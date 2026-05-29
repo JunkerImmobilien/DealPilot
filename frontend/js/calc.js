@@ -1531,7 +1531,7 @@ function _calcImmediate(){
   st('kpi-cfvst-ezb',fE(cf_op_ezb/12,0,true));
   st('kpi-cfvst-an',fE(cf_op_an/12,0,true));
   st('sc-an',fE(cf_ns_an,0,true));setKpiColor('kpi-cfm',cf_m,0,-200);
-  st('kpi-ltv',fP(ltv,1));setKpiColor('kpi-ltv',100-ltv,15,0);  // <85% green, 85-100 gold, >100 red
+  st('kpi-ltv',fP(ltv,1));setKpiColor('kpi-ltv',100-ltv,20,10);  // V317-ltv-card-aligned: <=80% green, <=90% gold, >90% red (deckt sich mit Bank-Bewertung Z.1215)
   st('kpi-dscr',fN(dscr,2));setKpiColor('kpi-dscr',dscr,1.2,1.0);  // ≥1.2 green, 1.0-1.2 gold, <1.0 red
   st('kpi-fak',fN(fak,1));
   // V63.62: Equity Multiple zeigt ∞ wenn kein EK eingesetzt (Vollfinanzierung)

@@ -1044,7 +1044,7 @@
                       (nmr <= 1 ? 0 : nmr >= 5 ? 100 : lerp(nmr, 1, 5, 0, 100)) * 0.4 +
                       (ekr <= 0 ? 0 : ekr >= 12 ? 100 : lerp(ekr, 0, 12, 0, 100)) * 0.2;
       sCashflow     = cfMon <= -200 ? 0 : cfMon >= 300 ? 100 : lerp(cfMon, -200, 300, 0, 100);
-      sSicherheit   = dscr <= 0.9 ? 0 : dscr >= 1.4 ? 100 : lerp(dscr, 0.9, 1.4, 0, 100);
+      sSicherheit   = dscr <= 0.9 ? 0 : dscr >= 1.5 ? 100 : lerp(dscr, 0.9, 1.5, 0, 100);  // V317-dscr-15: 1.4->1.5, angeglichen an dealscore/pdf/portfolio
       sFinanz       = (ltvPct >= 100 ? 30 : ltvPct >= 90 ? 60 : ltvPct >= 80 ? 80 : 90);
       sBewirt       = bewirtPctNkm <= 18 ? 100 : bewirtPctNkm >= 40 ? 30 : lerp(bewirtPctNkm, 18, 40, 100, 30);
       score = Math.round(
@@ -1116,7 +1116,7 @@
       _setKpi('cf',   (cfMon >= 0 ? '+' : '') + Math.round(cfMon) + ' €',
               (cfMon <= -200 ? 0 : cfMon >= 300 ? 1 : (cfMon + 200) / 500));
       _setKpi('dscr', dscr ? dscr.toFixed(2).replace('.', ',') : '—',
-              (dscr <= 0.9 ? 0 : dscr >= 1.4 ? 1 : (dscr - 0.9) / 0.5));
+              (dscr <= 0.9 ? 0 : dscr >= 1.5 ? 1 : (dscr - 0.9) / 0.6));  // V317-dscr-15
       _setKpi('ltv',  ltvPct.toFixed(0) + '%',
               (ltvPct >= 100 ? 0 : ltvPct >= 90 ? 0.4 : ltvPct >= 80 ? 0.7 : 1));
       _setKpi('bwk',  bewirtPctNkm.toFixed(0) + '%',
