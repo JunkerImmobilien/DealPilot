@@ -284,6 +284,10 @@ function loadData(d) {
       if (window.DealPilotDealAction && typeof DealPilotDealAction.refreshWonUI === 'function') {
         DealPilotDealAction.refreshWonUI();
       }
+      // V323-trigger-initsync: 3-Tile-Highlight nach Objekt-Load syncen
+      if (window.DealPilotDealAction && typeof DealPilotDealAction.initStatusSync === 'function') {
+        try { DealPilotDealAction.initStatusSync(); } catch(e) {}
+      }
     }
   } catch(e) {}
 }

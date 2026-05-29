@@ -232,10 +232,13 @@ window.DealPilotDealAction = (function() {
     }
   }
   function refreshDealWonUI() {
+    // V323-init-status: card-Check unschaedlich machen.
+    // da-won-card existiert in der neuen Tile-UI nicht mehr — fruehzeitiges return
+    // hat verhindert dass updateStatusUI fuer die Tiles aufgerufen wurde.
     var won = isDealWon();
     var card = document.getElementById('da-won-card');
-    if (!card) return;
-    card.classList.toggle('da-won-active', won);
+    // (Won-Card-Code lebt nur wenn card existiert — Tile-Sync laeuft trotzdem)
+    if (card) card.classList.toggle('da-won-active', won);
     var star = document.getElementById('da-won-star');
     if (star) star.innerHTML = won
       ? '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
@@ -250,12 +253,17 @@ window.DealPilotDealAction = (function() {
     if (typeof renderSaved === 'function') {
       try { renderSaved({_immediate: true}); } catch(e) {}
     }
-    // V322-refresh-status-tiles: auch die 3-Tile-Statusanzeige synchronisieren
+    // V322-refresh-status-tiles + V323-init-status:
+    // auch die 3-Tile-Statusanzeige synchronisieren. _deal_lost prio.
     try {
-      var lostEl = document.getElementById('_deal_lost_state');
-      var lost = lostEl ? (lostEl.value === 'true') : false;
-      var status = lost ? 'lost' : (won ? 'won' : 'open');
-      updateStatusUI(status);
+      var lostEl2 = document.getElementById('_deal_lost_state');
+      var lost2 = lostEl2 ? (lostEl2.value === 'true') : false;
+      // Fallback auf _currentObjData wenn Hidden-Input nicht gesetzt
+      if (!lost2 && !won && window._currentObjData) {
+        lost2 = !!window._currentObjData._deal_lost;
+      }
+      var status2 = lost2 ? 'lost' : (won ? 'won' : 'open');
+      updateStatusUI(status2);
     } catch(e) {}
   }
   // ───────────────────── V138: RND-Empfehlung ────────────────────
@@ -509,7 +517,7 @@ window.DealPilotDealAction = (function() {
     return [
       '<div class="da-status-card" id="da-status-card">',
       '  <div class="da-status-head">',
-      '    <div class="da-status-label" id="da-status-label">Status: Offen</div>',
+      '    <div class="da-status-label" id="da-status-label">Status: In Pruefung</div>',
       '    <div class="da-status-sub" id="da-status-sub">Markiere den Deal als gewonnen oder verloren.</div>',
       '  </div>',
       '  <div class="da-status-tiles">',
@@ -2483,12 +2491,12 @@ window.DealPilotDealAction = (function() {
     if (label) {
       label.textContent = status === 'won'  ? 'Status: Gewonnen ✓'
                        : status === 'lost' ? 'Status: Verloren'
-                                           : 'Status: Offen';
+                                           : 'Status: In Pruefung';
     }
     if (sub) {
       sub.textContent = status === 'won'  ? 'Deal als gewonnen markiert.'
                      : status === 'lost' ? 'Deal als verloren markiert.'
-                                         : 'Markiere den Deal als gewonnen oder verloren.';
+                                         : 'Markiere den Deal als gewonnen oder verloren wenn der Zuschlag entschieden ist.';
     }
     // Active-Klassen auf den 3 Buttons
     document.querySelectorAll('.da-status-btn').forEach(function(btn) {
@@ -2527,6 +2535,25 @@ window.DealPilotDealAction = (function() {
     // V252-02b: Drei-Status
     setStatus: setStatus,
     refreshStatusUI: updateStatusUI,
+    // V323-init-status: nach renderTab Status aus Daten ableiten + Tiles syncen
+    initStatusSync: function() {
+      try {
+        var wonEl = document.getElementById('_deal_won_state');
+        var lostEl = document.getElementById('_deal_lost_state');
+        var won = wonEl && wonEl.value === 'true';
+        var lost = lostEl && lostEl.value === 'true';
+        // Fallback: aus _currentObjData wenn Hidden-Inputs noch 'false' sind
+        if (!won && !lost && window._currentObjData) {
+          won = !!window._currentObjData._deal_won;
+          lost = !!window._currentObjData._deal_lost;
+          // Inputs synchronisieren
+          if (wonEl) wonEl.value = won ? 'true' : 'false';
+          if (lostEl) lostEl.value = lost ? 'true' : 'false';
+        }
+        var status = lost ? 'lost' : (won ? 'won' : 'open');
+        updateStatusUI(status);
+      } catch(e) { console.warn('[V323-init-status]', e); }
+    },
     // V104: Deal-Won-Status
     toggleWon: function() { setDealWon(!isDealWon(), true); },
     isWon: isDealWon,
