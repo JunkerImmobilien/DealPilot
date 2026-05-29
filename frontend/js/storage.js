@@ -1065,7 +1065,7 @@ async function renderSaved(opts) {
           showInvestor: showInvestor,         // V63.25 NEU
           canDs2: hasDs2Feature,              // V63.25: Plan kann DS2
           dealWon: !!o.deal_won,              // V104: Won-Flag aus DB
-          dealLost: !!(o.data && o.data._deal_lost), // V248-03: Lost-Flag aus data
+          dealLost: !!o.deal_lost,            // V320-deallost-from-summary: Lost-Flag aus Backend-Summary (vorher .data._deal_lost, aber data ist in list-API nicht da)
 
           photoSrc: o.thumbnail || null,
           hasAi: o.has_ai,

@@ -47,6 +47,8 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
             -- V104: Deal-Status "Zuschlag bekommen" — Filter für Track-Record/Bankexport
             COALESCE((data::jsonb->>'_deal_won')::boolean, false) AS deal_won,
             data::jsonb->>'_deal_won_at' AS deal_won_at,
+            -- V320-deal-lost-summary: deal_lost analog zu deal_won damit Sidebar-Card die VERLOREN-Klasse setzen kann
+            COALESCE((data::jsonb->>'_deal_lost')::boolean, false) AS deal_lost,
             -- V110: LTV mitliefern damit die Sidebar-DSCR-Card per Klick zu LTV toggeln kann
             (data::jsonb->>'_kpis_ltv')::numeric AS ltv,
             CASE
