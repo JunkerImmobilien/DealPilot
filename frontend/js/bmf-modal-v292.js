@@ -512,7 +512,11 @@
             '<span>Boden</span>' +
             '<span class="v292-var-2line"><b>' + _fmtPct(v.boden_pct) + '</b><small>' + _fmtEur(v.boden_eur_vertrag) + '</small></span>' +
           '</div>' +
-          '<div class="v292-var-row v292-var-row-hi"><span>AfA / Jahr</span><b>' + _fmtEur(afa.afa_summe_jahr) + '</b></div>' +
+          /* V297-afa-inventar-split: Gebaeude-AfA als Hauptzeile, Inventar separat (nur >0) */
+          '<div class="v292-var-row v292-var-row-hi"><span>AfA Geb\u00e4ude / Jahr</span><b>' + _fmtEur(afa.afa_jahr) + '</b></div>' +
+          ((afa.inventar_afa_jahr && afa.inventar_afa_jahr > 0)
+            ? '<div class="v292-var-row"><span>AfA Inventar / Jahr</span><b>' + _fmtEur(afa.inventar_afa_jahr) + '</b></div>'
+            : '') +
           '<div class="v292-var-row"><span>Steuerersparnis</span><b>~' + _fmtEur(afa.steuerersparnis_jahr) + '</b></div>' +
           '<div class="v292-var-risk"><small>Risiko Score ' + risk.score + '</small></div>' +
         '</div>';

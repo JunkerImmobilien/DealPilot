@@ -1,3 +1,5 @@
+<!-- V299-pane1-editierbar: 8 Reise/Aufwand-Felder wieder editierbar -->
+<!-- V295-pane1-readonly: alle Pane-1 ak_-Felder readonly -->
 <div class="bmf-modal-overlay bmfmo-overlay" id="bmfOverlay">
   <div class="bmfmo-modal" role="dialog" aria-labelledby="modal-ttl">
 
@@ -34,11 +36,11 @@
         <div class="g2">
           <div class="f">
             <label>Kaufpreis (aus Notarvertrag) <span class="auto" title="Aus Tab Investition · #kp">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_kp" type="text" inputmode="decimal" value="87.569,13" class="trl tr from-tab" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_kp" type="text" inputmode="decimal" value="87.569,13" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
           </div>
           <div class="f">
             <label>Anschaffungsnahe Herstellkosten <span class="badge badge-blue" style="margin-left:6px">§ 6 Abs. 1 Nr. 1a EStG</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_ahk" type="text" inputmode="decimal" value="0,00" class="trl tr" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_ahk" type="text" inputmode="decimal" value="0,00" class="trl tr" oninput="calcAk()" readonly data-auto></div>
             <span class="hint">15-%-Grenze wird im Sanierungs-Modul geprüft</span>
           </div>
         </div>
@@ -48,26 +50,26 @@
         <div class="g3">
           <div class="f">
             <label>Grunderwerbsteuer <span class="auto" title="Aus Tab Investition · #gest_e">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_grest" type="text" inputmode="decimal" value="4.250,00" class="trl tr from-tab" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_grest" type="text" inputmode="decimal" value="4.250,00" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
           </div>
           <div class="f">
             <label>Notar <span class="auto" title="Aus Tab Investition · #notar_e">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_notar" type="text" inputmode="decimal" value="1.492,26" class="trl tr from-tab" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_notar" type="text" inputmode="decimal" value="1.492,26" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
           </div>
           <div class="f">
             <label>Grundbuchamt <span class="auto" title="Aus Tab Investition · #gba_e">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_gba" type="text" inputmode="decimal" value="0,00" class="trl tr from-tab" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_gba" type="text" inputmode="decimal" value="0,00" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
           </div>
         </div>
 
         <div class="g2">
           <div class="f">
             <label>Maklergebühr <span class="auto" title="Aus Tab Investition · #makler_e">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_makler" type="text" inputmode="decimal" value="0,00" class="trl tr from-tab" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_makler" type="text" inputmode="decimal" value="0,00" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
           </div>
           <div class="f">
             <label>Sonstige <span class="auto" title="Aus Tab Investition · #ji_e">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="ak_ji" type="text" inputmode="decimal" value="0,00" class="trl tr from-tab" oninput="calcAk()"></div>
+            <div class="iw"><span class="pfx">€</span><input id="ak_ji" type="text" inputmode="decimal" value="0,00" class="trl tr from-tab" oninput="calcAk()" readonly data-auto></div>
           </div>
         </div>
 
@@ -202,7 +204,15 @@
         <div class="g2">
           <div class="f">
             <label>Monatliche Nettokaltmiete <span class="auto" title="Aus Tab Miete · #nkm">Auto</span></label>
-            <div class="iw"><span class="pfx">€</span><input id="bmf_miete" type="text" inputmode="decimal" class="trl tr from-tab"></div>
+            <!-- V303-miete-checkbox: Auto-Uebernahme umschaltbar -->
+            <label class="san-tax-checkbox" style="margin:0 0 6px;font-size:12px">
+              <input type="checkbox" id="bmf_miete_auto" checked onchange="bmfMieteToggle()">
+              <span>Aus Tab Miete übernehmen (Auto)</span>
+            </label>
+            <div class="iw"><span class="pfx">€</span><input id="bmf_miete" type="text" inputmode="decimal" class="trl tr from-tab" readonly data-auto></div>
+            <div id="bmf_miete_warn" class="hint" style="display:none;margin-top:5px;padding:7px 9px;background:rgba(184,98,92,0.08);border-left:3px solid var(--red,#B8625C);border-radius:4px;font-size:11px;color:var(--ch)">
+              ⚠ Keine Nettokaltmiete übernommen. Bitte die <b>ortsübliche Vergleichsmiete</b> (monatlich) eintragen — sie wird für das Ertragswertverfahren benötigt. Quelle z.B. Mietspiegel der Gemeinde.
+            </div>
           </div>
           <div class="f">
             <label>Liegenschaftszins <span class="hint" style="display:inline;font-style:italic">(optional)</span></label>
