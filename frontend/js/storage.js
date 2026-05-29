@@ -619,6 +619,11 @@ function invalidateRenderCache() {
 window.invalidateRenderCache = invalidateRenderCache;
 
 async function renderSaved(opts) {
+  // V314b-rendersaved-token-check: Vor Login KEIN /objects-Fetch.
+  // Stille Rueckkehr — Sidebar bleibt im natuerlichen Zustand.
+  if (!window.Auth || typeof window.Auth.isLoggedIn !== 'function' || !window.Auth.isLoggedIn()) {
+    return;
+  }
   // Debounce: wenn schon ein Aufruf in 80ms ansteht, brechen ab und merken
   opts = opts || {};
   if (_renderTimer && !opts._immediate) {
