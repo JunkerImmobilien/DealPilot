@@ -2498,8 +2498,10 @@ window.DealPilotDealAction = (function() {
                      : status === 'lost' ? 'Deal als verloren markiert.'
                                          : 'Markiere den Deal als gewonnen oder verloren wenn der Zuschlag entschieden ist.';
     }
-    // Active-Klassen auf den 3 Buttons
-    document.querySelectorAll('.da-status-btn').forEach(function(btn) {
+    // V324-tile-selector: Active-Klassen auf den 3 Tiles (V322 hatte das
+    // Markup auf .da-status-tile umgestellt, alter Selektor .da-status-btn
+    // matchte nichts mehr).
+    document.querySelectorAll('.da-status-tile').forEach(function(btn) {
       var s = btn.getAttribute('data-status');
       if (s === status) btn.classList.add('active');
       else btn.classList.remove('active');
