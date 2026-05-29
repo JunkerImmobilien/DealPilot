@@ -2104,6 +2104,7 @@ function _calcImmediate(){
     // Exakte Monatsschleife. Wirkt nur wenn d1_auszahl oder WU/kaufdat
     // ein Startdatum innerhalb von Jahr 1 ergeben (monthsY1 < 12).
     // ═══════════════════════════════════════════════════════════════
+    var _v353_anteilig_hit = false;  // V353-y1-recompute: markiert ob zy2/ty2 anteilig angepasst wurden
     if (y === 1 && typeof window.DealPilotAnteilig === 'object') {
       try {
         var _v269_startISO = window.DealPilotAnteilig.getFinanzierungStartDate
@@ -2120,12 +2121,14 @@ function _calcImmediate(){
         // V269a2-monthsY1-zero: monthsY1 === 0 separat behandeln
         if (_v269_monthsY1 === 0) {
           // Auszahlung im Folgejahr → keine Zinsen/Tilgung in diesem Jahr
+          _v353_anteilig_hit = true;  // V353
           zy2 = 0;
           ty2 = 0;
           if (typeof bspar_y2 === 'number') bspar_y2 = 0;
           State._v269_y1_months = 0;
           State._v269_y1_startDate = _v269_startISO;
         } else if (_v269_monthsY1 > 0 && _v269_monthsY1 < 12) {
+          _v353_anteilig_hit = true;  // V353
           // CASE: Aussetzung (D1 ist Tilgungsaussetzungsdarlehen)
           if (_d1IsAussetzung) {
             // Aussetzung: nur Zinsen anteilig, keine Tilgung, BSV-Sparrate anteilig
@@ -2166,6 +2169,15 @@ function _calcImmediate(){
       }
     }
 
+    // V353-y1-recompute: Wenn die Anteilig-Schleife zy2/ty2/bspar_y2 angepasst hat,
+    //   die abgeleiteten Werte (oben mit VOLLEM zy2 berechnet) jetzt NEU rechnen.
+    //   Sonst tragen cfop_y/taxEffect_y/cfns_y noch die vollen Jahres-Zinsen.
+    if (_v353_anteilig_hit) {
+      cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
+      cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
+      taxEffect_y     = (cfop_y_operativ - afa) * grenz;
+      cfns_y          = cfop_y - taxEffect_y;
+    }
     var eff_rs = Math.max(0, rs3 - bspar_kum_proj);
     State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:wm_y2/12,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:rs3,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y});
   }
@@ -2206,9 +2218,14 @@ function _calcImmediate(){
 
       // (2) State.kpis.steuer (Year 1) und cf_ns für CF-Vergleich-Heute
       if (State.kpis && State.cfRows[0]) {
-        State.kpis.steuer = State.cfRows[0].tax_y;
-        State.kpis.cf_ns  = State.cfRows[0].cfns_y;
-        State.kpis.cf_m   = (State.cfRows[0].cfop_y || 0) / 12;  // unverändert
+        // V351-cfns-volljahr (Option B): Bewertung/Score immer auf VOLLES Jahr (eingeschwungen),
+        // unabhängig vom WÜ-Monat. Volljahr-cf_ns/cf_m stammen aus dem State (Z.1854, vor hier
+        // gesetzt) — NICHT mit dem Y1-Rumpfjahr (cfRows[0]) überschreiben. Steuer bleibt Y1.
+        var _v351_cfns_full = State.kpis.cf_ns;   // Volljahr CF n.St. (volle Miete+Zins+Tilg+Steuer)
+        var _v351_cfm_full  = State.kpis.cf_m;    // Volljahr CF v.St. / 12
+        State.kpis.steuer = State.cfRows[0].tax_y;   // Y1-Steuer (anteilig) — für Steuerverlauf/-modul
+        State.kpis.cf_ns  = _v351_cfns_full;          // Volljahr statt cfRows[0].cfns_y
+        State.kpis.cf_m   = _v351_cfm_full;           // Volljahr statt cfRows[0].cfop_y/12
       }
 
       // (3) State.kpis.ster_ezb (Year bindj) für CF-Vergleich-Ende-Zinsbindung
@@ -2672,7 +2689,10 @@ function renderCFCalc(mode){
     });
   }
   st('cr-cfvst', fE(cf_vst, 0, true));
-  st('cr-st', (data.steuer < 0 ? '+' : '–') + fE(Math.abs(data.steuer)));
+  // V352-cfbox-steuer: Steuer aus angezeigter Differenz ableiten, damit die Box aufgeht
+  //   (cf_vst und data.cf_ns sind Volljahr; K.steuer wäre Y1-anteilig -> Widerspruch).
+  var _v352_st = cf_vst - data.cf_ns;            // >0 = Belastung, <0 = Erstattung
+  st('cr-st', (_v352_st < 0 ? '+' : '–') + fE(Math.abs(_v352_st)));
   // V118: cr-cfns mit Farbklasse — rot bei Verlust, gold bei Überschuss
   var _crCfnsEl = document.getElementById('cr-cfns');
   if (_crCfnsEl) {
@@ -3253,7 +3273,7 @@ function renderPhaseTable() {
   setF('ph-tilg-now', -_tilgOrBsparNow);
   setF('ph-cfvst-now', nowVals.cfvst);
   setF('ph-cfvstm-now', nowVals.cfvst / 12);
-  setF('ph-st-now', -nowVals.ster);
+  setF('ph-st-now', (nowVals.cfns - nowVals.cfvst));  /* V352-phase-steuer: aus Differenz, kein Y1-Mismatch */
   setF('ph-cfns-now', nowVals.cfns);
   setF('ph-cfnsm-now', nowVals.cfns / 12);
   setP('ph-bmr-now', nowVals.bmy);
@@ -3273,7 +3293,7 @@ function renderPhaseTable() {
   setF('ph-tilg-ezb', -_tilgOrBsparEzb);
   setF('ph-cfvst-ezb', ezbVals.cfvst);
   setF('ph-cfvstm-ezb', ezbVals.cfvst / 12);
-  setF('ph-st-ezb', -ezbVals.ster);
+  setF('ph-st-ezb', (ezbVals.cfns - ezbVals.cfvst));  /* V352-phase-steuer */
   setF('ph-cfns-ezb', ezbVals.cfns);
   setF('ph-cfnsm-ezb', ezbVals.cfns / 12);
   setP('ph-bmr-ezb', ezbVals.bmy);
@@ -3292,7 +3312,7 @@ function renderPhaseTable() {
   setF('ph-tilg-an', -anVals.tilg);
   setF('ph-cfvst-an', anVals.cfvst);
   setF('ph-cfvstm-an', anVals.cfvst / 12);
-  setF('ph-st-an', -anVals.ster);
+  setF('ph-st-an', (anVals.cfns - anVals.cfvst));  /* V352-phase-steuer */
   setF('ph-cfns-an', anVals.cfns);
   setF('ph-cfnsm-an', anVals.cfns / 12);
   setP('ph-bmr-an', anVals.bmy);

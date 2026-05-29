@@ -244,6 +244,27 @@ function loadData(d) {
   if (typeof renderDealScore2 === 'function') {
     try { renderDealScore2(); } catch(e) { console.warn('renderDealScore2 nach loadData:', e.message); }
   }
+  // V351-load-cache-refresh: Score-/KPI-Cache aus dem frisch berechneten State auffrischen,
+  // damit die Sidebar (gecacht) = geladene Bewertung (live) ist — ohne manuelles Speichern.
+  try {
+    var _o351 = window._currentObjData;
+    if (_o351 && typeof State !== 'undefined' && State.kpis) {
+      _o351._kpis_bmy  = State.kpis.bmy;
+      _o351._kpis_cf_ns = State.kpis.cf_ns;
+      _o351._kpis_dscr = State.kpis.dscr;
+      _o351._kpis_ltv  = State.kpis.ltv;
+      if (typeof DealScore !== 'undefined' && typeof DealScore.compute === 'function') {
+        var _dp351 = DealScore.compute();
+        if (_dp351 && _dp351.score) _o351._dealpilot_score = Math.round(_dp351.score);
+      }
+      if (window.DealScore2 && typeof window._buildDeal2FromState === 'function' && _o351._ds2_computed) {
+        var _ds351 = window.DealScore2.compute(window._buildDeal2FromState());
+        if (_ds351 && _ds351.score) _o351._ds2_score = Math.round(_ds351.score);
+      }
+    }
+    // Leiser renderSaved(): aktive Karte rechnet live neu (storage.js Z.1011+)
+    if (typeof renderSaved === 'function') renderSaved();
+  } catch(_e351) { console.warn('[V351] load-cache-refresh:', _e351.message); }
   if (window._aiText) {
     // V25: Wenn _aiText valides JSON ist (Server-KI), beide Blöcke rehydrieren
     var parsedAI = null;
