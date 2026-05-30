@@ -102,8 +102,9 @@
   }
 
   /** Cascade: d1_auszahl > WU > kaufdat. Returns "YYYY-MM-01" oder null. */
-  function getFinanzierungStartDate() {
-    var auszahlEl = document.getElementById('d1_auszahl');
+  function getFinanzierungStartDate(fieldId) {  /* V354-param-fieldid */
+    var _fid = fieldId || 'd1_auszahl';
+    var auszahlEl = document.getElementById(_fid);
     if (auszahlEl && auszahlEl.value) {
       var parsed = parseD1Auszahl(auszahlEl.value);
       if (parsed && parsed.month >= 1 && parsed.month <= 12) {
@@ -114,8 +115,8 @@
   }
 
   /** Year-Int für Finanzierungs-Start mit Safeguards. */
-  function getFinanzierungBaseYear() {
-    var rd = getFinanzierungStartDate();
+  function getFinanzierungBaseYear(fieldId) {  /* V354-param-fieldid */
+    var rd = getFinanzierungStartDate(fieldId);
     if (!rd) return null;
     var y = parseInt(rd.split('-')[0], 10);
     var nowY = new Date().getFullYear();

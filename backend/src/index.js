@@ -27,6 +27,7 @@ const rndRequestRoutes = require('./routes/rndRequest');  // V186: RND-Anfrage-E
 const adminRoutes = require('./routes/admin');  // V194: Admin-Dashboard
 const creditsRoutes = require('./routes/credits');  // V197: KI-Credit-Käufe
 const resellerRoutes = require('./routes/reseller');  // V200: Reseller-Anfragen
+const avmRoutes = require('./routes/avm');  // V326: AVM-Integration
 
 const app = express();
 
@@ -106,6 +107,7 @@ app.use('/api/v1/tax-periods', require('./routes/taxPeriods'));  // V259-02: Ste
 // V194: Admin-Dashboard
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/credits', creditsRoutes);  // V197
+app.use('/api/v1/avm', avmRoutes);  // V326: AVM-Integration
 app.use('/api/v1', resellerRoutes);  // V200
 app.set('db', pool);
 

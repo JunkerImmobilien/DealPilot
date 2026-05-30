@@ -1,0 +1,5159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealPilot Quick-Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   APP DESIGN TOKENS (aus echter DealPilot-App)
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --gold:     #C9A84C;
+  --gold-l:   #E2C97E;
+  --gold-2:   #E8C964;
+  --gold-3:   #9a7f33;
+  --gold-d:   #B89638;
+  --gold-bg:  #FAF5E8;
+  --gold-dim: rgba(201,168,76,0.12);
+  --gold-dim2:rgba(201,168,76,0.22);
+  --gold-soft:#f5ecd0;
+  --ch:       #2A2727;
+  --ch2:      #3D3A3A;
+  --ch3:      #5a5350;
+  --surface:  #F8F6F1;
+  --surface2: #F0ECE4;
+  --white:    #fff;
+  --border:   #E0DBD3;
+  --border-g: rgba(201,168,76,0.30);
+  --text:     #2A2727;
+  --muted:    #7A7370;
+  --muted2:   #9A9390;
+  --green:    #3FA56C;
+  --green-strong: #2A7E54;
+  --green-bg: #EAF7F0;
+  --green-dim:rgba(63,165,108,0.12);
+  --red:      #B8625C;
+  --red-bg:   #FBF1F0;
+  --blue:     #185FA5;
+  --blue-bg:  #E8F0FA;
+  --r:        8px;
+  --r2:       12px;
+  --shadow:   0 2px 12px rgba(42,39,39,0.08);
+  --shadow-md:0 4px 24px rgba(42,39,39,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Goldenes Particle-Universe Background (dezent, weiß durchscheinend) */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(201,168,76,0.10), transparent 35%),
+    radial-gradient(circle at 88% 80%, rgba(201,168,76,0.06), transparent 40%);
+}
+#particle-canvas {
+  position: fixed; inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.5rem 1.2rem 4rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE HEADER
+   ═══════════════════════════════════════════════════════════════ */
+.page-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.page-head-icon {
+  width: 44px; height: 44px;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border-radius: var(--r);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.page-head-title-block { flex: 1; min-width: 0; }
+.page-head-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 600;
+  color: var(--ch);
+}
+.page-head-sub {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCORE BLOCK (V16 — DealPilot-Header-Style: Charcoal + Goldlinie)
+   Spiegelt 1:1 .hdr aus der echten DealPilot-App
+   ═══════════════════════════════════════════════════════════════ */
+.score-perspective {
+  margin-bottom: 18px;
+  position: sticky;
+  top: 12px;
+  z-index: 100;
+}
+.score-block {
+  background: var(--ch);
+  border-radius: var(--r2, 12px);
+  border: none;
+  border-bottom: 2.5px solid var(--gold);
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(42,39,39,.18);
+  position: relative;
+}
+.score-block::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  z-index: 4;
+}
+
+.sb-header {
+  padding: 0.7rem 1.5rem 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+  position: relative; z-index: 2;
+}
+.sb-issue {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(201,168,76,0.5);
+}
+.sb-issue strong { color: var(--gold); font-weight: 600; }
+.sb-status {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.82rem;
+  color: rgba(201,168,76,0.5);
+}
+.sb-status[data-stage="live"] { color: var(--gold); font-style: normal; }
+.sb-status[data-stage="solid"] { color: #5ED99E; font-style: normal; }
+
+.sb-hero {
+  padding: 1.3rem 1.5rem 1.1rem;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  position: relative; z-index: 2;
+}
+.sb-hero .sb-mega { order: 1; }
+.sb-hero .sb-left { order: 2; }
+@media (max-width: 800px) {
+  .sb-hero { grid-template-columns: 1fr; }
+  .sb-hero .sb-mega { order: 1; }
+  .sb-hero .sb-left { order: 2; }
+}
+
+.sb-left { min-width: 0; }
+.sb-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: var(--gold);
+  margin: 0 0 0.4rem;
+}
+.sb-title .gold-l { color: #fff; font-weight: 500; }
+.sb-tagline {
+  font-size: 0.8rem;
+  color: rgba(201,168,76,0.55);
+  font-style: italic;
+  margin: 0 0 1rem;
+  max-width: 480px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+.subs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.45rem;
+  padding: 0.5rem;
+  background: rgba(0,0,0,0.20);
+  border-radius: 12px;
+}
+@media (max-width: 600px) { .subs { grid-template-columns: repeat(3, 1fr); } }
+.sub {
+  background: var(--ch2);
+  border: 1px solid rgba(201,168,76,0.12);
+  border-radius: 10px;
+  padding: 0.5rem 0.4rem 0.6rem;
+  text-align: center;
+  transition: all 0.3s;
+}
+.sub[data-tier="good"] {
+  border-color: rgba(94,217,158,0.30);
+  background: linear-gradient(180deg, rgba(94,217,158,0.10) 0%, rgba(94,217,158,0.03) 50%, var(--ch2) 100%);
+}
+.sub[data-tier="mid"]  {
+  border-color: rgba(201,168,76,0.35);
+  background: linear-gradient(180deg, rgba(201,168,76,0.12) 0%, rgba(201,168,76,0.04) 50%, var(--ch2) 100%);
+}
+.sub[data-tier="bad"]  {
+  border-color: rgba(213,91,91,0.30);
+  background: linear-gradient(180deg, rgba(213,91,91,0.10) 0%, rgba(213,91,91,0.03) 50%, var(--ch2) 100%);
+}
+.sub-ic { display: none; }
+.sub-l {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 0.1rem;
+}
+.sub-v {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gold);
+  line-height: 1;
+}
+.sub[data-tier="good"] .sub-v { color: #5ED99E; }
+.sub[data-tier="mid"]  .sub-v { color: var(--gold); }
+.sub[data-tier="bad"]  .sub-v { color: #FF9999; }
+.sub-tiny {
+  font-size: 0.55rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 0.1rem;
+}
+
+.sb-mega {
+  position: relative;
+  width: 170px; height: 170px;
+  margin: 0 auto;
+}
+.sb-mega svg { width: 100%; height: 100%; transform: rotate(-90deg); filter: drop-shadow(0 4px 12px rgba(201,168,76,0.30)); }
+.sb-mega .bg { stroke: rgba(255,255,255,0.06); fill: none; }
+.sb-mega .ring { stroke: var(--gold); fill: none; stroke-linecap: round; transition: stroke-dasharray 0.9s cubic-bezier(0.34, 1.56, 0.64, 1), stroke 0.4s; }
+.sb-mega-text {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.sb-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.5rem;
+  font-weight: 600;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: 0;
+}
+.sb-num-max {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.5);
+  margin-top: 0.25rem;
+  font-weight: 600;
+}
+.sb-tier {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--gold);
+  margin-top: 0.3rem;
+  display: none;
+}
+.sb-mega[data-stage="live"] .sb-tier,
+.sb-mega[data-stage="solid"] .sb-tier { display: block; }
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+  padding: 0.8rem 1.5rem 1rem;
+  border-top: 1px solid rgba(201,168,76,0.12);
+  background: rgba(0,0,0,0.18);
+  position: relative; z-index: 2;
+}
+@media (max-width: 900px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 520px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+.kpi {
+  background: var(--ch2);
+  border: 1px solid rgba(201,168,76,0.12);
+  border-radius: 8px;
+  padding: 0.5rem 0.35rem;
+  text-align: center;
+  transition: all 0.3s;
+}
+.kpi.good { border-color: rgba(94,217,158,0.30); background: linear-gradient(180deg, rgba(94,217,158,0.10) 0%, rgba(94,217,158,0.03) 50%, var(--ch2) 100%); }
+.kpi.mid  { border-color: rgba(201,168,76,0.35); background: linear-gradient(180deg, rgba(201,168,76,0.12) 0%, rgba(201,168,76,0.04) 50%, var(--ch2) 100%); }
+.kpi.bad  { border-color: rgba(213,91,91,0.30); background: linear-gradient(180deg, rgba(213,91,91,0.10) 0%, rgba(213,91,91,0.03) 50%, var(--ch2) 100%); }
+.kpi .l {
+  font-size: 0.58rem; color: rgba(255,255,255,0.55);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  font-weight: 600; margin-bottom: 0.15rem;
+}
+.kpi .v {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; font-weight: 700;
+  color: var(--gold); letter-spacing: 0; line-height: 1.1;
+}
+.kpi.good .v { color: #5ED99E; }
+.kpi.mid  .v { color: var(--gold); }
+.kpi.bad  .v { color: #FF8A8A; }
+.kpi .h {
+  font-size: 0.55rem; color: rgba(255,255,255,0.4);
+  font-style: italic; margin-top: 0.08rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACTION BAR (App-Design, in Container mit weißer Card)
+   ═══════════════════════════════════════════════════════════════ */
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--white);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(42,39,39,0.04);
+}
+.actions-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--gold-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-right: 6px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ch);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+  position: relative;
+}
+.btn:hover:not([disabled]) {
+  border-color: var(--gold);
+  color: var(--gold-3);
+  background: rgba(201,168,76,0.04);
+}
+.btn.primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold-d));
+  color: #fff;
+  border-color: transparent;
+}
+.btn.primary:hover {
+  background: linear-gradient(135deg, var(--gold-l), var(--gold));
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(201,168,76,0.40);
+}
+.btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--surface2);
+  color: var(--muted2);
+}
+.btn.ready {
+  border-color: var(--gold);
+  animation: btn-ready-pulse 2s ease-in-out infinite;
+}
+@keyframes btn-ready-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.4); }
+  50%      { box-shadow: 0 0 0 5px rgba(201,168,76,0); }
+}
+.btn .ico { display: inline-flex; align-items: center; }
+.btn .tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ch);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+  z-index: 50;
+}
+.btn[disabled]:hover .tip { opacity: 1; }
+.coming-soon-tag {
+  font-size: 9px;
+  font-weight: 700;
+  background: rgba(201,168,76,0.15);
+  color: var(--gold-3);
+  padding: 2px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  margin-left: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CARDS (App-Style — wie Investition-Tab)
+   ═══════════════════════════════════════════════════════════════ */
+.card {
+  background: var(--white);
+  border-radius: 10px;
+  border: 1px solid rgba(201,168,76,0.18);
+  padding: 20px 24px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(42,39,39,0.04);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  border-color: rgba(201,168,76,0.35);
+  box-shadow: 0 2px 8px rgba(42,39,39,0.06);
+}
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--gold-3);
+  font-weight: 700;
+  margin-bottom: 18px;
+  padding: 0 0 0 12px;
+  position: relative;
+}
+.card-title::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 2px; bottom: 2px;
+  width: 3px;
+  background: var(--gold);
+  border-radius: 2px;
+}
+.card-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-soft), transparent);
+  margin-left: 8px;
+}
+.card-title-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  background: linear-gradient(135deg, #fdf9ef, #f5ecd0);
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 5px;
+  color: var(--gold);
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(201,168,76,0.10);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FORM
+   ═══════════════════════════════════════════════════════════════ */
+.row { display: grid; gap: 12px; margin-bottom: 10px; }
+.row-2 { grid-template-columns: 1fr 1fr; }
+.row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.row-adr { grid-template-columns: 3fr 1fr; }
+@media (min-width: 700px) {
+  .row-adr { grid-template-columns: 3fr 1fr 1fr 3fr; }
+  .row-adr-2 { grid-template-columns: 1fr 3fr; }
+}
+@media (max-width: 700px) {
+  .row-3, .row-4 { grid-template-columns: 1fr 1fr; }
+}
+
+.field { position: relative; display: flex; flex-direction: column; gap: 4px; }
+.field label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ch);
+}
+.field label.req::after {
+  content: ' *';
+  color: var(--red);
+  font-weight: 700;
+}
+.field input,
+.field select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid rgba(42,39,39,0.12);
+  border-radius: 6px;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  background: #fff;
+  color: var(--text);
+  transition: all 0.15s;
+}
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+}
+.field input::placeholder { color: rgba(42,39,39,0.30); }
+.field.has-source input,
+.field.has-source select {
+  border-color: var(--gold);
+  background: #FDF9EF;
+}
+.field .hint {
+  font-size: 11px;
+  color: rgba(42,39,39,0.50);
+  font-style: italic;
+  margin-top: 2px;
+}
+.field .source {
+  display: none;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  background: rgba(201,168,76,0.12);
+  color: var(--gold-3);
+  border-radius: 3px;
+  width: fit-content;
+  margin-top: 3px;
+}
+.field.has-source .source { display: inline-block; }
+
+/* LTV Buttons */
+.ltv-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.ltv-l {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold-3);
+  margin-right: 6px;
+}
+.ltv-btn {
+  padding: 6px 14px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--ch);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.ltv-btn:hover { border-color: var(--gold); color: var(--gold-3); }
+.ltv-btn.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-d));
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Bewirtschaftung Derived Display */
+.bewirt-derived {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--gold-bg);
+  border: 1px solid rgba(201,168,76,0.20);
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--ch2);
+}
+.bewirt-derived strong { color: var(--gold-3); }
+.bewirt-derived .nul-pill { color: var(--red); font-weight: 600; }
+.bewirt-derived .ul-pill { color: var(--green); font-weight: 600; }
+
+/* Foto-Drop */
+.photo-drop {
+  border: 2px dashed rgba(42,39,39,0.20);
+  background: rgba(201,168,76,0.04);
+  border-radius: 8px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.photo-drop:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.08);
+}
+.photo-drop-l {
+  font-size: 13px;
+  color: var(--ch3);
+}
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.photo-thumb {
+  position: relative;
+  aspect-ratio: 4/3;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+}
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.photo-thumb-rm {
+  position: absolute;
+  top: 4px; right: 4px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px; height: 22px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AVM CARDS (PriceHubble Result) — App-Design
+   ═══════════════════════════════════════════════════════════════ */
+.avm-card {
+  background: linear-gradient(135deg, #FDFCF8 0%, #FAF5E8 100%);
+  border: 1.5px solid rgba(201,168,76,0.45);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  position: relative;
+  box-shadow: 0 4px 18px rgba(201,168,76,0.10);
+}
+.avm-card.avm-card-spr {
+  /* Subtile visuelle Unterscheidung — Sprengnetter etwas wärmer im Goldton */
+  background: linear-gradient(135deg, #FDFCF8 0%, #F7EFD8 100%);
+}
+.avm-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold-d), var(--gold-2), var(--gold-d));
+  border-radius: 12px 12px 0 0;
+}
+/* ─── Sprengnetter-Extra-Sektionen ─────────────────── */
+.spr-section {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 8px;
+}
+.spr-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.spr-section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ch);
+}
+.spr-section-badge {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.spr-section-body {
+  font-size: 13.5px;
+  color: var(--ch2);
+  line-height: 1.5;
+}
+.spr-grid-2, .spr-grid-3, .spr-grid-4 {
+  display: grid;
+  gap: 8px;
+}
+.spr-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.spr-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.spr-grid-4 { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.spr-mini {
+  background: var(--surface, #F8F6F1);
+  border: 1px solid var(--border, rgba(0,0,0,0.06));
+  border-radius: 6px;
+  padding: 8px 10px;
+  text-align: center;
+}
+.spr-mini.good { border-color: rgba(63,165,108,0.35); background: rgba(63,165,108,0.06); }
+.spr-mini.bad  { border-color: rgba(184,98,92,0.35);  background: rgba(184,98,92,0.06); }
+.spr-mini-l {
+  font-size: 11px;
+  color: var(--ch2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+.spr-mini-v {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ch);
+}
+.spr-range-bar {
+  position: relative;
+  height: 38px;
+  background: linear-gradient(90deg, rgba(184,98,92,0.20) 0%, rgba(201,168,76,0.20) 50%, rgba(63,165,108,0.20) 100%);
+  border-radius: 6px;
+  margin: 8px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ch2);
+}
+.spr-range-marker {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 3px;
+  background: var(--ch);
+  border-radius: 2px;
+  z-index: 2;
+}
+.spr-range-marker::before {
+  content: '▼';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--ch);
+}
+.spr-range-label {
+  font-size: 12.5px;
+  color: var(--ch2);
+  margin-top: 4px;
+}
+/* ─── V2: Spannen-Auswahl Cells ─── */
+.spr-section-hero { background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(250,245,232,0.6) 100%); }
+.spr-section-sub { font-size: 12px; color: var(--ch2); font-weight: 500; }
+.spr-range-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 6px;
+}
+.spr-range-cell {
+  background: var(--surface, #F8F6F1);
+  border: 1.5px solid var(--border, rgba(0,0,0,0.10));
+  border-radius: 10px;
+  padding: 14px 12px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 180ms ease;
+  position: relative;
+}
+.spr-range-cell:hover {
+  border-color: rgba(201,168,76,0.55);
+  background: rgba(201,168,76,0.06);
+  transform: translateY(-1px);
+}
+.spr-range-cell.is-selected {
+  background: linear-gradient(135deg, rgba(201,168,76,0.18) 0%, rgba(201,168,76,0.10) 100%);
+  border-color: var(--gold-2, #C9A84C);
+  box-shadow: 0 4px 14px rgba(201,168,76,0.25);
+}
+.spr-range-cell.is-selected::after {
+  content: '✓';
+  position: absolute; top: 6px; right: 9px;
+  color: var(--gold-d, #9a7f33);
+  font-weight: 700;
+  font-size: 14px;
+}
+.spr-range-label-top {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--ch2);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.spr-range-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ch);
+  line-height: 1.1;
+}
+.spr-range-sub {
+  font-size: 12px;
+  color: var(--ch2);
+  margin-top: 2px;
+}
+.spr-range-diff {
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.spr-range-btn {
+  margin-top: 10px;
+  padding: 5px 12px;
+  font-size: 12px;
+  background: transparent;
+  border: 1px solid var(--border, rgba(0,0,0,0.15));
+  border-radius: 999px;
+  color: var(--ch);
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.spr-range-cell.is-selected .spr-range-btn {
+  background: var(--gold-d, #9a7f33);
+  color: #fff;
+  border-color: var(--gold-d, #9a7f33);
+  font-weight: 600;
+}
+.spr-range-cell:not(.is-selected) .spr-range-btn:hover {
+  background: var(--ch);
+  color: #fff;
+  border-color: var(--ch);
+}
+/* ─── Abgeleitete Kennzahlen Liste ─── */
+.spr-derived-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.spr-derived-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  cursor: help;
+}
+.spr-derived-row:last-child { border-bottom: none; }
+.spr-derived-label {
+  font-size: 13.5px;
+  color: var(--ch);
+}
+.spr-derived-val {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ch);
+  letter-spacing: 0.5px;
+}
+.spr-derived-info {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 1px solid var(--ch2);
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 12px;
+  text-align: center;
+  color: var(--ch2);
+  margin-left: 4px;
+  vertical-align: middle;
+  cursor: help;
+}
+/* ─── Action-Buttons ─── */
+.avm-action-btn.primary {
+  background: linear-gradient(135deg, var(--gold-2, #C9A84C), var(--gold-d, #9a7f33));
+  color: #fff;
+  border: none;
+  font-weight: 600;
+}
+.avm-action-btn.primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* ─── KI-Marktcheck-Block ─── */
+.ai-marktcheck {
+  background: linear-gradient(135deg, #FAF5E8 0%, #F7EFD8 100%);
+  border: 1px solid rgba(201,168,76,0.30);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+.ai-marktcheck-head {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ch);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ai-marktcheck-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ai-marktcheck-cell {
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(201,168,76,0.20);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.ai-marktcheck-cell-l {
+  font-size: 11px;
+  color: var(--ch2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+.ai-marktcheck-cell-v {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ch);
+}
+.ai-marktcheck-verdict {
+  font-size: 13.5px;
+  color: var(--ch);
+  line-height: 1.5;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.5);
+  border-left: 3px solid var(--gold-d, #9a7f33);
+  border-radius: 4px;
+}
+
+@media (max-width: 720px) {
+  .spr-range-grid { grid-template-columns: 1fr; }
+  .spr-compact-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── V3: Kompakte Sprengnetter-Card ─── */
+.avm-card.avm-card-compact {
+  padding: 14px 16px;
+}
+.avm-card.avm-card-compact .avm-head {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+}
+.avm-card.avm-card-compact .avm-head-logo {
+  width: 28px; height: 28px;
+}
+.avm-card.avm-card-compact .avm-head-title {
+  font-size: 17px;
+}
+.avm-card.avm-card-compact .avm-head-conf {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.spr-compact-section {
+  margin-bottom: 10px;
+}
+.spr-compact-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.spr-compact-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ch);
+}
+.spr-fp-badge {
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.spr-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.spr-compact-cell {
+  background: var(--surface, #F8F6F1);
+  border: 1.5px solid var(--border, rgba(0,0,0,0.10));
+  border-radius: 8px;
+  padding: 8px 8px 7px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 140ms ease;
+  position: relative;
+}
+.spr-compact-cell:hover {
+  border-color: rgba(201,168,76,0.55);
+  background: rgba(201,168,76,0.06);
+}
+.spr-compact-cell.is-selected {
+  background: linear-gradient(135deg, rgba(201,168,76,0.20) 0%, rgba(201,168,76,0.10) 100%);
+  border-color: var(--gold-2, #C9A84C);
+  box-shadow: 0 2px 8px rgba(201,168,76,0.22);
+}
+.spr-compact-cell.is-selected::after {
+  content: '✓';
+  position: absolute;
+  top: 3px; right: 6px;
+  color: var(--gold-d, #9a7f33);
+  font-weight: 700;
+  font-size: 12px;
+}
+.spr-compact-cell-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--ch2);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.spr-compact-cell-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ch);
+  line-height: 1.05;
+}
+.spr-compact-cell-sub {
+  font-size: 10.5px;
+  color: var(--ch2);
+  margin-top: 2px;
+}
+.spr-compact-diff {
+  margin-top: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-align: right;
+}
+.spr-compact-disclaimer {
+  font-size: 10.5px;
+  color: var(--ch2);
+  text-align: center;
+  padding: 6px 4px 0;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  margin-top: 6px;
+}
+.avm-card.avm-card-compact .avm-actions {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+.avm-card.avm-card-compact .avm-action-btn {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+/* ═══ V4: Einheitliche AVM-Card ═══ */
+.avm4-card {
+  background: linear-gradient(135deg, #FDFCF8 0%, #FAF5E8 100%);
+  border: 1.5px solid rgba(201,168,76,0.45);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  position: relative;
+  box-shadow: 0 4px 18px rgba(201,168,76,0.12);
+}
+.avm4-card.is-spr { background: linear-gradient(135deg, #FDFCF8 0%, #F7EFD8 100%); }
+.avm4-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold-d, #9a7f33), var(--gold-2, #C9A84C), var(--gold-d, #9a7f33));
+  border-radius: 14px 14px 0 0;
+}
+.avm4-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.avm4-provider {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ch);
+}
+.avm4-conf {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.05);
+  color: var(--ch2);
+}
+.avm4-conf.good { background: rgba(63,165,108,0.15); color: #2E7D4F; }
+.avm4-conf.mid  { background: rgba(229,189,83,0.18); color: #9a7f33; }
+.avm4-conf.low  { background: rgba(184,98,92,0.15);  color: #B8625C; }
+
+.avm4-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.avm4-values {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  flex: 1;
+}
+.avm4-val-block { min-width: 0; }
+.avm4-val-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--ch2);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.avm4-val-big {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 27px;
+  font-weight: 700;
+  color: var(--ch);
+  line-height: 1.05;
+}
+.avm4-val-cur { font-size: 17px; font-weight: 600; opacity: 0.7; }
+.avm4-val-sub {
+  font-size: 12px;
+  color: var(--ch2);
+  margin-top: 3px;
+  line-height: 1.35;
+}
+.avm4-fp {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+/* Score-Ring */
+.avm4-score {
+  position: relative;
+  width: 64px; height: 64px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.avm4-score-svg { width: 64px; height: 64px; display: block; }
+.avm4-score-num {
+  position: absolute;
+  top: 19px; left: 0; right: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+.avm4-score-lbl {
+  position: absolute;
+  bottom: 11px; left: 0; right: 0;
+  font-size: 8.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ch2);
+}
+/* Lage-Scores (PriceHubble) */
+.avm4-lage {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.avm4-lage-item {
+  flex: 1;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 7px;
+  padding: 7px 9px;
+  text-align: center;
+}
+.avm4-lage-l {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ch2);
+  margin-bottom: 2px;
+}
+.avm4-lage-v {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ch);
+  font-family: 'Cormorant Garamond', serif;
+}
+.avm4-lage-v small { font-size: 10px; opacity: 0.6; font-weight: 500; }
+/* Applied-Hinweis */
+.avm4-applied {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: #2E7D4F;
+  background: rgba(63,165,108,0.08);
+  border: 1px solid rgba(63,165,108,0.22);
+  border-radius: 7px;
+  padding: 7px 11px;
+}
+.avm4-applied.is-custom {
+  color: #9a7f33;
+  background: rgba(229,189,83,0.10);
+  border-color: rgba(229,189,83,0.30);
+}
+.avm4-link {
+  background: none;
+  border: none;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  font-weight: 600;
+}
+/* Spanne (aufklappbar) */
+.avm4-span {
+  margin-top: 10px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.avm4-span summary {
+  cursor: pointer;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ch2);
+  background: rgba(0,0,0,0.02);
+  list-style: none;
+  user-select: none;
+}
+.avm4-span summary::-webkit-details-marker { display: none; }
+.avm4-span summary::before { content: '▸ '; }
+.avm4-span[open] summary::before { content: '▾ '; }
+.avm4-span-body { padding: 10px 12px 12px; }
+.avm4-span-group { margin-bottom: 10px; }
+.avm4-span-group:last-child { margin-bottom: 0; }
+.avm4-span-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ch);
+  margin-bottom: 5px;
+}
+.avm4-span-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.avm4-span-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 7px 4px;
+  border: 1.5px solid rgba(0,0,0,0.10);
+  border-radius: 7px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 130ms ease;
+}
+.avm4-span-btn:hover { border-color: rgba(201,168,76,0.5); }
+.avm4-span-btn.sel {
+  border-color: var(--gold-2, #C9A84C);
+  background: linear-gradient(135deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08));
+}
+.avm4-span-btn-l { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--ch2); font-weight: 600; }
+.avm4-span-btn-v { font-size: 13px; font-weight: 700; color: var(--ch); }
+.avm4-disclaimer {
+  font-size: 10px;
+  color: var(--ch2);
+  text-align: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  line-height: 1.4;
+}
+.avm4-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.avm4-btn-ghost {
+  background: none;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 7px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  color: var(--ch2);
+  cursor: pointer;
+  transition: all 130ms ease;
+}
+.avm4-btn-ghost:hover { background: rgba(0,0,0,0.04); color: var(--ch); }
+
+/* Mobile */
+
+/* ═══ V5: Kompakte Einheits-Card ═══ */
+.avm5-card {
+  background: linear-gradient(135deg, #FDFCF8 0%, #FAF5E8 100%);
+  border: 1px solid rgba(201,168,76,0.40);
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.avm5-card.is-spr { background: linear-gradient(135deg, #FDFCF8 0%, #F7EFD8 100%); }
+.avm5-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.avm5-provider {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ch);
+}
+.avm5-conf {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.05);
+  color: var(--ch2);
+}
+.avm5-conf.good { background: rgba(63,165,108,0.15); color: #2E7D4F; }
+.avm5-conf.mid  { background: rgba(229,189,83,0.18); color: #9a7f33; }
+.avm5-conf.low  { background: rgba(184,98,92,0.15);  color: #B8625C; }
+.avm5-x {
+  margin-left: auto;
+  background: none; border: none;
+  color: var(--ch2);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 4px;
+}
+.avm5-x:hover { background: rgba(0,0,0,0.06); color: var(--ch); }
+.avm5-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.avm5-cell-l {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--ch2);
+  font-weight: 600;
+}
+.avm5-cell-v {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--ch);
+  line-height: 1.1;
+}
+.avm5-cell-s {
+  font-size: 11px;
+  color: var(--ch2);
+  margin-top: 1px;
+}
+.avm5-lage {
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--ch);
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(201,168,76,0.16);
+  border-radius: 6px;
+  padding: 5px 9px;
+}
+.avm5-applied {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #2E7D4F;
+}
+.avm5-applied.custom { color: #9a7f33; }
+.avm5-link {
+  background: none; border: none;
+  color: inherit; text-decoration: underline;
+  cursor: pointer; font-size: inherit; padding: 0; font-weight: 600;
+}
+.avm5-span {
+  margin-top: 8px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  padding-top: 6px;
+}
+.avm5-span summary {
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ch2);
+  list-style: none;
+  user-select: none;
+}
+.avm5-span summary::-webkit-details-marker { display: none; }
+.avm5-span summary::before { content: '▸ '; }
+.avm5-span[open] summary::before { content: '▾ '; }
+.avm5-span-body { padding-top: 8px; }
+.avm5-span-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+}
+.avm5-span-label { color: var(--ch2); font-weight: 600; white-space: nowrap; }
+.avm5-span-text { color: var(--ch); }
+.avm5-span-pick {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-top: 4px;
+}
+.avm5-pick {
+  padding: 4px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ch2);
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.avm5-pick:hover { border-color: rgba(201,168,76,0.5); color: var(--ch); }
+.avm5-pick.sel {
+  border-color: var(--gold-2, #C9A84C);
+  background: linear-gradient(135deg, rgba(201,168,76,0.20), rgba(201,168,76,0.08));
+  color: var(--ch);
+}
+.avm5-foot {
+  font-size: 9.5px;
+  color: var(--ch2);
+  text-align: center;
+  margin-top: 8px;
+  opacity: 0.75;
+}
+@media (max-width: 480px) {
+  .avm5-grid { grid-template-columns: 1fr; gap: 8px; }
+  .avm5-cell-v { font-size: 19px; }
+}
+
+
+@media (max-width: 560px) {
+  .avm4-main { flex-direction: column; align-items: stretch; }
+  .avm4-score { align-self: center; }
+  .avm4-values { grid-template-columns: 1fr; gap: 10px; }
+  .avm4-val-big { font-size: 24px; }
+  .avm4-lage { flex-wrap: wrap; }
+  .avm4-lage-item { min-width: calc(50% - 4px); }
+}
+
+
+
+.avm-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(201,168,76,0.20);
+}
+.avm-head-logo {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-d));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+.avm-head-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ch);
+  flex: 1;
+}
+.avm-head-conf {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.avm-head-conf.good { background: var(--green-bg); color: var(--green); }
+.avm-head-conf.mid  { background: var(--gold-dim); color: var(--gold-3); }
+
+.avm-main {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+@media (max-width: 700px) { .avm-main { grid-template-columns: 1fr; } }
+
+.avm-hero {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  position: relative;
+}
+.avm-hero-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.avm-hero-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--gold-3);
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.avm-hero-spread {
+  font-size: 12px;
+  color: var(--ch3);
+  margin-bottom: 10px;
+}
+.avm-hero-spread strong { color: var(--ch); font-weight: 600; }
+.avm-disclaimer {
+  font-size: 11px;
+  color: var(--ch3);
+  background: var(--surface);
+  border-left: 3px solid var(--gold);
+  padding: 6px 10px;
+  margin-top: 10px;
+  border-radius: 0 4px 4px 0;
+  line-height: 1.45;
+  font-style: italic;
+}
+
+.avm-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.avm-stat {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.avm-stat-l {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.avm-stat-v {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ch);
+  line-height: 1.1;
+}
+.avm-stat-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+/* Aktions-Buttons unten in AVM-Card */
+.avm-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.avm-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  background: #fff;
+  border: 1px solid rgba(201,168,76,0.40);
+  border-radius: 5px;
+  color: var(--gold-3);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.avm-action-btn:hover {
+  background: var(--gold-bg);
+  border-color: var(--gold);
+}
+.avm-action-btn .ico { display: inline-flex; }
+
+.avm-info {
+  background: rgba(42,39,39,0.04);
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.avm-info-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--gold-3);
+}
+.avm-info-toggle .chev { transition: transform 0.3s; }
+.avm-info.open .avm-info-toggle .chev { transform: rotate(180deg); }
+.avm-info-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, padding 0.3s, margin 0.3s;
+}
+.avm-info.open .avm-info-body {
+  max-height: 800px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.avm-info-body p {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: var(--ch2);
+  line-height: 1.55;
+}
+.avm-info-body p:last-child { margin: 0; }
+.avm-info-body strong { color: var(--gold-3); }
+
+/* ═══════════════════════════════════════════════════════════════
+   KI-EMPFEHLUNGS-CARD — App-Design (cremig, dezent)
+   ═══════════════════════════════════════════════════════════════ */
+.ai-card {
+  background: linear-gradient(135deg, #FDFCF8 0%, #FAF5E8 100%);
+  border: 1.5px solid rgba(201,168,76,0.45);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 12px;
+  position: relative;
+  display: none;
+  box-shadow: 0 4px 24px rgba(201,168,76,0.12);
+}
+.ai-card.visible { display: block; }
+.ai-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold-d), var(--gold-2), var(--gold-d));
+  border-radius: 12px 12px 0 0;
+}
+.ai-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(201,168,76,0.20);
+}
+.ai-head-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-d));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.ai-head-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ch);
+  flex: 1;
+  margin: 0;
+}
+.ai-head-source {
+  font-size: 10.5px;
+  padding: 3px 9px;
+  background: var(--gold-dim);
+  color: var(--gold-3);
+  border-radius: 100px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.ai-verdict-big {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--green-bg);
+  border: 1px solid rgba(63,165,108,0.30);
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+.ai-verdict-big.warn { background: #FFF6E0; border-color: rgba(229,189,83,0.40); }
+.ai-verdict-big.bad  { background: var(--red-bg); border-color: rgba(184,98,92,0.40); }
+.ai-verdict-emoji { font-size: 2rem; }
+.ai-verdict-text {
+  flex: 1;
+  min-width: 0;
+}
+.ai-verdict-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--green-strong);
+  line-height: 1.1;
+}
+.ai-verdict-big.warn .ai-verdict-headline { color: var(--gold-3); }
+.ai-verdict-big.bad  .ai-verdict-headline { color: #8B3F3A; }
+.ai-verdict-sub {
+  font-size: 12px;
+  color: var(--ch3);
+  margin-top: 3px;
+}
+
+/* Verhandlungs-Empfehlung */
+.ai-negotiate {
+  background: #fff;
+  border: 1px solid rgba(201,168,76,0.30);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+}
+.ai-negotiate-l {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold-3);
+  margin-bottom: 6px;
+}
+.ai-negotiate-v {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ch);
+  line-height: 1.3;
+}
+.ai-negotiate-v strong { color: var(--gold-3); }
+
+.ai-points {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+@media (max-width: 700px) { .ai-points { grid-template-columns: 1fr; } }
+.ai-points-col {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+}
+.ai-points-col h4 {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+.ai-points-col.pro h4 { color: var(--green); }
+.ai-points-col.con h4 { color: var(--red); }
+.ai-points-col ul { list-style: none; padding: 0; margin: 0; }
+.ai-points-col li {
+  font-size: 12.5px;
+  color: var(--ch2);
+  margin-bottom: 6px;
+  padding-left: 18px;
+  position: relative;
+  line-height: 1.5;
+}
+.ai-points-col li:last-child { margin-bottom: 0; }
+.ai-points-col.pro li::before {
+  content: '✓';
+  position: absolute; left: 0;
+  color: var(--green); font-weight: 700;
+}
+.ai-points-col.con li::before {
+  content: '⚠';
+  position: absolute; left: 0;
+  color: var(--red);
+}
+.ai-points-col li strong { color: var(--ch); font-weight: 600; }
+
+.ai-opinion {
+  background: #fff;
+  border-left: 4px solid var(--gold);
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  color: var(--ch2);
+  line-height: 1.6;
+}
+.ai-opinion-l {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold-3);
+  margin-bottom: 6px;
+}
+.ai-opinion strong { color: var(--ch); font-weight: 600; }
+
+.ai-real-btn {
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: var(--white);
+  border: 1px dashed rgba(201,168,76,0.50);
+  border-radius: 8px;
+  color: var(--gold-3);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.15s;
+}
+.ai-real-btn:hover {
+  border-style: solid;
+  border-color: var(--gold);
+  background: var(--gold-bg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SAVE BUTTON (App-Stil — weiß mit Border, kein dicker Pill)
+   ═══════════════════════════════════════════════════════════════ */
+.save-zone {
+  margin: 24px 0 12px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  background: var(--white);
+  border: 1px solid rgba(201,168,76,0.22);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(42,39,39,0.06);
+}
+.save-zone-info {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-style: italic;
+  flex: 1;
+  text-align: left;
+}
+.save-zone-info strong { color: var(--gold-3); font-style: normal; }
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--white);
+  color: var(--ch);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.save-btn:hover:not([disabled]) {
+  border-color: var(--gold);
+  color: var(--gold-3);
+  background: rgba(201,168,76,0.04);
+}
+.save-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--surface2);
+  color: var(--muted2);
+}
+.save-btn.ready {
+  border-color: var(--gold);
+  background: var(--gold-bg);
+  color: var(--gold-3);
+}
+.save-btn .ico { display: inline-flex; }
+.save-hint {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODAL (Transfer-Dialog + API-Key)
+   ═══════════════════════════════════════════════════════════════ */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(42,39,39,0.55);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  overflow-y: auto;
+}
+.modal-backdrop.show { opacity: 1; pointer-events: auto; }
+.modal {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 24px 28px;
+  max-width: 620px;
+  width: 100%;
+  margin: auto;
+  transform: scale(0.96) translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  border: 1px solid rgba(201,168,76,0.30);
+}
+.modal-backdrop.show .modal { transform: scale(1) translateY(0); }
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-head-ic {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold-d));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+}
+.modal-head h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ch);
+  margin: 0;
+  flex: 1;
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.modal-close:hover { color: var(--ch); background: var(--surface); }
+
+.modal-body {
+  font-size: 13px;
+  color: var(--ch2);
+  line-height: 1.55;
+}
+.modal-body p {
+  margin: 0 0 12px;
+}
+
+/* Transfer-Liste */
+.transfer-section {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed rgba(201,168,76,0.20);
+}
+.transfer-section:last-of-type { border-bottom: none; padding-bottom: 0; }
+.transfer-section-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-3);
+  margin-bottom: 8px;
+}
+.transfer-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.transfer-item:hover { background: var(--gold-bg); }
+.transfer-item input[type="checkbox"] {
+  margin: 2px 0 0 0;
+  width: 16px; height: 16px;
+  cursor: pointer;
+  accent-color: var(--gold);
+  flex-shrink: 0;
+}
+.transfer-item-body { flex: 1; min-width: 0; }
+.transfer-item-l {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ch);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.transfer-item-source {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  background: var(--gold-dim);
+  color: var(--gold-3);
+  border-radius: 3px;
+}
+.transfer-item-v {
+  font-size: 12px;
+  color: var(--ch3);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.transfer-item-v strong { color: var(--ch); font-weight: 600; }
+.transfer-warning {
+  font-size: 11px;
+  color: var(--red);
+  background: var(--red-bg);
+  border: 1px solid rgba(184,98,92,0.20);
+  border-radius: 5px;
+  padding: 6px 8px;
+  margin-top: 6px;
+  line-height: 1.45;
+}
+.transfer-warning strong { font-weight: 700; }
+
+.transfer-toggle-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--ch3);
+  padding: 6px 10px;
+  background: var(--gold-bg);
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+.transfer-toggle-all label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.transfer-toggle-all input { accent-color: var(--gold); cursor: pointer; }
+
+.modal-foot {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.modal input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  margin-bottom: 12px;
+}
+.modal input[type="password"]:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ch);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid rgba(201,168,76,0.30);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.20);
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1500;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  width: 8px; height: 8px;
+  pointer-events: none;
+  z-index: 2000;
+  animation: confetti-fall 2.5s ease-out forwards;
+}
+@keyframes confetti-fall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(80vh) rotate(720deg); opacity: 0; }
+}
+
+/* V6-STYLES ─────────────────────────────────────────────────────────
+   Quick-Check AVM V6: Spannen-Konfig, Kombi-Auswahl, Credit-Modal,
+   Settings-Modal, PDF-Style Spanne, sequenzieller Progress
+   ─────────────────────────────────────────────────────────────────── */
+
+/* ── Spannen-Segmented-Control (Aktions-Leiste + Settings) ── */
+.qc6-seg {
+  display: inline-flex;
+  border: 1px solid rgba(201,168,76,0.45);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(248,246,241,0.6);
+}
+.qc6-seg button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 7px 14px;
+  font: 600 13px/1 'DM Sans', system-ui, sans-serif;
+  color: var(--ch2, #6b6660);
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+  white-space: nowrap;
+}
+.qc6-seg button + button { border-left: 1px solid rgba(201,168,76,0.25); }
+.qc6-seg button:hover { color: var(--ch, #2A2727); }
+.qc6-seg button.sel {
+  background: var(--gold, #C9A84C);
+  color: #fff;
+}
+.qc6-seg-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.qc6-seg-lbl {
+  font: 600 12px/1 'DM Sans', system-ui, sans-serif;
+  color: var(--ch2, #6b6660);
+  letter-spacing: .02em;
+}
+
+/* ── Abfrage-Kombi-Auswahl ── */
+.qc6-combo {
+  appearance: none;
+  border: 1px solid rgba(42,39,39,0.18);
+  border-radius: 10px;
+  padding: 8px 30px 8px 12px;
+  font: 500 13px/1.2 'DM Sans', system-ui, sans-serif;
+  color: var(--ch, #2A2727);
+  background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%239a7f33' stroke-width='1.5' stroke-linecap='round'/></svg>") no-repeat right 10px center;
+  cursor: pointer;
+  min-width: 220px;
+}
+.qc6-combo:focus { outline: none; border-color: var(--gold, #C9A84C); }
+.qc6-run {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Generisches V6-Modal (Credit + Settings) ── */
+.qc6-modal {
+  position: fixed; inset: 0;
+  display: none;
+  align-items: center; justify-content: center;
+  background: rgba(20,18,16,0.55);
+  z-index: 9000;
+  padding: 16px;
+}
+.qc6-modal.show { display: flex; }
+.qc6-modal-box {
+  background: var(--surface, #F8F6F1);
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 16px;
+  width: min(440px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.28);
+}
+.qc6-modal-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 18px 20px 12px;
+}
+.qc6-modal-title {
+  font: 600 20px/1.1 'Cormorant Garamond', Georgia, serif;
+  color: var(--ch, #2A2727);
+  letter-spacing: .01em;
+  flex: 1;
+}
+.qc6-modal-x {
+  appearance: none; border: 0; background: transparent;
+  font-size: 18px; color: var(--ch2, #6b6660); cursor: pointer;
+  line-height: 1; padding: 4px;
+}
+.qc6-modal-body { padding: 4px 20px 8px; }
+.qc6-modal-foot {
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding: 14px 20px 18px;
+}
+
+/* ── Credit-Aufschlüsselung ── */
+.qc6-credit-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(42,39,39,0.08);
+}
+.qc6-credit-row:last-of-type { border-bottom: 0; }
+.qc6-credit-name {
+  display: flex; align-items: center; gap: 8px;
+  font: 500 14px/1.2 'DM Sans', system-ui, sans-serif;
+  color: var(--ch, #2A2727);
+}
+.qc6-credit-sub {
+  font: 400 12px/1.2 'DM Sans', system-ui, sans-serif;
+  color: var(--ch2, #6b6660);
+}
+.qc6-credit-cost {
+  font: 600 14px/1 'DM Sans', system-ui, sans-serif;
+  color: var(--gold-3, #9a7f33);
+  white-space: nowrap;
+}
+.qc6-credit-total {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 10px; padding-top: 12px;
+  border-top: 2px solid rgba(201,168,76,0.4);
+}
+.qc6-credit-total .lbl {
+  font: 600 15px/1 'DM Sans', system-ui, sans-serif; color: var(--ch, #2A2727);
+}
+.qc6-credit-total .val {
+  font: 700 18px/1 'Cormorant Garamond', Georgia, serif; color: var(--gold-3, #9a7f33);
+}
+.qc6-credit-note {
+  margin-top: 10px;
+  font: 400 12px/1.4 'DM Sans', system-ui, sans-serif;
+  color: var(--ch2, #6b6660);
+}
+
+/* ── Settings-Modal Inhalt ── */
+.qc6-set-section { margin: 6px 0 14px; }
+.qc6-set-label {
+  font: 600 13px/1.2 'DM Sans', system-ui, sans-serif;
+  color: var(--ch, #2A2727);
+  margin-bottom: 8px;
+}
+.qc6-set-hint {
+  font: 400 12px/1.4 'DM Sans', system-ui, sans-serif;
+  color: var(--ch2, #6b6660);
+  margin-top: 6px;
+}
+
+/* ── Sequenzieller Progress ── */
+.qc6-progress {
+  display: none;
+  margin: 12px 0;
+  padding: 14px 16px;
+  background: rgba(248,246,241,0.9);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 12px;
+}
+.qc6-progress.show { display: block; }
+.qc6-prog-step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0;
+  font: 500 13px/1.2 'DM Sans', system-ui, sans-serif;
+  color: var(--ch2, #6b6660);
+}
+.qc6-prog-step .dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid rgba(201,168,76,0.4);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0;
+}
+.qc6-prog-step.run { color: var(--ch, #2A2727); }
+.qc6-prog-step.run .dot {
+  border-color: var(--gold, #C9A84C);
+  border-top-color: transparent;
+  animation: qc6spin .8s linear infinite;
+}
+.qc6-prog-step.done { color: var(--ch, #2A2727); }
+.qc6-prog-step.done .dot {
+  background: var(--gold, #C9A84C); border-color: var(--gold, #C9A84C); color: #fff;
+}
+@keyframes qc6spin { to { transform: rotate(360deg); } }
+
+/* ── PDF-Style Spannen-Block in der Card (statt Pick-Buttons) ── */
+.avm6-spanblock {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: var(--surface, #F8F6F1);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 12px;
+}
+.avm6-spanrow + .avm6-spanrow { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(42,39,39,0.08); }
+.avm6-span-title {
+  font: 600 13px/1.2 'DM Sans', system-ui, sans-serif;
+  color: var(--ch, #2A2727);
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.avm6-span-vals {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+}
+.avm6-span-main {
+  font: 700 19px/1 'Cormorant Garamond', Georgia, serif;
+  color: var(--gold-3, #9a7f33);
+}
+.avm6-span-range {
+  font: 500 13px/1.2 'DM Sans', system-ui, sans-serif;
+  color: var(--ch2, #6b6660);
+}
+.avm6-span-sqm {
+  font: 400 12px/1.2 'DM Sans', system-ui, sans-serif;
+  color: var(--ch2, #6b6660);
+  margin-top: 3px;
+}
+.avm6-applied-tag {
+  font: 600 11px/1 'DM Sans', system-ui, sans-serif;
+  color: var(--gold-3, #9a7f33);
+  text-transform: uppercase; letter-spacing: .04em;
+  background: rgba(201,168,76,0.14);
+  padding: 3px 7px; border-radius: 6px;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .qc6-combo { min-width: 0; width: 100%; }
+  .qc6-seg-wrap { width: 100%; }
+  .qc6-seg { flex: 1; }
+  .qc6-seg button { flex: 1; padding: 8px 6px; }
+}
+/* END-V6-STYLES */
+
+
+/* V7-STYLES ─────────────────────────────────────────────────────────
+   Multi-Select Abruf-Quellen, Pflichtfeld-Block, Card-Typo-Fix
+   ─────────────────────────────────────────────────────────────────── */
+
+/* ── Multi-Select Checkbox-Gruppe (Abruf-Quellen) ── */
+.qc7-sources {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.qc7-src {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1px solid rgba(42,39,39,0.18);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  font: 500 13px/1 'DM Sans', system-ui, sans-serif;
+  color: var(--ch, #2A2727);
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  user-select: none;
+}
+.qc7-src:hover { border-color: rgba(201,168,76,0.55); }
+.qc7-src input { display: none; }
+.qc7-src .qc7-box {
+  width: 18px; height: 18px; flex-shrink: 0;
+  border: 2px solid rgba(42,39,39,0.28);
+  border-radius: 5px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background .15s ease, border-color .15s ease;
+}
+.qc7-src .qc7-box svg { width: 12px; height: 12px; opacity: 0; transition: opacity .12s ease; }
+.qc7-src.on {
+  border-color: var(--gold, #C9A84C);
+  background: rgba(201,168,76,0.10);
+  box-shadow: 0 1px 0 rgba(201,168,76,0.25);
+}
+.qc7-src.on .qc7-box { background: var(--gold, #C9A84C); border-color: var(--gold, #C9A84C); }
+.qc7-src.on .qc7-box svg { opacity: 1; }
+.qc7-src .qc7-ic { display: inline-flex; color: var(--gold-3, #9a7f33); }
+.qc7-src.disabled { opacity: .45; cursor: not-allowed; }
+
+/* ── Credit-Modal: getrennte Credit-Typen ── */
+.qc7-credit-badge {
+  display: inline-block;
+  font: 600 11px/1 'DM Sans', system-ui, sans-serif;
+  padding: 4px 8px; border-radius: 999px;
+  background: rgba(201,168,76,0.16); color: var(--gold-3, #9a7f33);
+  white-space: nowrap;
+}
+.qc7-credit-badge.ki  { background: rgba(99,102,241,0.14); color: #5457c4; }
+.qc7-credit-badge.free{ background: rgba(63,165,108,0.14); color: #3FA56C; }
+.qc7-credit-totals {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 2px solid rgba(201,168,76,0.4);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.qc7-credit-totline {
+  display: flex; align-items: center; justify-content: space-between;
+  font: 600 14px/1 'DM Sans', system-ui, sans-serif; color: var(--ch, #2A2727);
+}
+.qc7-credit-totline .v { font: 700 16px/1 'DM Sans', system-ui, sans-serif; color: var(--gold-3, #9a7f33); }
+
+/* ── Pflichtfeld-Fehlblock im Modal ── */
+.qc7-missing {
+  margin: 4px 0 12px;
+  padding: 12px 14px;
+  background: rgba(184,98,92,0.08);
+  border: 1px solid rgba(184,98,92,0.35);
+  border-radius: 12px;
+}
+.qc7-missing-head {
+  font: 600 13px/1.2 'DM Sans', system-ui, sans-serif;
+  color: #9c3f39; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.qc7-missing ul { margin: 0; padding-left: 18px; }
+.qc7-missing li {
+  font: 400 13px/1.5 'DM Sans', system-ui, sans-serif; color: var(--ch, #2A2727);
+}
+.qc7-missing li b { color: #9c3f39; }
+
+/* ── Card V7: professionelle Typografie + Icon-Slot ── */
+/* Werte in DM Sans (financial/tabular), größer, klare Hierarchie */
+.avm6-span-title {
+  font: 600 12px/1.2 'DM Sans', system-ui, sans-serif !important;
+  text-transform: uppercase; letter-spacing: .04em;
+  color: var(--ch2, #6b6660) !important;
+}
+.avm6-span-title .avm7-ic {
+  display: inline-flex; color: var(--gold-3, #9a7f33);
+}
+.avm6-span-main {
+  font: 700 28px/1.05 'DM Sans', system-ui, sans-serif !important;
+  color: var(--ch, #2A2727) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.avm6-span-range {
+  font: 500 14px/1.3 'DM Sans', system-ui, sans-serif !important;
+  color: var(--ch2, #6b6660) !important;
+  font-variant-numeric: tabular-nums;
+}
+.avm6-span-range b, .avm6-span-range strong {
+  color: var(--ch, #2A2727); font-weight: 700;
+}
+.avm6-span-sqm {
+  font: 500 13px/1.3 'DM Sans', system-ui, sans-serif !important;
+  color: var(--ch2, #6b6660) !important;
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px !important;
+}
+.avm6-span-vals { gap: 4px 12px !important; align-items: baseline; }
+/* Provider-Name bleibt im Marken-Serif, das ist gewollt; Konfidenz-Badge sans */
+.avm5-conf { font-family: 'DM Sans', system-ui, sans-serif; }
+.avm6-applied-tag {
+  font-family: 'DM Sans', system-ui, sans-serif !important;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .qc7-sources { width: 100%; }
+  .qc7-src { flex: 1 1 calc(50% - 4px); justify-content: flex-start; }
+  .avm6-span-main { font-size: 24px !important; }
+}
+/* ═══ V17: AVM-Card weiß & magazinhaft (PriceHubble + Sprengnetter) ═══ */
+.avm5-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r2, 12px);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  position: relative;
+  box-shadow: var(--shadow, 0 2px 12px rgba(42,39,39,.08));
+  transition: border-color .15s, box-shadow .15s;
+}
+.avm5-card:hover {
+  border-color: rgba(201,168,76,0.35);
+  box-shadow: var(--shadow-md, 0 4px 24px rgba(42,39,39,.12));
+}
+.avm5-card.is-spr,
+.avm5-card.is-ph { background: var(--white); }
+.avm5-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: var(--r2, 12px) var(--r2, 12px) 0 0;
+}
+.avm5-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-g, rgba(201,168,76,.3));
+}
+.avm5-head::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 14px;
+  background: var(--gold);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.avm5-provider {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ch);
+  letter-spacing: 0.01em;
+}
+.avm5-provider::before {
+  content: 'Marktbewertung · ';
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family: 'DM Sans', sans-serif;
+  margin-right: 4px;
+  vertical-align: 1px;
+}
+.avm5-conf {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.25);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-left: auto;
+  font-family: 'DM Sans', sans-serif;
+}
+.avm5-conf.good { background: var(--green-dim, rgba(63,165,108,.12)); color: var(--green, #3FA56C); border-color: rgba(63,165,108,0.3); }
+.avm5-conf.mid  { background: var(--gold-dim); color: var(--gold); border-color: rgba(201,168,76,0.3); }
+.avm5-conf.low  { background: rgba(184,98,92,0.10); color: var(--red, #B8625C); border-color: rgba(184,98,92,0.3); }
+.avm5-x {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  width: 24px; height: 24px;
+  line-height: 1;
+  border-radius: var(--r, 8px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .12s;
+}
+.avm5-x:hover {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--ch);
+}
+.avm5-lage {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.avm5-foot {
+  font-size: 9.5px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  letter-spacing: 0.02em;
+}
+
+/* avm6-spanblock — innere Werte-Sektion */
+.avm6-spanblock {
+  margin-top: 16px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r, 8px);
+  position: relative;
+}
+.avm6-spanblock::before {
+  content: '';
+  position: absolute;
+  left: 18px; top: 0;
+  height: 3px; width: 32px;
+  background: var(--gold);
+  border-radius: 0 0 2px 2px;
+}
+.avm6-spanrow + .avm6-spanrow {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.avm6-span-title {
+  font: 600 10px/1.2 'DM Sans', sans-serif !important;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold) !important;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.avm6-span-title .avm7-ic {
+  display: inline-flex;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+.avm6-span-vals {
+  display: flex;
+  align-items: baseline;
+  gap: 6px 14px !important;
+  flex-wrap: wrap;
+}
+.avm6-span-main {
+  font: 600 28px/1.05 'Cormorant Garamond', serif !important;
+  color: var(--ch) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.avm6-span-range {
+  font: 500 13px/1.3 'DM Sans', sans-serif !important;
+  color: var(--muted) !important;
+  font-variant-numeric: tabular-nums;
+}
+.avm6-span-range b,
+.avm6-span-range strong {
+  color: var(--gold);
+  font-weight: 600;
+}
+.avm6-span-sqm {
+  font: 500 12px/1.4 'DM Sans', sans-serif !important;
+  color: var(--ch2) !important;
+  font-variant-numeric: tabular-nums;
+  margin-top: 6px !important;
+}
+.avm6-applied-tag {
+  font: 600 9.5px/1.2 'DM Sans', sans-serif !important;
+  color: var(--gold) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--gold-dim);
+  border: 1px solid rgba(201,168,76,0.25);
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-left: auto;
+}
+
+/* ── Mobile + Tablet ── */
+@media (max-width: 720px) {
+  .avm5-card { padding: 16px 16px; border-radius: var(--r, 8px); }
+  .avm5-lage { grid-template-columns: 1fr 1fr; }
+  .avm5-lage > *:nth-child(3) { grid-column: 1 / -1; }
+  .avm5-head { gap: 8px; flex-wrap: wrap; }
+  .avm5-provider { font-size: 16px; }
+  .avm5-provider::before { display: block; margin: 0 0 2px; }
+  .avm5-conf { font-size: 9.5px; }
+  .avm6-spanblock { padding: 14px 14px; }
+  .avm6-spanblock::before { left: 14px; }
+  .avm6-span-main { font-size: 24px !important; }
+  .avm6-span-title { font-size: 9.5px !important; }
+}
+@media (max-width: 420px) {
+  .avm5-card { padding: 14px 14px; }
+  .avm5-lage { grid-template-columns: 1fr; }
+  .avm6-span-main { font-size: 22px !important; }
+  .avm6-span-vals { flex-direction: column; gap: 2px !important; align-items: flex-start; }
+}
+
+/* END-V7-STYLES */
+
+</style>
+<style id="qc-app-overrides">
+button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
+.field.qc-missing-hl input, .field.qc-missing-hl select { border-color:#B8625C !important; box-shadow:0 0 0 2px rgba(184,98,92,.22) !important; }
+.field.qc-missing-hl label { color:#B8625C !important; }
+.qc6-pausebox { margin-top:10px; padding:12px 14px; border:1px solid rgba(184,98,92,.45); background:#FFF3F2; border-radius:10px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.qc6-pausebox-txt { font-size:13px; color:#8B3F3A; flex:1 1 auto; line-height:1.4; }
+.qc6-pausebox-btn { background:#C9A84C; color:#1a1a1a; border:0; border-radius:8px; padding:8px 20px; font-weight:600; cursor:pointer; }
+.qc6-pausebox-btn:hover { filter:brightness(1.06); }
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div class="container">
+
+  <!-- ═════ PAGE HEAD ═════ -->
+  <div class="page-head">
+    <div class="page-head-icon" id="page-head-ic"></div>
+    <div class="page-head-title-block">
+      <div class="page-head-title">Quick-Check</div>
+      <div class="page-head-sub">Schnelle Investment-Bewertung — alle wichtigen Daten auf einen Blick. PDF-Import, AVM-Anbindung und KI-Bewertung integriert.</div>
+    </div>
+  </div>
+
+  <!-- ═════ SCORE BLOCK ═════ -->
+  <div class="score-perspective">
+    <div class="score-block" id="score-block">
+
+      <div class="sb-header">
+        <div class="sb-issue">DEALPILOT · <strong>QUICK CHECK SCORE</strong> · LIVE</div>
+        <div class="sb-status" id="sb-status" data-stage="sprout">Bereit für Daten</div>
+      </div>
+
+      <div class="sb-hero">
+        <div class="sb-left">
+          <h1 class="sb-title">Quick <span class="gold-l">Check</span> Score</h1>
+          <p class="sb-tagline" id="sb-tagline">Trag deine Eckdaten ein — der Score reagiert in Echtzeit.</p>
+          <div class="subs">
+            <div class="sub" data-tier="" id="sub-rendite">
+              <div class="sub-ic" id="sub-rendite-ic"></div>
+              <div class="sub-l">Rendite</div>
+              <div class="sub-v" id="sub-rendite-v">—</div>
+              <div class="sub-tiny">/100</div>
+            </div>
+            <div class="sub" data-tier="" id="sub-cashflow">
+              <div class="sub-ic" id="sub-cashflow-ic"></div>
+              <div class="sub-l">Cashflow</div>
+              <div class="sub-v" id="sub-cashflow-v">—</div>
+              <div class="sub-tiny">/100</div>
+            </div>
+            <div class="sub" data-tier="" id="sub-sicherheit">
+              <div class="sub-ic" id="sub-sicherheit-ic"></div>
+              <div class="sub-l">Sicherheit</div>
+              <div class="sub-v" id="sub-sicherheit-v">—</div>
+              <div class="sub-tiny">/100</div>
+            </div>
+            <div class="sub" data-tier="" id="sub-finanzierung">
+              <div class="sub-ic" id="sub-finanzierung-ic"></div>
+              <div class="sub-l">Finanz.</div>
+              <div class="sub-v" id="sub-finanzierung-v">—</div>
+              <div class="sub-tiny">/100</div>
+            </div>
+            <div class="sub" data-tier="" id="sub-effizienz">
+              <div class="sub-ic" id="sub-effizienz-ic"></div>
+              <div class="sub-l">Effizienz</div>
+              <div class="sub-v" id="sub-effizienz-v">—</div>
+              <div class="sub-tiny">/100</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sb-mega" id="sb-mega" data-stage="sprout">
+          <svg viewBox="0 0 120 120">
+            <circle class="bg" cx="60" cy="60" r="52" stroke-width="5"/>
+            <circle class="ring" id="sb-ring" cx="60" cy="60" r="52" stroke-width="5" stroke-dasharray="0 327"/>
+          </svg>
+          <div class="sb-mega-text">
+            <div class="sb-num" id="sb-num">–</div>
+            <div class="sb-num-max">VON 100</div>
+            <div class="sb-tier" id="sb-tier"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi" id="kpi-bmr"><div class="l">Bruttomietr.</div><div class="v">—</div><div class="h">Ziel ≥5%</div></div>
+        <div class="kpi" id="kpi-nmr"><div class="l">Nettomietr.</div><div class="v">—</div><div class="h">Ziel ≥3%</div></div>
+        <div class="kpi" id="kpi-ekr"><div class="l">EK-Rendite</div><div class="v">—</div><div class="h">Ziel ≥7%</div></div>
+        <div class="kpi" id="kpi-cf"><div class="l">Cashflow/Mo</div><div class="v">—</div><div class="h">Ziel ≥0€</div></div>
+        <div class="kpi" id="kpi-dscr"><div class="l">DSCR</div><div class="v">—</div><div class="h">Ziel ≥1,2</div></div>
+        <div class="kpi" id="kpi-ltv"><div class="l">LTV</div><div class="v">—</div><div class="h">Ziel &lt;90%</div></div>
+        <div class="kpi" id="kpi-bwk"><div class="l">Bewirtsch.</div><div class="v">—</div><div class="h">18-35%</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═════ ACTION BAR (qc6-actionbar / qc7-sources) ═════ -->
+  <div class="actions">
+    <span class="actions-label">Aktionen</span>
+    <input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="QcApp.handlePdfFile(event)">
+
+    <!-- Multi-Select: Abruf-Quellen frei kombinieren -->
+    <span class="qc7-sources" id="qc7-sources">
+      <label class="qc7-src" data-src="expose">
+        <input type="checkbox" value="expose" onchange="QcApp.toggleSource(this)">
+        <span class="qc7-box"><span class="qc7-check"></span></span>
+        <span class="qc7-ic" id="ico-src-expose"></span> Exposé-Import
+      </label>
+      <label class="qc7-src" data-src="ph">
+        <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)">
+        <span class="qc7-box"><span class="qc7-check"></span></span>
+        <span class="qc7-ic" id="ico-src-ph"></span> PriceHubble
+      </label>
+      <label class="qc7-src" data-src="spr">
+        <input type="checkbox" value="spr" onchange="QcApp.toggleSource(this)">
+        <span class="qc7-box"><span class="qc7-check"></span></span>
+        <span class="qc7-ic" id="ico-src-spr"></span> Sprengnetter
+      </label>
+      <label class="qc7-src" data-src="ki">
+        <input type="checkbox" value="ki" onchange="QcApp.toggleSource(this)">
+        <span class="qc7-box"><span class="qc7-check"></span></span>
+        <span class="qc7-ic" id="ico-src-ki"></span> KI-Recherche
+      </label>
+    </span>
+
+    <!-- Spannen-Schnellauswahl (gilt für Marktwert + Marktmiete) -->
+    <span class="qc6-seg-wrap" title="Welche Spanne wird übernommen? Standard: Durchschnitt">
+      <span class="qc6-seg-lbl">Spanne</span>
+      <span class="qc6-seg" id="qc6-seg">
+        <button type="button" data-span="low"  onclick="QcApp.setSpanConfig('low', this)">Unten</button>
+        <button type="button" data-span="mid"  class="sel" onclick="QcApp.setSpanConfig('mid', this)">Ø</button>
+        <button type="button" data-span="high" onclick="QcApp.setSpanConfig('high', this)">Oben</button>
+      </span>
+    </span>
+
+    <!-- Abrufen → prüft Pflichtfelder + öffnet Credit-Modal -->
+    <button class="btn primary qc6-run" data-provider="combo" onclick="QcApp.openCreditModal()">
+      <span class="ico" id="ico-run"></span> Abrufen
+    </button>
+
+    <!-- Detail-Einstellungen -->
+    <button class="btn" onclick="QcApp.openQc6Settings()" title="Spannen-Einstellungen">
+      <span class="ico" id="ico-gear"></span> Einstellungen
+    </button>
+  </div>
+
+  <!-- Sequenzieller Progress-Indikator -->
+  <div class="qc6-progress" id="qc6-progress"></div>
+
+  <!-- ═════ FORM ═════ -->
+
+  <!-- Adresse -->
+  <div class="card">
+    <div class="card-title">
+      <span class="card-title-ic" id="ico-grp-adr"></span>
+      <span>Adresse</span>
+    </div>
+    <div class="row row-adr">
+      <div class="field">
+        <label for="qc_str">Straße</label>
+        <input type="text" id="qc_str" placeholder="Dresdenstraße" autocomplete="off">
+        <span class="source">PDF-Import</span>
+      </div>
+      <div class="field">
+        <label for="qc_hnr">Hausnr.</label>
+        <input type="text" id="qc_hnr" placeholder="116" autocomplete="off">
+        <span class="source">PDF</span>
+      </div>
+      <div class="field">
+        <label class="req" for="qc_plz">PLZ</label>
+        <input type="text" id="qc_plz" placeholder="32052" maxlength="5" inputmode="numeric" autocomplete="off">
+        <span class="source">PDF</span>
+      </div>
+      <div class="field">
+        <label class="req" for="qc_ort">Ort</label>
+        <input type="text" id="qc_ort" placeholder="Herford" autocomplete="off">
+        <span class="source">PDF</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Objektdaten -->
+  <div class="card">
+    <div class="card-title">
+      <span class="card-title-ic" id="ico-grp-obj"></span>
+      <span>Objektdaten</span>
+    </div>
+    <div class="row row-3">
+      <div class="field">
+        <label for="qc_objektart">Objektart</label>
+        <select id="qc_objektart">
+          <option value="">– bitte wählen –</option>
+          <option value="ETW">Eigentumswohnung</option>
+          <option value="EFH">Einfamilienhaus</option>
+          <option value="MFH">Mehrfamilienhaus</option>
+          <option value="DHH">Doppelhaushälfte</option>
+          <option value="RH">Reihenhaus</option>
+          <option value="Gewerbe">Gewerbe</option>
+        </select>
+        <span class="source">PDF</span>
+      </div>
+      <div class="field">
+        <label class="req" for="qc_wfl">Wohnfläche (m²)</label>
+        <input type="text" id="qc_wfl" placeholder="96" inputmode="decimal" autocomplete="off">
+        <span class="source">PDF</span>
+      </div>
+      <div class="field">
+        <label for="qc_bj">Baujahr</label>
+        <input type="text" id="qc_bj" placeholder="1997" inputmode="numeric" autocomplete="off">
+        <span class="source">PDF</span>
+      </div>
+    </div>
+    <div class="row row-3" style="margin-top:10px">
+      <div class="field">
+        <label for="qc_zimmer">Zimmer</label>
+        <input type="text" id="qc_zimmer" placeholder="2" inputmode="decimal" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="qc_energieklasse">Energieklasse</label>
+        <select id="qc_energieklasse">
+          <option value="">–</option>
+          <option>A+</option><option>A</option><option>B</option><option>C</option>
+          <option>D</option><option>E</option><option>F</option><option>G</option><option>H</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="qc_stellplatz">Stellplatz</label>
+        <input type="text" id="qc_stellplatz" placeholder="Tiefgarage / Außen" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <!-- Mieten -->
+  <div class="card">
+    <div class="card-title">
+      <span class="card-title-ic" id="ico-grp-miete"></span>
+      <span>Mieteinnahmen / Monat</span>
+    </div>
+    <div class="row row-4">
+      <div class="field">
+        <label for="qc_nkm_grund">Grundmiete (€)</label>
+        <input type="text" id="qc_nkm_grund" placeholder="780" inputmode="decimal" autocomplete="off">
+        <span class="hint">Reine Kaltmiete</span>
+      </div>
+      <div class="field">
+        <label for="qc_nkm_stp">Stellplatz (€)</label>
+        <input type="text" id="qc_nkm_stp" placeholder="0" inputmode="decimal" autocomplete="off">
+        <span class="hint">Stellplatz/Garage</span>
+      </div>
+      <div class="field">
+        <label for="qc_nkm_kueche">Küche (€)</label>
+        <input type="text" id="qc_nkm_kueche" placeholder="0" inputmode="decimal" autocomplete="off">
+        <span class="hint">Einbauküche-Zuschlag</span>
+      </div>
+      <div class="field">
+        <label for="qc_nkm_sonst">Sonstige (€)</label>
+        <input type="text" id="qc_nkm_sonst" placeholder="0" inputmode="decimal" autocomplete="off">
+        <span class="hint">Werbefläche, Antenne</span>
+      </div>
+    </div>
+    <div class="field" style="margin-top:10px">
+      <label class="req" for="qc_nkm">Nettokaltmiete gesamt / Monat (€) <span class="hint" style="font-style:italic">— Summe der Komponenten oben</span></label>
+      <input type="text" id="qc_nkm" placeholder="850" inputmode="decimal" autocomplete="off">
+    </div>
+  </div>
+
+  <!-- Bewirtschaftung -->
+  <div class="card">
+    <div class="card-title">
+      <span class="card-title-ic" id="ico-grp-bewirt"></span>
+      <span>Bewirtschaftungskosten</span>
+    </div>
+    <p style="margin:0 0 12px;font-size:12.5px;color:var(--ch3);line-height:1.5">
+      Hausgeld vom Verwalter (Heizung + Rücklagen + Verwaltung), davon ein Teil nicht-umlagefähig.
+    </p>
+    <div class="row row-2">
+      <div class="field">
+        <label class="req" for="qc_hg">Hausgeld / Monat (€)</label>
+        <input type="text" id="qc_hg" placeholder="221" inputmode="decimal" autocomplete="off">
+        <span class="hint">Inkl. Heizung + Rücklagen — wie auf Exposé. Faustregel: ~26% der NKM</span>
+        <span class="source">PDF</span>
+      </div>
+      <div class="field">
+        <label class="req" for="qc_hg_split">Nicht-umlagefähig (% vom HG)</label>
+        <input type="text" id="qc_hg_split" value="22" placeholder="22" inputmode="decimal" autocomplete="off">
+        <span class="hint">Üblich 12-30%, Faustregel 22%. Rest geht auf Mieter.</span>
+      </div>
+    </div>
+    <div class="bewirt-derived" id="bewirt-derived">Tragen Sie Hausgeld und NUL-Anteil ein …</div>
+  </div>
+
+  <!-- Finanzierung -->
+  <div class="card">
+    <div class="card-title">
+      <span class="card-title-ic" id="ico-grp-fin"></span>
+      <span>Finanzierung</span>
+    </div>
+    <div class="ltv-row">
+      <span class="ltv-l">Beleihung (LTV):</span>
+      <button class="ltv-btn active" data-ltv="100" onclick="QcApp.setLtv(100, this)">100%</button>
+      <button class="ltv-btn" data-ltv="95" onclick="QcApp.setLtv(95, this)">95%</button>
+      <button class="ltv-btn" data-ltv="90" onclick="QcApp.setLtv(90, this)">90%</button>
+      <button class="ltv-btn" data-ltv="85" onclick="QcApp.setLtv(85, this)">85%</button>
+      <button class="ltv-btn" data-ltv="80" onclick="QcApp.setLtv(80, this)">80%</button>
+    </div>
+    <div class="row row-4">
+      <div class="field">
+        <label class="req" for="qc_kp">Kaufpreis (€)</label>
+        <input type="text" id="qc_kp" placeholder="180000" inputmode="decimal" autocomplete="off">
+        <span class="source">PDF</span>
+      </div>
+      <div class="field">
+        <label class="req" for="qc_ek">Eigenkapital (€)</label>
+        <input type="text" id="qc_ek" placeholder="20000" inputmode="decimal" autocomplete="off">
+        <span class="hint">~10% des KP + NK</span>
+      </div>
+      <div class="field">
+        <label class="req" for="qc_zins">Zinssatz (%)</label>
+        <input type="text" id="qc_zins" name="qcfin_zins" placeholder="3,8" inputmode="decimal" autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore data-bwignore readonly onfocus="this.removeAttribute('readonly')">
+        <span class="hint">Standardannahme – per KI-Recherche oder manuell</span>
+      </div>
+      <div class="field">
+        <label class="req" for="qc_tilg">Tilgung (%)</label>
+        <input type="text" id="qc_tilg" name="qcfin_tilg" placeholder="1,5" inputmode="decimal" autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore data-bwignore readonly onfocus="this.removeAttribute('readonly')">
+        <span class="hint">Standardannahme – anpassbar</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Objektfotos -->
+  <div class="card">
+    <div class="card-title">
+      <span class="card-title-ic" id="ico-grp-photo"></span>
+      <span>Objektfotos (optional, max 6)</span>
+    </div>
+    <div class="photo-drop" onclick="document.getElementById('photo-input').click()">
+      <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="QcApp.handlePhotos(this.files)">
+      <div class="photo-drop-l">📷 Fotos hochladen oder hierher ziehen</div>
+    </div>
+    <div class="photo-grid" id="photo-grid"></div>
+    <p class="hint" style="margin-top:8px;font-size:11px;color:var(--muted)">Werden beim "Als Objekt speichern" mit übernommen.</p>
+  </div>
+
+  <!-- AVM Results -->
+  <div id="avm-results-host"></div>
+
+  <!-- KI-Empfehlung -->
+  <div class="ai-card" id="ai-card">
+    <div class="ai-head">
+      <div class="ai-head-icon" id="ai-icon"></div>
+      <h3 class="ai-head-title">Bewertung</h3>
+      <span class="ai-head-source" id="ai-source">Lokale Analyse</span>
+    </div>
+    <div class="ai-verdict-big" id="ai-verdict">
+      <span class="ai-verdict-emoji" id="ai-verdict-emoji">💚</span>
+      <div class="ai-verdict-text">
+        <div class="ai-verdict-headline" id="ai-verdict-headline">Kauf erwägen</div>
+        <div class="ai-verdict-sub" id="ai-verdict-sub">Objekt zeigt solides Investment-Profil</div>
+      </div>
+    </div>
+    <div class="ai-negotiate" id="ai-negotiate">
+      <div class="ai-negotiate-l">💼 Verhandlungs-Empfehlung</div>
+      <div class="ai-negotiate-v" id="ai-negotiate-v">—</div>
+    </div>
+    <div class="ai-points">
+      <div class="ai-points-col pro">
+        <h4>✓ Pro-Argumente</h4>
+        <ul id="ai-pros"></ul>
+      </div>
+      <div class="ai-points-col con">
+        <h4>⚠ Achtung</h4>
+        <ul id="ai-cons"></ul>
+      </div>
+    </div>
+    <!-- Marktcheck (nur sichtbar wenn Sprengnetter-Daten vorhanden) -->
+    <div id="ai-marktcheck-host"></div>
+    <div class="ai-opinion">
+      <div class="ai-opinion-l">📋 Experten-Meinung</div>
+      <div id="ai-opinion"></div>
+    </div>
+    <!-- V342: "tiefer analysieren"-Button entfernt — KI läuft über den oberen Abruf -->
+  </div>
+
+  <!-- Save Zone -->
+  <div class="save-zone">
+    <div class="save-zone-info" id="save-hint">Bitte fülle alle Pflichtfelder aus, um das Objekt speichern zu können.</div>
+    <button class="save-btn" id="save-btn" disabled onclick="QcApp.openSaveModal()">
+      <span class="ico" id="ico-save-btn"></span>
+      Als Objekt speichern
+    </button>
+  </div>
+
+</div>
+
+<!-- ═════ MODAL: Transfer-Dialog ═════ -->
+<div class="modal-backdrop" id="transfer-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-ic" id="modal-icon"></div>
+      <h3>Welche Daten übernehmen?</h3>
+      <button class="modal-close" onclick="QcApp.closeSaveModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Diese zusätzlichen Daten wurden beim PDF-Import oder AVM-Abruf erkannt. Sie passen nicht ins Quick-Check-Formular, können aber später ins Vollobjekt übernommen werden.</p>
+
+      <div class="transfer-toggle-all">
+        <label>
+          <input type="checkbox" id="transfer-all-toggle" checked onchange="QcApp.toggleAllTransfer(this.checked)">
+          <span>Alle übernehmen</span>
+        </label>
+      </div>
+
+      <div id="transfer-list"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="QcApp.closeSaveModal()">Abbrechen</button>
+      <button class="btn primary" onclick="QcApp.confirmSave()">Speichern &amp; übernehmen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════ MODAL: API-Key ═════ -->
+<div class="modal-backdrop" id="api-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <div class="modal-head-ic" id="api-modal-icon"></div>
+      <h3>OpenAI API-Key</h3>
+      <button class="modal-close" onclick="QcApp.closeApiModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Trage deinen OpenAI API-Key ein (beginnt mit <code style="background:var(--gold-bg);padding:1px 6px;border-radius:3px;font-size:12px">sk-</code>). Der Key wird nur lokal in deinem Browser benutzt.</p>
+      <input type="password" id="api-key-input" placeholder="sk-...">
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="QcApp.closeApiModal()">Abbrechen</button>
+      <button class="btn primary" onclick="QcApp.runRealAi()">Analyse starten</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   ICONS — Lucide-Style SVG
+   ═══════════════════════════════════════════════════════════════════ */
+const QcIcons = (function() {
+  const P = {
+    rendite:    '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+    cashflow:   '<rect x="3" y="6" width="18" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/><path d="M3 10h18M3 15h18"/>',
+    sicherheit: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+    finanzierung:'<path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/>',
+    effizienz:  '<path d="M12 14l4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/><circle cx="12" cy="14" r="1.5"/>',
+    upload:     '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+    sparkles:   '<path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 14l.7 2.1L22 17l-2.3.9L19 20l-.7-2.1L16 17l2.3-.9z"/>',
+    building:   '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M12 10h.01"/>',
+    chart:      '<path d="M3 3v18h18"/><path d="M7 17l4-4 4 4 6-6"/>',
+    home:       '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+    file:       '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    coins:      '<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>',
+    wallet:     '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>',
+    bank:       '<path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/>',
+    zap:        '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    camera:     '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+    info:       '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+    save:       '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+    qc:         '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><polyline points="11 7 11 11 14 13"/>',
+    key:        '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/>',
+    arrow:      '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>'
+  };
+  function svg(name, opts) {
+    opts = opts || {};
+    const size = opts.size || 18, sw = opts.strokeWidth || 2;
+    const stroke = opts.stroke || 'currentColor';
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${P[name]||''}</svg>`;
+  }
+  return { svg };
+})();
+
+/* ═══════════════════════════════════════════════════════════════════
+   ENGINE — Score, Sub-Scores, KPIs, Pflichtfelder
+   ═══════════════════════════════════════════════════════════════════ */
+const QcEngine = (function() {
+  const FIELDS = [
+    { id: 'plz', required: true }, { id: 'ort', required: true },
+    { id: 'str', required: false }, { id: 'hnr', required: false },
+    { id: 'objektart', required: false }, { id: 'wfl', required: true },
+    { id: 'bj', required: false }, { id: 'zimmer', required: false },
+    { id: 'energieklasse', required: false }, { id: 'stellplatz', required: false },
+    { id: 'kp', required: true }, { id: 'nkm', required: true },
+    { id: 'hg', required: true }, { id: 'hg_split', required: true },
+    { id: 'ek', required: true }, { id: 'zins', required: true }, { id: 'tilg', required: true }
+  ];
+  function num(v) {
+    if (v == null || v === '') return null;
+    let s = String(v).trim();
+    if (s.indexOf(',') !== -1) s = s.replace(/\./g, '').replace(',', '.');
+    else if (s.indexOf('.') !== -1) {
+      const parts = s.split('.');
+      const allThree = parts.slice(1).every(p => p.length === 3);
+      if (allThree && parts.length > 1) s = parts.join('');
+    }
+    const n = parseFloat(s);
+    return isNaN(n) ? null : n;
+  }
+  function getInputs() {
+    const out = {};
+    FIELDS.forEach(f => {
+      const el = document.getElementById('qc_' + f.id);
+      if (el) out[f.id] = (el.value || '').trim();
+    });
+    return out;
+  }
+  function completeness(inputs) {
+    const missing = [];
+    FIELDS.forEach(f => { if (f.required && !inputs[f.id]) missing.push(f); });
+    return { missing, hasAllRequired: missing.length === 0 };
+  }
+  function hasFullAddress(inputs) { return !!(inputs.plz && inputs.ort && inputs.str && inputs.hnr); }
+  function isAvmReady(inputs) { return hasFullAddress(inputs) && !!inputs.objektart && !!inputs.wfl; }
+  function stage(inputs) {
+    const kp = num(inputs.kp), nkm = num(inputs.nkm), wfl = num(inputs.wfl);
+    const ek = num(inputs.ek), zins = num(inputs.zins), tilg = num(inputs.tilg), hg = num(inputs.hg);
+    if (!kp || !nkm || !wfl) return 'sprout';
+    if (ek == null || zins == null || tilg == null || !hg) return 'live';
+    return 'solid';
+  }
+  function lerp(v, a, b, oa, ob) { if (v <= a) return oa; if (v >= b) return ob; return oa + (v - a) / (b - a) * (ob - oa); }
+
+  function computeScore(inputs, avm) {
+    const kp = num(inputs.kp), nkm = num(inputs.nkm), wfl = num(inputs.wfl);
+    const ek = num(inputs.ek), zins = num(inputs.zins) || 3.8, tilg = num(inputs.tilg) || 1.5;
+    const hg = num(inputs.hg) || 0, hgSplit = num(inputs.hg_split) || 22;
+    if (!kp || !nkm) return { score: null, tier: null, label: '–', sub: {}, kpi: {} };
+
+    const bmr = (nkm * 12) / kp * 100;
+    const hgY = hg * 12;
+    const nulY = hgY * hgSplit / 100;
+    const ulY = hgY * (100 - hgSplit) / 100;
+    const nmr = ((nkm * 12) - nulY) / kp * 100;
+    const knkPct = 10.5;
+    const gesamt = kp * (1 + knkPct / 100);
+    const ekValue = ek != null ? ek : gesamt * 0.20;
+    const darlehen = Math.max(0, gesamt - ekValue);
+    const ltvPct = darlehen / kp * 100;
+    const ekr = ekValue > 0 ? ((nkm * 12) - nulY - (darlehen * zins / 100)) / ekValue * 100 : 0;
+    const annu = darlehen * (zins + tilg) / 100;
+    const annuMon = annu / 12;
+    const cfMon = nkm - (nulY / 12) - annuMon;
+    const dscr = annu > 0 ? ((nkm * 12) - nulY) / annu : null;
+    const bwkPctOfNkm = nkm > 0 ? hgY / (nkm * 12) * 100 : 0;
+
+    const sRendite = (
+      (bmr <= 3 ? 0 : bmr >= 7 ? 100 : lerp(bmr, 3, 7, 0, 100)) * 0.5 +
+      (nmr <= 1 ? 0 : nmr >= 5 ? 100 : lerp(nmr, 1, 5, 0, 100)) * 0.5
+    );
+    const sCashflow = cfMon <= -200 ? 0 : cfMon >= 300 ? 100 : lerp(cfMon, -200, 300, 0, 100);
+    const sSicherheit = dscr == null ? 50 : (dscr <= 0.9 ? 0 : dscr >= 1.4 ? 100 : lerp(dscr, 0.9, 1.4, 0, 100));
+    /* V11-LTV-SOFT: weichere Grenzen — 90/95% gut, darunter besser */
+    const sFinanz = ltvPct >= 105 ? 45 : ltvPct >= 100 ? 60 : ltvPct >= 95 ? 75 : ltvPct >= 90 ? 85 : ltvPct >= 80 ? 92 : 100;
+    const sEffizienz = bwkPctOfNkm <= 18 ? 100 : bwkPctOfNkm >= 40 ? 30 : lerp(bwkPctOfNkm, 18, 40, 100, 30);
+    /* V15-MARKTLAGE: AVM-Daten (PriceHubble/Sprengnetter) in den Score einfließen lassen */
+    var sMarktlage = null, mlPriceGapPct = null, mlMarktwert = null;
+    if (avm && (avm.marktwert || avm.scoreMicro != null || avm.scoreMacro != null)) {
+      var comps = [];   // { score, weight }
+      // (a) Preis vs. Marktwert — Kern
+      var mw = num(avm.marktwert);
+      if (mw && kp) {
+        mlMarktwert = mw;
+        var gap = (mw - kp) / kp * 100;   // positiv = Marktwert über Kaufpreis (gut)
+        mlPriceGapPct = Math.round(gap);
+        // -15% (über Markt gekauft) → 10 ; 0% → 65 ; +10% (günstig) → 100
+        var sPrice = gap <= -15 ? 10 : gap >= 10 ? 100 : lerp(gap, -15, 10, 10, 100);
+        // Sprengnetter Fair-Price-Label als Bonus/Malus
+        if (avm.fairPriceLabel) {
+          var fp = String(avm.fairPriceLabel).toUpperCase();
+          if (fp.indexOf('VERY_EXPENSIVE') !== -1) sPrice -= 18;
+          else if (fp.indexOf('EXPENSIVE') !== -1) sPrice -= 9;
+          else if (fp.indexOf('GOOD') !== -1) sPrice += 9;
+          else if (fp.indexOf('CHEAP') !== -1 || fp.indexOf('VERY_GOOD') !== -1) sPrice += 14;
+          sPrice = Math.max(0, Math.min(100, sPrice));
+        }
+        comps.push({ s: sPrice, w: 0.60 });
+      }
+      // (b) Lage Mikro/Makro (0..10) — nur falls vorhanden (PriceHubble)
+      var lageVals = [];
+      if (avm.scoreMicro != null) lageVals.push(num(avm.scoreMicro));
+      if (avm.scoreMacro != null) lageVals.push(num(avm.scoreMacro));
+      if (lageVals.length) {
+        var lageAvg = lageVals.reduce(function(a,b){return a+b;},0) / lageVals.length;
+        comps.push({ s: Math.max(0, Math.min(100, lageAvg * 10)), w: 0.25 });
+      }
+      // (c) Wertentwicklung p.a. — 0% → 40 ; >=4% → 100
+      if (avm.wertentwicklung != null) {
+        var we = num(avm.wertentwicklung) || 0;
+        comps.push({ s: we <= 0 ? 30 : we >= 4 ? 100 : lerp(we, 0, 4, 40, 100), w: 0.15 });
+      }
+      if (comps.length) {
+        var wsum = comps.reduce(function(a,c){return a + c.w;},0);
+        sMarktlage = Math.round(comps.reduce(function(a,c){return a + c.s * c.w;},0) / wsum);
+      }
+    }
+    var score;
+    if (sMarktlage != null) {
+      // 5 Basis-Scores anteilig auf 85%, Marktlage 15%
+      var base = sRendite*0.30 + sCashflow*0.25 + sSicherheit*0.20 + sFinanz*0.15 + sEffizienz*0.10;
+      score = Math.round(base * 0.85 + sMarktlage * 0.15);
+    } else {
+      score = Math.round(sRendite*0.30 + sCashflow*0.25 + sSicherheit*0.20 + sFinanz*0.15 + sEffizienz*0.10);
+    }
+    const tier = score >= 80 ? 'green-strong' : score >= 65 ? 'green' : score >= 50 ? 'gold' : 'red';
+    const label = score >= 80 ? 'Sehr gut' : score >= 65 ? 'Gut' : score >= 50 ? 'Solide' : 'Schwach';
+
+    return {
+      score, tier, label,
+      sub: {
+        rendite: Math.round(sRendite), cashflow: Math.round(sCashflow),
+        sicherheit: Math.round(sSicherheit), finanzierung: Math.round(sFinanz),
+        effizienz: Math.round(sEffizienz),
+        marktlage: sMarktlage  /* null wenn keine AVM-Daten */
+      },
+      kpi: {
+        bmr: Math.round(bmr*10)/10, nmr: Math.round(nmr*10)/10,
+        ekr: Math.round(ekr*10)/10, cfMon: Math.round(cfMon),
+        dscr: dscr == null ? null : Math.round(dscr*100)/100,
+        ltvPct: Math.round(ltvPct), bwkPctOfNkm: Math.round(bwkPctOfNkm),
+        avmMarktwert: mlMarktwert, avmPriceGapPct: mlPriceGapPct, marktlage: sMarktlage,
+        annuMon: Math.round(annuMon), darlehen: Math.round(darlehen),
+        ekValue: Math.round(ekValue), gesamt: Math.round(gesamt),
+        hgY: Math.round(hgY), nulY: Math.round(nulY), ulY: Math.round(ulY)
+      }
+    };
+  }
+  function tierColor(tier) {
+    return { 'green-strong': '#3FA56C', 'green': '#5ED99E', 'gold': '#E5BD53', 'red': '#D55B5B' }[tier] || '#C9A84C';
+  }
+  function kpiClass(kpi, value) {
+    if (value == null) return null;
+    const r = {
+      bmr: value <= 3 ? 'bad' : value >= 5 ? 'good' : 'mid',
+      nmr: value <= 1 ? 'bad' : value >= 3 ? 'good' : 'mid',
+      ekr: value <= 0 ? 'bad' : value >= 7 ? 'good' : 'mid',
+      cfMon: value <= -100 ? 'bad' : value >= 0 ? 'good' : 'mid',
+      dscr: value <= 1.0 ? 'bad' : value >= 1.2 ? 'good' : 'mid',
+      ltvPct: value >= 105 ? 'bad' : value <= 95 ? 'good' : 'mid',
+      bwk: value > 35 ? 'bad' : value >= 18 ? 'good' : 'mid'
+    };
+    return r[kpi] || null;
+  }
+  return { FIELDS, num, getInputs, completeness, hasFullAddress, isAvmReady, stage, computeScore, tierColor, kpiClass };
+})();
+
+/* ═══════════════════════════════════════════════════════════════════
+   PARTICLE BACKGROUND (dezent)
+   ═══════════════════════════════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('particle-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  for (let i = 0; i < 40; i++) {
+    particles.push({
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.12, vy: (Math.random() - 0.5) * 0.12,
+      r: Math.random() * 1.2 + 0.6, a: Math.random() * 0.45 + 0.2
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 130) {
+          ctx.strokeStyle = `rgba(201,168,76,${(1 - d/130) * 0.15})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(201,168,76,${p.a})`;
+      ctx.fill();
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+    });
+    requestAnimationFrame(draw);
+  }
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) draw();
+})();
+
+/* ═══════════════════════════════════════════════════════════════════
+   QcApp — Main Controller
+   ═══════════════════════════════════════════════════════════════════ */
+const QcApp = (function() {
+  let _updateTimer = null;
+  let _ltv = 100;
+  let _avmResults = [];
+  let _avmSelection = { marktwert: 'mid', marktmiete: 'mid' };  // Sprengnetter Spannen-Auswahl
+  let _photos = [];
+  let _confetti = false;
+  let _pendingTransfer = {};  // Extra-Daten die nicht in den QC-Felder gehen
+  /* V6-JS state */
+  let _spanConfig = (function(){ try { return localStorage.getItem('qc_span_config') || 'mid'; } catch(e){ return 'mid'; } })();
+  let _comboQueue = null;   // aktuell zu bestätigende Kombi
+  // _avmSelection bleibt bestehen, wird aber aus _spanConfig gespeist (gemeinsam für beide)
+
+  function fmt0(n) { return new Intl.NumberFormat('de-DE').format(Math.round(n)); }
+  function fmtPct(n, d) { return (Math.round(n * Math.pow(10, d||1)) / Math.pow(10, d||1)).toString().replace('.', ','); }
+
+  /* V13-ICONS-SAFE */
+  function injectIcons() {
+    // Null-sicher: fehlende Elemente (z.B. aus früheren Layout-Änderungen) crashen NICHT mehr.
+    function _setIcon(id, name, opts) {
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = QcIcons.svg(name, opts || { size: 14 });
+    }
+    _setIcon('page-head-ic', 'qc', { size: 22 });
+    _setIcon('ico-upload', 'upload', { size: 14 });
+    _setIcon('ico-run', 'zap', { size: 14, stroke:'#fff' });
+    _setIcon('ico-gear', 'file', { size: 14 });
+
+    if (typeof QcApp_v6_syncSegments === 'function') QcApp_v6_syncSegments();
+
+    /* Multi-Select Quellen-Icons */
+    var _qm = { 'ico-src-expose':'upload', 'ico-src-ph':'building', 'ico-src-spr':'chart', 'ico-src-ki':'sparkles' };
+    Object.keys(_qm).forEach(function(id){ _setIcon(id, _qm[id], { size: 14 }); });
+    document.querySelectorAll('.qc7-box .qc7-check').forEach(function(c){ c.innerHTML = QcIcons.svg('arrow',{size:12,stroke:'#fff'}); });
+
+    _setIcon('ico-grp-adr', 'home', { size: 14 });
+    _setIcon('ico-grp-obj', 'file', { size: 14 });
+    _setIcon('ico-grp-miete', 'wallet', { size: 14 });
+    _setIcon('ico-grp-bewirt', 'coins', { size: 14 });
+    _setIcon('ico-grp-fin', 'bank', { size: 14 });
+    _setIcon('ico-grp-photo', 'camera', { size: 14 });
+    _setIcon('ai-icon', 'sparkles', { size: 20, stroke:'#fff' });
+    _setIcon('modal-icon', 'save', { size: 20, stroke:'#fff' });
+    _setIcon('api-modal-icon', 'key', { size: 20, stroke:'#fff' });
+    _setIcon('ico-save-btn', 'save', { size: 15 });
+  }
+
+  function attach3DTilt() {
+    // V16: 3D-Tilt deaktiviert — passt nicht zum klassischen DealPilot-Header-Look
+    return;
+  }
+
+  function bindInputs() {
+    QcEngine.FIELDS.forEach(f => {
+      const el = document.getElementById('qc_' + f.id);
+      if (!el) return;
+      const evt = el.tagName === 'SELECT' ? 'change' : 'input';
+      el.addEventListener(evt, scheduleUpdate);
+    });
+    /* V12-MIETE-ROBUST: Bestandteile lösen mieteAddUp + direkte Neuberechnung aus */
+    ['nkm_grund', 'nkm_stp', 'nkm_kueche', 'nkm_sonst'].forEach(id => {
+      const el = document.getElementById('qc_' + id);
+      if (el) {
+        el.addEventListener('input', mieteAddUp);
+        el.addEventListener('input', scheduleUpdate);
+        el.addEventListener('change', scheduleUpdate);
+      }
+    });
+    /* Hauptfeld: manuelle Eingabe merken, damit mieteAddUp sie nicht überschreibt */
+    (function(){
+      const nkmEl = document.getElementById('qc_nkm');
+      if (nkmEl) {
+        nkmEl.addEventListener('input', function(){ nkmEl.dataset.userSet = '1'; scheduleUpdate(); });
+        nkmEl.addEventListener('change', scheduleUpdate);
+      }
+    })();
+  }
+
+  function mieteAddUp() {
+    /* V11-MIETE-LIVE: Summe immer schreiben + immer aktualisieren */
+    const ids = ['nkm_grund', 'nkm_stp', 'nkm_kueche', 'nkm_sonst'];
+    let any = false;
+    const sum = ids.map(id => {
+      const el = document.getElementById('qc_' + id);
+      if (el && el.value.trim() !== '') any = true;
+      return (el ? QcEngine.num(el.value) : 0) || 0;
+    }).reduce((a,b) => a+b, 0);
+    // V12: manuell getippte Gesamtmiete nicht überschreiben
+    const nkmEl = document.getElementById('qc_nkm');
+    if (any && nkmEl && nkmEl.dataset.userSet !== '1') nkmEl.value = String(sum);
+    scheduleUpdate();
+  }
+
+  function setLtv(pct, btnEl) {
+    _ltv = pct;
+    document.querySelectorAll('.ltv-btn').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+    const inputs = QcEngine.getInputs();
+    const kp = QcEngine.num(inputs.kp);
+    if (kp) {
+      const ekInp = document.getElementById('qc_ek');
+      if (!ekInp.dataset.userSet) {
+        const knkPct = 10.5;
+        const ekKpPart = kp * (1 - pct / 100);
+        const ekNk = kp * knkPct / 100;
+        ekInp.value = String(Math.round(ekKpPart + ekNk));
+        scheduleUpdate();
+      }
+    }
+  }
+
+  function scheduleUpdate() { clearTimeout(_updateTimer); _updateTimer = setTimeout(updateAll, 50); }
+
+  function updateAll() {
+    const inputs = QcEngine.getInputs();
+    const score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
+    const stage = QcEngine.stage(inputs);
+    const comp = QcEngine.completeness(inputs);
+    const avmReady = QcEngine.isAvmReady(inputs);
+    const gated = !comp.hasAllRequired;  // V346: Score/Bewertung erst bei allen Pflichtfeldern
+
+    // V346: Bewertung/Score erst, wenn ALLE Pflichtfelder gefüllt sind (sonst verwirrend).
+    var _aiCard = document.getElementById('ai-card');
+    if (gated) { if (_aiCard) _aiCard.classList.remove('visible'); }
+    else { try { if (score && score.score != null) renderAI(score, inputs); } catch(_e){} }
+
+    const mega = document.getElementById('sb-mega');
+    const ring = document.getElementById('sb-ring');
+    const num = document.getElementById('sb-num');
+    const tier = document.getElementById('sb-tier');
+    mega.dataset.stage = stage;
+    if (gated || score.score == null) {
+      num.textContent = '–';
+      ring.setAttribute('stroke-dasharray', '0 327');
+      tier.textContent = '';
+    } else {
+      num.textContent = score.score;
+      const dash = (score.score / 100 * 327).toFixed(1);
+      ring.setAttribute('stroke-dasharray', dash + ' 327');
+      ring.style.stroke = QcEngine.tierColor(score.tier);
+      num.style.color = QcEngine.tierColor(score.tier);
+      tier.textContent = score.label;
+      tier.style.color = QcEngine.tierColor(score.tier);
+    }
+
+    const st = document.getElementById('sb-status');
+    st.dataset.stage = stage;
+    const today = new Date().toLocaleDateString('de-DE');
+    if (gated)                   st.textContent = today + ' · noch ' + comp.missing.length + ' Pflichtfeld' + (comp.missing.length>1?'er':'') + ' offen';
+    else if (stage === 'sprout') st.textContent = today + ' · Bereit für Daten';
+    else if (stage === 'live')   st.textContent = today + ' · Live · ' + score.label;
+    else                          st.textContent = today + ' · Vollständig · ' + score.label;
+
+    ['rendite', 'cashflow', 'sicherheit', 'finanzierung', 'effizienz'].forEach(name => {
+      const row = document.getElementById('sub-' + name);
+      const val = document.getElementById('sub-' + name + '-v');
+      const v = gated ? null : score.sub[name];
+      if (v == null) { val.textContent = '—'; row.dataset.tier = ''; }
+      else { val.textContent = v; row.dataset.tier = v >= 70 ? 'good' : v >= 50 ? 'mid' : 'bad'; }
+    });
+
+    const k = gated ? {} : (score.kpi || {});
+    setKpi('kpi-bmr',  k.bmr != null ? k.bmr.toString().replace('.', ',') + '%' : null, 'bmr');
+    setKpi('kpi-nmr',  k.nmr != null ? k.nmr.toString().replace('.', ',') + '%' : null, 'nmr');
+    setKpi('kpi-ekr',  k.ekr != null ? k.ekr.toString().replace('.', ',') + '%' : null, 'ekr');
+    setKpi('kpi-cf',   k.cfMon != null ? (k.cfMon >= 0 ? '+' : '') + k.cfMon + '€' : null, 'cfMon');
+    setKpi('kpi-dscr', k.dscr != null ? k.dscr.toString().replace('.', ',') : null, 'dscr');
+    setKpi('kpi-ltv',  k.ltvPct != null ? k.ltvPct + '%' : null, 'ltvPct');
+    setKpi('kpi-bwk',  k.bwkPctOfNkm != null ? k.bwkPctOfNkm + '%' : null, 'bwk');
+
+    const derived = document.getElementById('bewirt-derived');
+    if (k.hgY > 0) {
+      const pctNkm = inputs.nkm ? Math.round(k.hgY / (QcEngine.num(inputs.nkm) * 12) * 100) : '–';
+      derived.innerHTML =
+        '<strong>' + fmt0(k.hgY) + ' €/Jahr</strong> gesamt ' +
+        '(' + pctNkm + '% der NKM) · ' +
+        '<span class="nul-pill">nicht-umlagef.: ' + fmt0(k.nulY) + ' €/Jahr</span> · ' +
+        '<span class="ul-pill">umlagef.: ' + fmt0(k.ulY) + ' €/Jahr</span>';
+    } else {
+      derived.textContent = 'Tragen Sie Hausgeld und NUL-Anteil ein …';
+    }
+
+    document.querySelectorAll('[data-avm-btn]').forEach(btn => {
+      if (avmReady) { btn.removeAttribute('disabled'); btn.classList.add('ready'); }
+      else { btn.setAttribute('disabled', ''); btn.classList.remove('ready'); }
+    });
+
+    const saveBtn = document.getElementById('save-btn');
+    const saveHint = document.getElementById('save-hint');
+    if (comp.hasAllRequired && score.score != null) {
+      saveBtn.removeAttribute('disabled');
+      saveBtn.classList.add('ready');
+      saveHint.innerHTML = 'Bereit zum Speichern · Score <strong>' + score.score + ' / 100</strong> · ' + score.label;
+    } else {
+      saveBtn.setAttribute('disabled', '');
+      saveBtn.classList.remove('ready');
+      const missing = (comp.missing.length || 0);
+      saveHint.innerHTML = missing > 0 ? 'Noch <strong>' + missing + ' Pflichtfeld' + (missing > 1 ? 'er' : '') + '</strong> ausfüllen, dann kannst du speichern.' : 'Bitte fülle alle Pflichtfelder aus.';
+    }
+
+    /* V8-BEWERTUNG: Bewertung anzeigen sobald ein Score existiert (nicht erst bei 'solid') */
+    if (!gated && score.score != null) renderAI(score, inputs);
+
+    if (stage === 'solid' && score.score >= 80 && !_confetti) { fireConfetti(); _confetti = true; }
+  }
+
+  function setKpi(id, val, kpiKey) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = el.querySelector('.v');
+    if (val == null) { v.textContent = '—'; el.classList.remove('good', 'mid', 'bad'); return; }
+    v.textContent = val;
+    const cls = QcEngine.kpiClass(kpiKey, parseFloat(String(val).replace(/[^\d.,\-]/g, '').replace(',', '.')));
+    el.classList.remove('good', 'mid', 'bad');
+    if (cls) el.classList.add(cls);
+  }
+
+  /* ─── PDF Import (Mock) ─── */
+  function handlePdfFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    _exposeFileLoaded = true;
+    if (_exposeResolve) { var _r = _exposeResolve; _exposeResolve = null; setTimeout(_r, 1200); } // nach Mock-Parse weiterlaufen
+    try {
+      var _xcb = document.querySelector('#qc7-sources input[value=\"expose\"]');
+      if (_xcb && !_xcb.checked) { _xcb.checked = true; var _l=_xcb.closest('.qc7-src'); if(_l)_l.classList.add('on'); }
+      else if (_xcb) { var _l2=_xcb.closest('.qc7-src'); if(_l2)_l2.classList.add('on'); }
+    } catch(_e){}
+    showToast('📄 PDF wird analysiert: ' + file.name);
+    // V349: Mock-Befüllung entfernt — der echte Exposé-Import läuft über die Bridge
+    // (qc-import-pdf → Parent-qcImportPdfTrigger → qc-import-result). Keine Demo-/
+    // Finanzierungswerte mehr aus dem iframe.
+    scheduleUpdate();
+    e.target.value = '';
+  }
+
+  function setVal(id, v) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = v;
+  }
+
+  /* ─── KI-Recherche (Mock) ─── */
+  /* V6-ABRUF */
+  async function kiResearch(opts) {
+    const silent = !!(opts && opts.silent);
+    function _v(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; }
+    var adr = _v('qc_str')
+      ? (_v('qc_str') + ' ' + _v('qc_hnr') + ', ' + _v('qc_plz') + ' ' + _v('qc_ort')).trim()
+      : (_v('qc_plz') + ' ' + _v('qc_ort')).trim();
+    var ctx = {
+      adresse: adr, ort: _v('qc_ort'), plz: _v('qc_plz'),
+      kaufpreis: QcEngine.num(_v('qc_kp')), wohnflaeche: QcEngine.num(_v('qc_wfl')),
+      baujahr: parseInt(_v('qc_bj')) || 0, objektart: _v('qc_objektart')
+    };
+    if (!ctx.ort && !ctx.adresse) { if (!silent) showToast('\u26A0 F\u00FCr die KI-Recherche zuerst Adresse oder PLZ + Ort eintragen.'); return; }
+    if (!silent) showToast('\u2728 KI-Recherche l\u00E4uft \u2026');
+    var token = ''; try { token = localStorage.getItem('ji_token') || ''; } catch(e){}
+    try {
+      var groups = ['rent','mgmt','finance'];
+      var results = await Promise.all(groups.map(function(g){
+        return fetch('/api/v1/ai/qc-suggest', {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + token },
+          body: JSON.stringify({ group:g, context:ctx })
+        }).then(function(r){
+          if (r.status === 503) return { _err:'nokey' };
+          if (r.status === 402) return { _err:'nocredits' };
+          if (!r.ok)            return { _err:'http' };
+          return r.json().catch(function(){ return {}; });
+        }).catch(function(){ return { _err:'net' }; });
+      }));
+      var sug = {}, errKind = null;
+      results.forEach(function(r){ if (r){ if (r._err) errKind = r._err; if (r.suggestions) Object.assign(sug, r.suggestions); } });
+      if (!Object.keys(sug).length) {
+        showToast(errKind==='nokey' ? 'KI nicht verf\u00FCgbar \u2014 kein OpenAI-Key hinterlegt.'
+          : errKind==='nocredits' ? 'Keine KI-Credits mehr verf\u00FCgbar.'
+          : 'KI lieferte keine Vorschl\u00E4ge.');
+        return;
+      }
+      function _setIfEmpty(id, val){ var el=document.getElementById(id); if (el && !String(el.value||'').trim() && val!=null && val!=='') el.value = String(val); }
+      if (sug.nettokaltmiete && sug.nettokaltmiete.value != null) _setIfEmpty('qc_nkm', Math.round(sug.nettokaltmiete.value));
+      // V349: KI füllt Zinssatz/Tilgung NICHT — Finanzierungskonditionen setzt der Nutzer selbst.
+      scheduleUpdate();
+      try {
+        var _inp = QcEngine.getInputs();
+        var _sc = QcEngine.computeScore(_inp, (_avmResults[0]||null));
+        if (_sc && _sc.score != null) {
+          renderAI(_sc, _inp);
+          var _card = document.getElementById('ai-card');
+          if (_card && !silent) _card.scrollIntoView({ behavior:'smooth', block:'center' });
+        }
+      } catch(_e){}
+      if (!silent) showToast('\u2713 KI-Recherche \u00FCbernommen');
+    } catch(e){
+      showToast('KI-Fehler: ' + (e.message || 'unbekannt'));
+    }
+  }
+
+  /* ─── PriceHubble (echte Backend-Anbindung mit Demo-Fallback) ─── */
+  // Wenn diese Demo standalone läuft (Doppelklick auf die HTML-Datei),
+  // gibt es kein DealPilot-Backend → wir nutzen den Demo-Fallback.
+  // In der echten App-Integration wird das automatisch über das Backend
+  // unter /api/v1/avm/pricehubble aufgelöst.
+  async function priceHubble(opts) {
+    const silent = !!(opts && opts.silent);
+    if (!silent) showToast('🏛 PriceHubble wird angefragt...');
+    const inputs = QcEngine.getInputs();
+
+    let result = null;
+    let usedFallback = false;
+
+    // Erst echten Backend-Call versuchen
+    try {
+      const res = await fetch('/api/v1/avm/pricehubble', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + ((function(){try{return localStorage.getItem('ji_token')||'';}catch(e){return '';}})())
+        },
+        body: JSON.stringify({
+          plz:       inputs.plz,
+          ort:       inputs.ort,
+          str:       inputs.str,
+          hnr:       inputs.hnr,
+          objektart: inputs.objektart,
+          wfl:       QcEngine.num(inputs.wfl),
+          bj:        inputs.bj ? QcEngine.num(inputs.bj) : null,
+          zimmer:    inputs.zimmer ? QcEngine.num(inputs.zimmer) : null
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok && data.result) result = data.result;
+      }
+    } catch (e) {
+      // Netzwerkfehler — vermutlich Demo-Standalone-Mode
+    }
+
+    // Fallback: Demo-Werte (nur in Standalone-HTML)
+    if (!result) {
+      usedFallback = true;
+      await new Promise(r => setTimeout(r, 800));
+      const wfl = QcEngine.num(inputs.wfl) || 73;
+      const eurPerSqm = 1485;
+      const marktwert = Math.round(wfl * eurPerSqm);
+      result = {
+        provider: 'PriceHubble',
+        marktwert,
+        low:  Math.round(marktwert * 0.92),
+        high: Math.round(marktwert * 1.10),
+        eurPerSqm,
+        conf: 'Gut', confClass: 'good',
+        scoreLocation: 6.8,
+        scoreMicro: 7.1, scoreMacro: 6.5,
+        wertentwicklung: 2.42,
+        marktmieteCold:    Math.round(wfl * 8.5),
+        marktmieteLow:     Math.round(wfl * 8.5 * 0.92),
+        marktmieteHigh:    Math.round(wfl * 8.5 * 1.10),
+        marktmieteEurSqm:  8.5,
+        comparables: 47,
+        ts: new Date()
+      };
+    }
+
+    _avmStore(result);
+    _avmSelection = { marktwert: _spanConfig, marktmiete: _spanConfig };
+
+    // Extra-Daten ins _pendingTransfer
+    _pendingTransfer.ph_marktwert = {
+      label: 'AVM-Marktwert',
+      value: fmt0(result.marktwert) + ' € (' + fmt0(result.low) + '-' + fmt0(result.high) + ')',
+      source: 'PriceHubble', target: 'verkehrswert', isMarktwert: true
+    };
+    if (result.scoreMicro != null) _pendingTransfer.ph_mikrolage = {
+      label: 'Mikrolage-Score', value: result.scoreMicro.toFixed(1) + ' / 10',
+      source: 'PriceHubble', target: 'lage_micro'
+    };
+    if (result.scoreMacro != null) _pendingTransfer.ph_makrolage = {
+      label: 'Makrolage-Score', value: result.scoreMacro.toFixed(1) + ' / 10',
+      source: 'PriceHubble', target: 'lage_macro'
+    };
+    if (result.scoreLocation != null) _pendingTransfer.ph_lage = {
+      label: 'Lage-Score (aggregiert)', value: result.scoreLocation.toFixed(1) + ' / 10',
+      source: 'PriceHubble', target: 'lage_score'
+    };
+    if (result.wertentwicklung != null) _pendingTransfer.ph_wertentwicklung = {
+      label: 'Wertentwicklung p.a.', value: '+' + result.wertentwicklung.toFixed(2) + ' %',
+      source: 'PriceHubble', target: 'wertsteigerung_pa'
+    };
+    if (result.marktmieteCold != null) _pendingTransfer.ph_mietspanne = {
+      label: 'Marktmiete-Range',
+      value: fmt0(result.marktmieteLow) + '-' + fmt0(result.marktmieteHigh) + ' €/Mo',
+      source: 'PriceHubble', target: 'mietspanne'
+    };
+    _pendingTransfer.ph_konfidenz = {
+      label: 'AVM-Konfidenz', value: result.conf,
+      source: 'PriceHubble', target: 'avm_konfidenz'
+    };
+
+    _applySelectionToQc(result);   // V4: Durchschnitt automatisch übernehmen
+    renderAvmResults();
+    if (typeof scheduleUpdate === "function") scheduleUpdate();
+    if (!silent) {
+      if (usedFallback) showToast('ℹ Demo-Daten · ' + _selectionLabel('marktwert') + ' übernommen');
+      else showToast('✓ PriceHubble: ' + fmt0(result.marktwert) + ' € · ' + _selectionLabel('marktwert') + ' übernommen');
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     SPRENGNETTER AVM — V2: Spannen-Auswahl + Marktcheck + DealScore-Inputs
+     ════════════════════════════════════════════════════════════════ */
+  async function sprengnetter(opts) {
+    const silent = !!(opts && opts.silent);
+    if (!silent) showToast('🏛 Sprengnetter wird angefragt...');
+    const inputs = QcEngine.getInputs();
+    let result = null;
+    let usedFallback = false;
+
+    try {
+      const res = await fetch('/api/v1/avm/sprengnetter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ((function(){try{return localStorage.getItem('ji_token')||'';}catch(e){return '';}})()) },
+        body: JSON.stringify({
+          plz:       inputs.plz,
+          ort:       inputs.ort,
+          str:       inputs.str,
+          hnr:       inputs.hnr,
+          objektart: inputs.objektart,
+          wfl:       QcEngine.num(inputs.wfl),
+          bj:        inputs.bj ? QcEngine.num(inputs.bj) : null,
+          sanj:      inputs.sanj ? QcEngine.num(inputs.sanj) : null,
+          zimmer:    inputs.zimmer ? QcEngine.num(inputs.zimmer) : null,
+          gfl:       inputs.gfl ? QcEngine.num(inputs.gfl) : null,
+          stockwerk: inputs.stockwerk ? QcEngine.num(inputs.stockwerk) : null,
+          stockwerke:inputs.stockwerke ? QcEngine.num(inputs.stockwerke) : null,
+          aufzug:    inputs.aufzug,
+          garage:    inputs.garage,
+          stellplatz:inputs.stellplatz,
+          zustand:   inputs.zustand,
+          kp:        inputs.kp ? QcEngine.num(inputs.kp) : null
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok && data.result) result = data.result;
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast('✗ Sprengnetter: ' + (err.detail || err.error || 'HTTP ' + res.status));
+      }
+    } catch (e) {
+      // Standalone-Mode → Demo-Fallback
+    }
+
+    if (!result) {
+      usedFallback = true;
+      await new Promise(r => setTimeout(r, 1200));
+      result = _demoSprResult(inputs);
+    }
+
+    _avmStore(result);
+    _avmSelection = { marktwert: _spanConfig, marktmiete: _spanConfig };
+    _buildPendingTransfer(result, inputs);
+    _applySelectionToQc(result);   // V4: Durchschnitt automatisch übernehmen
+
+    renderAvmResults();
+    if (typeof scheduleUpdate === "function") scheduleUpdate();   // Score sofort aktualisieren
+    if (!silent) {
+      if (usedFallback) showToast('ℹ Demo-Daten · ' + _selectionLabel('marktwert') + ' übernommen');
+      else showToast('✓ Sprengnetter: ' + fmt0(result.marktwert) + ' € · ' + _selectionLabel('marktwert') + ' übernommen');
+    }
+  }
+
+  function _demoSprResult(inputs) {
+    const wfl = QcEngine.num(inputs.wfl) || 73;
+    const eurPerSqm = 1620;
+    const marktwert = Math.round(wfl * eurPerSqm);
+    const eurMieteSqm = 8.8;
+    const marktmiete = Math.round(wfl * eurMieteSqm);
+    const kp = QcEngine.num(inputs.kp) || marktwert;
+    const diffPct = (kp - marktwert) / marktwert * 100;
+    const fpl = diffPct < -10 ? 'TOP_OFFER'
+              : diffPct <  -3 ? 'GOOD_OFFER'
+              : diffPct <   5 ? 'FAIR_OFFER'
+              : diffPct <  15 ? 'EXPENSIVE'
+                              : 'VERY_EXPENSIVE';
+    return {
+      provider: 'Sprengnetter',
+      marktwert,
+      low:  Math.round(marktwert * 0.91),
+      high: Math.round(marktwert * 1.12),
+      eurPerSqm,
+      conf: 'Gut', confClass: 'good',
+      confidenceRaw: 0.72,
+      standardError: 5.4,
+      marktmieteCold:   marktmiete,
+      marktmieteLow:    Math.round(marktmiete * 0.91),
+      marktmieteHigh:   Math.round(marktmiete * 1.12),
+      marktmieteEurSqm: eurMieteSqm,
+      rentScore: 0.68,
+      wertentwicklung: 2.18,
+      grossYield: marktmiete * 12 / marktwert * 100,
+      priceFactor: marktwert / (marktmiete * 12),
+      fairPriceLabel: fpl,
+      fairPriceValue: marktwert,
+      priceRangeMin: Math.round(eurPerSqm * 0.78),
+      priceRangeMax: Math.round(eurPerSqm * 1.28),
+      timeseriesPoints: 40,
+      timeseriesStart: { date: '2016-01-01', value: Math.round(marktwert * 0.74) },
+      timeseriesEnd:   { date: new Date().toISOString().slice(0,10), value: marktwert },
+      sepi: {
+        top:    Math.round(eurPerSqm * 1.18),
+        medium: eurPerSqm,
+        low:    Math.round(eurPerSqm * 0.82)
+      },
+      ts: new Date()
+    };
+  }
+
+  function _buildPendingTransfer(r, inputs) {
+    const mw  = _selectedValue(r, 'marktwert');   // gewählter Marktwert (€)
+    const mm  = _selectedValue(r, 'marktmiete');  // gewählte Marktmiete (€/Mo)
+    const wfl = QcEngine.num(inputs.wfl) || 0;
+
+    // Kern: Marktwert + Marktmiete (kann durch Klick neu gesetzt werden)
+    _pendingTransfer.spr_marktwert = {
+      label: 'AVM-Marktwert (' + _selectionLabel('marktwert') + ')',
+      value: fmt0(mw) + ' €',
+      raw:    mw,
+      source: 'Sprengnetter', target: 'verkehrswert', isMarktwert: true
+    };
+    _pendingTransfer.spr_marktmiete = {
+      label: 'Marktmiete-NKM (' + _selectionLabel('marktmiete') + ')',
+      value: fmt0(mm) + ' €/Mo',
+      raw:    mm,
+      source: 'Sprengnetter', target: 'nkm_grund'
+    };
+
+    // Abgeleitete Werte (fix, nicht spannen-abhängig)
+    if (r.wertentwicklung != null) _pendingTransfer.spr_wertentwicklung = {
+      label: 'Wertsteigerung p.a. (CAGR)',
+      value: (r.wertentwicklung >= 0 ? '+' : '') + r.wertentwicklung.toFixed(2) + ' %',
+      raw:    r.wertentwicklung,
+      source: 'Sprengnetter', target: 'wertsteigerung_pa'
+    };
+
+    // Brutto-Mietrendite (auto-berechnet aus aktueller Auswahl)
+    if (mw && mm) _pendingTransfer.spr_bruttorendite = {
+      label: 'Brutto-Mietrendite (aus Auswahl)',
+      value: (mm * 12 / mw * 100).toFixed(2) + ' %',
+      raw:    mm * 12 / mw * 100,
+      source: 'Sprengnetter', target: 'brutto_mietrendite'
+    };
+
+    // Nachfrage-Indikator (Proxy aus Konfidenz)
+    const demand = _demandScore(r);
+    _pendingTransfer.spr_nachfrage = {
+      label: 'Nachfrage-Indikator (Proxy)',
+      value: demand.label + ' (' + demand.score + ' / 5)',
+      raw:    demand.score,
+      source: 'Sprengnetter', target: 'nachfrage_indikator'
+    };
+
+    // Mietausfall-Proxy
+    const risk = _rentRiskScore(r);
+    _pendingTransfer.spr_mietausfall = {
+      label: 'Mietausfall-Risiko (Proxy)',
+      value: risk.label + ' (' + risk.score + ' / 5)',
+      raw:    risk.score,
+      source: 'Sprengnetter', target: 'mietausfall_risk'
+    };
+
+    // Fair-Price-Label
+    if (r.fairPriceLabel) _pendingTransfer.spr_fairprice = {
+      label: 'Fair-Price-Label',
+      value: _fairPriceText(r.fairPriceLabel),
+      raw:    r.fairPriceLabel,
+      source: 'Sprengnetter', target: 'fair_price'
+    };
+
+    // Energieklassen-Aufschlag aus S-EPI
+    if (r.sepi && r.sepi.top && r.sepi.low) {
+      const aufpreis = (r.sepi.top / r.sepi.low - 1) * 100;
+      _pendingTransfer.spr_energie_aufpreis = {
+        label: 'EEK-Aufpreis A+/B vs F-H',
+        value: '+' + aufpreis.toFixed(1) + ' %',
+        raw:    aufpreis,
+        source: 'Sprengnetter', target: 'energieklasse_aufpreis'
+      };
+    }
+
+    _pendingTransfer.spr_konfidenz = {
+      label: 'AVM-Konfidenz',
+      value: r.conf + (r.confidenceRaw != null ? ' (' + (r.confidenceRaw*100).toFixed(0) + '/100)' : ''),
+      raw:    r.confidenceRaw,
+      source: 'Sprengnetter', target: 'avm_konfidenz'
+    };
+  }
+
+  function _selectedValue(r, kind) {
+    const sel = _spanConfig || 'mid';
+    if (kind === 'marktwert') {
+      if (sel === 'low')  return r.low;
+      if (sel === 'high') return r.high;
+      return r.marktwert;
+    }
+    if (kind === 'marktmiete') {
+      if (sel === 'low')  return r.marktmieteLow;
+      if (sel === 'high') return r.marktmieteHigh;
+      return r.marktmieteCold;
+    }
+  }
+  function _selectionLabel(kind) {
+    const sel = _spanConfig || 'mid';
+    return sel === 'low' ? 'Unten' : sel === 'high' ? 'Oben' : 'Durchschnitt';
+  }
+
+  /* ─── Ableitungen aus AVM-Werten (ehrliche Proxies, keine echten Lage-Daten) ─── */
+  function _demandScore(r) {
+    // Hohe Konfidenz + enge Range = aktiver Markt = hohe Nachfrage
+    let pts = 0;
+    if (r.confidenceRaw != null) {
+      if (r.confidenceRaw >= 0.80) pts += 2;
+      else if (r.confidenceRaw >= 0.60) pts += 1;
+    }
+    // Range-Breite (Standardfehler) — eng = hohe Datendichte
+    if (r.standardError != null) {
+      if (r.standardError <= 5) pts += 2;
+      else if (r.standardError <= 10) pts += 1;
+    } else if (r.low && r.high && r.marktwert) {
+      const spread = (r.high - r.low) / r.marktwert * 100;
+      if (spread <= 12) pts += 2;
+      else if (spread <= 20) pts += 1;
+    }
+    // CAGR positiv = Marktbewegung = Nachfrage
+    if (r.wertentwicklung != null) {
+      if (r.wertentwicklung >= 3) pts += 1;
+      else if (r.wertentwicklung <= 0) pts -= 1;
+    }
+    pts = Math.max(1, Math.min(5, Math.round(pts)));
+    const labels = ['', 'Sehr niedrig', 'Niedrig', 'Mittel', 'Hoch', 'Sehr hoch'];
+    return { score: pts, label: labels[pts] };
+  }
+  function _rentRiskScore(r) {
+    // Brutto-Rendite zu hoch = Risiko-Standort, zu niedrig = stabiler A-Standort
+    let pts = 3;
+    if (r.grossYield != null) {
+      if (r.grossYield > 8.5)       pts = 5;
+      else if (r.grossYield > 7)    pts = 4;
+      else if (r.grossYield > 5)    pts = 3;
+      else if (r.grossYield > 3.5)  pts = 2;
+      else                          pts = 1;
+    }
+    // CAGR positiv mildert Risiko
+    if (r.wertentwicklung != null && r.wertentwicklung > 2) pts = Math.max(1, pts - 1);
+    if (r.wertentwicklung != null && r.wertentwicklung < 0) pts = Math.min(5, pts + 1);
+    const labels = ['', 'Sehr niedrig', 'Niedrig', 'Mittel', 'Hoch', 'Sehr hoch'];
+    return { score: pts, label: labels[pts] };
+  }
+
+  function _fairPriceText(label) {
+    const map = {
+      'TOP_OFFER':       '🏆 Top-Angebot',
+      'GOOD_OFFER':      '✅ Gutes Angebot',
+      'FAIR_OFFER':      '⚖ Faires Angebot',
+      'EXPENSIVE':       '⚠ Teuer',
+      'VERY_EXPENSIVE':  '🚫 Sehr teuer',
+      'UNDEFINED':       '❓ Nicht bewertbar'
+    };
+    return map[label] || label;
+  }
+  function _fairPriceColor(label) {
+    const map = {
+      'TOP_OFFER':       '#3FA56C',
+      'GOOD_OFFER':      '#3FA56C',
+      'FAIR_OFFER':      '#9a7f33',
+      'EXPENSIVE':       '#cc7a30',
+      'VERY_EXPENSIVE':  '#B8625C',
+      'UNDEFINED':       '#888'
+    };
+    return map[label] || '#888';
+  }
+
+  /* User-Klick auf Spannen-Button → Auswahl aktualisieren + Re-Render */
+  /* ════════════════════════════════════════════════════════════════
+     V4: Einheitliche AVM-Card (PriceHubble + Sprengnetter)
+     - Durchschnitt groß, Spanne aufklappbar
+     - Auto-Übernahme des Durchschnitts + Hinweis
+     - Live-Score-Ring zeigt Effekt auf DealScore
+     - Mikro/Makro nur wenn Provider sie liefert (PriceHubble)
+     - Mobile-first responsive
+     ════════════════════════════════════════════════════════════════ */
+
+  function selectAvmRange(kind, which) {
+    _avmSelection = _avmSelection || { marktwert: 'mid', marktmiete: 'mid' };
+    _avmSelection[kind] = which;
+    if (_avmResults.length) {
+      _buildPendingTransfer(_avmResults[0], QcEngine.getInputs());
+      _applySelectionToQc(_avmResults[0]);   // Auswahl sofort in QC + Score
+      renderAvmResults();
+    }
+  }
+
+  /* Setzt NKM aus aktueller Marktmiete-Auswahl + triggert Score-Recalc */
+  function _applySelectionToQc(r) {
+    const mm = _selectedValue(r, 'marktmiete');
+    if (mm) {
+      setVal('qc_nkm_grund', String(Math.round(mm)));
+      if (typeof mieteAddUp === 'function') mieteAddUp();
+      const fEl = document.getElementById('qc_nkm_grund');
+      if (fEl) { const fld = fEl.closest('.field'); if (fld) fld.classList.add('has-source'); }
+    }
+  }
+
+  /* Button: explizit nochmal übernehmen (für den Fall dass User Felder geändert hat) */
+  function applyAvmToQc() {
+    if (!_avmResults.length) return;
+    _applySelectionToQc(_avmResults[0]);
+    _buildPendingTransfer(_avmResults[0], QcEngine.getInputs());
+    showToast('✓ Marktwert + Marktmiete (' + _selectionLabel('marktmiete') + ') übernommen');
+    renderAvmResults();
+  }
+
+  /* Probe-Score: wie steht der DealScore mit der aktuellen AVM-Marktmiete-Auswahl? */
+  function _previewScore(r) {
+    const inputs = QcEngine.getInputs();
+    const mm = _selectedValue(r, 'marktmiete');
+    if (!mm) return null;
+    const probe = Object.assign({}, inputs, { nkm: String(Math.round(mm)) });
+    try { return QcEngine.computeScore(probe, (_avmResults[0]||null)); }
+    catch (e) { return null; }
+  }
+
+  /* V6-ABRUF: Provider-spezifisch speichern (Kombi behält anderen Provider) */
+  function _avmStore(result) {
+    if (!result || !result.provider) { _avmResults = [result]; return; }
+    _avmResults = _avmResults.filter(function(x){ return x.provider !== result.provider; });
+    _avmResults.unshift(result);
+  }
+
+  function renderAvmResults() {
+    const host = document.getElementById('avm-results-host');
+    if (_avmResults.length === 0) { host.innerHTML = ''; return; }
+    let html = '';
+    _avmResults.forEach((r) => {
+      html += _renderUnifiedCard(r, QcEngine.getInputs());
+    });
+    host.innerHTML = html;
+  }
+
+  /* Einheitliche Card für beide Provider */
+  /* V5: Kompakte Einheits-Card — Text-Spannen, kein Score-Ring */
+  /* V6-JS: Card mit PDF-Style Spanne (keine Pick-Buttons mehr) */
+  function _renderUnifiedCard(r, inputs) {
+    const isSpr = (r.provider === 'Sprengnetter');
+    const kp  = QcEngine.num(inputs.kp);
+    const wfl = QcEngine.num(inputs.wfl) || 0;
+
+    // Gewählte Werte nach _spanConfig (gemeinsam für beide)
+    const mwSel = _selectedValue(r, 'marktwert');
+    const mmSel = _selectedValue(r, 'marktmiete');
+    const lblSel = _selectionLabel('marktwert'); // identisch für beide
+    const isMid = (_spanConfig === 'mid');
+
+    // Diff vs Kaufpreis
+    const mwDiff = kp && mwSel ? ((mwSel - kp) / kp * 100) : null;
+    const mwDiffColor = mwDiff == null ? 'var(--ch2)' : (mwDiff > 3 ? '#3FA56C' : mwDiff < -3 ? '#B8625C' : 'var(--gold-3)');
+
+    // Fair-Price (nur Sprengnetter)
+    let fpInline = '';
+    if (isSpr && r.fairPriceLabel) {
+      const c = _fairPriceColor(r.fairPriceLabel);
+      fpInline = ` · <span style="color:${c};font-weight:600">${_fairPriceText(r.fairPriceLabel)}</span>`;
+    }
+
+    // Lage (nur PriceHubble)
+    let lageInline = '';
+    if (!isSpr) {
+      const parts = [];
+      if (r.scoreMicro != null) parts.push(`Mikro ${r.scoreMicro.toFixed(1)}`);
+      if (r.scoreMacro != null) parts.push(`Makro ${r.scoreMacro.toFixed(1)}`);
+      if (r.wertentwicklung != null) parts.push(`Wertentw. +${r.wertentwicklung.toFixed(1)}%/J`);
+      if (parts.length) lageInline = `<div class="avm5-lage">${parts.join(' &nbsp;·&nbsp; ')}</div>`;
+    }
+
+    // €/m²
+    const mwSqm = wfl ? fmt0(mwSel / wfl) + ' €/m²' : '';
+    const mmSqm = wfl ? (mmSel / wfl).toFixed(2).replace('.', ',') + ' €/m² kalt' : 'monatlich';
+
+    // PDF-Style Spannen-Block (Text, keine Buttons) — gewählter Wert hervorgehoben
+    const mwRange = `${fmt0(r.low)} € – <strong>${fmt0(r.marktwert)} €</strong> – ${fmt0(r.high)} €`;
+    const mmRange = `${fmt0(r.marktmieteLow)} € – <strong>${fmt0(r.marktmieteCold)} €</strong> – ${fmt0(r.marktmieteHigh)} €`;
+
+    const spanBlock = `
+    <div class="avm6-spanblock">
+      <div class="avm6-spanrow">
+        <div class="avm6-span-title"><span class="avm7-ic">${QcIcons.svg('bank',{size:14})}</span> Marktwert <span class="avm6-applied-tag">${lblSel} übernommen</span></div>
+        <div class="avm6-span-vals">
+          <span class="avm6-span-main">${fmt0(mwSel)} €</span>
+          <span class="avm6-span-range">Spanne ${mwRange}</span>
+        </div>
+        ${mwSqm ? `<div class="avm6-span-sqm">${mwSqm}${mwDiff != null ? ` · <span style="color:${mwDiffColor}">${mwDiff >= 0 ? '+' : ''}${mwDiff.toFixed(1)}% vs. Kaufpreis</span>` : ''}${fpInline}</div>` : ''}
+      </div>
+      <div class="avm6-spanrow">
+        <div class="avm6-span-title"><span class="avm7-ic">${QcIcons.svg('home',{size:14})}</span> Marktmiete (kalt) <span class="avm6-applied-tag">${lblSel} übernommen</span></div>
+        <div class="avm6-span-vals">
+          <span class="avm6-span-main">${fmt0(mmSel)} €</span>
+          <span class="avm6-span-range">Spanne ${mmRange}</span>
+        </div>
+        <div class="avm6-span-sqm">${mmSqm}</div>
+      </div>
+    </div>`;
+
+    return `
+<div class="avm5-card ${isSpr ? 'is-spr' : 'is-ph'}">
+  <div class="avm5-head">
+    <span class="avm5-provider">${r.provider}</span>
+    <span class="avm5-conf ${r.confClass}">${r.conf}</span>
+    <button class="avm5-x" onclick="QcApp.dismissAvm('${isSpr ? 'spr' : 'ph'}')" title="Verwerfen">✕</button>
+  </div>
+
+  ${lageInline}
+
+  ${spanBlock}
+
+  <div class="avm5-foot">Marktpreisindikation — kein Gutachten n. § 194 BauGB${isMid ? '' : ' · Spanne „' + lblSel + '“ übernommen (Einstellung)'}</div>
+</div>`;
+  }
+
+  function applyAvmNkm(value) {
+    setVal('qc_nkm_grund', String(value));
+    mieteAddUp();
+    document.getElementById('qc_nkm_grund').closest('.field').classList.add('has-source');
+    showToast('✓ Marktmiete als Grundmiete übernommen');
+  }
+  function dismissAvm(which) {
+    if (which === 'spr') _avmResults = _avmResults.filter(r => r.provider !== 'Sprengnetter');
+    else if (which === 'ph') _avmResults = _avmResults.filter(r => r.provider !== 'PriceHubble');
+    else _avmResults = [];
+    renderAvmResults();
+    showToast('AVM-Ergebnis verworfen');
+  }
+
+  /* ─── Photos ─── */
+  function handlePhotos(files) {
+    Array.from(files).slice(0, 6 - _photos.length).forEach(f => {
+      const r = new FileReader();
+      r.onload = (e) => {
+        _photos.push({ name: f.name, data: e.target.result });
+        renderPhotos();
+      };
+      r.readAsDataURL(f);
+    });
+  }
+  function renderPhotos() {
+    const grid = document.getElementById('photo-grid');
+    grid.innerHTML = _photos.map((p, i) => `
+      <div class="photo-thumb">
+        <img src="${p.data}" alt="${p.name}">
+        <button class="photo-thumb-rm" onclick="QcApp.removePhoto(${i})">✕</button>
+      </div>`).join('');
+  }
+  function removePhoto(i) { _photos.splice(i, 1); renderPhotos(); }
+
+  /* ─── KI-Empfehlung (Mock — nutzt AVM-Daten wenn vorhanden) ─── */
+  function renderAI(score, inputs) {
+    const card = document.getElementById('ai-card');
+    card.classList.add('visible');
+    const k = score.kpi;
+    const pros = [], cons = [];
+
+    if (k.bmr >= 5)        pros.push(`Bruttomietrendite <strong>${k.bmr.toString().replace('.', ',')}%</strong> liegt über dem Zielwert`);
+    else if (k.bmr >= 4)   pros.push(`Bruttomietrendite mit ${k.bmr.toString().replace('.', ',')}% solide`);
+    else                   cons.push(`Bruttomietrendite <strong>${k.bmr.toString().replace('.', ',')}%</strong> unter Zielwert — Verhandlungsbedarf`);
+    if (k.nmr >= 3)        pros.push(`Nettomietrendite <strong>${k.nmr.toString().replace('.', ',')}%</strong> erreicht das Ziel`);
+    else                   cons.push(`Nettomietrendite <strong>${k.nmr.toString().replace('.', ',')}%</strong> zu niedrig`);
+    if (k.cfMon >= 100)    pros.push(`Cashflow <strong>+${k.cfMon} €/Mo</strong> ist solide positiv`);
+    else if (k.cfMon >= 0) pros.push(`Cashflow knapp positiv (+${k.cfMon} €/Mo)`);
+    else                   cons.push(`Cashflow <strong>${k.cfMon} €/Mo</strong> — Zuzahlung nötig`);
+    if (k.dscr != null) {
+      if (k.dscr >= 1.3)   pros.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> — Bank-tauglich`);
+      else if (k.dscr >= 1.1) cons.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> grenzwertig für die Bank`);
+      else                 cons.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> kritisch — Finanzierung schwierig`);
+    }
+    if (k.ltvPct <= 95)      pros.push(`Beleihung <strong>${k.ltvPct}%</strong> in solidem Rahmen`);
+    else if (k.ltvPct < 105) cons.push(`Beleihung <strong>${k.ltvPct}%</strong> leicht erhöht`);
+    else                     cons.push(`Beleihung <strong>${k.ltvPct}%</strong> — Vollfinanzierung+`);
+    if (k.bwkPctOfNkm <= 25) pros.push(`Bewirtschaftung <strong>${k.bwkPctOfNkm}%</strong> der NKM — schlank`);
+    else if (k.bwkPctOfNkm > 35) cons.push(`Bewirtschaftung <strong>${k.bwkPctOfNkm}%</strong> der NKM hoch`);
+
+    // AVM-Daten einfließen lassen (provider-aware: PriceHubble + Sprengnetter)
+    let avmAnalysis = '';
+    let priceGap = 0;
+    let priceGapPct = 0;
+    if (_avmResults.length > 0) {
+      const avm = _avmResults[0];
+      const isSpr = (avm.provider === 'Sprengnetter');
+      const kp = QcEngine.num(inputs.kp);
+      // Bei Sprengnetter: spannen-basierte Auswahl nutzen
+      const avmValueForCheck = isSpr ? _selectedValue(avm, 'marktwert') : avm.marktwert;
+      const avmMieteForCheck = isSpr ? _selectedValue(avm, 'marktmiete') : avm.marktmieteCold;
+      const providerName = avm.provider || 'AVM';
+
+      priceGap = (avmValueForCheck || 0) - kp;
+      priceGapPct = kp ? Math.round(priceGap / kp * 100) : 0;
+
+      if (priceGapPct > 8) {
+        pros.push(`Marktwert <strong>${priceGapPct}% über Kaufpreis</strong> — eingebauter Wertpuffer`);
+        avmAnalysis = `Laut ${providerName}-AVM liegt der Marktwert (${isSpr ? _selectionLabel('marktwert') : 'Mittel'}-Spanne) <strong>${fmt0(priceGap)} €</strong> über dem Kaufpreis. Das ist eine günstige Ausgangslage.`;
+      } else if (priceGapPct >= -5) {
+        avmAnalysis = `Der Kaufpreis liegt im Rahmen der ${providerName}-Marktpreisindikation (Abweichung ${priceGapPct}%).`;
+      } else {
+        cons.push(`Kaufpreis <strong>${Math.abs(priceGapPct)}% über Marktwert</strong> — überteuert`);
+        avmAnalysis = `Laut ${providerName} ist das Objekt um etwa <strong>${fmt0(Math.abs(priceGap))} €</strong> überteuert. Das ist ein deutliches Warnsignal.`;
+      }
+
+      // Provider-spezifische Pros/Cons
+      if (!isSpr) {
+        // PriceHubble: Lage-Scores
+        if (avm.scoreLocation != null) {
+          if (avm.scoreLocation < 5)      cons.push(`Lage-Score <strong>${avm.scoreLocation.toFixed(1)}/10</strong> — eher schwache Lage`);
+          else if (avm.scoreLocation >= 7) pros.push(`Lage-Score <strong>${avm.scoreLocation.toFixed(1)}/10</strong> — gute Mikro- und Makrolage`);
+        }
+      } else {
+        // Sprengnetter: abgeleitete Werte
+        const demand = _demandScore(avm);
+        const risk   = _rentRiskScore(avm);
+        if (demand.score >= 4)      pros.push(`Nachfrage-Indikator <strong>${demand.label}</strong> (Sprengnetter-Proxy)`);
+        else if (demand.score <= 2) cons.push(`Nachfrage-Indikator <strong>${demand.label}</strong> — Wiederverkauf kann dauern`);
+        if (risk.score >= 4)        cons.push(`Mietausfall-Risiko <strong>${risk.label}</strong> (Brutto-Renditen-Proxy)`);
+        if (avm.fairPriceLabel === 'TOP_OFFER' || avm.fairPriceLabel === 'GOOD_OFFER')
+          pros.push(`Sprengnetter Fair-Price: <strong>${_fairPriceText(avm.fairPriceLabel)}</strong>`);
+        else if (avm.fairPriceLabel === 'VERY_EXPENSIVE')
+          cons.push(`Sprengnetter Fair-Price: <strong>${_fairPriceText(avm.fairPriceLabel)}</strong>`);
+        if (avm.wertentwicklung != null && avm.wertentwicklung >= 2.5)
+          pros.push(`Wertsteigerung <strong>+${avm.wertentwicklung.toFixed(2)}% p.a.</strong> (CAGR)`);
+        else if (avm.wertentwicklung != null && avm.wertentwicklung < 0)
+          cons.push(`Wertverlust <strong>${avm.wertentwicklung.toFixed(2)}% p.a.</strong> in der Region`);
+      }
+
+      const nkmCurrent = QcEngine.num(inputs.nkm);
+      if (nkmCurrent && avmMieteForCheck && avmMieteForCheck > nkmCurrent * 1.10) {
+        pros.push(`Bestandsmiete <strong>${Math.round((avmMieteForCheck/nkmCurrent - 1) * 100)}% unter Marktmiete</strong> — Mietsteigerungspotenzial`);
+      } else if (nkmCurrent && avmMieteForCheck && avmMieteForCheck < nkmCurrent * 0.90) {
+        cons.push(`NKM <strong>${Math.round((nkmCurrent/avmMieteForCheck - 1) * 100)}% über Marktmiete</strong> — Risiko bei Mieterwechsel`);
+      }
+    }
+
+    // Verhandlungs-Empfehlung
+    const verdict = document.getElementById('ai-verdict');
+    const verdictEmoji = document.getElementById('ai-verdict-emoji');
+    const verdictHl = document.getElementById('ai-verdict-headline');
+    const verdictSub = document.getElementById('ai-verdict-sub');
+    const negotiate = document.getElementById('ai-negotiate-v');
+
+    let negotiateText = '';
+    if (score.score >= 75) {
+      verdict.classList.remove('warn', 'bad');
+      verdictEmoji.textContent = '💚';
+      verdictHl.textContent = 'Starker Kauf — empfehlenswert';
+      verdictSub.textContent = 'Score ' + score.score + '/100 (' + score.label + ') · Investment-Profil stimmt';
+      if (priceGapPct > 5) {
+        negotiateText = `<strong>Nicht stark verhandeln</strong> — der Preis ist marktgerecht (Marktwert ${fmt0(_avmResults[0].marktwert)} € liegt über KP). Versuche <strong>2-3% Nachlass</strong> für kleinere Mängel oder schnellen Abschluss. Sicher die Konditionen schnell.`;
+      } else {
+        negotiateText = `Versuche <strong>3-5% Nachlass</strong> — kein Druck, der Deal ist auch so stark. Bei Erfolg bist du beim Top-Score.`;
+      }
+    } else if (score.score >= 60) {
+      verdict.classList.remove('bad');
+      verdict.classList.add('warn');
+      verdictEmoji.textContent = '⚖️';
+      verdictHl.textContent = 'Kauf möglich — verhandeln nötig';
+      verdictSub.textContent = 'Score ' + score.score + '/100 (' + score.label + ') · Optimierungspotenzial';
+      if (priceGapPct < -5) {
+        const targetReduction = Math.abs(priceGapPct) + 2;
+        negotiateText = `<strong>Hart verhandeln, mindestens ${targetReduction}% Nachlass</strong>. Argumentation: AVM zeigt Überpreis von ${Math.abs(priceGapPct)}%. Bei ${targetReduction}% Reduktion käme der Deal auf einen guten Score.`;
+      } else {
+        negotiateText = `<strong>5-8% Nachlass</strong> verhandeln. Schwachpunkte als Argumentation: ${cons.length > 0 ? cons.slice(0,2).map(c => c.replace(/<\/?strong>/g, '"')).join(' · ').substring(0,200) : 'Cashflow und DSCR'}.`;
+      }
+    } else {
+      verdict.classList.remove('warn');
+      verdict.classList.add('bad');
+      verdictEmoji.textContent = '🔴';
+      verdictHl.textContent = 'Vorsicht — überdenken';
+      verdictSub.textContent = 'Score ' + score.score + '/100 (' + score.label + ') · zu schwach';
+      negotiateText = `<strong>Mindestens 10-15% Nachlass erforderlich</strong> — sonst weitersuchen. Bei diesem Score-Niveau ist der Deal aktuell nicht tragfähig. Alternative: anderes Finanzierungs-Setup (mehr EK, längere Zinsbindung).`;
+    }
+    // V344: Verhandlungs-Empfehlung mit nachvollziehbarer Rechnung (Kaufpreis → Zielpreis + Begründung)
+    (function(){
+      var _kp = QcEngine.num(inputs.kp);
+      var _nkmJ = QcEngine.num(inputs.nkm) * 12;
+      var _mw = 0, _prov = 'AVM';
+      if (_avmResults.length) {
+        var _a = _avmResults[0]; _prov = _a.provider || 'AVM';
+        _mw = (_a.provider === 'Sprengnetter') ? _selectedValue(_a, 'marktwert') : _a.marktwert;
+      }
+      if (!_kp) return; // ohne Kaufpreis bleibt der allgemeine Text
+      var _ziel = null, _grund = '';
+      if (_mw && _mw < _kp * 0.98) {
+        _ziel = Math.round(_mw);
+        _grund = 'Das entspricht dem ' + _prov + '-Marktwert (' + fmt0(_mw) + ' €); der Kaufpreis liegt aktuell ' + Math.round((_kp - _mw) / _kp * 100) + ' % darüber.';
+      } else if (_nkmJ) {
+        var _kpBmr = Math.round(_nkmJ / 0.05);
+        if (_kpBmr < _kp * 0.99) {
+          _ziel = _kpBmr;
+          _grund = 'Bei diesem Preis erreicht die Bruttomietrendite die Zielmarke von 5,0 % (aktuell ' + String(k.bmr).replace('.', ',') + ' %; Rechnung: ' + fmt0(_nkmJ) + ' € Jahresnettokaltmiete ÷ 5,0 %).';
+        }
+      }
+      if (_ziel && _ziel < _kp) {
+        var _redPct = Math.round((_kp - _ziel) / _kp * 100);
+        negotiateText = 'Kaufpreis <strong>' + fmt0(_kp) + ' €</strong> → Zielpreis <strong>' + fmt0(_ziel) + ' €</strong> ' +
+          '(<strong>\u2212' + _redPct + ' %</strong>, ' + fmt0(_kp - _ziel) + ' € weniger). ' + _grund;
+      } else {
+        negotiateText = 'Kaufpreis <strong>' + fmt0(_kp) + ' €</strong> ist marktgerecht \u2014 kein nennenswerter Verhandlungsbedarf. ' +
+          'Versuche 2\u20133 % (' + fmt0(Math.round(_kp * 0.025)) + ' €) f\u00FCr kleinere M\u00E4ngel oder einen schnellen Abschluss.';
+      }
+    })();
+    negotiate.innerHTML = negotiateText;
+
+    // Experten-Meinung
+    const opinionText = composeOpinion(score, inputs, avmAnalysis);
+    document.getElementById('ai-opinion').innerHTML = opinionText;
+
+    document.getElementById('ai-pros').innerHTML = pros.slice(0, 6).map(p => '<li>' + p + '</li>').join('') || '<li>—</li>';
+    document.getElementById('ai-cons').innerHTML = cons.slice(0, 6).map(p => '<li>' + p + '</li>').join('') || '<li>Keine kritischen Punkte</li>';
+    document.getElementById('ai-source').textContent = 'Lokale Heuristik';
+
+    // V4: Marktcheck-Block rausgenommen (Wunsch) — AVM-Daten fließen weiterhin in Pros/Cons + Opinion
+    const mcHost = document.getElementById('ai-marktcheck-host');
+    if (mcHost) mcHost.innerHTML = '';
+  }
+
+  function renderMarktcheck(score, inputs) {
+    const host = document.getElementById('ai-marktcheck-host');
+    if (!host) return;
+    const sprResult = _avmResults.find(r => r.provider === 'Sprengnetter');
+    if (!sprResult) { host.innerHTML = ''; return; }
+
+    const r = sprResult;
+    const kp  = QcEngine.num(inputs.kp);
+    const nkm = QcEngine.num(inputs.nkm);
+    const wfl = QcEngine.num(inputs.wfl) || 0;
+    const sel = _avmSelection || { marktwert: 'mid', marktmiete: 'mid' };
+    const mwSel = _selectedValue(r, 'marktwert');
+    const mmSel = _selectedValue(r, 'marktmiete');
+    const demand = _demandScore(r);
+    const risk   = _rentRiskScore(r);
+
+    // Verdict-Komposition (Marktcheck-spezifisch, unabhängig vom Haupt-Score)
+    let verdictParts = [];
+    if (kp && mwSel) {
+      const diffPct = (kp - mwSel) / mwSel * 100;
+      if (diffPct < -8)       verdictParts.push(`Kaufpreis liegt <b>${Math.abs(diffPct).toFixed(1)}% unter dem AVM-Wert</b> (${_selectionLabel('marktwert')}) — eingebauter Wertpuffer von ${fmt0(mwSel - kp)} €.`);
+      else if (diffPct < -3)  verdictParts.push(`Kaufpreis ${Math.abs(diffPct).toFixed(1)}% unter AVM — fairer Preis mit kleinem Puffer.`);
+      else if (diffPct < 5)   verdictParts.push(`Kaufpreis liegt im Marktrahmen (${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(1)}% vs. AVM-${_selectionLabel('marktwert')}).`);
+      else if (diffPct < 12)  verdictParts.push(`Kaufpreis <b>${diffPct.toFixed(1)}% über dem AVM-Wert</b> — Verhandlungsbedarf von ${fmt0(kp - mwSel)} €.`);
+      else                    verdictParts.push(`<b>Warnung:</b> Kaufpreis <b>${diffPct.toFixed(1)}% über dem AVM-Marktwert</b> (${_selectionLabel('marktwert')}). Differenz: ${fmt0(kp - mwSel)} €. Stark verhandeln oder weitersuchen.`);
+    }
+    if (nkm && mmSel) {
+      const mietDiff = (mmSel - nkm) / nkm * 100;
+      if (Math.abs(mietDiff) > 8) {
+        if (mietDiff > 0) verdictParts.push(`Marktmiete (${_selectionLabel('marktmiete')}) liegt <b>${mietDiff.toFixed(1)}% über deiner aktuellen NKM</b> — Mietsteigerungspotenzial bei Neuvermietung.`);
+        else              verdictParts.push(`NKM liegt <b>${Math.abs(mietDiff).toFixed(1)}% über der AVM-Marktmiete</b> — Risiko bei Mieterwechsel, eventuell überzahlt.`);
+      }
+    }
+    if (r.fairPriceLabel === 'VERY_EXPENSIVE' || r.fairPriceLabel === 'EXPENSIVE') {
+      verdictParts.push(`Sprengnetter Fair-Price-Label: <b>${_fairPriceText(r.fairPriceLabel).replace(/^[^ ]+ /, '')}</b>.`);
+    }
+    if (demand.score <= 2) verdictParts.push(`Nachfrage-Indikator niedrig (${demand.label}) — Wiederverkauf könnte länger dauern.`);
+    if (risk.score >= 4)   verdictParts.push(`Mietausfall-Risiko ${risk.label.toLowerCase()} — auf Mieterbonität achten, ggf. Mietausfallversicherung.`);
+    if (r.wertentwicklung != null) {
+      if (r.wertentwicklung < 0)      verdictParts.push(`Region hat zuletzt <b>${r.wertentwicklung.toFixed(2)}% p.a. an Wert verloren</b> — Vorsicht.`);
+      else if (r.wertentwicklung > 3) verdictParts.push(`Wertsteigerung +${r.wertentwicklung.toFixed(2)}% p.a. — solides Lage-Momentum.`);
+    }
+
+    const verdict = verdictParts.length ? verdictParts.join(' ') : 'Sprengnetter-Daten liegen im erwarteten Marktrahmen.';
+
+    host.innerHTML = `
+<div class="ai-marktcheck">
+  <div class="ai-marktcheck-head">🏛 Marktcheck — Sprengnetter AVM <span style="font-weight:400;font-size:12px;color:var(--ch2)">(${_selectionLabel('marktwert')}-Spanne)</span></div>
+  <div class="ai-marktcheck-grid">
+    <div class="ai-marktcheck-cell">
+      <div class="ai-marktcheck-cell-l">AVM-Wert (${_selectionLabel('marktwert')})</div>
+      <div class="ai-marktcheck-cell-v">${fmt0(mwSel)} €</div>
+    </div>
+    <div class="ai-marktcheck-cell">
+      <div class="ai-marktcheck-cell-l">Marktmiete (${_selectionLabel('marktmiete')})</div>
+      <div class="ai-marktcheck-cell-v">${fmt0(mmSel)} €/Mo</div>
+    </div>
+    ${kp && mwSel ? `<div class="ai-marktcheck-cell">
+      <div class="ai-marktcheck-cell-l">Diff KP vs AVM</div>
+      <div class="ai-marktcheck-cell-v" style="color:${(kp - mwSel) > 0 ? '#B8625C' : '#3FA56C'}">${(kp - mwSel) > 0 ? '+' : ''}${(((kp - mwSel) / mwSel) * 100).toFixed(1)} %</div>
+    </div>` : ''}
+    ${r.fairPriceLabel ? `<div class="ai-marktcheck-cell">
+      <div class="ai-marktcheck-cell-l">Fair-Price</div>
+      <div class="ai-marktcheck-cell-v" style="font-size:13px">${_fairPriceText(r.fairPriceLabel)}</div>
+    </div>` : ''}
+    <div class="ai-marktcheck-cell">
+      <div class="ai-marktcheck-cell-l">Nachfrage (Proxy)</div>
+      <div class="ai-marktcheck-cell-v">${'●'.repeat(demand.score)}${'○'.repeat(5-demand.score)} <span style="font-size:12px;color:var(--ch2);font-weight:500">${demand.label}</span></div>
+    </div>
+    <div class="ai-marktcheck-cell">
+      <div class="ai-marktcheck-cell-l">Mietausfall (Proxy)</div>
+      <div class="ai-marktcheck-cell-v">${'●'.repeat(risk.score)}${'○'.repeat(5-risk.score)} <span style="font-size:12px;color:var(--ch2);font-weight:500">${risk.label}</span></div>
+    </div>
+  </div>
+  <div class="ai-marktcheck-verdict">${verdict}</div>
+</div>`;
+  }
+
+  function composeOpinion(score, inputs, avmAnalysis) {
+    const k = score.kpi;
+    const parts = [];
+    
+    // Einleitung
+    const objArt = inputs.objektart || 'Immobilie';
+    const wfl = QcEngine.num(inputs.wfl);
+    const ort = inputs.ort || 'unbekannter Ort';
+    const kp = QcEngine.num(inputs.kp);
+    parts.push(`Eine <strong>${objArt}</strong> in <strong>${ort}</strong>${wfl ? ' mit ' + wfl + ' m²' : ''} für <strong>${fmt0(kp)} €</strong> zu kaufen ist`);
+    
+    // Bewertung
+    if (score.score >= 75) parts.push(`<strong>sachlich gerechtfertigt</strong>.`);
+    else if (score.score >= 60) parts.push(`<strong>vertretbar, aber nicht optimal</strong>.`);
+    else parts.push(`<strong>aktuell nicht empfehlenswert</strong>.`);
+
+    // KPI-Analyse
+    if (k.bmr) {
+      parts.push(`Die Bruttomietrendite von <strong>${k.bmr.toString().replace('.', ',')}%</strong> ist`);
+      if (k.bmr >= 5.5) parts.push(`<strong>gut</strong> und liegt über dem deutschen Durchschnitt (~4,5%).`);
+      else if (k.bmr >= 4.5) parts.push(`<strong>marktüblich</strong>.`);
+      else parts.push(`<strong>unterdurchschnittlich</strong> und braucht entweder Mietsteigerung oder Kaufpreis-Reduktion.`);
+    }
+
+    if (k.cfMon != null) {
+      if (k.cfMon < 0) {
+        parts.push(`Der monatliche Cashflow von <strong>${k.cfMon} €</strong> bedeutet, dass du jeden Monat aus eigener Tasche zulegst — über 10 Jahre sind das ${fmt0(Math.abs(k.cfMon * 120))} €.`);
+      } else {
+        parts.push(`Der positive Cashflow von <strong>+${k.cfMon} €/Mo</strong> deckt die laufenden Kosten ab.`);
+      }
+    }
+
+    if (avmAnalysis) parts.push(avmAnalysis);
+
+    // Tilgung-Status
+    if (k.darlehen && k.annuMon) {
+      const tilgPaRel = (k.darlehen * QcEngine.num(inputs.tilg) / 100);
+      const jahreBisHalbiert = Math.round(50 / QcEngine.num(inputs.tilg));
+      parts.push(`Mit der gewählten Tilgung von <strong>${inputs.tilg}%</strong> dauert es etwa <strong>${jahreBisHalbiert} Jahre</strong> bis das Darlehen zur Hälfte getilgt ist.`);
+    }
+
+    // Schluss
+    if (score.score >= 75) {
+      parts.push(`<strong>Empfehlung:</strong> Konditionen zügig sichern, kleinere Verhandlungen versuchen.`);
+    } else if (score.score >= 60) {
+      parts.push(`<strong>Empfehlung:</strong> Verhandeln, dann nochmal nachrechnen. Bei Erfolg ist es ein guter Deal.`);
+    } else {
+      parts.push(`<strong>Empfehlung:</strong> Deutlich verhandeln oder weitersuchen. So wie es ist, ist die Rendite-Risiko-Relation nicht stimmig.`);
+    }
+
+    return parts.join(' ');
+  }
+
+  /* ─── OpenAI Modal ─── */
+  function showApiKeyModal() {
+    document.getElementById('api-modal').classList.add('show');
+    setTimeout(() => document.getElementById('api-key-input').focus(), 100);
+  }
+  function closeApiModal() { document.getElementById('api-modal').classList.remove('show'); }
+  async function runRealAi() {
+    const key = document.getElementById('api-key-input').value.trim();
+    if (!key.startsWith('sk-')) { showToast('⚠ API-Key muss mit sk- beginnen'); return; }
+    closeApiModal();
+    showToast('🤖 OpenAI wird angefragt...');
+    document.getElementById('ai-source').textContent = 'OpenAI · GPT-4 (Live)';
+    const inputs = QcEngine.getInputs();
+    const score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
+    const avmData = _avmResults.length > 0 ? _avmResults[0] : null;
+    const prompt = `Du bist ein Immobilien-Investment-Experte. Analysiere diesen Deal auf Deutsch.
+
+Eingaben:
+- Objekt: ${inputs.objektart} in ${inputs.plz} ${inputs.ort}, ${inputs.wfl} m², Bj. ${inputs.bj}
+- Kaufpreis: ${fmt0(QcEngine.num(inputs.kp))} €
+- Nettokaltmiete: ${inputs.nkm} €/Mo
+- Hausgeld: ${inputs.hg} €/Mo
+- EK: ${fmt0(QcEngine.num(inputs.ek))} €, Zins: ${inputs.zins}%, Tilg: ${inputs.tilg}%
+
+Berechnete KPIs: BMR ${score.kpi.bmr}%, NMR ${score.kpi.nmr}%, EKR ${score.kpi.ekr}%, CF ${score.kpi.cfMon}€/Mo, DSCR ${score.kpi.dscr}, LTV ${score.kpi.ltvPct}%
+Score: ${score.score}/100 (${score.label})
+${avmData ? `\nAVM-Daten (PriceHubble): Marktwert ${fmt0(avmData.marktwert)} €, Lage ${avmData.scoreLocation}/10, Wertentwicklung ${avmData.wertentwicklung}% p.a.` : ''}
+
+Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
+{
+  "verdict": "Starker Kauf / Kauf möglich / Vorsicht",
+  "negotiate": "konkrete Verhandlungsempfehlung mit Prozent",
+  "pros": ["Punkt 1", "Punkt 2", "Punkt 3", "Punkt 4"],
+  "cons": ["Punkt 1", "Punkt 2", "Punkt 3"],
+  "opinion": "Sachliche Experten-Meinung in 3-4 Sätzen"
+}`;
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.5
+        })
+      });
+      const data = await res.json();
+      if (data.error) { showToast('⚠ ' + data.error.message); return; }
+      const content = data.choices[0].message.content;
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) { showToast('⚠ KI-Antwort nicht parsebar'); return; }
+      const result = JSON.parse(jsonMatch[0]);
+      
+      document.getElementById('ai-verdict-headline').textContent = result.verdict || 'Analyse';
+      document.getElementById('ai-negotiate-v').innerHTML = result.negotiate || '—';
+      document.getElementById('ai-pros').innerHTML = (result.pros || []).map(p => '<li>' + p + '</li>').join('');
+      document.getElementById('ai-cons').innerHTML = (result.cons || []).map(p => '<li>' + p + '</li>').join('');
+      document.getElementById('ai-opinion').innerHTML = result.opinion || '';
+      showToast('✓ GPT-4-Analyse fertig');
+    } catch (e) {
+      showToast('⚠ Fehler: ' + e.message);
+    }
+  }
+
+  /* ─── Save-Modal mit Transfer-Daten ─── */
+  function openSaveModal() {
+    // Auch wenn _pendingTransfer leer ist, schick das Modal trotzdem zur Bestätigung
+    renderTransferList();
+    document.getElementById('transfer-modal').classList.add('show');
+  }
+  function closeSaveModal() { document.getElementById('transfer-modal').classList.remove('show'); }
+  function renderTransferList() {
+    const list = document.getElementById('transfer-list');
+    const keys = Object.keys(_pendingTransfer);
+    if (keys.length === 0) {
+      list.innerHTML = '<p style="text-align:center;padding:20px;color:var(--muted);font-style:italic">Keine zusätzlichen Daten zum Übernehmen — du kannst direkt speichern.</p>';
+      document.querySelector('.transfer-toggle-all').style.display = 'none';
+      return;
+    }
+    document.querySelector('.transfer-toggle-all').style.display = 'flex';
+    
+    // Gruppiere nach Quelle
+    const groups = {};
+    keys.forEach(k => {
+      const item = _pendingTransfer[k];
+      if (!groups[item.source]) groups[item.source] = [];
+      groups[item.source].push({ key: k, ...item });
+    });
+    
+    let html = '';
+    Object.entries(groups).forEach(([source, items]) => {
+      html += `<div class="transfer-section">
+        <div class="transfer-section-title">${source}</div>`;
+      items.forEach(item => {
+        const idAttr = 'transfer-cb-' + item.key;
+        html += `<label class="transfer-item">
+          <input type="checkbox" id="${idAttr}" data-key="${item.key}" checked>
+          <div class="transfer-item-body">
+            <div class="transfer-item-l">
+              <span>${item.label}</span>
+              <span class="transfer-item-source">→ ${item.target}</span>
+            </div>
+            <div class="transfer-item-v"><strong>${item.value}</strong></div>
+            ${item.isMarktwert ? `
+              <div class="transfer-warning">
+                <strong>⚠ Wichtig:</strong> Dieser Wert ist eine automatisierte <strong>Marktpreisindikation</strong> (AVM) auf Basis von Vergleichsobjekten. Er ersetzt <strong>KEIN Gutachten</strong> eines vereidigten Sachverständigen nach § 194 BauGB / ImmoWertV.
+              </div>
+            ` : ''}
+          </div>
+        </label>`;
+      });
+      html += '</div>';
+    });
+    list.innerHTML = html;
+  }
+  function toggleAllTransfer(checked) {
+    document.querySelectorAll('#transfer-list input[type="checkbox"]').forEach(cb => cb.checked = checked);
+  }
+  function confirmSave() {
+    /* V329: Anbindung an die echte App — Werte an Parent posten. */
+    const inputs = QcEngine.getInputs();
+    let avm = null;
+    try {
+      if (_avmResults && _avmResults[0]) {
+        const r = _avmResults[0];
+        var _sel = function (kind, fb) { try { return (typeof _selectedValue === 'function') ? _selectedValue(r, kind) : fb; } catch (e) { return fb; } };
+        // V348: angehakte Übernahme-Targets sammeln (Modal-Checkboxen)
+        var _checked = {};
+        try {
+          Object.keys(_pendingTransfer).forEach(function (key) {
+            var cb = document.getElementById('transfer-cb-' + key);
+            if (!cb || cb.checked) _checked[_pendingTransfer[key].target] = true;
+          });
+        } catch (e) {}
+        avm = {
+          provider: r.provider,
+          marktwert: _sel('marktwert', r.marktwert),
+          marktmiete: _sel('marktmiete', r.marktmieteCold),     // €/Monat (gewählte Spanne)
+          scoreMacro: r.scoreMacro,
+          scoreMicro: r.scoreMicro,
+          wertentwicklung: r.wertentwicklung,                    // % p.a.
+          demandScore: (typeof _demandScore === 'function' ? (_demandScore(r) || {}).score : null),
+          riskScore:   (typeof _rentRiskScore === 'function' ? (_rentRiskScore(r) || {}).score : null),
+          wfl: QcEngine.num(inputs.wfl) || 0,
+          checkedTargets: _checked
+        };
+      }
+    } catch (e) {}
+    try { window.parent.postMessage({ source: 'dp-qc', type: 'qc-save', inputs: inputs, avm: avm, photos: (typeof _photos !== 'undefined' ? _photos : []) }, '*'); } catch (e) {}
+    closeSaveModal();
+    showToast('💾 Objekt wird in DealPilot übernommen …');
+    fireConfetti();
+  }
+
+
+  /* V6-JS ─────────────────────────────────────────────────────────
+     Spannen-Konfig, Settings-Modal, Credit-Modal, sequenzieller Abruf
+     ───────────────────────────────────────────────────────────────── */
+
+  function QcApp_v6_syncSegments() {
+    ['qc6-seg', 'qc6-set-seg'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.querySelectorAll('button').forEach(function(b){
+        if (b.getAttribute('data-span') === _spanConfig) b.classList.add('sel');
+        else b.classList.remove('sel');
+      });
+    });
+  }
+
+  function setSpanConfig(which) {
+    _spanConfig = (which === 'low' || which === 'high') ? which : 'mid';
+    try { localStorage.setItem('qc_span_config', _spanConfig); } catch(e){}
+    // _avmSelection synchron halten (Altcode liest stellenweise noch davon)
+    _avmSelection = { marktwert: _spanConfig, marktmiete: _spanConfig };
+    QcApp_v6_syncSegments();
+    // Falls schon Ergebnisse da: sofort neu übernehmen + rendern
+    if (_avmResults.length) {
+      _applySelectionToQc(_avmResults[0]);
+      _buildPendingTransfer(_avmResults[0], QcEngine.getInputs());
+      renderAvmResults();
+      if (typeof scheduleUpdate === 'function') scheduleUpdate();
+    }
+  }
+
+  /* ─── Settings-Modal ─── */
+  function openQc6Settings()  { QcApp_v6_syncSegments(); document.getElementById('qc6-settings-modal').classList.add('show'); }
+  function closeQc6Settings() { document.getElementById('qc6-settings-modal').classList.remove('show'); }
+
+  /* ─── Credit-Kosten je Schnittstelle ─── */
+  /* V7-JS ─────────────────────────────────────────────────────────
+     Multi-Select Abruf-Quellen, Pflichtfeld-Validierung, getrennte Credits
+     ───────────────────────────────────────────────────────────────── */
+
+  // Pflichtfelder pro Schnittstelle (Feld-id ohne qc_ Präfix → Label)
+  var QC7_REQUIRED = {
+    ph:  [['plz','PLZ'],['ort','Ort'],['str','Straße'],['hnr','Hausnummer'],['objektart','Objektart'],['wfl','Wohnfläche']],
+    spr: [['plz','PLZ'],['ort','Ort'],['objektart','Objektart'],['wfl','Wohnfläche']],
+    ki:  [],          // KI braucht keine harten Pflichtfelder
+    expose: []        // Exposé-Import: Datei statt Felder
+  };
+
+  function _selectedSources() {
+    var out = [];
+    document.querySelectorAll('#qc7-sources input[type="checkbox"]:checked').forEach(function(cb){ out.push(cb.value); });
+    return out;
+  }
+
+  // Exposé-Checkbox: beim Anhaken sofort Datei-Dialog öffnen (vorher reinladen)
+  var _exposeFileLoaded = false;
+  function toggleSource(cb) {
+    var label = cb.closest('.qc7-src');
+    if (label) label.classList.toggle('on', cb.checked);
+    // V8: Exposé öffnet den Datei-Dialog NICHT mehr beim Anhaken,
+    // sondern erst beim Klick auf "Abrufen" (siehe _runSelected).
+  }
+  // V8: Promise-Hook, damit der Exposé-Schritt im Ablauf auf den Import warten kann
+  var _exposeResolve = null;
+
+  // Validierung: welche Pflichtfelder fehlen je gewählter Quelle?
+  // V10: fehlende Pflichtfelder eines einzelnen Providers (Array von Labels)
+  function _missingForProvider(src) {
+    var inputs = QcEngine.getInputs();
+    var req = QC7_REQUIRED[src] || [];
+    return req.filter(function(f){ return !inputs[f[0]] || String(inputs[f[0]]).trim()===''; }).map(function(f){ return f[1]; });
+  }
+
+  function _validateSources(sources) {
+    var inputs = QcEngine.getInputs();
+    var missingByProvider = [];
+    sources.forEach(function(src){
+      if (src === 'expose') {
+        // V8: Datei wird erst im Ablauf (beim Abrufen) geladen → hier nicht blockieren
+        return;
+      }
+      var req = QC7_REQUIRED[src] || [];
+      var miss = req.filter(function(f){ return !inputs[f[0]] || String(inputs[f[0]]).trim()===''; });
+      if (miss.length) missingByProvider.push({ src:src, name:_srcName(src), items:miss });
+    });
+    return missingByProvider;
+  }
+
+  function _srcName(src) {
+    return src==='ph' ? 'PriceHubble' : src==='spr' ? 'Sprengnetter' : src==='ki' ? 'KI-Recherche' : 'Exposé-Import';
+  }
+
+  // Credit-Aufschlüsselung (getrennte Töpfe je Typ — NICHT verrechnet)
+  function _creditParts(sources) {
+    var inputs = QcEngine.getInputs();
+    var hasKp = !!QcEngine.num(inputs.kp);
+    var parts = [];
+    if (sources.indexOf('expose') !== -1) parts.push({ key:'expose', name:'Exposé-Import', sub:'PDF auslesen', type:'free', calls:0 });
+    if (sources.indexOf('ph')  !== -1)    parts.push({ key:'ph',  name:'PriceHubble', sub:'Marktwert, Mikro-/Makrolage', type:'ph',  calls:1 });
+    if (sources.indexOf('spr') !== -1)    parts.push({ key:'spr', name:'Sprengnetter', sub: hasKp ? 'Wert, Miete, Fair-Price' : 'Wert, Miete (kein Kaufpreis)', type:'spr', calls: hasKp ? 3 : 2 });
+    if (sources.indexOf('ki')  !== -1)    parts.push({ key:'ki',  name:'KI-Recherche', sub:'ergänzt Annahmen (1 OpenAI-Call)', type:'ki', calls:1 });
+    return parts;
+  }
+
+  function openCreditModal() {
+    var sources = _selectedSources();
+    if (!sources.length) { showToast('Bitte mindestens eine Quelle auswählen'); return; }
+
+    var listEl  = document.getElementById('qc6-credit-list');
+    var totBox  = document.getElementById('qc6-credit-totalbox');
+    var noteEl  = document.getElementById('qc6-credit-note');
+    var footBtn = document.getElementById('qc6-credit-confirm');
+    var _hasExpose = sources.indexOf('expose') !== -1;
+    // V10: Wenn Exposé dabei ist, AVM-Pflichtfelder NICHT vorab erzwingen
+    // (werden aus dem Exposé übernommen, danach im Ablauf erneut geprüft).
+    var missing = _hasExpose ? [] : _validateSources(sources);
+
+    if (missing.length) {
+      // V335: Pflichtfelder im Formular MARKIEREN statt den Abruf zu blockieren.
+      // Quellen-Auswahl bleibt erhalten → nach Ausfüllen erneut "Abrufen".
+      document.querySelectorAll('.qc-missing-hl').forEach(function(el){ el.classList.remove('qc-missing-hl'); });
+      var _first = null, _names = [];
+      missing.forEach(function(m){
+        m.items.forEach(function(it){
+          var el = document.getElementById('qc_' + it[0]);
+          if (el) { var f = (el.closest && el.closest('.field')) || el; f.classList.add('qc-missing-hl'); if (!_first) _first = f; }
+          if (_names.indexOf(it[1]) === -1) _names.push(it[1]);
+        });
+      });
+      if (_first && _first.scrollIntoView) _first.scrollIntoView({ behavior:'smooth', block:'center' });
+      showToast('Bitte ausfüllen: ' + _names.join(', ') + ' — dann erneut „Abrufen"');
+      return;
+    }
+
+    // OK: getrennte Credit-Töpfe anzeigen
+    if (noteEl) noteEl.style.display = '';
+    if (footBtn) { footBtn.removeAttribute('disabled'); footBtn.style.opacity = ''; footBtn.style.pointerEvents = ''; }
+    var parts = _creditParts(sources);
+    var html = '';
+    parts.forEach(function(p){
+      var badge;
+      if (p.type==='free') badge = '<span class="qc7-credit-badge free">kostenlos</span>';
+      else if (p.type==='ki') badge = '<span class="qc7-credit-badge ki">1 KI-Credit</span>';
+      else badge = '<span class="qc7-credit-badge">1 ' + (p.type==='ph'?'PriceHubble':'Sprengnetter') + '-Credit</span>';
+      var callInfo = p.calls > 0 ? (p.calls + ' API-Abruf' + (p.calls===1?'':'e')) : '—';
+      html += '<div class="qc6-credit-row">'
+        + '<span class="qc6-credit-name">' + p.name + '<span class="qc6-credit-sub">' + p.sub + ' · ' + callInfo + '</span></span>'
+        + badge + '</div>';
+    });
+    if (_hasExpose && (sources.indexOf('ph')!==-1 || sources.indexOf('spr')!==-1)) {
+      html += '<div class="qc6-credit-sub" style="padding:8px 0 0;color:var(--gold-3)">Adress-/Objektdaten werden zuerst aus dem Exposé übernommen.</div>';
+    }
+    listEl.innerHTML = html;
+
+    // Getrennte Gesamtzeilen je Credit-Typ (NICHT verrechnet)
+    var nPh  = parts.filter(function(p){return p.type==='ph';}).length;
+    var nSpr = parts.filter(function(p){return p.type==='spr';}).length;
+    var nKi  = parts.filter(function(p){return p.type==='ki';}).length;
+    var tot  = '<div class="qc7-credit-totals">';
+    if (nPh)  tot += '<div class="qc7-credit-totline"><span>PriceHubble-Credits</span><span class="v">' + nPh + '</span></div>';
+    if (nSpr) tot += '<div class="qc7-credit-totline"><span>Sprengnetter-Credits</span><span class="v">' + nSpr + '</span></div>';
+    if (nKi)  tot += '<div class="qc7-credit-totline"><span>KI-Credits</span><span class="v">' + nKi + '</span></div>';
+    if (!nPh && !nSpr && !nKi) tot += '<div class="qc7-credit-totline"><span>Kosten</span><span class="v">kostenlos</span></div>';
+    tot += '</div>';
+    if (totBox) totBox.innerHTML = tot;
+
+    document.getElementById('qc6-credit-modal').classList.add('show');
+  }
+
+  function closeCreditModal() { document.getElementById('qc6-credit-modal').classList.remove('show'); }
+
+  function confirmCreditModal() {
+    closeCreditModal();
+    _runSelected(_selectedSources());
+  }
+
+  /* ─── Progress-UI ─── */
+  function _progressRender(steps) {
+    var host = document.getElementById('qc6-progress');
+    if (!host) return;
+    if (!steps || !steps.length) { host.className = 'qc6-progress'; host.innerHTML = ''; return; }
+    host.className = 'qc6-progress show';
+    host.innerHTML = steps.map(function(s){
+      var cls = s.state === 'run' ? 'run' : s.state === 'done' ? 'done' : '';
+      var mark = s.state === 'done' ? '✓' : '';
+      return '<div class="qc6-prog-step ' + cls + '"><span class="dot">' + mark + '</span>' + s.label + '</div>';
+    }).join('');
+  }
+
+  /* V339: fehlende Pflichtfelder eines Providers (mit Key + Label) */
+  function _qcMissingFull(src) {
+    var inputs = QcEngine.getInputs();
+    return (QC7_REQUIRED[src] || []).filter(function(f){
+      return !inputs[f[0]] || String(inputs[f[0]]).trim() === '';
+    });
+  }
+  /* V339: Abruf pausieren — fehlende Felder markieren + "Weiter"-Button, auf User warten */
+  function _qcPauseForMissing(prov) {
+    return new Promise(function(resolve){
+      var miss = _qcMissingFull(prov);
+      if (!miss.length) { resolve(); return; }
+      document.querySelectorAll('.qc-missing-hl').forEach(function(el){ el.classList.remove('qc-missing-hl'); });
+      var first = null;
+      miss.forEach(function(f){
+        var el = document.getElementById('qc_' + f[0]);
+        if (el) { var fld = (el.closest && el.closest('.field')) || el; fld.classList.add('qc-missing-hl'); if (!first) first = fld; }
+      });
+      var host = document.getElementById('qc6-progress');
+      var box = document.createElement('div');
+      box.className = 'qc6-pausebox';
+      box.innerHTML = '<div class="qc6-pausebox-txt">\u26A0 <b>' + (prov==='ph'?'PriceHubble':'Sprengnetter') +
+        '</b> braucht noch: <b>' + miss.map(function(f){return f[1];}).join(', ') +
+        '</b>. Bitte ausf\u00FCllen, dann auf \u201EWeiter\u201C.</div>' +
+        '<button type="button" class="qc6-pausebox-btn">Weiter</button>';
+      if (host) host.appendChild(box);
+      (box.querySelector('.qc6-pausebox-btn') || box).scrollIntoView({ behavior:'smooth', block:'center' });
+      function go(){ if (box.parentNode) box.parentNode.removeChild(box); resolve(); }
+      box.addEventListener('click', function(e){ if (e.target && e.target.classList.contains('qc6-pausebox-btn')) go(); });
+    });
+  }
+
+  /* ─── Sequenzieller Orchestrator (Exposé → AVM → KI) ─── */
+  async function _runSelected(sources) {
+    if (!sources || !sources.length) return;
+    // Reihenfolge erzwingen: expose, ph, spr, ki
+    var order = ['expose','ph','spr','ki'];
+    var ordered = order.filter(function(s){ return sources.indexOf(s) !== -1; });
+    var labels = { expose:'Exposé-Import', ph:'PriceHubble', spr:'Sprengnetter', ki:'KI-Recherche' };
+    var steps = ordered.map(function(s){ return { key:s, label:labels[s], state:'pending' }; });
+    _progressRender(steps);
+
+    for (var i = 0; i < ordered.length; i++) {
+      steps[i].state = 'run'; _progressRender(steps);
+      try {
+        if (ordered[i] === 'expose') {
+          // V333: echten DealPilot-Exposé-Import im Parent ausloesen, auf Ergebnis warten
+          await new Promise(function(resolve){
+            window._qcImportResolve = resolve;
+            try { window.parent.postMessage({ source:'dp-qc', type:'qc-import-pdf' }, '*'); } catch(e){}
+            setTimeout(function(){ if (window._qcImportResolve){ window._qcImportResolve(); window._qcImportResolve = null; } }, 60000);
+          });
+        }
+        if (ordered[i] === 'ph' || ordered[i] === 'spr') {
+          var _prov = ordered[i];
+          var _miss = _missingForProvider(_prov);
+          if (_miss.length) {
+            // V339: NICHT überspringen — pausieren, Felder markieren, auf "Weiter" warten
+            await _qcPauseForMissing(_prov);
+            _miss = _missingForProvider(_prov); // nach "Weiter" erneut prüfen
+          }
+          if (_miss.length) {
+            showToast('⚠ ' + (_prov==='ph'?'PriceHubble':'Sprengnetter') + ' übersprungen — es fehlt noch: ' + _miss.join(', '));
+          } else if (_prov === 'ph') {
+            await priceHubble({ silent:true });
+          } else {
+            await sprengnetter({ silent:true });
+          }
+        }
+        if (ordered[i] === 'ki')  await kiResearch({ silent:true });
+      } catch (e) { /* einzelner Abruf fehlgeschlagen — weiter */ }
+      steps[i].state = 'done'; _progressRender(steps);
+    }
+    setTimeout(function(){ _progressRender(null); }, 1400);
+    showToast('✓ Abruf abgeschlossen (' + ordered.map(function(s){return labels[s];}).join(' + ') + ')');
+  }
+
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3000);
+  }
+  function fireConfetti() {
+    const colors = ['#C9A84C', '#E8C964', '#5ED99E', '#3FA56C', '#9a7f33'];
+    for (let i = 0; i < 50; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.background = colors[i % colors.length];
+      c.style.left = (10 + Math.random() * 80) + 'vw';
+      c.style.top = '-20px';
+      c.style.animationDelay = (Math.random() * 0.6) + 's';
+      c.style.animationDuration = (1.8 + Math.random() * 1.2) + 's';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3500);
+    }
+  }
+
+  function init() {
+    injectIcons();
+    attach3DTilt();
+    bindInputs();
+    scheduleUpdate();
+  }
+
+  function addExposePhotos(arr) {
+    if (!Array.isArray(arr) || !arr.length) return;
+    arr.forEach(function(src){
+      if (_photos.length >= 6 || !src) return;
+      _photos.push({ name: 'expose_' + (_photos.length + 1) + '.jpg', data: src });
+    });
+    renderPhotos();
+  }
+
+  return {
+    init, scheduleUpdate, setLtv, mieteAddUp,
+    handlePdfFile, kiResearch, priceHubble, sprengnetter, selectAvmRange, applyAvmToQc,
+    applyAvmNkm, dismissAvm,
+    handlePhotos, removePhoto, addExposePhotos,
+    showApiKeyModal, closeApiModal, runRealAi,
+    openSaveModal, closeSaveModal, confirmSave, toggleAllTransfer,
+    setSpanConfig, openQc6Settings, closeQc6Settings, toggleSource,
+    openCreditModal, closeCreditModal, confirmCreditModal
+  };
+})();
+
+document.addEventListener('DOMContentLoaded', () => QcApp.init());
+</script>
+
+
+
+<!-- ═════ V6: CREDIT-BESTÄTIGUNGS-MODAL ═════ -->
+<div class="qc6-modal" id="qc6-credit-modal">
+  <div class="qc6-modal-box">
+    <div class="qc6-modal-head">
+      <span class="qc6-modal-title">Abruf bestätigen</span>
+      <button class="qc6-modal-x" onclick="QcApp.closeCreditModal()">✕</button>
+    </div>
+    <div class="qc6-modal-body">
+      <div id="qc6-credit-list"></div>
+      <div id="qc6-credit-totalbox"></div>
+      <p class="qc6-credit-note" id="qc6-credit-note">
+        Die Abrufe laufen nacheinander (Exposé → AVM → KI). Nur vorhandene Eingabedaten werden
+        verwendet — Mikro-/Makrolage liefert nur PriceHubble, das Fair-Price-Label nur Sprengnetter.
+        PriceHubble- und Sprengnetter-Credits sind getrennte Pakete.
+      </p>
+    </div>
+    <div class="qc6-modal-foot">
+      <button class="btn" onclick="QcApp.closeCreditModal()">Abbrechen</button>
+      <button class="btn primary" id="qc6-credit-confirm" onclick="QcApp.confirmCreditModal()">Bestätigen &amp; abrufen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════ V6: SETTINGS-MODAL (Detail-Spannen-Konfig) ═════ -->
+<div class="qc6-modal" id="qc6-settings-modal">
+  <div class="qc6-modal-box">
+    <div class="qc6-modal-head">
+      <span class="qc6-modal-title">Spannen-Einstellungen</span>
+      <button class="qc6-modal-x" onclick="QcApp.closeQc6Settings()">✕</button>
+    </div>
+    <div class="qc6-modal-body">
+      <div class="qc6-set-section">
+        <div class="qc6-set-label">Welche Spanne wird übernommen?</div>
+        <span class="qc6-seg" id="qc6-set-seg">
+          <button type="button" data-span="low"  onclick="QcApp.setSpanConfig('low', this)">Unten</button>
+          <button type="button" data-span="mid"  class="sel" onclick="QcApp.setSpanConfig('mid', this)">Durchschnitt</button>
+          <button type="button" data-span="high" onclick="QcApp.setSpanConfig('high', this)">Oben</button>
+        </span>
+        <div class="qc6-set-hint">
+          Diese Auswahl gilt gemeinsam für <strong>Marktwert</strong> und <strong>Marktmiete</strong>.
+          Standard ist der Durchschnitt. Die gewählte Spanne wird beim Abruf direkt übernommen;
+          die vollständige Spanne bleibt in der Ergebnis-Card zur Orientierung sichtbar.
+        </div>
+      </div>
+    </div>
+    <div class="qc6-modal-foot">
+      <button class="btn primary" onclick="QcApp.closeQc6Settings()">Fertig</button>
+    </div>
+  </div>
+</div>
+<script id="qc-bridge-listener">
+(function(){
+  function _s(id,v){ var e=document.getElementById(id); if(e&&v!=null&&String(v)!==""){ e.value=String(v); try{e.dispatchEvent(new Event("input",{bubbles:true}));}catch(_){} } }
+  window.addEventListener("message", function(ev){
+    var d=ev.data; if(!d||d.source!=="dp-app") return;
+    if(d.type==="qc-import-result"){
+      var im=d.data||{};
+      ["qc_str","qc_hnr","qc_plz","qc_ort","qc_adresse","qc_wfl","qc_bj","qc_zimmer","qc_kp","qc_nkm","qc_hg"].forEach(function(k){ _s(k, im[k]); });
+      try{ if(window.QcApp&&QcApp.mieteAddUp) QcApp.mieteAddUp(); }catch(_){}
+      try{ if(window.QcApp&&QcApp.scheduleUpdate) QcApp.scheduleUpdate(); }catch(_){}
+      if(window._qcImportResolve){ var r=window._qcImportResolve; window._qcImportResolve=null; r(); }
+    }
+    if(d.type==="qc-import-photos"){
+      try { if (typeof QcApp !== "undefined" && QcApp.addExposePhotos) QcApp.addExposePhotos(d.photos||[]); } catch(_){}
+    }
+  });
+})();
+</script>
+<script id="qc-autoek">
+(function(){
+  function _num(x){ return parseFloat(String(x||"").replace(/\./g,"").replace(",",".")) || 0; }
+  function autoEk(){
+    var kpEl=document.getElementById("qc_kp"), ekEl=document.getElementById("qc_ek");
+    if(!kpEl||!ekEl||ekEl.dataset.userSet==="1") return;
+    var kp=_num(kpEl.value); if(!kp) return;
+    var act=document.querySelector(".ltv-btn.active");
+    var pct=act?parseFloat(act.getAttribute("data-ltv")):100; if(isNaN(pct)) pct=100;
+    ekEl.value=String(Math.round(kp*(1-pct/100)+kp*10.5/100));
+    try{ if(window.QcApp&&QcApp.scheduleUpdate) QcApp.scheduleUpdate(); }catch(_){}
+  }
+  function ready(){
+    var kpEl=document.getElementById("qc_kp"), ekEl=document.getElementById("qc_ek");
+    if(!kpEl||!ekEl){ setTimeout(ready,200); return; }
+    kpEl.addEventListener("input", autoEk);
+    ekEl.addEventListener("input", function(){ ekEl.dataset.userSet="1"; });
+    function _clr(e){ var f=e.target&&e.target.closest&&e.target.closest(".field.qc-missing-hl"); if(f) f.classList.remove("qc-missing-hl"); }
+    document.addEventListener("input",_clr,true); document.addEventListener("change",_clr,true);
+    autoEk();
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", ready); else ready();
+})();
+</script>
+</body>
+</html>

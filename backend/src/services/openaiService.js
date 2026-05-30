@@ -1016,6 +1016,10 @@ async function extractExpose(text, opts) {
     '  - aufzug: true/false',
     '  - zustand: einer von "Neubau", "Erstbezug", "saniert", "renoviert", "modernisiert", "renovierungsbedürftig"',
     '',
+    'MIETE (NUR falls der Bericht Mietdaten enthaelt, z.B. Sprengnetter-Mietgutachten; sonst weglassen/null — NICHTS erfinden):',
+    '  - marktmiete_qm: Marktmiete (Nettokaltmiete) pro m² in Euro (Zahl)',
+    '  - marktmiete_monat: Marktmiete (Nettokaltmiete) pro Monat in Euro (Zahl)',
+    '',  // V356-marktmiete
     'WICHTIG:',
     '  - Zahlen IMMER als Number, NICHT als String',
     '  - Bei mehreren Mietangaben: bevorzugt Nettokaltmiete, sonst Kaltmiete',
@@ -1151,7 +1155,8 @@ async function extractMarketData(text, opts) {
    'lage_geraeusch','lage_einkaufen','lage_bildung','lage_gastronomie','lage_gesundheit','lage_freizeit',
    'wertentwicklung_3jahre_pct','wertentwicklung_1jahr_pct','prognose_naechstes_jahr_pct',
    'markt_durchschnittspreis','markt_tage_auf_dem_markt',
-   'bevoelkerung','arbeitslosenquote_pct','wanderungssaldo'
+   'bevoelkerung','arbeitslosenquote_pct','wanderungssaldo',
+   'marktmiete_qm','marktmiete_monat'  /* V356-marktmiete */
   ].forEach(k => {
     const v = ext[k];
     if (v == null || v === '') return;

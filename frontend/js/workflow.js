@@ -30,8 +30,8 @@ window.DealPilotWorkflow = (function() {
     objekt: {
       name: 'Objekt',
       tabIndex: 1,
-      einfach: ['ort', 'wfl', 'baujahr', 'objart'],
-      detailliert: ['plz', 'ort', 'str', 'hnr', 'wfl', 'baujahr', 'objart', 'kaufdat', 'makrolage', 'mikrolage']
+      einfach: ['ort', 'wfl', 'baujahr', 'objart', 'wirtschaftlicher_uebergang'],  /* V355b-wue-fieldgroups */
+      detailliert: ['plz', 'ort', 'str', 'hnr', 'wfl', 'baujahr', 'objart', 'kaufdat', 'makrolage', 'mikrolage', 'wirtschaftlicher_uebergang']
     },
     investition: {
       name: 'Investition',
@@ -54,7 +54,7 @@ window.DealPilotWorkflow = (function() {
     bewirtschaftung: {
       name: 'Bewirtschaftung',
       tabIndex: 6,
-      einfach: ['hg_ul'],
+      einfach: ['hg_ul', 'hg_nul'],  /* V355-hgnul-einfach: nicht-umlagefaehig auch im einfach-Modus Pflicht */
       detailliert: ['hg_ul', 'hg_nul', 'verwaltung', 'grundsteuer']
     },
     steuer: {
