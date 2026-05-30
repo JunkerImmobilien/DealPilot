@@ -21,6 +21,7 @@ var FIELDS = [
   'd2','d2z','d2t','d2_bindj','d2_inst','d2_type','bwk_ul_pct','bwk_nul_pct','bwk_kp_pct',
   // V63.49: D1-Typ + Bausparvertrag
   'd1_type', 'd1_auszahl', 'd1_vertrag',
+  'd2_auszahl', 'd2_az', 'd2_at',  /* V354-fields: D2 Auszahlung + eigene Anschlussfinanzierung */
   'bspar_inst', 'bspar_vertrag', 'bspar_sum', 'bspar_rate', 'bspar_zuteil', 'bspar_zins',
   'bspar_quote_min', 'bspar_dar_z', 'bspar_dar_t',
   // V23: Mietentwicklung Detail-Modus
@@ -59,6 +60,12 @@ function collectData() {
   // Checkboxes
   var d2enable = document.getElementById('d2_enable');
   if (d2enable) d['_d2_enabled'] = d2enable.checked;
+  // V354b-d2anschl-persist: eigene D2-Anschlussfinanzierung-Checkbox mitspeichern
+  var d2anschl = document.getElementById('d2_anschl_enable');
+  if (d2anschl) d['_d2_anschl_enable'] = d2anschl.checked;
+  // V357-d1anschl-persist: eigene D1-Anschlussfinanzierung-Checkbox mitspeichern
+  var d1anschl = document.getElementById('d1_anschl_enable');
+  if (d1anschl) d['_d1_anschl_enable'] = d1anschl.checked;
   // V23: Mietentwicklungs-Toggle (NKM vs NKM+zE)
   var meIncZe = document.getElementById('me_inc_ze');
   if (meIncZe) d['_me_inc_ze'] = meIncZe.checked;
@@ -193,6 +200,24 @@ function loadData(d) {
     var cb = document.getElementById('d2_enable');
     if (cb) { cb.checked = d._d2_enabled; if (typeof toggleD2 === 'function') toggleD2(); }
   }
+  // V354b-d2anschl-persist: D2-Anschluss-Checkbox + Feld-Sichtbarkeit wiederherstellen
+  if (d._d2_anschl_enable !== undefined) {
+    var cbAn = document.getElementById('d2_anschl_enable');
+    if (cbAn) {
+      cbAn.checked = d._d2_anschl_enable;
+      var anFields = document.getElementById('d2_anschl_fields');
+      if (anFields) anFields.style.display = cbAn.checked ? '' : 'none';
+    }
+  }
+  // V357-d1anschl-persist: D1-Anschluss-Checkbox + Feld-Sichtbarkeit wiederherstellen
+  if (d._d1_anschl_enable !== undefined) {
+    var cbAn1 = document.getElementById('d1_anschl_enable');
+    if (cbAn1) {
+      cbAn1.checked = d._d1_anschl_enable;
+      var anFields1 = document.getElementById('d1_anschl_fields');
+      if (anFields1) anFields1.style.display = cbAn1.checked ? '' : 'none';
+    }
+  }
   // V23: Mietentwicklungs-Toggle wiederherstellen
   if (d._me_inc_ze !== undefined) {
     var meCb = document.getElementById('me_inc_ze');
@@ -244,6 +269,27 @@ function loadData(d) {
   if (typeof renderDealScore2 === 'function') {
     try { renderDealScore2(); } catch(e) { console.warn('renderDealScore2 nach loadData:', e.message); }
   }
+  // V351-load-cache-refresh: Score-/KPI-Cache aus dem frisch berechneten State auffrischen,
+  // damit die Sidebar (gecacht) = geladene Bewertung (live) ist — ohne manuelles Speichern.
+  try {
+    var _o351 = window._currentObjData;
+    if (_o351 && typeof State !== 'undefined' && State.kpis) {
+      _o351._kpis_bmy  = State.kpis.bmy;
+      _o351._kpis_cf_ns = State.kpis.cf_ns;
+      _o351._kpis_dscr = State.kpis.dscr;
+      _o351._kpis_ltv  = State.kpis.ltv;
+      if (typeof DealScore !== 'undefined' && typeof DealScore.compute === 'function') {
+        var _dp351 = DealScore.compute();
+        if (_dp351 && _dp351.score) _o351._dealpilot_score = Math.round(_dp351.score);
+      }
+      if (window.DealScore2 && typeof window._buildDeal2FromState === 'function' && _o351._ds2_computed) {
+        var _ds351 = window.DealScore2.compute(window._buildDeal2FromState());
+        if (_ds351 && _ds351.score) _o351._ds2_score = Math.round(_ds351.score);
+      }
+    }
+    // Leiser renderSaved(): aktive Karte rechnet live neu (storage.js Z.1011+)
+    if (typeof renderSaved === 'function') renderSaved();
+  } catch(_e351) { console.warn('[V351] load-cache-refresh:', _e351.message); }
   if (window._aiText) {
     // V25: Wenn _aiText valides JSON ist (Server-KI), beide Blöcke rehydrieren
     var parsedAI = null;

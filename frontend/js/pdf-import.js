@@ -752,7 +752,7 @@
     var body = document.getElementById('pdfi-body');
     if (!body) return;
 
-    var FIELDS = [
+    var EXPOSE_FIELDS = [
       { id: 'adresse',        label: 'Adresse',          unit: '' },
       { id: 'plz',            label: 'PLZ',              unit: '' },
       { id: 'ort',            label: 'Ort',              unit: '' },
@@ -773,6 +773,62 @@
       { id: 'stellplatz',     label: 'Stellplatz',       unit: '' },
       { id: 'balkon',         label: 'Balkon/Terrasse',  unit: '' }
     ];
+
+    // V356-fe-2: Markt-FIELDS (Marktbericht) + Unter/Ø/Ober-Switch
+    var MARKET_FIELDS = [
+      { id: 'adresse',        label: 'Adresse',          unit: '' },
+      { id: 'plz',            label: 'PLZ',              unit: '' },
+      { id: 'ort',            label: 'Ort',              unit: '' },
+      { id: 'wohnflaeche',    label: 'Wohnfläche',       unit: 'm²' },
+      { id: 'baujahr',        label: 'Baujahr',          unit: '' },
+      { id: 'zimmer',         label: 'Zimmer',           unit: '' },
+      { id: 'objektart',      label: 'Objektart',        unit: '' },
+      { id: 'verkehrswert',   label: 'Marktpreisindikation (AVM)', unit: '€', format: 'eur' },
+      { id: 'preis_pro_qm',   label: 'Preis pro m²',     unit: '€/m²', format: 'eur' },
+      { id: 'energie_label',  label: 'Energieklasse',    unit: '' },
+      { id: 'marktmiete_qm',  label: 'Marktmiete',       unit: '€/m²' },
+      { id: 'lage_einkaufen', label: 'Lage · Einkaufen', unit: '' },
+      { id: 'lage_bildung',   label: 'Lage · Bildung',   unit: '' },
+      { id: 'lage_gastronomie', label: 'Lage · Gastronomie', unit: '' },
+      { id: 'lage_gesundheit', label: 'Lage · Gesundheit', unit: '' },
+      { id: 'lage_freizeit',  label: 'Lage · Freizeit',  unit: '' },
+      { id: 'prognose_naechstes_jahr_pct', label: 'Wertprognose nächstes Jahr', unit: '%' },
+      { id: 'wanderungssaldo', label: 'Wanderungssaldo', unit: '/1000 EW' },
+      { id: 'markt_tage_auf_dem_markt', label: 'Ø Tage am Markt', unit: 'Tage' }
+    ];
+    var FIELDS = _isMarketMode ? MARKET_FIELDS : EXPOSE_FIELDS;
+
+    var _v356SwitchHtml = '';
+    if (_isMarketMode && data && data.verkehrswert_min != null && data.verkehrswert_max != null) {
+      var _bs = 'padding:5px 10px;border:1px solid #E0DBD3;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;font-family:inherit';
+      var _ba = _bs + ';border-color:#C9A84C;background:rgba(201,168,76,0.12);font-weight:600';
+      _v356SwitchHtml =
+        '<div class="pdfi-vw-switch" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 10px">' +
+          '<span style="font-size:12px;color:#7A7370;font-weight:600">Verkehrswert-Ansatz:</span>' +
+          '<button type="button" class="pdfi-vw-switch-btn" data-vw="min" style="' + _bs + '">Untergrenze (' + Math.round(data.verkehrswert_min).toLocaleString('de-DE') + ' €)</button>' +
+          '<button type="button" class="pdfi-vw-switch-btn" data-vw="mid" style="' + _ba + '">Ø Mittelwert (' + Math.round(data.verkehrswert).toLocaleString('de-DE') + ' €)</button>' +
+          '<button type="button" class="pdfi-vw-switch-btn" data-vw="max" style="' + _bs + '">Obergrenze (' + Math.round(data.verkehrswert_max).toLocaleString('de-DE') + ' €)</button>' +
+        '</div>';
+    }
+    function _v356WireSwitch(d){
+      var modal = document.getElementById('pdfimport-modal'); if(!modal) return;
+      var cb = modal.querySelector('input[data-fid="verkehrswert"]'); if(!cb) return;
+      var tr = cb.closest ? cb.closest('tr') : null;
+      var valCell = tr ? tr.querySelector('.pdfi-result-value') : null;
+      var btns = modal.querySelectorAll('.pdfi-vw-switch-btn');
+      var _b = 'padding:5px 10px;border:1px solid #E0DBD3;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;font-family:inherit';
+      var _a = _b + ';border-color:#C9A84C;background:rgba(201,168,76,0.12);font-weight:600';
+      Array.prototype.forEach.call(btns, function(b){
+        b.addEventListener('click', function(){
+          var w = b.getAttribute('data-vw');
+          var v = w==='min'?d.verkehrswert_min : w==='max'?d.verkehrswert_max : d.verkehrswert;
+          if(v==null) return;
+          cb.setAttribute('data-val', String(Math.round(v)));
+          if(valCell) valCell.textContent = Math.round(v).toLocaleString('de-DE') + ' €';
+          Array.prototype.forEach.call(btns, function(x){ x.setAttribute('style', x===b?_a:_b); });
+        });
+      });
+    }
 
     var rows = '';
     var anyValue = false;
@@ -826,6 +882,7 @@
         '</div>' +
       '</div>' +
       (!anyValue ? '<div class="pdfi-result-warn">Die KI konnte aus dem PDF keine relevanten Daten extrahieren. Vielleicht ist es ein Bild-PDF oder ein Format das wir noch nicht unterstützen.</div>' : '') +
+      _v356SwitchHtml +
       '<table class="pdfi-result-table"><tbody>' + rows + '</tbody></table>' +
       photosHtml +
       '<div class="pdfi-result-actions">' +
@@ -833,6 +890,7 @@
       '</div>';
     // data global merken für apply
     window._pdfImportData = data;
+    if (_isMarketMode) { try { _v356WireSwitch(data); } catch(e){} }
   }
 
   /**
@@ -1005,49 +1063,94 @@
           }
         }
       }
-      if (picked.adresse) set('addr', picked.adresse);
-      if (picked.plz) set('plz', picked.plz);
-      if (picked.ort) set('ort', picked.ort);
-      if (picked.wohnflaeche) set('wfl', picked.wohnflaeche);
-      if (picked.baujahr) set('baujahr', picked.baujahr);
-      if (picked.zimmer) set('zimmer', picked.zimmer);
-      if (picked.objektart) setSel('objart', picked.objektart);
+      // V356-fe-mapping: alle Felder + Gold-Streifen (wie QuickCheck) + Marktpreisindikation
+      var _marked = [];
+      function num(v){ if(v==null||v==='')return null; var n=parseFloat(String(v).replace(/[^\d.,-]/g,'').replace(',','.')); return isNaN(n)?null:n; }
+      function setM(id, val){ var el=document.getElementById(id); if(!el||val==null||val==='')return; el.value=val; try{el.dispatchEvent(new Event('input',{bubbles:true}));}catch(e){} _marked.push(id); }
+      function setSelM(id, val){ var el=document.getElementById(id); if(!el||val==null||val==='')return; var b=el.selectedIndex; setSel(id,val); if(el.selectedIndex!==b||(el.value&&el.value!==''))_marked.push(id); }
 
-      // Kernfelder Lage- & Markt
-      if (picked.verkehrswert) set('svwert', picked.verkehrswert);
-      // bankval nur wenn nicht schon befüllt
-      var bv = document.getElementById('bankval');
-      if (bv && !bv.value && picked.verkehrswert_min) set('bankval', picked.verkehrswert_min);
+      // Grunddaten
+      if (picked.adresse) setM('addr', picked.adresse);
+      if (picked.plz) setM('plz', picked.plz);
+      if (picked.ort) setM('ort', picked.ort);
+      if (picked.wohnflaeche) setM('wfl', picked.wohnflaeche);
+      if (picked.baujahr) setM('baujahr', picked.baujahr);
+      if (picked.zimmer) setM('zimmer', picked.zimmer);
+      if (picked.objektart) setSelM('objart', picked.objektart);
 
-      // Energie
-      if (picked.energie_label) set('ds2_energie', String(picked.energie_label).toUpperCase());
+      // Verkehrswert → als MARKTPREISINDIKATION (AVM); bankval NICHT auto-füllen (ist die echte Bankbewertung)
+      if (picked.verkehrswert) {
+        setM('svwert', picked.verkehrswert);
+        try {
+          var vh = document.getElementById('verkehrswert-hint');
+          if (vh) {
+            if (!vh._origText) vh._origText = vh.textContent;
+            vh.textContent = '(Marktpreisindikation · AVM-Bericht — kein Verkehrswert n. §194 BauGB)';
+            var svEl = document.getElementById('svwert');
+            if (svEl && !svEl._v356HintReset) {
+              svEl._v356HintReset = true;
+              svEl.addEventListener('input', function _r(){ try{ if(vh._origText) vh.textContent=vh._origText; }catch(e){} svEl.removeEventListener('input', _r); });
+            }
+          }
+        } catch(e) {}
+      }
 
-      // V63.91: Lage-Scores → falls die Mikrolage noch leer ist, mappen wir
-      // den Durchschnitt der PriceHubble-Scores (0-5) auf die DealPilot-Skala.
+      // Energieklasse
+      if (picked.energie_label) setSelM('ds2_energie', String(picked.energie_label).toUpperCase());
+
+      // Lage-Scores (0–5) → Makro-/Mikrolage (Durchschnitt der Nahversorgungs-Scores)
       var avgLage = 0, cnt = 0;
       ['lage_einkaufen','lage_bildung','lage_gastronomie','lage_gesundheit','lage_freizeit'].forEach(function(k){
-        if (typeof picked[k] === 'number') { avgLage += picked[k]; cnt++; }
+        var n = num(picked[k]); if (n != null) { avgLage += n; cnt++; }
       });
       if (cnt >= 3) {
-        var avg = avgLage / cnt;
-        var mapVal = '';
+        var avg = avgLage / cnt, mapVal = '';
         if (avg >= 4.5) mapVal = 'sehr_gut';
         else if (avg >= 3.5) mapVal = 'gut';
         else if (avg >= 2.5) mapVal = 'durchschnittlich';
         else if (avg >= 1.5) mapVal = 'schwach';
         else mapVal = 'sehr_schwach';
         var mikEl = document.getElementById('mikrolage');
-        if (mikEl && !mikEl.value) {
-          mikEl.value = mapVal;
-          try { mikEl.dispatchEvent(new Event('change', { bubbles: true })); } catch(e) {}
-        }
+        if (mikEl && !mikEl.value) { mikEl.value = mapVal; try{mikEl.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){} _marked.push('mikrolage'); }
+        var makEl = document.getElementById('makrolage');
+        if (makEl && !makEl.value) { makEl.value = mapVal; try{makEl.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){} _marked.push('makrolage'); }
       }
+
+      // Marktmiete (nur falls Backend sie geliefert hat) → ds2_marktmiete (€/m²)
+      var mmq = num(picked.marktmiete_qm), mmm = num(picked.marktmiete_monat), wflN = num(picked.wohnflaeche);
+      var _mm = (mmq != null) ? mmq : ((mmm != null && wflN) ? (mmm / wflN) : null);
+      if (_mm) setM('ds2_marktmiete', _mm.toFixed(2).replace('.', ','));
+
+      // V356-fe-2: qualitative Ableitungen aus Sozio-Ökonomie/Markttrends
+      var _ws = num(picked.wanderungssaldo);
+      if (_ws != null) {
+        var _bev = _ws >= 8 ? 'stark_wachsend' : _ws >= 2 ? 'wachsend' : _ws > -2 ? 'stabil' : _ws > -8 ? 'leicht_fallend' : 'stark_fallend';
+        var _bEl = document.getElementById('ds2_bevoelkerung');
+        if (_bEl && !_bEl.value) { _bEl.value = _bev; try{_bEl.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){} _marked.push('ds2_bevoelkerung'); }
+      }
+      var _tg = num(picked.markt_tage_auf_dem_markt);
+      if (_tg != null) {
+        var _nf = _tg <= 30 ? 'sehr_stark' : _tg <= 60 ? 'stark' : _tg <= 120 ? 'mittel' : _tg <= 200 ? 'schwach' : 'sehr_schwach';
+        var _nEl = document.getElementById('ds2_nachfrage');
+        if (_nEl && !_nEl.value) { _nEl.value = _nf; try{_nEl.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){} _marked.push('ds2_nachfrage'); }
+      }
+      var _pg = num(picked.prognose_naechstes_jahr_pct);
+      if (_pg != null) {
+        var _wsp = _pg >= 3 ? 'sehr_hoch' : _pg >= 2 ? 'hoch' : _pg >= 1 ? 'mittel' : _pg > 0 ? 'niedrig' : 'keines';
+        var _wEl = document.getElementById('ds2_wertsteigerung');
+        if (_wEl && !_wEl.value) { _wEl.value = _wsp; try{_wEl.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){} _marked.push('ds2_wertsteigerung'); }
+      }
+      // Gold-Streifen setzen (identisch zur QuickCheck-Übernahme)
+      try { if (typeof window._v236MarkQcLoaded === 'function' && _marked.length) window._v236MarkQcLoaded(_marked); } catch(e) {}
 
       if (typeof calc === 'function') calc();
       if (typeof toast === 'function') {
         var bits = [];
-        if (picked.verkehrswert) bits.push('Verkehrswert ' + Math.round(picked.verkehrswert/1000) + 'k €');
-        if (picked.preis_pro_qm) bits.push(Math.round(picked.preis_pro_qm) + ' €/m²');
+        var vwn = num(picked.verkehrswert);
+        if (vwn) bits.push('Marktpreisindikation ' + Math.round(vwn/1000) + 'k €');
+        var ppq = num(picked.preis_pro_qm);
+        if (ppq) bits.push(Math.round(ppq) + ' €/m²');
+        if (_mm) bits.push('Marktmiete ' + _mm.toFixed(2).replace('.', ',') + ' €/m²');
         toast('✓ Marktbericht übernommen' + (bits.length ? ': ' + bits.join(' · ') : ''));
       }
       _isMarketMode = false;  // Reset für nächsten Aufruf

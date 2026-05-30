@@ -158,6 +158,8 @@
     // _qcImgs nur leeren wenn der Tab gerade frisch geöffnet wird (nicht bei Re-Render)
     var hostId = 'qc-tab-host';
     var host = document.getElementById(hostId);
+    // V329: Quick-Check = uebernommene V17-Seite (iframe) + Carrier-Felder.
+    if (host && window.__qcMountIframe) { window.__qcMountIframe(host); return; }
     if (!host) {
       // Tab existiert nicht? Fallback: alte Modal-Variante
       var existing = document.getElementById('qc-modal');
@@ -588,7 +590,7 @@
             '.qc-ai-result-card{background:#fff;border:1px solid #E0DBD3;border-radius:8px;padding:12px 14px;margin-bottom:10px}' +
             '.qc-ai-result-card-low{background:rgba(184,98,92,0.04);border-color:rgba(184,98,92,0.25)}' +
             '.qc-ai-result-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}' +
-            '.qc-ai-result-icon{font-size:16px}' +
+            '.qc-ai-result-icon{font-size:16px;display:inline-flex;align-items:center;color:#C9A84C}/*V355c-icons*/' +
             '.qc-ai-result-label{font-weight:600;color:#2A2727;font-size:13px;flex:1}' +
             '.qc-ai-conf-badge{font-size:10.5px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap}' +
             '.qc-ai-result-value{font-size:18px;color:#2A2727;font-weight:600;margin:4px 0}' +
@@ -1923,7 +1925,7 @@
         if (conf >= CONFIDENCE_THRESHOLD) {
           html += '<div class="qc-ai-result-card">' +
             '<div class="qc-ai-result-head">' +
-              '<span class="qc-ai-result-icon">💶</span>' +
+              '<span class="qc-ai-result-icon"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 9.5a4 4 0 1 0 0 5\"/><path d=\"M4 10h7\"/><path d=\"M4 14h7\"/></svg></span>' +
               '<span class="qc-ai-result-label">Marktmiete (NKM)</span>' +
               _renderConfBadge(conf) +
             '</div>' +
@@ -1951,7 +1953,7 @@
           var lageColor = lageVal >= 7 ? '#3FA56C' : lageVal >= 4 ? '#C9A84C' : '#B8625C';
           html += '<div class="qc-ai-result-card">' +
             '<div class="qc-ai-result-head">' +
-              '<span class="qc-ai-result-icon">📍</span>' +
+              '<span class="qc-ai-result-icon"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg></span>' +
               '<span class="qc-ai-result-label">Lage-Score</span>' +
               _renderConfBadge(lconf) +
             '</div>' +
@@ -1974,7 +1976,7 @@
         if (bconf >= CONFIDENCE_THRESHOLD) {
           html += '<div class="qc-ai-result-card">' +
             '<div class="qc-ai-result-head">' +
-              '<span class="qc-ai-result-icon">🗺️</span>' +
+              '<span class="qc-ai-result-icon"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3Z\"/><path d=\"M9 3v15\"/><path d=\"M15 6v15\"/></svg></span>' +
               '<span class="qc-ai-result-label">Bodenrichtwert</span>' +
               _renderConfBadge(bconf) +
             '</div>' +
@@ -1997,7 +1999,7 @@
           var wertText = wert.text || (wert.value > 0 ? '+' + wert.value : wert.value) + ' % p.a.';
           html += '<div class="qc-ai-result-card">' +
             '<div class="qc-ai-result-head">' +
-              '<span class="qc-ai-result-icon">📈</span>' +
+              '<span class="qc-ai-result-icon"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 17l6-6 4 4 8-8\"/><path d=\"M17 7h4v4\"/></svg></span>' +
               '<span class="qc-ai-result-label">Wertentwicklung-Prognose</span>' +
               _renderConfBadge(wconf) +
             '</div>' +
@@ -2018,7 +2020,7 @@
         var nulPctVisual = bewirtCard.nulPct != null ? bewirtCard.nulPct : 22;
         html += '<div class="qc-ai-result-card">' +
           '<div class="qc-ai-result-head">' +
-            '<span class="qc-ai-result-icon">' + (bIsFaust ? '📐' : '🏠') + '</span>' +
+            '<span class="qc-ai-result-icon">' + (bIsFaust ? '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m21.3 8.7-8.6 8.6-9.4-9.4 8.6-8.6 9.4 9.4Z\"/><path d=\"m7.5 10.5 2 2\"/><path d=\"m10.5 7.5 2 2\"/><path d=\"m13.5 13.5 2 2\"/></svg>' : '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5 9.5V21h14V9.5\"/></svg>') + '</span>' +
             '<span class="qc-ai-result-label">Bewirtschaftung übernommen</span>' +
             (bIsFaust ?
               '<span class="qc-ai-conf-badge" style="background:#C9A84C20;color:#C9A84C;border:1px solid #C9A84C40">Faustregel</span>' :
@@ -2080,7 +2082,7 @@
     var pct = Math.round(conf * 100);
     return '<div class="qc-ai-result-card qc-ai-result-card-low">' +
       '<div class="qc-ai-result-head">' +
-        '<span class="qc-ai-result-icon">⚠️</span>' +
+        '<span class="qc-ai-result-icon"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/><path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z\"/></svg></span>' +
         '<span class="qc-ai-result-label">' + _escHtmlQc(label) + '</span>' +
         '<span class="qc-ai-conf-badge" style="background:#B8625C20;color:#B8625C;border:1px solid #B8625C40">' +
           'Konfidenz: ' + pct + ' %' +
@@ -2477,6 +2479,8 @@
   function qcImportPdfTrigger() {
     if (typeof showPdfImport === 'function') {
       showPdfImport(function(extracted) {
+        // Exposé-Fotos für die Quick-Check-Übernahme zwischenspeichern
+        try { window._qcExposePhotos = (extracted && extracted._photos) ? extracted._photos.slice() : []; } catch (e) {}
         function set(id, val) { var e = document.getElementById(id); if (e && val) e.value = val; }
         function setSel(id, val) {
           var e = document.getElementById(id); if (!e || !val) return;
@@ -2495,6 +2499,7 @@
         if (extracted.wohnflaeche)    set('qc_wfl',     extracted.wohnflaeche);
         if (extracted.baujahr)        set('qc_bj',      extracted.baujahr);
         if (extracted.nettokaltmiete) set('qc_nkm',     extracted.nettokaltmiete);
+        if (extracted.hausgeld)       set('qc_hg',      extracted.hausgeld);
         if (extracted.adresse || extracted.strasse || extracted.plz || extracted.ort) {
           // V199: Defensiv — Backend liefert evtl. separate Felder ODER kombinierte Adresse
           console.log('[V199 pdf-import] adresse fields:', {

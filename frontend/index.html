@@ -1893,7 +1893,10 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
-  <!-- V210: Indikative Konditionen nach Zinsbindung (Pfandbrief-Rendite + Marge) -->
+  
+  </div>
+
+  <!-- V357-marktdaten-top: Pfandbrief-Konditionen (5/10/15/20J) sichtbar im Tab -->
   <div class="card market-rates-card mr-pf-card" data-collapsible="mr-pf" data-collapse-title="Indikative Konditionen nach Zinsbindung">
     <div class="ct-row">
       <div class="ct" style="margin:0;border:none;padding:0">
@@ -1975,7 +1978,7 @@ label.dp-required.qc-required::after {
       Konkrete Angebote über Vermittler wie Interhyp, Dr. Klein, Baufi24 oder direkt bei der Hausbank.
     </div>
   </div>
-  </div>
+
 
   <div class="col2">
     <div>
@@ -2034,6 +2037,25 @@ label.dp-required.qc-required::after {
             <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Daten aus Bank-PDF importieren</span>
           </button>
           <span class="hint" style="margin-left:8px">Bankvertrag scannen — Werte werden automatisch übernommen</span>
+        </div>
+        <!-- V357-d1anschl-html: Eigene Anschlussfinanzierung fuer Darlehen 1 (analog D2) -->
+        <div class="f" style="margin-top:6px"><label class="toggle-slim" style="cursor:pointer"><input type="checkbox" id="d1_anschl_enable" onchange="var f=document.getElementById('d1_anschl_fields'); if(f) f.style.display=this.checked?'':'none'; calc();"> <span>Eigene Anschlussfinanzierung für Darlehen 1</span></label></div>
+        <div id="d1_anschl_fields" style="display:none; padding-top:6px">
+          <p class="hint" style="margin-top:-2px">Konservativ rechnen: z.B. <b>5,0 % Zins</b> und <b>1,0 % Tilgung</b> als Puffer. Diese Werte fließen in die 3-Phasen-Berechnung und Projektion ein.</p>
+          <div class="g2">
+            <div class="f"><label>Zinssatz Anschluss (%)</label><div class="iw"><input id="anschl_z" type="text" inputmode="decimal" value="5.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+            <div class="f"><label>Tilgung Anschluss (%)</label><div class="iw"><input id="anschl_t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          </div>
+          <div class="g2">
+            <div class="f"><label>Rate Anschluss / Monat</label><div class="cf" id="anschl_rate">—</div></div>
+            <div class="f"><label>Zinsbindung Anschluss (J.)</label><div class="iw"><input id="anschl_bj" type="text" inputmode="decimal" value="15" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
+          </div>
+          <div class="g2">
+            <div class="f"><label>Zinsrisiko (auto berechnet)</label><div class="cf" id="zaer_display" data-v257-03="1">—</div></div>
+            <div class="f"><label>Mehrkosten Anschluss / Monat</label><div class="cf" id="zaer_m">—</div></div>
+          </div>
+          <input type="hidden" id="zaer" value="0">
+          <span class="hint">Ohne Häkchen läuft Darlehen 1 mit seiner Annuität weiter (durchfinanziert) — keine Anschluss-Annahme.</span>
         </div>
       </div>
 
@@ -2142,21 +2164,7 @@ label.dp-required.qc-required::after {
         </div>
       </div>
 
-      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-clock"/></svg></span>Anschlussfinanzierung (Prognose)</div>
-        <p class="hint" style="margin-top:-4px">
-          <b>Empfehlung:</b> Konservativ rechnen mit <b>5,0 % Zins</b> und <b>1,0 % Tilgung</b>.
-          So hast du einen Puffer wenn die Zinsen bis zur Anschlussfinanzierung steigen.
-          Diese Werte fließen in die 3-Phasen-Berechnung und 15-Jahres-Projektion ein.
-        </p>
-        <div class="g2">
-          <div class="f"><label>Zinssatz Anschluss (%)</label><div class="iw"><input id="anschl_z" type="text" inputmode="decimal" value="5.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-          <div class="f"><label>Tilgung Anschluss (%)</label><div class="iw"><input id="anschl_t" type="text" inputmode="decimal" value="1.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-          <div class="f"><label>Rate Anschluss / Monat</label><div class="cf" id="anschl_rate">—</div></div>
-          <div class="f"><label>Zinsbindung Anschluss (J.)</label><div class="iw"><input id="anschl_bj" type="text" inputmode="decimal" value="15" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
-          <div class="f"><label>Zinsrisiko (auto berechnet)</label><div class="cf" id="zaer_display" data-v257-03="1">—</div></div>
-          <input type="hidden" id="zaer" value="0"><div class="f"><label>Mehrkosten Anschluss / Monat</label><div class="cf" id="zaer_m">—</div></div>
-        </div>
-      </div>
+      <!-- V357-d1anschl-html: untere Anschluss-Karte aufgeloest, Felder jetzt im D1-Schieber -->
     </div>
     <div>
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-portfolio"/></svg></span>Finanzierungsübersicht</div>
@@ -2800,9 +2808,9 @@ label.dp-required.qc-required::after {
   <script src="js/tour-sidebar.js?v=2"></script>
   <script src="js/anteilig.js?v=5"></script>
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
-  <script src="js/anteilig-recalc.js?v=318"></script>
+  <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=318"></script>
+  <script src="js/calc.js?v=357"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -2834,7 +2842,7 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=291.1"></script>
-<script src="js/storage.js?v=325"></script>
+<script src="js/storage.js?v=357"></script>
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=166"></script>
 <script src="js/portfolio-strategy.js?v=144"></script>
@@ -2855,12 +2863,13 @@ label.dp-required.qc-required::after {
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=124"></script>
 <script src="js/star-rating.js?v=167"></script>
-<script src="js/pdf-import.js?v=166"></script>
+<script src="js/pdf-import.js?v=3562"></script>
 <script src="js/financing.js?v=124"></script>
 <script src="js/financing-pdf.js?v=166"></script>
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=124"></script>
-<script src="js/quick-check.js?v=317"></script>
+<script src="js/quick-check.js?v=3292"></script>
+<script src="js/qc-bridge.js?v=350"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/quick-check-tab.js?v=166"></script>
@@ -2883,7 +2892,7 @@ label.dp-required.qc-required::after {
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=142"></script>
 <script src="js/rnd-bte-katalog.js?v=142"></script>
-<script src="js/rnd-calc.js?v=318"></script>
+<script src="js/rnd-calc.js?v=353"></script>
 <script src="js/rnd-pdf.js?v=166"></script>
 <script src="js/rnd-docx.js?v=142"></script>
 <script src="js/rnd-ui.js?v=291.1"></script>

@@ -1058,6 +1058,29 @@ function _calcImmediate(){
   }
   State.d2 = d2; State.d2z = d2z; State.d2t = d2t;
   State.d2_rate_m = d2_rate_m; State.d2_enabled = d2_enabled; State.d2_type = d2_type;
+  // V354-read-d2: D2 Zinsbindung + eigene Anschlussfinanzierung (Checkbox) + Auszahlung
+  var d2_bindj = v('d2_bindj') || 10;
+  var d2_anschl_enable = !!(el('d2_anschl_enable') && el('d2_anschl_enable').checked);
+  var d2_az = d2_anschl_enable ? (v('d2_az')/100) : 0;
+  var d2_at = d2_anschl_enable ? (v('d2_at')/100) : 0;
+  if (d2_anschl_enable && d2_az <= 0) d2_az = d2z;   // Fallback: weiter mit aktuellem Zins
+  if (d2_anschl_enable && d2_at <= 0) d2_at = (d2t > 0 ? d2t : 0.01);
+  var _d2IsAussetzung = (d2_type === 'tilgungsaussetzung');
+  State.d2_bindj = d2_bindj; State.d2_anschl_enable = d2_anschl_enable;
+  State.d2_az = d2_az; State.d2_at = d2_at;
+  // V354: D2-Aussetzung ohne Tilgungstraeger -> Hinweis (kein BSV-Nachbau fuer D2)
+  var _d2tadHint = el('d2_tad_box');
+  if (_d2tadHint && d2_enabled && _d2IsAussetzung) {
+    var _d2warn = el('d2_aussetzung_warn');
+    if (!_d2warn) {
+      _d2warn = document.createElement('div');
+      _d2warn.id = 'd2_aussetzung_warn';
+      _d2warn.className = 'hint';
+      _d2warn.style.cssText = 'margin-top:8px;color:#B8625C;font-weight:600';
+      _d2tadHint.appendChild(_d2warn);
+    }
+    _d2warn.textContent = 'Hinweis: Darlehen 2 als Tilgungsaussetzung wird ohne Tilgungstraeger als reines Zinsdarlehen gerechnet (Restschuld bleibt konstant). Fuer eine vollstaendige Bausparvertrags-Abbildung Darlehen 1 nutzen.';
+  }
 
   // ═════ Gesamtfinanzierung: gewichtete Zinsen/Tilgung ═════
   var d_total = d1 + d2;
@@ -1111,10 +1134,20 @@ function _calcImmediate(){
   var vtJ=d1_tm>0?Math.ceil(Math.log(d1_rate_m/d1_tm)/Math.log(1+d1z/12)/12):99;
   st('volltilg',(new Date().getFullYear()+vtJ).toString());
   var az=v('anschl_z')/100,at=v('anschl_t')/100;State.az=az;State.at=at;
+  // V357-d1anschl: D1 eigene Anschlussfinanzierung als Schieber.
+  //   Ohne Haken = durchfinanziert (D1 laeuft mit eigener Annuitaet weiter).
+  //   Default true (Abwaertskompat.: alte Objekte ohne Checkbox-State rechnen wie bisher mit anschl_z/t).
+  var d1_anschl_enable = (el('d1_anschl_enable') ? !!el('d1_anschl_enable').checked : true);
+  State.d1_anschl_enable = d1_anschl_enable;
+  // Effektive D1-Anschlusskonditionen: bei deaktiviertem Schieber = aktuelle Kondition (durchfinanziert)
+  var _d1_az_eff = d1_anschl_enable ? (az > 0 ? az : d1z) : d1z;
+  var _d1_at_eff = d1_anschl_enable ? (at > 0 ? at : d1t) : d1t;
   // Zinsänderungsrisiko auto = Anschluss - Aktuell
   var zaer_auto=Math.max(0,v('anschl_z')-v('d1z'));
   // zaer wird nur angezeigt
-  var ar=rs*(az+at)/12;st('anschl_rate',fE(ar,2));
+  // V357-d1anschl: D1-Anschlussrate respektiert Schieber (durchfinanziert = eigene Annuitaet)
+  var ar = d1_anschl_enable ? (rs*(_d1_az_eff+_d1_at_eff)/12) : (d1_rate_m);
+  st('anschl_rate',fE(ar,2));
   // Auto-calc zaer = difference between anschl and current
   var zaer_pct=Math.max(0,v('anschl_z')-v('d1z'));
   var zaer_m=rs*(zaer_pct/100)/12;
@@ -1156,7 +1189,16 @@ function _calcImmediate(){
   }
   st('r-zins', zinsDisplay);
   st('r-bindend',be.toLocaleDateString('de-DE',{month:'2-digit',year:'numeric'}));
-  st('r-rs',fE(State.rs,0));st('r-anschl',fE(ar,2));
+  // V357-d1anschl: r-anschl = D1-Anschlussrate + D2-Anschlussrate (bisher nur D1)
+  var _ar_d2_m = 0;
+  if (d2_enabled && d2 > 0) {
+    var _rs2_now = (typeof State.rs2 === 'number' ? State.rs2 : d2);
+    if (_d2IsAussetzung) { _ar_d2_m = (d2 * d2z) / 12; }
+    else if (d2_anschl_enable) { _ar_d2_m = (_rs2_now * (d2_az + d2_at)) / 12; }
+    else { _ar_d2_m = d2_rate_m; }
+  }
+  var _ar_total = ar + _ar_d2_m;
+  st('r-rs',fE(State.rs,0));st('r-anschl',fE(_ar_total,2));
   var grenz=v('grenz')/100;
   var zins_j=(d1_zm+d2_zm)*12, tilg_j=(d1_tm+d2_tm)*12;
   // V63.49: Bei Tilgungsaussetzung läuft parallel eine Bausparrate als Sparbeitrag.
@@ -1277,8 +1319,9 @@ function _calcImmediate(){
   // V63.60: Anschluss-Logik korrigiert — bei 'after_ezb'/'never' bleibt RS voll
   //   (Sparguthaben bleibt im Vertrag gebunden, wird NICHT Sondertilgung), Sparrate läuft weiter.
   var rs_loop = d1, cfkum = 0;
-  var az_eff_v = az > 0 ? az : d1z;       // Anschluss-Zins, Fallback aktueller Zins
-  var at_eff_v = at > 0 ? at : d1t;       // Anschluss-Tilgung
+  // V357-d1anschl: bei deaktiviertem D1-Schieber durchfinanziert (d1z/d1t)
+  var az_eff_v = d1_anschl_enable ? (az > 0 ? az : d1z) : d1z;       // Anschluss-Zins
+  var at_eff_v = d1_anschl_enable ? (at > 0 ? at : d1t) : d1t;       // Anschluss-Tilgung
   if (_d1IsAussetzung && at_eff_v === 0) at_eff_v = 0.01; // Default 1% Anschluss-Tilgung bei Aussetzung
   // V121: rate_anschl_v wird erst NACH der Bindungsphase auf Basis der Restschuld am EZB
   //   gesetzt (= konsistent zur zweiten Schleife in cfRows-Build, die State.rs * (az+at) nutzt).
@@ -1404,7 +1447,8 @@ function _calcImmediate(){
   var nkm_ezb=_nkmJYear(bindj),bwk_cf_ezb=bwk_cf*Math.pow(1+kstg,bindj);
   // V63.52: Bei Tilgungsaussetzung läuft die Restschuld konstant (kein Tilg-Abbau)
   // Bei Annuität: Restschuld bei Ende Zinsbindung
-  var rs_at_bindj = State.rs;  // Restschuld bei Ende Zinsbindung
+  // V354b-d2-phasen: D1 nutzt D1-only RS (State.rs1); kombiniert wäre bei 2 Darlehen falsch.
+  var rs_at_bindj = (typeof State.rs1 === 'number' ? State.rs1 : State.rs);  // Restschuld D1 bei Ende Zinsbindung
   var zins_ezb, tilg_ezb;
   if (_d1IsAussetzung) {
     // Tilgungsaussetzung: Zinsen konstant auf voller Darlehenssumme, keine Tilgung
@@ -1415,6 +1459,17 @@ function _calcImmediate(){
     var zins_ezb_avg = (d1 * d1z + rs_at_bindj * d1z) / 2;
     zins_ezb = zins_ezb_avg;
     tilg_ezb = d1_rate_m * 12 - zins_ezb;
+  }
+  // V354b-d2-phasen: Darlehen 2 zur EZB-Phase addieren (State.rs2 = D2-RS am Ende D1-Bindung)
+  if (typeof d2_enabled !== 'undefined' && d2_enabled && d2 > 0 && typeof _d2IsAussetzung !== 'undefined') {
+    var _rs2_ezb = (typeof State.rs2 === 'number' ? State.rs2 : d2);
+    if (_d2IsAussetzung) {
+      zins_ezb += d2 * d2z;            // reines Zinsdarlehen
+    } else {
+      var _zins_ezb_d2 = (d2 * d2z + _rs2_ezb * d2z) / 2;   // Durchschnitt analog D1
+      zins_ezb += _zins_ezb_d2;
+      tilg_ezb += (d2_rate_m * 12 - _zins_ezb_d2);
+    }
   }
   // V63.52: Bei Aussetzung Bauspar-Rate als Liquiditätsabfluss
   var bspar_y_ezb = _d1IsAussetzung ? bspar_y : 0;
@@ -1438,8 +1493,9 @@ function _calcImmediate(){
   var zins_an, tilg_an, rate_an_m;
   var bspar_y_an = 0;
   // V63.38: Fallback wenn anschl_z/anschl_t = 0 — nehme aktuelle Konditionen
-  var az_an = az > 0 ? az : d1z;
-  var at_an = at > 0 ? at : d1t;
+  // V357-d1anschl: bei deaktiviertem D1-Schieber durchfinanziert (d1z/d1t)
+  var az_an = d1_anschl_enable ? (az > 0 ? az : d1z) : d1z;
+  var at_an = d1_anschl_enable ? (at > 0 ? at : d1t) : d1t;
 
   if (_d1IsAussetzung && State.bsvLifecycle && State.bsvLifecycle.zuteilStatus === 'before_ezb') {
     // V63.54: Zuteilung VOR Bindungsende — Bauspardarlehen läuft schon
@@ -1515,6 +1571,19 @@ function _calcImmediate(){
     rate_an_m = (zins_an + tilg_an) / 12;
   }
   // V63.40: CF v.St. = nach Tilgung
+  // V354b-d2-phasen: Darlehen 2 zur Anschluss-Phase addieren (State.rs2 als Basis)
+  if (typeof d2_enabled !== 'undefined' && d2_enabled && d2 > 0 && typeof _d2IsAussetzung !== 'undefined') {
+    var _rs2_an = (typeof State.rs2 === 'number' ? State.rs2 : d2);
+    if (_d2IsAussetzung) {
+      zins_an += d2 * d2z;                       // reines Zinsdarlehen, keine Tilgung
+    } else if (d2_anschl_enable) {
+      zins_an += _rs2_an * d2_az;                // eigene D2-Anschlusskonditionen
+      tilg_an += Math.max(0, _rs2_an * (d2_az + d2_at) - _rs2_an * d2_az);
+    } else {
+      zins_an += _rs2_an * d2z;                  // läuft mit eigener Annuität weiter
+      tilg_an += Math.max(0, d2_rate_m * 12 - _rs2_an * d2z);
+    }
+  }
   var cf_op_an_operativ = nkm_an - bwk_cf_an - zins_an;          // intern für Steuer
   var ster_an = (cf_op_an_operativ - afa) * grenz;
   var cf_op_an = cf_op_an_operativ - tilg_an - bspar_y_an;       // V63.52
@@ -1923,6 +1992,7 @@ function _calcImmediate(){
   }
 
   State.cfRows=[];var rs3=d1;
+  var rs3_d2 = (typeof d2_enabled !== 'undefined' && d2_enabled && d2 > 0) ? d2 : 0;  // V354-rs3d2-init: D2-Restschuld-Strang
   // V268-06: Anzeige-Basisjahr aus Kaufjahr (WU/kaufdat), Fallback heute
   var _v268_baseYear = (function(){
     try {
@@ -1944,8 +2014,9 @@ function _calcImmediate(){
   }
   st('chart-lbl',btj+' Jahre');
   // V63.38: Anschluss-Konditionen mit Fallback auf aktuelle Werte (falls anschl_z=0)
-  var az_eff = az > 0 ? az : d1z;       // Anschluss-Zins, Fallback = aktueller Zins
-  var at_eff = at > 0 ? at : d1t;       // Anschluss-Tilgung, Fallback = aktuelle Tilgung
+  // V357-d1anschl: bei deaktiviertem D1-Schieber durchfinanziert (d1z/d1t)
+  var az_eff = d1_anschl_enable ? (az > 0 ? az : d1z) : d1z;       // Anschluss-Zins
+  var at_eff = d1_anschl_enable ? (at > 0 ? at : d1t) : d1t;       // Anschluss-Tilgung
   var anschl_rate_eff = az_eff + at_eff;
   // V63.54: Bei Tilgungsaussetzung mit BSV — Lifecycle-aware
   var lc_proj = State.bsvLifecycle;
@@ -2069,7 +2140,7 @@ function _calcImmediate(){
       } else if (rs3 > 0) {
         // Anschluss-Phase: Annuität bleibt konstant
         zy2 = rs3 * az_eff;
-        var rate_anschl = State.rs * anschl_rate_eff;  // konstante Jahresannuität
+        var rate_anschl = (typeof State.rs1 === 'number' ? State.rs1 : State.rs) * anschl_rate_eff;  // V354c-anschluss-rs1: D1-only RS (kein D2-Doppelzaehlen)
         ty2 = Math.max(0, rate_anschl - zy2);
         if (ty2 > rs3) { ty2 = rs3; }
       } else {
@@ -2093,7 +2164,8 @@ function _calcImmediate(){
     // V63.83 KOMMENTAR: wert_y zeigt Stand ANFANG Jahr y → Jahr 1 = heute = ^0
     //   Endwert (Stand nach btj Jahren) wird in der Equity-Build-Box separat als
     //   wert_basis × (1+wstg)^btj berechnet. PDF muss konsistent dazu rechnen.
-    var wert_y=wert_basis*Math.pow(1+wstg,y-1),eq_y=wert_y-rs3,ltv_y=wert_y>0?rs3/wert_y*100:0;
+    var _rs_comb = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);  // V354-d2-strang: D1+D2
+    var wert_y=wert_basis*Math.pow(1+wstg,y-1),eq_y=wert_y-_rs_comb,ltv_y=wert_y>0?_rs_comb/wert_y*100:0;
     // V63.64: Kumuliertes Sparguthaben tracken (für Bank-Charts: Equity-Aufbau, Waterfall)
     bspar_kum_proj += (bspar_y2 || 0);
     // Effektive Restschuld = formal aufgenommen MINUS bereits angespartes BSV-Guthaben.
@@ -2104,6 +2176,7 @@ function _calcImmediate(){
     // Exakte Monatsschleife. Wirkt nur wenn d1_auszahl oder WU/kaufdat
     // ein Startdatum innerhalb von Jahr 1 ergeben (monthsY1 < 12).
     // ═══════════════════════════════════════════════════════════════
+    var _v353_anteilig_hit = false;  // V353-y1-recompute: markiert ob zy2/ty2 anteilig angepasst wurden
     if (y === 1 && typeof window.DealPilotAnteilig === 'object') {
       try {
         var _v269_startISO = window.DealPilotAnteilig.getFinanzierungStartDate
@@ -2120,12 +2193,14 @@ function _calcImmediate(){
         // V269a2-monthsY1-zero: monthsY1 === 0 separat behandeln
         if (_v269_monthsY1 === 0) {
           // Auszahlung im Folgejahr → keine Zinsen/Tilgung in diesem Jahr
+          _v353_anteilig_hit = true;  // V353
           zy2 = 0;
           ty2 = 0;
           if (typeof bspar_y2 === 'number') bspar_y2 = 0;
           State._v269_y1_months = 0;
           State._v269_y1_startDate = _v269_startISO;
         } else if (_v269_monthsY1 > 0 && _v269_monthsY1 < 12) {
+          _v353_anteilig_hit = true;  // V353
           // CASE: Aussetzung (D1 ist Tilgungsaussetzungsdarlehen)
           if (_d1IsAussetzung) {
             // Aussetzung: nur Zinsen anteilig, keine Tilgung, BSV-Sparrate anteilig
@@ -2166,8 +2241,85 @@ function _calcImmediate(){
       }
     }
 
-    var eff_rs = Math.max(0, rs3 - bspar_kum_proj);
-    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:wm_y2/12,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:rs3,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y});
+    // V353-y1-recompute: Wenn die Anteilig-Schleife zy2/ty2/bspar_y2 angepasst hat,
+    //   die abgeleiteten Werte (oben mit VOLLEM zy2 berechnet) jetzt NEU rechnen.
+    //   Sonst tragen cfop_y/taxEffect_y/cfns_y noch die vollen Jahres-Zinsen.
+    // ═══════════════════════════════════════════════════════════════
+    // V354-d2-strang: Darlehen 2 als paralleler Strang (Annuitaet/KfW; Aussetzung = reines
+    //   Zinsdarlehen ohne Tilgungstraeger). Eigene Zinsbindung d2_bindj, optionale eigene
+    //   Anschlussfinanzierung (d2_anschl_enable -> d2_az/d2_at), eigene Y1-Anteiligkeit
+    //   ueber d2_auszahl. D1-Logik bleibt unberuehrt; D2 wird auf zy2/ty2 addiert.
+    // ═══════════════════════════════════════════════════════════════
+    var _v354_d2_active = false;
+    if (typeof d2_enabled !== 'undefined' && d2_enabled && d2 > 0 && rs3_d2 > 0) {
+      _v354_d2_active = true;
+      var zy2_d2 = 0, ty2_d2 = 0;
+      if (_d2IsAussetzung) {
+        // Reines Zinsdarlehen (kein Tilgungstraeger im Modell) -> RS konstant
+        zy2_d2 = rs3_d2 * d2z;
+        ty2_d2 = 0;
+      } else if (y <= d2_bindj) {
+        // Zinsbindungsphase: Annuitaet
+        zy2_d2 = rs3_d2 * d2z;
+        ty2_d2 = Math.min(rs3_d2, d2_rate_m * 12 - zy2_d2);
+      } else if (d2_anschl_enable) {
+        // Eigene Anschlussfinanzierung (Checkbox)
+        zy2_d2 = rs3_d2 * d2_az;
+        var _rate_d2_an = rs3_d2 * (d2_az + d2_at);
+        ty2_d2 = Math.min(rs3_d2, Math.max(0, _rate_d2_an - zy2_d2));
+      } else {
+        // Variante (c): laeuft mit eigener Annuitaet weiter (durchfinanziert)
+        zy2_d2 = rs3_d2 * d2z;
+        ty2_d2 = Math.min(rs3_d2, d2_rate_m * 12 - zy2_d2);
+      }
+      // Y1-Anteiligkeit fuer D2 (eigenes Auszahlungsdatum d2_auszahl, sonst WU-Fallback)
+      if (y === 1 && typeof window.DealPilotAnteilig === 'object') {
+        try {
+          var _d2_startISO = window.DealPilotAnteilig.getFinanzierungStartDate
+            ? window.DealPilotAnteilig.getFinanzierungStartDate('d2_auszahl') : null;
+          var _d2_baseY = window.DealPilotAnteilig.getFinanzierungBaseYear
+            ? window.DealPilotAnteilig.getFinanzierungBaseYear('d2_auszahl') : null;
+          if (!_d2_baseY && typeof _v268_baseYear === 'number') _d2_baseY = _v268_baseYear;
+          var _d2_months = window.DealPilotAnteilig.getFinanzierungMonths
+            ? window.DealPilotAnteilig.getFinanzierungMonths(_d2_startISO, _d2_baseY) : 12;
+          if (_d2_months === 0) {
+            zy2_d2 = 0; ty2_d2 = 0;
+          } else if (_d2_months > 0 && _d2_months < 12) {
+            if (_d2IsAussetzung) {
+              var _d2rA0 = window.DealPilotAnteilig.computeY1Aussetzung(d2, d2z * 100, _d2_months);
+              zy2_d2 = _d2rA0.zins; ty2_d2 = 0;
+            } else {
+              var _d2rA = window.DealPilotAnteilig.computeY1Annuitaet(d2, d2z * 100, d2t * 100, _d2_months);
+              zy2_d2 = _d2rA.zins; ty2_d2 = _d2rA.tilg;
+              rs3_d2 = _d2rA.restschuld;  // RS nach anteiliger Tilgung (Annuitaet Y1)
+            }
+            State._v354_d2_y1_months = _d2_months;
+          }
+        } catch(_d2_e) { console.warn('[V354] D2 Y1-Anteil:', _d2_e.message); }
+      }
+      // RS fortschreiben (ausser Y1-Annuitaet, wo rs3_d2 schon gesetzt wurde, und Aussetzung)
+      if (!(y === 1 && State._v354_d2_y1_months) && !_d2IsAussetzung) {
+        rs3_d2 = Math.max(0, rs3_d2 - ty2_d2);
+      }
+      // D2 zu Gesamt-Zins/Tilgung addieren
+      zy2 += zy2_d2;
+      ty2 += ty2_d2;
+    }
+    // V353-y1-recompute (V354 erweitert): cfop_y/taxEffect_y/cfns_y mit finalen zy2/ty2
+    //   neu rechnen, wenn D1-Y1 anteilig ODER D2 aktiv ist.
+    if (_v353_anteilig_hit || _v354_d2_active) {
+      cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
+      cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
+      taxEffect_y     = (cfop_y_operativ - afa) * grenz;
+      cfns_y          = cfop_y - taxEffect_y;
+      // eq_y/ltv_y mit aktueller kombinierter RS aktualisieren (rs3_d2 ggf. Y1-reduziert)
+      var _rs_comb2 = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);
+      eq_y  = wert_y - _rs_comb2;
+      ltv_y = wert_y > 0 ? _rs_comb2 / wert_y * 100 : 0;
+    }
+    var _rs_push = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);  // V354: kombinierte RS fuer Anzeige
+    var eff_rs = Math.max(0, _rs_push - bspar_kum_proj);
+    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:wm_y2/12,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y});
   }
   // V111 STEUER-KONSISTENZ-FIX (V113 erweitert): Cashflow-Tabelle, CF-Projektion, Steuerverlauf,
   //   Vermögenszuwachs-Aufschlüsselung und CF-Vergleich-Heute/EZB/Anschluss müssen identische
@@ -2206,9 +2358,14 @@ function _calcImmediate(){
 
       // (2) State.kpis.steuer (Year 1) und cf_ns für CF-Vergleich-Heute
       if (State.kpis && State.cfRows[0]) {
-        State.kpis.steuer = State.cfRows[0].tax_y;
-        State.kpis.cf_ns  = State.cfRows[0].cfns_y;
-        State.kpis.cf_m   = (State.cfRows[0].cfop_y || 0) / 12;  // unverändert
+        // V351-cfns-volljahr (Option B): Bewertung/Score immer auf VOLLES Jahr (eingeschwungen),
+        // unabhängig vom WÜ-Monat. Volljahr-cf_ns/cf_m stammen aus dem State (Z.1854, vor hier
+        // gesetzt) — NICHT mit dem Y1-Rumpfjahr (cfRows[0]) überschreiben. Steuer bleibt Y1.
+        var _v351_cfns_full = State.kpis.cf_ns;   // Volljahr CF n.St. (volle Miete+Zins+Tilg+Steuer)
+        var _v351_cfm_full  = State.kpis.cf_m;    // Volljahr CF v.St. / 12
+        State.kpis.steuer = State.cfRows[0].tax_y;   // Y1-Steuer (anteilig) — für Steuerverlauf/-modul
+        State.kpis.cf_ns  = _v351_cfns_full;          // Volljahr statt cfRows[0].cfns_y
+        State.kpis.cf_m   = _v351_cfm_full;           // Volljahr statt cfRows[0].cfop_y/12
       }
 
       // (3) State.kpis.ster_ezb (Year bindj) für CF-Vergleich-Ende-Zinsbindung
@@ -2672,7 +2829,10 @@ function renderCFCalc(mode){
     });
   }
   st('cr-cfvst', fE(cf_vst, 0, true));
-  st('cr-st', (data.steuer < 0 ? '+' : '–') + fE(Math.abs(data.steuer)));
+  // V352-cfbox-steuer: Steuer aus angezeigter Differenz ableiten, damit die Box aufgeht
+  //   (cf_vst und data.cf_ns sind Volljahr; K.steuer wäre Y1-anteilig -> Widerspruch).
+  var _v352_st = cf_vst - data.cf_ns;            // >0 = Belastung, <0 = Erstattung
+  st('cr-st', (_v352_st < 0 ? '+' : '–') + fE(Math.abs(_v352_st)));
   // V118: cr-cfns mit Farbklasse — rot bei Verlust, gold bei Überschuss
   var _crCfnsEl = document.getElementById('cr-cfns');
   if (_crCfnsEl) {
@@ -3253,7 +3413,7 @@ function renderPhaseTable() {
   setF('ph-tilg-now', -_tilgOrBsparNow);
   setF('ph-cfvst-now', nowVals.cfvst);
   setF('ph-cfvstm-now', nowVals.cfvst / 12);
-  setF('ph-st-now', -nowVals.ster);
+  setF('ph-st-now', (nowVals.cfns - nowVals.cfvst));  /* V352-phase-steuer: aus Differenz, kein Y1-Mismatch */
   setF('ph-cfns-now', nowVals.cfns);
   setF('ph-cfnsm-now', nowVals.cfns / 12);
   setP('ph-bmr-now', nowVals.bmy);
@@ -3273,7 +3433,7 @@ function renderPhaseTable() {
   setF('ph-tilg-ezb', -_tilgOrBsparEzb);
   setF('ph-cfvst-ezb', ezbVals.cfvst);
   setF('ph-cfvstm-ezb', ezbVals.cfvst / 12);
-  setF('ph-st-ezb', -ezbVals.ster);
+  setF('ph-st-ezb', (ezbVals.cfns - ezbVals.cfvst));  /* V352-phase-steuer */
   setF('ph-cfns-ezb', ezbVals.cfns);
   setF('ph-cfnsm-ezb', ezbVals.cfns / 12);
   setP('ph-bmr-ezb', ezbVals.bmy);
@@ -3292,7 +3452,7 @@ function renderPhaseTable() {
   setF('ph-tilg-an', -anVals.tilg);
   setF('ph-cfvst-an', anVals.cfvst);
   setF('ph-cfvstm-an', anVals.cfvst / 12);
-  setF('ph-st-an', -anVals.ster);
+  setF('ph-st-an', (anVals.cfns - anVals.cfvst));  /* V352-phase-steuer */
   setF('ph-cfns-an', anVals.cfns);
   setF('ph-cfnsm-an', anVals.cfns / 12);
   setP('ph-bmr-an', anVals.bmy);
