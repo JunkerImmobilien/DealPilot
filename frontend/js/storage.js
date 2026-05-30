@@ -21,6 +21,7 @@ var FIELDS = [
   'd2','d2z','d2t','d2_bindj','d2_inst','d2_type','bwk_ul_pct','bwk_nul_pct','bwk_kp_pct',
   // V63.49: D1-Typ + Bausparvertrag
   'd1_type', 'd1_auszahl', 'd1_vertrag',
+  'd2_auszahl', 'd2_az', 'd2_at',  /* V354-fields: D2 Auszahlung + eigene Anschlussfinanzierung */
   'bspar_inst', 'bspar_vertrag', 'bspar_sum', 'bspar_rate', 'bspar_zuteil', 'bspar_zins',
   'bspar_quote_min', 'bspar_dar_z', 'bspar_dar_t',
   // V23: Mietentwicklung Detail-Modus
@@ -59,6 +60,12 @@ function collectData() {
   // Checkboxes
   var d2enable = document.getElementById('d2_enable');
   if (d2enable) d['_d2_enabled'] = d2enable.checked;
+  // V354b-d2anschl-persist: eigene D2-Anschlussfinanzierung-Checkbox mitspeichern
+  var d2anschl = document.getElementById('d2_anschl_enable');
+  if (d2anschl) d['_d2_anschl_enable'] = d2anschl.checked;
+  // V357-d1anschl-persist: eigene D1-Anschlussfinanzierung-Checkbox mitspeichern
+  var d1anschl = document.getElementById('d1_anschl_enable');
+  if (d1anschl) d['_d1_anschl_enable'] = d1anschl.checked;
   // V23: Mietentwicklungs-Toggle (NKM vs NKM+zE)
   var meIncZe = document.getElementById('me_inc_ze');
   if (meIncZe) d['_me_inc_ze'] = meIncZe.checked;
@@ -192,6 +199,24 @@ function loadData(d) {
   if (d._d2_enabled !== undefined) {
     var cb = document.getElementById('d2_enable');
     if (cb) { cb.checked = d._d2_enabled; if (typeof toggleD2 === 'function') toggleD2(); }
+  }
+  // V354b-d2anschl-persist: D2-Anschluss-Checkbox + Feld-Sichtbarkeit wiederherstellen
+  if (d._d2_anschl_enable !== undefined) {
+    var cbAn = document.getElementById('d2_anschl_enable');
+    if (cbAn) {
+      cbAn.checked = d._d2_anschl_enable;
+      var anFields = document.getElementById('d2_anschl_fields');
+      if (anFields) anFields.style.display = cbAn.checked ? '' : 'none';
+    }
+  }
+  // V357-d1anschl-persist: D1-Anschluss-Checkbox + Feld-Sichtbarkeit wiederherstellen
+  if (d._d1_anschl_enable !== undefined) {
+    var cbAn1 = document.getElementById('d1_anschl_enable');
+    if (cbAn1) {
+      cbAn1.checked = d._d1_anschl_enable;
+      var anFields1 = document.getElementById('d1_anschl_fields');
+      if (anFields1) anFields1.style.display = cbAn1.checked ? '' : 'none';
+    }
   }
   // V23: Mietentwicklungs-Toggle wiederherstellen
   if (d._me_inc_ze !== undefined) {
