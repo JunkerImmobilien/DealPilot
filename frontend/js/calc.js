@@ -1199,6 +1199,27 @@ function _calcImmediate(){
   }
   var _ar_total = ar + _ar_d2_m;
   st('r-rs',fE(State.rs,0));st('r-anschl',fE(_ar_total,2));
+  // v359-d2-anschl-display: D2-Anschluss-Anzeigefelder (analog D1) befuellen
+  if (d2_enabled && d2 > 0) {
+    st('d2_anschl_rate', fE(_ar_d2_m, 2));
+    var _d2_zaer_pct = Math.max(0, (d2_anschl_enable ? (d2_az * 100) : v('d2z')) - v('d2z'));
+    var _rs2_disp = (typeof State.rs2 === 'number' ? State.rs2 : d2);
+    var _d2_zaer_m = _rs2_disp * (_d2_zaer_pct / 100) / 12;
+    var _d2zd = document.getElementById('d2_zaer_display');
+    if (_d2zd) {
+      if (d2_anschl_enable) {
+        _d2zd.textContent = '+' + fP(_d2_zaer_pct, 2) + ' p.a. (Anschluss ' + fP(d2_az * 100, 2) + ' \u2212 Aktuell ' + fP(v('d2z'), 2) + ')';
+      } else {
+        _d2zd.textContent = 'durchfinanziert';
+      }
+    }
+    st('d2_zaer_m', (d2_anschl_enable ? (fE(_d2_zaer_m, 0) + '/Mon.') : '\u2014'));
+  } else {
+    st('d2_anschl_rate', '\u2014');
+    var _d2zd0 = document.getElementById('d2_zaer_display');
+    if (_d2zd0) _d2zd0.textContent = '\u2014';
+    st('d2_zaer_m', '\u2014');
+  }
   var grenz=v('grenz')/100;
   var zins_j=(d1_zm+d2_zm)*12, tilg_j=(d1_tm+d2_tm)*12;
   // V63.49: Bei Tilgungsaussetzung läuft parallel eine Bausparrate als Sparbeitrag.

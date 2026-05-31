@@ -159,6 +159,7 @@
       }
 
       // 4. Ergebnis anzeigen
+      try { window._pdfImportRawText = text; } catch(e) {}  /*v361-enrich-flow*/
       _showResult(extracted);
     } catch (err) {
       _showError(err.message || 'Unbekannter Fehler beim PDF-Import.');
@@ -794,7 +795,22 @@
       { id: 'lage_freizeit',  label: 'Lage · Freizeit',  unit: '' },
       { id: 'prognose_naechstes_jahr_pct', label: 'Wertprognose nächstes Jahr', unit: '%' },
       { id: 'wanderungssaldo', label: 'Wanderungssaldo', unit: '/1000 EW' },
-      { id: 'markt_tage_auf_dem_markt', label: 'Ø Tage am Markt', unit: 'Tage' }
+      { id: 'markt_tage_auf_dem_markt', label: 'Ø Tage am Markt', unit: 'Tage' },
+      { id: 'badezimmer',          label: 'Badezimmer',          unit: '' },
+      { id: 'etage',               label: 'Etage',               unit: '' },
+      { id: 'etagen',              label: 'Anzahl Etagen',       unit: '' },
+      { id: 'modernisierungsjahr', label: 'Modernisierungsjahr', unit: '' },
+      { id: 'garagen',             label: 'Garagenplätze',       unit: '' },
+      { id: 'stellplatz_aussen',   label: 'Außenstellplätze',    unit: '' },
+      { id: 'balkon_flaeche',      label: 'Balkon/Terrasse',     unit: 'm²' },
+      { id: 'kueche_qualitaet',    label: 'Küche · Qualität',     unit: '' },
+      { id: 'bad_qualitaet',       label: 'Bad · Qualität',         unit: '' },
+      { id: 'boden_qualitaet',     label: 'Boden · Qualität',       unit: '' },
+      { id: 'fenster_qualitaet',   label: 'Fenster · Qualität',     unit: '' },
+      { id: 'kueche_zustand',      label: 'Küche · Zustand',        unit: '' },
+      { id: 'bad_zustand',         label: 'Bad · Zustand',            unit: '' },
+      { id: 'boden_zustand',       label: 'Boden · Zustand',          unit: '' },
+      { id: 'fenster_zustand',     label: 'Fenster · Zustand',        unit: '' }
     ];
     var FIELDS = _isMarketMode ? MARKET_FIELDS : EXPOSE_FIELDS;
 
@@ -885,8 +901,11 @@
       _v356SwitchHtml +
       '<table class="pdfi-result-table"><tbody>' + rows + '</tbody></table>' +
       photosHtml +
+      '<div id="v361-lage-section"></div>' +  /*v361-enrich-flow*/
       '<div class="pdfi-result-actions">' +
-        '<button type="button" class="btn btn-gold" onclick="pdfImportApply()">Ausgewählte übernehmen</button>' +
+        (_isMarketMode
+          ? '<button type="button" class="btn btn-gold" id="v361-weiter-btn" onclick="_v361Enrich()">Weiter: Lücken per KI füllen</button>'
+          : '<button type="button" class="btn btn-gold" onclick="pdfImportApply()">Ausgewählte übernehmen</button>') +
       '</div>';
     // data global merken für apply
     window._pdfImportData = data;
@@ -904,6 +923,17 @@
     checked.forEach(function(cb) {
       picked[cb.getAttribute('data-fid')] = cb.getAttribute('data-val');
     });
+    // v361-enrich-flow: Lage-Selects (makrolage/mikrolage/ds2_*) direkt setzen (Enum-Option + change)
+    try {
+      checked.forEach(function(cb){
+        if (cb.getAttribute('data-sel') !== '1') return;
+        var fid=cb.getAttribute('data-fid'), val=cb.getAttribute('data-val');
+        var el=document.getElementById(fid);
+        if (el && val && el.querySelector('option[value="'+val+'"]')) {
+          el.value=val; try{ el.dispatchEvent(new Event('change',{bubbles:true})); }catch(e){}
+        }
+      });
+    } catch(e) { console.warn('[v361] lage-apply:', e); }
 
     // V42/V62: Bilder mit übernehmen — immer wenn Bilder da sind
     // Die Checkbox kann fehlen wenn die Foto-Sektion nicht gerendert wurde
@@ -1140,6 +1170,55 @@
         var _wEl = document.getElementById('ds2_wertsteigerung');
         if (_wEl && !_wEl.value) { _wEl.value = _wsp; try{_wEl.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){} _marked.push('ds2_wertsteigerung'); }
       }
+      // ===== v362-apply: zusaetzliche Stammdaten (reine Erfassung, score-neutral) =====
+      if (picked.zimmer) setM('zimmer', picked.zimmer);
+      if (picked.badezimmer) setM('bad_anz', picked.badezimmer);
+      if (picked.etage) setM('etage', picked.etage);
+      if (picked.etagen) setM('etagen_ges', picked.etagen);
+      if (picked.modernisierungsjahr) setM('modernis', picked.modernisierungsjahr);
+      if (picked.garagen) setM('garagen', picked.garagen);
+      if (picked.stellplatz_aussen) setM('stellpl_aussen', picked.stellplatz_aussen);
+      if (picked.balkon_flaeche) setM('balkon_flae', picked.balkon_flaeche);
+
+      // v362: Qualitaet & Zustand -> Sterne (StarRating)
+      function _v362Stars(s, scale){
+        if (s == null) return 0;
+        var t = String(s).trim().toLowerCase();
+        var order = [5,4,3,2,1];
+        for (var i = 0; i < order.length; i++){
+          var k = order[i], arr = scale[k];
+          if (arr) { for (var j = 0; j < arr.length; j++){ if (t.indexOf(arr[j]) >= 0) return k; } }
+        }
+        return 0;
+      }
+      var _V362_QUAL = {5:['luxus','luxuri'],4:['gehoben','hochwertig'],3:['normal'],2:['standard'],1:['einfach','schlicht']};
+      var _V362_ZUST = {5:['neu','k\u00fcrzlich modernis','kuerzlich modernis','erstbezug','kernsaniert'],4:['gehobenes niveau','gehoben'],3:['gut in stand','gepflegt','gut'],2:['renovierungsbed'],1:['stark sanier','sanierungsbed']};
+      function _v362SetStar(id, val, scale){
+        var n = _v362Stars(val, scale);
+        if (n > 0 && window.StarRating && typeof StarRating.setRating === 'function'){ StarRating.setRating(id, n); _marked.push(id); }
+      }
+      _v362SetStar('qual_kueche',  picked.kueche_qualitaet,  _V362_QUAL);
+      _v362SetStar('qual_bad',     picked.bad_qualitaet,     _V362_QUAL);
+      _v362SetStar('qual_boden',   picked.boden_qualitaet,   _V362_QUAL);
+      _v362SetStar('qual_fenster', picked.fenster_qualitaet, _V362_QUAL);
+      _v362SetStar('rate_kueche',  picked.kueche_zustand,    _V362_ZUST);
+      _v362SetStar('rate_bad',     picked.bad_zustand,       _V362_ZUST);
+      _v362SetStar('rate_boden',   picked.boden_zustand,     _V362_ZUST);
+      _v362SetStar('rate_fenster', picked.fenster_zustand,   _V362_ZUST);
+
+      // v362: Modernisierungsjahr -> ds2_zustand nudgen (nur wenn leer; manuelle Wahl bleibt)
+      var _v362mj = num(picked.modernisierungsjahr);
+      if (_v362mj != null && _v362mj > 1900) {
+        var _v362z = document.getElementById('ds2_zustand');
+        if (_v362z && !_v362z.value) {
+          var _v362age = (new Date().getFullYear()) - _v362mj;
+          // Konservativ: kuerzlich modernisiert -> "gut"; "neubau" kommt aus dem Baujahr, nicht der Modernisierung.
+          // Schwelle bei Bedarf hier anpassen:
+          var _v362zv = _v362age <= 2 ? 'gut' : '';
+          if (_v362zv) { _v362z.value = _v362zv; try{_v362z.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){} _marked.push('ds2_zustand'); }
+        }
+      }
+
       // Gold-Streifen setzen (identisch zur QuickCheck-Übernahme)
       try { if (typeof window._v236MarkQcLoaded === 'function' && _marked.length) window._v236MarkQcLoaded(_marked); } catch(e) {}
 
@@ -1160,13 +1239,88 @@
       var titleEl = document.querySelector('#pdfimport-modal .pdfi-title-block h3');
       var subEl = document.querySelector('#pdfimport-modal .pdfi-title-block .pdfi-sub');
       var iconEl = document.querySelector('#pdfimport-modal .pdfi-icon');
+      if (iconEl) { iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>'; iconEl.style.fontSize = '0'; }  /*v359-modal-neutral-icon*/
       if (titleEl) titleEl.textContent = 'Marktbericht-PDF importieren';
-      if (subEl) subEl.textContent = 'PriceHubble, Sprengnetter, Maklergutachten — die KI extrahiert Verkehrswert, Lage-Scores und Wertentwicklung.';
+      if (subEl) subEl.textContent = 'Marktbericht- oder Gutachten-PDF — die KI extrahiert Verkehrswert, Lage-Scores und Wertentwicklung.' /*v359-modal-neutral*/;
       if (iconEl) iconEl.textContent = '📊';
     }, 50);
   }
 
   // Globale Exports
+  /* v361-enrich-flow: Markt-Modus — fehlende Lage-Felder per KI ermitteln + als Zeilen anzeigen */
+  var _V361_LAGE = [
+    { id:'makrolage',          label:'Makrolage' },
+    { id:'mikrolage',          label:'Mikrolage' },
+    { id:'ds2_bevoelkerung',   label:'Bev\u00f6lkerungsentwicklung' },
+    { id:'ds2_nachfrage',      label:'Nachfrage-Indikatoren' },
+    { id:'ds2_wertsteigerung', label:'Wertsteigerungs-Potenzial' },
+    { id:'ds2_entwicklung',    label:'Entwicklungsm\u00f6glichkeiten' }
+  ];
+  function _v361Empty(fid){ var e=document.getElementById(fid); return e && !e.value; }
+  function _v361OptLabel(fid, val){
+    var e=document.getElementById(fid); if(!e) return val;
+    var o=e.querySelector('option[value="'+val+'"]'); return o ? (o.textContent||val) : val;
+  }
+  function _v361Ctx(){
+    function v(id){ var e=document.getElementById(id); return e?e.value:''; }
+    return { adresse:[v('str')+' '+v('hnr'), v('plz')+' '+v('ort')].map(function(s){return s.trim();}).filter(Boolean).join(', '),
+             str:v('str'), hnr:v('hnr'), plz:v('plz'), ort:v('ort'), objektart:v('objart'), baujahr:v('baujahr') };
+  }
+  async function _v361Enrich(){
+    var btn=document.getElementById('v361-weiter-btn');
+    var text = window._pdfImportRawText || '';
+    // fehlende Lage-Felder
+    var missing = _V361_LAGE.map(function(x){return x.id;}).filter(_v361Empty);
+    if (!missing.length || text.length < 50) {
+      // nichts zu ergaenzen -> direkt uebernehmen
+      pdfImportApply(); return;
+    }
+    if (btn) { btn.disabled=true; btn.textContent='KI recherchiert\u2026'; }
+    try {
+      var res = await fetch('/api/v1/ai/enrich-market-fields', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+_getToken()},
+        body: JSON.stringify({ text:text, fields:missing, context:_v361Ctx(), userApiKey:_getUserApiKey() })
+      });
+      var data={}; try{ data=await res.json(); }catch(e){}
+      if (!res.ok) {
+        var msg=data.error||('HTTP '+res.status);
+        if (data.needs_credits) msg='Keine KI-Credits mehr verf\u00fcgbar.';
+        throw new Error(msg);
+      }
+      _v361RenderLageRows(data.suggestions||{});
+    } catch(err) {
+      if (typeof toast==='function') toast('\u26a0 KI-Fehler: '+(err.message||'unbekannt'));
+    } finally {
+      if (btn) { btn.disabled=false; btn.textContent='Ausgew\u00e4hlte \u00fcbernehmen'; btn.setAttribute('onclick','pdfImportApply()'); }
+    }
+  }
+  function _escA(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  function _escT(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function _v361RenderLageRows(sugg){
+    var sec=document.getElementById('v361-lage-section'); if(!sec) return;
+    var rows='';
+    _V361_LAGE.forEach(function(f){
+      var s=sugg[f.id];
+      if (!s || !s.value) return;
+      var herkunft = (s.herkunft==='kontext+ki') ? 'Aus Kontext + KI abgeleitet' : 'Aus Kontext abgeleitet';
+      var disp=_v361OptLabel(f.id, s.value);
+      rows += '<tr class="pdfi-result-row v361-lage-row">' +
+        '<td class="pdfi-result-cb"><input type="checkbox" data-fid="'+f.id+'" data-val="'+_escA(s.value)+'" data-sel="1" checked></td>' +
+        '<td class="pdfi-result-label">'+_escT(f.label)+'</td>' +
+        '<td class="pdfi-result-value">'+_escT(disp)+
+          '<div class="dp-feldquelle">'+herkunft+(s.text?(' \u00b7 '+_escT(s.text)):'')+'</div></td>' +
+        '</tr>';
+    });
+    if (!rows) {
+      sec.innerHTML = '<div class="v361-lage-empty">Keine zus\u00e4tzlichen Lage-Werte ermittelt.</div>';
+      return;
+    }
+    sec.innerHTML = '<div class="v361-lage-head">\u2728 KI-erg\u00e4nzte Lage-Felder</div>' +
+      '<table class="pdfi-result-table"><tbody>'+rows+'</tbody></table>';
+  }
+  window._v361Enrich = _v361Enrich;
+
   window.showPdfImport         = showPdfImport;
   window.closePdfImport        = closePdfImport;
   window.pdfImportApply        = pdfImportApply;

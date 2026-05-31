@@ -1104,6 +1104,14 @@ async function extractMarketData(text, opts) {
     '  - lage_gesundheit: Zahl',
     '  - lage_freizeit: Zahl',
     '',
+    '  LAGE-/MARKT-EINSTUFUNG (fuer Investor-Score) — wenn der Bericht nur einen Gesamt-Score oder ein Label fuer Makro-/Mikrolage nennt, leite die Stufe daraus ab:',
+    '  - makrolage: genau einer von [sehr_schwach, schwach, durchschnittlich, gut, sehr_gut]',
+    '  - mikrolage: genau einer von [sehr_schwach, schwach, durchschnittlich, gut, sehr_gut]',
+    '  - bevoelkerung_entwicklung: Bevoelkerungs-ENTWICKLUNG (kein Einwohner-Wert), genau einer von [stark_wachsend, wachsend, stabil, leicht_fallend, stark_fallend]',
+    '  - nachfrage: genau einer von [sehr_stark, stark, mittel, schwach, sehr_schwach]',
+    '  - wertsteigerung: genau einer von [sehr_hoch, hoch, mittel, niedrig, keines]',
+    '  - entwicklung: Entwicklungs-/Stadtentwicklungs-Moeglichkeiten, genau einer von [mehrere, eine_starke, begrenzt, kaum, keine]',  // v374-ds2-extract
+    '',
     'WERTENTWICKLUNG (Markttrends):',
     '  - wertentwicklung_3jahre_pct: Veränderung der letzten 3 Jahre in % (Zahl, kann negativ sein)',
     '  - wertentwicklung_1jahr_pct: Veränderung im letzten Jahr in % (Zahl)',
@@ -1121,6 +1129,17 @@ async function extractMarketData(text, opts) {
     '  - bad_qualitaet: String',
     '  - boden_qualitaet: String',
     '  - fenster_qualitaet: String',
+    '  - kueche_zustand: String (z.B. "Neu / kürzlich modernisiert", "Gut in Stand gehalten", "Renovierungsbedürftig")',
+    '  - bad_zustand: String',
+    '  - boden_zustand: String',
+    '  - fenster_zustand: String',
+    '  - badezimmer: Number (Anzahl Badezimmer)',
+    '  - etage: Number (Etage der Wohnung)',
+    '  - etagen: Number (Anzahl Etagen im Gebäude)',
+    '  - modernisierungsjahr: Number (Jahr der letzten Modernisierung)',
+    '  - garagen: Number (Anzahl Garagen-/Tiefgaragenplätze)',
+    '  - stellplatz_aussen: Number (Anzahl Außenstellplätze)',
+    '  - balkon_flaeche: Number (Fläche Balkon/Terrasse in m²)',
     '  - energie_label: String (A+, A, B, ..., H)',
     '',
     'WICHTIG:',
@@ -1144,8 +1163,8 @@ async function extractMarketData(text, opts) {
   const ext = parsed.extracted || parsed;
   const cleaned = {};
   // String-Felder
-  ['adresse','plz','ort','objektart','bewertungsdatum','konfidenz',
-   'kueche_qualitaet','bad_qualitaet','boden_qualitaet','fenster_qualitaet','energie_label'
+  ['adresse','plz','ort','objektart','bewertungsdatum','konfidenz','makrolage','mikrolage','bevoelkerung_entwicklung','nachfrage','wertsteigerung','entwicklung',
+   'kueche_qualitaet','bad_qualitaet','boden_qualitaet','fenster_qualitaet','kueche_zustand','bad_zustand','boden_zustand','fenster_zustand','badezimmer','etage','etagen','modernisierungsjahr','garagen','stellplatz_aussen','balkon_flaeche','energie_label'
   ].forEach(k => {
     if (ext[k] != null && ext[k] !== '') cleaned[k] = String(ext[k]).trim();
   });
@@ -1166,6 +1185,99 @@ async function extractMarketData(text, opts) {
   return { success: true, model: r.model, extracted: cleaned };
 }
 
+/**
+ * v361-enrich-market-fields: Fehlende Lage-Felder nach Marktbericht-Import per KI ermitteln.
+ * Bekommt den PDF-Volltext + Liste fehlender Feld-IDs. Leitet jedes Feld ZUERST
+ * aus dem Bericht ab; nur was dort nicht steht, wird per web_search recherchiert.
+ * Gibt pro Feld { value, herkunft: 'kontext'|'kontext+ki', text } zurueck.
+ *
+ * @param {string} text     PDF-Volltext (gekuerzt)
+ * @param {string[]} fields Feld-IDs aus: makrolage, mikrolage, ds2_bevoelkerung,
+ *                          ds2_nachfrage, ds2_wertsteigerung, ds2_entwicklung
+ * @param {object} context  { adresse, plz, ort, ... }
+ */
+async function enrichMarketFields(text, fields, context, opts) {
+  opts = opts || {};
+  context = context || {};
+  const ENUMS = {
+    makrolage:          ['sehr_schwach','schwach','durchschnittlich','gut','sehr_gut'],
+    mikrolage:          ['sehr_schwach','schwach','durchschnittlich','gut','sehr_gut'],
+    ds2_bevoelkerung:   ['stark_wachsend','wachsend','stabil','leicht_fallend','stark_fallend'],
+    ds2_nachfrage:      ['sehr_stark','stark','mittel','schwach','sehr_schwach'],
+    ds2_wertsteigerung: ['sehr_hoch','hoch','mittel','niedrig','keines'],
+    ds2_entwicklung:    ['mehrere','eine_starke','begrenzt','kaum','keine']
+  };
+  const LABELS = {
+    makrolage: 'Makrolage (Stadt/Region: Bevoelkerung, Wirtschaft, Arbeitsmarkt)',
+    mikrolage: 'Mikrolage (Stadtteil: OEPNV, Infrastruktur, Wohnumfeld)',
+    ds2_bevoelkerung: 'Bevoelkerungsentwicklung der Region',
+    ds2_nachfrage: 'Nachfrage-Indikatoren / Marktpuls',
+    ds2_wertsteigerung: 'Mittelfristiges Wertsteigerungs-Potenzial',
+    ds2_entwicklung: 'Entwicklungs-Moeglichkeiten / Stadtentwicklungs-Plaene'
+  };
+  const want = (Array.isArray(fields) ? fields : []).filter(f => ENUMS[f]);
+  if (!want.length) return { success: true, model: null, suggestions: {} };
+
+  const adresse = context.adresse || [context.str, context.hnr, context.plz, context.ort].filter(Boolean).join(' ');
+  const dimLines = want.map((f, i) => {
+    return (i + 1) + '. ' + f + ' (' + LABELS[f] + ')\n   ENUM-Werte: ' + ENUMS[f].map(v => '"' + v + '"').join(' | ');
+  }).join('\n\n');
+
+  const prompt = [
+    'Du bist Immobilien-Marktexperte. Du bekommst den TEXT eines Immobilien-Marktberichts',
+    'und sollst fehlende Lage-Einschaetzungen fuer ein Objekt ermitteln.',
+    '',
+    'OBJEKT-ADRESSE: ' + (adresse || '(nicht angegeben)'),
+    '',
+    'VORGEHEN PRO FELD (strikt einhalten):',
+    '1. Pruefe ZUERST, ob sich der Wert AUS DEM BERICHTSTEXT ableiten laesst',
+    '   (direkt genannt ODER klar aus Zahlen/Aussagen im Text herleitbar).',
+    '   Wenn ja: setze "herkunft": "kontext".',
+    '2. Nur wenn der Bericht dazu NICHTS hergibt: recherchiere im Web (web_search)',
+    '   fuer die genannte Adresse/Region und kombiniere mit dem Bericht.',
+    '   Dann: setze "herkunft": "kontext+ki".',
+    '3. Der BERICHT ist immer fuehrend. Web-Funde duerfen Bericht-Aussagen NICHT widersprechen.',
+    '',
+    'WICHTIG:',
+    '- Fuer jedes Feld GENAU einen der vorgegebenen ENUM-Strings als "value".',
+    '- Erfinde keine eigenen Werte, keine freien Zahlen.',
+    '- Wenn ein Feld gar nicht bestimmbar ist: "value": null.',
+    '',
+    'FELDER:',
+    '',
+    dimLines,
+    '',
+    'Antwort STRIKT als JSON, kein Markdown:',
+    '{',
+    '  "suggestions": {',
+    '    "<feldId>": { "value": "<enum>", "herkunft": "kontext"|"kontext+ki", "text": "1 kurzer Satz Begruendung" }',
+    '  }',
+    '}',
+    '',
+    '─── MARKTBERICHTS-TEXT ───',
+    String(text || '').slice(0, 12000)
+  ].join('\n');
+
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 2000 }, opts));
+  const parsed = extractJson(r.text);
+  if (!parsed || !parsed.suggestions) {
+    return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
+  }
+  const cleaned = {};
+  want.forEach(f => {
+    const s = parsed.suggestions[f];
+    if (!s || s.value == null || s.value === '') return;
+    if (ENUMS[f].indexOf(s.value) < 0) return;   // Enum-Schutz
+    let herkunft = (s.herkunft === 'kontext+ki') ? 'kontext+ki' : 'kontext';
+    cleaned[f] = {
+      value: s.value,
+      herkunft: herkunft,
+      text: (s.text || '').toString().slice(0, 200)
+    };
+  });
+  return { success: true, model: r.model, suggestions: cleaned };
+}
+
 module.exports = {
   analyze,
   analyzeLage,
@@ -1173,6 +1285,7 @@ module.exports = {
   suggestQcFields,
   extractExpose,
   extractMarketData,
+  enrichMarketFields,
   buildPrompt,
   callOpenAI,
   extractJson

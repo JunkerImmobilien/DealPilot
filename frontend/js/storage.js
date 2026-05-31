@@ -32,6 +32,7 @@ var FIELDS = [
   'ds2_wertsteigerung','ds2_entwicklung',
   // V37: Qualität & Zustand Sterne-Bewertung
   'rate_kueche','rate_bad','rate_boden','rate_fenster',
+  'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis','garagen','stellpl_aussen','balkon_flae',
   /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
   'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years'
 ];

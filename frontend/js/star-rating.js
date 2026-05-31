@@ -9,6 +9,19 @@
 ═══════════════════════════════════════════════════════════════════════════ */
 
 window.StarRating = (function() {
+    // v362: Qualitaets-Skala (separat von Zustand) fuer qual_* Targets
+    var QUAL_LABELS = {
+      0: '– keine Bewertung –',
+      1: 'Einfach',
+      2: 'Standard',
+      3: 'Normal',
+      4: 'Gehoben',
+      5: 'Luxus'
+    };
+    function _labelsFor(targetId) {
+      return (targetId && targetId.indexOf('qual_') === 0) ? QUAL_LABELS : LABELS;
+    }
+
 
   // Label-Texte je Stern-Anzahl
   var LABELS = {
@@ -107,7 +120,7 @@ window.StarRating = (function() {
     if (stars) _renderStars(stars, rating);
     var label = document.querySelector('[data-qz-label="' + targetId + '"]');
     if (label) {
-      label.textContent = LABELS[rating];
+      label.textContent = _labelsFor(targetId)[rating];
       label.classList.toggle('qz-label-empty', rating === 0);
       _applyLabelStyle(label, rating === 0);
     }
@@ -132,7 +145,7 @@ window.StarRating = (function() {
    * Returns null wenn keine Bewertungen vorhanden.
    */
   function getAverage() {
-    var keys = ['rate_kueche', 'rate_bad', 'rate_boden', 'rate_fenster'];
+    var keys = ['rate_kueche', 'rate_bad', 'rate_boden', 'rate_fenster', 'qual_kueche', 'qual_bad', 'qual_boden', 'qual_fenster']; // v364: Qualitaet zaehlt mit
     var sum = 0, count = 0;
     keys.forEach(function(k) {
       var r = getRating(k);
@@ -190,7 +203,7 @@ window.StarRating = (function() {
       _renderStars(container, current);
       var labelEl = document.querySelector('[data-qz-label="' + targetId + '"]');
       if (labelEl) {
-        labelEl.textContent = LABELS[current];
+        labelEl.textContent = _labelsFor(targetId)[current];
         labelEl.classList.toggle('qz-label-empty', current === 0);
         _applyLabelStyle(labelEl, current === 0);
       }
@@ -248,7 +261,7 @@ window.StarRating = (function() {
       _renderStars(container, current);
       var labelEl = document.querySelector('[data-qz-label="' + targetId + '"]');
       if (labelEl) {
-        labelEl.textContent = LABELS[current];
+        labelEl.textContent = _labelsFor(targetId)[current];
         labelEl.classList.toggle('qz-label-empty', current === 0);
         _applyLabelStyle(labelEl, current === 0);
       }
