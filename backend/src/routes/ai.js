@@ -800,4 +800,49 @@ router.post('/bmf-gaa', authenticate, plzValidator.middleware, async (req, res, 
   }
 });
 
+/**
+ * v361-enrich-market-fields: POST /api/v1/ai/enrich-market-fields
+ * Ermittelt fehlende Lage-Felder nach Marktbericht-Import. Bekommt den PDF-Text +
+ * Liste fehlender Felder. Leitet zuerst aus dem Bericht ab, sonst web_search.
+ * Pro Feld: { value, herkunft: 'kontext'|'kontext+ki', text }.
+ * Kostet 1 Credit pro Aufruf (egal wie viele Felder).
+ */
+router.post('/enrich-market-fields', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { text, fields, context, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+
+    if (!config.openai.apiKey && !userApiKey) {
+      return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.', needs_user_key: true });
+    }
+    if (!text || typeof text !== 'string' || text.length < 50) {
+      return res.status(400).json({ error: 'Body muss "text" enthalten (mindestens 50 Zeichen).' });
+    }
+    if (!Array.isArray(fields) || fields.length === 0) {
+      return res.status(400).json({ error: 'Body muss "fields" als nicht-leeres Array enthalten.' });
+    }
+
+    // Credit-Check (1 Credit pro Aufruf) — nur bei Server-Key
+    if (!userApiKey) {
+      const status = await aiCreditsService.getStatus(req.user.id);
+      if (status.total_remaining < 1) {
+        return res.status(402).json({ error: 'Keine KI-Credits mehr verfuegbar.', credits: status, needs_credits: true });
+      }
+    }
+
+    const result = await openaiService.enrichMarketFields(text, fields, context || {}, { userApiKey });
+
+    if (!userApiKey) {
+      try { await aiCreditsService.consume(req.user.id, 1, 'enrich-market-fields'); } catch (e) {}
+    }
+    try { await usageService.incrementUsage(req.user.id, 'ai_analysis'); } catch (e) {}
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
+    if (err.status === 401) return res.status(401).json({ error: err.message, needs_user_key: err.keySource === 'user' });
+    if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+    next(err);
+  }
+});
+
 module.exports = router;

@@ -76,3 +76,9 @@ letsencrypt/
 # DB-Backups (V225 + V246-Prod)
 backup_*.sql
 *.sql.bak
+# Deploy-Artefakte (vNNN-Bundles)
+/apply-v*.sh
+/patches/
+/files/
+/README-v*.md
+*.bak

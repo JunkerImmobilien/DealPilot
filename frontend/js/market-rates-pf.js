@@ -81,6 +81,7 @@ var MarketRatesPF = (function() {
     if (!data) data = _buildFromFallback();
     _currentData = data;
     _renderUI();
+    try { _syncTopStrip(); } catch(e){}
   }
 
   function setMargin(marginKey) {
@@ -91,6 +92,7 @@ var MarketRatesPF = (function() {
       b.classList.toggle('active', b.getAttribute('data-margin') === marginKey);
     });
     _renderUI();
+    try { _syncTopStrip(); } catch(e){}
   }
   window.setPfandbriefMargin = setMargin;
 
@@ -98,6 +100,27 @@ var MarketRatesPF = (function() {
     return _refresh();
   }
   window.refreshPfandbriefRates = refreshPfandbriefRates;
+
+  // v358-top-sync: spiegelt die Pfandbrief-Tiles in die schlanke Top-Leiste (#mrpf-top-*)
+  function _syncTopStrip() {
+    if (!_currentData) return;
+    var d = _currentData;
+    ['5','10','15','20'].forEach(function(key) {
+      var srcRate = document.getElementById('mr-pf-rate-' + key);
+      var srcSrc  = document.getElementById('mr-pf-src-' + key);
+      var srcDet  = document.getElementById('mr-pf-detail-' + key);
+      var topRate = document.getElementById('mrpf-top-rate-' + key);
+      var topSrc  = document.getElementById('mrpf-top-src-' + key);
+      var topDet  = document.getElementById('mrpf-top-detail-' + key);
+      if (topRate && srcRate) topRate.textContent = srcRate.textContent;
+      if (topDet  && srcDet)  topDet.textContent  = srcDet.textContent;
+      if (topSrc  && srcSrc)  {
+        topSrc.textContent = srcSrc.textContent;
+        topSrc.className   = srcSrc.className.replace('mr-pf-tile-src', 'mrpf-top-src');
+      }
+    });
+  }
+  window._mrPfSyncTopStrip = _syncTopStrip;
 
   function _renderUI() {
     if (!_currentData) return;
