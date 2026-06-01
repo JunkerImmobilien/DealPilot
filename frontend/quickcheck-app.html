@@ -1339,6 +1339,30 @@ body::before {
   position: relative;
 }
 .avm5-card.is-spr { background: linear-gradient(135deg, #FDFCF8 0%, #F7EFD8 100%); }
+/* v416-card-css: Zwei-Spalten-Layout der AVM-Ergebnis-Card (wie Objekt-Tab) */
+#avm-results-host{margin:10px 0 14px}
+.avm6-cols{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;padding:4px 0 2px}
+.avm6-col{flex:1 1 0;min-width:150px;padding:6px 14px;display:flex;flex-direction:column;gap:3px}
+.avm6-coldiv{width:1px;background:rgba(42,39,39,0.08);align-self:stretch}
+.avm6-col-l{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--gold-3,#9a7f33);display:flex;align-items:center;gap:5px}
+.avm6-col-l svg{width:13px;height:13px;stroke:currentColor}
+.avm6-col-big{font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;font-weight:700;color:var(--ch,#2A2727);line-height:1.05}
+.avm6-cur{font-size:17px;font-weight:600;opacity:.7}
+.avm6-col-range{font-size:11.5px;color:var(--ch2,#6b6660)}
+.avm6-col-sub{font-size:11.5px;color:var(--ch2,#6b6660)}
+.avm6-spancolwrap{flex:0 0 auto;justify-content:center;align-items:flex-start}
+.avm6-spancol{display:flex;flex-direction:column;gap:5px}
+.avm6-seg-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-3,#9a7f33)}
+.avm6-seg{display:inline-flex;border:1px solid rgba(201,168,76,0.45);border-radius:8px;overflow:hidden}
+.avm6-seg button{padding:5px 11px;border:0;border-right:1px solid rgba(201,168,76,0.30);background:#fff;cursor:pointer;font:600 12px/1 'DM Sans',system-ui,sans-serif;color:var(--ch2,#6b6660)}
+.avm6-seg button:last-child{border-right:0}
+.avm6-seg button.sel{background:var(--gold,#C9A84C);color:#fff}
+.avm6-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;padding-top:10px;border-top:1px solid rgba(42,39,39,0.07)}
+.avm6-disc{flex:1 1 auto;font-size:10.5px;color:var(--muted,#7A7370)}
+.avm6-apply{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border:1px solid rgba(201,168,76,0.5);border-radius:10px;background:#fff;cursor:pointer;font:700 12.5px/1 'DM Sans',system-ui,sans-serif;color:var(--gold-3,#9a7f33);transition:background .15s ease,box-shadow .15s ease}
+.avm6-apply:hover{background:rgba(201,168,76,0.10);box-shadow:0 4px 12px -6px rgba(201,168,76,0.5)}
+.avm6-apply svg{width:13px;height:13px;stroke:currentColor}
+@media (max-width:640px){.avm6-cols{flex-direction:column}.avm6-coldiv{width:auto;height:1px}}
 /* v415-card-collapse: Einklapp-Mechanik fuer AVM-Ergebnis-Cards */
 .avm5-card.collapsed > *:not(.avm5-head){display:none !important;}
 .avm5-card.collapsed .avm5-head{border-bottom:0;}
@@ -2877,6 +2901,9 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
   <!-- Sequenzieller Progress-Indikator -->
   <div class="qc6-progress" id="qc6-progress"></div>
 
+  <!-- v416-card-css: AVM-Ergebnis-Cards direkt unter der Aktionsleiste -->
+  <div id="avm-results-host"></div>
+
   <!-- ═════ FORM ═════ -->
 
   <!-- Adresse -->
@@ -3072,7 +3099,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
   </div>
 
   <!-- AVM Results -->
-  <div id="avm-results-host"></div>
+  <!-- v416-card-css: avm-results-host nach oben verschoben -->
 
   <!-- KI-Empfehlung -->
   <div class="ai-card" id="ai-card">
@@ -4224,24 +4251,28 @@ const QcApp = (function() {
     const mwRange = `${fmt0(r.low)} € – <strong>${fmt0(r.marktwert)} €</strong> – ${fmt0(r.high)} €`;
     const mmRange = `${fmt0(r.marktmieteLow)} € – <strong>${fmt0(r.marktmieteCold)} €</strong> – ${fmt0(r.marktmieteHigh)} €`;
 
-    const spanBlock = `
-    <div class="avm6-spanblock">
-      <div class="avm6-spanrow">
-        <div class="avm6-span-title"><span class="avm7-ic">${QcIcons.svg('bank',{size:14})}</span> Marktwert <span class="avm6-applied-tag">${lblSel} übernommen</span></div>
-        <div class="avm6-span-vals">
-          <span class="avm6-span-main">${fmt0(mwSel)} €</span>
-          <span class="avm6-span-range">Spanne ${mwRange}</span>
-        </div>
-        ${mwSqm ? `<div class="avm6-span-sqm">${mwSqm}${mwDiff != null ? ` · <span style="color:${mwDiffColor}">${mwDiff >= 0 ? '+' : ''}${mwDiff.toFixed(1)}% vs. Kaufpreis</span>` : ''}${fpInline}</div>` : ''}
+    /* v416-card-layout: zwei Spalten (Marktwert | Marktmiete) + Spanne-Segment + Uebernehmen-Button (wie Objekt-Tab). */
+    var _seg = function (val) { return '<button type="button" data-span="' + val + '"' + (_spanConfig === val ? ' class="sel"' : '') + ' onclick="QcApp.setSpanConfig(\'' + val + '\')">' + (val === 'low' ? 'Unten' : val === 'high' ? 'Oben' : 'Ø') + '</button>'; };
+    const spanCtl = '<div class="avm6-spancol"><span class="avm6-seg-lbl">Spanne</span><span class="avm6-seg">' + _seg('low') + _seg('mid') + _seg('high') + '</span></div>';
+    const mwSubHtml = mwSqm ? ('<div class="avm6-col-sub">' + mwSqm + (mwDiff != null ? ' · <span style="color:' + mwDiffColor + '">' + (mwDiff >= 0 ? '+' : '') + mwDiff.toFixed(1) + '% vs. Kaufpreis</span>' : '') + fpInline + '</div>') : '';
+    const mmSubHtml = '<div class="avm6-col-sub">' + mmSqm + '</div>';
+    const colsBlock = `
+    <div class="avm6-cols">
+      <div class="avm6-col">
+        <div class="avm6-col-l">${QcIcons.svg('bank',{size:13})} Marktwert</div>
+        <div class="avm6-col-big">${fmt0(mwSel)} <span class="avm6-cur">€</span></div>
+        <div class="avm6-col-range">${mwRange}</div>
+        ${mwSubHtml}
       </div>
-      <div class="avm6-spanrow">
-        <div class="avm6-span-title"><span class="avm7-ic">${QcIcons.svg('home',{size:14})}</span> Marktmiete (kalt) <span class="avm6-applied-tag">${lblSel} übernommen</span></div>
-        <div class="avm6-span-vals">
-          <span class="avm6-span-main">${fmt0(mmSel)} €</span>
-          <span class="avm6-span-range">Spanne ${mmRange}</span>
-        </div>
-        <div class="avm6-span-sqm">${mmSqm}</div>
+      <div class="avm6-coldiv"></div>
+      <div class="avm6-col">
+        <div class="avm6-col-l">${QcIcons.svg('home',{size:13})} Marktmiete (kalt)</div>
+        <div class="avm6-col-big">${fmt0(mmSel)} <span class="avm6-cur">€</span></div>
+        <div class="avm6-col-range">${mmRange}</div>
+        ${mmSubHtml}
       </div>
+      <div class="avm6-coldiv"></div>
+      <div class="avm6-col avm6-spancolwrap">${spanCtl}</div>
     </div>`;
 
     return `
@@ -4255,9 +4286,12 @@ const QcApp = (function() {
 
   ${lageInline}
 
-  ${spanBlock}
+  ${colsBlock}
 
-  <div class="avm5-foot">Marktpreisindikation — kein Gutachten n. § 194 BauGB${isMid ? '' : ' · Spanne „' + lblSel + '“ übernommen (Einstellung)'}</div>
+  <div class="avm6-actions">
+    <span class="avm6-disc">Marktpreisindikation — kein Gutachten n. § 194 BauGB</span>
+    <button type="button" class="avm6-apply" onclick="QcApp.applyAvmToQc()">${QcIcons.svg('save',{size:13})} In Felder übernehmen (${lblSel})</button>
+  </div>
 </div>`;
   }
 
