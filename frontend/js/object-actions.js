@@ -209,10 +209,15 @@
     var sel = selectedSources();
     var avm = sel.filter(function (s) { return s === 'pricehubble' || s === 'sprengnetter'; });
     if (!avm.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
-    var names = avm.map(function (s) { return s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter'; });
     var demo = !!(_avmHealth && _avmHealth.mode === 'stub');
-    var parts = names.map(function (n) { return '<b>1 ' + n + '-Credit</b>'; }).join(' + ');
-    var txt = 'Beim <b>Abrufen</b> ' + (avm.length > 1 ? 'werden ' : 'wird ') + parts + ' verbraucht' + (avm.length > 1 ? ' (' + avm.length + ' gesamt)' : '') + '.';
+    /* v414-credit-real: echte Kosten gemaess Backend-COST (PriceHubble 1, Sprengnetter 3 mit / 2 ohne Kaufpreis). */
+    var _hasKp = (numDe(val('kp')) || 0) > 0;
+    var _total = 0;
+    var parts = avm.map(function (s) {
+      if (s === 'pricehubble') { _total += 1; return '<b>1 PriceHubble-Credit</b>'; }
+      var c = _hasKp ? 3 : 2; _total += c; return '<b>' + c + ' Sprengnetter-Credit' + (c > 1 ? 's' : '') + '</b>';
+    }).join(' + ');
+    var txt = 'Beim <b>Abrufen</b> ' + (_total > 1 ? 'werden ' : 'wird ') + parts + ' verbraucht' + (avm.length > 1 ? ' (' + _total + ' gesamt)' : '') + '.';
     if (demo) txt += ' <span style="opacity:.75">Im Demo-Modus aktuell kostenlos.</span>';
     el.innerHTML = '<span class="oab-credit-dot"></span>' + txt;
     el.style.display = '';

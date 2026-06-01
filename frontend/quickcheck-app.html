@@ -353,6 +353,7 @@ body::before {
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(42,39,39,0.04);
 }
+.actions .qc6-run.oab-act { margin-left: auto; padding: 8px 16px; border-radius: 11px; }  /* v414-run-right + v415-card-collapse: Abrufen rechts + klare Pille */
 .actions-label {
   font-size: 10.5px;
   font-weight: 700;
@@ -1338,6 +1339,12 @@ body::before {
   position: relative;
 }
 .avm5-card.is-spr { background: linear-gradient(135deg, #FDFCF8 0%, #F7EFD8 100%); }
+/* v415-card-collapse: Einklapp-Mechanik fuer AVM-Ergebnis-Cards */
+.avm5-card.collapsed > *:not(.avm5-head){display:none !important;}
+.avm5-card.collapsed .avm5-head{border-bottom:0;}
+.avm5-min{flex-shrink:0;width:24px;height:24px;border:1px solid var(--border,#E7E2DC);border-radius:7px;background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--ch2,#6b6660);transition:transform .2s ease;padding:0;}
+.avm5-min svg{transition:transform .2s ease;transform:rotate(90deg);}
+.avm5-card.collapsed .avm5-min svg{transform:rotate(0deg);}
 .avm5-head {
   display: flex;
   align-items: center;
@@ -2425,7 +2432,18 @@ body::before {
 }
 .qc7-src.on .qc7-box { background: var(--gold, #C9A84C); border-color: var(--gold, #C9A84C); }
 .qc7-src.on .qc7-box svg { opacity: 1; }
-.qc7-src .qc7-ic { display: inline-flex; color: var(--gold-3, #9a7f33); }
+/* v413-credit-hint: dezente Credit-Hinweiszeile unter der Aktionsleiste */
+.qc-credit-hint{margin:8px 2px 0;padding:8px 12px;font:500 12.5px/1.5 'DM Sans',system-ui,sans-serif;color:#9C7223;background:rgba(229,168,71,0.10);border:1px solid rgba(229,168,71,0.42);border-radius:9px;display:flex;align-items:center;gap:8px}
+.qc-credit-hint b{color:#7a5a16;font-weight:700}
+.qc-credit-dot{width:7px;height:7px;border-radius:50%;background:var(--gold,#C9A84C);flex-shrink:0;display:inline-block}
+/* v412-optik-paritaet: Marken-Logos + heller Abrufen-Button (wie Objekt-Tab) */
+.qc7-logo{height:16px;width:auto;max-width:120px;object-fit:contain;display:inline-block;vertical-align:middle;mix-blend-mode:multiply}
+.oab-act{border:1px solid rgba(42,39,39,0.16) !important;background:#fff !important;color:var(--ch,#2A2727) !important;box-shadow:none !important}
+.oab-act:hover{border-color:rgba(201,168,76,0.6) !important;box-shadow:0 4px 12px -6px rgba(201,168,76,0.45) !important;transform:translateY(-1px)}
+.oab-act .qc7-ic{display:inline-flex}
+.oab-act .qc7-ic svg{width:15px;height:15px}
+.qc7-src .qc7-ic { display: inline-flex; align-items: center; color: var(--gold-3, #9a7f33); }
+.qc7-src .qc7-ic svg { width: 14px; height: 14px; display: block; stroke: currentColor; }  /* v411-icon-fix: SVG-Groesse erzwingen (war 0) */
 .qc7-src.disabled { opacity: .45; cursor: not-allowed; }
 
 /* ── Credit-Modal: getrennte Credit-Typen ── */
@@ -2820,7 +2838,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     </div>
   </div>
 
-  <!-- ═════ ACTION BAR (qc6-actionbar / qc7-sources) ═════ -->
+  <!-- ═════ ACTION BAR (qc6-actionbar / qc7-sources) ═════ v409-actionbar-trim -->
   <div class="actions">
     <span class="actions-label">Aktionen</span>
     <input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="QcApp.handlePdfFile(event)">
@@ -2830,45 +2848,31 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       <label class="qc7-src" data-src="expose">
         <input type="checkbox" value="expose" onchange="QcApp.toggleSource(this)">
         <span class="qc7-box"><span class="qc7-check"></span></span>
-        <span class="qc7-ic" id="ico-src-expose"></span> Exposé-Import
+        <span class="qc7-ic" id="ico-src-expose"></span> Exposé/Marktbericht <!-- v410-rename-expose -->
       </label>
       <label class="qc7-src" data-src="ph">
         <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)">
         <span class="qc7-box"><span class="qc7-check"></span></span>
-        <span class="qc7-ic" id="ico-src-ph"></span> PriceHubble
+        <img class="qc7-logo" src="img/pricehubble.jpg" alt="PriceHubble" title="PriceHubble"> <!-- v412-optik-paritaet -->
       </label>
       <label class="qc7-src" data-src="spr">
         <input type="checkbox" value="spr" onchange="QcApp.toggleSource(this)">
         <span class="qc7-box"><span class="qc7-check"></span></span>
-        <span class="qc7-ic" id="ico-src-spr"></span> Sprengnetter
-      </label>
-      <label class="qc7-src" data-src="ki">
-        <input type="checkbox" value="ki" onchange="QcApp.toggleSource(this)">
-        <span class="qc7-box"><span class="qc7-check"></span></span>
-        <span class="qc7-ic" id="ico-src-ki"></span> KI-Recherche
+        <img class="qc7-logo" src="img/sprengnetter.jpg" alt="Sprengnetter" title="Sprengnetter">
       </label>
     </span>
 
-    <!-- Spannen-Schnellauswahl (gilt für Marktwert + Marktmiete) -->
-    <span class="qc6-seg-wrap" title="Welche Spanne wird übernommen? Standard: Durchschnitt">
-      <span class="qc6-seg-lbl">Spanne</span>
-      <span class="qc6-seg" id="qc6-seg">
-        <button type="button" data-span="low"  onclick="QcApp.setSpanConfig('low', this)">Unten</button>
-        <button type="button" data-span="mid"  class="sel" onclick="QcApp.setSpanConfig('mid', this)">Ø</button>
-        <button type="button" data-span="high" onclick="QcApp.setSpanConfig('high', this)">Oben</button>
-      </span>
-    </span>
+    <!-- v409-actionbar-trim: Spannen-Schnellauswahl entfernt (Spanne bleibt an der Ergebnis-Card) -->
 
     <!-- Abrufen → prüft Pflichtfelder + öffnet Credit-Modal -->
-    <button class="btn primary qc6-run" data-provider="combo" onclick="QcApp.openCreditModal()">
-      <span class="ico" id="ico-run"></span> Abrufen
+    <button class="qc6-run oab-act" data-provider="combo" onclick="QcApp.openCreditModal()">
+      <span class="qc7-ic" id="ico-run"></span> Abrufen
     </button>
 
-    <!-- Detail-Einstellungen -->
-    <button class="btn" onclick="QcApp.openQc6Settings()" title="Spannen-Einstellungen">
-      <span class="ico" id="ico-gear"></span> Einstellungen
-    </button>
   </div>
+
+  <!-- v413-credit-hint: Live-Credit-Hinweis (nur bei AVM-Quellen) -->
+  <div class="qc-credit-hint" id="qc-credit-hint" style="display:none"></div>
 
   <!-- Sequenzieller Progress-Indikator -->
   <div class="qc6-progress" id="qc6-progress"></div>
@@ -3190,7 +3194,9 @@ const QcIcons = (function() {
     save:       '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
     qc:         '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><polyline points="11 7 11 11 14 13"/>',
     key:        '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/>',
-    arrow:      '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>'
+    arrow:      '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+    check:      '<polyline points="20 6 9 17 4 12"/>',  /* v411-icon-fix */
+    analyze:    '<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M8 11h6M11 8v6"/>'  /* v412-optik-paritaet */
   };
   function svg(name, opts) {
     opts = opts || {};
@@ -3450,15 +3456,15 @@ const QcApp = (function() {
     }
     _setIcon('page-head-ic', 'qc', { size: 22 });
     _setIcon('ico-upload', 'upload', { size: 14 });
-    _setIcon('ico-run', 'zap', { size: 14, stroke:'#fff' });
+    _setIcon('ico-run', 'analyze', { size: 15, stroke:'#9a7f33' });  /* v412-optik-paritaet */
     _setIcon('ico-gear', 'file', { size: 14 });
 
     if (typeof QcApp_v6_syncSegments === 'function') QcApp_v6_syncSegments();
 
     /* Multi-Select Quellen-Icons */
-    var _qm = { 'ico-src-expose':'upload', 'ico-src-ph':'building', 'ico-src-spr':'chart', 'ico-src-ki':'sparkles' };
+    var _qm = { 'ico-src-expose':'file' };  /* v412-optik-paritaet: ph/spr nutzen img-Logos, ki entfernt */
     Object.keys(_qm).forEach(function(id){ _setIcon(id, _qm[id], { size: 14 }); });
-    document.querySelectorAll('.qc7-box .qc7-check').forEach(function(c){ c.innerHTML = QcIcons.svg('arrow',{size:12,stroke:'#fff'}); });
+    document.querySelectorAll('.qc7-box .qc7-check').forEach(function(c){ c.innerHTML = QcIcons.svg('check',{size:12,stroke:'#fff'}); });  /* v411-icon-fix: Haekchen statt Pfeil */
 
     _setIcon('ico-grp-adr', 'home', { size: 14 });
     _setIcon('ico-grp-obj', 'file', { size: 14 });
@@ -4240,7 +4246,8 @@ const QcApp = (function() {
 
     return `
 <div class="avm5-card ${isSpr ? 'is-spr' : 'is-ph'}">
-  <div class="avm5-head">
+  <div class="avm5-head" onclick="QcApp.toggleAvmCard(event, this)" style="cursor:pointer">
+    <button class="avm5-min" type="button" title="Ein-/Ausklappen" onclick="QcApp.toggleAvmCard(event, this)">${QcIcons.svg('arrow',{size:13})}</button>
     <span class="avm5-provider">${r.provider}</span>
     <span class="avm5-conf ${r.confClass}">${r.conf}</span>
     <button class="avm5-x" onclick="QcApp.dismissAvm('${isSpr ? 'spr' : 'ph'}')" title="Verwerfen">✕</button>
@@ -4259,6 +4266,14 @@ const QcApp = (function() {
     mieteAddUp();
     document.getElementById('qc_nkm_grund').closest('.field').classList.add('has-source');
     showToast('✓ Marktmiete als Grundmiete übernommen');
+  }
+  /* v415-card-collapse: AVM-Ergebnis-Card ein-/ausklappen (Head-Klick oder Chevron). */
+  function toggleAvmCard(ev, node) {
+    try {
+      if (ev) { ev.stopPropagation(); }
+      var card = node && node.closest ? node.closest('.avm5-card') : null;
+      if (card) card.classList.toggle('collapsed');
+    } catch (e) {}
   }
   function dismissAvm(which) {
     if (which === 'spr') _avmResults = _avmResults.filter(r => r.provider !== 'Sprengnetter');
@@ -4800,6 +4815,7 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
   function toggleSource(cb) {
     var label = cb.closest('.qc7-src');
     if (label) label.classList.toggle('on', cb.checked);
+    _updateCreditHint();  /* v413-credit-hint */
     // V8: Exposé öffnet den Datei-Dialog NICHT mehr beim Anhaken,
     // sondern erst beim Klick auf "Abrufen" (siehe _runSelected).
   }
@@ -4834,14 +4850,32 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
   }
 
   // Credit-Aufschlüsselung (getrennte Töpfe je Typ — NICHT verrechnet)
+  /* v413-credit-hint: Live-Hinweis unter der Aktionsleiste — nur bei AVM-Quellen (ph/spr). */
+  function _updateCreditHint() {
+    var el = document.getElementById('qc-credit-hint'); if (!el) return;
+    var sel = _selectedSources();
+    var inputs = QcEngine.getInputs();
+    var hasKp = !!QcEngine.num(inputs.kp);
+    var parts = [];
+    if (sel.indexOf('ph')  !== -1) parts.push('<b>1 PriceHubble-Credit</b>');
+    if (sel.indexOf('spr') !== -1) parts.push('<b>' + (hasKp ? 3 : 2) + ' Sprengnetter-Credits</b>');
+    if (!parts.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    var n = parts.length;
+    var txt = 'Beim <b>Abrufen</b> ' + (n > 1 ? 'werden ' : 'wird ') + parts.join(' + ') + ' verbraucht.';
+    var demo = false;
+    try { demo = !!(window._qcAvmHealth && window._qcAvmHealth.mode === 'stub'); } catch (e) {}
+    if (demo) txt += ' <span style="opacity:.75">Im Demo-Modus aktuell kostenlos.</span>';
+    el.innerHTML = '<span class="qc-credit-dot"></span>' + txt;
+    el.style.display = '';
+  }
   function _creditParts(sources) {
     var inputs = QcEngine.getInputs();
     var hasKp = !!QcEngine.num(inputs.kp);
     var parts = [];
-    if (sources.indexOf('expose') !== -1) parts.push({ key:'expose', name:'Exposé-Import', sub:'PDF auslesen', type:'free', calls:0 });
+    if (sources.indexOf('expose') !== -1) parts.push({ key:'expose', name:'Exposé/Marktbericht', sub:'PDF auslesen', type:'free', calls:0 });
     if (sources.indexOf('ph')  !== -1)    parts.push({ key:'ph',  name:'PriceHubble', sub:'Marktwert, Mikro-/Makrolage', type:'ph',  calls:1 });
     if (sources.indexOf('spr') !== -1)    parts.push({ key:'spr', name:'Sprengnetter', sub: hasKp ? 'Wert, Miete, Fair-Price' : 'Wert, Miete (kein Kaufpreis)', type:'spr', calls: hasKp ? 3 : 2 });
-    if (sources.indexOf('ki')  !== -1)    parts.push({ key:'ki',  name:'KI-Recherche', sub:'ergänzt Annahmen (1 OpenAI-Call)', type:'ki', calls:1 });
+    /* v409-actionbar-trim: KI-Recherche als Abruf-Quelle entfernt */
     return parts;
   }
 
@@ -4968,7 +5002,7 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
     // Reihenfolge erzwingen: expose, ph, spr, ki
     var order = ['expose','ph','spr','ki'];
     var ordered = order.filter(function(s){ return sources.indexOf(s) !== -1; });
-    var labels = { expose:'Exposé-Import', ph:'PriceHubble', spr:'Sprengnetter', ki:'KI-Recherche' };
+    var labels = { expose:'Exposé/Marktbericht', ph:'PriceHubble', spr:'Sprengnetter', ki:'KI-Recherche' };
     var steps = ordered.map(function(s){ return { key:s, label:labels[s], state:'pending' }; });
     _progressRender(steps);
 
@@ -5049,7 +5083,7 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
   return {
     init, scheduleUpdate, setLtv, mieteAddUp,
     handlePdfFile, kiResearch, priceHubble, sprengnetter, selectAvmRange, applyAvmToQc,
-    applyAvmNkm, dismissAvm,
+    applyAvmNkm, dismissAvm, toggleAvmCard,
     handlePhotos, removePhoto, addExposePhotos,
     showApiKeyModal, closeApiModal, runRealAi,
     openSaveModal, closeSaveModal, confirmSave, toggleAllTransfer,
