@@ -2018,6 +2018,7 @@
         function set(id, val) { var e = document.getElementById(id); if (e && val) e.value = val; }
         function setSel(id, val) {
           var e = document.getElementById(id); if (!e || !val) return;
+          if (!e.options || typeof e.options.length !== 'number') return;  /* v407-setsel-guard: kein <select> -> ueberspringen statt crashen */
           var raw = String(val).trim().toLowerCase();
           for (var i = 0; i < e.options.length; i++) {
             var t = (e.options[i].text || '').toLowerCase();
