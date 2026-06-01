@@ -1321,6 +1321,7 @@
   }
   window._v361Enrich = _v361Enrich;
 
+  window.PdfImport = window.PdfImport || {}; window.PdfImport.extractImages = _extractPdfImages; /* v402-expose: Bild-Extraktion fuer Objekt-Tab-Import wiederverwenden */
   window.showPdfImport         = showPdfImport;
   window.closePdfImport        = closePdfImport;
   window.pdfImportApply        = pdfImportApply;

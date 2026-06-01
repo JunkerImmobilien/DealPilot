@@ -24,6 +24,7 @@
 const express = require('express');
 const { authenticate } = require('../middleware/auth');
 const aiCreditsService = require('../services/aiCreditsService');
+const { query } = require('../db/pool');  // v387 Per-Plan-Modus
 const stub = require('../services/avm-stub');
 const sprengnetter = require('../services/sprengnetter-client');
 const pricehubble = require('../services/pricehubble-client');
@@ -33,6 +34,19 @@ const router = express.Router();
 // ── Konfiguration ─────────────────────────────────────────────────────────
 function avmEnabled() { return String(process.env.AVM_ENABLED || '').toLowerCase() === 'true'; }
 function avmMode() { return String(process.env.AVM_MODE || 'stub').toLowerCase() === 'live' ? 'live' : 'stub'; }
+// v387: Plan des Users (Spiegel aiCreditsService).
+async function getPlanId(userId) {
+  try {
+    const r = await query("SELECT plan_id FROM subscriptions WHERE user_id = $1 AND status = 'active' LIMIT 1", [userId]);
+    return r.rowCount ? r.rows[0].plan_id : 'free';
+  } catch (e) { return 'free'; }
+}
+// Free -> immer Demo (stub). Bezahlt -> live nur wenn global AVM_MODE=live, sonst stub.
+async function modeForUser(userId) {
+  if (avmMode() !== 'live') return 'stub';
+  const plan = await getPlanId(userId);
+  return (plan && plan !== 'free') ? 'live' : 'stub';
+}
 
 // Credit-Kosten je Provider. Sprengnetter: 3 mit Kaufpreis (inkl. Fair-Price-Label),
 // 2 ohne. PriceHubble: 1 (bündelt alles in einem Call).
@@ -88,15 +102,16 @@ router.post('/quote', authenticate, async function (req, res, next) {
     const miss = missingFields(provider, inputs);
     const cost = costFor(provider, inputs);
     const status = await aiCreditsService.getStatus(req.user.id);
+    const mode = await modeForUser(req.user.id);
     res.json({
       provider: provider,
-      mode: avmMode(),
+      mode: mode,
       cost: cost,
-      free_in_stub: avmMode() === 'stub',
+      free_in_stub: mode === 'stub',
       missing_fields: miss,
       ready: miss.length === 0,
       credits: status,
-      enough_credits: avmMode() === 'stub' ? true : (status.total_remaining >= cost)
+      enough_credits: mode === 'stub' ? true : (status.total_remaining >= cost)
     });
   } catch (e) { next(e); }
 });
@@ -113,7 +128,7 @@ async function runProvider(provider, req, res, next) {
       return res.status(400).json({ error: 'missing_fields', missing_fields: miss, message: 'Es fehlen Pflichtfelder: ' + miss.join(', ') });
     }
 
-    const mode = avmMode();
+    const mode = await modeForUser(req.user.id);
     const cost = costFor(provider, inputs);
 
     // Credit-Pre-Check NUR im Live-Modus (Stub ist kostenlos).

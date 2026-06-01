@@ -1110,7 +1110,8 @@ async function extractMarketData(text, opts) {
     '  - bevoelkerung_entwicklung: Bevoelkerungs-ENTWICKLUNG (kein Einwohner-Wert), genau einer von [stark_wachsend, wachsend, stabil, leicht_fallend, stark_fallend]',
     '  - nachfrage: genau einer von [sehr_stark, stark, mittel, schwach, sehr_schwach]',
     '  - wertsteigerung: genau einer von [sehr_hoch, hoch, mittel, niedrig, keines]',
-    '  - entwicklung: Entwicklungs-/Stadtentwicklungs-Moeglichkeiten, genau einer von [mehrere, eine_starke, begrenzt, kaum, keine]',  // v374-ds2-extract
+    '  - entwicklung: Entwicklungs-/Stadtentwicklungs-Moeglichkeiten, genau einer von [mehrere, eine_starke, begrenzt, kaum, keine]',
+    '  WICHTIG: Lass makrolage, mikrolage, bevoelkerung_entwicklung, nachfrage, wertsteigerung und entwicklung NIE leer. Stehen sie nicht ausdruecklich im Bericht, schaetze den plausibelsten Wert aus Ort/Region, Lage-Scores und Gesamtkontext des Berichts ab (es sind ueberschreibbare Vorschlaege fuer den Nutzer). Nur wenn gar kein Ortsbezug erkennbar ist, gib null zurueck.',  // v381-ds2-estimate  // v374-ds2-extract
     '',
     'WERTENTWICKLUNG (Markttrends):',
     '  - wertentwicklung_3jahre_pct: Veränderung der letzten 3 Jahre in % (Zahl, kann negativ sein)',

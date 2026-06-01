@@ -32,7 +32,7 @@ var FIELDS = [
   'ds2_wertsteigerung','ds2_entwicklung',
   // V37: Qualität & Zustand Sterne-Bewertung
   'rate_kueche','rate_bad','rate_boden','rate_fenster',
-  'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis','garagen','stellpl_aussen','balkon_flae',
+  'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis','garagen','stellpl_aussen','balkon_flae','_avm_state','einheiten',
   /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
   'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years'
 ];
@@ -79,13 +79,10 @@ function collectData() {
   // V63.25: Marker setzen ob ein echter Investor Deal Score 2.0 berechnet wurde.
   // Das brauchen wir damit die Sidebar-Karte das Investor-Sternchen NUR zeigt
   // wenn (a) Plan investor/pro ist UND (b) der User die DS2-Pflichtfelder ausgefüllt hat.
-  var ds2Fields = ['ds2_zustand','ds2_energie','ds2_marktmiete','ds2_bevoelkerung','ds2_nachfrage'];
-  var ds2Filled = ds2Fields.filter(function(id) {
-    var v = (document.getElementById(id) || {}).value;
-    return v && String(v).trim() !== '' && String(v).trim() !== '0';
-  }).length;
-  // Mindestens 3 von 5 DS2-Pflichtfeldern müssen ausgefüllt sein, sonst gilt DS2 als NICHT berechnet
-  d._ds2_computed = (ds2Filled >= 3);
+  // v403-ds2-gate: DS2 gilt als "berechnet", wenn die KPI-Vollständigkeit dieselbe
+  // Schwelle erreicht wie der Header (renderDealScore2): getKpiCompleteness >= MIN (Default 70%).
+  // Vorher: starre "3 von 5 ds2_-Felder" -> wich vom Header ab (Header 76 / Kachel 52).
+  d._ds2_computed = _dpDs2Available();
   // Plan-Feature-Check: hat der User überhaupt Zugriff auf DS2?
   if (window.DealPilotConfig && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.hasFeature === 'function') {
     d._has_ds2_feature = DealPilotConfig.pricing.hasFeature('deal_score_v2');
@@ -283,6 +280,7 @@ function loadData(d) {
         var _dp351 = DealScore.compute();
         if (_dp351 && _dp351.score) _o351._dealpilot_score = Math.round(_dp351.score);
       }
+      _o351._ds2_computed = (typeof window._dpDs2Available === 'function') ? window._dpDs2Available() : _o351._ds2_computed;  /* v403-ds2-gate */
       if (window.DealScore2 && typeof window._buildDeal2FromState === 'function' && _o351._ds2_computed) {
         var _ds351 = window.DealScore2.compute(window._buildDeal2FromState());
         if (_ds351 && _ds351.score) _o351._ds2_score = Math.round(_ds351.score);
@@ -346,12 +344,12 @@ async function saveObj(opts) {
   opts = opts || {};
   var silent = !!opts.silent || !!window._autoSaveActive;
   // Paywall: Track calculation usage
-  if (typeof Paywall !== 'undefined' && Paywall.gate) {
+  if (!silent && typeof Paywall !== 'undefined' && Paywall.gate) {  /* v379-autosave */
     if (!Paywall.gate('calculations')) return;  // Limit reached → modal opens
   }
   // V63.82: Objekt-Limit-Check (Plan.atLimit) — vor dem Save
   // Wir zählen die existierenden Objekte; wenn Plan-Limit erreicht UND es ist ein NEUES Objekt → Paywall
-  if (typeof Plan !== 'undefined' && !window._currentObjId) {
+  if (!silent && typeof Plan !== 'undefined' && !_currentObjKey) {  /* v379-autosave */
     try {
       var existingCount = 0;
       if (Auth.isApiMode() && typeof window._serverObjList !== 'undefined') {
@@ -547,7 +545,7 @@ function _clearFormForNewObject() {
 window._clearFormForNewObject = _clearFormForNewObject;
 
 function newObj() {
-  if (!confirm('Neues Objekt anlegen?\nAktuelle Eingaben gehen verloren, falls nicht gespeichert.')) return;
+  /* v379-autosave: confirm entfernt (Auto-Save aktiv) */
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
     if (e) e.value = '';
@@ -1042,7 +1040,7 @@ async function renderSaved(opts) {
         if (window.DealPilotConfig && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.hasFeature === 'function') {
           hasDs2Feature = DealPilotConfig.pricing.hasFeature('deal_score_v2');
         }
-        var showInvestor = !!(hasDs2Feature && o.ds2_computed);
+        var showInvestor = !!(hasDs2Feature && (o.ds2_computed || o.ds2_score_persist != null));  /* v403-ds2-gate */
 
         // Score-Auswahl:
         //   - Plan kann DS2 + DS2 wirklich berechnet → DS2-Score (aus DB)
@@ -1352,6 +1350,7 @@ async function delSaved(k) {
 
 // V63.27: UI-Reset nach Löschen des aktiven Objekts
 function _resetUiAfterDelete() {
+  try { if (window.ObjectActions && typeof window.ObjectActions.clearAvm === "function") window.ObjectActions.clearAvm(); } catch (e) {}
   // Alle Hauptfelder leeren
   if (typeof FIELDS !== 'undefined' && Array.isArray(FIELDS)) {
     FIELDS.forEach(function(id) {
@@ -1651,7 +1650,10 @@ async function importJSON(inp) {
           localStorage.setItem('ji_' + Date.now() + '_' + Math.random().toString(36).slice(2), JSON.stringify(d));
         });
       }
-      renderSaved();
+      /* v382-import-refresh */
+      if (typeof invalidateRenderCache === 'function') invalidateRenderCache();
+      await renderSaved({forceFresh: true, _immediate: true});
+      if (typeof updateSidebarPortfolio === 'function') updateSidebarPortfolio();
       toast('✓ ' + arr.length + ' Objekte importiert');
     } catch(err) {
       toast('⚠ Importfehler: ' + err.message);
@@ -3205,3 +3207,31 @@ async function exportWithEncryption(payload, baseFilename) {
   }
 }
 window.exportWithEncryption = exportWithEncryption;
+
+/* v403-ds2-gate: einheitliches "DS2 verfuegbar?"-Kriterium (identisch zum Header renderDealScore2). */
+function _dpDs2Available() {
+  try {
+    if (!window.DealScore2 || typeof window._buildDeal2FromState !== 'function') return false;
+    var _kpEl = document.getElementById('kp'), _nkmEl = document.getElementById('nkm');
+    var _kp = _kpEl ? ((typeof parseDe === 'function') ? parseDe(_kpEl.value) : parseFloat(_kpEl.value)) : 0;
+    var _nkm = _nkmEl ? ((typeof parseDe === 'function') ? parseDe(_nkmEl.value) : parseFloat(_nkmEl.value)) : 0;
+    if (!_kp || !_nkm) return false;
+    var MIN = 0.70;
+    try {
+      var us = JSON.parse(localStorage.getItem('dp_user_settings') || '{}');
+      if (typeof us.completeness_threshold === 'number' && us.completeness_threshold >= 0.5 && us.completeness_threshold <= 1) MIN = us.completeness_threshold;
+    } catch (e) {}
+    var deal = window._buildDeal2FromState();
+    var pct = 0;
+    if (typeof window.DealScore2.getKpiCompleteness === 'function') {
+      var r = window.DealScore2.getKpiCompleteness(deal);
+      pct = (r && r.percent != null) ? r.percent / 100 : 0;
+    } else {
+      var res = window.DealScore2.compute(deal);
+      pct = (res && res.dataCompleteness != null) ? res.dataCompleteness : 0;
+    }
+    return pct >= MIN;
+  } catch (e) { return false; }
+}
+window._dpDs2Available = _dpDs2Available;
+

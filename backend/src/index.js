@@ -65,6 +65,7 @@ app.use(express.json({ limit: '50mb' }));
 const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
   max: config.rateLimit.max,
+  skip: function (req) { /* v395-ratelimit-skip: eingeloggte App-Requests nicht limitieren */ return !!(req.headers && req.headers.authorization && /^Bearer /i.test(req.headers.authorization)); },
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.path.startsWith('/health')

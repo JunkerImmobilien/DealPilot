@@ -1,4 +1,21 @@
 'use strict';
+/* v406-bridge-contract ===========================================================
+   ROLLE (QC-Integration Etappe C): qc-bridge.js ist die EINZIGE Integrationsschicht
+   zwischen dem iframe-QuickCheck (frontend/quickcheck-app.html / QcApp) und der
+   Haupt-App. Sonst spricht NICHTS direkt mit dem iframe.
+
+   NACHRICHTEN VOM IFRAME (nur diese 2 werden verarbeitet, siehe message-Listener):
+     'qc-save'        -> _handleSave(inputs, avm, photos) -> window.qcSaveAsObject()
+     'qc-import-pdf'  -> _handleImportPdf()                -> window.qcImportPdfTrigger()
+
+   RUECKKANAL AN DEN IFRAME (_postToFrame):
+     'qc-import-result'  Werte (Verkehrswert/Lage/etc.) zurueck in die iframe-Felder
+     'qc-import-photos'  aus dem Exposé extrahierte Fotos zurueck in den iframe
+
+   ABHAENGIGKEITEN (aus quick-check.js = Bridge-Backing, siehe dortigen v405-Block):
+     window.qcSaveAsObject, window.qcImportPdfTrigger.
+     Aendert sich dort etwas an diesen beiden Funktionen, hier mitdenken.
+   ============================================================================== */
 /**
  * V333: Brücke iframe ⇄ DealPilot-App.
  *  - iframe = Viewport-Höhe, intern scrollend (Modale/Karte korrekt).
