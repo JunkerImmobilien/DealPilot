@@ -347,9 +347,7 @@ function enterQuickCheckMode() {
         if (typeof window.qcCalc === 'function') {
           try { window.qcCalc(); } catch(e) {}
         }
-        if (typeof window.qcUpdate === 'function') {
-          try { window.qcUpdate(); } catch(e) {}
-        }
+        /* v404-qcupdate-removed: qcUpdate() lebte nur in quick-check-tab.js (entfernt). QC rechnet im iframe (QcApp). */
       }
     } catch(e) { console.warn('[V199 qc-reset]', e); }
     // Harter Scroll nach oben

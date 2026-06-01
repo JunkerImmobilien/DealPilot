@@ -18,6 +18,7 @@
   var _avm = {};
   var _avmHealth = null;
   var _collapsed = {};
+  var _oabiDone = null;  /* v393: Kombi-Flow Completion */
 
   function $(id) { return document.getElementById(id); }
   function val(id) { var e = $(id); return e ? (e.value || '').trim() : ''; }
@@ -35,7 +36,9 @@
     check: '<polyline points="20 6 9 17 4 12"/>',
     home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
     chevron: '<polyline points="6 9 12 15 18 9"/>',
-    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>'
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    doc: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
+    analyze: '<circle cx="10.5" cy="10.5" r="6.5"/><line x1="21" y1="21" x2="15.2" y2="15.2"/><line x1="8" y1="11.5" x2="8" y2="9.5"/><line x1="10.5" y1="11.5" x2="10.5" y2="7.5"/><line x1="13" y1="11.5" x2="13" y2="10"/>'
   };
   function svg(name, size, stroke) { var p = ICO[name] || ''; var s = size || 14; return '<svg xmlns="http://www.w3.org/2000/svg" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="' + (stroke || 'currentColor') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; }
 
@@ -52,26 +55,41 @@
     var P = '#' + MOUNT_ID + ' ';
     var css = [
       '[data-v365-top]{display:none!important}',
-      P + '.actions{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap;align-items:center;padding:14px 18px;background:var(--white,#fff);border:1px solid rgba(201,168,76,0.18);border-radius:10px;box-shadow:0 1px 3px rgba(42,39,39,0.04)}',
+      P + '.actions{display:flex;gap:10px;margin:0 0 14px;flex-wrap:wrap;align-items:center;padding:13px 16px;background:linear-gradient(180deg,#ffffff,#fdfbf6);border:1px solid rgba(201,168,76,0.30);border-radius:14px;box-shadow:0 1px 2px rgba(42,39,39,0.04),0 10px 24px -16px rgba(201,168,76,0.55)}',
       P + '.actions-label{font-size:10.5px;font-weight:700;color:var(--gold-3,#9a7f33);letter-spacing:.14em;text-transform:uppercase;margin-right:6px}',
       P + '.qc7-sources{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}',
-      P + ".qc7-src{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid rgba(42,39,39,0.18);border-radius:10px;background:#fff;cursor:pointer;font:500 13px/1 'DM Sans',system-ui,sans-serif;color:var(--ch,#2A2727);transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;user-select:none}",
-      P + '.qc7-src:hover{border-color:rgba(201,168,76,0.55)}',
+      P + ".qc7-src{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid rgba(42,39,39,0.16);border-radius:11px;background:#fff;cursor:pointer;font:600 13px/1 'DM Sans',system-ui,sans-serif;color:var(--ch,#2A2727);transition:border-color .15s ease,background .15s ease,box-shadow .15s ease,transform .12s ease;user-select:none}",
+      P + '.qc7-src:hover{border-color:rgba(201,168,76,0.6);box-shadow:0 4px 12px -6px rgba(201,168,76,0.45);transform:translateY(-1px)}',
+      P + '.qc7-src[data-src="import"]{border-color:rgba(201,168,76,0.5);box-shadow:0 2px 10px -5px rgba(201,168,76,0.45)}',
       P + '.qc7-src input{display:none}',
-      P + '.qc7-src .qc7-box{width:18px;height:18px;flex-shrink:0;border:2px solid rgba(42,39,39,0.28);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;transition:background .15s ease,border-color .15s ease}',
+      P + '.qc7-src .qc7-box{width:18px;height:18px;flex-shrink:0;border:2px solid rgba(42,39,39,0.26);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;transition:background .15s ease,border-color .15s ease}',
       P + '.qc7-src .qc7-box svg{width:12px;height:12px;opacity:0;transition:opacity .12s ease}',
-      P + '.qc7-src.on{border-color:var(--gold,#C9A84C);background:rgba(201,168,76,0.10);box-shadow:0 1px 0 rgba(201,168,76,0.25)}',
+      P + '.qc7-src.on{border-color:var(--gold,#C9A84C);background:linear-gradient(180deg,rgba(201,168,76,0.16),rgba(201,168,76,0.06));box-shadow:0 2px 8px -3px rgba(201,168,76,0.45)}',
       P + '.qc7-src.on .qc7-box{background:var(--gold,#C9A84C);border-color:var(--gold,#C9A84C)}',
       P + '.qc7-src.on .qc7-box svg{opacity:1}',
       P + '.qc7-src .qc7-ic{display:inline-flex;color:var(--gold-3,#9a7f33)}',
-      P + '.qc6-seg{display:inline-flex;border:1px solid rgba(201,168,76,0.45);border-radius:10px;overflow:hidden;background:rgba(248,246,241,0.6)}',
+      P + ".oab-act{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid rgba(42,39,39,0.16);border-radius:11px;background:#fff;cursor:pointer;font:600 13px/1 'DM Sans',system-ui,sans-serif;color:var(--ch,#2A2727);transition:border-color .15s ease,background .15s ease,box-shadow .15s ease,transform .12s ease}",
+      P + '.oab-act:hover{border-color:rgba(201,168,76,0.6);box-shadow:0 4px 12px -6px rgba(201,168,76,0.45);transform:translateY(-1px)}',
+      P + '.oab-act .qc7-ic{display:inline-flex}',
+      P + '#oab-run{margin-left:auto}',  /* v394: Abrufen rechts */
+      '#brw-ai-btn{display:none!important}',  /* v389: BRW-Schaetzen dauerhaft aus (ueberlebt Re-Render) */
+      P + '.qc6-seg{display:inline-flex;border:1px solid rgba(201,168,76,0.4);border-radius:11px;overflow:hidden;background:rgba(248,246,241,0.7)}',
       P + ".qc6-seg button{appearance:none;border:0;background:transparent;padding:7px 14px;font:600 13px/1 'DM Sans',system-ui,sans-serif;color:var(--ch2,#6b6660);cursor:pointer;transition:background .18s ease,color .18s ease;white-space:nowrap}",
       P + '.qc6-seg button + button{border-left:1px solid rgba(201,168,76,0.25)}',
       P + '.qc6-seg button:hover{color:var(--ch,#2A2727)}',
-      P + '.qc6-seg button.sel{background:var(--gold,#C9A84C)!important;color:#fff!important}',  /* sichtbar */
+      P + '.qc6-seg button.sel{background:linear-gradient(180deg,#d4b65a,#bd9c3f)!important;color:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,0.25)}',  /* sichtbar */
+      P + '.avmx-spancol{display:flex;align-items:center}',
+      P + '.avmx-spanbox{display:flex;flex-direction:column;gap:6px;align-items:flex-start;justify-content:center}',  /* v393: Spanne rechts neben Marktmiete */
       P + '.qc6-seg-wrap{display:inline-flex;align-items:center;gap:8px}',
       P + ".qc6-seg-lbl{font:600 12px/1 'DM Sans',system-ui,sans-serif;color:var(--ch2,#6b6660);letter-spacing:.02em}",
-      P + '.qc6-run{display:inline-flex;align-items:center;gap:6px}',
+      P + ".qc6-run{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:0;border-radius:11px;background:linear-gradient(180deg,#d4b65a,#bd9c3f);color:#fff;font:700 13px/1 'DM Sans',system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px -5px rgba(189,156,63,0.7);transition:transform .12s ease,box-shadow .15s ease,filter .15s ease}",
+      P + '.qc6-run:hover{transform:translateY(-1px);box-shadow:0 8px 22px -6px rgba(189,156,63,0.85);filter:brightness(1.05)}',
+      P + '.qc6-run .ico{display:inline-flex;align-items:center}',
+      P + '.qc6-run .ico svg{width:16px;height:16px}',
+      P + '.avmx-logo{height:24px;width:auto;max-width:175px;object-fit:contain;vertical-align:middle;margin-left:5px;background:#fff;border:1px solid rgba(42,39,39,0.10);border-radius:7px;padding:4px 11px;box-shadow:0 1px 2px rgba(42,39,39,0.06)}',
+      P + ".oab-credit-hint{display:inline-flex;align-items:center;gap:8px;margin:-4px 2px 12px;padding:8px 12px;font:500 12px/1.3 'DM Sans',system-ui,sans-serif;color:var(--ch2,#6b6660);background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.22);border-radius:9px}",
+      P + '.oab-credit-hint b{color:var(--ch,#2A2727);font-weight:700}',
+      P + '.oab-credit-dot{width:7px;height:7px;border-radius:50%;background:var(--gold,#C9A84C);flex-shrink:0;box-shadow:0 0 0 3px rgba(201,168,76,0.18)}',
       P + '.qc6-seg-wrap{display:inline-flex;align-items:center;gap:8px;margin-left:auto}',
       P + ".btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--white,#fff);border:1px solid var(--border,#E7E2DC);border-radius:6px;font:inherit;font-size:12.5px;font-weight:500;color:var(--ch,#2A2727);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;position:relative}",
       P + '.btn.primary{background:linear-gradient(135deg,var(--gold,#C9A84C),var(--gold-d,#9a7f33));color:#fff;border-color:transparent}',
@@ -101,12 +119,13 @@
       P + '.avmx-span b{color:var(--gold-3,#9a7f33)}',
       P + '.avmx-sub{font-size:11.5px;color:var(--ch2,#6b6660);margin-top:3px}',
       P + '.avmx-foot{padding:10px 18px;border-top:1px solid rgba(201,168,76,0.18);font-size:11px;color:var(--muted,#7A7370);text-align:center}',
-      P + '.avmx-cols{display:grid;grid-template-columns:1fr 1px 1fr;gap:16px;align-items:start;padding:2px 0 2px}',
+      P + '.avmx-cols{display:grid;grid-template-columns:1fr 1px 1fr 1px auto;gap:16px;align-items:start;padding:2px 0 2px}',
       P + '.avmx-col{min-width:0}',
       P + '.avmx-div{background:rgba(201,168,76,0.30);width:1px;align-self:stretch}',
       P + '.avmx-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;padding-top:7px;border-top:1px solid rgba(201,168,76,0.18)}',
       P + '.avmx-disc{font-size:10.5px;color:var(--muted,#7A7370)}',
-      P + '.avmx-apply{margin:0}',
+      P + ".avmx-apply{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border:1px solid rgba(201,168,76,0.50);border-radius:10px;background:#fff;color:var(--gold-3,#9a7f33);font:600 12.5px/1 'DM Sans',system-ui,sans-serif;cursor:pointer;margin:0;transition:background .15s ease,border-color .15s ease}",
+      P + '.avmx-apply:hover{background:rgba(201,168,76,0.08);border-color:var(--gold,#C9A84C)}',
       '.oabi-warn{margin:10px 0 4px;padding:9px 12px;background:rgba(229,168,71,0.12);border:1px solid rgba(229,168,71,0.5);border-radius:8px;font-size:12px;color:#9C7223;line-height:1.45}',
       P + '.avmx-apply{margin:12px 0 2px}',
       /* combined import modal */
@@ -126,6 +145,14 @@
       '.oabi-tbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}',
       '.oabi-tbl td{padding:7px 8px;border-bottom:1px solid rgba(42,39,39,0.07)}',
       '.oabi-tbl .src{font-size:10.5px;color:#9a7f33}',
+      '.oabi-span{display:inline-flex;margin-left:8px;border:1px solid rgba(201,168,76,0.45);border-radius:7px;overflow:hidden;vertical-align:middle}',
+      ".oabi-spbtn{padding:2px 7px;border:0;border-right:1px solid rgba(201,168,76,0.30);background:#fff;cursor:pointer;font:600 11px/1.4 'DM Sans',system-ui,sans-serif;color:var(--ch2,#6b6660)}",
+      '.oabi-spbtn:last-child{border-right:0}',
+      '.oabi-spbtn.on{background:var(--gold,#C9A84C);color:#fff}',
+      '.oabi-addr{margin:10px 0 4px;padding:10px 12px;background:rgba(229,168,71,0.10);border:1px solid rgba(229,168,71,0.45);border-radius:8px}',
+      '.oabi-addr-h{font-size:12px;font-weight:700;color:#9C7223;margin-bottom:6px}',
+      ".oabi-addr-opt{display:block;font-size:12.5px;color:var(--ch,#2A2727);padding:3px 0;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif}",
+      '.oabi-addr-opt .src{font-size:10.5px;color:#9a7f33}',
       '.oabi-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid rgba(42,39,39,0.08)}',
       '.oabi-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--border,#E7E2DC);border-radius:8px;background:#fff;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ch,#2A2727)}',
       '.oabi-btn.primary{background:linear-gradient(135deg,var(--gold,#C9A84C),var(--gold-d,#9a7f33));color:#fff;border-color:transparent}',
@@ -134,6 +161,10 @@
       '.oab-note{font-size:11px;color:var(--muted,#7A7370);margin-top:2px}',
       '#ki-lage-min{width:28px;height:28px;border:1px solid var(--border,#E7E2DC);border-radius:7px;background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--ch2,#6b6660);margin-left:8px;vertical-align:middle;transition:transform .2s}',
       '#ki-lage-btn{margin-left:auto}',
+      '.qc7-logo{height:16px;width:auto;max-width:120px;object-fit:contain;display:inline-block;vertical-align:middle;mix-blend-mode:multiply}',
+      '#ki-lage-box.ki-lage-box{padding:10px 16px !important;margin-top:10px !important}',
+      '#ki-lage-box .ki-lage-header{margin-bottom:4px !important}',
+      '#ki-lage-box .ki-lage-empty{margin:0 !important;padding:2px 0 0 !important;font-size:12px !important;line-height:1.35 !important}',
       '#ki-lage-min.collapsed svg{transform:rotate(-90deg)}'
     ].join('\n');
     var st = document.createElement('style'); st.id = 'oab-style'; st.textContent = css; document.head.appendChild(st);
@@ -146,6 +177,12 @@
       '<span class="qc7-box">' + svg('check', 12, '#fff') + '</span>' +
       '<span class="qc7-ic">' + svg(icoName, 14) + '</span> ' + text + '</label>';
   }
+  function srcLabelImg(value, img, alt, disabled) {
+    return '<label class="qc7-src" data-src="' + value + '"' + (disabled ? ' title="AVM derzeit deaktiviert"' : '') + '>' +
+      '<input type="checkbox" value="' + value + '"' + (disabled ? ' disabled' : '') + '>' +
+      '<span class="qc7-box">' + svg('check', 12, '#fff') + '</span>' +
+      '<img class="qc7-logo" src="' + img + '" alt="' + alt + '" title="' + alt + '">' + '</label>';
+  }
   function render() {
     var mount = $(MOUNT_ID); if (!mount) return;
     var avmOff = !(_avmHealth && _avmHealth.available);
@@ -153,31 +190,32 @@
       '<div class="actions" id="oab-bar">' +
         '<span class="actions-label">Aktionen</span>' +
         '<span class="qc7-sources">' +
-          srcLabel('import', 'upload', 'Exposé/Marktbericht importieren', false) +
-          srcLabel('pricehubble', 'building', 'PriceHubble', avmOff) +
-          srcLabel('sprengnetter', 'chart', 'Sprengnetter', avmOff) +
+          srcLabel('import', 'doc', 'Exposé/Marktbericht', false) +
+          srcLabelImg('pricehubble', 'img/pricehubble.jpg', 'PriceHubble', avmOff) +
+          srcLabelImg('sprengnetter', 'img/sprengnetter.jpg', 'Sprengnetter', avmOff) +
         '</span>' +
-        '<span class="qc6-seg-wrap"><span class="qc6-seg-lbl">Spanne</span>' +
-          '<span class="qc6-seg" id="oab-seg">' +
-            '<button type="button" data-span="low">Unten</button>' +
-            '<button type="button" data-span="mid" class="sel">Ø</button>' +
-            '<button type="button" data-span="high">Oben</button>' +
-          '</span></span>' +
-        '<button type="button" class="btn primary qc6-run" id="oab-run"><span class="ico">' + svg('zap', 14, '#fff') + '</span> Abrufen</button>' +
+        '<button type="button" class="qc6-run oab-act" id="oab-run"><span class="qc7-ic">' + svg('analyze', 15, '#9a7f33') + '</span> Abrufen</button>' +
       '</div>' +
+      '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
       (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">AVM (PriceHubble/Sprengnetter) ist derzeit deaktiviert — Import funktioniert.</div>' : '') +
       '<div class="oab-prog" id="oab-prog" style="display:none"></div>' +
       '<div class="oab-results" id="oab-results"></div>';
-    mount.querySelectorAll('.qc7-src input').forEach(function (cb) { cb.addEventListener('change', function () { var l = cb.closest('.qc7-src'); if (l) l.classList.toggle('on', cb.checked); }); });
-    mount.querySelectorAll('#oab-seg button').forEach(function (b) {
-      b.addEventListener('click', function () {
-        _span = b.getAttribute('data-span') || 'mid';
-        mount.querySelectorAll('#oab-seg button').forEach(function (x) { x.classList.toggle('sel', x === b); });
-        renderResults();
-      });
-    });
+    mount.querySelectorAll('.qc7-src input').forEach(function (cb) { cb.addEventListener('change', function () { var l = cb.closest('.qc7-src'); if (l) l.classList.toggle('on', cb.checked); updateCreditHint(); }); });
     $('oab-run').addEventListener('click', runSelected);
-    renderResults();
+    renderResults(); updateCreditHint();
+  }
+  function updateCreditHint() {
+    var el = $('oab-credit-hint'); if (!el) return;
+    var sel = selectedSources();
+    var avm = sel.filter(function (s) { return s === 'pricehubble' || s === 'sprengnetter'; });
+    if (!avm.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    var names = avm.map(function (s) { return s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter'; });
+    var demo = !!(_avmHealth && _avmHealth.mode === 'stub');
+    var parts = names.map(function (n) { return '<b>1 ' + n + '-Credit</b>'; }).join(' + ');
+    var txt = 'Beim <b>Abrufen</b> ' + (avm.length > 1 ? 'werden ' : 'wird ') + parts + ' verbraucht' + (avm.length > 1 ? ' (' + avm.length + ' gesamt)' : '') + '.';
+    if (demo) txt += ' <span style="opacity:.75">Im Demo-Modus aktuell kostenlos.</span>';
+    el.innerHTML = '<span class="oab-credit-dot"></span>' + txt;
+    el.style.display = '';
   }
   function selectedSources() { var out = [], m = $(MOUNT_ID); if (!m) return out; m.querySelectorAll('.qc7-src input:checked').forEach(function (c) { out.push(c.value); }); return out; }
   function setProg(t) { var p = $('oab-prog'); if (p) { p.style.display = t ? '' : 'none'; p.textContent = t || ''; } }
@@ -191,7 +229,7 @@
     for (var i = 0; i < ordered.length; i++) {
       var s = ordered[i];
       try {
-        if (s === 'import') { setProg('Import …'); openCombinedImport(); }
+        if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); }
         else if (s === 'pricehubble' || s === 'sprengnetter') { setProg((s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' …'); await avmFetch(s); }
       } catch (e) { try { console.warn('[obj-actions] step', s, e); } catch (_) {} }
     }
@@ -205,20 +243,66 @@
     (REQUIRED[p] || []).forEach(function (f) { if (!inp[f[0]]) { var el = $(f[0] === 'objektart' ? 'objart' : f[0]); if (el) { el.classList.add('oab-missing-hl'); if (!first) first = el; } } });
     if (first && first.scrollIntoView) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
+  function missingPairs(provider) {
+    var i = mainInputs();
+    return (REQUIRED[provider] || []).filter(function (f) { return !i[f[0]] || String(i[f[0]]).trim() === ''; });
+  }
+  function promptMissing(provider) {
+    var pairs = missingPairs(provider);
+    if (provider === 'sprengnetter') {  /* v393: Straße+Hausnummer immer abfragen, wenn fehlend */
+      var _mi = mainInputs();
+      [['str', 'Straße'], ['hnr', 'Hausnummer']].forEach(function (f) {
+        if ((!_mi[f[0]] || String(_mi[f[0]]).trim() === '') && !pairs.some(function (p) { return p[0] === f[0]; })) pairs.push(f);
+      });
+    }
+    if (!pairs.length) { avmFetch(provider); return; }
+    var pName = provider === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter';
+    var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oab-miss-ov';
+    var rows = pairs.map(function (f) {
+      var key = f[0], label = f[1];
+      if (key === 'objektart') {
+        var sel = document.getElementById('objart');
+        var opts = sel ? sel.innerHTML : '<option value="">–</option>';
+        return '<div class="f"><label>' + escH(label) + '</label><select data-mf="objart">' + opts + '</select></div>';
+      }
+      return '<div class="f"><label>' + escH(label) + '</label><input type="text" data-mf="' + key + '" value="' + escH(val(key) || '') + '"></div>';
+    }).join('');
+    ov.innerHTML =
+      '<div class="oabi-modal" style="max-width:440px">' +
+        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('analyze', 20) + '</span><h3>Fehlende Angaben — ' + pName + '</h3></div>' +
+        '<div class="oabi-sub">Diese Pflichtfelder braucht der Abruf. Eintragen und „Weiter".</div>' +
+        '<div class="oabi-body"><div class="g2">' + rows + '</div></div>' +
+        '<div class="oabi-foot"><button type="button" class="oabi-btn" id="oab-miss-cancel">Abbrechen</button>' +
+          '<button type="button" class="oabi-btn primary" id="oab-miss-go">Weiter</button></div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    var objSel = ov.querySelector('select[data-mf="objart"]');
+    if (objSel) { var cur = document.getElementById('objart'); if (cur) objSel.value = cur.value; }
+    function close() { var x = $('oab-miss-ov'); if (x) x.remove(); }
+    $('oab-miss-cancel').addEventListener('click', close);
+    $('oab-miss-go').addEventListener('click', function () {
+      ov.querySelectorAll('[data-mf]').forEach(function (el) {
+        var id = el.getAttribute('data-mf'), v = el.value;
+        if (v != null && String(v).trim() !== '') setInput(id, v);
+      });
+      close();
+      avmFetch(provider);
+    });
+  }
   async function avmFetch(provider) {
     var miss = missingFor(provider);
-    if (miss.length) { highlightMissing(provider); toast('⚠ ' + (provider === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' braucht: ' + miss.join(', ')); return; }
+    if (miss.length) { promptMissing(provider); return; }
     try {
       var res = await fetch('/api/v1/avm/' + provider, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() }, body: JSON.stringify({ inputs: mainInputs() }) });
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) {
         if (data && data.needs_credits) toast('⚠ Nicht genug Credits (' + (data.required || '?') + ' nötig)');
-        else if (data && data.missing_fields) { highlightMissing(provider); toast('⚠ Fehlt: ' + data.missing_fields.join(', ')); }
+        else if (data && data.missing_fields) { promptMissing(provider); }
         else if (data && data.disabled) toast('AVM ist derzeit deaktiviert.');
         else toast('⚠ AVM-Abruf fehlgeschlagen' + (data && data.message ? ': ' + data.message : ''));
         return;
       }
-      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−' + (data.cost || 0) + ' Credits)')); }
+      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); persistAvmState(); toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−' + (data.cost || 0) + ' Credits)')); }
     } catch (e) { toast('⚠ Netzwerkfehler beim AVM-Abruf'); }
   }
   function pickMW(r) { return _span === 'low' ? r.low : _span === 'high' ? r.high : r.marktwert; }
@@ -228,13 +312,41 @@
     function piece(v, sel) { return sel ? '<b>' + fmt0(v) + ' €</b>' : fmt0(v) + ' €'; }
     return 'Spanne ' + piece(lo, _span === 'low') + ' – ' + piece(mid, _span === 'mid') + ' – ' + piece(hi, _span === 'high');
   }
+  function applyAvmHealth() {
+    var m = $(MOUNT_ID); if (!m) return;
+    var off = !(_avmHealth && _avmHealth.available);
+    ['pricehubble', 'sprengnetter'].forEach(function (p) {
+      var lab = m.querySelector('.qc7-src[data-src="' + p + '"]'); if (!lab) return;
+      var cb = lab.querySelector('input'); if (cb) cb.disabled = off;
+      if (off) lab.setAttribute('title', 'AVM derzeit deaktiviert'); else lab.removeAttribute('title');
+      lab.style.opacity = off ? '0.55' : '';
+    });
+    var note = m.querySelector('.oab-note'); if (!off && note) note.remove();
+    try { updateCreditHint(); } catch (e) {}
+  }
+  function persistAvmState() {
+    try {
+      var el = document.getElementById('_avm_state');
+      if (!el) return;
+      el.value = JSON.stringify({ avm: _avm, collapsed: _collapsed });
+      el.dispatchEvent(new Event('input', { bubbles: true }));  /* v392: -> Auto-Save persistiert ins JSONB */
+    } catch (e) {}
+  }
+  function restoreAvmState() {
+    var el = document.getElementById('_avm_state'), st = null;
+    try { if (el && el.value) st = JSON.parse(el.value); } catch (e) {}
+    _avm = (st && st.avm && typeof st.avm === 'object') ? st.avm : {};
+    _collapsed = (st && st.collapsed && typeof st.collapsed === 'object') ? st.collapsed : {};
+    renderResults();
+  }
   function renderResults() {
     var host = $('oab-results'); if (!host) return;
     var provs = Object.keys(_avm);
     if (!provs.length) { host.innerHTML = ''; return; }
     host.innerHTML = provs.map(function (p) { return renderCard(_avm[p]); }).join('');
     host.querySelectorAll('[data-apply]').forEach(function (b) { b.addEventListener('click', function () { applyAvm(_avm[b.getAttribute('data-apply')]); }); });
-    host.querySelectorAll('[data-min]').forEach(function (b) { b.addEventListener('click', function () { var pr = b.getAttribute('data-min'); _collapsed[pr] = !_collapsed[pr]; renderResults(); }); });
+    host.querySelectorAll('[data-min]').forEach(function (b) { b.addEventListener('click', function () { var pr = b.getAttribute('data-min'); _collapsed[pr] = !_collapsed[pr]; renderResults(); persistAvmState(); }); });
+    host.querySelectorAll('[data-span]').forEach(function (b) { b.addEventListener('click', function () { _span = b.getAttribute('data-span') || 'mid'; renderResults(); }); });
   }
   function renderCard(r) {
     var isSpr = (r.provider === 'Sprengnetter');
@@ -246,6 +358,8 @@
     var dLbl = diff == null ? '' : (diff <= -10 ? 'Sehr teuer' : diff <= -3 ? 'Teuer' : diff < 3 ? 'Marktgerecht' : diff < 10 ? 'Günstig' : 'Sehr günstig');
     var dCol = diff == null ? 'var(--muted,#7A7370)' : (diff < -3 ? '#B8625C' : diff > 3 ? '#3FA56C' : 'var(--gold-3,#9a7f33)');
     var coll = !!_collapsed[r.provider];
+    var _provImg = r.provider === 'PriceHubble' ? 'img/pricehubble.jpg' : (r.provider === 'Sprengnetter' ? 'img/sprengnetter.jpg' : '');
+    var _provHtml = _provImg ? ('<img class="avmx-logo" src="' + _provImg + '" alt="' + escH(r.provider) + '">') : ('<span class="avmx-prov">' + escH(r.provider) + '</span>');
     var chip = '';
     if (r.scoreMicro != null || r.scoreMacro != null || r.wertentwicklung != null) {
       var parts = [];
@@ -254,12 +368,19 @@
       if (r.wertentwicklung != null) parts.push('Wertentw. ' + (r.wertentwicklung >= 0 ? '+' : '') + r.wertentwicklung.toFixed(1) + '%/J');
       chip = '<div class="avmx-chip">' + parts.map(escH).join(' · ') + '</div>';
     }
+    var spanCtl = '<div class="avmx-spanbox"><span class="qc6-seg-lbl">Spanne</span>' +
+      '<span class="qc6-seg">' +
+        '<button type="button" data-span="low"' + (_span === 'low' ? ' class="sel"' : '') + '>Unten</button>' +
+        '<button type="button" data-span="mid"' + (_span === 'mid' ? ' class="sel"' : '') + '>Ø</button>' +
+        '<button type="button" data-span="high"' + (_span === 'high' ? ' class="sel"' : '') + '>Oben</button>' +
+      '</span></div>';
     var mwSub = [];
     if (mwSqm) mwSub.push(fmt0(mwSqm) + ' €/m²');
     if (diff != null) mwSub.push('<span style="color:' + dCol + '">' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + '% vs. Kaufpreis · ' + escH(dLbl) + '</span>');
+    if (r.fairpriceLabel) mwSub.push('Sprengnetter-Preislabel: ' + escH(r.fairpriceLabel));  /* v388 */
     return '<div class="avmx' + (isSpr ? ' is-spr' : '') + (coll ? ' collapsed' : '') + '">' +
       '<div class="avmx-head">' +
-        '<span class="avmx-eye">Marktbewertung ·</span><span class="avmx-prov">' + escH(r.provider) + '</span>' +
+        '<span class="avmx-eye">Marktbewertung ·</span>' + _provHtml +
         '<span class="avmx-conf">' + escH(r.conf || 'AVM') + (r.mode === 'stub' ? ' · Demo' : '') + '</span>' +
         '<button type="button" class="avmx-min" data-min="' + escH(r.provider) + '" title="' + (coll ? 'Aufklappen' : 'Minimieren') + '">' + svg('chevron', 16) + '</button>' +
       '</div>' +
@@ -278,10 +399,12 @@
             '<div class="avmx-span">' + spanRow(r.marktmieteLow, r.marktmieteCold, r.marktmieteHigh) + '</div>' +
             (mmSqm ? '<div class="avmx-sub">' + mmSqm.toFixed(2).replace('.', ',') + ' €/m² kalt</div>' : '') +
           '</div>' +
+          '<div class="avmx-div"></div>' +
+          '<div class="avmx-col avmx-spancol">' + spanCtl + '</div>' +
         '</div>' +
         '<div class="avmx-actions">' +
           '<span class="avmx-disc">Marktpreisindikation — kein Gutachten n. § 194 BauGB</span>' +
-          '<button type="button" class="btn primary avmx-apply" data-apply="' + escH(r.provider) + '"><span class="ico">' + svg('download', 14, '#fff') + '</span> In Felder übernehmen (' + spanLabel() + ')</button>' +
+          '<button type="button" class="avmx-apply" data-apply="' + escH(r.provider) + '"><span class="ico">' + svg('download', 13, '#9a7f33') + '</span> In Felder übernehmen (' + spanLabel() + ')</button>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -383,18 +506,36 @@
   }
 
   /* ── svwert-Label: §194 ↔ Marktpreisindikation (AVM) ── */
-  function markSvwertAvm() {
+  function _firstTextNode(el) {
+    if (!el) return null;
+    for (var i = 0; i < el.childNodes.length; i++) { var n = el.childNodes[i]; if (n.nodeType === 3 && n.nodeValue && n.nodeValue.trim()) return n; }
+    return null;
+  }
+  function markSvwertAvm() {  /* v396: Label-Wort + Hinweis */
     var sv = $('svwert'); if (!sv) return;
     var fld = sv.closest ? sv.closest('.f') : null;
     var hint = fld ? fld.querySelector('.cf-hint') : null;
-    if (!hint) return;
-    if (!hint._orig) hint._orig = hint.textContent;
-    hint.textContent = '(Marktpreisindikation · AVM — kein Verkehrswert n. § 194 BauGB)';
-    hint.title = 'Der übernommene Wert stammt aus einer AVM-Markteinschätzung (PriceHubble/Sprengnetter), nicht aus einem Verkehrswertgutachten nach § 194 BauGB. Bei manueller Eingabe wird die Bezeichnung automatisch zurückgesetzt.';
-    hint.style.color = 'var(--gold-3,#9a7f33)';
+    var lbl = fld ? fld.querySelector('label') : null;
+    var tn = _firstTextNode(lbl);
+    if (hint) {
+      if (!hint._orig) hint._orig = hint.textContent;
+      hint.textContent = '(Marktpreisindikation · AVM — kein Verkehrswert n. § 194 BauGB)';
+      hint.title = 'Der übernommene Wert stammt aus einer AVM-Markteinschätzung (PriceHubble/Sprengnetter), nicht aus einem Verkehrswertgutachten nach § 194 BauGB. Bei manueller Eingabe wird die Bezeichnung automatisch zurückgesetzt.';
+      hint.style.color = 'var(--gold-3,#9a7f33)';
+    }
+    if (tn) { if (lbl._origTxt == null) lbl._origTxt = tn.nodeValue; tn.nodeValue = 'Marktpreis '; }
+    if (lbl) lbl.style.color = 'var(--gold-3,#9a7f33)';
     if (!sv._avmResetBound) {
       sv._avmResetBound = true;
-      sv.addEventListener('input', function _r() { try { if (hint._orig) hint.textContent = hint._orig; hint.removeAttribute('title'); hint.style.color = ''; } catch (e) {} sv.removeEventListener('input', _r); sv._avmResetBound = false; });
+      sv.addEventListener('input', function _r() {
+        try {
+          if (hint && hint._orig) { hint.textContent = hint._orig; hint.removeAttribute('title'); hint.style.color = ''; }
+          var t2 = _firstTextNode(lbl);
+          if (t2 && lbl._origTxt != null) t2.nodeValue = lbl._origTxt;
+          if (lbl) lbl.style.color = '';
+        } catch (e) {}
+        sv.removeEventListener('input', _r); sv._avmResetBound = false;
+      });
     }
   }
 
@@ -417,7 +558,8 @@
   function lageCat(avg) { return avg >= 4.5 ? 'sehr_gut' : avg >= 3.5 ? 'gut' : avg >= 2.5 ? 'durchschnittlich' : avg >= 1.5 ? 'schwach' : 'sehr_schwach'; }
 
   /* ── Merge (Zeilen mit kind: input|select|star) ── */
-  var _merged = {};   // id -> { label, value(display), raw, source, kind, emptyOnly }
+  var _merged = {};   // id -> { label, value(display), raw, source, kind, emptyOnly, range? }
+  var _addrChoice = null;
   function addRow(id, label, display, raw, source, kind, emptyOnly) {
     if (display == null || display === '' || raw == null || raw === '' || raw === 0 && kind === 'star') return;
     if (_merged[id] && _merged[id].source === 'Marktbericht' && source !== 'Marktbericht') return;
@@ -444,12 +586,12 @@
     addRow('wfl', 'Wohnfläche', d.wohnflaeche, d.wohnflaeche, S, 'input'); addRow('baujahr', 'Baujahr', d.baujahr, d.baujahr, S, 'input');
     addRow('zimmer', 'Zimmer', d.zimmer, d.zimmer, S, 'input');
     if (d.objektart) addRow('objart', 'Objektart', d.objektart, d.objektart, S, 'select', false);
-    if (d.verkehrswert) addRow('svwert', 'Marktpreisindikation (AVM)', fmt0(d.verkehrswert) + ' €', d.verkehrswert, S, 'input');
+    if (d.verkehrswert) { addRow('svwert', 'Marktpreisindikation (AVM)', fmt0(d.verkehrswert) + ' €', d.verkehrswert, S, 'input'); attachRange('svwert', numDe(d.verkehrswert_min), numDe(d.verkehrswert), numDe(d.verkehrswert_max), 'eur'); }
     if (d.energie_label) addRow('ds2_energie', 'Energieklasse', String(d.energie_label).toUpperCase(), String(d.energie_label).toUpperCase(), S, 'select', false);
     // Marktmiete €/m²
     var mmq = numDe(d.marktmiete_qm), mmm = numDe(d.marktmiete_monat), wfl = numDe(d.wohnflaeche);
     var mm = (mmq != null) ? mmq : ((mmm != null && wfl) ? mmm / wfl : null);
-    if (mm != null) addRow('ds2_marktmiete', 'Marktmiete (€/m²)', mm.toFixed(2).replace('.', ',') + ' €/m²', mm.toFixed(2).replace('.', ','), S, 'input');
+    if (mm != null) { addRow('ds2_marktmiete', 'Marktmiete (€/m²)', mm.toFixed(2).replace('.', ',') + ' €/m²', mm.toFixed(2).replace('.', ','), S, 'input'); attachRange('ds2_marktmiete', numDe(d.marktmiete_qm_min), mm, numDe(d.marktmiete_qm_max), 'qm'); }
     // Makro-/Mikrolage: DIREKT aus Bericht (bevorzugt), sonst aus Lage-Sub-Scores ableiten
     var maD = validEnum('makrolage', d.makrolage), miD = validEnum('mikrolage', d.mikrolage);
     var la = lageAvg(d), laCat = (la != null) ? lageCat(la) : null;
@@ -500,9 +642,12 @@
     addRow('verwaltung', 'Verwaltung', d.verwaltung, d.verwaltung, S, 'input');
     addRow('nk_pct', 'Kaufnebenkosten %', d.kaufnebenkosten, d.kaufnebenkosten, S, 'input');
     if (d.energieklasse) addRow('ds2_energie', 'Energieklasse', String(d.energieklasse).toUpperCase(), String(d.energieklasse).toUpperCase(), S, 'select', false);
+    if (d.sanierungsjahr) addRow('modernis', 'Modernisierungsjahr', d.sanierungsjahr, d.sanierungsjahr, S, 'input');
+    if (d.stellplatz) { var _sp = String(d.stellplatz).toLowerCase(); if (_sp.indexOf('kein') < 0) { if (/tiefgarage|garage|duplex/.test(_sp)) addRow('garagen', 'Garagenpl\u00e4tze', '1', '1', S, 'input'); else if (/stellplatz|au\u00dfen|aussen|parkplatz|carport|freiplatz/.test(_sp)) addRow('stellpl_aussen', 'Au\u00dfenstellpl\u00e4tze', '1', '1', S, 'input'); } }
   }
 
-  var _files = [];   // { name, text, type, userType, cache, status, row }
+  var _files = [];   // { name, text, type, userType, cache, status, row, file }
+  var _importPhotos = [];   // v402: aus Exposé-PDFs extrahierte Bilder (dataURLs, max 6)
   function recompute() {
     _merged = {};
     _files.filter(function (f) { return f.type === 'expose' && f.cache.expose; }).forEach(function (f) { mergeExpose(f.cache.expose); });
@@ -524,19 +669,90 @@
     if (!msgs.length) return '';
     return '<div class="oabi-warn">\u26A0 <b>Unterschiedliche Adressen erkannt</b> — gehören die PDFs wirklich zum selben Objekt? (' + escH(msgs.join(' · ')) + ')</div>';
   }
+  function fmtRange(v, fmt) { if (fmt === 'eur') return fmt0(v) + ' €'; if (fmt === 'qm') return v.toFixed(2).replace('.', ',') + ' €/m²'; return String(v); }
+  function applySpan(it, sp) {
+    if (!it.range) return; it.range.cur = sp; var v = it.range[sp];
+    if (it.range.fmt === 'eur') { it.raw = v; it.value = fmt0(v) + ' €'; }
+    else if (it.range.fmt === 'qm') { it.raw = v.toFixed(2).replace('.', ','); it.value = it.raw + ' €/m²'; }
+    else { it.raw = v; it.value = String(v); }
+  }
+  function attachRange(id, minV, midV, maxV, fmt) {
+    var it = _merged[id]; if (!it) return;
+    if (minV == null || midV == null || maxV == null || !(minV < maxV)) return;
+    it.range = { min: minV, mid: midV, max: maxV, cur: 'mid', fmt: fmt }; applySpan(it, 'mid');
+  }
+  function spanToggle(id, cur) {
+    return '<span class="oabi-span">' + [['min', 'Unten'], ['mid', 'Ø'], ['max', 'Oben']].map(function (p) {
+      return '<button type="button" class="oabi-spbtn' + (p[0] === cur ? ' on' : '') + '" data-id="' + escH(id) + '" data-sp="' + p[0] + '">' + p[1] + '</button>';
+    }).join('') + '</span>';
+  }
+  /* Adress-Auswahl bei mehreren Objekten */
+  function _fileAddr(f) {
+    var d = f.cache[f.type]; if (!d) return null;
+    var str = '', hnr = '';
+    if (d.adresse) { var s0 = String(d.adresse).split(',')[0].trim(); var m = s0.match(/^(.+?)\s+(\d+\w*)$/); if (m) { str = m[1]; hnr = m[2]; } else str = s0; }
+    if (!str && !d.plz && !d.ort) return null;
+    return { str: str, hnr: hnr, plz: d.plz || '', ort: d.ort || '', source: (f.type === 'market' ? 'Marktbericht' : 'Exposé') };
+  }
+  function addressOptions() {
+    var seen = {}, out = [];
+    _files.forEach(function (f) { var a = _fileAddr(f); if (!a) return; var key = _norm(a.str) + '|' + _norm(a.plz) + '|' + _norm(a.ort); if (seen[key]) return; seen[key] = 1; a.key = key; a.label = (a.str + (a.hnr ? ' ' + a.hnr : '') + ', ' + a.plz + ' ' + a.ort).replace(/^,\s*|,\s*$/g, '').trim(); out.push(a); });
+    return out;
+  }
   function renderMergedTable() {
     var host = $('oabi-result'); if (!host) return;
-    var keys = Object.keys(_merged);
     var ab = $('oabi-apply');
-    if (!keys.length) { host.innerHTML = '<p style="color:var(--muted,#7A7370);font-style:italic;margin-top:10px">Noch keine Werte erkannt.</p>'; if (ab) ab.disabled = true; return; }
-    host.innerHTML = addressWarning() + '<table class="oabi-tbl"><tbody>' + keys.map(function (id) {
+    // Adress-Auswahl: bei mehreren Objekten Radio anbieten; gewählte Adresse überschreibt str/hnr/plz/ort
+    var addrHtml = '', addrOpts = addressOptions();
+    if (addrOpts.length > 1) {
+      if (!_addrChoice || !addrOpts.some(function (o) { return o.key === _addrChoice; })) {
+        var pref = addrOpts.filter(function (o) { return o.source === 'Marktbericht'; })[0] || addrOpts[0];
+        _addrChoice = pref.key;
+      }
+      var ch = addrOpts.filter(function (o) { return o.key === _addrChoice; })[0];
+      if (ch) {
+        if (ch.str) _merged['str'] = { label: 'Straße', value: ch.str, raw: ch.str, source: ch.source, kind: 'input' };
+        if (ch.hnr) _merged['hnr'] = { label: 'Hausnummer', value: ch.hnr, raw: ch.hnr, source: ch.source, kind: 'input' };
+        if (ch.plz) _merged['plz'] = { label: 'PLZ', value: ch.plz, raw: ch.plz, source: ch.source, kind: 'input' };
+        if (ch.ort) _merged['ort'] = { label: 'Ort', value: ch.ort, raw: ch.ort, source: ch.source, kind: 'input' };
+      }
+      addrHtml = '<div class="oabi-addr"><div class="oabi-addr-h">\u26A0 Unterschiedliche Adressen erkannt — welche gilt?</div>' +
+        addrOpts.map(function (o) {
+          return '<label class="oabi-addr-opt"><input type="radio" name="oabi-addr" value="' + escH(o.key) + '"' + (o.key === _addrChoice ? ' checked' : '') + '> ' + escH(o.label) + ' <span class="src">(' + escH(o.source) + ')</span></label>';
+        }).join('') + '</div>';
+    }
+    var keys = Object.keys(_merged);
+    var hasPhotos = !!(_importPhotos && _importPhotos.length);
+    if (!keys.length && !hasPhotos) { host.innerHTML = '<p style="color:var(--muted,#7A7370);font-style:italic;margin-top:10px">Noch keine Werte erkannt.</p>'; if (ab) ab.disabled = true; return; }
+    var photoRow = '';
+    if (hasPhotos) {
+      var thumbs = _importPhotos.slice(0, 6).map(function (src) { return '<img src="' + src + '" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;margin-right:3px;vertical-align:middle">'; }).join('');
+      photoRow = '<tr><td style="width:34px"><input type="checkbox" data-photos="1" checked></td><td>\uD83D\uDDBC Bilder</td><td><b>' + _importPhotos.length + '</b> aus PDF \u2014 in Objektfotos &uebernehmen; ' + thumbs + '</td><td class="src">Expos\u00e9</td></tr>';
+    }
+    host.innerHTML = addrHtml + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
-      return '<tr><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '" checked></td><td>' + escH(it.label) + '</td><td><b>' + escH(it.value) + '</b></td><td class="src">' + escH(it.source) + '</td></tr>';
+      var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
+      return '<tr><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '" checked></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + '</td></tr>';
     }).join('') + '</tbody></table>';
     if (ab) ab.disabled = false;
+    // Range-Toggle-Handler
+    host.querySelectorAll('.oabi-spbtn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = b.getAttribute('data-id'), sp = b.getAttribute('data-sp'), it = _merged[id]; if (!it || !it.range) return;
+        applySpan(it, sp);
+        var tr = b.closest('tr'); var nv = tr ? tr.querySelector('.oabi-vnum') : null; if (nv) nv.textContent = it.value;
+        if (tr) tr.querySelectorAll('.oabi-spbtn').forEach(function (x) { x.classList.toggle('on', x === b); });
+      });
+    });
+    // Adress-Radio-Handler
+    host.querySelectorAll('input[name="oabi-addr"]').forEach(function (r) {
+      r.addEventListener('change', function () { _addrChoice = r.value; renderMergedTable(); });
+    });
   }
-  function openCombinedImport() {
-    _merged = {}; _files = [];
+  function _fireOabiDone() { var d = _oabiDone; _oabiDone = null; if (typeof d === 'function') { try { setTimeout(d, 0); } catch (e) { d(); } } }
+  function openCombinedImport(onDone) {
+    _oabiDone = (typeof onDone === 'function') ? onDone : null;
+    _merged = {}; _files = []; _importPhotos = [];
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
@@ -551,8 +767,7 @@
           '<button type="button" class="oabi-btn primary" id="oabi-apply" disabled><span style="display:inline-flex">' + svg('download', 14, '#fff') + '</span> Ausgewählte übernehmen</button></div>' +
       '</div>';
     document.body.appendChild(ov);
-    function close() { var x = $('oabi-ov'); if (x) x.remove(); }
-    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    function close() { var x = $('oabi-ov'); if (x) x.remove(); _fireOabiDone(); }
     $('oabi-cancel').addEventListener('click', close);
     var drop = $('oabi-drop'), input = $('oabi-input');
     drop.addEventListener('click', function () { input.click(); });
@@ -573,6 +788,35 @@
     var sel = f.row.querySelector('select');
     if (sel) sel.addEventListener('change', function () { onTypeChange(f, sel.value); });
   }
+  // Typklassifizierung: 'market' | 'expose' | 'unknown' (Stichwort-Vorfilter, Rest entscheidet der Inhalt)
+  function classifyType(file, text) {
+    var fn = (file && file.name || '').toLowerCase();
+    if (/markt|verkehrswert|pricehubble|sprengnetter|gutachten|\bavm\b|bewertung|wertermittlung/.test(fn)) return 'market';
+    if (/expose|exposé|immoscout|scout24|kleinanzeige/.test(fn)) return 'expose';
+    if (detectMarket({ name: '' }, text)) return 'market';
+    var t = (text || '').toLowerCase();
+    var marketHits = ['marktwert', 'mikrolage', 'makrolage', 'mikro ', 'makro ', 'wertentwicklung', 'bodenrichtwert', 'konfidenz', 'marktmiete', '€/m²', 'spanne', 'wertsteigerung'].reduce(function (n, kw) { return n + (t.indexOf(kw) >= 0 ? 1 : 0); }, 0);
+    var exposeHits = ['kaufpreis', 'courtage', 'provision', 'maklerprovision', 'objektbeschreibung', 'besichtigung', 'immobilienscout', 'provisionsfrei'].reduce(function (n, kw) { return n + (t.indexOf(kw) >= 0 ? 1 : 0); }, 0);
+    if (exposeHits >= 2 && marketHits === 0) return 'expose';
+    return 'unknown';
+  }
+  // Marktbericht-typische Felder im Extraktionsergebnis? (valuation-spezifisch, in Exposés nicht vorhanden)
+  function hasMarketSignals(d) {
+    if (!d) return false;
+    var keys = ['verkehrswert', 'preis_pro_qm', 'makrolage', 'mikrolage', 'lage_einkaufen', 'lage_bildung', 'lage_gastronomie', 'lage_gesundheit', 'lage_freizeit', 'marktmiete_qm', 'marktmiete_monat', 'wertentwicklung_1jahr_pct', 'wertentwicklung_3jahre_pct', 'bevoelkerung_entwicklung', 'nachfrage', 'wertsteigerung', 'entwicklung', 'wanderungssaldo', 'markt_tage_auf_dem_markt'];
+    for (var i = 0; i < keys.length; i++) { var v = d[keys[i]]; if (v != null && v !== '') return true; }
+    return false;
+  }
+  // Typ auflösen: bei klarem Befund direkt; bei 'unknown' erst Marktbericht versuchen und per Inhalt bestätigen, sonst Exposé.
+  async function resolveType(f) {
+    if (f.userType) { f.type = f.userType; await ensureExtract(f); return; }
+    var cls = classifyType({ name: f.name }, f.text);
+    if (cls === 'market' || cls === 'expose') { f.type = cls; await ensureExtract(f); return; }
+    setStatus(f, 'Typ prüfen…');
+    f.type = 'market'; await ensureExtract(f);
+    if (f.cache.market && hasMarketSignals(f.cache.market)) return;   // bestätigt Marktbericht
+    f.type = 'expose'; await ensureExtract(f);                        // sonst Exposé
+  }
   async function ensureExtract(f) {
     if (f.cache[f.type]) return;
     f.status = 'reading'; renderFileRow(f);
@@ -582,8 +826,7 @@
   }
   async function onTypeChange(f, v) {
     f.userType = (v === 'auto') ? null : v;
-    f.type = f.userType || (detectMarket({ name: f.name }, f.text) ? 'market' : 'expose');
-    await ensureExtract(f); recompute(); renderMergedTable();
+    await resolveType(f); recompute(); renderMergedTable();
   }
   async function handleFiles(fileList) {
     var files = Array.prototype.slice.call(fileList).filter(function (f) { return /\.pdf$/i.test(f.name) && f.size <= 10 * 1024 * 1024; });
@@ -592,16 +835,27 @@
     for (var i = 0; i < files.length; i++) {
       var file = files[i];
       var row = document.createElement('div'); row.className = 'oabi-file'; filesHost.appendChild(row);
-      var f = { name: file.name, text: '', type: 'expose', userType: null, cache: {}, status: 'reading', row: row };
+      var f = { name: file.name, file: file, text: '', type: 'expose', userType: null, cache: {}, status: 'reading', row: row };
       _files.push(f); renderFileRow(f);
       try {
         f.text = await extractTextFull(file, function (m) { setStatus(f, m); });
         if (!f.text || f.text.replace(/\s/g, '').length < 50) { f.status = 'err'; renderFileRow(f); continue; }
-        f.type = detectMarket(file, f.text) ? 'market' : 'expose';
-        await ensureExtract(f);
+        await resolveType(f);
       } catch (e) { f.status = 'err'; renderFileRow(f); }
     }
     recompute(); renderMergedTable();
+    _extractImportPhotos();  /* v402: Exposé-Bilder asynchron nachladen */
+  }
+  async function _extractImportPhotos() {
+    if (!window.PdfImport || typeof window.PdfImport.extractImages !== 'function') { _importPhotos = []; return; }
+    var expFiles = _files.filter(function (f) { return f.type === 'expose' && f.file; });
+    if (!expFiles.length) { if (_importPhotos.length) { _importPhotos = []; renderMergedTable(); } return; }
+    var all = [];
+    for (var i = 0; i < expFiles.length && all.length < 6; i++) {
+      try { var imgs = await window.PdfImport.extractImages(expFiles[i].file); if (imgs && imgs.length) all = all.concat(imgs); } catch (e) {}
+    }
+    _importPhotos = all.slice(0, 6);
+    renderMergedTable();
   }
   function applyMerged() {
     var ov = $('oabi-ov'); if (!ov) return;
@@ -612,14 +866,93 @@
       if (it.kind === 'select') { if (setSelectSmart(id, it.raw, it.emptyOnly)) { n++; _applied.push(id); } return; }
       setInput(id, it.raw); if (id === 'svwert' && it.source === 'Marktbericht') markSvwertAvm(); n++; _applied.push(id);
     });
+    try {
+      var pcb = ov.querySelector('.oabi-tbl input[data-photos="1"]:checked');
+      if (pcb && _importPhotos && _importPhotos.length && typeof window.dpSetImgs === 'function') {
+        var photoObjs = _importPhotos.slice(0, 6).map(function (src, i) { return { src: src, name: 'expose_' + (i + 1) + '.jpg' }; });
+        window.dpSetImgs(photoObjs); n += photoObjs.length;
+      }
+    } catch (e) {}
     try { if (typeof window._v236MarkQcLoaded === 'function' && _applied.length) window._v236MarkQcLoaded(_applied); } catch (e) {}
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
     try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
-    ov.remove();
+    ov.remove(); _fireOabiDone();
     toast('✓ ' + n + ' Werte aus Import übernommen');
   }
 
   /* ── KI-Lage-Karte minimierbar machen (ohne ki-lage.js zu aendern) ── */
+  function syncObjExtra() {
+    var ids = ['zimmer','bad_anz','etage','etagen_ges','modernis','garagen','stellpl_aussen','balkon_flae'];
+    var tg = document.getElementById('obj-extra-toggle'), wrap = document.getElementById('obj-extra-wrap');
+    if (tg && wrap) {
+      var anyVal = ids.some(function (id) { var e = document.getElementById(id); return e && e.value != null && String(e.value).trim() !== ''; });
+      if (!tg._dpAccWired) {  /* v396: Aufklapp-Header statt Checkbox */
+        tg._dpAccWired = true;
+        tg._dpSetOpen = function (open) {
+          wrap.style.display = open ? '' : 'none';
+          tg.setAttribute('aria-expanded', open ? 'true' : 'false');
+          var ch = tg.querySelector('.obj-extra-chev'); if (ch) ch.style.transform = open ? 'rotate(90deg)' : '';
+        };
+        var _tog = function () { tg._dpSetOpen(wrap.style.display === 'none'); };
+        tg.addEventListener('click', _tog);
+        tg.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); _tog(); } });
+      }
+      if (typeof tg._dpSetOpen === 'function') tg._dpSetOpen(anyVal);  /* default zu, offen nur wenn Daten vorhanden */
+    }
+    var obj = document.getElementById('objart'), ew = document.getElementById('einheiten-wrap');
+    if (obj && ew) {
+      if (!obj._dpEinhWired) { obj._dpEinhWired = true; obj.addEventListener('change', function () { syncObjExtra(); }); }
+      ew.style.display = (['MFH','GESCH','GEW','HOTEL'].indexOf(obj.value) >= 0) ? '' : 'none';
+    }
+  }
+  function syncQzStars() {  /* v397: STERNE-Block einklappbar (Standard zu) */
+    var tg = document.getElementById('qz-stars-toggle');
+    var rows = document.getElementById('qz-stars-rows');
+    if (!tg || !rows) return;
+    var footer = rows.parentNode ? rows.parentNode.querySelector('.qz-footer') : null;
+    var ids = ['rate_kueche','rate_bad','rate_boden','rate_fenster','qual_kueche','qual_bad','qual_boden','qual_fenster'];
+    var anyRated = ids.some(function (id) { var e = document.getElementById(id); return e && parseFloat(e.value) > 0; });
+    if (!tg._dpQzWired) {
+      tg._dpQzWired = true;
+      tg._dpQzSet = function (open) {
+        rows.style.display = open ? '' : 'none';
+        if (footer) footer.style.display = open ? '' : 'none';
+        tg.setAttribute('aria-expanded', open ? 'true' : 'false');
+        var ch = tg.querySelector('.qz-acc-chev'); if (ch) ch.style.transform = open ? 'rotate(90deg)' : '';
+      };
+      var _t = function () { tg._dpQzSet(rows.style.display === 'none'); };
+      tg.addEventListener('click', _t);
+      tg.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); _t(); } });
+    }
+    if (typeof tg._dpQzSet === 'function') tg._dpQzSet(anyRated);
+  }
+  function clearAvm() {  /* v398: AVM-Karte + svwert-Label vollstaendig zuruecksetzen (z.B. nach Loeschen) */
+    _avm = {}; _collapsed = {};
+    var el = document.getElementById('_avm_state'); if (el) el.value = '';
+    try { renderResults(); } catch (e) {}
+    try {
+      var sv = $('svwert'); if (sv) {
+        var fld = sv.closest ? sv.closest('.f') : null;
+        var hint = fld ? fld.querySelector('.cf-hint') : null, lbl = fld ? fld.querySelector('label') : null;
+        if (hint && hint._orig) { hint.textContent = hint._orig; hint.removeAttribute('title'); hint.style.color = ''; }
+        var tn = _firstTextNode(lbl); if (tn && lbl && lbl._origTxt != null) tn.nodeValue = lbl._origTxt;
+        if (lbl) lbl.style.color = '';
+      }
+    } catch (e) {}
+  }
+  function enhanceObjektdaten() {
+    syncObjExtra(); syncQzStars();
+    if (typeof window.loadData === 'function' && !window.loadData._dpObjWrap) {
+      var _ld = window.loadData;
+      window.loadData = function () { var r = _ld.apply(this, arguments); try { setTimeout(function(){ syncObjExtra(); syncQzStars(); restoreAvmState(); }, 0); } catch (e) {} return r; };
+      window.loadData._dpObjWrap = true;
+    }
+    if (typeof window.newObj === 'function' && !window._dpObjNewWrap) {
+      window._dpObjNewWrap = true;
+      var _no = window.newObj;
+      window.newObj = function () { var r = _no.apply(this, arguments); try { setTimeout(function(){ syncObjExtra(); syncQzStars(); _avm = {}; _collapsed = {}; var el = document.getElementById('_avm_state'); if (el) el.value = ''; renderResults(); }, 0); } catch (e) {} return r; };
+    }
+  }
   function enhanceKiLage() {
     var btn = $('ki-lage-btn'); var body = $('ki-lage-body');
     if (!btn || !body || $('ki-lage-min')) return;
@@ -639,12 +972,12 @@
   /* ── Init ──────────────────────────────────────────────────────── */
   function init() {
     if (!$(MOUNT_ID)) return;
-    injectCss(); render(); enhanceKiLage();
-    fetch('/api/v1/avm/health').then(function (r) { return r.json(); }).then(function (h) { _avmHealth = h || { available: false }; render(); }).catch(function () { _avmHealth = { available: false }; render(); });
+    injectCss(); render(); enhanceKiLage(); enhanceObjektdaten(); restoreAvmState();
+    fetch('/api/v1/avm/health').then(function (r) { return r.json(); }).then(function (h) { _avmHealth = h || { available: false }; applyAvmHealth(); }).catch(function () { _avmHealth = { available: false }; applyAvmHealth(); });
   }
   var _tries = 0;
   function autoInit() { if ($(MOUNT_ID)) { init(); return; } if (_tries++ < 40) setTimeout(autoInit, 250); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoInit); else setTimeout(autoInit, 0);
   window.addEventListener('load', autoInit);
-  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage };
+  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm };
 })();
