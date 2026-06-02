@@ -45,7 +45,7 @@
   };
   function svg(name, size, stroke) { var p = ICO[name] || ''; var s = size || 14; return '<svg xmlns="http://www.w3.org/2000/svg" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="' + (stroke || 'currentColor') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; }
 
-  function mainInputs() { return { plz: val('plz'), ort: val('ort'), str: val('str'), hnr: val('hnr'), objektart: val('objart'), wfl: val('wfl'), baujahr: val('baujahr'), kp: val('kp') }; }
+  function mainInputs() { /* v438-num-fix: numerische Felder als Zahl senden (73.31 darf nicht zu 7331 werden) */ return { plz: val('plz'), ort: val('ort'), str: val('str'), hnr: val('hnr'), objektart: val('objart'), wfl: numDe(val('wfl')), baujahr: numDe(val('baujahr')), kp: numDe(val('kp')) }; }
   var REQUIRED = {
     pricehubble: [['plz', 'PLZ'], ['ort', 'Ort'], ['str', 'Straße'], ['hnr', 'Hausnummer'], ['objektart', 'Objektart'], ['wfl', 'Wohnfläche']],
     sprengnetter: [['plz', 'PLZ'], ['ort', 'Ort'], ['objektart', 'Objektart'], ['wfl', 'Wohnfläche']]
@@ -264,6 +264,17 @@
       });
     }
     if (!pairs.length) { avmFetch(provider); return; }
+    /* v441-inline-missing: kein Modal mehr – Pflichtfelder inline rot markieren */
+    try { document.querySelectorAll('.oab-missing-hl').forEach(function(el){ el.classList.remove('oab-missing-hl'); }); } catch (e) {}
+    var _firstM441 = null;
+    pairs.forEach(function (f) {
+      var el = $(f[0] === 'objektart' ? 'objart' : f[0]);
+      if (el) { el.classList.add('oab-missing-hl'); if (!_firstM441) _firstM441 = el; }
+    });
+    if (_firstM441 && _firstM441.scrollIntoView) _firstM441.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    toast('Bitte die markierten Pflichtfelder ausf\u00fcllen');
+    return;
+
     var pName = provider === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter';
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oab-miss-ov';
     var rows = pairs.map(function (f) {
@@ -310,7 +321,7 @@
         else toast('⚠ AVM-Abruf fehlgeschlagen' + (data && data.message ? ': ' + data.message : ''));
         return;
       }
-      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); persistAvmState(); toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−' + (data.cost || 0) + ' Credits)')); }
+      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); persistAvmState(); toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−' + (data.cost || 0) + ' Credits)')); /* v435-credit-refresh: Header-Marktcredit-Pille live aktualisieren */ if (data.mode !== 'stub') { try { setTimeout(function(){ if (window.AiCredits && typeof window.AiCredits.refreshAvm === 'function') window.AiCredits.refreshAvm(); }, 400); } catch (e) {} } }
     } catch (e) { toast('⚠ Netzwerkfehler beim AVM-Abruf'); }
   }
   function pickMW(r) { return _span === 'low' ? r.low : _span === 'high' ? r.high : r.marktwert; }
@@ -389,7 +400,7 @@
     return '<div class="avmx' + (isSpr ? ' is-spr' : '') + (coll ? ' collapsed' : '') + '">' +
       '<div class="avmx-head">' +
         '<span class="avmx-eye">Marktbewertung ·</span>' + _provHtml +
-        '<span class="avmx-conf">' + escH(r.conf || 'AVM') + (r.mode === 'stub' ? ' · Demo' : '') + '</span>' +
+        '<span class="avmx-conf">' + escH(r.conf || 'AVM') + (r.mode === 'stub' ? ' · DEMO (fiktive Werte)' : '') /* v445-demo-hint */ + '</span>' +
         '<button type="button" class="avmx-min" data-min="' + escH(r.provider) + '" title="' + (coll ? 'Aufklappen' : 'Minimieren') + '">' + svg('chevron', 16) + '</button>' +
       '</div>' +
       '<div class="avmx-body">' + chip +

@@ -31456,3 +31456,318 @@ aside.sidebar .sb-card.deal-lost.active {
   font-style: italic;
 }
 .v361-lage-row .pdfi-result-value { line-height: 1.35; }
+
+/* =================================================================
+   v437 - Sidebar-Suchfeld in der Portfolio-Zeile
+   ================================================================= */
+aside.sidebar .sb-section-title.sb-section-title-with-sort {
+  padding-top: 6px !important;
+  padding-bottom: 8px !important;
+  gap: 8px !important;
+  flex-wrap: nowrap;
+}
+aside.sidebar .sb-section-title-with-sort > span:first-child {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.sb-search-box {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 8px;
+  padding: 4px 9px;
+  transition: border-color .15s ease;
+}
+.sb-search-box:focus-within { border-color: var(--gold, #C9A84C); }
+.sb-search-box input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text, #F8F6F1);
+  font-size: 12px;
+  font-family: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: 0;
+}
+.sb-search-box input::placeholder { color: rgba(168,162,153,0.7); }
+.sb-search-box input[type=search]::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+aside.sidebar .sb-sort-toggle { flex: 0 0 auto; }
+
+/* =================================================================
+   v438 - Sidebar-Suchfeld in der Portfolio-Zeile
+   ================================================================= */
+aside.sidebar .sb-section-title.sb-section-title-with-sort {
+  padding-top: 6px !important;
+  padding-bottom: 8px !important;
+  gap: 8px !important;
+  flex-wrap: nowrap;
+}
+aside.sidebar .sb-section-title-with-sort > span:first-child {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.sb-search-box {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 8px;
+  padding: 4px 9px;
+  transition: border-color .15s ease;
+}
+.sb-search-box:focus-within { border-color: var(--gold, #C9A84C); }
+.sb-search-box input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #F2EFE9 !important;
+  font-size: 12px;
+  font-family: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: 0;
+}
+.sb-search-box input::placeholder { color: rgba(168,162,153,0.7); }
+.sb-search-box input[type=search]::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+aside.sidebar .sb-sort-toggle { flex: 0 0 auto; }
+
+/* =================================================================
+   v440 - Sammelpaket UI (Suchfeld kompakt, Finanz-Tab oben, Deal-Aktion, Register)
+   ================================================================= */
+/* --- Sidebar-Suchfeld: kompakt + lesbar, eine Reihe --- */
+aside.sidebar .sb-section-title.sb-section-title-with-sort {
+  padding-top: 6px !important;
+  padding-bottom: 8px !important;
+  gap: 8px !important;
+  flex-wrap: nowrap;
+}
+aside.sidebar .sb-section-title-with-sort > span:first-child { flex: 0 0 auto; white-space: nowrap; }
+.sb-search-box {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 8px;
+  padding: 0 9px;
+  transition: border-color .15s ease;
+}
+.sb-search-box:focus-within { border-color: var(--gold, #C9A84C); }
+.sb-search-box input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #F2EFE9 !important;
+  font-size: 12px;
+  font-family: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: 0;
+}
+.sb-search-box input::placeholder { color: rgba(168,162,153,0.7); }
+.sb-search-box input[type=text]::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+aside.sidebar .sb-sort-toggle { flex: 0 0 auto; }
+/* --- Finanz-Tab oben: Empfehlungs-Streifen + Zinszeile entfernen --- */
+#v10-zins-compact .v10-zc-recommend { display: none !important; }
+#v10-zins-compact .v10-zc-row2 { display: none !important; }
+#v10-zins-compact .v10-zc-row1 { justify-content: flex-end !important; }
+/* --- Deal-Aktion: Junker-Header-Banner ausblenden --- */
+/* v446: Banner wieder sichtbar (war v440-hide) */
+/* #junker-action-banner-host { display: none !important; } */
+/* --- Zins-Register-Header (einklappbar) --- */
+.mrpf-register-head {
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none;
+  padding: 9px 13px; margin: 8px 0;
+  border: 1px solid var(--border-g, rgba(201,168,76,0.3));
+  border-radius: 10px;
+  background: rgba(201,168,76,0.06);
+  font-size: 13px; font-weight: 600; color: var(--gold, #C9A84C);
+}
+.mrpf-register-head:hover { background: rgba(201,168,76,0.10); }
+.mrpf-register-chev { transition: transform .2s ease; font-size: 12px; }
+
+/* =================================================================
+   v441 - Inline-Pflichtfelder + Finanz-Card-Integration
+   ================================================================= */
+/* Rote Pflichtfeld-Markierung im Objekt-Tab (ersetzt das AVM-Modal) */
+.oab-missing-hl,
+input.oab-missing-hl,
+select.oab-missing-hl {
+  border-color: #B8625C !important;
+  background: #FBF1F0 !important;
+  box-shadow: 0 0 0 3px rgba(184,98,92,0.15) !important;
+}
+/* Card-Titel fuer integrierte Zins-Tiles */
+#v10-zins-compact .v441-cond-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--gold, #C9A84C);
+  margin: 10px 0 8px;
+}
+/* Zins-Tile-Streifen, wenn in die Card integriert */
+#v10-zins-compact #mrpf-top-strip {
+  margin: 0;
+}
+
+/* =================================================================
+   v442 - Finanz-Tiles kompakt + LTV-Switcher
+   ================================================================= */
+/* Titelzeile mit Switcher */
+.v442-cond-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap; margin: 10px 0 8px;
+}
+.v442-cond-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--gold, #C9A84C); margin: 0;
+}
+/* LTV-Switcher (3 Segmente) */
+.ltv-switch {
+  display: inline-flex; gap: 2px; padding: 2px;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid var(--border-g, rgba(201,168,76,0.3));
+  border-radius: 7px;
+}
+.ltv-switch button {
+  background: transparent; border: none; cursor: pointer;
+  font-size: 11px; font-weight: 600; padding: 4px 10px;
+  border-radius: 5px; color: var(--muted, #7A7370);
+  transition: background .15s, color .15s;
+}
+.ltv-switch button:hover { color: var(--gold, #C9A84C); }
+.ltv-switch button.active { background: var(--gold, #C9A84C); color: #2A2727; }
+/* Zins-Tiles kompakter, wenn in der Card integriert */
+#v10-zins-compact #mrpf-top-strip { margin: 0; gap: 8px; }
+#v10-zins-compact .mrpf-top-tile { padding: 8px 10px !important; }
+#v10-zins-compact .mrpf-top-head { margin-bottom: 1px !important; }
+#v10-zins-compact .mrpf-top-rate { font-size: 18px !important; margin: 1px 0 !important; line-height: 1.15 !important; }
+#v10-zins-compact .mrpf-top-detail { font-size: 10.5px !important; margin-top: 1px !important; }
+
+/* =================================================================
+   v443 - Finanz-Kopfzeile eine Reihe
+   ================================================================= */
+#v10-zins-compact { padding-top: 12px !important; padding-bottom: 12px !important; }
+.v443-cond-row {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: nowrap; margin: 0 0 10px;
+}
+.v443-cond-title {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 11px; font-weight: 700; letter-spacing: 1.1px;
+  text-transform: uppercase; color: var(--gold, #C9A84C);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.v443-cond-right { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; }
+/* LTV-Switch klein */
+.ltv-switch {
+  display: inline-flex; gap: 2px; padding: 2px;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid var(--border-g, rgba(201,168,76,0.3));
+  border-radius: 6px;
+}
+.ltv-switch button {
+  background: transparent; border: none; cursor: pointer;
+  font-size: 10.5px; font-weight: 600; padding: 3px 8px;
+  border-radius: 4px; color: var(--muted, #7A7370); line-height: 1.1;
+  transition: background .15s, color .15s; white-space: nowrap;
+}
+.ltv-switch button:hover { color: var(--gold, #C9A84C); }
+.ltv-switch button.active { background: var(--gold, #C9A84C); color: #2A2727; }
+/* Marktdaten-Button kompakt in der Kopfzeile */
+.v443-mkt-btn {
+  font-size: 11px !important; padding: 4px 11px !important;
+  height: auto !important; white-space: nowrap;
+}
+/* Zins-Tiles flacher */
+#v10-zins-compact #mrpf-top-strip { margin: 0; gap: 8px; }
+#v10-zins-compact .mrpf-top-tile { padding: 7px 10px !important; }
+#v10-zins-compact .mrpf-top-head { margin-bottom: 0 !important; }
+#v10-zins-compact .mrpf-top-rate { font-size: 16px !important; margin: 0 !important; line-height: 1.2 !important; }
+#v10-zins-compact .mrpf-top-detail { font-size: 10px !important; margin-top: 0 !important; }
+
+/* =================================================================
+   v444 - Klapp-Header Objektdetails + Sterne
+   ================================================================= */
+.obj-extra-acc, .qz-acc {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; user-select: none;
+  padding: 8px 11px; margin: 4px 0 8px;
+  border: 1px solid var(--border-g, rgba(201,168,76,0.3));
+  border-radius: 8px; background: rgba(201,168,76,0.06);
+  font-size: 13px; font-weight: 600; color: var(--text, #2A2727);
+}
+.obj-extra-acc:hover, .qz-acc:hover { background: rgba(201,168,76,0.11); }
+.obj-extra-chev, .qz-acc-chev {
+  color: var(--gold, #C9A84C); font-size: 11px;
+  transition: transform .18s ease; flex: 0 0 auto;
+}
+.obj-extra-acc-lbl, .qz-acc-lbl { flex: 0 0 auto; }
+.obj-extra-acc-hint, .qz-acc-hint {
+  font-size: 11px; font-weight: 400; color: var(--muted, #7A7370);
+  margin-left: auto; text-align: right;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* qz-acc soll volle Breite ueber dem Grid einnehmen */
+.qz-acc { width: 100%; }
+
+/* =================================================================
+   v445 - dezenter Klapp-Header + 2-spaltige Detailfelder
+   ================================================================= */
+/* dezent: kein Goldkasten, nur feine Linie + Pfeil + Text */
+.obj-extra-acc, .qz-acc {
+  background: transparent !important;
+  border: none !important;
+  border-top: 1px solid var(--border, #E0DBD3) !important;
+  border-radius: 0 !important;
+  padding: 9px 2px 5px !important;
+  margin: 8px 0 4px !important;
+  color: var(--muted, #7A7370) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: .02em;
+}
+.obj-extra-acc:hover, .qz-acc:hover {
+  background: transparent !important;
+  color: var(--gold, #C9A84C) !important;
+}
+.obj-extra-chev, .qz-acc-chev { color: var(--gold, #C9A84C) !important; }
+.obj-extra-acc-hint, .qz-acc-hint { color: var(--muted2, #9A9390) !important; }
+/* Detailfelder wieder 2-spaltig (eigenes Grid, volle Breite) */
+#obj-extra-wrap.obj-extra-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+/* =================================================================
+   v446 - Deal-Header Kontakt raus (Logo/Schriftzug bleibt, Tel/Mail weg)
+   ================================================================= */
+#junker-action-banner-host { display: flex !important; }
+.junker-action-banner-contact,
+#dp-banner-phone,
+#dp-banner-email { display: none !important; }

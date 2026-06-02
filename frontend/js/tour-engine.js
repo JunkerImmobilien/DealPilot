@@ -835,6 +835,9 @@
     },
 
     exit: function() {
+      // v433: beim Schliessen (X / ESC) als gesehen markieren, sonst startet die
+      // Tour bei jedem Hard-Reload erneut (nur complete()/skip() setzten das Flag).
+      try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}
       _cleanup();
     },
 

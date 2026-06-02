@@ -428,9 +428,9 @@ const STATIC_PFANDBRIEF_AS_OF = '2026-05';
 
 // Marge-Modell — wird im Frontend wählbar gemacht
 const MARGINS = {
-  premium:  0.60,  // LTV ≤ 60%, Top-Bonität
-  standard: 1.00,  // LTV 60-80%, normale Bonität
-  schwach:  1.60   // LTV > 90% oder Bonität mittel
+  premium:  0.40,  // LTV ≤ 60%, Top-Bonität
+  standard: 0.70,  // LTV 60-80%, normale Bonität
+  schwach:  1.00   // LTV > 90% oder Bonität mittel
 };
 
 const SOURCE_PFANDBRIEF_LIVE = {
