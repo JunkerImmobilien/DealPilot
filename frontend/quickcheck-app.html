@@ -2773,6 +2773,11 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 .qc6-pausebox-btn { background:#C9A84C; color:#1a1a1a; border:0; border-radius:8px; padding:8px 20px; font-weight:600; cursor:pointer; }
 .qc6-pausebox-btn:hover { filter:brightness(1.06); }
 </style>
+<style id="qc-v420-avmhead">
+  .avm5-logo{height:18px;width:auto;max-width:140px;object-fit:contain;display:inline-block;vertical-align:middle;mix-blend-mode:multiply;}
+  .avm5-head .avm5-conf{margin-left:8px !important;}
+  .avm5-head .avm5-x{margin-left:auto !important;}
+</style>
 </head>
 <body>
 
@@ -4279,7 +4284,7 @@ const QcApp = (function() {
 <div class="avm5-card ${isSpr ? 'is-spr' : 'is-ph'}">
   <div class="avm5-head" onclick="QcApp.toggleAvmCard(event, this)" style="cursor:pointer">
     <button class="avm5-min" type="button" title="Ein-/Ausklappen" onclick="QcApp.toggleAvmCard(event, this)">${QcIcons.svg('arrow',{size:13})}</button>
-    <span class="avm5-provider">${r.provider}</span>
+    <span class="avm5-provider"><img class="avm5-logo" src="img/${isSpr ? 'sprengnetter.jpg' : 'pricehubble.jpg'}" alt="${r.provider}" title="${r.provider}"></span>
     <span class="avm5-conf ${r.confClass}">${r.conf}</span>
     <button class="avm5-x" onclick="QcApp.dismissAvm('${isSpr ? 'spr' : 'ph'}')" title="Verwerfen">✕</button>
   </div>
@@ -4290,7 +4295,7 @@ const QcApp = (function() {
 
   <div class="avm6-actions">
     <span class="avm6-disc">Marktpreisindikation — kein Gutachten n. § 194 BauGB</span>
-    <button type="button" class="avm6-apply" onclick="QcApp.applyAvmToQc()">${QcIcons.svg('save',{size:13})} In Felder übernehmen (${lblSel})</button>
+    
   </div>
 </div>`;
   }
@@ -4707,7 +4712,16 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
     document.getElementById('transfer-modal').classList.add('show');
   }
   function closeSaveModal() { document.getElementById('transfer-modal').classList.remove('show'); }
-  function renderTransferList() {
+    // v419: PDF-Import (Bucket B+C) in die Save-Transfer-Liste einspeisen; zeigt sich
+  // im "Welche Daten übernehmen?"-Modal beim Speichern. Alte pdf_-Eintraege ersetzen.
+  function setPdfPending(list) {
+    Object.keys(_pendingTransfer).forEach(function (k) { if (k.indexOf('pdf_') === 0) delete _pendingTransfer[k]; });
+    (list || []).forEach(function (it) {
+      if (!it || !it.key) return;
+      _pendingTransfer['pdf_' + it.key] = { label: it.label, value: it.value, target: it.target, source: it.source || 'Exposé/Marktbericht' };
+    });
+  }
+function renderTransferList() {
     const list = document.getElementById('transfer-list');
     const keys = Object.keys(_pendingTransfer);
     if (keys.length === 0) {
@@ -4784,7 +4798,15 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
         };
       }
     } catch (e) {}
-    try { window.parent.postMessage({ source: 'dp-qc', type: 'qc-save', inputs: inputs, avm: avm, photos: (typeof _photos !== 'undefined' ? _photos : []) }, '*'); } catch (e) {}
+    // v419: alle angehakten Transfer-Targets (inkl. PDF-Import Bucket B+C) sammeln
+    var _pendingTargets = {};
+    try {
+      Object.keys(_pendingTransfer).forEach(function (key) {
+        var cb = document.getElementById('transfer-cb-' + key);
+        if (!cb || cb.checked) _pendingTargets[_pendingTransfer[key].target] = true;
+      });
+    } catch (e) {}
+    try { window.parent.postMessage({ source: 'dp-qc', type: 'qc-save', inputs: inputs, avm: avm, pendingTargets: _pendingTargets, photos: (typeof _photos !== 'undefined' ? _photos : []) }, '*'); } catch (e) {}
     closeSaveModal();
     showToast('💾 Objekt wird in DealPilot übernommen …');
     fireConfetti();
@@ -4892,7 +4914,7 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
     var hasKp = !!QcEngine.num(inputs.kp);
     var parts = [];
     if (sel.indexOf('ph')  !== -1) parts.push('<b>1 PriceHubble-Credit</b>');
-    if (sel.indexOf('spr') !== -1) parts.push('<b>' + (hasKp ? 3 : 2) + ' Sprengnetter-Credits</b>');
+    if (sel.indexOf('spr') !== -1) parts.push('<b>1 Sprengnetter-Credit</b>');
     if (!parts.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var n = parts.length;
     var txt = 'Beim <b>Abrufen</b> ' + (n > 1 ? 'werden ' : 'wird ') + parts.join(' + ') + ' verbraucht.';
@@ -4908,7 +4930,7 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
     var parts = [];
     if (sources.indexOf('expose') !== -1) parts.push({ key:'expose', name:'Exposé/Marktbericht', sub:'PDF auslesen', type:'free', calls:0 });
     if (sources.indexOf('ph')  !== -1)    parts.push({ key:'ph',  name:'PriceHubble', sub:'Marktwert, Mikro-/Makrolage', type:'ph',  calls:1 });
-    if (sources.indexOf('spr') !== -1)    parts.push({ key:'spr', name:'Sprengnetter', sub: hasKp ? 'Wert, Miete, Fair-Price' : 'Wert, Miete (kein Kaufpreis)', type:'spr', calls: hasKp ? 3 : 2 });
+    if (sources.indexOf('spr') !== -1)    parts.push({ key:'spr', name:'Sprengnetter', sub: hasKp ? 'Wert, Miete, Fair-Price' : 'Wert, Miete (kein Kaufpreis)', type:'spr', calls: 1 });
     /* v409-actionbar-trim: KI-Recherche als Abruf-Quelle entfernt */
     return parts;
   }
@@ -4943,39 +4965,8 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
       return;
     }
 
-    // OK: getrennte Credit-Töpfe anzeigen
-    if (noteEl) noteEl.style.display = '';
-    if (footBtn) { footBtn.removeAttribute('disabled'); footBtn.style.opacity = ''; footBtn.style.pointerEvents = ''; }
-    var parts = _creditParts(sources);
-    var html = '';
-    parts.forEach(function(p){
-      var badge;
-      if (p.type==='free') badge = '<span class="qc7-credit-badge free">kostenlos</span>';
-      else if (p.type==='ki') badge = '<span class="qc7-credit-badge ki">1 KI-Credit</span>';
-      else badge = '<span class="qc7-credit-badge">1 ' + (p.type==='ph'?'PriceHubble':'Sprengnetter') + '-Credit</span>';
-      var callInfo = p.calls > 0 ? (p.calls + ' API-Abruf' + (p.calls===1?'':'e')) : '—';
-      html += '<div class="qc6-credit-row">'
-        + '<span class="qc6-credit-name">' + p.name + '<span class="qc6-credit-sub">' + p.sub + ' · ' + callInfo + '</span></span>'
-        + badge + '</div>';
-    });
-    if (_hasExpose && (sources.indexOf('ph')!==-1 || sources.indexOf('spr')!==-1)) {
-      html += '<div class="qc6-credit-sub" style="padding:8px 0 0;color:var(--gold-3)">Adress-/Objektdaten werden zuerst aus dem Exposé übernommen.</div>';
-    }
-    listEl.innerHTML = html;
-
-    // Getrennte Gesamtzeilen je Credit-Typ (NICHT verrechnet)
-    var nPh  = parts.filter(function(p){return p.type==='ph';}).length;
-    var nSpr = parts.filter(function(p){return p.type==='spr';}).length;
-    var nKi  = parts.filter(function(p){return p.type==='ki';}).length;
-    var tot  = '<div class="qc7-credit-totals">';
-    if (nPh)  tot += '<div class="qc7-credit-totline"><span>PriceHubble-Credits</span><span class="v">' + nPh + '</span></div>';
-    if (nSpr) tot += '<div class="qc7-credit-totline"><span>Sprengnetter-Credits</span><span class="v">' + nSpr + '</span></div>';
-    if (nKi)  tot += '<div class="qc7-credit-totline"><span>KI-Credits</span><span class="v">' + nKi + '</span></div>';
-    if (!nPh && !nSpr && !nKi) tot += '<div class="qc7-credit-totline"><span>Kosten</span><span class="v">kostenlos</span></div>';
-    tot += '</div>';
-    if (totBox) totBox.innerHTML = tot;
-
-    document.getElementById('qc6-credit-modal').classList.add('show');
+    // v421: Bestaetigungs-Modal entfernt -> direkt abrufen (Quellen-/Pflichtfeld-Pruefung oben bleibt).
+    _runSelected(sources);
   }
 
   function closeCreditModal() { document.getElementById('qc6-credit-modal').classList.remove('show'); }
@@ -5120,7 +5111,7 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
     applyAvmNkm, dismissAvm, toggleAvmCard,
     handlePhotos, removePhoto, addExposePhotos,
     showApiKeyModal, closeApiModal, runRealAi,
-    openSaveModal, closeSaveModal, confirmSave, toggleAllTransfer,
+    openSaveModal, closeSaveModal, confirmSave, toggleAllTransfer, setPdfPending,
     setSpanConfig, openQc6Settings, closeQc6Settings, toggleSource,
     openCreditModal, closeCreditModal, confirmCreditModal
   };
@@ -5184,11 +5175,27 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 <script id="qc-bridge-listener">
 (function(){
   function _s(id,v){ var e=document.getElementById(id); if(e&&v!=null&&String(v)!==""){ e.value=String(v); try{e.dispatchEvent(new Event("input",{bubbles:true}));}catch(_){} } }
+  function _applyImportData(im){
+    Object.keys(im||{}).forEach(function(id){
+      var v=im[id]; if(v==null||String(v)==="") return;
+      var e=document.getElementById(id); if(!e) return;
+      if(e.tagName==="SELECT" && e.options){
+        var raw=String(v).trim().toLowerCase();
+        for(var i=0;i<e.options.length;i++){
+          var t=(e.options[i].text||"").toLowerCase(), vv=(e.options[i].value||"").toLowerCase();
+          if(t===raw||vv===raw||(t&&t.indexOf(raw)>=0)||(raw&&raw.indexOf(t)>=0)){ e.selectedIndex=i; try{e.dispatchEvent(new Event("change",{bubbles:true}));}catch(_){} return; }
+        }
+        return;
+      }
+      e.value=String(v); try{e.dispatchEvent(new Event("input",{bubbles:true}));}catch(_){}
+    });
+  }
   window.addEventListener("message", function(ev){
     var d=ev.data; if(!d||d.source!=="dp-app") return;
     if(d.type==="qc-import-result"){
       var im=d.data||{};
-      ["qc_str","qc_hnr","qc_plz","qc_ort","qc_adresse","qc_wfl","qc_bj","qc_zimmer","qc_kp","qc_nkm","qc_hg"].forEach(function(k){ _s(k, im[k]); });
+      _applyImportData(im);
+      if (d.pending && window.QcApp && QcApp.setPdfPending) { try { QcApp.setPdfPending(d.pending); } catch(_){} }
       try{ if(window.QcApp&&QcApp.mieteAddUp) QcApp.mieteAddUp(); }catch(_){}
       try{ if(window.QcApp&&QcApp.scheduleUpdate) QcApp.scheduleUpdate(); }catch(_){}
       if(window._qcImportResolve){ var r=window._qcImportResolve; window._qcImportResolve=null; r(); }

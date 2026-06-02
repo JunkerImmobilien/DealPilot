@@ -16,6 +16,7 @@
 const express = require('express');
 const Stripe = require('stripe');
 const { CREDIT_PACKS, getPack, listPacks } = require('../services/creditPacks');
+const avmPacks = require('../services/avmPacks');
 
 const router = express.Router();
 
@@ -71,11 +72,24 @@ router.get('/packs', (req, res) => {
 // GET /api/v1/credits/balance
 // ──────────────────────────────────────────────────────────
 
+router.get('/avm-packs', (req, res) => {
+  res.json({
+    packs: avmPacks.listPacks().map(function (p) {
+      return {
+        id: p.id, kind: 'avm', label: p.label, credits: p.credits,
+        amount_cents: p.amount_cents, currency: p.currency,
+        price_per_call_cents: Math.round(p.amount_cents / p.credits),
+        popular: p.popular
+      };
+    })
+  });
+});
+
 router.get('/balance', userAuth, async (req, res) => {
   const db = req.app.get('db');
   try {
     const r = await db.query(
-      'SELECT current_period_used, bonus_credits FROM ai_credits_user WHERE user_id = $1',
+      'SELECT current_period_used, bonus_credits, avm_bonus_credits FROM ai_credits_user WHERE user_id = $1',
       [req.user.id]
     );
     const row = r.rows[0] || { current_period_used: 0, bonus_credits: 0 };
@@ -87,7 +101,8 @@ router.get('/balance', userAuth, async (req, res) => {
     res.json({
       current_period_used: row.current_period_used || 0,
       bonus_credits: bonus_marketing_credits,   // wie auf Marketing-Seite (1=2 Anfragen)
-      bonus_requests_left: bonus_requests_left  // tatsächliche Anfragen die übrig sind
+      bonus_requests_left: bonus_requests_left,
+      avm_credits: (row.avm_bonus_credits || 0)  // tatsächliche Anfragen die übrig sind
     });
   } catch (err) {
     console.error('[credits/balance] error:', err);
@@ -107,9 +122,11 @@ router.post('/checkout', userAuth, async (req, res) => {
     return res.status(500).json({ error: 'stripe_not_configured' });
   }
 
-  const pack = getPack(pack_id);
+  let pack = getPack(pack_id);
+  let packKind = 'ki';
+  if (!pack) { pack = avmPacks.getPack(pack_id); if (pack) packKind = 'avm'; }
   if (!pack) {
-    return res.status(400).json({ error: 'invalid_pack', valid_packs: Object.keys(CREDIT_PACKS) });
+    return res.status(400).json({ error: 'invalid_pack', valid_packs: Object.keys(CREDIT_PACKS).concat(avmPacks.listPacks().map(function (p) { return p.id; })) });
   }
 
   try {
@@ -159,7 +176,8 @@ router.post('/checkout', userAuth, async (req, res) => {
         user_id: user.id,
         pack_id: pack.id,
         credits_granted: String(pack.credits),
-        bonus_credits_units: String(pack.bonus_credits_units),
+        bonus_credits_units: String(pack.bonus_credits_units || pack.credits),
+        kind: packKind,
         type: 'credit_pack'
       },
       payment_intent_data: {
@@ -178,9 +196,9 @@ router.post('/checkout', userAuth, async (req, res) => {
     // 4) Purchase-Eintrag (pending)
     await db.query(`
       INSERT INTO credit_purchases
-        (user_id, pack_id, credits_granted, amount_cents, currency, stripe_session_id, status)
-      VALUES ($1, $2, $3, $4, $5, $6, 'pending')
-    `, [user.id, pack.id, pack.credits, pack.amount_cents, pack.currency, session.id]);
+        (user_id, pack_id, credits_granted, amount_cents, currency, stripe_session_id, status, kind)
+      VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7)
+    `, [user.id, pack.id, pack.credits, pack.amount_cents, pack.currency, session.id, packKind]);
 
     res.json({
       url: session.url,

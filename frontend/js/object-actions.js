@@ -19,6 +19,9 @@
   var _avmHealth = null;
   var _collapsed = {};
   var _oabiDone = null;  /* v393: Kombi-Flow Completion */
+  var _qcMode = false;            /* v418: Import aus dem Quick-Check */
+  var _qcPendingMerged = {};      /* v418: Bucket B+C -> beim qc-save ins Objekt */
+  var OBJ2QC = { str:'qc_str', hnr:'qc_hnr', plz:'qc_plz', ort:'qc_ort', wfl:'qc_wfl', baujahr:'qc_bj', zimmer:'qc_zimmer', objart:'qc_objektart', kp:'qc_kp', nkm:'qc_nkm', hg_ul:'qc_hg', ek:'qc_ek', ds2_energie:'qc_energieklasse', stellpl_aussen:'qc_stellplatz' };  /* v418: Bucket A */
 
   function $(id) { return document.getElementById(id); }
   function val(id) { var e = $(id); return e ? (e.value || '').trim() : ''; }
@@ -215,7 +218,7 @@
     var _total = 0;
     var parts = avm.map(function (s) {
       if (s === 'pricehubble') { _total += 1; return '<b>1 PriceHubble-Credit</b>'; }
-      var c = _hasKp ? 3 : 2; _total += c; return '<b>' + c + ' Sprengnetter-Credit' + (c > 1 ? 's' : '') + '</b>';
+      _total += 1; return '<b>1 Sprengnetter-Credit</b>';
     }).join(' + ');
     var txt = 'Beim <b>Abrufen</b> ' + (_total > 1 ? 'werden ' : 'wird ') + parts + ' verbraucht' + (avm.length > 1 ? ' (' + _total + ' gesamt)' : '') + '.';
     if (demo) txt += ' <span style="opacity:.75">Im Demo-Modus aktuell kostenlos.</span>';
@@ -737,7 +740,7 @@
     host.innerHTML = addrHtml + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
-      return '<tr><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '" checked></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + '</td></tr>';
+      return '<tr><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '" checked></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:#9a7f33;font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
     }).join('') + '</tbody></table>';
     if (ab) ab.disabled = false;
     // Range-Toggle-Handler
@@ -755,8 +758,10 @@
     });
   }
   function _fireOabiDone() { var d = _oabiDone; _oabiDone = null; if (typeof d === 'function') { try { setTimeout(d, 0); } catch (e) { d(); } } }
-  function openCombinedImport(onDone) {
+  function openCombinedImport(onDone, opts) {
     _oabiDone = (typeof onDone === 'function') ? onDone : null;
+    _qcMode = !!(opts && opts.target === 'qc');  /* v418 */
+    _qcPendingMerged = {};
     _merged = {}; _files = []; _importPhotos = [];
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
     ov.innerHTML =
@@ -864,6 +869,7 @@
   }
   function applyMerged() {
     var ov = $('oabi-ov'); if (!ov) return;
+    if (_qcMode) { return applyMergedQc(ov); }  /* v418 */
     var n = 0, _applied = [];
     ov.querySelectorAll('.oabi-tbl input[type="checkbox"]:checked').forEach(function (cb) {
       var id = cb.getAttribute('data-id'), it = _merged[id]; if (!it) return;
@@ -885,6 +891,48 @@
     toast('✓ ' + n + ' Werte aus Import übernommen');
   }
 
+  // v418: QC-Modus — angehakte Zeilen splitten. Bucket A (qc_-Feld) -> zurueck an
+  // den iframe (qcData). Bucket B+C (kein qc_-Feld) -> _qcPendingMerged stashen +
+  // pendingList melden (Anzeige im Save-Transfer-Modal). Schreibt NICHTS in Objektfelder.
+  function applyMergedQc(ov) {
+    var qcData = {}, pendingList = [];
+    ov.querySelectorAll('.oabi-tbl input[type="checkbox"]:checked').forEach(function (cb) {
+      var id = cb.getAttribute('data-id'); if (!id) return;
+      var it = _merged[id]; if (!it) return;
+      var q = OBJ2QC[id];
+      if (q) { qcData[q] = it.raw; }
+      else {
+        _qcPendingMerged[id] = it;
+        pendingList.push({ key: id, label: it.label, value: it.value, target: id, source: it.source });
+      }
+    });
+    var photos = [];
+    try {
+      var pcb = ov.querySelector('.oabi-tbl input[data-photos="1"]:checked');
+      if (pcb && _importPhotos && _importPhotos.length) photos = _importPhotos.slice(0, 6);
+    } catch (e) {}
+    var done = _oabiDone; _oabiDone = null;
+    ov.remove();
+    if (typeof done === 'function') { try { done({ qcData: qcData, pendingList: pendingList, photos: photos }); } catch (e) {} }
+  }
+  // v418: beim qc-save aufgerufen — Bucket B+C aus dem Stash ins frisch angelegte
+  // Objekt schreiben (gleiche Schreiblogik wie applyMerged), gefiltert nach den im
+  // Transfer-Modal angehakten Targets. Danach Stash leeren.
+  function applyQcPending(targets) {
+    var n = 0, applied = [];
+    Object.keys(_qcPendingMerged).forEach(function (id) {
+      if (targets && !targets[id]) return;
+      var it = _qcPendingMerged[id]; if (!it) return;
+      if (it.kind === 'star') { if (it.raw > 0 && window.StarRating && typeof StarRating.setRating === 'function') { StarRating.setRating(id, it.raw); n++; applied.push(id); } return; }
+      if (it.kind === 'select') { if (setSelectSmart(id, it.raw, it.emptyOnly)) { n++; applied.push(id); } return; }
+      setInput(id, it.raw); if (id === 'svwert') { try { markSvwertAvm(); } catch (e) {} } n++; applied.push(id);
+    });
+    _qcPendingMerged = {};
+    try { if (typeof window._v236MarkQcLoaded === 'function' && applied.length) window._v236MarkQcLoaded(applied); } catch (e) {}
+    try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
+    try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
+    return n;
+  }
   /* ── KI-Lage-Karte minimierbar machen (ohne ki-lage.js zu aendern) ── */
   function syncObjExtra() {
     var ids = ['zimmer','bad_anz','etage','etagen_ges','modernis','garagen','stellpl_aussen','balkon_flae'];
@@ -984,5 +1032,5 @@
   function autoInit() { if ($(MOUNT_ID)) { init(); return; } if (_tries++ < 40) setTimeout(autoInit, 250); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoInit); else setTimeout(autoInit, 0);
   window.addEventListener('load', autoInit);
-  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm };
+  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm, applyQcPending: applyQcPending };
 })();

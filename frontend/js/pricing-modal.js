@@ -232,6 +232,24 @@
         '<p class="dp-note" style="text-align:center;margin-top:14px">Credits sind ab dem Starter-Plan zubuchbar und verfallen nicht.</p>' +
       '</div>' +
 
+      // Marktdaten-Credits (v424)
+      '<div class="dp-container dp-section">' +
+        '<div class="dp-section-head">' +
+          '<span class="dp-pill dp-pill-alt">Marktdaten-Credits</span>' +
+          '<h2 class="dp-h2">Echte Marktwerte auf Knopfdruck</h2>' +
+          '<p class="dp-sub">' +
+            '<strong>1 Credit = 1 Abruf.</strong> Automatische Marktbewertung über PriceHubble oder Sprengnetter. Ab dem Starter-Plan zubuchbar, Credits verfallen nicht.' +
+          '</p>' +
+        '</div>' +
+        '<div class="dp-credits-grid">' +
+          _avmCard(1, 7.99, 'avm_1', 'Einzelabruf', false) +
+          _avmCard(5, 37.95, 'avm_5', 'Mehrere Objekte', true) +
+          _avmCard(10, 69.90, 'avm_10', 'Aktiver Investor', false) +
+          _avmCard(25, 159.75, 'avm_25', 'Profi / Sachverständiger', false) +
+        '</div>' +
+        '<p class="dp-note" style="text-align:center;margin-top:14px">Daten von PriceHubble &amp; Sprengnetter · ab Starter · Credits verfallen nicht.</p>' +
+      '</div>' +
+
       // V63.82: Feature-Übersicht — vollständige Vergleichstabelle
       '<div class="dp-container dp-feature-table-wrap">' +
         '<h3 class="dp-feature-table-h">Feature-Übersicht — alle Pläne im Vergleich</h3>' +
@@ -356,6 +374,23 @@
       '<div class="dp-credits-divider"></div>' +
       '<div class="dp-credits-price">' + price + ' €</div>' +
       '<div class="dp-credits-perunit">' + perAnfrageStr + ' / Anfrage</div>' +
+      '<div class="dp-credits-target">' + target + '</div>' +
+      '<a class="dp-credits-cta" href="#" data-pack-id="' + packId + '" onclick="window._buyCreditPackDirect(this); return false;">Credits kaufen</a>' +
+    '</div>';
+  }
+
+  function _avmCard(credits, price, packId, target, best) {
+    var priceStr = price.toFixed(2).replace('.', ',');
+    var perCallStr = (price / credits).toFixed(2).replace('.', ',') + ' €';
+    var credLabel = credits === 1 ? '1 Credit' : credits + ' Credits';
+    var abrufLabel = credits === 1 ? '1 Abruf' : credits + ' Abrufe';
+    return '<div class="dp-credits-card' + (best ? ' dp-credits-card-best' : '') + '">' +
+      (best ? '<span class="dp-credits-best">Beliebt</span>' : '') +
+      '<div class="dp-credits-amount">' + credits + '</div>' +
+      '<div class="dp-credits-amount-label">' + credLabel + ' = ' + abrufLabel + '</div>' +
+      '<div class="dp-credits-divider"></div>' +
+      '<div class="dp-credits-price">' + priceStr + ' €</div>' +
+      '<div class="dp-credits-perunit">' + perCallStr + ' / Abruf</div>' +
       '<div class="dp-credits-target">' + target + '</div>' +
       '<a class="dp-credits-cta" href="#" data-pack-id="' + packId + '" onclick="window._buyCreditPackDirect(this); return false;">Credits kaufen</a>' +
     '</div>';
