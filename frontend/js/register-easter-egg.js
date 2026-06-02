@@ -149,10 +149,11 @@
 
     // Close-Handler
     document.getElementById('dp-register-close').addEventListener('click', function () { if (typeof showAuthModal === 'function') setTimeout(function(){ showAuthModal('login'); }, 50);
+      try { sessionStorage.removeItem('dp_auth_flow'); } catch (e) {}
       modal.remove();
     });
     modal.addEventListener('click', function (e) {
-      if (e.target === modal) { modal.remove(); if (typeof showAuthModal === 'function') setTimeout(function(){ showAuthModal('login'); }, 50); }
+      if (e.target === modal) { try { sessionStorage.removeItem('dp_auth_flow'); } catch (e2) {} modal.remove(); if (typeof showAuthModal === 'function') setTimeout(function(){ showAuthModal('login'); }, 50); }
     });
 
     // V271a-register-consent: Submit nur aktiv wenn Checkbox an
@@ -320,6 +321,7 @@
 
     // ?register=1 → Register-Modal direkt öffnen (Landingpage-Link)
     if (params.get('register') === '1') {
+      try { sessionStorage.setItem('dp_auth_flow', '1'); } catch (e) {}
       var clean2 = window.location.pathname;
       history.replaceState({}, '', clean2);
       setTimeout(showRegisterModal, 400);  // Etwas warten bis DOM/Auth-Modal etc. ready

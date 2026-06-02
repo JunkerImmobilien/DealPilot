@@ -902,12 +902,17 @@
         console.log('[DpTour V247] Auto-Start unterdrueckt: URL-Param signalisiert Auth-Flow');
         return;
       }
+      // v427: persistenter Marker (URL wird vom register-Handler bereinigt)
+      try { if (sessionStorage.getItem('dp_auth_flow')) {
+        console.log('[DpTour v427] Auto-Start unterdrueckt: dp_auth_flow gesetzt');
+        return;
+      } } catch (e) {}
       // V247: Laengere Wartezeit damit Sidebar fertig rendert + Auth-Modal-Check
       setTimeout(function() {
         if (Tour.isComplete()) return;
         // V247: Modal-Check direkt vor Start (nicht nur beim DOMContentLoaded)
-        if (document.getElementById('auth-modal')) {
-          console.log('[DpTour V247] Auto-Start unterdrueckt: Auth-Modal noch offen');
+        if (document.getElementById('auth-modal') || document.getElementById('dp-register-modal')) {
+          console.log('[DpTour V247/v427] Auto-Start unterdrueckt: Auth-/Register-Modal noch offen');
           return;
         }
         // V247: Session muss aktiv sein
