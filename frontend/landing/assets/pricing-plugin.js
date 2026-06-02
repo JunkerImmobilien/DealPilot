@@ -202,6 +202,24 @@
           '<p class="dp-note" style="text-align:center;margin-top:14px">Credits sind ab dem Starter-Plan zubuchbar und verfallen nicht.</p>' +
         '</div>' +
 
+        // Marktdaten-Credits (Landing)
+        '<div class="dp-container dp-section">' +
+          '<div class="dp-section-head">' +
+            '<span class="dp-pill dp-pill-alt">Marktdaten-Credits</span>' +
+            '<h2 class="dp-h2">Echte Marktwerte auf Knopfdruck</h2>' +
+            '<p class="dp-sub">' +
+              '<strong>1 Credit = 1 Abruf.</strong> Automatische Marktbewertung über PriceHubble oder Sprengnetter. Ab dem Starter-Plan zubuchbar, Credits verfallen nicht.' +
+            '</p>' +
+          '</div>' +
+          '<div class="dp-credits-grid">' +
+            _avmCard(1,   7.99,   'Einzelabruf',               false) +
+            _avmCard(5,   37.95,  'Mehrere Objekte',           true)  +
+            _avmCard(10,  69.90,  'Aktiver Investor',          false) +
+            _avmCard(25,  159.75, 'Profi / Sachverständiger',  false) +
+          '</div>' +
+          '<p class="dp-note" style="text-align:center;margin-top:14px">Daten von PriceHubble &amp; Sprengnetter · ab Starter · Credits verfallen nicht.</p>' +
+        '</div>' +
+
         // Feature-Übersicht
         '<div class="dp-container dp-table-wrap-outer">' +
           '<h3 class="dp-section-h">Feature-Übersicht — alle Pläne im Vergleich</h3>' +
@@ -303,6 +321,23 @@
       '<div class="dp-credits-perunit">' + perAnfrageStr + ' / Anfrage</div>' +
       '<div class="dp-credits-target">' + target + '</div>' +
       '<a class="dp-credits-cta" href="https://app.dealpilot.junker-immobilien.io/?register=1&credits=' + credits + '">Credits kaufen</a>' +
+    '</div>';
+  }
+
+  function _avmCard(credits, price, target, best) {
+    var priceStr = price.toFixed(2).replace('.', ',');
+    var perCallStr = (price / credits).toFixed(2).replace('.', ',') + ' €';
+    var credLabel = credits === 1 ? '1 Credit' : credits + ' Credits';
+    var abrufLabel = credits === 1 ? '1 Abruf' : credits + ' Abrufe';
+    return '<div class="dp-credits-card' + (best ? ' dp-credits-card-best' : '') + '">' +
+      (best ? '<span class="dp-credits-best">Beliebt</span>' : '') +
+      '<div class="dp-credits-amount">' + credits + '</div>' +
+      '<div class="dp-credits-amount-label">' + credLabel + ' = ' + abrufLabel + '</div>' +
+      '<div class="dp-credits-divider"></div>' +
+      '<div class="dp-credits-price">' + priceStr + ' €</div>' +
+      '<div class="dp-credits-perunit">' + perCallStr + ' / Abruf</div>' +
+      '<div class="dp-credits-target">' + target + '</div>' +
+      '<a class="dp-credits-cta" href="https://app.dealpilot.junker-immobilien.io/?register=1&avm=' + credits + '">Credits kaufen</a>' +
     '</div>';
   }
 
