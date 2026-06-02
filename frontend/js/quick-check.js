@@ -2011,160 +2011,75 @@
   }
 
   function qcImportPdfTrigger() {
-    if (typeof showPdfImport === 'function') {
-      showPdfImport(function(extracted) {
-        // Exposé-Fotos für die Quick-Check-Übernahme zwischenspeichern
-        try { window._qcExposePhotos = (extracted && extracted._photos) ? extracted._photos.slice() : []; } catch (e) {}
-        function set(id, val) { var e = document.getElementById(id); if (e && val) e.value = val; }
-        function setSel(id, val) {
-          var e = document.getElementById(id); if (!e || !val) return;
-          if (!e.options || typeof e.options.length !== 'number') return;  /* v407-setsel-guard: kein <select> -> ueberspringen statt crashen */
-          var raw = String(val).trim().toLowerCase();
-          for (var i = 0; i < e.options.length; i++) {
-            var t = (e.options[i].text || '').toLowerCase();
-            var vv = (e.options[i].value || '').toLowerCase();
-            if (t === raw || vv === raw || t.indexOf(raw) >= 0 || raw.indexOf(t) >= 0) {
-              e.selectedIndex = i; return;
-            }
-          }
-        }
-
-        // Pflicht-/Standardfelder
-        if (extracted.kaufpreis)      set('qc_kp',      extracted.kaufpreis);
-        if (extracted.wohnflaeche)    set('qc_wfl',     extracted.wohnflaeche);
-        if (extracted.baujahr)        set('qc_bj',      extracted.baujahr);
-        if (extracted.nettokaltmiete) set('qc_nkm',     extracted.nettokaltmiete);
-        if (extracted.hausgeld)       set('qc_hg',      extracted.hausgeld);
-        if (extracted.adresse || extracted.strasse || extracted.plz || extracted.ort) {
-          // V199: Defensiv — Backend liefert evtl. separate Felder ODER kombinierte Adresse
-          console.log('[V199 pdf-import] adresse fields:', {
-            adresse: extracted.adresse,
-            strasse: extracted.strasse,
-            hausnummer: extracted.hausnummer || extracted.hausnr,
-            plz: extracted.plz,
-            ort: extracted.ort
-          });
-
-          // Priorität 1: separate Felder vom Backend
-          if (extracted.strasse)     set('qc_str', extracted.strasse);
-          if (extracted.hausnummer)  set('qc_hnr', extracted.hausnummer);
-          if (extracted.hausnr)      set('qc_hnr', extracted.hausnr);
-          if (extracted.plz)         set('qc_plz', String(extracted.plz));
-          if (extracted.ort)         set('qc_ort', extracted.ort);
-
-          // Priorität 2: aus kombinierter Adresse splitten (Lücken füllen)
-          if (extracted.adresse) {
-            var addr = String(extracted.adresse).trim();
-            // Match: "Straße HNR, PLZ Ort" (typisches Format)
-            var m = addr.match(/^(.+?)\s+(\d+[a-zA-Z]?)(?:\s*,\s*|\s+)(\d{5})\s+(.+)$/);
-            if (m) {
-              if (!document.getElementById('qc_str').value) set('qc_str', m[1].trim());
-              if (!document.getElementById('qc_hnr').value) set('qc_hnr', m[2].trim());
-              if (!document.getElementById('qc_plz').value) set('qc_plz', m[3].trim());
-              if (!document.getElementById('qc_ort').value) set('qc_ort', m[4].trim());
-            } else {
-              var m2 = addr.match(/^(.+?)\s*,\s*(\d{5})\s+(.+)$/);
-              if (m2) {
-                if (!document.getElementById('qc_str').value) set('qc_str', m2[1].trim());
-                if (!document.getElementById('qc_plz').value) set('qc_plz', m2[2].trim());
-                if (!document.getElementById('qc_ort').value) set('qc_ort', m2[3].trim());
-              } else {
-                var m3 = addr.match(/(\d{5})\s+(.+?)(?:[,;]|$)/);
-                if (m3) {
-                  if (!document.getElementById('qc_plz').value) set('qc_plz', m3[1].trim());
-                  if (!document.getElementById('qc_ort').value) set('qc_ort', m3[2].trim());
-                  // Versuche Straße separat aus dem Anfang zu ziehen
-                  var beforePlz = addr.split(/\d{5}/)[0].replace(/[,;]\s*$/, '').trim();
-                  if (beforePlz) {
-                    // Straße + HNR splitten
-                    var sm = beforePlz.match(/^(.+?)\s+(\d+[a-zA-Z]?)\s*$/);
-                    if (sm) {
-                      if (!document.getElementById('qc_str').value) set('qc_str', sm[1].trim());
-                      if (!document.getElementById('qc_hnr').value) set('qc_hnr', sm[2].trim());
-                    } else {
-                      if (!document.getElementById('qc_str').value) set('qc_str', beforePlz);
-                    }
-                  }
-                } else {
-                  if (!document.getElementById('qc_str').value) set('qc_str', addr);
-                }
-              }
-            }
-            set('qc_adresse', addr);
-          } else {
-            // Kombinierte Adresse zusammenbauen für Backward-Compat
-            var combined = [
-              ((extracted.strasse || '') + ' ' + (extracted.hausnummer || extracted.hausnr || '')).trim(),
-              ((extracted.plz || '') + ' ' + (extracted.ort || '')).trim()
-            ].filter(Boolean).join(', ');
-            if (combined) set('qc_adresse', combined);
-          }
-
-          // V199: Nach Adresse-Setzen direkt qcCalc triggern (KNK aus PLZ etc.)
-          if (typeof qcCalc === 'function') qcCalc();
-        }
-
-        // V54: Optionale Felder
-        if (extracted.zimmer)         set('qc_zimmer',       extracted.zimmer);
-        if (extracted.energieklasse)  setSel('qc_energieklasse', extracted.energieklasse);
-        if (extracted.objektart)      setSel('qc_objektart',     extracted.objektart);
-        if (extracted.stellplatz)     set('qc_stellplatz',   extracted.stellplatz);
-        // V63.8: qc_ek_pdf Feld entfernt
-        if (extracted.kaufnebenkosten) set('qc_knk',         extracted.kaufnebenkosten);
-
-        // V54: Hausgeld → automatisch HG-Direkt-Modus aktivieren
-        if (extracted.hausgeld) {
-          set('qc_hg', extracted.hausgeld);
-          if (typeof qcBewirtMode === 'function') qcBewirtMode('hg');
-        }
-        // Verwaltung + Instandhaltung → in NUL aufaddieren (falls HG nicht da)
-        if (!extracted.hausgeld && (extracted.verwaltung || extracted.instandhaltung)) {
-          var verw = parseFloat((extracted.verwaltung || '0').toString().replace(',', '.')) || 0;
-          var inst = parseFloat((extracted.instandhaltung || '0').toString().replace(',', '.')) || 0;
-          var nulY = (verw + inst) * 12; // monatlich → jährlich
-          if (nulY > 0) {
-            set('qc_nul', String(Math.round(nulY)));
-          }
-        }
-        // Optionales: Eigenkapital aus PDF in qc_ek übernehmen wenn dort noch nichts steht
-        // V206: Wenn aus PDF, als aiSet markieren — verhindert Auto-Überschreibung beim LTV-Wechsel
-        if (extracted.eigenkapital && !document.getElementById('qc_ek').value) {
-          set('qc_ek', extracted.eigenkapital);
-          var ekInpPdf = document.getElementById('qc_ek');
-          if (ekInpPdf) ekInpPdf.dataset.aiSet = '1';
-        }
-
-        // Open the optional details if any optional field came in
-        var hasOptional = extracted.zimmer || extracted.energieklasse || extracted.objektart ||
-                          extracted.stellplatz || extracted.eigenkapital;
-        if (hasOptional) {
-          var det = document.getElementById('qc-optional-block');
-          if (det) det.open = true;
-        }
-
-        if (Array.isArray(extracted._photos) && extracted._photos.length) {
-          // V58: extracted._photos zusätzlich auch in _qcImgs übernehmen + sichtbar machen
-          extracted._photos.forEach(function(src) {
-            if (_qcImgs.length < 6) _qcImgs.push({ src: src, name: 'pdf_extracted.jpg' });
-          });
-          _qcRenderPhotos();
-          // V58: ZUSÄTZLICH direkt in das Haupt-Foto-Grid (Tab Objekt) schreiben
-          // Damit der User sofort sieht, dass die Fotos auch im Tab Objekt landen
-          if (typeof window.dpSetImgs === 'function') {
-            window.dpSetImgs(_qcImgs.slice());
-            console.log('[QC-PDF] ' + _qcImgs.length + ' Fotos auch in Haupt-Grid (imgs) geschrieben');
-          }
-        }
-        qcCalc();
-        if (typeof toast === 'function') {
-          var pn = (extracted._photos && extracted._photos.length) || 0;
-          toast('✓ ' + Object.keys(extracted).length + ' Felder' +
-                (pn > 0 ? ' + ' + pn + ' Foto' + (pn===1?'':'s') : '') + ' aus PDF übernommen');
-        }
-      });
-    } else {
-      if (typeof toast === 'function') toast('PDF-Import wird gerade geladen — bitte erneut probieren.');
+    if (typeof showPdfImport !== 'function') {
+      if (typeof toast === 'function') toast('PDF-Import wird gerade geladen \u2014 bitte erneut probieren.');
+      return;
     }
+    // v417: skipReview -> Parent zeigt KEINE eigene Pick-Tabelle; volle Extraktion
+    // kommt in den Callback. Wir bauen daraus rows[] und legen sie als Payload ab.
+    // Die Bridge pollt _qcImportPayload und postet sie an den iframe (Review dort).
+    showPdfImport(function (extracted) {
+      try { window._qcExposePhotos = (extracted && extracted._photos) ? extracted._photos.slice() : []; } catch (e) {}
+      try {
+        window._qcImportPayload = {
+          rows: _qcBuildImportRows(extracted || {}),
+          photos: (window._qcExposePhotos || []).slice()
+        };
+      } catch (e) { console.error('[QC-PDF v417] buildRows:', e); window._qcImportPayload = { rows: [], photos: [] }; }
+    }, { skipReview: true });
+  }
+
+  // v417: extracted (pdf-import EXPOSE_FIELDS + Backend-Extras) -> rows[] fuer die
+  // iframe-Review-Tabelle. NUR Felder mit echtem qc_-Ziel (E4: nebenkosten/
+  // verwaltung/instandhaltung/kaufnebenkosten/balkon bewusst weggelassen).
+  function _qcBuildImportRows(x) {
+    function _fmtEur(v) {
+      var n = parseFloat(String(v).replace(/\./g, '').replace(',', '.'));
+      return isNaN(n) ? String(v) : Math.round(n).toLocaleString('de-DE') + ' \u20AC';
+    }
+    var str = x.strasse || '', hnr = x.hausnummer || x.hausnr || '';
+    var plz = x.plz ? String(x.plz) : '', ort = x.ort || '';
+    if (x.adresse) {
+      var addr = String(x.adresse).trim();
+      var m = addr.match(/^(.+?)\s+(\d+[a-zA-Z]?)(?:\s*,\s*|\s+)(\d{5})\s+(.+)$/);
+      if (m) { str = str || m[1].trim(); hnr = hnr || m[2].trim(); plz = plz || m[3].trim(); ort = ort || m[4].trim(); }
+      else {
+        var m2 = addr.match(/^(.+?)\s*,\s*(\d{5})\s+(.+)$/);
+        if (m2) { str = str || m2[1].trim(); plz = plz || m2[2].trim(); ort = ort || m2[3].trim(); }
+        else {
+          var m3 = addr.match(/(\d{5})\s+(.+?)(?:[,;]|$)/);
+          if (m3) {
+            plz = plz || m3[1].trim(); ort = ort || m3[2].trim();
+            var bp = addr.split(/\d{5}/)[0].replace(/[,;]\s*$/, '').trim();
+            if (bp) {
+              var sm = bp.match(/^(.+?)\s+(\d+[a-zA-Z]?)\s*$/);
+              if (sm) { str = str || sm[1].trim(); hnr = hnr || sm[2].trim(); }
+              else { str = str || bp; }
+            }
+          } else { str = str || addr; }
+        }
+      }
+    }
+    var rows = [];
+    function push(id, label, val, display, sel) {
+      if (val == null || String(val).trim() === '') return;
+      rows.push({ id: id, label: label, value: String(val).trim(), display: display || String(val).trim(), sel: !!sel });
+    }
+    push('qc_str', 'Stra\u00DFe', str);
+    push('qc_hnr', 'Hausnummer', hnr);
+    push('qc_plz', 'PLZ', plz);
+    push('qc_ort', 'Ort', ort);
+    push('qc_kp', 'Kaufpreis', x.kaufpreis, x.kaufpreis ? _fmtEur(x.kaufpreis) : null);
+    push('qc_wfl', 'Wohnfl\u00E4che', x.wohnflaeche, x.wohnflaeche ? (x.wohnflaeche + ' m\u00B2') : null);
+    push('qc_bj', 'Baujahr', x.baujahr);
+    push('qc_objektart', 'Objektart', x.objektart, x.objektart, true);
+    push('qc_zimmer', 'Zimmer', x.zimmer);
+    push('qc_nkm', 'Nettokaltmiete', x.nettokaltmiete, x.nettokaltmiete ? _fmtEur(x.nettokaltmiete) : null);
+    push('qc_energieklasse', 'Energieklasse', x.energieklasse, x.energieklasse, true);
+    push('qc_hg', 'Hausgeld', x.hausgeld, x.hausgeld ? _fmtEur(x.hausgeld) : null);
+    push('qc_ek', 'Eigenkapital', x.eigenkapital, x.eigenkapital ? _fmtEur(x.eigenkapital) : null);
+    push('qc_stellplatz', 'Stellplatz', x.stellplatz);
+    return rows;
   }
 
   // V63.85: URL-Import — Inserat-URL → Backend Scraper → Felder befüllen

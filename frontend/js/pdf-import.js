@@ -18,6 +18,7 @@
   var PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   var _pdfjsLoaded = false;
   var _onDoneCallback = null;
+  var _pdfiSkipReview = false;  /* v417: QC-Review im iframe -> Parent-Pick-Tabelle ueberspringen */
   var _isMarketMode = false;  // V63.91: Market-Bericht-Modus für Endpoint-Switch
 
   function _loadPdfJs() {
@@ -44,8 +45,9 @@
    * @param onDone optional callback(extractedData) — wird gerufen wenn User "Übernehmen" klickt.
    *               Falls nicht angegeben, schreibt der Modal direkt in die Haupt-FIELDS.
    */
-  function showPdfImport(onDone) {
+  function showPdfImport(onDone, opts) {
     _onDoneCallback = onDone || null;
+    _pdfiSkipReview = !!(opts && opts.skipReview);  /* v417 */
     var existing = document.getElementById('pdfimport-modal');
     if (existing) existing.remove();
 
@@ -160,7 +162,13 @@
 
       // 4. Ergebnis anzeigen
       try { window._pdfImportRawText = text; } catch(e) {}  /*v361-enrich-flow*/
-      _showResult(extracted);
+      if (_pdfiSkipReview) {
+        _pdfiSkipReview = false;  /* v417: QC-Modus -> volle Extraktion direkt an Callback */
+        if (typeof _onDoneCallback === 'function') { try { _onDoneCallback(extracted); } catch (e) { console.error('[PDF-Import] skipReview callback err:', e); } }
+        closePdfImport();
+      } else {
+        _showResult(extracted);
+      }
     } catch (err) {
       _showError(err.message || 'Unbekannter Fehler beim PDF-Import.');
     }

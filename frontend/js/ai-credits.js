@@ -169,18 +169,68 @@
     }
   }
 
+  // ── v423: Marktdaten-(AVM)-Credits-Pille (Zwilling der KI-Pille) ──
+  function _ensureAvmPill() {
+    var ki = document.getElementById('hdr-credits-pill');
+    if (!ki) return null;
+    var avm = document.getElementById('hdr-avm-pill');
+    if (avm) return avm;
+    avm = document.createElement('button');
+    avm.id = 'hdr-avm-pill';
+    avm.type = 'button';
+    avm.className = ki.className;
+    avm.title = 'Marktdaten-Credits — klicken für Details';
+    avm.style.display = 'none';
+    avm.innerHTML =
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<path d="M4 20V10M10 20V4M16 20v-7M21 20H3"></path></svg>' +
+      '<span id="hdr-avm-pill-label">Marktcredits</span>';
+    avm.addEventListener('click', function(){
+      if (typeof showSettings === 'function') { showSettings('plan'); return; }
+      if (window.CreditsModal && typeof window.CreditsModal.open === 'function') window.CreditsModal.open();
+    });
+    ki.parentNode.insertBefore(avm, ki.nextSibling);
+    return avm;
+  }
+
+  function renderAvm(n) {
+    var avm = _ensureAvmPill();
+    if (!avm) return;
+    if (n == null) { avm.style.display = 'none'; return; }
+    avm.style.display = 'inline-flex';
+    avm.classList.remove('low', 'empty');
+    if (n === 0) avm.classList.add('empty');
+    else if (n <= 3) avm.classList.add('low');
+    var lbl = document.getElementById('hdr-avm-pill-label');
+    if (lbl) lbl.textContent = n + ' Marktcredits';
+    avm.title = 'Marktdaten-Credits: ' + n + ' übrig (PriceHubble / Sprengnetter)';
+  }
+
+  async function refreshAvm() {
+    var t = _token();
+    if (!t) { renderAvm(null); return; }
+    try {
+      var resp = await fetch(_apiBase() + '/credits/balance', { headers: { 'Authorization': 'Bearer ' + t } });
+      if (!resp.ok) { renderAvm(null); return; }
+      var d = await resp.json();
+      renderAvm(typeof d.avm_credits === 'number' ? d.avm_credits : 0);
+    } catch (e) { renderAvm(null); }
+  }
+
   window.AiCredits = {
     refresh: refresh,
     getStatus: getStatus,
     render: render,
     renderSettingsBox: renderSettingsBox,
     _buyClick: _buyClick,
-    _purchase: _purchase
+    _purchase: _purchase,
+    refreshAvm: refreshAvm
   };
 
   // Auto-Refresh beim Laden + nach Login
   document.addEventListener('DOMContentLoaded', function(){
     setTimeout(function(){ refresh(true); }, 500);
+    setTimeout(function(){ refreshAvm(); }, 700);
   });
   // Auto-Refresh wenn der User in den Settings-KI-Tab wechselt (auch bei Erst-Öffnung)
   document.addEventListener('click', function(e){

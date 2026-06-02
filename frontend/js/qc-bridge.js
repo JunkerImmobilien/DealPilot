@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=416';
+  var IFRAME_SRC = 'quickcheck-app.html?v=425';
 
   // v345: doppelte weiße "⚡ Quick-Check"-Überschrift entfernen.
   // Sie ist ein CSS-Pseudo-Element (body.qc-standalone-active #s-quick::before)
@@ -124,7 +124,7 @@
   }
 
   // ── (qc-save) Übernahme ──
-  function _handleSave(inputs, avm, photos) {
+  function _handleSave(inputs, avm, photos, pendingTargets) {
     inputs = inputs || {};
 
     // (1) ÜBERSCHREIB-SCHUTZ: echtes newObj() STILL aufrufen. Nur newObj() setzt die
@@ -205,6 +205,13 @@
     }
 
     // (7) Persistieren → POST (neues Objekt), weil _currentObjKey=null
+    // v419: Bucket B+C (PDF-Import, kein qc_-Feld) ins frisch angelegte Objekt schreiben
+    try {
+      if (window.ObjectActions && typeof window.ObjectActions.applyQcPending === 'function') {
+        window.ObjectActions.applyQcPending(pendingTargets || null);
+      }
+    } catch (e) { console.warn('[qc-bridge] applyQcPending:', e); }
+
     if (typeof window.saveObj === 'function') {
       try { window.saveObj(true); } catch (e) { console.warn('[qc-bridge] saveObj:', e); }
     }
@@ -217,40 +224,31 @@
     return o;
   }
   function _handleImportPdf() {
-    var before = JSON.stringify(_snapImport());
-    try { if (typeof window.qcImportPdfTrigger === 'function') window.qcImportPdfTrigger(); }
-    catch (e) { console.warn('[qc-bridge] qcImportPdfTrigger:', e); }
-
-    var tries = 0, lastSent = '', photosSent = false;
-    function _sendPhotos() {
-      if (photosSent) return;
-      try {
-        if (window._qcExposePhotos && window._qcExposePhotos.length) {
-          _postToFrame({ source: 'dp-app', type: 'qc-import-photos', photos: window._qcExposePhotos.slice() });
-          photosSent = true;
-        }
-      } catch (e) {}
+    // v419: echtes Objekt-Tab-Kombi-Modal (Exposé + Marktbericht) im QC-Modus oeffnen.
+    // Bucket A (qc_-Felder) -> data; Bucket B+C -> pending (Anzeige im Save-Modal);
+    // die Rohwerte bleiben in object-actions (_qcPendingMerged) bis zum qc-save.
+    try { window._qcExposePhotos = []; } catch (e) {}
+    if (!(window.ObjectActions && typeof window.ObjectActions.openImport === 'function')) {
+      console.warn('[qc-bridge] ObjectActions.openImport fehlt — Import nicht moeglich.');
+      _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: {}, pending: [] });
+      return;
     }
-    var iv = setInterval(function () {
-      tries++;
-      var cur = _snapImport(), curStr = JSON.stringify(cur);
-      if (curStr !== before && curStr !== lastSent) {
-        lastSent = curStr;
-        _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: cur });
-        _sendPhotos();
+    window.ObjectActions.openImport(function (applied) {
+      var qcData  = (applied && applied.qcData)      ? applied.qcData      : {};
+      var pending = (applied && applied.pendingList) ? applied.pendingList : [];
+      var photos  = (applied && applied.photos)      ? applied.photos      : [];
+      try { if (photos && photos.length) window._qcExposePhotos = photos.slice(); } catch (e) {}
+      _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: qcData, pending: pending });
+      if (window._qcExposePhotos && window._qcExposePhotos.length) {
+        _postToFrame({ source: 'dp-app', type: 'qc-import-photos', photos: window._qcExposePhotos.slice() });
       }
-      if (tries > 66) { // ~40s
-        clearInterval(iv);
-        _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: _snapImport() });
-        _sendPhotos();
-      }
-    }, 600);
+    }, { target: 'qc' });
   }
 
   window.addEventListener('message', function (ev) {
     var d = ev.data;
     if (!d || d.source !== 'dp-qc') return;
-    if (d.type === 'qc-save') _handleSave(d.inputs, d.avm, d.photos);
+    if (d.type === 'qc-save') _handleSave(d.inputs, d.avm, d.photos, d.pendingTargets);
     else if (d.type === 'qc-import-pdf') _handleImportPdf();
   });
 })();

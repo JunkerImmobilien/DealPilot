@@ -9,6 +9,7 @@
  */
 
 const { getPack } = require('./creditPacks');
+const avmPacks = require('./avmPacks');
 
 /**
  * Verarbeitet ein checkout.session.completed Event für einen Credit-Pack-Kauf.
@@ -34,7 +35,8 @@ async function handleCreditPackPaid(db, session) {
     return { ok: false, reason: 'missing_metadata' };
   }
 
-  const pack = getPack(packId);
+  const packKind = (session.metadata && session.metadata.kind === 'avm') ? 'avm' : 'ki';
+  const pack = packKind === 'avm' ? avmPacks.getPack(packId) : getPack(packId);
   if (!pack) {
     console.error('[credits-webhook] unknown pack_id:', packId);
     return { ok: false, reason: 'unknown_pack' };
@@ -72,30 +74,31 @@ async function handleCreditPackPaid(db, session) {
       return { ok: false, reason: 'purchase_not_found' };
     }
 
-    // 2) Credits in ai_credits_user.bonus_credits hinzufügen
-    //    (DB speichert Anfragen-Einheiten = credits * 2)
-    await client.query(`
-      INSERT INTO ai_credits_user (user_id, bonus_credits)
-      VALUES ($1, $2)
-      ON CONFLICT (user_id) DO UPDATE SET
-        bonus_credits = ai_credits_user.bonus_credits + EXCLUDED.bonus_credits,
-        updated_at = NOW()
-    `, [userId, pack.bonus_credits_units]);
+    // 2) Credits gutschreiben — KI-Topf (bonus_credits, =credits*2) ODER Markt-Topf (avm_bonus_credits, 1:1)
+    var _creditCol = packKind === 'avm' ? 'avm_bonus_credits' : 'bonus_credits';
+    var _creditAmt = packKind === 'avm' ? pack.credits : pack.bonus_credits_units;
+    await client.query(
+      'INSERT INTO ai_credits_user (user_id, ' + _creditCol + ') VALUES ($1, $2) ' +
+      'ON CONFLICT (user_id) DO UPDATE SET ' +
+      _creditCol + ' = ai_credits_user.' + _creditCol + ' + EXCLUDED.' + _creditCol + ', updated_at = NOW()',
+      [userId, _creditAmt]
+    );
 
     // 3) ai_credits_log Eintrag (für Buchhaltung)
     await client.query(`
       INSERT INTO ai_credits_log (user_id, endpoint, cost, source, meta)
       VALUES ($1, 'credit-pack-purchase', $2, 'stripe', $3::jsonb)
-    `, [userId, -pack.bonus_credits_units, JSON.stringify({
+    `, [userId, -_creditAmt, JSON.stringify({
       pack_id: pack.id,
+      kind: packKind,
       credits_granted: pack.credits,
-      requests_granted: pack.bonus_credits_units,
+      requests_granted: _creditAmt,
       stripe_session_id: session.id,
       amount_cents: session.amount_total
     })]);
 
     await client.query('COMMIT');
-    console.log(`[credits-webhook] ✓ ${pack.credits} Credits (${pack.bonus_credits_units} Anfragen) gutgeschrieben an User ${userId}`);
+    console.log(`[credits-webhook] ✓ ${pack.credits} Credits (${_creditAmt} Einheiten) gutgeschrieben an User ${userId}`);
 
     // V198: Credit-Pack-Bestätigungs-Mail asynchron (non-blocking)
     setImmediate(async () => {
@@ -105,7 +108,7 @@ async function handleCreditPackPaid(db, session) {
           userId,
           packLabel: pack.label || pack.id,
           creditsGranted: pack.credits,
-          requestsGranted: pack.bonus_credits_units,
+          requestsGranted: (pack.bonus_credits_units || pack.credits),
           amountCents: session.amount_total || pack.amount_cents,
           sessionId: session.id
         });
