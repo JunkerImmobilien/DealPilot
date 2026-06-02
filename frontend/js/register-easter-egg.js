@@ -111,24 +111,20 @@
           '<div id="dp-reg-error" class="auth-error-v39" style="display:none"></div>' +
           '<div id="dp-reg-success" style="display:none;background:#E8F5E9;border-left:3px solid #3FA56C;padding:14px 18px;border-radius:4px;margin:8px 0 0;color:#2A2727;font-size:13px;line-height:1.5"></div>' +
 
-          // V271a-register-consent: B2C/B2B-Toggle + AGB-Pflicht-Checkbox
-          '<div style="margin:12px 0 8px;padding:12px;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.20);border-radius:6px;font-size:12px">' +
-            '<div style="margin-bottom:8px;color:rgba(250,246,232,0.85)">Ich melde mich an als:</div>' +
-            '<label style="display:inline-flex;align-items:center;gap:6px;margin-right:14px;cursor:pointer;color:rgba(250,246,232,0.85)">' +
-              '<input type="radio" name="dp-reg-usertype" value="consumer" checked style="accent-color:#C9A84C">' +
-              '<span>Privatperson</span>' +
-            '</label>' +
-            '<label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:rgba(250,246,232,0.85)">' +
-              '<input type="radio" name="dp-reg-usertype" value="business" style="accent-color:#C9A84C">' +
-              '<span>Unternehmer / Selbstaendiger</span>' +
-            '</label>' +
-          '</div>' +
+          // v428: B2C/B2B-Auswahl entfernt – Verbraucher-/Unternehmer-Status ergibt
+          // sich aus dem Gesetz (§ 13/14 BGB, AGB Ziffer V); Erhebung erst beim Kauf.
           '<label id="dp-reg-consent-label" style="display:flex;align-items:flex-start;gap:8px;margin:10px 0 6px;cursor:pointer;font-size:12px;line-height:1.5;color:rgba(250,246,232,0.85)">' +
             '<input type="checkbox" id="dp-reg-consent" style="margin-top:3px;accent-color:#C9A84C;flex-shrink:0">' +
             '<span>Ich habe die <a href="/agb.html" target="_blank" style="color:#C9A84C">AGB</a>, die ' +
             '<a href="/datenschutz.html" target="_blank" style="color:#C9A84C">Datenschutzerklaerung</a> und ' +
             'die <a href="#" onclick="if(window.DealPilotLegal){DealPilotLegal.showInfo();return false;}" style="color:#C9A84C">Nutzungshinweise</a> ' +
             'gelesen und akzeptiere sie. Mir ist bewusst, dass DealPilot <strong>keine Beratung</strong> ist.</span>' +
+          '</label>' +
+
+          // v428: Newsletter-Opt-in (freiwillig, default AUS)
+          '<label style="display:flex;align-items:flex-start;gap:8px;margin:4px 0 6px;cursor:pointer;font-size:12px;line-height:1.5;color:rgba(250,246,232,0.70)">' +
+            '<input type="checkbox" id="dp-reg-newsletter" style="margin-top:3px;accent-color:#C9A84C;flex-shrink:0">' +
+            '<span>Ich möchte gelegentlich Produkt-News, Tipps und Angebote zu DealPilot per E-Mail erhalten. <em style="opacity:.8">(Freiwillig, jederzeit abbestellbar.)</em></span>' +
           '</label>' +
 
           '<button class="auth-btn-v39" id="dp-reg-submit" type="button" disabled style="opacity:0.45;cursor:not-allowed">' +
@@ -236,7 +232,8 @@
       var resp = await fetch('/api/v1/auth/register-with-verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, email: email, password: pass, hp: hp })
+        body: JSON.stringify({ name: name, email: email, password: pass, hp: hp,
+          newsletter: !!(document.getElementById('dp-reg-newsletter') && document.getElementById('dp-reg-newsletter').checked) })
       });
       var data = await resp.json().catch(function () { return {}; });
 

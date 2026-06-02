@@ -22,7 +22,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=361">
+<link rel="stylesheet" href="css/style.css?v=446">
 <link rel="stylesheet" href="css/bmf-modal.css?v=293f">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=303"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
@@ -887,6 +887,7 @@ label.dp-required.qc-required::after {
 <div class="sec active" id="s0">
   <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p>
   <div id="obj-action-bar"></div>
+  <input type="hidden" id="_avm_state" value="">
   <!-- v365: Markt-Import oben unter der Ueberschrift -->
   <div class="market-import-row" data-v365-top style="position:relative" data-v358-market-enabled="1">
     <div class="market-import-info">
@@ -910,8 +911,11 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Objektart</label><select id="objart"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+      <!-- v445-obj-reorder -->
       <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
-      <!-- v362-stammdaten: zusaetzliche Objekt-Stammdaten (u.a. aus Marktbericht) -->
+      <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
+      <div class="obj-extra-acc" id="obj-extra-toggle" role="button" tabindex="0" aria-expanded="false" style="grid-column:1/-1"><span class="obj-extra-chev" aria-hidden="true">▸</span><span class="obj-extra-acc-lbl">Weitere Objektdetails</span></div>
+      <div id="obj-extra-wrap" class="obj-extra-wrap">
       <div class="f" data-v362-stammdaten><label>Zimmer</label><input id="zimmer" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
       <div class="f"><label>Badezimmer</label><input id="bad_anz" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Etage</label><input id="etage" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
@@ -920,7 +924,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Garagenpl&auml;tze</label><input id="garagen" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Au&szlig;enstellpl&auml;tze</label><input id="stellpl_aussen" type="text" inputmode="decimal" placeholder="z.B. 0"></div>
       <div class="f"><label>Balkon / Terrasse (m&sup2;)</label><div class="iw"><input id="balkon_flae" type="text" inputmode="decimal" placeholder="z.B. 10" class="tr"><span class="sfx">m&sup2;</span></div></div>
-      <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
+      </div><!-- /obj-extra-wrap -->
       <div class="f s2"><label>Investitionsthese <button type="button" class="dp-tip" data-tip-id="tab1.investitionsthese" tabindex="-1" aria-label="Hilfe zu tab1.investitionsthese"></button></label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
       <div class="f s2"><label>Bekannte Risiken <button type="button" class="dp-tip" data-tip-id="tab1.bekannte_risiken" tabindex="-1" aria-label="Hilfe zu tab1.bekannte_risiken"></button></label><textarea id="risiken" placeholder="Bekannte Risiken und Maßnahmen..."></textarea></div>
       <!-- v363-erwerb: abgesetzte Untergruppe -->
@@ -954,7 +958,8 @@ label.dp-required.qc-required::after {
         <div class="f"><label>Exitstrategie <button type="button" class="dp-tip" data-tip-id="tab1.exitstrategie" tabindex="-1" aria-label="Hilfe zu tab1.exitstrategie"></button></label><select id="exitstr"><option selected>Langfristig halten</option><option>Verkauf nach 10 Jahren</option><option>Verkauf nach 20 Jahren</option><option>Aufwertung &amp; Verkauf</option></select></div>
       </div>
       <div class="qz-divider"></div>
-      <div class="qz-rows">
+      <div class="qz-acc" id="qz-stars-toggle" role="button" tabindex="0" aria-expanded="false"><span class="qz-acc-chev" aria-hidden="true">▸</span><span class="qz-acc-lbl">Sterne-Bewertung</span><span class="qz-acc-hint">Zustand &amp; Qualität bewerten</span></div>
+      <div class="qz-rows" id="qz-stars-rows">
         <div class="qz-subhead" data-v362-zust-head style="grid-column:1/-1;margin:2px 0;font-size:12px;font-weight:600;color:var(--muted,#7A7370);letter-spacing:.04em;text-transform:uppercase">Zustand</div>
         <div class="qz-row" data-qz-row="kueche">
           <div class="qz-row-name">
@@ -1937,15 +1942,15 @@ label.dp-required.qc-required::after {
       <span class="mr-pf-margin-label">Ihr Szenario:</span>
       <button type="button" class="mr-pf-margin-btn" data-margin="premium"            onclick="setPfandbriefMargin('premium')">
         <span class="mr-pf-margin-btn-title">Premium</span>
-        <span class="mr-pf-margin-btn-hint">LTV ≤ 60% · Top-Bonität · +0,8%</span>
+        <span class="mr-pf-margin-btn-hint">LTV ≤ 60% · Top-Bonität · +0,4%</span>
       </button>
       <button type="button" class="mr-pf-margin-btn active" data-margin="standard"   onclick="setPfandbriefMargin('standard')">
         <span class="mr-pf-margin-btn-title">Standard</span>
-        <span class="mr-pf-margin-btn-hint">LTV 60–80% · normale Bonität · +1,2%</span>
+        <span class="mr-pf-margin-btn-hint">LTV 60–80% · normale Bonität · +0,7%</span>
       </button>
       <button type="button" class="mr-pf-margin-btn" data-margin="schwach"            onclick="setPfandbriefMargin('schwach')">
         <span class="mr-pf-margin-btn-title">Risiko-Aufschlag</span>
-        <span class="mr-pf-margin-btn-hint">LTV > 90% oder Bonität mittel · +1,8%</span>
+        <span class="mr-pf-margin-btn-hint">LTV > 90% oder Bonität mittel · +1,0%</span>
       </button>
     </div>
 
@@ -1997,7 +2002,7 @@ label.dp-required.qc-required::after {
     <div class="mr-pf-source" id="mr-pf-source"></div>
     <div class="mr-disclaimer">
       <strong>Hinweis:</strong> Diese Werte sind <strong>indikative Schätzungen</strong> basierend auf der Bundesbank-Pfandbrief-Zinsstruktur (BBSIS) plus einer typischen Bank-Marge.
-      Sie ersetzen <strong>kein</strong> konkretes Bankangebot. Tatsächliche Konditionen variieren je nach Bank, regionaler Lage, individueller Bonität, Beleihungswert und Auszahlungszeitpunkt.
+      Sie ersetzen <strong>kein</strong> konkretes Bankangebot. Tatsächliche Konditionen variieren je nach Bank, regionaler Lage, individueller Bonität, Beleihungswert und Auszahlungszeitpunkt. Es handelt sich um <strong>keine Finanzierungsberatung und keine Darlehensvermittlung</strong> im Sinne des § 34c GewO und um kein konkretes Angebot; die zugrunde gelegte Bank-Marge ist eine <strong>typisierte Annahme</strong>.
       Konkrete Angebote über Vermittler wie Interhyp, Dr. Klein, Baufi24 oder direkt bei der Hausbank.
     </div>
   </div>
@@ -2872,7 +2877,7 @@ label.dp-required.qc-required::after {
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=286"></script>
-<script src="js/config.js?v=228"></script>
+<script src="js/config.js?v=431"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -2891,7 +2896,7 @@ label.dp-required.qc-required::after {
 <script src="js/werbungskosten-pdf.js?v=166"></script>
 <script src="js/charts.js?v=166"></script>
 <script src="js/market-rates.js?v=100"></script>
-<script src="js/market-rates-pf.js?v=358"></script>
+<script src="js/market-rates-pf.js?v=431"></script>
 <script src="js/market-context.js?v=100"></script>
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
@@ -2934,13 +2939,17 @@ label.dp-required.qc-required::after {
 <script src="js/bank-pdf.js?v=166"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
 <script src="js/help.js?v=238"></script>
-  <script src="js/tour-engine.js?v=240_10"></script>
+  <script src="js/tour-engine.js?v=433_10"></script>
   <script src="js/tour-content.js?v=239_10"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=124"></script>
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
 <script src="js/deal-action.js?v=324"></script>
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
+<script src="js/newobj-fixes.js?v=434"></script>
+<script src="js/sidebar-search.js?v=447"></script>
+<script src="js/finanz-card-merge.js?v=443"></script>
+<script src="js/avm-missing-reset.js?v=443"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=124"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
@@ -2955,7 +2964,7 @@ label.dp-required.qc-required::after {
 <script src="js/investment-profile.js?v=124"></script>
 <script src="js/main.js?v=187h2"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
-  <script src="js/object-actions.js?v=402"></script>
+  <script src="js/object-actions.js?v=445"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->

@@ -30,7 +30,7 @@ var MarketRatesPF = (function() {
   // Sane Defaults — falls Backend nie antwortet
   var STATIC_FALLBACK_PF = {
     yields:  { '5': 2.85, '10': 3.05, '15': 3.18, '20': 3.28 },
-    margins: { premium: 0.80, standard: 1.20, schwach: 1.80 }
+    margins: { premium: 0.40, standard: 0.70, schwach: 1.00 }
   };
 
   async function _fetchFromBackend() {
