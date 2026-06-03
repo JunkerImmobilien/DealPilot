@@ -97,6 +97,7 @@ function collectData() {
     if (typeof DealScore !== 'undefined' && typeof DealScore.compute === 'function') {
       var _dpRes = DealScore.compute();
       if (_dpRes && _dpRes.score) d._dealpilot_score = Math.round(_dpRes.score);
+      if (_dpRes && _dpRes.categories) d._dp_categories = _dpRes.categories;
     }
   } catch(e) {}
   try {
@@ -104,6 +105,7 @@ function collectData() {
       var _ds2Deal = window._buildDeal2FromState();
       var _ds2Res = window.DealScore2.compute(_ds2Deal);
       if (_ds2Res && _ds2Res.score) d._ds2_score = Math.round(_ds2Res.score);
+      if (_ds2Res && _ds2Res.categories) d._ds2_categories = _ds2Res.categories;
     }
   } catch(e) {}
 
@@ -279,11 +281,13 @@ function loadData(d) {
       if (typeof DealScore !== 'undefined' && typeof DealScore.compute === 'function') {
         var _dp351 = DealScore.compute();
         if (_dp351 && _dp351.score) _o351._dealpilot_score = Math.round(_dp351.score);
+        if (_dp351 && _dp351.categories) _o351._dp_categories = _dp351.categories;
       }
       _o351._ds2_computed = (typeof window._dpDs2Available === 'function') ? window._dpDs2Available() : _o351._ds2_computed;  /* v403-ds2-gate */
       if (window.DealScore2 && typeof window._buildDeal2FromState === 'function' && _o351._ds2_computed) {
         var _ds351 = window.DealScore2.compute(window._buildDeal2FromState());
         if (_ds351 && _ds351.score) _o351._ds2_score = Math.round(_ds351.score);
+        if (_ds351 && _ds351.categories) _o351._ds2_categories = _ds351.categories;
       }
     }
     // Leiser renderSaved(): aktive Karte rechnet live neu (storage.js Z.1011+)

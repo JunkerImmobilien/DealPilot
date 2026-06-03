@@ -31810,3 +31810,19 @@ select.oab-missing-hl {
 .da-status-card .da-status-tile.active.da-status-open{box-shadow:0 8px 26px rgba(226,180,59,0.30)}
 .da-status-card .da-status-tile.active.da-status-won{box-shadow:0 8px 26px rgba(31,114,68,0.28)}
 .da-status-card .da-status-tile.active.da-status-lost{box-shadow:0 8px 26px rgba(145,50,50,0.26)}
+
+
+/* ===== v452 Dashboard-Akkordeon ===== */
+/* Dashboard-Eintrag im Aktionen-Akkordeon: Icon + Gold-Accent wie Quick Check */
+.sb-act-item .sb-act-ico[data-icon="dashboard"]{
+  -webkit-mask:none; mask:none;
+}
+.sb-act-item .sb-act-ico[data-icon="dashboard"]::before{
+  content:""; display:inline-block; width:18px; height:18px;
+  background:currentColor;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2'><rect x='3' y='3' width='7' height='9' rx='1'/><rect x='14' y='3' width='7' height='5' rx='1'/><rect x='14' y='12' width='7' height='9' rx='1'/><rect x='3' y='16' width='7' height='5' rx='1'/></svg>") center/contain no-repeat;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2'><rect x='3' y='3' width='7' height='9' rx='1'/><rect x='14' y='3' width='7' height='5' rx='1'/><rect x='14' y='12' width='7' height='9' rx='1'/><rect x='3' y='16' width='7' height='5' rx='1'/></svg>") center/contain no-repeat;
+}
+/* v452 Dashboard-Hauptview soll volle Hoehe des Scroll-Containers nutzen */
+#dashboard-main{ min-height:calc(100vh - 0px); }
+/* ===== v452 Dashboard-Akkordeon ENDE ===== */

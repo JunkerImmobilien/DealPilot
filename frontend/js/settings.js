@@ -606,10 +606,19 @@ function showSettings(initialTab) {
             'Welcher Bereich soll geöffnet werden, wenn du die App startest?' +
           '</div>' +
           '<select id="set_startup_view" onchange="_setStartupView(this.value)">' +
-            '<option value="objekt">Tab "Objekt" (Default)</option>' +
+            '<option value="dashboard">Portfolio-Dashboard (Default)</option>' +
+            '<option value="objekt">Tab "Objekt"</option>' +
             '<option value="quickcheck">Quick-Check (Standalone)</option>' +
             '<option value="all-objects">Alle Objekte (Übersicht)</option>' +
           '</select>' +
+        '</div>' +
+        /* v452: App-weiter Theme-Switch Hell/Dunkel */
+        '<div class="f startup-view-row" style="margin-top:14px">' +
+          '<div class="startup-view-desc">App-Erscheinungsbild (gilt fuer die gesamte App)</div>' +
+          '<div class="dp-theme-switch" id="dp-theme-switch">' +
+            '<button type="button" data-th="light" onclick="DealPilotDashboard.setTheme(\'light\')">Hell</button>' +
+            '<button type="button" data-th="dark" onclick="DealPilotDashboard.setTheme(\'dark\')">Dunkel</button>' +
+          '</div>' +
         '</div>' +
 
         /* V76: Workflow-Bar-Section entfernt — Steps + Fortschritt sind jetzt direkt
@@ -912,10 +921,18 @@ function _swSet(btn) {
     var sel = document.getElementById('set_startup_view');
     if (sel) {
       try {
-        var current = localStorage.getItem('dp_startup_view') || 'objekt';
+        var current = localStorage.getItem('dp_startup_view') || 'dashboard';
         sel.value = current;
       } catch (e) {}
     }
+    /* v452: Theme-Switch aktiv markieren */
+    try {
+      var _dpTh = localStorage.getItem('dp_theme') || 'light';
+      var _dpSw = document.getElementById('dp-theme-switch');
+      if (_dpSw) _dpSw.querySelectorAll('button').forEach(function(b){
+        b.classList.toggle('active', b.getAttribute('data-th') === _dpTh);
+      });
+    } catch (e2) {}
     // V257-08 → V259-11: zvE-Editor durch Hinweis ersetzt
     try {
       if (window.DealPilotZvE) {
