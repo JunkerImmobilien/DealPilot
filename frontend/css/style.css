@@ -31771,3 +31771,42 @@ select.oab-missing-hl {
 .junker-action-banner-contact,
 #dp-banner-phone,
 #dp-banner-email { display: none !important; }
+
+/* =================================================================
+   v448 - Deal-Aktion Ready-Check
+   ================================================================= */
+.da-readycheck{border:1px solid rgba(201,168,76,.30);border-radius:12px;padding:14px 16px;margin:14px 0 16px;background:rgba(201,168,76,.06)}
+.dp-rc-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+.dp-rc-title{font-size:14px;font-weight:600;color:var(--text,#2A2727)}
+.dp-rc-prog{font-size:12px;color:var(--muted,#7A7370);white-space:nowrap}
+.dp-rc-bar{height:6px;border-radius:3px;background:rgba(0,0,0,.08);overflow:hidden;margin-bottom:12px}
+.dp-rc-bar-fill{height:100%;background:var(--gold,#C9A84C);border-radius:3px;transition:width .4s ease}
+.dp-rc-missing-label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#7A7370);margin-bottom:6px}
+.dp-rc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.dp-rc-chip{background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.30);color:#8A6D1F;padding:4px 10px;border-radius:14px;font-size:12px;cursor:pointer;font-family:inherit}
+.dp-rc-chip:hover{background:rgba(201,168,76,.20)}
+.dp-rc-allset{color:#2E7D52;font-size:13px;font-weight:600;margin-bottom:12px}
+.dp-rc-exports{display:flex;flex-wrap:wrap;align-items:center;gap:8px;border-top:1px solid rgba(0,0,0,.08);padding-top:10px}
+.dp-rc-exp-label{font-size:12px;color:var(--muted,#7A7370)}
+.dp-rc-exp-btn{background:transparent;border:1px solid rgba(0,0,0,.18);color:var(--text,#2A2727);padding:5px 12px;border-radius:14px;font-size:12px;cursor:pointer;font-family:inherit}
+.dp-rc-exp-btn:hover{border-color:var(--gold,#C9A84C);color:#8A6D1F}
+.dp-rc-flash{outline:2px solid var(--gold,#C9A84C)!important;outline-offset:2px;border-radius:4px}
+
+/* =================================================================
+   v449 - Status-Kacheln premium
+   ================================================================= */
+.da-status-card .da-status-tiles{gap:16px}
+.da-status-card .da-status-tile{
+  background:linear-gradient(180deg,rgba(42,39,39,0.02),rgba(42,39,39,0.05));
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.da-status-card .da-status-tile:hover{
+  transform:translateY(-4px);
+  box-shadow:0 10px 24px rgba(201,168,76,0.18);
+  border-color:rgba(201,168,76,0.70);
+}
+.da-status-card .da-status-tile .da-stat-ico{box-shadow:inset 0 0 0 1px rgba(201,168,76,0.12)}
+.da-status-card .da-status-tile.active .da-stat-ico{transform:scale(1.06)}
+.da-status-card .da-status-tile.active.da-status-open{box-shadow:0 8px 26px rgba(226,180,59,0.30)}
+.da-status-card .da-status-tile.active.da-status-won{box-shadow:0 8px 26px rgba(31,114,68,0.28)}
+.da-status-card .da-status-tile.active.da-status-lost{box-shadow:0 8px 26px rgba(145,50,50,0.26)}
