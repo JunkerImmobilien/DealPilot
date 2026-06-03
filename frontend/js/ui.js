@@ -1409,6 +1409,7 @@ function sbActionsAction(action) {
   }
   setTimeout(function() {
     switch (action) {
+      case 'dashboard':   if (typeof setMainView === 'function') setMainView('dashboard'); break;
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;
