@@ -249,6 +249,12 @@ window.setMainView = setMainView;
 // landet im normalen Tab-Layout (Tab Objekt = Index 0).
 // ═══════════════════════════════════════════════════════════════
 function enterQuickCheckMode() {
+  // v479 (v472-qcdash): Falls das Portfolio-Cockpit (Vollbild) offen ist, erst
+  // schliessen. Sonst ueberlagert die Body-Klasse dp-dash-fullscreen den
+  // Quick-Check und der Wechsel "Cockpit -> Aktion Quick Check" macht nichts.
+  if (document.body.classList.contains('dp-dash-fullscreen') && window.DealPilotDashboard && typeof window.DealPilotDashboard.close === 'function') {
+    try { window.DealPilotDashboard.close(); } catch (e) {}
+  }
   // Body-Klasse setzt CSS, das Tab-Bar + Workflow-Bar versteckt
   document.body.classList.add('qc-standalone-active');
 

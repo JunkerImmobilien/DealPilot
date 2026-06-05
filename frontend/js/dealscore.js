@@ -36,6 +36,17 @@ var DealScore = (function() {
     optimistic: {
       // Mehr auf Rendite + Upside-Potenzial
       cashflow: 25, rendite: 35, ltv: 10, risiko: 10, potenzial: 20
+    },
+    // V462: Investor-Profile (gekoppelt an DS2 ueber dp_dealscore2_preset)
+    lage: {
+      // DS1 hat keinen Lage-Faktor -> Potenzial (Wertpuffer/Mietpotenzial) als Naeherung
+      cashflow: 20, rendite: 22, ltv: 14, risiko: 14, potenzial: 30
+    },
+    cashflow: {
+      cashflow: 45, rendite: 20, ltv: 12, risiko: 13, potenzial: 10
+    },
+    sicherheit: {
+      cashflow: 28, rendite: 12, ltv: 25, risiko: 25, potenzial: 10
     }
   };
 
@@ -185,10 +196,11 @@ var DealScore = (function() {
     //   ≥65 → grün "Gut"
     //   ≥50 → gold "Solide"
     //   <50 → rot "Schwach"
-    if (score >= 80)      { color = 'green'; label = 'Top Deal'; }
-    else if (score >= 65) { color = 'green'; label = 'Gut'; }
-    else if (score >= 50) { color = 'gold';  label = 'Solide'; }
-    else                  { color = 'red';   label = 'Schwach'; }
+    var _k = (window.ScoreTier ? window.ScoreTier.classify(score) : (score>=85?'top':score>=70?'green':score>=50?'gold':'red'));
+    if (_k === 'top')        { color = 'green'; label = 'Top Deal'; }
+    else if (_k === 'green') { color = 'green'; label = 'Gut'; }
+    else if (_k === 'gold')  { color = 'gold';  label = 'Solide'; }
+    else                     { color = 'red';   label = 'Schwach'; }
 
     return {
       score: score,
@@ -205,14 +217,15 @@ var DealScore = (function() {
     var cf_m = K.cf_m || 0;
 
     // V63.32: Schwellen identisch zu QC (Sehr gut/Gut/Solide/Schwach)
-    if (score >= 80) {
+    var _ik = (window.ScoreTier ? window.ScoreTier.classify(score) : (score>=85?'top':score>=70?'green':score>=50?'gold':'red'));
+    if (_ik === 'top') {
       parts.push('Sehr attraktiver Deal');
       if (cf_m > 100) parts.push('mit positivem Cashflow von ' + cf_m.toFixed(0) + ' €/Mon');
       if ((K.nmy || 0) > 4) parts.push('und überdurchschnittlicher Nettomietrendite');
-    } else if (score >= 65) {
+    } else if (_ik === 'green') {
       parts.push('Guter Deal mit attraktiven Eckdaten');
       if (cf_m < 0) parts.push('Cashflow ist allerdings negativ');
-    } else if (score >= 50) {
+    } else if (_ik === 'gold') {
       parts.push('Solider Deal mit moderatem Risiko');
       if (cf_m < 0) parts.push('Cashflow ist negativ');
       if ((K.ltv || 0) > 95) parts.push('LTV ist hoch');
@@ -393,7 +406,7 @@ function renderDealScore() {
         '<div class="ds-metrics">' +
           result.breakdown.map(function(c) {
             var icon = _dsIconFor(c.label);
-            var iconColor = c.score >= 80 ? '#2FBE6E' : c.score >= 60 ? '#E5BD53' : '#D55B5B';
+            var iconColor = c.score >= 70 ? '#2FBE6E' : c.score >= 50 ? '#E5BD53' : '#D55B5B';
             var barColor  = iconColor;
             return '<div class="ds-metric">' +
               '<div class="ds-metric-icon" style="color:' + iconColor + ';border-color:' + iconColor + '40">' + icon + '</div>' +
@@ -809,7 +822,7 @@ function _updateDsCollapseSummary(score, label) {
     el.className = 'ds-collapse-summary';
     return;
   }
-  var cls = score >= 75 ? 'ds-coll-green' :
+  var cls = score >= 70 ? 'ds-coll-green' :
             score >= 50 ? 'ds-coll-gold' : 'ds-coll-red';
   el.className = 'ds-collapse-summary ' + cls;
   el.innerHTML = '<strong>' + score + '/100</strong> · ' + (label || '');

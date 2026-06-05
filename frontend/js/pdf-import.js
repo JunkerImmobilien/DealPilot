@@ -68,7 +68,7 @@
           '<div class="pdfi-drop" id="pdfi-drop">' +
             '<div class="pdfi-drop-icon">📁</div>' +
             '<div class="pdfi-drop-title">Datei auswählen oder hierher ziehen</div>' +
-            '<div class="pdfi-drop-sub">PDF-Datei, max 10 MB</div>' +
+            '<div class="pdfi-drop-sub">PDF-Datei, max 100 MB</div>' +
             '<input type="file" id="pdfi-file" accept="application/pdf,.pdf" style="display:none">' +
             '<button type="button" class="btn btn-gold" onclick="document.getElementById(\'pdfi-file\').click()">Datei wählen</button>' +
           '</div>' +
@@ -107,8 +107,8 @@
 
   async function _handleFile(file) {
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      _showError('Datei zu groß (max 10 MB).');
+    if (file.size > 100 * 1024 * 1024) {
+      _showError('Datei zu groß (max 100 MB).');
       return;
     }
     if (!/\.pdf$/i.test(file.name)) {

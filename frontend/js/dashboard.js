@@ -32,6 +32,12 @@
   function fmtKEU(v){ if(v==null||isNaN(v))return '–'; var a=Math.abs(v); if(a>=1e6)return (v/1e6).toFixed(2).replace('.',',')+' Mio'; if(a>=1e3)return Math.round(v/1e3)+'k'; return Math.round(v)+''; }
   function num(v){ if(v==null)return 0; if(typeof v==='number')return v; var n=parseFloat(String(v).replace(/\./g,'').replace(',','.')); return isNaN(n)?0:n; }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  /* v475: %-Felder sauber parsen (Komma ODER Punkt als Dezimal, keine Tausenderpunkte) */
+  function _pct(x){ var n=parseFloat(String(x==null?'':x).replace(',','.')); return isNaN(n)?0:n; }
+  /* v475: Erwerbsnebenkosten in EURO — absolut falls vorhanden, sonst aus %-Feldern (wie calc.js Z.663) */
+  function _nkEuro(o){ if(num(o&&o.nk)>0) return num(o.nk); var kp=_kpEuro(o); return kp*(_pct(o&&o.notar_p)+_pct(o&&o.gest_p)+_pct(o&&o.makler_p)+_pct(o&&o.gba_p)+_pct(o&&o.ji_p))/100; }
+  /* v475: heutiges Datum DD.MM.YYYY */
+  function _heute(){ var d=new Date(); return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear(); }
 
   /* ── Plan-Detection ── */
   function plan(){
@@ -60,7 +66,7 @@
       if(k!==_lastPlanKey){
         _lastPlanKey=k;
         // Score + KPIs + Health spiegeln den neuen Plan (full? -> Investor, sonst DealPilot)
-        renderScoreHero(); renderKpiCards(); renderHealth();
+        renderScoreHero(); renderKpiCards(); renderHealth(); renderOverview();
       }
     }, 1200);
   }
@@ -84,12 +90,41 @@
   /* ── Tier-Logik (1:1 wie DESIGN-DECISIONS) ── */
   function tierOf(score){
     if(score==null) return {t:'na', l:'–', col:'var(--dp-muted)'};
-    if(score>=85) return {t:'top', l:'Sehr gut', col:'var(--dp-green)'};
-    if(score>=70) return {t:'hi',  l:'Gut',      col:'var(--dp-green)'};
-    if(score>=50) return {t:'mid', l:'Solide',   col:'var(--dp-gold)'};
+    var _k=(window.ScoreTier?window.ScoreTier.classify(score):(score>=85?'top':score>=70?'green':score>=50?'gold':'red'));
+    if(_k==='top') return {t:'top', l:'Sehr gut', col:'var(--dp-green)'};
+    if(_k==='green') return {t:'hi',  l:'Gut',      col:'var(--dp-green)'};
+    if(_k==='gold') return {t:'mid', l:'Solide',   col:'var(--dp-gold)'};
     return {t:'lo', l:'Schwach', col:'var(--dp-red)'};
   }
   function catBarColor(s){ return s>=70?'var(--dp-green)':s>=50?'var(--dp-gold)':'var(--dp-red)'; }
+  /* v455: KPI-Anzahl + Gewicht je Score-Kategorie (Investor-Modell, 24 KPIs). Fallback;
+     echte Werte werden aus DealScore2-Breakdown gezogen (catMeta). */
+  var KPICOUNT={rendite:4,finanzierung:5,risiko:6,lage:5,upside:4};
+  var KPIWEIGHT={rendite:35,finanzierung:25,risiko:20,lage:10,upside:10};
+  var _catMetaCache=null;
+  function catMeta(){
+    if(_catMetaCache) return _catMetaCache;
+    var CK=['rendite','finanzierung','risiko','lage','upside']; var meta={};
+    CK.forEach(function(k){ meta[k]={count:KPICOUNT[k]||0, weight:KPIWEIGHT[k]||0, names:[], kpis:[]}; });
+    try{
+      var arr=detailArr();
+      if(arr.length && window.DealScore2 && typeof window.DealScore2.compute==='function'){
+        var res=window.DealScore2.compute(buildDealFromData(arr[0]));
+        var cw=(res && res.configUsed && res.configUsed.weights)?res.configUsed.weights:null;
+        if(res && res.categories){ CK.forEach(function(k){
+          var c=res.categories[k]; if(!c) return;
+          if(Array.isArray(c.breakdown)){
+            meta[k].names=c.breakdown.map(function(x){return x.name||x.key;});
+            meta[k].count=c.breakdown.length;
+            meta[k].kpis=c.breakdown.map(function(b){return {name:(b.name||b.key), weight:(b.weight!=null&&!isNaN(b.weight)?Math.round(+b.weight):null)};});
+          }
+          if(cw && cw[k]!=null && !isNaN(cw[k])){ var w=+cw[k]; meta[k].weight = w<=1?Math.round(w*100):Math.round(w); }
+        }); }
+      }
+    }catch(e){}
+    if(_detailsLoaded) _catMetaCache=meta;
+    return meta;
+  }
 
   /* ════ DATEN-LAYER ════ */
 
@@ -129,7 +164,34 @@
 
   // Detail-Objekte als Array (nur erfolgreich geladene)
   function detailArr(){
-    return wonList().map(function(o){ return _details[o.id||o.key]; }).filter(Boolean);
+    var all = wonList().map(function(o){ return _details[o.id||o.key]; }).filter(Boolean);
+    if(_dashSelIdx>=0 && _dashSelIdx<all.length) return [all[_dashSelIdx]];   // v475: Einzelobjekt-Ansicht
+    return all;
+  }
+
+  /* ════ PORTFOLIO-RECHEN-SSoT ════
+     EINE Stelle fuer die Aggregat-Mathematik. aggStats() ist die Quelle;
+     renderOverview UND renderHealth greifen darauf zu. WICHTIG:
+     o.kp = Kaufpreis in EURO (String). o._kaufpreis = Kaufpreis in CENT! */
+  function _kpEuro(o){ return num(o && o.kp) || (num(o && o._kaufpreis) / 100) || 0; }
+  function _restschuldOf(o){
+    var fromKpi = num(o._kpis_restschuld); if(fromKpi > 0) return fromKpi;
+    var D = num(o.d1) + num(o.d2); if(D <= 0) return 0;
+    var zins = num(o.d1z)/100, tilg = num(o.d1t)/100; if(zins <= 0 || tilg <= 0) return D;
+    var i = zins/12, A = D*(zins+tilg)/12, m = 0;
+    var au = (o.d1_auszahl||'').toString().match(/(\d{1,2})[.\/](\d{4})/);
+    if(au){ var mm = +au[1], yy = +au[2]; var now = new Date(); m = (now.getFullYear()-yy)*12 + (now.getMonth()+1-mm); }
+    if(m <= 0) return D;
+    var pow = Math.pow(1+i, m), rest = D*pow - (A/i)*(pow-1); return rest > 0 ? rest : 0;
+  }
+  var _cfMode = 'vs'; /* 'vs' vor Steuer | 'ns' nach Steuer (Cashflow-Karte) */
+  function toggleCf(){ _cfMode = (_cfMode === 'vs') ? 'ns' : 'vs'; try{ renderOverview(); }catch(e){} }
+  /* v475: Objekt-Auswahl im Cockpit. -1 = alle aggregiert, sonst Index in wonList()/detailArr(). */
+  var _dashSelIdx = -1;
+  function selectObject(v){
+    _dashSelIdx = (v==='__all__'||v===''||v==null) ? -1 : parseInt(v,10);
+    if(isNaN(_dashSelIdx)) _dashSelIdx = -1;
+    try{ renderOverview(); renderHealth(); renderScoreHero(); renderKpiCards(); }catch(e){}
   }
   /* ════ SCORE-AGGREGATION (IV-gewichtet, SSoT) ════
      Gesamt-Score = investitionsvolumen-gewichtetes Mittel der
@@ -286,6 +348,9 @@
       catsHtml = '<div class="pscore-headline" style="grid-column:1/-1">Kategorien werden geladen…</div>';
     }
 
+    var detailsBtn = P.full
+      ? '<button class="pscore-details" onclick="DealPilotDashboard.showScoreDetails()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4-4M11 8v6M8 11h6"/></svg> Details &amp; alle KPIs</button>'
+      : '<button class="pscore-details locked" onclick="DealPilotDashboard.showScoreUpgrade()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Volle 24-KPI-Analyse (Investor)</button>';
     var watermark = P.demo ? '<div class="pscore-watermark">DEMO · Investor freischalten</div>' : '';
 
     host.innerHTML = watermark
@@ -294,10 +359,10 @@
       + '<div class="pscore-right">'
       + '<div class="pscore-pill">'+(P.full?'☆ INVESTOR':'☆ DEALPILOT')+'</div>'
       + '<div class="pscore-titlebar"><span class="pscore-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>'+esc(title)+'</span>'
-      + '<span class="pscore-tier"><span class="tdot" style="background:'+t.col+';color:'+t.col+'"></span>'+t.l+'</span></div>'
-      + '<div class="pscore-headline">'+headlines[t.t]+' · '+ag.scored+' von '+ag.n+' Objekten bewertet</div>'
+      + '<span class="pscore-tier tier-'+t.t+'"><span class="tdot" style="background:'+t.col+';color:'+t.col+'"></span>'+t.l+'</span></div>'
+      + '<div class="pscore-headline">'+headlines[t.t]+'<span class="pscore-hl-meta"> · '+ag.scored+' von '+ag.n+' Objekten bewertet</span></div>'
       + '<div class="pscore-cats slim">'+catsHtml+'</div>'
-      + '<div class="pscore-actions"><div class="pscore-kirat" style="color:'+arcCol+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>'+kiRat[t.t]+'</div></div>'
+      + '<div class="pscore-actions">'+detailsBtn+'<div class="pscore-kirat" style="color:'+arcCol+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>'+kiRat[t.t]+'</div></div>'
       + '</div>';
 
     // v452.9: Tier-Klasse fuer Score-abhaengigen Glow (gruen bei gut/top)
@@ -324,6 +389,7 @@
   function renderKpiCards(){
     var host=$('dp-kpi-grid'); if(!host) return;
     var ag=aggregateScore();
+    var P=plan();
     var icons={rendite:'M3 17l6-6 4 4 8-8',finanzierung:'M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
       risiko:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',lage:'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z',
       upside:'M4.5 16.5L12 4l7.5 12.5M8 14h8'};
@@ -333,6 +399,7 @@
     }
     host.innerHTML = ag.cats.map(function(c){
       var sc=c.score==null?0:c.score; var t=tierOf(c.score);
+      var kn=(catMeta()[c.key]||{}).count||(KPICOUNT[c.key]||0);
       var tierBadge = c.score==null?'–':(c.score>=85?'TOP':c.score>=70?'GUT':c.score>=50?'SOLIDE':c.score>=35?'SCHWACH':'KRITISCH');
       var tierCls = c.score==null?'':(c.score>=85?'tier-top':c.score>=70?'tier-gut':c.score>=50?'tier-solide':'');
       // Sparkline neben dem Sub-Text (wie Mockup kpi-sub-row), nicht als Hintergrund
@@ -341,8 +408,8 @@
         + '<div class="kpi-head"><span class="kpi-tier" style="color:'+t.col+';border-color:'+t.col+'">'+tierBadge+'</span></div>'
         + '<div class="kpi-row"><div class="kpi-l">'+esc(c.label)+'</div>'
         + '<svg class="kpi-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="'+icons[c.key]+'"/></svg></div>'
-        + '<div class="kpi-v" style="color:'+t.col+'">'+(c.score==null?'–':sc)+'</div>'
-        + '<div class="kpi-sub-row"><div class="kpi-sub">'+(c.score==null?'keine Daten':'Kategorie-Score')+'</div>'+sparkHtml+'</div>'
+        + '<div class="kpi-v" style="color:'+t.col+'">'+(c.score==null?'–':sc+' %')+'</div>'
+        + '<div class="kpi-sub-row"><div class="kpi-sub">'+(c.score==null?'keine Daten':(P.full?(kn+' / '+kn+' KPIs'):'Plan-Bewertung'))+'</div>'+sparkHtml+'</div>'
         + '<div class="kpi-prog"><div class="kpi-prog-fill" data-w="'+sc+'" style="width:0%;background:'+t.col+'"></div></div>'
         + '</div>';
     }).join('');
@@ -378,7 +445,7 @@
     var host=$('dp-status-row'); if(!host) return;
     var pruef=0,won=0,lost=0, pVol=0,wVol=0,lVol=0;
     _summaries.forEach(function(o){
-      var s=stageOf(o), v=num(o.kaufpreis);
+      var s=stageOf(o), v=num(o.kaufpreis)/100;  /* v475: kaufpreis kommt aus der Liste in Cent */
       if(s==='won'){won++;wVol+=v;} else if(s==='lost'){lost++;lVol+=v;} else {pruef++;pVol+=v;}
     });
     host.innerHTML =
@@ -392,6 +459,77 @@
     }
   }
   /* ════ HEALTH-LEISTE (braucht Detaildaten) ════ */
+  /* ══ v456: Portfolio-Uebersicht (Bestands-Hardfacts, aggregiert) ══ */
+  function aggStats(){
+    var arr=detailArr();
+    var sum=function(f){return arr.reduce(function(s,o){return s+(f(o)||0);},0);};
+    var kpSum=sum(_kpEuro);
+    var giSum=sum(function(o){var g=num(o._kpis_gi); if(g>0)return g; return _kpEuro(o)+_nkEuro(o)+num(o.san)+num(o.moebl);});
+    var mieteJ=sum(function(o){var m=num(o._kpis_miete_j); if(m>0)return m; return (num(o.nkm)+num(o.ze))*12;});
+    var rest=sum(_restschuldOf);
+    var cfNsJ=sum(function(o){return num(o._kpis_cf_ns);});
+    var cfVsJ=sum(function(o){var v=o._kpis_cf_vs; return (v!=null&&!isNaN(num(v)))?num(v):num(o._kpis_cf_ns);});
+    var kdSum=sum(function(o){return num(o.d1)*(num(o.d1z)+num(o.d1t))/100 + num(o.d2)*(num(o.d2z)+num(o.d2t))/100;});
+    var ekSum=sum(function(o){return num(o.ek);});
+    var darlSum=sum(function(o){return num(o.d1)+num(o.d2);});
+    // Nettomietrendite: IV-gewichtet ueber die kanonische KPI-Engine (window.DealKpis),
+    // damit der Portfolio-Wert exakt der Objekt-Berechnung entspricht.
+    // Fallback: persistierte _kpis_nmy/_kpis_nmr.
+    var nw=0,nws=0;
+    arr.forEach(function(o){
+      var v=NaN, w=_kpEuro(o)||1;
+      if(window.DealKpis && typeof window.DealKpis.compute==='function'){
+        try{ var k=window.DealKpis.compute(o); if(k && isFinite(k.nmy)) v=k.nmy; }catch(e){}
+      }
+      if(!isFinite(v)){ var raw=o._kpis_nmy; if(raw==null)raw=o._kpis_nmr; var rv=num(raw); if(raw!=null&&!isNaN(rv)) v=rv; }
+      if(isFinite(v)){ nw+=w; nws+=v*w; }
+    });
+    var nettoCalc = nw>0 ? (nws/nw) : null;
+    return {
+      n:arr.length, gi:giSum, kp:kpSum, ek:ekSum, darl:darlSum,
+      mieteJ:mieteJ, mieteM:mieteJ/12, rest:rest,
+      cfNsJ:cfNsJ, cfVsJ:cfVsJ, cfNsM:cfNsJ/12, cfVsM:cfVsJ/12,
+      brutto:(kpSum>0?(mieteJ/kpSum*100):null),
+      netto:nettoCalc,
+      dscr:(kdSum>0?(mieteJ/kdSum):null)
+    };
+  }
+  function renderOverview(){
+    var host=$('dp-overview-strip'); if(!host) return;
+    if(!_detailsLoaded){ host.innerHTML='<div class="dp-chart-loading" style="grid-column:1/-1;height:54px"><span class="dp-spin"></span>Kennzahlen werden geladen\u2026</div>'; return; }
+    var arr=detailArr(); if(!arr.length){ host.innerHTML='<div class="health-sub" style="grid-column:1/-1">Keine Detaildaten verfuegbar.</div>'; return; }
+    var s=aggStats();
+    /* v475: Objekt-Dropdown befuellen (volle Liste, nicht gefiltert) */
+    (function(){
+      var sel=document.getElementById('dp-dash-objsel'); if(!sel) return;
+      var allD=wonList().map(function(o){ return _details[o.id||o.key]; }).filter(Boolean);
+      var html='<option value="__all__">Alle Objekte ('+allD.length+')</option>';
+      allD.forEach(function(d,i){ var nm=(d&&(d._name||d.kuerzel||d._obj_seq))||('Objekt '+(i+1)); html+='<option value="'+i+'"'+(i===_dashSelIdx?' selected':'')+'>'+esc(nm)+'</option>'; });
+      if(sel.innerHTML!==html) sel.innerHTML=html;
+    })();
+    function M(v){ if(v==null||isNaN(v))return '\u2013'; var sg=v<0?'-':''; var a=Math.abs(v); if(a>=1e6) return sg+(a/1e6).toFixed(2).replace('.',',')+'\u00a0Mio\u00a0\u20ac'; return sg+new Intl.NumberFormat('de-DE').format(Math.round(a))+'\u00a0\u20ac'; }
+    function P2(v,d){ if(v==null||isNaN(v))return '\u2013'; return v.toFixed(d==null?2:d).replace('.',',')+'\u00a0%'; }
+    var green='var(--dp-green)', gold='var(--dp-gold)', red='var(--dp-red)', ch='var(--dp-card-ch)';
+    function cfc(v){ return v>=0?green:red; }
+    function rcol(v,g,go){ return (v==null||isNaN(v))?ch:(v>=g?green:v>=go?gold:red); }
+    function half(l,v,col,sub){ return '<div class="ov-half"><span class="ov-l">'+esc(l)+'</span><div class="ov-v" style="color:'+col+'">'+v+'</div><span class="ov-sub">'+esc(sub)+'</span></div>'; }
+    var cfVor = (_cfMode==='vs');
+    var cfM = cfVor ? s.cfVsM : s.cfNsM, cfJ = cfVor ? s.cfVsJ : s.cfNsJ;
+    var cfLabel = cfVor ? 'vor Steuer' : 'nach Steuer';
+    var groups=[
+      {t:'Bestand', h:[ half('Objekte', String(s.n), gold, 'im Bestand'), half('Mieteinnahmen / Monat', M(s.mieteM), green, 'netto kalt') ]},
+      {t:'Investition', h:[ half('Gesamtinvestition', M(s.gi), ch, 'Kaufpreis + NK'), half('Restschuld gesamt', M(s.rest), ch, 'Verbindlichkeiten') ]},
+      {t:'Mietrendite', h:[ half('Bruttomietrendite', P2(s.brutto), rcol(s.brutto,5,3.5), 'Jahresmiete / KP'), half('Nettomietrendite', P2(s.netto), rcol(s.netto,4,2.5), (s.netto==null?'k.\u00a0A.':'nach BWK')) ]},
+      {t:'Cashflow \u00b7 '+cfLabel, click:true, h:[ half('/ Monat', M(cfM), cfc(cfM), cfLabel), half('/ Jahr', M(cfJ), cfc(cfJ), 'Klick: '+(cfVor?'nach':'vor')+' Steuer') ]}
+    ];
+    host.innerHTML=groups.map(function(g){
+      var cl='ov-card ov-pair-card'+(g.click?' ov-clickable':'');
+      var on=g.click?' onclick="DealPilotDashboard.toggleCf()" title="Klick wechselt vor/nach Steuer"':'';
+      return '<div class="'+cl+'"'+on+'>'
+        + '<div class="ov-card-title">'+esc(g.t)+(g.click?' <span class="ov-toggle-hint">\u21c4</span>':'')+'</div>'
+        + '<div class="ov-pair">'+g.h.join('')+'</div></div>';
+    }).join('');
+  }
   function renderHealth(){
     var host=$('dp-health-strip'); if(!host) return;
     var arr=detailArr();
@@ -400,38 +538,23 @@
       return;
     }
     if(!arr.length){ host.innerHTML='<div class="health-sub" style="grid-column:1/-1">Keine Detaildaten verfuegbar.</div>'; return; }
+    var P=plan();
+    if(!P.full){
+      host.innerHTML='<div class="health-lock" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Portfolio-Health-KPIs (ROE, Cash-on-Cash, Ø-Zins, ESG …) ab Investor-Plan freigeschaltet</div>';
+      return;
+    }
 
     var nowY=new Date().getFullYear();
     var sum=function(f){return arr.reduce(function(s,o){return s+(f(o)||0);},0);};
-    var totalKp=sum(function(o){return num(o._kaufpreis)||num(o.kp);});
-    var totalEk=sum(function(o){return num(o.ek);});
-    // Restschuld: aus persistierten KPIs oder aus Annuitaet berechnen.
-    // Annuitaet: Darlehen d1+d2, Zins d1z, Tilgung d1t, Auszahlung d1_auszahl (MM.YYYY).
-    function restschuldOf(o){
-      var fromKpi=num(o._kpis_restschuld);
-      if(fromKpi>0) return fromKpi;
-      var D=num(o.d1)+num(o.d2); if(D<=0) return 0;
-      var zins=num(o.d1z)/100;
-      var tilg=num(o.d1t)/100;
-      if(zins<=0||tilg<=0) return D;
-      var i=zins/12;
-      var A=D*(zins+tilg)/12;
-      var m=0; var au=(o.d1_auszahl||'').toString().match(/(\d{1,2})[.\/](\d{4})/);
-      if(au){ var mm=+au[1], yy=+au[2]; var now=new Date(); m=(now.getFullYear()-yy)*12+(now.getMonth()+1-mm); }
-      if(m<=0) return D;
-      var pow=Math.pow(1+i,m);
-      var rest=D*pow - (A/i)*(pow-1);
-      return rest>0?rest:0;
-    }
-    var totalRest=sum(restschuldOf);
-    // Jahres-CF nach Steuer (gespeichert) + vor Steuer (approx ueber Steuereffekt)
-    var cfNsJ=sum(function(o){return num(o._kpis_cf_ns);});
-    var cfVsJ=sum(function(o){return num(o._kpis_cf_vs)!=null?num(o._kpis_cf_vs):num(o._kpis_cf_ns);}); // falls vor-Steuer fehlt: =nach
-    var cfNsM=cfNsJ/12, cfVsM=cfVsJ/12;
+    var S=aggStats();                 // SSoT: exakt dieselben Zahlen wie die Portfolio-Uebersicht
+    var totalKp=S.kp, totalEk=S.ek, totalRest=S.rest;
+    var cfNsJ=S.cfNsJ, cfVsJ=S.cfVsJ, cfNsM=S.cfNsM, cfVsM=S.cfVsM;
+    var restschuldOf=_restschuldOf;   // eine gemeinsame Restschuld-Funktion
     var roe=totalEk>0?(cfNsJ/totalEk*100):null;
     // Ø-Zins gewichtet nach Restschuld
     var zw=0,zws=0; arr.forEach(function(o){var z=num(o.d1z),r=restschuldOf(o)||1; if(z>0){zw+=r;zws+=z*r;}});
     var avgZins=zw>0?zws/zw:null;
+    var coc = totalEk>0 ? (cfVsJ/totalEk*100) : null;
     // Zinsbindungs-Risiko: Bindungsende = Auszahlungsjahr (d1_auszahl MM.YYYY) + d1_bindj.
     // Risiko = Restschuld-Anteil, dessen Bindung in <=3 Jahren ausläuft.
     var riskRest=sum(function(o){
@@ -469,7 +592,7 @@
     var hasTilg=totalDarl>0;
     // Energie-Substanz (ESG)
     var eMap={A:100,B:88,C:75,D:60,E:45,F:30,G:15,H:0};
-    var esgW=0,esgS=0; arr.forEach(function(o){var e=(o.ds2_energie||'').toString().toUpperCase().charAt(0); if(eMap[e]!=null){esgW+=num(o._kaufpreis||o.kp);esgS+=eMap[e]*num(o._kaufpreis||o.kp);}});
+    var esgW=0,esgS=0; arr.forEach(function(o){var e=(o.ds2_energie||'').toString().toUpperCase().charAt(0); if(eMap[e]!=null){esgW+=_kpEuro(o);esgS+=eMap[e]*_kpEuro(o);}});
     var esg=esgW>0?esgS/esgW:null;
     var leer=arr.length?sum(function(o){return num(o.leerstand);})/arr.length:null;
 
@@ -477,28 +600,24 @@
     function eurM(v){ return (v<0?'-':'')+fmtE(Math.abs(Math.round(v)))+' €'; }
     function cfCol(v){ return v>=0?'var(--dp-green)':'var(--dp-red)'; }
 
-    // l=Label (deutsch), v=Wert, sub=Unterzeile, tip=Tooltip-Erklaerung
+    // l=Label, v=Wert, sub=Unterzeile, tip=Tooltip (v454: Set + Reihenfolge nach Mockup)
     var cards=[
-      {l:'Cashflow / Monat', v:eurM(cfNsM), sub:'nach Steuer', col:cfCol(cfNsM),
-       tip:'Monatlicher Überschuss nach allen Kosten, Zins, Tilgung und Steuern – summiert über alle gewonnenen Objekte.'},
-      {l:'Cashflow / Monat', v:eurM(cfVsM), sub:'vor Steuer', col:cfCol(cfVsM),
-       tip:'Monatlicher Überschuss vor Steuern (Miete minus Bewirtschaftung, Zins und Tilgung).'},
-      {l:'Cashflow / Jahr', v:eurM(cfNsJ), sub:'nach Steuer', col:cfCol(cfNsJ),
-       tip:'Jährlicher Netto-Cashflow nach Steuern über das gesamte Portfolio.'},
-      {l:'Cashflow / Jahr', v:eurM(cfVsJ), sub:'vor Steuer', col:cfCol(cfVsJ),
-       tip:'Jährlicher Cashflow vor Steuern über das gesamte Portfolio.'},
-      {l:'Eigenkapital-Rendite', v:roe==null?'–':roe.toFixed(1).replace('.',',')+' %', sub:'nach Steuer (ROE)', col:colByVal(roe,6,3),
-       tip:'Return on Equity: jährlicher Cashflow nach Steuern im Verhältnis zum eingesetzten Eigenkapital. Wie stark sich dein Eigenkapital verzinst.'},
-      {l:'Ø-Zinssatz', v:avgZins==null?'–':avgZins.toFixed(2).replace('.',',')+' %', sub:'nach Restschuld gewichtet', col:avgZins==null?'var(--dp-card-ch)':(avgZins<=3?'var(--dp-green)':avgZins<=4.5?'var(--dp-gold)':'var(--dp-red)'),
+      {l:'Eigenkapital-Rendite', v:roe==null?'–':roe.toFixed(2).replace('.',',')+' %', sub:'nach Steuer (ROE)', col:colByVal(roe,6,3),
+       tip:'Return on Equity: jährlicher Cashflow nach Steuern im Verhältnis zum eingesetzten Eigenkapital.'},
+      {l:'Cash-on-Cash', v:coc==null?'–':coc.toFixed(2).replace('.',',')+' %', sub:totalEk>0?('auf '+fmtKEU(totalEk)+' EK'):'auf Eigenkapital', col:colByVal(coc,4,2),
+       tip:'Cash-on-Cash-Rendite: jährlicher Cashflow vor Steuern im Verhältnis zum eingesetzten Eigenkapital.'},
+      {l:'Ø-Zinssatz', v:avgZins==null?'–':avgZins.toFixed(2).replace('.',',')+' %', sub:'nach Restschuld gewichtet', col:avgZins==null?'var(--dp-card-ch)':(avgZins<=3?'var(--dp-green)':avgZins<=4.5?'var(--dp-gold)':'var(--dp-red)'),
        tip:'Durchschnittlicher Sollzins aller Finanzierungen, gewichtet nach der jeweiligen Restschuld.'},
-      {l:'Zinsbindungs-Risiko', v:!hasZinsRisk?'–':Math.round(zinsRiskPct)+' %', sub:'Bindung läuft < 3 J. aus', warn:zinsRiskPct>20, col:zinsRiskPct>20?'var(--dp-red)':'var(--dp-card-ch)',
-       tip:'Anteil der Restschuld, deren Zinsbindung in den nächsten 3 Jahren ausläuft – also bald zu (evtl. höheren) Zinsen neu finanziert werden muss.'},
       {l:'Mietpotenzial', v:!hasMietPot?'–':eurM(mietPot)+' p.a.', sub:'stille Reserve', col:'var(--dp-gold)',
-       tip:'Differenz zwischen ortsüblicher Marktmiete und aktueller Ist-Miete, hochgerechnet auf das Jahr. Zeigt ungenutztes Mietsteigerungs-Potenzial.'},
-      {l:'Tilgungsfortschritt', v:!hasTilg?'–':Math.max(0,tilgFort).toFixed(0)+' %', sub:'Darlehen getilgt', col:'var(--dp-gold)',
-       tip:'Wie viel des ursprünglichen Darlehens bereits getilgt wurde – der über die Tilgung aufgebaute Eigenkapital-Anteil.'},
+       tip:'Differenz zwischen ortsüblicher Marktmiete und aktueller Ist-Miete, hochgerechnet aufs Jahr.'},
+      {l:'DSCR', v:(S.dscr==null?'–':S.dscr.toFixed(2).replace('.',',')), sub:'Kapitaldienstdeckung', col:(S.dscr==null?'var(--dp-card-ch)':(S.dscr>=1.2?'var(--dp-green)':S.dscr>=1?'var(--dp-gold)':'var(--dp-red)')),
+       tip:'Schuldendienstdeckungsgrad: Mietüberschuss im Verhältnis zum Kapitaldienst (Zins + Tilgung). Ab 1,2 komfortabel.'},
+      {l:'Tilgungsfortschritt', v:!hasTilg?'–':Math.max(0,tilgFort).toFixed(2).replace('.',',')+' %', sub:'Darlehen getilgt', col:'var(--dp-gold)',
+       tip:'Wie viel des ursprünglichen Darlehens bereits getilgt wurde.'},
       {l:'Energie-Substanz', v:esg==null?'–':Math.round(esg)+'/100', sub:'nach Energieklasse', col:colByVal(esg,70,45),
-       tip:'Bewertung der energetischen Substanz aus den Energieausweis-Klassen (A=100 … H=0), gewichtet nach Kaufpreis. Indikator für Sanierungsbedarf und ESG-Tauglichkeit.'}
+       tip:'Energetische Substanz aus den Energieausweis-Klassen (A=100 … H=0), gewichtet nach Kaufpreis.'},
+      {l:'Zinsbindungs-Risiko', v:!hasZinsRisk?'–':zinsRiskPct.toFixed(2).replace('.',',')+' %', sub:'Bindung läuft < 3 J. aus', warn:zinsRiskPct>20, col:zinsRiskPct>20?'var(--dp-red)':'var(--dp-card-ch)',
+       tip:'Anteil der Restschuld, deren Zinsbindung in den nächsten 3 Jahren ausläuft.'}
     ];
     host.innerHTML=cards.map(function(c){
       return '<div class="health-box'+(c.warn?' warn':'')+'" title="'+esc(c.tip||'')+'">'
@@ -706,8 +825,8 @@
     var st=stageOf(o); var sc=scoreOf(o); var t=tierOf(sc); var k=o.id||o.key;
     var scorePill = sc!=null ? '<span class="kc-pill" style="color:'+t.col+';border-color:'+t.col+'">'+sc+'</span>' : '';
     var statLine = st==='won'
-      ? 'CF '+(o.cf_ns!=null?fmtE(num(o.cf_ns)/12)+' €/Mon':'–')+' · DSCR '+(o.dscr!=null?(+o.dscr).toFixed(2).replace('.',','):'–')
-      : 'KP '+fmtKEU(num(o.kaufpreis))+' € · Rendite '+(o.bmy!=null?(+o.bmy).toFixed(1).replace('.',',')+'%':'–');
+      ? 'CF '+(o.cf_ns!=null?fmtE(num(o.cf_ns)/100/12)+' €/Mon':'–')+' · DSCR '+(o.dscr!=null?(+o.dscr).toFixed(2).replace('.',','):'–')
+      : 'KP '+fmtKEU(num(o.kaufpreis)/100)+' € · Rendite '+(o.bmy!=null?(+o.bmy).toFixed(1).replace('.',',')+'%':'–');
     return '<div class="dp-kanban-card kc-'+st+'">'
       + '<div class="kc-top"><span class="kc-name">'+esc(o.name||o.kuerzel||'Unbenannt')+'</span>'+scorePill+'</div>'
       + '<div class="kc-meta"><span>'+esc(o.kuerzel||'')+'</span><span>'+esc(o.ort||'')+'</span></div>'
@@ -860,7 +979,7 @@
       _summaries=_summaries.filter(function(o){return (o.id||o.key)!==key;});
       delete _details[key]; _detailsLoaded=false;
       renderAll();
-      loadDetails().then(function(){ renderHealth(); renderKpiCards(); renderScoreHero(); buildCharts(); renderProjTable(); });
+      loadDetails().then(function(){ renderHealth(); renderOverview(); renderKpiCards(); renderScoreHero(); buildCharts(); renderProjTable(); });
       if(typeof window.refreshSavedList==='function') window.refreshSavedList();
       if(typeof window.toast==='function') window.toast('Objekt geloescht');
     }).catch(function(e){ if(typeof window.toast==='function') window.toast('Loeschen fehlgeschlagen'); });
@@ -946,7 +1065,7 @@
   /* ════ RENDER-ORCHESTRIERUNG ════ */
   function renderAll(){
     renderScoreHero(); renderKpiCards(); renderStatus(); renderBoardOrCards();
-    renderHealth(); renderProjTable();
+    renderHealth(); renderOverview(); renderProjTable();
   }
 
   /* ════ DASHBOARD-MARKUP (in #dashboard-main injecten) ════ */
@@ -962,14 +1081,19 @@
     }
     m.innerHTML =
       '<div id="dp-dash-bgfx"><span class="dp-orb o1"></span><span class="dp-orb o2"></span><span class="dp-orb o3"></span><canvas id="dp-particles"></canvas></div>'
-      + '<div class="dp-dash-header"><div><div class="dp-dash-title">Portfolio-Dashboard</div>'
-      + '<div class="dp-dash-sub">Zentrale Management- und Analyseoberfläche · alle gewonnenen Objekte</div></div>'
-      + '<div class="dp-dash-actions">'
-      + '<button class="dp-dash-btn" onclick="DealPilotDashboard.toggleSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Vollbreite</button>'
-      + '<button class="dp-dash-btn" onclick="DealPilotDashboard.headerTrackRecord()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Track-Record</button>'
+      + '<div class="dp-dash-header"><div><div class="dp-dash-title">Portfolio-Cockpit</div>'
+      + '<div class="dp-dash-sub">Live · Stand heute (' + _heute() + ') · aggregiert über gewonnene Objekte</div></div>'
+      /* v486: Vollbreite- + Track-Record-Button entfernt (Vollbreite ersetzt durch
+         globalen Sidebar-Toggle aus sidebar-collapse.js). Objekt-Selektor nach RECHTS,
+         lesbar (cream auf #1c1c1c) + Label davor. */
+      + '<div class="dp-dash-objsel-wrap" style="display:flex;align-items:center;gap:10px;align-self:center;">'
+      + '<span class="dp-dash-objsel-label" style="color:#C9A84C;font-family:Inter,sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;">Objekt</span>'
+      + '<select id="dp-dash-objsel" class="dp-dash-objsel" onchange="DealPilotDashboard.selectObject(this.value)" style="background:#1c1c1c;color:#F4ECD8;border:1px solid rgba(201,168,76,.45);border-radius:8px;padding:8px 14px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;max-width:280px;cursor:pointer;"></select>'
       + '</div></div>'
       + '<div class="pscore-hero dp-card-dark" id="dp-pscore-hero"></div>'
       + '<div class="kpi-grid" id="dp-kpi-grid"></div>'
+      + '<div class="dp-section-label">Portfolio-\u00dcbersicht <span class="dp-model-tag">Bestand \u00b7 aggregiert</span></div>'
+      + '<div class="overview-strip dp-card-dark" id="dp-overview-strip"></div>'
       + '<div class="health-strip dp-card-dark" id="dp-health-strip"></div>'
       + '<div class="dp-status-row" id="dp-status-row"></div>'
       + '<div class="dp-section-label">Objekte <span class="dp-view-switch" id="dp-view-switch">'
@@ -1078,7 +1202,7 @@
       // Hintergrund: Details nachladen -> Health/KPIs/Charts/Tabelle
       return loadDetails();
     }).then(function(){
-      renderScoreHero(); renderKpiCards(); renderHealth(); renderProjTable(); buildCharts();
+      renderScoreHero(); renderKpiCards(); renderHealth(); renderOverview(); renderProjTable(); buildCharts();
     }).catch(function(e){
       $('dp-kpi-grid').innerHTML='<div class="health-sub" style="grid-column:1/-1">Daten konnten nicht geladen werden: '+esc(e.message)+'</div>';
     });
@@ -1134,6 +1258,50 @@
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
   else boot();
 
+  /* ══ v454: Score-Detail-Modal – welche KPIs fließen ein ══ */
+  function _scoreModalClose(){ var ov=document.getElementById('dp-score-modal-ov'); if(ov) ov.parentNode.removeChild(ov); }
+  function showScoreDetails(){
+    var ag=aggregateScore();
+    var cats=(ag && ag.cats)?ag.cats:null;
+    var meta=catMeta();
+    var totalKpi=0; Object.keys(meta).forEach(function(k){ totalKpi+=meta[k].count||0; });
+    var total=(ag && ag.total!=null)?ag.total:null;
+    var tcol=total==null?'var(--dp-gold)':(total>=70?'#3FA56C':total>=50?'#C9A84C':'#B86250');
+    var tlab=total==null?'\u2013':(total>=85?'Sehr gut':total>=70?'Gut':total>=50?'Solide':'Schwach');
+    var head='<div class="dp-sd-total">Gesamt <b style="color:'+tcol+'">'+(total==null?'\u2013':total)+'/100</b> \u00b7 '+tlab
+      +' \u2014 gewichteter Durchschnitt \u00fcber alle Kategorien und '+totalKpi+' KPIs</div>';
+    var rows=(cats||[]).map(function(c){
+      var scN=c.score==null?0:c.score; var sc=c.score==null?'\u2013':c.score;
+      var col=catBarColor(scN); var m=meta[c.key]||{count:0,weight:0,names:[]};
+      var kl=(m.kpis&&m.kpis.length)?m.kpis:((m.names||[]).map(function(n){return {name:n,weight:null};}));
+      var chips=kl.length
+        ? kl.map(function(b){ var wv=(b.weight!=null)?'<span class="dp-sd-kw">'+b.weight+'\u00a0%</span>':''; return '<div class="dp-sd-krow"><span class="dp-sd-kn">'+esc(b.name)+'</span>'+wv+'</div>'; }).join('')
+        : '<div class="dp-sd-krow dim">'+(m.count||0)+' KPIs</div>';
+      return '<div class="dp-sd-cat">'
+        + '<div class="dp-sd-cat-head"><span>'+esc(c.label)+' <span class="dp-sd-weight">'+(m.weight||0)+'%</span></span>'
+        + '<span class="dp-sd-cat-score" style="color:'+col+'">'+sc+'/100</span></div>'
+        + '<div class="dp-sd-bar"><div class="dp-sd-bar-fill" style="width:'+scN+'%;background:'+col+'"></div></div>'
+        + '<div class="dp-sd-klist">'+chips+'</div></div>';
+    }).join('');
+    var ov=document.createElement('div'); ov.id='dp-score-modal-ov'; ov.className='dp-wk-modal-ov';
+    ov.innerHTML='<div class="dp-wk-modal dp-sd-modal" style="max-width:520px;max-height:84vh;overflow:auto">'
+      + '<div class="dp-wk-modal-t">Investor Portfolio Score \u00b7 Aufschl\u00fcsselung</div>'
+      + head
+      + (rows||'<div class="dp-wk-modal-s">Kategorien werden noch geladen.</div>')
+      + '<button class="dp-wk-modal-x" onclick="DealPilotDashboard.closeScoreModal()">Schlie\u00dfen</button></div>';
+    ov.addEventListener('click',function(e){ if(e.target===ov) _scoreModalClose(); });
+    document.body.appendChild(ov);
+  }
+  function showScoreUpgrade(){
+    var ov=document.createElement('div'); ov.id='dp-score-modal-ov'; ov.className='dp-wk-modal-ov';
+    ov.innerHTML='<div class="dp-wk-modal" style="max-width:430px">'
+      + '<div class="dp-wk-modal-t">Volle 24-KPI-Analyse</div>'
+      + '<div class="dp-wk-modal-s">Im Investor-Plan fließen 24 Einzel-KPIs (ROE, Cash-on-Cash, DSCR, WALT, ESG …) in den Portfolio-Score und die Health-Leiste ein. Im Starter-Plan siehst du die Plan-Bewertung der fünf Kategorien.</div>'
+      + '<button class="dp-wk-modal-x" onclick="DealPilotDashboard.closeScoreModal()">Verstanden</button></div>';
+    ov.addEventListener('click',function(e){ if(e.target===ov) _scoreModalClose(); });
+    document.body.appendChild(ov);
+  }
+
   /* ════ PUBLIC API ════ */
   window.DealPilotDashboard = {
     open: openDashboard, close: closeDashboard,
@@ -1141,6 +1309,9 @@
     cardPdf: cardPdf, cardDelete: cardDelete,
     headerTrackRecord: headerTrackRecord, exportPortfolioPdf: exportPortfolioPdf,
     toggleSidebar: toggleSidebar, setTheme: setTheme, applyTheme: applyTheme,
+    showScoreDetails: showScoreDetails, showScoreUpgrade: showScoreUpgrade, closeScoreModal: _scoreModalClose,
+    toggleCf: toggleCf,
+    selectObject: selectObject,
     _debug: function(){ return { summaries:_summaries, details:_details, loaded:_detailsLoaded }; }
   };
 })();

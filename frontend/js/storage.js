@@ -133,6 +133,7 @@ function collectData() {
   if (typeof State !== 'undefined' && State.kpis) {
     d._kpis_bmy = State.kpis.bmy;
     d._kpis_cf_ns = State.kpis.cf_ns;
+    d._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs: CF vor Steuer (Jahr) fuers Cockpit */
     d._kpis_dscr = State.kpis.dscr;
     d._kpis_ltv = State.kpis.ltv;       // V110: LTV mitspeichern für Sidebar-Toggle DSCR↔LTV
   }
@@ -276,6 +277,7 @@ function loadData(d) {
     if (_o351 && typeof State !== 'undefined' && State.kpis) {
       _o351._kpis_bmy  = State.kpis.bmy;
       _o351._kpis_cf_ns = State.kpis.cf_ns;
+      _o351._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs */
       _o351._kpis_dscr = State.kpis.dscr;
       _o351._kpis_ltv  = State.kpis.ltv;
       if (typeof DealScore !== 'undefined' && typeof DealScore.compute === 'function') {

@@ -42,13 +42,17 @@ var Auth = (function() {
     } else {
       defaultCtrl = new AbortController();
       fetchOpts.signal = defaultCtrl.signal;
-      setTimeout(function() { defaultCtrl.abort(); }, 15000);
+      /* v487-ai-timeout: KI-Endpunkte (/ai/) machen Web-Suche + lange Texte
+         -> bis ~60s. Default 15s, /ai/ 120s, options.timeout (ms) ueberschreibt. */
+      var _toMs = (options.timeout != null) ? options.timeout
+                  : (/\/ai\//.test(path) ? 120000 : 15000);
+      setTimeout(function() { defaultCtrl.abort(); }, _toMs);
     }
     var res;
     try { res = await fetch(url, fetchOpts); }
     catch (err) {
       if (err && err.name === 'AbortError') {
-        throw new Error('Anfrage-Timeout (Server antwortet nicht binnen 15s)');
+        throw new Error('Anfrage-Timeout (Server antwortet nicht rechtzeitig)');
       }
       throw new Error('Server nicht erreichbar (' + err.message + ')');
     }

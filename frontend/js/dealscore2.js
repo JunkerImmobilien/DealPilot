@@ -272,6 +272,29 @@ window.DealScore2 = (function() {
           ]
         }
       }
+    },
+
+    /* V462 - Investor-Profile: Lage / Cashflow / Sicherheit */
+    lage: {
+      key: 'lage',
+      label: 'Lage-Fokus',
+      description: 'Fokus auf Lagequalität — die Lage zählt am stärksten, ideal für wertstabile A-/B-Lagen.',
+      icon: '📍',
+      overrides: { weights: { rendite: 20, finanzierung: 15, risiko: 15, lage: 40, upside: 10 } }
+    },
+    cashflow: {
+      key: 'cashflow',
+      label: 'Cashflow-Fokus',
+      description: 'Fokus auf laufenden Cashflow + Rendite — für Anleger, die den monatlichen Überschuss priorisieren.',
+      icon: '💶',
+      overrides: { weights: { rendite: 40, finanzierung: 25, risiko: 20, lage: 8, upside: 7 } }
+    },
+    sicherheit: {
+      key: 'sicherheit',
+      label: 'Sicherheit',
+      description: 'Fokus auf Finanzierungssicherheit + geringes Risiko — solide Finanzierung schlägt Renditejagd.',
+      icon: '🔒',
+      overrides: { weights: { rendite: 25, finanzierung: 30, risiko: 30, lage: 10, upside: 5 } }
     }
   };
   // Default-Preset (Fallback wenn nichts gespeichert)
@@ -643,10 +666,11 @@ window.DealScore2 = (function() {
 
     // Ampel-Logik
     var label, color;
-    if (totalScore < 50) { label = 'Schwach'; color = 'red'; }
-    else if (totalScore < 70) { label = 'Okay'; color = 'gold'; }
-    else if (totalScore < 85) { label = 'Gut'; color = 'green'; }
-    else { label = 'Sehr gut'; color = 'green-strong'; }
+    var _k = (window.ScoreTier ? window.ScoreTier.classify(totalScore) : (totalScore>=85?'top':totalScore>=70?'green':totalScore>=50?'gold':'red'));
+    if (_k === 'red')        { label = 'Schwach';  color = 'red'; }
+    else if (_k === 'gold')  { label = 'Okay';     color = 'gold'; }
+    else if (_k === 'green') { label = 'Gut';      color = 'green'; }
+    else                     { label = 'Sehr gut'; color = 'green-strong'; }
 
     // Top 3 positive + top 3 negative Sub-KPIs (über alle Kategorien) sammeln
     var allKpis = [];

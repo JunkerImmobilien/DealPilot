@@ -22,6 +22,7 @@
  */
 
 const express = require('express');
+const crypto = require('crypto'); // v480: Cache-Key-Hash
 const { authenticate } = require('../middleware/auth');
 const aiCreditsService = require('../services/aiCreditsService');
 const avmCreditsService = require('../services/avmCreditsService');
@@ -49,8 +50,9 @@ async function modeForUser(userId) {
   return (plan && plan !== 'free') ? 'live' : 'stub';
 }
 
-// Credit-Kosten je Provider. Sprengnetter: 3 mit Kaufpreis (inkl. Fair-Price-Label),
-// 2 ohne. PriceHubble: 1 (bündelt alles in einem Call).
+// Credit-Kosten je Provider. Sprengnetter: seit v480 immer 2 echte API-Calls
+// (Marktwert + Marktmiete); das Fair-Price-Label (3. Call) ist deaktiviert.
+// PriceHubble: 1 Call. (Credit-Preis je Abruf hier = 1, unabhaengig vom Kaufpreis.)
 const COST = { pricehubble: 1, sprengnetter_full: 1, sprengnetter_nokp: 1 };
 
 function num(v) { return stub.num(v); }
@@ -117,6 +119,48 @@ router.post('/quote', authenticate, async function (req, res, next) {
   } catch (e) { next(e); }
 });
 
+// ── In-Memory AVM-Result-Cache (v480) ───────────────────────────────────────
+// Spart echte API-Kosten UND Credits, wenn dasselbe Objekt (gleicher User, gleicher
+// Anbieter, gleiche Eckdaten) erneut bewertet wird. NUR im Live-Modus aktiv.
+// HINWEIS: In-Memory → wird bei Backend-Neustart/Rebuild geleert. Fuer dauerhaftes
+// Caching ueber Neustarts hinweg braeuchte es eine DB-Tabelle (Migration).
+// TTL via ENV AVM_CACHE_TTL_DAYS (Default 90 Tage).
+const AVM_CACHE = new Map(); // key -> { result, ts }
+const AVM_CACHE_TTL_MS = (parseInt(process.env.AVM_CACHE_TTL_DAYS || '90', 10) || 90) * 24 * 60 * 60 * 1000;
+const AVM_CACHE_MAX = 2000;
+
+function _cacheKey(userId, provider, inputs) {
+  inputs = inputs || {};
+  const norm = [
+    provider,
+    String(userId || ''),
+    String(inputs.plz || '').trim().toLowerCase(),
+    String(inputs.ort || '').trim().toLowerCase(),
+    String(inputs.str || '').trim().toLowerCase(),
+    String(inputs.hnr || '').trim().toLowerCase(),
+    String(inputs.objektart || '').trim().toLowerCase(),
+    String(num(inputs.wfl) || ''),
+    String(num(inputs.baujahr) || ''),
+    String(num(inputs.zimmer) || ''),
+    String(num(inputs.etage) || ''),
+    hasKp(inputs) ? '1' : '0'
+  ].join('|');
+  return crypto.createHash('sha256').update(norm).digest('hex');
+}
+function _cacheGet(key) {
+  const e = AVM_CACHE.get(key);
+  if (!e) return null;
+  if (Date.now() - e.ts > AVM_CACHE_TTL_MS) { AVM_CACHE.delete(key); return null; }
+  return e.result;
+}
+function _cacheSet(key, result) {
+  if (AVM_CACHE.size >= AVM_CACHE_MAX) {
+    const oldest = AVM_CACHE.keys().next().value; // Map bewahrt Insertion-Order
+    if (oldest !== undefined) AVM_CACHE.delete(oldest);
+  }
+  AVM_CACHE.set(key, { result: result, ts: Date.now() });
+}
+
 // ── gemeinsamer Handler ──────────────────────────────────────────────────────
 async function runProvider(provider, req, res, next) {
   try {
@@ -131,6 +175,16 @@ async function runProvider(provider, req, res, next) {
 
     const mode = await modeForUser(req.user.id);
     const cost = costFor(provider, inputs);
+
+    // v480: Cache-Treffer im Live-Modus -> kostenlos, kein API-Call, kein Credit-Abzug.
+    let cacheKey = null;
+    if (mode === 'live') {
+      cacheKey = _cacheKey(req.user.id, provider, inputs);
+      const hit = _cacheGet(cacheKey);
+      if (hit) {
+        return res.json({ ok: true, mode: mode, cost: 0, cached: true, result: hit });
+      }
+    }
 
     // Credit-Pre-Check NUR im Live-Modus (Stub ist kostenlos).
     if (mode === 'live') {
@@ -152,6 +206,7 @@ async function runProvider(provider, req, res, next) {
     } else {
       const client = provider === 'pricehubble' ? pricehubble : sprengnetter;
       result = await client.valuate(inputs);
+      if (cacheKey) _cacheSet(cacheKey, result); // v480: Ergebnis cachen
     }
 
     // Credits abziehen NUR im Live-Modus nach Erfolg.
@@ -163,7 +218,7 @@ async function runProvider(provider, req, res, next) {
       }
     }
 
-    res.json({ ok: true, mode: mode, cost: (mode === 'stub' ? 0 : cost), result: result });
+    res.json({ ok: true, mode: mode, cost: (mode === 'stub' ? 0 : cost), cached: false, result: result });
   } catch (err) {
     if (err.code === 'AVM_NOT_CONFIGURED') {
       return res.status(503).json({ error: 'avm_not_configured', message: err.message });

@@ -623,3 +623,366 @@ body:not(.dp-theme-dark) #dashboard-main .chart-card{
   font-size:9px !important; margin-top:3px !important;
 }
 #dashboard-main .health-box .health-i{ width:11px; height:11px; font-size:8px; }
+
+
+/* ====================================================================
+   v453 - Score-Hero + KPI Optik 1:1 nach Mockup v22 (dashboard-mock-v22)
+   Append-only. Exakte Werte aus dem Mockup. Ueberschreibt v452.x.
+   ==================================================================== */
+
+/* -- Score-Hero Container: Grid auto/1fr, Mockup-Padding -- */
+#dashboard-main .pscore-hero{
+  display:grid !important; grid-template-columns:auto 1fr !important;
+  gap:32px !important; align-items:center !important;
+  padding:28px 32px !important; margin-bottom:26px !important;
+}
+
+/* -- Titel-Hierarchie FLIP: Label klein/uppercase, Headline gross/Gradient -- */
+#dashboard-main .pscore-titlebar{ gap:12px !important; margin-bottom:4px !important; }
+#dashboard-main .pscore-title{
+  font-family:'Inter',-apple-system,sans-serif !important;
+  font-size:12px !important; font-weight:700 !important;
+  letter-spacing:.06em !important; text-transform:uppercase !important;
+  opacity:.85; gap:6px !important;
+}
+#dashboard-main .pscore-title svg{ width:13px !important; height:13px !important; color:var(--dp-gold-2) !important; }
+
+#dashboard-main .pscore-headline{
+  font-size:22px !important; font-weight:700 !important; line-height:1.2 !important;
+  letter-spacing:-.01em; margin-bottom:16px !important; padding-bottom:3px;
+  background:linear-gradient(90deg,var(--dp-card-ch),var(--dp-gold-2)) !important;
+  -webkit-background-clip:text !important; background-clip:text !important;
+  -webkit-text-fill-color:transparent !important; color:transparent !important;
+}
+/* Zaehler-Suffix in der Headline: klein + dezent, nicht Teil des grossen Gradients */
+#dashboard-main .pscore-headline .pscore-hl-meta{
+  font-size:12.5px !important; font-weight:600 !important; letter-spacing:0;
+  background:none !important; -webkit-text-fill-color:var(--dp-card-muted) !important;
+  color:var(--dp-card-muted) !important;
+}
+
+/* -- Plan-Pill (Stern INVESTOR) wie Mockup -- */
+#dashboard-main .pscore-pill{
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:9.5px !important; font-weight:700 !important; letter-spacing:.08em !important;
+  padding:2px 9px !important; margin-bottom:9px !important;
+  color:var(--dp-gold-2) !important; border:1px solid var(--dp-gold-dk) !important;
+  background:rgba(201,168,76,.06) !important; border-radius:99px;
+}
+
+/* -- Tier-Pille ("Gut" etc.) als farbige Plakette (Mockup) -- */
+#dashboard-main .pscore-tier{
+  padding:2px 10px !important; border-radius:99px;
+  font-size:11px !important; font-weight:700 !important; gap:5px !important;
+}
+#dashboard-main .pscore-tier.tier-top,
+#dashboard-main .pscore-tier.tier-hi{
+  background:rgba(63,165,108,.16) !important; color:#3FA56C !important; border:1px solid #3FA56C !important;
+}
+#dashboard-main .pscore-tier.tier-mid{
+  background:rgba(201,168,76,.14) !important; color:#C9A84C !important; border:1px solid #C9A84C !important;
+}
+#dashboard-main .pscore-tier.tier-lo{
+  background:rgba(184,98,80,.14) !important; color:#B86250 !important; border:1px solid #B86250 !important;
+}
+
+/* -- Kategorie-Balken: feste 5 Spalten, kraeftigerer Wert, Glow am Fill -- */
+#dashboard-main .pscore-cats.slim{
+  grid-template-columns:repeat(5,1fr) !important; gap:14px !important; margin-top:4px !important;
+}
+@media(max-width:680px){ #dashboard-main .pscore-cats.slim{ grid-template-columns:repeat(2,1fr) !important; } }
+#dashboard-main .pscore-cat.slim .pscore-cat-head{ margin-bottom:5px !important; }
+#dashboard-main .pscore-cat.slim .pscore-cat-l{ font-size:11px !important; }
+#dashboard-main .pscore-cat.slim .pscore-cat-v{ font-size:14px !important; font-weight:800 !important; }
+#dashboard-main .pscore-bar{ height:5px !important; background:rgba(201,168,76,.10) !important; }
+#dashboard-main .pscore-bar-fill{ box-shadow:0 0 6px rgba(201,168,76,.35); }
+
+/* -- Actions + KI-Rat -- */
+#dashboard-main .pscore-actions{ gap:14px !important; margin-top:16px !important; }
+#dashboard-main .pscore-kirat{ font-size:12px !important; font-weight:700 !important; }
+
+/* ==== KPI-Kacheln Feinschliff nach Mockup ==== */
+#dashboard-main .kpi{ padding:13px 14px 14px !important; }
+#dashboard-main .kpi .kpi-l{
+  font-size:10.5px !important; font-weight:700 !important; letter-spacing:.06em !important;
+  text-transform:uppercase; opacity:.8; color:var(--dp-card-ch) !important;
+}
+#dashboard-main .kpi .kpi-ico{ width:15px !important; height:15px !important; }
+#dashboard-main .kpi .kpi-v{ font-weight:800 !important; }
+#dashboard-main .kpi .kpi-tier{
+  font-size:9px !important; font-weight:800 !important; letter-spacing:.10em !important;
+  padding:2px 8px !important; background:rgba(255,255,255,.02);
+}
+#dashboard-main .kpi .kpi-sub{ font-size:10px !important; }
+#dashboard-main .kpi .kpi-prog{ height:3px !important; }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v454 - Portfolio-Cockpit: tiefes Schwarz + Sternenfeld, Header, Plan-Gate,
+   Score-Detail-Modal, Effekt stark, Hero-Hoehe. Append-only, exakte Mockup-Werte.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* -- 1) Header wie Mockup: 28px/700, Gradient ch->gold-2 (NICHT Cormorant) -- */
+#dashboard-main .dp-dash-title{
+  font-family:'Space Grotesk','Inter',-apple-system,sans-serif !important;
+  font-size:28px !important; font-weight:700 !important; letter-spacing:-.02em !important;
+  line-height:1.15 !important; padding-bottom:4px;
+  background:linear-gradient(90deg,var(--dp-ch),var(--dp-gold-2)) !important;
+  -webkit-background-clip:text !important; background-clip:text !important;
+  -webkit-text-fill-color:transparent !important; color:transparent !important;
+}
+#dashboard-main .dp-dash-sub{ font-size:12.5px !important; }
+
+/* -- 2) TIEFES SCHWARZ + Sternenfeld-Pattern auf den Premium-Cards (BEIDE Modi).
+       Ueberschreibt den grauen v452.11-Verlauf (rgba(20,20,24)) per !important. -- */
+#dashboard-main .dp-card-dark,
+#dashboard-main .pscore-hero,
+#dashboard-main .kpi,
+#dashboard-main .health-strip,
+#dashboard-main .health-box{
+  background-color:#050505 !important;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><circle cx='25' cy='40' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='90' cy='15' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='150' cy='70' r='.8' fill='%23C9A84C' opacity='.40'/><circle cx='60' cy='110' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='130' cy='140' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='40' cy='165' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='170' cy='30' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='15' cy='95' r='.55' fill='%23C9A84C' opacity='.28'/></svg>"),
+    linear-gradient(180deg,rgba(201,168,76,.05),rgba(201,168,76,0) 25%),
+    linear-gradient(180deg,#0a0805,#000 65%) !important;
+  background-size:180px 180px, auto, auto !important;
+  background-repeat:repeat, no-repeat, no-repeat !important;
+  border:1px solid rgba(201,168,76,0.20) !important;
+  backdrop-filter:none !important;
+}
+/* health-box behaelt kompaktes Padding (v452.15), nur Hintergrund tiefschwarz + Pattern */
+
+/* -- 3) Effekt STARK: Orbs + Partikel deutlich sichtbar -- */
+#dp-dash-bgfx{ z-index:0 !important; }
+#dp-dash-bgfx .dp-orb{ opacity:1 !important; }
+#dp-dash-bgfx .dp-orb.o1{ animation-duration:13s !important; }
+#dp-dash-bgfx .dp-orb.o2{ animation-duration:15s !important; }
+#dp-dash-bgfx .dp-orb.o3{ animation-duration:11s !important; }
+#dp-dash-bgfx canvas#dp-particles{ opacity:1 !important; mix-blend-mode:screen; }
+
+/* -- 4) Hero-Hoehe: kompakt, Inhalt zentriert (killt evtl. globale min-height) -- */
+#dashboard-main .pscore-hero{ min-height:0 !important; align-items:center !important; }
+
+/* -- 5) Health-Lock-Hinweis (Starter-Plan) -- */
+#dashboard-main .health-lock{
+  display:flex; align-items:center; gap:9px; grid-column:1/-1;
+  background:rgba(201,168,76,.05) !important; border:1px dashed var(--dp-gold-dk) !important;
+  border-radius:12px; padding:14px 18px; color:var(--dp-card-muted);
+  font-size:12.5px; font-weight:600; background-image:none !important;
+}
+#dashboard-main .health-lock svg{ width:16px; height:16px; color:var(--dp-gold); flex-shrink:0; }
+
+/* -- 6) Score-Detail-Modal: Kategorien + welche KPIs einfliessen -- */
+.dp-sd-cat{ border-top:1px solid rgba(201,168,76,.14); padding:11px 0 9px; }
+.dp-sd-cat:first-of-type{ border-top:none; }
+.dp-sd-cat-head{ display:flex; justify-content:space-between; align-items:center;
+  font-size:13px; font-weight:700; color:#F2ECDC; margin-bottom:6px; }
+.dp-sd-kpis{ display:flex; flex-wrap:wrap; gap:6px; }
+.dp-sd-kpi{ font-size:11px; color:rgba(232,226,212,.78); background:rgba(201,168,76,.08);
+  border:1px solid rgba(201,168,76,.18); border-radius:7px; padding:3px 8px; }
+.dp-sd-kpi.dim{ color:rgba(232,226,212,.5); background:transparent; border-style:dashed; }
+
+/* -- 7) Details-/Lock-Button Feinschliff -- */
+#dashboard-main .pscore-details{ margin-top:2px; }
+#dashboard-main .pscore-details.locked{ border-style:dashed; cursor:pointer; }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v455 - Hero-Hoehe (kompakt) + Score-Detail-Modal mit Gewicht/Score/Balken
+   ════════════════════════════════════════════════════════════════════ */
+
+/* -- Hero-Hoehe: deckt min-height-, height- UND Parent-Stretch-Ursache ab.
+   align-self:start verhindert, dass ein Grid/Flex-Parent den Hero streckt. -- */
+#dashboard-main .pscore-hero{
+  min-height:0 !important; height:auto !important;
+  align-self:start !important; align-items:center !important;
+}
+#dashboard-main .pscore-gauge{ align-self:center !important; }
+
+/* -- Score-Detail-Modal: Header + Gewicht-Badge + Kategorie-Balken -- */
+.dp-sd-modal .dp-sd-total{ font-size:12.5px; color:rgba(232,226,212,.8); margin:2px 0 16px; line-height:1.5; }
+.dp-sd-cat-score{ font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:800; }
+.dp-sd-cat-head span:first-child{ font-family:'Space Grotesk',sans-serif; }
+.dp-sd-weight{ font-family:'Inter',sans-serif; font-size:10.5px; font-weight:600; color:var(--dp-gold);
+  background:rgba(201,168,76,.10); border:1px solid rgba(201,168,76,.22); border-radius:6px; padding:1px 6px; margin-left:4px; }
+.dp-sd-bar{ height:5px; border-radius:3px; background:rgba(201,168,76,.10); overflow:hidden; margin:7px 0 9px; }
+.dp-sd-bar-fill{ height:100%; border-radius:3px; box-shadow:0 0 6px rgba(201,168,76,.35);
+  transition:width .9s cubic-bezier(.2,.8,.2,1); }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v456 - Portfolio-Uebersicht-Leiste (Bestands-Hardfacts)
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Strip-Container: gleiche Premium-Optik (tiefes Schwarz + Sternenfeld) wie Health */
+#dashboard-main .overview-strip{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:11px; padding:16px 18px; margin-bottom:18px; border-radius:var(--dp-radius);
+  background-color:#050505 !important;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><circle cx='25' cy='40' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='90' cy='15' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='150' cy='70' r='.8' fill='%23C9A84C' opacity='.40'/><circle cx='60' cy='110' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='130' cy='140' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='40' cy='165' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='170' cy='30' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='15' cy='95' r='.55' fill='%23C9A84C' opacity='.28'/></svg>"),
+    linear-gradient(180deg,rgba(201,168,76,.05),rgba(201,168,76,0) 25%),
+    linear-gradient(180deg,#0a0805,#000 65%) !important;
+  background-size:180px 180px, auto, auto !important;
+  border:1px solid rgba(201,168,76,0.20) !important;
+}
+
+/* Einzel-Kachel: Icon + Label oben, grosser Wert, Sub. Gold-Akzentstreifen links. */
+#dashboard-main .ov-card{
+  position:relative; padding:12px 13px 11px; border-radius:11px; overflow:hidden;
+  background:rgba(201,168,76,.05); border:1px solid rgba(201,168,76,.16);
+  transition:transform .16s, border-color .16s, box-shadow .16s;
+}
+#dashboard-main .ov-card::after{
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--dp-gold); box-shadow:0 0 6px rgba(201,168,76,.45);
+}
+#dashboard-main .ov-card:hover{ transform:translateY(-1px); border-color:rgba(201,168,76,.35);
+  box-shadow:0 6px 18px rgba(0,0,0,.4); }
+#dashboard-main .ov-top{ display:flex; align-items:center; gap:6px; margin-bottom:7px; }
+#dashboard-main .ov-ico{ width:13px; height:13px; color:var(--dp-gold); opacity:.85; flex-shrink:0; }
+#dashboard-main .ov-l{ font-size:9.5px; font-weight:600; letter-spacing:.02em; line-height:1.2;
+  color:var(--dp-card-muted); text-transform:none; }
+#dashboard-main .ov-v{ font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:800;
+  line-height:1.05; font-variant-numeric:tabular-nums; text-shadow:0 0 10px currentColor; }
+#dashboard-main .ov-sub{ font-size:9px; color:var(--dp-card-muted); margin-top:3px; }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v457 - Hero zurueck auf FLEX (Hoehe kam mit der grid-Umstellung in v453)
+   + Score-Detail-Modal: KPI-Zeilen mit Gewicht
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Hero: grid (v453/v455) wird durch flex ersetzt -> Hoehe = Inhalt (wie v452-Original) */
+#dashboard-main .pscore-hero{
+  display:flex !important; flex-direction:row !important; align-items:center !important;
+  gap:32px !important; min-height:0 !important; height:auto !important;
+}
+#dashboard-main .pscore-hero .pscore-gauge{ flex:0 0 auto !important; }
+#dashboard-main .pscore-hero .pscore-right{ flex:1 1 0 !important; min-width:0 !important; }
+@media (max-width:760px){ #dashboard-main .pscore-hero{ flex-direction:column !important; text-align:center; } }
+
+/* Score-Detail-Modal: KPI-Zeilen (Name + Gewicht statt Chips) */
+.dp-sd-klist{ display:flex; flex-direction:column; gap:1px; margin-top:3px; }
+.dp-sd-krow{ display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:5px 0; border-top:1px solid rgba(201,168,76,.07); }
+.dp-sd-krow:first-child{ border-top:none; }
+.dp-sd-kn{ font-size:12px; color:rgba(232,226,212,.82); }
+.dp-sd-kw{ font-family:'Space Grotesk',sans-serif; font-size:11.5px; font-weight:700; color:var(--dp-gold);
+  background:rgba(201,168,76,.10); border:1px solid rgba(201,168,76,.20); border-radius:6px;
+  padding:1px 7px; flex-shrink:0; font-variant-numeric:tabular-nums; }
+.dp-sd-krow.dim{ color:rgba(232,226,212,.5); font-size:11px; }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v464 - Portfolio-Uebersicht: grosse Karten mit 2 Werten (Paare)
+   + bewegte Partikel im Hero (score-fx Layer, siehe .ds-fx in style.css)
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Grid: grosse Karten wie die Kategorie-Karten (ca. 3 pro Reihe) */
+#dashboard-main .overview-strip{
+  grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)) !important;
+  gap:14px !important;
+}
+
+/* Paar-Karte: Titel oben, zwei Werte nebeneinander mit Trenner */
+#dashboard-main .ov-card.ov-pair-card{
+  padding:16px 20px !important;
+  min-height:112px;
+  display:flex; flex-direction:column; justify-content:center;
+}
+#dashboard-main .ov-card.ov-pair-card::after{ width:3px; }
+#dashboard-main .ov-card-title{
+  font-family:'Space Grotesk',sans-serif; font-size:10.5px; font-weight:700;
+  letter-spacing:.07em; text-transform:uppercase; color:var(--dp-gold);
+  margin-bottom:13px; opacity:.92;
+}
+#dashboard-main .ov-pair{ display:flex; gap:18px; align-items:flex-start; }
+#dashboard-main .ov-pair .ov-half{ flex:1 1 0; min-width:0; }
+#dashboard-main .ov-pair .ov-half + .ov-half{
+  border-left:1px solid rgba(201,168,76,.16); padding-left:18px;
+}
+#dashboard-main .ov-pair .ov-l{
+  display:block; font-size:11px; font-weight:600; line-height:1.25;
+  color:var(--dp-card-muted); margin-bottom:5px;
+}
+#dashboard-main .ov-pair .ov-v{
+  font-family:'Space Grotesk',sans-serif; font-size:23px; font-weight:800;
+  line-height:1.05; font-variant-numeric:tabular-nums; text-shadow:0 0 10px currentColor;
+}
+#dashboard-main .ov-pair .ov-sub{
+  display:block; font-size:10px; color:var(--dp-card-muted); margin-top:4px;
+}
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v465 - Hero links + Uebersicht wie Kategorie-Karten + Modal-% lesbar
+   ════════════════════════════════════════════════════════════════════ */
+
+/* (a) HERO LINKSBUENDIG: rays/burst/Partikel-Layer wieder ABSOLUTE.
+   Ursache war '#dashboard-main .pscore-hero > *{position:relative}', das das
+   absolute dieser Layer ueberschrieb -> sie landeten im Flex-Fluss und
+   schoben den Gauge nach rechts (und machten den Hero hoch). */
+#dashboard-main .pscore-hero > .pscore-rays,
+#dashboard-main .pscore-hero > .pscore-burst,
+#dashboard-main .pscore-hero > .ds-fx{
+  position:absolute !important; z-index:0 !important;
+}
+#dashboard-main .pscore-hero{ justify-content:flex-start !important; }
+
+/* (b) UEBERSICHT: schwarzer Container-Hintergrund WEG (transparent),
+   die Karten selbst aber dunkel wie die Kategorie-Karten oben. */
+#dashboard-main .overview-strip.dp-card-dark,
+#dashboard-main .overview-strip{
+  background:none !important; background-color:transparent !important;
+  background-image:none !important; border:none !important;
+  padding:0 !important; margin-bottom:18px !important;
+}
+/* Karte = Kategorie-Karten-Optik: tiefes Schwarz + Sternenfeld + Goldrand */
+#dashboard-main .ov-card.ov-pair-card{
+  background-color:#050505 !important;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><circle cx='25' cy='40' r='.7' fill='%23C9A84C' opacity='.30'/><circle cx='90' cy='15' r='.5' fill='%23C9A84C' opacity='.22'/><circle cx='150' cy='70' r='.8' fill='%23C9A84C' opacity='.34'/><circle cx='60' cy='110' r='.6' fill='%23C9A84C' opacity='.26'/><circle cx='130' cy='140' r='.7' fill='%23C9A84C' opacity='.30'/><circle cx='40' cy='165' r='.5' fill='%23C9A84C' opacity='.22'/></svg>"),
+    linear-gradient(180deg,rgba(201,168,76,.05),rgba(201,168,76,0) 30%) !important;
+  background-size:180px 180px, auto !important;
+  background-repeat:repeat, no-repeat !important;
+  border:1px solid rgba(201,168,76,0.20) !important;
+  border-radius:14px !important;
+}
+/* linker Gold-Streifen der alten ov-card raus (Kategorie-Karten haben keinen) */
+#dashboard-main .ov-card.ov-pair-card::after{ display:none !important; }
+
+/* (c) MODAL: Prozent-Badges lesbar (heller Text, klarer Hintergrund) */
+.dp-sd-kw{
+  color:#F0D98A !important;
+  background:rgba(201,168,76,.20) !important;
+  border:1px solid rgba(201,168,76,.45) !important;
+}
+.dp-sd-weight{ color:#F0D98A !important; }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   v466 - Uebersicht-Karten exakt wie Kategorie-Karten (Effekte) + Cashflow-Klick
+   ════════════════════════════════════════════════════════════════════ */
+#dashboard-main .ov-card.ov-pair-card{
+  min-height:118px !important;
+  border-radius:var(--dp-radius) !important;
+  transition:transform .16s, box-shadow .16s, border-color .16s !important;
+}
+#dashboard-main .ov-card.ov-pair-card:hover{
+  transform:translateY(-2px) !important;
+  box-shadow:0 0 0 1px rgba(201,168,76,.45), 0 12px 32px rgba(0,0,0,.7), 0 0 28px rgba(201,168,76,.18) !important;
+}
+/* Shimmer-Overlay wie bei .kpi (statt altem Gold-Streifen) */
+#dashboard-main .ov-card.ov-pair-card::after{
+  content:'' !important; display:block !important; position:absolute; inset:0;
+  border-radius:inherit; pointer-events:none; width:auto; background-clip:border-box;
+  background:radial-gradient(120px 80px at 50% 0%, rgba(201,168,76,.07), transparent 70%) !important;
+  box-shadow:none !important; opacity:0; transition:opacity .25s;
+}
+#dashboard-main .ov-card.ov-pair-card:hover::after{ opacity:1 !important; }
+
+/* Klickbare Cashflow-Karte */
+#dashboard-main .ov-card.ov-clickable{ cursor:pointer; }
+#dashboard-main .ov-card.ov-clickable:hover{ border-color:rgba(201,168,76,.45) !important; }
+#dashboard-main .ov-toggle-hint{ color:var(--dp-gold); font-size:11px; margin-left:4px; opacity:.85; }

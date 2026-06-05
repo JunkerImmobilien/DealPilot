@@ -1,247 +1,346 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>AGB · DealPilot</title>
-<link rel="stylesheet" href="/css/main.css">
-<style>
-  body { font-family: 'DM Sans', system-ui, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 24px; color: #1a1a1a; line-height: 1.7; }
-  h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2.4em; margin-bottom: 4px; color: #1a1a1a; }
-  h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.5em; margin-top: 2.5em; padding-bottom: 8px; border-bottom: 2px solid #c9a042; color: #1a1a1a; }
-  h3 { font-size: 1.05em; margin-top: 1.8em; color: #1a1a1a; }
-  .meta { color: #6a6a6a; font-size: 0.92em; margin-bottom: 32px; }
-  .review-note { background: #fff8e1; border-left: 4px solid #c9a042; padding: 16px 20px; border-radius: 4px; margin: 24px 0; }
-  ul, ol { padding-left: 24px; }
-  li { margin-bottom: 6px; }
-  a { color: #c9a042; }
-  .back-link { display: inline-block; margin-bottom: 24px; color: #6a6a6a; text-decoration: none; font-size: 0.92em; }
-  .back-link:hover { color: #c9a042; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGB — DealPilot</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      margin: 0; padding: 40px 20px;
+      background: #F8F6F1; color: #2A2727;
+      line-height: 1.65;
+    }
+    main {
+      max-width: 820px; margin: 0 auto;
+      background: #fff; padding: 48px 56px;
+      border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+    }
+    h1 {
+      color: #C9A84C; font-size: 28px; margin: 0 0 8px;
+      font-weight: 700;
+    }
+    h2 {
+      color: #2A2727; font-size: 19px; margin: 36px 0 12px;
+      padding-top: 18px; border-top: 1px solid #ECE7DC;
+    }
+    h3 { color: #2A2727; font-size: 15px; margin: 22px 0 8px; }
+    p, ul, ol { margin: 8px 0; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 4px 0; }
+    .meta { color: #888; font-size: 13px; margin-bottom: 32px; }
+    .version-banner {
+      background: rgba(201, 168, 76, 0.08);
+      border-left: 3px solid #C9A84C;
+      padding: 14px 18px; margin: 0 0 28px; font-size: 13px; color: #2A2727;
+      border-radius: 4px;
+    }
+    .highlight {
+      background: rgba(201, 168, 76, 0.06);
+      border: 1px solid rgba(201, 168, 76, 0.20);
+      padding: 14px 18px; margin: 14px 0; border-radius: 6px; font-size: 14px;
+    }
+    .important {
+      background: #FFF8E1;
+      border-left: 3px solid #E0A800;
+      padding: 12px 16px; margin: 14px 0; border-radius: 4px; font-size: 14px;
+    }
+    a { color: #C9A84C; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back { display: inline-block; margin-bottom: 24px; color: #888; font-size: 13px; }
+    footer { text-align: center; margin-top: 40px; color: #888; font-size: 12px; }
+    @media print {
+      body { padding: 0; background: #fff; }
+      main { box-shadow: none; padding: 16px; max-width: 100%; }
+      .back { display: none; }
+    }
+  </style>
 </head>
 <body>
+  <main>
+    <a href="/" class="back">← zurück zu DealPilot</a>
+    <h1>Allgemeine Geschäftsbedingungen</h1>
+    <p class="meta">Stand: 24. Mai 2026 · Version 1.0</p>
 
-<a href="/" class="back-link">← Zurück zur App</a>
+    <div class="version-banner">
+      <strong>Diese AGB gelten für die Nutzung von DealPilot</strong>, einem Online-Werkzeug zur Modell-Berechnung von Immobilien-Investments, angeboten von Junker Immobilien. DealPilot leistet <strong>keine Rechts-, Steuer-, Finanz- oder Anlageberatung</strong>.
+    </div>
 
-<h1>Allgemeine Geschäftsbedingungen (AGB)</h1>
-<div class="meta">Stand: 17. Mai 2026 · DealPilot, ein Service von Junker Immobilien</div>
+    <h2>I. Geltungsbereich und Anbieter</h2>
 
-<div class="review-note">
-  <strong>⚠ Hinweis für den Betreiber:</strong> Diese AGB sind ein <strong>Template basierend auf branchenüblichen Klauseln für deutsche SaaS-Anbieter</strong>. Vor dem Live-Betrieb müssen sie zwingend von einem auf IT-Recht spezialisierten Anwalt geprüft und ggf. angepasst werden — insbesondere die Klauseln zu Haftungsbeschränkung, Datenverarbeitung und automatisierten Anlage-Bewertungen.
-</div>
+    <h3>(1) Anbieter</h3>
+    <p>
+      Anbieter und Vertragspartner ist:<br>
+      <strong>Junker Immobilien</strong><br>
+      Inhaber: Marcel Junker<br>
+      Hermannstr. 9<br>
+      32609 Hüllhorst<br>
+      Deutschland<br><br>
+      Tel.: +49 (0) 151 298 200 57<br>
+      E-Mail: <a href="mailto:info@junker-immobilien.io">info@junker-immobilien.io</a><br>
+      Web: <a href="https://junker-immobilien.io" target="_blank" rel="noopener">www.junker-immobilien.io</a>
+    </p>
+    <p>(nachfolgend „Anbieter" oder „Junker Immobilien")</p>
 
-<h2>§ 1 Geltungsbereich, Vertragspartner</h2>
-<p>
-  (1) Diese Allgemeinen Geschäftsbedingungen ("AGB") regeln das Vertragsverhältnis zwischen
-  <strong>Junker Immobilien, Inhaber Marcel Junker, Hermannstr. 9, 32609 Hüllhorst</strong> (nachfolgend "Anbieter")
-  und dem Nutzer ("Kunde") über die Nutzung der Software-as-a-Service-Anwendung "DealPilot"
-  unter dealpilot.junker-immobilien.io.
-</p>
-<p>
-  (2) Diese AGB gelten ausschließlich gegenüber Unternehmern im Sinne des § 14 BGB, juristischen Personen des öffentlichen Rechts sowie öffentlich-rechtlichen Sondervermögen.
-  Eine Nutzung durch Verbraucher im Sinne des § 13 BGB ist <strong>nicht vorgesehen und nicht gestattet</strong>.
-</p>
-<p>
-  (3) Abweichende, entgegenstehende oder ergänzende AGB des Kunden werden, selbst bei Kenntnis,
-  nicht Vertragsbestandteil, es sei denn, ihrer Geltung wird ausdrücklich schriftlich zugestimmt.
-</p>
+    <h3>(2) Geltung</h3>
+    <p>Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB") gelten für sämtliche Verträge zwischen dem Anbieter und seinen Kunden (nachfolgend „Nutzer") über die Nutzung der Software-as-a-Service-Plattform „DealPilot" (nachfolgend „DealPilot" oder „Plattform").</p>
+    <p>Abweichende Geschäftsbedingungen des Nutzers finden keine Anwendung, auch wenn der Anbieter ihnen nicht ausdrücklich widerspricht.</p>
 
-<h2>§ 2 Leistungsgegenstand</h2>
-<p>
-  (1) Der Anbieter stellt dem Kunden über das Internet die Software DealPilot zur Nutzung zur Verfügung.
-  DealPilot ist ein Software-Tool zur Analyse von Immobilien-Investments. Es unterstützt den Kunden
-  bei der Bewertung von Investmentobjekten durch Berechnung von Kennzahlen (z.B. Cashflow, Eigenkapitalrendite,
-  DealScore), beim PDF-Import von Exposés und stellt KI-gestützte Analysen zur Lagebewertung bereit.
-</p>
-<p>
-  (2) Der genaue Funktionsumfang richtet sich nach dem gebuchten Plan (Free, Starter, Investor, Pro).
-  Die jeweils aktuelle Leistungsbeschreibung ist auf der Webseite des Anbieters einsehbar.
-</p>
-<p>
-  (3) <strong>DealPilot ersetzt keine professionelle Immobilien- oder Investmentberatung.</strong>
-  Die berechneten Werte, Scores und KI-generierten Analysen dienen ausschließlich zur Orientierung
-  und ersetzen weder eine Bewertung durch einen Sachverständigen noch eine Beratung durch einen
-  Steuerberater, Rechtsanwalt oder anderen qualifizierten Fachmann.
-</p>
+    <h3>(3) Verbraucher und Unternehmer</h3>
+    <p>Die Plattform richtet sich sowohl an Verbraucher als auch an Unternehmer im Sinne der §§ 13, 14 BGB.</p>
+    <ul>
+      <li><strong>Verbraucher (§ 13 BGB):</strong> jede natürliche Person, die ein Rechtsgeschäft zu Zwecken abschließt, die überwiegend weder ihrer gewerblichen noch ihrer selbständigen beruflichen Tätigkeit zugerechnet werden können.</li>
+      <li><strong>Unternehmer (§ 14 BGB):</strong> eine natürliche oder juristische Person oder eine rechtsfähige Personengesellschaft, die bei Abschluss eines Rechtsgeschäfts in Ausübung ihrer gewerblichen oder selbständigen beruflichen Tätigkeit handelt.</li>
+    </ul>
+    <p>Der Nutzer ist verpflichtet, bei der Registrierung wahrheitsgemäß anzugeben, ob er als Verbraucher oder als Unternehmer handelt.</p>
 
-<h2>§ 3 Vertragsschluss, Registrierung</h2>
-<p>
-  (1) Die Darstellung der Leistungen auf der Webseite stellt kein bindendes Angebot dar.
-  Der Kunde gibt durch Abschluss der Online-Registrierung und die Bestätigung des Plans
-  ein verbindliches Angebot zum Vertragsschluss ab.
-</p>
-<p>
-  (2) Der Vertrag kommt mit Zusendung der Bestätigungs-E-Mail bzw. mit Freischaltung des Zugangs zustande.
-</p>
-<p>
-  (3) Der Kunde versichert, dass die bei der Registrierung gemachten Angaben wahr und vollständig sind.
-  Änderungen sind unverzüglich mitzuteilen.
-</p>
-<p>
-  (4) Der Kunde ist verpflichtet, seine Zugangsdaten geheim zu halten und vor dem Zugriff Dritter
-  zu schützen. Bei Verdacht auf Missbrauch hat der Kunde den Anbieter unverzüglich zu informieren.
-</p>
+    <h2>II. Leistungsbeschreibung</h2>
 
-<h2>§ 4 Preise, Zahlungsbedingungen</h2>
-<p>
-  (1) Die aktuell gültigen Preise sind auf der Webseite des Anbieters einsehbar.
-  Alle Preise verstehen sich zuzüglich der jeweils geltenden gesetzlichen Umsatzsteuer.
-</p>
-<p>
-  (2) Die Abrechnung erfolgt im Voraus für den jeweiligen Abrechnungszeitraum (monatlich oder jährlich).
-  Die Zahlung erfolgt über den Zahlungsdienstleister Stripe Payments Europe Ltd.
-</p>
-<p>
-  (3) Bei jährlicher Vorauszahlung wird der vereinbarte Betrag bei Vertragsschluss fällig.
-  Bei monatlicher Abrechnung wird der Monatsbetrag jeweils zum Beginn der monatlichen Abrechnungsperiode fällig.
-</p>
-<p>
-  (4) Zusatzleistungen wie KI-Credit-Pakete werden als Einmalzahlung abgerechnet. Erworbene Credits
-  sind in der Regel zeitlich unbeschränkt nutzbar, soweit nicht auf der Webseite anders ausgewiesen.
-  <strong>Eine Rückerstattung gewährter, jedoch nicht aufgebrauchter Credits ist ausgeschlossen.</strong>
-</p>
-<p>
-  (5) Bei Zahlungsverzug ist der Anbieter berechtigt, den Zugang des Kunden bis zur vollständigen
-  Zahlung zu sperren.
-</p>
+    <h3>(1) Wesen der Leistung</h3>
+    <p>DealPilot ist ein webbasiertes Software-Werkzeug (Software-as-a-Service), das es dem Nutzer ermöglicht, Modell-Berechnungen für Immobilien-Investitionen durchzuführen. Insbesondere unterstützt DealPilot bei:</p>
+    <ul>
+      <li>der Berechnung von Cashflow, Renditen und Tilgungsverläufen,</li>
+      <li>der Darstellung steuerlicher Effekte (z.B. AfA, Sonderabschreibungen) anhand vom Nutzer eingegebener Annahmen,</li>
+      <li>der Erstellung von KI-gestützten Bewertungen und Hinweisen zu eingegebenen Investments,</li>
+      <li>der Generierung von Exporten (PDF, Bankexport) zur weiteren Verwendung durch den Nutzer.</li>
+    </ul>
 
-<h2>§ 5 Laufzeit und Kündigung</h2>
-<p>
-  (1) Der Vertrag wird auf unbestimmte Zeit geschlossen. Die Mindestlaufzeit richtet sich nach
-  dem gewählten Abrechnungsintervall:
-</p>
-<ul>
-  <li>Bei monatlicher Abrechnung: 1 Monat</li>
-  <li>Bei jährlicher Abrechnung: 12 Monate</li>
-</ul>
-<p>
-  (2) Der Vertrag verlängert sich automatisch um die jeweilige Mindestlaufzeit, wenn er nicht
-  zum Ende des aktuellen Abrechnungszeitraums gekündigt wird.
-</p>
-<p>
-  (3) Die Kündigung kann jederzeit über die Kontoeinstellungen in der Anwendung oder per E-Mail an
-  <a href="mailto:info@junker-immobilien.io">info@junker-immobilien.io</a> erfolgen.
-</p>
-<p>
-  (4) Das Recht beider Parteien zur außerordentlichen Kündigung aus wichtigem Grund bleibt unberührt.
-  Ein wichtiger Grund für den Anbieter liegt insbesondere vor, wenn der Kunde gegen wesentliche
-  Vertragsbestimmungen oder geltende Gesetze verstößt.
-</p>
+    <h3>(2) Keine Rechts-, Steuer-, Finanz- oder Anlageberatung</h3>
+    <div class="important">
+      <strong>Wichtig:</strong> DealPilot erbringt <strong>keine Rechts-, Steuer-, Finanz- oder Anlageberatung</strong> im Sinne des Rechtsdienstleistungsgesetzes (RDG), des Steuerberatungsgesetzes (StBerG) oder des Wertpapierhandelsgesetzes (WpHG). Sämtliche Ausgaben sind Modell-Berechnungen auf Basis der vom Nutzer eingegebenen Daten und stellen keine verbindlichen Empfehlungen oder Beratungsergebnisse dar.
+    </div>
+    <p>Vor jeder Investitionsentscheidung mit steuerlicher, rechtlicher oder finanzieller Tragweite hat der Nutzer zwingend einen Steuerberater, Rechtsanwalt, Notar oder qualifizierten Finanzierungsberater zu konsultieren.</p>
 
-<h2>§ 6 Nutzungsrechte, Pflichten des Kunden</h2>
-<p>
-  (1) Der Kunde erhält das einfache, nicht übertragbare Recht, die Software während der Vertragslaufzeit
-  bestimmungsgemäß zu nutzen.
-</p>
-<p>
-  (2) Der Kunde ist nicht berechtigt:
-</p>
-<ul>
-  <li>die Software anderen Personen ohne ausdrückliche Zustimmung des Anbieters zur Verfügung zu stellen</li>
-  <li>die Software zu reverse-engineeren, zu dekompilieren oder zu disassemblieren</li>
-  <li>automatisierte Abfragen (Scraping, Bots) durchzuführen</li>
-  <li>die Sicherheits- oder Zugriffskontrollen zu umgehen</li>
-  <li>die Software für rechtswidrige oder die Rechte Dritter verletzende Zwecke einzusetzen</li>
-</ul>
-<p>
-  (3) Der Kunde ist für die von ihm eingegebenen Daten und Inhalte ausschließlich selbst verantwortlich.
-  Er versichert, hierzu berechtigt zu sein und keine Rechte Dritter zu verletzen.
-</p>
+    <h3>(3) KI-gestützte Inhalte</h3>
+    <p>DealPilot nutzt zur Erstellung von Bewertungen und Texten Sprachmodelle der OpenAI, L.L.C. (USA). Diese KI-generierten Inhalte werden auf statistischer Basis erstellt und können Fehler oder ungenaue Darstellungen enthalten. Der Nutzer ist verpflichtet, jede KI-Aussage vor einer Entscheidung durch einen qualifizierten Berater verifizieren zu lassen.</p>
 
-<h2>§ 7 Verfügbarkeit, Wartung</h2>
-<p>
-  (1) Der Anbieter strebt eine durchschnittliche Verfügbarkeit der Software von 99 % im Jahresmittel an.
-  Hiervon ausgenommen sind Zeiten geplanter Wartungsarbeiten sowie Ausfälle aufgrund höherer Gewalt
-  oder anderer vom Anbieter nicht zu vertretender Ursachen.
-</p>
-<p>
-  (2) Wartungsarbeiten werden nach Möglichkeit in verkehrsarme Zeiten gelegt und mindestens 24 Stunden
-  im Voraus angekündigt.
-</p>
+    <h3>(4) Verfügbarkeit</h3>
+    <p>Der Anbieter strebt eine Verfügbarkeit der Plattform von 95 % im Jahresmittel an. Ausgenommen sind Zeiten, in denen die Plattform aufgrund höherer Gewalt, Wartungsarbeiten, technischer Probleme außerhalb des Einflussbereichs des Anbieters oder Handlungen Dritter nicht erreichbar ist.</p>
 
-<h2>§ 8 Haftung und Haftungsausschluss</h2>
-<p>
-  (1) Der Anbieter haftet unbeschränkt nur für Vorsatz und grobe Fahrlässigkeit sowie für Schäden
-  aus der Verletzung des Lebens, des Körpers oder der Gesundheit.
-</p>
-<p>
-  (2) Bei leicht fahrlässiger Verletzung von Pflichten, deren Erfüllung die ordnungsgemäße Durchführung
-  des Vertrags überhaupt erst ermöglicht und auf deren Einhaltung der Kunde regelmäßig vertrauen darf
-  (sog. Kardinalpflichten), ist die Haftung der Höhe nach auf den vertragstypischen, vorhersehbaren
-  Schaden begrenzt, höchstens jedoch auf das im jeweiligen Jahr gezahlte Entgelt.
-</p>
-<p>
-  (3) Eine weitergehende Haftung des Anbieters ist ausgeschlossen.
-</p>
-<p>
-  (4) <strong>Der Anbieter haftet insbesondere nicht für:</strong>
-</p>
-<ul>
-  <li>die Richtigkeit, Vollständigkeit oder Aktualität der berechneten Investmentkennzahlen, Scores oder KI-Analysen</li>
-  <li>wirtschaftliche Entscheidungen, die der Kunde auf Basis der DealPilot-Ausgaben trifft</li>
-  <li>entgangenen Gewinn oder andere mittelbare Schäden, die durch Investmententscheidungen entstehen</li>
-  <li>Schäden, die durch unvollständige oder fehlerhafte Eingaben des Kunden entstehen</li>
-  <li>Verfügbarkeit oder Inhalte externer Datenquellen (z.B. Geo-Daten, Marktdaten, KI-API-Dienste)</li>
-</ul>
-<p>
-  (5) Die Haftung nach dem Produkthaftungsgesetz bleibt unberührt.
-</p>
+    <h3>(5) Weiterentwicklung</h3>
+    <p>Der Anbieter ist berechtigt, den Funktionsumfang der Plattform anzupassen, zu erweitern oder einzelne Funktionen einzustellen. Wesentliche Änderungen, die den vereinbarten Leistungsumfang reduzieren, werden dem Nutzer mit angemessener Vorlauffrist mitgeteilt; dem Nutzer steht in diesem Fall ein Sonderkündigungsrecht zu.</p>
 
-<h2>§ 9 Datenschutz</h2>
-<p>
-  (1) Der Anbieter verarbeitet personenbezogene Daten ausschließlich nach Maßgabe der geltenden
-  datenschutzrechtlichen Bestimmungen.
-</p>
-<p>
-  (2) Soweit der Kunde im Rahmen der Software personenbezogene Daten Dritter verarbeitet, schließen
-  die Parteien einen separaten Vertrag zur Auftragsverarbeitung nach Art. 28 DSGVO ab.
-</p>
-<p>
-  (3) Einzelheiten zur Datenverarbeitung sind in der
-  <a href="/datenschutz">Datenschutzerklärung</a> geregelt.
-</p>
+    <h2>III. Vertragsabschluss und Registrierung</h2>
 
-<h2>§ 10 Vertraulichkeit</h2>
-<p>
-  Beide Parteien verpflichten sich, alle im Rahmen des Vertragsverhältnisses bekannt gewordenen
-  vertraulichen Informationen geheim zu halten und nicht für eigene oder fremde Zwecke zu nutzen.
-  Dies gilt auch über das Vertragsende hinaus.
-</p>
+    <h3>(1) Registrierung</h3>
+    <p>Die Nutzung von DealPilot erfordert die Registrierung mit Name, gültiger E-Mail-Adresse und einem selbstgewählten Passwort. Der Nutzer bestätigt im Rahmen der Registrierung:</p>
+    <ul>
+      <li>die Geschäftsfähigkeit (Volljährigkeit oder Zustimmung der Erziehungsberechtigten),</li>
+      <li>die Wahrheit und Vollständigkeit seiner Angaben,</li>
+      <li>die Kenntnisnahme und Akzeptanz dieser AGB sowie der <a href="/datenschutz.html">Datenschutzerklärung</a> und der <a href="#" onclick="if(window.DealPilotLegal){DealPilotLegal.showInfo();return false;}">Nutzungshinweise</a>.</li>
+    </ul>
 
-<h2>§ 11 Änderungen der AGB</h2>
-<p>
-  (1) Der Anbieter behält sich vor, diese AGB mit einer Frist von 6 Wochen schriftlich oder per E-Mail
-  zu ändern. Widerspricht der Kunde der Änderung nicht innerhalb dieser Frist, gelten die Änderungen
-  als angenommen. Hierauf wird der Anbieter in der Änderungsmitteilung gesondert hinweisen.
-</p>
-<p>
-  (2) Im Falle eines fristgerechten Widerspruchs sind beide Parteien berechtigt, den Vertrag zum
-  Wirksamwerden der Änderung außerordentlich zu kündigen.
-</p>
+    <h3>(2) Vertragsabschluss</h3>
+    <p>Mit der Bestätigung der Registrierung per E-Mail-Verifizierung kommt zwischen dem Anbieter und dem Nutzer ein Nutzungsvertrag über die unentgeltliche Basis-Variante („Free-Plan") zustande.</p>
+    <p>Für kostenpflichtige Plan-Varianten (Starter, Investor, Pro) sowie für KI-Credit-Pakete kommt der Vertrag durch Abschluss des Bestellvorgangs über den Zahlungsdienstleister Stripe Payments Europe Ltd. (siehe IV.) zustande. Der Nutzer erhält eine elektronische Bestätigung.</p>
 
-<h2>§ 12 Schlussbestimmungen</h2>
-<p>
-  (1) Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts.
-</p>
-<p>
-  (2) Ausschließlicher Gerichtsstand für alle Streitigkeiten aus diesem Vertragsverhältnis ist
-  der Geschäftssitz des Anbieters, soweit der Kunde Kaufmann, juristische Person des öffentlichen
-  Rechts oder öffentlich-rechtliches Sondervermögen ist.
-</p>
-<p>
-  (3) Sollten einzelne Bestimmungen dieser AGB unwirksam sein, berührt dies nicht die Wirksamkeit
-  der übrigen Bestimmungen. An die Stelle der unwirksamen Bestimmung tritt diejenige zulässige
-  Regelung, die dem wirtschaftlichen Zweck der unwirksamen Regelung am nächsten kommt.
-</p>
+    <h3>(3) Eigene Verantwortung</h3>
+    <p>Jeder Nutzer ist nur berechtigt, ein eigenes Konto zu betreiben. Die Registrierung ist nicht übertragbar. Der Nutzer ist verpflichtet, seine Zugangsdaten geheim zu halten und den Anbieter unverzüglich zu informieren, wenn er Kenntnis von einem unbefugten Zugriff erlangt.</p>
 
-<hr style="margin:48px 0 24px 0;border:0;border-top:1px solid #e5dfd2;">
-<p style="color:#6a6a6a;font-size:0.9em;">
-  <strong>Anbieter (im Sinne dieser AGB):</strong><br>
-  Junker Immobilien<br>
-  Inhaber: Marcel Junker<br>
-  Hermannstr. 9, 32609 Hüllhorst<br>
-  E-Mail: info@junker-immobilien.io
-</p>
+    <h2>IV. Preise und Zahlungsbedingungen</h2>
 
+    <h3>(1) Preise und Mehrwertsteuer</h3>
+    <div class="highlight">
+      <strong>Hinweis Kleinunternehmer:</strong> Der Anbieter ist Kleinunternehmer im Sinne von § 19 UStG. Es wird daher <strong>keine Umsatzsteuer</strong> ausgewiesen oder berechnet. Alle Preise sind Endpreise.
+    </div>
+    <p>Die aktuellen Preise für die kostenpflichtigen Plan-Varianten und KI-Credit-Pakete sind auf der Plattform und im Bestellvorgang ersichtlich.</p>
+
+    <h3>(2) Zahlungsdienstleister</h3>
+    <p>Die Abwicklung der Zahlungen erfolgt über Stripe Payments Europe Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland (nachfolgend „Stripe"). Der Nutzer akzeptiert mit der Bestellung zusätzlich die <a href="https://stripe.com/de/legal/ssa" target="_blank" rel="noopener">Stripe Services Agreement</a> sowie die <a href="https://stripe.com/de/privacy" target="_blank" rel="noopener">Stripe Datenschutzerklärung</a>.</p>
+
+    <h3>(3) Fälligkeit</h3>
+    <p>Abonnement-Entgelte sind im Voraus zu Beginn der jeweiligen Abrechnungsperiode (monatlich oder jährlich) zahlbar. Einmal-Käufe (KI-Credit-Pakete) sind sofort fällig.</p>
+
+    <h3>(4) Rechnungen</h3>
+    <p>Stripe stellt elektronische Rechnungen zur Verfügung. Diese können vom Nutzer jederzeit über sein Stripe-Customer-Portal eingesehen und heruntergeladen werden.</p>
+
+    <h3>(5) Zahlungsverzug</h3>
+    <p>Bei Zahlungsverzug ist der Anbieter berechtigt, den Zugang zu kostenpflichtigen Funktionen vorübergehend zu sperren. Die grundsätzliche Zahlungspflicht des Nutzers bleibt unberührt. Bei nicht erfolgreichen Lastschrift- oder Kreditkartenbuchungen können dem Nutzer die durch Stripe entstehenden Gebühren weiterbelastet werden.</p>
+
+    <h2>V. Widerrufsrecht für Verbraucher</h2>
+
+    <div class="important">
+      <strong>Widerrufsbelehrung für Verbraucher</strong><br>
+      Dieser Abschnitt gilt nur für Verbraucher im Sinne des § 13 BGB. Unternehmer haben kein Widerrufsrecht.
+    </div>
+
+    <h3>(0) Einordnung als Verbraucher oder Unternehmer</h3>
+    <p>Ob der Nutzer Verbraucher (§ 13 BGB) oder Unternehmer (§ 14 BGB) ist, richtet sich nach den Umständen der Anmeldung und Nutzung; eine ausdrückliche Auswahl bei der Registrierung ist hierfür nicht erforderlich. Die nachfolgende Widerrufsbelehrung gilt ausschließlich für Verbraucher. Bei einem späteren kostenpflichtigen Vertragsabschluss kann der Anbieter die Verbraucher- bzw. Unternehmer-Eigenschaft sowie die für die Rechnungsstellung erforderlichen Angaben gesondert erheben.</p>
+
+    <h3>(1) Widerrufsrecht</h3>
+    <p>Verbraucher haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses.</p>
+
+    <h3>(2) Ausübung des Widerrufs</h3>
+    <p>Um Ihr Widerrufsrecht auszuüben, müssen Sie uns mittels einer eindeutigen Erklärung (z.B. ein mit der Post versandter Brief oder E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das nachfolgende Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist:</p>
+
+    <div class="highlight">
+      <strong>Muster-Widerrufsformular</strong><br><br>
+      An: Junker Immobilien, Hermannstr. 9, 32609 Hüllhorst, E-Mail: info@junker-immobilien.io<br><br>
+      Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über die Erbringung der folgenden Dienstleistung (*):<br>
+      ___________________________________________<br><br>
+      Bestellt am (*) / erhalten am (*): _________________________<br>
+      Name des/der Verbraucher(s): _________________________<br>
+      Anschrift des/der Verbraucher(s): _________________________<br>
+      Unterschrift des/der Verbraucher(s) (nur bei Mitteilung auf Papier): _________________________<br>
+      Datum: _________________________<br><br>
+      (*) Unzutreffendes streichen.
+    </div>
+
+    <h3>(3) Folgen des Widerrufs</h3>
+    <p>Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über Ihren Widerruf dieses Vertrags bei uns eingegangen ist. Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden Ihnen wegen dieser Rückzahlung Entgelte berechnet.</p>
+
+    <h3>(4) Erlöschen des Widerrufsrechts bei digitalen Inhalten</h3>
+    <div class="important">
+      <strong>Vorzeitiges Erlöschen des Widerrufsrechts (§ 356 Abs. 5 BGB):</strong><br>
+      Bei einem Vertrag über die Lieferung von nicht auf einem körperlichen Datenträger befindlichen digitalen Inhalten und digitalen Dienstleistungen (DealPilot fällt hierunter als Software-as-a-Service) erlischt das Widerrufsrecht <strong>vorzeitig</strong>, wenn:
+      <ol>
+        <li>der Nutzer ausdrücklich zugestimmt hat, dass der Anbieter mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist beginnt, und</li>
+        <li>der Nutzer seine Kenntnis davon bestätigt hat, dass durch seine Zustimmung mit Beginn der Vertragsausführung sein Widerrufsrecht erlischt, und</li>
+        <li>der Anbieter dem Nutzer eine Bestätigung gemäß § 312f BGB zur Verfügung gestellt hat.</li>
+      </ol>
+    </div>
+    <p>Diese Zustimmung wird der Verbraucher im Bestellvorgang über eine gesonderte Checkbox abgeben. Der Anbieter weist darauf hin, dass die aktive Nutzung der Plattform (Anlegen von Objekten, Berechnungen durchführen) als Beginn der Vertragsausführung gilt.</p>
+
+    <h2>VI. Vertragslaufzeit und Kündigung</h2>
+
+    <h3>(1) Free-Plan</h3>
+    <p>Der unentgeltliche Free-Plan ist auf unbestimmte Zeit geschlossen und kann jederzeit vom Nutzer durch Löschen seines Kontos beendet werden.</p>
+
+    <h3>(2) Kostenpflichtige Pläne</h3>
+    <p>Kostenpflichtige Pläne (Starter, Investor, Pro) werden für die im Bestellvorgang angegebene Mindestlaufzeit (monatlich oder jährlich) abgeschlossen.</p>
+    <ul>
+      <li><strong>Monatlich:</strong> Die Laufzeit beträgt einen Monat. Verlängerung automatisch um jeweils einen weiteren Monat, sofern nicht spätestens am letzten Tag der laufenden Periode gekündigt wird.</li>
+      <li><strong>Jährlich:</strong> Die Laufzeit beträgt ein Jahr. Verlängerung automatisch um jeweils ein weiteres Jahr, sofern nicht spätestens 14 Tage vor Ablauf gekündigt wird.</li>
+    </ul>
+
+    <h3>(3) Verbraucher-Sonderregelung</h3>
+    <p>Bei Verbraucherverträgen verlängert sich die Vertragslaufzeit nach Ablauf der ersten Mindestlaufzeit auf unbestimmte Zeit. Der Verbraucher kann den Vertrag sodann jederzeit mit einer Frist von <strong>einem Monat zum Monatsende</strong> kündigen (§ 309 Nr. 9 BGB n.F.).</p>
+
+    <h3>(4) Kündigungserklärung</h3>
+    <p>Die Kündigung kann erfolgen:</p>
+    <ul>
+      <li>über das Stripe-Customer-Portal (verlinkt in den Einstellungen),</li>
+      <li>per E-Mail an <a href="mailto:info@junker-immobilien.io">info@junker-immobilien.io</a>,</li>
+      <li>per Brief an die im Impressum angegebene Adresse.</li>
+    </ul>
+    <p>Eine Kündigung in Textform (per E-Mail) ist auch für Verbraucher zulässig.</p>
+
+    <h3>(5) Außerordentliche Kündigung</h3>
+    <p>Das Recht zur außerordentlichen Kündigung aus wichtigem Grund bleibt unberührt. Ein wichtiger Grund liegt für den Anbieter insbesondere vor, wenn:</p>
+    <ul>
+      <li>der Nutzer mit der Zahlung von Entgelten in Höhe von zwei monatlichen Grundentgelten in Verzug gerät;</li>
+      <li>der Nutzer schuldhaft gegen wesentliche Vertragspflichten verstößt und trotz Abmahnung innerhalb angemessener Frist keine Abhilfe schafft;</li>
+      <li>der Nutzer die Plattform für rechtswidrige Zwecke nutzt.</li>
+    </ul>
+
+    <h3>(6) Datenexport vor Kündigung</h3>
+    <p>Der Nutzer hat das Recht, vor Beendigung des Vertrags seine eingegebenen Daten als Export (PDF, CSV) zu sichern. Nach Vertragsende werden die Daten nach Ablauf gesetzlicher Aufbewahrungsfristen gelöscht. Details siehe <a href="/datenschutz.html">Datenschutzerklärung</a>.</p>
+
+    <h2>VII. Pflichten des Nutzers</h2>
+
+    <h3>(1) Wahrheitsgemäße Angaben</h3>
+    <p>Der Nutzer sichert zu, alle bei Registrierung und Vertragsabwicklung angegebenen Daten wahrheitsgemäß und vollständig zu übermitteln und Änderungen unverzüglich mitzuteilen.</p>
+
+    <h3>(2) Geheimhaltung der Zugangsdaten</h3>
+    <p>Der Nutzer verwaltet sein Passwort gewissenhaft und gibt es nicht an Dritte weiter. Der Anbieter wird den Nutzer niemals nach seinem Passwort fragen.</p>
+
+    <h3>(3) Verantwortung für eingegebene Inhalte</h3>
+    <p>Für sämtliche vom Nutzer in die Plattform eingegebenen Inhalte (Objektdaten, Berechnungsannahmen, Dateien) ist der Nutzer ausschließlich selbst verantwortlich. Der Nutzer verpflichtet sich, dass diese Inhalte nicht gegen gesetzliche Vorschriften, Rechte Dritter (insbesondere Datenschutz-, Urheber- und Persönlichkeitsrechte) oder die guten Sitten verstoßen.</p>
+
+    <h3>(4) Keine missbräuchliche Nutzung</h3>
+    <p>Der Nutzer verpflichtet sich, die Plattform nicht zu missbräuchlichen Zwecken zu nutzen, insbesondere keine Massen-Anfragen, automatisierte Scraping-Tools oder Sicherheitsverletzungen vorzunehmen.</p>
+
+    <h3>(5) Hochgeladene Dokumente und Datei-Uploads</h3>
+    <p>Die Plattform bietet Funktionen, mit denen der Nutzer Dokumente (z. B. Exposés, Mietverträge, Mietaufstellungen, Grundbuchauszüge, Energieausweise, Teilungserklärungen, Jahresabrechnungen oder vergleichbare Unterlagen) hochladen kann. Diese werden automatisiert – unter anderem mittels Texterkennung (OCR) und PDF-Auslesung sowie durch beauftragte Dienstleister einschließlich der OpenAI, L.L.C. (USA) – ausgewertet, um Kennzahlen und Eingabewerte zu extrahieren.</p>
+    <p>Der Nutzer sichert mit jedem Upload ausdrücklich zu, dass er zur Nutzung, Vervielfältigung und Verarbeitung der hochgeladenen Dokumente zu den vorgenannten Zwecken uneingeschränkt berechtigt ist und hierdurch keine Rechte Dritter verletzt werden. Dies umfasst insbesondere Urheber- und Leistungsschutzrechte, Eigentums- und Besitzrechte, Geschäfts- und Betriebsgeheimnisse sowie datenschutz- und persönlichkeitsrechtliche Belange. Enthalten die Dokumente personenbezogene Daten Dritter (etwa von Mietern), sichert der Nutzer zu, über die erforderliche Rechtsgrundlage bzw. Einwilligung für deren Übermittlung und Verarbeitung zu verfügen.</p>
+    <p>Der Nutzer ist allein dafür verantwortlich, vor dem Upload die Berechtigung zu prüfen und – soweit erforderlich – Schwärzungen oder Anonymisierungen vorzunehmen. Der Anbieter ist nicht verpflichtet, hochgeladene Dokumente auf Rechtmäßigkeit, Echtheit oder Berechtigung zu prüfen, und übernimmt keine Gewähr für die Richtigkeit der automatisiert ausgelesenen Werte.</p>
+    <p>Der Nutzer stellt den Anbieter von sämtlichen Ansprüchen Dritter frei, die wegen einer vom Nutzer zu vertretenden Verletzung der vorstehenden Zusicherungen gegen den Anbieter geltend gemacht werden, einschließlich angemessener Kosten der erforderlichen Rechtsverteidigung.</p>
+
+    <h2>VIII. Sperrung von Inhalten oder Zugang</h2>
+    <p>Bei schuldhaftem Verstoß gegen wesentliche Vertragspflichten ist der Anbieter berechtigt, das Konto des Nutzers oder einzelne Inhalte vorübergehend oder endgültig zu sperren.</p>
+
+    <h2>IX. Gewährleistung</h2>
+
+    <h3>(1) Hinweis zum Stand der Technik</h3>
+    <p>Der Anbieter weist darauf hin, dass es nach dem derzeitigen Stand der Technik nicht möglich ist, Software so zu erstellen, dass sie in allen Anwendungs-Kombinationen fehlerfrei arbeitet oder gegen Manipulation durch Dritte vollständig geschützt ist.</p>
+
+    <h3>(2) Verfügbarkeit</h3>
+    <p>Der Anbieter gewährleistet eine Verfügbarkeit der Plattform von über 95 % im Jahresmittel. Nicht in die Verfügbarkeit eingerechnet werden Zeiten für Wartung, Notfallmaßnahmen und Ausfälle aufgrund höherer Gewalt oder Handlungen Dritter.</p>
+
+    <h3>(3) Modell-Berechnungen</h3>
+    <p>Der Anbieter übernimmt keine Gewähr für die Richtigkeit, Vollständigkeit oder Eignung der von DealPilot ausgegebenen Modell-Berechnungen für einen bestimmten Zweck. Der Nutzer verwendet die Ergebnisse in eigener Verantwortung.</p>
+
+    <h3>(4) Mängelrechte für Verbraucher</h3>
+    <p>Für Verbraucher gelten die gesetzlichen Gewährleistungsrechte gemäß §§ 327d ff. BGB.</p>
+
+    <h2>X. Haftung</h2>
+
+    <h3>(1) Vorsatz und grobe Fahrlässigkeit</h3>
+    <p>Der Anbieter haftet bei Vorsatz und grober Fahrlässigkeit nach den gesetzlichen Vorschriften.</p>
+
+    <h3>(2) Leichte Fahrlässigkeit</h3>
+    <p>Bei leichter Fahrlässigkeit haftet der Anbieter nur bei Verletzung einer wesentlichen Vertragspflicht (Kardinalpflicht), deren Erfüllung die ordnungsgemäße Durchführung des Vertrags überhaupt erst ermöglicht und auf deren Einhaltung der Nutzer regelmäßig vertrauen darf. In diesen Fällen haftet der Anbieter lediglich in Höhe des vorhersehbaren, vertragstypischen Schadens.</p>
+
+    <h3>(3) Ausschluss</h3>
+    <p>In Fällen leichter Fahrlässigkeit ist die Haftung für alle übrigen Schäden, insbesondere Folgeschäden, mittelbare Schäden oder entgangenen Gewinn, ausgeschlossen.</p>
+
+    <h3>(4) Unberührte Haftung</h3>
+    <p>Die vorstehenden Beschränkungen gelten nicht bei einer Verletzung von Leben, Körper oder Gesundheit, bei Garantieübernahmen sowie bei einer Haftung nach dem Produkthaftungsgesetz.</p>
+
+    <h3>(5) Keine Haftung für Inhalte und Berechnungen</h3>
+    <p>Der Anbieter haftet ausdrücklich nicht für:</p>
+    <ul>
+      <li>Inhalte, die der Nutzer in die Plattform eingibt,</li>
+      <li>die Richtigkeit, Vollständigkeit oder Eignung der Modell-Berechnungen für eine konkrete Investitionsentscheidung des Nutzers,</li>
+      <li>KI-generierte Inhalte, die auf Basis statistischer Sprachmodelle erstellt werden,</li>
+      <li>Schäden, die aus der Nutzung der Modell-Berechnungen oder daraus abgeleiteten Entscheidungen entstehen,</li>
+      <li>Leistungen Dritter (z.B. Stripe, OpenAI, Hosting-Provider), auf die im Zusammenhang mit der Plattform zugegriffen wird.</li>
+    </ul>
+
+    <h3>(6) Mitarbeiter und Erfüllungsgehilfen</h3>
+    <p>Soweit die Haftung des Anbieters ausgeschlossen oder beschränkt ist, gilt dies auch für die Haftung der Mitarbeiter, Vertreter und Erfüllungsgehilfen des Anbieters.</p>
+
+    <h2>XI. Datenschutz</h2>
+    <p>Der Anbieter beachtet die geltenden Datenschutzgesetze, insbesondere die Datenschutz-Grundverordnung (DSGVO) und das Bundesdatenschutzgesetz (BDSG). Einzelheiten sind in der <a href="/datenschutz.html">Datenschutzerklärung</a> geregelt.</p>
+    <p>Der Nutzer ist selbst für die Einhaltung aller datenschutzrechtlichen Bestimmungen bei der Eingabe von Daten Dritter (z.B. Daten potenzieller Mieter, Verkäufer) in die Plattform verantwortlich. Insbesondere stellt der Nutzer sicher, dass er zur Verarbeitung dieser Daten berechtigt ist.</p>
+
+    <h2>XII. Änderung der AGB</h2>
+    <p>Der Anbieter ist berechtigt, diese AGB anzupassen, sofern die Änderung erforderlich ist aufgrund:</p>
+    <ul>
+      <li>geänderter rechtlicher Rahmenbedingungen,</li>
+      <li>technischer Weiterentwicklungen,</li>
+      <li>Anpassungen des Leistungsumfangs.</li>
+    </ul>
+    <p>Wesentliche Änderungen werden dem Nutzer mindestens 6 Wochen vor Inkrafttreten per E-Mail mitgeteilt. Widerspricht der Nutzer nicht innerhalb von 4 Wochen nach Mitteilung, gelten die neuen AGB als angenommen. Im Falle eines Widerspruchs steht dem Nutzer ein Sonderkündigungsrecht zu.</p>
+
+    <h2>XIII. Schlussbestimmungen</h2>
+
+    <h3>(1) Anwendbares Recht</h3>
+    <p>Für sämtliche Rechtsbeziehungen zwischen dem Nutzer und dem Anbieter gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts. Bei Verbrauchern gilt diese Rechtswahl nur insoweit, als dadurch nicht der durch zwingende Bestimmungen des Rechts des Staates, in dem der Verbraucher seinen gewöhnlichen Aufenthalt hat, gewährte Schutz entzogen wird.</p>
+
+    <h3>(2) Gerichtsstand</h3>
+    <p>Gerichtsstand für alle Streitigkeiten aus oder im Zusammenhang mit diesem Vertragsverhältnis ist, soweit der Nutzer Kaufmann, juristische Person des öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen ist, der Sitz des Anbieters (Hüllhorst bzw. das zuständige Amts-/Landgericht Bad Oeynhausen / Bielefeld).</p>
+
+    <h3>(3) Streitschlichtung</h3>
+    <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit, die Sie unter <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">https://ec.europa.eu/consumers/odr</a> finden. Der Anbieter ist nicht verpflichtet und nicht bereit, an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+
+    <h3>(4) Salvatorische Klausel</h3>
+    <p>Sollten einzelne Bestimmungen dieser AGB unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt. Die unwirksame Bestimmung soll durch die Vertragsparteien durch eine wirksame Bestimmung ersetzt werden, die dem wirtschaftlich gewollten Ergebnis am nächsten kommt. Gleiches gilt im Falle einer Regelungslücke.</p>
+
+    <h3>(5) Schriftform</h3>
+    <p>Änderungen und Ergänzungen dieses Vertrages bedürfen der Textform (z.B. E-Mail). Dies gilt auch für die Abänderung dieses Schriftformerfordernisses.</p>
+
+    <h2>Kontakt für rechtliche Fragen</h2>
+    <p>
+      Junker Immobilien, Marcel Junker<br>
+      Hermannstr. 9, 32609 Hüllhorst<br>
+      <a href="mailto:info@junker-immobilien.io">info@junker-immobilien.io</a>
+    </p>
+
+    <footer>
+      Stand: 24. Mai 2026 · AGB-Version 1.0 · <a href="/impressum.html">Impressum</a> · <a href="/datenschutz.html">Datenschutzerklärung</a>
+    </footer>
+  </main>
 </body>
 </html>

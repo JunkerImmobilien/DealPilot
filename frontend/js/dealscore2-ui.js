@@ -84,6 +84,7 @@ function _buildDeal2FromState() {
   // Wir nehmen WEG-Rücklage + eigene Rücklage als jährliche Instandhaltungsbasis.
   // Wenn beides leer aber Hausgeld nicht-umlagefähig vorhanden: Schätzung 35% davon (typisch).
   var nkm     = v('nkm');
+  var ze      = v('ze') || 0;   // v481: Zusatzeinnahmen (Stellplatz etc.) - Teil der Ist-Kaltmiete
   var wegR    = v('weg_r');
   var eigenR  = v('eigen_r');
   var hgNul   = v('hg_nul');
@@ -118,7 +119,7 @@ function _buildDeal2FromState() {
 
   // Lage
   var wfl = v('wfl');
-  if (nkm > 0 && wfl > 0) deal.istMieteEurQm = nkm / wfl;
+  if ((nkm + ze) > 0 && wfl > 0) deal.istMieteEurQm = (nkm + ze) / wfl;  // v481: Gesamt-Ist-Kaltmiete (nkm+ze), konsistent mit "Aktuelle Miete pro m2" + deal-kpis.js
   deal.marktmieteEurQm      = v('ds2_marktmiete') || null;
   deal.mietwachstumPct      = v('mietstg');
   deal.bevoelkerung         = g('ds2_bevoelkerung') || null;

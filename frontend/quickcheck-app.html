@@ -2777,6 +2777,100 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
   .avm5-logo{height:18px;width:auto;max-width:140px;object-fit:contain;display:inline-block;vertical-align:middle;mix-blend-mode:multiply;}
   .avm5-head .avm5-conf{margin-left:8px !important;}
   .avm5-head .avm5-x{margin-left:auto !important;}
+
+/* ===== v482-qc-cockpit: Quick-Check-Score auf Cockpit-Optik (Schwarz/Glow/health-box) ===== */
+.score-block {
+  background: #050505 !important;
+  border: none !important;
+  border-bottom: 2.5px solid var(--gold) !important;
+  box-shadow: 0 0 0 1px rgba(201,168,76,.18), 0 18px 50px rgba(0,0,0,.55), 0 0 60px rgba(63,165,108,.10) !important;
+}
+.score-block::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(120% 90% at 12% -10%, rgba(201,168,76,.14), transparent 58%);
+}
+.score-block > * { position: relative; z-index: 1; }
+#particle-canvas { opacity: .7 !important; }
+.score-block .sub, .score-block .sb-num {
+  background: rgba(201,168,76,.06) !important;
+  border: 1px solid rgba(201,168,76,.16) !important;
+  border-radius: 8px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: border-color .16s, transform .16s !important;
+}
+.score-block .sub::after, .score-block .sb-num::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: #3FA56C; box-shadow: 0 0 6px rgba(63,165,108,.5);
+}
+.score-block .sub:hover, .score-block .sb-num:hover {
+  border-color: rgba(201,168,76,.35) !important;
+  transform: translateY(-1px) !important;
+}
+/* ===== /v482-qc-cockpit ===== */
+
+
+/* ===== v483-qc-optik: Score-Block pures Obsidian + .kpi health-box + groessere Werte + Partikel ===== */
+.score-block { background: #050505 !important; }
+.score-block .kpis { background: transparent !important; }
+
+/* v482 hatte versehentlich die Gauge-Zahl (.sb-num) als Karte gestylt -> zuruecknehmen */
+.score-block .sb-num { background: transparent !important; border: none !important; box-shadow: none !important; }
+.score-block .sb-num::after { display: none !important; }
+
+/* Bottom-KPI-Karten (Bruttomietr. ... Bewirtsch.) -> Cockpit-health-box */
+.score-block .kpis .kpi {
+  background: rgba(201,168,76,.06) !important;
+  border: 1px solid rgba(201,168,76,.16) !important;
+  border-radius: 8px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: border-color .16s, transform .16s !important;
+}
+.score-block .kpis .kpi::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: #3FA56C; box-shadow: 0 0 6px rgba(63,165,108,.5);
+}
+.score-block .kpis .kpi:hover {
+  border-color: rgba(201,168,76,.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Werte groesser + lesbar (Sans statt Serif), Karte bleibt gleich gross */
+.sub-v {
+  font-family: 'Space Grotesk','DM Sans',sans-serif !important;
+  font-size: 1.7rem !important; font-weight: 700 !important; line-height: 1 !important;
+}
+.score-block .kpis .kpi .v {
+  font-family: 'Space Grotesk','DM Sans',sans-serif !important;
+  font-size: 1.4rem !important; font-weight: 700 !important; line-height: 1.05 !important;
+}
+.score-block .kpis .kpi .l { font-size: 9px !important; letter-spacing: .3px !important; }
+.score-block .kpis .kpi .h { font-size: 8.5px !important; }
+
+/* Partikel praesenter */
+#particle-canvas { opacity: .95 !important; }
+/* ===== /v483-qc-optik ===== */
+
+
+/* ===== v484-qc-wow: Cockpit-Orbs + fliegende Partikel im Score-Block + Gauge-Glow ===== */
+#score-block { position: relative !important; overflow: hidden !important; }
+#score-block > *:not(.qc-bgfx) { position: relative; z-index: 1; }
+.qc-bgfx { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; border-radius: inherit; }
+.qc-bgfx .qc-fx-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.qc-bgfx .qc-orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .7; }
+.qc-bgfx .qc-orb.o1 { width: 460px; height: 460px; background: radial-gradient(circle, rgba(201,168,76,.45), transparent 70%); top: -130px; left: -90px; animation: qcOrb1 22s ease-in-out infinite; }
+.qc-bgfx .qc-orb.o2 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(201,168,76,.33), transparent 70%); bottom: -110px; right: 6%; animation: qcOrb2 26s ease-in-out infinite; }
+.qc-bgfx .qc-orb.o3 { width: 320px; height: 320px; background: radial-gradient(circle, rgba(167,139,54,.30), transparent 70%); top: 28%; left: 56%; animation: qcOrb3 18s ease-in-out infinite; }
+@keyframes qcOrb1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,40px)} }
+@keyframes qcOrb2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,-30px)} }
+@keyframes qcOrb3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-50px)} }
+/* globalen Seiten-Canvas ausblenden - der In-Panel-Effekt ist reicher */
+#particle-canvas { display: none !important; }
+/* Gauge-Glow staerker (Wow) */
+.sb-mega svg { filter: drop-shadow(0 0 14px rgba(201,168,76,.45)) drop-shadow(0 4px 12px rgba(201,168,76,.30)) !important; }
+/* ===== /v484-qc-wow ===== */
+
 </style>
 </head>
 <body>
@@ -3423,11 +3517,11 @@ const QcEngine = (function() {
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 85; i++) {
     particles.push({
       x: Math.random() * canvas.width, y: Math.random() * canvas.height,
       vx: (Math.random() - 0.5) * 0.12, vy: (Math.random() - 0.5) * 0.12,
-      r: Math.random() * 1.2 + 0.6, a: Math.random() * 0.45 + 0.2
+      r: Math.random() * 1.3 + 0.6, a: Math.random() * 0.5 + 0.35
     });
   }
   function draw() {
@@ -5230,5 +5324,76 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", ready); else ready();
 })();
 </script>
+
+<script>
+/* v484-qc-wow: Orbs + fliegende Partikel direkt im Score-Block (wie Cockpit-Hero) */
+(function () {
+  function init() {
+    var sb = document.getElementById('score-block');
+    if (!sb) { return false; }
+    if (sb.querySelector('.qc-bgfx')) { return true; }
+    var fx = document.createElement('div');
+    fx.className = 'qc-bgfx';
+    fx.innerHTML = '<canvas class="qc-fx-canvas"></canvas>' +
+      '<span class="qc-orb o1"></span><span class="qc-orb o2"></span><span class="qc-orb o3"></span>';
+    sb.insertBefore(fx, sb.firstChild);
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return true; }
+    var canvas = fx.querySelector('.qc-fx-canvas');
+    var ctx = canvas.getContext('2d');
+    var parts = [];
+    function size() {
+      var r = sb.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.round(r.width));
+      canvas.height = Math.max(1, Math.round(r.height));
+    }
+    size();
+    if (window.ResizeObserver) { new ResizeObserver(size).observe(sb); }
+    else { window.addEventListener('resize', size); }
+    var N = 60;
+    for (var i = 0; i < N; i++) {
+      parts.push({
+        x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.28, vy: (Math.random() - 0.5) * 0.28,
+        r: Math.random() * 1.4 + 0.6, a: Math.random() * 0.5 + 0.3
+      });
+    }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (var i = 0; i < parts.length; i++) {
+        for (var j = i + 1; j < parts.length; j++) {
+          var dx = parts[i].x - parts[j].x, dy = parts[i].y - parts[j].y;
+          var d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 120) {
+            ctx.strokeStyle = 'rgba(201,168,76,' + ((1 - d / 120) * 0.18) + ')';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath(); ctx.moveTo(parts[i].x, parts[i].y); ctx.lineTo(parts[j].x, parts[j].y); ctx.stroke();
+          }
+        }
+      }
+      ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(201,168,76,.7)';
+      parts.forEach(function (p) {
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(201,168,76,' + p.a + ')'; ctx.fill();
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      });
+      ctx.shadowBlur = 0;
+      requestAnimationFrame(draw);
+    }
+    draw();
+    return true;
+  }
+  var tries = 0;
+  (function boot() {
+    if (init()) { return; }
+    if (tries++ < 40) { setTimeout(boot, 200); }
+  })();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 100); });
+  }
+})();
+</script>
+
 </body>
 </html>

@@ -77,10 +77,14 @@
   }
 
   var t = 0;
-  (function boot() {
+  // v481: boot als Funktions-DEKLARATION (nicht benannter Ausdruck), damit der
+  // Name auch im DOMContentLoaded-Handler unten im Scope ist. Vorher:
+  // "(function boot(){...})()" -> Name nur INNERHALB -> "boot is not defined".
+  function boot() {
     if (build()) { applyDefaultMargin(); return; }
     if (t++ < 60) setTimeout(boot, 200);
-  })();
+  }
+  boot();
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () { setTimeout(boot, 400); });
   }

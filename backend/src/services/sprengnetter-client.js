@@ -110,11 +110,18 @@ async function valuate(inputs) {
   // Marktmiete (best effort)
   var rent = await _post('/service/api/rent', baseReq).catch(function () { return null; });
   // Fair-Price-Label (nur mit Kaufpreis)
+  // ───────────────────────────────────────────────────────────────────────
+  // v480: Fair-Price-Label ("vs. Kaufpreis / Sehr teuer", rotes Label) VORERST
+  // DEAKTIVIERT. Es ist ein eigener API-Request (≈1 € pro Bewertung MIT Kaufpreis).
+  // fairpriceClass/fairpriceLabel bleiben dadurch null → das rote Label rendert nicht.
+  // REAKTIVIEREN: einfach den if-Block unten wieder einkommentieren (und ggf. den
+  // Credit-Preis in avm.js COST.sprengnetter_full wieder anheben).
+  // ───────────────────────────────────────────────────────────────────────
   var fpl = null;
-  if (kp) {
-    try { fpl = await _post('/service/api/valuation/fairpricelabel', _mapRequest(inputs, { askingPrice: kp })); }
-    catch (e2) { fpl = null; }
-  }
+  // if (kp) {
+  //   try { fpl = await _post('/service/api/valuation/fairpricelabel', _mapRequest(inputs, { askingPrice: kp })); }
+  //   catch (e2) { fpl = null; }
+  // }
 
   var la = fin(inputs.wfl) || 0;
   var mw = fin(valuation && valuation.value);
