@@ -595,10 +595,11 @@
     // Die 70%-Sperre gilt NUR für den Investor Deal Score (DS2, 24 KPIs) im Tab Kennzahlen.
 
     var tag, cls, ringColor;
-    if (score >= 80)      { tag = 'Sehr gut'; cls = 'ds-score-green-strong'; ringColor = '#10A65C'; }
-    else if (score >= 65) { tag = 'Gut';      cls = 'ds-score-green';        ringColor = '#2FBE6E'; }
-    else if (score >= 50) { tag = 'Solide';   cls = 'ds-score-gold';         ringColor = '#E5BD53'; }
-    else                  { tag = 'Schwach';  cls = 'ds-score-red';          ringColor = '#D55B5B'; }
+    var _k = (window.ScoreTier ? window.ScoreTier.classify(score) : (score>=85?'top':score>=70?'green':score>=50?'gold':'red'));
+    if (_k === 'top')        { tag = 'Sehr gut'; cls = 'ds-score-green-strong'; ringColor = '#10A65C'; }
+    else if (_k === 'green') { tag = 'Gut';      cls = 'ds-score-green';        ringColor = '#2FBE6E'; }
+    else if (_k === 'gold')  { tag = 'Solide';   cls = 'ds-score-gold';         ringColor = '#E5BD53'; }
+    else                     { tag = 'Schwach';  cls = 'ds-score-red';          ringColor = '#D55B5B'; }
 
     if (scoreVal) scoreVal.textContent = score;
     if (scoreTag) {
@@ -608,9 +609,9 @@
     var topDescAct = document.getElementById('qc-top-deal-desc');
     if (topDescAct) {
       topDescAct.textContent =
-        score >= 80 ? 'Quick-Check zeigt sehr gute Kennzahlen. Im Objekt-Modus genauer prüfen für vollen Score.' :
-        score >= 65 ? 'Quick-Check signalisiert solide bis gute Eckwerte. Detail-Analyse empfohlen.' :
-        score >= 50 ? 'Brauchbare Basis aber mit Schwächen. Genaue Prüfung notwendig.' :
+        _k === 'top' ? 'Quick-Check zeigt sehr gute Kennzahlen. Im Objekt-Modus genauer prüfen für vollen Score.' :
+        _k === 'green' ? 'Quick-Check signalisiert solide bis gute Eckwerte. Detail-Analyse empfohlen.' :
+        _k === 'gold' ? 'Brauchbare Basis aber mit Schwächen. Genaue Prüfung notwendig.' :
                       'Quick-Check zeigt Schwächen. Im Detail-Modus analysieren ob das Bild kippt.';
     }
     if (scoreRing) {

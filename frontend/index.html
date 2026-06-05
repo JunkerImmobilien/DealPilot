@@ -22,11 +22,10 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=449">
+<link rel="stylesheet" href="css/style.css?v=488">
 <link rel="stylesheet" href="css/bmf-modal.css?v=293f">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=303"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
-<link rel="stylesheet" href="css/portfolio-strategy.css?v=144">
 <link rel="stylesheet" href="css/pricing-modal.css?v=197">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
 <link rel="stylesheet" href="css/rnd-styles.css?v=150">
@@ -459,7 +458,7 @@ label.dp-required.qc-required::after {
 <!-- V292.6.5-cache-applied -->
 <!-- V292.6.6-cache-applied -->
 <!-- V292.6.8-cache-applied -->
-  <link rel="stylesheet" href="css/dashboard.css?v=452_15">
+  <link rel="stylesheet" href="css/dashboard.css?v=467">
 </head>
 <body>
 <!-- V257-06: Hintergrund-Modus (Bootstrap, kein Flash) -->
@@ -638,10 +637,7 @@ label.dp-required.qc-required::after {
   <!-- V63.57: Aktionen-Akkordeon mit neuer Reihenfolge + Import/Export-Sektionen -->
   <div class="sb-actions-accordion" id="sb-actions-accordion">
     <div class="sb-actions-accordion-inner">
-      <!-- Hauptaktionen -->
-      <button class="sb-act-item sb-act-accent" type="button" onclick="sbActionsAction('dashboard')">
-        <span class="sb-act-ico" data-icon="dashboard"></span><span class="sb-act-l">Dashboard</span>
-      </button>
+      <!-- Hauptaktionen (Dashboard entfernt - jetzt ueber Portfolio-Cockpit in der Sidebar) -->
       <button class="sb-act-item" type="button" onclick="sbActionsAction('new')">
         <span class="sb-act-ico" data-icon="new"></span><span class="sb-act-l">Neues Objekt</span>
       </button>
@@ -687,7 +683,7 @@ label.dp-required.qc-required::after {
   <!-- V90: Portfolio-Übersicht ist jetzt UNTEN, direkt vor dem Aktionen-Trigger -->
   <div id="sb-portfolio" class="sb-portfolio sb-portfolio-collapsible" style="display:none">
     <button type="button" class="sb-section-title sb-collapsible-header" onclick="togglePortfolio()">
-      <span><svg width="13" height="13"><use href="#i-bar"/></svg>Portfolio-Übersicht</span>
+      <span class="sb-port-open" onclick="event.stopPropagation(); if(typeof setMainView==='function')setMainView('dashboard');" title="Portfolio-Cockpit öffnen" style="cursor:pointer"><svg width="13" height="13"><use href="#i-bar"/></svg>Portfolio-Cockpit</span>
       <span class="sb-toggle-arrow" id="sb-port-arrow">▴</span>
     </button>
     <div class="sb-portfolio-content" id="sb-portfolio-content" style="display:none">
@@ -2867,7 +2863,7 @@ label.dp-required.qc-required::after {
 <script src="js/dscr-engine.js?v=231"></script>
 <script src="js/deal-kpis.js?v=231"></script>
 <script src="js/afa-engine.js?v=227"></script>
-  <script src="js/afa-ui.js?v=291.1"></script>
+  <script src="js/afa-ui.js?v=479"></script>
   <script src="js/zve-manager.js?v=1"></script>
   <script src="js/tax-periods.js?v=1"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
@@ -2894,7 +2890,8 @@ label.dp-required.qc-required::after {
   <script src="js/plan-visibility.js?v=173" defer></script>
   <script src="js/plan-audit.js?v=160" defer></script>
   <script src="js/ui-audit.js?v=167" defer></script>
-<script src="js/dealscore.js?v=166"></script>
+<script src="js/score-tiers.js?v=463"></script>
+<script src="js/dealscore.js?v=463"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=144">
 <script src="js/datenraum.js?v=160"></script>
 <script src="js/tooltip-content.js?v=2351"></script>
@@ -2911,34 +2908,31 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=291.1"></script>
-<script src="js/storage.js?v=403"></script>
+<script src="js/ui.js?v=482"></script>
+<script src="js/sidebar-collapse.js?v=486"></script>
+<script src="js/storage.js?v=487"></script>
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=166"></script>
-<script src="js/portfolio-strategy.js?v=144"></script>
-<script src="js/portfolio-strategy-ui.js?v=291.1"></script>
-<script src="js/portfolio-strategy-pdf.js?v=166"></script>
-<script src="js/bank-negotiation-pdf.js?v=166"></script>
 <script src="js/track-record.js?v=166"></script>
 <script src="js/pdf.js?v=166"></script>
-<script src="js/auth.js?v=229"></script>
+<script src="js/auth.js?v=487"></script>
   <script src="js/auth-401-handler.js?v=162" defer></script>
 <script src="js/subscription.js?v=187"></script>
 <script src="js/bmf-data.js?v=166"></script>
 <script src="js/bmf-afa.js?v=287"></script>
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
-<script src="js/dealscore2.js?v=226"></script>
-<script src="js/dealscore2-ui.js?v=291.1"></script>
+<script src="js/dealscore2.js?v=463"></script>
+<script src="js/dealscore2-ui.js?v=482"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=124"></script>
 <script src="js/star-rating.js?v=364"></script>
-<script src="js/pdf-import.js?v=402"></script>
+<script src="js/pdf-import.js?v=477"></script>
 <script src="js/financing.js?v=124"></script>
 <script src="js/financing-pdf.js?v=166"></script>
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=124"></script>
-<script src="js/quick-check.js?v=407"></script>
+<script src="js/quick-check.js?v=463"></script>
 <script src="js/qc-bridge.js?v=406"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
@@ -2946,7 +2940,6 @@ label.dp-required.qc-required::after {
 <script src="js/workflow.js?v=124"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=166"></script>
-<script src="js/bank-pdf.js?v=166"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
 <script src="js/help.js?v=238"></script>
   <script src="js/tour-engine.js?v=433_10"></script>
@@ -2959,7 +2952,7 @@ label.dp-required.qc-required::after {
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
 <script src="js/newobj-fixes.js?v=434"></script>
 <script src="js/sidebar-search.js?v=447"></script>
-<script src="js/finanz-card-merge.js?v=443"></script>
+<script src="js/finanz-card-merge.js?v=482"></script>
 <script src="js/avm-missing-reset.js?v=443"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=124"></script>
@@ -2969,14 +2962,15 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-calc.js?v=353"></script>
 <script src="js/rnd-pdf.js?v=166"></script>
 <script src="js/rnd-docx.js?v=142"></script>
-<script src="js/rnd-ui.js?v=291.1"></script>
+<script src="js/rnd-ui.js?v=479"></script>
 <script src="js/rnd-wizard.js?v=160"></script>
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=124"></script>
-<script src="js/dashboard.js?v=452_15"></script>
+<script src="js/dashboard.js?v=486"></script>
+<script src="js/score-fx.js?v=464"></script>
 <script src="js/main.js?v=187h2"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
-  <script src="js/object-actions.js?v=445"></script>
+  <script src="js/object-actions.js?v=483"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->

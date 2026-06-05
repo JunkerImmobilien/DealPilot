@@ -31826,3 +31826,393 @@ select.oab-missing-hl {
 /* v452 Dashboard-Hauptview soll volle Hoehe des Scroll-Containers nutzen */
 #dashboard-main{ min-height:calc(100vh - 0px); }
 /* ===== v452 Dashboard-Akkordeon ENDE ===== */
+
+
+/* ====================================================================
+   v458 - Bewertungs-Tab Score-Karten in Portfolio-Optik
+   DealPilot Score (.ds-mockup) + Investor Deal Score (.ds2-mockup):
+   tiefes Schwarz #050505 + Sternenfeld + warmer Verlauf + Gold-Glow.
+   Append-only, ueberschreibt nur Optik (Render bleibt unveraendert).
+   ==================================================================== */
+
+.ds-mockup,
+.ds2-mockup{
+  background-color:#050505 !important;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><circle cx='25' cy='40' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='90' cy='15' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='150' cy='70' r='.8' fill='%23C9A84C' opacity='.40'/><circle cx='60' cy='110' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='130' cy='140' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='40' cy='165' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='170' cy='30' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='15' cy='95' r='.55' fill='%23C9A84C' opacity='.28'/></svg>"),
+    linear-gradient(180deg,rgba(201,168,76,.05),rgba(201,168,76,0) 25%),
+    linear-gradient(165deg,#0a0805,#000 70%) !important;
+  background-size:180px 180px, auto, auto !important;
+  border:1px solid rgba(201,168,76,0.30) !important;
+  box-shadow:inset 0 1px 0 rgba(201,168,76,.06), 0 0 48px rgba(201,168,76,.07), 0 18px 44px rgba(0,0,0,.6) !important;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Brand-Box ("DealPilot Score" / "Investor Deal Score") */
+.ds-brand{
+  background:rgba(201,168,76,.06) !important;
+  border:1px solid rgba(201,168,76,.30) !important;
+}
+.ds-brand-name{ font-family:'Space Grotesk','DM Sans',sans-serif !important; letter-spacing:-.01em; }
+
+/* Erklaer-/Top-Deal-Box transparent, damit das Sternenfeld durchscheint */
+.ds-top-deal{
+  background:rgba(255,255,255,0.025) !important;
+  border-color:rgba(201,168,76,.18) !important;
+}
+
+/* Donut-Score + Ampel-Pille leuchten (wie Portfolio-Score) */
+.ds-donut-score{ text-shadow:0 0 18px rgba(201,168,76,.40); }
+.ds-donut-pill{ box-shadow:0 0 12px currentColor; }
+
+/* Investor Deal Score: Positiv/Negativ-Items dunkel */
+.ds2-pn-col li{ background:rgba(255,255,255,0.02) !important; }
+
+
+/* ====================================================================
+   v459 - Bewertungs-Tab Bewegung + Score-Inszenierung
+   Bewegte Partikel kommen aus score-fx.js (Canvas in .ds-fx).
+   Hier: statisches Sternenfeld raus (Canvas uebernimmt), Glow-Orbs,
+   pulsierender Score-Glow. Append-only, ueberschreibt v458-Optik.
+   ==================================================================== */
+
+/* Container: tiefes Schwarz + warmer Verlauf + Glow; KEIN statisches
+   Sternenfeld mehr (die bewegten Partikel liefert der Canvas) */
+.ds-mockup,
+.ds2-mockup{
+  background-color:#050505 !important;
+  background-image:
+    radial-gradient(120% 80% at 50% -12%, rgba(201,168,76,.07), transparent 60%),
+    linear-gradient(165deg,#0a0805 0%,#000 70%) !important;
+  background-size:auto !important;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Inhalt ueber den Effekt-Layer heben (wie #dashboard-main im Portfolio) */
+.ds-mockup > *:not(.ds-fx),
+.ds2-mockup > *:not(.ds-fx){ position:relative; z-index:1; }
+
+/* Effekt-Layer: Canvas-Partikel + Glow-Orbs, nicht klickbar */
+.ds-fx{ position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; border-radius:inherit; }
+.ds-fx canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; opacity:.9; }
+.ds-fx-orb{ position:absolute; border-radius:50%; filter:blur(60px); }
+.ds-fx-orb.a{ width:300px; height:300px; top:-90px; left:-60px;
+  background:radial-gradient(circle, rgba(201,168,76,.40), transparent 70%);
+  animation:dsFxOrbA 20s ease-in-out infinite; }
+.ds-fx-orb.b{ width:240px; height:240px; bottom:-80px; right:-40px;
+  background:radial-gradient(circle, rgba(167,139,54,.30), transparent 70%);
+  animation:dsFxOrbB 26s ease-in-out infinite; }
+@keyframes dsFxOrbA{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(50px,40px); } }
+@keyframes dsFxOrbB{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(-40px,-30px); } }
+
+/* ── Score staerker in Szene ── */
+/* Donut-Score: pulsierender Gold-Glow */
+.ds-donut-score{ animation:dsScorePulse 3.2s ease-in-out infinite; }
+@keyframes dsScorePulse{
+  0%,100%{ text-shadow:0 0 14px rgba(201,168,76,.35); }
+  50%    { text-shadow:0 0 26px rgba(201,168,76,.65), 0 0 44px rgba(201,168,76,.30); }
+}
+/* Donut-Ring leuchtet */
+.ds-donut{ filter:drop-shadow(0 0 8px rgba(201,168,76,.30)); }
+/* Ampel-Pille pulsiert in ihrer Farbe */
+.ds-donut-pill{ animation:dsPillPulse 3.2s ease-in-out infinite; }
+@keyframes dsPillPulse{
+  0%,100%{ box-shadow:0 0 8px currentColor; }
+  50%    { box-shadow:0 0 18px currentColor; }
+}
+/* Metrik-Score + Balken bekommen Glow */
+.ds-metric-score{ text-shadow:0 0 8px rgba(201,168,76,.30); }
+.ds-metric-bar-fill{ box-shadow:0 0 7px rgba(201,168,76,.35); }
+
+
+/* ====================================================================
+   v460 - Score WOW: KPI-/Kategorie-Anzeigen inszeniert
+   Balken laufen gestaffelt ein + Licht-Sheen + Glow, Icons + Zeilen
+   reagieren auf Hover, Karte atmet. Greift beide Karten (.ds-metric*).
+   Append-only.
+   ==================================================================== */
+
+/* Balken: gestaffeltes Einlaufen (scaleX) + Glow */
+.ds-metric-bar-fill{
+  position:relative;
+  overflow:hidden;
+  transform-origin:left center;
+  animation:dsBarGrow .8s cubic-bezier(.2,.7,.2,1) both;
+  box-shadow:0 0 9px rgba(201,168,76,.40);
+}
+@keyframes dsBarGrow{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+
+/* Licht-Sheen, der periodisch durch den Balken wandert */
+.ds-metric-bar-fill::after{
+  content:'';
+  position:absolute; top:0; left:0; height:100%; width:100%;
+  background:linear-gradient(100deg, transparent 25%, rgba(255,255,255,.60) 50%, transparent 75%);
+  transform:translateX(-130%);
+  animation:dsSheen 3s ease-in-out 1s infinite;
+}
+@keyframes dsSheen{ 0%{ transform:translateX(-130%); } 45%,100%{ transform:translateX(130%); } }
+
+/* Kaskaden-Verzoegerung fuer die einzelnen Balken */
+.ds-metrics .ds-metric:nth-child(1) .ds-metric-bar-fill,
+.ds2-metrics .ds-metric:nth-child(1) .ds-metric-bar-fill{ animation-delay:0s; }
+.ds-metrics .ds-metric:nth-child(2) .ds-metric-bar-fill,
+.ds2-metrics .ds-metric:nth-child(2) .ds-metric-bar-fill{ animation-delay:.07s; }
+.ds-metrics .ds-metric:nth-child(3) .ds-metric-bar-fill,
+.ds2-metrics .ds-metric:nth-child(3) .ds-metric-bar-fill{ animation-delay:.14s; }
+.ds-metrics .ds-metric:nth-child(4) .ds-metric-bar-fill,
+.ds2-metrics .ds-metric:nth-child(4) .ds-metric-bar-fill{ animation-delay:.21s; }
+.ds-metrics .ds-metric:nth-child(5) .ds-metric-bar-fill,
+.ds2-metrics .ds-metric:nth-child(5) .ds-metric-bar-fill{ animation-delay:.28s; }
+.ds-metrics .ds-metric:nth-child(6) .ds-metric-bar-fill,
+.ds2-metrics .ds-metric:nth-child(6) .ds-metric-bar-fill{ animation-delay:.35s; }
+
+/* Metrik-Zeile: Hover-Lift + leichtes Aufhellen */
+.ds-metric{ transition:transform .2s ease, filter .2s ease; }
+.ds-metric:hover{ transform:translateY(-1px); filter:brightness(1.07); }
+
+/* Icon-Kachel leuchtet beim Hover in Gold */
+.ds-metric-icon{ transition:box-shadow .2s ease, border-color .2s ease; }
+.ds-metric:hover .ds-metric-icon{
+  box-shadow:0 0 16px rgba(201,168,76,.35);
+  border-color:rgba(201,168,76,.45);
+}
+
+/* Score-Zahlen je Kategorie mit Glow (DealPilot: -score, Investor: -pct) */
+.ds-metric-score,
+.ds-metric-pct{ text-shadow:0 0 9px rgba(201,168,76,.32); }
+
+/* Die ganze Karte atmet einen sanften Gold-Glow */
+.ds-mockup,
+.ds2-mockup{ animation:dsCardBreath 5s ease-in-out infinite; }
+@keyframes dsCardBreath{
+  0%,100%{ box-shadow:inset 0 1px 0 rgba(201,168,76,.06), 0 0 40px rgba(201,168,76,.06), 0 18px 44px rgba(0,0,0,.6); }
+  50%    { box-shadow:inset 0 1px 0 rgba(201,168,76,.10), 0 0 66px rgba(201,168,76,.15), 0 18px 44px rgba(0,0,0,.6); }
+}
+
+
+/* v465-btn-pscore : Investor-Buttons wie der Hero-Button 'Details & alle KPIs' */
+.ds-settings-btn, .ds-mockup .ds-settings-btn{
+  display:inline-flex !important; align-items:center !important; gap:7px !important;
+  padding:8px 15px !important; border-radius:999px !important; cursor:pointer !important;
+  border:1px solid rgba(201,168,76,.40) !important;
+  background:rgba(201,168,76,.08) !important; color:#C9A84C !important;
+  font-family:'Inter',sans-serif !important; font-size:12px !important; font-weight:600 !important;
+  box-shadow:none !important; width:auto !important;
+}
+.ds-settings-btn:hover, .ds-mockup .ds-settings-btn:hover{
+  background:rgba(201,168,76,.16) !important; border-color:rgba(201,168,76,.60) !important; transform:none !important;
+}
+.ds-settings-btn svg, .ds-settings-btn .ds-settings-icon, .ds-settings-btn .ds-settings-icon svg{
+  width:14px !important; height:14px !important;
+}
+
+
+/* v469-btn-kpis : Investor 'KPIs anzeigen'-Button wie der Hero-Button */
+.ds2-actions-row .btn,
+.ds2-actions-row .btn-outline,
+.ds2-actions-row .btn-sm{
+  display:inline-flex !important; align-items:center !important; gap:7px !important;
+  padding:8px 15px !important; border-radius:999px !important; cursor:pointer !important;
+  border:1px solid rgba(201,168,76,.40) !important;
+  background:rgba(201,168,76,.08) !important; color:#C9A84C !important;
+  font-family:'Inter',sans-serif !important; font-size:12px !important; font-weight:600 !important;
+  box-shadow:none !important; width:auto !important; text-transform:none !important;
+}
+.ds2-actions-row .btn:hover,
+.ds2-actions-row .btn-outline:hover{
+  background:rgba(201,168,76,.16) !important; border-color:rgba(201,168,76,.60) !important; transform:none !important;
+}
+.ds2-actions-row .btn svg{ width:14px !important; height:14px !important; }
+
+/* v475-sbport-hide: hochklappbare Sidebar-Portfolio-Anzeige entfernt (Portfolio-Cockpit ersetzt sie) */
+#sb-portfolio{display:none !important;}
+
+/* v476-sbport-fix: nur das Accordion raus, der Portfolio-Cockpit-Button bleibt */
+#sb-portfolio{display:block !important;}
+#sb-portfolio-content{display:none !important;}
+#sb-port-arrow{display:none !important;}
+
+
+/* ===== v482-eval-cockpit: Bewertung-KPI-Karten (.kpi-grid-eval .kpi) im Cockpit-health-box-Look ===== */
+.kpi-grid-eval .kpi {
+  position: relative !important;
+  background: rgba(201,168,76,.06) !important;
+  border: 1px solid rgba(201,168,76,.16) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  transition: border-color .16s, transform .16s !important;
+}
+.kpi-grid-eval .kpi::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: #3FA56C; box-shadow: 0 0 6px rgba(63,165,108,.5);
+}
+.kpi-grid-eval .kpi:hover {
+  border-color: rgba(201,168,76,.35) !important;
+  transform: translateY(-1px) !important;
+}
+/* ===== /v482-eval-cockpit ===== */
+
+
+/* ===== v485-sidebar-collapse: Vollbild-Toggle fuer Tabs (Sidebar einklappen) ===== */
+/* Gleiche Grid-Mechanik wie das Cockpit (body.dp-dash-fullscreen). */
+body.dp-sidebar-collapsed .app-wrap { grid-template-columns: 0 1fr !important; }
+body.dp-sidebar-collapsed #sidebar { display: none !important; }
+body.dp-sidebar-collapsed .main-col { grid-column: 1 / -1 !important; }
+
+#dp-sb-toggle {
+  position: fixed; top: 9px; left: 9px; z-index: 9000;
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(11,9,6,.82); border: 1px solid rgba(201,168,76,.30);
+  color: #E8C964; font-size: 16px; line-height: 1; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35); backdrop-filter: blur(4px);
+  transition: background .15s, border-color .15s, transform .15s;
+}
+#dp-sb-toggle:hover { background: rgba(201,168,76,.16); border-color: #C9A84C; transform: translateY(-1px); }
+/* Im Cockpit-Vollbild und im QuickCheck-Standalone NICHT zeigen (eigene Steuerung). */
+body.dp-dash-fullscreen #dp-sb-toggle,
+body.qc-standalone-active #dp-sb-toggle { display: none !important; }
+/* ===== /v485-sidebar-collapse ===== */
+
+
+/* ===== v486-eval-dark: Bewertung cf-phase Bloecke + Karten im Cockpit-Look ===== */
+/* Container-Panel: Obsidian-Glas wie das Portfolio-Cockpit */
+.cf-phase-block {
+  background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.008)) !important;
+  border: 1px solid rgba(201,168,76,.14) !important;
+  border-radius: 14px !important;
+  padding: 18px 20px 20px !important;
+  margin-bottom: 16px !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03) !important;
+}
+.cf-phase-block.cf-phase-block-tax {
+  border-color: rgba(201,168,76,.18) !important;
+}
+.cf-phase-title {
+  color: #C9A84C !important;
+  font-family: Inter, sans-serif !important;
+  font-size: 12px !important; font-weight: 700 !important;
+  letter-spacing: .09em !important; text-transform: uppercase !important;
+  margin: 0 0 14px 0 !important;
+  border-left: 3px solid #C9A84C !important; padding-left: 10px !important;
+  line-height: 1.1 !important;
+}
+.cf-phase-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 14px !important;
+}
+/* Einzelkarte: health-box (gold-getoent, gruener/goldener Phasen-Streifen, Hover-Lift) */
+.cf-phase-card {
+  position: relative !important;
+  background: rgba(201,168,76,.05) !important;
+  border: 1px solid rgba(201,168,76,.16) !important;
+  border-radius: 10px !important;
+  padding: 16px 18px 16px 20px !important;
+  overflow: hidden !important;
+  transition: border-color .16s, transform .16s, box-shadow .16s !important;
+}
+.cf-phase-card::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: #C9A84C; box-shadow: 0 0 8px rgba(201,168,76,.5);
+}
+/* "Heute" = gruener Akzent (wie das positive Jetzt), Ende/Anschluss = Gold */
+.cf-phase-card.cf-phase-now::after {
+  background: #3FA56C !important; box-shadow: 0 0 8px rgba(63,165,108,.55) !important;
+}
+.cf-phase-card:hover {
+  border-color: rgba(201,168,76,.40) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.40) !important;
+}
+.cf-phase-label {
+  color: #8f897c !important;
+  font-family: Inter, sans-serif !important;
+  font-size: 11px !important; font-weight: 600 !important;
+  letter-spacing: .06em !important; text-transform: uppercase !important;
+  margin-bottom: 8px !important;
+}
+.cf-phase-val {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 30px !important; font-weight: 700 !important;
+  line-height: 1.05 !important; margin-bottom: 6px !important;
+  /* keine Farbe — wird vom JS gesetzt (gruen/rot) */
+}
+.cf-phase-sub {
+  color: #6f6a60 !important;
+  font-family: Inter, sans-serif !important;
+  font-size: 11px !important;
+}
+/* ===== /v486-eval-dark ===== */
+
+
+/* ===== v488-eval-solid: Bewertung-Karten SOLIDE dunkel + Cockpit-Selektor lesbar ===== */
+
+/* --- Cockpit-Objekt-Selektor: helle Schrift erzwingen (Inline wurde von !important ueberschrieben) --- */
+#dp-dash-objsel { color: #F4ECD8 !important; background: #1c1c1c !important; }
+#dp-dash-objsel option { color: #F4ECD8 !important; background: #1c1c1c !important; }
+
+/* --- Cashflow-Bloecke: solides Obsidian-Panel --- */
+.cf-phase-block {
+  background: #0d0d0d !important;
+  border: 1px solid rgba(201,168,76,.16) !important;
+  border-radius: 14px !important;
+  padding: 18px 20px 20px !important;
+  margin-bottom: 16px !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,.40) !important;
+}
+.cf-phase-title {
+  color: #C9A84C !important;
+  font-family: Inter, sans-serif !important;
+  font-size: 12px !important; font-weight: 700 !important;
+  letter-spacing: .09em !important; text-transform: uppercase !important;
+  margin: 0 0 14px 0 !important;
+  border-left: 3px solid #C9A84C !important; padding-left: 10px !important;
+}
+.cf-phase-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 14px !important; }
+
+/* --- cf-phase-Karten: SOLIDE dunkel + Phasen-Streifen + Hover-Lift --- */
+.cf-phase-card {
+  position: relative !important;
+  background: #161310 !important;
+  border: 1px solid rgba(201,168,76,.18) !important;
+  border-radius: 10px !important;
+  padding: 16px 18px 16px 20px !important;
+  overflow: hidden !important;
+  transition: border-color .16s, transform .16s, box-shadow .16s !important;
+}
+.cf-phase-card::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: #C9A84C; box-shadow: 0 0 8px rgba(201,168,76,.5);
+}
+.cf-phase-card.cf-phase-now::after { background: #3FA56C !important; box-shadow: 0 0 8px rgba(63,165,108,.55) !important; }
+.cf-phase-card:hover {
+  border-color: rgba(201,168,76,.40) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.45) !important;
+}
+.cf-phase-label { color: #9a9384 !important; font-family: Inter, sans-serif !important; font-size: 11px !important; font-weight: 600 !important; letter-spacing: .06em !important; text-transform: uppercase !important; margin-bottom: 8px !important; }
+.cf-phase-sub   { color: #8a857a !important; font-family: Inter, sans-serif !important; font-size: 11px !important; }
+.cf-phase-val   { font-family: 'Space Grotesk', sans-serif !important; font-size: 30px !important; font-weight: 700 !important; line-height: 1.05 !important; margin-bottom: 6px !important; color: #F4ECD8 !important; }
+.cf-phase-card .cf-phase-val.positive { color: #3FA56C !important; }
+.cf-phase-card .cf-phase-val.negative { color: #D9685F !important; }
+
+/* --- KPI-Strip: SOLIDE dunkel + helle Labels; Werte-Farbklassen gn/rd bleiben --- */
+.kpi-grid-eval .kpi {
+  position: relative !important;
+  background: #161310 !important;
+  border: 1px solid rgba(201,168,76,.18) !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  transition: border-color .16s, transform .16s !important;
+}
+.kpi-grid-eval .kpi::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #3FA56C; box-shadow: 0 0 6px rgba(63,165,108,.5); }
+.kpi-grid-eval .kpi:hover { border-color: rgba(201,168,76,.38) !important; transform: translateY(-1px) !important; }
+.kpi-grid-eval .kpi .kpi-label { color: #9a9384 !important; }
+.kpi-grid-eval .kpi .kpi-sub   { color: #8a857a !important; }
+.kpi-grid-eval .kpi .kpi-val   { color: #F4ECD8 !important; }
+.kpi-grid-eval .kpi .kpi-val.gn { color: #3FA56C !important; }
+.kpi-grid-eval .kpi .kpi-val.rd { color: #D9685F !important; }
+/* ===== /v488-eval-solid ===== */

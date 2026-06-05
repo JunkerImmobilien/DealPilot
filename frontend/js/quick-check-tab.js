@@ -75,20 +75,45 @@
     _setCls('qct_ltv', ltv > 100 ? 'rd' : (ltv <= 85 ? 'gn' : null));
     _setCls('qct_bmr', bmr >= 5 ? 'gn' : (bmr < 3.5 ? 'rd' : null));
 
-    // Verdict
+    // Verdict (v474): IDENTISCHE Engine wie QC-Modal + DealScore-Karte.
+    // QC-Werte -> DealKpis.compute() (kanonische Engine) -> DealScore.computeFromKpis()
+    // -> ScoreTier-Baender. Gleiche Werte und Grenzen ueberall.
     var ico, label, sub;
-    if (bmr >= 5 && cf_vst_m >= 0 && ltv <= 100) {
-      ico = '✅';
-      label = 'Solider Deal';
-      sub = 'Rendite passt, Cashflow positiv, Beleihung im Rahmen. Vollberechnung lohnt sich.';
-    } else if (bmr >= 3.5 && cf_vst_m > -200) {
-      ico = '⚠️';
-      label = 'Grenzwertig — genauer prüfen';
-      sub = 'Rendite oder Cashflow knapp. Mit Verhandlung oder mehr EK ggf. machbar.';
+    var _qZins = (_val('qct_zins') || 3.95);  // Prozent (DealKpis erwartet %)
+    var _qTilg = (_val('qct_tilg') || 2.0);   // Prozent
+    var _qscore = null;
+    try {
+      if (window.DealKpis && DealKpis.compute && window.DealScore && DealScore.computeFromKpis) {
+        var _k = DealKpis.compute({
+          kp: kp, nk: nk, san: 0, moebl: 0,
+          nkm: nkm, ze: 0, uf: 0, bwk_ul: 0, bwk_nul: 0,
+          d1: darlehen, d1z: _qZins, d1t: _qTilg,
+          ek: ek, afa: 0, grenz: 0, ekInklNkLtv: false, svw: 0
+        });
+        var _ds = DealScore.computeFromKpis({
+          kp: kp, cf_m: _k.cf_m, nmy: _k.nmy, ltv: _k.ltv, dscr: _k.dscr,
+          wp_kpi: kp * 0.05, mstg: 1.5
+        });
+        if (_ds && isFinite(_ds.score)) _qscore = Math.round(_ds.score);
+      }
+    } catch (e) { _qscore = null; }
+    if (_qscore == null) {
+      // Fallback nur falls Engines (noch) nicht geladen sind
+      var _f = Math.max(0, Math.min(100, (bmr - 3) / 4 * 100));
+      _qscore = Math.round(_f * 0.6 + (cf_vst_m >= 0 ? 40 : 0));
+    }
+    var _t = (window.ScoreTier && window.ScoreTier.classify)
+      ? window.ScoreTier.classify(_qscore)
+      : (_qscore >= 70 ? 'green' : _qscore >= 50 ? 'gold' : 'red');
+    if (_t === 'top' || _t === 'green') {
+      ico = '✅'; label = 'Solider Deal (' + _qscore + '/100)';
+      sub = 'Gleicher Score wie die Vollbewertung — Vollberechnung lohnt sich.';
+    } else if (_t === 'gold') {
+      ico = '⚠️'; label = 'Grenzwertig (' + _qscore + '/100)';
+      sub = 'Solide Basis mit Schwächen — genauer prüfen, ggf. Verhandlung oder mehr EK.';
     } else {
-      ico = '❌';
-      label = 'Schwacher Deal';
-      sub = 'Rendite zu niedrig oder Cashflow stark negativ. Eher passen.';
+      ico = '❌'; label = 'Schwacher Deal (' + _qscore + '/100)';
+      sub = 'Rendite oder Cashflow zu schwach — eher passen.';
     }
     _setT('qct_verdict_ico', ico);
     _setT('qct_verdict_label', label);

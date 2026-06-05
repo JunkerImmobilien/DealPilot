@@ -780,7 +780,7 @@
         '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>Exposé &amp; Marktbericht importieren</h3></div>' +
         '<div class="oabi-sub">Mehrere PDFs gleichzeitig anhängen — Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
         '<div class="oabi-body">' +
-          '<div class="oabi-drop" id="oabi-drop">📁 PDFs auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 10 MB je Datei</span>' +
+          '<div class="oabi-drop" id="oabi-drop">📁 PDFs auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 100 MB je Datei</span>' +
             '<input type="file" id="oabi-input" accept="application/pdf,.pdf" multiple style="display:none"></div>' +
           '<div class="oabi-files" id="oabi-files"></div><div id="oabi-result"></div>' +
         '</div>' +
@@ -850,8 +850,8 @@
     await resolveType(f); recompute(); renderMergedTable();
   }
   async function handleFiles(fileList) {
-    var files = Array.prototype.slice.call(fileList).filter(function (f) { return /\.pdf$/i.test(f.name) && f.size <= 10 * 1024 * 1024; });
-    if (!files.length) { toast('Bitte gültige PDF-Dateien (max 10 MB) wählen.'); return; }
+    var files = Array.prototype.slice.call(fileList).filter(function (f) { return /\.pdf$/i.test(f.name) && f.size <= 100 * 1024 * 1024; });
+    if (!files.length) { toast('Bitte gültige PDF-Dateien (max 100 MB) wählen.'); return; }
     var filesHost = $('oabi-files');
     for (var i = 0; i < files.length; i++) {
       var file = files[i];
