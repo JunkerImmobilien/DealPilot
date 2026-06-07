@@ -1,9 +1,15 @@
 'use strict';
 /* ═══════════════════════════════════════════════════════════════
-   V63.86 — KI-Credits-Frontend-Modul
-   - Holt /api/v1/ai/credits beim Login + nach jeder KI-Anfrage
-   - Aktualisiert Sidebar-Pill (Header)
+   V63.86 → v489 — Pilot-Tank-Frontend-Modul (vorher: KI-Credits)
+   - Holt /api/v1/ai/credits beim Login + nach jeder Pilot-Anfrage
+   - Aktualisiert Header-Fuel-Pill (Tank-Icon + Stand + Mini-Füllbalken)
    - Stellt window.AiCredits.refresh(), .render(), .getStatus() bereit
+   v489-HINWEIS:
+   - Die separate Marktdaten-(AVM)-Pille ist entfernt; refreshAvm/renderAvm
+     bleiben als No-Ops erhalten (object-actions.js ruft sie weiter auf).
+   - v490: Anzeige in Litern. Die Backend-Einheit ist bereits 1 = 1 Anfrage
+     (ai.js zieht consume(1) pro Anfrage) = 1 Liter — die Zahl ist also korrekt.
+     Der Backend-Merge (v491) hebt nur die Plan-Limits aufs Marketing-Niveau.
 ═══════════════════════════════════════════════════════════════ */
 (function(){
   var _cache = null;
@@ -42,6 +48,7 @@
 
   function getStatus() { return _cache; }
 
+  /* v489-fuel-pill: Tank-Icon + Stand + Mini-Füllbalken in der Header-Pille */
   function render(s) {
     var pill = document.getElementById('hdr-credits-pill');
     if (!pill) return;
@@ -49,28 +56,52 @@
     var label = document.getElementById('hdr-credits-pill-label');
     var total = s.total_remaining;
     pill.style.display = 'inline-flex';
+    pill.classList.add('fuel-pill');
     pill.classList.remove('low', 'empty');
     if (total === 0) pill.classList.add('empty');
     else if (total <= 2) pill.classList.add('low');
 
+    /* v490: 1 Backend-Einheit = 1 Anfrage = 1 Liter -> direkte Liter-Anzeige */
     if (label) {
-      label.textContent = total + ' KI-Credit' + (total === 1 ? '' : 's');
+      label.textContent = total + ' L';
     }
+
+    /* Mini-Füllbalken: Anteil des Monatskontingents, das noch im Tank ist */
+    var bar = document.getElementById('hdr-credits-pill-bar');
+    if (!bar) {
+      bar = document.createElement('span');
+      bar.id = 'hdr-credits-pill-bar';
+      bar.className = 'fuel-pill-bar';
+      bar.innerHTML = '<i></i>';
+      pill.appendChild(bar);
+    }
+    var fill = bar.querySelector('i');
+    if (fill) {
+      var pct = 0;
+      if (s.monthly_limit > 0) {
+        pct = Math.max(0, Math.min(100, Math.round((s.monthly_remaining / s.monthly_limit) * 100)));
+      } else if (total > 0) {
+        pct = 100;
+      }
+      fill.style.width = pct + '%';
+    }
+
     var titleParts = [
-      'Monat: ' + s.monthly_used + '/' + s.monthly_limit + ' verbraucht',
-      'Verbleibend: ' + s.monthly_remaining,
-      'Bonus: ' + s.bonus_credits,
-      'Reset: ' + (s.period_reset_at || '')
+      'Pilot-Tank · Kerosin',
+      'Monat: ' + s.monthly_used + '/' + s.monthly_limit + ' L verbraucht',
+      'Verbleibend: ' + s.monthly_remaining + ' L',
+      'Bonus-Tank: ' + s.bonus_credits + ' L (verfällt nicht)',
+      'Reset Monatskontingent: ' + (s.period_reset_at || '')
     ];
     pill.title = titleParts.join('\n');
   }
 
-  // Render Settings-KI-Tab Credits-Box (wird von settings.js aufgerufen)
+  // Render Settings-Pilot-Tab Tank-Box (wird von settings.js aufgerufen)
   function renderSettingsBox(host) {
     if (!host) return;
     var s = _cache;
     if (!s) {
-      host.innerHTML = '<div class="hint">KI-Credit-Status wird geladen…</div>';
+      host.innerHTML = '<div class="hint">Pilot-Tank-Status wird geladen…</div>';
       return;
     }
     var resetDate = s.period_reset_at || '—';
@@ -80,31 +111,32 @@
         '<div class="ai-credits-row">' +
           '<div class="ai-credits-cell">' +
             '<div class="ai-credits-label">Monatslimit</div>' +
-            '<div class="ai-credits-value">' + s.monthly_limit + '</div>' +
+            '<div class="ai-credits-value">' + s.monthly_limit + ' L</div>' +
             '<div class="ai-credits-sub">aus Plan</div>' +
           '</div>' +
           '<div class="ai-credits-cell">' +
             '<div class="ai-credits-label">Verbraucht</div>' +
-            '<div class="ai-credits-value">' + s.monthly_used + '</div>' +
+            '<div class="ai-credits-value">' + s.monthly_used + ' L</div>' +
             '<div class="ai-credits-sub">in diesem Monat</div>' +
           '</div>' +
           '<div class="ai-credits-cell">' +
             '<div class="ai-credits-label">Verbleibend</div>' +
-            '<div class="ai-credits-value' + (s.monthly_remaining === 0 ? ' rd' : ' gn') + '">' + s.monthly_remaining + '</div>' +
+            '<div class="ai-credits-value' + (s.monthly_remaining === 0 ? ' rd' : ' gn') + '">' + s.monthly_remaining + ' L</div>' +
             '<div class="ai-credits-sub">aus Monatslimit</div>' +
           '</div>' +
           '<div class="ai-credits-cell">' +
-            '<div class="ai-credits-label">Bonus-Credits</div>' +
-            '<div class="ai-credits-value gold">' + s.bonus_credits + '</div>' +
+            '<div class="ai-credits-label">Bonus-Tank</div>' +
+            '<div class="ai-credits-value gold">' + s.bonus_credits + ' L</div>' +
             '<div class="ai-credits-sub">aus Käufen</div>' +
           '</div>' +
         '</div>' +
         '<div class="ai-credits-bar">' +
           '<div class="ai-credits-bar-fill" style="width:' + pctUsed + '%"></div>' +
         '</div>' +
+        '<div class="hint">Monatskontingent resettet am 1. — der Bonus-Tank (gekauftes Kerosin) verfällt nie und wird zuletzt verbraucht.</div>' + /* v491-hybrid */
         '<div class="ai-credits-meta">' +
           '<span>Reset am ' + resetDate + ' (1. des Monats, 00:00 UTC)</span>' +
-          '<button class="btn btn-outline btn-sm" type="button" onclick="if(typeof showSettings===\'function\')showSettings(\'plan\');">Credits dazukaufen</button>' +  // V225: öffnet Plan-Tab statt eigenes Modal
+          '<button class="btn btn-outline btn-sm" type="button" onclick="if(typeof showSettings===\'function\')showSettings(\'plan\');">Kerosin tanken</button>' +  // V225: öffnet Plan-Tab statt eigenes Modal
         '</div>' +
       '</div>';
   }
@@ -116,13 +148,13 @@
       return;
     }
     // Fallback falls credits-modal.js nicht geladen ist
-    alert('Credit-Modal konnte nicht geladen werden. Bitte Seite neu laden.');
+    alert('Kerosin-Modal konnte nicht geladen werden. Bitte Seite neu laden.');
   }
 
   function _packCard(amount, price, label, desc, recommended) {
     return '<div class="cb-pack' + (recommended ? ' recommended' : '') + '">' +
       (recommended ? '<div class="cb-pack-badge">Empfohlen</div>' : '') +
-      '<div class="cb-pack-amount">' + amount + ' Credits</div>' +
+      '<div class="cb-pack-amount">' + amount + ' Liter</div>' +
       '<div class="cb-pack-price">' + price + '</div>' +
       '<div class="cb-pack-label">' + label + '</div>' +
       '<div class="cb-pack-desc">' + desc + '</div>' +
@@ -150,7 +182,7 @@
       try { data = await resp.json(); } catch(e) { data = {}; }
       if (!resp.ok) throw new Error(data.error || ('HTTP ' + resp.status));
       if (typeof toast === 'function') {
-        toast('✓ ' + amount + ' Bonus-Credits gutgeschrieben (Demo)');
+        toast('✓ ' + amount + ' in den Bonus-Tank gutgeschrieben (Demo)');
       }
       // Cache invalidieren + neu rendern
       _cache = data.status || null;
@@ -169,52 +201,20 @@
     }
   }
 
-  // ── v423: Marktdaten-(AVM)-Credits-Pille (Zwilling der KI-Pille) ──
-  function _ensureAvmPill() {
-    var ki = document.getElementById('hdr-credits-pill');
-    if (!ki) return null;
+  // ── v489: AVM-Pille entfernt — Kerosin ist die eine Währung. ──
+  // No-Ops bleiben, weil object-actions.js (v435-credit-refresh) refreshAvm()
+  // nach Live-Abrufen aufruft. Eine evtl. noch vorhandene Pille aus altem
+  // Markup wird ausgeblendet.
+  function renderAvm() {
     var avm = document.getElementById('hdr-avm-pill');
-    if (avm) return avm;
-    avm = document.createElement('button');
-    avm.id = 'hdr-avm-pill';
-    avm.type = 'button';
-    avm.className = ki.className;
-    avm.title = 'Marktdaten-Credits — klicken für Details';
-    avm.style.display = 'none';
-    avm.innerHTML =
-      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-        '<path d="M4 20V10M10 20V4M16 20v-7M21 20H3"></path></svg>' +
-      '<span id="hdr-avm-pill-label">Marktcredits</span>';
-    avm.addEventListener('click', function(){
-      if (typeof showSettings === 'function') { showSettings('plan'); return; }
-      if (window.CreditsModal && typeof window.CreditsModal.open === 'function') window.CreditsModal.open();
-    });
-    ki.parentNode.insertBefore(avm, ki.nextSibling);
-    return avm;
-  }
-
-  function renderAvm(n) {
-    var avm = _ensureAvmPill();
-    if (!avm) return;
-    if (n == null) { avm.style.display = 'none'; return; }
-    avm.style.display = 'inline-flex';
-    avm.classList.remove('low', 'empty');
-    if (n === 0) avm.classList.add('empty');
-    else if (n <= 3) avm.classList.add('low');
-    var lbl = document.getElementById('hdr-avm-pill-label');
-    if (lbl) lbl.textContent = n + ' Marktcredits';
-    avm.title = 'Marktdaten-Credits: ' + n + ' übrig (PriceHubble / Sprengnetter)';
+    if (avm) avm.style.display = 'none';
   }
 
   async function refreshAvm() {
-    var t = _token();
-    if (!t) { renderAvm(null); return; }
-    try {
-      var resp = await fetch(_apiBase() + '/credits/balance', { headers: { 'Authorization': 'Bearer ' + t } });
-      if (!resp.ok) { renderAvm(null); return; }
-      var d = await resp.json();
-      renderAvm(typeof d.avm_credits === 'number' ? d.avm_credits : 0);
-    } catch (e) { renderAvm(null); }
+    renderAvm();
+    /* v489: Kerosin-Stand mitziehen, damit die Fuel-Pill nach AVM-Abrufen
+       (sobald die über Kerosin laufen, E2/v490) aktuell ist. */
+    try { refresh(true); } catch (e) {}
   }
 
   window.AiCredits = {
@@ -230,9 +230,9 @@
   // Auto-Refresh beim Laden + nach Login
   document.addEventListener('DOMContentLoaded', function(){
     setTimeout(function(){ refresh(true); }, 500);
-    setTimeout(function(){ refreshAvm(); }, 700);
+    setTimeout(function(){ renderAvm(); }, 700);
   });
-  // Auto-Refresh wenn der User in den Settings-KI-Tab wechselt (auch bei Erst-Öffnung)
+  // Auto-Refresh wenn der User in den Settings-Pilot-Tab wechselt (auch bei Erst-Öffnung)
   document.addEventListener('click', function(e){
     var t = e.target.closest && e.target.closest('[data-st-tab="ai"]');
     if (t) setTimeout(function(){ refresh(true); }, 100);

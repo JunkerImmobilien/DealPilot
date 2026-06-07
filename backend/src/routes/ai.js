@@ -130,14 +130,15 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
       return res.status(400).json({ error: 'Body muss mindestens "objekt" oder "kennzahlen" enthalten.' });
     }
 
-    // V63.86: Credits-Pre-Check — nur wenn kein eigener User-API-Key (dann zahlt User selbst)
+    // v491-kerosin-ai: volle Pilot-Analyse = 3 Liter (Pre-Check, nur Server-Key)
     if (!userApiKey) {
       const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < 1) {
+      if (status.total_remaining < 3) {
         return res.status(402).json({
-          error: 'Keine KI-Credits mehr verfügbar.',
-          message: 'Dein Monatslimit ist aufgebraucht und du hast keine Bonus-Credits. Reset am ' + status.period_reset_at + '.',
+          error: 'Nicht genug Kerosin im Tank.',
+          message: 'Die volle Pilot-Analyse braucht 3 Liter. Monatskontingent-Reset am ' + status.period_reset_at + ' — oder jetzt Kerosin tanken.',
           credits: status,
+          required: 3,
           needs_credits: true
         });
       }
@@ -148,7 +149,7 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
     // V63.86: Nach erfolgreicher Analyse Credits abziehen (nur wenn Server-Key benutzt wurde)
     if (!userApiKey) {
       try {
-        await aiCreditsService.consume(req.user.id, 1, 'analyze', { model: config.openai.defaultModel });
+        await aiCreditsService.consume(req.user.id, 3, 'analyze', { model: config.openai.defaultModel });
       } catch (e) {
         console.warn('[ai/analyze] Credits consume failed:', e.message);
       }
@@ -217,7 +218,7 @@ router.post('/lage', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzi
       const status = await aiCreditsService.getStatus(req.user.id);
       if (status.total_remaining < 1) {
         return res.status(402).json({
-          error: 'Keine KI-Credits mehr verfügbar.',
+          error: 'Nicht genug Kerosin im Tank.',
           credits: status,
           needs_credits: true
         });
@@ -297,7 +298,7 @@ router.post('/ds2-suggest', authenticate, /* V186: kein requireUnderLimit, AI-Cr
     if (!userApiKey) {
       const status = await aiCreditsService.getStatus(req.user.id);
       if (status.total_remaining < 1) {
-        return res.status(402).json({ error: 'Keine KI-Credits mehr verfügbar.', credits: status, needs_credits: true });
+        return res.status(402).json({ error: 'Nicht genug Kerosin im Tank.', credits: status, needs_credits: true });
       }
     }
 
@@ -472,7 +473,7 @@ router.post('/bodenrichtwert', authenticate, plzValidator.middleware, /* V229: P
       const status = await aiCreditsService.getStatus(req.user.id);
       if (status.total_remaining < 1) {
         return res.status(402).json({
-          error: 'Keine KI-Credits mehr verfügbar.',
+          error: 'Nicht genug Kerosin im Tank.',
           credits: status,
           needs_credits: true
         });
@@ -660,7 +661,7 @@ router.post('/bmf-gaa', authenticate, plzValidator.middleware, async (req, res, 
       const status = await aiCreditsService.getStatus(req.user.id);
       if (status.total_remaining < 1) {
         return res.status(402).json({
-          error: 'Keine KI-Credits mehr verfügbar.',
+          error: 'Nicht genug Kerosin im Tank.',
           credits: status,
           needs_credits: true
         });
@@ -826,7 +827,7 @@ router.post('/enrich-market-fields', authenticate, extractLimiter, async (req, r
     if (!userApiKey) {
       const status = await aiCreditsService.getStatus(req.user.id);
       if (status.total_remaining < 1) {
-        return res.status(402).json({ error: 'Keine KI-Credits mehr verfuegbar.', credits: status, needs_credits: true });
+        return res.status(402).json({ error: 'Nicht genug Kerosin im Tank.', credits: status, needs_credits: true });
       }
     }
 

@@ -32216,3 +32216,24 @@ body.qc-standalone-active #dp-sb-toggle { display: none !important; }
 .kpi-grid-eval .kpi .kpi-val.gn { color: #3FA56C !important; }
 .kpi-grid-eval .kpi .kpi-val.rd { color: #D9685F !important; }
 /* ===== /v488-eval-solid ===== */
+
+
+/* ===== v489-kerosin ===== */
+/* Fuel-Pill: Tank-Icon + Stand + Mini-Fuellbalken (Header) */
+#hdr-credits-pill.fuel-pill{gap:8px !important;align-items:center !important}
+.fuel-pill-bar{display:inline-block;width:38px;height:5px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden;flex:0 0 auto}
+.fuel-pill-bar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#C9A84C,#3FA56C);transition:width .5s ease}
+#hdr-credits-pill.low .fuel-pill-bar i{background:linear-gradient(90deg,#B86250,#C9A84C)}
+#hdr-credits-pill.empty .fuel-pill-bar i{background:#B86250}
+
+/* Kerosin-Tacho (Credits-Modal + Plan-Tab) */
+.kp-tacho{width:150px;height:78px;display:block;margin:0 auto 2px}
+.kp-arc{stroke-dasharray:201;stroke-dashoffset:201;animation:kpArc 1.9s cubic-bezier(.34,1.2,.5,1) forwards .25s}
+@keyframes kpArc{to{stroke-dashoffset:var(--off)}}
+.kp-needle{transform-origin:92px 88px;animation:kpNeedle 1.9s cubic-bezier(.34,1.25,.5,1) forwards .25s}
+@keyframes kpNeedle{from{transform:rotate(-90deg)}to{transform:rotate(var(--deg))}}
+.kp-flight{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;color:#C9A84C;text-transform:uppercase;margin-bottom:8px;text-align:center}
+.kp-reach{font-size:11.5px;color:rgba(244,236,216,.55);line-height:1.45;margin:6px 0 10px;text-align:center;min-height:26px}
+.credit-pack.kp-card{display:flex;flex-direction:column;align-items:center;text-align:center}
+.plan-credit-flight{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#C9A84C;text-transform:uppercase;margin-bottom:6px}
+/* ===== /v489-kerosin ===== */

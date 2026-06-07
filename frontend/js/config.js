@@ -364,13 +364,15 @@ window.DealPilotConfig = (function() {
     }
   };
 
-  // V159: KI-Credit-Pakete (Landing-Page Wahrheit)
-  // 1 Credit = 2 Anfragen. Credits ab Starter zubuchbar. Verfallen nicht.
+  // v489-kerosin: Kerosin-Pakete (Landing-Page Wahrheit) — vorher KI-Credit-Pakete
+  // 1 Liter = 1 Pilot-Anfrage (klein). Kerosin ab Starter zubuchbar. Verfällt nicht.
+  // Kompat: credits/anfragen/per_anfrage spiegeln liter/per_liter, damit
+  // bestehende Konsumenten (plan-audit.js etc.) nicht brechen.
   var AI_CREDIT_PACKAGES = [
-    { key: 'pack_5',   credits: 5,   anfragen: 10,  price_eur: 2,  per_anfrage: 0.20, label: '5 Credits',   tag: 'Mal schnell prüfen' },
-    { key: 'pack_15',  credits: 15,  anfragen: 30,  price_eur: 5,  per_anfrage: 0.17, label: '15 Credits',  tag: 'Mehrere Deals' },
-    { key: 'pack_40',  credits: 40,  anfragen: 80,  price_eur: 12, per_anfrage: 0.15, label: '40 Credits',  tag: 'Aktiver Investor', highlight: true },
-    { key: 'pack_100', credits: 100, anfragen: 200, price_eur: 25, per_anfrage: 0.13, label: '100 Credits', tag: 'Profi / Sachverständiger' }
+    { key: 'kerosin_10',  liter: 10,  per_liter: 0.20,  credits: 10,  anfragen: 10,  price_eur: 2,  per_anfrage: 0.20,  label: '10 Liter',  tag: 'Mal schnell prüfen',  flight: '✈ Kurzstrecke',       gauge_off: 164.8, gauge_deg: -57.6 },
+    { key: 'kerosin_28',  liter: 28,  per_liter: 0.18,  credits: 28,  anfragen: 28,  price_eur: 5,  per_anfrage: 0.18,  label: '28 Liter',  tag: 'Mehrere Deals',        flight: '✈✈ Mittelstrecke',   gauge_off: 116.6, gauge_deg: -14.4 },
+    { key: 'kerosin_90',  liter: 90,  per_liter: 0.167, credits: 90,  anfragen: 90,  price_eur: 15, per_anfrage: 0.167, label: '90 Liter',  tag: 'Aktiver Investor',     flight: '✈✈✈ Langstrecke',  gauge_off: 56.3,  gauge_deg: 39.6, highlight: true },
+    { key: 'kerosin_160', liter: 160, per_liter: 0.156, credits: 160, anfragen: 160, price_eur: 25, per_anfrage: 0.156, label: '160 Liter', tag: 'Maximale Reichweite',  flight: '🌍 Interkontinental', gauge_off: 14.1,  gauge_deg: 77.4 }
   ];
 
   // V63: Yearly-Bonus-Konfiguration (was beim Wechsel auf jährlich extra dazu kommt)

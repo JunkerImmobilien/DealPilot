@@ -1546,7 +1546,7 @@ function _renderPlanPane() {
     html += '<div class="plan-yearly-bonus-banner">' +
       '<strong>Jahres-Vorteile:</strong> ' +
       (yearlyBonus.free_months || 2) + ' Monate gratis · ' +
-      (yearlyBonus.bonus_ai_credits || 50) + ' Bonus-KI-Credits einmalig · ' +
+      (yearlyBonus.bonus_ai_credits || 50) + ' Liter Bonus-Kerosin einmalig · ' +
       'Preisgarantie ' + (yearlyBonus.price_lock_months || 24) + ' Monate' +
     '</div>';
   }
@@ -1586,11 +1586,11 @@ function _renderPlanPane() {
     if (l.ai_credits === -1) {
       html += '<li>Unbegrenzte KI-Analysen</li>';
     } else if (l.ai_credits > 0) {
-      html += '<li><strong>' + l.ai_credits + '</strong> KI-Credits / Monat</li>';
+      html += '<li><strong>' + (l.ai_credits * 2) + '</strong> Pilot-Anfragen / Monat</li>';
     } else if (l.ai_credits === 0) {
       html += '<li><em>KI nur als Credit-Paket dazubuchbar</em></li>';
     } else {
-      html += '<li>' + l.ai_credits + ' KI-Analyse einmalig</li>';
+      html += '<li>' + l.ai_credits + ' Pilot-Analyse einmalig</li>';
     }
     // Wasserzeichen
     html += '<li>PDF ' + (l.watermark ? '<em>mit Wasserzeichen</em>' : '<strong>ohne Wasserzeichen</strong>') + '</li>';
@@ -1639,17 +1639,18 @@ function _renderPlanPane() {
   // V63.1: KI-Credit-Pakete
   if (creditPacks.length > 0) {
     html += '<div class="plan-credits-section">' +
-      '<h3 class="plan-credits-title">KI-Credit-Pakete</h3>' +
-      '<p class="plan-credits-desc">Brauchst du mehr KI-Analysen? Pakete sind einmalig zubuchbar und verfallen nicht.</p>' +
+      '<h3 class="plan-credits-title">Kerosin-Pakete</h3>' + /* v489-kerosin-settings */
+      '<p class="plan-credits-desc">Brauchst du mehr Pilot-Anfragen? Kerosin ist einmalig zubuchbar und verfällt nie. 1 Liter = 1 Pilot-Anfrage. Dein Plan füllt den Tank am 1. jeden Monats automatisch — gekauftes Kerosin kommt obendrauf und wird erst nach dem Monatskontingent verbraucht.</p>' /* v491-hybrid */ +
       '<div class="plan-credits-grid">';
     creditPacks.forEach(function(pack) {
       html += '<div class="plan-credit-card' + (pack.highlight ? ' plan-credit-highlight' : '') + '">' +
         (pack.highlight ? '<span class="plan-credit-best">Beliebt</span>' : '') +
-        '<div class="plan-credit-num">' + pack.credits + '</div>' +
-        '<div class="plan-credit-label">Credits</div>' +
+        '<div class="plan-credit-flight">' + (pack.flight || '') + '</div>' +
+        '<div class="plan-credit-num">' + (pack.liter != null ? pack.liter : pack.credits) + '</div>' +
+        '<div class="plan-credit-label">Liter</div>' +
         '<div class="plan-credit-price">' + pack.price_eur + ' €</div>' +
-        '<div class="plan-credit-sub">≈ ' + pack.per_anfrage.toFixed(2).replace('.', ',') + ' € / Anfrage</div>' +
-        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + pack.key + '\')">Dazubuchen</button>' +
+        '<div class="plan-credit-sub">≈ ' + (pack.per_liter != null ? pack.per_liter : pack.per_anfrage).toFixed(2).replace('.', ',') + ' € / Liter</div>' +
+        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + pack.key + '\')">Tanken</button>' +
       '</div>';
     });
     html += '</div></div>';

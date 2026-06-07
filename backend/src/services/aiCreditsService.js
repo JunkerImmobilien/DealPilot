@@ -14,11 +14,13 @@
  */
 const { query } = require('../db/pool');
 
+// v491-kerosin: Limits in LITERN (1 L = 1 Anfrage). Entspricht dem
+// Marketing-Versprechen und plans.max_ai_analyses_monthly (Migration 020).
 const PLAN_LIMITS = {
-  free:     1,
-  starter:  5,
-  investor: 15,
-  pro:      40
+  free:     2,
+  starter:  10,
+  investor: 30,
+  pro:      80
 };
 
 // Monats-Reset: Wenn current_period_start in einem früheren Monat liegt → reset
@@ -63,6 +65,7 @@ async function getStatus(userId) {
   next.setUTCHours(0, 0, 0, 0);
 
   return {
+    unit:               'liter',
     monthly_limit:      monthlyLimit,
     monthly_used:       row.current_period_used,
     monthly_remaining:  monthlyRemaining,
@@ -83,9 +86,9 @@ async function consume(userId, cost, endpoint, meta) {
     return { ok: false, reason: 'no_credits', status: status };
   }
 
-  // 1. Bonus zuerst aufbrauchen
-  let fromBonus = Math.min(status.bonus_credits, cost);
-  let fromMonthly = cost - fromBonus;
+  // v491: Monatskontingent ZUERST (verfällt am 1.), dann Bonus-Tank (verfällt nie).
+  let fromMonthly = Math.min(status.monthly_remaining, cost);
+  let fromBonus = cost - fromMonthly;
 
   if (fromBonus > 0) {
     await query(`UPDATE ai_credits_user SET bonus_credits = bonus_credits - $1, updated_at = NOW() WHERE user_id = $2`, [fromBonus, userId]);

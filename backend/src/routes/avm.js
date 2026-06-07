@@ -53,7 +53,9 @@ async function modeForUser(userId) {
 // Credit-Kosten je Provider. Sprengnetter: seit v480 immer 2 echte API-Calls
 // (Marktwert + Marktmiete); das Fair-Price-Label (3. Call) ist deaktiviert.
 // PriceHubble: 1 Call. (Credit-Preis je Abruf hier = 1, unabhaengig vom Kaufpreis.)
-const COST = { pricehubble: 1, sprengnetter_full: 1, sprengnetter_nokp: 1 };
+// v491-kerosin-avm: Verbrauch in LITERN aus dem einen Kerosin-Tank.
+// PriceHubble 40 L (Kosten 6 EUR), Sprengnetter 20 L (Kosten 3 EUR, 2 API-Calls).
+const COST = { pricehubble: 40, sprengnetter_full: 20, sprengnetter_nokp: 20 };
 
 function num(v) { return stub.num(v); }
 function hasKp(inputs) { return !!num((inputs || {}).kp); }
@@ -104,7 +106,7 @@ router.post('/quote', authenticate, async function (req, res, next) {
     const inputs = (req.body || {}).inputs || {};
     const miss = missingFields(provider, inputs);
     const cost = costFor(provider, inputs);
-    const status = await avmCreditsService.getStatus(req.user.id);
+    const status = await aiCreditsService.getStatus(req.user.id);
     const mode = await modeForUser(req.user.id);
     res.json({
       provider: provider,
@@ -188,10 +190,10 @@ async function runProvider(provider, req, res, next) {
 
     // Credit-Pre-Check NUR im Live-Modus (Stub ist kostenlos).
     if (mode === 'live') {
-      const status = await avmCreditsService.getStatus(req.user.id);
+      const status = await aiCreditsService.getStatus(req.user.id);
       if (status.total_remaining < cost) {
         return res.status(402).json({
-          error: 'Keine ausreichenden Credits.',
+          error: 'Nicht genug Kerosin im Tank.',
           needs_credits: true,
           required: cost,
           credits: status
@@ -212,7 +214,7 @@ async function runProvider(provider, req, res, next) {
     // Credits abziehen NUR im Live-Modus nach Erfolg.
     if (mode === 'live') {
       try {
-        await avmCreditsService.consume(req.user.id, cost, 'avm:' + provider, { cost: cost, mode: mode });
+        await aiCreditsService.consume(req.user.id, cost, 'avm:' + provider, { cost: cost, mode: mode });
       } catch (e) {
         console.warn('[avm/' + provider + '] credits consume failed:', e.message);
       }

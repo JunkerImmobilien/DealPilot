@@ -54,15 +54,20 @@ function userAuth(req, res, next) {
 // ──────────────────────────────────────────────────────────
 
 router.get('/packs', (req, res) => {
+  // v491-kerosin-route: Kerosin-Packs in Litern (Tacho-Karten lesen liter/flight/reach/gauge)
   res.json({
+    unit: 'liter',
     packs: listPacks().map(p => ({
       id: p.id,
       label: p.label,
+      liter: p.liter,
       credits: p.credits,
-      requests: p.requests,
       amount_cents: p.amount_cents,
       currency: p.currency,
-      price_per_request_cents: p.price_per_request_cents,
+      per_liter_cents: p.per_liter_cents,
+      flight: p.flight,
+      reach: p.reach,
+      gauge: p.gauge,
       popular: p.popular
     }))
   });
@@ -128,6 +133,13 @@ router.post('/checkout', userAuth, async (req, res) => {
   if (!pack) {
     return res.status(400).json({ error: 'invalid_pack', valid_packs: Object.keys(CREDIT_PACKS).concat(avmPacks.listPacks().map(function (p) { return p.id; })) });
   }
+  // v491: bis die Kerosin-Produkte in Stripe angelegt sind (E3), sauber ablehnen
+  if (!pack.stripe_price_id) {
+    return res.status(503).json({
+      error: 'stripe_price_missing',
+      message: 'Kerosin-Kauf ist noch nicht freigeschaltet. (Stripe-Produkt fehlt — ENV STRIPE_PRICE_' + pack.id.toUpperCase() + ' setzen.)'
+    });
+  }
 
   try {
     // 1) Plan-Check: muss zahlender Plan sein (nicht Free)
@@ -146,7 +158,7 @@ router.post('/checkout', userAuth, async (req, res) => {
     if (!userPlan || userPlan.plan_id === 'free') {
       return res.status(403).json({
         error: 'upgrade_required',
-        message: 'Credits können nur ab dem Starter-Plan zugebucht werden. Bitte upgrade dein Abo.',
+        message: 'Kerosin kann nur ab dem Starter-Plan getankt werden. Bitte upgrade dein Abo.',
         upgrade_to: 'starter'
       });
     }
