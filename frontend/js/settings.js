@@ -2181,6 +2181,11 @@ window._downloadDiag = _downloadDiag;
 // Filename: DealPilot_Objekte_Export_<YYYY-MM-DD>.csv
 // ═══════════════════════════════════════════════════════════════
 async function _exportAllCSV() {
+  if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('export_csv')) { /* v495-gate */
+    if (typeof toast === 'function') toast('Rohdatenexport (CSV/XLSX) ist im Pro-Plan enthalten.');
+    else alert('Rohdatenexport (CSV/XLSX) ist im Pro-Plan enthalten.');
+    return;
+  }
   if (typeof getAllObjectsData !== 'function') {
     alert('Export nicht verfügbar (getAllObjectsData fehlt)');
     return;

@@ -130,15 +130,15 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
       return res.status(400).json({ error: 'Body muss mindestens "objekt" oder "kennzahlen" enthalten.' });
     }
 
-    // v491-kerosin-ai: volle Pilot-Analyse = 3 Liter (Pre-Check, nur Server-Key)
+    // v493-limits: 1 Liter = 1 KI-Analyse (Feature-Matrix 05.06.)
     if (!userApiKey) {
       const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < 3) {
+      if (status.total_remaining < 1) {
         return res.status(402).json({
           error: 'Nicht genug Kerosin im Tank.',
-          message: 'Die volle Pilot-Analyse braucht 3 Liter. Monatskontingent-Reset am ' + status.period_reset_at + ' — oder jetzt Kerosin tanken.',
+          message: 'Dein Tank ist leer. Monatskontingent-Reset am ' + status.period_reset_at + ' — oder jetzt Kerosin tanken.',
           credits: status,
-          required: 3,
+          required: 1,
           needs_credits: true
         });
       }
@@ -149,7 +149,7 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
     // V63.86: Nach erfolgreicher Analyse Credits abziehen (nur wenn Server-Key benutzt wurde)
     if (!userApiKey) {
       try {
-        await aiCreditsService.consume(req.user.id, 3, 'analyze', { model: config.openai.defaultModel });
+        await aiCreditsService.consume(req.user.id, 1, 'analyze', { model: config.openai.defaultModel });
       } catch (e) {
         console.warn('[ai/analyze] Credits consume failed:', e.message);
       }

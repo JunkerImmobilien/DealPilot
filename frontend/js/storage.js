@@ -1400,6 +1400,11 @@ function _resetUiAfterDelete() {
 // EXPORT / IMPORT
 // ══════════════════════════════════════════════════
 async function exportAllJSON() {
+  if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('json_backup')) { /* v496-gate */
+    if (typeof toast === 'function') toast('JSON-Objektsicherung (Import/Export) ist im Pro-Plan enthalten.');
+    else alert('JSON-Objektsicherung (Import/Export) ist im Pro-Plan enthalten.');
+    return;
+  }
   var all = [];
   if (Auth.isApiMode()) {
     try {
@@ -1443,6 +1448,11 @@ window.exportAllObjectsJson = exportAllJSON;
  * nur als Array mit einem Element. Damit lässt sie sich später wieder importieren.
  */
 async function exportSingleObjectJson(objId) {
+  if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('json_backup')) { /* v495-export-gate */
+    if (typeof toast === 'function') toast('JSON-Objektsicherung ist im Pro-Plan enthalten.');
+    else alert('JSON-Objektsicherung ist im Pro-Plan enthalten.');
+    return;
+  }
   if (!objId) { toast('⚠ Kein Objekt ausgewählt'); return; }
   var single = null;
   try {
@@ -1525,6 +1535,11 @@ function _buildXlsxRowForObject(o) {
  * V118: Exportiert ein EINZELNES Objekt als Excel (.xlsx) mit allen Kennzahlen.
  */
 async function exportSingleObjectExcel(objId) {
+  if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('export_csv')) { /* v495-export-gate */
+    if (typeof toast === 'function') toast('Rohdatenexport (CSV/XLSX) ist im Pro-Plan enthalten.');
+    else alert('Rohdatenexport (CSV/XLSX) ist im Pro-Plan enthalten.');
+    return;
+  }
   if (typeof Paywall !== 'undefined' && !Paywall.gate('exports')) return;
   if (typeof XLSX === 'undefined') { toast('⚠ Excel-Bibliothek (SheetJS) nicht geladen'); return; }
   if (!objId) { toast('⚠ Kein Objekt ausgewählt'); return; }
@@ -1564,6 +1579,11 @@ window.exportSingleObjectExcel = exportSingleObjectExcel;
  *   Zuvor war nur CSV verfügbar — Marcels Wunsch: echtes Excel.
  */
 async function exportAllObjectsExcel() {
+  if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('export_csv')) { /* v495-export-gate */
+    if (typeof toast === 'function') toast('Rohdatenexport (CSV/XLSX) ist im Pro-Plan enthalten.');
+    else alert('Rohdatenexport (CSV/XLSX) ist im Pro-Plan enthalten.');
+    return;
+  }
   if (typeof Paywall !== 'undefined' && !Paywall.gate('exports')) return;
   if (typeof XLSX === 'undefined') { toast('⚠ Excel-Bibliothek (SheetJS) nicht geladen'); return; }
 
@@ -1603,6 +1623,11 @@ window.exportAllObjectsExcel = exportAllObjectsExcel;
 // V63.44: Trigger-Helfer — erzeugt versteckten File-Input und klickt ihn,
 // damit der User direkt aus der Sidebar Excel/JSON importieren kann
 window.triggerImportExcel = function() {
+  if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('excel_import')) { /* v496-gate */
+    if (typeof toast === 'function') toast('Excel-Import ist ab dem Starter-Plan verf\u00fcgbar.');
+    else alert('Excel-Import ist ab dem Starter-Plan verf\u00fcgbar.');
+    return;
+  }
   var input = document.createElement('input');
   input.type = 'file';
   input.accept = '.xlsx,.xlsm,.xlsb';
@@ -1618,6 +1643,11 @@ window.triggerImportExcel = function() {
 };
 
 window.triggerImportJson = function() {
+  if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('json_backup')) { /* v496-gate */
+    if (typeof toast === 'function') toast('JSON-Objektsicherung (Import/Export) ist im Pro-Plan enthalten.');
+    else alert('JSON-Objektsicherung (Import/Export) ist im Pro-Plan enthalten.');
+    return;
+  }
   var input = document.createElement('input');
   input.type = 'file';
   input.accept = '.json';

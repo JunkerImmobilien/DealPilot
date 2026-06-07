@@ -16,11 +16,12 @@ const { query } = require('../db/pool');
 
 // v491-kerosin: Limits in LITERN (1 L = 1 Anfrage). Entspricht dem
 // Marketing-Versprechen und plans.max_ai_analyses_monthly (Migration 020).
+/* v493-limits: Feature-Matrix 05.06. — Investor 40 L, Pro 100 L */
 const PLAN_LIMITS = {
   free:     2,
   starter:  10,
-  investor: 30,
-  pro:      80
+  investor: 40,
+  pro:      100
 };
 
 // Monats-Reset: Wenn current_period_start in einem früheren Monat liegt → reset

@@ -856,7 +856,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 500; letter-spacing: -0.03em;
   line-height: 1.02; margin: 0 0 24px;
 }
-.cta-final h2 .accent {
+.cta-final h2 .accent { padding-right: .12em; /* v497: kursives ? nicht abschneiden */
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2788,8 +2788,8 @@ html { scroll-behavior: smooth; }
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-3.16 19.5"/><path d="M12 2a10 10 0 0 1 7.4 16.4"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="3"/></svg>
         </div>
-        <h3>KI-Investment-Analyse</h3>
-        <p>ChatGPT mit Web-Recherche zu Lage und Markt.</p>
+        <h3>Pilot-Analyse (KI)</h3>
+        <p>Dein KI-Copilot mit Web-Recherche zu Lage und Markt.</p>
         <ul>
           <li>Stärken, Risiken, Investor-Fit</li>
           <li>Verhandlungsempfehlung mit Zielpreis</li>
@@ -2835,7 +2835,7 @@ html { scroll-behavior: smooth; }
         <ul>
           <li>Suchbare, sortierbare Tabelle</li>
           <li>Portfolio-Kennzahlen aggregiert</li>
-          <li>Strategie-Modul mit Bausparung</li>
+          <li>Portfolio-Cockpit mit gewichtetem Score</li>
           <li>JSON-Export für Backup</li>
         </ul>
       </div>
@@ -2851,6 +2851,48 @@ html { scroll-behavior: smooth; }
           <li>Cloud-Sync (Server-Modus)</li>
           <li>Lokal-Modus ohne Account möglich</li>
           <li>Versionierte JSON-Backups</li>
+        </ul>
+      </div>
+
+      <div class="feature"><!-- v497 -->
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        </div>
+        <h3>Steuer &amp; AfA</h3>
+        <p>Vom AfA-Modell bis zur Steuerersparnis pro Jahr.</p>
+        <ul>
+          <li>AfA linear, degressiv (§ 7 Abs. 5a) &amp; § 7b Sonder-AfA</li>
+          <li>BMF-Rechner für Gebäude-/Bodenanteil</li>
+          <li>Steuerverlauf &amp; V+V über die Jahre</li>
+          <li>Grenzsteuersatz nach Tarif 2026</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h3>Marktdaten &amp; Marktwert</h3>
+        <p>Live-Daten statt Bauchgefühl.</p>
+        <ul>
+          <li>Marktwert-Indikation (PriceHubble &amp; Sprengnetter)</li>
+          <li>Live-Marktzinsen für die Finanzierung</li>
+          <li>Bodenrichtwert-Abruf (BORIS)</li>
+          <li>Automatischer Mietspiegel-Vergleich</li>
+        </ul>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+        </div>
+        <h3>RND-Gutachten</h3>
+        <p>Restnutzungsdauer für die AfA-Optimierung.</p>
+        <ul>
+          <li>Methodik nach Sachverständigen-Standard</li>
+          <li>Modernisierungs-Katalog (GND/BTE)</li>
+          <li>Ausgabe als PDF &amp; DOCX</li>
+          <li>Gutachten-Anfrage direkt aus der App</li>
         </ul>
       </div>
 
@@ -2986,7 +3028,7 @@ html { scroll-behavior: smooth; }
       </div>
     </div>
     <div class="footer-bottom">
-      <div>© 2026 Junker Immobilien · Hermannstr. 9 · 32609 Hüllhorst</div>
+      <div>© 2026 Junker Immobilien</div>
       <div>Keine Steuer- oder Finanzberatung. Analyse-Tool für eigene Kalkulationen.</div>
     </div>
   </div>
