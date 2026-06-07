@@ -24,7 +24,7 @@
         '3 Speicherungen',
         'DealPilot Score (5 Faktoren)',
         'Investor Deal Score (24 KPIs) — Demo',
-        '1 KI-Analyse',
+        '1 Pilot-Analyse',
         'Alle PDFs mit Wasserzeichen'
       ],
       not_included: null,
@@ -44,7 +44,7 @@
         'Werbungskosten-Modul vollständig',
         'Mietspiegel-Vergleich (manuell)',
         'Manuelle Marktzinsen',
-        '5 KI-Credits / Monat (= 10 Analysen)'
+        '10 Pilot-Anfragen / Monat inklusive'
       ],
       not_included: [
         'Investor Deal Score (24 KPIs)',
@@ -72,7 +72,7 @@
         'Live-Marktzinsen',
         'Mietspiegel — Auto-Vergleich',
         'BMF-Rechner & Export',
-        '15 KI-Credits / Monat (= 30 Analysen)'
+        '30 Pilot-Anfragen / Monat inklusive'
       ],
       not_included: null,
       result: 'Sie investieren wie ein institutioneller Investor — mit allen KPIs, die Banken und Steuerberater erwarten.',
@@ -90,7 +90,7 @@
         'Custom Track-Record Cover',
         'BMF-Rechner & Export',
         'Priorisierter Support',
-        '40 KI-Credits / Monat (= 80 Analysen)',
+        '80 Pilot-Anfragen / Monat inklusive',
         'Migration & Einrichtungsservice (bis 3 h) inkl.'
       ],
       not_included: null,
@@ -213,41 +213,22 @@
         '</article>' +
       '</div>' +
 
-      // KI-Credits
+      // v490-kerosin-modal: Kerosin-Tacho-Karten (ersetzt KI-Credits + Marktdaten-Credits)
       '<div class="dp-container dp-section">' +
         '<div class="dp-section-head">' +
-          '<span class="dp-pill dp-pill-alt">KI-Credits</span>' +
-          '<h2 class="dp-h2">Mehr KI-Power, wann Sie sie brauchen</h2>' +
+          '<span class="dp-pill dp-pill-alt">Kerosin</span>' +
+          '<h2 class="dp-h2">Volltanken. Durchstarten.</h2>' +
           '<p class="dp-sub">' +
-            '<strong>1 Credit = 2 KI-Analysen.</strong> Monatliche inklusive Credits werden zuerst verbraucht. Zugekaufte Credits verfallen nicht.' +
+            '<strong>1 Liter = 1 Pilot-Anfrage.</strong> Dein Plan füllt den Tank monatlich (Starter 10 L · Investor 30 L · Pro 80 L) — gekauftes Kerosin kommt obendrauf, wird zuletzt verbraucht und verfällt nie.' /* v491-hybrid */ +
           '</p>' +
         '</div>' +
         '<div class="dp-credits-grid">' +
-          // V197: pack_5/15/40/100 mit korrekten Stripe-Preisen
-          _creditCard(5, 2, 'pack_5', 'Mal schnell prüfen', false) +
-          _creditCard(15, 5, 'pack_15', 'Mehrere Deals', false) +
-          _creditCard(40, 12, 'pack_40', 'Aktiver Investor', true) +
-          _creditCard(100, 25, 'pack_100', 'Profi / Sachverständiger', false) +
+          _kerosinCard(10,  2,  0.20,  'kerosin_10',  'Mal schnell prüfen',  '✈ Kurzstrecke',       164.8, -57.6, '≈ 2 Reports oder 5 Markteinschätzungen',   false) +
+          _kerosinCard(28,  5,  0.18,  'kerosin_28',  'Mehrere Deals',        '✈✈ Mittelstrecke',   116.6, -14.4, '≈ 7 Reports oder 14 Markteinschätzungen',  false) +
+          _kerosinCard(90,  15, 0.167, 'kerosin_90',  'Aktiver Investor',     '✈✈✈ Langstrecke',  56.3,  39.6,  '≈ 22 Reports oder 45 Markteinschätzungen', true)  +
+          _kerosinCard(160, 25, 0.156, 'kerosin_160', 'Maximale Reichweite',  '🌍 Interkontinental', 14.1,  77.4,  '≈ 40 Reports oder 80 Markteinschätzungen', false) +
         '</div>' +
-        '<p class="dp-note" style="text-align:center;margin-top:14px">Credits sind ab dem Starter-Plan zubuchbar und verfallen nicht.</p>' +
-      '</div>' +
-
-      // Marktdaten-Credits (v424)
-      '<div class="dp-container dp-section">' +
-        '<div class="dp-section-head">' +
-          '<span class="dp-pill dp-pill-alt">Marktdaten-Credits</span>' +
-          '<h2 class="dp-h2">Echte Marktwerte auf Knopfdruck</h2>' +
-          '<p class="dp-sub">' +
-            '<strong>1 Credit = 1 Abruf.</strong> Automatische Marktbewertung über PriceHubble oder Sprengnetter. Ab dem Starter-Plan zubuchbar, Credits verfallen nicht.' +
-          '</p>' +
-        '</div>' +
-        '<div class="dp-credits-grid">' +
-          _avmCard(1, 7.99, 'avm_1', 'Einzelabruf', false) +
-          _avmCard(5, 37.95, 'avm_5', 'Mehrere Objekte', true) +
-          _avmCard(10, 69.90, 'avm_10', 'Aktiver Investor', false) +
-          _avmCard(25, 159.75, 'avm_25', 'Profi / Sachverständiger', false) +
-        '</div>' +
-        '<p class="dp-note" style="text-align:center;margin-top:14px">Daten von PriceHubble &amp; Sprengnetter · ab Starter · Credits verfallen nicht.</p>' +
+        '<p class="dp-note" style="text-align:center;margin-top:14px">Kerosin ist ab dem Starter-Plan zubuchbar · verfällt nicht · kein Abo.</p>' +
       '</div>' +
 
       // V63.82: Feature-Übersicht — vollständige Vergleichstabelle
@@ -264,7 +245,7 @@
 
       // Footer-Hinweise
       '<div class="dp-container dp-footer-note">' +
-        '<p>Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. KI-Credits verfallen nicht.</p>' +
+        '<p>Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. Kerosin verfällt nicht.</p>' +
       '</div>';
   }
 
@@ -299,10 +280,10 @@
         ['Steuer-Modul',                         '–', 'Werbungsk.', 'Werbungsk. + AfA', 'erweitert'],
         ['Personalisierte Zinsmodelle',          '–', '–', '–', '✓']
       ]},
-      { cat: 'KI-Analyse', items: [
-        ['KI-Analyse-Tab',                       'vereinfacht', 'vereinfacht', '✓', '✓'],
-        ['KI-Credits / Monat (inkl.)',           '1', '5', '15', '40'],
-        ['KI-Marktanalyse / Lagebewertung',      '–', '–', '✓', '✓']
+      { cat: 'Pilot-Analyse', items: [
+        ['Pilot-Analyse-Tab',                       'vereinfacht', 'vereinfacht', '✓', '✓'],
+        ['Pilot-Anfragen / Monat (inkl.)',       '2', '10', '30', '80'],
+        ['Pilot-Marktanalyse / Lagebewertung',      '–', '–', '✓', '✓']
       ]},
       { cat: 'Limits & Import', items: [
         ['Objekte',                              '1', '5', '25', '∞'],
@@ -360,6 +341,37 @@
     // V63.82: Bei aktivem Backend-Mailer wäre hier ein POST /service-request möglich.
     // Für jetzt: einfach toasten — Marcel sieht's beim Plan-Wechsel-Workflow.
   };
+
+  /* v490-kerosin-modal: Tacho-Karte — CTA nutzt den bestehenden Direkt-Checkout */
+  function _kerosinGauge(off, deg) {
+    var gid = 'kgm' + String(Math.abs(off)).replace('.', '');
+    return '<svg class="kp-tacho" viewBox="0 0 184 96" aria-hidden="true">' +
+      '<path d="M28 88 A64 64 0 0 1 156 88" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8" stroke-linecap="round"/>' +
+      '<path d="M149 59 A64 64 0 0 1 156 88" fill="none" stroke="rgba(184,98,80,.55)" stroke-width="8" stroke-linecap="round"/>' +
+      '<path class="kp-arc" style="--off:' + off + '" d="M28 88 A64 64 0 0 1 156 88" fill="none" stroke="url(#' + gid + ')" stroke-width="8" stroke-linecap="round"/>' +
+      '<g stroke="rgba(244,236,216,.2)" stroke-width="2"><line x1="28" y1="88" x2="36" y2="88"/><line x1="46.8" y1="42.8" x2="52.4" y2="48.4"/><line x1="92" y1="24" x2="92" y2="32"/><line x1="137.2" y1="42.8" x2="131.6" y2="48.4"/><line x1="156" y1="88" x2="148" y2="88"/></g>' +
+      '<g class="kp-needle" style="--deg:' + deg + 'deg"><line x1="92" y1="88" x2="92" y2="34" stroke="#F4ECD8" stroke-width="3" stroke-linecap="round"/></g>' +
+      '<circle cx="92" cy="88" r="5.5" fill="#C9A84C"/>' +
+      '<defs><linearGradient id="' + gid + '" x1="0" x2="1"><stop offset="0" stop-color="#C9A84C"/><stop offset="1" stop-color="#3FA56C"/></linearGradient></defs>' +
+    '</svg>';
+  }
+
+  function _kerosinCard(liter, price, perLiter, packId, target, flight, off, deg, reach, best) {
+    var perLiterStr = perLiter.toFixed(perLiter < 0.17 ? 3 : 2).replace('.', ',') + ' €';
+    return '<div class="dp-credits-card kp-card' + (best ? ' dp-credits-card-best' : '') + '">' +
+      (best ? '<span class="dp-credits-best">Beliebt</span>' : '') +
+      '<div class="kp-flight">' + flight + '</div>' +
+      _kerosinGauge(off, deg) +
+      '<div class="dp-credits-amount">' + liter + '</div>' +
+      '<div class="dp-credits-amount-label">Liter = ' + liter + ' Pilot-Anfragen</div>' +
+      '<div class="dp-credits-divider"></div>' +
+      '<div class="dp-credits-price">' + price + ' €</div>' +
+      '<div class="dp-credits-perunit">' + perLiterStr + ' / Liter</div>' +
+      '<div class="dp-credits-target">' + target + '</div>' +
+      '<div class="kp-reach">' + reach + '</div>' +
+      '<a class="dp-credits-cta" href="#" data-pack-id="' + packId + '" onclick="window._buyCreditPackDirect(this); return false;">Kerosin kaufen</a>' +
+    '</div>';
+  }
 
   function _creditCard(credits, price, packId, target, best) {
     // V197.2: Direkt zu Stripe, ohne Zwischenmodal.

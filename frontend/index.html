@@ -22,7 +22,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=488">
+<link rel="stylesheet" href="css/style.css?v=489">
 <link rel="stylesheet" href="css/bmf-modal.css?v=293f">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=303"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
@@ -800,13 +800,13 @@ label.dp-required.qc-required::after {
       <button class="hdr-icon-btn" type="button" title="Duplizieren" onclick="if(typeof duplicateObj==='function')duplicateObj()">
         <svg width="14" height="14"><use href="#i-copy"/></svg>
       </button>
-      <!-- V63.86: KI-Credits-Pill — Live-Status, klickt zu Settings → KI -->
-      <button class="hdr-credits-pill" id="hdr-credits-pill" type="button"
-              title="KI-Credits — klicken für Details"
+      <!-- v489-fuel-pill: Pilot-Tank — Kerosin-Stand, klickt zu Settings → Pilot -->
+      <button class="hdr-credits-pill fuel-pill" id="hdr-credits-pill" type="button"
+              title="Pilot-Tank — klicken für Details"
               onclick="if(typeof showSettings==='function')showSettings('api')"
               style="display:none">
-        <svg width="13" height="13"><use href="#i-brain"/></svg>
-        <span id="hdr-credits-pill-label">KI</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 22h12V4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v18Z"/><path d="M15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V9l-3-3"/><path d="M6 6h6"/></svg>
+        <span id="hdr-credits-pill-label">Pilot</span>
       </button>
     </div>
   </div>
@@ -832,7 +832,7 @@ label.dp-required.qc-required::after {
   <button class="tab" data-target-sec="s3" data-wf-key="finanzierung"><span class="tab-ico" data-ico="bank"></span><span class="tab-lbl">Finanzierung</span></button>
   <button class="tab" data-target-sec="s4" data-wf-key="bewirtschaftung"><span class="tab-ico" data-ico="settings"></span><span class="tab-lbl">Bewirtschaftung</span></button>
   <button class="tab" data-target-sec="s3-tax" data-wf-key="steuer"><span class="tab-ico" data-ico="fileText"></span><span class="tab-lbl">Steuer</span></button>
-  <button class="tab" data-target-sec="s5"><span class="tab-ico" data-ico="brain"></span><span class="tab-lbl">KI-Analyse</span></button>
+  <button class="tab" data-target-sec="s5"><span class="tab-ico" data-ico="brain"></span><span class="tab-lbl">Pilot-Analyse</span></button>
   <button class="tab" data-target-sec="s6"><span class="tab-ico" data-ico="barChart"></span><span class="tab-lbl">Bewertung</span></button>
   <button class="tab" data-target-sec="s8"><span class="tab-ico" data-ico="handshake"></span><span class="tab-lbl">Deal-Aktion</span></button>
   <div class="tabs-spacer"></div>
@@ -896,7 +896,7 @@ label.dp-required.qc-required::after {
       </span>
       <div>
         <div class="market-import-title">Marktbericht-PDF importieren</div>
-        <div class="market-import-sub">Marktbericht- oder Gutachten-PDF hochladen — die KI füllt Verkehrswert, Lage-Scores und Wertentwicklung automatisch aus.</div>
+        <div class="market-import-sub">Marktbericht- oder Gutachten-PDF hochladen — DealPilot füllt Verkehrswert, Lage-Scores und Wertentwicklung automatisch aus.</div>
       </div>
     </div>
     <button type="button" class="btn btn-outline btn-sm" onclick="showMarketDataImport()">📁 PDF wählen</button>
@@ -1097,7 +1097,7 @@ label.dp-required.qc-required::after {
       <div class="ki-lage-header">
         <div class="ki-lage-title">
           <span id="ki-lage-icon" class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
-          <span>KI-Lage-Bewertung</span>
+          <span>Pilot-Lage-Bewertung</span>
           <span class="ki-lage-tag">alle 8 Felder</span>
         </div>
         <button class="btn btn-gold btn-sm" id="ki-lage-btn" onclick="runKiLage()" type="button">
@@ -1105,7 +1105,7 @@ label.dp-required.qc-required::after {
         </button>
       </div>
       <div class="ki-lage-body" id="ki-lage-body">
-        <div class="ki-lage-empty">Adresse oben eintragen, dann Button klicken — die KI bewertet Makro/Mikro, Bevölkerung, Nachfrage, Wertsteigerung &amp; Entwicklung in einem Aufruf mit Quellen.</div>
+        <div class="ki-lage-empty">Adresse oben eintragen, dann Button klicken — DealPilot bewertet Makro/Mikro, Bevölkerung, Nachfrage, Wertsteigerung &amp; Entwicklung in einem Aufruf mit Quellen.</div>
       </div>
     </div>
   </div>
@@ -1135,7 +1135,7 @@ label.dp-required.qc-required::after {
                 <button type="button" class="btn-brw" onclick="DealPilotBrw.openBoris()" title="Öffnet BORIS-Portal des passenden Bundeslandes">
                   <span class="btn-brw-icon">🔗</span> BORIS-Portal
                 </button>
-                <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="KI schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren">
+                <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="DealPilot schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren">
                   <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></span> Bodenrichtwert schätzen
                 </button>
                 <span id="brw-ai-status" class="brw-ai-status"></span>
@@ -1421,7 +1421,7 @@ label.dp-required.qc-required::after {
       <div class="ki-lage-header">
         <div class="ki-lage-title">
           <span class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
-          <span>KI-Mietpreis-Analyse</span>
+          <span>Pilot-Mietpreis-Analyse</span>
           <span class="ki-lage-tag">Marktmiete + Mietausfall</span>
         </div>
         <button class="btn btn-gold btn-sm" id="ki-miete-btn" onclick="runKiMiete()" type="button">
@@ -1429,7 +1429,7 @@ label.dp-required.qc-required::after {
         </button>
       </div>
       <div class="ki-lage-body" id="ki-miete-body">
-        <div class="ki-lage-empty">Die KI recherchiert die marktübliche Miete für deine Adresse + Wohnfläche und schätzt das Mietausfall-Risiko ein. Werte können per Klick übernommen werden.</div>
+        <div class="ki-lage-empty">DealPilot recherchiert die marktübliche Miete für deine Adresse + Wohnfläche und schätzt das Mietausfall-Risiko ein. Werte können per Klick übernommen werden.</div>
       </div>
     </div>
     </div>
@@ -1563,7 +1563,7 @@ label.dp-required.qc-required::after {
     <div class="ct-row">
       <div class="ct-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:0;width:100%"><!-- V304-bmf-btn-rechts: width:100% damit Button ganz rechts -->
   <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-percent"/></svg></span>AfA-Konfiguration</div>
-  <button class="btn btn-outline btn-sm afa-detail-btn" id="btnBmfAdvanced" type="button" onclick="openBMFModal()" title="Pro-Plan · BMF-Kaufpreisaufteilung · 3 Verfahren · KI-GAA · PDF-Anlage Finanzamt" style="margin-left:auto">
+  <button class="btn btn-outline btn-sm afa-detail-btn" id="btnBmfAdvanced" type="button" onclick="openBMFModal()" title="Pro-Plan · BMF-Kaufpreisaufteilung · 3 Verfahren · Pilot-GAA · PDF-Anlage Finanzamt" style="margin-left:auto">
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:-2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
   BMF-Rechner
   <span class="plan-badge plan-badge-gold" style="margin-left:6px">Pro</span>
@@ -1746,7 +1746,7 @@ label.dp-required.qc-required::after {
   </div>
 
 
-  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>KI-Analyse</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s3-tax');return false;">Weiter: KI-Analyse<span class="v235-next-btn-arrow">→</span></button></div>
+  <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Pilot-Analyse</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s3-tax');return false;">Weiter: Pilot-Analyse<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
 <!-- ═══════════ TAB 3: FINANZIERUNG ═══════════ -->
@@ -2388,31 +2388,31 @@ label.dp-required.qc-required::after {
 
 <!-- ═══════════ TAB 5: KI ═══════════ -->
 <div class="sec" id="s5">
-  <h2 class="sec-title">KI-Investment-Analyse</h2>
-  <p class="sec-desc">DealPilot KI bewertet deine Zahlen — Bewertung, Stärken, Risiken, Verhandlungsempfehlung, Bankargumente, Fazit</p>
+  <h2 class="sec-title">Pilot-Investment-Analyse</h2>
+  <p class="sec-desc">DealPilot bewertet deine Zahlen — Bewertung, Stärken, Risiken, Verhandlungsempfehlung, Bankargumente, Fazit</p>
 
   <div class="ai-box">
     <div class="ai-hdr">
       <div class="ai-icon ai-icon-brain" id="ai-icon-main"></div>
       <div>
         <div class="ai-title">Investment-Analyse</div>
-        <div class="ai-sub">DealPilot KI</div>
+        <div class="ai-sub">Pilot-Analyse</div>
       </div>
     </div>
 
     <div id="ai-content" class="ai-body">
-      Eine KI-gestützte Investment-Analyse mit konkreten Zahlen und klarer Kaufempfehlung — basierend auf allen Eingaben dieses Objekts.
+      Eine datengestützte Pilot-Analyse mit konkreten Zahlen und klarer Kaufempfehlung — basierend auf allen Eingaben dieses Objekts.
     </div>
 
-    <button class="ai-btn" id="ai-btn" onclick="runAI()">✦ KI-Analyse starten</button>
+    <button class="ai-btn" id="ai-btn" onclick="runAI()">✦ Pilot-Analyse starten</button>
 
     <div class="ai-pdf-toggle">
       <label class="ji-switch">
         <input type="checkbox" id="ai-in-pdf" checked>
         <span class="ji-slider"></span>
-        <span class="ji-switch-label">KI-Analyse im PDF-Export einschließen</span>
+        <span class="ji-switch-label">Pilot-Analyse im PDF-Export einschließen</span>
       </label>
-      <div class="ai-pdf-hint">Deaktiviere diese Option, wenn du das PDF ohne die KI-Seite exportieren möchtest.</div>
+      <div class="ai-pdf-hint">Deaktiviere diese Option, wenn du das PDF ohne die Pilot-Seite exportieren möchtest.</div>
     </div>
   </div>
 
@@ -2480,7 +2480,7 @@ label.dp-required.qc-required::after {
       <div class="kpi-eval-title">
         <span class="kpi-eval-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M12 12c0-.621.504-1.125 1.125-1.125M12 12v1.5m0 1.5v-1.5"/></svg></span>
         <span>Kennzahlen-Bewertung</span>
-        <span class="kpi-eval-tag">lokal · ohne KI</span>
+        <span class="kpi-eval-tag">lokal · ohne Pilot-Anfrage</span>
       </div>
     </div>
     <div class="kpi-eval-body" id="kpi-eval-body">
@@ -2493,12 +2493,12 @@ label.dp-required.qc-required::after {
     <div class="ai-mini-header">
       <div class="ai-mini-title">
         <span class="ai-mini-icon ai-mini-icon-svg" id="ai-mini-icon-svg"></span>
-        <span>KI-Investment-Analyse</span>
+        <span>Pilot-Investment-Analyse</span>
         <span class="ai-mini-tag">basiert auf DealScore</span>
       </div>
       <div class="ai-mini-actions">
         <button class="btn btn-outline btn-sm" id="ai-mini-run" onclick="runMiniAI()">Analyse starten</button>
-        <button class="btn btn-link btn-sm ai-mini-link" id="ai-mini-detail" onclick="switchTab(4)" title="Vollständige Analyse im Tab KI-Analyse">Vollständige Analyse →</button>
+        <button class="btn btn-link btn-sm ai-mini-link" id="ai-mini-detail" onclick="switchTab(4)" title="Vollständige Analyse im Tab Pilot-Analyse">Vollständige Analyse →</button>
       </div>
     </div>
     <div class="ai-mini-body" id="ai-mini-body">
@@ -2883,7 +2883,7 @@ label.dp-required.qc-required::after {
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=286"></script>
-<script src="js/config.js?v=431"></script>
+<script src="js/config.js?v=489"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -2896,8 +2896,8 @@ label.dp-required.qc-required::after {
 <script src="js/datenraum.js?v=160"></script>
 <script src="js/tooltip-content.js?v=2351"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
-  <script src="js/settings.js?v=2348"></script>
-<script src="js/pricing-modal.js?v=197-2"></script>
+  <script src="js/settings.js?v=491"></script>
+<script src="js/pricing-modal.js?v=491-2"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=162"></script>
 <script src="js/werbungskosten-pdf.js?v=166"></script>
@@ -2936,7 +2936,7 @@ label.dp-required.qc-required::after {
 <script src="js/qc-bridge.js?v=406"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
-<script src="js/ai-credits.js?v=225"></script>
+<script src="js/ai-credits.js?v=491"></script>
 <script src="js/workflow.js?v=124"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=166"></script>
@@ -2977,7 +2977,7 @@ label.dp-required.qc-required::after {
 
 
   <script src="js/register-easter-egg.js?v=207" defer></script>
-  <script src="credits-modal.js?v=197"></script>
+  <script src="credits-modal.js?v=491"></script>
   <script src="js/grest-plz-lookup.js?v=226"></script>
 
 <!-- V229: globaler PLZ-Fehler-Interceptor -->
