@@ -209,6 +209,7 @@ window.DealPilotConfig = (function() {
         watermark:     true
       },
       features: {
+        marktreport: false, rnd_full: false, json_backup: false, excel_import: false, // v494-matrix
         full_calc:           true,    // Vollständige Kalkulation & Charts
         deal_score_v2:       'demo', // V63.82: nur Demo-Sichtbarkeit, kein voller Funktionsumfang
         deal_score_basic:    true,    // V112: Free zeigt BEIDE Scores (DS1 + DS2-Demo) — Marcels Wunsch
@@ -216,13 +217,13 @@ window.DealPilotConfig = (function() {
         market_data_fields:  true,    // V159: Free darf Marktdaten sehen (Demo)
         bmf_calc_export:     true,    // V159: BMF-Demo verfügbar
         export_pdf:          true,    // mit Wasserzeichen
-        export_csv:          true,
+        export_csv:          false,   // v494-matrix: Rohdatenexport nur Pro
         custom_finance_models: true,  // V159: ✅ zum Ausprobieren (Bauspar/Tilgungsaussetzung)
         custom_logo:         false,
         live_market_rates:   true,    // V159: Demo
         bank_pdf_a3:         false,
         bank_pdf_normal:     true,    // V159: Demo
-        werbungskosten_pdf:  true,
+        werbungskosten_pdf:  false,   // v494-matrix: erst ab Investor
         steuer_modul:        true,
         track_record_pdf:    true     // V159: Demo
       },
@@ -244,20 +245,21 @@ window.DealPilotConfig = (function() {
         watermark:     false              // PDFs ohne Wasserzeichen
       },
       features: {
+        marktreport: true, rnd_full: false, json_backup: false, excel_import: true, // v494-matrix
         full_calc:           true,
         deal_score_v2:       false,       // Nur Basic-Score
         deal_score_basic:    true,        // 5 Faktoren sichtbar
         ai_analysis:         true,        // V168: explizit (war undefined)
         ai_analysis_tab:     'simplified', // V63.82: vereinfachte KI-Analyse
-        ai_market_analysis:  false,        // V168: explizit (war undefined)
+        ai_market_analysis:  true,         // v494-matrix: Matrix — Lagebewertung ab Starter
         market_data_fields:  false,        // V63.82: ausgegraut
         bmf_calc_export:     false,        // V63.82: BMF nur Investor+
         bankexport:          false,        // V168: explizit (war undefined)
         export_pdf:          true,
-        export_csv:          true,
+        export_csv:          false,   // v494-matrix
         bank_pdf_normal:     true,
         bank_pdf_premium:    false,        // V168: explizit (war undefined)
-        werbungskosten_pdf:  true,
+        werbungskosten_pdf:  false,   // v494-matrix: erst ab Investor
         steuer_modul:        true,        // Steuer-Modul voll
         investment_thesis_ai: false,       // V168: explizit (war undefined)
         custom_logo:         false,
@@ -286,16 +288,17 @@ window.DealPilotConfig = (function() {
       limits: {
         objects:       25,
         max_saves:     -1,
-        ai_credits:    15,                // 15 Credits = 30 Anfragen / Monat
+        ai_credits:    40,                // v494-matrix: 40 L Kerosin / Monat
         photos_per_obj: 10,
         watermark:     false
       },
       features: {
+        marktreport: true, rnd_full: true, json_backup: false, excel_import: true, // v494-matrix
         full_calc:           true,
         deal_score_v2:       true,        // Voller Deal Score 2.0 (24-30 KPIs)
         deal_score_basic:    true,        // V112: DS1 sichtbar (in Tab Kennzahlen eingeklappt, ausklappbar)
         export_pdf:          true,
-        export_csv:          true,
+        export_csv:          false,   // v494-matrix
         bank_pdf_normal:     true,
         bank_pdf_a3:         true,        // Bank-PDF A3
         bankexport:          true,        // V159: Bankexport
@@ -326,11 +329,12 @@ window.DealPilotConfig = (function() {
       limits: {
         objects:       -1,                // Unbegrenzt
         max_saves:     -1,
-        ai_credits:    40,                // 40 Credits = 80 Anfragen / Monat
+        ai_credits:    100,               // v494-matrix: 100 L Kerosin / Monat
         photos_per_obj: 30,
         watermark:     false
       },
       features: {
+        marktreport: true, rnd_full: true, json_backup: true, excel_import: true, // v494-matrix
         full_calc:                  true,
         deal_score_v2:              true,
         deal_score_basic:           true,    // V112: DS1 sichtbar (in Tab Kennzahlen eingeklappt, ausklappbar)

@@ -54,7 +54,10 @@
     return 'free';
   }
 
-  function hasAccess(opts) {
+  function hasAccess(opts) { /* v495-gate: rnd_full ab Investor (Feature-Matrix) */
+    try {
+      if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('rnd_full')) return false;
+    } catch (e) {}
     if (!opts.showPlanGate) return true;
     const planId = getCurrentPlanId();
     return opts.requirePlan.indexOf(planId) >= 0;

@@ -24,7 +24,7 @@
         '3 Speicherungen',
         'DealPilot Score (5 Faktoren)',
         'Investor Deal Score (24 KPIs) — Demo',
-        '1 Pilot-Analyse',
+        '2 L Kerosin / Monat' /* v493-liter */,
         'Alle PDFs mit Wasserzeichen'
       ],
       not_included: null,
@@ -44,7 +44,7 @@
         'Werbungskosten-Modul vollständig',
         'Mietspiegel-Vergleich (manuell)',
         'Manuelle Marktzinsen',
-        '10 Pilot-Anfragen / Monat inklusive'
+        '10 L Kerosin / Monat inklusive'
       ],
       not_included: [
         'Investor Deal Score (24 KPIs)',
@@ -72,7 +72,7 @@
         'Live-Marktzinsen',
         'Mietspiegel — Auto-Vergleich',
         'BMF-Rechner & Export',
-        '30 Pilot-Anfragen / Monat inklusive'
+        '40 L Kerosin / Monat inklusive'
       ],
       not_included: null,
       result: 'Sie investieren wie ein institutioneller Investor — mit allen KPIs, die Banken und Steuerberater erwarten.',
@@ -90,7 +90,7 @@
         'Custom Track-Record Cover',
         'BMF-Rechner & Export',
         'Priorisierter Support',
-        '80 Pilot-Anfragen / Monat inklusive',
+        '100 L Kerosin / Monat inklusive',
         'Migration & Einrichtungsservice (bis 3 h) inkl.'
       ],
       not_included: null,
@@ -219,7 +219,7 @@
           '<span class="dp-pill dp-pill-alt">Kerosin</span>' +
           '<h2 class="dp-h2">Volltanken. Durchstarten.</h2>' +
           '<p class="dp-sub">' +
-            '<strong>1 Liter = 1 Pilot-Anfrage.</strong> Dein Plan füllt den Tank monatlich (Starter 10 L · Investor 30 L · Pro 80 L) — gekauftes Kerosin kommt obendrauf, wird zuletzt verbraucht und verfällt nie.' /* v491-hybrid */ +
+            '<strong>1 Liter = 1 Pilot-Anfrage.</strong> Dein Plan füllt den Tank monatlich (Starter 10 L · Investor 40 L · Pro 100 L) — gekauftes Kerosin kommt obendrauf, wird zuletzt verbraucht und verfällt nie.' /* v491-hybrid */ +
           '</p>' +
         '</div>' +
         '<div class="dp-credits-grid">' +
@@ -252,42 +252,50 @@
   // V63.82: Service-Card-Helper
   // V63.82: Feature-Übersicht-Tabelle — alle Features alle Pläne
   function _renderFeatureTable() {
-    var rows = [
-      // [Feature-Label, Free, Starter, Investor, Pro]
-      { cat: 'Score & Bewertung', items: [
+    var rows = [ /* v493-matrix — Feature-Matrix Stand 05.06.2026 */
+      { cat: 'Nutzung & Kerosin', items: [
+        ['Objekte',                              '1', '5', '25', '∞'],
+        ['Kerosin / Monat',                      '2 L', '10 L', '40 L', '100 L'],
+        ['Kerosin nachtanken (Liter-Pakete)',    '–', '✓', '✓', '✓']
+      ]},
+      { cat: 'Analyse & Bewertung', items: [
         ['DealPilot Score (5 Faktoren)',         '✓', '✓', '✓', '✓'],
         ['Investor Deal Score (24 KPIs)',        'Demo', '–', '✓', '✓'],
         ['Quick-Check (Schnellbewertung)',       '✓', '✓', '✓', '✓'],
-        ['Deal-Aktion (Anfragen / Gutachten)',   '✓', '✓', '✓', '✓']
+        ['Pilot-Analyse (KI)',                   'vereinfacht', 'vereinfacht', 'Vollversion', 'Vollversion'],
+        ['Pilot-Lagebewertung (KI)',             '–', '✓', '✓', '✓'],
+        ['DealPilot Marktreport',                '–', '✓', '✓', '✓'],
+        ['Deal-Aktion (Anfragen / Gutachten)',   '✓', '✓', '✓', '✓'],
+        ['RND-Einschätzung & Gutachten-Anfrage', 'nur Anfrage', 'nur Anfrage', '✓', '✓']
       ]},
-      { cat: 'PDFs & Export', items: [
-        ['Investment-PDF',                       'Wasserzeichen', '✓', '✓', '✓'],
-        ['Werbungskosten-PDF',                   'Wasserzeichen', '✓', '✓', '✓'],
-        ['Track-Record-PDF',                     'Wasserzeichen', '–', '✓', '✓'],
-        ['Bankexport',                           'Wasserzeichen', '–', '✓', '✓'],
-        ['Logo & Footer im PDF',                 '–', '–', '✓', '✓'],
-        ['Premium-PDF-Layouts',                  '–', '–', '–', '✓'],
-        ['Custom Track-Record-Cover',            '–', '–', '–', '✓']
-      ]},
-      { cat: 'Daten & Marktanalyse', items: [
-        ['Marktdatenfelder',                     'ausgegraut', 'ausgegraut', '✓', '✓'],
+      { cat: 'Markt & Daten', items: [
+        ['Marktdatenfelder',                     'gesperrt*', 'gesperrt*', '✓', '✓'],
         ['Live-Marktzinsen',                     '–', '–', '✓', '✓'],
-        ['Mietspiegel-Vergleich',                '–', 'manuell', 'auto', 'auto'],
-        ['BMF-Rechner & -Export',                '–', '–', '✓', '✓']
+        ['Mietspiegel-Vergleich',                '–', 'manuell', 'automatisch', 'automatisch'],
+        ['Marktdaten-Schnittstellen (Marktwert-Abrufe)', 'Demo', 'zubuchbar', 'zubuchbar', 'zubuchbar'],
+        ['BMF-Rechner & Export',                 '–', '–', '✓', '✓ Advanced']
       ]},
-      { cat: 'Finanzierung & Steuern', items: [
-        ['Finanzierungs-Optionen',               'einfach', 'Annuität', 'alle Typen', 'alle + erweitert'],
-        ['Steuer-Modul',                         '–', 'Werbungsk.', 'Werbungsk. + AfA', 'erweitert'],
-        ['Personalisierte Zinsmodelle',          '–', '–', '–', '✓']
+      { cat: 'Finanzierung & Steuer', items: [
+        ['Finanzierung',                         'alle Modelle als Demo', 'Hauptdarlehen', 'Haupt- + Zusatzdarlehen + KfW + BSV', 'wie Investor'],
+        ['AfA-Methoden',                         'Demo', 'linear + § 7b', 'linear + degressiv + § 7b', 'wie Investor'],
+        ['Werbungskosten-Modul',                 'Demo', '✓', '✓', '✓']
       ]},
-      { cat: 'Pilot-Analyse', items: [
-        ['Pilot-Analyse-Tab',                       'vereinfacht', 'vereinfacht', '✓', '✓'],
-        ['Pilot-Anfragen / Monat (inkl.)',       '2', '10', '30', '80'],
-        ['Pilot-Marktanalyse / Lagebewertung',      '–', '–', '✓', '✓']
+      { cat: 'Reports & Exporte', items: [
+        ['Investment-PDF',                       'Wasserzeichen', '✓', '✓', '✓'],
+        ['Werbungskosten-PDF',                   '–', '–', '✓', '✓'],
+        ['Track-Record-PDF',                     'Wasserzeichen', '–', '✓', '✓'],
+        ['Eigenes Logo & Footer im PDF',         '–', '–', '✓', '✓'],
+        ['Bankexport (PDF / Excel)',             '–', '–', '✓', '✓'],
+        ['Rohdatenexport (CSV / XLSX)',          '–', '–', '–', '✓'],
+        ['JSON-Objektsicherung',                 '–', '–', '–', '✓']
       ]},
-      { cat: 'Limits & Import', items: [
-        ['Objekte',                              '1', '5', '25', '∞'],
-        ['Import (Excel, PDF)',                  '–', 'Excel', 'Excel + Bank-PDF', 'alle Formate'],
+      { cat: 'Import & Datenübernahme', items: [
+        ['Exposé-Import',                   '✓', '✓', '✓', '✓'],
+        ['Marktbericht-Import',                  '✓', '✓', '✓', '✓'],
+        ['Excel-Import',                         '–', '✓', '✓', '✓']
+      ]},
+      { cat: 'Service & Integration', items: [
+        ['API-Zugang',                           '–', '–', '–', '✓'],
         ['Migration & Setup-Service',            '–', '–', '–', '✓ (3 h)']
       ]}
     ];
@@ -313,7 +321,8 @@
         '</tr>';
       });
     });
-    html += '</tbody></table>';
+    html += '</tbody></table>' +
+      '<p class="dp-note" style="margin-top:10px;font-size:11.5px">* sichtbar, aber deaktiviert — die Felder zeigen, was im Upgrade steckt.</p>';
     return html;
   }
 
