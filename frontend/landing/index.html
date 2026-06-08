@@ -2085,96 +2085,12 @@ html { scroll-behavior: smooth; }
 </head>
 <body>
 <!-- V206: Cinematic-Intro mit Single-Container Logo -->
+<!-- v499: Kerosin-Intro (Anzeigen mit Tier-Farben -> Runway -> Kreuz-Flyby -> Logo -> Odometer).
+     Sequenz-Logik in assets/intro-kerosin.js. Session-/Skip-/reduced-motion-Verhalten unveraendert. -->
 <div id="dp-intro-overlay" aria-hidden="true">
-  <!-- Phase 1 Effekte: Vortex + Blitze + Shockwave + Flash + Mega-Bolt -->
-  <div class="dp-intro-bolt-side dp-intro-bolt-1"></div>
-  <div class="dp-intro-bolt-side dp-intro-bolt-2"></div>
-  <div class="dp-intro-bolt-side dp-intro-bolt-3"></div>
-  <div class="dp-intro-shockwave"></div>
-  <div class="dp-intro-flash"></div>
-  <div class="dp-intro-mega-bolt"></div>
-
-  <!-- Logo (Single-Container, PNG bis Rahmen, Sternschnuppe + Sparkle direkt drauf) -->
-  <div class="dp-intro-logo-wrap">
-    <div class="dp-intro-logo">
-      <img src="assets/dealpilot-logo.png" alt="DealPilot" />
-    </div>
-  </div>
-
-  <!-- Phase 2 Mini-Blitz -->
-  <div class="dp-intro-mini-bolt"></div>
-
   <button class="dp-intro-skip" type="button" onclick="dpIntroSkip()">Skip ›</button>
 </div>
-<script>
-(function() {
-  try {
-    if (sessionStorage.getItem('dp_intro_shown') === '1') {
-      var ov = document.getElementById('dp-intro-overlay');
-      if (ov) ov.style.display = 'none';
-      return;
-    }
-  } catch(e) {}
-
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    var ov = document.getElementById('dp-intro-overlay');
-    if (ov) ov.style.display = 'none';
-    return;
-  }
-
-  var overlay = document.getElementById('dp-intro-overlay');
-  if (!overlay) return;
-
-  // 100 Vortex-Partikel
-  for (var i = 0; i < 100; i++) {
-    var p = document.createElement('div');
-    p.className = 'dp-intro-particle';
-    var angle = (Math.PI * 2 * i) / 100 + Math.random() * 0.6;
-    var dist = 300 + Math.random() * 400;
-    p.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
-    p.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
-    p.style.animationDelay = (Math.random() * 0.6) + 's';
-    overlay.insertBefore(p, overlay.firstChild);
-  }
-
-  function ended() {
-    overlay.classList.add('dp-intro-done');
-    try { sessionStorage.setItem('dp_intro_shown', '1'); } catch(e) {}
-    setTimeout(function() { overlay.style.display = 'none'; }, 1100);
-  }
-
-  // Phase 0: Sequenz startet
-  requestAnimationFrame(function() {
-    requestAnimationFrame(function() {
-      overlay.classList.add('dp-intro-play');
-    });
-  });
-
-  // Phase 1: Sternschnuppe + Sparkle ab 4.3s (nach Logo-Bounce)
-  setTimeout(function() {
-    overlay.classList.add('dp-intro-phase-1');
-  }, 4300);
-
-  // Phase 2: Mini-Blitz ab 7.3s (Sternschnuppe lief 3s = 1 Runde, schnell)
-  setTimeout(function() {
-    overlay.classList.add('dp-intro-phase-2');
-  }, 7300);
-
-  // Ende bei 8.0s
-  setTimeout(ended, 8000);
-
-  window.dpIntroSkip = function() { ended(); };
-
-  overlay.addEventListener('click', function(e) {
-    if (e.target.classList.contains('dp-intro-skip')) return;
-    window.dpIntroSkip();
-  });
-
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') window.dpIntroSkip();
-  });
-})();
-</script>
+<script src="assets/intro-kerosin.js?v=499"></script>
 
 
 <div class="bg-animated" aria-hidden="true">
@@ -2700,6 +2616,20 @@ html { scroll-behavior: smooth; }
         </ul>
       </div>
 
+      <div class="feature"><!-- v498 -->
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <h3>PDF-Import</h3>
+        <p>Exposé rein — Felder gefüllt.</p>
+        <ul>
+          <li>Exposé- &amp; Marktbericht-PDFs automatisch auslesen</li>
+          <li>KI-Extraktion der Eckdaten</li>
+          <li>Direkte Übernahme in die Berechnung</li>
+          <li>Spart das Abtippen komplett</li>
+        </ul>
+      </div>
+
       <div class="feature">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -2802,8 +2732,8 @@ html { scroll-behavior: smooth; }
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
         </div>
-        <h3>Investor Deal Score 2.0</h3>
-        <p>0-100 Punkte aus über 20 Kennzahlen.</p>
+        <h3>Investor Deal Score</h3>
+        <p>0–100 Punkte aus 24 KPIs.</p>
         <ul>
           <li>5 Bereiche: Rendite, Cashflow, Risiko</li>
           <li>Finanzierung und Potenzial</li>
@@ -2820,7 +2750,7 @@ html { scroll-behavior: smooth; }
         <p>Bankfähige Unterlagen in Sekunden.</p>
         <ul>
           <li>Investment-Case-PDF mit Charts</li>
-          <li>Premium-Layout für Investor &amp; Pro</li>
+          <li>Eigenes Logo &amp; Adresse im PDF (ab Investor)</li>
           <li>Track-Record über alle Objekte</li>
           <li>Excel/CSV-Bankexport (25 Spalten)</li>
         </ul>
@@ -2850,7 +2780,7 @@ html { scroll-behavior: smooth; }
           <li>Auto-Save beim Feld-Verlassen</li>
           <li>Cloud-Sync (Server-Modus)</li>
           <li>Lokal-Modus ohne Account möglich</li>
-          <li>Versionierte JSON-Backups</li>
+          <li>JSON-Objektsicherung (Pro-Plan)</li>
         </ul>
       </div>
 
@@ -2887,11 +2817,11 @@ html { scroll-behavior: smooth; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
         </div>
         <h3>RND-Gutachten</h3>
-        <p>Restnutzungsdauer für die AfA-Optimierung.</p>
+        <p>Restnutzungsdauer grob einschätzen, Gutachten anfragen.</p>
         <ul>
           <li>Methodik nach Sachverständigen-Standard</li>
           <li>Modernisierungs-Katalog (GND/BTE)</li>
-          <li>Ausgabe als PDF &amp; DOCX</li>
+          <li>Grobe Erst-Einschätzung in Minuten</li>
           <li>Gutachten-Anfrage direkt aus der App</li>
         </ul>
       </div>

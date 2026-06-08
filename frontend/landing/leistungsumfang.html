@@ -864,12 +864,12 @@ article.section .stat-row {
         <li><strong>Bankargumente</strong> — 5–7 ausführliche, fundierte Argumente für die Finanzierungsanfrage, mit konkreten Zahlen und Bezug auf den Deal</li>
       </ul>
 
-      <h3>Wie das Credit-System funktioniert</h3>
+      <h3>Wie das Kerosin-System funktioniert</h3>
       <p>
-        Jede vollständige KI-Analyse verbraucht <strong>einen halben Credit</strong> (1 Credit = 2 Analysen). Wir nutzen ein Credit-System statt einer Flatrate, weil KI-Aufrufe für uns echte Kosten bedeuten — und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
+        DealPilot rechnet in <strong>Kerosin</strong>: 1 Liter = 1 Pilot-Anfrage. Eine vollständige Pilot-Analyse verbraucht also genau einen Liter aus deinem Tank. Wir nutzen dieses System statt einer Flatrate, weil KI-Aufrufe für uns echte Kosten bedeuten — und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
       </p>
       <p>
-        In jedem Bezahl-Plan sind monatliche Credits inklusive (Starter: 5, Investor: 15, Pro: 40). Sind die aufgebraucht, kannst du Credit-Pakete nachkaufen: 5 für 2 €, 15 für 5 €, 40 für 12 €, 100 für 25 €. <strong>Zugekaufte Credits verfallen nicht.</strong>
+        Dein Plan füllt den Tank jeden Monat neu (Free: 2 L, Starter: 10 L, Investor: 40 L, Pro: 100 L). Brauchst du mehr, tankst du nach: 10 L für 2 €, 28 L für 5 €, 90 L für 15 € oder 160 L für 25 €. <strong>Gekauftes Kerosin verfällt nie</strong> — es wird erst angezapft, wenn dein Monatskontingent leer ist.
       </p>
     </article>
 
@@ -893,9 +893,9 @@ article.section .stat-row {
         <li><strong>Annahmen &amp; Disclaimer</strong> — alle eingegebenen Prognose-Parameter zur Nachvollziehbarkeit, plus rechtlicher Disclaimer</li>
       </ol>
 
-      <h3>Premium-Layout (Investor &amp; Pro)</h3>
+      <h3>Eigenes Logo &amp; Footer (Investor &amp; Pro)</h3>
       <p>
-        Im Investor- und Pro-Plan kannst du ein <em>Premium-Layout</em> für den Investment-Case wählen — mit erweiterten Charts, höherer Informationsdichte und eigenem Logo + Footer. Geeignet für anspruchsvolle Bankgespräche und institutionelle Investorenmeetings.
+        Ab dem Investor-Plan machst du den Investment-Case zu deinem Dokument: eigenes Logo und eigene Adresszeile im PDF. Der Bankexport selbst bleibt in jedem Fall derselbe vollständige Export — mit Logo und Footer tritt er nur unter deiner Marke auf. Geeignet für anspruchsvolle Bankgespräche und Investorenmeetings.
       </p>
 
       <h3>Werbungskosten-PDF</h3>
@@ -931,9 +931,9 @@ article.section .stat-row {
         Eine kompakte Sidebar mit Mockup-Karten zeigt dir die wichtigsten Werte jedes Objekts auf einen Blick — Foto, Adresse, Kaufpreis, DSCR mit Ampel-Slider, Cashflow mit Trendkurve, Bruttomietrendite mit Bar. Perfekt für den schnellen Status-Check beim Vorbeischauen.
       </p>
 
-      <h3>Strategie-Modul (Investor &amp; Pro)</h3>
+      <h3>Portfolio-Cockpit</h3>
       <p>
-        Im Strategie-Modul aggregiert DealPilot dein gesamtes Portfolio: Gesamt-Cashflow, Portfolio-Rendite, durchschnittlicher LTV, gewichtete DSCR, Gesamt-Restschuld. Plus eine Übersicht für <strong>Bausparverträge und Tilgungsaussetzungs-Darlehen</strong>, die dir für jedes betroffene Objekt anzeigt, wie es mit der Anschlussfinanzierung aussieht: Bausparsumme vs. Hauptdarlehen, Jahre bis zur Zuteilung, Status-Ampel.
+        Das Portfolio-Cockpit aggregiert dein gesamtes Portfolio auf einen Blick: ein <strong>investitionsvolumen-gewichteter Gesamt-Score</strong> über alle gekauften Objekte, dazu Cashflow, Restschuld und Finanzierungskennzahlen als Portfolio-Summen — mit Objekt-Selektor für den schnellen Wechsel ins Detail. Das Cockpit gibt es in Hell und Dunkel und du kannst es als Startansicht festlegen.
       </p>
     </article>
 
@@ -954,16 +954,11 @@ article.section .stat-row {
 
       <h3>JSON-Export für Backup</h3>
       <p>
-        Du kannst jederzeit dein gesamtes Portfolio als JSON-Datei exportieren — als Backup oder zum Übertragen in eine andere Installation. Der Import funktioniert genauso einfach: JSON-Datei reinziehen, Objekte werden übernommen.
+        Im Pro-Plan kannst du dein gesamtes Portfolio als JSON-Datei exportieren — als Backup oder zum Übertragen in eine andere Installation. Der Import funktioniert genauso einfach: JSON-Datei reinziehen, Objekte werden übernommen. (JSON-Objektsicherung ist Teil des Pro-Plans.)
       </p>
     </article>
 
-    <div class="cta-block">
-      <h3>Bereit, das in der <em>Praxis</em> zu sehen?</h3>
-      <p>Starte mit dem kostenlosen Plan — kein Kreditkarten-Zwang, kein Verkaufsgespräch. Du kannst innerhalb von Minuten dein erstes Objekt durchrechnen.</p>
-      <a href="https://app.dealpilot.junker-immobilien.io/?register=1" class="btn-primary">Kostenlos registrieren →</a>
-      <a href="index.html#pricing" class="btn-secondary">Pläne ansehen</a>
-    </div>
+<!-- v498: CTA ans Seitenende verschoben -->
 
 
     <article class="section reveal" id="steuer"><!-- v497 -->
@@ -999,9 +994,16 @@ article.section .stat-row {
         Die gesetzliche AfA unterstellt pauschal lange Nutzungsdauern — bei älteren Objekten liegt die tatsächliche Restnutzungsdauer oft deutlich darunter. Wer das nachweist, schreibt schneller ab und spart jedes Jahr Steuern. Das <strong>RND-Modul</strong> führt dich durch die Einschätzung nach Sachverständigen-Standard: Gesamtnutzungsdauer-Tabelle, Modernisierungs-Katalog mit Punktesystem und nachvollziehbarer Herleitung.
       </p>
       <p>
-        Das Ergebnis bekommst du als sauber aufbereitetes Dokument (PDF und DOCX) — als Grundlage für das Gespräch mit dem Finanzamt oder als Vorbereitung für ein vollwertiges Gutachten. Die Gutachten-Anfrage an unser Sachverständigenbüro stellst du direkt aus der App; das vollständige RND-Modul steht ab dem Investor-Plan bereit, die Anfrage in jedem Plan.
+        Wichtig zur Einordnung: Das Modul liefert eine <strong>grobe, nachvollziehbare Erst-Einschätzung</strong> — eine Orientierung, kein Gutachten. Für den steuerlich belastbaren Nachweis stellst du die Gutachten-Anfrage an unser Sachverständigenbüro direkt aus der App, und wir kümmern uns um den Rest. Das Einschätzungs-Modul steht ab dem Investor-Plan bereit, die Gutachten-Anfrage in jedem Plan.
       </p>
     </article>
+
+    <div class="cta-block">
+      <h3>Bereit, das in der <em>Praxis</em> zu sehen?</h3>
+      <p>Starte mit dem kostenlosen Plan — kein Kreditkarten-Zwang, kein Verkaufsgespräch. Du kannst innerhalb von Minuten dein erstes Objekt durchrechnen.</p>
+      <a href="https://app.dealpilot.junker-immobilien.io/?register=1" class="btn-primary">Kostenlos registrieren →</a>
+      <a href="index.html#pricing" class="btn-secondary">Pläne ansehen</a>
+    </div>
 
   </div>
 </section>
