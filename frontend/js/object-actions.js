@@ -21,7 +21,9 @@
   var _oabiDone = null;  /* v393: Kombi-Flow Completion */
   var _qcMode = false;            /* v418: Import aus dem Quick-Check */
   var _qcPendingMerged = {};      /* v418: Bucket B+C -> beim qc-save ins Objekt */
-  var OBJ2QC = { str:'qc_str', hnr:'qc_hnr', plz:'qc_plz', ort:'qc_ort', wfl:'qc_wfl', baujahr:'qc_bj', zimmer:'qc_zimmer', objart:'qc_objektart', kp:'qc_kp', nkm:'qc_nkm', hg_ul:'qc_hg', ek:'qc_ek', ds2_energie:'qc_energieklasse', stellpl_aussen:'qc_stellplatz' };  /* v418: Bucket A */
+  var OBJ2QC = { str:'qc_str', hnr:'qc_hnr', plz:'qc_plz', ort:'qc_ort', wfl:'qc_wfl', baujahr:'qc_bj', zimmer:'qc_zimmer', objart:'qc_objektart', kp:'qc_kp', nkm:'qc_nkm', hg_ul:'qc_hg', ek:'qc_ek', ds2_energie:'qc_energieklasse', stellpl_aussen:'qc_stellplatz',
+    /* v506-obj2qc: Finanzierung + Mieten-Einzelposten (Sprachaufzeichnung) */
+    d1z:'qc_zins', d1t:'qc_tilg', ze_stp:'qc_nkm_stp', ze_kueche:'qc_nkm_kueche', ze_sonst:'qc_nkm_sonst' };  /* v418: Bucket A */
 
   function $(id) { return document.getElementById(id); }
   function val(id) { var e = $(id); return e ? (e.value || '').trim() : ''; }
@@ -196,6 +198,7 @@
           srcLabel('import', 'doc', 'Exposé/Marktbericht', false) +
           srcLabelImg('pricehubble', 'img/pricehubble.jpg', 'PriceHubble', avmOff) +
           srcLabelImg('sprengnetter', 'img/sprengnetter.jpg', 'Sprengnetter', avmOff) +
+          (window.VoiceImport ? window.VoiceImport.srcLabel() : '') +  /* v503-voice-label */
         '</span>' +
         '<button type="button" class="qc6-run oab-act" id="oab-run"><span class="qc7-ic">' + svg('analyze', 15, '#9a7f33') + '</span> Abrufen</button>' +
       '</div>' +
@@ -210,18 +213,21 @@
   function updateCreditHint() {
     var el = $('oab-credit-hint'); if (!el) return;
     var sel = selectedSources();
-    var avm = sel.filter(function (s) { return s === 'pricehubble' || s === 'sprengnetter'; });
-    if (!avm.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    /* v503-kerosin-hint: Liter statt "Credits" — Saetze gemaess Backend
+       (avm.js COST: PriceHubble 40 L, Sprengnetter 20 L; ai.js extract-voice 1 L).
+       Frontend zeigt nur an, abgerechnet wird serverseitig. */
+    var KEROSIN_L = { voice: 1, pricehubble: 40, sprengnetter: 20 };
+    var billed = sel.filter(function (s) { return KEROSIN_L[s] != null; });
+    if (!billed.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var demo = !!(_avmHealth && _avmHealth.mode === 'stub');
-    /* v414-credit-real: echte Kosten gemaess Backend-COST (PriceHubble 1, Sprengnetter 3 mit / 2 ohne Kaufpreis). */
-    var _hasKp = (numDe(val('kp')) || 0) > 0;
     var _total = 0;
-    var parts = avm.map(function (s) {
-      if (s === 'pricehubble') { _total += 1; return '<b>1 PriceHubble-Credit</b>'; }
-      _total += 1; return '<b>1 Sprengnetter-Credit</b>';
+    var parts = billed.map(function (s) {
+      var L = KEROSIN_L[s]; _total += L;
+      var nm = s === 'voice' ? 'Sprachauswertung' : (s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter');
+      return '<b>' + L + '\u00a0L</b> ' + nm;
     }).join(' + ');
-    var txt = 'Beim <b>Abrufen</b> ' + (_total > 1 ? 'werden ' : 'wird ') + parts + ' verbraucht' + (avm.length > 1 ? ' (' + _total + ' gesamt)' : '') + '.';
-    if (demo) txt += ' <span style="opacity:.75">Im Demo-Modus aktuell kostenlos.</span>';
+    var txt = 'Beim <b>Abrufen</b> ' + (billed.length > 1 ? 'werden ' : 'wird ') + parts + ' Kerosin verbraucht' + (billed.length > 1 ? ' (' + _total + '\u00a0L gesamt)' : '') + '.';
+    if (demo && billed.some(function (s) { return s !== 'voice'; })) txt += ' <span style="opacity:.75">AVM im Demo-Modus aktuell kostenlos.</span>';
     el.innerHTML = '<span class="oab-credit-dot"></span>' + txt;
     el.style.display = '';
   }
@@ -231,13 +237,14 @@
   async function runSelected() {
     var srcs = selectedSources();
     if (!srcs.length) { toast('Bitte mindestens eine Quelle auswählen'); return; }
-    var order = ['import', 'pricehubble', 'sprengnetter'];
+    var order = ['voice', 'import', 'pricehubble', 'sprengnetter'];  /* v503-voice-first */
     var ordered = order.filter(function (s) { return srcs.indexOf(s) !== -1; });
     var btn = $('oab-run'); if (btn) btn.disabled = true;
     for (var i = 0; i < ordered.length; i++) {
       var s = ordered[i];
       try {
-        if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); }
+        if (s === 'voice') { setProg('Sprachaufzeichnung …'); await new Promise(function (res) { if (window.VoiceImport) { window.VoiceImport.open(res); } else { res(); } }); }  /* v503-voice-run */
+        else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); }
         else if (s === 'pricehubble' || s === 'sprengnetter') { setProg((s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' …'); await avmFetch(s); }
       } catch (e) { try { console.warn('[obj-actions] step', s, e); } catch (_) {} }
     }
@@ -917,6 +924,31 @@
         pendingList.push({ key: id, label: it.label, value: it.value, target: id, source: it.source });
       }
     });
+    /* v506-qc-derive: QC-spezifische Umrechnungen */
+    try {
+      // Hausgeld: qc_hg verlangt GESAMT (Label 'Hausgeld / Monat inkl. ...'),
+      // Quelle liefert hg_ul/hg_nul getrennt -> Summe + Split-Prozent.
+      var _hgU = _merged['hg_ul'], _hgN = _merged['hg_nul'];
+      var _hgUOn = _hgU && ov.querySelector('.oabi-tbl input[data-id="hg_ul"]:checked');
+      var _hgNOn = _hgN && ov.querySelector('.oabi-tbl input[data-id="hg_nul"]:checked');
+      if (_hgUOn || _hgNOn) {
+        var _u = _hgUOn ? (numDe(_hgU.raw) || 0) : 0;
+        var _n = _hgNOn ? (numDe(_hgN.raw) || 0) : 0;
+        var _ges = _u + _n;
+        if (_ges > 0) {
+          qcData['qc_hg'] = String(Math.round(_ges));
+          if (_n > 0) qcData['qc_hg_split'] = String(Math.round(_n / _ges * 100));
+          delete _qcPendingMerged['hg_nul'];
+          pendingList = pendingList.filter(function (x) { return x.key !== 'hg_nul'; });
+        }
+      }
+      // Mieten: bei Einzelposten geht die Kaltmiete als GRUNDmiete rein,
+      // qc_nkm summiert das iframe selbst (mieteAddUp im Result-Handler).
+      if ((qcData['qc_nkm_stp'] != null || qcData['qc_nkm_kueche'] != null || qcData['qc_nkm_sonst'] != null) && qcData['qc_nkm'] != null) {
+        qcData['qc_nkm_grund'] = qcData['qc_nkm'];
+        delete qcData['qc_nkm'];
+      }
+    } catch (e) {}
     var photos = [];
     try {
       var pcb = ov.querySelector('.oabi-tbl input[data-photos="1"]:checked');
@@ -1043,5 +1075,14 @@
   function autoInit() { if ($(MOUNT_ID)) { init(); return; } if (_tries++ < 40) setTimeout(autoInit, 250); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoInit); else setTimeout(autoInit, 0);
   window.addEventListener('load', autoInit);
-  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm, applyQcPending: applyQcPending };
+  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm, applyQcPending: applyQcPending,
+    /* v503-voice-bridge: Sprach-Ergebnisliste ueber die Import-Mechanik (gleiche Optik,
+       gleicher Schreibweg inkl. Sterne + QC-Bucket-Logik). */
+    _voice: {
+      reset: function () { _merged = {}; _files = []; _importPhotos = []; _addrChoice = null; },
+      setMode: function (qc, done) { _qcMode = !!qc; _qcPendingMerged = {}; _oabiDone = (typeof done === 'function') ? done : null; },
+      addRow: addRow,
+      render: renderMergedTable,
+      apply: applyMerged
+    } };
 })();

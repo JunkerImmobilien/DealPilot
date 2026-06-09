@@ -20,6 +20,7 @@ const usageService = require('../services/usageService');
 const openaiService = require('../services/openaiService');
 const aiCreditsService = require('../services/aiCreditsService');  // V63.86
 const plzValidator = require('../services/plzValidator');  // V229: PLZ-Halluzinationsschutz
+const voiceExtractService = require('../services/voiceExtractService');  // v503-voice
 
 const router = express.Router();
 
@@ -399,6 +400,74 @@ router.post('/extract-market-data', authenticate, extractLimiter, async (req, re
     if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
     if (err.status === 401) return res.status(401).json({ error: err.message });
     if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+    next(err);
+  }
+});
+
+/**
+ * v503-voice: POST /api/v1/ai/extract-voice — Sprachaufzeichnung auswerten.
+ * Body: { audio: base64 (ohne data:-Prefix), mime: 'audio/webm'|...,
+ *         catalog: [{id, kind, label, hint?, options?:[{v,t}]}], userApiKey? }
+ * Ablauf: Transkription (OpenAI Audio) -> Feld-Extraktion gegen den vom
+ * Frontend mitgelieferten Laufzeit-Katalog (alle Tabs, Selects mit echten
+ * Optionen -> KI brueckt freie Formulierungen auf Optionswerte).
+ * Response: { transcript, fields: {feldId: wert}, unsicher: [feldId] }
+ *
+ * KEROSIN: 1 Liter pro Auswertung (Muster wie /analyze, v493-limits:
+ * 1 Liter = 1 KI-Analyse). Pre-Check + consume nur bei Server-Key.
+ * Zusaetzlich extractLimiter (30/h) + Groessenlimit (~10 min Audio).
+ */
+router.post('/extract-voice', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { audio, mime, catalog, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+
+    if (!config.openai.apiKey && !userApiKey) {
+      return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.', needs_user_key: true });
+    }
+    if (!audio || typeof audio !== 'string' || audio.length < 2000) {
+      return res.status(400).json({ error: 'Body muss "audio" (base64) enthalten.' });
+    }
+    if (audio.length > 26 * 1024 * 1024) {
+      return res.status(413).json({ error: 'Aufnahme zu gross (max ca. 10 Minuten).' });
+    }
+
+    // Kerosin-Pre-Check (nur Server-Key) — Muster /analyze
+    if (!userApiKey) {
+      const status = await aiCreditsService.getStatus(req.user.id);
+      if (status.total_remaining < 1) {
+        return res.status(402).json({
+          error: 'Nicht genug Kerosin im Tank.',
+          credits: status,
+          required: 1,
+          needs_credits: true
+        });
+      }
+    }
+
+    const result = await voiceExtractService.extractFromAudio(audio, mime, catalog, {
+      apiKey: config.openai.apiKey,
+      userApiKey: userApiKey
+    });
+
+    // Kerosin abziehen (nur Server-Key), erst NACH erfolgreicher Auswertung
+    if (!userApiKey) {
+      try {
+        await aiCreditsService.consume(req.user.id, 1, 'extract-voice');
+      } catch (e) {
+        console.warn('[ai/extract-voice] Credits consume failed:', e.message);
+      }
+    }
+    try {
+      if (aiCreditsService && typeof aiCreditsService.logExtract === 'function') {
+        await aiCreditsService.logExtract(req.user.id, 'extract-voice');
+      }
+    } catch (e) { /* nicht kritisch */ }
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
+    if (err.status === 401) return res.status(401).json({ error: err.message });
+    if (err.status) return res.status(err.status >= 500 ? 502 : err.status).json({ error: err.message });
     next(err);
   }
 });
