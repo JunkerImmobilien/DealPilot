@@ -2872,6 +2872,22 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 /* ===== /v484-qc-wow ===== */
 
 </style>
+<style id="qc-cp2-style">
+/* v525 QuickCheck-Cockpit: S / klein / Obsidian / dezente Partikel, Label unter Zeiger */
+#sb-mega { width:100% !important; max-width:300px !important; height:auto !important; min-height:0 !important; margin:0 auto !important; }
+#sb-mega > svg { display:none !important; }
+#sb-mega .sb-mega-text { display:none !important; }
+#sb-mega #qc-reaktor { width:100%; line-height:0; }
+#sb-mega #qc-reaktor svg { display:block !important; width:100% !important; height:auto !important; transform:none !important; filter:none !important; }
+.score-block .sub .sub-ic, .score-block .sub .sub-v, .score-block .sub .sub-tiny { display:none !important; }
+.score-block .sub .qc-mini { width:100%; max-width:92px; margin:2px auto 0; line-height:0; }
+.score-block .sub .qc-mini svg { display:block; width:100%; height:auto; }
+/* schwarz/obsidian + dezente Partikel, alte Gold-Vignette + app-Partikel raus */
+.score-block { background:#060608 !important; }
+.score-block::before { display:none !important; }
+#score-block #particle-canvas { display:none !important; }
+.qc-bgfx, .qc-bgfx .qc-orb, .qc-orb { display:none !important; }
+</style>
 </head>
 <body>
 
@@ -2905,30 +2921,35 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
             <div class="sub" data-tier="" id="sub-rendite">
               <div class="sub-ic" id="sub-rendite-ic"></div>
               <div class="sub-l">Rendite</div>
+              <div class="qc-mini" id="qc-mini-rendite"></div>
               <div class="sub-v" id="sub-rendite-v">—</div>
               <div class="sub-tiny">/100</div>
             </div>
             <div class="sub" data-tier="" id="sub-cashflow">
               <div class="sub-ic" id="sub-cashflow-ic"></div>
               <div class="sub-l">Cashflow</div>
+              <div class="qc-mini" id="qc-mini-cashflow"></div>
               <div class="sub-v" id="sub-cashflow-v">—</div>
               <div class="sub-tiny">/100</div>
             </div>
             <div class="sub" data-tier="" id="sub-sicherheit">
               <div class="sub-ic" id="sub-sicherheit-ic"></div>
               <div class="sub-l">Sicherheit</div>
+              <div class="qc-mini" id="qc-mini-sicherheit"></div>
               <div class="sub-v" id="sub-sicherheit-v">—</div>
               <div class="sub-tiny">/100</div>
             </div>
             <div class="sub" data-tier="" id="sub-finanzierung">
               <div class="sub-ic" id="sub-finanzierung-ic"></div>
               <div class="sub-l">Finanz.</div>
+              <div class="qc-mini" id="qc-mini-finanzierung"></div>
               <div class="sub-v" id="sub-finanzierung-v">—</div>
               <div class="sub-tiny">/100</div>
             </div>
             <div class="sub" data-tier="" id="sub-effizienz">
               <div class="sub-ic" id="sub-effizienz-ic"></div>
               <div class="sub-l">Effizienz</div>
+              <div class="qc-mini" id="qc-mini-effizienz"></div>
               <div class="sub-v" id="sub-effizienz-v">—</div>
               <div class="sub-tiny">/100</div>
             </div>
@@ -2936,6 +2957,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         </div>
 
         <div class="sb-mega" id="sb-mega" data-stage="sprout">
+          <div id="qc-reaktor" class="qc-reaktor"></div>
           <svg viewBox="0 0 120 120">
             <circle class="bg" cx="60" cy="60" r="52" stroke-width="5"/>
             <circle class="ring" id="sb-ring" cx="60" cy="60" r="52" stroke-width="5" stroke-dasharray="0 327"/>
@@ -3765,7 +3787,7 @@ const QcApp = (function() {
     /* V8-BEWERTUNG: Bewertung anzeigen sobald ein Score existiert (nicht erst bei 'solid') */
     if (!gated && score.score != null) renderAI(score, inputs);
 
-    if (stage === 'solid' && score.score >= 80 && !_confetti) { fireConfetti(); _confetti = true; }
+    /* v529-no-green-confetti: kein Konfetti mehr beim Erreichen des gruenen Bereichs */
   }
 
   function setKpi(id, val, kpiKey) {
@@ -5411,5 +5433,100 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 })();
 </script>
 
+<script>
+/* v525 QuickCheck-Cockpit: Reaktor-Halbkreis (#qc-reaktor) + 5 Mini-Tachos (#qc-mini-*)
+   aus Live-Werten (#sb-num, #sub-*-v). Tier-Wort UNTER dem Zeiger. Eigene dezente
+   90deg-Dreh-Fix per CSS. Kein eigener Partikel-Canvas (v528 entfernt). */
+(function () {
+  if (window.__qcCockpitPanel2) return;
+  window.__qcCockpitPanel2 = true;
+
+  var C = {
+    green: { base: '#226E46', glow: '#2FB06C', hot: '#49D38C' },
+    gold:  { base: '#C99A2E', glow: '#EFC23F', hot: '#FFD24A' },
+    red:   { base: '#9A3A30', glow: '#E04F3C', hot: '#FF6E55' }
+  };
+  function tkMain(s) { return s >= 70 ? 'green' : s >= 50 ? 'gold' : 'red'; }
+  function tkSub(s)  { return s >= 70 ? 'green' : s >= 50 ? 'gold' : 'red'; }
+  function labelFor(s) { return s >= 80 ? 'Sehr gut' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : 'Schwach'; }
+  var UID = 0;
+  function arcPts(cx, cy, r, t0, t1, n) {
+    var p = [];
+    for (var i = 0; i <= n; i++) { var t = t0 + (t1 - t0) * i / n, w = Math.PI * (1 - t); p.push((cx + r * Math.cos(w)).toFixed(1) + ',' + (cy - r * Math.sin(w)).toFixed(1)); }
+    return p.join(' ');
+  }
+  function gauge(score, label) {
+    var id = ++UID, cx = 120, cy = 116, r = 92, sw = 15;
+    var has = (score != null && !isNaN(score)), sc = has ? Math.max(0, Math.min(100, score)) : 0, t = sc / 100;
+    var g = has ? C[tkMain(sc)].glow : '#7a7a82', k = has ? tkMain(sc) : 'gold';
+    var grads = '<linearGradient id="z' + id + '" gradientUnits="userSpaceOnUse" x1="' + (cx - r) + '" y1="0" x2="' + (cx + r) + '" y2="0"><stop offset="0" stop-color="' + C.red.base + '"/><stop offset="0.5" stop-color="' + C.red.hot + '"/><stop offset="0.5" stop-color="' + C.gold.base + '"/><stop offset="0.727" stop-color="' + C.gold.hot + '"/><stop offset="0.727" stop-color="' + C.green.base + '"/><stop offset="1" stop-color="' + C.green.hot + '"/></linearGradient>';
+    var arcs = '<polyline points="' + arcPts(cx, cy, r, 0, 1, 44) + '" fill="none" stroke="url(#z' + id + ')" stroke-width="' + sw + '" stroke-linecap="butt" filter="url(#gl' + id + ')"/>';
+    var ticks = '';
+    for (var i = 0; i <= 10; i++) { var w = Math.PI * (1 - i / 10), r1 = r - sw / 2 - 3, r2 = r - sw / 2 - (i % 5 === 0 ? 11 : 6); ticks += '<line x1="' + (cx + r1 * Math.cos(w)).toFixed(1) + '" y1="' + (cy - r1 * Math.sin(w)).toFixed(1) + '" x2="' + (cx + r2 * Math.cos(w)).toFixed(1) + '" y2="' + (cy - r2 * Math.sin(w)).toFixed(1) + '" stroke="#54545e" stroke-width="' + (i % 5 === 0 ? 1.8 : 1) + '"/>'; }
+    var plasma = '', needle = '';
+    if (has) {
+      plasma = '<polyline points="' + arcPts(cx, cy, r, 0, t, 22) + '" fill="none" stroke="url(#pl' + id + ')" stroke-width="' + sw + '" stroke-linecap="butt" filter="url(#gl' + id + ')"/>';
+      var wN = Math.PI * (1 - t), nx = cx + (r - 12) * Math.cos(wN), ny = cy - (r - 12) * Math.sin(wN);
+      needle = '<line x1="' + cx + '" y1="' + cy + '" x2="' + nx.toFixed(1) + '" y2="' + ny.toFixed(1) + '" stroke="' + g + '" stroke-width="5" stroke-linecap="round" filter="url(#ng' + id + ')" opacity=".8"/><line x1="' + cx + '" y1="' + cy + '" x2="' + nx.toFixed(1) + '" y2="' + ny.toFixed(1) + '" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="' + nx.toFixed(1) + '" cy="' + ny.toFixed(1) + '" r="5" fill="#fff" filter="url(#ng' + id + ')"/>';
+    }
+    var hub = '<circle cx="' + cx + '" cy="' + cy + '" r="7.5" fill="' + g + '" filter="url(#ng' + id + ')"/><circle cx="' + cx + '" cy="' + cy + '" r="6" fill="#fff"/><circle cx="' + cx + '" cy="' + cy + '" r="2.6" fill="#0a0a0c"/>';
+    var pg = '<linearGradient id="pl' + id + '" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="' + C[k].base + '"/><stop offset=".55" stop-color="' + C[k].hot + '"/><stop offset="1" stop-color="' + C[k].glow + '"/></linearGradient>';
+    var num = has ? sc : '\u2013', lab = (label || '').trim();
+    return '<svg viewBox="0 0 240 150" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;overflow:visible"><defs>' + grads + pg
+      + '<filter id="gl' + id + '" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+      + '<filter id="ng' + id + '" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.6"/></filter></defs>'
+      + '<path d="M' + (cx - r - 9) + ' ' + cy + ' A ' + (r + 9) + ' ' + (r + 9) + ' 0 0 1 ' + (cx + r + 9) + ' ' + cy + '" fill="none" stroke="#C99A2E" stroke-width="3.5" stroke-linecap="round" opacity=".9"/>'
+      + ticks + arcs + plasma + needle + hub
+      + '<text x="' + cx + '" y="' + (cy - 16) + '" text-anchor="middle" fill="#fff" stroke="#0a0a0c" stroke-width="3" paint-order="stroke" font-family="Cormorant Garamond, serif" font-weight="600" font-size="54" style="filter:drop-shadow(0 0 14px ' + g + '99)">' + num + '</text>'
+      + (lab ? '<text x="' + cx + '" y="' + (cy + 26) + '" text-anchor="middle" fill="' + g + '" stroke="#0a0a0c" stroke-width="1.8" paint-order="stroke" font-family="Cormorant Garamond, serif" font-style="italic" font-weight="600" font-size="19">' + lab + '</text>' : '')
+      + '<text x="' + (cx - r - 1) + '" y="' + (cy + 13) + '" text-anchor="middle" fill="#7a7a82" font-family="DM Sans, sans-serif" font-size="10">0</text>'
+      + '<text x="' + (cx + r + 1) + '" y="' + (cy + 13) + '" text-anchor="middle" fill="#7a7a82" font-family="DM Sans, sans-serif" font-size="10">100</text></svg>';
+  }
+  function mini(value) {
+    var id = ++UID, cx = 70, cy = 64, r = 52, sw = 9;
+    var has = (value != null && !isNaN(value)), v = has ? Math.max(0, Math.min(100, value)) : 0, t = v / 100, g = has ? C[tkSub(v)].glow : '#7a7a82';
+    var grads = '<linearGradient id="mz' + id + '" gradientUnits="userSpaceOnUse" x1="' + (cx - r) + '" y1="0" x2="' + (cx + r) + '" y2="0"><stop offset="0" stop-color="' + C.red.base + '"/><stop offset="0.5" stop-color="' + C.red.hot + '"/><stop offset="0.5" stop-color="' + C.gold.base + '"/><stop offset="0.794" stop-color="' + C.gold.hot + '"/><stop offset="0.794" stop-color="' + C.green.base + '"/><stop offset="1" stop-color="' + C.green.hot + '"/></linearGradient>';
+    var arcs = '<polyline points="' + arcPts(cx, cy, r, 0, 1, 30) + '" fill="none" stroke="url(#mz' + id + ')" stroke-width="' + sw + '" stroke-linecap="butt" filter="url(#mg' + id + ')"/>';
+    var needle = '';
+    if (has) { var w = Math.PI * (1 - t), nx = cx + (r - 7) * Math.cos(w), ny = cy - (r - 7) * Math.sin(w); needle = '<line x1="' + cx + '" y1="' + cy + '" x2="' + nx.toFixed(1) + '" y2="' + ny.toFixed(1) + '" stroke="#fff" stroke-width="2" stroke-linecap="round" style="filter:drop-shadow(0 0 3px ' + g + ')"/><circle cx="' + cx + '" cy="' + cy + '" r="3.5" fill="#fff"/>'; }
+    return '<svg viewBox="0 0 140 78" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;overflow:visible"><defs>' + grads + '<filter id="mg' + id + '" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' + arcs + needle + '<text x="' + cx + '" y="' + (cy - 6) + '" text-anchor="middle" fill="' + g + '" stroke="#0a0a0c" stroke-width="2" paint-order="stroke" font-family="Cormorant Garamond, serif" font-weight="600" font-size="22">' + (has ? v : '\u2013') + '</text></svg>';
+  }
+  function num(el) {
+    if (!el) return null;
+    var t = (el.textContent || '').replace(/\s/g, '');
+    if (t === '' || t === '-' || t === '\u2013') return null;
+    var m = t.match(/-?\d+/); if (!m) return null;
+    var n = parseInt(m[0], 10); return isNaN(n) ? null : n;
+  }
+  var SUBN = [['rendite'], ['cashflow'], ['sicherheit'], ['finanzierung'], ['effizienz']];
+  var sbl = document.getElementById('score-block');
+  var mo = null;
+  function paint() {
+    if (mo) mo.disconnect();
+    try {
+      var sc = num(document.getElementById('sb-num'));
+      var rk = document.getElementById('qc-reaktor');
+      if (rk) rk.innerHTML = gauge(sc, sc == null ? '' : labelFor(sc));
+      SUBN.forEach(function (s) { var v = num(document.getElementById('sub-' + s[0] + '-v')); var m = document.getElementById('qc-mini-' + s[0]); if (m) m.innerHTML = mini(v); });
+    } catch (e) {}
+    if (mo && sbl) mo.observe(sbl, { subtree: true, childList: true, characterData: true });
+    killBgFx();
+  }
+  if (sbl && typeof MutationObserver !== 'undefined') mo = new MutationObserver(function () { paint(); });
+  function killBgFx() {
+    try {
+      var bg = document.querySelector('.qc-bgfx');
+      if (bg) bg.style.setProperty('display', 'none', 'important');
+      var pc = document.getElementById('particle-canvas');
+      if (pc) pc.style.setProperty('display', 'none', 'important');
+      var orbs = document.querySelectorAll('.qc-orb');
+      for (var i = 0; i < orbs.length; i++) orbs[i].style.setProperty('display', 'none', 'important');
+    } catch (e) {}
+  }
+  killBgFx(); setTimeout(killBgFx, 300); setTimeout(killBgFx, 1200); setTimeout(killBgFx, 2500);
+  paint(); setTimeout(paint, 300); setTimeout(paint, 1200);
+
+})();
+</script>
 </body>
 </html>

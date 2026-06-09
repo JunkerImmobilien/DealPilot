@@ -27,7 +27,7 @@ const LIVE_LANG = process.env.OPENAI_REALTIME_LANG || 'de';
 // Anweisungen, nur Stichwoerter. Wird NICHT an *-whisper-Modelle geschickt
 // (dort 'prompt' nicht unterstuetzt).
 const LIVE_PROMPT = process.env.OPENAI_REALTIME_PROMPT ||
-  'Diktat auf Deutsch, Immobilien-Investment. Begriffe: Eigentumswohnung, Mehrfamilienhaus, Wohnflaeche, Quadratmeter, Baujahr, Kaufpreis, Kaltmiete, Hausgeld, Eigenkapital, Zinssatz, Tilgung, Bodenrichtwert, Stellplatz, Garage, Grunderwerbsteuer, Notarkosten, Mikrolage, Makrolage.';
+  ''  /* v516: Default-Prompt entfernt (leakte als Transkript-Echo) */;
 
 function attach(server) {
   const apiKey = config && config.openai && config.openai.apiKey;
@@ -56,11 +56,12 @@ function attach(server) {
   });
 
   wss.on('connection', function (client) {
-    let closed = false, msgCount = 0;
+    let closed = false, msgCount = 0, commitTimer = null, lastCommitBytes = 0, audioFrames = 0, audioBytes = 0;  /* v531-commit */
     console.log('[voiceStream] Client verbunden -> verbinde OpenAI (' + LIVE_MODEL + ') ' + REALTIME_URL);
 
     function closeBoth() {
       if (closed) return; closed = true;
+      try { if (commitTimer) { clearInterval(commitTimer); commitTimer = null; } } catch (e) {}  /* v531-commit */
       try { up.close(); } catch (e) {}
       try { client.close(); } catch (e) {}
     }
@@ -96,22 +97,32 @@ function attach(server) {
               format: { type: 'audio/pcm', rate: 24000 },
               transcription: transCfg,
               noise_reduction: { type: 'near_field' },  // Objekt! (String -> invalid_type)
-              turn_detection: { type: 'server_vad' }
+              turn_detection: null  /* v531-commit: manueller Modus, Commit loest Transkription aus */
             }
           }
         }
       }));
       tellClient({ type: 'dp-ready' });
+      /* v531-commit: gepuffertes Audio periodisch committen, sonst feuert der
+         VAD bei Dauer-append oft nie -> kein transcription-Event. */
+      try { if (commitTimer) clearInterval(commitTimer); } catch (e) {}
+      commitTimer = setInterval(function () {
+        if (up.readyState === WebSocket.OPEN && (audioBytes - lastCommitBytes) >= 120000) {  /* v532-interval: min ~2.5s Audio pro Commit */
+          lastCommitBytes = audioBytes;
+          try { up.send(JSON.stringify({ type: 'input_audio_buffer.commit' })); } catch (e) {}
+        }
+      }, 4000);  /* v532-interval */
     });
 
     up.on('message', function (data, isBinary) {
-      // Erste Events + alle Fehler ins Log (Diagnose)
-      if (!isBinary && msgCount < 8) {
+      /* v530-diag: ALLE Event-Typen; Fehler + session.* voll */
+      if (!isBinary) {
         msgCount++;
-        let t = '?';
-        try { const o = JSON.parse(data.toString()); t = o.type || '?';
-          if (String(t).indexOf('error') >= 0) console.error('[voiceStream] OpenAI-Event#' + msgCount + ' FEHLER:', data.toString().slice(0, 500));
-          else console.log('[voiceStream] OpenAI-Event#' + msgCount + ':', t);
+        try {
+          const txt = data.toString(); const o = JSON.parse(txt); const t = o.type || '?';
+          if (String(t).indexOf('error') >= 0) console.error('[voiceStream] OpenAI FEHLER #' + msgCount + ':', txt.slice(0, 600));
+          else if (t === 'session.created' || t === 'session.updated') console.log('[voiceStream] OpenAI #' + msgCount + ' ' + t + ': ' + txt.slice(0, 600));
+          else console.log('[voiceStream] OpenAI #' + msgCount + ': ' + t);
         } catch (e) {}
       }
       if (client.readyState === WebSocket.OPEN) {
@@ -119,7 +130,7 @@ function attach(server) {
       }
     });
     up.on('close', function (code, reason) {
-      console.log('[voiceStream] OpenAI getrennt: code ' + code + (reason ? ' / ' + reason.toString() : ''));
+      console.log('[voiceStream] OpenAI getrennt: code ' + code + (reason ? ' / ' + reason.toString() : '') + ' | v530-diag: Audio-Frames empfangen=' + audioFrames + ', Bytes=' + audioBytes);
       closeBoth();
     });
     up.on('error', function (err) {
@@ -128,12 +139,28 @@ function attach(server) {
       closeBoth();
     });
 
+    audioFrames = 0; audioBytes = 0;  /* v531: oben deklariert */
     client.on('message', function (data, isBinary) {
-      if (up.readyState !== WebSocket.OPEN) return;
+      if (up.readyState !== WebSocket.OPEN) {
+        if (isBinary) { audioFrames++; if (audioFrames === 1 || audioFrames % 100 === 0) console.warn('[voiceStream] v530-diag: Audio-Frame #' + audioFrames + ' aber OpenAI-WS NICHT offen (state=' + up.readyState + ')'); }
+        return;
+      }
       if (isBinary) {
+        audioFrames++; audioBytes += (data && data.length) || 0;
+        if (audioFrames === 1 || audioFrames === 5 || audioFrames % 100 === 0) console.log('[voiceStream] v530-diag: Audio-Frame #' + audioFrames + ' (' + ((data && data.length) || 0) + ' B, gesamt ' + audioBytes + ' B) -> append');
+        if (audioFrames === 1 || audioFrames % 50 === 0) {  /* v533-pcmlevel */
+          try {
+            var _i16 = new Int16Array(data.buffer, data.byteOffset, Math.floor(data.length / 2));
+            var _peak = 0, _sum = 0;
+            for (var _k = 0; _k < _i16.length; _k++) { var _a = Math.abs(_i16[_k]); if (_a > _peak) _peak = _a; _sum += _i16[_k] * _i16[_k]; }
+            var _rms = _i16.length ? Math.round(Math.sqrt(_sum / _i16.length)) : 0;
+            console.log('[voiceStream] v533-pcmlevel: Frame #' + audioFrames + ' samples=' + _i16.length + ' peak=' + _peak + '/32767 rms=' + _rms);
+          } catch (e) { console.error('[voiceStream] v533-pcmlevel Fehler:', e && e.message); }
+        }
         const b64 = Buffer.from(data).toString('base64');
-        try { up.send(JSON.stringify({ type: 'input_audio_buffer.append', audio: b64 })); } catch (e) {}
+        try { up.send(JSON.stringify({ type: 'input_audio_buffer.append', audio: b64 })); } catch (e) { console.error('[voiceStream] v530-diag: append-send Fehler:', e && e.message); }
       } else {
+        console.log('[voiceStream] v530-diag: Text-Frame vom Client:', data.toString().slice(0, 120));
         try { up.send(data.toString()); } catch (e) {}
       }
     });

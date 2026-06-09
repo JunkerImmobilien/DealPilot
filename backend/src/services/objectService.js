@@ -88,26 +88,45 @@ async function create(userId, { data, aiAnalysis, photos }) {
     // Auch im data-Blob hinterlegen, damit Client beim nächsten GET die Nummer bekommt
     if (data && typeof data === 'object') data._obj_seq = seq;
   }
-  const r = await query(
-    `INSERT INTO objects
-       (user_id, name, kuerzel, ort, kaufpreis, bmy, cf_ns, dscr, seq_no, data, ai_analysis, photos)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-     RETURNING id, name, seq_no, version, created_at, updated_at`,
-    [
-      userId,
-      summary.name,
-      summary.kuerzel,
-      summary.ort,
-      safeNumeric(summary.kaufpreis),
-      safeNumeric(summary.bmy),
-      safeNumeric(summary.cf_ns),
-      safeNumeric(summary.dscr),
-      seq,
-      JSON.stringify(data || {}),
-      aiAnalysis || null,
-      JSON.stringify(photos || [])
-    ]
-  );
+  // v529-seq-retry: Bei Unique-Kollision auf (user_id, seq_no) NICHT mit 409 scheitern,
+  // sondern eine frische fortlaufende Server-Sequenz ziehen und erneut inserten.
+  // (Loest die Auto-Save-Schleife, die wiederum den Voice-Stream staendig neu verband.)
+  let r;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    try {
+      r = await query(
+        `INSERT INTO objects
+           (user_id, name, kuerzel, ort, kaufpreis, bmy, cf_ns, dscr, seq_no, data, ai_analysis, photos)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+         RETURNING id, name, seq_no, version, created_at, updated_at`,
+        [
+          userId,
+          summary.name,
+          summary.kuerzel,
+          summary.ort,
+          safeNumeric(summary.kaufpreis),
+          safeNumeric(summary.bmy),
+          safeNumeric(summary.cf_ns),
+          safeNumeric(summary.dscr),
+          seq,
+          JSON.stringify(data || {}),
+          aiAnalysis || null,
+          JSON.stringify(photos || [])
+        ]
+      );
+      break;
+    } catch (e) {
+      if (e && e.code === '23505' && attempt < 5) {
+        // seq_no schon vergeben -> naechste freie Server-Sequenz holen und neu versuchen
+        const yr = new Date().getFullYear();
+        const sr = await query('SELECT get_next_obj_seq($1, $2) AS seq', [userId, yr]);
+        seq = sr.rows[0].seq;
+        if (data && typeof data === 'object') data._obj_seq = seq;
+        continue;
+      }
+      throw e;
+    }
+  }
   return r.rows[0];
 }
 
