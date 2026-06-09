@@ -417,6 +417,31 @@ router.post('/extract-market-data', authenticate, extractLimiter, async (req, re
  * 1 Liter = 1 KI-Analyse). Pre-Check + consume nur bei Server-Key.
  * Zusaetzlich extractLimiter (30/h) + Groessenlimit (~10 min Audio).
  */
+/* v536-transcribe-chunk: Live-Mitschrift aus MediaRecorder-Haeppchen (Web-Audio liefert
+ * auf manchen Geraeten Stille -> Realtime-WS unbrauchbar). Nur Transkription, KEIN
+ * Kerosin, KEINE Feld-Extraktion. Eigener grosszuegiger Limiter (4s-Takt). */
+const liveTranscribeLimiter = rateLimit({ windowMs: 60 * 1000, max: 40, standardHeaders: true, legacyHeaders: false });
+router.post('/transcribe-chunk', authenticate, liveTranscribeLimiter, async (req, res, next) => {
+  try {
+    const { audio, mime, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+    const apiKey = userApiKey || config.openai.apiKey;
+    if (!apiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.' });
+    if (!audio || typeof audio !== 'string' || audio.length < 500) {
+      return res.json({ text: '' });  /* zu kurz -> leer, kein Fehler */
+    }
+    if (audio.length > 8 * 1024 * 1024) {
+      return res.status(413).json({ error: 'Live-Chunk zu gross.' });
+    }
+    let buf;
+    try { buf = Buffer.from(audio, 'base64'); } catch (e) { return res.json({ text: '' }); }
+    let text = '';
+    try { text = await voiceExtractService.transcribe(buf, mime || 'audio/webm', apiKey); }
+    catch (e) { return res.json({ text: '', warn: (e && e.message) || 'transcribe failed' }); }
+    return res.json({ text: text || '' });
+  } catch (err) { next(err); }
+});
+
 router.post('/extract-voice', authenticate, extractLimiter, async (req, res, next) => {
   try {
     const { audio, mime, catalog, userApiKey: rawUserKey } = req.body || {};
@@ -481,6 +506,23 @@ router.post('/extract-voice', authenticate, extractLimiter, async (req, res, nex
  *
  * Response: { suggestions: { fieldName: { value, source, reasoning } } }
  */
+/* v513-voice: Live-Zwischenauswertung waehrend des Sprechens.
+ * Transkript-Text rein -> Array erkannter Feld-ids raus (keine Werte).
+ * KEIN Kerosin-Consume (Eigenkosten), nur Server-Key, eigener Limiter,
+ * fail-soft: liefert im Zweifel { ids: [] } statt zu fehlern. */
+const quickMatchLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 240, standardHeaders: true, legacyHeaders: false });
+router.post('/voice-quickmatch', authenticate, quickMatchLimiter, async (req, res) => {
+  try {
+    const { transcript, catalog } = req.body || {};
+    if (!config.openai.apiKey) return res.json({ ids: [] });  // nur Server-Key
+    if (!transcript || typeof transcript !== 'string' || transcript.length < 3) return res.json({ ids: [] });
+    const out = await voiceExtractService.quickMatch(transcript.slice(0, 8000), catalog, config.openai.apiKey);
+    res.json({ ids: (out && out.ids) || [] });
+  } catch (err) {
+    res.json({ ids: [] });  // Live-Hilfe darf nie hart fehlschlagen
+  }
+});
+
 router.post('/qc-suggest', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzinationsschutz */ /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const { group, context, userApiKey: rawUserKey } = req.body || {};

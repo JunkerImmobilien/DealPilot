@@ -156,8 +156,9 @@ async function start() {
     console.log('───────────────────────────────────────────────');
   });
   // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)
-  try { require('./ws/voiceStream').attach(_server); }
-  catch (e) { console.error('[voiceStream] attach failed:', e && e.message); }
+  /* v538-ws-removed: Realtime-WS-Live-Pfad entfernt. Web-Audio liefert auf manchen
+     Geraeten Stille -> Realtime unbrauchbar. Live-Mitschrift laeuft seit v536 ueber
+     POST /api/v1/ai/transcribe-chunk. voiceStream.js bleibt ungenutzt auf Platte. */
 }
 
 // Graceful shutdown
