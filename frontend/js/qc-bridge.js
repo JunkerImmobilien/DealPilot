@@ -245,10 +245,27 @@
     }, { target: 'qc' });
   }
 
+  /* v505-voice: Sprachaufzeichnung im Quick Check. Modal + Mikrofon laufen im
+     Parent (im iframe kein getUserMedia). Uebernehmen geht durch applyMergedQc
+     (v418): qcData -> qc_*-Felder im iframe, Rest -> pendingList (Save-Transfer). */
+  function _handleVoice() {
+    if (!(window.VoiceImport && typeof window.VoiceImport.open === 'function')) {
+      console.warn('[qc-bridge] VoiceImport.open fehlt — Sprachaufzeichnung nicht moeglich.');
+      _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: {}, pending: [] });
+      return;
+    }
+    window.VoiceImport.open(function (applied) {
+      var qcData  = (applied && applied.qcData)      ? applied.qcData      : {};
+      var pending = (applied && applied.pendingList) ? applied.pendingList : [];
+      _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: qcData, pending: pending });
+    }, { target: 'qc' });
+  }
+
   window.addEventListener('message', function (ev) {
     var d = ev.data;
     if (!d || d.source !== 'dp-qc') return;
     if (d.type === 'qc-save') _handleSave(d.inputs, d.avm, d.photos, d.pendingTargets);
     else if (d.type === 'qc-import-pdf') _handleImportPdf();
+    else if (d.type === 'qc-voice') _handleVoice();  /* v505-voice */
   });
 })();

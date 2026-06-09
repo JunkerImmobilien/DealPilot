@@ -2983,6 +2983,11 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         <span class="qc7-box"><span class="qc7-check"></span></span>
         <img class="qc7-logo" src="img/sprengnetter.jpg" alt="Sprengnetter" title="Sprengnetter">
       </label>
+      <label class="qc7-src" data-src="voice" title="Objekt frei einsprechen — 1 L Kerosin"> <!-- v505-voice-src -->
+        <input type="checkbox" value="voice" onchange="QcApp.toggleSource(this)">
+        <span class="qc7-box"><span class="qc7-check"></span></span>
+        <span class="qc7-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></span> Sprachaufzeichnung
+      </label>
     </span>
 
     <!-- v409-actionbar-trim: Spannen-Schnellauswahl entfernt (Spanne bleibt an der Ergebnis-Card) -->
@@ -4996,7 +5001,7 @@ function renderTransferList() {
   }
 
   function _srcName(src) {
-    return src==='ph' ? 'PriceHubble' : src==='spr' ? 'Sprengnetter' : src==='ki' ? 'KI-Recherche' : 'Exposé-Import';
+    return src==='voice' ? 'Sprachaufzeichnung' : src==='ph' ? 'PriceHubble' : src==='spr' ? 'Sprengnetter' : src==='ki' ? 'KI-Recherche' : 'Exposé-Import';
   }
 
   // Credit-Aufschlüsselung (getrennte Töpfe je Typ — NICHT verrechnet)
@@ -5007,11 +5012,13 @@ function renderTransferList() {
     var inputs = QcEngine.getInputs();
     var hasKp = !!QcEngine.num(inputs.kp);
     var parts = [];
-    if (sel.indexOf('ph')  !== -1) parts.push('<b>1 PriceHubble-Credit</b>');
-    if (sel.indexOf('spr') !== -1) parts.push('<b>1 Sprengnetter-Credit</b>');
+    /* v505-kerosin-hint: Liter-Saetze gemaess Backend (avm.js COST + ai.js extract-voice) */
+    if (sel.indexOf('voice') !== -1) parts.push('<b>1\u00a0L</b> Sprachauswertung');
+    if (sel.indexOf('ph')  !== -1) parts.push('<b>40\u00a0L</b> PriceHubble');
+    if (sel.indexOf('spr') !== -1) parts.push('<b>20\u00a0L</b> Sprengnetter');
     if (!parts.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var n = parts.length;
-    var txt = 'Beim <b>Abrufen</b> ' + (n > 1 ? 'werden ' : 'wird ') + parts.join(' + ') + ' verbraucht.';
+    var txt = 'Beim <b>Abrufen</b> ' + (n > 1 ? 'werden ' : 'wird ') + parts.join(' + ') + ' Kerosin verbraucht.';
     var demo = false;
     try { demo = !!(window._qcAvmHealth && window._qcAvmHealth.mode === 'stub'); } catch (e) {}
     if (demo) txt += ' <span style="opacity:.75">Im Demo-Modus aktuell kostenlos.</span>';
@@ -5022,6 +5029,7 @@ function renderTransferList() {
     var inputs = QcEngine.getInputs();
     var hasKp = !!QcEngine.num(inputs.kp);
     var parts = [];
+    if (sources.indexOf('voice') !== -1)  parts.push({ key:'voice', name:'Sprachaufzeichnung', sub:'Objekt einsprechen, Felder befüllen', type:'kerosin', calls:1 });
     if (sources.indexOf('expose') !== -1) parts.push({ key:'expose', name:'Exposé/Marktbericht', sub:'PDF auslesen', type:'free', calls:0 });
     if (sources.indexOf('ph')  !== -1)    parts.push({ key:'ph',  name:'PriceHubble', sub:'Marktwert, Mikro-/Makrolage', type:'ph',  calls:1 });
     if (sources.indexOf('spr') !== -1)    parts.push({ key:'spr', name:'Sprengnetter', sub: hasKp ? 'Wert, Miete, Fair-Price' : 'Wert, Miete (kein Kaufpreis)', type:'spr', calls: 1 });
@@ -5037,7 +5045,7 @@ function renderTransferList() {
     var totBox  = document.getElementById('qc6-credit-totalbox');
     var noteEl  = document.getElementById('qc6-credit-note');
     var footBtn = document.getElementById('qc6-credit-confirm');
-    var _hasExpose = sources.indexOf('expose') !== -1;
+    var _hasExpose = sources.indexOf('expose') !== -1 || sources.indexOf('voice') !== -1;  /* v505-voice-skip: Sprache befuellt Felder vor AVM */
     // V10: Wenn Exposé dabei ist, AVM-Pflichtfelder NICHT vorab erzwingen
     // (werden aus dem Exposé übernommen, danach im Ablauf erneut geprüft).
     var missing = _hasExpose ? [] : _validateSources(sources);
@@ -5119,15 +5127,23 @@ function renderTransferList() {
   async function _runSelected(sources) {
     if (!sources || !sources.length) return;
     // Reihenfolge erzwingen: expose, ph, spr, ki
-    var order = ['expose','ph','spr','ki'];
+    var order = ['voice','expose','ph','spr','ki'];  /* v505-voice-first */
     var ordered = order.filter(function(s){ return sources.indexOf(s) !== -1; });
-    var labels = { expose:'Exposé/Marktbericht', ph:'PriceHubble', spr:'Sprengnetter', ki:'KI-Recherche' };
+    var labels = { voice:'Sprachaufzeichnung', expose:'Exposé/Marktbericht', ph:'PriceHubble', spr:'Sprengnetter', ki:'KI-Recherche' };
     var steps = ordered.map(function(s){ return { key:s, label:labels[s], state:'pending' }; });
     _progressRender(steps);
 
     for (var i = 0; i < ordered.length; i++) {
       steps[i].state = 'run'; _progressRender(steps);
       try {
+        if (ordered[i] === 'voice') {  /* v505-voice-step: Modal laeuft im Parent (Mikrofon),
+             Ergebnis kommt wie beim Import als qc-import-result zurueck (gleicher Handler/Resolve). */
+          await new Promise(function(resolve){
+            window._qcImportResolve = resolve;
+            try { window.parent.postMessage({ source:'dp-qc', type:'qc-voice' }, '*'); } catch(e){}
+            setTimeout(function(){ if (window._qcImportResolve){ window._qcImportResolve(); window._qcImportResolve = null; } }, 900000);
+          });
+        }
         if (ordered[i] === 'expose') {
           // V333: echten DealPilot-Exposé-Import im Parent ausloesen, auf Ergebnis warten
           await new Promise(function(resolve){
@@ -5229,7 +5245,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
       <p class="qc6-credit-note" id="qc6-credit-note">
         Die Abrufe laufen nacheinander (Exposé → AVM → KI). Nur vorhandene Eingabedaten werden
         verwendet — Mikro-/Makrolage liefert nur PriceHubble, das Fair-Price-Label nur Sprengnetter.
-        PriceHubble- und Sprengnetter-Credits sind getrennte Pakete.
+        Alle Abrufe laufen über deinen Kerosin-Tank: Sprachauswertung 1 L, Sprengnetter 20 L, PriceHubble 40 L.
       </p>
     </div>
     <div class="qc6-modal-foot">

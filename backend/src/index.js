@@ -150,11 +150,14 @@ async function start() {
     console.error('✗ Database not reachable - start anyway (will retry on requests)');
   }
 
-  app.listen(config.port, () => {
+  const _server = app.listen(config.port, () => {
     console.log(`✓ Server listening on http://localhost:${config.port}`);
     console.log(`  Try: curl http://localhost:${config.port}/health`);
     console.log('───────────────────────────────────────────────');
   });
+  // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)
+  try { require('./ws/voiceStream').attach(_server); }
+  catch (e) { console.error('[voiceStream] attach failed:', e && e.message); }
 }
 
 // Graceful shutdown
