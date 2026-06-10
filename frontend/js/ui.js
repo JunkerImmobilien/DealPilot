@@ -216,7 +216,7 @@ function setMainView(view) {
     if (typeof showAllObjectsView === 'function') showAllObjectsView();
   } else {
     if (tabs) tabs.style.display = '';
-    if (wfBar) wfBar.style.display = '';        // V63.48: WF-Bar wieder einblenden
+    /* v564-no-wfbar: alte Workflow-Bar bleibt versteckt (nicht mehr verwendet) */
     sections.forEach(function(s) { s.style.display = ''; });
     if (aoMain) aoMain.style.display = 'none';
     if (btnSingle) btnSingle.classList.add('active');
@@ -1275,6 +1275,7 @@ function bsheetAction(action) {
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;
+      case 'marktbericht':  if (typeof openMarktberichtView === 'function') openMarktberichtView(); break;
       case 'new':           if (typeof newObj === 'function') newObj(); break;
       case 'trackrec':      if (typeof showTrackRecordView === 'function') showTrackRecordView(); break;
       case 'portfolio-strategy': if (typeof showPortfolioStrategyView === 'function') showPortfolioStrategyView(); break;
@@ -1295,7 +1296,7 @@ function bsheetAction(action) {
 function _bsheetRenderIcons() {
   if (!window.Icons) return;
   var map = {
-    single: 'fileText', all: 'folder', quickcheck: 'sparkles', new: 'plus',
+    single: 'house', all: 'folder', quickcheck: 'sparkles', new: 'plus', market: 'fileText',
     trackrec: 'trophy', bankexport: 'bank', pdf: 'fileText', csv: 'fileText',
     settings: 'settings', help: 'help', feedback: 'feedback'
   };
@@ -1383,7 +1384,7 @@ function _sbActionsSyncActive() {
 function _sbActionsRenderIcons() {
   if (!window.Icons) return;
   var map = {
-    single: 'fileText', all: 'folder', quickcheck: 'sparkles', new: 'plus',
+    single: 'house', all: 'folder', quickcheck: 'sparkles', new: 'plus', market: 'fileText',
     trackrec: 'trophy', bankexport: 'bank',
     pdf: 'fileText',
     csv: 'fileText',
@@ -1419,6 +1420,7 @@ function sbActionsAction(action) {
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;
+      case 'marktbericht':  if (typeof openMarktberichtView === 'function') openMarktberichtView(); break;
       case 'new':           if (typeof newObj === 'function') newObj(); break;
       case 'trackrec':      if (typeof showTrackRecordView === 'function') showTrackRecordView(); break;
       case 'portfolio-strategy': if (typeof showPortfolioStrategyView === 'function') showPortfolioStrategyView(); break;
@@ -1587,3 +1589,5 @@ window.syncKuecheToMoebl = function(){
     try { window._syncInventarToMoebl(); } catch(e) {}
   }
 };
+
+/* v569-icon: Einzelobjekt-Icon single->house */

@@ -860,4 +860,63 @@ router.get('/plans', requireAdmin, async (req, res) => {
   }
 });
 
+// ── v554-admin-credits: Guthaben & Kosten ────────────────────────────────────
+const creditAlert554 = require('../services/creditAlert');
+
+// GeoMap-Restguthaben (live) + OpenAI-Verbrauch (aus Kostenlog getrackt).
+router.get('/credits', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const geomapBalance = await creditAlert554.fetchGeomapBalance();
+    // OpenAI: kein Live-Guthaben-API -> getrackte Summe der openai_eur aus dem Log.
+    let openaiSpent = null, geomapSpent = null;
+    try {
+      const r = await db.query(
+        "SELECT COALESCE(SUM(openai_eur),0) AS openai, COALESCE(SUM(geomap_eur),0) AS geomap FROM marktbericht_cost_log WHERE ok = true"
+      );
+      openaiSpent = Number(r.rows[0].openai);
+      geomapSpent = Number(r.rows[0].geomap);
+    } catch (e) { /* Tabelle evtl. noch nicht da */ }
+    res.json({
+      geomap: {
+        balance_eur: geomapBalance,
+        threshold_eur: creditAlert554.THRESHOLD,
+        spent_tracked_eur: geomapSpent
+      },
+      openai: {
+        balance_eur: null,        // kein Live-API
+        spent_tracked_eur: openaiSpent,
+        note: 'OpenAI bietet kein Live-Guthaben-API; nur getrackter Verbrauch.'
+      }
+    });
+  } catch (err) {
+    console.error('[admin/credits] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// Marktbericht-Kosten: Summen pro Typ (gesamt + 30 Tage) + letzte 20 Abrufe.
+router.get('/marktbericht-costs', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const byKind = await db.query(
+      "SELECT kind, COUNT(*) AS n, COALESCE(SUM(liters),0) AS liters, " +
+      "COALESCE(SUM(geomap_eur),0) AS geomap_eur, COALESCE(SUM(openai_eur),0) AS openai_eur " +
+      "FROM marktbericht_cost_log WHERE ok = true GROUP BY kind ORDER BY kind"
+    );
+    const last30 = await db.query(
+      "SELECT kind, COUNT(*) AS n, COALESCE(SUM(geomap_eur),0) AS geomap_eur " +
+      "FROM marktbericht_cost_log WHERE ok = true AND ts > NOW() - INTERVAL '30 days' GROUP BY kind ORDER BY kind"
+    );
+    const recent = await db.query(
+      "SELECT ts, kind, liters, geomap_eur, geomap_balance_eur, address, ok " +
+      "FROM marktbericht_cost_log ORDER BY ts DESC LIMIT 20"
+    );
+    res.json({ by_kind: byKind.rows, last_30d: last30.rows, recent: recent.rows });
+  } catch (err) {
+    console.error('[admin/marktbericht-costs] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
 module.exports = router;

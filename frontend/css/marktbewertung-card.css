@@ -1,0 +1,102 @@
+/* =====================================================================
+   DealPilot · Marktbewertung-Karte  —  Styles
+   Alle Klassen + CSS-Variablen mit Prefix "dpmb-" -> kollidiert NICHT
+   mit bestehendem App-CSS. Fonts (Space Grotesk / JetBrains Mono / Inter)
+   sollten in der App geladen sein (sind sie bei DealPilot bereits).
+   ===================================================================== */
+.dpmb-card{
+  --dpmb-gold:#C9A84C; --dpmb-gold2:#E8C766; --dpmb-gold-deep:#a8761f;
+  --dpmb-green:#43B77C; --dpmb-gold-t:#D9B45A; --dpmb-red:#D9685F;
+  --dpmb-txt:#ECECEF; --dpmb-mut:#83838e; --dpmb-line:rgba(201,168,76,.14);
+  position:relative; border-radius:18px; overflow:hidden;
+  background:radial-gradient(130% 130% at 10% -10%,#0c0c11,#060608 55%,#020203);
+  border:1px solid var(--dpmb-line);
+  box-shadow:0 30px 70px -34px #000, inset 0 1px 0 rgba(255,255,255,.05);
+  color:var(--dpmb-txt); font-family:'Inter',system-ui,sans-serif;
+  transition:transform .4s, box-shadow .4s, border-color .4s;
+}
+.dpmb-card:hover{transform:translateY(-2px);border-color:rgba(201,168,76,.3);
+  box-shadow:0 40px 90px -36px #000, 0 0 46px -20px rgba(201,168,76,.35)}
+.dpmb-card *{box-sizing:border-box}
+.dpmb-cfx{position:absolute;inset:0;z-index:0;pointer-events:none}
+.dpmb-sheen{position:absolute;top:0;left:0;height:1.4px;width:100%;z-index:2;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(232,199,102,.9),transparent);
+  background-size:36% 100%;background-repeat:no-repeat;animation:dpmb-sweep 5.5s linear infinite}
+@keyframes dpmb-sweep{0%{background-position:-40% 0}100%{background-position:150% 0}}
+.dpmb-inner{position:relative;z-index:1;padding:17px 20px}
+
+.dpmb-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-.01em}
+.dpmb-logo .dpmb-d{color:#fff}
+.dpmb-logo .dpmb-p{background:linear-gradient(95deg,var(--dpmb-gold2),var(--dpmb-gold) 55%,var(--dpmb-gold-deep));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+
+.dpmb-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.dpmb-hl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dpmb-brand{font-size:19px}
+.dpmb-eyebrow{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;color:var(--dpmb-gold);text-transform:uppercase}
+.dpmb-rating{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.04em;padding:3px 10px;border-radius:999px;color:var(--dpmb-green);border:1px solid rgba(67,183,124,.45);background:rgba(67,183,124,.12);box-shadow:0 0 16px -5px rgba(67,183,124,.6)}
+.dpmb-conf{display:inline-flex;align-items:center;gap:7px;font-size:11px;color:var(--dpmb-mut);border:1px solid var(--dpmb-line);border-radius:999px;padding:4px 11px}
+.dpmb-conf .dpmb-cd{width:8px;height:8px;border-radius:50%;background:var(--dpmb-green);box-shadow:0 0 8px var(--dpmb-green)}
+.dpmb-conf b{color:var(--dpmb-txt);font-family:'JetBrains Mono',monospace;font-weight:700}
+
+.dpmb-sub{display:flex;gap:15px;flex-wrap:wrap;margin-top:12px;padding:8px 13px;border:1px solid rgba(255,255,255,.05);border-radius:11px;background:rgba(255,255,255,.022)}
+.dpmb-it{font-size:12px;color:var(--dpmb-mut)} .dpmb-it b{color:var(--dpmb-txt);font-family:'JetBrains Mono',monospace;font-weight:700}
+.dpmb-up{color:var(--dpmb-green);font-family:'JetBrains Mono',monospace;font-weight:700}
+
+.dpmb-spanne{display:flex;align-items:center;gap:11px;margin:14px 0 2px}
+.dpmb-lab{font-size:10px;letter-spacing:.16em;color:var(--dpmb-mut);text-transform:uppercase}
+.dpmb-seg{display:inline-flex;border:1px solid var(--dpmb-line);border-radius:999px;overflow:hidden;background:rgba(0,0,0,.4)}
+.dpmb-seg button{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:11.5px;color:var(--dpmb-mut);background:transparent;border:none;padding:6px 15px;cursor:pointer;transition:.16s}
+.dpmb-seg button:hover{color:var(--dpmb-gold2)}
+.dpmb-seg button.dpmb-on{background:linear-gradient(var(--dpmb-gold2),var(--dpmb-gold-deep));color:#1a1407}
+
+.dpmb-mtg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:11px}
+@media(max-width:560px){.dpmb-mtg{grid-template-columns:1fr}}
+.dpmb-b{display:flex;align-items:center;gap:13px;padding:12px 14px;border:1px solid rgba(255,255,255,.06);border-radius:14px;background:linear-gradient(150deg,rgba(255,255,255,.028),transparent)}
+.dpmb-mg{flex:0 0 104px} .dpmb-mg svg{width:100%;height:auto;display:block;overflow:visible}
+.dpmb-val{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:21px;letter-spacing:-.01em;line-height:1.1}
+.dpmb-mw .dpmb-val{color:var(--dpmb-gold);text-shadow:0 0 20px rgba(201,168,76,.45)}
+.dpmb-mm .dpmb-val{color:var(--dpmb-txt)}
+.dpmb-sqm{font-size:11px;color:var(--dpmb-mut);font-family:'JetBrains Mono',monospace}
+
+.dpmb-foot{display:flex;align-items:center;justify-content:space-between;margin-top:13px;padding-top:9px;border-top:1px solid rgba(255,255,255,.06)}
+.dpmb-foot small{font-size:9.5px;color:#5e5e68} .dpmb-foot .dpmb-mk2{font-size:12px}
+
+/* ---- Optionaler Standortfinder-Rahmen (Demo) ---- */
+.dpmb-finder{position:relative;border-radius:18px;overflow:hidden;padding:18px 20px;margin-bottom:18px;
+  background:radial-gradient(120% 140% at 0% 0%,#0c0c11,#060608 60%);border:1px solid rgba(201,168,76,.14);
+  color:#ECECEF;font-family:'Inter',system-ui,sans-serif}
+.dpmb-finder .dpmb-cfx{position:absolute;inset:0;z-index:0}
+.dpmb-finder .dpmb-fi{position:relative;z-index:1}
+.dpmb-finder .dpmb-ttl{display:flex;align-items:center;gap:10px;font-size:14px}
+.dpmb-finder .dpmb-ttl .dpmb-logo{font-size:17px}
+.dpmb-finder .dpmb-ttl span{color:#83838e;font-size:12px}
+.dpmb-frow{display:flex;gap:10px;margin-top:13px;flex-wrap:wrap}
+.dpmb-frow input{flex:1;min-width:200px;background:rgba(0,0,0,.45);border:1px solid rgba(201,168,76,.14);border-radius:11px;padding:11px 14px;color:#ECECEF;font-family:'Inter';font-size:14px;outline:none}
+.dpmb-frow input:focus{border-color:rgba(201,168,76,.5)}
+.dpmb-frow input::placeholder{color:#6a6a74}
+.dpmb-frow button{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;padding:11px 20px;border:none;border-radius:11px;cursor:pointer;color:#1a1407;background:linear-gradient(#E8C766,#a8761f);box-shadow:0 4px 18px -4px rgba(201,168,76,.7)}
+
+/* ===== v49e: Karte kompakter (weniger hoch), wirkt durch breiteres Layout grosszuegiger ===== */
+.dpmb-inner{padding:13px 18px}
+.dpmb-sub{margin-top:9px;padding:6px 11px;gap:12px}
+.dpmb-mtg{gap:10px;margin-top:9px}
+.dpmb-b{padding:9px 12px;gap:11px}
+.dpmb-mg{flex:0 0 92px}
+.dpmb-val{font-size:19px}
+.dpmb-foot{margin-top:9px;padding-top:7px}
+.dpmb-spanne{margin:10px 0 0}
+
+
+/* ═══ v541-mb-wide: Objekt-Tab — Karte volle Breite, innen sauber verteilt ═══ */
+#dp-mb-host{width:100%}
+#dp-mb-host .dpmb-card .dpmb-inner{padding:16px 24px}
+/* Meta-Leiste nur in Inhaltsbreite statt voll gestreckt (kein toter Raum rechts) */
+#dp-mb-host .dpmb-card .dpmb-sub{display:inline-flex;width:auto;gap:20px}
+#dp-mb-host .dpmb-card .dpmb-spanne{margin-top:13px}
+/* Mehr Platz -> Tachos + Werte groesser, Kacheln fuellen die Breite (1fr 1fr) */
+#dp-mb-host .dpmb-card .dpmb-mtg{gap:18px;margin-top:14px}
+#dp-mb-host .dpmb-card .dpmb-b{padding:16px 20px}
+#dp-mb-host .dpmb-card .dpmb-mg{flex:0 0 120px}
+#dp-mb-host .dpmb-card .dpmb-val{font-size:24px}
+#dp-mb-host .dpmb-card .dpmb-foot{margin-top:14px}

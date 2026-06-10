@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>DealPilot · Angebot</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="marktbewertung-card.css?v=49k" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{ --bg:#050505; --gold:#C9A84C; --gold-soft:rgba(201,168,76,.14);
+    --txt:#e8e8ea; --muted:#8a8a93; --line:#26262c; --good:#43B77C; --warn:#D9B45A; --bad:#D9685F; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;line-height:1.55;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(900px 600px at 85% -12%,rgba(201,168,76,.13),transparent 60%),
+    radial-gradient(760px 560px at -12% 112%,rgba(201,168,76,.07),transparent 55%);}
+  .wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:22px 18px 70px;}
+  .logo{font-family:'Space Grotesk';font-weight:700;font-size:20px;letter-spacing:.4px;}
+  .logo b{color:var(--gold);}
+  .logo span{font-family:'Inter';font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.5px;margin-left:8px;text-transform:uppercase;}
+  /* Hero */
+  .hero{position:relative;border-radius:20px;overflow:hidden;margin:18px 0 20px;border:1px solid var(--line);
+    box-shadow:0 30px 70px -34px #000;min-height:300px;background:#0a0a0c;}
+  .hero img{width:100%;height:340px;object-fit:cover;display:block;filter:saturate(1.02) contrast(1.02);}
+  .hero .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,5,.15) 0%,rgba(5,5,5,.55) 55%,rgba(5,5,5,.96) 100%);}
+  .hero .hc{position:absolute;left:0;right:0;bottom:0;padding:22px 24px;}
+  .hero .badge{display:inline-flex;align-items:center;gap:7px;font-family:'Space Grotesk';font-weight:600;font-size:11px;
+    letter-spacing:.06em;padding:4px 11px;border-radius:999px;border:1px solid;text-transform:uppercase;}
+  .hero .addr{font-family:'Space Grotesk';font-weight:700;font-size:24px;color:#fff;margin:10px 0 2px;}
+  .hero .sub{font-size:12.5px;color:#c7c7cf;}
+  .hero .mw{font-family:'Space Grotesk';font-weight:700;font-size:34px;color:var(--gold);margin-top:10px;
+    text-shadow:0 0 30px rgba(201,168,76,.4);}
+  .hero .mwsub{font-family:'JetBrains Mono';font-size:12px;color:#c7c7cf;margin-top:2px;}
+  /* Sections */
+  h2{font-family:'Space Grotesk';font-weight:600;font-size:13px;letter-spacing:.7px;text-transform:uppercase;
+    color:var(--muted);margin:26px 0 12px;display:flex;align-items:center;gap:8px;}
+  h2::before{content:'';width:14px;height:2px;background:var(--gold);border-radius:2px;}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
+  @media(max-width:620px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:linear-gradient(180deg,#131316,#0e0e11);border:1px solid var(--line);border-radius:13px;
+    padding:13px 14px;position:relative;overflow:hidden;}
+  .kpi::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;background:var(--gold);opacity:.6;}
+  .kpi .v{font-family:'Space Grotesk';font-weight:600;font-size:19px;}
+  .kpi .l{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.3px;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{font-family:'JetBrains Mono';font-size:11.5px;padding:3px 10px;border-radius:999px;
+    border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.08);color:#e7e2d4;}
+  .scorebox{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,rgba(201,168,76,.07),rgba(15,15,18,.6));
+    border:1px solid rgba(201,168,76,.22);border-radius:16px;padding:18px 20px;}
+  .ring{width:84px;height:84px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+    font-family:'Space Grotesk';font-weight:700;font-size:26px;position:relative;}
+  .ring::after{content:'';position:absolute;inset:7px;border-radius:50%;background:#0c0c0f;}
+  .ring span{position:relative;z-index:1;}
+  .infra{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  @media(max-width:620px){.infra{grid-template-columns:repeat(2,1fr)}}
+  .icat{background:linear-gradient(180deg,#131316,#0e0e11);border:1px solid var(--line);border-radius:12px;padding:11px 13px;}
+  .icat .top{display:flex;justify-content:space-between;align-items:center;}
+  .icat .nm{font-family:'Space Grotesk';font-weight:600;font-size:13px;}
+  .icat .sc{font-weight:700;font-family:'JetBrains Mono';font-size:13px;}
+  .report{background:#0f0f12;border:1px solid var(--line);border-radius:14px;padding:22px 24px;font-size:14.5px;line-height:1.7;}
+  .report h3{font-family:'Space Grotesk';font-size:16px;color:var(--gold);margin:18px 0 7px;}
+  .report strong{color:var(--txt);}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px;}
+  .btn{font-family:'Space Grotesk';font-weight:600;font-size:13.5px;padding:11px 20px;border-radius:999px;cursor:pointer;
+    text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:.16s;}
+  .btn.gold{background:var(--gold);color:#1a1500;border:1px solid var(--gold);}
+  .btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+  .btn.ghost:hover{background:var(--gold-soft);}
+  .foot{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  .loading,.error{padding:60px 20px;text-align:center;color:var(--muted);}
+  .error{color:var(--bad);}
+  .disc{font-size:10.5px;color:#5e5e68;margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Deal<b>Pilot</b><span>Angebot</span></div>
+  <div id="root"><div class="loading">Angebot wird geladen…</div></div>
+  <div class="foot">
+    <span>DealPilot · Marktbericht — Marktpreisindikation, kein Gutachten n. § 194 BauGB</span>
+    <span id="footMeta"></span>
+  </div>
+</div>
+
+<script src="marktbewertung-card.js?v=49k"></script>
+<script>
+const API = '/api/v1/marktbericht';
+const $ = (s, r = document) => r.querySelector(s);
+const fmt = (n, suf = '') => (n == null ? '–' : Math.round(n).toLocaleString('de-DE') + suf);
+const tierCol = (s) => s >= 70 ? '#43B77C' : s >= 50 ? '#C9A84C' : '#D9685F';
+const scoreWord = (s) => s == null ? '' : s >= 80 ? 'sehr gut' : s >= 65 ? 'gut' : s >= 45 ? 'durchschnittlich' : s >= 25 ? 'schwach' : 'sehr schwach';
+
+function mdToHtml(md) {
+  if (!md) return '';
+  return md.split(/\n{2,}/).map((blk) => {
+    const t = blk.trim();
+    if (/^#{1,3}\s/.test(t)) return '<h3>' + t.replace(/^#{1,3}\s/, '').replace(/_/g, '') + '</h3>';
+    const html = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/_(.+?)_/g, '<em>$1</em>').replace(/\n/g, '<br>');
+    return '<p>' + html + '</p>';
+  }).join('');
+}
+
+function ratingColor(rating) {
+  const r = (rating || '').toLowerCase();
+  if (/(sehr gut|top|exzellent|attraktiv|gut)/.test(r)) return '#43B77C';
+  if (/(durchschnitt|mittel|okay|neutral)/.test(r)) return '#C9A84C';
+  if (/(schwach|risiko|pass)/.test(r)) return '#D9685F';
+  return '#C9A84C';
+}
+
+async function load() {
+  const key = new URLSearchParams(location.search).get('key');
+  if (!key) { $('#root').innerHTML = '<div class="error">Kein Angebot angegeben (?key= fehlt).</div>'; return; }
+  let out;
+  try {
+    const res = await fetch(API + '/reports/replay?key=' + encodeURIComponent(key));
+    if (!res.ok) {
+      let msg = 'Angebot nicht verfügbar (' + res.status + ')';
+      try { const j = await res.json(); if (j && j.error) msg += ' — ' + j.error; } catch (_) {}
+      if (res.status === 404) msg = 'Dieses Angebot wurde noch nicht gespeichert. Bitte im Tool den Bericht einmal neu erstellen und den Link erneut kopieren.';
+      throw new Error(msg);
+    }
+    out = await res.json();
+  } catch (e) { $('#root').innerHTML = '<div class="error">' + e.message + '</div>'; return; }
+  render(out, key);
+}
+
+function render(out, key) {
+  const d = out.data || {};
+  const mv = (d.valuation && d.valuation.market_value) || {};
+  const yld = (d.valuation && d.valuation.yield) || {};
+  const ds = d.deal_score || {};
+  const rf = d.ref || {};
+  const adr = (d.address && d.address.formatted) || rf.address || 'Objekt';
+  const lat = d.address && d.address.lat, lon = d.address && d.address.lon;
+  const score = ds.score;
+  const rCol = ratingColor(ds.rating);
+
+  const facts = [
+    rf.property_type, rf.living_area ? rf.living_area + ' m²' : null, rf.rooms ? rf.rooms + ' Zi.' : null,
+    rf.build_year ? 'Bj. ' + rf.build_year : null, rf.energy_class ? 'Energie ' + rf.energy_class : null,
+    rf.condition ? 'Zustand ' + rf.condition : null, rf.quality ? 'Ausstattung ' + rf.quality : null,
+    rf.modernization ? 'Mod. ' + rf.modernization + (rf.modernization_year ? ' (' + rf.modernization_year + ')' : '') : null,
+    rf.plot_area ? 'Grundstück ' + rf.plot_area + ' m²' : null, rf.units ? rf.units + ' WE' : null,
+    rf.purchase_price ? 'Kaufpreis ' + fmt(rf.purchase_price, ' €') : null,
+  ].filter(Boolean);
+
+  // Infrastruktur
+  const groups = (d.micro && d.micro.groups) || {};
+  const order = ['einkaufen', 'verkehr', 'gesundheit', 'freizeit', 'bildung', 'gastronomie'];
+  const infra = order.filter((k) => groups[k]).map((k) => {
+    const g = groups[k];
+    return '<div class="icat"><div class="top"><span class="nm">' + g.label + '</span>'
+      + '<span class="sc" style="color:' + tierCol(g.score) + '">' + (g.score5 ?? '–') + '/5'
+      + (g.score != null ? ' · ' + g.score : '') + '</span></div></div>';
+  }).join('');
+
+  const microScore = d.micro && d.micro.score, macroScore = d.macro && d.macro.score;
+
+  // Makro-Subscores (nur wenn echte Destatis-Daten vorliegen)
+  const macroBd = (d.macro && d.macro.estimated === false && d.macro.breakdown) ? d.macro.breakdown : null;
+  const MLAB = { bevoelkerung: 'Bevölkerung', kaufkraft: 'Kaufkraft', arbeitslosigkeit: 'Arbeitsmarkt', wanderung: 'Wanderung', miet_trend: 'Miettrend', kaufpreis_trend: 'Kaufpreistrend' };
+  const macroTiles = macroBd ? Object.keys(MLAB).filter((k) => macroBd[k] != null).map((k) => {
+    const raw = macroBd[k]; const v = Math.round(raw <= 1 ? raw * 100 : raw); const c = tierCol(v);
+    return '<div class="kpi" style="--c:' + c + '"><div class="v" style="color:' + c + '">' + v + '<span style="font-size:11px;color:#8a8a93;">/100</span></div>'
+      + '<div class="l">' + MLAB[k] + '</div>'
+      + '<div style="height:3px;border-radius:2px;background:#26262c;margin-top:7px;overflow:hidden;"><div style="height:100%;width:' + v + '%;background:' + c + ';border-radius:2px;"></div></div></div>';
+  }).join('') : '';
+
+  $('#root').innerHTML =
+    '<div class="hero">'
+      + '<img id="heroImg" alt="Standort" />'
+      + '<div class="ov"></div>'
+      + '<div class="hc">'
+        + (ds.rating ? '<span class="badge" style="color:' + rCol + ';border-color:' + rCol + '55;background:' + rCol + '1f;">★ ' + ds.rating + '</span>' : '')
+        + '<div class="addr">' + adr + '</div>'
+        + '<div class="sub">' + facts.slice(0, 5).join('  ·  ') + '</div>'
+        + (mv.estimated != null ? '<div class="mw">' + fmt(mv.estimated, ' €') + '</div>'
+            + '<div class="mwsub">Marktwert-Indikation' + (mv.low != null && mv.high != null ? '  ·  ' + fmt(mv.low, ' €') + ' – ' + fmt(mv.high, ' €') : '')
+            + (mv.confidence_label ? '  ·  Aussagekraft ' + mv.confidence_label + (mv.confidence_pct != null ? ' ' + mv.confidence_pct + ' %' : '') : '') + '</div>' : '')
+      + '</div>'
+    + '</div>'
+
+    + '<div id="mbCard"></div>'
+
+    + '<h2>Kennzahlen</h2>'
+    + '<div class="kpis">'
+      + '<div class="kpi"><div class="v">' + fmt(mv.estimated, ' €') + '</div><div class="l">Marktwert</div></div>'
+      + '<div class="kpi"><div class="v">' + (yld.gross_yield_pct ?? '–') + ' %</div><div class="l">Bruttorendite</div></div>'
+      + '<div class="kpi"><div class="v">' + (yld.rent_multiplier ?? '–') + '</div><div class="l">Kaufpreisfaktor</div></div>'
+      + '<div class="kpi"><div class="v">' + (mv.basis_median_sqm ? fmt(mv.basis_median_sqm, ' €') : '–') + '</div><div class="l">Marktwert €/m²</div></div>'
+    + '</div>'
+
+    + (score != null ? '<h2>Deal-Score</h2>'
+      + '<div class="scorebox">'
+        + '<div class="ring" style="background:conic-gradient(' + tierCol(score) + ' ' + (score * 3.6) + 'deg,#26262c 0);"><span style="color:' + tierCol(score) + '">' + score + '</span></div>'
+        + '<div><div style="font-family:\'Space Grotesk\';font-weight:600;font-size:18px;color:' + rCol + '">' + (ds.rating || '–') + '</div>'
+          + '<div style="font-size:12.5px;color:var(--muted);margin-top:3px;">'
+          + (macroScore != null ? 'Makrolage <b style="color:' + tierCol(macroScore) + '">' + macroScore + ' · ' + scoreWord(macroScore) + '</b>' : '')
+          + (microScore != null ? '&nbsp;&nbsp;·&nbsp;&nbsp;Mikrolage <b style="color:' + tierCol(microScore) + '">' + microScore + ' · ' + scoreWord(microScore) + '</b>' : '')
+          + '</div></div>'
+      + '</div>' : '')
+
+    + (infra ? '<h2>Lage &amp; Infrastruktur</h2><div class="infra">' + infra + '</div>' : '')
+
+    + ((lat != null && lon != null) ? '<h2>Lage-Karte</h2>'
+        + '<div id="amapCtrl" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;font-size:11.5px;color:var(--muted);"></div>'
+        + '<div id="amap" style="height:380px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:inset 0 0 40px rgba(0,0,0,.4);"></div><div id="amapLegend" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:11.5px;color:var(--muted);"></div>' : '')
+
+    + (macroTiles ? '<h2>Makrolage &amp; Sozioökonomie</h2><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;">' + macroTiles + '</div>' : '')
+
+    + (out.report_md ? '<h2>Markteinschätzung</h2><div class="report">' + mdToHtml(out.report_md) + '</div>' : '')
+
+    + '<h2>Objektdaten</h2><div class="chips">' + facts.map((f) => '<span class="chip">' + f + '</span>').join('') + '</div>'
+
+    + '<div class="actions">'
+      + '<a class="btn ghost" href="index.html?angebot=' + encodeURIComponent(key) + '">Vollständigen Marktbericht &amp; PDF öffnen →</a>'
+    + '</div>'
+    + '<div class="disc">Marktpreisindikation auf Basis von Vergleichsangeboten — kein Verkehrswertgutachten n. § 194 BauGB. Straßenansicht: © Google, sofern vorhanden.</div>';
+
+  // Hero-Bild: Street View (falls Key + Aufnahme vorhanden) -> sonst Obsidian-Karte
+  const img = $('#heroImg');
+  if (lat != null && lon != null) {
+    const mapUrl = API + '/static-map?lat=' + lat + '&lon=' + lon + '&style=dark-matter-yellow-roads&width=920&height=340&zoom=16';
+    img.onerror = () => { img.onerror = null; img.src = mapUrl; };
+    img.src = API + '/streetview?lat=' + lat + '&lon=' + lon + '&width=640&height=340';
+  } else {
+    img.style.display = 'none';
+  }
+
+  // Marktbewertung-Karte (self-contained) mounten
+  try {
+    const areaC = rf.living_area, rentS = (d.valuation && d.valuation.rent_estimate) || (d.rent) || {};
+    const rl = (areaC && rentS.q25_per_sqm) ? Math.round(rentS.q25_per_sqm * areaC) : null;
+    const rm = (areaC && rentS.median_per_sqm) ? Math.round(rentS.median_per_sqm * areaC) : null;
+    const rh = (areaC && rentS.q75_per_sqm) ? Math.round(rentS.q75_per_sqm * areaC) : null;
+    const fmtSq = (v, dec) => v != null ? v.toLocaleString('de-DE', { maximumFractionDigits: dec }) : '–';
+    if (window.DealPilotMarktbewertung && mv.estimated != null && mv.low != null && mv.high != null && rm != null) {
+      window.DealPilotMarktbewertung.mount('#mbCard', {
+        rating: ds.rating || 'Marktwert',
+        confidence: { label: mv.confidence_label || '–', pct: mv.confidence_pct != null ? mv.confidence_pct : '–' },
+        meta: {
+          mikro: microScore != null ? microScore + ' · ' + scoreWord(microScore) : '–',
+          makro: macroScore != null ? macroScore + ' · ' + scoreWord(macroScore) : '–',
+          trend: d.price_trend_pct != null ? (d.price_trend_pct > 0 ? '+' : '') + fmtSq(d.price_trend_pct, 1) + '%/J' : '–',
+        },
+        marktwert: { low: mv.low, med: mv.estimated, high: mv.high,
+          sqm: mv.basis_median_sqm ? Math.round(mv.basis_median_sqm).toLocaleString('de-DE') + ' €/m²' : '' },
+        miete: { low: rl, med: rm, high: rh,
+          sqm: rentS.median_per_sqm ? fmtSq(rentS.median_per_sqm, 2) + ' €/m² kalt' : '' },
+      });
+    } else { $('#mbCard').style.display = 'none'; }
+  } catch (e) { const c = $('#mbCard'); if (c) c.style.display = 'none'; }
+
+  $('#footMeta').textContent = 'Stand ' + new Date().toLocaleDateString('de-DE');
+
+  // Interaktive Lage-Karte: Objekt + POIs je Kategorie (wie Profi-Exposés)
+  try {
+    if (window.L && lat != null && lon != null && document.getElementById('amap')) {
+      const CAT = {
+        einkaufen: { c: '#43B77C', l: 'Einkaufen' }, verkehr: { c: '#C9A84C', l: 'Verkehr/ÖPNV' },
+        gesundheit: { c: '#5AA0E6', l: 'Gesundheit' }, freizeit: { c: '#C77DD9', l: 'Freizeit' },
+        bildung: { c: '#E8946A', l: 'Bildung' }, gastronomie: { c: '#D9685F', l: 'Gastronomie' },
+      };
+      const map = L.map('amap', { scrollWheelZoom: false, attributionControl: true }).setView([lat, lon], 15);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19,
+      }).addTo(map);
+      // Objekt-Marker (Gold)
+      L.circleMarker([lat, lon], { radius: 9, color: '#0a0a0c', weight: 2, fillColor: '#C9A84C', fillOpacity: 1 })
+        .addTo(map).bindPopup('<b>' + adr + '</b>');
+      const used = {}; const pts = [[lat, lon]];
+      order.forEach((k) => {
+        const g = groups[k]; if (!g || !g.items) return;
+        const col = (CAT[k] || { c: '#8a8a93' }).c;
+        g.items.forEach((it) => {
+          if (it.lat == null || it.lon == null) return;
+          used[k] = true; pts.push([it.lat, it.lon]);
+          L.circleMarker([it.lat, it.lon], { radius: 5, color: '#0a0a0c', weight: 1, fillColor: col, fillOpacity: .92 })
+            .addTo(map).bindPopup('<b>' + (it.name || g.label) + '</b><br>' + g.label + ' · ' + it.distance_m + ' m');
+        });
+      });
+      try { map.fitBounds(pts, { padding: [30, 30], maxZoom: 16 }); } catch (e) {}
+      setTimeout(() => map.invalidateSize(), 200);
+      const leg = document.getElementById('amapLegend');
+      if (leg) leg.innerHTML = '<span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:9px;height:9px;border-radius:50%;background:#C9A84C;display:inline-block;"></i>Objekt</span>'
+        + order.filter((k) => used[k]).map((k) => '<span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:9px;height:9px;border-radius:50%;background:' + CAT[k].c + ';display:inline-block;"></i>' + CAT[k].l + '</span>').join('');
+
+      // Erreichbarkeit (Isochrone, Geoapify) — optional, faellt still aus wenn kein Key
+      let isoLayer = null;
+      const drawIso = async (minutes, mode, btn) => {
+        try {
+          const r = await fetch(API + '/isoline?lat=' + lat + '&lon=' + lon + '&minutes=' + minutes + '&mode=' + mode);
+          if (!r.ok) return;
+          const gj = await r.json();
+          if (isoLayer) { map.removeLayer(isoLayer); isoLayer = null; }
+          isoLayer = L.geoJSON(gj, { style: { color: '#C9A84C', weight: 1.5, fillColor: '#C9A84C', fillOpacity: 0.1 } }).addTo(map);
+          [...document.querySelectorAll('#amapCtrl button')].forEach((b) => { b.style.background = 'transparent'; });
+          if (btn) btn.style.background = 'rgba(201,168,76,.25)';
+        } catch (e) { /* optional */ }
+      };
+      const ctrl = document.getElementById('amapCtrl');
+      if (ctrl) {
+        ctrl.innerHTML = '<span>Erreichbarkeit:</span>';
+        const mk = (label, min, mode) => {
+          const b = document.createElement('button');
+          b.textContent = label;
+          b.style.cssText = "font-family:'Inter';font-size:11.5px;color:#C9A84C;background:transparent;border:1px solid rgba(201,168,76,.4);border-radius:999px;padding:4px 10px;cursor:pointer;";
+          b.onclick = () => drawIso(min, mode, b);
+          ctrl.appendChild(b); return b;
+        };
+        const b1 = mk('🚶 10 Min', 10, 'walk'); mk('🚶 15 Min', 15, 'walk'); mk('🚗 10 Min', 10, 'drive');
+        drawIso(10, 'walk', b1);
+      }
+    }
+  } catch (e) { /* Karte optional */ }
+}
+
+load();
+</script>
+</body>
+</html>

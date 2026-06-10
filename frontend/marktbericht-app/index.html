@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="de" data-bg="obsidian">
+<head>
+<!-- v562-locallibs: Libs aus vendor/ (CDN-unabhaengig) -->
+<script>/* dpEmbedBootstrap v557: Auth + kostenpflichtiger Pfad + Prefill (additiv, app.js unangetastet) */
+(function () {
+  var TOKEN_KEY = 'ji_token';
+  function tok() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; } }
+  // fetch-Wrapper: Auth-Header + generate-stream -> generate (Proxy hat nur den kostenpflichtigen generate)
+  var _origFetch = window.fetch.bind(window);
+  window.fetch = function (url, opts) {
+    try {
+      opts = opts || {};
+      var u = (typeof url === 'string') ? url : (url && url.url) || '';
+      if (u.indexOf('/api/v1/marktbericht') !== -1) {
+        /* v560-nostreamredirect: generate-stream geht jetzt echt durch (Proxy streamt). */
+        var t = tok();
+        if (t) {
+          opts.headers = opts.headers || {};
+          if (opts.headers instanceof Headers) { if (!opts.headers.has('Authorization')) opts.headers.set('Authorization', 'Bearer ' + t); }
+          else if (!opts.headers['Authorization'] && !opts.headers['authorization']) { opts.headers['Authorization'] = 'Bearer ' + t; }
+        }
+      }
+    } catch (e) {}
+    return _origFetch(url, opts);
+  };
+  // Prefill aus URL-Query, sobald DOM bereit
+  function prefill() {
+    try {
+      var q = new URLSearchParams(location.search);
+      function set(id, key) { var e = document.getElementById(id); if (e && q.get(key) != null && q.get(key) !== '') e.value = q.get(key); }
+      set('address', 'address'); set('ptype', 'ptype'); set('usage', 'usage');
+      set('area', 'area'); set('rooms', 'rooms'); set('year', 'year');
+      set('price', 'price'); set('rent', 'rent'); set('cond', 'cond'); set('energy', 'energy');
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prefill);
+  else prefill();
+})();
+</script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DealPilot · Marktbericht</title>
+<link rel="stylesheet" href="vendor/leaflet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#050505; --panel:#141417; --panel2:#1b1b20; --line:#2a2a31;
+    --gold:#C9A84C; --gold-soft:rgba(201,168,76,.14); --txt:#e8e8ea; --muted:#8a8a93;
+    --good:#4caf7d; --warn:#d9a441; --bad:#d9655b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.5;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(800px 500px at 80% -10%, rgba(201,168,76,.10), transparent 60%),
+               radial-gradient(700px 500px at -10% 110%, rgba(201,168,76,.06), transparent 55%);}
+  .wrap{position:relative;z-index:1;max-width:1340px;margin:0 auto;padding:28px 20px 80px;}
+  header.top{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+  .logo{font-family:'Space Grotesk';font-weight:700;font-size:22px;letter-spacing:.5px;}
+  .logo b{color:var(--gold);}
+  .pill{font-family:'JetBrains Mono';font-size:11px;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:4px 10px;}
+  h1{font-family:'Space Grotesk';font-weight:600;font-size:15px;letter-spacing:.4px;
+    text-transform:uppercase;color:var(--muted);margin:0 0 14px;}
+  .grid{display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start;}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:16px;padding:20px;
+    box-shadow:0 10px 40px rgba(0,0,0,.35);}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:13px 0 6px;letter-spacing:.2px;}
+  input,select{width:100%;background:#0f0f12;border:1px solid var(--line);color:var(--txt);
+    border-radius:11px;padding:12px 14px;font-family:'Inter';font-size:15px;min-height:44px;box-sizing:border-box;}
+  input:focus,select:focus{outline:none;border-color:var(--gold);}
+  .row{display:flex;gap:12px;flex-wrap:wrap;}.row>div{flex:1 1 calc(50% - 6px);min-width:128px;}
+  input[type=number]{padding-right:8px;}
+  button.go{margin-top:18px;width:100%;background:var(--gold);color:#1a1500;border:none;
+    border-radius:999px;padding:13px;font-family:'Space Grotesk';font-weight:600;font-size:15px;
+    cursor:pointer;transition:.15s;}
+  button.go:hover{filter:brightness(1.08);}
+  button.go:disabled{opacity:.5;cursor:wait;}
+  .scorebox{display:flex;gap:16px;align-items:center;margin-bottom:18px;}
+  .score-circle{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;
+    font-family:'Space Grotesk';font-weight:700;font-size:30px;flex:none;
+    background:conic-gradient(var(--gold) var(--deg,0deg), #26262c 0);position:relative;}
+  .score-circle::after{content:'';position:absolute;inset:7px;border-radius:50%;background:var(--panel);}
+  .score-circle span{position:relative;z-index:1;}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;}
+  .kpi{background:#0f0f12;border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .kpi .v{font-family:'Space Grotesk';font-weight:600;font-size:18px;}
+  .kpi .l{font-size:11px;color:var(--muted);margin-top:2px;}
+  #map{height:300px;border-radius:14px;border:1px solid var(--line);margin:8px 0 18px;}
+  .bars{display:flex;flex-direction:column;gap:8px;margin:6px 0 16px;}
+  .bar{display:flex;align-items:center;gap:10px;font-size:12px;}
+  .bar .lab{width:120px;color:var(--muted);}
+  .bar .track{flex:1;height:9px;background:#26262c;border-radius:999px;overflow:hidden;}
+  .bar .fill{height:100%;background:var(--gold);border-radius:999px;}
+  .report{background:#0f0f12;border:1px solid var(--line);border-radius:14px;padding:22px 24px;
+    font-size:14.5px;white-space:normal;}
+  .report h1{font-size:22px;color:var(--txt);text-transform:none;font-weight:700;margin:0 0 12px;}
+  .report h2{font-family:'Space Grotesk';font-size:16px;color:var(--gold);margin:20px 0 8px;
+    text-transform:none;letter-spacing:0;}
+  .report ul{margin:6px 0;padding-left:20px;}
+  .report strong{color:var(--txt);}
+  .muted{color:var(--muted);font-size:12px;}
+  .err{color:var(--bad);font-family:'JetBrains Mono';font-size:13px;margin-top:10px;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .chip{font-family:'JetBrains Mono';font-size:10.5px;padding:3px 8px;border-radius:6px;
+    border:1px solid var(--line);color:var(--muted);}
+  .chip.on{color:var(--gold);border-color:var(--gold);}
+  canvas{max-width:100%;}
+  .hide{display:none;}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid #1a1500;
+    border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px;}
+  @keyframes s{to{transform:rotate(360deg)}}
+  /* Marktbewertung (Wert + Spanne) */
+  .valbox{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  @media(max-width:560px){.valbox{grid-template-columns:1fr}}
+  .valcard{background:#0f0f12;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .valcard .cap{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+  .valcard .big{font-family:'Space Grotesk';font-weight:700;font-size:30px;margin:4px 0 2px;}
+  .valcard .sub{font-family:'JetBrains Mono';font-size:12px;color:var(--muted);}
+  .valcard .sub b{color:var(--txt);}
+  .rangebar{position:relative;height:6px;background:#26262c;border-radius:999px;margin:12px 0 6px;}
+  .rangebar .fillspan{position:absolute;top:0;bottom:0;background:var(--gold-soft);border-radius:999px;}
+  .rangebar .mark{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;
+    background:var(--gold);transform:translate(-50%,-50%);box-shadow:0 0 0 3px var(--panel);}
+  /* Bewertungs-Kacheln */
+  .assess-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 18px;}
+  @media(max-width:560px){.assess-grid{grid-template-columns:repeat(2,1fr)}}
+  .assess{background:#0f0f12;border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .assess .l{font-size:11px;color:var(--muted);}
+  .assess .v{font-family:'Space Grotesk';font-weight:600;font-size:15px;margin-top:3px;text-transform:capitalize;}
+  .assess .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px;}
+  .rate-good .dot{background:var(--good)} .rate-mid .dot{background:var(--warn)} .rate-low .dot{background:var(--bad)} .rate-neutral .dot{background:var(--muted)}
+  /* .dpkt-Upload */
+  .upload{margin:4px 0 8px;border:1px dashed var(--line);border-radius:10px;padding:12px;text-align:center;
+    cursor:pointer;transition:.15s;font-size:12.5px;color:var(--muted);}
+  .upload:hover{border-color:var(--gold);color:var(--txt);}
+  .upload b{color:var(--gold);}
+  .sep{display:flex;align-items:center;gap:10px;margin:14px 0 4px;color:var(--muted);font-size:11px;}
+  .sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--line);}
+  /* Datengrundlage / Echtheit */
+  .prov{display:flex;flex-direction:column;gap:6px;margin:6px 0 8px;}
+  .prov-row{display:flex;align-items:center;gap:10px;font-size:12.5px;padding:7px 10px;
+    background:#0f0f12;border:1px solid var(--line);border-radius:9px;}
+  .prov-row .pl{flex:1;}
+  .prov-row .ps{color:var(--muted);font-size:11px;}
+  .badge{font-family:'JetBrains Mono';font-size:10px;font-weight:500;padding:2px 8px;border-radius:999px;
+    text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+  .b-echt{background:rgba(76,175,125,.16);color:var(--good);}
+  .b-berechnet{background:var(--gold-soft);color:var(--gold);}
+  .b-eingabe{background:rgba(90,150,230,.16);color:#7ab0ff;}
+  .b-simuliert{background:rgba(217,164,65,.16);color:var(--warn);}
+  .b-fehlt{background:#26262c;color:var(--muted);}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--muted);margin:8px 0 2px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .legend i{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  button.pdf{margin-top:14px;width:100%;background:transparent;color:var(--gold);
+    border:1px solid var(--gold);border-radius:999px;padding:11px;font-family:'Space Grotesk';
+    font-weight:600;font-size:14px;cursor:pointer;transition:.15s;}
+  button.pdf:hover{background:var(--gold-soft);}
+  button.pdf:disabled{opacity:.5;cursor:wait;}
+
+  /* ===== Redesign-Politur (DealPilot-Stil) ===== */
+  body::before{background:
+    radial-gradient(900px 600px at 85% -12%, rgba(201,168,76,.13), transparent 60%),
+    radial-gradient(760px 560px at -12% 112%, rgba(201,168,76,.07), transparent 55%),
+    radial-gradient(500px 400px at 50% 50%, rgba(201,168,76,.02), transparent 70%);}
+  .panel{background:linear-gradient(180deg,rgba(26,26,31,.92),rgba(20,20,24,.92));
+    backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);
+    box-shadow:0 16px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.03);}
+  h1{font-size:13px;letter-spacing:.8px;display:flex;align-items:center;gap:8px;}
+  h1::before{content:'';width:14px;height:2px;background:var(--gold);border-radius:2px;display:inline-block;}
+  /* Score-Bereich als eigenes Panel-im-Panel */
+  .scorebox{background:linear-gradient(135deg,rgba(201,168,76,.07),rgba(15,15,18,.6));
+    border:1px solid rgba(201,168,76,.22);border-radius:16px;padding:18px 20px;margin-bottom:18px;}
+  /* KPI-Kacheln mit Hover + Gold-Akzent */
+  .kpis{gap:11px;}
+  .kpi{background:linear-gradient(180deg,#131316,#0e0e11);border:1px solid var(--line);
+    border-radius:13px;padding:13px 14px;transition:.18s;position:relative;overflow:hidden;}
+  .kpi::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;background:var(--gold);opacity:.6;}
+  .kpi:hover{border-color:rgba(201,168,76,.4);transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(0,0,0,.3);}
+  .kpi .v{font-size:19px;letter-spacing:.3px;}
+  .kpi .l{margin-top:4px;letter-spacing:.3px;}
+  /* Marktwert/Miete-Karten */
+  .valbox{gap:16px;margin:16px 0 18px;}
+  .valcard{background:linear-gradient(180deg,#131316,#0e0e11);border:1px solid var(--line);
+    border-radius:16px;padding:18px 20px;transition:.18s;}
+  .valcard:hover{border-color:rgba(201,168,76,.28);}
+  .valcard .cap{font-size:11px;letter-spacing:.6px;font-weight:600;}
+  .valcard .big{font-family:'Space Grotesk';font-weight:700;font-size:27px;margin:6px 0 2px;}
+  /* Map edler */
+  #map{height:280px;border-radius:16px;border:1px solid var(--line);
+    box-shadow:inset 0 0 40px rgba(0,0,0,.4);}
+  /* Score-Komponenten-Bars */
+  .bar .lab{font-size:12px;letter-spacing:.2px;}
+  .bar .track{height:8px;background:#202026;}
+  .bar .fill{background:linear-gradient(90deg,#a98e3a,var(--gold));box-shadow:0 0 10px rgba(201,168,76,.4);}
+  /* Assessment-Kacheln */
+  .assess{background:linear-gradient(180deg,#131316,#0e0e11);transition:.18s;}
+  .assess:hover{border-color:rgba(201,168,76,.28);}
+  /* Buttons edler */
+  button.go{box-shadow:0 8px 24px rgba(201,168,76,.25);letter-spacing:.3px;}
+  #replayBtn:hover{border-color:var(--gold);color:var(--gold);}
+  /* Report lesbarer */
+  .report{padding:26px 28px;line-height:1.7;}
+  .report h2{margin:22px 0 10px;font-size:17px;}
+  .report p{margin:10px 0;}
+  .pdfth-wrap{display:flex;align-items:center;gap:9px;margin-top:14px;}
+  .pdfth-lbl{font-family:'JetBrains Mono';font-size:10.5px;color:var(--muted);letter-spacing:.3px;}
+  .pdfth-seg{display:flex;gap:3px;background:#0f0f12;border:1px solid var(--line);border-radius:999px;padding:3px;}
+  .pdfth{background:transparent;border:none;color:var(--muted);font-family:'Space Grotesk';font-weight:600;
+    font-size:12px;padding:5px 14px;border-radius:999px;cursor:pointer;transition:.16s;}
+  .pdfth.on{background:var(--gold);color:#1a1500;}
+  .pdfth:not(.on):hover{color:var(--txt);}
+
+  /* ===== Obsidian-Atmosphäre: animierte Orbs + Partikelfeld ===== */
+  body{background:#050505;}
+  #mb-orbs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .mb-orb{position:absolute;border-radius:50%;filter:blur(72px);opacity:.46;will-change:transform;}
+  .mb-orb.o1{width:520px;height:520px;top:-150px;right:-110px;
+    background:radial-gradient(circle at 35% 30%,rgba(201,168,76,.30),transparent 70%);animation:mbDrift1 26s ease-in-out infinite;}
+  .mb-orb.o2{width:460px;height:460px;bottom:-170px;left:-140px;
+    background:radial-gradient(circle at 50% 50%,rgba(201,168,76,.15),transparent 70%);animation:mbDrift2 33s ease-in-out infinite;}
+  .mb-orb.o3{width:360px;height:360px;top:40%;left:48%;
+    background:radial-gradient(circle at 50% 50%,rgba(201,168,76,.045),transparent 70%);animation:mbDrift3 39s ease-in-out infinite;}
+  @keyframes mbDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-42px,30px) scale(1.08)}}
+  @keyframes mbDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(52px,-26px) scale(1.06)}}
+  @keyframes mbDrift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,-42px) scale(1.1)}}
+  #mb-particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  /* Panels etwas glasiger, damit Orbs/Partikel durchschimmern */
+  .panel,.report,.valcard,.kpi,.assess{backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);}
+  @media (prefers-reduced-motion: reduce){.mb-orb{animation:none}}
+</style>
+<link href="marktbewertung-card.css?v=49k" rel="stylesheet">
+</head>
+<body>
+<div id="mb-orbs" aria-hidden="true"><span class="mb-orb o1"></span><span class="mb-orb o2"></span><span class="mb-orb o3"></span></div>
+<canvas id="mb-particles" aria-hidden="true"></canvas>
+<div class="wrap">
+<!-- v568-objektart: doppelter Header entfernt --><span class="pill" id="healthPill" style="display:none">prüfe Status…</span>
+
+  <!-- v569-mbtabs: Standort-Finder raus, PDF + Schliessen rein -->
+  <div id="mainTabs" style="display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;align-items:center;">
+    <button class="mtab" data-view="report" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Marktbericht</button>
+    <button id="mbTopPdf" type="button" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">PDF-Export</button>
+    <span style="flex:1"></span>
+    <button id="mbTopClose" type="button" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Schließen</button><!-- v571-mbui -->
+  </div>
+
+  <div id="view-report">
+  <div class="grid">
+    <!-- Eingabe -->
+    <div class="panel">
+      <h1>Objekt eingeben</h1>
+      <div class="upload" id="dpktDrop">
+        <input type="file" id="dpktFile" accept=".dpkt,.json" style="display:none" />
+        <b>DealPilot-Objekt (.dpkt)</b> laden — Bericht automatisch erstellen
+      </div>
+      <div class="sep">oder manuell eingeben</div>
+      <label>Adresse</label>
+      <input id="address" placeholder="Hermannstr. 9, 32609 Hüllhorst" value="Hermannstr. 9, 32609 Hüllhorst" />
+      <div class="row">
+        <div><label>Objektart</label>
+          <select id="ptype"><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select>
+        </div>
+        <div><label>Nutzung</label>
+          <select id="usage"><option value="kapitalanlage">Kapitalanlage</option><option value="eigennutzung">Eigennutzung</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Wohnfläche (m²)</label><input id="area" type="number" value="80" /></div>
+        <div><label>Zimmer</label><input id="rooms" type="number" value="3" /></div>
+      </div>
+      <div class="row">
+        <div><label>Baujahr</label><input id="year" type="number" placeholder="z. B. 1995" /></div>
+        <div><label>Etage</label><input id="floor" type="number" placeholder="z. B. 1" /></div>
+      </div>
+      <div class="row">
+        <div><label>Kaltmiete/Monat (€) <span style="color:#6a6a72;font-weight:400;font-size:11px;">— optional, sonst Marktmiete</span></label><input id="rent" type="number" placeholder="falls vermietet" /></div>
+        <div><label>Kaufpreis (€) <span style="color:#6a6a72;font-weight:400;font-size:11px;">— optional</span></label><input id="price" type="number" placeholder="falls bekannt" /></div>
+      </div>
+
+      <!-- Genauere Angaben (optional) – heben die Konfidenz -->
+      <div id="precHead" style="margin-top:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#0f0f13;border:1px solid #26262c;border-radius:10px;font-size:12.5px;color:#c9a84c;">
+        <span><span id="precCaret">▸</span> &nbsp;Erweiterte Angaben <span style="color:#6a6a72;">— optional, erhöhen die Genauigkeit</span></span>
+        <span id="precCount" style="color:#8a8a93;font-size:11.5px;">0/4</span>
+      </div>
+      <div id="precBox" style="display:none;margin-top:10px;">
+        <div class="row">
+          <div><label>Zustand</label>
+            <select id="cond"><option value="" selected>– keine Angabe –</option><option value="gepflegt">gepflegt</option><option value="neuwertig">neuwertig</option><option value="saniert">saniert</option><option value="modernisiert">modernisiert</option><option value="normal">normal</option><option value="renovierungsbeduerftig">renovierungsbedürftig</option></select>
+          </div>
+          <div><label>Energieklasse</label>
+            <select id="energy"><option value="" selected>– keine Angabe –</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select>
+          </div>
+        </div>
+        <div class="row">
+          <div><label>Ausstattungsqualität</label>
+            <select id="quality"><option value="" selected>– keine Angabe –</option><option value="einfach">einfach</option><option value="normal">normal</option><option value="gehoben">gehoben</option><option value="luxurioes">luxuriös</option></select>
+          </div>
+          <div><label>Modernisierung</label>
+            <select id="modern"><option value="" selected>– keine Angabe –</option><option value="kernsaniert">kernsaniert</option><option value="umfassend">umfassend modernisiert</option><option value="teilmodernisiert">teilmodernisiert</option><option value="keine">keine</option><option value="renovierungsstau">Renovierungsstau</option></select>
+          </div>
+        </div>
+        <div class="row">
+          <div><label>Modernisierungsjahr</label><input id="modyear" type="number" placeholder="z. B. 2018" /></div>
+          <div><label>Anzahl Badezimmer</label><input id="baths" type="number" placeholder="z. B. 1" /></div>
+        </div>
+        <div class="row">
+          <div><label>Balkon / Terrasse (m²)</label><input id="balcony" type="number" placeholder="0" /></div>
+          <div><label>Garten (m²)</label><input id="garden" type="number" placeholder="0" /></div>
+          <div><label>Grundstück (m²) <span style="color:#6a6a72;font-weight:400;font-size:11px;">— nur Häuser</span></label><input id="plot" type="number" placeholder="z.B. 650" /></div>
+          <div><label>Wohneinheiten <span style="color:#6a6a72;font-weight:400;font-size:11px;">— nur MFH</span></label><input id="units" type="number" placeholder="z.B. 4" /></div>
+        </div>
+        <div class="row">
+          <div><label>Garagen / TG-Stellplätze</label><input id="garages" type="number" placeholder="0" /></div>
+          <div><label>Außenstellplätze</label><input id="outdoor" type="number" placeholder="0" /></div>
+        </div>
+        <div style="margin-top:4px;"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;">
+          <input id="elevator" type="checkbox" style="width:auto;" /> Aufzug vorhanden</label></div>
+      </div>
+      <!-- Live-Konfidenz-Anzeige -->
+      <div id="precMeter" style="margin-top:12px;padding:10px 12px;background:#0f0f13;border:1px solid #26262c;border-radius:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#9a9aa2;margin-bottom:6px;">
+          <span>Voraussichtliche Genauigkeit</span><span id="precPct" style="font-weight:700;color:#c9a84c;">–</span>
+        </div>
+        <div style="height:7px;border-radius:4px;background:#1c1c22;overflow:hidden;">
+          <div id="precBar" style="height:100%;width:0%;background:linear-gradient(90deg,#A98E3A,#C9A84C);transition:width .25s;"></div>
+        </div>
+        <div id="precHint" style="font-size:11px;color:#6a6a72;margin-top:6px;line-height:1.4;">Mindestangaben genügen für eine erste Indikation. Jede zusätzliche Angabe erhöht die Konfidenz.</div>
+      </div>
+      <div id="loadSignal" class="hide" style="margin-top:12px;padding:11px 13px;border-radius:10px;border:1px solid rgba(201,168,76,.5);background:rgba(201,168,76,.08);font-size:12.5px;color:#e7e2d4;line-height:1.45;"></div>
+      <label for="fastMode" style="display:flex;align-items:center;gap:8px;margin:4px 0 10px;font-size:12.5px;color:#b8b8c0;cursor:pointer;user-select:none;">
+        <input type="checkbox" id="fastMode" style="width:15px;height:15px;accent-color:#C9A84C;cursor:pointer;">
+        ⚡ Schnell-Modus — nur Marktwert &amp; Miete (inkl. Spanne), ohne KI-Text &amp; Historie
+      </label>
+      <button class="go" id="goBtn">Marktbericht erstellen</button>
+      <button id="replayBtn" style="display:none!important;width:100%;margin-top:8px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:9px;font-size:12.5px;cursor:pointer;">↺ Letzten Bericht laden (gratis, Demo)</button>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        <button id="loadLastBtn" type="button" style="display:none;flex:1 1 30%;min-width:104px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11px;cursor:pointer;">⟳ Letzte&nbsp;Ausgabe</button>
+        <button id="saveFileBtn" type="button" style="flex:1 1 30%;min-width:104px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11px;cursor:pointer;">⤓ Als&nbsp;Datei</button>
+        <button id="loadFileBtn" type="button" style="flex:1 1 30%;min-width:104px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11px;cursor:pointer;">⤒ Datei&nbsp;laden</button>
+        <button id="shareBtn" type="button" data-v565-no-share style="display:none;flex:1 1 100%;background:transparent;border:1px solid #C9A84C;color:#C9A84C;border-radius:999px;padding:9px;font-size:12px;cursor:pointer;margin-top:2px;">🔗 Teilbares Angebot (Link) kopieren</button>
+        <input type="file" id="loadFileInput" accept="application/json,.json" style="display:none;">
+      </div>
+      <div class="err hide" id="errBox"></div>
+      <div class="hide" id="genProgress" style="margin-top:10px;padding:10px 12px;background:#0f0f13;border:1px solid #26262c;border-radius:10px;"></div>
+      <div class="chips" id="srcChips"></div>
+      <div id="costNote" style="display:none;"></div><!-- v565-no-share -->
+    </div>
+
+    <!-- Ergebnis -->
+    <div>
+      <div class="panel" id="resultPanel">
+        <h1>Ergebnis</h1>
+        <p class="muted" id="placeholder">Noch kein Bericht. Objekt eingeben und „Marktbericht erstellen“ klicken.</p>
+
+        <div id="resultBody" class="hide"><!-- v565-no-mbcard -->
+          <!-- v565-no-mbcard: Mini-Marktbewertung-Karte entfernt -->
+          <div id="objSummary" class="hide"></div>
+          <img id="objImage" class="hide" alt="" aria-hidden="true" style="display:none!important" /><!-- v570-mbfix: Objektkarte hart aus -->
+          <div class="scorebox">
+            <div class="score-circle" id="scoreCircle"><span id="scoreNum">–</span></div>
+            <div>
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:18px;" id="scoreRating">–</div>
+              <div class="muted" id="scoreSub">Deal-Score</div>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi"><div class="v" id="kMv">–</div><div class="l">Marktwert</div></div>
+            <div class="kpi"><div class="v" id="kYield">–</div><div class="l">Bruttorendite</div></div>
+            <div class="kpi"><div class="v" id="kFactor">–</div><div class="l">Kaufpreisfaktor</div></div>
+            <div class="kpi"><div class="v" id="kSqm">–</div><div class="l">Kaufpreis €/m²</div></div>
+            <div class="kpi"><div class="v" id="kMrent">–</div><div class="l">Marktmiete €/m²</div></div>
+            <div class="kpi"><div class="v" id="kDisc">–</div><div class="l">Abw. z. Marktwert</div></div>
+          </div>
+
+          <div class="valbox hide" id="valBox">
+            <div class="valcard" id="vwCard"></div>
+            <div class="valcard" id="mmCard"></div>
+          </div>
+
+          <div id="map"></div>
+
+          <h1 class="hide" id="assessTitle">Lage- &amp; Potenzialbewertung</h1>
+          <div class="assess-grid hide" id="assessGrid"></div>
+
+          <h1 class="hide" id="histTitle">Marktentwicklung (echte Historie)</h1>
+          <canvas id="histChart" height="150" class="hide"></canvas>
+          <div class="muted hide" id="histNote" style="margin:6px 0 16px;"></div>
+
+          <h1 class="hide" id="microTitle">Lage &amp; Infrastruktur</h1>
+          <div id="microGrid" class="hide" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;"></div>
+
+          <h1 class="hide" id="objHistTitle">Marktwert-Verlauf dieses Objekts</h1>
+          <canvas id="objHistChart" height="140" class="hide"></canvas>
+          <div class="muted hide" id="objHistNote" style="margin:6px 0 16px;"></div>
+
+          <div id="dsMeta" class="hide" style="margin-bottom:16px;"></div>
+
+          <h1>Deal-Score-Komponenten</h1>
+          <div class="bars" id="scoreBars"></div>
+
+          <h1>Vergleichspreise (€/m²)</h1>
+          <canvas id="chart" height="160"></canvas>
+        </div>
+      </div>
+
+      <div class="panel hide" id="reportPanel" style="margin-top:20px;">
+        <h1>Bericht <span class="muted" id="aiMode"></span></h1>
+        <div class="report" id="reportMd"></div>
+
+        <h1 style="margin-top:26px;">Datengrundlage &amp; Verlässlichkeit</h1>
+        <div class="legend">
+          <span><i style="background:#4caf7d"></i>echt (API)</span>
+          <span><i style="background:#C9A84C"></i>berechnet</span>
+          <span><i style="background:#7ab0ff"></i>Eingabe</span>
+          <span><i style="background:#d9a441"></i>simuliert</span>
+          <span><i style="background:#8a8a93"></i>keine Daten</span>
+        </div>
+        <div class="prov" id="provList"></div>
+
+        <button class="pdf" id="pdfBtn">Als PDF exportieren</button>
+      </div>
+    </div>
+  </div>
+  </div><!-- /#view-report -->
+
+  <div id="view-finder" class="hide">
+    <div class="panel" style="max-width:840px;">
+      <h1>Standort-Finder</h1>
+      <p class="muted" style="margin-top:-8px;">Gib deine Investment-Absicht an — wir ranken passende Standorte. Basis: kostenlose Signale (Hochschulen/POI via Geoapify, Bevölkerungstrend via Destatis).</p>
+      <label>Investment-Absicht</label>
+      <select id="lfIntent"></select>
+      <div id="lfIntentDesc" class="muted" style="font-size:12px;margin-top:6px;line-height:1.4;"></div>
+      <div style="margin-top:14px;"><label>Suchraum</label>
+        <select id="lfRegion"></select></div>
+      <button class="go" id="lfBtn" style="margin-top:16px;">Standorte finden</button>
+      <div class="err hide" id="lfErr" style="margin-top:10px;"></div>
+      <div id="lfProgress" class="hide" style="margin-top:10px;padding:10px 12px;background:#0f0f13;border:1px solid #26262c;border-radius:10px;font-size:12.5px;color:#9a9aa3;"></div>
+    </div>
+    <div id="lfResults" style="margin-top:20px;display:grid;gap:14px;"></div>
+  </div>
+</div>
+
+<script src="vendor/leaflet.js"></script>
+<script src="vendor/chart.umd.min.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="vendor/jspdf.plugin.autotable.min.js"></script>
+<script src="marktbewertung-card.js?v=49k"></script>
+<script src="app.js?v=49k"></script>
+<script src="mb-objektwahl.js?v=568"></script><!-- v566-objektwahl -->
+<script>
+/* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
+(function () {
+  var c = document.getElementById('mb-particles'); if (!c || !c.getContext) return;
+  var ctx = c.getContext('2d'), w = 0, h = 0, parts = [], raf = 0, running = true;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2), N = 46;
+  function size() { w = c.width = innerWidth * dpr; h = c.height = innerHeight * dpr; c.style.width = innerWidth + 'px'; c.style.height = innerHeight + 'px'; }
+  function init() { parts = []; for (var i = 0; i < N; i++) parts.push({ x: Math.random() * w, y: Math.random() * h, r: (Math.random() * 1.5 + 0.5) * dpr, vx: (Math.random() - 0.5) * 0.14 * dpr, vy: (Math.random() - 0.5) * 0.14 * dpr, a: Math.random() * 0.5 + 0.14 }); }
+  function paintOnce() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < parts.length; i++) { var p = parts[i]; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fillStyle = 'rgba(201,168,76,' + p.a + ')'; ctx.fill(); } }
+  function tick() { for (var i = 0; i < parts.length; i++) { var p = parts[i]; p.x += p.vx; p.y += p.vy; if (p.x < 0) p.x = w; else if (p.x > w) p.x = 0; if (p.y < 0) p.y = h; else if (p.y > h) p.y = 0; } paintOnce(); if (running) raf = requestAnimationFrame(tick); }
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  size(); init();
+  if (reduce) { paintOnce(); window.addEventListener('resize', function () { size(); init(); paintOnce(); }); return; }
+  raf = requestAnimationFrame(tick);
+  window.addEventListener('resize', function () { size(); init(); });
+  document.addEventListener('visibilitychange', function () { running = !document.hidden; if (running) raf = requestAnimationFrame(tick); else cancelAnimationFrame(raf); });
+})();
+</script>
+</body>
+</html>

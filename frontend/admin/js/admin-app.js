@@ -124,6 +124,52 @@
     if (view === 'dashboard') loadDashboard();
     if (view === 'users') loadUsers();
     if (view === 'audit') loadAudit();
+    if (view === 'credits') loadCredits();
+  }
+
+  // ── v554: Guthaben & Kosten ────────────────
+  async function loadCredits() {
+    function eur(v) { return (v == null) ? '–' : Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+    try {
+      const c = await API.credits();
+      const balEl = document.getElementById('cred-geomap-balance');
+      const noteEl = document.getElementById('cred-geomap-note');
+      const cardEl = document.getElementById('cred-geomap-card');
+      const bal = c.geomap && c.geomap.balance_eur;
+      const thr = (c.geomap && c.geomap.threshold_eur) || 10;
+      if (balEl) balEl.textContent = eur(bal);
+      if (cardEl) {
+        cardEl.style.borderLeft = '4px solid ' +
+          (bal == null ? '#666' : bal <= 0 ? '#dc2626' : bal < thr ? '#f59e0b' : '#10b981');
+      }
+      if (noteEl) noteEl.textContent = (bal != null && bal < thr) ? ('⚠ unter Schwelle ' + eur(thr)) : '';
+      const gsp = document.getElementById('cred-geomap-spent');
+      if (gsp) gsp.textContent = eur(c.geomap && c.geomap.spent_tracked_eur);
+      const osp = document.getElementById('cred-openai-spent');
+      if (osp) osp.textContent = eur(c.openai && c.openai.spent_tracked_eur);
+    } catch (e) {
+      const balEl = document.getElementById('cred-geomap-balance');
+      if (balEl) balEl.textContent = 'Fehler';
+    }
+    try {
+      const m = await API.marktberichtCosts();
+      const labels = { qc: 'QuickCheck (2 L)', objekt: 'Objekt-Tab (2 L)', voll: 'Vollbericht (5 L)' };
+      const bk = document.getElementById('mbcost-bykind');
+      if (bk) bk.innerHTML = (m.by_kind && m.by_kind.length)
+        ? m.by_kind.map(function (r) { return '<tr><td>' + (labels[r.kind] || r.kind) + '</td><td>' + r.n + '</td><td>' + r.liters + '</td><td>' + eur(r.geomap_eur) + '</td><td>' + eur(r.openai_eur) + '</td></tr>'; }).join('')
+        : '<tr><td colspan="5" style="color:var(--text-muted)">Noch keine Abrufe</td></tr>';
+      const rc = document.getElementById('mbcost-recent');
+      if (rc) rc.innerHTML = (m.recent && m.recent.length)
+        ? m.recent.map(function (r) {
+            var d = new Date(r.ts);
+            var ds = d.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+            return '<tr><td>' + ds + '</td><td>' + (labels[r.kind] || r.kind) + '</td><td>' + r.liters + '</td><td>' + eur(r.geomap_eur) + '</td><td>' + eur(r.geomap_balance_eur) + '</td><td>' + (r.ok ? '✓' : '✗') + '</td></tr>';
+          }).join('')
+        : '<tr><td colspan="6" style="color:var(--text-muted)">Noch keine Abrufe</td></tr>';
+    } catch (e) {
+      const bk = document.getElementById('mbcost-bykind');
+      if (bk) bk.innerHTML = '<tr><td colspan="5">Fehler beim Laden</td></tr>';
+    }
   }
 
   // ── Dashboard ───────────────────────────────────────────

@@ -46,6 +46,7 @@
         <a href="#" data-view="dashboard" class="nav-link active">Dashboard</a>
         <a href="#" data-view="users" class="nav-link">User</a>
         <a href="#" data-view="audit" class="nav-link">Audit-Log</a>
+        <a href="#" data-view="credits" class="nav-link">Guthaben &amp; Kosten</a>
       </nav>
     </div>
     <div class="topbar-right">
@@ -198,6 +199,39 @@
         <tbody id="audit-list"><tr><td colspan="6">Lädt…</td></tr></tbody>
       </table>
     </section>
+      <section id="view-credits" class="view" style="display:none;">
+      <div class="view-header"><h2>Guthaben &amp; Kosten</h2></div>
+      <div class="kpi-grid">
+        <div class="kpi-card" id="cred-geomap-card">
+          <div class="kpi-label">GeoMap-Guthaben</div>
+          <div class="kpi-value" id="cred-geomap-balance">–</div>
+          <div class="kpi-sub" id="cred-geomap-note" style="font-size:0.7em;"></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">GeoMap verbraucht (getrackt)</div>
+          <div class="kpi-value" id="cred-geomap-spent">–</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">OpenAI verbraucht (getrackt)</div>
+          <div class="kpi-value" id="cred-openai-spent">–</div>
+          <div class="kpi-sub" style="font-size:0.7em;font-style:italic;">Kein Live-Guthaben-API</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Marktbericht-Kosten pro Typ (gesamt)</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Abrufe</th><th>Liter</th><th>GeoMap €</th><th>OpenAI €</th></tr></thead>
+          <tbody id="mbcost-bykind"><tr><td colspan="5">Lädt…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Letzte 20 Abrufe</h3>
+        <table class="data-table">
+          <thead><tr><th>Zeit</th><th>Typ</th><th>Liter</th><th>GeoMap €</th><th>Restguthaben €</th><th>OK</th></tr></thead>
+          <tbody id="mbcost-recent"><tr><td colspan="6">Lädt…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -252,9 +286,9 @@
 
 <div id="toast-container" class="toast-container"></div>
 
-<script src="js/admin-api.js?v=197"></script>
+<script src="js/admin-api.js?v=554"></script>
 <script src="js/admin-auth.js?v=197"></script>
 <script src="js/admin-charts.js?v=197"></script>
-<script src="js/admin-app.js?v=197"></script>
+<script src="js/admin-app.js?v=554"></script>
 </body>
 </html>
