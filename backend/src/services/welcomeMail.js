@@ -1,3 +1,4 @@
+// v565-mail-kerosin
 'use strict';
 /**
  * V198: Welcome-Mails nach Stripe-Checkout
@@ -175,9 +176,9 @@ async function sendCreditPackConfirmation(db, { userId, packLabel, creditsGrante
       from: getMailFrom(),
       replyTo: process.env.MAIL_REPLY_TO || undefined,
       to: user.email,
-      subject: `Deine ${creditsGranted} KI-Credits sind aufgeladen`,
+      subject: `Deine ${creditsGranted} Liter Kerosin sind im Tank`,
       html,
-      text: `Deine ${creditsGranted} KI-Credits (${requestsGranted} Anfragen) wurden gutgeschrieben. App: ${appUrl}`
+      text: `Deine ${creditsGranted} Liter Kerosin wurden deinem Tank gutgeschrieben. App: ${appUrl}`
     });
     await logSent(db, userId, 'credit_pack_confirmation', sessionId, result.messageId);
     console.log('[welcome-mail] ✓ Credit-Pack-Confirmation an', user.email);

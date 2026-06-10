@@ -65,7 +65,7 @@
       P + '.qc7-sources{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}',
       P + ".qc7-src{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid rgba(42,39,39,0.16);border-radius:11px;background:#fff;cursor:pointer;font:600 13px/1 'DM Sans',system-ui,sans-serif;color:var(--ch,#2A2727);transition:border-color .15s ease,background .15s ease,box-shadow .15s ease,transform .12s ease;user-select:none}",
       P + '.qc7-src:hover{border-color:rgba(201,168,76,0.6);box-shadow:0 4px 12px -6px rgba(201,168,76,0.45);transform:translateY(-1px)}',
-      P + '.qc7-src[data-src="import"]{border-color:rgba(201,168,76,0.5);box-shadow:0 2px 10px -5px rgba(201,168,76,0.45)}',
+      P + '.dp-pf-tile[data-src="import"]{border-color:rgba(201,168,76,0.5);box-shadow:0 2px 10px -5px rgba(201,168,76,0.45)}',
       P + '.qc7-src input{display:none}',
       P + '.qc7-src .qc7-box{width:18px;height:18px;flex-shrink:0;border:2px solid rgba(42,39,39,0.26);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;transition:background .15s ease,border-color .15s ease}',
       P + '.qc7-src .qc7-box svg{width:12px;height:12px;opacity:0;transition:opacity .12s ease}',
@@ -191,22 +191,55 @@
   function render() {
     var mount = $(MOUNT_ID); if (!mount) return;
     var avmOff = !(_avmHealth && _avmHealth.available);
+    var _doc = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>';
+    var _mic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>';
+    var _plane = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>';
+    // PRE-FLIGHT-Kachel mit verstecktem Checkbox-Input (Logik unveraendert) + LED an .on
+    function pfTileLogo(value, inner, disabled, title) {
+      return '<label class="dp-pf-tile' + (disabled ? ' dp-pf-disabled' : '') + '" data-src="' + value + '"' + (title ? ' title="' + title + '"' : '') + '>' +
+        '<input type="checkbox" value="' + value + '"' + (disabled ? ' disabled' : '') + ' style="display:none">' +
+        inner + '<span class="dp-pf-led"></span></label>';
+    }
+    function pfTileTool(value, icoSvg, label, title) {
+      return '<label class="dp-pf-tile tool" data-src="' + value + '"' + (title ? ' title="' + title + '"' : '') + '>' +
+        '<input type="checkbox" value="' + value + '" style="display:none">' +
+        '<span class="dp-pf-ic">' + icoSvg + '</span><span class="dp-pf-lbl">' + label + '</span>' +
+        '<span class="dp-pf-led"></span></label>';
+    }
+    var _phInner = '<span class="dp-pf-logo"><img src="img/pricehubble.jpg" alt="PriceHubble"></span>';
+    var _snInner = '<span class="dp-pf-logo"><img src="img/sprengnetter.jpg" alt="Sprengnetter"></span>';
+    var _dpInner = '<span class="dp-pf-logo dp">Deal<b>Pilot</b></span>';
     mount.innerHTML =
-      '<div class="actions" id="oab-bar">' +
-        '<span class="actions-label">Aktionen</span>' +
-        '<span class="qc7-sources">' +
-          srcLabel('import', 'doc', 'Exposé/Marktbericht', false) +
-          srcLabelImg('pricehubble', 'img/pricehubble.jpg', 'PriceHubble', avmOff) +
-          srcLabelImg('sprengnetter', 'img/sprengnetter.jpg', 'Sprengnetter', avmOff) +
-          (window.VoiceImport ? window.VoiceImport.srcLabel() : '') +  /* v503-voice-label */
-        '</span>' +
-        '<button type="button" class="qc6-run oab-act" id="oab-run"><span class="qc7-ic">' + svg('analyze', 15, '#9a7f33') + '</span> Abrufen</button>' +
-      '</div>' +
+      '<div class="dp-pf-scroll"><div class="dp-pfbar" id="oab-bar">' +
+        '<span class="dp-pf-stripe"></span>' +
+        '<div class="dp-pf-lead"><span class="k">PRE-FLIGHT</span><span class="s">DealPilot \u00b7 Boarding</span></div>' + /* v572-leadtext */
+        '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">' +
+          pfTileLogo('pricehubble', _phInner, avmOff, avmOff ? 'AVM derzeit deaktiviert' : 'PriceHubble') +
+          pfTileLogo('sprengnetter', _snInner, avmOff, avmOff ? 'AVM derzeit deaktiviert' : 'Sprengnetter') +
+          pfTileLogo('dealpilot', _dpInner, false, 'Marktpreisbewertung') +
+        '</div></div>' +
+        '<div class="dp-pf-sep"></div>' +
+        '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">' +
+          pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
+          (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprachaufzeichnung', 'Objekt frei einsprechen \u2014 1 L Kerosin') : '') +
+        '</div></div>' +
+        '<button type="button" class="dp-pf-launch oab-act" id="oab-run"><span class="dp-pf-ic">' + _plane + '</span> Abrufen</button>' +
+      '</div></div>' +
       '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
-      (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">AVM (PriceHubble/Sprengnetter) ist derzeit deaktiviert — Import funktioniert.</div>' : '') +
+      (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">AVM (PriceHubble/Sprengnetter) ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
       '<div class="oab-prog" id="oab-prog" style="display:none"></div>' +
       '<div class="oab-results" id="oab-results"></div>';
-    mount.querySelectorAll('.qc7-src input').forEach(function (cb) { cb.addEventListener('change', function () { var l = cb.closest('.qc7-src'); if (l) l.classList.toggle('on', cb.checked); updateCreditHint(); }); });
+    // v570-pf: initial .on synchronisieren (DealPilot default aktiv) + LED-Kopplung sicherstellen
+    try {
+      mount.querySelectorAll('.dp-pf-tile').forEach(function (t) {
+        var cb = t.querySelector('input[type=checkbox]');
+        if (!cb) return;
+        if (t.getAttribute('data-src') === 'dealpilot' && !cb.disabled) { cb.checked = true; }
+        t.classList.toggle('on', cb.checked);
+        if (!cb._v570bound) { cb._v570bound = 1; cb.addEventListener('change', function () { t.classList.toggle('on', cb.checked); try { updateCreditHint(); } catch (e) {} }); }
+      });
+    } catch (e) {}
+    /* v570-pf: alter qc7-src-Listener ersetzt durch dp-pf-tile-Bind im Render */
     $('oab-run').addEventListener('click', runSelected);
     renderResults(); updateCreditHint();
   }
@@ -231,13 +264,13 @@
     el.innerHTML = '<span class="oab-credit-dot"></span>' + txt;
     el.style.display = '';
   }
-  function selectedSources() { var out = [], m = $(MOUNT_ID); if (!m) return out; m.querySelectorAll('.qc7-src input:checked').forEach(function (c) { out.push(c.value); }); return out; }
+  function selectedSources() { var out = [], m = $(MOUNT_ID); if (!m) return out; m.querySelectorAll('.dp-pf-tile input:checked').forEach(function (c) { out.push(c.value); }); return out; }
   function setProg(t) { var p = $('oab-prog'); if (p) { p.style.display = t ? '' : 'none'; p.textContent = t || ''; } }
 
   async function runSelected() {
     var srcs = selectedSources();
     if (!srcs.length) { toast('Bitte mindestens eine Quelle auswählen'); return; }
-    var order = ['voice', 'import', 'pricehubble', 'sprengnetter'];  /* v503-voice-first */
+    var order = ['voice', 'import', 'pricehubble', 'sprengnetter', 'dealpilot'];  /* v503-voice-first */
     var ordered = order.filter(function (s) { return srcs.indexOf(s) !== -1; });
     var btn = $('oab-run'); if (btn) btn.disabled = true;
     for (var i = 0; i < ordered.length; i++) {
@@ -246,6 +279,7 @@
         if (s === 'voice') { setProg('Sprachaufzeichnung …'); await new Promise(function (res) { if (window.VoiceImport) { window.VoiceImport.open(res); } else { res(); } }); }  /* v503-voice-run */
         else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); }
         else if (s === 'pricehubble' || s === 'sprengnetter') { setProg((s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' …'); await avmFetch(s); }
+        else if (s === 'dealpilot') { setProg('DealPilot-Marktbewertung …'); try { if (window.DealPilotMB) await window.DealPilotMB.run(); } catch (e) {} }
       } catch (e) { try { console.warn('[obj-actions] step', s, e); } catch (_) {} }
     }
     setProg(''); if (btn) btn.disabled = false;
@@ -342,7 +376,7 @@
     var m = $(MOUNT_ID); if (!m) return;
     var off = !(_avmHealth && _avmHealth.available);
     ['pricehubble', 'sprengnetter'].forEach(function (p) {
-      var lab = m.querySelector('.qc7-src[data-src="' + p + '"]'); if (!lab) return;
+      var lab = m.querySelector('.dp-pf-tile[data-src="' + p + '"]'); if (!lab) return;
       var cb = lab.querySelector('input'); if (cb) cb.disabled = off;
       if (off) lab.setAttribute('title', 'AVM derzeit deaktiviert'); else lab.removeAttribute('title');
       lab.style.opacity = off ? '0.55' : '';
@@ -406,10 +440,16 @@
     if (r.fairpriceLabel) mwSub.push('Sprengnetter-Preislabel: ' + escH(r.fairpriceLabel));  /* v388 */
     return '<div class="avmx' + (isSpr ? ' is-spr' : '') + (coll ? ' collapsed' : '') + '">' +
       '<div class="avmx-head">' +
-        '<span class="avmx-eye">Marktbewertung ·</span>' + _provHtml +
-        '<span class="avmx-conf">' + escH(r.conf || 'AVM') + (r.mode === 'stub' ? ' · DEMO (fiktive Werte)' : '') /* v445-demo-hint */ + '</span>' +
+        '<span class="avmx-hlogo">' + _provHtml + '</span>' +
+        '<span class="avmx-eye">Marktbewertung</span>' +
+        '<span class="avmx-hdiv"></span>' +
+        '<span class="avmx-hvals">' +
+          '<span class="avmx-hv"><span class="hl">Marktwert</span><span class="hb">' + fmt0(mw) + ' €</span>' + (mwSqm ? '<span class="hs">· ' + fmt0(mwSqm) + ' €/m²</span>' : '') + '</span>' +
+          (mm ? '<span class="avmx-hv"><span class="hl">Miete</span><span class="hb">' + fmt0(mm) + ' €</span></span>' : '') +
+        '</span>' +
+        '<span class="avmx-htier">' + escH(r.conf || 'AVM') + (r.mode === 'stub' ? ' · DEMO (fiktive Werte)' : '') + '</span>' +
         '<button type="button" class="avmx-min" data-min="' + escH(r.provider) + '" title="' + (coll ? 'Aufklappen' : 'Minimieren') + '">' + svg('chevron', 16) + '</button>' +
-      '</div>' +
+      '</div>' + /* v576-avmxhead */
       '<div class="avmx-body">' + chip +
         '<div class="avmx-cols">' +
           '<div class="avmx-col">' +
@@ -1086,3 +1126,5 @@
       apply: applyMerged
     } };
 })();
+
+/* v570-pf: PRE-FLIGHT Aktionsleiste (Markup), Logik/IDs/data-src/.on unveraendert */

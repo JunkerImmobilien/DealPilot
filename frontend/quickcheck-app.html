@@ -74,10 +74,10 @@ body::before {
   opacity: 0.55;
 }
 
-.container {
-  max-width: 1180px;
+.container { /* v574-qcwidth: Breite + Padding wie Objekt-Tab (.body 1320px) */
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 1.5rem 1.2rem 4rem;
+  padding: 20px 22px 80px;
   position: relative;
   z-index: 2;
 }
@@ -2888,6 +2888,238 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 #score-block #particle-canvas { display:none !important; }
 .qc-bgfx, .qc-bgfx .qc-orb, .qc-orb { display:none !important; }
 </style>
+  <style id="dpmb-modal-white">
+    /* v552: Modale weiss, Creme nur als Akzent (Kopf-Icon/Rahmen/Gold-Button bleiben) */
+    .modal { background: #fff !important; }
+    .modal .modal-body { background: #fff !important; }
+    .modal .transfer-item { background: #fff !important; border: 1px solid var(--border) !important; }
+    .modal .transfer-item:hover { background: var(--gold-bg) !important; }
+    .modal-close:hover { background: var(--gold-bg) !important; }
+    .modal .transfer-toggle-all { background: #fff !important; }
+  
+/* v570-qccss === PRE-FLIGHT Aktionsleiste (QuickCheck) === */
+/* ===== v570 · PRE-FLIGHT Aktionsleiste (Gold-Runway, LED 11px) ===== */
+.dp-pf-scroll{overflow-x:auto;padding-bottom:4px}
+.dp-pfbar{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#bd9a3e);border-radius:16px;
+  padding:11px 16px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;
+  box-shadow:0 18px 44px -24px rgba(150,110,0,.7);margin:0 0 14px}
+.dp-pfbar .dp-pf-stripe{position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.12) 0 2px,transparent 2px 64px)}
+.dp-pfbar>*{position:relative}
+.dp-pf-lead .k{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#050505;font-weight:700;display:block}
+.dp-pf-lead .s{font-size:9.5px;color:#4a3c10;display:block}
+.dp-pf-seg{display:flex;flex-direction:column;gap:5px}
+.dp-pf-grouplbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.6px;
+  font-weight:600;text-transform:uppercase;color:#4a3c10}
+.dp-pf-row{display:flex;gap:8px}
+.dp-pf-sep{width:1px;align-self:stretch;background:rgba(5,5,5,.22);margin:0 4px}
+.dp-pf-tile{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(0,0,0,.12);
+  border-radius:9px;padding:7px 11px;cursor:pointer;transition:.18s;position:relative;user-select:none}
+.dp-pf-tile.tool{background:rgba(8,7,4,.86);color:#e9e3d2}
+.dp-pf-tile.tool .dp-pf-ic{color:#bdb398}
+.dp-pf-tile .dp-pf-lbl{font-size:13px;font-weight:500}
+.dp-pf-tile:hover{transform:translateY(-1px)}
+.dp-pf-tile.dp-pf-disabled{opacity:.45;cursor:not-allowed}
+.dp-pf-tile.dp-pf-disabled:hover{transform:none}
+.dp-pf-ic{width:17px;height:17px;display:block}
+.dp-pf-ic svg{width:17px;height:17px;display:block;stroke:currentColor}
+.dp-pf-logo{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:12.5px;white-space:nowrap;letter-spacing:-.2px;display:inline-flex;align-items:center}
+.dp-pf-logo img{height:16px;width:auto;max-width:120px;object-fit:contain;display:block;mix-blend-mode:multiply}
+.dp-pf-logo.dp{background:#050505;color:#fff;border-radius:6px;padding:3px 8px;font-weight:700}
+.dp-pf-logo.dp b{color:#E8CC7A}
+/* LED 11px (Groesse S) — gekoppelt an .on (bestehender State!) */
+.dp-pf-led{width:11px;height:11px;border-radius:50%;flex:none;background:#cfc3a0;
+  border:1px solid rgba(5,5,5,.25);transition:.22s}
+.dp-pf-tile.on .dp-pf-led{
+  background:radial-gradient(circle at 35% 30%, #5BD98E, #3FA56C 70%);
+  border-color:rgba(5,5,5,.4);
+  box-shadow:0 0 0 2px rgba(5,5,5,.18), 0 0 10px 1px rgba(63,165,108,.9), inset 0 0 3px rgba(255,255,255,.6);
+  animation:dpPfPulse 1.8s ease-in-out infinite}
+@keyframes dpPfPulse{
+  0%,100%{box-shadow:0 0 0 2px rgba(5,5,5,.18),0 0 9px 1px rgba(63,165,108,.85),inset 0 0 3px rgba(255,255,255,.6)}
+  50%{box-shadow:0 0 0 2px rgba(5,5,5,.18),0 0 15px 3px rgba(63,165,108,1),inset 0 0 3px rgba(255,255,255,.7)}}
+.dp-pf-launch{display:flex;align-items:center;gap:8px;margin-left:auto;background:#050505;color:#E8CC7A;
+  font-weight:700;border:none;border-radius:11px;padding:11px 18px;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-size:14px;transition:.18s;white-space:nowrap}
+.dp-pf-launch:hover{filter:brightness(1.15)}
+.dp-pf-launch:disabled{opacity:.6;cursor:default}
+.dp-pf-launch .dp-pf-ic,.dp-pf-launch .dp-pf-ic svg{width:16px;height:16px;color:#E8CC7A;stroke:#E8CC7A}
+/* v570 · QC: alte qc7-src-Optik neutralisieren wo dp-pf-tile aktiv (Container = dp-pfbar) */
+#qc7-sources.dp-pfbar{display:flex !important;flex-wrap:nowrap}
+#qc7-sources .qc7-src.dp-pf-tile{border-radius:9px;font:inherit}
+#qc7-sources .qc7-src.dp-pf-tile .qc7-box,#qc7-sources .qc7-src.dp-pf-tile .qc7-check{display:none !important}
+#qc7-sources .qc7-src.dp-pf-tile.on{background:#fff;box-shadow:none}
+#qc7-sources .qc7-src.dp-pf-tile.tool.on{background:rgba(8,7,4,.86)}
+#qc7-sources .qc7-src.dp-pf-tile:hover{border-color:rgba(0,0,0,.12)}
+
+
+/* v571-pflayout-qc === PRE-FLIGHT Layout (QC) === */
+/* ===== v571 · PRE-FLIGHT Layout-Feinschliff ===== */
+/* mehr Luft + Trenner-Rhythmus: PRE-FLIGHT | Marktbewertung | Daten einlesen */
+.dp-pfbar{gap:18px;align-items:stretch;padding:14px 18px}
+.dp-pf-lead{display:flex;flex-direction:column;justify-content:center}
+/* Trenner nach PRE-FLIGHT-Lead ergaenzen (CSS-Pseudo statt Markup) */
+.dp-pf-lead::after{content:"";display:block;position:absolute;top:14px;bottom:14px;width:1px;
+  background:rgba(5,5,5,.22);right:-9px}
+.dp-pf-lead{position:relative;padding-right:9px}
+.dp-pf-seg{justify-content:center;gap:7px}
+.dp-pf-grouplbl{margin-bottom:1px}
+.dp-pf-sep{margin:0 5px}
+/* Kacheln vereinheitlichen: gleiche Mindesthoehe, Logo links, LED konsequent rechts */
+.dp-pf-row{align-items:stretch}
+.dp-pf-tile{min-height:40px;justify-content:space-between;min-width:150px}
+.dp-pf-tile.tool{min-width:200px}
+.dp-pf-logo{flex:1;justify-content:flex-start}
+.dp-pf-logo img{height:17px;max-width:130px}
+.dp-pf-tile .dp-pf-lbl{flex:1}
+.dp-pf-led{margin-left:8px}
+/* Abrufen: an die Kachelreihe ausrichten (unten buendig statt vertikal zentriert) */
+.dp-pf-launch{align-self:flex-end;margin-bottom:0}
+
+
+/* v572-lead-qc === PRE-FLIGHT Lead schwarz (QC) === */
+/* ===== v572 · PRE-FLIGHT Lead schwarz (Bild 1) + groessere Logos ===== */
+/* Lead als schwarzer Block, wie das DealPilot-Boarding-Pill */
+.dp-pf-lead{background:#0a0a0a;border-radius:11px;padding:9px 15px;align-self:stretch;
+  display:flex;flex-direction:column;justify-content:center;margin-right:4px;box-shadow:0 2px 8px -3px rgba(0,0,0,.5)}
+.dp-pf-lead .k{color:#E8CC7A;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2.5px;font-weight:700;display:block}
+.dp-pf-lead .s{color:#c9b886;font-size:10px;display:block;margin-top:2px;letter-spacing:.3px}
+/* v571-Trenner nach Lead entfaellt — schwarzer Block trennt optisch selbst */
+.dp-pf-lead::after{display:none !important}
+.dp-pf-lead{padding-right:15px}
+/* Logos groesser (Sprengnetter/PriceHubble) — Kachelmaße bleiben */
+.dp-pf-logo img{height:24px !important;max-width:150px !important}
+
+
+/* v573-pffix-qc === PRE-FLIGHT Fix (QC) === */
+/* ===== v573 · PRE-FLIGHT Fix: Lead ganz schwarz + Kacheln solide (kein Durchscheinen) ===== */
+/* 1) Logo-Kacheln solide weiss — mix-blend-mode raus (war Ursache fuer "durchsichtig") */
+.dp-pf-tile{background:#ffffff !important}
+.dp-pf-tile.tool{background:#0a0a0a !important;color:#e9e3d2}
+.dp-pf-logo img{mix-blend-mode:normal !important;height:24px !important;max-width:150px !important}
+/* 2) Lead als ganzer schwarzer Block (breiter, mehr Praesenz) */
+.dp-pf-lead{background:#0a0a0a !important;border-radius:12px;padding:11px 20px !important;
+  min-width:150px;align-self:stretch;display:flex;flex-direction:column;justify-content:center;
+  margin-right:6px;box-shadow:0 3px 12px -4px rgba(0,0,0,.6)}
+.dp-pf-lead .k{color:#E8CC7A;font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:2.5px;font-weight:700}
+.dp-pf-lead .s{color:#c9b886;font-size:10.5px;margin-top:3px;letter-spacing:.3px}
+.dp-pf-lead::after{display:none !important}
+
+
+/* v575-qcbtn-css === Lead randlos + Abrufen in Leiste (QC) === */
+/* ===== v575 · Lead randlos schwarz + Abrufen in Leiste ===== */
+/* Lead bis an die Bar-Kante (Bar-Padding 14/18 neutralisieren), links eckig */
+.dp-pf-lead{margin:-14px 14px -14px -18px !important;border-radius:0 14px 14px 0 !important;
+  padding:14px 20px 14px 20px !important;align-self:stretch !important}
+/* Abrufen in der QC-Leiste: dp-pf-launch sitzt rechts, unten buendig */
+#qc7-sources .dp-pf-launch{align-self:center;margin-left:auto}
+
+
+/* v576-qchuelle === PRE-FLIGHT QC = Objekt-Tab === */
+/* ===== v576 · PRE-FLIGHT QC = Objekt-Tab (weisse Huelle neutralisieren, Scroll, Button passt) ===== */
+/* .actions-Huelle um die PRE-FLIGHT-Leiste neutralisieren: kein weisser Kasten/Padding/Border */
+.actions:has(#qc7-sources){background:transparent !important;border:none !important;box-shadow:none !important;
+  padding:0 !important;display:block !important}
+/* "Aktionen"-Label ausblenden (Objekt-Tab hat keins ueber der Leiste) */
+.actions:has(#qc7-sources) .actions-label{display:none !important}
+/* Leiste bekommt Scroll-Verhalten wie dp-pf-scroll im Objekt-Tab */
+#qc7-sources.dp-pfbar{overflow-x:auto;flex-wrap:nowrap;width:100%}
+/* Abrufen-Button passt rein, wird nicht abgeschnitten */
+#qc7-sources .dp-pf-launch{flex:0 0 auto;align-self:stretch;margin-left:auto}
+
+
+/* v577-wrapqc === PRE-FLIGHT umbrechen (QC) === */
+/* ===== v577 · PRE-FLIGHT Leiste umbrechen statt scrollen (Objekt-Tab + QC identisch) ===== */
+/* Scroll-Wrapper neutralisieren: kein horizontales Scrollen mehr */
+.dp-pf-scroll{overflow-x:visible !important;padding-bottom:0 !important}
+/* Bar darf umbrechen */
+.dp-pfbar{flex-wrap:wrap !important;row-gap:12px}
+/* Segmente + Daten-Gruppe wachsen sinnvoll, Trenner bei Umbruch unsichtbar */
+.dp-pf-seg{flex:1 1 auto}
+/* Abrufen bleibt rechts, rutscht bei Umbruch in die zweite Zeile ans Ende */
+.dp-pf-launch{align-self:center !important;margin-left:auto}
+@media(max-width:1100px){.dp-pf-sep{display:none}}
+
+/* ===== v577 · QC: Umbruch statt Scroll (v576-Overrides zuruecknehmen) ===== */
+#qc7-sources.dp-pfbar{overflow-x:visible !important;flex-wrap:wrap !important;width:100%}
+#qc7-sources .dp-pf-launch{flex:0 0 auto;align-self:center;margin-left:auto}
+/* weisse Huelle bleibt neutralisiert (v576) — hier nichts zuruecknehmen */
+
+
+/* v578-oneline-qc === PRE-FLIGHT eine Zeile (QC) === */
+/* ===== v578 · PRE-FLIGHT EINE Zeile, kompakt (konsolidiert, ueberschreibt v570-v577-Konflikte) ===== */
+/* Kein Scroll, kein Umbruch - alles in eine Zeile, kompakt */
+.dp-pf-scroll{overflow-x:visible !important;padding-bottom:0 !important}
+.dp-pfbar{flex-wrap:nowrap !important;gap:7px !important;align-items:stretch !important;
+  padding:12px 14px !important;row-gap:0 !important}
+/* Lead kompakt, volle Hoehe, randlos links */
+.dp-pf-lead{flex:0 0 auto !important;min-width:0 !important;
+  margin:-12px 8px -12px -14px !important;border-radius:0 12px 12px 0 !important;
+  padding:12px 14px !important;align-self:stretch !important}
+.dp-pf-lead .k{font-size:11px !important;letter-spacing:1.5px !important}
+.dp-pf-lead .s{font-size:9px !important;margin-top:2px !important}
+/* Segmente kompakt */
+.dp-pf-seg{flex:0 1 auto !important;gap:4px !important}
+.dp-pf-grouplbl{font-size:9px !important;margin-bottom:2px !important}
+.dp-pf-row{gap:6px !important;flex-wrap:nowrap !important}
+/* Kacheln kompakter: weniger Padding, kleinere Logos, kleinere min-width */
+.dp-pf-tile{min-width:0 !important;min-height:34px !important;gap:6px !important;
+  padding:6px 9px !important;justify-content:space-between !important}
+.dp-pf-tile.tool{min-width:0 !important}
+.dp-pf-logo img{height:18px !important;max-width:96px !important}
+.dp-pf-tile .dp-pf-lbl{font-size:12px !important;white-space:nowrap}
+.dp-pf-logo.dp{font-size:11px !important;padding:2px 6px !important}
+.dp-pf-led{width:9px !important;height:9px !important;margin-left:5px !important}
+.dp-pf-ic{flex:0 0 auto}
+.dp-pf-ic svg{width:14px !important;height:14px !important}
+/* Trenner schmal */
+.dp-pf-sep{margin:0 3px !important}
+/* Abrufen kompakt, in der Zeile rechts */
+.dp-pf-launch{flex:0 0 auto !important;align-self:center !important;margin-left:auto !important;
+  padding:9px 14px !important;font-size:13px !important}
+.dp-pf-launch .dp-pf-ic svg{width:15px !important;height:15px !important}
+
+#qc7-sources.dp-pfbar{flex-wrap:nowrap !important;overflow-x:visible !important;gap:7px !important}
+
+
+/* v579-launch-qc === Abrufen weiss/gold (QC) === */
+/* ===== v579 · Abrufen-Button weiss + goldener Text/Icon, Groesse wie Kacheln (beide Tabs) ===== */
+.dp-pf-launch{background:#ffffff !important;color:#9a7f33 !important;
+  border:1px solid rgba(201,168,76,.55) !important;
+  min-height:34px !important;padding:6px 16px !important;font-size:13px !important;
+  font-weight:700 !important;border-radius:9px !important;
+  box-shadow:0 1px 2px rgba(42,39,39,.06) !important}
+.dp-pf-launch:hover{background:#FBF7EC !important;filter:none !important}
+.dp-pf-launch .dp-pf-ic,.dp-pf-launch .dp-pf-ic svg{color:#9a7f33 !important;stroke:#9a7f33 !important;
+  width:15px !important;height:15px !important}
+
+
+/* v580-launch-qc === Abrufen Flucht/Hoehe + Text schwarz (QC) === */
+/* ===== v580 · Abrufen: QC-Text schwarz + Flucht/Hoehe wie Kacheln (beide Tabs) ===== */
+/* Hoehe exakt wie Kacheln (34px), gleiche vertikale Flucht:
+   Kacheln sitzen unter dem Gruppenlabel -> Launch nach unten ausrichten (flex-end),
+   damit Unterkante buendig mit den Kacheln ist. */
+.dp-pf-launch{align-self:flex-end !important;min-height:34px !important;height:34px !important;
+  padding:0 16px !important;display:inline-flex !important;align-items:center !important}
+/* Objekt-Tab: Text bleibt gold (war ok). QC: Text schwarz erzwingen. */
+#qc7-sources .dp-pf-launch{color:#1a1407 !important}
+#qc7-sources .dp-pf-launch .dp-pf-ic,#qc7-sources .dp-pf-launch .dp-pf-ic svg{color:#9a7f33 !important;stroke:#9a7f33 !important}
+
+
+/* v581-hover-qc === Abrufen-Hover bleibt weiss (QC) === */
+/* ===== v581 · Abrufen-Hover-Fix: bleibt weiss (kein transparent/dunkel), beide Tabs ===== */
+/* Maximale Spezifitaet + alle Hover-Eigenschaften erzwingen */
+.dp-pfbar .dp-pf-launch:hover,
+.dp-pfbar .dp-pf-launch:focus,
+#qc7-sources .dp-pf-launch:hover,
+#qc7-sources .dp-pf-launch:focus{
+  background:#FBF7EC !important;color:#9a7f33 !important;
+  filter:none !important;opacity:1 !important;
+  border-color:rgba(201,168,76,.7) !important}
+/* QC-Text schwarz auch im Hover */
+#qc7-sources .dp-pf-launch:hover{color:#1a1407 !important}
+
+</style>
 </head>
 <body>
 
@@ -2989,35 +3221,36 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     <input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="QcApp.handlePdfFile(event)">
 
     <!-- Multi-Select: Abruf-Quellen frei kombinieren -->
-    <span class="qc7-sources" id="qc7-sources">
-      <label class="qc7-src" data-src="expose">
-        <input type="checkbox" value="expose" onchange="QcApp.toggleSource(this)">
-        <span class="qc7-box"><span class="qc7-check"></span></span>
-        <span class="qc7-ic" id="ico-src-expose"></span> Exposé/Marktbericht <!-- v410-rename-expose -->
-      </label>
-      <label class="qc7-src" data-src="ph">
-        <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)">
-        <span class="qc7-box"><span class="qc7-check"></span></span>
-        <img class="qc7-logo" src="img/pricehubble.jpg" alt="PriceHubble" title="PriceHubble"> <!-- v412-optik-paritaet -->
-      </label>
-      <label class="qc7-src" data-src="spr">
-        <input type="checkbox" value="spr" onchange="QcApp.toggleSource(this)">
-        <span class="qc7-box"><span class="qc7-check"></span></span>
-        <img class="qc7-logo" src="img/sprengnetter.jpg" alt="Sprengnetter" title="Sprengnetter">
-      </label>
-      <label class="qc7-src" data-src="voice" title="Objekt frei einsprechen — 1 L Kerosin"> <!-- v505-voice-src -->
-        <input type="checkbox" value="voice" onchange="QcApp.toggleSource(this)">
-        <span class="qc7-box"><span class="qc7-check"></span></span>
-        <span class="qc7-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></span> Sprachaufzeichnung
-      </label>
+    <span class="qc7-sources dp-pfbar" id="qc7-sources"><!-- v570-qcpf -->
+      <span class="dp-pf-stripe"></span>
+      <div class="dp-pf-lead"><span class="k">PRE-FLIGHT</span><span class="s">DealPilot · Boarding</span></div><!-- v572-leadtext-qc -->
+      <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">
+        <label class="qc7-src dp-pf-tile" data-src="ph" title="PriceHubble">
+          <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)" style="display:none">
+          <span class="dp-pf-logo"><img src="img/pricehubble.jpg" alt="PriceHubble"></span><span class="dp-pf-led"></span>
+        </label>
+        <label class="qc7-src dp-pf-tile" data-src="spr" title="Sprengnetter">
+          <input type="checkbox" value="spr" onchange="QcApp.toggleSource(this)" style="display:none">
+          <span class="dp-pf-logo"><img src="img/sprengnetter.jpg" alt="Sprengnetter"></span><span class="dp-pf-led"></span>
+        </label>
+        <label class="qc7-src dp-pf-tile" data-src="dpmb" title="Marktpreisbewertung">
+          <input type="checkbox" value="dpmb" onchange="QcApp.toggleSource(this)" style="display:none">
+          <span class="dp-pf-logo dp">Deal<b>Pilot</b></span><span class="dp-pf-led"></span>
+        </label>
+      </div></div>
+      <div class="dp-pf-sep"></div>
+      <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">
+        <label class="qc7-src dp-pf-tile tool" data-src="expose">
+          <input type="checkbox" value="expose" onchange="QcApp.toggleSource(this)" style="display:none">
+          <span class="dp-pf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></span><span class="dp-pf-lbl">Exposé / Marktbericht</span><span class="dp-pf-led"></span>
+        </label>
+        <label class="qc7-src dp-pf-tile tool" data-src="voice" title="Objekt frei einsprechen — 1 L Kerosin">
+          <input type="checkbox" value="voice" onchange="QcApp.toggleSource(this)" style="display:none">
+          <span class="dp-pf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></span><span class="dp-pf-lbl">Sprachaufzeichnung</span><span class="dp-pf-led"></span>
+        </label>
+      </div></div>
+      <button class="dp-pf-launch qc6-run" data-provider="combo" onclick="QcApp.openCreditModal()"><!-- v575-qcbtn --><span class="dp-pf-ic"><svg class="dp-pf-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg></span> Abrufen</button>
     </span>
-
-    <!-- v409-actionbar-trim: Spannen-Schnellauswahl entfernt (Spanne bleibt an der Ergebnis-Card) -->
-
-    <!-- Abrufen → prüft Pflichtfelder + öffnet Credit-Modal -->
-    <button class="qc6-run oab-act" data-provider="combo" onclick="QcApp.openCreditModal()">
-      <span class="qc7-ic" id="ico-run"></span> Abrufen
-    </button>
 
   </div>
 
@@ -4329,6 +4562,7 @@ const QcApp = (function() {
     if (_avmResults.length === 0) { host.innerHTML = ''; return; }
     let html = '';
     _avmResults.forEach((r) => {
+      if (r.provider === 'DealPilot') return; // dpmb-skip: eigene Karte rendert separat
       html += _renderUnifiedCard(r, QcEngine.getInputs());
     });
     host.innerHTML = html;
@@ -5038,6 +5272,7 @@ function renderTransferList() {
     if (sel.indexOf('voice') !== -1) parts.push('<b>1\u00a0L</b> Sprachauswertung');
     if (sel.indexOf('ph')  !== -1) parts.push('<b>40\u00a0L</b> PriceHubble');
     if (sel.indexOf('spr') !== -1) parts.push('<b>20\u00a0L</b> Sprengnetter');
+    if (sel.indexOf('dpmb') !== -1) parts.push('<b>2\u00a0L</b> DealPilot');
     if (!parts.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var n = parts.length;
     var txt = 'Beim <b>Abrufen</b> ' + (n > 1 ? 'werden ' : 'wird ') + parts.join(' + ') + ' Kerosin verbraucht.';
@@ -5149,7 +5384,7 @@ function renderTransferList() {
   async function _runSelected(sources) {
     if (!sources || !sources.length) return;
     // Reihenfolge erzwingen: expose, ph, spr, ki
-    var order = ['voice','expose','ph','spr','ki'];  /* v505-voice-first */
+    var order = ['voice','expose','ph','spr','dpmb', 'ki'];  /* v505-voice-first */
     var ordered = order.filter(function(s){ return sources.indexOf(s) !== -1; });
     var labels = { voice:'Sprachaufzeichnung', expose:'Exposé/Marktbericht', ph:'PriceHubble', spr:'Sprengnetter', ki:'KI-Recherche' };
     var steps = ordered.map(function(s){ return { key:s, label:labels[s], state:'pending' }; });
@@ -5190,6 +5425,7 @@ function renderTransferList() {
             await sprengnetter({ silent:true });
           }
         }
+        if (ordered[i] === 'dpmb') { try { if (window.DealPilotMBQc) await window.DealPilotMBQc.run(); } catch (e) {} }
         if (ordered[i] === 'ki')  await kiResearch({ silent:true });
       } catch (e) { /* einzelner Abruf fehlgeschlagen — weiter */ }
       steps[i].state = 'done'; _progressRender(steps);
@@ -5237,6 +5473,28 @@ function renderTransferList() {
     renderPhotos();
   }
 
+  // v551: DealPilot als vollwertige AVM-Quelle registrieren -> Werte ins Speichern-Modal
+  function registerDpmb(d) {
+    if (!d) return;
+    var mw = Math.round(d.marktwert || 0), mm = Math.round(d.marktmiete || 0);
+    var wfl = QcEngine.num(QcEngine.getInputs().wfl) || 0;
+    var r = { provider: 'DealPilot', marktwert: mw, low: mw, high: mw,
+      marktmieteCold: mm, marktmieteLow: mm, marktmieteHigh: mm,
+      marktmieteEurSqm: wfl ? (mm / wfl) : null,
+      scoreMacro: (d.macro != null ? d.macro / 10 : null),
+      scoreMicro: (d.micro != null ? d.micro / 10 : null),
+      wertentwicklung: (d.trend != null ? d.trend : null),
+      conf: 'Indikation', confClass: 'mid' };
+    _avmResults = _avmResults.filter(function (x) { return x.provider !== 'DealPilot'; });
+    _avmResults.unshift(r);
+    Object.keys(_pendingTransfer).forEach(function (k) { if (k.indexOf('dp_') === 0) delete _pendingTransfer[k]; });
+    if (mw) _pendingTransfer.dp_marktwert = { label: 'DealPilot-Marktwert', value: fmt0(mw) + ' €', raw: mw, source: 'DealPilot', target: 'verkehrswert', isMarktwert: true };
+    if (mm) _pendingTransfer.dp_marktmiete = { label: 'DealPilot-Marktmiete', value: fmt0(mm) + ' €/Mo', raw: mm, source: 'DealPilot', target: 'nkm_grund' };
+    if (d.macro != null) _pendingTransfer.dp_makrolage = { label: 'Makrolage', value: d.macro + ' / 100', raw: d.macro / 10, source: 'DealPilot', target: 'lage_macro' };
+    if (d.micro != null) _pendingTransfer.dp_mikrolage = { label: 'Mikrolage', value: d.micro + ' / 100', raw: d.micro / 10, source: 'DealPilot', target: 'lage_micro' };
+    if (d.trend != null) _pendingTransfer.dp_wertentwicklung = { label: 'Wertentwicklung p.a.', value: (d.trend >= 0 ? '+' : '') + Number(d.trend).toFixed(2) + ' %', raw: d.trend, source: 'DealPilot', target: 'wertsteigerung_pa' };
+  }
+
   return {
     init, scheduleUpdate, setLtv, mieteAddUp,
     handlePdfFile, kiResearch, priceHubble, sprengnetter, selectAvmRange, applyAvmToQc,
@@ -5245,7 +5503,7 @@ function renderTransferList() {
     showApiKeyModal, closeApiModal, runRealAi,
     openSaveModal, closeSaveModal, confirmSave, toggleAllTransfer, setPdfPending,
     setSpanConfig, openQc6Settings, closeQc6Settings, toggleSource,
-    openCreditModal, closeCreditModal, confirmCreditModal
+    openCreditModal, closeCreditModal, confirmCreditModal, registerDpmb
   };
 })();
 
@@ -5528,5 +5786,6 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
 })();
 </script>
+  <script src="js/dealpilot-mb-qc.js?v=554"></script>
 </body>
 </html>

@@ -70,6 +70,62 @@ services:
     networks:
       - dealpilot-net
 
+  # ── Marktbericht-Microservice DB (PostGIS, intern, kein Port nach aussen) ── v539
+  mb-db:
+    image: postgis/postgis:16-3.4
+    container_name: dealpilot-mb-db
+    environment:
+      POSTGRES_USER: mb
+      POSTGRES_PASSWORD: mb
+      POSTGRES_DB: marktbericht
+    volumes:
+      - mb_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mb -d marktbericht"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - dealpilot-net
+
+  # ── Marktbericht-Microservice Backend (intern, nur via Haupt-Backend-Proxy) ── v539
+  mb-backend:
+    build:
+      context: ./marktbericht
+      dockerfile: backend/Dockerfile
+    container_name: dealpilot-mb-backend
+    depends_on:
+      mb-db:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      PGHOST: mb-db
+      PGPORT: 5432
+      PGUSER: mb
+      PGPASSWORD: mb
+      PGDATABASE: marktbericht
+      MARKET_SOURCE: seed
+      REPORT_AI_MODE: ${MB_REPORT_AI_MODE:-stub}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${MB_OPENAI_MODEL:-gpt-4.1-mini}
+      GEOAPIFY_KEY: ${GEOAPIFY_KEY:-}
+      GEOMAP_TOKEN: ${GEOMAP_TOKEN:-}
+      MB_DEMO: ${MB_DEMO:-}
+      GEOMAP_BASE: ${GEOMAP_BASE:-https://api.geomap.immo}
+      GEOMAP_REPORT_LISTINGS: ${GEOMAP_REPORT_LISTINGS:-0}
+      GEOMAP_HISTORY_START: ${GEOMAP_HISTORY_START:-2018}
+      DESTATIS_TOKEN: ${DESTATIS_TOKEN:-}
+      DESTATIS_PASSWORD: ${DESTATIS_PASSWORD:-}
+      DESTATIS_BASE: ${DESTATIS_BASE:-https://www.regionalstatistik.de/genesisws/rest/2020}
+      BORISD_WMS_BASE: ${BORISD_WMS_BASE:-}
+      BORISD_WMS_LAYER: ${BORISD_WMS_LAYER:-}
+      GOOGLE_MAPS_KEY: ${GOOGLE_MAPS_KEY:-}
+    command: sh -c "node src/lib/migrate.js && node src/lib/seed.js && node src/server.js"
+    restart: unless-stopped
+    networks:
+      - dealpilot-net
+
   # ── Caddy (Reverse-Proxy + TLS + Static Frontend) ──
   caddy:
     image: caddy:2-alpine
@@ -94,6 +150,8 @@ services:
       - dealpilot-net
 
 volumes:
+  mb_pg:
+    name: dealpilot_mb_pg
   postgres_data:
     name: dealpilot_postgres_data
     external: true

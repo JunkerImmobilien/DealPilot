@@ -49,7 +49,11 @@ const API = (function() {
     setTimeout(() => URL.revokeObjectURL(url), 200);
   }
 
-  return {
+    function credits() { return call('GET', '/credits'); }
+  function marktberichtCosts() { return call('GET', '/marktbericht-costs'); }
+
+return {
+    credits, marktberichtCosts,
     login: (email, password, totpCode) => call('POST', '/auth/login', { email, password, totpCode }),
     me: () => call('GET', '/auth/me'),
 

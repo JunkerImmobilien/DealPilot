@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: mb-db
+    environment:
+      POSTGRES_USER: mb
+      POSTGRES_PASSWORD: mb
+      POSTGRES_DB: marktbericht
+    ports:
+      - "5433:5432"
+    volumes:
+      - mb_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mb -d marktbericht"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: mb-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: mb
+      PGPASSWORD: mb
+      PGDATABASE: marktbericht
+      GEOAPIFY_KEY: ${GEOAPIFY_KEY:-}
+      REPORT_AI_MODE: ${REPORT_AI_MODE:-stub}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.2}
+      MARKET_SOURCE: seed
+      GEOMAP_TOKEN: ${GEOMAP_TOKEN:-}
+      GEOMAP_BASE: ${GEOMAP_BASE:-https://api.geomap.immo}
+      GEOMAP_MAX_DETAILS: ${GEOMAP_MAX_DETAILS:-40}
+      GEOMAP_RADIUS_KM: ${GEOMAP_RADIUS_KM:-5}
+      GEOMAP_REPORT_LISTINGS: ${GEOMAP_REPORT_LISTINGS:-0}
+      GEOMAP_HISTORY_START: ${GEOMAP_HISTORY_START:-2018}
+      GEOMAP_HISTORY_RENT: ${GEOMAP_HISTORY_RENT:-false}
+      DESTATIS_TOKEN: ${DESTATIS_TOKEN:-}
+      DESTATIS_PASSWORD: ${DESTATIS_PASSWORD:-}
+      DESTATIS_BASE: ${DESTATIS_BASE:-https://www.regionalstatistik.de/genesisws/rest/2020}
+      DESTATIS_TABLE_POP: ${DESTATIS_TABLE_POP:-12411-0014}
+      BORISD_WMS_BASE: ${BORISD_WMS_BASE:-}
+      BORISD_WMS_LAYER: ${BORISD_WMS_LAYER:-}
+      GOOGLE_MAPS_KEY: ${GOOGLE_MAPS_KEY:-}
+    ports:
+      - "4000:4000"
+    command: sh -c "node src/lib/migrate.js && node src/lib/seed.js && node src/server.js"
+
+volumes:
+  mb_pg:
