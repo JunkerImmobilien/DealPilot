@@ -305,7 +305,7 @@ function loadData(d) {
         var aiContent = document.getElementById('ai-content');
         if (aiContent) aiContent.innerHTML = _renderAIServerAnalysis(parsedAI);
       }
-      if (typeof _renderMiniAI === 'function') _renderMiniAI(parsedAI);
+      var _mb = document.getElementById('ai-mini-body'); if (_mb && typeof _renderAIServerAnalysis === 'function') _mb.innerHTML = _renderAIServerAnalysis(parsedAI); /* v596-restore-both */
     } else if (typeof renderAIResponse === 'function') {
       var aiContent2 = document.getElementById('ai-content');
       if (aiContent2) aiContent2.innerHTML = renderAIResponse(window._aiText);

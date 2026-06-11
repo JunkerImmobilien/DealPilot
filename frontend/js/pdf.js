@@ -676,6 +676,12 @@ function sBox(doc, x, y, w, label, val, sub, bg, acc) {
  * @param newPage  newPage-Helper aus exportPDF (für Seitenumbruch)
  * @returns        neue cy-Position
  */
+/* v603-pdf-sections: Titel -> Checkbox-Key (default an, unbekannt = an) */
+function _dpPdfSecKey(title){
+  var m={'Gesamtbewertung':'gesamt','Stärken':'staerken','Risiken':'risiken','Risikoanalyse':'risikoanalyse','Szenario-Analyse':'szenarien','Investor-Fit':'investorfit','Empfehlung':'empfehlung','Investmentbewertung':'investbew','Verhandlungsempfehlung':'verhandlung','Kaufpreis-Offerte':'offerte','Bankargumente':'bank','DealPilot-Insight':'insight'};
+  return m[title]||null;
+}
+function _dpPdfSectionOn(title){var k=_dpPdfSecKey(title);if(!k)return true;var cb=document.getElementById('ai-pdf-sec-'+k);return !cb||cb.checked;}
 function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   function clean(s) {
     if (s == null) return '';
@@ -707,6 +713,8 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   }
 
   function block(title, text, bgColor, accentColor, isDarkBg) {
+    if (typeof _dpPdfSectionOn === 'function' && !_dpPdfSectionOn(title)) return; /* v603-gate */
+    bgColor = [255, 255, 255]; accentColor = [201, 168, 76]; isDarkBg = false; /* v596-pdf-clean */
     if (!text) return;
     // V63.71: Schriftgröße VOR splitTextToSize setzen - sonst nimmt jsPDF die alte Größe
     doc.setFont('helvetica', 'normal');
@@ -744,6 +752,8 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   }
 
   function bulletBlock(title, items, bgColor, accentColor) {
+    if (typeof _dpPdfSectionOn === 'function' && !_dpPdfSectionOn(title)) return; /* v603-gate2 */
+    bgColor = [255, 255, 255]; accentColor = [201, 168, 76]; /* v596-pdf-clean2 */
     if (!Array.isArray(items) || !items.length) return;
     // V63.71: Schriftgröße VOR splitTextToSize
     doc.setFont('helvetica', 'normal');

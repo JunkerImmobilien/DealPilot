@@ -110,10 +110,10 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
     try {
       await mailerService.sendMail({
         to: user.email,
-        subject: 'DealPilot — Bitte bestätige deine E-Mail',
+        subject: 'DealPilot — Check-in bestätigen',
         text:
           `Hallo ${user.name},\n\n` +
-          `Vielen Dank für deine Anmeldung bei DealPilot.\n\n` +
+          `Vielen Dank für deinen Check-in bei DealPilot.\n\n` +
           `Bitte bestätige deine E-Mail-Adresse, um dein Konto zu aktivieren:\n` +
           `${verifyUrl}\n\n` +
           `Der Link ist 24 Stunden gültig.\n\n` +
@@ -122,11 +122,11 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
           `https://dealpilot.junker-immobilien.io`,
         html:
           `<div style="font-family:-apple-system,sans-serif;max-width:560px;color:#2A2727">` +
-            `<h2 style="color:#C9A84C;margin-bottom:8px">Willkommen bei DealPilot, ${_esc(user.name)}!</h2>` +
-            `<p>Vielen Dank für deine Anmeldung. Bitte bestätige deine E-Mail-Adresse, um dein Konto zu aktivieren.</p>` +
+            `<h2 style="color:#C9A84C;margin-bottom:8px">Willkommen an Bord bei DealPilot, ${_esc(user.name)}!</h2>` +
+            `<p>Vielen Dank für deinen Check-in. Bitte bestätige deine E-Mail-Adresse, um dein Konto zu aktivieren und an Bord zu kommen.</p>` +
             `<p style="margin:24px 0">` +
               `<a href="${verifyUrl}" style="background:#C9A84C;color:#1A1818;padding:12px 28px;text-decoration:none;border-radius:8px;font-weight:600;display:inline-block">` +
-                `E-Mail bestätigen` +
+                `Check-in abschließen` +
               `</a>` +
             `</p>` +
             `<p style="color:#666;font-size:12px">Oder kopiere diesen Link in deinen Browser:<br>` +
@@ -148,9 +148,9 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
       const adminMail = process.env.BETA_MAIL_TO || 'dealpilot@junker-immobilien.io';
       await mailerService.sendMail({
         to: adminMail,
-        subject: '[DealPilot] Neue Registrierung: ' + name,
+        subject: '[DealPilot] Neuer Check-in: ' + name,
         text:
-          `Neue Registrierung über das DealPilot-Anmeldeformular:\n\n` +
+          `Neuer Check-in über das DealPilot-Anmeldeformular:\n\n` +
           `Name:    ${name}\n` +
           `E-Mail:  ${email}\n` +
           `Zeit:    ${new Date().toISOString()}\n` +
@@ -161,7 +161,7 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
           `- Plan ändern: /api/v1/plans/admin/users/${user.id}/plan`,
         html:
           `<div style="font-family:-apple-system,sans-serif">` +
-            `<h3 style="color:#C9A84C">Neue Registrierung</h3>` +
+            `<h3 style="color:#C9A84C">Neuer Check-in</h3>` +
             `<table style="border-collapse:collapse">` +
               `<tr><td style="padding:4px 16px 4px 0;color:#888"><strong>Name</strong></td><td>${_esc(name)}</td></tr>` +
               `<tr><td style="padding:4px 16px 4px 0;color:#888"><strong>E-Mail</strong></td><td><a href="mailto:${_esc(email)}">${_esc(email)}</a></td></tr>` +

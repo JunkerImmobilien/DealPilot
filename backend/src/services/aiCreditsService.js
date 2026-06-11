@@ -126,8 +126,22 @@ async function logExtract(userId, endpoint) {
   return { ok: true };
 }
 
+/* v596-copilot-monthly */
+async function copilotUsage(userId) {
+  const uid = String(userId);
+  await query(`INSERT INTO copilot_usage (user_id) VALUES ($1::text) ON CONFLICT (user_id) DO NOTHING`, [uid]);
+  await query(`UPDATE copilot_usage SET used = 0, period_start = date_trunc('month', NOW())::date, updated_at = NOW() WHERE user_id = $1::text AND period_start < date_trunc('month', NOW())::date`, [uid]);
+  const { rows } = await query(`SELECT used FROM copilot_usage WHERE user_id = $1::text`, [uid]);
+  return rows && rows[0] ? rows[0].used : 0;
+}
+async function copilotInc(userId) {
+  await query(`UPDATE copilot_usage SET used = used + 1, updated_at = NOW() WHERE user_id = $1::text`, [String(userId)]);
+}
+
 module.exports = {
   getStatus,
+  copilotUsage,
+  copilotInc,
   consume,
   addBonus,
   logExtract,

@@ -229,7 +229,7 @@
       { cat: 'Analyse & Bewertung', items: [
         ['DealPilot Score (5 Faktoren)',         '✓', '✓', '✓', '✓'],
         ['Investor Deal Score (24 KPIs)',        'Demo', '–', '✓', '✓'],
-        ['Quick-Check (Schnellbewertung)',       '✓', '✓', '✓', '✓'],
+        ['Boarding (Schnellprüfung)',       '✓', '✓', '✓', '✓'],
         ['Pilot-Analyse (KI)',                   'vereinfacht', 'vereinfacht', 'Vollversion', 'Vollversion'],
         ['Pilot-Lagebewertung (KI)',             '–', '✓', '✓', '✓'],
         ['DealPilot Marktreport',                '–', '✓', '✓', '✓'],

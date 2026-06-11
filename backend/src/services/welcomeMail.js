@@ -127,9 +127,9 @@ async function sendSubscriptionWelcome(db, { userId, planName, planId, amountCen
       from: getMailFrom(),
       replyTo: process.env.MAIL_REPLY_TO || undefined,
       to: user.email,
-      subject: `Willkommen bei DealPilot ${planName}`,
+      subject: `Willkommen an Bord bei DealPilot ${planName}`,
       html,
-      text: `Willkommen bei DealPilot ${planName}! Dein Abo ist aktiv. App: ${appUrl}`
+      text: `Willkommen an Bord bei DealPilot ${planName}! Dein Abo ist aktiv. App: ${appUrl}`
     });
     await logSent(db, userId, 'subscription_welcome', sessionId, result.messageId);
     console.log('[welcome-mail] ✓ Subscription-Welcome an', user.email);

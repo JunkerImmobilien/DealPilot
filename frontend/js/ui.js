@@ -638,7 +638,7 @@ function _buildAIPayload() {
       plz: g('plz'), ort: g('ort'), str: g('str'), hnr: g('hnr'),
       objart: g('objart'), wfl: parseDe(g('wfl')) || null, baujahr: g('baujahr'),
       makrolage: g('makrolage'), mikrolage: g('mikrolage'),
-      thesis: g('thesis'), risiken: g('risiken'),
+      thesis: g('thesis'), risiken: g('risiken'), notizen: g('notizen'),
       wertstg_pct: parseDe(g('wertstg')) || null,
       mietstg_pct: parseDe(g('mietstg')) || null
     },
@@ -647,12 +647,64 @@ function _buildAIPayload() {
       dscr: k.dscr, ltv: k.ltv, cf_m: k.cf_m, em: k.em
     },
     finanzierung: {
-      d1z_pct: k.d1z_pct, d1t_pct: k.d1t_pct, d1: k.d1
+      d1z_pct: k.d1z_pct, d1t_pct: k.d1t_pct, d1: k.d1,
+      restschuld_ezb: (typeof State !== 'undefined' && State.rs1 != null) ? State.rs1 : ((typeof State !== 'undefined' && State.rs != null) ? State.rs : (parseDe(g('restschuld')) || null))
     },
-    dealscore: dealscoreSnap || {}
+    dealscore: dealscoreSnap || {},
+    marktbewertung: {
+      marktwert: parseDe(g('svwert')) || null,
+      marktmiete_qm: parseDe(g('ds2_marktmiete')) || null
+    }
   };
   // User-Key aus Settings als Fallback mitschicken — Backend nutzt ihn nur
   // wenn kein Server-Key konfiguriert ist.
+  // v589: Marktradar-Indikationen (PriceHubble/Sprengnetter) aus _avm_state
+  try {
+    var _avmRaw = g('_avm_state');
+    if (_avmRaw) {
+      var _avmObj = JSON.parse(_avmRaw);
+      var _avmMap = (_avmObj && _avmObj.avm) ? _avmObj.avm : {};
+      var _mr = [];
+      Object.keys(_avmMap).forEach(function (pk) {
+        var r = _avmMap[pk] || {};
+        var ent = { provider: r.provider || pk };
+        if (r.marktwert != null) ent.marktwert = r.marktwert;
+        if (r.low != null) ent.low = r.low;
+        if (r.high != null) ent.high = r.high;
+        var konf = (r.konfidenz != null) ? r.konfidenz : ((r.confidence != null) ? r.confidence : ((r.confidence_label != null) ? r.confidence_label : null));
+        if (konf != null) ent.konfidenz = konf;
+        _mr.push(ent);
+      });
+      if (_mr.length) payload.marktradar = _mr;
+    }
+  } catch (e) { /* optional */ }
+  // v589: KI-Stil-Einstellungen auch fuer die Pilot-Analyse mitsenden
+  try {
+    if (typeof Settings !== 'undefined') {
+      var _s = Settings.get() || {};
+      payload.aiOptions = {
+        detailLevel: _s.ai_detail_level || '',
+        tonality: _s.ai_tonality || '',
+        focusAreas: Array.isArray(_s.ai_focus_areas) ? _s.ai_focus_areas : [],
+        customInstructions: (_s.ai_custom_instructions || '').toString().slice(0, 500)
+      };
+    }
+  } catch (e) { /* optional */ }
+  // v590: Investor Deal Score (DS2) fuer Score-Vergleich, falls vorhanden
+  try {
+    var _d2 = window._dpLastDs2;
+    if (_d2 && _d2.score != null) {
+      var _cat = _d2.categories || {};
+      payload.investor_score = {
+        total: Math.round(_d2.score),
+        label: _d2.label || null,
+        rendite: _cat.scoreRendite ? Math.round(_cat.scoreRendite.score) : null,
+        finanzierung: _cat.scoreFinanzierung ? Math.round(_cat.scoreFinanzierung.score) : null,
+        risiko: _cat.scoreRisiko ? Math.round(_cat.scoreRisiko.score) : null,
+        lage: _cat.scoreLage ? Math.round(_cat.scoreLage.score) : null
+      };
+    }
+  } catch (e) { /* optional */ }
   if (typeof Settings !== 'undefined') {
     var s = Settings.get();
     if (s && s.openai_api_key && s.openai_api_key.indexOf('sk-') === 0) {
@@ -680,6 +732,7 @@ function _formatAIError(err) {
   return '⚠ KI-Analyse fehlgeschlagen: ' + ((err && (err.message || err.error)) || err);
 }
 async function _runAIServer(btn) {
+  var _orig = btn.innerHTML; /* v596-origbtn */
   btn.textContent = '⏳ Recherchiere Lage & analysiere...';
   document.getElementById('ai-content').innerHTML =
     '<div class="ai-loading">' +
@@ -696,7 +749,7 @@ async function _runAIServer(btn) {
       window._aiAnalysis = data.analysis;
       window._aiText = JSON.stringify(data.analysis, null, 2);
       // V25: Mini-Block in Tab Kennzahlen mit aktualisieren
-      if (typeof _renderMiniAI === 'function') _renderMiniAI(data.analysis);
+      var _mb = document.getElementById('ai-mini-body'); if (_mb) _mb.innerHTML = html; /* v596: Voll-Analyse in Bewertung */
       // V63.69: KI-Analyse direkt persistieren — User-Wunsch
       // Damit sie beim nächsten Öffnen des Objekts da ist
       if (typeof saveObj === 'function') {
@@ -732,7 +785,7 @@ async function _runAIServer(btn) {
     if (window.AiCredits) window.AiCredits.refresh(true);
   } finally {
     btn.disabled = false;
-    btn.textContent = '🤖 Analyse starten';
+    if (typeof _orig === 'string') btn.innerHTML = _orig; /* v596-restorebtn */
   }
 }
 
@@ -765,158 +818,229 @@ function _stripMd(s) {
 /**
  * Combined: Markdown weg + HTML escape. Wird in allen AI-Render-Funktionen verwendet.
  */
+function _linkify(escaped) {
+  /* v588-linkify */
+  if (!escaped) return escaped;
+  var out = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, function (m, label, url) {
+    var dom = label; try { dom = (url.replace(/^https?:\/\//, '').split('/')[0] || label).replace(/^www\./, ''); } catch (e) {}
+    return '<a href="' + url + '" target="_blank" rel="noopener" class="dp-pa-srclink" title="' + url + '">' + dom + ' \u2197</a>';
+  });
+  out = out.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, function (m, pre, url) {
+    var dom = url.replace(/^https?:\/\//, '').split('/')[0].replace(/^www\./, '');
+    return pre + '<a href="' + url + '" target="_blank" rel="noopener" class="dp-pa-srclink" title="' + url + '">' + dom + ' \u2197</a>';
+  });
+  return out;
+}
 function _escClean(s) {
-  return _esc(_stripMd(s));
+  return _linkify(_esc(_stripMd(s)));
 }
 
+/* v584-rail BEGIN */
+window._dpPaTab = function (id, btn) {
+  try {
+    var wrap = btn && btn.closest ? btn.closest('.dp-pa-wrap') : null;
+    if (!wrap) return;
+    var tabs = wrap.querySelectorAll('.dp-pa-tab');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('active', tabs[i] === btn);
+    var pans = wrap.querySelectorAll('.dp-pa-panel');
+    for (var j = 0; j < pans.length; j++) pans[j].classList.toggle('active', pans[j].id === 'dp-pa-' + id);
+  } catch (e) {}
+};
 function _renderAIServerAnalysis(a) {
+  /* v584-rail */
+  a = a || {};
   function list(arr) {
-    if (!Array.isArray(arr) || !arr.length) return '<em style="opacity:.5">—</em>';
-    return '<ul>' + arr.map(function(x){ return '<li>' + _escClean(x) + '</li>'; }).join('') + '</ul>';
+    if (!Array.isArray(arr) || !arr.length) return '<em class="dp-pa-empty">\u2014</em>';
+    return '<ul>' + arr.map(function (x) { return '<li>' + _escClean(x) + '</li>'; }).join('') + '</ul>';
+  }
+  function num(arr) {
+    if (!Array.isArray(arr) || !arr.length) return '<em class="dp-pa-empty">\u2014</em>';
+    return '<ol class="dp-pa-num">' + arr.map(function (x) { return '<li>' + _escClean(x) + '</li>'; }).join('') + '</ol>';
   }
   function fitBadge(value) {
     if (!value) return '';
-    var v = String(value).toLowerCase().trim();
-    var color, label;
-    if (v.indexOf('ja') === 0) { color = '#3FA56C'; label = 'Ja'; }
+    var v = String(value).toLowerCase().trim(), color, label;
+    if (v.indexOf('ja') === 0) { color = '#2F8E5A'; label = 'Ja'; }
     else if (v.indexOf('nein') === 0) { color = '#B8625C'; label = 'Nein'; }
     else { color = '#C9A84C'; label = 'Teilweise'; }
-    return '<span style="display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;background:' + color + ';color:#fff">' + label + '</span>';
+    return '<span class="dp-pa-pill" style="background:' + color + '">' + label + '</span>';
   }
   function fitReason(value) {
     if (!value) return '';
-    var v = String(value);
-    var dash = v.indexOf('—');
+    var v = String(value), dash = v.indexOf('\u2014');
     if (dash < 0) dash = v.indexOf(' - ');
     if (dash > 0) v = v.substring(dash + 1).trim();
     else if (v.toLowerCase().indexOf('ja') === 0 || v.toLowerCase().indexOf('nein') === 0 || v.toLowerCase().indexOf('teilweise') === 0) {
-      var firstSpace = v.indexOf(' ');
-      if (firstSpace > 0) v = v.substring(firstSpace).replace(/^[\s,—-]+/, '').trim();
+      var fs = v.indexOf(' ');
+      if (fs > 0) v = v.substring(fs).replace(/^[\s,\u2014-]+/, '').trim();
     }
     return _escClean(v);
   }
-  function empfehlungBadge(emp) {
-    var e = String(emp || '').toLowerCase();
-    var color = '#C9A84C', label = emp || '—';
-    if (e.indexOf('kaufen') === 0)        { color = '#3FA56C'; label = 'KAUFEN'; }
-    else if (e.indexOf('nicht') === 0)    { color = '#B8625C'; label = 'NICHT KAUFEN'; }
-    else if (e.indexOf('prüfen') >= 0 || e.indexOf('pruefen') >= 0) { color = '#C9A84C'; label = 'PRÜFEN'; }
-    return '<span style="display:inline-block;padding:6px 18px;border-radius:6px;font-size:14px;font-weight:800;letter-spacing:.05em;background:' + color + ';color:#fff">' + label + '</span>';
+  function empfBadge(emp) {
+    var e = String(emp || '').toLowerCase(), color = '#C9A84C', label = emp || '\u2014';
+    if (e.indexOf('kaufen') === 0) { color = '#2F8E5A'; label = 'KAUFEN'; }
+    else if (e.indexOf('nicht') === 0) { color = '#B8625C'; label = 'NICHT KAUFEN'; }
+    else if (e.indexOf('pr\u00fcfen') >= 0 || e.indexOf('pruefen') >= 0) { color = '#C9A84C'; label = 'PR\u00dcFEN'; }
+    return '<span class="dp-pa-empf" style="background:' + color + '">' + label + '</span>';
   }
+  function sec(cls, icon, label) {
+    return '<div class="dp-pa-sec ' + (cls || '') + '"><span class="dp-pa-bar"></span>' +
+      '<span class="dp-pa-sq">' + icon + '</span><span class="dp-pa-lbl">' + label + '</span><span class="dp-pa-rule"></span></div>';
+  }
+  function p(t) { return t ? '<p class="dp-pa-p">' + _escClean(t) + '</p>' : ''; }
+  function has(x) { return x != null && x !== ''; }
+  function kv(lbl, val) { return '<div class="dp-pa-kv"><strong>' + lbl + ':</strong> ' + _escClean(val) + '</div>'; }
 
-  var html = '';
+  var I = {
+    brief: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg>',
+    sr:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 18.6 7.1 21.2l.9-5.5-4-3.9 5.5-.8z"/></svg>',
+    risk:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>',
+    loc:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6 7-11a7 7 0 1 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+    deal:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>',
+    bank:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 10l9-6 9 6M5 10v8m14-8v8M9 10v8m6-8v8M3 20h18"/></svg>'
+  };
 
-  // 1. Gesamtbewertung
-  html += '<div class="ai-block">';
-  html += '<h3>📊 Gesamtbewertung</h3>';
-  html += '<p>' + _escClean(a.gesamtbewertung || a.fazit_kurz || '—') + '</p>';
-  html += '</div>';
+  // Panel 1 — Briefing
+  var pB = sec('', I.brief, 'BRIEFING');
+  pB += '<div class="dp-pa-card"><div class="dp-pa-empf-row">' + empfBadge(a.empfehlung || a.fazit_kurz) + '</div>' +
+        p(a.gesamtbewertung || a.fazit_kurz) + p(a.empfehlung_begruendung) + '</div>';
+  if (has(a.investmentbewertung))
+    pB += '<div class="dp-pa-card">' + sec('', I.deal, 'INVESTMENTBEWERTUNG') + p(a.investmentbewertung) + '</div>';
+  if (has(a.score_vergleich))
+    pB += '<div class="dp-pa-card">' + sec('', I.deal, 'SCORE-VERGLEICH') + p(a.score_vergleich) + '</div>';
+  if (a.investor_fit && typeof a.investor_fit === 'object') {
+    var f = a.investor_fit;
+    pB += '<div class="dp-pa-card">' + sec('', I.deal, 'INVESTOR-FIT') + '<div class="dp-pa-fit">';
+    if (f.cashflow_investor)        pB += '<div class="dp-pa-fit-row"><span class="dp-pa-fit-l">Cashflow-Investor</span>' + fitBadge(f.cashflow_investor) + '<span class="dp-pa-fit-r">' + fitReason(f.cashflow_investor) + '</span></div>';
+    if (f.wertsteigerungs_investor) pB += '<div class="dp-pa-fit-row"><span class="dp-pa-fit-l">Wertsteigerungs-Investor</span>' + fitBadge(f.wertsteigerungs_investor) + '<span class="dp-pa-fit-r">' + fitReason(f.wertsteigerungs_investor) + '</span></div>';
+    if (f.sicherheitsorientiert)    pB += '<div class="dp-pa-fit-row"><span class="dp-pa-fit-l">Sicherheitsorientiert</span>' + fitBadge(f.sicherheitsorientiert) + '<span class="dp-pa-fit-r">' + fitReason(f.sicherheitsorientiert) + '</span></div>';
+    pB += '</div></div>';
+  }
+  if (has(a.dealpilot_insight))
+    pB += '<div class="dp-pa-card dp-pa-insight">' + sec('', I.deal, 'DEALPILOT-INSIGHT') + '<p class="dp-pa-p dp-pa-italic">' + _escClean(a.dealpilot_insight) + '</p></div>';
 
-  // 2. Stärken & Schwächen
-  html += '<div class="ai-block ai-block-green"><h3>✅ Stärken</h3>' + list(a.staerken) + '</div>';
-  html += '<div class="ai-block ai-block-red"><h3>⚠ Risiken</h3>' + list(a.risiken) + '</div>';
+  // Panel 2 — Staerken & Risiken
+  var pS = sec('', I.sr, 'ST\u00c4RKEN & RISIKEN') +
+    '<div class="dp-pa-cols">' +
+      '<div class="dp-pa-card">' + sec('good', I.sr, 'ST\u00c4RKEN') + list(a.staerken) + '</div>' +
+      '<div class="dp-pa-card">' + sec('bad', I.risk, 'RISIKEN') + list(a.risiken) + '</div>' +
+    '</div>';
 
-  // 3. Risikoanalyse
+  // Panel 3 — Risiko & Szenarien
+  var pR = sec('', I.risk, 'RISIKO & SZENARIEN');
   if (a.risikoanalyse && typeof a.risikoanalyse === 'object') {
     var ra = a.risikoanalyse;
-    html += '<div class="ai-block"><h3>🛡 Risikoanalyse</h3>';
-    if (ra.finanzierungsrisiko)    html += '<div class="ai-sub"><strong>Finanzierungsrisiko (LTV + DSCR):</strong> ' + _escClean(ra.finanzierungsrisiko) + '</div>';
-    if (ra.cashflow_stabilitaet)   html += '<div class="ai-sub"><strong>Cashflow-Stabilität:</strong> ' + _escClean(ra.cashflow_stabilitaet) + '</div>';
-    if (ra.annahmen_abhaengigkeit) html += '<div class="ai-sub"><strong>Abhängigkeit von Annahmen:</strong> ' + _escClean(ra.annahmen_abhaengigkeit) + '</div>';
-    html += '</div>';
+    pR += '<div class="dp-pa-card">' + sec('', I.risk, 'RISIKOANALYSE');
+    if (ra.finanzierungsrisiko)    pR += kv('Finanzierungsrisiko (LTV + DSCR)', ra.finanzierungsrisiko);
+    if (ra.cashflow_stabilitaet)   pR += kv('Cashflow-Stabilit\u00e4t', ra.cashflow_stabilitaet);
+    if (ra.annahmen_abhaengigkeit) pR += kv('Abh\u00e4ngigkeit von Annahmen', ra.annahmen_abhaengigkeit);
+    pR += '</div>';
   }
-
-  // 4. Szenario-Analyse
+  if (has(a.anschlussfinanzierung))
+    pR += '<div class="dp-pa-card">' + sec('', I.risk, 'ANSCHLUSSFINANZIERUNG') + p(a.anschlussfinanzierung) + '</div>';
   if (a.szenarien && typeof a.szenarien === 'object') {
-    html += '<div class="ai-block"><h3>📉📈 Szenario-Analyse</h3>';
-    if (a.szenarien.worst_case) html += '<div class="ai-sub ai-scenario-worst"><strong>Worst Case</strong> (Miete -10%, Zins +1%): ' + _escClean(a.szenarien.worst_case) + '</div>';
-    if (a.szenarien.best_case)  html += '<div class="ai-sub ai-scenario-best"><strong>Best Case</strong> (Miete +5%, höhere Wertsteigerung): ' + _escClean(a.szenarien.best_case) + '</div>';
-    html += '</div>';
+    pR += '<div class="dp-pa-cols">' +
+      '<div class="dp-pa-card dp-pa-tone-bad">' + sec('bad', I.risk, 'WORST CASE') + '<div class="dp-pa-kv-sub">Miete -10%, Zins +1%</div>' + p(a.szenarien.worst_case) + '</div>' +
+      '<div class="dp-pa-card dp-pa-tone-good">' + sec('good', I.sr, 'BEST CASE') + '<div class="dp-pa-kv-sub">Miete +5%, h\u00f6here Wertsteigerung</div>' + p(a.szenarien.best_case) + '</div>' +
+    '</div>';
   }
 
-  // 5. Investor-Fit
-  if (a.investor_fit && typeof a.investor_fit === 'object') {
-    var fit = a.investor_fit;
-    html += '<div class="ai-block"><h3>👥 Investor-Fit</h3>';
-    html += '<div class="ai-fit-grid">';
-    if (fit.cashflow_investor)        html += '<div class="ai-fit-row"><span class="ai-fit-label">Cashflow-Investor</span>' + fitBadge(fit.cashflow_investor) + '<span class="ai-fit-reason">' + fitReason(fit.cashflow_investor) + '</span></div>';
-    if (fit.wertsteigerungs_investor) html += '<div class="ai-fit-row"><span class="ai-fit-label">Wertsteigerungs-Investor</span>' + fitBadge(fit.wertsteigerungs_investor) + '<span class="ai-fit-reason">' + fitReason(fit.wertsteigerungs_investor) + '</span></div>';
-    if (fit.sicherheitsorientiert)    html += '<div class="ai-fit-row"><span class="ai-fit-label">Sicherheitsorientiert</span>' + fitBadge(fit.sicherheitsorientiert) + '<span class="ai-fit-reason">' + fitReason(fit.sicherheitsorientiert) + '</span></div>';
-    html += '</div></div>';
+  // Panel 4 — Lage & Markt
+  var pL = sec('', I.loc, 'LAGE & MARKT') + '<div class="dp-pa-card">';
+  if (a.makrolage_recherche)     pL += kv('Makrolage', a.makrolage_recherche);
+  if (a.mikrolage_recherche)     pL += kv('Mikrolage', a.mikrolage_recherche);
+  if (has(a.mietspiegel_eur_qm)) pL += '<div class="dp-pa-kv"><strong>Mietspiegel:</strong> ' + _escClean(a.mietspiegel_eur_qm) + ' \u20ac/m\u00b2</div>';
+  if (a.kaufpreisniveau)         pL += kv('Kaufpreisniveau', a.kaufpreisniveau);
+  if (!a.makrolage_recherche && !a.mikrolage_recherche && !has(a.mietspiegel_eur_qm) && !a.kaufpreisniveau)
+    pL += '<em class="dp-pa-empty">\u2014 keine Lage-Daten</em>';
+  pL += '</div>';
+  if (Array.isArray(a.quellen) && a.quellen.length) {
+    pL += '<div class="dp-pa-card">' + sec('', I.loc, 'QUELLEN') + '<ul class="dp-pa-src">' +
+      a.quellen.map(function (q) { var m = ('' + q).match(/https?:\/\/\S+/); return '<li>' + (m ? '<a href="' + _esc(m[0]) + '" target="_blank" rel="noopener">' + _esc(q) + '</a>' : _esc(q)) + '</li>'; }).join('') +
+      '</ul></div>';
   }
 
-  // 6. Empfehlung
-  html += '<div class="ai-block ai-block-empfehlung"><h3>🎯 Empfehlung</h3>';
-  html += '<div class="ai-empfehlung-row">' + empfehlungBadge(a.empfehlung || a.fazit_kurz) + '</div>';
-  if (a.empfehlung_begruendung) html += '<p style="margin-top:10px">' + _escClean(a.empfehlung_begruendung) + '</p>';
-  html += '</div>';
-
-  // V29: Alte 6-Block-Struktur — Investmentbewertung / Verhandlung / Kaufpreis-Offerte / Bankargumente
-  // Wenn die Felder vorhanden sind, werden sie als eigene farbige Karten gerendert.
-  if (a.investmentbewertung) {
-    html += '<div class="ai-block ai-block-investmentbewertung">';
-    html += '<h3>📈 Investmentbewertung</h3>';
-    html += '<p>' + _escClean(a.investmentbewertung) + '</p>';
-    html += '</div>';
-  }
-  if (a.verhandlungsempfehlung) {
-    html += '<div class="ai-block ai-block-verhandlung">';
-    html += '<h3>🤝 Verhandlungsempfehlung</h3>';
-    html += '<p>' + _escClean(a.verhandlungsempfehlung) + '</p>';
-    html += '</div>';
-  }
+  // Panel 5 — Verhandlung & Offerte
+  var pV = sec('', I.deal, 'VERHANDLUNG & OFFERTE');
+  if (has(a.verhandlungsempfehlung))
+    pV += '<div class="dp-pa-card">' + sec('', I.deal, 'VERHANDLUNGSEMPFEHLUNG') + p(a.verhandlungsempfehlung) + '</div>';
   if (a.kaufpreis_offerte && typeof a.kaufpreis_offerte === 'object') {
     var kp = a.kaufpreis_offerte;
-    html += '<div class="ai-block ai-block-offerte">';
-    html += '<h3>💰 Kaufpreis-Offerte</h3>';
-    if (kp.empfohlen) {
-      html += '<div class="ai-offerte-price">' + _escClean(kp.empfohlen) + '</div>';
-    }
-    if (kp.begruendung) {
-      html += '<p>' + _escClean(kp.begruendung) + '</p>';
-    }
-    if (Array.isArray(kp.argumente) && kp.argumente.length) {
-      html += '<div class="ai-sub"><strong>Argumente für die Verhandlung:</strong></div>';
-      html += list(kp.argumente);
-    }
-    html += '</div>';
+    pV += '<div class="dp-pa-card dp-pa-offerte">' + sec('', I.deal, 'KAUFPREIS-OFFERTE');
+    if (kp.empfohlen)   pV += '<div class="dp-pa-price">' + _escClean(kp.empfohlen) + '</div>';
+    if (kp.begruendung) pV += p(kp.begruendung);
+    if (Array.isArray(kp.argumente) && kp.argumente.length)
+      pV += '<div class="dp-pa-kv"><strong>Argumente f\u00fcr die Verhandlung:</strong></div>' + list(kp.argumente);
+    pV += '</div>';
   }
-  if (Array.isArray(a.bankargumente) && a.bankargumente.length) {
-    html += '<div class="ai-block ai-block-bank">';
-    html += '<h3>🏦 Bankargumente</h3>';
-    html += list(a.bankargumente);
-    html += '</div>';
+  if (a.offerte_mail && typeof a.offerte_mail === 'object') {
+    var om = a.offerte_mail;
+    var omRaw = (om.text || '');
+    pV += '<div class="dp-pa-card dp-pa-offmail">' + sec('', I.deal, 'OFFERTE ALS E-MAIL') +
+      (om.betreff ? '<div class="dp-pa-kv"><strong>Betreff:</strong> ' + _esc(om.betreff) + '</div>' : '') +
+      '<div class="dp-pa-mailtext">' + _esc(omRaw) + '</div>' +
+      '<div class="dp-pa-mailbtns">' +
+        '<button type="button" class="dp-pa-mbtn" onclick="_dpOfferteMail(\'mail\',this)">Als E-Mail erzeugen</button>' +
+        '<button type="button" class="dp-pa-mbtn ghost" onclick="_dpOfferteMail(\'copy\',this)">Text kopieren</button>' +
+      '</div>' +
+      '<textarea class="dp-pa-mailraw" hidden>' + _esc(omRaw) + '</textarea>' +
+      '<input type="hidden" class="dp-pa-mailsubj" value="' + _esc(om.betreff || '') + '">' +
+      '</div>';
+  }
+  if (!has(a.verhandlungsempfehlung) && !(a.kaufpreis_offerte && typeof a.kaufpreis_offerte === 'object') && !(a.offerte_mail && typeof a.offerte_mail === 'object'))
+    pV += '<div class="dp-pa-card"><em class="dp-pa-empty">\u2014 keine Verhandlungsdaten</em></div>';
+
+  // Panel 6 — Bank
+  var pK = sec('', I.bank, 'BANK') + '<div class="dp-pa-card">' + sec('', I.bank, 'BANKARGUMENTE') +
+    ((Array.isArray(a.bankargumente) && a.bankargumente.length) ? num(a.bankargumente) : '<em class="dp-pa-empty">\u2014 keine Bankargumente</em>') + '</div>';
+
+  function tab(id, label, active) {
+    return '<button type="button" class="dp-pa-tab' + (active ? ' active' : '') + '" onclick="_dpPaTab(\'' + id + '\',this)">' + label + '</button>';
+  }
+  function panel(id, inner, active) {
+    return '<section class="dp-pa-panel' + (active ? ' active' : '') + '" id="dp-pa-' + id + '">' + inner + '</section>';
   }
 
-  // 7. DealPilot Insight
-  if (a.dealpilot_insight) {
-    html += '<div class="ai-block ai-block-insight">';
-    html += '<h3>💡 DealPilot-Insight</h3>';
-    html += '<p style="font-style:italic">' + _escClean(a.dealpilot_insight) + '</p>';
-    html += '</div>';
-  }
-
-  // Lage-Recherche
-  if (a.makrolage_recherche || a.mikrolage_recherche || a.mietspiegel_eur_qm || a.kaufpreisniveau) {
-    html += '<div class="ai-block ai-block-research"><h3>🌍 Markt-Recherche</h3>';
-    if (a.makrolage_recherche)  html += '<div class="ai-sub"><strong>Makrolage:</strong> ' + _escClean(a.makrolage_recherche) + '</div>';
-    if (a.mikrolage_recherche)  html += '<div class="ai-sub"><strong>Mikrolage:</strong> ' + _escClean(a.mikrolage_recherche) + '</div>';
-    if (a.mietspiegel_eur_qm)   html += '<div class="ai-sub"><strong>Mietspiegel:</strong> ' + _escClean(a.mietspiegel_eur_qm) + ' €/m²</div>';
-    if (a.kaufpreisniveau)      html += '<div class="ai-sub"><strong>Kaufpreisniveau:</strong> ' + _escClean(a.kaufpreisniveau) + '</div>';
-    html += '</div>';
-  }
-
-  // Quellen — _esc reicht hier, das sind URLs
-  if (Array.isArray(a.quellen) && a.quellen.length) {
-    html += '<div class="ai-block ai-block-sources"><h3>🔗 Quellen</h3><ul>' +
-            a.quellen.map(function(q){
-              var url = ('' + q).match(/https?:\/\/\S+/);
-              return '<li>' + (url ? '<a href="' + _esc(url[0]) + '" target="_blank" rel="noopener">' + _esc(q) + '</a>' : _esc(q)) + '</li>';
-            }).join('') + '</ul></div>';
-  }
-
-  return html;
+  return '<div class="dp-pa-wrap">' +
+    '<nav class="dp-pa-rail">' +
+      tab('briefing', 'Briefing', true) +
+      tab('sr', 'St\u00e4rken &amp; Risiken', false) +
+      tab('risk', 'Risiko &amp; Szenarien', false) +
+      tab('loc', 'Lage &amp; Markt', false) +
+      tab('verh', 'Verhandlung &amp; Offerte', false) +
+      tab('bank', 'Bank', false) +
+    '</nav>' +
+    '<div class="dp-pa-content">' +
+      panel('briefing', pB, true) +
+      panel('sr', pS, false) +
+      panel('risk', pR, false) +
+      panel('loc', pL, false) +
+      panel('verh', pV, false) +
+      panel('bank', pK, false) +
+    '</div>' +
+  '</div>';
 }
+/* v584-rail END */
+/* v589-offmail */
+function _dpFallbackCopy(el) {
+  try { el.removeAttribute('hidden'); el.select(); document.execCommand('copy'); el.setAttribute('hidden', ''); } catch (e) {}
+}
+window._dpOfferteMail = function (action, btn) {
+  try {
+    var card = btn && btn.closest ? btn.closest('.dp-pa-offmail') : null; if (!card) return;
+    var raw = card.querySelector('.dp-pa-mailraw');
+    var subjEl = card.querySelector('.dp-pa-mailsubj');
+    var text = raw ? raw.value : '';
+    var subj = subjEl ? subjEl.value : '';
+    if (action === 'copy') {
+      var done = function () { var o = btn.textContent; btn.textContent = 'Kopiert \u2713'; setTimeout(function () { btn.textContent = o; }, 1600); };
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, function () { _dpFallbackCopy(raw); done(); }); }
+      else { _dpFallbackCopy(raw); done(); }
+    } else {
+      window.location.href = 'mailto:?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(text);
+    }
+  } catch (e) {}
+};
 
 /**
  * V25: Kompakter AI-Render für Tab Kennzahlen (s6).

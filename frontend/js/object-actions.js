@@ -56,7 +56,12 @@
 
   /* ── CSS (exakte QuickCheck-Klassen, scoped) ───────────────────── */
   function injectCss() {
-    if ($('oab-style')) return;
+    /* v600-reinject: veraltetes oab-style ersetzen statt blind behalten */
+    var _old = $('oab-style');
+    if (_old) {
+      if (_old.textContent && _old.textContent.indexOf('E8CC7A') > -1) return;
+      if (_old.parentNode) _old.parentNode.removeChild(_old);
+    }
     var P = '#' + MOUNT_ID + ' ';
     var css = [
       '[data-v365-top]{display:none!important}',
@@ -77,6 +82,8 @@
       P + '.oab-act:hover{border-color:rgba(201,168,76,0.6);box-shadow:0 4px 12px -6px rgba(201,168,76,0.45);transform:translateY(-1px)}',
       P + '.oab-act .qc7-ic{display:inline-flex}',
       P + '#oab-run{margin-left:auto}',  /* v394: Abrufen rechts */
+      P + '#oab-run.dp-pf-launch{background:linear-gradient(180deg,#E8CC7A,#C9A84C);color:#1a1407;border:none;box-shadow:0 2px 6px -2px rgba(0,0,0,.30);transform:none}',  /* v599-gold */
+      P + '#oab-run.dp-pf-launch:hover,#oab-run.dp-pf-launch:focus,#oab-run.dp-pf-launch:active{background:linear-gradient(180deg,#E8CC7A,#C9A84C);color:#1a1407;border:none;box-shadow:0 2px 6px -2px rgba(0,0,0,.30);transform:none;filter:brightness(1.04);opacity:1}',  /* v599-gold */
       '#brw-ai-btn{display:none!important}',  /* v389: BRW-Schaetzen dauerhaft aus (ueberlebt Re-Render) */
       P + '.qc6-seg{display:inline-flex;border:1px solid rgba(201,168,76,0.4);border-radius:11px;overflow:hidden;background:rgba(248,246,241,0.7)}',
       P + ".qc6-seg button{appearance:none;border:0;background:transparent;padding:7px 14px;font:600 13px/1 'DM Sans',system-ui,sans-serif;color:var(--ch2,#6b6660);cursor:pointer;transition:background .18s ease,color .18s ease;white-space:nowrap}",
@@ -177,13 +184,13 @@
 
   /* ── Leiste (ohne KI-Recherche) ────────────────────────────────── */
   function srcLabel(value, icoName, text, disabled) {
-    return '<label class="qc7-src" data-src="' + value + '"' + (disabled ? ' title="AVM derzeit deaktiviert"' : '') + '>' +
+    return '<label class="qc7-src" data-src="' + value + '"' + (disabled ? ' title="Marktradar derzeit deaktiviert"' : '') + '>' +
       '<input type="checkbox" value="' + value + '"' + (disabled ? ' disabled' : '') + '>' +
       '<span class="qc7-box">' + svg('check', 12, '#fff') + '</span>' +
       '<span class="qc7-ic">' + svg(icoName, 14) + '</span> ' + text + '</label>';
   }
   function srcLabelImg(value, img, alt, disabled) {
-    return '<label class="qc7-src" data-src="' + value + '"' + (disabled ? ' title="AVM derzeit deaktiviert"' : '') + '>' +
+    return '<label class="qc7-src" data-src="' + value + '"' + (disabled ? ' title="Marktradar derzeit deaktiviert"' : '') + '>' +
       '<input type="checkbox" value="' + value + '"' + (disabled ? ' disabled' : '') + '>' +
       '<span class="qc7-box">' + svg('check', 12, '#fff') + '</span>' +
       '<img class="qc7-logo" src="' + img + '" alt="' + alt + '" title="' + alt + '">' + '</label>';
@@ -209,13 +216,14 @@
     var _phInner = '<span class="dp-pf-logo"><img src="img/pricehubble.jpg" alt="PriceHubble"></span>';
     var _snInner = '<span class="dp-pf-logo"><img src="img/sprengnetter.jpg" alt="Sprengnetter"></span>';
     var _dpInner = '<span class="dp-pf-logo dp">Deal<b>Pilot</b></span>';
+      var _qrSvg = '<svg class="dp-qr" viewBox="0 0 37 37" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-label="QR DealPilot"><rect width="37" height="37" fill="#fff"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM17 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM29 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM14 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM19 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM13 6h1v1h-1zM14 6h1v1h-1zM15 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM23 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM29 6h1v1h-1zM30 6h1v1h-1zM32 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM21 7h1v1h-1zM23 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM29 7h1v1h-1zM30 7h1v1h-1zM32 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM17 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM32 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM21 9h1v1h-1zM22 9h1v1h-1zM26 9h1v1h-1zM32 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM29 10h1v1h-1zM30 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM16 11h1v1h-1zM18 11h1v1h-1zM20 11h1v1h-1zM22 11h1v1h-1zM23 11h1v1h-1zM24 11h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM16 12h1v1h-1zM21 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM26 12h1v1h-1zM27 12h1v1h-1zM28 12h1v1h-1zM29 12h1v1h-1zM30 12h1v1h-1zM4 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM23 13h1v1h-1zM24 13h1v1h-1zM26 13h1v1h-1zM27 13h1v1h-1zM28 13h1v1h-1zM32 13h1v1h-1zM4 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM24 14h1v1h-1zM25 14h1v1h-1zM28 14h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM17 15h1v1h-1zM19 15h1v1h-1zM20 15h1v1h-1zM24 15h1v1h-1zM25 15h1v1h-1zM27 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM4 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM21 16h1v1h-1zM24 16h1v1h-1zM29 16h1v1h-1zM30 16h1v1h-1zM5 17h1v1h-1zM9 17h1v1h-1zM11 17h1v1h-1zM16 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM23 17h1v1h-1zM24 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM28 17h1v1h-1zM32 17h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM19 18h1v1h-1zM20 18h1v1h-1zM22 18h1v1h-1zM25 18h1v1h-1zM26 18h1v1h-1zM27 18h1v1h-1zM28 18h1v1h-1zM29 18h1v1h-1zM30 18h1v1h-1zM5 19h1v1h-1zM7 19h1v1h-1zM8 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM18 19h1v1h-1zM19 19h1v1h-1zM23 19h1v1h-1zM28 19h1v1h-1zM31 19h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM21 20h1v1h-1zM23 20h1v1h-1zM29 20h1v1h-1zM30 20h1v1h-1zM4 21h1v1h-1zM9 21h1v1h-1zM15 21h1v1h-1zM17 21h1v1h-1zM18 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM22 21h1v1h-1zM23 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM30 21h1v1h-1zM32 21h1v1h-1zM4 22h1v1h-1zM7 22h1v1h-1zM10 22h1v1h-1zM11 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM30 22h1v1h-1zM4 23h1v1h-1zM6 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM14 23h1v1h-1zM17 23h1v1h-1zM19 23h1v1h-1zM20 23h1v1h-1zM23 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM27 23h1v1h-1zM28 23h1v1h-1zM31 23h1v1h-1zM4 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM11 24h1v1h-1zM16 24h1v1h-1zM18 24h1v1h-1zM21 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM28 24h1v1h-1zM30 24h1v1h-1zM31 24h1v1h-1zM32 24h1v1h-1zM12 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM20 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM29 25h1v1h-1zM30 25h1v1h-1zM31 25h1v1h-1zM32 25h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM12 27h1v1h-1zM13 27h1v1h-1zM14 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h1v1h-1zM32 27h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM14 28h1v1h-1zM16 28h1v1h-1zM21 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM7 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM12 29h1v1h-1zM13 29h1v1h-1zM17 29h1v1h-1zM18 29h1v1h-1zM20 29h1v1h-1zM21 29h1v1h-1zM22 29h1v1h-1zM29 29h1v1h-1zM30 29h1v1h-1zM31 29h1v1h-1zM32 29h1v1h-1zM4 30h1v1h-1zM6 30h1v1h-1zM7 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h1v1h-1zM13 30h1v1h-1zM14 30h1v1h-1zM17 30h1v1h-1zM19 30h1v1h-1zM21 30h1v1h-1zM23 30h1v1h-1zM25 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM28 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM4 31h1v1h-1zM10 31h1v1h-1zM13 31h1v1h-1zM14 31h1v1h-1zM15 31h1v1h-1zM16 31h1v1h-1zM23 31h1v1h-1zM24 31h1v1h-1zM26 31h1v1h-1zM28 31h1v1h-1zM29 31h1v1h-1zM31 31h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM7 32h1v1h-1zM8 32h1v1h-1zM9 32h1v1h-1zM10 32h1v1h-1zM12 32h1v1h-1zM15 32h1v1h-1zM17 32h1v1h-1zM18 32h1v1h-1zM19 32h1v1h-1zM21 32h1v1h-1zM23 32h1v1h-1zM26 32h1v1h-1zM27 32h1v1h-1zM28 32h1v1h-1zM30 32h1v1h-1z" fill="#141210"/></svg>';
     mount.innerHTML =
       '<div class="dp-pf-scroll"><div class="dp-pfbar" id="oab-bar">' +
         '<span class="dp-pf-stripe"></span>' +
-        '<div class="dp-pf-lead"><span class="k">PRE-FLIGHT</span><span class="s">DealPilot \u00b7 Boarding</span></div>' + /* v572-leadtext */
+        '<div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot \u00b7 Boarding</span></div><span class="dp-pf-perf"></span>' + /* v572-leadtext */
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">' +
-          pfTileLogo('pricehubble', _phInner, avmOff, avmOff ? 'AVM derzeit deaktiviert' : 'PriceHubble') +
-          pfTileLogo('sprengnetter', _snInner, avmOff, avmOff ? 'AVM derzeit deaktiviert' : 'Sprengnetter') +
+          pfTileLogo('pricehubble', _phInner, avmOff, avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble') +
+          pfTileLogo('sprengnetter', _snInner, avmOff, avmOff ? 'Marktradar derzeit deaktiviert' : 'Sprengnetter') +
           pfTileLogo('dealpilot', _dpInner, false, 'Marktpreisbewertung') +
         '</div></div>' +
         '<div class="dp-pf-sep"></div>' +
@@ -223,10 +231,10 @@
           pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprachaufzeichnung', 'Objekt frei einsprechen \u2014 1 L Kerosin') : '') +
         '</div></div>' +
-        '<button type="button" class="dp-pf-launch oab-act" id="oab-run"><span class="dp-pf-ic">' + _plane + '</span> Abrufen</button>' +
+        '<a class="dp-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run"><span class="dp-pf-ic">' + _plane + '</span> Abrufen</button>' + '</span>' +
       '</div></div>' +
       '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
-      (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">AVM (PriceHubble/Sprengnetter) ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
+      (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Marktradar (PriceHubble/Sprengnetter) ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
       '<div class="oab-prog" id="oab-prog" style="display:none"></div>' +
       '<div class="oab-results" id="oab-results"></div>';
     // v570-pf: initial .on synchronisieren (DealPilot default aktiv) + LED-Kopplung sicherstellen
@@ -260,7 +268,7 @@
       return '<b>' + L + '\u00a0L</b> ' + nm;
     }).join(' + ');
     var txt = 'Beim <b>Abrufen</b> ' + (billed.length > 1 ? 'werden ' : 'wird ') + parts + ' Kerosin verbraucht' + (billed.length > 1 ? ' (' + _total + '\u00a0L gesamt)' : '') + '.';
-    if (demo && billed.some(function (s) { return s !== 'voice'; })) txt += ' <span style="opacity:.75">AVM im Demo-Modus aktuell kostenlos.</span>';
+    if (demo && billed.some(function (s) { return s !== 'voice'; })) txt += ' <span style="opacity:.75">Marktradar im Demo-Modus aktuell kostenlos.</span>';
     el.innerHTML = '<span class="oab-credit-dot"></span>' + txt;
     el.style.display = '';
   }
@@ -358,12 +366,12 @@
       if (!res.ok) {
         if (data && data.needs_credits) toast('⚠ Nicht genug Credits (' + (data.required || '?') + ' nötig)');
         else if (data && data.missing_fields) { promptMissing(provider); }
-        else if (data && data.disabled) toast('AVM ist derzeit deaktiviert.');
-        else toast('⚠ AVM-Abruf fehlgeschlagen' + (data && data.message ? ': ' + data.message : ''));
+        else if (data && data.disabled) toast('Marktradar ist derzeit deaktiviert.');
+        else toast('⚠ Marktradar-Abruf fehlgeschlagen' + (data && data.message ? ': ' + data.message : ''));
         return;
       }
       if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); persistAvmState(); toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−' + (data.cost || 0) + ' Credits)')); /* v435-credit-refresh: Header-Marktcredit-Pille live aktualisieren */ if (data.mode !== 'stub') { try { setTimeout(function(){ if (window.AiCredits && typeof window.AiCredits.refreshAvm === 'function') window.AiCredits.refreshAvm(); }, 400); } catch (e) {} } }
-    } catch (e) { toast('⚠ Netzwerkfehler beim AVM-Abruf'); }
+    } catch (e) { toast('⚠ Netzwerkfehler beim Marktradar-Abruf'); }
   }
   function pickMW(r) { return _span === 'low' ? r.low : _span === 'high' ? r.high : r.marktwert; }
   function pickMM(r) { return _span === 'low' ? r.marktmieteLow : _span === 'high' ? r.marktmieteHigh : r.marktmieteCold; }
@@ -378,7 +386,7 @@
     ['pricehubble', 'sprengnetter'].forEach(function (p) {
       var lab = m.querySelector('.dp-pf-tile[data-src="' + p + '"]'); if (!lab) return;
       var cb = lab.querySelector('input'); if (cb) cb.disabled = off;
-      if (off) lab.setAttribute('title', 'AVM derzeit deaktiviert'); else lab.removeAttribute('title');
+      if (off) lab.setAttribute('title', 'Marktradar derzeit deaktiviert'); else lab.removeAttribute('title');
       lab.style.opacity = off ? '0.55' : '';
     });
     var note = m.querySelector('.oab-note'); if (!off && note) note.remove();
