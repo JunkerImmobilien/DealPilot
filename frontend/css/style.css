@@ -32730,3 +32730,129 @@ body.hdr-banner-only .hdr-v61-row2 {
 .ai-pdf-details[open]>summary::before{transform:rotate(90deg)}
 .ai-pdf-details .ai-pdf-sections{margin-top:8px}
 /* v604-pdf-details-css END */
+
+/* ===== v607-sidebar-rail BEGIN: eingeklappt = 66px Icon-Rail (statt display:none) ===== */
+/* Grid auf schmale Rail statt 0; Main bleibt in Spalte 2 (kein Overlap) */
+body.dp-sidebar-collapsed .app-wrap { grid-template-columns: 66px 1fr !important; }
+body.dp-sidebar-collapsed #sidebar { display:flex !important; width:66px !important; overflow:visible !important; }
+body.dp-sidebar-collapsed .main-col { grid-column: auto !important; }
+
+/* Header/Logo: DP-Logo bleibt, geschrumpft + zentriert */
+body.dp-sidebar-collapsed #sidebar .sb-header { padding:8px 0 !important; min-height:0 !important; }
+body.dp-sidebar-collapsed #sidebar .app-logo-simple-wrap-sidebar { margin:6px auto !important; justify-content:center; }
+body.dp-sidebar-collapsed #sidebar .app-logo-simple-sidebar { height:auto !important; width:46px !important; object-fit:contain; }
+
+/* Portfolio-Titel: Icon bleibt, Text + Sortier-Toggle aus */
+body.dp-sidebar-collapsed #sidebar .sb-section-title { font-size:0 !important; justify-content:center !important; padding:8px 0 !important; }
+body.dp-sidebar-collapsed #sidebar .sb-section-title svg { width:14px; height:14px; }
+body.dp-sidebar-collapsed #sidebar .sb-sort-toggle { display:none !important; }
+body.dp-sidebar-collapsed #sidebar .sb-empty { display:none !important; }
+
+/* Objekt-Liste -> Score-Punkte (zentriert, scrollt bei vielen) */
+body.dp-sidebar-collapsed #sidebar #sb-list { flex:0 1 auto !important; max-height:38vh; overflow-y:auto; overflow-x:visible;
+  display:flex !important; flex-direction:column; align-items:center; gap:8px; padding:6px 0 !important; }
+body.dp-sidebar-collapsed #sidebar .sb-card { width:44px !important; min-height:0 !important; height:44px !important;
+  padding:0 !important; margin:0 !important; border:0 !important; background:transparent !important; box-shadow:none !important;
+  border-radius:50% !important; display:flex !important; align-items:center; justify-content:center; position:relative; overflow:visible !important; }
+body.dp-sidebar-collapsed #sidebar .sb-card > * { display:none !important; }
+body.dp-sidebar-collapsed #sidebar .sb-card .sbc-score-overlay { display:flex !important; position:static !important;
+  top:auto !important; right:auto !important; flex-direction:column; align-items:center; }
+body.dp-sidebar-collapsed #sidebar .sb-card .sbc-score-label { display:none !important; }
+body.dp-sidebar-collapsed #sidebar .sb-card .sbc-mini-score { width:38px !important; height:38px !important; }
+body.dp-sidebar-collapsed #sidebar .sb-card.active .sbc-mini-score { box-shadow:0 0 0 2px #C9A84C; border-radius:50%; }
+/* Karten ohne Score -> neutraler Punkt */
+body.dp-sidebar-collapsed #sidebar .sb-card:not(:has(.sbc-score-overlay)) { width:14px !important; height:14px !important;
+  background:#3a3a3f !important; border:2px solid rgba(255,255,255,.12) !important; }
+
+/* Aktionen-Akkordeon: im eingeklappten Zustand DAUERHAFT als Icon-Strip (statt Popover) */
+body.dp-sidebar-collapsed #sidebar .sb-actions-accordion { position:static !important; max-height:none !important;
+  opacity:1 !important; pointer-events:auto !important; bottom:auto !important; left:auto !important; right:auto !important;
+  overflow:visible !important; z-index:auto !important; }
+body.dp-sidebar-collapsed #sidebar .sb-actions-accordion-inner { max-height:none !important; overflow:visible !important;
+  background:transparent !important; padding:0 !important; border:0 !important; box-shadow:none !important; }
+body.dp-sidebar-collapsed #sidebar .sb-act-l { display:none !important; }
+body.dp-sidebar-collapsed #sidebar .sb-act-section-title { font-size:0 !important; height:1px; overflow:hidden;
+  background:rgba(255,255,255,.08); margin:8px 14px !important; padding:0 !important; }
+body.dp-sidebar-collapsed #sidebar .sb-act-item { justify-content:center !important; padding:9px 0 !important; position:relative; }
+body.dp-sidebar-collapsed #sidebar .sb-actions-trigger { display:none !important; }
+
+/* Toggle an den rechten Rand der Rail (slidet mit), rund + gold */
+#dp-sb-toggle { left:367px !important; top:26px !important; right:auto !important; border-radius:50% !important;
+  transition:left .25s ease, background .15s, border-color .15s, transform .15s !important; }
+body.dp-sidebar-collapsed #dp-sb-toggle { left:53px !important; }
+
+/* Tooltips im eingeklappten Zustand (Label rechts neben Icon/Punkt) */
+body.dp-sidebar-collapsed #sidebar .sb-act-item[data-tip]:hover::after,
+body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
+  content:attr(data-tip); position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%);
+  background:#000; color:#fff; font-size:12px; font-weight:500; padding:6px 10px; border-radius:7px; white-space:nowrap;
+  border:1px solid #C9A84C; z-index:9999; pointer-events:none; }
+/* ===== v607-sidebar-rail END ===== */
+
+/* ===== v608-sidebar-fix BEGIN: Aktionen-Icons sichtbar + user-box Avatar+Logout ===== */
+/* Akkordeon im eingeklappten Zustand kompromisslos als Dauer-Icon-Strip (alle Versteck-Props) */
+body.dp-sidebar-collapsed #sidebar .sb-actions-accordion,
+body.dp-sidebar-collapsed #sidebar .sb-actions-accordion-inner {
+  max-height:none !important; height:auto !important; opacity:1 !important; visibility:visible !important;
+  transform:none !important; pointer-events:auto !important; overflow:visible !important; display:block !important; }
+body.dp-sidebar-collapsed #sidebar .sb-actions-accordion {
+  position:static !important; bottom:auto !important; left:auto !important; right:auto !important; background:transparent !important; }
+body.dp-sidebar-collapsed #sidebar .sb-actions-accordion-inner {
+  background:transparent !important; padding:0 !important; border:0 !important; box-shadow:none !important; }
+body.dp-sidebar-collapsed #sidebar .sb-act-item { padding:6px 0 !important; }
+body.dp-sidebar-collapsed #sidebar #sb-list { max-height:32vh !important; }
+
+/* user-box: nur Avatar + Logout (Name/E-Mail/V1.1/Plan-Icon aus) */
+body.dp-sidebar-collapsed #sidebar .sb-user-box { padding:6px 0 !important; }
+body.dp-sidebar-collapsed #sidebar .sb-user-main { flex-direction:column !important; gap:8px !important; align-items:center !important; padding:6px 0 !important; }
+body.dp-sidebar-collapsed #sidebar .sb-user-text,
+body.dp-sidebar-collapsed #sidebar .sb-version-badge { display:none !important; }
+body.dp-sidebar-collapsed #sidebar .sb-user-icons { flex-direction:column !important; gap:8px !important; }
+body.dp-sidebar-collapsed #sidebar .sb-user-icons button:nth-of-type(1) { display:none !important; }
+/* ===== v608-sidebar-fix END ===== */
+
+/* ===== v609-settings-sidebar BEGIN ===== */
+/* Anfrage-Routing in Einstellungen vorerst ausblenden (Code bleibt erhalten -> Zeile entfernen = zurueck) */
+#branding-routing-section { display:none !important; }
+
+/* Sidebar eingeklappt: "+ Neues Objekt hinzufuegen" -> reines +-Icon (kein Textumbruch) */
+body.dp-sidebar-collapsed #sidebar .sb-add-new {
+  font-size:0 !important; width:44px !important; padding:10px 0 !important; margin:6px auto 12px !important;
+  display:flex !important; align-items:center; justify-content:center; }
+body.dp-sidebar-collapsed #sidebar .sb-add-new::before {
+  content:"+"; font-size:22px; line-height:1; color:var(--gold); }
+/* ===== v609-settings-sidebar END ===== */
+
+/* ===== v610-sidebar-polish BEGIN ===== */
+/* (1) Doppeltes "+" weg: oberen add-new in der Rail ausblenden (Aktionen-Icon "Neues Objekt" bleibt) */
+body.dp-sidebar-collapsed #sidebar .sb-add-new { display:none !important; }
+/* (2) Leere "Schiene" oben (Portfolio-Section-Title) eingeklappt ausblenden */
+body.dp-sidebar-collapsed #sidebar .sb-section-title { display:none !important; }
+/* (3) Logo -> DP-Badge (D weiss, P gold) */
+body.dp-sidebar-collapsed #sidebar .app-logo-simple-sidebar { display:none !important; }
+body.dp-sidebar-collapsed #sidebar .app-logo-simple-wrap-sidebar {
+  justify-content:center !important; align-items:center !important; gap:0 !important; height:40px !important; margin:8px auto !important; }
+body.dp-sidebar-collapsed #sidebar .app-logo-simple-wrap-sidebar::before {
+  content:"D"; color:#ffffff; font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:21px; line-height:1; }
+body.dp-sidebar-collapsed #sidebar .app-logo-simple-wrap-sidebar::after {
+  content:"P"; color:var(--gold,#C9A84C); font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:21px; line-height:1; }
+
+/* (4) Bild 3: Vorlagen-Checkboxen sauber ausrichten (Checkbox oben buendig, Text umbricht) */
+.set-modal-v2 .ai-sugg-item { display:flex !important; align-items:flex-start !important; gap:9px !important; }
+.set-modal-v2 .ai-sugg-cb { flex:0 0 auto !important; margin-top:3px !important; }
+.set-modal-v2 .ai-sugg-item > span { flex:1 1 auto !important; min-width:0; line-height:1.45 !important; }
+/* ===== v610-sidebar-polish END ===== */
+
+/* ===== v612-sidebar-center BEGIN ===== */
+/* Punkte + Aktionen vertikal mittig (Logo bleibt oben, User unten) */
+body.dp-sidebar-collapsed #sidebar #sb-list { margin-top:auto !important; }
+body.dp-sidebar-collapsed #sidebar .sb-actions-accordion { margin-bottom:auto !important; }
+/* Einklapp-Toggle auch im QuickCheck-Standalone zeigen */
+body.qc-standalone-active #dp-sb-toggle { display:flex !important; }
+/* Tooltip am Score-Punkt sicherstellen (Objektname) */
+body.dp-sidebar-collapsed #sidebar .sb-card { position:relative; }
+body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
+  content:attr(data-tip); position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%);
+  background:#000; color:#fff; font-size:12px; font-weight:500; padding:6px 10px; border-radius:7px; white-space:nowrap;
+  border:1px solid #C9A84C; z-index:9999; pointer-events:none; }
+/* ===== v612-sidebar-center END ===== */

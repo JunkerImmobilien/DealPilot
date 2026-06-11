@@ -15,7 +15,7 @@
 
   function setCollapsed(on) {
     document.body.classList.toggle('dp-sidebar-collapsed', !!on);
-    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+    /* v607: keine Persistenz */ if (on) { try { _v607TagTips(); } catch (e2) {} try { if (typeof window._sbActionsRenderIcons === 'function') window._sbActionsRenderIcons(); } catch (e3) {} /* v611-paint */ }
     updateBtn();
   }
   function toggle() { setCollapsed(!isCollapsed()); }
@@ -70,9 +70,24 @@
     window.enterQuickCheckMode = wrapped;
   }
 
+  function _v607TagTips() {
+    try {
+      document.querySelectorAll('#sidebar .sb-act-item').forEach(function (it) {
+        if (it.getAttribute('data-tip')) return;
+        var l = it.querySelector('.sb-act-l');
+        if (l) it.setAttribute('data-tip', (l.textContent || '').trim());
+      });
+      document.querySelectorAll('#sidebar .sb-card').forEach(function (cc) {
+        if (cc.getAttribute('data-tip')) return;
+        var a = cc.querySelector('.sbc-address');
+        if (a) cc.setAttribute('data-tip', (a.getAttribute('title') || a.textContent || '').trim());
+      });
+    } catch (e) {}
+  }
+
   function init() {
     ensureBtn();
-    try { if (localStorage.getItem(KEY) === '1') setCollapsed(true); } catch (e) {}
+    /* v607: immer ausgeklappt starten */
     wrapQuickCheck();
     // enterQuickCheckMode koennte erst nach ui.js verfuegbar sein -> kurz nachfassen
     var tries = 0;

@@ -232,7 +232,7 @@ function showSettings(initialTab) {
           '<h3 class="set-section-h">Passwort ändern</h3>' +
           '<div class="g3">' +
             '<div class="f"><label>Aktuelles Passwort</label><input id="set_pwd_old" type="password" autocomplete="current-password"></div>' +
-            '<div class="f"><label>Neues Passwort</label><input id="set_pwd_new" type="password" autocomplete="new-password"></div>' +
+            '<div class="f"><label>Neues Passwort <small style="opacity:.55;font-weight:400">(mind. 10 Zeichen)</small></label><input id="set_pwd_new" type="password" autocomplete="new-password"></div>' +
             '<div class="f"><label>Bestätigen</label><input id="set_pwd_new2" type="password" autocomplete="new-password"></div>' +
           '</div>' +
           '<div class="account-pw-actions">' +
@@ -364,9 +364,6 @@ function showSettings(initialTab) {
       // User soll da nichts einstellen können). Determinismus + alte Stil-Settings entfernt.
       '<div class="st-pane" data-pane="api" style="display:none">' +
         // V63.86: KI-Credits-Übersicht oben in der KI-Pane
-        '<h3 class="set-section-h">KI-Credits</h3>' +
-        '<div id="set-ai-credits-host"><div class="hint">Lädt…</div></div>' +
-        '<hr class="dvd">' +
         '<p class="hint">Diese Einstellungen werden allen KI-Analysen (KI-Lage, Quick-Check, Investor Deal Score AI) angehängt.</p>' +
 
         '<h3 class="set-section-h">Prompt-Qualität</h3>' +
@@ -754,7 +751,7 @@ function _getCurrentPlanMeta() {
     var parts = [];
     if (objLimit > 0)        parts.push(objLimit + ' Objekt' + (objLimit === 1 ? '' : 'e'));
     else if (objLimit < 0)   parts.push('unbegrenzte Objekte');
-    if (aiLimit > 0)         parts.push(aiLimit + ' KI-Credits / Monat');
+    if (aiLimit > 0)         parts.push(aiLimit + ' L Kerosin / Monat');
     else if (aiLimit === 1)  parts.push('1 KI-Analyse');
     return _esc(parts.join(' · '));
   } catch(e) { return ''; }
@@ -774,7 +771,7 @@ async function _changePassword() {
   var newPwd2 = document.getElementById('set_pwd_new2').value;
   if (!oldPwd) { _msg('Aktuelles Passwort fehlt', true); return; }
   if (!newPwd) { _msg('Neues Passwort fehlt', true); return; }
-  if (newPwd.length < 6) { _msg('Neues Passwort muss mindestens 6 Zeichen haben', true); return; }
+  if (newPwd.length < 10) { _msg('Neues Passwort muss mindestens 10 Zeichen haben', true); return; }
   if (newPwd !== newPwd2) { _msg('Neues Passwort und Bestätigung stimmen nicht überein', true); return; }
   try {
     // V63.22 Fix: Backend-Schema erwartet camelCase oldPassword / newPassword (NICHT snake_case)
@@ -790,7 +787,7 @@ async function _changePassword() {
     var em = e.message || 'Unbekannt';
     // Bei "Validation failed" oder "Invalid input" → spezifischere Hinweise
     if (/validation|invalid input/i.test(em)) {
-      _msg('Ungültige Eingabe — Passwort prüfen (mind. 6 Zeichen, max 128)', true);
+      _msg('Ungültige Eingabe — Passwort prüfen (mind. 10 Zeichen, max 128)', true);
     } else if (/incorrect|wrong|invalid/i.test(em)) {
       _msg('Aktuelles Passwort ist falsch', true);
     } else {
@@ -1404,7 +1401,7 @@ function _v234_1RenderPlanStatusHeader() {
         }
         // Meta-Info: Credits + Objekt-Limit
         var metaParts = [];
-        if (plan.aiCreditsPerMonth) metaParts.push(plan.aiCreditsPerMonth + ' KI-Credits / Monat');
+        if (plan.aiCreditsPerMonth) metaParts.push(plan.aiCreditsPerMonth + ' L Kerosin / Monat');
         if (plan.maxObjects === Infinity || plan.maxObjects === -1) {
           metaParts.push('Unbegrenzte Objekte');
         } else if (plan.maxObjects) {
@@ -1474,7 +1471,7 @@ function _renderPlanPane() {
 
   // Bei bezahltem Plan: nur Status-Header zurückgeben (keine Plan-Cards)
   if (_v234_1CurrentPlan !== 'free') {
-    return _v234_1Header;
+    return '<h3 class="set-section-h">Kerosin</h3><div id="set-ai-credits-host"><div class="hint">Lädt…</div></div><hr class="dvd">' + _v234_1Header; /* v611-kerosin-paid */
   }
 
   // Free-User: Status-Header + bisherige Plan-Card-Logik (siehe unten)
@@ -1491,7 +1488,7 @@ function _renderPlanPane() {
   var creditPacks = DealPilotConfig.pricing.aiCreditPackages || [];
   var yearlyBonus = DealPilotConfig.pricing.yearlyBonus || {};
 
-  var html = '';
+  var html = '<h3 class="set-section-h">Kerosin</h3><div id="set-ai-credits-host"><div class="hint">Lädt…</div></div><hr class="dvd">'; /* v611-kerosin */
   if (plans[current]) {
     html += '<p class="hint">Aktueller Plan: <strong>' + plans[current].label + '</strong>';
     if (DealPilotConfig.dev.isDev()) html += ' <span class="dev-badge">DEV</span>';

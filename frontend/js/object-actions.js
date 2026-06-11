@@ -118,7 +118,7 @@
       P + '.avmx-prov{font-size:15px;font-weight:700;color:var(--ch,#2A2727)}',
       P + '.avmx-conf{margin-left:auto;font-size:11px;font-weight:700;padding:3px 11px;border-radius:999px;background:rgba(63,165,108,0.15);color:#2E7D4F;text-transform:uppercase;letter-spacing:.04em}',
       P + '.avmx-min{margin-left:8px;width:26px;height:26px;border:1px solid var(--border,#E7E2DC);border-radius:7px;background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--ch2,#6b6660);transition:transform .2s}',
-      P + '.avmx.collapsed .avmx-min svg{transform:rotate(-90deg)}',
+      P + '.avmx.collapsed .avmx-min svg{transform:rotate(180deg)}',
       P + '.avmx-body{padding:6px 16px 10px}',
       P + '.avmx.collapsed .avmx-body{display:none}',
       P + '.avmx-chip{display:inline-flex;gap:10px;flex-wrap:wrap;margin:4px 0 2px;padding:4px 10px;background:rgba(255,255,255,0.6);border:1px solid rgba(201,168,76,0.25);border-radius:7px;font-size:11.5px;color:var(--ch2,#6b6660)}',

@@ -50,6 +50,7 @@
       '.dpx .dpx-eyebrow{font-family:\'Space Grotesk\',sans-serif;font-weight:600;font-size:11px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase}' +
       '.dpx .dpx-rating{font-family:\'Space Grotesk\',sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.04em;padding:3px 10px;border-radius:999px;color:var(--green);border:1px solid rgba(67,183,124,.45);background:rgba(67,183,124,.12)}' +
       '.dpx .dpx-headR{margin-left:auto;display:flex;align-items:center;gap:10px}' +
+      '.dpx .dpx-hvals{display:inline-flex;align-items:center;gap:8px;font-family:\'JetBrains Mono\',monospace;font-size:12.5px;color:var(--txt);flex-wrap:wrap}.dpx .dpx-hvals .hl{color:var(--mut);font-family:\'Space Grotesk\',sans-serif;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;margin-right:3px}.dpx .dpx-hvals .hmw{color:var(--gold)}.dpx .dpx-hvals .hs{color:var(--mut);font-size:11px}.dpx .dpx-hvals .hsep{color:var(--mut);margin:0 4px;opacity:.5}' +
       '.dpx .dpx-conf{display:inline-flex;align-items:center;gap:7px;font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:4px 11px}' +
       '.dpx .dpx-conf .cd{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}.dpx .dpx-conf b{color:var(--txt);font-family:\'JetBrains Mono\',monospace;font-weight:700}' +
       '#dp-mb-host .dpx-chev{width:30px;height:30px;border-radius:9px;border:1px solid var(--gold)!important;background:linear-gradient(var(--gold2),var(--gold))!important;color:#1a1407!important;display:grid;place-items:center;cursor:pointer;transition:.18s;flex:0 0 auto;box-shadow:0 4px 14px -6px rgba(201,168,76,.8)!important}#dp-mb-host .dpx-chev:hover{filter:brightness(1.06)}#dp-mb-host .dpx-chev svg{transition:transform .25s}#dp-mb-host .dpx.collapsed .dpx-chev svg{transform:rotate(180deg)!important}' +
@@ -168,11 +169,11 @@
         '<div class="dpx-head">' +
           '<span class="dpx-logo"><span class="d">Deal</span><span class="p">Pilot</span></span>' +
           '<span class="dpx-eyebrow">Marktbewertung</span>' +
-          '<span class="dpx-rating">' + D.rating + '</span>' +
+          '<span class="dpx-hvals" id="dpx-hvals"></span>' +
           '<div class="dpx-headR"><span class="dpx-conf"><span class="cd"></span>Aussagekraft: <b>' + D.conf.label + '</b> · <b>' + D.conf.pct + ' %</b></span>' +
             '<button class="dpx-chev" id="dpx-chev" title="Ein-/Ausklappen"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></div>' +
         '</div>' +
-        '<div class="dpx-sub"><div class="dpx-it">Mikro <b>' + D.mikro + '</b></div><div class="dpx-it">Makro <b>' + D.makro + '</b></div><div class="dpx-it">Wertentw. <span class="dpx-up">' + D.trend + '</span></div></div>' +
+        '<div class="dpx-sub"><div class="dpx-it dpx-rating-it">Bewertung <b>' + D.rating + '</b></div><div class="dpx-it">Mikro <b>' + D.mikro + '</b></div><div class="dpx-it">Makro <b>' + D.makro + '</b></div><div class="dpx-it">Wertentw. <span class="dpx-up">' + D.trend + '</span></div></div>' +
         '<div class="dpx-body"><div class="dpx-gauges">' +
           (hasMw ? '<div class="dpx-b dpx-mw"><div class="dpx-mg" id="dpx-g-mw">' + tachoSvg() + '</div><div><span class="dpx-lab">Marktwert</span><div class="dpx-val" id="dpx-v-mw">–</div><span class="dpx-sqm">' + D.mw.sqm + '</span><div class="dpx-spn" id="dpx-s-mw"></div></div></div>' : '') +
           (hasMm ? '<div class="dpx-b dpx-mm"><div class="dpx-mg" id="dpx-g-mm">' + tachoSvg() + '</div><div><span class="dpx-lab">Marktmiete (kalt)</span><div class="dpx-val" id="dpx-v-mm">–</div><span class="dpx-sqm">' + D.mm.sqm + '</span><div class="dpx-spn" id="dpx-s-mm"></div></div></div>' : '') +
@@ -197,6 +198,12 @@
   function paint() {
     if (D.mw) { countUp($('dpx-v-mw'), D.mw[mode]); setNeedle(gz.mw, frac(D.mw)); var s1 = $('dpx-s-mw'); if (s1) s1.innerHTML = spnHtml(D.mw); }
     if (D.mm) { countUp($('dpx-v-mm'), D.mm[mode]); setNeedle(gz.mm, frac(D.mm)); var s2 = $('dpx-s-mm'); if (s2) s2.innerHTML = spnHtml(D.mm); }
+    var hv = $('dpx-hvals');
+    if (hv) { var hp = [];
+      if (D.mw) hp.push('<span class="hl">MW</span><b class="hmw">' + fmt0(D.mw[mode]) + ' €</b>' + (D.mw.sqm ? ' <span class="hs">' + D.mw.sqm + '</span>' : ''));
+      if (D.mm) hp.push('<span class="hl">Miete</span><b>' + fmt0(D.mm[mode]) + ' €</b>');
+      hv.innerHTML = hp.join('<span class="hsep">|</span>');
+    }
     var t = $('dpx-applytxt'); if (t) t.textContent = 'In Felder übernehmen (' + spanLabel() + ')';
     try { if (global.QcApp && typeof global.QcApp.registerDpmb === 'function') global.QcApp.registerDpmb({
       marktwert: D.mw ? D.mw[mode] : 0, marktmiete: D.mm ? D.mm[mode] : 0,

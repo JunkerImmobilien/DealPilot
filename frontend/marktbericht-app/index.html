@@ -47,14 +47,24 @@
   :root{
     --bg:#050505; --panel:#141417; --panel2:#1b1b20; --line:#2a2a31;
     --gold:#C9A84C; --gold-soft:rgba(201,168,76,.14); --txt:#e8e8ea; --muted:#8a8a93;
+    --good:#4caf7d; --warn:#d9a441; --bad:#d9655b;
+  }
   /* v605-mb-light */
   html[data-mb-theme="light"]{--bg:#ffffff;--panel:#faf8f2;--panel2:#f3efe4;--line:#e6e0d3;--txt:#2a2727;--muted:#8a857c;--gold-soft:rgba(201,168,76,.12);}
   html[data-mb-theme="light"] input,html[data-mb-theme="light"] select,html[data-mb-theme="light"] .kpi,html[data-mb-theme="light"] .report,html[data-mb-theme="light"] .valcard{background:#ffffff !important;}
   html[data-mb-theme="light"] .score-circle{background:conic-gradient(var(--gold) var(--deg,0deg),#e6e0d3 0) !important;}
   html[data-mb-theme="light"] .dpmb-logo .dpmb-d{color:#2a2727 !important;}
-
-    --good:#4caf7d; --warn:#d9a441; --bad:#d9655b;
-  }
+  /* v608-mb-light-fix */
+  html[data-mb-theme="light"] body{background:#ffffff !important;}
+  html[data-mb-theme="light"] body::before{opacity:0 !important;}
+  html[data-mb-theme="light"] .panel{background:linear-gradient(180deg,#faf8f2,#f3efe4) !important;}
+  html[data-mb-theme="light"] .kpi{background:#ffffff !important;}
+  html[data-mb-theme="light"] .report,html[data-mb-theme="light"] .valcard,html[data-mb-theme="light"] .assess{background:#ffffff !important;}
+  html[data-mb-theme="light"] input,html[data-mb-theme="light"] select{background:#ffffff !important;}
+  html[data-mb-theme="light"] .pdfth-seg{background:#f3efe4 !important;}
+  html[data-mb-theme="light"] #precHead,html[data-mb-theme="light"] #precMeter,html[data-mb-theme="light"] #genProgress,html[data-mb-theme="light"] #lfProgress{background:#f7f4ec !important;border-color:#e6e0d3 !important;}
+  html[data-mb-theme="light"] #precHead{color:#9a7f33 !important;}
+  html[data-mb-theme="light"] .panel,html[data-mb-theme="light"] .report,html[data-mb-theme="light"] .valcard,html[data-mb-theme="light"] .kpi,html[data-mb-theme="light"] .assess{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);
     font-family:'Inter',system-ui,sans-serif;line-height:1.5;}
