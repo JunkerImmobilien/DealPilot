@@ -36,6 +36,9 @@ function buildPrompt(payload) {
   const k = payload.kennzahlen || {};
   const f = payload.finanzierung || {};
   const ds = payload.dealscore || {};
+  const mb = payload.marktbewertung || {};
+  const mr = payload.marktradar || [];
+  const isc = payload.investor_score || null;
 
   // Kennzahlen sicher formatieren
   const fmtPct = (v, dec) => v == null ? '–' : (v * (Math.abs(v) > 1 ? 1 : 100)).toFixed(dec || 1) + ' %';
@@ -109,6 +112,23 @@ function buildPrompt(payload) {
     '  „relativ hoch" oder „erhöht" — das ist faktisch falsch und kontrastiert mit',
     '  unserer Skala.',
     '- Ein DSCR von 1,25 ist SOLIDE und damit eine STÄRKE, kein Risiko.',
+    '',
+    '## GEWICHTUNG & HEBEL-LOGIK (verbindlich)',
+    '- LTV ist NUR EINER von mehreren Faktoren — gewichte ihn NICHT über. Ein hoher',
+    '  LTV ist KEIN eigenständiges K.-o.-Kriterium, wenn DSCR solide und die',
+    '  Eigenkapitalrendite hoch ist.',
+    '- Eine sehr hohe oder UNENDLICHE EK-Rendite (no-money-down: Kaufpreis UND',
+    '  Kaufnebenkosten vollständig aus Fremdkapital finanziert) ist eine herausragende',
+    '  HEBEL-STÄRKE und gehört prominent in die Stärken — niemals in die Risiken.',
+    '  Bei EK ~ 0 verzinst jeder positive Cashflow das eingesetzte Eigenkapital',
+    '  faktisch unendlich gut. Stelle das ausdrücklich als Top-Argument dar.',
+    '- NIEMALS formulieren, 0 % Eigenkapital / no-money-down "mindere die Attraktivität"',
+    '  oder "die EK-Rendite sei nicht gegeben". Das Gegenteil ist richtig: maximaler Hebel,',
+    '  höchste/unendliche EK-Rendite — das ist die STAERKSTE Eigenschaft des Deals.',
+    '- Bewerte den Deal PRIMÄR über Cashflow, EK-Rendite, DSCR und Substanz/Lage.',
+    '  Der LTV moduliert nur das Finanzierungsrisiko, dominiert aber nie das Urteil.',
+    '- Wenn DSCR >= 1,2 UND EK-Rendite hoch/unendlich: Finanzierung klar als STÄRKE',
+    '  darstellen; LTV nur als nachrangigen Hinweis (Zinsänderungs-/Anschlussrisiko).',
     '- Wenn du die Skala-Texte in der Gesamtbewertung oder Risikoanalyse zitierst,',
     '  verwende den DealPilot-Wortlaut wörtlich oder zumindest sinngemäß identisch.',
     '',
@@ -119,10 +139,14 @@ function buildPrompt(payload) {
     o.baujahr ? '- Baujahr: ' + o.baujahr : '',
     o.makrolage ? '- Makrolage (Selbstbewertung): ' + o.makrolage : '',
     o.mikrolage ? '- Mikrolage (Selbstbewertung): ' + o.mikrolage : '',
+    o.thesis ? '- Investitionsthese des Investors: ' + o.thesis : '',
+    o.risiken ? '- Vom Investor benannte Risiken: ' + o.risiken : '',
+    o.notizen ? '- Sonstige Bemerkungen des Investors: ' + o.notizen : '',
     '',
     '## INPUT-DATEN',
     '',
     'DealScore: ' + (ds.total != null ? ds.total : '–') + ' / 100',
+    isc ? ('Investor Deal Score: ' + (isc.total != null ? isc.total : '–') + ' / 100 (beruecksichtigt zusaetzlich Lage/Substanz/Upside — 24 KPIs)') : '',
     '',
     'Cashflow:',
     '- Monatlich: ' + fmtEur(k.cf_m),
@@ -150,8 +174,27 @@ function buildPrompt(payload) {
     'Kaufpreis: ' + fmtEur(k.kp),
     'Gesamtinvestition: ' + fmtEur(k.gi),
     'Eigenkapital: ' + fmtEur(k.ek),
+    'Eigenkapitalrendite (EK-Rendite): ' + (k.em == null ? '–' : (!isFinite(k.em) ? 'unendlich — no-money-down (Kaufpreis & Kaufnebenkosten voll fremdfinanziert)' : fmtPct(k.em, 1))),
     f.d1z_pct != null ? 'Sollzins D1: ' + Number(f.d1z_pct).toFixed(2) + ' %' : '',
     f.d1t_pct != null ? 'Tilgung D1: ' + Number(f.d1t_pct).toFixed(2) + ' %' : '',
+    f.restschuld_ezb != null ? 'Restschuld am Ende der Zinsbindung: ' + fmtEur(f.restschuld_ezb) : '',
+    '',
+    '## MARKTBEWERTUNG (falls hinterlegt — vorrangig vor Schätzungen nutzen)',
+    mb.marktwert ? '- Hinterlegter Marktwert: ' + fmtEur(mb.marktwert) : '- Keine eigene Marktbewertung hinterlegt.',
+    mb.marktmiete_qm ? '- Hinterlegte Marktmiete: ' + fmtNum(mb.marktmiete_qm, 2) + ' €/m²' : '',
+    mr.length ? ('- Marktpreisindikationen (mehrere Anbieter):\n' + mr.map(function (x) {
+      var parts = [];
+      if (x.marktwert != null) parts.push('Marktwert ' + fmtEur(x.marktwert));
+      if (x.low != null || x.high != null) parts.push('Spanne ' + fmtEur(x.low) + ' bis ' + fmtEur(x.high));
+      if (x.konfidenz != null) parts.push('Konfidenz ' + x.konfidenz);
+      return '  • ' + (x.provider || 'Anbieter') + ': ' + parts.join(', ');
+    }).join('\n')) : '',
+    (mr.length > 1) ? '- Es liegen MEHRERE Marktpreisindikationen vor — gehe auf ALLE ein, vergleiche sie, nenne jeweils Spanne und (falls vorhanden) Konfidenz und qualifiziere die Aussage. Es sind Marktpreisindikationen, KEIN Verkehrswert.' : '',
+    '- Wenn ein Marktwert hinterlegt ist, nutze ihn als VORRANGIGEN Vergleichsanker',
+    '  für Kaufpreis-Einordnung, Offerte und Bewertung — vor allgemeinen Annahmen.',
+    '- Wenn Web-Recherche aktiv ist: leite Kaufpreisniveau und Mietspiegel aus den',
+    '  recherchierten Quellen ab — qualifiziert mit Spanne/Konfidenz statt vager',
+    '  Allgemeinplätze.',
     '',
     '## RECHERCHE-AUFTRAG',
     'Recherchiere im Web zu folgenden Punkten und nimm die Erkenntnisse in deine Analyse auf:',
@@ -195,6 +238,9 @@ function buildPrompt(payload) {
     '',
     '8. Investmentbewertung — eine umfassende holistische Bewertung des Deals (8-12 Sätze).',
     '   Soll Rendite, Lage, Marktumfeld, Risiko und langfristige Perspektive verbinden.',
+    '   Gehe dabei auch auf die Steuererstattung/den Steuervorteil ein: was sie bringt und wie',
+    '   sie sich auf das zu versteuernde Einkommen auswirkt (Bezug AfA und Werbungskosten),',
+    '   qualitativ und mit Zahlen soweit aus den Eingabedaten ableitbar.',
     '',
     '9. Verhandlungsempfehlung — konkrete Verhandlungsstrategie (8-12 Sätze).',
     '   Welche Argumente, welche Hebel, welcher Zielpreis, welche Kompromisse?',
@@ -205,12 +251,42 @@ function buildPrompt(payload) {
     '11. Bankargumente — 5-7 ausführliche, fundierte Argumente zur Vorlage bei der Bank.',
     '   Jedes Argument 2-3 Sätze mit konkreten Zahlen aus dem Deal.',
     '',
+    '12. Offerte-Anschreiben — ein höfliches, wertschätzendes Schreiben an Makler/',
+    '   Verkäufer, das die Situation mit allen Vor- und Nachteilen respektvoll',
+    '   darstellt und die Preisvorstellung herleitet (Feld "offerte_mail").',
+    '',
+    '## OFFERTE-LEITLINIEN (verbindlich)',
+    '- In Kaufpreis-Offerte UND offerte_mail NICHT mit LTV/Beleihungsauslauf argumentieren',
+    '  (interne Finanzierungskennzahl des Kaeufers, KEIN Verhandlungsargument).',
+    '- Argumentiere mit: den vorliegenden Marktbewertungen (du DARFST Quellen/Anbieter beim',
+    '  Namen nennen — sie sind belastbar), Objektzustand (z.B. Modernisierungsbedarf),',
+    '  Lage/Markt und den eigenen Kennzahlen des Deals. Nenne Vorteile UND Nachteile.',
+    '- Formatiere die offerte_mail wie einen echten Brief: Anrede in eigener Zeile, dann',
+    '  2-3 inhaltliche Absaetze (durch Leerzeile getrennt), dann Grussformel und Name in',
+    '  eigenen Zeilen. Nutze echte Zeilenumbrueche, KEIN durchgehender Fliesstext-Block.',
+    '',
+    '13. Anschlussfinanzierung — betrachte die Phase nach der Zinsbindung: schaetze die',
+    '   voraussichtliche Restschuld am Ende der Zinsbindung, ordne das Anschlussrisiko ein',
+    '   und gib an, welcher Eigenkapital-Einsatz oder welche Sondertilgung die',
+    '   Anschlussfinanzierung tragfaehig macht. Konkret mit Zahlen, soweit ableitbar.',
+    '   Betrachte dabei die Wertsteigerung: der voraussichtliche Objektwert am Ende der',
+    '   Zinsbindung senkt den effektiven Beleihungsauslauf der Anschlussfinanzierung; stelle',
+    '   die Restschuld dem gestiegenen Wert gegenueber. Sage KLAR, ob sich das Investment auch',
+    '   im Anschluss traegt (Bezug Cashflow, Ziel etwa +/- 0). Wird es eng, empfiehl konkret',
+    '   entweder Eigenkapital-Einsatz/Sondertilgung (mit Hausnummer) ODER eine guenstigere',
+    '   Anschlusskondition (Zielzins), damit der Cashflow nicht negativ wird.',
+    '',
     '## STIL',
     '- Klar, professionell, wie ein ausführlicher Investment-Report',
     '- Mit Zahlen aus dem Deal arbeiten — konkret werden',
     '- Wo immer möglich Bezüge zur Lage-Recherche herstellen',
     '- KEINE Markdown-Sterne (**fett** vermeiden), KEINE Listen-Bullets mit *',
     '- AUSFÜHRLICH schreiben — Marcel will fundierte Texte, keine Floskeln',
+    '- Werte Investitionsthese, die vom Investor benannten Risiken und die sonstigen',
+    '  Bemerkungen aktiv aus: spiegle sie in Stärken/Risiken (Pro/Kontra) und',
+    '  bestätige oder widerlege sie mit Zahlen.',
+    '- Quellen: vollständige URLs NUR im "quellen"-Array. Im Fließtext höchstens',
+    '  den Quellennamen nennen — KEINE rohen Markdown-Links im Text.',
     '',
     '## ANTWORTFORMAT — strikt JSON, keine Markdown-Codeblöcke',
     'Antworte AUSSCHLIESSLICH mit folgendem JSON-Objekt:',
@@ -243,6 +319,10 @@ function buildPrompt(payload) {
     '    "begruendung": "Warum dieser Preis? 5-7 Sätze mit Bezug auf Vergleichswerte und Marktlage",',
     '    "argumente": ["Argument 1 für die Verhandlung — ausführlich mit Zahl", "Argument 2", "Argument 3", "Argument 4", "Argument 5"]',
     '  },',
+    '  "offerte_mail": {',
+    '    "betreff": "Betreff der E-Mail an Makler/Verkäufer (kurz, sachlich)",',
+    '    "text": "Höfliches, sehr wertschätzendes Anschreiben an Makler oder Verkäufer, 10-16 Sätze. Beschreibe die Situation sachlich und respektvoll, würdige das Objekt, lege Vorteile UND Nachteile transparent dar (gestützt auf Investitionsthese und benannte Risiken) und leite daraus die Preisvorstellung wertschätzend und nachvollziehbar her. Freundlicher, seriöser Ton, kein Druck, mit höflicher Grußformel."',
+    '  },',
     '  "bankargumente": [',
     '    "Argument 1 zur Vorlage bei Bank — DSCR/LTV/Lage, 2-3 Sätze mit konkreten Zahlen",',
     '    "Argument 2",',
@@ -254,6 +334,8 @@ function buildPrompt(payload) {
     '  "mikrolage_recherche": "Ausführlich recherchierte Fakten zur Mikrolage, 4-6 Sätze",',
     '  "mietspiegel_eur_qm":  "Recherchierter Wert €/m² oder null",',
     '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten, 3-4 Sätze",',
+    '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
+    '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',
     '  "quellen":             ["URL 1", "URL 2", "..."]',
     '}'
   ].filter(Boolean).join('\n');
@@ -473,8 +555,20 @@ function _recoverTruncatedJson(text) {
  *
  * V34: Logging gegen "wo ist mein Output hin"-Probleme.
  */
+function _analyzeStyleSuffix(opts) {
+  var ai = opts && opts.aiOptions; if (!ai) return '';
+  var parts = [];
+  var dlMap = { kurz: 'Antworte knapper, fokussiert auf das Wesentliche.', mittel: 'Antworte in mittlerer Laenge.', ausfuehrlich: 'Antworte ausfuehrlich mit Begruendung und Datenpunkten.' };
+  if (ai.detailLevel && dlMap[ai.detailLevel]) parts.push(dlMap[ai.detailLevel]);
+  var tnMap = { sachlich: 'Tonalitaet: streng sachlich-neutral.', beratend: 'Tonalitaet: beratend mit konkreten Empfehlungen.', kritisch: 'Tonalitaet: kritisch — Risiken zuerst benennen, dann Chancen.' };
+  if (ai.tonality && tnMap[ai.tonality]) parts.push(tnMap[ai.tonality]);
+  if (Array.isArray(ai.focusAreas) && ai.focusAreas.length) parts.push('Lege besonderen Fokus auf: ' + ai.focusAreas.join(', ') + '.');
+  if (ai.customInstructions && typeof ai.customInstructions === 'string') { var ci = ai.customInstructions.trim().slice(0, 500); if (ci) parts.push('Zusaetzliche Anweisung des Nutzers: ' + ci); }
+  if (!parts.length) return '';
+  return '\n\n## STIL-VORGABEN (verbindlich)\n' + parts.join('\n') + '\n';
+}
 async function analyze(payload, opts) {
-  const prompt = buildPrompt(payload);
+  const prompt = buildPrompt(payload) + _analyzeStyleSuffix(opts);
   const r = await callOpenAI(prompt, opts);
   const parsed = extractJson(r.text);
   // V34: Lokales Logging — bei Parse-Fail Länge + Anfang/Ende für Debug
@@ -1279,7 +1373,56 @@ async function enrichMarketFields(text, fields, context, opts) {
   return { success: true, model: r.model, suggestions: cleaned };
 }
 
+/* v585-copilot BEGIN */
+/**
+ * Co-Pilot — leichter Chat-Agent. Reused callOpenAI (web_search_preview ist dort
+ * immer angehaengt, wird aber per System-Prompt gesteuert):
+ *   - allowWeb=false  -> Prompt verbietet Web-Suche, weist Nutzer an, sie zu aktivieren.
+ *   - allowWeb=true   -> Web-Suche erlaubt, nur bei Bedarf.
+ * KEIN Kerosin-Abzug (Aufrufer zieht nichts ab) — server-seitig rate-limited.
+ * Modell: COPILOT_MODEL (.env) oder Default gpt-4.1-mini.
+ */
+async function copilotChat(payload, opts) {
+  opts = opts || {};
+  payload = payload || {};
+  const ctx = payload.context && typeof payload.context === 'object' ? payload.context : {};
+  const history = Array.isArray(payload.history) ? payload.history.slice(-12) : [];
+  const message = String(payload.message || '').trim();
+  const allowWeb = payload.allowWeb === true;
+
+  const sys = [
+    'Du bist der DealPilot Co-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse.',
+    'Antworte praezise, auf Deutsch, in du-Form, ohne Floskeln und ohne Markdown-Ueberschriften.',
+    'Nutze die bereitgestellten Objekt- und Kennzahlendaten als PRIMAERE Quelle. Rechne wo sinnvoll mit den',
+    'gegebenen Zahlen (DSCR, LTV, Cashflow, Renditen, Kaufpreis). Erfinde keine Werte; fehlt etwas, sag es klar.',
+    allowWeb
+      ? 'Web-Recherche ist FREIGEGEBEN: nutze das web_search-Tool nur, wenn die Frage aktuelle externe Marktdaten erfordert, die nicht in den Objektdaten stehen. Nenne keine internen Anbieter-Namen.'
+      : 'Web-Recherche ist NICHT freigegeben: recherchiere NICHT im Web und rufe KEIN Such-Tool auf. Wenn die Frage externe oder aktuelle Marktdaten braucht, die nicht in den Daten stehen, erklaere in 1-2 Saetzen was dir fehlt und bitte den Nutzer, oben den Schalter \u201eWeb-Recherche\u201c zu aktivieren.'
+  ].join('\n');
+
+  const ctxBlock = 'AKTUELLES OBJEKT (Kontext, JSON):\n' + JSON.stringify(ctx, null, 2);
+
+  let convo = '';
+  for (const m of history) {
+    const role = (m && m.role === 'assistant') ? 'Co-Pilot' : 'Nutzer';
+    convo += role + ': ' + String((m && m.content) || '').trim() + '\n';
+  }
+  convo += 'Nutzer: ' + message + '\nCo-Pilot:';
+
+  const prompt = sys + '\n\n' + ctxBlock + '\n\n--- Gespraech ---\n' + convo;
+  const model = opts.model || process.env.COPILOT_MODEL || 'gpt-4.1-mini';
+
+  const res = await callOpenAI(prompt, {
+    userApiKey: opts.userApiKey,
+    model: model,
+    aiOptions: { temperature: 0.4 }
+  });
+  return { reply: res.text, model: res.model, allowWeb: allowWeb };
+}
+/* v585-copilot END */
+
 module.exports = {
+  copilotChat,  /* v585 */
   analyze,
   analyzeLage,
   suggestDs2Fields,

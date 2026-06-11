@@ -598,40 +598,6 @@ function showSettings(initialTab) {
         '<hr class="dvd" style="margin:32px 0 22px">' +
         '<h2 class="set-section-h2">Anzeige-Optionen</h2>' +
         '<p class="hint">Steuere, welche UI-Elemente in der App angezeigt werden.</p>' +
-
-        // V63.77: App-Start-View konfigurierbar
-        '<h3 class="set-section-h">Beim Start öffnen</h3>' +
-        '<div class="f startup-view-row">' +
-          '<div class="startup-view-desc">' +
-            'Welcher Bereich soll geöffnet werden, wenn du die App startest?' +
-          '</div>' +
-          '<select id="set_startup_view" onchange="_setStartupView(this.value)">' +
-            '<option value="dashboard">Portfolio-Dashboard (Default)</option>' +
-            '<option value="objekt">Tab "Objekt"</option>' +
-            '<option value="quickcheck">Quick-Check (Standalone)</option>' +
-            '<option value="all-objects">Alle Objekte (Übersicht)</option>' +
-          '</select>' +
-        '</div>' +
-        /* v452: App-weiter Theme-Switch Hell/Dunkel */
-        '<div class="f startup-view-row" style="margin-top:14px">' +
-          '<div class="startup-view-desc">App-Erscheinungsbild (gilt fuer die gesamte App)</div>' +
-          '<div class="dp-theme-switch" id="dp-theme-switch">' +
-            '<button type="button" data-th="light" onclick="DealPilotDashboard.setTheme(\'light\')">Hell</button>' +
-            '<button type="button" data-th="dark" onclick="DealPilotDashboard.setTheme(\'dark\')">Dunkel</button>' +
-          '</div>' +
-        '</div>' +
-
-        /* V76: Workflow-Bar-Section entfernt — Steps + Fortschritt sind jetzt direkt
-           in der Tab-Bar integriert (Häkchen + Status-Badge). */
-
-        '<h3 class="set-section-h" style="margin-top:24px">Hilfe & Dokumentation</h3>' +
-        '<div class="f setting-row-card setting-row-card-gold">' +
-          '<div>' +
-            '<div class="setting-row-title setting-row-title-gold">' + (window.Icons && Icons.help ? Icons.help({size:14}) : '') + ' DealPilot-Hilfe öffnen</div>' +
-            '<div class="setting-row-desc">9 Themen mit Erklärungen zu Kennzahlen, Finanzierung, Steuern, Charts, KI-Analyse, FAQ und Glossar. Mit Suche und KI-Assistent.</div>' +
-          '</div>' +
-          '<button class="btn btn-gold" type="button" onclick="closeSettings(); if(typeof showHelp===\'function\') showHelp();">Öffnen →</button>' +
-        '</div>' +
         /* === V213 collapse-toggle profilanzeige START === */
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Markt-Daten im Tab Finanzierung</h3>' +
@@ -960,7 +926,7 @@ function _swSet(btn) {
     }
     // V257-06: Hintergrund-Toggle einfuegen
     try {
-      if (window.DealPilotBgMode) {
+      if (false && window.DealPilotBgMode) { /* v606-bg-off: Hintergrund entfernt */
         var ipHost = document.getElementById('ip-pane-host');
         var bgHost = document.getElementById('dp-bg-toggle-host');
         if (!bgHost && ipHost && ipHost.parentNode) {

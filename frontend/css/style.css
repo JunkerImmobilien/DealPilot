@@ -32469,3 +32469,264 @@ body.hdr-banner-only .hdr-v61-row2 {
 /* QC-Text schwarz auch im Hover */
 #qc7-sources .dp-pf-launch:hover{color:#1a1407 !important}
 
+/* v584-pa-rail BEGIN === Pilot-Analyse Rail (Business-White, namespaced dp-pa*) === */
+.ai-box:has(.dp-pa-wrap){background:#fff !important;border:1px solid #E7E4DC !important;box-shadow:0 1px 2px rgba(40,35,20,.04) !important}
+.ai-box:has(.dp-pa-wrap) .ai-hdr{border-bottom:1px solid #EFECE4}
+.ai-box:has(.dp-pa-wrap) .ai-title{color:#2A2826 !important}
+.ai-box:has(.dp-pa-wrap) .ai-sub{color:#938B7F !important}
+#ai-content:has(.dp-pa-wrap){background:transparent !important;padding:0 !important;color:#2A2826}
+.dp-pa-wrap{--gold:#C9A84C;--gold-deep:#A6842D;--gold-soft:#FBF6E9;--gold-bd:#ECE0BE;--line:#E7E4DC;--ink:#2A2826;--label:#4A453F;--ink2:#5C554E;--ink3:#938B7F;--green:#2F8E5A;--red:#B8625C;display:grid;grid-template-columns:204px 1fr;gap:20px;font-family:'Inter',sans-serif;color:var(--ink);align-items:start}
+.dp-pa-rail{position:sticky;top:8px;display:flex;flex-direction:column;gap:4px}
+.dp-pa-tab{appearance:none;border:none;background:transparent;text-align:left;font:600 13px/1.2 'Inter',sans-serif;color:var(--ink2);padding:10px 12px;border-radius:9px;cursor:pointer;transition:.14s}
+.dp-pa-tab:hover{background:#FBFAF6;color:var(--ink)}
+.dp-pa-tab.active{background:var(--gold-soft);color:var(--gold-deep)}
+.dp-pa-content{min-width:0}
+.dp-pa-panel{display:none}
+.dp-pa-panel.active{display:block;animation:dpPaIn .18s ease}
+@keyframes dpPaIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.dp-pa-sec{display:flex;align-items:center;gap:9px;margin:0 0 10px}
+.dp-pa-bar{width:3px;height:16px;border-radius:2px;background:var(--gold);flex:none}
+.dp-pa-sq{width:22px;height:22px;border:1px solid var(--gold-bd);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--gold-deep);flex:none}
+.dp-pa-sq svg{width:13px;height:13px}
+.dp-pa-lbl{font:700 11px/1 'Inter',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:var(--label)}
+.dp-pa-rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.dp-pa-sec.good .dp-pa-bar{background:var(--green)}
+.dp-pa-sec.good .dp-pa-sq{border-color:#CDE5D6;color:var(--green)}
+.dp-pa-sec.bad .dp-pa-bar{background:var(--red)}
+.dp-pa-sec.bad .dp-pa-sq{border-color:#E9CFC9;color:var(--red)}
+.dp-pa-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:0 0 14px;box-shadow:0 1px 2px rgba(40,35,20,.04)}
+.dp-pa-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dp-pa-cols .dp-pa-card{margin:0}
+.dp-pa-p{font-size:13.5px;line-height:1.62;color:var(--ink2);margin:0 0 8px}
+.dp-pa-p:last-child{margin-bottom:0}
+.dp-pa-italic{font-style:italic}
+.dp-pa-wrap ul,.dp-pa-wrap ol{margin:4px 0 0;padding-left:18px}
+.dp-pa-wrap li{font-size:13.5px;line-height:1.55;color:var(--ink2);margin:0 0 6px}
+.dp-pa-wrap li:last-child{margin-bottom:0}
+.dp-pa-empty{color:var(--ink3);opacity:.75;font-size:13px;font-style:normal}
+.dp-pa-empf-row{margin:0 0 10px}
+.dp-pa-empf{display:inline-block;padding:6px 18px;border-radius:6px;font:800 14px/1 'Inter',sans-serif;letter-spacing:.05em;color:#fff}
+.dp-pa-pill{display:inline-block;padding:2px 10px;border-radius:99px;font:700 11px/1.5 'Inter',sans-serif;color:#fff}
+.dp-pa-fit{display:flex;flex-direction:column;gap:8px}
+.dp-pa-fit-row{display:grid;grid-template-columns:170px auto 1fr;align-items:center;gap:10px}
+.dp-pa-fit-l{font-size:13px;font-weight:600;color:var(--ink)}
+.dp-pa-fit-r{font-size:12.5px;color:var(--ink3)}
+.dp-pa-kv{font-size:13.5px;line-height:1.6;color:var(--ink2);margin:0 0 8px}
+.dp-pa-kv strong{color:var(--ink)}
+.dp-pa-kv:last-child{margin-bottom:0}
+.dp-pa-kv-sub{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);margin:0 0 6px}
+.dp-pa-tone-good{border-color:#CDE5D6;background:#F4FAF6}
+.dp-pa-tone-bad{border-color:#E9CFC9;background:#FBF4F2}
+.dp-pa-insight{background:var(--gold-soft);border-color:var(--gold-bd)}
+.dp-pa-price{font:800 30px/1 'Inter',sans-serif;color:var(--gold-deep);letter-spacing:-.01em;margin:2px 0 10px}
+.dp-pa-src{word-break:break-all}
+.dp-pa-src a{color:var(--gold-deep);text-decoration:none}
+.dp-pa-src a:hover{text-decoration:underline}
+@media(max-width:980px){.dp-pa-wrap{grid-template-columns:1fr}.dp-pa-rail{position:static;flex-direction:row;flex-wrap:wrap;gap:6px;margin-bottom:6px}.dp-pa-cols{grid-template-columns:1fr}.dp-pa-fit-row{grid-template-columns:1fr auto}.dp-pa-fit-r{grid-column:1/-1}}
+/* v584-pa-rail END */
+
+/* v585-copilot BEGIN === Co-Pilot Chat (Pilot-Analyse) === */
+#dp-cp{margin-top:18px;border:1px solid #E7E4DC;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(40,35,20,.04);overflow:hidden;font-family:'Inter',sans-serif}
+.dp-cp-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #EFECE4;background:#FBFAF6}
+.dp-cp-ic{width:26px;height:26px;border:1px solid #ECE0BE;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#A6842D;flex:none}
+.dp-cp-ic svg{width:15px;height:15px}
+.dp-cp-tt{display:flex;flex-direction:column;line-height:1.15;margin-right:auto}
+.dp-cp-t{font-weight:700;font-size:13.5px;color:#2A2826}
+.dp-cp-s{font-size:11px;color:#938B7F}
+.dp-cp-badge{font-size:10.5px;font-weight:600;color:#2F8E5A;background:#EBF3EF;border:1px solid #CDE5D6;border-radius:99px;padding:3px 9px;white-space:nowrap}
+.dp-cp-web{display:flex;align-items:center;gap:5px;font-size:11.5px;color:#5C554E;cursor:pointer;user-select:none}
+.dp-cp-web input{accent-color:#C9A84C;margin:0}
+.dp-cp-log{max-height:340px;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.dp-cp-hint{font-size:12.5px;color:#938B7F;line-height:1.5}
+.dp-cp-msg{font-size:13px;line-height:1.55;padding:9px 12px;border-radius:11px;max-width:88%}
+.dp-cp-u{align-self:flex-end;background:#C9A84C;color:#1a1407;border-bottom-right-radius:3px}
+.dp-cp-a{align-self:flex-start;background:#F6F4EE;color:#2A2826;border:1px solid #EFECE4;border-bottom-left-radius:3px}
+.dp-cp-think{opacity:.6;font-style:italic}
+.dp-cp-bar{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #EFECE4;background:#fff}
+.dp-cp-in{flex:1;resize:none;border:1px solid #E7E4DC;border-radius:9px;padding:9px 11px;font:400 13px/1.4 'Inter',sans-serif;color:#2A2826;outline:none;max-height:120px}
+.dp-cp-in:focus{border-color:#C9A84C}
+.dp-cp-send{border:none;background:#C9A84C;color:#1a1407;font:600 13px/1 'Inter',sans-serif;padding:0 16px;border-radius:9px;cursor:pointer}
+.dp-cp-send:hover{filter:brightness(1.04)}
+.dp-cp-send:disabled{opacity:.5;cursor:default}
+/* v585-copilot END */
+
+/* v586-pa-layout BEGIN === Pilot-Analyse: Kopf-Dopplung weg, Controls nach oben, Button-Icon === */
+#s5 .ai-hdr{display:none !important}
+#s5 .ai-box{display:flex;flex-direction:column}
+#s5 .ai-box > .ai-btn{order:1}
+#s5 .ai-box > .ai-pdf-toggle{order:2;margin-top:10px}
+#s5 .ai-box > #ai-content{order:3;margin-top:16px}
+.ai-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.ai-btn .ai-btn-ic{width:17px;height:17px;flex:none}
+/* v586-pa-layout END */
+
+/* v588-srclink BEGIN === Klickbare Quellen im KI-Text (kompakt, URL im Hover) === */
+.dp-pa-srclink{color:#9a7f33;text-decoration:none;font-size:.82em;white-space:nowrap;border-bottom:1px dotted rgba(201,168,76,.45);padding:0 1px}
+.dp-pa-srclink:hover{color:#7a6020;border-bottom-color:#c9a84c}
+/* v588-srclink END */
+
+/* v589-offmail BEGIN === Offerte als E-Mail (Card + Buttons) === */
+.dp-pa-offmail .dp-pa-mailtext{white-space:pre-wrap;line-height:1.55;color:#3a3a3a;background:#faf8f2;border:1px solid rgba(201,168,76,.28);border-radius:10px;padding:14px 16px;margin:8px 0 12px;font-size:.95em}
+.dp-pa-mailbtns{display:flex;gap:10px;flex-wrap:wrap}
+.dp-pa-mbtn{appearance:none;border:1px solid #c9a84c;background:#c9a84c;color:#1a1407;font-weight:600;font-size:.9em;padding:8px 16px;border-radius:8px;cursor:pointer;transition:filter .15s}
+.dp-pa-mbtn:hover{filter:brightness(1.06)}
+.dp-pa-mbtn.ghost{background:transparent;color:#9a7f33}
+.dp-pa-mbtn.ghost:hover{background:rgba(201,168,76,.12);filter:none}
+/* v589-offmail END */
+
+/* v591-miniic BEGIN === Mini-Analyse-Button Icon === */
+#ai-mini-run{display:inline-flex;align-items:center;gap:6px}
+#ai-mini-run .ai-btn-ic{width:15px;height:15px;flex:none}
+/* v591-miniic END */
+
+/* v593-boardingpass BEGIN */
+/* Ticket-Optik nach preflight-final-stilC.html — nur Optik, Logik/Klassen unverändert */
+.dp-pfbar{padding:0 !important;gap:0 !important;align-items:stretch !important;overflow:hidden;min-height:78px}
+.dp-pfbar .dp-pf-stripe{opacity:.4}
+/* Stub: schwarzer Boarding-Block links */
+.dp-pf-lead{background:#070707;padding:12px 18px !important;justify-content:center;gap:3px;align-self:stretch}
+.dp-pf-lead::after{display:none !important}
+.dp-pf-lead .bp{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;font-weight:600;color:#9a8f6a;display:block}
+.dp-pf-lead .k{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:3px;font-weight:700;color:#E8CC7A !important;line-height:1.1}
+.dp-pf-lead .s{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.5px;color:#C9A84C !important}
+/* Perforation mit Halbkreis-Cutouts */
+.dp-pf-perf{position:relative;flex:0 0 0;width:0;align-self:stretch;border-left:2px dashed rgba(5,5,5,.34);margin:0 14px}
+.dp-pf-perf::before,.dp-pf-perf::after{content:"";position:absolute;left:-10px;width:20px;height:20px;border-radius:50%;background:var(--dp-pf-cut,#0e0e10);box-shadow:inset 0 0 0 1px rgba(5,5,5,.12)}
+.dp-pf-perf::before{top:-11px}
+.dp-pf-perf::after{bottom:-11px}
+/* Gruppen vertikal zentriert */
+.dp-pf-seg{justify-content:center;padding:12px 0}
+.dp-pf-tile{border-radius:9px}
+/* LED grün (armed/on) */
+.dp-pf-tile.on .dp-pf-led{background:radial-gradient(circle at 35% 30%,#5BD98E,#3FA56C 70%) !important;border-color:rgba(5,5,5,.4) !important;box-shadow:0 0 0 2px rgba(5,5,5,.16),0 0 9px 1px rgba(63,165,108,.9),inset 0 0 3px rgba(255,255,255,.6);animation:dpPfPulse 1.8s ease-in-out infinite}
+@keyframes dpPfPulse{0%,100%{box-shadow:0 0 0 2px rgba(5,5,5,.16),0 0 8px 1px rgba(63,165,108,.85),inset 0 0 3px rgba(255,255,255,.6)}50%{box-shadow:0 0 0 2px rgba(5,5,5,.16),0 0 14px 3px rgba(63,165,108,1),inset 0 0 3px rgba(255,255,255,.7)}}
+/* QR + Scan-Link */
+.dp-pf-qr{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;align-self:center;margin:0 6px}
+.dp-pf-qr svg{width:54px;height:54px;display:block;border-radius:7px;border:1px solid rgba(5,5,5,.2);background:#fff;padding:2px;box-shadow:0 4px 12px -6px rgba(0,0,0,.4);transition:.16s}
+.dp-pf-qr:hover svg{box-shadow:0 0 0 3px rgba(5,5,5,.25)}
+.dp-pf-scan{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:1.5px;color:#5a4a14;text-transform:uppercase;font-weight:600}
+/* Weiße Reißzone mit Barcode hinter dem Abrufen-Button */
+.dp-pf-rz{position:relative;display:flex;align-items:center;justify-content:center;background:#fff;padding:0 20px;min-width:172px;align-self:stretch}
+.dp-pf-bc{position:absolute;inset:12px 16px;background:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 4px,#111 4px 5px,transparent 5px 8px,#111 8px 11px,transparent 11px 13px,#111 13px 14px,transparent 14px 17px,#111 17px 19px,transparent 19px 22px);opacity:.92;pointer-events:none}
+.dp-pf-launch{position:relative;z-index:1;margin-left:0 !important;background:linear-gradient(180deg,#E8CC7A,#C9A84C) !important;color:#0a0a0a !important;border-radius:10px;padding:10px 16px;box-shadow:0 0 0 5px #fff}
+.dp-pf-launch:hover{filter:brightness(1.04)}
+.dp-pf-launch .dp-pf-ic,.dp-pf-launch .dp-pf-ic svg{color:#0a0a0a !important;stroke:#0a0a0a !important}
+/* v593-boardingpass END */
+
+/* v592-mailtext — Offerte-Mail lesbar + Brief-Format */
+#s5 .dp-pa-offmail .dp-pa-mailtext{color:#2a2620 !important;white-space:pre-wrap !important;line-height:1.65 !important;background:#fbf9f3 !important}
+
+/* v594-bp-fix BEGIN */
+/* Konsolidierter Endzustand — gewinnt per Spezifitaet+Reihenfolge gegen v579-593 */
+/* 1) Stub sauber im Bar-Rahmen, Text vertikal zentriert (killt neg. Margin/Radius) */
+.dp-pf-lead{margin:0 !important;border-radius:0 !important;min-width:auto !important;
+  padding:12px 20px !important;display:flex !important;flex-direction:column !important;
+  justify-content:center !important;align-items:flex-start !important;gap:3px !important;
+  align-self:stretch !important;background:#070707 !important}
+.dp-pf-lead::after{display:none !important}
+/* 2) Mehr Luft vor + hinter dem Gruppen-Trenner */
+.dp-pf-sep{margin:0 16px !important}
+/* 3) Weisse Reisszone breit genug -> Button mittig ueber dem Barcode */
+.dp-pf-rz{align-self:stretch !important;min-width:208px !important}
+/* 4) Abrufen: Gold-Verlauf, mittig, weisser Halo (Objekt-Tab + QC) */
+.dp-pfbar .dp-pf-launch,
+#qc7-sources .dp-pf-launch{background:linear-gradient(180deg,#E8CC7A,#C9A84C) !important;
+  color:#0a0a0a !important;align-self:center !important;margin:0 !important;
+  height:auto !important;min-height:0 !important;padding:10px 18px !important;
+  border-radius:10px !important;box-shadow:0 0 0 5px #fff !important;flex:0 0 auto !important}
+.dp-pfbar .dp-pf-launch .dp-pf-ic,.dp-pfbar .dp-pf-launch .dp-pf-ic svg,
+#qc7-sources .dp-pf-launch .dp-pf-ic,#qc7-sources .dp-pf-launch .dp-pf-ic svg{
+  color:#0a0a0a !important;stroke:#0a0a0a !important}
+/* 5) Hover bleibt Gold (kein weiss/transparent) */
+.dp-pfbar .dp-pf-launch:hover,.dp-pfbar .dp-pf-launch:focus,
+#qc7-sources .dp-pf-launch:hover,#qc7-sources .dp-pf-launch:focus{
+  background:linear-gradient(180deg,#E8CC7A,#C9A84C) !important;color:#0a0a0a !important;
+  filter:brightness(1.04) !important;opacity:1 !important}
+/* v594-bp-fix END */
+
+/* v595-bp-final BEGIN */
+/* Finaler Boarding-Pass-Endzustand. Cutout-Farbe = Flaeche HINTER der Leiste (hell). */
+.dp-pfbar{--dp-pf-cut:#f4f2ed}
+/* Stub: schwarzer Block, Text vertikal zentriert */
+.dp-pf-lead{margin:0 !important;border-radius:0 !important;min-width:auto !important;padding:12px 20px !important;display:flex !important;flex-direction:column !important;justify-content:center !important;align-items:flex-start !important;gap:3px !important;align-self:stretch !important;background:#070707 !important}
+.dp-pf-lead::after{display:none !important}
+/* Perforation: helle Halbkreis-Cutouts (wie stilC) + gestrichelte Linie */
+.dp-pf-perf{position:relative !important;flex:0 0 0 !important;width:0 !important;align-self:stretch !important;border-left:2px dashed rgba(5,5,5,.34) !important;margin:0 16px !important}
+.dp-pf-perf::before,.dp-pf-perf::after{content:"" !important;position:absolute !important;left:-10px !important;width:20px !important;height:20px !important;border-radius:50% !important;background:var(--dp-pf-cut,#f4f2ed) !important;box-shadow:inset 0 0 0 1px rgba(5,5,5,.12) !important}
+.dp-pf-perf::before{top:-11px !important}
+.dp-pf-perf::after{bottom:-11px !important}
+/* Mehr Luft um den Gruppen-Trenner */
+.dp-pf-sep{margin:0 16px !important}
+/* Weisse Reisszone breit genug -> Button mittig ueber Barcode */
+.dp-pf-rz{align-self:stretch !important;min-width:208px !important}
+/* Abrufen: Gold-Verlauf, mittig, weisser Halo (Objekt-Tab + QC) */
+.dp-pfbar .dp-pf-launch,#qc7-sources .dp-pf-launch{background:linear-gradient(180deg,#E8CC7A,#C9A84C) !important;color:#0a0a0a !important;align-self:center !important;margin:0 !important;height:auto !important;min-height:0 !important;padding:10px 18px !important;border-radius:10px !important;box-shadow:0 0 0 5px #fff !important;flex:0 0 auto !important}
+.dp-pfbar .dp-pf-launch .dp-pf-ic,.dp-pfbar .dp-pf-launch .dp-pf-ic svg,#qc7-sources .dp-pf-launch .dp-pf-ic,#qc7-sources .dp-pf-launch .dp-pf-ic svg{color:#0a0a0a !important;stroke:#0a0a0a !important}
+/* Hover bleibt Gold (kein weiss/transparent) */
+.dp-pfbar .dp-pf-launch:hover,.dp-pfbar .dp-pf-launch:focus,#qc7-sources .dp-pf-launch:hover,#qc7-sources .dp-pf-launch:focus{background:linear-gradient(180deg,#E8CC7A,#C9A84C) !important;color:#0a0a0a !important;filter:brightness(1.04) !important;opacity:1 !important}
+/* v595-bp-final END */
+
+/* v596-css BEGIN */
+/* A: QR mittig, Barcode/Button ans Ende */
+.dp-pf-qr{margin-left:auto !important;margin-right:auto !important}
+/* C1: kein Start-Button in der Bewertung (nur Anzeige) */
+#ai-mini-run,#ai-mini-detail{display:none !important}
+.ai-mini-card .ai-mini-actions{display:none !important}
+/* v596-css END */
+
+/* v597-preflight-final BEGIN */
+/* rz = weisser Boarding-Stub, GOLD gerahmt */
+.dp-pfbar .dp-pf-rz,#qc7-sources .dp-pf-rz{background:#fff !important;border:1.5px solid #C9A84C !important;border-radius:10px !important;box-shadow:inset 0 0 0 1px rgba(201,168,76,.30) !important;align-self:stretch !important;min-width:208px !important;overflow:hidden !important}
+/* Abrufen: weiss + Gold-Text, Hover bleibt weiss-creme (NIE transparent) */
+.dp-pfbar .dp-pf-launch,#qc7-sources .dp-pf-launch{background:#ffffff !important;color:#9a7f33 !important;filter:none !important;opacity:1 !important;box-shadow:none !important;border:none !important;align-self:center !important;margin:0 !important;padding:9px 16px !important;border-radius:8px !important}
+.dp-pfbar .dp-pf-launch:hover,.dp-pfbar .dp-pf-launch:focus,.dp-pfbar .dp-pf-launch:active,#qc7-sources .dp-pf-launch:hover,#qc7-sources .dp-pf-launch:focus,#qc7-sources .dp-pf-launch:active{background:#FBF7EC !important;color:#9a7f33 !important;filter:none !important;opacity:1 !important;box-shadow:none !important}
+.dp-pfbar .dp-pf-launch .dp-pf-ic,.dp-pfbar .dp-pf-launch .dp-pf-ic svg,#qc7-sources .dp-pf-launch .dp-pf-ic,#qc7-sources .dp-pf-launch .dp-pf-ic svg{color:#9a7f33 !important;stroke:#9a7f33 !important}
+/* Provider-Kacheln solide, nie durchscheinend */
+.dp-pfbar .dp-pf-tile,#qc7-sources .dp-pf-tile{opacity:1 !important;filter:none !important;mix-blend-mode:normal !important;background:#ffffff !important}
+.dp-pfbar .dp-pf-tile.tool,#qc7-sources .dp-pf-tile.tool{background:#0a0a0a !important;color:#e9e3d2 !important}
+.dp-pfbar .dp-pf-tile.dp-pf-disabled,#qc7-sources .dp-pf-tile.dp-pf-disabled{opacity:1 !important}
+/* v597-preflight-final END */
+
+/* v598-pf-fix BEGIN */
+/* rz: nur EIN sauberer Goldrand (inset-Strich raus -> gleichmaessige Radien) */
+.dp-pfbar .dp-pf-rz,#qc7-sources .dp-pf-rz{box-shadow:none !important}
+/* QR-Block vertikal mittig */
+.dp-pfbar .dp-pf-qr,#qc7-sources .dp-pf-qr{align-self:center !important}
+/* v598-pf-fix END */
+
+/* v599-gold-launch BEGIN */
+.dp-pfbar .dp-pf-launch,#qc7-sources .dp-pf-launch,.dp-pfbar .dp-pf-launch:hover,.dp-pfbar .dp-pf-launch:focus,.dp-pfbar .dp-pf-launch:active,#qc7-sources .dp-pf-launch:hover,#qc7-sources .dp-pf-launch:focus,#qc7-sources .dp-pf-launch:active{background:linear-gradient(180deg,#E8CC7A,#C9A84C) !important;color:#1a1407 !important;filter:none !important;opacity:1 !important;box-shadow:0 2px 6px -2px rgba(0,0,0,.30) !important;border:none !important}
+.dp-pfbar .dp-pf-launch:hover,#qc7-sources .dp-pf-launch:hover{filter:brightness(1.04) !important}
+.dp-pfbar .dp-pf-launch .dp-pf-ic,.dp-pfbar .dp-pf-launch .dp-pf-ic svg,#qc7-sources .dp-pf-launch .dp-pf-ic,#qc7-sources .dp-pf-launch .dp-pf-ic svg{color:#1a1407 !important;stroke:#1a1407 !important}
+/* v599-gold-launch END */
+
+/* v601-oab-gold-hard BEGIN */
+#obj-action-bar #oab-run.dp-pf-launch,#obj-action-bar #oab-run.dp-pf-launch:hover,#obj-action-bar #oab-run.dp-pf-launch:focus,#obj-action-bar #oab-run.dp-pf-launch:active{background:linear-gradient(180deg,#E8CC7A,#C9A84C) !important;color:#1a1407 !important;border:none !important;box-shadow:0 2px 6px -2px rgba(0,0,0,.30) !important;filter:none !important;opacity:1 !important;transform:none !important}
+#obj-action-bar #oab-run.dp-pf-launch:hover{filter:brightness(1.04) !important}
+#obj-action-bar #oab-run.dp-pf-launch .dp-pf-ic,#obj-action-bar #oab-run.dp-pf-launch .dp-pf-ic svg{color:#1a1407 !important;stroke:#1a1407 !important}
+/* rz Goldrahmen + QR vertikal mittig hart absichern (beide Leisten) */
+#obj-action-bar .dp-pf-rz,#qc7-sources .dp-pf-rz{border:1.5px solid #C9A84C !important;border-radius:10px !important;box-shadow:none !important;overflow:hidden !important}
+#obj-action-bar .dp-pf-qr,#qc7-sources .dp-pf-qr{align-self:center !important}
+/* v601-oab-gold-hard END */
+
+/* v602-rz-radius BEGIN */
+/* rechte Ecken = Bar-Radius (16px), damit der weisse Stub die Rundung buendig ausfuellt */
+#obj-action-bar .dp-pf-rz,#qc7-sources .dp-pf-rz{border-radius:10px 16px 16px 10px !important}
+/* v602-rz-radius END */
+
+/* v603-pdf-sections-css BEGIN */
+.ai-pdf-sections{margin:10px 2px 2px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 16px}
+.ai-pdf-sections-h{grid-column:1/-1;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-3,#9a7f33);margin-bottom:3px}
+.ai-pdf-sections label{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ch,#2A2727);cursor:pointer}
+.ai-pdf-sections input{accent-color:#C9A84C;width:15px;height:15px;cursor:pointer;flex:0 0 auto}
+@media (max-width:560px){.ai-pdf-sections{grid-template-columns:1fr}}
+/* v603-pdf-sections-css END */
+
+/* v604-pdf-details-css BEGIN */
+.ai-pdf-details{margin:10px 2px 2px}
+.ai-pdf-details>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px}
+.ai-pdf-details>summary::-webkit-details-marker{display:none}
+.ai-pdf-details>summary::before{content:'\25b8';font-size:12px;transition:transform .15s ease;color:var(--gold-3,#9a7f33)}
+.ai-pdf-details[open]>summary::before{transform:rotate(90deg)}
+.ai-pdf-details .ai-pdf-sections{margin-top:8px}
+/* v604-pdf-details-css END */

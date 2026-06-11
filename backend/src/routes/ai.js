@@ -957,4 +957,59 @@ router.post('/enrich-market-fields', authenticate, extractLimiter, async (req, r
   }
 });
 
+/* v585-copilot-route BEGIN */
+/* v588-copilot-tiering */
+/**
+ * POST /api/v1/ai/copilot — Co-Pilot Chat. KEIN Kerosin, plan-basiertes Tageslimit.
+ * Tier aus dem bekannten Monatslimit abgeleitet (aiCreditsService.getStatus ist Wahrheit):
+ *   monthly_limit 2->free(10) 10->starter(50) 40->investor(150) 100->pro(300)
+ * Body: { message, history:[{role,content}], context:{...}, allowWeb:bool, userApiKey? }
+ */
+const COPILOT_PLAN_LIMITS = { free: 10, starter: 50, investor: 150, pro: 300 };
+const _COPILOT_BY_MONTHLY = { 2: 10, 10: 50, 40: 150, 100: 300 };
+const _cpDaily = new Map(); // key: userId:YYYY-MM-DD -> count
+function _cpKey(uid) { return uid + ':' + new Date().toISOString().slice(0, 10); }
+async function _copilotLimit(uid) {
+  try {
+    const st = await aiCreditsService.getStatus(uid);
+    return _COPILOT_BY_MONTHLY[st && st.monthly_limit] || COPILOT_PLAN_LIMITS.free;
+  } catch (e) { return COPILOT_PLAN_LIMITS.free; }
+}
+router.post('/copilot', authenticate, async (req, res, next) => {
+  try {
+    const uid = req.user && req.user.id;
+    const limit = await _copilotLimit(uid);
+    const key = _cpKey(uid);
+    const used = _cpDaily.get(key) || 0;
+    if (used >= limit) {
+      return res.status(429).json({ error: 'copilot_rate_limited', message: 'Co-Pilot-Tageslimit erreicht (' + limit + '/Tag). Morgen wieder verfuegbar.' });
+    }
+
+    const payload = req.body || {};
+    const userApiKey = (typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')) ? payload.userApiKey : null;
+    delete payload.userApiKey;
+
+    if (!config.openai.apiKey && !userApiKey) {
+      return res.status(503).json({ error: 'Kein OpenAI-API-Key verfuegbar.', needs_user_key: true });
+    }
+    if (!payload.message || !String(payload.message).trim()) {
+      return res.status(400).json({ error: 'message fehlt.' });
+    }
+
+    const result = await openaiService.copilotChat(payload, { userApiKey });
+    _cpDaily.set(key, used + 1);
+    if (_cpDaily.size > 5000) {
+      const today = new Date().toISOString().slice(0, 10);
+      for (const k of Array.from(_cpDaily.keys())) { if (k.slice(-10) !== today) _cpDaily.delete(k); }
+    }
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
+    if (err.status === 401) return res.status(401).json({ error: err.message, key_source: err.keySource, needs_user_key: err.keySource === 'user' });
+    if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+    next(err);
+  }
+});
+/* v585-copilot-route END */
+
 module.exports = router;

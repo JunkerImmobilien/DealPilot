@@ -182,6 +182,7 @@ function renderDealScore2() {
   try {
     deal = _buildDeal2FromState();
     result = window.DealScore2.compute(deal);
+    try { window._dpLastDs2 = result; } catch (e) {}
   } catch (err) {
     // V43: Defensiv — wenn compute crasht (z.B. wegen ungültiger Energieklasse), Fallback statt Crash
     console.warn('[ds2] compute fehlgeschlagen:', err.message);
