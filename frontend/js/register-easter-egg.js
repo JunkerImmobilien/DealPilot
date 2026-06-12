@@ -291,12 +291,20 @@
       var token = (hashParams && hashParams.get('t')) || params.get('t');
       try {
         localStorage.setItem('ji_token', token);
-        // Mini-Session-Eintrag damit Auth.getSession() klappt (vollständige Daten holt apiCall nach)
+        // v629-jwt-session: Name/E-Mail/Role direkt aus dem JWT lesen, damit die
+        // Session NICHT leer bleibt (sonst "?"-Avatar trotz gueltigem Token).
+        var _claims = {};
+        try {
+          var _b = (token.split('.')[1] || '').replace(/-/g, '+').replace(/_/g, '/');
+          while (_b.length % 4) { _b += '='; }
+          _claims = JSON.parse(decodeURIComponent(escape(atob(_b)))) || {};
+        } catch (e) { console.warn('[v629] JWT-Decode fehlgeschlagen', e); }
         var nullSession = {
           mode: 'api',
-          email: '',
-          name: '',
-          role: 'user',
+          userId: _claims.userId || _claims.sub || null,
+          email: _claims.email || '',
+          name: _claims.name || '',
+          role: _claims.role || 'user',
           token: token,
           expires: Date.now() + 7 * 24 * 60 * 60 * 1000  // 7 Tage
         };
