@@ -33211,3 +33211,77 @@ body.qc-standalone-active .main-col { grid-column: 1 / -1 !important; }
   }
 }
 /* ===== v638-mobile END ===== */
+
+/* ===== v639-mobile BEGIN ===== */
+/* (1) dp-tip: gemessen w18 h44 -> elliptisch, weil die Hoehe vom Label gestreckt wird.
+   Hoehe hart auf 18, align-self zentriert, echter Kreis. */
+@media (max-width: 768px) {
+  .dp-tip {
+    width: 18px !important; min-width: 18px !important; max-width: 18px !important;
+    height: 18px !important; min-height: 18px !important; max-height: 18px !important;
+    padding: 0 !important; border-radius: 50% !important;
+    align-self: center !important; vertical-align: middle !important;
+    flex: 0 0 18px !important; box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+}
+
+/* (2) Accordion soll im Drawer NACH OBEN aufklappen (ueber dem Trigger schweben),
+   nicht nach unten. v634 hatte es 'static' gemacht (-> nach unten). Zuruecknehmen:
+   absolute, bottom:100% relativ zum Trigger-Container. */
+@media (max-width: 768px) {
+  body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-accordion,
+  body aside.sidebar.sb-mobile-open .sb-actions-accordion {
+    position: absolute !important;
+    left: 12px !important; right: 12px !important;
+    bottom: 64px !important;            /* knapp ueber dem Trigger */
+    top: auto !important;
+    margin: 0 !important;
+    z-index: 120 !important;
+    max-height: 60vh !important;
+    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
+    box-shadow: 0 -10px 32px rgba(0,0,0,0.6) !important;
+  }
+  body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-accordion:not(.sb-actions-open),
+  body aside.sidebar.sb-mobile-open .sb-actions-accordion:not(.sb-actions-open) {
+    display: none !important;          /* zu: komplett weg, kein Platzhalter */
+  }
+  /* Trigger braucht einen positionierten Vorfahren -> Sidebar relativ */
+  body .app-wrap.sb-mobile-open aside.sidebar,
+  body aside.sidebar.sb-mobile-open {
+    position: relative !important;
+  }
+}
+
+/* (3) Objektliste: max-height greift nicht, weil .sb-list-grow overflow-y:visible +
+   .sb-portfolio-collapsible max-height:none gewinnen. Hier spezifisch beide Klassen fangen. */
+@media (max-width: 768px) {
+  body .app-wrap.sb-mobile-open aside.sidebar .sb-list.sb-list-grow,
+  body aside.sidebar.sb-mobile-open .sb-list.sb-list-grow,
+  body .app-wrap.sb-mobile-open aside.sidebar #sb-list,
+  body aside.sidebar.sb-mobile-open #sb-list {
+    max-height: 40vh !important;
+    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+  }
+}
+
+/* (4) Settings-Tabs: Scroll-Hinweis (Fade rechts) damit ersichtlich ist, dass es weitergeht. */
+@media (max-width: 768px) {
+  .set-modal-cream .modal-side { position: relative !important; }
+  .set-modal-cream .settings-tabs.ms-tabs { position: relative !important; }
+  .set-modal-cream .modal-side::after {
+    content: "" !important; position: absolute !important;
+    right: 0 !important; top: 56px !important; height: 52px !important; width: 36px !important;
+    background: linear-gradient(90deg, rgba(13,10,4,0), rgba(13,10,4,0.95)) !important;
+    pointer-events: none !important; z-index: 3 !important;
+  }
+  /* Tabs: Text behalten, Icon davor sichtbar (Orientierung) */
+  .set-modal-cream .settings-tabs.ms-tabs .st-tab .st-tab-ico,
+  .set-modal-cream .settings-tabs.ms-tabs .st-tab .ic {
+    display: inline-flex !important; margin-right: 6px !important;
+    width: 15px !important; height: 15px !important;
+  }
+}
+/* ===== v639-mobile END ===== */
