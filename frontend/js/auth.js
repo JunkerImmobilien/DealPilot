@@ -428,6 +428,28 @@ async function logout() {
 }
 
 function initAuth() {
+  /* v627-hashlogin: Verify-Redirect (#welcome=1&t=JWT) -> direkt korrekt einloggen */
+  try {
+    var _h = window.location.hash || '';
+    if (_h.indexOf('welcome=1') !== -1 && _h.indexOf('t=') !== -1) {
+      var _m = _h.match(/[#&]t=([^&]+)/);
+      if (_m) {
+        var _jwt = decodeURIComponent(_m[1]);
+        var _b = (_jwt.split('.')[1] || '').replace(/-/g, '+').replace(/_/g, '/');
+        while (_b.length % 4) { _b += '='; }
+        var _pl = JSON.parse(decodeURIComponent(escape(atob(_b))));
+        if (_pl && _pl.userId) {
+          localStorage.setItem('ji_token', _jwt);
+          localStorage.setItem('ji_session', JSON.stringify({
+            userId: _pl.userId, email: _pl.email, name: _pl.name, role: _pl.role,
+            mode: 'api', expires: Date.now() + 7 * 24 * 60 * 60 * 1000
+          }));
+          try { history.replaceState({}, '', window.location.pathname + window.location.search); } catch (e) {}
+          if (typeof toast === 'function') { try { toast('\u2713 Willkommen, ' + (_pl.name || '')); } catch (e) {} }
+        }
+      }
+    }
+  } catch (e) { console.warn('[v627-hashlogin] fehlgeschlagen', e); }
   var session = Auth.getSession();
   if (!session) {
     // V270.5b-initauth: ?register=1 aus URL → Register-Modal direkt

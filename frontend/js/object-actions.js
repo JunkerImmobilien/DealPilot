@@ -1136,3 +1136,47 @@
 })();
 
 /* v570-pf: PRE-FLIGHT Aktionsleiste (Markup), Logik/IDs/data-src/.on unveraendert */
+
+/* ===== v619-boarding-mobile BEGIN ===== */
+/* PRE-FLIGHT-Leiste auf schmalen Screens als Kompakt-Button + Bottom-Sheet. Logik/IDs/data-src unveraendert. */
+(function () {
+  'use strict';
+  if (window._pfMobileInit) return; window._pfMobileInit = 1;
+  var PLANE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l20-9-9 20-2-9-9-2z"/></svg>';
+  function enhance(bar) {
+    if (!bar || bar._pfM) return;
+    var sheet = bar.closest('.dp-pf-scroll'); if (!sheet) return;
+    bar._pfM = 1;
+    var host = sheet.parentNode; if (!host) return;
+    var trig = document.createElement('button');
+    trig.type = 'button'; trig.className = 'dp-pf-mtrigger';
+    trig.innerHTML = '<span class="dp-pf-mt-ico">' + PLANE + '</span>' +
+      '<span class="dp-pf-mt-txt"><b>PRE-FLIGHT</b><small>Quellen w\u00e4hlen \u00b7 Boarding</small></span>' +
+      '<span class="dp-pf-mt-cnt"><b>0</b> aktiv</span><span class="dp-pf-mt-chev">\u25B8</span>';
+    host.insertBefore(trig, sheet);
+    var bd = document.createElement('div'); bd.className = 'dp-pf-mbackdrop';
+    host.insertBefore(bd, sheet);
+    var head = document.createElement('div'); head.className = 'dp-pf-msheet-head';
+    head.innerHTML = '<span class="dp-pf-mgrip"></span>' +
+      '<div class="dp-pf-mtitle"><b>PRE-FLIGHT</b><small>Datenquellen f\u00fcr diesen Abruf</small></div>' +
+      '<button type="button" class="dp-pf-mclose" aria-label="Schlie\u00dfen">\u2715</button>';
+    sheet.insertBefore(head, sheet.firstChild);
+    function refresh() { var n = bar.querySelectorAll('.dp-pf-tile.on').length; var el = trig.querySelector('.dp-pf-mt-cnt b'); if (el) el.textContent = n; }
+    function open() { document.body.classList.add('dp-pf-sheet-open'); sheet.classList.add('dp-pf-open'); bd.classList.add('show'); refresh(); }
+    function close() { document.body.classList.remove('dp-pf-sheet-open'); sheet.classList.remove('dp-pf-open'); bd.classList.remove('show'); }
+    trig.addEventListener('click', open);
+    bd.addEventListener('click', close);
+    var cl = head.querySelector('.dp-pf-mclose'); if (cl) cl.addEventListener('click', close);
+    var run = bar.querySelector('#oab-run, .dp-pf-launch'); if (run) run.addEventListener('click', function () { setTimeout(close, 60); });
+    sheet.addEventListener('change', refresh, true);
+    sheet.addEventListener('click', function () { setTimeout(refresh, 0); }, true);
+    refresh();
+  }
+  function scan() { var b = document.querySelectorAll('.dp-pfbar'); for (var i = 0; i < b.length; i++) enhance(b[i]); }
+  if (document.readyState !== 'loading') scan(); else document.addEventListener('DOMContentLoaded', scan);
+  try {
+    var mo = new MutationObserver(function () { if (window._pfScanQ) return; window._pfScanQ = 1; requestAnimationFrame(function () { window._pfScanQ = 0; scan(); }); });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  } catch (e) {}
+})();
+/* ===== v619-boarding-mobile END ===== */

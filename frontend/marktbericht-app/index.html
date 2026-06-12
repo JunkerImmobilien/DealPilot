@@ -249,6 +249,22 @@
   /* Panels etwas glasiger, damit Orbs/Partikel durchschimmern */
   .panel,.report,.valcard,.kpi,.assess{backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);}
   @media (prefers-reduced-motion: reduce){.mb-orb{animation:none}}
+
+  /* v620-mb-mobile — Handy: kein Rechts-Ueberlauf, Score-Kopf stapeln, Raster 1-spaltig (AUSSERHALB :root) */
+  @media (max-width:560px){
+    html,body{overflow-x:hidden !important;max-width:100vw}
+    .wrap{padding-left:14px !important;padding-right:14px !important}
+    .scorebox{flex-direction:column !important;align-items:flex-start !important;gap:12px !important}
+    .kpis{grid-template-columns:1fr 1fr !important}
+    .valbox{grid-template-columns:1fr !important}
+    .assess-grid{grid-template-columns:1fr 1fr !important}
+    .report{padding:16px 16px !important;max-width:100% !important;overflow-wrap:break-word}
+    .report h1{font-size:19px !important}
+    .report h2{font-size:15px !important}
+    canvas,img{max-width:100% !important;height:auto}
+    .row>div{min-width:0 !important}
+    table{display:block;overflow-x:auto;max-width:100%}
+  }
 </style>
 <link href="marktbewertung-card.css?v=49k" rel="stylesheet">
 </head>

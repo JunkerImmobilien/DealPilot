@@ -6,6 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const { query } = require('../db/pool');
+const { extractSummary } = require('./objectService'); // v628-demo-kpis
 
 const DEMO_JSON_PATH = path.resolve(__dirname, '../db/demo-object.json');
 
@@ -53,11 +54,16 @@ async function assignDemoObject(userId) {
   const aiAnalysis = demo.ai_analysis || null;
   const photos = demo.photos || [];
 
+  // v628: Summary-Spalten aus dem Demo-data ableiten, damit die Sidebar-Karte
+  // DSCR/CF/BMR/Score sofort zeigt (wie bei echten Objekten via create()).
+  const s = extractSummary(data);
+  const _num = function (v) { if (v == null) return null; const n = parseFloat(v); return (isNaN(n) || !isFinite(n)) ? null : n; };
   const result = await query(
-    `INSERT INTO objects (user_id, name, data, ai_analysis, photos, created_at, updated_at)
-     VALUES ($1, $2, $3::jsonb, $4, $5::jsonb, NOW(), NOW())
+    `INSERT INTO objects (user_id, name, kuerzel, ort, kaufpreis, bmy, cf_ns, dscr, seq_no, data, ai_analysis, photos, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12::jsonb, NOW(), NOW())
      RETURNING id, name`,
-    [userId, name, JSON.stringify(data), aiAnalysis, JSON.stringify(photos)]
+    [userId, name, s.kuerzel, s.ort, _num(s.kaufpreis), _num(s.bmy), _num(s.cf_ns), _num(s.dscr),
+     s.seq_no, JSON.stringify(data), aiAnalysis, JSON.stringify(photos)]
   );
 
   console.log('[demoObjectService] Demo-Objekt angelegt fuer User', userId, '→', result.rows[0]);
