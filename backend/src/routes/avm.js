@@ -36,6 +36,23 @@ const router = express.Router();
 // ── Konfiguration ─────────────────────────────────────────────────────────
 function avmEnabled() { return String(process.env.AVM_ENABLED || '').toLowerCase() === 'true'; }
 function avmMode() { return String(process.env.AVM_MODE || 'stub').toLowerCase() === 'live' ? 'live' : 'stub'; }
+
+// v644: Per-Provider Live-Allowlist + Client-Readiness.
+// AVM_LIVE_PROVIDERS=sprengnetter (CSV) -> nur gelistete Provider duerfen live gehen.
+// AVM_CLIENT_READY: pricehubble-client.js ist derzeit nur ein Stub-Wrapper und NICHT
+// live-faehig (wuerde sonst 40 L abziehen und Demo-Daten als echt labeln). Bei echtem
+// PH-Client einfach pricehubble:true setzen.
+var AVM_CLIENT_READY = { sprengnetter: true, pricehubble: false };
+function avmLiveProviders() {
+  return String(process.env.AVM_LIVE_PROVIDERS || '').toLowerCase().split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+}
+function providerEnabled(provider) {
+  var p = String(provider || '').toLowerCase();
+  if (!AVM_CLIENT_READY[p]) return false;            // Client noch nicht echt -> coming soon
+  var list = avmLiveProviders();
+  if (!list.length) return true;                      // keine Allowlist -> Legacy (alle ready-Clients an)
+  return list.indexOf(p) !== -1;
+}
 // v387: Plan des Users (Spiegel aiCreditsService).
 async function getPlanId(userId) {
   try {
@@ -87,8 +104,8 @@ router.get('/health', function (req, res) {
     available: enabled,
     mode: avmMode(),
     providers: {
-      pricehubble: { enabled: enabled, configured: pricehubble.isConfigured() },
-      sprengnetter: { enabled: enabled, configured: sprengnetter.isConfigured() }
+      pricehubble: { enabled: enabled && providerEnabled('pricehubble'), configured: pricehubble.isConfigured(), coming_soon: !providerEnabled('pricehubble') },
+      sprengnetter: { enabled: enabled && providerEnabled('sprengnetter'), configured: sprengnetter.isConfigured(), coming_soon: !providerEnabled('sprengnetter') }
     }
   });
 });
@@ -165,6 +182,7 @@ function _cacheSet(key, result) {
 
 // ── gemeinsamer Handler ──────────────────────────────────────────────────────
 async function runProvider(provider, req, res, next) {
+  if (!providerEnabled(provider)) return res.status(409).json({ error: 'provider_coming_soon', coming_soon: true, provider: provider, message: 'Dieser Anbieter ist derzeit noch nicht verfügbar (demnächst).' });
   try {
     if (!avmEnabled()) {
       return res.status(503).json({ error: 'avm_disabled', disabled: true, message: 'AVM-Abruf ist derzeit deaktiviert.' });

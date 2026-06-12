@@ -121,6 +121,15 @@ document.addEventListener('input', function() {
 });
 
 function switchTab(i) {
+  /* v652-qc-exit: Klick auf einen Tab verlaesst den inline-QuickCheck sauber */
+  if (document.body.classList.contains('qc-standalone-active') && typeof exitQuickCheckMode === 'function') {
+    try { exitQuickCheckMode(); } catch (e) {}
+  }
+  /* v645-mb-exit: Klick auf einen Tab verlaesst den inline-Marktbericht sauber */
+  if (document.body.classList.contains('mb-standalone-active')) {
+    document.body.classList.remove('mb-standalone-active');
+    var _mbx = document.getElementById('s-marktbericht'); if (_mbx) { _mbx.classList.remove('active'); _mbx.innerHTML = ''; }
+  }
   // V47: Tab-Wechsel triggert Save (Auto-Save ist aus)
   if (typeof window.dpTabSwitchSave === 'function') {
     try { window.dpTabSwitchSave(); } catch(e) {}

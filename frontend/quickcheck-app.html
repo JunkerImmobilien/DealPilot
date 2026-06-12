@@ -3237,6 +3237,9 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 .dp-pfbar .dp-pf-tile,#qc7-sources .dp-pf-tile{opacity:1 !important;filter:none !important;mix-blend-mode:normal !important;background:#ffffff !important}
 .dp-pfbar .dp-pf-tile.tool,#qc7-sources .dp-pf-tile.tool{background:#0a0a0a !important;color:#e9e3d2 !important}
 .dp-pfbar .dp-pf-tile.dp-pf-disabled,#qc7-sources .dp-pf-tile.dp-pf-disabled{opacity:1 !important}
+/* v644-coming-soon: PriceHubble ausgegraut bis Zugang da */
+#qc7-sources .dp-pf-tile.dp-pf-soon-on,.dp-pfbar .dp-pf-tile.dp-pf-soon-on{opacity:.5 !important;filter:grayscale(.35) !important;cursor:not-allowed !important}
+#qc7-sources .dp-pf-tile.dp-pf-soon-on:hover{transform:none !important;border-color:rgba(0,0,0,.12) !important}
 .dp-pf-bc{position:absolute;inset:12px 16px;background:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 4px,#111 4px 5px,transparent 5px 8px,#111 8px 11px,transparent 11px 13px,#111 13px 14px,transparent 14px 17px,#111 17px 19px,transparent 19px 22px);opacity:.92;pointer-events:none}
 /* v597-preflight-final END */
 /* v598-pf-fix BEGIN */
@@ -3406,8 +3409,8 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       <span class="dp-pf-stripe"></span>
       <div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot · Boarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
       <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">
-        <label class="qc7-src dp-pf-tile" data-src="ph" title="PriceHubble">
-          <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)" style="display:none">
+        <label class="qc7-src dp-pf-tile dp-pf-soon-on" data-src="ph" title="Demnächst verfügbar"><!-- v644-coming-soon -->
+          <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)" style="display:none" disabled>
           <span class="dp-pf-logo"><img src="img/pricehubble.jpg" alt="PriceHubble"></span><span class="dp-pf-led"></span>
         </label>
         <label class="qc7-src dp-pf-tile" data-src="spr" title="Sprengnetter">

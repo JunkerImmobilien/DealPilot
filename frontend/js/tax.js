@@ -883,7 +883,7 @@ function _computeAutoForYear(yearIdx, year) {
 
     // 3.0 Verwaltungskosten
     hausverwaltung: verwaltung,
-    steuerber: 15,
+    steuerber: 0,  /* v646: kein Auto-Vorschlag */
     porto: 5,
     verw_sonst: 0,
 
@@ -893,7 +893,7 @@ function _computeAutoForYear(yearIdx, year) {
     hotel: 0,
     inserat: 0,
     gericht: 0,
-    telefon: 10,
+    telefon: 0,  /* v646: kein Auto-Vorschlag */
     sonst_kosten: 0,
 
     // 5.0 AfA Gebäude — V112 reine Gebäude-AfA (ohne Küche)
@@ -1248,7 +1248,8 @@ function _ytfCell(year, field, val, auto) {
   var isOverride = override !== undefined;
   return '<td class="num ytf-cell ' + (isOverride ? 'ytf-overridden' : '') + '">' +
     '<div class="ytf-input-wrap">' +
-      '<input type="number" step="1" value="' + Math.round(val) + '"' +
+      /* v646-empty-input: 0 ohne Override -> leeres Feld + Placeholder */
+      '<input type="number" step="1" value="' + (Math.round(val) === 0 && !isOverride ? '' : Math.round(val)) + '" placeholder="0"' +
         ' data-year="' + year + '" data-field="' + field + '"' +
         ' onchange="updateTaxOverride(this)" />' +
       (isOverride ? '<button class="ytf-reset" onclick="resetTaxOverride(\'' + year + '\',\'' + field + '\')" title="Auf Vorschlag zurücksetzen (' + Math.round(auto).toLocaleString('de-DE') + ' €)">↺</button>' : '') +
@@ -1260,7 +1261,8 @@ function _ytfDetailInput(year, field, val, auto) {
   var override = _getYearOverride(year, field);
   var isOverride = override !== undefined;
   return '<div class="ytf-input-wrap">' +
-    '<input type="number" step="1" value="' + Math.round(val) + '"' +
+    /* v646-empty-input */
+    '<input type="number" step="1" value="' + (Math.round(val) === 0 && !isOverride ? '' : Math.round(val)) + '" placeholder="0"' +
       ' data-year="' + year + '" data-field="' + field + '"' +
       ' onchange="updateTaxOverride(this)" />' +
     (isOverride ?
