@@ -33064,3 +33064,63 @@ body.qc-standalone-active .main-col { grid-column: 1 / -1 !important; }
      intakt, damit der Trigger weiter funktioniert. */
 }
 /* ===== v634-accordion-drawer END ===== */
+
+/* ===== v637-aktionen-stack BEGIN ===== */
+/* Bug (Console): #sb-portfolio (top681,h45,bottom726) ueberlappt .sb-actions-trigger
+   (top666,h36,bottom702) um ~21px - beide relative, aber im Drawer kein sauberer Abstand.
+   Fix: im mobilen Drawer beide mit klarer Reihenfolge + Abstand stapeln. */
+@media (max-width: 768px) {
+  body .app-wrap.sb-mobile-open aside.sidebar #sb-portfolio,
+  body aside.sidebar.sb-mobile-open #sb-portfolio {
+    position: static !important;
+    margin: 10px 12px 6px !important;
+    order: 90 !important;
+  }
+  body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-trigger,
+  body aside.sidebar.sb-mobile-open .sb-actions-trigger {
+    position: static !important;
+    margin: 6px 12px 14px !important;
+    order: 95 !important;
+  }
+  /* sicherstellen, dass die Sidebar ihre Kinder als saubere Spalte ordnet */
+  body .app-wrap.sb-mobile-open aside.sidebar,
+  body aside.sidebar.sb-mobile-open {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
+/* ===== v637-aktionen-stack END ===== */
+
+/* ===== v637-settings-equity BEGIN ===== */
+/* Settings-Modal-Header laeuft auf dem Handy raus (Titel + ms-sub + Tabs zu breit). */
+@media (max-width: 640px) {
+  .set-modal-cream .ms-head, .settings-modal .ms-head {
+    flex-wrap: wrap !important;
+    padding-right: 48px !important;   /* Platz fuer den absoluten X-Button */
+    gap: 4px !important;
+  }
+  .set-modal-cream .ms-head .ms-title, .settings-modal .ms-title {
+    font-size: 17px !important; line-height: 1.2 !important;
+  }
+  .set-modal-cream .ms-sub, .settings-modal .ms-sub {
+    font-size: 11px !important; width: 100% !important; white-space: normal !important;
+  }
+  .settings-tabs.ms-tabs, .settings-tabs {
+    overflow-x: auto !important; -webkit-overflow-scrolling: touch !important;
+    flex-wrap: nowrap !important;
+  }
+}
+/* Equity-/Bank-Chart: feste 380px-Hoehe staucht das 1100x380-SVG auf dem Handy zur Briefmarke.
+   Fix: auf Mobile horizontal scrollbar, SVG behaelt lesbare Mindestbreite. */
+@media (max-width: 768px) {
+  .bc-svg-wrap {
+    height: auto !important;
+    overflow-x: auto !important; -webkit-overflow-scrolling: touch !important;
+  }
+  .bc-svg-wrap svg {
+    min-width: 680px !important;   /* lesbar; Nutzer scrollt horizontal */
+    height: auto !important;
+    aspect-ratio: 1100 / 380;
+  }
+}
+/* ===== v637-settings-equity END ===== */
