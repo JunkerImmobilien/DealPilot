@@ -32986,3 +32986,45 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   body.dp-sidebar-collapsed .hdr-mobile-menu{display:none !important;}
 }
 /* ===== v625-mobile-iconrail END ===== */
+
+/* ===== v633-drawer-qc BEGIN ===== */
+/* Bug 1: Im QuickCheck-Standalone blutet die volle Sidebar (360px) durch
+   (dp-sidebar-collapsed=false, aber sidebar display:flex sichtbar). -> ausblenden,
+   main-col volle Breite. Diagnose: body.qc-standalone-active + sidebar rectW 360, app-wrap 400px. */
+body.qc-standalone-active #sidebar { display: none !important; }
+body.qc-standalone-active .app-wrap { grid-template-columns: 1fr !important; }
+body.qc-standalone-active .main-col { grid-column: 1 / -1 !important; }
+
+/* Bug 2: Im mobilen Drawer ueberlappen die Bloecke, weil #sb-actions-accordion
+   position:absolute ist (aus dem Fluss, top:662 h:0 -> liegt ueber sb-list/sb-user).
+   Diagnose: sb-list rel top232 h449, accordion ABSOLUTE, sb-user top774, footer top860.
+   Fix: im Drawer alles in den normalen Fluss (static) + saubere Spalten-Stapelung. */
+@media (max-width: 768px) {
+  body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-actions-accordion,
+  body #sidebar.sidebar.sb-mobile-open .sb-actions-accordion {
+    position: static !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+  body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-list,
+  body #sidebar.sidebar.sb-mobile-open .sb-list {
+    position: static !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+  }
+  body .app-wrap.sb-mobile-open #sidebar.sidebar,
+  body #sidebar.sidebar.sb-mobile-open {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+  /* User-Box ans Ende, Footer-Spacer ohne Hoehe -> keine Ueberlappung */
+  body .app-wrap.sb-mobile-open #sidebar.sidebar #sb-user,
+  body #sidebar.sidebar.sb-mobile-open #sb-user {
+    position: static !important;
+    margin: 8px 0 0 0 !important;
+    order: 99 !important;
+  }
+}
+/* ===== v633-drawer-qc END ===== */
