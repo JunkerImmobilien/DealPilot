@@ -1582,12 +1582,22 @@ window.toggleMobileSidebar = function() {
 (function() {
   function closeMobileSidebarOnAction() {
     if (window.innerWidth > 768) return;
+    // v634-autoclose: Der echte Drawer-Toggle ist .app-wrap.sb-mobile-open (main.js),
+    // NICHT .sidebar.sb-mobile-open -> hier beide Mechanismen sauber schliessen,
+    // sonst bleibt der Drawer nach Objektwahl/Tab-Klick offen.
+    var aw = document.querySelector('.app-wrap');
     var sb = document.getElementById('sidebar');
     var ov = document.getElementById('mobile-overlay');
+    var bd = document.getElementById('sb-backdrop');
+    if (aw && aw.classList.contains('sb-mobile-open')) {
+      aw.classList.remove('sb-mobile-open');
+      if (bd) bd.style.display = 'none';
+      document.body.style.overflow = '';
+    }
     if (sb && sb.classList.contains('sb-mobile-open')) {
       sb.classList.remove('sb-mobile-open');
-      if (ov) ov.classList.remove('active');
     }
+    if (ov) ov.classList.remove('active');
   }
   // V100: Expose damit andere Stellen (z.B. loadSaved nach Card-Klick) das auch nutzen können
   window.closeMobileSidebarOnAction = closeMobileSidebarOnAction;

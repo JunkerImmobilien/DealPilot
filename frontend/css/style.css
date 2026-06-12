@@ -33028,3 +33028,39 @@ body.qc-standalone-active .main-col { grid-column: 1 / -1 !important; }
   }
 }
 /* ===== v633-drawer-qc END ===== */
+
+/* ===== v634-header-mobile BEGIN ===== */
+/* Auf dem Handy nimmt der Investor-Deal-Score-Header zu viel Platz (Donut + 5 KPI-Pills).
+   Gewuenscht: nur die Gesamtbewertung (Donut + Score-Wort + KI-Rat). Die 5 KPI-Pills
+   (.sc-pill: Rendite/Finanz./Risiko/Lage/Upside) werden ausgeblendet. */
+@media (max-width: 768px) {
+  #hdr-badges .sc-pill { display: none !important; }
+  /* Donut-Wrap darf die volle Breite nehmen, Score-Wort/KI-Rat bleiben sichtbar */
+  #hdr-badges .sc-donut-wrap { flex: 1 1 auto !important; }
+}
+/* ===== v634-header-mobile END ===== */
+
+/* ===== v634-accordion-drawer BEGIN ===== */
+/* Bug: aside.sidebar .sb-actions-accordion ist position:absolute !important; bottom:86px
+   (fuer Desktop-Sidebar gedacht -> schwebt ueber Karten). Im mobilen Drawer ueberlappt es
+   "PORTFOLIO-COCKPIT" + User-Box. Gleich-spezifischer Selektor zwingt es in den Fluss. */
+@media (max-width: 768px) {
+  body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-accordion,
+  body aside.sidebar.sb-mobile-open .sb-actions-accordion {
+    position: static !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: auto !important;
+    box-shadow: none !important;
+    margin: 8px 0 0 0 !important;
+  }
+  /* offen-Zustand erzwingen ist NICHT noetig: im Drawer soll das Accordion-Inner sichtbar sein,
+     wenn der User es aufklappt. Wir lassen die :not(.sb-actions-open)-Regel (inner display:none)
+     intakt, damit der Trigger weiter funktioniert. */
+}
+/* ===== v634-accordion-drawer END ===== */
