@@ -159,7 +159,7 @@ function renderVerifyMail(firstName, verifyUrl) {
 '          <a href="mailto:support@junker-immobilien.io" style="color:#C9A84C;">support@junker-immobilien.io</a>.\n' +
 '        </div>\n' +
 '        <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.6;color:#6a6453;margin-top:14px;border-top:1px solid #1f1c14;padding-top:14px;">\n' +
-'          Junker Immobilien \u00b7 Hüllhorst \u00b7 DealPilot<br>\n' +
+'          Junker Immobilien \u00b7 DealPilot<br>\n' +
 '          Du erhältst diese Mail, weil du dich gerade bei DealPilot registriert hast. Der Link ist 24 Stunden gültig.\n' +
 '        </div>\n' +
 '      </td>\n' +
