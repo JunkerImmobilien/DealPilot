@@ -51,7 +51,10 @@ function renderVerifyMail(firstName, verifyUrl) {
 '    .px{padding-left:22px!important;padding-right:22px!important;}\n' +
 '    .stub{display:block!important;width:100%!important;border-radius:14px 14px 0 0!important;}\n' +
 '    .ticketbody{display:block!important;width:100%!important;border-radius:0 0 14px 14px!important;}\n' +
-'    .fields td{display:inline-block!important;}\n' +
+'    .fields td{display:table-cell!important;width:33%!important;vertical-align:top!important;padding-right:6px!important;}\n' +
+'    .perf{display:none!important;}\n' +
+'    .ticketbody{padding:16px 18px!important;}\n' +  /* v631-ticket-mobile */
+
 '  }\n' +
 '</style>\n' +
 '</head>\n' +
@@ -95,7 +98,7 @@ function renderVerifyMail(firstName, verifyUrl) {
 '              <div style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:8px;letter-spacing:1px;color:#9a8f6a;margin-top:12px;">FLIGHT</div>\n' +
 '              <div style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:13px;font-weight:700;color:#ffffff;margin-top:2px;">DP \u00b7 BOARDING</div>\n' +
 '            </td>\n' +
-'            <td width="1" style="border-left:2px dashed #d9cfb4;font-size:0;line-height:0;">&nbsp;</td>\n' +
+'            <td class="perf" width="1" style="border-left:2px dashed #d9cfb4;font-size:0;line-height:0;">&nbsp;</td>\n' +
 '            <td class="ticketbody" valign="middle" style="padding:18px 22px;">\n' +
 '              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="fields"><tr>\n' +
 '                <td style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:8px;letter-spacing:1px;color:#8a8473;padding-right:18px;">\n' +

@@ -32901,25 +32901,6 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 }
 /* ===== v619-boarding-mobile END ===== */
 
-/* ===== v621-qc-mobile BEGIN ===== */
-/* QuickCheck = iframe (qc-bridge.js setzt _frame.style.height = Inhaltshoehe; auf Mobile fragil
-   -> Rest abgeschnitten / kein Scroll). Fix: auf schmalen Screens iframe fix = Viewport-Hoehe,
-   das QC-body scrollt selbst (hat min-height:100vh). #s-quick zusaetzlich scrollbar als Sicherung. */
-@media (max-width:640px){
-  body.qc-standalone-active #s-quick{
-    height:auto !important;min-height:100dvh;
-    overflow-y:auto !important;-webkit-overflow-scrolling:touch;
-    padding:8px 10px calc(72px + env(safe-area-inset-bottom)) !important;}
-  body.qc-standalone-active #qc-tab-host{max-width:100% !important}
-  /* das auto-grow-iframe auf Mobile auf Viewport-Hoehe fixieren -> innen scrollen */
-  body.qc-standalone-active #s-quick iframe,
-  body.qc-standalone-active #qc-tab-host iframe{
-    width:100% !important;
-    height:calc(100dvh - 96px) !important;
-    min-height:420px !important;
-    border:0 !important;display:block !important;}
-}
-/* ===== v621-qc-mobile END ===== */
 
 /* ===== v622-mobile-shell BEGIN ===== */
 /* Handy-Shell konsolidiert: EIN Menue (oberer Header-Hamburger), Sidebar = sauberer Vollbild-naher

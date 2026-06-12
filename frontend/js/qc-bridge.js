@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=425';
+  var IFRAME_SRC = 'quickcheck-app.html?v=632';
 
   // v345: doppelte weiße "⚡ Quick-Check"-Überschrift entfernen.
   // Sie ist ein CSS-Pseudo-Element (body.qc-standalone-active #s-quick::before)
@@ -91,15 +91,33 @@
 
     function sizeFrame() {
       try {
+        // v630-autoheight: Auf schmalen Screens das iframe = ECHTE Inhaltshoehe,
+        // damit die Seite normal scrollt (statt Inhalt auf Fensterhoehe abzuschneiden).
+        // iframe ist same-origin -> contentDocument lesbar.
+        var isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
+          var ch = doc && doc.documentElement ? doc.documentElement.scrollHeight : 0;
+          if (ch && ch > 0) { _frame.style.height = (ch + 4) + 'px'; return; }
+        }
         var top = _frame.getBoundingClientRect().top;
         var h = Math.max(480, Math.floor(window.innerHeight - top - 8));
         _frame.style.height = h + 'px';
       } catch (e) {}
     }
-    _frame.addEventListener('load', sizeFrame);
+    function _attachContentObserver() {
+      try {
+        var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
+        if (doc && window.ResizeObserver && doc.documentElement && !_frame._qcRO) {
+          _frame._qcRO = new ResizeObserver(function () { sizeFrame(); });
+          _frame._qcRO.observe(doc.documentElement);
+        }
+      } catch (e) {}
+    }
+    _frame.addEventListener('load', function () { sizeFrame(); _attachContentObserver(); });
     sizeFrame();
     window.addEventListener('resize', sizeFrame);
-    [120, 400, 900].forEach(function (ms) { setTimeout(sizeFrame, ms); });
+    [120, 400, 900, 1500].forEach(function (ms) { setTimeout(sizeFrame, ms); }); // v630-autoheight
   };
 
   function _postToFrame(msg) {
