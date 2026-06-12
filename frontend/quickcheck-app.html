@@ -3270,6 +3270,36 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 
 
 
+
+/* v636-preflight-mobile: PRE-FLIGHT-Leiste im QC laeuft auf dem Handy raus
+   (gemessen: scrollW 1179 / Kinder-Summe 1411 vs clientW 299, flex-wrap:nowrap).
+   Fix: umbrechen statt scrollen, Gruppen + Button volle Breite. ACHTUNG: dp-pf-rz
+   enthaelt den Abrufen-Button -> NUR Barcode-Deko (dp-pf-bc) + QR (dp-pf-qr) ausblenden. */
+@media (max-width:640px){
+  #qc7-sources.dp-pfbar, .dp-pfbar{
+    flex-wrap:wrap !important; align-items:stretch !important;
+    gap:10px !important; padding:12px !important; overflow:visible !important;
+  }
+  .dp-pf-scroll{ overflow-x:visible !important; }
+  .dp-pf-lead{ width:100% !important; align-self:stretch !important; margin:0 0 2px 0 !important; padding:9px 13px !important; }
+  .dp-pf-sep{ display:none !important; }
+  .dp-pf-seg{ width:100% !important; flex:1 1 100% !important; }
+  .dp-pf-row{ flex-wrap:wrap !important; gap:8px !important; }
+  .dp-pf-tile{ min-width:0 !important; flex:1 1 calc(50% - 4px) !important; }
+  .dp-pf-tile.tool{ min-width:0 !important; flex:1 1 100% !important; }
+  /* QR-Link + Barcode-Deko raus (spart Breite); Reisszone-Span traegt den Button -> bleibt */
+  .dp-pf-qr{ display:none !important; }
+  .dp-pf-bc{ display:none !important; }
+  .dp-pf-rz{ width:100% !important; flex:1 1 100% !important; display:block !important; }
+  #qc7-sources .dp-pf-launch, .dp-pf-launch{
+    width:100% !important; margin:2px 0 0 0 !important;
+    align-self:stretch !important; justify-content:center !important;
+    flex:1 1 100% !important;
+  }
+}
+@media (max-width:400px){
+  .dp-pf-tile{ flex:1 1 100% !important; }
+}
 </style>
 </head>
 <body>

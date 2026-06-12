@@ -94,7 +94,7 @@
   function particles(canvas) {
     if (!canvas || canvas._dpxOn) return; canvas._dpxOn = true;
     var x = canvas.getContext('2d'); var w, h, ps; var DP = Math.min(2, global.devicePixelRatio || 1);
-    function size() { var r = canvas.getBoundingClientRect(); if (!r.width) return; w = r.width; h = r.height; canvas.width = w * DP; canvas.height = h * DP; x.setTransform(DP, 0, 0, DP, 0, 0);
+    function size() { var r = canvas.getBoundingClientRect(); /* v635-canvas-guard: plausibilitaetspruefung gegen 67M-Canvas (Infinity/NaN/Riesenwerte) */ if (!r.width || !r.height || !isFinite(r.width) || !isFinite(r.height) || r.width > 4000 || r.height > 4000) return; w = r.width; h = r.height; canvas.width = Math.max(1, Math.min(4000, Math.round(w * DP))); canvas.height = Math.max(1, Math.min(4000, Math.round(h * DP))); x.setTransform(DP, 0, 0, DP, 0, 0);
       var n = Math.max(12, Math.min(34, Math.floor(w * h / 9000))); ps = Array.from({ length: n }, function () { return { x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .15, vy: (Math.random() - .5) * .15, r: Math.random() * 1.3 + .4, o: Math.random() * .5 + .16, g: Math.random() > .45 }; }); }
     function loop() {
       if (!canvas.isConnected) { canvas._dpxOn = false; return; } // gestoppt, wenn Karte ersetzt
