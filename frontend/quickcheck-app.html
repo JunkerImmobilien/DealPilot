@@ -2763,6 +2763,28 @@ body::before {
 
 /* END-V7-STYLES */
 
+
+/* v630-qc-body-mobile: Auf dem Handy darf das body NICHT auf Fensterhoehe (min-height:100vh)
+   gezwungen werden — sonst meldet scrollHeight die Fensterhoehe und der Inhalt wird
+   abgeschnitten. Inhalt bestimmt die Hoehe, das Parent-iframe waechst mit (qc-bridge v630). */
+@media (max-width:768px){
+  html,body{ min-height:0 !important; height:auto !important; overflow:visible !important; }
+}
+
+/* v632-subs-mobile: Auf dem Handy die Mini-Tachos (.qc-mini) der 5 Score-Kacheln ausblenden
+   und stattdessen den reinen Zahlenwert (.sub-v) + "/100" (.sub-tiny) zeigen. Kompakter,
+   keine gestauchten Halbkreise. Desktop unveraendert. */
+@media (max-width:768px){
+  .score-block .sub .qc-mini{ display:none !important; }
+  .score-block .sub .sub-v{ display:block !important; font-size:1.35rem !important; line-height:1.05 !important; margin-top:2px !important; }
+  .score-block .sub .sub-tiny{ display:block !important; font-size:0.55rem !important; color:rgba(255,255,255,0.40) !important; }
+  .subs{ grid-template-columns:repeat(5,1fr) !important; gap:0.35rem !important; }
+  .sub{ padding:0.45rem 0.3rem 0.5rem !important; }
+  .sub-l{ font-size:0.52rem !important; }
+}
+@media (max-width:480px){
+  .subs{ grid-template-columns:repeat(3,1fr) !important; }
+}
 </style>
 <style id="qc-app-overrides">
 button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
