@@ -33262,41 +33262,42 @@ body.qc-standalone-active .main-col { grid-column: 1 / -1 !important; }
 }
 /* ===== v639-mobile END ===== */
 
-/* ===== v640-accordion-float BEGIN ===== */
-/* Accordion im Drawer NACH OBEN schweben (wie Desktop). v634 (static) wurde entfernt.
-   Diagnose: Toggle funktioniert (open-Klasse + INNER block h621), aber Container blieb
-   static h64 -> Inner quoll raus/ueberlappte. Jetzt absolute ueber dem Trigger.
-   Drawer-Klasse kann auf .app-wrap ODER .sidebar sitzen -> beide Varianten matchen. */
+/* ===== v641-accordion-flow BEGIN ===== */
+/* Accordion im Drawer: IM FLUSS nach unten (robust, kein Schweben/Mitscrollen).
+   Container static + height:auto -> waechst mit dem Inner, schiebt User-Box runter.
+   v640 (absolute schweben) wurde entfernt. */
 @media (max-width: 768px) {
-  body .app-wrap.sb-mobile-open aside.sidebar.sidebar .sb-actions-accordion.sb-actions-open,
-  body aside.sidebar.sidebar.sb-mobile-open .sb-actions-accordion.sb-actions-open {
-    position: absolute !important;
-    left: 12px !important; right: 12px !important;
-    bottom: 60px !important;          /* knapp ueber dem AKTIONEN-Trigger */
-    top: auto !important;
-    margin: 0 !important;
-    z-index: 200 !important;
-    max-height: 65vh !important;
+  body .app-wrap.sb-mobile-open aside.sidebar.sidebar .sb-actions-accordion,
+  body aside.sidebar.sidebar.sb-mobile-open .sb-actions-accordion {
+    position: static !important;
+    left: auto !important; right: auto !important; bottom: auto !important; top: auto !important;
+    max-height: none !important;
+    height: auto !important;
     overflow: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: auto !important;
+    box-shadow: none !important;
+    margin: 4px 0 0 0 !important;
+    order: 96 !important;   /* nach dem Trigger */
   }
+  /* geschlossen: Inner weg (Trigger funktioniert weiter), Container nimmt keinen Platz */
+  body .app-wrap.sb-mobile-open aside.sidebar.sidebar .sb-actions-accordion:not(.sb-actions-open) .sb-actions-accordion-inner,
+  body aside.sidebar.sidebar.sb-mobile-open .sb-actions-accordion:not(.sb-actions-open) .sb-actions-accordion-inner {
+    display: none !important;
+  }
+  /* offen: Inner sichtbar im Fluss, KEIN max-height-Clip, KEIN eigener Scroll */
   body .app-wrap.sb-mobile-open aside.sidebar.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner,
   body aside.sidebar.sidebar.sb-mobile-open .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner {
-    max-height: 65vh !important;
-    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
     display: block !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 12px !important;
   }
-  /* geschlossen: komplett weg */
-  body .app-wrap.sb-mobile-open aside.sidebar.sidebar .sb-actions-accordion:not(.sb-actions-open),
-  body aside.sidebar.sidebar.sb-mobile-open .sb-actions-accordion:not(.sb-actions-open) {
-    position: absolute !important; max-height: 0 !important; overflow: hidden !important;
-    pointer-events: none !important; bottom: 60px !important;
-  }
-  /* Anker: Sidebar relativ, damit bottom:60px sich auf die Sidebar bezieht */
-  body .app-wrap.sb-mobile-open aside.sidebar.sidebar,
-  body aside.sidebar.sidebar.sb-mobile-open {
-    position: relative !important;
-  }
-  /* Button-Optik: AKTIONEN-Trigger + COCKPIT-Header gleich aussehen lassen (gleicher Rahmen-Look) */
+  /* Trigger-Pfeil: zeigt bei offen nach oben (Inhalt darunter), bei zu nach unten - rein kosmetisch,
+     wir lassen die bestehende Arrow-Logik. */
+
+  /* Button-Optik: AKTIONEN-Trigger + PORTFOLIO-COCKPIT-Header gleicher Look */
   body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-trigger,
   body aside.sidebar.sb-mobile-open .sb-actions-trigger,
   body .app-wrap.sb-mobile-open aside.sidebar .sb-portfolio-collapsible .sb-collapsible-header,
@@ -33309,4 +33310,4 @@ body.qc-standalone-active .main-col { grid-column: 1 / -1 !important; }
     box-sizing: border-box !important;
   }
 }
-/* ===== v640-accordion-float END ===== */
+/* ===== v641-accordion-flow END ===== */
