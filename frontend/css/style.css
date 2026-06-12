@@ -33337,3 +33337,58 @@ body.qc-standalone-active .main-col { grid-column: 1 / -1 !important; }
   .set-modal-cream .modal-side::after { display: none !important; }
 }
 /* ===== v642-accordion-overlay END ===== */
+
+/* ===== v643-help-mobile BEGIN ===== */
+/* Hilfe-Modal war auf Mobile kaputt (Bild 4: 18 Kategorien uebereinandergestapelt, Inhalt leer).
+   Ursache: vorhandene Mobile-Regeln zielten auf .help-modal-body / .help-sidebar - diese Klassen
+   existieren im aktuellen Markup NICHT (echte: .help-modal-side, .help-sidebar-list, .help-sidebar-item).
+   Fix: echte Klassen, vertikal stapeln, Kategorien als horizontal scrollbare Leiste oben. */
+@media (max-width: 768px) {
+  .help-modal.global-view-overlay .help-modal-inner.global-view-modal {
+    display: flex !important; flex-direction: column !important;
+    grid-template-columns: none !important; grid-template-rows: none !important;
+    width: 100vw !important; max-width: 100vw !important;
+    height: 100dvh !important; max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+  /* Side (Header + Kategorien) oben, NICHT volle Hoehe */
+  .help-modal.global-view-overlay .help-modal-side {
+    flex: 0 0 auto !important; width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(201,168,76,0.25) !important;
+    overflow: visible !important;
+  }
+  .help-modal.global-view-overlay .help-modal-side .ms-h { padding: 14px 16px 8px !important; }
+  /* Kategorien-Liste: horizontale, scrollbare Chip-Leiste (18 Stueck) */
+  .help-modal.global-view-overlay #help-sidebar.help-sidebar-list,
+  .help-modal.global-view-overlay .settings-tabs.ms-tabs.help-sidebar-list {
+    display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
+    overflow-x: auto !important; overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 6px !important; padding: 8px 12px !important;
+    max-height: none !important;
+    border-bottom: none !important;
+  }
+  .help-modal.global-view-overlay .help-sidebar-item.st-tab {
+    flex: 0 0 auto !important; white-space: nowrap !important;
+    width: auto !important;
+    padding: 8px 12px !important; font-size: 12px !important;
+    border: 1px solid rgba(201,168,76,0.35) !important; border-radius: 8px !important;
+    display: inline-flex !important; align-items: center !important; gap: 6px !important;
+  }
+  .help-modal.global-view-overlay .help-sidebar-item.st-tab.active,
+  .help-modal.global-view-overlay .help-sidebar-item.help-sidebar-item-active {
+    background: rgba(201,168,76,0.18) !important;
+    border-color: var(--gold, #C9A84C) !important;
+  }
+  .help-modal.global-view-overlay .help-sidebar-item-icon { display: inline-flex !important; }
+  .help-modal.global-view-overlay .help-sidebar-item-row { display: inline-flex !important; }
+  /* Content unten, volle Breite, scrollbar */
+  .help-modal.global-view-overlay .help-modal-content {
+    flex: 1 1 auto !important; width: 100% !important;
+    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
+    min-height: 0 !important;
+  }
+  .help-modal.global-view-overlay .help-content { padding: 14px 16px !important; }
+}
+/* ===== v643-help-mobile END ===== */
