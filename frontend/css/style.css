@@ -20825,12 +20825,7 @@ body.fb-modal-open.plan-free .body::before {
    Body-Klasse .qc-standalone-active blendet Tab-Bar + Workflow-Bar aus.
    Die Quick-Check-View nutzt die volle Breite des Content-Bereichs.
 ═══════════════════════════════════════════════════════════════ */
-body.qc-standalone-active .tabs,
-body.qc-standalone-active .tabs-workflow-bar,
-body.qc-standalone-active .wf-tab-bar,
-body.qc-standalone-active .workflow-tab-bar {
-  display: none !important;
-}
+/* v652-qc-inline: Tab-Bar bleibt sichtbar (war: ausgeblendet im QC-Standalone) */
 
 /* Standalone-Section sichtbar wenn body-Klasse gesetzt ist */
 body.qc-standalone-active #s-quick {
@@ -32991,9 +32986,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* Bug 1: Im QuickCheck-Standalone blutet die volle Sidebar (360px) durch
    (dp-sidebar-collapsed=false, aber sidebar display:flex sichtbar). -> ausblenden,
    main-col volle Breite. Diagnose: body.qc-standalone-active + sidebar rectW 360, app-wrap 400px. */
-body.qc-standalone-active #sidebar { display: none !important; }
-body.qc-standalone-active .app-wrap { grid-template-columns: 1fr !important; }
-body.qc-standalone-active .main-col { grid-column: 1 / -1 !important; }
+/* v652-qc-inline: Sidebar bleibt sichtbar, normales Grid (war: ausgeblendet im QC-Standalone) */
 
 /* Bug 2: Im mobilen Drawer ueberlappen die Bloecke, weil #sb-actions-accordion
    position:absolute ist (aus dem Fluss, top:662 h:0 -> liegt ueber sb-list/sb-user).

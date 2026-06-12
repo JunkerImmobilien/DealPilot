@@ -22,7 +22,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20260612115748">
+<link rel="stylesheet" href="css/style.css?v=652">
 <link rel="stylesheet" href="css/bmf-modal.css?v=293f">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=303"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
@@ -1743,9 +1743,10 @@ label.dp-required.qc-required::after {
   <div class="card tax-module-card" style="margin-top:14px">
     <div class="ct-row">
       <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-receipt"/></svg></span>Steuerformular pro Jahr · individuelle Werte</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF('single-year')" title="PDF nur für das aktuelle Jahr"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg> Finanzamt-PDF (1 Jahr)</button>
-        <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF('all-years')" title="PDF mit allen 15 Jahren + Gesamtübersicht">📑 Finanzamt-PDF (alle Jahre)</button>
+      <div class="fa-pdf-ctrl" style="display:flex;gap:8px;flex-wrap:nowrap;align-items:center"><!-- v645-fa-pdf v646-fa-pdf -->
+        <label for="fa-pdf-year" style="font-size:12px;color:var(--muted,#7A7370);font-weight:600">Steuerjahr</label>
+        <select id="fa-pdf-year" onfocus="if(typeof _populateFaPdfYearSelect==='function')_populateFaPdfYearSelect()" title="Jahr für das Finanzamt-PDF wählen" style="border:1px solid var(--line,#e6e0d3);border-radius:8px;padding:7px 10px;font-size:13px;background:#fff;color:var(--ch,#2a2727);font-family:inherit;min-width:90px;width:auto"></select>
+        <button class="btn btn-outline btn-sm" onclick="exportWerbungskostenPDF()" title="Finanzamt-PDF für das gewählte Steuerjahr erzeugen"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg> Finanzamt-PDF</button>
       </div>
     </div>
     <p class="hint" style="margin-bottom:10px">
@@ -2891,7 +2892,7 @@ label.dp-required.qc-required::after {
 <script src="js/dscr-engine.js?v=231"></script>
 <script src="js/deal-kpis.js?v=231"></script>
 <script src="js/afa-engine.js?v=227"></script>
-  <script src="js/afa-ui.js?v=20260611092701"></script>
+  <script src="js/afa-ui.js?v=652"></script>
   <script src="js/zve-manager.js?v=1"></script>
   <script src="js/tax-periods.js?v=1"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
@@ -2910,7 +2911,7 @@ label.dp-required.qc-required::after {
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=286"></script>
+<script src="js/tax.js?v=646"></script>
 <script src="js/config.js?v=495"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
@@ -2924,11 +2925,11 @@ label.dp-required.qc-required::after {
 <script src="js/datenraum.js?v=160"></script>
 <script src="js/tooltip-content.js?v=2351"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
-  <script src="js/settings.js?v=20260611181146"></script>
+  <script src="js/settings.js?v=648"></script>
 <script src="js/pricing-modal.js?v=493-2"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=162"></script>
-<script src="js/werbungskosten-pdf.js?v=20260611105943"></script>
+<script src="js/werbungskosten-pdf.js?v=645"></script>
 <script src="js/charts.js?v=166"></script>
 <script src="js/market-rates.js?v=100"></script>
 <script src="js/market-rates-pf.js?v=431"></script>
@@ -2936,7 +2937,7 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=20260612103711"></script>
+<script src="js/ui.js?v=652"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=20260611175525"></script>
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
@@ -2950,7 +2951,7 @@ label.dp-required.qc-required::after {
 <script src="js/bmf-afa.js?v=287"></script>
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
 <script src="js/dealscore2.js?v=463"></script>
-<script src="js/dealscore2-ui.js?v=20260611092701"></script>
+<script src="js/dealscore2-ui.js?v=652"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=124"></script>
@@ -2961,7 +2962,7 @@ label.dp-required.qc-required::after {
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=124"></script>
 <script src="js/quick-check.js?v=463"></script>
-<script src="js/qc-bridge.js?v=20260612091636"></script>
+<script src="js/qc-bridge.js?v=652"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/ai-credits.js?v=491"></script>
@@ -2985,7 +2986,7 @@ label.dp-required.qc-required::after {
 <link rel="stylesheet" href="css/marktbewertung-card.css?v=541">
 <script src="js/marktbewertung-card.js?v=540"></script>
 <script src="js/dealpilot-mb.js?v=20260612103408"></script>
-  <script src="js/marktbericht-view.js?v=569"></script>
+  <script src="js/marktbericht-view.js?v=653"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=124"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
@@ -2994,7 +2995,7 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-calc.js?v=353"></script>
 <script src="js/rnd-pdf.js?v=20260611105943"></script>
 <script src="js/rnd-docx.js?v=142"></script>
-<script src="js/rnd-ui.js?v=20260611092701"></script>
+<script src="js/rnd-ui.js?v=652"></script>
 <script src="js/rnd-wizard.js?v=160"></script>
 <script src="js/free-lock.js?v=495"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
@@ -3004,7 +3005,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=187h2"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=20260611211722"></script>
+  <script src="js/object-actions.js?v=644"></script>
   <script src="js/voice-import.js?v=537"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->

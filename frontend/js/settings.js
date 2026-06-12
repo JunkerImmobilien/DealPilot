@@ -631,6 +631,15 @@ function showSettings(initialTab) {
         '</div>' +
         '<p class="hint" style="margin-top:8px;font-size:11px;color:var(--muted)">Anfänger-Modus zeigt alle Tooltips (Default). Profi-Modus blendet Anfänger-Erklärungen aus, behält aber kritische Hinweise (§ 7b, 15%-Regel etc.). Aus = komplett aus.</p>' +
         /* === V228 tooltip-mode-toggle END === */
+        /* === v648-mb-theme START === */
+        '<hr class="dvd">' +
+        '<h3 class="set-section-h">Marktbericht-Design</h3>' +
+        '<p class="hint" style="margin-bottom:10px">Hell oder Dunkel f\u00fcr den Marktbericht-Bereich. \u00c4nderung wird beim n\u00e4chsten \u00d6ffnen des Marktberichts aktiv.</p>' +
+        '<div class="dp-tt-mode-toggle" id="mb-theme-switch">' +
+          '<button type="button" class="dp-tt-mode-btn' + (_mbThemePref()==='light'?' active':'') + '" data-mbth="light" onclick="_setMbThemeLight()">Hell<span class="dp-tt-mode-btn-label">Wie Objekt-Tab</span></button>' +
+          '<button type="button" class="dp-tt-mode-btn' + (_mbThemePref()==='dark'?' active':'') + '" data-mbth="dark" onclick="_setMbThemeDark()">Dunkel<span class="dp-tt-mode-btn-label">Obsidian/Gold</span></button>' +
+        '</div>' +
+        /* === v648-mb-theme END === */
       '</div>' +
       '</div>' +    // pane-wrap Ende
       '<div class="settings-footer save-row">' +
@@ -2912,3 +2921,12 @@ function _v213ResetCards() {
   }
 })();
 
+
+
+/* v648-mb-theme: Marktbericht Hell/Dunkel (localStorage dp_mb_theme) */
+function _mbThemePref(){ try{ var t=localStorage.getItem('dp_mb_theme'); if(t==='dark'||t==='light') return t; }catch(e){} return 'light'; }
+function _applyMbThemeBtns(t){ var sw=document.getElementById('mb-theme-switch'); if(sw){ sw.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mbth')===t); }); } }
+function _setMbTheme(t){ if(t!=='dark') t='light'; try{ localStorage.setItem('dp_mb_theme', t); }catch(e){} _applyMbThemeBtns(t); if(typeof toast==='function') toast('Marktbericht-Design gespeichert \u2014 beim n\u00e4chsten \u00d6ffnen aktiv'); }
+function _setMbThemeLight(){ _setMbTheme('light'); }
+function _setMbThemeDark(){ _setMbTheme('dark'); }
+try{ window._mbThemePref=_mbThemePref; window._setMbTheme=_setMbTheme; window._setMbThemeLight=_setMbThemeLight; window._setMbThemeDark=_setMbThemeDark; }catch(e){}

@@ -35,6 +35,8 @@ $('replayBtn').addEventListener('click', async () => {
 });
 
 async function generate() {
+  /* v647-cost: Kostenhinweis vor dem kostenpflichtigen Abruf */
+  if (!window.confirm('Marktbericht jetzt erstellen?\n\nKosten: 5 L Kerosin – nur wenn ein Marktwert ermittelt wird. Liegen keine Marktdaten vor, wird nichts abgebucht.')) return; /* v654-cost-text */
   try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} /* v569-appbeh scroll */
   const btn = $('goBtn');
   $('errBox').classList.add('hide');

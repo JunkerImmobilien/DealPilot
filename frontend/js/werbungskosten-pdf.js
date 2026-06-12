@@ -10,7 +10,6 @@
 async function exportWerbungskostenPDF(mode) {
   if (typeof Paywall !== 'undefined' && !Paywall.gate('exports')) return;
 
-  // mode: 'single-year' (aktuelles Jahr) oder 'all-years'
   if (typeof window.jspdf === 'undefined') {
     if (typeof toast === 'function') toast('PDF-Bibliothek lädt noch...');
     return;
@@ -20,32 +19,78 @@ async function exportWerbungskostenPDF(mode) {
     return;
   }
 
+  // v645: Jahr-Quelle = State.cfRows -> exakt dieselben (Jahr, Index)-Paare wie der Bildschirm
+  // (_computeYearTotal(cfRows[yi].cal, yi)). Behebt den Versatz durch fixes new Date().getFullYear().
+  var rows = State.cfRows.slice(0, 15);
+
+  if (mode === undefined || mode === null) {
+    var selEl = document.getElementById('fa-pdf-year');
+    if (selEl && (!selEl.options || !selEl.options.length)) { try { _populateFaPdfYearSelect(); } catch (e) {} }
+    mode = selEl ? selEl.value : '0';
+  }
+  if (mode === 'single-year') mode = '0';           // Legacy-Kompat
+  var allYears = (mode === 'all' || mode === 'all-years');
+
   var jsPDF = window.jspdf.jsPDF;
   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   var W = 210, H = 297;
   var M = 16;
   var CW = W - 2 * M;
 
-  var startYear = new Date().getFullYear();
-  var nYears = mode === 'all-years' ? Math.min(15, State.cfRows.length) : 1;
-
-  for (var yi = 0; yi < nYears; yi++) {
-    if (yi > 0) doc.addPage();
-    _renderWerbungskostenPage(doc, startYear + yi, yi, W, H, M, CW);
+  var name;
+  if (allYears) {
+    var nYears = rows.length;
+    for (var yi = 0; yi < nYears; yi++) {
+      if (yi > 0) doc.addPage();
+      _renderWerbungskostenPage(doc, rows[yi].cal, yi, W, H, M, CW);
+    }
+    if (nYears > 1) {
+      doc.addPage();
+      _renderWerbungskostenSummaryPage(doc, rows[0].cal, nYears, W, H, M, CW);
+    }
+    name = 'Werbungskosten_Uebersicht_' + rows[0].cal + '-' + rows[nYears - 1].cal;
+  } else {
+    var idx = parseInt(mode, 10);
+    if (isNaN(idx) || idx < 0 || idx >= rows.length) idx = 0;
+    _renderWerbungskostenPage(doc, rows[idx].cal, idx, W, H, M, CW);
+    name = 'Werbungskosten_' + rows[idx].cal;
   }
 
-  // Wenn all-years: Add Summary page at end
-  if (mode === 'all-years' && nYears > 1) {
-    doc.addPage();
-    _renderWerbungskostenSummaryPage(doc, startYear, nYears, W, H, M, CW);
-  }
-
-  var name = mode === 'all-years'
-    ? 'Werbungskosten_Uebersicht_' + startYear + '-' + (startYear + nYears - 1)
-    : 'Werbungskosten_' + startYear;
   doc.save(name + '.pdf');
   if (typeof toast === 'function') toast('✓ Werbungskosten-PDF erstellt');
 }
+
+/* v645: Dropdown "Steuerjahr" fuer das Finanzamt-PDF aus State.cfRows befuellen. */
+function _populateFaPdfYearSelect() {
+  var sel = document.getElementById('fa-pdf-year');
+  if (!sel || !window.State || !State.cfRows || !State.cfRows.length) return;
+  var rows = State.cfRows.slice(0, 15);
+  var sig = rows.map(function (r) { return r.cal; }).join(',');
+  if (sel.getAttribute('data-sig') === sig && sel.options && sel.options.length) return;
+  var prev = sel.value;
+  var html = '';
+  for (var i = 0; i < rows.length; i++) {
+    html += '<option value="' + i + '">' + rows[i].cal + '</option>';
+  }
+  html += '<option value="all">Alle Jahre</option>';
+  sel.innerHTML = html;
+  sel.setAttribute('data-sig', sig);
+  if (prev && /^(all|\d+)$/.test(prev) && sel.querySelector('option[value="' + prev + '"]')) sel.value = prev;
+  else sel.value = '0';
+}
+
+/* v645: Dropdown initial befuellen, sobald cfRows existieren (ohne tax.js anzufassen). */
+(function () {
+  var tries = 0;
+  function tryPop() {
+    tries++;
+    try { _populateFaPdfYearSelect(); } catch (e) {}
+    var sel = document.getElementById('fa-pdf-year');
+    if ((!sel || !sel.options || !sel.options.length) && tries < 25) setTimeout(tryPop, 800);
+  }
+  if (document.readyState !== 'loading') setTimeout(tryPop, 600);
+  else document.addEventListener('DOMContentLoaded', function () { setTimeout(tryPop, 600); });
+})();
 
 function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
   // ── HEADER ─────────────────────────────────────

@@ -60,11 +60,34 @@
   html[data-mb-theme="light"] .panel{background:linear-gradient(180deg,#faf8f2,#f3efe4) !important;}
   html[data-mb-theme="light"] .kpi{background:#ffffff !important;}
   html[data-mb-theme="light"] .report,html[data-mb-theme="light"] .valcard,html[data-mb-theme="light"] .assess{background:#ffffff !important;}
+  /* v647-mb: Hell-Modus entcremen (Optik wie Objekt-Tab) */
+  html[data-mb-theme="light"] body{background:#ffffff !important;}
+  html[data-mb-theme="light"] .panel{background:#ffffff !important;border:1px solid #ece8df !important;box-shadow:0 1px 2px rgba(0,0,0,.04) !important;}
+  html[data-mb-theme="light"] #mb-orbs{opacity:.16 !important;}
+  html[data-mb-theme="light"] h1{color:#211f1d !important;}
+  html[data-mb-theme="light"] .muted{color:#6f6a61 !important;}
+  /* v649-mb: Hell-Modus Text schwarz + Schriftart wie Objekt-Tab */
+  html[data-mb-theme="light"]{--txt:#161616 !important;--muted:#4d4a45 !important;}
+  html[data-mb-theme="light"] body,html[data-mb-theme="light"] label,html[data-mb-theme="light"] p,html[data-mb-theme="light"] h2,html[data-mb-theme="light"] li,html[data-mb-theme="light"] td,html[data-mb-theme="light"] th{color:#161616 !important;}
+  html[data-mb-theme="light"] h1{color:#0e0e0e !important;}
+  html[data-mb-theme="light"] .muted{color:#4d4a45 !important;}
+  html[data-mb-theme="light"] body,html[data-mb-theme="light"] input,html[data-mb-theme="light"] select,html[data-mb-theme="light"] textarea,html[data-mb-theme="light"] label,html[data-mb-theme="light"] p,html[data-mb-theme="light"] button{font-family:'Inter','Space Grotesk',system-ui,sans-serif !important;}
+  html[data-mb-theme="light"] h1,html[data-mb-theme="light"] h2{font-family:'Space Grotesk','Inter',system-ui,sans-serif !important;}
   html[data-mb-theme="light"] input,html[data-mb-theme="light"] select{background:#ffffff !important;}
+  /* v651-mb-css: Feld-Flucht + Hell-Lesbarkeit + Letzte-Ausgabe raus */
+  .row{align-items:stretch;}
+  .row>div{display:flex;flex-direction:column;}
+  .row>div>input:not([type=checkbox]),.row>div>select{margin-top:auto;}
+  html[data-mb-theme="light"] input,html[data-mb-theme="light"] select,html[data-mb-theme="light"] textarea,html[data-mb-theme="light"] option{color:#161616 !important;}
+  html[data-mb-theme="light"] select option{background:#ffffff !important;color:#161616 !important;}
+  html[data-mb-theme="light"] #saveFileBtn,html[data-mb-theme="light"] #loadFileBtn{color:#161616 !important;border-color:#C9A84C !important;background:#ffffff !important;}
+  #loadLastBtn{display:none !important;}
   html[data-mb-theme="light"] .pdfth-seg{background:#f3efe4 !important;}
   html[data-mb-theme="light"] #precHead,html[data-mb-theme="light"] #precMeter,html[data-mb-theme="light"] #genProgress,html[data-mb-theme="light"] #lfProgress{background:#f7f4ec !important;border-color:#e6e0d3 !important;}
   html[data-mb-theme="light"] #precHead{color:#9a7f33 !important;}
   html[data-mb-theme="light"] .panel,html[data-mb-theme="light"] .report,html[data-mb-theme="light"] .valcard,html[data-mb-theme="light"] .kpi,html[data-mb-theme="light"] .assess{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
+  /* v645: Buttons typografisch an die Haupt-App angleichen */
+  html[data-mb-theme="light"] button{font-family:'Space Grotesk','Inter',system-ui,sans-serif !important;}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);
     font-family:'Inter',system-ui,sans-serif;line-height:1.5;}
@@ -276,11 +299,11 @@
 
   <!-- v569-mbtabs: Standort-Finder raus, PDF + Schliessen rein -->
   <div id="mainTabs" style="display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;align-items:center;">
-    <button class="mtab" data-view="report" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Marktbericht</button>
-    <button id="mbTopPdf" type="button" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">PDF-Export</button>
-    <button id="mbThemeToggle" type="button" style="background:transparent;color:#C9A84C;border:1px solid #C9A84C;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;">Hell</button><!-- v605-mb-toggle -->
+    <button class="mtab" data-view="report" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;display:none;"><!-- v647-mb hidden -->Marktbericht</button>
+    <button id="mbTopPdf" type="button" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;display:none;"><!-- v649-mb -->PDF-Export</button>
+    <button id="mbThemeToggle" type="button" style="background:transparent;color:#C9A84C;border:1px solid #C9A84C;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;display:none;">Hell</button><!-- v605-mb-toggle v647-mb hidden -->
     <span style="flex:1"></span>
-    <button id="mbTopClose" type="button" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Schließen</button><!-- v571-mbui -->
+    <button id="mbTopClose" type="button" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;display:none;">Schließen</button><!-- v571-mbui v649-mb -->
   </div>
 
   <div id="view-report">
@@ -485,7 +508,7 @@
 <script src="vendor/jspdf.umd.min.js"></script>
 <script src="vendor/jspdf.plugin.autotable.min.js"></script>
 <script src="marktbewertung-card.js?v=49k"></script>
-<script src="app.js?v=49k"></script>
+<script src="app.js?v=654"></script>
 <script src="mb-objektwahl.js?v=568"></script><!-- v566-objektwahl -->
 <script>
 /* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
@@ -510,7 +533,7 @@
 function apply(t){var l=(t==='light');document.documentElement.setAttribute('data-mb-theme',l?'light':'dark');var b=document.getElementById('mbThemeToggle');if(b)b.textContent=l?'Dunkel':'Hell';}
 function cur(){return document.documentElement.getAttribute('data-mb-theme')==='light'?'light':'dark';}
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('#mbThemeToggle'):null;if(!b)return;var n=cur()==='light'?'dark':'light';try{sessionStorage.setItem(K,n);}catch(_){}apply(n);});
-try{var s=sessionStorage.getItem(K);if(s)apply(s);}catch(_){}
+try{var _u=new URLSearchParams(location.search).get('theme');if(_u==='light'||_u==='dark'){sessionStorage.setItem(K,_u);apply(_u);}else{var s=sessionStorage.getItem(K);if(s)apply(s);}}catch(_){}
 })();</script>
 </body>
 </html>

@@ -17,6 +17,12 @@
   var _span = 'mid';
   var _avm = {};
   var _avmHealth = null;
+  /* v644-avm-soon: PriceHubble bleibt "coming soon", bis echter Client + Zugang da sind. */
+  var PH_COMING_SOON = true;
+  function provComingSoon(p) {
+    if (p === 'pricehubble' && PH_COMING_SOON) return true;
+    try { return !!(_avmHealth && _avmHealth.providers && _avmHealth.providers[p] && _avmHealth.providers[p].coming_soon); } catch (e) { return false; }
+  }
   var _collapsed = {};
   var _oabiDone = null;  /* v393: Kombi-Flow Completion */
   var _qcMode = false;            /* v418: Import aus dem Quick-Check */
@@ -107,6 +113,8 @@
       P + '.btn.primary{background:linear-gradient(135deg,var(--gold,#C9A84C),var(--gold-d,#9a7f33));color:#fff;border-color:transparent}',
       P + '.btn.primary:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,0.40)}',
       P + '.btn[disabled]{opacity:.45;cursor:not-allowed}',
+      P + '.dp-pf-tile.dp-pf-soon-on{opacity:.5 !important;filter:grayscale(.35) !important;cursor:not-allowed !important}',
+      P + '.dp-pf-tile.dp-pf-soon-on:hover{transform:none !important}',
       P + '.btn .ico{display:inline-flex;align-items:center}',
       P + '.oab-prog{margin:0 0 12px;font-size:12.5px;color:var(--muted,#7A7370)}',
       P + '.oab-results{display:grid;gap:12px;margin:0 0 14px}',
@@ -202,8 +210,8 @@
     var _mic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>';
     var _plane = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>';
     // PRE-FLIGHT-Kachel mit verstecktem Checkbox-Input (Logik unveraendert) + LED an .on
-    function pfTileLogo(value, inner, disabled, title) {
-      return '<label class="dp-pf-tile' + (disabled ? ' dp-pf-disabled' : '') + '" data-src="' + value + '"' + (title ? ' title="' + title + '"' : '') + '>' +
+    function pfTileLogo(value, inner, disabled, title, extraCls) {
+      return '<label class="dp-pf-tile' + (disabled ? ' dp-pf-disabled' : '') + (extraCls ? ' ' + extraCls : '') + '" data-src="' + value + '"' + (title ? ' title="' + title + '"' : '') + '>' +
         '<input type="checkbox" value="' + value + '"' + (disabled ? ' disabled' : '') + ' style="display:none">' +
         inner + '<span class="dp-pf-led"></span></label>';
     }
@@ -222,7 +230,7 @@
         '<span class="dp-pf-stripe"></span>' +
         '<div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot \u00b7 Boarding</span></div><span class="dp-pf-perf"></span>' + /* v572-leadtext */
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">' +
-          pfTileLogo('pricehubble', _phInner, avmOff, avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble') +
+          pfTileLogo('pricehubble', _phInner, (avmOff || provComingSoon('pricehubble')), provComingSoon('pricehubble') ? 'Demnächst verfügbar' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble'), provComingSoon('pricehubble') ? 'dp-pf-soon-on' : '') +
           pfTileLogo('sprengnetter', _snInner, avmOff, avmOff ? 'Marktradar derzeit deaktiviert' : 'Sprengnetter') +
           pfTileLogo('dealpilot', _dpInner, false, 'Marktpreisbewertung') +
         '</div></div>' +
@@ -257,14 +265,14 @@
     /* v503-kerosin-hint: Liter statt "Credits" — Saetze gemaess Backend
        (avm.js COST: PriceHubble 40 L, Sprengnetter 20 L; ai.js extract-voice 1 L).
        Frontend zeigt nur an, abgerechnet wird serverseitig. */
-    var KEROSIN_L = { voice: 1, pricehubble: 40, sprengnetter: 20 };
+    var KEROSIN_L = { voice: 1, pricehubble: 40, sprengnetter: 20, dealpilot: 2 }; /* v654-dp-hint */
     var billed = sel.filter(function (s) { return KEROSIN_L[s] != null; });
     if (!billed.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var demo = !!(_avmHealth && _avmHealth.mode === 'stub');
     var _total = 0;
     var parts = billed.map(function (s) {
       var L = KEROSIN_L[s]; _total += L;
-      var nm = s === 'voice' ? 'Sprachauswertung' : (s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter');
+      var nm = s === 'voice' ? 'Sprachauswertung' : (s === 'pricehubble' ? 'PriceHubble' : (s === 'dealpilot' ? 'DealPilot' : 'Sprengnetter'));
       return '<b>' + L + '\u00a0L</b> ' + nm;
     }).join(' + ');
     var txt = 'Beim <b>Abrufen</b> ' + (billed.length > 1 ? 'werden ' : 'wird ') + parts + ' Kerosin verbraucht' + (billed.length > 1 ? ' (' + _total + '\u00a0L gesamt)' : '') + '.';
@@ -382,14 +390,20 @@
   }
   function applyAvmHealth() {
     var m = $(MOUNT_ID); if (!m) return;
-    var off = !(_avmHealth && _avmHealth.available);
+    var avmAvail = !!(_avmHealth && _avmHealth.available);
     ['pricehubble', 'sprengnetter'].forEach(function (p) {
       var lab = m.querySelector('.dp-pf-tile[data-src="' + p + '"]'); if (!lab) return;
-      var cb = lab.querySelector('input'); if (cb) cb.disabled = off;
-      if (off) lab.setAttribute('title', 'Marktradar derzeit deaktiviert'); else lab.removeAttribute('title');
-      lab.style.opacity = off ? '0.55' : '';
+      var soon = provComingSoon(p);
+      var off = soon || !avmAvail;
+      var cb = lab.querySelector('input'); if (cb) { cb.disabled = off; if (off) cb.checked = false; }
+      lab.classList.toggle('dp-pf-soon-on', off);
+      if (off) lab.classList.remove('on');
+      lab.style.opacity = '';
+      if (soon) lab.setAttribute('title', 'Demnächst verfügbar');
+      else if (!avmAvail) lab.setAttribute('title', 'Marktradar derzeit deaktiviert');
+      else lab.removeAttribute('title');
     });
-    var note = m.querySelector('.oab-note'); if (!off && note) note.remove();
+    var note = m.querySelector('.oab-note'); if (avmAvail && note) note.remove();
     try { updateCreditHint(); } catch (e) {}
   }
   function persistAvmState() {

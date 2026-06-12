@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=636';
+  var IFRAME_SRC = 'quickcheck-app.html?v=652';
 
   // v345: doppelte weiße "⚡ Quick-Check"-Überschrift entfernen.
   // Sie ist ein CSS-Pseudo-Element (body.qc-standalone-active #s-quick::before)
@@ -94,12 +94,10 @@
         // v630-autoheight: Auf schmalen Screens das iframe = ECHTE Inhaltshoehe,
         // damit die Seite normal scrollt (statt Inhalt auf Fensterhoehe abzuschneiden).
         // iframe ist same-origin -> contentDocument lesbar.
-        var isMobile = window.innerWidth <= 768;
-        if (isMobile) {
-          var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
-          var ch = doc && doc.documentElement ? doc.documentElement.scrollHeight : 0;
-          if (ch && ch > 0) { _frame.style.height = (ch + 4) + 'px'; return; }
-        }
+        /* v652-qc-autoheight: immer echte Inhaltshoehe -> kein Eigen-Scroll im iframe (Seite scrollt) */
+        var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
+        var ch = doc && doc.documentElement ? doc.documentElement.scrollHeight : 0;
+        if (ch && ch > 0) { _frame.style.height = (ch + 4) + 'px'; return; }
         var top = _frame.getBoundingClientRect().top;
         var h = Math.max(480, Math.floor(window.innerHeight - top - 8));
         _frame.style.height = h + 'px';
