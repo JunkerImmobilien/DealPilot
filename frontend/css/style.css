@@ -32856,3 +32856,152 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   background:#000; color:#fff; font-size:12px; font-weight:500; padding:6px 10px; border-radius:7px; white-space:nowrap;
   border:1px solid #C9A84C; z-index:9999; pointer-events:none; }
 /* ===== v612-sidebar-center END ===== */
+
+/* ===== v619-boarding-mobile BEGIN ===== */
+.dp-pf-mtrigger,.dp-pf-msheet-head,.dp-pf-mbackdrop{display:none}
+@media (max-width:640px){
+  .dp-pf-mtrigger{display:flex;align-items:center;gap:11px;width:100%;cursor:pointer;
+    background:linear-gradient(100deg,#0a0a0c,#15130c 60%,#1c170b);border:1px solid rgba(201,168,76,.35);
+    border-radius:14px;padding:11px 13px;margin-bottom:14px;box-shadow:0 6px 22px -12px rgba(201,168,76,.5);color:#ECECEF;font-family:inherit}
+  .dp-pf-mt-ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:0 0 auto;background:linear-gradient(#E8CC7A,#C9A84C);color:#1a1407}
+  .dp-pf-mt-ico svg{width:18px;height:18px}
+  .dp-pf-mt-txt{text-align:left;line-height:1.2}
+  .dp-pf-mt-txt b{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12.5px;letter-spacing:.16em;color:#E8CC7A;display:block}
+  .dp-pf-mt-txt small{font-size:11px;color:#8A8A93}
+  .dp-pf-mt-cnt{margin-left:auto;font-size:11px;color:#8A8A93;white-space:nowrap}
+  .dp-pf-mt-cnt b{font-family:'JetBrains Mono',monospace;color:#3FA56C;font-size:13px;margin-right:3px}
+  .dp-pf-mt-chev{color:#C9A84C;opacity:.85}
+
+  .dp-pf-mbackdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:1099;opacity:0;pointer-events:none;transition:opacity .22s}
+  .dp-pf-mbackdrop.show{opacity:1;pointer-events:auto}
+
+  .dp-pf-scroll{position:fixed!important;left:0;right:0;bottom:0;z-index:1100;max-height:88vh;
+    overflow-y:auto!important;overflow-x:hidden!important;transform:translateY(110%);transition:transform .26s cubic-bezier(.4,0,.2,1);
+    background:#0c0c0e;border-radius:18px 18px 0 0;border-top:1px solid rgba(201,168,76,.4);box-shadow:0 -20px 60px -20px rgba(0,0,0,.9);padding:0!important}
+  .dp-pf-scroll.dp-pf-open{transform:translateY(0)}
+
+  .dp-pf-msheet-head{display:flex;align-items:center;gap:10px;padding:16px 16px 8px;position:relative}
+  .dp-pf-mgrip{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:38px;height:4px;border-radius:99px;background:#33333c}
+  .dp-pf-mtitle{margin-top:6px}
+  .dp-pf-mtitle b{font-family:'JetBrains Mono',monospace;font-weight:800;letter-spacing:.18em;color:#E8CC7A;font-size:13px;display:block}
+  .dp-pf-mtitle small{font-size:11px;color:#8A8A93}
+  .dp-pf-mclose{margin-left:auto;margin-top:6px;width:30px;height:30px;border-radius:8px;border:1px solid #26262e;background:none;color:#8A8A93;cursor:pointer;font-size:13px}
+
+  .dp-pf-scroll .dp-pfbar{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;
+    gap:12px!important;border-radius:0!important;margin:0!important;width:100%!important;
+    padding:6px 16px calc(18px + env(safe-area-inset-bottom))!important}
+  .dp-pf-scroll .dp-pf-lead{display:none!important}
+  .dp-pf-scroll .dp-pf-perf,.dp-pf-scroll .dp-pf-qr,.dp-pf-scroll .dp-pf-sep,.dp-pf-scroll .dp-pf-bc{display:none!important}
+  .dp-pf-scroll .dp-pf-seg{width:100%!important;flex:0 0 auto!important;gap:8px!important}
+  .dp-pf-scroll .dp-pf-grouplbl{font-size:10px!important;margin-bottom:4px!important}
+  .dp-pf-scroll .dp-pf-row{flex-wrap:wrap!important;gap:8px!important}
+  .dp-pf-scroll .dp-pf-tile{flex:1 1 100%!important;min-width:0!important;min-height:48px!important;justify-content:space-between!important}
+  .dp-pf-scroll .dp-pf-rz{width:100%!important;display:block!important}
+  .dp-pf-scroll .dp-pf-launch,.dp-pf-scroll #oab-run{width:100%!important;justify-content:center!important;align-self:stretch!important;margin:6px 0 0 0!important;min-height:50px!important;border-radius:12px!important}
+}
+/* ===== v619-boarding-mobile END ===== */
+
+/* ===== v621-qc-mobile BEGIN ===== */
+/* QuickCheck = iframe (qc-bridge.js setzt _frame.style.height = Inhaltshoehe; auf Mobile fragil
+   -> Rest abgeschnitten / kein Scroll). Fix: auf schmalen Screens iframe fix = Viewport-Hoehe,
+   das QC-body scrollt selbst (hat min-height:100vh). #s-quick zusaetzlich scrollbar als Sicherung. */
+@media (max-width:640px){
+  body.qc-standalone-active #s-quick{
+    height:auto !important;min-height:100dvh;
+    overflow-y:auto !important;-webkit-overflow-scrolling:touch;
+    padding:8px 10px calc(72px + env(safe-area-inset-bottom)) !important;}
+  body.qc-standalone-active #qc-tab-host{max-width:100% !important}
+  /* das auto-grow-iframe auf Mobile auf Viewport-Hoehe fixieren -> innen scrollen */
+  body.qc-standalone-active #s-quick iframe,
+  body.qc-standalone-active #qc-tab-host iframe{
+    width:100% !important;
+    height:calc(100dvh - 96px) !important;
+    min-height:420px !important;
+    border:0 !important;display:block !important;}
+}
+/* ===== v621-qc-mobile END ===== */
+
+/* ===== v622-mobile-shell BEGIN ===== */
+/* Handy-Shell konsolidiert: EIN Menue (oberer Header-Hamburger), Sidebar = sauberer Vollbild-naher
+   Drawer, scrollbar (AKTIONEN/Cockpit erreichbar). Ueberstimmt die widerspruechlichen Alt-Bloecke. */
+@media (max-width:768px){
+  /* doppeltes Menue weg: untere mobile-topbar ("DealPilot") + redundanter Hamburger raus */
+  .mobile-topbar{display:none !important}
+  .mobile-hamburger{display:none !important}
+  /* v607-Einklapp-Toggle auf dem Handy weg -> der Header-Hamburger uebernimmt */
+  body:not(.qc-standalone-active) #dp-sb-toggle{display:none !important}
+
+  /* EIN einheitlicher Drawer, egal welche Toggle-Mechanik gewinnt */
+  body #sidebar.sidebar{
+    position:fixed !important; top:0 !important; left:0 !important; bottom:0 !important;
+    width:min(90vw,380px) !important; max-width:90vw !important; height:100dvh !important;
+    transform:translateX(-100%); transition:transform .26s cubic-bezier(.4,0,.2,1) !important;
+    z-index:1060 !important; overflow-y:auto !important; -webkit-overflow-scrolling:touch;
+    box-shadow:4px 0 34px rgba(0,0,0,.55) !important; display:flex !important; flex-direction:column !important;
+  }
+  body .app-wrap.sb-mobile-open #sidebar.sidebar,
+  body #sidebar.sidebar.sb-mobile-open,
+  body #sidebar.sidebar.open{ transform:translateX(0) !important; }
+
+  /* Backdrops beider Mechaniken ueber den Content, unter die Sidebar */
+  #sb-backdrop,#mobile-overlay{ z-index:1055 !important; }
+
+  /* Sidebar-Inhalt voll scrollbar: keine inneren Hoehen-Klemmen */
+  body #sidebar .sb-list{ max-height:none !important; overflow:visible !important; }
+  body #sidebar .sb-footer,body #sidebar .sb-user-box{ position:static !important; }
+}
+/* ===== v622-mobile-shell END ===== */
+
+/* ===== v623-mobile-readability BEGIN ===== */
+/* Handy: Investor-Deal-Score-Karte + Tab-Workflow-Bar lesbarer. Konsolidiert am Ende, ueberstimmt. */
+@media (max-width:768px){
+  /* Score-Karte: mehr Kontrast, Donut/Text sauber nebeneinander, Headline darf umbrechen */
+  .hdr-score-card{
+    align-items:flex-start !important;
+    padding:12px 14px !important; gap:14px !important;
+    background:rgba(255,255,255,0.06) !important; border-color:rgba(255,255,255,0.16) !important;}
+  .hdr-score-card.tier-red{background:rgba(240,128,128,0.12) !important;border-color:rgba(240,128,128,0.45) !important}
+  .hdr-score-card.tier-gold{background:rgba(201,168,76,0.12) !important;border-color:rgba(201,168,76,0.45) !important}
+  .hdr-score-card.tier-green{background:rgba(94,217,158,0.12) !important;border-color:rgba(94,217,158,0.45) !important}
+  .hdr-score-donut{width:64px !important;height:64px !important;flex-shrink:0 !important}
+  .hdr-score-info{flex:1 1 auto !important;min-width:0 !important}
+  .hdr-score-headline{
+    font-size:18px !important;color:#fff !important;
+    white-space:normal !important;overflow:visible !important;text-overflow:clip !important;line-height:1.15 !important}
+  .hdr-score-sub{color:rgba(255,255,255,0.80) !important;font-size:11.5px !important;-webkit-line-clamp:unset !important}
+  .hdr-score-rec{color:rgba(255,255,255,0.88) !important;font-size:11.5px !important}
+  .hdr-score-tier{font-size:10px !important}
+
+  /* Tab-Workflow-Bar (Titel/Fortschritt) lesbar + nicht klemmen */
+  .tabs-workflow-bar{padding:8px 14px !important;gap:10px !important;flex-wrap:wrap !important}
+  .tabs-workflow-bar .wf-tab-title{font-size:18px !important}
+  .tabs-workflow-bar .wf-tab-sub{font-size:11.5px !important;color:rgba(42,39,39,0.7) !important}
+  .tabs-workflow-bar .wf-tab-progress-bar{width:120px !important}
+}
+/* ===== v623-mobile-readability END ===== */
+
+/* ===== v625-mobile-iconrail BEGIN ===== */
+/* Icon-Rail (66px, v607) als dritter Zustand auf dem Handy. Toggle = FAB unten-links
+   (kollidiert nicht mit Header-Hamburger). Eingeklappt: Rail IN-FLOW statt Drawer (v622). */
+@media (max-width:768px){
+  /* v607-Toggle wieder zeigen, als FAB unten-links */
+  body:not(.qc-standalone-active):not(.dp-dash-fullscreen) #dp-sb-toggle{
+    display:flex !important; top:auto !important; bottom:16px !important;
+    left:16px !important; right:auto !important; z-index:9001 !important;
+    width:42px !important; height:42px !important;}
+
+  /* COLLAPSED = 66px Icon-Rail IN-FLOW (v622-Drawer-Positionierung zuruecknehmen) */
+  body.dp-sidebar-collapsed #sidebar.sidebar{
+    position:sticky !important; top:0 !important; left:auto !important; bottom:auto !important;
+    transform:none !important; width:66px !important; max-width:66px !important;
+    height:100dvh !important; box-shadow:none !important; overflow:visible !important;
+    z-index:250 !important;}
+  body.dp-sidebar-collapsed .app-wrap{grid-template-columns:66px 1fr !important;}
+  body.dp-sidebar-collapsed .main-col{grid-column:auto !important;}
+
+  /* im Rail-Modus: kein Drawer-Backdrop, Header-Hamburger weg (Rail IST die Navigation) */
+  body.dp-sidebar-collapsed #sb-backdrop,
+  body.dp-sidebar-collapsed #mobile-overlay{display:none !important;}
+  body.dp-sidebar-collapsed .hdr-mobile-menu{display:none !important;}
+}
+/* ===== v625-mobile-iconrail END ===== */

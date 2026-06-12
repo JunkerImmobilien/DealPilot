@@ -26,6 +26,7 @@ const { query } = require('../db/pool');
 const userService = require('../services/userService');
 const emailVerifyService = require('../services/emailVerifyService');
 const mailerService = require('../services/mailerService');
+const verifyMailTemplate = require('../services/verifyMailTemplate'); // v627-verify-backend
 const objectService = require('../services/objectService');
 const jwtUtil = require('../utils/jwt');
 const password = require('../utils/password');
@@ -94,7 +95,7 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
 
     // Verify-Token generieren
     const token = await emailVerifyService.createVerifyToken(user.id);
-    const verifyUrl = `${baseUrl}/api/v1/auth/verify-email?token=${token}`;
+    const verifyUrl = `${process.env.APP_URL || baseUrl}/api/v1/auth/verify-email?token=${token}`;
 
     // Audit
     try {
@@ -108,35 +109,12 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
 
     // Mail an User
     try {
+      const firstName = (user.name || '').trim().split(/\s+/)[0] || user.name || '';
       await mailerService.sendMail({
         to: user.email,
-        subject: 'DealPilot — Check-in bestätigen',
-        text:
-          `Hallo ${user.name},\n\n` +
-          `Vielen Dank für deinen Check-in bei DealPilot.\n\n` +
-          `Bitte bestätige deine E-Mail-Adresse, um dein Konto zu aktivieren:\n` +
-          `${verifyUrl}\n\n` +
-          `Der Link ist 24 Stunden gültig.\n\n` +
-          `Falls du dich nicht angemeldet hast, ignoriere diese Mail einfach.\n\n` +
-          `Gruß\nDealPilot Team\n` +
-          `https://dealpilot.junker-immobilien.io`,
-        html:
-          `<div style="font-family:-apple-system,sans-serif;max-width:560px;color:#2A2727">` +
-            `<h2 style="color:#C9A84C;margin-bottom:8px">Willkommen an Bord bei DealPilot, ${_esc(user.name)}!</h2>` +
-            `<p>Vielen Dank für deinen Check-in. Bitte bestätige deine E-Mail-Adresse, um dein Konto zu aktivieren und an Bord zu kommen.</p>` +
-            `<p style="margin:24px 0">` +
-              `<a href="${verifyUrl}" style="background:#C9A84C;color:#1A1818;padding:12px 28px;text-decoration:none;border-radius:8px;font-weight:600;display:inline-block">` +
-                `Check-in abschließen` +
-              `</a>` +
-            `</p>` +
-            `<p style="color:#666;font-size:12px">Oder kopiere diesen Link in deinen Browser:<br>` +
-              `<a href="${verifyUrl}" style="color:#888;word-break:break-all">${verifyUrl}</a>` +
-            `</p>` +
-            `<hr style="border:none;border-top:1px solid #eee;margin:24px 0">` +
-            `<p style="color:#888;font-size:12px">` +
-              `Der Link ist 24 Stunden gültig. Falls du dich nicht angemeldet hast, kannst du diese Mail ignorieren.` +
-            `</p>` +
-          `</div>`
+        subject: verifyMailTemplate.subject(),
+        text: verifyMailTemplate.renderVerifyText(firstName, verifyUrl),
+        html: verifyMailTemplate.renderVerifyMail(firstName, verifyUrl)
       });
       console.log('[register-verify] Verify-Mail gesendet an:', email);
     } catch (e) {
@@ -196,7 +174,7 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
  */
 router.get('/verify-email', async (req, res) => {
   const token = req.query.token || '';
-  const baseUrl = process.env.FRONTEND_BASE_URL || 'https://dealpilot.junker-immobilien.io';
+  const baseUrl = process.env.APP_URL || process.env.FRONTEND_BASE_URL || 'https://app.dealpilot.junker-immobilien.io';
 
   try {
     const userId = await emailVerifyService.consumeVerifyToken(token);

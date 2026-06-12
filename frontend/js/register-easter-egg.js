@@ -104,7 +104,7 @@
           '<div class="auth-field-v39">' +
             '<label for="dp-reg-pass">Passwort</label>' +
             '<div class="auth-input-wrap">' +
-              '<input type="password" id="dp-reg-pass" placeholder="Mindestens 8 Zeichen" autocomplete="new-password" required minlength="8" maxlength="128">' +
+              '<input type="password" id="dp-reg-pass" placeholder="Mindestens 10 Zeichen" autocomplete="new-password" required minlength="10" maxlength="128">' +
             '</div>' +
           '</div>' +
 
@@ -223,7 +223,7 @@
 
     if (name.length < 2) { _error(errEl, 'Bitte Namen eingeben'); return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { _error(errEl, 'Bitte gültige E-Mail-Adresse eingeben'); return; }
-    if (pass.length < 8) { _error(errEl, 'Passwort muss mindestens 8 Zeichen haben'); return; }
+    if (pass.length < 10) { _error(errEl, 'Passwort muss mindestens 10 Zeichen haben'); return; }
 
     btn.disabled = true;
     btn.innerHTML = '<span>Wird gesendet…</span>';

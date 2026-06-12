@@ -192,6 +192,8 @@ async function logAudit({ userId, action, resourceType, resourceId, ipAddress, u
 }
 
 module.exports = {
+  extractSummary,  // v628: fuer demoObjectService
+
   listForUser,
   getById,
   create,
