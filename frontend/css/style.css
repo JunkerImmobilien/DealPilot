@@ -33124,3 +33124,90 @@ body.qc-standalone-active .main-col { grid-column: 1 / -1 !important; }
   }
 }
 /* ===== v637-settings-equity END ===== */
+
+/* ===== v638-mobile BEGIN ===== */
+/* (1) dp-tip "?"-Hilfe-Buttons: ein frueherer Mobile-Fix setzte .dp-tip::before{display:none}
+   in dem Glauben, es sei eine Hover-Bubble - tatsaechlich ist ::before das "?"-Symbol.
+   Folge: leere beige Ovale neben jedem Label. Hier wieder einblenden + saubere runde Form. */
+@media (max-width: 768px) {
+  .dp-tip {
+    width: 18px !important; height: 18px !important; min-width: 18px !important;
+    border-radius: 50% !important; padding: 0 !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    line-height: 1 !important; vertical-align: middle !important;
+  }
+  .dp-tip::before {
+    display: inline !important;
+    content: "?" !important;
+    font-size: 11px !important; font-weight: 700 !important;
+    color: var(--gold-d, #9a7f33) !important; line-height: 1 !important;
+  }
+  /* falls statt ::before ein SVG drin ist, das auch sauber zentrieren */
+  .dp-tip svg { width: 11px !important; height: 11px !important; display: block !important; }
+}
+
+/* (2) Sidebar-Objektliste im Drawer: ohne max-height waechst sie ueber alle Objekte,
+   AKTIONEN/COCKPIT erst nach langem Scrollen erreichbar. -> begrenzen + eigener Scroll. */
+@media (max-width: 768px) {
+  body .app-wrap.sb-mobile-open aside.sidebar .sb-list,
+  body aside.sidebar.sb-mobile-open .sb-list {
+    max-height: 42vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex: 0 0 auto !important;
+  }
+}
+
+/* (3) Button-Groessen Cockpit (sb-collapsible-header) vs Aktionen (sb-actions-trigger)
+   im Drawer vereinheitlichen (gleiche Hoehe/Padding/Radius). */
+@media (max-width: 768px) {
+  body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-trigger,
+  body aside.sidebar.sb-mobile-open .sb-actions-trigger,
+  body .app-wrap.sb-mobile-open aside.sidebar .sb-portfolio-collapsible .sb-collapsible-header,
+  body aside.sidebar.sb-mobile-open .sb-portfolio-collapsible .sb-collapsible-header {
+    min-height: 44px !important;
+    padding: 11px 14px !important;
+    margin: 6px 12px !important;
+    width: calc(100% - 24px) !important;
+    border-radius: 9px !important;
+    font-size: 12px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* (4) Settings-Modal: Split-Layout (modal-side links schmal) ist auf dem Handy unbrauchbar
+   (Tabs laufen raus). -> auf Mobile vertikal stapeln: Header+Tabs oben (Tabs horizontal
+   scrollbar mit sichtbarem Text), Content darunter, volle Breite. */
+@media (max-width: 768px) {
+  .set-modal-cream.settings-modal,
+  #settings-modal .settings-modal,
+  #settings-modal .global-view-modal.settings-modal {
+    display: flex !important; flex-direction: column !important;
+    width: 100vw !important; max-width: 100vw !important;
+    height: 100dvh !important; max-height: 100dvh !important;
+    border-radius: 0 !important; margin: 0 !important;
+  }
+  .set-modal-cream .modal-side {
+    flex: 0 0 auto !important; width: 100% !important;
+    flex-direction: column !important; overflow: visible !important;
+  }
+  .set-modal-cream .ms-h { padding: 16px 16px 10px !important; }
+  .set-modal-cream .settings-tabs.ms-tabs {
+    flex-direction: row !important; flex-wrap: nowrap !important;
+    overflow-x: auto !important; -webkit-overflow-scrolling: touch !important;
+    gap: 4px !important; padding: 0 12px 10px !important;
+  }
+  .set-modal-cream .settings-tabs.ms-tabs .st-tab {
+    flex: 0 0 auto !important; white-space: nowrap !important;
+    font-size: 12px !important; padding: 9px 12px !important;
+  }
+  /* User-Foot in der Side auf Mobile ausblenden (spart Platz, steht eh in der App) */
+  .set-modal-cream .modal-side .ms-foot { display: none !important; }
+  /* Content rechts -> darunter, volle Breite, scrollbar */
+  .set-modal-cream .modal-main,
+  .set-modal-cream .set-modal-content {
+    flex: 1 1 auto !important; width: 100% !important;
+    overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
+  }
+}
+/* ===== v638-mobile END ===== */
