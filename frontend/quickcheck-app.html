@@ -5568,9 +5568,9 @@ function renderTransferList() {
   async function _runSelected(sources) {
     if (!sources || !sources.length) return;
     // Reihenfolge erzwingen: expose, ph, spr, ki
-    var order = ['voice','expose','ph','spr','dpmb', 'ki'];  /* v505-voice-first */
+    var order = ['voice','expose','immometrica','ph','spr','dpmb', 'ki'];  /* v505-voice-first; v667 immometrica */
     var ordered = order.filter(function(s){ return sources.indexOf(s) !== -1; });
-    var labels = { voice:'Sprachaufzeichnung', expose:'Exposé/Marktbericht', ph:'PriceHubble', spr:'Sprengnetter', ki:'KI-Recherche' };
+    var labels = { voice:'Sprachaufzeichnung', expose:'Exposé/Marktbericht', immometrica:'ImmoMetrica', ph:'PriceHubble', spr:'Sprengnetter', ki:'KI-Recherche' };
     var steps = ordered.map(function(s){ return { key:s, label:labels[s], state:'pending' }; });
     _progressRender(steps);
 
@@ -5591,6 +5591,15 @@ function renderTransferList() {
             window._qcImportResolve = resolve;
             try { window.parent.postMessage({ source:'dp-qc', type:'qc-import-pdf' }, '*'); } catch(e){}
             setTimeout(function(){ if (window._qcImportResolve){ window._qcImportResolve(); window._qcImportResolve = null; } }, 60000);
+          });
+        }
+        if (ordered[i] === 'immometrica') {
+          await new Promise(function(resolve){
+            try {
+              if (window.parent && window.parent.ImmoMetricaImport) {
+                window.parent.ImmoMetricaImport.open(function(picked){ try { if (window.ImmoMetricaQcFill) window.ImmoMetricaQcFill(picked); } catch(e){} resolve(); }, { target:'qc', onClose:function(){ resolve(); } });
+              } else { resolve(); }
+            } catch(e){ resolve(); }
           });
         }
         if (ordered[i] === 'ph' || ordered[i] === 'spr') {
@@ -5778,6 +5787,46 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
       try { if (typeof QcApp !== "undefined" && QcApp.addExposePhotos) QcApp.addExposePhotos(d.photos||[]); } catch(_){}
     }
   });
+})();
+</script>
+<script id="qc-profile-defaults">
+(function(){
+  function setEmpty(id, val){ if (val == null || val === "") return; var el = document.getElementById(id); if (!el) return;
+    if ((el.value || "").trim() !== "") return; el.value = String(val).replace(".", ","); try { el.dispatchEvent(new Event("input", {bubbles:true})); } catch(e){} }
+  function num(x){ return parseFloat(String(x||"").replace(/\./g,"").replace(",",".")) || 0; }
+  function autoHg(){
+    try {
+      var IP = window.parent && window.parent.DealPilotInvestmentProfile;
+      if (!IP || typeof IP.getHausgeldMonthly !== "function") return;
+      var kpEl = document.getElementById("qc_kp"), hgEl = document.getElementById("qc_hg");
+      if (!kpEl || !hgEl) return;
+      function recalc(){
+        if (hgEl.dataset.userSet === "1") return;
+        var kp = num(kpEl.value); if (!kp) return;
+        var hg = IP.getHausgeldMonthly(kp); if (hg == null) return;
+        hgEl.dataset.autoHg = "1"; hgEl.value = String(hg).replace(".", ",");
+        try { hgEl.dispatchEvent(new Event("input", {bubbles:true})); } catch(e){}
+      }
+      if (!hgEl._hgUserBound){ hgEl._hgUserBound = 1; hgEl.addEventListener("input", function(){ if (hgEl.dataset.autoHg === "1") { hgEl.dataset.autoHg = ""; } else { hgEl.dataset.userSet = "1"; } }); }
+      if (!kpEl._hgKpBound){ kpEl._hgKpBound = 1; kpEl.addEventListener("input", recalc); }
+      recalc();
+    } catch(e){}
+  }
+  function apply(){
+    try {
+      var IP = window.parent && window.parent.DealPilotInvestmentProfile; if (!IP) return;
+      var zins = (typeof IP.getZins === "function") ? IP.getZins() : null;
+      var tilg = (typeof IP.get === "function") ? IP.get("tilgung_default") : null;
+      var bwk  = (typeof IP.get === "function") ? IP.get("bwk_anteil_default") : null;
+      setEmpty("qc_zins", zins);
+      setEmpty("qc_tilg", tilg);
+      var hs = document.getElementById("qc_hg_split");
+      if (hs && bwk != null) { var cur = (hs.value||"").trim(); if (!cur || cur === "22") { hs.value = String(bwk).replace(".", ","); try { hs.dispatchEvent(new Event("input",{bubbles:true})); } catch(e){} } }
+      autoHg();
+    } catch(e){}
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply); else apply();
+  setTimeout(apply, 1500); /* Zinsdaten laden ggf. asynchron nach */
 })();
 </script>
 <script id="qc-autoek">
@@ -5971,5 +6020,6 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 })();
 </script>
   <script src="js/dealpilot-mb-qc.js?v=554"></script>
+  <script src="js/immometrica-qc.js?v=667"></script>
 </body>
 </html>

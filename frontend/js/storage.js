@@ -34,7 +34,8 @@ var FIELDS = [
   'rate_kueche','rate_bad','rate_boden','rate_fenster',
   'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','einheiten',
   /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
-  'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years'
+  'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years',
+  'erwerbsart','anbietertyp','_immometrica_id','_immometrica_online_since','_immometrica_portals'
 ];
 
 var _currentObjKey = null;  // Local mode key OR API object id

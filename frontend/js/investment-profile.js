@@ -40,6 +40,26 @@ window.DealPilotInvestmentProfile = (function() {
     return d[key];
   }
 
+  // v669: monatliches Hausgeld als Annahme aus % vom Kaufpreis p.a.
+  function getHausgeldMonthly(kp) {
+    var pct = get('hausgeld_pct');
+    if (pct == null || pct === '') return null;
+    var p2 = parseFloat(String(pct).replace(',', '.'));
+    if (!isFinite(p2) || p2 <= 0) return null;
+    var k = parseFloat(String(kp == null ? 0 : kp).replace(',', '.')) || 0;
+    if (!k) return null;
+    return Math.round(k * p2 / 100 / 12);
+  }
+
+  // v668: effektiver Standard-Zins = eigener Wert, sonst indikativer Pfandbrief-Satz der Zinsbindung
+  function getZins() {
+    var ov = get('zins_override');
+    if (ov != null && String(ov).trim() !== '') { var nn = parseFloat(String(ov).replace(',', '.')); if (isFinite(nn) && nn > 0) return nn; }
+    var binding = get('zinsbindung_default') || 10;
+    try { if (typeof window.dpGetIndicativeZins === 'function') { var r = window.dpGetIndicativeZins(binding, get('zins_margin') || 'standard'); if (typeof r === 'number' && isFinite(r)) return r; } } catch (e) {}
+    return null;
+  }
+
   // Wendet das Profil auf ein neu angelegtes Objekt an. Wird von newObj()
   // oder von Quick-Check beim ersten Tippen aufgerufen.
   // Nur SETZEN wenn das Feld noch leer ist — wir überschreiben keine User-Eingaben.
@@ -148,13 +168,17 @@ window.DealPilotInvestmentProfile = (function() {
       '<h3 class="ip-section">Finanzierung</h3>',
       '<div class="ip-grid">',
         field('ip_tilgung_default',     'Standard-Tilgung',          p.tilgung_default,     '% p.a.', 'z.B. 2,5 %'),
-        field('ip_zinsbindung_default', 'Standard-Zinsbindung',      p.zinsbindung_default, 'Jahre',  'z.B. 10 Jahre'),
+        (function(){ var bind = String(p.zinsbindung_default || 10); var o = ['5','10','15','20'].map(function(y){ return '<option value="'+y+'"'+(y===bind?' selected':'')+'>'+y+' Jahre</option>'; }).join(''); return '<div class="ip-field"><label for="ip_zinsbindung_default">Standard-Zinsbindung</label><div class="ip-field-row"><select id="ip_zinsbindung_default">'+o+'</select></div><div class="ip-hint">Zins-Quelle: indikativer Pfandbrief-Satz dieser Bindung</div></div>'; })(),
+        field('ip_zins_override', 'Eigener Zinssatz (optional)', p.zins_override, '%', 'leer = indikativer Satz der Zinsbindung'),
+        (function(){ var mg = String(p.zins_margin || 'standard'); var L = [['premium','Top (LTV ≤ 60 %)'],['standard','Normal (LTV 60–80 %)'],['schwach','Schwächer (LTV > 90 %)']]; var o = L.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===mg?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_zins_margin">Zins-Stufe (Bonität / LTV)</label><div class="ip-field-row"><select id="ip_zins_margin">'+o+'</select></div><div class="ip-hint">Marge auf den Pfandbrief-Satz — nur bei indikativem Zins (eigener Zinssatz übersteuert)</div></div>'; })(),
         field('ip_ek_quote_default',    'Standard-Eigenkapital',     p.ek_quote_default,    '% v. KP', 'wird automatisch in € umgerechnet'),
       '</div>',
 
       '<h3 class="ip-section">Bewirtschaftung</h3>',
       '<div class="ip-grid">',
         field('ip_bwk_anteil_default', 'Bewirtschaftungs-Anteil', p.bwk_anteil_default, '% der NKM', 'nicht-umlagefähig, Schätzwert'),
+        (function(){ var presets = ['','0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0']; var cur = (p.hausgeld_pct != null && p.hausgeld_pct !== '') ? String(p.hausgeld_pct) : ''; var isP = presets.indexOf(cur) >= 0; var o = [['','— (aus)'],['0.5','0,5 % vom KP / Jahr'],['1.0','1,0 %'],['1.5','1,5 %'],['2.0','2,0 %'],['2.5','2,5 %'],['3.0','3,0 %'],['4.0','4,0 %'],['5.0','5,0 %']].map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===(isP?cur:'')?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_hausgeld_sel">Hausgeld-Annahme</label><div class="ip-field-row"><select id="ip_hausgeld_sel">'+o+'</select></div><div class="ip-hint">Anteil vom Kaufpreis p.a. — QC rechnet daraus das monatliche Hausgeld (nur wenn leer)</div></div>'; })(),
+        field('ip_hausgeld_pct', 'Eigener Hausgeld-Anteil (optional)', (p.hausgeld_pct != null && ['0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0',''].indexOf(String(p.hausgeld_pct)) < 0) ? p.hausgeld_pct : '', '% vom KP/Jahr', 'übersteuert die Schnellauswahl'),
       '</div>',
 
       '<h3 class="ip-section">Persönliche Mindest-Schwellen</h3>',
@@ -203,6 +227,9 @@ window.DealPilotInvestmentProfile = (function() {
     var p = {
       tilgung_default:        v('ip_tilgung_default'),
       zinsbindung_default:    v('ip_zinsbindung_default'),
+      zins_override:          v('ip_zins_override'),
+      zins_margin:            s('ip_zins_margin'),
+      hausgeld_pct:           (function(){ var own = v('ip_hausgeld_pct'); if (own != null) return own; var sl = s('ip_hausgeld_sel'); if (sl != null && String(sl).trim() !== '') { var n2 = parseFloat(String(sl).replace(',', '.')); return isFinite(n2) ? n2 : null; } return null; })(),
       ek_quote_default:       v('ip_ek_quote_default'),
       bwk_anteil_default:     v('ip_bwk_anteil_default'),
       min_dscr:               v('ip_min_dscr'),
@@ -240,6 +267,8 @@ window.DealPilotInvestmentProfile = (function() {
     get: get,
     save: save,                     // V63.96: für Settings-KI-Tab-Persist
     applyToNewObject: applyToNewObject,
+    getZins: getZins,
+    getHausgeldMonthly: getHausgeldMonthly,
     syncAiParamsToTab: syncAiParamsToTab,
     renderPaneHtml: renderPaneHtml,
     saveFromForm: saveFromForm,

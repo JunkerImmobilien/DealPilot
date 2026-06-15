@@ -170,6 +170,7 @@ function showSettings(initialTab) {
         '<button class="st-tab ms-tab" data-tab="dealscore" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-bar"/></svg></span>Deal Score</button>' +
         '<button class="st-tab ms-tab" data-tab="profilanzeige" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-target"/></svg></span>Profil &amp; Anzeige</button>' +
         '<button class="st-tab ms-tab" data-tab="datenraum" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-share"/></svg></span>Datenraum</button>' +
+        '<button class="st-tab ms-tab" data-tab="anbieter" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-share"/></svg></span>Externe Anbieter</button>' +
         // V63.57: Daten-Tab entfernt — Import/Export jetzt direkt aus der Sidebar
         '<button class="st-tab ms-tab" data-tab="plan" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-star"/></svg></span>Plan</button>' +
         '<button class="st-tab ms-tab" data-tab="info" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-info"/></svg></span>Info</button>' +
@@ -641,6 +642,7 @@ function showSettings(initialTab) {
         '</div>' +
         /* === v648-mb-theme END === */
       '</div>' +
+            '<div class="st-pane" data-pane="anbieter"><div id="anbieter-host"></div></div>' +
       '</div>' +    // pane-wrap Ende
       '<div class="settings-footer save-row">' +
         '<div class="save-info">' +
@@ -875,6 +877,12 @@ function _swSet(btn) {
   if (pane === 'security') {
     if (typeof _renderTwoFactor === 'function') _renderTwoFactor();
   }
+  // v655: Externe-Anbieter-Pane lazy rendern
+  if (pane === 'anbieter' && window.DealPilotProviderKeys) {
+    var apHost = document.getElementById('anbieter-host');
+    if (apHost) { apHost.innerHTML = window.DealPilotProviderKeys.renderPane(); window.DealPilotProviderKeys.afterRender(); }
+  }
+
 
   // V140: Datenraum-Pane lazy rendern
   if (pane === 'datenraum') {
