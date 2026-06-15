@@ -190,13 +190,23 @@ function parseAddr(it) {
   const raw = (it.address_raw || '').trim();
   let plz = it.address_zipcode ? String(it.address_zipcode) : '';
   let str = '', hnr = '', ort = '';
+  function splitStrHnr(seg) {
+    seg = (seg || '').trim();
+    const mm = seg.match(/^(.*?[^\s\d])\s+(\d+\s*[a-zA-Z]?(?:\s*[-+\/]\s*\d+\s*[a-zA-Z]?)?)$/);
+    if (mm) return { str: mm[1].trim(), hnr: mm[2].replace(/\s+/g, '') };
+    return { str: seg, hnr: '' };
+  }
   if (raw.includes(',')) {
     const parts = raw.split(',');
     const left = parts[0].trim(); const right = (parts[1] || '').trim();
-    const m = left.match(/^(.*?)\s+(\d+[a-zA-Z]?)$/);
-    if (m) { str = m[1]; hnr = m[2]; } else { str = left; }
+    const sh = splitStrHnr(left); str = sh.str; hnr = sh.hnr;
     const mr = right.match(/(\d{5})\s+(.+)$/);
     if (mr) { plz = plz || mr[1]; ort = mr[2].trim(); }
+  } else if (/[A-Za-z].*\s+\d/.test(raw) && !/^\d{5}\b/.test(raw)) {
+    const noplz = raw.replace(/\s*\b\d{5}\b.*$/, '').trim();
+    const sh2 = splitStrHnr(noplz); str = sh2.str; hnr = sh2.hnr;
+    const mp = raw.match(/(\d{5})\b/); if (mp) plz = plz || mp[1];
+    const mo = raw.match(/\b\d{5}\b\s+(.+)$/); if (mo) ort = mo[1].trim();
   } else {
     const m = raw.match(/(\d{5})\b/); if (m) plz = plz || m[1];
     const seg = raw.split(/\s-\s|\u2013/);

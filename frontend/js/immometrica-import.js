@@ -9,6 +9,7 @@
   function hdr() { return { 'Authorization': 'Bearer ' + tok() }; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
   function fmt(n) { return n == null ? '\u2014' : new Intl.NumberFormat('de-DE').format(n); }
+  function fmtY(n) { return (n == null || n === '') ? '\u2014' : String(n).replace(/\D/g, ''); }
 
   var IMO_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>';
 
@@ -181,7 +182,7 @@
     var map = 'ImmoMetrica <span style="color:var(--muted,#7A7370)">\u2192</span> <b>' + targetLabel() + '</b>';
     var rows = FIELD_ORDER.filter(function (k) { return dp[k] != null && dp[k] !== ''; }).map(function (k) {
       var v = dp[k];
-      var disp = (k === 'notizen') ? '<span style="color:var(--muted,#7A7370)">Zusammenfassung</span>' : (typeof v === 'number' ? fmt(v) : esc(v));
+      var disp = (k === 'notizen') ? '<span style="color:var(--muted,#7A7370)">Zusammenfassung</span>' : (k === 'baujahr' ? fmtY(v) : (typeof v === 'number' ? fmt(v) : esc(v)));
       return '<label class="imo-f">' +
         '<input type="checkbox" class="imo-cb" data-k="' + k + '" checked>' +
         '<span class="lbl">' + (FIELD_LABEL[k] || k) + '</span>' +
