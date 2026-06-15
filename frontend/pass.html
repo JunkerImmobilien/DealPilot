@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Boarding Pass · DealPilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--obsidian:#050505;--gold:#C9A84C;--gold-hi:#E8CC7A;--gold-dim:#8d7430;--green:#3FA56C;--green-hi:#5BD98E;--red:#B8625C;--red-hi:#D9685F;
+ --display:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace;--body:'Inter',sans-serif;--line:rgba(201,168,76,.2)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--body);background:#050505;color:#fff;-webkit-font-smoothing:antialiased;min-height:100vh}
+.bg{position:fixed;inset:0;background:radial-gradient(130% 90% at 15% -10%,#16120b 0%,#0a0908 50%,#050505 100%);z-index:0}
+canvas.px{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:28px 16px 80px}
+.brand{display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:18px;font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.02em}
+.brand .d{color:#fff}.brand .p{color:var(--gold-hi)}
+.brand .tag{font-family:var(--mono);font-size:8px;letter-spacing:.2em;color:var(--gold-dim);text-transform:uppercase;margin-left:6px}
+svg{overflow:visible;display:block}
+
+/* Pass-Karte */
+.pass{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:rgba(10,9,8,.82);backdrop-filter:blur(4px);box-shadow:0 28px 70px -40px #000}
+.ghead{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 52%,#b8932f);min-height:46px}
+.ghead::after{content:"";position:absolute;inset:0;opacity:.42;background:repeating-linear-gradient(102deg,rgba(255,255,255,.10) 0 1px,transparent 1px 8px);pointer-events:none}
+.ghead .t{position:relative;z-index:2;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5a4a14;font-weight:700}
+.ghead .r{position:relative;z-index:2;margin-left:auto;display:flex;align-items:center;gap:7px}
+.passno{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.08em;color:#0a0a0a;background:rgba(10,10,10,.14);border:1px dashed rgba(10,10,10,.4);border-radius:6px;padding:3px 8px}
+.contrail{position:absolute;top:50%;left:13%;right:42%;height:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.6) 0 5px,transparent 5px 11px);transform:translateY(-50%);z-index:1}
+.flyico{position:absolute;top:50%;color:#070707;transform:translate(-50%,-50%);z-index:1;animation:fly 5s ease-in-out infinite}
+.flyico svg{height:17px;width:auto}
+@keyframes fly{0%{left:13%;opacity:.25}10%{opacity:1}55%{left:58%;opacity:1}55.01%{opacity:0}56%{left:13%}66%{opacity:.25}100%{left:13%;opacity:.25}}
+.addr{padding:13px 16px 4px;font-family:var(--display);font-weight:600;font-size:17px}
+.addr .sub{font-family:var(--mono);font-size:10px;color:#9a9080;font-weight:400;letter-spacing:.03em;margin-top:2px}
+.mbody{padding:10px 16px 14px;display:flex;align-items:center;gap:16px}
+.scorewrap{flex:none;text-align:center}
+.scorewrap .ind{font-family:var(--mono);font-size:7px;letter-spacing:.14em;color:var(--gold-dim);text-transform:uppercase;margin-top:3px}
+.kbox{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;min-width:0}
+.ki{display:flex;flex-direction:column}
+.ki .l{font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;text-transform:uppercase;color:#9a9080}
+.ki .v{font-family:var(--display);font-weight:700;font-size:15px;color:#fff;line-height:1.1}
+.ki.good .v{color:var(--green-hi)}.ki.bad .v{color:var(--red-hi)}.ki.mid .v{color:var(--gold-hi)}
+.kt{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+@media(max-width:460px){.kt{grid-template-columns:repeat(2,1fr)}}
+.kt .k{position:relative;padding:9px 6px;text-align:center;border-left:1px solid var(--line)}
+.kt .k:first-child{border-left:0}
+.kt .l{font-family:var(--mono);font-size:7px;letter-spacing:.04em;text-transform:uppercase;color:#9a9080}
+.kt .v{font-family:var(--display);font-weight:700;font-size:14px;margin-top:2px}
+
+/* Galerie */
+.sec{margin-top:20px}
+.sec h2{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:9px;font-weight:700}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:460px){.gal{grid-template-columns:repeat(2,1fr)}}
+.gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;background:#111}
+.report{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.6;color:#d8d2c2;white-space:pre-wrap;max-height:280px;overflow:auto}
+
+/* CTA */
+.cta{position:sticky;bottom:0;margin-top:24px;padding:14px 0 4px;background:linear-gradient(0deg,#050505 70%,transparent)}
+.btn{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:12px;padding:15px;font:700 15px var(--display);cursor:pointer;background:linear-gradient(180deg,#E8CC7A,#C9A84C);color:#0a0a0a}
+.btn:active{transform:translateY(1px)}
+.btn .pl svg{height:18px;width:auto;color:#0a0a0a}
+.hint{text-align:center;font-size:11px;color:#8d846d;margin-top:9px}
+.meta{text-align:center;font-family:var(--mono);font-size:9px;color:#6f6a5c;margin-top:14px;letter-spacing:.05em}
+
+/* Zustaende */
+.state{max-width:440px;margin:60px auto;text-align:center;padding:0 20px}
+.state .ic{font-size:40px;margin-bottom:14px}
+.state h1{font-family:var(--display);font-size:20px;margin-bottom:8px}
+.state p{color:#9a9080;font-size:14px;line-height:1.6}
+.state a{color:var(--gold-hi)}
+.spin{width:34px;height:34px;border:3px solid rgba(201,168,76,.25);border-top-color:var(--gold);border-radius:50%;margin:80px auto;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.lb{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+.lb.on{display:flex}.lb img{max-width:100%;max-height:100%;border-radius:10px}
+@media (prefers-reduced-motion: reduce){.flyico{animation:none}}
+</style></head>
+<body>
+<div class="bg"></div><canvas class="px"></canvas>
+<div class="wrap">
+  <div class="brand"><span class="d">Deal</span><span class="p">Pilot</span><span class="tag">Quick Boarding</span></div>
+  <div id="mount"><div class="spin"></div></div>
+</div>
+<div class="lb" id="lb" onclick="this.classList.remove('on')"><img id="lbimg" alt=""></div>
+<script>
+var CODE = (location.search.match(/[?&]c=([^&]+)/) || [])[1] || '';
+function tc(s){return s>=70?'#3FA56C':s>=50?'#C9A84C':'#B8625C';}
+function th(s){return s>=70?'#5BD98E':s>=50?'#E8CC7A':'#D9685F';}
+function tl(s){return s>=70?'STARK':s>=50?'SOLIDE':'SCHWACH';}
+function planeS(){return '<svg viewBox="0 0 24 24" fill="currentColor"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>';}
+function pt(cx,cy,r,d){var a=(d-90)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+function aP(cx,cy,r,d0,d1){var p=[],N=Math.max(8,Math.round(Math.abs(d1-d0)/4));for(var i=0;i<=N;i++){var d=d0+(d1-d0)*i/N,q=pt(cx,cy,r,d);p.push((i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1));}return p.join(' ');}
+function dial(s,z){s=Math.max(0,Math.min(100,s));var c=z/2,r=z*0.38,D0=225,D1=495,dv=D0+(D1-D0)*s/100,o='';for(var t=0;t<=100;t+=5){var dd=D0+(D1-D0)*t/100,p1=pt(c,c,r,dd),p2=pt(c,c,r-(t%25===0?z*0.07:z*0.04),dd);o+='<line x1="'+p1[0].toFixed(1)+'" y1="'+p1[1].toFixed(1)+'" x2="'+p2[0].toFixed(1)+'" y2="'+p2[1].toFixed(1)+'" stroke="'+(t%25===0?'#C9A84C':'rgba(201,168,76,.4)')+'" stroke-width="'+(t%25===0?2:1)+'"/>';}var np=pt(c,c,r-z*0.1,dv),b1=pt(c,c,z*0.045,dv+90),b2=pt(c,c,z*0.045,dv-90);return '<svg viewBox="0 0 '+z+' '+z+'" width="'+z+'" height="'+z+'"><defs><filter id="gg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="'+aP(c,c,r,D0,D1)+'" fill="none" stroke="rgba(201,168,76,.16)" stroke-width="'+(z*0.07)+'" stroke-linecap="round"/><path d="'+aP(c,c,r,D0,dv)+'" fill="none" stroke="'+tc(s)+'" stroke-width="'+(z*0.07)+'" stroke-linecap="round" filter="url(#gg)"/>'+o+'<polygon points="'+np[0].toFixed(1)+','+np[1].toFixed(1)+' '+b1[0].toFixed(1)+','+b1[1].toFixed(1)+' '+b2[0].toFixed(1)+','+b2[1].toFixed(1)+'" fill="'+th(s)+'" filter="url(#gg)"/><circle cx="'+c+'" cy="'+c+'" r="'+(z*0.055)+'" fill="#0a0a0a" stroke="'+tc(s)+'" stroke-width="1.6"/><text x="'+c+'" y="'+(c-z*0.03)+'" text-anchor="middle" dominant-baseline="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(z*0.24)+'" fill="#fff">'+s+'</text><text x="'+c+'" y="'+(c+z*0.14)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="'+(z*0.058)+'" letter-spacing="1.2" fill="'+th(s)+'">'+tl(s)+'</text></svg>';}
+
+// Deutsche Zahl -> Number ("180.000" / "1.180,50")
+function num(v){if(v==null)return 0;var s=String(v).trim().replace(/\./g,'').replace(',','.').replace(/[^0-9.\-]/g,'');var n=parseFloat(s);return isFinite(n)?n:0;}
+function eur(n){try{return new Intl.NumberFormat('de-DE',{maximumFractionDigits:0}).format(Math.round(n))+' €';}catch(e){return Math.round(n)+' €';}}
+function pct(n){return n.toFixed(1).replace('.',',')+' %';}
+
+function computeKpis(d){
+  d=d||{};
+  var kp=num(d.kp), wfl=num(d.wfl), kaltmiete=num(d.nkm)+num(d.ze), ek=num(d.ek);
+  var bmr=kp?kaltmiete*12/kp*100:0;
+  var eurm2=wfl?kp/wfl:0;
+  var ltv=kp?(kp-ek)/kp*100:0;
+  return {kp:kp,wfl:wfl,kaltmiete:kaltmiete,ek:ek,bmr:bmr,eurm2:eurm2,ltv:ltv,bj:d.baujahr||d.bj||'',
+          plz:d.plz||'',ort:d.ort||'',str:d.str||'',hnr:d.hnr||''};
+}
+// indikativer Quick-Score aus KPIs (0-100), falls kein offizieller Score im Snapshot
+function quickScore(k){
+  var sBmr=Math.max(0,Math.min(100,k.bmr/6*100));
+  var sLtv=Math.max(0,Math.min(100,120-k.ltv));
+  var sEk =Math.max(0,Math.min(100,(k.kp?k.ek/k.kp*100:0)*4));
+  return Math.round(sBmr*0.5+sLtv*0.3+sEk*0.2);
+}
+
+function imgSrc(p){if(!p)return '';return /^data:/.test(p)?p:('data:image/jpeg;base64,'+p);}
+
+function render(pass){
+  var snap=pass.snapshot||{};
+  var data=snap.data||{};
+  var disp=snap.display||null;            // offizielle Werte, falls vom Teilen-Modal mitgegeben (v676)
+  var k=computeKpis(data);
+  var score = disp&&typeof disp.score==='number' ? disp.score : quickScore(k);
+  var indicative = !(disp&&typeof disp.score==='number');
+  var title = pass.title || snap.name || ((k.str?k.str+' ':'')+(k.hnr||'')).trim() || 'Immobilie';
+  var subline = ((k.plz?k.plz+' ':'')+(k.ort||'')).trim();
+
+  var kpis=[
+    ['Kaufpreis', k.kp?eur(k.kp):'—',''],
+    ['Kaltmiete/Mo', k.kaltmiete?eur(k.kaltmiete):'—',''],
+    ['Bruttomietr.', k.kp?pct(k.bmr):'—', k.bmr>=5?'good':(k.bmr>=3?'mid':'')],
+    ['LTV', k.kp?Math.round(k.ltv)+' %':'—', k.ltv&&k.ltv<90?'good':(k.ltv?'bad':'')]
+  ];
+  var ticket=[
+    ['Wohnfl.', k.wfl?k.wfl.toString().replace('.',',')+' m²':'—'],
+    ['Preis/m²', k.eurm2?eur(k.eurm2):'—'],
+    ['Baujahr', k.bj||'—'],
+    ['Eigenkapital', k.ek?eur(k.ek):'—']
+  ];
+
+  var photos=Array.isArray(snap.photos)?snap.photos.filter(Boolean):[];
+  var ai=(snap.ai_analysis||'').trim();
+
+  var html='';
+  html+='<div class="pass">';
+  html+= '<div class="ghead"><span class="contrail"></span><span class="flyico">'+planeS()+'</span>'+
+         '<span class="t">Quick Boarding</span><span class="r"><span class="passno">'+pass.code+'</span></span></div>';
+  html+= '<div class="addr">'+esc(title)+(subline?'<div class="sub">'+esc(subline)+'</div>':'')+'</div>';
+  html+= '<div class="mbody"><div class="scorewrap">'+dial(score,124)+(indicative?'<div class="ind">indikativ</div>':'')+'</div>';
+  html+=  '<div class="kbox">'+kpis.map(function(x){return '<div class="ki '+x[2]+'"><span class="l">'+x[0]+'</span><span class="v">'+x[1]+'</span></div>';}).join('')+'</div></div>';
+  html+= '<div class="kt">'+ticket.map(function(x){return '<div class="k"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>';}).join('')+'</div>';
+  html+='</div>';
+
+  if(photos.length){
+    html+='<div class="sec"><h2>Bilder</h2><div class="gal">'+photos.slice(0,9).map(function(p){var s=imgSrc(p);return '<img loading="lazy" src="'+s+'" alt="" onclick="zoom(this.src)">';}).join('')+'</div></div>';
+  }
+  if(ai){
+    html+='<div class="sec"><h2>DealPilot Einschätzung</h2><div class="report">'+esc(ai)+'</div></div>';
+  }
+
+  html+='<div class="cta"><button class="btn" id="claimBtn"><span class="pl">'+planeS()+'</span> Als eigenes Objekt übernehmen</button>'+
+        '<div class="hint" id="claimHint">Kostenlos in dein DealPilot übernehmen — du kannst dann selbst weiterrechnen.</div></div>';
+
+  var d=new Date(pass.expires_at);
+  html+='<div class="meta">Pass '+pass.code+' · gültig bis '+(isFinite(d)?d.toLocaleDateString('de-DE'):'—')+'</div>';
+
+  document.getElementById('mount').innerHTML=html;
+  document.getElementById('claimBtn').addEventListener('click',claim);
+}
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function zoom(src){var i=document.getElementById('lbimg');i.src=src;document.getElementById('lb').classList.add('on');}
+
+function claim(){
+  var btn=document.getElementById('claimBtn'), hint=document.getElementById('claimHint');
+  var token=localStorage.getItem('ji_token');
+  if(!token){
+    try{localStorage.setItem('qb_claim_code',CODE);}catch(e){}
+    window.location.href='/index.html?register=1';
+    return;
+  }
+  btn.disabled=true; btn.textContent='Übernehme…';
+  fetch('/api/v1/passes/'+encodeURIComponent(CODE)+'/claim',{method:'POST',headers:{'Authorization':'Bearer '+token}})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,status:r.status,j:j};});})
+    .then(function(res){
+      if(res.ok){ try{localStorage.removeItem('qb_claim_code');}catch(e){} window.location.href='/index.html'; return; }
+      if(res.status===401){ try{localStorage.setItem('qb_claim_code',CODE);}catch(e){} window.location.href='/index.html'; return; }
+      btn.disabled=false; btn.innerHTML='<span class="pl">'+planeS()+'</span> Als eigenes Objekt übernehmen';
+      hint.textContent='Konnte nicht übernehmen ('+(res.j&&res.j.error||res.status)+'). Bitte später erneut versuchen.';
+    })
+    .catch(function(){ btn.disabled=false; btn.innerHTML='<span class="pl">'+planeS()+'</span> Als eigenes Objekt übernehmen'; hint.textContent='Netzwerkfehler. Bitte später erneut versuchen.'; });
+}
+
+function showState(ic,h,p){document.getElementById('mount').innerHTML='<div class="state"><div class="ic">'+ic+'</div><h1>'+h+'</h1><p>'+p+'</p></div>';}
+
+function load(){
+  if(!CODE){ showState('✈','Kein Pass angegeben','Der Link ist unvollständig.'); return; }
+  fetch('/api/v1/passes/'+encodeURIComponent(CODE))
+    .then(function(r){
+      if(r.status===404){ showState('✈','Pass nicht gefunden','Dieser Quick Boarding Pass existiert nicht.'); return null; }
+      if(r.status===410){ showState('⏱','Pass nicht mehr verfügbar','Dieser Pass ist abgelaufen oder wurde widerrufen.'); return null; }
+      if(!r.ok){ showState('⚠','Fehler','Der Pass konnte nicht geladen werden.'); return null; }
+      return r.json();
+    })
+    .then(function(p){ if(p) render(p); })
+    .catch(function(){ showState('⚠','Verbindungsfehler','Bitte später erneut versuchen.'); });
+}
+
+(function(){var c=document.querySelector('canvas.px'),ctx=c.getContext('2d'),DPR=Math.min(2,window.devicePixelRatio||1);
+ function size(){c.width=innerWidth*DPR;c.height=innerHeight*DPR;}size();addEventListener('resize',size);
+ var N=42,ps=[];for(var i=0;i<N;i++)ps.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.2*DPR,vy:(Math.random()-.5)*.2*DPR,r:(Math.random()*1.5+.4)*DPR});
+ function step(){ctx.clearRect(0,0,c.width,c.height);for(var i=0;i<N;i++){var p=ps[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>c.width)p.vx*=-1;if(p.y<0||p.y>c.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.283);ctx.fillStyle='rgba(201,168,76,.4)';ctx.fill();}for(var a=0;a<N;a++)for(var b=a+1;b<N;b++){var dx=ps[a].x-ps[b].x,dy=ps[a].y-ps[b].y,d=Math.sqrt(dx*dx+dy*dy);if(d<92*DPR){ctx.beginPath();ctx.moveTo(ps[a].x,ps[a].y);ctx.lineTo(ps[b].x,ps[b].y);ctx.strokeStyle='rgba(201,168,76,'+(.08*(1-d/(92*DPR)))+')';ctx.lineWidth=DPR*.6;ctx.stroke();}}requestAnimationFrame(step);}step();})();
+load();
+</script>
+</body></html>
