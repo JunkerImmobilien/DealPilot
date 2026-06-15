@@ -299,3 +299,64 @@ var MarketRatesPF = (function() {
     setMargin: setMargin
   };
 })();
+
+
+/* === dpfk-konditionen-v3 BEGIN — alleiniger Kopfzeilen-Builder (finanz-card-merge ist deaktiviert) === */
+(function(){
+  var PLANE='<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M21.5 2.5l-7 19.5-3.8-8.2-8.2-3.8z"/></svg>';
+  var LBL={ premium:'LTV \u2264 60 %', standard:'LTV \u2264 80 %', schwach:'LTV > 90 %' };
+  function activeKey(){
+    var a=document.querySelector('.mr-pf-margin-btn.active');
+    return a ? a.getAttribute('data-margin') : 'standard';
+  }
+  function syncActive(key){
+    var band=document.getElementById('dpfk-band'); if(!band) return;
+    band.querySelectorAll('.dpfk-ltv-btn').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-margin')===key); });
+    var lab=document.getElementById('dpfk-ltvlabel'); if(lab) lab.textContent=LBL[key]||'';
+  }
+  function deco(){
+    var strip=document.getElementById('mrpf-top-strip'); if(!strip) return;
+    /* Reste der alten Merge-Kopfzeile entfernen (falls je gelaufen) */
+    document.querySelectorAll('.v443-cond-row').forEach(function(r){ try{r.remove();}catch(e){} });
+    var band=document.getElementById('dpfk-band');
+    if(!band){
+      band=document.createElement('div'); band.className='dpfk-band'; band.id='dpfk-band';
+      band.innerHTML=
+        '<div class="dpfk-stub"><span class="dpfk-bp">PRE-FLIGHT</span><span class="dpfk-pf">KONDI&shy;TIONEN</span><span class="dpfk-fl" id="dpfk-ltvlabel">LTV \u2264 80 %</span><span class="dpfk-bc"></span></div>'+
+        '<div class="dpfk-perf"></div>'+
+        '<div class="dpfk-body"><div class="dpfk-head">'+
+          '<span class="dpfk-title"><span class="dpfk-plane">'+PLANE+'</span>Indikative Konditionen nach Zinsbindung</span>'+
+          '<span class="dpfk-ctrl"><span class="dpfk-ltv">'+
+            '<button type="button" class="dpfk-ltv-btn" data-margin="premium">\u226460&nbsp;%</button>'+
+            '<button type="button" class="dpfk-ltv-btn" data-margin="standard">\u226480&nbsp;%</button>'+
+            '<button type="button" class="dpfk-ltv-btn" data-margin="schwach">&gt;90&nbsp;%</button>'+
+          '</span></span>'+
+        '</div></div>';
+      strip.parentNode.insertBefore(band, strip);
+      band.querySelector('.dpfk-body').appendChild(strip);
+      strip.classList.add('dpfk-strip');
+      band.querySelector('.dpfk-ltv').addEventListener('click', function(e){
+        var b=e.target.closest('.dpfk-ltv-btn'); if(!b) return;
+        var key=b.getAttribute('data-margin');
+        if(typeof window.setPfandbriefMargin==='function') window.setPfandbriefMargin(key);
+        syncActive(key);
+      });
+    } else if(!band.querySelector('#mrpf-top-strip')){
+      strip.classList.add('dpfk-strip');
+      band.querySelector('.dpfk-body').appendChild(strip);
+    }
+    /* Marktdaten-Button dezent in den Gold-Kopf ziehen (Handler V10.openMarketModal bleibt) */
+    var head=band.querySelector('.dpfk-head');
+    var btn=document.querySelector('.v10-zc-btn');
+    if(btn && head && !head.contains(btn)){
+      btn.classList.add('dpfk-mkt');
+      var ctrl=head.querySelector('.dpfk-ctrl'); if(ctrl) ctrl.appendChild(btn);
+      var row1=document.querySelector('.v10-zc-row1'); if(row1) row1.style.display='none';
+    }
+    syncActive(activeKey());
+  }
+  function boot(){ deco(); setTimeout(deco, 600); setTimeout(deco, 1600); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+/* === dpfk-konditionen-v3 END === */

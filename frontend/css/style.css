@@ -33385,3 +33385,155 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   .help-modal.global-view-overlay .help-content { padding: 14px 16px !important; }
 }
 /* ===== v643-help-mobile END ===== */
+
+
+/* === dpfk-konditionen-v3 BEGIN (Indikative Konditionen · PRE-FLIGHT, dezent, eigener Namespace) === */
+.dpfk-band{position:relative;display:flex;align-items:stretch;border:1px solid #E6DFCE;border-radius:14px;background:#fff;box-shadow:0 14px 38px -30px rgba(120,90,0,.5);margin:6px 0 4px}
+.dpfk-stub{display:flex;flex-direction:column;justify-content:center;gap:5px;background:#070707;padding:16px 15px;border-radius:13px 0 0 13px;min-width:116px}
+.dpfk-bp{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.2em;color:#9a8f6a}
+.dpfk-pf{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.16em;color:#E8CC7A;line-height:1.05}
+.dpfk-fl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.04em;color:#C9A84C}
+.dpfk-bc{margin-top:5px;height:24px;width:58px;border-radius:2px;opacity:.85;background:repeating-linear-gradient(90deg,#cdbf94 0 2px,transparent 2px 4px,#cdbf94 4px 5px,transparent 5px 8px,#cdbf94 8px 11px,transparent 11px 13px)}
+.dpfk-perf{position:relative;width:0;border-left:2px dashed #d9cfb4}
+.dpfk-perf::before,.dpfk-perf::after{content:"";position:absolute;left:-9px;width:18px;height:18px;border-radius:50%;background:#f3eee4;box-shadow:inset 0 0 0 1px rgba(5,5,5,.07)}
+.dpfk-perf::before{top:-10px}.dpfk-perf::after{bottom:-10px}
+.dpfk-body{flex:1;display:flex;flex-direction:column;min-width:0}
+.dpfk-head{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-radius:0 13px 0 0}
+.dpfk-head::after{content:"";position:absolute;inset:0;opacity:.4;background:repeating-linear-gradient(102deg,rgba(255,255,255,.12) 0 1px,transparent 1px 8px);pointer-events:none}
+.dpfk-title{position:relative;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#5a4a14;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:8px}
+.dpfk-plane{display:inline-flex;color:#070707}
+.dpfk-ctrl{position:relative;margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+/* LTV-Pills dezent + kleiner */
+.dpfk-ltv{display:inline-flex;background:rgba(255,255,255,.45);border:1px solid rgba(90,74,20,.2);border-radius:9px;padding:2px}
+.dpfk-ltv-btn{border:0;background:transparent;font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:11px;color:#6a5a24;padding:5px 9px;border-radius:6px;cursor:pointer;transition:.14s;white-space:nowrap}
+.dpfk-ltv-btn:hover{color:#1a1407}
+.dpfk-ltv-btn.active{background:#1a1407;color:#E8CC7A}
+/* Marktdaten-Button dezent in den Gold-Kopf */
+.dpfk-head .dpfk-mkt{display:inline-flex !important;align-items:center;gap:6px;background:rgba(255,255,255,.5) !important;color:#5a4a14 !important;border:1px solid rgba(90,74,20,.28) !important;border-radius:8px !important;padding:6px 10px !important;font-size:11px !important;font-weight:600 !important;line-height:1 !important;min-height:0 !important;box-shadow:none !important;cursor:pointer;white-space:nowrap}
+.dpfk-head .dpfk-mkt:hover{background:#fff !important;color:#1a1407 !important}
+.dpfk-head .dpfk-mkt svg{width:13px;height:13px}
+/* alte Merge-Kopfzeile sicher ausblenden */
+.v443-cond-row{display:none !important}
+/* Tiles als durchgehendes Ticket */
+.dpfk-strip.mrpf-top-strip{display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:0 !important;background:#fff !important;border:0 !important;padding:0 !important;margin:0 !important;border-radius:0 0 13px 0 !important}
+.dpfk-strip .mrpf-top-tile{position:relative;padding:15px 17px !important;border:0 !important;border-left:2px dashed #e1d6b8 !important;background:transparent !important;border-radius:0 !important;margin:0 !important;box-shadow:none !important}
+.dpfk-strip .mrpf-top-tile:first-child{border-left:0 !important}
+.dpfk-strip .mrpf-top-tile::before,.dpfk-strip .mrpf-top-tile::after{content:"";position:absolute;left:-9px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 1px rgba(5,5,5,.06)}
+.dpfk-strip .mrpf-top-tile:first-child::before,.dpfk-strip .mrpf-top-tile:first-child::after{display:none}
+.dpfk-strip .mrpf-top-tile::before{top:-9px}.dpfk-strip .mrpf-top-tile::after{bottom:-9px}
+.dpfk-strip .mrpf-top-head{display:flex !important;align-items:center;justify-content:space-between;gap:8px;margin:0 0 9px !important}
+.dpfk-strip .mrpf-top-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.13em;color:#8d7430;text-transform:uppercase;font-weight:600}
+.dpfk-strip [id^="mrpf-top-src-"]{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.1em;font-weight:600;color:#2c7a4c;background:rgba(63,165,108,.10);border:1px solid rgba(63,165,108,.30);border-radius:5px;padding:3px 6px;text-transform:uppercase;white-space:nowrap}
+.dpfk-strip [id^="mrpf-top-src-"].static{color:#8d7430;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.32)}
+.dpfk-strip [id^="mrpf-top-rate-"]{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:27px;color:#050505;line-height:1;margin:0 0 6px !important}
+.dpfk-strip [id^="mrpf-top-detail-"]{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;color:#8a8473;line-height:1.45}
+@media(max-width:560px){
+  .dpfk-strip.mrpf-top-strip{grid-template-columns:1fr 1fr !important}
+  .dpfk-strip .mrpf-top-tile{border-left:2px dashed #e1d6b8 !important}
+  .dpfk-strip .mrpf-top-tile:nth-child(odd){border-left:0 !important}
+  .dpfk-strip .mrpf-top-tile:nth-child(odd)::before,.dpfk-strip .mrpf-top-tile:nth-child(odd)::after{display:none}
+  .dpfk-band{flex-wrap:wrap}
+  .dpfk-stub{min-width:0;width:100%;border-radius:13px 13px 0 0;flex-direction:row;align-items:center;gap:12px}
+  .dpfk-perf{display:none}
+  .dpfk-body{width:100%}
+  .dpfk-head{border-radius:0}
+}
+/* --- dpfk-v4: leere #v10-zins-compact-Karte ausblenden + LTV-Pills auf Marktdaten-Button-Mass --- */
+.v10-zins-compact{display:none !important}
+.dpfk-ltv{padding:0 !important;background:transparent !important;border:0 !important;gap:6px}
+.dpfk-ltv-btn{background:rgba(255,255,255,.5) !important;color:#5a4a14 !important;border:1px solid rgba(90,74,20,.28) !important;border-radius:8px !important;padding:6px 10px !important;font-size:11px !important;font-weight:600 !important;line-height:1 !important;min-height:0 !important;white-space:nowrap}
+.dpfk-ltv-btn:hover{background:#fff !important;color:#1a1407 !important}
+.dpfk-ltv-btn.active{background:#1a1407 !important;color:#E8CC7A !important;border-color:#1a1407 !important}
+/* === dpfk-konditionen-v3 END === */
+
+
+/* === dpfk-da-v5 BEGIN (Deal-Aktion Pilot-Boarding-Reskin, scoped #s8) === */
+/* --- Bereit fuer die Bank (dp-rc) --- */
+#s8 .da-readycheck{background:#FAF6EC;border:1px solid #efe7d4;border-radius:13px;padding:15px 18px;margin:0 0 18px}
+#s8 .dp-rc-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+#s8 .dp-rc-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:#1a1407}
+#s8 .dp-rc-prog{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8d7430}
+#s8 .dp-rc-bar{position:relative;height:10px;border-radius:99px;background:#e7ddc4;margin:11px 0 12px;overflow:hidden}
+#s8 .dp-rc-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#b8932f,#C9A84C 70%,#E8CC7A)}
+#s8 .dp-rc-missing-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#8d7430;margin-bottom:8px}
+#s8 .dp-rc-chips{display:flex;flex-wrap:wrap;gap:7px}
+#s8 .dp-rc-chip{background:#fff;border:1px solid #E6DFCE;border-radius:8px;padding:7px 11px;font:600 12px 'Inter',sans-serif;color:#6a5a24;cursor:pointer;transition:.14s}
+#s8 .dp-rc-chip:hover{border-color:#C9A84C;color:#1a1407}
+#s8 .dp-rc-allset{font-family:'JetBrains Mono',monospace;font-size:12px;color:#2c7a4c}
+#s8 .dp-rc-exports{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #efe7d4}
+#s8 .dp-rc-exp-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#9a8f6a}
+#s8 .dp-rc-exp-btn{background:#0a0a0a;color:#E8CC7A;border:0;border-radius:8px;padding:8px 13px;font:600 12px 'Space Grotesk',sans-serif;cursor:pointer;transition:.14s}
+#s8 .dp-rc-exp-btn:hover{filter:brightness(1.1)}
+/* --- Stage-Header --- */
+#s8 .da-stage{margin:0 0 18px}
+#s8 .da-stage-head{display:flex;align-items:center;gap:11px;padding:11px 16px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-radius:12px 12px 0 0;position:relative;overflow:hidden}
+#s8 .da-stage-head::after{content:"";position:absolute;inset:0;opacity:.4;background:repeating-linear-gradient(102deg,rgba(255,255,255,.12) 0 1px,transparent 1px 8px);pointer-events:none}
+#s8 .da-stage-ico{position:relative;width:26px;height:26px;border-radius:50%;background:#070707;color:#E8CC7A;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;flex:none}
+#s8 .da-stage-title{position:relative;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#5a4a14;font-weight:700}
+#s8 .da-stage-sub{position:relative;font-size:11.5px;color:#6a5a30;margin-left:auto;text-align:right;max-width:60%}
+/* Stage-Body als weisse Karte unter dem Gold-Kopf */
+#s8 .da-stage-status .da-status-card,
+#s8 .da-stage > .da-grid,
+#s8 .da-stage-bank .da-bank-card{border:1px solid #E6DFCE;border-top:0;border-radius:0 0 12px 12px;background:#fff;box-shadow:0 14px 38px -30px rgba(120,90,0,.5)}
+#s8 .da-stage > .da-grid{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+/* --- Status-Card (Deal abschliessen) --- */
+#s8 .da-status-card{padding:18px}
+#s8 .da-status-head{margin-bottom:14px}
+#s8 .da-status-label{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:#1a1407}
+#s8 .da-status-sub{font-size:12px;color:#8a8473;margin-top:3px}
+#s8 .da-status-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+/* --- Gate-Karten --- */
+#s8 .da-status-tile{position:relative;overflow:hidden;border:1px solid #E6DFCE;border-radius:13px;background:#fcfaf4;padding:22px 16px 18px;text-align:center;cursor:pointer;transition:.18s}
+#s8 .da-status-tile::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#E8CC7A,#C9A84C);opacity:.35;transition:.18s}
+#s8 .da-status-tile:hover{transform:translateY(-2px);box-shadow:0 16px 34px -24px rgba(120,90,0,.5)}
+#s8 .da-status-tile .da-stat-ico{width:74px;height:74px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #E6DFCE;color:#8a8473;transition:.2s}
+#s8 .da-status-tile .da-stat-ico svg{display:none}
+#s8 .da-status-tile .da-stat-ico::after{content:"";width:34px;height:34px;background:currentColor;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain}
+#s8 .da-status-open  .da-stat-ico::after{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%203h12M6%2021h12M7%203c0%204.5%2010%205.5%2010%209s-10%204.5-10%209M17%203c0%204.5-10%205.5-10%209%22%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%203h12M6%2021h12M7%203c0%204.5%2010%205.5%2010%209s-10%204.5-10%209M17%203c0%204.5-10%205.5-10%209%22%2F%3E%3C%2Fsvg%3E")}
+#s8 .da-status-won   .da-stat-ico::after{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23000%22%3E%3Cpath%20d%3D%22M22%202L11.5%2013.5%207%2011.5%202.5%2013%208%2016l1.5%205.5%202.5-4.2z%22%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23000%22%3E%3Cpath%20d%3D%22M22%202L11.5%2013.5%207%2011.5%202.5%2013%208%2016l1.5%205.5%202.5-4.2z%22%2F%3E%3C%2Fsvg%3E")}
+#s8 .da-status-lost  .da-stat-ico::after{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229%22%2F%3E%3Cpath%20d%3D%22M5.6%205.6l12.8%2012.8%22%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229%22%2F%3E%3Cpath%20d%3D%22M5.6%205.6l12.8%2012.8%22%2F%3E%3C%2Fsvg%3E")}
+#s8 .da-stat-lbl{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:#2a2620;display:block;margin-top:2px}
+/* aktive Zustaende */
+#s8 .da-status-tile.active::before{opacity:1;height:4px}
+#s8 .da-status-open.active{background:linear-gradient(180deg,#fff7e6,#fdf0d0);border-color:#C9A84C}
+#s8 .da-status-open.active .da-stat-ico{background:#E8CC7A;color:#1a1407;border-color:#C9A84C}
+#s8 .da-status-open.active .da-stat-lbl{color:#8d7430}
+#s8 .da-status-won.active{background:linear-gradient(180deg,#eaf7f0,#d8f0e2);border-color:#3FA56C}
+#s8 .da-status-won.active .da-stat-ico{background:#3FA56C;color:#fff;border-color:#3FA56C}
+#s8 .da-status-won.active .da-stat-lbl{color:#2c7a4c}
+#s8 .da-status-lost.active{background:linear-gradient(180deg,#fbf1f0,#f4e0de);border-color:#B8625C}
+#s8 .da-status-lost.active .da-stat-ico{background:#B8625C;color:#fff;border-color:#B8625C}
+#s8 .da-status-lost.active .da-stat-lbl{color:#9a4636}
+/* --- Karten (renderCard) --- */
+#s8 .da-card{position:relative;overflow:hidden;background:#fff;border:1px solid #E6DFCE;border-radius:13px;padding:16px;box-shadow:0 10px 26px -22px rgba(120,90,0,.4)}
+#s8 .da-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#E8CC7A,#C9A84C)}
+#s8 .da-card-icon{color:#8d7430;margin-bottom:8px}
+#s8 .da-card-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:#1a1407}
+#s8 .da-card-sub{font-size:12px;color:#8a8473;margin-top:2px}
+#s8 .da-card-desc{font-size:12.5px;color:#6a6453;margin:8px 0;line-height:1.5}
+#s8 .da-card-cta.btn-primary{background:linear-gradient(180deg,#E8CC7A,#C9A84C);color:#0a0a0a;border:0;border-radius:9px;font-family:'Space Grotesk',sans-serif;font-weight:600}
+#s8 .da-card-cta.btn-primary:hover{filter:brightness(1.05)}
+/* --- Bankgespraech-Karte --- */
+#s8 .da-bank-pdf-btn{background:#0a0a0a;color:#E8CC7A;border:0;border-radius:9px;padding:10px 15px;font:600 13px 'Space Grotesk',sans-serif;cursor:pointer}
+#s8 .da-bank-pdf-btn:hover{filter:brightness(1.1)}
+/* --- Effekte (Maximal, kein Konfetti) --- */
+@keyframes dpfk-flyoff{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(46px,-70px) rotate(16deg);opacity:0}}
+#s8 .da-stat-ico.dpfk-flyoff::after{animation:dpfk-flyoff .85s cubic-bezier(.4,0,.2,1)}
+@keyframes dpfk-shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+#s8 .da-status-tile.dpfk-shake{animation:dpfk-shake .4s}
+@media (prefers-reduced-motion: reduce){#s8 *{animation:none !important}}
+@media(max-width:680px){#s8 .da-status-tiles{grid-template-columns:1fr}#s8 .da-stage-sub{display:none}}
+/* --- dpfk-da-v51: Junker-Banner ausblenden + Bank-Runway mit Flieger + gestrichelter Reststrecke --- */
+#s8 .junker-action-banner{display:none !important}
+#s8 .dp-rc-bar{position:relative;height:14px;border-radius:99px;background:#e9dfc6;overflow:visible;
+  background-image:repeating-linear-gradient(90deg,rgba(141,116,48,.55) 0 7px,transparent 7px 14px);
+  background-size:14px 2px;background-position:left center;background-repeat:repeat-x}
+#s8 .dp-rc-bar-fill{position:relative;height:100%;border-radius:99px;background:linear-gradient(90deg,#b8932f,#C9A84C 70%,#E8CC7A);overflow:visible}
+/* zurueckgelegte Strecke: durchgezogene helle Mittellinie ueber dem Gold */
+#s8 .dp-rc-bar-fill::before{content:"";position:absolute;left:0;right:0;top:50%;height:0;border-top:1px dashed rgba(255,255,255,.65)}
+/* Flieger sitzt am Fortschritts-Ende */
+#s8 .dp-rc-bar-fill::after{content:"";position:absolute;right:-7px;top:50%;width:16px;height:16px;transform:translateY(-50%);
+  background:#070707;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='black'%20d='M22%202L11.5%2013.5%207%2011.5%202.5%2013%208%2016l1.5%205.5%202.5-4.2z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='black'%20d='M22%202L11.5%2013.5%207%2011.5%202.5%2013%208%2016l1.5%205.5%202.5-4.2z'/%3E%3C/svg%3E") center/contain no-repeat;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+/* === dpfk-da-v5 END === */

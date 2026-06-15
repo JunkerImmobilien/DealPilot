@@ -237,7 +237,8 @@
         '<div class="dp-pf-sep"></div>' +
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">' +
           pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
-          (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprachaufzeichnung', 'Objekt frei einsprechen \u2014 1 L Kerosin') : '') +
+          (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen \u2014 1 L Kerosin') : '') +
+          '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
         '</div></div>' +
         '<a class="dp-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run"><span class="dp-pf-ic">' + _plane + '</span> Abrufen</button>' + '</span>' +
       '</div></div>' +
@@ -257,6 +258,25 @@
     } catch (e) {}
     /* v570-pf: alter qc7-src-Listener ersetzt durch dp-pf-tile-Bind im Render */
     $('oab-run').addEventListener('click', runSelected);
+    /* v656: ImmoMetrica-Tile gating + direkte Aktion */
+    try {
+      var _imoTile = mount.querySelector('[data-src="immometrica"]');
+      if (_imoTile && !_imoTile._imoBound) {
+        _imoTile._imoBound = 1;
+        _imoTile.classList.add('dp-pf-disabled');
+        _imoTile.setAttribute('title', 'ImmoMetrica: Zug\u00e4nge erforderlich \u2014 Einstellungen');
+        if (window.ImmoMetricaImport) {
+          window.ImmoMetricaImport.isReady(function (ok) {
+            if (ok) { _imoTile.classList.remove('dp-pf-disabled'); var _ic = _imoTile.querySelector('input[type=checkbox]'); if (_ic) _ic.disabled = false; _imoTile.setAttribute('title', 'Aus ImmoMetrica importieren'); }
+          });
+        }
+        _imoTile.addEventListener('click', function () {
+          if (_imoTile.classList.contains('dp-pf-disabled')) { try { toast('ImmoMetrica: bitte Zugang in den Einstellungen speichern'); } catch (e) {} return; }
+          /* v667: ImmoMetrica laeuft jetzt als Lampe + Abrufen-Schritt (kein Direkt-Open) */
+        });
+      }
+    } catch (e) {}
+
     renderResults(); updateCreditHint();
   }
   function updateCreditHint() {
@@ -286,7 +306,7 @@
   async function runSelected() {
     var srcs = selectedSources();
     if (!srcs.length) { toast('Bitte mindestens eine Quelle auswählen'); return; }
-    var order = ['voice', 'import', 'pricehubble', 'sprengnetter', 'dealpilot'];  /* v503-voice-first */
+    var order = ['voice', 'import', 'immometrica', 'pricehubble', 'sprengnetter', 'dealpilot'];  /* v503-voice-first; v667 immometrica */
     var ordered = order.filter(function (s) { return srcs.indexOf(s) !== -1; });
     var btn = $('oab-run'); if (btn) btn.disabled = true;
     for (var i = 0; i < ordered.length; i++) {
@@ -294,6 +314,7 @@
       try {
         if (s === 'voice') { setProg('Sprachaufzeichnung …'); await new Promise(function (res) { if (window.VoiceImport) { window.VoiceImport.open(res); } else { res(); } }); }  /* v503-voice-run */
         else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); }
+        else if (s === 'immometrica') { setProg('ImmoMetrica …'); await new Promise(function (res) { if (window.ImmoMetricaImport) window.ImmoMetricaImport.open(function (picked) { applyImmometrica(picked); res(); }, { target: 'obj', onClose: function () { res(); } }); else res(); }); }
         else if (s === 'pricehubble' || s === 'sprengnetter') { setProg((s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' …'); await avmFetch(s); }
         else if (s === 'dealpilot') { setProg('DealPilot-Marktbewertung …'); try { if (window.DealPilotMB) await window.DealPilotMB.run(); } catch (e) {} }
       } catch (e) { try { console.warn('[obj-actions] step', s, e); } catch (_) {} }
@@ -736,6 +757,31 @@
 
   var _files = [];   // { name, text, type, userType, cache, status, row, file }
   var _importPhotos = [];   // v402: aus Exposé-PDFs extrahierte Bilder (dataURLs, max 6)
+  /* v656: ImmoMetrica-Felder ins Formular schreiben (nutzt setSelectSmart) */
+  function applyImmometrica(p) {
+    if (!p) return;
+    var SELECTS = { objart: 1, vermstand: 1, ds2_energie: 1 };
+    Object.keys(p).forEach(function (id) {
+      if (id.charAt(0) === '_') {
+        if (id.indexOf('_immometrica_') === 0) { var _mel = $(id); if (_mel) { _mel.value = (p[id] == null ? '' : p[id]); try { _mel.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} } }
+        return;
+      }
+      var v = p[id];
+      if (v == null || v === '') return;
+      if (id === 'notizen') {
+        var nt = $('notizen'); if (nt) { nt.value = (nt.value ? nt.value + '\n\n' : '') + v; try { nt.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
+        return;
+      }
+      if (SELECTS[id]) { try { setSelectSmart(id, v, false); } catch (e) {} return; }
+      var el = $(id); if (!el) return;
+      el.value = v;
+      try { el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    });
+    try { if (typeof calc === 'function') calc(); } catch (e) {}
+    try { if (typeof dpUpdateAll === 'function') dpUpdateAll(); } catch (e) {}
+    try { toast('ImmoMetrica-Daten \u00fcbernommen'); } catch (e) {}
+  }
+
   function recompute() {
     _merged = {};
     _files.filter(function (f) { return f.type === 'expose' && f.cache.expose; }).forEach(function (f) { mergeExpose(f.cache.expose); });

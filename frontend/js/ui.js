@@ -687,7 +687,18 @@ function _buildAIPayload() {
       if (_mr.length) payload.marktradar = _mr;
     }
   } catch (e) { /* optional */ }
-  // v589: KI-Stil-Einstellungen auch fuer die Pilot-Analyse mitsenden
+  // v671: Inseratsalter / Vermarktungsdauer fuer Verhandlung & Offerte
+  try {
+    var _os = g('_immometrica_online_since');
+    if (_os) {
+      var _od = new Date(String(_os).slice(0, 10));
+      if (!isNaN(_od.getTime())) {
+        var _days = Math.max(0, Math.round((Date.now() - _od.getTime()) / 86400000));
+        payload.verhandlung = { inseriert_seit: String(_os).slice(0, 10), tage_online: _days };
+      }
+    }
+  } catch (e) { /* optional */ }
+    // v589: KI-Stil-Einstellungen auch fuer die Pilot-Analyse mitsenden
   try {
     if (typeof Settings !== 'undefined') {
       var _s = Settings.get() || {};

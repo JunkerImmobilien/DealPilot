@@ -7,6 +7,7 @@
    ============================================================================ */
 (function () {
   'use strict';
+  /* dpfk-v3-off: deaktiviert — dpfk-Band uebernimmt die Kopfzeile (kein Strip-Klau) */ return;
   var LTV = [
     { key: 'premium',  label: '\u226460\u202f%' },
     { key: 'standard', label: '\u226480\u202f%' },

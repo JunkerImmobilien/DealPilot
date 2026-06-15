@@ -660,6 +660,9 @@ window.DealPilotConfig = (function() {
       // Finanzierung
       tilgung_default:        2.5,    // % p.a.
       zinsbindung_default:    10,     // Jahre
+      zins_override:          null,   // eigener Zinssatz (%); null = indikativer Pfandbrief-Satz
+      zins_margin:            'standard', // Zins-Stufe: premium (LTV<=60%) / standard (60-80%) / schwach (>90%)
+      hausgeld_pct:           null,   // Hausgeld-Annahme als % vom Kaufpreis p.a.; null = aus
       ek_quote_default:       20,     // % vom Kaufpreis
       // Bewirtschaftung
       bwk_anteil_default:     22,     // % der NKM (nicht-umlagefähig)
