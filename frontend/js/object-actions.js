@@ -768,6 +768,8 @@
       }
       var v = p[id];
       if (v == null || v === '') return;
+      var YEAR_FIELDS = { baujahr: 1 };
+      if (YEAR_FIELDS[id]) { v = String(v).replace(/\D/g, ''); }
       if (id === 'notizen') {
         var nt = $('notizen'); if (nt) { nt.value = (nt.value ? nt.value + '\n\n' : '') + v; try { nt.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
         return;
