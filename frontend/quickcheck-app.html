@@ -6029,5 +6029,37 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 (function(){ try{ if(window.frameElement){ document.documentElement.classList.add('qc-embedded'); } }catch(e){} })();
 </script>
 
+<!-- qb-modal-scrollview (v684): beim Oeffnen einmal sanft zum Modal scrollen -->
+<script id="qb-modal-scrollview-js">
+(function(){
+  'use strict';
+  var tries=0;
+  function toModal(){
+    var bd=document.querySelector('.modal-backdrop.show'); if(!bd) return;
+    var b=bd.querySelector('.modal')||bd;
+    try{ b.scrollIntoView({block:'center', inline:'nearest', behavior:'smooth'}); }catch(e){
+      try{ b.scrollIntoView(true); }catch(e2){}
+    }
+  }
+  function run(){ requestAnimationFrame(function(){ requestAnimationFrame(toModal); }); }
+  function wrap(name){
+    if(!window.QcApp || typeof QcApp[name]!=='function') return false;
+    if(QcApp[name].__qbsv) return true;
+    var orig=QcApp[name];
+    var fn=function(){ var r=orig.apply(this,arguments); try{ run(); }catch(e){} return r; };
+    fn.__qbsv=true;
+    try{ QcApp[name]=fn; }catch(e){ return false; }
+    return QcApp[name].__qbsv===true;
+  }
+  function install(){
+    if(!window.QcApp){ if(tries++<40) return setTimeout(install,80); return; }
+    var ok=wrap('openSaveModal');
+    wrap('openApiModal');
+    if(!ok && tries++<40) return setTimeout(install,80);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
 </body>
 </html>
