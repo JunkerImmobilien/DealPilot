@@ -150,8 +150,12 @@ function render(pass){
 
   /* qb-stammdaten: alle vorhandenen Felder ausklappbar */
   var _allF=[['Objektart',data.objektart],['Zimmer',data.zimmer],['Energieklasse',data.energieklasse?String(data.energieklasse).toUpperCase():''],['Stellplatz',data.stellplatz],['Hausgeld',data.hg?(num(data.hg)?eur(num(data.hg))+'/Mo':data.hg):''],['Eigenkapital',k.ek?eur(k.ek):''],['Zinssatz',data.zins?(String(data.zins).replace('.',',')+' %'):''],['Tilgung',data.tilg?(String(data.tilg).replace('.',',')+' %'):''],['Kaufnebenkosten',data.knk?(String(data.knk).replace('.',',')+' %'):'']];
-  var _ds2r=[]; try { var _pd=data.__ds2pending; if(_pd&&typeof _pd==='object'){ Object.keys(_pd).forEach(function(id){ var it=_pd[id]; if(it&&it.value!=null&&String(it.value).trim()!==''){ _ds2r.push([it.label||id, String(it.value)]); } }); } } catch(e){}
+  var _ds2r=[]; try { var _pd=data.__ds2pending; if(_pd&&typeof _pd==='object'){ Object.keys(_pd).forEach(function(id){ var it=_pd[id]; if(it&&it.value!=null&&String(it.value).trim()!==''){ _ds2r.push([it.label||id, String(it.value), id]); } }); } } catch(e){}
   var _mrows=_allF.filter(function(f){return f[1]!=null && String(f[1]).trim()!=='';}).concat(_ds2r);
+  /* qb-sort: Objektdaten -> Ausstattung -> Finanzen -> Markt/Lage -> Qualitaet+Zustand paarweise */
+  var _SDORD={'Objektart':1,'Zimmer':2,'Energieklasse':3,'etage':4,'etagen_ges':5,'modernis':6,'Stellplatz':7,'garagen':8,'stellpl_aussen':9,'balkon_flae':10,'bad_anz':11,'Eigenkapital':12,'Hausgeld':13,'Zinssatz':14,'Tilgung':15,'Kaufnebenkosten':16,'svwert':17,'ds2_marktmiete':18,'makrolage':19,'mikrolage':20,'ds2_wertsteigerung':21,'ds2_bevoelkerung':22,'ds2_nachfrage':23,'ds2_entwicklung':24,'qual_kueche':25,'rate_kueche':26,'qual_bad':27,'rate_bad':28,'qual_boden':29,'rate_boden':30,'qual_fenster':31,'rate_fenster':32};
+  _mrows.forEach(function(r,i){ r.__i=i; });
+  _mrows.sort(function(a,b){ var ka=(a[2]!=null?a[2]:a[0]), kb=(b[2]!=null?b[2]:b[0]); var ra=(_SDORD[ka]!=null?_SDORD[ka]:99), rb=(_SDORD[kb]!=null?_SDORD[kb]:99); return ra!==rb ? ra-rb : a.__i-b.__i; });
   var _more = _mrows.length ? '<div class="sec"><details class="more"><summary>Alle Stammdaten anzeigen</summary><div class="mlist">'+_mrows.map(function(f){return '<div class="mrow"><span class="ml">'+esc(f[0])+'</span><span class="mv">'+esc(String(f[1]))+'</span></div>';}).join('')+'</div></details></div>' : '';
   var photos=Array.isArray(snap.photos)?snap.photos.filter(Boolean):[];
   var ai=(snap.ai_analysis||'').trim();
