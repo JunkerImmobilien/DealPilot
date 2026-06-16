@@ -5763,6 +5763,23 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply); else apply();
   setTimeout(apply, 1500); /* Zinsdaten laden ggf. asynchron nach */
+  /* v719/dpfk-zins-retry: Marktzins kommt asynchron (Pfandbrief-Raten) -> mehrfach versuchen,
+     bis getZins() einen Wert liefert und qc_zins noch leer/unangetastet ist. */
+  (function(){
+    var tries = 0, MAX = 24;            /* ~ alle 700ms bis ~17s */
+    var iv = setInterval(function(){
+      tries++;
+      var zEl = document.getElementById("qc_zins");
+      if (!zEl) { if (tries >= MAX) clearInterval(iv); return; }
+      if (zEl.dataset.userSet === "1" || (zEl.value||"").trim() !== "") { clearInterval(iv); return; }
+      try {
+        var IP = window.parent && window.parent.DealPilotInvestmentProfile;
+        var z = (IP && typeof IP.getZins === "function") ? IP.getZins() : null;
+        if (z != null && isFinite(z) && z > 0) { setEmpty("qc_zins", z); clearInterval(iv); }
+      } catch(e){}
+      if (tries >= MAX) clearInterval(iv);
+    }, 700);
+  })();
 })();
 </script>
 <script id="qc-autoek">
