@@ -6029,27 +6029,34 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 (function(){ try{ if(window.frameElement){ document.documentElement.classList.add('qc-embedded'); } }catch(e){} })();
 </script>
 
-<!-- qb-modal-scrollview (v684): beim Oeffnen einmal sanft zum Modal scrollen -->
-<script id="qb-modal-scrollview-js">
+<!-- qb-modal-scrolljump (v685): beim Oeffnen Parent gezielt zur Modal-Mitte scrollen -->
+<script id="qb-modal-scrolljump-js">
 (function(){
   'use strict';
   var tries=0;
   function toModal(){
     var bd=document.querySelector('.modal-backdrop.show'); if(!bd) return;
-    var b=bd.querySelector('.modal')||bd;
-    try{ b.scrollIntoView({block:'center', inline:'nearest', behavior:'smooth'}); }catch(e){
-      try{ b.scrollIntoView(true); }catch(e2){}
-    }
+    var b=bd.querySelector('.modal'); if(!b) return;
+    var fe=window.frameElement;
+    if(!fe){ try{ b.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} return; }
+    try{
+      var pv=window.parent;
+      var feTop=fe.getBoundingClientRect().top + (pv.scrollY||pv.pageYOffset||0);
+      var m=b.getBoundingClientRect();             // im Iframe ohne Eigen-Scroll = Content-Position
+      var center=feTop + m.top + (m.height/2);
+      var pvh=pv.innerHeight||window.innerHeight;
+      pv.scrollTo({top:Math.max(0,Math.round(center - pvh/2)), behavior:'smooth'});
+    }catch(e){}
   }
   function run(){ requestAnimationFrame(function(){ requestAnimationFrame(toModal); }); }
   function wrap(name){
     if(!window.QcApp || typeof QcApp[name]!=='function') return false;
-    if(QcApp[name].__qbsv) return true;
+    if(QcApp[name].__qbsj) return true;
     var orig=QcApp[name];
     var fn=function(){ var r=orig.apply(this,arguments); try{ run(); }catch(e){} return r; };
-    fn.__qbsv=true;
+    fn.__qbsj=true;
     try{ QcApp[name]=fn; }catch(e){ return false; }
-    return QcApp[name].__qbsv===true;
+    return QcApp[name].__qbsj===true;
   }
   function install(){
     if(!window.QcApp){ if(tries++<40) return setTimeout(install,80); return; }
