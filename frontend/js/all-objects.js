@@ -117,9 +117,10 @@
 
     // V27: Portfolio-Header aus den Rows berechnen
     var portfolioHeader = _renderPortfolioHeader(rows);
+    setTimeout(function(){ try { _aoLoadSharedPasses(); } catch (e) {} }, 0);
 
     content.innerHTML =
-      portfolioHeader +
+      portfolioHeader + '<div id="ao-shared-passes" style="margin:16px 0 4px"></div>' +
       '<div class="ao-table-wrap">' +
         '<table class="ao-table">' +
           '<thead>' +
@@ -212,6 +213,57 @@
     return '<th class="' + cls + '" onclick="_aoSort(\'' + key + '\')">' + label + arrow + '</th>';
   }
 
+  /* F3/qb-shared-table: Tabelle aller aktuell geteilten Objekte (nutzt window.Auth.apiCall). */
+  function _restLabel(exp) {
+    var ms = new Date(exp).getTime() - Date.now();
+    if (!isFinite(ms) || ms <= 0) return 'abgelaufen';
+    var days = ms / 86400000;
+    if (days >= 1) { var d = Math.round(days); return d + ' Tag' + (d === 1 ? '' : 'e'); }
+    var h = Math.max(1, Math.round(ms / 3600000));
+    return h + ' Std';
+  }
+  function _aoLoadSharedPasses() {
+    var host = document.getElementById('ao-shared-passes');
+    if (!host) return;
+    if (!window.Auth || typeof window.Auth.apiCall !== 'function') { host.innerHTML = ''; return; }
+    var HEAD = '<div style="font:700 13px/1.2 \'Space Grotesk\',sans-serif;color:#2A2727;margin:0 2px 8px;display:flex;align-items:center;gap:7px"><span>\uD83D\uDD17</span> Geteilte Objekte<SUFFIX></div>';
+    host.innerHTML = HEAD.replace('<SUFFIX>', '') + '<div style="color:#9A9390;font-size:12px;padding:2px">l\u00e4dt \u2026</div>';
+    window.Auth.apiCall('/passes', { method: 'GET' }).then(function (res) {
+      var items = ((res && res.items) || []).filter(function (p) { return !p.revoked_at && new Date(p.expires_at).getTime() > Date.now(); });
+      if (!items.length) {
+        host.innerHTML = HEAD.replace('<SUFFIX>', '') + '<div style="color:#9A9390;font-size:12.5px;padding:8px 12px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);border-radius:9px">Aktuell ist kein Objekt geteilt. Teile ein Objekt \u00fcber \u201eQuick Boarding teilen\u201c.</div>';
+        return;
+      }
+      var body = items.map(function (p) {
+        var datum = new Date(p.created_at).toLocaleDateString('de-DE');
+        var rest = _restLabel(p.expires_at);
+        var c = _esc(p.code);
+        return '<tr><td>' + _esc(p.title || '\u2014') + '</td>' +
+          '<td style="font-family:\'JetBrains Mono\',monospace;font-size:12px">' + c + '</td>' +
+          '<td>' + datum + '</td><td>' + rest + '</td>' +
+          '<td style="white-space:nowrap">' +
+            '<button type="button" style="font:600 11px/1 \'DM Sans\',sans-serif;padding:5px 9px;border-radius:7px;border:1px solid rgba(201,168,76,.45);background:#fff;color:#7a5d18;cursor:pointer" onclick="_aoPassExtend(\'' + c + '\')">Verl\u00e4ngern</button> ' +
+            '<button type="button" style="font:600 11px/1 \'DM Sans\',sans-serif;padding:5px 9px;border-radius:7px;border:1px solid rgba(184,98,92,.5);background:#fff;color:#B8625C;cursor:pointer" onclick="_aoPassRevoke(\'' + c + '\')">Beenden</button>' +
+          '</td></tr>';
+      }).join('');
+      host.innerHTML = HEAD.replace('<SUFFIX>', ' (' + items.length + ')') +
+        '<div class="ao-table-wrap"><table class="ao-table"><thead><tr>' +
+        '<th>Objekt</th><th>Pass-Nr</th><th>geteilt am</th><th>Restlaufzeit</th><th>Aktionen</th>' +
+        '</tr></thead><tbody>' + body + '</tbody></table></div>';
+    }).catch(function () { host.innerHTML = ''; });
+  }
+  window._aoLoadSharedPasses = _aoLoadSharedPasses;
+  window._aoPassExtend = function (code) {
+    if (!window.Auth) return;
+    window.Auth.apiCall('/passes/' + encodeURIComponent(code) + '/extend', { method: 'POST', body: { days: 30 } })
+      .then(function () { _aoLoadSharedPasses(); }).catch(function () {});
+  };
+  window._aoPassRevoke = function (code) {
+    if (!window.Auth) return;
+    if (!window.confirm('Teilen f\u00fcr diesen Pass beenden? Der Link wird ung\u00fcltig.')) return;
+    window.Auth.apiCall('/passes/' + encodeURIComponent(code), { method: 'DELETE' })
+      .then(function () { _aoLoadSharedPasses(); }).catch(function () {});
+  };
   function _esc(s) {
     return ('' + (s || '')).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
