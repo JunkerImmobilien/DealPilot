@@ -5246,7 +5246,17 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
 
   /* ─── Save-Modal mit Transfer-Daten ─── */
   function openSaveModal() {
-    // Auch wenn _pendingTransfer leer ist, schick das Modal trotzdem zur Bestätigung
+    // qb-parentmodal v689: Bestaetigung im Parent (immer im sichtbaren Fenster zentriert)
+    var __items = [];
+    try {
+      Object.keys(_pendingTransfer).forEach(function (key) {
+        var it = _pendingTransfer[key] || {};
+        __items.push({ key: key, label: it.label, value: it.value, target: it.target, source: it.source || '', isMarktwert: !!it.isMarktwert });
+      });
+    } catch (e) {}
+    if (window.parent && window.parent !== window) {
+      try { window.parent.postMessage({ source: 'dp-qc', type: 'qc-save-open', items: __items }, '*'); return; } catch (e) {}
+    }
     renderTransferList();
     document.getElementById('transfer-modal').classList.add('show');
   }
@@ -5307,7 +5317,8 @@ function renderTransferList() {
   function toggleAllTransfer(checked) {
     document.querySelectorAll('#transfer-list input[type="checkbox"]').forEach(cb => cb.checked = checked);
   }
-  function confirmSave() {
+  function confirmSave(_ck) {
+    var _useCk = _ck && typeof _ck.has === 'function';
     /* V329: Anbindung an die echte App — Werte an Parent posten. */
     const inputs = QcEngine.getInputs();
     let avm = null;
@@ -5320,7 +5331,7 @@ function renderTransferList() {
         try {
           Object.keys(_pendingTransfer).forEach(function (key) {
             var cb = document.getElementById('transfer-cb-' + key);
-            if (!cb || cb.checked) _checked[_pendingTransfer[key].target] = true;
+            if (_useCk ? _ck.has(key) : (!cb || cb.checked)) _checked[_pendingTransfer[key].target] = true;
           });
         } catch (e) {}
         avm = {
@@ -5342,7 +5353,7 @@ function renderTransferList() {
     try {
       Object.keys(_pendingTransfer).forEach(function (key) {
         var cb = document.getElementById('transfer-cb-' + key);
-        if (!cb || cb.checked) _pendingTargets[_pendingTransfer[key].target] = true;
+        if (_useCk ? _ck.has(key) : (!cb || cb.checked)) _pendingTargets[_pendingTransfer[key].target] = true;
       });
     } catch (e) {}
     try { window.parent.postMessage({ source: 'dp-qc', type: 'qc-save', inputs: inputs, avm: avm, pendingTargets: _pendingTargets, photos: (typeof _photos !== 'undefined' ? _photos : []) }, '*'); } catch (e) {}
@@ -6029,64 +6040,20 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 (function(){ try{ if(window.frameElement){ document.documentElement.classList.add('qc-embedded'); } }catch(e){} })();
 </script>
 
-<!-- qb-modal-absview (v688): Box absolute an Content-Y = sichtbare Mitte -->
-<style id="qb-modal-absview-style">
-.modal-backdrop.qb-av{ align-items:flex-start !important; }
-.modal-backdrop.qb-av .modal{ position:absolute !important; left:50% !important; margin:0 !important; transform:translate(-50%,-50%) !important; transition:none !important; }
-</style>
-<script id="qb-modal-absview-js">
+<!-- qb-parentmodal (v689): Parent -> Iframe Bestaetigung -->
+<script id="qb-parentmodal-js">
 (function(){
   'use strict';
-  var raf=0, tries=0;
-  function place(){
-    var bd=document.querySelector('.modal-backdrop.show'); if(!bd) return;
-    var b=bd.querySelector('.modal'); if(!b) return;
-    bd.classList.add('qb-av');
-    var fe=window.frameElement;
-    var cy;
-    if(fe){
-      var rect=fe.getBoundingClientRect();
-      var pvh=(window.parent&&window.parent.innerHeight)||window.innerHeight;
-      var H=fe.offsetHeight||document.documentElement.scrollHeight;
-      var visTop=Math.max(0,-rect.top);
-      var visBot=Math.min(H, pvh-rect.top);
-      if(visBot<=visTop){ visTop=0; visBot=Math.min(H,pvh); }
-      cy=(visTop+visBot)/2;
-    } else {
-      cy=(window.innerHeight/2)+(window.scrollY||0);
-    }
-    b.style.top=Math.round(cy)+'px';
-  }
-  function clear(){
-    var l=document.querySelectorAll('.modal-backdrop.qb-av');
-    for(var i=0;i<l.length;i++){ l[i].classList.remove('qb-av'); var b=l[i].querySelector('.modal'); if(b) b.style.top=''; }
-  }
-  function run(){ requestAnimationFrame(function(){ requestAnimationFrame(place); }); }
-  function reflow(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; if(document.querySelector('.modal-backdrop.show.qb-av')) place(); }); }
-  function wrapOpen(name){
-    if(!window.QcApp || typeof QcApp[name]!=='function') return false;
-    if(QcApp[name].__qbav) return true;
-    var orig=QcApp[name];
-    var fn=function(){ var r=orig.apply(this,arguments); try{ run(); }catch(e){} return r; };
-    fn.__qbav=true; try{ QcApp[name]=fn; }catch(e){ return false; }
-    return QcApp[name].__qbav===true;
-  }
-  function wrapClose(name){
-    if(!window.QcApp || typeof QcApp[name]!=='function') return;
-    if(QcApp[name].__qbavc) return;
-    var orig=QcApp[name];
-    var fn=function(){ try{ clear(); }catch(e){} return orig.apply(this,arguments); };
-    fn.__qbavc=true; try{ QcApp[name]=fn; }catch(e){}
-  }
-  function install(){
-    if(!window.QcApp){ if(tries++<40) return setTimeout(install,80); return; }
-    var ok=wrapOpen('openSaveModal'); wrapOpen('openApiModal');
-    wrapClose('closeSaveModal'); wrapClose('closeApiModal'); wrapClose('confirmSave');
-    try{ window.parent.addEventListener('resize', reflow); }catch(e){}
-    window.addEventListener('resize', reflow);
-    if(!ok && tries++<40) return setTimeout(install,80);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+  try {
+    window.addEventListener('message', function(ev){
+      var d=ev.data; if(!d) return;
+      if(d.type==='qc-save-confirm'){
+        try{ if(window.QcApp && QcApp.confirmSave) QcApp.confirmSave(new Set(d.checkedKeys||[])); }catch(e){}
+      } else if(d.type==='qc-save-cancel'){
+        try{ if(window.QcApp && QcApp.closeSaveModal) QcApp.closeSaveModal(); }catch(e){}
+      }
+    });
+  } catch(e){}
 })();
 </script>
 
