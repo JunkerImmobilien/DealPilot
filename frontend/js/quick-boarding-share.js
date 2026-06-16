@@ -107,6 +107,7 @@
       var id = window._currentObjKey;
       if (!id) { toast('Bitte das Objekt zuerst speichern.'); btn.disabled = false; btn.innerHTML = plane() + ' Pass erstellen'; return; }
       var res = await window.Auth.apiCall('/passes', { method: 'POST', body: { objectId: id, days: _days } });
+      try { if (window._oabRefreshShareQr) setTimeout(window._oabRefreshShareQr, 400); } catch (e) {}
       if (!res || !res.code) throw new Error('no code');
       viewDone(res.code, res.expires_at);
     } catch (e) {
@@ -152,7 +153,7 @@
       } catch (e) { toast('Verl\u00e4ngern fehlgeschlagen.'); b.disabled = false; }
     });
     document.getElementById('qbs-rev').addEventListener('click', async function () {
-      try { await window.Auth.apiCall('/passes/' + encodeURIComponent(code), { method: 'DELETE' });
+      try { await window.Auth.apiCall('/passes/' + encodeURIComponent(code), { method: 'DELETE' }); try { if (window._oabRefreshShareQr) setTimeout(window._oabRefreshShareQr, 400); if (window._dpDealShareRefresh) setTimeout(window._dpDealShareRefresh, 400); } catch (e) {}
         setBody('Pass widerrufen', '<div class="qbs-done"><div class="qbs-no" style="color:#D9685F;border-color:#D9685F">' + esc(code) + ' widerrufen</div><div class="qbs-note">Der Link funktioniert nicht mehr. Du kannst jederzeit einen neuen Pass erstellen.</div></div>');
       } catch (e) { toast('Widerrufen fehlgeschlagen.'); }
     });

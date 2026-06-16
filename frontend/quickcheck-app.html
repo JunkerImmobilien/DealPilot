@@ -2800,116 +2800,9 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
   .avm5-head .avm5-conf{margin-left:8px !important;}
   .avm5-head .avm5-x{margin-left:auto !important;}
 
-/* ===== v482-qc-cockpit: Quick-Check-Score auf Cockpit-Optik (Schwarz/Glow/health-box) ===== */
-.score-block {
-  background: #050505 !important;
-  border: none !important;
-  border-bottom: 2.5px solid var(--gold) !important;
-  box-shadow: 0 0 0 1px rgba(201,168,76,.18), 0 18px 50px rgba(0,0,0,.55), 0 0 60px rgba(63,165,108,.10) !important;
-}
-.score-block::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background: radial-gradient(120% 90% at 12% -10%, rgba(201,168,76,.14), transparent 58%);
-}
-.score-block > * { position: relative; z-index: 1; }
-#particle-canvas { opacity: .7 !important; }
-.score-block .sub, .score-block .sb-num {
-  background: rgba(201,168,76,.06) !important;
-  border: 1px solid rgba(201,168,76,.16) !important;
-  border-radius: 8px !important;
-  position: relative !important;
-  overflow: hidden !important;
-  transition: border-color .16s, transform .16s !important;
-}
-.score-block .sub::after, .score-block .sb-num::after {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-  background: #3FA56C; box-shadow: 0 0 6px rgba(63,165,108,.5);
-}
-.score-block .sub:hover, .score-block .sb-num:hover {
-  border-color: rgba(201,168,76,.35) !important;
-  transform: translateY(-1px) !important;
-}
-/* ===== /v482-qc-cockpit ===== */
-
-
-/* ===== v483-qc-optik: Score-Block pures Obsidian + .kpi health-box + groessere Werte + Partikel ===== */
-.score-block { background: #050505 !important; }
-.score-block .kpis { background: transparent !important; }
-
-/* v482 hatte versehentlich die Gauge-Zahl (.sb-num) als Karte gestylt -> zuruecknehmen */
-.score-block .sb-num { background: transparent !important; border: none !important; box-shadow: none !important; }
-.score-block .sb-num::after { display: none !important; }
-
-/* Bottom-KPI-Karten (Bruttomietr. ... Bewirtsch.) -> Cockpit-health-box */
-.score-block .kpis .kpi {
-  background: rgba(201,168,76,.06) !important;
-  border: 1px solid rgba(201,168,76,.16) !important;
-  border-radius: 8px !important;
-  position: relative !important;
-  overflow: hidden !important;
-  transition: border-color .16s, transform .16s !important;
-}
-.score-block .kpis .kpi::after {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-  background: #3FA56C; box-shadow: 0 0 6px rgba(63,165,108,.5);
-}
-.score-block .kpis .kpi:hover {
-  border-color: rgba(201,168,76,.35) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* Werte groesser + lesbar (Sans statt Serif), Karte bleibt gleich gross */
-.sub-v {
-  font-family: 'Space Grotesk','DM Sans',sans-serif !important;
-  font-size: 1.7rem !important; font-weight: 700 !important; line-height: 1 !important;
-}
-.score-block .kpis .kpi .v {
-  font-family: 'Space Grotesk','DM Sans',sans-serif !important;
-  font-size: 1.4rem !important; font-weight: 700 !important; line-height: 1.05 !important;
-}
-.score-block .kpis .kpi .l { font-size: 9px !important; letter-spacing: .3px !important; }
-.score-block .kpis .kpi .h { font-size: 8.5px !important; }
-
-/* Partikel praesenter */
-#particle-canvas { opacity: .95 !important; }
-/* ===== /v483-qc-optik ===== */
-
-
-/* ===== v484-qc-wow: Cockpit-Orbs + fliegende Partikel im Score-Block + Gauge-Glow ===== */
-#score-block { position: relative !important; overflow: hidden !important; }
-#score-block > *:not(.qc-bgfx) { position: relative; z-index: 1; }
-.qc-bgfx { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; border-radius: inherit; }
-.qc-bgfx .qc-fx-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.qc-bgfx .qc-orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .7; }
-.qc-bgfx .qc-orb.o1 { width: 460px; height: 460px; background: radial-gradient(circle, rgba(201,168,76,.45), transparent 70%); top: -130px; left: -90px; animation: qcOrb1 22s ease-in-out infinite; }
-.qc-bgfx .qc-orb.o2 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(201,168,76,.33), transparent 70%); bottom: -110px; right: 6%; animation: qcOrb2 26s ease-in-out infinite; }
-.qc-bgfx .qc-orb.o3 { width: 320px; height: 320px; background: radial-gradient(circle, rgba(167,139,54,.30), transparent 70%); top: 28%; left: 56%; animation: qcOrb3 18s ease-in-out infinite; }
-@keyframes qcOrb1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,40px)} }
-@keyframes qcOrb2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-50px,-30px)} }
-@keyframes qcOrb3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-50px)} }
-/* globalen Seiten-Canvas ausblenden - der In-Panel-Effekt ist reicher */
-#particle-canvas { display: none !important; }
-/* Gauge-Glow staerker (Wow) */
-.sb-mega svg { filter: drop-shadow(0 0 14px rgba(201,168,76,.45)) drop-shadow(0 4px 12px rgba(201,168,76,.30)) !important; }
-/* ===== /v484-qc-wow ===== */
 
 </style>
-<style id="qc-cp2-style">
-/* v525 QuickCheck-Cockpit: S / klein / Obsidian / dezente Partikel, Label unter Zeiger */
-#sb-mega { width:100% !important; max-width:300px !important; height:auto !important; min-height:0 !important; margin:0 auto !important; }
-#sb-mega > svg { display:none !important; }
-#sb-mega .sb-mega-text { display:none !important; }
-#sb-mega #qc-reaktor { width:100%; line-height:0; }
-#sb-mega #qc-reaktor svg { display:block !important; width:100% !important; height:auto !important; transform:none !important; filter:none !important; }
-.score-block .sub .sub-ic, .score-block .sub .sub-v, .score-block .sub .sub-tiny { display:none !important; }
-.score-block .sub .qc-mini { width:100%; max-width:92px; margin:2px auto 0; line-height:0; }
-.score-block .sub .qc-mini svg { display:block; width:100%; height:auto; }
-/* schwarz/obsidian + dezente Partikel, alte Gold-Vignette + app-Partikel raus */
-.score-block { background:#060608 !important; }
-.score-block::before { display:none !important; }
-#score-block #particle-canvas { display:none !important; }
-.qc-bgfx, .qc-bgfx .qc-orb, .qc-orb { display:none !important; }
-</style>
+
   <style id="dpmb-modal-white">
     /* v552: Modale weiss, Creme nur als Akzent (Kopf-Icon/Rahmen/Gold-Button bleiben) */
     .modal { background: #fff !important; }
@@ -3304,8 +3197,9 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
   .dp-pf-tile{ flex:1 1 100% !important; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
-<body>
+<body><!-- qb-rename-v699 -->
 
 <canvas id="particle-canvas"></canvas>
 
@@ -3407,7 +3301,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     <!-- Multi-Select: Abruf-Quellen frei kombinieren -->
     <span class="qc7-sources dp-pfbar" id="qc7-sources"><!-- v570-qcpf -->
       <span class="dp-pf-stripe"></span>
-      <div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot · Boarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
+      <div class="dp-pf-lead"><span class="bp">QUICKBOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot · Quickboarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
       <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">
         <label class="qc7-src dp-pf-tile dp-pf-soon-on" data-src="ph" title="Demnächst verfügbar"><!-- v644-coming-soon -->
           <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)" style="display:none" disabled>
@@ -3433,7 +3327,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
           <span class="dp-pf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></span><span class="dp-pf-lbl">Sprachaufzeichnung</span><span class="dp-pf-led"></span>
         </label>
       </div></div>
-      <a class="dp-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot öffnen"><svg class="dp-qr" viewBox="0 0 37 37" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-label="QR DealPilot"><rect width="37" height="37" fill="#fff"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM17 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM29 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM14 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM19 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM13 6h1v1h-1zM14 6h1v1h-1zM15 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM23 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM29 6h1v1h-1zM30 6h1v1h-1zM32 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM21 7h1v1h-1zM23 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM29 7h1v1h-1zM30 7h1v1h-1zM32 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM17 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM32 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM21 9h1v1h-1zM22 9h1v1h-1zM26 9h1v1h-1zM32 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM29 10h1v1h-1zM30 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM16 11h1v1h-1zM18 11h1v1h-1zM20 11h1v1h-1zM22 11h1v1h-1zM23 11h1v1h-1zM24 11h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM16 12h1v1h-1zM21 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM26 12h1v1h-1zM27 12h1v1h-1zM28 12h1v1h-1zM29 12h1v1h-1zM30 12h1v1h-1zM4 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM23 13h1v1h-1zM24 13h1v1h-1zM26 13h1v1h-1zM27 13h1v1h-1zM28 13h1v1h-1zM32 13h1v1h-1zM4 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM24 14h1v1h-1zM25 14h1v1h-1zM28 14h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM17 15h1v1h-1zM19 15h1v1h-1zM20 15h1v1h-1zM24 15h1v1h-1zM25 15h1v1h-1zM27 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM4 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM21 16h1v1h-1zM24 16h1v1h-1zM29 16h1v1h-1zM30 16h1v1h-1zM5 17h1v1h-1zM9 17h1v1h-1zM11 17h1v1h-1zM16 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM23 17h1v1h-1zM24 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM28 17h1v1h-1zM32 17h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM19 18h1v1h-1zM20 18h1v1h-1zM22 18h1v1h-1zM25 18h1v1h-1zM26 18h1v1h-1zM27 18h1v1h-1zM28 18h1v1h-1zM29 18h1v1h-1zM30 18h1v1h-1zM5 19h1v1h-1zM7 19h1v1h-1zM8 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM18 19h1v1h-1zM19 19h1v1h-1zM23 19h1v1h-1zM28 19h1v1h-1zM31 19h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM21 20h1v1h-1zM23 20h1v1h-1zM29 20h1v1h-1zM30 20h1v1h-1zM4 21h1v1h-1zM9 21h1v1h-1zM15 21h1v1h-1zM17 21h1v1h-1zM18 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM22 21h1v1h-1zM23 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM30 21h1v1h-1zM32 21h1v1h-1zM4 22h1v1h-1zM7 22h1v1h-1zM10 22h1v1h-1zM11 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM30 22h1v1h-1zM4 23h1v1h-1zM6 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM14 23h1v1h-1zM17 23h1v1h-1zM19 23h1v1h-1zM20 23h1v1h-1zM23 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM27 23h1v1h-1zM28 23h1v1h-1zM31 23h1v1h-1zM4 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM11 24h1v1h-1zM16 24h1v1h-1zM18 24h1v1h-1zM21 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM28 24h1v1h-1zM30 24h1v1h-1zM31 24h1v1h-1zM32 24h1v1h-1zM12 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM20 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM29 25h1v1h-1zM30 25h1v1h-1zM31 25h1v1h-1zM32 25h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM12 27h1v1h-1zM13 27h1v1h-1zM14 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h1v1h-1zM32 27h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM14 28h1v1h-1zM16 28h1v1h-1zM21 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM7 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM12 29h1v1h-1zM13 29h1v1h-1zM17 29h1v1h-1zM18 29h1v1h-1zM20 29h1v1h-1zM21 29h1v1h-1zM22 29h1v1h-1zM29 29h1v1h-1zM30 29h1v1h-1zM31 29h1v1h-1zM32 29h1v1h-1zM4 30h1v1h-1zM6 30h1v1h-1zM7 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h1v1h-1zM13 30h1v1h-1zM14 30h1v1h-1zM17 30h1v1h-1zM19 30h1v1h-1zM21 30h1v1h-1zM23 30h1v1h-1zM25 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM28 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM4 31h1v1h-1zM10 31h1v1h-1zM13 31h1v1h-1zM14 31h1v1h-1zM15 31h1v1h-1zM16 31h1v1h-1zM23 31h1v1h-1zM24 31h1v1h-1zM26 31h1v1h-1zM28 31h1v1h-1zM29 31h1v1h-1zM31 31h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM7 32h1v1h-1zM8 32h1v1h-1zM9 32h1v1h-1zM10 32h1v1h-1zM12 32h1v1h-1zM15 32h1v1h-1zM17 32h1v1h-1zM18 32h1v1h-1zM19 32h1v1h-1zM21 32h1v1h-1zM23 32h1v1h-1zM26 32h1v1h-1zM27 32h1v1h-1zM28 32h1v1h-1zM30 32h1v1h-1z" fill="#141210"/></svg><span class="dp-pf-scan">Scan ›</span></a><span class="dp-pf-rz"><span class="dp-pf-bc"></span><button class="dp-pf-launch qc6-run" data-provider="combo" onclick="QcApp.openCreditModal()"><!-- v575-qcbtn --><span class="dp-pf-ic"><svg class="dp-pf-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg></span> Abrufen</button></span>
+      <span class="dp-pf-rz"><span class="dp-pf-bc"></span><button class="dp-pf-launch qc6-run" data-provider="combo" onclick="QcApp.openCreditModal()"><!-- v575-qcbtn --><span class="dp-pf-ic"><svg class="dp-pf-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg></span> Abrufen</button></span>
     </span>
 
   </div>
@@ -3577,6 +3471,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       <div class="field">
         <label class="req" for="qc_hg">Hausgeld / Monat (€)</label>
         <input type="text" id="qc_hg" placeholder="221" inputmode="decimal" autocomplete="off">
+        <div class="qc-hg-hint" id="qc-hg-hint" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:5px 2px 0;min-height:14px"></div>
         <span class="hint">Inkl. Heizung + Rücklagen — wie auf Exposé. Faustregel: ~26% der NKM</span>
         <span class="source">PDF</span>
       </div>
@@ -4825,7 +4720,6 @@ const QcApp = (function() {
     <button class="avm5-min" type="button" title="Ein-/Ausklappen" onclick="QcApp.toggleAvmCard(event, this)">${QcIcons.svg('arrow',{size:13})}</button>
     <span class="avm5-provider"><img class="avm5-logo" src="img/${isSpr ? 'sprengnetter.jpg' : 'pricehubble.jpg'}" alt="${r.provider}" title="${r.provider}"></span>
     <span class="avm5-conf ${r.confClass}">${r.conf}</span>
-    <button class="avm5-x" onclick="QcApp.dismissAvm('${isSpr ? 'spr' : 'ph'}')" title="Verwerfen">✕</button>
   </div>
 
   ${lageInline}
@@ -5629,8 +5523,25 @@ function renderTransferList() {
     }
     setTimeout(function(){ _progressRender(null); }, 1400);
     showToast('✓ Abruf abgeschlossen (' + ordered.map(function(s){return labels[s];}).join(' + ') + ')');
+    try { _qbSetRunBtn('reset'); } catch(e){}
   }
 
+  function _qbSetRunBtn(mode){
+    var b=document.querySelector('.dp-pf-launch.qc6-run'); if(!b) return;
+    if(mode==='reset'){ b.innerHTML='<span class="dp-pf-ic"><svg class="dp-pf-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span> Neuer Vorgang'; b.setAttribute('onclick','QcApp.qbResetVorgang()'); }
+    else { b.innerHTML='<span class="dp-pf-ic"><svg class="dp-pf-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg></span> Abrufen'; b.setAttribute('onclick','QcApp.openCreditModal()'); }
+  }
+  function qbResetVorgang(){
+    if(!window.confirm('Wirklich verwerfen? Eingaben, importierte Daten und der geteilte Pass gehen verloren.')) return;
+    try { document.querySelectorAll('input[id^="qc_"],select[id^="qc_"],textarea[id^="qc_"]').forEach(function(el){ if(el.tagName==='SELECT'){el.selectedIndex=0;} else {el.value='';} try{el.dataset.userSet='';el.removeAttribute('data-user-set');}catch(e){} }); } catch(e){}
+    try { _photos=[]; var g=document.getElementById('photo-grid'); if(g) g.innerHTML=''; } catch(e){}
+    try { window._qcExposePhotos=[]; } catch(e){}
+    try { window.__qbPlzOrtLast=''; } catch(e){}
+    try { window.parent.postMessage({source:'dp-qc',type:'qc-reset-buffer'},'*'); } catch(e){}
+    _qbSetRunBtn('abrufen');
+    try { if (typeof scheduleUpdate==='function') scheduleUpdate(); } catch(e){}
+    showToast('Neuer Vorgang \u2014 alles zur\u00fcckgesetzt');
+  }
   function showToast(msg) {
     const t = document.createElement('div');
     t.className = 'toast';
@@ -5700,7 +5611,7 @@ function renderTransferList() {
     showApiKeyModal, closeApiModal, runRealAi,
     openSaveModal, closeSaveModal, confirmSave, toggleAllTransfer, setPdfPending,
     setSpanConfig, openQc6Settings, closeQc6Settings, toggleSource,
-    openCreditModal, closeCreditModal, confirmCreditModal, registerDpmb
+    openCreditModal, closeCreditModal, confirmCreditModal, registerDpmb, qbResetVorgang
   };
 })();
 
@@ -5801,18 +5712,39 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   function autoHg(){
     try {
       var IP = window.parent && window.parent.DealPilotInvestmentProfile;
-      if (!IP || typeof IP.getHausgeldMonthly !== "function") return;
-      var kpEl = document.getElementById("qc_kp"), hgEl = document.getElementById("qc_hg");
-      if (!kpEl || !hgEl) return;
-      function recalc(){
-        if (hgEl.dataset.userSet === "1") return;
-        var kp = num(kpEl.value); if (!kp) return;
-        var hg = IP.getHausgeldMonthly(kp); if (hg == null) return;
-        hgEl.dataset.autoHg = "1"; hgEl.value = String(hg).replace(".", ",");
-        try { hgEl.dispatchEvent(new Event("input", {bubbles:true})); } catch(e){}
+      if (!IP) return;
+      function pick(ids){ for (var i=0;i<ids.length;i++){ var e=document.getElementById(ids[i]); if (e) return e; } return null; }
+      var kpEl  = document.getElementById("qc_kp");
+      var hgEl  = document.getElementById("qc_hg");
+      var wflEl = pick(["qc_wfl","qc_wohnflaeche","qc_flae"]);
+      var bjEl  = pick(["qc_bj","qc_baujahr"]);
+      var ekEl  = pick(["qc_energieklasse","qc_energie","qc_ek"]);
+      if (!hgEl) return;
+      function renderHint(est){
+        var box = document.getElementById("qc-hg-hint"); if (!box) return;
+        if (hgEl.dataset.userSet === "1") { box.textContent = "Eigener/importierter Wert \u2014 wird \u00fcbernommen (keine Sch\u00e4tzung)."; return; }
+        if (est && est.grundlageText) {
+          var w = (est.plausibilitaet && est.plausibilitaet.hint) ? "  \u26a0 " + est.plausibilitaet.hint
+                 : (est.ungenau ? "  \u26a0 grobe Sch\u00e4tzung" : "");
+          box.textContent = est.grundlageText + w;
+        } else box.textContent = "";
       }
-      if (!hgEl._hgUserBound){ hgEl._hgUserBound = 1; hgEl.addEventListener("input", function(){ if (hgEl.dataset.autoHg === "1") { hgEl.dataset.autoHg = ""; } else { hgEl.dataset.userSet = "1"; } }); }
-      if (!kpEl._hgKpBound){ kpEl._hgKpBound = 1; kpEl.addEventListener("input", recalc); }
+      function recalc(){
+        if (hgEl.dataset.userSet === "1") { renderHint(null); return; }
+        var kp  = kpEl  ? num(kpEl.value)  : 0;
+        var wfl = wflEl ? num(wflEl.value) : 0;
+        var bj  = bjEl  ? (bjEl.value||"").trim() : "";
+        var ek  = ekEl  ? (ekEl.value||"").trim() : "";
+        var est = (typeof IP.getHausgeldEstimate === "function")
+          ? IP.getHausgeldEstimate(kp, { wohnflaeche: wfl, baujahr: bj, energieklasse: ek })
+          : (typeof IP.getHausgeldMonthly === "function" ? { monatlich: IP.getHausgeldMonthly(kp), grundlageText: "" } : null);
+        if (!est || est.monatlich == null || !isFinite(est.monatlich)) { renderHint(null); return; }
+        hgEl.dataset.autoHg = "1"; hgEl.value = String(Math.round(est.monatlich)).replace(".", ",");
+        try { hgEl.dispatchEvent(new Event("input", {bubbles:true})); } catch(e){}
+        renderHint(est);
+      }
+      if (!hgEl._hgUserBound){ hgEl._hgUserBound = 1; hgEl.addEventListener("input", function(){ if (hgEl.dataset.autoHg === "1") { hgEl.dataset.autoHg = ""; } else { hgEl.dataset.userSet = "1"; renderHint(null); } }); }
+      [kpEl, wflEl, bjEl, ekEl].forEach(function(el){ if (el && !el._hgBound){ el._hgBound = 1; el.addEventListener("input", recalc); el.addEventListener("change", recalc); } });
       recalc();
     } catch(e){}
   }
@@ -5831,6 +5763,23 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply); else apply();
   setTimeout(apply, 1500); /* Zinsdaten laden ggf. asynchron nach */
+  /* v719/dpfk-zins-retry: Marktzins kommt asynchron (Pfandbrief-Raten) -> mehrfach versuchen,
+     bis getZins() einen Wert liefert und qc_zins noch leer/unangetastet ist. */
+  (function(){
+    var tries = 0, MAX = 24;            /* ~ alle 700ms bis ~17s */
+    var iv = setInterval(function(){
+      tries++;
+      var zEl = document.getElementById("qc_zins");
+      if (!zEl) { if (tries >= MAX) clearInterval(iv); return; }
+      if (zEl.dataset.userSet === "1" || (zEl.value||"").trim() !== "") { clearInterval(iv); return; }
+      try {
+        var IP = window.parent && window.parent.DealPilotInvestmentProfile;
+        var z = (IP && typeof IP.getZins === "function") ? IP.getZins() : null;
+        if (z != null && isFinite(z) && z > 0) { setEmpty("qc_zins", z); clearInterval(iv); }
+      } catch(e){}
+      if (tries >= MAX) clearInterval(iv);
+    }, 700);
+  })();
 })();
 </script>
 <script id="qc-autoek">
@@ -5858,171 +5807,9 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 })();
 </script>
 
-<script>
-/* v484-qc-wow: Orbs + fliegende Partikel direkt im Score-Block (wie Cockpit-Hero) */
-(function () {
-  function init() {
-    var sb = document.getElementById('score-block');
-    if (!sb) { return false; }
-    if (sb.querySelector('.qc-bgfx')) { return true; }
-    var fx = document.createElement('div');
-    fx.className = 'qc-bgfx';
-    fx.innerHTML = '<canvas class="qc-fx-canvas"></canvas>' +
-      '<span class="qc-orb o1"></span><span class="qc-orb o2"></span><span class="qc-orb o3"></span>';
-    sb.insertBefore(fx, sb.firstChild);
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return true; }
-    var canvas = fx.querySelector('.qc-fx-canvas');
-    var ctx = canvas.getContext('2d');
-    var parts = [];
-    function size() {
-      var r = sb.getBoundingClientRect();
-      canvas.width = Math.max(1, Math.round(r.width));
-      canvas.height = Math.max(1, Math.round(r.height));
-    }
-    size();
-    if (window.ResizeObserver) { new ResizeObserver(size).observe(sb); }
-    else { window.addEventListener('resize', size); }
-    var N = 60;
-    for (var i = 0; i < N; i++) {
-      parts.push({
-        x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.28, vy: (Math.random() - 0.5) * 0.28,
-        r: Math.random() * 1.4 + 0.6, a: Math.random() * 0.5 + 0.3
-      });
-    }
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (var i = 0; i < parts.length; i++) {
-        for (var j = i + 1; j < parts.length; j++) {
-          var dx = parts[i].x - parts[j].x, dy = parts[i].y - parts[j].y;
-          var d = Math.sqrt(dx * dx + dy * dy);
-          if (d < 120) {
-            ctx.strokeStyle = 'rgba(201,168,76,' + ((1 - d / 120) * 0.18) + ')';
-            ctx.lineWidth = 0.5;
-            ctx.beginPath(); ctx.moveTo(parts[i].x, parts[i].y); ctx.lineTo(parts[j].x, parts[j].y); ctx.stroke();
-          }
-        }
-      }
-      ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(201,168,76,.7)';
-      parts.forEach(function (p) {
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(201,168,76,' + p.a + ')'; ctx.fill();
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-      });
-      ctx.shadowBlur = 0;
-      requestAnimationFrame(draw);
-    }
-    draw();
-    return true;
-  }
-  var tries = 0;
-  (function boot() {
-    if (init()) { return; }
-    if (tries++ < 40) { setTimeout(boot, 200); }
-  })();
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 100); });
-  }
-})();
-</script>
 
-<script>
-/* v525 QuickCheck-Cockpit: Reaktor-Halbkreis (#qc-reaktor) + 5 Mini-Tachos (#qc-mini-*)
-   aus Live-Werten (#sb-num, #sub-*-v). Tier-Wort UNTER dem Zeiger. Eigene dezente
-   90deg-Dreh-Fix per CSS. Kein eigener Partikel-Canvas (v528 entfernt). */
-(function () {
-  if (window.__qcCockpitPanel2) return;
-  window.__qcCockpitPanel2 = true;
 
-  var C = {
-    green: { base: '#226E46', glow: '#2FB06C', hot: '#49D38C' },
-    gold:  { base: '#C99A2E', glow: '#EFC23F', hot: '#FFD24A' },
-    red:   { base: '#9A3A30', glow: '#E04F3C', hot: '#FF6E55' }
-  };
-  function tkMain(s) { return s >= 70 ? 'green' : s >= 50 ? 'gold' : 'red'; }
-  function tkSub(s)  { return s >= 70 ? 'green' : s >= 50 ? 'gold' : 'red'; }
-  function labelFor(s) { return s >= 80 ? 'Sehr gut' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : 'Schwach'; }
-  var UID = 0;
-  function arcPts(cx, cy, r, t0, t1, n) {
-    var p = [];
-    for (var i = 0; i <= n; i++) { var t = t0 + (t1 - t0) * i / n, w = Math.PI * (1 - t); p.push((cx + r * Math.cos(w)).toFixed(1) + ',' + (cy - r * Math.sin(w)).toFixed(1)); }
-    return p.join(' ');
-  }
-  function gauge(score, label) {
-    var id = ++UID, cx = 120, cy = 116, r = 92, sw = 15;
-    var has = (score != null && !isNaN(score)), sc = has ? Math.max(0, Math.min(100, score)) : 0, t = sc / 100;
-    var g = has ? C[tkMain(sc)].glow : '#7a7a82', k = has ? tkMain(sc) : 'gold';
-    var grads = '<linearGradient id="z' + id + '" gradientUnits="userSpaceOnUse" x1="' + (cx - r) + '" y1="0" x2="' + (cx + r) + '" y2="0"><stop offset="0" stop-color="' + C.red.base + '"/><stop offset="0.5" stop-color="' + C.red.hot + '"/><stop offset="0.5" stop-color="' + C.gold.base + '"/><stop offset="0.727" stop-color="' + C.gold.hot + '"/><stop offset="0.727" stop-color="' + C.green.base + '"/><stop offset="1" stop-color="' + C.green.hot + '"/></linearGradient>';
-    var arcs = '<polyline points="' + arcPts(cx, cy, r, 0, 1, 44) + '" fill="none" stroke="url(#z' + id + ')" stroke-width="' + sw + '" stroke-linecap="butt" filter="url(#gl' + id + ')"/>';
-    var ticks = '';
-    for (var i = 0; i <= 10; i++) { var w = Math.PI * (1 - i / 10), r1 = r - sw / 2 - 3, r2 = r - sw / 2 - (i % 5 === 0 ? 11 : 6); ticks += '<line x1="' + (cx + r1 * Math.cos(w)).toFixed(1) + '" y1="' + (cy - r1 * Math.sin(w)).toFixed(1) + '" x2="' + (cx + r2 * Math.cos(w)).toFixed(1) + '" y2="' + (cy - r2 * Math.sin(w)).toFixed(1) + '" stroke="#54545e" stroke-width="' + (i % 5 === 0 ? 1.8 : 1) + '"/>'; }
-    var plasma = '', needle = '';
-    if (has) {
-      plasma = '<polyline points="' + arcPts(cx, cy, r, 0, t, 22) + '" fill="none" stroke="url(#pl' + id + ')" stroke-width="' + sw + '" stroke-linecap="butt" filter="url(#gl' + id + ')"/>';
-      var wN = Math.PI * (1 - t), nx = cx + (r - 12) * Math.cos(wN), ny = cy - (r - 12) * Math.sin(wN);
-      needle = '<line x1="' + cx + '" y1="' + cy + '" x2="' + nx.toFixed(1) + '" y2="' + ny.toFixed(1) + '" stroke="' + g + '" stroke-width="5" stroke-linecap="round" filter="url(#ng' + id + ')" opacity=".8"/><line x1="' + cx + '" y1="' + cy + '" x2="' + nx.toFixed(1) + '" y2="' + ny.toFixed(1) + '" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="' + nx.toFixed(1) + '" cy="' + ny.toFixed(1) + '" r="5" fill="#fff" filter="url(#ng' + id + ')"/>';
-    }
-    var hub = '<circle cx="' + cx + '" cy="' + cy + '" r="7.5" fill="' + g + '" filter="url(#ng' + id + ')"/><circle cx="' + cx + '" cy="' + cy + '" r="6" fill="#fff"/><circle cx="' + cx + '" cy="' + cy + '" r="2.6" fill="#0a0a0c"/>';
-    var pg = '<linearGradient id="pl' + id + '" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="' + C[k].base + '"/><stop offset=".55" stop-color="' + C[k].hot + '"/><stop offset="1" stop-color="' + C[k].glow + '"/></linearGradient>';
-    var num = has ? sc : '\u2013', lab = (label || '').trim();
-    return '<svg viewBox="0 0 240 150" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;overflow:visible"><defs>' + grads + pg
-      + '<filter id="gl' + id + '" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
-      + '<filter id="ng' + id + '" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.6"/></filter></defs>'
-      + '<path d="M' + (cx - r - 9) + ' ' + cy + ' A ' + (r + 9) + ' ' + (r + 9) + ' 0 0 1 ' + (cx + r + 9) + ' ' + cy + '" fill="none" stroke="#C99A2E" stroke-width="3.5" stroke-linecap="round" opacity=".9"/>'
-      + ticks + arcs + plasma + needle + hub
-      + '<text x="' + cx + '" y="' + (cy - 16) + '" text-anchor="middle" fill="#fff" stroke="#0a0a0c" stroke-width="3" paint-order="stroke" font-family="Cormorant Garamond, serif" font-weight="600" font-size="54" style="filter:drop-shadow(0 0 14px ' + g + '99)">' + num + '</text>'
-      + (lab ? '<text x="' + cx + '" y="' + (cy + 26) + '" text-anchor="middle" fill="' + g + '" stroke="#0a0a0c" stroke-width="1.8" paint-order="stroke" font-family="Cormorant Garamond, serif" font-style="italic" font-weight="600" font-size="19">' + lab + '</text>' : '')
-      + '<text x="' + (cx - r - 1) + '" y="' + (cy + 13) + '" text-anchor="middle" fill="#7a7a82" font-family="DM Sans, sans-serif" font-size="10">0</text>'
-      + '<text x="' + (cx + r + 1) + '" y="' + (cy + 13) + '" text-anchor="middle" fill="#7a7a82" font-family="DM Sans, sans-serif" font-size="10">100</text></svg>';
-  }
-  function mini(value) {
-    var id = ++UID, cx = 70, cy = 64, r = 52, sw = 9;
-    var has = (value != null && !isNaN(value)), v = has ? Math.max(0, Math.min(100, value)) : 0, t = v / 100, g = has ? C[tkSub(v)].glow : '#7a7a82';
-    var grads = '<linearGradient id="mz' + id + '" gradientUnits="userSpaceOnUse" x1="' + (cx - r) + '" y1="0" x2="' + (cx + r) + '" y2="0"><stop offset="0" stop-color="' + C.red.base + '"/><stop offset="0.5" stop-color="' + C.red.hot + '"/><stop offset="0.5" stop-color="' + C.gold.base + '"/><stop offset="0.794" stop-color="' + C.gold.hot + '"/><stop offset="0.794" stop-color="' + C.green.base + '"/><stop offset="1" stop-color="' + C.green.hot + '"/></linearGradient>';
-    var arcs = '<polyline points="' + arcPts(cx, cy, r, 0, 1, 30) + '" fill="none" stroke="url(#mz' + id + ')" stroke-width="' + sw + '" stroke-linecap="butt" filter="url(#mg' + id + ')"/>';
-    var needle = '';
-    if (has) { var w = Math.PI * (1 - t), nx = cx + (r - 7) * Math.cos(w), ny = cy - (r - 7) * Math.sin(w); needle = '<line x1="' + cx + '" y1="' + cy + '" x2="' + nx.toFixed(1) + '" y2="' + ny.toFixed(1) + '" stroke="#fff" stroke-width="2" stroke-linecap="round" style="filter:drop-shadow(0 0 3px ' + g + ')"/><circle cx="' + cx + '" cy="' + cy + '" r="3.5" fill="#fff"/>'; }
-    return '<svg viewBox="0 0 140 78" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;overflow:visible"><defs>' + grads + '<filter id="mg' + id + '" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' + arcs + needle + '<text x="' + cx + '" y="' + (cy - 6) + '" text-anchor="middle" fill="' + g + '" stroke="#0a0a0c" stroke-width="2" paint-order="stroke" font-family="Cormorant Garamond, serif" font-weight="600" font-size="22">' + (has ? v : '\u2013') + '</text></svg>';
-  }
-  function num(el) {
-    if (!el) return null;
-    var t = (el.textContent || '').replace(/\s/g, '');
-    if (t === '' || t === '-' || t === '\u2013') return null;
-    var m = t.match(/-?\d+/); if (!m) return null;
-    var n = parseInt(m[0], 10); return isNaN(n) ? null : n;
-  }
-  var SUBN = [['rendite'], ['cashflow'], ['sicherheit'], ['finanzierung'], ['effizienz']];
-  var sbl = document.getElementById('score-block');
-  var mo = null;
-  function paint() {
-    if (mo) mo.disconnect();
-    try {
-      var sc = num(document.getElementById('sb-num'));
-      var rk = document.getElementById('qc-reaktor');
-      if (rk) rk.innerHTML = gauge(sc, sc == null ? '' : labelFor(sc));
-      SUBN.forEach(function (s) { var v = num(document.getElementById('sub-' + s[0] + '-v')); var m = document.getElementById('qc-mini-' + s[0]); if (m) m.innerHTML = mini(v); });
-    } catch (e) {}
-    if (mo && sbl) mo.observe(sbl, { subtree: true, childList: true, characterData: true });
-    killBgFx();
-  }
-  if (sbl && typeof MutationObserver !== 'undefined') mo = new MutationObserver(function () { paint(); });
-  function killBgFx() {
-    try {
-      var bg = document.querySelector('.qc-bgfx');
-      if (bg) bg.style.setProperty('display', 'none', 'important');
-      var pc = document.getElementById('particle-canvas');
-      if (pc) pc.style.setProperty('display', 'none', 'important');
-      var orbs = document.querySelectorAll('.qc-orb');
-      for (var i = 0; i < orbs.length; i++) orbs[i].style.setProperty('display', 'none', 'important');
-    } catch (e) {}
-  }
-  killBgFx(); setTimeout(killBgFx, 300); setTimeout(killBgFx, 1200); setTimeout(killBgFx, 2500);
-  paint(); setTimeout(paint, 300); setTimeout(paint, 1200);
 
-})();
-</script>
   <script src="js/dealpilot-mb-qc.js?v=554"></script>
   <script src="js/immometrica-qc.js?v=667"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
@@ -6041,5 +5828,220 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 });}catch(e){}})();
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- qb-reskin4 (v702): schwarzer BG, groesserer + klickbarer QR-Stub. Liest LIVE-Werte; Auto-Pass-Trigger. -->
+<style id="qb-reskin-style4">
+#score-block .sb-header, #score-block .sb-hero, #score-block .kpis { display:none !important; }
+#score-block #particle-canvas, #score-block .qc-bgfx { display:none !important; }
+#score-block { background:transparent !important; border:none !important; box-shadow:none !important; overflow:visible !important; }
+#qb-bp{ --gold:#C9A84C;--gold-hi:#E8CC7A;--green:#3FA56C;--green-hi:#5BD98E;--red:#B8625C;--red-hi:#D9685F;
+  --cmut:#9a9080;--cline:rgba(201,168,76,.2);--ctrack:rgba(201,168,76,.14);
+  position:relative;display:flex;align-items:stretch;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(201,168,76,.22);background:#0a0a0a;color:#fff;
+  box-shadow:0 24px 60px -38px rgba(0,0,0,.9);font-family:'Space Grotesk','DM Sans',system-ui,sans-serif; }
+#qb-bp .qb-main{ flex:1;min-width:0;display:flex;flex-direction:column;background:#0a0a0a; }
+#qb-bp .ghead{ position:relative;overflow:hidden;display:flex;align-items:center;gap:9px;padding:11px 16px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 52%,#b8932f);min-height:44px; }
+#qb-bp .ghead::after{ content:"";position:absolute;inset:0;opacity:.42;pointer-events:none;background:repeating-linear-gradient(102deg,rgba(255,255,255,.10) 0 1px,transparent 1px 8px); }
+#qb-bp .ghead .t{ position:relative;z-index:2;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#5a4a14;font-weight:700; }
+#qb-bp .ghead .r{ position:relative;z-index:2;margin-left:auto;display:flex;align-items:center;gap:7px; }
+#qb-bp .htier{ font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:700;padding:3px 8px;border-radius:7px;background:#0a0a0a; }
+#qb-bp .hstat{ font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:.06em;color:#0a0a0a;background:rgba(10,10,10,.14);border:1px dashed rgba(10,10,10,.4);border-radius:6px;padding:2px 7px; }
+#qb-bp .contrail{ position:absolute;top:50%;left:12%;right:38%;height:2px;transform:translateY(-50%);z-index:1;background:repeating-linear-gradient(90deg,rgba(255,255,255,.65) 0 5px,transparent 5px 11px); }
+#qb-bp .flyico{ position:absolute;top:50%;color:#070707;transform:translate(-50%,-50%);z-index:1;animation:qbfly 5s ease-in-out infinite; }
+#qb-bp .flyico svg{ height:17px;width:auto;display:block; }
+@keyframes qbfly{0%{left:12%;opacity:.25}10%{opacity:1}55%{left:62%;opacity:1}55.01%{opacity:0}56%{left:12%}66%{opacity:.25}100%{left:12%;opacity:.25}}
+@media (prefers-reduced-motion: reduce){ #qb-bp .flyico{animation:none} }
+#qb-bp .mbody{ padding:16px 18px;display:flex;align-items:center;gap:20px; }
+@media(max-width:640px){ #qb-bp .mbody{flex-direction:column;gap:10px} }
+#qb-bp .dialwrap{ flex:none; }
+#qb-bp .cbars{ flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;width:100%; }
+#qb-bp .cb{ display:flex;align-items:center;gap:10px; }
+#qb-bp .cb .cl{ font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--cmut);width:74px;flex:none; }
+#qb-bp .cb .bar{ flex:1;height:6px;border-radius:99px;background:var(--ctrack);overflow:hidden; }
+#qb-bp .cb .bar i{ display:block;height:100%;border-radius:99px;transition:width .5s cubic-bezier(.2,.7,.2,1); }
+#qb-bp .cb .cv{ font-weight:700;font-size:12px;width:24px;text-align:right; }
+#qb-bp .kt{ display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--cline); }
+@media(max-width:760px){ #qb-bp .kt{grid-template-columns:repeat(4,1fr)} }
+@media(max-width:460px){ #qb-bp .kt{grid-template-columns:repeat(2,1fr)} }
+#qb-bp .kt .k{ position:relative;padding:10px 5px;text-align:center;border-left:2px dashed var(--cline); }
+#qb-bp .kt .k:first-child{ border-left:0; }
+#qb-bp .kt .k::before,#qb-bp .kt .k::after{ content:"";position:absolute;left:-6px;width:11px;height:11px;border-radius:50%;background:#050505; }
+#qb-bp .kt .k:first-child::before,#qb-bp .kt .k:first-child::after{ display:none; }
+#qb-bp .kt .k::before{ top:-6px; } #qb-bp .kt .k::after{ bottom:-6px; }
+#qb-bp .kt .l{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.05em;text-transform:uppercase;color:var(--cmut); }
+#qb-bp .kt .v{ font-weight:700;font-size:13px;margin:2px 0 1px;color:#fff; }
+#qb-bp .kt .h{ font-size:7.5px;color:var(--cmut); }
+/* QR-Stub rechts — groesser */
+#qb-bp .qb-tear{ position:relative;width:0;border-left:3px dashed rgba(201,168,76,.5);flex:none; }
+#qb-bp .qb-tear::before,#qb-bp .qb-tear::after{ content:"";position:absolute;left:-13px;width:25px;height:25px;border-radius:50%;background:#050505; }
+#qb-bp .qb-tear::before{ top:-13px; } #qb-bp .qb-tear::after{ bottom:-13px; }
+#qb-bp .qb-stub{ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px 20px;width:208px;background:#fff;flex:none; }
+#qb-bp .qb-stub .bp{ font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.18em;color:#8d846d; }
+#qb-bp .qb-stub .qrlink{ display:block;line-height:0;border-radius:10px;cursor:pointer;transition:transform .14s,box-shadow .14s; }
+#qb-bp .qb-stub .qrlink:hover{ transform:translateY(-1px);box-shadow:0 8px 20px -8px rgba(201,168,76,.6); }
+#qb-bp .qb-stub .qrtile{ width:128px;height:128px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid #efe7cf; }
+#qb-bp .qb-stub .qrtile img,#qb-bp .qb-stub .qrtile canvas{ display:block;border-radius:4px; }
+#qb-bp .qb-stub .qrtile .ph{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;color:#b9ad88;text-align:center;line-height:1.6;padding:6px; }
+#qb-bp .qb-stub .no{ font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;color:#1a1407; }
+#qb-bp .qb-stub .lnk{ font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#9a7f33;text-decoration:none;border-bottom:1px dashed #cdbb80; }
+#qb-bp .qb-stub .lnk:hover{ color:#5a4a14; }
+#qb-bp .qb-stub .cap{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:#9a8f6a; }
+@media(max-width:560px){ #qb-bp{flex-direction:column} #qb-bp .qb-tear{display:none} #qb-bp .qb-stub{flex-direction:row;flex-wrap:wrap;gap:14px;border-top:2px dashed rgba(201,168,76,.4)} }
+</style>
+<script id="qb-reskin4-js">
+(function(){
+  'use strict';
+  var CATS=['rendite','cashflow','sicherheit','finanzierung','effizienz'];
+  var CATL={rendite:'Rendite',cashflow:'Cashflow',sicherheit:'Sicherheit',finanzierung:'Finanz.',effizienz:'Effizienz'};
+  var KPI=[['kpi-bmr','Bruttomietr.','\u22655%'],['kpi-nmr','Nettomietr.','\u22653%'],['kpi-ekr','EK-Rendite','\u22657%'],
+           ['kpi-cf','Cashflow/Mo','\u22650\u20ac'],['kpi-dscr','DSCR','\u22651,2'],['kpi-ltv','LTV','<90%'],['kpi-bwk','Bewirtsch.','18\u201335%']];
+  function tc(s){return s>=70?'#3FA56C':s>=50?'#C9A84C':'#B8625C';}
+  function th(s){return s>=70?'#5BD98E':s>=50?'#E8CC7A':'#D9685F';}
+  function tl(s){return s>=70?'STARK':s>=50?'SOLIDE':'SCHWACH';}
+  function jet(){return '<svg viewBox="0 0 24 24" fill="currentColor"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>';}
+  function num(el){ if(!el)return null; var t=(el.textContent||'').replace(/\s/g,''); if(t===''||t==='-'||t==='\u2013')return null; var m=t.match(/-?\d+/); if(!m)return null; var n=parseInt(m[0],10); return isNaN(n)?null:n; }
+  function pt(cx,cy,r,d){var a=(d-90)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+  function aP(cx,cy,r,d0,d1){var p=[],N=Math.max(8,Math.round(Math.abs(d1-d0)/4));for(var i=0;i<=N;i++){var d=d0+(d1-d0)*i/N,q=pt(cx,cy,r,d);p.push((i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1));}return p.join(' ');}
+  function dial(s,z){
+    var c=z/2,r=z*0.38,D0=225,D1=495; var has=(s!=null);
+    var dv=D0+(D1-D0)*(has?s:0)/100,o='';
+    for(var t=0;t<=100;t+=5){var dd=D0+(D1-D0)*t/100,p1=pt(c,c,r,dd),p2=pt(c,c,r-(t%25===0?z*0.07:z*0.04),dd);
+      o+='<line x1="'+p1[0].toFixed(1)+'" y1="'+p1[1].toFixed(1)+'" x2="'+p2[0].toFixed(1)+'" y2="'+p2[1].toFixed(1)+'" stroke="'+(t%25===0?'#C9A84C':'rgba(201,168,76,.4)')+'" stroke-width="'+(t%25===0?2:1)+'"/>';}
+    var np=pt(c,c,r-z*0.1,dv),b1=pt(c,c,z*0.045,dv+90),b2=pt(c,c,z*0.045,dv-90);
+    var col=has?tc(s):'#8d7430', colh=has?th(s):'#8d7430';
+    return '<svg viewBox="0 0 '+z+' '+z+'" width="'+z+'" height="'+z+'"><defs><filter id="qbg'+z+'"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
+      '<path d="'+aP(c,c,r,D0,D1)+'" fill="none" stroke="rgba(201,168,76,.16)" stroke-width="'+(z*0.07)+'" stroke-linecap="round"/>'+
+      (has?'<path d="'+aP(c,c,r,D0,dv)+'" fill="none" stroke="'+col+'" stroke-width="'+(z*0.07)+'" stroke-linecap="round" filter="url(#qbg'+z+')"/>':'')+o+
+      (has?'<polygon points="'+np[0].toFixed(1)+','+np[1].toFixed(1)+' '+b1[0].toFixed(1)+','+b1[1].toFixed(1)+' '+b2[0].toFixed(1)+','+b2[1].toFixed(1)+'" fill="'+colh+'" filter="url(#qbg'+z+')"/>':'')+
+      '<circle cx="'+c+'" cy="'+c+'" r="'+(z*0.055)+'" fill="#0a0a0a" stroke="'+col+'" stroke-width="1.6"/>'+
+      '<text x="'+c+'" y="'+(c-z*0.03)+'" text-anchor="middle" dominant-baseline="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(z*0.24)+'" fill="#fff">'+(has?s:'\u2013')+'</text>'+
+      '<text x="'+c+'" y="'+(c+z*0.14)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="'+(z*0.058)+'" letter-spacing="1.2" fill="'+colh+'">'+(has?tl(s):'')+'</text></svg>';
+  }
+  function gatherInputs(){ var o={},els=document.querySelectorAll('input[id^="qc_"],select[id^="qc_"],textarea[id^="qc_"]'); for(var i=0;i<els.length;i++){var el=els[i],k=el.id.slice(3); if(k) o[k]=el.value;} return o; }
+  function gatherPhotos(){ var out=[],imgs=document.querySelectorAll('#photo-grid img'); for(var i=0;i<imgs.length&&out.length<6;i++){ var src=imgs[i].getAttribute('src')||''; if(src) out.push(src); } return out; }
+  var _apLast=0,_apT=0;
+  function maybeAutopass(s){
+    if(s==null) return;
+    var now=Date.now();
+    if(now-_apLast<800){ if(_apT) return; _apT=setTimeout(function(){_apT=0;maybeAutopass(num(document.getElementById('sb-num')));},800); return; }
+    _apLast=now;
+    try{ window.parent.postMessage({source:'dp-qc',type:'qc-autopass',inputs:gatherInputs(),photos:gatherPhotos()},'*'); }catch(e){}
+  }
+  var _shareUrl='';
+  function renderQR(url,code,tries){
+    tries=tries||0;
+    var tile=document.getElementById('qb-qrtile'),no=document.getElementById('qb-passno'),
+        a=document.getElementById('qb-qrlink'),lnk=document.getElementById('qb-qrurl');
+    if(url){ _shareUrl=url; }
+    if(no&&code) no.textContent=code;
+    if(a&&_shareUrl){ a.href=_shareUrl; }
+    if(lnk&&_shareUrl){ lnk.href=_shareUrl; lnk.style.visibility='visible'; }
+    if(!tile) return;
+    if(!window.QRCode){ if(tries<20) return void setTimeout(function(){renderQR(url,code,tries+1);},250); return; }
+    if(_shareUrl){ tile.innerHTML=''; try{ new window.QRCode(tile,{text:_shareUrl,width:116,height:116,colorDark:'#141210',colorLight:'#fff',correctLevel:window.QRCode.CorrectLevel.M}); }catch(e){} }
+  }
+  window.addEventListener('message',function(ev){ var d=ev.data; if(!d||d.source!=='dp-app') return; if(d.type==='qc-autopass-code') renderQR(d.url,d.code,0); });
+
+  function paint(){
+    var sb=document.getElementById('score-block'); if(!sb) return;
+    var s=num(document.getElementById('sb-num'));
+    var d=document.getElementById('qb-dial'); if(d) d.innerHTML=dial(s,128);
+    var cb=document.getElementById('qb-cbars');
+    if(cb){ cb.innerHTML=CATS.map(function(name){
+      var v=num(document.getElementById('sub-'+name+'-v'));
+      var w=(v==null?0:Math.max(0,Math.min(100,v)));
+      var col=(v==null?'rgba(201,168,76,.3)':tc(v));
+      return '<div class="cb"><span class="cl">'+CATL[name]+'</span><div class="bar"><i style="width:'+w+'%;background:'+col+'"></i></div><span class="cv" style="color:'+(v==null?'#9a9080':th(v))+'">'+(v==null?'\u2013':v)+'</span></div>';
+    }).join(''); }
+    var kt=document.getElementById('qb-kt');
+    if(kt){ kt.innerHTML=KPI.map(function(k){
+      var src=document.getElementById(k[0]); var sv=src?src.querySelector('.v'):null;
+      var txt=sv?(sv.textContent||'\u2014'):'\u2014'; var col='';
+      try{ if(sv){ var c=getComputedStyle(sv).color; if(c) col='color:'+c; } }catch(e){}
+      return '<div class="k"><div class="l">'+k[1]+'</div><div class="v" style="'+col+'">'+txt+'</div><div class="h">'+k[2]+'</div></div>';
+    }).join(''); }
+    var ht=document.getElementById('qb-htier');
+    if(ht){ if(s==null){ht.textContent='';} else { ht.textContent=tl(s); ht.style.color=th(s); } }
+    var hs=document.getElementById('qb-hstat'); var stEl=document.getElementById('sb-status');
+    if(hs && stEl){ var raw=(stEl.textContent||'').split('\u00b7').pop().trim(); hs.textContent=raw||'PRE-FLIGHT'; }
+    maybeAutopass(s);
+  }
+  var _raf=0; function schedule(){ if(_raf) return; _raf=requestAnimationFrame(function(){ _raf=0; paint(); }); }
+  function boot(){
+    var sb=document.getElementById('score-block'); if(!sb){ return setTimeout(boot,150); }
+    if(!document.getElementById('qb-bp')){
+      var bp=document.createElement('div'); bp.id='qb-bp';
+      bp.innerHTML='<div class="qb-main">'+
+          '<div class="ghead"><span class="contrail"></span><span class="flyico" id="qb-fly"></span><span class="t">Quick Boarding</span><span class="r"><span class="hstat" id="qb-hstat"></span><span class="htier" id="qb-htier"></span></span></div>'+
+          '<div class="mbody"><div class="dialwrap" id="qb-dial"></div><div class="cbars" id="qb-cbars"></div></div>'+
+          '<div class="kt" id="qb-kt"></div>'+
+        '</div>'+
+        '<div class="qb-tear"></div>'+
+        '<div class="qb-stub" id="qb-stub"><span class="bp">QUICKBOARDING PASS</span>'+
+          '<a class="qrlink" id="qb-qrlink" href="#" target="_blank" rel="noopener"><div class="qrtile" id="qb-qrtile"><span class="ph">QR<br>nach<br>Score</span></div></a>'+
+          '<span class="no" id="qb-passno">\u2014</span>'+
+          '<a class="lnk" id="qb-qrurl" href="#" target="_blank" rel="noopener" style="visibility:hidden">Karte \u00f6ffnen \u203a</a>'+
+          '<span class="cap">Scan \u203a \u00fcbernehmen</span></div>';
+      sb.appendChild(bp);
+    }
+    var fly=document.getElementById('qb-fly'); if(fly) fly.innerHTML=jet();
+    if(typeof MutationObserver!=='undefined'){ try{ new MutationObserver(schedule).observe(sb,{subtree:true,childList:true,characterData:true}); }catch(e){} }
+    paint(); setTimeout(paint,300); setTimeout(paint,1200);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+
+<style id="qb-pfbar-fix">/* v705: weisser Kasten wieder rechtsbuendig (QR war frueher der Schieber) */
+#qc7-sources .dp-pf-rz{margin-left:auto !important}</style>
+<style id="qb-sticky-fix">/* v708: Quickboarding-Karte scrollt normal mit (kein Kleben) */
+.score-perspective{position:static !important;top:auto !important;z-index:auto !important}</style>
+<style id="qb-credithint-skin">/* v715: Kerosin-Hinweis im QC = gleiche Optik wie Objekt-Tab (.oab-credit-hint) */
+.qc-credit-hint{color:var(--ch2,#6b6660) !important;background:rgba(201,168,76,0.08) !important;border:1px solid rgba(201,168,76,0.22) !important;border-radius:9px !important;font:500 12px/1.3 'DM Sans',system-ui,sans-serif !important}
+.qc-credit-hint b{color:var(--ch,#2A2727) !important;font-weight:700 !important}
+.qc-credit-dot{background:var(--gold,#C9A84C) !important;box-shadow:0 0 0 3px rgba(201,168,76,0.18) !important}</style>
+<style id="qb-pflead">/* v723: PRE-FLIGHT-Kopfzeile ueber der QC-Quellenleiste (wie Objekt-Tab) */
+.qc-pf-lead{display:inline-flex;align-items:center;gap:12px;margin:0 0 10px;padding:8px 14px;border:1px solid rgba(201,168,76,.35);border-radius:10px;background:rgba(201,168,76,.06)}
+.qc-pf-lead-txt{display:flex;align-items:baseline;gap:8px}
+.qc-pf-lead-txt b{font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:.12em;color:#2A2727}
+.qc-pf-lead-txt small{font:500 11.5px/1 'DM Sans',system-ui,sans-serif;color:#7A7370}
+.qc-pf-lead-cnt{font:600 12px/1 'DM Sans',system-ui,sans-serif;color:#7a5d18;background:rgba(201,168,76,.16);padding:4px 10px;border-radius:20px}
+.qc-pf-lead-cnt b{font-weight:700;color:#2A2727}</style>
+<script>/* qb-pflead: statische Anzeige + Live-Zaehler aktiver Quellen */
+(function(){
+  'use strict';
+  function update(){
+    var bar=document.getElementById('qc7-sources');
+    var cnt=document.querySelector('#qc-pf-lead .qc-pf-lead-cnt b'); if(!bar||!cnt) return;
+    var n=bar.querySelectorAll('input[type=checkbox]:checked').length;
+    if(!n) n=bar.querySelectorAll('.dp-pf-tile.on').length;
+    cnt.textContent=n;
+  }
+  function build(){
+    var bar=document.getElementById('qc7-sources'); if(!bar) return false;
+    if(!document.getElementById('qc-pf-lead')){
+      var lead=document.createElement('div'); lead.id='qc-pf-lead'; lead.className='qc-pf-lead';
+      lead.innerHTML='<span class="qc-pf-lead-txt"><b>PRE-FLIGHT</b><small>Quellen w\u00e4hlen \u00b7 Boarding</small></span>'+
+        '<span class="qc-pf-lead-cnt"><b>0</b> aktiv</span>';
+      bar.parentNode.insertBefore(lead, bar);
+      bar.addEventListener('change', update, true);
+      bar.addEventListener('click', function(){ setTimeout(update,0); }, true);
+    }
+    update(); return true;
+  }
+  var tries=0; var iv=setInterval(function(){ tries++; if(build() || tries>40) clearInterval(iv); }, 300);
+})();
+</script>
 </body>
 </html>

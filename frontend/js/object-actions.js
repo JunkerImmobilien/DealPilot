@@ -208,7 +208,7 @@
     var avmOff = !(_avmHealth && _avmHealth.available);
     var _doc = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>';
     var _mic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>';
-    var _plane = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>';
+    var _plane = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>';
     // PRE-FLIGHT-Kachel mit verstecktem Checkbox-Input (Logik unveraendert) + LED an .on
     function pfTileLogo(value, inner, disabled, title, extraCls) {
       return '<label class="dp-pf-tile' + (disabled ? ' dp-pf-disabled' : '') + (extraCls ? ' ' + extraCls : '') + '" data-src="' + value + '"' + (title ? ' title="' + title + '"' : '') + '>' +
@@ -240,7 +240,7 @@
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen \u2014 1 L Kerosin') : '') +
           '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
         '</div></div>' +
-        '<a class="dp-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run"><span class="dp-pf-ic">' + _plane + '</span> Abrufen</button>' + '</span>' +
+        '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run"><span class="dp-pf-ic">' + _plane + '</span> Abrufen</button>' + '</span>' +
       '</div></div>' +
       '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
       (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Marktradar (PriceHubble/Sprengnetter) ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
@@ -258,6 +258,31 @@
     } catch (e) {}
     /* v570-pf: alter qc7-src-Listener ersetzt durch dp-pf-tile-Bind im Render */
     $('oab-run').addEventListener('click', runSelected);
+    /* F1/qb-objqr: aktiver Shared-Pass fuers aktuelle Objekt -> echten QR in .dp-pf-qr rendern */
+    function _updateShareQr(){
+      var a = document.getElementById('oab-pf-qr'); if (!a) return;
+      var objId = window._currentObjKey;
+      if (!objId || !window.Auth || typeof window.Auth.apiCall !== 'function') return;
+      window.Auth.apiCall('/passes', { method: 'GET' }).then(function (res) {
+        var items = (res && res.items) || [], now = Date.now(), m = null;
+        for (var i = 0; i < items.length; i++) { var p = items[i];
+          if (p.object_id === objId && !p.revoked_at && new Date(p.expires_at).getTime() > now) { m = p; break; } }
+        if (m && window.DpQr) {
+          var url = location.origin + '/pass.html?c=' + encodeURIComponent(m.code);
+          a.setAttribute('href', url); a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener');
+          a.setAttribute('title', 'Geteilter Pass ' + m.code);
+          a.innerHTML = window.DpQr.svg(url, { ecc: 'M', border: 1 }) + '<span class="dp-pf-scan">Pass \u203a</span>';
+          a.setAttribute('data-shared', '1');
+        } else { a.removeAttribute('data-shared'); }
+      }).catch(function () {});
+    }
+    function _startShareQrWatch(){
+      if (window._oabShareQrWatch) return; window._oabShareQrWatch = 1;
+      var last = window._currentObjKey;
+      setInterval(function () { if (window._currentObjKey !== last) { last = window._currentObjKey; try { _updateShareQr(); } catch (e) {} } }, 1500);
+    }
+    window._oabRefreshShareQr = _updateShareQr;
+    try { _updateShareQr(); _startShareQrWatch(); } catch (e) {}
     /* v656: ImmoMetrica-Tile gating + direkte Aktion */
     try {
       var _imoTile = mount.querySelector('[data-src="immometrica"]');
@@ -1185,7 +1210,7 @@
   function autoInit() { if ($(MOUNT_ID)) { init(); return; } if (_tries++ < 40) setTimeout(autoInit, 250); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoInit); else setTimeout(autoInit, 0);
   window.addEventListener('load', autoInit);
-  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm, applyQcPending: applyQcPending,
+  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm, applyQcPending: applyQcPending, getQcPending: function(){ return _qcPendingMerged; }, setQcPending: function(p){ _qcPendingMerged=(p&&typeof p==='object')?p:{}; }, clearQcPending: function(){ _qcPendingMerged={}; },
     /* v503-voice-bridge: Sprach-Ergebnisliste ueber die Import-Mechanik (gleiche Optik,
        gleicher Schreibweg inkl. Sterne + QC-Bucket-Logik). */
     _voice: {

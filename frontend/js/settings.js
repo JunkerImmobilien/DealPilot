@@ -897,6 +897,7 @@ function _swSet(btn) {
     if (window.DealPilotInvestmentProfile) {
       var host = document.getElementById('ip-pane-host');
       if (host) host.innerHTML = window.DealPilotInvestmentProfile.renderPaneHtml();
+      try { if (window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.wireMarketRate) DealPilotInvestmentProfile.wireMarketRate(); } catch(e){}
     }
     var sel = document.getElementById('set_startup_view');
     if (sel) {

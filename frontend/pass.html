@@ -72,6 +72,17 @@ svg{overflow:visible;display:block}
 .lb{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
 .lb.on{display:flex}.lb img{max-width:100%;max-height:100%;border-radius:10px}
 @media (prefers-reduced-motion: reduce){.flyico{animation:none}}
+/* qb-stammdaten */
+.more{border-top:1px solid var(--line);margin-top:2px}
+.more>summary{list-style:none;cursor:pointer;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);padding:12px 0 10px;font-weight:700}
+.more>summary::-webkit-details-marker{display:none}
+.more>summary::after{content:' \25be';color:var(--gold)}
+.more[open]>summary::after{content:' \25b4'}
+.mlist{display:grid;grid-template-columns:1fr 1fr;gap:7px 16px;padding:0 0 6px}
+@media(max-width:460px){.mlist{grid-template-columns:1fr}}
+.mrow{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed rgba(201,168,76,.14);padding:6px 0}
+.mrow .ml{font-family:var(--mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:#9a9080}
+.mrow .mv{font-family:var(--display);font-weight:600;font-size:12px;color:#e9e3d2;text-align:right}
 </style></head>
 <body>
 <div class="bg"></div><canvas class="px"></canvas>
@@ -91,7 +102,7 @@ function aP(cx,cy,r,d0,d1){var p=[],N=Math.max(8,Math.round(Math.abs(d1-d0)/4));
 function dial(s,z){s=Math.max(0,Math.min(100,s));var c=z/2,r=z*0.38,D0=225,D1=495,dv=D0+(D1-D0)*s/100,o='';for(var t=0;t<=100;t+=5){var dd=D0+(D1-D0)*t/100,p1=pt(c,c,r,dd),p2=pt(c,c,r-(t%25===0?z*0.07:z*0.04),dd);o+='<line x1="'+p1[0].toFixed(1)+'" y1="'+p1[1].toFixed(1)+'" x2="'+p2[0].toFixed(1)+'" y2="'+p2[1].toFixed(1)+'" stroke="'+(t%25===0?'#C9A84C':'rgba(201,168,76,.4)')+'" stroke-width="'+(t%25===0?2:1)+'"/>';}var np=pt(c,c,r-z*0.1,dv),b1=pt(c,c,z*0.045,dv+90),b2=pt(c,c,z*0.045,dv-90);return '<svg viewBox="0 0 '+z+' '+z+'" width="'+z+'" height="'+z+'"><defs><filter id="gg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="'+aP(c,c,r,D0,D1)+'" fill="none" stroke="rgba(201,168,76,.16)" stroke-width="'+(z*0.07)+'" stroke-linecap="round"/><path d="'+aP(c,c,r,D0,dv)+'" fill="none" stroke="'+tc(s)+'" stroke-width="'+(z*0.07)+'" stroke-linecap="round" filter="url(#gg)"/>'+o+'<polygon points="'+np[0].toFixed(1)+','+np[1].toFixed(1)+' '+b1[0].toFixed(1)+','+b1[1].toFixed(1)+' '+b2[0].toFixed(1)+','+b2[1].toFixed(1)+'" fill="'+th(s)+'" filter="url(#gg)"/><circle cx="'+c+'" cy="'+c+'" r="'+(z*0.055)+'" fill="#0a0a0a" stroke="'+tc(s)+'" stroke-width="1.6"/><text x="'+c+'" y="'+(c-z*0.03)+'" text-anchor="middle" dominant-baseline="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(z*0.24)+'" fill="#fff">'+s+'</text><text x="'+c+'" y="'+(c+z*0.14)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="'+(z*0.058)+'" letter-spacing="1.2" fill="'+th(s)+'">'+tl(s)+'</text></svg>';}
 
 // Deutsche Zahl -> Number ("180.000" / "1.180,50")
-function num(v){if(v==null)return 0;var s=String(v).trim().replace(/\./g,'').replace(',','.').replace(/[^0-9.\-]/g,'');var n=parseFloat(s);return isFinite(n)?n:0;}
+function num(v){/*qb-num-decimalfix*/if(v==null)return 0;var s=String(v).trim();if(s.indexOf(',')<0&&/^-?\d+\.\d{1,2}$/.test(s)){var f=parseFloat(s);return isFinite(f)?f:0;}s=s.replace(/\./g,'').replace(',','.').replace(/[^0-9.\-]/g,'');var n=parseFloat(s);return isFinite(n)?n:0;}
 function eur(n){try{return new Intl.NumberFormat('de-DE',{maximumFractionDigits:0}).format(Math.round(n))+' €';}catch(e){return Math.round(n)+' €';}}
 function pct(n){return n.toFixed(1).replace('.',',')+' %';}
 
@@ -114,6 +125,33 @@ function quickScore(k){
 
 function imgSrc(p){if(!p)return '';return /^data:/.test(p)?p:('data:image/jpeg;base64,'+p);}
 
+function fmtAnalysis(raw){
+  raw = String(raw||'').trim();
+  if(!raw) return '';
+  var obj=null; try { obj=JSON.parse(raw); } catch(e){ obj=null; }
+  if(!obj || typeof obj!=='object'){ return esc(raw).replace(/\n/g,'<br>'); }
+  var LBL={gesamtbewertung:'Gesamtbewertung',fazit_kurz:'Fazit',empfehlung:'Empfehlung',staerken:'St\u00e4rken',schwaechen:'Schw\u00e4chen',risiken:'Risiken',chancen:'Chancen',verhandlung:'Verhandlung',hinweise:'Hinweise',score:'Score'};
+  var ORD=['fazit_kurz','gesamtbewertung','staerken','schwaechen','chancen','risiken','verhandlung','empfehlung','hinweise'];
+  var L_LBL="font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9a8a52;margin:14px 0 5px";
+  var L_P='color:#d8d4cc;font-size:13px;line-height:1.55';
+  var L_UL='margin:4px 0 0;padding-left:18px;color:#d8d4cc;font-size:13px;line-height:1.5';
+  var out='', seen={};
+  function blk(key){
+    if(!(key in obj)) return; seen[key]=1;
+    var v=obj[key]; var lbl=LBL[key]||key;
+    if(Array.isArray(v)){
+      var it=v.filter(function(x){return x!=null && String(x).trim()!=='';});
+      if(!it.length) return;
+      out+='<div style="'+L_LBL+'">'+esc(lbl)+'</div><ul style="'+L_UL+'">'+it.map(function(x){return '<li style="margin:3px 0">'+esc(String(x))+'</li>';}).join('')+'</ul>';
+    } else if(v!=null && String(v).trim()!==''){
+      if(key==='fazit_kurz'){ out+='<div style="font-weight:700;color:#E8CC7A;font-size:15px;margin:0 0 8px">'+esc(String(v))+'</div>'; }
+      else { out+='<div style="'+L_LBL+'">'+esc(lbl)+'</div><div style="'+L_P+'">'+esc(String(v))+'</div>'; }
+    }
+  }
+  ORD.forEach(blk);
+  Object.keys(obj).forEach(function(k){ if(!seen[k]) blk(k); });
+  return out || esc(raw);
+}
 function render(pass){
   var snap=pass.snapshot||{};
   var data=snap.data||{};
@@ -137,8 +175,17 @@ function render(pass){
     ['Eigenkapital', k.ek?eur(k.ek):'—']
   ];
 
+  /* qb-stammdaten: alle vorhandenen Felder ausklappbar */
+  var _allF=[['Objektart',data.objektart],['Zimmer',data.zimmer],['Energieklasse',data.energieklasse?String(data.energieklasse).toUpperCase():''],['Stellplatz',data.stellplatz],['Hausgeld',data.hg?(num(data.hg)?eur(num(data.hg))+'/Mo':data.hg):''],['Eigenkapital',k.ek?eur(k.ek):''],['Zinssatz',data.zins?(String(data.zins).replace('.',',')+' %'):''],['Tilgung',data.tilg?(String(data.tilg).replace('.',',')+' %'):''],['Kaufnebenkosten',data.knk?(String(data.knk).replace('.',',')+' %'):'']];
+  var _ds2r=[]; try { var _pd=data.__ds2pending; if(_pd&&typeof _pd==='object'){ Object.keys(_pd).forEach(function(id){ var it=_pd[id]; if(it&&it.value!=null&&String(it.value).trim()!==''){ _ds2r.push([it.label||id, String(it.value), id]); } }); } } catch(e){}
+  var _mrows=_allF.filter(function(f){return f[1]!=null && String(f[1]).trim()!=='';}).concat(_ds2r);
+  /* qb-sort: Objektdaten -> Ausstattung -> Finanzen -> Markt/Lage -> Qualitaet+Zustand paarweise */
+  var _SDORD={'Objektart':1,'Zimmer':2,'Energieklasse':3,'etage':4,'etagen_ges':5,'modernis':6,'Stellplatz':7,'garagen':8,'stellpl_aussen':9,'balkon_flae':10,'bad_anz':11,'Eigenkapital':12,'Hausgeld':13,'Zinssatz':14,'Tilgung':15,'Kaufnebenkosten':16,'svwert':17,'ds2_marktmiete':18,'makrolage':19,'mikrolage':20,'ds2_wertsteigerung':21,'ds2_bevoelkerung':22,'ds2_nachfrage':23,'ds2_entwicklung':24,'qual_kueche':25,'rate_kueche':26,'qual_bad':27,'rate_bad':28,'qual_boden':29,'rate_boden':30,'qual_fenster':31,'rate_fenster':32};
+  _mrows.forEach(function(r,i){ r.__i=i; });
+  _mrows.sort(function(a,b){ var ka=(a[2]!=null?a[2]:a[0]), kb=(b[2]!=null?b[2]:b[0]); var ra=(_SDORD[ka]!=null?_SDORD[ka]:99), rb=(_SDORD[kb]!=null?_SDORD[kb]:99); return ra!==rb ? ra-rb : a.__i-b.__i; });
+  var _more = _mrows.length ? '<div class="sec"><details class="more"><summary>Alle Stammdaten anzeigen</summary><div class="mlist">'+_mrows.map(function(f){return '<div class="mrow"><span class="ml">'+esc(f[0])+'</span><span class="mv">'+esc(String(f[1]))+'</span></div>';}).join('')+'</div></details></div>' : '';
   var photos=Array.isArray(snap.photos)?snap.photos.filter(Boolean):[];
-  var ai=(snap.ai_analysis||'').trim();
+  var ai=(snap.ai_analysis||'').trim(); var _moreShown=0;
 
   var html='';
   html+='<div class="pass">';
@@ -154,9 +201,10 @@ function render(pass){
     html+='<div class="sec"><h2>Bilder</h2><div class="gal">'+photos.slice(0,9).map(function(p){var s=imgSrc(p);return '<img loading="lazy" src="'+s+'" alt="" onclick="zoom(this.src)">';}).join('')+'</div></div>';
   }
   if(ai){
-    html+='<div class="sec"><h2>DealPilot Einschätzung</h2><div class="report">'+esc(ai)+'</div></div>';
+    html+=_more; _moreShown=1; html+='<div class="sec"><h2>DealPilot Einschätzung</h2><div class="report" style="max-height:none;overflow:visible">'+fmtAnalysis(ai)+'</div></div>';
   }
 
+  if(!_moreShown){html+=_more;}
   html+='<div class="cta"><button class="btn" id="claimBtn"><span class="pl">'+planeS()+'</span> Als eigenes Objekt übernehmen</button>'+
         '<div class="hint" id="claimHint">Kostenlos in dein DealPilot übernehmen — du kannst dann selbst weiterrechnen.</div></div>';
 
@@ -179,6 +227,7 @@ function claim(){
     return;
   }
   btn.disabled=true; btn.textContent='Übernehme…';
+  window.location.href='/index.html?qbclaim='+encodeURIComponent(CODE); return;   /* qb-claim: kanonische Kette in der App */
   fetch('/api/v1/passes/'+encodeURIComponent(CODE)+'/claim',{method:'POST',headers:{'Authorization':'Bearer '+token}})
     .then(function(r){return r.json().then(function(j){return {ok:r.ok,status:r.status,j:j};});})
     .then(function(res){

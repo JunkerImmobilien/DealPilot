@@ -18,6 +18,14 @@ const createBody = z.object({
 const extendBody = z.object({
   days: z.number().int().min(1).max(30).optional()
 });
+// qb-snapshot: Zwischenspeicher-Pass (KEIN echtes Objekt) — Score erreichbar im QC
+const snapBody = z.object({
+  code: z.string().min(4).max(16).regex(/^[0-9A-Za-z]+$/).optional(),
+  data: z.record(z.any()),
+  photos: z.array(z.string()).max(6).optional(),   /* qb-snap-photos */
+  title: z.string().max(255).optional(),
+  days: z.number().int().min(1).max(30).optional()
+});
 
 // ── PUBLIC: geteilten Pass lesen (KEIN Auth) ───────────────
 router.get('/:code', validate({ params: codeParam }), async (req, res, next) => {
@@ -37,6 +45,16 @@ router.post('/', authenticate, validate({ body: createBody }), async (req, res, 
   try {
     const r = await sharedPassService.createForObject(req.user.id, req.body.objectId, { days: req.body.days });
     res.status(201).json(r);
+  } catch (err) { next(err); }
+});
+
+// qb-snapshot: Pass aus Zwischenspeicher anlegen ODER (mit code) aktualisieren — object_id bleibt NULL
+router.post('/from-snapshot', authenticate, validate({ body: snapBody }), async (req, res, next) => {
+  try {
+    const r = await sharedPassService.upsertSnapshotPass(req.user.id, {
+      code: req.body.code, data: req.body.data, photos: req.body.photos, title: req.body.title, days: req.body.days
+    });
+    res.status(req.body.code ? 200 : 201).json(r);
   } catch (err) { next(err); }
 });
 

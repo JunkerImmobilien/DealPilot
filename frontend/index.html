@@ -2893,6 +2893,8 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="js/dscr-engine.js?v=231"></script>
+<script src="js/dp-qr.js?v=721"></script>
+<script src="js/hausgeld-engine.js?v=717"></script>
 <script src="js/deal-kpis.js?v=231"></script>
 <script src="js/afa-engine.js?v=227"></script>
   <script src="js/afa-ui.js?v=671"></script>
@@ -2932,7 +2934,7 @@ label.dp-required.qc-required::after {
   <script src="js/immometrica-qc.js?v=672"></script>
   <script src="js/modal-boarding-skin.js?v=672"></script>
   <script src="js/provider-keys.js?v=672"></script>
-  <script src="js/settings.js?v=648"></script>
+  <script src="js/settings.js?v=714"></script>
 <script src="js/pricing-modal.js?v=493-2"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=162"></script>
@@ -2948,7 +2950,7 @@ label.dp-required.qc-required::after {
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=20260611175525"></script>
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
-<script src="js/all-objects.js?v=166"></script>
+<script src="js/all-objects.js?v=720"></script>
 <script src="js/track-record.js?v=166"></script>
 <script src="js/pdf.js?v=20260611105943"></script>
 <script src="js/auth.js?v=20260612061718"></script>
@@ -2969,7 +2971,7 @@ label.dp-required.qc-required::after {
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=124"></script>
 <script src="js/quick-check.js?v=463"></script>
-<script src="js/qc-bridge.js?v=652"></script>
+<script src="js/qc-bridge.js?v=711"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/ai-credits.js?v=491"></script>
@@ -2985,7 +2987,7 @@ label.dp-required.qc-required::after {
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
 <script src="js/deal-action.js?v=324"></script>
 <script src="js/deal-action-readycheck.js?v=451"></script>
-<script src="js/deal-action-pilot.js?v=dav5"></script>
+<script src="js/deal-action-pilot.js?v=722"></script>
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
 <script src="js/newobj-fixes.js?v=434"></script>
 <script src="js/sidebar-search.js?v=447"></script>
@@ -3007,13 +3009,13 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-wizard.js?v=160"></script>
 <script src="js/free-lock.js?v=495"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
-<script src="js/investment-profile.js?v=670"></script>
+<script src="js/investment-profile.js?v=717"></script>
 <script src="js/dashboard.js?v=486"></script>
 <script src="js/score-fx.js?v=464"></script>
 <script src="js/main.js?v=187h2"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=673"></script>
+  <script src="js/object-actions.js?v=721"></script>
   <script src="js/quick-boarding-share.js?v=676"></script>
   <script src="js/voice-import.js?v=537"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
@@ -3367,10 +3369,35 @@ label.dp-required.qc-required::after {
     }
   }
 
+  function _qbClaimBoot(){
+    if (window.__qbClaimStarted) return;
+    var code=null;
+    try { code=new URLSearchParams(location.search).get('qbclaim'); } catch(e){}
+    if (!code) { try { code=localStorage.getItem('qb_claim_code'); } catch(e){} }
+    if (!code) return;
+    var tok=null; try { tok=localStorage.getItem('ji_token'); } catch(e){}
+    if (!tok) return;   // nicht eingeloggt -> Register-Flow laeuft, kommt beim naechsten Laden erneut
+    if (!(window.Auth && typeof window.Auth.apiCall==='function') || typeof window.__qbClaimFromSnapshot!=='function' || typeof window.qcSaveAsObject!=='function') {
+      window.__qbClaimTries=(window.__qbClaimTries||0)+1;
+      if (window.__qbClaimTries>25) return;
+      return setTimeout(_qbClaimBoot, 200);
+    }
+    window.__qbClaimStarted=true;
+    try { localStorage.removeItem('qb_claim_code'); } catch(e){}
+    try { history.replaceState({}, '', location.pathname); } catch(e){}
+    window.Auth.apiCall('/passes/'+encodeURIComponent(code))
+      .then(function(pass){
+        var snap=(pass&&pass.snapshot)||{};
+        window.__qbClaimFromSnapshot(snap.data||{}, snap.photos||[]);
+        if (typeof toast==='function') toast('\u2713 Boarding \u00fcbernommen \u2014 als neues Objekt angelegt');
+      })
+      .catch(function(e){ console.warn('[qb-claim]', e); if(typeof toast==='function') toast('\u26a0 Pass konnte nicht geladen werden'); });
+  }
   function _v236Init() {
     _v236RemoveAllTabIndicators();  // alte Indikatoren entfernen
     _v236AttachErrorClear();
     _v236WrapQcSave();
+    try { _qbClaimBoot(); } catch(e){}
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _v236Init);
