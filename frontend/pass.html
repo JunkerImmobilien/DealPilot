@@ -125,6 +125,33 @@ function quickScore(k){
 
 function imgSrc(p){if(!p)return '';return /^data:/.test(p)?p:('data:image/jpeg;base64,'+p);}
 
+function fmtAnalysis(raw){
+  raw = String(raw||'').trim();
+  if(!raw) return '';
+  var obj=null; try { obj=JSON.parse(raw); } catch(e){ obj=null; }
+  if(!obj || typeof obj!=='object'){ return esc(raw).replace(/\n/g,'<br>'); }
+  var LBL={gesamtbewertung:'Gesamtbewertung',fazit_kurz:'Fazit',empfehlung:'Empfehlung',staerken:'St\u00e4rken',schwaechen:'Schw\u00e4chen',risiken:'Risiken',chancen:'Chancen',verhandlung:'Verhandlung',hinweise:'Hinweise',score:'Score'};
+  var ORD=['fazit_kurz','gesamtbewertung','staerken','schwaechen','chancen','risiken','verhandlung','empfehlung','hinweise'];
+  var L_LBL="font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9a8a52;margin:14px 0 5px";
+  var L_P='color:#d8d4cc;font-size:13px;line-height:1.55';
+  var L_UL='margin:4px 0 0;padding-left:18px;color:#d8d4cc;font-size:13px;line-height:1.5';
+  var out='', seen={};
+  function blk(key){
+    if(!(key in obj)) return; seen[key]=1;
+    var v=obj[key]; var lbl=LBL[key]||key;
+    if(Array.isArray(v)){
+      var it=v.filter(function(x){return x!=null && String(x).trim()!=='';});
+      if(!it.length) return;
+      out+='<div style="'+L_LBL+'">'+esc(lbl)+'</div><ul style="'+L_UL+'">'+it.map(function(x){return '<li style="margin:3px 0">'+esc(String(x))+'</li>';}).join('')+'</ul>';
+    } else if(v!=null && String(v).trim()!==''){
+      if(key==='fazit_kurz'){ out+='<div style="font-weight:700;color:#E8CC7A;font-size:15px;margin:0 0 8px">'+esc(String(v))+'</div>'; }
+      else { out+='<div style="'+L_LBL+'">'+esc(lbl)+'</div><div style="'+L_P+'">'+esc(String(v))+'</div>'; }
+    }
+  }
+  ORD.forEach(blk);
+  Object.keys(obj).forEach(function(k){ if(!seen[k]) blk(k); });
+  return out || esc(raw);
+}
 function render(pass){
   var snap=pass.snapshot||{};
   var data=snap.data||{};
@@ -174,7 +201,7 @@ function render(pass){
     html+='<div class="sec"><h2>Bilder</h2><div class="gal">'+photos.slice(0,9).map(function(p){var s=imgSrc(p);return '<img loading="lazy" src="'+s+'" alt="" onclick="zoom(this.src)">';}).join('')+'</div></div>';
   }
   if(ai){
-    html+='<div class="sec"><h2>DealPilot Einschätzung</h2><div class="report">'+esc(ai)+'</div></div>';
+    html+='<div class="sec"><h2>DealPilot Einschätzung</h2><div class="report" style="max-height:none;overflow:visible">'+fmtAnalysis(ai)+'</div></div>';
   }
 
   html+=_more;
