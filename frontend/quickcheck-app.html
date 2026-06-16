@@ -6061,6 +6061,8 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     try{ for(var i=0;i<document.styleSheets.length;i++){ try{ walk(document.styleSheets[i].cssRules); }catch(e){} } }catch(e){}
     // CSS-Variablen als Inline-Props auf den Modal-Knoten (kein globaler Parent-Override)
     if(m){ Object.keys(rootVars).forEach(function(v){ try{ m.style.setProperty(v, rootVars[v]); }catch(e){} }); }
+    /* qb-moved-center: erzwingt Zentrierung im Parent (wie das funktionierende Overlay) */
+    css += '.modal-backdrop.qb-moved{position:fixed !important;inset:0 !important;display:flex !important;align-items:center !important;justify-content:center !important;overflow-y:auto !important;margin:0 !important;padding:24px !important;z-index:100000 !important}.modal-backdrop.qb-moved>.modal{margin:0 !important;max-height:90vh !important;overflow:auto !important}';
     var st=pd.createElement('style'); st.id='qb-moved-modal-css'; st.textContent=css; pd.head.appendChild(st);
     _cssDone=true;
   }
@@ -6086,6 +6088,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     copyCss();
     wireButtons(m);
     try{ m.style.zIndex='100000'; }catch(e){}
+    m.classList.add('qb-moved'); // qb-moved-center
     if(m.parentNode!==pd.body) pd.body.appendChild(m); // in den Parent (fixed = sichtbares Fenster)
   }
 
