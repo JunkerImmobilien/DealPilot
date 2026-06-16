@@ -6021,5 +6021,13 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 </script>
   <script src="js/dealpilot-mb-qc.js?v=554"></script>
   <script src="js/immometrica-qc.js?v=667"></script>
+<!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
+<style id="qc-embedded-decouple-style">
+html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !important; }
+</style>
+<script id="qc-embedded-decouple-js">
+(function(){ try{ if(window.frameElement){ document.documentElement.classList.add('qc-embedded'); } }catch(e){} })();
+</script>
+
 </body>
 </html>

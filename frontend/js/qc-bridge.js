@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=669';
+  var IFRAME_SRC = 'quickcheck-app.html?v=683';
 
   // v345: doppelte weiße "⚡ Quick-Check"-Überschrift entfernen.
   // Sie ist ein CSS-Pseudo-Element (body.qc-standalone-active #s-quick::before)
@@ -89,25 +89,26 @@
     host.dataset.qcIframe = '1';
     _frame = document.getElementById('qc-v17-frame');
 
-    function sizeFrame() {
+    function sizeFrame() {  // qb-szf: Hysterese, kein +4 (kein Aufaddieren)
       try {
-        // v630-autoheight: Auf schmalen Screens das iframe = ECHTE Inhaltshoehe,
-        // damit die Seite normal scrollt (statt Inhalt auf Fensterhoehe abzuschneiden).
-        // iframe ist same-origin -> contentDocument lesbar.
-        /* v652-qc-autoheight: immer echte Inhaltshoehe -> kein Eigen-Scroll im iframe (Seite scrollt) */
         var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
         var ch = doc && doc.documentElement ? doc.documentElement.scrollHeight : 0;
-        if (ch && ch > 0) { _frame.style.height = (ch + 4) + 'px'; return; }
+        if (ch && ch > 0) {
+          var cur = parseInt(_frame.style.height, 10) || 0;
+          if (Math.abs(ch - cur) > 8) { _frame.style.height = ch + 'px'; }
+          return;
+        }
         var top = _frame.getBoundingClientRect().top;
         var h = Math.max(480, Math.floor(window.innerHeight - top - 8));
-        _frame.style.height = h + 'px';
+        var cur2 = parseInt(_frame.style.height, 10) || 0;
+        if (Math.abs(h - cur2) > 8) { _frame.style.height = h + 'px'; }
       } catch (e) {}
     }
     function _attachContentObserver() {
       try {
         var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
         if (doc && window.ResizeObserver && doc.documentElement && !_frame._qcRO) {
-          _frame._qcRO = new ResizeObserver(function () { sizeFrame(); });
+          _frame._qcRO = new ResizeObserver(function () { if (_frame._qcRaf) return; _frame._qcRaf = requestAnimationFrame(function(){ _frame._qcRaf = 0; sizeFrame(); }); });
           _frame._qcRO.observe(doc.documentElement);
         }
       } catch (e) {}
