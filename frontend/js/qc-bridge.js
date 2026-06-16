@@ -415,6 +415,7 @@
     else if (d.type === 'qc-reset-buffer') {   /* qb-reset: Neuer Vorgang -> Buffer-Pass loeschen */
       try { if(window.ObjectActions&&window.ObjectActions.clearQcPending) window.ObjectActions.clearQcPending(); } catch(e){}
       try { var _c=_bufState.code; _bufReset(); if(_c && window.Auth && typeof window.Auth.apiCall==='function') window.Auth.apiCall('/passes/'+encodeURIComponent(_c),{method:'DELETE'}).catch(function(){}); } catch(e){}
+      try { if(_frame) _frame.src = IFRAME_SRC + '&_t=' + Date.now(); } catch(e){}   /* v712: frische QC-Seite -> Profil-Defaults (Hausgeld/Zins/Tilgung) greifen wieder */
     }
     else if (d.type === 'qc-import-pdf') _handleImportPdf();
     else if (d.type === 'qc-voice') _handleVoice();  /* v505-voice */
