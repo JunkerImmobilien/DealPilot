@@ -185,7 +185,7 @@ function render(pass){
   _mrows.sort(function(a,b){ var ka=(a[2]!=null?a[2]:a[0]), kb=(b[2]!=null?b[2]:b[0]); var ra=(_SDORD[ka]!=null?_SDORD[ka]:99), rb=(_SDORD[kb]!=null?_SDORD[kb]:99); return ra!==rb ? ra-rb : a.__i-b.__i; });
   var _more = _mrows.length ? '<div class="sec"><details class="more"><summary>Alle Stammdaten anzeigen</summary><div class="mlist">'+_mrows.map(function(f){return '<div class="mrow"><span class="ml">'+esc(f[0])+'</span><span class="mv">'+esc(String(f[1]))+'</span></div>';}).join('')+'</div></details></div>' : '';
   var photos=Array.isArray(snap.photos)?snap.photos.filter(Boolean):[];
-  var ai=(snap.ai_analysis||'').trim();
+  var ai=(snap.ai_analysis||'').trim(); var _moreShown=0;
 
   var html='';
   html+='<div class="pass">';
@@ -201,10 +201,10 @@ function render(pass){
     html+='<div class="sec"><h2>Bilder</h2><div class="gal">'+photos.slice(0,9).map(function(p){var s=imgSrc(p);return '<img loading="lazy" src="'+s+'" alt="" onclick="zoom(this.src)">';}).join('')+'</div></div>';
   }
   if(ai){
-    html+='<div class="sec"><h2>DealPilot Einschätzung</h2><div class="report" style="max-height:none;overflow:visible">'+fmtAnalysis(ai)+'</div></div>';
+    html+=_more; _moreShown=1; html+='<div class="sec"><h2>DealPilot Einschätzung</h2><div class="report" style="max-height:none;overflow:visible">'+fmtAnalysis(ai)+'</div></div>';
   }
 
-  html+=_more;
+  if(!_moreShown){html+=_more;}
   html+='<div class="cta"><button class="btn" id="claimBtn"><span class="pl">'+planeS()+'</span> Als eigenes Objekt übernehmen</button>'+
         '<div class="hint" id="claimHint">Kostenlos in dein DealPilot übernehmen — du kannst dann selbst weiterrechnen.</div></div>';
 
