@@ -40,15 +40,33 @@ window.DealPilotInvestmentProfile = (function() {
     return d[key];
   }
 
-  // v669: monatliches Hausgeld als Annahme aus % vom Kaufpreis p.a.
-  function getHausgeldMonthly(kp) {
+  // v717/dpfk-hg-v1: Hausgeld primaer ueber Wohnflaeche (window.Hausgeld), Kaufpreis nur Fallback.
+  function getHausgeldEstimate(kp, opts) {
+    opts = opts || {};
+    var H = window.Hausgeld;
+    if (H && typeof H.estimate === 'function' && H._num(opts.wohnflaeche) > 0) {
+      return H.estimate({ wohnflaeche: opts.wohnflaeche, baujahr: opts.baujahr, energieklasse: opts.energieklasse,
+        aufzug: opts.aufzug, tiefgarage: opts.tiefgarage, gemeinschaft: opts.gemeinschaft });
+    }
+    // Keine Wohnflaeche: alter %-vom-KP-Regler (Investmentprofil-Annahme) als Fallback.
     var pct = get('hausgeld_pct');
-    if (pct == null || pct === '') return null;
-    var p2 = parseFloat(String(pct).replace(',', '.'));
-    if (!isFinite(p2) || p2 <= 0) return null;
-    var k = parseFloat(String(kp == null ? 0 : kp).replace(',', '.')) || 0;
-    if (!k) return null;
-    return Math.round(k * p2 / 100 / 12);
+    if (pct != null && pct !== '') {
+      var p2 = parseFloat(String(pct).replace(',', '.'));
+      var k = parseFloat(String(kp == null ? 0 : kp).replace(',', '.')) || 0;
+      if (isFinite(p2) && p2 > 0 && k) {
+        var m = Math.round(k * p2 / 100 / 12);
+        return { monatlich: m, jaehrlich: m * 12, methode: 'kaufpreis_pct', isEstimate: true, ungenau: true,
+          faktor: null, grundlageText: 'Hausgeld-Annahme: ' + String(p2).replace('.', ',') + ' % vom Kaufpreis p.a.',
+          plausibilitaet: null };
+      }
+    }
+    // Sonst Engine-Kaufpreis-Fallback (1,2 % p.a., als ungenau markiert).
+    if (H && typeof H.estimate === 'function') return H.estimate({ kaufpreis: kp });
+    return null;
+  }
+  function getHausgeldMonthly(kp, opts) {
+    var r = getHausgeldEstimate(kp, opts);
+    return (r && isFinite(r.monatlich)) ? Math.round(r.monatlich) : null;
   }
 
   // v668: effektiver Standard-Zins = eigener Wert, sonst indikativer Pfandbrief-Satz der Zinsbindung
@@ -177,7 +195,7 @@ window.DealPilotInvestmentProfile = (function() {
       '<h3 class="ip-section">Bewirtschaftung</h3>',
       '<div class="ip-grid">',
         field('ip_bwk_anteil_default', 'Bewirtschaftungs-Anteil', p.bwk_anteil_default, '% der NKM', 'nicht-umlagefähig, Schätzwert'),
-        (function(){ var presets = ['','0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0']; var cur = (p.hausgeld_pct != null && p.hausgeld_pct !== '') ? String(p.hausgeld_pct) : ''; var isP = presets.indexOf(cur) >= 0; var o = [['','— (aus)'],['0.5','0,5 % vom KP / Jahr'],['1.0','1,0 %'],['1.5','1,5 %'],['2.0','2,0 %'],['2.5','2,5 %'],['3.0','3,0 %'],['4.0','4,0 %'],['5.0','5,0 %']].map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===(isP?cur:'')?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_hausgeld_sel">Hausgeld-Annahme</label><div class="ip-field-row"><select id="ip_hausgeld_sel">'+o+'</select></div><div class="ip-hint">Anteil vom Kaufpreis p.a. — QC rechnet daraus das monatliche Hausgeld (nur wenn leer)</div></div>'; })(),
+        (function(){ var presets = ['','0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0']; var cur = (p.hausgeld_pct != null && p.hausgeld_pct !== '') ? String(p.hausgeld_pct) : ''; var isP = presets.indexOf(cur) >= 0; var o = [['','— (aus)'],['0.5','0,5 % vom KP / Jahr'],['1.0','1,0 %'],['1.5','1,5 %'],['2.0','2,0 %'],['2.5','2,5 %'],['3.0','3,0 %'],['4.0','4,0 %'],['5.0','5,0 %']].map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===(isP?cur:'')?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_hausgeld_sel">Hausgeld-Annahme</label><div class="ip-field-row"><select id="ip_hausgeld_sel">'+o+'</select></div><div class="ip-hint">Anteil vom Kaufpreis p.a. — Fallback — nur wenn keine Wohnfläche vorliegt (sonst Wohnflächen-Schätzung)</div></div>'; })(),
         field('ip_hausgeld_pct', 'Eigener Hausgeld-Anteil (optional)', (p.hausgeld_pct != null && ['0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0',''].indexOf(String(p.hausgeld_pct)) < 0) ? p.hausgeld_pct : '', '% vom KP/Jahr', 'übersteuert die Schnellauswahl'),
       '</div>',
 
@@ -290,6 +308,7 @@ window.DealPilotInvestmentProfile = (function() {
     getZins: getZins,
     wireMarketRate: wireMarketRate,
     getHausgeldMonthly: getHausgeldMonthly,
+    getHausgeldEstimate: getHausgeldEstimate,
     syncAiParamsToTab: syncAiParamsToTab,
     renderPaneHtml: renderPaneHtml,
     saveFromForm: saveFromForm,

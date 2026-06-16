@@ -3471,6 +3471,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       <div class="field">
         <label class="req" for="qc_hg">Hausgeld / Monat (€)</label>
         <input type="text" id="qc_hg" placeholder="221" inputmode="decimal" autocomplete="off">
+        <div class="qc-hg-hint" id="qc-hg-hint" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:5px 2px 0;min-height:14px"></div>
         <span class="hint">Inkl. Heizung + Rücklagen — wie auf Exposé. Faustregel: ~26% der NKM</span>
         <span class="source">PDF</span>
       </div>
@@ -5711,18 +5712,39 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   function autoHg(){
     try {
       var IP = window.parent && window.parent.DealPilotInvestmentProfile;
-      if (!IP || typeof IP.getHausgeldMonthly !== "function") return;
-      var kpEl = document.getElementById("qc_kp"), hgEl = document.getElementById("qc_hg");
-      if (!kpEl || !hgEl) return;
-      function recalc(){
-        if (hgEl.dataset.userSet === "1") return;
-        var kp = num(kpEl.value); if (!kp) return;
-        var hg = IP.getHausgeldMonthly(kp); if (hg == null) return;
-        hgEl.dataset.autoHg = "1"; hgEl.value = String(hg).replace(".", ",");
-        try { hgEl.dispatchEvent(new Event("input", {bubbles:true})); } catch(e){}
+      if (!IP) return;
+      function pick(ids){ for (var i=0;i<ids.length;i++){ var e=document.getElementById(ids[i]); if (e) return e; } return null; }
+      var kpEl  = document.getElementById("qc_kp");
+      var hgEl  = document.getElementById("qc_hg");
+      var wflEl = pick(["qc_wfl","qc_wohnflaeche","qc_flae"]);
+      var bjEl  = pick(["qc_bj","qc_baujahr"]);
+      var ekEl  = pick(["qc_energieklasse","qc_energie","qc_ek"]);
+      if (!hgEl) return;
+      function renderHint(est){
+        var box = document.getElementById("qc-hg-hint"); if (!box) return;
+        if (hgEl.dataset.userSet === "1") { box.textContent = "Eigener/importierter Wert \u2014 wird \u00fcbernommen (keine Sch\u00e4tzung)."; return; }
+        if (est && est.grundlageText) {
+          var w = (est.plausibilitaet && est.plausibilitaet.hint) ? "  \u26a0 " + est.plausibilitaet.hint
+                 : (est.ungenau ? "  \u26a0 grobe Sch\u00e4tzung" : "");
+          box.textContent = est.grundlageText + w;
+        } else box.textContent = "";
       }
-      if (!hgEl._hgUserBound){ hgEl._hgUserBound = 1; hgEl.addEventListener("input", function(){ if (hgEl.dataset.autoHg === "1") { hgEl.dataset.autoHg = ""; } else { hgEl.dataset.userSet = "1"; } }); }
-      if (!kpEl._hgKpBound){ kpEl._hgKpBound = 1; kpEl.addEventListener("input", recalc); }
+      function recalc(){
+        if (hgEl.dataset.userSet === "1") { renderHint(null); return; }
+        var kp  = kpEl  ? num(kpEl.value)  : 0;
+        var wfl = wflEl ? num(wflEl.value) : 0;
+        var bj  = bjEl  ? (bjEl.value||"").trim() : "";
+        var ek  = ekEl  ? (ekEl.value||"").trim() : "";
+        var est = (typeof IP.getHausgeldEstimate === "function")
+          ? IP.getHausgeldEstimate(kp, { wohnflaeche: wfl, baujahr: bj, energieklasse: ek })
+          : (typeof IP.getHausgeldMonthly === "function" ? { monatlich: IP.getHausgeldMonthly(kp), grundlageText: "" } : null);
+        if (!est || est.monatlich == null || !isFinite(est.monatlich)) { renderHint(null); return; }
+        hgEl.dataset.autoHg = "1"; hgEl.value = String(Math.round(est.monatlich)).replace(".", ",");
+        try { hgEl.dispatchEvent(new Event("input", {bubbles:true})); } catch(e){}
+        renderHint(est);
+      }
+      if (!hgEl._hgUserBound){ hgEl._hgUserBound = 1; hgEl.addEventListener("input", function(){ if (hgEl.dataset.autoHg === "1") { hgEl.dataset.autoHg = ""; } else { hgEl.dataset.userSet = "1"; renderHint(null); } }); }
+      [kpEl, wflEl, bjEl, ekEl].forEach(function(el){ if (el && !el._hgBound){ el._hgBound = 1; el.addEventListener("input", recalc); el.addEventListener("change", recalc); } });
       recalc();
     } catch(e){}
   }
