@@ -37,7 +37,8 @@
   function _bufPostCode(){ if(_bufState.code) _postToFrame({source:'dp-app',type:'qc-autopass-code',code:_bufState.code,url:_bufShareUrl(_bufState.code)}); }
   function _handleAutopass(inputs, photos){   /* qb-buffer-photos */
     inputs = inputs || {}; photos = photos || [];
-    var sig; try { sig = JSON.stringify(inputs) + '|ph:' + photos.length + ':' + photos.map(function(p){return (p||'').slice(0,24);}).join(','); } catch (e) { sig = ''; }
+    var _ds2k=''; try { var _pp=(window.ObjectActions&&window.ObjectActions.getQcPending)?window.ObjectActions.getQcPending():null; if(_pp) _ds2k=Object.keys(_pp).sort().join(','); } catch(e){}
+    var sig; try { sig = JSON.stringify(inputs) + '|ph:' + photos.length + ':' + photos.map(function(p){return (p||'').slice(0,24);}).join(',') + '|ds2:' + _ds2k; } catch (e) { sig = ''; }
     if (sig && sig === _bufState.lastSig) return;
     _bufState.lastSig = sig; _bufState.photos = photos;
     if (_bufState.timer) clearTimeout(_bufState.timer);
@@ -49,6 +50,7 @@
     _bufState.busy = true;
     var title=''; if(inputs.str) title=inputs.str+(inputs.hnr?' '+inputs.hnr:''); if(inputs.ort) title=(title?title+', ':'')+inputs.ort;
     var body={ data: inputs, days: 30 }; if(title) body.title=title; if(_bufState.code) body.code=_bufState.code;
+    try { var _pend=(window.ObjectActions&&window.ObjectActions.getQcPending)?window.ObjectActions.getQcPending():null; if(_pend&&Object.keys(_pend).length){ body.data=Object.assign({},inputs,{__ds2pending:_pend}); } } catch(e){}   /* v711-ds2 */
     if(_bufState.photos && _bufState.photos.length) body.photos=_bufState.photos;   /* qb-buffer-photos */
     window.Auth.apiCall('/passes/from-snapshot',{method:'POST',body:body})
       .then(function(r){ if(r&&r.code){ _bufState.code=r.code; _bufPostCode(); } _bufState.busy=false; })
@@ -273,12 +275,16 @@
   }
   window.__qbClaimFromSnapshot = function (data, photos) {
     data = data || {};
+    var _pend711=null, _clean={};
+    try { if(data.__ds2pending&&typeof data.__ds2pending==='object') _pend711=data.__ds2pending; } catch(e){}
+    Object.keys(data).forEach(function(k){ if(k!=='__ds2pending') _clean[k]=data[k]; });
+    try { if(_pend711 && window.ObjectActions && typeof window.ObjectActions.setQcPending==='function') window.ObjectActions.setQcPending(_pend711); } catch(e){}
     var ph = (photos || []).filter(Boolean).map(function (s, i) {
       return (typeof s === 'string') ? { src: s, name: 'foto_' + (i + 1) + '.jpg' } : s;
     });
     var temp = null;
     try { temp = _ensureClaimCarriers(); } catch (e) { console.warn('[qb-claim] carriers:', e); }
-    try { _handleSave(data, null, ph, null); }
+    try { _handleSave(_clean, null, ph, null); }
     catch (e) { console.error('[qb-claim] handleSave:', e); }
     finally { if (temp && temp.parentNode) temp.parentNode.removeChild(temp); }
   };
@@ -407,6 +413,7 @@
     if (!d || d.source !== 'dp-qc') return;
     if (d.type === 'qc-save') _handleSave(d.inputs, d.avm, d.photos, d.pendingTargets);
     else if (d.type === 'qc-reset-buffer') {   /* qb-reset: Neuer Vorgang -> Buffer-Pass loeschen */
+      try { if(window.ObjectActions&&window.ObjectActions.clearQcPending) window.ObjectActions.clearQcPending(); } catch(e){}
       try { var _c=_bufState.code; _bufReset(); if(_c && window.Auth && typeof window.Auth.apiCall==='function') window.Auth.apiCall('/passes/'+encodeURIComponent(_c),{method:'DELETE'}).catch(function(){}); } catch(e){}
     }
     else if (d.type === 'qc-import-pdf') _handleImportPdf();

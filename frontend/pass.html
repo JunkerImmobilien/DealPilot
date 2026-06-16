@@ -150,7 +150,8 @@ function render(pass){
 
   /* qb-stammdaten: alle vorhandenen Felder ausklappbar */
   var _allF=[['Objektart',data.objektart],['Zimmer',data.zimmer],['Energieklasse',data.energieklasse?String(data.energieklasse).toUpperCase():''],['Stellplatz',data.stellplatz],['Hausgeld',data.hg?(num(data.hg)?eur(num(data.hg))+'/Mo':data.hg):''],['Eigenkapital',k.ek?eur(k.ek):''],['Zinssatz',data.zins?(String(data.zins).replace('.',',')+' %'):''],['Tilgung',data.tilg?(String(data.tilg).replace('.',',')+' %'):''],['Kaufnebenkosten',data.knk?(String(data.knk).replace('.',',')+' %'):'']];
-  var _mrows=_allF.filter(function(f){return f[1]!=null && String(f[1]).trim()!=='';});
+  var _ds2r=[]; try { var _pd=data.__ds2pending; if(_pd&&typeof _pd==='object'){ Object.keys(_pd).forEach(function(id){ var it=_pd[id]; if(it&&it.value!=null&&String(it.value).trim()!==''){ _ds2r.push([it.label||id, String(it.value)]); } }); } } catch(e){}
+  var _mrows=_allF.filter(function(f){return f[1]!=null && String(f[1]).trim()!=='';}).concat(_ds2r);
   var _more = _mrows.length ? '<div class="sec"><details class="more"><summary>Alle Stammdaten anzeigen</summary><div class="mlist">'+_mrows.map(function(f){return '<div class="mrow"><span class="ml">'+esc(f[0])+'</span><span class="mv">'+esc(String(f[1]))+'</span></div>';}).join('')+'</div></details></div>' : '';
   var photos=Array.isArray(snap.photos)?snap.photos.filter(Boolean):[];
   var ai=(snap.ai_analysis||'').trim();

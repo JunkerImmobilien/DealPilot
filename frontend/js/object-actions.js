@@ -1185,7 +1185,7 @@
   function autoInit() { if ($(MOUNT_ID)) { init(); return; } if (_tries++ < 40) setTimeout(autoInit, 250); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoInit); else setTimeout(autoInit, 0);
   window.addEventListener('load', autoInit);
-  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm, applyQcPending: applyQcPending,
+  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm, applyQcPending: applyQcPending, getQcPending: function(){ return _qcPendingMerged; }, setQcPending: function(p){ _qcPendingMerged=(p&&typeof p==='object')?p:{}; }, clearQcPending: function(){ _qcPendingMerged={}; },
     /* v503-voice-bridge: Sprach-Ergebnisliste ueber die Import-Mechanik (gleiche Optik,
        gleicher Schreibweg inkl. Sterne + QC-Bucket-Logik). */
     _voice: {
