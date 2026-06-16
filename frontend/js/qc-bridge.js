@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=669';
+  var IFRAME_SRC = 'quickcheck-app.html?v=696';
 
   // v345: doppelte weiße "⚡ Quick-Check"-Überschrift entfernen.
   // Sie ist ein CSS-Pseudo-Element (body.qc-standalone-active #s-quick::before)
@@ -89,25 +89,26 @@
     host.dataset.qcIframe = '1';
     _frame = document.getElementById('qc-v17-frame');
 
-    function sizeFrame() {
+    function sizeFrame() {  // qb-szf: Hysterese, kein +4 (kein Aufaddieren)
       try {
-        // v630-autoheight: Auf schmalen Screens das iframe = ECHTE Inhaltshoehe,
-        // damit die Seite normal scrollt (statt Inhalt auf Fensterhoehe abzuschneiden).
-        // iframe ist same-origin -> contentDocument lesbar.
-        /* v652-qc-autoheight: immer echte Inhaltshoehe -> kein Eigen-Scroll im iframe (Seite scrollt) */
         var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
         var ch = doc && doc.documentElement ? doc.documentElement.scrollHeight : 0;
-        if (ch && ch > 0) { _frame.style.height = (ch + 4) + 'px'; return; }
+        if (ch && ch > 0) {
+          var cur = parseInt(_frame.style.height, 10) || 0;
+          if (Math.abs(ch - cur) > 8) { _frame.style.height = ch + 'px'; }
+          return;
+        }
         var top = _frame.getBoundingClientRect().top;
         var h = Math.max(480, Math.floor(window.innerHeight - top - 8));
-        _frame.style.height = h + 'px';
+        var cur2 = parseInt(_frame.style.height, 10) || 0;
+        if (Math.abs(h - cur2) > 8) { _frame.style.height = h + 'px'; }
       } catch (e) {}
     }
     function _attachContentObserver() {
       try {
         var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
         if (doc && window.ResizeObserver && doc.documentElement && !_frame._qcRO) {
-          _frame._qcRO = new ResizeObserver(function () { sizeFrame(); });
+          _frame._qcRO = new ResizeObserver(function () { if (_frame._qcRaf) return; _frame._qcRaf = requestAnimationFrame(function(){ _frame._qcRaf = 0; sizeFrame(); }); });
           _frame._qcRO.observe(doc.documentElement);
         }
       } catch (e) {}
@@ -277,11 +278,88 @@
     }, { target: 'qc' });
   }
 
+  // qcpm-final2 v696: Save-Bestaetigung komplett im Parent (immer mittig), Original-Look.
+  // QcApp ist im iframe ein const (NICHT window.QcApp) -> Bestaetigung NUR per postMessage.
+  function _qcpmEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function _qcpmStyle(){
+    if (document.getElementById('qcpm-style')) return;
+    var s=document.createElement('style'); s.id='qcpm-style';
+    s.textContent=[
+      '#qcpm-ov{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto;background:rgba(15,13,12,.62);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);font-family:"Space Grotesk",system-ui,sans-serif}',
+      '#qcpm-ov .qcpm-box{background:#fff;border:1px solid rgba(201,168,76,.30);border-radius:16px;width:min(640px,100%);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 28px 70px rgba(0,0,0,.32),0 0 0 1px rgba(201,168,76,.10);animation:qcpmIn .22s cubic-bezier(.2,.7,.2,1)}',
+      '@keyframes qcpmIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}',
+      '#qcpm-ov .qcpm-head{display:flex;align-items:center;gap:13px;padding:20px 24px 12px;border-bottom:1px solid #EFEAE0;background:linear-gradient(180deg,rgba(201,168,76,.08),#fff)}',
+      '#qcpm-ov .qcpm-ic{width:40px;height:40px;border-radius:10px;background:rgba(201,168,76,.16);color:#9a7f33;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:19px}',
+      '#qcpm-ov .qcpm-head h3{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-size:23px;font-weight:600;color:#2A2727;flex:1;line-height:1.15}',
+      '#qcpm-ov .qcpm-x{background:transparent;border:1px solid #E7E2DC;color:#7A7370;width:34px;height:34px;border-radius:8px;font-size:18px;line-height:1;cursor:pointer;flex-shrink:0;transition:all .15s}',
+      '#qcpm-ov .qcpm-x:hover{background:#F6F2E9;border-color:#C9A84C;color:#2A2727}',
+      '#qcpm-ov .qcpm-body{padding:16px 24px 18px;overflow:auto}',
+      '#qcpm-ov .qcpm-intro{font-size:13px;color:#6B6560;line-height:1.55;margin:0 0 14px}',
+      '#qcpm-ov .qcpm-all{display:flex;align-items:center;gap:9px;margin:0 0 14px;font-size:13px;font-weight:600;color:#2A2727}',
+      '#qcpm-ov .qcpm-all input{width:16px;height:16px;accent-color:#C9A84C}',
+      '#qcpm-ov .qcpm-sec{margin-bottom:14px}',
+      '#qcpm-ov .qcpm-sec-t{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#9a7f33;font-weight:700;margin-bottom:7px}',
+      '#qcpm-ov .qcpm-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid #ECE6DA;border-radius:10px;margin-bottom:7px;transition:background .12s}',
+      '#qcpm-ov .qcpm-item:hover{background:rgba(201,168,76,.06)}',
+      '#qcpm-ov .qcpm-item input{width:16px;height:16px;margin-top:1px;accent-color:#C9A84C;flex-shrink:0}',
+      '#qcpm-ov .qcpm-item .l{flex:1;font-size:13px;color:#2A2727;min-width:0}',
+      '#qcpm-ov .qcpm-item .t{display:block;font-size:11px;color:#9a7f33;margin-top:2px}',
+      '#qcpm-ov .qcpm-item .v{font-weight:700;font-size:13px;color:#2A2727;white-space:nowrap}',
+      '#qcpm-ov .qcpm-empty{text-align:center;font-style:italic;color:#7A7370;font-size:13px;padding:8px 0 4px}',
+      '#qcpm-ov .qcpm-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid #EFEAE0;background:#FAF8F3;border-radius:0 0 16px 16px}',
+      '#qcpm-ov .qcpm-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border:1px solid #E2DCD2;border-radius:9px;background:#fff;font:600 13px "Space Grotesk",system-ui,sans-serif;cursor:pointer;color:#2A2727;transition:all .14s}',
+      '#qcpm-ov .qcpm-btn:hover{border-color:#C9A84C}',
+      '#qcpm-ov .qcpm-btn.primary{background:linear-gradient(135deg,#E8CC7A,#C9A84C);color:#3a2f0c;border-color:transparent;font-weight:700}',
+      '#qcpm-ov .qcpm-btn.primary:hover{filter:brightness(1.04)}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  function _closeSaveOverlay(){ var ov=document.getElementById('qcpm-ov'); if(ov&&ov.parentNode) ov.parentNode.removeChild(ov); }
+  function _showSaveOverlay(items){
+    _qcpmStyle(); _closeSaveOverlay();
+    var ov=document.createElement('div'); ov.id='qcpm-ov';
+    var body='<p class="qcpm-intro">Diese zus\u00e4tzlichen Daten wurden beim PDF-Import oder AVM-Abruf erkannt. Sie passen nicht ins Boarding-Formular, k\u00f6nnen aber sp\u00e4ter ins Vollobjekt \u00fcbernommen werden.</p>';
+    if(!items || !items.length){
+      body+='<p class="qcpm-empty">Keine zus\u00e4tzlichen Daten zum \u00dcbernehmen \u2014 du kannst direkt speichern.</p>';
+    } else {
+      body+='<label class="qcpm-all"><input type="checkbox" id="qcpm-all" checked> Alle \u00fcbernehmen</label>';
+      var groups={}, order=[];
+      items.forEach(function(it){ var s=it.source||''; if(!groups[s]){groups[s]=[];order.push(s);} groups[s].push(it); });
+      order.forEach(function(src){
+        body+='<div class="qcpm-sec"><div class="qcpm-sec-t">'+_qcpmEsc(src||'Daten')+'</div>';
+        groups[src].forEach(function(it){
+          body+='<label class="qcpm-item"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(it.key)+'" checked>'
+              +'<span class="l">'+_qcpmEsc(it.label||'')+'<span class="t">\u2192 '+_qcpmEsc(it.target||'')+'</span></span>'
+              +'<span class="v">'+_qcpmEsc(it.value==null?'':String(it.value))+'</span></label>';
+        });
+        body+='</div>';
+      });
+    }
+    ov.innerHTML='<div class="qcpm-box"><div class="qcpm-head"><div class="qcpm-ic">\u2699</div>'
+      +'<h3>Welche Daten \u00fcbernehmen?</h3><button class="qcpm-x" id="qcpm-x">\u2715</button></div>'
+      +'<div class="qcpm-body">'+body+'</div>'
+      +'<div class="qcpm-foot"><button class="qcpm-btn" id="qcpm-cancel">Abbrechen</button>'
+      +'<button class="qcpm-btn primary" id="qcpm-ok">Speichern &amp; \u00fcbernehmen</button></div></div>';
+    document.body.appendChild(ov);
+    function cancel(){ _postToFrame({source:'dp-qc-parent',type:'qc-save-cancel'}); _closeSaveOverlay(); }
+    ov.addEventListener('click', function(e){ if(e.target===ov) cancel(); });
+    document.getElementById('qcpm-x').onclick=cancel;
+    document.getElementById('qcpm-cancel').onclick=cancel;
+    var all=document.getElementById('qcpm-all');
+    if(all) all.onchange=function(){ var on=all.checked; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){cb.checked=on;}); };
+    document.getElementById('qcpm-ok').onclick=function(){
+      var keys=[]; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){ if(cb.checked) keys.push(cb.getAttribute('data-key')); });
+      _postToFrame({source:'dp-qc-parent',type:'qc-save-confirm',checkedKeys:keys});   /* QcApp=const -> nur postMessage */
+      _closeSaveOverlay();
+    };
+  }
+
   window.addEventListener('message', function (ev) {
     var d = ev.data;
     if (!d || d.source !== 'dp-qc') return;
     if (d.type === 'qc-save') _handleSave(d.inputs, d.avm, d.photos, d.pendingTargets);
     else if (d.type === 'qc-import-pdf') _handleImportPdf();
     else if (d.type === 'qc-voice') _handleVoice();  /* v505-voice */
+    else if (d.type === 'qc-save-open') _showSaveOverlay(d.items || []);
   });
 })();

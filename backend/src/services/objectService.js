@@ -76,6 +76,17 @@ async function getById(userId, objectId) {
   return r.rows[0] || null;
 }
 
+// qb-seqfix: kollisionssichere, fortlaufende Objekt-Nummer (selbstheilend: MAX+1 aus Tabelle)
+async function nextFreeSeq(userId, year) {
+  const r = await query(
+    `SELECT COALESCE(MAX(CASE WHEN seq_no ~ '^[0-9]{4}-[0-9]+$' THEN split_part(seq_no,'-',2)::int END),0) + 1 AS n
+       FROM objects WHERE user_id = $1 AND seq_no LIKE $2`,
+    [userId, year + '-%']
+  );
+  const n = r.rows[0].n || 1;
+  return year + '-' + String(n).padStart(3, '0');
+}
+
 async function create(userId, { data, aiAnalysis, photos }) {
   const summary = extractSummary(data);
   // V23: Wenn der Client noch keine Sequenznummer hat, vergibt der Server eine
@@ -83,8 +94,7 @@ async function create(userId, { data, aiAnalysis, photos }) {
   let seq = summary.seq_no;
   if (!seq) {
     const year = new Date().getFullYear();
-    const seqResult = await query('SELECT get_next_obj_seq($1, $2) AS seq', [userId, year]);
-    seq = seqResult.rows[0].seq;
+    seq = await nextFreeSeq(userId, year);
     // Auch im data-Blob hinterlegen, damit Client beim nächsten GET die Nummer bekommt
     if (data && typeof data === 'object') data._obj_seq = seq;
   }
@@ -119,8 +129,7 @@ async function create(userId, { data, aiAnalysis, photos }) {
       if (e && e.code === '23505' && attempt < 5) {
         // seq_no schon vergeben -> naechste freie Server-Sequenz holen und neu versuchen
         const yr = new Date().getFullYear();
-        const sr = await query('SELECT get_next_obj_seq($1, $2) AS seq', [userId, yr]);
-        seq = sr.rows[0].seq;
+        seq = await nextFreeSeq(userId, yr);
         if (data && typeof data === 'object') data._obj_seq = seq;
         continue;
       }
