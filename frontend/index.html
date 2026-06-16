@@ -2969,7 +2969,7 @@ label.dp-required.qc-required::after {
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=124"></script>
 <script src="js/quick-check.js?v=463"></script>
-<script src="js/qc-bridge.js?v=652"></script>
+<script src="js/qc-bridge.js?v=709"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/ai-credits.js?v=491"></script>
@@ -3367,10 +3367,35 @@ label.dp-required.qc-required::after {
     }
   }
 
+  function _qbClaimBoot(){
+    if (window.__qbClaimStarted) return;
+    var code=null;
+    try { code=new URLSearchParams(location.search).get('qbclaim'); } catch(e){}
+    if (!code) { try { code=localStorage.getItem('qb_claim_code'); } catch(e){} }
+    if (!code) return;
+    var tok=null; try { tok=localStorage.getItem('ji_token'); } catch(e){}
+    if (!tok) return;   // nicht eingeloggt -> Register-Flow laeuft, kommt beim naechsten Laden erneut
+    if (!(window.Auth && typeof window.Auth.apiCall==='function') || typeof window.__qbClaimFromSnapshot!=='function' || typeof window.qcSaveAsObject!=='function') {
+      window.__qbClaimTries=(window.__qbClaimTries||0)+1;
+      if (window.__qbClaimTries>25) return;
+      return setTimeout(_qbClaimBoot, 200);
+    }
+    window.__qbClaimStarted=true;
+    try { localStorage.removeItem('qb_claim_code'); } catch(e){}
+    try { history.replaceState({}, '', location.pathname); } catch(e){}
+    window.Auth.apiCall('/passes/'+encodeURIComponent(code))
+      .then(function(pass){
+        var snap=(pass&&pass.snapshot)||{};
+        window.__qbClaimFromSnapshot(snap.data||{}, snap.photos||[]);
+        if (typeof toast==='function') toast('\u2713 Boarding \u00fcbernommen \u2014 als neues Objekt angelegt');
+      })
+      .catch(function(e){ console.warn('[qb-claim]', e); if(typeof toast==='function') toast('\u26a0 Pass konnte nicht geladen werden'); });
+  }
   function _v236Init() {
     _v236RemoveAllTabIndicators();  // alte Indikatoren entfernen
     _v236AttachErrorClear();
     _v236WrapQcSave();
+    try { _qbClaimBoot(); } catch(e){}
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _v236Init);

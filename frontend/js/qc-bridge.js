@@ -261,6 +261,28 @@
   }
 
   // ── (2) Exposé-Import: echten Import auslösen, Ergebnis an iframe zurück ──
+  // qb-claim: Pass-Snapshot ueber die KANONISCHE Kette (_handleSave) zu einem korrekten Objekt.
+  //           Kein Mapping-Duplikat: _handleSave ruft newObj -> qcSaveAsObject -> saveObj.
+  function _ensureClaimCarriers() {
+    if (document.getElementById('qc-carrier')) return null;   // QC war schon offen -> nicht anfassen
+    var wrap = document.createElement('div');
+    wrap.innerHTML = _carrierHtml();
+    var node = wrap.firstChild;
+    if (node) { node.setAttribute('data-qb-temp', '1'); document.body.appendChild(node); }
+    return node;
+  }
+  window.__qbClaimFromSnapshot = function (data, photos) {
+    data = data || {};
+    var ph = (photos || []).filter(Boolean).map(function (s, i) {
+      return (typeof s === 'string') ? { src: s, name: 'foto_' + (i + 1) + '.jpg' } : s;
+    });
+    var temp = null;
+    try { temp = _ensureClaimCarriers(); } catch (e) { console.warn('[qb-claim] carriers:', e); }
+    try { _handleSave(data, null, ph, null); }
+    catch (e) { console.error('[qb-claim] handleSave:', e); }
+    finally { if (temp && temp.parentNode) temp.parentNode.removeChild(temp); }
+  };
+
   function _snapImport() {
     var o = {};
     IMPORT_KEYS.forEach(function (k) { var e = document.getElementById(k); o[k] = e ? e.value : ''; });
