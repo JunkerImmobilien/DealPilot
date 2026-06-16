@@ -107,6 +107,7 @@
       var id = window._currentObjKey;
       if (!id) { toast('Bitte das Objekt zuerst speichern.'); btn.disabled = false; btn.innerHTML = plane() + ' Pass erstellen'; return; }
       var res = await window.Auth.apiCall('/passes', { method: 'POST', body: { objectId: id, days: _days } });
+      try { if (window._oabRefreshShareQr) setTimeout(window._oabRefreshShareQr, 400); } catch (e) {}
       if (!res || !res.code) throw new Error('no code');
       viewDone(res.code, res.expires_at);
     } catch (e) {

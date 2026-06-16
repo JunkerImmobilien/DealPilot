@@ -240,7 +240,7 @@
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen \u2014 1 L Kerosin') : '') +
           '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
         '</div></div>' +
-        '<a class="dp-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run"><span class="dp-pf-ic">' + _plane + '</span> Abrufen</button>' + '</span>' +
+        '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run"><span class="dp-pf-ic">' + _plane + '</span> Abrufen</button>' + '</span>' +
       '</div></div>' +
       '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
       (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Marktradar (PriceHubble/Sprengnetter) ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
@@ -258,6 +258,31 @@
     } catch (e) {}
     /* v570-pf: alter qc7-src-Listener ersetzt durch dp-pf-tile-Bind im Render */
     $('oab-run').addEventListener('click', runSelected);
+    /* F1/qb-objqr: aktiver Shared-Pass fuers aktuelle Objekt -> echten QR in .dp-pf-qr rendern */
+    function _updateShareQr(){
+      var a = document.getElementById('oab-pf-qr'); if (!a) return;
+      var objId = window._currentObjKey;
+      if (!objId || !window.Auth || typeof window.Auth.apiCall !== 'function') return;
+      window.Auth.apiCall('/passes', { method: 'GET' }).then(function (res) {
+        var items = (res && res.items) || [], now = Date.now(), m = null;
+        for (var i = 0; i < items.length; i++) { var p = items[i];
+          if (p.object_id === objId && !p.revoked_at && new Date(p.expires_at).getTime() > now) { m = p; break; } }
+        if (m && window.DpQr) {
+          var url = location.origin + '/pass.html?c=' + encodeURIComponent(m.code);
+          a.setAttribute('href', url); a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener');
+          a.setAttribute('title', 'Geteilter Pass ' + m.code);
+          a.innerHTML = window.DpQr.svg(url, { ecc: 'M', border: 1 }) + '<span class="dp-pf-scan">Pass \u203a</span>';
+          a.setAttribute('data-shared', '1');
+        } else { a.removeAttribute('data-shared'); }
+      }).catch(function () {});
+    }
+    function _startShareQrWatch(){
+      if (window._oabShareQrWatch) return; window._oabShareQrWatch = 1;
+      var last = window._currentObjKey;
+      setInterval(function () { if (window._currentObjKey !== last) { last = window._currentObjKey; try { _updateShareQr(); } catch (e) {} } }, 1500);
+    }
+    window._oabRefreshShareQr = _updateShareQr;
+    try { _updateShareQr(); _startShareQrWatch(); } catch (e) {}
     /* v656: ImmoMetrica-Tile gating + direkte Aktion */
     try {
       var _imoTile = mount.querySelector('[data-src="immometrica"]');

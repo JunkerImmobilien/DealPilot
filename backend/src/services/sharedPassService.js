@@ -142,7 +142,7 @@ async function claim(userId, code) {
 // Eigene Paesse auflisten (zum Verwalten/Widerrufen)
 async function listForOwner(userId) {
   const r = await query(
-    `SELECT code, title, view_count, claim_count, created_at, expires_at, revoked_at
+    `SELECT code, title, object_id, view_count, claim_count, created_at, expires_at, revoked_at
        FROM shared_passes WHERE owner_user_id = $1
        ORDER BY created_at DESC LIMIT 200`,
     [userId]
