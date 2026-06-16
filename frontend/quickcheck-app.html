@@ -6021,29 +6021,29 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 </script>
   <script src="js/dealpilot-mb-qc.js?v=554"></script>
   <script src="js/immometrica-qc.js?v=667"></script>
-<!-- qb-modal-vcenter: Modal im sichtbaren Fensterbereich zentrieren (Iframe-Fix v678) -->
-<style id="qb-modal-vcenter-style">
-.modal-backdrop.qb-vc .modal{position:absolute!important;left:50%!important;margin:0!important;transform:translate(-50%,-50%) scale(.96)!important}
-.modal-backdrop.qb-vc.show .modal{transform:translate(-50%,-50%) scale(1)!important}
+<!-- qb-modal-vcenter-v2: Modal ins sichtbare Fenster verschieben (transform-only, v679) -->
+<style id="qb-modal-vcenter-v2-style">
+.modal-backdrop.qb-vc .modal{transition:none!important}
 </style>
-<script id="qb-modal-vcenter-js">
+<script id="qb-modal-vcenter-v2-js">
 (function(){
   'use strict';
-  function center(bd){
+  var raf=0;
+  function shift(bd){
     var b=bd.querySelector('.modal'); if(!b) return;
-    var fe=window.frameElement; if(!fe) return;
+    var fe=window.frameElement; if(!fe){ b.style.transform=''; return; }
     var rect=fe.getBoundingClientRect();
     var pvh=(window.parent&&window.parent.innerHeight)||window.innerHeight;
     var H=fe.offsetHeight||document.documentElement.scrollHeight;
     var top=Math.max(0,-rect.top);
     var bot=Math.min(H,pvh-rect.top);
     if(bot<=top){top=0;bot=Math.min(H,pvh);}
-    b.style.top=((top+bot)/2)+'px';
-    b.style.maxHeight=Math.max(160,(bot-top-24))+'px';
-    b.style.overflowY='auto';
+    var visMid=(top+bot)/2;
+    var delta=visMid-(H/2);            // Box ist flex-zentriert bei ~H/2
+    b.style.transform='translateY('+Math.round(delta)+'px)';
   }
-  function onShow(bd){bd.classList.add('qb-vc');center(bd);}
-  function onHide(bd){bd.classList.remove('qb-vc');}
+  function onShow(bd){bd.classList.add('qb-vc');shift(bd);}
+  function onHide(bd){bd.classList.remove('qb-vc');var b=bd.querySelector('.modal');if(b)b.style.transform='';}
   function watch(bd){
     var mo=new MutationObserver(function(){
       if(bd.classList.contains('show'))onShow(bd);else onHide(bd);
@@ -6052,8 +6052,12 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
     if(bd.classList.contains('show'))onShow(bd);
   }
   function reflow(){
-    var l=document.querySelectorAll('.modal-backdrop.qb-vc.show');
-    for(var i=0;i<l.length;i++)center(l[i]);
+    if(raf)return;
+    raf=requestAnimationFrame(function(){
+      raf=0;
+      var l=document.querySelectorAll('.modal-backdrop.qb-vc.show');
+      for(var i=0;i<l.length;i++)shift(l[i]);
+    });
   }
   function init(){
     var bds=document.querySelectorAll('.modal-backdrop');
