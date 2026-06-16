@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=689';
+  var IFRAME_SRC = 'quickcheck-app.html?v=691';
 
   // v345: doppelte weiße "⚡ Quick-Check"-Überschrift entfernen.
   // Sie ist ein CSS-Pseudo-Element (body.qc-standalone-active #s-quick::before)
@@ -278,79 +278,11 @@
     }, { target: 'qc' });
   }
 
-  // qb-parentmodal v689: Save-Bestaetigung im Parent (immer im sichtbaren Fenster zentriert)
-  function _qcpmEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-  function _qcpmStyle(){
-    if (document.getElementById('qcpm-style')) return;
-    var s=document.createElement('style'); s.id='qcpm-style';
-    s.textContent = [
-      '.qcpm-ov{position:fixed;inset:0;z-index:100000;background:rgba(20,18,16,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;font-family:"DM Sans",system-ui,sans-serif}',
-      '.qcpm-box{background:#fff;border:1px solid rgba(201,168,76,.30);border-radius:14px;width:min(620px,100%);max-height:86vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.28)}',
-      '.qcpm-head{display:flex;align-items:center;gap:12px;padding:18px 22px 8px}',
-      '.qcpm-head h3{margin:0;font-size:17px;color:#2A2727}',
-      '.qcpm-x{margin-left:auto;background:none;border:0;font-size:20px;cursor:pointer;color:#7A7370;line-height:1}',
-      '.qcpm-body{padding:6px 22px 14px;overflow:auto}',
-      '.qcpm-body>p{font-size:13px;color:#555;line-height:1.5}',
-      '.qcpm-all{display:flex;align-items:center;gap:8px;margin:6px 0 12px;font-size:13px;color:#2A2727}',
-      '.qcpm-sec{margin-bottom:12px}',
-      '.qcpm-sec-t{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#9a7f33;margin-bottom:6px}',
-      '.qcpm-item{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border:1px solid #ECE6DA;border-radius:9px;margin-bottom:6px}',
-      '.qcpm-item .l{flex:1;font-size:13px;color:#2A2727}',
-      '.qcpm-item .t{font-size:11px;color:#9a7f33}',
-      '.qcpm-item .v{font-weight:700;font-size:13px;color:#2A2727;white-space:nowrap}',
-      '.qcpm-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid #EFEAE0}',
-      '.qcpm-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:1px solid #E7E2DC;border-radius:8px;background:#fff;font:600 13px "DM Sans",system-ui,sans-serif;cursor:pointer;color:#2A2727}',
-      '.qcpm-btn.primary{background:linear-gradient(135deg,#C9A84C,#9a7f33);color:#fff;border-color:transparent}'
-    ].join('');
-    document.head.appendChild(s);
-  }
-  function _closeSaveOverlay(){ var ov=document.getElementById('qcpm-ov'); if(ov&&ov.parentNode) ov.parentNode.removeChild(ov); }
-  function _showSaveOverlay(items){
-    _qcpmStyle(); _closeSaveOverlay();
-    var ov=document.createElement('div'); ov.className='qcpm-ov'; ov.id='qcpm-ov';
-    var body='<p style="font-size:13px;color:#555;line-height:1.5;margin:0 0 12px">Diese zus\u00e4tzlichen Daten wurden beim PDF-Import oder AVM-Abruf erkannt. Sie passen nicht ins Boarding-Formular, k\u00f6nnen aber sp\u00e4ter ins Vollobjekt \u00fcbernommen werden.</p>';
-    if(!items || !items.length){
-      body='<p style="text-align:center;font-style:italic">Keine zus\u00e4tzlichen Daten zum \u00dcbernehmen \u2014 du kannst direkt speichern.</p>';
-    } else {
-      body='<div class="qcpm-all"><input type="checkbox" id="qcpm-all" checked><label for="qcpm-all">Alle \u00fcbernehmen</label></div>';
-      var groups={}, order=[];
-      items.forEach(function(it){ var s=it.source||''; if(!groups[s]){groups[s]=[];order.push(s);} groups[s].push(it); });
-      order.forEach(function(src){
-        body+='<div class="qcpm-sec"><div class="qcpm-sec-t">'+_qcpmEsc(src)+'</div>';
-        groups[src].forEach(function(it){
-          body+='<label class="qcpm-item"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(it.key)+'" checked>'
-              +'<span class="l">'+_qcpmEsc(it.label||'')+' <span class="t">\u2192 '+_qcpmEsc(it.target||'')+'</span></span>'
-              +'<span class="v">'+_qcpmEsc(it.value==null?'':String(it.value))+'</span></label>';
-        });
-        body+='</div>';
-      });
-    }
-    ov.innerHTML='<div class="qcpm-box"><div class="qcpm-head"><h3>Welche Daten \u00fcbernehmen?</h3>'
-      +'<button class="qcpm-x" id="qcpm-x">\u2715</button></div>'
-      +'<div class="qcpm-body">'+body+'</div>'
-      +'<div class="qcpm-foot"><button class="qcpm-btn" id="qcpm-cancel">Abbrechen</button>'
-      +'<button class="qcpm-btn primary" id="qcpm-ok">Speichern &amp; \u00fcbernehmen</button></div></div>';
-    document.body.appendChild(ov);
-    function cancel(){ try { _frame.contentWindow.QcApp.closeSaveModal(); } catch(e){} _postToFrame({ source:'dp-qc-parent', type:'qc-save-cancel' }); _closeSaveOverlay(); }
-    ov.addEventListener('click', function(e){ if(e.target===ov) cancel(); });
-    document.getElementById('qcpm-x').onclick=cancel;
-    document.getElementById('qcpm-cancel').onclick=cancel;
-    var all=document.getElementById('qcpm-all');
-    if(all) all.onchange=function(){ var on=all.checked; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){ cb.checked=on; }); };
-    document.getElementById('qcpm-ok').onclick=function(){
-      var keys=[]; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){ if(cb.checked) keys.push(cb.getAttribute('data-key')); });
-      try { _frame.contentWindow.QcApp.confirmSave(new Set(keys)); } /* qb-v690-direct */
-      catch(e){ _postToFrame({ source:'dp-qc-parent', type:'qc-save-confirm', checkedKeys:keys }); }
-      _closeSaveOverlay();
-    };
-  }
-
   window.addEventListener('message', function (ev) {
     var d = ev.data;
     if (!d || d.source !== 'dp-qc') return;
     if (d.type === 'qc-save') _handleSave(d.inputs, d.avm, d.photos, d.pendingTargets);
     else if (d.type === 'qc-import-pdf') _handleImportPdf();
     else if (d.type === 'qc-voice') _handleVoice();  /* v505-voice */
-    else if (d.type === 'qc-save-open') _showSaveOverlay(d.items || []);
   });
 })();
