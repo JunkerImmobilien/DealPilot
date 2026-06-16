@@ -6021,67 +6021,44 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 </script>
   <script src="js/dealpilot-mb-qc.js?v=554"></script>
   <script src="js/immometrica-qc.js?v=667"></script>
-<!-- qb-modal-vcenter-v4: Modal fixed in die Mitte des sichtbaren Fensters (v681) -->
-<style id="qb-modal-vcenter-v4-style">
-.modal-backdrop.qb-vc .modal{transition:none!important}
-</style>
-<script id="qb-modal-vcenter-v4-js">
+<!-- qb-modal-vcenter-v5: beim Oeffnen Parent zum Modal scrollen (zentriert), v682 -->
+<script id="qb-modal-vcenter-v5-js">
 (function(){
   'use strict';
-  var raf=0, listening=false, tries=0;
-  function reset(b){ b.style.position=''; b.style.left=''; b.style.top=''; b.style.margin=''; b.style.transform=''; }
-  function shift(bd){
-    var b=bd&&bd.querySelector('.modal'); if(!b) return;
-    var fe=window.frameElement; if(!fe){ reset(b); return; }
-    var rect=fe.getBoundingClientRect();
-    var pvh=(window.parent&&window.parent.innerHeight)||window.innerHeight;
-    var H=fe.offsetHeight||document.documentElement.scrollHeight;
-    var top=Math.max(0,-rect.top), bot=Math.min(H,pvh-rect.top);
-    if(bot<=top){ top=0; bot=Math.min(H,pvh); }
-    var cy=(top+bot)/2;
-    b.style.position='fixed';
-    b.style.left='50%';
-    b.style.top=Math.round(cy)+'px';
-    b.style.margin='0';
-    b.style.transform='translate(-50%,-50%)';
+  var tries=0;
+  function scrollToModal(){
+    var bd=document.querySelector('.modal-backdrop.show'); if(!bd) return;
+    var b=bd.querySelector('.modal'); if(!b) return;
+    var fe=window.frameElement;
+    if(!fe){ try{ b.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} return; }
+    try{
+      var pv=window.parent;
+      var feRect=fe.getBoundingClientRect();
+      var feTopDoc=feRect.top+(pv.scrollY||pv.pageYOffset||0);
+      var mRect=b.getBoundingClientRect();            // im Iframe ohne Eigen-Scroll = Content-Y
+      var modalCenterDoc=feTopDoc + mRect.top + (mRect.height/2);
+      var pvh=pv.innerHeight||window.innerHeight;
+      var target=Math.max(0,Math.round(modalCenterDoc - pvh/2));
+      pv.scrollTo({top:target,behavior:'smooth'});
+    }catch(e){
+      try{ b.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e2){}
+    }
   }
-  function shown(){ return document.querySelectorAll('.modal-backdrop.show'); }
-  function positionAll(){
-    var l=shown();
-    for(var i=0;i<l.length;i++){ l[i].classList.add('qb-vc'); shift(l[i]); }
-    if(l.length) ensureListening();
-  }
-  function clearAll(){
-    var l=document.querySelectorAll('.modal-backdrop.qb-vc');
-    for(var i=0;i<l.length;i++){ l[i].classList.remove('qb-vc'); var b=l[i].querySelector('.modal'); if(b) reset(b); }
-  }
-  function reflow(){
-    if(raf) return;
-    raf=requestAnimationFrame(function(){ raf=0; var l=shown(); for(var i=0;i<l.length;i++) shift(l[i]); });
-  }
-  function ensureListening(){
-    if(listening) return; listening=true;
-    try{window.parent.addEventListener('scroll',reflow,{passive:true});}catch(e){}
-    try{window.parent.addEventListener('resize',reflow);}catch(e){}
-    window.addEventListener('resize',reflow);
-  }
-  function wrap(name, after){
+  function run(){ requestAnimationFrame(function(){ requestAnimationFrame(scrollToModal); }); }
+  function wrap(name){
     if(!window.QcApp || typeof QcApp[name]!=='function') return false;
-    if(QcApp[name].__qbv4) return true;
+    if(QcApp[name].__qbv5) return true;
     var orig=QcApp[name];
-    var fn=function(){ var r=orig.apply(this,arguments); try{ after(); }catch(e){} return r; };
-    fn.__qbv4=true;
+    var fn=function(){ var r=orig.apply(this,arguments); try{ run(); }catch(e){} return r; };
+    fn.__qbv5=true;
     try{ QcApp[name]=fn; }catch(e){ return false; }
-    return QcApp[name].__qbv4===true;
+    return QcApp[name].__qbv5===true;
   }
   function install(){
     if(!window.QcApp){ if(tries++<40) return setTimeout(install,80); return; }
-    var ok = wrap('openSaveModal', function(){ setTimeout(positionAll,0); });
-    wrap('openApiModal', function(){ setTimeout(positionAll,0); });
-    wrap('closeSaveModal', clearAll);
-    wrap('closeApiModal', clearAll);
-    wrap('confirmSave', clearAll);
-    if(!ok && tries++<40){ return setTimeout(install,80); }
+    var ok=wrap('openSaveModal');
+    wrap('openApiModal');
+    if(!ok && tries++<40) return setTimeout(install,80);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
