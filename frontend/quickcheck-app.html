@@ -3197,8 +3197,9 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
   .dp-pf-tile{ flex:1 1 100% !important; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
-<body>
+<body><!-- qb-rename-v699 -->
 
 <canvas id="particle-canvas"></canvas>
 
@@ -3300,7 +3301,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     <!-- Multi-Select: Abruf-Quellen frei kombinieren -->
     <span class="qc7-sources dp-pfbar" id="qc7-sources"><!-- v570-qcpf -->
       <span class="dp-pf-stripe"></span>
-      <div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot · Boarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
+      <div class="dp-pf-lead"><span class="bp">QUICKBOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot · Quickboarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
       <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">
         <label class="qc7-src dp-pf-tile dp-pf-soon-on" data-src="ph" title="Demnächst verfügbar"><!-- v644-coming-soon -->
           <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)" style="display:none" disabled>
@@ -5772,16 +5773,23 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 });}catch(e){}})();
 </script>
 
-<!-- qb-reskin (v697): QuickCheck-Score im Quick-Boarding-V1-Look (Tacho + Boarding-Ticket).
-     Liest LIVE-Werte aus #sb-num/#sub-*-v/#kpi-*. updateAll() bleibt unberuehrt. -->
-<style id="qb-reskin-style">
+
+
+
+
+<!-- qb-reskin2 (v698): QuickCheck-Score im Quick-Boarding-Look + QR-Stub + Auto-Pass.
+     Liest LIVE-Werte aus #sb-num/#sub-*-v/#kpi-*. updateAll() unveraendert.
+     Triggert (gedrosselt) qc-autopass an den Parent, sobald der Score erreichbar ist. -->
+<style id="qb-reskin-style2">
 #score-block .sb-header, #score-block .sb-hero, #score-block .kpis { display:none !important; }
 #score-block #particle-canvas, #score-block .qc-bgfx { display:none !important; }
-#score-block { background:#050505 !important; border:none !important; border-bottom:2.5px solid #C9A84C !important;
-  box-shadow:0 0 0 1px rgba(201,168,76,.16), 0 18px 50px rgba(0,0,0,.55) !important; overflow:hidden !important; }
+#score-block { background:transparent !important; border:none !important; box-shadow:none !important; overflow:visible !important; }
 #qb-bp{ --gold:#C9A84C;--gold-hi:#E8CC7A;--green:#3FA56C;--green-hi:#5BD98E;--red:#B8625C;--red-hi:#D9685F;
   --cmut:#9a9080;--cline:rgba(201,168,76,.2);--ctrack:rgba(201,168,76,.14);
-  position:relative;z-index:2;display:flex;flex-direction:column;color:#fff;font-family:'Space Grotesk','DM Sans',system-ui,sans-serif; }
+  position:relative;display:flex;align-items:stretch;border-radius:14px;overflow:hidden;
+  border:1px solid var(--cline);background:rgba(10,9,8,.82);color:#fff;
+  box-shadow:0 24px 60px -38px rgba(0,0,0,.85);font-family:'Space Grotesk','DM Sans',system-ui,sans-serif; }
+#qb-bp .qb-main{ flex:1;min-width:0;display:flex;flex-direction:column; }
 #qb-bp .ghead{ position:relative;overflow:hidden;display:flex;align-items:center;gap:9px;padding:11px 16px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 52%,#b8932f);min-height:44px; }
 #qb-bp .ghead::after{ content:"";position:absolute;inset:0;opacity:.42;pointer-events:none;background:repeating-linear-gradient(102deg,rgba(255,255,255,.10) 0 1px,transparent 1px 8px); }
 #qb-bp .ghead .t{ position:relative;z-index:2;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#5a4a14;font-weight:700; }
@@ -5813,8 +5821,20 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .kt .l{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.05em;text-transform:uppercase;color:var(--cmut); }
 #qb-bp .kt .v{ font-weight:700;font-size:13px;margin:2px 0 1px;color:#fff; }
 #qb-bp .kt .h{ font-size:7.5px;color:var(--cmut); }
+/* QR-Stub rechts */
+#qb-bp .qb-tear{ position:relative;width:0;border-left:3px dashed rgba(201,168,76,.45);flex:none; }
+#qb-bp .qb-tear::before,#qb-bp .qb-tear::after{ content:"";position:absolute;left:-11px;width:21px;height:21px;border-radius:50%;background:#050505; }
+#qb-bp .qb-tear::before{ top:-11px; } #qb-bp .qb-tear::after{ bottom:-11px; }
+#qb-bp .qb-stub{ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:14px;min-width:132px;background:#fff;flex:none; }
+#qb-bp .qb-stub .bp{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.18em;color:#8d846d; }
+#qb-bp .qb-stub .qrtile{ width:98px;height:98px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #efe7cf; }
+#qb-bp .qb-stub .qrtile img,#qb-bp .qb-stub .qrtile canvas{ display:block;border-radius:3px; }
+#qb-bp .qb-stub .qrtile .ph{ font-family:'JetBrains Mono',monospace;font-size:6.5px;letter-spacing:.1em;color:#b9ad88;text-align:center;line-height:1.5;padding:6px; }
+#qb-bp .qb-stub .no{ font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;color:#1a1407; }
+#qb-bp .qb-stub .cap{ font-family:'JetBrains Mono',monospace;font-size:6.5px;letter-spacing:.1em;text-transform:uppercase;color:#9a8f6a; }
+@media(max-width:560px){ #qb-bp{flex-direction:column} #qb-bp .qb-tear{display:none} #qb-bp .qb-stub{flex-direction:row;gap:14px;border-top:2px dashed rgba(201,168,76,.4)} }
 </style>
-<script id="qb-reskin-js">
+<script id="qb-reskin2-js">
 (function(){
   'use strict';
   var CATS=['rendite','cashflow','sicherheit','finanzierung','effizienz'];
@@ -5843,7 +5863,27 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
       '<text x="'+c+'" y="'+(c-z*0.03)+'" text-anchor="middle" dominant-baseline="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(z*0.24)+'" fill="#fff">'+(has?s:'\u2013')+'</text>'+
       '<text x="'+c+'" y="'+(c+z*0.14)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="'+(z*0.058)+'" letter-spacing="1.2" fill="'+colh+'">'+(has?tl(s):'')+'</text></svg>';
   }
-  var _raf=0;
+  // ── Auto-Pass-Trigger (gedrosselt) ──
+  function gatherInputs(){ var o={},els=document.querySelectorAll('input[id^="qc_"],select[id^="qc_"],textarea[id^="qc_"]'); for(var i=0;i<els.length;i++){var el=els[i],k=el.id.slice(3); if(k) o[k]=el.value;} return o; }
+  var _apLast=0,_apT=0;
+  function maybeAutopass(s){
+    if(s==null) return;
+    var now=Date.now();
+    if(now-_apLast<800){ if(_apT) return; _apT=setTimeout(function(){_apT=0;maybeAutopass(num(document.getElementById('sb-num')));},800); return; }
+    _apLast=now;
+    try{ window.parent.postMessage({source:'dp-qc',type:'qc-autopass',inputs:gatherInputs()},'*'); }catch(e){}
+  }
+  // ── QR aus Parent-Code rendern ──
+  function renderQR(url,code,tries){
+    tries=tries||0;
+    var tile=document.getElementById('qb-qrtile'),no=document.getElementById('qb-passno');
+    if(no&&code) no.textContent=code;
+    if(!tile) return;
+    if(!window.QRCode){ if(tries<20) return void setTimeout(function(){renderQR(url,code,tries+1);},250); return; }
+    if(url){ tile.innerHTML=''; try{ new window.QRCode(tile,{text:url,width:86,height:86,colorDark:'#141210',colorLight:'#fff',correctLevel:window.QRCode.CorrectLevel.M}); }catch(e){} }
+  }
+  window.addEventListener('message',function(ev){ var d=ev.data; if(!d||d.source!=='dp-app') return; if(d.type==='qc-autopass-code') renderQR(d.url,d.code,0); });
+
   function paint(){
     var sb=document.getElementById('score-block'); if(!sb) return;
     var s=num(document.getElementById('sb-num'));
@@ -5866,14 +5906,20 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     if(ht){ if(s==null){ht.textContent='';} else { ht.textContent=tl(s); ht.style.color=th(s); } }
     var hs=document.getElementById('qb-hstat'); var stEl=document.getElementById('sb-status');
     if(hs && stEl){ var raw=(stEl.textContent||'').split('\u00b7').pop().trim(); hs.textContent=raw||'PRE-FLIGHT'; }
+    maybeAutopass(s);
   }
-  function schedule(){ if(_raf) return; _raf=requestAnimationFrame(function(){ _raf=0; paint(); }); }
+  var _raf=0; function schedule(){ if(_raf) return; _raf=requestAnimationFrame(function(){ _raf=0; paint(); }); }
   function boot(){
     var sb=document.getElementById('score-block'); if(!sb){ return setTimeout(boot,150); }
     if(!document.getElementById('qb-bp')){
       var bp=document.createElement('div'); bp.id='qb-bp';
-      bp.innerHTML='<div class="ghead"><span class="contrail"></span><span class="flyico" id="qb-fly"></span><span class="t">Quick Boarding</span><span class="r"><span class="hstat" id="qb-hstat"></span><span class="htier" id="qb-htier"></span></span></div>'+
-        '<div class="mbody"><div class="dialwrap" id="qb-dial"></div><div class="cbars" id="qb-cbars"></div></div><div class="kt" id="qb-kt"></div>';
+      bp.innerHTML='<div class="qb-main">'+
+          '<div class="ghead"><span class="contrail"></span><span class="flyico" id="qb-fly"></span><span class="t">Quick Boarding</span><span class="r"><span class="hstat" id="qb-hstat"></span><span class="htier" id="qb-htier"></span></span></div>'+
+          '<div class="mbody"><div class="dialwrap" id="qb-dial"></div><div class="cbars" id="qb-cbars"></div></div>'+
+          '<div class="kt" id="qb-kt"></div>'+
+        '</div>'+
+        '<div class="qb-tear"></div>'+
+        '<div class="qb-stub" id="qb-stub"><span class="bp">QUICKBOARDING PASS</span><div class="qrtile" id="qb-qrtile"><span class="ph">QR<br>nach<br>Score</span></div><span class="no" id="qb-passno">\u2014</span><span class="cap">Scan \u203a \u00fcbernehmen</span></div>';
       sb.appendChild(bp);
     }
     var fly=document.getElementById('qb-fly'); if(fly) fly.innerHTML=jet();

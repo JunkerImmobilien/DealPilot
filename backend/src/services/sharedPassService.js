@@ -60,6 +60,42 @@ async function createForObject(userId, objectId, opts) {
   throw new HttpError(500, 'Could not allocate pass code');
 }
 
+// qb-snapshot: Pass aus Zwischenspeicher (kein Objekt) anlegen/aktualisieren. object_id bleibt NULL.
+async function upsertSnapshotPass(userId, opts) {
+  opts = opts || {};
+  const d = clampDays(opts.days);
+  const data = (opts.data && typeof opts.data === 'object') ? opts.data : {};
+  const title = (opts.title && String(opts.title).slice(0, 255)) || data.str || data.ort || 'Quick Boarding Pass';
+  const snapshot = { data: data, name: title, source: 'qc-buffer' };
+
+  if (opts.code) {
+    const u = await query(
+      `UPDATE shared_passes SET snapshot = $3, title = $4
+         WHERE code = $1 AND owner_user_id = $2 AND revoked_at IS NULL
+         RETURNING code, expires_at, created_at`,
+      [opts.code, userId, JSON.stringify(snapshot), title]
+    );
+    if (u.rowCount) return u.rows[0];
+    // sonst faellt durch -> neuer Pass
+  }
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const code = genCode(10);
+    try {
+      const r = await query(
+        `INSERT INTO shared_passes (code, owner_user_id, object_id, title, snapshot, expires_at)
+         VALUES ($1, $2, NULL, $3, $4, now() + make_interval(days => $5::int))
+         RETURNING code, expires_at, created_at`,
+        [code, userId, title, JSON.stringify(snapshot), d]
+      );
+      return r.rows[0];
+    } catch (err) {
+      if (err && err.code === '23505') continue;
+      throw err;
+    }
+  }
+  throw new HttpError(500, 'Could not allocate pass code');
+}
+
 // Oeffentlich lesen (kein Auth) — gibt Status zurueck statt zu werfen
 async function getPublic(code) {
   const r = await query(
@@ -144,5 +180,5 @@ async function purgeExpired() {
 }
 
 module.exports = {
-  createForObject, getPublic, claim, listForOwner, revoke, extend, purgeExpired, genCode
+  createForObject, upsertSnapshotPass, getPublic, claim, listForOwner, revoke, extend, purgeExpired, genCode
 };
