@@ -6021,23 +6021,29 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 </script>
   <script src="js/dealpilot-mb-qc.js?v=554"></script>
   <script src="js/immometrica-qc.js?v=667"></script>
-<!-- qb-modal-vcenter-v3: Modal ins sichtbare Fenster (transform-only, kein Observer, v680) -->
-<style id="qb-modal-vcenter-v3-style">
+<!-- qb-modal-vcenter-v4: Modal fixed in die Mitte des sichtbaren Fensters (v681) -->
+<style id="qb-modal-vcenter-v4-style">
 .modal-backdrop.qb-vc .modal{transition:none!important}
 </style>
-<script id="qb-modal-vcenter-v3-js">
+<script id="qb-modal-vcenter-v4-js">
 (function(){
   'use strict';
   var raf=0, listening=false, tries=0;
+  function reset(b){ b.style.position=''; b.style.left=''; b.style.top=''; b.style.margin=''; b.style.transform=''; }
   function shift(bd){
     var b=bd&&bd.querySelector('.modal'); if(!b) return;
-    var fe=window.frameElement; if(!fe){ b.style.transform=''; return; }
+    var fe=window.frameElement; if(!fe){ reset(b); return; }
     var rect=fe.getBoundingClientRect();
     var pvh=(window.parent&&window.parent.innerHeight)||window.innerHeight;
     var H=fe.offsetHeight||document.documentElement.scrollHeight;
     var top=Math.max(0,-rect.top), bot=Math.min(H,pvh-rect.top);
-    if(bot<=top){top=0;bot=Math.min(H,pvh);}
-    b.style.transform='translateY('+Math.round((top+bot)/2-(H/2))+'px)';
+    if(bot<=top){ top=0; bot=Math.min(H,pvh); }
+    var cy=(top+bot)/2;
+    b.style.position='fixed';
+    b.style.left='50%';
+    b.style.top=Math.round(cy)+'px';
+    b.style.margin='0';
+    b.style.transform='translate(-50%,-50%)';
   }
   function shown(){ return document.querySelectorAll('.modal-backdrop.show'); }
   function positionAll(){
@@ -6047,7 +6053,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   }
   function clearAll(){
     var l=document.querySelectorAll('.modal-backdrop.qb-vc');
-    for(var i=0;i<l.length;i++){ l[i].classList.remove('qb-vc'); var b=l[i].querySelector('.modal'); if(b) b.style.transform=''; }
+    for(var i=0;i<l.length;i++){ l[i].classList.remove('qb-vc'); var b=l[i].querySelector('.modal'); if(b) reset(b); }
   }
   function reflow(){
     if(raf) return;
@@ -6061,12 +6067,12 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   }
   function wrap(name, after){
     if(!window.QcApp || typeof QcApp[name]!=='function') return false;
-    if(QcApp[name].__qbv3) return true;
+    if(QcApp[name].__qbv4) return true;
     var orig=QcApp[name];
     var fn=function(){ var r=orig.apply(this,arguments); try{ after(); }catch(e){} return r; };
-    fn.__qbv3=true;
+    fn.__qbv4=true;
     try{ QcApp[name]=fn; }catch(e){ return false; }
-    return QcApp[name].__qbv3===true;
+    return QcApp[name].__qbv4===true;
   }
   function install(){
     if(!window.QcApp){ if(tries++<40) return setTimeout(install,80); return; }
