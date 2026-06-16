@@ -6021,52 +6021,63 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 </script>
   <script src="js/dealpilot-mb-qc.js?v=554"></script>
   <script src="js/immometrica-qc.js?v=667"></script>
-<!-- qb-modal-vcenter-v2: Modal ins sichtbare Fenster verschieben (transform-only, v679) -->
-<style id="qb-modal-vcenter-v2-style">
+<!-- qb-modal-vcenter-v3: Modal ins sichtbare Fenster (transform-only, kein Observer, v680) -->
+<style id="qb-modal-vcenter-v3-style">
 .modal-backdrop.qb-vc .modal{transition:none!important}
 </style>
-<script id="qb-modal-vcenter-v2-js">
+<script id="qb-modal-vcenter-v3-js">
 (function(){
   'use strict';
-  var raf=0;
+  var raf=0, listening=false, tries=0;
   function shift(bd){
-    var b=bd.querySelector('.modal'); if(!b) return;
+    var b=bd&&bd.querySelector('.modal'); if(!b) return;
     var fe=window.frameElement; if(!fe){ b.style.transform=''; return; }
     var rect=fe.getBoundingClientRect();
     var pvh=(window.parent&&window.parent.innerHeight)||window.innerHeight;
     var H=fe.offsetHeight||document.documentElement.scrollHeight;
-    var top=Math.max(0,-rect.top);
-    var bot=Math.min(H,pvh-rect.top);
+    var top=Math.max(0,-rect.top), bot=Math.min(H,pvh-rect.top);
     if(bot<=top){top=0;bot=Math.min(H,pvh);}
-    var visMid=(top+bot)/2;
-    var delta=visMid-(H/2);            // Box ist flex-zentriert bei ~H/2
-    b.style.transform='translateY('+Math.round(delta)+'px)';
+    b.style.transform='translateY('+Math.round((top+bot)/2-(H/2))+'px)';
   }
-  function onShow(bd){bd.classList.add('qb-vc');shift(bd);}
-  function onHide(bd){bd.classList.remove('qb-vc');var b=bd.querySelector('.modal');if(b)b.style.transform='';}
-  function watch(bd){
-    var mo=new MutationObserver(function(){
-      if(bd.classList.contains('show'))onShow(bd);else onHide(bd);
-    });
-    mo.observe(bd,{attributes:true,attributeFilter:['class']});
-    if(bd.classList.contains('show'))onShow(bd);
+  function shown(){ return document.querySelectorAll('.modal-backdrop.show'); }
+  function positionAll(){
+    var l=shown();
+    for(var i=0;i<l.length;i++){ l[i].classList.add('qb-vc'); shift(l[i]); }
+    if(l.length) ensureListening();
+  }
+  function clearAll(){
+    var l=document.querySelectorAll('.modal-backdrop.qb-vc');
+    for(var i=0;i<l.length;i++){ l[i].classList.remove('qb-vc'); var b=l[i].querySelector('.modal'); if(b) b.style.transform=''; }
   }
   function reflow(){
-    if(raf)return;
-    raf=requestAnimationFrame(function(){
-      raf=0;
-      var l=document.querySelectorAll('.modal-backdrop.qb-vc.show');
-      for(var i=0;i<l.length;i++)shift(l[i]);
-    });
+    if(raf) return;
+    raf=requestAnimationFrame(function(){ raf=0; var l=shown(); for(var i=0;i<l.length;i++) shift(l[i]); });
   }
-  function init(){
-    var bds=document.querySelectorAll('.modal-backdrop');
-    for(var i=0;i<bds.length;i++)watch(bds[i]);
+  function ensureListening(){
+    if(listening) return; listening=true;
     try{window.parent.addEventListener('scroll',reflow,{passive:true});}catch(e){}
     try{window.parent.addEventListener('resize',reflow);}catch(e){}
     window.addEventListener('resize',reflow);
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+  function wrap(name, after){
+    if(!window.QcApp || typeof QcApp[name]!=='function') return false;
+    if(QcApp[name].__qbv3) return true;
+    var orig=QcApp[name];
+    var fn=function(){ var r=orig.apply(this,arguments); try{ after(); }catch(e){} return r; };
+    fn.__qbv3=true;
+    try{ QcApp[name]=fn; }catch(e){ return false; }
+    return QcApp[name].__qbv3===true;
+  }
+  function install(){
+    if(!window.QcApp){ if(tries++<40) return setTimeout(install,80); return; }
+    var ok = wrap('openSaveModal', function(){ setTimeout(positionAll,0); });
+    wrap('openApiModal', function(){ setTimeout(positionAll,0); });
+    wrap('closeSaveModal', clearAll);
+    wrap('closeApiModal', clearAll);
+    wrap('confirmSave', clearAll);
+    if(!ok && tries++<40){ return setTimeout(install,80); }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
 </script>
 
