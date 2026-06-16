@@ -227,7 +227,7 @@ window.DealPilotInvestmentProfile = (function() {
     var p = {
       tilgung_default:        v('ip_tilgung_default'),
       zinsbindung_default:    v('ip_zinsbindung_default'),
-      zins_override:          v('ip_zins_override'),
+      zins_override:          (function(){ var _z=document.getElementById('ip_zins_override'); if(_z && _z.dataset && _z.dataset.market==='1') return null; return v('ip_zins_override'); })(),
       zins_margin:            s('ip_zins_margin'),
       hausgeld_pct:           (function(){ var own = v('ip_hausgeld_pct'); if (own != null) return own; var sl = s('ip_hausgeld_sel'); if (sl != null && String(sl).trim() !== '') { var n2 = parseFloat(String(sl).replace(',', '.')); return isFinite(n2) ? n2 : null; } return null; })(),
       ek_quote_default:       v('ip_ek_quote_default'),
@@ -262,12 +262,33 @@ window.DealPilotInvestmentProfile = (function() {
     }, 100);
   }
 
+  // v714: Marktzins automatisch ins 'Eigener Zinssatz'-Feld; Label 'Marktzinssatz'.
+  function _mktZins(){
+    var bEl=document.getElementById('ip_zinsbindung_default');
+    var mEl=document.getElementById('ip_zins_margin');
+    var b=bEl?(parseInt(bEl.value,10)||10):10;
+    var m=mEl?(mEl.value||'standard'):'standard';
+    try { if(typeof window.dpGetIndicativeZins==='function'){ var r=window.dpGetIndicativeZins(b,m); if(typeof r==='number'&&isFinite(r)&&r>0) return r; } } catch(e){}
+    return null;
+  }
+  function wireMarketRate(){
+    var inp=document.getElementById('ip_zins_override'); if(!inp || inp._mktWired) return; inp._mktWired=1;
+    var lab=document.querySelector('label[for="ip_zins_override"]');
+    function setLabel(market){ if(lab) lab.textContent = market ? 'Marktzinssatz' : 'Eigener Zinssatz (optional)'; }
+    function toMarket(){ var r=_mktZins(); if(r==null) return; inp.dataset.market='1'; inp.value=r.toFixed(2); setLabel(true); }
+    function toOverride(){ inp.dataset.market=''; setLabel(false); }
+    if(!String(inp.value).trim()){ toMarket(); if(inp.dataset.market!=='1'){ setTimeout(function(){ if(!String(inp.value).trim()) toMarket(); },500); } }
+    else { toOverride(); }
+    ['ip_zinsbindung_default','ip_zins_margin'].forEach(function(id){ var el=document.getElementById(id); if(!el||el._mktBound) return; el._mktBound=1; el.addEventListener('change', function(){ if(inp.dataset.market==='1') toMarket(); }); });
+    inp.addEventListener('input', function(){ if(inp.dataset.market==='1' && document.activeElement===inp) toOverride(); });
+  }
   return {
     load: load,
     get: get,
     save: save,                     // V63.96: für Settings-KI-Tab-Persist
     applyToNewObject: applyToNewObject,
     getZins: getZins,
+    wireMarketRate: wireMarketRate,
     getHausgeldMonthly: getHausgeldMonthly,
     syncAiParamsToTab: syncAiParamsToTab,
     renderPaneHtml: renderPaneHtml,
