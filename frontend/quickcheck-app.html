@@ -6029,48 +6029,54 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 (function(){ try{ if(window.frameElement){ document.documentElement.classList.add('qc-embedded'); } }catch(e){} })();
 </script>
 
-<!-- qb-modal-fixedview (v687): Box fixed in die Mitte des sichtbaren Fensters -->
-<style id="qb-modal-fixedview-style">
-.modal-backdrop.qb-fv .modal{ position:fixed !important; left:50% !important; margin:0 !important; transform:translate(-50%,-50%) !important; transition:none !important; }
+<!-- qb-modal-absview (v688): Box absolute an Content-Y = sichtbare Mitte -->
+<style id="qb-modal-absview-style">
+.modal-backdrop.qb-av{ align-items:flex-start !important; }
+.modal-backdrop.qb-av .modal{ position:absolute !important; left:50% !important; margin:0 !important; transform:translate(-50%,-50%) !important; transition:none !important; }
 </style>
-<script id="qb-modal-fixedview-js">
+<script id="qb-modal-absview-js">
 (function(){
   'use strict';
-  var raf=0, tries=0, openCount=0;
+  var raf=0, tries=0;
   function place(){
-    var bd=document.querySelector('.modal-backdrop.show'); if(!bd){ return; }
+    var bd=document.querySelector('.modal-backdrop.show'); if(!bd) return;
     var b=bd.querySelector('.modal'); if(!b) return;
+    bd.classList.add('qb-av');
     var fe=window.frameElement;
-    bd.classList.add('qb-fv');
-    if(!fe){ b.style.top='50%'; return; }
-    var rect=fe.getBoundingClientRect();          // iframe-Lage relativ zum sichtbaren Fenster
-    var pvh=(window.parent&&window.parent.innerHeight)||window.innerHeight;
-    var H=fe.offsetHeight||document.documentElement.scrollHeight;
-    var visTop=Math.max(0, -rect.top);            // sichtbarer Bereich in Content-Koordinaten
-    var visBot=Math.min(H, pvh - rect.top);
-    if(visBot<=visTop){ visTop=0; visBot=Math.min(H,pvh); }
-    b.style.top=Math.round((visTop+visBot)/2)+'px';   // top ist Content-Koordinate (fixed = iframe-Ursprung)
+    var cy;
+    if(fe){
+      var rect=fe.getBoundingClientRect();
+      var pvh=(window.parent&&window.parent.innerHeight)||window.innerHeight;
+      var H=fe.offsetHeight||document.documentElement.scrollHeight;
+      var visTop=Math.max(0,-rect.top);
+      var visBot=Math.min(H, pvh-rect.top);
+      if(visBot<=visTop){ visTop=0; visBot=Math.min(H,pvh); }
+      cy=(visTop+visBot)/2;
+    } else {
+      cy=(window.innerHeight/2)+(window.scrollY||0);
+    }
+    b.style.top=Math.round(cy)+'px';
   }
   function clear(){
-    var l=document.querySelectorAll('.modal-backdrop.qb-fv');
-    for(var i=0;i<l.length;i++){ l[i].classList.remove('qb-fv'); var b=l[i].querySelector('.modal'); if(b){ b.style.top=''; } }
+    var l=document.querySelectorAll('.modal-backdrop.qb-av');
+    for(var i=0;i<l.length;i++){ l[i].classList.remove('qb-av'); var b=l[i].querySelector('.modal'); if(b) b.style.top=''; }
   }
   function run(){ requestAnimationFrame(function(){ requestAnimationFrame(place); }); }
-  function reflow(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; if(document.querySelector('.modal-backdrop.show.qb-fv')) place(); }); }
+  function reflow(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; if(document.querySelector('.modal-backdrop.show.qb-av')) place(); }); }
   function wrapOpen(name){
     if(!window.QcApp || typeof QcApp[name]!=='function') return false;
-    if(QcApp[name].__qbfv) return true;
+    if(QcApp[name].__qbav) return true;
     var orig=QcApp[name];
     var fn=function(){ var r=orig.apply(this,arguments); try{ run(); }catch(e){} return r; };
-    fn.__qbfv=true; try{ QcApp[name]=fn; }catch(e){ return false; }
-    return QcApp[name].__qbfv===true;
+    fn.__qbav=true; try{ QcApp[name]=fn; }catch(e){ return false; }
+    return QcApp[name].__qbav===true;
   }
   function wrapClose(name){
     if(!window.QcApp || typeof QcApp[name]!=='function') return;
-    if(QcApp[name].__qbfvc) return;
+    if(QcApp[name].__qbavc) return;
     var orig=QcApp[name];
     var fn=function(){ try{ clear(); }catch(e){} return orig.apply(this,arguments); };
-    fn.__qbfvc=true; try{ QcApp[name]=fn; }catch(e){}
+    fn.__qbavc=true; try{ QcApp[name]=fn; }catch(e){}
   }
   function install(){
     if(!window.QcApp){ if(tries++<40) return setTimeout(install,80); return; }
