@@ -308,7 +308,7 @@
   function _showSaveOverlay(items){
     _qcpmStyle(); _closeSaveOverlay();
     var ov=document.createElement('div'); ov.className='qcpm-ov'; ov.id='qcpm-ov';
-    var body='';
+    var body='<p style="font-size:13px;color:#555;line-height:1.5;margin:0 0 12px">Diese zus\u00e4tzlichen Daten wurden beim PDF-Import oder AVM-Abruf erkannt. Sie passen nicht ins Boarding-Formular, k\u00f6nnen aber sp\u00e4ter ins Vollobjekt \u00fcbernommen werden.</p>';
     if(!items || !items.length){
       body='<p style="text-align:center;font-style:italic">Keine zus\u00e4tzlichen Daten zum \u00dcbernehmen \u2014 du kannst direkt speichern.</p>';
     } else {
@@ -331,7 +331,7 @@
       +'<div class="qcpm-foot"><button class="qcpm-btn" id="qcpm-cancel">Abbrechen</button>'
       +'<button class="qcpm-btn primary" id="qcpm-ok">Speichern &amp; \u00fcbernehmen</button></div></div>';
     document.body.appendChild(ov);
-    function cancel(){ _postToFrame({ source:'dp-qc-parent', type:'qc-save-cancel' }); _closeSaveOverlay(); }
+    function cancel(){ try { _frame.contentWindow.QcApp.closeSaveModal(); } catch(e){} _postToFrame({ source:'dp-qc-parent', type:'qc-save-cancel' }); _closeSaveOverlay(); }
     ov.addEventListener('click', function(e){ if(e.target===ov) cancel(); });
     document.getElementById('qcpm-x').onclick=cancel;
     document.getElementById('qcpm-cancel').onclick=cancel;
@@ -339,7 +339,8 @@
     if(all) all.onchange=function(){ var on=all.checked; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){ cb.checked=on; }); };
     document.getElementById('qcpm-ok').onclick=function(){
       var keys=[]; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){ if(cb.checked) keys.push(cb.getAttribute('data-key')); });
-      _postToFrame({ source:'dp-qc-parent', type:'qc-save-confirm', checkedKeys:keys });
+      try { _frame.contentWindow.QcApp.confirmSave(new Set(keys)); } /* qb-v690-direct */
+      catch(e){ _postToFrame({ source:'dp-qc-parent', type:'qc-save-confirm', checkedKeys:keys }); }
       _closeSaveOverlay();
     };
   }
