@@ -6029,75 +6029,89 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 (function(){ try{ if(window.frameElement){ document.documentElement.classList.add('qc-embedded'); } }catch(e){} })();
 </script>
 
-<!-- qb-modalmove (v691): echtes Save-Modal in den Parent verschieben, dort mittig -->
-<script id="qb-modalmove-js">
+<!-- qb-ov (v693): Modal-Box in eigenen, zentrierten Parent-Overlay -->
+<script id="qb-ov-js">
 (function(){
   'use strict';
-  var tries=0, _home=null, _wired=false, _cssDone=false;
+  var tries=0, _box=null, _cssDone=false, _wired=false;
+  function pwin(){ return (window.parent && window.parent!==window) ? window.parent : null; }
+  function tmEl(){ return document.getElementById('transfer-modal'); }
 
-  function pdoc(){ return (window.parent && window.parent!==window) ? window.parent.document : null; }
-
-  function copyCss(){
-    if(_cssDone) return; var pd=pdoc(); if(!pd) return;
-    if(pd.getElementById('qb-moved-modal-css')){ _cssDone=true; return; }
-    var css='', m=document.getElementById('transfer-modal');
-    var rootVars={};
+  function copyCss(pd, box){
+    if(_cssDone) return;
+    var css='', vars={};
     function walk(rules){
       if(!rules) return;
       for(var j=0;j<rules.length;j++){
         var r=rules[j];
-        if(r.type===1){ // STYLE_RULE
+        if(r.type===1){
           var sel=r.selectorText||'';
-          if(/:root/.test(sel)){
-            for(var k=0;k<r.style.length;k++){ var p=r.style[k]; if(p.indexOf('--')===0) rootVars[p]=r.style.getPropertyValue(p); }
-          } else if(/\.modal|\.transfer|\.btn(\b|\.|:)/.test(sel)){
-            css+=r.cssText+'\n';
-          }
-        } else if(r.type===4){ // MEDIA_RULE
-          if(r.cssText && /modal|transfer/.test(r.cssText)) css+=r.cssText+'\n';
-        }
+          if(/:root/.test(sel)){ for(var k=0;k<r.style.length;k++){ var p=r.style[k]; if(p.indexOf('--')===0) vars[p]=r.style.getPropertyValue(p); } }
+          else if(/\.modal|\.transfer|\.btn/.test(sel)){ css+=r.cssText+'\n'; }
+        } else if(r.type===4){ if(r.cssText && /modal|transfer/.test(r.cssText)) css+=r.cssText+'\n'; }
       }
     }
-    try{ for(var i=0;i<document.styleSheets.length;i++){ try{ walk(document.styleSheets[i].cssRules); }catch(e){} } }catch(e){}
-    // CSS-Variablen als Inline-Props auf den Modal-Knoten (kein globaler Parent-Override)
-    if(m){ Object.keys(rootVars).forEach(function(v){ try{ m.style.setProperty(v, rootVars[v]); }catch(e){} }); }
-    /* qb-moved-center: erzwingt Zentrierung im Parent (wie das funktionierende Overlay) */
-    css += '.modal-backdrop.qb-moved{position:fixed !important;inset:0 !important;display:flex !important;align-items:center !important;justify-content:center !important;overflow-y:auto !important;margin:0 !important;padding:24px !important;z-index:100000 !important}.modal-backdrop.qb-moved>.modal{margin:0 !important;max-height:90vh !important;overflow:auto !important}';
-    var st=pd.createElement('style'); st.id='qb-moved-modal-css'; st.textContent=css; pd.head.appendChild(st);
+    for(var i=0;i<document.styleSheets.length;i++){ try{ walk(document.styleSheets[i].cssRules); }catch(e){} }
+    Object.keys(vars).forEach(function(v){ try{ box.style.setProperty(v, vars[v]); }catch(e){} });
+    var st=pd.getElementById('qb-ov-css') || pd.createElement('style');
+    st.id='qb-ov-css'; st.textContent=css;
+    if(!st.parentNode) (pd.head||pd.documentElement).appendChild(st);
     _cssDone=true;
   }
 
-  function backHome(m){ try{ if(_home && m.parentNode!==_home) _home.appendChild(m); }catch(e){} }
+  function getOv(pd){
+    var ov=pd.getElementById('qb-ov');
+    if(!ov){
+      ov=pd.createElement('div'); ov.id='qb-ov';
+      ov.style.cssText='position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:24px;overflow:auto;background:rgba(20,18,18,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)';
+      ov.addEventListener('click', function(e){ if(e.target===ov) restore(pd); });
+      pd.body.appendChild(ov);
+    }
+    return ov;
+  }
 
-  function wireButtons(m){
-    if(_wired) return; _wired=true;
-    var close=m.querySelectorAll('[onclick*="closeSaveModal"]');
-    [].forEach.call(close,function(b){ b.removeAttribute('onclick'); b.onclick=function(){ m.classList.remove('show'); backHome(m); }; });
-    var ok=m.querySelector('[onclick*="confirmSave"]');
-    if(ok){ ok.removeAttribute('onclick'); ok.onclick=function(){ m.classList.remove('show'); backHome(m); try{ QcApp.confirmSave(); }catch(e){} }; }
-    var tg=m.querySelector('[onchange*="toggleAllTransfer"]');
-    if(tg){ tg.removeAttribute('onchange'); tg.onchange=function(){ var on=this.checked; [].forEach.call(m.querySelectorAll('#transfer-list input[type=checkbox]'),function(cb){ cb.checked=on; }); }; }
-    // Klick auf den dunklen Hintergrund schliesst (wie Original-Backdrop)
-    m.addEventListener('click', function(e){ if(e.target===m){ m.classList.remove('show'); backHome(m); } });
+  function restore(pd){
+    var ov=pd.getElementById('qb-ov'); if(ov) ov.style.display='none';
+    var tm=tmEl();
+    if(_box && tm && _box.parentNode!==tm) tm.appendChild(_box);
+    if(tm){ tm.classList.remove('show'); tm.style.display=''; }
+  }
+
+  function wire(pd){
+    if(_wired || !_box) return; _wired=true;
+    [].forEach.call(_box.querySelectorAll('[onclick*="closeSaveModal"]'), function(b){
+      b.removeAttribute('onclick'); b.onclick=function(){ restore(pd); };
+    });
+    var ok=_box.querySelector('[onclick*="confirmSave"]');
+    if(ok){ ok.removeAttribute('onclick'); ok.onclick=function(){ restore(pd); try{ QcApp.confirmSave(); }catch(e){} }; }
+    var tg=_box.querySelector('[onchange*="toggleAllTransfer"]');
+    if(tg){ tg.removeAttribute('onchange'); tg.onchange=function(){ var on=this.checked; [].forEach.call(_box.querySelectorAll('#transfer-list input[type=checkbox]'), function(cb){ cb.checked=on; }); }; }
   }
 
   function relocate(){
-    var pd=pdoc(); var m=document.getElementById('transfer-modal'); if(!m) return;
-    if(!pd){ return; } // kein Parent -> Original-Verhalten
-    if(!_home) _home=m.parentNode;
-    copyCss();
-    wireButtons(m);
-    try{ m.style.zIndex='100000'; }catch(e){}
-    m.classList.add('qb-moved'); // qb-moved-center
-    if(m.parentNode!==pd.body) pd.body.appendChild(m); // in den Parent (fixed = sichtbares Fenster)
+    var pw=pwin(); if(!pw) return; var pd=pw.document;
+    var tm=tmEl(); if(!tm) return;
+    var box=tm.querySelector('.modal'); if(!box) return;
+    copyCss(pd, box);
+    var ov=getOv(pd);
+    if(_box!==box){ _box=box; _wired=false; wire(pd); }
+    ov.appendChild(box);          // nur die Box ins zentrierte Overlay
+    ov.style.display='flex';
+    tm.classList.remove('show'); tm.style.display='none';  // leeren Original-Backdrop im iframe verstecken
   }
 
   function install(){
     if(!window.QcApp || typeof QcApp.openSaveModal!=='function'){ if(tries++<60) return setTimeout(install,80); return; }
-    if(QcApp.openSaveModal.__qbmv) return;
-    var orig=QcApp.openSaveModal;
-    var fn=function(){ var r=orig.apply(this,arguments); try{ relocate(); }catch(e){} return r; };
-    fn.__qbmv=true; QcApp.openSaveModal=fn;
+    if(!QcApp.openSaveModal.__qbov){
+      var orig=QcApp.openSaveModal;
+      var fn=function(){ var r=orig.apply(this,arguments); try{ relocate(); }catch(e){} return r; };
+      fn.__qbov=true; QcApp.openSaveModal=fn;
+    }
+    if(typeof QcApp.closeSaveModal==='function' && !QcApp.closeSaveModal.__qbov){
+      var oc=QcApp.closeSaveModal;
+      var cf=function(){ try{ var pw=pwin(); if(pw) restore(pw.document); }catch(e){} return oc.apply(this,arguments); };
+      cf.__qbov=true; QcApp.closeSaveModal=cf;
+    }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
