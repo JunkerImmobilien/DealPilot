@@ -218,6 +218,25 @@
       if (event && event.target && event.target.id === 'qc_plz') {
         var plzVal = (v('qc_plz') || '').trim();
         if (/^\d{5}$/.test(plzVal)) {
+          /* qb-plz-ort: Ort aus PLZ ableiten (openPLZ, EU/DSGVO, kein Key). Nur fuellen wenn Ort leer. */
+          try {
+            var _ortF = document.getElementById('qc_ort');
+            if (_ortF && !_ortF.value.trim() && !_ortF.dataset.userSet && window.__qbPlzOrtLast !== plzVal) {
+              window.__qbPlzOrtLast = plzVal;
+              fetch('https://openplzapi.org/de/Localities?postalCode=' + plzVal)
+                .then(function(r){ return r.ok ? r.json() : null; })
+                .then(function(arr){
+                  if (arr && arr.length && arr[0] && arr[0].name) {
+                    var of = document.getElementById('qc_ort');
+                    if (of && !of.value.trim() && !of.dataset.userSet) {
+                      of.value = arr[0].name;
+                      try { of.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+                    }
+                  }
+                })
+                .catch(function(){});
+            }
+          } catch (e) {}
           var knkField = document.getElementById('qc_knk');
           // Nur überschreiben wenn User nicht selbst was eingetragen hat
           if (knkField && !knkField.dataset.userSet) {
