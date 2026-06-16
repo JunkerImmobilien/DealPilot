@@ -5777,19 +5777,21 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 
 
 
-<!-- qb-reskin2 (v698): QuickCheck-Score im Quick-Boarding-Look + QR-Stub + Auto-Pass.
-     Liest LIVE-Werte aus #sb-num/#sub-*-v/#kpi-*. updateAll() unveraendert.
-     Triggert (gedrosselt) qc-autopass an den Parent, sobald der Score erreichbar ist. -->
-<style id="qb-reskin-style2">
+
+
+
+
+<!-- qb-reskin3 (v700): schwarzer BG, groesserer + klickbarer QR-Stub. Liest LIVE-Werte; Auto-Pass-Trigger. -->
+<style id="qb-reskin-style3">
 #score-block .sb-header, #score-block .sb-hero, #score-block .kpis { display:none !important; }
 #score-block #particle-canvas, #score-block .qc-bgfx { display:none !important; }
 #score-block { background:transparent !important; border:none !important; box-shadow:none !important; overflow:visible !important; }
 #qb-bp{ --gold:#C9A84C;--gold-hi:#E8CC7A;--green:#3FA56C;--green-hi:#5BD98E;--red:#B8625C;--red-hi:#D9685F;
   --cmut:#9a9080;--cline:rgba(201,168,76,.2);--ctrack:rgba(201,168,76,.14);
   position:relative;display:flex;align-items:stretch;border-radius:14px;overflow:hidden;
-  border:1px solid var(--cline);background:rgba(10,9,8,.82);color:#fff;
-  box-shadow:0 24px 60px -38px rgba(0,0,0,.85);font-family:'Space Grotesk','DM Sans',system-ui,sans-serif; }
-#qb-bp .qb-main{ flex:1;min-width:0;display:flex;flex-direction:column; }
+  border:1px solid rgba(201,168,76,.22);background:#0a0a0a;color:#fff;
+  box-shadow:0 24px 60px -38px rgba(0,0,0,.9);font-family:'Space Grotesk','DM Sans',system-ui,sans-serif; }
+#qb-bp .qb-main{ flex:1;min-width:0;display:flex;flex-direction:column;background:#0a0a0a; }
 #qb-bp .ghead{ position:relative;overflow:hidden;display:flex;align-items:center;gap:9px;padding:11px 16px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 52%,#b8932f);min-height:44px; }
 #qb-bp .ghead::after{ content:"";position:absolute;inset:0;opacity:.42;pointer-events:none;background:repeating-linear-gradient(102deg,rgba(255,255,255,.10) 0 1px,transparent 1px 8px); }
 #qb-bp .ghead .t{ position:relative;z-index:2;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#5a4a14;font-weight:700; }
@@ -5801,10 +5803,10 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .flyico svg{ height:17px;width:auto;display:block; }
 @keyframes qbfly{0%{left:12%;opacity:.25}10%{opacity:1}55%{left:62%;opacity:1}55.01%{opacity:0}56%{left:12%}66%{opacity:.25}100%{left:12%;opacity:.25}}
 @media (prefers-reduced-motion: reduce){ #qb-bp .flyico{animation:none} }
-#qb-bp .mbody{ padding:14px 16px;display:flex;align-items:center;gap:18px; }
+#qb-bp .mbody{ padding:16px 18px;display:flex;align-items:center;gap:20px; }
 @media(max-width:640px){ #qb-bp .mbody{flex-direction:column;gap:10px} }
 #qb-bp .dialwrap{ flex:none; }
-#qb-bp .cbars{ flex:1;display:flex;flex-direction:column;gap:8px;min-width:0;width:100%; }
+#qb-bp .cbars{ flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;width:100%; }
 #qb-bp .cb{ display:flex;align-items:center;gap:10px; }
 #qb-bp .cb .cl{ font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--cmut);width:74px;flex:none; }
 #qb-bp .cb .bar{ flex:1;height:6px;border-radius:99px;background:var(--ctrack);overflow:hidden; }
@@ -5813,7 +5815,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .kt{ display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--cline); }
 @media(max-width:760px){ #qb-bp .kt{grid-template-columns:repeat(4,1fr)} }
 @media(max-width:460px){ #qb-bp .kt{grid-template-columns:repeat(2,1fr)} }
-#qb-bp .kt .k{ position:relative;padding:9px 5px;text-align:center;border-left:2px dashed var(--cline); }
+#qb-bp .kt .k{ position:relative;padding:10px 5px;text-align:center;border-left:2px dashed var(--cline); }
 #qb-bp .kt .k:first-child{ border-left:0; }
 #qb-bp .kt .k::before,#qb-bp .kt .k::after{ content:"";position:absolute;left:-6px;width:11px;height:11px;border-radius:50%;background:#050505; }
 #qb-bp .kt .k:first-child::before,#qb-bp .kt .k:first-child::after{ display:none; }
@@ -5821,20 +5823,24 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .kt .l{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.05em;text-transform:uppercase;color:var(--cmut); }
 #qb-bp .kt .v{ font-weight:700;font-size:13px;margin:2px 0 1px;color:#fff; }
 #qb-bp .kt .h{ font-size:7.5px;color:var(--cmut); }
-/* QR-Stub rechts */
-#qb-bp .qb-tear{ position:relative;width:0;border-left:3px dashed rgba(201,168,76,.45);flex:none; }
-#qb-bp .qb-tear::before,#qb-bp .qb-tear::after{ content:"";position:absolute;left:-11px;width:21px;height:21px;border-radius:50%;background:#050505; }
-#qb-bp .qb-tear::before{ top:-11px; } #qb-bp .qb-tear::after{ bottom:-11px; }
-#qb-bp .qb-stub{ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:14px;min-width:132px;background:#fff;flex:none; }
-#qb-bp .qb-stub .bp{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.18em;color:#8d846d; }
-#qb-bp .qb-stub .qrtile{ width:98px;height:98px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #efe7cf; }
-#qb-bp .qb-stub .qrtile img,#qb-bp .qb-stub .qrtile canvas{ display:block;border-radius:3px; }
-#qb-bp .qb-stub .qrtile .ph{ font-family:'JetBrains Mono',monospace;font-size:6.5px;letter-spacing:.1em;color:#b9ad88;text-align:center;line-height:1.5;padding:6px; }
-#qb-bp .qb-stub .no{ font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;color:#1a1407; }
-#qb-bp .qb-stub .cap{ font-family:'JetBrains Mono',monospace;font-size:6.5px;letter-spacing:.1em;text-transform:uppercase;color:#9a8f6a; }
-@media(max-width:560px){ #qb-bp{flex-direction:column} #qb-bp .qb-tear{display:none} #qb-bp .qb-stub{flex-direction:row;gap:14px;border-top:2px dashed rgba(201,168,76,.4)} }
+/* QR-Stub rechts — groesser */
+#qb-bp .qb-tear{ position:relative;width:0;border-left:3px dashed rgba(201,168,76,.5);flex:none; }
+#qb-bp .qb-tear::before,#qb-bp .qb-tear::after{ content:"";position:absolute;left:-13px;width:25px;height:25px;border-radius:50%;background:#050505; }
+#qb-bp .qb-tear::before{ top:-13px; } #qb-bp .qb-tear::after{ bottom:-13px; }
+#qb-bp .qb-stub{ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px 20px;min-width:184px;background:#fff;flex:none; }
+#qb-bp .qb-stub .bp{ font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.18em;color:#8d846d; }
+#qb-bp .qb-stub .qrlink{ display:block;line-height:0;border-radius:10px;cursor:pointer;transition:transform .14s,box-shadow .14s; }
+#qb-bp .qb-stub .qrlink:hover{ transform:translateY(-1px);box-shadow:0 8px 20px -8px rgba(201,168,76,.6); }
+#qb-bp .qb-stub .qrtile{ width:128px;height:128px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid #efe7cf; }
+#qb-bp .qb-stub .qrtile img,#qb-bp .qb-stub .qrtile canvas{ display:block;border-radius:4px; }
+#qb-bp .qb-stub .qrtile .ph{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;color:#b9ad88;text-align:center;line-height:1.6;padding:6px; }
+#qb-bp .qb-stub .no{ font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;color:#1a1407; }
+#qb-bp .qb-stub .lnk{ font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#9a7f33;text-decoration:none;border-bottom:1px dashed #cdbb80; }
+#qb-bp .qb-stub .lnk:hover{ color:#5a4a14; }
+#qb-bp .qb-stub .cap{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:#9a8f6a; }
+@media(max-width:560px){ #qb-bp{flex-direction:column} #qb-bp .qb-tear{display:none} #qb-bp .qb-stub{flex-direction:row;flex-wrap:wrap;gap:14px;border-top:2px dashed rgba(201,168,76,.4)} }
 </style>
-<script id="qb-reskin2-js">
+<script id="qb-reskin3-js">
 (function(){
   'use strict';
   var CATS=['rendite','cashflow','sicherheit','finanzierung','effizienz'];
@@ -5863,7 +5869,6 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
       '<text x="'+c+'" y="'+(c-z*0.03)+'" text-anchor="middle" dominant-baseline="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(z*0.24)+'" fill="#fff">'+(has?s:'\u2013')+'</text>'+
       '<text x="'+c+'" y="'+(c+z*0.14)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="'+(z*0.058)+'" letter-spacing="1.2" fill="'+colh+'">'+(has?tl(s):'')+'</text></svg>';
   }
-  // ── Auto-Pass-Trigger (gedrosselt) ──
   function gatherInputs(){ var o={},els=document.querySelectorAll('input[id^="qc_"],select[id^="qc_"],textarea[id^="qc_"]'); for(var i=0;i<els.length;i++){var el=els[i],k=el.id.slice(3); if(k) o[k]=el.value;} return o; }
   var _apLast=0,_apT=0;
   function maybeAutopass(s){
@@ -5873,14 +5878,18 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     _apLast=now;
     try{ window.parent.postMessage({source:'dp-qc',type:'qc-autopass',inputs:gatherInputs()},'*'); }catch(e){}
   }
-  // ── QR aus Parent-Code rendern ──
+  var _shareUrl='';
   function renderQR(url,code,tries){
     tries=tries||0;
-    var tile=document.getElementById('qb-qrtile'),no=document.getElementById('qb-passno');
+    var tile=document.getElementById('qb-qrtile'),no=document.getElementById('qb-passno'),
+        a=document.getElementById('qb-qrlink'),lnk=document.getElementById('qb-qrurl');
+    if(url){ _shareUrl=url; }
     if(no&&code) no.textContent=code;
+    if(a&&_shareUrl){ a.href=_shareUrl; }
+    if(lnk&&_shareUrl){ lnk.href=_shareUrl; lnk.style.visibility='visible'; }
     if(!tile) return;
     if(!window.QRCode){ if(tries<20) return void setTimeout(function(){renderQR(url,code,tries+1);},250); return; }
-    if(url){ tile.innerHTML=''; try{ new window.QRCode(tile,{text:url,width:86,height:86,colorDark:'#141210',colorLight:'#fff',correctLevel:window.QRCode.CorrectLevel.M}); }catch(e){} }
+    if(_shareUrl){ tile.innerHTML=''; try{ new window.QRCode(tile,{text:_shareUrl,width:116,height:116,colorDark:'#141210',colorLight:'#fff',correctLevel:window.QRCode.CorrectLevel.M}); }catch(e){} }
   }
   window.addEventListener('message',function(ev){ var d=ev.data; if(!d||d.source!=='dp-app') return; if(d.type==='qc-autopass-code') renderQR(d.url,d.code,0); });
 
@@ -5919,7 +5928,11 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
           '<div class="kt" id="qb-kt"></div>'+
         '</div>'+
         '<div class="qb-tear"></div>'+
-        '<div class="qb-stub" id="qb-stub"><span class="bp">QUICKBOARDING PASS</span><div class="qrtile" id="qb-qrtile"><span class="ph">QR<br>nach<br>Score</span></div><span class="no" id="qb-passno">\u2014</span><span class="cap">Scan \u203a \u00fcbernehmen</span></div>';
+        '<div class="qb-stub" id="qb-stub"><span class="bp">QUICKBOARDING PASS</span>'+
+          '<a class="qrlink" id="qb-qrlink" href="#" target="_blank" rel="noopener"><div class="qrtile" id="qb-qrtile"><span class="ph">QR<br>nach<br>Score</span></div></a>'+
+          '<span class="no" id="qb-passno">\u2014</span>'+
+          '<a class="lnk" id="qb-qrurl" href="#" target="_blank" rel="noopener" style="visibility:hidden">Karte \u00f6ffnen \u203a</a>'+
+          '<span class="cap">Scan \u203a \u00fcbernehmen</span></div>';
       sb.appendChild(bp);
     }
     var fly=document.getElementById('qb-fly'); if(fly) fly.innerHTML=jet();
