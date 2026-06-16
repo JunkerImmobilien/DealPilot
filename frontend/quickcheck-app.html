@@ -6029,8 +6029,8 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 (function(){ try{ if(window.frameElement){ document.documentElement.classList.add('qc-embedded'); } }catch(e){} })();
 </script>
 
-<!-- qb-modal-scrolljump (v685): beim Oeffnen Parent gezielt zur Modal-Mitte scrollen -->
-<script id="qb-modal-scrolljump-js">
+<!-- qb-modal-scrollfix (v686): scrollbaren Container finden + Modal zentrieren -->
+<script id="qb-modal-scrollfix-js">
 (function(){
   'use strict';
   var tries=0;
@@ -6041,22 +6041,38 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     if(!fe){ try{ b.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} return; }
     try{
       var pv=window.parent;
-      var feTop=fe.getBoundingClientRect().top + (pv.scrollY||pv.pageYOffset||0);
-      var m=b.getBoundingClientRect();             // im Iframe ohne Eigen-Scroll = Content-Position
-      var center=feTop + m.top + (m.height/2);
-      var pvh=pv.innerHeight||window.innerHeight;
-      pv.scrollTo({top:Math.max(0,Math.round(center - pvh/2)), behavior:'smooth'});
+      var mr=b.getBoundingClientRect();
+      var modalY=mr.top + (mr.height/2);            // Content-Y im iframe (kein Eigen-Scroll)
+      // scrollbaren Vorfahren des iframes im Parent suchen
+      var el=fe.parentElement, scroller=null;
+      while(el && el!==pv.document.documentElement){
+        var s=pv.getComputedStyle(el);
+        if(/(auto|scroll)/.test(s.overflowY) && el.scrollHeight - el.clientHeight > 4){ scroller=el; break; }
+        el=el.parentElement;
+      }
+      var feRect=fe.getBoundingClientRect();
+      if(scroller){
+        var scRect=scroller.getBoundingClientRect();
+        var point=(feRect.top - scRect.top) + scroller.scrollTop + modalY;
+        var target=point - (scroller.clientHeight/2);
+        scroller.scrollTo({top:Math.max(0,Math.round(target)), behavior:'smooth'});
+      } else {
+        var pvh=pv.innerHeight||window.innerHeight;
+        var feTopDoc=feRect.top + (pv.scrollY||pv.pageYOffset||0);
+        var t=feTopDoc + modalY - (pvh/2);
+        pv.scrollTo({top:Math.max(0,Math.round(t)), behavior:'smooth'});
+      }
     }catch(e){}
   }
   function run(){ requestAnimationFrame(function(){ requestAnimationFrame(toModal); }); }
   function wrap(name){
     if(!window.QcApp || typeof QcApp[name]!=='function') return false;
-    if(QcApp[name].__qbsj) return true;
+    if(QcApp[name].__qbsf) return true;
     var orig=QcApp[name];
     var fn=function(){ var r=orig.apply(this,arguments); try{ run(); }catch(e){} return r; };
-    fn.__qbsj=true;
+    fn.__qbsf=true;
     try{ QcApp[name]=fn; }catch(e){ return false; }
-    return QcApp[name].__qbsj===true;
+    return QcApp[name].__qbsf===true;
   }
   function install(){
     if(!window.QcApp){ if(tries++<40) return setTimeout(install,80); return; }
