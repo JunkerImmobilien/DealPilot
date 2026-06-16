@@ -5522,8 +5522,25 @@ function renderTransferList() {
     }
     setTimeout(function(){ _progressRender(null); }, 1400);
     showToast('✓ Abruf abgeschlossen (' + ordered.map(function(s){return labels[s];}).join(' + ') + ')');
+    try { _qbSetRunBtn('reset'); } catch(e){}
   }
 
+  function _qbSetRunBtn(mode){
+    var b=document.querySelector('.dp-pf-launch.qc6-run'); if(!b) return;
+    if(mode==='reset'){ b.innerHTML='<span class="dp-pf-ic"><svg class="dp-pf-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span> Neuer Vorgang'; b.setAttribute('onclick','QcApp.qbResetVorgang()'); }
+    else { b.innerHTML='<span class="dp-pf-ic"><svg class="dp-pf-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg></span> Abrufen'; b.setAttribute('onclick','QcApp.openCreditModal()'); }
+  }
+  function qbResetVorgang(){
+    if(!window.confirm('Wirklich verwerfen? Eingaben, importierte Daten und der geteilte Pass gehen verloren.')) return;
+    try { document.querySelectorAll('input[id^="qc_"],select[id^="qc_"],textarea[id^="qc_"]').forEach(function(el){ if(el.tagName==='SELECT'){el.selectedIndex=0;} else {el.value='';} try{el.dataset.userSet='';el.removeAttribute('data-user-set');}catch(e){} }); } catch(e){}
+    try { _photos=[]; var g=document.getElementById('photo-grid'); if(g) g.innerHTML=''; } catch(e){}
+    try { window._qcExposePhotos=[]; } catch(e){}
+    try { window.__qbPlzOrtLast=''; } catch(e){}
+    try { window.parent.postMessage({source:'dp-qc',type:'qc-reset-buffer'},'*'); } catch(e){}
+    _qbSetRunBtn('abrufen');
+    try { if (typeof scheduleUpdate==='function') scheduleUpdate(); } catch(e){}
+    showToast('Neuer Vorgang \u2014 alles zur\u00fcckgesetzt');
+  }
   function showToast(msg) {
     const t = document.createElement('div');
     t.className = 'toast';
@@ -5593,7 +5610,7 @@ function renderTransferList() {
     showApiKeyModal, closeApiModal, runRealAi,
     openSaveModal, closeSaveModal, confirmSave, toggleAllTransfer, setPdfPending,
     setSpanConfig, openQc6Settings, closeQc6Settings, toggleSource,
-    openCreditModal, closeCreditModal, confirmCreditModal, registerDpmb
+    openCreditModal, closeCreditModal, confirmCreditModal, registerDpmb, qbResetVorgang
   };
 })();
 

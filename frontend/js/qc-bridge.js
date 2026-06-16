@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=707';
+  var IFRAME_SRC = 'quickcheck-app.html?v=710';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
@@ -384,6 +384,9 @@
     var d = ev.data;
     if (!d || d.source !== 'dp-qc') return;
     if (d.type === 'qc-save') _handleSave(d.inputs, d.avm, d.photos, d.pendingTargets);
+    else if (d.type === 'qc-reset-buffer') {   /* qb-reset: Neuer Vorgang -> Buffer-Pass loeschen */
+      try { var _c=_bufState.code; _bufReset(); if(_c && window.Auth && typeof window.Auth.apiCall==='function') window.Auth.apiCall('/passes/'+encodeURIComponent(_c),{method:'DELETE'}).catch(function(){}); } catch(e){}
+    }
     else if (d.type === 'qc-import-pdf') _handleImportPdf();
     else if (d.type === 'qc-voice') _handleVoice();  /* v505-voice */
     else if (d.type === 'qc-save-open') _showSaveOverlay(d.items || []);
