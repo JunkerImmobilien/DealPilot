@@ -5245,7 +5245,7 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
   }
 
   /* ─── Save-Modal mit Transfer-Daten ─── */
-  function openSaveModal() { /* qb-final-iframe */
+  function openSaveModal() { /* qb-final2-iframe */
     var __items=[];
     try { Object.keys(_pendingTransfer).forEach(function(key){ var it=_pendingTransfer[key]||{};
       __items.push({key:key,label:it.label,value:it.value,target:it.target,source:it.source||'',isMarktwert:!!it.isMarktwert}); }); } catch(e){}
@@ -6033,11 +6033,11 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 (function(){ try{ if(window.frameElement){ document.documentElement.classList.add('qc-embedded'); } }catch(e){} })();
 </script>
 
-<!-- qb-final-iframe (v694): Parent -> Iframe Bestaetigung -->
-<script id="qb-final-iframe-js">
+<!-- qb-final2-iframe (v696): Parent -> Iframe Bestaetigung (QcApp ist const, NICHT window.QcApp) -->
+<script id="qb-final2-iframe-js">
 (function(){'use strict';try{window.addEventListener('message',function(ev){var d=ev.data;if(!d)return;
-  if(d.type==='qc-save-confirm'){try{if(window.QcApp&&QcApp.confirmSave)QcApp.confirmSave(new Set(d.checkedKeys||[]));}catch(e){}}
-  else if(d.type==='qc-save-cancel'){try{if(window.QcApp&&QcApp.closeSaveModal)QcApp.closeSaveModal();}catch(e){}}
+  if(d.type==='qc-save-confirm'){ try{ if(typeof QcApp!=='undefined' && QcApp.confirmSave) QcApp.confirmSave(new Set(d.checkedKeys||[])); }catch(e){ try{console.error('[qb] confirmSave',e);}catch(_){} } }
+  else if(d.type==='qc-save-cancel'){ try{ if(typeof QcApp!=='undefined' && QcApp.closeSaveModal) QcApp.closeSaveModal(); }catch(e){} }
 });}catch(e){}})();
 </script>
 

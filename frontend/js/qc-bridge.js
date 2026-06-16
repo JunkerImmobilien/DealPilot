@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=695';
+  var IFRAME_SRC = 'quickcheck-app.html?v=696';
 
   // v345: doppelte weiße "⚡ Quick-Check"-Überschrift entfernen.
   // Sie ist ein CSS-Pseudo-Element (body.qc-standalone-active #s-quick::before)
@@ -278,7 +278,8 @@
     }, { target: 'qc' });
   }
 
-  // qcpm-final v694: Save-Bestaetigung komplett im Parent (immer mittig), Original-Look, direktes Speichern
+  // qcpm-final2 v696: Save-Bestaetigung komplett im Parent (immer mittig), Original-Look.
+  // QcApp ist im iframe ein const (NICHT window.QcApp) -> Bestaetigung NUR per postMessage.
   function _qcpmEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function _qcpmStyle(){
     if (document.getElementById('qcpm-style')) return;
@@ -340,7 +341,7 @@
       +'<div class="qcpm-foot"><button class="qcpm-btn" id="qcpm-cancel">Abbrechen</button>'
       +'<button class="qcpm-btn primary" id="qcpm-ok">Speichern &amp; \u00fcbernehmen</button></div></div>';
     document.body.appendChild(ov);
-    function cancel(){ try{ if(_frame&&_frame.contentWindow&&_frame.contentWindow.QcApp) _frame.contentWindow.QcApp.closeSaveModal(); }catch(e){} _postToFrame({source:'dp-qc-parent',type:'qc-save-cancel'}); _closeSaveOverlay(); }
+    function cancel(){ _postToFrame({source:'dp-qc-parent',type:'qc-save-cancel'}); _closeSaveOverlay(); }
     ov.addEventListener('click', function(e){ if(e.target===ov) cancel(); });
     document.getElementById('qcpm-x').onclick=cancel;
     document.getElementById('qcpm-cancel').onclick=cancel;
@@ -348,8 +349,7 @@
     if(all) all.onchange=function(){ var on=all.checked; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){cb.checked=on;}); };
     document.getElementById('qcpm-ok').onclick=function(){
       var keys=[]; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){ if(cb.checked) keys.push(cb.getAttribute('data-key')); });
-      try { _frame.contentWindow.QcApp.confirmSave(new Set(keys)); }            /* direkt = zuverlaessig */
-      catch(e){ _postToFrame({source:'dp-qc-parent',type:'qc-save-confirm',checkedKeys:keys}); }
+      _postToFrame({source:'dp-qc-parent',type:'qc-save-confirm',checkedKeys:keys});   /* QcApp=const -> nur postMessage */
       _closeSaveOverlay();
     };
   }
