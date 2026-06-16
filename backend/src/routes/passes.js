@@ -22,6 +22,7 @@ const extendBody = z.object({
 const snapBody = z.object({
   code: z.string().min(4).max(16).regex(/^[0-9A-Za-z]+$/).optional(),
   data: z.record(z.any()),
+  photos: z.array(z.string()).max(6).optional(),   /* qb-snap-photos */
   title: z.string().max(255).optional(),
   days: z.number().int().min(1).max(30).optional()
 });
@@ -51,7 +52,7 @@ router.post('/', authenticate, validate({ body: createBody }), async (req, res, 
 router.post('/from-snapshot', authenticate, validate({ body: snapBody }), async (req, res, next) => {
   try {
     const r = await sharedPassService.upsertSnapshotPass(req.user.id, {
-      code: req.body.code, data: req.body.data, title: req.body.title, days: req.body.days
+      code: req.body.code, data: req.body.data, photos: req.body.photos, title: req.body.title, days: req.body.days
     });
     res.status(req.body.code ? 200 : 201).json(r);
   } catch (err) { next(err); }

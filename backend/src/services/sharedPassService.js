@@ -66,7 +66,8 @@ async function upsertSnapshotPass(userId, opts) {
   const d = clampDays(opts.days);
   const data = (opts.data && typeof opts.data === 'object') ? opts.data : {};
   const title = (opts.title && String(opts.title).slice(0, 255)) || data.str || data.ort || 'Quick Boarding Pass';
-  const snapshot = { data: data, name: title, source: 'qc-buffer' };
+  const snapshot = { data: data, name: title, source: 'qc-buffer' };   /* qb-snap-photos */
+  if (Array.isArray(opts.photos) && opts.photos.length) snapshot.photos = opts.photos.slice(0, 6);
 
   if (opts.code) {
     const u = await query(

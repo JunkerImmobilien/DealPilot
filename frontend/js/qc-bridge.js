@@ -28,18 +28,18 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=700';
+  var IFRAME_SRC = 'quickcheck-app.html?v=702';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
   function _bufReset(){ _bufState.code=null; _bufState.lastSig=''; if(_bufState.timer){clearTimeout(_bufState.timer);_bufState.timer=0;} _bufState.busy=false; }
   function _bufShareUrl(code){ try{ return window.location.origin+'/pass.html?c='+encodeURIComponent(code); }catch(e){ return '/pass.html?c='+code; } }
   function _bufPostCode(){ if(_bufState.code) _postToFrame({source:'dp-app',type:'qc-autopass-code',code:_bufState.code,url:_bufShareUrl(_bufState.code)}); }
-  function _handleAutopass(inputs){
-    inputs = inputs || {};
-    var sig; try { sig = JSON.stringify(inputs); } catch (e) { sig = ''; }
+  function _handleAutopass(inputs, photos){   /* qb-buffer-photos */
+    inputs = inputs || {}; photos = photos || [];
+    var sig; try { sig = JSON.stringify(inputs) + '|ph:' + photos.length + ':' + photos.map(function(p){return (p||'').slice(0,24);}).join(','); } catch (e) { sig = ''; }
     if (sig && sig === _bufState.lastSig) return;
-    _bufState.lastSig = sig;
+    _bufState.lastSig = sig; _bufState.photos = photos;
     if (_bufState.timer) clearTimeout(_bufState.timer);
     _bufState.timer = setTimeout(function(){ _bufState.timer=0; _bufSave(inputs); }, 1500);
   }
@@ -49,6 +49,7 @@
     _bufState.busy = true;
     var title=''; if(inputs.str) title=inputs.str+(inputs.hnr?' '+inputs.hnr:''); if(inputs.ort) title=(title?title+', ':'')+inputs.ort;
     var body={ data: inputs, days: 30 }; if(title) body.title=title; if(_bufState.code) body.code=_bufState.code;
+    if(_bufState.photos && _bufState.photos.length) body.photos=_bufState.photos;   /* qb-buffer-photos */
     window.Auth.apiCall('/passes/from-snapshot',{method:'POST',body:body})
       .then(function(r){ if(r&&r.code){ _bufState.code=r.code; _bufPostCode(); } _bufState.busy=false; })
       .catch(function(e){ console.warn('[qc-buffer] from-snapshot:',e); _bufState.busy=false; });
@@ -386,6 +387,6 @@
     else if (d.type === 'qc-import-pdf') _handleImportPdf();
     else if (d.type === 'qc-voice') _handleVoice();  /* v505-voice */
     else if (d.type === 'qc-save-open') _showSaveOverlay(d.items || []);
-    else if (d.type === 'qc-autopass') _handleAutopass(d.inputs);   /* qb-buffer */
+    else if (d.type === 'qc-autopass') _handleAutopass(d.inputs, d.photos);   /* qb-buffer-photos */
   });
 })();

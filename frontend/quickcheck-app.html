@@ -5781,8 +5781,12 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 
 
 
-<!-- qb-reskin3 (v700): schwarzer BG, groesserer + klickbarer QR-Stub. Liest LIVE-Werte; Auto-Pass-Trigger. -->
-<style id="qb-reskin-style3">
+
+
+
+
+<!-- qb-reskin4 (v702): schwarzer BG, groesserer + klickbarer QR-Stub. Liest LIVE-Werte; Auto-Pass-Trigger. -->
+<style id="qb-reskin-style4">
 #score-block .sb-header, #score-block .sb-hero, #score-block .kpis { display:none !important; }
 #score-block #particle-canvas, #score-block .qc-bgfx { display:none !important; }
 #score-block { background:transparent !important; border:none !important; box-shadow:none !important; overflow:visible !important; }
@@ -5827,7 +5831,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .qb-tear{ position:relative;width:0;border-left:3px dashed rgba(201,168,76,.5);flex:none; }
 #qb-bp .qb-tear::before,#qb-bp .qb-tear::after{ content:"";position:absolute;left:-13px;width:25px;height:25px;border-radius:50%;background:#050505; }
 #qb-bp .qb-tear::before{ top:-13px; } #qb-bp .qb-tear::after{ bottom:-13px; }
-#qb-bp .qb-stub{ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px 20px;min-width:184px;background:#fff;flex:none; }
+#qb-bp .qb-stub{ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px 20px;width:208px;background:#fff;flex:none; }
 #qb-bp .qb-stub .bp{ font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.18em;color:#8d846d; }
 #qb-bp .qb-stub .qrlink{ display:block;line-height:0;border-radius:10px;cursor:pointer;transition:transform .14s,box-shadow .14s; }
 #qb-bp .qb-stub .qrlink:hover{ transform:translateY(-1px);box-shadow:0 8px 20px -8px rgba(201,168,76,.6); }
@@ -5840,7 +5844,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .qb-stub .cap{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:#9a8f6a; }
 @media(max-width:560px){ #qb-bp{flex-direction:column} #qb-bp .qb-tear{display:none} #qb-bp .qb-stub{flex-direction:row;flex-wrap:wrap;gap:14px;border-top:2px dashed rgba(201,168,76,.4)} }
 </style>
-<script id="qb-reskin3-js">
+<script id="qb-reskin4-js">
 (function(){
   'use strict';
   var CATS=['rendite','cashflow','sicherheit','finanzierung','effizienz'];
@@ -5870,13 +5874,14 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
       '<text x="'+c+'" y="'+(c+z*0.14)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="'+(z*0.058)+'" letter-spacing="1.2" fill="'+colh+'">'+(has?tl(s):'')+'</text></svg>';
   }
   function gatherInputs(){ var o={},els=document.querySelectorAll('input[id^="qc_"],select[id^="qc_"],textarea[id^="qc_"]'); for(var i=0;i<els.length;i++){var el=els[i],k=el.id.slice(3); if(k) o[k]=el.value;} return o; }
+  function gatherPhotos(){ var out=[],imgs=document.querySelectorAll('#photo-grid img'); for(var i=0;i<imgs.length&&out.length<6;i++){ var src=imgs[i].getAttribute('src')||''; if(src) out.push(src); } return out; }
   var _apLast=0,_apT=0;
   function maybeAutopass(s){
     if(s==null) return;
     var now=Date.now();
     if(now-_apLast<800){ if(_apT) return; _apT=setTimeout(function(){_apT=0;maybeAutopass(num(document.getElementById('sb-num')));},800); return; }
     _apLast=now;
-    try{ window.parent.postMessage({source:'dp-qc',type:'qc-autopass',inputs:gatherInputs()},'*'); }catch(e){}
+    try{ window.parent.postMessage({source:'dp-qc',type:'qc-autopass',inputs:gatherInputs(),photos:gatherPhotos()},'*'); }catch(e){}
   }
   var _shareUrl='';
   function renderQR(url,code,tries){
