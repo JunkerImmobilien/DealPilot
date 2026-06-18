@@ -938,6 +938,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Garagenpl&auml;tze</label><input id="garagen" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Au&szlig;enstellpl&auml;tze</label><input id="stellpl_aussen" type="text" inputmode="decimal" placeholder="z.B. 0"></div>
       <div class="f"><label>Balkon / Terrasse (m&sup2;)</label><div class="iw"><input id="balkon_flae" type="text" inputmode="decimal" placeholder="z.B. 10" class="tr"><span class="sfx">m&sup2;</span></div></div>
+      <!-- v727-ausst-fields B: Bauliche Details --><div class="f"><label>Keller / Abstellraum <button type="button" class="dp-tip" data-tip-id="tab1.eq_store_room" tabindex="-1" aria-label="Hilfe zu Keller / Abstellraum"></button></label><select id="eq_store_room"><option value="">– keine Angabe –</option><option value="INNERHALB">Innerhalb</option><option value="AUSSERHALB">Außerhalb</option><option value="INNERHALB_UND_AUSSERHALB">Innen & außen</option><option value="KEINER">Keiner</option></select></div><div class="f"><label>Außenwände <button type="button" class="dp-tip" data-tip-id="tab1.eq_walls" tabindex="-1" aria-label="Hilfe zu Außenwände"></button></label><select id="eq_walls"><option value="">– keine Angabe –</option><option value="AUSSENWAENDE_GEDAEMMT">Gedämmt</option><option value="AUSSENWAENDE_NICHT_GEDAEMMT">Nicht gedämmt</option></select></div><div class="f"><label>Dacheindeckung <button type="button" class="dp-tip" data-tip-id="tab1.eq_roof" tabindex="-1" aria-label="Hilfe zu Dacheindeckung"></button></label><select id="eq_roof"><option value="">– keine Angabe –</option><option value="DACHPFANNEN">Dachpfannen</option><option value="SCHIEFER">Schiefer</option><option value="METALL">Metall</option><option value="DACHPAPPE">Dachpappe</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Aufzug <button type="button" class="dp-tip" data-tip-id="tab1.eq_elevator" tabindex="-1" aria-label="Hilfe zu Aufzug"></button></label><select id="eq_elevator"><option value="">– keine Angabe –</option><option value="Ja">Ja</option><option value="Nein">Nein</option></select></div>
       </div><!-- /obj-extra-wrap -->
       <div class="f s2"><label>Investitionsthese <button type="button" class="dp-tip" data-tip-id="tab1.investitionsthese" tabindex="-1" aria-label="Hilfe zu tab1.investitionsthese"></button></label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
       <div class="f s2"><label>Bekannte Risiken <button type="button" class="dp-tip" data-tip-id="tab1.bekannte_risiken" tabindex="-1" aria-label="Hilfe zu tab1.bekannte_risiken"></button></label><textarea id="risiken" placeholder="Bekannte Risiken und Maßnahmen..."></textarea></div>
@@ -971,6 +972,7 @@ label.dp-required.qc-required::after {
         <div class="f" data-v363-ausst><label>Ausstattung</label><select id="ausst"><option>Einfach</option><option selected>Normal</option><option>Gehoben</option><option>Luxus</option></select></div>
         <div class="f"><label>Exitstrategie <button type="button" class="dp-tip" data-tip-id="tab1.exitstrategie" tabindex="-1" aria-label="Hilfe zu tab1.exitstrategie"></button></label><select id="exitstr"><option selected>Langfristig halten</option><option>Verkauf nach 10 Jahren</option><option>Verkauf nach 20 Jahren</option><option>Aufwertung &amp; Verkauf</option></select></div>
       </div>
+      <!-- v727-ausst-fields A: Ausstattungsdetails (Qualitaet) --><div class="f" style="grid-column:1/-1"><div class="qz-acc-sub" style="font-size:12px;color:var(--muted);margin:4px 0 2px;font-weight:600">Ausstattung im Detail <span style="font-weight:400">(verbessert die Marktbewertung)</span></div></div><div class="f"><label>Heizung <button type="button" class="dp-tip" data-tip-id="tab1.eq_heating" tabindex="-1" aria-label="Hilfe zu Heizung"></button></label><select id="eq_heating"><option value="">– keine Angabe –</option><option value="FUSSBODENHEIZUNG">Fußbodenheizung</option><option value="ZENTRALHEIZUNG">Zentralheizung</option><option value="EINZELOEFEN">Einzelöfen</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Verglasung <button type="button" class="dp-tip" data-tip-id="tab1.eq_windows" tabindex="-1" aria-label="Hilfe zu Verglasung"></button></label><select id="eq_windows"><option value="">– keine Angabe –</option><option value="EINFACH">Einfachverglasung</option><option value="ISOLIERVERGLASUNG">Isolierverglasung</option><option value="ZWEIFACHVERGLASUNG">Zweifachverglasung</option><option value="DREIFACHVERGLASUNG">Dreifachverglasung</option><option value="SPEZIALVERGLASUNG">Spezialverglasung</option><option value="RAUMHOHE_VERGLASUNG">Raumhohe Verglasung</option><option value="KASTENFENSTER">Kastenfenster</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Bodenbelag <button type="button" class="dp-tip" data-tip-id="tab1.eq_floor" tabindex="-1" aria-label="Hilfe zu Bodenbelag"></button></label><select id="eq_floor"><option value="">– keine Angabe –</option><option value="PARKETT_NATURSTEIN">Parkett / Naturstein</option><option value="FLIESEN">Fliesen</option><option value="TEPPICH_LAMINAT">Teppich / Laminat</option><option value="KUNSTSTOFF_PVC">Kunststoff / PVC</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Bad <button type="button" class="dp-tip" data-tip-id="tab1.eq_bath" tabindex="-1" aria-label="Hilfe zu Bad"></button></label><select id="eq_bath"><option value="">– keine Angabe –</option><option value="EIN_BAD">Ein Bad</option><option value="MEHR_ALS_EIN_BAD">Mehr als ein Bad</option><option value="MIT_FENSTER">Bad mit Fenster</option><option value="INNENLIEGEND">Innenliegendes Bad</option></select></div><div class="f"><label>Gäste-WC <button type="button" class="dp-tip" data-tip-id="tab1.eq_guest_wc" tabindex="-1" aria-label="Hilfe zu Gäste-WC"></button></label><select id="eq_guest_wc"><option value="">– keine Angabe –</option><option value="GAESTE_WC">Ja</option><option value="KEIN_GAESTE_WC">Nein</option></select></div>
       <div class="qz-divider"></div>
       <div class="qz-acc" id="qz-stars-toggle" role="button" tabindex="0" aria-expanded="false"><span class="qz-acc-chev" aria-hidden="true">▸</span><span class="qz-acc-lbl">Sterne-Bewertung</span><span class="qz-acc-hint">Zustand &amp; Qualität bewerten</span></div>
       <div class="qz-rows" id="qz-stars-rows">
@@ -2910,7 +2912,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=359"></script>
+  <script src="js/calc.js?v=732"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -2928,7 +2930,7 @@ label.dp-required.qc-required::after {
 <script src="js/dealscore.js?v=463"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=144">
 <script src="js/datenraum.js?v=160"></script>
-<script src="js/tooltip-content.js?v=2351"></script>
+<script src="js/tooltip-content.js?v=727"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=673"></script>
   <script src="js/immometrica-qc.js?v=672"></script>
@@ -2948,7 +2950,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=725"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=725"></script>
+<script src="js/storage.js?v=734"></script>
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=720"></script>
 <script src="js/track-record.js?v=166"></script>
@@ -2979,7 +2981,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=166"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=238"></script>
+<script src="js/help.js?v=727"></script>
   <script src="js/tour-engine.js?v=433_10"></script>
   <script src="js/tour-content.js?v=239_10"></script>
 <!-- V63.73: Feedback & Support Modal -->
@@ -2989,7 +2991,7 @@ label.dp-required.qc-required::after {
 <script src="js/deal-action-readycheck.js?v=451"></script>
 <script src="js/deal-action-pilot.js?v=722"></script>
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
-<script src="js/newobj-fixes.js?v=434"></script>
+<script src="js/newobj-fixes.js?v=728"></script>
 <script src="js/sidebar-search.js?v=447"></script>
 <script src="js/finanz-card-merge.js?v=483"></script>
 <script src="js/avm-missing-reset.js?v=443"></script>
@@ -3015,7 +3017,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=187h2"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=721"></script>
+  <script src="js/object-actions.js?v=727"></script>
   <script src="js/quick-boarding-share.js?v=676"></script>
   <script src="js/voice-import.js?v=537"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->

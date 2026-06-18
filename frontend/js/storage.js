@@ -35,7 +35,9 @@ var FIELDS = [
   'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','einheiten',
   /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
   'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years',
-  'erwerbsart','anbietertyp','_immometrica_id','_immometrica_online_since','_immometrica_portals'
+  'erwerbsart','anbietertyp','_immometrica_id','_immometrica_online_since','_immometrica_portals',
+  /* v727-ausst: Ausstattungsdetails fuer AVM-Bewertung (Sprengnetter-Enums als Wert) */
+  'eq_heating','eq_windows','eq_floor','eq_bath','eq_guest_wc','eq_store_room','eq_walls','eq_roof','eq_elevator'
 ];
 
 var _currentObjKey = null;  // Local mode key OR API object id
@@ -402,6 +404,19 @@ async function saveObj(opts) {
   var data = collectData();
   var aiText = window._aiText || null;
   var photos = (typeof imgs !== 'undefined') ? imgs.map(function(i){ return i.src; }) : [];
+  /* v734-resize-on-save: grosse (Alt-)Fotos vor dem Upload verkleinern. v725 resized nur beim
+     Upload; Altfotos liegen unkomprimiert (gemessen 3MB) und liessen den PUT timeouten.
+     Schwelle 800KB base64 (~580KB Bild); resize auf 1600px/0.82 wie v725 ui.js. */
+  try {
+    if (photos && photos.length && typeof window._dpResizeDataUrl === 'function') {
+      for (var _pi = 0; _pi < photos.length; _pi++) {
+        var _src = photos[_pi];
+        if (typeof _src === 'string' && _src.length > 800000 && _src.indexOf('data:image') === 0) {
+          try { photos[_pi] = await window._dpResizeDataUrl(_src, 1600, 0.82); } catch (e) { /* Original behalten */ }
+        }
+      }
+    }
+  } catch (e) { /* defensiv: ohne Resize weiter */ }
   /* v725-thumb: kleines Titelbild-Thumbnail (240px) fuer Portfolio-Liste -> data._thumb.
      Haelt die Listen-Query schlank (kein Vollbild mehr). Bei Fehler: kein _thumb (Icon-Fallback). */
   try {
@@ -551,6 +566,12 @@ function _clearFormForNewObject() {
   window._aiText = '';
   window._aiAnalysis = null;
   _currentObjKey = null;
+  /* v728-status-reset: neues Objekt IMMER Status offen. _currentObjData darf NICHT vom
+     Vorgaenger erben (storage.js Fallback Z.126 liest sonst alten _deal_won/_deal_lost). */
+  window._currentObjData = {};
+  var _dwS = document.getElementById('_deal_won_state'); if (_dwS) _dwS.value = 'false';
+  var _dlS = document.getElementById('_deal_lost_state'); if (_dlS) _dlS.value = 'false';
+  var _dwA = document.getElementById('_deal_won_at_state'); if (_dwA) _dwA.value = '';
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);
   }
@@ -674,12 +695,15 @@ function newObj() {
 //   3) Debounce: mehrere renderSaved()-Aufrufe innerhalb von 80ms werden zu einem einzigen zusammengefasst
 //   4) Wenn die DOM-Liste schon korrekte Cards zeigt und der Cache frisch ist → nur live-Daten der aktiven Karte updaten
 var _renderCache = { items: null, ts: 0, ttl: 60 * 1000 };
+/* v729-allobj-cache: Cache fuer getAllObjectsData (verhindert N+1-Flut -> 429). TTL 8s + inflight-dedup. */
+var _allObjCache = { data: null, ts: 0, ttl: 8000, inflight: null };
 var _renderTimer = null;
 var _renderInflight = null;
 
 function invalidateRenderCache() {
   _renderCache.items = null;
   _renderCache.ts = 0;
+  /* v729-allobj-cache */ _allObjCache.data = null; _allObjCache.ts = 0; _allObjCache.inflight = null;
 }
 window.invalidateRenderCache = invalidateRenderCache;
 
@@ -1738,7 +1762,31 @@ function exportCSV() {
 // ═══════════════════════════════════════════════════
 // PORTFOLIO SUMMARY (alle gespeicherten Objekte aggregiert)
 // ═══════════════════════════════════════════════════
-async function getAllObjectsData() {
+/* v729-allobj-cache: Cache-Wrapper. Buendelt parallele/schnelle Aufrufe (renderSaved feuert oft)
+   zu EINEM API-Durchlauf. opts.forceFresh umgeht den Cache (nach Save). */
+async function getAllObjectsData(opts) {
+  opts = opts || {};
+  var now = Date.now();
+  if (!opts.forceFresh && _allObjCache.data && (now - _allObjCache.ts) < _allObjCache.ttl) {
+    return _allObjCache.data;
+  }
+  if (!opts.forceFresh && _allObjCache.inflight) {
+    return _allObjCache.inflight;
+  }
+  var _p = (async function () {
+    try {
+      var _res = await _getAllObjectsDataRaw();
+      _allObjCache.data = _res;
+      _allObjCache.ts = Date.now();
+      return _res;
+    } finally {
+      _allObjCache.inflight = null;
+    }
+  })();
+  _allObjCache.inflight = _p;
+  return _p;
+}
+async function _getAllObjectsDataRaw() {
   var objects = [];
 
   // V315-getall-token-check: Vor Login KEIN /objects-Fetch.
@@ -1827,9 +1875,39 @@ function extractKpisFromData(d) {
   };
 }
 
+// v733-sidebar-list-only: schlanke KPI-Liste fuer Sidebar - NUR /objects-Liste, KEINE Vollbild-Calls.
+// War die Wurzel der 3MB-Call-Flut: v725 machte die Liste schlank -> getAllObjectsData
+// musste Vollbilder einzeln nachladen. updateSidebarPortfolio brauchte die nie - nur KPIs.
+async function _getSidebarKpis() {
+  if (!(Auth.isApiMode() && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn())) {
+    return await getAllObjectsData(); // Nicht-API-Modus: alter localStorage-Pfad
+  }
+  try {
+    var resp = await Auth.apiCall('/objects?limit=500');
+    var items = (resp && resp.items) || [];
+    return items.map(function (it) {
+      var kp = parseFloat(it.kaufpreis) || 0;
+      var bmy = parseFloat(it.bmy) || 0;
+      var cf_ns = parseFloat(it.cf_ns) || 0;   // Backend: cf_ns = jaehrlich
+      var dscr = parseFloat(it.dscr) || 0;
+      var ltv = parseFloat(it.ltv) || 0;
+      // Miete + Darlehen aus den Spalten ableiten (verifiziert):
+      var nkm_m = (bmy > 0 && kp > 0) ? (bmy * kp / 100 / 12) : 0;  // bmy = Jahresmiete/KP*100
+      var d_total = (ltv > 0 && kp > 0) ? (ltv * kp / 100) : 0;     // ltv = Darlehen/KP*100
+      return {
+        id: it.id, name: it.name,
+        kpis: {
+          kp: kp, nkm_m: nkm_m, d_total: d_total, bmy: bmy,
+          cf_ns_yearly: cf_ns, cf_ns_monthly: cf_ns / 12,
+          dscr: dscr, rate_total_m: 0
+        }
+      };
+    });
+  } catch (e) { return []; }
+}
 // Update sidebar Portfolio panel
 async function updateSidebarPortfolio() {
-  var objects = await getAllObjectsData();
+  var objects = await _getSidebarKpis();
   var portfolioDiv = document.getElementById('sb-portfolio');
   if (!portfolioDiv) return;
 

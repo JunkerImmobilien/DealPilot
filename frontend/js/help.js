@@ -17,6 +17,35 @@
 
   // ─── Hilfe-Inhalte: Themen-Baum ─────────────────────────────────────────
   var HELP_TOPICS = [
+    /* v727-help-avm: Marktbewertung-Felder */
+    {
+      id: 'marktbewertung_felder',
+      title: 'Marktbewertung — welche Felder zählen',
+      icon: 'i-bar',
+      desc: 'Welche Objektangaben in Sprengnetter, DealPilot-Marktwert und PriceHubble einfließen',
+      sections: [
+        {
+          h: 'Warum mehr Angaben = bessere Bewertung',
+          body: 'Je vollständiger ein Objekt erfasst ist, desto genauer die Marktbewertung. Beispiel aus der Praxis: Nur mit Adresse + Wohnfläche ergab eine Bewertung 212.000 € mit hoher Unsicherheit — mit vollständigen Angaben (Zustand, Ausstattung, Baujahr, Grundstück) 251.000 € mit deutlich höherer Treffsicherheit. Es lohnt sich, die Felder im Tab „Objekt“ möglichst komplett auszufüllen.'
+        },
+        {
+          h: 'Sprengnetter (aktiv)',
+          body: 'Sprengnetter AVM nutzt alle folgenden Angaben: <strong>Adresse, Objektart, Wohnfläche, Baujahr, Zimmerzahl, Etage, Grundstücksfläche, Modernisierungsjahr</strong> sowie die Ausstattungsdetails <strong>Zustand, Ausstattungsstandard, Heizung, Verglasung, Bodenbelag, Bad, Gäste-WC, Keller, Außenwände, Dacheindeckung, Aufzug, Balkon, Garage/Stellplatz</strong>. Zurück kommen Marktwert mit Spanne, Marktmiete und echte Vergleichsobjekte aus der Nachbarschaft.'
+        },
+        {
+          h: 'DealPilot-Marktwert (aktiv)',
+          body: 'Die DealPilot-eigene Markteinschätzung kombiniert deine Lage- und Potenzialbewertungen (Mikro-/Makrolage, Nachfrage, Entwicklung) mit Zustand, Ausstattung, Energieklasse und Bodenrichtwert sowie amtlichen Marktdaten. Die neuen Ausstattungsdetails fließen ebenfalls ein.'
+        },
+        {
+          h: 'PriceHubble (in Vorbereitung)',
+          body: 'Die PriceHubble-Anbindung ist in Vorbereitung und noch nicht aktiv. Sobald verfügbar, werden dieselben Objektangaben genutzt. Bis dahin liefert PriceHubble nur Demo-Werte.'
+        },
+        {
+          h: 'Tipp: Pflichtfelder zuerst',
+          body: 'Pflicht für jede Bewertung sind PLZ, Ort, Objektart und Wohnfläche. Alles darüber hinaus ist optional, verbessert aber die Genauigkeit. Die kleinen Info-Symbole an den Feldern erklären, wofür jede Angabe relevant ist.'
+        }
+      ]
+    },
     {
       id: 'einstieg',
       title: 'Einstieg',

@@ -59,6 +59,17 @@
       paragraph: '§ 23 EStG',
       severity: 'beginner'
     },
+    /* v727-eq-tips: Ausstattungsdetails fuer Marktbewertung */
+    'tab1.eq_heating': { title: 'Heizung', body: 'Heizungsart der Wohnung. Fließt in die Sprengnetter-Marktbewertung ein — Fußboden- und Zentralheizung wirken werterhöhend gegenüber Einzelöfen.' },
+    'tab1.eq_windows': { title: 'Verglasung', body: 'Fenstertyp. Relevant für Sprengnetter-Bewertung und Energiebewertung. Dreifachverglasung = modern/energieeffizient, Kastenfenster = Altbau.' },
+    'tab1.eq_floor': { title: 'Bodenbelag', body: 'Hauptbodenbelag. Parkett/Naturstein gilt als hochwertig, Teppich/Laminat als einfacher. Beeinflusst die Ausstattungsbewertung bei Sprengnetter.' },
+    'tab1.eq_bath': { title: 'Bad', body: 'Badausstattung. „Mit Fenster“ und „mehr als ein Bad“ wirken werterhöhend. Geht in die Sprengnetter-Bewertung ein.' },
+    'tab1.eq_guest_wc': { title: 'Gäste-WC', body: 'Separates Gäste-WC vorhanden? Werterhöhendes Ausstattungsmerkmal in der Sprengnetter-Bewertung.' },
+    'tab1.eq_store_room': { title: 'Keller / Abstellraum', body: 'Lage des Abstellraums. Relevant für die Sprengnetter-Ausstattungsbewertung.' },
+    'tab1.eq_walls': { title: 'Außenwände', body: 'Sind die Außenwände gedämmt? Energetisch und für die Bewertung relevant (Sprengnetter).' },
+    'tab1.eq_roof': { title: 'Dacheindeckung', body: 'Art der Dacheindeckung (v.a. bei Häusern relevant). Fließt in die Sprengnetter-Bewertung ein.' },
+    'tab1.eq_elevator': { title: 'Aufzug', body: 'Aufzug im Gebäude vorhanden? Werterhöhend besonders in oberen Etagen — geht in die Sprengnetter-Bewertung ein.' },
+
     'tab1.wfl': {
       title: 'Wohnfläche',
       body: 'Wohnfläche nach Wohnflächenverordnung (WoFlV). Wichtig für: Miete pro m², Bodenrichtwert-Hochrechnung, BMF-AfA-Berechnung und § 7b Sonder-AfA-Cap (max. 4.000 €/m² förderfähig).',
