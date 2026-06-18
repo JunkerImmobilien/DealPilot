@@ -1065,7 +1065,7 @@
   /* ════ RENDER-ORCHESTRIERUNG ════ */
   function renderAll(){
     renderScoreHero(); renderKpiCards(); renderStatus(); renderBoardOrCards();
-    renderHealth(); renderOverview(); renderProjTable();
+    renderHealth(); renderOverview(); renderProjTable(); if(window._dashLoadSharedPasses)window._dashLoadSharedPasses();
   }
 
   /* ════ DASHBOARD-MARKUP (in #dashboard-main injecten) ════ */
@@ -1100,6 +1100,7 @@
       + '<button data-v="kanban" class="active" onclick="DealPilotDashboard.setCardView(\'kanban\')">Kanban</button>'
       + '<button data-v="cards" onclick="DealPilotDashboard.setCardView(\'cards\')">Karten</button></span></div>'
       + '<div id="dp-board"></div>'
+      + '<div id="dp-shared-passes" style="margin:14px 0 2px"></div>'
       + '<div class="dp-section-label">Projektion &amp; Verlauf <span class="dp-model-tag">Modellprojektion (vereinfacht)</span></div>'
       + '<div class="dp-dash-charts">'
       + chartCard('dpc-cashflow','M3 17l6-6 4 4 8-8','Cashflow-Verlauf','vor / nach Steuer','€/Jahr')
@@ -1313,5 +1314,69 @@
     toggleCf: toggleCf,
     selectObject: selectObject,
     _debug: function(){ return { summaries:_summaries, details:_details, loaded:_detailsLoaded }; }
+  };
+})();
+
+
+/* ==== dpfk-f3-dash-v1 : F3 Geteilte Objekte im Portfolio-Cockpit (dashboard.js / #dp-shared-passes) ==== */
+(function(){
+  if (window._dashLoadSharedPasses) return;
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function fmtD(s){ try{ return new Date(s).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(e){ return '\u2013'; } }
+  function restLabel(exp){
+    var ms=new Date(exp).getTime()-Date.now();
+    if(!(ms>0)) return '<span style="color:#B86250">abgelaufen</span>';
+    var d=Math.round(ms/86400000);
+    return d+' Tag'+(d===1?'':'e');
+  }
+  var BTN="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.35);color:#E8CC7A;border-radius:7px;padding:3px 9px;font-size:11.5px;cursor:pointer";
+  var BTN_D="background:rgba(184,98,80,0.12);border:1px solid rgba(184,98,80,0.40);color:#D9685F;border-radius:7px;padding:3px 9px;font-size:11.5px;cursor:pointer;margin-left:6px";
+  var LABEL='<div class="dp-section-label">Geteilte Objekte <span class="dp-model-tag">Quick Boarding</span></div>';
+  function host(){ return document.getElementById('dp-shared-passes'); }
+  function render(items){
+    var h=host(); if(!h) return;
+    if(!items.length){
+      h.innerHTML=LABEL+'<div class="dp-card-dark" style="padding:10px 14px;color:#9A9390;font-size:12.5px">Aktuell ist kein Objekt geteilt. Teile ein Objekt \u00fcber \u201eQuick Boarding teilen\u201c.</div>';
+      return;
+    }
+    var rows=items.map(function(p){
+      return '<tr style="border-top:1px solid rgba(255,255,255,0.05)">'
+        +'<td style="padding:7px 8px;color:#E8E4DD">'+esc(p.title||'Objekt')+'</td>'
+        +'<td style="padding:7px 8px;font-family:monospace;color:#C9A84C">'+esc(p.code)+'</td>'
+        +'<td style="padding:7px 8px;color:#9A9390">'+fmtD(p.created_at)+'</td>'
+        +'<td style="padding:7px 8px;color:#9A9390">'+restLabel(p.expires_at)+'</td>'
+        +'<td style="padding:7px 8px;text-align:right;white-space:nowrap">'
+          +'<button style="'+BTN+'" onclick="window._dpfkPassExtend(\''+esc(p.code)+'\')">Verl\u00e4ngern</button>'
+          +'<button style="'+BTN_D+'" onclick="window._dpfkPassRevoke(\''+esc(p.code)+'\')">Beenden</button>'
+        +'</td></tr>';
+    }).join('');
+    h.innerHTML=LABEL+'<div class="dp-card-dark" style="padding:4px 6px;overflow-x:auto">'
+      +'<table style="width:100%;border-collapse:collapse;font-size:12.5px">'
+      +'<thead><tr style="color:#9A9390;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em">'
+      +'<th style="padding:6px 8px;font-weight:600">Objekt</th>'
+      +'<th style="padding:6px 8px;font-weight:600">Pass-Nr</th>'
+      +'<th style="padding:6px 8px;font-weight:600">geteilt am</th>'
+      +'<th style="padding:6px 8px;font-weight:600">Restlaufzeit</th>'
+      +'<th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+  function load(){
+    var h=host(); if(!h) return;
+    if(!window.Auth||typeof window.Auth.apiCall!=='function'){ h.innerHTML=''; return; }
+    window.Auth.apiCall('/passes',{method:'GET'}).then(function(r){
+      var items=(r&&r.items)||[];
+      var now=Date.now();
+      items=items.filter(function(p){ return !p.revoked_at && new Date(p.expires_at).getTime()>now; });
+      render(items);
+    }).catch(function(){ h.innerHTML=''; });
+  }
+  window._dashLoadSharedPasses=load;
+  window._dpfkPassExtend=function(code){
+    if(!window.Auth||!window.Auth.apiCall) return;
+    window.Auth.apiCall('/passes/'+encodeURIComponent(code)+'/extend',{method:'POST',body:{days:30}}).then(load).catch(load);
+  };
+  window._dpfkPassRevoke=function(code){
+    if(!window.Auth||!window.Auth.apiCall) return;
+    if(!confirm('Diesen Pass beenden? Der \u00f6ffentliche Link wird ung\u00fcltig.')) return;
+    window.Auth.apiCall('/passes/'+encodeURIComponent(code),{method:'DELETE'}).then(load).catch(load);
   };
 })();
