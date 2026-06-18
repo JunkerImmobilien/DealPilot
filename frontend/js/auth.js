@@ -46,7 +46,7 @@ var Auth = (function() {
          -> bis ~60s. Default 15s, /ai/ 120s, options.timeout (ms) ueberschreibt. */
       var _toMs = (options.timeout != null) ? options.timeout
                   : (/\/ai\//.test(path) ? 120000 : 15000);
-      setTimeout(function() { defaultCtrl.abort(); }, _toMs);
+      var _toTimer = setTimeout(function() { defaultCtrl.abort(); }, _toMs); /* v724-clear-abort */
     }
     var res;
     try { res = await fetch(url, fetchOpts); }
@@ -57,7 +57,10 @@ var Auth = (function() {
       throw new Error('Server nicht erreichbar (' + err.message + ')');
     }
     var data = null;
-    try { data = await res.json(); } catch(e) {}
+    if (typeof _toTimer !== "undefined" && _toTimer) { clearTimeout(_toTimer); } /* v724-clear-abort */
+    var _jsonErr = null;
+    try { data = await res.json(); } catch(e) { _jsonErr = e; } /* v724-json-throw */
+    if (res.ok && _jsonErr) { throw new Error("Antwort konnte nicht gelesen werden (" + _jsonErr.name + ")"); }
     if (!res.ok) {
       var msg = (data && data.error) || ('HTTP ' + res.status);
       var error = new Error(msg);

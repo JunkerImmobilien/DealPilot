@@ -402,6 +402,15 @@ async function saveObj(opts) {
   var data = collectData();
   var aiText = window._aiText || null;
   var photos = (typeof imgs !== 'undefined') ? imgs.map(function(i){ return i.src; }) : [];
+  /* v725-thumb: kleines Titelbild-Thumbnail (240px) fuer Portfolio-Liste -> data._thumb.
+     Haelt die Listen-Query schlank (kein Vollbild mehr). Bei Fehler: kein _thumb (Icon-Fallback). */
+  try {
+    if (photos && photos[0] && typeof window._dpResizeDataUrl === 'function') {
+      data._thumb = await window._dpResizeDataUrl(photos[0], 240, 0.7);
+    } else if (data && '_thumb' in data) {
+      delete data._thumb;
+    }
+  } catch (e) { /* defensiv: ohne _thumb weiter */ }
 
   if (Auth.isApiMode()) {
     try {
@@ -1738,7 +1747,7 @@ async function getAllObjectsData() {
     try {
       var resp = await Auth.apiCall('/objects?limit=500');
       // For each summary, fetch full data
-      var items = resp.items || [];
+      var items = (resp && resp.items) || []; /* v724-resp-guard */
       for (var i = 0; i < items.length; i++) {
         try {
           var full = await Auth.apiCall('/objects/' + items[i].id);

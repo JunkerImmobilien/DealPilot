@@ -51,9 +51,12 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
             COALESCE((data::jsonb->>'_deal_lost')::boolean, false) AS deal_lost,
             -- V110: LTV mitliefern damit die Sidebar-DSCR-Card per Klick zu LTV toggeln kann
             (data::jsonb->>'_kpis_ltv')::numeric AS ltv,
+            -- v725-thumb-query: kleines data._thumb statt Vollbild photos[0] (Liste schlank).
+            -- Fallback: Altobjekte ohne _thumb -> kein Thumbnail (Frontend zeigt Haus-Icon).
+            -- Laengen-Cap 60000 Zeichen als Netz gegen versehentlich grosse Werte.
             CASE
-              WHEN photos IS NOT NULL AND jsonb_typeof(photos::jsonb) = 'array' AND jsonb_array_length(photos::jsonb) > 0
-              THEN photos::jsonb->>0
+              WHEN (data::jsonb->>'_thumb') IS NOT NULL AND length(data::jsonb->>'_thumb') <= 60000
+              THEN data::jsonb->>'_thumb'
               ELSE NULL
             END AS thumbnail
      FROM objects

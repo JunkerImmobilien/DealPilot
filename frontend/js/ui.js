@@ -421,13 +421,43 @@ function exitQuickCheckMode() {
 window.enterQuickCheckMode = enterQuickCheckMode;
 window.exitQuickCheckMode  = exitQuickCheckMode;
 
+/* v725-photo-resize: Canvas-Resize beim Upload. Bei jedem Fehler -> Original behalten. */
+window._dpResizeDataUrl = function(dataUrl, maxEdge, quality) {
+  return new Promise(function(resolve) {
+    try {
+      if (!dataUrl || typeof dataUrl !== "string" || dataUrl.indexOf("data:image") !== 0) { return resolve(dataUrl); }
+      var img = new Image();
+      img.onload = function() {
+        try {
+          var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+          if (!w || !h) return resolve(dataUrl);
+          var scale = (w <= maxEdge && h <= maxEdge) ? 1 : (maxEdge / Math.max(w, h));
+          var nw = Math.max(1, Math.round(w * scale)), nh = Math.max(1, Math.round(h * scale));
+          var c = document.createElement("canvas"); c.width = nw; c.height = nh;
+          var ctx = c.getContext("2d");
+          ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, nw, nh);
+          ctx.drawImage(img, 0, 0, nw, nh);
+          var out = c.toDataURL("image/jpeg", quality || 0.82);
+          resolve(out && out.length < dataUrl.length ? out : dataUrl);
+        } catch (e) { resolve(dataUrl); }
+      };
+      img.onerror = function() { resolve(dataUrl); };
+      img.src = dataUrl;
+    } catch (e) { resolve(dataUrl); }
+  });
+};
 // ── IMAGES ────────────────────────────────────────────
 var imgs = [];
 function handleImgs(files) {
   Array.from(files).forEach(function(f) {
     if (imgs.length >= 6) return;
     var r = new FileReader();
-    r.onload = function(e) { imgs.push({ src: e.target.result, name: f.name }); renderImgs(); };
+    r.onload = function(e) {
+      var _raw = e.target.result;
+      window._dpResizeDataUrl(_raw, 1600, 0.82).then(function(small) {
+        imgs.push({ src: small || _raw, name: f.name }); renderImgs();
+      });
+    }; /* v725-photo-resize */
     r.readAsDataURL(f);
   });
   var inp = document.getElementById('img-inp');
