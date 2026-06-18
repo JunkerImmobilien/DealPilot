@@ -1965,9 +1965,13 @@ function _calcImmediate(){
       });
     }
     // V277-direct-post: Snapshot direkt ins Backend, kein Cache-Hack mehr
+    // v732-kill-dead-post: tax.js (_scheduleTaxSnapshotPost, debounced) ist der gewollte Schreiber.
+    // Dieser calc.js-Pfad lief faelschlich bei JEDEM calc() mit (Call-Flut -> Speicher-Timeout).
+    // Nur noch als NOTNAGEL aktiv, falls tax.js nicht geladen ist (dann kein Snapshot-Verlust).
     try {
+      var _taxWriterReady = (typeof window._scheduleTaxSnapshotPost === 'function');
       var _oid = window._currentObjKey || (window._currentObjData && (window._currentObjData.id || window._currentObjData._id));
-      if (_oid && window.Auth && typeof window.Auth.apiCall === 'function') {
+      if (!_taxWriterReady && _oid && window.Auth && typeof window.Auth.apiCall === 'function') {
         // Fire-and-forget - blockiert nicht das UI
         window.Auth.apiCall('/objects/' + _oid + '/steuer-snapshot', {
           method: 'POST',
@@ -1975,14 +1979,16 @@ function _calcImmediate(){
         }).then(function(){
           // Cache invalidieren damit getAllObjectsWithWK nachzieht
           if (window.DealPilotWKAggregator && typeof window.DealPilotWKAggregator.loadAll === 'function') {
-            window.DealPilotWKAggregator.loadAll(true).catch(function(){});
+            /* v730-loop-fix: force=false statt true -> nutzt 30s-Cache, bricht Render-Loop
+               (POST steuer-snapshot -> loadAll -> GET -> Re-Render -> POST). */
+            window.DealPilotWKAggregator.loadAll(false).catch(function(){});
           }
         }).catch(function(err){
           console.warn('[V277] steuer-snapshot POST failed:', err && err.message);
         });
       }
-      // Alter Aufruf bleibt als Fallback (schadet nicht)
-      if (window.DealPilotWKAggregator && typeof window.DealPilotWKAggregator.saveSnapshot === 'function' && _oid) {
+      // Alter Aufruf bleibt als Fallback (schadet nicht) - v732-kill-dead-post: auch nur Notnagel
+      if (!_taxWriterReady && window.DealPilotWKAggregator && typeof window.DealPilotWKAggregator.saveSnapshot === 'function' && _oid) {
         window.DealPilotWKAggregator.saveSnapshot(_oid, snapshot);
       }
     } catch(e) { console.warn('[V277] snapshot persist error:', e); }

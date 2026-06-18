@@ -34,12 +34,21 @@
   function saveEmptyCard() {
     // #1: leeres neues Objekt sofort als Kartei speichern (umgeht hasCoreData).
     // saveObj() committet die Preview-ID, setzt _currentObjKey und rendert die Sidebar.
+    /* v728-once-guard: doppelte leere Karte verhindern. newObj kann ueber mehrere Wege 2x feuern,
+       saveObj ist async -> ein _currentObjKey-Check greift zu spaet. Daher SYNCHRONES Flag,
+       das sofort sperrt und nach 1.5s (bzw. nach Erfolg) wieder freigibt. */
     try {
+      if (window._dpEmptyCardSaving) return;
+      if (window._currentObjKey) return; /* bereits eine ID -> kein leeres Anlegen noetig */
+      window._dpEmptyCardSaving = true;
+      var _rel = function () { window._dpEmptyCardSaving = false; };
+      setTimeout(_rel, 1500); /* Sicherheitsnetz falls Promise nie aufloest */
       if (typeof window.saveObj === 'function') {
         var p = window.saveObj({ silent: true });
-        if (p && typeof p.then === 'function') p.catch(function () {});
-      }
-    } catch (e) {}
+        if (p && typeof p.then === 'function') { p.then(_rel).catch(function () { _rel(); }); }
+        else { _rel(); }
+      } else { _rel(); }
+    } catch (e) { window._dpEmptyCardSaving = false; }
   }
 
   function afterNewObj() {

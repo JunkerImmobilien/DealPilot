@@ -32,6 +32,55 @@ function fin(x) {
   return isFinite(n) ? n : null;
 }
 
+/* v727-eq-matrix: Enum-Whitelists exakt aus Sprengnetter-Spec. Frontend liefert Enum als value -> nur validieren. */
+var _EQ_ENUMS = {
+  heating: ['FUSSBODENHEIZUNG','ZENTRALHEIZUNG','EINZELOEFEN','SONSTIGE'],
+  windows: ['ISOLIERVERGLASUNG','ZWEIFACHVERGLASUNG','DREIFACHVERGLASUNG','SPEZIALVERGLASUNG','RAUMHOHE_VERGLASUNG','KASTENFENSTER','EINFACH','SONSTIGE'],
+  floor: ['FLIESEN','KUNSTSTOFF_PVC','PARKETT_NATURSTEIN','TEPPICH_LAMINAT','SONSTIGE'],
+  bath_room: ['EIN_BAD','MEHR_ALS_EIN_BAD','MIT_FENSTER','INNENLIEGEND'],
+  guest_toilet: ['GAESTE_WC','KEIN_GAESTE_WC'],
+  store_room: ['INNERHALB','AUSSERHALB','INNERHALB_UND_AUSSERHALB','KEINER'],
+  insulated_exterior_walls: ['AUSSENWAENDE_GEDAEMMT','AUSSENWAENDE_NICHT_GEDAEMMT'],
+  roof_covering: ['DACHPFANNEN','SCHIEFER','METALL','DACHPAPPE','SONSTIGE']
+};
+function _validEq(field, val) {
+  var v = String(val || '').trim().toUpperCase();
+  if (!v) return null;
+  return (_EQ_ENUMS[field] && _EQ_ENUMS[field].indexOf(v) >= 0) ? v : null;
+}
+function _mapElevator(v) {
+  var sx = String(v || '').trim().toLowerCase();
+  if (sx === 'ja' || sx === 'true' || sx === '1') return true;
+  if (sx === 'nein' || sx === 'false' || sx === '0') return false;
+  return null;
+}
+/* v726-equipment: Mapping DealPilot-Werte -> Sprengnetter-Enums (abgenickt + Live-verifiziert). */
+function _mapEquipmentValue(ausst) {
+  switch (String(ausst || '').trim().toLowerCase()) {
+    case 'einfach': return 'EINFACH';
+    case 'normal': return 'MITTEL';
+    case 'gehoben': return 'GEHOBEN';
+    case 'luxus': return 'STARK_GEHOBEN';
+    default: return null;
+  }
+}
+function _mapModernization(z) {
+  switch (String(z || '').trim().toLowerCase()) {
+    case 'neubau': return 'EXTENSIVE';
+    case 'gut': return 'PREDOMINANT';
+    case 'normal': return 'AVERAGE';
+    case 'renovierungsbeduerftig': return 'SIMPLE';
+    case 'stark_sanierungsbeduerftig': return 'NONE';
+    default: return null;
+  }
+}
+function _mapResidentialArea(balkonRaw) {
+  var b = fin(balkonRaw);
+  if (b === null) return null;
+  if (b <= 0) return 'KEINBALKON';
+  if (b > 10) return 'BALKON_UEBER_10';
+  return 'BALKON_UNTER_10';
+}
 // DealPilot-Objektart -> Sprengnetter Category (+ ggf. construction)
 function _category(objart) {
   var o = String(objart || '').toUpperCase();
@@ -62,6 +111,22 @@ function _mapRequest(inputs, opts) {
   var fn = fin(inputs.etagen_ges); if (fn && (cat.category === 'EFH' || cat.category === 'MFH')) body.floor_number = Math.round(fn);
   var gar = fin(inputs.garagen); if (gar !== null) body.garages = gar > 0;
   var sp = fin(inputs.stellpl_aussen); if (sp !== null) body.outdoor_parking_space = sp > 0;
+  /* v726-equipment: erweiterte Felder (Mapping bewiesen gegen Live-API, value=GEHOBEN akzeptiert). */
+  var pa = fin(inputs.gsfl); if (pa) body.plot_area = pa;
+  var modClass = _mapModernization(inputs.ds2_zustand); if (modClass) body.modernization_class = modClass;
+  var eq = {};
+  var eqVal = _mapEquipmentValue(inputs.ausst); if (eqVal) eq.value = eqVal;
+  var resArea = _mapResidentialArea(inputs.balkon_flae); if (resArea) eq.residential_area = resArea;
+  /* v727-eq-matrix: feingranulare Ausstattung (Frontend liefert Enum direkt) */
+  var _eqMap = { heating:'eq_heating', windows:'eq_windows', floor:'eq_floor', bath_room:'eq_bath',
+                 guest_toilet:'eq_guest_wc', store_room:'eq_store_room',
+                 insulated_exterior_walls:'eq_walls', roof_covering:'eq_roof' };
+  Object.keys(_eqMap).forEach(function (snField) {
+    var v = _validEq(snField, inputs[_eqMap[snField]]); if (v) eq[snField] = v;
+  });
+  if (Object.keys(eq).length) body.equipment = eq;
+  var elev = _mapElevator(inputs.eq_elevator); if (elev !== null) body.elevator = elev;
+  body.compare_prices = true;
   if (opts.askingPrice) body.asking_price = opts.askingPrice;
   return body;
 }
@@ -146,6 +211,21 @@ async function valuate(inputs) {
     scoreMicro: null,
     scoreMacro: null,
     wertentwicklung: null,
+    /* v726-response: Vergleichsobjekte + Score + Standardfehler durchreichen. */
+    comparePrices: (valuation && Array.isArray(valuation.compare_prices))
+      ? valuation.compare_prices.map(function (c) {
+          return {
+            value: fin(c.value), distance: fin(c.distance),
+            livingArea: fin(c.living_area), rooms: fin(c.rooms),
+            constructionYear: fin(c.construction_year),
+            equipment: c.equipment || null, construction: c.construction || null,
+            energyClass: c.energy_class || null, similarity: fin(c.similarity),
+            date: c.date || null
+          };
+        })
+      : [],
+    score: (valuation && valuation.meta && valuation.meta.score != null) ? fin(valuation.meta.score) : null,
+    standardError: (valuation && valuation.meta && valuation.meta.standarderror != null) ? fin(valuation.meta.standarderror) : null,
     _raw: {
       valuationValue: mw, valuationRange: mwR,
       rentValue: mm, rentRange: mmR,

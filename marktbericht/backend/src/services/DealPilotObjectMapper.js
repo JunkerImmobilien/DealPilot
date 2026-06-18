@@ -62,6 +62,16 @@ export const DealPilotObjectMapper = {
       vacancy: vacancyFrom(d),
       // Bodenrichtwert aus DealPilot als BORIS-Fallback
       land_value_manual: num(pick(d, ['brw'])),
+      /* v727-equipment: Ausstattungsdetails (fliessen in DealPilot-Marktanalyse ein) */
+      heating: pick(d, ['eq_heating']),
+      windows: pick(d, ['eq_windows']),
+      floor_covering: pick(d, ['eq_floor']),
+      bath: pick(d, ['eq_bath']),
+      guest_wc: pick(d, ['eq_guest_wc']),
+      store_room: pick(d, ['eq_store_room']),
+      exterior_walls: pick(d, ['eq_walls']),
+      roof: pick(d, ['eq_roof']),
+      elevator: pick(d, ['eq_elevator']),
     };
   },
 

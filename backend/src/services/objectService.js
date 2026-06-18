@@ -54,9 +54,16 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
             -- v725-thumb-query: kleines data._thumb statt Vollbild photos[0] (Liste schlank).
             -- Fallback: Altobjekte ohne _thumb -> kein Thumbnail (Frontend zeigt Haus-Icon).
             -- Laengen-Cap 60000 Zeichen als Netz gegen versehentlich grosse Werte.
+            -- v731-thumb-fallback: _thumb wenn vorhanden, sonst photos[0] mit Laengen-Cap.
+            -- Altobjekte ohne _thumb bekommen ihr Titelbild zurueck (altes V29-Verhalten),
+            -- aber nur wenn es nicht riesig ist (Schutz gegen Listen-Flut, v725-Lehre).
             CASE
               WHEN (data::jsonb->>'_thumb') IS NOT NULL AND length(data::jsonb->>'_thumb') <= 60000
               THEN data::jsonb->>'_thumb'
+              WHEN jsonb_typeof(photos::jsonb) = 'array'
+                   AND jsonb_array_length(photos::jsonb) > 0
+                   AND length(photos::jsonb->>0) <= 500000
+              THEN photos::jsonb->>0
               ELSE NULL
             END AS thumbnail
      FROM objects

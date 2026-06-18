@@ -53,7 +53,7 @@
   };
   function svg(name, size, stroke) { var p = ICO[name] || ''; var s = size || 14; return '<svg xmlns="http://www.w3.org/2000/svg" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="' + (stroke || 'currentColor') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; }
 
-  function mainInputs() { /* v438-num-fix: numerische Felder als Zahl senden (73.31 darf nicht zu 7331 werden) */ return { plz: val('plz'), ort: val('ort'), str: val('str'), hnr: val('hnr'), objektart: val('objart'), wfl: numDe(val('wfl')), baujahr: numDe(val('baujahr')), kp: numDe(val('kp')) }; }
+  function mainInputs() { /* v438-num-fix + v726-inputs: vollumfaenglich an AVM */ return { plz: val('plz'), ort: val('ort'), str: val('str'), hnr: val('hnr'), objektart: val('objart'), wfl: numDe(val('wfl')), baujahr: numDe(val('baujahr')), kp: numDe(val('kp')), zimmer: numDe(val('zimmer')), etage: numDe(val('etage')), etagen_ges: numDe(val('etagen_ges')), garagen: numDe(val('garagen')), stellpl_aussen: numDe(val('stellpl_aussen')), modernis: numDe(val('modernis')), gsfl: numDe(val('gsfl')), ausst: val('ausst'), ds2_zustand: val('ds2_zustand'), balkon_flae: numDe(val('balkon_flae')), /* v727-eq-inputs */ eq_heating: val('eq_heating'), eq_windows: val('eq_windows'), eq_floor: val('eq_floor'), eq_bath: val('eq_bath'), eq_guest_wc: val('eq_guest_wc'), eq_store_room: val('eq_store_room'), eq_walls: val('eq_walls'), eq_roof: val('eq_roof'), eq_elevator: val('eq_elevator') }; }
   var REQUIRED = {
     pricehubble: [['plz', 'PLZ'], ['ort', 'Ort'], ['str', 'Straße'], ['hnr', 'Hausnummer'], ['objektart', 'Objektart'], ['wfl', 'Wohnfläche']],
     sprengnetter: [['plz', 'PLZ'], ['ort', 'Ort'], ['objektart', 'Objektart'], ['wfl', 'Wohnfläche']]
@@ -443,6 +443,7 @@
       var off = soon || !avmAvail;
       var cb = lab.querySelector('input'); if (cb) { cb.disabled = off; if (off) cb.checked = false; }
       lab.classList.toggle('dp-pf-soon-on', off);
+      lab.classList.toggle('dp-pf-disabled', off); /* v727-tile-disabled: die echte Sperr-Klasse */
       if (off) lab.classList.remove('on');
       lab.style.opacity = '';
       if (soon) lab.setAttribute('title', 'Demnächst verfügbar');
