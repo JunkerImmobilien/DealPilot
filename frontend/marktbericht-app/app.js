@@ -69,6 +69,15 @@ async function generate() {
     purchase_price: parseFloat($('price').value) || null,
     monthly_net_rent: parseFloat($('rent').value) || null,
     fast: $('fastMode') ? $('fastMode').checked : false,
+    /* v736-mb-eq: 8 Ausstattungsfelder -> Keys wie DealPilotObjectMapper (v727) */
+    heating: $('eq_heating') ? ($('eq_heating').value || null) : null,
+    windows: $('eq_windows') ? ($('eq_windows').value || null) : null,
+    floor_covering: $('eq_floor') ? ($('eq_floor').value || null) : null,
+    bath: $('eq_bath') ? ($('eq_bath').value || null) : null,
+    guest_wc: $('eq_guest_wc') ? ($('eq_guest_wc').value || null) : null,
+    store_room: $('eq_store_room') ? ($('eq_store_room').value || null) : null,
+    exterior_walls: $('eq_walls') ? ($('eq_walls').value || null) : null,
+    roof: $('eq_roof') ? ($('eq_roof').value || null) : null,
   };
 
   const prog = $('genProgress');
@@ -2232,7 +2241,10 @@ function mdToPdfLines(md) {
       box.style.display = open ? 'none' : 'block';
       if (caret) caret.textContent = open ? '\u25B8' : '\u25BE';
     });
-    const labels = { cond: 'Zustand', energy: 'Energieklasse', quality: 'Ausstattung', modern: 'Modernisierung' };
+    const labels = { cond: 'Zustand', energy: 'Energieklasse', quality: 'Ausstattung', modern: 'Modernisierung',
+      /* v736-mb-eq: 8 Ausstattungsfelder zaehlen mit (X/12) */
+      eq_heating: 'Heizung', eq_windows: 'Verglasung', eq_floor: 'Bodenbelag', eq_bath: 'Bad',
+      eq_guest_wc: 'Gäste-WC', eq_store_room: 'Keller', eq_walls: 'Außenwände', eq_roof: 'Dacheindeckung' };
     const fields = Object.keys(labels);
     function upd() {
       const isFilled = function (id) { const e = document.getElementById(id); return !!(e && e.value && e.value.trim() !== ''); };

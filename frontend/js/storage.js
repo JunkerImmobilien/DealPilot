@@ -583,6 +583,8 @@ window._clearFormForNewObject = _clearFormForNewObject;
 
 function newObj() {
   /* v379-autosave: confirm entfernt (Auto-Save aktiv) */
+  /* v736-save-before-switch: aktuelles Objekt sichern bevor gewechselt/neu */
+  try { if (window.dpIsDirty && window.dpIsDirty() && window.dpTabSwitchSave) { window.dpTabSwitchSave(); } } catch (e) {}
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
     if (e) e.value = '';
@@ -1258,6 +1260,8 @@ function _addNewBtn() {
 // LOAD / DUPLICATE / DELETE
 // ══════════════════════════════════════════════════
 async function loadSaved(k) {
+  /* v736-save-before-switch: aktuelles Objekt sichern bevor gewechselt/neu */
+  try { if (window.dpIsDirty && window.dpIsDirty() && window.dpTabSwitchSave) { window.dpTabSwitchSave(); } } catch (e) {}
   if (Auth.isApiMode()) {
     try {
       var obj = await Auth.apiCall('/objects/' + k);

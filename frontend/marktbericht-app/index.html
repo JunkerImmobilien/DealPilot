@@ -353,12 +353,44 @@
             <select id="energy"><option value="" selected>– keine Angabe –</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select>
           </div>
         </div>
+        <div class="row"><!-- v736-mb-eq -->
+          <div><label>Heizung</label>
+            <select id="eq_heating"><option value="" selected>– keine Angabe –</option><option value="FUSSBODENHEIZUNG">Fußbodenheizung</option><option value="ZENTRALHEIZUNG">Zentralheizung</option><option value="EINZELOEFEN">Einzelöfen</option><option value="SONSTIGE">Sonstige</option></select>
+          </div>
+          <div><label>Verglasung</label>
+            <select id="eq_windows"><option value="" selected>– keine Angabe –</option><option value="ISOLIERVERGLASUNG">Isolierverglasung</option><option value="ZWEIFACHVERGLASUNG">Zweifachverglasung</option><option value="DREIFACHVERGLASUNG">Dreifachverglasung</option><option value="SPEZIALVERGLASUNG">Spezialverglasung</option><option value="RAUMHOHE_VERGLASUNG">Raumhohe Verglasung</option><option value="KASTENFENSTER">Kastenfenster</option><option value="EINFACH">Einfachverglasung</option><option value="SONSTIGE">Sonstige</option></select>
+          </div>
+        </div>
         <div class="row">
           <div><label>Ausstattungsqualität</label>
             <select id="quality"><option value="" selected>– keine Angabe –</option><option value="einfach">einfach</option><option value="normal">normal</option><option value="gehoben">gehoben</option><option value="luxurioes">luxuriös</option></select>
           </div>
           <div><label>Modernisierung</label>
             <select id="modern"><option value="" selected>– keine Angabe –</option><option value="kernsaniert">kernsaniert</option><option value="umfassend">umfassend modernisiert</option><option value="teilmodernisiert">teilmodernisiert</option><option value="keine">keine</option><option value="renovierungsstau">Renovierungsstau</option></select>
+          </div>
+        </div>
+        <div class="row"><!-- v736-mb-eq -->
+          <div><label>Bodenbelag</label>
+            <select id="eq_floor"><option value="" selected>– keine Angabe –</option><option value="FLIESEN">Fliesen</option><option value="KUNSTSTOFF_PVC">Kunststoff / PVC</option><option value="PARKETT_NATURSTEIN">Parkett / Naturstein</option><option value="TEPPICH_LAMINAT">Teppich / Laminat</option><option value="SONSTIGE">Sonstige</option></select>
+          </div>
+          <div><label>Bad</label>
+            <select id="eq_bath"><option value="" selected>– keine Angabe –</option><option value="EIN_BAD">Ein Bad</option><option value="MEHR_ALS_EIN_BAD">Mehr als ein Bad</option><option value="MIT_FENSTER">Mit Fenster</option><option value="INNENLIEGEND">Innenliegend</option></select>
+          </div>
+        </div>
+        <div class="row"><!-- v736-mb-eq -->
+          <div><label>Gäste-WC</label>
+            <select id="eq_guest_wc"><option value="" selected>– keine Angabe –</option><option value="GAESTE_WC">Gäste-WC vorhanden</option><option value="KEIN_GAESTE_WC">Kein Gäste-WC</option></select>
+          </div>
+          <div><label>Keller / Abstellraum</label>
+            <select id="eq_store_room"><option value="" selected>– keine Angabe –</option><option value="INNERHALB">Innerhalb</option><option value="AUSSERHALB">Außerhalb</option><option value="INNERHALB_UND_AUSSERHALB">Innerhalb und außerhalb</option><option value="KEINER">Keiner</option></select>
+          </div>
+        </div>
+        <div class="row"><!-- v736-mb-eq -->
+          <div><label>Außenwände</label>
+            <select id="eq_walls"><option value="" selected>– keine Angabe –</option><option value="AUSSENWAENDE_GEDAEMMT">Gedämmt</option><option value="AUSSENWAENDE_NICHT_GEDAEMMT">Nicht gedämmt</option></select>
+          </div>
+          <div><label>Dacheindeckung</label>
+            <select id="eq_roof"><option value="" selected>– keine Angabe –</option><option value="DACHPFANNEN">Dachpfannen</option><option value="SCHIEFER">Schiefer</option><option value="METALL">Metall</option><option value="DACHPAPPE">Dachpappe</option><option value="SONSTIGE">Sonstige</option></select>
           </div>
         </div>
         <div class="row">
@@ -508,7 +540,7 @@
 <script src="vendor/jspdf.umd.min.js"></script>
 <script src="vendor/jspdf.plugin.autotable.min.js"></script>
 <script src="marktbewertung-card.js?v=49k"></script>
-<script src="app.js?v=654"></script>
+<script src="app.js?v=736"></script>
 <script src="mb-objektwahl.js?v=568"></script><!-- v566-objektwahl -->
 <script>
 /* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
