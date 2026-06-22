@@ -18,7 +18,7 @@
   var _avm = {};
   var _avmHealth = null;
   /* v644-avm-soon: PriceHubble bleibt "coming soon", bis echter Client + Zugang da sind. */
-  var PH_COMING_SOON = true;
+  var PH_COMING_SOON = false; /* v741-ph-soon-off: folgt jetzt /health (Client live+ready) */
   function provComingSoon(p) {
     if (p === 'pricehubble' && PH_COMING_SOON) return true;
     try { return !!(_avmHealth && _avmHealth.providers && _avmHealth.providers[p] && _avmHealth.providers[p].coming_soon); } catch (e) { return false; }
@@ -70,6 +70,7 @@
     }
     var P = '#' + MOUNT_ID + ' ';
     var css = [
+      /* v745e-css-unprefixed */
       '[data-v365-top]{display:none!important}',
       P + '.actions{display:flex;gap:10px;margin:0 0 14px;flex-wrap:wrap;align-items:center;padding:13px 16px;background:linear-gradient(180deg,#ffffff,#fdfbf6);border:1px solid rgba(201,168,76,0.30);border-radius:14px;box-shadow:0 1px 2px rgba(42,39,39,0.04),0 10px 24px -16px rgba(201,168,76,0.55)}',
       P + '.actions-label{font-size:10.5px;font-weight:700;color:var(--gold-3,#9a7f33);letter-spacing:.14em;text-transform:uppercase;margin-right:6px}',
@@ -118,7 +119,66 @@
       P + '.btn .ico{display:inline-flex;align-items:center}',
       P + '.oab-prog{margin:0 0 12px;font-size:12.5px;color:var(--muted,#7A7370)}',
       P + '.oab-results{display:grid;gap:12px;margin:0 0 14px}',
-      /* AVM-Card QuickCheck-Look */
+      '.oab-history{margin:6px 0 16px}', /* v742-avm-history-css */
+      '.oab-h-head{display:flex;align-items:center;justify-content:space-between;font:700 12px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-3,#9a7f33);margin-bottom:7px}',
+      '.oab-h-add{border:1px solid rgba(201,168,76,0.45);border-radius:8px;background:#fff;color:var(--gold-3,#9a7f33);font:600 11.5px/1 "DM Sans",system-ui,sans-serif;padding:5px 10px;cursor:pointer}',
+      '.oab-h-add:hover{background:rgba(201,168,76,0.08)}',
+      '.oab-h-tbl{width:100%;border-collapse:collapse;font:13px/1.4 "JetBrains Mono",ui-monospace,monospace}',
+      '.oab-h-tbl th{font:700 10px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--muted,#7A7370);text-align:left;padding:6px 8px;border-bottom:1px solid rgba(201,168,76,0.25)}',
+      '.oab-h-tbl td{padding:7px 8px;border-bottom:1px solid rgba(42,39,39,0.06);color:var(--ch,#2A2727)}',
+      '.oab-h-tbl .r{text-align:right}',
+      '.oab-h-del{border:0;background:none;color:var(--muted,#B8625C);font-size:15px;cursor:pointer;line-height:1;padding:0 4px}',
+      '.oab-h-del:hover{color:#B8625C}',
+      '.oab-h-empty{font:italic 12px/1.5 "DM Sans",system-ui,sans-serif;color:var(--muted,#7A7370);padding:6px 2px}', /* v745-hist-css: Tabelle aufgewertet */
+      '.oab-history{background:#fff;border:1px solid rgba(201,168,76,0.30);border-radius:14px;padding:16px 18px;margin:6px 0 16px}',
+      '.oab-h-title{font:700 13px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--ch,#2A2727)}',
+      '.oab-h-head{margin-bottom:12px}',
+      '.oab-h-date{font:12px/1 "JetBrains Mono",ui-monospace,monospace;color:var(--muted,#7A7370);white-space:nowrap}',
+      '.oab-h-badge{display:inline-block;font:600 11px/1.3 "DM Sans",system-ui,sans-serif;padding:3px 9px;border-radius:999px;white-space:nowrap}',
+      '.oab-h-badge-avm{background:rgba(201,168,76,0.14);color:var(--gold-3,#9a7f33)}',
+      '.oab-h-badge-dp{background:rgba(42,39,39,0.92);color:#E8CC7A}',
+      '.oab-h-badge-man{background:rgba(63,165,108,0.14);color:#2E7D4F}',
+      '.oab-h-mw{font:700 14px/1.1 "JetBrains Mono",ui-monospace,monospace;color:var(--ch,#2A2727)}',
+      '.oab-h-sub{display:block;font:11px/1.3 "JetBrains Mono",ui-monospace,monospace;color:var(--muted,#7A7370);margin-top:2px}',
+      '.oab-h-span{font:12.5px/1.1 "JetBrains Mono",ui-monospace,monospace;color:var(--ch2,#6b6660);white-space:nowrap}',
+      '.oab-h-tbl tbody tr{transition:background .12s}',
+      '.oab-h-tbl tbody tr:hover{background:rgba(201,168,76,0.05)}', /* v745-hist-css: Modal Boarding-Look */
+      '.v743-hist-ov{position:fixed;inset:0;background:rgba(5,5,5,0.55);display:flex;align-items:center;justify-content:center;z-index:9999}',
+      '.v743-hist-dlg{background:#fff;border-radius:16px;width:min(460px,93vw);overflow:hidden;box-shadow:0 22px 60px rgba(5,5,5,0.4)}',
+      '.v743-hist-brand{background:#070707;padding:13px 22px;display:flex;align-items:center;gap:12px}',
+      '.v743-hist-brand .lg{font:700 16px/1 "Space Grotesk",system-ui,sans-serif;color:#fff;letter-spacing:.3px}',
+      '.v743-hist-brand .lg b{color:#E8CC7A}',
+      '.v743-hist-brand .tg{margin-left:auto;font:700 9.5px/1 "JetBrains Mono",monospace;letter-spacing:2px;color:#C9A84C}',
+      '.v743-hist-hero{background:linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f);padding:15px 22px}',
+      '.v743-hist-hero .kick{font:700 10px/1 "JetBrains Mono",monospace;letter-spacing:2.5px;color:#5a4a14;margin-bottom:5px}',
+      '.v743-hist-hero .h{font:700 19px/1.15 "Space Grotesk",system-ui,sans-serif;color:#1a1407;margin:0}',
+      '.v743-hist-bd{padding:20px 22px;background:#fff}',
+      '.v743-hist-f{margin-bottom:13px;display:flex;flex-direction:column;gap:5px}',
+      '.v743-hist-f label{font:600 11px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-3,#9a7f33)}',
+      '.v743-hist-f input{border:1px solid var(--border,#E7E2DC);border-radius:9px;padding:10px 12px;font:14px/1.3 "JetBrains Mono",ui-monospace,monospace;color:var(--ch,#2A2727)}',
+      '.v743-hist-f input:focus{outline:none;border-color:var(--gold,#C9A84C);box-shadow:0 0 0 3px rgba(201,168,76,0.15)}',
+      '.v743-hist-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}',
+      '.v743-hist-calc{font:12px/1.4 "DM Sans",system-ui,sans-serif;color:var(--gold-3,#9a7f33);background:rgba(201,168,76,0.08);border-radius:8px;padding:9px 12px;margin-bottom:18px}',
+      '.v743-hist-act{display:flex;justify-content:flex-end;gap:10px}',
+      '.v743-hist-cancel{border:1px solid var(--border,#E7E2DC);background:#fff;color:var(--ch2,#6b6660);border-radius:9px;padding:10px 16px;font:600 13px/1 "DM Sans",system-ui,sans-serif;cursor:pointer}',
+      '.v743-hist-save{border:0;background:#0a0a0a;color:#E8CC7A;border-radius:9px;padding:10px 20px;font:700 13px/1 "DM Sans",system-ui,sans-serif;cursor:pointer}',
+      '.v743-hist-save:hover{background:#141414}',
+      /* v747-logo-css: Provider-Logo in Badge + Tabellen-Schrift */
+      '.oab-h-badge{display:inline-flex;align-items:center;gap:7px;font:600 12px/1.3 "DM Sans",system-ui,sans-serif;padding:3px 10px 3px 4px;border-radius:999px;white-space:nowrap;background:#fff;border:1px solid rgba(42,39,39,0.12)}',
+      '.oab-h-logo{width:auto;height:18px;border-radius:4px;background:#fff;object-fit:contain;display:block}',
+      '.oab-h-bname{font:600 12px/1.3 "DM Sans",system-ui,sans-serif;color:var(--ch,#2A2727)}',
+      '.oab-h-badge-man{padding-left:10px}',
+      '.oab-h-badge-man .oab-h-bname{color:#2E7D4F}',
+      '.oab-h-tbl th{font:700 10px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-3,#9a7f33);text-align:left;padding:7px 10px;border-bottom:1px solid rgba(201,168,76,0.25)}',
+      '.oab-h-tbl td{padding:9px 10px;border-bottom:1px solid rgba(42,39,39,0.06);vertical-align:middle}',
+      '.oab-h-title{font:700 11.5px/1 "DM Sans",system-ui,sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold-3,#9a7f33)}',
+      /* v747-font-align: Tabellen-Schrift wie ds2-ro (Standard-Font 12.5px, kein Monospace) */
+      '.oab-h-tbl{width:100%;border-collapse:collapse;font:12.5px/1.4 "Inter",system-ui,sans-serif}',
+      '.oab-h-tbl td{padding:9px 10px;border-bottom:1px solid rgba(42,39,39,0.06);vertical-align:middle;color:var(--ch,#2A2727)}',
+      '.oab-h-date{font:500 12.5px/1.3 "Inter",system-ui,sans-serif;color:var(--ch,#2A2727);white-space:nowrap}',
+      '.oab-h-mw{font:600 12.5px/1.2 "Inter",system-ui,sans-serif;color:var(--ch,#2A2727)}',
+      '.oab-h-sub{display:block;font:400 11px/1.3 "Inter",system-ui,sans-serif;color:var(--muted,#7A7370);margin-top:2px}',
+      '.oab-h-span{font:500 12.5px/1.2 "Inter",system-ui,sans-serif;color:var(--ch2,#6b6660);white-space:nowrap}', /* AVM-Card QuickCheck-Look */
       P + '.avmx{position:relative;background:linear-gradient(135deg,#FDFCF8 0%,#FAF5E8 100%);border:1.5px solid rgba(201,168,76,0.45);border-radius:14px;padding:0;overflow:hidden}',
       P + '.avmx.is-spr{background:linear-gradient(135deg,#FDFCF8 0%,#F7EFD8 100%)}',
       P + '.avmx-head{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(201,168,76,0.18)}',
@@ -387,7 +447,7 @@
         var opts = sel ? sel.innerHTML : '<option value="">–</option>';
         return '<div class="f"><label>' + escH(label) + '</label><select data-mf="objart">' + opts + '</select></div>';
       }
-      return '<div class="f"><label>' + escH(label) + '</label><input type="text" data-mf="' + key + '" value="' + escH(val(key) || '') + '"></div>';
+      return '<div class="f"><label>' + escH(label) + '</label><input type="text" autocomplete="off" data-form-type="other" data-mf="' + key + '" value="' + escH(val(key) || '') + '"></div>'; /* v742-avm-persist: Browser-Adress-Popup weg */
     }).join('');
     ov.innerHTML =
       '<div class="oabi-modal" style="max-width:440px">' +
@@ -415,7 +475,7 @@
     var miss = missingFor(provider);
     if (miss.length) { promptMissing(provider); return; }
     try {
-      var res = await fetch('/api/v1/avm/' + provider, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() }, body: JSON.stringify({ inputs: mainInputs() }) });
+      var res = await fetch('/api/v1/avm/' + provider, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() }, body: JSON.stringify({ inputs: mainInputs(), objectId: window._currentObjKey || null }) }); /* v742-avm-history-ui */
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) {
         if (data && data.needs_credits) toast('⚠ Nicht genug Credits (' + (data.required || '?') + ' nötig)');
@@ -424,7 +484,7 @@
         else toast('⚠ Marktradar-Abruf fehlgeschlagen' + (data && data.message ? ': ' + data.message : ''));
         return;
       }
-      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); persistAvmState(); toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−' + (data.cost || 0) + ' Credits)')); /* v435-credit-refresh: Header-Marktcredit-Pille live aktualisieren */ if (data.mode !== 'stub') { try { setTimeout(function(){ if (window.AiCredits && typeof window.AiCredits.refreshAvm === 'function') window.AiCredits.refreshAvm(); }, 400); } catch (e) {} } }
+      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); /* v742-avm-persist: nur echte Live-Ergebnisse persistieren (kein Stub/live-unmapped) */ if (data.result.mode === 'live') { persistAvmState(); } toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−' + (data.cost || 0) + ' Credits)')); if (data.mode !== 'stub') { try { setTimeout(function(){ if (window.AiCredits && typeof window.AiCredits.refreshAvm === 'function') window.AiCredits.refreshAvm(); }, 400); } catch (e) {} } }
     } catch (e) { toast('⚠ Netzwerkfehler beim Marktradar-Abruf'); }
   }
   function pickMW(r) { return _span === 'low' ? r.low : _span === 'high' ? r.high : r.marktwert; }
@@ -433,6 +493,135 @@
   function spanRow(lo, mid, hi) {
     function piece(v, sel) { return sel ? '<b>' + fmt0(v) + ' €</b>' : fmt0(v) + ' €'; }
     return 'Spanne ' + piece(lo, _span === 'low') + ' – ' + piece(mid, _span === 'mid') + ' – ' + piece(hi, _span === 'high');
+  }
+  /* v742-avm-history-ui: Bewertungshistorie unter den Karten */
+  function _v742FmtEur(n) { if (n == null) return '\u2013'; try { return Number(n).toLocaleString('de-DE') + ' \u20ac'; } catch (e) { return n + ' \u20ac'; } }
+  function _v742FmtDate(s) { try { var d = new Date(s); return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear(); } catch (e) { return ''; } }
+  /* v747-prov-names: echte Anbieternamen (Marcel-Entscheidung) */
+  function _v742ProvLabel(p) { var x = String(p||'').toLowerCase(); if (x==='pricehubble') return 'PriceHubble'; if (x==='sprengnetter') return 'Sprengnetter'; if (x==='dealpilot') return 'DealPilot'; if (x==='manuell') return 'Manuell'; return p; }
+  function _v747ProvLogo(p) { var x = String(p||'').toLowerCase(); if (x==='pricehubble') return 'img/pricehubble.jpg'; if (x==='sprengnetter') return 'img/sprengnetter.jpg'; if (x==='dealpilot') return 'img/dealpilot-logo.png'; return null; }
+  function _v747HistIcon() { return '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>'; }
+  function _v742RenderHistory() {
+    /* v743-hist-target + v745-hist-table + v747-hist-logo: Ziel Tab Bewertung (s6) */
+    var box = document.getElementById('avm-history-host');
+    if (!box) return;
+    var objId = window._currentObjKey;
+    if (!objId) { box.innerHTML = '<div class="oab-h-head ct ct-pro"><span class="ct-ico">' + _v747HistIcon() + '</span><span class="oab-h-title">Bewertungshistorie</span></div><div class="oab-h-empty">Objekt speichern, um Bewertungen zu erfassen.</div>'; return; }
+    if (!window.Auth || typeof window.Auth.apiCall !== 'function') return;
+    /* v744-import-state: vorhandene Live-Bewertungen einmalig uebernehmen */
+    if (!window._v744Imported) { window._v744Imported = {}; }
+    if (!window._v744Imported[objId]) {
+      window._v744Imported[objId] = true;
+      var _liveResults = [];
+      try { Object.keys(_avm).forEach(function (p) { if (_avm[p] && _avm[p].mode === 'live') _liveResults.push(_avm[p]); }); } catch (e) {}
+      if (_liveResults.length) {
+        window.Auth.apiCall('/avm/' + objId + '/history/import', { method: 'POST', body: { results: _liveResults } })
+          .then(function (r) { if (r && r.written) { try { _v742RenderHistory(); } catch (e) {} } })
+          .catch(function () {});
+      }
+    }
+    function _v745k(n) { if (n == null) return null; var v = Number(n); if (v >= 1000) return (Math.round(v / 1000)).toLocaleString('de-DE') + 'k'; return v.toLocaleString('de-DE'); }
+    function _v745badge(it) {
+      var p = String(it.provider || '').toLowerCase();
+      var cls = (p === 'manuell') ? 'man' : (p === 'dealpilot' ? 'dp' : 'avm');
+      var name = _v742ProvLabel(it.provider);
+      var logo = _v747ProvLogo(it.provider);
+      var img = logo ? ('<img class="oab-h-logo" src="' + logo + '" alt="">') : '';
+      return '<span class="oab-h-badge oab-h-badge-' + cls + '">' + img + '<span class="oab-h-bname">' + name + '</span></span>';
+    }
+    window.Auth.apiCall('/avm/' + objId + '/history', { method: 'GET' }).then(function (resp) {
+      var items = (resp && resp.items) || [];
+      var rows = items.map(function (it) {
+        var sqm = it.eur_per_sqm ? ('<span class="oab-h-sub">' + Number(it.eur_per_sqm).toLocaleString('de-DE') + ' \u20ac/m\u00b2</span>') : '';
+        var spanne = (it.low != null && it.high != null) ? (_v745k(it.low) + ' \u2013 ' + _v745k(it.high)) : '\u2013';
+        var miete = it.marktmiete ? _v742FmtEur(it.marktmiete) : '\u2013';
+        return '<tr>'
+          + '<td class="oab-h-date">' + _v742FmtDate(it.created_at) + '</td>'
+          + '<td>' + _v745badge(it) + '</td>'
+          + '<td class="r"><span class="oab-h-mw">' + _v742FmtEur(it.marktwert) + '</span>' + sqm + '</td>'
+          + '<td class="r oab-h-span">' + spanne + '</td>'
+          + '<td class="r">' + miete + '</td>'
+          + '<td class="r"><button type="button" class="oab-h-del" data-h-del="' + it.id + '" title="Eintrag löschen">\u00d7</button></td>'
+          + '</tr>';
+      }).join('');
+      box.innerHTML = '<div class="oab-h-head ct ct-pro"><span class="ct-ico">' + _v747HistIcon() + '</span><span class="oab-h-title">Bewertungshistorie</span> <button type="button" class="oab-h-add" id="oab-h-add">+ Eintrag</button></div>'
+        + (items.length ? '<table class="oab-h-tbl"><thead><tr><th>Datum</th><th>Quelle</th><th class="r">Marktwert</th><th class="r">Spanne</th><th class="r">Miete</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>'
+          : '<div class="oab-h-empty">Noch keine gespeicherten Bewertungen. Abrufe werden automatisch erfasst (max. 1 pro Anbieter und Tag).</div>');
+      var addBtn = document.getElementById('oab-h-add');
+      if (addBtn) addBtn.addEventListener('click', _v742AddManual);
+      box.querySelectorAll('[data-h-del]').forEach(function (b) { b.addEventListener('click', function () { _v742DelEntry(b.getAttribute('data-h-del')); }); });
+    }).catch(function () {});
+  }
+  function _v742AddManual() {
+    var objId = window._currentObjKey; if (!objId) { try { toast('Bitte erst das Objekt speichern.'); } catch (e) {} return; }
+    _v745HistModal();
+  }
+  /* v745-hist-modal: Eingabe-Dialog im Boarding-Look (Obsidian-Bar, Gold-Hero). */
+  function _v745HistModal() {
+    var objId = window._currentObjKey; if (!objId) return;
+    var wfl = 0; try { wfl = numDe(val('wfl')) || 0; } catch (e) {}
+    var old = document.getElementById('v743-hist-ov'); if (old) old.remove();
+    var ov = document.createElement('div');
+    ov.id = 'v743-hist-ov'; ov.className = 'v743-hist-ov';
+    ov.innerHTML =
+      '<div class="v743-hist-dlg" role="dialog" aria-modal="true">' +
+        '<div class="v743-hist-brand"><span class="lg">Deal<b>Pilot</b></span><span class="tg">BEWERTUNG ERFASSEN</span></div>' +
+        '<div class="v743-hist-hero"><div class="kick">HISTORIE</div><div class="h">Bewertung hinzuf\u00fcgen</div></div>' +
+        '<div class="v743-hist-bd">' +
+          '<div class="v743-hist-f"><label>Quelle</label>' +
+            '<input type="text" id="v743-src" placeholder="z.B. Makler M\u00fcller, eigenes Gutachten" autocomplete="off"></div>' +
+          '<div class="v743-hist-row">' +
+            '<div class="v743-hist-f"><label>Marktwert (\u20ac)</label>' +
+              '<input type="text" id="v743-mw" inputmode="numeric" placeholder="z.B. 250000" autocomplete="off"></div>' +
+            '<div class="v743-hist-f"><label>Marktmiete kalt / Monat (\u20ac)</label>' +
+              '<input type="text" id="v743-mm" inputmode="numeric" placeholder="optional" autocomplete="off"></div>' +
+          '</div>' +
+          '<div class="v743-hist-calc" id="v743-calc">' + (wfl ? ('Wohnfl\u00e4che ' + wfl + ' m\u00b2 \u2014 \u20ac/m\u00b2 wird automatisch berechnet') : 'Keine Wohnfl\u00e4che hinterlegt \u2014 \u20ac/m\u00b2 wird nicht berechnet') + '</div>' +
+          '<div class="v743-hist-act">' +
+            '<button type="button" class="v743-hist-cancel" id="v743-cancel">Abbrechen</button>' +
+            '<button type="button" class="v743-hist-save" id="v743-save">Speichern</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    var mwIn = document.getElementById('v743-mw');
+    var calcEl = document.getElementById('v743-calc');
+    function upd() {
+      var mw = parseInt(String(mwIn.value).replace(/[^0-9]/g, ''), 10) || 0;
+      if (wfl && mw) { calcEl.textContent = '\u20ac/m\u00b2: ' + Math.round(mw / wfl).toLocaleString('de-DE') + ' \u20ac (' + mw.toLocaleString('de-DE') + ' \u20ac / ' + wfl + ' m\u00b2)'; }
+      else if (wfl) { calcEl.textContent = 'Wohnfl\u00e4che ' + wfl + ' m\u00b2 \u2014 \u20ac/m\u00b2 wird automatisch berechnet'; }
+    }
+    mwIn.addEventListener('input', upd);
+    function close() { ov.remove(); }
+    document.getElementById('v743-cancel').addEventListener('click', close);
+    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    document.getElementById('v743-save').addEventListener('click', function () {
+      var src = (document.getElementById('v743-src').value || '').trim();
+      var mw = parseInt(String(mwIn.value).replace(/[^0-9]/g, ''), 10) || 0;
+      var mm = parseInt(String(document.getElementById('v743-mm').value).replace(/[^0-9]/g, ''), 10) || 0;
+      if (!mw) { try { toast('Bitte einen Marktwert eingeben.'); } catch (e) {} return; }
+      var body = { sourceLabel: src || null, marktwert: mw };
+      if (mm) body.marktmiete = mm;
+      if (wfl && mw) body.eurPerSqm = Math.round(mw / wfl);
+      window.Auth.apiCall('/avm/' + objId + '/history', { method: 'POST', body: body })
+        .then(function () { try { toast('\u2713 Eintrag gespeichert'); } catch (e) {} close(); _v742RenderHistory(); })
+        .catch(function () { try { toast('\u26a0 Speichern fehlgeschlagen'); } catch (e) {} });
+    });
+    try { document.getElementById('v743-src').focus(); } catch (e) {}
+  }
+  /* v745-hist-modal: Historie beim Oeffnen Tab Bewertung (s6) aktualisieren. */
+  var _v745HookBound = false;
+  function _v745BindTabHook() {
+    if (_v745HookBound) return; _v745HookBound = true;
+    document.addEventListener('click', function (e) {
+      var t = e.target && e.target.closest ? e.target.closest('.tab[data-target-sec="s6"]') : null;
+      if (t) { setTimeout(function () { try { _v742RenderHistory(); } catch (e2) {} }, 60); }
+    }, true);
+  }
+  function _v742DelEntry(id) {
+    var objId = window._currentObjKey; if (!objId || !id) return;
+    window.Auth.apiCall('/avm/' + objId + '/history/' + id, { method: 'DELETE' })
+      .then(function () { _v742RenderHistory(); }).catch(function () {});
   }
   function applyAvmHealth() {
     var m = $(MOUNT_ID); if (!m) return;
@@ -465,7 +654,16 @@
     var el = document.getElementById('_avm_state'), st = null;
     try { if (el && el.value) st = JSON.parse(el.value); } catch (e) {}
     _avm = (st && st.avm && typeof st.avm === 'object') ? st.avm : {};
+    /* v742-avm-persist: alte Stub/live-unmapped-Staende rauswerfen (DEMO-Bug nach Wechsel) */
+    Object.keys(_avm).forEach(function (p) {
+      var m = _avm[p] && _avm[p].mode;
+      if (m && m !== 'live') { delete _avm[p]; }
+    });
     _collapsed = (st && st.collapsed && typeof st.collapsed === 'object') ? st.collapsed : {};
+    /* v742-avm-persist: Karten beim Oeffnen default minimiert (nur wenn nicht explizit gesetzt) */
+    Object.keys(_avm).forEach(function (p) {
+      if (!(p in _collapsed)) { _collapsed[p] = true; }
+    });
     renderResults();
   }
   function renderResults() {
@@ -475,6 +673,8 @@
     host.innerHTML = provs.map(function (p) { return renderCard(_avm[p]); }).join('');
     host.querySelectorAll('[data-apply]').forEach(function (b) { b.addEventListener('click', function () { applyAvm(_avm[b.getAttribute('data-apply')]); }); });
     host.querySelectorAll('[data-min]').forEach(function (b) { b.addEventListener('click', function () { var pr = b.getAttribute('data-min'); _collapsed[pr] = !_collapsed[pr]; renderResults(); persistAvmState(); }); });
+    try { _v742RenderHistory(); } catch (e) {} /* v742-avm-history-ui */
+    try { _v745BindTabHook(); } catch (e) {} /* v745-hook-call */
     host.querySelectorAll('[data-span]').forEach(function (b) { b.addEventListener('click', function () { _span = b.getAttribute('data-span') || 'mid'; renderResults(); }); });
   }
   function renderCard(r) {
@@ -1205,7 +1405,7 @@
   function init() {
     if (!$(MOUNT_ID)) return;
     injectCss(); render(); enhanceKiLage(); enhanceObjektdaten(); restoreAvmState();
-    fetch('/api/v1/avm/health').then(function (r) { return r.json(); }).then(function (h) { _avmHealth = h || { available: false }; applyAvmHealth(); }).catch(function () { _avmHealth = { available: false }; applyAvmHealth(); });
+    fetch('/api/v1/avm/health', { headers: { 'Authorization': 'Bearer ' + token() } }).then(function (r) { return r.json(); }).then(function (h) { _avmHealth = h || { available: false }; applyAvmHealth(); }).catch(function () { _avmHealth = { available: false }; applyAvmHealth(); }); /* v740-health-auth */
   }
   var _tries = 0;
   function autoInit() { if ($(MOUNT_ID)) { init(); return; } if (_tries++ < 40) setTimeout(autoInit, 250); }

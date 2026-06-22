@@ -728,6 +728,30 @@ function _buildAIPayload() {
       }
     }
   } catch (e) { /* optional */ }
+  // v746-dpmb-payload: DealPilot-Marktbewertung (Lage + Wertentwicklung) fuer die Pilot-Analyse
+  try {
+    var _mbRaw = g('_mb_state');
+    if (_mbRaw) {
+      var _mbObj = JSON.parse(_mbRaw);
+      var _card = (_mbObj && _mbObj.card) ? _mbObj.card : null;
+      if (_card) {
+        function _v746Lbl(raw) {
+          if (raw == null) return null;
+          var s = raw / 10;
+          var w = s >= 8 ? 'sehr_gut' : s >= 6 ? 'gut' : s >= 4 ? 'durchschnittlich' : s >= 2 ? 'schwach' : 'sehr_schwach';
+          return { label: w, score: Math.round(s * 10) / 10 };
+        }
+        var _dpmb = {};
+        var _mi = _v746Lbl(_card.microRaw);
+        var _ma = _v746Lbl(_card.macroRaw);
+        if (_mi) _dpmb.mikrolage = _mi;
+        if (_ma) _dpmb.makrolage = _ma;
+        if (_card.trendRaw != null) _dpmb.wertentwicklung_pct_pa = _card.trendRaw;
+        if (_card.mw && _card.mw.med != null) _dpmb.marktwert = _card.mw.med;
+        if (Object.keys(_dpmb).length) payload.dealpilot_marktbewertung = _dpmb;
+      }
+    }
+  } catch (e) { /* optional */ }
     // v589: KI-Stil-Einstellungen auch fuer die Pilot-Analyse mitsenden
   try {
     if (typeof Settings !== 'undefined') {

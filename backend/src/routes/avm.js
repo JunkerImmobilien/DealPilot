@@ -30,6 +30,7 @@ const { query } = require('../db/pool');  // v387 Per-Plan-Modus
 const stub = require('../services/avm-stub');
 const sprengnetter = require('../services/sprengnetter-client');
 const pricehubble = require('../services/pricehubble-client');
+const avmHistoryService = require('../services/avmHistoryService'); /* v742-avm-history */
 
 const router = express.Router();
 
@@ -42,7 +43,7 @@ function avmMode() { return String(process.env.AVM_MODE || 'stub').toLowerCase()
 // AVM_CLIENT_READY: pricehubble-client.js ist derzeit nur ein Stub-Wrapper und NICHT
 // live-faehig (wuerde sonst 40 L abziehen und Demo-Daten als echt labeln). Bei echtem
 // PH-Client einfach pricehubble:true setzen.
-var AVM_CLIENT_READY = { sprengnetter: true, pricehubble: false };
+var AVM_CLIENT_READY = { sprengnetter: true, pricehubble: true }; /* v739-ph-ready */
 function avmLiveProviders() {
   return String(process.env.AVM_LIVE_PROVIDERS || '').toLowerCase().split(',').map(function (s) { return s.trim(); }).filter(Boolean);
 }
@@ -238,6 +239,11 @@ async function runProvider(provider, req, res, next) {
       }
     }
 
+    /* v742-avm-history: echte Live-Bewertung in die Historie (1/Anbieter/Tag, objectId optional) */
+    if (mode === 'live' && result) {
+      try { await avmHistoryService.record(req.user.id, (req.body && req.body.objectId) || null, result); }
+      catch (e) { console.warn('[avm/' + provider + '] history record failed:', e.message); }
+    }
     res.json({ ok: true, mode: mode, cost: (mode === 'stub' ? 0 : cost), cached: false, result: result });
   } catch (err) {
     if (err.code === 'AVM_NOT_CONFIGURED') {
@@ -258,5 +264,47 @@ router.post('/sprengnetter', authenticate, function (req, res, next) { return ru
 
 // ── POST /pricehubble ─────────────────────────────────────────────────────────
 router.post('/pricehubble', authenticate, function (req, res, next) { return runProvider('pricehubble', req, res, next); });
+
+// ── History: GET/POST/DELETE /:objectId/history ─────────────────────────────── (v742-avm-history)
+router.get('/:objectId/history', authenticate, async function (req, res, next) {
+  try {
+    const items = await avmHistoryService.listForObject(req.user.id, req.params.objectId);
+    res.json({ ok: true, items: items });
+  } catch (err) { next(err); }
+});
+
+router.post('/:objectId/history', authenticate, async function (req, res, next) {
+  try {
+    const row = await avmHistoryService.addManual(req.user.id, req.params.objectId, req.body || {});
+    res.json({ ok: true, entry: row });
+  } catch (err) {
+    if (err.status === 400) return res.status(400).json({ error: 'bad_request', message: err.message });
+    next(err);
+  }
+});
+
+// v744-history-import: vorhandene AVM-Staende in die Historie uebernehmen (Tages-Dedup greift)
+router.post('/:objectId/history/import', authenticate, async function (req, res, next) {
+  try {
+    const results = (req.body && Array.isArray(req.body.results)) ? req.body.results : [];
+    let written = 0;
+    for (const r of results) {
+      if (!r || !r.provider) continue;
+      if (r.mode && r.mode !== 'live') continue; // nur echte Live-Werte
+      try {
+        const row = await avmHistoryService.record(req.user.id, req.params.objectId, r);
+        if (row) written++;
+      } catch (e) { /* einzelner Fehler nicht fatal */ }
+    }
+    res.json({ ok: true, written: written });
+  } catch (err) { next(err); }
+});
+
+router.delete('/:objectId/history/:id', authenticate, async function (req, res, next) {
+  try {
+    const ok = await avmHistoryService.remove(req.user.id, req.params.id);
+    res.json({ ok: ok });
+  } catch (err) { next(err); }
+});
 
 module.exports = router;
