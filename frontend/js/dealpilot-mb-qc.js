@@ -125,8 +125,15 @@
     var out = { area: area };
     out.rating = (d.deal_score && d.deal_score.rating) ? d.deal_score.rating : 'Indikation';
     out.conf = { label: mv.confidence_label || 'Indikation', pct: mv.confidence_pct != null ? mv.confidence_pct : 0 };
-    out.mikro = (d.micro && d.micro.score != null) ? String(d.micro.score) : '–';
-    out.makro = (d.macro && d.macro.score != null) ? String(d.macro.score) : '–';
+    /* v746-mikro-label: Label (wie Pilot) + Score auf 0-10-Skala statt Rohwert 0-100 */
+    function _v746lbl(raw) {
+      if (raw == null) return '–';
+      var s = raw / 10;
+      var w = s >= 8 ? 'Sehr gut' : s >= 6 ? 'Gut' : s >= 4 ? 'Durchschnittlich' : s >= 2 ? 'Schwach' : 'Sehr schwach';
+      return w + ' · ' + s.toFixed(1).replace('.', ',');
+    }
+    out.mikro = (d.micro && d.micro.score != null) ? _v746lbl(d.micro.score) : '–';
+    out.makro = (d.macro && d.macro.score != null) ? _v746lbl(d.macro.score) : '–';
     out.microRaw = (d.micro && d.micro.score != null) ? d.micro.score : null;
     out.macroRaw = (d.macro && d.macro.score != null) ? d.macro.score : null;
     out.trendRaw = (d.price_trend_pct != null) ? d.price_trend_pct : null;
