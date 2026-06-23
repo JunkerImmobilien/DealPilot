@@ -97,6 +97,19 @@
     return {t:'lo', l:'Schwach', col:'var(--dp-red)'};
   }
   function catBarColor(s){ return s>=70?'var(--dp-green)':s>=50?'var(--dp-gold)':'var(--dp-red)'; }
+  function _dl(){return '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>';}
+  function _qrSvg(text,px){try{if(window.DpQr&&DpQr.svg)return DpQr.svg(String(text||'DealPilot'),{px:px||3,ecc:'M',border:2,dark:'#0c0b09',light:'#ffffff'});}catch(e){}return '<div style="width:74px;height:74px;border-radius:4px;background:repeating-linear-gradient(45deg,#0c0b09 0 3px,#fff 3px 6px)"></div>';}
+  function _tierBg(tt){return tt==='lo'?'rgba(184,98,80,.16)':tt==='mid'?'rgba(201,168,76,.16)':'rgba(63,165,108,.16)';}
+  var _passByObj = {};
+  function _passRest(exp){ var ms=new Date(exp).getTime()-Date.now(); if(!(ms>0))return 'abgelaufen'; var d=Math.round(ms/86400000); return d+' Tag'+(d===1?'':'e'); }
+  function loadPasses(){
+    if(!window.Auth || typeof window.Auth.apiCall!=='function') return Promise.resolve();
+    return window.Auth.apiCall('/passes',{method:'GET'}).then(function(r){
+      var items=(r&&r.items)||[]; var now=Date.now(); var map={};
+      items.forEach(function(p){ if(p.revoked_at) return; if(new Date(p.expires_at).getTime()<=now) return; var oid=p.object_id; if(oid&&!map[oid]) map[oid]=p; });
+      _passByObj=map; try{ renderBoardOrCards(); }catch(e){}
+    }).catch(function(){});
+  }
   /* v455: KPI-Anzahl + Gewicht je Score-Kategorie (Investor-Modell, 24 KPIs). Fallback;
      echte Werte werden aus DealScore2-Breakdown gezogen (catMeta). */
   var KPICOUNT={rendite:4,finanzierung:5,risiko:6,lage:5,upside:4};
@@ -296,96 +309,51 @@
     var P = plan();
     var ag = aggregateScore();
     var title = P.full ? 'Investor Portfolio Score' : 'DealPilot Portfolio Score';
-
     if(!ag.hasData){
-      host.innerHTML = '<div class="pscore-right" style="text-align:center;width:100%">'
-        + '<div class="pscore-title" style="justify-content:center">'+esc(title)+'</div>'
-        + '<div class="pscore-headline" style="margin-top:8px">Noch kein gewonnenes Objekt mit berechnetem Score. '
-        + 'Sobald du ein Objekt auf „Gewonnen" setzt und der DealScore berechnet ist, erscheint hier dein Portfolio-Score.</div>'
-        + '</div>';
+      host.innerHTML = '<div class="hmain"><div class="hpre"><span class="led"></span><span class="t">Pre-Flight \u00b7 Portfolio Score</span><span class="cls">Boarding</span></div>'
+        + '<div class="hbody" style="display:block;text-align:center;color:var(--c-pmut);font-family:Inter,sans-serif;font-size:13px;line-height:1.6;padding:30px 22px">'
+        + 'Noch kein gewonnenes Objekt mit berechnetem Score.<br>Sobald du ein Objekt auf \u201eGewonnen\u201c setzt und der DealScore berechnet ist, erscheint hier dein Portfolio-Score.</div></div>';
       return;
     }
-
     var t = tierOf(ag.total);
-    var arcCol = t.t==='lo'?'#B86250':t.t==='mid'?'#C9A84C':'#3FA56C';
-    var arcCol2= t.t==='lo'?'#8A4538':t.t==='mid'?'#9a7f33':'#2A7E50';
-    var r=70, circ=2*Math.PI*r, off=circ*(1-ag.total/100);
-    var headlines={top:'Erstklassiges Portfolio',hi:'Solides, gut aufgestelltes Portfolio',mid:'Tragfaehiges Portfolio mit Optimierungspotenzial',lo:'Portfolio mit erhoehtem Handlungsbedarf'};
-    var kiRat={top:'KI raet: Aktiv ausbauen',hi:'KI raet: Position halten',mid:'KI raet: Optimieren',lo:'KI raet: Restrukturieren'};
-
-    // Tick-Marks
-    var ticks='';
-    for(var i=0;i<=20;i++){var ang=-90+i*18,r1=92,r2=98;
-      var x1=80+r1*Math.cos(ang*Math.PI/180),y1=80+r1*Math.sin(ang*Math.PI/180);
-      var x2=80+r2*Math.cos(ang*Math.PI/180),y2=80+r2*Math.sin(ang*Math.PI/180);
-      var act=(i*5)<=ag.total;
-      ticks+='<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="'+(act?arcCol:'rgba(201,168,76,.10)')+'" stroke-width="'+(i%2===0?1.8:1)+'" opacity="'+(act?0.9:0.35)+'"/>';
-    }
-    var orbits='';
-    for(var o2=0;o2<3;o2++){orbits+='<circle cx="80" cy="'+(80-r)+'" r="2" fill="'+arcCol+'" style="filter:drop-shadow(0 0 6px '+arcCol+');animation:orbit 8s linear infinite;animation-delay:-'+(o2*0.7)+'s;transform-origin:80px 80px"/>';}
-
-    var gauge='<svg viewBox="0 0 160 160" style="width:170px;height:170px"><g>'+ticks+'</g>'
-      + '<g style="transform-origin:80px 80px;transform:rotate(-90deg)">'
-      + '<circle cx="80" cy="80" r="78" fill="none" stroke="rgba(201,168,76,.06)" stroke-width="1"/>'
-      + '<circle cx="80" cy="80" r="'+r+'" fill="none" stroke="rgba(201,168,76,.10)" stroke-width="9"/>'
-      + '<circle cx="80" cy="80" r="'+r+'" fill="none" stroke="url(#dpGrad)" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+circ+'" id="dp-arc" style="transition:stroke-dashoffset 1.8s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 14px '+arcCol+')"/>'
-      + '</g>'
-      + '<g style="transform-origin:80px 80px">'+orbits+'</g>'
-      + '<circle cx="80" cy="80" r="52" fill="url(#dpCenterGlow)"/>'
-      + '<defs><linearGradient id="dpGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="'+arcCol+'"/><stop offset="100%" stop-color="'+arcCol2+'"/></linearGradient>'
-      + '<radialGradient id="dpCenterGlow"><stop offset="0%" stop-color="'+arcCol+'" stop-opacity=".25"/><stop offset="100%" stop-color="'+arcCol+'" stop-opacity="0"/></radialGradient></defs></svg>';
-
-    // Kategorie-Balken (wenn Details geladen)
-    var catsHtml='';
-    if(ag.cats){
-      catsHtml = ag.cats.map(function(c){
-        var sc = c.score==null?0:c.score;
-        return '<div class="pscore-cat slim"><div class="pscore-cat-head"><span class="pscore-cat-l">'+esc(c.label)+'</span>'
-          + '<span class="pscore-cat-v" style="color:'+catBarColor(sc)+'">'+(c.score==null?'–':sc)+'</span></div>'
-          + '<div class="pscore-bar"><div class="pscore-bar-fill" data-w="'+sc+'" style="width:0%;background:linear-gradient(90deg,'+catBarColor(sc)+'66,'+catBarColor(sc)+')"></div></div></div>';
-      }).join('');
-    } else {
-      catsHtml = '<div class="pscore-headline" style="grid-column:1/-1">Kategorien werden geladen…</div>';
-    }
-
+    var S = aggStats();
     var detailsBtn = P.full
-      ? '<button class="pscore-details" onclick="DealPilotDashboard.showScoreDetails()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4-4M11 8v6M8 11h6"/></svg> Details &amp; alle KPIs</button>'
-      : '<button class="pscore-details locked" onclick="DealPilotDashboard.showScoreUpgrade()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Volle 24-KPI-Analyse (Investor)</button>';
-    var watermark = P.demo ? '<div class="pscore-watermark">DEMO · Investor freischalten</div>' : '';
-
-    host.innerHTML = watermark
-      + '<div class="pscore-rays"></div><div class="pscore-burst" id="dp-burst"></div>'
-      + '<div class="pscore-gauge">'+gauge+'<div class="pscore-num"><div class="pscore-val" id="dp-scoreval" style="color:'+arcCol+'">0</div><div class="pscore-max">/ 100</div></div></div>'
-      + '<div class="pscore-right">'
-      + '<div class="pscore-pill">'+(P.full?'☆ INVESTOR':'☆ DEALPILOT')+'</div>'
-      + '<div class="pscore-titlebar"><span class="pscore-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>'+esc(title)+'</span>'
-      + '<span class="pscore-tier tier-'+t.t+'"><span class="tdot" style="background:'+t.col+';color:'+t.col+'"></span>'+t.l+'</span></div>'
-      + '<div class="pscore-headline">'+headlines[t.t]+'<span class="pscore-hl-meta"> · '+ag.scored+' von '+ag.n+' Objekten bewertet</span></div>'
-      + '<div class="pscore-cats slim">'+catsHtml+'</div>'
-      + '<div class="pscore-actions">'+detailsBtn+'<div class="pscore-kirat" style="color:'+arcCol+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>'+kiRat[t.t]+'</div></div>'
-      + '</div>';
-
-    // v452.9: Tier-Klasse fuer Score-abhaengigen Glow (gruen bei gut/top)
-    host.classList.remove('tier-gut','tier-top','tier-mid','tier-lo');
-    host.classList.add(t.t==='hi'?(ag.total>=85?'tier-top':'tier-gut'):(t.t==='mid'?'tier-mid':'tier-lo'));
-
-    // Animationen
-    var burst=$('dp-burst');
-    if(burst){ burst.innerHTML='';
-      for(var b=0;b<12;b++){var sp=el('span','spark'); var a=(b/12)*Math.PI*2;
-        sp.style.setProperty('--dx',Math.cos(a)*90+'px'); sp.style.setProperty('--dy',Math.sin(a)*90+'px');
-        sp.style.background=arcCol; sp.style.boxShadow='0 0 8px '+arcCol; sp.style.animationDelay=(b*0.04)+'s'; burst.appendChild(sp);
-      }
-    }
-    setTimeout(function(){
-      var arc=$('dp-arc'); if(arc) arc.style.strokeDashoffset=off;
-      host.querySelectorAll('.pscore-bar-fill').forEach(function(bf){ bf.style.width=bf.dataset.w+'%'; });
-      var cur=0,tgt=ag.total,step=Math.max(1,Math.round(tgt/50)),vEl=$('dp-scoreval');
-      var iv=setInterval(function(){cur+=step; if(cur>=tgt){cur=tgt;clearInterval(iv);} if(vEl)vEl.textContent=cur;},22);
-    },200);
+      ? '<button class="hkpi-btn" onclick="DealPilotDashboard.showScoreDetails()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4-4M11 8v6M8 11h6"/></svg> Details &amp; alle KPIs</button>'
+      : '<button class="hkpi-btn" onclick="DealPilotDashboard.showScoreUpgrade()"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Volle 24-KPI-Analyse</button>';
+    var catsHtml = ag.cats ? ag.cats.map(function(c){
+        var sc=c.score==null?0:c.score; var w=(KPICOUNT[c.key]||0);
+        return '<div class="bar"><div class="bt"><span class="n">'+esc(c.label)+'<em>'+w+' KPIs</em></span><span class="v">'+(c.score==null?'\u2013':sc)+'</span></div>'
+          + '<div class="track"><div class="fill" data-w="'+sc+'" style="width:0;background:'+catBarColor(sc)+'"></div></div></div>';
+      }).join('') : '<div class="bar" style="color:var(--c-pmut);font-family:JetBrains Mono;font-size:11px">Kategorien werden geladen\u2026</div>';
+    var cfM=S.cfVsM;
+    host.innerHTML =
+      '<div class="hmain">'
+      + '<div class="hpre"><span class="led"></span><span class="t">Pre-Flight \u00b7 '+(P.full?'Investor':'DealPilot')+' Portfolio Score</span><span class="cls">Boarding</span></div>'
+      + '<div class="hbody">'
+      + '<div class="hgate">'
+      + '<div class="gl">'+esc(title)+'</div>'
+      + '<div id="dp-hero-ring"></div>'
+      + '<div class="gt" style="background:'+_tierBg(t.t)+';color:'+t.col+'">'+t.l+'</div>'
+      + '<div class="tot"><div><div class="k">OBJEKTE</div><div class="v">'+ag.n+'</div></div>'
+      + '<div><div class="k">VOL.</div><div class="v">'+fmtKEU(S.kp)+'</div></div>'
+      + '<div><div class="k">CF/MON</div><div class="v" style="color:'+(cfM>=0?'var(--c-greenl)':'var(--c-redl)')+'">'+(cfM>=0?'+':'')+fmtE(cfM)+'</div></div></div>'
+      + '</div>'
+      + '<div class="hbars"><div class="ttl">So setzt sich der Score zusammen</div><div id="dp-hero-bars">'+catsHtml+'</div>'+detailsBtn+'</div>'
+      + '</div></div>'
+      + '<div class="vperf"></div>'
+      + '<div class="hpass"><div class="hp-lab">PORTFOLIO-PASS</div><div class="qb" id="dp-hero-qr"></div>'
+      + '<div class="hp-code">PORTFOLIO</div><div class="hp-sub">'+ag.scored+' / '+ag.n+' bewertet<br>Stand '+_heute()+'</div></div>';
+    (function(){
+      var sc=ag.total, r=46, C=2*Math.PI*r, d=sc/100*C, col=t.col, ring=$('dp-hero-ring');
+      if(ring) ring.innerHTML='<svg viewBox="0 0 116 116" width="116" height="116">'
+        + '<circle cx="58" cy="58" r="'+r+'" fill="none" stroke="rgba(140,140,140,.18)" stroke-width="9"/>'
+        + '<circle cx="58" cy="58" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+d.toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 58 58)"/>'
+        + '<text x="58" y="56" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="34" fill="'+col+'">'+sc+'</text>'
+        + '<text x="58" y="73" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#9a948a">/ 100</text></svg>';
+    })();
+    var qrEl=$('dp-hero-qr'); if(qrEl){ qrEl.innerHTML=_qrSvg(((window.location&&location.origin)?location.origin:'')+'/?cockpit', 3); }
+    setTimeout(function(){ host.querySelectorAll('.fill').forEach(function(f){ if(f.dataset.w!=null) f.style.width=f.dataset.w+'%'; }); },140);
   }
-
-  /* ════ RENDER: 5 KPI-Cards (Kategorien) ════ */
   function renderKpiCards(){
     var host=$('dp-kpi-grid'); if(!host) return;
     var ag=aggregateScore();
@@ -555,6 +523,9 @@
     var zw=0,zws=0; arr.forEach(function(o){var z=num(o.d1z),r=restschuldOf(o)||1; if(z>0){zw+=r;zws+=z*r;}});
     var avgZins=zw>0?zws/zw:null;
     var coc = totalEk>0 ? (cfVsJ/totalEk*100) : null;
+    var roeMode=(window._dpRoeMode==='nach')?'nach':'vor';
+    var roeVal=(roeMode==='nach')?roe:coc;
+    var roeCfJ=(roeMode==='nach')?cfNsJ:cfVsJ;
     // Zinsbindungs-Risiko: Bindungsende = Auszahlungsjahr (d1_auszahl MM.YYYY) + d1_bindj.
     // Risiko = Restschuld-Anteil, dessen Bindung in <=3 Jahren ausläuft.
     var riskRest=sum(function(o){
@@ -601,29 +572,36 @@
     function cfCol(v){ return v>=0?'var(--dp-green)':'var(--dp-red)'; }
 
     // l=Label, v=Wert, sub=Unterzeile, tip=Tooltip (v454: Set + Reihenfolge nach Mockup)
+    var zinsMode=(window._dpZinsMode==='risiko')?'risiko':'zins';
     var cards=[
-      {l:'Eigenkapital-Rendite', v:roe==null?'–':roe.toFixed(2).replace('.',',')+' %', sub:'nach Steuer (ROE)', col:colByVal(roe,6,3),
-       tip:'Return on Equity: jährlicher Cashflow nach Steuern im Verhältnis zum eingesetzten Eigenkapital.'},
-      {l:'Cash-on-Cash', v:coc==null?'–':coc.toFixed(2).replace('.',',')+' %', sub:totalEk>0?('auf '+fmtKEU(totalEk)+' EK'):'auf Eigenkapital', col:colByVal(coc,4,2),
-       tip:'Cash-on-Cash-Rendite: jährlicher Cashflow vor Steuern im Verhältnis zum eingesetzten Eigenkapital.'},
-      {l:'Ø-Zinssatz', v:avgZins==null?'–':avgZins.toFixed(2).replace('.',',')+' %', sub:'nach Restschuld gewichtet', col:avgZins==null?'var(--dp-card-ch)':(avgZins<=3?'var(--dp-green)':avgZins<=4.5?'var(--dp-gold)':'var(--dp-red)'),
-       tip:'Durchschnittlicher Sollzins aller Finanzierungen, gewichtet nach der jeweiligen Restschuld.'},
-      {l:'Mietpotenzial', v:!hasMietPot?'–':eurM(mietPot)+' p.a.', sub:'stille Reserve', col:'var(--dp-gold)',
-       tip:'Differenz zwischen ortsüblicher Marktmiete und aktueller Ist-Miete, hochgerechnet aufs Jahr.'},
-      {l:'DSCR', v:(S.dscr==null?'–':S.dscr.toFixed(2).replace('.',',')), sub:'Kapitaldienstdeckung', col:(S.dscr==null?'var(--dp-card-ch)':(S.dscr>=1.2?'var(--dp-green)':S.dscr>=1?'var(--dp-gold)':'var(--dp-red)')),
-       tip:'Schuldendienstdeckungsgrad: Mietüberschuss im Verhältnis zum Kapitaldienst (Zins + Tilgung). Ab 1,2 komfortabel.'},
-      {l:'Tilgungsfortschritt', v:!hasTilg?'–':Math.max(0,tilgFort).toFixed(2).replace('.',',')+' %', sub:'Darlehen getilgt', col:'var(--dp-gold)',
-       tip:'Wie viel des ursprünglichen Darlehens bereits getilgt wurde.'},
-      {l:'Energie-Substanz', v:esg==null?'–':Math.round(esg)+'/100', sub:'nach Energieklasse', col:colByVal(esg,70,45),
-       tip:'Energetische Substanz aus den Energieausweis-Klassen (A=100 … H=0), gewichtet nach Kaufpreis.'},
-      {l:'Zinsbindungs-Risiko', v:!hasZinsRisk?'–':zinsRiskPct.toFixed(2).replace('.',',')+' %', sub:'Bindung läuft < 3 J. aus', warn:zinsRiskPct>20, col:zinsRiskPct>20?'var(--dp-red)':'var(--dp-card-ch)',
-       tip:'Anteil der Restschuld, deren Zinsbindung in den nächsten 3 Jahren ausläuft.'}
+      {l:'Eigenkapital-Rendite',
+       v:roeVal==null?'\u2013':roeVal.toFixed(2).replace('.',',')+'\u00a0%',
+       sub:roeMode==='nach'?'nach Steuer \u00b7 ROE \u00b7 Klick: vor Steuer':'vor Steuer \u00b7 Cash-on-Cash \u00b7 Klick: nach Steuer',
+       col:colByVal(roeVal,roeMode==='nach'?6:4,roeMode==='nach'?3:2),
+       click:'DealPilotDashboard.toggleRoe()',
+       tip:'Eigenkapital-Rendite ('+(roeMode==='nach'?'nach Steuer \u00b7 ROE':'vor Steuer \u00b7 Cash-on-Cash')+')\n= j\u00e4hrlicher Cashflow '+(roeMode==='nach'?'nach':'vor')+' Steuer \u00f7 eingesetztes Eigenkapital\n= '+eurM(roeCfJ)+' \u00f7 '+(totalEk>0?(fmtE(Math.round(totalEk))+'\u00a0\u20ac'):'\u2014')+(roeVal==null?'':(' = '+roeVal.toFixed(2).replace('.',',')+'\u00a0%'))+'\n\nVor Steuer entspricht der Cash-on-Cash-Rendite. Klick wechselt vor/nach Steuer.'},
+      (zinsMode==='risiko' ? {l:'Zinsbindungs-Risiko',
+        v:!hasZinsRisk?'\u2013':zinsRiskPct.toFixed(2).replace('.',',')+'\u00a0%',
+        sub:'Bindung l\u00e4uft < 3 J. aus \u00b7 Klick: \u00d8-Zins',
+        col:zinsRiskPct>20?'var(--dp-red)':'var(--dp-card-ch)',
+        click:'DealPilotDashboard.toggleZins()',
+        tip:'Zinsbindungs-Risiko: Anteil der Restschuld, deren Zinsbindung in den n\u00e4chsten 3 Jahren ausl\u00e4uft.\nKlick wechselt zum \u00d8-Zinssatz.'}
+      : {l:'\u00d8-Zinssatz',
+        v:avgZins==null?'\u2013':avgZins.toFixed(2).replace('.',',')+'\u00a0%',
+        sub:'nach Restschuld gewichtet \u00b7 Klick: Zinsrisiko',
+        col:avgZins==null?'var(--dp-card-ch)':(avgZins<=3?'var(--dp-green)':avgZins<=4.5?'var(--dp-gold)':'var(--dp-red)'),
+        click:'DealPilotDashboard.toggleZins()',
+        tip:'Durchschnittlicher Sollzins aller Finanzierungen, gewichtet nach der jeweiligen Restschuld.\nKlick wechselt zum Zinsbindungs-Risiko.'}),
+      {l:'DSCR', v:(S.dscr==null?'\u2013':S.dscr.toFixed(2).replace('.',',')), sub:'Kapitaldienstdeckung', col:(S.dscr==null?'var(--dp-card-ch)':(S.dscr>=1.2?'var(--dp-green)':S.dscr>=1?'var(--dp-gold)':'var(--dp-red)')),
+       tip:'Schuldendienstdeckungsgrad: Miet\u00fcberschuss im Verh\u00e4ltnis zum Kapitaldienst (Zins + Tilgung). Ab 1,2 komfortabel.'},
+      {l:'Tilgungsfortschritt', v:!hasTilg?'\u2013':Math.max(0,tilgFort).toFixed(2).replace('.',',')+'\u00a0%', sub:'Darlehen getilgt', col:'var(--dp-gold)',
+       tip:'Wie viel des urspr\u00fcnglichen Darlehens bereits getilgt wurde.'}
     ];
     host.innerHTML=cards.map(function(c){
-      return '<div class="health-box'+(c.warn?' warn':'')+'" title="'+esc(c.tip||'')+'">'
-        + '<div class="health-l">'+esc(c.l)+'<span class="health-i" title="'+esc(c.tip||'')+'">i</span></div>'
-        + '<div class="health-v" style="color:'+(c.col||'var(--dp-card-ch)')+'">'+c.v+'</div>'
-        + '<div class="health-sub">'+esc(c.sub)+'</div></div>';
+      return '<div class="kpi'+(c.click?' kpi-click':'')+'"'+(c.click?(' onclick="'+c.click+'"'):'')+' title="'+esc(c.tip||'')+'">'
+        + '<div class="k">'+esc(c.l)+(c.click?' <span class="kpi-hint">\u21c4</span>':'')+'</div>'
+        + '<div class="v" style="color:'+(c.col||'var(--c-ptext)')+'">'+c.v+'</div>'
+        + '<div class="h">'+esc(c.sub)+'</div></div>';
     }).join('');
   }
 
@@ -823,21 +801,33 @@
   }
   function kanbanCardHtml(o){
     var st=stageOf(o); var sc=scoreOf(o); var t=tierOf(sc); var k=o.id||o.key;
-    var scorePill = sc!=null ? '<span class="kc-pill" style="color:'+t.col+';border-color:'+t.col+'">'+sc+'</span>' : '';
-    var statLine = st==='won'
-      ? 'CF '+(o.cf_ns!=null?fmtE(num(o.cf_ns)/100/12)+' €/Mon':'–')+' · DSCR '+(o.dscr!=null?(+o.dscr).toFixed(2).replace('.',','):'–')
-      : 'KP '+fmtKEU(num(o.kaufpreis)/100)+' € · Rendite '+(o.bmy!=null?(+o.bmy).toFixed(1).replace('.',',')+'%':'–');
-    return '<div class="dp-kanban-card kc-'+st+'">'
-      + '<div class="kc-top"><span class="kc-name">'+esc(o.name||o.kuerzel||'Unbenannt')+'</span>'+scorePill+'</div>'
-      + '<div class="kc-meta"><span>'+esc(o.kuerzel||'')+'</span><span>'+esc(o.ort||'')+'</span></div>'
-      + '<div class="kc-stat">'+statLine+'</div>'
-      + '<div class="pdf-row pdf-row-mini">'
-      + '<button onclick="DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'invest\')">Invest.</button>'
-      + '<button onclick="DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'bank\')">Bank</button>'
-      + '<button onclick="DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'wk\')">WK</button>'
-      + '<button class="kc-del" onclick="DealPilotDashboard.cardDelete(\''+esc(k)+'\',\''+esc(o.name||o.kuerzel||'Objekt')+'\')" title="Löschen">✕</button>'
-      + '</div>'
+    var tcls = (t.t==='lo')?'tr':((t.t==='mid')?'ty':'tg');
+    var scVal = (sc==null)?'\u2013':sc;
+    var cf = (o.cf_ns!=null)? (num(o.cf_ns)/100/12) : null;
+    var cfStr = (cf==null)?'\u2013':((cf>=0?'+':'')+fmtE(cf)+' \u20ac');
+    var dscrStr = (o.dscr!=null)?(+o.dscr).toFixed(2).replace('.',','):'\u2013';
+    var bmrStr = (o.bmy!=null)?(+o.bmy).toFixed(2).replace('.',',')+' %':'\u2013';
+    var nm=esc(o.name||o.kuerzel||'Unbenannt');
+    var meta=esc((o.ort||o.kuerzel||'')+(o.seq_no?(' \u00b7 '+o.seq_no):''));
+    var pass=_passByObj[k];
+    var share = pass
+      ? '<div class="kc-share"><a class="qb" href="'+(((window.location&&location.origin)?location.origin:'')+'/pass.html?c='+pass.code)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+_qrSvg(((window.location&&location.origin)?location.origin:'')+'/pass.html?c='+pass.code,3)+'</a>'
+        + '<div class="si">Geteilter Pass<br><b>'+esc(pass.code)+'</b><br>'+_passRest(pass.expires_at)+' Restlaufzeit</div></div>'
+      : '<div class="cta"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8h16v-8M12 3v13m0-13l-4 4m4-4l4 4"/></svg>Quick Boarding teilen \u2192 QR erscheint</div>';
+    var pdfs='<div class="pdfs">'+'<button class="kc-openbtn" onclick="event.stopPropagation();DealPilotDashboard.openObject(\''+esc(k)+'\')">Objekt \u00f6ffnen</button>'
+      + '<button onclick="event.stopPropagation();DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'invest\')">'+_dl()+'Investment</button>'
+      + '<button onclick="event.stopPropagation();DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'wk\')">'+_dl()+'Werbungsk.</button>'
+      + '<button onclick="event.stopPropagation();DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'bank\')">'+_dl()+'Bank</button>'
       + '</div>';
+    return '<div class="kc '+tcls+'" onclick="this.classList.toggle(\'open\')">'
+      + '<div class="kc-flat"><div class="nm">'+nm+'<small>'+meta+'</small></div>'
+      + '<div class="kc-scwrap" style="text-align:center"><div class="sc" style="--p:'+(sc==null?0:sc)+'"><span>'+scVal+'</span></div><div class="scl">'+t.l+'</div></div>'
+      + '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>'
+      + '<div class="kc-body"><div class="kc-in"><div class="kc-kp">'
+      + '<div><div class="kk">DSCR</div><div class="kv">'+dscrStr+'</div></div>'
+      + '<div><div class="kk">CF/Mon</div><div class="kv" style="color:'+((cf!=null&&cf<0)?'var(--c-red)':'var(--c-green)')+'">'+cfStr+'</div></div>'
+      + '<div><div class="kk">BMR</div><div class="kv">'+bmrStr+'</div></div>'
+      + '</div>'+share+pdfs+'</div></div></div>';
   }
   function objCardHtml(o){
     var st=stageOf(o); var sc=scoreOf(o); var t=tierOf(sc); var k=o.id||o.key;
@@ -861,20 +851,18 @@
   function renderBoardOrCards(){
     var host=$('dp-board'); if(!host) return;
     if(!_summaries.length){
-      host.innerHTML='<div class="dp-dash-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>'
-        + '<h3>Noch keine Objekte</h3><p>Lege dein erstes Objekt an, dann erscheint es hier im Portfolio.</p></div>';
+      host.innerHTML='<div class="gempty" style="grid-column:1/-1">Noch keine Objekte \u2013 lege dein erstes Objekt an, dann erscheint es hier.</div>';
       return;
     }
-    if(_cardView==='cards'){
-      host.innerHTML='<div class="cards-grid">'+_summaries.map(objCardHtml).join('')+'</div>';
-      return;
+    var groups={pruef:[],won:[],lost:[]};
+    _summaries.forEach(function(o){ (groups[stageOf(o)]||groups.pruef).push(o); });
+    function col(title,cls,arr){
+      return '<div><div class="gh '+cls+'"><span>'+title+'</span><span class="c">'+arr.length+'</span></div>'
+        + '<div class="gcol">'+(arr.length?arr.map(kanbanCardHtml).join(''):'<div class="gempty">keine Objekte am Gate</div>')+'</div></div>';
     }
-    var stages=[['pruef','In Prüfung'],['won','Gewonnen'],['lost','Verloren']];
-    host.innerHTML='<div class="kanban">'+stages.map(function(s){
-      var items=_summaries.filter(function(o){return stageOf(o)===s[0];});
-      return '<div class="kanban-col"><div class="kanban-col-head">'+s[1]+'<span class="kc-count">'+items.length+'</span></div>'
-        + (items.length?items.map(kanbanCardHtml).join(''):'<div class="health-sub" style="padding:8px 2px">keine Objekte</div>')+'</div>';
-    }).join('')+'</div>';
+    host.innerHTML = col('\u229d In Pr\u00fcfung','',groups.pruef)
+      + col('\u2713 Gewonnen','won',groups.won)
+      + col('\u2717 Verloren','lost',groups.lost);
   }
   function setCardView(v){ _cardView=v;
     var sw=$('dp-view-switch'); if(sw){sw.querySelectorAll('button').forEach(function(b){b.classList.toggle('active',b.dataset.v===v);});}
@@ -1065,7 +1053,7 @@
   /* ════ RENDER-ORCHESTRIERUNG ════ */
   function renderAll(){
     renderScoreHero(); renderKpiCards(); renderStatus(); renderBoardOrCards();
-    renderHealth(); renderOverview(); renderProjTable(); if(window._dashLoadSharedPasses)window._dashLoadSharedPasses();
+    renderHealth(); renderOverview(); renderProjTable(); loadPasses(); if(window._dashLoadSharedPasses)window._dashLoadSharedPasses();
   }
 
   /* ════ DASHBOARD-MARKUP (in #dashboard-main injecten) ════ */
@@ -1073,49 +1061,36 @@
     var m=$(MOUNT_ID); if(!m) return false;
     if(m.getAttribute('data-dp-built')==='1') return true;
     function chartCard(id,ico,title,sub,badge,tall){
-      return '<div class="chart-card"><div class="chart-card-head">'
-        + '<div class="chart-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="'+ico+'"/></svg></div>'
-        + '<div class="chart-card-headtext"><div class="chart-card-t">'+title+'</div><div class="chart-card-s">'+sub+'</div></div>'
-        + '<span class="chart-card-badge">'+badge+'</span></div>'
+      return '<div class="chart"><div class="ch"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="'+ico+'"/></svg></div>'
+        + '<div><div class="ct">'+title+'</div><div class="cs">'+sub+'</div></div>'
+        + '<span class="badge">'+badge+'</span></div>'
         + '<div class="chart-box'+(tall?' tall':'')+'"><canvas id="'+id+'"></canvas></div></div>';
     }
     m.innerHTML =
-      '<div id="dp-dash-bgfx"><span class="dp-orb o1"></span><span class="dp-orb o2"></span><span class="dp-orb o3"></span><canvas id="dp-particles"></canvas></div>'
-      + '<div class="dp-dash-header"><div><div class="dp-dash-title">Portfolio-Cockpit</div>'
-      + '<div class="dp-dash-sub">Live · Stand heute (' + _heute() + ') · aggregiert über gewonnene Objekte</div></div>'
-      /* v486: Vollbreite- + Track-Record-Button entfernt (Vollbreite ersetzt durch
-         globalen Sidebar-Toggle aus sidebar-collapse.js). Objekt-Selektor nach RECHTS,
-         lesbar (cream auf #1c1c1c) + Label davor. */
-      + '<div class="dp-dash-objsel-wrap" style="display:flex;align-items:center;gap:10px;align-self:center;">'
-      + '<span class="dp-dash-objsel-label" style="color:#C9A84C;font-family:Inter,sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;">Objekt</span>'
-      + '<select id="dp-dash-objsel" class="dp-dash-objsel" onchange="DealPilotDashboard.selectObject(this.value)" style="background:#1c1c1c;color:#F4ECD8;border:1px solid rgba(201,168,76,.45);border-radius:8px;padding:8px 14px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;max-width:280px;cursor:pointer;"></select>'
-      + '</div></div>'
-      + '<div class="pscore-hero dp-card-dark" id="dp-pscore-hero"></div>'
-      + '<div class="kpi-grid" id="dp-kpi-grid"></div>'
-      + '<div class="dp-section-label">Portfolio-\u00dcbersicht <span class="dp-model-tag">Bestand \u00b7 aggregiert</span></div>'
-      + '<div class="overview-strip dp-card-dark" id="dp-overview-strip"></div>'
-      + '<div class="health-strip dp-card-dark" id="dp-health-strip"></div>'
-      + '<div class="dp-status-row" id="dp-status-row"></div>'
-      + '<div class="dp-section-label">Objekte <span class="dp-view-switch" id="dp-view-switch">'
-      + '<button data-v="kanban" class="active" onclick="DealPilotDashboard.setCardView(\'kanban\')">Kanban</button>'
-      + '<button data-v="cards" onclick="DealPilotDashboard.setCardView(\'cards\')">Karten</button></span></div>'
-      + '<div id="dp-board"></div>'
-      + '<div id="dp-shared-passes" style="margin:14px 0 2px"></div>'
-      + '<div class="dp-section-label">Projektion &amp; Verlauf <span class="dp-model-tag">Modellprojektion (vereinfacht)</span></div>'
-      + '<div class="dp-dash-charts">'
-      + chartCard('dpc-cashflow','M3 17l6-6 4 4 8-8','Cashflow-Verlauf','vor / nach Steuer','€/Jahr')
-      + chartCard('dpc-vermoegen','M3 3v18h18M7 14l4-4 3 3 5-6','Vermögens-Schere','Wert vs. Restschuld','Mio €')
+      '<div id="dp-stage" class="stage fc fc9"><div class="app">'
+      + '<div class="sl sl-head"><span class="e">01</span><h2>Portfolio Score</h2><span class="tag">Quick-Boarding-Stil</span><span class="rule"></span>'
+      + '<span class="cp-objsel"><span class="cp-objsel-lab">Objekt</span><select id="dp-dash-objsel" onchange="DealPilotDashboard.selectObject(this.value)"></select></span></div>'
+      + '<div class="hero" id="dp-pscore-hero"></div>'
+      + '<div class="sl"><span class="e">02</span><h2>Kennzahlen</h2><span class="tag">Portfolio \u00b7 aggregiert</span><span class="rule"></span></div>'
+      + '<div id="dp-overview-strip" class="overview-strip" style="margin-bottom:13px"></div>'
+      + '<div class="kpis" id="dp-health-strip"></div>'
+      + '<div class="sl"><span class="e">03</span><h2>Objekte</h2><span class="tag">Kanban \u00b7 Karte antippen = aufklappen</span><span class="rule"></span></div>'
+      + '<div class="gates" id="dp-board"></div>'
+      + '<div class="sl"><span class="e">04</span><h2>Geteilte Objekte</h2><span class="tag">Quick Boarding</span><span class="rule"></span></div>'
+      + '<div id="dp-shared-passes" style="margin:0 0 4px"></div>'
+      + '<details id="dp-charts-sec" open><summary class="sl dp-charts-summary"><span class="e">05</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
+      + '<div class="charts">'
+      + chartCard('dpc-cashflow','M3 17l6-6 4 4 8-8','Cashflow-Verlauf','vor / nach Steuer','\u20ac/Jahr')
+      + chartCard('dpc-vermoegen','M3 3v18h18M7 14l4-4 3 3 5-6','Verm\u00f6gens-Schere','Wert vs. Restschuld','Mio \u20ac')
       + chartCard('dpc-mittelverw','M4 20V10M10 20V4M16 20v-7M22 20H2','Mittelverwendung','Jahr 1','Allokation')
       + chartCard('dpc-wealth','M3 21h18M6 21V9l6-4 6 4v12','Wealth-Stacks','Eigenkapital-Aufbau','Aufbau',true)
       + chartCard('dpc-klumpen','M12 2a10 10 0 1 0 10 10H12z','Klumpenrisiko','Volumen nach Lage','Diversifikation')
       + chartCard('dpc-steuer','M9 14l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z','Steuer-Verlauf','Steuereffekt','10 Jahre',true)
-      + '</div>'
-      + '<div class="dp-section-label">Gesamt-Projektion <span class="dp-model-tag">Modellprojektion (vereinfacht)</span>'
-      + '<span class="proj-years" id="dp-proj-years">'
-      + '<button data-y="10" onclick="DealPilotDashboard.setProjYears(10)">10 J.</button>'
-      + '<button data-y="20" class="active" onclick="DealPilotDashboard.setProjYears(20)">20 J.</button>'
-      + '<button data-y="30" onclick="DealPilotDashboard.setProjYears(30)">30 J.</button></span></div>'
-      + '<div class="proj-scroll"><table class="proj-table" id="dp-proj-table"></table></div>';
+      + '</div></details>'
+      + '<div class="sl"><span class="e">06</span><h2>Gesamt-Projektion</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="rule"></span></div>'
+      + '<div class="proj"><div class="ph"><span class="t">Cashflow &amp; Verm\u00f6gensaufbau</span><span class="tag">Modellprojektion</span></div>'
+      + '<div class="pw"><table class="pt" id="dp-proj-table"></table></div></div>'
+      + '</div></div>';
     m.setAttribute('data-dp-built','1');
     return true;
   }
@@ -1159,6 +1134,7 @@
   function openDashboard(){
     var m=$(MOUNT_ID); if(!m) return;
     if(!ensureMarkup()) return;
+    try{ if(typeof saveObj==='function') saveObj({silent:true}); }catch(e){}
     // Andere Hauptviews ausblenden — ALLE .sec (auch sec-hidden wie Quick-Check)
     var tabs=document.querySelector('.tabs'); if(tabs)tabs.style.display='none';
     var wf=document.querySelector('.tabs-workflow-bar'); if(wf)wf.style.display='none';
@@ -1196,16 +1172,16 @@
 
     // Sofort: Summaries laden + Score/KPI/Status/Kanban rendern
     renderScoreHero(); renderStatus();
-    $('dp-kpi-grid').innerHTML='<div class="dp-chart-loading" style="grid-column:1/-1;height:90px"><span class="dp-spin"></span>laden…</div>';
+    var _dpLoadHost=$('dp-health-strip'); if(_dpLoadHost) _dpLoadHost.innerHTML='<div class="dp-chart-loading"><span class="dp-spin"></span>laden…</div>';
     loadSummaries().then(function(){
-      renderScoreHero(); renderStatus(); renderBoardOrCards();
+      renderScoreHero(); renderStatus(); renderBoardOrCards(); loadPasses(); if(window._dashLoadSharedPasses)window._dashLoadSharedPasses();
       setTimeout(initParticles, 250);   // v452.6: nach Layout, sonst Canvas 0x0
       // Hintergrund: Details nachladen -> Health/KPIs/Charts/Tabelle
       return loadDetails();
     }).then(function(){
       renderScoreHero(); renderKpiCards(); renderHealth(); renderOverview(); renderProjTable(); buildCharts();
     }).catch(function(e){
-      $('dp-kpi-grid').innerHTML='<div class="health-sub" style="grid-column:1/-1">Daten konnten nicht geladen werden: '+esc(e.message)+'</div>';
+      var _dpErrHost=$('dp-health-strip'); if(_dpErrHost) _dpErrHost.innerHTML='<div class="gempty">Daten konnten nicht geladen werden: '+esc(e.message)+'</div>';
     });
   }
   function closeDashboard(){
@@ -1240,6 +1216,19 @@
     };
     window._dpDashWrapInstalled = true;
   }
+  function installLoadSavedWrap(){
+    if(window._dpLoadSavedWrapped) return;
+    var orig = window.loadSaved;
+    if(typeof orig!=='function'){ setTimeout(installLoadSavedWrap,300); return; }
+    window.loadSaved = function(){
+      var m=$(MOUNT_ID);
+      var dashWasActive = !!(m && m.classList.contains('dp-active'));
+      var r = orig.apply(this, arguments);
+      if(dashWasActive){ try{ if(typeof window.setMainView==='function') window.setMainView('single'); }catch(e){} }
+      return r;
+    };
+    window._dpLoadSavedWrapped = true;
+  }
 
   /* ════ STARTUP-VIEW Hook (Dashboard nach Login) ════ */
   function maybeStartupDashboard(){
@@ -1254,6 +1243,7 @@
     if(_booted) return; _booted=true;
     applyTheme();
     installWrap();
+    installLoadSavedWrap();
     maybeStartupDashboard();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
@@ -1312,6 +1302,9 @@
     toggleSidebar: toggleSidebar, setTheme: setTheme, applyTheme: applyTheme,
     showScoreDetails: showScoreDetails, showScoreUpgrade: showScoreUpgrade, closeScoreModal: _scoreModalClose,
     toggleCf: toggleCf,
+    toggleRoe: function(){ window._dpRoeMode=(window._dpRoeMode==='nach')?'vor':'nach'; try{ renderHealth(); }catch(e){} },
+    openObject: function(k){ try{ if(typeof window.loadSaved==='function') window.loadSaved(k); }catch(e){} },
+    toggleZins: function(){ window._dpZinsMode=(window._dpZinsMode==='risiko')?'zins':'risiko'; try{ renderHealth(); }catch(e){} },
     selectObject: selectObject,
     _debug: function(){ return { summaries:_summaries, details:_details, loaded:_detailsLoaded }; }
   };
@@ -1333,31 +1326,40 @@
   var BTN_D="background:rgba(184,98,80,0.12);border:1px solid rgba(184,98,80,0.40);color:#D9685F;border-radius:7px;padding:3px 9px;font-size:11.5px;cursor:pointer;margin-left:6px";
   var LABEL='<div class="dp-section-label">Geteilte Objekte <span class="dp-model-tag">Quick Boarding</span></div>';
   function host(){ return document.getElementById('dp-shared-passes'); }
+  var _shView='peek', _shItems=[];
+  window._dpShared=function(m){ _shView=m; render(_shItems); };
+  var _shView='peek', _shItems=[];
+  window._dpShared=function(m){ _shView=m; render(_shItems); };
   function render(items){
     var h=host(); if(!h) return;
-    if(!items.length){
-      h.innerHTML=LABEL+'<div class="dp-card-dark" style="padding:10px 14px;color:#9A9390;font-size:12.5px">Aktuell ist kein Objekt geteilt. Teile ein Objekt \u00fcber \u201eQuick Boarding teilen\u201c.</div>';
+    _shItems=items||[];
+    if(!_shItems.length){
+      h.innerHTML='<div class="gempty">Aktuell ist kein Objekt geteilt. Teile ein Objekt im Objekt-Tab \u00fcber \u201eQuick Boarding teilen\u201c \u2013 der Pass erscheint dann hier.</div>';
       return;
     }
-    var rows=items.map(function(p){
-      return '<tr style="border-top:1px solid rgba(255,255,255,0.05)">'
-        +'<td style="padding:7px 8px;color:#E8E4DD">'+esc(p.title||'Objekt')+'</td>'
-        +'<td style="padding:7px 8px;font-family:monospace;color:#C9A84C">'+esc(p.code)+'</td>'
-        +'<td style="padding:7px 8px;color:#9A9390">'+fmtD(p.created_at)+'</td>'
-        +'<td style="padding:7px 8px;color:#9A9390">'+restLabel(p.expires_at)+'</td>'
-        +'<td style="padding:7px 8px;text-align:right;white-space:nowrap">'
-          +'<button style="'+BTN+'" onclick="window._dpfkPassExtend(\''+esc(p.code)+'\')">Verl\u00e4ngern</button>'
-          +'<button style="'+BTN_D+'" onclick="window._dpfkPassRevoke(\''+esc(p.code)+'\')">Beenden</button>'
-        +'</td></tr>';
+    var n=_shItems.length;
+    var show=(_shView==='all')?_shItems:((_shView==='min')?[]:_shItems.slice(0,3));
+    var base=((window.location&&location.origin)?location.origin:'');
+    var cards=show.map(function(p){
+      var url=base+'/pass.html?c='+p.code;
+      var qr='';
+      try{ if(window.DpQr&&DpQr.svg){ qr=DpQr.svg(url,{px:2,ecc:'M',border:1,dark:'#0c0b09',light:'#ffffff'}); } }catch(e){}
+      var qrHtml=qr?('<span class="shr-qr">'+qr+'</span>'):'<span class="shr-qr"><span class="shr-qr-ph"></span></span>';
+      return '<div class="shr2">'
+        +'<div class="shr-body">'
+          +'<div class="o">'+esc(p.title||'Objekt')+'<small>geteilt am '+fmtD(p.created_at)+'</small></div>'
+          +'<div class="shr-meta"><span class="cd">'+esc(p.code)+'</span><span class="rt">'+restLabel(p.expires_at)+'</span></div>'
+          +'<div class="ac"><button class="e" onclick="window._dpfkPassExtend(\''+esc(p.code)+'\')">Verl\u00e4ngern</button>'
+          +'<button class="r" onclick="window._dpfkPassRevoke(\''+esc(p.code)+'\')">Beenden</button></div>'
+        +'</div>'
+        +'<a class="shr-stub" href="'+url+'" target="_blank" rel="noopener" title="Objekt \u00f6ffnen">'+qrHtml+'<span class="shr-stub-lab">Scan</span></a>'
+      +'</div>';
     }).join('');
-    h.innerHTML=LABEL+'<div class="dp-card-dark" style="padding:4px 6px;overflow-x:auto">'
-      +'<table style="width:100%;border-collapse:collapse;font-size:12.5px">'
-      +'<thead><tr style="color:#9A9390;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em">'
-      +'<th style="padding:6px 8px;font-weight:600">Objekt</th>'
-      +'<th style="padding:6px 8px;font-weight:600">Pass-Nr</th>'
-      +'<th style="padding:6px 8px;font-weight:600">geteilt am</th>'
-      +'<th style="padding:6px 8px;font-weight:600">Restlaufzeit</th>'
-      +'<th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    var ctrl;
+    if(_shView==='min'){ ctrl='<button class="shb" onclick="window._dpShared(\'peek\')">Anzeigen</button>'; }
+    else if(_shView==='all'){ ctrl='<button class="shb" onclick="window._dpShared(\'peek\')">Weniger</button><button class="shb shb-m" onclick="window._dpShared(\'min\')">Minimieren</button>'; }
+    else { ctrl=(n>3?'<button class="shb" onclick="window._dpShared(\'all\')">Alle '+n+' anzeigen</button>':'')+'<button class="shb shb-m" onclick="window._dpShared(\'min\')">Minimieren</button>'; }
+    h.innerHTML='<div class="shared2"><div class="sh-bar"><span class="sh-cnt">'+n+' geteilte Objekte</span><span class="sh-ctrl">'+ctrl+'</span></div>'+(cards?'<div class="sh-grid">'+cards+'</div>':'')+'</div>';
   }
   function load(){
     var h=host(); if(!h) return;
