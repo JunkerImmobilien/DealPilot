@@ -1,988 +1,674 @@
-/* ════════════════════════════════════════════════════════════════
-   DealPilot Portfolio-Dashboard — v452
-   Eigener Namespace #dashboard-main. Append-only, berührt keine
-   bestehenden Styles. Light = Default, .dp-theme-dark = Overrides.
-   Palette V3 (Schwarz/Weiß/Gold/Grau), Effekt-Variante C.
-   ════════════════════════════════════════════════════════════════ */
+/* ================================================================
+   v750 - Portfolio-Cockpit: VOLLPORT cockpit-qb-final (Quick-Boarding)
+   Komplettes Demo-CSS, scoped unter #dashboard-main (Auto-Prefix).
+   Ersetzt das alte dashboard.css. Rollback via git checkout.
+   ================================================================ */
 
-#dashboard-main{
-  --dp-bg:#FFFFFF; --dp-surface:#FFFFFF; --dp-surface2:#FBFAF8; --dp-surfaceHi:#FFFFFF;
-  --dp-line:#E8E4DC; --dp-lineHi:rgba(201,168,76,0.30);
-  --dp-ch:#2A2727; --dp-muted:#7A7370; --dp-hint:#9A9390;
-  --dp-gold:#C9A84C; --dp-gold-dk:#A78B36; --dp-gold-2:#E2C97E; --dp-gold-3:#A78B36; --dp-gold-soft:#FAF5E8;
-  --dp-gold-glow:rgba(201,168,76,.22);
-  --dp-green:#3FA56C; --dp-green-bg:#EAF7F0; --dp-green-tx:#1F5A3A;
-  --dp-red:#B86250; --dp-red-bg:#FBF1F0;
-  --dp-blue:#185FA5;
-  --dp-radius:14px; --dp-radius-sm:10px;
-  --dp-card-bg:#0B0906;          /* Premium-Block: Cards bleiben schwarz im Hellmodus */
-  --dp-card-ch:#F2ECDC;
-  --dp-card-muted:rgba(232,226,212,0.55);
-  position:relative;
-  min-height:100%;
-  padding:22px 26px 60px;
-  color:var(--dp-ch);
-  font-family:'Inter',-apple-system,'Segoe UI',sans-serif;
+  #dashboard-main *{box-sizing:border-box}
+
+  #dashboard-main body{margin:0;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#111}
+
+  
+  
+  
+  
+  
+  
+
+  #dashboard-main .stage{
+    --c-page:#fff;--c-ink:#1b1815;--c-mut:#6b6660;--c-panel:#0c0b09;--c-ptext:#ece7dd;--c-pmut:#9a948a;
+    --c-acc:#C9A84C;--c-acc2:#E8CC7A;--c-accd:#b8932f;--c-line:rgba(201,168,76,.22);
+    --c-green:#3FA56C;--c-greenl:#5cc187;--c-greenm:#2FBE6E;--c-red:#B86250;--c-redl:#d98579;
+    --c1:#C9A84C;--c2:#3FA56C;--c3:#E8CC7A;--c4:#6f93b8;
+    --c-front:#fff;--c-front-tx:#191713;--c-front-mut:#6b6660;--c-front-line:#cdbf9a;--c-front-acc:#b8932f;
+    --c-ring:#2FBE6E;--ring-w:13;--head-font:'Space Grotesk';
+    --c-hatch:repeating-linear-gradient(102deg,transparent 0,transparent 6px,rgba(201,168,76,.12) 6px,rgba(201,168,76,.12) 7px);
+    --page-bg:radial-gradient(110% 50% at 88% -8%,rgba(201,168,76,.16),transparent 55%),#fff;
+    background:var(--page-bg);background-attachment:fixed;color:var(--c-ink);min-height:100vh;padding:0 0 70px}
+
+  #dashboard-main .app{max-width:1140px;margin:0 auto;padding:0 16px}
+
+  #dashboard-main .hdr{display:flex;align-items:center;gap:13px;padding:18px 4px 6px}
+
+  #dashboard-main .hdr .wm{font-family:'Space Grotesk';font-weight:700;font-size:18px;color:var(--c-ink)}
+#dashboard-main .hdr .wm span{color:var(--c-accd)}
+
+  #dashboard-main .hdr .pf{margin-left:auto;display:flex;align-items:center;gap:9px;background:var(--c-panel);color:var(--c-ptext);border-radius:30px;padding:7px 15px;border:1px solid var(--c-line)}
+
+  #dashboard-main .hdr .pf .led{width:8px;height:8px;border-radius:50%;background:var(--c-green);box-shadow:0 0 8px 1px rgba(63,165,108,.7);animation:pulse 2.2s infinite}
+
+  #dashboard-main .hdr .pf .t{font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.3px;color:var(--c-acc2)}
+
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  #dashboard-main .sl{display:flex;align-items:center;gap:11px;margin:26px 4px 12px}
+
+  #dashboard-main .sl .e{font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--c-accd)}
+
+  #dashboard-main .sl h2{font-family:var(--head-font);font-weight:600;font-size:17px;margin:0;color:var(--c-ink)}
+
+  #dashboard-main .sl .tag{font-family:'JetBrains Mono';font-size:9px;color:var(--c-mut);border:1px solid rgba(0,0,0,.12);border-radius:20px;padding:2px 9px}
+
+  #dashboard-main .sl .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--c-line),transparent)}
+
+  #dashboard-main .cnum{font-family:'Space Grotesk';font-weight:700;font-variant-numeric:tabular-nums}
+
+
+  /* QC-STYLE HERO */
+  #dashboard-main .hero{background:var(--c-panel);border-radius:20px;overflow:hidden;border:1px solid var(--c-line);box-shadow:0 24px 56px -34px rgba(0,0,0,.5);position:relative}
+
+  #dashboard-main .hpre{display:flex;align-items:center;gap:9px;padding:12px 18px;background:var(--c-hatch);border-bottom:1px dashed var(--c-line)}
+
+  #dashboard-main .hpre .led{width:9px;height:9px;border-radius:50%;background:var(--c-green);box-shadow:0 0 8px 1px rgba(63,165,108,.7);animation:pulse 2.2s infinite}
+
+  #dashboard-main .hpre .t{font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--c-acc2)}
+
+  #dashboard-main .hpre .cls{margin-left:auto;font-family:'JetBrains Mono';font-size:9px;letter-spacing:1px;color:#2c2410;background:linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f);border-radius:20px;padding:3px 11px;font-weight:700}
+
+  #dashboard-main .hbody{display:flex;gap:20px;padding:22px}
+
+  #dashboard-main .hgate{flex:0 0 150px;text-align:center;border-right:2px dashed var(--c-line);padding-right:18px;position:relative}
+
+  #dashboard-main .hgate .gl{font-family:'JetBrains Mono';font-size:9px;letter-spacing:1.5px;color:var(--c-pmut);text-transform:uppercase}
+
+  #dashboard-main .hgate .gn{font-family:'Space Grotesk';font-weight:700;font-size:64px;line-height:.95;color:var(--c-greenm)}
+
+  #dashboard-main .hgate .gd{font-family:'JetBrains Mono';font-size:11px;color:var(--c-pmut)}
+
+  #dashboard-main .hgate .gt{display:inline-block;margin-top:9px;font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;padding:3px 11px;border-radius:20px;background:rgba(47,190,110,.16);color:var(--c-greenm)}
+
+  #dashboard-main .hgate .tot{display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+
+  #dashboard-main .hgate .tot div{text-align:center}
+#dashboard-main .hgate .tot .k{font-family:'JetBrains Mono';font-size:7.5px;color:var(--c-pmut)}
+#dashboard-main .hgate .tot .v{font-family:'JetBrains Mono';font-weight:700;font-size:12px;color:var(--c-ptext);margin-top:2px}
+
+  #dashboard-main .hbars{flex:1;display:flex;flex-direction:column;gap:11px;justify-content:center}
+
+  #dashboard-main .hbars .ttl{font-family:var(--head-font);font-weight:600;font-size:13px;color:var(--c-ptext);margin-bottom:1px}
+
+  #dashboard-main .bar .bt{display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:11px;margin-bottom:4px}
+
+  #dashboard-main .bar .bt .n{color:var(--c-ptext)}
+#dashboard-main .bar .bt .n em{font-style:normal;color:var(--c-pmut);font-size:9px;margin-left:5px}
+
+  #dashboard-main .bar .bt .v{font-weight:700;color:var(--c-ptext)}
+
+  #dashboard-main .track{height:7px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
+
+  #dashboard-main .fill{height:100%;border-radius:6px;width:0;transition:width 1.1s cubic-bezier(.2,.7,.2,1);background:var(--c-greenm)}
+
+
+  /* KPI */
+  #dashboard-main .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+  #dashboard-main .kpi{background:var(--c-panel);color:var(--c-ptext);border-radius:14px;padding:13px 15px;border:1px solid var(--c-line)}
+
+  #dashboard-main .kpi .k{font-family:'JetBrains Mono';font-size:9px;letter-spacing:1px;color:var(--c-pmut);text-transform:uppercase}
+
+  #dashboard-main .kpi .v{font-family:'JetBrains Mono';font-weight:700;font-size:21px;margin-top:5px;color:var(--c-ptext)}
+
+  #dashboard-main .kpi .b{height:4px;border-radius:4px;background:rgba(255,255,255,.08);margin-top:9px;overflow:hidden}
+
+  #dashboard-main .kpi .b i{display:block;height:100%;width:0;border-radius:4px;transition:width 1s ease}
+
+  #dashboard-main .kpi .h{font-family:'JetBrains Mono';font-size:8.5px;color:var(--c-pmut);margin-top:7px}
+
+
+  /* KANBAN flat-expand cards */
+  #dashboard-main .gates{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+  #dashboard-main .gh{display:flex;align-items:center;gap:7px;margin:0 2px 9px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--c-mut)}
+
+  #dashboard-main .gh .c{margin-left:auto;font-weight:700;background:rgba(0,0,0,.07);border-radius:20px;padding:1px 9px;font-size:11px}
+
+  #dashboard-main .gh.won{color:var(--c-green)}
+#dashboard-main .gh.lost{color:var(--c-red)}
+
+  #dashboard-main .gcol{display:flex;flex-direction:column;gap:11px;min-height:50px}
+
+  #dashboard-main .gempty{font-size:12px;color:#a89f8c;font-style:italic;padding:13px 4px;border:1px dashed var(--c-line);border-radius:11px;text-align:center}
+
+  #dashboard-main .kc{background:var(--c-front);color:var(--c-front-tx);border:1px solid rgba(201,168,76,.4);border-left:4px solid var(--tier,var(--c-green));border-radius:12px;
+    box-shadow:0 9px 22px -12px rgba(110,82,18,.45);overflow:hidden;cursor:pointer}
+
+  #dashboard-main .kc.tg{--tier:var(--c-green)}
+#dashboard-main .kc.ty{--tier:var(--c-acc)}
+#dashboard-main .kc.tr{--tier:var(--c-red)}
+
+  #dashboard-main .kc-flat{display:flex;align-items:center;gap:11px;padding:11px 14px}
+
+  #dashboard-main .kc-flat .nm{flex:1;min-width:0;font-family:'Space Grotesk';font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--c-front-tx)}
+
+  #dashboard-main .kc-flat .nm small{display:block;font-family:'JetBrains Mono';font-weight:400;font-size:9.5px;color:var(--c-front-mut)}
+
+  #dashboard-main .kc-flat .sc{font-family:'Space Grotesk';font-weight:700;font-size:23px;line-height:1}
+
+  #dashboard-main .kc-flat .scl{font-family:'JetBrains Mono';font-size:7.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;text-align:center;margin-top:1px}
+
+  #dashboard-main .kc.tg .sc, #dashboard-main .kc.tg .scl{color:var(--c-green)}
+#dashboard-main .kc.ty .sc, #dashboard-main .kc.ty .scl{color:var(--c-accd)}
+#dashboard-main .kc.tr .sc, #dashboard-main .kc.tr .scl{color:var(--c-red)}
+
+  #dashboard-main .kc-flat .chev{width:15px;height:15px;flex:0 0 15px;color:var(--c-front-mut);transition:transform .35s}
+
+  #dashboard-main .kc.open .chev{transform:rotate(180deg)}
+
+  #dashboard-main .kc-body{max-height:0;overflow:hidden;transition:max-height .42s cubic-bezier(.3,.7,.3,1)}
+
+  #dashboard-main .kc.open .kc-body{max-height:260px}
+
+  #dashboard-main .kc-in{padding:2px 14px 13px;border-top:1px solid rgba(201,168,76,.18)}
+
+  #dashboard-main .kc-kp{display:flex;gap:15px;margin:10px 0}
+
+  #dashboard-main .kc-kp .kk{font-family:'JetBrains Mono';font-size:8px;color:var(--c-front-mut);text-transform:uppercase}
+
+  #dashboard-main .kc-kp .kv{font-family:'JetBrains Mono';font-weight:700;font-size:13px;margin-top:2px;color:var(--c-front-tx)}
+
+  #dashboard-main .kc-share{display:flex;align-items:center;gap:10px;background:var(--c-hatch);border-radius:9px;padding:8px 10px;margin-bottom:9px}
+
+  #dashboard-main .kc-share .qb{background:#fff;border-radius:6px;padding:4px}
+
+  #dashboard-main .kc-share .si{font-family:'JetBrains Mono';font-size:9px;color:var(--c-front-mut);line-height:1.6}
+
+  #dashboard-main .kc-share .si b{color:var(--c-front-acc);font-size:11px;letter-spacing:1px}
+
+  #dashboard-main .pdfs{display:flex;gap:6px}
+
+  #dashboard-main .pdfs button{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;font-family:'JetBrains Mono';font-size:9px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.08);color:var(--c-front-acc);border-radius:7px;padding:7px 3px;cursor:pointer}
+
+  #dashboard-main .pdfs button svg{width:10px;height:10px}
+
+  #dashboard-main .cta{display:flex;align-items:center;justify-content:center;gap:6px;font-family:'JetBrains Mono';font-size:9.5px;border-radius:8px;padding:8px;border:1px dashed rgba(201,168,76,.45);color:var(--c-front-acc);margin-bottom:9px}
+
+
+  /* SHARED */
+  #dashboard-main .shared{background:var(--c-panel);color:var(--c-ptext);border-radius:16px;overflow:hidden;border:1px solid var(--c-line);display:grid;grid-template-columns:1fr 210px}
+
+  #dashboard-main .shr{display:grid;grid-template-columns:1.5fr 1fr .8fr auto;align-items:center;gap:10px;padding:12px 18px;border-top:1px solid rgba(255,255,255,.05)}
+
+  #dashboard-main .shr:first-child{border-top:none}
+
+  #dashboard-main .shr .o{font-family:'Space Grotesk';font-weight:600;font-size:13px;color:var(--c-ptext)}
+#dashboard-main .shr .o small{display:block;font-family:Inter;font-weight:400;font-size:10px;color:var(--c-pmut);margin-top:1px}
+
+  #dashboard-main .shr .cd{font-family:'JetBrains Mono';font-size:11.5px;color:var(--c-acc2);letter-spacing:1px}
+
+  #dashboard-main .shr .rt{font-family:'JetBrains Mono';font-size:11px;color:var(--c-pmut)}
+#dashboard-main .shr .rt.w{color:var(--c-redl)}
+
+  #dashboard-main .shr .ac{display:flex;gap:6px;justify-self:end}
+#dashboard-main .shr .ac button{font-family:'JetBrains Mono';font-size:10px;cursor:pointer;border-radius:7px;padding:5px 10px}
+
+  #dashboard-main .shr .ac .e{background:rgba(201,168,76,.13);border:1px solid var(--c-line);color:var(--c-acc2)}
+#dashboard-main .shr .ac .r{background:rgba(184,98,80,.13);border:1px solid rgba(184,98,80,.4);color:var(--c-redl)}
+
+  #dashboard-main .shq{background:var(--c-hatch);border-left:1px dashed var(--c-line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:15px}
+
+  #dashboard-main .shq .qb{background:#fff;border-radius:8px;padding:7px;position:relative;overflow:hidden}
+
+  #dashboard-main .shq .qb::after{content:"";position:absolute;left:0;right:0;top:0;height:30%;background:linear-gradient(180deg,rgba(201,168,76,.5),transparent);animation:scan 2.6s ease-in-out infinite}
+
+  @keyframes scan{0%{top:-30%}60%{top:100%}100%{top:100%}}
+  #dashboard-main .shq .cap{font-family:'JetBrains Mono';font-size:9px;color:var(--c-pmut);text-align:center}
+
+
+  /* CHARTS */
+  #dashboard-main .charts{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+
+  #dashboard-main .chart{background:var(--c-panel);color:var(--c-ptext);border-radius:15px;border:1px solid var(--c-line);padding:13px 15px}
+
+  #dashboard-main .chart .ch{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+
+  #dashboard-main .chart .ico{width:25px;height:25px;border-radius:7px;background:rgba(201,168,76,.14);display:flex;align-items:center;justify-content:center}
+
+  #dashboard-main .chart .ico svg{width:14px;height:14px;stroke:var(--c-acc2);fill:none;stroke-width:2}
+
+  #dashboard-main .chart .ct{font-family:'Space Grotesk';font-weight:600;font-size:13px;color:var(--c-ptext)}
+
+  #dashboard-main .chart .cs{font-family:'JetBrains Mono';font-size:9px;color:var(--c-pmut)}
+
+  #dashboard-main .chart .badge{margin-left:auto;font-family:'JetBrains Mono';font-size:8.5px;color:var(--c-acc2);border:1px solid var(--c-line);border-radius:20px;padding:2px 8px}
+
+  #dashboard-main .draw{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 1.9s ease-out forwards}
+
+  @keyframes draw{to{stroke-dashoffset:0}}
+  #dashboard-main .leg{display:flex;gap:13px;margin-top:6px;font-family:'JetBrains Mono';font-size:9px;color:var(--c-pmut)}
+
+  #dashboard-main .leg i{display:inline-block;width:10px;height:3px;border-radius:3px;vertical-align:middle;margin-right:5px}
+
+
+  /* PROJ */
+  #dashboard-main .proj{background:var(--c-panel);color:var(--c-ptext);border-radius:16px;overflow:hidden;border:1px solid var(--c-line)}
+
+  #dashboard-main .ph{display:flex;align-items:center;gap:10px;padding:13px 18px;background:var(--c-hatch);border-bottom:1px dashed var(--c-line)}
+
+  #dashboard-main .ph .t{font-family:'Space Grotesk';font-weight:600;font-size:13.5px;color:var(--c-ptext)}
+
+  #dashboard-main .ph .tag{font-family:'JetBrains Mono';font-size:9px;color:var(--c-acc2);border:1px solid var(--c-line);border-radius:20px;padding:2px 8px}
+
+  #dashboard-main .ph .yrs{margin-left:auto;display:flex;gap:5px}
+
+  #dashboard-main .ph .yrs button{font-family:'JetBrains Mono';font-size:10px;border:1px solid var(--c-line);background:transparent;color:var(--c-pmut);border-radius:7px;padding:4px 9px;cursor:pointer}
+
+  #dashboard-main .ph .yrs button.on{background:linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f);color:#2c2410;border-color:transparent;font-weight:700}
+
+  #dashboard-main .pw{overflow-x:auto}
+
+  #dashboard-main table.pt{width:100%;border-collapse:collapse;font-family:'JetBrains Mono';font-size:10.5px;min-width:660px}
+
+  #dashboard-main table.pt th{text-align:right;padding:8px 11px;font-size:8.5px;letter-spacing:.4px;color:var(--c-pmut);text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)}
+
+  #dashboard-main table.pt th:first-child, #dashboard-main table.pt td:first-child{text-align:left}
+
+  #dashboard-main table.pt td{text-align:right;padding:7px 11px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--c-ptext)}
+
+  #dashboard-main table.pt tr:hover td{background:rgba(201,168,76,.05)}
+
+  #dashboard-main table.pt td.pos{color:var(--c-greenl)}
+#dashboard-main table.pt td.neg{color:var(--c-redl)}
+
+  #dashboard-main .pcanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity .4s}
+
+
+  /* ════ FINAL: Weiß + Gold-Band + runde Scores ════ */
+  #dashboard-main .stage.fc{--c-ink:#1b1815;--c-mut:#6b6660;--page-bg:#FDFCFA;
+    --c-panel:#fff;--c-ptext:#1b1815;--c-pmut:#6b6660;--c-front:#fff;--c-front-tx:#191713;--c-front-mut:#6b6660;--c-front-acc:#b8932f;
+    --gb-hatch:repeating-linear-gradient(102deg,transparent 0,transparent 7px,rgba(255,255,255,.18) 7px,rgba(255,255,255,.18) 8px);
+    --gb-gold:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#bd9a3e);--gb-band:var(--gb-hatch),var(--gb-gold)}
+
+  /* Panels weiß mit Goldrand */
+  #dashboard-main .stage.fc .hero, #dashboard-main .stage.fc .kpi, #dashboard-main .stage.fc .chart, #dashboard-main .stage.fc .shared, #dashboard-main .stage.fc .proj, #dashboard-main .stage.fc .kc{border:1px solid rgba(201,168,76,.4);box-shadow:0 9px 26px -17px rgba(120,90,20,.25)}
+
+  #dashboard-main .stage.fc .track, #dashboard-main .stage.fc .kpi .b{background:#ece8dd}
+
+  #dashboard-main .stage.fc table.pt th{border-bottom-color:#ece4d2}
+#dashboard-main .stage.fc table.pt td{border-bottom-color:#f4f1e8}
+
+  #dashboard-main .stage.fc .shr{border-top-color:#f0ece1}
+#dashboard-main .stage.fc .hgate .tot{border-top-color:#eee6d6}
+
+  #dashboard-main .stage.fc .hgate{border-right-color:#e8e3d6}
+#dashboard-main .stage.fc .hgate .gl, #dashboard-main .stage.fc .hgate .gd, #dashboard-main .stage.fc .hgate .tot .k{color:#9a948a}
+#dashboard-main .stage.fc .hgate .tot .v{color:#1b1815}
+
+  /* Gold-Band Pre-Flight + Sektionen */
+  #dashboard-main .stage.fc .hpre{background:var(--gb-band);border-bottom:1px dashed rgba(58,47,18,.3)}
+
+  #dashboard-main .stage.fc .hpre .t{color:#2c2410}
+#dashboard-main .stage.fc .hpre .cls{background:#2c2410;color:#E8CC7A}
+#dashboard-main .stage.fc .hpre .led{background:#1f6b43;box-shadow:0 0 8px 1px rgba(31,107,67,.6)}
+
+  #dashboard-main .stage.fc .sl{background:var(--gb-band);border-radius:9px;padding:8px 13px}
+
+  #dashboard-main .stage.fc .sl .e{background:rgba(44,36,16,.85);color:#E8CC7A;padding:3px 8px;border-radius:6px}
+
+  #dashboard-main .stage.fc .sl h2{color:#2c2410}
+#dashboard-main .stage.fc .sl .tag{color:#2c2410;border-color:rgba(58,47,18,.35)}
+#dashboard-main .stage.fc .sl .rule{display:none}
+
+  #dashboard-main .stage.fc .ph{background:var(--gb-band)}
+#dashboard-main .stage.fc .ph .t, #dashboard-main .stage.fc .ph .tag{color:#2c2410}
+#dashboard-main .stage.fc .ph .tag{border-color:rgba(58,47,18,.35)}
+#dashboard-main .stage.fc .ph .yrs button{color:#7a6a3a;border-color:rgba(58,47,18,.3)}
+#dashboard-main .stage.fc .ph .yrs button.on{color:#2c2410}
+
+  #dashboard-main .stage.fc .shq{background:var(--gb-band);border-left:1px dashed rgba(58,47,18,.3)}
+#dashboard-main .stage.fc .shq .cap{color:#3a2f12}
+
+  /* RUNDE PROGRESS-RING-SCORES im Kanban */
+  #dashboard-main .stage.fc .kc-flat .sc{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;background:conic-gradient(var(--tier,var(--c-green)) calc(var(--p,0)*1%),rgba(0,0,0,.08) 0)}
+
+  #dashboard-main .stage.fc .kc-flat .sc::before{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--c-front)}
+
+  #dashboard-main .stage.fc .kc-flat .sc span{position:relative;z-index:1;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:var(--tier,var(--c-green))}
+
+  #dashboard-main .stage.fc .kc.tg{--tier:var(--c-green)}
+#dashboard-main .stage.fc .kc.ty{--tier:var(--c-accd)}
+#dashboard-main .stage.fc .kc.tr{--tier:var(--c-red)}
+
+  #dashboard-main .stage.fc .kc-flat .scl{margin-top:3px}
+
+
+  /* fc1 · Basis (Gold-Band + Progress-Ring) */
+  /* fc2 · Gold-Unterstrich statt Band */
+  
+  
+  
+  /* fc3 · Gold-Tick Sektionen */
+  
+  
+  /* fc4 · Ring mit Hatch-Kern */
+  
+  /* fc5 · Dicker Doppel-Ring */
+  
+  /* fc6 · Gold-Oberkante an Karten */
+  
+  /* fc7 · Perforierte Karten-Ränder */
+  
+  /* fc8 · Serif-Headlines */
+  
+  /* fc9 · Dunkler Hero zum Kontrast */
+  #dashboard-main .stage.fc9 .hero{--c-panel:#0c0b09;--c-ptext:#ece7dd;--c-pmut:#9a948a;border-color:rgba(201,168,76,.4)}
+
+  #dashboard-main .stage.fc9 .hgate{border-right-color:rgba(255,255,255,.12)}
+#dashboard-main .stage.fc9 .hgate .gl, #dashboard-main .stage.fc9 .hgate .gd, #dashboard-main .stage.fc9 .hgate .tot .k{color:#9a948a}
+#dashboard-main .stage.fc9 .hgate .tot{border-top-color:rgba(255,255,255,.1)}
+#dashboard-main .stage.fc9 .hgate .tot .v{color:#fff}
+
+  #dashboard-main .stage.fc9 .track{background:rgba(255,255,255,.08)}
+
+
+  
+  /* ── v2: kompaktere Karten + Schwarz/Gold-Aufklappbereich ── */
+  #dashboard-main .stage.fc .kc-flat{padding:8px 12px;gap:9px}
+
+  #dashboard-main .stage.fc .kc-flat .nm{font-size:12.5px}
+
+  #dashboard-main .stage.fc .kc-flat .nm small{font-size:9px}
+
+  #dashboard-main .stage.fc .kc-flat .sc{width:40px;height:40px}
+
+  #dashboard-main .stage.fc .kc-flat .sc::before{inset:3.5px}
+
+  #dashboard-main .stage.fc .kc-flat .sc span{font-size:13px}
+
+  #dashboard-main .stage.fc .kc-flat .scl{font-size:7px;margin-top:2px}
+
+  #dashboard-main .stage.fc .kc.open .kc-body{max-height:300px}
+
+  /* Aufklappen: Obsidian-Panel mit Gold */
+  #dashboard-main .stage.fc .kc-in{background:#0c0b09;color:#ece7dd;border-top:1px dashed rgba(201,168,76,.4);padding:12px 13px}
+
+  #dashboard-main .stage.fc .kc-kp{margin:2px 0 11px}
+
+  #dashboard-main .stage.fc .kc-kp .kk{color:#9a948a}
+
+  #dashboard-main .stage.fc .kc-kp .kv{color:#fff}
+
+  #dashboard-main .stage.fc .kc-share{background:repeating-linear-gradient(102deg,transparent 0,transparent 9px,rgba(201,168,76,.16) 9px,rgba(201,168,76,.16) 10px);border:1px solid rgba(201,168,76,.3)}
+
+  #dashboard-main .stage.fc .kc-share .si{color:#cfc9bd}
+
+  #dashboard-main .stage.fc .kc-share .si b{color:#E8CC7A}
+
+  /* PDF-Buttons: Gold */
+  #dashboard-main .stage.fc .pdfs button{background:linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f);color:#2c2410;border:none;font-weight:700}
+
+
+
+  /* Endfassung-Hero: dunkel + runder Score + weißer Abriss-QR */
+  #dashboard-main .hero{display:flex}
+
+  #dashboard-main .hmain{flex:1;display:flex;flex-direction:column;min-width:0}
+
+  #dashboard-main .hgate{display:flex;flex-direction:column;align-items:center}
+
+  #dashboard-main #hero-ring{margin:2px 0 0}
+
+  #dashboard-main .vperf{position:relative;width:0;border-left:2px dashed rgba(201,168,76,.5);align-self:stretch}
+
+  #dashboard-main .vperf::before, #dashboard-main .vperf::after{content:"";position:absolute;left:-8px;width:15px;height:15px;border-radius:50%;background:#FDFCFA;z-index:2}
+
+  #dashboard-main .vperf::before{top:-7.5px}
+#dashboard-main .vperf::after{bottom:-7.5px}
+
+  #dashboard-main .hpass{flex:0 0 158px;background:#fff;color:#1b1815;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px 14px}
+
+  #dashboard-main .hpass .hp-lab{font-family:'JetBrains Mono';font-size:8px;letter-spacing:1.4px;color:#b8932f}
+
+  #dashboard-main .hpass .qb{background:#fff;border:1px solid rgba(201,168,76,.3);border-radius:9px;padding:6px}
+
+  #dashboard-main .hpass .hp-code{font-family:'JetBrains Mono';font-size:11px;letter-spacing:1px;color:#1b1815}
+
+  #dashboard-main .hpass .hp-sub{font-family:'JetBrains Mono';font-size:8.5px;color:#6b6660;text-align:center}
+
+  @media(max-width:760px){#dashboard-main .hero{flex-direction:column}
+#dashboard-main .vperf{display:none}
+#dashboard-main .hpass{flex-basis:auto}
 }
 
-/* ── Dunkelmodus: App-weite Body-Class schaltet um ── */
-body.dp-theme-dark #dashboard-main{
-  --dp-bg:#000000; --dp-surface:#050505; --dp-surface2:#080604; --dp-surfaceHi:#0d0a04;
-  --dp-line:rgba(201,168,76,0.22); --dp-lineHi:rgba(201,168,76,0.45);
-  --dp-ch:#F2ECDC; --dp-muted:rgba(232,226,212,0.55); --dp-hint:rgba(168,162,153,0.5);
-  --dp-gold-2:#E8C964; --dp-gold-3:#9a7f33; --dp-gold-soft:#6E5A2E;
-  --dp-gold-glow:rgba(201,168,76,.45);
-  --dp-green-bg:#0d1f15; --dp-red-bg:#1f0d0a;
-  --dp-card-bg:#0B0906;
-  background:#000000;   /* v452.6: ganzer Dashboard-Hintergrund dunkel, nicht nur Karten */
+  #dashboard-main .pick, #dashboard-main @media(max-width:880px){
+    .kpis{grid-template-columns:repeat(2,1fr)}.gates{grid-template-columns:1fr}
+    .hbody{flex-direction:column}.hgate{border-right:none;border-bottom:2px dashed var(--c-line);padding-right:0;padding-bottom:14px}
+    .shared{grid-template-columns:1fr}.shq{border-left:none;border-top:1px dashed var(--c-line);flex-direction:row}
+    .charts{grid-template-columns:1fr}.shr{grid-template-columns:1fr auto}.shr .cd,.shr .rt{display:none}
+  }
+
+  @media(prefers-reduced-motion:reduce){#dashboard-main *{animation:none!important}
+#dashboard-main .draw{stroke-dashoffset:0!important}
+#dashboard-main .kc-body{transition:none}
 }
-/* v452.6: Dark-Mode soll den GANZEN sichtbaren Bereich faerben (auch hinter dem
-   Dashboard, falls main-col groesser ist). */
-body.dp-theme-dark .main-col,
-body.dp-theme-dark.qc-standalone-active{ background:#000000; }
-/* Heller Modus: dezenter warmer Grund, damit die Gold-Orbs sichtbar werden */
-#dashboard-main{ background:#FDFCFA; }
 
-/* ════ v452.10: Vollbild-Fix — app-wrap ist GRID mit fester Sidebar-Spalte.
-   display:none am Sidebar-Kind entfernt die Spalte NICHT -> Grid-Template
-   muss ueberschrieben werden. Zusaetzlich Flex-Fallback. ════ */
-body.dp-dash-fullscreen .sidebar{ display:none !important; }
-body.dp-dash-fullscreen .tabs,
-body.dp-dash-fullscreen .tabs-workflow-bar{ display:none !important; }
-/* Grid-Fall: Sidebar-Spalte auf 0 */
-body.dp-dash-fullscreen .app-wrap{
-  grid-template-columns:0 1fr !important;
-  grid-template-areas:none !important;
-}
-/* Flex-Fall: main-col zieht 100% */
-body.dp-dash-fullscreen .main-col{
-  flex:1 1 100% !important; max-width:100% !important; width:100% !important;
-  margin-left:0 !important; grid-column:1 / -1 !important;
-}
-body.dp-dash-fullscreen #dashboard-main{ max-width:100% !important; width:100% !important; }
-
-/* ════ v452.9: Dashboard nach OBEN — Leerraum minimieren ════ */
-#dashboard-main.dp-active{ margin-top:0 !important; padding-top:10px !important; }
-/* dp-dash-header dichter an den oberen Rand */
-#dashboard-main .dp-dash-header{ margin-top:0 !important; }
-
-/* ════ Hintergrund-Effekt Variante C: Glow-Orbs + Partikel ════ */
-#dp-dash-bgfx{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
-#dp-dash-bgfx .dp-orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;}
-/* Hell: kraeftigere Orbs, damit auf hellem Grund sichtbar */
-#dp-dash-bgfx .dp-orb.o1{width:460px;height:460px;background:radial-gradient(circle,rgba(201,168,76,.38),transparent 70%);top:-80px;left:-60px;animation:dpOrb1 22s ease-in-out infinite;}
-#dp-dash-bgfx .dp-orb.o2{width:380px;height:380px;background:radial-gradient(circle,rgba(201,168,76,.28),transparent 70%);bottom:-60px;right:10%;animation:dpOrb2 26s ease-in-out infinite;}
-#dp-dash-bgfx .dp-orb.o3{width:320px;height:320px;background:radial-gradient(circle,rgba(167,139,54,.24),transparent 70%);top:40%;left:55%;animation:dpOrb3 18s ease-in-out infinite;}
-/* Dunkel: Orbs leuchten staerker auf schwarzem Grund */
-body.dp-theme-dark #dp-dash-bgfx .dp-orb{opacity:.7;}
-body.dp-theme-dark #dp-dash-bgfx .dp-orb.o1{background:radial-gradient(circle,rgba(201,168,76,.45),transparent 70%);}
-body.dp-theme-dark #dp-dash-bgfx .dp-orb.o2{background:radial-gradient(circle,rgba(201,168,76,.33),transparent 70%);}
-body.dp-theme-dark #dp-dash-bgfx .dp-orb.o3{background:radial-gradient(circle,rgba(167,139,54,.30),transparent 70%);}
-#dp-dash-bgfx canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
-@keyframes dpOrb1{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,40px)}}
-@keyframes dpOrb2{0%,100%{transform:translate(0,0)}50%{transform:translate(-50px,-30px)}}
-@keyframes dpOrb3{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-50px)}}
-#dashboard-main > *:not(#dp-dash-bgfx){position:relative;z-index:1;}
-
-/* ════ Werbungskosten-Auswahl-Modal (v452.6) ════ */
-.dp-wk-modal-ov{position:fixed;inset:0;z-index:99999;background:rgba(8,6,4,.6);backdrop-filter:blur(3px);
-  display:flex;align-items:center;justify-content:center;}
-.dp-wk-modal{background:#0B0906;border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:24px;max-width:380px;width:90%;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);}
-.dp-wk-modal-t{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#F2ECDC;margin-bottom:6px;}
-.dp-wk-modal-s{font-size:12.5px;color:rgba(232,226,212,.6);margin-bottom:18px;}
-.dp-wk-modal-btns{display:flex;flex-direction:column;gap:9px;}
-.dp-wk-modal-btns button{padding:13px 16px;border-radius:10px;border:1px solid rgba(201,168,76,.3);
-  background:rgba(201,168,76,.08);color:#E8C964;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s;text-align:left;}
-.dp-wk-modal-btns button:hover{background:rgba(201,168,76,.18);border-color:#C9A84C;}
-.dp-wk-modal-x{margin-top:14px;width:100%;padding:9px;border-radius:9px;border:1px solid rgba(232,226,212,.15);
-  background:transparent;color:rgba(232,226,212,.55);font-size:12px;cursor:pointer;}
-.dp-wk-modal-x:hover{color:#F2ECDC;border-color:rgba(232,226,212,.3);}
-
-/* ════ Health-Tooltip-Icon (v452.6) ════ */
-.health-l{display:flex;align-items:center;gap:5px;}
-.health-i{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;
-  border:1px solid currentColor;font-size:9px;font-weight:700;opacity:.5;cursor:help;font-style:normal;line-height:1;}
-.health-i:hover{opacity:1;}
-
-/* ════ Header ════ */
-.dp-dash-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
-.dp-dash-title{font-family:'Cormorant Garamond','Space Grotesk',serif;font-size:30px;font-weight:700;letter-spacing:.3px;
-  background:linear-gradient(90deg,var(--dp-gold-dk),var(--dp-gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
-body.dp-theme-dark .dp-dash-title{background:linear-gradient(90deg,var(--dp-gold-2),var(--dp-gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
-.dp-dash-sub{font-size:12.5px;color:var(--dp-muted);margin-top:2px;}
-.dp-dash-actions{display:flex;gap:9px;flex-wrap:wrap;}
-.dp-dash-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;border:1px solid var(--dp-line);
-  background:var(--dp-surface);color:var(--dp-ch);font-size:12.5px;font-weight:600;cursor:pointer;transition:.18s;}
-.dp-dash-btn:hover{border-color:var(--dp-gold);box-shadow:0 0 0 3px var(--dp-gold-glow);}
-.dp-dash-btn.gold{background:linear-gradient(135deg,var(--dp-gold),var(--dp-gold-dk));color:#0B0906;border-color:transparent;}
-.dp-dash-btn svg{width:15px;height:15px;}
-
-/* ════ Premium schwarze Cards (Score/KPI/Health bleiben schwarz im Hellmodus) ════ */
-.dp-card-dark{background:var(--dp-card-bg);color:var(--dp-card-ch);border-radius:var(--dp-radius);
-  box-shadow:0 0 0 1px rgba(201,168,76,.18),0 12px 40px rgba(0,0,0,.18);position:relative;overflow:hidden;}
-.dp-card-dark::before{content:'';position:absolute;inset:0;opacity:.5;pointer-events:none;
-  background-image:radial-gradient(rgba(201,168,76,.06) 1px,transparent 1px);background-size:22px 22px;}
-
-/* ════ Score-Hero ════ */
-.pscore-hero{display:flex;gap:30px;align-items:center;padding:26px 30px;margin-bottom:18px;}
-.pscore-gauge{position:relative;flex-shrink:0;width:170px;height:170px;display:flex;align-items:center;justify-content:center;}
-.pscore-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.pscore-val{font-family:'Space Grotesk',sans-serif;font-size:56px;font-weight:700;line-height:1;}
-.pscore-max{font-size:13px;color:var(--dp-card-muted);margin-top:3px;}
-.pscore-right{flex:1;min-width:0;}
-.pscore-pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:1px;color:var(--dp-gold);
-  border:1px solid rgba(201,168,76,.4);border-radius:999px;padding:3px 11px;margin-bottom:9px;}
-.pscore-titlebar{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-bottom:5px;}
-.pscore-title{display:inline-flex;align-items:center;gap:7px;font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;color:var(--dp-card-ch);}
-.pscore-title svg{width:18px;height:18px;color:var(--dp-gold);}
-.pscore-tier{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;}
-.pscore-tier .tdot{width:8px;height:8px;border-radius:50%;box-shadow:0 0 7px currentColor;}
-.pscore-headline{font-size:13px;color:var(--dp-card-muted);margin-bottom:13px;}
-.pscore-cats.slim{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px 18px;margin-bottom:13px;}
-.pscore-cat.slim .pscore-cat-head{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px;}
-.pscore-cat.slim .pscore-cat-l{color:var(--dp-card-muted);}
-.pscore-cat.slim .pscore-cat-v{font-weight:700;}
-.pscore-bar{height:5px;border-radius:3px;background:rgba(201,168,76,.12);overflow:hidden;}
-.pscore-bar-fill{height:100%;border-radius:3px;transition:width 1.1s cubic-bezier(.2,.8,.2,1);}
-.pscore-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-.pscore-details{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:999px;cursor:pointer;
-  border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.08);color:var(--dp-gold);font-size:12px;font-weight:600;}
-.pscore-details svg{width:14px;height:14px;}
-.pscore-details.locked{opacity:.85;}
-.pscore-kirat{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;animation:dpPulse 2.6s ease-in-out infinite;}
-.pscore-kirat svg{width:15px;height:15px;}
-@keyframes dpPulse{0%,100%{opacity:.7}50%{opacity:1}}
-/* Score-Hero Effekte */
-.pscore-rays{position:absolute;left:115px;top:50%;width:170px;height:170px;transform:translateY(-50%);pointer-events:none;
-  background:conic-gradient(from 0deg,transparent,rgba(201,168,76,.10),transparent 30%);
-  -webkit-mask:radial-gradient(circle,transparent 40%,#000 41%,transparent 75%);mask:radial-gradient(circle,transparent 40%,#000 41%,transparent 75%);
-  animation:dpRays 60s linear infinite;border-radius:50%;}
-@keyframes dpRays{to{transform:translateY(-50%) rotate(360deg)}}
-.pscore-burst{position:absolute;left:200px;top:50%;width:1px;height:1px;}
-.pscore-burst .spark{position:absolute;width:5px;height:5px;border-radius:50%;left:0;top:0;
-  animation:dpSpark 1s cubic-bezier(.15,.7,.3,1) forwards;opacity:0;}
-@keyframes dpSpark{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
-@keyframes orbit{to{transform:rotate(360deg)}}
-.pscore-watermark{position:absolute;top:14px;right:18px;font-size:10.5px;font-weight:700;letter-spacing:1px;
-  color:var(--dp-gold);border:1px solid rgba(201,168,76,.4);border-radius:999px;padding:3px 10px;z-index:3;}
-
-/* ════ KPI-Cards (5 Score-Kategorien) ════ */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:18px;}
-.kpi{padding:16px 17px;}
-.kpi-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
-.kpi-tier{font-size:10px;font-weight:700;letter-spacing:.7px;border:1px solid;border-radius:6px;padding:2px 7px;}
-.kpi-trend{font-size:11px;font-weight:600;}
-.kpi-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;}
-.kpi-l{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--dp-card-muted);}
-.kpi-ico{width:22px;height:22px;color:var(--dp-gold);opacity:.8;}
-.kpi-v{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;line-height:1;}
-.kpi-sub{font-size:11px;color:var(--dp-card-muted);margin-top:6px;margin-bottom:8px;}
-.kpi-prog{height:5px;border-radius:3px;background:rgba(201,168,76,.12);overflow:hidden;}
-.kpi-prog-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.2,.8,.2,1);}
-
-/* ════ Health-Leiste ════ */
-.health-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:11px;padding:16px 18px;margin-bottom:18px;}
-.health-box{position:relative;padding:11px 13px;border-radius:var(--dp-radius-sm);background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.14);}
-.health-box.warn{background:var(--dp-red-bg);border-color:rgba(184,98,80,.4);}
-.health-l{font-size:10.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--dp-card-muted);margin-bottom:5px;}
-.health-v{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;line-height:1;}
-.health-sub{font-size:10.5px;color:var(--dp-card-muted);margin-top:3px;}
-
-/* ════ Status-Übersicht ════ */
-.dp-status-row{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:22px;}
-.dp-status-tile{padding:16px 18px;border-radius:var(--dp-radius);border:1px solid var(--dp-line);background:var(--dp-surface);}
-.dp-status-tile .st-l{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--dp-muted);}
-.dp-status-tile .st-v{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;margin-top:6px;}
-.dp-status-tile.st-won .st-v{color:var(--dp-green);}
-.dp-status-tile.st-lost .st-v{color:var(--dp-red);}
-.dp-status-tile.st-pruef .st-v{color:var(--dp-gold);}
-.dp-status-tile .st-sub{font-size:11.5px;color:var(--dp-muted);margin-top:3px;}
-
-/* ════ Charts ════ */
-.dp-section-label{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;
-  color:var(--dp-ch);margin:6px 0 13px;}
-.dp-section-label .dp-model-tag{font-size:10.5px;font-weight:600;letter-spacing:.5px;color:var(--dp-muted);
-  border:1px solid var(--dp-line);border-radius:999px;padding:2px 9px;text-transform:none;letter-spacing:0;}
-.dp-dash-charts{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:18px;}
-@media (max-width:900px){ .dp-dash-charts{grid-template-columns:1fr;} }
-.chart-card{position:relative;padding:16px 18px 14px;border-radius:var(--dp-radius);border:1px solid var(--dp-line);
-  background:var(--dp-surface);overflow:hidden;transition:.18s;}
-.chart-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--dp-gold),var(--dp-gold-dk));opacity:.55;}
-.chart-card:hover{border-color:var(--dp-lineHi);box-shadow:0 8px 26px rgba(201,168,76,.10);}
-.chart-card-head{display:flex;align-items:center;gap:11px;margin-bottom:12px;}
-.chart-card-ico{width:30px;height:30px;flex-shrink:0;border-radius:9px;display:flex;align-items:center;justify-content:center;
-  background:rgba(201,168,76,.12);color:var(--dp-gold);}
-.chart-card-ico svg{width:16px;height:16px;}
-.chart-card-headtext{flex:1;min-width:0;}
-.chart-card-t{font-size:14px;font-weight:600;color:var(--dp-ch);}
-.chart-card-s{font-size:11.5px;color:var(--dp-muted);margin-top:1px;}
-.chart-card-badge{font-size:10px;font-weight:600;color:var(--dp-muted);border:1px solid var(--dp-line);border-radius:999px;padding:2px 8px;}
-.chart-box{position:relative;height:300px;}
-.chart-box.tall{height:340px;}
-.chart-box canvas{max-width:100%;}
-.dp-chart-loading{display:flex;align-items:center;justify-content:center;height:100%;color:var(--dp-muted);font-size:12.5px;gap:9px;}
-.dp-chart-loading .dp-spin{width:15px;height:15px;border:2px solid var(--dp-line);border-top-color:var(--dp-gold);border-radius:50%;animation:dpSpin .8s linear infinite;}
+/* -- Charts: Canvas-Box-Hoehe (buildCharts nutzt <canvas> statt SVG) -- */
+#dashboard-main .chart .chart-box{position:relative;height:132px;margin-top:8px}
+#dashboard-main .chart .chart-box.tall{height:172px}
+#dashboard-main .chart .dp-chart-loading{display:flex;align-items:center;justify-content:center;height:100%;color:var(--c-pmut);font-size:12px;gap:9px}
+#dashboard-main .chart .dp-chart-loading .dp-spin{width:15px;height:15px;border:2px solid rgba(201,168,76,.25);border-top-color:#C9A84C;border-radius:50%;animation:dpSpin .8s linear infinite}
 @keyframes dpSpin{to{transform:rotate(360deg)}}
+/* -- Charts einklappbar -- */
+#dashboard-main details#dp-charts-sec{margin:0}
+#dashboard-main summary.dp-charts-summary{cursor:pointer;list-style:none}
+#dashboard-main summary.dp-charts-summary::-webkit-details-marker{display:none}
+#dashboard-main .dp-charts-hint{margin-left:8px;font-family:'JetBrains Mono';font-size:9px;color:#2c2410;opacity:.85}
+#dashboard-main details#dp-charts-sec:not([open]) .charts{display:none}
+/* -- Header (Titel + Objekt-Auswahl) im neuen Look -- */
+#dashboard-main .dp-cp-head{display:flex;align-items:center;gap:14px;padding:18px 4px 4px}
+#dashboard-main .dp-cp-head .ti{font-family:'Space Grotesk';font-weight:700;font-size:22px;color:#1b1815}
+#dashboard-main .dp-cp-head .su{font-family:'JetBrains Mono';font-size:10px;color:#6b6660;margin-top:2px}
+#dashboard-main .dp-cp-head .objsel-wrap{margin-left:auto;display:flex;align-items:center;gap:9px}
+#dashboard-main .dp-cp-head .objsel-lab{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#b8932f}
+#dashboard-main .dp-cp-head select{background:#fff;color:#1b1815;border:1px solid rgba(201,168,76,.45);border-radius:8px;padding:8px 12px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;max-width:260px;cursor:pointer}
+/* -- Details-&-KPIs-Button im Hero -- */
+#dashboard-main .hero .hkpi-btn{display:inline-flex;align-items:center;gap:7px;margin-top:12px;font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#2c2410;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#bd9a3e);border:none;border-radius:8px;padding:8px 13px;cursor:pointer}
+#dashboard-main .hero .hkpi-btn svg{width:13px;height:13px;stroke:#2c2410;fill:none;stroke-width:2}
+/* -- Shared-Passes-Host (F3-Loader) bekommt Panel-Optik -- */
+#dashboard-main #dp-shared-passes:empty{display:none}
 
-/* ════ Projektionstabelle ════ */
-.proj-scroll{overflow-x:auto;border-radius:var(--dp-radius);border:1px solid var(--dp-line);margin-bottom:22px;}
-.proj-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--dp-surface);}
-.proj-table th,.proj-table td{padding:7px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--dp-line);}
-.proj-table th{position:sticky;top:0;background:var(--dp-surface2);font-weight:600;color:var(--dp-muted);font-size:11px;letter-spacing:.3px;}
-.proj-table td:first-child,.proj-table th:first-child{text-align:left;font-weight:600;}
-.proj-table tr.milestone td{background:rgba(201,168,76,.06);}
-.proj-table td.pos{color:var(--dp-green);}
-.proj-table td.neg{color:var(--dp-red);}
-.proj-years{display:inline-flex;gap:4px;margin-left:auto;}
-.proj-years button{padding:5px 11px;border-radius:999px;border:1px solid var(--dp-line);background:var(--dp-surface);
-  color:var(--dp-muted);font-size:11.5px;font-weight:600;cursor:pointer;}
-.proj-years button.active{background:var(--dp-gold);color:#0B0906;border-color:transparent;}
+/* -- proj-years: setProjYears toggelt .active (Demo nutzt .on) -- */
+#dashboard-main .ph .yrs button.active{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#bd9a3e);color:#2c2410;border-color:transparent;font-weight:700}
+/* -- view-switch (Kanban/Karten) entfaellt im Vollport, ScoreTier-Farben sicherstellen -- */
+#dashboard-main .kc.tg{--tier:var(--c-green)}#dashboard-main .kc.ty{--tier:var(--c-accd)}#dashboard-main .kc.tr{--tier:var(--c-red)}
 
-/* ════ Kanban + Karten ════ */
-.dp-view-switch{display:inline-flex;gap:4px;margin-left:auto;}
-.dp-view-switch button{padding:6px 14px;border-radius:999px;border:1px solid var(--dp-line);background:var(--dp-surface);
-  color:var(--dp-muted);font-size:11.5px;font-weight:600;cursor:pointer;}
-.dp-view-switch button.active{background:var(--dp-gold);color:#0B0906;border-color:transparent;}
-.kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
-.kanban-col{background:var(--dp-surface2);border:1px solid var(--dp-line);border-radius:var(--dp-radius);padding:13px;}
-.kanban-col-head{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;margin-bottom:11px;padding-bottom:9px;border-bottom:1px solid var(--dp-line);}
-.kanban-col-head .kc-count{font-size:11px;color:var(--dp-muted);font-weight:600;background:rgba(201,168,76,.1);border-radius:999px;padding:2px 9px;}
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:22px;}
-.dp-obj-card{background:var(--dp-surface);border:1px solid var(--dp-line);border-radius:var(--dp-radius);overflow:hidden;transition:.18s;}
-.dp-obj-card:hover{border-color:var(--dp-lineHi);box-shadow:0 8px 24px rgba(201,168,76,.1);}
-.dp-obj-card .oc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 0;}
-.dp-obj-card .oc-badge{font-size:10px;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:6px;
-  background:rgba(201,168,76,.12);color:var(--dp-gold);}
-.dp-obj-card .oc-badge-won{background:rgba(63,165,108,.14);color:var(--dp-green);}
-.dp-obj-card .oc-badge-lost{background:rgba(184,98,80,.14);color:var(--dp-red);}
-.dp-obj-card .oc-score{font-size:15px;font-weight:700;font-family:'Space Grotesk',sans-serif;}
-.dp-obj-card .oc-body{padding:12px 14px;}
-.dp-obj-card .oc-name{font-size:13.5px;font-weight:600;color:var(--dp-ch);}
-.dp-obj-card .oc-ort{font-size:11.5px;color:var(--dp-muted);margin-top:1px;}
-.dp-obj-card .oc-kpis{display:flex;gap:14px;margin-top:9px;font-size:11.5px;}
-.dp-obj-card .oc-kpis b{font-family:'Space Grotesk',sans-serif;display:block;font-size:14px;color:var(--dp-ch);}
-.dp-obj-card .oc-kpis span{color:var(--dp-muted);}
-.pdf-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px;padding-top:11px;border-top:1px solid var(--dp-line);}
-.pdf-row button{flex:1;min-width:64px;font-size:10.5px;font-weight:600;padding:6px 4px;border-radius:8px;cursor:pointer;
-  border:1px solid var(--dp-line);background:var(--dp-surface2);color:var(--dp-muted);transition:.15s;}
-.pdf-row button:hover{border-color:var(--dp-gold);color:var(--dp-gold);}
-.oc-delete{width:100%;margin-top:5px;font-size:10.5px;font-weight:600;padding:6px;border-radius:8px;cursor:pointer;
-  border:1px solid rgba(184,98,80,.3);background:transparent;color:var(--dp-red);transition:.15s;}
-.oc-delete:hover{background:var(--dp-red-bg);}
 
-/* ════ Empty-State ════ */
-.dp-dash-empty{text-align:center;padding:70px 20px;color:var(--dp-muted);}
-.dp-dash-empty svg{width:48px;height:48px;color:var(--dp-gold);opacity:.6;margin-bottom:14px;}
-.dp-dash-empty h3{font-family:'Space Grotesk',sans-serif;font-size:18px;color:var(--dp-ch);margin-bottom:7px;}
-
-/* ════ Sidebar-Collapse (optionales Feature) ════ */
-.app-wrap.dp-sidebar-collapsed .sidebar{width:0!important;min-width:0!important;overflow:hidden!important;}
-.dp-sidebar-toggle{position:fixed;bottom:18px;left:14px;z-index:60;width:38px;height:38px;border-radius:50%;cursor:pointer;
-  border:1px solid var(--dp-line);background:var(--dp-surface);color:var(--dp-gold);display:none;align-items:center;justify-content:center;
-  box-shadow:0 4px 14px rgba(0,0,0,.12);transition:.18s;}
-#dashboard-main.dp-active ~ .dp-sidebar-toggle,
-body .dp-sidebar-toggle.dp-show{display:flex;}
-.dp-sidebar-toggle:hover{border-color:var(--dp-gold);}
-.dp-sidebar-toggle svg{width:17px;height:17px;transition:transform .25s;}
-.app-wrap.dp-sidebar-collapsed .dp-sidebar-toggle svg{transform:rotate(180deg);}
-
-/* ── Settings: Theme-Switch + Dashboard-Akkordeon-Icon ── */
-.dp-theme-switch{display:inline-flex;border:1px solid var(--dp-line,#E8E4DC);border-radius:999px;overflow:hidden;}
-.dp-theme-switch button{padding:7px 18px;border:0;background:transparent;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--dp-muted,#7A7370);}
-.dp-theme-switch button.active{background:#C9A84C;color:#0B0906;}
-
-/* ── Responsive ── */
-@media (max-width:760px){
-  #dashboard-main{padding:16px 14px 50px;}
-  .pscore-hero{flex-direction:column;text-align:center;}
-  .dp-status-row{grid-template-columns:1fr;}
-  .kanban{grid-template-columns:1fr;}
+/* ================================================================
+   v750b - Farb-Aliase: --dp-* auf die Vollport-Palette (--c-*) mappen,
+   damit tierOf()/catBarColor()/renderHealth() (var(--dp-...)) Farben zeigen.
+   ================================================================ */
+#dashboard-main{
+  --dp-green:#3FA56C; --dp-gold:#C9A84C; --dp-red:#B86250; --dp-muted:#9a948a;
+  --dp-card-ch:#ece7dd; --dp-green-bg:rgba(63,165,108,.14); --dp-red-bg:rgba(184,98,80,.14);
 }
 
 
-/* ════════════════════════════════════════════════════════════════
-   v452.1 OPTIK-HÄRTUNG — Premium schwarze Cards im Hellmodus
-   durchsetzen (App-globale .kpi/.health-box-Styles haben Spezifitaet).
-   ID-Prefix #dashboard-main + !important. Append-only.
-   ════════════════════════════════════════════════════════════════ */
-#dashboard-main .dp-card-dark{
-  background:#0B0906 !important;
-  color:#F2ECDC !important;
-  border:1px solid rgba(201,168,76,.22) !important;
-  box-shadow:0 0 0 1px rgba(201,168,76,.18),0 12px 40px rgba(0,0,0,.30) !important;
-}
-#dashboard-main .pscore-hero,
-#dashboard-main .health-strip{ background:#0B0906 !important; }
-#dashboard-main .pscore-hero *,
-#dashboard-main .health-strip .health-l,
-#dashboard-main .health-strip .health-sub{ color:#F2ECDC; }
-#dashboard-main .pscore-title,
-#dashboard-main .pscore-val{ color:inherit; }
-#dashboard-main .pscore-headline,
-#dashboard-main .pscore-max,
-#dashboard-main .pscore-cat-l{ color:rgba(232,226,212,.6) !important; }
-
-/* KPI-Cards (5 Kategorien) — schwarz, helle Schrift, Gold-Glow */
-#dashboard-main .kpi.dp-card-dark{
-  background:#0B0906 !important;
-  border:1px solid rgba(201,168,76,.22) !important;
-}
-#dashboard-main .kpi .kpi-l{ color:rgba(232,226,212,.6) !important; }
-#dashboard-main .kpi .kpi-v{ /* Tier-Farbe inline gesetzt, nicht ueberschreiben */ }
-#dashboard-main .kpi .kpi-sub{ color:rgba(232,226,212,.5) !important; }
-#dashboard-main .kpi .kpi-ico{ color:#C9A84C !important; }
-
-/* Health-Boxen innerhalb der schwarzen Strip */
-#dashboard-main .health-strip .health-box{
-  background:rgba(201,168,76,.06) !important;
-  border:1px solid rgba(201,168,76,.16) !important;
-}
-#dashboard-main .health-strip .health-box.warn{
-  background:rgba(184,98,80,.14) !important;
-  border-color:rgba(184,98,80,.4) !important;
-}
-
-/* Header-Titel Goldverlauf garantiert sichtbar */
-#dashboard-main .dp-dash-title{
-  background:linear-gradient(90deg,#A78B36,#C9A84C) !important;
-  -webkit-background-clip:text !important; background-clip:text !important;
-  -webkit-text-fill-color:transparent !important;
-}
-
-/* Charts/Tabelle/Status bleiben helle App-Cards (Kontrast zum schwarzen Block) */
-#dashboard-main .chart-card,
-#dashboard-main .dp-status-tile,
-#dashboard-main .proj-scroll{ background:#FFFFFF !important; }
-body.dp-theme-dark #dashboard-main .chart-card,
-body.dp-theme-dark #dashboard-main .dp-status-tile,
-body.dp-theme-dark #dashboard-main .proj-scroll,
-body.dp-theme-dark #dashboard-main .proj-table{ background:#050505 !important; }
-
-
-/* ════ v452.3 Karten-Redesign (wie Sidebar-Objektkarten) ════ */
-/* Kanban-Karte: flach, kompakt (nach Mockup .kcard) */
-.dp-kanban-card{background:var(--dp-surface);border:1px solid var(--dp-line);border-radius:10px;
-  padding:9px 11px;margin-bottom:9px;border-left:3px solid var(--dp-line);}
-.dp-kanban-card:last-child{margin-bottom:0;}
-.dp-kanban-card.kc-won{border-left-color:var(--dp-green);}
-.dp-kanban-card.kc-lost{border-left-color:var(--dp-red);}
-.dp-kanban-card.kc-pruef{border-left-color:var(--dp-gold);}
-.dp-kanban-card .kc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-.dp-kanban-card .kc-name{font-size:12.5px;font-weight:600;color:var(--dp-ch);line-height:1.2;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.dp-kanban-card .kc-pill{flex-shrink:0;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;
-  border:1px solid;border-radius:6px;padding:1px 7px;}
-.dp-kanban-card .kc-meta{display:flex;gap:9px;font-size:10.5px;color:var(--dp-muted);margin-top:3px;}
-.dp-kanban-card .kc-stat{font-size:10.5px;color:var(--dp-muted);margin-top:4px;}
-.dp-kanban-card .pdf-row-mini{margin-top:7px;gap:5px;}
-.dp-kanban-card .pdf-row-mini button{padding:5px 4px;font-size:10px;}
-.dp-kanban-card .kc-del{flex:0 0 auto!important;width:28px;color:var(--dp-red);border-color:rgba(184,98,80,.3);}
-.dp-kanban-card .kc-del:hover{background:var(--dp-red-bg);border-color:var(--dp-red);color:var(--dp-red);}
-
-/* Karten-View: wie Sidebar sb-card mit Thumb + Score-Ring */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:13px;margin-bottom:22px;}
-.dp-obj-card{background:var(--dp-surface);border:1px solid var(--dp-line);border-radius:var(--dp-radius);
-  padding:13px 14px;transition:.18s;}
-.dp-obj-card:hover{border-color:var(--dp-lineHi);box-shadow:0 6px 20px rgba(201,168,76,.1);}
-.dp-obj-card .oc-row{display:flex;align-items:center;gap:11px;}
-.dp-obj-card .oc-thumb{width:48px;height:48px;flex-shrink:0;border-radius:10px;background-size:cover;background-position:center;
-  background-color:var(--dp-surface2);}
-.dp-obj-card .oc-thumb-empty{display:flex;align-items:center;justify-content:center;color:var(--dp-gold);
-  background:rgba(201,168,76,.08);}
-.dp-obj-card .oc-thumb-empty svg{width:22px;height:22px;}
-.dp-obj-card .oc-main{flex:1;min-width:0;}
-.dp-obj-card .oc-name{font-size:13.5px;font-weight:600;color:var(--dp-ch);line-height:1.2;margin-top:3px;}
-.dp-obj-card .oc-ort{font-size:11.5px;color:var(--dp-muted);}
-.dp-obj-card .oc-ring{position:relative;width:42px;height:42px;flex-shrink:0;}
-.dp-obj-card .oc-ring svg{width:42px;height:42px;}
-.dp-obj-card .oc-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:currentColor;}
-.dp-obj-card .oc-kpis{display:flex;gap:14px;margin:11px 0;}
-.dp-obj-card .oc-kpis>div{flex:1;}
-.dp-obj-card .oc-kpis b{font-family:'Space Grotesk',sans-serif;display:block;font-size:14px;color:var(--dp-ch);}
-.dp-obj-card .oc-kpis span{font-size:10.5px;color:var(--dp-muted);}
-
-/* PDF-Row: nur noch 2 Buttons */
-.pdf-row{display:flex;gap:6px;margin-top:4px;}
-.pdf-row button{flex:1;font-size:10.5px;font-weight:600;padding:7px 4px;border-radius:8px;cursor:pointer;
-  border:1px solid var(--dp-line);background:var(--dp-surface2);color:var(--dp-muted);transition:.15s;}
-.pdf-row button:hover{border-color:var(--dp-gold);color:var(--dp-gold);}
-.oc-delete{width:100%;margin-top:6px;font-size:10.5px;font-weight:600;padding:6px;border-radius:8px;cursor:pointer;
-  border:1px solid rgba(184,98,80,.3);background:transparent;color:var(--dp-red);transition:.15s;}
-.oc-delete:hover{background:var(--dp-red-bg);}
-
-/* Vollbreite: Dashboard nutzt echten Platz wenn Sidebar weg.
-   DOM-Diagnose v452.4: app-wrap=1303px aber main-col bleibt 923px ->
-   main-col ist flex-begrenzt. flex + max-width + width adressieren. */
-.app-wrap.dp-sidebar-collapsed .main-col{
-  flex:1 1 100%!important;
-  max-width:100%!important;
-  width:100%!important;
-  margin-left:0!important;
-}
-.app-wrap.dp-sidebar-collapsed #dashboard-main{ max-width:100%!important; width:100%!important; }
-
-
-/* ════ v452.7: 3-Button PDF-Row (Investment/Bank/Werbungskosten) ════ */
-.pdf-row-3{display:grid !important;grid-template-columns:repeat(3,1fr);gap:6px;}
-.pdf-row-3 button{font-size:10px;padding:7px 3px;}
-.pdf-row-mini{display:grid !important;grid-template-columns:1fr 1fr 1fr auto;gap:4px;}
-.pdf-row-mini button{font-size:9.5px;padding:5px 3px;}
-.pdf-row-mini .kc-del{width:26px;}
-
-
-/* ════════════════════════════════════════════════════════════
-   v452.9 — Mockup-Optik (Bild 3 "Portfolio-Cockpit") + Partikel auf Karten
-   ════════════════════════════════════════════════════════════ */
-
-/* Partikel/Orbs dezent durch die Karten schimmern — aber Karten bleiben SATT
-   (v452.10: 0.72 war zu milchig/aufgehellt). Fast opak + minimaler Blur. */
-#dashboard-main .dp-card-dark,
-#dashboard-main .kpi,
-#dashboard-main .health-strip,
-#dashboard-main .chart-card{
-  background:rgba(11,9,6,0.94) !important;
-  backdrop-filter:blur(2px);
-  -webkit-backdrop-filter:blur(2px);
-}
-#dashboard-main .health-box{ background:rgba(201,168,76,0.06); }
-
-/* Score-abhaengiger Glow am Hero (gold=solide, gruen=gut/top) */
-.pscore-hero{ box-shadow:0 0 0 1px rgba(201,168,76,.14), 0 18px 50px rgba(0,0,0,.35); }
-.pscore-hero.tier-gut, .pscore-hero.tier-top{ box-shadow:0 0 0 1px rgba(63,165,108,.22), 0 18px 50px rgba(0,0,0,.35), 0 0 60px rgba(63,165,108,.10); }
-
-/* ── KPI-Kacheln im Mockup-Stil: Mini-Sparkline + Glow ── */
-.kpi{ position:relative; overflow:hidden; }
-.kpi .kpi-sub-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:6px 0 10px; min-height:20px; }
-.kpi .kpi-spark{ width:60px; height:18px; flex-shrink:0; opacity:.9; }
-.kpi .kpi-spark polyline{ fill:none; }
-.kpi.tier-top, .kpi.tier-gut{ box-shadow:inset 0 0 0 1px rgba(63,165,108,.18), 0 0 30px rgba(63,165,108,.06); }
-.kpi.tier-top .kpi-v, .kpi.tier-gut .kpi-v{ text-shadow:0 0 18px rgba(63,165,108,.25); }
-.kpi-kpicount{ font-size:10px; color:var(--dp-card-muted); margin-top:4px; }
-
-/* ── Untere Detail-Kacheln (Health) im Mockup-Stil: kleiner, mit Akzentrand ── */
-.health-box{ transition:.16s; }
-.health-box:hover{ border-color:rgba(201,168,76,.35); transform:translateY(-1px); }
-
-/* Score-Donut-Glow (gruen wenn gut) — der echte Arc bekommt drop-shadow */
-#dp-arc{ filter:drop-shadow(0 0 6px currentColor); }
-
-/* Etwas mehr Leben: dezenter Schimmer ueber Karten beim Hover */
-#dashboard-main .kpi::after,
-#dashboard-main .chart-card::after{
-  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-  background:radial-gradient(120px 80px at var(--mx,50%) var(--my,0%),rgba(201,168,76,.06),transparent 70%);
-  opacity:0; transition:opacity .25s;
-}
-#dashboard-main .kpi:hover::after,
-#dashboard-main .chart-card:hover::after{ opacity:1; }
-
-
-/* ════════════════════════════════════════════════════════════
-   v452.11 — CIP-Optik: reines Schwarz (kein Braun), Partikel sichtbar,
-   gruener Score-Glow, Leerraum weg, Charts hell im Hellmodus.
-   ════════════════════════════════════════════════════════════ */
-
-/* 1) BRAUN -> SCHWARZ. #0B0906 hat Rotstich -> neutrales Tiefschwarz.
-   Karten mit dezentem Verlauf wie im CIP (oben minimal heller). */
-#dashboard-main .dp-card-dark,
-#dashboard-main .kpi,
-#dashboard-main .health-strip,
-#dashboard-main .chart-card,
-#dashboard-main .pscore-hero{
-  background:linear-gradient(165deg,rgba(20,20,24,0.96),rgba(8,8,10,0.97)) !important;
-  border:1px solid rgba(255,255,255,0.06) !important;
-  backdrop-filter:blur(1px);
-}
-
-/* 2) PARTIKEL deutlich sichtbar: Canvas heller, Orbs kraeftiger, und die
-   Karten lassen an den Raendern etwas durch (innerer Glow statt Vollfarbe). */
-#dp-dash-bgfx{ z-index:0 !important; }
-#dp-dash-bgfx canvas{ opacity:0.9 !important; mix-blend-mode:screen; }
-#dp-dash-bgfx .dp-orb{ opacity:0.8 !important; }
-/* Subtiler innerer Schein in den Karten (wie CIP-Glow) */
-#dashboard-main .kpi, #dashboard-main .pscore-hero, #dashboard-main .chart-card{
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 30px rgba(0,0,0,0.45) !important;
-}
-
-/* 3) GRUENER Score-Glow (CIP: 76 ist gruen). tier-gut/tier-top -> gruen. */
-.pscore-hero.tier-gut, .pscore-hero.tier-top{
-  box-shadow:inset 0 1px 0 rgba(63,165,108,0.10), 0 0 70px rgba(63,165,108,0.14), 0 10px 30px rgba(0,0,0,0.5) !important;
-}
-.kpi.tier-gut, .kpi.tier-top{
-  box-shadow:inset 0 0 0 1px rgba(63,165,108,0.22), 0 0 26px rgba(63,165,108,0.10) !important;
-}
-
-/* 4) LEERRAUM oben: echte Ursache (leeres .body-Element, 90px) wird per JS
-   ausgeblendet (v452.12). Hier nur minimales Padding. */
-#dashboard-main.dp-active{ padding-top:8px !important; }
-#dashboard-main .dp-dash-header{ margin-top:0 !important; padding-top:0 !important; }
-
-/* 5) CHARTS im HELLMODUS hell (nicht zwangsweise dunkel). Nur im Dark-Mode dunkel. */
-body:not(.dp-theme-dark) #dashboard-main .chart-card{
-  background:linear-gradient(165deg,#FFFFFF,#FBFAF8) !important;
-  border:1px solid #E8E4DC !important;
-}
-body:not(.dp-theme-dark) #dashboard-main .chart-card .chart-card-t{ color:#2A2727; }
-body:not(.dp-theme-dark) #dashboard-main .chart-card .chart-card-s{ color:#7A7370; }
-
-
-/* ════════════════════════════════════════════════════════════════════
-   v452.13 — FINALE OPTIK 1:1 aus dem Handoff-Mockup (dashboard-final.html)
-   Ueberschreibt alle vorherigen Optik-Versuche. Exakte Werte aus dem ZIP.
-   ════════════════════════════════════════════════════════════════════ */
-
-/* Reines Schwarz (Mockup --surface:#050505), KEIN Braunstich (#0B0906 raus) */
-body.dp-theme-dark #dashboard-main{
-  --dp-card-bg:#050505;
-  background:#000000;
-}
-/* DARK: Karten = reines Schwarz mit goldenem Hauch-Rand + dezentem Glow (Mockup) */
-body.dp-theme-dark #dashboard-main .dp-card-dark,
-body.dp-theme-dark #dashboard-main .kpi,
-body.dp-theme-dark #dashboard-main .health-strip,
-body.dp-theme-dark #dashboard-main .chart-card{
-  background:#050505 !important;
-  border:1px solid rgba(201,168,76,0.22) !important;
-  box-shadow:inset 0 1px 0 rgba(201,168,76,.06), 0 12px 32px rgba(0,0,0,.7) !important;
-  backdrop-filter:none !important;
-}
-/* Score-Hero (Mockup): goldener Rand, pulsierender Glow rechts oben */
-body.dp-theme-dark #dashboard-main .pscore-hero{
-  background:#050505 !important;
-  border:1px solid rgba(201,168,76,0.30) !important;
-}
-#dashboard-main .pscore-hero::before{
-  content:'';position:absolute;right:-60px;top:-60px;width:280px;height:280px;border-radius:50%;
-  background:radial-gradient(circle,var(--dp-gold-glow),transparent 70%);opacity:.45;pointer-events:none;
-  animation:dpPulseGlow 6s ease-in-out infinite;z-index:0;
-}
-#dashboard-main .pscore-hero{ position:relative; overflow:hidden; }
-#dashboard-main .pscore-hero > *{ position:relative; z-index:1; }
-@keyframes dpPulseGlow{0%,100%{opacity:.30;transform:scale(1)}50%{opacity:.55;transform:scale(1.10)}}
-
-/* KPI-Karten EXAKT wie Mockup: min-height, Glow auf Wert + Tier-Badge, Hover-Lift */
-#dashboard-main .kpi{ min-height:118px; transition:transform .16s,box-shadow .16s,border-color .16s; }
-#dashboard-main .kpi:hover{ transform:translateY(-2px);
-  box-shadow:0 0 0 1px rgba(201,168,76,.45), 0 12px 32px rgba(0,0,0,.7), 0 0 28px rgba(201,168,76,.18) !important; }
-#dashboard-main .kpi-v{ text-shadow:0 0 8px currentColor, 0 0 16px currentColor; }
-#dashboard-main .kpi-tier{ box-shadow:0 0 8px currentColor; text-shadow:0 0 6px currentColor; }
-/* Score-Hero-Wert leuchtet (Mockup text-shadow) */
-#dashboard-main .pscore-val{ text-shadow:0 0 28px currentColor, 0 0 50px currentColor; }
-
-/* HEALTH-Boxen EXAKT wie Mockup: reines Schwarz, gruener Leuchtstreifen links,
-   gruene Werte (statt gold/weiss) */
-body.dp-theme-dark #dashboard-main .health-box{
-  background:#050505 !important; border:1px solid rgba(201,168,76,0.18) !important;
-  position:relative; overflow:hidden;
-}
-#dashboard-main .health-box::after{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:var(--dp-green);box-shadow:0 0 6px rgba(63,165,108,.5);
-}
-#dashboard-main .health-box.warn::after{ background:var(--dp-red);box-shadow:0 0 6px rgba(184,98,80,.5); }
-#dashboard-main .health-v{ color:var(--dp-green); }
-#dashboard-main .health-box.warn .health-v{ color:var(--dp-red); }
-
-/* Partikel/Orbs: sichtbar im Hintergrund, NICHT durch Karten (Karten sind opak).
-   Mockup hat Orbs + statisches Sternenfeld hinter den opaken Karten. */
-#dp-dash-bgfx{ z-index:0 !important; }
-#dp-dash-bgfx canvas{ opacity:0.85 !important; mix-blend-mode:normal !important; }
-#dp-dash-bgfx .dp-orb{ opacity:0.6 !important; }
-
-/* Score-Ring Glow (Mockup) */
-#dp-arc{ filter:drop-shadow(0 0 10px currentColor); }
-
-/* LIGHT-Mode: Charts + Karten hell (unveraendert sinnvoll) */
-body:not(.dp-theme-dark) #dashboard-main .chart-card{
-  background:linear-gradient(165deg,#FFFFFF,#FBFAF8) !important; border:1px solid #E8E4DC !important;
-}
-
-
-/* ════════════════════════════════════════════════════════════════════
-   v452.15 — untere Health-Kacheln EXAKT nach Mockup-Massen (kompakter)
-   ════════════════════════════════════════════════════════════════════ */
-/* Mockup: 12 Kacheln -> auto-fit mit kleinerer Mindestbreite, kompaktes Padding */
-#dashboard-main .health-strip{
-  grid-template-columns:repeat(auto-fit,minmax(118px,1fr)) !important;
-  gap:10px !important; padding:14px 16px !important;
-}
-#dashboard-main .health-box{
-  border-radius:11px !important; padding:11px 12px !important;
-}
-#dashboard-main .health-box .health-l{
-  font-size:9.5px !important; margin-bottom:5px !important; letter-spacing:.02em;
-  line-height:1.3 !important; min-height:24px; text-transform:none !important; font-weight:600 !important;
-}
-#dashboard-main .health-box .health-v{
-  font-size:17px !important; font-weight:800 !important; line-height:1 !important;
-  font-variant-numeric:tabular-nums;
-}
-#dashboard-main .health-box .health-sub{
-  font-size:9px !important; margin-top:3px !important;
-}
-#dashboard-main .health-box .health-i{ width:11px; height:11px; font-size:8px; }
-
-
-/* ====================================================================
-   v453 - Score-Hero + KPI Optik 1:1 nach Mockup v22 (dashboard-mock-v22)
-   Append-only. Exakte Werte aus dem Mockup. Ueberschreibt v452.x.
-   ==================================================================== */
-
-/* -- Score-Hero Container: Grid auto/1fr, Mockup-Padding -- */
-#dashboard-main .pscore-hero{
-  display:grid !important; grid-template-columns:auto 1fr !important;
-  gap:32px !important; align-items:center !important;
-  padding:28px 32px !important; margin-bottom:26px !important;
-}
-
-/* -- Titel-Hierarchie FLIP: Label klein/uppercase, Headline gross/Gradient -- */
-#dashboard-main .pscore-titlebar{ gap:12px !important; margin-bottom:4px !important; }
-#dashboard-main .pscore-title{
-  font-family:'Inter',-apple-system,sans-serif !important;
-  font-size:12px !important; font-weight:700 !important;
-  letter-spacing:.06em !important; text-transform:uppercase !important;
-  opacity:.85; gap:6px !important;
-}
-#dashboard-main .pscore-title svg{ width:13px !important; height:13px !important; color:var(--dp-gold-2) !important; }
-
-#dashboard-main .pscore-headline{
-  font-size:22px !important; font-weight:700 !important; line-height:1.2 !important;
-  letter-spacing:-.01em; margin-bottom:16px !important; padding-bottom:3px;
-  background:linear-gradient(90deg,var(--dp-card-ch),var(--dp-gold-2)) !important;
-  -webkit-background-clip:text !important; background-clip:text !important;
-  -webkit-text-fill-color:transparent !important; color:transparent !important;
-}
-/* Zaehler-Suffix in der Headline: klein + dezent, nicht Teil des grossen Gradients */
-#dashboard-main .pscore-headline .pscore-hl-meta{
-  font-size:12.5px !important; font-weight:600 !important; letter-spacing:0;
-  background:none !important; -webkit-text-fill-color:var(--dp-card-muted) !important;
-  color:var(--dp-card-muted) !important;
-}
-
-/* -- Plan-Pill (Stern INVESTOR) wie Mockup -- */
-#dashboard-main .pscore-pill{
-  display:inline-flex; align-items:center; gap:4px;
-  font-size:9.5px !important; font-weight:700 !important; letter-spacing:.08em !important;
-  padding:2px 9px !important; margin-bottom:9px !important;
-  color:var(--dp-gold-2) !important; border:1px solid var(--dp-gold-dk) !important;
-  background:rgba(201,168,76,.06) !important; border-radius:99px;
-}
-
-/* -- Tier-Pille ("Gut" etc.) als farbige Plakette (Mockup) -- */
-#dashboard-main .pscore-tier{
-  padding:2px 10px !important; border-radius:99px;
-  font-size:11px !important; font-weight:700 !important; gap:5px !important;
-}
-#dashboard-main .pscore-tier.tier-top,
-#dashboard-main .pscore-tier.tier-hi{
-  background:rgba(63,165,108,.16) !important; color:#3FA56C !important; border:1px solid #3FA56C !important;
-}
-#dashboard-main .pscore-tier.tier-mid{
-  background:rgba(201,168,76,.14) !important; color:#C9A84C !important; border:1px solid #C9A84C !important;
-}
-#dashboard-main .pscore-tier.tier-lo{
-  background:rgba(184,98,80,.14) !important; color:#B86250 !important; border:1px solid #B86250 !important;
-}
-
-/* -- Kategorie-Balken: feste 5 Spalten, kraeftigerer Wert, Glow am Fill -- */
-#dashboard-main .pscore-cats.slim{
-  grid-template-columns:repeat(5,1fr) !important; gap:14px !important; margin-top:4px !important;
-}
-@media(max-width:680px){ #dashboard-main .pscore-cats.slim{ grid-template-columns:repeat(2,1fr) !important; } }
-#dashboard-main .pscore-cat.slim .pscore-cat-head{ margin-bottom:5px !important; }
-#dashboard-main .pscore-cat.slim .pscore-cat-l{ font-size:11px !important; }
-#dashboard-main .pscore-cat.slim .pscore-cat-v{ font-size:14px !important; font-weight:800 !important; }
-#dashboard-main .pscore-bar{ height:5px !important; background:rgba(201,168,76,.10) !important; }
-#dashboard-main .pscore-bar-fill{ box-shadow:0 0 6px rgba(201,168,76,.35); }
-
-/* -- Actions + KI-Rat -- */
-#dashboard-main .pscore-actions{ gap:14px !important; margin-top:16px !important; }
-#dashboard-main .pscore-kirat{ font-size:12px !important; font-weight:700 !important; }
-
-/* ==== KPI-Kacheln Feinschliff nach Mockup ==== */
-#dashboard-main .kpi{ padding:13px 14px 14px !important; }
-#dashboard-main .kpi .kpi-l{
-  font-size:10.5px !important; font-weight:700 !important; letter-spacing:.06em !important;
-  text-transform:uppercase; opacity:.8; color:var(--dp-card-ch) !important;
-}
-#dashboard-main .kpi .kpi-ico{ width:15px !important; height:15px !important; }
-#dashboard-main .kpi .kpi-v{ font-weight:800 !important; }
-#dashboard-main .kpi .kpi-tier{
-  font-size:9px !important; font-weight:800 !important; letter-spacing:.10em !important;
-  padding:2px 8px !important; background:rgba(255,255,255,.02);
-}
-#dashboard-main .kpi .kpi-sub{ font-size:10px !important; }
-#dashboard-main .kpi .kpi-prog{ height:3px !important; }
-
-
-/* ════════════════════════════════════════════════════════════════════
-   v454 - Portfolio-Cockpit: tiefes Schwarz + Sternenfeld, Header, Plan-Gate,
-   Score-Detail-Modal, Effekt stark, Hero-Hoehe. Append-only, exakte Mockup-Werte.
-   ════════════════════════════════════════════════════════════════════ */
-
-/* -- 1) Header wie Mockup: 28px/700, Gradient ch->gold-2 (NICHT Cormorant) -- */
-#dashboard-main .dp-dash-title{
-  font-family:'Space Grotesk','Inter',-apple-system,sans-serif !important;
-  font-size:28px !important; font-weight:700 !important; letter-spacing:-.02em !important;
-  line-height:1.15 !important; padding-bottom:4px;
-  background:linear-gradient(90deg,var(--dp-ch),var(--dp-gold-2)) !important;
-  -webkit-background-clip:text !important; background-clip:text !important;
-  -webkit-text-fill-color:transparent !important; color:transparent !important;
-}
-#dashboard-main .dp-dash-sub{ font-size:12.5px !important; }
-
-/* -- 2) TIEFES SCHWARZ + Sternenfeld-Pattern auf den Premium-Cards (BEIDE Modi).
-       Ueberschreibt den grauen v452.11-Verlauf (rgba(20,20,24)) per !important. -- */
-#dashboard-main .dp-card-dark,
-#dashboard-main .pscore-hero,
-#dashboard-main .kpi,
-#dashboard-main .health-strip,
-#dashboard-main .health-box{
-  background-color:#050505 !important;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><circle cx='25' cy='40' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='90' cy='15' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='150' cy='70' r='.8' fill='%23C9A84C' opacity='.40'/><circle cx='60' cy='110' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='130' cy='140' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='40' cy='165' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='170' cy='30' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='15' cy='95' r='.55' fill='%23C9A84C' opacity='.28'/></svg>"),
-    linear-gradient(180deg,rgba(201,168,76,.05),rgba(201,168,76,0) 25%),
-    linear-gradient(180deg,#0a0805,#000 65%) !important;
-  background-size:180px 180px, auto, auto !important;
-  background-repeat:repeat, no-repeat, no-repeat !important;
-  border:1px solid rgba(201,168,76,0.20) !important;
-  backdrop-filter:none !important;
-}
-/* health-box behaelt kompaktes Padding (v452.15), nur Hintergrund tiefschwarz + Pattern */
-
-/* -- 3) Effekt STARK: Orbs + Partikel deutlich sichtbar -- */
-#dp-dash-bgfx{ z-index:0 !important; }
-#dp-dash-bgfx .dp-orb{ opacity:1 !important; }
-#dp-dash-bgfx .dp-orb.o1{ animation-duration:13s !important; }
-#dp-dash-bgfx .dp-orb.o2{ animation-duration:15s !important; }
-#dp-dash-bgfx .dp-orb.o3{ animation-duration:11s !important; }
-#dp-dash-bgfx canvas#dp-particles{ opacity:1 !important; mix-blend-mode:screen; }
-
-/* -- 4) Hero-Hoehe: kompakt, Inhalt zentriert (killt evtl. globale min-height) -- */
-#dashboard-main .pscore-hero{ min-height:0 !important; align-items:center !important; }
-
-/* -- 5) Health-Lock-Hinweis (Starter-Plan) -- */
-#dashboard-main .health-lock{
-  display:flex; align-items:center; gap:9px; grid-column:1/-1;
-  background:rgba(201,168,76,.05) !important; border:1px dashed var(--dp-gold-dk) !important;
-  border-radius:12px; padding:14px 18px; color:var(--dp-card-muted);
-  font-size:12.5px; font-weight:600; background-image:none !important;
-}
-#dashboard-main .health-lock svg{ width:16px; height:16px; color:var(--dp-gold); flex-shrink:0; }
-
-/* -- 6) Score-Detail-Modal: Kategorien + welche KPIs einfliessen -- */
-.dp-sd-cat{ border-top:1px solid rgba(201,168,76,.14); padding:11px 0 9px; }
-.dp-sd-cat:first-of-type{ border-top:none; }
-.dp-sd-cat-head{ display:flex; justify-content:space-between; align-items:center;
-  font-size:13px; font-weight:700; color:#F2ECDC; margin-bottom:6px; }
-.dp-sd-kpis{ display:flex; flex-wrap:wrap; gap:6px; }
-.dp-sd-kpi{ font-size:11px; color:rgba(232,226,212,.78); background:rgba(201,168,76,.08);
-  border:1px solid rgba(201,168,76,.18); border-radius:7px; padding:3px 8px; }
-.dp-sd-kpi.dim{ color:rgba(232,226,212,.5); background:transparent; border-style:dashed; }
-
-/* -- 7) Details-/Lock-Button Feinschliff -- */
-#dashboard-main .pscore-details{ margin-top:2px; }
-#dashboard-main .pscore-details.locked{ border-style:dashed; cursor:pointer; }
-
-
-/* ════════════════════════════════════════════════════════════════════
-   v455 - Hero-Hoehe (kompakt) + Score-Detail-Modal mit Gewicht/Score/Balken
-   ════════════════════════════════════════════════════════════════════ */
-
-/* -- Hero-Hoehe: deckt min-height-, height- UND Parent-Stretch-Ursache ab.
-   align-self:start verhindert, dass ein Grid/Flex-Parent den Hero streckt. -- */
-#dashboard-main .pscore-hero{
-  min-height:0 !important; height:auto !important;
-  align-self:start !important; align-items:center !important;
-}
-#dashboard-main .pscore-gauge{ align-self:center !important; }
-
-/* -- Score-Detail-Modal: Header + Gewicht-Badge + Kategorie-Balken -- */
-.dp-sd-modal .dp-sd-total{ font-size:12.5px; color:rgba(232,226,212,.8); margin:2px 0 16px; line-height:1.5; }
-.dp-sd-cat-score{ font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:800; }
-.dp-sd-cat-head span:first-child{ font-family:'Space Grotesk',sans-serif; }
-.dp-sd-weight{ font-family:'Inter',sans-serif; font-size:10.5px; font-weight:600; color:var(--dp-gold);
-  background:rgba(201,168,76,.10); border:1px solid rgba(201,168,76,.22); border-radius:6px; padding:1px 6px; margin-left:4px; }
-.dp-sd-bar{ height:5px; border-radius:3px; background:rgba(201,168,76,.10); overflow:hidden; margin:7px 0 9px; }
-.dp-sd-bar-fill{ height:100%; border-radius:3px; box-shadow:0 0 6px rgba(201,168,76,.35);
-  transition:width .9s cubic-bezier(.2,.8,.2,1); }
-
-
-/* ════════════════════════════════════════════════════════════════════
-   v456 - Portfolio-Uebersicht-Leiste (Bestands-Hardfacts)
-   ════════════════════════════════════════════════════════════════════ */
-
-/* Strip-Container: gleiche Premium-Optik (tiefes Schwarz + Sternenfeld) wie Health */
-#dashboard-main .overview-strip{
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:11px; padding:16px 18px; margin-bottom:18px; border-radius:var(--dp-radius);
-  background-color:#050505 !important;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><circle cx='25' cy='40' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='90' cy='15' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='150' cy='70' r='.8' fill='%23C9A84C' opacity='.40'/><circle cx='60' cy='110' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='130' cy='140' r='.7' fill='%23C9A84C' opacity='.35'/><circle cx='40' cy='165' r='.5' fill='%23C9A84C' opacity='.25'/><circle cx='170' cy='30' r='.6' fill='%23C9A84C' opacity='.30'/><circle cx='15' cy='95' r='.55' fill='%23C9A84C' opacity='.28'/></svg>"),
-    linear-gradient(180deg,rgba(201,168,76,.05),rgba(201,168,76,0) 25%),
-    linear-gradient(180deg,#0a0805,#000 65%) !important;
-  background-size:180px 180px, auto, auto !important;
-  border:1px solid rgba(201,168,76,0.20) !important;
-}
-
-/* Einzel-Kachel: Icon + Label oben, grosser Wert, Sub. Gold-Akzentstreifen links. */
-#dashboard-main .ov-card{
-  position:relative; padding:12px 13px 11px; border-radius:11px; overflow:hidden;
-  background:rgba(201,168,76,.05); border:1px solid rgba(201,168,76,.16);
-  transition:transform .16s, border-color .16s, box-shadow .16s;
-}
-#dashboard-main .ov-card::after{
-  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-  background:var(--dp-gold); box-shadow:0 0 6px rgba(201,168,76,.45);
-}
-#dashboard-main .ov-card:hover{ transform:translateY(-1px); border-color:rgba(201,168,76,.35);
-  box-shadow:0 6px 18px rgba(0,0,0,.4); }
-#dashboard-main .ov-top{ display:flex; align-items:center; gap:6px; margin-bottom:7px; }
-#dashboard-main .ov-ico{ width:13px; height:13px; color:var(--dp-gold); opacity:.85; flex-shrink:0; }
-#dashboard-main .ov-l{ font-size:9.5px; font-weight:600; letter-spacing:.02em; line-height:1.2;
-  color:var(--dp-card-muted); text-transform:none; }
-#dashboard-main .ov-v{ font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:800;
-  line-height:1.05; font-variant-numeric:tabular-nums; text-shadow:0 0 10px currentColor; }
-#dashboard-main .ov-sub{ font-size:9px; color:var(--dp-card-muted); margin-top:3px; }
-
-
-/* ════════════════════════════════════════════════════════════════════
-   v457 - Hero zurueck auf FLEX (Hoehe kam mit der grid-Umstellung in v453)
-   + Score-Detail-Modal: KPI-Zeilen mit Gewicht
-   ════════════════════════════════════════════════════════════════════ */
-
-/* Hero: grid (v453/v455) wird durch flex ersetzt -> Hoehe = Inhalt (wie v452-Original) */
-#dashboard-main .pscore-hero{
-  display:flex !important; flex-direction:row !important; align-items:center !important;
-  gap:32px !important; min-height:0 !important; height:auto !important;
-}
-#dashboard-main .pscore-hero .pscore-gauge{ flex:0 0 auto !important; }
-#dashboard-main .pscore-hero .pscore-right{ flex:1 1 0 !important; min-width:0 !important; }
-@media (max-width:760px){ #dashboard-main .pscore-hero{ flex-direction:column !important; text-align:center; } }
-
-/* Score-Detail-Modal: KPI-Zeilen (Name + Gewicht statt Chips) */
-.dp-sd-klist{ display:flex; flex-direction:column; gap:1px; margin-top:3px; }
-.dp-sd-krow{ display:flex; align-items:center; justify-content:space-between; gap:10px;
-  padding:5px 0; border-top:1px solid rgba(201,168,76,.07); }
-.dp-sd-krow:first-child{ border-top:none; }
-.dp-sd-kn{ font-size:12px; color:rgba(232,226,212,.82); }
-.dp-sd-kw{ font-family:'Space Grotesk',sans-serif; font-size:11.5px; font-weight:700; color:var(--dp-gold);
-  background:rgba(201,168,76,.10); border:1px solid rgba(201,168,76,.20); border-radius:6px;
-  padding:1px 7px; flex-shrink:0; font-variant-numeric:tabular-nums; }
-.dp-sd-krow.dim{ color:rgba(232,226,212,.5); font-size:11px; }
-
-
-/* ════════════════════════════════════════════════════════════════════
-   v464 - Portfolio-Uebersicht: grosse Karten mit 2 Werten (Paare)
-   + bewegte Partikel im Hero (score-fx Layer, siehe .ds-fx in style.css)
-   ════════════════════════════════════════════════════════════════════ */
-
-/* Grid: grosse Karten wie die Kategorie-Karten (ca. 3 pro Reihe) */
-#dashboard-main .overview-strip{
-  grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)) !important;
-  gap:14px !important;
-}
-
-/* Paar-Karte: Titel oben, zwei Werte nebeneinander mit Trenner */
-#dashboard-main .ov-card.ov-pair-card{
-  padding:16px 20px !important;
-  min-height:112px;
-  display:flex; flex-direction:column; justify-content:center;
-}
-#dashboard-main .ov-card.ov-pair-card::after{ width:3px; }
-#dashboard-main .ov-card-title{
-  font-family:'Space Grotesk',sans-serif; font-size:10.5px; font-weight:700;
-  letter-spacing:.07em; text-transform:uppercase; color:var(--dp-gold);
-  margin-bottom:13px; opacity:.92;
-}
-#dashboard-main .ov-pair{ display:flex; gap:18px; align-items:flex-start; }
-#dashboard-main .ov-pair .ov-half{ flex:1 1 0; min-width:0; }
-#dashboard-main .ov-pair .ov-half + .ov-half{
-  border-left:1px solid rgba(201,168,76,.16); padding-left:18px;
-}
-#dashboard-main .ov-pair .ov-l{
-  display:block; font-size:11px; font-weight:600; line-height:1.25;
-  color:var(--dp-card-muted); margin-bottom:5px;
-}
-#dashboard-main .ov-pair .ov-v{
-  font-family:'Space Grotesk',sans-serif; font-size:23px; font-weight:800;
-  line-height:1.05; font-variant-numeric:tabular-nums; text-shadow:0 0 10px currentColor;
-}
-#dashboard-main .ov-pair .ov-sub{
-  display:block; font-size:10px; color:var(--dp-card-muted); margin-top:4px;
-}
-
-
-/* ════════════════════════════════════════════════════════════════════
-   v465 - Hero links + Uebersicht wie Kategorie-Karten + Modal-% lesbar
-   ════════════════════════════════════════════════════════════════════ */
-
-/* (a) HERO LINKSBUENDIG: rays/burst/Partikel-Layer wieder ABSOLUTE.
-   Ursache war '#dashboard-main .pscore-hero > *{position:relative}', das das
-   absolute dieser Layer ueberschrieb -> sie landeten im Flex-Fluss und
-   schoben den Gauge nach rechts (und machten den Hero hoch). */
-#dashboard-main .pscore-hero > .pscore-rays,
-#dashboard-main .pscore-hero > .pscore-burst,
-#dashboard-main .pscore-hero > .ds-fx{
-  position:absolute !important; z-index:0 !important;
-}
-#dashboard-main .pscore-hero{ justify-content:flex-start !important; }
-
-/* (b) UEBERSICHT: schwarzer Container-Hintergrund WEG (transparent),
-   die Karten selbst aber dunkel wie die Kategorie-Karten oben. */
-#dashboard-main .overview-strip.dp-card-dark,
-#dashboard-main .overview-strip{
-  background:none !important; background-color:transparent !important;
-  background-image:none !important; border:none !important;
-  padding:0 !important; margin-bottom:18px !important;
-}
-/* Karte = Kategorie-Karten-Optik: tiefes Schwarz + Sternenfeld + Goldrand */
-#dashboard-main .ov-card.ov-pair-card{
-  background-color:#050505 !important;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><circle cx='25' cy='40' r='.7' fill='%23C9A84C' opacity='.30'/><circle cx='90' cy='15' r='.5' fill='%23C9A84C' opacity='.22'/><circle cx='150' cy='70' r='.8' fill='%23C9A84C' opacity='.34'/><circle cx='60' cy='110' r='.6' fill='%23C9A84C' opacity='.26'/><circle cx='130' cy='140' r='.7' fill='%23C9A84C' opacity='.30'/><circle cx='40' cy='165' r='.5' fill='%23C9A84C' opacity='.22'/></svg>"),
-    linear-gradient(180deg,rgba(201,168,76,.05),rgba(201,168,76,0) 30%) !important;
-  background-size:180px 180px, auto !important;
-  background-repeat:repeat, no-repeat !important;
-  border:1px solid rgba(201,168,76,0.20) !important;
-  border-radius:14px !important;
-}
-/* linker Gold-Streifen der alten ov-card raus (Kategorie-Karten haben keinen) */
-#dashboard-main .ov-card.ov-pair-card::after{ display:none !important; }
-
-/* (c) MODAL: Prozent-Badges lesbar (heller Text, klarer Hintergrund) */
-.dp-sd-kw{
-  color:#F0D98A !important;
-  background:rgba(201,168,76,.20) !important;
-  border:1px solid rgba(201,168,76,.45) !important;
-}
-.dp-sd-weight{ color:#F0D98A !important; }
-
-
-/* ════════════════════════════════════════════════════════════════════
-   v466 - Uebersicht-Karten exakt wie Kategorie-Karten (Effekte) + Cashflow-Klick
-   ════════════════════════════════════════════════════════════════════ */
-#dashboard-main .ov-card.ov-pair-card{
-  min-height:118px !important;
-  border-radius:var(--dp-radius) !important;
-  transition:transform .16s, box-shadow .16s, border-color .16s !important;
-}
-#dashboard-main .ov-card.ov-pair-card:hover{
-  transform:translateY(-2px) !important;
-  box-shadow:0 0 0 1px rgba(201,168,76,.45), 0 12px 32px rgba(0,0,0,.7), 0 0 28px rgba(201,168,76,.18) !important;
-}
-/* Shimmer-Overlay wie bei .kpi (statt altem Gold-Streifen) */
-#dashboard-main .ov-card.ov-pair-card::after{
-  content:'' !important; display:block !important; position:absolute; inset:0;
-  border-radius:inherit; pointer-events:none; width:auto; background-clip:border-box;
-  background:radial-gradient(120px 80px at 50% 0%, rgba(201,168,76,.07), transparent 70%) !important;
-  box-shadow:none !important; opacity:0; transition:opacity .25s;
-}
-#dashboard-main .ov-card.ov-pair-card:hover::after{ opacity:1 !important; }
-
-/* Klickbare Cashflow-Karte */
-#dashboard-main .ov-card.ov-clickable{ cursor:pointer; }
-#dashboard-main .ov-card.ov-clickable:hover{ border-color:rgba(201,168,76,.45) !important; }
-#dashboard-main .ov-toggle-hint{ color:var(--dp-gold); font-size:11px; margin-left:4px; opacity:.85; }
+/* ================================================================
+   v750c - 4er-Block + Modal + Kanban-Fix
+   ================================================================ */
+/* (A) Kennzahlen 4er-Block (renderOverview -> #dp-overview-strip) */
+#dashboard-main #dp-overview-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:13px}
+#dashboard-main .ov-card{background:var(--c-panel);border:1px solid var(--c-line);border-radius:14px;padding:14px 16px;position:relative;box-shadow:0 9px 26px -17px rgba(120,90,20,.25)}
+#dashboard-main .ov-card-title{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c-accd);margin-bottom:11px}
+#dashboard-main .ov-toggle-hint{color:var(--c-accd);font-size:11px;margin-left:5px;opacity:.85}
+#dashboard-main .ov-pair{display:flex;gap:14px}
+#dashboard-main .ov-pair .ov-half{flex:1 1 0;min-width:0}
+#dashboard-main .ov-pair .ov-half + .ov-half{border-left:1px solid var(--c-line);padding-left:14px}
+#dashboard-main .ov-l{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--c-mut);margin-bottom:5px;line-height:1.25}
+#dashboard-main .ov-v{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;line-height:1.05;font-variant-numeric:tabular-nums}
+#dashboard-main .ov-sub{display:block;font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--c-mut);margin-top:5px}
+#dashboard-main .ov-card.ov-clickable{cursor:pointer}
+#dashboard-main .ov-card.ov-clickable:hover{border-color:rgba(201,168,76,.5)}
+@media(max-width:880px){#dashboard-main #dp-overview-strip{grid-template-columns:repeat(2,1fr)}}
+
+/* (D) Kanban: Score-Spalte feste Breite (Tier-Label-Laenge verschob Ausrichtung) */
+#dashboard-main .kc-flat{align-items:center}
+#dashboard-main .kc-flat .kc-scwrap{flex:0 0 54px}
+#dashboard-main .kc-flat .nm{text-align:left}
+#dashboard-main .kc-flat .scl{white-space:nowrap}
+
+/* (B) Score-/WK-Modal GLOBAL (haengt an document.body, NICHT unter #dashboard-main) */
+.dp-wk-modal-ov{position:fixed;inset:0;z-index:99999;background:rgba(8,6,4,.6);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center}
+.dp-wk-modal{background:#0B0906;border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:24px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dp-wk-modal-t{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#F2ECDC;margin-bottom:6px}
+.dp-wk-modal-s{font-size:12.5px;color:rgba(232,226,212,.6);margin-bottom:18px}
+.dp-wk-modal-btns{display:flex;flex-direction:column;gap:9px}
+.dp-wk-modal-btns button{padding:13px 16px;border-radius:10px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.08);color:#E8C964;font-size:13.5px;font-weight:600;cursor:pointer;text-align:left}
+.dp-wk-modal-btns button:hover{background:rgba(201,168,76,.18);border-color:#C9A84C}
+.dp-wk-modal-x{margin-top:14px;width:100%;padding:9px;border-radius:9px;border:1px solid rgba(232,226,212,.15);background:transparent;color:rgba(232,226,212,.55);font-size:12px;cursor:pointer}
+.dp-wk-modal-x:hover{color:#F2ECDC;border-color:rgba(232,226,212,.3)}
+.dp-sd-modal .dp-sd-total{font-size:12.5px;color:rgba(232,226,212,.8);margin:2px 0 16px;line-height:1.5}
+.dp-sd-cat{border-top:1px solid rgba(201,168,76,.14);padding:11px 0 9px}
+.dp-sd-cat:first-of-type{border-top:none}
+.dp-sd-cat-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:#F2ECDC;margin-bottom:6px}
+.dp-sd-cat-head span:first-child{font-family:'Space Grotesk',sans-serif}
+.dp-sd-cat-score{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:800}
+.dp-sd-weight{font-family:'Inter',sans-serif;font-size:10.5px;font-weight:600;color:#F0D98A;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.22);border-radius:6px;padding:1px 6px;margin-left:4px}
+.dp-sd-bar{height:5px;border-radius:3px;background:rgba(201,168,76,.10);overflow:hidden;margin:7px 0 9px}
+.dp-sd-bar-fill{height:100%;border-radius:3px;box-shadow:0 0 6px rgba(201,168,76,.35)}
+.dp-sd-klist{display:flex;flex-direction:column;gap:1px;margin-top:3px}
+.dp-sd-krow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid rgba(201,168,76,.07)}
+.dp-sd-krow:first-child{border-top:none}
+.dp-sd-krow.dim{color:rgba(232,226,212,.5);font-size:11px}
+.dp-sd-kn{font-size:12px;color:rgba(232,226,212,.82)}
+.dp-sd-kw{font-family:'Space Grotesk',sans-serif;font-size:11.5px;font-weight:700;color:#F0D98A;background:rgba(201,168,76,.20);border:1px solid rgba(201,168,76,.45);border-radius:6px;padding:1px 7px;flex-shrink:0;font-variant-numeric:tabular-nums}
+
+
+/* ================================================================
+   v750d - Hero-Tot lesbar + klickbarer QR
+   ================================================================ */
+#dashboard-main .hgate{flex-basis:174px}
+#dashboard-main .hgate .tot{gap:8px}
+#dashboard-main .hgate .tot div{flex:1 1 0;min-width:0}
+#dashboard-main .hgate .tot .k{font-size:7px;letter-spacing:.2px;white-space:nowrap}
+#dashboard-main .hgate .tot .v{font-size:12.5px;white-space:nowrap;margin-top:4px}
+#dashboard-main .kc-share a.qb{display:block;text-decoration:none;cursor:pointer}
+#dashboard-main .kc-share a.qb:hover{box-shadow:0 0 0 2px rgba(201,168,76,.5)}
+
+
+/* ================================================================
+   v750e - Header + card-ch
+   ================================================================ */
+/* (B) neutrale Kartenwerte (Gesamtinvestition/Restschuld) auf weissen Karten lesbar */
+#dashboard-main{--dp-card-ch:#1b1815}
+/* (A) Sektion-01 groesser + Objekt-Auswahl im Gold-Band rechts */
+#dashboard-main .sl-head{padding-top:11px;padding-bottom:11px}
+#dashboard-main .sl-head h2{font-size:21px}
+#dashboard-main .sl .cp-objsel{margin-left:auto;display:inline-flex;align-items:center;gap:8px}
+#dashboard-main .sl .cp-objsel-lab{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#2c2410}
+#dashboard-main .sl .cp-objsel select{background:#2c2410;color:#E8CC7A;border:1px solid rgba(44,36,16,.5);border-radius:7px;padding:6px 11px;font-family:Inter,sans-serif;font-size:12.5px;font-weight:600;max-width:220px;cursor:pointer}
+
+
+/* ================================================================
+   v750f - Geteilte Objekte: Zeilen mit Abrisskante + QR-Stub
+   ================================================================ */
+#dashboard-main .shared2{background:var(--c-panel);border:1px solid var(--c-line);border-radius:16px;overflow:hidden;box-shadow:0 9px 26px -17px rgba(120,90,20,.25)}
+#dashboard-main .shr2{display:grid;grid-template-columns:1.5fr .9fr .7fr auto 74px;align-items:center;gap:12px;padding:11px 0 11px 18px;border-top:1px solid var(--c-line);position:relative}
+#dashboard-main .shr2:first-child{border-top:none}
+#dashboard-main .shr2 .o{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;color:var(--c-ink)}
+#dashboard-main .shr2 .o small{display:block;font-family:Inter,sans-serif;font-weight:400;font-size:10px;color:var(--c-mut);margin-top:1px}
+#dashboard-main .shr2 .cd{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--c-accd);letter-spacing:1px}
+#dashboard-main .shr2 .rt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--c-mut)}
+#dashboard-main .shr2 .ac{display:flex;gap:6px;justify-self:end}
+#dashboard-main .shr2 .ac button{font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;border-radius:7px;padding:5px 10px}
+#dashboard-main .shr2 .ac .e{background:rgba(201,168,76,.13);border:1px solid var(--c-line);color:var(--c-accd)}
+#dashboard-main .shr2 .ac .r{background:rgba(184,98,80,.13);border:1px solid rgba(184,98,80,.4);color:var(--c-red)}
+#dashboard-main .shr-stub{position:relative;display:flex;align-items:center;justify-content:center;align-self:stretch;padding:0 14px;border-left:2px dashed var(--c-line);text-decoration:none}
+#dashboard-main .shr-stub::before,#dashboard-main .shr-stub::after{content:'';position:absolute;left:-7px;width:12px;height:12px;border-radius:50%;background:var(--c-page)}
+#dashboard-main .shr-stub::before{top:-6px}
+#dashboard-main .shr-stub::after{bottom:-6px}
+#dashboard-main .shr-stub .shr-qr{background:#fff;border:1px solid rgba(201,168,76,.3);border-radius:6px;padding:3px;display:block;transition:box-shadow .15s}
+#dashboard-main .shr-stub .shr-qr svg{display:block;width:46px;height:46px}
+#dashboard-main .shr-stub:hover .shr-qr{box-shadow:0 0 0 2px rgba(201,168,76,.55)}
+@media(max-width:880px){#dashboard-main .shr2{grid-template-columns:1fr auto 74px}#dashboard-main .shr2 .cd,#dashboard-main .shr2 .rt{display:none}}
+
+
+/* ================================================================
+   v750g - Kennzahlen-Toggle + Shared-Toolbar + dunkler Stub
+   ================================================================ */
+/* klickbare Kennzahl-Kachel (EK-Rendite vor/nach Steuer) */
+#dashboard-main .kpi.kpi-click{cursor:pointer;transition:box-shadow .15s,transform .12s}
+#dashboard-main .kpi.kpi-click:hover{box-shadow:0 0 0 2px rgba(201,168,76,.45);transform:translateY(-1px)}
+#dashboard-main .kpi.kpi-click::after{content:'\21C4';position:absolute;top:9px;right:11px;font-size:11px;color:var(--c-acc);opacity:.6}
+#dashboard-main .kpi{position:relative}
+
+/* Geteilte Objekte: Toolbar (Minimieren / Alle anzeigen) */
+#dashboard-main .sh-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 16px;border-bottom:1px solid var(--c-line);background:rgba(201,168,76,.05)}
+#dashboard-main .sh-cnt{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--c-mut)}
+#dashboard-main .sh-ctrl{display:flex;gap:7px}
+#dashboard-main .shb{font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;border-radius:7px;padding:5px 11px;background:rgba(201,168,76,.14);border:1px solid var(--c-line);color:var(--c-accd)}
+#dashboard-main .shb.shb-m{background:transparent;color:var(--c-mut)}
+#dashboard-main .shb:hover{filter:brightness(1.06)}
+
+/* dunkler QR-Stub mit Abrisskante + Kerben (Pre-Flight-Karte) */
+#dashboard-main .shr2{grid-template-columns:1.5fr .9fr .7fr auto 116px;padding-right:8px}
+#dashboard-main .shr-stub{position:relative;display:flex;align-items:center;justify-content:center;align-self:center;background:#0c0b09;border-radius:12px;margin:7px 6px 7px 6px;padding:11px 16px 11px 19px;border-left:2px dashed rgba(201,168,76,.5);text-decoration:none;transition:box-shadow .15s}
+#dashboard-main .shr-stub::before,#dashboard-main .shr-stub::after{content:'';position:absolute;left:-7px;width:13px;height:13px;border-radius:50%;background:var(--c-panel);z-index:2}
+#dashboard-main .shr-stub::before{top:-3px}
+#dashboard-main .shr-stub::after{bottom:-3px}
+#dashboard-main .shr-stub .shr-qr{background:#fff;border:none;border-radius:7px;padding:4px;display:block}
+#dashboard-main .shr-stub .shr-qr svg{display:block;width:52px;height:52px}
+#dashboard-main .shr-stub:hover{box-shadow:0 0 0 2px rgba(201,168,76,.55)}
+@media(max-width:880px){#dashboard-main .shr2{grid-template-columns:1fr auto 110px}#dashboard-main .shr2 .cd,#dashboard-main .shr2 .rt{display:none}}
+
+
+/* ================================================================
+   v750h - Kanban Objekt-oeffnen-Button
+   ================================================================ */
+#dashboard-main .kc-openbtn{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;cursor:pointer;border-radius:7px;padding:6px 12px;margin-right:7px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#bd9a3e);border:1px solid #b8932f;color:#1b1815}
+#dashboard-main .kc-openbtn:hover{filter:brightness(1.05)}
+
+
+/* ================================================================
+   v750i - Bestand-Flucht + Toggle-Clean + Boarding-Pass-Karten
+   ================================================================ */
+/* (1) Kennzahlen-Uebersicht: alle Werte in horizontale Flucht (Label-Hoehe gleich),
+       Bestand-Trenner etwas nach rechts (linke Haelfte schmaler). */
+#dashboard-main .ov-l{min-height:24px}
+#dashboard-main #dp-overview-strip .ov-card:first-child .ov-pair .ov-half:first-child{flex:0 0 34%}
+
+/* (2) Toggle-Kachel (EK-Rendite / Zins): stoerende Linie + Ring entfernen */
+#dashboard-main .kpi.kpi-click::after{content:none}
+#dashboard-main .kpi.kpi-click:hover{box-shadow:none;transform:none;background:rgba(201,168,76,.05)}
+
+/* (7) Geteilte Objekte: schmalere Boarding-Pass-Karten mit Abrisskante */
+#dashboard-main .shared2{background:none;border:none;box-shadow:none;overflow:visible;border-radius:0}
+#dashboard-main .sh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-top:12px}
+#dashboard-main .shr2{display:grid;grid-template-columns:1fr 102px;align-items:stretch;background:var(--c-panel);border:1px solid var(--c-line);border-radius:14px;box-shadow:0 8px 22px -16px rgba(120,90,20,.32);overflow:hidden;padding:0;border-top:1px solid var(--c-line);position:relative}
+#dashboard-main .shr-body{padding:13px 16px;display:flex;flex-direction:column;gap:9px;min-width:0}
+#dashboard-main .shr2 .o{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;color:var(--c-ink);line-height:1.2}
+#dashboard-main .shr2 .o small{display:block;font-family:Inter,sans-serif;font-weight:400;font-size:10px;color:var(--c-mut);margin-top:2px}
+#dashboard-main .shr-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+#dashboard-main .shr2 .cd{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--c-accd);letter-spacing:1px}
+#dashboard-main .shr2 .rt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--c-mut);padding:2px 8px;border:1px solid var(--c-line);border-radius:20px}
+#dashboard-main .shr2 .ac{display:flex;gap:6px;margin-top:1px}
+#dashboard-main .shr2 .ac button{font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;border-radius:7px;padding:5px 11px}
+#dashboard-main .shr2 .ac .e{background:rgba(201,168,76,.13);border:1px solid var(--c-line);color:var(--c-accd)}
+#dashboard-main .shr2 .ac .r{background:rgba(184,98,80,.12);border:1px solid rgba(184,98,80,.4);color:var(--c-red)}
+#dashboard-main .shr-stub{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#0c0b09;text-decoration:none;border-left:2px dashed rgba(201,168,76,.5);transition:box-shadow .15s}
+#dashboard-main .shr-stub::before,#dashboard-main .shr-stub::after{content:'';position:absolute;left:-7px;width:13px;height:13px;border-radius:50%;background:var(--c-page);z-index:2}
+#dashboard-main .shr-stub::before{top:-7px}
+#dashboard-main .shr-stub::after{bottom:-7px}
+#dashboard-main .shr-stub .shr-qr{background:#fff;border-radius:7px;padding:4px;display:block}
+#dashboard-main .shr-stub .shr-qr svg{display:block;width:52px;height:52px}
+#dashboard-main .shr-stub .shr-qr-ph{display:block;width:52px;height:52px;border-radius:4px;background:repeating-linear-gradient(45deg,#0c0b09 0 2px,#fff 2px 4px)}
+#dashboard-main .shr-stub-lab{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#E8CC7A;opacity:.85}
+#dashboard-main .shr-stub:hover{box-shadow:inset 0 0 0 2px rgba(201,168,76,.5)}
+@media(max-width:760px){#dashboard-main .sh-grid{grid-template-columns:1fr}}
+
+
+/* ================================================================
+   v750j - Jahres-Band + Toggle-Pfeil
+   ================================================================ */
+/* 10/20/30-J.-Auswahl im goldenen "Projektion & Verlauf"-Band */
+#dashboard-main .dp-charts-summary .yrs.sl-yrs{display:inline-flex;gap:6px;margin-left:auto;margin-right:14px}
+#dashboard-main .dp-charts-summary .yrs.sl-yrs button{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;cursor:pointer;border-radius:7px;padding:4px 11px;background:rgba(12,11,9,.12);border:1px solid rgba(44,36,16,.45);color:#2c2410;transition:background .12s,color .12s}
+#dashboard-main .dp-charts-summary .yrs.sl-yrs button:hover{background:rgba(12,11,9,.2)}
+#dashboard-main .dp-charts-summary .yrs.sl-yrs button.active{background:#2c2410;color:#E8CC7A;border-color:#2c2410}
+
+/* Wechselzeichen hinter dem Label der Toggle-Kacheln (wie Cashflow-vor-Steuer) */
+#dashboard-main .kpi .kpi-hint{color:var(--c-acc);font-size:11px;margin-left:5px;opacity:.8;font-weight:400}
+
+
+/* ================================================================
+   v750k - Modellprojektion-Hinweis (hoverbar)
+   ================================================================ */
+#dashboard-main .tag.mp-info{cursor:help;border-bottom:1px dotted currentColor;padding-bottom:1px}
