@@ -642,7 +642,7 @@ label.dp-required.qc-required::after {
         <span class="sb-act-ico" data-icon="new"></span><span class="sb-act-l">Neues Objekt</span>
       </button>
       <button class="sb-act-item sb-act-accent" type="button" onclick="sbActionsAction('quickcheck')">
-        <span class="sb-act-ico" data-icon="quickcheck"></span><span class="sb-act-l">Boarding</span>
+        <span class="sb-act-ico" data-icon="quickcheck"></span><span class="sb-act-l">Quick Boarding</span>
       </button>
       <button class="sb-act-item" type="button" onclick="sbActionsAction('marktbericht')">
         <span class="sb-act-ico" data-icon="market"></span><span class="sb-act-l">Marktbericht</span>
@@ -895,8 +895,8 @@ label.dp-required.qc-required::after {
 
 <!-- ═══════════ TAB 1: OBJEKT ═══════════ -->
 <div class="sec active" id="s0">
-  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p>
   <div id="obj-action-bar"></div>
+  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p>
   <input type="hidden" id="_avm_state" value="">
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
   <input type="hidden" id="_immometrica_id" value="">
@@ -2935,7 +2935,7 @@ label.dp-required.qc-required::after {
 <script src="js/datenraum.js?v=160"></script>
 <script src="js/tooltip-content.js?v=738"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
-  <script src="js/immometrica-import.js?v=673"></script>
+  <script src="js/immometrica-import.js?v=769"></script>
   <script src="js/immometrica-qc.js?v=672"></script>
   <script src="js/modal-boarding-skin.js?v=672"></script>
   <script src="js/provider-keys.js?v=672"></script>
@@ -2953,7 +2953,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=746"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=736"></script>
+<script src="js/storage.js?v=771"></script>
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=720"></script>
 <script src="js/track-record.js?v=166"></script>
@@ -3000,7 +3000,8 @@ label.dp-required.qc-required::after {
 <script src="js/avm-missing-reset.js?v=443"></script>
 <link rel="stylesheet" href="css/marktbewertung-card.css?v=541">
 <script src="js/marktbewertung-card.js?v=540"></script>
-<script src="js/dealpilot-mb.js?v=746"></script>
+<script src="js/avm-section.js?v=766"></script>
+<script src="js/dealpilot-mb.js?v=752"></script>
   <script src="js/marktbericht-view.js?v=653"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=124"></script>
@@ -3020,7 +3021,8 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=187h2"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=748"></script>
+  <script src="js/object-actions.js?v=770"></script>
+  <script src="js/dpsh-score-hero.js?v=7"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=676"></script>
   <script src="js/voice-import.js?v=537"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->

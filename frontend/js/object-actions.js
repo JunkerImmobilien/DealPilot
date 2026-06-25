@@ -118,7 +118,7 @@
       P + '.dp-pf-tile.dp-pf-soon-on:hover{transform:none !important}',
       P + '.btn .ico{display:inline-flex;align-items:center}',
       P + '.oab-prog{margin:0 0 12px;font-size:12.5px;color:var(--muted,#7A7370)}',
-      P + '.oab-results{display:grid;gap:12px;margin:0 0 14px}',
+      P + '.oab-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:12px;margin:0 0 14px}', /* v751-grid */
       '.oab-history{margin:6px 0 16px}', /* v742-avm-history-css */
       '.oab-h-head{display:flex;align-items:center;justify-content:space-between;font:700 12px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-3,#9a7f33);margin-bottom:7px}',
       '.oab-h-add{border:1px solid rgba(201,168,76,0.45);border-radius:8px;background:#fff;color:var(--gold-3,#9a7f33);font:600 11.5px/1 "DM Sans",system-ui,sans-serif;padding:5px 10px;cursor:pointer}',
@@ -290,9 +290,9 @@
         '<span class="dp-pf-stripe"></span>' +
         '<div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot \u00b7 Boarding</span></div><span class="dp-pf-perf"></span>' + /* v572-leadtext */
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">' +
-          pfTileLogo('pricehubble', _phInner, (avmOff || provComingSoon('pricehubble')), provComingSoon('pricehubble') ? 'Demnächst verfügbar' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble'), provComingSoon('pricehubble') ? 'dp-pf-soon-on' : '') +
+          /* v752-order */ pfTileLogo('dealpilot', _dpInner, false, 'Marktpreisbewertung') +
           pfTileLogo('sprengnetter', _snInner, avmOff, avmOff ? 'Marktradar derzeit deaktiviert' : 'Sprengnetter') +
-          pfTileLogo('dealpilot', _dpInner, false, 'Marktpreisbewertung') +
+          pfTileLogo('pricehubble', _phInner, (avmOff || provComingSoon('pricehubble')), provComingSoon('pricehubble') ? 'Demnächst verfügbar' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble'), provComingSoon('pricehubble') ? 'dp-pf-soon-on' : '') +
         '</div></div>' +
         '<div class="dp-pf-sep"></div>' +
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">' +
@@ -311,13 +311,13 @@
       mount.querySelectorAll('.dp-pf-tile').forEach(function (t) {
         var cb = t.querySelector('input[type=checkbox]');
         if (!cb) return;
-        if (t.getAttribute('data-src') === 'dealpilot' && !cb.disabled) { cb.checked = true; }
+        /* v770-no-default-dealpilot: keine Vorauswahl mehr */
         t.classList.toggle('on', cb.checked);
         if (!cb._v570bound) { cb._v570bound = 1; cb.addEventListener('change', function () { t.classList.toggle('on', cb.checked); try { updateCreditHint(); } catch (e) {} }); }
       });
     } catch (e) {}
     /* v570-pf: alter qc7-src-Listener ersetzt durch dp-pf-tile-Bind im Render */
-    $('oab-run').addEventListener('click', runSelected);
+    $('oab-run').addEventListener('click', _v754ConfirmRun); /* v754-confirm */
     /* F1/qb-objqr: aktiver Shared-Pass fuers aktuelle Objekt -> echten QR in .dp-pf-qr rendern */
     function _updateShareQr(){
       var a = document.getElementById('oab-pf-qr'); if (!a) return;
@@ -385,6 +385,60 @@
     el.innerHTML = '<span class="oab-credit-dot"></span>' + txt;
     el.style.display = '';
   }
+  /* v754-confirm: Abruf-Bestaetigung (DealPilot-Stil) bei Kerosin-Kosten + angedockter Kerosin-Strip */
+  function _v754Style() {
+    if (document.getElementById('v754-confirm-style')) return;
+    var st = document.createElement('style'); st.id = 'v754-confirm-style';
+    st.textContent =
+      '#oab-credit-hint{margin:-8px 0 12px;padding:8px 16px;background:linear-gradient(120deg,#fbf3df,#f6ead0);border:1px solid rgba(201,168,76,.32);border-top:none;border-radius:0 0 14px 14px;font:12.5px/1.45 "JetBrains Mono",monospace;color:#5f5236}' +
+      '#oab-credit-hint .oab-credit-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#C9A84C;margin-right:8px;vertical-align:middle}' +
+      '.v754-ov{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(8,7,5,.55);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}' +
+      '.v754-modal{width:min(430px,92vw);background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.6);font-family:Inter,system-ui,sans-serif}' +
+      '.v754-hero{position:relative;overflow:hidden;background:linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f);padding:16px 20px}' +
+      '.v754-hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(118deg,transparent 0 7px,rgba(44,36,16,.12) 7px 8px)}' +
+      '.v754-hero .bp{position:relative;display:block;font:700 8px/1 "JetBrains Mono",monospace;letter-spacing:2px;color:#5c4a18;margin-bottom:6px}' +
+      '.v754-hero h3{position:relative;margin:0;font:700 16px/1.2 "Space Grotesk",sans-serif;color:#2c2410}' +
+      '.v754-body{padding:18px 20px;color:#3a352e;font-size:13.5px;line-height:1.55}' +
+      '.v754-cost{margin:12px 0;padding:11px 13px;background:#faf6ec;border:1px solid rgba(201,168,76,.3);border-radius:10px;font:13px/1.5 "JetBrains Mono",monospace;color:#1b1815}' +
+      '.v754-cost b{color:#9a7f33}' +
+      '.v754-foot{display:flex;gap:10px;padding:0 20px 18px}' +
+      '.v754-btn{flex:1;border:none;border-radius:10px;padding:11px 14px;font:700 13px/1 "Space Grotesk",sans-serif;cursor:pointer}' +
+      '.v754-cancel{background:#f1ede4;color:#3a352e}' +
+      '.v754-go{background:#0c0b09;color:#E8CC7A}';
+    document.head.appendChild(st);
+  }
+  function _v754ConfirmRun() {
+    _v754Style();
+    var sel = []; try { sel = selectedSources(); } catch (e) {}
+    var KL = { voice: 1, pricehubble: 40, sprengnetter: 20, dealpilot: 2 };
+    var demo = !!(typeof _avmHealth !== 'undefined' && _avmHealth && _avmHealth.mode === 'stub');
+    var billed = sel.filter(function (x) { return KL[x] != null; });
+    var costing = demo ? billed.filter(function (x) { return x === 'voice'; }) : billed;
+    if (!costing.length) { try { runSelected(); } catch (e) {} return; }
+    var NM = { voice: 'Sprachauswertung', pricehubble: 'PriceHubble', sprengnetter: 'Sprengnetter', dealpilot: 'DealPilot' };
+    var total = costing.reduce(function (a, x) { return a + KL[x]; }, 0);
+    var parts = costing.map(function (x) { return '<b>' + KL[x] + '\u00a0L</b> ' + NM[x]; }).join(' + ');
+    var ov = document.createElement('div'); ov.className = 'v754-ov';
+    ov.innerHTML =
+      '<div class="v754-modal" role="dialog" aria-modal="true">' +
+        '<div class="v754-hero"><span class="bp">BOARDING PASS \u00b7 DEALPILOT</span><h3>Abruf best\u00e4tigen</h3></div>' +
+        '<div class="v754-body">F\u00fcr diesen Abruf wird Kerosin verbraucht:' +
+          '<div class="v754-cost">' + parts + (costing.length > 1 ? ' &nbsp;=&nbsp; <b>' + total + '\u00a0L</b> gesamt' : '') + '</div>' +
+          'M\u00f6chtest du fortfahren?</div>' +
+        '<div class="v754-foot">' +
+          '<button type="button" class="v754-btn v754-cancel" id="v754-cancel">Abbrechen</button>' +
+          '<button type="button" class="v754-btn v754-go" id="v754-go">Abrufen (' + total + '\u00a0L)</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    function close() { if (ov && ov.parentNode) ov.parentNode.removeChild(ov); }
+    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    var c = document.getElementById('v754-cancel'); if (c) c.addEventListener('click', close);
+    var g = document.getElementById('v754-go'); if (g) g.addEventListener('click', function () { close(); try { runSelected(); } catch (e) {} });
+    var esc = function (e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } };
+    document.addEventListener('keydown', esc);
+  }
+
   function selectedSources() { var out = [], m = $(MOUNT_ID); if (!m) return out; m.querySelectorAll('.dp-pf-tile input:checked').forEach(function (c) { out.push(c.value); }); return out; }
   function setProg(t) { var p = $('oab-prog'); if (p) { p.style.display = t ? '' : 'none'; p.textContent = t || ''; } }
 
@@ -666,82 +720,160 @@
     });
     renderResults();
   }
-  function renderResults() {
+  function renderResults() { /* v752-avsec */
     var host = $('oab-results'); if (!host) return;
-    var provs = Object.keys(_avm);
+    try { window._oabAvm = _avm; } catch (e) {}
+    if (window.AvmSection) {
+      try { window.AvmSection.setExternal(_avm); } catch (e) {}
+      window.AvmSection.render();
+      return;
+    }
+    var provs = Object.keys(_avm).sort(function (a, b) { var o = { PriceHubble: 0, Sprengnetter: 1 }; return (o[a] == null ? 9 : o[a]) - (o[b] == null ? 9 : o[b]); });
     if (!provs.length) { host.innerHTML = ''; return; }
     host.innerHTML = provs.map(function (p) { return renderCard(_avm[p]); }).join('');
-    host.querySelectorAll('[data-apply]').forEach(function (b) { b.addEventListener('click', function () { applyAvm(_avm[b.getAttribute('data-apply')]); }); });
-    host.querySelectorAll('[data-min]').forEach(function (b) { b.addEventListener('click', function () { var pr = b.getAttribute('data-min'); _collapsed[pr] = !_collapsed[pr]; renderResults(); persistAvmState(); }); });
-    try { _v742RenderHistory(); } catch (e) {} /* v742-avm-history-ui */
-    try { _v745BindTabHook(); } catch (e) {} /* v745-hook-call */
-    host.querySelectorAll('[data-span]').forEach(function (b) { b.addEventListener('click', function () { _span = b.getAttribute('data-span') || 'mid'; renderResults(); }); });
   }
-  function renderCard(r) {
-    var isSpr = (r.provider === 'Sprengnetter');
+
+  /* v752-avsec: Bruecken fuer den Section-Renderer (avm-section.js) */
+  window._oabSetSpan = function (sp) { _span = (sp === 'med') ? 'mid' : sp; };
+  window._oabApplyExternal = function (name) { if (_avm && _avm[name]) applyAvm(_avm[name]); };
+  window._oabApplyConsensus = function (mw, mm) {
+    var wfl = numDe(val('wfl')) || 0, ap = [];
+    if (mw) { setInput('svwert', fmt0(mw)); try { markSvwertAvm(); } catch (e) {} ap.push('Verkehrswert'); }
+    var mmSqm = (mm && wfl) ? (mm / wfl) : null;
+    if (mmSqm) { setInput('ds2_marktmiete', mmSqm.toFixed(2).replace('.', ',')); ap.push('Marktmiete \u20ac/m\u00b2'); }
+    try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
+    try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
+    try { toast('\u2713 \u00d8 Konsens \u00fcbernommen (' + (ap.join(' + ') || 'Werte') + ')'); } catch (e) {}
+  };
+
+  function renderCard(r) { /* v751-avb */
+    if (!document.getElementById('avb-style')) {
+      var _avb = document.createElement('style'); _avb.id = 'avb-style';
+      _avb.textContent = [
+        '.avb{display:flex;flex-direction:column;border:1px solid #ece2c8;border-left:4px solid #0F73B8;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 6px 18px -13px rgba(110,82,18,.4)}',
+        '.avb-head{display:flex;align-items:center;gap:9px;padding:0 14px;height:46px}',
+        '.avb-mk{background:#fff;border-radius:7px;padding:3px 9px;display:inline-flex;align-items:center}',
+        '.avb-mk img{height:16px;width:auto;display:block}',
+        '.avb-eye{font:800 10px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.92)}',
+        '.avb-cf{margin-left:auto;font:700 10px/1 "JetBrains Mono",monospace;color:#fff;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:4px 10px;white-space:nowrap}',
+        '.avb-min{width:26px;height:26px;border:1px solid rgba(255,255,255,.4);border-radius:7px;background:rgba(255,255,255,.12);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#fff;transition:transform .2s;flex:0 0 auto}',
+        '.avb.collapsed .avb-min svg{transform:rotate(180deg)}',
+        '.avb-perf{position:relative;height:0;border-top:1.5px dashed rgba(201,168,76,.55);margin:0 12px}',
+        '.avb-body{display:flex;flex-direction:column;flex:1;padding:12px 14px 0}',
+        '.avb-mw{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;font-weight:700;line-height:1;color:#2A2727}',
+        '.avb-sub{font:9.5px/1.4 "JetBrains Mono",monospace;margin-top:6px;color:#7A7370;min-height:14px}',
+        '.avb-miete{font:10px/1.4 "JetBrains Mono",monospace;margin-top:7px;color:#7A7370;min-height:15px}',
+        '.avb-miete b{color:#2A2727;font-size:12px}',
+        '.avb-f3{display:flex;gap:7px;margin-top:11px}',
+        '.avb-fi{flex:1;border:1px solid #efe7d2;border-radius:9px;padding:6px 8px;min-width:0;background:#fffdf8}',
+        '.avb-fi .k{font:700 6.5px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#a59c86}',
+        '.avb-fi .v{font:700 11px/1.25 "JetBrains Mono",monospace;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+        '.avb-lage{margin-top:11px;min-height:26px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}',
+        '.avb-lchip{font:700 9.5px/1 "JetBrains Mono",monospace;padding:4px 9px;border-radius:999px;background:rgba(201,168,76,.14);color:#9a7f33}',
+        '.avb-nolage{font:9px/1.3 "JetBrains Mono",monospace;color:#b3ab98}',
+        '.avb-cmp{margin-top:11px;border:1px solid #e3ecf6;border-radius:10px;overflow:hidden}',
+        '.avb-cmp summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 11px;background:#f1f6fb;font:700 10.5px/1 "JetBrains Mono",monospace;color:#0F73B8}',
+        '.avb-cmp summary::-webkit-details-marker{display:none}',
+        '.avb-cmp summary .ch{margin-left:auto;transition:transform .2s}',
+        '.avb-cmp[open] summary .ch{transform:rotate(180deg)}',
+        '.avb-cmp table{width:100%;border-collapse:collapse;font:10px/1.3 "JetBrains Mono",monospace}',
+        '.avb-cmp th{text-align:right;color:#8a9cc2;font:700 7.5px/1 "Space Grotesk",sans-serif;letter-spacing:.04em;text-transform:uppercase;padding:7px 8px;border-bottom:1px solid #eef3f9}',
+        '.avb-cmp th:first-child{text-align:left}',
+        '.avb-cmp td{text-align:right;padding:6px 8px;border-bottom:1px solid #f4f7fb;color:#3f4a5c}',
+        '.avb-cmp td:first-child{text-align:left;font-weight:700;color:#23303f}',
+        '.avb-spanrow{display:flex;align-items:center;gap:8px;margin-top:12px}',
+        '.avb-spanlbl{font:600 11px/1 "DM Sans",system-ui,sans-serif;color:#6b6660}',
+        '.avb-foot{display:flex;padding:11px 14px 4px}',
+        '.avb-apply{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:none;border-radius:11px;padding:9px 14px;font:700 12px/1 "DM Sans",system-ui,sans-serif;color:#2c2410;cursor:pointer;background:linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 13px -7px rgba(160,120,20,.55)}',
+        '.avb.collapsed .avb-perf,.avb.collapsed .avb-body,.avb.collapsed .avb-foot,.avb.collapsed .avb-legal{display:none}',
+        '.avb-legal{padding:7px 14px 12px;font:9px/1.3 "JetBrains Mono",monospace;color:#b3ab98;text-align:center}'
+      ].join('');
+      document.head.appendChild(_avb);
+    }
+    var prov = r.provider || '';
+    var isSpr = (prov === 'Sprengnetter');
+    var isPh = (prov === 'PriceHubble');
+    var pri = isPh ? '#1F3A6E' : '#0F73B8';
     var wfl = numDe(val('wfl')) || 0, kp = numDe(val('kp')) || 0;
     var mw = pickMW(r), mm = pickMM(r);
     var mwSqm = wfl ? (mw / wfl) : (r.eurPerSqm || null);
-    var mmSqm = wfl ? (mm / wfl) : (r.marktmieteEurSqm || null);
+    var mmSqm = (mm && wfl) ? (mm / wfl) : (r.marktmieteEurSqm || null);
+    var coll = !!_collapsed[prov];
+    /* Feld 1 — Preis-Einordnung (fairpriceLabel hat Vorrang, sonst KP vs Marktwert) */
     var diff = (kp && mw) ? ((mw - kp) / kp * 100) : null;
-    var dLbl = diff == null ? '' : (diff <= -10 ? 'Sehr teuer' : diff <= -3 ? 'Teuer' : diff < 3 ? 'Marktgerecht' : diff < 10 ? 'Günstig' : 'Sehr günstig');
-    var dCol = diff == null ? 'var(--muted,#7A7370)' : (diff < -3 ? '#B8625C' : diff > 3 ? '#3FA56C' : 'var(--gold-3,#9a7f33)');
-    var coll = !!_collapsed[r.provider];
-    var _provImg = r.provider === 'PriceHubble' ? 'img/pricehubble.jpg' : (r.provider === 'Sprengnetter' ? 'img/sprengnetter.jpg' : '');
-    var _provHtml = _provImg ? ('<img class="avmx-logo" src="' + _provImg + '" alt="' + escH(r.provider) + '">') : ('<span class="avmx-prov">' + escH(r.provider) + '</span>');
-    var chip = '';
-    if (r.scoreMicro != null || r.scoreMacro != null || r.wertentwicklung != null) {
-      var parts = [];
-      if (r.scoreMicro != null) parts.push('Mikro ' + r.scoreMicro);
-      if (r.scoreMacro != null) parts.push('Makro ' + r.scoreMacro);
-      if (r.wertentwicklung != null) parts.push('Wertentw. ' + (r.wertentwicklung >= 0 ? '+' : '') + r.wertentwicklung.toFixed(1) + '%/J');
-      chip = '<div class="avmx-chip">' + parts.map(escH).join(' · ') + '</div>';
+    var pcLabel, pcCol;
+    if (r.fairpriceLabel) { pcLabel = r.fairpriceLabel; }
+    else if (diff == null) { pcLabel = '\u2013'; }
+    else { pcLabel = diff <= -10 ? 'Sehr teuer' : diff <= -3 ? 'Teuer' : diff < 3 ? 'Marktgerecht' : diff < 10 ? 'G\u00fcnstig' : 'Sehr g\u00fcnstig'; }
+    pcCol = diff == null ? '#7A7370' : (diff < -3 ? '#B8625C' : diff > 3 ? '#3FA56C' : '#9a7f33');
+    /* Feld 2 — Genauigkeit (Sprengnetter standardError -> Ampel, sonst conf-Text) */
+    var accLabel, accCol;
+    if (isSpr && r.standardError != null) {
+      var se = r.standardError;
+      accLabel = (se < 0.15 ? 'Hoch' : se <= 0.30 ? 'Mittel' : 'Niedrig') + ' \u00b7 ' + se.toFixed(2).replace('.', ',');
+      accCol = se < 0.15 ? '#3FA56C' : se <= 0.30 ? '#9a7f33' : '#B8625C';
+    } else {
+      var ct = String(r.conf || '').toLowerCase();
+      accLabel = (r.conf && !/sprengnetter avm/i.test(r.conf)) ? r.conf : (r.conf ? 'AVM' : '\u2013');
+      accCol = /hoch|gut|sehr/.test(ct) ? '#3FA56C' : /mittel/.test(ct) ? '#9a7f33' : '#7A7370';
     }
-    var spanCtl = '<div class="avmx-spanbox"><span class="qc6-seg-lbl">Spanne</span>' +
-      '<span class="qc6-seg">' +
-        '<button type="button" data-span="low"' + (_span === 'low' ? ' class="sel"' : '') + '>Unten</button>' +
-        '<button type="button" data-span="mid"' + (_span === 'mid' ? ' class="sel"' : '') + '>Ø</button>' +
-        '<button type="button" data-span="high"' + (_span === 'high' ? ' class="sel"' : '') + '>Oben</button>' +
-      '</span></div>';
-    var mwSub = [];
-    if (mwSqm) mwSub.push(fmt0(mwSqm) + ' €/m²');
-    if (diff != null) mwSub.push('<span style="color:' + dCol + '">' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + '% vs. Kaufpreis · ' + escH(dLbl) + '</span>');
-    if (r.fairpriceLabel) mwSub.push('Sprengnetter-Preislabel: ' + escH(r.fairpriceLabel));  /* v388 */
-    return '<div class="avmx' + (isSpr ? ' is-spr' : '') + (coll ? ' collapsed' : '') + '">' +
-      '<div class="avmx-head">' +
-        '<span class="avmx-hlogo">' + _provHtml + '</span>' +
-        '<span class="avmx-eye">Marktbewertung</span>' +
-        '<span class="avmx-hdiv"></span>' +
-        '<span class="avmx-hvals">' +
-          '<span class="avmx-hv"><span class="hl">Marktwert</span><span class="hb">' + fmt0(mw) + ' €</span>' + (mwSqm ? '<span class="hs">· ' + fmt0(mwSqm) + ' €/m²</span>' : '') + '</span>' +
-          (mm ? '<span class="avmx-hv"><span class="hl">Miete</span><span class="hb">' + fmt0(mm) + ' €</span></span>' : '') +
-        '</span>' +
-        '<span class="avmx-htier">' + escH(r.conf || 'AVM') + (r.mode === 'stub' ? ' · DEMO (fiktive Werte)' : '') + '</span>' +
-        '<button type="button" class="avmx-min" data-min="' + escH(r.provider) + '" title="' + (coll ? 'Aufklappen' : 'Minimieren') + '">' + svg('chevron', 16) + '</button>' +
-      '</div>' + /* v576-avmxhead */
-      '<div class="avmx-body">' + chip +
-        '<div class="avmx-cols">' +
-          '<div class="avmx-col">' +
-            '<div class="avmx-bl-l">' + svg('home', 13) + ' Marktwert</div>' +
-            '<div><span class="avmx-big">' + fmt0(mw) + ' <span class="avmx-cur">€</span></span></div>' +
-            '<div class="avmx-span">' + spanRow(r.low, r.marktwert, r.high) + '</div>' +
-            (mwSub.length ? '<div class="avmx-sub">' + mwSub.join(' · ') + '</div>' : '') +
-          '</div>' +
-          '<div class="avmx-div"></div>' +
-          '<div class="avmx-col">' +
-            '<div class="avmx-bl-l">' + svg('home', 13) + ' Marktmiete (kalt)</div>' +
-            '<div><span class="avmx-big">' + fmt0(mm) + ' <span class="avmx-cur">€</span></span></div>' +
-            '<div class="avmx-span">' + spanRow(r.marktmieteLow, r.marktmieteCold, r.marktmieteHigh) + '</div>' +
-            (mmSqm ? '<div class="avmx-sub">' + mmSqm.toFixed(2).replace('.', ',') + ' €/m² kalt</div>' : '') +
-          '</div>' +
-          '<div class="avmx-div"></div>' +
-          '<div class="avmx-col avmx-spancol">' + spanCtl + '</div>' +
+    /* Feld 3 — Bewertung (Sprengnetter score 0-100) */
+    var scoreTxt = (isSpr && r.score != null) ? (Math.round(r.score) + ' / 100') : '\u2013';
+    /* Lage — nur wenn Anbieter Score liefert (sonst Zeile reserviert) */
+    var lageHtml;
+    if (r.scoreMicro != null || r.scoreMacro != null) {
+      var lp = [];
+      if (r.scoreMicro != null) lp.push('<span class="avb-lchip">Mikro \u00b7 ' + escH(r.scoreMicro) + '</span>');
+      if (r.scoreMacro != null) lp.push('<span class="avb-lchip">Makro \u00b7 ' + escH(r.scoreMacro) + '</span>');
+      lageHtml = lp.join('');
+    } else {
+      lageHtml = '<span class="avb-nolage">\u2014 keine Lagebewertung von diesem Anbieter</span>';
+    }
+    /* Vergleichsobjekte (nur Sprengnetter, gratis im Abruf) */
+    var cmpHtml = '';
+    if (isSpr && Array.isArray(r.comparePrices) && r.comparePrices.length) {
+      var rows = r.comparePrices.slice(0, 6).map(function (c) {
+        var dist = (c.distance != null) ? (c.distance >= 1000 ? (c.distance / 1000).toFixed(1).replace('.', ',') + ' km' : Math.round(c.distance) + ' m') : '\u2013';
+        var fl = (c.livingArea != null) ? (Math.round(c.livingArea) + ' m\u00b2') : '\u2013';
+        var by = (c.constructionYear != null) ? c.constructionYear : '\u2013';
+        var vv = (c.value != null) ? (fmt0(c.value) + ' \u20ac') : '\u2013';
+        var sim = (c.similarity != null) ? (Math.round(c.similarity <= 1 ? c.similarity * 100 : c.similarity) + ' %') : '\u2013';
+        return '<tr><td>' + dist + '</td><td>' + fl + '</td><td>' + by + '</td><td>' + vv + '</td><td>' + sim + '</td></tr>';
+      }).join('');
+      cmpHtml = '<details class="avb-cmp"><summary>Vergleichsobjekte (' + r.comparePrices.length + ') <span class="ch">\u25be</span></summary>' +
+        '<table><tr><th>Distanz</th><th>Fl\u00e4che</th><th>Baujahr</th><th>Wert</th><th>\u00c4hnl.</th></tr>' + rows + '</table></details>';
+    }
+    var logo = isPh ? 'img/pricehubble.jpg' : (isSpr ? 'img/sprengnetter.jpg' : '');
+    var head = '<div class="avb-head" style="background:' + pri + '">' +
+      (logo ? '<span class="avb-mk"><img src="' + logo + '" alt="' + escH(prov) + '"></span>' : '<span class="avb-eye">' + escH(prov) + '</span>') +
+      '<span class="avb-eye">Marktbewertung</span>' +
+      '<span class="avb-cf">' + escH(accLabel) + '</span>' +
+      '<button type="button" class="avb-min" data-min="' + escH(prov) + '" title="' + (coll ? 'Aufklappen' : 'Minimieren') + '">' + svg('chevron', 16) + '</button>' +
+      '</div>';
+    var spanSeg = '<span class="qc6-seg avb-seg">' +
+      '<button type="button" data-span="low"' + (_span === 'low' ? ' class="sel"' : '') + '>Unten</button>' +
+      '<button type="button" data-span="mid"' + (_span === 'mid' ? ' class="sel"' : '') + '>\u00d8</button>' +
+      '<button type="button" data-span="high"' + (_span === 'high' ? ' class="sel"' : '') + '>Oben</button></span>';
+    return '<div class="avb avb-' + (isPh ? 'ph' : isSpr ? 'spr' : 'x') + (coll ? ' collapsed' : '') + '" style="border-left-color:' + pri + '">' +
+      head +
+      '<div class="avb-perf"></div>' +
+      '<div class="avb-body">' +
+        '<div class="avb-mw">' + fmt0(mw) + ' \u20ac</div>' +
+        '<div class="avb-sub">' + (mwSqm ? fmt0(mwSqm) + ' \u20ac/m\u00b2' : '') + (diff != null ? ' \u00b7 <span style="color:' + pcCol + '">' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + '% vs. Kaufpreis</span>' : '') + '</div>' +
+        '<div class="avb-miete">Miete <b>' + fmt0(mm) + ' \u20ac</b>' + (mmSqm ? ' \u00b7 ' + mmSqm.toFixed(2).replace('.', ',') + ' \u20ac/m\u00b2 kalt' : '') + '</div>' +
+        '<div class="avb-f3">' +
+          '<div class="avb-fi"><div class="k">Einordnung</div><div class="v" style="color:' + pcCol + '">' + escH(pcLabel) + '</div></div>' +
+          '<div class="avb-fi"><div class="k">Genauigkeit</div><div class="v" style="color:' + accCol + '">' + escH(accLabel) + '</div></div>' +
+          '<div class="avb-fi"><div class="k">Bewertung</div><div class="v">' + escH(scoreTxt) + '</div></div>' +
         '</div>' +
-        '<div class="avmx-actions">' +
-          '<span class="avmx-disc">Marktpreisindikation — kein Gutachten n. § 194 BauGB</span>' +
-          '<button type="button" class="avmx-apply" data-apply="' + escH(r.provider) + '"><span class="ico">' + svg('download', 13, '#9a7f33') + '</span> In Felder übernehmen (' + spanLabel() + ')</button>' +
-        '</div>' +
+        '<div class="avb-lage">' + lageHtml + '</div>' +
+        cmpHtml +
+        '<div class="avb-spanrow"><span class="avb-spanlbl">Spanne</span>' + spanSeg + '</div>' +
       '</div>' +
+      '<div class="avb-foot">' +
+        '<button type="button" class="avb-apply" data-apply="' + escH(prov) + '">' + svg('download', 13, '#2c2410') + ' In Felder \u00fcbernehmen (' + spanLabel() + ')</button>' +
+      '</div>' +
+      '<div class="avb-legal">Marktpreisindikation \u2014 kein Gutachten n. \u00a7 194 BauGB</div>' +
     '</div>';
   }
   function setSelIfEmpty(id, v) { var el = $(id); if (!el || !v || el.value) return; el.value = v; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
@@ -1382,7 +1514,7 @@
     if (typeof window.newObj === 'function' && !window._dpObjNewWrap) {
       window._dpObjNewWrap = true;
       var _no = window.newObj;
-      window.newObj = function () { var r = _no.apply(this, arguments); try { setTimeout(function(){ syncObjExtra(); syncQzStars(); _avm = {}; _collapsed = {}; var el = document.getElementById('_avm_state'); if (el) el.value = ''; renderResults(); }, 0); } catch (e) {} return r; };
+      window.newObj = function () { var r = _no.apply(this, arguments); try { setTimeout(function(){ syncObjExtra(); syncQzStars(); _avm = {}; _collapsed = {}; var el = document.getElementById('_avm_state'); if (el) el.value = ''; if (window.AvmSection) { try { window.AvmSection.setExternal({}); window.AvmSection.clearDealpilot(); } catch (e) {} } /* v770-clear-avsec */ renderResults(); }, 0); } catch (e) {} return r; };
     }
   }
   function enhanceKiLage() {

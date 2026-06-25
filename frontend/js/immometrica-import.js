@@ -7,6 +7,35 @@
   var API = '/api/v1/immometrica';
   function tok() { try { return localStorage.getItem('ji_token') || ''; } catch (e) { return ''; } }
   function hdr() { return { 'Authorization': 'Bearer ' + tok() }; }
+
+  /* v769-imo-stub: Demo-Modal bei AVM_MODE=stub (kein Key noetig). */
+  var _imoHealthCache=null,_imoHealthTs=0;
+  function _imoHealth(cb){
+    var now=Date.now();
+    if(_imoHealthCache!==null && (now-_imoHealthTs)<60000){ cb(_imoHealthCache); return; }
+    fetch('/api/v1/avm/health',{headers:hdr()}).then(function(r){return r.json();})
+      .then(function(h){ _imoHealthCache=h||{}; _imoHealthTs=Date.now(); cb(_imoHealthCache); })
+      .catch(function(){ _imoHealthCache={}; _imoHealthTs=Date.now(); cb(_imoHealthCache); });
+  }
+  function _imoStubSync(){ return !!(_imoHealthCache && _imoHealthCache.mode==='stub'); }
+  function _imoStubData(){
+    function mk(id,title,addr,dp){ return { raw:{ id:id, title:title, address_raw:addr, _demo:true, _immometrica_id:id }, dp:dp }; }
+    var items=[
+      mk('demo-1','ETW Leipzig Zentrum-S\u00fcd','Musterstra\u00dfe 12, 04109 Leipzig',
+        { kuerzel:'DEMO-LE1', objart:'Eigentumswohnung', plz:'04109', ort:'Leipzig', str:'Musterstra\u00dfe', hnr:'12',
+          wfl:68, baujahr:1998, kp:189000, nkm:690, zimmer:3, bad_anz:1, etage:2, etagen_ges:4,
+          notizen:'Demo-Objekt (ImmoMetrica-Simulation)' }),
+      mk('demo-2','ETW Dresden Neustadt','Beispielweg 7, 01097 Dresden',
+        { kuerzel:'DEMO-DD2', objart:'Eigentumswohnung', plz:'01097', ort:'Dresden', str:'Beispielweg', hnr:'7',
+          wfl:82, baujahr:2012, kp:245000, nkm:880, zimmer:3, bad_anz:1, etage:3, etagen_ges:5,
+          notizen:'Demo-Objekt (ImmoMetrica-Simulation)' }),
+      mk('demo-3','MFH Chemnitz','Demoallee 30, 09111 Chemnitz',
+        { kuerzel:'DEMO-C3', objart:'Mehrfamilienhaus', plz:'09111', ort:'Chemnitz', str:'Demoallee', hnr:'30',
+          wfl:240, gsfl:420, baujahr:1965, kp:420000, nkm:1850, zimmer:9, etagen_ges:3, einheiten:4,
+          notizen:'Demo-Objekt (ImmoMetrica-Simulation)' })
+    ];
+    return { sources:[{ key:'sdemo', label:'Demo-Suche', count:items.length, kind:'search', id:'demo' }], items:items };
+  }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
   function fmt(n) { return n == null ? '\u2014' : new Intl.NumberFormat('de-DE').format(n); }
   function fmtY(n) { return (n == null || n === '') ? '\u2014' : String(n).replace(/\D/g, ''); }
@@ -36,10 +65,13 @@
   function targetLabel() { return state.target === 'qc' ? 'Quick-Check' : 'Objekt'; }
 
   function isReady(cb) {
-    fetch(API + '/credentials', { headers: hdr() })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { cb(!!(d && d.immometrica && d.immometrica.exists)); })
-      .catch(function () { cb(false); });
+    _imoHealth(function(h){
+      if (_imoStubSync()) { cb(true); return; }  /* v769-imo-stub */
+      fetch(API + '/credentials', { headers: hdr() })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { cb(!!(d && d.immometrica && d.immometrica.exists)); })
+        .catch(function () { cb(false); });
+    });
   }
 
   /* Picker-spezifisches CSS (oabi-* kommt aus object-actions oab-style). Nur die
@@ -116,6 +148,7 @@
 
   function loadSources() {
     var host = document.getElementById('imo-src');
+    if (_imoStubSync()) { var _d=_imoStubData(); state.sources=_d.sources; renderSources(); if(state.sources[0]) selectSource(state.sources[0]); return; }  /* v769-imo-stub */
     host.innerHTML = '<span style="font:12px ui-monospace,monospace;color:var(--muted,#7A7370)">Lade Quellen\u2026</span>';
     fetch(API + '/searches', { headers: hdr() })
       .then(function (r) { return r.json(); })
@@ -144,6 +177,7 @@
     state.source = s; state.active = null; renderSources(); renderDetail();
     var list = document.getElementById('imo-list');
     list.innerHTML = '<div style="color:var(--muted,#7A7370);font-size:13px;padding:20px 0">Lade Objekte\u2026</div>';
+    if (_imoStubSync()) { state.items=_imoStubData().items; state.items.forEach(function(it){ augmentDp(it.dp,it.raw); }); renderList(state.items.length); return; }  /* v769-imo-stub */
     var url = s.kind === 'search' ? API + '/searches/' + s.id + '/results' : API + '/favorites/' + s.cc;
     fetch(url, { headers: hdr() })
       .then(function (r) { return r.json(); })

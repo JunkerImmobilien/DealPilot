@@ -617,6 +617,11 @@ function newObj() {
   window._aiText = '';
   window._aiAnalysis = null;
   _currentObjKey = null;
+  /* v771-status-reset: newObj ruft _clearFormForNewObject NICHT -> Status hier auf offen */
+  window._currentObjData = {};
+  var _dwS = document.getElementById('_deal_won_state'); if (_dwS) _dwS.value = 'false';
+  var _dlS = document.getElementById('_deal_lost_state'); if (_dlS) _dlS.value = 'false';
+  var _dwA = document.getElementById('_deal_won_at_state'); if (_dwA) _dwA.value = '';
   // V58: Workflow-Bar zurücksetzen + Outputs nullen
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);
