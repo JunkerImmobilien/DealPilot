@@ -3340,6 +3340,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 
   <!-- v416-card-css: AVM-Ergebnis-Cards direkt unter der Aktionsleiste -->
   <div id="avm-results-host"></div>
+  <div id="oab-results"></div>
 
   <!-- ═════ FORM ═════ -->
 
@@ -4637,6 +4638,8 @@ const QcApp = (function() {
   }
 
   function renderAvmResults() {
+    _oabFeed(); /* v762-feed */
+    _oabFeed(); /* v761-feed */
     const host = document.getElementById('avm-results-host');
     if (_avmResults.length === 0) { host.innerHTML = ''; return; }
     let html = '';
@@ -5384,7 +5387,7 @@ function renderTransferList() {
     var totBox  = document.getElementById('qc6-credit-totalbox');
     var noteEl  = document.getElementById('qc6-credit-note');
     var footBtn = document.getElementById('qc6-credit-confirm');
-    var _hasExpose = sources.indexOf('expose') !== -1 || sources.indexOf('voice') !== -1;  /* v505-voice-skip: Sprache befuellt Felder vor AVM */
+    var _hasExpose = sources.indexOf('expose') !== -1 || sources.indexOf('voice') !== -1 || sources.indexOf('immometrica') !== -1;  /* v505-voice-skip: Sprache befuellt Felder vor AVM */
     // V10: Wenn Exposé dabei ist, AVM-Pflichtfelder NICHT vorab erzwingen
     // (werden aus dem Exposé übernommen, danach im Ablauf erneut geprüft).
     var missing = _hasExpose ? [] : _validateSources(sources);
@@ -5468,7 +5471,7 @@ function renderTransferList() {
     // Reihenfolge erzwingen: expose, ph, spr, ki
     var order = ['voice','expose','immometrica','ph','spr','dpmb', 'ki'];  /* v505-voice-first; v667 immometrica */
     var ordered = order.filter(function(s){ return sources.indexOf(s) !== -1; });
-    var labels = { voice:'Sprachaufzeichnung', expose:'Exposé/Marktbericht', immometrica:'ImmoMetrica', ph:'PriceHubble', spr:'Sprengnetter', ki:'KI-Recherche' };
+    var labels = { voice:'Sprachaufzeichnung', expose:'Exposé/Marktbericht', immometrica:'ImmoMetrica', ph:'PriceHubble', spr:'Sprengnetter', dpmb:'DealPilot', ki:'KI-Recherche' };
     var steps = ordered.map(function(s){ return { key:s, label:labels[s], state:'pending' }; });
     _progressRender(steps);
 
@@ -5601,7 +5604,117 @@ function renderTransferList() {
     if (d.macro != null) _pendingTransfer.dp_makrolage = { label: 'Makrolage', value: d.macro + ' / 100', raw: d.macro / 10, source: 'DealPilot', target: 'lage_macro' };
     if (d.micro != null) _pendingTransfer.dp_mikrolage = { label: 'Mikrolage', value: d.micro + ' / 100', raw: d.micro / 10, source: 'DealPilot', target: 'lage_micro' };
     if (d.trend != null) _pendingTransfer.dp_wertentwicklung = { label: 'Wertentwicklung p.a.', value: (d.trend >= 0 ? '+' : '') + Number(d.trend).toFixed(2) + ' %', raw: d.trend, source: 'DealPilot', target: 'wertsteigerung_pa' };
+    setTimeout(function(){ if (typeof renderAvmResults === 'function') renderAvmResults(); }, 0); /* v762-dpfeed */
+    if (typeof renderAvmResults === 'function') renderAvmResults(); /* v761-dpfeed */
   }
+
+  /* v761: AVM-Sektion (avm-section.js) im QuickCheck einspeisen + Bruecken */
+  function _oabFeed() {
+    if (!window.AvmSection) return;
+    try {
+      var ext = {}, dp = null;
+      (_avmResults || []).forEach(function (r) {
+        if (!r || !r.provider) return;
+        if (r.provider === 'Sprengnetter' || r.provider === 'PriceHubble') ext[r.provider] = r;
+        else if (r.provider === 'DealPilot') dp = r;
+      });
+      window.AvmSection.setExternal(ext);
+      if (dp) {
+        window.AvmSection.setDealpilot({
+          mw: { low: dp.low, med: dp.marktwert, high: dp.high },
+          mm: { low: dp.marktmieteLow, med: dp.marktmieteCold, high: dp.marktmieteHigh },
+          conf: { label: 'Indikation', pct: null }, rating: '',
+          microRaw: (dp.scoreMicro != null ? dp.scoreMicro * 10 : null),
+          macroRaw: (dp.scoreMacro != null ? dp.scoreMacro * 10 : null)
+        }, 'live', {
+          setMode: function (mo) { try { setSpanConfig(mo === 'med' ? 'mid' : mo); } catch (e) {} },
+          apply:   function () { try { window._oabApplyExternal('DealPilot'); } catch (e) {} },
+          report:  function () { try { if (window.DealPilotMBQc && DealPilotMBQc.run) DealPilotMBQc.run(); } catch (e) {} }
+        });
+      } else if (window.AvmSection.clearDealpilot) { window.AvmSection.clearDealpilot(); }
+    } catch (e) { try { console.warn('[oab-feed]', e); } catch (_) {} }
+  }
+  window._oabSetSpan = function (s) { try { setSpanConfig(s); } catch (e) {} };
+  window._oabApplyExternal = function (name) {
+    try {
+      var i = -1, k;
+      for (k = 0; k < _avmResults.length; k++) { if (_avmResults[k] && _avmResults[k].provider === name) { i = k; break; } }
+      if (i > 0) { var r = _avmResults.splice(i, 1)[0]; _avmResults.unshift(r); }
+      if (i >= 0 && typeof applyAvmToQc === 'function') applyAvmToQc();
+    } catch (e) {}
+  };
+  window._oabApplyConsensus = function (mw, mm) {
+    try {
+      if (mm) { setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
+      if (typeof scheduleUpdate === 'function') scheduleUpdate();
+    } catch (e) {}
+  };
+  (function () { try { if (!document.getElementById('oab-qc-hide')) {
+    var st = document.createElement('style'); st.id = 'oab-qc-hide';
+    st.textContent = '#avm-results-host{display:none!important}#dp-mb-host{display:none!important}';
+    document.head.appendChild(st);
+  } } catch (e) {} })();
+
+  /* v762: AVM-Sektion (avm-section.js) im QuickCheck einspeisen + Bruecken */
+  var _oabDpMode = 'med';
+  function _oabDpSnap() {
+    try { var el = document.getElementById('_mb_state'); if (el && el.value) { var s = JSON.parse(el.value); if (s && s.card && (s.card.mw || s.card.mm)) return s; } } catch (e) {}
+    return null;
+  }
+  function _oabFeed() {
+    if (!window.AvmSection) return;
+    try {
+      var ext = {};
+      (_avmResults || []).forEach(function (r) {
+        if (!r || !r.provider) return;
+        if (r.provider === 'Sprengnetter' || r.provider === 'PriceHubble') ext[r.provider] = r;
+      });
+      window.AvmSection.setExternal(ext);
+      var snap = _oabDpSnap();
+      if (snap) {
+        var c = snap.card;
+        _oabDpMode = snap.mode || _oabDpMode || 'med';
+        window.AvmSection.setDealpilot({
+          mw: c.mw ? { low: c.mw.low, med: c.mw.med, high: c.mw.high } : null,
+          mm: c.mm ? { low: c.mm.low, med: c.mm.med, high: c.mm.high } : null,
+          conf: c.conf || { label: 'Indikation', pct: null }, rating: c.rating || '',
+          microRaw: (c.microRaw != null ? c.microRaw : null),
+          macroRaw: (c.macroRaw != null ? c.macroRaw : null)
+        }, 'live', {
+          setMode: function (mo) { _oabDpMode = (mo === 'low' || mo === 'high') ? mo : 'med'; },
+          apply: function () {
+            try {
+              var sn = _oabDpSnap(); var cc = sn ? sn.card : null;
+              var mm = (cc && cc.mm) ? cc.mm[_oabDpMode] : null;
+              if (mm) { setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
+              if (typeof scheduleUpdate === 'function') scheduleUpdate();
+            } catch (e) {}
+          },
+          report: function () { try { if (window.DealPilotMBQc && DealPilotMBQc.run) DealPilotMBQc.run(); } catch (e) {} }
+        });
+      } else if (window.AvmSection.clearDealpilot) { window.AvmSection.clearDealpilot(); }
+    } catch (e) { try { console.warn('[oab-feed]', e); } catch (_) {} }
+  }
+  window._oabSetSpan = function (s) { try { setSpanConfig(s); } catch (e) {} };
+  window._oabApplyExternal = function (name) {
+    try {
+      var i = -1, k;
+      for (k = 0; k < _avmResults.length; k++) { if (_avmResults[k] && _avmResults[k].provider === name) { i = k; break; } }
+      if (i > 0) { var r = _avmResults.splice(i, 1)[0]; _avmResults.unshift(r); }
+      if (i >= 0 && typeof applyAvmToQc === 'function') applyAvmToQc();
+    } catch (e) {}
+  };
+  window._oabApplyConsensus = function (mw, mm) {
+    try {
+      if (mm) { setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
+      if (typeof scheduleUpdate === 'function') scheduleUpdate();
+    } catch (e) {}
+  };
+  (function () { try { if (!document.getElementById('oab-qc-hide')) {
+    var st = document.createElement('style'); st.id = 'oab-qc-hide';
+    st.textContent = '#avm-results-host{display:none!important}#dp-mb-host{display:none!important}';
+    document.head.appendChild(st);
+  } } catch (e) {} })();
 
   return {
     init, scheduleUpdate, setLtv, mieteAddUp,
@@ -5810,6 +5923,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
 
 
+  <script src="js/avm-section.js?v=766"></script>
   <script src="js/dealpilot-mb-qc.js?v=554"></script>
   <script src="js/immometrica-qc.js?v=667"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
@@ -6041,6 +6155,44 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     update(); return true;
   }
   var tries=0; var iv=setInterval(function(){ tries++; if(build() || tries>40) clearInterval(iv); }, 300);
+})();
+</script>
+<style id="qc-credit-inpill-css">/* v763-credit: Kerosin-Hinweis in die PRE-FLIGHT-Pille (wie Objekt-Tab) */
+#qc-credit-hint.qc-credit-inpill{display:inline-flex !important;align-items:center;gap:6px;margin:0 0 0 6px !important;padding:0 !important;background:none !important;border:none !important;border-radius:0 !important;font:600 11px/1.3 'JetBrains Mono',monospace !important;color:#6b5d3a !important;vertical-align:middle}
+#qc-credit-hint.qc-credit-inpill b{color:#2A2727 !important;font-weight:700 !important}
+#qc-credit-hint.qc-credit-inpill .qc-credit-dot{width:7px;height:7px;flex:none}
+#qc-pf-lead.has-credit{flex-wrap:wrap;max-width:100%}
+
+
+/* v767-leadwhite BEGIN */
+/* Oberer PRE-FLIGHT-Streifen (.qc-pf-lead) -> weiss. Zaehler-Chip + Kerosin-Hinweis bleiben. */
+.qc-pf-lead{background:#ffffff !important;border:1px solid #ece4cf !important}
+/* v767-leadwhite END */
+</style>
+<script id="qc-credit-inpill-js">/* v763-credit */
+(function(){'use strict';
+  function move(){
+    var lead=document.getElementById('qc-pf-lead');
+    var hint=document.getElementById('qc-credit-hint');
+    if(!lead||!hint) return false;
+    if(hint.parentNode!==lead){ hint.classList.add('qc-credit-inpill'); lead.classList.add('has-credit'); lead.appendChild(hint); }
+    return true;
+  }
+  var t=0, iv=setInterval(function(){ t++; if(move()||t>60) clearInterval(iv); },300);
+  if(document.readyState!=='loading') move();
+})();
+</script>
+<script id="qc-ph-enable">/* v764-ph: PriceHubble ist live -> Kachel waehlbar machen */
+(function(){'use strict';
+  function en(){
+    var lab=document.querySelector('.dp-pf-tile[data-src="ph"]'); if(!lab) return false;
+    lab.classList.remove('dp-pf-soon-on','dp-pf-disabled');
+    lab.setAttribute('title','PriceHubble');
+    var cb=lab.querySelector('input'); if(cb) cb.disabled=false;
+    return true;
+  }
+  var t=0, iv=setInterval(function(){ t++; if(en()||t>40) clearInterval(iv); },250);
+  if(document.readyState!=='loading') en();
 })();
 </script>
 </body>
