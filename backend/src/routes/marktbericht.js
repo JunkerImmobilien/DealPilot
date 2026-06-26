@@ -186,6 +186,10 @@ router.get('/geocode/autocomplete', authenticate, readGet('/geocode/autocomplete
 router.get('/location-finder/meta', authenticate, readGet('/location-finder/meta'));
 router.get('/geomap/balance', authenticate, readGet('/geomap/balance'));
 router.get('/geomap/timeseries', authenticate, readGet('/geomap/timeseries'));
+// v785-boris-proxy: Bodenrichtwert (Open Data, 0 Kerosin) + Geocoding fuer das Objekt-Tab.
+router.get('/boris', authenticate, readGet('/boris'));
+router.get('/boris/coverage', authenticate, readGet('/boris/coverage'));
+router.get('/geocode', authenticate, readGet('/geocode'));
 router.post('/location-finder', authenticate, async function (req, res) {
   try { const out = await forward('POST', '/location-finder', { body: req.body || {} }); res.status(out.status).json(out.data); }
   catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }

@@ -172,6 +172,28 @@ async function start() {
     setTimeout(_runLc, 60000);                  // einmal ~1min nach Boot
     setInterval(_runLc, 24 * 60 * 60 * 1000);   // danach taeglich
   } catch (e) { console.error('[lifecycle] init failed:', e && e.message); }
+
+  // v799-retention-scheduler: taeglicher Kundenbindungs-Lauf (Auslauf + Inaktivitaet)
+  try {
+    const retentionService = require('./services/retentionService');
+    const _RET_INTERVAL_MS = 24 * 60 * 60 * 1000; // taeglich
+    const _runRetention = async () => {
+      try {
+        const r = await retentionService.runOnce({ dryRun: false });
+        console.log('[retention] Lauf fertig:',
+          'Auslauf', r.expiry.sent + '/' + r.expiry.candidates,
+          '| Inaktiv', r.inactive.sent + '/' + r.inactive.candidates);
+      } catch (e) {
+        console.error('[retention] Lauf-Fehler:', e.message);
+      }
+    };
+    setTimeout(_runRetention, 60 * 1000);          // erster Lauf 60s nach Start
+    setInterval(_runRetention, _RET_INTERVAL_MS);  // danach taeglich
+    console.log('✓ Retention-Scheduler aktiv (taeglich)');
+  } catch (e) {
+    console.error('✗ Retention-Scheduler konnte nicht starten:', e.message);
+  }
+
   // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)
   /* v538-ws-removed: Realtime-WS-Live-Pfad entfernt. Web-Audio liefert auf manchen
      Geraeten Stille -> Realtime unbrauchbar. Live-Mitschrift laeuft seit v536 ueber

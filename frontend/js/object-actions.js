@@ -408,6 +408,8 @@
     document.head.appendChild(st);
   }
   function _v754ConfirmRun() {
+    /* v782-skip-confirm: 'nicht mehr fragen' respektieren */
+    try { if (localStorage.getItem('dp_skip_kerosin_confirm') === '1') { runSelected(); return; } } catch (e) {}
     _v754Style();
     var sel = []; try { sel = selectedSources(); } catch (e) {}
     var KL = { voice: 1, pricehubble: 40, sprengnetter: 20, dealpilot: 2 };
@@ -424,7 +426,10 @@
         '<div class="v754-hero"><span class="bp">BOARDING PASS \u00b7 DEALPILOT</span><h3>Abruf best\u00e4tigen</h3></div>' +
         '<div class="v754-body">F\u00fcr diesen Abruf wird Kerosin verbraucht:' +
           '<div class="v754-cost">' + parts + (costing.length > 1 ? ' &nbsp;=&nbsp; <b>' + total + '\u00a0L</b> gesamt' : '') + '</div>' +
-          'M\u00f6chtest du fortfahren?</div>' +
+          'M\u00f6chtest du fortfahren?' +
+          '<label style="display:flex;align-items:center;gap:7px;margin-top:12px;font-size:12.5px;color:#6b6660;cursor:pointer">' +
+            '<input type="checkbox" id="v754-skip" style="accent-color:#C9A84C"> Nicht mehr fragen' +
+          '</label></div>' +
         '<div class="v754-foot">' +
           '<button type="button" class="v754-btn v754-cancel" id="v754-cancel">Abbrechen</button>' +
           '<button type="button" class="v754-btn v754-go" id="v754-go">Abrufen (' + total + '\u00a0L)</button>' +
@@ -434,7 +439,9 @@
     function close() { if (ov && ov.parentNode) ov.parentNode.removeChild(ov); }
     ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
     var c = document.getElementById('v754-cancel'); if (c) c.addEventListener('click', close);
-    var g = document.getElementById('v754-go'); if (g) g.addEventListener('click', function () { close(); try { runSelected(); } catch (e) {} });
+    var g = document.getElementById('v754-go'); if (g) g.addEventListener('click', function () {
+      try { var sk = document.getElementById('v754-skip'); if (sk && sk.checked) localStorage.setItem('dp_skip_kerosin_confirm','1'); } catch (e) {}
+      close(); try { runSelected(); } catch (e) {} });
     var esc = function (e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } };
     document.addEventListener('keydown', esc);
   }
@@ -713,7 +720,10 @@
       var m = _avm[p] && _avm[p].mode;
       if (m && m !== 'live') { delete _avm[p]; }
     });
-    _collapsed = (st && st.collapsed && typeof st.collapsed === 'object') ? st.collapsed : {};
+    /* v787-avmx-collapsed: beim Laden IMMER minimiert (gespeicherten Offen-Zustand ignorieren). */
+    _collapsed = {};
+    var _restoredColl = (st && st.collapsed && typeof st.collapsed === 'object') ? st.collapsed : {};
+    for (var _pk in _restoredColl) { if (Object.prototype.hasOwnProperty.call(_restoredColl, _pk)) _collapsed[_pk] = true; }
     /* v742-avm-persist: Karten beim Oeffnen default minimiert (nur wenn nicht explizit gesetzt) */
     Object.keys(_avm).forEach(function (p) {
       if (!(p in _collapsed)) { _collapsed[p] = true; }

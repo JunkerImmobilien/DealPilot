@@ -145,6 +145,22 @@
       var hi = rent.q75_per_sqm != null ? rent.q75_per_sqm : rsqm * 1.1;
       out.mm = { low: Math.round(lo * area), med: Math.round(rsqm * area), high: Math.round(hi * area), sqm: deNum(rsqm, 2) + ' €/m² kalt' };
     }
+    /* v783-compare: Vergleichsobjekte aus sale.comparables (Feldnamen an avm-section angleichen) */
+    try {
+      var _cmp = (d.sale && Array.isArray(d.sale.comparables)) ? d.sale.comparables : null;
+      if (_cmp && _cmp.length) {
+        out.compare = _cmp.slice(0, 10).map(function (c) {
+          return {
+            distance: (c.distance_m != null) ? c.distance_m : null,
+            livingArea: (c.living_area != null) ? c.living_area : null,
+            constructionYear: (c.build_year != null) ? c.build_year : null,
+            value: (c.price != null) ? c.price : null,
+            ppsm: (c.price_per_sqm != null) ? c.price_per_sqm : null,
+            similarity: null
+          };
+        });
+      }
+    } catch (e) {}
     return out;
   }
 
@@ -285,6 +301,23 @@
       micro:{ score:72 }, macro:{ score:65 }, price_trend_pct:2.4,
       deal_score:{ rating:'Solide' }, ref:{ living_area:wfl } };
   }
+  function _mbSpinner(on) { /* v782-spinner */
+    var ID='dp-mb-spin';
+    if (on) {
+      if (document.getElementById(ID)) return;
+      if (!document.getElementById('dp-mb-spin-css')) {
+        var st=document.createElement('style'); st.id='dp-mb-spin-css';
+        st.textContent='#'+ID+'{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;background:rgba(12,11,9,.45)}'+
+          '#'+ID+' .b{background:#fff;border-radius:14px;padding:22px 26px;display:flex;flex-direction:column;align-items:center;gap:13px;box-shadow:0 20px 60px -16px rgba(0,0,0,.5)}'+
+          '#'+ID+' .sp{width:34px;height:34px;border:3px solid rgba(201,168,76,.25);border-top-color:#C9A84C;border-radius:50%;animation:dpmbspin .8s linear infinite}'+
+          '#'+ID+' .t{font:600 13.5px/1.4 "DM Sans",sans-serif;color:#1b1815}@keyframes dpmbspin{to{transform:rotate(360deg)}}';
+        document.head.appendChild(st);
+      }
+      var o=document.createElement('div'); o.id=ID;
+      o.innerHTML='<div class="b"><div class="sp"></div><div class="t">Marktdaten werden geladen …</div></div>';
+      document.body.appendChild(o);
+    } else { var e=document.getElementById(ID); if (e&&e.parentNode) e.parentNode.removeChild(e); }
+  }
   async function run() {
     var i = inputs();
     if (!i.plz && !i.ort) { toast('Bitte mindestens PLZ oder Ort ausfüllen'); return; }
@@ -298,6 +331,7 @@
       return;
     }
     var ref = objId();
+    _mbSpinner(true);
     try {
       var res = await fetch('/api/v1/marktbericht/reports/from-dealpilot', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok() },
@@ -327,6 +361,7 @@
       toast('✓ DealPilot-Marktbewertung' + (_lc ? ' (−' + _lc + ' L)' : ''));
       try { if (global.AiCredits && typeof global.AiCredits.refreshAvm === 'function') setTimeout(global.AiCredits.refreshAvm, 400); } catch (e) {}
     } catch (e) { toast('⚠ Netzwerkfehler bei der DealPilot-Marktbewertung'); }
+    finally { _mbSpinner(false); }
   }
 
   function watch() {

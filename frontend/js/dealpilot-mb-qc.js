@@ -251,7 +251,7 @@
     var _dph = await _dpmbHealth();
     if (_dph && _dph.mode === 'stub') { /* v772-dpmb-stub */
       var _p = _dpmbStubPayload(i);
-      D = mapCard(_p); mode = 'med'; collapsed = false;
+      D = mapCard(_p); mode = 'med'; collapsed = true; /* v782-collapsed-default */
       render();
       try { var _el = $(STATE_ID); if (_el) { _el.value = JSON.stringify({ ts:Date.now(), card:D, mode:mode, collapsed:collapsed }); _el.dispatchEvent(new Event('input',{ bubbles:true })); } } catch (e) {}
       toast('\u2713 DealPilot-Marktbewertung (Demo)');
@@ -273,7 +273,7 @@
         return;
       }
       var payload = data.data || data;
-      D = mapCard(payload); mode = 'med'; collapsed = false;
+      D = mapCard(payload); mode = 'med'; collapsed = true; /* v782-collapsed-default */
       render();
       var _lc = (data._kerosin && typeof data._kerosin.charged === 'number') ? data._kerosin.charged : ((typeof data.cost === 'number') ? data.cost : (data.charged || data.liters || null));
       toast('✓ DealPilot-Marktbewertung' + (_lc ? ' (−' + _lc + ' L)' : ''));

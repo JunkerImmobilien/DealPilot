@@ -1799,3 +1799,6 @@ window.syncKuecheToMoebl = function(){
 };
 
 /* v569-icon: Einzelobjekt-Icon single->house */
+
+/* v790-buildpayload-global: Hilfe-Agent nutzt denselben Objekt-Kontext wie Pilot-Analyse */
+try { window._buildAIPayload = _buildAIPayload; } catch (e) {}

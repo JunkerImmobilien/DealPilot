@@ -417,6 +417,7 @@
     modal.className = 'help-modal global-view-overlay';
     modal.innerHTML =
       '<div class="help-modal-inner global-view-modal set-modal-v2 set-modal-cream">' +
+        '<div class="dp-modal-topband">' +'<div class="dp-mtb-brand"><span class="dp-mtb-logo">DealPilot</span><span class="dp-mtb-tag">HILFE</span></div>' +'<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title">DealPilot Hilfe</div><div class="dp-mtb-h-sub">Begriffe, Kennzahlen, Praxis-Wissen</div></div>' +'</div>' +  /* v793-topband */
         // V118: Sidebar links (wie Settings) — Header + Topics-Liste + Search-Foot
         '<aside class="modal-side help-modal-side">' +
           '<div class="ms-h">' +
@@ -442,6 +443,9 @@
           '</div>' +
           '<div class="help-modal-foot help-ai-foot">' +            '<div class="help-ai-bar" id="help-ai-bar">' +
               '<input type="text" id="help-ai-input" placeholder="✦ Frag den DealPilot-Assistenten — z.B. ‚Wann lohnt sich Tilgungsaussetzung?‘">' +
+              '<label class="help-ai-web-toggle" title="Aktuelle Marktdaten aus dem Web einbeziehen (etwas langsamer)">' +
+              '<input type="checkbox" id="help-ai-web"> <span>Web</span>' +
+              '</label>' + /* v790-help-webtoggle */
               '<button class="help-ai-btn" type="button" id="help-ai-btn" onclick="helpAskAI()">Fragen</button>' +
             '</div>' +
             '<div class="help-ai-response" id="help-ai-response"></div>' +
@@ -449,6 +453,12 @@
         '</div>' +
       '</div>';
     document.body.appendChild(modal);
+    /* v790-help-webtoggle-css */
+    if (!document.getElementById('help-webtoggle-style')) {
+      var _wt = document.createElement('style'); _wt.id = 'help-webtoggle-style';
+      _wt.textContent = '.help-ai-web-toggle{display:inline-flex;flex:0 0 auto;align-items:center;gap:5px;font-size:11.5px;color:#6f675b;cursor:pointer;user-select:none;margin-right:8px;white-space:nowrap}/*v793-toggle-flex*/.help-ai-web-toggle input{accent-color:#C9A84C;cursor:pointer;margin:0}.help-ai-web-toggle span{font-weight:600}';
+      document.head.appendChild(_wt);
+    }
 
     // Sidebar rendern — V118: nutzt Settings-Tab-Optik (.st-tab.ms-tab)
     // V120: SVG-Icons (Sprite-Refs) statt Emojis
@@ -481,9 +491,8 @@
     });
 
     // Close bei ESC oder Click auf Backdrop
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) hideHelp();
-    });
+    /* v793i-no-outside-close: Klick-aussen-schliesst KOMPLETT entfernt. Modal schliesst nur
+       noch via X-Button oder ESC. Verhindert versehentliches Schliessen bei Klick ins Modal. */
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && modal.classList.contains('help-modal-open')) hideHelp();
     });
@@ -523,6 +532,81 @@
     try { localStorage.setItem('dp_help_last_topic', id); } catch(e) {}
   }
 
+  /* v789-kpi-viz: dezente Kennzahlen-Visuals im Feedback-Stil (nur 'kennzahlen'-Topic). */
+  function _kpiVizCss() {
+    if (document.getElementById('help-kpiviz-style')) return;
+    var css = [
+      '.hkv{border:1px solid rgba(0,0,0,.09);border-radius:12px;margin:0 0 16px;overflow:hidden;background:#fff}',
+      '.hkv-h{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.09)}',
+      '.hkv-ic{width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#E8CC7A,#C9A84C);border:1px solid rgba(201,168,76,.5)}',
+      '.hkv-ic svg{width:18px;height:18px;stroke:#1c1502;fill:none;stroke-width:1.8}',
+      '.hkv-h .t{font:700 14px Inter,system-ui,sans-serif;color:#1b1815}',
+      '.hkv-h .s{font-size:11px;color:#6f675b;margin-top:1px}',
+      '.hkv-b{padding:16px 18px}',
+      '.hkv-row{display:grid;grid-template-columns:104px 1fr 80px;align-items:center;gap:13px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05)}',
+      '.hkv-row:last-child{border-bottom:0}',
+      '.hkv-row .lab{font-size:12.5px;font-weight:600;color:#1b1815}',
+      '.hkv-track{height:6px;background:#faf7f0;border-radius:3px;position:relative}',
+      '.hkv-mark{position:absolute;left:0;top:0;height:6px;border-radius:3px;background:linear-gradient(90deg,#E8CC7A,#b8932f)}',
+      '.hkv-val{font:700 12px "JetBrains Mono",monospace;color:#b8932f;text-align:right}',
+      '.hkv-cap{grid-column:1/-1;font-size:10.5px;color:#6f675b;padding-left:117px;margin-top:-3px}',
+      '.hkv-duo{display:grid;grid-template-columns:1fr 1fr;gap:13px}',
+      '.hkv-col{border:1px solid rgba(0,0,0,.09);border-radius:9px;padding:12px 14px;background:#faf7f0}',
+      '.hkv-col.acc{border-color:rgba(201,168,76,.4)}',
+      '.hkv-col .k{font:700 10px "DM Sans",sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#9a7f33}',
+      '.hkv-col .v{font:700 25px "Cormorant Garamond",Georgia,serif;margin-top:2px;color:#1b1815}',
+      '.hkv-col .d{font-size:10.5px;color:#6f675b;margin-top:2px}',
+      '.hkv-seg{display:flex;border:1px solid rgba(0,0,0,.09);border-radius:9px;overflow:hidden}',
+      '.hkv-seg .sg{flex:1;padding:10px;text-align:center}',
+      '.hkv-seg .sg .r{font:700 12px "JetBrains Mono",monospace}',
+      '.hkv-seg .sg .l{font-size:10.5px;font-weight:600;margin-top:2px}',
+      '.hkv-ftab{width:100%;border-collapse:collapse;font-size:13px}',
+      '.hkv-ftab td{padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.05)}',
+      '.hkv-ftab tr:last-child td{border-bottom:0}',
+      '.hkv-ftab .fc{font:700 14px "JetBrains Mono",monospace;color:#1b1815;width:56px}',
+      '.hkv-ftab .ar{color:#C9A84C;width:26px;text-align:center}',
+      '.hkv-ftab .rc{font:600 13px "JetBrains Mono",monospace;color:#6f675b;width:80px}',
+      '.hkv-ftab .nc{color:#6f675b;font-size:12px}'
+    ].join('');
+    var st = document.createElement('style'); st.id = 'help-kpiviz-style'; st.textContent = css;
+    document.head.appendChild(st);
+  }
+  function _kpiVizHtml() {
+    _kpiVizCss();
+    var icBar = '<svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>';
+    var icScale = '<svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M5 8l-2 5a3 3 0 006 0z"/><path d="M19 8l-2 5a3 3 0 006 0z"/></svg>';
+    var icScore = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+    var icTab = '<svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h10"/></svg>';
+    var h = '';
+    /* Bruttomietrendite-Skala */
+    h += '<div class="hkv"><div class="hkv-h"><span class="hkv-ic">' + icBar + '</span><div><div class="t">Bruttomietrendite</div><div class="s">Typische Werte nach Lage</div></div></div><div class="hkv-b">'
+      + '<div class="hkv-row"><span class="lab">A-Lagen</span><span class="hkv-track"><span class="hkv-mark" style="width:35%"></span></span><span class="hkv-val">2,5\u20133,5\u00a0%</span><span class="hkv-cap">M\u00fcnchen, Hamburg, Frankfurt</span></div>'
+      + '<div class="hkv-row"><span class="lab">B-/C-St\u00e4dte</span><span class="hkv-track"><span class="hkv-mark" style="width:62%"></span></span><span class="hkv-val">5\u20137\u00a0%</span><span class="hkv-cap">Herford, Dortmund, Kassel \u2014 \u201eSweet Spot\u201c</span></div>'
+      + '<div class="hkv-row"><span class="lab">D-Lagen</span><span class="hkv-track"><span class="hkv-mark" style="width:85%"></span></span><span class="hkv-val">7\u20139\u00a0%</span><span class="hkv-cap">Chemnitz, Halle \u2014 h\u00f6here Rendite, h\u00f6heres Risiko</span></div>'
+      + '</div></div>';
+    /* Brutto vs Netto */
+    h += '<div class="hkv"><div class="hkv-h"><span class="hkv-ic">' + icScale + '</span><div><div class="t">Brutto- vs. Nettomietrendite</div><div class="s">Netto zieht Kosten ab \u2014 liegt immer darunter</div></div></div><div class="hkv-b">'
+      + '<div class="hkv-duo"><div class="hkv-col"><div class="k">Brutto</div><div class="v">6,0\u00a0%</div><div class="d">nur Kaufpreis \u00b7 vor Kosten</div></div>'
+      + '<div class="hkv-col acc"><div class="k">Netto</div><div class="v" style="color:#2f8f57">4,0\u00a0%</div><div class="d">\u2212 Kosten \u00b7 inkl. Kaufnebenkosten</div></div></div>'
+      + '</div></div>';
+    /* DealScore-Leiste */
+    h += '<div class="hkv"><div class="hkv-h"><span class="hkv-ic">' + icScore + '</span><div><div class="t">DealScore</div><div class="s">Eine Zahl 0\u2013100 aus acht Kennzahlen</div></div></div><div class="hkv-b">'
+      + '<div class="hkv-seg">'
+      + '<div class="sg" style="background:rgba(63,165,108,.16)"><div class="r" style="color:#2f8f57">80\u2013100</div><div class="l" style="color:#2f8f57">Ausgezeichnet</div></div>'
+      + '<div class="sg" style="background:rgba(201,168,76,.18)"><div class="r" style="color:#b8932f">60\u201379</div><div class="l" style="color:#b8932f">Gut</div></div>'
+      + '<div class="sg" style="background:rgba(201,140,60,.16)"><div class="r" style="color:#b5742a">40\u201359</div><div class="l" style="color:#b5742a">Mittel</div></div>'
+      + '<div class="sg" style="background:rgba(184,98,92,.15)"><div class="r" style="color:#a8514a">0\u201339</div><div class="l" style="color:#a8514a">Schwach</div></div>'
+      + '</div></div></div>';
+    /* Faktor-Tabelle */
+    h += '<div class="hkv"><div class="hkv-h"><span class="hkv-ic">' + icTab + '</span><div><div class="t">Faktor \u2194 Bruttomietrendite</div><div class="s">Kaufpreis \u00f7 Jahresmiete \u2014 Spiegelbild der Rendite</div></div></div><div class="hkv-b">'
+      + '<table class="hkv-ftab">'
+      + '<tr><td class="fc">20\u00d7</td><td class="ar">\u2194</td><td class="rc">\u2248 5,0\u00a0%</td><td class="nc">B-/C-Lagen-Bereich</td></tr>'
+      + '<tr><td class="fc">25\u00d7</td><td class="ar">\u2194</td><td class="rc">\u2248 4,0\u00a0%</td><td class="nc">solide bis gehoben</td></tr>'
+      + '<tr><td class="fc">30\u00d7</td><td class="ar">\u2194</td><td class="rc">\u2248 3,3\u00a0%</td><td class="nc">A-Lagen-Einstieg</td></tr>'
+      + '<tr><td class="fc">40\u00d7</td><td class="ar">\u2194</td><td class="rc">\u2248 2,5\u00a0%</td><td class="nc">Top-Lagen (M\u00fcnchen)</td></tr>'
+      + '</table></div></div>';
+    return h;
+  }
   function _renderTopic(topic) {
     var c = document.getElementById('help-content');
     if (!c) return;
@@ -559,6 +643,8 @@
           '</button>' +
         '</div>';
     }
+    /* v789-kpi-viz: Visuals oben im Kennzahlen-Topic */
+    if (topic.id === 'kennzahlen') { html += _kpiVizHtml(); }
     topic.sections.forEach(function(s) {
       html += '<div class="help-section">' +
         '<h3>' + _escHtml(s.h) + '</h3>' +
@@ -646,24 +732,44 @@
 
   // Server-Proxy zum KI-Endpoint. Wenn Auth verfügbar, nutzen wir es.
   // Fallback: Lokale FAQ-Suche wenn keine Auth/keine API.
+  /* v790-help-copilot: echter Agent ueber /ai/copilot (kennt Objekt, Kerosin-frei). */
+  var _helpHistory = [];
+  function _helpResetHistory() { _helpHistory = []; }
+  function _helpBuildContext() {
+    try {
+      if (typeof window._buildAIPayload === 'function') {
+        var p = window._buildAIPayload();
+        if (p && typeof p === 'object') { var c = Object.assign({}, p); delete c.userApiKey; delete c.apiKey; delete c.openai_api_key; return c; }
+      }
+    } catch (e) {}
+    try { if (window._currentObjData && typeof window._currentObjData === 'object') return window._currentObjData; } catch (e) {}
+    return {};
+  }
+  function _helpWebAllowed() {
+    try { var t = document.getElementById('help-ai-web'); return !!(t && t.checked); } catch (e) { return false; }
+  }
   function _callHelpAI(question) {
     return new Promise(function(resolve, reject) {
-      // V63.70: Reuse OpenAI-Endpoint mit Help-Modus
-      // Backend kann das später als eigenen /help/ask routen — Frontend ist robust.
       if (typeof Auth !== 'undefined' && Auth.apiCall && Auth.isApiMode && Auth.isApiMode()) {
-        Auth.apiCall('/ai/help', { method: 'POST', body: { question: question } })
+        var body = {
+          message: question,
+          context: _helpBuildContext(),
+          history: _helpHistory.slice(-10),
+          allowWeb: _helpWebAllowed()
+        };
+        Auth.apiCall('/ai/copilot', { method: 'POST', body: body })
           .then(function(data) {
-            if (data && data.answer) resolve(data.answer);
-            else if (data && data.text) resolve(data.text);
-            else reject(new Error('Antwort vom Server hatte kein Format'));
+            var ans = (data && (data.reply || data.answer || data.text)) || '';
+            if (!ans) { reject(new Error('Antwort vom Server war leer')); return; }
+            _helpHistory.push({ role: 'user', content: question });
+            _helpHistory.push({ role: 'assistant', content: ans });
+            resolve(ans);
           })
           .catch(function(e) {
-            // Wenn /ai/help noch nicht existiert, Lokal-Fallback
-            if (e && (e.status === 404 || e.status === 405)) {
-              resolve(_localFallback(question));
-            } else {
-              reject(e);
-            }
+            if (e && e.status === 429) { reject(new Error('Tageslimit fuer KI-Fragen erreicht \u2014 morgen wieder verfuegbar.')); return; }
+            if (e && e.status === 503) { reject(new Error('KI momentan nicht konfiguriert. Bitte sp\u00e4ter erneut versuchen.')); return; }
+            if (e && (e.status === 404 || e.status === 405)) { resolve(_localFallback(question)); return; }
+            reject(e);
           });
       } else {
         resolve(_localFallback(question));

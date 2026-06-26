@@ -19113,13 +19113,13 @@ body .help-modal.global-view-overlay {
   font-size: 13px;
   line-height: 1.55;
 }
-.help-ai-hint { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.55); }
+.help-ai-hint { background: rgba(0,0,0,0.03); color: #6f675b; } /* v792-aitext */
 .help-ai-loading {
   display: flex;
   align-items: center;
   gap: 4px;
   background: rgba(201,168,76,0.06);
-  color: rgba(255,255,255,0.7);
+  color: #6f675b; /* v792-aitext */
 }
 .help-ai-loading-text { margin-left: 8px; font-size: 12.5px; }
 .help-ai-dot {
@@ -19144,18 +19144,18 @@ body .help-modal.global-view-overlay {
 .help-ai-answer {
   background: rgba(63,165,108,0.08);
   border: 1px solid rgba(63,165,108,0.25);
-  color: rgba(255,255,255,0.92);
+  color: #1b1815;            /* v792-aitext: lesbar auf hellem Grund */
 }
 .help-ai-answer-q {
   font-size: 12px;
-  color: rgba(255,255,255,0.55);
+  color: #6f675b;            /* v792-aitext */
   margin-bottom: 6px;
   padding-bottom: 6px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .help-ai-answer-a p { margin: 0 0 6px; }
 .help-ai-answer-a p:last-child { margin-bottom: 0; }
-.help-ai-answer-a strong { color: var(--gold); }
+.help-ai-answer-a strong { color: #b8932f; } /* v792-aitext */
 
 /* Help-Tile-Akzent im Aktionen-Panel */
 .bsheet-tile-help {
@@ -25916,8 +25916,8 @@ html[data-bg="white"] .set-modal-cream .pane-wrap {
   border-radius: 16px !important;
   width: 1100px !important;
   max-width: calc(100vw - 60px) !important;
-  max-height: 680px !important;
-  height: 680px !important;
+  max-height: 92vh !important;     /* v786c-fix: war 680px fix */
+  height: auto !important;
   overflow: hidden !important;
   display: grid !important;
   grid-template-columns: 240px 1fr !important;
@@ -26057,12 +26057,16 @@ html[data-bg="white"] .set-modal-cream .pane-wrap {
   height: 100% !important;
   overflow: hidden !important;
   background: var(--cream, #F8F6F1) !important;
+  min-height: 0 !important;            /* v792-scroll: Grid-Zelle darf schrumpfen */
 }
 
 /* Pane-Wrap (alle st-panes leben hier drin) */
 .set-modal-cream .pane-wrap {
   padding: 24px 28px;
-  overflow: auto;
+  overflow-y: auto;            /* v792-scroll: vertikal scrollen */
+  overflow-x: hidden;
+  min-height: 0;               /* v792-scroll: KERN-FIX - Flex-Child darf schrumpfen statt Grid zu sprengen */
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -26334,7 +26338,7 @@ html[data-bg="white"] .set-modal-cream .pane-wrap {
     border-bottom: 1px solid rgba(201,168,76,.2);
   }
   .set-modal-cream .ms-h { padding: 14px 14px 10px; }
-  .set-modal-cream .ms-tabs { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; padding: 8px 12px; }
+  /* v786d: ms-tabs vertikal statt horizontal */ .set-modal-cream .ms-tabs { flex-direction: column !important; flex-wrap: nowrap !important; overflow-x: visible !important; overflow-y: auto !important; padding: 8px 10px !important; gap: 3px !important; }
   .set-modal-cream .ms-tab { flex-shrink: 0; }
   .set-modal-cream .ms-foot { display: none; }
 }
@@ -33772,3 +33776,530 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 #feedback-modal .fb-success-icon{ background:rgba(63,165,108,.14) !important; color:#3FA56C !important; }
 /* === v777e-success-fix END === */
 
+/* v785c-brw-helpers-row: Buttons unter Grund&Boden nebeneinander statt untereinander. */
+.brw-helpers{
+  grid-column:1 / -1 !important;        /* aus der schmalen .g2-Spalte ueber volle Breite */
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  gap:8px !important;
+  margin-top:8px !important;
+}
+.brw-helpers .btn-brw{ flex:0 0 auto !important; }
+.brw-helpers .brw-ai-status{ flex:1 1 100% !important; margin-top:2px !important; }
+
+
+/* v785d-brw-field-span: .brw-helpers ist Enkel von .g2 (sitzt in .f). grid-column auf .brw-helpers
+   wirkt nicht. Stattdessen das .f-Feld, das .brw-helpers enthaelt, ueber beide Spalten
+   spannen -> die Buttons haben die volle Breite und stehen nebeneinander. */
+.g2 > .f:has(.brw-helpers){
+  grid-column:1 / -1 !important;
+}
+
+/* v786b-modal-feedback: Settings + Hilfe im Feedback-Modal-Look (hell, 1180px, Brandbar + Gold-Hero). */
+
+/* ===== Container: 1180px, weiss, Flex-Spalte (Brandbar oben, dann Split) ===== */
+.settings-modal.set-modal-v2{
+  max-width:1180px !important; width:100% !important;
+  background:#fff !important;
+  position:relative !important;
+  padding-top:46px !important;            /* Platz fuer absolute Brandbar */
+  overflow:hidden !important;
+  border:1px solid rgba(201,168,76,.30) !important;
+}
+.help-modal.global-view-overlay .help-modal-inner.global-view-modal{
+  position:relative !important;
+  padding-top:46px !important;
+  background:#fff !important;
+}
+
+/* ===== Obsidian-Brandbar (absolut oben, ueber beiden Modalen) ===== */
+.settings-modal.set-modal-v2::before,
+.help-modal.global-view-overlay .help-modal-inner::before{
+  content:'DealPilot';
+  position:absolute; top:0; left:0; right:0; height:46px;
+  display:flex; align-items:center; padding:0 24px;
+  background:#070707 !important; color:#fff !important;
+  font:700 17px 'Space Grotesk','DM Sans',system-ui,sans-serif !important; letter-spacing:.3px;
+  z-index:8; pointer-events:none;
+}
+.settings-modal.set-modal-v2::after,
+.help-modal.global-view-overlay .help-modal-inner::after{
+  position:absolute; top:0; right:24px; height:46px;
+  display:flex; align-items:center;
+  font:700 10px 'JetBrains Mono',monospace !important; letter-spacing:2px; color:#C9A84C !important;
+  z-index:8; pointer-events:none;
+}
+.settings-modal.set-modal-v2::after{ content:'EINSTELLUNGEN'; }
+.help-modal.global-view-overlay .help-modal-inner::after{ content:'HILFE'; }
+
+/* ===== HELLE Sidebar (war dunkel) ===== */
+.set-modal-cream .modal-side,
+.help-modal.global-view-overlay .help-modal-side{
+  background:#FDFCFA !important;
+  border-right:1px solid rgba(201,168,76,.18) !important;
+}
+/* Partikel-Overlay der dunklen Sidebar abschalten */
+.set-modal-cream .modal-side::before{ display:none !important; }
+
+/* ===== Gold-Hero: der Sidebar-Header .ms-h wird zum Runway-Band ===== */
+.set-modal-cream .ms-h,
+.help-modal.global-view-overlay .help-modal-side .ms-h{
+  background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f) !important;
+  border-bottom:0 !important; padding:16px 20px 14px !important;
+}
+.set-modal-cream .ms-h .ms-title,
+.help-modal.global-view-overlay .help-modal-side .ms-h .ms-title{ color:#1c1502 !important; }
+.set-modal-cream .ms-h .ms-title .gold,
+.help-modal.global-view-overlay .help-modal-side .ms-h .ms-title .gold{
+  -webkit-text-fill-color:#3a2c06 !important; background:none !important; color:#3a2c06 !important;
+}
+.set-modal-cream .ms-h .ms-title .ic,
+.help-modal.global-view-overlay .help-modal-side .ms-h .ms-title .ic{ color:#3a2c06 !important; }
+.set-modal-cream .ms-h .ms-sub,
+.help-modal.global-view-overlay .help-modal-side .ms-h .ms-sub{ color:#5a4609 !important; }
+
+/* ===== Tabs auf HELLER Sidebar (Settings .st-tab/.ms-tab) ===== */
+.set-modal-cream .modal-side .st-tab,
+.set-modal-cream .modal-side .ms-tab{
+  color:#5b554c !important; background:transparent !important;
+}
+.set-modal-cream .modal-side .st-tab:hover,
+.set-modal-cream .modal-side .ms-tab:hover{
+  background:rgba(201,168,76,.08) !important; color:#1b1815 !important;
+}
+.set-modal-cream .modal-side .st-tab.active,
+.set-modal-cream .modal-side .ms-tab.active{
+  background:rgba(201,168,76,.13) !important; color:#7a5e16 !important;
+  border-bottom-color:transparent !important;
+}
+.set-modal-cream .modal-side .st-tab .ic,
+.set-modal-cream .modal-side .ms-tab .ic{ color:#a98f43 !important; }
+.set-modal-cream .modal-side .st-tab.active .ic,
+.set-modal-cream .modal-side .ms-tab.active .ic{ color:var(--gold,#C9A84C) !important; }
+
+/* ===== Hilfe: Topic-Items auf heller Sidebar ===== */
+.help-modal.global-view-overlay .help-sidebar-item{
+  color:#5b554c !important; background:transparent !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item:hover{
+  background:rgba(201,168,76,.08) !important; color:#1b1815 !important;
+  border-color:rgba(201,168,76,.22) !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item.active,
+.help-modal.global-view-overlay .help-sidebar-item.help-sidebar-item-active{
+  background:rgba(201,168,76,.13) !important; color:#7a5e16 !important;
+  border-color:rgba(201,168,76,.40) !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item .help-sidebar-item-icon{
+  background:rgba(201,168,76,.14) !important; color:var(--gold,#C9A84C) !important;
+}
+/* Hilfe-Suchfeld auf heller Sidebar */
+.help-modal.global-view-overlay .help-modal-side .help-modal-search input{
+  background:#fff !important; color:#1b1815 !important; border:1px solid rgba(201,168,76,.25) !important;
+}
+
+/* ===== Body/Content bleibt hell ===== */
+.set-modal-cream .set-modal-content,
+.set-modal-cream .pane-wrap{ background:#fff !important; }
+.set-modal-content.help-modal-content{ background:#fff !important; }
+
+/* X-Button unter die Brandbar schieben */
+.settings-modal.set-modal-v2 .set-modal-close,
+.set-modal-content.help-modal-content .set-modal-close{
+  top:56px !important; z-index:9 !important;
+}
+
+/* v786b-modal-feedback-end */
+
+/* v786c-fix: Hilfe-Sidebar-Texte auf heller Sidebar lesbar (waren weiss). */
+.help-modal.global-view-overlay .help-sidebar-item-title{
+  color:#1b1815 !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item-desc{
+  color:#6f675b !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item.active .help-sidebar-item-title,
+.help-modal.global-view-overlay .help-sidebar-item.help-sidebar-item-active .help-sidebar-item-title{
+  color:#7a5e16 !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item.active .help-sidebar-item-desc,
+.help-modal.global-view-overlay .help-sidebar-item.help-sidebar-item-active .help-sidebar-item-desc{
+  color:#8a6c1e !important;
+}
+/* v786c-fix-end */
+
+/* v785e-btn-brw-font: BORIS-Buttons Schrift an Tab-Standard angleichen. */
+.brw-helpers .btn-brw{
+  font-family:var(--font-main,'IBM Plex Sans',system-ui,sans-serif) !important;
+  font-size:13px !important;
+  font-weight:600 !important;
+  letter-spacing:0 !important;
+  font-feature-settings:normal !important;
+  padding:9px 14px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:7px !important;
+}
+.brw-helpers .btn-brw .btn-brw-icon{
+  font-size:13px !important;
+  display:inline-flex !important; align-items:center !important;
+}
+.brw-helpers .btn-brw .btn-brw-icon svg{ width:15px !important; height:15px !important; }
+/* v785e-btn-brw-font-end */
+
+/* v786d-sidebar-polish: Sidebar-Aufwertung (Feedback-Stil) + Goldrand durchgaengig. */
+
+/* ===== Goldrand/Brandbar oben sauber durchgaengig ===== */
+.settings-modal.set-modal-v2,
+.help-modal-inner.set-modal-v2{
+  border-radius:14px !important;
+}
+.settings-modal.set-modal-v2::before,
+.help-modal.global-view-overlay .help-modal-inner::before{
+  border-top-left-radius:14px !important; border-top-right-radius:14px !important;
+}
+
+/* ===== Settings-Tabs vertikal (kein horizontales Scrollen) ===== */
+.set-modal-cream .ms-tabs,
+.set-modal-cream .settings-tabs{
+  flex-direction:column !important; flex-wrap:nowrap !important;
+  overflow-x:visible !important; overflow-y:auto !important;
+  border-bottom:0 !important; gap:3px !important; padding:8px 10px !important;
+}
+/* Schmale, dezente Scrollbar in der Sidebar */
+.set-modal-cream .ms-tabs::-webkit-scrollbar,
+.help-modal.global-view-overlay .help-sidebar-list::-webkit-scrollbar{ width:5px; }
+.set-modal-cream .ms-tabs::-webkit-scrollbar-thumb,
+.help-modal.global-view-overlay .help-sidebar-list::-webkit-scrollbar-thumb{ background:rgba(201,168,76,.35); border-radius:3px; }
+
+/* ===== Settings-Tab als Zeile mit Gold-Icon-Box ===== */
+.set-modal-cream .modal-side .st-tab,
+.set-modal-cream .modal-side .ms-tab{
+  display:flex !important; align-items:center !important; gap:11px !important;
+  width:100% !important; text-align:left !important;
+  padding:10px 11px !important; border-radius:10px !important;
+  border:1px solid transparent !important; border-bottom:1px solid transparent !important;
+  white-space:normal !important; transition:.14s !important;
+}
+.set-modal-cream .modal-side .st-tab:hover,
+.set-modal-cream .modal-side .ms-tab:hover{
+  background:rgba(201,168,76,.07) !important; border-color:rgba(201,168,76,.18) !important;
+}
+.set-modal-cream .modal-side .st-tab.active,
+.set-modal-cream .modal-side .ms-tab.active{
+  background:rgba(201,168,76,.12) !important; border-color:rgba(201,168,76,.38) !important;
+}
+/* Icon -> Gold-Box */
+.set-modal-cream .modal-side .st-tab .ic,
+.set-modal-cream .modal-side .ms-tab .ic{
+  width:32px !important; height:32px !important; flex:none !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  background:#faf7f0 !important; border:1px solid rgba(0,0,0,.09) !important; border-radius:9px !important;
+  color:#9a7f33 !important; transition:.14s !important;
+}
+.set-modal-cream .modal-side .st-tab.active .ic,
+.set-modal-cream .modal-side .ms-tab.active .ic{
+  background:linear-gradient(135deg,#E8CC7A,#C9A84C) !important;
+  border-color:rgba(201,168,76,.5) !important; color:#1c1502 !important;
+}
+.set-modal-cream .modal-side .st-tab .ic svg,
+.set-modal-cream .modal-side .ms-tab .ic svg{ width:16px !important; height:16px !important; }
+
+/* ===== Hilfe-Sidebar-Items als Gold-Icon-Box (Mockup-Look) ===== */
+.help-modal.global-view-overlay .help-sidebar-item{
+  display:flex !important; flex-direction:column !important; gap:3px !important;
+  padding:10px 11px !important; border-radius:10px !important;
+  border:1px solid transparent !important; transition:.14s !important; margin:0 !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item:hover{
+  background:rgba(201,168,76,.07) !important; border-color:rgba(201,168,76,.18) !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item.active,
+.help-modal.global-view-overlay .help-sidebar-item.help-sidebar-item-active{
+  background:rgba(201,168,76,.12) !important; border-color:rgba(201,168,76,.38) !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item-row{
+  display:flex !important; align-items:center !important; gap:11px !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item-icon{
+  width:32px !important; height:32px !important; flex:none !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  background:#faf7f0 !important; border:1px solid rgba(0,0,0,.09) !important; border-radius:9px !important;
+  color:#9a7f33 !important; margin:0 !important; transition:.14s !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item.active .help-sidebar-item-icon,
+.help-modal.global-view-overlay .help-sidebar-item.help-sidebar-item-active .help-sidebar-item-icon{
+  background:linear-gradient(135deg,#E8CC7A,#C9A84C) !important;
+  border-color:rgba(201,168,76,.5) !important; color:#1c1502 !important;
+}
+.help-modal.global-view-overlay .help-sidebar-item-icon svg{ width:16px !important; height:16px !important; }
+/* Desc unter dem Titel, an Icon-Box ausgerichtet */
+.help-modal.global-view-overlay .help-sidebar-item-desc{
+  margin-left:43px !important; margin-top:0 !important; line-height:1.3 !important;
+}
+/* v786d-sidebar-polish-end */
+
+/* v786f-scroll-fix: Einstellungen-Content scrollt wieder + X-Button oben rechts. */
+
+/* Grid-Zelle (Pane-Bereich) darf schrumpfen, damit der Wrap scrollen kann */
+.set-modal-cream .set-modal-content{
+  min-height:0 !important;
+}
+.set-modal-cream .set-modal-content > .pane-wrap,
+.set-modal-cream .pane-wrap{
+  min-height:0 !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  max-height:100% !important;
+}
+/* aktives Pane im normalen Fluss (nicht endlos wachsen lassen) */
+.set-modal-cream .pane-wrap .st-pane.active,
+.set-modal-cream .pane-wrap .st-pane{
+  flex:0 0 auto !important;
+  overflow:visible !important;
+  height:auto !important;
+}
+/* dezente Gold-Scrollbar */
+.set-modal-cream .pane-wrap::-webkit-scrollbar{ width:7px; }
+.set-modal-cream .pane-wrap::-webkit-scrollbar-thumb{ background:rgba(201,168,76,.35); border-radius:3px; }
+
+/* X-Button zurueck in die obere rechte Ecke (v786b hatte top:56px) */
+.settings-modal.set-modal-v2 .set-modal-close,
+.set-modal-content.help-modal-content .set-modal-close,
+.set-modal-cream .set-modal-close{
+  top:12px !important; right:14px !important; z-index:12 !important;
+}
+/* v786f-scroll-fix-end */
+
+/* v793-topband-css: vollbreite Hero-Leiste (schwarze Brandbar + Gold-Band) ueber beide Spalten. */
+
+/* Container: Grid mit erster vollbreiter Zeile fuer das Topband */
+.help-modal.global-view-overlay .help-modal-inner.global-view-modal,
+.settings-modal.set-modal-v2{
+  grid-template-columns:280px 1fr !important;
+  grid-template-rows:auto 1fr !important;
+  grid-template-areas:'band band' 'side main' !important;
+  padding-top:0 !important;
+}
+/* Topband ueber beide Spalten */
+.dp-modal-topband{ grid-area:band; display:flex; flex-direction:column; }
+/* Schwarze Brandbar */
+.dp-mtb-brand{ background:#070707; height:46px; display:flex; align-items:center; padding:0 24px; }
+.dp-mtb-logo{ font:700 17px 'Space Grotesk','DM Sans',system-ui,sans-serif; color:#fff; letter-spacing:.3px; }
+.dp-mtb-tag{ margin-left:auto; font:700 10px 'JetBrains Mono',monospace; letter-spacing:2px; color:#C9A84C; }
+/* Gold-Band, volle Breite */
+.dp-mtb-hero{ height:54px; background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f); }
+
+/* Sidebar + Content in die Grid-Areas */
+.help-modal.global-view-overlay .help-modal-side,
+.settings-modal.set-modal-v2 .modal-side{ grid-area:side !important; }
+.set-modal-content,
+.set-modal-content.help-modal-content{ grid-area:main !important; }
+
+/* Alten Gold-Hero in der Sidebar (.ms-h) NEUTRALISIEREN - Gold kommt jetzt vom Topband.
+   ms-h wird zur normalen Sidebar-Ueberschrift auf hellem Grund. */
+.set-modal-cream .ms-h,
+.help-modal.global-view-overlay .help-modal-side .ms-h{
+  background:#FBFAF7 !important; position:static !important;
+  padding:14px 16px 10px !important; border-bottom:1px solid rgba(0,0,0,.07) !important;
+}
+.set-modal-cream .ms-h .ms-title,
+.help-modal.global-view-overlay .help-modal-side .ms-h .ms-title{ color:#1b1815 !important; }
+.set-modal-cream .ms-h .ms-title .gold,
+.help-modal.global-view-overlay .help-modal-side .ms-h .ms-title .gold{
+  -webkit-text-fill-color:#b8932f !important; background:none !important; color:#b8932f !important;
+}
+.set-modal-cream .ms-h .ms-title .ic,
+.help-modal.global-view-overlay .help-modal-side .ms-h .ms-title .ic{ color:#b8932f !important; }
+.set-modal-cream .ms-h .ms-sub,
+.help-modal.global-view-overlay .help-modal-side .ms-h .ms-sub{ color:#6f675b !important; }
+
+/* X-Button unter das Band */
+.settings-modal.set-modal-v2 .set-modal-close,
+.set-modal-content.help-modal-content .set-modal-close,
+
+/* Alte v786b-Brandbar-Pseudos abschalten (jetzt echtes Markup) */
+.settings-modal.set-modal-v2::before,
+.help-modal.global-view-overlay .help-modal-inner::before,
+.settings-modal.set-modal-v2::after,
+.help-modal.global-view-overlay .help-modal-inner::after{ content:none !important; display:none !important; }
+/* v793-topband-css-end */
+
+/* v793b-goldband-fix: Titel im Gold-Band, Sidebar-ms-h weg, Hilfe-Grid sauber. */
+
+/* Titel + Untertitel im Gold-Band */
+.dp-mtb-hero-titled{ display:flex; flex-direction:column; justify-content:center; padding:0 30px; }
+.dp-mtb-h-title{ font:600 22px 'Cormorant Garamond',Georgia,serif; color:#1c1502; line-height:1.1; }
+.dp-mtb-h-sub{ font-size:12px; color:#4f4111; margin-top:1px; }
+
+/* Gold-Band etwas hoeher fuer Titel */
+.dp-mtb-hero{ height:62px !important; }
+
+/* Sidebar-Titel .ms-h KOMPLETT weg (Titel ist jetzt im Band) */
+.set-modal-cream .ms-h,
+.help-modal.global-view-overlay .help-modal-side .ms-h{ display:none !important; }
+
+/* Container: harte Grid-Definition, alte padding-top-Reste killen */
+.help-modal.global-view-overlay .help-modal-inner.global-view-modal,
+.settings-modal.set-modal-v2{
+  display:grid !important;
+  grid-template-columns:280px 1fr !important;
+  grid-template-rows:auto 1fr !important;
+  grid-template-areas:'band band' 'side main' !important;
+  padding:0 !important; padding-top:0 !important;
+  overflow:hidden !important;
+}
+.dp-modal-topband{ grid-area:band !important; }
+/* BEIDE Sidebar-Varianten in die side-Area */
+.help-modal.global-view-overlay .help-modal-side,
+.settings-modal.set-modal-v2 > .modal-side,
+.settings-modal.set-modal-v2 .modal-side{ grid-area:side !important; padding-top:0 !important; }
+/* Content in main */
+.help-modal.global-view-overlay .set-modal-content,
+.settings-modal.set-modal-v2 .set-modal-content,
+.set-modal-content.help-modal-content{ grid-area:main !important; }
+
+/* Search-Feld in der Sidebar braucht jetzt oben etwas Luft (ms-h weg) */
+.help-modal.global-view-overlay .help-modal-side .help-modal-search{ padding-top:14px !important; }
+.settings-modal.set-modal-v2 .settings-tabs.ms-tabs{ padding-top:8px !important; }
+
+/* X-Button unter das Band */
+.settings-modal.set-modal-v2 .set-modal-close,
+.set-modal-content.help-modal-content .set-modal-close,
+/* v793b-goldband-fix-end */
+
+/* v793c-help-grid-id: Hilfe-Grid mit ID-Spezifitaet erzwingen (schlaegt #help-modal display:flex Z.30609). */
+#help-modal.help-modal.global-view-overlay .help-modal-inner.global-view-modal,
+#help-modal .help-modal-inner{
+  display:grid !important;
+  flex-direction:unset !important;
+  grid-template-columns:280px 1fr !important;
+  grid-template-rows:auto 1fr !important;
+  grid-template-areas:'band band' 'side main' !important;
+  width:92vw !important; max-width:1180px !important;
+  height:88vh !important; max-height:88vh !important;
+  padding:0 !important; overflow:hidden !important;
+}
+/* Topband + Sidebar + Content in ihre Areas (ID-Spezifitaet) */
+#help-modal .dp-modal-topband{ grid-area:band !important; }
+#help-modal .help-modal-side{ grid-area:side !important; flex-shrink:unset !important; max-height:unset !important; }
+#help-modal .set-modal-content.help-modal-content{ grid-area:main !important; }
+/* v793c-help-grid-id-end */
+
+/* v793d-xbtn: X-Schliessen-Button sauber oben rechts im Content (unter dem Gold-Band). */
+.settings-modal.set-modal-v2 .set-modal-close,
+.set-modal-content.help-modal-content .set-modal-close,
+#help-modal .help-modal-content .set-modal-close,
+.set-modal-cream .set-modal-close{
+  position:absolute !important; top:12px !important; right:14px !important;
+  z-index:13 !important;
+}
+/* v793d-xbtn-end */
+
+/* v793g-solid-fill: Modal-Inneres KOMPLETT deckend - verdeckt den blur-Overlay, kein Lila-Schimmer. */
+/* Hoechste Spezifitaet (ID), damit es ALLES schlaegt. */
+#help-modal.help-modal.global-view-overlay .help-modal-inner,
+#help-modal .help-modal-inner,
+#help-modal .help-modal-inner.global-view-modal{
+  background:#ffffff !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  isolation:auto !important;
+  display:grid !important;
+  grid-template-columns:280px 1fr !important;
+  grid-template-rows:auto 1fr !important;
+  grid-template-areas:'band band' 'side main' !important;
+  overflow:hidden !important;
+}
+/* Jede Zelle deckend + voll, keine Luecke */
+#help-modal .dp-modal-topband{ grid-area:band !important; width:100% !important; background:#fff !important; }
+#help-modal .help-modal-side{ grid-area:side !important; width:100% !important; height:100% !important; background:#FBFAF7 !important; }
+#help-modal .set-modal-content.help-modal-content{ grid-area:main !important; width:100% !important; height:100% !important; background:#fff !important; overflow-y:auto !important; overflow-x:hidden !important; }
+#help-modal .help-content{ background:#fff !important; min-height:100% !important; }
+/* Settings analog (gleicher Effekt, ohne ID) */
+.settings-modal.set-modal-v2{ background:#fff !important; backdrop-filter:none !important; }
+.settings-modal.set-modal-v2 .set-modal-content{ background:#fff !important; width:100% !important; height:100% !important; }
+.settings-modal.set-modal-v2 .modal-side{ background:#FBFAF7 !important; width:100% !important; height:100% !important; }
+.settings-modal.set-modal-v2 .pane-wrap{ background:#fff !important; min-height:100% !important; }
+/* Streifen-Pseudo aus */
+#help-modal .dpfk-head::after,
+.settings-modal.set-modal-v2 .dpfk-head::after{ display:none !important; }
+/* v793g-solid-fill-end */
+
+/* v793h-solid-content: Content SOLIDE undurchsichtig - kein durchscheinender Blur-Overlay (rosa/lila). */
+/* Hoechste Spezifitaet: html-Prefix + ID, schlaegt html[data-bg]-Regeln. */
+html #help-modal .set-modal-content.help-modal-content,
+html[data-bg="white"] #help-modal .set-modal-content.help-modal-content,
+html[data-bg="cream"] #help-modal .set-modal-content.help-modal-content{
+  background:#FAFAF7 !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  position:relative !important; z-index:5 !important;
+}
+/* help-content war background:transparent -> SOLIDE setzen */
+html #help-modal .help-content,
+html #help-modal .help-content-wrap{
+  background:#FAFAF7 !important; min-height:100% !important;
+}
+/* Sidebar solide */
+html #help-modal .help-modal-side{
+  background:#FBFAF7 !important; backdrop-filter:none !important;
+}
+/* Modal-Inneres solide (kein Blur durchscheinend) */
+html #help-modal .help-modal-inner{
+  background:#FAFAF7 !important; backdrop-filter:none !important;
+}
+/* Eingabe-Bar + Feld klickbar, ganz oben */
+html #help-modal .help-modal-foot,
+html #help-modal .help-ai-foot,
+html #help-modal .help-ai-bar,
+html #help-modal .help-ai-bar input,
+html #help-modal #help-ai-bar input{
+  position:relative !important; z-index:30 !important; pointer-events:auto !important;
+}
+html #help-modal .help-ai-bar input,
+html #help-modal #help-ai-bar input{ background:#fff !important; }
+/* Settings analog */
+html .settings-modal.set-modal-v2 .set-modal-content{ background:#FAFAF7 !important; backdrop-filter:none !important; }
+html .settings-modal.set-modal-v2 .pane-wrap{ background:#FAFAF7 !important; }
+/* v793h-solid-content-end */
+
+/* v793i-no-hover-field: Hover-Querfeld ueber Content-Karten komplett aus. */
+/* Alle Hover-Zustaende im Hilfe-Content neutralisieren */
+html #help-modal .help-content *:hover{
+  box-shadow:none !important;
+  transform:none !important;
+  outline:none !important;
+}
+/* Pseudo-Overlays (::before/::after) im Content, die sich quer drueberlegen, AUS */
+html #help-modal .help-content *::before,
+html #help-modal .help-content *::after{
+  content:none !important;
+  background:none !important;
+  display:none !important;
+}
+/* Aber Text-Inhalte (Listen-Marker etc.) nicht kaputt machen: nur dekorative absolute Pseudos */
+/* (Falls doch was fehlt, ist es nur Deko - Funktion bleibt.) */
+/* v793i-no-hover-field-end */
+
+/* v793i-xbtn-small: X-Button hart klein (36x36, oben rechts) - kein aufgeblaehter Klickbereich. */
+html #help-modal .set-modal-close,
+html #help-modal .help-modal-content .set-modal-close,
+html .settings-modal.set-modal-v2 .set-modal-close{
+  position:absolute !important;
+  top:12px !important; right:14px !important;
+  width:36px !important; height:36px !important;
+  max-width:36px !important; max-height:36px !important;
+  min-width:0 !important; min-height:0 !important;
+  padding:0 !important; margin:0 !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  z-index:40 !important; overflow:hidden !important;
+  background:rgba(42,39,39,0.06) !important;
+  border:1px solid rgba(42,39,39,0.10) !important; border-radius:9px !important;
+}
+html #help-modal .set-modal-close:hover,
+html .settings-modal.set-modal-v2 .set-modal-close:hover{
+  background:rgba(42,39,39,0.12) !important;
+}
+html #help-modal .set-modal-close svg,
+html .settings-modal.set-modal-v2 .set-modal-close svg{ width:18px !important; height:18px !important; }
+/* v793i-xbtn-small-end */

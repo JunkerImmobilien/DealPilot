@@ -136,24 +136,24 @@
   // v776: Rechnungen
   async function loadInvoices() {
     var tbody = document.getElementById('invoices-tbody');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6">L\u00e4dt\u2026</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7">L\u00e4dt\u2026</td></tr>';
     var from = (document.getElementById('inv-from') || {}).value || '';
     var to = (document.getElementById('inv-to') || {}).value || '';
     try {
       var r = await API.invoices({ from: from, to: to });
       var rows = (r && r.invoices) || [];
       if (!tbody) return;
-      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">Keine Rechnungen</td></tr>'; return; }
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted)">Keine Rechnungen</td></tr>'; return; }
       tbody.innerHTML = rows.map(function (i) {
         var d = i.invoice_date ? new Date(i.invoice_date).toLocaleDateString('de-DE') : '\u2013';
         var amt = (i.amount_total != null) ? (Number(i.amount_total) / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + (i.currency || 'EUR').toUpperCase() : '\u2013';
         var pdf = i.has_pdf
           ? '<a href="#" onclick="return window._invPdf(\'' + i.id + '\')">PDF</a>'
           : (i.hosted_invoice_url ? '<a href="' + i.hosted_invoice_url + '" target="_blank" rel="noopener">Stripe</a>' : '\u2013');
-        return '<tr><td>' + (i.invoice_number || '\u2013') + '</td><td>' + d + '</td><td>' + amt + '</td><td>' + (i.status || '\u2013') + '</td><td>' + escapeHtml(i.user_email || '\u2013') + '</td><td>' + pdf + '</td></tr>';
+        return '<tr><td>' + (i.invoice_number || '\u2013') + '</td><td>' + d + '</td><td>' + amt + '</td><td>' + (i.status || '\u2013') + '</td><td>' + escapeHtml(i.user_email || '\u2013') + '</td><td>' + pdf + '</td><td class="dpx-del-td"><button type="button" class="dpx-row-del" title="Rechnung l\u00f6schen" onclick="window._dpxRowDel(this)" data-del-kind="invoice" data-del-id="' + i.id + '"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td></tr>';
       }).join('');
     } catch (e) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="6"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
     }
   }
   function _invPdf(id) { try { API.downloadInvoicePdf(id); } catch (e) {} return false; }
@@ -179,13 +179,13 @@
     if (detEl) detEl.style.display = 'none';
     if (listEl) listEl.style.display = 'block';
     var tbody = document.getElementById('tickets-tbody');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6">L\u00e4dt\u2026</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7">L\u00e4dt\u2026</td></tr>';
     var status = (document.getElementById('tk-status-filter') || {}).value || 'all';
     try {
       var r = await API.tickets({ status: status });
       var rows = (r && r.tickets) || [];
       if (!tbody) return;
-      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">Keine Tickets</td></tr>'; return; }
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted)">Keine Tickets</td></tr>'; return; }
       tbody.innerHTML = rows.map(function (t) {
         var d = t.last_activity_at ? new Date(t.last_activity_at).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '\u2013';
         var mail = escapeHtml(t.user_email || t.contact_email || '\u2013');
@@ -195,10 +195,11 @@
           '<td>' + escapeHtml(t.category || '\u2013') + '</td>' +
           '<td>' + mail + '</td>' +
           '<td>' + _tkStatusLabel(t.status) + ' \u00b7 ' + t.msg_count + '</td>' +
-          '<td>' + d + '</td></tr>';
+          '<td>' + d + '</td>' +
+          '<td class="dpx-del-td"><button type="button" class="dpx-row-del" title="Ticket l\u00f6schen" onclick="event.stopPropagation();window._dpxRowDel(this)" data-del-kind="ticket" data-del-id="' + t.id + '"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td></tr>';
       }).join('');
     } catch (e) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="6"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
     }
   }
   async function _tkOpen(id) {
@@ -308,7 +309,7 @@
   async function loadFeedback() {
     var statEl = document.getElementById('fb-stats');
     var tbody = document.getElementById('feedback-tbody');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="4">L\u00e4dt\u2026</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="5">L\u00e4dt\u2026</td></tr>';
     try {
       var r = await API.feedbackQuery({ period: _fbPeriod, from: _fbFrom, to: _fbTo });
       var s = (r && r.stats) || {};
@@ -343,15 +344,15 @@
       }
       var rows = (r && r.feedback) || [];
       if (!tbody) return;
-      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted)">Noch kein Feedback</td></tr>'; return; }
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted)">Noch kein Feedback</td></tr>'; return; }
       tbody.innerHTML = rows.map(function (f) {
         var dt = f.created_at ? new Date(f.created_at).toLocaleString('de-DE') : '\u2013';
         var n = f.overall_rating || 0;
         var stars = n ? (new Array(n + 1).join('\u2605') + new Array(Math.max(0, 5 - n) + 1).join('\u2606')) : '\u2013';
-        return '<tr><td style="color:#C9A84C;white-space:nowrap;">' + stars + '</td><td>' + escapeHtml(f.message || '\u2013') + '</td><td>' + escapeHtml(f.user_email || f.contact_email || '\u2013') + '</td><td style="white-space:nowrap;">' + dt + '</td></tr>';
+        return '<tr><td style="color:#C9A84C;white-space:nowrap;">' + stars + '</td><td>' + escapeHtml(f.message || '\u2013') + '</td><td>' + escapeHtml(f.user_email || f.contact_email || '\u2013') + '</td><td style="white-space:nowrap;">' + dt + '</td><td class="dpx-del-td"><button type="button" class="dpx-row-del" title="Endg\u00fcltig l\u00f6schen" onclick="window._dpxRowDel(this)" data-del-kind="feedback" data-del-id="' + f.id + '"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td></tr>';
       }).join('');
     } catch (e) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="4"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="5"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
     }
   }
   window._fbSetPeriod = _fbSetPeriod; window._fbApplyRange = _fbApplyRange; window._fbExportCsv = _fbExportCsv;
@@ -398,7 +399,7 @@
     _bcRenderPreview();
     await _bcUpdateCount();
     var tbody = document.getElementById('bc-history-tbody');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6">L\u00e4dt\u2026</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7">L\u00e4dt\u2026</td></tr>';
     try {
       var r = await API.broadcastHistory();
       var rows = (r && r.broadcasts) || [];
@@ -410,7 +411,7 @@
         return '<tr><td>' + d + '</td><td>' + escapeHtml(b.subject || '\u2013') + '</td><td>' + modeL + '</td><td>' + (b.sent_count || 0) + ' / ' + (b.recipient_count || 0) + '</td><td>' + (b.status || '') + '</td><td>' + escapeHtml(b.admin_label || '') + '</td></tr>';
       }).join('');
     } catch (e) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="6"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
     }
   }
   async function _bcTest() {
@@ -1010,4 +1011,30 @@
     }
   }
   boot();
+
+  // v798-row-delete: generischer Loeschen-Handler fuer Admin-Tabellen-Zeilen
+  var _DPX_DEL = {
+    feedback: { label: 'Diesen Zufriedenheits-Eintrag endg\u00fcltig l\u00f6schen?', fn: function (id) { return API.deleteFeedback(id); } },
+    ticket:   { label: 'Dieses Support-Ticket endg\u00fcltig l\u00f6schen (inkl. Nachrichten)?', fn: function (id) { return API.deleteSupportTicket(id); } },
+    invoice:  { label: 'Diese Rechnung endg\u00fcltig l\u00f6schen?', fn: function (id) { return API.deleteInvoice(id); } }
+  };
+  window._dpxRowDel = function (btn) {
+    if (!btn) return;
+    var kind = btn.getAttribute('data-del-kind');
+    var id = btn.getAttribute('data-del-id');
+    var cfg = _DPX_DEL[kind];
+    if (!cfg || !id) return;
+    if (!window.confirm(cfg.label)) return;
+    btn.disabled = true;
+    cfg.fn(id).then(function () {
+      if (typeof toast === 'function') toast('\u2713 Gel\u00f6scht', 'success');
+      var tr = btn.closest('tr');
+      if (tr && tr.parentNode) tr.parentNode.removeChild(tr);
+    }).catch(function (err) {
+      btn.disabled = false;
+      if (typeof toast === 'function') toast('Fehler: ' + (err.message || 'unbekannt'), 'error');
+      else alert('Fehler: ' + (err.message || 'unbekannt'));
+    });
+  };
+
 })();

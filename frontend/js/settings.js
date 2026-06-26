@@ -205,7 +205,7 @@ function showSettings(initialTab) {
         '<h3 class="set-section-h">Account-Info</h3>' +
         '<div class="g2">' +
           '<div class="f"><label>Name</label><input id="set_user_name" type="text" value="' + _esc(view.user_name) + '" placeholder="Max Mustermann"></div>' +
-          '<div class="f"><label>E-Mail (Login)</label><input id="set_user_email_readonly" type="email" value="' + _esc(_getCurrentUserEmail()) + '" readonly style="opacity:0.7;cursor:not-allowed">' +
+          '<div class="f"><label>E-Mail (Login)</label>' +'<div class="set-email-row" style="display:flex;gap:8px;align-items:center">' +'<input id="set_user_email_readonly" type="email" value="' + _esc(_getCurrentUserEmail()) + '" readonly style="opacity:0.7;cursor:not-allowed;flex:1">' +'<button type="button" class="btn btn-sm btn-ghost" onclick="_changeEmail()" title="E-Mail-Adresse ändern">Ändern</button>' +'</div>' +'<div id="set-email-msg" class="account-pw-msg" style="margin-top:6px"></div>' +  /* v796-email-change-btn */
           ((typeof Auth !== 'undefined' && Auth.isApiMode && Auth.isApiMode()) ?
             '<button type="button" class="btn btn-sm btn-ghost" style="margin-top:6px" onclick="if(window._dpEmailChangeToggle)_dpEmailChangeToggle()">E-Mail \u00e4ndern</button>' +
             '<div id="dp-email-change-box" style="display:none;margin-top:8px;padding:12px;border:1px solid #E6DFCE;border-radius:10px;background:#fffdf9">' +
@@ -666,6 +666,8 @@ function showSettings(initialTab) {
       '</div>' +    // set-modal-content Ende
     '</div>';
   document.body.appendChild(modal);
+  /* v795-2fa-direct: 2FA-Status sofort rendern (nicht erst nach Tab-Wechsel). */
+  setTimeout(function(){ try { if (typeof _renderTwoFactor === 'function') _renderTwoFactor(); } catch(e){} }, 60);
 
   // V108: Backdrop-Klick + ESC-Taste schließen das Settings-Modal
   //       Marcel-Wunsch: schließbar ohne extra "Abbrechen" zu drücken
@@ -815,6 +817,31 @@ async function _changePassword() {
     }
   }
 }
+
+// v796-email-change-btn: E-Mail-Adresse aendern (Verify-Mail an neue Adresse)
+async function _changeEmail() {
+  var msgEl = document.getElementById('set-email-msg');
+  function _msg(text, isError) {
+    if (msgEl) { msgEl.textContent = text; msgEl.className = 'account-pw-msg' + (isError ? ' err' : ' ok'); }
+  }
+  var current = (typeof _getCurrentUserEmail === 'function') ? _getCurrentUserEmail() : '';
+  var neu = window.prompt('Neue E-Mail-Adresse eingeben:\n\nDu erhältst eine Bestätigungs-Mail an die neue Adresse. Erst nach Klick auf den Link wird die Adresse aktiv.', current && current !== '\u2014' ? current : '');
+  if (neu == null) return;
+  neu = (neu || '').trim();
+  if (!neu || !/^[^@]+@[^@]+\.[^@]+$/.test(neu)) { _msg('Bitte eine gültige E-Mail-Adresse eingeben.', true); return; }
+  if (neu.toLowerCase() === (current || '').toLowerCase()) { _msg('Das ist bereits deine aktuelle Adresse.', true); return; }
+  try {
+    await Auth.apiCall('/auth/change-email', { method: 'POST', body: { newEmail: neu } });
+    _msg('✓ Bestätigungs-Mail an ' + neu + ' gesendet. Bitte Postfach prüfen und den Link klicken.', false);
+  } catch (e) {
+    var em = e.message || 'Unbekannt';
+    if (/bereits|exists|verwendet/i.test(em)) _msg('Diese E-Mail-Adresse wird bereits verwendet.', true);
+    else if (/ungültig|invalid/i.test(em)) _msg('Ungültige E-Mail-Adresse.', true);
+    else _msg('Fehler: ' + em, true);
+  }
+}
+window._changeEmail = _changeEmail;
+
 window._changePassword = _changePassword;
 
 async function _resetPasswordEmail() {
