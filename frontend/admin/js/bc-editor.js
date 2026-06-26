@@ -1,6 +1,6 @@
-/* DealPilot Admin — Massenmail-Editor (v778f + v780b Datei-Bilder + v780c Bild-Resize/Loeschen)
-   Self-contained: injiziert eigenes CSS, kein CDN. Ersetzt sichtbar die
-   Textarea #bc-body, spiegelt HTML in die (versteckte) Textarea zurueck. */
+/* DealPilot Admin — Massenmail-Editor
+   v778f Editor + v780b Datei-Bilder + v780c Resize-Griffe + v780d Rechtsklick-Menue/Loeschen.
+   Self-contained, kein CDN. Ersetzt sichtbar die Textarea #bc-body, spiegelt HTML zurueck. */
 (function () {
   'use strict';
   if (window._bcEditorInit) return;
@@ -26,18 +26,24 @@
       '#bc-editor{position:relative;min-height:200px;max-height:340px;overflow:auto;padding:14px 16px;font-size:14px;line-height:1.6;outline:none;font-family:Inter,Arial,sans-serif;color:#1b1815;}',
       '#bc-editor:empty:before{content:attr(data-ph);color:#9a9184;}',
       '#bc-editor img{max-width:100%;border-radius:6px;}',
-      '#bc-editor img.bc-img-sel{outline:2px solid #C9A84C;outline-offset:1px;}',
+      '#bc-editor img.bc-img-sel{outline:2px solid #C9A84C;outline-offset:2px;}',
       '#bc-editor a{color:#b8932f;}',
       '#bc-editor blockquote{border-left:3px solid #C9A84C;margin:8px 0;padding:3px 12px;color:#6f675b;}',
       '#bc-editor hr{border:none;border-top:1px solid #e7e1d4;margin:12px 0;}',
-      /* Resize-Griffe (Overlay) */
       '#bc-img-handles{position:absolute;border:1px solid #C9A84C;pointer-events:none;z-index:5;display:none;}',
       '#bc-img-handles .h{position:absolute;width:12px;height:12px;background:#fff;border:2px solid #C9A84C;border-radius:50%;pointer-events:auto;}',
       '#bc-img-handles .h.nw{left:-7px;top:-7px;cursor:nwse-resize;}',
       '#bc-img-handles .h.ne{right:-7px;top:-7px;cursor:nesw-resize;}',
       '#bc-img-handles .h.sw{left:-7px;bottom:-7px;cursor:nesw-resize;}',
       '#bc-img-handles .h.se{right:-7px;bottom:-7px;cursor:nwse-resize;}',
-      '#bc-img-handles .sz{position:absolute;right:0;top:-22px;background:#1b1815;color:#fff;font:11px/1.4 JetBrains Mono,monospace;padding:1px 6px;border-radius:4px;white-space:nowrap;}'
+      '#bc-img-handles .sz{position:absolute;right:0;top:-22px;background:#1b1815;color:#fff;font:11px/1.4 JetBrains Mono,monospace;padding:1px 6px;border-radius:4px;white-space:nowrap;}',
+      /* Rechtsklick-Menue (an document.body, nie im Mail-HTML) */
+      '#bc-img-menu{position:absolute;z-index:99999;min-width:180px;background:#fff;border:1px solid #e7e1d4;border-radius:10px;box-shadow:0 14px 40px -10px rgba(20,15,5,.35);padding:6px;font-family:Inter,Arial,sans-serif;font-size:13.5px;display:none;}',
+      '#bc-img-menu .it{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;color:#1b1815;}',
+      '#bc-img-menu .it:hover{background:#faf7f0;}',
+      '#bc-img-menu .it.del{color:#B86250;}',
+      '#bc-img-menu .sep{height:1px;background:#f0ebe0;margin:5px 4px;}',
+      '#bc-img-menu .hd{font:10px/1.4 JetBrains Mono,monospace;letter-spacing:.1em;text-transform:uppercase;color:#9a9184;padding:5px 10px 2px;}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -80,7 +86,6 @@
     ed.setAttribute('data-ph', 'Hier die Nachricht schreiben \u2026');
 
     function sync() {
-      // Mail-HTML OHNE Resize-Overlay und ohne Auswahl-Markierung spiegeln
       var clone = ed.cloneNode(true);
       var hh = clone.querySelector('#bc-img-handles'); if (hh && hh.parentNode) hh.parentNode.removeChild(hh);
       var seld = clone.querySelectorAll('img.bc-img-sel');
@@ -109,26 +114,22 @@
     col.addEventListener('input', function () { exec('foreColor', col.value); });
     g1.appendChild(fSel); g1.appendChild(sSel); g1.appendChild(col);
 
-    // B/I/U
     var g2 = document.createElement('div'); g2.className = 'g';
     g2.appendChild(btn('<b>B</b>', 'Fett', function () { exec('bold'); }, 'bold'));
     g2.appendChild(btn('<i>I</i>', 'Kursiv', function () { exec('italic'); }, 'italic'));
     g2.appendChild(btn('<u>U</u>', 'Unterstrichen', function () { exec('underline'); }, 'underline'));
 
-    // Ausrichtung
     var g3 = document.createElement('div'); g3.className = 'g';
     g3.appendChild(btn('\u2630', 'Linksb\u00fcndig', function () { exec('justifyLeft'); }));
     g3.appendChild(btn('\u2261', 'Zentriert', function () { exec('justifyCenter'); }));
     g3.appendChild(btn('\u2630', 'Rechtsb\u00fcndig', function () { exec('justifyRight'); }));
     g3.appendChild(btn('\u25a4', 'Blocksatz', function () { exec('justifyFull'); }));
 
-    // Listen / Zitat
     var g4 = document.createElement('div'); g4.className = 'g';
     g4.appendChild(btn('\u2022 Liste', 'Aufz\u00e4hlung', function () { exec('insertUnorderedList'); }));
     g4.appendChild(btn('1. Liste', 'Nummeriert', function () { exec('insertOrderedList'); }));
     g4.appendChild(btn('\u275d', 'Zitat', function () { exec('formatBlock', 'blockquote'); }));
 
-    // Link / Bilder / Linie
     var g5 = document.createElement('div'); g5.className = 'g';
     g5.appendChild(btn('\ud83d\udd17 Link', 'Link einf\u00fcgen', function () {
       var u = prompt('Link-Adresse (https://\u2026):', 'https://'); if (u) exec('createLink', u);
@@ -162,25 +163,20 @@
 
     host.appendChild(tb); host.appendChild(ed);
 
-    // ---------- Bild-Auswahl + Resize-Griffe + Loeschen ----------
-    var sel = null;            // aktuell ausgewaehltes <img>
+    // ---------- Bild-Auswahl + Resize-Griffe ----------
+    var sel = null;
     var handles = document.createElement('div'); handles.id = 'bc-img-handles';
     ['nw', 'ne', 'sw', 'se'].forEach(function (k) {
       var h = document.createElement('div'); h.className = 'h ' + k; h.setAttribute('data-k', k); handles.appendChild(h);
     });
     var szTag = document.createElement('div'); szTag.className = 'sz'; handles.appendChild(szTag);
-    ed.appendChild(handles);
 
     function placeHandles() {
       if (!sel) { handles.style.display = 'none'; return; }
-      // Position relativ zum scrollbaren Editor
-      var er = ed.getBoundingClientRect();
-      var ir = sel.getBoundingClientRect();
-      var left = ir.left - er.left + ed.scrollLeft;
-      var top = ir.top - er.top + ed.scrollTop;
+      var er = ed.getBoundingClientRect(), ir = sel.getBoundingClientRect();
       handles.style.display = 'block';
-      handles.style.left = left + 'px';
-      handles.style.top = top + 'px';
+      handles.style.left = (ir.left - er.left + ed.scrollLeft) + 'px';
+      handles.style.top = (ir.top - er.top + ed.scrollTop) + 'px';
       handles.style.width = ir.width + 'px';
       handles.style.height = ir.height + 'px';
       szTag.textContent = Math.round(ir.width) + ' \u00d7 ' + Math.round(ir.height) + ' px';
@@ -188,35 +184,44 @@
     function selectImg(img) {
       if (sel) sel.classList.remove('bc-img-sel');
       sel = img;
-      if (sel) { sel.classList.add('bc-img-sel'); placeHandles(); }
-      else handles.style.display = 'none';
+      if (sel) { sel.classList.add('bc-img-sel'); placeHandles(); } else handles.style.display = 'none';
+    }
+    function deleteImg(img) {
+      var t = img || sel; if (!t) return;
+      selectImg(null);
+      if (t && t.parentNode) t.parentNode.removeChild(t);
+      sync();
+    }
+    function setImgWidth(img, val) {
+      if (!img) return;
+      img.removeAttribute('width'); img.removeAttribute('height');
+      if (val == null) { img.style.width = ''; img.style.height = ''; }
+      else { img.style.width = val; img.style.height = 'auto'; }
+      placeHandles(); sync();
     }
 
     ed.addEventListener('click', function (e) {
-      if (e.target && e.target.tagName === 'IMG') { selectImg(e.target); }
-      else if (e.target !== szTag && !/\bh\b/.test(e.target.className || '')) { selectImg(null); }
+      if (e.target && e.target.tagName === 'IMG') selectImg(e.target);
+      else if (e.target !== szTag && !/\bh\b/.test(e.target.className || '')) selectImg(null);
     });
     ed.addEventListener('scroll', placeHandles);
     window.addEventListener('resize', placeHandles);
 
-    // Drag-Resize
     var drag = null;
     handles.addEventListener('mousedown', function (e) {
       if (!sel || !e.target.classList.contains('h')) return;
       e.preventDefault();
       var ir = sel.getBoundingClientRect();
-      drag = { k: e.target.getAttribute('data-k'), x: e.clientX, w: ir.width, h: ir.height, ratio: ir.width / ir.height };
+      drag = { k: e.target.getAttribute('data-k'), x: e.clientX, w: ir.width };
       document.addEventListener('mousemove', onDrag);
       document.addEventListener('mouseup', endDrag);
     });
     function onDrag(e) {
       if (!drag || !sel) return;
       var dx = e.clientX - drag.x;
-      // nw/sw verkleinern bei Rechtsziehen -> Vorzeichen je Ecke
       var dir = (drag.k === 'ne' || drag.k === 'se') ? 1 : -1;
       var newW = Math.max(40, Math.round(drag.w + dir * dx));
-      sel.style.width = newW + 'px';
-      sel.style.height = 'auto';
+      sel.style.width = newW + 'px'; sel.style.height = 'auto';
       sel.removeAttribute('width'); sel.removeAttribute('height');
       placeHandles();
     }
@@ -228,17 +233,52 @@
 
     // Loeschen per Entf/Backspace, wenn ein Bild markiert ist
     ed.addEventListener('keydown', function (e) {
-      if (sel && (e.key === 'Delete' || e.key === 'Backspace')) {
+      if (sel && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); deleteImg(sel); }
+    });
+
+    // ---------- Rechtsklick-Menue (an document.body) ----------
+    var menu = document.createElement('div'); menu.id = 'bc-img-menu';
+    menu.innerHTML =
+      '<div class="hd">Bildgr\u00f6\u00dfe</div>' +
+      '<div class="it" data-w="200px">Klein</div>' +
+      '<div class="it" data-w="350px">Mittel</div>' +
+      '<div class="it" data-w="520px">Gro\u00df</div>' +
+      '<div class="it" data-w="__orig">Originalgr\u00f6\u00dfe</div>' +
+      '<div class="sep"></div>' +
+      '<div class="it del" data-act="del">\ud83d\uddd1 Bild l\u00f6schen</div>';
+    document.body.appendChild(menu);
+    var menuTarget = null;
+    function showMenu(x, y, img) {
+      menuTarget = img;
+      menu.style.left = x + 'px'; menu.style.top = y + 'px'; menu.style.display = 'block';
+    }
+    function hideMenu() { menu.style.display = 'none'; menuTarget = null; }
+    ed.addEventListener('contextmenu', function (e) {
+      if (e.target && e.target.tagName === 'IMG') {
         e.preventDefault();
-        var img = sel; selectImg(null);
-        if (img && img.parentNode) img.parentNode.removeChild(img);
-        sync();
+        selectImg(e.target);
+        showMenu(e.pageX, e.pageY, e.target);
       }
     });
+    menu.addEventListener('mousedown', function (e) { e.preventDefault(); });
+    menu.addEventListener('click', function (e) {
+      var it = e.target.closest ? e.target.closest('.it') : null;
+      if (!it || !menuTarget) { return; }
+      if (it.getAttribute('data-act') === 'del') { deleteImg(menuTarget); }
+      else {
+        var w = it.getAttribute('data-w');
+        setImgWidth(menuTarget, w === '__orig' ? null : w);
+      }
+      hideMenu();
+    });
+    document.addEventListener('mousedown', function (e) {
+      if (menu.style.display === 'block' && !menu.contains(e.target)) hideMenu();
+    });
+    document.addEventListener('scroll', hideMenu, true);
+    window.addEventListener('resize', hideMenu);
 
     var initial = (ta.value && ta.value.trim()) ? ta.value : DEFAULT_HTML;
     ed.innerHTML = initial;
-    // handles-Overlay nach innerHTML neu anhaengen (innerHTML hat es entfernt)
     ed.appendChild(handles);
     sync();
   }
