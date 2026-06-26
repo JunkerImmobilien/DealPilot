@@ -198,9 +198,11 @@ async function handleEvent(event) {
     }
 
     case 'invoice.payment_succeeded': {
-      // Invoice paid - subscription remains active. Stripe sends a subscription.updated
-      // event after this anyway, so usually nothing to do here.
-      // We could insert a "payment_received" audit log entry.
+      // v776-invoices: Rechnung archivieren (PDF + Metadaten in DB). Best-effort.
+      try {
+        const invoiceService = require('../services/invoiceService');
+        await invoiceService.recordFromStripeInvoice(event.data && event.data.object);
+      } catch (e) { console.error('[invoice-archive] record failed:', e && e.message); }
       break;
     }
 

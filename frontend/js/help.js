@@ -174,7 +174,7 @@
       sections: [
         {
           h: 'PDF-Export (Aktionen → PDF Export)',
-          body: 'Erzeugt einen kompletten Investment-Case mit Cover, Executive Summary, Objekt & Finanzierung, 3-Phasen-Vergleich, Cashflow-Projektion über 10 Jahre, Equity-Build-Charts, Wasserfall-Diagramm, Stress-Test, KI-Analyse (sofern erstellt) und Annahmen-Seite.\n\n<strong>Tipp:</strong> Für beste Qualität öffne den Tab „Kennzahlen" einmal kurz vor dem Export — dann sind alle Charts gerendert.'
+          body: 'Erzeugt einen kompletten Investment-Case mit Cover, Executive Summary, Objekt & Finanzierung, 3-Phasen-Vergleich, Cashflow-Projektion über 10 Jahre, Equity-Build-Charts, Wasserfall-Diagramm, Stress-Test, Pilot-Analyse (sofern erstellt) und Annahmen-Seite.\n\n<strong>Tipp:</strong> Für beste Qualität öffne den Tab „Kennzahlen" einmal kurz vor dem Export — dann sind alle Charts gerendert.'
         },
         {
           h: 'Bank-Präsentations-PDF (Tab Kennzahlen)',
@@ -212,7 +212,7 @@
     },
     {
       id: 'ki',
-      title: 'KI-Analyse',
+      title: 'Pilot-Analyse',
       icon: 'i-cpu',
       desc: 'KI-gestützte Investment-Bewertung',
       sections: [
@@ -226,7 +226,7 @@
         },
         {
           h: 'Persistenz',
-          body: 'Die KI-Analyse wird ab V63.69 automatisch beim Objekt gespeichert. Beim erneuten Öffnen siehst du die Analyse direkt — du musst sie nicht neu berechnen lassen. Wenn du frische Daten/Marktanalyse willst, klicke „Analyse erneut starten".'
+          body: 'Die Pilot-Analyse wird ab V63.69 automatisch beim Objekt gespeichert. Beim erneuten Öffnen siehst du die Analyse direkt — du musst sie nicht neu berechnen lassen. Wenn du frische Daten/Marktanalyse willst, klicke „Analyse erneut starten".'
         }
       ]
     },
@@ -254,7 +254,7 @@
         },
         {
           h: 'Werden meine Daten weitergegeben?',
-          body: 'Nein. DealPilot speichert deine Objekte ausschließlich auf einem deutschen Server (Hetzner). Die KI-Analyse läuft über einen Server-Proxy mit minimal nötiger Datenmenge — keine Adressen, keine Personennamen. Stripe verarbeitet nur Zahlungsdaten, sieht keine Objektdaten.'
+          body: 'Nein. DealPilot speichert deine Objekte ausschließlich auf einem deutschen Server (Hetzner). Die Pilot-Analyse läuft über einen Server-Proxy mit minimal nötiger Datenmenge — keine Adressen, keine Personennamen. Stripe verarbeitet nur Zahlungsdaten, sieht keine Objektdaten.'
         }
       ]
     },

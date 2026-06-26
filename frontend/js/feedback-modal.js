@@ -148,6 +148,7 @@
 
     modal.innerHTML =
       '<div class="fb-modal modal">' +
+      '<div class="fb-brandbar"><span class="fb-bb-logo">Deal<b>Pilot</b></span><span class="fb-bb-tag">FEEDBACK &amp; SUPPORT</span></div>' +
         '<button class="fb-close close" type="button" onclick="closeFeedback()" aria-label="Schließen">' +
           '<span class="ic"><svg><use href="#i-x"/></svg></span>' +
         '</button>' +
@@ -543,8 +544,8 @@
     if (!inner) return;
     var title = payload.type === 'support' ? 'Support-Anfrage gesendet!' : 'Vielen Dank für dein Feedback!';
     var sub = payload.type === 'support'
-      ? 'Wir melden uns innerhalb von 48 Stunden bei dir.'
-      : 'Dein Feedback hilft uns, DealPilot besser zu machen.';
+      ? 'Deine Anfrage ist bei uns angekommen \u2014 wir melden uns innerhalb von 48 Stunden per E-Mail bei dir.'
+      : 'Vielen Dank! Dein Feedback ist bei uns angekommen und hilft uns, DealPilot besser zu machen.';
     inner.innerHTML =
       '<div class="fb-success">' +
         '<div class="fb-success-icon">' + _icon('check', 32) + '</div>' +

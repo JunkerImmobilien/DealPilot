@@ -7,6 +7,7 @@ const userService = require('../services/userService');
 const objectService = require('../services/objectService');
 const twoFactorService = require('../services/twoFactorService');
 const jwtUtil = require('../utils/jwt');
+const emailChangeService = require('../services/emailChangeService'); // v774-change-email
 
 const router = express.Router();
 
@@ -26,6 +27,11 @@ const changePasswordSchema = z.object({
   oldPassword: z.string().min(1).max(128),
   newPassword: z.string().min(10, 'Password must be at least 10 characters').max(128)
 });
+
+const changeEmailSchema = z.object({
+  newEmail: z.string().email().max(255),
+  password: z.string().min(1).max(128)
+}); // v774-change-email
 
 // ── Helpers ──────────────────────────────────────────
 function sessionFromUser(user) {
@@ -414,5 +420,50 @@ router.post('/2fa/regenerate-codes', authenticate, validate({ body: confirmSchem
     res.json({ recoveryCodes: codes });
   } catch (err) { next(err); }
 });
+
+/**
+ * v774: E-Mail-Adresse aendern (verify-before-active).
+ * POST /auth/change-email  (authenticated) -> Verify-Mail an NEUE Adresse, alte bleibt aktiv.
+ * GET  /auth/verify-email-change?token=X (public) -> setzt um, Notice-Mail an ALTE Adresse, Redirect.
+ */
+router.post('/change-email', authenticate, validate({ body: changeEmailSchema }), async (req, res, next) => {
+  try {
+    const r = await emailChangeService.requestChange({
+      userId: req.user.id, newEmail: req.body.newEmail, plainPassword: req.body.password
+    });
+    const baseUrl = process.env.APP_URL || process.env.FRONTEND_BASE_URL || 'https://app.dealpilot.junker-immobilien.io';
+    const verifyUrl = `${baseUrl}/api/v1/auth/verify-email-change?token=${r.token}`;
+    const tpl = require('../services/emailChangeMailTemplate');
+    const mailer = require('../services/mailerService');
+    await mailer.sendMail({
+      to: r.newEmail, subject: tpl.subjectVerify(),
+      text: tpl.renderVerifyText(r.userName, verifyUrl, r.newEmail),
+      html: tpl.renderVerifyMail(r.userName, verifyUrl, r.newEmail)
+    });
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+router.get('/verify-email-change', async (req, res) => {
+  const baseUrl = process.env.APP_URL || process.env.FRONTEND_BASE_URL || 'https://app.dealpilot.junker-immobilien.io';
+  try {
+    const result = await emailChangeService.confirmChange(req.query.token);
+    if (!result) return res.redirect(`${baseUrl}/?email_change_error=invalid`);
+    if (result.error === 'taken') return res.redirect(`${baseUrl}/?email_change_error=taken`);
+    try {
+      const tpl = require('../services/emailChangeMailTemplate');
+      const mailer = require('../services/mailerService');
+      await mailer.sendMail({
+        to: result.oldEmail, subject: tpl.subjectNotice(),
+        text: tpl.renderNoticeText(result.userName, result.newEmail),
+        html: tpl.renderNoticeMail(result.userName, result.newEmail)
+      });
+    } catch (e) { console.error('[change-email] notice mail failed:', e && e.message); }
+    return res.redirect(`${baseUrl}/?email_changed=1`);
+  } catch (e) {
+    console.error('[change-email] confirm error:', e && e.message);
+    return res.redirect(`${baseUrl}/?email_change_error=server`);
+  }
+}); // v774-change-email
 
 module.exports = router;

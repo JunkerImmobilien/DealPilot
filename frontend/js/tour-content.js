@@ -136,7 +136,7 @@
       tab: 's5',
       selector: '.tab[data-target-sec="s5"]',
       icon: 'i-pin',
-      title: 'Tab 6: KI-Analyse',
+      title: 'Tab 6: Pilot-Analyse',
       body: 'Die **KI analysiert Mikrolage, Infrastruktur, Wertentwicklung** und liefert einen ausfuehrlichen Lage-Bericht.',
       bodyMore: '**Was die Lage-KI prueft:**\n\n• **Mikrolage** — Verkehrsanbindung, Infrastruktur, Nachbarschaft\n• **Mieterstruktur** — Einkommensniveau, Beruf\n• **Wertentwicklung** — historisch + Prognose\n• **Risikofaktoren** — Leerstand, Gentrifizierung\n• **Vergleichsobjekte** im Umkreis\n\nErgebnis: ein **Lage-Score (0-100)** + ausfuehrlicher Text fuer deine Bank-Praesentation.\n\nKostet KI-Credits — auf Pro-Plan unlimited.',
       placement: 'auto'

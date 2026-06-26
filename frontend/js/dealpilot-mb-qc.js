@@ -229,9 +229,34 @@
     toast('✓ Marktmiete übernommen (' + spanLabel() + ')');
   }
 
+  /* v772-dpmb-stub: DealPilot-Marktbewertung Demo bei AVM_MODE=stub (kein Microservice/Kerosin). */
+  var _dpmbHC=null,_dpmbHT=0;
+  function _dpmbHealth(){ return new Promise(function(resolve){
+    var now=Date.now();
+    if(_dpmbHC!==null && (now-_dpmbHT)<60000){ resolve(_dpmbHC); return; }
+    fetch('/api/v1/avm/health',{headers:{'Authorization':'Bearer '+tok()}}).then(function(r){return r.json();})
+      .then(function(h){ _dpmbHC=h||{}; _dpmbHT=Date.now(); resolve(_dpmbHC); })
+      .catch(function(){ _dpmbHC={}; _dpmbHT=Date.now(); resolve(_dpmbHC); });
+  }); }
+  function _dpmbStubPayload(i){
+    var wfl=(i&&i.wfl)||70, sqm=2600, est=Math.round(wfl*sqm), rsqm=9.2;
+    return { valuation:{ market_value:{ estimated:est, low:Math.round(est*0.9), high:Math.round(est*1.1), confidence_label:'Gut', confidence_pct:78, basis_median_sqm:sqm } },
+      rent:{ median_per_sqm:rsqm, q25_per_sqm:rsqm*0.9, q75_per_sqm:rsqm*1.1 },
+      micro:{ score:72 }, macro:{ score:65 }, price_trend_pct:2.4,
+      deal_score:{ rating:'Solide' }, ref:{ living_area:wfl } };
+  }
   async function run() {
     var i = inputs();
     if (!i.plz && !i.ort) { toast('Bitte mindestens PLZ oder Ort ausfüllen'); return; }
+    var _dph = await _dpmbHealth();
+    if (_dph && _dph.mode === 'stub') { /* v772-dpmb-stub */
+      var _p = _dpmbStubPayload(i);
+      D = mapCard(_p); mode = 'med'; collapsed = false;
+      render();
+      try { var _el = $(STATE_ID); if (_el) { _el.value = JSON.stringify({ ts:Date.now(), card:D, mode:mode, collapsed:collapsed }); _el.dispatchEvent(new Event('input',{ bubbles:true })); } } catch (e) {}
+      toast('\u2713 DealPilot-Marktbewertung (Demo)');
+      return;
+    }
     try {
       var res = await fetch('/api/v1/marktbericht/reports/from-dealpilot', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok() },
