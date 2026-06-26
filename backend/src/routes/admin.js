@@ -18,6 +18,10 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 const { requireAdmin, requireRole, signAdminToken } = require('../middleware/adminAuth');
+const lifecycleService = require('../services/lifecycleService'); // v779-lifecycle
+const broadcastService = require('../services/broadcastService'); // v778-broadcast
+const supportService = require('../services/supportService'); // v777-support
+const invoiceService = require('../services/invoiceService'); // v776-invoices
 
 // ──────────────────────────────────────────────────────────────
 // HELPERS
@@ -918,5 +922,219 @@ router.get('/marktbericht-costs', requireAdmin, async (req, res) => {
     res.status(500).json({ error: 'server_error', message: err.message });
   }
 });
+
+router.get('/invoices', requireAdmin, async (req, res) => {
+  try {
+    const rows = await invoiceService.listInvoices({
+      from: req.query.from, to: req.query.to, q: req.query.q,
+      limit: parseInt(req.query.limit, 10) || 200, offset: parseInt(req.query.offset, 10) || 0
+    });
+    res.json({ invoices: rows });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/invoices/:id/pdf', requireAdmin, async (req, res) => {
+  try {
+    const pdf = await invoiceService.getPdf(req.params.id);
+    if (!pdf) return res.status(404).json({ error: 'PDF nicht vorhanden' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="' + (pdf.number || req.params.id) + '.pdf"');
+    res.send(pdf.data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/invoices.csv', requireAdmin, async (req, res) => {
+  try {
+    const rows = await invoiceService.listForCsv({ from: req.query.from, to: req.query.to });
+    const head = 'Rechnungsnummer;Datum;Betrag;Waehrung;Status;Kunde\n';
+    const body = rows.map(function (r) {
+      return [
+        r.invoice_number || '',
+        r.invoice_date ? new Date(r.invoice_date).toISOString().slice(0, 10) : '',
+        (r.amount_total != null ? (r.amount_total / 100).toFixed(2).replace('.', ',') : ''),
+        (r.currency || '').toUpperCase(),
+        r.status || '',
+        (r.user_email || '').replace(/;/g, ',')
+      ].join(';');
+    }).join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="rechnungen.csv"');
+    res.send('\ufeff' + head + body);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+}); // v776-invoices
+
+router.get('/tickets', requireAdmin, async (req, res) => {
+  try { res.json({ tickets: await supportService.listTickets({ status: req.query.status }) }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/tickets/:id/object.json', requireAdmin, async (req, res) => {
+  try {
+    const { query } = require('../db/pool');
+    const r = await query('SELECT object_snapshot FROM support_tickets WHERE id = $1', [req.params.id]);
+    if (!r.rowCount || !r.rows[0].object_snapshot) return res.status(404).json({ error: 'kein Objekt angeh\u00e4ngt' });
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="ticket-' + String(req.params.id).slice(0,8) + '-objekt.json"');
+    res.send(JSON.stringify(r.rows[0].object_snapshot, null, 2));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+}); // v777c-object-download
+
+let _tkUpload; // v777h-reply-upload
+try {
+  const _multer = require('multer');
+  _tkUpload = _multer({ storage: _multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024, files: 6 } }).any();
+} catch (e) { _tkUpload = function (req, res, next) { next(); }; }
+
+router.get('/attachments/:id', requireAdmin, async (req, res) => {
+  try {
+    const a = await supportService.getAttachment(req.params.id);
+    if (!a) return res.status(404).json({ error: 'Anhang nicht gefunden' });
+    const fs = require('fs');
+    if (!a.path || !fs.existsSync(a.path)) return res.status(404).json({ error: 'Datei fehlt' });
+    res.setHeader('Content-Type', a.mime || 'application/octet-stream');
+    res.setHeader('Content-Disposition', 'inline; filename="' + String(a.filename || 'bild').replace(/[^a-zA-Z0-9._-]/g, '_') + '"');
+    fs.createReadStream(a.path).pipe(res);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+}); // v777g-attachments
+
+router.get('/tickets/:id', requireAdmin, async (req, res) => {
+  try {
+    const t = await supportService.getTicket(req.params.id);
+    if (!t) return res.status(404).json({ error: 'Ticket nicht gefunden' });
+    res.json(t);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/tickets/:id/reply', requireAdmin, _tkUpload, async (req, res) => {
+  try {
+    const body = (req.body && req.body.body) || '';
+    if (!String(body).trim()) return res.status(400).json({ error: 'Antwort leer' });
+    const t = await supportService.addReply({ ticketId: req.params.id, body: body });
+    if (!t) return res.status(404).json({ error: 'Ticket nicht gefunden' });
+    try { // v777h: Admin-Bilder an die Antwort haengen
+      const _imgs = (Array.isArray(req.files) ? req.files : []).filter(function (f) { return f && f.mimetype && /^image\//.test(f.mimetype); });
+      if (_imgs.length && supportService.saveAttachments) {
+        await supportService.saveAttachments({ ticketId: req.params.id, messageId: t.messageId || null, sender: 'admin', files: _imgs });
+      }
+    } catch (attErr) { console.error('[reply-att] save failed:', attErr && attErr.message); }
+    if (t.contact_email) {
+      try {
+        const mailLayout = require('../services/mailLayout');
+        const mailer = require('../services/mailerService');
+        await mailer.sendMail({
+          to: t.contact_email,
+          replyTo: process.env.SUPPORT_MAIL_TO || 'support@junker-immobilien.io',
+          subject: 'Re: [DP-' + String(req.params.id).slice(0, 8) + '] ' + (t.subject || 'Deine Anfrage'),
+          text: String(body) + '\n\n-- DealPilot Support, Junker Immobilien',
+          html: mailLayout.wrap({
+            brandTag: 'SUPPORT', heroKicker: 'ANTWORT VOM SUPPORT',
+            heroTitle: 'Antwort auf deine Anfrage',
+            bodyHtml: '<div style="font-size:14px;line-height:1.6;color:#3a2e08;white-space:pre-wrap;">' + mailLayout._esc(String(body)) + '</div>',
+            footerNote: 'DealPilot Support \u00b7 du kannst direkt auf diese E-Mail antworten.'
+          })
+        });
+      } catch (mailErr) { console.error('[ticket-reply] mail failed:', mailErr && mailErr.message); }
+    }
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/tickets/:id/status', requireAdmin, async (req, res) => {
+  try {
+    const r = await supportService.setStatus({ ticketId: req.params.id, status: (req.body && req.body.status) });
+    if (r && r.error) return res.status(400).json(r);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/feedback/export.csv', requireAdmin, async (req, res) => {
+  try {
+    const rows = await supportService.listFeedbackRange(req.query.period, req.query.from, req.query.to);
+    const keys = supportService.FB_CRIT_KEYS;
+    const esc = function (v) { const x = String(v == null ? '' : v); return /[";\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+    const head = ['Datum', 'Gesamt'].concat(keys).concat(['E-Mail', 'Nachricht']);
+    const lines = [head.join(';')];
+    for (const r of rows) {
+      const c = r.criteria || {};
+      const row = [
+        (r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : ''),
+        (r.overall_rating != null ? r.overall_rating : '')
+      ].concat(keys.map(function (k) { return (c && c[k] != null) ? c[k] : ''; }))
+       .concat([r.user_email || r.contact_email || '', r.message || '']);
+      lines.push(row.map(esc).join(';'));
+    }
+    const csv = '\ufeff' + lines.join('\r\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="kundenzufriedenheit.csv"');
+    res.send(csv);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+}); // v777f-csv
+
+router.get('/feedback', requireAdmin, async (req, res) => {
+  try {
+    const [feedback, stats] = await Promise.all([supportService.listFeedback(), supportService.feedbackStats(req.query.period, req.query.from, req.query.to)]);
+    res.json({ feedback: feedback, stats: stats });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+}); // v777-support
+
+router.get('/broadcast/recipients', requireAdmin, async (req, res) => {
+  try { res.json({ count: await broadcastService.countRecipients(req.query.mode) }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/broadcast/test', requireAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const r = await broadcastService.sendTest({ subject: b.subject, bodyText: b.body, mode: b.mode, toEmail: b.toEmail, asHtml: !!b.html }); // v778f-html
+    if (r && r.error) return res.status(400).json(r);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/broadcast/send', requireAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const mode = (b.mode === 'newsletter') ? 'newsletter' : 'operational';
+    if (mode === 'operational' && !b.confirmOperational) {
+      return res.status(400).json({ error: 'Betriebs-Best\u00e4tigung fehlt' });
+    }
+    if (!b.subject || !b.body) return res.status(400).json({ error: 'Betreff/Text fehlt' });
+    const r = await broadcastService.createAndSend({ adminLabel: b.adminLabel, mode: mode, subject: b.subject, bodyText: b.body, asHtml: !!b.html });
+    res.json(r);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/broadcast/preview', requireAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const mode = (b.mode === 'newsletter') ? 'newsletter' : 'operational';
+    res.json({ html: broadcastService.buildHtml(b.subject || '', b.body || '', mode, !!b.html) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+}); // v778e-preview
+
+router.get('/broadcast/history', requireAdmin, async (req, res) => {
+  try { res.json({ broadcasts: await broadcastService.listBroadcasts() }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+}); // v778-broadcast
+
+router.get('/lifecycle/config', requireAdmin, async (req, res) => {
+  try { res.json({ config: await lifecycleService.getConfig() }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/lifecycle/config', requireAdmin, async (req, res) => {
+  try { res.json({ config: await lifecycleService.updateConfig(req.body || {}) }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/lifecycle/dryrun', requireAdmin, async (req, res) => {
+  try { res.json(await lifecycleService.scan({ dryRun: true })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/lifecycle/events', requireAdmin, async (req, res) => {
+  try { res.json({ events: await lifecycleService.listEvents({}) }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+}); // v779-lifecycle
 
 module.exports = router;

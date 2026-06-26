@@ -125,9 +125,393 @@
     if (view === 'users') loadUsers();
     if (view === 'audit') loadAudit();
     if (view === 'credits') loadCredits();
+    if (view === 'lifecycle') loadLifecycle();
+    if (view === 'broadcast') loadBroadcast();
+    if (view === 'support') loadTickets();
+    if (view === 'satisfaction') loadFeedback();
+    if (view === 'invoices') loadInvoices();
   }
 
   // ── v554: Guthaben & Kosten ────────────────
+  // v776: Rechnungen
+  async function loadInvoices() {
+    var tbody = document.getElementById('invoices-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6">L\u00e4dt\u2026</td></tr>';
+    var from = (document.getElementById('inv-from') || {}).value || '';
+    var to = (document.getElementById('inv-to') || {}).value || '';
+    try {
+      var r = await API.invoices({ from: from, to: to });
+      var rows = (r && r.invoices) || [];
+      if (!tbody) return;
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">Keine Rechnungen</td></tr>'; return; }
+      tbody.innerHTML = rows.map(function (i) {
+        var d = i.invoice_date ? new Date(i.invoice_date).toLocaleDateString('de-DE') : '\u2013';
+        var amt = (i.amount_total != null) ? (Number(i.amount_total) / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + (i.currency || 'EUR').toUpperCase() : '\u2013';
+        var pdf = i.has_pdf
+          ? '<a href="#" onclick="return window._invPdf(\'' + i.id + '\')">PDF</a>'
+          : (i.hosted_invoice_url ? '<a href="' + i.hosted_invoice_url + '" target="_blank" rel="noopener">Stripe</a>' : '\u2013');
+        return '<tr><td>' + (i.invoice_number || '\u2013') + '</td><td>' + d + '</td><td>' + amt + '</td><td>' + (i.status || '\u2013') + '</td><td>' + escapeHtml(i.user_email || '\u2013') + '</td><td>' + pdf + '</td></tr>';
+      }).join('');
+    } catch (e) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
+    }
+  }
+  function _invPdf(id) { try { API.downloadInvoicePdf(id); } catch (e) {} return false; }
+  function _invCsv() { var f = (document.getElementById('inv-from') || {}).value || ''; var t = (document.getElementById('inv-to') || {}).value || ''; try { API.invoiceCsv(f, t); } catch (e) {} }
+  window._invPdf = _invPdf; window._invReload = loadInvoices; window._invCsv = _invCsv; // v776-invoices
+
+  // v777-support: Support-Tickets + Kundenzufriedenheit
+  function _tkAge(iso, status) {
+    if (status === 'closed') return '<span style="color:#999">\u25cf</span>';
+    var days = (Date.now() - new Date(iso).getTime()) / 86400000;
+    if (days < 1) return '<span style="color:#3FA56C">\u25cf</span>';
+    if (days < 3) return '<span style="color:#C9A84C">\u25cf</span>';
+    return '<span style="color:#B86250">\u25cf</span>';
+  }
+  function _tkStatusLabel(s) {
+    var L = ({ 'new': 'Neu', open: 'Offen', waiting: 'Wartet', closed: 'Geschlossen' })[s] || s;
+    var C = ({ 'new': '#3FA56C', open: '#3FA56C', waiting: '#C9A84C', closed: '#9a9184' })[s] || '#9a9184';
+    return '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:50%;background:' + C + ';display:inline-block;flex:none;"></span>' + L + '</span>'; // v777e-status-dot
+  }
+  async function loadTickets() {
+    var listEl = document.getElementById('tickets-list');
+    var detEl = document.getElementById('ticket-detail');
+    if (detEl) detEl.style.display = 'none';
+    if (listEl) listEl.style.display = 'block';
+    var tbody = document.getElementById('tickets-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6">L\u00e4dt\u2026</td></tr>';
+    var status = (document.getElementById('tk-status-filter') || {}).value || 'all';
+    try {
+      var r = await API.tickets({ status: status });
+      var rows = (r && r.tickets) || [];
+      if (!tbody) return;
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">Keine Tickets</td></tr>'; return; }
+      tbody.innerHTML = rows.map(function (t) {
+        var d = t.last_activity_at ? new Date(t.last_activity_at).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '\u2013';
+        var mail = escapeHtml(t.user_email || t.contact_email || '\u2013');
+        return '<tr style="cursor:pointer" onclick="window._tkOpen(\'' + t.id + '\')">' +
+          '<td>' + _tkAge(t.last_activity_at, t.status) + '</td>' +
+          '<td>' + escapeHtml(t.subject || '(ohne Betreff)') + '</td>' +
+          '<td>' + escapeHtml(t.category || '\u2013') + '</td>' +
+          '<td>' + mail + '</td>' +
+          '<td>' + _tkStatusLabel(t.status) + ' \u00b7 ' + t.msg_count + '</td>' +
+          '<td>' + d + '</td></tr>';
+      }).join('');
+    } catch (e) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
+    }
+  }
+  async function _tkOpen(id) {
+    var listEl = document.getElementById('tickets-list');
+    var detEl = document.getElementById('ticket-detail');
+    if (listEl) listEl.style.display = 'none';
+    if (detEl) { detEl.style.display = 'block'; detEl.innerHTML = 'L\u00e4dt\u2026'; }
+    try {
+      var r = await API.getTicket(id);
+      if (!r || !r.ticket) { if (detEl) detEl.innerHTML = '<div class="error-msg">Ticket nicht gefunden</div>'; return; }
+      var t = r.ticket;
+      var _atts = r.attachments || []; // v777g-att
+      function _attBlock(mid) {
+        var mine = _atts.filter(function (a) { return a.message_id === mid; });
+        if (!mine.length) return '';
+        return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">' + mine.map(function (a) {
+          return '<a href="#" data-att-id="' + a.id + '" title="' + escapeHtml(a.filename || '') + '" ' +
+            'style="width:84px;height:84px;border:1px solid #e7e1d4;border-radius:8px;overflow:hidden;background:#faf7f0 center/cover no-repeat;display:inline-block;"></a>';
+        }).join('') + '</div>';
+      }
+      var thread = (r.messages || []).map(function (m) {
+        var who = m.sender === 'admin' ? 'Support' : 'Kunde';
+        var bg = m.sender === 'admin' ? '#FAF6EC' : '#fff';
+        var bd = m.sender === 'admin' ? '#C9A84C' : '#ddd';
+        var dt = new Date(m.created_at).toLocaleString('de-DE');
+        return '<div style="border:1px solid ' + bd + ';background:' + bg + ';border-radius:8px;padding:10px 12px;margin:8px 0;">' +
+          '<div style="font-size:11px;color:#888;margin-bottom:4px;">' + who + ' \u00b7 ' + dt + '</div>' +
+          '<div style="white-space:pre-wrap;font-size:14px;">' + escapeHtml(m.body || '') + '</div>' + _attBlock(m.id) + '</div>';
+      }).join('');
+      detEl.innerHTML =
+        '<button class="btn" onclick="window._tkBack()">\u2190 Zur\u00fcck</button>' +
+        '<h3 style="margin:12px 0 4px;">' + escapeHtml(t.subject || '(ohne Betreff)') + '</h3>' +
+        '<div style="font-size:12px;color:#888;margin-bottom:6px;">' + escapeHtml(t.user_email || t.contact_email || '\u2013') + ' \u00b7 ' + _tkStatusLabel(t.status) + ' \u00b7 ' + escapeHtml(t.category || '') + '</div>' +
+        '<div>' + thread + '</div>' +
+        '<textarea id="tk-reply-body" rows="5" style="width:100%;margin-top:10px;padding:8px;box-sizing:border-box;" placeholder="Antwort an den Kunden\u2026"></textarea>' +
+        '<div style="margin-top:8px;font-size:13px;color:#6f675b;">\ud83d\udcce Bilder anh\u00e4ngen: <input type="file" id="tk-reply-files" accept="image/*" multiple style="font-size:12px;"></div>' + // v777h-reply-files
+        '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<button class="btn btn-primary" onclick="window._tkReply(\'' + t.id + '\')">Antwort senden</button>' +
+        '<button class="btn" onclick="window._tkStatus(\'' + t.id + '\',\'open\')">Offen</button>' +
+        '<button class="btn" onclick="window._tkStatus(\'' + t.id + '\',\'waiting\')">Wartet</button>' +
+        '<button class="btn" onclick="window._tkStatus(\'' + t.id + '\',\'closed\')">Geschlossen</button>' +
+        (t.object_snapshot ? '<button class="btn" onclick="window._tkObjDownload(\'' + t.id + '\')">\u2b07 Objekt (JSON)</button>'                            : '<span style="font-size:12px;color:#aaa;align-self:center;">kein Objekt angeh\u00e4ngt</span>') +
+        '</div><div id="tk-msg" style="margin-top:8px;font-size:13px;"></div>';
+      _tkLoadAttachments();
+    } catch (e) {
+      if (detEl) detEl.innerHTML = '<div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div>';
+    }
+  }
+  function _tkBack() { loadTickets(); }
+  async function _tkLoadAttachments() { // v777g-att
+    var nodes = document.querySelectorAll('#ticket-detail [data-att-id]');
+    for (var i = 0; i < nodes.length; i++) {
+      (function (el) {
+        var id = el.getAttribute('data-att-id');
+        API.fetchAttachmentUrl(id).then(function (url) {
+          el.style.backgroundImage = 'url(' + url + ')';
+          el.onclick = function (ev) { ev.preventDefault(); _tkAttFull(url); };
+        }).catch(function () { el.textContent = '\u00d7'; el.style.color = '#B86250'; el.style.fontSize = '20px'; el.style.textAlign = 'center'; el.style.lineHeight = '84px'; });
+      })(nodes[i]);
+    }
+  }
+  function _tkAttFull(url) {
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(8,7,6,.86);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:zoom-out;padding:24px;';
+    var img = document.createElement('img');
+    img.src = url; img.style.cssText = 'max-width:94vw;max-height:92vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5);';
+    ov.appendChild(img);
+    ov.onclick = function () { document.body.removeChild(ov); };
+    document.body.appendChild(ov);
+  }
+  async function _tkObjDownload(id) {
+    try { await API.downloadCsv('/tickets/' + id + '/object.json', 'ticket-' + String(id).slice(0,8) + '-objekt.json'); }
+    catch (e) { alert('Download fehlgeschlagen: ' + (e.message || '')); }
+  }
+  window._tkObjDownload = _tkObjDownload; // v777c-object-download
+  async function _tkReply(id) {
+    var body = (document.getElementById('tk-reply-body') || {}).value || '';
+    var msg = document.getElementById('tk-msg');
+    if (!body.trim()) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Antwort ist leer.'; } return; }
+    if (msg) { msg.style.color = '#888'; msg.textContent = 'Senden\u2026'; }
+    try {
+      var _rf = (document.getElementById('tk-reply-files') || {}).files;
+      await API.replyTicket(id, body, _rf);
+      if (msg) { msg.style.color = '#3FA56C'; msg.textContent = 'Antwort gesendet \u2713'; }
+      setTimeout(function () { _tkOpen(id); }, 700);
+    } catch (e) {
+      if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Fehler: ' + (e.message || ''); }
+    }
+  }
+  async function _tkStatus(id, status) {
+    var msg = document.getElementById('tk-msg');
+    try {
+      await API.setTicketStatus(id, status);
+      if (msg) { msg.style.color = '#3FA56C'; msg.textContent = 'Status: ' + _tkStatusLabel(status); }
+      setTimeout(function () { _tkOpen(id); }, 450);
+    } catch (e) {
+      if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Fehler: ' + (e.message || ''); }
+    }
+  }
+  var _fbPeriod = 'all';
+  var _fbFrom = '';
+  var _fbTo = '';
+  function _fbSetPeriod(p) { _fbPeriod = p; _fbFrom = ''; _fbTo = ''; loadFeedback(); }
+  function _fbApplyRange() { _fbFrom = (document.getElementById('fb-from') || {}).value || ''; _fbTo = (document.getElementById('fb-to') || {}).value || ''; loadFeedback(); }
+  function _fbExportCsv() { API.feedbackCsv({ period: _fbPeriod, from: _fbFrom, to: _fbTo }); }
+  var _FB_CRIT_LABELS = { ux: 'Bedienung & UX', workflow: 'Workflow-Verst\u00e4ndlichkeit', onboarding: 'Onboarding', kpis: 'Kennzahlen-Aufbereitung', score: 'DealScore-Logik', pdf: 'PDF-Qualit\u00e4t', ai: 'Pilot-Analyse', performance: 'Geschwindigkeit' };
+  async function loadFeedback() {
+    var statEl = document.getElementById('fb-stats');
+    var tbody = document.getElementById('feedback-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="4">L\u00e4dt\u2026</td></tr>';
+    try {
+      var r = await API.feedbackQuery({ period: _fbPeriod, from: _fbFrom, to: _fbTo });
+      var s = (r && r.stats) || {};
+      if (statEl) {
+        var avg = (s.avg_rating != null) ? Number(s.avg_rating).toFixed(2) : '\u2013';
+        var rangeActive = !!(_fbFrom || _fbTo);
+        function pb(p, lbl) { return '<button class="btn' + ((!rangeActive && _fbPeriod === p) ? ' btn-primary' : '') + '" onclick="window._fbSetPeriod(\'' + p + '\')">' + lbl + '</button>'; }
+        var toggle = '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">' +
+          pb('all', 'Gesamt') + pb('year', 'Jahr') + pb('month', 'Monat') +
+          '<span style="margin:0 4px;color:#ccc;">|</span>' +
+          '<input type="date" id="fb-from" value="' + _fbFrom + '" style="padding:5px;border:1px solid #ddd;border-radius:6px;">' +
+          '<span style="color:#888;font-size:13px;">bis</span>' +
+          '<input type="date" id="fb-to" value="' + _fbTo + '" style="padding:5px;border:1px solid #ddd;border-radius:6px;">' +
+          '<button class="btn' + (rangeActive ? ' btn-primary' : '') + '" onclick="window._fbApplyRange()">Filtern</button>' +
+          '<button class="btn" onclick="window._fbExportCsv()">\u2b07 CSV exportieren</button>' +
+        '</div>';
+        var periodTxt = _fbPeriod === 'year' ? ' (dieses Jahr)' : (_fbPeriod === 'month' ? ' (dieser Monat)' : '');
+        var head = '<div style="font-size:28px;font-weight:700;color:#C9A84C;">' + avg + ' <span style="font-size:16px;color:#888;">/ 5</span></div>' +
+          '<div style="color:#888;font-size:13px;margin-bottom:14px;">' + (s.n || 0) + ' Bewertungen' + periodTxt + '</div>';
+        var bc = (s.byCriterion) || {};
+        var bars = Object.keys(_FB_CRIT_LABELS).map(function (k) {
+          var d = bc[k] || {};
+          var v = (d.avg != null) ? d.avg : 0;
+          var pct = Math.round(v / 5 * 100);
+          var valTxt = (d.avg != null) ? (d.avg.toFixed(2) + ' <span style="color:#aaa;">(' + (d.n || 0) + ')</span>') : '<span style="color:#bbb;">\u2013</span>';
+          return '<div style="margin:7px 0;">' +
+            '<div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px;"><span>' + _FB_CRIT_LABELS[k] + '</span><span>' + valTxt + '</span></div>' +
+            '<div style="height:8px;background:#eee;border-radius:4px;overflow:hidden;"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#E8CC7A,#C9A84C);"></div></div>' +
+          '</div>';
+        }).join('');
+        statEl.innerHTML = toggle + head + '<div style="font-weight:600;font-size:13px;margin:8px 0 4px;">Schnitt je Bereich</div>' + bars;
+      }
+      var rows = (r && r.feedback) || [];
+      if (!tbody) return;
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted)">Noch kein Feedback</td></tr>'; return; }
+      tbody.innerHTML = rows.map(function (f) {
+        var dt = f.created_at ? new Date(f.created_at).toLocaleString('de-DE') : '\u2013';
+        var n = f.overall_rating || 0;
+        var stars = n ? (new Array(n + 1).join('\u2605') + new Array(Math.max(0, 5 - n) + 1).join('\u2606')) : '\u2013';
+        return '<tr><td style="color:#C9A84C;white-space:nowrap;">' + stars + '</td><td>' + escapeHtml(f.message || '\u2013') + '</td><td>' + escapeHtml(f.user_email || f.contact_email || '\u2013') + '</td><td style="white-space:nowrap;">' + dt + '</td></tr>';
+      }).join('');
+    } catch (e) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="4"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
+    }
+  }
+  window._fbSetPeriod = _fbSetPeriod; window._fbApplyRange = _fbApplyRange; window._fbExportCsv = _fbExportCsv;
+  window._loadTickets = loadTickets; window._loadFeedback = loadFeedback;
+  window._tkOpen = _tkOpen; window._tkBack = _tkBack; window._tkReply = _tkReply; window._tkStatus = _tkStatus; // v777-support
+
+  // v778-broadcast: Massenmail
+  function _bcModeVal() { return (document.getElementById('bc-mode') || {}).value || 'operational'; }
+  async function _bcUpdateCount() {
+    var el = document.getElementById('bc-count');
+    if (el) el.textContent = '\u2026';
+    var opBox = document.getElementById('bc-op-confirm-box');
+    if (opBox) opBox.style.display = (_bcModeVal() === 'operational') ? 'block' : 'none';
+    try {
+      var r = await API.broadcastRecipients(_bcModeVal());
+      var n = (r && r.count != null) ? r.count : '?';
+      if (el) el.textContent = n;
+      var warn = document.getElementById('bc-newsletter-warn');
+      if (warn) warn.style.display = (_bcModeVal() === 'newsletter' && r && r.count === 0) ? 'block' : 'none';
+    } catch (e) { if (el) el.textContent = '?'; }
+  }
+  var _BC_TEMPLATE = 'Hallo,\n\nkurze Info aus dem DealPilot-Team:\n\n\n\nViele Gr\u00fc\u00dfe\nDein DealPilot-Team';
+  var _bcPrevT = null;
+  function _bcPreviewSoon() { clearTimeout(_bcPrevT); _bcPrevT = setTimeout(_bcRenderPreview, 400); }
+  async function _bcRenderPreview() {
+    var fr = document.getElementById('bc-preview-frame'); if (!fr) return;
+    var subj = (document.getElementById('bc-subject') || {}).value || '';
+    var body = (document.getElementById('bc-body') || {}).value || '';
+    try { var r = await API.broadcastPreview({ subject: subj, body: body, mode: _bcModeVal(), html: true }) /* v778f-html-flag */; fr.srcdoc = (r && r.html) || ''; }
+    catch (e) { /* Vorschau still lassen bei Fehler */ }
+  }
+  function _bcWirePreview() {
+    if (window._bcPreviewWired) return; window._bcPreviewWired = true;
+    ['bc-subject', 'bc-body'].forEach(function (id) { var el = document.getElementById(id); if (el) el.addEventListener('input', _bcPreviewSoon); });
+    var m = document.getElementById('bc-mode'); if (m) m.addEventListener('change', _bcPreviewSoon);
+  }
+  // v778e-preview
+  async function loadBroadcast() {
+    window._bcTested = false;
+    var sb = document.getElementById('bc-send-btn'); if (sb) sb.disabled = true;
+    var _bcBodyEl = document.getElementById('bc-body');
+    if (_bcBodyEl && !_bcBodyEl.value.trim()) _bcBodyEl.value = _BC_TEMPLATE;
+    _bcWirePreview();
+    _bcRenderPreview();
+    await _bcUpdateCount();
+    var tbody = document.getElementById('bc-history-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6">L\u00e4dt\u2026</td></tr>';
+    try {
+      var r = await API.broadcastHistory();
+      var rows = (r && r.broadcasts) || [];
+      if (!tbody) return;
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted)">Noch nichts versendet</td></tr>'; return; }
+      tbody.innerHTML = rows.map(function (b) {
+        var d = b.created_at ? new Date(b.created_at).toLocaleString('de-DE') : '\u2013';
+        var modeL = b.mode === 'newsletter' ? 'Newsletter' : 'Betrieb';
+        return '<tr><td>' + d + '</td><td>' + escapeHtml(b.subject || '\u2013') + '</td><td>' + modeL + '</td><td>' + (b.sent_count || 0) + ' / ' + (b.recipient_count || 0) + '</td><td>' + (b.status || '') + '</td><td>' + escapeHtml(b.admin_label || '') + '</td></tr>';
+      }).join('');
+    } catch (e) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>';
+    }
+  }
+  async function _bcTest() {
+    var msg = document.getElementById('bc-msg');
+    var subj = (document.getElementById('bc-subject') || {}).value || '';
+    var body = (document.getElementById('bc-body') || {}).value || '';
+    var to = (document.getElementById('bc-test-email') || {}).value || '';
+    if (!to) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Bitte Test-Adresse eingeben.'; } return; }
+    if (!subj.trim() || !body.trim()) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Betreff und Text d\u00fcrfen nicht leer sein.'; } return; }
+    if (msg) { msg.style.color = '#888'; msg.textContent = 'Testmail wird gesendet\u2026'; }
+    try {
+      await API.broadcastTest({ subject: subj, body: body, mode: _bcModeVal(), toEmail: to, html: true });
+      window._bcTested = true;
+      var sb = document.getElementById('bc-send-btn'); if (sb) sb.disabled = false;
+      if (msg) { msg.style.color = '#3FA56C'; msg.textContent = 'Testmail gesendet an ' + to + ' \u2713 \u2014 pr\u00fcfe dein Postfach, dann unten senden.'; }
+    } catch (e) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Fehler: ' + (e.message || ''); } }
+  }
+  async function _bcSend() {
+    var msg = document.getElementById('bc-msg');
+    var subj = (document.getElementById('bc-subject') || {}).value || '';
+    var body = (document.getElementById('bc-body') || {}).value || '';
+    var mode = _bcModeVal();
+    var label = (document.getElementById('bc-label') || {}).value || '';
+    if (!subj.trim() || !body.trim()) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Betreff und Text d\u00fcrfen nicht leer sein.'; } return; }
+    if (!window._bcTested) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Bitte zuerst eine Testmail an dich senden.'; } return; }
+    if (mode === 'operational') {
+      var chk = document.getElementById('bc-confirm-op');
+      if (!chk || !chk.checked) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Bitte best\u00e4tigen: nur Betriebs-/Wartungsinfo, keine Werbung.'; } return; }
+    }
+    var cnt = (document.getElementById('bc-count') || {}).textContent || '?';
+    if (!window.confirm('Wirklich an ' + cnt + ' Empf\u00e4nger senden? L\u00e4sst sich nicht zur\u00fccknehmen.')) return;
+    if (msg) { msg.style.color = '#888'; msg.textContent = 'Versand wird gestartet\u2026'; }
+    try {
+      var r = await API.broadcastSend({ adminLabel: label, mode: mode, subject: subj, body: body, confirmOperational: true, html: true });
+      if (msg) { msg.style.color = '#3FA56C'; msg.textContent = 'Versand gestartet an ' + ((r && r.recipientCount) || '?') + ' Empf\u00e4nger. Fortschritt im Verlauf unten.'; }
+      window._bcTested = false;
+      var sb = document.getElementById('bc-send-btn'); if (sb) sb.disabled = true;
+      setTimeout(loadBroadcast, 1500);
+    } catch (e) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Fehler: ' + (e.message || ''); } }
+  }
+  window._loadBroadcast = loadBroadcast; window._bcMode = _bcUpdateCount; window._bcTest = _bcTest; window._bcSend = _bcSend; window._bcRefresh = loadBroadcast; // v778-broadcast
+
+  // v779-lifecycle: Kundenbindung
+  async function loadLifecycle() {
+    var msg = document.getElementById('lc-msg'); if (msg) msg.textContent = '';
+    try {
+      var c = await API.lifecycleConfig();
+      var cfg = (c && c.config) || c || {};
+      function set(id, v) { var e = document.getElementById(id); if (e && v != null) e.value = v; }
+      var en = document.getElementById('lc-enabled'); if (en) en.checked = !!cfg.enabled;
+      set('lc-days_reminder', cfg.days_reminder); set('lc-days_warn_delete', cfg.days_warn_delete);
+      set('lc-days_soft_delete', cfg.days_soft_delete); set('lc-days_hard_delete', cfg.days_hard_delete);
+      set('lc-coupon_percent', cfg.coupon_percent); set('lc-coupon_days', cfg.coupon_days);
+      var badge = document.getElementById('lc-state-badge');
+      if (badge) { badge.textContent = cfg.enabled ? 'AKTIV' : 'AUS (Dry-Run)'; badge.style.color = cfg.enabled ? '#B86250' : '#3FA56C'; }
+    } catch (e) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Config-Fehler: ' + (e.message || ''); } }
+    await _lcLoadEvents();
+  }
+  async function _lcLoadEvents() {
+    var tbody = document.getElementById('lc-events-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="3">L\u00e4dt\u2026</td></tr>';
+    try {
+      var r = await API.lifecycleEvents();
+      var rows = (r && r.events) || [];
+      if (!tbody) return;
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="3" style="color:var(--text-muted)">Noch keine Ereignisse</td></tr>'; return; }
+      tbody.innerHTML = rows.map(function (e) {
+        var d = e.created_at ? new Date(e.created_at).toLocaleString('de-DE') : '\u2013';
+        return '<tr><td>' + d + '</td><td>' + escapeHtml(e.stage || '') + '</td><td>' + escapeHtml(e.email || '\u2013') + '</td></tr>';
+      }).join('');
+    } catch (e) { if (tbody) tbody.innerHTML = '<tr><td colspan="3"><div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div></td></tr>'; }
+  }
+  function _lcNum(id) { var v = parseInt((document.getElementById(id) || {}).value, 10); return isNaN(v) ? undefined : v; }
+  async function _lcSave() {
+    var msg = document.getElementById('lc-msg');
+    var enabled = !!(document.getElementById('lc-enabled') || {}).checked;
+    if (enabled && !window.confirm('Lifecycle WIRKLICH scharf schalten? Ab jetzt werden Mails versendet und nach Ablauf der Fristen Konten deaktiviert und gel\u00f6scht.')) return;
+    var patch = {
+      enabled: enabled,
+      days_reminder: _lcNum('lc-days_reminder'), days_warn_delete: _lcNum('lc-days_warn_delete'),
+      days_soft_delete: _lcNum('lc-days_soft_delete'), days_hard_delete: _lcNum('lc-days_hard_delete'),
+      coupon_percent: _lcNum('lc-coupon_percent'), coupon_days: _lcNum('lc-coupon_days')
+    };
+    if (msg) { msg.style.color = '#888'; msg.textContent = 'Speichern\u2026'; }
+    try { await API.lifecycleSaveConfig(patch); if (msg) { msg.style.color = '#3FA56C'; msg.textContent = 'Gespeichert \u2713'; } loadLifecycle(); }
+    catch (e) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Fehler: ' + (e.message || ''); } }
+  }
+  async function _lcDryRun() {
+    var out = document.getElementById('lc-dryrun-out');
+    if (out) out.innerHTML = 'Simuliere\u2026';
+    try {
+      var r = await API.lifecycleDryRun();
+      var acts = (r && r.actions) || [];
+      var hdr = '<div style="margin-bottom:6px;">Status: <strong>' + (r && r.enabled ? 'AKTIV' : 'AUS') + '</strong> \u00b7 ' + (acts.length) + ' Aktion(en) f\u00e4llig' + ((r && r.dryRun) ? ' (Vorschau, nichts ausgef\u00fchrt)' : '') + '</div>';
+      if (!acts.length) { if (out) out.innerHTML = hdr + '<div style="color:var(--text-muted)">Aktuell nichts f\u00e4llig.</div>'; return; }
+      var rows = acts.map(function (a) { return '<tr><td>' + escapeHtml(a.stage) + '</td><td>' + escapeHtml(a.email || a.userId) + '</td></tr>'; }).join('');
+      if (out) out.innerHTML = hdr + '<table class="data-table"><thead><tr><th>Stufe</th><th>Kontakt</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    } catch (e) { if (out) out.innerHTML = '<div class="error-msg">' + escapeHtml(e.message || 'Fehler') + '</div>'; }
+  }
+  window._loadLifecycle = loadLifecycle; window._lcSave = _lcSave; window._lcDryRun = _lcDryRun; // v779-lifecycle
+
   async function loadCredits() {
     function eur(v) { return (v == null) ? '–' : Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
     try {

@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DealPilot · Admin</title>
-  <link rel="stylesheet" href="css/admin.css?v=197">
+  <link rel="stylesheet" href="css/admin.css?v=780a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <meta name="robots" content="noindex, nofollow">
 </head>
 <body>
@@ -44,9 +44,17 @@
       <span class="brand">⚙ DealPilot Admin</span>
       <nav class="nav">
         <a href="#" data-view="dashboard" class="nav-link active">Dashboard</a>
-        <a href="#" data-view="users" class="nav-link">User</a>
-        <a href="#" data-view="audit" class="nav-link">Audit-Log</a>
+        <span class="nav-grp">Nutzer &amp; Umsatz</span>
+        <a href="#" data-view="users" class="nav-link">Nutzer</a>
         <a href="#" data-view="credits" class="nav-link">Guthaben &amp; Kosten</a>
+        <a href="#" data-view="invoices" class="nav-link">Rechnungen</a>
+        <a href="#" data-view="audit" class="nav-link">Audit-Log</a>
+        <span class="nav-grp">Support</span>
+        <a href="#" data-view="support" class="nav-link">Support</a>
+        <a href="#" data-view="satisfaction" class="nav-link">Kundenzufriedenheit</a>
+        <span class="nav-grp">Kommunikation</span>
+        <a href="#" data-view="broadcast" class="nav-link">Massenmail</a>
+        <a href="#" data-view="lifecycle" class="nav-link">Kundenbindung</a>
       </nav>
     </div>
     <div class="topbar-right">
@@ -57,6 +65,125 @@
   </header>
 
   <main class="main">
+    <section id="view-invoices" class="view" style="display:none;">
+      <div class="view-header"><h2>Rechnungen</h2></div>
+      <div class="card">
+        <div class="range-bar">
+          <span class="range-label">Zeitraum:</span>
+          <input type="date" id="inv-from" style="padding:6px">
+          <input type="date" id="inv-to" style="padding:6px">
+          <button class="btn" onclick="if(window._invReload)window._invReload()">Filtern</button>
+          <button class="btn" onclick="if(window._invCsv)window._invCsv()">CSV-Export (Buchhaltung)</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Nummer</th><th>Datum</th><th>Betrag</th><th>Status</th><th>Kunde</th><th>PDF</th></tr></thead>
+          <tbody id="invoices-tbody"><tr><td colspan="6">Lädt…</td></tr></tbody>
+        </table>
+        <p style="font-size:12px;color:#888;margin-top:10px">Rechnungen werden automatisch aus Stripe archiviert (bei jeder erfolgreichen Zahlung). § 19 UStG: ohne USt-Ausweis. Beim UG-Wechsel übernimmt Stripe den USt-Ausweis automatisch — keine Code-Änderung nötig.</p>
+      </div>
+    </section>
+
+    <section id="view-support" class="view" style="display:none;">
+      <div class="view-header"><h2>Support</h2></div>
+      <div id="tickets-list">
+        <div class="card">
+          <div class="range-bar">
+            <span class="range-label">Status:</span>
+            <select id="tk-status-filter" onchange="if(window._loadTickets)window._loadTickets()">
+              <option value="all">Alle</option>
+              <option value="new">Neu</option>
+              <option value="open">Offen</option>
+              <option value="waiting">Wartet</option>
+              <option value="closed">Geschlossen</option>
+            </select>
+            <button class="btn" onclick="if(window._loadTickets)window._loadTickets()">Aktualisieren</button>
+          </div>
+          <table class="data-table">
+            <thead><tr><th></th><th>Betreff</th><th>Kategorie</th><th>Kontakt</th><th>Status · Msg</th><th>Letzte Aktivität</th></tr></thead>
+            <tbody id="tickets-tbody"><tr><td colspan="6">Lädt…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="ticket-detail" class="card" style="display:none;"></div>
+    </section>
+
+    <section id="view-satisfaction" class="view" style="display:none;">
+      <div class="view-header"><h2>Kundenzufriedenheit</h2></div>
+      <div class="card"><div id="fb-stats">Lädt…</div></div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Bewertung</th><th>Nachricht</th><th>Kontakt</th><th>Datum</th></tr></thead>
+          <tbody id="feedback-tbody"><tr><td colspan="4">Lädt…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="view-broadcast" class="view" style="display:none;">
+      <div class="view-header"><h2>Massenmail</h2></div>
+      <div class="card">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
+          <label>Modus<br><select id="bc-mode" onchange="if(window._bcMode)window._bcMode()">
+            <option value="operational">Betrieb / Wartung (alle aktiven Nutzer)</option>
+            <option value="newsletter">Newsletter (nur Opt-ins)</option>
+          </select></label>
+          <div>Empfänger: <strong id="bc-count">…</strong></div>
+        </div>
+        <div id="bc-newsletter-warn" style="display:none;color:#B86250;font-size:13px;margin-bottom:10px;">Noch keine Newsletter-Opt-ins vorhanden — die Einwilligung wird beim Registrieren aktuell nicht erfasst (separater kleiner Schritt).</div>
+        <label>Betreff<br><input type="text" id="bc-subject" style="width:100%;padding:8px;box-sizing:border-box;"></label>
+        <label style="display:block;margin-top:10px;">Text<br><div id="bc-editor-host"></div><textarea id="bc-body" rows="9" style="width:100%;padding:8px;box-sizing:border-box;"></textarea></label>
+        <div id="bc-op-confirm-box" style="margin-top:10px;">
+          <label style="font-size:13px;"><input type="checkbox" id="bc-confirm-op"> Ich bestätige: nur Betriebs-/Wartungsinformation, KEINE Werbung.</label>
+        </div>
+        <label style="display:block;margin-top:10px;">Interne Bezeichnung (optional)<br><input type="text" id="bc-label" style="width:100%;padding:8px;box-sizing:border-box;"></label>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <input type="email" id="bc-test-email" placeholder="Test-Adresse (du)" style="padding:8px;">
+          <button class="btn" onclick="if(window._bcTest)window._bcTest()">Testmail senden</button>
+          <button class="btn btn-primary" id="bc-send-btn" disabled onclick="if(window._bcSend)window._bcSend()">An alle senden</button>
+        </div>
+        <div id="bc-msg" style="margin-top:8px;font-size:13px;"></div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid #eee;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Live-Vorschau (so kommt die Mail an)</div>
+          <iframe id="bc-preview-frame" title="Mail-Vorschau" style="width:100%;height:520px;border:1px solid #e3ddcf;border-radius:8px;background:#fff;"></iframe>
+        </div>
+      </div>
+      <div class="card">
+        <div class="view-header"><h2 style="font-size:16px;">Verlauf</h2><button class="btn" onclick="if(window._bcRefresh)window._bcRefresh()">Aktualisieren</button></div>
+        <table class="data-table">
+          <thead><tr><th>Zeit</th><th>Betreff</th><th>Modus</th><th>Gesendet</th><th>Status</th><th>Notiz</th></tr></thead>
+          <tbody id="bc-history-tbody"><tr><td colspan="6">Lädt…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="view-lifecycle" class="view" style="display:none;">
+      <div class="view-header"><h2>Kundenbindung <span id="lc-state-badge" style="font-size:13px;margin-left:8px;">…</span></h2></div>
+      <div class="card">
+        <p style="font-size:13px;color:#888;">Automatische Stufen nach Ablauf eines Abos. Solange <strong>nicht aktiv</strong>, läuft der Job nur als Dry-Run (sendet/löscht nichts).</p>
+        <label style="display:block;margin:8px 0;"><input type="checkbox" id="lc-enabled"> <strong>Lifecycle aktiv</strong> (scharf — sendet Mails, deaktiviert &amp; löscht Konten)</label>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;">
+          <label>Erinnerung T-? (Tage vor Ende)<br><input type="number" id="lc-days_reminder" value="2" style="width:90px;padding:6px;"></label>
+          <label>Lösch-Warnung (Tage nach Ende)<br><input type="number" id="lc-days_warn_delete" value="83" style="width:90px;padding:6px;"></label>
+          <label>Deaktivieren (Tage)<br><input type="number" id="lc-days_soft_delete" value="90" style="width:90px;padding:6px;"></label>
+          <label>Endgültig löschen (Tage)<br><input type="number" id="lc-days_hard_delete" value="97" style="width:90px;padding:6px;"></label>
+          <label>Gutschein %<br><input type="number" id="lc-coupon_percent" value="10" style="width:90px;padding:6px;"></label>
+          <label>Gutschein gültig (Tage)<br><input type="number" id="lc-coupon_days" value="14" style="width:90px;padding:6px;"></label>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="if(window._lcSave)window._lcSave()">Speichern</button>
+          <button class="btn" onclick="if(window._lcDryRun)window._lcDryRun()">Dry-Run jetzt (Vorschau)</button>
+        </div>
+        <div id="lc-msg" style="margin-top:8px;font-size:13px;"></div>
+        <div id="lc-dryrun-out" style="margin-top:12px;"></div>
+      </div>
+      <div class="card">
+        <div class="view-header"><h2 style="font-size:16px;">Ereignisse</h2></div>
+        <table class="data-table">
+          <thead><tr><th>Zeit</th><th>Stufe</th><th>Kontakt</th></tr></thead>
+          <tbody id="lc-events-tbody"><tr><td colspan="3">Lädt…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
     <section id="view-dashboard" class="view">
       <div class="view-header">
         <h2>Dashboard</h2>
@@ -289,6 +416,7 @@
 <script src="js/admin-api.js?v=554"></script>
 <script src="js/admin-auth.js?v=197"></script>
 <script src="js/admin-charts.js?v=197"></script>
-<script src="js/admin-app.js?v=554"></script>
+<script src="js/bc-editor.js?v=780c"></script>
+    <script src="js/admin-app.js?v=554"></script>
 </body>
 </html>

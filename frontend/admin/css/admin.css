@@ -257,3 +257,335 @@ h4 { margin: 0 0 8px 0; font-size: 1.05em; }
   from { opacity: 0; transform: translateX(20px); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+/* ============================================================
+   admin-reskin-v780 — Welcome-Mail-Look fuer das Admin-Portal.
+   Hell/cremefarben, Obsidian-Brandbar (.topbar), Gold-Hero pro
+   .view-header, Gold nur fuer die Hauptaktion (.btn-primary).
+   Append-only, spaetester Block -> greift portalweit ueber admin.css.
+   ============================================================ */
+
+:root {
+  --gold:        #C9A84C;
+  --gold-light:  #E8CC7A;
+  --gold-dark:   #b8932f;
+  --charcoal:    #1b1815;
+  --charcoal-light:#2a2620;
+  --bg:          #FDFCFA;
+  --bg-card:     #ffffff;
+  --bg-card-dark:#070707;
+  --text:        #1b1815;
+  --text-muted:  #6f675b;
+  --text-light:  #9a9184;
+  --border:      #e7e1d4;
+  --danger:      #B86250;
+  --danger-bg:   rgba(184,98,80,.12);
+  --success:     #3FA56C;
+  --success-bg:  rgba(63,165,108,.12);
+  --test:        #8b5cf6;
+  --test-bg:     #ede9fe;
+  --r-obsidian:  #070707;
+  --r-runway:    linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --r-field:     #faf7f0;
+  --r-line-soft: #f0ebe0;
+  --r-disp:'Space Grotesk',system-ui,sans-serif;
+  --r-body:'Inter',system-ui,sans-serif;
+  --r-mono:'JetBrains Mono',ui-monospace,monospace;
+  --r-shadow:0 1px 2px rgba(20,15,5,.04),0 14px 34px -22px rgba(20,15,5,.22);
+}
+
+body {
+  font-family: var(--r-body) !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+h1, h2, h3, h4, .login-title, .brand {
+  font-family: var(--r-disp) !important;
+  letter-spacing: -.01em;
+}
+
+/* ---- Obsidian-Brandbar (Topbar) ---- */
+.topbar {
+  background: var(--r-obsidian) !important;
+  border-bottom: none !important;
+  padding: 0 26px !important;
+  box-shadow: none !important;
+  min-height: 56px;
+}
+.topbar-left { gap: 26px !important; }
+.brand {
+  color: #fff !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+}
+.nav { gap: 4px !important; }
+.nav-link {
+  color: #cfc8ba !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  padding: 8px 12px !important;
+  border-bottom: none !important;
+  border-radius: 9px;
+  transition: .12s;
+}
+.nav-link:hover { color: #fff !important; background: rgba(255,255,255,.06); }
+.nav-link.active {
+  color: #1b1815 !important;
+  background: var(--gold-light) !important;
+  border-bottom: none !important;
+  font-weight: 600 !important;
+}
+.topbar-right { gap: 14px !important; }
+.user-email { color: #cfc8ba !important; font-size: 12.5px !important; }
+.user-role {
+  background: transparent !important;
+  color: var(--gold-light) !important;
+  border: 1px solid rgba(201,168,76,.45) !important;
+  font-family: var(--r-mono) !important;
+  letter-spacing: .08em !important;
+}
+.logout { color: #cfc8ba !important; }
+.logout:hover { color: #fff !important; }
+
+/* ---- Gold-Hero pro View-Header ---- */
+.view-header {
+  background: var(--r-runway);
+  color: #241a06;
+  border-radius: 14px;
+  padding: 20px 22px !important;
+  margin-bottom: 24px !important;
+  box-shadow: var(--r-shadow);
+}
+.view-header h2 {
+  color: #241a06 !important;
+  font-size: 21px !important;
+  margin: 0 !important;
+}
+.view-header .btn { box-shadow: none; }
+/* Buttons im Hero: heller Rahmen statt creme-auf-gold */
+.view-header .btn:not(.btn-primary) {
+  background: rgba(255,255,255,.85) !important;
+  border-color: rgba(36,26,6,.25) !important;
+  color: #241a06 !important;
+}
+.view-header .btn-primary {
+  background: var(--r-obsidian) !important;
+  color: #fff !important;
+}
+
+/* ---- Cards ---- */
+.card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--r-shadow) !important;
+}
+
+/* ---- KPI-Cards ---- */
+.kpi-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--r-shadow) !important;
+}
+.kpi-label, .kpi-sub {
+  font-family: var(--r-mono) !important;
+  letter-spacing: .06em;
+  color: var(--text-light) !important;
+  text-transform: uppercase;
+  font-size: 10.5px !important;
+}
+.kpi-value {
+  font-family: var(--r-disp) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.02em;
+}
+.kpi-card--gold {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+.kpi-card--gold::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--r-runway);
+}
+.kpi-card--gold .kpi-value { color: var(--gold-dark) !important; }
+.kpi-card--gold .kpi-label,
+.kpi-card--gold .kpi-sub { color: var(--text-light) !important; opacity: 1; }
+
+/* ---- Daten-Tabelle ---- */
+.data-table {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--r-shadow);
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
+.data-table thead th {
+  font-family: var(--r-mono) !important;
+  font-size: 10.5px !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-light) !important;
+  background: var(--r-field) !important;
+  padding: 12px 14px !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.data-table tbody td { border-bottom: 1px solid var(--r-line-soft) !important; }
+.data-table tbody tr:last-child td { border-bottom: none !important; }
+.data-table tbody tr:hover { background: #fdfaf2 !important; }
+.data-table .row-link { color: var(--gold-dark) !important; font-weight: 600 !important; }
+
+/* ---- Buttons: schlicht; nur Hauptaktion Gold ---- */
+.btn {
+  font-family: var(--r-body) !important;
+  font-weight: 600 !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg-card) !important;
+  color: var(--text) !important;
+  border-radius: 9px !important;
+  transition: .12s;
+}
+.btn:hover { background: var(--r-field) !important; border-color: var(--text-light) !important; }
+.btn-primary {
+  background: var(--r-runway) !important;
+  color: #241a06 !important;
+  border: none !important;
+  box-shadow: 0 2px 8px -2px rgba(184,147,47,.5) !important;
+}
+.btn-primary:hover { filter: brightness(1.04); background: var(--r-runway) !important; color: #241a06 !important; }
+.btn-danger {
+  background: var(--danger-bg) !important;
+  color: var(--danger) !important;
+  border-color: transparent !important;
+}
+.btn-danger:hover { background: var(--danger) !important; color: #fff !important; }
+
+/* ---- Range/Filter-Buttons ---- */
+.range-btn.active { background: var(--charcoal) !important; color: #fff !important; border-color: var(--charcoal) !important; }
+.range-label { font-family: var(--r-mono) !important; font-size: 11px; letter-spacing: .06em; color: var(--text-muted) !important; }
+
+/* ---- Inputs/Selects ---- */
+input[type="text"], input[type="email"], input[type="date"], input[type="number"],
+input[type="search"], select, textarea, .search-input, .filter-select {
+  font-family: var(--r-body) !important;
+  border: 1px solid var(--border) !important;
+  background: var(--r-field) !important;
+  border-radius: 9px !important;
+  color: var(--text) !important;
+}
+input:focus, select:focus, textarea:focus { outline: 2px solid rgba(201,168,76,.35); outline-offset: 1px; }
+
+/* ---- Status-Pills ---- */
+.pill { border-radius: 999px !important; font-weight: 600 !important; }
+.pill-active { background: var(--success-bg) !important; color: #2c7e51 !important; }
+.pill-inactive { background: #f0ece3 !important; color: var(--text-muted) !important; }
+.pill-plan-paid { background: rgba(201,168,76,.16) !important; color: var(--gold-dark) !important; }
+
+/* ---- Modal ---- */
+.modal-content {
+  border-radius: 14px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 24px 70px -20px rgba(20,15,5,.45) !important;
+}
+
+/* ---- Toasts ---- */
+.toast.toast-success { background: var(--success) !important; }
+.toast.toast-error { background: var(--danger) !important; }
+.toast.toast-info { background: var(--charcoal) !important; }
+
+/* ---- Login (Obsidian + Gold) ---- */
+.login-screen { background: linear-gradient(135deg,#1b1815 0%,#070707 100%) !important; }
+.login-card { border: 1px solid var(--gold) !important; border-radius: 16px !important; }
+.login-title { color: var(--gold-dark) !important; }
+
+/* ---- Massenmail-Editor harmoniert ---- */
+#bc-editor-host { border-color: var(--border) !important; }
+/* === admin-reskin-v780 END === */
+
+
+/* ============================================================
+   admin-reskin-v780a — Linke Sidebar-Navigation (wie Demo).
+   Brandbar bleibt oben schmal; Nav wandert per CSS in eine helle
+   Seitenleiste links; Main rueckt nach rechts. Append nach v780.
+   ============================================================ */
+
+/* Topbar: schmal, Brand links / User rechts. Nav verlaesst den Fluss. */
+.topbar {
+  position: sticky; top: 0; z-index: 40;
+  height: 56px; min-height: 56px;
+  padding: 0 26px !important;
+}
+.topbar-left { gap: 0 !important; }
+
+/* Nav -> fixe helle Sidebar links unter der Brandbar */
+.nav {
+  position: fixed !important;
+  left: 0; top: 56px; bottom: 0;
+  width: 214px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  padding: 16px 12px !important;
+  background: var(--bg-card) !important;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 35;
+}
+.nav-link {
+  display: flex !important;
+  align-items: center; gap: 10px;
+  color: var(--text) !important;
+  background: transparent !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  padding: 9px 12px !important;
+  border-radius: 9px !important;
+  border: none !important;
+}
+.nav-link::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--border); flex: none;
+}
+.nav-link:hover { background: var(--r-field) !important; color: var(--text) !important; }
+.nav-link.active {
+  background: var(--charcoal) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+.nav-link.active::before { background: var(--gold-light); }
+
+/* Gruppen-Label in der Sidebar */
+.nav-grp {
+  font-family: var(--r-mono);
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-light);
+  padding: 6px 12px; margin-top: 12px;
+}
+.nav-grp:first-of-type { margin-top: 6px; }
+
+/* Main rueckt neben die Sidebar */
+.main {
+  margin-left: 214px !important;
+  max-width: none !important;
+  padding: 26px 30px 60px !important;
+}
+
+/* Mobile: Sidebar wird wieder zur horizontalen Leiste */
+@media (max-width: 820px) {
+  .nav {
+    position: static !important; width: auto;
+    flex-direction: row !important; flex-wrap: wrap;
+    border-right: none; border-bottom: 1px solid var(--border);
+    top: auto;
+  }
+  .nav-grp { display: none; }
+  .nav-link::before { display: none; }
+  .main { margin-left: 0 !important; }
+}
+/* === admin-reskin-v780a END === */
+

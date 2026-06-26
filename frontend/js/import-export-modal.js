@@ -99,7 +99,7 @@
           'Bestehende Objekte mit gleichem Namen werden überschrieben.</p>' +
           '<ul class="iexp-bullets">' +
             '<li>Alle Eingaben &amp; Berechnungen pro Objekt</li>' +
-            '<li>Sterne-Bewertungen, Annotationen, KI-Analysen</li>' +
+            '<li>Sterne-Bewertungen, Annotationen, Pilot-Analysen</li>' +
             '<li>Objektfotos (falls in Backup enthalten)</li>' +
           '</ul>' +
           '<p class="iexp-warn">⚠ Stripe/Plan-Daten sind <em>nicht</em> enthalten — nur Objekte.</p>' +
@@ -148,7 +148,7 @@
             '<li>Deckblatt mit Hauptkennzahlen + Foto</li>' +
             '<li>Cashflow heute · Ende Zinsbindung · Anschluss</li>' +
             '<li>Charts (Cashflow, Wertverlauf, Equity-Schere)</li>' +
-            '<li>Vermögensaufbau, KI-Analyse, Annahmen</li>' +
+            '<li>Vermögensaufbau, Pilot-Analyse, Annahmen</li>' +
           '</ul>' +
           '<div class="iexp-card-cta">Objekt wählen <span>›</span></div>' +
         '</div>' +
@@ -162,7 +162,7 @@
           'Empfohlen vor jedem App-Update als Sicherheits-Backup.</p>' +
           '<ul class="iexp-bullets">' +
             '<li>Komplette Eingaben + Berechnungen</li>' +
-            '<li>KI-Analysen, Sterne, Bemerkungen</li>' +
+            '<li>Pilot-Analysen, Sterne, Bemerkungen</li>' +
             '<li>Objektfotos (Base64 eingebettet)</li>' +
           '</ul>' +
           '<p class="iexp-warn">⚠ Datei ist nicht verschlüsselt — sicher aufbewahren.</p>' +

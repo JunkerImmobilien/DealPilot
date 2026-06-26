@@ -221,6 +221,29 @@ router.post('/', fbLimiter, (req, res) => {
         });
       }
 
+      // v777: zusaetzlich persistent ablegen (Mail oben bleibt Benachrichtigung). Best-effort.
+      try {
+        const supportService = require('../services/supportService');
+        const _uid = (req.user && req.user.id) || null;
+        const _mail = payload.contact_email || (req.user && req.user.email) || null;
+        if (payload.type === 'support') {
+          var _ticket = await supportService.createTicketFromSubmission({
+            userId: _uid, contactEmail: _mail, category: payload.category,
+            subject: subject, message: payload.message, objectSnapshot: objJson
+          });
+          try { // v777g-att-save
+            var _imgs = (Array.isArray(req.files) ? req.files : []).filter(function (f) { return f && f.mimetype && /^image\//.test(f.mimetype); });
+            if (_ticket && _ticket.ticketId && _imgs.length && supportService.saveAttachments) {
+              await supportService.saveAttachments({ ticketId: _ticket.ticketId, messageId: _ticket.messageId || null, sender: 'user', files: _imgs });
+            }
+          } catch (attErr) { console.error('[feedback-att] save failed:', attErr && attErr.message); }
+        } else {
+          await supportService.recordFeedback({
+            userId: _uid, contactEmail: _mail, overallRating: payload.overall_rating,
+            criteria: payload.criteria, message: payload.message
+          });
+        }
+      } catch (dbErr) { console.error('[feedback-db] persist failed:', dbErr && dbErr.message); }
       res.json({ success: true, type: payload.type, attachmentCount: attachments.length });
     } catch (e) {
       console.error('[feedback] error:', e);

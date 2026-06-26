@@ -205,7 +205,16 @@ function showSettings(initialTab) {
         '<h3 class="set-section-h">Account-Info</h3>' +
         '<div class="g2">' +
           '<div class="f"><label>Name</label><input id="set_user_name" type="text" value="' + _esc(view.user_name) + '" placeholder="Max Mustermann"></div>' +
-          '<div class="f"><label>E-Mail (Login)</label><input id="set_user_email_readonly" type="email" value="' + _esc(_getCurrentUserEmail()) + '" readonly style="opacity:0.7;cursor:not-allowed"></div>' +
+          '<div class="f"><label>E-Mail (Login)</label><input id="set_user_email_readonly" type="email" value="' + _esc(_getCurrentUserEmail()) + '" readonly style="opacity:0.7;cursor:not-allowed">' +
+          ((typeof Auth !== 'undefined' && Auth.isApiMode && Auth.isApiMode()) ?
+            '<button type="button" class="btn btn-sm btn-ghost" style="margin-top:6px" onclick="if(window._dpEmailChangeToggle)_dpEmailChangeToggle()">E-Mail \u00e4ndern</button>' +
+            '<div id="dp-email-change-box" style="display:none;margin-top:8px;padding:12px;border:1px solid #E6DFCE;border-radius:10px;background:#fffdf9">' +
+              '<div class="f"><label>Neue E-Mail</label><input id="dp-ec-new" type="email" placeholder="neu@beispiel.de" autocomplete="off"></div>' +
+              '<div class="f"><label>Aktuelles Passwort</label><input id="dp-ec-pw" type="password" autocomplete="current-password"></div>' +
+              '<button type="button" class="btn btn-sm" onclick="if(window._dpEmailChangeSubmit)_dpEmailChangeSubmit()">Best\u00e4tigungslink senden</button>' +
+              '<div id="dp-ec-msg" style="margin-top:8px;font-size:12.5px;line-height:1.4"></div>' +
+            '</div>' : '') +
+          '</div>' +
         '</div>' +
         '<div class="g2">' +
           '<div class="f"><label>Rolle / Funktion</label><input id="set_user_role" type="text" value="' + _esc(view.user_role) + '" placeholder="Investor, Geschäftsführer"></div>' +
@@ -365,7 +374,7 @@ function showSettings(initialTab) {
       // User soll da nichts einstellen können). Determinismus + alte Stil-Settings entfernt.
       '<div class="st-pane" data-pane="api" style="display:none">' +
         // V63.86: KI-Credits-Übersicht oben in der KI-Pane
-        '<p class="hint">Diese Einstellungen werden allen KI-Analysen (KI-Lage, Quick-Check, Investor Deal Score AI) angehängt.</p>' +
+        '<p class="hint">Diese Einstellungen werden allen Pilot-Analysen (KI-Lage, Quick-Check, Investor Deal Score AI) angehängt.</p>' +
 
         '<h3 class="set-section-h">Prompt-Qualität</h3>' +
 
@@ -408,7 +417,7 @@ function showSettings(initialTab) {
         // ohne Argument → undefined. Das warf TypeError beim Zugriff auf .ai_strat und
         // verhinderte das gesamte Settings-Modal-Render. Jetzt direkt einzelne Keys abfragen.
         '<h3 class="set-section-h" style="margin-top:24px">Standard-Analyseparameter</h3>' +
-        '<p class="hint" style="margin-top:-6px;margin-bottom:14px">Diese Werte fließen in jeden KI-Analyse-Prompt ein. Sie sind pro Objekt im KI-Tab überschreibbar.</p>' +
+        '<p class="hint" style="margin-top:-6px;margin-bottom:14px">Diese Werte fließen in jeden Pilot-Analyse-Prompt ein. Sie sind pro Objekt im KI-Tab überschreibbar.</p>' +
         (function() {
           var ipApi = (window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get) ? DealPilotInvestmentProfile : null;
           var aiStrat = (ipApi ? ipApi.get('ai_strat') : null) || 'Buy & Hold (Langfristig halten)';
@@ -763,7 +772,7 @@ function _getCurrentPlanMeta() {
     if (objLimit > 0)        parts.push(objLimit + ' Objekt' + (objLimit === 1 ? '' : 'e'));
     else if (objLimit < 0)   parts.push('unbegrenzte Objekte');
     if (aiLimit > 0)         parts.push(aiLimit + ' L Kerosin / Monat');
-    else if (aiLimit === 1)  parts.push('1 KI-Analyse');
+    else if (aiLimit === 1)  parts.push('1 Pilot-Analyse');
     return _esc(parts.join(' · '));
   } catch(e) { return ''; }
 }
@@ -1565,7 +1574,7 @@ function _renderPlanPane() {
     html += '<li><strong>' + (l.objects === -1 ? 'Unbegrenzt' : l.objects) + '</strong> Objekt' + (l.objects === 1 ? '' : 'e') + '</li>';
     // KI-Credits
     if (l.ai_credits === -1) {
-      html += '<li>Unbegrenzte KI-Analysen</li>';
+      html += '<li>Unbegrenzte Pilot-Analysen</li>';
     } else if (l.ai_credits > 0) {
       html += '<li><strong>' + (l.ai_credits * 2) + '</strong> Pilot-Anfragen / Monat</li>';
     } else if (l.ai_credits === 0) {

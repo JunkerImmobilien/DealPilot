@@ -78,7 +78,7 @@ var TAB_META = [
   { title: 'Steuer-Details',  sub: 'AfA, Werbungskosten und persönliche Steuerprognose.' },
   { title: 'Finanzierung',    sub: 'Darlehen, Zins, Tilgung und DSCR.' },
   { title: 'Bewirtschaftung', sub: 'Hausgeld, Verwaltung und Instandhaltung.' },
-  { title: 'KI-Analyse',      sub: 'Automatische Bewertung von Lage und Investmentpotenzial.' },
+  { title: 'Pilot-Analyse',      sub: 'Automatische Bewertung von Lage und Investmentpotenzial.' },
   { title: 'Kennzahlen',      sub: 'Alle KPIs, Szenarien, Charts und Projektion.' },
   { title: 'Deal-Aktion',     sub: 'Empfehlung, Bietstrategie und Verhandlung.' }
 ];
@@ -801,9 +801,9 @@ function _formatAIError(err) {
     return '⚠ KI-Key wurde abgelehnt. Bitte in den Einstellungen prüfen.';
   }
   if (err && err.status === 429) {
-    return '⚠ KI-Analyse-Limit erreicht oder KI-Rate-Limit. Bitte später nochmal probieren.';
+    return '⚠ Pilot-Analyse-Limit erreicht oder KI-Rate-Limit. Bitte später nochmal probieren.';
   }
-  return '⚠ KI-Analyse fehlgeschlagen: ' + ((err && (err.message || err.error)) || err);
+  return '⚠ Pilot-Analyse fehlgeschlagen: ' + ((err && (err.message || err.error)) || err);
 }
 async function _runAIServer(btn) {
   var _orig = btn.innerHTML; /* v596-origbtn */
@@ -849,7 +849,7 @@ async function _runAIServer(btn) {
       throw new Error('Antwort vom Server enthielt keine Analyse.');
     }
     document.getElementById('ai-content').innerHTML = html;
-    toast('✓ KI-Analyse mit Web-Recherche abgeschlossen');
+    toast('✓ Pilot-Analyse mit Web-Recherche abgeschlossen');
     // V63.86: Pill aktualisieren nach Credit-Verbrauch
     if (window.AiCredits) window.AiCredits.refresh(true);
   } catch (e) {
@@ -1200,7 +1200,7 @@ async function runMiniAI() {
 
   // Im Local-Mode (kein Backend) gibt's keine Server-KI → Hinweis zum Tab KI-Analyse
   if (typeof Auth !== 'undefined' && Auth.isApiMode && !Auth.isApiMode()) {
-    if (typeof toast === 'function') toast('Server-KI nur im Backend-Modus — bitte Tab "KI-Analyse" für Client-Modus nutzen');
+    if (typeof toast === 'function') toast('Server-KI nur im Backend-Modus — bitte Tab "Pilot-Analyse" für Client-Modus nutzen');
     if (typeof switchTab === 'function') switchTab(6); /* V51: KI-Analyse ist Tab 6 (V63.76: Quick-Check ist Standalone-View, Objekt=0) */
     return;
   }
@@ -1223,7 +1223,7 @@ async function runMiniAI() {
         await Sub.trackUsage('ai_analysis');
       } catch (e) {
         if (e.status === 403) {
-          body.innerHTML = '<div class="ai-error">⚠ KI-Analyse-Limit erreicht. Bitte upgrade deinen Plan.</div>';
+          body.innerHTML = '<div class="ai-error">⚠ Pilot-Analyse-Limit erreicht. Bitte upgrade deinen Plan.</div>';
           btn.disabled = false; btn.textContent = 'Analyse starten';
           return;
         }
@@ -1238,13 +1238,13 @@ async function runMiniAI() {
       // Auch den großen Block in Tab s5 mit aktualisieren
       var aiContent = document.getElementById('ai-content');
       if (aiContent) aiContent.innerHTML = _renderAIServerAnalysis(data.analysis);
-      if (typeof toast === 'function') toast('✓ KI-Analyse abgeschlossen');
+      if (typeof toast === 'function') toast('✓ Pilot-Analyse abgeschlossen');
       // V63.69: KI-Analyse persistieren
       if (typeof saveObj === 'function') {
         try { saveObj({ silent: true }); } catch(e) { console.warn('[ai] auto-save failed:', e); }
       }
     } else if (data && data.raw_text) {
-      body.innerHTML = '<div class="ai-error">JSON-Parse fehlgeschlagen — Roh-Antwort siehe Tab "KI-Analyse".</div>';
+      body.innerHTML = '<div class="ai-error">JSON-Parse fehlgeschlagen — Roh-Antwort siehe Tab "Pilot-Analyse".</div>';
       var ai = document.getElementById('ai-content');
       if (ai) ai.innerHTML = '<pre style="white-space:pre-wrap;font-size:11.5px">' + _esc(data.raw_text) + '</pre>';
     } else {
@@ -1300,7 +1300,7 @@ async function _runAIClient(btn) {
       } catch (e) {
         if (e.status === 403) {
           var box = document.getElementById('ai-content');
-          if (box) box.innerHTML = '<div class="ai-error">⚠ KI-Analyse-Limit erreicht. Bitte upgrade deinen Plan.</div>';
+          if (box) box.innerHTML = '<div class="ai-error">⚠ Pilot-Analyse-Limit erreicht. Bitte upgrade deinen Plan.</div>';
           if (btn) { btn.disabled = false; btn.textContent = '🤖 Analyse starten'; }
           return;
         }

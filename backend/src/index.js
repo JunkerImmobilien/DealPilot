@@ -160,6 +160,18 @@ async function start() {
     console.log(`  Try: curl http://localhost:${config.port}/health`);
     console.log('───────────────────────────────────────────────');
   });
+  // v779-lifecycle: taeglicher Abo-Lifecycle-Job. Laeuft als Dry-Run, solange
+  // lifecycle_config.enabled=false (sendet/loescht nichts). Scharf nur ueber Admin 'Kundenbindung'.
+  try {
+    const lifecycleService = require('./services/lifecycleService');
+    const _runLc = function () {
+      lifecycleService.scan({}).then(function (r) {
+        console.log('[lifecycle] scan: enabled=' + r.enabled + ' dryRun=' + r.dryRun + ' actions=' + r.count);
+      }).catch(function (e) { console.error('[lifecycle] scan failed:', e && e.message); });
+    };
+    setTimeout(_runLc, 60000);                  // einmal ~1min nach Boot
+    setInterval(_runLc, 24 * 60 * 60 * 1000);   // danach taeglich
+  } catch (e) { console.error('[lifecycle] init failed:', e && e.message); }
   // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)
   /* v538-ws-removed: Realtime-WS-Live-Pfad entfernt. Web-Audio liefert auf manchen
      Geraeten Stille -> Realtime unbrauchbar. Live-Mitschrift laeuft seit v536 ueber

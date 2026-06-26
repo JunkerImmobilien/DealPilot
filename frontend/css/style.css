@@ -33537,3 +33537,238 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   mask:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='black'%20d='M22%202L11.5%2013.5%207%2011.5%202.5%2013%208%2016l1.5%205.5%202.5-4.2z'/%3E%3C/svg%3E") center/contain no-repeat;
   filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
 /* === dpfk-da-v5 END === */
+
+/* ============================================================
+   v777b-immometrica-reskin — Feedback/Support-Modal auf ImmoMetrica-Look:
+   Obsidian-Brandbar + Gold-Hero + weisser Body. Groesse wie Hilfe-Modal
+   (1180px / 92vh). Kriterien 3-spaltig. Append-only, ueberschreibt die
+   dunklen #feedback-modal-Regeln (gleiche Spezifitaet, spaeter -> gewinnt).
+   ============================================================ */
+
+/* ---- Modal-Container: weiss, breit, hoch ---- */
+#feedback-modal .fb-modal{
+  width:1180px !important; max-width:calc(100vw - 48px) !important;
+  max-height:92vh !important;
+  background:#fff !important;
+  border:1px solid rgba(201,168,76,.30) !important;
+  color:#1b1815 !important;
+  box-shadow:0 24px 70px rgba(0,0,0,.45) !important;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif !important;
+}
+#feedback-modal .fb-modal::before{ display:none !important; }   /* dunkler Gold-Halo weg */
+#feedback-modal.fb-overlay{ padding:24px !important; }
+
+/* ---- Obsidian-Brandbar (neu, oben) ---- */
+#feedback-modal .fb-brandbar{
+  flex:none; background:#070707; padding:13px 24px;
+  display:flex; align-items:center; gap:12px;
+}
+#feedback-modal .fb-brandbar .fb-bb-logo{
+  font:700 17px 'Space Grotesk','DM Sans',system-ui,sans-serif; color:#fff; letter-spacing:.3px;
+}
+#feedback-modal .fb-brandbar .fb-bb-logo b{ color:#E8CC7A; font-weight:700; }
+#feedback-modal .fb-brandbar .fb-bb-tag{
+  margin-left:auto; font:700 10px 'JetBrains Mono',monospace; letter-spacing:2px; color:#C9A84C;
+}
+/* Close-Button sitzt jetzt in der Brandbar (dunkel) */
+#feedback-modal .fb-close{
+  top:11px !important; right:14px !important;
+  background:rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.08) !important;
+  color:rgba(255,255,255,.65) !important;
+}
+#feedback-modal .fb-close:hover{ background:rgba(184,98,92,.25) !important; color:#fff !important; }
+
+/* ---- Gold-Hero-Band ---- */
+#feedback-modal .fb-head.hero{
+  background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f) !important;
+  border-bottom:0 !important; padding:22px 32px 20px !important;
+}
+#feedback-modal .hero-cat{ color:#5c4a13 !important; }
+#feedback-modal .hero-cat .ic{ color:#5c4a13 !important; }
+#feedback-modal .hero-h{ color:#1c1502 !important; }
+#feedback-modal .hero-h .gold{ color:#5a4609 !important; }
+#feedback-modal .hero-d{ color:#4f4111 !important; }
+
+/* ---- Body weiss ---- */
+#feedback-modal .fb-body{ background:#fff !important; padding:8px 32px 6px !important; }
+
+/* Type-Tabs (Feedback/Support) */
+#feedback-modal .fb-type-tab{
+  background:#FDFCFA !important; border:1.5px solid rgba(0,0,0,.10) !important;
+}
+#feedback-modal .fb-type-tab:hover{ background:#fff !important; border-color:rgba(201,168,76,.45) !important; }
+#feedback-modal .fb-type-tab-active{ background:rgba(201,168,76,.10) !important; border-color:#C9A84C !important; }
+#feedback-modal .fb-type-l{ color:#1b1815 !important; }
+#feedback-modal .fb-type-tab-active .fb-type-l{ color:#b8932f !important; }
+#feedback-modal .fb-type-d{ color:#6f675b !important; }
+#feedback-modal .fb-type-icon{ color:#b8932f !important; }
+
+/* Section-Kopf + Nummern-Badge */
+#feedback-modal .fb-section-l, #feedback-modal .section-l{ color:#1b1815 !important; }
+#feedback-modal .fb-section-d, #feedback-modal .section-d{ color:#6f675b !important; }
+#feedback-modal .section-h-num{
+  background:#FDFCFA !important; border:1px solid #C9A84C !important; color:#b8932f !important;
+}
+
+/* Sterne */
+#feedback-modal .fb-star, #feedback-modal .star{ color:#dcd5c4 !important; }
+#feedback-modal .fb-star:hover, #feedback-modal .star:hover{ color:rgba(201,168,76,.6) !important; }
+#feedback-modal .fb-star-active, #feedback-modal .star.act, #feedback-modal .star-active{ color:#C9A84C !important; }
+#feedback-modal .fb-stars-label, #feedback-modal .stars-label{ color:#6f675b !important; }
+
+/* Kriterien: 3-spaltig + helle Karten */
+#feedback-modal .detail-grid.fb-criteria{ grid-template-columns:repeat(3,1fr) !important; }
+#feedback-modal .fb-criteria > [style*="grid-column"]{ grid-column:auto !important; }   /* Spotlight zurueck in den Fluss */
+#feedback-modal .fb-criterion{
+  background:#FDFCFA !important; border:1px solid rgba(0,0,0,.06) !important;
+}
+#feedback-modal .fb-crit-label{ color:#1b1815 !important; }
+#feedback-modal .fb-crit-desc{ color:#9a9184 !important; }
+#feedback-modal .fb-crit-icon{ color:#b8932f !important; }
+#feedback-modal .fb-mini-star{ color:#dcd5c4 !important; }
+#feedback-modal .fb-mini-star:hover{ color:rgba(201,168,76,.6) !important; }
+#feedback-modal .fb-mini-star-active{ color:#C9A84C !important; }
+
+/* Kategorien (Support) */
+#feedback-modal .fb-cat{
+  background:#FDFCFA !important; border:1.5px solid rgba(0,0,0,.10) !important;
+}
+#feedback-modal .fb-cat:hover{ background:#fff !important; border-color:rgba(201,168,76,.40) !important; }
+#feedback-modal .fb-cat-active{ background:rgba(201,168,76,.10) !important; border-color:#C9A84C !important; }
+#feedback-modal .fb-cat-l{ color:#1b1815 !important; }
+#feedback-modal .fb-cat-active .fb-cat-l{ color:#b8932f !important; }
+#feedback-modal .fb-cat-d{ color:#9a9184 !important; }
+#feedback-modal .fb-cat-icon{ color:#b8932f !important; }
+
+/* Textarea / E-Mail */
+#feedback-modal .fb-pane textarea, #feedback-modal .fb-pane input[type="email"],
+#feedback-modal .ta{
+  background:#faf7f0 !important; color:#1b1815 !important; border:1px solid rgba(0,0,0,.12) !important;
+}
+#feedback-modal .fb-pane textarea:focus, #feedback-modal .fb-pane input[type="email"]:focus,
+#feedback-modal .ta:focus{ border-color:#C9A84C !important; }
+#feedback-modal .fb-pane textarea::placeholder, #feedback-modal .ta::placeholder{ color:#9a9184 !important; }
+#feedback-modal .fb-textcount{ color:#9a9184 !important; }
+
+/* Diagnose-Accordion */
+#feedback-modal .fb-diag{ background:#FDFCFA !important; border:1px solid rgba(0,0,0,.06) !important; }
+#feedback-modal .fb-diag summary{ color:#6f675b !important; }
+#feedback-modal .fb-diag summary:hover{ color:#1b1815 !important; }
+#feedback-modal .fb-diag-content{ color:#6f675b !important; }
+#feedback-modal .fb-diag-k{ color:#1b1815 !important; }
+#feedback-modal .fb-diag-v{ color:#6f675b !important; }
+#feedback-modal .fb-hint{ color:#9a9184 !important; }
+
+/* Footer */
+#feedback-modal .footer.fb-foot{
+  background:linear-gradient(180deg,#fff,#faf7f0) !important;
+  border-top:1px solid rgba(0,0,0,.06) !important;
+}
+#feedback-modal .fb-foot-hint{ color:#9a9184 !important; }
+#feedback-modal .fb-foot-hint .ic{ color:#3FA56C !important; }
+#feedback-modal .fb-btn-ghost{
+  background:#fff !important; color:#6f675b !important; border:1px solid rgba(0,0,0,.12) !important;
+}
+#feedback-modal .fb-btn-ghost:hover{ background:#FDFCFA !important; color:#1b1815 !important; }
+#feedback-modal .submit-btn.fb-btn-gold, #feedback-modal .fb-btn-gold{
+  background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f) !important; color:#241c05 !important;
+}
+
+/* 3-spaltig nur auf breitem Viewport; darunter wieder schmaler */
+@media (max-width:1000px){
+  #feedback-modal .fb-modal{ width:100% !important; }
+  #feedback-modal .detail-grid.fb-criteria{ grid-template-columns:1fr 1fr !important; }
+}
+@media (max-width:680px){
+  #feedback-modal .detail-grid.fb-criteria{ grid-template-columns:1fr !important; }
+}
+/* === v777b-immometrica-reskin END === */
+
+
+/* ============================================================
+   v777b1-detail-fix — Korrektur: das Modal-Markup nutzt .detail-ic/.detail-l/
+   .detail-d (Glassmorphic), nicht .fb-crit-*. Diese Regeln treffen die echten
+   Klassen, scoped auf #feedback-modal. Lesbarkeit Icon-Boxen + Labels + Sterne.
+   ============================================================ */
+
+/* Icon-Kachel (Kriterien + Kategorien): helle Kachel, dunkelgoldenes Icon */
+#feedback-modal .detail-ic{
+  background:#fff !important;
+  border:1px solid rgba(201,168,76,.35) !important;
+  color:#b8932f !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.04) !important;
+}
+#feedback-modal .detail-ic .ic, #feedback-modal .detail-ic svg{ color:#b8932f !important; }
+
+/* Labels in den Karten kräftig lesbar */
+#feedback-modal .detail-l{ color:#1b1815 !important; font-weight:600 !important; }
+#feedback-modal .detail-d{ color:#7a7064 !important; }
+
+/* Karten-Grund + Rand klar abgesetzt */
+#feedback-modal .detail.fb-criterion,
+#feedback-modal .fb-cat.detail{
+  background:#FDFCFA !important;
+  border:1px solid rgba(0,0,0,.10) !important;
+}
+#feedback-modal .fb-cat.detail:hover{ border-color:rgba(201,168,76,.45) !important; background:#fff !important; }
+
+/* Kategorie AKTIV: Gold-Kachel -> Icon + Label DUNKEL (Kontrast) */
+#feedback-modal .fb-cat.detail.fb-cat-active,
+#feedback-modal .fb-cat.detail.act{
+  background:rgba(201,168,76,.12) !important; border-color:#C9A84C !important;
+}
+#feedback-modal .fb-cat-active .detail-ic, #feedback-modal .fb-cat.act .detail-ic{
+  background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f) !important;
+  border-color:transparent !important; color:#241c05 !important;
+}
+#feedback-modal .fb-cat-active .detail-ic .ic, #feedback-modal .fb-cat-active .detail-ic svg,
+#feedback-modal .fb-cat.act .detail-ic .ic, #feedback-modal .fb-cat.act .detail-ic svg{ color:#241c05 !important; }
+#feedback-modal .fb-cat-active .detail-l, #feedback-modal .fb-cat.act .detail-l{ color:#b8932f !important; }
+
+/* Mini-Sterne in den Karten: sichtbares Warmgrau -> aktiv Gold */
+#feedback-modal .detail-stars .star,
+#feedback-modal .fb-crit-stars .fb-mini-star,
+#feedback-modal .fb-mini-star{ color:#cfc6b2 !important; }
+#feedback-modal .detail-stars .star.act,
+#feedback-modal .detail-stars .star.star-active,
+#feedback-modal .fb-mini-star.fb-mini-star-active,
+#feedback-modal .fb-mini-star.act{ color:#C9A84C !important; }
+
+/* Type-Tabs (Feedback/Support) Icon-Box ebenfalls .toggle-ic/.detail-ic */
+#feedback-modal .toggle-ic.fb-type-icon{ color:#b8932f !important; }
+#feedback-modal .fb-type-tab-active .toggle-ic.fb-type-icon,
+#feedback-modal .fb-type-tab.act .toggle-ic.fb-type-icon{ color:#b8932f !important; }
+/* === v777b1-detail-fix END === */
+
+
+/* ============================================================
+   v777c-modal-tweaks — drei Optik-Fixes am Feedback/Support-Modal:
+   1) Kriterien 2-spaltig (groesser) statt 3
+   2) Diagnose-<details> nur im Feedback-Tab (per :has auf aktives Pane)
+   3) Checkbox 'Aktuelles Objekt anhaengen': Label sichtbar neben dem Haekchen
+   ============================================================ */
+
+/* 1) Kriterien 2-spaltig + etwas mehr Luft (Spotlight-Neutralizer kommt aus v777b) */
+#feedback-modal .detail-grid.fb-criteria{ grid-template-columns:1fr 1fr !important; gap:12px !important; }
+#feedback-modal .detail.fb-criterion{ padding:13px 15px !important; }
+
+/* 2) Diagnose-Accordion nur im Feedback-Tab: ausblenden wenn Support-Pane aktiv */
+#feedback-modal .fb-body:has(.fb-pane[data-pane="support"].fb-pane-active) .fb-diag{ display:none !important; }
+
+/* 3) Objekt-anhaengen-Toggle: Haekchen + Label in einer Zeile, Label sichtbar */
+#feedback-modal .fb-toggle-row{ display:flex !important; align-items:center !important; gap:9px !important; cursor:pointer; }
+#feedback-modal .fb-toggle-cb{ accent-color:#C9A84C; width:17px; height:17px; flex:none; margin:0; }
+#feedback-modal .fb-toggle-text{ color:#1b1815 !important; font-size:13.5px !important; font-weight:500 !important; }
+/* === v777c-modal-tweaks END === */
+
+
+/* ============================================================
+   v777e-success-fix — Bestaetigungs-Screen (.fb-success) auf weissem Body
+   lesbar: Titel/Untertitel dunkel, Icon-Kreis gruen. Scoped #feedback-modal.
+   ============================================================ */
+#feedback-modal .fb-success{ text-align:center; padding:40px 32px; }
+#feedback-modal .fb-success-title{ color:#1b1815 !important; font-weight:700 !important; margin:14px 0 6px !important; }
+#feedback-modal .fb-success-sub{ color:#6f675b !important; margin:0 auto 22px !important; max-width:420px !important; }
+#feedback-modal .fb-success-icon{ background:rgba(63,165,108,.14) !important; color:#3FA56C !important; }
+/* === v777e-success-fix END === */
+

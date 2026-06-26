@@ -49,11 +49,66 @@ const API = (function() {
     setTimeout(() => URL.revokeObjectURL(url), 200);
   }
 
+    async function fetchAttachmentUrl(id) {
+      const token = getToken();
+      const r = await fetch(BASE + '/attachments/' + id, { headers: token ? { 'X-Admin-Token': token } : {} });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const blob = await r.blob();
+      return URL.createObjectURL(blob);
+    }
     function credits() { return call('GET', '/credits'); }
   function marktberichtCosts() { return call('GET', '/marktbericht-costs'); }
 
 return {
     credits, marktberichtCosts,
+    fetchAttachmentUrl,
+    feedbackPeriod: (period) => call('GET', '/feedback?period=' + encodeURIComponent(period || 'all')),
+    feedbackQuery: (q) => { q = q || {}; var p = []; if (q.period) p.push('period=' + encodeURIComponent(q.period)); if (q.from) p.push('from=' + encodeURIComponent(q.from)); if (q.to) p.push('to=' + encodeURIComponent(q.to)); return call('GET', '/feedback' + (p.length ? '?' + p.join('&') : '')); },
+    feedbackCsv: (q) => { q = q || {}; var p = []; if (q.period) p.push('period=' + encodeURIComponent(q.period)); if (q.from) p.push('from=' + encodeURIComponent(q.from)); if (q.to) p.push('to=' + encodeURIComponent(q.to)); return downloadCsv('/feedback/export.csv' + (p.length ? '?' + p.join('&') : ''), 'kundenzufriedenheit.csv'); },
+    lifecycleConfig: () => call('GET', '/lifecycle/config'),
+    lifecycleSaveConfig: (p) => call('POST', '/lifecycle/config', p),
+    lifecycleDryRun: () => call('POST', '/lifecycle/dryrun', {}),
+    lifecycleEvents: () => call('GET', '/lifecycle/events'),
+    broadcastRecipients: (mode) => call('GET', '/broadcast/recipients?mode=' + encodeURIComponent(mode || 'operational')),
+    broadcastTest: (p) => call('POST', '/broadcast/test', p),
+    broadcastSend: (p) => call('POST', '/broadcast/send', p),
+    broadcastPreview: (p) => call('POST', '/broadcast/preview', p),
+    broadcastHistory: () => call('GET', '/broadcast/history'),
+    tickets: (params) => {
+      params = params || {};
+      const usp = new URLSearchParams();
+      if (params.status) usp.set('status', params.status);
+      return call('GET', '/tickets?' + usp.toString());
+    },
+    getTicket: (id) => call('GET', '/tickets/' + id),
+    replyTicket: (id, body, files) => { // v777h-reply
+      if (files && files.length) {
+        const token = getToken();
+        const fd = new FormData();
+        fd.append('body', body);
+        for (let i = 0; i < files.length; i++) fd.append('screenshots', files[i]);
+        return fetch(BASE + '/tickets/' + id + '/reply', { method: 'POST', headers: token ? { 'X-Admin-Token': token } : {}, body: fd })
+          .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+      }
+      return call('POST', '/tickets/' + id + '/reply', { body: body });
+    },
+    setTicketStatus: (id, status) => call('POST', '/tickets/' + id + '/status', { status: status }),
+    feedback: () => call('GET', '/feedback'),
+    invoices: (params) => {
+      params = params || {};
+      const usp = new URLSearchParams();
+      if (params.from) usp.set('from', params.from);
+      if (params.to) usp.set('to', params.to);
+      if (params.q) usp.set('q', params.q);
+      return call('GET', '/invoices?' + usp.toString());
+    },
+    downloadInvoicePdf: (id) => downloadCsv('/invoices/' + id + '/pdf', 'rechnung.pdf'),
+    invoiceCsv: (from, to) => {
+      const usp = new URLSearchParams();
+      if (from) usp.set('from', from);
+      if (to) usp.set('to', to);
+      return downloadCsv('/invoices.csv?' + usp.toString(), 'rechnungen.csv');
+    },
     login: (email, password, totpCode) => call('POST', '/auth/login', { email, password, totpCode }),
     me: () => call('GET', '/auth/me'),
 

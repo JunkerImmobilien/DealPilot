@@ -17,6 +17,7 @@
  * Konfig führt dort zu einem klaren 503-Fehler.
  */
 
+const mailLayout = require('./mailLayout'); // v775-mail-layout
 let nodemailer;
 try {
   nodemailer = require('nodemailer');
@@ -162,31 +163,24 @@ async function sendConfirmation(recipientEmail, ctx) {
   ].join('\n');
 
   // HTML-Body (etwas hübscher)
-  const html = `
-    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#2A2727;line-height:1.55">
-      <div style="border-top:3px solid #C9A84C;padding-top:18px;">
-        <h2 style="font-family:Georgia,serif;color:#2A2727;margin:0 0 14px;font-weight:600;">
-          Wir haben deine ${label} erhalten
-        </h2>
-        <p style="margin:0 0 14px">${greeting.replace(',', ',<br>')}</p>
-        <p style="margin:0 0 16px">vielen Dank — wir haben deine <strong>${label}</strong> erhalten und kümmern uns zeitnah darum.</p>
-        <div style="background:#F8F6F1;border-left:3px solid #C9A84C;padding:14px 18px;margin:18px 0;border-radius:4px;">
-          <strong style="color:#C9A84C;font-size:13px;letter-spacing:0.5px;text-transform:uppercase;">Was passiert jetzt?</strong>
-          <ul style="margin:8px 0 0 18px;padding:0;font-size:14px;">
-            <li style="margin-bottom:4px">Wir prüfen die Unterlagen / dein Anliegen.</li>
-            <li style="margin-bottom:4px">Du bekommst innerhalb von <strong>1–3 Werktagen</strong> eine persönliche Antwort.</li>
-            <li>Solltest du Rückfragen haben, antworte einfach auf diese E-Mail.</li>
-          </ul>
-        </div>
-        ${ctx.summary ? `<div style="background:#fafafa;border:1px solid #eee;border-radius:6px;padding:14px;margin:18px 0;font-size:13px;color:#555;"><strong style="color:#2A2727;">Deine Anfrage:</strong><br><br>${String(ctx.summary).replace(/\n/g, '<br>')}</div>` : ''}
-        <p style="margin:24px 0 6px">Beste Grüße</p>
-        <p style="margin:0;font-weight:600">Marcel Junker · Junker Immobilien</p>
-        <p style="margin:4px 0 0;font-size:13px;"><a href="https://www.junker-immobilien.io" style="color:#C9A84C;text-decoration:none">www.junker-immobilien.io</a></p>
-        <hr style="border:none;border-top:1px solid #eee;margin:22px 0 8px;">
-        <p style="color:#999;font-size:11px;margin:0;">DealPilot · automatische Bestätigung</p>
-      </div>
-    </div>
-  `.trim();
+  const html = mailLayout.wrap({
+    brandTag: 'BEST\u00c4TIGUNG',
+    heroKicker: 'ANFRAGE EINGEGANGEN',
+    heroTitle: 'Wir haben deine ' + label + ' erhalten',
+    heroSubtitle: greeting,
+    bodyHtml:
+      '<p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#3a2e08;">vielen Dank \u2014 wir haben deine <strong>' + label + '</strong> erhalten und k\u00fcmmern uns zeitnah darum.</p>' +
+      '<div style="background:#FAF6EC;border-left:3px solid #C9A84C;padding:14px 18px;margin:0 0 16px;border-radius:6px;">' +
+        '<strong style="color:#b8932f;font-size:12px;letter-spacing:.5px;text-transform:uppercase;">Was passiert jetzt?</strong>' +
+        '<ul style="margin:8px 0 0 18px;padding:0;font-size:13.5px;color:#4a4536;line-height:1.6;">' +
+          '<li>Wir pr\u00fcfen dein Anliegen.</li>' +
+          '<li>Du bekommst innerhalb von <strong>1\u20133 Werktagen</strong> eine pers\u00f6nliche Antwort.</li>' +
+          '<li>R\u00fcckfragen? Antworte einfach auf diese E-Mail.</li>' +
+        '</ul></div>' +
+      (ctx.summary ? '<div style="background:#fafafa;border:1px solid #eee;border-radius:6px;padding:14px;margin:0 0 16px;font-size:13px;color:#555;"><strong style="color:#1a1407;">Deine Anfrage:</strong><br><br>' + String(ctx.summary).replace(/\n/g, '<br>') + '</div>' : '') +
+      '<p style="margin:0;font-size:14px;color:#3a2e08;">Beste Gr\u00fc\u00dfe<br><strong>Marcel Junker \u00b7 Junker Immobilien</strong></p>',
+    footerNote: 'DealPilot \u00b7 automatische Best\u00e4tigung \u00b7 <a href="https://www.junker-immobilien.io" style="color:#b8932f;text-decoration:none;">junker-immobilien.io</a>'
+  });
 
   try {
     return await sendMail({
