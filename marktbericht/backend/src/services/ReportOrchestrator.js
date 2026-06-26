@@ -136,7 +136,10 @@ export const ReportOrchestrator = {
     const agsP = AgsResolver.fromPostcode(geo?.components?.postcode).catch(() => null);
 
     // Makro-Kette (Destatis) als eigener paralleler Strang:
-    const macroP = (async () => {
+    // v784-fast-macro: im Schnell-Modus ueberspringen (Destatis haengt ~5,6s, liefert hier eh keine Daten).
+    const macroP = FAST
+      ? Promise.resolve({ agsInfo: null, macroRaw: { available: false, reason: 'schnell-modus' } })
+      : (async () => {
       const agsInfo = await agsP;
       const macroRaw = await DestatisConnector.macro({ ags: agsInfo?.kreis_ags, city: geo?.components?.city });
       step(`Makrolage: ${macroRaw.available ? 'ausgewertet' : 'keine Daten'}`);

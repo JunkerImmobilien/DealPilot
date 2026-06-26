@@ -181,6 +181,72 @@ router.post('/change-password', authenticate, validate({ body: changePasswordSch
 });
 
 /**
+ * v796-email-change: E-Mail-Adresse aendern (Token-Verify an NEUE Adresse)
+ */
+router.post('/change-email', authenticate, async (req, res, next) => {
+  try {
+    const newEmail = (req.body && req.body.newEmail) || (req.body && req.body.new_email) || '';
+    const emailChangeService = require('../services/emailChangeService');
+    const mailer = require('../services/mailerService');
+
+    const { token, newEmail: cleanEmail } = await emailChangeService.requestChange(req.user.id, newEmail);
+
+    const baseUrl = process.env.APP_URL || process.env.FRONTEND_BASE_URL || 'https://app.dealpilot.junker-immobilien.io';
+    const confirmUrl = `${baseUrl}/api/v1/auth/confirm-email-change?token=${token}`;
+
+    // Verify-Mail an die NEUE Adresse
+    try {
+      await mailer.sendMail({
+        to: cleanEmail,
+        subject: 'DealPilot — Neue E-Mail-Adresse bestätigen',
+        text:
+          `Hallo,\n\n` +
+          `du möchtest deine DealPilot-Login-Adresse auf diese E-Mail ändern.\n\n` +
+          `Bitte bestätige die Änderung mit folgendem Link (gültig 1 Stunde):\n` +
+          `${confirmUrl}\n\n` +
+          `Falls du das nicht angefordert hast, ignoriere diese Mail einfach — deine bisherige Adresse bleibt aktiv.\n\n` +
+          `Gruß\nDealPilot Team`,
+        html:
+          `<p>Hallo,</p>` +
+          `<p>du möchtest deine DealPilot-Login-Adresse auf <strong>${cleanEmail}</strong> ändern.</p>` +
+          `<p><a href="${confirmUrl}" style="background:#C9A84C;color:#1A1818;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:600">Neue E-Mail bestätigen</a></p>` +
+          `<p style="color:#666;font-size:12px">Oder kopiere diesen Link: ${confirmUrl}</p>` +
+          `<p style="color:#666;font-size:12px">Der Link ist 1 Stunde gültig. Falls du das nicht warst, ignoriere diese Mail einfach.</p>`
+      });
+    } catch (e) {
+      console.error('[change-email] Mail-Fehler:', e.message);
+    }
+
+    res.json({ ok: true, message: 'Bestätigungs-Mail an die neue Adresse gesendet. Bitte Posteingang prüfen.' });
+  } catch (err) {
+    if (err.code === 'INVALID_EMAIL') return res.status(400).json({ error: 'Ungültige E-Mail-Adresse.' });
+    if (err.code === 'EMAIL_EXISTS') return res.status(409).json({ error: 'Diese E-Mail-Adresse wird bereits verwendet.' });
+    next(err);
+  }
+});
+
+/**
+ * v796-email-change: Bestaetigung der neuen E-Mail (Token aus Mail)
+ */
+router.get('/confirm-email-change', async (req, res) => {
+  const token = req.query.token || '';
+  const baseUrl = process.env.APP_URL || process.env.FRONTEND_BASE_URL || 'https://app.dealpilot.junker-immobilien.io';
+  try {
+    const emailChangeService = require('../services/emailChangeService');
+    const result = await emailChangeService.consumeChange(token);
+    if (!result) {
+      return res.redirect(`${baseUrl}/?email_change=invalid`);
+    }
+    // Erfolgreich — User muss sich mit der neuen Adresse neu einloggen (Token enthält alte Mail)
+    return res.redirect(`${baseUrl}/?email_change=ok`);
+  } catch (err) {
+    if (err.code === 'EMAIL_EXISTS') return res.redirect(`${baseUrl}/?email_change=taken`);
+    console.error('[confirm-email-change] error:', err);
+    return res.redirect(`${baseUrl}/?email_change=error`);
+  }
+});
+
+/**
  * POST /auth/logout
  * Note: JWT-based logout is client-side (drop the token).
  * This endpoint just logs the action for audit purposes.

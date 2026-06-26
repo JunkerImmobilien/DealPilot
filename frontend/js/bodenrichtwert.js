@@ -324,8 +324,99 @@
   }
 
   // ── Public API ───────────────────────────────────────────────
+  /* v785-fetch-boris: echten Bodenrichtwert ueber den Marktbericht-Proxy holen.
+     Verifizierte Laender (NRW/Brandenburg) live; sonst ausgegraut. */
+  /* v785b-dynamic-gating: gesperrte Laender dynamisch aus /boris/coverage. */
+  /* PLZ-Region (_plzToBundesland) -> BORIS-Registry-Code. Mischzonen konservativ
+     auf das potenziell gesperrte Land gemappt (HH-SH->sh, SL-RP->sl). */
+  var PLZ_TO_BORIS = {
+    'BW':'bw', 'BY':'by', 'BE':'be', 'BB':'bb', 'BB-BE':'bb', 'HB':'borisd', 'HB-NI':'borisd',
+    'HH':'borisd', 'HH-SH':'sh', 'HE':'he', 'HE-NI':'he', 'MV':'mv', 'NI':'borisd',
+    'NRW':'nrw', 'NRW-NI':'nrw', 'RP':'borisd', 'SH':'sh', 'SL':'sl', 'SL-RP':'sl',
+    'SN':'borisd', 'ST':'borisd', 'TH':'borisd'
+  };
+  var _borisRestricted = null; /* Set der gesperrten Codes; null = noch nicht geladen */
+  function _loadBorisCoverage() {
+    if (_borisRestricted !== null) return Promise.resolve(_borisRestricted);
+    var token = _token();
+    return fetch(_apiBase() + '/marktbericht/boris/coverage', token ? { headers: { 'Authorization': 'Bearer ' + token } } : {})
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (list) {
+        var set = {};
+        if (Array.isArray(list)) { list.forEach(function (a) { if (a && a.restricted) set[a.code] = 1; }); }
+        else { set = { 'sh':1, 'by':1, 'bw':1, 'sl':1 }; } /* Fallback = bekannter Stand */
+        _borisRestricted = set; return set;
+      })
+      .catch(function () { _borisRestricted = { 'sh':1, 'by':1, 'bw':1, 'sl':1 }; return _borisRestricted; });
+  }
+  function borisAvailableForPlz(plz) {
+    var bl = _plzToBundesland(plz);
+    if (!bl) return false;
+    var code = PLZ_TO_BORIS[bl] || 'borisd';
+    /* solange coverage nicht geladen: optimistisch erlauben ausser bekannt gesperrt */
+    var restricted = _borisRestricted || { 'sh':1, 'by':1, 'bw':1, 'sl':1 };
+    return !restricted[code];
+  }
+  function _refreshBorisBtn() {
+    var btn = _el('brw-boris-btn'); if (!btn) return;
+    var ok = borisAvailableForPlz(_val('plz'));
+    btn.disabled = !ok;
+    btn.title = ok ? 'Bodenrichtwert direkt abrufen — gratis (Open Data)' /* v785f-tooltip */
+                   : 'Direkt-Abruf hier nicht verfügbar (Bayern, Baden-Württemberg, Schleswig-Holstein, Saarland) — BORIS-Portal nutzen';
+  }
+  async function fetchBoris() {
+    var btn = _el('brw-boris-btn');
+    var plz = _val('plz'), ort = _val('ort'), str = _val('str');
+    if (!borisAvailableForPlz(plz)) {
+      _setStatus('⚠ Direkt-Abruf hier nicht verfügbar — BORIS-Portal nutzen', 'err'); /* v785f-tooltip */
+      if (typeof toast === 'function') toast('⚠ BORIS-Direktabruf hier nicht verfügbar — BORIS-Portal nutzen'); /* v785f-tooltip */
+      return;
+    }
+    var token = _token();
+    if (!token) { _setStatus('\u26a0 Bitte einloggen', 'err'); return; }
+    var addr = [str, (plz + ' ' + ort).trim()].filter(Boolean).join(', ');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon">\u23f3</span> BORIS \u2026'; }
+    _setStatus('Bodenrichtwert wird abgerufen \u2026', '');
+    try {
+      var g = await fetch(_apiBase() + '/marktbericht/geocode?address=' + encodeURIComponent(addr), {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      var gd = await g.json().catch(function () { return null; });
+      if (!g.ok || !gd || gd.lat == null || gd.lon == null) { throw new Error('Adresse nicht geokodierbar'); }
+      var b = await fetch(_apiBase() + '/marktbericht/boris?lat=' + gd.lat + '&lon=' + gd.lon, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      var bd = await b.json().catch(function () { return null; });
+      if (!b.ok || !bd) { throw new Error((bd && (bd.error || bd.message)) || ('Fehler ' + b.status)); }
+      if (bd.available && bd.value_sqm != null && bd.value_sqm > 0) {
+        var brwEl = _el('brw');
+        if (brwEl) { brwEl.value = String(bd.value_sqm).replace('.', ','); brwEl.dispatchEvent(new Event('input', { bubbles: true })); }
+        var extra = [];
+        if (bd.stichtag) extra.push('Stichtag ' + bd.stichtag);
+        if (bd.zone) extra.push('Zone ' + bd.zone);
+        if (bd.source) extra.push(bd.source);
+        _setStatus('\u2713 BORIS: ' + bd.value_sqm + ' \u20ac/m\u00b2' + (extra.length ? ' (' + extra.join(' \u00b7 ') + ')' : ''), 'ok');
+        if (typeof toast === 'function') toast('\u2713 Bodenrichtwert (BORIS): ' + bd.value_sqm + ' \u20ac/m\u00b2');
+      } else {
+        _setStatus('\u26a0 Kein BORIS-Wert fuer diese Lage \u2014 bitte Portal pruefen', 'err');
+        if (typeof toast === 'function') toast('\u26a0 Kein BORIS-Wert gefunden \u2014 BORIS-Portal pruefen');
+      }
+    } catch (err) {
+      _setStatus('\u26a0 ' + (err.message || 'BORIS-Fehler'), 'err');
+      if (typeof toast === 'function') toast('\u26a0 ' + (err.message || 'BORIS-Fehler'));
+    } finally {
+      if (btn) { btn.innerHTML = '<span class="btn-brw-icon">\ud83d\udccd</span> BORIS abrufen'; _refreshBorisBtn(); }
+    }
+  }
+  (function _wireBoris(){
+    function go(){ try { _loadBorisCoverage().then(function(){ _refreshBorisBtn(); }); var p = _el('plz'); if (p && !p._borisWired) { p._borisWired = 1; p.addEventListener('input', _refreshBorisBtn); } } catch (e) {} }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else setTimeout(go, 300);
+  })();
+
   window.DealPilotBrw = {
     openBoris: openBoris,
+    fetchBoris: fetchBoris,
+    refreshBorisBtn: _refreshBorisBtn,
     askAi: askAi,
     renderResult: _renderResult,
     clearResult: _clearResult,

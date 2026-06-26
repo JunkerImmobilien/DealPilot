@@ -1,0 +1,58 @@
+/* v796 admin-extras: Loeschen-Buttons, Empfaenger-Modal, Mail-Layout-Bar */
+
+/* Loeschen-Button in Tabellen */
+.dpx-del-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:30px; height:30px; padding:0;
+  background:var(--danger-bg,#fbe9e3); color:var(--danger,#b94f3a);
+  border:1px solid var(--danger,#b94f3a); border-radius:7px; cursor:pointer;
+}
+.dpx-del-btn:hover{ background:var(--danger,#b94f3a); color:#fff; }
+.dpx-del-btn:disabled{ opacity:.5; cursor:not-allowed; }
+.dpx-del-th, .dpx-del-td{ text-align:center; white-space:nowrap; }
+
+/* Empfaenger-Modal */
+.dpx-modal-overlay{
+  position:fixed; inset:0; z-index:9999;
+  background:rgba(20,18,16,.55); display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.dpx-modal{
+  background:#fff; border-radius:14px; width:100%; max-width:640px; max-height:82vh;
+  display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.35);
+}
+.dpx-modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px; border-bottom:1px solid var(--border,#e5dfd2); font-size:1.1em;
+}
+.dpx-modal-x{
+  background:none; border:none; font-size:26px; line-height:1; cursor:pointer; color:var(--text-muted,#6a6a6a);
+}
+.dpx-modal-x:hover{ color:var(--text,#1a1a1a); }
+.dpx-modal-body{ padding:18px 20px; overflow:auto; }
+.dpx-loading{ padding:30px; text-align:center; color:var(--text-muted,#6a6a6a); }
+.dpx-recip-count{ margin-bottom:14px; font-size:1.05em; }
+.dpx-recip-table{ width:100%; }
+
+/* Mail-Layout-Bar */
+.dpx-ml-bar{
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  padding:10px 12px; margin:10px 0; background:#faf7f0;
+  border:1px solid var(--border,#e5dfd2); border-radius:10px;
+}
+.dpx-ml-select{
+  min-width:200px; padding:6px 10px; border:1px solid var(--border,#e5dfd2);
+  border-radius:7px; background:#fff;
+}
+.dpx-ml-sep{ flex:0 0 1px; height:24px; background:var(--border,#e5dfd2); margin:0 4px; }
+
+/* v798-row-delete-css: Muelleimer-Button in Tabellenzeilen */
+.dpx-del-td{ text-align:center; white-space:nowrap; width:48px; }
+.dpx-row-del{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:30px; height:30px; padding:0;
+  background:var(--danger-bg,#fbe9e3); color:var(--danger,#b94f3a);
+  border:1px solid var(--danger,#b94f3a); border-radius:7px; cursor:pointer;
+  transition:background .12s,color .12s;
+}
+.dpx-row-del:hover{ background:var(--danger,#b94f3a); color:#fff; }
+.dpx-row-del:disabled{ opacity:.5; cursor:not-allowed; }

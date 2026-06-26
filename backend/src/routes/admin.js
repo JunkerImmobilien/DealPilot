@@ -1137,4 +1137,248 @@ router.get('/lifecycle/events', requireAdmin, async (req, res) => {
   catch (e) { res.status(500).json({ error: e.message }); }
 }); // v779-lifecycle
 
+
+// ──────────────────────────────────────────────────────────────
+// v794-admin-extras: Hart-Loeschen + Mail-Layouts + Empfaenger-Liste
+// ──────────────────────────────────────────────────────────────
+
+// --- Hart-Loeschen: Kundenzufriedenheit (feedback_entries) ---
+router.delete('/feedback/:id', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const r = await db.query('DELETE FROM feedback_entries WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!r.rowCount) return res.status(404).json({ error: 'not_found' });
+    await audit(db, req.adminUser.id, req.adminUser.email, 'feedback.delete', 'feedback', req.params.id, null, req.ip, req.headers['user-agent']);
+    res.json({ success: true, deleted: req.params.id });
+  } catch (err) {
+    console.error('[admin/feedback/delete] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// --- Hart-Loeschen: Support-Ticket (inkl. Messages via CASCADE/manuell) ---
+router.delete('/support-tickets/:id', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    try { await db.query('DELETE FROM ticket_messages WHERE ticket_id = $1', [req.params.id]); } catch (e) {}
+    const r = await db.query('DELETE FROM support_tickets WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!r.rowCount) return res.status(404).json({ error: 'not_found' });
+    await audit(db, req.adminUser.id, req.adminUser.email, 'support_ticket.delete', 'ticket', req.params.id, null, req.ip, req.headers['user-agent']);
+    res.json({ success: true, deleted: req.params.id });
+  } catch (err) {
+    console.error('[admin/support-tickets/delete] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// --- Hart-Loeschen: Audit-Log-Eintrag ---
+router.delete('/audit-log/:id', requireAdmin, requireRole('owner'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const r = await db.query('DELETE FROM admin_audit_log WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!r.rowCount) return res.status(404).json({ error: 'not_found' });
+    res.json({ success: true, deleted: req.params.id });
+  } catch (err) {
+    console.error('[admin/audit-log/delete] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// --- Hart-Loeschen: Rechnung ---
+router.delete('/invoices/:id', requireAdmin, requireRole('owner'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const r = await db.query('DELETE FROM invoices WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!r.rowCount) return res.status(404).json({ error: 'not_found' });
+    await audit(db, req.adminUser.id, req.adminUser.email, 'invoice.delete', 'invoice', req.params.id, null, req.ip, req.headers['user-agent']);
+    res.json({ success: true, deleted: req.params.id });
+  } catch (err) {
+    console.error('[admin/invoices/delete] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+// MAIL-LAYOUTS (Layout-HTML + Text-Bausteine speichern/laden/loeschen)
+// ──────────────────────────────────────────────────────────────
+
+router.get('/mail-layouts', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  const kind = req.query.kind || null;
+  try {
+    let q = 'SELECT id, name, kind, subject, body_html, body_text, created_by, created_at, updated_at FROM mail_layouts';
+    const params = [];
+    if (kind) { params.push(kind); q += ' WHERE kind = $1'; }
+    q += ' ORDER BY updated_at DESC';
+    const r = await db.query(q, params);
+    res.json({ layouts: r.rows });
+  } catch (err) {
+    console.error('[admin/mail-layouts/list] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.post('/mail-layouts', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  const b = req.body || {};
+  const name = (b.name || '').trim();
+  const kind = (b.kind === 'snippet') ? 'snippet' : 'layout';
+  if (!name) return res.status(400).json({ error: 'name_required' });
+  try {
+    if (b.id) {
+      const r = await db.query(
+        'UPDATE mail_layouts SET name=$1, kind=$2, subject=$3, body_html=$4, body_text=$5, updated_at=NOW() WHERE id=$6 RETURNING id',
+        [name, kind, b.subject || null, b.body_html || null, b.body_text || null, b.id]
+      );
+      if (!r.rowCount) return res.status(404).json({ error: 'not_found' });
+      return res.json({ success: true, id: b.id, updated: true });
+    }
+    const r = await db.query(
+      'INSERT INTO mail_layouts (name, kind, subject, body_html, body_text, created_by) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id',
+      [name, kind, b.subject || null, b.body_html || null, b.body_text || null, req.adminUser.email]
+    );
+    await audit(db, req.adminUser.id, req.adminUser.email, 'mail_layout.save', 'mail_layout', r.rows[0].id, { name, kind }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, id: r.rows[0].id, created: true });
+  } catch (err) {
+    console.error('[admin/mail-layouts/save] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+router.delete('/mail-layouts/:id', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const r = await db.query('DELETE FROM mail_layouts WHERE id = $1 RETURNING id', [req.params.id]);
+    if (!r.rowCount) return res.status(404).json({ error: 'not_found' });
+    res.json({ success: true, deleted: req.params.id });
+  } catch (err) {
+    console.error('[admin/mail-layouts/delete] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+// BROADCAST: Empfaenger-LISTE (fuer 'wie viele erreicht' + Modal)
+// ──────────────────────────────────────────────────────────────
+
+router.get('/broadcast/recipients-list', requireAdmin, async (req, res) => {
+  try {
+    const broadcastService = require('../services/broadcastService');
+    const list = await broadcastService.listRecipients(req.query.mode);
+    res.json({
+      count: list.length,
+      recipients: list.map(function (u) {
+        return { id: u.id, email: u.email, name: u.name || null };
+      })
+    });
+  } catch (err) {
+    console.error('[admin/broadcast/recipients-list] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+
+
+// ──────────────────────────────────────────────────────────────
+// v799-retention-routes: Kundenbindung (Auslauf + Inaktivitaet)
+// ──────────────────────────────────────────────────────────────
+const retentionService = require('../services/retentionService');
+
+// Einstellungen lesen
+router.get('/retention/settings', requireAdmin, async (req, res) => {
+  try {
+    const s = await retentionService.getSettings();
+    res.json({ settings: s });
+  } catch (e) {
+    console.error('[admin/retention/settings:get]', e.message);
+    res.status(500).json({ error: 'server_error', message: e.message });
+  }
+});
+
+// Einstellungen speichern (nur owner)
+router.post('/retention/settings', requireAdmin, requireRole('owner'), async (req, res) => {
+  try {
+    const s = await retentionService.saveSettings(req.body || {});
+    try { await audit(req, 'retention_settings_update', null, { expiry_enabled: s.expiry_enabled, inactive_enabled: s.inactive_enabled }); } catch (e) {}
+    res.json({ settings: s, ok: true });
+  } catch (e) {
+    console.error('[admin/retention/settings:post]', e.message);
+    res.status(500).json({ error: 'server_error', message: e.message });
+  }
+});
+
+// Auslauf-Liste (optional days-Override via ?days=)
+router.get('/retention/expiring', requireAdmin, async (req, res) => {
+  try {
+    let days = parseInt(req.query.days, 10);
+    if (isNaN(days)) { const s = await retentionService.getSettings(); days = s.expiry_days_before; }
+    const rows = await retentionService.listExpiring(days);
+    res.json({ days: days, rows: rows });
+  } catch (e) {
+    console.error('[admin/retention/expiring]', e.message);
+    res.status(500).json({ error: 'server_error', message: e.message });
+  }
+});
+
+// Inaktiv-Liste (optional days-Override via ?days=)
+router.get('/retention/inactive', requireAdmin, async (req, res) => {
+  try {
+    let days = parseInt(req.query.days, 10);
+    if (isNaN(days)) { const s = await retentionService.getSettings(); days = s.inactive_days; }
+    const rows = await retentionService.listInactive(days);
+    res.json({ days: days, rows: rows });
+  } catch (e) {
+    console.error('[admin/retention/inactive]', e.message);
+    res.status(500).json({ error: 'server_error', message: e.message });
+  }
+});
+
+// Manuell jetzt senden (force=true ignoriert die enabled-Schalter). Nur owner.
+// ?dry=1 -> nur zaehlen (Vorschau), nichts verschicken.
+router.post('/retention/run', requireAdmin, requireRole('owner'), async (req, res) => {
+  try {
+    const dry = String(req.query.dry || (req.body && req.body.dry) || '') === '1';
+    const result = await retentionService.runOnce({ dryRun: dry, force: true });
+    if (!dry) { try { await audit(req, 'retention_manual_run', null, result); } catch (e) {} }
+    res.json({ result: result });
+  } catch (e) {
+    console.error('[admin/retention/run]', e.message);
+    res.status(500).json({ error: 'server_error', message: e.message });
+  }
+});
+
+// Versand-Log (letzte 100)
+router.get('/retention/log', requireAdmin, async (req, res) => {
+  try {
+    const db = req.app.get('db');
+    const r = await db.query(
+      `SELECT l.user_id, l.kind, l.ref_key, l.sent_at, u.email
+         FROM retention_log l LEFT JOIN users u ON u.id = l.user_id
+        ORDER BY l.sent_at DESC LIMIT 100`);
+    res.json({ log: r.rows });
+  } catch (e) {
+    console.error('[admin/retention/log]', e.message);
+    res.status(500).json({ error: 'server_error', message: e.message });
+  }
+});
+
+
+
+// ──────────────────────────────────────────────────────────────
+// v800-stats-routes: Statistik / Analytics
+// ──────────────────────────────────────────────────────────────
+const statsService = require('../services/statsService');
+
+router.get('/stats/overview', requireAdmin, async (req, res) => {
+  try {
+    const days = parseInt(req.query.days, 10) || 30;
+    const data = await statsService.overview(days);
+    res.json(data);
+  } catch (e) {
+    console.error('[admin/stats/overview]', e.message);
+    res.status(500).json({ error: 'server_error', message: e.message });
+  }
+});
+
+
 module.exports = router;

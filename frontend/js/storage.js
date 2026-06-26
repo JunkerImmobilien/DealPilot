@@ -584,7 +584,7 @@ window._clearFormForNewObject = _clearFormForNewObject;
 function newObj() {
   /* v379-autosave: confirm entfernt (Auto-Save aktiv) */
   /* v736-save-before-switch: aktuelles Objekt sichern bevor gewechselt/neu */
-  try { if (window.dpIsDirty && window.dpIsDirty() && window.dpTabSwitchSave) { window.dpTabSwitchSave(); } } catch (e) {}
+  try { if (window.dpTabSwitchSave) { window.dpTabSwitchSave(); } } catch (e) {} /* v782-always-save */
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
     if (e) e.value = '';
@@ -1266,7 +1266,7 @@ function _addNewBtn() {
 // ══════════════════════════════════════════════════
 async function loadSaved(k) {
   /* v736-save-before-switch: aktuelles Objekt sichern bevor gewechselt/neu */
-  try { if (window.dpIsDirty && window.dpIsDirty() && window.dpTabSwitchSave) { window.dpTabSwitchSave(); } } catch (e) {}
+  try { if (window.dpTabSwitchSave) { window.dpTabSwitchSave(); } } catch (e) {} /* v782-always-save */
   if (Auth.isApiMode()) {
     try {
       var obj = await Auth.apiCall('/objects/' + k);
@@ -3131,8 +3131,15 @@ window._checkObjIdConflict = _checkObjIdConflict;
   }
 
   // V47: Globale Funktionen für Save-Button + Tab-Wechsel
+  function _hasCurrentObject() {
+    try { return !!(window._currentObjKey) || (typeof hasCoreData === 'function' && hasCoreData()); }
+    catch (e) { return false; }
+  }
   window.dpManualSave = function() { return performSave({ silent: false }); };
   window.dpTabSwitchSave = function() {
+    /* v782-always-save: beim Verlassen immer sichern, auch wenn der Dirty-
+       Tracker das Feld nicht erfasst hat (Container ohne .sec/.card). */
+    if (_hasCurrentObject && _hasCurrentObject()) return performSave({ silent: true });
     if (_isDirty) return performSave({ silent: true });
   };
   window.dpIsDirty = function() { return _isDirty; };

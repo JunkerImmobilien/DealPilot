@@ -6,7 +6,7 @@ const { HttpError } = require('../middleware/errors');
 /**
  * Create a new user. First user becomes admin.
  */
-async function createUser({ email, plainPassword, name }) {
+async function createUser({ email, plainPassword, name, newsletter }) {
   const emailLower = email.toLowerCase().trim();
 
   // Check if user exists
@@ -21,11 +21,12 @@ async function createUser({ email, plainPassword, name }) {
   const role = isFirstUser ? 'admin' : 'user';
 
   const hash = await password.hash(plainPassword);
+  const wantsNews = (newsletter === true);
   const r = await query(
-    `INSERT INTO users (email, password_hash, name, role)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO users (email, password_hash, name, role, newsletter_consent, newsletter_consent_at)
+     VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING id, email, name, role, created_at`,
-    [emailLower, hash, name.trim(), role]
+    [emailLower, hash, name.trim(), role, wantsNews, wantsNews ? new Date() : null]
   );
   return r.rows[0];
 }

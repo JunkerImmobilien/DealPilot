@@ -90,6 +90,7 @@
     return {
       key: 'dp', name: 'DealPilot', isDP: true, brand: '#C9A84C',
       label: 'Markteinsch\u00e4tzung',
+      compare: (D.compare && D.compare.length) ? D.compare : null, /* v783-dp-compare */
       mw: { low: band('low'), mid: band('med'), high: band('high') },
       mm: { low: bandM('low'), mid: bandM('med'), high: bandM('high') },
       eurSqm: null, mmEurSqm: null,
@@ -291,7 +292,7 @@
     var sub = (sqm ? fmt(sqm) + ' \u20ac/m\u00b2' : '') + (d != null ? ' \u00b7 <span style="color:' + (d >= 0 ? '#2f8f57' : '#c0564f') + '">' + (d >= 0 ? '+' : '') + d.toFixed(1) + '%</span>' : '');
     var miete = (mm != null) ? ('Miete <b>' + fmt(mm) + ' \u20ac</b>' + (mmSqm ? ' \u00b7 ' + dec(mmSqm) + ' \u20ac/m\u00b2 kalt' : '')) : '';
     var foot = '<div class="mfoot">';
-    if (u.isDP) foot += '<button type="button" class="av-ghost" data-report="1">Marktbericht erzeugen</button>';
+    /* v782-report-btn-removed: 'Marktbericht erzeugen' entfernt (DealPilot-Karte) */
     foot += '<button type="button" class="av-btn full" data-apply="' + u.key + '">\u21a7 \u00fcbernehmen (' + spanLbl(b) + ')</button>';
     foot += '</div>';
     var body = '<div class="mbody"><div class="' + mwCls + '"' + (u.isDP ? '' : ' style="color:#1b1815"') + '>' + fmt(mw) + ' \u20ac</div>' +
@@ -432,7 +433,7 @@
   document.addEventListener('click', onClick, false);
 
   global.AvmSection = {
-    setExternal: function (avm) { _ext = avm || {}; },
+    setExternal: function (avm) { _ext = avm || {}; st.min = true; /* v787c-min-on-switch: bei jedem Objektwechsel minimiert */ },
     setDealpilot: function (D, mode, api) { _dp = (D && D.mw) ? { D: D, mode: mode, api: api } : null; render(); },
     clearDealpilot: function () { _dp = null; render(); },
     render: render,
