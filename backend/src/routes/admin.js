@@ -808,7 +808,7 @@ router.delete('/users/:id', requireAdmin, requireRole('owner'), async (req, res)
 
 router.get('/audit-log', requireAdmin, async (req, res) => {
   const db = req.app.get('db');
-  const { action = '', limit = 100, offset = 0 } = req.query;
+  const { action = '', limit = 100, offset = 0, from = '', to = '' } = req.query; /* v802-audit-range */
   try {
     let where = '1=1';
     const params = [];
@@ -816,6 +816,8 @@ router.get('/audit-log', requireAdmin, async (req, res) => {
       params.push(`%${action}%`);
       where += ` AND a.action LIKE $${params.length}`;
     }
+    if (from) { params.push(from); where += ` AND a.created_at >= $${params.length}`; }
+    if (to) { params.push(to); where += ` AND a.created_at < ($${params.length}::date + 1)`; }
     params.push(parseInt(limit, 10) || 100);
     params.push(parseInt(offset, 10) || 0);
 
@@ -1172,6 +1174,24 @@ router.delete('/support-tickets/:id', requireAdmin, requireRole('owner', 'suppor
 });
 
 // --- Hart-Loeschen: Audit-Log-Eintrag ---
+// v802-audit-purge: gesamtes Audit-Log loeschen (owner, ?confirm=DELETE). Optional ?before=YYYY-MM-DD.
+router.delete('/audit-log', requireAdmin, requireRole('owner'), async (req, res) => {
+  const db = req.app.get('db');
+  if (String(req.query.confirm || '') !== 'DELETE') {
+    return res.status(400).json({ error: 'confirm_required', message: 'confirm=DELETE noetig' });
+  }
+  try {
+    let sql = 'DELETE FROM admin_audit_log';
+    const params = [];
+    if (req.query.before) { params.push(req.query.before); sql += ' WHERE created_at < ($1::date + 1)'; }
+    const r = await db.query(sql + ' RETURNING id', params);
+    res.json({ ok: true, deleted: r.rowCount });
+  } catch (err) {
+    console.error('[admin/audit-log/purge] error:', err.message);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
 router.delete('/audit-log/:id', requireAdmin, requireRole('owner'), async (req, res) => {
   const db = req.app.get('db');
   try {
@@ -1378,6 +1398,43 @@ router.get('/stats/overview', requireAdmin, async (req, res) => {
     console.error('[admin/stats/overview]', e.message);
     res.status(500).json({ error: 'server_error', message: e.message });
   }
+});
+
+
+
+// ──────────────────────────────────────────────────────────────
+// v802-retention-templates: Kundenbindung-Vorlagen + Hintergrund + Vorschau
+// ──────────────────────────────────────────────────────────────
+const retentionTemplateService = require('../services/retentionTemplateService');
+
+router.get('/retention/templates', requireAdmin, async (req, res) => {
+  try { res.json({ templates: await retentionTemplateService.listTemplates(req.query.kind || 'any') }); }
+  catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
+});
+router.post('/retention/templates', requireAdmin, requireRole('owner'), async (req, res) => {
+  try { res.json({ template: await retentionTemplateService.saveTemplate(req.body || {}), ok: true }); }
+  catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
+});
+router.delete('/retention/templates/:id', requireAdmin, requireRole('owner'), async (req, res) => {
+  try { const ok = await retentionTemplateService.deleteTemplate(req.params.id); res.json({ ok: ok }); }
+  catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
+});
+router.get('/retention/background', requireAdmin, async (req, res) => {
+  try { res.json({ background: await retentionTemplateService.getBackground() }); }
+  catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
+});
+router.post('/retention/background', requireAdmin, requireRole('owner'), async (req, res) => {
+  try {
+    const b = req.body || {};
+    res.json({ background: await retentionTemplateService.saveBackground(b.html, b.name), ok: true });
+  } catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
+});
+router.post('/retention/preview', requireAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const html = await retentionTemplateService.previewHtml(b.subject || '', b.body_html || b.body || '');
+    res.json({ html: html });
+  } catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
 });
 
 

@@ -1,10 +1,6 @@
-// DealPilot Admin v799 — Kundenbindung (Retention)
-// Eigenstaendiges additives Modul. Rendert den Kundenbindung-Tab komplett selbst:
-//   - Auto-Versand-Schalter + Schwellen (Auslauf-Tage / Inaktiv-Tage)
-//   - Mail-Editor (Subject + Body) mit "Standard wiederherstellen"
-//   - "Jetzt senden" (force) + "Vorschau" (dry-run)
-//   - Auslauf-Liste (Kunden + Tage bis Ablauf)
-//   - Inaktiv-Liste (Kunden + Tage ohne Login)
+// DealPilot Admin v802 — Kundenbindung (Retention) mit Rich-Editor, Vorschau, Vorlagen
+// Auslauf/Inaktiv per Toggle (umswitchen). Nutzt window.DpRichEditor (generisch).
+// Eigene Vorlagen-Bibliothek + Hintergrund-Upload (getrennt von Massenmail).
 'use strict';
 (function () {
   var BASE = '/api/v1/admin';
@@ -25,12 +21,9 @@
     alert(msg);
   }
 
-  // ── Container finden/erzeugen ───────────────────────────────────
-  // Sucht die Kundenbindung-View. Bevorzugt #view-retention; sonst per Nav-Link-Text.
   function _findHost() {
     var v = document.getElementById('view-retention');
     if (v) return v;
-    // Fallback: Nav-Link "Kundenbindung" -> data-view
     var links = document.querySelectorAll('.nav-link');
     for (var i = 0; i < links.length; i++) {
       if (/kundenbindung/i.test(links[i].textContent || '')) {
@@ -42,24 +35,26 @@
   }
 
   var _settings = null;
-  var _DEFAULTS = null; // {expiry:{subject,body}, inactive:{subject,body}}
+  var _DEFAULTS = null;
+  var _active = 'expiry';      // aktiver Tab
+  var _editors = {};           // kind -> DpRichEditor-Instanz
+  var _prevT = null;
 
   function _render(host) {
     if (!host) return;
     var s = _settings || {};
     host.innerHTML =
       '<div class="view-header"><h2>Kundenbindung</h2></div>' +
-      // ── Einstellungen ──
+
+      // ── Auto-Versand-Einstellungen ──
       '<div class="card" style="margin-bottom:18px;padding:18px;">' +
         '<h3 style="margin:0 0 14px;">Automatischer Versand</h3>' +
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">' +
-          // Auslauf
           '<div style="border:1px solid #eee;border-radius:10px;padding:14px;">' +
             '<label style="display:flex;align-items:center;gap:8px;font-weight:600;">' +
               '<input type="checkbox" id="ret-expiry-enabled"' + (s.expiry_enabled ? ' checked' : '') + '> Auslauf-Erinnerung automatisch senden</label>' +
             '<div style="margin-top:10px;font-size:13px;color:#666;">Senden, wenn Abo in <input type="number" id="ret-expiry-days" value="' + (s.expiry_days_before != null ? s.expiry_days_before : 14) + '" min="1" max="365" style="width:60px;padding:4px;border:1px solid #ddd;border-radius:6px;"> Tagen ausl\u00e4uft</div>' +
           '</div>' +
-          // Inaktiv
           '<div style="border:1px solid #eee;border-radius:10px;padding:14px;">' +
             '<label style="display:flex;align-items:center;gap:8px;font-weight:600;">' +
               '<input type="checkbox" id="ret-inactive-enabled"' + (s.inactive_enabled ? ' checked' : '') + '> Inaktivit\u00e4ts-Mail automatisch senden</label>' +
@@ -68,17 +63,51 @@
         '</div>' +
         '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">' +
           '<button class="btn btn-primary" id="ret-save">Einstellungen speichern</button>' +
-          '<button class="btn" id="ret-preview">Vorschau (z\u00e4hlt nur)</button>' +
+          '<button class="btn" id="ret-preview-run">Vorschau (z\u00e4hlt nur)</button>' +
           '<button class="btn" id="ret-run" style="background:#3FA56C;color:#fff;border-color:#3FA56C;">Jetzt senden</button>' +
           '<span id="ret-run-msg" style="align-self:center;font-size:13px;color:#666;"></span>' +
         '</div>' +
       '</div>' +
-      // ── Mail-Editoren ──
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">' +
-        _editorBlock('expiry', 'Auslauf-Erinnerung', s.expiry_subject, s.expiry_body) +
-        _editorBlock('inactive', 'Inaktivit\u00e4ts-Mail', s.inactive_subject, s.inactive_body) +
+
+      // ── Editor mit Toggle ──
+      '<div class="card" style="margin-bottom:18px;padding:18px;">' +
+        '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap;">' +
+          '<button class="btn ret-switch" data-ret-kind="expiry">Auslauf-Erinnerung</button>' +
+          '<button class="btn ret-switch" data-ret-kind="inactive">Inaktivit\u00e4ts-Mail</button>' +
+          '<span style="flex:1;"></span>' +
+          '<select id="ret-tpl-select" style="height:32px;border:1px solid #ddd;border-radius:6px;padding:0 8px;max-width:200px;"><option value="">\u2014 Vorlage laden \u2014</option></select>' +
+          '<button class="btn" id="ret-tpl-save" title="Aktuellen Editor als Vorlage speichern">Als Vorlage speichern</button>' +
+          '<button class="btn" id="ret-tpl-del" title="Gew\u00e4hlte Vorlage l\u00f6schen" style="color:#B86250;">L\u00f6schen</button>' +
+          '<button class="btn" id="ret-reset" title="Standard-Vorlage wiederherstellen">Standard</button>' +
+        '</div>' +
+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">' +
+          // Editor-Spalte
+          '<div>' +
+            '<label style="font-size:12px;color:#666;display:block;margin-bottom:4px;">Betreff</label>' +
+            '<input type="text" id="ret-subject" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;margin-bottom:10px;">' +
+            '<label style="font-size:12px;color:#666;display:block;margin-bottom:4px;">Text</label>' +
+            '<div id="ret-editor-host"></div>' +
+            '<textarea id="ret-body" style="display:none;"></textarea>' +
+          '</div>' +
+          // Vorschau-Spalte
+          '<div>' +
+            '<label style="font-size:12px;color:#666;display:block;margin-bottom:4px;">Live-Vorschau</label>' +
+            '<iframe id="ret-preview-frame" style="width:100%;height:420px;border:1px solid #e7e1d4;border-radius:8px;background:#fff;"></iframe>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:12px;color:#888;margin-top:10px;">Platzhalter: <code>{{name}}</code> \u00b7 <code>{{days}}</code> (Tage) \u00b7 <code>{{date}}</code> (Ablaufdatum, nur Auslauf)</div>' +
+
+        // Hintergrund-Vorlage
+        '<div style="margin-top:14px;padding-top:14px;border-top:1px solid #eee;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' +
+          '<span style="font-size:13px;color:#666;">Hintergrund-Vorlage (HTML mit <code>{{BODY}}</code>):</span>' +
+          '<span id="ret-bg-name" style="font-size:13px;color:#3FA56C;"></span>' +
+          '<button class="btn" id="ret-bg-upload">Hochladen</button>' +
+          '<button class="btn" id="ret-bg-clear" style="color:#B86250;">Entfernen</button>' +
+          '<input type="file" id="ret-bg-file" accept=".html,.htm,.txt" style="display:none;">' +
+        '</div>' +
       '</div>' +
-      '<div style="font-size:12px;color:#888;margin-bottom:18px;">Platzhalter: <code>{{name}}</code> \u00b7 <code>{{days}}</code> (Tage) \u00b7 <code>{{date}}</code> (Ablaufdatum, nur Auslauf)</div>' +
+
       // ── Listen ──
       '<div class="card" style="margin-bottom:18px;padding:18px;">' +
         '<h3 style="margin:0 0 4px;">L\u00e4uft demn\u00e4chst aus</h3>' +
@@ -91,39 +120,58 @@
         '<table class="data-table"><thead><tr><th>E-Mail</th><th>Name</th><th>Letzter Login</th><th style="text-align:right;">Tage inaktiv</th></tr></thead><tbody id="ret-inactive-tbody"><tr><td colspan="4">L\u00e4dt\u2026</td></tr></tbody></table>' +
       '</div>';
 
+    _mountEditor(host);
     _wire(host);
+    _switchTo('expiry');
+    _loadTemplates();
+    _loadBackground();
     _loadLists();
   }
 
-  function _editorBlock(kind, title, subject, body) {
-    return '<div class="card" style="padding:16px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-        '<h3 style="margin:0;">' + _esc(title) + '</h3>' +
-        '<button class="btn" data-ret-reset="' + kind + '" style="font-size:12px;">Standard wiederherstellen</button>' +
-      '</div>' +
-      '<label style="font-size:12px;color:#666;display:block;margin-bottom:4px;">Betreff</label>' +
-      '<input type="text" id="ret-' + kind + '-subject" value="' + _esc(subject) + '" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;margin-bottom:10px;">' +
-      '<label style="font-size:12px;color:#666;display:block;margin-bottom:4px;">Text</label>' +
-      '<textarea id="ret-' + kind + '-body" rows="10" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;font-family:inherit;font-size:13px;">' + _esc(body) + '</textarea>' +
-    '</div>';
+  // Body je Kind im Speicher halten (damit Umschalten nichts verliert)
+  var _bodies = { expiry: '', inactive: '' };
+  var _subjects = { expiry: '', inactive: '' };
+
+  function _mountEditor(host) {
+    var hostEl = document.getElementById('ret-editor-host');
+    if (!hostEl || !window.DpRichEditor) return;
+    var inst = window.DpRichEditor.mount(hostEl, {
+      textarea: 'ret-body',
+      placeholder: 'Mailtext \u2026',
+      onChange: function () { _bodies[_active] = document.getElementById('ret-body').value; _previewSoon(); }
+    });
+    _editors.single = inst;
   }
 
-  function _collect() {
-    function val(id) { var e = document.getElementById(id); return e ? e.value : ''; }
-    function chk(id) { var e = document.getElementById(id); return !!(e && e.checked); }
-    return {
-      expiry_enabled: chk('ret-expiry-enabled'),
-      expiry_days_before: parseInt(val('ret-expiry-days'), 10) || 14,
-      expiry_subject: val('ret-expiry-subject'),
-      expiry_body: val('ret-expiry-body'),
-      inactive_enabled: chk('ret-inactive-enabled'),
-      inactive_days: parseInt(val('ret-inactive-days'), 10) || 30,
-      inactive_subject: val('ret-inactive-subject'),
-      inactive_body: val('ret-inactive-body')
-    };
+  function _switchTo(kind) {
+    // aktuellen Stand sichern
+    var subEl = document.getElementById('ret-subject');
+    if (subEl) _subjects[_active] = subEl.value;
+    var bodyEl = document.getElementById('ret-body');
+    if (bodyEl) _bodies[_active] = bodyEl.value;
+
+    _active = kind;
+    // Buttons markieren
+    var btns = document.querySelectorAll('.ret-switch');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('btn-primary', btns[i].getAttribute('data-ret-kind') === kind);
+    // Inhalte laden
+    var s = _settings || {};
+    if (!_subjects[kind]) _subjects[kind] = (kind === 'expiry') ? s.expiry_subject : s.inactive_subject;
+    if (!_bodies[kind]) _bodies[kind] = (kind === 'expiry') ? s.expiry_body : s.inactive_body;
+    if (subEl) subEl.value = _subjects[kind] || '';
+    if (_editors.single) _editors.single.setHtml(_bodies[kind] || '');
+    _previewSoon();
+    _loadTemplates();
   }
 
   function _wire(host) {
+    // Tab-Switch
+    host.querySelectorAll('.ret-switch').forEach(function (b) {
+      b.onclick = function () { _switchTo(b.getAttribute('data-ret-kind')); };
+    });
+    var subEl = document.getElementById('ret-subject');
+    if (subEl) subEl.addEventListener('input', function () { _subjects[_active] = subEl.value; _previewSoon(); });
+
     var saveBtn = document.getElementById('ret-save');
     if (saveBtn) saveBtn.onclick = async function () {
       saveBtn.disabled = true;
@@ -131,36 +179,116 @@
       catch (e) { _toast('Fehler: ' + (e.message || ''), 'error'); }
       saveBtn.disabled = false;
     };
-    var prevBtn = document.getElementById('ret-preview');
-    if (prevBtn) prevBtn.onclick = async function () { await _run(true); };
+    var prevBtn = document.getElementById('ret-preview-run');
+    if (prevBtn) prevBtn.onclick = function () { _run(true); };
     var runBtn = document.getElementById('ret-run');
-    if (runBtn) runBtn.onclick = async function () {
+    if (runBtn) runBtn.onclick = function () {
       if (!window.confirm('Jetzt wirklich an alle passenden Kunden senden? (Bereits benachrichtigte werden \u00fcbersprungen)')) return;
-      await _run(false);
+      _run(false);
     };
-    // Schwellen aendern -> Listen neu laden
     ['ret-expiry-days', 'ret-inactive-days'].forEach(function (id) {
       var e = document.getElementById(id); if (e) e.onchange = _loadLists;
     });
-    // Standard wiederherstellen
-    host.querySelectorAll('[data-ret-reset]').forEach(function (b) {
-      b.onclick = function () {
-        var k = b.getAttribute('data-ret-reset');
-        var def = _DEFAULTS && _DEFAULTS[k];
-        if (!def) return;
-        var sub = document.getElementById('ret-' + k + '-subject');
-        var bod = document.getElementById('ret-' + k + '-body');
-        if (sub) sub.value = def.subject; if (bod) bod.value = def.body;
-        _toast('Standard-Vorlage eingesetzt (noch nicht gespeichert)', 'info');
+    var resetBtn = document.getElementById('ret-reset');
+    if (resetBtn) resetBtn.onclick = function () {
+      var def = _DEFAULTS && _DEFAULTS[_active];
+      if (!def) return;
+      var se = document.getElementById('ret-subject'); if (se) { se.value = def.subject; _subjects[_active] = def.subject; }
+      if (_editors.single) _editors.single.setHtml(def.body);
+      _bodies[_active] = def.body;
+      _previewSoon();
+      _toast('Standard-Vorlage eingesetzt (noch nicht gespeichert)', 'info');
+    };
+
+    // Vorlagen
+    var tplSel = document.getElementById('ret-tpl-select');
+    if (tplSel) tplSel.onchange = function () {
+      var id = tplSel.value; if (!id) return;
+      var t = (_tplCache || []).filter(function (x) { return x.id === id; })[0];
+      if (!t) return;
+      var se = document.getElementById('ret-subject'); if (se && t.subject != null) { se.value = t.subject; _subjects[_active] = t.subject; }
+      if (_editors.single) _editors.single.setHtml(t.body_html || '');
+      _bodies[_active] = t.body_html || '';
+      _previewSoon();
+    };
+    var tplSave = document.getElementById('ret-tpl-save');
+    if (tplSave) tplSave.onclick = async function () {
+      var name = window.prompt('Name f\u00fcr die Vorlage:', '');
+      if (name == null) return;
+      try {
+        await _call('POST', '/retention/templates', {
+          name: name, kind: _active,
+          subject: (document.getElementById('ret-subject') || {}).value || '',
+          body_html: (document.getElementById('ret-body') || {}).value || ''
+        });
+        _toast('\u2713 Vorlage gespeichert', 'success'); _loadTemplates();
+      } catch (e) { _toast('Fehler: ' + (e.message || ''), 'error'); }
+    };
+    var tplDel = document.getElementById('ret-tpl-del');
+    if (tplDel) tplDel.onclick = async function () {
+      var sel = document.getElementById('ret-tpl-select'); var id = sel ? sel.value : '';
+      if (!id) { _toast('Erst eine Vorlage w\u00e4hlen', 'info'); return; }
+      if (!window.confirm('Diese Vorlage l\u00f6schen?')) return;
+      try { await _call('DELETE', '/retention/templates/' + id); _toast('\u2713 Gel\u00f6scht', 'success'); _loadTemplates(); }
+      catch (e) { _toast('Fehler: ' + (e.message || ''), 'error'); }
+    };
+
+    // Hintergrund
+    var bgUp = document.getElementById('ret-bg-upload');
+    var bgFile = document.getElementById('ret-bg-file');
+    if (bgUp && bgFile) {
+      bgUp.onclick = function () { bgFile.click(); };
+      bgFile.onchange = function () {
+        var f = bgFile.files && bgFile.files[0]; if (!f) return;
+        var rd = new FileReader();
+        rd.onload = async function () {
+          try {
+            await _call('POST', '/retention/background', { html: String(rd.result || ''), name: f.name });
+            _toast('\u2713 Hintergrund gespeichert', 'success'); _loadBackground(); _previewSoon();
+          } catch (e) { _toast('Fehler: ' + (e.message || ''), 'error'); }
+        };
+        rd.readAsText(f); bgFile.value = '';
       };
-    });
+    }
+    var bgClear = document.getElementById('ret-bg-clear');
+    if (bgClear) bgClear.onclick = async function () {
+      if (!window.confirm('Hintergrund-Vorlage entfernen?')) return;
+      try { await _call('POST', '/retention/background', { html: '', name: '' }); _toast('\u2713 Entfernt', 'success'); _loadBackground(); _previewSoon(); }
+      catch (e) { _toast('Fehler: ' + (e.message || ''), 'error'); }
+    };
+  }
+
+  function _collect() {
+    function val(id) { var e = document.getElementById(id); return e ? e.value : ''; }
+    function chk(id) { var e = document.getElementById(id); return !!(e && e.checked); }
+    // aktuellen Editor-Stand in die Speicher schreiben
+    var subEl = document.getElementById('ret-subject'); if (subEl) _subjects[_active] = subEl.value;
+    var bodyEl = document.getElementById('ret-body'); if (bodyEl) _bodies[_active] = bodyEl.value;
+    return {
+      expiry_enabled: chk('ret-expiry-enabled'),
+      expiry_days_before: parseInt(val('ret-expiry-days'), 10) || 14,
+      expiry_subject: _subjects.expiry || '',
+      expiry_body: _bodies.expiry || '',
+      inactive_enabled: chk('ret-inactive-enabled'),
+      inactive_days: parseInt(val('ret-inactive-days'), 10) || 30,
+      inactive_subject: _subjects.inactive || '',
+      inactive_body: _bodies.inactive || ''
+    };
+  }
+
+  function _previewSoon() { clearTimeout(_prevT); _prevT = setTimeout(_renderPreview, 350); }
+  async function _renderPreview() {
+    var fr = document.getElementById('ret-preview-frame'); if (!fr) return;
+    var subj = (document.getElementById('ret-subject') || {}).value || '';
+    var body = (document.getElementById('ret-body') || {}).value || '';
+    try { var r = await _call('POST', '/retention/preview', { subject: subj, body_html: body }); fr.srcdoc = (r && r.html) || ''; }
+    catch (e) { /* still lassen */ }
   }
 
   async function _run(dry) {
     var msg = document.getElementById('ret-run-msg');
     if (msg) { msg.style.color = '#666'; msg.textContent = dry ? 'Vorschau l\u00e4uft\u2026' : 'Senden\u2026'; }
     try {
-      // Erst speichern, damit der Lauf die aktuellen Templates/Schwellen nutzt
       var sv = await _call('POST', '/retention/settings', _collect()); _settings = sv.settings;
       var r = await _call('POST', '/retention/run?dry=' + (dry ? '1' : '0'));
       var res = r.result || {};
@@ -174,10 +302,29 @@
     }
   }
 
+  var _tplCache = [];
+  async function _loadTemplates() {
+    var sel = document.getElementById('ret-tpl-select'); if (!sel) return;
+    try {
+      var r = await _call('GET', '/retention/templates?kind=' + _active);
+      _tplCache = (r && r.templates) || [];
+      sel.innerHTML = '<option value="">\u2014 Vorlage laden \u2014</option>' +
+        _tplCache.map(function (t) { return '<option value="' + _esc(t.id) + '">' + _esc(t.name) + ' (' + _esc(t.kind) + ')</option>'; }).join('');
+    } catch (e) { /* still */ }
+  }
+
+  async function _loadBackground() {
+    var el = document.getElementById('ret-bg-name'); if (!el) return;
+    try {
+      var r = await _call('GET', '/retention/background');
+      var bg = (r && r.background) || {};
+      el.textContent = bg.name ? ('\u2713 ' + bg.name) : '(keine \u2014 Standard-Rahmen)';
+    } catch (e) { el.textContent = ''; }
+  }
+
   async function _loadLists() {
     var ed = parseInt((document.getElementById('ret-expiry-days') || {}).value, 10);
     var idd = parseInt((document.getElementById('ret-inactive-days') || {}).value, 10);
-    // Auslauf
     var et = document.getElementById('ret-expiring-tbody');
     if (et) {
       et.innerHTML = '<tr><td colspan="5">L\u00e4dt\u2026</td></tr>';
@@ -193,7 +340,6 @@
         }).join('') : '<tr><td colspan="5" style="color:#999;">Niemand l\u00e4uft im Fenster aus.</td></tr>';
       } catch (e) { et.innerHTML = '<tr><td colspan="5" style="color:#B86250;">' + _esc(e.message || 'Fehler') + '</td></tr>'; }
     }
-    // Inaktiv
     var it = document.getElementById('ret-inactive-tbody');
     if (it) {
       it.innerHTML = '<tr><td colspan="4">L\u00e4dt\u2026</td></tr>';
@@ -211,24 +357,23 @@
 
   async function _open() {
     var host = _findHost();
-    if (!host) { return; }
+    if (!host) return;
     if (!_settings) {
       host.innerHTML = '<div style="padding:30px;color:#888;">L\u00e4dt Kundenbindung\u2026</div>';
       try {
         var r = await _call('GET', '/retention/settings');
         _settings = r.settings;
-        // Defaults merken (fuer "Standard wiederherstellen") = aktuelle Server-Defaults,
-        // die getSettings() bei leeren Feldern liefert. Wir holen sie separat einmal.
         _DEFAULTS = {
           expiry: { subject: _settings.expiry_subject, body: _settings.expiry_body },
           inactive: { subject: _settings.inactive_subject, body: _settings.inactive_body }
         };
+        _bodies = { expiry: _settings.expiry_body || '', inactive: _settings.inactive_body || '' };
+        _subjects = { expiry: _settings.expiry_subject || '', inactive: _settings.inactive_subject || '' };
       } catch (e) { host.innerHTML = '<div style="padding:30px;color:#B86250;">Fehler: ' + _esc(e.message || '') + '</div>'; return; }
     }
     _render(host);
   }
 
-  // ── Einhaengen: Klick auf Kundenbindung-Nav-Link ────────────────
   function _hook() {
     var links = document.querySelectorAll('.nav-link');
     for (var i = 0; i < links.length; i++) {
@@ -238,21 +383,13 @@
         }
       })(links[i]);
     }
-    // Falls die View beim Laden schon aktiv ist
-    var host = _findHost();
-    if (host && host.style.display !== 'none' && host.offsetParent !== null) {
-      // nur wenn sichtbar
-    }
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () { setTimeout(_hook, 400); });
-  } else {
-    setTimeout(_hook, 400);
-  }
-  // Re-Hook nach App-Mount (Nav-Links entstehen evtl. erst nach Login)
+  } else { setTimeout(_hook, 400); }
   setTimeout(_hook, 1500);
   setTimeout(_hook, 3000);
 
-  window._dpRetentionOpen = _open; // manueller Aufruf moeglich
+  window._dpRetentionOpen = _open;
 })();
