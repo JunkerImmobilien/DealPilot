@@ -1438,4 +1438,67 @@ router.post('/retention/preview', requireAdmin, async (req, res) => {
 });
 
 
+/* mand v807-admin-keys: API-Key-Verwaltung */
+const _apiKeyService = require('../services/apiKeyService');
+router.get('/users/:id/api-keys', requireAdmin, async (req, res) => {
+  try { res.json({ keys: await _apiKeyService.adminList(req.params.id) }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/users/:id/api-keys', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  try {
+    const r = await _apiKeyService.adminCreate(req.params.id, {
+      name: (req.body && req.body.name) || 'Admin-Key',
+      expiresInDays: req.body && req.body.expiresInDays
+    });
+    res.json({ key: r });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/api-keys/:keyId/extend', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  try { res.json(await _apiKeyService.adminExtend(req.params.keyId, (req.body && req.body.days) || 90)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.delete('/api-keys/:keyId', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  try { res.json(await _apiKeyService.adminRevoke(req.params.keyId)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* mand v811-pro-trial: zeitlich begrenzter Pro-Test (laeuft via isActive/trial_end automatisch aus) */
+router.post('/users/:id/start-pro-trial', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  let days = parseInt((req.body && req.body.days), 10);
+  if (!days || days < 1 || days > 90) days = 14;
+  try {
+    await db.query("UPDATE subscriptions SET status='canceled', ended_at=NOW() WHERE user_id=$1 AND status IN ('active','trialing')", [req.params.id]);
+    await db.query(
+      "INSERT INTO subscriptions (user_id, plan_id, billing_interval, status, current_period_start, current_period_end, trial_end) " +
+      "VALUES ($1, 'pro', 'monthly', 'trialing', NOW(), NOW() + ($2 || ' days')::interval, NOW() + ($2 || ' days')::interval)",
+      [req.params.id, String(days)]
+    );
+    await audit(db, req.adminUser.id, req.adminUser.email, 'user.pro_trial', 'user', req.params.id, { days }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, plan_id: 'pro', trial_days: days });
+  } catch (err) {
+    console.error('[admin/users/start-pro-trial] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+/* mand v811b-pro-trial: Pro-Test als Override (plan_trials) - echte Subscription bleibt unangetastet */
+router.post('/users/:id/start-pro-trial', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  let days = parseInt((req.body && req.body.days), 10);
+  if (!days || days < 1 || days > 90) days = 14;
+  try {
+    await db.query('UPDATE plan_trials SET revoked_at=NOW() WHERE user_id=$1 AND revoked_at IS NULL', [req.params.id]);
+    await db.query(
+      "INSERT INTO plan_trials (user_id, granted_plan, expires_at) VALUES ($1, 'pro', NOW() + ($2 || ' days')::interval)",
+      [req.params.id, String(days)]
+    );
+    await audit(db, req.adminUser.id, req.adminUser.email, 'user.pro_trial', 'user', req.params.id, { days, plan: 'pro' }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, plan: 'pro', trial_days: days });
+  } catch (err) {
+    console.error('[admin/users/start-pro-trial] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
 module.exports = router;

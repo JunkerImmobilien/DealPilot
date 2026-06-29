@@ -178,6 +178,7 @@
   // Detail-Objekte als Array (nur erfolgreich geladene)
   function detailArr(){
     var all = wonList().map(function(o){ return _details[o.id||o.key]; }).filter(Boolean);
+    all = (window.DealPilotMandanten && window.DealPilotMandanten.filterByHalter) ? window.DealPilotMandanten.filterByHalter(all) : all; /* mand-filter v803 */
     if(_dashSelIdx>=0 && _dashSelIdx<all.length) return [all[_dashSelIdx]];   // v475: Einzelobjekt-Ansicht
     return all;
   }
@@ -1053,7 +1054,7 @@
   /* ════ RENDER-ORCHESTRIERUNG ════ */
   function renderAll(){
     renderScoreHero(); renderKpiCards(); renderStatus(); renderBoardOrCards();
-    renderHealth(); renderOverview(); renderProjTable(); loadPasses(); if(window._dashLoadSharedPasses)window._dashLoadSharedPasses();
+    renderHealth(); renderOverview(); renderProjTable(); loadPasses(); if(window._dashLoadSharedPasses)window._dashLoadSharedPasses(); try{ if(window.DealPilotMandanten) DealPilotMandanten.renderHalterChips(); }catch(e){} /* mand-chips-init v803 */
   }
 
   /* ════ DASHBOARD-MARKUP (in #dashboard-main injecten) ════ */
@@ -1069,7 +1070,7 @@
     m.innerHTML =
       '<div id="dp-stage" class="stage fc fc9"><div class="app">'
       + '<div class="sl sl-head"><span class="e">01</span><h2>Portfolio Score</h2><span class="tag">Quick-Boarding-Stil</span><span class="rule"></span>'
-      + '<span class="cp-objsel"><span class="cp-objsel-lab">Objekt</span><select id="dp-dash-objsel" onchange="DealPilotDashboard.selectObject(this.value)"></select></span></div>'
+      + '<span class="cp-objsel"><span class="cp-objsel-lab">Objekt</span><select id="dp-dash-objsel" onchange="DealPilotDashboard.selectObject(this.value)"></select></span><span id="dp-halter-filter" class="mand-chips"></span></div>'  /* mand-chips v803 */
       + '<div class="hero" id="dp-pscore-hero"></div>'
       + '<div class="sl"><span class="e">02</span><h2>Kennzahlen</h2><span class="tag">Portfolio \u00b7 aggregiert</span><span class="rule"></span></div>'
       + '<div id="dp-overview-strip" class="overview-strip" style="margin-bottom:13px"></div>'
@@ -1306,6 +1307,7 @@
     openObject: function(k){ try{ if(typeof window.loadSaved==='function') window.loadSaved(k); }catch(e){} },
     toggleZins: function(){ window._dpZinsMode=(window._dpZinsMode==='risiko')?'zins':'risiko'; try{ renderHealth(); }catch(e){} },
     selectObject: selectObject,
+    applyHalterFilter: function(id){ try{ window._dpHalterFilter=id; }catch(e){} try{ renderScoreHero(); }catch(e){} try{ renderOverview(); }catch(e){} try{ renderHealth(); }catch(e){} try{ renderKpiCards(); }catch(e){} try{ buildCharts(); }catch(e){} try{ renderProjTable(); }catch(e){} try{ if(window.DealPilotMandanten) DealPilotMandanten.renderHalterChips(); }catch(e){} },  /* mand-export v803 */
     _debug: function(){ return { summaries:_summaries, details:_details, loaded:_detailsLoaded }; }
   };
 })();

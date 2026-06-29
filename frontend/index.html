@@ -927,7 +927,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
       <!-- v445-obj-reorder -->
       <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
-      <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
+      <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div><!-- mand-halter-block v803 --><div class="f" data-mand><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><div class="f" data-mand><label>Herkunft</label><select id="obj_herkunft"><option value="neukauf">Neukauf</option><option value="ueberfuehrung">Überführung aus Privatbestand</option></select></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" placeholder="0"></div></div>
       <div class="obj-extra-acc" id="obj-extra-toggle" role="button" tabindex="0" aria-expanded="false" style="grid-column:1/-1"><span class="obj-extra-chev" aria-hidden="true">▸</span><span class="obj-extra-acc-lbl">Weitere Objektdetails</span></div>
       <div id="obj-extra-wrap" class="obj-extra-wrap">
       <div class="f" data-v362-stammdaten><label>Zimmer</label><input id="zimmer" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
@@ -2915,13 +2915,13 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=732"></script>
+  <script src="js/calc.js?v=804"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=646"></script>
+<script src="js/tax.js?v=805"></script>
 <script src="js/config.js?v=669"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
@@ -2939,7 +2939,9 @@ label.dp-required.qc-required::after {
   <script src="js/immometrica-qc.js?v=672"></script>
   <script src="js/modal-boarding-skin.js?v=672"></script>
   <script src="js/provider-keys.js?v=672"></script>
-  <script src="js/settings.js?v=796b"></script>
+  <script src="js/mandanten.js?v=809"></script>
+  <script src="js/apikeys.js?v=810"></script>
+  <script src="js/settings.js?v=810"></script>
 <script src="js/pricing-modal.js?v=493-2"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=162"></script>
@@ -2953,7 +2955,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=773"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=771"></script>
+<script src="js/storage.js?v=808"></script>
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=720"></script>
 <script src="js/track-record.js?v=166"></script>
@@ -2974,7 +2976,7 @@ label.dp-required.qc-required::after {
 <script src="js/financing.js?v=124"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=124"></script>
-<script src="js/import-export-modal.js?v=773"></script>
+<script src="js/import-export-modal.js?v=808"></script>
 <script src="js/quick-check.js?v=463"></script>
 <script src="js/qc-bridge.js?v=711"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
@@ -3017,7 +3019,7 @@ label.dp-required.qc-required::after {
 <script src="js/free-lock.js?v=495"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=717"></script>
-<script src="js/dashboard.js?v=750k"></script>
+<script src="js/dashboard.js?v=804"></script>
 <script src="js/score-fx.js?v=464"></script>
 <script src="js/main.js?v=187h2"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->

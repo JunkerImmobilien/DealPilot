@@ -453,6 +453,18 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
     if (_zveOhneTip) _zveOhneTip.title = 'zvE-Quelle: ' + _zveSource;
   } catch(_) {}
   var impact = Tax.calcImmoTaxImpact(baseIncome, totals.ergebnis);
+  /* mand v805: Halter-Regime fuer den Steuer-Tab */
+  var _mandCorp = false, _mandRate = null, _mandName = '';
+  try {
+    var _hsel = document.getElementById('halter');
+    var _hid = _hsel ? _hsel.value : 'privat';
+    if (window.DealPilotMandanten && DealPilotMandanten.get) {
+      var _mObj = DealPilotMandanten.get(_hid);
+      _mandCorp = !!(_mObj && DealPilotMandanten.isCorp && DealPilotMandanten.isCorp(_mObj.rechtsform));
+      _mandName = _mObj ? _mObj.name : '';
+      if (_mandCorp && DealPilotMandanten.effRate) _mandRate = DealPilotMandanten.effRate(_hid);
+    }
+  } catch (_eM) {}
 
   var refundColor = impact.refund > 0 ? 'var(--green)' : 'var(--red)';
   var refundLabel = impact.refund > 0 ? 'Steuer-Erstattung' : 'Steuer-Nachzahlung';
@@ -560,6 +572,25 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
       /* ─── RECHTS: Durchschnittssteuersatz ─── */
       '<div class="tax-item"><div class="tax-label">Durchschnittssteuersatz</div><div class="tax-val">' + (impact.avgAfter * 100).toFixed(1).replace('.', ',') + ' %</div></div>' +
     '</div>';
+
+  /* mand v805: GmbH/UG -> Koerperschaftsteuer-Ansicht statt ESt/Erstattung */
+  if (_mandCorp && _mandRate != null) {
+    var _erg = totals.ergebnis;
+    var _kst = Math.max(0, _erg) * _mandRate;
+    var _ergCol = _erg >= 0 ? 'var(--gold-d)' : 'var(--green)';
+    var _rateTxt = (_mandRate * 100).toFixed(1).replace('.', ',') + ' %';
+    box.innerHTML =
+      '<div class="tax-grid">' +
+        '<div class="tax-item" style="grid-column:1/-1;background:#1b1408;border-color:var(--gold-d)"><div class="tax-label" style="color:var(--gold-h)">Halter \u00b7 ' + (_mandName || 'Gesellschaft') + '</div><div class="tax-val" style="color:var(--gold-h)">K\u00f6rperschaftsteuer-Regime \u00b7 ' + _rateTxt + '</div></div>' +
+        '<div class="tax-item"><div class="tax-label">Einnahmen V+V</div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
+        '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt</div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
+        '<div class="tax-item tax-highlight" style="grid-column:1/-1"><div class="tax-label">Beitrag zum GmbH-Ergebnis (' + displayYear + ')</div><div class="tax-val" style="color:' + _ergCol + '">' + fE(_erg, 0, true) + '</div></div>' +
+        '<div class="tax-item"><div class="tax-label">K\u00f6rperschaftsteuer-Satz</div><div class="tax-val">' + _rateTxt + '</div></div>' +
+        '<div class="tax-item tax-result"><div class="tax-label">K\u00f6rperschaftsteuer (dieses Objekt)</div><div class="tax-val" style="color:' + (_erg >= 0 ? 'var(--red)' : 'var(--green)') + ';font-size:20px">' + (_erg >= 0 ? '\u2212' + fE(_kst, 0) : '0 \u20ac') + '</div></div>' +
+        (_erg < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlust</div><div class="tax-val" style="color:var(--green)">keine Erstattung \u00b7 Verlustvortrag ins Folgejahr</div></div>' : '') +
+        '<div class="tax-item" style="grid-column:1/-1;background:transparent;border-color:rgba(201,168,76,0.15)"><div class="tax-label" style="font-style:italic;color:var(--muted)">Hinweis</div><div class="tax-val" style="font-size:12px;color:var(--muted);font-weight:400">Die endg\u00fcltige KSt rechnet die Gesellschaft \u00fcber ALLE ihre Objekte (Verluste verrechnen sich). Mandanten-Steuerakte folgt.</div></div>' +
+      '</div>';
+  }
 
   // V279-debounced: renderTaxModule ruft Debouncer mit aktualisierter taxTimeline
   try {

@@ -184,6 +184,19 @@
           '<div class="iexp-card-cta">Auswahl ‹ einzeln / alle › <span>›</span></div>' +
         '</div>' +
 
+        '<div class="iexp-card" onclick="iexpExportPortfolioCsv()">' +
+          '<div class="iexp-card-ico iexp-ico-green">' + _icon('download', 22) + '</div>' +
+          '<div class="iexp-card-tag">CSV \u00b7 ganzes Portfolio</div>' +
+          '<h3>Portfolio-CSV</h3>' +
+          '<p>Exportiert <b>alle Objekte</b> als eine CSV-Tabelle (Semikolon, Excel-DE) \u2014 eine Zeile je Objekt plus Summenzeile.</p>' +
+          '<ul class="iexp-bullets">' +
+            '<li>Kaufpreis, Miete, Cashflow n. Steuer</li>' +
+            '<li>Beleihung (BMR), DSCR, Restdarlehen</li>' +
+            '<li>\u00d8-Werte + Portfolio-Summe</li>' +
+          '</ul>' +
+          '<div class="iexp-card-cta">CSV herunterladen <span>\u203a</span></div>' +
+        '</div>' +
+
       '</div>'
     );
   }
@@ -194,6 +207,19 @@
       'PDF-Report für ein Objekt erstellen, Backup ziehen oder Portfolio nach Excel exportieren.',
       _renderExportCards()
     );
+  };
+
+  /* v808: Portfolio-CSV aus dem Hub (Cache notfalls selbst aufbauen) */
+  window.iexpExportPortfolioCsv = async function () {
+    try {
+      if (!window._portfolioCache && typeof updateSidebarPortfolio === 'function') {
+        await updateSidebarPortfolio();
+      }
+      if (typeof exportPortfolioCSV === 'function') exportPortfolioCSV();
+      else if (typeof toast === 'function') toast('\u26a0 Portfolio-Export nicht verf\u00fcgbar');
+    } catch (e) {
+      if (typeof toast === 'function') toast('\u26a0 Export-Fehler: ' + (e && e.message || e));
+    }
   };
 
   // ── PDF-Export mit Objekt-Auswahl ─────────────────────────────────

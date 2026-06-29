@@ -1221,6 +1221,9 @@ function _calcImmediate(){
     st('d2_zaer_m', '\u2014');
   }
   var grenz=v('grenz')/100;
+  /* mand v804: Halter-Regime — Privat/GbR = grenz (1:1 wie heute), GmbH/UG = KSt(+GewSt), KEINE Erstattung bei Verlust */
+  var _mandRate = (function(){ try{ if(window.DealPilotMandanten && DealPilotMandanten.effRate){ var _r=DealPilotMandanten.effRate(); return (_r!=null && isFinite(_r)) ? _r : null; } }catch(_e){} return null; })();
+  function _mtx(base){ return (_mandRate!=null) ? (Math.max(0, base) * _mandRate) : (base * grenz); }
   var zins_j=(d1_zm+d2_zm)*12, tilg_j=(d1_tm+d2_tm)*12;
   // V63.49: Bei Tilgungsaussetzung läuft parallel eine Bausparrate als Sparbeitrag.
   // Der ist KEIN steuerlich abziehbarer Aufwand, aber ein Liquiditätsabfluss —
@@ -1234,7 +1237,7 @@ function _calcImmediate(){
   // cf_operativ wird intern für Steuerbemessung gebraucht (Tilgung steuerlich nicht abziehbar).
   var cf_operativ = nkm_j - bwk_cf - zins_j;          // intern: vor Tilg, für Steuer
   var zve_immo = cf_operativ - afa;
-  var steuer   = zve_immo * grenz;
+  var steuer   = _mtx(zve_immo);
   // Öffentliche Werte: alle nach Tilgung (Banker) und nach BSV-Sparrate
   var cf_op = cf_operativ - tilg_j - bspar_y;          // CF v.St. NACH Tilgung & BSV
   var cf_ns = cf_op - steuer;                          // CF n.St. NACH Tilgung & BSV
@@ -1415,7 +1418,7 @@ function _calcImmediate(){
       }
     }
     var cf_y_op=nkm_y-bwk_cf_y-zy;
-    var tax_y_loop = (cf_y_op-afa)*grenz;
+    var tax_y_loop = _mtx(cf_y_op-afa);
     // V63.58: BSV-Sparrate ist CF-Abfluss (gebundenes Geld), gehört in CF-Berechnung
     var cf_y_ns=cf_y_op-tax_y_loop-bspar_y_loop;
     cfkum+=cf_y_ns;
@@ -1496,7 +1499,7 @@ function _calcImmediate(){
   var bspar_y_ezb = _d1IsAussetzung ? bspar_y : 0;
   // V63.40: CF v.St. = nach Tilgung (Banker-Sicht)
   var cf_op_ezb_operativ = nkm_ezb - bwk_cf_ezb - zins_ezb;     // intern für Steuer
-  var ster_ezb = (cf_op_ezb_operativ - afa) * grenz;
+  var ster_ezb = _mtx(cf_op_ezb_operativ - afa);
   var cf_op_ezb = cf_op_ezb_operativ - tilg_ezb - bspar_y_ezb;  // V63.52: nach Tilg & BSV
   var cf_ns_ezb = cf_op_ezb - ster_ezb;                          // Banker-CF n.St.
   var cf_ezb = cf_ns_ezb;
@@ -1606,7 +1609,7 @@ function _calcImmediate(){
     }
   }
   var cf_op_an_operativ = nkm_an - bwk_cf_an - zins_an;          // intern für Steuer
-  var ster_an = (cf_op_an_operativ - afa) * grenz;
+  var ster_an = _mtx(cf_op_an_operativ - afa);
   var cf_op_an = cf_op_an_operativ - tilg_an - bspar_y_an;       // V63.52
   var cf_ns_an = cf_op_an - ster_an;                             // Banker-CF n.St.
   // KPI color coding
@@ -2185,7 +2188,7 @@ function _calcImmediate(){
     // Begründung: Vorher griff in der Projektion das Yearly-Total mit potenziell anderen Schuldzinsen
     // (z.B. nach Anschluss-Phase) oder unfertigen cfRows-Daten → produzierte inkonsistente Werte.
     // Nun ist Frontend Cashflow-Vergleich-Heute, Cashflow-Projektion und PDF überall identisch.
-    var taxEffect_y = (cfop_y_operativ - afa) * grenz;
+    var taxEffect_y = _mtx(cfop_y_operativ - afa);
     var cfns_y = cfop_y - taxEffect_y;                     // V63.40: nach Tilgung, BSV & Steuer
     // V63.65: Wertsteigerung ausgehend vom besten Wert-Anker (svw > bankval > kp)
     // V63.83 KOMMENTAR: wert_y zeigt Stand ANFANG Jahr y → Jahr 1 = heute = ^0
@@ -2337,7 +2340,7 @@ function _calcImmediate(){
     if (_v353_anteilig_hit || _v354_d2_active) {
       cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
       cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
-      taxEffect_y     = (cfop_y_operativ - afa) * grenz;
+      taxEffect_y     = _mtx(cfop_y_operativ - afa);
       cfns_y          = cfop_y - taxEffect_y;
       // eq_y/ltv_y mit aktueller kombinierter RS aktualisieren (rs3_d2 ggf. Y1-reduziert)
       var _rs_comb2 = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);
