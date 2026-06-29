@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot API — Dokumentation</title>
+<style>
+  :root{
+    --obsidian:#050505; --ink:#1b1815; --gold:#C9A84C; --gold-h:#E8CC7A; --gold-d:#b8932f;
+    --green:#3FA56C; --red:#B86250; --cream:#FDFCFA; --muted:#7A7370; --line:rgba(201,168,76,.22);
+    --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Inter','DM Sans',system-ui,sans-serif;line-height:1.6;font-size:15px}
+  code,pre{font-family:'JetBrains Mono',ui-monospace,Consolas,monospace}
+  .wrap{max-width:940px;margin:0 auto;padding:0 22px 90px}
+  header{background:var(--obsidian);color:var(--cream);padding:46px 0 40px}
+  .kick{font:700 12px/1 'DM Sans',sans-serif;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-h);margin:0 0 12px}
+  header h1{font-family:'Space Grotesk','Inter',sans-serif;font-size:40px;line-height:1.05;margin:0 0 10px;letter-spacing:-.5px}
+  header p{color:#cdc8bf;max-width:660px;margin:0}
+  .runway{height:4px;background:var(--runway);border:0;margin:0}
+  h2{font-family:'Space Grotesk','Inter',sans-serif;font-size:24px;margin:46px 0 8px;letter-spacing:-.3px}
+  h2 .num{color:var(--gold-d);font-size:15px;font-weight:600;margin-right:8px}
+  h3{font-family:'Space Grotesk','Inter',sans-serif;font-size:16px;margin:24px 0 4px}
+  .lead{color:var(--muted)}
+  a{color:var(--gold-d);text-decoration:none;border-bottom:1px solid var(--line)}
+  pre{background:var(--obsidian);color:var(--gold-h);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.55;border:1px solid #1d1a16}
+  pre .c{color:#8a8a8a}
+  p code,li code,td code{background:#F2EEE3;color:#6b551c;padding:1.5px 6px;border-radius:5px;font-size:12.5px}
+  .ep{display:flex;align-items:center;gap:12px;margin:20px 0 4px;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .m{font:700 12px/1 'JetBrains Mono',monospace;padding:5px 9px;border-radius:6px;color:#fff;letter-spacing:.5px}
+  .m.get{background:var(--green)} .m.post{background:var(--gold-d)} .m.put{background:#6b8cc4} .m.del{background:var(--red)}
+  .ep .path{font:600 14px/1 'JetBrains Mono',monospace}
+  .ep .desc{margin-left:auto;color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid #ece7da;vertical-align:top}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+  .pill{display:inline-block;background:#F2EEE3;color:#6b551c;border-radius:20px;padding:3px 11px;font-size:12px;font-weight:600}
+  .uc{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+  .uc .card{border:1px solid var(--line);border-radius:11px;padding:15px 17px;background:#fff}
+  .uc .card h3{margin:0 0 5px;font-size:15px}
+  .uc .card p{margin:0;font-size:13.5px;color:#4a4540}
+  .grp{border:1px solid #ece7da;border-radius:11px;padding:14px 16px;margin:12px 0;background:#fff}
+  .grp h3{margin:0 0 4px}
+  .grp .gd{color:var(--muted);font-size:13px;margin:0 0 8px}
+  .grp .keys code{margin:2px 3px 2px 0;display:inline-block}
+  .note{background:#FAF9F4;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:14px 16px;margin:18px 0;font-size:14px}
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid #ece7da;color:var(--muted);font-size:13px}
+  .toc{display:flex;flex-wrap:wrap;gap:8px 16px;margin:18px 0 0;font-size:14px}
+  .toc a{border:0}
+  @media(max-width:620px){.uc{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <p class="kick">◆ DealPilot Platform</p>
+    <h1>DealPilot API</h1>
+    <p>Greife programmatisch auf deine Immobilien-Objekte zu — anlegen, lesen, ändern, löschen. Eine vollständige REST-Schnittstelle über HTTPS, JSON rein und raus. Für Pro-Konten.</p>
+  </div>
+</header>
+<hr class="runway">
+
+<div class="wrap">
+  <div class="toc">
+    <a href="#was">Was du damit machst</a>
+    <a href="#start">Schnellstart</a>
+    <a href="#auth">Authentifizierung</a>
+    <a href="#objekte">Endpunkte</a>
+    <a href="#modell">Datenmodell &amp; Felder</a>
+    <a href="#fehler">Fehler &amp; Limits</a>
+    <a href="#beispiele">Beispiele</a>
+  </div>
+
+  <h2 id="was"><span class="num">01</span>Was du mit der API machen kannst</h2>
+  <p class="lead">Die API gibt dir vollen Lese- und Schreibzugriff auf deinen eigenen Objektbestand. Typische Anwendungen:</p>
+  <div class="uc">
+    <div class="card"><h3>Objekte automatisiert anlegen</h3><p>Neue Investments aus einer Tabelle, einem CRM oder einem Akquise-Tool direkt in DealPilot kippen — ohne manuelles Abtippen.</p></div>
+    <div class="card"><h3>Bestand synchronisieren</h3><p>Mietänderungen, neue Finanzierungskonditionen oder Sanierungskosten aus deinem System per <code>PUT</code> nach DealPilot spiegeln.</p></div>
+    <div class="card"><h3>Eigene Dashboards &amp; Reports</h3><p>Alle Objektdaten abrufen und in eigene Auswertungen, BI-Tools oder ein Investoren-Reporting einspeisen.</p></div>
+    <div class="card"><h3>Buchhaltung &amp; Steuerberater anbinden</h3><p>Objekt- und Mandanten-/Halter-Daten exportieren und an die Buchhaltung oder den StB übergeben.</p></div>
+    <div class="card"><h3>Massen-Import &amp; Migration</h3><p>Einen ganzen Bestand aus einer Alt-Lösung übernehmen — Schleife über deine Datensätze, je ein <code>POST</code>.</p></div>
+    <div class="card"><h3>Aufräumen &amp; Pflegen</h3><p>Veraltete Objekte per <code>DELETE</code> entfernen oder Felder programmatisch korrigieren.</p></div>
+  </div>
+  <p>Ein Key sieht und ändert ausschließlich die Objekte des eigenen Kontos — nie fremde Daten und nie mehr, als der Pro-Plan erlaubt.</p>
+
+  <h2 id="start"><span class="num">02</span>Schnellstart</h2>
+  <p class="lead">Basis-URL für alle Aufrufe:</p>
+  <pre>https://app.dealpilot.junker-immobilien.io/api/v1</pre>
+  <p>Den API-Key erzeugst du in DealPilot unter <b>Einstellungen → Account &amp; Sicherheit → DealPilot API</b>. Er wird genau einmal vollständig angezeigt (Aufbau <code>dpk_live_…</code>) — danach nur noch der Anfang. Verloren? Einfach widerrufen und neu erzeugen.</p>
+  <pre><span class="c"># Alle eigenen Objekte abrufen</span>
+curl -H "X-API-Key: dpk_live_DEIN_KEY" \
+  https://app.dealpilot.junker-immobilien.io/api/v1/objects</pre>
+
+  <h2 id="auth"><span class="num">03</span>Authentifizierung</h2>
+  <table>
+    <tr><th>Punkt</th><th>Details</th></tr>
+    <tr><td>Header</td><td><code>X-API-Key: dpk_live_…</code> bei jedem Aufruf</td></tr>
+    <tr><td>Voraussetzung</td><td>Aktiver <span class="pill">Pro</span>-Plan. Fällt das Konto unter Pro, sind die Keys inaktiv.</td></tr>
+    <tr><td>Geltungsbereich</td><td>Nur die Objekte des eigenen Kontos. Voller CRUD (Lesen/Schreiben/Löschen).</td></tr>
+    <tr><td>Rate-Limit</td><td>120 Anfragen pro Minute und Key (darüber <code>429</code>).</td></tr>
+    <tr><td>Speicherung</td><td>Der Key wird serverseitig nur als SHA-256-Hash abgelegt — der Klartext ist nicht wiederherstellbar.</td></tr>
+  </table>
+
+  <h2 id="objekte"><span class="num">04</span>Endpunkte</h2>
+  <div class="ep"><span class="m get">GET</span><span class="path">/objects</span><span class="desc">Liste (Kennzahlen + Vorschau)</span></div>
+  <pre>{ "items": [ { "id": "…", "name": "…", "kpis": { … }, "thumbnail": "…" } ], "count": 1 }</pre>
+  <div class="ep"><span class="m get">GET</span><span class="path">/objects/:id</span><span class="desc">Ein Objekt vollständig (inkl. data)</span></div>
+  <div class="ep"><span class="m post">POST</span><span class="path">/objects</span><span class="desc">Anlegen</span></div>
+  <pre>{ "name": "Beispielstraße 1", "data": { "kp": 250000, "nkm": 980, "halter": "privat" } }</pre>
+  <div class="ep"><span class="m put">PUT</span><span class="path">/objects/:id</span><span class="desc">Ändern (name und/oder data)</span></div>
+  <div class="ep"><span class="m del">DELETE</span><span class="path">/objects/:id</span><span class="desc">Löschen</span></div>
+  <pre>{ "ok": true }</pre>
+
+  <h2 id="modell"><span class="num">05</span>Datenmodell &amp; Felder</h2>
+  <p>Ein Objekt hat eine schlanke Hülle; alle Rechen-Eingaben liegen im <code>data</code>-Objekt:</p>
+  <table>
+    <tr><th>Feld</th><th>Typ</th><th>Bedeutung</th></tr>
+    <tr><td><code>id</code></td><td>string</td><td>Eindeutige ID</td></tr>
+    <tr><td><code>name</code></td><td>string</td><td>Anzeigename</td></tr>
+    <tr><td><code>data</code></td><td>object</td><td>Alle Eingabefelder (siehe Gruppen unten)</td></tr>
+    <tr><td><code>photos</code></td><td>array</td><td>Objektfotos</td></tr>
+    <tr><td><code>ai_analysis</code></td><td>string</td><td>Gespeicherte KI-Analyse</td></tr>
+  </table>
+  <div class="note"><b>Voll durchlässig:</b> Das <code>data</code>-Objekt akzeptiert beim Anlegen/Ändern beliebige Schlüssel und gibt sie unverändert wieder zurück. Es gibt keine serverseitige Whitelist — alle hier gelisteten Felder (und künftige) gehen 1:1 durch.</div>
+
+  <p class="lead">Alle <code>data</code>-Felder, nach Themen gruppiert:</p>
+
+  <div class="grp"><h3>Adresse &amp; Objekt</h3><p class="gd">Lage, Größe, Baujahr, Einheiten.</p>
+    <div class="keys"><code>plz</code><code>ort</code><code>str</code><code>hnr</code><code>objart</code><code>wfl</code><code>baujahr</code><code>kaufdat</code><code>wirtschaftlicher_uebergang</code><code>kuerzel</code><code>ausst</code><code>einheiten</code><code>zimmer</code><code>bad_anz</code><code>etage</code><code>etagen_ges</code><code>garagen</code><code>stellpl_aussen</code><code>balkon_flae</code><code>modernis</code></div></div>
+
+  <div class="grp"><h3>Bewertung &amp; Lage</h3><p class="gd">Bankwert, Sachverständigenwert, Lage-Scores, Bodenrichtwert.</p>
+    <div class="keys"><code>bankval</code><code>svwert</code><code>makrolage</code><code>mikrolage</code><code>brw</code><code>mea</code><code>gsfl</code></div></div>
+
+  <div class="grp"><h3>Strategie &amp; Notizen</h3><p class="gd">These, Risiken, Vermietungsstand, Exit, KI-Texte.</p>
+    <div class="keys"><code>thesis</code><code>risiken</code><code>notizen</code><code>vermstand</code><code>exitstr</code><code>bank_inst</code><code>ai_strat</code><code>ai_verk</code><code>ai_risk</code><code>ai_markt</code></div></div>
+
+  <div class="grp"><h3>Kaufpreis &amp; Kaufnebenkosten</h3><p class="gd">Kaufpreis und alle Erwerbsnebenkosten (Makler, Notar, Grundbuch, Grunderwerbsteuer …).</p>
+    <div class="keys"><code>kp</code><code>makler_p</code><code>notar_p</code><code>gba_p</code><code>gest_p</code><code>ji_p</code></div></div>
+
+  <div class="grp"><h3>Investitionen &amp; Inventar</h3><p class="gd">Sanierung, Möblierung, Küche, Geräte, PV, Stellplatz.</p>
+    <div class="keys"><code>san</code><code>moebl</code><code>inv_kueche</code><code>inv_moebel</code><code>inv_geraete</code><code>inv_pv</code><code>inv_stellplatz</code><code>inv_sonst</code></div></div>
+
+  <div class="grp"><h3>Miete &amp; Mietentwicklung</h3><p class="gd">Nettokaltmiete, Zusatzeinnahmen, Steigerungen, Leerstand, Mietspiegel-Detailmodus.</p>
+    <div class="keys"><code>nkm</code><code>ze</code><code>umlagef</code><code>mietstg</code><code>wertstg</code><code>kostenstg</code><code>leerstand</code><code>btj</code><code>exit_bmy</code><code>mietspiegel</code><code>me_modus</code><code>me_soll</code><code>me_anz</code><code>me_int</code><code>me_pct</code></div></div>
+
+  <div class="grp"><h3>Bewirtschaftungskosten</h3><p class="gd">Umlagefähige und nicht-umlagefähige Kosten, Rücklagen, Mietausfall, BWK-Pauschalen.</p>
+    <div class="keys"><code>hg_ul</code><code>grundsteuer</code><code>ul_sonst</code><code>hg_nul</code><code>weg_r</code><code>eigen_r</code><code>mietausfall</code><code>nul_sonst</code><code>bwk_ul_pct</code><code>bwk_nul_pct</code><code>bwk_kp_pct</code></div></div>
+
+  <div class="grp"><h3>Finanzierung — Darlehen 1 &amp; Anschluss</h3><p class="gd">Eigenkapital, Darlehen 1 (Betrag/Zins/Tilgung/Bindung/Typ/Auszahlung), Anschlussfinanzierung.</p>
+    <div class="keys"><code>ek</code><code>d1</code><code>d1z</code><code>d1t</code><code>d1_bindj</code><code>d1_type</code><code>d1_auszahl</code><code>d1_vertrag</code><code>anschl_z</code><code>anschl_t</code><code>anschl_bj</code></div></div>
+
+  <div class="grp"><h3>Finanzierung — Darlehen 2</h3><p class="gd">Zweites Darlehen mit eigener Anschlussfinanzierung.</p>
+    <div class="keys"><code>d2</code><code>d2z</code><code>d2t</code><code>d2_bindj</code><code>d2_inst</code><code>d2_type</code><code>d2_auszahl</code><code>d2_az</code><code>d2_at</code></div></div>
+
+  <div class="grp"><h3>Bausparvertrag</h3><p class="gd">Bausparsumme, Rate, Zuteilung, Zins, Mindestquote, Darlehenskonditionen.</p>
+    <div class="keys"><code>bspar_inst</code><code>bspar_vertrag</code><code>bspar_sum</code><code>bspar_rate</code><code>bspar_zuteil</code><code>bspar_zins</code><code>bspar_quote_min</code><code>bspar_dar_z</code><code>bspar_dar_t</code></div></div>
+
+  <div class="grp"><h3>Vergleichsobjekte</h3><p class="gd">Bis zu vier Vergleichspreise mit Label.</p>
+    <div class="keys"><code>kp1</code><code>kp1l</code><code>kp2</code><code>kp2l</code><code>kp3</code><code>kp3l</code><code>kp4</code><code>kp4l</code></div></div>
+
+  <div class="grp"><h3>Steuer</h3><p class="gd">AfA-Satz, Gebäudeanteil, zu versteuerndes Einkommen, Grenzsteuersatz, Werbungskosten-Übernahme.</p>
+    <div class="keys"><code>afa_satz</code><code>geb_ant</code><code>zve</code><code>grenz</code><code>san_tax_active</code><code>san_tax_years</code><code>moebl_tax_active</code><code>moebl_tax_years</code></div></div>
+
+  <div class="grp"><h3>DealScore 2.0</h3><p class="gd">Zusatzangaben für den erweiterten Deal-Score.</p>
+    <div class="keys"><code>ds2_zustand</code><code>ds2_energie</code><code>ds2_mietausfall</code><code>ds2_marktmiete</code><code>ds2_bevoelkerung</code><code>ds2_nachfrage</code><code>ds2_marktfaktor</code><code>ds2_wertsteigerung</code><code>ds2_entwicklung</code></div></div>
+
+  <div class="grp"><h3>Qualität &amp; Zustand</h3><p class="gd">Sterne- und Qualitätsbewertung je Gewerk.</p>
+    <div class="keys"><code>rate_kueche</code><code>rate_bad</code><code>rate_boden</code><code>rate_fenster</code><code>qual_kueche</code><code>qual_bad</code><code>qual_boden</code><code>qual_fenster</code></div></div>
+
+  <div class="grp"><h3>Ausstattung (für Marktbewertung)</h3><p class="gd">Ausstattungsdetails für die AVM-Bewertung.</p>
+    <div class="keys"><code>eq_heating</code><code>eq_windows</code><code>eq_floor</code><code>eq_bath</code><code>eq_guest_wc</code><code>eq_store_room</code><code>eq_walls</code><code>eq_roof</code><code>eq_elevator</code></div></div>
+
+  <div class="grp"><h3>Mandant &amp; Halter</h3><p class="gd">Wer das Objekt hält und — bei Überführung in eine Gesellschaft — die steuerlich relevanten Eckwerte.</p>
+    <table>
+      <tr><th>Feld</th><th>Bedeutung</th></tr>
+      <tr><td><code>halter</code></td><td>ID des haltenden Mandanten (<code>privat</code> oder eine Gesellschaft)</td></tr>
+      <tr><td><code>obj_herkunft</code></td><td><code>neukauf</code> oder <code>ueberfuehrung</code></td></tr>
+      <tr><td><code>halter_seit</code></td><td>Stichtag des Halterwechsels (Cut Privat → Gesellschaft)</td></tr>
+      <tr><td><code>verkehrswert_ueberf</code></td><td>Verkehrswert als AfA-Bemessungsgrundlage der Gesellschaft</td></tr>
+      <tr><td><code>ueberf_preis</code></td><td>Überführungspreis (Grunderwerbsteuer-Basis)</td></tr>
+      <tr><td><code>gesellschafterdarlehen</code></td><td>Gesellschafterdarlehen (z.B. gestundeter Kaufpreis)</td></tr>
+    </table></div>
+
+  <div class="grp"><h3>Intern &amp; Integrationen</h3><p class="gd">Felder aus externen Anbindungen und gespeicherte Modul-Zustände.</p>
+    <div class="keys"><code>erwerbsart</code><code>anbietertyp</code><code>_immometrica_id</code><code>_immometrica_online_since</code><code>_immometrica_portals</code><code>_avm_state</code><code>_mb_state</code></div></div>
+
+  <h2 id="fehler"><span class="num">06</span>Fehler &amp; Limits</h2>
+  <table>
+    <tr><th>Status</th><th>Bedeutung</th></tr>
+    <tr><td><code>401</code></td><td>Kein, ungültiger oder widerrufener Key</td></tr>
+    <tr><td><code>403</code></td><td>Konto kein Pro / deaktiviert</td></tr>
+    <tr><td><code>404</code></td><td>Objekt nicht gefunden (oder nicht deins)</td></tr>
+    <tr><td><code>429</code></td><td>Rate-Limit überschritten (120/min)</td></tr>
+  </table>
+  <p>Fehler kommen als JSON: <code>{ "error": "…" }</code></p>
+
+  <h2 id="beispiele"><span class="num">07</span>Beispiele</h2>
+  <pre><span class="c"># Objekt anlegen</span>
+curl -X POST -H "X-API-Key: dpk_live_DEIN_KEY" -H "Content-Type: application/json" \
+  -d '{"name":"Beispielstraße 1","data":{"kp":250000,"nkm":980,"d1":200000,"d1z":3.8}}' \
+  https://app.dealpilot.junker-immobilien.io/api/v1/objects
+
+<span class="c"># Miete aktualisieren</span>
+curl -X PUT -H "X-API-Key: dpk_live_DEIN_KEY" -H "Content-Type: application/json" \
+  -d '{"data":{"nkm":1050}}' \
+  https://app.dealpilot.junker-immobilien.io/api/v1/objects/OBJEKT_ID
+
+<span class="c"># Objekt einer Gesellschaft zuweisen</span>
+curl -X PUT -H "X-API-Key: dpk_live_DEIN_KEY" -H "Content-Type: application/json" \
+  -d '{"data":{"halter":"MANDANT_ID","obj_herkunft":"ueberfuehrung"}}' \
+  https://app.dealpilot.junker-immobilien.io/api/v1/objects/OBJEKT_ID
+
+<span class="c"># Objekt löschen</span>
+curl -X DELETE -H "X-API-Key: dpk_live_DEIN_KEY" \
+  https://app.dealpilot.junker-immobilien.io/api/v1/objects/OBJEKT_ID</pre>
+
+  <footer>
+    DealPilot API · Junker Group UG · Fragen an <a href="mailto:dealpilot@junker-immobilien.io">dealpilot@junker-immobilien.io</a><br>
+    Endpunkte v1 · voller CRUD-Zugriff für Pro-Konten · <code>data</code> ist voll durchlässig.
+  </footer>
+</div>
+</body>
+</html>

@@ -37,7 +37,9 @@ var FIELDS = [
   'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years',
   'erwerbsart','anbietertyp','_immometrica_id','_immometrica_online_since','_immometrica_portals',
   /* v727-ausst: Ausstattungsdetails fuer AVM-Bewertung (Sprengnetter-Enums als Wert) */
-  'eq_heating','eq_windows','eq_floor','eq_bath','eq_guest_wc','eq_store_room','eq_walls','eq_roof','eq_elevator'
+  'eq_heating','eq_windows','eq_floor','eq_bath','eq_guest_wc','eq_store_room','eq_walls','eq_roof','eq_elevator',
+  /* mand-fields v803: Mandanten/Halter + Überführung */
+  'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen'
 ];
 
 var _currentObjKey = null;  // Local mode key OR API object id
@@ -2011,9 +2013,6 @@ async function showPortfolioDetail() {
           }).join('') +
         '</tbody>' +
       '</table>' +
-      '<div style="margin-top:16px;text-align:right">' +
-        '<button class="btn btn-outline" onclick="exportPortfolioCSV()">📊 Portfolio-CSV exportieren</button>' +
-      '</div>' +
     '</div>';
   document.body.appendChild(modal);
 }

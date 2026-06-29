@@ -111,6 +111,7 @@ app.use('/api/v1/tax-periods', require('./routes/taxPeriods'));  // V259-02: Ste
 // V194: Admin-Dashboard
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/credits', creditsRoutes);  // V197
+app.use('/api/v1/api-keys', require('./routes/apiKeys'));  // mand v807-api-keys
 app.use('/api/v1/avm', avmRoutes);  // V326: AVM-Integration
 app.use('/api/v1/immometrica', require('./routes/immometrica'));  // v655: ImmoMetrica
 app.use('/api/v1/marktbericht', marktberichtRoutes);  // v539: Marktbericht-Proxy

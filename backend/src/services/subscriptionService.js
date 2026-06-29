@@ -53,7 +53,12 @@ async function getCurrentSubscription(userId) {
  */
 function isActive(sub) {
   if (!sub) return false;
-  if (['active', 'trialing'].includes(sub.status)) return true;
+  if (sub.status === 'active') return true;
+  if (sub.status === 'trialing') {
+    /* mand v811: Pro-Test laeuft am trial_end (bzw. current_period_end) automatisch aus */
+    var _until = sub.trial_end || sub.current_period_end;
+    return !_until || new Date() < new Date(_until);
+  }
   if (sub.status === 'past_due') {
     // Grace period: allow access for 7 days after period end
     if (sub.current_period_end) {
@@ -69,6 +74,25 @@ function isActive(sub) {
  * Get the EFFECTIVE plan for a user. If subscription is canceled/expired, falls back to free.
  */
 async function getEffectivePlan(userId) {
+  /* mand v811b: aktiver Pro-Test ueberschreibt den realen Plan voruebergehend.
+     Die echte subscriptions-Zeile bleibt unangetastet -> nach Ablauf gilt sie wieder. */
+  try {
+    const _t = await query("SELECT granted_plan FROM plan_trials WHERE user_id=$1 AND revoked_at IS NULL AND expires_at > NOW() ORDER BY expires_at DESC LIMIT 1", [userId]);
+    if (_t.rowCount) {
+      const _tp = await planService.getPlan(_t.rows[0].granted_plan);
+      if (_tp) {
+        return {
+          plan_id: _tp.id, plan_name: _tp.name, plan_features: _tp.features,
+          status: 'trialing', cancel_at_period_end: false,
+          max_objects: _tp.max_objects, max_users: _tp.max_users,
+          max_ai_analyses_monthly: _tp.max_ai_analyses_monthly,
+          max_pdf_exports_monthly: _tp.max_pdf_exports_monthly,
+          max_photo_uploads_per_object: _tp.max_photo_uploads_per_object,
+          trial: true
+        };
+      }
+    }
+  } catch (_e) { /* Tabelle evtl. noch nicht da -> normal weiter */ }
   const sub = await getCurrentSubscription(userId);
   if (sub.synthetic) return sub; // already free
   if (isActive(sub)) return sub;

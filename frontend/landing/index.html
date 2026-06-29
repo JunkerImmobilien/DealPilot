@@ -2873,6 +2873,59 @@ html { scroll-behavior: smooth; }
      PRICING — vollständige Plan-Vergleich-Tabelle
      1:1 aus DealPilotConfig.pricing (V146)
 ═══════════════════════════════════════════════════ -->
+<!-- v812: API-Section -->
+<style>
+.dpapi-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;margin-top:8px}
+.dpapi-points ul{list-style:none;margin:0 0 26px;padding:0;display:grid;gap:13px}
+.dpapi-points li{display:flex;gap:12px;align-items:flex-start;font-size:15px;color:var(--muted)}
+.dpapi-points li .ck{flex:0 0 auto;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(63,165,108,.16);color:#5cc78a;font-size:11px;margin-top:2px}
+.dpapi-points li b{color:var(--text)}
+.dpapi-cta{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(110deg,#e8c878,#C9A84C 55%,#A8861E);color:#1a1407;font-weight:700;font-size:15px;padding:14px 24px;border-radius:11px;box-shadow:0 8px 24px rgba(201,168,76,.22);transition:transform .15s}
+.dpapi-cta:hover{transform:translateY(-1px)}
+.dpapi-hint{margin:14px 0 0;font-size:12.5px;color:var(--dim)}
+.dpapi-hint code{color:var(--muted)}
+.dpapi-term{background:#0c0c0c;border:1px solid var(--gold-border);border-radius:16px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+.dpapi-term .bar{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--border);background:#0f0f0f}
+.dpapi-term .bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.dpapi-term .bar i:nth-child(1){background:#e0625c}.dpapi-term .bar i:nth-child(2){background:#e3b341}.dpapi-term .bar i:nth-child(3){background:#3fa56c}
+.dpapi-term .bar span{margin-left:8px;font:600 12px/1 'JetBrains Mono',monospace;color:var(--dim)}
+.dpapi-term pre{margin:0;padding:20px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;color:var(--text);overflow-x:auto;white-space:pre}
+.dpapi-term .c{color:var(--dim)}.dpapi-term .k{color:var(--gold-bright)}.dpapi-term .s{color:#7fb98a}
+@media(max-width:820px){.dpapi-grid{grid-template-columns:1fr;gap:30px}}
+</style>
+<section class="section dpapi" id="api">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">// Schnittstelle</span>
+      <h2 class="section-title">Deine Objekte. <span class="accent">Deine API.</span></h2>
+      <p class="section-lead">Verbinde DealPilot mit deinen eigenen Tools — Objekte automatisiert anlegen, Bestand synchronisieren, alle Kennzahlen ins eigene Reporting ziehen. Voller CRUD über eine saubere REST-Schnittstelle, enthalten im Pro-Plan.</p>
+    </div>
+    <div class="dpapi-grid">
+      <div class="dpapi-points">
+        <ul>
+          <li><span class="ck">✓</span><span><b>Voller CRUD-Zugriff</b> — Objekte lesen, anlegen, ändern, löschen.</span></li>
+          <li><span class="ck">✓</span><span><b>Alle Datenfelder</b> — Kaufpreis, Finanzierung, Steuer, Halter — lückenlos.</span></li>
+          <li><span class="ck">✓</span><span><b>Sicher &amp; abgegrenzt</b> — Key-Auth, nur dein Bestand, rate-limitiert.</span></li>
+          <li><span class="ck">✓</span><span><b>In Sekunden startklar</b> — Key in den Einstellungen erzeugen, los.</span></li>
+        </ul>
+        <a class="dpapi-cta" href="/api-docs.html">Zur API-Dokumentation →</a>
+        <p class="dpapi-hint">Enthalten im Pro-Plan · Header <code>X-API-Key</code> · Basis-URL <code>/api/v1</code></p>
+      </div>
+      <div class="dpapi-term" aria-hidden="true">
+        <div class="bar"><i></i><i></i><i></i><span>terminal — dealpilot</span></div>
+<pre><span class="c"># Neues Objekt anlegen</span>
+curl -X POST <span class="k">…/api/v1/objects</span> \
+  -H <span class="s">"X-API-Key: dpk_live_…"</span> \
+  -d <span class="s">'{"name":"Beispielstr. 1",
+       "data":{"kp":250000,"nkm":980}}'</span>
+
+<span class="c"># Antwort</span>
+{ <span class="k">"ok"</span>: true, <span class="k">"id"</span>: <span class="s">"obj_a1b2c3"</span> }</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section pricing" id="pricing">
   <div class="container">
     <div class="section-head">

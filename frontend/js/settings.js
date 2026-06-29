@@ -171,6 +171,7 @@ function showSettings(initialTab) {
         '<button class="st-tab ms-tab" data-tab="profilanzeige" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-target"/></svg></span>Profil &amp; Anzeige</button>' +
         '<button class="st-tab ms-tab" data-tab="datenraum" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-share"/></svg></span>Datenraum</button>' +
         '<button class="st-tab ms-tab" data-tab="anbieter" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-share"/></svg></span>Externe Anbieter</button>' +
+        '<button class="st-tab ms-tab" data-tab="mandanten" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-home"/></svg></span>Mandanten</button>' +
         // V63.57: Daten-Tab entfernt — Import/Export jetzt direkt aus der Sidebar
         '<button class="st-tab ms-tab" data-tab="plan" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-star"/></svg></span>Plan</button>' +
         '<button class="st-tab ms-tab" data-tab="info" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-info"/></svg></span>Info</button>' +
@@ -225,17 +226,8 @@ function showSettings(initialTab) {
           '<div class="f"><label>USt-IdNr.</label><input id="set_user_uid" type="text" value="' + _esc(view.user_uid) + '" placeholder="DE123456789"></div>' +
         '</div>' +
 
-        // Plan-Anzeige (read-only mit Link zum Plan-Tab)
-        '<hr class="dvd">' +
-        '<h3 class="set-section-h">Aktueller Plan</h3>' +
-        '<div class="account-plan-box plan-box">' +
-          '<div class="account-plan-name-wrap">' +
-            '<div class="account-plan-name pl-name" id="account-plan-name"><span class="ic"><svg width="14" height="14"><use href="#i-star"/></svg></span>' + _esc(_getCurrentPlanLabel()) + '</div>' +
-            '<div class="account-plan-meta pl-meta" id="account-plan-meta">' + _getCurrentPlanMeta() + '</div>' +
-          '</div>' +
-          '<button type="button" class="account-plan-link btn btn-ghost" onclick="closeSettings(); if(typeof openPricingModal===\'function\') openPricingModal();">Plan ändern <span class="ic"><svg width="12" height="12"><use href="#i-chevr"/></svg></span></button>' +
-        '</div>' +
-
+        // v810: Plan-Anzeige entfernt (eigener Plan-Reiter links). Anker fuer das API-Panel:
+        '<div id="dp-apikey-host"></div>' +
         // Passwort ändern Block (nur API-Mode)
         (typeof Auth !== 'undefined' && Auth.isApiMode && Auth.isApiMode() ?
           '<hr class="dvd">' +
@@ -595,6 +587,10 @@ function showSettings(initialTab) {
       '</div>' +
 
       // V63.78: "Profil & Anzeige" — vereint Investmentprofil + Anzeige-Toggles
+      '<div class="st-pane" data-pane="mandanten" style="display:none">' +
+        '<div id="mand-settings-host"><!-- mand v803: lazy --></div>' +
+      '</div>' +
+
       '<div class="st-pane" data-pane="datenraum" style="display:none">' +
         '<h2 class="set-section-h2">Datenraum</h2>' +
         '<div id="dr-settings-host"><!-- wird beim Tab-Wechsel befüllt --></div>' +
@@ -919,6 +915,14 @@ function _swSet(btn) {
     if (apHost) { apHost.innerHTML = window.DealPilotProviderKeys.renderPane(); window.DealPilotProviderKeys.afterRender(); }
   }
 
+
+  // mand v803: Mandanten-Pane lazy rendern
+  if (pane === 'mandanten') {
+    if (window.DealPilotMandanten) {
+      var mandHost = document.getElementById('mand-settings-host');
+      if (mandHost) mandHost.innerHTML = window.DealPilotMandanten.renderSettingsTab();
+    }
+  }
 
   // V140: Datenraum-Pane lazy rendern
   if (pane === 'datenraum') {
