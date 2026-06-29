@@ -43,7 +43,7 @@
       // V278: Mapping snapshots[] -> objects[] fuer Backwards-Compat
       if (_cache && Array.isArray(_cache.snapshots)) {
         _cache.objects = _cache.snapshots.map(function(s){
-          return { id: s.object_id, address: s.address, purchase_date: s.purchase_date, status: 'won', wk_per_year: s.wk_per_year || {} };
+          return { id: s.object_id, address: s.address, purchase_date: s.purchase_date, status: 'won', wk_per_year: s.wk_per_year || {}, halter: s.halter || 'privat' /* v813-3c */ };
         });
         _cache.totals_per_year = {};
         _cache.snapshots.forEach(function(s){

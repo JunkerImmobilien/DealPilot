@@ -860,6 +860,17 @@ function _calcImmediate(){
   } else {
     afa_geb_basis = kp * (v('geb_ant') / 100);
   }
+  /* v813-3a: bei Ueberfuehrung haengt die AfA an der neuen Bemessungsgrundlage = Verkehrswert,
+     nicht am alten Kaufpreis. Skalierung erhaelt Kuechen-/NK-Proportionalitaet. */
+  try {
+    if (g('obj_herkunft') === 'ueberfuehrung') {
+      var _vwUe = v('verkehrswert_ueberf');
+      if (_vwUe > 0) {
+        if (kp > 0) afa_geb_basis = afa_geb_basis * (_vwUe / kp);
+        else afa_geb_basis = _vwUe * (v('geb_ant') / 100 || 0.80);
+      }
+    }
+  } catch (_e) {}
 
   // V227: § 7b Eligibility prüfen
   var sonder7bGueltig = (typeof window.afaSonder7bIsValid === 'function') ? window.afaSonder7bIsValid() : false;
@@ -1002,6 +1013,18 @@ function _calcImmediate(){
   st('ul_sum',fE(ul));st('nul_sum',fE(nul));st('r-ul',fE(ul));st('r-nul',fE(nul));
   st('r-bwk',fE(bwk));st('r-bwk-pct',nkm_j>0?fP(bwk/nkm_j*100,1):'—');st('r-hg-ges',fE(v('hg_ul')+v('hg_nul')));
   var d1=v('d1'),d1z=v('d1z')/100;
+  /* v813-3d: bei Ueberfuehrung uebernimmt die Gesellschaft die Restschuld als Darlehen.
+     Laeuft danach als ganz normale Finanzierung weiter (DSCR bleibt Dscr.compute()). */
+  try {
+    if (g('obj_herkunft') === 'ueberfuehrung') {
+      var _urs = v('ueberf_restschuld');
+      if (_urs > 0) {
+        d1 = _urs;
+        var _urz = v('ueberf_rest_zins');
+        if (_urz > 0) d1z = _urz / 100;
+      }
+    }
+  } catch (_e) {}
   // V63.49: Bei Tilgungsaussetzung wird Tilgung als 0 angesetzt — parallel läuft
   // ein Bausparvertrag der die Restschuld am Zuteilungsdatum ablöst.
   // Die Bausparrate fließt als Liquiditätsabfluss in den Cashflow.
@@ -1224,6 +1247,29 @@ function _calcImmediate(){
   /* mand v804: Halter-Regime — Privat/GbR = grenz (1:1 wie heute), GmbH/UG = KSt(+GewSt), KEINE Erstattung bei Verlust */
   var _mandRate = (function(){ try{ if(window.DealPilotMandanten && DealPilotMandanten.effRate){ var _r=DealPilotMandanten.effRate(); return (_r!=null && isFinite(_r)) ? _r : null; } }catch(_e){} return null; })();
   function _mtx(base){ return (_mandRate!=null) ? (Math.max(0, base) * _mandRate) : (base * grenz); }
+  /* v813-3b: Stichtag-Schnitt im Ueberfuehrungsjahr. Faellt fuer JEDEN anderen Fall
+     (Neukauf, kein Stichtag, Privat-Halter) exakt auf _mtx zurueck -> kein Verhaltenswechsel. */
+  function _mtxYear(base, calYear){
+    try {
+      if (g('obj_herkunft') === 'ueberfuehrung' && _mandRate != null) {
+        var _hs = g('halter_seit');
+        if (_hs && /^\d{4}-\d{2}-\d{2}$/.test(_hs) && typeof calYear === 'number') {
+          var _hy = parseInt(_hs.slice(0,4), 10);
+          var _hm = parseInt(_hs.slice(5,7), 10);
+          if (calYear < _hy) return base * grenz;       /* noch privat: ESt */
+          if (calYear > _hy) return _mtx(base);          /* GmbH: KSt */
+          /* Stichtagsjahr: anteilig Privat (vor Stichtag) + GmbH (ab Stichtag) */
+          var _gf = (_hm >= 1 && _hm <= 12) ? (13 - _hm) / 12 : 1;  /* GmbH-Anteil ab Stichtagsmonat */
+          var _pf = 1 - _gf;                                        /* Privat-Anteil davor */
+          var _taxPrivat = (base * _pf) * grenz;                    /* ESt-Seite (Erstattung moeglich) */
+          var _taxGmbh   = Math.max(0, base * _gf) * _mandRate;     /* KSt-Seite (kein Negativwert) */
+          return _taxPrivat + _taxGmbh;
+        }
+      }
+    } catch (_e) {}
+    return _mtx(base);
+  }
+  var _calYearBase = (function(){ try { if (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear){ var _y = DealPilotAnteilig.getBaseYear(); if (_y) return _y; } } catch(_e){} return (new Date()).getFullYear(); })();
   var zins_j=(d1_zm+d2_zm)*12, tilg_j=(d1_tm+d2_tm)*12;
   // V63.49: Bei Tilgungsaussetzung läuft parallel eine Bausparrate als Sparbeitrag.
   // Der ist KEIN steuerlich abziehbarer Aufwand, aber ein Liquiditätsabfluss —
@@ -1237,7 +1283,7 @@ function _calcImmediate(){
   // cf_operativ wird intern für Steuerbemessung gebraucht (Tilgung steuerlich nicht abziehbar).
   var cf_operativ = nkm_j - bwk_cf - zins_j;          // intern: vor Tilg, für Steuer
   var zve_immo = cf_operativ - afa;
-  var steuer   = _mtx(zve_immo);
+  var steuer   = _mtxYear(zve_immo, _calYearBase);
   // Öffentliche Werte: alle nach Tilgung (Banker) und nach BSV-Sparrate
   var cf_op = cf_operativ - tilg_j - bspar_y;          // CF v.St. NACH Tilgung & BSV
   var cf_ns = cf_op - steuer;                          // CF n.St. NACH Tilgung & BSV
@@ -1418,7 +1464,7 @@ function _calcImmediate(){
       }
     }
     var cf_y_op=nkm_y-bwk_cf_y-zy;
-    var tax_y_loop = _mtx(cf_y_op-afa);
+    var tax_y_loop = _mtxYear(cf_y_op-afa, _calYearBase + y - 1);
     // V63.58: BSV-Sparrate ist CF-Abfluss (gebundenes Geld), gehört in CF-Berechnung
     var cf_y_ns=cf_y_op-tax_y_loop-bspar_y_loop;
     cfkum+=cf_y_ns;
@@ -2188,7 +2234,7 @@ function _calcImmediate(){
     // Begründung: Vorher griff in der Projektion das Yearly-Total mit potenziell anderen Schuldzinsen
     // (z.B. nach Anschluss-Phase) oder unfertigen cfRows-Daten → produzierte inkonsistente Werte.
     // Nun ist Frontend Cashflow-Vergleich-Heute, Cashflow-Projektion und PDF überall identisch.
-    var taxEffect_y = _mtx(cfop_y_operativ - afa);
+    var taxEffect_y = _mtxYear(cfop_y_operativ - afa, _v268_baseYear + y - 1);
     var cfns_y = cfop_y - taxEffect_y;                     // V63.40: nach Tilgung, BSV & Steuer
     // V63.65: Wertsteigerung ausgehend vom besten Wert-Anker (svw > bankval > kp)
     // V63.83 KOMMENTAR: wert_y zeigt Stand ANFANG Jahr y → Jahr 1 = heute = ^0
@@ -2340,7 +2386,7 @@ function _calcImmediate(){
     if (_v353_anteilig_hit || _v354_d2_active) {
       cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
       cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
-      taxEffect_y     = _mtx(cfop_y_operativ - afa);
+      taxEffect_y     = _mtxYear(cfop_y_operativ - afa, _v268_baseYear + y - 1);
       cfns_y          = cfop_y - taxEffect_y;
       // eq_y/ltv_y mit aktueller kombinierter RS aktualisieren (rs3_d2 ggf. Y1-reduziert)
       var _rs_comb2 = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);

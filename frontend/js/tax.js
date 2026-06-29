@@ -465,6 +465,11 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
       if (_mandCorp && DealPilotMandanten.effRate) _mandRate = DealPilotMandanten.effRate(_hid);
     }
   } catch (_eM) {}
+  /* v814-A: persoenliche ESt-Sektion bei GmbH/UG ausblenden (Koerperschaft hat keine persoenliche ESt) */
+  try {
+    var _persCard = document.getElementById('tax-personal-card');
+    if (_persCard) _persCard.style.display = _mandCorp ? 'none' : '';
+  } catch (_e814) {}
 
   var refundColor = impact.refund > 0 ? 'var(--green)' : 'var(--red)';
   var refundLabel = impact.refund > 0 ? 'Steuer-Erstattung' : 'Steuer-Nachzahlung';
@@ -582,13 +587,45 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
     box.innerHTML =
       '<div class="tax-grid">' +
         '<div class="tax-item" style="grid-column:1/-1;background:#1b1408;border-color:var(--gold-d)"><div class="tax-label" style="color:var(--gold-h)">Halter \u00b7 ' + (_mandName || 'Gesellschaft') + '</div><div class="tax-val" style="color:var(--gold-h)">K\u00f6rperschaftsteuer-Regime \u00b7 ' + _rateTxt + '</div></div>' +
+        /* v814-B */ '<div class="tax-item" style="grid-column:1/-1;background:transparent;border-color:rgba(201,168,76,0.15)"><div class="tax-label" style="font-size:12px;color:var(--muted)">Halter wechseln</div><div class="tax-val" style="font-size:12px"><a href="#" onclick="if(typeof showSettings===&quot;function&quot;)showSettings();return false" style="color:var(--gold-d);text-decoration:underline">In den Einstellungen &rarr;</a></div></div>' +
         '<div class="tax-item"><div class="tax-label">Einnahmen V+V</div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
         '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt</div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
         '<div class="tax-item tax-highlight" style="grid-column:1/-1"><div class="tax-label">Beitrag zum GmbH-Ergebnis (' + displayYear + ')</div><div class="tax-val" style="color:' + _ergCol + '">' + fE(_erg, 0, true) + '</div></div>' +
         '<div class="tax-item"><div class="tax-label">K\u00f6rperschaftsteuer-Satz</div><div class="tax-val">' + _rateTxt + '</div></div>' +
         '<div class="tax-item tax-result"><div class="tax-label">K\u00f6rperschaftsteuer (dieses Objekt)</div><div class="tax-val" style="color:' + (_erg >= 0 ? 'var(--red)' : 'var(--green)') + ';font-size:20px">' + (_erg >= 0 ? '\u2212' + fE(_kst, 0) : '0 \u20ac') + '</div></div>' +
         (_erg < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlust</div><div class="tax-val" style="color:var(--green)">keine Erstattung \u00b7 Verlustvortrag ins Folgejahr</div></div>' : '') +
-        '<div class="tax-item" style="grid-column:1/-1;background:transparent;border-color:rgba(201,168,76,0.15)"><div class="tax-label" style="font-style:italic;color:var(--muted)">Hinweis</div><div class="tax-val" style="font-size:12px;color:var(--muted);font-weight:400">Die endg\u00fcltige KSt rechnet die Gesellschaft \u00fcber ALLE ihre Objekte (Verluste verrechnen sich). Mandanten-Steuerakte folgt.</div></div>' +
+        (function(){  /* v813-3c: echte Mandanten-Steuerakte (KSt ueber alle Objekte der Gesellschaft) */
+          try {
+            var _curId = (window._currentObjId || (window.State && State.currentObjectId) || window._currentObjKey || null);
+            var _curHalter = null;
+            try { var _hs2 = document.getElementById('halter'); _curHalter = _hs2 ? _hs2.value : null; } catch(_e){}
+            if (!_curHalter || _curHalter === 'privat' || !window.DealPilotWKAggregator) return '';
+            var _all = DealPilotWKAggregator.getAllObjectsWithWK();
+            if (!Array.isArray(_all)) return '';
+            var _yk = String(displayYear);
+            var _sum = 0, _n = 0, _curInList = false;
+            _all.forEach(function(o){
+              if (!o || (o.halter || 'privat') !== _curHalter) return;
+              if (o.id === _curId) _curInList = true;
+              var _vv = (o.wk_per_year && typeof o.wk_per_year[_yk] === 'number') ? o.wk_per_year[_yk] : null;
+              if (o.id === _curId && _vv == null) _vv = _erg;
+              if (typeof _vv !== 'number') return;
+              _sum += _vv; _n++;
+            });
+            if (!_curInList) { _sum += _erg; _n++; }
+            var _kstGes = Math.max(0, _sum) * _mandRate;
+            var _sumCol = _sum >= 0 ? 'var(--gold-d)' : 'var(--green)';
+            return '<div class="tax-item" style="grid-column:1/-1;background:#140f06;border-color:var(--gold-d)">'
+                 +   '<div class="tax-label" style="color:var(--gold-h)">Mandanten-Steuerakte &middot; ' + (_mandName || 'Gesellschaft') + ' (' + _n + ' Objekt' + (_n === 1 ? '' : 'e') + ', ' + displayYear + ')</div>'
+                 +   '<div class="tax-val" style="color:' + _sumCol + '">Gesamt-Ergebnis ' + fE(_sum, 0, true) + '</div>'
+                 + '</div>'
+                 + '<div class="tax-item tax-result" style="grid-column:1/-1">'
+                 +   '<div class="tax-label">K&ouml;rperschaftsteuer der Gesellschaft (' + displayYear + ')</div>'
+                 +   '<div class="tax-val" style="color:' + (_sum >= 0 ? 'var(--red)' : 'var(--green)') + ';font-size:20px">' + (_sum >= 0 ? '&minus;' + fE(_kstGes, 0) : '0 &euro;') + '</div>'
+                 + '</div>'
+                 + (_sum < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Gesellschaft im Verlust</div><div class="tax-val" style="color:var(--green)">keine KSt &middot; Verlustvortrag</div></div>' : '');
+          } catch(_e) { return ''; }
+        })() +
       '</div>';
   }
 
@@ -662,6 +699,46 @@ function renderTaxTimeline() {
     };
   });
 
+  /* v814-C: bei GmbH/UG -> KSt-Jahresverlauf der Gesellschaft statt ESt-Erstattung */
+  var _tlCorp = false, _tlRate = null;
+  try {
+    var _th = document.getElementById('halter'); var _thid = _th ? _th.value : 'privat';
+    if (window.DealPilotMandanten && DealPilotMandanten.get) {
+      var _tm = DealPilotMandanten.get(_thid);
+      _tlCorp = !!(_tm && DealPilotMandanten.isCorp && DealPilotMandanten.isCorp(_tm.rechtsform));
+      if (_tlCorp && DealPilotMandanten.effRate) _tlRate = DealPilotMandanten.effRate(_thid);
+    }
+  } catch (_e) {}
+  var _tlHdr = document.getElementById('tax-timeline-header');
+  if (_tlCorp && _tlRate != null) {
+    if (_tlHdr) _tlHdr.innerHTML = '<span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>K&ouml;rperschaftsteuer-Verlauf der Gesellschaft';
+    var _activeY = State._taxDisplayYear || new Date().getFullYear();
+    var chtml = '<div class="tax-tl-grid">';
+    var sumKst = 0;
+    timeline.forEach(function(t){
+      var kst = Math.max(0, t.immoResult) * _tlRate;
+      sumKst += kst;
+      var hasKst = kst > 0.5;
+      var color = hasKst ? 'var(--red)' : 'var(--green)';
+      var bg = hasKst ? 'rgba(201,76,76,0.1)' : 'rgba(42,154,90,0.1)';
+      var isA = (t.year === _activeY);
+      var aStyle = isA ? ';outline:2px solid var(--gold,#C9A84C);outline-offset:1px;box-shadow:0 2px 8px rgba(201,168,76,0.3)' : '';
+      chtml += '<div class="tax-tl-bar tax-tl-clickable" style="background:' + bg + ';border-left-color:' + color + ';cursor:pointer;transition:all 0.15s' + aStyle + '" '
+        + 'onclick="if(typeof renderTaxModule===&quot;function&quot;){renderTaxModule(' + t.year + ');var b=document.getElementById(&quot;tax-result-box&quot;);if(b)b.scrollIntoView({behavior:&quot;smooth&quot;,block:&quot;center&quot;});}" '
+        + 'title="Klick: Berechnung fuer ' + t.year + ' anzeigen">'
+        + '<div class="tax-tl-year">' + t.year + '</div>'
+        + '<div class="tax-tl-amount" style="color:' + color + '">' + (hasKst ? '&minus;' + Math.round(kst).toLocaleString('de-DE') + ' &euro;' : '0 &euro;') + '</div>'
+        + '<div class="tax-tl-label">' + (hasKst ? 'K&ouml;rperschaftsteuer' : 'kein KSt') + '</div>'
+        + '</div>';
+    });
+    chtml += '</div>';
+    chtml += '<div class="tax-tl-total"><span>Summe KSt &uuml;ber ' + timeline.length + ' Jahre:</span>'
+      + '<span style="color:var(--red);font-weight:700;font-size:18px">' + (sumKst > 0.5 ? '&minus;' + Math.round(sumKst).toLocaleString('de-DE') + ' &euro;' : '0 &euro;') + '</span></div>';
+    box.innerHTML = chtml;
+    return;
+  } else if (_tlHdr) {
+    _tlHdr.innerHTML = '<span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>Steuerverlauf &middot; Erstattung (gr&uuml;n) vs. Nachzahlung (rot)';
+  }
   // Render as visual timeline
   var html = '<div class="tax-tl-grid">';
   /* V270-cardClick: Klickbare Cards → laden Berechnung in Steuermodul oben */

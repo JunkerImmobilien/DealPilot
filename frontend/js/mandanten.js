@@ -157,10 +157,15 @@
   /* ===== Objekt-Felder: Ueberfuehrung ein/aus + %-Anzeige ===== */
   function wireObjectFields() {
     var herk = document.getElementById('obj_herkunft');
-    if (herk && !herk._mandWired) { herk._mandWired = true; herk.addEventListener('change', _syncUeberf); }
+    if (herk && !herk._mandWired) { herk._mandWired = true; herk.addEventListener('change', function(){ _syncUeberf(); try{ if(typeof calc==='function') calc(); }catch(e){} try{ if(typeof renderTaxModule==='function') renderTaxModule(); }catch(e){} }); }  /* v813-3d */
     ['ueberf_preis', 'verkehrswert_ueberf'].forEach(function (id) {
       var el = document.getElementById(id);
       if (el && !el._mandWired) { el._mandWired = true; el.addEventListener('input', _calcPct); }
+    });
+    /* v813-3d: Felder, die die Berechnung beeinflussen, loesen calc()+Steuer-Render aus */
+    ['verkehrswert_ueberf', 'ueberf_restschuld', 'ueberf_rest_zins'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && !el._mandCalcWired) { el._mandCalcWired = true; el.addEventListener('input', function(){ try{ if(typeof calc==='function') calc(); }catch(e){} try{ if(typeof renderTaxModule==='function') renderTaxModule(); }catch(e){} }); }
     });
     var hsel = document.getElementById('halter');
     if (hsel && !hsel._mandWired) {
@@ -172,11 +177,31 @@
     }
     _syncUeberf();
   }
+  /* v813-3d: Auto-Vorbelegung der uebernommenen Restschuld (A-Vorbelegung, ueberschreibbar). */
+  function _prefillRest() {
+    try {
+      var el = document.getElementById('ueberf_restschuld');
+      if (!el || el._mandPrefilled) return;
+      var cur = (el.value || '').trim();
+      if (cur !== '' && cur !== '0') return;  /* User hat schon was eingetragen */
+      var rs = 0;
+      try { if (window.State && typeof State.rs1 === 'number' && State.rs1 > 0) rs = State.rs1; } catch (_e) {}
+      if (!rs) { var d1el = document.getElementById('d1'); if (d1el) { var n = parseFloat(String(d1el.value).replace(/\./g, '').replace(',', '.')); if (isFinite(n) && n > 0) rs = n; } }
+      if (rs > 0) {
+        el.value = Math.round(rs).toLocaleString('de-DE');
+        el._mandPrefilled = true;
+        var h = document.getElementById('mand-rest-hint');
+        if (h) h.textContent = 'Vorschlag aus deiner Finanzierung, anpassbar';
+      }
+    } catch (_e) {}
+  }
+
   function _syncUeberf() {
     var herk = document.getElementById('obj_herkunft');
     var show = !!(herk && herk.value === 'ueberfuehrung');
     var nodes = document.querySelectorAll('.mand-ueberf');
     for (var i = 0; i < nodes.length; i++) { nodes[i].style.display = show ? '' : 'none'; }
+    if (show) _prefillRest();  /* v813-3d */
     _calcPct();
   }
   function _calcPct() {
