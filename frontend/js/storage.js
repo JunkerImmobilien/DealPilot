@@ -39,7 +39,9 @@ var FIELDS = [
   /* v727-ausst: Ausstattungsdetails fuer AVM-Bewertung (Sprengnetter-Enums als Wert) */
   'eq_heating','eq_windows','eq_floor','eq_bath','eq_guest_wc','eq_store_room','eq_walls','eq_roof','eq_elevator',
   /* mand-fields v803: Mandanten/Halter + Überführung */
-  'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen'
+  'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen',
+  /* v813-3d: uebernommene Restschuld bei Ueberfuehrung */
+  'ueberf_restschuld','ueberf_rest_zins'
 ];
 
 var _currentObjKey = null;  // Local mode key OR API object id

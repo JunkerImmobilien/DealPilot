@@ -927,7 +927,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
       <!-- v445-obj-reorder -->
       <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
-      <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div><!-- mand-halter-block v803 --><div class="f" data-mand><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><div class="f" data-mand><label>Herkunft</label><select id="obj_herkunft"><option value="neukauf">Neukauf</option><option value="ueberfuehrung">Überführung aus Privatbestand</option></select></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" placeholder="0"></div></div>
+      <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div><!-- mand-halter-block v803 --><div class="f" data-mand><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><div class="f" data-mand><label>Herkunft</label><select id="obj_herkunft"><option value="neukauf">Neukauf</option><option value="ueberfuehrung">Überführung aus Privatbestand</option></select></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8"></div>
       <div class="obj-extra-acc" id="obj-extra-toggle" role="button" tabindex="0" aria-expanded="false" style="grid-column:1/-1"><span class="obj-extra-chev" aria-hidden="true">▸</span><span class="obj-extra-acc-lbl">Weitere Objektdetails</span></div>
       <div id="obj-extra-wrap" class="obj-extra-wrap">
       <div class="f" data-v362-stammdaten><label>Zimmer</label><input id="zimmer" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
@@ -1540,7 +1540,7 @@ label.dp-required.qc-required::after {
     unter diesen Bereich.
   </div>
 
-  <div class="card" style="margin-top:14px">
+  <div class="card" id="tax-personal-card" style="margin-top:14px">
     <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-user"/></svg></span>Persönliche Steuer</div>
     <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
     <div class="g2">
@@ -1734,8 +1734,8 @@ label.dp-required.qc-required::after {
   </div>
 
   <!-- Steuerverlauf über die Jahre -->
-  <div class="card tax-module-card" style="margin-top:14px">
-    <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>Steuerverlauf · Erstattung (grün) vs. Nachzahlung (rot)</div>
+  <div class="card tax-module-card" id="tax-timeline-card" style="margin-top:14px">
+    <div class="ct ct-pro" id="tax-timeline-header"><span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>Steuerverlauf · Erstattung (grün) vs. Nachzahlung (rot)</div>
     <p class="hint" style="margin-bottom:10px">
       Verlauf über die ersten 15 Jahre. Verluste aus V+V mindern dein zvE → Erstattung. Mit fortschreitender Tilgung sinken die Schuldzinsen → irgendwann positives Ergebnis → Nachzahlung.
     </p>
@@ -2915,13 +2915,13 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=804"></script>
+  <script src="js/calc.js?v=813"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=805"></script>
+<script src="js/tax.js?v=814"></script>
 <script src="js/config.js?v=669"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
@@ -2939,7 +2939,7 @@ label.dp-required.qc-required::after {
   <script src="js/immometrica-qc.js?v=672"></script>
   <script src="js/modal-boarding-skin.js?v=672"></script>
   <script src="js/provider-keys.js?v=672"></script>
-  <script src="js/mandanten.js?v=809"></script>
+  <script src="js/mandanten.js?v=813"></script>
   <script src="js/apikeys.js?v=810"></script>
   <script src="js/settings.js?v=810"></script>
 <script src="js/pricing-modal.js?v=493-2"></script>
@@ -2955,7 +2955,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=773"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=808"></script>
+<script src="js/storage.js?v=813"></script>
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=720"></script>
 <script src="js/track-record.js?v=166"></script>

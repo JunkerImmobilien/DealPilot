@@ -25,7 +25,8 @@ router.get('/', async (req, res, next) => {
          ts.updated_at,
          o.name AS address,
          o.data->>'kaufdat' AS kaufdat,
-         o.data->>'wirtschaftlicher_uebergang' AS wirtschaftlicher_uebergang
+         o.data->>'wirtschaftlicher_uebergang' AS wirtschaftlicher_uebergang,
+         o.data->>'halter' AS halter  /* v813-3c-be */
        FROM tax_snapshots ts
        JOIN objects o ON o.id = ts.object_id
        WHERE ts.user_id = $1
@@ -38,6 +39,7 @@ router.get('/', async (req, res, next) => {
         object_id: row.object_id,
         address: row.address || '(ohne Adresse)',
         purchase_date: row.kaufdat || row.wirtschaftlicher_uebergang || null,
+        halter: row.halter || 'privat',  /* v813-3c-be */
         wk_per_year: row.wk_per_year || {},
         updated_at: row.updated_at
       })),
