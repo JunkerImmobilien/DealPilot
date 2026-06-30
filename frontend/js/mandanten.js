@@ -41,6 +41,7 @@
     var nodes = document.querySelectorAll('[data-mand]');
     for (var i = 0; i < nodes.length; i++) {
       if (nodes[i].classList && nodes[i].classList.contains('mand-ueberf')) continue; /* die steuert _syncUeberf */
+      if (nodes[i].getAttribute && nodes[i].getAttribute('data-halter-hide')) continue; /* v816e-applygate-skip: Halter bleibt aus */
       nodes[i].style.display = pro ? '' : 'none';
     }
     if (!pro) { var hsel = document.getElementById('halter'); if (hsel) { try { hsel.value = 'privat'; } catch (e) {} } }
@@ -107,7 +108,12 @@
   function renderHalterOptions() {
     var sel = document.getElementById('halter'); if (!sel) return;
     if (!_isPro()) { sel.innerHTML = '<option value="privat">Privat</option>'; sel.value = 'privat'; return; }
+    /* v816i-halter-persist: Wert aus geladenen Objektdaten holen, da loadData den select.value
+       setzt BEVOR die <option>s existieren -> Wert ginge sonst verloren. */
     var cur = sel.value;
+    if (!cur || cur === 'privat') {
+      try { var _od = window._currentObjData; if (_od && _od.halter) cur = _od.halter; } catch (e) {}
+    }
     sel.innerHTML = _state.list.map(function (m) {
       return '<option value="' + esc(m.id) + '">' + esc(m.name) + '</option>';
     }).join('');
@@ -126,25 +132,104 @@
     }).join('');
   }
   /* v815-sbchips: Mandanten-Switch in der Sidebar-Objektliste (#sb-mand-filter) */
+  /* v816f-filter-dropdown: Mandanten-Filter als Icon-Button + Dropdown (DealPilot-Stil). */
+  function _mandIco(c) {
+    if (c.id === '__all__') return 'i-layers';
+    if (c.id === 'privat' || c.rechtsform === 'privat') return 'i-user';
+    if (isCorp(c.rechtsform)) return 'i-building';
+    return 'i-user';
+  }
   function renderSidebarChips() {
     var host = document.getElementById('sb-mand-filter'); if (!host) return;
-    if (!_isPro() || !_state.list || _state.list.length <= 1) { host.innerHTML = ''; return; }
+    if (!_isPro() || !_state.list || _state.list.length <= 1) { host.innerHTML = ''; host.style.display = 'none'; return; }
+    host.style.display = '';
     var active = window._dpHalterFilter || '__all__';
-    var chips = [{ id: '__all__', name: 'Alle' }].concat(_state.list);
-    host.innerHTML = chips.map(function (c) {
-      var on = (c.id === active) ? ' mand-chip-on' : '';
-      return '<button type="button" class="mand-chip' + on + '" onclick="DealPilotMandanten.setFilter(\'' + c.id + '\')">' + esc(c.name) + '</button>';
+    var items = [{ id: '__all__', name: 'Alle', rechtsform: '__all__' }].concat(_state.list);
+    var filtered = (active !== '__all__');
+    var rows = items.map(function (c) {
+      var on = (c.id === active) ? ' active' : '';
+      return '<button type="button" class="sb-mand-item' + on + '" onclick="DealPilotMandanten.setFilter(\'' + c.id + '\')">' +
+               '<svg class="ic" width="15" height="15"><use href="#' + _mandIco(c) + '"/></svg>' + esc(c.name) +
+               '<svg class="chk" width="13" height="13"><use href="#i-check"/></svg></button>';
     }).join('');
+    /* Separator nach 'Alle' */
+    rows = rows.replace('</button>', '</button><div class="sb-mand-sep"></div>');
+    /* v816j: verwaiste body-Menues vor Neu-Aufbau entfernen */
+    try { var _orph = document.querySelectorAll('body > #sb-mand-menu, body > .sb-mand-menu'); for (var _o = 0; _o < _orph.length; _o++) { _orph[_o].parentNode.removeChild(_orph[_o]); } } catch (e) {}
+    host.innerHTML =
+      '<div class="sb-sort-toggle sb-mand-wrap">' +
+        '<button type="button" class="sb-sort-btn sb-mand-btn' + (filtered ? ' filtered' : '') + '" title="Nach Mandant filtern" onclick="DealPilotMandanten._toggleMandMenu(event)">' +
+          '<svg width="12" height="12"><use href="#i-building"/></svg><span class="sb-mand-dot"></span>' +
+        '</button>' +
+        '<div class="sb-mand-menu" id="sb-mand-menu">' +
+          '<div class="sb-mand-mhead">Mandant / Halter</div>' + rows +
+        '</div>' +
+      '</div>';
   }
+  function _positionMandMenu(m, btn) {
+    /* v816i-dropdown-body: Menue ans <body> haengen -> kein Vorfahre kann clippen/transparent machen. */
+    try {
+      if (m.parentElement !== document.body) { document.body.appendChild(m); }
+      var r = btn.getBoundingClientRect();
+      m.style.position = 'fixed';
+      m.style.top = (r.bottom + 6) + 'px';
+      var mw = m.offsetWidth || 172;
+      var left = r.right - mw;            /* rechtsbuendig zum Button */
+      if (left < 8) left = 8;
+      m.style.left = left + 'px';
+      m.style.right = 'auto';
+      m.style.zIndex = '99999';
+      m.style.background = '#100f0d';
+    } catch (_pe) {}
+  }
+  /* v816j-dropdown-close: alle (auch ans body gehaengte) Mandanten-Menues schliessen/entfernen. */
+  function _closeMandMenu() {
+    try {
+      var all = document.querySelectorAll('#sb-mand-menu, .sb-mand-menu');
+      for (var i = 0; i < all.length; i++) {
+        var el = all[i];
+        el.classList.remove('open');
+        /* am body verwaiste Menues ganz entfernen (renderSidebarChips baut frisch) */
+        if (el.parentElement === document.body) { try { el.parentNode.removeChild(el); } catch (e) {} }
+      }
+    } catch (e) {}
+  }
+  function _toggleMandMenu(e) {
+    if (e) { e.stopPropagation(); }
+    var m = document.getElementById('sb-mand-menu'); if (!m) return;
+    var btn = e && e.currentTarget ? e.currentTarget : document.querySelector('.sb-mand-btn');
+    var open = m.classList.toggle('open');
+    if (open && btn) { _positionMandMenu(m, btn); }
+    if (open && !_mandMenuDocBound) {
+      _mandMenuDocBound = true;
+      document.addEventListener('click', function _close() {
+        var mm = document.getElementById('sb-mand-menu'); if (mm) mm.classList.remove('open');
+      });
+      window.addEventListener('scroll', function () {
+        var mm = document.getElementById('sb-mand-menu'); if (mm) mm.classList.remove('open');
+      }, true);
+    }
+  }
+  var _mandMenuDocBound = false;
   /* v815-toggle: Checkbox 'Aus Privatbestand ueberfuehrt' treibt das versteckte obj_herkunft */
   function onUeberfToggle(checked) {
+    /* v816c-mandanten toggle-lock: Ueberfuehrung NUR ueber Wizard. */
     var h = document.getElementById('obj_herkunft');
-    if (h) h.value = checked ? 'ueberfuehrung' : 'neukauf';
-    try { _syncUeberf(); } catch (e) {}
-    try { if (typeof calc === 'function') calc(); } catch (e) {}
-    try { if (typeof renderTaxModule === 'function') renderTaxModule(); } catch (e) {}
+    var alreadyU = !!(h && h.value === 'ueberfuehrung');
+    var _cb = document.getElementById('mand_ueberf_cb');
+    if (checked && !alreadyU) {
+      if (_cb) _cb.checked = false;
+      if (typeof toast === 'function') toast('\u00dcberf\u00fchrung bitte \u00fcber \u201eDeal-Aktion \u2192 \u00dcberf\u00fchrung starten\u201c (oder Rechtsklick auf die Objektkarte).');
+      return;
+    }
+    if (!checked && alreadyU) {
+      if (_cb) _cb.checked = true;
+      if (typeof toast === 'function') toast('Eine bestehende \u00dcberf\u00fchrung hebst du \u00fcber \u201e\u00dcberf\u00fchrung aufheben\u201c auf.');
+      return;
+    }
   }
-  function setFilter(id) {  /* v815-setfilter */
+  function setFilter(id) {  /* v815-setfilter v816j */
+    try { _closeMandMenu(); } catch (e) {}   /* v816j: Menue schliessen bevor neu gerendert wird */
     window._dpHalterFilter = id;
     if (window.DealPilotDashboard && DealPilotDashboard.applyHalterFilter) { DealPilotDashboard.applyHalterFilter(id); }
     renderHalterChips();
@@ -223,8 +308,120 @@
     var _cb = document.getElementById('mand_ueberf_cb'); if (_cb) _cb.checked = show;  /* v815-cbsync */
     var nodes = document.querySelectorAll('.mand-ueberf');
     for (var i = 0; i < nodes.length; i++) { nodes[i].style.display = show ? '' : 'none'; }
+    /* v816c-mandanten readonly + v816g-field-polish: Felder nur ueber Wizard, dezent gesperrt */
+    var _roIds = ['verkehrswert_ueberf','ueberf_preis','halter_seit','gesellschafterdarlehen','ueberf_restschuld','ueberf_rest_zins','ueberf_ende'];
+    for (var _r = 0; _r < _roIds.length; _r++) {
+      var _el = document.getElementById(_roIds[_r]);
+      if (_el) {
+        /* v816i-readonly-normal: normale Schrift (schwarz, normal), nur nicht editierbar. */
+        if (show) { _el.setAttribute('readonly','readonly'); _el.style.background=''; _el.style.color=''; _el.style.opacity=''; _el.style.fontWeight=''; _el.style.cursor='not-allowed'; }
+        else { _el.removeAttribute('readonly'); _el.style.background=''; _el.style.color=''; _el.style.opacity=''; _el.style.fontWeight=''; _el.style.cursor=''; }
+      }
+    }
+    /* v816g-field-polish (b): Halter-select bei Ueberfuehrung sperren (zeigt Mandant-Namen). */
+    try {
+      var _hsel = document.getElementById('halter');
+      if (_hsel) {
+        var _endeEl2 = document.getElementById('ueberf_ende');
+        var _frozen = show || !!(_endeEl2 && (_endeEl2.value || '').trim());  /* GmbH ODER eingefrorenes Privat */
+        _hsel.disabled = _frozen;
+        _hsel.style.opacity = _frozen ? '0.72' : '';
+        _hsel.style.cursor = _frozen ? 'not-allowed' : '';
+      }
+    } catch (_he) {}
+    try { _renderUeberfBadge(); } catch (_e) {}
     if (show) _prefillRest();  /* v813-3d */
     _calcPct();
+  }
+  /* v816c-mandanten: beidseitige Kennung + Rueckgaengig (GmbH + Privat). */
+  function _fmtDe(d){ if(!d||!/^\d{4}-\d{2}-\d{2}$/.test(d)) return ''; var p=d.split('-'); return p[2]+'.'+p[1]+'.'+p[0]; }
+  function _renderUeberfBadge() {
+    /* v816e-hide-cb-privat: Checkbox-Block je nach Objekt-Typ steuern. */
+    try {
+      var _herk = document.getElementById('obj_herkunft');
+      var _isG = !!(_herk && _herk.value === 'ueberfuehrung');
+      var _endeEl = document.getElementById('ueberf_ende');
+      var _hasEnde = !!(_endeEl && (_endeEl.value || '').trim());
+      var _cb = document.getElementById('mand_ueberf_cb');
+      var _cbBox = _cb ? _cb.closest('.f') : null;
+      if (_cbBox) {
+        /* v816h-cb-only-ueberf: Checkbox NUR bei echter Ueberfuehrung (obj_herkunft=ueberfuehrung). */
+        if (_isG) { _cbBox.style.display = ''; if (_cb) { _cb.checked = true; _cb.disabled = true; } }      /* GmbH-ueberfuehrt: gesetzt+gesperrt */
+        else { _cbBox.style.display = 'none'; }                                                              /* alles andere (Privat, manuelle GmbH, normal): WEG */
+      }
+    } catch (_ce) {}
+    var host = document.getElementById('mand-ueberf-badge');
+    if (!host) {
+      var anchor = document.getElementById('mand_ueberf_cb');
+      var box = anchor ? anchor.closest('.f') : null;
+      if (box && box.parentNode) {
+        host = document.createElement('div'); host.id = 'mand-ueberf-badge';
+        host.setAttribute('data-mand',''); host.style.cssText = 'grid-column:1/-1;display:none';
+        box.parentNode.insertBefore(host, box.nextSibling);
+      }
+    }
+    if (!host) return;
+    var herk = document.getElementById('obj_herkunft');
+    var isGmbh = !!(herk && herk.value === 'ueberfuehrung');
+    var endeEl = document.getElementById('ueberf_ende');
+    var ende = endeEl ? _fmtDe(endeEl.value) : '';
+    var hasEnde = !!(endeEl && (endeEl.value || '').trim());
+    var BX = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(184,98,80,.08);border:1px solid rgba(184,98,80,.35);border-radius:10px;padding:10px 13px;margin:2px 0 4px';
+    var BTN = 'margin-left:auto;background:transparent;border:1px solid #B86250;color:#B86250;padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit';
+    if (isGmbh) {
+      host.style.display = '';
+      host.innerHTML = '<div style="'+BX+'"><span style="font-weight:700;color:#B86250;font-size:13px">\u2713 Aus Privatbestand \u00fcbernommen' + (ende ? ' \u00b7 l\u00e4uft bis ' + ende : '') + '</span><button type="button" onclick="if(window.DealPilotMandanten)DealPilotMandanten.undoUeberfuehrung()" style="'+BTN+'">\u00dcberf\u00fchrung aufheben</button></div>';
+      return;
+    }
+    if (hasEnde) {
+      host.style.display = '';
+      host.innerHTML = '<div style="'+BX+'"><span style="font-weight:700;color:#B86250;font-size:13px">\u2708 \u00dcberf\u00fchrt in Gesellschaft' + (ende ? ' \u00b7 eingefroren am ' + ende : '') + '</span><button type="button" onclick="if(window.DealPilotMandanten)DealPilotMandanten.undoUeberfuehrungFromPrivat()" style="'+BTN+'">\u00dcberf\u00fchrung aufheben</button></div>';
+      return;
+    }
+    host.style.display = 'none'; host.innerHTML = '';
+  }
+  /* Aufheben vom GmbH-Objekt aus: GmbH loeschen + Privat (via _ueberf_link) auftauen. */
+  async function undoUeberfuehrung() {
+    try {
+      var herk = document.getElementById('obj_herkunft');
+      if (!(herk && herk.value === 'ueberfuehrung')) { if (typeof toast === 'function') toast('Dieses Objekt ist keine Ueberfuehrung.'); return; }
+      var gmbhKey = (typeof _currentObjKey !== 'undefined') ? _currentObjKey : window._currentObjKey;
+      var linkEl = document.getElementById('_ueberf_link');
+      var privatKey = linkEl ? linkEl.value : '';
+      if (!window.confirm('\u00dcberf\u00fchrung aufheben?\n\nDieses GESELLSCHAFTS-Objekt wird GELOESCHT und das Privat-Objekt aufgetaut (Einfrier-Datum entfernt). Das kann nicht rueckgaengig gemacht werden.')) return;
+      if (!window.Auth || !Auth.apiCall) { if (typeof toast === 'function') toast('Nicht eingeloggt.'); return; }
+      if (privatKey) {
+        try {
+          var pObj = await Auth.apiCall('/objects/' + privatKey);
+          var pData = pObj.data || {}; delete pData.ueberf_ende; delete pData._ueberf_link;
+          await Auth.apiCall('/objects/' + privatKey, { method: 'PUT', body: { data: pData, aiAnalysis: pObj.ai_analysis || null, photos: pObj.photos || [] } });
+        } catch (e) {}
+      }
+      if (gmbhKey) { await Auth.apiCall('/objects/' + gmbhKey, { method: 'DELETE' }); }
+      if (typeof toast === 'function') toast('\u2713 \u00dcberf\u00fchrung aufgehoben \u2014 Gesellschafts-Objekt geloescht, Privat-Objekt aufgetaut.');
+      if (privatKey && typeof loadSaved === 'function') { try { await loadSaved(privatKey); } catch (e) {} }
+      try { if (typeof renderSaved === 'function') renderSaved({ _immediate: true }); } catch (e) {}
+      try { if (typeof updateSidebarPortfolio === 'function') updateSidebarPortfolio(); } catch (e) {}
+    } catch (err) { if (typeof toast === 'function') toast('Aufheben fehlgeschlagen: ' + (err && err.message || err)); }
+  }
+  /* Aufheben vom Privat-Objekt aus: GmbH (via _ueberf_link) loeschen + dieses Privat auftauen. */
+  async function undoUeberfuehrungFromPrivat() {
+    try {
+      var privatKey = (typeof _currentObjKey !== 'undefined') ? _currentObjKey : window._currentObjKey;
+      var linkEl = document.getElementById('_ueberf_link');
+      var gmbhKey = linkEl ? linkEl.value : '';
+      if (!window.confirm('\u00dcberf\u00fchrung aufheben?\n\nDas GESELLSCHAFTS-Objekt wird GELOESCHT und dieses Privat-Objekt aufgetaut (Einfrier-Datum entfernt). Das kann nicht rueckgaengig gemacht werden.')) return;
+      if (!window.Auth || !Auth.apiCall) { if (typeof toast === 'function') toast('Nicht eingeloggt.'); return; }
+      if (gmbhKey) { try { await Auth.apiCall('/objects/' + gmbhKey, { method: 'DELETE' }); } catch (e) {} }
+      var ueEl = document.getElementById('ueberf_ende'); if (ueEl) ueEl.value = '';
+      if (linkEl) linkEl.value = '';
+      if (typeof saveObj === 'function') await saveObj({ silent: true });
+      if (typeof toast === 'function') toast('\u2713 \u00dcberf\u00fchrung aufgehoben \u2014 Gesellschafts-Objekt geloescht, Privat-Objekt aufgetaut.');
+      try { _renderUeberfBadge(); } catch (e) {}
+      try { if (typeof renderSaved === 'function') renderSaved({ _immediate: true }); } catch (e) {}
+      try { if (typeof updateSidebarPortfolio === 'function') updateSidebarPortfolio(); } catch (e) {}
+      try { if (typeof calc === 'function') calc(); } catch (e) {}
+    } catch (err) { if (typeof toast === 'function') toast('Aufheben fehlgeschlagen: ' + (err && err.message || err)); }
   }
   function _calcPct() {
     var out = document.getElementById('mand-ueberf-pct'); if (!out) return;
@@ -410,11 +607,16 @@
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
   else { init(); }
 
+  /* v816d-sync-after-load: nach Objekt-Laden Haken + Kennung synchronisieren. */
+  function syncAfterLoad() {
+    try { wireObjectFields(); } catch (e) {}   /* idempotent (mandWired-Guards) -> registriert Events + ruft _syncUeberf */
+    try { _syncUeberf(); } catch (e) {}        /* sicherstellen: Haken/Kennung/read-only aktuell */
+  }
   window.DealPilotMandanten = {
     getList: getList, get: get, upsert: upsert, remove: remove, rfLabel: rfLabel, isCorp: isCorp,
     renderHalterOptions: renderHalterOptions, renderHalterChips: renderHalterChips,
     setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, wireObjectFields: wireObjectFields,
-    renderSidebarChips: renderSidebarChips, onUeberfToggle: onUeberfToggle,  /* v815-export */
+    renderSidebarChips: renderSidebarChips, _toggleMandMenu: _toggleMandMenu, onUeberfToggle: onUeberfToggle, undoUeberfuehrung: undoUeberfuehrung, undoUeberfuehrungFromPrivat: undoUeberfuehrungFromPrivat,  syncAfterLoad: syncAfterLoad,  /* v816d-export */
     renderSettingsTab: renderSettingsTab,
     uiNew: uiNew, uiEdit: uiEdit, uiCancel: uiCancel, uiSave: uiSave, uiDelete: uiDelete, uiToggleRf: uiToggleRf
   };

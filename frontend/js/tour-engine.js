@@ -923,6 +923,8 @@
           console.log('[DpTour V247] Auto-Start unterdrueckt: User nicht eingeloggt');
           return;
         }
+        /* v816h-tour-once: Flag SOFORT setzen, damit Auto-Start nur EINMAL passiert. */
+        try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}
         Tour.start();
       }, 2500);
     } catch(e) {

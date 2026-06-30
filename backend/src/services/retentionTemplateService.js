@@ -24,6 +24,18 @@ function _sanitize(html) {
   h = h.replace(/(href|src)\s*=\s*'\s*(javascript|data(?!:image\/)|vbscript):[^']*'/gi, "$1='#'");
   return h;
 }
+/* v816-bg-sanitize: schonende Bereinigung NUR fuer die Owner-Hintergrundvorlage.
+   Erlaubt <style>/<html>/<body> + Struktur (Effekte-Templates leben davon),
+   entfernt aber weiterhin aktive/gefaehrliche Inhalte. */
+function _sanitizeBackground(html) {
+  let h = String(html || '');
+  h = h.replace(/<\/?(script|iframe|object|embed|form|input|button|textarea|select)\b[^>]*>/gi, '');
+  h = h.replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, '').replace(/\son[a-z]+\s*=\s*'[^']*'/gi, '');
+  h = h.replace(/\son[a-z]+\s*=\s*[^\s>]+/gi, '');
+  h = h.replace(/(href|src)\s*=\s*"\s*(javascript|vbscript):[^"]*"/gi, '$1="#"');
+  h = h.replace(/(href|src)\s*=\s*'\s*(javascript|vbscript):[^']*'/gi, "$1='#'");
+  return h;
+}
 
 // ── Vorlagen ──────────────────────────────────────────────────
 async function listTemplates(kind) {
@@ -71,7 +83,7 @@ async function previewHtml(subject, bodyHtml) {
   let bg = null;
   try { bg = await getBackground(); } catch (e) { bg = null; }
   if (bg && bg.html && bg.html.indexOf('{{BODY}}') >= 0) {
-    return _sanitize(bg.html).replace('{{BODY}}', inner);
+    return _sanitizeBackground(bg.html).replace('{{BODY}}', inner);  /* v816-bg-preview: Owner-Vorlage schonend bereinigen, Style bleibt */
   }
   const body = '<div style="font-size:15px;line-height:1.6;color:#1b1815;">' + inner + '</div>';
   if (_mailLayout && typeof _mailLayout.wrap === 'function') {

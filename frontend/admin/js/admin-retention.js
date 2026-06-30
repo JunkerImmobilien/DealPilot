@@ -103,7 +103,7 @@
           '<span style="font-size:13px;color:#666;">Hintergrund-Vorlage (HTML mit <code>{{BODY}}</code>):</span>' +
           '<span id="ret-bg-name" style="font-size:13px;color:#3FA56C;"></span>' +
           '<button class="btn" id="ret-bg-upload">Hochladen</button>' +
-          '<button class="btn" id="ret-bg-clear" style="color:#B86250;">Entfernen</button>' +
+          '<button class="btn" id="ret-bg-clear" style="color:#B86250;" title="Eigene Hintergrund-Vorlage entfernen und auf den DealPilot-Standardrahmen zur\u00fccksetzen">Auf Standard zur\u00fccksetzen</button>'  /* v816-bg-default */ +
           '<input type="file" id="ret-bg-file" accept=".html,.htm,.txt" style="display:none;">' +
         '</div>' +
       '</div>' +
@@ -252,7 +252,7 @@
     }
     var bgClear = document.getElementById('ret-bg-clear');
     if (bgClear) bgClear.onclick = async function () {
-      if (!window.confirm('Hintergrund-Vorlage entfernen?')) return;
+      if (!window.confirm('Eigene Hintergrund-Vorlage entfernen und auf den DealPilot-Standardrahmen zur\u00fccksetzen?')) return;
       try { await _call('POST', '/retention/background', { html: '', name: '' }); _toast('\u2713 Entfernt', 'success'); _loadBackground(); _previewSoon(); }
       catch (e) { _toast('Fehler: ' + (e.message || ''), 'error'); }
     };

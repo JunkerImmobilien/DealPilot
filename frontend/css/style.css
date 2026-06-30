@@ -34303,3 +34303,51 @@ html .settings-modal.set-modal-v2 .set-modal-close:hover{
 html #help-modal .set-modal-close svg,
 html .settings-modal.set-modal-v2 .set-modal-close svg{ width:18px !important; height:18px !important; }
 /* v793i-xbtn-small-end */
+
+/* === v816f-mand-filter-css: Mandanten-Filter Icon-Button + Dropdown === */
+.sb-mand-filter { display:inline-flex; align-items:center; }
+.sb-mand-wrap { position:relative; }
+.sb-mand-btn { position:relative; }
+.sb-mand-btn.filtered { background:rgba(201,168,76,0.15); color:var(--gold,#C9A84C); }
+.sb-mand-dot { position:absolute; top:1px; right:1px; width:5px; height:5px; border-radius:50%; background:var(--gold,#C9A84C); display:none; }
+.sb-mand-btn.filtered .sb-mand-dot { display:block; }
+.sb-mand-menu { position:absolute; top:calc(100% + 6px); right:0; min-width:172px; background:#0e0d0c; border:1px solid rgba(201,168,76,0.25); border-radius:9px; box-shadow:0 10px 30px rgba(0,0,0,.55); padding:5px; z-index:60; display:none; }
+.sb-mand-menu.open { display:block; animation:sbMandPop .12s ease; }
+@keyframes sbMandPop { from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none} }
+.sb-mand-mhead { font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:#6f6a63; padding:5px 9px 6px; font-weight:700; }
+.sb-mand-item { display:flex; align-items:center; gap:9px; width:100%; background:transparent; border:none; color:#e8e6e3; font-size:13px; text-align:left; padding:8px 9px; border-radius:6px; cursor:pointer; font-family:inherit; transition:background .12s; }
+.sb-mand-item:hover { background:rgba(255,255,255,0.05); }
+.sb-mand-item .ic { color:#9a948c; flex:0 0 auto; }
+.sb-mand-item.active { color:var(--gold,#C9A84C); }
+.sb-mand-item.active .ic { color:var(--gold,#C9A84C); }
+.sb-mand-item .chk { margin-left:auto; opacity:0; color:var(--gold,#C9A84C); flex:0 0 auto; }
+.sb-mand-item.active .chk { opacity:1; }
+.sb-mand-sep { height:1px; background:rgba(255,255,255,0.07); margin:4px 6px; }
+/* === v816f-mand-filter-css END === */
+
+/* === v816g-dropdown-css: Mandanten-Dropdown deckend + ueber allem === */
+.sb-mand-menu { background:#100f0d !important; z-index:9999 !important; box-shadow:0 14px 40px rgba(0,0,0,.7) !important; }
+.sb-mand-menu.open { display:block !important; }
+/* Sortier-Icons + Mandanten-Icon in EINER Gruppe: kein Abstand-Bruch */
+.sb-tools-group { display:inline-flex; gap:6px; align-items:center; }
+/* === v816g-dropdown-css END === */
+
+/* === v816h-dropdown-force: Mandanten-Dropdown garantiert ueber den Objektkarten === */
+.sb-mand-menu.open { position:fixed !important; z-index:99999 !important; background:#100f0d !important; }
+/* === v816h-dropdown-force END === */
+
+/* === v816i-date-align: Datums- + tr-Felder rechtsbuendig === */
+input.tr { text-align: right !important; }
+input[type=date].tr { text-align: right !important; }
+input[type=date].tr::-webkit-datetime-edit { text-align: right; }
+/* === v816i-date-align END === */
+
+/* === v816j-field-font: Ueberfuehrungsfelder normale Schrift (wie normale Eingabefelder), auch readonly === */
+#verkehrswert_ueberf, #ueberf_preis, #gesellschafterdarlehen, #ueberf_restschuld,
+#halter_seit, #ueberf_ende, #ueberf_rest_zins,
+#verkehrswert_ueberf[readonly], #ueberf_preis[readonly], #gesellschafterdarlehen[readonly],
+#ueberf_restschuld[readonly], #halter_seit[readonly], #ueberf_ende[readonly], #ueberf_rest_zins[readonly] {
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 400 !important;
+}
+/* === v816j-field-font END === */

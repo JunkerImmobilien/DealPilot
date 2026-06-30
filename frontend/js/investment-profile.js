@@ -107,6 +107,16 @@ window.DealPilotInvestmentProfile = (function() {
     // Notar/Grundbuch + Makler nur falls Inputs existieren (Investition-Tab)
     setIfEmpty('notar_pct',  merged.notar_grundbuch);
     setIfEmpty('makler_pct', merged.maklerkosten);
+    /* v816-zins: effektiver Zins (eigener Wert ODER indikativer Pfandbrief-Satz der Zinsbindung+Stufe)
+       in Haupt-Zinsfeld (d1z) UND Quick-Boarding-Zinsfeld (qc_zins) schreiben. setIfEmpty -> User/eigener Zins behaelt Vorrang. */
+    try {
+      var _zEff = getZins();
+      if (_zEff != null && isFinite(_zEff) && _zEff > 0) {
+        var _zStr = (Math.round(_zEff * 100) / 100).toString();
+        setIfEmpty('d1z', _zStr);
+        setIfEmpty('qc_zins', _zStr);
+      }
+    } catch (_e816z) {}
     // Bundesland für GrESt
     var blEl = document.getElementById('bundesland');
     if (blEl && !blEl.value && merged.bundesland) {
