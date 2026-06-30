@@ -1084,6 +1084,9 @@ async function renderSaved(opts) {
         if (_seqCounts[s] > 1) _dupSeqs[s] = true;
       });
 
+      /* v815-sb-filter: Mandanten-Switch rendern + Liste nach aktivem Mandanten filtern */
+      try { if (window.DealPilotMandanten) { if (DealPilotMandanten.renderSidebarChips) DealPilotMandanten.renderSidebarChips(); if (DealPilotMandanten.filterByHalter) items = DealPilotMandanten.filterByHalter(items); } } catch (_e) {}
+      if (!items.length) { list.innerHTML = '<div class="sb-empty">Keine Objekte f\u00fcr diesen<br>Mandanten.</div>'; return; }
       list.innerHTML = items.map(function(o) {
         // V63.26: KONSISTENTER Score-Pfad
         // Plan-Gate für Investor-Sternchen
