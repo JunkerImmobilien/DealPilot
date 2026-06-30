@@ -19,7 +19,7 @@
     console.log('[apikeys]', m);
   }
   function _call(method, path, body) {
-    if (!(window.API && API.call)) return Promise.reject(new Error('API fehlt'));
+    if (!(typeof API !== 'undefined' && API && API.call)) return Promise.reject(new Error('API fehlt'));  /* v816-apicheck: API ist freie globale const, nicht window.API */
     return API.call(method, path, body);
   }
 

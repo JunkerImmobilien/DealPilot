@@ -1355,6 +1355,30 @@ function _calcImmediate(){
   var nk_total = Math.max(0, gi - kp);
   var wp_kpi=svw>0?svw-kp:0;
   var btj=parseInt(g('btj')||'20');
+  /* v816-CUT: Privat-Objekt-Cut bei Ueberfuehrung. Gated ueber Feld 'ueberf_ende' (Datum).
+     Kappt btj auf volle Jahre bis zum Stichtagsjahr; letztes Jahr wird anteilig (Monat/12) gerechnet.
+     OHNE ueberf_ende bleibt alles unveraendert (active=false, factor=1). */
+  var _v816cut = { active: false, factor: 1 };
+  (function(){
+    try {
+      var _ue = g('ueberf_ende');
+      if (!_ue || !/^\d{4}-\d{2}-\d{2}$/.test(_ue)) return;
+      var _ueY = parseInt(_ue.slice(0,4),10), _ueM = parseInt(_ue.slice(5,7),10);
+      if (!_ueY || !_ueM || _ueM < 1 || _ueM > 12) return;
+      /* Startjahr = WU/kaufdat (gleiche Quelle wie Projektion). */
+      var _startY = null;
+      try { if (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear) { var _by = DealPilotAnteilig.getBaseYear(); if (_by) _startY = _by; } } catch(_e){}
+      if (_startY == null) _startY = (new Date()).getFullYear();
+      if (_ueY < _startY) return;                 /* Stichtag vor Start -> kein sinnvoller Cut */
+      var _fullYears = _ueY - _startY;            /* volle Jahre vor dem Stichtagsjahr */
+      var _lastIdx = _fullYears + 1;              /* das (anteilige) Stichtagsjahr als Loop-Index */
+      if (_lastIdx < 1) return;
+      if (_lastIdx < btj) btj = _lastIdx;         /* nur kappen, nie verlaengern */
+      _v816cut.active = true;
+      _v816cut.factor = _ueM / 12;                /* Anteil des letzten Jahres bis Stichtagsmonat */
+      _v816cut.lastYear = btj;
+    } catch(_e){}
+  })();
   var mstg=v('mietstg')/100,wstg=v('wertstg')/100,kstg=v('kostenstg')/100;
   // V109 BUG-FIX: State.wstg + Co. waren nie gesetzt — bank-charts.js (und andere Module die
   // window.State lesen) bekamen `undefined` und nutzten Fallback 0.015 (1,5%). Folge: bei
@@ -1412,7 +1436,9 @@ function _calcImmediate(){
   for(var y=1;y<=btj;y++){
     // V63.35: Excel-Logik — CF auf NKM gegen NUL-Bewirt; UL ist durchlaufend
     // V63.61: Off-by-One — Jahr 1 ist HEUTE, also _mFac(0)=1.0 (keine Steigerung)
-    var nkm_y=_nkmJYear(y-1),bwk_cf_y=bwk_cf*Math.pow(1+kstg,y-1);
+    /* v816-ef: Anteilsfaktor nur im letzten Jahr wenn Cut aktiv, sonst 1 (bit-identisch). */
+    var _ef = (_v816cut.active && y === btj) ? _v816cut.factor : 1;
+    var nkm_y=_nkmJYear(y-1)*_ef,bwk_cf_y=bwk_cf*Math.pow(1+kstg,y-1)*_ef;
     // V121: rate_anschl_v am Übergang Bindung→Anschluss auf rs am EZB setzen
     if (y === bindj + 1 && rate_anschl_v === 0) {
       rate_anschl_v = rs_loop * (az_eff_v + at_eff_v);
@@ -1463,16 +1489,18 @@ function _calcImmediate(){
         zy = 0; ty = 0;
       }
     }
-    var cf_y_op=nkm_y-bwk_cf_y-zy;
-    var tax_y_loop = _mtxYear(cf_y_op-afa, _calYearBase + y - 1);
+    /* v816-ef-zins: Zins + AfA im letzten Jahr anteilig (Privatier zahlt nur bis Stichtag). */
+    var _zy_eff = zy * _ef, _afa_eff = afa * _ef;
+    var cf_y_op=nkm_y-bwk_cf_y-_zy_eff;
+    var tax_y_loop = _mtxYear(cf_y_op-_afa_eff, _calYearBase + y - 1);
     // V63.58: BSV-Sparrate ist CF-Abfluss (gebundenes Geld), gehört in CF-Berechnung
     var cf_y_ns=cf_y_op-tax_y_loop-bspar_y_loop;
     cfkum+=cf_y_ns;
     bspar_kum += bspar_y_loop;
-    rs_loop=Math.max(0,rs_loop-ty);
+    rs_loop=Math.max(0,rs_loop-ty*_ef);  /* v816-ef-tilg: Tilgung im letzten Jahr anteilig */
     miete_kum += nkm_y;
     bwk_kum   += bwk_cf_y;
-    zins_kum  += zy;
+    zins_kum  += _zy_eff;  /* v816-ef-kum */
     tax_kum   += tax_y_loop;
   }
   // Tilgung kumuliert nach btj Jahren = Differenz Anfangsdarlehen zu rs_loop

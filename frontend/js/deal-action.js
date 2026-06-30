@@ -578,6 +578,15 @@ window.DealPilotDealAction = (function() {
       // Bestehende Banner danach
       renderRndRecommendation(),
       renderKpAufteilungBanner(),
+      /* v816 dpuew-stage: Ueberfuehrungs-Wizard */
+      '<div class="da-stage" id="dpuew-stage">',
+        '<div class="da-stage-head">',
+          '<span class="da-stage-ico">\u21c4</span>',
+          '<div class="da-stage-title">In Gesellschaft \u00fcberf\u00fchren</div>',
+          '<div class="da-stage-sub">Privat-Objekt einfrieren + neues GmbH-Objekt anlegen (Werte, Fotos, KI \u00fcbernommen)</div>',
+        '</div>',
+        '<div style="padding:4px 0 2px"><button type="button" class="da-cta" style="background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1b1408;border:none;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="if(window.DealPilotUeberfuehrung)DealPilotUeberfuehrung.open()">\u2708 \u00dcberf\u00fchrung starten</button></div>',
+      '</div>',
       
       // V191: ═══════ STAGE 1: DEAL PRÜFEN ═══════
       '<div class="da-stage da-stage-1">',

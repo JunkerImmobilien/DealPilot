@@ -22,7 +22,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=777e">
+<link rel="stylesheet" href="css/style.css?v=816j">
 <link rel="stylesheet" href="css/bmf-modal.css?v=293f">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=303"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
@@ -625,12 +625,15 @@ label.dp-required.qc-required::after {
 
   <div class="sb-section-title sb-section-title-with-sort">
     <span><svg width="13" height="13"><use href="#i-portfolio"/></svg>Portfolio</span>
-    <div class="sb-sort-toggle">
-      <button type="button" class="sb-sort-btn active" data-sort="recent" onclick="setSidebarSort('recent')" title="Zuletzt bearbeitet zuerst"><svg width="11" height="11"><use href="#i-clock"/></svg></button>
-      <button type="button" class="sb-sort-btn" data-sort="id" onclick="setSidebarSort('id')" title="Nach ID sortieren"><svg width="11" height="11"><use href="#i-hash"/></svg></button>
+    <!-- v816g-tools-group -->
+    <div class="sb-tools-group">
+      <div class="sb-sort-toggle">
+        <button type="button" class="sb-sort-btn active" data-sort="recent" onclick="setSidebarSort('recent')" title="Zuletzt bearbeitet zuerst"><svg width="11" height="11"><use href="#i-clock"/></svg></button>
+        <button type="button" class="sb-sort-btn" data-sort="id" onclick="setSidebarSort('id')" title="Nach ID sortieren"><svg width="11" height="11"><use href="#i-hash"/></svg></button>
+      </div>
+      <div id="sb-mand-filter" class="sb-mand-filter"></div>
     </div>
   </div>
-  <div id="sb-mand-filter" class="sb-mand-filter" style="display:flex;flex-wrap:wrap;gap:5px;padding:0 10px 8px"></div>
   <div class="sb-list sb-list-grow" id="sb-list">
     <div class="sb-empty">Noch keine Objekte gespeichert.</div>
   </div>
@@ -651,9 +654,7 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item" type="button" data-act="view-single" onclick="sbActionsAction('view-single')">
         <span class="sb-act-ico" data-icon="single"></span><span class="sb-act-l">Einzelobjekt</span>
       </button>
-      <button class="sb-act-item" type="button" data-act="view-all" onclick="sbActionsAction('view-all')">
-        <span class="sb-act-ico" data-icon="all"></span><span class="sb-act-l">Alle Objekte</span>
-      </button>
+      <!-- v816h-no-allobjects: Akkordeon-Eintrag entfernt -->
       <button class="sb-act-item" type="button" onclick="sbActionsAction('trackrec')" data-feature="track_record_pdf">
         <span class="sb-act-ico" data-icon="trackrec"></span><span class="sb-act-l">Track Record</span>
       </button>
@@ -666,7 +667,7 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item" type="button" onclick="sbActionsAction('hub-import')">
         <span class="sb-act-ico" data-icon="import-hub"></span><span class="sb-act-l">Import</span>
       </button>
-      <button class="sb-act-item" type="button" onclick="sbActionsAction('hub-export')">
+      <button class="sb-act-item" type="button" data-feature="export_csv" onclick="sbActionsAction('hub-export')">
         <span class="sb-act-ico" data-icon="export-hub"></span><span class="sb-act-l">Export</span>
       </button>
 
@@ -732,10 +733,7 @@ label.dp-required.qc-required::after {
         <span class="bsheet-tile-ico" data-icon="single"></span>
         <span class="bsheet-tile-l">Einzelobjekt</span>
       </button>
-      <button class="bsheet-tile" data-bsheet-view="all" onclick="bsheetAction('view-all')">
-        <span class="bsheet-tile-ico" data-icon="all"></span>
-        <span class="bsheet-tile-l">Alle Objekte</span>
-      </button>
+      <!-- v816h-no-allobjects: bsheet-Tile entfernt -->
       <button class="bsheet-tile bsheet-tile-accent" onclick="bsheetAction('quickcheck')">
         <span class="bsheet-tile-ico" data-icon="quickcheck"></span>
         <span class="bsheet-tile-l">Boarding</span>
@@ -946,7 +944,7 @@ label.dp-required.qc-required::after {
       <!-- v363-erwerb: abgesetzte Untergruppe -->
       <div class="f s2" data-v363-erwerb data-v369-head style="margin-top:16px"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Erwerb &amp; Besitzübergang</div></div>
       <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1">Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div><!-- mand-halter-block v815 (umgezogen nach Erwerb) --><div class="f" data-mand><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8"></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1">Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div><!-- mand-halter-block v815 (umgezogen nach Erwerb) --><!-- v816g-halter-show: sichtbar, Sperrung via JS --><div class="f" data-mand data-halter-lock="1"><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" class="trl" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" class="trl" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" class="trl" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" class="trl" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Privat-Ende / überführt am <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat-Objekt rechnet bis hier, dann eingefroren)</span></label><input id="ueberf_ende" type="date" class="tr"></div><input id="_ueberf_link" type="hidden" value=""><!-- v816h-field-trl v816i-all-rightalign -->
     </div></div>
 
     <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-quality"/></svg></span>Qualität &amp; Zustand</div>
@@ -2940,7 +2938,8 @@ label.dp-required.qc-required::after {
   <script src="js/immometrica-qc.js?v=672"></script>
   <script src="js/modal-boarding-skin.js?v=672"></script>
   <script src="js/provider-keys.js?v=672"></script>
-  <script src="js/mandanten.js?v=815"></script>
+  <script src="js/mandanten.js?v=816j"></script>
+  <script src="js/ueberfuehrung-wizard.js?v=816i"></script>
   <script src="js/apikeys.js?v=810"></script>
   <script src="js/settings.js?v=810"></script>
 <script src="js/pricing-modal.js?v=493-2"></script>
@@ -2950,6 +2949,7 @@ label.dp-required.qc-required::after {
 <script src="js/charts.js?v=166"></script>
 <script src="js/market-rates.js?v=100"></script>
 <script src="js/market-rates-pf.js?v=pfpre3"></script>
+<script src="js/indicative-zins.js?v=816c"></script>
 <script src="js/market-context.js?v=100"></script>
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
@@ -2988,7 +2988,7 @@ label.dp-required.qc-required::after {
 <script src="js/bank-charts.js?v=166"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
 <script src="js/help.js?v=773"></script>
-  <script src="js/tour-engine.js?v=433_10"></script>
+  <script src="js/tour-engine.js?v=816h"></script>
   <script src="js/tour-content.js?v=773"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=777e"></script>

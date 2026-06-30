@@ -41,7 +41,9 @@ var FIELDS = [
   /* mand-fields v803: Mandanten/Halter + Überführung */
   'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen',
   /* v813-3d: uebernommene Restschuld bei Ueberfuehrung */
-  'ueberf_restschuld','ueberf_rest_zins'
+  'ueberf_restschuld','ueberf_rest_zins',
+  /* v816: Privat-Cut Enddatum + Wizard-Verknuepfung */
+  'ueberf_ende','_ueberf_link'
 ];
 
 var _currentObjKey = null;  // Local mode key OR API object id
@@ -345,6 +347,10 @@ function loadData(d) {
       // V323-trigger-initsync: 3-Tile-Highlight nach Objekt-Load syncen
       if (window.DealPilotDealAction && typeof DealPilotDealAction.initStatusSync === 'function') {
         try { DealPilotDealAction.initStatusSync(); } catch(e) {}
+      }
+      /* v816d-loaddata-hook: Mandanten-Sync nach Objekt-Load (Haken + Kennung + read-only). */
+      if (window.DealPilotMandanten && typeof DealPilotMandanten.syncAfterLoad === 'function') {
+        try { DealPilotMandanten.syncAfterLoad(); } catch(e) {}
       }
     }
   } catch(e) {}
@@ -3071,6 +3077,7 @@ window._checkObjIdConflict = _checkObjIdConflict;
 
   async function performSave(opts) {
     opts = opts || {};
+    if (window._dpUeberfActive) return;  /* v816b-autosave-pause: Wizard macht eigene Saves */
     if (_isSaving) return;
     if (typeof saveObj !== 'function') return;
     // Nur speichern wenn Daten vorhanden
@@ -3379,3 +3386,16 @@ function _dpDs2Available() {
 }
 window._dpDs2Available = _dpDs2Available;
 
+/* v816 dpuew-ctx: Rechtsklick auf Sidebar-Card -> Ueberfuehrungs-Wizard */
+document.addEventListener('contextmenu', function(e){
+  try {
+    var card = e.target && e.target.closest ? e.target.closest('.sb-card') : null;
+    if (!card) return;
+    var key = card.getAttribute('data-key'); if (!key) return;
+    if (!window.DealPilotUeberfuehrung) return;
+    e.preventDefault();
+    var _doOpen = function(){ if (window.DealPilotUeberfuehrung) DealPilotUeberfuehrung.open(); };
+    if (typeof loadSaved === 'function') { Promise.resolve(loadSaved(key)).then(function(){ setTimeout(_doOpen, 150); }); }
+    else { _doOpen(); }
+  } catch(_e){}
+}, false);
