@@ -125,10 +125,31 @@
       return '<button type="button" class="mand-chip' + on + '" onclick="DealPilotMandanten.setFilter(\'' + c.id + '\')">' + esc(c.name) + '</button>';
     }).join('');
   }
-  function setFilter(id) {
+  /* v815-sbchips: Mandanten-Switch in der Sidebar-Objektliste (#sb-mand-filter) */
+  function renderSidebarChips() {
+    var host = document.getElementById('sb-mand-filter'); if (!host) return;
+    if (!_isPro() || !_state.list || _state.list.length <= 1) { host.innerHTML = ''; return; }
+    var active = window._dpHalterFilter || '__all__';
+    var chips = [{ id: '__all__', name: 'Alle' }].concat(_state.list);
+    host.innerHTML = chips.map(function (c) {
+      var on = (c.id === active) ? ' mand-chip-on' : '';
+      return '<button type="button" class="mand-chip' + on + '" onclick="DealPilotMandanten.setFilter(\'' + c.id + '\')">' + esc(c.name) + '</button>';
+    }).join('');
+  }
+  /* v815-toggle: Checkbox 'Aus Privatbestand ueberfuehrt' treibt das versteckte obj_herkunft */
+  function onUeberfToggle(checked) {
+    var h = document.getElementById('obj_herkunft');
+    if (h) h.value = checked ? 'ueberfuehrung' : 'neukauf';
+    try { _syncUeberf(); } catch (e) {}
+    try { if (typeof calc === 'function') calc(); } catch (e) {}
+    try { if (typeof renderTaxModule === 'function') renderTaxModule(); } catch (e) {}
+  }
+  function setFilter(id) {  /* v815-setfilter */
     window._dpHalterFilter = id;
     if (window.DealPilotDashboard && DealPilotDashboard.applyHalterFilter) { DealPilotDashboard.applyHalterFilter(id); }
     renderHalterChips();
+    try { renderSidebarChips(); } catch (e) {}
+    try { if (typeof renderSaved === 'function') renderSaved({_immediate:true}); } catch (e) {}
   }
   function filterByHalter(arr) {
     var f = window._dpHalterFilter;
@@ -199,6 +220,7 @@
   function _syncUeberf() {
     var herk = document.getElementById('obj_herkunft');
     var show = !!(herk && herk.value === 'ueberfuehrung');
+    var _cb = document.getElementById('mand_ueberf_cb'); if (_cb) _cb.checked = show;  /* v815-cbsync */
     var nodes = document.querySelectorAll('.mand-ueberf');
     for (var i = 0; i < nodes.length; i++) { nodes[i].style.display = show ? '' : 'none'; }
     if (show) _prefillRest();  /* v813-3d */
@@ -392,6 +414,7 @@
     getList: getList, get: get, upsert: upsert, remove: remove, rfLabel: rfLabel, isCorp: isCorp,
     renderHalterOptions: renderHalterOptions, renderHalterChips: renderHalterChips,
     setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, wireObjectFields: wireObjectFields,
+    renderSidebarChips: renderSidebarChips, onUeberfToggle: onUeberfToggle,  /* v815-export */
     renderSettingsTab: renderSettingsTab,
     uiNew: uiNew, uiEdit: uiEdit, uiCancel: uiCancel, uiSave: uiSave, uiDelete: uiDelete, uiToggleRf: uiToggleRf
   };
