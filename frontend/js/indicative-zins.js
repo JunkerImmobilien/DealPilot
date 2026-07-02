@@ -10,6 +10,14 @@
 
   /* Greift defensiv auf die Pfandbrief-Tabelle in der Config zu (verschiedene moegliche Pfade). */
   function _pf() {
+    /* v829-zins-live: ZUERST die Live-Pfandbrief-Daten aus market-rates-pf.js (gleiche Quelle
+       wie die Kacheln). Nur wenn nicht vorhanden -> config-static-Fallback unten. */
+    try {
+      if (typeof window.dpGetPfData === 'function') {
+        var live = window.dpGetPfData();
+        if (live && live.yields && live.margins) return live;
+      }
+    } catch (e) {}
     try {
       var C = window.DealPilotConfig;
       if (!C) return null;

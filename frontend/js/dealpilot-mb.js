@@ -324,7 +324,7 @@
     var _dph = await _dpmbHealth();
     if (_dph && _dph.mode === 'stub') { /* v772-dpmb-stub */
       var _p = _dpmbStubPayload(i);
-      D = mapCard(_p); mode = 'med'; collapsed = true;
+      D = mapCard(_p); mode = 'med'; collapsed = false; /* v830-mb-expanded: nach Abruf offen */
       render();
       persistFull({ object_key:null, cost:0, market_value:_p.valuation.market_value, micro:_p.micro.score, macro:_p.macro.score, price_trend_pct:_p.price_trend_pct });
       toast('\u2713 DealPilot-Marktbewertung (Demo)');
@@ -348,7 +348,7 @@
         return;
       }
       var payload = data.data || data;
-      D = mapCard(payload); mode = 'med'; collapsed = true; /* v564-collapsed-default */
+      D = mapCard(payload); mode = 'med'; collapsed = false; /* v830-mb-expanded: nach Abruf offen */
       render();
       persistFull({
         object_key: data.object_key || null, cost: (typeof data.cost === 'number' ? data.cost : (data.charged || data.liters || 0)),

@@ -3302,18 +3302,18 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     <span class="qc7-sources dp-pfbar" id="qc7-sources"><!-- v570-qcpf -->
       <span class="dp-pf-stripe"></span>
       <div class="dp-pf-lead"><span class="bp">QUICKBOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot · Quickboarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
-      <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">
-        <label class="qc7-src dp-pf-tile dp-pf-soon-on" data-src="ph" title="Demnächst verfügbar"><!-- v644-coming-soon -->
-          <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)" style="display:none" disabled>
-          <span class="dp-pf-logo"><img src="img/pricehubble.jpg" alt="PriceHubble"></span><span class="dp-pf-led"></span>
+      <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row"><!-- v833-chip-order: DealPilot zuerst -->
+        <label class="qc7-src dp-pf-tile" data-src="dpmb" title="Marktpreisbewertung">
+          <input type="checkbox" value="dpmb" onchange="QcApp.toggleSource(this)" style="display:none">
+          <span class="dp-pf-logo dp">Deal<b>Pilot</b></span><span class="dp-pf-led"></span>
         </label>
         <label class="qc7-src dp-pf-tile" data-src="spr" title="Sprengnetter">
           <input type="checkbox" value="spr" onchange="QcApp.toggleSource(this)" style="display:none">
           <span class="dp-pf-logo"><img src="img/sprengnetter.jpg" alt="Sprengnetter"></span><span class="dp-pf-led"></span>
         </label>
-        <label class="qc7-src dp-pf-tile" data-src="dpmb" title="Marktpreisbewertung">
-          <input type="checkbox" value="dpmb" onchange="QcApp.toggleSource(this)" style="display:none">
-          <span class="dp-pf-logo dp">Deal<b>Pilot</b></span><span class="dp-pf-led"></span>
+        <label class="qc7-src dp-pf-tile dp-pf-soon-on" data-src="ph" title="Demnächst verfügbar"><!-- v644-coming-soon -->
+          <input type="checkbox" value="ph" onchange="QcApp.toggleSource(this)" style="display:none" disabled>
+          <span class="dp-pf-logo"><img src="img/pricehubble.jpg" alt="PriceHubble"></span><span class="dp-pf-led"></span>
         </label>
       </div></div>
       <div class="dp-pf-sep"></div>
@@ -5608,32 +5608,7 @@ function renderTransferList() {
     if (typeof renderAvmResults === 'function') renderAvmResults(); /* v761-dpfeed */
   }
 
-  /* v761: AVM-Sektion (avm-section.js) im QuickCheck einspeisen + Bruecken */
-  function _oabFeed() {
-    if (!window.AvmSection) return;
-    try {
-      var ext = {}, dp = null;
-      (_avmResults || []).forEach(function (r) {
-        if (!r || !r.provider) return;
-        if (r.provider === 'Sprengnetter' || r.provider === 'PriceHubble') ext[r.provider] = r;
-        else if (r.provider === 'DealPilot') dp = r;
-      });
-      window.AvmSection.setExternal(ext);
-      if (dp) {
-        window.AvmSection.setDealpilot({
-          mw: { low: dp.low, med: dp.marktwert, high: dp.high },
-          mm: { low: dp.marktmieteLow, med: dp.marktmieteCold, high: dp.marktmieteHigh },
-          conf: { label: 'Indikation', pct: null }, rating: '',
-          microRaw: (dp.scoreMicro != null ? dp.scoreMicro * 10 : null),
-          macroRaw: (dp.scoreMacro != null ? dp.scoreMacro * 10 : null)
-        }, 'live', {
-          setMode: function (mo) { try { setSpanConfig(mo === 'med' ? 'mid' : mo); } catch (e) {} },
-          apply:   function () { try { window._oabApplyExternal('DealPilot'); } catch (e) {} },
-          report:  function () { try { if (window.DealPilotMBQc && DealPilotMBQc.run) DealPilotMBQc.run(); } catch (e) {} }
-        });
-      } else if (window.AvmSection.clearDealpilot) { window.AvmSection.clearDealpilot(); }
-    } catch (e) { try { console.warn('[oab-feed]', e); } catch (_) {} }
-  }
+  /* v833-removed-dead-oabfeed: tote v761 _oabFeed entfernt (aktive v762 bleibt) */
   window._oabSetSpan = function (s) { try { setSpanConfig(s); } catch (e) {} };
   window._oabApplyExternal = function (name) {
     try {
@@ -5695,6 +5670,16 @@ function renderTransferList() {
       } else if (window.AvmSection.clearDealpilot) { window.AvmSection.clearDealpilot(); }
     } catch (e) { try { console.warn('[oab-feed]', e); } catch (_) {} }
   }
+  /* v832c-feed-trigger: _oabFeed global verfuegbar machen, damit der DealPilot-Abruf
+     (dealpilot-mb-qc.js) die AvmSection-Karte direkt anstossen kann - ohne Event-Timing.
+     Zusaetzlich ein input-Listener auf _mb_state als Backup. */
+  window._oabFeedTrigger = function () { try { _oabFeed(); } catch (e) {} };
+  (function(){ try {
+    function _wire(el){ if (el && !el._v832Wired) { el._v832Wired=1; el.addEventListener('input', function(){ try { _oabFeed(); } catch(e){} }); return true; } return false; }
+    if (!_wire(document.getElementById('_mb_state'))) {
+      var _t=0, _iv=setInterval(function(){ if (_wire(document.getElementById('_mb_state')) || ++_t>40) clearInterval(_iv); }, 250);
+    }
+  } catch(e){} })();
   window._oabSetSpan = function (s) { try { setSpanConfig(s); } catch (e) {} };
   window._oabApplyExternal = function (name) {
     try {
@@ -5710,11 +5695,7 @@ function renderTransferList() {
       if (typeof scheduleUpdate === 'function') scheduleUpdate();
     } catch (e) {}
   };
-  (function () { try { if (!document.getElementById('oab-qc-hide')) {
-    var st = document.createElement('style'); st.id = 'oab-qc-hide';
-    st.textContent = '#avm-results-host{display:none!important}#dp-mb-host{display:none!important}';
-    document.head.appendChild(st);
-  } } catch (e) {} })();
+  /* v833-removed-dup-hide: doppelter oab-qc-hide-Block entfernt */
 
   return {
     init, scheduleUpdate, setLtv, mieteAddUp,
@@ -5924,7 +5905,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
 
   <script src="js/avm-section.js?v=766"></script>
-  <script src="js/dealpilot-mb-qc.js?v=554"></script>
+  <script src="js/dealpilot-mb-qc.js?v=832c"></script>
   <script src="js/immometrica-qc.js?v=667"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">

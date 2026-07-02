@@ -102,6 +102,18 @@
     var s = _cache;
     if (!s) {
       host.innerHTML = '<div class="hint">Pilot-Tank-Status wird geladen…</div>';
+      /* v840-kerosin-load: Cache leer -> selbst refresh() triggern + nach Laden neu rendern.
+         Vorher haing die Box, bis refresh() zufaellig woanders lief. */
+      try {
+        if (typeof refresh === 'function' && !host._v840Loading) {
+          host._v840Loading = true;
+          refresh(false).then(function(fresh) {
+            host._v840Loading = false;
+            if (fresh) { try { renderSettingsBox(host); } catch(e){} }
+            else { host.innerHTML = '<div class="hint">Tank-Status nicht verfuegbar.</div>'; }
+          }).catch(function(){ host._v840Loading = false; });
+        }
+      } catch(e) {}
       return;
     }
     var resetDate = s.period_reset_at || '—';

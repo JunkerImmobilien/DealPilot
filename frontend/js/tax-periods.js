@@ -197,6 +197,59 @@
     refreshList();
   }
 
+  /* v841-render-inline: Steuerzeitraeume-Verwaltung INLINE (ohne Modal) in einen Host rendern.
+     Gleiche IDs wie das Modal (tp-list-host/tp-from/tp-to/tp-zve/tp-reason/tp-note/tp-conflict-host)
+     -> refreshList/submitNew/editPeriod/removePeriod funktionieren unveraendert. DB-Logik 1:1. */
+  function renderInline(host) {
+    if (typeof host === 'string') host = document.getElementById(host);
+    if (!host) return;
+    host.innerHTML = `
+      <div style="background:#fff;border:1px solid rgba(201,168,76,0.20);border-radius:12px;padding:18px 20px">
+        <div style="margin-bottom:14px">
+          <div style="font-size:15px;font-weight:600;color:var(--ch,#2A2727);display:flex;align-items:center;gap:7px">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Steuerzeitr\u00e4ume verwalten
+          </div>
+          <div style="font-size:12.5px;color:var(--muted,#7A7370);margin-top:3px">Zu versteuerndes Einkommen (zvE) verlaufsbasiert pflegen \u2014 gilt f\u00fcr alle privaten Objekte. Wird automatisch je nach Kaufdatum/wirtschaftlichem \u00dcbergang zugeordnet.</div>
+        </div>
+
+        <div id="tp-list-host" style="margin-bottom:18px"></div>
+
+        <div style="border-top:1px solid rgba(201,168,76,0.20);padding-top:14px;margin-top:8px">
+          <div style="font-weight:600;font-size:14px;color:var(--ch,#2A2727);margin-bottom:8px">Neuen Zeitraum hinzuf\u00fcgen</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+            <div>
+              <label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">G\u00fcltig von</label>
+              <input id="tp-from" type="date" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-size:13px;width:100%" />
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">G\u00fcltig bis (leer = laufend)</label>
+              <input id="tp-to" type="date" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-size:13px;width:100%" />
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">zvE / Jahr (\u20ac)</label>
+              <input id="tp-zve" type="text" inputmode="decimal" placeholder="65000" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-size:13px;width:100%" />
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:10px;align-items:end">
+            <div>
+              <label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Grund</label>
+              <input id="tp-reason" type="text" placeholder="z.B. Lohnerh\u00f6hung" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-size:13px;width:100%" />
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Notiz (optional)</label>
+              <input id="tp-note" type="text" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-size:13px;width:100%" />
+            </div>
+            <button onclick="DealPilotTaxPeriods.submitNew()" style="padding:9px 16px;background:var(--gold,#C9A84C);color:#fff;border:1.5px solid var(--gold,#C9A84C);border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Hinzuf\u00fcgen</button>
+          </div>
+        </div>
+
+        <div id="tp-conflict-host" style="margin-top:12px"></div>
+      </div>
+    `;
+    refreshList();
+  }
+
   function closeModal() {
     const m = document.getElementById('tax-periods-modal');
     if (m) m.remove();
@@ -343,7 +396,7 @@
   window.DealPilotTaxPeriods = {
     loadAll, getForDate, getForDateSync, checkOverlap,
     create, update, remove,
-    openModal, closeModal, refreshList, submitNew,
+    openModal, closeModal, renderInline, refreshList, submitNew, /* v841-render-inline */
     forceCreate, cancelConflict, editPeriod, removePeriod,
     _meta: 'V259-03'
   };

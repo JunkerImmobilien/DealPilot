@@ -22,7 +22,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=816j">
+<link rel="stylesheet" href="css/style.css?v=850">
 <link rel="stylesheet" href="css/bmf-modal.css?v=293f">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=303"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
@@ -648,6 +648,10 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item sb-act-accent" type="button" onclick="sbActionsAction('quickcheck')">
         <span class="sb-act-ico" data-icon="quickcheck"></span><span class="sb-act-l">Quick Boarding</span>
       </button>
+      <!-- v844-cockpit-action: Portfolio-Cockpit als Aktion (dritte Stelle) -->
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('cockpit')">
+        <span class="sb-act-ico" data-icon="cockpit"></span><span class="sb-act-l">Portfolio-Cockpit</span>
+      </button>
       <button class="sb-act-item" type="button" onclick="sbActionsAction('marktbericht')">
         <span class="sb-act-ico" data-icon="market"></span><span class="sb-act-l">Marktbericht</span>
       </button>
@@ -685,23 +689,7 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
-  <!-- V90: Portfolio-Übersicht ist jetzt UNTEN, direkt vor dem Aktionen-Trigger -->
-  <div id="sb-portfolio" class="sb-portfolio sb-portfolio-collapsible" style="display:none">
-    <button type="button" class="sb-section-title sb-collapsible-header" onclick="togglePortfolio()">
-      <span class="sb-port-open" onclick="event.stopPropagation(); if(typeof setMainView==='function')setMainView('dashboard');" title="Portfolio-Cockpit öffnen" style="cursor:pointer"><svg width="13" height="13"><use href="#i-bar"/></svg>Portfolio-Cockpit</span>
-      <span class="sb-toggle-arrow" id="sb-port-arrow">▴</span>
-    </button>
-    <div class="sb-portfolio-content" id="sb-portfolio-content" style="display:none">
-      <div class="port-row"><span>Anzahl Objekte</span><span class="port-v" id="port-count">—</span></div>
-      <div class="port-row"><span>Gesamt-Investment</span><span class="port-v" id="port-invest">—</span></div>
-      <div class="port-row"><span>Mieteinnahmen / Mon.</span><span class="port-v" id="port-miete">—</span></div>
-      <div class="port-row"><span>Cashflow / Mon. (n.St.)</span><span class="port-v port-cf" id="port-cf">—</span></div>
-      <div class="port-row"><span>Ø Bruttomietrendite</span><span class="port-v" id="port-bmr">—</span></div>
-      <div class="port-row"><span>Ø DSCR</span><span class="port-v" id="port-dscr">—</span></div>
-      <div class="port-row"><span>Gesamt-Restschuld</span><span class="port-v" id="port-rest">—</span></div>
-    </div>
-  </div>
-
+  <!-- v848-portfolio-removed: sb-portfolio-Block (Balken + Kennzahlen) komplett entfernt; Cockpit ueber Aktionen -->
   <!-- V46: Trigger jetzt mit Akkordeon-Toggle (war vorher Bottom-Sheet) -->
   <button class="sb-actions-trigger" type="button" id="sb-actions-trigger-btn" onclick="sbActionsToggle()" aria-label="Aktionen-Menü öffnen" aria-expanded="false" title="Aktionen-Menü öffnen">
     <span class="sb-actions-icon">
@@ -1548,7 +1536,7 @@ label.dp-required.qc-required::after {
   <div style="flex:1;font-size:12.5px;line-height:1.5">
     <strong style="font-weight:600">Dein zvE wird zentral im Profil gespeichert.</strong>
     Änderungen hier werden in dein Profil übernommen. Für historische Jahre (z.B. vor einer Lohnerhöhung) kannst du im Profil eigene Einträge hinterlegen. <!-- V258-01 -->
-    <a href="#" onclick="if(window.DealPilotTaxPeriods)DealPilotTaxPeriods.openModal();return false" style="color:var(--gold,#C9A84C);font-weight:600;text-decoration:underline;margin-left:4px">📅 Steuerzeiträume verwalten →</a> <!-- V259-06 -->
+    <a href="#" onclick="window._v842OpenTaxPeriods();return false" style="color:var(--gold,#C9A84C);font-weight:600;text-decoration:underline;margin-left:4px">📅 Steuerzeiträume verwalten →</a> <!-- v842-tax-redirect --> <!-- V259-06 -->
   </div>
 </div>
 <div class="f"><label>zvE vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="if(window.DealPilotZvE)DealPilotZvE.onObjectInput(this.value);calc()"></div></div>
@@ -2903,7 +2891,7 @@ label.dp-required.qc-required::after {
 <script src="js/afa-engine.js?v=227"></script>
   <script src="js/afa-ui.js?v=671"></script>
   <script src="js/zve-manager.js?v=1"></script>
-  <script src="js/tax-periods.js?v=1"></script>
+  <script src="js/tax-periods.js?v=841"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
   <script src="js/zve-smart.js?v=1"></script>
   <script src="js/wk-aggregator.js?v=2"></script>
@@ -2934,29 +2922,30 @@ label.dp-required.qc-required::after {
 <script src="js/datenraum.js?v=160"></script>
 <script src="js/tooltip-content.js?v=738"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
-  <script src="js/immometrica-import.js?v=769"></script>
+  <script src="js/immometrica-import.js?v=839"></script>
   <script src="js/immometrica-qc.js?v=672"></script>
   <script src="js/modal-boarding-skin.js?v=672"></script>
   <script src="js/provider-keys.js?v=672"></script>
-  <script src="js/mandanten.js?v=816j"></script>
+  <script src="js/mandanten.js?v=841b"></script>
   <script src="js/ueberfuehrung-wizard.js?v=816i"></script>
   <script src="js/apikeys.js?v=810"></script>
-  <script src="js/settings.js?v=810"></script>
+  <script src="js/settings.js?v=843"></script>
 <script src="js/pricing-modal.js?v=493-2"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=162"></script>
 <script src="js/werbungskosten-pdf.js?v=645"></script>
 <script src="js/charts.js?v=166"></script>
 <script src="js/market-rates.js?v=100"></script>
-<script src="js/market-rates-pf.js?v=pfpre3"></script>
-<script src="js/indicative-zins.js?v=816c"></script>
+<script src="js/market-rates-pf.js?v=829"></script>
+<script src="js/indicative-zins.js?v=829"></script>
 <script src="js/market-context.js?v=100"></script>
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=773"></script>
+<script src="js/ui.js?v=844"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=815"></script>
+<script src="js/storage.js?v=850"></script>
+<!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=720"></script>
 <script src="js/track-record.js?v=166"></script>
@@ -2967,7 +2956,7 @@ label.dp-required.qc-required::after {
 <script src="js/bmf-data.js?v=166"></script>
 <script src="js/bmf-afa.js?v=287"></script>
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
-<script src="js/dealscore2.js?v=463"></script>
+<script src="js/dealscore2.js?v=838b"></script>
 <script src="js/dealscore2-ui.js?v=671"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
@@ -2979,15 +2968,15 @@ label.dp-required.qc-required::after {
 <script src="js/immokalk-import.js?v=124"></script>
 <script src="js/import-export-modal.js?v=808"></script>
 <script src="js/quick-check.js?v=463"></script>
-<script src="js/qc-bridge.js?v=711"></script>
+<script src="js/qc-bridge.js?v=833"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
-<script src="js/ai-credits.js?v=491"></script>
+<script src="js/ai-credits.js?v=840"></script>
 <script src="js/workflow.js?v=124"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=166"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=773"></script>
+<script src="js/help.js?v=843"></script>
   <script src="js/tour-engine.js?v=816h"></script>
   <script src="js/tour-content.js?v=773"></script>
 <!-- V63.73: Feedback & Support Modal -->
@@ -2999,13 +2988,13 @@ label.dp-required.qc-required::after {
 <script src="js/deal-action-pilot.js?v=722"></script>
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
 <script src="js/newobj-fixes.js?v=728"></script>
-<script src="js/sidebar-search.js?v=447"></script>
+<script src="js/sidebar-search.js?v=846"></script>
 <script src="js/finanz-card-merge.js?v=483"></script>
 <script src="js/avm-missing-reset.js?v=443"></script>
 <link rel="stylesheet" href="css/marktbewertung-card.css?v=541">
 <script src="js/marktbewertung-card.js?v=540"></script>
 <script src="js/avm-section.js?v=766"></script>
-<script src="js/dealpilot-mb.js?v=773"></script>
+<script src="js/dealpilot-mb.js?v=830"></script>
   <script src="js/marktbericht-view.js?v=653"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=124"></script>

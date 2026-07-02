@@ -1470,6 +1470,7 @@ function bsheetAction(action) {
   bsheetToggle();
   setTimeout(function() {
     switch (action) {
+      case 'cockpit':       if (typeof setMainView === 'function') setMainView('dashboard'); break; /* v844-cockpit-handler */
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;
@@ -1583,7 +1584,7 @@ function _sbActionsRenderIcons() {
   if (!window.Icons) return;
   var map = {
     single: 'house', all: 'folder', quickcheck: 'sparkles', new: 'plus', market: 'fileText',
-    trackrec: 'trophy', bankexport: 'bank',
+    trackrec: 'trophy', bankexport: 'bank', cockpit: 'barChart', /* v844-cockpit-icon */
     pdf: 'fileText',
     csv: 'fileText',
     settings: 'settings',
@@ -1615,6 +1616,7 @@ function sbActionsAction(action) {
   setTimeout(function() {
     switch (action) {
       case 'dashboard':   if (typeof setMainView === 'function') setMainView('dashboard'); break;
+      case 'cockpit':       if (typeof setMainView === 'function') setMainView('dashboard'); break; /* v844-cockpit-handler */
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;
