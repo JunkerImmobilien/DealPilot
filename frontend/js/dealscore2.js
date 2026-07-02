@@ -177,7 +177,7 @@ window.DealScore2 = (function() {
       key: 'balanced',
       label: 'Ausgewogen',
       description: 'Standard-Bewertung — mittlere Anforderungen, breit einsetzbar für Buy & Hold und Trade-Deals.',
-      icon: '⚖️',
+      icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 7h14"/><path d="m5 7-3 6h6z"/><path d="m19 7-3 6h6z"/><path d="M8 21h8"/></svg>',
       // Keine Overrides nötig — nimmt 1:1 die DEFAULTS
       overrides: {}
     },
@@ -191,7 +191,7 @@ window.DealScore2 = (function() {
       key: 'conservative',
       label: 'Konservativ',
       description: 'Strengere Bewertung mit Fokus auf Substanz + Cashflow-Sicherheit. Höhere Renditen + niedrigerer LTV nötig für gute Punkte.',
-      icon: '🛡️',
+      icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
       overrides: {
         // Hauptgewichtungen: Risiko + Finanzierung wichtiger, Upside weniger
         weights: {
@@ -238,7 +238,7 @@ window.DealScore2 = (function() {
       key: 'optimistic',
       label: 'Optimistisch',
       description: 'Wachstumsorientierte Bewertung — Rendite + Upside-Potenzial dominieren, höhere LTV-Toleranz.',
-      icon: '🚀',
+      icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
       overrides: {
         // Hauptgewichtungen: Rendite + Upside wichtiger
         weights: {
@@ -279,21 +279,21 @@ window.DealScore2 = (function() {
       key: 'lage',
       label: 'Lage-Fokus',
       description: 'Fokus auf Lagequalität — die Lage zählt am stärksten, ideal für wertstabile A-/B-Lagen.',
-      icon: '📍',
+      icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
       overrides: { weights: { rendite: 20, finanzierung: 15, risiko: 15, lage: 40, upside: 10 } }
     },
     cashflow: {
       key: 'cashflow',
       label: 'Cashflow-Fokus',
       description: 'Fokus auf laufenden Cashflow + Rendite — für Anleger, die den monatlichen Überschuss priorisieren.',
-      icon: '💶',
+      icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 21a8 8 0 1 1 0-16"/><path d="M3 11h9"/><path d="M3 15h7"/></svg>',
       overrides: { weights: { rendite: 40, finanzierung: 25, risiko: 20, lage: 8, upside: 7 } }
     },
     sicherheit: {
       key: 'sicherheit',
       label: 'Sicherheit',
       description: 'Fokus auf Finanzierungssicherheit + geringes Risiko — solide Finanzierung schlägt Renditejagd.',
-      icon: '🔒',
+      icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
       overrides: { weights: { rendite: 25, finanzierung: 30, risiko: 30, lage: 10, upside: 5 } }
     }
   };
@@ -887,3 +887,4 @@ window.DealScore2 = (function() {
     _scoreUpside: scoreUpside
   };
 })();
+/* v838b-ds2-icons: 6 Profil-Emojis -> Inline-SVG (6 ersetzt) */

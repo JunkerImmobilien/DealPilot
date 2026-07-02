@@ -70,8 +70,23 @@
       '<input id="' + INPUT_ID + '" type="text" autocomplete="off" ' +
         'placeholder="Suche\u2026" aria-label="Objekte suchen nach ID, Stra\u00dfe oder Ort" ' +
         'style="color:#F2EFE9" />';
-    var toggle = row.querySelector('.sb-sort-toggle');
-    if (toggle) row.insertBefore(box, toggle); else row.appendChild(box);
+    /* v846-insertfix: robustes Einfuegen. .sb-sort-toggle steckt in .sb-tools-group und ist NICHT
+       direktes Kind von row -> row.insertBefore(box, toggle) warf NotFoundError und brach den
+       ganzen IIFE ab (kein Watcher, keine Suche). Jetzt: vor die tools-group, sonst vor toggle in
+       dessen echtem Parent, sonst ans row-Ende. */
+    try {
+      var toolsGroup = row.querySelector('.sb-tools-group');
+      var toggle = row.querySelector('.sb-sort-toggle');
+      if (toolsGroup && toolsGroup.parentNode === row) {
+        row.insertBefore(box, toolsGroup);
+      } else if (toggle && toggle.parentNode) {
+        toggle.parentNode.insertBefore(box, toggle);
+      } else {
+        row.appendChild(box);
+      }
+    } catch (e) {
+      try { row.appendChild(box); } catch (e2) {}
+    }
     var inp = document.getElementById(INPUT_ID);
     if (inp) {
       ['keyup', 'input', 'change', 'search'].forEach(function (ev) { inp.addEventListener(ev, applyFilter); });

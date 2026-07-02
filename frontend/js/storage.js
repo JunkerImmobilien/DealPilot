@@ -47,6 +47,7 @@ var FIELDS = [
 ];
 
 var _currentObjKey = null;  // Local mode key OR API object id
+var _newObjSaveInflight = false;  /* v828-inflight-guard: laeuft gerade ein POST fuer ein NEUES Objekt? */
 var _objCache = {};         // Cache of full object data when in API mode
 
 function collectData() {
@@ -362,6 +363,12 @@ function loadData(d) {
 async function saveObj(opts) {
   opts = opts || {};
   var silent = !!opts.silent || !!window._autoSaveActive;
+  /* v828-inflight-guard: Doppel-Anlage verhindern. Wenn bereits ein POST fuer ein NEUES
+     Objekt laeuft (_currentObjKey noch null), keinen zweiten POST starten. */
+  if (_newObjSaveInflight && !_currentObjKey) {
+    try { console.warn('[storage] saveObj: Neu-Anlage laeuft bereits -> zweiter Aufruf uebersprungen (v828)'); } catch(e){}
+    return;
+  }
   // Paywall: Track calculation usage
   if (!silent && typeof Paywall !== 'undefined' && Paywall.gate) {  /* v379-autosave */
     if (!Paywall.gate('calculations')) return;  // Limit reached → modal opens
@@ -447,11 +454,16 @@ async function saveObj(opts) {
           body: { data: data, aiAnalysis: aiText, photos: photos }
         });
       } else {
-        saved = await Auth.apiCall('/objects', {
-          method: 'POST',
-          body: { data: data, aiAnalysis: aiText, photos: photos }
-        });
-        _currentObjKey = saved.id;
+        _newObjSaveInflight = true;  /* v828-inflight-guard: Neu-Anlage-POST startet */
+        try {
+          saved = await Auth.apiCall('/objects', {
+            method: 'POST',
+            body: { data: data, aiAnalysis: aiText, photos: photos }
+          });
+          _currentObjKey = saved.id;
+        } finally {
+          _newObjSaveInflight = false;  /* v828-inflight-guard: POST fertig (ok oder Fehler) */
+        }
       }
 
       // Persist tax timeline with full detail (Migration 006)
@@ -792,6 +804,20 @@ async function renderSaved(opts) {
    * V63.4: Investor-Ribbon wenn ds2Score vorhanden (analog zur Header-Score-Karte)
    * opts: { key, seq, name, kp, cf_ns, dscr, bmy, photoSrc, hasAi, isActive, date, ds2Score }
    */
+  /* v844-card-kaufdat: Kaufdatum robust nach de-DE formatieren.
+     Akzeptiert 'YYYY-MM-DD', 'DD.MM.YYYY', ISO-Strings. Faellt auf Rohwert zurueck. */
+  function _fmtKaufdat(v) {
+    if (!v) return '';
+    try {
+      var str = String(v).trim();
+      if (/^\d{2}\.\d{2}\.\d{4}$/.test(str)) return str;            // schon de-DE
+      var m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);                  // YYYY-MM-DD[...] 
+      if (m) return m[3] + '.' + m[2] + '.' + m[1];
+      var d = new Date(str);
+      if (!isNaN(d.getTime())) return d.toLocaleDateString('de-DE');
+      return str;
+    } catch (e) { return String(v); }
+  }
   function _renderRichCard(opts) {
     var addr = _shortAddr(opts.name);
     var seqHtml = opts.seq
@@ -957,7 +983,7 @@ async function renderSaved(opts) {
         '</div>'
       : '';
 
-    return '<div class="sb-card' + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '" data-tip="' + _esc((opts.seq ? opts.seq + ' · ' : '') + (opts.name || '')) + '">' +
+    return '<div class="sb-card' + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '"' + (opts.dateUpdated ? ' data-updated="' + _esc(opts.dateUpdated) + '"' : '') /* v844-card-kaufdat: updated_at fuers Filtern */ + ' data-tip="' + _esc((opts.seq ? opts.seq + ' · ' : '') + (opts.name || '')) + '">' +
       investorRibbon +
       wonRibbon +
       lostRibbon + /* V322-lost-ribbon-html */
@@ -973,6 +999,8 @@ async function renderSaved(opts) {
             '<span class="sbc-arrow">›</span>' +
           '</div>' +
           (streetCity ? '<div class="sbc-address" title="' + _esc(opts.name) + '">' + _esc(streetCity) + '</div>' : '') +
+          /* v845-halter-nameonly: nur Name, kein 'Halter:'-Praefix, ganz klein */
+          (opts.halter ? '<div class="sbc-halter" style="color:rgba(168,162,153,0.85);font-size:8.5px;font-weight:500;line-height:1.2;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + _esc(opts.halter) + '</div>' : '') + /* v850-halter-inline */
           '<div class="sbc-kp-row">' +
             '<div class="sbc-kp">' + _fmtEUR(opts.kp) + '</div>' +
           '</div>' +
@@ -1186,7 +1214,10 @@ async function renderSaved(opts) {
           photoSrc: o.thumbnail || null,
           hasAi: o.has_ai,
           isActive: (o.id === _currentObjKey),
-          date: o.updated_at ? new Date(o.updated_at).toLocaleDateString('de-DE') : ''
+          /* v844-card-kaufdat: Karte zeigt Kaufdatum; updated_at nur noch als Filter-Attribut */
+          date: o.kaufdat ? _fmtKaufdat(o.kaufdat) : '',
+          dateUpdated: o.updated_at ? new Date(o.updated_at).toLocaleDateString('de-DE') : '',
+          halter: (o.halter && String(o.halter).trim()) ? o.halter : ''
         });
       }).join('') + _addNewBtn();
       list.querySelectorAll('.sb-card').forEach(function(el) {
@@ -1255,7 +1286,10 @@ async function renderSaved(opts) {
         photoSrc: photoSrc,
         hasAi: !!(d._ai),
         isActive: (k === _currentObjKey),
-        date: d._at ? new Date(d._at).toLocaleDateString('de-DE') : ''
+        /* v844-card-kaufdat: lokaler Pfad - Kaufdatum aus d.kaufdat/d.data, updated_at als Filter */
+        date: (d.kaufdat || (d.data && d.data.kaufdat)) ? _fmtKaufdat(d.kaufdat || d.data.kaufdat) : '',
+        dateUpdated: d._at ? new Date(d._at).toLocaleDateString('de-DE') : '',
+        halter: (function(){ var h = d.halter || (d.data && d.data.halter); return (h && String(h).trim()) ? h : ''; })()
       });
     }).join('') + _addNewBtn();
     list.querySelectorAll('.sb-card').forEach(function(el) {

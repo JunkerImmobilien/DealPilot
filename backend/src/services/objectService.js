@@ -41,6 +41,7 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
     `SELECT id, name, kuerzel, ort, kaufpreis, bmy, cf_ns, dscr, seq_no,
             version, created_at, updated_at,
             data::jsonb->>'halter' AS halter,  -- v815-halter: Mandanten-Filter Sidebar
+            data::jsonb->>'kaufdat' AS kaufdat,  -- v844-kaufdat: Kaufdatum auf Sidebar-Card
             CASE WHEN ai_analysis IS NULL OR ai_analysis = '' THEN false ELSE true END AS has_ai,
             COALESCE((data::jsonb->>'_ds2_computed')::boolean, false) AS ds2_computed,
             (data::jsonb->>'_dealpilot_score')::int AS dealpilot_score,

@@ -95,6 +95,12 @@ var MarketRatesPF = (function() {
     try { _syncTopStrip(); } catch(e){}
   }
   window.setPfandbriefMargin = setMargin;
+  /* v829-pf-expose: aktuell geladene Live-Pfandbrief-Daten (yields+margins) global bereitstellen,
+     damit dpGetIndicativeZins dieselbe Quelle wie die Kacheln nutzt (statt config-static). */
+  window.dpGetPfData = function () {
+    try { if (_currentData && _currentData.yields && _currentData.margins) return _currentData; } catch (e) {}
+    return null;
+  };
 
   function refreshPfandbriefRates() {
     return _refresh();

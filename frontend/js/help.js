@@ -22,7 +22,7 @@
       id: 'marktbewertung_felder',
       title: 'Marktbewertung — welche Felder zählen',
       icon: 'i-bar',
-      desc: 'Welche Objektangaben in Sprengnetter, DealPilot-Marktwert und PriceHubble einfließen',
+      desc: 'Objektangaben für die Marktbewertung',
       sections: [
         {
           h: 'Warum mehr Angaben = bessere Bewertung',
@@ -70,7 +70,7 @@
       id: 'kennzahlen',
       title: 'Kennzahlen verstehen',
       icon: 'i-bar',
-      desc: 'Bruttomietrendite, Nettomietrendite, DSCR, LTV, Equity Multiple, DealScore',
+      desc: 'Die wichtigsten Kennzahlen erklärt',
       sections: [
         {
           h: 'Bruttomietrendite — schnelle Vergleichszahl',
@@ -126,7 +126,7 @@
       id: 'finanzierung',
       title: 'Finanzierung',
       icon: 'i-coins',
-      desc: 'Annuität, Tilgungsaussetzung, Bausparen',
+      desc: 'Darlehen, Tilgung und Bausparen',
       sections: [
         {
           h: 'Annuitätendarlehen (Standard)',
@@ -146,7 +146,7 @@
       id: 'steuer',
       title: 'Steuer-Modul',
       icon: 'i-receipt',
-      desc: 'Tarif 2026, AfA, Werbungskosten',
+      desc: 'Steuer, AfA und Werbungskosten',
       sections: [
         {
           h: 'Persönlicher Grenzsteuersatz',
@@ -170,7 +170,7 @@
       id: 'pdf',
       title: 'PDF-Export',
       icon: 'i-file-text',
-      desc: 'Investment-Case, Bank-Präsentation',
+      desc: 'Bank-taugliche PDF-Reports',
       sections: [
         {
           h: 'PDF-Export (Aktionen → PDF Export)',
@@ -190,7 +190,7 @@
       id: 'charts',
       title: 'Charts & Visualisierungen',
       icon: 'i-trending-up',
-      desc: 'Equity-Build, Cockpit, Waterfall, Stress-Test',
+      desc: 'Portfolio-Auswertung und Charts',
       sections: [
         {
           h: 'Equity-Build (Vermögensaufbau)',
@@ -214,7 +214,7 @@
       id: 'ki',
       title: 'Pilot-Analyse',
       icon: 'i-cpu',
-      desc: 'KI-gestützte Investment-Bewertung',
+      desc: 'KI-gestützte Bewertung',
       sections: [
         {
           h: 'Was macht die KI?',
@@ -416,8 +416,8 @@
     modal.id = 'help-modal';
     modal.className = 'help-modal global-view-overlay';
     modal.innerHTML =
-      '<div class="help-modal-inner global-view-modal set-modal-v2 set-modal-cream">' +
-        '<div class="dp-modal-topband">' +'<div class="dp-mtb-brand"><span class="dp-mtb-logo">DealPilot</span><span class="dp-mtb-tag">HILFE</span></div>' +'<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title">DealPilot Hilfe</div><div class="dp-mtb-h-sub">Begriffe, Kennzahlen, Praxis-Wissen</div></div>' +'</div>' +  /* v793-topband */
+      '<div class="help-modal-inner global-view-modal set-modal-v2 set-modal-cream">' +  /* v820-help-remove-so */
+        '<div class="dp-modal-topband">' +'<div class="dp-mtb-brand"><span class="dp-mtb-logo">Deal<span class="dp-mtb-logo-g">Pilot</span></span><!--v821-logo-branding--><span class="dp-mtb-tag">HILFE</span></div>' +'<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title">DealPilot Hilfe</div><div class="dp-mtb-h-sub">Begriffe, Kennzahlen, Praxis-Wissen</div></div>' +'<button type="button" class="set-modal-close dp-band-close" onclick="hideHelp()" aria-label="Schließen" title="Schließen (ESC)">' +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +'</button>' +'</div>' +  /* v793-topband v843-x-in-band */
         // V118: Sidebar links (wie Settings) — Header + Topics-Liste + Search-Foot
         '<aside class="modal-side help-modal-side">' +
           '<div class="ms-h">' +
@@ -427,17 +427,16 @@
             '</div>' +
             '<div class="ms-sub">Begriffe, Kennzahlen, Praxis-Wissen</div>' +
           '</div>' +
-          '<div class="help-modal-search">' +
-            '<input type="text" id="help-search-input" placeholder="🔍 Suchen — DSCR, Tilgung, Steuer, Bausparen…" autocomplete="off">' +
+          '<div class="help-modal-search" style="position:relative">' + /* v838b-search-icon */
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:0.55;pointer-events:none" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>' +
+            '<input type="text" id="help-search-input" placeholder="Suchen — DSCR, Tilgung, Steuer, Bausparen…" autocomplete="off" style="padding-left:36px">' +
           '</div>' +
           '<div class="settings-tabs ms-tabs help-sidebar-list" id="help-sidebar"></div>' +
         '</aside>' +
 
         // V118: Content rechts (wie Settings) — X-Button + Pane + AI-Bar als Footer
         '<div class="set-modal-content help-modal-content">' +
-          '<button type="button" class="set-modal-close" onclick="hideHelp()" aria-label="Schließen" title="Schließen (ESC)">' +
-            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-          '</button>' +
+          /* v843-x-in-band: X-Button ins schwarze Band verschoben (siehe topband) */
           '<div class="pane-wrap help-content-wrap">' +
             '<main class="help-content" id="help-content"></main>' +
           '</div>' +
@@ -477,7 +476,7 @@
           iconHtml +
           '<span class="help-sidebar-item-title">' + _escHtml(t.title) + '</span>' +
         '</div>' +
-        '<span class="help-sidebar-item-desc">' + _escHtml(t.desc) + '</span>';
+        '<span class="help-sidebar-item-desc">' + _escHtml(t.desc) + '</span>'; /* v838b-help-desc: Untertexte wieder an, gekuerzt */
       item.onclick = function() { _selectTopic(t.id); };
       sidebar.appendChild(item);
     });

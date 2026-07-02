@@ -158,6 +158,21 @@
     if (a && a.parentNode) a.parentNode.insertBefore(h, a.nextSibling); else document.body.appendChild(h);
     return h;
   }
+  /* v832c-ensure-state: _mb_state existiert nur im Objekt-Tab, nicht im QC-iframe.
+     Element bei Bedarf erzeugen; _writeState schreibt + stoesst die AvmSection-Bruecke an. */
+  function _ensureState() {
+    var el = $(STATE_ID); if (el) return el;
+    el = document.createElement('input'); el.type = 'hidden'; el.id = STATE_ID; el.value = '';
+    document.body.appendChild(el);
+    return el;
+  }
+  function _writeState() {
+    try { var _el = _ensureState();
+      _el.value = JSON.stringify({ ts:Date.now(), card:D, mode:mode, collapsed:collapsed });
+      _el.dispatchEvent(new Event('input',{ bubbles:true }));
+    } catch (e) {}
+    try { if (typeof window._oabFeedTrigger === 'function') window._oabFeedTrigger(); } catch (e) {}
+  }
 
   function spanLabel() { return mode === 'low' ? 'Unten' : mode === 'high' ? 'Oben' : 'Ø'; }
   function frac(o) { return (o[mode] - o.low) / ((o.high - o.low) || 1); }
@@ -167,6 +182,10 @@
   }
 
   function render() {
+    /* v832c-disable-old-card: alte dp-mb-host-Tacho-Karte deaktiviert. DealPilot-Bewertung
+       erscheint jetzt als Karte im neuen AvmSection-System. run() schreibt weiterhin _mb_state. */
+    return;
+    /* --- alter Render-Pfad ab hier tot --- */
     if (!D) return;
     injectCss();
     var h = host();
@@ -251,9 +270,9 @@
     var _dph = await _dpmbHealth();
     if (_dph && _dph.mode === 'stub') { /* v772-dpmb-stub */
       var _p = _dpmbStubPayload(i);
-      D = mapCard(_p); mode = 'med'; collapsed = true; /* v782-collapsed-default */
+      D = mapCard(_p); mode = 'med'; collapsed = false; /* v830-mb-expanded: nach Abruf offen */
       render();
-      try { var _el = $(STATE_ID); if (_el) { _el.value = JSON.stringify({ ts:Date.now(), card:D, mode:mode, collapsed:collapsed }); _el.dispatchEvent(new Event('input',{ bubbles:true })); } } catch (e) {}
+      _writeState(); /* v832c-ensure-state: Stub */
       toast('\u2713 DealPilot-Marktbewertung (Demo)');
       return;
     }
@@ -273,8 +292,9 @@
         return;
       }
       var payload = data.data || data;
-      D = mapCard(payload); mode = 'med'; collapsed = true; /* v782-collapsed-default */
+      D = mapCard(payload); mode = 'med'; collapsed = false; /* v830-mb-expanded: nach Abruf offen */
       render();
+      _writeState(); /* v832c-ensure-state: Live-Zweig schrieb bisher KEINEN State */
       var _lc = (data._kerosin && typeof data._kerosin.charged === 'number') ? data._kerosin.charged : ((typeof data.cost === 'number') ? data.cost : (data.charged || data.liters || null));
       toast('✓ DealPilot-Marktbewertung' + (_lc ? ' (−' + _lc + ' L)' : ''));
     } catch (e) { toast('⚠ Netzwerkfehler bei der DealPilot-Marktbewertung'); }

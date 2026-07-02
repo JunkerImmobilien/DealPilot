@@ -431,7 +431,18 @@
 
   /* ===== Settings-Reiter ===== */
   var _editing = null;
-  function _rerender() { var host = document.getElementById('mand-settings-host'); if (host) host.innerHTML = renderSettingsTab(); }
+  function _rerender() {
+    var host = document.getElementById('mand-settings-host');
+    if (host) host.innerHTML = renderSettingsTab();
+    /* v841b-rerender-hook: nach dem Render die INLINE-Steuerzeitraeume-Verwaltung befuellen,
+       falls der Privat-Host da ist (nur im Bearbeiten-Modus des privaten Mandanten). */
+    try {
+      var _tph = document.getElementById('mand-tax-periods-host');
+      if (_tph && window.DealPilotTaxPeriods && typeof window.DealPilotTaxPeriods.renderInline === 'function') {
+        window.DealPilotTaxPeriods.renderInline(_tph);
+      }
+    } catch (e) { console.warn('[v841b-rerender-hook] renderInline:', e.message); }
+  }
   function renderSettingsTab() {
     if (!_isPro()) {
       return ''
@@ -524,12 +535,13 @@
       +   '</div>'
       + '</div>';
 
+    /* v841-zve-host: Privat -> echte INLINE-Steuerzeitraeume-Verwaltung (DB-gebunden). */
     var transHint =
         '<div id="mand-transparent-hint" style="display:' + (corp ? 'none' : 'block') + '">'
-      +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid rgba(201,168,76,.25);border-radius:10px;font-size:13px;color:#2A2727;line-height:1.5">'
-      +     '<b>Keine separaten Steuerangaben n\u00f6tig.</b> Privatverm\u00f6gen wird \u00fcber dein <b>zu versteuerndes Einkommen</b> besteuert \u2014 zvE / Grenzsteuersatz pflegst du im Tab <b>Steuer</b> beim Objekt. '
-      +     'Kein Kontenrahmen, keine Er\u00f6ffnungsbilanz.'
+      +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid rgba(201,168,76,.25);border-radius:10px;font-size:12.5px;color:#2A2727;line-height:1.5;margin-bottom:14px">'
+      +     '<b>Privatverm\u00f6gen</b> wird \u00fcber dein <b>zu versteuerndes Einkommen (zvE)</b> besteuert \u2014 gilt f\u00fcr alle privaten Objekte. Pflege die Zeitr\u00e4ume hier:'
       +   '</div>'
+      +   '<div id="mand-tax-periods-host"></div>'
       + '</div>';
 
     return ''
@@ -541,9 +553,10 @@
       + '</div>'
       + transHint
       + corpBlock
-      + '<div style="display:flex;gap:10px;margin-top:20px">'
-      +   '<button type="button" class="btn btn-gold" onclick="DealPilotMandanten.uiSave()"><span class="ic">\u2713</span> Speichern</button>'
-      +   '<button type="button" class="btn btn-outline" onclick="DealPilotMandanten.uiCancel()">Abbrechen</button>'
+      /* v827-back-btn: Zurueck-Button (uiCancel) - Rueckkehr zur Uebersicht. Speichern via unterem Global-Button. */
+      + '<div style="margin-top:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">'
+      +   '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiCancel()"><span class="ic">\u2190</span> Zur\u00fcck zur \u00dcbersicht</button>'
+      +   '<span style="font-size:12px;color:#7A7370">\u00c4nderungen werden mit \u201eSpeichern\u201c unten \u00fcbernommen.</span>'
       + '</div>';
   }
 
@@ -588,6 +601,24 @@
     if (locked) m._locked = true;
     upsert(m); _editing = null; _rerender();
   }
+  /* v826-mand-dedup: EINE uiSaveIfOpen (v818+v819-Doppelung entfernt). Speichert nur, wenn
+     der Editor offen ist UND es sich NICHT um einen leeren neuen Mandant handelt
+     (verhindert versehentliches Anlegen leerer Mandanten + Editor-Verlust). */
+  function uiSaveIfOpen() {
+    try {
+      if (!document.getElementById('mand-f-id')) return false;
+      /* Bei NEU (mand-f-id leer): nur speichern, wenn wirklich ein Name eingegeben wurde. */
+      var _idEl = document.getElementById('mand-f-id');
+      var _isNew = !_idEl || !String(_idEl.value || '').trim();
+      if (_isNew) {
+        var _nmEl = document.getElementById('mand-f-name');
+        var _nm = _nmEl ? String(_nmEl.value || '').trim() : '';
+        if (!_nm) return false;   /* leerer neuer Mandant -> NICHT anlegen */
+      }
+      uiSave(); return true;
+    } catch (e) {}
+    return false;
+  }
 
   /* ===== Init ===== */
   function init() {
@@ -618,6 +649,7 @@
     setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, wireObjectFields: wireObjectFields,
     renderSidebarChips: renderSidebarChips, _toggleMandMenu: _toggleMandMenu, onUeberfToggle: onUeberfToggle, undoUeberfuehrung: undoUeberfuehrung, undoUeberfuehrungFromPrivat: undoUeberfuehrungFromPrivat,  syncAfterLoad: syncAfterLoad,  /* v816d-export */
     renderSettingsTab: renderSettingsTab,
+    uiSaveIfOpen: uiSaveIfOpen,   /* v826 (dedup) */
     uiNew: uiNew, uiEdit: uiEdit, uiCancel: uiCancel, uiSave: uiSave, uiDelete: uiDelete, uiToggleRf: uiToggleRf
   };
 })();

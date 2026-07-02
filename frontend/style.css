@@ -27209,3 +27209,269 @@ aside.sidebar .sb-card.deal-won.active {
     height: 16px;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   v834-settings-unify — Arbeitsbereiche Settings + Hilfe an Objekt-Tab angleichen.
+   ADDITIV. Zielt auf die Content-Panes (nicht die linke Nav). Vereinheitlicht
+   Schrift, Labels, Inputs/Selects, Section-Ueberschriften, Hints, Einheiten.
+   Scope: .set-modal-v2 .set-modal-content  +  .help-modal-inner .help-modal-content
+   ═══════════════════════════════════════════════════════════════ */
+
+/* --- gemeinsamer Scope-Alias via zwei Selektor-Praefixe (Settings + Hilfe) --- */
+
+/* 1) Grundschrift im gesamten Arbeitsbereich vereinheitlichen */
+.set-modal-v2 .set-modal-content,
+.help-modal-inner .help-modal-content {
+  font-family: 'Inter', 'DM Sans', system-ui, sans-serif !important;
+  font-size: 13.5px;
+  color: var(--text, #1b1815);
+}
+
+/* 2) Section-Ueberschriften (h3.set-section-h + generische h3/h4) einheitlich */
+.set-modal-v2 .set-modal-content .set-section-h,
+.set-modal-v2 .set-modal-content h3,
+.set-modal-v2 .set-modal-content h4,
+.help-modal-inner .help-modal-content .set-section-h,
+.help-modal-inner .help-modal-content h3,
+.help-modal-inner .help-modal-content h4 {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: var(--gold, #C9A84C) !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  line-height: 1.3 !important;
+}
+
+/* 3) Feld-Wrapper .f einheitlicher Abstand */
+.set-modal-v2 .set-modal-content .f,
+.help-modal-inner .help-modal-content .f {
+  margin-bottom: 14px !important;
+}
+
+/* 4) Labels — eine Groesse/Gewicht/Farbe (wie Objekt-Tab) */
+.set-modal-v2 .set-modal-content .f > label,
+.set-modal-v2 .set-modal-content label,
+.help-modal-inner .help-modal-content .f > label,
+.help-modal-inner .help-modal-content label {
+  font-family: 'Inter', 'DM Sans', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  color: var(--muted, #6b6660) !important;
+  text-transform: none !important;
+  margin-bottom: 5px !important;
+  display: block !important;
+}
+/* kleine "(mind. 10 Zeichen)"-Zusaetze nicht fetten */
+.set-modal-v2 .set-modal-content label small,
+.help-modal-inner .help-modal-content label small {
+  font-weight: 400 !important;
+  opacity: 0.6 !important;
+  font-size: 11px !important;
+}
+
+/* 5) Inputs, Selects, Textareas — EINE einheitliche Optik (Objekt-Tab-Look) */
+.set-modal-v2 .set-modal-content input[type="text"],
+.set-modal-v2 .set-modal-content input[type="email"],
+.set-modal-v2 .set-modal-content input[type="password"],
+.set-modal-v2 .set-modal-content input[type="number"],
+.set-modal-v2 .set-modal-content input[type="tel"],
+.set-modal-v2 .set-modal-content input[type="url"],
+.set-modal-v2 .set-modal-content select,
+.set-modal-v2 .set-modal-content textarea,
+.help-modal-inner .help-modal-content input[type="text"],
+.help-modal-inner .help-modal-content input[type="email"],
+.help-modal-inner .help-modal-content input[type="password"],
+.help-modal-inner .help-modal-content input[type="number"],
+.help-modal-inner .help-modal-content select,
+.help-modal-inner .help-modal-content textarea {
+  font-family: 'Inter', 'DM Sans', system-ui, sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  color: var(--text, #1b1815) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(12,11,9,0.16) !important;
+  border-radius: 9px !important;
+  padding: 10px 12px !important;
+  height: auto !important;
+  line-height: 1.35 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+.set-modal-v2 .set-modal-content input:focus,
+.set-modal-v2 .set-modal-content select:focus,
+.set-modal-v2 .set-modal-content textarea:focus,
+.help-modal-inner .help-modal-content input:focus,
+.help-modal-inner .help-modal-content select:focus,
+.help-modal-inner .help-modal-content textarea:focus {
+  outline: none !important;
+  border-color: var(--gold, #C9A84C) !important;
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.14) !important;
+}
+/* readonly-Felder dezent */
+.set-modal-v2 .set-modal-content input[readonly],
+.help-modal-inner .help-modal-content input[readonly] {
+  background: #f7f5f1 !important;
+  color: var(--muted, #6b6660) !important;
+}
+
+/* 6) Hints/Erklaerungstexte — eine Groesse/Farbe, keine Inline-Wildwuchs-Groessen */
+.set-modal-v2 .set-modal-content .hint,
+.set-modal-v2 .set-modal-content p.hint,
+.help-modal-inner .help-modal-content .hint,
+.help-modal-inner .help-modal-content p.hint {
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  color: var(--muted, #6b6660) !important;
+  margin: 0 0 12px !important;
+}
+
+/* 7) Einheiten-Suffixe (.sfx) + Input-mit-Einheit (.iw) wie Objekt-Tab */
+.set-modal-v2 .set-modal-content .iw,
+.help-modal-inner .help-modal-content .iw {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.set-modal-v2 .set-modal-content .iw .sfx,
+.help-modal-inner .help-modal-content .iw .sfx {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+  color: var(--muted, #6b6660) !important;
+  margin-left: -34px !important;
+  pointer-events: none !important;
+  white-space: nowrap !important;
+}
+
+/* 8) Grid-Gruppen .g2/.g3 einheitlicher Gap */
+.set-modal-v2 .set-modal-content .g2,
+.help-modal-inner .help-modal-content .g2 {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 14px !important;
+}
+.set-modal-v2 .set-modal-content .g3,
+.help-modal-inner .help-modal-content .g3 {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr !important;
+  gap: 14px !important;
+}
+@media (max-width: 720px) {
+  .set-modal-v2 .set-modal-content .g2,
+  .set-modal-v2 .set-modal-content .g3,
+  .help-modal-inner .help-modal-content .g2,
+  .help-modal-inner .help-modal-content .g3 { grid-template-columns: 1fr !important; }
+}
+
+/* 9) Buttons im Arbeitsbereich einheitliche Groesse (nicht die Nav) */
+.set-modal-v2 .set-modal-content .btn.btn-sm,
+.help-modal-inner .help-modal-content .btn.btn-sm {
+  font-size: 12.5px !important;
+  padding: 8px 14px !important;
+  border-radius: 9px !important;
+}
+
+/* 10) Trennlinien einheitlich */
+.set-modal-v2 .set-modal-content hr.dvd,
+.help-modal-inner .help-modal-content hr.dvd {
+  border: none !important;
+  border-top: 1px solid rgba(12,11,9,0.10) !important;
+  margin: 22px 0 !important;
+}
+/* v834-settings-unify END */
+
+
+/* v843-band-close: Schliessen-X im schwarzen Header-Band (Settings + Hilfe) */
+.dp-modal-topband { position: relative; }
+.dp-band-close {
+  position: absolute !important;
+  top: 50% !important;
+  right: 20px !important;
+  transform: translateY(-50%) !important;
+  width: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(201,168,76,0.35) !important;
+  border-radius: 9px !important;
+  color: #E8CC7A !important;
+  cursor: pointer !important;
+  transition: background 0.15s, border-color 0.15s !important;
+  z-index: 10 !important;
+  padding: 0 !important;
+}
+.dp-band-close:hover {
+  background: rgba(201,168,76,0.18) !important;
+  border-color: rgba(201,168,76,0.6) !important;
+}
+.dp-band-close svg { width: 18px; height: 18px; }
+/* v843-band-close END */
+
+
+
+
+
+/* v845b-search-css: Styling der Sidebar-Suche (.sb-search-box) - fehlte komplett, Feld war unsichtbar.
+   Markup aus sidebar-search.js: Flex-Row mit Lupe-SVG + input#sb-search-input. */
+.sb-section-title-with-sort .sb-search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 8px;
+  padding: 5px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.28);
+  border-radius: 8px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.sb-section-title-with-sort .sb-search-box:focus-within {
+  border-color: rgba(201,168,76,0.55);
+  background: rgba(255,255,255,0.06);
+}
+.sb-section-title-with-sort .sb-search-box input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #F2EFE9;
+  font-size: 12.5px;
+  font-family: inherit;
+  padding: 0;
+}
+.sb-section-title-with-sort .sb-search-box input::placeholder {
+  color: #6a6560;
+}
+/* v845b-search-css END */
+
+
+/* v850-halter-final: Halter EXAKT wie Kaufdatum (.sbc-date = rgba(168,162,153,0.85)).
+   Element ist <div class="sbc-halter"> in .sbc-top-body. Direkte Klassen-Regel + !important,
+   ohne #sb-list-Vorbehalt (der matchte nicht zuverlaessig). Mehrere Selektor-Varianten fuer
+   maximale Reichweite, alle mit !important. */
+.sbc-halter,
+.sb-card .sbc-halter,
+.sbc-top-body .sbc-halter,
+aside.sidebar .sbc-halter {
+  color: rgba(168,162,153,0.85) !important;
+  font-size: 8.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  margin-top: 1px !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  opacity: 1 !important;
+}
+/* v850-halter-final END */

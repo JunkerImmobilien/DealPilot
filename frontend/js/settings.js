@@ -150,7 +150,8 @@ function showSettings(initialTab) {
   modal.id = 'settings-modal';
   modal.className = 'global-view-overlay';
   modal.innerHTML =
-    '<div class="global-view-modal settings-modal set-modal-v2 set-modal-cream">' +
+    '<div class="global-view-modal settings-modal set-modal-v2 set-modal-cream">' +  /* v819-settings-topband */
+      '<div class="dp-modal-topband">' +'<div class="dp-mtb-brand"><span class="dp-mtb-logo">Deal<span class="dp-mtb-logo-g">Pilot</span></span><!--v821-logo-branding--><span class="dp-mtb-tag">EINSTELLUNGEN</span></div>' +'<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title" id="set-band-title">Account &amp; Sicherheit</div><div class="dp-mtb-h-sub" id="set-band-sub">Login-Daten, Passwort und Zwei-Faktor-Absicherung.</div></div>' +'<button type="button" class="set-modal-close dp-band-close" onclick="closeSettings()" aria-label="Schließen" title="Schließen (ESC)">' +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +'</button>' +'</div>' + /* v843-x-in-band */
       // V87: Cream-Classic Split-Layout — Sidebar links (Header + Tabs + User-Foot),
       // Content rechts (Pane mit Header + Save-Row als Grid-Footer).
       '<aside class="modal-side">' +
@@ -162,21 +163,63 @@ function showSettings(initialTab) {
           '<div class="ms-sub">Account, KI, Deal Score-Gewichtung</div>' +
         '</div>' +
 
-      '<div class="settings-tabs ms-tabs">' +
-        '<button class="st-tab ms-tab active" data-tab="account" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-user"/></svg></span>Account &amp; Sicherheit</button>' +
-        // V275-2fa-final: Sicherheit-Tab entfernt - alles in Account-Tab
-        '<button class="st-tab ms-tab" data-tab="contact" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-pin"/></svg></span>Kontakt &amp; Logo</button>' +
-        '<button class="st-tab ms-tab" data-tab="api" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-brain"/></svg></span>KI</button>' +
-        '<button class="st-tab ms-tab" data-tab="dealscore" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-bar"/></svg></span>Deal Score</button>' +
-        '<button class="st-tab ms-tab" data-tab="profilanzeige" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-target"/></svg></span>Profil &amp; Anzeige</button>' +
-        '<button class="st-tab ms-tab" data-tab="datenraum" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-share"/></svg></span>Datenraum</button>' +
-        '<button class="st-tab ms-tab" data-tab="anbieter" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-share"/></svg></span>Externe Anbieter</button>' +
-        '<button class="st-tab ms-tab" data-tab="mandanten" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-home"/></svg></span>Mandanten</button>' +
-        // V63.57: Daten-Tab entfernt — Import/Export jetzt direkt aus der Sidebar
-        '<button class="st-tab ms-tab" data-tab="plan" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-star"/></svg></span>Plan</button>' +
-        '<button class="st-tab ms-tab" data-tab="info" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-info"/></svg></span>Info</button>' +
-        '<button class="st-tab ms-tab" data-tab="rechtliches" onclick="_swSet(this)"><span class="ic"><svg width="15" height="15"><use href="#i-book"/></svg></span>Rechtliches</button>' +
-        '<button class="st-tab ms-tab" data-tab="help" onclick="closeSettings(); if(typeof showHelp===\'function\') showHelp();"><span class="ic"><svg width="15" height="15"><use href="#i-help"/></svg></span>Hilfe</button>' +
+      '<div class="settings-tabs ms-tabs">' +  /* v823-settings-nav */
+        '<button class="help-sidebar-item st-tab ms-tab active" data-tab="account" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-user"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Account &amp; Sicherheit</span></div>' +
+          '<span class="help-sidebar-item-desc">Login, Passwort, Zwei-Faktor</span>' +
+        '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="contact" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-pin"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Kontakt &amp; Logo</span></div>' +
+          '<span class="help-sidebar-item-desc">PDF-Ersteller, Firmenlogo</span>' +
+        '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="api" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-brain"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Co-Pilot (KI)</span></div>' +
+          '<span class="help-sidebar-item-desc">Tonalit&auml;t, Fokus, Instruktionen</span>' +
+        '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="dealscore" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-bar"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Deal Score</span></div>' +
+          '<span class="help-sidebar-item-desc">Gewichtung, Schwellenwerte</span>' +
+        '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="profilanzeige" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-target"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Profil &amp; Anzeige</span></div>' +
+          '<span class="help-sidebar-item-desc">Sichtbarkeit, Darstellung</span>' +
+        '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="datenraum" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-share"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Datenraum</span></div>' +
+          '<span class="help-sidebar-item-desc">Freigaben, Zugriffe</span>' +
+        '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="anbieter" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-share"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Externe Anbieter</span></div>' +
+          '<span class="help-sidebar-item-desc">Partner &amp; Vermittlung</span>' +
+        '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="mandanten" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-home"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Mandanten</span></div>' +
+          '<span class="help-sidebar-item-desc">Steuerregime, Buchhaltung</span>' +
+        '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="plan" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-star"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Plan</span></div>' +
+          '<span class="help-sidebar-item-desc">Abo, Kerosin, Abrechnung</span>' +
+        '</button>' +
+        /* v839-info-removed: Info-Tab-Button entfernt */
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="rechtliches" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-book"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Rechtliches</span></div>' +
+          '<span class="help-sidebar-item-desc">Impressum, Datenschutz, AGB</span>' +
+        '</button>' +
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="help" onclick="closeSettings(); if(typeof showHelp===\'function\') showHelp();">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-help"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Hilfe</span></div>' +
+          '<span class="help-sidebar-item-desc">Begriffe, FAQ, Praxis-Wissen</span>' +
+        '</button>' +
       '</div>' +
 
       // V87: User-Foot in der Sidebar (Avatar + Name + E-Mail + Plan-Pille)
@@ -192,10 +235,7 @@ function showSettings(initialTab) {
 
       // V87: Content-Container rechts (Pane oben, Save-Row als Grid-Footer)
       '<div class="set-modal-content">' +
-        // V108: X-Button oben rechts zum Schließen (wie bei anderen Modals)
-        '<button type="button" class="set-modal-close" onclick="closeSettings()" aria-label="Schließen" title="Schließen (ESC)">' +
-          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-        '</button>' +
+        /* v843-x-in-band: X-Button ins schwarze Band verschoben (siehe topband) */
         '<div class="pane-wrap">' +
 
       // Tab 1: Account (V63.21: umbenannt von "Personal" + Passwort + Logout + Plan-Anzeige)
@@ -213,7 +253,7 @@ function showSettings(initialTab) {
               '<div class="f"><label>Neue E-Mail</label><input id="dp-ec-new" type="email" placeholder="neu@beispiel.de" autocomplete="off"></div>' +
               '<div class="f"><label>Aktuelles Passwort</label><input id="dp-ec-pw" type="password" autocomplete="current-password"></div>' +
               '<button type="button" class="btn btn-sm" onclick="if(window._dpEmailChangeSubmit)_dpEmailChangeSubmit()">Best\u00e4tigungslink senden</button>' +
-              '<div id="dp-ec-msg" style="margin-top:8px;font-size:12.5px;line-height:1.4"></div>' +
+              '<div id="dp-ec-msg" style="margin-top:8px;line-height:1.4"></div>' +
             '</div>' : '') +
           '</div>' +
         '</div>' +
@@ -255,10 +295,7 @@ function showSettings(initialTab) {
 
         // Logout-Button (nur API-Mode)
         (typeof Auth !== 'undefined' && Auth.isApiMode && Auth.isApiMode() ?
-          '<hr class="dvd">' +
-          '<div class="account-logout-row">' +
-            '<button type="button" class="btn-logout" onclick="_doLogout()">' + (window.Icons && Icons.logOut ? Icons.logOut({size:14}) : '') + ' Abmelden</button>' +
-          '</div>' +
+          /* v837-logout-removed: Abmelden-Button + fuehrende Trennlinie entfernt (Marcel-Wunsch) */
           // V63.76: Danger-Zone — Account-Löschung
           '<hr class="dvd">' +
           '<h3 class="set-section-h" style="color:var(--red,#B8625C)">Account löschen</h3>' +
@@ -315,10 +352,10 @@ function showSettings(initialTab) {
 
         // V193: Anfrage-Routing Sektion (nur Pro sichtbar — wird per JS ein-/ausgeblendet)
         '<div class="branding-routing-section" id="branding-routing-section" data-v193="1" style="display:none">' +
-          '<hr class="dvd"><h3 style="font-size:14px;margin:8px 0">📨 Anfrage-Routing <span style="font-size:11px;color:rgba(42,39,39,0.55);font-weight:400">— wer empfängt die Anfragen aus dem Deal-Aktion-Tab</span></h3>' +
+          '<hr class="dvd"><h3 class="set-section-h"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><use href="#i-send"/></svg>Anfrage-Routing <span style="color:rgba(42,39,39,0.55);font-weight:400">— wer empfängt die Anfragen aus dem Deal-Aktion-Tab</span></h3>' +
           '<p class="hint">Lass ein Feld leer um die zentrale E-Mail oben zu nutzen. Pro-Funktion: deine Anfragen werden direkt an deine Geschäftsadresse geleitet statt an Junker Immobilien.</p>' +
           '<div class="g2">' +
-            '<div class="f"><label>Firmenname Finanzierungspartner</label><input id="set_branding_bank_name" type="text" value="' + _esc(view.branding_bank_name) + '" placeholder="z.B. Müller Finanzberatung"><span class="hint" style="font-size:11px">Erscheint im Submit-Button "An [Name] senden"</span></div>' +
+            '<div class="f"><label>Firmenname Finanzierungspartner</label><input id="set_branding_bank_name" type="text" value="' + _esc(view.branding_bank_name) + '" placeholder="z.B. Müller Finanzberatung"><span class="hint">Erscheint im Submit-Button "An [Name] senden"</span></div>' +
             '<div class="f"><label>Bank-Anfrage E-Mail</label><input id="set_branding_email_bank" type="email" value="' + _esc(view.branding_email_bank) + '" placeholder="leer = zentrale E-Mail oben"></div>' +
           '</div>' +
           '<div class="g2">' +
@@ -332,7 +369,7 @@ function showSettings(initialTab) {
           '<div class="f"><label>Calendly-URL für Termine</label><input id="set_branding_calendly_url" type="url" value="' + _esc(view.branding_calendly_url) + '" placeholder="https://calendly.com/deine-firma/kennenlernen — leer = Junker-Calendly"></div>' +
         '</div>' +
 
-        '<hr class="dvd"><h3 style="font-size:14px;margin:8px 0">Eigenes Logo für PDFs</h3>' +
+        '<hr class="dvd"><h3 class="set-section-h">Eigenes Logo für PDFs</h3>' +
         // V63.5: Hartes Feature-Gating — Logo-Upload nur bei custom_logo-Feature
         (function() {
           var hasCustomLogo = window.DealPilotConfig && DealPilotConfig.pricing &&
@@ -576,10 +613,7 @@ function showSettings(initialTab) {
         _renderPlanPane() +
       '</div>' +
 
-      // V51 — Tab 7: Info
-      '<div class="st-pane" data-pane="info" style="display:none">' +
-        _renderInfoPane() +
-      '</div>' +
+      /* v839-info-removed: Info-Pane + Kommentar entfernt */
 
       // V142: Tab Rechtliches — Impressum + Datenschutz dauerhaft ausgeklappt
       '<div class="st-pane" data-pane="rechtliches" style="display:none">' +
@@ -608,8 +642,8 @@ function showSettings(initialTab) {
           '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">' +
             '<input type="checkbox" id="set_collapse_market_cards"' + (_v213IsChecked()?' checked':'') + ' style="margin-top:3px;flex-shrink:0;cursor:pointer;" onchange="_v213OnToggleChange(this)">' +
             '<span>' +
-              '<span style="display:block;font-size:13px;color:var(--ch,#2A2727);font-weight:500">Markt-Daten-Cards standardmäßig zugeklappt</span>' +
-              '<span style="display:block;font-size:11.5px;color:var(--muted,#5F5E5A);margin-top:2px;line-height:1.5;font-weight:400">Wenn aktiviert: Markt-Kontext, Marktzinsen und Pfandbrief-Card im Finanzierung-Tab werden beim Laden zugeklappt. Du kannst sie jederzeit einzeln per Klick öffnen.</span>' +
+              '<span style="display:block;color:var(--ch,#2A2727);font-weight:500">Markt-Daten-Cards standardmäßig zugeklappt</span>' +
+              '<span style="display:block;color:var(--muted,#5F5E5A);margin-top:2px;line-height:1.5;font-weight:400">Wenn aktiviert: Markt-Kontext, Marktzinsen und Pfandbrief-Card im Finanzierung-Tab werden beim Laden zugeklappt. Du kannst sie jederzeit einzeln per Klick öffnen.</span>' +
             '</span>' +
           '</label>' +
           '<div style="margin-top:10px;text-align:right">' +
@@ -635,7 +669,7 @@ function showSettings(initialTab) {
             '<span class="dp-tt-mode-btn-label">Alle anzeigen</span>' +
           '</button>' +
         '</div>' +
-        '<p class="hint" style="margin-top:8px;font-size:11px;color:var(--muted)">Anfänger-Modus zeigt alle Tooltips (Default). Profi-Modus blendet Anfänger-Erklärungen aus, behält aber kritische Hinweise (§ 7b, 15%-Regel etc.). Aus = komplett aus.</p>' +
+        '<p class="hint" style="margin-top:8px;color:var(--muted)">Anfänger-Modus zeigt alle Tooltips (Default). Profi-Modus blendet Anfänger-Erklärungen aus, behält aber kritische Hinweise (§ 7b, 15%-Regel etc.). Aus = komplett aus.</p>' +
         /* === V228 tooltip-mode-toggle END === */
         /* === v648-mb-theme START === */
         '<hr class="dvd">' +
@@ -667,12 +701,8 @@ function showSettings(initialTab) {
 
   // V108: Backdrop-Klick + ESC-Taste schließen das Settings-Modal
   //       Marcel-Wunsch: schließbar ohne extra "Abbrechen" zu drücken
-  modal.addEventListener('click', function(e) {
-    // Nur wenn auf Backdrop geklickt wird (nicht auf Inhalt)
-    if (e.target === modal) {
-      closeSettings();
-    }
-  });
+  /* v825-no-outclick: Backdrop-Klick-Handler entfernt. Settings schliesst NUR ueber das X
+     (oder ESC). Klick neben das Modal tut bewusst nichts. */
   // ESC-Handler — wird beim Schließen wieder entfernt (in closeSettings)
   window._setEscHandler = function(e) {
     if (e.key === 'Escape' || e.keyCode === 27) {
@@ -879,6 +909,31 @@ function _swSet(btn) {
   _setCollectFormIntoDraft();
   var pane = btn.dataset.tab;
   document.querySelectorAll('.st-tab').forEach(function(t) { t.classList.toggle('active', t === btn); });
+  /* v818-swset-hero: durchlaufendes Gold-Band oben auf den aktiven Tab setzen. */
+  try {
+    var _tab = btn && btn.getAttribute('data-tab');
+    var _SOH = {
+      account:['Account & Sicherheit','Login-Daten, Passwort und Zwei-Faktor-Absicherung.'],
+      contact:['Kontakt & Logo','Kontaktdaten und Logo f\u00fcr den Bankexport.'],
+      api:['KI','Analyse-Tonalit\u00e4t, Fokus und Instruktionen f\u00fcr alle Pilot-Analysen.'],
+      dealscore:['Deal Score','Gewichtung der Score-Kategorien und Schwellenwerte.'],
+      profilanzeige:['Profil & Anzeige','Investmentprofil und Anzeige-Einstellungen.'],
+      datenraum:['Datenraum','Geteilte Objekte und Portfolio-P\u00e4sse.'],
+      anbieter:['Externe Anbieter','ImmoMetrica und weitere Datenquellen verbinden.'],
+      mandanten:['Mandanten','Gesellschaften, Halter und Steuerregime verwalten.'],
+      plan:['Plan','Dein aktueller Tarif und Kerosin-Guthaben.'],
+      info:['Info','Version, Changelog und Systemstatus.'],
+      rechtliches:['Rechtliches','Impressum, Datenschutz und AGB.'],
+      help:['Hilfe','Interaktive Tour, FAQ und Support.']
+    };
+    var _e = _SOH[_tab];
+    if (_e) {
+      /* v819-swset-band: Titel im echten dp-modal-topband setzen. */
+      var _t = document.getElementById('set-band-title'), _sub = document.getElementById('set-band-sub');
+      if (_t) _t.textContent = _e[0];
+      if (_sub) _sub.textContent = _e[1];
+    }
+  } catch (e) {}
   document.querySelectorAll('.st-pane').forEach(function(p) {
     var show = p.dataset.pane === pane;
     p.classList.toggle('active', show);
@@ -922,6 +977,13 @@ function _swSet(btn) {
       var mandHost = document.getElementById('mand-settings-host');
       if (mandHost) mandHost.innerHTML = window.DealPilotMandanten.renderSettingsTab();
     }
+    /* v841-zve-inline-call: echte Steuerzeitraeume-Verwaltung INLINE in den Privat-Mandanten. */
+    try {
+      if (window.DealPilotTaxPeriods && typeof window.DealPilotTaxPeriods.renderInline === 'function') {
+        var _tph = document.getElementById('mand-tax-periods-host');
+        if (_tph) window.DealPilotTaxPeriods.renderInline(_tph);
+      }
+    } catch (e) { console.warn('[v841-zve-inline] renderInline:', e.message); }
   }
 
   // V140: Datenraum-Pane lazy rendern
@@ -959,23 +1021,14 @@ function _swSet(btn) {
       if (window.DealPilotZvE) {
         // Override renderHistoryEditor mit Hinweis-Stub
         window.DealPilotZvE.renderHistoryEditor = function() {
-          return '<div style="margin-top:22px;padding:14px 16px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.22);border-radius:10px;font-family:var(--font-main,\'IBM Plex Sans\',sans-serif)">' +
-            '<div style="font-weight:600;font-size:14px;color:var(--ch,#2A2727);margin-bottom:4px">Zu versteuerndes Einkommen (zvE)</div>' +
-            '<div style="font-size:12.5px;color:var(--muted,#7A7370);margin-bottom:8px">Die zvE-Verwaltung ist jetzt verlaufsbasiert mit Steuerzeitraeumen. Du findest sie im Steuer-Tab.</div>' +
-            '<button type="button" onclick="if(window.DealPilotTaxPeriods)DealPilotTaxPeriods.openModal()" style="padding:10px 16px;background:#fff;color:var(--ch,#2A2727);border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer">Steuerzeitraeume verwalten →</button>' +
+          return '<div style="margin-top:22px;padding:14px 16px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.22);border-radius:10px">' +
+            '<div style="font-weight:600;color:var(--ch,#2A2727);margin-bottom:4px;font-size:15px">Zu versteuerndes Einkommen (zvE)</div>' +
+            '<div style="color:var(--muted,#7A7370);margin-bottom:8px">Die zvE-Verwaltung ist jetzt verlaufsbasiert mit Steuerzeitraeumen. Du findest sie im Steuer-Tab.</div>' +
+            '<button type="button" onclick="if(window.DealPilotTaxPeriods)DealPilotTaxPeriods.openModal()" style="padding:10px 16px;background:#fff;color:var(--ch,#2A2727);border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-weight:500;cursor:pointer">Steuerzeitraeume verwalten →</button>' +
             '</div>';
         };
       }
-      if (window.DealPilotZvE) {
-        var ipHost2 = document.getElementById('ip-pane-host');
-        var zveHost = document.getElementById('dp-zve-editor-host');
-        if (!zveHost && ipHost2 && ipHost2.parentNode) {
-          zveHost = document.createElement('div');
-          zveHost.id = 'dp-zve-editor-host';
-          ipHost2.parentNode.insertBefore(zveHost, ipHost2.nextSibling);
-        }
-        if (zveHost) zveHost.innerHTML = window.DealPilotZvE.renderHistoryEditor();
-      }
+      /* v839-zve-move: zvE-Hinweis nicht mehr in Profil&Anzeige - jetzt in Mandanten (siehe unten) */
     } catch (e) {
       console.warn('[V257-08] zvE-Editor-Inject fehlgeschlagen:', e.message);
     }
@@ -1018,6 +1071,13 @@ function closeSettings() {
     document.removeEventListener('keydown', window._setEscHandler);
     window._setEscHandler = null;
   }
+  /* v842-editing-reset: Mandanten-Bearbeitungsmodus zuruecksetzen, damit beim naechsten
+     Oeffnen die Uebersicht erscheint (nicht das Formular). */
+  try {
+    if (window.DealPilotMandanten && typeof window.DealPilotMandanten.uiCancel === 'function') {
+      window.DealPilotMandanten.uiCancel();
+    }
+  } catch (e) {}
 }
 
 function _uploadLogo(input) {
@@ -1215,6 +1275,16 @@ function _saveSettings() {
     } catch (e) { console.warn('[settings] InvestmentProfile-Save fehlgeschlagen:', e); }
   }
 
+  // v818-global-save-mand: Mandanten-Editor (Steuerregime/Buchhaltung) mitspeichern, wenn offen.
+  if (window.DealPilotMandanten && typeof window.DealPilotMandanten.uiSaveIfOpen === 'function') {
+    try { window.DealPilotMandanten.uiSaveIfOpen(); } catch (e) { console.warn('[settings] Mandanten-Save fehlgeschlagen:', e); }
+  }
+
+  // v819-global-save-mand: Mandanten-Editor (Steuerregime/Buchhaltung) mitspeichern, wenn offen.
+  if (window.DealPilotMandanten && typeof window.DealPilotMandanten.uiSaveIfOpen === 'function') {
+    try { window.DealPilotMandanten.uiSaveIfOpen(); } catch (e) { console.warn('[settings] Mandanten-Save fehlgeschlagen:', e); }
+  }
+
   // Draft = aktueller Stand, also nicht mehr dirty
   window._SetDraft.current = Object.assign({}, s);
   window._SetDraft.dirty = false;
@@ -1267,9 +1337,9 @@ function _v192ShowProHintIfNeeded() {
     hint.className = 'v192-pro-hint';
     hint.style.cssText = 'background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05));border:1px solid rgba(201,168,76,0.40);border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px';
     hint.innerHTML = 
-      '<div style="font-size:22px">✨</div>' +
+      '<div style="display:flex;align-items:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-star"/></svg></div>' + /* v838-sparkle-svg */
       '<div style="flex:1">' +
-      '<div style="font-weight:600;color:#9a7f33;font-size:13px;margin-bottom:2px">Eigenes Branding nur im Pro-Plan</div>' +
+      '<div style="font-weight:600;color:#9a7f33;margin-bottom:2px;font-size:15px">Eigenes Branding nur im Pro-Plan</div>' +
       '<div style="font-size:12px;color:rgba(42,39,39,0.7);line-height:1.4">Im Pro-Plan kannst du deine eigenen Firmen- und Kontaktdaten hinterlegen — sie erscheinen dann im <strong>Deal-Aktion-Banner</strong>, den <strong>Anfrage-Karten</strong> und in <strong>PDF-Exports</strong>. Aktuell wird Junker Immobilien angezeigt.</div>' +
       '</div>' +
       '<button type="button" onclick="closeSettings(); if(typeof openPricingModal===\'function\') openPricingModal();" style="background:#C9A84C;color:#2A2727;border:none;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-size:12px;white-space:nowrap">Pro ansehen</button>';
@@ -1298,6 +1368,24 @@ window._v228RefreshTipButtons = _v228RefreshTipButtons;
 
 window.showSettings = showSettings;
 window.closeSettings = closeSettings;
+/* v842-open-taxperiods: aus dem Steuer-Tab -> Einstellungen -> Mandanten -> privaten Mandanten
+   bearbeiten (dort ist die INLINE-Steuerzeitraeume-Verwaltung, v841/v841b). */
+window._v842OpenTaxPeriods = function() {
+  try {
+    if (typeof showSettings === "function") showSettings("mandanten");
+    var tries = 0;
+    var iv = setInterval(function() {
+      tries++;
+      var host = document.getElementById("mand-settings-host");
+      if (host && window.DealPilotMandanten && typeof window.DealPilotMandanten.uiEdit === "function") {
+        clearInterval(iv);
+        try { window.DealPilotMandanten.uiEdit("privat"); } catch (e) { console.warn("[v842] uiEdit:", e.message); }
+      } else if (tries > 40) {
+        clearInterval(iv);
+      }
+    }, 50);
+  } catch (e) { console.warn("[v842] OpenTaxPeriods:", e.message); }
+};
 window._swSet = _swSet;
 
 // V63.76: KI-Anweisungs-Vorschlag in Textarea einfügen
@@ -1492,7 +1580,7 @@ function _v234_1RenderPlanStatusHeader() {
     html +=
       '<div class="v234-status-actions">' +
         '<button class="v234-btn v234-btn-primary" onclick="if(typeof Sub!==\'undefined\'&&Sub.openPortal)Sub.openPortal();return false">' +
-          '<span class="v234-btn-icon">🔧</span> Abo verwalten' +
+          '<span class="v234-btn-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><use href="#i-settings"/></svg></span> Abo verwalten' + /* v838-wrench-svg */
         '</button>' +
         '<button class="v234-btn v234-btn-secondary" onclick="closeSettings();if(typeof openPricingModal===\'function\')openPricingModal();return false">' +
           'Plan wechseln →' +
@@ -1648,7 +1736,7 @@ function _renderPlanPane() {
     if (isCurrent) {
       html += '<button class="btn btn-outline btn-sm" disabled>✓ Aktueller Plan</button>';
     } else if (key === 'free') {
-      html += '<button class="btn btn-outline btn-sm" disabled title="Downgrade per Mail: info@junker-immobilien.io">Downgrade auf Anfrage</button>';
+      html += '<button class="btn btn-outline btn-sm" disabled title="Downgrade per Mail: dealpilot@junker-immobilien.io">Downgrade auf Anfrage</button>';
     } else {
       html += '<button class="btn btn-gold btn-sm" onclick="_startStripeCheckout(\'' + key + '\')">' +
               (billingCycle === 'yearly' ? 'Jährlich abonnieren' : 'Monatlich abonnieren') + '</button>';
@@ -1783,7 +1871,7 @@ async function _startStripeCheckout(planKey) {
     console.error('[stripe-checkout] error:', e);
     var msg = e && e.message ? e.message : 'Stripe-Checkout fehlgeschlagen';
     if (msg.indexOf('not yet available') >= 0 || msg.indexOf('503') >= 0) {
-      msg = 'Dieser Plan kann aktuell nicht online abonniert werden. Bitte info@junker-immobilien.io kontaktieren.';
+      msg = 'Dieser Plan kann aktuell nicht online abonniert werden. Bitte dealpilot@junker-immobilien.io kontaktieren.';
     }
     if (typeof toast === 'function') toast('❌ ' + msg);
     if (btn) {
@@ -1971,12 +2059,10 @@ function _renderInfoPane() {
     '</div>' +
 
     // V142: Schnellzugriff zum neuen Rechtliches-Tab (Impressum + Datenschutz dort)
-    '<div class="info-quick-links">' +
-      '<button type="button" class="info-quick-btn" onclick="_swSet(document.querySelector(\'.st-tab[data-tab=&quot;rechtliches&quot;]\'))">📋 Impressum &amp; Datenschutz</button>' +
-    '</div>' +
+    /* v838b-info-tab: Impressum-Button entfernt (eigener Rechtliches-Reiter) */
 
     '<div class="info-section">' +
-      '<div class="info-section-title">⚖ Lizenz &amp; Hinweise</div>' +
+      '<div class="info-section-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><path d="M12 3v18"/><path d="M5 7h14"/><path d="m5 7-3 6h6z"/><path d="m19 7-3 6h6z"/><path d="M8 21h8"/></svg>Lizenz &amp; Hinweise</div>' +
       '<div class="info-license">' +
         '<strong>DealPilot ' + _esc(ver) + '</strong> — Investmentanalyse für deutsche Wohnimmobilien.<br>' +
         'Steuerberechnungen sind Schätzungen nach §6 StBerG und ersetzen keine Steuerberatung. ' +
@@ -1985,11 +2071,11 @@ function _renderInfoPane() {
     '</div>' +
 
     '<div class="info-section">' +
-      '<div class="info-section-title">📋 Diagnose-Info (für Support)</div>' +
+      '<div class="info-section-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Diagnose-Info (für Support)</div>' +
       '<textarea class="info-textarea" id="info-diag" readonly>' + _esc(diag) + '</textarea>' +
       '<div class="info-actions">' +
-        '<button class="btn btn-outline btn-sm" type="button" onclick="_copyDiag()">📋 Kopieren</button>' +
-        '<button class="btn btn-ghost btn-sm" type="button" onclick="_downloadDiag()">⬇ Als Datei</button>' +
+        '<button class="btn btn-outline btn-sm" type="button" onclick="_copyDiag()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Kopieren</button>' +
+        '<button class="btn btn-ghost btn-sm" type="button" onclick="_downloadDiag()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Als Datei</button>' +
       '</div>' +
     '</div>'
   );
@@ -2020,11 +2106,11 @@ function _dpGetConsentStatusHTML() {
 function _renderRechtlichesPane() {
   return (
     '<h2 class="set-section-h2">Rechtliches</h2>' +
-    '<p style="margin:-4px 0 18px 0;font-size:13px;color:var(--muted)">Impressum nach § 5 TMG und Datenschutzerklärung gemäß DSGVO.</p>' +
+    '<p class="hint" style="margin:-4px 0 18px 0;color:var(--muted)">Impressum nach § 5 TMG und Datenschutzerklärung gemäß DSGVO.</p>' +
 
     // Impressum
     '<div class="info-section" id="info-section-imp">' +
-      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px">📋 Impressum</div>' +
+      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><use href="#i-file-text"/></svg>Impressum</div>' +
       '<div class="info-legal-text">' +
         '<h4>Angaben gemäß § 5 TMG</h4>' +
         '<p>Junker Immobilien<br>' +
@@ -2035,7 +2121,7 @@ function _renderRechtlichesPane() {
 
         '<h4>Kontakt</h4>' +
         '<p>Telefon: +49 151 29820057<br>' +
-        'E-Mail: info@junker-immobilien.io<br>' +
+        'E-Mail: dealpilot@junker-immobilien.io<br>' +
         'Website: www.junker-immobilien.io</p>' +
 
         '<h4>Umsatzsteuer</h4>' +
@@ -2063,11 +2149,11 @@ function _renderRechtlichesPane() {
 
     // Datenschutz
     '<div class="info-section" id="info-section-ds" style="margin-top:24px">' +
-      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px">🔒 Datenschutzerklärung</div>' +
+      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><use href="#i-shield"/></svg>Datenschutzerklärung</div>' +
       '<div class="info-legal-text">' +
         '<h4>1. Verantwortlicher</h4>' +
         '<p>Junker Immobilien, Inhaber: Marcel Junker, Hermannstraße 9, 32609 Hüllhorst, Deutschland<br>' +
-        'Telefon: +49 151 29820057, E-Mail: info@junker-immobilien.io</p>' +
+        'Telefon: +49 151 29820057, E-Mail: dealpilot@junker-immobilien.io</p>' +
 
         '<h4>2. Allgemeine Hinweise zur Datenverarbeitung</h4>' +
         '<p>Wir verarbeiten personenbezogene Daten ausschließlich im Rahmen der geltenden Datenschutzgesetze (insbesondere DSGVO). Personenbezogene Daten sind alle Informationen, mit denen Sie persönlich identifiziert werden können.</p>' +
@@ -2138,7 +2224,7 @@ function _renderRechtlichesPane() {
 
     // V272.1b-rechtl-cleanup: AGB + Nutzungshinweise + Consent-Status
     '<div class="info-section" id="info-section-agb" style="margin-top:24px">' +
-      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px">📄 Allgemeine Geschäftsbedingungen</div>' +
+      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><use href="#i-book"/></svg>Allgemeine Geschäftsbedingungen</div>' +
       '<div class="info-legal-text">' +
         '<p>Unsere vollständigen AGB regeln den Vertrag zwischen dir und Junker Immobilien. Sie enthalten Regelungen zu Leistungen, Preisen (Kleinunternehmer nach § 19 UStG), Vertragslaufzeit, Widerrufsrecht für Verbraucher (§ 355/356 BGB), Haftung und Gerichtsstand.</p>' +
         '<p><a href="/agb.html" target="_blank" style="color:#C9A84C;text-decoration:underline">Vollständige AGB öffnen (Version 1.0 · Stand 24.05.2026) →</a></p>' +
@@ -2146,7 +2232,7 @@ function _renderRechtlichesPane() {
     '</div>' +
 
     '<div class="info-section" id="info-section-hinweise" style="margin-top:24px">' +
-      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px">⚖️ Nutzungshinweise / Disclaimer</div>' +
+      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><use href="#i-book"/></svg>Nutzungshinweise / Disclaimer</div>' +
       '<div class="info-legal-text">' +
         '<p><strong>DealPilot ist ein Werkzeug zur Modell-Berechnung von Immobilien-Investments. Es leistet KEINE Steuer-, Rechts-, Finanz- oder Anlageberatung im Sinne des RDG, StBerG oder WpHG.</strong></p>' +
         '<p>Die ausgegebenen Werte sind Modell-Berechnungen, keine verbindlichen Empfehlungen. Vor jeder Entscheidung mit steuerlicher, rechtlicher oder finanzieller Tragweite ist zwingend ein Steuerberater, Rechtsanwalt oder Notar zu konsultieren.</p>' +
@@ -2156,10 +2242,10 @@ function _renderRechtlichesPane() {
     '</div>' +
 
     '<div class="info-section" id="info-section-consent" style="margin-top:24px">' +
-      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px">✓ Deine Zustimmung</div>' +
+      '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><use href="#i-file-text"/></svg>Deine Zustimmung</div>' +
       '<div class="info-legal-text">' +
         '<p>' + _dpGetConsentStatusHTML() + '</p>' +
-        '<p style="font-size:12px;color:#888;margin-top:8px">Bei Fragen wende dich an <a href="mailto:info@junker-immobilien.io" style="color:#C9A84C">info@junker-immobilien.io</a>.</p>' +
+        '<p style="font-size:12px;color:#888;margin-top:8px">Bei Fragen wende dich an <a href="mailto:dealpilot@junker-immobilien.io" style="color:#C9A84C">dealpilot@junker-immobilien.io</a>.</p>' +
       '</div>' +
     '</div>'
   );
@@ -2752,66 +2838,7 @@ async function _api2faRegenerateCodes(code) {
   return j;
 }
 
-/* === V212 collapse-market-cards toggle START === */
-// V212: Markt-Cards Default-Collapse-Toggle
-(function() {
-  function _readSettings() {
-    try { return JSON.parse(localStorage.getItem('dp_user_settings') || '{}'); }
-    catch(e) { return {}; }
-  }
-  function _writeSettings(patch) {
-    var s = _readSettings();
-    Object.assign(s, patch);
-    try { localStorage.setItem('dp_user_settings', JSON.stringify(s)); } catch(e) {}
-  }
-
-  // Wird bei Settings-Modal-Render aufgerufen
-  window.renderV212CollapseToggle = function(containerId) {
-    var container = typeof containerId === 'string'
-      ? document.getElementById(containerId) : containerId;
-    if (!container) return;
-    if (container.querySelector('[data-v212-collapse-toggle]')) return; // bereits da
-
-    var s = _readSettings();
-    // Default: true = zugeklappt
-    var checked = (typeof s.collapseMarketCards === 'boolean')
-      ? s.collapseMarketCards : true;
-
-    var wrap = document.createElement('div');
-    wrap.setAttribute('data-v212-collapse-toggle', '1');
-    wrap.style.cssText = 'margin:14px 0;padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25);';
-    wrap.innerHTML =
-      '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:500;">' +
-      '  <input type="checkbox" id="v212-collapse-market-cards"' + (checked ? ' checked' : '') + ' style="margin-top:3px;flex-shrink:0;cursor:pointer;">' +
-      '  <span>' +
-      '    <span style="display:block;font-size:13px;color:var(--ch);">Markt-Daten-Cards standardmäßig zugeklappt</span>' +
-      '    <span style="display:block;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.5;">' +
-      '      Wenn aktiviert, werden die Markt-Kontext-, Marktzinsen- und Pfandbrief-Cards im Finanzierung-Tab beim Laden automatisch zugeklappt. Du kannst sie jederzeit einzeln per Klick öffnen.' +
-      '    </span>' +
-      '  </span>' +
-      '</label>' +
-      '<div style="margin-top:10px;text-align:right">' +
-      '  <button type="button" class="btn btn-outline btn-sm" onclick="window.resetV212CardOverrides()" title="Verwirft alle manuellen Ein-/Ausklapp-Entscheidungen">Alle Karten zurücksetzen</button>' +
-      '</div>';
-
-    container.appendChild(wrap);
-
-    var cb = wrap.querySelector('#v212-collapse-market-cards');
-    cb.addEventListener('change', function() {
-      _writeSettings({ collapseMarketCards: cb.checked });
-      if (window.CollapsibleCards && window.CollapsibleCards.applyDefaultFromSettings) {
-        window.CollapsibleCards.applyDefaultFromSettings(cb.checked);
-      }
-    });
-  };
-
-  window.resetV212CardOverrides = function() {
-    if (window.CollapsibleCards && window.CollapsibleCards.resetAllOverrides) {
-      window.CollapsibleCards.resetAllOverrides();
-    }
-  };
-})();
-/* === V212 collapse-market-cards toggle END === */
+/* v836-removed-v212: toter V212-Collapse-Toggle-Block entfernt (renderV212CollapseToggle nie aufgerufen; aktive Version = V213) */
 
 /* === V213 collapse-toggle helpers (global) START === */
 function _v213IsChecked() {
@@ -2979,3 +3006,7 @@ function _setMbTheme(t){ if(t!=='dark') t='light'; try{ localStorage.setItem('dp
 function _setMbThemeLight(){ _setMbTheme('light'); }
 function _setMbThemeDark(){ _setMbTheme('dark'); }
 try{ window._mbThemePref=_mbThemePref; window._setMbTheme=_setMbTheme; window._setMbThemeLight=_setMbThemeLight; window._setMbThemeDark=_setMbThemeDark; }catch(e){}
+/* v835-inline-cleanup */
+/* v837-emoji-svg: Section-Emojis durch SVG ersetzt (6 Stellen) */
+/* v838-copilot-label: KI-Tab -> Co-Pilot (KI) */
+/* v838b-info-tab: Impressum-Button raus + Emojis -> SVG */

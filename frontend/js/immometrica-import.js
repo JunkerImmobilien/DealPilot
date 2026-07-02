@@ -40,7 +40,7 @@
   function fmt(n) { return n == null ? '\u2014' : new Intl.NumberFormat('de-DE').format(n); }
   function fmtY(n) { return (n == null || n === '') ? '\u2014' : String(n).replace(/\D/g, ''); }
 
-  var IMO_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>';
+  var IMO_ICON = '<img src="img/immometrica.png" alt="ImmoMetrica" style="height:22px;vertical-align:middle;display:inline-block">'; /* v839-immo-logo */
 
   var FIELD_LABEL = {
     kuerzel: 'K\u00fcrzel', objart: 'Objektart', plz: 'PLZ', ort: 'Ort', str: 'Stra\u00dfe', hnr: 'Nr.',

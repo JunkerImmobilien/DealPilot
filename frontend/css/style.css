@@ -34351,3 +34351,304 @@ input[type=date].tr::-webkit-datetime-edit { text-align: right; }
   font-weight: 400 !important;
 }
 /* === v816j-field-font END === */
+
+/* ============================================================
+   v820-sidebar-dark — Sidebar DUNKEL (Settings + Hilfe), Content weiss.
+   Kehrt die v793b-Hell-Sidebar um. Hohe Spezifitaet + spaeteste Position schlaegt
+   die #FDFCFA/#FBFAF7-Regeln (Z.33837, 34222, 34216).
+   ============================================================ */
+/* Sidebar dunkel (Obsidian) */
+html body .set-modal-cream .modal-side,
+html body .settings-modal.set-modal-v2 .modal-side,
+html body #help-modal .help-modal-side,
+html body .help-modal.global-view-overlay .help-modal-side {
+  background: linear-gradient(180deg, #141312 0%, #0a0a0a 100%) !important;
+  border-right: 1px solid rgba(255,255,255,.06) !important;
+}
+/* Suchfeld im Hilfe-Modal dunkel */
+html body #help-modal .help-modal-side .help-modal-search input,
+html body .help-modal.global-view-overlay .help-modal-side .help-modal-search input {
+  background: rgba(255,255,255,.05) !important; color: #e8e6e3 !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+}
+html body #help-modal .help-modal-side .help-modal-search input::placeholder {
+  color: rgba(255,255,255,.4) !important;
+}
+/* Nav-Tabs: heller Text auf dunkel, aktiv = Gold */
+html body .set-modal-cream .modal-side .st-tab,
+html body .set-modal-cream .modal-side .ms-tab,
+html body #help-modal .help-sidebar-item {
+  color: #8a8378 !important;
+}
+html body .set-modal-cream .modal-side .st-tab:hover,
+html body .set-modal-cream .modal-side .ms-tab:hover,
+html body #help-modal .help-sidebar-item:hover {
+  background: rgba(255,255,255,.04) !important; color: #e8e6e3 !important;
+}
+html body .set-modal-cream .modal-side .st-tab.active,
+html body .set-modal-cream .modal-side .ms-tab.active,
+html body #help-modal .help-sidebar-item.active,
+html body #help-modal .help-sidebar-item.help-sidebar-item-active {
+  background: linear-gradient(90deg, rgba(201,168,76,.16), rgba(201,168,76,.04)) !important;
+  color: #E8CC7A !important;
+}
+html body .set-modal-cream .modal-side .st-tab .ic,
+html body .set-modal-cream .modal-side .ms-tab .ic {
+  color: #6a655e !important;
+}
+html body .set-modal-cream .modal-side .st-tab.active .ic,
+html body .set-modal-cream .modal-side .ms-tab.active .ic {
+  color: #E8CC7A !important;
+}
+/* Titel-Texte in heller Nav-Sidebar (Hilfe-Themen) */
+html body #help-modal .help-sidebar-item-title { color: #e8e6e3 !important; }
+html body #help-modal .help-sidebar-item.active .help-sidebar-item-title,
+html body #help-modal .help-sidebar-item.help-sidebar-item-active .help-sidebar-item-title { color: #E8CC7A !important; }
+html body #help-modal .help-sidebar-item-desc { color: rgba(255,255,255,.4) !important; }
+/* User-Block unten dunkel */
+html body .set-modal-cream .ms-foot {
+  background: rgba(0,0,0,.4) !important; border-top: 1px solid rgba(255,255,255,.06) !important;
+}
+html body .set-modal-cream .ms-foot .nm { color: #e8e6e3 !important; }
+html body .set-modal-cream .ms-foot .ml { color: rgba(255,255,255,.5) !important; }
+/* Content-Bereich bleibt WEISS (explizit sicherstellen) */
+html body .settings-modal.set-modal-v2 .pane-wrap,
+html body #help-modal .help-content,
+html body #help-modal .set-modal-content.help-modal-content { background: #fff !important; }
+/* === v820-sidebar-dark END === */
+
+/* ============================================================
+   v821-sidebar-polish — Logo-Gold + Suchfeld lesbar + Nav-Icons hell/gold
+   ============================================================ */
+/* (a) Logo: "Pilot" gold */
+html body .dp-mtb-logo .dp-mtb-logo-g { color: #C9A84C !important; }
+
+/* (b) Suchfeld klar lesbar: kraeftigerer dunkler Grund, heller Text, sichtbarer Placeholder */
+html body #help-modal .help-modal-side .help-modal-search input,
+html body .help-modal.global-view-overlay .help-modal-side .help-modal-search input {
+  background: #1b1917 !important;
+  color: #f0eee9 !important;
+  border: 1px solid rgba(201,168,76,.25) !important;
+}
+html body #help-modal .help-modal-side .help-modal-search input::placeholder,
+html body .help-modal.global-view-overlay .help-modal-side .help-modal-search input::placeholder {
+  color: rgba(240,238,233,.55) !important;
+}
+html body #help-modal .help-modal-side .help-modal-search input:focus,
+html body .help-modal.global-view-overlay .help-modal-side .help-modal-search input:focus {
+  border-color: #C9A84C !important; outline: none !important;
+  box-shadow: 0 0 0 3px rgba(201,168,76,.15) !important;
+}
+
+/* (c) Nav-Icons: hell-gedaempft (wie Text), aktiv = Gold. Schlaegt #a98f43/#6a655e. */
+html body .set-modal-cream .modal-side .st-tab .ic,
+html body .set-modal-cream .modal-side .ms-tab .ic,
+html body #help-modal .help-sidebar-item .help-sidebar-item-icon {
+  color: #b5ad9f !important;
+}
+html body .set-modal-cream .modal-side .st-tab .ic svg,
+html body .set-modal-cream .modal-side .ms-tab .ic svg,
+html body #help-modal .help-sidebar-item .help-sidebar-item-icon svg {
+  color: #b5ad9f !important;
+}
+html body .set-modal-cream .modal-side .st-tab:hover .ic,
+html body .set-modal-cream .modal-side .ms-tab:hover .ic,
+html body #help-modal .help-sidebar-item:hover .help-sidebar-item-icon {
+  color: #E8CC7A !important;
+}
+html body .set-modal-cream .modal-side .st-tab.active .ic,
+html body .set-modal-cream .modal-side .ms-tab.active .ic,
+html body #help-modal .help-sidebar-item.active .help-sidebar-item-icon,
+html body #help-modal .help-sidebar-item.help-sidebar-item-active .help-sidebar-item-icon {
+  color: #E8CC7A !important;
+}
+/* Aktives Icon-Kaestchen (falls Hintergrund) dezent golden hinterlegt */
+html body #help-modal .help-sidebar-item.active .help-sidebar-item-icon,
+html body #help-modal .help-sidebar-item.help-sidebar-item-active .help-sidebar-item-icon {
+  background: rgba(201,168,76,.14) !important;
+}
+/* === v821-sidebar-polish END === */
+
+/* ============================================================
+   v822-icons-gold — Nav-Icons durchgehend GOLD (Settings + Hilfe)
+   ============================================================ */
+html body .set-modal-cream .modal-side .st-tab .ic,
+html body .set-modal-cream .modal-side .ms-tab .ic,
+html body .set-modal-cream .modal-side .st-tab .ic svg,
+html body .set-modal-cream .modal-side .ms-tab .ic svg,
+html body #help-modal .help-sidebar-item .help-sidebar-item-icon,
+html body #help-modal .help-sidebar-item .help-sidebar-item-icon svg {
+  color: #C9A84C !important;
+}
+/* Hover/aktiv etwas heller-gold */
+html body .set-modal-cream .modal-side .st-tab:hover .ic,
+html body .set-modal-cream .modal-side .ms-tab:hover .ic,
+html body .set-modal-cream .modal-side .st-tab.active .ic,
+html body .set-modal-cream .modal-side .ms-tab.active .ic,
+html body #help-modal .help-sidebar-item:hover .help-sidebar-item-icon,
+html body #help-modal .help-sidebar-item.active .help-sidebar-item-icon,
+html body #help-modal .help-sidebar-item.help-sidebar-item-active .help-sidebar-item-icon {
+  color: #E8CC7A !important;
+}
+/* === v822-icons-gold END === */
+
+/* ============================================================
+   v823-nav-footer — Settings-Nav wie Hilfe (Titel+Desc+Icon) auf DUNKLER Sidebar + Footer dunkel
+   ============================================================ */
+/* Settings-Nav-Items: gleiche Struktur wie Hilfe (help-sidebar-item ist jetzt dran) */
+html body .set-modal-cream .modal-side .help-sidebar-item {
+  display: flex !important; flex-direction: column !important; align-items: flex-start !important;
+  gap: 2px !important; padding: 9px 12px !important; width: 100% !important;
+  background: transparent !important; border: 1px solid transparent !important; border-radius: 8px !important;
+  text-align: left !important; cursor: pointer !important; transition: all .12s !important;
+}
+html body .set-modal-cream .modal-side .help-sidebar-item-row {
+  display: flex !important; align-items: center !important; gap: 9px !important; width: 100% !important;
+}
+html body .set-modal-cream .modal-side .help-sidebar-item-icon {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  width: 24px !important; height: 24px !important; border-radius: 6px !important;
+  background: rgba(201,168,76,.14) !important; color: #C9A84C !important; flex-shrink: 0 !important;
+}
+html body .set-modal-cream .modal-side .help-sidebar-item-icon svg { stroke: currentColor !important; fill: none !important; }
+html body .set-modal-cream .modal-side .help-sidebar-item-title {
+  font-size: 13px !important; font-weight: 600 !important; color: #e8e6e3 !important; line-height: 1.2 !important;
+}
+html body .set-modal-cream .modal-side .help-sidebar-item-desc {
+  font-size: 11px !important; color: rgba(255,255,255,.42) !important; line-height: 1.3 !important;
+  padding-left: 33px !important; margin-top: 1px !important;
+}
+/* Hover */
+html body .set-modal-cream .modal-side .help-sidebar-item:hover {
+  background: rgba(201,168,76,.10) !important; border-color: rgba(201,168,76,.22) !important;
+}
+html body .set-modal-cream .modal-side .help-sidebar-item:hover .help-sidebar-item-title { color: #fff !important; }
+/* Aktiv */
+html body .set-modal-cream .modal-side .help-sidebar-item.active {
+  background: linear-gradient(135deg, rgba(201,168,76,.22), rgba(201,168,76,.08)) !important;
+  border-color: rgba(201,168,76,.50) !important; box-shadow: 0 2px 10px rgba(201,168,76,.20) !important;
+}
+html body .set-modal-cream .modal-side .help-sidebar-item.active .help-sidebar-item-icon {
+  background: linear-gradient(135deg, #C9A84C, #9a7f33) !important; color: #1a1414 !important;
+}
+html body .set-modal-cream .modal-side .help-sidebar-item.active .help-sidebar-item-title { color: #E8CC7A !important; }
+html body .set-modal-cream .modal-side .help-sidebar-item.active .help-sidebar-item-desc { color: rgba(232,204,122,.6) !important; }
+
+/* (b) Grauer Footer (save-row) DUNKEL */
+html body .set-modal-cream .save-row,
+html body .set-modal-cream .settings-footer {
+  background: linear-gradient(180deg, #141312, #0a0a0a) !important;
+  border-top: 1px solid rgba(255,255,255,.06) !important;
+}
+html body .set-modal-cream .save-row .save-info,
+html body .set-modal-cream .settings-footer .save-info { color: rgba(255,255,255,.6) !important; }
+html body .set-modal-cream .save-row #settings-dirty-hint { color: rgba(255,255,255,.5) !important; }
+/* Ghost-Button (Abbrechen) auf dunkel lesbar */
+html body .set-modal-cream .save-row .btn-ghost,
+html body .set-modal-cream .settings-footer .btn-ghost {
+  color: #d8d4cc !important; border-color: rgba(255,255,255,.18) !important; background: transparent !important;
+}
+html body .set-modal-cream .save-row .btn-ghost:hover,
+html body .set-modal-cream .settings-footer .btn-ghost:hover { background: rgba(255,255,255,.06) !important; }
+
+/* User-Block (ms-foot) dunkel (kraeftiger als .3) */
+html body .set-modal-cream .ms-foot {
+  background: linear-gradient(180deg, #141312, #0a0a0a) !important;
+  border-top: 1px solid rgba(255,255,255,.06) !important;
+}
+/* === v823-nav-footer END === */
+
+/* ============================================================
+   v824-overlay-line-footer — Overlay wie Hilfe + Gold-Trennlinie + flacher Footer
+   ============================================================ */
+/* (1) Settings-Overlay-Hintergrund = Hilfe (schlicht dunkel + Blur, KEINE Gold-Partikel) */
+html body #settings-modal.global-view-overlay:has(.set-modal-cream),
+html body #settings-modal:has(.set-modal-cream) {
+  background: rgba(42,39,39,0.55) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(8px) !important;
+}
+/* Gold-Partikel-Schicht abschalten (war nur bei Settings) */
+html body #settings-modal:has(.set-modal-cream)::before {
+  content: none !important; display: none !important; animation: none !important;
+}
+/* (2) Vertikale Trennlinie Sidebar -> Content: GOLD statt grau */
+html body .set-modal-cream .modal-side,
+html body .settings-modal.set-modal-v2 .modal-side,
+html body #help-modal .help-modal-side,
+html body .help-modal.global-view-overlay .help-modal-side {
+  border-right: 1px solid rgba(201,168,76,.35) !important;
+}
+/* (3) Footer (save-row) flacher: weniger vertikales Padding */
+html body .set-modal-cream .save-row,
+html body .set-modal-cream .settings-footer {
+  padding: 8px 24px !important;
+}
+/* Buttons bleiben gleich gross, nur Zeile kompakter */
+html body .set-modal-cream .save-row .btn,
+html body .set-modal-cream .settings-footer .btn {
+  padding-top: 8px !important; padding-bottom: 8px !important;
+}
+/* === v824-overlay-line-footer END === */
+
+/* ============================================================
+   v825-line-scrollbar — graue Sidebar-Kante weg: Scrollbar-Track dunkel, Trennlinie gold
+   ============================================================ */
+/* Scrollbar-Track der inneren Nav-Liste dunkel (war grau) */
+html body .set-modal-cream .ms-tabs::-webkit-scrollbar,
+html body .set-modal-cream .modal-side .ms-tabs::-webkit-scrollbar,
+html body #help-modal .help-sidebar-list::-webkit-scrollbar {
+  width: 5px !important; background: transparent !important;
+}
+html body .set-modal-cream .ms-tabs::-webkit-scrollbar-track,
+html body .set-modal-cream .modal-side .ms-tabs::-webkit-scrollbar-track,
+html body #help-modal .help-sidebar-list::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+html body .set-modal-cream .ms-tabs::-webkit-scrollbar-thumb,
+html body .set-modal-cream .modal-side .ms-tabs::-webkit-scrollbar-thumb,
+html body #help-modal .help-sidebar-list::-webkit-scrollbar-thumb {
+  background: rgba(201,168,76,.40) !important; border-radius: 3px !important;
+}
+/* Trennlinie Sidebar->Content klar GOLD (hohe Spezifitaet, damit sie sicher greift) */
+html body .settings-modal.set-modal-v2 .modal-side,
+html body .set-modal-cream .modal-side,
+html body .help-modal.global-view-overlay .help-modal-side,
+html body #help-modal .help-modal-side {
+  border-right: 1px solid rgba(201,168,76,.40) !important;
+  box-shadow: none !important;
+}
+/* === v825-line-scrollbar END === */
+
+/* ============================================================
+   v827-scrollbar-gold — Nav-Scrollbar (ms-tabs / help-sidebar-list) GOLD in allen Browsern
+   ============================================================ */
+/* Firefox + neuere Chrome: scrollbar-color */
+html body .set-modal-cream .ms-tabs,
+html body .set-modal-cream .modal-side .ms-tabs,
+html body #help-modal .help-sidebar-list,
+html body .help-modal.global-view-overlay .help-sidebar-list {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(201,168,76,.55) transparent !important;
+}
+/* WebKit (Chrome/Safari) */
+html body .set-modal-cream .ms-tabs::-webkit-scrollbar,
+html body .set-modal-cream .modal-side .ms-tabs::-webkit-scrollbar,
+html body #help-modal .help-sidebar-list::-webkit-scrollbar {
+  width: 6px !important; background: transparent !important;
+}
+html body .set-modal-cream .ms-tabs::-webkit-scrollbar-track,
+html body .set-modal-cream .modal-side .ms-tabs::-webkit-scrollbar-track,
+html body #help-modal .help-sidebar-list::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+html body .set-modal-cream .ms-tabs::-webkit-scrollbar-thumb,
+html body .set-modal-cream .modal-side .ms-tabs::-webkit-scrollbar-thumb,
+html body #help-modal .help-sidebar-list::-webkit-scrollbar-thumb {
+  background: rgba(201,168,76,.55) !important; border-radius: 3px !important;
+}
+html body .set-modal-cream .ms-tabs::-webkit-scrollbar-thumb:hover,
+html body #help-modal .help-sidebar-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(201,168,76,.80) !important;
+}
+/* === v827-scrollbar-gold END === */
