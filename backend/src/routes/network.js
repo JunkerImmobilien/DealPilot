@@ -29,7 +29,9 @@ const REQ_LABELS = {
 router.get('/', async (req, res) => {
   try {
     const cards = await svc.listActive();
-    res.json({ cards: cards });
+    let categories = [];
+    try { categories = await svc.listCategories(); } catch (e2) { /* Mig 051 evtl. noch nicht da */ }
+    res.json({ cards: cards, categories: categories });
   } catch (e) {
     console.error('[network] list', e.message);
     res.status(500).json({ error: 'list_failed' });

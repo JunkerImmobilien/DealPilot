@@ -1520,4 +1520,25 @@ router.delete('/network-cards/:id', requireAdmin, requireRole('owner'), async (r
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ── v855: Netzwerk-Kategorien (frei anlegbar) ──
+router.get('/network-categories', requireAdmin, async (req, res) => {
+  try { const categories = await networkCardsService.listCategoriesWithCounts(); res.json({ categories: categories }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/network-categories', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  try { const category = await networkCardsService.createCategory(req.body || {}); res.json({ category: category }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.put('/network-categories/:key', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  try { const category = await networkCardsService.updateCategory(req.params.key, req.body || {}); res.json({ category: category }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.delete('/network-categories/:key', requireAdmin, requireRole('owner'), async (req, res) => {
+  try {
+    const r = await networkCardsService.deleteCategory(req.params.key);
+    if (r && r.ok === false) return res.status(409).json({ error: 'Kategorie enthaelt noch Karten' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = router;

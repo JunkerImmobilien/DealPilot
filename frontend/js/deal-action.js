@@ -569,60 +569,7 @@ window.DealPilotDealAction = (function() {
         '<div style="padding:4px 0 2px"><button type="button" class="da-cta" style="background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1b1408;border:none;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="if(window.DealPilotUeberfuehrung)DealPilotUeberfuehrung.open()">\u2708 \u00dcberf\u00fchrung starten</button></div>',
       '</div>',
       
-      // V191: ═══════ STAGE 1: DEAL PRÜFEN ═══════
-      '<div class="da-stage da-stage-1">',
-        '<div class="da-stage-head">',
-          '<span class="da-stage-ico">①</span>',
-          '<div class="da-stage-title">Deal prüfen</div>',
-          '<div class="da-stage-sub">Bonität klären, Bankanfrage starten, Beratung holen</div>',
-        '</div>',
-        '<div class="da-grid">',
-          renderCard({
-            id: 'da-card-bank',
-            icon: ico('bank', 26),
-            title: 'Bankanfrage',
-            subtitle: 'An den Finanzierungspartner senden',
-            desc: 'Komplettpaket: Objektanalyse + Bankunterlagen. KI prüft Vollständigkeit vor dem Versand.',
-            status: '<span id="da-bank-progress">0 / 2 Pflicht-Dokumente</span>',
-            cta: 'Anfrage starten',
-            onclick: 'DealPilotDealAction.openBank()'
-          }),
-/* V256-04: FB-Box entfernt */
-
-          renderCard({
-            id: 'da-card-consult',
-            icon: ico('lifebuoy', 26),
-            title: 'Beratung & Zweite Meinung',
-            subtitle: 'Schnell-Check oder Termin buchen',
-            desc: 'Fotos hochladen + Frage stellen ODER Termin online buchen — direkt im Kalender.',
-            status: '<span style="color:var(--muted)">Schnell-Check oder Termin</span>',
-            cta: 'Auswählen',
-            onclick: 'DealPilotDealAction.openConsult()'
-          }),
-        '</div>',
-      '</div>',
-      
-      // V191: ═══════ STAGE 2: DEAL ABSICHERN ═══════
-      '<div class="da-stage da-stage-2">',
-        '<div class="da-stage-head">',
-          '<span class="da-stage-ico">②</span>',
-          '<div class="da-stage-title">Deal absichern</div>',
-          '<div class="da-stage-sub">Gutachten, Restnutzungsdauer, Aufteilung KP/Boden</div>',
-        '</div>',
-        '<div class="da-grid">',
-          renderCard({
-            id: 'da-card-expert',
-            icon: ico('clipboard', 26),
-            title: 'Gutachten & Expertise',
-            subtitle: 'Sachverständigen-Leistungen',
-            desc: 'Verkehrswert · Restnutzungsdauer · Sanierungskonzept · Projektentwicklung — durch ' + _brandCompany() + '.',
-            status: '<span style="color:var(--muted)">Anfrage per E-Mail</span>',
-            cta: 'Anfrage stellen',
-            onclick: 'DealPilotDealAction.openExpert()'
-          }),
-        '</div>',
-      '</div>',
-      
+      // v854: Stage 1+2 entfernt - Bankanfrage/Beratung/Gutachten laufen ueber die Netzwerk-Karten
       // V252-01: STAGE 3 (Won-Card + Portfolio-Strategie-Banner) entfernt — Won ist jetzt oben
     ].join('');
 
