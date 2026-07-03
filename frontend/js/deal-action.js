@@ -557,27 +557,8 @@ window.DealPilotDealAction = (function() {
       
       // V191: Banner-Sektion (Empfehlungen + KP-Aufteilung) ganz oben
       // V252-01: NEUE REIHENFOLGE — Deal-Status + Bankgespräch ZUERST
-      '<div class="da-stage da-stage-status">',
-        '<div class="da-stage-head">',
-          '<span class="da-stage-ico">①</span>',
-          '<div class="da-stage-title">Deal abschließen</div>',
-          '<div class="da-stage-sub">Status setzen — Markierung an der Objekt-Kartei in der Sidebar</div>',
-        '</div>',
-        renderWonCard(),
-      '</div>',
-
-      '<div class="da-stage da-stage-bank">',
-        '<div class="da-stage-head">',
-          '<span class="da-stage-ico">②</span>',
-          '<div class="da-stage-title">Bankgespräch</div>',
-          '<div class="da-stage-sub">Vorbereitung mit Unterlagen-Checkliste + Investment-PDF</div>',
-        '</div>',
-        renderBankgespraechCard(),
-      '</div>',
-
-      // Bestehende Banner danach
-      renderRndRecommendation(),
-      renderKpAufteilungBanner(),
+      // v852: Boarding-Cockpit (Startbahn-Readiness + Departure-Tafel + Exporte + Bordkarte + Netzwerk)
+      (window.DealActionBoarding ? window.DealActionBoarding.buildTop() : (renderWonCard() + renderBankgespraechCard())),
       /* v816 dpuew-stage: Ueberfuehrungs-Wizard */
       '<div class="da-stage" id="dpuew-stage">',
         '<div class="da-stage-head">',
@@ -646,6 +627,9 @@ window.DealPilotDealAction = (function() {
     ].join('');
 
     refreshProgressLabels();
+    // v852: Boarding-Sektionen verdrahten (Netzwerk laden, Datenraum, Readiness)
+    try { if (window.DealActionBoarding) window.DealActionBoarding.afterRender(); } catch(e){}
+    try { if (window.DealPilotReadyCheck && window.DealPilotReadyCheck.refresh) window.DealPilotReadyCheck.refresh(); } catch(e){}
     // V104: Won-Status aus dem aktuell geladenen Objekt rekonstruieren und UI updaten
     try {
       var won = false;

@@ -22,6 +22,7 @@ const lifecycleService = require('../services/lifecycleService'); // v779-lifecy
 const broadcastService = require('../services/broadcastService'); // v778-broadcast
 const supportService = require('../services/supportService'); // v777-support
 const invoiceService = require('../services/invoiceService'); // v776-invoices
+const networkCardsService = require('../services/networkCardsService'); // v852-network
 
 // ──────────────────────────────────────────────────────────────
 // HELPERS
@@ -1499,6 +1500,24 @@ router.post('/users/:id/start-pro-trial', requireAdmin, requireRole('owner', 'su
     console.error('[admin/users/start-pro-trial] error:', err);
     res.status(500).json({ error: 'server_error', message: err.message });
   }
+});
+
+// ── v852: Netzwerk-Karten (Karten-Designer) ──
+router.get('/network-cards', requireAdmin, async (req, res) => {
+  try { const cards = await networkCardsService.listAll(); res.json({ cards: cards }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/network-cards', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  try { const card = await networkCardsService.create(req.body || {}); res.json({ card: card }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.put('/network-cards/:id', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  try { const card = await networkCardsService.update(parseInt(req.params.id, 10), req.body || {}); res.json({ card: card }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.delete('/network-cards/:id', requireAdmin, requireRole('owner'), async (req, res) => {
+  try { const ok = await networkCardsService.remove(parseInt(req.params.id, 10)); res.json({ ok: ok }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 module.exports = router;

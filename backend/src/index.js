@@ -30,6 +30,7 @@ const resellerRoutes = require('./routes/reseller');  // V200: Reseller-Anfragen
 const avmRoutes = require('./routes/avm');  // V326: AVM-Integration
 const marktberichtRoutes = require('./routes/marktbericht');  // v539: Marktbericht-Proxy
 const passesRoutes = require('./routes/passes');  // qb-shared-pass
+const networkRoutes = require('./routes/network');  // v852-network
 
 const app = express();
 
@@ -104,6 +105,7 @@ app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/listing', scrapeRoutes);  // V63.85: URL-Scraper für Quick-Check
 app.use('/api/v1/rnd-request', rndRequestRoutes);  // V186: RND-Wizard-Anfrage
 app.use('/api/v1/passes', passesRoutes);  // qb-shared-pass
+app.use('/api/v1/network-cards', networkRoutes);  // v852-network
 app.use('/api/v1/export', require('./routes/exportEncrypt'));
 // V276.1-route-order: wkAggregate wurde NACH OBEN verschoben (vor objectRoutes) — siehe oben
 app.use('/api/v1/tax-periods', require('./routes/taxPeriods'));  // V259-02: Steuerzeitraeume  // V258-04: WK-Aggregation  // V251-05: Encrypted Export

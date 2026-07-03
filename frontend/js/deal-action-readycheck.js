@@ -122,6 +122,10 @@
     if (!sec) return;
     if (!sec.querySelector('.da-stage') && !sec.querySelector('.junker-action-banner')) return;
     var d = getData();
+    if (window.DealActionBoarding && document.getElementById('dab-readiness-host')) {
+      try { window.DealActionBoarding.renderReadiness(d); } catch (e) {}
+      return;
+    }
     var existing = document.getElementById('da-readycheck');
     var html = buildHtml(d);
     if (existing) {
@@ -164,7 +168,7 @@
     } catch (e) { console.warn('[v449] export ' + which, e); }
   }
 
-  window.DealPilotReadyCheck = { jump: jump, exp: exp, refresh: inject };
+  window.DealPilotReadyCheck = { jump: jump, exp: exp, refresh: inject, getData: getData };
 
   var _obs = null;
   function startObserver() {
