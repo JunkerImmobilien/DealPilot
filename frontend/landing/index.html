@@ -1251,6 +1251,7 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
 
   /* ── LICHT-INTRO ── */
   var intro=document.getElementById('intro');
+  try{if(intro&&(localStorage.getItem('dpi_seen')==='1'||document.cookie.indexOf('dpi_seen=1')>-1)){if(intro.parentNode)intro.parentNode.removeChild(intro);intro=null;}}catch(e){}
   if(intro){
     // Runway-Randlichter setzen (POV)
     var lane=intro.querySelector('.runway');
@@ -1277,9 +1278,11 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
     },2450);
     setTimeout(function(){intro.classList.add('flash-on');},1800);
     setTimeout(function(){intro.classList.add('logo-on');},2050);
-    function finish(){intro.classList.add('done');document.body.classList.remove('intro-lock');setTimeout(function(){if(intro.parentNode)intro.parentNode.removeChild(intro);},1000);}
+    function finish(){if(finish._d)return;finish._d=true;try{localStorage.setItem('dpi_seen','1');}catch(e){}try{document.cookie='dpi_seen=1;max-age=31536000;path=/';}catch(e){}intro.classList.add('done');document.body.classList.remove('intro-lock');setTimeout(function(){if(intro.parentNode)intro.parentNode.removeChild(intro);},1000);}
     var t=setTimeout(finish,5500);
     document.getElementById('introSkip').addEventListener('click',function(){clearTimeout(t);clearInterval(odt);od.textContent='100';finish();});
+    intro.style.cursor='pointer';
+    intro.addEventListener('click',function(){clearTimeout(t);clearInterval(odt);od.textContent='100';finish();});
   } else { document.body.classList.remove('intro-lock'); }
 
   /* ── View-Switch ── */
