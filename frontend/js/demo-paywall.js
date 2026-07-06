@@ -151,6 +151,9 @@ var Paywall = (function() {
    * Render the usage badge in the sidebar (above the user-section).
    */
   async function renderUsageBadge() {
+    /* v878-usage-off: Sidebar-Usage-Badge deaktiviert (zeigte fehlerhaft "FREE x/undefined"). */
+    var _pwEx = document.getElementById('paywall-usage'); if (_pwEx) _pwEx.remove();
+    return;
     // V27: Wenn der User einen bezahlten Plan hat (kein "free"), zeigen wir den Banner gar nicht.
     var planKey = 'free';
     if (typeof Sub !== 'undefined' && Sub.isApiMode && Sub.isApiMode()) {
