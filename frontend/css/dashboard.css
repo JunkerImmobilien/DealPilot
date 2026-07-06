@@ -672,3 +672,8 @@
    v750k - Modellprojektion-Hinweis (hoverbar)
    ================================================================ */
 #dashboard-main .tag.mp-info{cursor:help;border-bottom:1px dotted currentColor;padding-bottom:1px}
+
+/* v880-cockpit-struktur: dezente weiße Struktur auf den Gold-Sektionsbannern */
+#dashboard-main .stage.fc .sl{position:relative;overflow:hidden}
+#dashboard-main .stage.fc .sl::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(125deg,rgba(255,255,255,.12) 0 1px,transparent 1px 11px);pointer-events:none;border-radius:9px}
+#dashboard-main .stage.fc .sl>*{position:relative;z-index:1}
