@@ -306,6 +306,16 @@ function render(out) {
   $('kSqm').textContent = fmt(inp.price_per_sqm, ' €');
   $('kMrent').textContent = fmt(inp.market_rent_sqm, ' €');
   $('kDisc').textContent = (mv.discount_to_market_pct ?? '–') + ' %';
+  /* v877-kpi-spannen: Sub-Zeilen mit Spannen (nur wo Daten vorliegen) */
+  (function(){
+    var _sale = d.sale || {}, _rent = d.rent || {};
+    var _set = function(id, txt){ var e = $(id); if (e) e.textContent = txt || ''; };
+    var _r = function(n){ return Math.round(n); };
+    _set('kMvSp', (mv.low != null && mv.high != null) ? ('Spanne ' + fmt(_r(mv.low), '\u2013') + fmt(_r(mv.high), ' \u20ac')) : '');
+    _set('kSqmSp', (_sale.q25_per_sqm != null && _sale.q75_per_sqm != null) ? ('Median-Band ' + fmt(_r(_sale.q25_per_sqm), '\u2013') + fmt(_r(_sale.q75_per_sqm), ' \u20ac/m\u00b2')) : '');
+    _set('kMrentSp', (_rent.q25_per_sqm != null && _rent.q75_per_sqm != null) ? (fmt(_r(_rent.q25_per_sqm), '\u2013') + fmt(_r(_rent.q75_per_sqm), ' \u20ac/m\u00b2')) : '');
+    _set('kDiscSp', (mv.discount_to_market_pct != null) ? (mv.discount_to_market_pct >= 0 ? 'Kaufpreis unter Wert' : 'Kaufpreis \u00fcber Wert') : '');
+  })();
 
   // Marktwert-/Marktmiete-Spanne + Lage-/Potenzialbewertung
   renderValuation(d);
@@ -832,8 +842,6 @@ function drawChart(sale, objSqm) {
   _ensureChartDefaults();
   const ctx = $('chart').getContext('2d');
   if (chart) chart.destroy();
-  // Statt Einzelobjekten (oft nicht abgerufen) die Vergleichspreis-Verteilung zeigen,
-  // die immer vorliegt: Minimum, Q25, Median, Q75, Maximum + das eigene Objekt.
   const stat = [
     ['Minimum', sale.min_per_sqm], ['25 %-Quartil', sale.q25_per_sqm],
     ['Median', sale.median_per_sqm], ['75 %-Quartil', sale.q75_per_sqm],
@@ -841,24 +849,56 @@ function drawChart(sale, objSqm) {
   ];
   const labels = stat.map((s) => s[0]);
   const data = stat.map((s) => (s[1] != null ? Math.round(s[1]) : null));
-  // V3-Palette (monochrom): eigenes Objekt = volles Gold (der interessante Wert),
-  // Median = dunkles Gold, Rest = warmer Stein. Kein Blau/Grün.
-  const colors = stat.map((s) => s[0] === 'Dieses Objekt' ? '#C9A84C'
-    : s[0] === 'Median' ? '#9a7f33' : '#5A5350');
+  const median = sale.median_per_sqm != null ? Math.round(sale.median_per_sqm) : null;
+  // Gold-Verlauf fuers eigene Objekt, warmer Stein fuer die Verteilung, dunkles Gold fuer Median.
+  const bg = (c) => {
+    const s0 = stat[c.dataIndex] ? stat[c.dataIndex][0] : '';
+    const a = c.chart.chartArea;
+    if (s0 === 'Dieses Objekt' && a) {
+      const g = c.chart.ctx.createLinearGradient(0, a.bottom, 0, a.top);
+      g.addColorStop(0, '#a8842c'); g.addColorStop(1, '#E8CC7A'); return g;
+    }
+    return s0 === 'Median' ? '#9a7f33' : '#5A5350';
+  };
+  // Inline-Plugin: Wert-Labels ueber den Balken + gestrichelte Median-Linie.
+  const deco = {
+    id: 'mbDeco',
+    afterDatasetsDraw(ch) {
+      const x = ch.ctx, a = ch.chartArea, scales = ch.scales; if (!a) return;
+      const meta = ch.getDatasetMeta(0);
+      x.save();
+      x.font = "700 10.5px 'JetBrains Mono',monospace"; x.textAlign = 'center';
+      meta.data.forEach((bar, i) => {
+        const v = data[i]; if (v == null) return;
+        x.fillStyle = labels[i] === 'Dieses Objekt' ? '#E8CC7A' : '#b8b0a0';
+        x.fillText(v.toLocaleString('de-DE'), bar.x, bar.y - 7);
+      });
+      if (median != null && scales.y) {
+        const yy = scales.y.getPixelForValue(median);
+        x.strokeStyle = 'rgba(201,168,76,.6)'; x.lineWidth = 1; x.setLineDash([4, 4]);
+        x.beginPath(); x.moveTo(a.left, yy); x.lineTo(a.right, yy); x.stroke(); x.setLineDash([]);
+        x.fillStyle = '#C9A84C'; x.textAlign = 'right';
+        x.fillText('Median ' + median.toLocaleString('de-DE'), a.right - 2, yy - 5);
+      }
+      x.restore();
+    }
+  };
   chart = new Chart(ctx, {
     type: 'bar',
-    data: { labels, datasets: [{ label: 'Kaufpreis €/m²', data, backgroundColor: colors, borderColor: colors, borderWidth: 0, borderRadius: 6, maxBarThickness: 64 }] },
+    data: { labels, datasets: [{ label: 'Kaufpreis \u20ac/m\u00b2', data, backgroundColor: bg, borderColor: bg, borderWidth: 0, borderRadius: 7, maxBarThickness: 66 }] },
     options: {
+      layout: { padding: { top: 22 } },
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: (c) => (c.parsed.y != null ? c.parsed.y.toLocaleString('de-DE') + ' €/m²' : '–') } },
+        tooltip: { callbacks: { label: (c) => (c.parsed.y != null ? c.parsed.y.toLocaleString('de-DE') + ' \u20ac/m\u00b2' : '\u2013') } },
       },
       scales: {
         x: { ticks: { color: '#8a8a93', font: { size: 11 } }, grid: { display: false }, border: { display: false } },
         y: { ticks: { color: '#8a8a93', callback: (v) => v.toLocaleString('de-DE') }, grid: { color: 'rgba(255,255,255,.04)' }, border: { display: false },
-             title: { display: true, text: '€/m²', color: '#8a8a93' } },
+             title: { display: true, text: '\u20ac/m\u00b2', color: '#8a8a93' } },
       },
     },
+    plugins: [deco],
   });
 }
 
@@ -887,6 +927,7 @@ function mdToHtml(md) {
 function renderProvenance(out) {
   const prov = out && out.data && out.data.meta && out.data.meta.provenance;
   const el = $('provList');
+  if (!el) return; /* v877-datengrundlage-out */
   if (!prov || !prov.length) { el.innerHTML = ''; return; }
   el.innerHTML = prov.map((p) =>
     `<div class="prov-row"><span class="pl">${p.label}</span>
