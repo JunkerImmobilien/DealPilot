@@ -40,8 +40,7 @@
       '#' + HOST_ID + '{width:100%;margin-top:14px}' +
       '.dpx{display:flex;flex-direction:column;border:1px solid #ece2c8;border-left:5px solid #0c0b09;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 6px 20px -13px rgba(110,82,18,.45);font-family:"Inter",system-ui,sans-serif}' +
       '.dpx *{box-sizing:border-box}' +
-      '.dpx .dpx-head{position:relative;display:flex;align-items:center;gap:9px;height:46px;padding:0 14px;overflow:hidden;background:linear-gradient(110deg,#E8CC7A,#C9A84C 58%,#b8932f)}' +
-      '.dpx .dpx-head::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(118deg,transparent 0 7px,rgba(44,36,16,.13) 7px 8px)}' +
+      /*v877-no-hatch*/'.dpx .dpx-head{position:relative;display:flex;align-items:center;gap:9px;height:46px;padding:0 14px;overflow:hidden;background:linear-gradient(110deg,#E8CC7A,#C9A84C 58%,#b8932f)}' +
       '.dpx .dpx-head::after{content:"";position:absolute;inset:0;background:linear-gradient(157deg,rgba(255,255,255,.5),rgba(255,255,255,0) 46%)}' +
       '.dpx .dpx-head>*{position:relative;z-index:1}' +
       '.dpx .dpx-logo{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:15px}.dpx .dpx-logo .d{color:#0c0b09}.dpx .dpx-logo .p{color:#0c0b09}' +
