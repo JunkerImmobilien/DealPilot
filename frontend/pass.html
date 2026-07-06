@@ -152,6 +152,7 @@ function fmtAnalysis(raw){
   Object.keys(obj).forEach(function(k){ if(!seen[k]) blk(k); });
   return out || esc(raw);
 }
+function _deDate(v){ if(!v) return ''; try{ var d=new Date(v); if(isFinite(d)) return d.toLocaleDateString('de-DE'); }catch(e){} return String(v); }
 function render(pass){
   var snap=pass.snapshot||{};
   var data=snap.data||{};
@@ -172,11 +173,18 @@ function render(pass){
     ['Wohnfl.', k.wfl?k.wfl.toString().replace('.',',')+' m²':'—'],
     ['Preis/m²', k.eurm2?eur(k.eurm2):'—'],
     ['Baujahr', k.bj||'—'],
-    ['Eigenkapital', k.ek?eur(k.ek):'—']
+    ['Eigenkapital', k.ek?eur(k.ek):'—'],
+    ['Objektart', data.objektart||'—'],
+    ['Zimmer', data.zimmer||'—']
   ];
 
   /* qb-stammdaten: alle vorhandenen Felder ausklappbar */
-  var _allF=[['Objektart',data.objektart],['Zimmer',data.zimmer],['Energieklasse',data.energieklasse?String(data.energieklasse).toUpperCase():''],['Stellplatz',data.stellplatz],['Hausgeld',data.hg?(num(data.hg)?eur(num(data.hg))+'/Mo':data.hg):''],['Eigenkapital',k.ek?eur(k.ek):''],['Zinssatz',data.zins?(String(data.zins).replace('.',',')+' %'):''],['Tilgung',data.tilg?(String(data.tilg).replace('.',',')+' %'):''],['Kaufnebenkosten',data.knk?(String(data.knk).replace('.',',')+' %'):'']];
+  var _allF=[['Objektart',data.objektart],['Zimmer',data.zimmer],['Energieklasse',data.energieklasse?String(data.energieklasse).toUpperCase():''],['Stellplatz',data.stellplatz],['Hausgeld',data.hg?(num(data.hg)?eur(num(data.hg))+'/Mo':data.hg):''],['Eigenkapital',k.ek?eur(k.ek):''],['Zinssatz',data.zins?(String(data.zins).replace('.',',')+' %'):''],['Tilgung',data.tilg?(String(data.tilg).replace('.',',')+' %'):''],['Kaufnebenkosten',data.knk?(String(data.knk).replace('.',',')+' %'):''],
+    ['Bäder',data.baeder||data.bad||''],['Etage',data.etage||''],['Kaufdatum',_deDate(data.kaufdat)],
+    ['Kürzel',data.kuerzel||''],['Zustand',data.ds2_zustand||data.zustand||''],
+    ['Ausstattung',data.ausstattung||''],['Nettokaltmiete',data.nkm&&num(data.nkm)?eur(num(data.nkm))+'/Mo':''],
+    ['Sonst. Einnahmen',data.ze&&num(data.ze)?eur(num(data.ze))+'/Mo':''],
+    ['Modernisierung',data.modernisierung||data.mod_jahr||''],['Vermietungsstand',data.vermietungsstand||'']];
   var _ds2r=[]; try { var _pd=data.__ds2pending; if(_pd&&typeof _pd==='object'){ Object.keys(_pd).forEach(function(id){ var it=_pd[id]; if(it&&it.value!=null&&String(it.value).trim()!==''){ _ds2r.push([it.label||id, String(it.value), id]); } }); } } catch(e){}
   var _mrows=_allF.filter(function(f){return f[1]!=null && String(f[1]).trim()!=='';}).concat(_ds2r);
   /* qb-sort: Objektdaten -> Ausstattung -> Finanzen -> Markt/Lage -> Qualitaet+Zustand paarweise */
@@ -193,9 +201,19 @@ function render(pass){
          '<span class="t">Quick Boarding</span><span class="r"><span class="passno">'+pass.code+'</span></span></div>';
   html+= '<div class="addr">'+esc(title)+(subline?'<div class="sub">'+esc(subline)+'</div>':'')+'</div>';
   html+= '<div class="mbody"><div class="scorewrap">'+dial(score,124)+(indicative?'<div class="ind">indikativ</div>':'')+'</div>';
+  /* v875: Leeres bleibt LEER — Kacheln ohne Wert verschwinden */
+  kpis=kpis.filter(function(x){return x[1]!=='—';});
+  ticket=ticket.filter(function(x){return x[1]!=='—';});
   html+=  '<div class="kbox">'+kpis.map(function(x){return '<div class="ki '+x[2]+'"><span class="l">'+x[0]+'</span><span class="v">'+x[1]+'</span></div>';}).join('')+'</div></div>';
   html+= '<div class="kt">'+ticket.map(function(x){return '<div class="k"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>';}).join('')+'</div>';
   html+='</div>';
+
+  /* v875: Text-Stammdaten als eigene Abschnitte — nur wenn befuellt */
+  function _txt(c){for(var i=0;i<c.length;i++){var v=c[i];if(v!=null&&String(v).trim()!=='')return String(v);}return '';}
+  var _these=_txt([data.these,data.investitionsthese,data.invthese]);
+  var _risk=_txt([data.risiken,data.bekannte_risiken,data.risiken_text]);
+  if(_these){html+='<div class="sec"><h2>Investitionsthese</h2><div class="report" style="max-height:none;overflow:visible">'+esc(_these).replace(/\n/g,'<br>')+'</div></div>';}
+  if(_risk){html+='<div class="sec"><h2>Bekannte Risiken</h2><div class="report" style="max-height:none;overflow:visible">'+esc(_risk).replace(/\n/g,'<br>')+'</div></div>';}
 
   if(photos.length){
     html+='<div class="sec"><h2>Bilder</h2><div class="gal">'+photos.slice(0,9).map(function(p){var s=imgSrc(p);return '<img loading="lazy" src="'+s+'" alt="" onclick="zoom(this.src)">';}).join('')+'</div></div>';

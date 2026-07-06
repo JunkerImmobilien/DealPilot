@@ -129,4 +129,48 @@ router.post('/:id/lead', async (req, res) => {
   }
 });
 
+/* v856: Pro-Einreichung — Karte landet als 'eingereicht' (aktiv=false) zur Freigabe im Admin */
+router.post('/einreichen', async (req, res) => {
+  try {
+    const b = req.body || {};
+    if (!b.name || !String(b.name).trim()) return res.status(400).json({ error: 'name_missing' });
+    if (!b.ziel_email || !String(b.ziel_email).trim()) return res.status(400).json({ error: 'email_missing' });
+    const userId = req.user ? (req.user.id || req.user.userId || null) : null;
+    const userEmail = req.user ? (req.user.email || '') : '';
+    const card = await svc.createSubmission(userId, userEmail, b);
+    // Marcel informieren
+    if (mailerService && typeof mailerService.sendMail === 'function') {
+      try {
+        await mailerService.sendMail({
+          to: 'dealpilot@junker-immobilien.io',
+          subject: 'Neue Netzwerk-Karten-Einreichung: ' + card.name,
+          text: 'Neue Einreichung ueber die App.\n\nName: ' + card.name +
+            '\nVon: ' + (userEmail || 'unbekannt') +
+            (b.wunsch_kategorie ? '\nWunsch-Kategorie: ' + b.wunsch_kategorie : '') +
+            '\n\nFreigabe im Admin unter Netzwerk.',
+          replyTo: userEmail || undefined
+        });
+      } catch (mailErr) { console.warn('[network] submission mail failed:', mailErr.message); }
+    }
+    res.json({ ok: true, status: 'eingereicht' });
+  } catch (e) {
+    console.error('[network] einreichen', e.message);
+    res.status(500).json({ error: 'submit_failed' });
+  }
+});
+
+/* v871: Link-Klick zaehlt als Lead (cta_aktion 'link' — Partner-Seite/eigene Anfrageseite) */
+router.post('/:id/click', async (req, res) => {
+  try {
+    const cardId = parseInt(req.params.id, 10);
+    if (!cardId) return res.status(400).json({ error: 'bad_id' });
+    await svc.recordLead(cardId, req.user ? req.user.id : null,
+      'link-click:' + ((req.body && req.body.object_ref) || ''));
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[network] click:', e.message);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
 module.exports = router;

@@ -717,7 +717,8 @@
       const u = r.user;
       const audit = r.audit || [];
 
-      const planOptions = (window._plans || []).map(p =>
+      /* v859-plan-filter: nur die vier echten Plaene anzeigen */
+      const planOptions = (window._plans || []).filter(p => ['starter', 'investor', 'pro'].includes(p.id)).map(p =>
         `<option value="${p.id}" ${u.plan_id === p.id ? 'selected' : ''}>${escapeHtml(p.name)}</option>`
       ).join('');
 

@@ -22,7 +22,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=850">
+<link rel="stylesheet" href="css/style.css?v=875">
 <link rel="stylesheet" href="css/bmf-modal.css?v=293f">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=303"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=3">
@@ -680,9 +680,7 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item" type="button" onclick="sbActionsAction('settings')">
         <span class="sb-act-ico" data-icon="settings"></span><span class="sb-act-l">Einstellungen</span>
       </button>
-      <button class="sb-act-item sb-act-help" type="button" onclick="sbActionsAction('help')">
-        <span class="sb-act-ico" data-icon="help"></span><span class="sb-act-l">Hilfe</span>
-      </button>
+      <!-- v857: Hilfe aus Aktionen-Menue entfernt (weiterhin ueber Header + Settings erreichbar) -->
       <button class="sb-act-item sb-act-feedback" type="button" onclick="sbActionsAction('feedback')">
         <span class="sb-act-ico" data-icon="feedback"></span><span class="sb-act-l">Feedback &amp; Support</span>
       </button>
@@ -791,9 +789,7 @@ label.dp-required.qc-required::after {
         <svg width="14" height="14"><use href="#i-help"/></svg>
       </button>
       <!-- V108: Verlauf + Teilen Buttons entfernt (Marcels Wunsch) -->
-      <button class="hdr-icon-btn" type="button" title="Duplizieren" onclick="if(typeof duplicateObj==='function')duplicateObj()">
-        <svg width="14" height="14"><use href="#i-copy"/></svg>
-      </button>
+      <!-- v857: Duplizieren-Button aus dem Header entfernt -->
       <!-- v489-fuel-pill: Pilot-Tank — Kerosin-Stand, klickt zu Settings → Pilot -->
       <button class="hdr-credits-pill fuel-pill" id="hdr-credits-pill" type="button"
               title="Pilot-Tank — klicken für Details"
@@ -2919,17 +2915,17 @@ label.dp-required.qc-required::after {
 <script src="js/score-tiers.js?v=463"></script>
 <script src="js/dealscore.js?v=463"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=144">
-<script src="js/datenraum.js?v=160"></script>
+<script src="js/datenraum.js?v=875"></script>
 <script src="js/tooltip-content.js?v=738"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=839"></script>
   <script src="js/immometrica-qc.js?v=672"></script>
   <script src="js/modal-boarding-skin.js?v=672"></script>
   <script src="js/provider-keys.js?v=672"></script>
-  <script src="js/mandanten.js?v=841b"></script>
+  <script src="js/mandanten.js?v=865"></script>
   <script src="js/ueberfuehrung-wizard.js?v=816i"></script>
   <script src="js/apikeys.js?v=810"></script>
-  <script src="js/settings.js?v=843"></script>
+  <script src="js/settings.js?v=875"></script>
 <script src="js/pricing-modal.js?v=493-2"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=162"></script>
@@ -2950,7 +2946,7 @@ label.dp-required.qc-required::after {
 <script src="js/all-objects.js?v=720"></script>
 <script src="js/track-record.js?v=166"></script>
 <script src="js/pdf.js?v=20260611105943"></script>
-<script src="js/auth.js?v=724"></script>
+<script src="js/auth.js?v=860"></script>
   <script src="js/auth-401-handler.js?v=162" defer></script>
 <script src="js/subscription.js?v=187"></script>
 <script src="js/bmf-data.js?v=166"></script>
@@ -2976,17 +2972,20 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=166"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=843"></script>
-  <script src="js/tour-engine.js?v=816h"></script>
-  <script src="js/tour-content.js?v=773"></script>
+<script src="js/help.js?v=860"></script>
+  <script src="js/dp-band-fix.js?v=863"></script> <!-- v863-band-fix -->
+  <script src="js/dp-plan-gates.js?v=875"></script> <!-- v874-plan-gates -->
+  <script src="js/tour-engine.js?v=872"></script>
+  <script src="js/tour-content.js?v=873"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
-<script src="js/deal-action.js?v=854"></script>
+<script src="js/deal-action.js?v=869"></script>
 <script src="js/deal-action-readycheck.js?v=852"></script>
-<script src="js/deal-action-boarding.js?v=855"></script>
-<script src="js/deal-action-pilot.js?v=722"></script>
+<script src="js/deal-action-boarding.js?v=875"></script>
+<script src="js/deal-action-pilot.js?v=875"></script>
+<script src="js/netzwerk-einreichung.js?v=857"></script> <!-- v856-einreichung -->
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
 <script src="js/newobj-fixes.js?v=728"></script>
 <script src="js/sidebar-search.js?v=846"></script>
@@ -3016,7 +3015,7 @@ label.dp-required.qc-required::after {
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=770"></script>
-  <script src="js/dpsh-score-hero.js?v=7"></script><!-- dpsh-score-hero -->
+  <script src="js/dpsh-score-hero.js?v=875"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=676"></script>
   <script src="js/voice-import.js?v=537"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->

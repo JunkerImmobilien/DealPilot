@@ -445,8 +445,22 @@
   }
   function renderSettingsTab() {
     if (!_isPro()) {
+      /* v865-privat-frei: Der PRIVATE Halter (inkl. Steuerzeitraeume) bleibt fuer
+         ALLE Plaene bearbeitbar — nur Gesellschaften (GmbH/UG) sind Pro. */
+      if (_editing === 'privat') {
+        return '<h2 class="set-section-h2">Mandanten</h2>' + _renderForm();
+      }
+      var _priv = get('privat') || { id: 'privat', name: 'Privat', rechtsform: 'privat', regime: {} };
       return ''
         + '<h2 class="set-section-h2">Mandanten</h2>'
+        + '<p class="hint">Dein privater Halter — inklusive <b>Steuerzeitr\u00e4umen</b> — ist in allen Pl\u00e4nen verf\u00fcgbar. Weitere Gesellschaften (GmbH/UG) mit eigenem Steuerregime sind Teil des <b>Pro</b>-Plans.</p>'
+        + '<div style="border:1px solid #ece7df;border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;background:#fff;margin:14px 0">'
+        +   '<div style="flex:1;min-width:0">'
+        +   '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px"><strong style="font:600 15px/1.2 \'Space Grotesk\',sans-serif">' + esc(_priv.name || 'Privat') + '</strong>' + _badge('privat') + '</div>'
+        +   '<div style="font-size:12px;color:#7A7370">Einkommensteuer \u00b7 \u00fcber zvE (Tab Steuer) \u00b7 Steuerzeitr\u00e4ume verwalten</div>'
+        +   '</div>'
+        +   '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'privat\')">Bearbeiten</button>'
+        + '</div>'
         + '<div style="margin-top:14px;padding:20px 22px;border:1px solid var(--gold,#C9A84C);border-radius:14px;background:#FAF9F4">'
         +   '<div style="font:700 13px/1 \'DM Sans\',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:#b8932f;margin-bottom:8px">Pro-Funktion</div>'
         +   '<p style="margin:0 0 14px;color:#2A2727;font-size:14px;line-height:1.55">Mit <b>Mandanten</b> h\u00e4ltst du Objekte privat <i>oder</i> in einer GmbH/UG \u2014 mit eigener K\u00f6rperschaftsteuer-Rechnung, Cockpit-Filter pro Halter und (in Vorbereitung) GuV/Bilanz-Export. Verf\u00fcgbar im <b>Pro</b>-Plan.</p>'
@@ -487,7 +501,12 @@
       + 'Privat l\u00e4uft \u00fcber dein zu versteuerndes Einkommen (Tab Steuer). Bei GmbH/UG gibst du das Steuerregime + Buchhaltungs-Stammwerte an \u2014 die werden in einer n\u00e4chsten Ausbaustufe aktiv (eigene Steuerrechnung + GuV/Bilanz-Export). '
       + 'Privat bleibt der Standard.</p>'
       + '<div style="display:grid;gap:11px;margin:16px 0">' + cards + '</div>'
-      + '<button type="button" class="btn btn-gold" onclick="DealPilotMandanten.uiNew()"><span class="ic">+</span> Neuer Mandant</button>';
+      + '<button type="button" class="btn btn-gold" onclick="DealPilotMandanten.uiNew()"><span class="ic">+</span> Neuer Mandant</button>'
+      /* v856-uew: Ueberfuehrung direkt aus den Mandanten heraus (mit Objekt-Auswahl) */
+      + '<hr class="dvd"><h3 class="set-section-h">In Gesellschaft \u00fcberf\u00fchren</h3>'
+      + '<p class="hint">Privat-Objekt einfrieren + neues GmbH-Objekt anlegen (Werte, Fotos, KI \u00fcbernommen). W\u00e4hle zuerst das Objekt.</p>'
+      + '<button type="button" class="btn btn-gold" onclick="DealPilotMandanten.openUeberfuehrung()">\u2708 \u00dcberf\u00fchrung starten</button>'
+      + '<div id="mand-uew-picker" style="margin-top:12px"></div>';
   }
 
   function _fGrid() { return 'display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin:14px 0'; }
@@ -643,7 +662,64 @@
     try { wireObjectFields(); } catch (e) {}   /* idempotent (mandWired-Guards) -> registriert Events + ruft _syncUeberf */
     try { _syncUeberf(); } catch (e) {}        /* sicherstellen: Haken/Kennung/read-only aktuell */
   }
+  /* v856-uew-picker: Objekt waehlen -> laden -> Ueberfuehrungs-Wizard oeffnen */
+  function openUeberfuehrung() {
+    var host = document.getElementById('mand-uew-picker');
+    if (!host) return;
+    if (!window.Auth || typeof window.Auth.apiCall !== 'function') { host.innerHTML = '<div style="color:#B86250;font-size:13px">Bitte neu einloggen.</div>'; return; }
+    host.innerHTML = '<div style="color:#7A7370;font-size:13px">Objekte laden \u2026</div>';
+    window.Auth.apiCall('/objects', { method: 'GET' }).then(function (r) {
+      var items = (r && (r.objects || r.items)) || [];
+      if (!items.length) { host.innerHTML = '<div style="color:#7A7370;font-size:13px">Keine Objekte vorhanden.</div>'; return; }
+      /* v857-uew-liste: DealPilot-Stil (Monogramm, Adresse, Ort, Kaufpreis) — INLINE-Styles */
+      host.innerHTML = '<div style="display:grid;gap:8px;max-height:320px;overflow:auto;padding-right:2px">' + items.map(function (o) {
+        var d = o.data || {};
+        var label = [d.str, d.hnr].filter(Boolean).join(' ') || o.name || ('Objekt ' + o.id);
+        var ort = [d.plz, d.ort].filter(Boolean).join(' ');
+        var kp = d.kp ? (String(d.kp) + ' \u20ac') : '';
+        var subline = [ort, kp].filter(Boolean).join(' \u00b7 ');
+        var kz = (d.kuerzel || '').toString().toUpperCase() || label.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || 'OB';
+        return '<button type="button" onclick="DealPilotMandanten._uewPick(\'' + String(o.id).replace(/'/g, '') + '\', this)" '
+          + 'style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 13px;border:1px solid #ece7df;border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .15s">'
+          + '<span style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#E8CC7A,#b8932f);color:#1a1508;display:inline-flex;align-items:center;justify-content:center;font:700 12px \'Space Grotesk\',sans-serif;flex-shrink:0;letter-spacing:.5px">' + esc(kz) + '</span>'
+          + '<span style="flex:1;min-width:0"><b style="display:block;font:600 14px/1.25 \'Space Grotesk\',sans-serif;color:#2A2727;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(label) + '</b>'
+          + (subline ? '<span style="font-size:12px;color:#7A7370">' + esc(subline) + '</span>' : '')
+          + '</span>'
+          + '<span style="color:#b8932f;font:700 15px sans-serif;flex-shrink:0">\u2192</span></button>';
+      }).join('') + '</div>';
+    }).catch(function () { host.innerHTML = '<div style="color:#B86250;font-size:13px">Objekte konnten nicht geladen werden.</div>'; });
+  }
+  function _uewPick(objId, btn) {
+    if (btn) { btn.disabled = true; btn.style.opacity = '.6'; }
+    var open = function () {
+      try { if (typeof closeSettings === 'function') closeSettings(); } catch (e) {}
+      setTimeout(function () {
+        if (window.DealPilotUeberfuehrung && typeof DealPilotUeberfuehrung.open === 'function') DealPilotUeberfuehrung.open();
+      }, 350);
+    };
+    if (window._currentObjKey === objId) { open(); return; }
+    /* Objekt via Sidebar-Karte laden (gleicher Weg wie ein Klick des Nutzers) */
+    var clicked = false;
+    try {
+      var cards = document.querySelectorAll('#sb-list .sb-card');
+      for (var i = 0; i < cards.length; i++) {
+        var k = cards[i].getAttribute('data-key') || cards[i].getAttribute('data-id') || '';
+        if (k === objId) { cards[i].click(); clicked = true; break; }
+      }
+    } catch (e) {}
+    if (!clicked) {
+      if (typeof toast === 'function') toast('Bitte das Objekt links in der Sidebar \u00f6ffnen \u2014 der Wizard startet dann.');
+    }
+    var tries = 0;
+    var t = setInterval(function () {
+      tries++;
+      if (window._currentObjKey === objId) { clearInterval(t); open(); }
+      else if (tries > 16) { clearInterval(t); if (btn) { btn.disabled = false; btn.style.opacity = ''; } }
+    }, 250);
+  }
+
   window.DealPilotMandanten = {
+    openUeberfuehrung: openUeberfuehrung, _uewPick: _uewPick,  /* v856-uew */
     getList: getList, get: get, upsert: upsert, remove: remove, rfLabel: rfLabel, isCorp: isCorp,
     renderHalterOptions: renderHalterOptions, renderHalterChips: renderHalterChips,
     setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, wireObjectFields: wireObjectFields,

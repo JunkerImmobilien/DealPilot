@@ -674,9 +674,17 @@ router.post('/users/:id/change-plan', requireAdmin, requireRole('owner', 'suppor
     await db.query(`UPDATE subscriptions SET status='canceled', ended_at=NOW() WHERE user_id=$1 AND status='active'`, [req.params.id]);
 
     if (plan_id !== 'free') {
+      /* v859-upsert: UNIQUE(user_id) auf subscriptions — alte Zeile aktualisieren statt neu einfuegen */
       await db.query(`
         INSERT INTO subscriptions (user_id, plan_id, billing_interval, status, current_period_start, current_period_end)
         VALUES ($1, $2, $3, 'active', NOW(), NOW() + INTERVAL '1 year')
+        ON CONFLICT (user_id) DO UPDATE SET
+          plan_id = EXCLUDED.plan_id,
+          billing_interval = EXCLUDED.billing_interval,
+          status = 'active',
+          current_period_start = NOW(),
+          current_period_end = NOW() + INTERVAL '1 year',
+          ended_at = NULL
       `, [req.params.id, plan_id, billing_interval]);
     }
 
@@ -1539,6 +1547,12 @@ router.delete('/network-categories/:key', requireAdmin, requireRole('owner'), as
     if (r && r.ok === false) return res.status(409).json({ error: 'Kategorie enthaelt noch Karten' });
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── v856: Netzwerk-Leads-Statistik ──
+router.get('/network-stats', requireAdmin, async (req, res) => {
+  try { const stats = await networkCardsService.statsLeads(); res.json(stats); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 module.exports = router;

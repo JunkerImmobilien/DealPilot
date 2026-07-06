@@ -17,35 +17,6 @@
 
   // ─── Hilfe-Inhalte: Themen-Baum ─────────────────────────────────────────
   var HELP_TOPICS = [
-    /* v727-help-avm: Marktbewertung-Felder */
-    {
-      id: 'marktbewertung_felder',
-      title: 'Marktbewertung — welche Felder zählen',
-      icon: 'i-bar',
-      desc: 'Objektangaben für die Marktbewertung',
-      sections: [
-        {
-          h: 'Warum mehr Angaben = bessere Bewertung',
-          body: 'Je vollständiger ein Objekt erfasst ist, desto genauer die Marktbewertung. Beispiel aus der Praxis: Nur mit Adresse + Wohnfläche ergab eine Bewertung 212.000 € mit hoher Unsicherheit — mit vollständigen Angaben (Zustand, Ausstattung, Baujahr, Grundstück) 251.000 € mit deutlich höherer Treffsicherheit. Es lohnt sich, die Felder im Tab „Objekt“ möglichst komplett auszufüllen.'
-        },
-        {
-          h: 'Sprengnetter (aktiv)',
-          body: 'Sprengnetter AVM nutzt alle folgenden Angaben: <strong>Adresse, Objektart, Wohnfläche, Baujahr, Zimmerzahl, Etage, Grundstücksfläche, Modernisierungsjahr</strong> sowie die Ausstattungsdetails <strong>Zustand, Ausstattungsstandard, Heizung, Verglasung, Bodenbelag, Bad, Gäste-WC, Keller, Außenwände, Dacheindeckung, Aufzug, Balkon, Garage/Stellplatz</strong>. Zurück kommen Marktwert mit Spanne, Marktmiete und echte Vergleichsobjekte aus der Nachbarschaft.'
-        },
-        {
-          h: 'DealPilot-Marktwert (aktiv)',
-          body: 'Die DealPilot-eigene Markteinschätzung kombiniert deine Lage- und Potenzialbewertungen (Mikro-/Makrolage, Nachfrage, Entwicklung) mit Zustand, Ausstattung, Energieklasse und Bodenrichtwert sowie amtlichen Marktdaten. Die neuen Ausstattungsdetails fließen ebenfalls ein.'
-        },
-        {
-          h: 'PriceHubble (in Vorbereitung)',
-          body: 'Die PriceHubble-Anbindung ist in Vorbereitung und noch nicht aktiv. Sobald verfügbar, werden dieselben Objektangaben genutzt. Bis dahin liefert PriceHubble nur Demo-Werte.'
-        },
-        {
-          h: 'Tipp: Pflichtfelder zuerst',
-          body: 'Pflicht für jede Bewertung sind PLZ, Ort, Objektart und Wohnfläche. Alles darüber hinaus ist optional, verbessert aber die Genauigkeit. Die kleinen Info-Symbole an den Feldern erklären, wofür jede Angabe relevant ist.'
-        }
-      ]
-    },
     {
       id: 'einstieg',
       title: 'Einstieg',
@@ -227,6 +198,35 @@
         {
           h: 'Persistenz',
           body: 'Die Pilot-Analyse wird ab V63.69 automatisch beim Objekt gespeichert. Beim erneuten Öffnen siehst du die Analyse direkt — du musst sie nicht neu berechnen lassen. Wenn du frische Daten/Marktanalyse willst, klicke „Analyse erneut starten".'
+        }
+      ]
+    },
+    /* v727-help-avm: Marktbewertung-Felder */
+    {
+      id: 'marktbewertung_felder',
+      title: 'Marktbewertung — welche Felder zählen',
+      icon: 'i-bar',
+      desc: 'Objektangaben für die Marktbewertung',
+      sections: [
+        {
+          h: 'Warum mehr Angaben = bessere Bewertung',
+          body: 'Je vollständiger ein Objekt erfasst ist, desto genauer die Marktbewertung. Beispiel aus der Praxis: Nur mit Adresse + Wohnfläche ergab eine Bewertung 212.000 € mit hoher Unsicherheit — mit vollständigen Angaben (Zustand, Ausstattung, Baujahr, Grundstück) 251.000 € mit deutlich höherer Treffsicherheit. Es lohnt sich, die Felder im Tab „Objekt“ möglichst komplett auszufüllen.'
+        },
+        {
+          h: 'Sprengnetter (aktiv)',
+          body: 'Sprengnetter AVM nutzt alle folgenden Angaben: <strong>Adresse, Objektart, Wohnfläche, Baujahr, Zimmerzahl, Etage, Grundstücksfläche, Modernisierungsjahr</strong> sowie die Ausstattungsdetails <strong>Zustand, Ausstattungsstandard, Heizung, Verglasung, Bodenbelag, Bad, Gäste-WC, Keller, Außenwände, Dacheindeckung, Aufzug, Balkon, Garage/Stellplatz</strong>. Zurück kommen Marktwert mit Spanne, Marktmiete und echte Vergleichsobjekte aus der Nachbarschaft.'
+        },
+        {
+          h: 'DealPilot-Marktwert (aktiv)',
+          body: 'Die DealPilot-eigene Markteinschätzung kombiniert deine Lage- und Potenzialbewertungen (Mikro-/Makrolage, Nachfrage, Entwicklung) mit Zustand, Ausstattung, Energieklasse und Bodenrichtwert sowie amtlichen Marktdaten. Die neuen Ausstattungsdetails fließen ebenfalls ein.'
+        },
+        {
+          h: 'PriceHubble (in Vorbereitung)',
+          body: 'Die PriceHubble-Anbindung ist in Vorbereitung und noch nicht aktiv. Sobald verfügbar, werden dieselben Objektangaben genutzt. Bis dahin liefert PriceHubble nur Demo-Werte.'
+        },
+        {
+          h: 'Tipp: Pflichtfelder zuerst',
+          body: 'Pflicht für jede Bewertung sind PLZ, Ort, Objektart und Wohnfläche. Alles darüber hinaus ist optional, verbessert aber die Genauigkeit. Die kleinen Info-Symbole an den Feldern erklären, wofür jede Angabe relevant ist.'
         }
       ]
     },
@@ -417,7 +417,7 @@
     modal.className = 'help-modal global-view-overlay';
     modal.innerHTML =
       '<div class="help-modal-inner global-view-modal set-modal-v2 set-modal-cream">' +  /* v820-help-remove-so */
-        '<div class="dp-modal-topband">' +'<div class="dp-mtb-brand"><span class="dp-mtb-logo">Deal<span class="dp-mtb-logo-g">Pilot</span></span><!--v821-logo-branding--><span class="dp-mtb-tag">HILFE</span></div>' +'<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title">DealPilot Hilfe</div><div class="dp-mtb-h-sub">Begriffe, Kennzahlen, Praxis-Wissen</div></div>' +'<button type="button" class="set-modal-close dp-band-close" onclick="hideHelp()" aria-label="Schließen" title="Schließen (ESC)">' +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +'</button>' +'</div>' +  /* v793-topband v843-x-in-band */
+        '<div class="dp-modal-topband">' +'<div class="dp-mtb-brand"><span class="dp-mtb-logo">Deal<span class="dp-mtb-logo-g">Pilot</span></span><!--v821-logo-branding--><span class="dp-mtb-tag">HILFE</span>' +'<button type="button" class="set-modal-close dp-band-close" onclick="hideHelp()" aria-label="Schließen" title="Schließen (ESC)">' +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +'</button>' +'</div>' +'<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title">DealPilot Hilfe</div><div class="dp-mtb-h-sub">Begriffe, Kennzahlen, Praxis-Wissen</div></div>' +'</div>' +  /* v793-topband v843-x-in-band */
         // V118: Sidebar links (wie Settings) — Header + Topics-Liste + Search-Foot
         '<aside class="modal-side help-modal-side">' +
           '<div class="ms-h">' +

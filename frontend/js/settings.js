@@ -151,7 +151,7 @@ function showSettings(initialTab) {
   modal.className = 'global-view-overlay';
   modal.innerHTML =
     '<div class="global-view-modal settings-modal set-modal-v2 set-modal-cream">' +  /* v819-settings-topband */
-      '<div class="dp-modal-topband">' +'<div class="dp-mtb-brand"><span class="dp-mtb-logo">Deal<span class="dp-mtb-logo-g">Pilot</span></span><!--v821-logo-branding--><span class="dp-mtb-tag">EINSTELLUNGEN</span></div>' +'<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title" id="set-band-title">Account &amp; Sicherheit</div><div class="dp-mtb-h-sub" id="set-band-sub">Login-Daten, Passwort und Zwei-Faktor-Absicherung.</div></div>' +'<button type="button" class="set-modal-close dp-band-close" onclick="closeSettings()" aria-label="Schließen" title="Schließen (ESC)">' +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +'</button>' +'</div>' + /* v843-x-in-band */
+      '<div class="dp-modal-topband">' +'<div class="dp-mtb-brand"><span class="dp-mtb-logo">Deal<span class="dp-mtb-logo-g">Pilot</span></span><!--v821-logo-branding--><span class="dp-mtb-tag">EINSTELLUNGEN</span>' +'<button type="button" class="set-modal-close dp-band-close" onclick="closeSettings()" aria-label="Schließen" title="Schließen (ESC)">' +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +'</button>' +'</div>' +'<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title" id="set-band-title">Account &amp; Sicherheit</div><div class="dp-mtb-h-sub" id="set-band-sub">Login-Daten, Passwort und Zwei-Faktor-Absicherung.</div></div>' +'</div>' + /* v843-x-in-band */
       // V87: Cream-Classic Split-Layout — Sidebar links (Header + Tabs + User-Foot),
       // Content rechts (Pane mit Header + Save-Row als Grid-Footer).
       '<aside class="modal-side">' +
@@ -649,6 +649,18 @@ function showSettings(initialTab) {
           '<div style="margin-top:10px;text-align:right">' +
             '<button type="button" class="btn btn-sm btn-ghost" onclick="_v213ResetCards()" title="Verwirft alle manuellen Klapp-Entscheidungen">Alle Karten zurücksetzen</button>' +
           '</div>' +
+        '</div>' +
+        /* v875: Investor-Deal-Score-Leiste Default beim Objekt-Oeffnen */
+        '<hr class="dvd">' +
+        '<h3 class="set-section-h">Investor Deal Score beim Öffnen</h3>' +
+        '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
+          '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">' +
+            '<input type="checkbox" id="set_dpsh_min"' + (function(){try{return localStorage.getItem('dp_dpsh_min')==='1'?' checked':'';}catch(e){return '';}})() + ' style="margin-top:3px;flex-shrink:0;cursor:pointer;" onchange="window._dpshMinToggle(this)">' +
+            '<span>' +
+              '<span style="display:block;color:var(--ch,#2A2727);font-weight:500">Score-Leiste standardmäßig minimiert</span>' +
+              '<span style="display:block;color:var(--muted,#5F5E5A);margin-top:2px;line-height:1.5;font-weight:400">Beim Öffnen eines Objekts startet die Investor-Deal-Score-Leiste kompakt — aufklappen jederzeit per Klick. (Wird auf diesem Gerät gespeichert.)</span>' +
+            '</span>' +
+          '</label>' +
         '</div>' +
         /* === V213 collapse-toggle profilanzeige END === */
         /* === V228 tooltip-mode-toggle START === */
@@ -3010,3 +3022,14 @@ try{ window._mbThemePref=_mbThemePref; window._setMbTheme=_setMbTheme; window._s
 /* v837-emoji-svg: Section-Emojis durch SVG ersetzt (6 Stellen) */
 /* v838-copilot-label: KI-Tab -> Co-Pilot (KI) */
 /* v838b-info-tab: Impressum-Button raus + Emojis -> SVG */
+
+
+/* v875-dpsh-toggle: Anzeige-Praeferenz sofort anwenden + lokal speichern */
+window._dpshMinToggle = function (cb) {
+  try { localStorage.setItem('dp_dpsh_min', cb.checked ? '1' : '0'); } catch (e) {}
+  try {
+    document.body.classList.toggle('dpsh-stub', !!cb.checked);
+    var card = document.getElementById('kpi-eval-card');
+    if (card) card.classList.toggle('dpsh-collapsed', !!cb.checked);
+  } catch (e) {}
+};

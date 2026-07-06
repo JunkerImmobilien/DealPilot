@@ -51,6 +51,7 @@
   var _cards = [];
   var _cats = [];
   var _editId = null;
+  var _status = 'aktiv';   /* v856: bleibt beim Bearbeiten erhalten */
   var _logoData = '';   // Bild-Upload (dataURL) oder ''
   var _bgData = '';     // Hintergrund-Bild (dataURL) oder ''
 
@@ -179,10 +180,13 @@
       verified: _chk('adn-verified'),
       cta_label: _val('adn-cta') || 'Anfrage senden',
       cta_aktion: _val('adn-ctaakt') || 'lead',
+      cta_url: _val('adn-ctaurl') || '',
+      status: _status,
       akzent: _val('adn-akzent') || '#C9A84C',
       hintergrund: _val('adn-bg'),
       hintergrund_farbe: _val('adn-bg') === 'custom' ? _val('adn-bgfarbe') : '',
       hintergrund_bild: _val('adn-bg') === 'bild' ? _bgData : '',
+      hintergrund_deckkraft: _num('adn-deck', 85),
       kante_stil: _val('adn-kante'),
       kante_farbe: _chk('adn-kante-auto') ? '' : _val('adn-kantefarbe'),
       kuerzel: _val('adn-kuerzel'),
@@ -191,6 +195,7 @@
       logo_zoom: _num('adn-lz', 100),
       logo_x: _num('adn-lx', 50),
       logo_y: _num('adn-ly', 50),
+      logo_bg: _val('adn-logobg') || '#ffffff',
       website: _val('adn-web'),
       ziel_email: _val('adn-email'),
       mitgabe: mit,
@@ -206,7 +211,7 @@
     var acc = d.akzent || '#C9A84C';
     var lsrc = d.logo_data || d.logo_url;
     var logo = lsrc
-      ? '<img src="' + _esc(lsrc) + '" alt="" style="object-position:' + d.logo_x + '% ' + d.logo_y + '%;transform:scale(' + (d.logo_zoom / 100) + ');transform-origin:' + d.logo_x + '% ' + d.logo_y + '%">'
+      ? '<img src="' + _esc(lsrc) + '" alt="" style="background:' + _esc(d.logo_bg || '#fff') + ';object-position:' + d.logo_x + '% ' + d.logo_y + '%;transform:scale(' + (d.logo_zoom / 100) + ');transform-origin:' + d.logo_x + '% ' + d.logo_y + '%">'
       : _esc((d.kuerzel || (d.name || '?').slice(0, 2)).toUpperCase());
     var tags = _tagArr(d.tags).slice(0, 4).map(function (t) { return '<span class="pv-tag">' + _esc(t) + '</span>'; }).join('');
     var ver = d.verified ? '<span class="pv-ver">\u2713 Gepr\u00fcft</span>' : '';
@@ -218,11 +223,11 @@
       ? '<div class="pv-req"><div class="t">\ud83d\udd12 Voraussetzungen f\u00fcr die Anfrage</div><ul>' +
         anfOn.map(function (a) { return '<li>\u2715 ' + a[1] + '</li>'; }).join('') + '</ul></div>' : '';
     var bgCls = '', bgStyle = '';
-    if (d.hintergrund === 'bild' && d.hintergrund_bild) bgStyle = "background:linear-gradient(rgba(255,255,255,.87),rgba(255,255,255,.8)),url('" + d.hintergrund_bild + "') center/cover;";
+    if (d.hintergrund === 'bild' && d.hintergrund_bild) { var _a = Math.max(0, Math.min(100, d.hintergrund_deckkraft == null ? 85 : d.hintergrund_deckkraft)) / 100; bgStyle = "background:linear-gradient(rgba(255,255,255," + _a.toFixed(2) + "),rgba(255,255,255," + (_a * 0.92).toFixed(2) + ")),url('" + d.hintergrund_bild + "') center/cover;"; }
     else if (d.hintergrund === 'custom' && d.hintergrund_farbe) bgStyle = 'background:' + _esc(d.hintergrund_farbe) + ';';
     else if (d.hintergrund && d.hintergrund !== 'weiss') bgCls = ' pv-bg-' + _esc(d.hintergrund);
     var kSt = d.kante_farbe ? ' style="--kante:' + _esc(d.kante_farbe) + '"' : '';
-    var ctaSub = d.cta_aktion === 'gutachten_modal' ? 'Details direkt angeben' : 'kostenlos &amp; unverbindlich';
+    var ctaSub = d.cta_aktion === 'gutachten_modal' ? 'Details direkt angeben' : (d.cta_aktion === 'link' ? '\u00f6ffnet Partner-Seite' : 'kostenlos &amp; unverbindlich');
     host.innerHTML =
       '<div class="pv' + bgCls + '" style="--acc:' + _esc(acc) + ';' + bgStyle + '">' +
         '<div class="pv-l"><div class="pv-top"><div class="pv-logo" style="background:' + _esc(acc) + '">' + logo + '</div>' +
@@ -235,6 +240,31 @@
         '<div class="pv-edge pv-edge-' + _esc(d.kante_stil || 'k1') + '"' + kSt + '></div>' +
         '<div class="pv-stub"><div class="pv-code">' + _esc((d.kuerzel || 'DP').toUpperCase()) + '</div><div class="pv-barcode"></div><div class="pv-lbl">BOARDING</div></div>' +
       '</div>';
+  }
+
+  /* ── Leads-Statistik (v856) ── */
+  async function _loadStats() {
+    var host = document.getElementById('adn-stats'); if (!host) return;
+    try {
+      var r = await _call('GET', '/network-stats');
+      var t = (r && r.totals) || { total: 0, d30: 0, d7: 0 };
+      var pc = (r && r.perCard) || [];
+      var pd = (r && r.perDay) || [];
+      var maxN = 1; pd.forEach(function (x) { if (x.n > maxN) maxN = x.n; });
+      var bars = pd.map(function (x) {
+        var h = Math.max(3, Math.round((x.n / maxN) * 38));
+        return '<div title="' + _esc(x.d) + ': ' + x.n + '" style="width:14px;height:' + h + 'px;background:#C9A84C;border-radius:3px 3px 0 0;align-self:flex-end"></div>';
+      }).join('');
+      var rows = pc.filter(function (c) { return c.leads > 0; }).slice(0, 8).map(function (c) {
+        return '<tr><td style="padding:3px 8px 3px 0">' + _esc(c.name) + '</td><td style="font-family:monospace;text-align:right;font-weight:700">' + c.leads + '</td><td style="color:#999;font-size:11px;padding-left:10px">' + (c.last_at ? new Date(c.last_at).toLocaleDateString('de-DE') : '') + '</td></tr>';
+      }).join('') || '<tr><td style="color:#999;padding:3px 0">Noch keine Leads.</td></tr>';
+      host.innerHTML =
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">' +
+          '<div class="adn-card" style="padding:13px 16px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9a7f33">Leads gesamt</div><div style="font-size:26px;font-weight:700;font-family:sans-serif">' + t.total + '</div><div style="font-size:11px;color:#888">' + t.d30 + ' in 30 Tagen \u00b7 ' + t.d7 + ' in 7 Tagen</div></div>' +
+          '<div class="adn-card" style="padding:13px 16px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9a7f33">Letzte 14 Tage</div><div style="display:flex;gap:3px;height:42px;align-items:flex-end;margin-top:6px">' + (bars || '<span style="color:#999;font-size:11px">keine</span>') + '</div></div>' +
+          '<div class="adn-card" style="padding:13px 16px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9a7f33">Top-Karten</div><table style="border-collapse:collapse;font-size:12px;margin-top:4px">' + rows + '</table></div>' +
+        '</div>';
+    } catch (e) { host.innerHTML = ''; }
   }
 
   /* ── Kategorien-Verwaltung ── */
@@ -308,22 +338,38 @@
       var anf = c.anforderungen || {};
       if (typeof anf === 'string') { try { anf = JSON.parse(anf); } catch (e) { anf = {}; } }
       var hasAnf = Object.keys(anf).some(function (k) { return anf[k] === true; });
-      return '<div class="adn-litem">' +
+      var pend = c.status === 'eingereicht';
+      return '<div class="adn-litem"' + (pend ? ' style="border-color:#C9A84C;background:#fffbef"' : '') + '>' +
         '<div class="adn-move"><button data-move="' + c.id + '" data-dir="-1" title="nach oben">\u25b2</button><button data-move="' + c.id + '" data-dir="1" title="nach unten">\u25bc</button></div>' +
+        (pend ? '<span class="adn-badge" style="background:#C9A84C;color:#1a1508">\u23f3 Eingereicht</span>' : '') +
         '<span class="adn-badge">' + _esc(_catLabel(c.kategorie)) + '</span>' +
         '<div style="flex:1;min-width:140px"><div style="font-weight:700;font-size:13px">' + _esc(c.name) + '</div>' +
           '<div style="font-size:11px;color:#888">' + _esc(c.rolle || '') + '</div></div>' +
+        (pend && c.eingereicht_email ? '<span style="font-size:11px;color:#9a7f33">von ' + _esc(c.eingereicht_email) + (c.wunsch_kategorie ? ' \u00b7 Wunsch: ' + _esc(c.wunsch_kategorie) : '') + '</span>' : '') +
         (hasAnf ? '<span class="adn-badge lock">\ud83d\udd12 Pflicht-Check</span>' : '') +
         (c.cta_aktion === 'gutachten_modal' ? '<span class="adn-badge">Modal</span>' : '') +
+        (c.cta_aktion === 'link' ? '<span class="adn-badge">Link</span>' : '') +
         '<span class="adn-leads">' + (c.leads | 0) + ' Leads</span>' +
         '<span class="adn-badge ' + (c.aktiv ? '' : 'off') + '">' + (c.aktiv ? 'aktiv' : 'aus') + '</span>' +
         '<button class="adn-btn sec min" data-edit="' + c.id + '">Bearbeiten</button>' +
-        '<button class="adn-btn del" data-del="' + c.id + '">L\u00f6schen</button>' +
+        (pend ? '<button class="adn-btn min" data-approve="' + c.id + '">Freigeben</button>' : '') +
+        '<button class="adn-btn del" data-del="' + c.id + '">' + (pend ? 'Ablehnen' : 'L\u00f6schen') + '</button>' +
         '</div>';
     }).join('');
     host.querySelectorAll('[data-edit]').forEach(function (b) { b.onclick = function () { _edit(parseInt(b.getAttribute('data-edit'), 10)); }; });
     host.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { _del(parseInt(b.getAttribute('data-del'), 10)); }; });
     host.querySelectorAll('[data-move]').forEach(function (b) { b.onclick = function () { _move(parseInt(b.getAttribute('data-move'), 10), parseInt(b.getAttribute('data-dir'), 10)); }; });
+    host.querySelectorAll('[data-approve]').forEach(function (b) { b.onclick = function () { _approve(parseInt(b.getAttribute('data-approve'), 10)); }; });
+  }
+  async function _approve(id) {
+    var card = _cards.filter(function (c) { return c.id === id; })[0];
+    if (!card) return;
+    if (!confirm('Karte "' + card.name + '" freigeben? Sie erscheint dann im Deal-Aktion-Tab.')) return;
+    try {
+      await _call('PUT', '/network-cards/' + id, Object.assign({}, card, { status: 'aktiv', aktiv: true }));
+      _toast('Freigegeben \u2014 Karte ist live', 'success');
+      await _load(); await _loadStats();
+    } catch (e) { _toast(e.message || 'Fehler', 'error'); }
   }
   async function _move(id, dir) {
     var card = _cards.filter(function (c) { return c.id === id; })[0];
@@ -345,6 +391,7 @@
 
   function _fill(c) {
     _editId = c ? c.id : null;
+    _status = (c && c.status) || 'aktiv';
     _logoData = (c && c.logo_data) || '';
     _bgData = (c && c.hintergrund_bild) || '';
     function set(id, v) { var e = document.getElementById(id); if (e) e.value = (v == null ? '' : v); }
@@ -364,6 +411,7 @@
     setc('adn-verified', c ? c.verified !== false : true);
     set('adn-cta', c ? c.cta_label : 'Anfrage senden');
     set('adn-ctaakt', (c && c.cta_aktion) || 'lead');
+    set('adn-ctaurl', (c && c.cta_url) || '');
     set('adn-akzent', (c && c.akzent) || '#C9A84C');
     set('adn-bg', (c && c.hintergrund) || 'weiss');
     set('adn-bgfarbe', (c && c.hintergrund_farbe) || '#ffffff');
@@ -376,6 +424,8 @@
     set('adn-lz', c ? (c.logo_zoom || 100) : 100);
     set('adn-lx', c ? (c.logo_x == null ? 50 : c.logo_x) : 50);
     set('adn-ly', c ? (c.logo_y == null ? 50 : c.logo_y) : 50);
+    set('adn-logobg', (c && c.logo_bg) || '#ffffff');
+    set('adn-deck', c ? (c.hintergrund_deckkraft == null ? 85 : c.hintergrund_deckkraft) : 85);
     set('adn-web', c ? c.website : '');
     set('adn-email', c ? c.ziel_email : '');
     MIT_DEFS.forEach(function (m) { setc('adn-mit-' + m[0], !!mit[m[0]]); });
@@ -401,6 +451,7 @@
     var lz = document.getElementById('adn-lz-val'); if (lz) lz.textContent = _num('adn-lz', 100) + ' %';
     var lx = document.getElementById('adn-lx-val'); if (lx) lx.textContent = _num('adn-lx', 50) + ' %';
     var ly = document.getElementById('adn-ly-val'); if (ly) ly.textContent = _num('adn-ly', 50) + ' %';
+    var dk = document.getElementById('adn-deck-val'); if (dk) dk.textContent = _num('adn-deck', 85) + ' %';
   }
   function _edit(id) { var c = _cards.filter(function (x) { return x.id === id; })[0]; if (c) { _fill(c); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
   async function _del(id) {
@@ -425,6 +476,7 @@
   function _render(host) {
     host.innerHTML =
       '<div class="view-header"><h2>Netzwerk \u2013 Karten-Designer</h2></div>' +
+      '<div id="adn-stats" style="margin-bottom:16px"></div>' +
       '<div class="adn-wrap">' +
         '<div class="adn-card">' +
           '<div class="adn-sec">Kategorien (Rails im Deal-Aktion-Tab)</div>' +
@@ -462,16 +514,18 @@
             '<div class="adn-field"><label>Position X <span id="adn-lx-val" style="color:#9a7f33"></span></label><input id="adn-lx" type="range" min="0" max="100" step="1" value="50"><div class="adn-rangelbl"><span>links</span><span>rechts</span></div></div>' +
             '<div class="adn-field"><label>Position Y <span id="adn-ly-val" style="color:#9a7f33"></span></label><input id="adn-ly" type="range" min="0" max="100" step="1" value="50"><div class="adn-rangelbl"><span>oben</span><span>unten</span></div></div>' +
           '</div>' +
-          '<div class="adn-row2">' +
+          '<div class="adn-row3">' +
             '<div class="adn-field"><label>K\u00fcrzel (Abriss / Fallback-Monogramm)</label><input id="adn-kuerzel" maxlength="4" placeholder="SPR"></div>' +
             '<div class="adn-field"><label>Akzentfarbe</label><input id="adn-akzent" type="color" value="#C9A84C" style="height:38px;padding:2px"></div>' +
+            '<div class="adn-field"><label>Logo-Feld-Hintergrund</label><input id="adn-logobg" type="color" value="#ffffff" style="height:38px;padding:2px"></div>' +
           '</div>' +
           '<div class="adn-sec">Hintergrund &amp; Abrisskante</div>' +
           '<div class="adn-row3">' +
             '<div class="adn-field"><label>Hintergrund</label><select id="adn-bg">' + BG_OPTS.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('') + '</select></div>' +
             '<div class="adn-field" id="adn-bgfarbe-wrap" style="display:none"><label>Eigene Hintergrundfarbe</label><input id="adn-bgfarbe" type="color" value="#ffffff" style="height:38px;padding:2px"></div>' +
             '<div class="adn-field" id="adn-bgbild-wrap" style="display:none"><label>Hintergrund-Bild <span id="adn-bgbild-status" style="color:#9a7f33;font-weight:400"></span></label>' +
-              '<div class="adn-imgbtns"><input type="file" id="adn-bgfile" accept="image/*" style="font-size:12px"><button class="adn-btn sec mini" type="button" id="adn-bgclear">Entfernen</button></div></div>' +
+              '<div class="adn-imgbtns"><input type="file" id="adn-bgfile" accept="image/*" style="font-size:12px"><button class="adn-btn sec mini" type="button" id="adn-bgclear">Entfernen</button></div>' +
+              '<label style="display:block;font-size:11px;font-weight:700;color:#555;margin:8px 0 3px">Schleier-Deckkraft <span id="adn-deck-val" style="color:#9a7f33"></span> <span style="font-weight:400;color:#999">(0 = Bild pur)</span></label><input id="adn-deck" type="range" min="0" max="100" step="5" value="85"></div>' +
           '</div>' +
           '<div class="adn-row3">' +
             '<div class="adn-field"><label>Abrisskante</label><select id="adn-kante">' + KANTE_OPTS.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('') + '</select></div>' +
@@ -483,7 +537,8 @@
           '<div class="adn-sec">Anforderungen \u2014 Pflicht vor dem Versand (sonst Anfrage gesperrt)</div>' +
           ANF_DEFS.map(function (a) { return '<label class="adn-check"><input id="adn-anf-' + a[0] + '" type="checkbox"> ' + a[1] + '</label>'; }).join('') +
           '<div class="adn-sec">Versand &amp; Status</div>' +
-          '<div class="adn-field"><label>CTA-Verhalten</label><select id="adn-ctaakt"><option value="lead">Standard \u2014 Lead z\u00e4hlen + E-Mail an Ziel-Adresse</option><option value="gutachten_modal">Gutachten-Modal \u2014 \u00f6ffnet die DealPilot-Anfrage (keine Lead-Mail)</option></select></div>' +
+          '<div class="adn-field"><label>CTA-Verhalten</label><select id="adn-ctaakt"><option value="lead">Standard \u2014 Lead z\u00e4hlen + E-Mail an Ziel-Adresse</option><option value="gutachten_modal">Gutachten-Modal \u2014 \u00f6ffnet die DealPilot-Anfrage (keine Lead-Mail)</option><option value="link">Link \u2014 \u00f6ffnet Partner-Seite, Klick wird als Lead gez\u00e4hlt</option></select></div>' +
+          '<div class="adn-field"><label>Ziel-URL (bei CTA-Verhalten "Link")</label><input id="adn-ctaurl" placeholder="https://partner.de/anfrage"></div>' +
           '<div class="adn-row2">' +
             '<div class="adn-field"><label>Ziel-E-Mail (Anfragen gehen hierhin)</label><input id="adn-email" placeholder="partner@example.de"></div>' +
             '<div class="adn-field"><label>&nbsp;</label><label class="adn-check"><input id="adn-aktiv" type="checkbox" checked> Karte aktiv (sichtbar im Tab)</label></div>' +
@@ -496,8 +551,8 @@
 
     // Live-Preview-Bindings
     var ids = ['adn-kategorie', 'adn-name', 'adn-rolle', 'adn-tags', 'adn-web', 'adn-beschreibung', 'adn-usp',
-      'adn-antwortzeit', 'adn-verified', 'adn-cta', 'adn-ctaakt', 'adn-akzent', 'adn-bg', 'adn-bgfarbe',
-      'adn-kante', 'adn-kantefarbe', 'adn-kante-auto', 'adn-kuerzel', 'adn-logo', 'adn-lz', 'adn-lx', 'adn-ly'];
+      'adn-antwortzeit', 'adn-verified', 'adn-cta', 'adn-ctaakt', 'adn-ctaurl', 'adn-akzent', 'adn-bg', 'adn-bgfarbe',
+      'adn-kante', 'adn-kantefarbe', 'adn-kante-auto', 'adn-kuerzel', 'adn-logo', 'adn-lz', 'adn-lx', 'adn-ly', 'adn-logobg', 'adn-deck'];
     MIT_DEFS.forEach(function (m) { ids.push('adn-mit-' + m[0]); });
     ANF_DEFS.forEach(function (a) { ids.push('adn-anf-' + a[0]); });
     ids.forEach(function (id) {
@@ -530,6 +585,7 @@
     var sv = document.getElementById('adn-save'); if (sv) sv.onclick = _save;
     var nw = document.getElementById('adn-new'); if (nw) nw.onclick = function () { _fill(null); };
     _loadCats().then(function () { _fill(null); _load(); });
+    _loadStats();
   }
 
   /* ── Nav-Link + View SELBST erzeugen ── */

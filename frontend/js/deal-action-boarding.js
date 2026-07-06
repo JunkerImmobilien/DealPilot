@@ -24,7 +24,11 @@
   }
   function token() { try { return localStorage.getItem('ji_token') || ''; } catch (e) { return ''; } }
   function currentObjId() {
-    try { var o = window._currentObjData; return o ? (o.id || o._id || '') : ''; } catch (e) { return ''; }
+    try {
+      /* v869: window._currentObjKey ist das echte App-Global fuers aktive Objekt */
+      if (typeof window._currentObjKey === 'string' && window._currentObjKey) return window._currentObjKey;
+      var o = window._currentObjData; return o ? (o.id || o._id || '') : '';
+    } catch (e) { return ''; }
   }
   function toast(m) { try { if (typeof window.toast === 'function') window.toast(m); } catch (e) {} }
   function gv(id) { var e = document.getElementById(id); return e ? String(e.value || '').trim() : ''; }
@@ -89,7 +93,7 @@
           '<div id="dab-readiness-host"><div class="dab-rc-load">Vorflug-Check l\u00e4dt \u2026</div></div>' +
           '<div class="dab-perf"></div>' +
           '<div class="dab-sthead"><div class="dab-route">Objekt \u2192 Abschluss</div><div class="dab-title" id="dab-abtitle">Bereit zum Abflug</div></div>' +
-          statusTafel() +
+          '<div class="dab-status-grid">' + statusTafel() + '<div id="dab-share-slot"></div></div>' +
         '</div>' +
       '</div>' +
 
@@ -102,6 +106,8 @@
         '</div>' +
         '<div class="dab-smart-body">' + docs + '</div>' +
       '</div></div>' +
+
+      '<div id="dab-uew-slot"></div>' +
 
       band('doc2', 'Bordkarte &amp; Unterlagen', 'Bankgespr\u00e4ch vorbereiten') +
       '<div class="dab-panel">' +
@@ -184,9 +190,11 @@
     var c1 = 2 * Math.PI * R1, o1 = (c1 * (1 - pct / 100)).toFixed(1), c2 = 2 * Math.PI * R2;
     var chips;
     if (d.missing && d.missing.length) {
+      // v856: kompakte Chips mit INLINE-Style (CSS-KOMMT-NICHT-AN-Garantie)
+      var chipStyle = 'font-family:var(--dab-fs),sans-serif;font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;color:#6fd6a0;background:rgba(111,214,160,.12);border:1px solid rgba(111,214,160,.45);line-height:1.4';
       chips = '<div class="dab-chips"><span class="dab-chips-lbl">Fehlt (Grundfeld):</span>' +
         d.missing.map(function (m) {
-          return '<button type="button" class="dab-chip" onclick="DealPilotReadyCheck.jump(\'' + esc(m.key) + '\')"><span class="x"></span>' + esc(m.name) + '</button>';
+          return '<button type="button" class="dab-chip" style="' + chipStyle + '" onclick="DealPilotReadyCheck.jump(\'' + esc(m.key) + '\')"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 4px currentColor;flex-shrink:0"></span>' + esc(m.name) + '</button>';
         }).join('') + '</div>';
     } else {
       chips = '<div class="dab-allset">\u2713 Alle Grundfelder vollst\u00e4ndig \u2014 startklar f\u00fcr die Bank</div>';
@@ -203,6 +211,18 @@
       '</div></div>' +
       '<div class="dab-cap"><b>Grundfelder f\u00fcr die Bank-Bewertung</b> \u2014 nur diese Felder z\u00e4hlen in die Readiness. Weitere Angaben (Ausstattung, Historie, Fotos) sind hilfreich, flie\u00dfen aber <b>nicht</b> in diese Bewertung ein.</div>' +
       chips;
+    // v857: Chip-Styles per setProperty('important') erzwingen (schlaegt JEDE CSS-Regel)
+    try {
+      host.querySelectorAll('.dab-chip').forEach(function (b) {
+        b.style.setProperty('background', 'rgba(111,214,160,.12)', 'important');
+        b.style.setProperty('color', '#6fd6a0', 'important');
+        b.style.setProperty('border', '1px solid rgba(111,214,160,.45)', 'important');
+        b.style.setProperty('font-size', '10px', 'important');
+        b.style.setProperty('padding', '3px 10px', 'important');
+        b.style.setProperty('min-height', '0', 'important');
+        b.style.setProperty('border-radius', '99px', 'important');
+      });
+    } catch (e) {}
     var pill = document.getElementById('dab-ready-pill');
     if (pill) pill.textContent = pct + ' %' + (d.missing && d.missing.length ? '' : ' \u00b7 STARTKLAR \u2713');
     var ck = document.getElementById('dab-cockpit');
@@ -263,6 +283,9 @@
     var cta;
     if (locked) {
       cta = '<button class="dab-bp-cta locked" type="button"><span class="dab-bp-cta-t">' + ICO.lock + ' Anfrage gesperrt</span><span class="dab-bp-cta-s">erst Voraussetzungen erf\u00fcllen</span></button>';
+    } else if ((card.cta_aktion || 'lead') === 'link' && card.cta_url) {
+      /* v871: CTA oeffnet Partner-Seite; Klick wird als Lead gezaehlt */
+      cta = '<button class="dab-bp-cta" type="button" style="--acc:' + esc(card.akzent || '#C9A84C') + '" onclick="DealActionBoarding.linkOut(' + (card.id | 0) + ')"><span class="dab-bp-cta-t">' + esc(card.cta_label || 'Zur Anfrage') + '</span><span class="dab-bp-cta-s">\u00f6ffnet Partner-Seite</span></button>';
     } else if ((card.cta_aktion || 'lead') === 'gutachten_modal') {
       // v854: DealPilot-internes Gutachten-Modal statt Lead-Mail
       cta = '<button class="dab-bp-cta" type="button" style="--acc:' + esc(card.akzent || '#C9A84C') + '" onclick="DealActionBoarding.gutachtenModal()"><span class="dab-bp-cta-t">' + esc(card.cta_label || 'Gutachten anfragen') + '</span><span class="dab-bp-cta-s">Details direkt angeben</span></button>';
@@ -295,8 +318,17 @@
     var headers = {};
     var t = token(); if (t) headers['Authorization'] = 'Bearer ' + t;
     fetch('/api/v1/network-cards', { headers: headers })
-      .then(function (r) { return r.ok ? r.json() : { cards: [], categories: [] }; })
+      .then(function (r) {
+        if (r.status === 401) {
+          /* v870: abgelaufene Sitzung ehrlich melden statt "Noch keine Partner" */
+          var h = document.getElementById('dab-rails-host');
+          if (h) h.innerHTML = '<div class="dab-net-load">Sitzung abgelaufen \u2014 bitte einmal neu anmelden (Seite neu laden), dann erscheint dein Netzwerk wieder.</div>';
+          return null;
+        }
+        return r.ok ? r.json() : { cards: [], categories: [] };
+      })
       .then(function (data) {
+        if (data === null) return;
         _cards = (data && data.cards) || [];
         _cats = (data && data.categories) || [];
         buildRails();
@@ -335,8 +367,9 @@
   function bgAttrs(card) {
     var bg = card.hintergrund || 'weiss';
     if (bg === 'bild' && card.hintergrund_bild) {
-      // v855: Bild-Hintergrund mit hellem Schleier fuer Lesbarkeit
-      return { cls: '', style: "background:linear-gradient(rgba(255,255,255,.87),rgba(255,255,255,.8)),url('" + String(card.hintergrund_bild).replace(/'/g, '') + "') center/cover;" };
+      // v856: Schleier-Deckkraft pro Karte einstellbar (0 = Bild pur, 100 = fast weiss)
+      var a = Math.max(0, Math.min(100, parseInt(card.hintergrund_deckkraft, 10) >= 0 ? parseInt(card.hintergrund_deckkraft, 10) : 85)) / 100;
+      return { cls: '', style: "background:linear-gradient(rgba(255,255,255," + a.toFixed(2) + "),rgba(255,255,255," + (a * 0.92).toFixed(2) + ")),url('" + String(card.hintergrund_bild).replace(/'/g, '') + "') center/cover;" };
     }
     if (bg === 'custom' && card.hintergrund_farbe) {
       return { cls: '', style: 'background:' + esc(card.hintergrund_farbe) + ';' };
@@ -359,7 +392,7 @@
     var lx = Math.max(0, Math.min(100, parseInt(c.logo_x, 10) || 50));
     var ly = Math.max(0, Math.min(100, parseInt(c.logo_y, 10) || 50));
     var logo = lsrc
-      ? '<img src="' + esc(lsrc) + '" alt="" style="width:100%;height:100%;object-fit:cover;background:#fff;object-position:' + lx + '% ' + ly + '%;transform:scale(' + (lz / 100) + ');transform-origin:' + lx + '% ' + ly + '%">'
+      ? '<img src="' + esc(lsrc) + '" alt="" style="width:100%;height:100%;object-fit:cover;background:' + esc(c.logo_bg || '#fff') + ';object-position:' + lx + '% ' + ly + '%;transform:scale(' + (lz / 100) + ');transform-origin:' + lx + '% ' + ly + '%">'
       : '<div class="dab-bp-mono" style="background:' + esc(acc) + '">' + esc((c.kuerzel || (c.name || '?').slice(0, 2)).toUpperCase()) + '</div>';
     var ver = c.verified
       ? '<span class="dab-bp-ver">' + ICO.check + ' Gepr\u00fcft</span>' : '';
@@ -558,6 +591,30 @@
     var host = document.getElementById('dab-dr-host');
     if (!host) return;
     var oid = currentObjId();
+    /* v873: beim Tab-Aufbau kann der Objekt-Key noch fehlen — kurz nachfassen */
+    if (!oid) {
+      mountDatenraum._try = (mountDatenraum._try || 0) + 1;
+      if (mountDatenraum._try <= 4) setTimeout(mountDatenraum, 900);
+    } else {
+      mountDatenraum._try = 0;
+    }
+    /* v873: Verknuepfungs-Status sichtbar (persoenlich / Objekt) */
+    var _pOk = false, _oOk = false;
+    try {
+      if (oid && window.DealPilotDatenraum && window.DealPilotDatenraum.getCompletionForRequest) {
+        var _st = window.DealPilotDatenraum.getCompletionForRequest(oid, 'bank');
+        _pOk = !!(_st && _st.persoenlich && _st.persoenlich.hatOrdner);
+        _oOk = !!(_st && _st.objekt && _st.objekt.hatOrdner);
+      }
+    } catch (e) {}
+    function drChip(ok, lbl) {
+      return '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;margin-right:6px;' +
+        (ok ? 'background:rgba(63,165,108,.14);color:#2f7d52;border:1px solid rgba(63,165,108,.4)'
+            : 'background:rgba(0,0,0,.04);color:#8a8378;border:1px solid #ddd6c8') + '">' +
+        (ok ? '\u2713' : '\u2715') + ' ' + lbl + '</span>';
+    }
+    var drChips = '<div style="margin-top:7px">' + drChip(_pOk, 'Pers\u00f6nlich verkn\u00fcpft') + drChip(_oOk, 'Objekt verkn\u00fcpft') + '</div>';
+    var drBtnLabel = (_pOk && _oOk) ? 'Verwalten' : 'Einrichten';
     var inner = '';
     try {
       if (window.DealPilotDatenraum && typeof window.DealPilotDatenraum.renderDealActionPanel === 'function') {
@@ -566,10 +623,12 @@
     } catch (e) { inner = ''; }
     host.innerHTML =
       '<div class="dab-dr-link"><div class="dab-dr-ic"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a8 3 0 0 0 16 0 8 3 0 0 0-16 0z"/><path d="M4 7v10a8 3 0 0 0 16 0V7"/><path d="M4 12a8 3 0 0 0 16 0"/></svg></div>' +
-        '<div class="dab-dr-x"><div class="dab-dr-t">Datenraum verkn\u00fcpfen</div><div class="dab-dr-s">Pers\u00f6nlicher + Objekt-Datenraum \u2014 werden Bank-Anfragen automatisch beigef\u00fcgt und schalten Partner-Anfragen frei.</div></div>' +
-        '<button class="dab-dr-btn" type="button" onclick="DealPilotDealAction.openDatenraumSettings()">Einrichten</button></div>' +
+        '<div class="dab-dr-x"><div class="dab-dr-t">Datenraum verkn\u00fcpfen</div><div class="dab-dr-s">Pers\u00f6nlicher + Objekt-Datenraum \u2014 werden Bank-Anfragen automatisch beigef\u00fcgt und schalten Partner-Anfragen frei.</div>' + drChips + '</div>' +
+        '<button class="dab-dr-btn" type="button" onclick="DealPilotDealAction.openDatenraumSettings()">' + drBtnLabel + '</button></div>' +
       (inner ? '<div class="dab-dr-panel">' + inner + '</div>' : '');
   }
+
+  window._dabDrRefresh = mountDatenraum;  /* v874: Live-Refresh nach Haekchen-Klick */
 
   /* ────────────────── afterRender ────────────────── */
   function afterRender() {
@@ -579,6 +638,11 @@
     try { if (window.DealPilotReadyCheck && window.DealPilotReadyCheck.refresh) window.DealPilotReadyCheck.refresh(); } catch (e) {}
     try { fillFaYears(); } catch (e) {}
     try { mountDatenraum(); } catch (e) {}
+    try {
+      var _uw = document.getElementById('dpuew-stage'), _usl = document.getElementById('dab-uew-slot');
+      if (_uw && _usl && _uw.parentNode !== _usl) _usl.appendChild(_uw);
+    } catch (e) {}
+    try { if (typeof window._dpDealShareRefresh === 'function') setTimeout(window._dpDealShareRefresh, 350); } catch (e) {}
     try { loadNetwork(); } catch (e) {}
   }
 
@@ -590,7 +654,26 @@
     document.head.appendChild(st);
   }
 
+  /* v871: Partner-Link oeffnen + Klick als Lead zaehlen (fire-and-forget) */
+  function linkOut(cardId) {
+    var card = null;
+    for (var i = 0; i < _cards.length; i++) { if ((_cards[i].id | 0) === (cardId | 0)) { card = _cards[i]; break; } }
+    if (!card || !card.cta_url) return;
+    try {
+      var headers = { 'Content-Type': 'application/json' };
+      var t = token(); if (t) headers['Authorization'] = 'Bearer ' + t;
+      fetch('/api/v1/network-cards/' + (cardId | 0) + '/click', {
+        method: 'POST', headers: headers,
+        body: JSON.stringify({ object_ref: currentObjId() || '' })
+      }).catch(function () {});
+    } catch (e) {}
+    var u = String(card.cta_url);
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    window.open(u, '_blank', 'noopener');
+  }
+
   window.DealActionBoarding = {
+    linkOut: linkOut,
     buildTop: buildTop,
     afterRender: afterRender,
     renderReadiness: renderReadiness,
@@ -643,6 +726,11 @@
     '#s8 .dab-chip{font-family:var(--dab-fs);font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:6px;color:var(--dab-m2);background:rgba(111,214,160,.1);border:1px solid rgba(111,214,160,.4)}',
     '#s8 .dab-chip:hover{background:rgba(111,214,160,.22)}#s8 .dab-chip .x{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 5px currentColor}',
     '#s8 .dab-allset{font-family:var(--dab-fs);font-size:12.5px;font-weight:600;color:var(--dab-m2);margin-top:10px}',
+    '#s8 #dab-uew-slot .da-stage{margin-top:6px}',
+    '#s8 .dab-status-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:stretch}',
+    '@media(max-width:900px){#s8 .dab-status-grid{grid-template-columns:1fr}}',
+    '#s8 #dab-share-slot{display:block;min-width:0}',
+    '#s8 #dab-share-slot > div{margin:0 !important;height:100%;box-sizing:border-box}',
     '#s8 .dab-perf{height:0;border-top:1.5px dashed rgba(201,168,76,.28);margin:24px -26px;position:relative}',
     '#s8 .dab-perf::before,#s8 .dab-perf::after{content:"";position:absolute;top:-9px;width:18px;height:18px;border-radius:50%;background:var(--dab-ob)}',
     '#s8 .dab-perf::before{left:-9px}#s8 .dab-perf::after{right:-9px}',

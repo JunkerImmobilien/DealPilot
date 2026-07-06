@@ -772,6 +772,8 @@ window.DealPilotDealAction = (function() {
   // V143: Helper zentral — Objekt-ID aus mehreren Quellen
   function _resolveCurrentObjId() {
     try {
+      // v869: 0. window._currentObjKey — das echte App-Global fuers aktive Objekt
+      if (typeof window._currentObjKey === 'string' && window._currentObjKey) return window._currentObjKey;
       // 1. window._currentObjData mit ID
       if (typeof window._currentObjData === 'object' && window._currentObjData) {
         if (window._currentObjData.id) return window._currentObjData.id;
