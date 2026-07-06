@@ -89,12 +89,17 @@
           .then(done).catch(done);
       });
   };
-  /* v873: Pass direkt hier erzeugen (POST /passes) */
+  /* v876-share-modal: "Jetzt teilen" oeffnet dasselbe Modal wie im Objekt-Tab
+     (QuickBoardingShare) statt eines stillen POST. Danach die Kachel nachziehen. */
   window._dpStartShare = function () {
-    var oid = window._currentObjKey;
-    if (!oid) { window.alert('Bitte zuerst ein Objekt laden.'); return; }
-    /* v874: Route erwartet objectId; apiCall stringifiziert selbst */
-    window.Auth.apiCall('/passes', { method: 'POST', body: { objectId: oid } })
+    if (!window._currentObjKey) { window.alert('Bitte zuerst ein Objekt laden.'); return; }
+    if (window.QuickBoardingShare && typeof window.QuickBoardingShare.open === 'function') {
+      window.QuickBoardingShare.open();
+      var n = 0, iv = setInterval(function () { try { ensure(); } catch (e) {} if (++n >= 12) clearInterval(iv); }, 700);
+      return;
+    }
+    /* Fallback (Modal nicht geladen): alter Direkt-POST */
+    window.Auth.apiCall('/passes', { method: 'POST', body: { objectId: window._currentObjKey } })
       .then(function () { try { ensure(); } catch (e) {} })
       .catch(function () {
         window.alert('Teilen hier gerade nicht m\u00f6glich \u2014 bitte einmal \u00fcber den Boarding-Pass im Tab Objekt teilen.');

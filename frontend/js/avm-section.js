@@ -250,12 +250,12 @@
     var mw = mwAt(u, b), mm = mmAt(u, b);
     return (mm != null && mw) ? ((mm * 12 / mw * 100).toFixed(1).replace('.', ',') + ' %') : '\u2013';
   }
+  /* v876-brutto-out: Bruttorendite aus Karte + Tabelle entfernt */
   function field3(u) {
     var b = st.span, pc = priceClass(mwAt(u, b)), acc = accUnified(u);
     return '<div class="row3">' +
       '<div class="f3"><div class="fk">Einordnung</div><div class="fv" style="color:' + pc[1] + '">' + pc[0] + '</div></div>' +
-      '<div class="f3"><div class="fk">Genauigkeit</div><div class="fv" style="color:' + acc[1] + '">' + acc[0] + '</div></div>' +
-      '<div class="f3"><div class="fk">Bruttorendite</div><div class="fv">' + bruttoRendite(u, b) + '</div></div></div>';
+      '<div class="f3"><div class="fk">Genauigkeit</div><div class="fv" style="color:' + acc[1] + '">' + acc[0] + '</div></div></div>';
   }
   function lageRow(u) {
     if (!hasLage(u)) return '<div class="lage"><span class="nolage">\u2014 keine Lagebewertung von diesem Anbieter</span></div>';
@@ -319,7 +319,6 @@
       row('vs. Kaufpreis', function (u) { var mw = u ? mwAt(u, b) : cMW; var d = diffPct(mw); return d == null ? '\u2013' : '<span class="' + (d >= 0 ? 'pos' : 'neg') + '">' + (d >= 0 ? '+' : '') + d.toFixed(1) + '%</span>'; }) +
       row('Einordnung', function (u) { var mw = u ? mwAt(u, b) : cMW; var pc = priceClass(mw); return '<span style="color:' + pc[1] + '">' + pc[0] + '</span>'; }) +
       row('Genauigkeit', function (u) { return u ? accUnified(u)[0] : '\u2014'; }) +
-      row('Bruttorendite', function (u) { var mw = u ? mwAt(u, b) : cMW; var mm = u ? mmAt(u, b) : cMM; return (mm != null && mw) ? ((mm * 12 / mw * 100).toFixed(1).replace('.', ',') + ' %') : '\u2013'; }) +
       row('Miete kalt', function (u) { var v = u ? mmAt(u, b) : cMM; return v == null ? '\u2013' : (fmt(v) + ' \u20ac'); });
     var take = '<tr class="take"><td></td>' + ps.map(function (u) { return '<td><button type="button" class="av-btn sm" data-apply="' + u.key + '">\u21a7 ' + spanLbl(b) + '</button></td>'; }).join('') +
       (multi ? '<td><button type="button" class="av-btn sm" data-konsens="1">\u21a7 Konsens</button></td>' : '') + '</tr>';
