@@ -119,8 +119,8 @@ window.DealPilotDatenraum = (function() {
   }
 
   function providerIcon(p) {
-    return ({ gdrive: '🟢', onedrive: '🔵', dropbox: '🟦',
-      icloud: '⚪', mega: '🔴', nextcloud: '🟧', other: '🔗' })[p] || '🔗';
+    /* v874: neutral (kein rotes/oranges Quadrat im Panel) */
+    return '\ud83d\udd17';
   }
 
   // V142: Cache für Objekt-Liste (wird async vom Backend geladen)
@@ -190,6 +190,8 @@ window.DealPilotDatenraum = (function() {
     // V143: Mehrere Quellen für die aktuelle Objekt-ID prüfen
     try {
       // 1. Explizit gesetzter Key
+      /* v869: 0. window._currentObjKey — das echte App-Global (Sidebar setzt es beim Laden) */
+      if (typeof window._currentObjKey === 'string' && window._currentObjKey) return window._currentObjKey;
       var fromStorage = localStorage.getItem('dp_current_object_id');
       if (fromStorage) return fromStorage;
       // 2. window._currentObjData (Backend-Objekt das gerade geladen ist)
@@ -246,7 +248,18 @@ window.DealPilotDatenraum = (function() {
 
   function getObjektOrdner(objId) {
     var s = _read();
-    return (s.objekte && s.objekte[objId]) || null;
+    if (s.objekte && s.objekte[objId]) return s.objekte[objId];
+    /* v869: Alias — Verknuepfung kann unter der ID ODER dem Kuerzel gespeichert sein
+       (je nachdem, mit welcher Quelle sie angelegt wurde). Beide Richtungen probieren. */
+    try {
+      var list = _cachedObjekteList || [];
+      for (var i = 0; i < list.length; i++) {
+        var o = list[i];
+        if (o.id === objId && o.kuerzel && s.objekte && s.objekte[o.kuerzel]) return s.objekte[o.kuerzel];
+        if (o.kuerzel === objId && o.id && s.objekte && s.objekte[o.id]) return s.objekte[o.id];
+      }
+    } catch (e) {}
+    return null;
   }
 
   function setObjektOrdner(objId, data) {
@@ -648,7 +661,20 @@ window.DealPilotDatenraum = (function() {
 
     var html = [];
     html.push('<div class="dr-da-panel">');
-    html.push('  <div class="dr-da-head"><strong>Datenraum für diese Anfrage</strong></div>');
+    /* v874: Kopf klickbar (Collapse), Status direkt sichtbar, Inhalt default ZU */
+    var _open = !!window._dpDaPanelOpen;
+    var _chip;
+    if (status.complete && status.hatBeideOrdner) {
+      _chip = '<span style="background:rgba(63,165,108,.14);color:#2f7d52;border:1px solid rgba(63,165,108,.4);border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:600">\u2713 Alle Pflicht-Dokumente best\u00e4tigt</span>';
+    } else if (!status.hatBeideOrdner) {
+      _chip = '<span style="background:rgba(0,0,0,.04);color:#8a8378;border:1px solid #ddd6c8;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:600">Noch nicht verkn\u00fcpft</span>';
+    } else {
+      _chip = '<span style="background:rgba(201,168,76,.14);color:#8a6d1f;border:1px solid rgba(201,168,76,.45);border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:600">Noch ' + status.gesamt_missing + ' Pflicht-Dokumente ausstehend</span>';
+    }
+    html.push('  <div class="dr-da-head" onclick="DealPilotDatenraum._daPanelToggle(this)" style="cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
+      '<strong>Datenraum f\u00fcr diese Anfrage</strong>' + _chip +
+      '<span class="dr-da-chev" style="margin-left:auto;transition:transform .15s;transform:rotate(' + (_open ? 90 : 0) + 'deg)">\u203a</span></div>');
+    html.push('  <div class="dr-da-body"' + (_open ? '' : ' style="display:none"') + '>');
 
     if (!currentObjId || !status) {
       html.push('  <div class="dr-da-warn">⚠ Kein aktives Objekt — bitte zuerst Objekt im Tab "Objekt" laden.</div>');
@@ -745,8 +771,22 @@ window.DealPilotDatenraum = (function() {
       html.push('  <div class="dr-da-warn">⚠ Noch ' + status.gesamt_missing + ' Pflicht-Dokumente ausstehend.</div>');
     }
 
+    html.push('</div>');  /* v874: dr-da-body zu */
     html.push('</div>');
     return html.join('');
+  }
+
+  /* v874: Panel auf-/zuklappen (Zustand ueberlebt Re-Renders) */
+  function _daPanelToggle(head) {
+    try {
+      var body = head.parentElement.querySelector('.dr-da-body');
+      if (!body) return;
+      var open = body.style.display === 'none';
+      body.style.display = open ? '' : 'none';
+      window._dpDaPanelOpen = open;
+      var ch = head.querySelector('.dr-da-chev');
+      if (ch) ch.style.transform = 'rotate(' + (open ? 90 : 0) + 'deg)';
+    } catch (e) {}
   }
 
   // V179: Toggle-Handler für Klicks AUS dem Deal-Action-Panel.
@@ -755,11 +795,13 @@ window.DealPilotDatenraum = (function() {
   function _togglePersFromPanel(docKey, requestType, checkbox) {
     togglePersDoc(docKey);
     _refreshDealActionPanelAndValidate(requestType);
+    if (window._dabDrRefresh) setTimeout(function () { try { window._dabDrRefresh(); } catch (e) {} }, 30);
   }
 
   function _toggleObjFromPanel(objId, docKey, requestType, checkbox) {
     toggleObjDoc(objId, docKey);
     _refreshDealActionPanelAndValidate(requestType);
+    if (window._dabDrRefresh) setTimeout(function () { try { window._dabDrRefresh(); } catch (e) {} }, 30);
   }
 
   function _refreshDealActionPanelAndValidate(requestType) {
@@ -856,6 +898,7 @@ window.DealPilotDatenraum = (function() {
     _removeObjConfirm: _removeObjConfirm,
     _switchObjekt: _switchObjekt,
     _togglePersFromUI: _togglePersFromUI,
+    _daPanelToggle: _daPanelToggle,
     _togglePersFromPanel: _togglePersFromPanel,
     _toggleObjFromPanel: _toggleObjFromPanel,
     invalidateCache: _invalidateCache,

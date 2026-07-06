@@ -43,6 +43,7 @@ function fields(d) {
     d.hintergrund || 'weiss',
     d.hintergrund_farbe || null,
     d.hintergrund_bild || null,
+    clampInt(d.hintergrund_deckkraft, 0, 100, 85),
     d.kante_stil || 'k1',
     d.kante_farbe || null,
     d.kuerzel || null,
@@ -51,28 +52,31 @@ function fields(d) {
     clampInt(d.logo_zoom, 50, 300, 100),
     clampInt(d.logo_x, 0, 100, 50),
     clampInt(d.logo_y, 0, 100, 50),
+    d.logo_bg || null,
     d.website || null,
     d.ziel_email || null,
     normObj(d.mitgabe, MITGABE_DEFAULT),
     normObj(d.anforderungen, '{}'),
     d.cta_aktion === 'gutachten_modal' ? 'gutachten_modal' : 'lead',
+    d.status === 'eingereicht' ? 'eingereicht' : 'aktiv',
     d.aktiv === false ? false : true,
-    Number.isFinite(+d.sortierung) ? +d.sortierung : 0
+    Number.isFinite(+d.sortierung) ? +d.sortierung : 0,
+    d.cta_url || null
   ];
 }
 
 const COLS = 'kategorie, name, rolle, tags, beschreibung, usp, antwortzeit, verified, ' +
-  'cta_label, akzent, hintergrund, hintergrund_farbe, hintergrund_bild, kante_stil, kante_farbe, ' +
-  'kuerzel, logo_url, logo_data, logo_zoom, logo_x, logo_y, website, ziel_email, ' +
-  'mitgabe, anforderungen, cta_aktion, aktiv, sortierung';
-const PARAMS = '$1,$2,$3,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24::jsonb,$25::jsonb,$26,$27,$28';
+  'cta_label, akzent, hintergrund, hintergrund_farbe, hintergrund_bild, hintergrund_deckkraft, kante_stil, kante_farbe, ' +
+  'kuerzel, logo_url, logo_data, logo_zoom, logo_x, logo_y, logo_bg, website, ziel_email, ' +
+  'mitgabe, anforderungen, cta_aktion, status, aktiv, sortierung, cta_url';
+const PARAMS = '$1,$2,$3,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26::jsonb,$27::jsonb,$28,$29,$30,$31,$32';
 
 async function listActive() {
   const r = await pool.query(
     `SELECT id, kategorie, name, rolle, tags, beschreibung, usp, antwortzeit, verified,
             cta_label, akzent, hintergrund, hintergrund_farbe, hintergrund_bild,
-            kante_stil, kante_farbe, kuerzel, logo_url, logo_data, logo_zoom, logo_x, logo_y,
-            website, mitgabe, anforderungen, cta_aktion
+            hintergrund_deckkraft, kante_stil, kante_farbe, kuerzel, logo_url, logo_data,
+            logo_zoom, logo_x, logo_y, logo_bg, website, mitgabe, anforderungen, cta_aktion
      FROM network_cards WHERE aktiv = true
      ORDER BY kategorie, sortierung, id`
   );
@@ -103,10 +107,10 @@ async function update(id, d) {
     `UPDATE network_cards SET
        kategorie=$2, name=$3, rolle=$4, tags=$5::jsonb, beschreibung=$6, usp=$7,
        antwortzeit=$8, verified=$9, cta_label=$10, akzent=$11, hintergrund=$12,
-       hintergrund_farbe=$13, hintergrund_bild=$14, kante_stil=$15, kante_farbe=$16,
-       kuerzel=$17, logo_url=$18, logo_data=$19, logo_zoom=$20, logo_x=$21, logo_y=$22,
-       website=$23, ziel_email=$24, mitgabe=$25::jsonb, anforderungen=$26::jsonb,
-       cta_aktion=$27, aktiv=$28, sortierung=$29, updated_at=NOW()
+       hintergrund_farbe=$13, hintergrund_bild=$14, hintergrund_deckkraft=$15, kante_stil=$16,
+       kante_farbe=$17, kuerzel=$18, logo_url=$19, logo_data=$20, logo_zoom=$21, logo_x=$22,
+       logo_y=$23, logo_bg=$24, website=$25, ziel_email=$26, mitgabe=$27::jsonb,
+       anforderungen=$28::jsonb, cta_aktion=$29, status=$30, aktiv=$31, sortierung=$32, cta_url=$33, updated_at=NOW()
      WHERE id=$1 RETURNING *`,
     [id].concat(fields(d))
   );
@@ -128,6 +132,64 @@ async function recordLead(cardId, userId, objectRef) {
     'INSERT INTO network_leads (card_id, user_id, object_ref) VALUES ($1,$2,$3)',
     [cardId, userId || null, objectRef || null]
   );
+}
+
+/* ── Pro-Einreichung + Leads-Statistik (v856) ── */
+async function createSubmission(userId, email, d) {
+  const r = await pool.query(
+    `INSERT INTO network_cards
+       (kategorie, name, rolle, tags, beschreibung, website, ziel_email, akzent, kuerzel,
+        logo_data, logo_zoom, logo_x, logo_y, logo_bg,
+        mitgabe, anforderungen, cta_aktion, status, aktiv, sortierung,
+        wunsch_kategorie, eingereicht_von, eingereicht_email)
+     VALUES ($1,$2,$3,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,
+             $15::jsonb,'{}'::jsonb,'lead','eingereicht',false,999,$16,$17,$18)
+     RETURNING id, name, status`,
+    [
+      (d.kategorie || 'finanzierung').toString().trim() || 'finanzierung',
+      (d.name || '').toString().slice(0, 120) || 'Einreichung',
+      (d.rolle || '').toString().slice(0, 160) || null,
+      normTags(d.tags),
+      (d.beschreibung || '').toString().slice(0, 600) || null,
+      (d.website || '').toString().slice(0, 200) || null,
+      (d.ziel_email || '').toString().slice(0, 200) || null,
+      d.akzent || '#C9A84C',
+      (d.kuerzel || '').toString().slice(0, 4) || null,
+      d.logo_data || null,
+      clampInt(d.logo_zoom, 50, 300, 100),
+      clampInt(d.logo_x, 0, 100, 50),
+      clampInt(d.logo_y, 0, 100, 50),
+      d.logo_bg || null,
+      MITGABE_DEFAULT,
+      (d.wunsch_kategorie || '').toString().slice(0, 120) || null,
+      userId || null,
+      email || null
+    ]
+  );
+  return r.rows[0];
+}
+
+async function statsLeads() {
+  const totals = await pool.query(
+    `SELECT COUNT(*)::int AS total,
+            COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '30 days')::int AS d30,
+            COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days')::int AS d7
+     FROM network_leads`
+  );
+  const perCard = await pool.query(
+    `SELECT c.id, c.name, c.kategorie, COALESCE(l.cnt,0)::int AS leads, l.last_at
+     FROM network_cards c
+     LEFT JOIN (SELECT card_id, COUNT(*) cnt, MAX(created_at) last_at FROM network_leads GROUP BY card_id) l
+       ON l.card_id = c.id
+     ORDER BY COALESCE(l.cnt,0) DESC, c.name`
+  );
+  const perDay = await pool.query(
+    `SELECT to_char(date_trunc('day', created_at), 'YYYY-MM-DD') AS d, COUNT(*)::int AS n
+     FROM network_leads
+     WHERE created_at > NOW() - INTERVAL '14 days'
+     GROUP BY 1 ORDER BY 1`
+  );
+  return { totals: totals.rows[0], perCard: perCard.rows, perDay: perDay.rows };
 }
 
 /* ── Kategorien ─────────────────────────────────────────────────────────── */
@@ -173,5 +235,6 @@ async function deleteCategory(key) {
 
 module.exports = {
   listActive, listAll, create, update, remove, getById, recordLead,
+  createSubmission, statsLeads,
   listCategories, listCategoriesWithCounts, createCategory, updateCategory, deleteCategory
 };

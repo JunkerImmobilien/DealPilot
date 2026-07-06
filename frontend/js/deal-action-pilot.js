@@ -49,18 +49,23 @@
               '<div style="color:#d8d4cc;font-size:13px;line-height:1.5">Dieses Objekt ist geteilt \u2014 wer Code oder QR hat, sieht den \u00f6ffentlichen Boarding-Pass.</div>'+
               '<div style="margin-top:8px;font:600 12px/1.4 \'JetBrains Mono\',monospace;color:#E8CC7A">Pass '+esc(m.code)+'</div>'+
               '<div style="color:#9a8a52;font-size:11.5px">g\u00fcltig noch '+restLabel(m.expires_at)+'</div>'+
+              '<button type="button" onclick="window._dpEndShare(\''+esc(m.code)+'\')" style="margin-top:10px;padding:7px 13px;border-radius:9px;border:1px solid rgba(217,104,95,.55);background:transparent;color:#D9685F;font:600 12px/1 \'Space Grotesk\',sans-serif;cursor:pointer">Teilen beenden</button>'+
             '</div>'+
           '</div></div>';
       } else {
         sec.innerHTML='<div style="margin:20px 0 4px;padding:16px;border-radius:14px;background:#0c0c0c;border:1px solid rgba(201,168,76,.18)">'+head+
-          '<div style="color:#bdb8ae;font-size:13px;line-height:1.5">Dieses Objekt ist noch nicht geteilt. \u00dcber \u201eQuick Boarding teilen\u201c erzeugst du einen Link \u2014 danach erscheint hier der QR-Code.</div></div>';
+          '<div style="color:#bdb8ae;font-size:13px;line-height:1.5">Dieses Objekt ist noch nicht geteilt. Erzeuge hier direkt einen Link + QR-Code \u2014 oder wie gewohnt \u00fcber den Boarding-Pass im Tab Objekt.</div>'+
+          '<button type="button" onclick="window._dpStartShare()" style="margin-top:12px;padding:9px 16px;border-radius:10px;border:none;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1508;font:700 13px/1 \'Space Grotesk\',sans-serif;cursor:pointer">\u2708 Jetzt teilen</button></div>';
       }
     }).catch(function(){ sec.innerHTML=''; });
   }
   function ensure(){
     var s8=document.getElementById('s8'); if(!s8 || s8.offsetParent===null) return;
+    /* v856-share-slot: bevorzugt in den Cockpit-Slot (unter der Departure-Tafel) */
+    var slot=document.getElementById('dab-share-slot');
     var sec=document.getElementById('da-share-section');
-    if(!sec){ sec=document.createElement('div'); sec.id='da-share-section'; s8.appendChild(sec); }
+    if(!sec){ sec=document.createElement('div'); sec.id='da-share-section'; (slot||s8).appendChild(sec); }
+    else if(slot){ if(sec.parentNode!==slot) slot.appendChild(sec); }
     else if(sec!==s8.lastElementChild){ s8.appendChild(sec); }
     render(sec);
   }
@@ -73,5 +78,27 @@
     if(vis && (!lastVis || key!==lastKey || secMissing)){ try{ ensure(); }catch(e){} }
     lastVis=vis; lastKey=key;
   }, 1200);
+  /* v871: Teilen direkt hier beenden (Pass widerrufen) — nicht nur uebers Cockpit */
+  window._dpEndShare = function (code) {
+    if (!window.confirm('Teilen beenden? Link und QR-Code werden sofort ung\u00fcltig.')) return;
+    function done() { try { ensure(); } catch (e) {} }
+    window.Auth.apiCall('/passes/' + encodeURIComponent(code), { method: 'DELETE' })
+      .then(done)
+      .catch(function () {
+        window.Auth.apiCall('/passes/' + encodeURIComponent(code) + '/revoke', { method: 'POST' })
+          .then(done).catch(done);
+      });
+  };
+  /* v873: Pass direkt hier erzeugen (POST /passes) */
+  window._dpStartShare = function () {
+    var oid = window._currentObjKey;
+    if (!oid) { window.alert('Bitte zuerst ein Objekt laden.'); return; }
+    /* v874: Route erwartet objectId; apiCall stringifiziert selbst */
+    window.Auth.apiCall('/passes', { method: 'POST', body: { objectId: oid } })
+      .then(function () { try { ensure(); } catch (e) {} })
+      .catch(function () {
+        window.alert('Teilen hier gerade nicht m\u00f6glich \u2014 bitte einmal \u00fcber den Boarding-Pass im Tab Objekt teilen.');
+      });
+  };
   window._dpDealShareRefresh = ensure;
 })();

@@ -260,7 +260,7 @@ function showAuthModal(mode) {
       '</div>' +
       // V213/V215/V216: App-Logo HD-PNG, zentriert
       '<div class="auth-logo-simple-wrap">' +
-        '<img class="app-logo-simple app-logo-simple-auth" src="assets/dealpilot-logo-app.png" alt="DealPilot by Junker Immobilien" />' +
+        '<div class="dp-wordmark-auth" style="font-family:&quot;Space Grotesk&quot;,sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.5px;line-height:1;text-align:center;margin:4px 0 8px"><span style="color:#f6f2e8">Deal</span><span style="color:#C9A84C">Pilot</span></div>' +
       '</div>' +
 
       '<h2 id="auth-title" class="auth-title-v39">Willkommen zurück</h2>' +
@@ -778,7 +778,7 @@ function showPasswordReset() {
     '<div class="auth-card-v39" style="max-width:380px;animation:none">' +
       // V213/V215: Simples App-Logo
       '<div class="auth-logo-simple-wrap">' +
-        '<img class="app-logo-simple app-logo-simple-auth" src="assets/dealpilot-logo-app.png" alt="DealPilot by Junker Immobilien" />' +
+        '<div class="dp-wordmark-auth" style="font-family:&quot;Space Grotesk&quot;,sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.5px;line-height:1;text-align:center;margin:4px 0 8px"><span style="color:#f6f2e8">Deal</span><span style="color:#C9A84C">Pilot</span></div>' +
       '</div>' +
       '<h2 class="auth-title-v39" style="font-size:18px">Passwort zurücksetzen</h2>' +
       '<p class="auth-sub-v39" style="font-size:12.5px">Trag deine E-Mail-Adresse ein. Wir schicken dir einen Reset-Link.</p>' +
@@ -861,7 +861,7 @@ window.handlePwReset = handlePwReset;
       '<div class="auth-card-v39" style="max-width:380px;animation:none">' +
         // V213/V215: Simples App-Logo
         '<div class="auth-logo-simple-wrap">' +
-          '<img class="app-logo-simple app-logo-simple-auth" src="assets/dealpilot-logo-app.png" alt="DealPilot by Junker Immobilien" />' +
+          '<div class="dp-wordmark-auth" style="font-family:&quot;Space Grotesk&quot;,sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.5px;line-height:1;text-align:center;margin:4px 0 8px"><span style="color:#f6f2e8">Deal</span><span style="color:#C9A84C">Pilot</span></div>' +
         '</div>' +
         '<h2 class="auth-title-v39" style="font-size:18px">Neues Passwort setzen</h2>' +
         '<p class="auth-sub-v39" style="font-size:12.5px">Trag dein neues Passwort ein. Mindestens 10 Zeichen.</p>' +
@@ -997,4 +997,82 @@ function _v10OpenRegister() {
     }
   });
   obs.observe(document.body, { childList: true, subtree: true });
+})();
+
+
+/* ═══════════════════════════════════════════════════════════
+   v859-wordmark-swap — ersetzt JEDES alte Auth-PNG-Logo
+   (auch aus RegisterModal / anderen Modulen) live durch die
+   DealPilot-Wortmarke. Sidebar-Logo bleibt unberuehrt.
+   ═══════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  function makeWordmark() {
+    var d = document.createElement('div');
+    d.className = 'dp-wordmark-auth';
+    d.style.cssText = 'font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:32px;letter-spacing:-0.5px;line-height:1;text-align:center;margin:4px 0 8px';
+    d.innerHTML = '<span style="color:#f6f2e8">Deal</span><span style="color:#C9A84C">Pilot</span>';
+    return d;
+  }
+  function swap(img) {
+    if (!img || img.dataset.v859 === '1') return;
+    img.dataset.v859 = '1';
+    try { img.replaceWith(makeWordmark()); } catch (e) {}
+  }
+  function scan(root) {
+    if (!root || !root.querySelectorAll) return;
+    var imgs = root.querySelectorAll('img.app-logo-simple-auth');
+    for (var i = 0; i < imgs.length; i++) swap(imgs[i]);
+  }
+  function boot() {
+    scan(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var m = 0; m < muts.length; m++) {
+          var added = muts[m].addedNodes;
+          for (var n = 0; n < added.length; n++) {
+            var node = added[n];
+            if (node.nodeType !== 1) continue;
+            if (node.matches && node.matches('img.app-logo-simple-auth')) swap(node);
+            scan(node);
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+
+
+/* v860-byline-remove: entfernt die Textzeile "by Junker Immobilien" in Auth-/Register-
+   Modalen (eigenes Markup aus RegisterModal.show()). Nur Leaf-Elemente in Auth-Kontexten. */
+(function () {
+  'use strict';
+  function nuke(root) {
+    if (!root || !root.querySelectorAll) return;
+    var els = root.querySelectorAll('div,span,p,small,h1,h2,h3,h4');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el.children.length === 0 && el.textContent && el.textContent.trim() === 'by Junker Immobilien') {
+        var ctx = el.closest ? el.closest('.auth-overlay-v39, [id*="register"], [class*="register"], [class*="auth"]') : null;
+        if (ctx) { try { el.remove(); } catch (e) {} }
+      }
+    }
+  }
+  function boot() {
+    nuke(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var m = 0; m < muts.length; m++) {
+          var added = muts[m].addedNodes;
+          for (var n = 0; n < added.length; n++) {
+            if (added[n].nodeType === 1) nuke(added[n]);
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();

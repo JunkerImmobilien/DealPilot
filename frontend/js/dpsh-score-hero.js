@@ -492,6 +492,7 @@
     var header = card.querySelector('.kpi-eval-header');
     if (!header) return;
     card.setAttribute('data-dpsh-coll', '1');
+    try { if (localStorage.getItem('dp_dpsh_min') === '1') card.classList.add('dpsh-collapsed'); } catch (e) {}
     var chev = document.createElement('span');
     chev.className = 'dpsh-coll-chev';
     chev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
@@ -506,6 +507,8 @@
 
   function boot() {
     injectCss();
+    /* v875: Nutzer-Praeferenz — Leiste kompakt starten */
+    try { if (localStorage.getItem('dp_dpsh_min') === '1') document.body.classList.add('dpsh-stub'); } catch (e) {}
     wrap('renderDealScore'); wrap('renderDealScore2');
     realRenderAll();
     setupKpiEvalCollapse();

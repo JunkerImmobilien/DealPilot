@@ -34652,3 +34652,62 @@ html body #help-modal .help-sidebar-list::-webkit-scrollbar-thumb:hover {
   background: rgba(201,168,76,.80) !important;
 }
 /* === v827-scrollbar-gold END === */
+
+
+/* v861-band-close */
+/* Schwarzes Brand-Band als Flex-Zeile: Logo links, Tag + X rechts, ALLE mittig auf einer Linie */
+.dp-mtb-brand{display:flex !important;align-items:center !important;position:relative !important;}
+.dp-mtb-brand .dp-mtb-tag{margin-left:auto !important;margin-right:14px !important;position:static !important;right:auto !important;top:auto !important;}
+.dp-mtb-brand .dp-band-close{position:static !important;top:auto !important;right:auto !important;transform:none !important;margin:0 !important;flex-shrink:0 !important;width:28px !important;height:28px !important;background:#17130d !important;border:1.5px solid rgba(232,204,122,.8) !important;color:#E8CC7A !important;border-radius:8px !important;box-shadow:0 2px 8px rgba(0,0,0,.45) !important;z-index:20 !important;display:flex !important;align-items:center !important;justify-content:center !important;padding:0 !important;cursor:pointer !important;}
+.dp-mtb-brand .dp-band-close svg{width:13px !important;height:13px !important;}
+.dp-mtb-brand .dp-band-close:hover{background:#C9A84C !important;border-color:#E8CC7A !important;color:#1a1508 !important;}
+/* Fallback: Button noch ausserhalb des Brand-Bands (Cache) */
+.dp-modal-topband > .dp-band-close{top:9px !important;transform:none !important;right:16px !important;width:28px !important;height:28px !important;}
+/* v861-band-close END */
+
+
+/* v865-login-hero */
+/* Neues Werbebild v865 — volle Breite, oben ausgerichtet, dunkler Schleier */
+.auth-overlay-v39{background:linear-gradient(rgba(5,5,5,.78),rgba(5,5,5,.86)),url('../assets/login-hero-v865.jpg') center top/cover no-repeat !important;}
+.auth-bg-v39{background:linear-gradient(rgba(5,5,5,.78),rgba(5,5,5,.86)),url('../assets/login-hero-v865.jpg') center top/cover no-repeat !important;}
+.auth-bg-coming{display:none !important;}
+/* v865-login-hero END */
+
+
+/* v871-share-align */
+/* Boarding-Pass-Karte in gleicher Flucht/Hoehe wie die Departure-Tafel */
+#s8 .dab-status-grid{align-items:stretch !important;}
+#dab-share-slot{align-self:stretch !important;display:flex !important;}
+#dab-share-slot #da-share-section{flex:1 1 auto !important;display:flex !important;}
+#dab-share-slot #da-share-section > div{flex:1 1 auto !important;margin:0 !important;display:flex !important;flex-direction:column !important;justify-content:center !important;}
+/* v871-share-align END */
+
+
+/* v872-tour-skin */
+/* Mail-Anatomie: schwarze Kopfzeile + GOLDENES Titelband + weisser Body + Creme-Fuss */
+.dp-tour-bubble{background:#fff !important;border:1px solid #e6ddc9 !important;border-radius:12px !important;box-shadow:0 24px 70px rgba(0,0,0,.55) !important;overflow:hidden !important;color:#2b2723 !important;}
+.dp-tour-head{background:#141414 !important;padding:13px 18px 0 !important;}
+.dp-tour-eyebrow{color:#C9A84C !important;font:700 10.5px/1 'JetBrains Mono',monospace !important;letter-spacing:.16em !important;text-transform:uppercase !important;padding-bottom:12px !important;display:flex !important;align-items:center !important;gap:7px !important;}
+.dp-tour-title{display:block !important;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f) !important;color:#1a1508 !important;font-family:'Cormorant Garamond',serif !important;font-size:22px !important;font-weight:700 !important;line-height:1.15 !important;margin:0 -18px !important;padding:12px 18px !important;}
+.dp-tour-close{background:rgba(255,255,255,.06) !important;border:1px solid rgba(232,204,122,.5) !important;color:#E8CC7A !important;border-radius:7px !important;}
+.dp-tour-body{background:#fff !important;color:#2b2723 !important;padding-top:16px !important;}
+.dp-tour-text{color:#2b2723 !important;}
+.dp-tour-body strong{color:#1a1508 !important;}
+.dp-tour-bubble [data-action='toggle-more']{background:#fff !important;border:1px solid #C9A84C !important;color:#8a6d1f !important;border-radius:8px !important;font-weight:600 !important;}
+.dp-tour-progress-bar{background:#EDE7DA !important;border-radius:99px !important;}
+.dp-tour-progress-fill{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f) !important;border-radius:99px !important;}
+.dp-tour-foot{background:#FDFCFA !important;border-top:1px solid #EDE7DA !important;}
+.dp-tour-btn-primary{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f) !important;color:#1a1508 !important;border:none !important;font-weight:700 !important;}
+.dp-tour-btn-secondary{background:#fff !important;color:#2b2723 !important;border:1px solid #d9d2c4 !important;}
+.dp-tour-btn-ghost{background:transparent !important;color:#8a8378 !important;border:none !important;}
+.dp-tour-toggle-btn{border:1px solid #d9d2c4 !important;background:#fff !important;color:#2b2723 !important;}
+.dp-tour-toggle-btn.active{background:#141414 !important;color:#E8CC7A !important;border-color:#141414 !important;}
+/* v872-tour-skin END */
+
+
+/* v874-dr-panel */
+.dr-da-provider{color:#8a8378 !important;}
+.dr-da-head:hover{opacity:.85;}
+.dr-da-chev{font-size:18px;color:#8a8378;line-height:1;}
+.dr-da-body{margin-top:10px;}
+/* v874-dr-panel END */
