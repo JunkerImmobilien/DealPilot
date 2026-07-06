@@ -338,6 +338,29 @@
         if (h) h.innerHTML = '<div class="dab-net-load">Netzwerk aktuell nicht erreichbar.</div>';
       });
   }
+  /* v878-rotate: Netzwerk-Karten mischen + rotieren */
+  var _dabRotTimer = null, _dabRotPaused = false;
+  function _dabShuffle(a){ for (var i=a.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0, t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function _dabStartRotate(){
+    if (_dabRotTimer){ clearInterval(_dabRotTimer); _dabRotTimer=null; }
+    try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch(e){}
+    var rails = document.querySelectorAll('#s8 .dab-rail');
+    rails.forEach(function(rail){
+      rail.addEventListener('mouseenter', function(){ _dabRotPaused = true; });
+      rail.addEventListener('mouseleave', function(){ _dabRotPaused = false; });
+    });
+    _dabRotTimer = setInterval(function(){
+      if (_dabRotPaused) return;
+      var s8 = document.getElementById('s8'); if (!s8 || s8.offsetParent === null) return;
+      document.querySelectorAll('#s8 .dab-rail').forEach(function(rail){
+        var cards = rail.querySelectorAll('.dab-bp:not(.dab-bp-ad)');
+        if (cards.length < 2) return;
+        var first = cards[0], ad = rail.querySelector('.dab-bp-ad');
+        if (ad) { rail.insertBefore(first, ad); } else { rail.appendChild(first); }
+        try { rail.scrollTo({ left: 0, behavior: 'smooth' }); } catch(e){ rail.scrollLeft = 0; }
+      });
+    }, 5000);
+  }
   function buildRails() {
     var host = document.getElementById('dab-rails-host');
     if (!host) return;
@@ -349,6 +372,7 @@
     cats.forEach(function (cat) {
       var cs = _cards.filter(function (c) { return c.kategorie === cat.key; });
       if (!cs.length) return;
+      _dabShuffle(cs); /* v878-rotate: gemischte Startreihenfolge */
       var farbe = cat.farbe || '#C9A84C';
       html += railHead(cat.key, farbe, cat.label || cat.key);
       html += '<div class="dab-rail" id="dab-rail-' + esc(cat.key) + '">' +
@@ -363,6 +387,7 @@
       }, { passive: false });
       updArrows(el.id);
     });
+    _dabStartRotate();
   }
   function bgAttrs(card) {
     var bg = card.hintergrund || 'weiss';
