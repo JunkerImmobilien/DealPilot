@@ -435,7 +435,7 @@
         '</div>';
     }
     var bg = bgAttrs(c);
-    return '<article class="dab-bp' + bg.cls + '" style="--acc:' + esc(acc) + ';' + bg.style + '">' +
+    return '<article class="dab-bp' + bg.cls + '" style="--acc:' + esc(acc) + ';' + (c.kante_farbe ? '--stubbg:' + esc(c.kante_farbe) + ';' : '') + bg.style + '">' + /* v879-stub-farbe */
       '<div class="dab-bp-l"><div class="dab-bp-top"><div class="dab-bp-logo">' + logo + '</div>' +
         '<div><div class="dab-bp-name">' + esc(c.name || '') + ver + '</div><div class="dab-bp-role">' + esc(c.rolle || '') + '</div></div></div>' +
         '<div class="dab-bp-tags">' + tagH + '</div>' +
@@ -718,7 +718,9 @@
     '#s8{--dab-ob:#0a0a0a;--dab-m2:#6fd6a0;--dab-glow:rgba(111,214,160,.5);--dab-gold:#C9A84C;--dab-goldhi:#E8CC7A;--dab-gold3:#9a7f33;--dab-green:#3FA56C;--dab-red:#B86250;--dab-run:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);--dab-fd:"Cormorant Garamond",serif;--dab-fs:"Space Grotesk",sans-serif;--dab-fm:"JetBrains Mono",monospace;}',
     '#s8 .dab-cockpit{background:radial-gradient(120% 90% at 50% -10%,#17181a 0%,var(--dab-ob) 55%);border:1px solid rgba(201,168,76,.2);border-radius:18px;overflow:hidden;margin:0 0 24px;box-shadow:0 14px 50px rgba(0,0,0,.16);transition:box-shadow .5s}',
     '#s8 .dab-cockpit.ready{box-shadow:0 14px 50px rgba(0,0,0,.16),0 0 40px var(--dab-glow)}',
-    '#s8 .dab-strip{background:var(--dab-run);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}',
+    '#s8 .dab-strip{position:relative;overflow:hidden;background:var(--dab-run);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}',
+    '#s8 .dab-strip::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(125deg,rgba(255,255,255,.12) 0 1px,transparent 1px 11px);pointer-events:none}',
+    '#s8 .dab-strip>*{position:relative;z-index:1}', /* v879-banner-struktur */
     '#s8 .dab-strip-l{display:flex;align-items:center;gap:9px;font-family:var(--dab-fs);font-size:11px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:#1a1508}',
     '#s8 .dab-strip-l .dot{width:8px;height:8px;border-radius:50%;background:#2e7d4f;box-shadow:0 0 7px #3FA56C}',
     '#s8 .dab-pill{font-family:var(--dab-fm);font-size:11px;font-weight:700;color:#fff;background:#161310;border:1px solid rgba(255,255,255,.14);padding:4px 13px;border-radius:99px;transition:.3s}',
@@ -778,7 +780,9 @@
     '#s8 .dab-row.active[data-status="won"] .dab-row-dot{background:var(--dab-green);box-shadow:0 0 8px var(--dab-green)}#s8 .dab-row.active[data-status="won"] .dab-row-flip{background:var(--dab-green);color:#fff}',
     '#s8 .dab-row.active[data-status="lost"] .dab-row-dot{background:var(--dab-red);box-shadow:0 0 8px var(--dab-red)}#s8 .dab-row.active[data-status="lost"] .dab-row-flip{background:var(--dab-red);color:#fff}',
     /* Baender / Panels */
-    '#s8 .dab-band{display:flex;align-items:center;margin:28px 0 0;background:var(--dab-run);border-radius:11px 11px 0 0;padding:12px 16px}',
+    '#s8 .dab-band{position:relative;overflow:hidden;display:flex;align-items:center;margin:28px 0 0;background:var(--dab-run);border-radius:11px 11px 0 0;padding:12px 16px}',
+    '#s8 .dab-band::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(125deg,rgba(255,255,255,.12) 0 1px,transparent 1px 11px);pointer-events:none}',
+    '#s8 .dab-band>*{position:relative;z-index:1}',
     '#s8 .dab-band-ic{width:27px;height:27px;border-radius:50%;background:#0d0d0d;display:flex;align-items:center;justify-content:center;color:var(--dab-goldhi);flex-shrink:0;margin-right:11px}',
     '#s8 .dab-band-t{font-family:var(--dab-fs);font-size:12px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#1a1508}',
     '#s8 .dab-band-s{font-size:11px;color:rgba(26,21,8,.62);margin-left:auto}',
