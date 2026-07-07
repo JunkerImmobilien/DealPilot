@@ -79,6 +79,7 @@ svg{overflow:visible;display:block}
 .more>summary::after{content:' \25be';color:var(--gold)}
 .more[open]>summary::after{content:' \25b4'}
 .mlist{display:grid;grid-template-columns:1fr 1fr;gap:7px 16px;padding:0 0 6px}
+.rubh{grid-column:1/-1;font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:12px 0 2px;padding-top:8px;border-top:1px solid rgba(201,168,76,.12)}/*v883-rubriken*/
 @media(max-width:460px){.mlist{grid-template-columns:1fr}}
 .mrow{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed rgba(201,168,76,.14);padding:6px 0}
 .mrow .ml{font-family:var(--mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:#9a9080}
@@ -208,7 +209,20 @@ function render(pass){
   var _SDORD={'Objektart':1,'Zimmer':2,'Energieklasse':3,'etage':4,'etagen_ges':5,'modernis':6,'Stellplatz':7,'garagen':8,'stellpl_aussen':9,'balkon_flae':10,'bad_anz':11,'Eigenkapital':12,'Hausgeld':13,'Zinssatz':14,'Tilgung':15,'Kaufnebenkosten':16,'svwert':17,'ds2_marktmiete':18,'makrolage':19,'mikrolage':20,'ds2_wertsteigerung':21,'ds2_bevoelkerung':22,'ds2_nachfrage':23,'ds2_entwicklung':24,'qual_kueche':25,'rate_kueche':26,'qual_bad':27,'rate_bad':28,'qual_boden':29,'rate_boden':30,'qual_fenster':31,'rate_fenster':32};
   _mrows.forEach(function(r,i){ r.__i=i; });
   _mrows.sort(function(a,b){ var ka=(a[2]!=null?a[2]:a[0]), kb=(b[2]!=null?b[2]:b[0]); var ra=(_SDORD[ka]!=null?_SDORD[ka]:99), rb=(_SDORD[kb]!=null?_SDORD[kb]:99); return ra!==rb ? ra-rb : a.__i-b.__i; });
-  var _more = _mrows.length ? '<div class="sec"><details class="more"><summary>Alle Stammdaten anzeigen</summary><div class="mlist">'+_mrows.map(function(f){return '<div class="mrow"><span class="ml">'+esc(f[0])+'</span><span class="mv">'+esc(String(f[1]))+'</span></div>';}).join('')+'</div></details></div>' : '';
+  /* v883-rubriken: Stammdaten in Rubriken gruppieren */
+  var _RUB=[
+    ['Objekt & Ausstattung',['Objektart','Zimmer','Energieklasse','Etage','etage','etagen_ges','Stellplatz','garagen','stellpl_aussen','B\u00e4der','bad_anz','balkon_flae','Ausstattung','Modernisierung','modernis','Vermietungsstand','K\u00fcrzel']],
+    ['Finanzierung',['Eigenkapital','Hausgeld','Zinssatz','Tilgung','Kaufnebenkosten','Nettokaltmiete','Sonst. Einnahmen','Kaufdatum']],
+    ['Lage & Markt',['makrolage','mikrolage','ds2_marktmiete','svwert','ds2_wertsteigerung','ds2_bevoelkerung','ds2_nachfrage','ds2_entwicklung']],
+    ['Qualit\u00e4t & Zustand',['Zustand','ds2_zustand','qual_kueche','rate_kueche','qual_bad','rate_bad','qual_boden','rate_boden','qual_fenster','rate_fenster']]
+  ];
+  function _rubOf(f){ var k=(f[2]!=null?f[2]:f[0]); for(var i=0;i<_RUB.length;i++){ if(_RUB[i][1].indexOf(k)>=0 || _RUB[i][1].indexOf(f[0])>=0) return _RUB[i][0]; } return 'Weitere'; }
+  var _groups={}; _mrows.forEach(function(f){ var r=_rubOf(f); (_groups[r]=_groups[r]||[]).push(f); });
+  var _rubOrder=['Objekt & Ausstattung','Finanzierung','Lage & Markt','Qualit\u00e4t & Zustand','Weitere'];
+  var _inner=_rubOrder.map(function(rn){ var rows=_groups[rn]; if(!rows||!rows.length) return '';
+    return '<div class="rubh">'+esc(rn)+'</div><div class="mlist">'+rows.map(function(f){return '<div class="mrow"><span class="ml">'+esc(f[0])+'</span><span class="mv">'+esc(String(f[1]))+'</span></div>';}).join('')+'</div>';
+  }).join('');
+  var _more = _mrows.length ? '<div class="sec"><details class="more"><summary>Alle Stammdaten anzeigen</summary>'+_inner+'</details></div>' : '';
   var photos=Array.isArray(snap.photos)?snap.photos.filter(Boolean):[];
   var ai=(snap.ai_analysis||'').trim(); var _moreShown=0;
 
