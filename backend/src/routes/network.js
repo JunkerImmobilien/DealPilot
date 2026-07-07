@@ -12,11 +12,27 @@ const express = require('express');
 const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 const svc = require('../services/networkCardsService');
+const { query } = require('../db/pool'); /* v891-dpk */
 
 let mailerService = null;
 try { mailerService = require('../services/mailerService'); } catch (e) { /* optional */ }
 let mailLayout = null;
 try { mailLayout = require('../services/mailLayout'); } catch (e) { /* optional */ }
+
+/* v891-dpk: object_ref -> volles Objekt des Users (UUID | kuerzel | seq_no | data.kuerzel) */
+async function resolveObject(userId, ref) {
+  if (!userId || !ref) return null;
+  try {
+    const r = await query(
+      `SELECT id, name, kuerzel, data, ai_analysis
+         FROM objects
+        WHERE user_id = $1 AND (id::text = $2 OR kuerzel = $2 OR seq_no = $2 OR data->>'kuerzel' = $2)
+        LIMIT 1`,
+      [userId, String(ref)]
+    );
+    return r.rows[0] || null;
+  } catch (e) { console.warn('[network] resolveObject:', e.message); return null; }
+}
 
 router.use(authenticate);
 
@@ -96,6 +112,27 @@ router.post('/:id/lead', async (req, res) => {
         if (mit.dr_persoenlich && dr.pers_url) { tl.push('', 'Datenraum pers\u00f6nlich: ' + dr.pers_url); hl.push('<p><strong>Datenraum pers\u00f6nlich:</strong> <a href="' + dr.pers_url + '">' + dr.pers_url + '</a></p>'); }
         if (mit.dr_objekt && dr.obj_url) { tl.push('Datenraum Objekt: ' + dr.obj_url); hl.push('<p><strong>Datenraum Objekt:</strong> <a href="' + dr.obj_url + '">' + dr.obj_url + '</a></p>'); }
         if ((mit.dr_persoenlich || mit.dr_objekt) && dr.snippet) { tl.push('', dr.snippet); }
+        // v891-dpk: ganzes Objekt als .dpk anhaengen (alle eingegebenen Werte inkl. Finanzierung)
+        let attachments;
+        if (mit.objekt_voll && objectRef) {
+          try {
+            const obj = await resolveObject(userId, objectRef);
+            if (obj && obj.data) {
+              const dpk = JSON.stringify({
+                exported_at: new Date().toISOString(),
+                source: 'DealPilot',
+                name: obj.name || null,
+                kuerzel: obj.kuerzel || null,
+                data: obj.data,
+                aiAnalysis: obj.ai_analysis || null
+              }, null, 2);
+              const safe = String(obj.kuerzel || obj.name || 'objekt').replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 40) || 'objekt';
+              attachments = [{ filename: safe + '.dpk', content: dpk, contentType: 'application/json' }];
+              tl.push('', 'Ganzes Objekt als .dpk-Datei im Anhang (alle eingegebenen Werte inkl. Finanzierung).');
+              hl.push('<p><strong>Anhang:</strong> Ganzes Objekt als <code>.dpk</code>-Datei (alle eingegebenen Werte inkl. Finanzierung).</p>');
+            }
+          } catch (e) { console.warn('[network] dpk attach failed:', e.message); }
+        }
         tl.push('', 'Bitte nehmen Sie zeitnah Kontakt auf.');
         hl.push('<p>Bitte nehmen Sie zeitnah Kontakt auf.</p>');
 
@@ -115,7 +152,8 @@ router.post('/:id/lead', async (req, res) => {
           subject: 'Neue Anfrage \u00fcber DealPilot',
           text: tl.join('\n'),
           html: html || undefined,
-          replyTo: userEmail || undefined
+          replyTo: userEmail || undefined,
+          attachments: attachments
         });
       } catch (mailErr) {
         console.warn('[network] lead mail failed:', mailErr.message);

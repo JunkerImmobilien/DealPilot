@@ -4297,7 +4297,7 @@ const QcApp = (function() {
       source: 'PriceHubble', target: 'avm_konfidenz'
     };
 
-    _applySelectionToQc(result);   // V4: Durchschnitt automatisch übernehmen
+    _applyConsensusToQc();   // V4: Durchschnitt automatisch übernehmen
     renderAvmResults();
     if (typeof scheduleUpdate === "function") scheduleUpdate();
     if (!silent) {
@@ -4360,7 +4360,7 @@ const QcApp = (function() {
     _avmStore(result);
     _avmSelection = { marktwert: _spanConfig, marktmiete: _spanConfig };
     _buildPendingTransfer(result, inputs);
-    _applySelectionToQc(result);   // V4: Durchschnitt automatisch übernehmen
+    _applyConsensusToQc();   // V4: Durchschnitt automatisch übernehmen
 
     renderAvmResults();
     if (typeof scheduleUpdate === "function") scheduleUpdate();   // Score sofort aktualisieren
@@ -4612,6 +4612,34 @@ const QcApp = (function() {
   }
 
   /* Button: explizit nochmal übernehmen (für den Fall dass User Felder geändert hat) */
+  /* v893b-konsens: Auto-Uebernahme = Durchschnitt (Konsens) aller aktiven Quellen
+     (Sprengnetter/PriceHubble aus _avmResults + DealPilot aus _mb_state), am aktuellen Spann. */
+  function _applyConsensusToQc() {
+    var mms = [];
+    (_avmResults || []).forEach(function (r) {
+      if (!r) return;
+      var mm = _selectedValue(r, 'marktmiete');
+      if (mm != null && isFinite(mm)) mms.push(mm);
+    });
+    try {
+      var el = document.getElementById('_mb_state');
+      if (el && el.value) {
+        var st = JSON.parse(el.value);
+        if (st && st.card && st.card.mm) {
+          var k = (_spanConfig === 'low') ? 'low' : (_spanConfig === 'high') ? 'high' : 'med';
+          var dpmm = st.card.mm[k];
+          if (dpmm != null && isFinite(dpmm)) mms.push(dpmm);
+        }
+      }
+    } catch (e) {}
+    if (!mms.length) return;
+    var avg = Math.round(mms.reduce(function (a, b) { return a + b; }, 0) / mms.length);
+    setVal('qc_nkm_grund', String(avg));
+    if (typeof mieteAddUp === 'function') mieteAddUp();
+    var fEl = document.getElementById('qc_nkm_grund');
+    if (fEl) { var fld = fEl.closest('.field'); if (fld) fld.classList.add('has-source'); }
+  }
+
   function applyAvmToQc() {
     if (!_avmResults.length) return;
     _applySelectionToQc(_avmResults[0]);
@@ -5276,7 +5304,7 @@ function renderTransferList() {
     QcApp_v6_syncSegments();
     // Falls schon Ergebnisse da: sofort neu übernehmen + rendern
     if (_avmResults.length) {
-      _applySelectionToQc(_avmResults[0]);
+      _applyConsensusToQc(); /* v893b-konsens */
       _buildPendingTransfer(_avmResults[0], QcEngine.getInputs());
       renderAvmResults();
       if (typeof scheduleUpdate === 'function') scheduleUpdate();
@@ -5904,8 +5932,8 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
 
 
-  <script src="js/avm-section.js?v=766"></script>
-  <script src="js/dealpilot-mb-qc.js?v=832c"></script>
+  <script src="js/avm-section.js?v=893b"></script>
+  <script src="js/dealpilot-mb-qc.js?v=892"></script>
   <script src="js/immometrica-qc.js?v=667"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">

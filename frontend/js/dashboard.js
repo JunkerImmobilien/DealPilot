@@ -200,6 +200,8 @@
   }
   var _cfMode = 'vs'; /* 'vs' vor Steuer | 'ns' nach Steuer (Cashflow-Karte) */
   function toggleCf(){ _cfMode = (_cfMode === 'vs') ? 'ns' : 'vs'; try{ renderOverview(); }catch(e){} }
+  var _giMode = 'mit'; /* v886-dash: 'mit' = Gesamtinvestition inkl. NK | 'ohne' = nur Kaufpreis */
+  function toggleGi(){ _giMode = (_giMode === 'mit') ? 'ohne' : 'mit'; try{ renderOverview(); }catch(e){} }
   /* v475: Objekt-Auswahl im Cockpit. -1 = alle aggregiert, sonst Index in wonList()/detailArr(). */
   var _dashSelIdx = -1;
   function selectObject(v){
@@ -487,13 +489,13 @@
     var cfLabel = cfVor ? 'vor Steuer' : 'nach Steuer';
     var groups=[
       {t:'Bestand', h:[ half('Objekte', String(s.n), gold, 'im Bestand'), half('Mieteinnahmen / Monat', M(s.mieteM), green, 'netto kalt') ]},
-      {t:'Investition', h:[ half('Gesamtinvestition', M(s.gi), ch, 'Kaufpreis + NK'), half('Restschuld gesamt', M(s.rest), ch, 'Verbindlichkeiten') ]},
+      (function(){ var giO=(_giMode==='ohne'); return {t:'Investition', click:true, fn:'DealPilotDashboard.toggleGi()', ctitle:'Klick wechselt Gesamtinvestition mit/ohne Kaufnebenkosten', h:[ half('Gesamtinvestition', M(giO?s.kp:s.gi), ch, giO?'ohne NK \u00b7 Klick: mit NK':'Kaufpreis + NK \u00b7 Klick: ohne NK'), half('Restschuld gesamt', M(s.rest), ch, 'Verbindlichkeiten') ]}; })(),
       {t:'Mietrendite', h:[ half('Bruttomietrendite', P2(s.brutto), rcol(s.brutto,5,3.5), 'Jahresmiete / KP'), half('Nettomietrendite', P2(s.netto), rcol(s.netto,4,2.5), (s.netto==null?'k.\u00a0A.':'nach BWK')) ]},
       {t:'Cashflow \u00b7 '+cfLabel, click:true, h:[ half('/ Monat', M(cfM), cfc(cfM), cfLabel), half('/ Jahr', M(cfJ), cfc(cfJ), 'Klick: '+(cfVor?'nach':'vor')+' Steuer') ]}
     ];
     host.innerHTML=groups.map(function(g){
       var cl='ov-card ov-pair-card'+(g.click?' ov-clickable':'');
-      var on=g.click?' onclick="DealPilotDashboard.toggleCf()" title="Klick wechselt vor/nach Steuer"':'';
+      var on=g.click?(' onclick="'+(g.fn||'DealPilotDashboard.toggleCf()')+'" title="'+esc(g.ctitle||'Klick wechselt vor/nach Steuer')+'"'):'';
       return '<div class="'+cl+'"'+on+'>'
         + '<div class="ov-card-title">'+esc(g.t)+(g.click?' <span class="ov-toggle-hint">\u21c4</span>':'')+'</div>'
         + '<div class="ov-pair">'+g.h.join('')+'</div></div>';
@@ -1135,7 +1137,7 @@
   function openDashboard(){
     var m=$(MOUNT_ID); if(!m) return;
     if(!ensureMarkup()) return;
-    try{ if(typeof saveObj==='function') saveObj({silent:true}); }catch(e){}
+    try{ if(window._currentObjKey && typeof saveObj==='function') saveObj({silent:true}); }catch(e){} /* v886-dash: nur speichern wenn echtes aktives Objekt -> kein Phantom-Objekt beim Cockpit-Open */
     // Andere Hauptviews ausblenden — ALLE .sec (auch sec-hidden wie Quick-Check)
     var tabs=document.querySelector('.tabs'); if(tabs)tabs.style.display='none';
     var wf=document.querySelector('.tabs-workflow-bar'); if(wf)wf.style.display='none';
@@ -1303,6 +1305,7 @@
     toggleSidebar: toggleSidebar, setTheme: setTheme, applyTheme: applyTheme,
     showScoreDetails: showScoreDetails, showScoreUpgrade: showScoreUpgrade, closeScoreModal: _scoreModalClose,
     toggleCf: toggleCf,
+    toggleGi: toggleGi,
     toggleRoe: function(){ window._dpRoeMode=(window._dpRoeMode==='nach')?'vor':'nach'; try{ renderHealth(); }catch(e){} },
     openObject: function(k){ try{ if(typeof window.loadSaved==='function') window.loadSaved(k); }catch(e){} },
     toggleZins: function(){ window._dpZinsMode=(window._dpZinsMode==='risiko')?'zins':'risiko'; try{ renderHealth(); }catch(e){} },

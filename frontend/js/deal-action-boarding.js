@@ -261,11 +261,37 @@
     } catch (e) {}
     return st;
   }
+  /* v890-cdoc: Bestaetigung eigener Pflichtdokumente (localStorage je Karte+Objekt) */
+  function _cdocSlug(x){ return String(x||'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40); }
+  function _cdocStoreKey(cid, obj){ return 'dp_ncd_' + (cid|0) + '_' + (obj||''); }
+  function _cdocConfirmed(cid, obj){ try { var v = JSON.parse(localStorage.getItem(_cdocStoreKey(cid,obj))||'[]'); return Array.isArray(v)?v:[]; } catch(e){ return []; } }
+  function toggleCustomDoc(cid, slug, on){
+    var obj = currentObjId(); var set = _cdocConfirmed(cid,obj); var i = set.indexOf(slug);
+    if (on && i<0) set.push(slug); else if (!on && i>=0) set.splice(i,1);
+    try { localStorage.setItem(_cdocStoreKey(cid,obj), JSON.stringify(set)); } catch(e){}
+    refreshGates();
+  }
   function reqList(card) {
     var anf = anfOf(card), st = checkStates(), out = [];
     Object.keys(REQ_DEFS).forEach(function (k) {
       if (anf[k] === true) out.push({ key: k, label: REQ_DEFS[k], ok: !!st[k] });
     });
+    /* v889-docs: waehlbare Pflichtdokumente */
+    if (Array.isArray(anf.docs) && anf.docs.length) {
+      var conf = [];
+      try { if (window.DealPilotDatenraum && window.DealPilotDatenraum.getConfirmedDocKeys) conf = window.DealPilotDatenraum.getConfirmedDocKeys(currentObjId()) || []; } catch (e) {}
+      var miss = anf.docs.filter(function (k) { return conf.indexOf(k) < 0; });
+      out.push({ key: 'docs', label: 'Pflichtdokumente (' + (anf.docs.length - miss.length) + '/' + anf.docs.length + ' best\u00e4tigt)', ok: miss.length === 0 });
+    }
+    /* v890-cdoc: eigene Pflichtdokumente (Nutzer bestaetigt manuell) */
+    var _cds = Array.isArray(anf.custom_docs) ? anf.custom_docs : [];
+    if (_cds.length) {
+      var _conf = _cdocConfirmed(card.id, currentObjId());
+      _cds.forEach(function (lbl) {
+        var sl = _cdocSlug(lbl);
+        out.push({ key: 'cdoc:' + sl, label: lbl, ok: _conf.indexOf(sl) >= 0, custom: true, cid: card.id, slug: sl });
+      });
+    }
     return out;
   }
   function gateHtml(card) {
@@ -275,9 +301,13 @@
     if (reqs.length) {
       reqBox = '<div class="dab-req"><div class="dab-req-t">' + ICO.lock + ' Voraussetzungen f\u00fcr die Anfrage</div><ul>' +
         reqs.map(function (r) {
-          var fix = r.ok ? '' :
-            '<span class="dab-req-fix" onclick="DealActionBoarding.fixReq(\'' + r.key + '\')">Beheben</span>';
-          return '<li class="' + (r.ok ? 'ok' : 'no') + '"><span class="ic">' + (r.ok ? '\u2713' : '\u2715') + '</span>' + r.label + fix + '</li>';
+          var fix;
+          if (r.custom) {
+            fix = '<label class="dab-cdoc"><input type="checkbox" ' + (r.ok ? 'checked' : '') + ' onchange="DealActionBoarding.toggleCustomDoc(' + (r.cid | 0) + ',\'' + r.slug + '\',this.checked)"> bestätigt</label>';
+          } else {
+            fix = r.ok ? '' : '<span class="dab-req-fix" onclick="DealActionBoarding.fixReq(\'' + r.key + '\')">Beheben</span>';
+          }
+          return '<li class="' + (r.ok ? 'ok' : 'no') + '"><span class="ic">' + (r.ok ? '✓' : '✕') + '</span>' + esc(r.label) + fix + '</li>';
         }).join('') + '</ul></div>';
     }
     var cta;
@@ -355,11 +385,29 @@
       document.querySelectorAll('#s8 .dab-rail').forEach(function(rail){
         var cards = rail.querySelectorAll('.dab-bp:not(.dab-bp-ad)');
         if (cards.length < 2) return;
+        if (rail.getAttribute('data-sliding') === '1') return;
         var first = cards[0], ad = rail.querySelector('.dab-bp-ad');
-        if (ad) { rail.insertBefore(first, ad); } else { rail.appendChild(first); }
-        try { rail.scrollTo({ left: 0, behavior: 'smooth' }); } catch(e){ rail.scrollLeft = 0; }
+        var cs = window.getComputedStyle(rail);
+        var gap = parseFloat(cs.columnGap || cs.gap || '0') || 0;
+        var dx = first.getBoundingClientRect().width + gap;
+        if (!(dx > 0)) { if (ad) { rail.insertBefore(first, ad); } else { rail.appendChild(first); } return; }
+        /* v890-rotate: weiches Slide (leicht weiter gleiten), dann lautlos umsortieren */
+        rail.setAttribute('data-sliding', '1');
+        rail.style.transition = 'transform .7s cubic-bezier(.33,0,.2,1)';
+        rail.style.transform = 'translateX(-' + dx + 'px)';
+        var done = function(){
+          if (rail.getAttribute('data-sliding') !== '1') return;
+          rail.removeEventListener('transitionend', done);
+          rail.style.transition = 'none';
+          rail.style.transform = 'translateX(0)';
+          if (ad) { rail.insertBefore(first, ad); } else { rail.appendChild(first); }
+          void rail.offsetWidth;
+          rail.removeAttribute('data-sliding');
+        };
+        rail.addEventListener('transitionend', done);
+        setTimeout(function(){ if (rail.getAttribute('data-sliding') === '1') done(); }, 900);
       });
-    }, 5000);
+    }, 10000);
   }
   function buildRails() {
     var host = document.getElementById('dab-rails-host');
@@ -514,6 +562,7 @@
     var items = [];
     var addr = adresse();
     if (mit.objekt) items.push('Objekt: ' + (addr || 'aktuelles Objekt'));
+    if (mit.objekt_voll) items.push('Ganzes Objekt als .dpk-Datei (alle Werte inkl. Finanzierung)'); /* v891-dpk */
     if (mit.eckdaten) items.push('Eckdaten: Kaufpreis, Wohnfl\u00e4che, DSCR, LTV');
     if (mit.kontakt) items.push('Deine Kontakt-E-Mail f\u00fcr die R\u00fcckmeldung');
     if (mit.dr_persoenlich) items.push('Link: Datenraum pers\u00f6nlich');
@@ -710,6 +759,7 @@
     leadSheet: leadSheet,
     closeSheet: closeSheet,
     fixReq: fixReq,
+    toggleCustomDoc: toggleCustomDoc,
     partnerInterest: partnerInterest
   };
 
@@ -863,6 +913,10 @@
     '#s8 .dab-req li.no .ic{background:rgba(184,98,80,.12);color:var(--dab-red)}',
     '#s8 .dab-req li.ok{color:#2A2727}',
     '#s8 .dab-req-fix{margin-left:auto;font-family:var(--dab-fs);font-size:9px;font-weight:700;color:var(--dab-gold3);background:#fff;border:1px solid rgba(201,168,76,.35);border-radius:6px;padding:2px 8px;cursor:pointer}',
+    /* v890: eigene Pflichtdokumente + weiche Rotation */
+    '#s8 .dab-req li .dab-cdoc{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-family:var(--dab-fs);font-size:9px;font-weight:700;color:var(--dab-gold3);cursor:pointer;white-space:nowrap}',
+    '#s8 .dab-req li .dab-cdoc input{width:13px;height:13px;accent-color:var(--dab-green,#3FA56C);cursor:pointer}',
+    '#s8 .dab-rail{will-change:transform}',
     /* Abrisskanten */
     '#s8 .dab-edge{position:relative;width:0;flex-shrink:0}',
     '#s8 .dab-edge-k1{border-left:2px dashed var(--kante,rgba(42,39,39,.16))}',

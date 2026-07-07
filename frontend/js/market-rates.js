@@ -678,7 +678,39 @@ function _renderRecommendation(current, hist) {
       '</span>' +
     '</div>' +
     '<div class="mr-rec-context-line">' + ctxLine + '</div>' +
-    '<div class="mr-rec-reasoning">' + begruendung + '</div>';
+    '<div class="mr-rec-reasoning">' + begruendung + '</div>' +
+    '<div class="mr-ek-tool" style="margin-top:14px;padding:12px 14px;border:1px solid rgba(201,168,76,.3);border-radius:10px;background:#FDFCFA">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:#5F5E5A;margin-bottom:8px"><span>Eigenkapital-Einsatz (% vom Kaufpreis)</span><strong id="mr-ek-pct" style="color:#b8932f;font-size:15px">20 %</strong></div>' +
+      '<input type="range" id="mr-ek-slider" min="0" max="100" step="1" value="20" style="width:100%;accent-color:#C9A84C;cursor:pointer">' +
+      '<div style="display:flex;justify-content:space-between;font-size:11.5px;color:#7A7370;margin-top:6px"><span>EK <strong id="mr-ek-eur" style="color:#2A2727">–</strong></span><span>Beleihung <strong id="mr-ek-ltv" style="color:#2A2727">–</strong></span></div>' +
+    '</div>'; /* v893a-ek */
+  // v893a-ek: EK-Slider (% vom Kaufpreis) -> setzt Objekt-EK live
+  try {
+    var _ekKp = function () { var el = document.getElementById('kp') || document.getElementById('qc_kp'); return el ? (parseFloat(String(el.value || '').split('.').join('').replace(',', '.')) || 0) : 0; };
+    var _ekTarget = function () { return document.getElementById('ek') || document.getElementById('qc_ek'); };
+    var _ekCur = (function () { var t = _ekTarget(); return t ? (parseFloat(String(t.value || '').split('.').join('').replace(',', '.')) || 0) : 0; })();
+    var _sl = document.getElementById('mr-ek-slider');
+    var _pctEl = document.getElementById('mr-ek-pct'), _eurEl = document.getElementById('mr-ek-eur'), _ltvEl = document.getElementById('mr-ek-ltv');
+    if (_sl) {
+      var _kp0 = _ekKp();
+      var _init = (_kp0 > 0 && _ekCur > 0) ? Math.round(_ekCur / _kp0 * 100) : 20;
+      if (_init < 0) _init = 0; if (_init > 100) _init = 100;
+      _sl.value = _init;
+      var _ekUpd = function (write) {
+        var pct = parseInt(_sl.value, 10) || 0;
+        var kp = _ekKp();
+        var ek = Math.round(kp * pct / 100);
+        var loan = Math.max(0, kp * 1.105 - ek);
+        var ltv = kp > 0 ? (loan / kp * 100) : 0;
+        if (_pctEl) _pctEl.textContent = pct + ' %';
+        if (_eurEl) _eurEl.textContent = kp > 0 ? (ek.toLocaleString('de-DE') + ' €') : '–';
+        if (_ltvEl) _ltvEl.textContent = kp > 0 ? (ltv.toFixed(0) + ' %') : '–';
+        if (write) { var t = _ekTarget(); if (t) { t.value = String(ek); try { t.dispatchEvent(new Event('input', { bubbles: true })); t.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} } }
+      };
+      _sl.addEventListener('input', function () { _ekUpd(true); });
+      _ekUpd(false);
+    }
+  } catch (e) {}
 }
 
 // Auto-load — kurzer Delay damit config.js + Auth ready sind.

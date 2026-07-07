@@ -26,7 +26,7 @@ function clampInt(v, min, max, def) {
   if (!Number.isFinite(n)) return def;
   return Math.max(min, Math.min(max, n));
 }
-const MITGABE_DEFAULT = '{"objekt":true,"eckdaten":true,"kontakt":true,"dr_persoenlich":false,"dr_objekt":false}';
+const MITGABE_DEFAULT = '{"objekt":true,"eckdaten":true,"kontakt":true,"objekt_voll":true,"dr_persoenlich":false,"dr_objekt":false}'; /* v891-dpk */
 
 function fields(d) {
   return [

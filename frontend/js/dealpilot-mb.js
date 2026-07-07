@@ -136,7 +136,7 @@
     out.trendRaw = (d.price_trend_pct != null) ? d.price_trend_pct : null;
     out.trend = (d.price_trend_pct != null) ? ((d.price_trend_pct >= 0 ? '+' : '') + deNum(d.price_trend_pct, 1) + '%/J') : '–';
     if (mv.estimated != null) {
-      out.mw = { low: mv.low != null ? mv.low : Math.round(mv.estimated * 0.9), med: mv.estimated, high: mv.high != null ? mv.high : Math.round(mv.estimated * 1.1), sqm: (mv.basis_median_sqm != null) ? (deNum(mv.basis_median_sqm, 0) + ' €/m²') : '' };
+      out.mw = { low: mv.low != null ? mv.low : Math.round(mv.estimated * 0.9), med: mv.estimated, high: mv.high != null ? mv.high : Math.round(mv.estimated * 1.1), sqm: (mv.basis_median_sqm != null) ? (deNum(mv.basis_median_sqm, 0) + ' €/m²') : (area ? (deNum(Math.round(mv.estimated / area), 0) + ' €/m²') : '') }; /* v892-sqm */
     }
     var rsqm = rent.median_per_sqm != null ? rent.median_per_sqm : (vin.market_rent_sqm != null ? vin.market_rent_sqm : null);
     if (rsqm != null && area) {
@@ -321,7 +321,7 @@
     var i = inputs();
     if (!i.plz && !i.ort) { toast('Bitte mindestens PLZ oder Ort ausfüllen'); return; }
     var _dph = await _dpmbHealth();
-    if (_dph && _dph.mode === 'stub') { /* v772-dpmb-stub */
+    if (false && _dph && _dph.mode === 'stub') { /* v892-dp-live: DealPilot ruft IMMER den Microservice (entkoppelt von AVM_MODE) */
       var _p = _dpmbStubPayload(i);
       D = mapCard(_p); mode = 'med'; collapsed = false; /* v830-mb-expanded: nach Abruf offen */
       render();
