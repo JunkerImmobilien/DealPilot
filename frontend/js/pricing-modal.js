@@ -130,6 +130,7 @@
   function _esc(v){return String(v==null?'':v).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function _planCardsHtml(){
     var KER={free:2,starter:10,investor:40,pro:100};
+    var _cur=(window.DealPilotConfig&&DealPilotConfig.pricing&&DealPilotConfig.pricing.currentKey)?DealPilotConfig.pricing.currentKey():'';
     return '<div class="ppg">'+PLANS.map(function(p,i){
       var stars=''; for(var z=0;z<=i;z++)stars+='\u2605';
       var feats=(p.features||[]).filter(function(f){return !/Kerosin/.test(f);}).slice(0,8);
@@ -144,7 +145,7 @@
           '<div class="tk-note">'+_esc(note)+'</div>'+
           '<div class="tk-ker"><span>\u2708</span>'+(KER[p.key]||0)+' L Kerosin&nbsp;/&nbsp;Monat</div>'+
           '<ul class="tk-feat">'+feats.map(function(f){return '<li>'+_esc(f)+'</li>';}).join('')+'</ul>'+
-          '<a class="tk-cta" href="#" data-plan="'+p.key+'">'+_esc(p.ctaText||((p.title||p.label)+' w\u00e4hlen'))+'</a>'+
+          (p.key===_cur?'<a class="tk-cta tk-cta-cur" href="#" data-plan="'+p.key+'">\u2713 Dein aktueller Plan</a>':'<a class="tk-cta" href="#" data-plan="'+p.key+'">'+_esc(p.ctaText||((p.title||p.label)+' w\u00e4hlen'))+'</a>')+
           '<div class="tk-rip"><span class="bar"></span><span class="bp-txt">\u2708 Boarding Pass \u00b7 DP-0'+(i+1)+'</span></div>'+
         '</div>'+
       '</div>';
@@ -184,9 +185,164 @@
       P+' .tk-rip .bar{flex:1;max-width:56%;height:20px;background:repeating-linear-gradient(90deg,#1a1305 0 2px,transparent 2px 4px,#1a1305 4px 5px,transparent 5px 9px);border-radius:2px;opacity:.8}'+
       P+" .tk-rip .bp-txt{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#8a7c60;white-space:nowrap}"+
       '@media(max-width:820px){'+P+'{grid-template-columns:1fr 1fr}}'+
-      '@media(max-width:520px){'+P+'{grid-template-columns:1fr}}';
+      '@media(max-width:520px){'+P+'{grid-template-columns:1fr}}'+
+      _kerosinMatrixCss();
     document.head.appendChild(st);
   }
+  // ═══════════════════════════════════════════════════════════════
+  // v885-plan-landing: Kerosin-Streifen (bw) + Cockpit-Matrix (mx) + CSS
+  // ═══════════════════════════════════════════════════════════════
+  var KPACKS = [
+    { l:10,  p:2,  ppl:'0,20',  id:'kerosin_10',  cls:'\u2708 Kurzstrecke',        use:'Mal schnell pr\u00fcfen',     reach:'\u2248 2 Reports oder 5 Markteinsch\u00e4tzungen' },
+    { l:28,  p:5,  ppl:'0,18',  id:'kerosin_28',  cls:'\u2708\u2708 Mittelstrecke', use:'Mehrere Deals',           reach:'\u2248 7 Reports oder 14 Markteinsch\u00e4tzungen' },
+    { l:90,  p:15, ppl:'0,167', id:'kerosin_90',  cls:'\u2708\u2708\u2708 Langstrecke', use:'Aktiver Investor',    reach:'\u2248 22 Reports oder 45 Markteinsch\u00e4tzungen', best:true },
+    { l:160, p:25, ppl:'0,156', id:'kerosin_160', cls:'\ud83c\udf0d Interkontinental', use:'Maximale Reichweite', reach:'\u2248 40 Reports oder 80 Markteinsch\u00e4tzungen' }
+  ];
+  function _bwSegsHtml(idx){
+    return '<div class="bw-segs">' + KPACKS.map(function(k,i){
+      return '<div class="bw-seg'+(i===idx?' on':'')+'" data-i="'+i+'">' +
+        '<span class="bw-seg-l">'+k.l+' L</span><span class="bw-seg-p">'+k.p+' \u20ac</span></div>';
+    }).join('') + '</div>';
+  }
+  function _bwPassHtml(idx){
+    var k = KPACKS[idx];
+    return '<div class="bw'+(k.best?' best':'')+'" id="pm-bw">' +
+      (k.best?'<span class="bw-pop">Beliebt</span>':'') +
+      '<div class="bw-stub"><div class="bw-class">'+k.cls+'</div><div class="bw-l">'+k.l+'</div><div class="bw-ll">Liter Kerosin</div></div>' +
+      '<div class="bw-perf"></div>' +
+      '<div class="bw-body">' +
+        '<div class="bw-col"><span class="bw-k">Reichweite</span><span class="bw-v">'+k.reach+'</span></div>' +
+        '<div class="bw-col"><span class="bw-k">Preis / Liter</span><span class="bw-v"><span class="dp">'+k.ppl+' \u20ac</span> / L</span></div>' +
+        '<div class="bw-col"><span class="bw-k">Einsatz</span><span class="bw-v">'+k.use+'</span></div>' +
+        '<div class="bw-col"><span class="bw-k">Verfall</span><span class="bw-v"><span class="dp">nie</span> \u00b7 kein Abo</span></div>' +
+      '</div>' +
+      '<div class="bw-gate"><div class="bw-price">'+k.p+' \u20ac<small>einmalig \u00b7 '+k.l+' L</small></div>' +
+        '<a class="bw-cta" href="#" data-pack-id="'+k.id+'" onclick="window._buyCreditPackDirect(this); return false;">Kerosin kaufen</a></div>' +
+    '</div>';
+  }
+  function _kerosinStripHtml(){
+    var i = 2; // 90 L (Beliebt) als Default
+    return '<div id="pm-kerosin-strip">' + _bwSegsHtml(i) + _bwPassHtml(i) + '</div>';
+  }
+  function _wireKerosinStrip(){
+    var wrap = document.getElementById('pm-kerosin-strip');
+    if (!wrap) return;
+    function bind(){
+      Array.prototype.forEach.call(wrap.querySelectorAll('.bw-seg'), function(seg){
+        seg.addEventListener('click', function(){
+          var i = +seg.getAttribute('data-i');
+          wrap.innerHTML = _bwSegsHtml(i) + _bwPassHtml(i);
+          bind();
+        });
+      });
+    }
+    bind();
+  }
+  function _mxCell(v){
+    if (v === '\u2713') return '<span class="mxck">\u2713</span>';
+    if (v === '\u2013') return '<span class="mxds">\u2013</span>';
+    if (v === '\u221e') return '<span class="mxinf">\u221e</span>';
+    if (v.indexOf('\u2713 ') === 0) return '<span class="mxck">\u2713</span> <span class="mxlbl">'+v.slice(2)+'</span>';
+    return '<span class="mxlbl">'+v+'</span>';
+  }
+  function _cockpitMatrixHtml(){
+    var R = [
+      ['Objekte','1','5','25','\u221e'],
+      ['Kerosin / Monat','2 L','10 L','40 L','100 L'],
+      ['Kerosin nachtanken (Liter-Pakete)','\u2013','\u2713','\u2713','\u2713'],
+      ['DealPilot Score (5 Faktoren)','\u2713','\u2713','\u2713','\u2713'],
+      ['Investor Deal Score (24 KPIs)','Demo','\u2013','\u2713','\u2713'],
+      ['Boarding (Schnellpr\u00fcfung)','\u2713','\u2713','\u2713','\u2713'],
+      ['Pilot-Analyse (KI)','vereinfacht','vereinfacht','Vollversion','Vollversion'],
+      ['Pilot-Lagebewertung (KI)','\u2013','\u2713','\u2713','\u2713'],
+      ['DealPilot Marktreport','\u2013','\u2713','\u2713','\u2713'],
+      ['Deal-Aktion (Anfragen / Gutachten)','\u2713','\u2713','\u2713','\u2713'],
+      ['RND-Einsch\u00e4tzung &amp; Gutachten-Anfrage','nur Anfrage','nur Anfrage','\u2713','\u2713'],
+      ['Marktdatenfelder','gesperrt*','gesperrt*','\u2713','\u2713'],
+      ['Live-Marktzinsen','\u2013','\u2013','\u2713','\u2713'],
+      ['Mietspiegel-Vergleich','\u2013','manuell','automatisch','automatisch'],
+      ['Marktdaten-Schnittstellen (Marktwert-Abrufe)','Demo','zubuchbar','zubuchbar','zubuchbar'],
+      ['BMF-Rechner &amp; Export','\u2013','\u2013','\u2713','\u2713 Advanced'],
+      ['Finanzierung','alle Modelle als Demo','Hauptdarlehen','Haupt- + Zusatz + KfW + BSV','wie Investor'],
+      ['AfA-Methoden','Demo','linear + \u00a7 7b','linear + degressiv + \u00a7 7b','wie Investor'],
+      ['Werbungskosten-Modul','Demo','\u2713','\u2713','\u2713'],
+      ['Investment-PDF','Wasserzeichen','\u2713','\u2713','\u2713'],
+      ['Werbungskosten-PDF','\u2013','\u2013','\u2713','\u2713'],
+      ['Track-Record-PDF','Wasserzeichen','\u2013','\u2713','\u2713'],
+      ['Eigenes Logo &amp; Footer im PDF','\u2013','\u2013','\u2713','\u2713'],
+      ['Bankexport (PDF / Excel)','\u2013','\u2013','\u2713','\u2713'],
+      ['Rohdatenexport (CSV / XLSX)','\u2013','\u2013','\u2013','\u2713'],
+      ['JSON-Objektsicherung','\u2013','\u2013','\u2013','\u2713'],
+      ['Expos\u00e9-Import','\u2713','\u2713','\u2713','\u2713'],
+      ['Marktbericht-Import','\u2713','\u2713','\u2713','\u2713'],
+      ['Excel-Import','\u2013','\u2713','\u2713','\u2713'],
+      ['API-Zugang','\u2013','\u2013','\u2013','\u2713'],
+      ['Migration &amp; Setup-Service','\u2013','\u2013','\u2013','\u2713 (3 h)']
+    ];
+    var h = '<div class="mx-wrap"><table class="mx"><thead><tr>' +
+      '<th class="ft">Funktion</th><th>Free</th><th>Starter</th>' +
+      '<th class="best"><span class="bstar">\u2605</span>Investor</th><th>Pro</th></tr></thead><tbody>';
+    R.forEach(function(r){
+      h += '<tr><td class="ft">'+r[0]+'</td>' +
+        '<td>'+_mxCell(r[1])+'</td>' +
+        '<td>'+_mxCell(r[2])+'</td>' +
+        '<td class="best">'+_mxCell(r[3])+'</td>' +
+        '<td>'+_mxCell(r[4])+'</td></tr>';
+    });
+    return h + '</tbody></table></div>';
+  }
+  function _kerosinMatrixCss(){
+    var M = '#pricing-modal ';
+    return (
+      M+'.dp-ac{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text;color:transparent}' +
+      M+'.ppg .tk-cta-cur{border-color:rgba(201,168,76,.4);color:#8a7c60;background:#f7f2e6;pointer-events:none;font-weight:600}' +
+      /* bw-Streifen */
+      M+'.bw-segs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:720px;margin:8px auto 20px}' +
+      M+'.bw-seg{display:flex;flex-direction:column;gap:2px;align-items:center;font-family:\'JetBrains Mono\',monospace;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 8px;cursor:pointer;transition:.15s;color:rgba(255,255,255,.6)}' +
+      M+'.bw-seg .bw-seg-l{font-family:\'Space Grotesk\',sans-serif;font-size:19px;font-weight:700;color:#fff}' +
+      M+'.bw-seg .bw-seg-p{font-size:11px}' +
+      M+'.bw-seg.on{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-color:transparent}' +
+      M+'.bw-seg.on .bw-seg-l,'+M+'.bw-seg.on .bw-seg-p{color:#221a06}' +
+      M+'.bw{width:100%;margin:0;position:relative;display:grid;grid-template-columns:220px 22px 1fr 230px;align-items:stretch;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 40px 90px -40px rgba(0,0,0,.8),0 0 0 1px rgba(201,168,76,.35)}' +
+      M+'.bw.best{box-shadow:0 44px 100px -40px rgba(201,168,76,.5),0 0 0 1.5px #C9A84C}' +
+      M+'.bw-pop{position:absolute;top:12px;right:18px;font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#221a06;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-radius:20px;padding:3px 11px;font-weight:700;z-index:3}' +
+      M+'.bw-stub{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;padding:26px 20px;text-align:center;display:flex;flex-direction:column;justify-content:center}' +
+      M+'.bw-class{font-family:\'JetBrains Mono\',monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;opacity:.88}' +
+      M+'.bw-l{font-family:\'Space Grotesk\',sans-serif;font-size:50px;font-weight:700;line-height:1;margin-top:3px}' +
+      M+'.bw-ll{font-family:\'JetBrains Mono\',monospace;font-size:9px;font-weight:600}' +
+      M+'.bw-perf{background-image:radial-gradient(circle,#0d0c0a 3.5px,transparent 3.8px);background-size:20px 14px;background-position:center;background-repeat:repeat-y}' +
+      M+'.bw-body{background:#fff;display:grid;grid-template-columns:repeat(4,1fr);gap:0}' +
+      M+'.bw-col{padding:22px;border-right:1px solid rgba(27,24,21,.08);display:flex;flex-direction:column;justify-content:center}' +
+      M+'.bw-col:last-child{border-right:0}' +
+      M+'.bw-k{display:block;font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#6b6250;margin-bottom:5px}' +
+      M+'.bw-v{font-size:13px;color:#1a1305;font-weight:500;line-height:1.35}' +
+      M+'.bw-v .dp{color:#b8932f;font-weight:600}' +
+      M+'.bw-gate{background:#fff;padding:22px 20px;text-align:center;border-left:1px dashed rgba(27,24,21,.22);display:flex;flex-direction:column;justify-content:center;gap:12px}' +
+      M+'.bw-price{font-family:\'Space Grotesk\',sans-serif;font-size:34px;font-weight:700;color:#1a1305}' +
+      M+'.bw-price small{font-family:\'JetBrains Mono\',monospace;font-size:10px;color:#6b6250;display:block;font-weight:400;margin-top:2px}' +
+      M+'.bw-cta{font-family:\'JetBrains Mono\',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;border-radius:11px;padding:12px 16px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;font-weight:700;cursor:pointer}' +
+      /* mx-Matrix */
+      M+'.mx-wrap{overflow-x:auto;border-radius:16px;background:#fff;box-shadow:0 30px 66px -40px rgba(0,0,0,.8),0 0 0 1px rgba(201,168,76,.3)}' +
+      M+'.mx{width:100%;border-collapse:collapse;min-width:720px;font-size:13px}' +
+      M+'.mx thead th{position:sticky;top:0;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;font-family:\'JetBrains Mono\',monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;padding:15px 14px;text-align:center}' +
+      M+'.mx thead th.ft{text-align:left;background:#efe6cf;color:#5a4711}' +
+      M+'.mx thead th.best .bstar{margin-right:5px}' +
+      M+'.mx td{padding:12px 14px;text-align:center;border-bottom:1px solid rgba(27,24,21,.07);color:#1a1305;background:#fff;vertical-align:middle}' +
+      M+'.mx td.ft{text-align:left;font-weight:500}' +
+      M+'.mx td.best{background:rgba(201,168,76,.1)}' +
+      M+'.mx tbody tr:hover td{background:#faf6ea}' +
+      M+'.mx tbody tr:hover td.best{background:rgba(201,168,76,.16)}' +
+      M+'.mx tbody tr:last-child td{border-bottom:0}' +
+      M+'.mxck{color:#2f8a58;font-weight:700}' +
+      M+'.mxds{color:rgba(27,24,21,.28)}' +
+      M+'.mxinf{font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:18px;color:#1a1305}' +
+      M+'.mxlbl{font-family:\'JetBrains Mono\',monospace;font-size:10px;color:#6b5410;font-weight:600;background:rgba(201,168,76,.16);border:1px solid rgba(201,168,76,.32);border-radius:6px;padding:3px 8px;display:inline-block;line-height:1.35}' +
+      M+'.mx-foot{font-family:\'JetBrains Mono\',monospace;font-size:10px;color:rgba(255,255,255,.55);margin-top:12px;text-align:center}' +
+      '@media(max-width:900px){'+M+'.bw{grid-template-columns:150px 16px 1fr}'+M+'.bw-gate{grid-column:1/-1;border-left:0;border-top:1px dashed rgba(27,24,21,.22);flex-direction:row;justify-content:space-between}'+M+'.bw-body{grid-template-columns:1fr}'+M+'.bw-col{border-right:0;border-bottom:1px solid rgba(27,24,21,.08)}'+M+'.bw-col:last-child{border-bottom:0}}' +
+      '@media(max-width:520px){'+M+'.bw-segs{grid-template-columns:1fr 1fr}}'
+    );
+  }
+
   function _updatePpgPrices(period){
     var host=document.getElementById('pricing-plugin-host'); if(!host)return;
     Array.prototype.forEach.call(host.querySelectorAll('.ppg .tk-price'),function(pr){
@@ -237,6 +393,7 @@
       _initToggle();
       _bindCtaHandlers();
       _mountPlanCards();
+      _wireKerosinStrip();
     }, 30);
   }
 
@@ -247,9 +404,9 @@
     return '' +
       // Header
       '<div class="dp-container dp-header">' +
-        '<span class="dp-pill">Mein Plan</span>' +
-        '<h2 class="dp-h1">Wählen Sie Ihren DealPilot-Plan</h2>' +
-        '<p class="dp-sub">Vom kostenlosen Test bis zum unbegrenzten Profi-Werkzeug — jederzeit kündbar, jederzeit upgrade- oder downgradebar.</p>' +
+        '<span class="dp-pill">Dein Plan</span>' +
+        '<h2 class="dp-h1">Vier Pakete. <span class="dp-ac">Ein Cockpit.</span></h2>' +
+        '<p class="dp-sub">Vom kostenlosen Testflug bis zum Profi-Cockpit f\u00fcr Sachverst\u00e4ndige. Jederzeit wechselbar, kein Abo-Kleingedrucktes.</p>' +
         '<div class="dp-toggle" role="tablist" aria-label="Abrechnungszeitraum">' +
           '<button type="button" class="dp-toggle-btn dp-on" data-period="monthly" aria-selected="true">Monatlich</button>' +
           '<button type="button" class="dp-toggle-btn" data-period="yearly" aria-selected="false">Jährlich <span class="dp-toggle-save">~17 % gespart</span></button>' +
@@ -297,31 +454,23 @@
         '</article>' +
       '</div>' +
 
-      // v490-kerosin-modal: Kerosin-Tacho-Karten (ersetzt KI-Credits + Marktdaten-Credits)
+      // v885-plan-landing: Kerosin-Nachtank-Streifen (bw-Boarding-Pass, Landing-Look)
       '<div class="dp-container dp-section">' +
         '<div class="dp-section-head">' +
-          '<span class="dp-pill dp-pill-alt">Kerosin</span>' +
+          '<span class="dp-pill dp-pill-alt">Kerosin nachtanken</span>' +
           '<h2 class="dp-h2">Volltanken. Durchstarten.</h2>' +
-          '<p class="dp-sub">' +
-            '<strong>1 Liter = 1 Pilot-Anfrage.</strong> Dein Plan füllt den Tank monatlich (Starter 10 L · Investor 40 L · Pro 100 L) — gekauftes Kerosin kommt obendrauf, wird zuletzt verbraucht und verfällt nie.' /* v491-hybrid */ +
-          '</p>' +
+          '<p class="dp-sub"><strong>1 Liter = 1 Pilot-Anfrage.</strong> Ein Pass, umschaltbar \u2014 gekauftes Kerosin kommt obendrauf, wird zuletzt verbraucht und verf\u00e4llt nie.</p>' +
         '</div>' +
-        '<div class="dp-credits-grid">' +
-          _kerosinCard(10,  2,  0.20,  'kerosin_10',  'Mal schnell prüfen',  '✈ Kurzstrecke',       164.8, -57.6, '≈ 2 Reports oder 5 Markteinschätzungen',   false) +
-          _kerosinCard(28,  5,  0.18,  'kerosin_28',  'Mehrere Deals',        '✈✈ Mittelstrecke',   116.6, -14.4, '≈ 7 Reports oder 14 Markteinschätzungen',  false) +
-          _kerosinCard(90,  15, 0.167, 'kerosin_90',  'Aktiver Investor',     '✈✈✈ Langstrecke',  56.3,  39.6,  '≈ 22 Reports oder 45 Markteinschätzungen', true)  +
-          _kerosinCard(160, 25, 0.156, 'kerosin_160', 'Maximale Reichweite',  '🌍 Interkontinental', 14.1,  77.4,  '≈ 40 Reports oder 80 Markteinschätzungen', false) +
-        '</div>' +
-        '<p class="dp-note" style="text-align:center;margin-top:14px">Kerosin ist ab dem Starter-Plan zubuchbar · verfällt nicht · kein Abo.</p>' +
+        _kerosinStripHtml() +
+        '<p class="dp-note" style="text-align:center;margin-top:14px">Kerosin ist ab dem Starter-Plan zubuchbar \u00b7 verf\u00e4llt nicht \u00b7 kein Abo.</p>' +
       '</div>' +
 
       // V63.82: Feature-Übersicht — vollständige Vergleichstabelle
       '<div class="dp-container dp-feature-table-wrap">' +
-        '<h3 class="dp-feature-table-h">Feature-Übersicht — alle Pläne im Vergleich</h3>' +
-        '<p class="dp-feature-table-sub">Klare Gegenüberstellung aller Features pro Plan.</p>' +
-        '<div class="dp-feature-table-scroll">' +
-          _renderFeatureTable() +
-        '</div>' +
+        '<h3 class="dp-feature-table-h">Cockpit-Matrix</h3>' +
+        '<p class="dp-feature-table-sub">Klare Gegen\u00fcberstellung aller Features pro Plan.</p>' +
+        _cockpitMatrixHtml() +
+        '<div class="mx-foot">* Marktdatenfelder in Free &amp; Starter als Vorschau gesperrt, ab Investor freigeschaltet.</div>' +
       '</div>' +
 
       // V192: Service & Support-Block entfernt (auf User-Wunsch)
@@ -695,6 +844,19 @@
    */
   function _onPlanSelect(planKey, period) {
     if (!window.DealPilotConfig || !DealPilotConfig.pricing) return;
+
+    // v885-plan-landing: status-basiert. Aktueller Plan -> Hinweis; zahlendes Abo -> Portal;
+    // Free/kein Abo -> Stripe-Checkout (Entscheidung A).
+    var _cur = (DealPilotConfig.pricing.currentKey ? DealPilotConfig.pricing.currentKey() : 'free') || 'free';
+    if (planKey === _cur) {
+      if (typeof toast === 'function') toast('Das ist bereits dein aktueller Plan.');
+      return;
+    }
+    if (_cur !== 'free' && typeof Sub !== 'undefined' && typeof Sub.openPortal === 'function') {
+      // bestehendes zahlendes Abo -> Plan-Wechsel im Stripe Customer Portal
+      Sub.openPortal();
+      return;
+    }
 
     // V181: Stripe-Checkout ist jetzt der einzige Flow (kein Demo-Switch mehr).
     _startStripeCheckout(planKey, period);

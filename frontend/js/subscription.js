@@ -296,6 +296,8 @@ var Sub = (function() {
 // ═══════════════════════════════════════════════════
 
 async function showPricingModal() {
+  // v885-plan-landing: nur EIN Plan-Modal — Delegation an das neue Landing-Optik-Modal.
+  if (typeof window.openPricingModal === 'function') { window.openPricingModal(); return; }
   var existing = document.getElementById('pricing-modal');
   if (existing) existing.remove();
 
