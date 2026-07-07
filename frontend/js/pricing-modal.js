@@ -126,6 +126,90 @@
   // ═══════════════════════════════════════════════════════════════
   // MODAL-RENDER
   // ═══════════════════════════════════════════════════════════════
+  /* v884-flugklassen: Plan-Karten im Landing-Look (geteilte Optik) */
+  function _esc(v){return String(v==null?'':v).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function _planCardsHtml(){
+    var KER={free:2,starter:10,investor:40,pro:100};
+    return '<div class="ppg">'+PLANS.map(function(p,i){
+      var stars=''; for(var z=0;z<=i;z++)stars+='\u2605';
+      var feats=(p.features||[]).filter(function(f){return !/Kerosin/.test(f);}).slice(0,8);
+      var note=(p.price_yearly>0)?('oder '+p.price_yearly+' \u20ac/Jahr'):(p.footnote||'');
+      return '<div class="tk'+(p.best?' best':'')+'" data-plan="'+p.key+'">'+
+        '<div class="tk-stub"><div class="tk-stars">'+stars+'</div>'+
+          (p.best?'<span class="tk-bs">\u2605 Bestseller</span>':'')+
+          '<div class="tk-tag">'+_esc(p.tag||'')+'</div><div class="tk-name">'+_esc(p.title||p.label)+'</div></div>'+
+        '<div class="tkperf"></div>'+
+        '<div class="tk-body">'+
+          '<div class="tk-price" data-m="'+(p.price_monthly||0)+'" data-y="'+(p.price_yearly||0)+'"><b>'+(p.price_monthly||0)+'</b><span class="cur">\u20ac</span>'+(p.price_monthly>0?'<span class="per">/ Monat</span>':'')+'</div>'+
+          '<div class="tk-note">'+_esc(note)+'</div>'+
+          '<div class="tk-ker"><span>\u2708</span>'+(KER[p.key]||0)+' L Kerosin&nbsp;/&nbsp;Monat</div>'+
+          '<ul class="tk-feat">'+feats.map(function(f){return '<li>'+_esc(f)+'</li>';}).join('')+'</ul>'+
+          '<a class="tk-cta" href="#" data-plan="'+p.key+'">'+_esc(p.ctaText||((p.title||p.label)+' w\u00e4hlen'))+'</a>'+
+          '<div class="tk-rip"><span class="bar"></span><span class="bp-txt">\u2708 Boarding Pass \u00b7 DP-0'+(i+1)+'</span></div>'+
+        '</div>'+
+      '</div>';
+    }).join('')+'</div>';
+  }
+  function _injectPlanCss(){
+    if(document.getElementById('ppg-css'))return;
+    var st=document.createElement('style'); st.id='ppg-css';
+    var P='#pricing-modal .ppg';
+    st.textContent=
+      P+'{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:8px 0 4px;align-items:stretch}'+
+      P+' .tk{display:flex;flex-direction:column;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 30px 66px -38px rgba(0,0,0,.8),0 0 0 1px rgba(201,168,76,.28)}'+
+      P+' .tk.best{box-shadow:0 42px 92px -38px rgba(201,168,76,.5),0 0 0 1.6px #C9A84C}'+
+      P+' .tk-stub{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;padding:14px 20px 12px;position:relative}'+
+      P+' .tk-stars{font-size:11px;letter-spacing:3px;color:#221a06;line-height:1;margin-bottom:5px}'+
+      P+" .tk-bs{position:absolute;top:13px;right:14px;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;background:#0a0a0a;color:#E8CC7A;border-radius:20px;padding:3px 9px;font-weight:700}"+
+      P+" .tk-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#5a4711}"+
+      P+" .tk-name{font-family:'Space Grotesk',sans-serif;font-size:23px;font-weight:700;color:#1a1305;margin-top:1px}"+
+      P+' .tk-body{background:#fff;padding:16px 20px 20px;display:flex;flex-direction:column;flex:1}'+
+      P+' .tk-price{display:flex;align-items:baseline;gap:3px;margin-bottom:2px}'+
+      P+" .tk-price b{font-family:'Space Grotesk',sans-serif;font-size:42px;font-weight:700;color:#1a1305;line-height:1}"+
+      P+' .tk.best .tk-price b{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}'+
+      P+" .tk-price .cur{font-family:'Space Grotesk',sans-serif;font-size:18px;color:#1a1305}"+
+      P+" .tk-price .per{font-family:'JetBrains Mono',monospace;font-size:11px;color:#6b6250;margin-left:3px}"+
+      P+" .tk-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:#b8932f;min-height:14px;margin-bottom:14px}"+
+      P+" .tk-ker{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.03em;color:#1a1305;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.34);border-radius:9px;padding:7px 10px;display:flex;align-items:center;gap:7px;margin-bottom:16px}"+
+      P+' .tk-ker span{color:#b8932f}'+
+      P+' .tk-feat{list-style:none;padding:0;margin:0 0 20px;display:flex;flex-direction:column;gap:9px;flex:1}'+
+      P+' .tk-feat li{font-size:13px;line-height:1.4;color:#3a352c;padding-left:22px;position:relative}'+
+      P+" .tk-feat li::before{content:'\u2713';position:absolute;left:0;top:0;color:#2f8a58;font-weight:700}"+
+      P+" .tk-cta{display:block;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;border-radius:11px;padding:13px 16px;border:1px solid #b8932f;color:#b8932f;cursor:pointer;transition:.16s}"+
+      P+' .tk-cta:hover{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;border-color:transparent;font-weight:700}'+
+      P+' .tk.best .tk-cta{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;border-color:transparent;font-weight:700}'+
+      P+' .tkperf{height:15px;position:relative;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f)}'+
+      P+' .tkperf::before{content:"";position:absolute;left:14px;right:14px;top:50%;transform:translateY(-50%);border-top:2px dotted rgba(10,8,3,.5)}'+
+      P+' .tk-rip{position:relative;background:#fff;border-top:2px dashed #d8d2c2;padding:9px 4px 2px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px}'+
+      P+' .tk-rip .bar{flex:1;max-width:56%;height:20px;background:repeating-linear-gradient(90deg,#1a1305 0 2px,transparent 2px 4px,#1a1305 4px 5px,transparent 5px 9px);border-radius:2px;opacity:.8}'+
+      P+" .tk-rip .bp-txt{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#8a7c60;white-space:nowrap}"+
+      '@media(max-width:820px){'+P+'{grid-template-columns:1fr 1fr}}'+
+      '@media(max-width:520px){'+P+'{grid-template-columns:1fr}}';
+    document.head.appendChild(st);
+  }
+  function _updatePpgPrices(period){
+    var host=document.getElementById('pricing-plugin-host'); if(!host)return;
+    Array.prototype.forEach.call(host.querySelectorAll('.ppg .tk-price'),function(pr){
+      var m=pr.getAttribute('data-m'),y=pr.getAttribute('data-y');
+      var b=pr.querySelector('b'),per=pr.querySelector('.per');
+      if(period==='yearly'&&y&&(+y)>0){ if(b)b.textContent=y; if(per)per.textContent='/ Jahr'; }
+      else { if(b)b.textContent=m; if(per)per.textContent=((+m)>0?'/ Monat':''); }
+    });
+  }
+  function _mountPlanCards(){
+    var host=document.getElementById('pricing-plugin-host'); if(!host)return;
+    var tl=host.querySelector('.dp-timeline'); if(tl){var tc=tl.closest('.dp-container'); if(tc)tc.style.display='none';}
+    var card=host.querySelector('.dp-card'); var target=card?card.closest('.dp-container'):null; if(!target)return;
+    target.innerHTML=_planCardsHtml();
+    Array.prototype.forEach.call(host.querySelectorAll('.ppg .tk-cta'),function(a){
+      a.addEventListener('click',function(e){e.preventDefault();_onPlanSelect(a.getAttribute('data-plan'),(typeof STATE!=='undefined'&&STATE.period)||'monthly');});
+    });
+    Array.prototype.forEach.call(host.querySelectorAll('.dp-toggle-btn'),function(bt){
+      bt.addEventListener('click',function(){_updatePpgPrices(bt.getAttribute('data-period')||'monthly');});
+    });
+    _updatePpgPrices((typeof STATE!=='undefined'&&STATE.period)||'monthly');
+  }
+
   function _renderModal() {
     // Wenn schon offen, nicht doppelt rendern
     if (document.getElementById('pricing-modal')) return;
@@ -149,10 +233,10 @@
 
     // Plugin-JS initialisieren (nach kurzem Delay damit DOM ready ist)
     setTimeout(function() {
-      _initTimeline();
+      _injectPlanCss(); /* v884-flugklassen */
       _initToggle();
       _bindCtaHandlers();
-      _renderCard(STATE.activeKey);
+      _mountPlanCards();
     }, 30);
   }
 
