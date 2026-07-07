@@ -871,9 +871,21 @@ window.DealPilotDatenraum = (function() {
     return lines.join('\n');
   }
 
+  /* v889-docs: alle im Datenraum bestaetigten Dok-Keys (persoenlich + Objekt) */
+  function getConfirmedDocKeys(objId){
+    var s = getAll() || {}; var out = [];
+    var pc = (s.persoenlich && s.persoenlich.docs_checked) || {};
+    Object.keys(pc).forEach(function(k){ if(pc[k] && out.indexOf(k)<0) out.push(k); });
+    var o = (objId && s.objekte && s.objekte[objId]) || null;
+    var oc = (o && o.docs_checked) || {};
+    Object.keys(oc).forEach(function(k){ if(oc[k] && out.indexOf(k)<0) out.push(k); });
+    return out;
+  }
+
   return {
     DOCS_PERSOENLICH: DOCS_PERSOENLICH,
     DOCS_OBJEKT: DOCS_OBJEKT,
+    getConfirmedDocKeys: getConfirmedDocKeys,
     getAll: getAll,
     getPersoenlich: getPersoenlich,
     setPersoenlich: setPersoenlich,

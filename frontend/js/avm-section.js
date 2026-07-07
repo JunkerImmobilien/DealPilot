@@ -13,17 +13,19 @@
   'use strict';
   var HOST = 'oab-results';
   var _ext = {};                 // { PriceHubble:{...}, Sprengnetter:{...} }
+  var _extSig = '';              // v893b-minsig: Signatur des letzten Provider-Satzes
   var _dp = null;                // { D, mode, api }
   var st = { span: 'mid', view: 'cards', min: false };
 
   function $(id) { return document.getElementById(id); }
   function nd(v) {
     if (v == null) return 0;
-    var s = String(v).replace(/[^0-9,.-]/g, '').replace(/\./g, '').replace(',', '.');
-    var n = parseFloat(s); return isFinite(n) ? n : 0;
+    /* v892c-nd: deutsche UND Punkt-Dezimal-Formate robust lesen (nur Tausender-Punkte entfernen) */
+    var n = parseFloat(String(v).replace(/[^0-9,.-]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
+    return isFinite(n) ? n : 0;
   }
-  function KP() { var e = $('kp'); return e ? nd(e.value) : 0; }
-  function WFL() { var e = $('wfl'); return e ? nd(e.value) : 0; }
+  function KP() { var e = $('kp') || $('qc_kp'); return e ? nd(e.value) : 0; } /* v892b-qcfields */
+  function WFL() { var e = $('wfl') || $('qc_wfl'); return e ? nd(e.value) : 0; }
   function fmt(n) { return Math.round(n).toLocaleString('de-DE'); }
   function dec(n) { return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function spanLbl(b) { return b === 'low' ? 'Unten' : b === 'high' ? 'Oben' : '\u00d8'; }
@@ -78,6 +80,7 @@
       microRaw: (r.scoreMicro != null ? r.scoreMicro : null),
       macroRaw: (r.scoreMacro != null ? r.scoreMacro : null),
       compare: (Array.isArray(r.comparePrices) && r.comparePrices.length) ? r.comparePrices : null,
+      stub: (r.mode === 'stub'), /* v892-schwanken */
       _ext: name
     };
   }
@@ -93,7 +96,8 @@
       compare: (D.compare && D.compare.length) ? D.compare : null, /* v783-dp-compare */
       mw: { low: band('low'), mid: band('med'), high: band('high') },
       mm: { low: bandM('low'), mid: bandM('med'), high: bandM('high') },
-      eurSqm: null, mmEurSqm: null,
+      eurSqm: (o.D.area && D.mw && D.mw.med) ? Math.round(D.mw.med / o.D.area) : null, /* v892-sqm */
+      mmEurSqm: (o.D.area && D.mm && D.mm.med) ? +(D.mm.med / o.D.area).toFixed(2) : null,
       accLabel: accLabel, accCol: accCol,
       accTier: (pct != null) ? (pct >= 75 ? 'hoch' : pct >= 50 ? 'mittel' : 'niedrig') : tierFromLabel(D.conf && D.conf.label),
       bewertung: D.rating || '\u2013',
@@ -102,12 +106,54 @@
       compare: null, _dp: true
     };
   }
+  /* v892-schwanken: SN/PH im Stub deterministisch um die DealPilot-Einschaetzung streuen. */
+  function _hashWobble(n) { var x = Math.abs(Math.round(n || 0)) % 1000; return ((x / 999) - 0.5) * 0.05; }
+  function _applyClusterToSource() {
+    /* v892d: SN/PH-Stub um die DealPilot-Einschaetzung streuen — auf der QUELLE, damit
+       Anzeige UND Uebernahme (_oabApplyExternal -> window._oabAvm) denselben Wert nutzen. */
+    if (!(_dp && _dp.D && _dp.D.mw)) return;
+    var anchorMw = _dp.D.mw.med, anchorMm = (_dp.D.mm && _dp.D.mm.med) || null;
+    var BASE = { Sprengnetter: 0.94, PriceHubble: 0.89 };
+    ['Sprengnetter', 'PriceHubble'].forEach(function (name) {
+      var src = _ext[name];
+      if (!src || src.mode !== 'stub') return;
+      if (!src._v892o) {
+        src._v892o = { marktwert: src.marktwert, low: src.low, high: src.high,
+          marktmieteCold: src.marktmieteCold, marktmieteLow: src.marktmieteLow, marktmieteHigh: src.marktmieteHigh,
+          eurPerSqm: src.eurPerSqm, marktmieteEurSqm: src.marktmieteEurSqm };
+      }
+      var o = src._v892o, f = (BASE[name] != null ? BASE[name] : 0.92);
+      if (anchorMw && o.marktwert) {
+        var sW = (anchorMw * (f + _hashWobble(o.marktwert))) / o.marktwert;
+        src.marktwert = Math.round(o.marktwert * sW);
+        if (o.low != null) src.low = Math.round(o.low * sW);
+        if (o.high != null) src.high = Math.round(o.high * sW);
+        if (o.eurPerSqm != null) src.eurPerSqm = Math.round(o.eurPerSqm * sW);
+      }
+      if (anchorMm && o.marktmieteCold) {
+        var sR = (anchorMm * (f + _hashWobble(o.marktmieteCold))) / o.marktmieteCold;
+        src.marktmieteCold = Math.round(o.marktmieteCold * sR);
+        if (o.marktmieteLow != null) src.marktmieteLow = Math.round(o.marktmieteLow * sR);
+        if (o.marktmieteHigh != null) src.marktmieteHigh = Math.round(o.marktmieteHigh * sR);
+        if (o.marktmieteEurSqm != null) src.marktmieteEurSqm = +(o.marktmieteEurSqm * sR).toFixed(2);
+      }
+      try {
+        var ext = global._oabAvm;
+        if (ext && ext[name] && ext[name] !== src) {
+          ext[name].marktwert = src.marktwert; ext[name].low = src.low; ext[name].high = src.high;
+          ext[name].marktmieteCold = src.marktmieteCold; ext[name].marktmieteLow = src.marktmieteLow; ext[name].marktmieteHigh = src.marktmieteHigh;
+          ext[name].eurPerSqm = src.eurPerSqm; ext[name].marktmieteEurSqm = src.marktmieteEurSqm;
+        }
+      } catch (e) {}
+    });
+  }
   function providers() {
+    _applyClusterToSource(); /* v892d */
     var out = [];
     if (_dp && _dp.D && _dp.D.mw) out.push(uDealpilot(_dp));
     if (_ext['Sprengnetter']) out.push(uExternal('Sprengnetter', _ext['Sprengnetter']));
     if (_ext['PriceHubble']) out.push(uExternal('PriceHubble', _ext['PriceHubble']));
-    return out;
+    return out; /* v892d: Cluster liegt jetzt auf der Quelle */
   }
   function mwAt(u, b) { return u.mw[b] != null ? u.mw[b] : u.mw.mid; }
   function mmAt(u, b) { return u.mm[b] != null ? u.mm[b] : u.mm.mid; }
@@ -431,7 +477,11 @@
   document.addEventListener('click', onClick, false);
 
   global.AvmSection = {
-    setExternal: function (avm) { _ext = avm || {}; st.min = true; /* v787c-min-on-switch: bei jedem Objektwechsel minimiert */ },
+    setExternal: function (avm) {
+      var _s = ''; try { _s = Object.keys(avm || {}).sort().map(function (k) { var r = avm[k] || {}; return k + ':' + (r.marktwert || 0) + ':' + (r.marktmieteCold || 0); }).join('|'); } catch (e) {}
+      _ext = avm || {};
+      if (_s !== _extSig) { _extSig = _s; st.min = true; } /* v893b-minsig: nur bei NEUEN Daten minimieren (nicht beim Span-Refeed) */
+    },
     setDealpilot: function (D, mode, api) { _dp = (D && D.mw) ? { D: D, mode: mode, api: api } : null; render(); },
     clearDealpilot: function () { _dp = null; render(); },
     render: render,

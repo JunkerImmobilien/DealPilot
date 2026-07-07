@@ -22,7 +22,7 @@
     --c1:#C9A84C;--c2:#3FA56C;--c3:#E8CC7A;--c4:#6f93b8;
     --c-front:#fff;--c-front-tx:#191713;--c-front-mut:#6b6660;--c-front-line:#cdbf9a;--c-front-acc:#b8932f;
     --c-ring:#2FBE6E;--ring-w:13;--head-font:'Space Grotesk';
-    --c-hatch:repeating-linear-gradient(102deg,transparent 0,transparent 6px,rgba(201,168,76,.12) 6px,rgba(201,168,76,.12) 7px);
+    --c-hatch:repeating-linear-gradient(102deg,rgba(201,168,76,.08) 0 1px,transparent 1px 8px); /* v887-hatch: fein wie Deal-Aktion */
     --page-bg:radial-gradient(110% 50% at 88% -8%,rgba(201,168,76,.16),transparent 55%),#fff;
     background:var(--page-bg);background-attachment:fixed;color:var(--c-ink);min-height:100vh;padding:0 0 70px}
 
@@ -274,7 +274,7 @@
   /* ════ FINAL: Weiß + Gold-Band + runde Scores ════ */
   #dashboard-main .stage.fc{--c-ink:#1b1815;--c-mut:#6b6660;--page-bg:#FDFCFA;
     --c-panel:#fff;--c-ptext:#1b1815;--c-pmut:#6b6660;--c-front:#fff;--c-front-tx:#191713;--c-front-mut:#6b6660;--c-front-acc:#b8932f;
-    --gb-hatch:repeating-linear-gradient(102deg,transparent 0,transparent 7px,rgba(255,255,255,.18) 7px,rgba(255,255,255,.18) 8px);
+    --gb-hatch:repeating-linear-gradient(102deg,rgba(255,255,255,.06) 0 1px,transparent 1px 8px); /* v887-hatch: fein wie Deal-Aktion */
     --gb-gold:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#bd9a3e);--gb-band:var(--gb-hatch),var(--gb-gold)}
 
   /* Panels weiß mit Goldrand */

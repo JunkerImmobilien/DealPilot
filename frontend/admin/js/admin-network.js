@@ -41,8 +41,63 @@
   var MIT_DEFS = [
     ['objekt', 'Objekt (Adresse + Referenz)'], ['eckdaten', 'Eckdaten (KP, Wfl, DSCR, LTV)'],
     ['kontakt', 'Kontakt-E-Mail des Nutzers'], ['dr_persoenlich', 'Link Datenraum pers\u00f6nlich'],
-    ['dr_objekt', 'Link Datenraum Objekt']
+    ['dr_objekt', 'Link Datenraum Objekt'],
+    ['objekt_voll', 'Ganzes Objekt als .dpk (alle Werte inkl. Finanzierung)'] /* v891-dpk */
   ];
+  /* v889-docs: waehlbare Pflichtdokumente — Keys SYNCHRON zu datenraum.js halten */
+  var CAT_DEFS = [
+    { grp:'p', key:'ausweis',   label:'Ausweis & Identität' },
+    { grp:'p', key:'einkommen', label:'Einkommen & Beschäftigung' },
+    { grp:'p', key:'bonitaet',  label:'Bonität & Finanzen' },
+    { grp:'o', key:'verkauf',   label:'Verkaufsunterlagen' },
+    { grp:'o', key:'flaeche',   label:'Fläche & Energie' },
+    { grp:'o', key:'miete',     label:'Miete & Bewirtschaftung' },
+    { grp:'o', key:'recht',     label:'Recht & Grundbuch' },
+    { grp:'o', key:'weg',       label:'WEG-Unterlagen' },
+    { grp:'o', key:'gutachten', label:'Gutachten' }
+  ];
+  /* v889-docs / v890-cat: waehlbare Pflichtdokumente — Keys SYNCHRON zu datenraum.js halten */
+  var DOC_DEFS = [
+    { key:'personalausweis', grp:'p', cat:'ausweis',   label:'Personalausweis' },
+    { key:'gehalt',          grp:'p', cat:'einkommen', label:'Gehaltsabrechnungen' },
+    { key:'lohnsteuer',      grp:'p', cat:'einkommen', label:'Lohnsteuerbescheinigung' },
+    { key:'rentenbescheid',  grp:'p', cat:'einkommen', label:'Rentenbescheid' },
+    { key:'eur',             grp:'p', cat:'einkommen', label:'EÜR (Selbstständige)' },
+    { key:'schufa',          grp:'p', cat:'bonitaet',  label:'SCHUFA-Auskunft' },
+    { key:'selbstauskunft',  grp:'p', cat:'bonitaet',  label:'Selbstauskunft Bank' },
+    { key:'steuerbescheide', grp:'p', cat:'bonitaet',  label:'Steuerbescheide (2 J.)' },
+    { key:'kontoauszuege',   grp:'p', cat:'bonitaet',  label:'Kontoauszüge (3 Mon.)' },
+    { key:'expose',            grp:'o', cat:'verkauf',   label:'Exposé / Verkaufsunterlagen' },
+    { key:'objektbilder',      grp:'o', cat:'verkauf',   label:'Objektbilder' },
+    { key:'grundriss',         grp:'o', cat:'verkauf',   label:'Grundrisse' },
+    { key:'lageplan',          grp:'o', cat:'verkauf',   label:'Lageplan / Flurkarte' },
+    { key:'wohnflaeche',       grp:'o', cat:'flaeche',   label:'Wohnflächenberechnung' },
+    { key:'energieausweis',    grp:'o', cat:'flaeche',   label:'Energieausweis' },
+    { key:'mietvertraege',     grp:'o', cat:'miete',     label:'Mietverträge' },
+    { key:'mieterliste',       grp:'o', cat:'miete',     label:'Mieterliste' },
+    { key:'nebenkosten',       grp:'o', cat:'miete',     label:'Nebenkostenabrechnung' },
+    { key:'grundbuchauszug',   grp:'o', cat:'recht',     label:'Grundbuchauszug' },
+    { key:'kaufvertrag',       grp:'o', cat:'recht',     label:'Kaufvertrag-Entwurf' },
+    { key:'teilungserklaerung',grp:'o', cat:'recht',     label:'Teilungserklärung (ETW)' },
+    { key:'protokolle_eigent', grp:'o', cat:'weg',       label:'Eigentümerversammlungs-Protokolle' },
+    { key:'wirtschaftsplan',   grp:'o', cat:'weg',       label:'Wirtschaftsplan WEG' },
+    { key:'versicherung',      grp:'o', cat:'weg',       label:'Wohngebäudeversicherung' },
+    { key:'gutachten_vw',      grp:'o', cat:'gutachten', label:'Verkehrswert-Gutachten' },
+    { key:'gutachten_rnd',     grp:'o', cat:'gutachten', label:'RND-Gutachten' }
+  ];
+  function _docPickerHtml(){
+    function grp(title, g){
+      var cats = CAT_DEFS.filter(function(c){ return c.grp===g; });
+      var acc = cats.map(function(cat){
+        var items = DOC_DEFS.filter(function(d){ return d.grp===g && d.cat===cat.key; })
+          .map(function(d){ return '<label class="adn-check" style="font-size:12px"><input id="adn-doc-'+d.key+'" type="checkbox"> '+d.label+'</label>'; }).join('');
+        return '<details class="adn-doccat"><summary>'+cat.label+'</summary><div class="adn-doccat-body">'+items+'</div></details>';
+      }).join('');
+      return '<div style="flex:1;min-width:220px"><div style="font:700 10px/1 monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a7f33;margin:2px 0 6px">'+title+'</div>'+acc+'</div>';
+    }
+    return '<div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:6px">'+grp('Persönlich','p')+grp('Objekt','o')+'</div>';
+  }
+
   var ANF_DEFS = [
     ['readycheck100', 'Grundfelder-Check 100 %'], ['dr_objekt', 'Datenraum Objekt verkn\u00fcpft'],
     ['dr_persoenlich', 'Datenraum pers\u00f6nlich verkn\u00fcpft']
@@ -84,6 +139,14 @@
       '#view-network .adn-card{background:#fff;border:1px solid #e7e1d4;border-radius:12px;padding:18px}',
       '#view-network .adn-sec{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9a7f33;margin:16px 0 8px;padding-top:12px;border-top:1px dashed #e7e1d4}',
       '#view-network .adn-sec:first-child{margin-top:0;padding-top:0;border-top:none}',
+      '#view-network .adn-doccat{border:1px solid #e7e1d4;border-radius:7px;margin:4px 0;background:#fff;overflow:hidden}',
+      '#view-network .adn-doccat>summary{cursor:pointer;padding:6px 10px;font-size:11px;font-weight:700;color:#6b5a24;background:#faf7ef;user-select:none}',
+      '#view-network .adn-doccat-body{padding:6px 10px;display:flex;flex-direction:column;gap:3px}',
+      '#view-network .adn-ndoc-add{display:flex;gap:6px;margin-top:6px}',
+      '#view-network .adn-ndoc-add input{flex:1;padding:7px 9px;border:1px solid #d8d0bf;border-radius:6px;font-size:12px;box-sizing:border-box}',
+      '#view-network .adn-ndoc-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}',
+      '#view-network .adn-ndoc-chip{display:inline-flex;align-items:center;gap:6px;background:#f3ecda;border:1px solid #d8c98f;border-radius:14px;padding:3px 6px 3px 11px;font-size:12px;color:#5a4c1e}',
+      '#view-network .adn-ndoc-chip button{border:none;background:#c9a84c;color:#fff;width:17px;height:17px;border-radius:50%;cursor:pointer;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center}',
       '#view-network .adn-field{margin-bottom:11px}',
       '#view-network .adn-field label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:4px}',
       '#view-network .adn-field input,#view-network .adn-field select,#view-network .adn-field textarea{width:100%;padding:8px 10px;border:1px solid #d8d2c6;border-radius:7px;font:inherit;font-size:13px;box-sizing:border-box}',
@@ -165,10 +228,30 @@
   function _tagArr(s) { return (s || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean); }
   function _slug(s) { return String(s || '').toLowerCase().replace(/[\u00e4]/g, 'ae').replace(/[\u00f6]/g, 'oe').replace(/[\u00fc]/g, 'ue').replace(/[\u00df]/g, 'ss').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40); }
 
+  /* v890-cdoc: eigene Pflichtdokumente (frei definierbare Labels, anf.custom_docs[]) */
+  var _ndocList = [];
+  function _renderNdoc(){
+    var box = document.getElementById('adn-ndoc-list'); if (!box) return;
+    box.innerHTML = _ndocList.map(function(lbl, i){
+      return '<span class="adn-ndoc-chip">'+_esc(lbl)+'<button type="button" data-i="'+i+'" aria-label="Entfernen">×</button></span>';
+    }).join('');
+    box.querySelectorAll('button[data-i]').forEach(function(b){
+      b.addEventListener('click', function(){ _ndocList.splice(parseInt(b.getAttribute('data-i'),10),1); _renderNdoc(); try{_renderPreview();}catch(e){} });
+    });
+  }
+  function _ndocAdd(){
+    var inp = document.getElementById('adn-ndoc-in'); if (!inp) return;
+    var v = String(inp.value||'').trim();
+    if (!v) return;
+    if (_ndocList.indexOf(v) < 0) _ndocList.push(v);
+    inp.value = ''; inp.focus(); _renderNdoc(); try{_renderPreview();}catch(e){}
+  }
   function _formData() {
     var mit = {}, anf = {};
     MIT_DEFS.forEach(function (m) { mit[m[0]] = _chk('adn-mit-' + m[0]); });
     ANF_DEFS.forEach(function (a) { anf[a[0]] = _chk('adn-anf-' + a[0]); });
+    anf.docs = []; DOC_DEFS.forEach(function (dd) { if (_chk('adn-doc-' + dd.key)) anf.docs.push(dd.key); }); /* v889-docs */
+    anf.custom_docs = _ndocList.slice(); /* v890-cdoc */
     return {
       kategorie: _val('adn-kategorie') || 'finanzierung',
       name: _val('adn-name'),
@@ -398,7 +481,7 @@
     function setc(id, v) { var e = document.getElementById(id); if (e) e.checked = !!v; }
     var tags = [], mit = {}, anf = {};
     try { tags = c ? (Array.isArray(c.tags) ? c.tags : JSON.parse(c.tags || '[]')) : []; } catch (e) {}
-    try { mit = c ? (typeof c.mitgabe === 'object' ? c.mitgabe : JSON.parse(c.mitgabe || '{}')) : { objekt: true, eckdaten: true, kontakt: true }; } catch (e) { mit = {}; }
+    try { mit = c ? (typeof c.mitgabe === 'object' ? c.mitgabe : JSON.parse(c.mitgabe || '{}')) : { objekt: true, eckdaten: true, kontakt: true, objekt_voll: true }; } catch (e) { mit = {}; }
     try { anf = c ? (typeof c.anforderungen === 'object' ? c.anforderungen : JSON.parse(c.anforderungen || '{}')) : {}; } catch (e) { anf = {}; }
     _fillKategorieSelect(c ? c.kategorie : null);
     set('adn-kategorie', c ? c.kategorie : (_cats[0] ? _cats[0].key : 'finanzierung'));
@@ -430,6 +513,8 @@
     set('adn-email', c ? c.ziel_email : '');
     MIT_DEFS.forEach(function (m) { setc('adn-mit-' + m[0], !!mit[m[0]]); });
     ANF_DEFS.forEach(function (a) { setc('adn-anf-' + a[0], !!anf[a[0]]); });
+    var _selDocs = (anf.docs || []); DOC_DEFS.forEach(function (dd) { setc('adn-doc-' + dd.key, _selDocs.indexOf(dd.key) >= 0); }); /* v889-docs */
+    _ndocList = Array.isArray(anf.custom_docs) ? anf.custom_docs.slice() : []; _renderNdoc(); /* v890-cdoc */
     setc('adn-aktiv', c ? !!c.aktiv : true);
     set('adn-sort', c ? c.sortierung : 0);
     var sb = document.getElementById('adn-save'); if (sb) sb.textContent = c ? 'Karte aktualisieren' : 'Karte anlegen';
@@ -536,6 +621,11 @@
           MIT_DEFS.map(function (m) { return '<label class="adn-check"><input id="adn-mit-' + m[0] + '" type="checkbox"> ' + m[1] + '</label>'; }).join('') +
           '<div class="adn-sec">Anforderungen \u2014 Pflicht vor dem Versand (sonst Anfrage gesperrt)</div>' +
           ANF_DEFS.map(function (a) { return '<label class="adn-check"><input id="adn-anf-' + a[0] + '" type="checkbox"> ' + a[1] + '</label>'; }).join('') +
+          '<div class="adn-sec">Pflichtdokumente \u2014 diese muss der Nutzer im Datenraum best\u00e4tigt haben (sonst Anfrage gesperrt)</div>' +
+          _docPickerHtml() +
+          '<div class="adn-sec">Eigene Pflichtdokumente — frei definierbar (Nutzer bestätigt sie in der Anfrage)</div>' +
+          '<div class="adn-ndoc-add"><input id="adn-ndoc-in" placeholder="z. B. Baugenehmigung, Aufteilungsplan …" maxlength="80"><button type="button" id="adn-ndoc-btn" class="adn-btn sec">Hinzufügen</button></div>' +
+          '<div id="adn-ndoc-list" class="adn-ndoc-list"></div>' +
           '<div class="adn-sec">Versand &amp; Status</div>' +
           '<div class="adn-field"><label>CTA-Verhalten</label><select id="adn-ctaakt"><option value="lead">Standard \u2014 Lead z\u00e4hlen + E-Mail an Ziel-Adresse</option><option value="gutachten_modal">Gutachten-Modal \u2014 \u00f6ffnet die DealPilot-Anfrage (keine Lead-Mail)</option><option value="link">Link \u2014 \u00f6ffnet Partner-Seite, Klick wird als Lead gez\u00e4hlt</option></select></div>' +
           '<div class="adn-field"><label>Ziel-URL (bei CTA-Verhalten "Link")</label><input id="adn-ctaurl" placeholder="https://partner.de/anfrage"></div>' +
@@ -555,6 +645,7 @@
       'adn-kante', 'adn-kantefarbe', 'adn-kante-auto', 'adn-kuerzel', 'adn-logo', 'adn-lz', 'adn-lx', 'adn-ly', 'adn-logobg', 'adn-deck'];
     MIT_DEFS.forEach(function (m) { ids.push('adn-mit-' + m[0]); });
     ANF_DEFS.forEach(function (a) { ids.push('adn-anf-' + a[0]); });
+    DOC_DEFS.forEach(function (dd) { ids.push('adn-doc-' + dd.key); }); /* v889-docs */
     ids.forEach(function (id) {
       var e = document.getElementById(id);
       if (e) {
@@ -562,6 +653,11 @@
         e.addEventListener('change', function () { _syncVisibility(); _renderPreview(); });
       }
     });
+    var _ndBtn = document.getElementById('adn-ndoc-btn');
+    if (_ndBtn) _ndBtn.addEventListener('click', _ndocAdd);
+    var _ndIn = document.getElementById('adn-ndoc-in');
+    if (_ndIn) _ndIn.addEventListener('keydown', function(ev){ if (ev.key === 'Enter'){ ev.preventDefault(); _ndocAdd(); } });
+    _renderNdoc();
     // Bild-Uploads
     var lf = document.getElementById('adn-logofile');
     if (lf) lf.addEventListener('change', function () {
