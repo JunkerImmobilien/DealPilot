@@ -143,6 +143,23 @@ function fmtAnalysis(raw){
       var it=v.filter(function(x){return x!=null && String(x).trim()!=='';});
       if(!it.length) return;
       out+='<div style="'+L_LBL+'">'+esc(lbl)+'</div><ul style="'+L_UL+'">'+it.map(function(x){return '<li style="margin:3px 0">'+esc(String(x))+'</li>';}).join('')+'</ul>';
+    } else if(v!=null && typeof v==='object'){
+      /* v882-obj-unpack: verschachteltes KI-Objekt auspacken statt [object Object] */
+      var _parts=[];
+      Object.keys(v).forEach(function(kk){
+        var vv=v[kk]; if(vv==null||String(vv).trim()==='') return;
+        var _l2=(LBL[kk]||kk).replace(/_/g,' ');
+        if(Array.isArray(vv)){
+          var _i2=vv.filter(function(x){return x!=null&&String(x).trim()!=='';});
+          if(_i2.length) _parts.push('<div style="'+L_LBL+'">'+esc(_l2)+'</div><ul style="'+L_UL+'">'+_i2.map(function(x){return '<li style="margin:3px 0">'+esc(String(x))+'</li>';}).join('')+'</ul>');
+        } else if(typeof vv==='object'){
+          var _f=Object.keys(vv).map(function(k3){var w=vv[k3];return (w==null||String(w).trim()==='')?'':(String(k3).replace(/_/g,' ')+': '+String(w));}).filter(Boolean).join(' \u00b7 ');
+          if(_f) _parts.push('<div style="'+L_LBL+'">'+esc(_l2)+'</div><div style="'+L_P+'">'+esc(_f)+'</div>');
+        } else {
+          _parts.push('<div style="'+L_LBL+'">'+esc(_l2)+'</div><div style="'+L_P+'">'+esc(String(vv))+'</div>');
+        }
+      });
+      if(_parts.length){ out+='<div style="'+L_LBL+';color:#E8CC7A">'+esc(lbl)+'</div>'+_parts.join(''); }
     } else if(v!=null && String(v).trim()!==''){
       if(key==='fazit_kurz'){ out+='<div style="font-weight:700;color:#E8CC7A;font-size:15px;margin:0 0 8px">'+esc(String(v))+'</div>'; }
       else { out+='<div style="'+L_LBL+'">'+esc(lbl)+'</div><div style="'+L_P+'">'+esc(String(v))+'</div>'; }

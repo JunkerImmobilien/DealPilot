@@ -754,6 +754,9 @@
     '#s8 .dab-chip:hover{background:rgba(111,214,160,.22)}#s8 .dab-chip .x{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 5px currentColor}',
     '#s8 .dab-allset{font-family:var(--dab-fs);font-size:12.5px;font-weight:600;color:var(--dab-m2);margin-top:10px}',
     '#s8 #dab-uew-slot .da-stage{margin-top:6px}',
+    '#s8 #dab-uew-slot .da-stage-head{position:relative;overflow:hidden}', /* v882-uew-struktur */
+    '#s8 #dab-uew-slot .da-stage-head::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(125deg,rgba(255,255,255,.12) 0 1px,transparent 1px 11px);pointer-events:none}',
+    '#s8 #dab-uew-slot .da-stage-head>*{position:relative;z-index:1}',
     '#s8 .dab-status-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:stretch}',
     '@media(max-width:900px){#s8 .dab-status-grid{grid-template-columns:1fr}}',
     '#s8 #dab-share-slot{display:block;min-width:0}',

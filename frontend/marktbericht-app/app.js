@@ -456,7 +456,7 @@ function renderScore(d) {
       <div style="flex:1;min-width:170px;">
         <div style="display:inline-block;font-size:10px;letter-spacing:1.3px;font-weight:700;color:${col};border:1px solid ${col};border-radius:999px;padding:3px 11px;margin-bottom:9px;">DEAL-SCORE</div>
         <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;color:${col};">${ratingText}</div>
-        <div class="muted" style="margin-top:3px;font-size:13px;">Markt- &amp; Chance-Risiko-Bewertung dieses Objekts</div>
+        <div style="margin-top:3px;font-size:13px;color:#b8b0a0;">Markt- &amp; Chance-Risiko-Bewertung dieses Objekts</div><!--v882-hero-desc-->
         <div style="display:flex;align-items:center;gap:7px;margin-top:11px;font-size:13px;color:${col};font-weight:600;">
           <span style="font-size:14px;">✦</span> KI rät: ${_kiRaet(s)}
         </div>
