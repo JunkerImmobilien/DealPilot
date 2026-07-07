@@ -4617,7 +4617,7 @@ const QcApp = (function() {
   function _applyConsensusToQc() {
     var mms = [];
     (_avmResults || []).forEach(function (r) {
-      if (!r) return;
+      if (!r || r.provider === 'DealPilot') return; /* v893d-konsens: DealPilot nur aus _mb_state (span-genau), nicht doppelt */
       var mm = _selectedValue(r, 'marktmiete');
       if (mm != null && isFinite(mm)) mms.push(mm);
     });
@@ -5552,6 +5552,7 @@ function renderTransferList() {
       } catch (e) { /* einzelner Abruf fehlgeschlagen — weiter */ }
       steps[i].state = 'done'; _progressRender(steps);
     }
+    try { if (typeof _applyConsensusToQc === 'function') _applyConsensusToQc(); } catch (e) {} /* v893d-konsens: finaler Konsens (dpmb lief zuletzt, schreibt Feld nicht) */
     setTimeout(function(){ _progressRender(null); }, 1400);
     showToast('✓ Abruf abgeschlossen (' + ordered.map(function(s){return labels[s];}).join(' + ') + ')');
     try { _qbSetRunBtn('reset'); } catch(e){}
