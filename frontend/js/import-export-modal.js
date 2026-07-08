@@ -127,7 +127,7 @@
   window.iexpImportJson = function() {
     closeIexpModal();
     if (typeof window.triggerImportJson === 'function') window.triggerImportJson();
-    else if (typeof toast === 'function') toast('⚠ JSON-Import nicht verfügbar');
+    else if (typeof toast === 'function') toast('⚠ Import nicht verfügbar');
   };
 
   // ══════════════════════════════════════════════════════════════════
@@ -157,15 +157,20 @@
         '<div class="iexp-card" onclick="iexpExportJsonChoose()">' +
           '<div class="iexp-card-ico iexp-ico-gold">' + _icon('download', 22) + '</div>' +
           '<div class="iexp-card-tag">Sicherung · einzeln oder alle</div>' +
-          '<h3>JSON-Sicherung</h3>' +
-          '<p>Exportiere <b>ein einzelnes Objekt</b> oder <b>alle</b> als JSON-Backup. ' +
+          '<h3>DealPilot-Sicherung</h3>' + /* v893u-term */
+          '<p>Exportiere <b>ein einzelnes Objekt</b> oder <b>alle</b> als DealPilot-Backup (<b>.dpkt</b>). ' +
           'Empfohlen vor jedem App-Update als Sicherheits-Backup.</p>' +
           '<ul class="iexp-bullets">' +
             '<li>Komplette Eingaben + Berechnungen</li>' +
             '<li>Pilot-Analysen, Sterne, Bemerkungen</li>' +
             '<li>Objektfotos (Base64 eingebettet)</li>' +
           '</ul>' +
-          '<p class="iexp-warn">⚠ Datei ist nicht verschlüsselt — sicher aufbewahren.</p>' +
+          '<p class="iexp-warn">⚠ Ohne Verschlüsselung ist die Datei Klartext — sicher aufbewahren.</p>' +
+          /* v893t-encbox */
+          '<label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:8px;margin:8px 0 2px;font-size:12.5px;color:#4a4536;cursor:pointer">' +
+            '<input type="checkbox" id="iexp-encrypt"' + (window._exportEncrypt ? ' checked' : '') + ' onchange="window._exportEncrypt=this.checked" style="cursor:pointer;flex-shrink:0">' +
+            '<span>Mit <b>Passwort verschlüsseln</b> (AES-256)</span>' +
+          '</label>' +
           '<div class="iexp-card-cta">Auswahl ‹ einzeln / alle › <span>›</span></div>' +
         '</div>' +
 
@@ -338,7 +343,7 @@
         '<button class="iexp-choice-btn" onclick="iexpDoExportJsonAll()">' +
           '<span class="iexp-choice-ico">' + _icon('download', 24) + '</span>' +
           '<span class="iexp-choice-l">Alle Objekte sichern</span>' +
-          '<span class="iexp-choice-d">Komplettes JSON-Backup</span>' +
+          '<span class="iexp-choice-d">Komplettes Backup (.dpkt)</span>' +
         '</button>' +
         '<button class="iexp-choice-btn" onclick="iexpExportJsonSingle()">' +
           '<span class="iexp-choice-ico">' + _icon('fileText', 24) + '</span>' +
@@ -413,7 +418,7 @@
     bodyEl.innerHTML =
       '<div class="iexp-back" onclick="iexpExportJsonChoose()">‹ Zurück</div>' +
       '<h3 class="iexp-stage-title">Welches Objekt sichern?</h3>' +
-      '<p class="iexp-stage-sub">Klicke auf ein Objekt — die JSON-Datei wird sofort generiert.</p>' +
+      '<p class="iexp-stage-sub">Klicke auf ein Objekt — die Sicherungs-Datei (.dpkt) wird sofort generiert.</p>' +
       '<div class="iexp-obj-list">' + listHtml + '</div>';
   };
 
@@ -421,7 +426,7 @@
     closeIexpModal();
     if (typeof exportSingleObjectJson === 'function') {
       try { await exportSingleObjectJson(objId); }
-      catch (e) { if (typeof toast === 'function') toast('⚠ JSON-Export-Fehler: ' + e.message); }
+      catch (e) { if (typeof toast === 'function') toast('⚠ Export-Fehler: ' + e.message); }
     }
   };
 

@@ -1769,7 +1769,9 @@ body::before {
 }
 .ai-verdict-big.warn { background: #FFF6E0; border-color: rgba(229,189,83,0.40); }
 .ai-verdict-big.bad  { background: var(--red-bg); border-color: rgba(184,98,92,0.40); }
-.ai-verdict-emoji { font-size: 2rem; }
+.ai-verdict-emoji{width:13px;height:13px;border-radius:50%;background:#3FA56C;flex:0 0 auto;align-self:center;box-shadow:0 0 0 4px rgba(63,165,108,.16);font-size:0;overflow:hidden} /* v893p-icons: Status-Punkt statt Emoji */
+.ai-verdict-big.warn .ai-verdict-emoji{background:#E5BD53;box-shadow:0 0 0 4px rgba(229,189,83,.16)}
+.ai-verdict-big.bad .ai-verdict-emoji{background:#B8625C;box-shadow:0 0 0 4px rgba(184,98,92,.16)}
 .ai-verdict-text {
   flex: 1;
   min-width: 0;
@@ -3555,7 +3557,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       </div>
     </div>
     <div class="ai-negotiate" id="ai-negotiate">
-      <div class="ai-negotiate-l">💼 Verhandlungs-Empfehlung</div>
+      <div class="ai-negotiate-l">Verhandlungs-Empfehlung</div>
       <div class="ai-negotiate-v" id="ai-negotiate-v">—</div>
     </div>
     <div class="ai-points">
@@ -3571,7 +3573,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     <!-- Marktcheck (nur sichtbar wenn Sprengnetter-Daten vorhanden) -->
     <div id="ai-marktcheck-host"></div>
     <div class="ai-opinion">
-      <div class="ai-opinion-l">📋 Experten-Meinung</div>
+      <div class="ai-opinion-l">Experten-Meinung</div>
       <div id="ai-opinion"></div>
     </div>
     <!-- V342: "tiefer analysieren"-Button entfernt — KI läuft über den oberen Abruf -->
@@ -3938,7 +3940,7 @@ const QcApp = (function() {
     _setIcon('ico-grp-bewirt', 'coins', { size: 14 });
     _setIcon('ico-grp-fin', 'bank', { size: 14 });
     _setIcon('ico-grp-photo', 'camera', { size: 14 });
-    _setIcon('ai-icon', 'sparkles', { size: 20, stroke:'#fff' });
+    _setIcon('ai-icon', 'chart', { size: 20, stroke:'#fff' }); /* v893p-icons: kein Sparkle */
     _setIcon('modal-icon', 'save', { size: 20, stroke:'#fff' });
     _setIcon('api-modal-icon', 'key', { size: 20, stroke:'#fff' });
     _setIcon('ico-save-btn', 'save', { size: 15 });
@@ -4271,18 +4273,7 @@ const QcApp = (function() {
       value: fmt0(result.marktwert) + ' € (' + fmt0(result.low) + '-' + fmt0(result.high) + ')',
       source: 'PriceHubble', target: 'verkehrswert', isMarktwert: true
     };
-    if (result.scoreMicro != null) _pendingTransfer.ph_mikrolage = {
-      label: 'Mikrolage-Score', value: result.scoreMicro.toFixed(1) + ' / 10',
-      source: 'PriceHubble', target: 'lage_micro'
-    };
-    if (result.scoreMacro != null) _pendingTransfer.ph_makrolage = {
-      label: 'Makrolage-Score', value: result.scoreMacro.toFixed(1) + ' / 10',
-      source: 'PriceHubble', target: 'lage_macro'
-    };
-    if (result.scoreLocation != null) _pendingTransfer.ph_lage = {
-      label: 'Lage-Score (aggregiert)', value: result.scoreLocation.toFixed(1) + ' / 10',
-      source: 'PriceHubble', target: 'lage_score'
-    };
+    /* v893h-nolage: Lage liefert nur DealPilot -> PriceHubble-Lage (Mikro/Makro/aggregiert) nicht mehr in die Uebernahme */
     if (result.wertentwicklung != null) _pendingTransfer.ph_wertentwicklung = {
       label: 'Wertentwicklung p.a.', value: '+' + result.wertentwicklung.toFixed(2) + ' %',
       source: 'PriceHubble', target: 'wertsteigerung_pa'
@@ -4642,6 +4633,7 @@ const QcApp = (function() {
       var mm = _selectedValue(r, 'marktmiete');
       if (mm != null && isFinite(mm)) mms.push(mm);
     });
+    var _dpFound = false; /* v893s-dpmiete */
     try {
       var el = document.getElementById('_mb_state');
       if (el && el.value) {
@@ -4649,10 +4641,19 @@ const QcApp = (function() {
         if (st && st.card && st.card.mm) {
           var k = (_spanConfig === 'low') ? 'low' : (_spanConfig === 'high') ? 'high' : 'med';
           var dpmm = st.card.mm[k];
-          if (dpmm != null && isFinite(dpmm)) mms.push(dpmm);
+          if (dpmm != null && isFinite(dpmm)) { mms.push(dpmm); _dpFound = true; }
         }
       }
     } catch (e) {}
+    if (!_dpFound) { /* v893s-dpmiete: Fallback auf DealPilot-Eintrag in _avmResults (span-genau) */
+      for (var _di = 0; _di < (_avmResults || []).length; _di++) {
+        if (_avmResults[_di] && _avmResults[_di].provider === 'DealPilot') {
+          var _dm = _selectedValue(_avmResults[_di], 'marktmiete');
+          if (_dm != null && isFinite(_dm)) mms.push(_dm);
+          break;
+        }
+      }
+    }
     if (!mms.length) return;
     var avg = Math.round(mms.reduce(function (a, b) { return a + b; }, 0) / mms.length);
     setVal('qc_nkm_grund', String(avg));
@@ -5195,7 +5196,28 @@ Antworte ALS JSON (keine Markdown-Codeblöcke, nur reines JSON):
     var __items=[];
     try { Object.keys(_pendingTransfer).forEach(function(key){ var it=_pendingTransfer[key]||{};
       __items.push({key:key,label:it.label,value:it.value,target:it.target,source:it.source||'',isMarktwert:!!it.isMarktwert}); }); } catch(e){}
-    if (window.parent && window.parent!==window) { try { window.parent.postMessage({source:'dp-qc',type:'qc-save-open',items:__items},'*'); return; } catch(e){} }
+    var __avmRaw={}; /* v893j-modalpick: Roh-Spannen je Provider fuers interaktive Modal */
+    try {
+      (_avmResults||[]).forEach(function(r){ if(!r||!r.provider) return;
+        if(r.provider==='Sprengnetter'||r.provider==='PriceHubble'){
+          __avmRaw[r.provider]={ mw:{low:r.low,mid:r.marktwert,high:r.high}, mm:{low:r.marktmieteLow,mid:r.marktmieteCold,high:r.marktmieteHigh} };
+        }
+      });
+      var __el=document.getElementById('_mb_state');
+      if(__el&&__el.value){ var __st=JSON.parse(__el.value); if(__st&&__st.card){ var __c=__st.card;
+        __avmRaw['DealPilot']={ mw:__c.mw?{low:__c.mw.low,mid:__c.mw.med,high:__c.mw.high}:null, mm:__c.mm?{low:__c.mm.low,mid:__c.mm.med,high:__c.mm.high}:null }; } }
+    } catch(e){}
+    var __def='konsens'; try{ __def=localStorage.getItem('dp_qb_avm_src')||'konsens'; }catch(e){}
+    var __qcSet=[]; /* v893k-qcset: bereits gesetzte QC-Kernwerte fuer die Gesamtuebersicht */
+    try {
+      var IN=QcEngine.getInputs()||{}; /* v893l-qcsetfull: vollstaendig ueber alle QC-Felder */
+      var __ADR=[IN.str,IN.hnr].filter(Boolean).join(' ') + ((IN.plz||IN.ort)?(', '+[IN.plz,IN.ort].filter(Boolean).join(' ')):'');
+      __ADR=__ADR.replace(/^,\s*/,'').trim(); if(__ADR) __qcSet.push({label:'Adresse',value:__ADR});
+      var __L={objektart:'Objektart',wfl:'Wohnfläche',bj:'Baujahr',zimmer:'Zimmer',energieklasse:'Energieklasse',stellplatz:'Stellplatz',kp:'Kaufpreis',nkm:'Grundmiete',hg:'Hausgeld',ek:'Eigenkapital',zins:'Zins',tilg:'Tilgung'};
+      var __U={wfl:' m²',kp:' €',nkm:' €/Mo',hg:' €/Mo',ek:' €',zins:' %',tilg:' %'};
+      ['objektart','wfl','bj','zimmer','energieklasse','stellplatz','kp','nkm','hg','ek','zins','tilg'].forEach(function(k){ var v=(IN[k]||'').trim(); if(v) __qcSet.push({label:__L[k]||k,value:v+(__U[k]||'')}); });
+    } catch(e){}
+    if (window.parent && window.parent!==window) { try { window.parent.postMessage({source:'dp-qc',type:'qc-save-open',items:__items,avmRaw:__avmRaw,avmDefault:__def,qcSet:__qcSet},'*'); return; } catch(e){} }
     renderTransferList();
     document.getElementById('transfer-modal').classList.add('show');
   }
@@ -5256,32 +5278,37 @@ function renderTransferList() {
   function toggleAllTransfer(checked) {
     document.querySelectorAll('#transfer-list input[type="checkbox"]').forEach(cb => cb.checked = checked);
   }
-  function confirmSave(_ck) {
+  function confirmSave(_ck, _src, _span) {
     var _useCk = _ck && typeof _ck.has === 'function';
     /* V329: Anbindung an die echte App — Werte an Parent posten. */
     const inputs = QcEngine.getInputs();
     let avm = null;
     try {
-      if (_avmResults && _avmResults[0]) {
-        const r = _avmResults[0];
-        var _sel = function (kind, fb) { try { return (typeof _selectedValue === 'function') ? _selectedValue(r, kind) : fb; } catch (e) { return fb; } };
-        // V348: angehakte Übernahme-Targets sammeln (Modal-Checkboxen)
-        var _checked = {};
-        try {
-          Object.keys(_pendingTransfer).forEach(function (key) {
-            var cb = document.getElementById('transfer-cb-' + key);
-            if (_useCk ? _ck.has(key) : (!cb || cb.checked)) _checked[_pendingTransfer[key].target] = true;
-          });
-        } catch (e) {}
+      /* v893j-modalpick: Marktwert/Marktmiete aus gewaehlter Quelle (Konsens|Provider) + Spanne */
+      var _sp = (_span==='low'||_span==='high'||_span==='mid') ? _span : (_spanConfig||'mid');
+      var _dpR = (_avmResults||[]).filter(function(x){return x&&x.provider==='DealPilot';})[0] || null;
+      var _effR = (_src==='DealPilot'||_src==='Sprengnetter'||_src==='PriceHubble')
+        ? ((_avmResults||[]).filter(function(x){return x&&x.provider===_src;})[0] || (_avmResults||[])[0])
+        : ((_avmResults||[])[0] || null);
+      function _valAt(r,kind){ if(!r) return null; if(kind==='mw'){ return _sp==='low'?r.low:_sp==='high'?r.high:r.marktwert; } return _sp==='low'?r.marktmieteLow:_sp==='high'?r.marktmieteHigh:r.marktmieteCold; }
+      function _pick(kind){
+        if(_src==='DealPilot'||_src==='Sprengnetter'||_src==='PriceHubble'){ return _valAt(_effR,kind); }
+        var vals=[]; (_avmResults||[]).forEach(function(x){ if(!x) return; if(x.provider==='DealPilot'||x.provider==='Sprengnetter'||x.provider==='PriceHubble'){ var v=_valAt(x,kind); if(v!=null&&isFinite(v)) vals.push(v); } });
+        if(!vals.length) return null; return Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length);
+      }
+      var _checked = {};
+      try { Object.keys(_pendingTransfer).forEach(function (key) { var cb = document.getElementById('transfer-cb-' + key); if (_useCk ? _ck.has(key) : (!cb || cb.checked)) _checked[_pendingTransfer[key].target] = true; }); } catch (e) {}
+      var _mw=_pick('mw'), _mm=_pick('mm');
+      if (_mw!=null || _mm!=null || _dpR || _effR) {
         avm = {
-          provider: r.provider,
-          marktwert: _sel('marktwert', r.marktwert),
-          marktmiete: _sel('marktmiete', r.marktmieteCold),     // €/Monat (gewählte Spanne)
-          scoreMacro: r.scoreMacro,
-          scoreMicro: r.scoreMicro,
-          wertentwicklung: r.wertentwicklung,                    // % p.a.
-          demandScore: (typeof _demandScore === 'function' ? (_demandScore(r) || {}).score : null),
-          riskScore:   (typeof _rentRiskScore === 'function' ? (_rentRiskScore(r) || {}).score : null),
+          provider: _src || 'Konsens',
+          marktwert: _mw,
+          marktmiete: _mm,
+          scoreMacro: _dpR ? _dpR.scoreMacro : null,   /* Lage IMMER DealPilot */
+          scoreMicro: _dpR ? _dpR.scoreMicro : null,
+          wertentwicklung: _dpR ? _dpR.wertentwicklung : null,
+          demandScore: (_effR && typeof _demandScore === 'function') ? (_demandScore(_effR) || {}).score : null,
+          riskScore:   (_effR && typeof _rentRiskScore === 'function') ? (_rentRiskScore(_effR) || {}).score : null,
           wfl: QcEngine.num(inputs.wfl) || 0,
           checkedTargets: _checked
         };
@@ -5968,7 +5995,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 <!-- qb-final2-iframe (v696): Parent -> Iframe Bestaetigung (QcApp ist const, NICHT window.QcApp) -->
 <script id="qb-final2-iframe-js">
 (function(){'use strict';try{window.addEventListener('message',function(ev){var d=ev.data;if(!d)return;
-  if(d.type==='qc-save-confirm'){ try{ if(typeof QcApp!=='undefined' && QcApp.confirmSave) QcApp.confirmSave(new Set(d.checkedKeys||[])); }catch(e){ try{console.error('[qb] confirmSave',e);}catch(_){} } }
+  if(d.type==='qc-save-confirm'){ try{ if(typeof QcApp!=='undefined' && QcApp.confirmSave) QcApp.confirmSave(new Set(d.checkedKeys||[]), d.avmSource, d.avmSpan); /* v893j-modalpick */ }catch(e){ try{console.error('[qb] confirmSave',e);}catch(_){} } }
   else if(d.type==='qc-save-cancel'){ try{ if(typeof QcApp!=='undefined' && QcApp.closeSaveModal) QcApp.closeSaveModal(); }catch(e){} }
 });}catch(e){}})();
 </script>
@@ -6100,6 +6127,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 
   function paint(){
     var sb=document.getElementById('score-block'); if(!sb) return;
+    if(_sbObs){ try{ _sbObs.disconnect(); }catch(e){} } /* v893m-paintloop: paint plant sich nicht selbst neu */
     var s=num(document.getElementById('sb-num'));
     var d=document.getElementById('qb-dial'); if(d) d.innerHTML=dial(s,128);
     var cb=document.getElementById('qb-cbars');
@@ -6121,7 +6149,9 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var hs=document.getElementById('qb-hstat'); var stEl=document.getElementById('sb-status');
     if(hs && stEl){ var raw=(stEl.textContent||'').split('\u00b7').pop().trim(); hs.textContent=raw||'PRE-FLIGHT'; }
     maybeAutopass(s);
+    if(_sbObs){ try{ _sbObs.observe(sb,{subtree:true,childList:true,characterData:true}); }catch(e){} } /* v893m-paintloop */
   }
+  var _sbObs=null; /* v893m-paintloop */
   var _raf=0; function schedule(){ if(_raf) return; _raf=requestAnimationFrame(function(){ _raf=0; paint(); }); }
   function boot(){
     var sb=document.getElementById('score-block'); if(!sb){ return setTimeout(boot,150); }
@@ -6141,7 +6171,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
       sb.appendChild(bp);
     }
     var fly=document.getElementById('qb-fly'); if(fly) fly.innerHTML=jet();
-    if(typeof MutationObserver!=='undefined'){ try{ new MutationObserver(schedule).observe(sb,{subtree:true,childList:true,characterData:true}); }catch(e){} }
+    if(typeof MutationObserver!=='undefined'){ try{ _sbObs=new MutationObserver(schedule); _sbObs.observe(sb,{subtree:true,childList:true,characterData:true}); }catch(e){} } /* v893m-paintloop */
     paint(); setTimeout(paint,300); setTimeout(paint,1200);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();

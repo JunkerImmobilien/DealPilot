@@ -202,7 +202,7 @@ function render(pass){
     ['Kürzel',data.kuerzel||''],['Zustand',data.ds2_zustand||data.zustand||''],
     ['Ausstattung',data.ausstattung||''],['Nettokaltmiete',data.nkm&&num(data.nkm)?eur(num(data.nkm))+'/Mo':''],
     ['Sonst. Einnahmen',data.ze&&num(data.ze)?eur(num(data.ze))+'/Mo':''],
-    ['Modernisierung',data.modernisierung||data.mod_jahr||''],['Vermietungsstand',data.vermietungsstand||'']];
+    ['Modernisierung',data.modernisierung||data.mod_jahr||''],['Vermietungsstand',data.vermietungsstand||''],/* v893p-more */['Verkehrswert',data.svwert&&num(data.svwert)?eur(num(data.svwert)):''],['Wertentwicklung p.a.',data.ds2_wertsteigerung?(String(data.ds2_wertsteigerung).replace('.',',')+' %'):''],['Grundstücksfläche',data.grundstueck?(String(data.grundstueck).replace('.',',')+' m²'):(data.gst_flae?(String(data.gst_flae).replace('.',',')+' m²'):'')],['Balkon/Terrasse',data.balkon_flae?(String(data.balkon_flae).replace('.',',')+' m²'):''],['Etagen gesamt',data.etagen_ges||''],['Bäder (Anzahl)',data.bad_anz||'']];
   var _ds2r=[]; try { var _pd=data.__ds2pending; if(_pd&&typeof _pd==='object'){ Object.keys(_pd).forEach(function(id){ var it=_pd[id]; if(it&&it.value!=null&&String(it.value).trim()!==''){ _ds2r.push([it.label||id, String(it.value), id]); } }); } } catch(e){}
   var _mrows=_allF.filter(function(f){return f[1]!=null && String(f[1]).trim()!=='';}).concat(_ds2r);
   /* qb-sort: Objektdaten -> Ausstattung -> Finanzen -> Markt/Lage -> Qualitaet+Zustand paarweise */

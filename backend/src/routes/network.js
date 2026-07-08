@@ -24,7 +24,7 @@ async function resolveObject(userId, ref) {
   if (!userId || !ref) return null;
   try {
     const r = await query(
-      `SELECT id, name, kuerzel, data, ai_analysis
+      `SELECT id, name, kuerzel, data, ai_analysis, photos /* v893r-dpkphotos */
          FROM objects
         WHERE user_id = $1 AND (id::text = $2 OR kuerzel = $2 OR seq_no = $2 OR data->>'kuerzel' = $2)
         LIMIT 1`,
@@ -124,11 +124,12 @@ router.post('/:id/lead', async (req, res) => {
                 name: obj.name || null,
                 kuerzel: obj.kuerzel || null,
                 data: obj.data,
-                aiAnalysis: obj.ai_analysis || null
+                aiAnalysis: obj.ai_analysis || null,
+                photos: (body.mit_bilder === true && Array.isArray(obj.photos)) ? obj.photos : undefined /* v893r-dpkphotos */
               }, null, 2);
               const safe = String(obj.kuerzel || obj.name || 'objekt').replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 40) || 'objekt';
               attachments = [{ filename: safe + '.dpk', content: dpk, contentType: 'application/json' }];
-              tl.push('', 'Ganzes Objekt als .dpk-Datei im Anhang (alle eingegebenen Werte inkl. Finanzierung).');
+              tl.push('', 'Ganzes Objekt als .dpk-Datei im Anhang (alle eingegebenen Werte inkl. Finanzierung' + (body.mit_bilder === true ? ' und Fotos' : '') + ').');
               hl.push('<p><strong>Anhang:</strong> Ganzes Objekt als <code>.dpk</code>-Datei (alle eingegebenen Werte inkl. Finanzierung).</p>');
             }
           } catch (e) { console.warn('[network] dpk attach failed:', e.message); }
@@ -194,6 +195,27 @@ router.post('/einreichen', async (req, res) => {
   } catch (e) {
     console.error('[network] einreichen', e.message);
     res.status(500).json({ error: 'submit_failed' });
+  }
+});
+
+/* v893n-partner: "Partner werden" (Freier-Sitzplatz-CTA) -> Marcel informieren */
+router.post('/partner-interest', async (req, res) => {
+  try {
+    const userEmail = req.user ? (req.user.email || '') : '';
+    if (mailerService && typeof mailerService.sendMail === 'function') {
+      try {
+        await mailerService.sendMail({
+          to: 'dealpilot@junker-immobilien.io',
+          subject: 'Partner-werden-Anfrage' + (userEmail ? (' von ' + userEmail) : ''),
+          text: 'Anfrage verschickt',
+          replyTo: userEmail || undefined
+        });
+      } catch (mailErr) { console.warn('[network] partner-interest mail failed:', mailErr.message); }
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[network] partner-interest', e.message);
+    res.status(500).json({ error: 'interest_failed' });
   }
 });
 

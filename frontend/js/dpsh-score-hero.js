@@ -507,8 +507,7 @@
 
   function boot() {
     injectCss();
-    /* v875: Nutzer-Praeferenz — Leiste kompakt starten */
-    try { if (localStorage.getItem('dp_dpsh_min') === '1') document.body.classList.add('dpsh-stub'); } catch (e) {}
+    /* v893o-nostub: kein body.dpsh-stub mehr (Weissbild-Loop). Minimieren = #kpi-eval-card.dpsh-collapsed (setupKpiEvalCollapse liest dp_dpsh_min). */
     wrap('renderDealScore'); wrap('renderDealScore2');
     realRenderAll();
     setupKpiEvalCollapse();
