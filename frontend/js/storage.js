@@ -369,9 +369,12 @@ async function saveObj(opts) {
     try { console.warn('[storage] saveObj: Neu-Anlage laeuft bereits -> zweiter Aufruf uebersprungen (v828)'); } catch(e){}
     return;
   }
+  /* v893v-race: Lock SOFORT (synchron, vor allen awaits) setzen -> parallele Auto-Saves
+     koennen nicht mehr durchschluepfen und ein zweites/drittes Objekt anlegen. */
+  if (!_currentObjKey) _newObjSaveInflight = true;
   // Paywall: Track calculation usage
   if (!silent && typeof Paywall !== 'undefined' && Paywall.gate) {  /* v379-autosave */
-    if (!Paywall.gate('calculations')) return;  // Limit reached → modal opens
+    if (!Paywall.gate('calculations')) { _newObjSaveInflight = false; return; }  // v893v-race: Lock loesen
   }
   // V63.82: Objekt-Limit-Check (Plan.atLimit) — vor dem Save
   // Wir zählen die existierenden Objekte; wenn Plan-Limit erreicht UND es ist ein NEUES Objekt → Paywall
@@ -387,6 +390,7 @@ async function saveObj(opts) {
       if (Plan.atLimit('objects', existingCount)) {
         if (typeof toast === 'function') toast('Objekt-Limit (' + Plan.limit('objects') + ') erreicht — Plan upgraden.');
         if (typeof openPricingModal === 'function') setTimeout(openPricingModal, 800);
+        _newObjSaveInflight = false; /* v893v-race */
         return;
       }
     } catch (e) { /* defensiv: bei Fehler einfach durchlassen */ }
@@ -400,6 +404,7 @@ async function saveObj(opts) {
     var conflict = await _checkObjIdConflict(window._currentObjSeq);
     if (conflict) {
       toast('⚠ Objekt-ID "' + window._currentObjSeq + '" existiert bereits — bitte ändern.');
+      _newObjSaveInflight = false; /* v893v-race */
       return;
     }
     // V36: Counter mitziehen wenn manuell höher gesetzt
@@ -1489,10 +1494,30 @@ function _resetUiAfterDelete() {
 // ══════════════════════════════════════════════════
 // EXPORT / IMPORT
 // ══════════════════════════════════════════════════
+function _v893rExpPhotos(){ try { return localStorage.getItem('dp_export_photos') !== '0'; } catch(e){ return true; } } /* v893r-expphotos */
+/* v893t-crypto: AES-GCM Passwort-Verschluesselung (Web-Crypto) */
+async function _dpDeriveKey(password, salt) {
+  var km = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: salt, iterations: 200000, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+function _dpB64(buf) { return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))); }
+function _dpUnb64(str) { return Uint8Array.from(atob(str), function (c) { return c.charCodeAt(0); }); }
+async function _dpEncryptJson(plainText, password) {
+  var salt = crypto.getRandomValues(new Uint8Array(16));
+  var iv = crypto.getRandomValues(new Uint8Array(12));
+  var key = await _dpDeriveKey(password, salt);
+  var ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(plainText));
+  return JSON.stringify({ dp_enc: 1, v: 1, kdf: 'PBKDF2', hash: 'SHA-256', iter: 200000, salt: _dpB64(salt), iv: _dpB64(iv), ct: _dpB64(ct) }, null, 2);
+}
+async function _dpDecryptJson(env, password) {
+  var key = await _dpDeriveKey(password, _dpUnb64(env.salt));
+  var pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: _dpUnb64(env.iv) }, key, _dpUnb64(env.ct));
+  return new TextDecoder().decode(pt);
+}
 async function exportAllJSON() {
   if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('json_backup')) { /* v496-gate */
-    if (typeof toast === 'function') toast('JSON-Objektsicherung (Import/Export) ist im Pro-Plan enthalten.');
-    else alert('JSON-Objektsicherung (Import/Export) ist im Pro-Plan enthalten.');
+    if (typeof toast === 'function') toast('Objekt-Sicherung (Import/Export) ist im Pro-Plan enthalten.');
+    else alert('Objekt-Sicherung (Import/Export) ist im Pro-Plan enthalten.');
     return;
   }
   var all = [];
@@ -1504,7 +1529,7 @@ async function exportAllJSON() {
         var full = await Auth.apiCall('/objects/' + resp.items[i].id);
         all.push({
           data: full.data, ai_analysis: full.ai_analysis,
-          photos: full.photos, name: full.name, created_at: full.created_at
+          photos: (_v893rExpPhotos() ? full.photos : []), name: full.name, created_at: full.created_at
         });
       }
     } catch (err) { toast('⚠ Export-Fehler: ' + err.message); return; }
@@ -1517,7 +1542,13 @@ async function exportAllJSON() {
     });
     all = keys.map(function(k) { try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch(e) { return {}; } });
   }
-  var blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+  var _out = JSON.stringify(all, null, 2); /* v893t-crypto */
+  if (window._exportEncrypt) {
+    var _pw = window.prompt('Passwort für die Verschlüsselung vergeben — unbedingt merken! Ohne Passwort ist das Backup nicht wiederherstellbar.');
+    if (!_pw) { toast('Export abgebrochen (kein Passwort)'); return; }
+    try { _out = await _dpEncryptJson(_out, _pw); } catch (e) { toast('⚠ Verschlüsselung fehlgeschlagen: ' + e.message); return; }
+  }
+  var blob = new Blob([_out], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'DealPilot_Objekte_' + new Date().toISOString().replace(/[:T.]/g, '-').slice(0, 17) + '.dpkt';  // V251-05
@@ -1539,8 +1570,8 @@ window.exportAllObjectsJson = exportAllJSON;
  */
 async function exportSingleObjectJson(objId) {
   if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('json_backup')) { /* v495-export-gate */
-    if (typeof toast === 'function') toast('JSON-Objektsicherung ist im Pro-Plan enthalten.');
-    else alert('JSON-Objektsicherung ist im Pro-Plan enthalten.');
+    if (typeof toast === 'function') toast('Objekt-Sicherung ist im Pro-Plan enthalten.');
+    else alert('Objekt-Sicherung ist im Pro-Plan enthalten.');
     return;
   }
   if (!objId) { toast('⚠ Kein Objekt ausgewählt'); return; }
@@ -1550,7 +1581,7 @@ async function exportSingleObjectJson(objId) {
       var full = await Auth.apiCall('/objects/' + objId);
       single = {
         data: full.data, ai_analysis: full.ai_analysis,
-        photos: full.photos, name: full.name, created_at: full.created_at
+        photos: (_v893rExpPhotos() ? full.photos : []), name: full.name, created_at: full.created_at
       };
     } else {
       var raw = localStorage.getItem(objId);
@@ -1568,12 +1599,18 @@ async function exportSingleObjectJson(objId) {
     .toString()
     .replace(/[^a-zA-Z0-9_-]/g, '_')
     .substring(0, 40);
-  var blob = new Blob([JSON.stringify([single], null, 2)], { type: 'application/json' });
+  var _out = JSON.stringify([single], null, 2); /* v893t-crypto */
+  if (window._exportEncrypt) {
+    var _pw = window.prompt('Passwort für die Verschlüsselung vergeben — unbedingt merken! Ohne Passwort ist die Datei nicht wiederherstellbar.');
+    if (!_pw) { toast('Export abgebrochen (kein Passwort)'); return; }
+    try { _out = await _dpEncryptJson(_out, _pw); } catch (e) { toast('⚠ Verschlüsselung fehlgeschlagen: ' + e.message); return; }
+  }
+  var blob = new Blob([_out], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'DealPilot_Objekte_' + nameSlug + '_' + new Date().toISOString().replace(/[:T.]/g, '-').slice(0, 17) + '.dpkt';  // V251-05
   a.click();
-  toast('✓ Objekt "' + (single.name || nameSlug) + '" als JSON gesichert');
+  toast('✓ Objekt "' + (single.name || nameSlug) + '" als .dpkt-Datei gesichert'); /* v893u-term */
 }
 window.exportSingleObjectJson = exportSingleObjectJson;
 
@@ -1640,7 +1677,7 @@ async function exportSingleObjectExcel(objId) {
       var full = await Auth.apiCall('/objects/' + objId);
       single = {
         data: full.data, ai_analysis: full.ai_analysis,
-        photos: full.photos, name: full.name, created_at: full.created_at, id: full.id
+        photos: (_v893rExpPhotos() ? full.photos : []), name: full.name, created_at: full.created_at, id: full.id
       };
     } else {
       var raw = localStorage.getItem(objId);
@@ -1685,7 +1722,7 @@ async function exportAllObjectsExcel() {
         var full = await Auth.apiCall('/objects/' + resp.items[i].id);
         all.push({
           data: full.data, ai_analysis: full.ai_analysis,
-          photos: full.photos, name: full.name, created_at: full.created_at, id: full.id
+          photos: (_v893rExpPhotos() ? full.photos : []), name: full.name, created_at: full.created_at, id: full.id
         });
       }
     } else {
@@ -1734,8 +1771,8 @@ window.triggerImportExcel = function() {
 
 window.triggerImportJson = function() {
   if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('json_backup')) { /* v496-gate */
-    if (typeof toast === 'function') toast('JSON-Objektsicherung (Import/Export) ist im Pro-Plan enthalten.');
-    else alert('JSON-Objektsicherung (Import/Export) ist im Pro-Plan enthalten.');
+    if (typeof toast === 'function') toast('Objekt-Sicherung (Import/Export) ist im Pro-Plan enthalten.');
+    else alert('Objekt-Sicherung (Import/Export) ist im Pro-Plan enthalten.');
     return;
   }
   var input = document.createElement('input');
@@ -1758,6 +1795,12 @@ async function importJSON(inp) {
   r.onload = async function(e) {
     try {
       var data = JSON.parse(e.target.result);
+      if (data && data.dp_enc) { /* v893t-crypto: verschluesseltes Backup */
+        var _pw = window.prompt('Dieses Backup ist verschlüsselt. Bitte Passwort eingeben:');
+        if (!_pw) { toast('Import abgebrochen'); inp.value = ''; return; }
+        try { var _dec = await _dpDecryptJson(data, _pw); data = JSON.parse(_dec); }
+        catch (err) { toast('⚠ Falsches Passwort oder beschädigte Datei'); inp.value = ''; return; }
+      }
       var arr = Array.isArray(data) ? data : [data];
       if (Auth.isApiMode()) {
         for (var i = 0; i < arr.length; i++) {

@@ -672,6 +672,18 @@ function showSettings(initialTab) {
           (function(){ var cur='konsens'; try{cur=localStorage.getItem('dp_qb_avm_src')||'konsens';}catch(e){} return [['konsens','Konsens (\u00d8 aller aktiven)'],['dp','DealPilot'],['sp','Sprengnetter'],['ph','PriceHubble']].map(function(o){return '<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join(''); })() +
           '</select>' +
         '</div>' +
+        /* v893r-exportphotos: Bilder in Export & Netzwerk-Anhang */
+        '<hr class="dvd">' +
+        '<h3 class="set-section-h">Bilder in Sicherung & Netzwerk</h3>' +
+        '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
+          '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">' +
+            '<input type="checkbox" id="set_export_photos"' + (function(){try{return localStorage.getItem('dp_export_photos')!=='0'?' checked':'';}catch(e){return ' checked';}})() + ' style="margin-top:3px;flex-shrink:0;cursor:pointer;" onchange="window._exportPhotosToggle(this)">' +
+            '<span>' +
+              '<span style="display:block;color:var(--ch,#2A2727);font-weight:500">Objektfotos einbeziehen</span>' +
+              '<span style="display:block;color:var(--muted,#5F5E5A);margin-top:2px;line-height:1.5;font-weight:400">Beim JSON-Export und beim Anhängen eines Objekts im Netzwerk werden die Fotos mitgegeben (größere Dateien). Aus = ohne Bilder. (Wird auf diesem Gerät gespeichert.)</span>' +
+            '</span>' +
+          '</label>' +
+        '</div>' +
         /* === V213 collapse-toggle profilanzeige END === */
         /* === V228 tooltip-mode-toggle START === */
         '<hr class="dvd">' +
@@ -3036,10 +3048,12 @@ try{ window._mbThemePref=_mbThemePref; window._setMbTheme=_setMbTheme; window._s
 
 /* v875-dpsh-toggle: Anzeige-Praeferenz sofort anwenden + lokal speichern */
 window._qbAvmSrcSet = function (sel) { try { localStorage.setItem('dp_qb_avm_src', (sel && sel.value) || 'konsens'); } catch (e) {} }; /* v893e-src */
-window._dpshMinToggle = function (cb) {
+window._exportPhotosToggle = function (cb) { /* v893r-exportphotos */
+  try { localStorage.setItem('dp_export_photos', cb.checked ? '1' : '0'); } catch (e) {}
+};
+window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse wie der manuelle Chevron */
   try { localStorage.setItem('dp_dpsh_min', cb.checked ? '1' : '0'); } catch (e) {}
   try {
-    document.body.classList.toggle('dpsh-stub', !!cb.checked);
     var card = document.getElementById('kpi-eval-card');
     if (card) card.classList.toggle('dpsh-collapsed', !!cb.checked);
   } catch (e) {}

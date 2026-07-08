@@ -585,6 +585,7 @@
     var mit = mitOf(card);
     var body = {
       object_ref: currentObjId(),
+      mit_bilder: (function(){try{return localStorage.getItem('dp_export_photos')!=='0';}catch(e){return true;}})(), /* v893r-mitbilder */
       adresse: mit.objekt ? adresse() : '',
       eckdaten: mit.eckdaten ? eckdaten() : {},
       dr: (mit.dr_persoenlich || mit.dr_objekt) ? drInfo() : {},
@@ -616,7 +617,12 @@
       toast('Anfrage konnte nicht gesendet werden.');
     });
   }
-  function partnerInterest() { toast('Danke f\u00fcr das Interesse \u2014 Marcel wird informiert.'); }
+  function partnerInterest() { /* v893n-partner */
+    toast('Danke f\u00fcr das Interesse \u2014 Marcel wird informiert.');
+    try {
+      fetch('/api/v1/network-cards/partner-interest', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() }, body: '{}' }).catch(function () {});
+    } catch (e) {}
+  }
 
   /* ────────────────── Exporte ────────────────── */
   function exportDoc(which) {

@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=896';
+  var IFRAME_SRC = 'quickcheck-app.html?v=903';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
@@ -343,71 +343,132 @@
     if (document.getElementById('qcpm-style')) return;
     var s=document.createElement('style'); s.id='qcpm-style';
     s.textContent=[
-      '#qcpm-ov{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto;background:rgba(15,13,12,.62);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);font-family:"Space Grotesk",system-ui,sans-serif}',
-      '#qcpm-ov .qcpm-box{background:#fff;border:1px solid rgba(201,168,76,.30);border-radius:16px;width:min(640px,100%);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 28px 70px rgba(0,0,0,.32),0 0 0 1px rgba(201,168,76,.10);animation:qcpmIn .22s cubic-bezier(.2,.7,.2,1)}',
-      '@keyframes qcpmIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}',
-      '#qcpm-ov .qcpm-head{display:flex;align-items:center;gap:13px;padding:20px 24px 12px;border-bottom:1px solid #EFEAE0;background:linear-gradient(180deg,rgba(201,168,76,.08),#fff)}',
-      '#qcpm-ov .qcpm-ic{width:40px;height:40px;border-radius:10px;background:rgba(201,168,76,.16);color:#9a7f33;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:19px}',
-      '#qcpm-ov .qcpm-head h3{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-size:23px;font-weight:600;color:#2A2727;flex:1;line-height:1.15}',
-      '#qcpm-ov .qcpm-x{background:transparent;border:1px solid #E7E2DC;color:#7A7370;width:34px;height:34px;border-radius:8px;font-size:18px;line-height:1;cursor:pointer;flex-shrink:0;transition:all .15s}',
-      '#qcpm-ov .qcpm-x:hover{background:#F6F2E9;border-color:#C9A84C;color:#2A2727}',
-      '#qcpm-ov .qcpm-body{padding:16px 24px 18px;overflow:auto}',
-      '#qcpm-ov .qcpm-intro{font-size:13px;color:#6B6560;line-height:1.55;margin:0 0 14px}',
-      '#qcpm-ov .qcpm-all{display:flex;align-items:center;gap:9px;margin:0 0 14px;font-size:13px;font-weight:600;color:#2A2727}',
-      '#qcpm-ov .qcpm-all input{width:16px;height:16px;accent-color:#C9A84C}',
-      '#qcpm-ov .qcpm-sec{margin-bottom:14px}',
-      '#qcpm-ov .qcpm-sec-t{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#9a7f33;font-weight:700;margin-bottom:7px}',
-      '#qcpm-ov .qcpm-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid #ECE6DA;border-radius:10px;margin-bottom:7px;transition:background .12s}',
-      '#qcpm-ov .qcpm-item:hover{background:rgba(201,168,76,.06)}',
-      '#qcpm-ov .qcpm-item input{width:16px;height:16px;margin-top:1px;accent-color:#C9A84C;flex-shrink:0}',
-      '#qcpm-ov .qcpm-item .l{flex:1;font-size:13px;color:#2A2727;min-width:0}',
-      '#qcpm-ov .qcpm-item .t{display:block;font-size:11px;color:#9a7f33;margin-top:2px}',
-      '#qcpm-ov .qcpm-item .v{font-weight:700;font-size:13px;color:#2A2727;white-space:nowrap}',
-      '#qcpm-ov .qcpm-empty{text-align:center;font-style:italic;color:#7A7370;font-size:13px;padding:8px 0 4px}',
-      '#qcpm-ov .qcpm-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid #EFEAE0;background:#FAF8F3;border-radius:0 0 16px 16px}',
-      '#qcpm-ov .qcpm-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border:1px solid #E2DCD2;border-radius:9px;background:#fff;font:600 13px "Space Grotesk",system-ui,sans-serif;cursor:pointer;color:#2A2727;transition:all .14s}',
-      '#qcpm-ov .qcpm-btn:hover{border-color:#C9A84C}',
-      '#qcpm-ov .qcpm-btn.primary{background:linear-gradient(135deg,#E8CC7A,#C9A84C);color:#3a2f0c;border-color:transparent;font-weight:700}',
-      '#qcpm-ov .qcpm-btn.primary:hover{filter:brightness(1.04)}'
+      '#qcpm-ov{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:22px;overflow:auto;background:rgba(8,7,6,.62);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);font-family:"Inter",system-ui,sans-serif}',
+      '#qcpm-ov .qcpm-box{background:#FDFCFA;border:1px solid rgba(201,168,76,.35);border-radius:16px;width:min(760px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 28px 70px rgba(0,0,0,.5);animation:qcpmIn .22s cubic-bezier(.2,.7,.2,1)}',
+      '@keyframes qcpmIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}',
+      '#qcpm-ov .qcpm-head{background:#0a0a0a}',
+      '#qcpm-ov .qcpm-hbar{display:flex;align-items:center;justify-content:space-between;padding:13px 20px}',
+      '#qcpm-ov .qcpm-brand{font-family:"Space Grotesk",sans-serif;font-weight:700;color:#fff;font-size:15px}#qcpm-ov .qcpm-brand b{color:#C9A84C}',
+      '#qcpm-ov .qcpm-x{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#cfc8bd;font-size:15px;cursor:pointer;line-height:1}#qcpm-ov .qcpm-x:hover{border-color:#C9A84C;color:#C9A84C}',
+      '#qcpm-ov .qcpm-band{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);padding:15px 20px 13px}',
+      '#qcpm-ov .qcpm-band h3{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:24px;color:#161310}',
+      '#qcpm-ov .qcpm-band p{margin:3px 0 0;font-size:12.5px;color:#3a3020;line-height:1.5;max-width:600px}',
+      '#qcpm-ov .qcpm-tabs{display:flex;background:#161310;padding:0 20px}',
+      '#qcpm-ov .qcpm-tab{border:0;background:transparent;color:#b7ad9c;font:inherit;font-size:13px;font-weight:600;padding:12px 16px;cursor:pointer;border-bottom:2px solid transparent}',
+      '#qcpm-ov .qcpm-tab.active{color:#E8CC7A;border-bottom-color:#C9A84C}',
+      '#qcpm-ov .qcpm-tab .cnt{display:inline-block;margin-left:6px;font-size:10.5px;background:rgba(201,168,76,.18);color:#E8CC7A;border-radius:20px;padding:1px 7px}',
+      '#qcpm-ov .qcpm-body{padding:16px 20px 8px;overflow:auto;background:#FDFCFA}',
+      '#qcpm-ov .qcpm-pane{display:none}#qcpm-ov .qcpm-pane.active{display:block}',
+      '#qcpm-ov .qcpm-ctrls{display:flex;align-items:center;gap:14px 18px;flex-wrap:wrap;margin:0 0 13px}',
+      '#qcpm-ov .qcpm-cl{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#7A7370}',
+      '#qcpm-ov .qcpm-srcs{display:flex;flex-wrap:wrap;gap:7px}',
+      '#qcpm-ov .qcpm-src{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(201,168,76,.3);border-radius:9px;padding:6px 11px;font-size:12.5px;color:#2A2727;cursor:pointer;background:#fff;font-weight:500}',
+      '#qcpm-ov .qcpm-src input{display:none}',
+      '#qcpm-ov .qcpm-src.on{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-color:transparent;color:#161310;font-weight:700}',
+      '#qcpm-ov .qcpm-seg{display:inline-flex;border:1px solid rgba(201,168,76,.28);border-radius:9px;overflow:hidden;background:#fff}',
+      '#qcpm-ov .qcpm-seg button{border:0;background:transparent;padding:6px 13px;font:inherit;font-size:12.5px;color:#2A2727;cursor:pointer;font-weight:500}',
+      '#qcpm-ov .qcpm-seg button+button{border-left:1px solid rgba(201,168,76,.28)}',
+      '#qcpm-ov .qcpm-seg button.on{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#161310;font-weight:700}',
+      '#qcpm-ov .qcpm-all{display:flex;align-items:center;gap:9px;margin:0 0 12px;font-size:13px;font-weight:600;color:#2A2727;cursor:pointer}#qcpm-ov .qcpm-all input{width:16px;height:16px;accent-color:#b8932f}',
+      '#qcpm-ov .qcpm-sec{margin-bottom:15px}',
+      '#qcpm-ov .qcpm-sec-h{display:flex;align-items:center;gap:9px;margin:0 0 8px}',
+      '#qcpm-ov .qcpm-logo{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}',
+      '#qcpm-ov .qcpm-l-dp{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#161310}#qcpm-ov .qcpm-l-sn{background:#3557a6}#qcpm-ov .qcpm-l-ph{background:#1f9d8b}#qcpm-ov .qcpm-l-x{background:#161310;color:#E8CC7A}',
+      '#qcpm-ov .qcpm-sec-t{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#b8932f;font-weight:700}',
+      '#qcpm-ov .qcpm-win{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.06em;color:#161310;background:linear-gradient(110deg,#E8CC7A,#C9A84C);border-radius:20px;padding:2px 9px;display:none}',
+      '#qcpm-ov .qcpm-sec.winner .qcpm-win{display:inline-block}',
+      '#qcpm-ov .qcpm-item{display:flex;align-items:center;gap:12px;padding:10px 13px;border:1px solid #ececE4;border-radius:10px;background:#fff;margin-bottom:7px}#qcpm-ov .qcpm-item:hover{border-color:rgba(201,168,76,.4)}',
+      '#qcpm-ov .qcpm-item.dpband{border-left:3px solid #C9A84C}',
+      '#qcpm-ov .qcpm-item input{width:17px;height:17px;accent-color:#b8932f;flex-shrink:0}',
+      '#qcpm-ov .qcpm-item .l{flex:1;min-width:0}#qcpm-ov .qcpm-item .l .nm{display:block;font-size:13.5px;color:#2A2727;font-weight:500}#qcpm-ov .qcpm-item .l .t{display:block;font-size:11px;color:#b8932f;font-family:"JetBrains Mono",monospace;margin-top:1px}',
+      '#qcpm-ov .qcpm-item .v{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:14px;color:#2A2727;white-space:nowrap;text-align:right}',
+      '#qcpm-ov .qcpm-empty{text-align:center;font-style:italic;color:#7A7370;font-size:13px;padding:14px 0}',
+      '#qcpm-ov .qcpm-setb{font-size:10px;font-weight:700;letter-spacing:.03em;padding:2px 9px;border-radius:20px;background:rgba(63,165,108,.14);color:#2c7a4e;white-space:nowrap}',
+      '#qcpm-ov .qcpm-foot{display:flex;justify-content:flex-end;gap:10px;align-items:center;padding:13px 20px;background:#F6F2E9;border-top:1px solid rgba(201,168,76,.28)}',
+      '#qcpm-ov .qcpm-fh{margin-right:auto;font-size:11px;color:#7A7370}',
+      '#qcpm-ov .qcpm-btn{padding:10px 20px;border-radius:10px;font:600 13.5px "Inter",system-ui,sans-serif;cursor:pointer;border:1px solid rgba(201,168,76,.28);background:#fff;color:#2A2727}#qcpm-ov .qcpm-btn:hover{border-color:#b8932f}',
+      '#qcpm-ov .qcpm-btn.primary{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#161310;border:0;box-shadow:0 3px 12px rgba(201,168,76,.4);font-weight:700}'
     ].join('');
     document.head.appendChild(s);
   }
   function _closeSaveOverlay(){ var ov=document.getElementById('qcpm-ov'); if(ov&&ov.parentNode) ov.parentNode.removeChild(ov); }
-  function _showSaveOverlay(items){
+  function _showSaveOverlay(items, avmRaw, avmDefault, qcSet){
     _qcpmStyle(); _closeSaveOverlay();
+    /* v893j-modal2: Restyle + Tabs + Quelle-/Spannen-Wahl. */
+    var AVM={ 'DealPilot':{cls:'qcpm-l-dp',logo:'DP',prio:0}, 'Sprengnetter':{cls:'qcpm-l-sn',logo:'SN',prio:1}, 'PriceHubble':{cls:'qcpm-l-ph',logo:'PH',prio:2} };
+    items = items || []; avmRaw = avmRaw || {};
+    var state = { src: (avmDefault||'konsens'), span: 'mid' };
+    function fmt(n,unit){ if(n==null||!isFinite(n)) return '\u2013'; return Math.round(n).toLocaleString('de-DE')+(unit?(' '+unit):''); }
+    function kindOf(t){ return (t==='verkehrswert')?'mw':(t==='nkm_grund'||t==='mietspanne')?'mm':''; }
+    function val(prov,kind){ var r=avmRaw[prov]; if(!r||!r[kind]) return null; return r[kind][state.span]; }
+    function konsens(kind){ var vs=[]; Object.keys(avmRaw).forEach(function(p){ var v=val(p,kind); if(v!=null&&isFinite(v)) vs.push(v); }); if(!vs.length) return null; return Math.round(vs.reduce(function(a,b){return a+b;},0)/vs.length); }
+    // Provider mit Daten (aus items oder avmRaw), DealPilot zuerst
+    var provs=[]; items.forEach(function(it){ if(AVM[it.source]&&provs.indexOf(it.source)<0) provs.push(it.source); });
+    Object.keys(avmRaw).forEach(function(p){ if(AVM[p]&&provs.indexOf(p)<0) provs.push(p); });
+    provs.sort(function(a,b){ return AVM[a].prio-AVM[b].prio; });
+    var srcItems=items.filter(function(it){ return !AVM[it.source]; });
+
+    function secHtml(){ var h=''; provs.forEach(function(p){ var m=AVM[p], dp=(p==='DealPilot');
+      h+='<div class="qcpm-sec" data-prov="'+p+'"><div class="qcpm-sec-h"><span class="qcpm-logo '+m.cls+'">'+m.logo+'</span><span class="qcpm-sec-t">'+_qcpmEsc(p)+'</span><span class="qcpm-win">\u2713 gew\u00e4hlt</span></div>';
+      // Marktwert/Marktmiete aus avmRaw (recompute) + zugehoerige items als Checkbox
+      var mwIt=items.filter(function(it){ return it.source===p && kindOf(it.target)==='mw'; })[0];
+      var mmIt=items.filter(function(it){ return it.source===p && kindOf(it.target)==='mm'; })[0];
+      if(mwIt||avmRaw[p]&&avmRaw[p].mw){ h+='<label class="qcpm-item'+(dp?' dpband':'')+'"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(mwIt?mwIt.key:(p+'_mw'))+'" checked><span class="l"><span class="nm">Marktwert</span><span class="t">\u2192 verkehrswert</span></span><span class="v" data-p="'+p+'" data-k="mw">'+fmt(val(p,'mw'),'\u20ac')+'</span></label>'; }
+      if(mmIt||avmRaw[p]&&avmRaw[p].mm){ h+='<label class="qcpm-item'+(dp?' dpband':'')+'"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(mmIt?mmIt.key:(p+'_mm'))+'" checked><span class="l"><span class="nm">Marktmiete</span><span class="t">\u2192 nkm_grund</span></span><span class="v" data-p="'+p+'" data-k="mm">'+fmt(val(p,'mm'),'\u20ac/Mo')+'</span></label>'; }
+      // uebrige items dieses Providers (Lage/Rendite/Konfidenz ...)
+      items.filter(function(it){ return it.source===p && kindOf(it.target)===''; }).forEach(function(it){
+        h+='<label class="qcpm-item'+(dp?' dpband':'')+'"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(it.key)+'" checked><span class="l"><span class="nm">'+_qcpmEsc(it.label||'')+'</span><span class="t">\u2192 '+_qcpmEsc(it.target||'')+'</span></span><span class="v">'+_qcpmEsc(it.value==null?'':String(it.value))+'</span></label>'; });
+      h+='</div>'; }); return h||'<p class="qcpm-empty">Keine AVM-Daten.</p>'; }
+
+    function srcHtml(){ var qh=''; /* v893k-overview */
+      if(qcSet&&qcSet.length){ qh='<div class="qcpm-sec"><div class="qcpm-sec-h"><span class="qcpm-logo qcpm-l-x">\u2713</span><span class="qcpm-sec-t">Bereits im Quickboarding gesetzt</span></div>';
+        qcSet.forEach(function(it){ qh+='<div class="qcpm-item" style="cursor:default"><span class="qcpm-setb">gesetzt</span><span class="l"><span class="nm">'+_qcpmEsc(it.label)+'</span></span><span class="v">'+_qcpmEsc(it.value)+'</span></div>'; });
+        qh+='</div>'; }
+      if(!srcItems.length) return qh || '<p class="qcpm-empty">Keine weiteren ausgelesenen Daten.</p>';
+      var g={},o=[]; srcItems.forEach(function(it){ var s=it.source||''; if(!g[s]){g[s]=[];o.push(s);} g[s].push(it); });
+      var h=''; o.forEach(function(src){ h+='<div class="qcpm-sec"><div class="qcpm-sec-h"><span class="qcpm-logo qcpm-l-x">'+(src?src.charAt(0).toUpperCase():'?')+'</span><span class="qcpm-sec-t">'+_qcpmEsc(src||'Daten')+'</span></div>';
+        g[src].forEach(function(it){ h+='<label class="qcpm-item"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(it.key)+'" checked><span class="l"><span class="nm">'+_qcpmEsc(it.label||'')+'</span><span class="t">\u2192 '+_qcpmEsc(it.target||'')+'</span></span><span class="v">'+_qcpmEsc(it.value==null?'':String(it.value))+'</span></label>'; });
+        h+='</div>'; }); return qh+h; }
+
+    var srcChips='<label class="qcpm-src'+(state.src==='konsens'?' on':'')+'" data-src="konsens"><input type="radio" name="qcpm-src" '+(state.src==='konsens'?'checked':'')+'>Konsens (\u00d8)</label>';
+    provs.forEach(function(p){ srcChips+='<label class="qcpm-src'+(state.src===p?' on':'')+'" data-src="'+p+'"><input type="radio" name="qcpm-src" '+(state.src===p?'checked':'')+'>'+_qcpmEsc(p)+'</label>'; });
+
     var ov=document.createElement('div'); ov.id='qcpm-ov';
-    var body='<p class="qcpm-intro">Diese zus\u00e4tzlichen Daten wurden beim PDF-Import oder AVM-Abruf erkannt. Sie passen nicht ins Boarding-Formular, k\u00f6nnen aber sp\u00e4ter ins Vollobjekt \u00fcbernommen werden.</p>';
-    if(!items || !items.length){
-      body+='<p class="qcpm-empty">Keine zus\u00e4tzlichen Daten zum \u00dcbernehmen \u2014 du kannst direkt speichern.</p>';
-    } else {
-      body+='<label class="qcpm-all"><input type="checkbox" id="qcpm-all" checked> Alle \u00fcbernehmen</label>';
-      var groups={}, order=[];
-      items.forEach(function(it){ var s=it.source||''; if(!groups[s]){groups[s]=[];order.push(s);} groups[s].push(it); });
-      order.forEach(function(src){
-        body+='<div class="qcpm-sec"><div class="qcpm-sec-t">'+_qcpmEsc(src||'Daten')+'</div>';
-        groups[src].forEach(function(it){
-          body+='<label class="qcpm-item"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(it.key)+'" checked>'
-              +'<span class="l">'+_qcpmEsc(it.label||'')+'<span class="t">\u2192 '+_qcpmEsc(it.target||'')+'</span></span>'
-              +'<span class="v">'+_qcpmEsc(it.value==null?'':String(it.value))+'</span></label>';
-        });
-        body+='</div>';
-      });
-    }
-    ov.innerHTML='<div class="qcpm-box"><div class="qcpm-head"><div class="qcpm-ic">\u2699</div>'
-      +'<h3>Welche Daten \u00fcbernehmen?</h3><button class="qcpm-x" id="qcpm-x">\u2715</button></div>'
-      +'<div class="qcpm-body">'+body+'</div>'
-      +'<div class="qcpm-foot"><button class="qcpm-btn" id="qcpm-cancel">Abbrechen</button>'
-      +'<button class="qcpm-btn primary" id="qcpm-ok">Speichern &amp; \u00fcbernehmen</button></div></div>';
+    ov.innerHTML='<div class="qcpm-box">'
+      +'<div class="qcpm-head"><div class="qcpm-hbar"><span class="qcpm-brand">Deal<b>Pilot</b></span><button class="qcpm-x" id="qcpm-x">\u2715</button></div>'
+      +'<div class="qcpm-band"><h3>Welche Daten \u00fcbernehmen?</h3><p>W\u00e4hle Quelle &amp; Spanne \u2014 Marktwert/Marktmiete richten sich danach. Lage &amp; Wertentwicklung liefert nur DealPilot.</p></div>'
+      +'<div class="qcpm-tabs"><button class="qcpm-tab active" data-tab="avm">\u00dcbernahme</button><button class="qcpm-tab" data-tab="src">Ausgelesene Daten <span class="cnt">'+(srcItems.length+((qcSet&&qcSet.length)||0))+'</span></button></div></div>'
+      +'<div class="qcpm-body">'
+      +'<div class="qcpm-pane active" data-pane="avm">'
+      +'<div class="qcpm-ctrls"><span class="qcpm-cl">Quelle</span><div class="qcpm-srcs">'+srcChips+'</div>'
+      +'<span class="qcpm-cl">Spanne</span><div class="qcpm-seg" id="qcpm-span"><button data-span="low">Unten</button><button data-span="mid" class="on">\u00d8</button><button data-span="high">Oben</button></div></div>'
+      +'<label class="qcpm-all"><input type="checkbox" id="qcpm-all" checked> Alle \u00fcbernehmen</label>'
+      +'<div id="qcpm-secs">'+secHtml()+'</div></div>'
+      +'<div class="qcpm-pane" data-pane="src">'+srcHtml()+'</div>'
+      +'</div>'
+      +'<div class="qcpm-foot"><span class="qcpm-fh" id="qcpm-fh"></span><button class="qcpm-btn" id="qcpm-cancel">Abbrechen</button><button class="qcpm-btn primary" id="qcpm-ok">Speichern &amp; \u00fcbernehmen</button></div></div>';
     document.body.appendChild(ov);
+
+    function recompute(){
+      [].forEach.call(ov.querySelectorAll('.qcpm-v,[data-k]'),function(){});
+      [].forEach.call(ov.querySelectorAll('span.v[data-k]'),function(el){ var p=el.getAttribute('data-p'), k=el.getAttribute('data-k'); el.textContent=fmt(val(p,k), k==='mw'?'\u20ac':'\u20ac/Mo'); });
+      [].forEach.call(ov.querySelectorAll('.qcpm-sec[data-prov]'),function(sec){ sec.classList.toggle('winner', state.src!=='konsens' && sec.getAttribute('data-prov')===state.src); });
+      var lbl={low:'Unten',mid:'\u00d8',high:'Oben'}[state.span];
+      var sn=(state.src==='konsens')?'Konsens (\u00d8)':state.src;
+      var fh=ov.querySelector('#qcpm-fh'); if(fh) fh.textContent=sn+' \u00b7 '+lbl;
+    }
+    recompute();
+
     function cancel(){ _postToFrame({source:'dp-qc-parent',type:'qc-save-cancel'}); _closeSaveOverlay(); }
     ov.addEventListener('click', function(e){ if(e.target===ov) cancel(); });
-    document.getElementById('qcpm-x').onclick=cancel;
-    document.getElementById('qcpm-cancel').onclick=cancel;
-    var all=document.getElementById('qcpm-all');
-    if(all) all.onchange=function(){ var on=all.checked; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){cb.checked=on;}); };
-    document.getElementById('qcpm-ok').onclick=function(){
+    ov.querySelector('#qcpm-x').onclick=cancel; ov.querySelector('#qcpm-cancel').onclick=cancel;
+    [].forEach.call(ov.querySelectorAll('.qcpm-tab'),function(t){ t.onclick=function(){ [].forEach.call(ov.querySelectorAll('.qcpm-tab'),function(x){x.classList.remove('active');}); t.classList.add('active'); var p=t.getAttribute('data-tab'); [].forEach.call(ov.querySelectorAll('.qcpm-pane'),function(x){ x.classList.toggle('active', x.getAttribute('data-pane')===p); }); }; });
+    [].forEach.call(ov.querySelectorAll('.qcpm-src'),function(c){ c.onclick=function(){ state.src=c.getAttribute('data-src'); [].forEach.call(ov.querySelectorAll('.qcpm-src'),function(x){x.classList.remove('on');}); c.classList.add('on'); var ip=c.querySelector('input'); if(ip) ip.checked=true; recompute(); }; });
+    [].forEach.call(ov.querySelectorAll('#qcpm-span button'),function(b){ b.onclick=function(){ state.span=b.getAttribute('data-span'); [].forEach.call(ov.querySelectorAll('#qcpm-span button'),function(x){x.classList.remove('on');}); b.classList.add('on'); recompute(); }; });
+    var all=ov.querySelector('#qcpm-all'); if(all) all.onchange=function(){ var on=all.checked; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){cb.checked=on;}); };
+    ov.querySelector('#qcpm-ok').onclick=function(){
       var keys=[]; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){ if(cb.checked) keys.push(cb.getAttribute('data-key')); });
-      _postToFrame({source:'dp-qc-parent',type:'qc-save-confirm',checkedKeys:keys});   /* QcApp=const -> nur postMessage */
+      _postToFrame({source:'dp-qc-parent',type:'qc-save-confirm',checkedKeys:keys,avmSource:state.src,avmSpan:state.span});
       _closeSaveOverlay();
     };
   }
@@ -423,7 +484,7 @@
     }
     else if (d.type === 'qc-import-pdf') _handleImportPdf();
     else if (d.type === 'qc-voice') _handleVoice();  /* v505-voice */
-    else if (d.type === 'qc-save-open') _showSaveOverlay(d.items || []);
+    else if (d.type === 'qc-save-open') _showSaveOverlay(d.items || [], d.avmRaw || {}, d.avmDefault || 'konsens', d.qcSet || []); /* v893k-overview */
     else if (d.type === 'qc-autopass') _handleAutopass(d.inputs, d.photos);   /* qb-buffer-photos */
   });
 })();

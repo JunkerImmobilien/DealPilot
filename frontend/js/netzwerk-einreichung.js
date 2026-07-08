@@ -239,6 +239,7 @@
 
   var mo = new MutationObserver(function () { try { ensureTab(); } catch (e) {} });
   function boot() {
+    return; /* v893p-off: Netzwerk-Partner-Tab vorerst aus den Einstellungen entfernt (spaeter: return raus) */
     try { mo.observe(document.body, { childList: true, subtree: true }); ensureTab(); } catch (e) {}
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

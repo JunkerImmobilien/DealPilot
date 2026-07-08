@@ -14,6 +14,7 @@
 const path = require('path');
 const fs = require('fs');
 const { sendMail } = require('./mailerService');
+const mailLayout = require('./mailLayout'); // v893q-kerosin
 
 // ─── Mail-Settings ─────────────────────────────────────────
 
@@ -155,20 +156,28 @@ async function sendCreditPackConfirmation(db, { userId, packLabel, creditsGrante
   if (!u.rowCount) return { ok: false, reason: 'user_not_found' };
   const user = u.rows[0];
 
-  const tmpl = loadTemplate('credit-pack-confirmation');
-  if (!tmpl) return { ok: false, reason: 'template_missing' };
-
+  /* v893q-kerosin: On-Brand-Template (mailLayout) statt loadTemplate-File; Kerosin-Text */
   const appUrl = process.env.APP_URL || 'https://dealpilot.junker-immobilien.io';
-
-  const html = fillTemplate(tmpl, {
-    user_name: user.name || user.email.split('@')[0],
-    credits_granted: creditsGranted,
-    requests_granted: requestsGranted,
-    pack_label: packLabel || '',
-    amount: fmtMoney(amountCents),
-    app_url: appUrl,
-    support_email: process.env.SUPPORT_MAIL_TO || 'support@junker-immobilien.io',
-    current_year: new Date().getFullYear()
+  const _name = user.name || user.email.split('@')[0];
+  const _liters = creditsGranted;
+  const _packTxt = packLabel ? (' (' + mailLayout._esc(packLabel) + ')') : '';
+  const html = mailLayout.wrap({
+    brandTag: 'KEROSIN',
+    heroKicker: 'TANK AUFGEF\u00dcLLT',
+    heroTitle: _liters + ' Liter Kerosin sind im Tank',
+    heroSubtitle: 'Hallo ' + mailLayout._esc(_name) + ',',
+    bodyHtml:
+      '<p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#3a2e08;">danke f\u00fcr deinen Kauf \u2014 wir haben deinem Konto <strong>' + _liters + ' Liter Kerosin</strong>' + _packTxt + ' gutgeschrieben. Dein Tank ist aufgef\u00fcllt und startklar.</p>' +
+      '<div style="background:#FAF6EC;border-left:3px solid #C9A84C;padding:14px 18px;margin:0 0 16px;border-radius:6px;">' +
+        '<strong style="color:#b8932f;font-size:12px;letter-spacing:.5px;text-transform:uppercase;">Deine Buchung</strong>' +
+        '<table role="presentation" style="margin-top:8px;font-size:13.5px;color:#4a4536;line-height:1.7;">' +
+          '<tr><td style="padding-right:18px;">Kerosin</td><td><strong>' + _liters + ' L</strong></td></tr>' +
+          (amountCents ? ('<tr><td style="padding-right:18px;">Betrag</td><td><strong>' + fmtMoney(amountCents) + '</strong></td></tr>') : '') +
+        '</table></div>' +
+      '<p style="margin:0 0 18px;font-size:14px;line-height:1.6;color:#3a2e08;">Kerosin ist dein Treibstoff f\u00fcr Marktbewertungen und den Co-Pilot im Cockpit \u2014 einfach weiterfliegen.</p>' +
+      mailLayout.button('Zum Cockpit', appUrl) +
+      '<p style="margin:18px 0 0;font-size:14px;color:#3a2e08;">Gute Fl\u00fcge!<br><strong>Marcel Junker \u00b7 Junker Immobilien</strong></p>',
+    footerNote: 'DealPilot \u00b7 Kerosin-Kaufbest\u00e4tigung \u00b7 <a href="https://www.junker-immobilien.io" style="color:#b8932f;text-decoration:none;">junker-immobilien.io</a>'
   });
 
   try {
