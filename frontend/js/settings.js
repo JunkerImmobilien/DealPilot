@@ -662,6 +662,16 @@ function showSettings(initialTab) {
             '</span>' +
           '</label>' +
         '</div>' +
+        /* v893e-src: Quickboarding Auto-Uebernahme-Quelle */
+        '<hr class="dvd">' +
+        '<h3 class="set-section-h">Quickboarding \u2014 Auto-\u00dcbernahme</h3>' +
+        '<p class="hint" style="margin-bottom:10px">Sind mehrere Marktbewertungen aktiv, bestimmt diese Wahl, welcher Wert nach dem Abruf und beim Spannen-Wechsel automatisch in die Grundmiete \u00fcbernommen wird. Einzelne Karten kannst du weiterhin gezielt \u00fcbernehmen.</p>' +
+        '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
+          '<label for="set_qb_avm_src" style="display:block;color:var(--ch,#2A2727);font-weight:500;margin-bottom:8px">Standard-Quelle</label>' +
+          '<select id="set_qb_avm_src" onchange="window._qbAvmSrcSet(this)" style="width:100%;max-width:320px;padding:9px 12px;border:1px solid rgba(201,168,76,0.35);border-radius:8px;background:#fff;color:var(--ch,#2A2727);font:inherit;cursor:pointer">' +
+          (function(){ var cur='konsens'; try{cur=localStorage.getItem('dp_qb_avm_src')||'konsens';}catch(e){} return [['konsens','Konsens (\u00d8 aller aktiven)'],['dp','DealPilot'],['sp','Sprengnetter'],['ph','PriceHubble']].map(function(o){return '<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join(''); })() +
+          '</select>' +
+        '</div>' +
         /* === V213 collapse-toggle profilanzeige END === */
         /* === V228 tooltip-mode-toggle START === */
         '<hr class="dvd">' +
@@ -3025,6 +3035,7 @@ try{ window._mbThemePref=_mbThemePref; window._setMbTheme=_setMbTheme; window._s
 
 
 /* v875-dpsh-toggle: Anzeige-Praeferenz sofort anwenden + lokal speichern */
+window._qbAvmSrcSet = function (sel) { try { localStorage.setItem('dp_qb_avm_src', (sel && sel.value) || 'konsens'); } catch (e) {} }; /* v893e-src */
 window._dpshMinToggle = function (cb) {
   try { localStorage.setItem('dp_dpsh_min', cb.checked ? '1' : '0'); } catch (e) {}
   try {

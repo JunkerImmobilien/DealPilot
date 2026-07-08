@@ -42,6 +42,7 @@ router.post('/credentials/reveal', authenticate, async (req, res, next) => {
 
 /* ---- Daten (nutzt gespeicherten Token) ---- */
 async function tokenOr428(req, res) {
+  if (String(process.env.IMMOMETRICA_MODE || '').toLowerCase() === 'stub') return 'stub-token'; /* v893c-stub */
   const t = await creds.getSecret(uid(req), PROVIDER);
   if (t == null) { res.status(428).json({ error: 'Kein ImmoMetrica-Zugang gespeichert' }); return null; }
   return t;
