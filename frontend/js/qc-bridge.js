@@ -170,6 +170,10 @@
 
   // ── (qc-save) Übernahme ──
   function _handleSave(inputs, avm, photos, pendingTargets) {
+    /* v893f-guard: Doppel-/Dreifach-Anlage verhindern (iframe schickt qc-save teils mehrfach) */
+    if (_handleSave._busy) { try { console.warn('[qc-bridge] Speichern laeuft bereits \u2014 Doppelauftrag ignoriert (v893f)'); } catch (e) {} return; }
+    _handleSave._busy = true;
+    try { setTimeout(function () { _handleSave._busy = false; }, 6000); } catch (e) { _handleSave._busy = false; }
     inputs = inputs || {};
 
     // (1) ÜBERSCHREIB-SCHUTZ: echtes newObj() STILL aufrufen. Nur newObj() setzt die

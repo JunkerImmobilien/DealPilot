@@ -459,7 +459,7 @@
   function renderAll() {
     if (_pending) return; _pending = true;
     var raf = window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); };
-    raf(function () { _pending = false; try { realRenderAll(); } catch (e) {} });
+    raf(function () { try { realRenderAll(); } catch (e) {} _pending = false; }); /* v893g-loop: _pending erst NACH dem Render frei */
   }
 
   function injectCss() {
