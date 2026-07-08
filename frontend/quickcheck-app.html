@@ -4615,6 +4615,27 @@ const QcApp = (function() {
   /* v893b-konsens: Auto-Uebernahme = Durchschnitt (Konsens) aller aktiven Quellen
      (Sprengnetter/PriceHubble aus _avmResults + DealPilot aus _mb_state), am aktuellen Spann. */
   function _applyConsensusToQc() {
+    /* v893e-src: Standard-Quelle aus Setting (Profil & Anzeige). Default konsens. */
+    try {
+      var _src = localStorage.getItem('dp_qb_avm_src') || 'konsens';
+      if (_src === 'dp' || _src === 'sp' || _src === 'ph') {
+        var _pn = _src === 'dp' ? 'DealPilot' : _src === 'sp' ? 'Sprengnetter' : 'PriceHubble';
+        var _mm = null;
+        if (_pn === 'DealPilot') {
+          var _el = document.getElementById('_mb_state');
+          if (_el && _el.value) { var _st = JSON.parse(_el.value); if (_st && _st.card && _st.card.mm) { var _k = _spanConfig === 'low' ? 'low' : _spanConfig === 'high' ? 'high' : 'med'; _mm = _st.card.mm[_k]; } }
+        } else {
+          for (var _i = 0; _i < (_avmResults || []).length; _i++) { if (_avmResults[_i] && _avmResults[_i].provider === _pn) { _mm = _selectedValue(_avmResults[_i], 'marktmiete'); break; } }
+        }
+        if (_mm != null && isFinite(_mm)) {
+          setVal('qc_nkm_grund', String(Math.round(_mm)));
+          if (typeof mieteAddUp === 'function') mieteAddUp();
+          var _f = document.getElementById('qc_nkm_grund'); if (_f) { var _fl = _f.closest('.field'); if (_fl) _fl.classList.add('has-source'); }
+          return;
+        }
+        /* gewaehlte Quelle (noch) nicht aktiv -> Fallback Konsens */
+      }
+    } catch (e) {}
     var mms = [];
     (_avmResults || []).forEach(function (r) {
       if (!r || r.provider === 'DealPilot') return; /* v893d-konsens: DealPilot nur aus _mb_state (span-genau), nicht doppelt */
