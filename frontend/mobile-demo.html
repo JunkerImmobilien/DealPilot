@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DealPilot · App (Hell/Dunkel)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---- constant brand tokens (gold + black, beide Modi) ---- */
+:root{
+  --obsidian:#0a0a0a; --on-gold:#1a1407;
+  --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-deep:#9a7f33; --gold-dim:#8d7430;
+  --green:#3FA56C; --green-hi:#5BD98E; --red:#B86250; --red-hi:#D9685F;
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace; --body:'Inter',system-ui,sans-serif;
+}
+/* ---- DARK theme (default) ---- */
+.screen{
+  --bg:#050505; --card:#17161c; --panel:#111014; --soft:#16151a;
+  --ink:#F5F3EE; --txt:#F5F3EE; --txt2:#cfc7b2; --mut:#94907f; --mut2:#5e5b52;
+  --line:rgba(201,168,76,.16); --line2:rgba(255,255,255,.07); --inp:#111014;
+  --tabbg:rgba(5,5,5,.96); --gauge:#0a0a0c; --th1:#2a282e; --th2:#15141a;
+  --pos:#5BD98E; --neg:#D9685F; --dialtext:#fff; --dialcenter:#0a0a0a;
+}
+/* ---- LIGHT theme ---- */
+.screen.light{
+  --bg:#FFFFFF; --card:#FFFFFF; --panel:#FFFFFF; --soft:#F6F5F2;
+  --ink:#141414; --txt:#141414; --txt2:#3a3a38; --mut:#8a8a86; --mut2:#b5b5b0;
+  --line:#ECEAE4; --line2:#F0EFEB; --inp:#FFFFFF;
+  --tabbg:rgba(255,255,255,.97); --gauge:#efefec; --th1:#e4e4e0; --th2:#bcbcb6;
+  --pos:#2c7d4f; --neg:#a04535; --dialtext:#1a1407; --dialcenter:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:var(--body);color:#e8e6df;background:radial-gradient(900px 700px at 50% -8%,rgba(201,168,76,.08),transparent 60%),#15140f;display:flex;flex-direction:column;align-items:center;gap:22px;padding:34px 14px 60px;min-height:100%}
+.intro{text-align:center;max-width:800px}
+.intro .ey{font-family:var(--mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+.intro h1{font-family:var(--disp);font-weight:600;font-size:25px;letter-spacing:-.01em;margin:8px 0 6px;color:#f3efe6}
+.intro p{color:#a39d8b;font-size:13.5px;line-height:1.6}
+
+.phone{width:392px;height:812px;border-radius:48px;position:relative;flex:0 0 auto;background:linear-gradient(160deg,#2c2a26,#111014);padding:11px;box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 50px 90px -34px rgba(0,0,0,.9),0 0 0 1px rgba(0,0,0,.6)}
+.screen{position:relative;width:100%;height:100%;border-radius:38px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column;transition:background .35s,color .35s;color:var(--txt)}
+.pcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55;transition:opacity .35s}
+.screen.light .pcanvas{opacity:.3}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:132px;height:27px;background:#000;border-radius:0 0 17px 17px;z-index:60}
+.sbar{height:46px;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 5px;font-family:var(--mono);font-size:12px;z-index:50;position:relative;color:var(--txt)}
+.sbar .ic{display:flex;gap:6px;align-items:center;opacity:.85}
+.sbar .bars{display:flex;gap:2px;align-items:flex-end;height:10px}
+.sbar .bars i{width:3px;background:var(--txt);border-radius:1px}
+.sbar .bars i:nth-child(1){height:4px}.sbar .bars i:nth-child(2){height:6px}.sbar .bars i:nth-child(3){height:8px}.sbar .bars i:nth-child(4){height:10px}
+
+.scroll{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;position:relative;z-index:10}
+.scroll::-webkit-scrollbar{display:none}
+.view{display:none;padding-bottom:26px;animation:fade .3s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pad{padding:0 18px}
+
+/* headers */
+.topbar{display:flex;align-items:center;gap:10px;padding:8px 18px 14px}
+.topbar .brand{display:flex;align-items:center;gap:9px;flex:1}
+.topbar .brand .g{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--runway);font-family:var(--disp);font-weight:700;color:var(--on-gold);font-size:16px}
+.topbar .brand b{font-family:var(--disp);font-weight:600;font-size:17px;color:var(--txt)}
+.topbar .brand b span{color:var(--gold)}
+.themebtn{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--soft);display:grid;place-items:center;cursor:pointer;color:var(--gold-hi);font-size:15px}
+.av{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--soft);display:grid;place-items:center;font-family:var(--mono);font-size:13px;color:var(--gold-hi);cursor:pointer}
+.brandbar{display:flex;align-items:center;gap:10px;background:var(--obsidian);padding:13px 18px}
+.brandbar .lg{font-family:var(--disp);font-weight:700;font-size:17px;color:#fff}
+.brandbar .lg span{color:var(--gold-hi)}
+.brandbar .tag{margin-left:auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--gold)}
+.brandbar .bk{background:none;border:none;color:#cfc7b2;font-size:22px;cursor:pointer;margin-right:4px;display:flex;align-items:center}
+.brandbar .av{margin-left:12px;background:#1a1813;border-color:var(--gold-deep)}
+
+/* gold hero */
+.hero{position:relative;overflow:hidden;background:var(--runway);padding:17px 18px}
+.hero.rounded{margin:2px 14px 4px;border-radius:16px;box-shadow:0 16px 38px -20px rgba(120,90,0,.6)}
+.hero::after{content:"";position:absolute;inset:0;opacity:.44;background:repeating-linear-gradient(102deg,rgba(255,255,255,.12) 0 1px,transparent 1px 8px);pointer-events:none}
+.hero .k{position:relative;z-index:2;font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#5a4a14;font-weight:700}
+.hero h2{position:relative;z-index:2;font-family:var(--disp);font-weight:700;font-size:21px;color:var(--on-gold);margin-top:6px;line-height:1.18;letter-spacing:-.01em}
+.hero p{position:relative;z-index:2;font-size:13px;color:#3a2e08;margin-top:5px;line-height:1.5}
+
+/* tank */
+.tank{margin:14px 0;border:1px solid var(--line);border-radius:15px;padding:13px 15px;background:var(--card)}
+.tank .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.tank .top .t{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.tank .top .v{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--ink)}
+.tank .top .v small{color:var(--mut);font-weight:400}
+.gauge{height:9px;border-radius:6px;background:var(--gauge);border:1px solid var(--line2);overflow:hidden}
+.gauge i{display:block;height:100%;width:64%;border-radius:6px;background:var(--runway)}
+.tank .ft{margin-top:9px;font-size:11px;color:var(--mut)}
+.tank .ft a{color:var(--gold-hi);text-decoration:none;font-weight:600}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}
+.stat{border:1px solid var(--line);border-radius:13px;padding:12px 11px;background:var(--card)}
+.stat .k{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.stat .n{font-family:var(--mono);font-weight:700;font-size:19px;margin-top:6px;letter-spacing:-.02em;color:var(--ink)}
+.stat .n.pos{color:var(--pos)}
+.stat .n small{font-size:11px;color:var(--mut);font-weight:400}
+
+.sech{display:flex;align-items:center;justify-content:space-between;margin:6px 2px 12px}
+.sech .t{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.sech .a{font-size:12px;color:var(--mut);text-decoration:none;cursor:pointer}
+
+/* wallet stack */
+.wstack{position:relative;margin-bottom:10px}
+.wcard{position:absolute;left:0;right:0;border:1px solid var(--line);border-radius:15px;overflow:hidden;background:var(--card);cursor:pointer;box-shadow:0 12px 26px -16px rgba(0,0,0,.6);transition:top .42s cubic-bezier(.2,.7,.3,1),height .42s cubic-bezier(.2,.7,.3,1),box-shadow .3s,border-color .3s}
+.wcard.open{box-shadow:0 22px 46px -20px rgba(201,168,76,.45);border-color:var(--gold)}
+.wh{display:flex;align-items:center;gap:11px;height:64px;padding:0 13px;position:relative;overflow:hidden;background:var(--runway)}
+.wh::after{content:"";position:absolute;inset:0;opacity:.4;background:repeating-linear-gradient(102deg,rgba(255,255,255,.12) 0 1px,transparent 1px 8px)}
+.wh>*{position:relative;z-index:2}
+.wh .ms{width:42px;height:42px;border-radius:50%;flex:none;display:grid;place-items:center;position:relative;background:conic-gradient(var(--c) calc(var(--v)*1%),rgba(27,20,7,.18) 0)}
+.wh .ms::after{content:"";position:absolute;inset:4px;border-radius:50%;background:rgba(255,255,255,.9)}
+.wh .ms b{position:relative;z-index:2;font-family:var(--mono);font-weight:700;font-size:14px;color:var(--on-gold)}
+.wh .hi{flex:1;min-width:0}
+.wh .hi .nm{font-family:var(--disp);font-weight:600;font-size:14px;color:var(--on-gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+.wh .hi .ad{font-family:var(--mono);font-size:9.5px;color:#5a4708;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.wh .wt{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:6px;flex:none;background:var(--obsidian)}
+.wbody{opacity:0;transition:opacity .3s .08s}
+.wcard.open .wbody{opacity:1}
+.wmid{display:flex;align-items:center;gap:12px;padding:13px 14px 10px}
+.wthumb{width:48px;height:48px;border-radius:10px;flex:none;background:linear-gradient(135deg,var(--th1),var(--th2));position:relative;overflow:hidden;border:1px solid var(--line2)}
+.wthumb::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 42%,rgba(201,168,76,.18) 50%,transparent 58%)}
+.wmid .col{flex:1;min-width:0}
+.wmid .loc{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wmid .price{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--gold-deep);margin-top:2px}
+.wmid .wtier{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:6px;flex:none;color:#fff}
+.wstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 12px}
+.wkpi{border:1px solid var(--line2);border-radius:10px;padding:10px;background:var(--soft)}
+.wkpi .k{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-deep)}
+.wkpi .v{font-family:var(--mono);font-weight:700;font-size:16px;margin-top:6px;letter-spacing:-.01em;color:var(--ink)}
+.wkpi .v.pos{color:var(--pos)}.wkpi .v.neg{color:var(--neg)}
+.wfoot{display:flex;align-items:center;gap:10px;padding:0 14px 13px}
+.wfoot .badge{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.08em;padding:4px 9px;border-radius:6px}
+.wfoot .badge.won{background:rgba(63,165,108,.16);color:var(--pos);border:1px solid rgba(63,165,108,.3)}
+.wfoot .badge.watch{background:rgba(201,168,76,.16);color:var(--gold-hi);border:1px solid rgba(201,168,76,.32)}
+.wfoot .badge.lost{background:rgba(184,98,80,.16);color:var(--neg);border:1px solid rgba(184,98,80,.3)}
+.wfoot .open-btn{margin-left:auto;font-family:var(--disp);font-weight:600;font-size:13px;color:var(--gold-hi);background:none;border:none;cursor:pointer}
+
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 14px}
+.pill{font-family:var(--mono);font-size:11px;padding:8px 13px;border-radius:999px;cursor:pointer;background:var(--card);border:1px solid var(--line2);color:var(--mut)}
+.pill.on{border-color:var(--gold);color:var(--gold-hi);background:rgba(201,168,76,.07)}
+
+/* hub */
+.hero-tile{position:relative;overflow:hidden;border-radius:16px;background:var(--runway);padding:18px;margin:14px 0;cursor:pointer;box-shadow:0 16px 36px -18px rgba(120,90,0,.55)}
+.hero-tile::after{content:"";position:absolute;inset:0;opacity:.4;background:repeating-linear-gradient(102deg,rgba(255,255,255,.12) 0 1px,transparent 1px 8px)}
+.hero-tile>*{position:relative;z-index:2}
+.hero-tile .ic{width:48px;height:48px;border-radius:13px;background:var(--obsidian);display:grid;place-items:center;margin-bottom:13px}
+.hero-tile .ic svg{width:24px;height:24px;stroke:var(--gold-hi);fill:none;stroke-width:1.8}
+.hero-tile .nm{font-family:var(--disp);font-weight:700;font-size:19px;color:var(--on-gold)}
+.hero-tile .ds{font-size:13px;color:#3a2e08;margin-top:4px;max-width:240px;line-height:1.5}
+.hero-tile .go{position:absolute;right:18px;bottom:18px;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--on-gold);background:rgba(255,255,255,.5);border-radius:8px;padding:5px 10px;z-index:3}
+.lbl-sec{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:16px 2px 10px;font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.act{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:15px 14px;cursor:pointer;transition:border-color .2s,transform .12s;position:relative}
+.act:active{transform:scale(.98)}.act:hover{border-color:var(--gold)}
+.act .ic{width:42px;height:42px;border-radius:12px;background:var(--soft);border:1px solid var(--line2);display:grid;place-items:center;margin-bottom:11px}
+.act .ic svg{width:21px;height:21px;stroke:var(--gold-hi);fill:none;stroke-width:1.7}
+.act .nm{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--ink)}
+.act .ds{font-size:11.5px;color:var(--mut);margin-top:3px;line-height:1.4}
+.act .led{position:absolute;top:14px;right:14px;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#5BD98E,#3FA56C 70%);box-shadow:0 0 8px 1px rgba(63,165,108,.8);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 7px 1px rgba(63,165,108,.7)}50%{box-shadow:0 0 12px 2px rgba(63,165,108,1)}}
+
+/* form */
+.field{margin-bottom:13px}
+.field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:7px}
+.inp{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--inp);padding:0 14px;height:52px;transition:border-color .2s}
+.inp:focus-within{border-color:var(--gold)}
+.inp input,.inp select{flex:1;background:none;border:none;outline:none;color:var(--ink);font-family:var(--mono);font-size:17px;font-weight:600;width:100%}
+.inp select{font-family:var(--body);font-size:15px;font-weight:500}
+.inp .u{font-family:var(--mono);font-size:13px;color:var(--mut)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.cta{width:100%;height:55px;border:none;border-radius:14px;margin-top:8px;cursor:pointer;background:var(--runway);color:var(--on-gold);font-family:var(--disp);font-weight:600;font-size:16px;box-shadow:0 14px 30px -14px rgba(201,168,76,.6);transition:transform .12s;display:flex;align-items:center;justify-content:center;gap:9px}
+.cta:active{transform:scale(.98)}
+.cta.dark{background:var(--obsidian);color:var(--gold-hi)}
+.cta .ke{font-family:var(--mono);font-size:11px;background:rgba(0,0,0,.16);padding:3px 7px;border-radius:6px;font-weight:600}
+.cta.dark .ke{background:rgba(255,255,255,.16)}
+.ghost{width:100%;height:50px;border:1px solid var(--line);border-radius:13px;background:transparent;color:var(--gold-hi);font-family:var(--disp);font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:11px}
+.hintbar{display:flex;align-items:center;gap:9px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:6px 0 14px;font-size:12px;color:var(--txt2);line-height:1.4}
+.hintbar .i{flex:none;width:24px;height:24px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;color:var(--gold-deep);font-size:13px}
+
+/* boarding-pass result */
+.bpass{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);box-shadow:0 24px 60px -38px rgba(0,0,0,.6);margin-bottom:16px}
+.bphead{position:relative;overflow:hidden;display:flex;align-items:center;gap:9px;padding:11px 15px;background:var(--runway);min-height:44px}
+.bphead::after{content:"";position:absolute;inset:0;opacity:.42;background:repeating-linear-gradient(102deg,rgba(255,255,255,.1) 0 1px,transparent 1px 8px)}
+.bphead .t{position:relative;z-index:2;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#5a4a14;font-weight:700}
+.bphead .r{position:relative;z-index:2;margin-left:auto;display:flex;align-items:center;gap:7px}
+.bphead .pno{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.08em;color:#0a0a0a;background:rgba(10,10,10,.14);border:1px dashed rgba(10,10,10,.4);border-radius:6px;padding:2px 7px}
+.bphead .tier{font-family:var(--mono);font-size:8.5px;font-weight:700;padding:3px 8px;border-radius:7px;background:#0a0a0a}
+.contrail{position:absolute;top:50%;left:14%;right:40%;height:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.6) 0 5px,transparent 5px 11px);transform:translateY(-50%);z-index:1}
+.flyico{position:absolute;top:50%;color:#070707;transform:translate(-50%,-50%);z-index:1;animation:fly 5s ease-in-out infinite}
+.flyico svg{height:16px;width:auto;display:block}
+@keyframes fly{0%{left:14%;opacity:.25}10%{opacity:1}55%{left:58%;opacity:1}55.01%{opacity:0}56%{left:14%}66%{opacity:.25}100%{left:14%;opacity:.25}}
+.bpbody{padding:15px 16px;display:flex;align-items:center;gap:14px}
+.cbars{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cb{display:flex;align-items:center;gap:9px}
+.cb .cl{font-family:var(--mono);font-size:8px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);width:62px;flex:none}
+.cb .bar{flex:1;height:5px;border-radius:99px;background:rgba(201,168,76,.16);overflow:hidden}
+.cb .bar i{display:block;height:100%;border-radius:99px}
+.cb .cv{font-family:var(--disp);font-weight:700;font-size:11px;width:20px;text-align:right;color:var(--ink)}
+.kt{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+.kt .k{position:relative;padding:9px 5px;text-align:center;border-left:2px dashed var(--line)}
+.kt .k:first-child{border-left:0}
+.kt .k::before,.kt .k::after{content:"";position:absolute;left:-6px;width:11px;height:11px;border-radius:50%;background:var(--bg)}
+.kt .k:first-child::before,.kt .k:first-child::after{display:none}
+.kt .k::before{top:-6px}.kt .k::after{bottom:-6px}
+.kt .l{font-family:var(--mono);font-size:7px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}
+.kt .v{font-family:var(--disp);font-weight:700;font-size:13px;margin:2px 0 1px;color:var(--ink)}
+.kt .k.good .v{color:var(--pos)}.kt .k.bad .v{color:var(--neg)}.kt .k.mid .v{color:var(--gold-deep)}
+.bpstub{display:flex;align-items:center;gap:13px;padding:13px 16px;border-top:1px dashed var(--line)}
+.qrtile{width:62px;height:62px;flex:none;background:#fff;border-radius:8px;display:grid;place-items:center;padding:4px}
+.qrtile svg,.qrtile canvas,.qrtile img{display:block;width:100%;height:100%}
+.bpstub .info .bp{font-family:var(--mono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}
+.bpstub .info .no{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--gold-hi);margin-top:3px}
+.bpstub .info .cap{font-size:11px;color:var(--mut);margin-top:3px}
+
+/* extracted fields / immo */
+.xf{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;margin-bottom:8px;background:var(--card)}
+.xf input{accent-color:var(--gold);width:17px;height:17px;flex:none}
+.xf .l{font-family:var(--mono);font-size:11px;color:var(--gold-deep);min-width:92px}
+.xf .v{font-size:14px;font-weight:600;flex:1;text-align:right;font-family:var(--mono);color:var(--ink)}
+.imo{border:1px solid var(--line2);border-radius:13px;padding:13px 14px;margin-bottom:10px;background:var(--card);cursor:pointer;transition:border-color .2s}
+.imo:hover{border-color:var(--gold)}
+.imo .t{font-family:var(--disp);font-weight:500;font-size:14px;line-height:1.3;color:var(--ink)}
+.imo .a{font-size:12px;color:var(--mut);margin:4px 0 8px}
+.imo .m{display:flex;gap:13px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--mut)}
+.imo .m b{color:var(--gold-hi)}
+
+/* dropzone */
+.dz{border:1.5px dashed var(--gold);border-radius:16px;padding:32px 18px;text-align:center;background:var(--soft);margin:6px 0 16px;cursor:pointer}
+.dz .ic{width:54px;height:54px;border-radius:14px;margin:0 auto 14px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line)}
+.dz .nm{font-family:var(--disp);font-weight:600;font-size:16px;color:var(--ink)}
+.dz .ds{color:var(--mut);font-size:12.5px;margin-top:5px;line-height:1.5}
+.setrow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:13px;background:var(--card);padding:14px 15px;margin-bottom:10px;cursor:pointer}
+.setrow .ic{width:38px;height:38px;border-radius:11px;background:var(--soft);border:1px solid var(--line2);display:grid;place-items:center;flex:none}
+.setrow .ic svg{width:18px;height:18px;stroke:var(--gold-hi);fill:none;stroke-width:1.7}
+.setrow .tt{flex:1}.setrow .tt .nm{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--ink)}
+.setrow .tt .ds{font-size:12px;color:var(--mut);margin-top:2px}
+.setrow .ch{color:var(--mut2);font-family:var(--mono)}
+
+/* voice */
+.voicewrap{position:relative;padding:18px 18px 8px}
+.mic-stage{position:relative;height:290px;display:flex;align-items:center;justify-content:center;margin:6px 0}
+.ripple{position:absolute;border-radius:50%;border:1.5px solid var(--gold);opacity:0;left:50%;top:50%;transform:translate(-50%,-50%)}
+.mic-on .ripple{animation:ripple 2.6s ease-out infinite}
+.ripple.r1{width:120px;height:120px;animation-delay:0s}.ripple.r2{width:185px;height:185px;animation-delay:.6s}.ripple.r3{width:255px;height:255px;animation-delay:1.2s}
+@keyframes ripple{0%{opacity:.55;transform:translate(-50%,-50%) scale(.7)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.05)}}
+.mic{position:relative;z-index:3;width:104px;height:104px;border-radius:50%;background:var(--runway);display:grid;place-items:center;box-shadow:0 18px 40px -14px rgba(201,168,76,.7),0 0 0 8px rgba(201,168,76,.12);cursor:pointer}
+.mic svg{width:46px;height:46px;stroke:var(--on-gold);fill:none;stroke-width:1.8}
+.mic-on .mic{animation:breathe 2s ease-in-out infinite}
+@keyframes breathe{0%,100%{box-shadow:0 18px 40px -14px rgba(201,168,76,.7),0 0 0 8px rgba(201,168,76,.12)}50%{box-shadow:0 18px 46px -12px rgba(201,168,76,.95),0 0 0 14px rgba(201,168,76,.18)}}
+.chip{position:absolute;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:8px 11px;box-shadow:0 10px 24px -16px rgba(0,0,0,.5);opacity:0;transform:scale(.85);transition:opacity .4s,transform .4s;max-width:150px}
+.chip.show{opacity:1;transform:scale(1)}
+.chip .k{font-family:var(--mono);font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-deep);display:flex;align-items:center;gap:5px}
+.chip .k .ok{color:var(--pos)}
+.chip .v{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink);margin-top:2px}
+.chip.c1{top:14px;left:4px}.chip.c2{top:6px;right:4px}.chip.c3{top:46%;left:-6px}.chip.c4{top:52%;right:-6px}.chip.c5{bottom:22px;left:12px}.chip.c6{bottom:12px;right:12px}
+.wave{display:flex;align-items:center;justify-content:center;gap:3px;height:30px;margin-top:4px}
+.wave i{width:3px;border-radius:2px;background:var(--gold);height:6px}
+.mic-on .wave i{animation:eq 1s ease-in-out infinite}
+.wave i:nth-child(2n){animation-delay:.2s}.wave i:nth-child(3n){animation-delay:.4s}.wave i:nth-child(4n){animation-delay:.1s}.wave i:nth-child(5n){animation-delay:.3s}
+@keyframes eq{0%,100%{height:6px}50%{height:24px}}
+.voice-status{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);margin-top:4px}
+
+/* markt corridor */
+.corridor{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:18px 16px;margin:14px 0;box-shadow:0 14px 34px -22px rgba(0,0,0,.5)}
+.corridor .lab{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:6px}
+.corridor .big{font-family:var(--disp);font-weight:700;font-size:24px;color:var(--ink);letter-spacing:-.01em}
+.corridor .big small{font-size:13px;color:var(--mut);font-weight:500}
+.track{position:relative;height:12px;border-radius:8px;margin:22px 0 8px;background:linear-gradient(90deg,rgba(201,168,76,.18),#C9A84C 50%,rgba(201,168,76,.18))}
+.track .band{position:absolute;top:-3px;bottom:-3px;border-radius:8px;background:rgba(201,168,76,.28);border:1px solid var(--gold)}
+.track .mark{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--obsidian);border:2px solid var(--gold-hi);transform:translate(-50%,-50%);box-shadow:0 4px 10px -3px rgba(0,0,0,.5)}
+.track .mark::after{content:"DU";position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:8px;font-weight:700;color:var(--gold-deep)}
+.scalelbl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--mut)}
+.lagebars{display:flex;flex-direction:column;gap:11px;margin:8px 0 4px}
+.lb .tp{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;margin-bottom:6px}
+.lb .tp span{color:var(--mut)}.lb .tp b{color:var(--ink)}
+.lb .tr{height:7px;border-radius:4px;background:var(--gauge);overflow:hidden;border:1px solid var(--line2)}
+.lb .tr i{display:block;height:100%;border-radius:4px;background:var(--runway)}
+.srcline{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--mut);margin-top:12px}
+.srcline .s{border:1px solid var(--line);border-radius:6px;padding:3px 8px;background:var(--soft)}
+
+/* detail */
+.detimg{height:160px;margin:8px 18px 14px;border-radius:16px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--th1),var(--th2));display:flex;align-items:flex-end;padding:15px;border:1px solid var(--line2)}
+.detimg::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(201,168,76,.07) 0 2px,transparent 2px 22px),radial-gradient(150px 90px at 76% 22%,rgba(201,168,76,.22),transparent 70%)}
+.detimg .lab{position:relative;z-index:2}
+.detimg .nm{font-family:var(--disp);font-weight:600;font-size:19px;color:var(--ink)}
+.detimg .ad{font-size:12.5px;color:var(--mut);margin-top:2px}
+.detimg .pr{position:absolute;top:14px;right:14px;z-index:2;font-family:var(--mono);font-weight:700;font-size:16px;background:rgba(7,7,7,.78);color:var(--gold-hi);padding:6px 11px;border-radius:10px}
+.scorebox{display:flex;align-items:center;gap:15px;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:16px;background:var(--card)}
+.scorebox .tx .k{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.scorebox .tx .v{font-family:var(--disp);font-weight:600;font-size:17px;margin-top:4px;color:var(--pos)}
+.scorebox .tx p{font-size:12px;color:var(--mut);margin-top:5px;line-height:1.5}
+.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.ki{border:1px solid var(--line);border-radius:13px;padding:13px 14px;background:var(--card)}
+.ki .k{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.ki .v{font-family:var(--mono);font-weight:700;font-size:19px;margin-top:6px;color:var(--ink)}
+.ki .v.pos{color:var(--pos)}
+.barsd{display:flex;flex-direction:column;gap:11px;margin-bottom:16px}
+.bl .tp{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;margin-bottom:6px}
+.bl .tp span{color:var(--mut)}.bl .tp b{color:var(--ink)}
+.bl .tr{height:6px;border-radius:4px;background:var(--gauge);overflow:hidden;border:1px solid var(--line2)}
+.bl .tr i{display:block;height:100%;border-radius:4px}
+
+/* tab bar */
+.tabs{flex:0 0 auto;height:76px;display:flex;align-items:center;justify-content:space-around;padding:0 6px 16px;border-top:1px solid var(--line2);background:var(--tabbg);backdrop-filter:blur(12px);z-index:50;position:relative;transition:background .35s}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:var(--mut2);font-family:var(--mono);font-size:9px;letter-spacing:.05em;text-transform:uppercase;background:none;border:none;padding-top:6px;transition:color .2s}
+.tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7}
+.tab.active{color:var(--gold-hi)}
+.tab.center{flex:0 0 auto}
+.tab.center .fab{width:58px;height:58px;border-radius:19px;margin-top:-24px;display:grid;place-items:center;background:var(--runway);box-shadow:0 12px 28px -8px rgba(201,168,76,.7),0 0 0 5px var(--bg);transition:transform .14s}
+.tab.center:active .fab{transform:scale(.93)}
+.tab.center .fab svg{width:26px;height:26px;stroke:var(--on-gold);stroke-width:2}
+.tab.center span{margin-top:6px;color:var(--gold-hi)}
+
+.note{max-width:800px;text-align:center;color:#7d7768;font-size:12px;line-height:1.6;font-family:var(--mono);margin-top:4px}
+.note b{color:var(--gold)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:430px){body{padding:0;gap:0;background:#000}.intro,.note{display:none}.phone{width:100vw;height:100vh;border-radius:0;padding:0}.screen{border-radius:0}}
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <div class="ey">DealPilot · Mobile App</div>
+  <h1>Voller Prototyp · Hell/Dunkel umschaltbar</h1>
+  <p>Tipp oben im Cockpit auf ☀/☾ zum Umschalten. Der goldene Knopf öffnet den PRE-FLIGHT-Hub: Quick Check (mit Boarding-Pass-Ergebnis), Exposé/PDF, Sprache, ImmoMetrica, Markteinschätzung.</p>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="screen" id="screen">
+    <canvas class="pcanvas"></canvas>
+    <div class="sbar"><span>9:41</span><span class="ic"><span class="bars"><i></i><i></i><i></i><i></i></span> 5G&nbsp; ◗</span></div>
+
+    <div class="scroll" id="scroll">
+
+      <!-- COCKPIT -->
+      <section class="view active" data-view="cockpit">
+        <div class="topbar">
+          <div class="brand"><div class="g">D</div><b>Deal<span>Pilot</span></b></div>
+          <button class="themebtn" id="themebtn" title="Hell/Dunkel">☀</button>
+          <div class="av" data-go="profil">MJ</div>
+        </div>
+        <div class="hero rounded"><div class="k">Pre-Flight · Cockpit</div><h2>Moin, Marcel ✈</h2><p>4 Objekte · 3 aktiv · 1 in Beobachtung · Tank 32 L</p></div>
+        <div class="pad" style="padding-top:10px">
+          <div class="stats">
+            <div class="stat"><div class="k">Objekte</div><div class="n">4</div></div>
+            <div class="stat"><div class="k">Ø Score</div><div class="n">61</div></div>
+            <div class="stat"><div class="k">Cashflow</div><div class="n pos">+412<small>€</small></div></div>
+          </div>
+          <div class="sech"><span class="t">Mein Stapel</span><a class="a" data-go="objekte">Alle →</a></div>
+          <div id="cockpit-list"></div>
+        </div>
+      </section>
+
+      <!-- OBJEKTE -->
+      <section class="view" data-view="objekte">
+        <div class="topbar"><div class="brand"><div class="g">D</div><b>Objekte</b></div><div class="av" data-go="hub">+</div></div>
+        <div class="pad">
+          <div class="pills"><div class="pill on">Alle · 4</div><div class="pill">Im Rennen</div><div class="pill">Beobachten</div><div class="pill">Pass</div></div>
+          <div id="objekte-list"></div>
+          <button class="ghost" data-go="hub">＋ Objekt an Bord bringen</button>
+        </div>
+      </section>
+
+      <!-- HUB -->
+      <section class="view" data-view="hub">
+        <div class="brandbar"><span class="lg">Deal<span>Pilot</span></span><span class="tag">PRE-FLIGHT</span><div class="av" data-go="profil">MJ</div></div>
+        <div class="hero"><div class="k">Boarding</div><h2>Objekt an Bord bringen</h2><p>Wähl deinen schnellsten Weg. Felder werden automatisch befüllt, du prüfst und übernimmst.</p></div>
+        <div class="pad">
+          <div class="hero-tile" data-go="boarding">
+            <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg></div>
+            <div class="nm">Quick Check</div><div class="ds">Vier Zahlen, sofort Score, Rendite und Cashflow. Ohne Kerosin.</div><span class="go">0 L ›</span>
+          </div>
+          <div class="lbl-sec" style="margin-top:6px">Daten einlesen</div>
+          <div class="grid2">
+            <div class="act" data-go="import-pdf"><span class="led"></span><div class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></div><div class="nm">Exposé / PDF</div><div class="ds">PDF abrufen, Felder ausziehen</div></div>
+            <div class="act" data-go="voice"><span class="led"></span><div class="ic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><div class="nm">Sprache</div><div class="ds">Eckdaten einsprechen · 1 L</div></div>
+            <div class="act" data-go="import-immo"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 14h6"/></svg></div><div class="nm">ImmoMetrica</div><div class="ds">Verbunden · übernehmen</div></div>
+            <div class="act" data-go="markt"><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 17l5-5 4 4 7-8M16 4h4v4"/></svg></div><div class="nm">Markteinschätzung</div><div class="ds">Marktwert-Korridor</div></div>
+          </div>
+          <button class="ghost" data-go="anlegen" style="margin-top:16px">✎ Stattdessen manuell rechnen</button>
+        </div>
+      </section>
+
+      <!-- QUICK CHECK form -->
+      <section class="view" data-view="boarding"><div class="brandbar"><button class="bk" data-go="hub">‹</button><span class="lg">Quick <span>Boarding</span></span><span class="tag">0 L</span></div><div class="hero"><div class="k">Schnell-Check</div><h2>Objekt bewerten</h2><p>Piloten-Felder → echter Score, DSCR und Cashflow — direkt bei der Besichtigung.</p></div><div class="pad" style="padding-top:16px" id="mb-board-form"><div class="row2"><div class="field"><label>Straße</label><div class="inp"><input id="mb_str" type="text"></div></div><div class="field" style="max-width:34%"><label>Nr.</label><div class="inp"><input id="mb_hnr" type="text"></div></div></div><div class="row2"><div class="field" style="max-width:38%"><label>PLZ</label><div class="inp"><input id="mb_plz" type="text" inputmode="numeric"></div></div><div class="field"><label>Ort</label><div class="inp"><input id="mb_ort" type="text"></div></div></div><div class="field"><label>Objektart</label><div class="inp"><input id="mb_objart" type="text" value="Eigentumswohnung"></div></div><div class="row2"><div class="field"><label>Wohnfläche</label><div class="inp"><input id="mb_wfl" type="text" inputmode="numeric"><span class="u">m²</span></div></div><div class="field"><label>Baujahr</label><div class="inp"><input id="mb_bj" type="text" inputmode="numeric"></div></div></div><div class="row2"><div class="field"><label>Kaufpreis</label><div class="inp"><input id="mb_kp" type="text" inputmode="numeric"><span class="u">€</span></div></div><div class="field"><label>Kaufnebenk.</label><div class="inp"><input id="mb_knk" type="text" inputmode="decimal" value="10,5"><span class="u">%</span></div></div></div><div class="row2"><div class="field"><label>Kaltmiete / Mon</label><div class="inp"><input id="mb_nkm" type="text" inputmode="numeric"><span class="u">€</span></div></div><div class="field"><label>Zusatz / Mon</label><div class="inp"><input id="mb_ze" type="text" inputmode="numeric"><span class="u">€</span></div></div></div><div class="row2"><div class="field"><label>Eigenkapital</label><div class="inp"><input id="mb_ek" type="text" inputmode="numeric"><span class="u">€</span></div></div><div class="field"><label>Hausgeld / Mon</label><div class="inp"><input id="mb_hg" type="text" inputmode="numeric"><span class="u">€</span></div></div></div><div class="row2"><div class="field"><label>Sollzins</label><div class="inp"><input id="mb_zins" type="text" inputmode="decimal" value="3,8"><span class="u">%</span></div></div><div class="field"><label>Tilgung</label><div class="inp"><input id="mb_tilg" type="text" inputmode="decimal" value="2,0"><span class="u">%</span></div></div></div><div class="field"><label>Hausgeld nicht-umlagef.</label><div class="inp"><input id="mb_hgsplit" type="text" inputmode="numeric" value="60"><span class="u">%</span></div></div><div id="mb-board-err" style="display:none;color:var(--neg);font-family:var(--mono);font-size:11px;margin:4px 2px"></div><button class="cta" data-go="boarding-result">Boarding starten <span class="ke">0 L</span></button></div></section>
+
+      <!-- QUICK CHECK result (boarding pass) -->
+      <section class="view" data-view="boarding-result">
+        <div class="brandbar"><button class="bk" data-go="boarding">‹</button><span class="lg">Ergebnis</span><span class="tag">QB-7F3K-22</span></div>
+        <div class="pad" style="padding-top:6px">
+          <div class="bpass">
+            <div class="bphead"><span class="contrail"></span><span class="flyico" id="fly1"></span><span class="t">Boarding Pass</span><span class="r"><span class="pno">QB-7F3K-22</span><span class="tier" id="tier1"></span></span></div>
+            <div class="bpbody"><div id="dial1"></div><div class="cbars" id="cbars1"></div></div>
+            <div class="kt" id="kt1"></div>
+            <div class="bpstub"><div class="qrtile" id="qr1"></div><div class="info"><div class="bp">Boarding Pass</div><div class="no">QB-7F3K-22</div><div class="cap">Scan › teilen oder übernehmen</div></div></div>
+          </div>
+          <button class="cta dark" id="mb-board-save">Als Objekt speichern <span class="ke">↓</span></button>
+          <button class="ghost" data-go="boarding">↺ Neuer Check</button>
+        </div>
+      </section>
+
+      <!-- VOICE -->
+      <section class="view" data-view="voice">
+        <div class="brandbar"><button class="bk" data-go="hub">‹</button><span class="lg">Sprach<span>erfassung</span></span><span class="tag">1 L</span></div>
+        <div class="hero"><div class="k">Einsprechen</div><h2>Sag mir die Eckdaten</h2><p>„Mehrfamilienhaus Lindenstraße 12, Bielefeld, 385.000 Euro, 118 Quadratmeter, 1.640 Kaltmiete.“</p></div>
+        <div class="voicewrap">
+          <div class="mic-stage mic-on" id="mic-stage">
+            <span class="ripple r1"></span><span class="ripple r2"></span><span class="ripple r3"></span>
+            <div class="mic" id="mic-btn"><svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/></svg></div>
+            <div class="chip c1"><div class="k"><span class="ok">✓</span> Objektart</div><div class="v">Mehrfamilienhaus</div></div>
+            <div class="chip c2"><div class="k"><span class="ok">✓</span> Adresse</div><div class="v">Lindenstr. 12</div></div>
+            <div class="chip c3"><div class="k"><span class="ok">✓</span> Kaufpreis</div><div class="v">385.000 €</div></div>
+            <div class="chip c4"><div class="k"><span class="ok">✓</span> Wohnfläche</div><div class="v">118 m²</div></div>
+            <div class="chip c5"><div class="k"><span class="ok">✓</span> Kaltmiete</div><div class="v">1.640 €</div></div>
+            <div class="chip c6"><div class="k"><span class="ok">✓</span> Ort</div><div class="v">Bielefeld</div></div>
+          </div>
+          <div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="voice-status" id="voice-status">Hört zu …</div>
+          <div style="padding:18px 0 0"><button class="cta" data-go="anlegen">Erkannte Daten übernehmen <span class="ke">6 Felder</span></button></div>
+        </div>
+      </section>
+
+      <!-- PDF -->
+      <section class="view" data-view="import-pdf">
+        <div class="brandbar"><button class="bk" data-go="hub">‹</button><span class="lg">Exposé <span>einlesen</span></span><span class="tag">PDF</span></div>
+        <div class="pad" style="padding-top:14px">
+          <div id="pdf-drop">
+            <div class="dz" id="pdf-zone"><div class="ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="var(--gold-hi)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg></div><div class="nm">Exposé-PDF ablegen</div><div class="ds">Tippen zum Auswählen. Adresse, Preis, Fläche und Miete werden automatisch ausgelesen.</div></div>
+            <div class="lbl-sec" style="margin-top:4px">Zuletzt</div>
+            <div class="setrow" id="pdf-recent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></div><div class="tt"><div class="nm">expose-lindenstrasse.pdf</div><div class="ds">2,4 MB · tippen zum Einlesen</div></div><span class="ch">›</span></div>
+          </div>
+          <div id="pdf-result" style="display:none">
+            <div class="hintbar" style="border-color:rgba(63,165,108,.3);background:rgba(63,165,108,.08)"><div class="i" style="color:var(--pos)">✓</div><div><b>Exposé gelesen.</b> 14 Felder erkannt aus expose-lindenstrasse.pdf.</div></div>
+            <div class="lbl-sec" style="margin-top:0">Erkannte Felder</div>
+            <div id="pdf-fields"></div>
+            <button class="cta" data-go="anlegen">✈ In DealPilot übernehmen</button>
+            <button class="ghost" id="pdf-reset">↺ Anderes Exposé</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- IMMOMETRICA -->
+      <section class="view" data-view="import-immo">
+        <div class="brandbar"><button class="bk" data-go="hub">‹</button><span class="lg">Immo<span>Metrica</span></span><span class="tag">VERBUNDEN</span></div>
+        <div class="pad" style="padding-top:6px"><div class="pills" id="immo-src"></div><div id="immo-list"></div></div>
+      </section>
+      <section class="view" data-view="immo-detail">
+        <div class="brandbar"><button class="bk" data-go="import-immo">‹</button><span class="lg">Objekt prüfen</span><span class="tag">IMPORT</span></div>
+        <div class="hero"><div class="k">Felder prüfen</div><h2 id="immo-title">Objekt</h2><p>Haken setzen, was übernommen wird. DealPilot rechnet danach selbst.</p></div>
+        <div class="pad" style="padding-top:16px"><div id="immo-fields"></div><button class="cta" data-go="anlegen">✈ In DealPilot übernehmen</button></div>
+      </section>
+
+      <!-- MARKT -->
+      <section class="view" data-view="markt"><div class="brandbar"><button class="bk" data-go="hub">‹</button><span class="lg">Markt<span>einschätzung</span></span><span class="tag">AVM</span></div><div class="hero"><div class="k">Schnelle Bewertung</div><h2>Was ist der Markt wert?</h2><p>Objektdaten rein, Marktwert-Korridor raus.</p></div><div class="pad" style="padding-top:16px"><div class="row2"><div class="field"><label>Straße</label><div class="inp"><input id="mk_str" type="text"></div></div><div class="field" style="max-width:34%"><label>Nr.</label><div class="inp"><input id="mk_hnr" type="text"></div></div></div><div class="row2"><div class="field" style="max-width:38%"><label>PLZ</label><div class="inp"><input id="mk_plz" type="text" inputmode="numeric"></div></div><div class="field"><label>Ort</label><div class="inp"><input id="mk_ort" type="text"></div></div></div><div class="field"><label>Objektart</label><div class="inp"><input id="mk_objart" type="text" value="Eigentumswohnung"></div></div><div class="row2"><div class="field"><label>Wohnfläche</label><div class="inp"><input id="mk_wfl" type="text" inputmode="numeric"><span class="u">m²</span></div></div><div class="field"><label>Baujahr</label><div class="inp"><input id="mk_bj" type="text" inputmode="numeric"></div></div></div><div id="mk-status" style="display:none;font-family:var(--mono);font-size:11px;margin:6px 2px"></div><div class="row2" style="margin-top:6px"><button class="cta dark" data-avm="sprengnetter">Sprengnetter <span class="ke">20 L</span></button><button class="cta dark" data-avm="pricehubble">PriceHubble <span class="ke">40 L</span></button></div><div id="markt-result" style="display:none"></div></div></section>
+
+      <!-- DETAIL -->
+      <section class="view" data-view="detail">
+        <div class="brandbar"><button class="bk" data-go="cockpit">‹</button><span class="lg">Objekt</span><span class="tag">DP·001</span></div>
+        <div class="detimg"><div class="pr">385.000 €</div><div class="lab"><div class="nm">MFH Lindenstraße 12</div><div class="ad">33602 Bielefeld · 6 Einheiten · Bj. 1994</div></div></div>
+        <div class="pad">
+          <div class="scorebox"><div id="det-dial"></div><div class="tx"><div class="k">DealScore 2</div><div class="v">Grün · Kaufempfehlung</div><p>Starker Cashflow und Lage, leichter Sanierungsstau bei der Substanz. 24 KPIs, 5 Kategorien.</p></div></div>
+          <div class="kgrid">
+            <div class="ki"><div class="k">Bruttorendite</div><div class="v">4,8 %</div></div>
+            <div class="ki"><div class="k">Cashflow / Mon.</div><div class="v pos">+185 €</div></div>
+            <div class="ki"><div class="k">DSCR</div><div class="v">1,28</div></div>
+            <div class="ki"><div class="k">Beleihung</div><div class="v">82 %</div></div>
+          </div>
+          <div class="sech"><span class="t">Score nach Kategorie</span></div>
+          <div class="barsd">
+            <div class="bl"><div class="tp"><span>Rendite</span><b>82</b></div><div class="tr"><i style="width:82%;background:var(--green)"></i></div></div>
+            <div class="bl"><div class="tp"><span>Cashflow</span><b>76</b></div><div class="tr"><i style="width:76%;background:var(--green)"></i></div></div>
+            <div class="bl"><div class="tp"><span>Lage &amp; Markt</span><b>69</b></div><div class="tr"><i style="width:69%;background:var(--gold)"></i></div></div>
+            <div class="bl"><div class="tp"><span>Finanzierung</span><b>64</b></div><div class="tr"><i style="width:64%;background:var(--gold)"></i></div></div>
+            <div class="bl"><div class="tp"><span>Substanz</span><b>48</b></div><div class="tr"><i style="width:48%;background:var(--red)"></i></div></div>
+          </div>
+          <button class="cta" data-go="markt">Markteinschätzung öffnen <span class="ke">2 L</span></button>
+          <button class="ghost" data-go="anlegen">✎ Objekt rechnen / bearbeiten</button>
+        </div>
+      </section>
+
+      <!-- ANLEGEN -->
+      <section class="view" data-view="anlegen">
+        <div class="brandbar"><button class="bk" data-go="cockpit">‹</button><span class="lg">Objekt <span>rechnen</span></span><span class="tag">EDIT</span></div>
+        <div class="pad" style="padding-top:14px">
+          <div class="hintbar"><div class="i">🖥️</div><div>Volle Rechnung läuft am komfortabelsten am Desktop. Hier kannst du die Eckdaten erfassen und speichern.</div></div>
+          <div class="lbl-sec" style="margin-top:6px">Objekt</div>
+          <div class="field"><label>Bezeichnung</label><div class="inp"><input type="text" value="MFH Lindenstraße 12"></div></div>
+          <div class="row2">
+            <div class="field"><label>Wohnfläche</label><div class="inp"><input type="text" value="118" inputmode="numeric"><span class="u">m²</span></div></div>
+            <div class="field"><label>Baujahr</label><div class="inp"><input type="text" value="1994" inputmode="numeric"></div></div>
+          </div>
+          <div class="lbl-sec">Investition</div>
+          <div class="row2">
+            <div class="field"><label>Kaufpreis</label><div class="inp"><input type="text" value="385.000" inputmode="numeric"><span class="u">€</span></div></div>
+            <div class="field"><label>Kaufnebenkosten</label><div class="inp"><input type="text" value="9,9" inputmode="decimal"><span class="u">%</span></div></div>
+          </div>
+          <div class="field"><label>Eigenkapital</label><div class="inp"><input type="text" value="80.000" inputmode="numeric"><span class="u">€</span></div></div>
+          <div class="lbl-sec">Finanzierung</div>
+          <div class="row2">
+            <div class="field"><label>Sollzins</label><div class="inp"><input type="text" value="3,8" inputmode="decimal"><span class="u">%</span></div></div>
+            <div class="field"><label>Tilgung</label><div class="inp"><input type="text" value="2,0" inputmode="decimal"><span class="u">%</span></div></div>
+          </div>
+          <div class="lbl-sec">Miete</div>
+          <div class="row2">
+            <div class="field"><label>Kaltmiete / Monat</label><div class="inp"><input type="text" value="1.640" inputmode="numeric"><span class="u">€</span></div></div>
+            <div class="field"><label>Hausgeld / Monat</label><div class="inp"><input type="text" value="210" inputmode="numeric"><span class="u">€</span></div></div>
+          </div>
+          <button class="cta" data-go="detail">Speichern &amp; analysieren <span class="ke">↻</span></button>
+        </div>
+      </section>
+
+      <!-- PROFIL -->
+      <section class="view" data-view="profil">
+        <div class="brandbar"><span class="lg">Profil</span><span class="tag">★ INVESTOR</span><div class="av">MJ</div></div>
+        <div class="hero"><div class="k">Konto</div><h2>Marcel Junker</h2><p>Investor-Tarif · 40 L pro Monat · info@junker-immobilien.io</p></div>
+        <div class="pad" style="padding-top:16px">
+          <div class="tank" style="margin-top:0"><div class="top"><span class="t">Kerosin</span><span class="v">32 <small>/ 40 L</small></span></div><div class="gauge"><i></i></div><div class="ft"><a>Pakete · 10 · 28 · 90 · 160 L</a></div></div>
+          <div class="lbl-sec">Einstellungen</div>
+          <div class="setrow" id="theme-row"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></div><div class="tt"><div class="nm">Erscheinungsbild</div><div class="ds" id="theme-state">Dunkel · tippen zum Wechseln</div></div><span class="ch">›</span></div>
+          <div class="setrow"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></div><div class="tt"><div class="nm">Externe Anbieter</div><div class="ds">ImmoMetrica verbunden</div></div><span class="ch">›</span></div>
+          <div class="setrow"><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l9 6 9-6"/></svg></div><div class="tt"><div class="nm">Tarif &amp; Rechnungen</div><div class="ds">Investor · nächste Abrechnung 01.07.</div></div><span class="ch">›</span></div>
+        </div>
+      </section>
+
+    </div>
+
+    <nav class="tabs">
+      <button class="tab active" data-target="cockpit"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg><span>Cockpit</span></button>
+      <button class="tab" data-target="objekte"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 14h6"/></svg><span>Objekte</span></button>
+      <button class="tab center" data-target="hub"><span class="fab"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></span><span>Aufnehmen</span></button>
+      <button class="tab" data-target="markt"><svg viewBox="0 0 24 24"><path d="M3 17l5-5 4 4 7-8M16 4h4v4"/></svg><span>Markt</span></button>
+      <button class="tab" data-target="profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Profil</span></button>
+    </nav>
+
+  </div>
+</div>
+
+<div class="note">Tier-Logik · <b>≥ 70 STARK</b> · <b>≥ 50 SOLIDE</b> · <b>&lt; 50 SCHWACH</b> · Hell/Dunkel über ☀/☾ oder Profil. Echte Daten (Staging).</div>
+
+<!-- MA06: echte App-Anbindung -->
+<script>window.JI_API_BASE='/api/v1';</script>
+<script src="/js/auth.js?v=860"></script>
+<script src="/js/dscr-engine.js?v=231"></script>
+<script src="/js/deal-kpis.js?v=63"></script>
+<script src="/js/score-tiers.js?v=1"></script>
+<script src="/js/dealscore.js?v=1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+var screen=document.getElementById('screen');
+function tc(s){return s>=70?'#3FA56C':s>=50?'#C9A84C':'#B86250'}
+function th(s){return s>=70?'#5BD98E':s>=50?'#E8CC7A':'#D9685F'}
+function tl(s){return s>=70?'STARK':s>=50?'SOLIDE':'SCHWACH'}
+function jet(){return '<svg viewBox="0 0 24 24" fill="currentColor"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>'}
+function pt(cx,cy,r,d){var a=(d-90)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)]}
+function aP(cx,cy,r,d0,d1){var p=[],N=Math.max(8,Math.round(Math.abs(d1-d0)/4));for(var i=0;i<=N;i++){var d=d0+(d1-d0)*i/N,q=pt(cx,cy,r,d);p.push((i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1))}return p.join(' ')}
+function dial(s,z){
+  var dark=!screen.classList.contains('light'),txt=dark?'#fff':'#1a1407',center=dark?'#0a0a0a':'#fff';
+  var c=z/2,r=z*0.38,D0=225,D1=495,dv=D0+(D1-D0)*s/100,o='';
+  for(var t=0;t<=100;t+=5){var dd=D0+(D1-D0)*t/100,p1=pt(c,c,r,dd),p2=pt(c,c,r-(t%25===0?z*0.07:z*0.04),dd);o+='<line x1="'+p1[0].toFixed(1)+'" y1="'+p1[1].toFixed(1)+'" x2="'+p2[0].toFixed(1)+'" y2="'+p2[1].toFixed(1)+'" stroke="'+(t%25===0?'#C9A84C':'rgba(201,168,76,.4)')+'" stroke-width="'+(t%25===0?2:1)+'"/>'}
+  var np=pt(c,c,r-z*0.1,dv),b1=pt(c,c,z*0.045,dv+90),b2=pt(c,c,z*0.045,dv-90);
+  return '<svg viewBox="0 0 '+z+' '+z+'" width="'+z+'" height="'+z+'"><defs><filter id="g'+z+'"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
+    '<path d="'+aP(c,c,r,D0,D1)+'" fill="none" stroke="rgba(201,168,76,.18)" stroke-width="'+(z*0.07)+'" stroke-linecap="round"/>'+
+    '<path d="'+aP(c,c,r,D0,dv)+'" fill="none" stroke="'+tc(s)+'" stroke-width="'+(z*0.07)+'" stroke-linecap="round" filter="url(#g'+z+')"/>'+o+
+    '<polygon points="'+np[0].toFixed(1)+','+np[1].toFixed(1)+' '+b1[0].toFixed(1)+','+b1[1].toFixed(1)+' '+b2[0].toFixed(1)+','+b2[1].toFixed(1)+'" fill="'+th(s)+'" filter="url(#g'+z+')"/>'+
+    '<circle cx="'+c+'" cy="'+c+'" r="'+(z*0.055)+'" fill="'+center+'" stroke="'+tc(s)+'" stroke-width="1.6"/>'+
+    '<text x="'+c+'" y="'+(c-z*0.03)+'" text-anchor="middle" dominant-baseline="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(z*0.24)+'" fill="'+txt+'">'+s+'</text>'+
+    '<text x="'+c+'" y="'+(c+z*0.14)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="'+(z*0.058)+'" letter-spacing="1.2" fill="'+tc(s)+'">'+tl(s)+'</text></svg>'
+}
+
+var DEALS=[
+  {nm:'MFH Lindenstraße 12',ad:'33602 Bielefeld · 6 Einheiten',price:'385.000 €',score:74,tag:'live',rend:'4,8 %',cf:'+185 €',cfp:'pos',dscr:'1,28'},
+  {nm:'ETW In der Mark 110',ad:'32278 Kirchlengern · 3 Zi.',price:'196.000 €',score:61,tag:'watch',rend:'3,9 %',cf:'+62 €',cfp:'pos',dscr:'1,11'},
+  {nm:'2-Zi Neuer Markt 4',ad:'32278 Kirchlengern · vermietet',price:'109.500 €',score:52,tag:'watch',rend:'3,6 %',cf:'+28 €',cfp:'pos',dscr:'1,04'},
+  {nm:'MFH Bahnhofstraße 3',ad:'32423 Minden · 4 Einheiten',price:'245.000 €',score:41,tag:'pass',rend:'3,1 %',cf:'−140 €',cfp:'neg',dscr:'0,92'}
+];
+function statusOf(d){return d.tag==='live'?['won','✓ Im Rennen']:(d.tag==='pass'?['lost','✕ Eher Pass']:['watch','◷ Beobachten'])}
+function walletHTML(d){var st=statusOf(d);return '<div class="wcard"><div class="wh"><div class="ms" style="--v:'+d.score+';--c:'+tc(d.score)+'"><b>'+d.score+'</b></div><div class="hi"><div class="nm">'+d.nm+'</div><div class="ad">'+d.ad+'</div></div><span class="wt" style="color:'+th(d.score)+'">'+tl(d.score)+'</span></div><div class="wbody"><div class="wmid"><span class="wthumb"></span><div class="col"><div class="loc">'+d.ad+'</div><div class="price">'+d.price+'</div></div><span class="wtier" style="background:'+tc(d.score)+'">'+tl(d.score)+'</span></div><div class="wstats"><div class="wkpi"><div class="k">Rendite</div><div class="v">'+d.rend+'</div></div><div class="wkpi"><div class="k">Cashflow</div><div class="v '+d.cfp+'">'+d.cf+'</div></div><div class="wkpi"><div class="k">DSCR</div><div class="v">'+d.dscr+'</div></div></div><div class="wfoot"><span class="badge '+st[0]+'">'+st[1]+'</span><button class="open-btn">Detail öffnen →</button></div></div></div>'}
+function layoutStack(stack){var cards=[].slice.call(stack.querySelectorAll('.wcard')),y=0,maxB=0;cards.forEach(function(c,i){var open=c.classList.contains('open'),h=open?244:64;c.style.top=y+'px';c.style.height=h+'px';c.style.zIndex=open?100:(10+i);maxB=Math.max(maxB,y+h);y+=open?(244+10):50});stack.style.height=maxB+'px'}
+function buildStack(id){var stack=document.getElementById(id);if(!stack)return;stack.className='wstack';stack.innerHTML=DEALS.map(walletHTML).join('');var cards=[].slice.call(stack.querySelectorAll('.wcard'));cards[0].classList.add('open');cards.forEach(function(c){c.addEventListener('click',function(e){if(e.target.closest('.open-btn')){go('detail');return}if(c.classList.contains('open'))return;cards.forEach(function(x){x.classList.remove('open')});c.classList.add('open');layoutStack(stack)})});layoutStack(stack);setTimeout(function(){layoutStack(stack)},60)}
+
+function fillResult(){
+  var RS=71;
+  document.getElementById('dial1').innerHTML=dial(RS,128);
+  document.getElementById('tier1').innerHTML=tl(RS);document.getElementById('tier1').style.color=th(RS);
+  document.getElementById('fly1').innerHTML=jet();
+  var CATS=[['Rendite',78],['Cashflow',81],['Sicherheit',58],['Finanz.',69],['Effizienz',63]];
+  document.getElementById('cbars1').innerHTML=CATS.map(function(c){return '<div class="cb"><span class="cl">'+c[0]+'</span><div class="bar"><i style="width:'+c[1]+'%;background:'+tc(c[1])+'"></i></div><span class="cv">'+c[1]+'</span></div>'}).join('');
+  var KPIS=[['Bruttorend.','5,1 %','good'],['Cashflow','+178 €','good'],['DSCR','1,24','mid'],['Faktor','19,6','mid']];
+  document.getElementById('kt1').innerHTML=KPIS.map(function(k){return '<div class="k '+k[2]+'"><div class="l">'+k[0]+'</div><div class="v">'+k[1]+'</div></div>'}).join('');
+}
+function makeQR(id,text){var el=document.getElementById(id);if(!el)return;el.innerHTML='';if(typeof QRCode!=='undefined'){try{new QRCode(el,{text:text,width:54,height:54,colorDark:'#141210',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});return}catch(e){}}var n=21,s='';for(var y=0;y<n;y++)for(var x=0;x<n;x++){if(((x*7+y*13+((x*y)%5))%3)===0)s+='<rect x="'+x+'" y="'+y+'" width="1" height="1"/>'}el.innerHTML='<svg viewBox="0 0 '+n+' '+n+'" shape-rendering="crispEdges" style="width:100%;height:100%"><rect width="'+n+'" height="'+n+'" fill="#fff"/><g fill="#141210">'+s+'</g></svg>'}
+function fillDials(){document.getElementById('det-dial').innerHTML=dial(74,90);fillResult();}
+
+var SRC=[{l:'Suche · ETW',c:714,on:true},{l:'Suche · Eigenheim',c:128},{l:'Favoriten DE',c:2}];
+var IMO=[
+  {a:'In der Mark 110, 32278 Kirchlengern',t:'Bj. 1994: Grundsolide Eigentumswohnung zwischen Kirchlengern und Löhne',kp:'196.000 €',wfl:'91 m²',obj:'ETW',bj:1994,f:[['Kürzel','ETW Kirchlengern'],['Objektart','Eigentumswohnung'],['PLZ','32278'],['Ort','Kirchlengern'],['Straße','In der Mark'],['Nr.','110'],['Wohnfläche','91 m²'],['Baujahr','1994'],['Kaufpreis','196.000 €'],['Zimmer','3'],['Vermietung','leer']]},
+  {a:'Neuer Markt 4+5, 32278 Kirchlengern',t:'Geräumige 2-Zimmer-Wohnung mit Balkon und Abstellraum, zentrale Lage',kp:'109.500 €',wfl:'69 m²',obj:'ETW',bj:1983,f:[['Kürzel','2-Zi Neuer Markt'],['Objektart','Eigentumswohnung'],['PLZ','32278'],['Ort','Kirchlengern'],['Straße','Neuer Markt'],['Nr.','4'],['Wohnfläche','69 m²'],['Baujahr','1983'],['Kaufpreis','109.500 €'],['Zimmer','2'],['Vermietung','vermietet']]},
+  {a:'32278 Kirchlengern / Hagedorn',t:'Vermietete 2-Zimmer-Wohnung in ländlicher Lage',kp:'99.000 €',wfl:'67 m²',obj:'ETW',bj:1911,f:[['Kürzel','2-Zi Hagedorn'],['Objektart','Eigentumswohnung'],['PLZ','32278'],['Ort','Kirchlengern'],['Wohnfläche','67 m²'],['Baujahr','1911'],['Kaufpreis','99.000 €'],['Kaltmiete','420 €'],['Zimmer','2'],['Vermietung','vermietet']]}
+];
+function buildImmo(){document.getElementById('immo-src').innerHTML=SRC.map(function(s,i){return '<div class="pill'+(s.on?' on':'')+'" data-si="'+i+'">'+s.l+' · '+s.c+'</div>'}).join('');document.getElementById('immo-list').innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--mut);margin-bottom:10px">714 Treffer · Seite 1</div>'+IMO.map(function(it,i){return '<div class="imo" data-ii="'+i+'"><div class="t">'+it.t+'</div><div class="a">'+it.a+'</div><div class="m"><span>KP <b>'+it.kp+'</b></span><span>Wfl <b>'+it.wfl+'</b></span><span>'+it.obj+'</span><span>Bj '+it.bj+'</span></div></div>'}).join('')}
+function showImmoDetail(i){var it=IMO[i];document.getElementById('immo-title').textContent=it.f[0][1];document.getElementById('immo-fields').innerHTML=it.f.map(function(p){return '<label class="xf"><input type="checkbox" checked><span class="l">'+p[0]+'</span><span class="v">'+p[1]+'</span></label>'}).join('')}
+
+var PDF_FIELDS=[['Bezeichnung','MFH Lindenstraße 12'],['Objektart','Mehrfamilienhaus'],['PLZ','33602'],['Ort','Bielefeld'],['Straße','Lindenstraße'],['Nr.','12'],['Wohnfläche','118 m²'],['Baujahr','1994'],['Einheiten','6'],['Kaufpreis','385.000 €'],['Kaltmiete','1.640 €'],['Hausgeld','210 €'],['Energieklasse','D'],['Zustand','gepflegt']];
+function showPdf(){document.getElementById('pdf-drop').style.display='none';document.getElementById('pdf-result').style.display='block';document.getElementById('pdf-fields').innerHTML=PDF_FIELDS.map(function(p){return '<label class="xf"><input type="checkbox" checked><span class="l">'+p[0]+'</span><span class="v">'+p[1]+'</span></label>'}).join('');document.getElementById('scroll').scrollTop=0}
+function resetPdf(){document.getElementById('pdf-result').style.display='none';document.getElementById('pdf-drop').style.display='block';document.getElementById('scroll').scrollTop=0}
+
+var voiceTimers=[];
+function startVoice(){var chips=document.querySelectorAll('#mic-stage .chip');chips.forEach(function(c){c.classList.remove('show')});voiceTimers.forEach(clearTimeout);voiceTimers=[];chips.forEach(function(c,i){voiceTimers.push(setTimeout(function(){c.classList.add('show')},500+i*420))});voiceTimers.push(setTimeout(function(){var st=document.getElementById('voice-status');if(st)st.textContent='6 Felder erkannt ✓'},500+chips.length*420+300))}
+
+function go(name){
+  screen.querySelectorAll('.view').forEach(function(v){v.classList.toggle('active',v.getAttribute('data-view')===name)});
+  document.getElementById('scroll').scrollTop=0;
+  var map={cockpit:'cockpit',objekte:'objekte',hub:'hub',boarding:'hub','boarding-result':'hub',voice:'hub','import-pdf':'hub','import-immo':'hub','immo-detail':'hub',markt:'markt',detail:'objekte',anlegen:'objekte',profil:'profil'};
+  var act=map[name]||name;
+  screen.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-target')===act)});
+  if(name==='voice')startVoice();
+}
+screen.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){go(t.getAttribute('data-target'))})});
+
+function toggleTheme(){
+  screen.classList.toggle('light');
+  var light=screen.classList.contains('light');
+  document.getElementById('themebtn').textContent=light?'☾':'☀';
+  var ts=document.getElementById('theme-state');if(ts)ts.textContent=(light?'Hell':'Dunkel')+' · tippen zum Wechseln';
+  fillDials();
+}
+
+screen.addEventListener('click',function(e){
+  if(e.target.closest('#themebtn')||e.target.closest('#theme-row')){toggleTheme();return}
+  var goEl=e.target.closest('[data-go]');if(goEl){go(goEl.getAttribute('data-go'));return}
+  var pill=e.target.closest('.pill[data-si]');if(pill){screen.querySelectorAll('.pill[data-si]').forEach(function(p){p.classList.remove('on')});pill.classList.add('on');return}
+  var imo=e.target.closest('.imo[data-ii]');if(imo){showImmoDetail(+imo.getAttribute('data-ii'));go('immo-detail');return}
+  if(e.target.closest('#pdf-zone')||e.target.closest('#pdf-recent')){showPdf();return}
+  if(e.target.closest('#pdf-reset')){resetPdf();return}
+  if(e.target.closest('#markt-go')){document.getElementById('markt-result').style.display='block';e.target.closest('#markt-go').style.display='none';return}
+  if(e.target.closest('#mic-btn')){startVoice();return}
+});
+
+buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();makeQR('qr1','https://app.dealpilot.junker-immobilien.io/o/QB7F3K22');
+
+(function(){var c=document.querySelector('.pcanvas');if(!c)return;var ctx=c.getContext('2d'),DPR=Math.min(2,window.devicePixelRatio||1);function size(){c.width=c.clientWidth*DPR;c.height=c.clientHeight*DPR}size();window.addEventListener('resize',size);var N=30,ps=[];for(var i=0;i<N;i++)ps.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.16*DPR,vy:(Math.random()-.5)*.16*DPR,r:(Math.random()*1.4+.4)*DPR});function step(){ctx.clearRect(0,0,c.width,c.height);for(var i=0;i<N;i++){var p=ps[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>c.width)p.vx*=-1;if(p.y<0||p.y>c.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.283);ctx.fillStyle='rgba(201,168,76,.35)';ctx.fill()}for(var a=0;a<N;a++)for(var b=a+1;b<N;b++){var dx=ps[a].x-ps[b].x,dy=ps[a].y-ps[b].y,d=Math.sqrt(dx*dx+dy*dy);if(d<86*DPR){ctx.beginPath();ctx.moveTo(ps[a].x,ps[a].y);ctx.lineTo(ps[b].x,ps[b].y);ctx.strokeStyle='rgba(201,168,76,'+(.07*(1-d/(86*DPR)))+')';ctx.lineWidth=DPR*.5;ctx.stroke()}}requestAnimationFrame(step)}if(!window.matchMedia||!window.matchMedia('(prefers-reduced-motion:reduce)').matches)step()})();
+</script>
+
+<!-- MA06-DATA-LAYER:start (MA14 Exposé-Import) -->
+<script>
+(function(){
+  'use strict';
+  if (window.__MA06__) return; window.__MA06__ = 1;
+
+  function A(){ return window.Auth; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch];}); }
+  function numDe(v){ var n=(typeof v==='number')?v:parseFloat(String(v==null?'':v).replace(/\./g,'').replace(',','.').replace(/[^\d.-]/g,'')); return isFinite(n)?n:NaN; }
+  function euro(v){ var n=numDe(v); if(!isFinite(n)) return '\u2014'; return n.toLocaleString('de-DE',{maximumFractionDigits:0})+' \u20ac'; }
+  function firstName(n){ n=(n||'').trim().split(/\s+/)[0]; return n||'Pilot'; }
+  function addrOf(d){ d=d||{}; var l1=[d.str,d.hnr].filter(Boolean).join(' '); var l2=[d.plz,d.ort].filter(Boolean).join(' '); var extra=d.objart||d.kuerzel||''; return [ (l1||l2), extra ].filter(Boolean).join(' \u00b7 ') || 'Adresse folgt'; }
+  function numOr(v){ if(v==null||v==='')return null; var n=+v; return isFinite(n)?n:null; }
+
+  // ── persistierte Werte, KORREKTE Quellen (wie dashboard.js) ──
+  function scoreOf(it){ var s=(it.ds2_score_persist!=null)?it.ds2_score_persist:(it.dealpilot_score!=null?it.dealpilot_score:null); if(s==null)return null; var n=+s; return isFinite(n)?Math.round(n):null; }
+  // DSCR/Rendite: bevorzugt _kpis_* aus dem data-Blob, sonst Summary
+  function dscrOf(it,d){ var v=numOr(d&&d._kpis_dscr); return (v!=null)?v:numOr(it&&it.dscr); }
+  function bmyOf(it,d){ var v=numOr(d&&d._kpis_bmy); return (v!=null)?v:numOr(it&&it.bmy); }
+  // Cashflow/Monat: _kpis_cf_ns ist EURO/Jahr -> /12 (dashboard.buildDealFromData).
+  // Fallback (Altobjekte): Summary cf_ns in Cent/Jahr -> /100/12.
+  function cfMonat(it,d){ var e=numOr(d&&d._kpis_cf_ns); if(e!=null) return e/12; var c=numOr(it&&it.cf_ns); return (c==null)?null:(c/100/12); }
+  function ltvOf(it,d){ var v=numOr(d&&d._kpis_ltv); return (v!=null)?v:numOr(it&&it.ltv); }
+
+  function fmtDscr(n){ return (n==null)?'\u2014':(+n).toFixed(2).replace('.',','); }
+  function fmtPct(n){ return (n==null)?'\u2014':(+n).toFixed(1).replace('.',',')+' %'; }
+  function fmtCf(m){ if(m==null) return {s:'\u2014',p:''}; return {s:(m>=0?'+':'\u2212')+euro(Math.abs(m)), p:(m>=0?'pos':'neg')}; }
+  function tagOf(it){ return (it.deal_won||it._deal_won)?'live':((it.deal_lost||it._deal_lost)?'pass':'watch'); }
+
+  window.walletHTML = function(d){
+    var st=(typeof statusOf==='function')?statusOf(d):['watch','\u25f7 Beobachten'];
+    var has=(typeof d.score==='number'&&isFinite(d.score));
+    var rv=has?d.score:0, rc=has?tc(d.score):'var(--gold-dim)', rn=has?d.score:'\u00b7';
+    var wc=has?th(d.score):'var(--mut)', wb=has?tc(d.score):'var(--gold-dim)', wt=has?tl(d.score):'OFFEN';
+    return '<div class="wcard"><div class="wh"><div class="ms" style="--v:'+rv+';--c:'+rc+'"><b>'+rn+'</b></div>'
+      + '<div class="hi"><div class="nm">'+d.nm+'</div><div class="ad">'+d.ad+'</div></div>'
+      + '<span class="wt" style="color:'+wc+'">'+wt+'</span></div>'
+      + '<div class="wbody"><div class="wmid"><span class="wthumb"></span>'
+      + '<div class="col"><div class="loc">'+d.ad+'</div><div class="price">'+d.price+'</div></div>'
+      + '<span class="wtier" style="background:'+wb+'">'+wt+'</span></div>'
+      + '<div class="wstats"><div class="wkpi"><div class="k">Rendite</div><div class="v">'+d.rend+'</div></div>'
+      + '<div class="wkpi"><div class="k">Cashflow</div><div class="v '+d.cfp+'">'+d.cf+'</div></div>'
+      + '<div class="wkpi"><div class="k">DSCR</div><div class="v">'+d.dscr+'</div></div></div>'
+      + '<div class="wfoot"><span class="badge '+st[0]+'">'+st[1]+'</span>'
+      + '<button class="open-btn">Detail \u00f6ffnen \u2192</button></div></div></div>';
+  };
+
+  function toDeal(r){
+    var it=r.it||{}, d=r.data||{};
+    var nm=r.name||d.kuerzel||'Objekt';
+    var price=euro(d.kp); if(price==='\u2014' && it.kaufpreis!=null){ var kc=numOr(it.kaufpreis); if(kc!=null) price=euro(kc/100); }
+    var cf=fmtCf(cfMonat(it,d));
+    return { nm:esc(nm), ad:esc(addrOf(d)), price:price, score:scoreOf(it),
+             rend:fmtPct(bmyOf(it,d)), cf:cf.s, cfp:cf.p, dscr:fmtDscr(dscrOf(it,d)), tag:tagOf(it) };
+  }
+
+  function loader(t){ return '<div style="text-align:center;color:var(--mut);font-family:var(--mono);font-size:12px;padding:30px">'+esc(t)+'</div>'; }
+  function setList(id,html){ var el=document.getElementById(id); if(el) el.innerHTML=html; }
+  function setStat(rx,val,col){ var s=document.querySelectorAll('.stat'); for(var i=0;i<s.length;i++){ var k=s[i].querySelector('.k'),n=s[i].querySelector('.n'); if(k&&n&&rx.test(k.textContent)){ n.textContent=val; if(col)n.style.color=col; } } }
+
+  var _count=null, _kero=null;
+  function updateCockpitSub(){ var h=document.querySelector('.hero.rounded p'); if(!h)return; var parts=[]; if(_count!=null)parts.push(_count+(_count===1?' Objekt':' Objekte')); if(_kero!=null)parts.push('Tank '+_kero+' L'); h.textContent=parts.join(' \u00b7 ')||'in deiner Flotte'; }
+  function greetName(sess){ var h=document.querySelector('.hero.rounded'); if(!h)return; var t=h.querySelector('h2'); if(t)t.textContent='Moin, '+firstName(sess&&sess.name)+' \u2708'; }
+  function greetCount(count){ _count=count; updateCockpitSub(); setStat(/Objekte/i,String(count)); }
+
+  // Ø-Score: IV-gewichtet ueber Summary-Scores (wie dashboard.aggregateScore)
+  function aggregateScore(items){
+    var tw=0,ws=0;
+    items.forEach(function(it){ var sc=scoreOf(it); if(sc!=null){ var w=numOr(it.kaufpreis)||1; tw+=w; ws+=sc*w; } });
+    var avg=tw>0?Math.round(ws/tw):null;
+    setStat(/Score/i, avg==null?'\u2014':String(avg), avg==null?'var(--mut)':(avg>=70?'var(--pos)':avg>=50?'var(--gold-hi)':'var(--neg)'));
+  }
+  // Cashflow gesamt/Monat: Σ _kpis_cf_ns/12 aus den Detail-Rows (Euro)
+  function aggregateCashflow(rows){
+    var cf=0, has=false;
+    rows.forEach(function(r){ var m=cfMonat(r.it||{}, r.data||{}); if(m!=null){ cf+=m; has=true; } });
+    setStat(/Cashflow/i, has?fmtCf(cf).s:'\u2014', has?(cf>=0?'var(--pos)':'var(--neg)'):'var(--mut)');
+  }
+
+  function renderKerosin(s){
+    if(!s) return;
+    var total=numOr(s.total_remaining), mlim=numOr(s.monthly_limit), mrem=numOr(s.monthly_remaining), bonus=numOr(s.bonus_credits);
+    _kero=(total==null?null:total); updateCockpitSub();
+    var pv=document.querySelector('[data-view="profil"]'); if(!pv) return;
+    var tv=pv.querySelector('.tank .top .v'); if(tv) tv.innerHTML=(total==null?'\u2014':total)+' <small>/ '+(mlim==null?'\u2014':mlim)+' L</small>';
+    var gi=pv.querySelector('.tank .gauge i'); if(gi){ var pct=(mlim&&mrem!=null)?Math.max(0,Math.min(100,Math.round(mrem/mlim*100))):0; gi.style.width=pct+'%'; }
+    var ft=pv.querySelector('.tank .ft a'); if(ft&&bonus!=null) ft.textContent='Bonus-Tank '+bonus+' L \u00b7 Pakete 10 \u00b7 28 \u00b7 90 \u00b7 160 L';
+    var hp=pv.querySelector('.hero p'); if(hp){ var em=(A().getSession&&A().getSession()&&A().getSession().email)||''; hp.textContent=((mlim==null?'':mlim+' L pro Monat'))+(em?(' \u00b7 '+em):''); }
+  }
+  function loadKerosin(){ try{ A().apiCall('/ai/credits').then(renderKerosin).catch(function(){}); }catch(e){} }
+
+  function showGate(msg){
+    if(document.getElementById('ma06-gate'))return;
+    var g=document.createElement('div'); g.id='ma06-gate';
+    g.style.cssText='position:absolute;inset:0;z-index:9999;background:var(--bg,#050505);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;gap:16px';
+    g.innerHTML='<div style="font-family:var(--disp);font-weight:700;font-size:26px"><span style="color:#f6f2e8">Deal</span><span style="color:#C9A84C">Pilot</span></div>'
+      + '<div style="font-family:var(--disp);font-size:18px;color:var(--txt)">'+esc(msg||'Bitte im Cockpit anmelden')+'</div>'
+      + '<div style="font-size:13px;color:var(--mut);max-width:260px;line-height:1.5">Melde dich in DealPilot an \u2014 danach zeigt dir diese App deine echte Flotte.</div>'
+      + '<button id="ma06-login" style="margin-top:8px;background:var(--runway);color:#2a2107;font-family:var(--disp);font-weight:700;font-size:15px;padding:14px 26px;border:0;border-radius:14px;cursor:pointer">Zum Login \u2192</button>';
+    (document.getElementById('screen')||document.body).appendChild(g);
+    var b=document.getElementById('ma06-login'); if(b)b.addEventListener('click',function(){ location.href='/'; });
+  }
+
+  function paint(rows){
+    window.__MOB_ROWS = rows;
+    window.DEALS = rows.map(toDeal);
+    if(typeof window.buildStack==='function'){ window.buildStack('cockpit-list'); window.buildStack('objekte-list'); }
+  }
+
+  function loadFlotte(){
+    setList('cockpit-list', loader('Lade deine Flotte \u2026'));
+    setList('objekte-list', loader('Lade deine Flotte \u2026'));
+    A().apiCall('/objects?limit=100').then(function(resp){
+      var items=(resp&&resp.items)||[];
+      greetCount(items.length); aggregateScore(items);
+      if(!items.length){ var e='<div style="text-align:center;color:var(--mut);font-family:var(--mono);font-size:12px;padding:30px">Noch keine Objekte an Bord.</div>'; setList('cockpit-list',e); setList('objekte-list',e); setStat(/Cashflow/i,'\u2014','var(--mut)'); return; }
+      var top=items.slice(0,25);
+      return Promise.all(top.map(function(it){
+        return A().apiCall('/objects/'+it.id).then(function(full){ return { it:it, name:(it.name||full.name||(full.data&&full.data.kuerzel)), data:(full&&full.data)||{} }; })
+          .catch(function(){ return { it:it, name:it.name, data:{} }; });
+      })).then(function(rows){ paint(rows); aggregateCashflow(rows); });
+    }).catch(function(err){
+      if(err&&err.status===401){ showGate('Sitzung abgelaufen'); return; }
+      var m='<div style="text-align:center;color:var(--neg);font-family:var(--mono);font-size:12px;padding:24px">Konnte Flotte nicht laden.<br>'+esc((err&&err.message)||'')+'</div>';
+      setList('cockpit-list',m); setList('objekte-list',m);
+    });
+  }
+
+  // ════ ECHTES OBJEKT-DETAIL ════
+  function pickCats(d){
+    var raw = d._ds2_categories || d._dp_categories; if(!raw) return null;
+    var out={};
+    if(Array.isArray(raw)){ raw.forEach(function(c){ if(c&&c.key!=null) out[c.key]=(c.score!=null?+c.score:(c.value!=null?+c.value:null)); }); }
+    else if(typeof raw==='object'){ Object.keys(raw).forEach(function(k){ var c=raw[k]; out[k]=(c&&c.score!=null)?+c.score:(typeof c==='number'?c:null); }); }
+    return Object.keys(out).length?out:null;
+  }
+  function catColor(s){ return s>=70?'var(--green)':s>=50?'var(--gold)':'var(--red)'; }
+  function fillDetail(row){
+    var dv=document.querySelector('[data-view="detail"]'); if(!dv||!row) return;
+    var it=row.it||{}, d=row.data||{}, sc=scoreOf(it);
+    var dd=dv.querySelector('#det-dial');
+    if(dd){ dd.innerHTML=(sc!=null&&typeof dial==='function')?dial(sc,90):'<div style="width:90px;height:90px;display:flex;align-items:center;justify-content:center;color:var(--mut);font-family:var(--disp);font-size:26px">\u00b7</div>'; }
+    var vv=dv.querySelector('.scorebox .tx .v');
+    if(vv){ vv.textContent=sc==null?'Noch nicht bewertet':(sc>=70?'Gr\u00fcn \u00b7 Kaufempfehlung':sc>=50?'Gold \u00b7 Solide':'Rot \u00b7 Kritisch'); if(sc!=null&&typeof th==='function') vv.style.color=th(sc); }
+    var pr=dv.querySelector('.detimg .pr'); if(pr){ var p=euro(d.kp); if(p==='\u2014'&&it.kaufpreis!=null){ var kc=numOr(it.kaufpreis); if(kc!=null)p=euro(kc/100); } pr.textContent=p; }
+    var nm=dv.querySelector('.detimg .lab .nm'); if(nm) nm.textContent=(row.name||d.kuerzel||'Objekt');
+    var ad=dv.querySelector('.detimg .lab .ad'); if(ad){ var parts=[addrOf(d)]; if(d.baujahr) parts.push('Bj. '+d.baujahr); ad.textContent=parts.filter(Boolean).join(' \u00b7 '); }
+    var ki=dv.querySelectorAll('.kgrid .ki');
+    if(ki[0]){ var e0=ki[0].querySelector('.v'); if(e0)e0.textContent=fmtPct(bmyOf(it,d)); }
+    if(ki[1]){ var cc=fmtCf(cfMonat(it,d)); var e1=ki[1].querySelector('.v'); if(e1){ e1.textContent=cc.s; e1.className='v'+(cc.p?(' '+cc.p):''); } }
+    if(ki[2]){ var e2=ki[2].querySelector('.v'); if(e2)e2.textContent=fmtDscr(dscrOf(it,d)); }
+    if(ki[3]){ var e3=ki[3].querySelector('.v'); var ltv=ltvOf(it,d); if(e3)e3.textContent=(ltv==null?'\u2014':Math.round(ltv)+' %'); }
+    var barsd=dv.querySelector('.barsd');
+    if(barsd){
+      var cats=pickCats(d);
+      if(cats){
+        var order=[['rendite','Rendite'],['finanzierung','Finanzierung'],['risiko','Risiko'],['lage','Lage'],['upside','Upside']];
+        var html=order.map(function(o){ var s=cats[o[0]]; if(s==null)return ''; s=Math.round(s); return '<div class="bl"><div class="tp"><span>'+o[1]+'</span><b>'+s+'</b></div><div class="tr"><i style="width:'+s+'%;background:'+catColor(s)+'"></i></div></div>'; }).join('');
+        barsd.innerHTML=html||'<div style="color:var(--mut);font-family:var(--mono);font-size:11px;padding:8px 0">Kategorie-Details \u00b7 folgt</div>';
+      } else { barsd.innerHTML='<div style="color:var(--mut);font-family:var(--mono);font-size:11px;padding:8px 0">Kategorie-Details \u00b7 folgt</div>'; }
+    }
+  }
+
+  function installDetailHooks(){
+    document.addEventListener('click', function(e){
+      var btn=e.target.closest&&e.target.closest('.open-btn'); if(!btn) return;
+      var card=btn.closest('.wcard'); if(!card) return;
+      var stack=card.parentNode; if(!stack) return;
+      var cards=[].slice.call(stack.querySelectorAll('.wcard'));
+      var idx=cards.indexOf(card);
+      if(idx>=0 && window.__MOB_ROWS && window.__MOB_ROWS[idx]) window.__mobSel=window.__MOB_ROWS[idx];
+    }, true);
+    document.addEventListener('click', function(e){ var b=e.target.closest&&e.target.closest('#mb-board-save'); if(b){ e.preventDefault(); mbSave(); } var a=e.target.closest&&e.target.closest('[data-avm]'); if(a){ e.preventDefault(); mbAvm(a.getAttribute('data-avm')); } });
+    if(typeof window.go==='function' && !window.__mobGoWrapped){
+      var _og=window.go;
+      window.go=function(name){ if(name==='boarding-result'){ try{ var _l=mbCompute(); if(!_l) return; }catch(e){} } var r=_og.apply(this,arguments); if(name==='detail'){ try{ fillDetail(window.__mobSel); }catch(e){} } if(name==='boarding-result'){ try{ mbFillResult(window.__mbLast); }catch(e){} } if(name==='markt'){ try{ mkPrefill(); }catch(e){} } return r; };
+      window.__mobGoWrapped=true;
+    }
+  }
+
+
+  // ════ QUICK-BOARDING: echte Engine (DealKpis + DealScore) + POST /objects ════
+  function _t(id){ var e=document.getElementById(id); return e?(e.value||'').trim():''; }
+  function _nf(id){ var n=numDe(_t(id)); return isFinite(n)?n:0; }
+  function boardErr(msg){ var e=document.getElementById('mb-board-err'); if(e){ e.textContent=msg||''; e.style.display=msg?'block':'none'; } }
+
+  function mbCompute(){
+    var kp=_nf('mb_kp'), knkP=_nf('mb_knk')||10.5, nkm=_nf('mb_nkm'), ze=_nf('mb_ze')||0,
+        ek=_nf('mb_ek'), zinsP=_nf('mb_zins')||3.8, tilgP=_nf('mb_tilg')||2,
+        hg=_nf('mb_hg'), split=_nf('mb_hgsplit')||60, wfl=_nf('mb_wfl');
+    boardErr('');
+    if(!kp||!nkm){ boardErr('Kaufpreis und Kaltmiete sind Pflicht.'); return null; }
+    if(!(window.DealKpis&&DealKpis.compute)){ boardErr('Rechen-Engine nicht geladen.'); return null; }
+    var knkAbs=kp*knkP/100, gi=kp+knkAbs, darlehen=Math.max(0,gi-ek);
+    var hgY=hg*12, bwk_nul=hgY*split/100, bwk_ul=hgY*(100-split)/100;
+    var K=DealKpis.compute({kp:kp,nk:knkAbs,san:0,moebl:0,nkm:nkm,ze:ze,uf:0,bwk_ul:bwk_ul,bwk_nul:bwk_nul,d1:darlehen,d1z:zinsP,d1t:tilgP,ek:ek,afa:0,grenz:0});
+    var sc=scoreFromKpis(kp,K);
+    var last={ kp:kp,knkP:knkP,nkm:nkm,ze:ze,ek:ek,zinsP:zinsP,tilgP:tilgP,bwk_nul:bwk_nul,bwk_ul:bwk_ul,darlehen:darlehen,wfl:wfl,bj:_t('mb_bj'),
+      str:_t('mb_str'),hnr:_t('mb_hnr'),plz:_t('mb_plz'),ort:_t('mb_ort'),objart:_t('mb_objart'),
+      K:K, score:sc.score, breakdown:sc.breakdown };
+    window.__mbLast=last;
+    return last;
+  }
+
+  // DealScore.computeFromKpis (primär) + App-Fallback-Formel (aus qcCalc, identisch)
+  function scoreFromKpis(kp,K){
+    if(window.DealScore && typeof DealScore.computeFromKpis==='function'){
+      try{ var ds=DealScore.computeFromKpis({kp:kp,cf_m:K.cf_m,nmy:K.nmy,ltv:K.ltv,dscr:K.dscr,wp_kpi:kp*0.05,mstg:1.5});
+        if(ds&&ds.score!=null) return {score:Math.round(ds.score), breakdown:(ds.breakdown||null)}; }catch(e){}
+    }
+    function lerp(x,x1,x2,y1,y2){ if(x<=x1)return y1; if(x>=x2)return y2; return y1+(x-x1)*(y2-y1)/(x2-x1); }
+    var bmr=K.bmy||0, nmr=K.nmy||0, ekr=K.ekr||0, cfMon=K.cf_m||0, dscr=K.dscr||0, ltvPct=K.ltv||0;
+    var bewirtPctNkm=(K.nkm_j>0)?(K.bwk/K.nkm_j*100):0;
+    var sRendite=(bmr<=3?0:bmr>=7?100:lerp(bmr,3,7,0,100))*0.4+(nmr<=1?0:nmr>=5?100:lerp(nmr,1,5,0,100))*0.4+(ekr<=0?0:ekr>=12?100:lerp(ekr,0,12,0,100))*0.2;
+    var sCashflow=cfMon<=-200?0:cfMon>=300?100:lerp(cfMon,-200,300,0,100);
+    var sSicherheit=dscr<=0.9?0:dscr>=1.5?100:lerp(dscr,0.9,1.5,0,100);
+    var sFinanz=(ltvPct>=100?30:ltvPct>=90?60:ltvPct>=80?80:90);
+    var sBewirt=bewirtPctNkm<=18?100:bewirtPctNkm>=40?30:lerp(bewirtPctNkm,18,40,100,30);
+    var score=Math.max(0,Math.min(100,Math.round(sRendite*0.30+sCashflow*0.25+sSicherheit*0.20+sFinanz*0.15+sBewirt*0.10)));
+    return {score:score, breakdown:[{key:'rendite',score:sRendite},{key:'cashflow',score:sCashflow},{key:'risiko',score:sSicherheit},{key:'ltv',score:sFinanz},{key:'potenzial',score:sBewirt}]};
+  }
+
+  function mbFillResult(last){
+    if(!last) return;
+    var K=last.K, score=last.score;
+    var d1=document.getElementById('dial1'); if(d1) d1.innerHTML=(score!=null&&typeof dial==='function')?dial(score,128):'';
+    var t1=document.getElementById('tier1'); if(t1){ t1.innerHTML=(score!=null?tl(score):'\u2014'); if(score!=null) t1.style.color=th(score); }
+    var f1=document.getElementById('fly1'); if(f1&&typeof jet==='function') f1.innerHTML=jet();
+    var lbl={cashflow:'Cashflow',rendite:'Rendite',ltv:'Finanz.',risiko:'Sicherheit',potenzial:'Effizienz'};
+    var cb=document.getElementById('cbars1');
+    if(cb){ cb.innerHTML=(last.breakdown||[]).map(function(b){ var v=Math.round(b.score); return '<div class="cb"><span class="cl">'+(lbl[b.key]||b.key)+'</span><div class="bar"><i style="width:'+v+'%;background:'+tc(v)+'"></i></div><span class="cv">'+v+'</span></div>'; }).join(''); }
+    var cfMo=(K.cf_ns_m!=null)?K.cf_ns_m:(K.cf_ns!=null?K.cf_ns/12:0);
+    var fak=(K.nkm_j>0)?(last.kp/K.nkm_j):0;
+    var cls=function(x,g,w){ return x>=g?'good':x>=w?'mid':'bad'; };
+    var kt=[['Bruttorend.',fmtPct(K.bmy),cls(K.bmy,5,3.5)],['Cashflow',fmtCf(cfMo).s,cls(cfMo,1,-0.01)],['DSCR',fmtDscr(K.dscr),cls(K.dscr,1.2,1)],['Faktor',(fak?fak.toFixed(1).replace('.',','):'\u2014'),'mid']];
+    var k1=document.getElementById('kt1');
+    if(k1){ k1.innerHTML=kt.map(function(k){ return '<div class="k '+k[2]+'"><div class="l">'+k[0]+'</div><div class="v">'+k[1]+'</div></div>'; }).join(''); }
+    var pno=document.querySelector('[data-view="boarding-result"] .pno'); if(pno){ var code='QB-'+String(Math.abs((last.kp||0)+(last.nkm||0))).slice(-4)+'-'+String(score||0); }
+  }
+
+  function mbSave(){
+    var last=window.__mbLast; if(!last){ boardErr('Bitte erst „Boarding starten".'); return; }
+    var K=last.K;
+    var brk={}; (last.breakdown||[]).forEach(function(b){ brk[b.key]=Math.round(b.score); });
+    var data={
+      str:last.str, hnr:last.hnr, plz:last.plz, ort:last.ort, objart:last.objart,
+      wfl:(last.wfl?String(last.wfl):''), baujahr:(last.bj||''),
+      kp:String(Math.round(last.kp)), nkm:String(Math.round(last.nkm)),
+      ek:String(Math.round(last.ek)), d1z:String(last.zinsP), d1t:String(last.tilgP), ji_p:String(last.knkP),
+      d1:String(Math.round(last.darlehen)), d1_type:'annuitaet',
+      hg_nul:String(Math.round(last.bwk_nul)), hg_ul:String(Math.round(last.bwk_ul)),
+      kuerzel:((last.str?(last.str+' '+last.hnr).trim():'')||'Objekt'),
+      // persistierte KPIs (identische Keys wie dashboard.buildDealFromData)
+      _kpis_bmy:K.bmy, _kpis_nmy:K.nmy, _kpis_dscr:K.dscr, _kpis_ltv:K.ltv,
+      _kpis_cf_ns:K.cf_ns, _kpis_cf_vs:K.cf_op, _kpis_gi:K.gi, _kpis_miete_j:K.nkm_j, _kpis_restschuld:Math.round(last.darlehen),
+      _dealpilot_score:last.score, _dp_categories:brk
+    };
+    if(last.ze>0) data.ze=String(Math.round(last.ze));
+    var btn=document.getElementById('mb-board-save'); if(btn){ btn.disabled=true; }
+    A().apiCall('/objects',{method:'POST',body:{data:data, aiAnalysis:null, photos:[]}}).then(function(saved){
+      mobToast('\u2713 Objekt an Bord: '+(data.kuerzel||''));
+      if(btn){ btn.disabled=false; }
+      loadFlotte();
+      if(typeof window.go==='function') window.go('cockpit');
+    }).catch(function(err){
+      if(btn){ btn.disabled=false; }
+      boardErr('Speichern fehlgeschlagen: '+((err&&err.message)||''));
+    });
+  }
+
+
+  // ════ AVM / MARKTEINSCHÄTZUNG: POST /api/v1/avm/:provider ════
+  function _mk(id){ var e=document.getElementById(id); return e?(e.value||'').trim():''; }
+  function _mkn(id){ var n=numDe(_mk(id)); return isFinite(n)?n:0; }
+  function mkStatus(msg,isErr){ var e=document.getElementById('mk-status'); if(e){ e.textContent=msg||''; e.style.display=msg?'block':'none'; e.style.color=isErr?'var(--neg)':'var(--mut)'; } }
+  function mkPrefill(){
+    var d=(window.__mobSel&&window.__mobSel.data)||null; if(!d) return;
+    function set(id,v){ var e=document.getElementById(id); if(e&&!e.value&&v!=null&&v!=='') e.value=String(v); }
+    set('mk_str',d.str); set('mk_hnr',d.hnr); set('mk_plz',d.plz); set('mk_ort',d.ort);
+    if(d.objart) { var o=document.getElementById('mk_objart'); if(o) o.value=d.objart; }
+    set('mk_wfl',d.wfl); set('mk_bj',d.baujahr);
+  }
+  function mkRenderCorridor(r,data,provider,selKp){
+    var res=document.getElementById('markt-result'); if(!res) return;
+    var mw=numOr(r.marktwert), low=numOr(r.low), high=numOr(r.high);
+    if(low==null&&mw!=null) low=Math.round(mw*0.95);
+    if(high==null&&mw!=null) high=Math.round(mw*1.05);
+    var sMin=(low!=null)?Math.round(low*0.9):0, sMax=(high!=null)?Math.round(high*1.1):0;
+    function pct(x){ return (sMax>sMin)?Math.max(0,Math.min(100,(x-sMin)/(sMax-sMin)*100)):50; }
+    var bandL=(low!=null)?pct(low):20, bandR=(high!=null)?100-pct(high):20, markL=(mw!=null)?pct(mw):50;
+    var provName=(r.provider||provider);
+    var costNote=(data&&data.mode==='stub')?'Demo \u2014 kostenlos':('\u2212'+((data&&data.cost)||0)+' L Kerosin');
+    var kpHint='';
+    if(selKp!=null&&low!=null&&high!=null){
+      kpHint = (selKp<low) ? ('Dein Kaufpreis '+euro(selKp)+' liegt UNTER dem Korridor \u2014 verhandlungsstark.')
+             : (selKp>high) ? ('Dein Kaufpreis '+euro(selKp)+' liegt \u00dcBER dem Korridor \u2014 kritisch pr\u00fcfen.')
+             : ('Dein Kaufpreis '+euro(selKp)+' liegt im Korridor.');
+    }
+    res.style.display='block';
+    res.innerHTML='<div class="corridor">'
+      +'<div class="lab">Markteinsch\u00e4tzung \u00b7 '+esc(provName)+'</div>'
+      +'<div class="big">'+(low!=null?low.toLocaleString('de-DE'):'\u2014')+' \u2013 '+(high!=null?high.toLocaleString('de-DE'):'\u2014')+' <small>\u20ac</small></div>'
+      +'<div class="track"><div class="band" style="left:'+bandL.toFixed(0)+'%;right:'+bandR.toFixed(0)+'%"></div><div class="mark" style="left:'+markL.toFixed(0)+'%"></div></div>'
+      +'<div class="scalelbl"><span>'+(sMin?sMin.toLocaleString('de-DE')+' \u20ac':'')+'</span><span>Marktkorridor</span><span>'+(sMax?sMax.toLocaleString('de-DE')+' \u20ac':'')+'</span></div>'
+      +(kpHint?('<div class="hintbar" style="margin:16px 0 6px"><div class="i">i</div><div>'+esc(kpHint)+'</div></div>'):'')
+      +'<div class="srcline">Quelle: <span class="s">'+esc(provName)+'</span><span class="s">'+esc(costNote)+'</span></div>'
+      +'</div>';
+  }
+  function mbAvm(provider){
+    var inputs={ plz:_mk('mk_plz'), ort:_mk('mk_ort'), str:_mk('mk_str'), hnr:_mk('mk_hnr'), objektart:_mk('mk_objart'), wfl:_mkn('mk_wfl'), baujahr:_mkn('mk_bj') };
+    var selKp=(window.__mobSel&&window.__mobSel.data)?numOr(window.__mobSel.data.kp):null;
+    if(selKp!=null) inputs.kp=selKp;
+    var req=(provider==='pricehubble')?['plz','ort','str','hnr','objektart','wfl']:['plz','ort','objektart','wfl'];
+    var labels={plz:'PLZ',ort:'Ort',str:'Stra\u00dfe',hnr:'Nr.',objektart:'Objektart',wfl:'Wohnfl\u00e4che'};
+    var miss=req.filter(function(f){ return !inputs[f]||String(inputs[f]).trim()===''; });
+    if(miss.length){ mkStatus('Bitte ausf\u00fcllen: '+miss.map(function(f){return labels[f]||f;}).join(', '),true); return; }
+    mkStatus('Rufe Markteinsch\u00e4tzung \u2026',false);
+    var objectId=(window.__mobSel&&window.__mobSel.it)?window.__mobSel.it.id:null;
+    A().apiCall('/avm/'+provider,{method:'POST',body:{inputs:inputs, objectId:objectId}}).then(function(data){
+      var r=data&&data.result; if(!r){ mkStatus('Keine Bewertung erhalten.',true); return; }
+      mkStatus('',false);
+      mkRenderCorridor(r,data,provider,selKp);
+      if(data.mode!=='stub'){ try{ loadKerosin(); }catch(e){} }
+    }).catch(function(err){
+      if(err&&(err.status===402||err.status===403)){ mkStatus('Nicht genug Kerosin f\u00fcr diesen Abruf.',true); return; }
+      mkStatus('Abruf fehlgeschlagen: '+((err&&err.message)||''),true);
+    });
+  }
+
+
+  // ════ MA13: Hub ehrlich — kein Fake-Demo, "manuell rechnen" -> echtes Boarding ════
+  function mobToast(msg){
+    try{ if(typeof toast==='function'){ toast(msg); return; } }catch(e){}
+    var t=document.createElement('div'); t.textContent=msg;
+    t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--card,#17161c);color:var(--txt,#fff);border:1px solid var(--line);border-radius:12px;padding:12px 18px;font-family:var(--body),sans-serif;font-size:13px;z-index:100000;max-width:82%;text-align:center;box-shadow:0 10px 34px rgba(0,0,0,.45)';
+    (document.getElementById('screen')||document.body).appendChild(t);
+    setTimeout(function(){ try{ t.remove(); }catch(e){} },2800);
+  }
+  function installHubHonesty(){
+    document.addEventListener('click', function(e){
+      var t=e.target.closest&&e.target.closest('[data-go]'); if(!t) return;
+      var dest=t.getAttribute('data-go');
+      if(dest==='import-pdf'){ e.preventDefault(); e.stopPropagation(); var fi=document.getElementById('mb-pdf-file'); if(fi){ fi.value=''; fi.click(); } return; }
+      if(dest==='voice'){ e.preventDefault(); e.stopPropagation(); mbVoiceStart(); return; }
+      if(dest==='import-immo'){
+        e.preventDefault(); e.stopPropagation();
+        mobToast('ImmoMetrica-Import kommt als Nächstes — nutze solange Quick Check oder Exposé.');
+        return;
+      }
+      if(dest==='anlegen'){ e.preventDefault(); e.stopPropagation(); if(typeof window.go==='function') window.go('boarding'); return; }
+    }, true);
+  }
+
+  // ════ MA14: Exposé-PDF -> Boarding-Felder (POST /api/v1/ai/extract-expose) ════
+  function _userKey(){ try{ var st=JSON.parse(localStorage.getItem('dp_user_settings')||'{}'); return st.openaiApiKey||''; }catch(e){ return ''; } }
+  function pdfStatus(msg,isErr){
+    var g=document.getElementById('mb-pdf-ov');
+    if(!g){ g=document.createElement('div'); g.id='mb-pdf-ov'; g.style.cssText='position:absolute;inset:0;z-index:9998;background:rgba(5,5,5,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;gap:14px'; (document.getElementById('screen')||document.body).appendChild(g); }
+    g.innerHTML='<div style="font-family:var(--disp);font-weight:600;font-size:16px;color:'+(isErr?'var(--neg)':'var(--gold-hi)')+'">'+esc(msg)+'</div>'
+      +(isErr?'<button id="mb-pdf-close" style="margin-top:8px;background:var(--soft);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-family:var(--disp);cursor:pointer">Schlie\u00dfen</button>'
+             :'<div style="color:var(--mut);font-size:12px;font-family:var(--mono)">einen Moment \u2026</div>');
+    var b=document.getElementById('mb-pdf-close'); if(b) b.addEventListener('click',pdfHide);
+  }
+  function pdfHide(){ var g=document.getElementById('mb-pdf-ov'); if(g) g.remove(); }
+  function loadPdfJs(){
+    return new Promise(function(res,rej){
+      if(window.pdfjsLib){ res(window.pdfjsLib); return; }
+      var sc=document.createElement('script'); sc.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      sc.onload=function(){ try{ window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }catch(e){} res(window.pdfjsLib); };
+      sc.onerror=function(){ rej(new Error('PDF-Leser konnte nicht geladen werden')); };
+      document.head.appendChild(sc);
+    });
+  }
+  async function extractPdfText(file){
+    var lib=await loadPdfJs();
+    var buf=await file.arrayBuffer();
+    var pdf=await lib.getDocument({data:buf}).promise;
+    var out=[];
+    for(var p=1;p<=pdf.numPages;p++){ var page=await pdf.getPage(p); var tc=await page.getTextContent(); out.push(tc.items.map(function(i){return i.str;}).join(' ')); }
+    return out.join('\n');
+  }
+  function applyExtractToBoarding(ex){
+    function setF(id,v){ var e=document.getElementById(id); if(e&&v!=null&&String(v).trim()!=='') e.value=String(v); }
+    if(ex.plz) setF('mb_plz',ex.plz); if(ex.ort) setF('mb_ort',ex.ort);
+    if(ex.adresse){ var m=String(ex.adresse).match(/^(.+?)\s+(\d+\w*)/); if(m){ setF('mb_str',m[1].replace(/,$/,'').trim()); setF('mb_hnr',m[2]); } else setF('mb_str',ex.adresse); }
+    if(ex.objektart) setF('mb_objart',ex.objektart);
+    setF('mb_wfl',ex.wohnflaeche); setF('mb_bj',ex.baujahr);
+    setF('mb_kp',ex.kaufpreis);
+    if(ex.kaufnebenkosten) setF('mb_knk',ex.kaufnebenkosten);
+    setF('mb_nkm',ex.nettokaltmiete);
+    setF('mb_hg',ex.hausgeld);
+    setF('mb_ek',ex.eigenkapital);
+  }
+  async function mbPdfHandle(file){
+    if(!file) return;
+    try{
+      pdfStatus('Expos\u00e9 wird gelesen \u2026',false);
+      var text=await extractPdfText(file);
+      if(!text || text.replace(/\s/g,'').length<25){ pdfStatus('Kein Text im PDF gefunden (evtl. Scan/Bild-PDF).',true); return; }
+      pdfStatus('KI liest die Eckdaten \u2026',false);
+      var data=await A().apiCall('/ai/extract-expose',{method:'POST',body:{text:text,userApiKey:_userKey()}});
+      var ex=(data&&data.extracted)?data.extracted:(data||{});
+      applyExtractToBoarding(ex);
+      pdfHide();
+      if(typeof window.go==='function') window.go('boarding');
+      mobToast('Eckdaten aus Expos\u00e9 \u00fcbernommen \u2014 pr\u00fcfen & Boarding starten.');
+    }catch(err){
+      var m=(err&&err.message)||'Fehler';
+      if(err&&err.status===401) m='Nicht eingeloggt \u2014 bitte neu anmelden.';
+      else if(err&&err.status===403) m='Plan-Limit erreicht.';
+      else if(err&&err.status===502) m='KI nicht erreichbar. Sp\u00e4ter erneut versuchen.';
+      pdfStatus('Expos\u00e9-Import fehlgeschlagen: '+m,true);
+    }
+  }
+  function installPdfImport(){
+    if(document.getElementById('mb-pdf-file')) return;
+    var inp=document.createElement('input'); inp.type='file'; inp.id='mb-pdf-file'; inp.accept='application/pdf,.pdf'; inp.style.display='none';
+    inp.addEventListener('change',function(e){ var f=e.target.files&&e.target.files[0]; if(f) mbPdfHandle(f); });
+    document.body.appendChild(inp);
+  }
+  // MA15-VOICE:start \u2014 Sprach-Erfassung -> Boarding (POST /api/v1/ai/extract-voice)
+  var _vRec=null,_vChunks=[],_vStream=null,_vMime='',_vTimer=null,_vSec=0,_vSpeech=null,_vInterim='',_vStopReq=false;
+  var VOICE_MAX=120; // v512-Analog: 2 min Cap (Kostenkontrolle)
+  var VOICE_CAT=[
+    {id:'plz',label:'PLZ',kind:'text',hint:'Postleitzahl'},
+    {id:'ort',label:'Ort',kind:'text',hint:'Ort/Stadt'},
+    {id:'str',label:'Strasse',kind:'text',hint:'Strasse'},
+    {id:'hnr',label:'Hausnummer',kind:'text',hint:'Hausnummer'},
+    {id:'objart',label:'Objektart',kind:'text',hint:'z.B. Eigentumswohnung, Mehrfamilienhaus'},
+    {id:'wfl',label:'Wohnflaeche',kind:'num',hint:'Wohnflaeche in m2'},
+    {id:'baujahr',label:'Baujahr',kind:'num',hint:'Baujahr als Jahreszahl'},
+    {id:'kp',label:'Kaufpreis',kind:'num',hint:'Kaufpreis in Euro'},
+    {id:'nkm',label:'Kaltmiete',kind:'num',hint:'Nettokaltmiete in Euro pro Monat'},
+    {id:'ze',label:'Zusatzeinnahmen',kind:'num',hint:'Zusatzeinnahmen in Euro pro Monat'},
+    {id:'hg_ul',label:'Hausgeld',kind:'num',hint:'Hausgeld in Euro pro Monat'},
+    {id:'hg_nul',label:'Hausgeld nicht umlagefaehig',kind:'num',hint:'Anteil nicht umlagefaehig in Prozent'},
+    {id:'ek',label:'Eigenkapital',kind:'num',hint:'Eigenkapital in Euro'},
+    {id:'d1z',label:'Sollzins',kind:'num',hint:'Sollzins in Prozent'},
+    {id:'d1t',label:'Tilgung',kind:'num',hint:'Anfaengliche Tilgung in Prozent'}
+  ];
+  var VOICE_MAP={plz:'mb_plz',ort:'mb_ort',str:'mb_str',hnr:'mb_hnr',objart:'mb_objart',wfl:'mb_wfl',baujahr:'mb_bj',kp:'mb_kp',nkm:'mb_nkm',ze:'mb_ze',hg_ul:'mb_hg',hg_nul:'mb_hgsplit',ek:'mb_ek',d1z:'mb_zins',d1t:'mb_tilg'};
+
+  function _vHost(){ return document.getElementById('screen')||document.body; }
+  function _vFmt(s){ var m=Math.floor(s/60),r=s%60; return m+':'+(r<10?'0':'')+r; }
+  function _vB64(blob){ return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){ res(String(r.result).split(',')[1]||''); }; r.onerror=function(){ rej(new Error('Audio konnte nicht gelesen werden')); }; r.readAsDataURL(blob); }); }
+  function _vPickMime(){ var c=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg']; if(!window.MediaRecorder||!MediaRecorder.isTypeSupported) return ''; for(var i=0;i<c.length;i++){ if(MediaRecorder.isTypeSupported(c[i])) return c[i]; } return ''; }
+
+  function _vOv(){
+    var g=document.getElementById('mb-voice-ov');
+    if(!g){ g=document.createElement('div'); g.id='mb-voice-ov';
+      g.style.cssText='position:absolute;inset:0;z-index:9998;background:rgba(5,5,5,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:16px';
+      _vHost().appendChild(g); }
+    return g;
+  }
+  function _vHide(){ _vStopHard(); var g=document.getElementById('mb-voice-ov'); if(g) g.remove(); }
+  function _vErr(main,sub){
+    var g=_vOv();
+    g.innerHTML='<div style="font-family:var(--disp);font-weight:600;font-size:16px;color:var(--neg)">'+esc(main)+'</div>'
+      +(sub?'<div style="color:var(--mut);font-size:12px;font-family:var(--mono);max-width:78%;line-height:1.5">'+esc(sub)+'</div>':'')
+      +'<button id="mb-voice-x" style="margin-top:6px;background:var(--soft);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-family:var(--disp);cursor:pointer">Schlie\u00dfen</button>';
+    var b=document.getElementById('mb-voice-x'); if(b) b.addEventListener('click',_vHide);
+  }
+  function _vBusy(main){
+    var g=_vOv();
+    g.innerHTML='<div style="font-family:var(--disp);font-weight:600;font-size:16px;color:var(--gold-hi)">'+esc(main)+'</div>'
+      +'<div style="color:var(--mut);font-size:12px;font-family:var(--mono)">einen Moment \u2026</div>';
+  }
+  function _vRecUI(){
+    var g=_vOv();
+    g.innerHTML=''
+      +'<div style="position:relative;width:96px;height:96px;display:flex;align-items:center;justify-content:center">'
+      +  '<span id="mb-v-pulse" style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.35),rgba(201,168,76,0) 70%)"></span>'
+      +  '<span style="width:66px;height:66px;border-radius:50%;background:var(--runway,linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(201,168,76,.35)">'
+      +    '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a1407" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10a7 7 0 0 1-14 0"/><line x1="12" y1="17" x2="12" y2="22"/></svg>'
+      +  '</span>'
+      +'</div>'
+      +'<div style="font-family:var(--disp);font-weight:600;font-size:17px;color:var(--txt)">Sprich jetzt \u2026</div>'
+      +'<div id="mb-v-time" style="font-family:var(--mono);font-size:13px;color:var(--gold-hi);font-variant-numeric:tabular-nums">0:00</div>'
+      +'<div id="mb-v-live" style="min-height:44px;max-height:110px;overflow:auto;width:84%;font-family:var(--body),sans-serif;font-size:12.5px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:9px 12px">Nenne Adresse, Kaufpreis, Wohnfl\u00e4che, Miete, Zins \u2026</div>'
+      +'<div style="display:flex;gap:10px;margin-top:4px">'
+      +  '<button id="mb-v-stop" style="background:var(--runway,linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f));color:#1a1407;font-weight:700;border:none;border-radius:11px;padding:12px 20px;font-family:var(--disp);cursor:pointer">Stopp \u2014 auswerten (1\u00a0L)</button>'
+      +  '<button id="mb-v-cancel" style="background:var(--soft);color:var(--txt);border:1px solid var(--line);border-radius:11px;padding:12px 18px;font-family:var(--disp);cursor:pointer">Abbrechen</button>'
+      +'</div>';
+    var st=document.getElementById('mb-v-stop'); if(st) st.addEventListener('click',_vStopAndEval);
+    var cn=document.getElementById('mb-v-cancel'); if(cn) cn.addEventListener('click',_vHide);
+    // Puls-Animation (einmalig registrieren)
+    if(!document.getElementById('mb-v-anim')){ var s=document.createElement('style'); s.id='mb-v-anim'; s.textContent='@keyframes mbVpulse{0%,100%{transform:scale(.85);opacity:.55}50%{transform:scale(1.15);opacity:1}}#mb-v-pulse{animation:mbVpulse 1.4s ease-in-out infinite}'; document.head.appendChild(s); }
+  }
+
+  function _vStopHard(){
+    try{ if(_vTimer){ clearInterval(_vTimer); _vTimer=null; } }catch(e){}
+    try{ if(_vSpeech){ _vSpeech.onresult=null; _vSpeech.onerror=null; _vSpeech.onend=null; _vSpeech.stop(); _vSpeech=null; } }catch(e){}
+    try{ if(_vRec&&_vRec.state!=='inactive') _vRec.stop(); }catch(e){}
+    try{ if(_vStream){ _vStream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} }); _vStream=null; } }catch(e){}
+  }
+  function _vTick(){
+    _vSec++;
+    var t=document.getElementById('mb-v-time'); if(t) t.textContent=_vFmt(_vSec);
+    if(_vSec>=VOICE_MAX) _vStopAndEval();
+  }
+  function _vSpeechStart(){
+    try{
+      var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      if(!SR) return;
+      _vSpeech=new SR(); _vSpeech.lang='de-DE'; _vSpeech.continuous=true; _vSpeech.interimResults=true;
+      _vSpeech.onresult=function(ev){
+        var fin='',intr='';
+        for(var i=ev.resultIndex;i<ev.results.length;i++){ var r=ev.results[i]; if(r.isFinal) fin+=r[0].transcript; else intr+=r[0].transcript; }
+        if(fin) _vInterim+=fin;
+        var box=document.getElementById('mb-v-live');
+        if(box){ var txt=(_vInterim+' '+intr).trim(); if(txt){ box.textContent=txt; box.style.color='var(--txt)'; } }
+      };
+      _vSpeech.onerror=function(){};
+      _vSpeech.onend=function(){ try{ if(_vStream&&!_vStopReq&&_vSpeech) _vSpeech.start(); }catch(e){} };
+      _vSpeech.start();
+    }catch(e){}
+  }
+
+  function mbVoiceStart(){
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){
+      _vErr('Sprachaufnahme wird hier nicht unterst\u00fctzt.','Nutze Quick Check oder Expos\u00e9-Import.'); return;
+    }
+    _vChunks=[]; _vSec=0; _vStopReq=false; _vInterim=''; _vMime=_vPickMime();
+    _vBusy('Mikrofon wird angefragt \u2026');
+    navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true}}).then(function(stream){
+      _vStream=stream;
+      try{ _vRec=_vMime?new MediaRecorder(stream,{mimeType:_vMime}):new MediaRecorder(stream); }
+      catch(e){ try{ _vRec=new MediaRecorder(stream); }catch(e2){ _vRec=null; } }
+      if(!_vRec){ _vErr('Aufnahme auf diesem Ger\u00e4t nicht m\u00f6glich.',''); _vStopHard(); return; }
+      _vRec.ondataavailable=function(ev){ if(ev.data&&ev.data.size>0) _vChunks.push(ev.data); };
+      _vRec.onstop=function(){ if(_vStopReq) _vEvaluate(); };
+      try{ _vRec.start(); }catch(e){ _vErr('Aufnahme konnte nicht starten.',''); _vStopHard(); return; }
+      _vRecUI();
+      _vTimer=setInterval(_vTick,1000);
+      _vSpeechStart();
+    }).catch(function(){
+      _vErr('Kein Mikrofon-Zugriff.','Bitte Mikrofon f\u00fcr diese Seite erlauben und erneut versuchen.');
+    });
+  }
+
+  function _vStopAndEval(){
+    if(_vStopReq) return; _vStopReq=true;
+    if(_vTimer){ clearInterval(_vTimer); _vTimer=null; }
+    try{ if(_vSpeech){ _vSpeech.onend=null; _vSpeech.stop(); _vSpeech=null; } }catch(e){}
+    _vBusy('Aufnahme wird ausgewertet \u2026');
+    try{ if(_vRec&&_vRec.state!=='inactive'){ _vRec.stop(); } else { _vEvaluate(); } }catch(e){ _vEvaluate(); }
+  }
+
+  function _vEvaluate(){
+    try{ if(_vStream){ _vStream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} }); _vStream=null; } }catch(e){}
+    var blob;
+    try{ blob=new Blob(_vChunks,{type:(_vMime||'audio/webm')}); }catch(e){ blob=null; }
+    if(!blob||blob.size<2000){ _vErr('Aufnahme zu kurz \u2014 keine Auswertung.','Kein Kerosin verbraucht. Bitte l\u00e4nger sprechen.'); return; }
+    _vBusy('KI liest die Eckdaten \u2026');
+    _vB64(blob).then(function(b64){
+      return A().apiCall('/ai/extract-voice',{method:'POST',body:{audio:b64,mime:(blob.type||_vMime),catalog:VOICE_CAT}});
+    }).then(function(data){
+      var fields=(data&&data.fields)||{};
+      _vApply(fields);
+      _vHide();
+      if(typeof window.go==='function') window.go('boarding');
+      var n=0; for(var k in VOICE_MAP){ if(fields[k]!=null&&String(fields[k]).trim()!=='') n++; }
+      mobToast(n+' Feld'+(n===1?'':'er')+' aus Sprache \u00fcbernommen \u2014 pr\u00fcfen & Boarding starten.');
+      try{ loadKerosin(); }catch(e){}
+    }).catch(function(err){
+      var s=err&&err.status;
+      if(s===402||s===403){ _vErr('Nicht genug Kerosin (1\u00a0L n\u00f6tig).','Bitte tanken und erneut versuchen.'); return; }
+      if(s===401){ _vErr('Nicht eingeloggt \u2014 bitte neu anmelden.',''); return; }
+      if(s===502){ _vErr('KI nicht erreichbar.','Sp\u00e4ter erneut versuchen.'); return; }
+      _vErr('Sprachauswertung fehlgeschlagen.',(err&&err.message)||'');
+    });
+  }
+
+  function _vApply(fields){
+    function vSet(mbId,v){ var e=document.getElementById(mbId); if(!e||v==null||String(v).trim()==='') return; var raw=v; if(typeof v==='number'&&!Number.isInteger(v)) raw=String(v).replace('.',','); e.value=String(raw); }
+    for(var k in VOICE_MAP){ if(Object.prototype.hasOwnProperty.call(VOICE_MAP,k)&&(k in fields)) vSet(VOICE_MAP[k],fields[k]); }
+  }
+  // MA15-VOICE:end
+
+  function boot(){
+    var a=A();
+    if(!a||!a.apiCall){ showGate('App-Anbindung fehlt'); return; }
+    var sess=a.getSession?a.getSession():null;
+    if(!sess){ showGate('Bitte im Cockpit anmelden'); return; }
+    installDetailHooks();
+    installHubHonesty();
+    installPdfImport();
+    greetName(sess);
+    loadFlotte();
+    loadKerosin();
+  }
+
+  if(document.readyState==='complete'||document.readyState==='interactive'){ setTimeout(boot,0); }
+  else { document.addEventListener('DOMContentLoaded',function(){ setTimeout(boot,0); }); }
+})();
+</script>
+<!-- MA06-DATA-LAYER:end -->
+
+</body>
+</html>
