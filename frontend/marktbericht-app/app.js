@@ -391,23 +391,29 @@ function _scoreCol(s) { s = s || 0; return s >= 70 ? DP_GREEN : s >= 50 ? DP_GOL
 function _scoreTier(s) { s = s || 0; return s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : 'Schwach'; }
 function _kiRaet(s) { s = s || 0; return s >= 85 ? 'Aktiv ausbauen' : s >= 70 ? 'Kauf erwägen' : s >= 50 ? 'Genau prüfen' : 'Zurückhaltung'; }
 // Donut-Ring im DealPilot-Stil: dicker Ring, tier-farbig, Score gross, Tier-Pille unten.
-function svgDonut(score) {
-  const s = Math.max(0, Math.min(100, score || 0)), cx = 75, cy = 75, r = 60, col = _scoreCol(s);
-  const tier = _scoreTier(s);
-  const n = Math.max(2, Math.round(s / 100 * 90)), pts = [];
-  for (let i = 0; i <= n; i++) { const a = -Math.PI / 2 + (s / 100) * 2 * Math.PI * i / n; pts.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1)); }
-  return `<svg viewBox="0 0 150 162" style="width:150px;height:162px;flex:none;">
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#22222a" stroke-width="11"/>
-    <polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="11" stroke-linecap="round"
-      style="filter:drop-shadow(0 0 6px ${col}55);"/>
-    <text x="${cx}" y="${cy + 6}" text-anchor="middle" fill="#fff" font-family="Space Grotesk" font-weight="700" font-size="44">${score ?? '–'}</text>
-    <text x="${cx}" y="${cy + 26}" text-anchor="middle" fill="#8a8a93" font-size="12">/ 100</text>
-    <g transform="translate(${cx},${cy + r + 11})">
-      <rect x="-28" y="-12" width="56" height="23" rx="11.5" fill="#0a0a0c" stroke="${col}" stroke-width="1.4"/>
+function svgDonut(score, conf) { /*v895-doublering*/
+  const s = Math.max(0, Math.min(100, score || 0)), cx = 85, cy = 85, col = _scoreCol(s), tier = _scoreTier(s);
+  const rO = 68, rI = 51, hasConf = (conf != null && !isNaN(conf)), cCol = '#C9A84C';
+  const arc = (r, pct) => {
+    const p = Math.max(0, Math.min(100, pct || 0)), n = Math.max(2, Math.round(p / 100 * 90)), pts = [];
+    for (let i = 0; i <= n; i++) { const a = -Math.PI / 2 + (p / 100) * 2 * Math.PI * i / n; pts.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1)); }
+    return pts.join(' ');
+  };
+  return `<svg viewBox="0 0 170 196" style="width:170px;height:196px;flex:none;">
+    <circle cx="${cx}" cy="${cy}" r="80" fill="#0b0b0e"/>
+    <circle cx="${cx}" cy="${cy}" r="${rO}" fill="none" stroke="#22222a" stroke-width="11"/>
+    <polyline points="${arc(rO, s)}" fill="none" stroke="${col}" stroke-width="11" stroke-linecap="round" style="filter:drop-shadow(0 0 7px ${col}66);"/>
+    ${hasConf ? `<circle cx="${cx}" cy="${cy}" r="${rI}" fill="none" stroke="#1b1b21" stroke-width="7.5"/>
+      <polyline points="${arc(rI, conf)}" fill="none" stroke="${cCol}" stroke-width="7.5" stroke-linecap="round" style="filter:drop-shadow(0 0 5px ${cCol}55);"/>` : ''}
+    <text x="${cx}" y="${cy + 2}" text-anchor="middle" fill="#fff" font-family="Space Grotesk" font-weight="700" font-size="44">${score ?? '\u2013'}</text>
+    <text x="${cx}" y="${cy + 22}" text-anchor="middle" fill="#8a8a93" font-size="12">/ 100</text>
+    <g transform="translate(${cx},${cy + rO + 17})">
+      <rect x="-30" y="-12" width="60" height="23" rx="11.5" fill="#0a0a0c" stroke="${col}" stroke-width="1.4"/>
       <text x="0" y="4" text-anchor="middle" fill="${col}" font-family="Space Grotesk" font-weight="600" font-size="12.5">${tier}</text>
     </g>
   </svg>`;
 }
+
 function _arcPts(cx, cy, r, t0, t1, n) {
   const p = []; for (let i = 0; i <= n; i++) { const t = t0 + (t1 - t0) * i / n, w = Math.PI * (1 - t); p.push((cx + r * Math.cos(w)).toFixed(1) + ',' + (cy - r * Math.sin(w)).toFixed(1)); }
   return p.join(' ');
@@ -444,22 +450,32 @@ function rangeStrip(lo, mid, hi, fmt, marker, markerLabel) {
 }
 
 // Score-Bereich: Donut + Rating + KI-rät-Zeile (DealPilot-Look)
-function renderScore(d) {
+function renderScore(d) { /*v895-doublering*/
   const ds = d.deal_score || {};
   const box = document.querySelector('.scorebox');
   if (!box) return;
   const s = ds.score || 0, col = _scoreCol(s);
   const ratingText = ds.rating || _scoreTier(s);
+  const mv = (d.valuation && d.valuation.market_value) || {};
+  const confPct = (mv.confidence_pct != null) ? mv.confidence_pct : null;
+  let confLbl = mv.confidence_label || null;
+  if (!confLbl && confPct != null) { const ci = confInfo(confPct / 100); confLbl = ci ? ci.label : null; }
+  const confCol = (confPct == null) ? '#8a8a93' : (confPct >= 70 ? '#3FA56C' : confPct >= 55 ? '#C9A84C' : '#B86250');
   box.innerHTML = `
-    <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;width:100%;">
-      ${svgDonut(ds.score)}
-      <div style="flex:1;min-width:170px;">
+    <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;width:100%;">
+      ${svgDonut(ds.score, confPct)}
+      <div style="flex:1;min-width:190px;">
         <div style="display:inline-block;font-size:10px;letter-spacing:1.3px;font-weight:700;color:${col};border:1px solid ${col};border-radius:999px;padding:3px 11px;margin-bottom:9px;">DEAL-SCORE</div>
         <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;color:${col};">${ratingText}</div>
-        <div style="margin-top:3px;font-size:13px;color:#b8b0a0;">Markt- &amp; Chance-Risiko-Bewertung dieses Objekts</div><!--v882-hero-desc-->
-        <div style="display:flex;align-items:center;gap:7px;margin-top:11px;font-size:13px;color:${col};font-weight:600;">
-          <span style="font-size:14px;">✦</span> KI rät: ${_kiRaet(s)}
+        <div style="margin-top:3px;font-size:13px;color:#b8b0a0;">Markt- &amp; Chance-Risiko-Bewertung dieses Objekts</div>
+        ${confPct != null ? `<div style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:${confCol};font-weight:600;">
+          <span style="width:10px;height:10px;border-radius:50%;background:${confCol};display:inline-block;box-shadow:0 0 7px ${confCol}66;"></span>
+          Aussagekraft: ${confLbl || '\u2013'} \u00b7 ${confPct}%
         </div>
+        <div style="display:flex;gap:15px;margin-top:10px;font-size:10.5px;color:#8a8a93;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:2px;background:${col};display:inline-block;"></span>Score (Au\u00dfenring)</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:2px;background:#C9A84C;display:inline-block;"></span>Aussagekraft (Innenring)</span>
+        </div>` : ''}
       </div>
     </div>`;
 }
