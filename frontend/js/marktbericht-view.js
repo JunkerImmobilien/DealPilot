@@ -61,16 +61,16 @@
     if (g('wfl')) q.set('area', g('wfl'));
     if (g('baujahr')) q.set('year', g('baujahr'));
     if (g('kp')) q.set('price', g('kp'));
+    var _id = d.id || d._id || d.objId || d.kuerzel; if (_id) q.set('ref', _id); /* v895f-reportslist */
     return q.toString();
   }
 
   function mbTheme() {
-    try { var t = localStorage.getItem('dp_mb_theme'); if (t === 'dark' || t === 'light') return t; } catch (e) {}
-    return 'dark';
+    return 'light'; /* v895e: Marktbericht immer hell */
   }
 
   function frameSrc(query) {
-    return '/marktbericht-app/index.html?v=897&theme=' + mbTheme() + (query ? '&' + query : '');
+    return '/marktbericht-app/index.html?v=900&theme=' + mbTheme() + (query ? '&' + query : '');
   }
 
   // iframe waechst auf Content-Hoehe -> kein innerer Scrollbalken, Seite scrollt
@@ -104,7 +104,6 @@
     var host = $('s-marktbericht'); if (!host) return;
     host.innerHTML =
       '<div class="mbv-band">' +
-        '<button type="button" class="mbv-closex" id="mbv-back" title="Zur\u00fcck">\u00d7</button>' +
         '<div class="mbv-stub"><span class="bp">BOARDING PASS</span><span class="k">MB</span><span class="s">DealPilot \u00b7 Bericht</span></div>' +
         '<div class="mbv-bandmain">' +
           '<div class="ttl">Marktbericht<span class="sub">Voller Marktbericht \u2013 Daten aus dem gew\u00e4hlten Objekt vorbef\u00fcllt, im Bericht anpassbar.</span></div>' +

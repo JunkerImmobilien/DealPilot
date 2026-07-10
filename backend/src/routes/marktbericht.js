@@ -77,6 +77,7 @@ router.get('/reports/replay', authenticate, readGet('/reports/replay'));
 router.get('/reports/fixtures', authenticate, readGet('/reports/fixtures'));
 router.get('/objects', authenticate, readGet('/objects'));
 router.get('/objects/history', authenticate, readGet('/objects/history'));
+router.get('/reports/one', authenticate, readGet('/reports/one')); /* v895g-reportbyid */
 
 // ── Abruf-Endpoints (auth + Kerosin) ─────────────────────────────────────────
 async function runReport(req, res) {
