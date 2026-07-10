@@ -578,7 +578,7 @@ var DEALS=[
   {nm:'MFH Bahnhofstraße 3',ad:'32423 Minden · 4 Einheiten',price:'245.000 €',score:41,tag:'pass',rend:'3,1 %',cf:'−140 €',cfp:'neg',dscr:'0,92'}
 ];
 function statusOf(d){return d.tag==='live'?['won','✓ Im Rennen']:(d.tag==='pass'?['lost','✕ Eher Pass']:['watch','◷ Beobachten'])}
-function walletHTML(d){var st=statusOf(d);return '<div class="wcard"><div class="wh"><div class="ms" style="--v:'+d.score+';--c:'+tc(d.score)+'"><b>'+d.score+'</b></div><div class="hi"><div class="nm">'+d.nm+'</div><div class="ad">'+d.ad+'</div></div><span class="wt" style="color:'+th(d.score)+'">'+tl(d.score)+'</span></div><div class="wbody"><div class="wmid"><span class="wthumb"></span><div class="col"><div class="loc">'+d.ad+'</div><div class="price">'+d.price+'</div></div><span class="wtier" style="background:'+tc(d.score)+'">'+tl(d.score)+'</span></div><div class="wstats"><div class="wkpi"><div class="k">Rendite</div><div class="v">'+d.rend+'</div></div><div class="wkpi"><div class="k">Cashflow</div><div class="v '+d.cfp+'">'+d.cf+'</div></div><div class="wkpi"><div class="k">DSCR</div><div class="v">'+d.dscr+'</div></div></div><div class="wfoot"><span class="badge '+st[0]+'">'+st[1]+'</span><button class="open-btn">Detail öffnen →</button></div></div></div>'}
+function walletHTML(d){var st=statusOf(d);return '<div class="wcard"><div class="wh"><div class="ms" style="--v:'+d.score+';--c:'+tc(d.score)+'"><b>'+d.score+'</b></div><div class="hi"><div class="nm">'+d.nm+'</div><div class="ad">'+d.ad+'</div></div><span class="wt" style="color:'+th(d.score)+'">'+tl(d.score)+'</span></div><div class="wbody"><div class="wmid"><span class="wthumb"'+(d.thumb?' style="background-image:url('+d.thumb+');background-size:cover;background-position:center"':'')+'></span><div class="col"><div class="loc">'+d.ad+'</div><div class="price">'+d.price+'</div></div><span class="wtier" style="background:'+tc(d.score)+'">'+tl(d.score)+'</span></div><div class="wstats"><div class="wkpi"><div class="k">Rendite</div><div class="v">'+d.rend+'</div></div><div class="wkpi"><div class="k">Cashflow</div><div class="v '+d.cfp+'">'+d.cf+'</div></div><div class="wkpi"><div class="k">DSCR</div><div class="v">'+d.dscr+'</div></div></div><div class="wfoot"><span class="badge '+st[0]+'">'+st[1]+'</span><button class="open-btn">Detail öffnen →</button></div></div></div>'}
 function layoutStack(stack){var cards=[].slice.call(stack.querySelectorAll('.wcard')),y=0,maxB=0;cards.forEach(function(c,i){var open=c.classList.contains('open'),h=open?244:64;c.style.top=y+'px';c.style.height=h+'px';c.style.zIndex=open?100:(10+i);maxB=Math.max(maxB,y+h);y+=open?(244+10):50});stack.style.height=maxB+'px'}
 function buildStack(id){var stack=document.getElementById(id);if(!stack)return;stack.className='wstack';stack.innerHTML=DEALS.map(walletHTML).join('');var cards=[].slice.call(stack.querySelectorAll('.wcard'));cards[0].classList.add('open');cards.forEach(function(c){c.addEventListener('click',function(e){if(e.target.closest('.open-btn')){go('detail');return}if(c.classList.contains('open'))return;cards.forEach(function(x){x.classList.remove('open')});c.classList.add('open');layoutStack(stack)})});layoutStack(stack);setTimeout(function(){layoutStack(stack)},60)}
 
@@ -682,7 +682,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     return '<div class="wcard"><div class="wh"><div class="ms" style="--v:'+rv+';--c:'+rc+'"><b>'+rn+'</b></div>'
       + '<div class="hi"><div class="nm">'+d.nm+'</div><div class="ad">'+d.ad+'</div></div>'
       + '<span class="wt" style="color:'+wc+'">'+wt+'</span></div>'
-      + '<div class="wbody"><div class="wmid"><span class="wthumb"></span>'
+      + '<div class="wbody"><div class="wmid"><span class="wthumb"'+(d.thumb?' style="background-image:url('+d.thumb+');background-size:cover;background-position:center"':'')+'></span>'
       + '<div class="col"><div class="loc">'+d.ad+'</div><div class="price">'+d.price+'</div></div>'
       + '<span class="wtier" style="background:'+wb+'">'+wt+'</span></div>'
       + '<div class="wstats"><div class="wkpi"><div class="k">Rendite</div><div class="v">'+d.rend+'</div></div>'
@@ -697,7 +697,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     var nm=r.name||d.kuerzel||'Objekt';
     var price=euro(d.kp); if(price==='\u2014' && it.kaufpreis!=null){ var kc=numOr(it.kaufpreis); if(kc!=null) price=euro(kc/100); }
     var cf=fmtCf(cfMonat(it,d));
-    return { nm:esc(nm), ad:esc(addrOf(d)), price:price, score:scoreOf(it),
+    return { nm:esc(nm), ad:esc(addrOf(d)), price:price, score:scoreOf(it), thumb:(d&&d._thumb)?d._thumb:'',
              rend:fmtPct(bmyOf(it,d)), cf:cf.s, cfp:cf.p, dscr:fmtDscr(dscrOf(it,d)), tag:tagOf(it) };
   }
 
@@ -733,6 +733,12 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     var gi=pv.querySelector('.tank .gauge i'); if(gi){ var pct=(mlim&&mrem!=null)?Math.max(0,Math.min(100,Math.round(mrem/mlim*100))):0; gi.style.width=pct+'%'; }
     var ft=pv.querySelector('.tank .ft a'); if(ft&&bonus!=null) ft.textContent='Bonus-Tank '+bonus+' L \u00b7 Pakete 10 \u00b7 28 \u00b7 90 \u00b7 160 L';
     var hp=pv.querySelector('.hero p'); if(hp){ var em=(A().getSession&&A().getSession()&&A().getSession().email)||''; hp.textContent=((mlim==null?'':mlim+' L pro Monat'))+(em?(' \u00b7 '+em):''); }
+    var _pl=_planName(mlim);
+    if(_pl){ var _tg=pv.querySelector('.brandbar .tag'); if(_tg) _tg.textContent=_planStars(_pl)+' '+_pl.toUpperCase();
+      var _rw=pv.querySelectorAll('.setrow'); for(var _i=0;_i<_rw.length;_i++){ var _n=_rw[_i].querySelector('.nm'), _dd=_rw[_i].querySelector('.ds');
+        if(_n&&_dd&&/Tarif/.test(_n.textContent)){ var _rs=''; if(s.period_reset_at){ try{ var _dt=new Date(s.period_reset_at);
+          if(!isNaN(_dt)) _rs=' \u00b7 n\u00e4chste Abrechnung '+('0'+_dt.getDate()).slice(-2)+'.'+('0'+(_dt.getMonth()+1)).slice(-2)+'.'; }catch(e){} }
+          _dd.textContent=_pl+_rs; } } }
   }
   function loadKerosin(){ try{ A().apiCall('/ai/credits').then(renderKerosin).catch(function(){}); }catch(e){} }
 
@@ -743,9 +749,32 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     g.innerHTML='<div style="font-family:var(--disp);font-weight:700;font-size:26px"><span style="color:#f6f2e8">Deal</span><span style="color:#C9A84C">Pilot</span></div>'
       + '<div style="font-family:var(--disp);font-size:18px;color:var(--txt)">'+esc(msg||'Bitte im Cockpit anmelden')+'</div>'
       + '<div style="font-size:13px;color:var(--mut);max-width:260px;line-height:1.5">Melde dich in DealPilot an \u2014 danach zeigt dir diese App deine echte Flotte.</div>'
-      + '<button id="ma06-login" style="margin-top:8px;background:var(--runway);color:#2a2107;font-family:var(--disp);font-weight:700;font-size:15px;padding:14px 26px;border:0;border-radius:14px;cursor:pointer">Zum Login \u2192</button>';
+      + '<input id="ma21-email" type="email" autocomplete="username" inputmode="email" placeholder="E-Mail" style="width:100%;max-width:300px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;color:var(--txt);font-family:var(--body,sans-serif);font-size:15px;box-sizing:border-box">'
+      + '<input id="ma21-pwd" type="password" autocomplete="current-password" placeholder="Passwort" style="width:100%;max-width:300px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;color:var(--txt);font-family:var(--body,sans-serif);font-size:15px;box-sizing:border-box">'
+      + '<button id="ma21-login" style="width:100%;max-width:300px;margin-top:4px;background:var(--runway);color:#2a2107;font-family:var(--disp);font-weight:700;font-size:15px;padding:14px 26px;border:0;border-radius:14px;cursor:pointer">Anmelden \u2192</button>'
+      + '<div id="ma21-err" style="color:var(--neg);font-size:12.5px;font-family:var(--mono);min-height:15px;max-width:300px;line-height:1.4"></div>'
+      + '<a href="/" style="color:var(--mut);font-size:12px;text-decoration:underline">Stattdessen im Cockpit anmelden</a>'; /*MA21-LOGIN*/
     (document.getElementById('screen')||document.body).appendChild(g);
-    var b=document.getElementById('ma06-login'); if(b)b.addEventListener('click',function(){ location.href='/'; });
+    var _lb=document.getElementById('ma21-login'), _le=document.getElementById('ma21-email'),
+        _lp=document.getElementById('ma21-pwd'), _lerr=document.getElementById('ma21-err');
+    function _mbDoLogin(){
+      if(!_le||!_lp) return;
+      var em=(_le.value||'').trim(), pw=_lp.value||'';
+      if(!em||!pw){ if(_lerr)_lerr.textContent='Bitte E-Mail und Passwort eingeben.'; return; }
+      if(_lerr)_lerr.textContent=''; if(_lb){ _lb.disabled=true; _lb.textContent='Anmelden \u2026'; }
+      try{
+        Promise.resolve(A().login(em,pw)).then(function(){
+          var gg=document.getElementById('ma06-gate'); if(gg)gg.remove();
+          try{ boot(); }catch(e){}
+        }).catch(function(err){
+          if(_lb){ _lb.disabled=false; _lb.textContent='Anmelden \u2192'; }
+          if(_lerr)_lerr.textContent=(err&&err.message)||'Anmeldung fehlgeschlagen.';
+        });
+      }catch(e){ if(_lb){ _lb.disabled=false; _lb.textContent='Anmelden \u2192'; } if(_lerr)_lerr.textContent=(e&&e.message)||'Anmeldung fehlgeschlagen.'; }
+    }
+    if(_lb)_lb.addEventListener('click',_mbDoLogin);
+    if(_lp)_lp.addEventListener('keydown',function(ev){ if(ev.key==='Enter') _mbDoLogin(); });
+    if(_le) setTimeout(function(){ try{ _le.focus(); }catch(e){} },60);
   }
 
   function paint(rows){
@@ -792,6 +821,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     var pr=dv.querySelector('.detimg .pr'); if(pr){ var p=euro(d.kp); if(p==='\u2014'&&it.kaufpreis!=null){ var kc=numOr(it.kaufpreis); if(kc!=null)p=euro(kc/100); } pr.textContent=p; }
     var nm=dv.querySelector('.detimg .lab .nm'); if(nm) nm.textContent=(row.name||d.kuerzel||'Objekt');
     var ad=dv.querySelector('.detimg .lab .ad'); if(ad){ var parts=[addrOf(d)]; if(d.baujahr) parts.push('Bj. '+d.baujahr); ad.textContent=parts.filter(Boolean).join(' \u00b7 '); }
+    var _di=dv.querySelector('.detimg'); if(_di){ var _th=(d&&d._thumb)?d._thumb:''; _di.style.backgroundImage=_th?('url('+_th+')'):''; if(_th){ _di.style.backgroundSize='cover'; _di.style.backgroundPosition='center'; } }
     var ki=dv.querySelectorAll('.kgrid .ki');
     if(ki[0]){ var e0=ki[0].querySelector('.v'); if(e0)e0.textContent=fmtPct(bmyOf(it,d)); }
     if(ki[1]){ var cc=fmtCf(cfMonat(it,d)); var e1=ki[1].querySelector('.v'); if(e1){ e1.textContent=cc.s; e1.className='v'+(cc.p?(' '+cc.p):''); } }
@@ -904,8 +934,12 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     };
     if(last.ze>0) data.ze=String(Math.round(last.ze));
     var btn=document.getElementById('mb-board-save'); if(btn){ btn.disabled=true; }
-    A().apiCall('/objects',{method:'POST',body:{data:data, aiAnalysis:null, photos:[]}}).then(function(saved){
-      mobToast('\u2713 Objekt an Bord: '+(data.kuerzel||''));
+    var _mp=(window.__mbPhotos||[]).slice(); if(window.__mbEditPhotos&&window.__mbEditPhotos.length) _mp=_mp.concat(window.__mbEditPhotos);
+    if(_mp.length){ data._thumb=(window.__mbThumb||_mp[0]); }
+    var _ise=!!window.__mbEditId; var _pth=_ise?('/objects/'+window.__mbEditId):'/objects'; var _mth=_ise?'PUT':'POST';
+    A().apiCall(_pth,{method:_mth,body:{data:data, aiAnalysis:null, photos:_mp}}).then(function(saved){
+      mobToast('\u2713 '+(window.__mbEditId?'Objekt aktualisiert':'Objekt an Bord')+': '+(data.kuerzel||''));
+      window.__mbEditId=null; window.__mbPhotos=[]; window.__mbEditPhotos=[]; window.__mbThumb=null; try{_mbRenderThumbs();}catch(e){}
       if(btn){ btn.disabled=false; }
       loadFlotte();
       if(typeof window.go==='function') window.go('cockpit');
@@ -988,12 +1022,8 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
       var t=e.target.closest&&e.target.closest('[data-go]'); if(!t) return;
       var dest=t.getAttribute('data-go');
       if(dest==='import-pdf'){ e.preventDefault(); e.stopPropagation(); var fi=document.getElementById('mb-pdf-file'); if(fi){ fi.value=''; fi.click(); } return; }
-      if(dest==='voice'){ e.preventDefault(); e.stopPropagation(); mbVoiceStart(); return; }
-      if(dest==='import-immo'){
-        e.preventDefault(); e.stopPropagation();
-        mobToast('ImmoMetrica-Import kommt als Nächstes — nutze solange Quick Check oder Exposé.');
-        return;
-      }
+      if(dest==='voice'){ e.preventDefault(); e.stopPropagation(); mbVoiceOpen(); return; }
+      if(dest==='import-immo'){ e.preventDefault(); e.stopPropagation(); mbImmoOpen(); return; }
       if(dest==='anlegen'){ e.preventDefault(); e.stopPropagation(); if(typeof window.go==='function') window.go('boarding'); return; }
     }, true);
   }
@@ -1224,6 +1254,318 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
   }
   // MA15-VOICE:end
 
+  // MA16-17:start \u2014 Fotos (Karten+Detail) + echtes Profil (Name/Plan/Tank/Abmelden/Tanken)
+  function _planName(m){ if(m==null)return null; if(m>=100)return 'Pro'; if(m>=40)return 'Investor'; if(m>=10)return 'Starter'; return 'Free'; }
+  function _planStars(p){ return p==='Pro'?'\u2605\u2605\u2605\u2605':p==='Investor'?'\u2605\u2605\u2605':p==='Starter'?'\u2605\u2605':'\u2605'; }
+  function installProfil(){
+    var pv=document.querySelector('[data-view="profil"]'); if(!pv) return;
+    var sess=(A().getSession&&A().getSession())||{};
+    var nm=(sess.name||'').trim();
+    if(nm){ var _h2=pv.querySelector('.hero h2'); if(_h2)_h2.textContent=nm;
+      var _av=pv.querySelector('.brandbar .av'); if(_av){ var ps=nm.split(/\s+/); var ini=((ps[0]||'')[0]||'')+((ps[1]||'')[0]||''); _av.textContent=(ini||nm[0]||'?').toUpperCase(); } }
+    var pad=pv.querySelector('.pad');
+    if(pad && !document.getElementById('mb-logout-row')){
+      var lr=document.createElement('div'); lr.className='setrow'; lr.id='mb-logout-row'; lr.style.cursor='pointer';
+      lr.innerHTML='<div class="ic"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></div><div class="tt"><div class="nm">Abmelden</div><div class="ds">Von diesem Ger\u00e4t abmelden</div></div><span class="ch">\u203a</span>';
+      lr.addEventListener('click',function(){ try{ if(A()&&A().logout) A().logout(); }catch(e){} try{ localStorage.removeItem('ji_token'); }catch(e){} showGate('Abgemeldet'); });
+      pad.appendChild(lr);
+    }
+    var ft=pv.querySelector('.tank .ft a'); if(ft && !ft.__wired){ ft.__wired=1; ft.style.cursor='pointer'; ft.addEventListener('click',function(){ location.href='/'; }); }
+  }
+  // MA16-17:end
+
+  // MA20:start \u2014 Voice nutzt den echten Chip-Screen (data-view="voice")
+  var _vScreenActive=false;
+  function _vChip(n){ return document.querySelector('#mic-stage .chip.c'+n); }
+  function _vSetChip(n,val){
+    var c=_vChip(n); if(!c) return;
+    var v=c.querySelector('.v'), ok=c.querySelector('.ok');
+    if(val!=null && String(val).trim()!==''){ if(v){ v.textContent=String(val); v.style.opacity='1'; } if(ok) ok.style.visibility='visible'; c.classList.add('show'); }
+  }
+  var _V_HINTS={1:'z.B. Wohnung',2:'Stra\u00dfe + Nr.',3:'in Euro',4:'in m\u00b2',5:'\u20ac / Monat',6:'Stadt'};
+  function _vChipsReset(){
+    for(var n=1;n<=6;n++){ var c=_vChip(n); if(!c) continue;
+      var v=c.querySelector('.v'), ok=c.querySelector('.ok');
+      if(ok) ok.style.visibility='hidden';
+      if(v){ v.textContent=_V_HINTS[n]||'\u2026'; v.style.opacity='.55'; }
+      c.classList.remove('show');
+    }
+  }
+  function _vChipFill(f){
+    function _eu(x){ var n=parseFloat(String(x).replace(/\./g,'').replace(',','.')); return isFinite(n)?(n.toLocaleString('de-DE')+' \u20ac'):String(x); }
+    if(f.objart!=null) _vSetChip(1,f.objart);
+    var adr=[f.str,f.hnr].filter(function(x){return x!=null&&String(x).trim()!=='';}).join(' '); if(adr) _vSetChip(2,adr);
+    if(f.kp!=null) _vSetChip(3,_eu(f.kp));
+    if(f.wfl!=null) _vSetChip(4,String(f.wfl)+' m\u00b2');
+    if(f.nkm!=null) _vSetChip(5,_eu(f.nkm));
+    if(f.ort!=null) _vSetChip(6,f.ort);
+  }
+  function _vStatus(t){ var st=document.getElementById('voice-status'); if(st) st.textContent=t; }
+  function _vStageOn(on){ var s=document.getElementById('mic-stage'); if(s){ if(on) s.classList.add('mic-on'); else s.classList.remove('mic-on'); } }
+
+  function mbVoiceOpen(){
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){
+      mobToast('Sprachaufnahme wird hier nicht unterst\u00fctzt \u2014 nutze Quick Check oder Expos\u00e9.'); return;
+    }
+    if(typeof window.go==='function') window.go('voice');
+    _vChipsReset();
+    // Chips als Zielvorgaben gestaffelt einblenden (wie die Demo)
+    var chips=document.querySelectorAll('#mic-stage .chip');
+    for(var i=0;i<chips.length;i++){ (function(c,idx){ setTimeout(function(){ c.classList.add('show'); },300+idx*150); })(chips[i],i); }
+    _vStatus('H\u00f6rt zu \u2026'); _vStageOn(true);
+    _vChunks=[]; _vSec=0; _vStopReq=false; _vMime=_vPickMime(); _vScreenActive=true;
+    _vWireMic(); _vWireBack();
+    navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true}}).then(function(stream){
+      _vStream=stream;
+      try{ _vRec=_vMime?new MediaRecorder(stream,{mimeType:_vMime}):new MediaRecorder(stream); }
+      catch(e){ try{ _vRec=new MediaRecorder(stream); }catch(e2){ _vRec=null; } }
+      if(!_vRec){ _vStatus('Aufnahme nicht m\u00f6glich'); _vStageOn(false); _vStopHard(); return; }
+      _vRec.ondataavailable=function(ev){ if(ev.data&&ev.data.size>0) _vChunks.push(ev.data); };
+      _vRec.onstop=function(){ if(_vStopReq) _vScreenEvaluate(); };
+      try{ _vRec.start(); }catch(e){ _vStatus('Start fehlgeschlagen'); _vStageOn(false); _vStopHard(); return; }
+      _vTimer=setInterval(function(){ _vSec++; if(_vSec>=VOICE_MAX) _vScreenStop(); },1000);
+    }).catch(function(){ _vStatus('Tippe das Mikro und erlaube den Zugriff'); _vStageOn(false); _vScreenActive=false; });
+  }
+  function _vWireMic(){ var m=document.getElementById('mic-btn'); if(m&&!m.__ma20){ m.__ma20=1; m.style.cursor='pointer'; m.addEventListener('click',function(){ if(_vScreenActive&&!_vStopReq) _vScreenStop(); }); } }
+  function _vWireBack(){ var b=document.querySelector('[data-view="voice"] .bk'); if(b&&!b.__ma20){ b.__ma20=1; b.addEventListener('click',function(){ _vScreenActive=false; _vStopReq=true; _vStopHard(); _vStageOn(false); },true); } }
+
+  function _vScreenStop(){
+    if(_vStopReq) return; _vStopReq=true;
+    if(_vTimer){ clearInterval(_vTimer); _vTimer=null; }
+    _vStatus('Wird ausgewertet \u2026'); _vStageOn(false);
+    try{ if(_vRec&&_vRec.state!=='inactive'){ _vRec.stop(); } else { _vScreenEvaluate(); } }catch(e){ _vScreenEvaluate(); }
+  }
+  function _vScreenEvaluate(){
+    try{ if(_vStream){ _vStream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} }); _vStream=null; } }catch(e){}
+    var blob; try{ blob=new Blob(_vChunks,{type:(_vMime||'audio/webm')}); }catch(e){ blob=null; }
+    if(!blob||blob.size<2000){ _vStatus('Aufnahme zu kurz \u2014 Mikro tippen und nochmal'); _vScreenActive=false; _vStopReq=false; return; }
+    _vStatus('KI wertet aus \u2026');
+    _vB64(blob).then(function(b64){
+      return A().apiCall('/ai/extract-voice',{method:'POST',body:{audio:b64,mime:(blob.type||_vMime),catalog:VOICE_CAT}});
+    }).then(function(data){
+      var fields=(data&&data.fields)||{};
+      _vApply(fields);      // volles Boarding fuellen (MA15-Mapping)
+      _vChipFill(fields);   // Chips visuell fuellen + gruener Haken
+      var n=0; for(var k in VOICE_MAP){ if(fields[k]!=null&&String(fields[k]).trim()!=='') n++; }
+      _vStatus(n+' Feld'+(n===1?'':'er')+' erkannt \u2713');
+      var kb=document.querySelector('[data-view="voice"] .cta .ke'); if(kb) kb.textContent=n+' Felder';
+      _vScreenActive=false;
+      try{ loadKerosin(); }catch(e){}
+    }).catch(function(err){
+      var s=err&&err.status;
+      _vStatus((s===402||s===403)?'Nicht genug Kerosin (1\u00a0L)':(s===401?'Nicht eingeloggt':(s===502?'KI nicht erreichbar':'Auswertung fehlgeschlagen')));
+      _vScreenActive=false; _vStopReq=false;
+    });
+  }
+  // MA20:end
+
+  // MA22:start \u2014 Objekt-Lifecycle: Bearbeiten/Update, Loeschen, Deal-Status, Foto-Aufnahme
+  window.__mbPhotos = window.__mbPhotos || [];
+  window.__mbEditPhotos = window.__mbEditPhotos || [];
+  window.__mbEditId = window.__mbEditId || null;
+  window.__mbThumb = window.__mbThumb || null;
+
+  // data-Feld -> mb_-Input (Umkehrung des mbSave-Mappings)
+  var MB_LOAD = {str:'mb_str',hnr:'mb_hnr',plz:'mb_plz',ort:'mb_ort',objart:'mb_objart',wfl:'mb_wfl',
+    baujahr:'mb_bj',kp:'mb_kp',nkm:'mb_nkm',ze:'mb_ze',ek:'mb_ek',hg_ul:'mb_hg',hg_nul:'mb_hgsplit',
+    d1z:'mb_zins',d1t:'mb_tilg',ji_p:'mb_knk'};
+  function _mbSetF(mbId,v){ var e=document.getElementById(mbId); if(!e||v==null||String(v).trim()==='')return;
+    var raw=v; if(typeof v==='number'&&!Number.isInteger(v)) raw=String(v).replace('.',','); e.value=String(raw); }
+  function _mbLoadInto(data){ if(!data)return; for(var k in MB_LOAD){ if(Object.prototype.hasOwnProperty.call(MB_LOAD,k)&&data[k]!=null) _mbSetF(MB_LOAD[k],data[k]); } }
+
+  // Canvas-Resize (ersetzt _dpResizeDataUrl) -> Promise<dataURL>
+  function _mbResize(dataUrl,max,q){ return new Promise(function(res){ try{
+      var img=new Image(); img.onload=function(){ try{
+        var w=img.width,h=img.height,sc=Math.min(1,max/Math.max(w,h));
+        var cw=Math.round(w*sc),ch=Math.round(h*sc);
+        var c=document.createElement('canvas'); c.width=cw; c.height=ch;
+        c.getContext('2d').drawImage(img,0,0,cw,ch);
+        res(c.toDataURL('image/jpeg',q||0.82));
+      }catch(e){ res(dataUrl); } };
+      img.onerror=function(){ res(dataUrl); }; img.src=dataUrl;
+    }catch(e){ res(dataUrl); } }); }
+  function _mbReadFile(f){ return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){res(String(r.result));}; r.onerror=function(){rej(new Error('Lesen fehlgeschlagen'));}; r.readAsDataURL(f); }); }
+
+  function _mbThumbsHost(){ return document.getElementById('mb-photo-thumbs'); }
+  function _mbRenderThumbs(){ var h=_mbThumbsHost(); if(!h)return;
+    var all=(window.__mbEditPhotos||[]).concat(window.__mbPhotos||[]);
+    if(!all.length){ h.innerHTML=''; h.style.display='none'; return; }
+    h.style.display='flex';
+    h.innerHTML=all.map(function(src,i){ return '<span data-pi="'+i+'" style="position:relative;display:inline-block">'
+      +'<span style="display:block;width:52px;height:52px;border-radius:9px;border:1px solid var(--line);background-image:url('+src+');background-size:cover;background-position:center"></span>'
+      +'<button data-rm="'+i+'" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;border:none;background:var(--neg);color:#fff;font-size:11px;line-height:1;cursor:pointer">\u00d7</button></span>'; }).join('');
+    [].slice.call(h.querySelectorAll('[data-rm]')).forEach(function(b){ b.addEventListener('click',function(){
+      var i=parseInt(b.getAttribute('data-rm'),10); var ne=(window.__mbEditPhotos||[]).length;
+      if(i<ne){ window.__mbEditPhotos.splice(i,1); } else { window.__mbPhotos.splice(i-ne,1); }
+      if(!(window.__mbEditPhotos||[]).concat(window.__mbPhotos||[]).length) window.__mbThumb=null;
+      _mbRenderThumbs(); }); });
+  }
+  function _mbAddPhotos(files){ if(!files||!files.length)return;
+    var arr=[].slice.call(files);
+    (function nextP(i){ if(i>=arr.length){ _mbRenderThumbs(); return; }
+      _mbReadFile(arr[i]).then(function(du){ return _mbResize(du,1600,0.82); }).then(function(full){
+        window.__mbPhotos.push(full);
+        if(!window.__mbThumb){ _mbResize(full,240,0.7).then(function(t){ window.__mbThumb=t; }); }
+        nextP(i+1);
+      }).catch(function(){ nextP(i+1); });
+    })(0);
+  }
+
+  function installLifecycle(){
+    // 1) Foto-Feld ins Boarding (vor "Als Objekt speichern")
+    var save=document.getElementById('mb-board-save');
+    if(save && !document.getElementById('mb-photo-row')){
+      var row=document.createElement('div'); row.id='mb-photo-row'; row.style.cssText='margin:12px 0 4px';
+      row.innerHTML='<div class="lbl-sec" style="margin-bottom:6px">Fotos</div>'
+        +'<label style="display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px dashed var(--line);border-radius:11px;padding:11px 15px;cursor:pointer;color:var(--txt);font-family:var(--body,sans-serif);font-size:14px">'
+        +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>'
+        +'Foto aufnehmen / w\u00e4hlen<input id="mb-photo-input" type="file" accept="image/*" capture="environment" multiple style="display:none"></label>'
+        +'<div id="mb-photo-thumbs" style="display:none;flex-wrap:wrap;gap:10px;margin-top:10px"></div>';
+      save.parentNode.insertBefore(row,save);
+      var inp=document.getElementById('mb-photo-input');
+      if(inp) inp.addEventListener('change',function(){ _mbAddPhotos(inp.files); inp.value=''; });
+    }
+    // 2) Detail-Aktionen (Deal-Status + Loeschen) + "bearbeiten" umbiegen
+    var dv=document.querySelector('[data-view="detail"]');
+    var editBtn=dv?dv.querySelector('[data-go="anlegen"]'):null;
+    if(editBtn && !editBtn.__ma22){ editBtn.__ma22=1; editBtn.setAttribute('data-go',''); 
+      editBtn.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); mbEditCurrent(); },true); }
+    if(dv && editBtn && !document.getElementById('mb-life-actions')){
+      var box=document.createElement('div'); box.id='mb-life-actions'; box.style.cssText='display:flex;gap:8px;margin-top:8px;flex-wrap:wrap';
+      box.innerHTML='<button id="mb-deal-won" class="ghost" style="flex:1;min-width:120px">\u2713 Gewonnen</button>'
+        +'<button id="mb-deal-lost" class="ghost" style="flex:1;min-width:120px">\u2715 Verloren</button>'
+        +'<button id="mb-del" class="ghost" style="flex:1;min-width:120px;color:var(--neg);border-color:var(--neg)">\u2716 L\u00f6schen</button>';
+      editBtn.parentNode.insertBefore(box, editBtn.nextSibling);
+      document.getElementById('mb-deal-won').addEventListener('click',function(){ mbSetDeal('won'); });
+      document.getElementById('mb-deal-lost').addEventListener('click',function(){ mbSetDeal('lost'); });
+      document.getElementById('mb-del').addEventListener('click',function(){ mbDeleteCurrent(); });
+    }
+  }
+
+  function _mbCur(){ return (window.__mobSel&&window.__mobSel.it)?window.__mobSel.it:null; }
+
+  function mbEditCurrent(){
+    var it=_mbCur(); if(!it){ mobToast('Kein Objekt gew\u00e4hlt.'); return; }
+    window.__mbEditId=it.id; window.__mbPhotos=[]; window.__mbEditPhotos=[]; window.__mbThumb=null;
+    // Volles Objekt holen (Felder + Fotos)
+    A().apiCall('/objects/'+it.id).then(function(full){
+      var data=(full&&full.data)||{};
+      _mbLoadInto(data);
+      var ph=(full&&full.photos)||[]; window.__mbEditPhotos=Array.isArray(ph)?ph.slice():[];
+      if(data._thumb) window.__mbThumb=data._thumb;
+      if(typeof window.go==='function') window.go('boarding');
+      setTimeout(function(){ try{_mbRenderThumbs();}catch(e){} },30);
+      mobToast('Bearbeiten \u2014 \u00c4nderungen mit \u201eAls Objekt speichern\u201c sichern.');
+    }).catch(function(){ if(typeof window.go==='function') window.go('boarding'); });
+  }
+
+  function mbDeleteCurrent(){
+    var it=_mbCur(); if(!it){ mobToast('Kein Objekt gew\u00e4hlt.'); return; }
+    if(!confirm('Objekt wirklich l\u00f6schen?')) return;
+    A().apiCall('/objects/'+it.id,{method:'DELETE'}).then(function(){
+      mobToast('\u2713 Objekt gel\u00f6scht.'); window.__mobSel=null;
+      loadFlotte(); if(typeof window.go==='function') window.go('cockpit');
+    }).catch(function(err){ mobToast('L\u00f6schen fehlgeschlagen: '+((err&&err.message)||'')); });
+  }
+
+  function mbSetDeal(status){
+    var it=_mbCur(); if(!it){ mobToast('Kein Objekt gew\u00e4hlt.'); return; }
+    A().apiCall('/objects/'+it.id).then(function(full){
+      var data=(full&&full.data)||{};
+      if(status==='won'){ data._deal_won=true; data._deal_lost=false; data._deal_won_at=new Date().toISOString(); }
+      else if(status==='lost'){ data._deal_lost=true; data._deal_won=false; }
+      else { data._deal_won=false; data._deal_lost=false; }
+      var ph=(full&&full.photos)||[];
+      return A().apiCall('/objects/'+it.id,{method:'PUT',body:{data:data, aiAnalysis:(full&&full.ai_analysis)||null, photos:ph}});
+    }).then(function(){
+      mobToast(status==='won'?'\u2713 Als gewonnen markiert.':(status==='lost'?'\u2715 Als verloren markiert.':'Status zur\u00fcckgesetzt.'));
+      loadFlotte();
+    }).catch(function(err){ mobToast('Status fehlgeschlagen: '+((err&&err.message)||'')); });
+  }
+  // MA22:end
+
+  // MA23:start \u2014 ImmoMetrica-Import (Quellen/Liste/Detail -> Boarding)
+  var _imoSrc=[], _imoItems=[], _imoActive=null;
+  var IMO_MAP={objart:'mb_objart',plz:'mb_plz',ort:'mb_ort',str:'mb_str',hnr:'mb_hnr',wfl:'mb_wfl',baujahr:'mb_bj',kp:'mb_kp',nkm:'mb_nkm'};
+  var IMO_LBL={objart:'Objektart',plz:'PLZ',ort:'Ort',str:'Stra\u00dfe',hnr:'Nr.',wfl:'Wohnfl\u00e4che',baujahr:'Baujahr',kp:'Kaufpreis',nkm:'Kaltmiete'};
+  var IMO_ORDER=['objart','str','hnr','plz','ort','wfl','baujahr','kp','nkm'];
+  function _imoNum(n){ return (n==null||n==='')?'\u2014':new Intl.NumberFormat('de-DE').format(n); }
+  function _imoEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];}); }
+
+  function mbImmoOpen(){
+    if(typeof window.go==='function') window.go('import-immo');
+    var host=document.getElementById('immo-src'); var list=document.getElementById('immo-list');
+    if(host) host.innerHTML='<span style="font-family:var(--mono);font-size:12px;color:var(--mut)">Lade Quellen \u2026</span>';
+    if(list) list.innerHTML='';
+    A().apiCall('/immometrica/searches').then(function(searches){
+      _imoSrc=[];
+      (Array.isArray(searches)?searches:[]).forEach(function(s){ _imoSrc.push({key:'s'+s.id, label:'Suche \u00b7 '+(s.name||s.id), count:s.count, kind:'search', id:s.id}); });
+      _imoSrc.push({key:'favde', label:'Favoriten \u00b7 DE', kind:'fav', cc:'de'});
+      _imoRenderSrc();
+      if(_imoSrc[0]) _imoSelectSrc(_imoSrc[0]);
+    }).catch(function(err){
+      var s=err&&err.status;
+      var msg=(s===428)?'Kein ImmoMetrica-Zugang hinterlegt.':(s===401?'Bitte neu anmelden.':'Konnte Quellen nicht laden.');
+      if(host) host.innerHTML='<span style="font-family:var(--mono);font-size:12px;color:var(--neg)">'+_imoEsc(msg)+'</span>';
+    });
+  }
+  function _imoRenderSrc(){
+    var host=document.getElementById('immo-src'); if(!host) return;
+    host.innerHTML=_imoSrc.map(function(s){ var on=_imoCur&&_imoCur.key===s.key;
+      return '<button class="pill'+(on?' on':'')+'" data-k="'+s.key+'" style="border:1px solid var(--line);background:'+(on?'var(--runway)':'var(--card)')+';color:'+(on?'#1a1407':'var(--txt)')+';border-radius:999px;padding:7px 13px;font-family:var(--mono);font-size:11px;margin:0 6px 8px 0;cursor:pointer">'+_imoEsc(s.label)+(s.count!=null?' \u00b7 '+s.count:'')+'</button>'; }).join('');
+    [].slice.call(host.querySelectorAll('[data-k]')).forEach(function(el){ el.addEventListener('click',function(){ var s=_imoSrc.filter(function(x){return x.key===el.getAttribute('data-k');})[0]; if(s) _imoSelectSrc(s); }); });
+  }
+  var _imoCur=null;
+  function _imoSelectSrc(s){
+    _imoCur=s; _imoActive=null; _imoRenderSrc();
+    var list=document.getElementById('immo-list'); if(list) list.innerHTML='<div style="color:var(--mut);font-family:var(--mono);font-size:12px;padding:16px 0">Lade Objekte \u2026</div>';
+    var url=s.kind==='search'?('/immometrica/searches/'+s.id+'/results'):('/immometrica/favorites/'+s.cc);
+    A().apiCall(url).then(function(d){ _imoItems=(d&&d.items)||[]; _imoRenderList(d&&d.count); })
+    .catch(function(){ if(list) list.innerHTML='<div style="color:var(--neg);font-family:var(--mono);font-size:12px;padding:16px 0">Konnte Objekte nicht laden.</div>'; });
+  }
+  function _imoRenderList(total){
+    var list=document.getElementById('immo-list'); if(!list) return;
+    if(!_imoItems.length){ list.innerHTML='<div style="color:var(--mut);font-family:var(--mono);font-size:12px;padding:16px 0">Keine Objekte.</div>'; return; }
+    var note=(total!=null&&total>_imoItems.length)?'<div style="color:var(--mut);font-family:var(--mono);font-size:11px;margin:2px 0 8px">'+total+' Treffer \u2013 Seite 1.</div>':'';
+    list.innerHTML=note+_imoItems.map(function(it,i){ var r=it.raw||{}, dp=it.dp||{};
+      return '<button data-i="'+i+'" style="display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin-bottom:10px;cursor:pointer;color:var(--txt)">'
+        +'<div style="font-family:var(--disp);font-weight:600;font-size:14px">'+_imoEsc(r.title||dp.kuerzel||('Objekt '+r.id))+'</div>'
+        +'<div style="color:var(--mut);font-size:12px;margin-top:2px">'+_imoEsc(r.address_raw||[dp.str,dp.hnr,dp.plz,dp.ort].filter(Boolean).join(' '))+'</div>'
+        +'<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:7px;font-family:var(--mono);font-size:11px;color:var(--gold-hi)">'
+        +'<span>KP '+_imoNum(dp.kp)+' \u20ac</span><span>Wfl '+_imoNum(dp.wfl)+' m\u00b2</span>'+(dp.objart?'<span>'+_imoEsc(dp.objart)+'</span>':'')+(dp.baujahr?'<span>Bj '+_imoNum(dp.baujahr)+'</span>':'')
+        +'</div></button>'; }).join('');
+    [].slice.call(list.querySelectorAll('[data-i]')).forEach(function(el){ el.addEventListener('click',function(){ _imoOpenDetail(parseInt(el.getAttribute('data-i'),10)); }); });
+  }
+  function _imoOpenDetail(i){
+    _imoActive=i; var it=_imoItems[i]; if(!it) return;
+    if(typeof window.go==='function') window.go('immo-detail');
+    var dp=it.dp||{}, raw=it.raw||{};
+    var t=document.getElementById('immo-title'); if(t) t.textContent=raw.title||dp.kuerzel||'Objekt';
+    var host=document.getElementById('immo-fields'); if(host){
+      host.innerHTML=IMO_ORDER.filter(function(k){ return dp[k]!=null&&dp[k]!==''; }).map(function(k){
+        var v=(k==='kp'||k==='nkm'||k==='wfl')?_imoNum(dp[k]):(k==='baujahr'?String(dp[k]).replace(/\D/g,''):_imoEsc(dp[k]));
+        return '<label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)">'
+          +'<input type="checkbox" class="immo-cb" data-k="'+k+'" checked style="width:17px;height:17px;accent-color:var(--gold-hi)">'
+          +'<span style="flex:1;font-family:var(--mono);font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em">'+(IMO_LBL[k]||k)+'</span>'
+          +'<span style="font-family:var(--body,sans-serif);font-size:14px;font-weight:600;color:var(--txt)">'+v+(k==='kp'||k==='nkm'?' \u20ac':(k==='wfl'?' m\u00b2':''))+'</span></label>';
+      }).join('');
+    }
+    // "In DealPilot uebernehmen"-Button umbiegen
+    var dv=document.querySelector('[data-view="immo-detail"]'); var btn=dv?dv.querySelector('[data-go="anlegen"]'):null;
+    if(btn && !btn.__ma23){ btn.__ma23=1; btn.setAttribute('data-go','');
+      btn.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); _imoApply(); },true); }
+  }
+  function _imoApply(){
+    var it=_imoItems[_imoActive]; if(!it){ return; }
+    var dp=it.dp||{};
+    var checked={}; [].slice.call(document.querySelectorAll('#immo-fields .immo-cb')).forEach(function(cb){ if(cb.checked) checked[cb.getAttribute('data-k')]=true; });
+    var n=0;
+    IMO_ORDER.forEach(function(k){ if(checked[k] && dp[k]!=null && IMO_MAP[k]){ var e=document.getElementById(IMO_MAP[k]); if(e){ e.value=String(dp[k]); n++; } } });
+    if(typeof window.go==='function') window.go('boarding');
+    mobToast('\u2713 '+n+' Feld'+(n===1?'':'er')+' aus ImmoMetrica \u00fcbernommen.');
+  }
+  // MA23:end
+
   function boot(){
     var a=A();
     if(!a||!a.apiCall){ showGate('App-Anbindung fehlt'); return; }
@@ -1232,6 +1574,8 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     installDetailHooks();
     installHubHonesty();
     installPdfImport();
+    installProfil();
+    installLifecycle();
     greetName(sess);
     loadFlotte();
     loadKerosin();

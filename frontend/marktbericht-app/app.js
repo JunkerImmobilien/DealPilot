@@ -593,67 +593,183 @@ function rateClass(label, val) {
   return cls;
 }
 
+/* v895c-svgcharts : theme-aware Hochglanz-SVG-Diagramme (?theme=light|dark, Default dunkel, Hell=Weiss) */
+function _mbLight(){ try{ var t=new URLSearchParams(location.search).get('theme'); if(t==='light')return true; if(t==='dark')return false; }catch(e){} return false; }
+function _svgHost(el){ if(el&&el.tagName==='CANVAS'){ var d=document.createElement('div'); d.id=el.id; d.className=el.className; d.style.width='100%'; el.parentNode.replaceChild(d,el); return d; } return el; }
+function _fmt(v){ return (v==null||isNaN(v)) ? '\u2013' : Number(v).toLocaleString('de-DE'); }
+function _niceTicks(min,max,count){
+  if(min===max){ min-=Math.abs(min||1)*0.1; max+=Math.abs(max||1)*0.1; }
+  const span=(max-min)||1, step0=span/(count||4), mag=Math.pow(10,Math.floor(Math.log10(step0))), norm=step0/mag;
+  let step = norm<1.5?1 : norm<3?2 : norm<7?5 : 10; step*=mag;
+  const nmin=Math.floor(min/step)*step, nmax=Math.ceil(max/step)*step, ticks=[];
+  for(let v=nmin; v<=nmax+step*0.5; v+=step) ticks.push(Math.round(v*1e6)/1e6);
+  return {ticks, min:nmin, max:nmax};
+}
+function _smoothPath(pts){
+  if(!pts.length) return '';
+  if(pts.length<3) return 'M'+pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' L');
+  let d='M'+pts[0].x.toFixed(1)+','+pts[0].y.toFixed(1);
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
+    const c1x=p1.x+(p2.x-p0.x)/6, c1y=p1.y+(p2.y-p0.y)/6;
+    const c2x=p2.x-(p3.x-p1.x)/6, c2y=p2.y-(p3.y-p1.y)/6;
+    d+=' C'+c1x.toFixed(1)+','+c1y.toFixed(1)+' '+c2x.toFixed(1)+','+c2y.toFixed(1)+' '+p2.x.toFixed(1)+','+p2.y.toFixed(1);
+  }
+  return d;
+}
+function _mbPalette(){
+  const light = _mbLight();
+  return light ? {
+    light:true, panel:'#FFFFFF', panelStroke:'rgba(201,168,76,.20)',
+    txt:'#8a8172', txtStrong:'#4a443c', grid:'rgba(90,72,20,.10)', base:'rgba(184,147,47,.45)',
+    pillBg:'#FFFFFF', pillBorder:'#b8932f', goldTxt:'#9a7d28', legBg:'rgba(120,96,30,.06)', legTxt:'#5a5348',
+    lineA:'#d9b95a', lineB:'#C9A84C', lineC:'#a8842c', dot:'#b8932f', dotStroke:'#ffffff',
+    areaTop:'.30', areaMid:'.12', barTop:'#d8cfbe', barBot:'#a89f8c', medTop:'#cdae4e', medBot:'#a8842c',
+    stone:'#8a8172', axisGold:'#b8932f', bandFill:'rgba(201,168,76,.16)', bandStroke:'rgba(184,147,47,.4)',
+    bandTxt:'#9a7d28', medLine:'rgba(184,147,47,.72)', glow:2.4, topHi:'.4'
+  } : {
+    light:false, panel:null, panelStroke:null,
+    txt:'#8a8a93', txtStrong:'#c9c9d0', grid:'rgba(255,255,255,.05)', base:'rgba(201,168,76,.28)',
+    pillBg:'#0c0c10', pillBorder:'#C9A84C', goldTxt:'#E8CC7A', legBg:'rgba(255,255,255,.03)', legTxt:'#c9c9d0',
+    lineA:'#E8CC7A', lineB:'#C9A84C', lineC:'#b8932f', dot:'#E8CC7A', dotStroke:'#0a0a0c',
+    areaTop:'.42', areaMid:'.16', barTop:'#6a625d', barBot:'#3c3835', medTop:'#b89a3e', medBot:'#7a6428',
+    stone:'#A89F8E', axisGold:'#C9A84C', bandFill:'rgba(201,168,76,.07)', bandStroke:'rgba(201,168,76,.22)',
+    bandTxt:'rgba(201,168,76,.75)', medLine:'rgba(201,168,76,.65)', glow:3.2, topHi:'.18'
+  };
+}
+function _svgDualLine(cfg){
+  const P=_mbPalette();
+  const labels=cfg.labels||[], series=cfg.series||[], n=labels.length;
+  const W=760, H=336, padT=48, padB=42, padL=62, padR=cfg.rightTitle?62:26;
+  const plotW=W-padL-padR, plotH=H-padT-padB, x0=padL, y0=padT, x1=padL+plotW, y1=padT+plotH;
+  const uid='d'+Math.random().toString(36).slice(2,7);
+  const X=(i)=> x0 + (n<=1?plotW/2:plotW*i/(n-1));
+  const lv=[], rv=[]; series.forEach(s=>((s.axis==='R')?rv:lv).push(...s.vals.filter(v=>v!=null&&!isNaN(v))));
+  const L=_niceTicks(Math.min(...lv),Math.max(...lv),4);
+  const R= rv.length ? (cfg.rightMin!=null?{ticks:[0,25,50,75,100],min:cfg.rightMin,max:cfg.rightMax}:_niceTicks(Math.min(...rv),Math.max(...rv),4)) : null;
+  const yL=(v)=> y0 + plotH*(1-(v-L.min)/((L.max-L.min)||1));
+  const yR=(v)=> y0 + plotH*(1-(v-R.min)/((R.max-R.min)||1));
+  let defs='', body='';
+  if(P.panel) body+=`<rect x="1" y="1" width="${W-2}" height="${H-2}" rx="16" fill="${P.panel}" stroke="${P.panelStroke}" stroke-width="1"/>`;
+  L.ticks.forEach(tv=>{ const yy=yL(tv); if(yy<y0-1||yy>y1+1) return;
+    body+=`<line x1="${x0}" y1="${yy.toFixed(1)}" x2="${x1}" y2="${yy.toFixed(1)}" stroke="${P.grid}" stroke-width="1" stroke-dasharray="1 5"/>`;
+    body+=`<text x="${x0-10}" y="${(yy+3.5).toFixed(1)}" text-anchor="end" fill="${P.txt}" font-size="10.5" font-family="'JetBrains Mono',monospace">${_fmt(tv)}</text>`; });
+  if(R) R.ticks.forEach(tv=>{ const yy=yR(tv); if(yy<y0-1||yy>y1+1)return;
+    body+=`<text x="${x1+10}" y="${(yy+3.5).toFixed(1)}" text-anchor="start" fill="${P.stone}" font-size="10.5" font-family="'JetBrains Mono',monospace">${_fmt(tv)}</text>`; });
+  body+=`<line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="${P.base}" stroke-width="1"/>`;
+  const step=n>9?Math.ceil(n/8):1;
+  labels.forEach((lb,i)=>{ if(i%step!==0 && i!==n-1) return;
+    body+=`<text x="${X(i).toFixed(1)}" y="${y1+18}" text-anchor="middle" fill="${P.txt}" font-size="10.5" font-family="'Space Grotesk',sans-serif">${lb}</text>`; });
+  body+=`<text transform="translate(15,${(y0+plotH/2).toFixed(1)}) rotate(-90)" text-anchor="middle" fill="${P.axisGold}" font-size="10" font-weight="600" letter-spacing=".4">${cfg.leftTitle||''}</text>`;
+  if(cfg.rightTitle) body+=`<text transform="translate(${W-13},${(y0+plotH/2).toFixed(1)}) rotate(90)" text-anchor="middle" fill="${P.stone}" font-size="10" font-weight="600" letter-spacing=".4">${cfg.rightTitle}</text>`;
+  defs+=`<filter id="${uid}glow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="${P.glow}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  series.forEach((s,si)=>{
+    const yf=(s.axis==='R')?yR:yL;
+    const pts=[]; s.vals.forEach((v,i)=>{ if(v!=null&&!isNaN(v)) pts.push({x:X(i),y:yf(v),v}); });
+    if(!pts.length) return;
+    const path=_smoothPath(pts), last=pts[pts.length-1];
+    if(s.fill){
+      defs+=`<linearGradient id="${uid}area${si}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9A84C" stop-opacity="${P.areaTop}"/><stop offset=".45" stop-color="#C9A84C" stop-opacity="${P.areaMid}"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/></linearGradient>`;
+      defs+=`<linearGradient id="${uid}stroke${si}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${P.lineA}"/><stop offset=".55" stop-color="${P.lineB}"/><stop offset="1" stop-color="${P.lineC}"/></linearGradient>`;
+      const area=path+` L${last.x.toFixed(1)},${y1.toFixed(1)} L${pts[0].x.toFixed(1)},${y1.toFixed(1)} Z`;
+      body+=`<path d="${area}" fill="url(#${uid}area${si})" opacity="0" style="animation:${uid}fade .9s .35s ease forwards"/>`;
+      body+=`<path d="${path}" fill="none" stroke="url(#${uid}stroke${si})" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#${uid}glow)" stroke-dasharray="3000" stroke-dashoffset="3000" style="animation:${uid}draw 1.25s cubic-bezier(.25,.6,.2,1) forwards"/>`;
+    } else {
+      body+=`<path d="${path}" fill="none" stroke="${s.color}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"${s.dash?' stroke-dasharray="6 5"':''} opacity="0" style="animation:${uid}fade .8s .5s ease forwards"/>`;
+    }
+    pts.forEach((p,pi)=>{
+      const lastOne = pi===pts.length-1;
+      if(lastOne && s.fill){
+        body+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="9" fill="#C9A84C" opacity=".18"><animate attributeName="r" values="7;12;7" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values=".22;.05;.22" dur="2.4s" repeatCount="indefinite"/></circle>`;
+        body+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.4" fill="${P.dot}" stroke="${P.dotStroke}" stroke-width="1.6"/>`;
+      } else {
+        body+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${s.fill?2.8:2.4}" fill="${s.color||P.dot}" stroke="${P.dotStroke}" stroke-width="1.2"/>`;
+      }
+    });
+    if(s.fill){
+      const txt=_fmt(Math.round(last.v)), pw=16+txt.length*7.2, px=Math.min(last.x+10, x1-pw), py=Math.max(last.y-30, y0+2);
+      body+=`<g opacity="0" style="animation:${uid}fade .5s 1.15s ease forwards"><rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${pw.toFixed(1)}" height="21" rx="10.5" fill="${P.pillBg}" stroke="${P.pillBorder}" stroke-width="1.1"/><text x="${(px+pw/2).toFixed(1)}" y="${(py+14.5).toFixed(1)}" text-anchor="middle" fill="${P.goldTxt}" font-size="11" font-weight="700" font-family="'JetBrains Mono',monospace">${txt}</text></g>`;
+    }
+  });
+  const main=series.find(s=>s.fill);
+  if(main){ const a=main.vals.find(v=>v!=null), b=[...main.vals].reverse().find(v=>v!=null);
+    if(a!=null&&b!=null&&a!==0){ const pct=Math.round((b/a-1)*100), up=pct>=0;
+      const lbl=(up?'\u25B2 +':'\u25BC ')+pct+' %', col=up?'#3FA56C':'#B86250', bw=20+lbl.length*7;
+      body+=`<g><rect x="${x0}" y="14" width="${bw}" height="22" rx="11" fill="${col}22" stroke="${col}" stroke-width="1"/><text x="${(x0+bw/2).toFixed(1)}" y="29" text-anchor="middle" fill="${col}" font-size="11.5" font-weight="700" font-family="'JetBrains Mono',monospace">${lbl}</text></g>`; }
+  }
+  let lx=x1, ly=25;
+  series.slice().reverse().forEach(s=>{ const w=15+s.name.length*6.2; lx-=w;
+    body+=`<rect x="${lx.toFixed(1)}" y="${ly-11}" width="${w-6}" height="20" rx="10" fill="${P.legBg}"/><circle cx="${(lx+9).toFixed(1)}" cy="${ly-1}" r="3.4" fill="${s.fill?'#C9A84C':s.color}"/><text x="${(lx+16).toFixed(1)}" y="${ly+2.5}" fill="${P.legTxt}" font-size="10.5" font-family="'Space Grotesk',sans-serif">${s.name}</text>`; lx-=6; });
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;overflow:visible;"><style>@keyframes ${uid}draw{to{stroke-dashoffset:0}}@keyframes ${uid}fade{to{opacity:1}}</style><defs>${defs}</defs>${body}</svg>`;
+}
+function _svgBars(cfg){
+  const P=_mbPalette();
+  const labels=cfg.labels||[], data=cfg.data||[], median=cfg.median, hl=cfg.highlight, unit=cfg.unit||'', band=cfg.band;
+  const W=760, H=358, padT=54, padB=44, padL=62, padR=24, n=labels.length;
+  const plotW=W-padL-padR, plotH=H-padT-padB, x0=padL, y0=padT, x1=padL+plotW, y1=padT+plotH;
+  const uid='b'+Math.random().toString(36).slice(2,7);
+  const vals=data.filter(v=>v!=null); const T=_niceTicks(0,Math.max(...vals,median||0),4);
+  const Y=(v)=> y0 + plotH*(1-(v-0)/((T.max)||1));
+  const slot=plotW/n, bw=Math.min(58, slot*0.56);
+  let defs='', body='';
+  if(P.panel) body+=`<rect x="1" y="1" width="${W-2}" height="${H-2}" rx="16" fill="${P.panel}" stroke="${P.panelStroke}" stroke-width="1"/>`;
+  defs+=`<linearGradient id="${uid}hl" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#9a751f"/><stop offset=".5" stop-color="#C9A84C"/><stop offset="1" stop-color="#E8CC7A"/></linearGradient>`;
+  defs+=`<linearGradient id="${uid}med" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="${P.medBot}"/><stop offset="1" stop-color="${P.medTop}"/></linearGradient>`;
+  defs+=`<linearGradient id="${uid}neu" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="${P.barBot}"/><stop offset="1" stop-color="${P.barTop}"/></linearGradient>`;
+  defs+=`<filter id="${uid}glow" x="-60%" y="-30%" width="220%" height="160%"><feGaussianBlur stdDeviation="${P.glow+0.8}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  T.ticks.forEach(tv=>{ const yy=Y(tv); if(yy<y0-1||yy>y1+1)return;
+    body+=`<line x1="${x0}" y1="${yy.toFixed(1)}" x2="${x1}" y2="${yy.toFixed(1)}" stroke="${P.grid}" stroke-width="1" stroke-dasharray="1 5"/>`;
+    body+=`<text x="${x0-10}" y="${(yy+3.5).toFixed(1)}" text-anchor="end" fill="${P.txt}" font-size="10.5" font-family="'JetBrains Mono',monospace">${_fmt(tv)}</text>`; });
+  body+=`<text transform="translate(15,${(y0+plotH/2).toFixed(1)}) rotate(-90)" text-anchor="middle" fill="${P.txt}" font-size="10" font-weight="600">${unit}</text>`;
+  if(band && band.lo!=null && band.hi!=null){ const yt=Y(band.hi), yb=Y(band.lo);
+    body+=`<rect x="${x0}" y="${yt.toFixed(1)}" width="${plotW}" height="${(yb-yt).toFixed(1)}" fill="${P.bandFill}" stroke="${P.bandStroke}" stroke-width="1" stroke-dasharray="4 4"/>`;
+    body+=`<text x="${x0+8}" y="${(yt+14).toFixed(1)}" fill="${P.bandTxt}" font-size="9.5" font-weight="600" font-family="'JetBrains Mono',monospace" letter-spacing=".3">TYPISCHER KORRIDOR</text>`; }
+  body+=`<line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="${P.base}" stroke-width="1"/>`;
+  labels.forEach((lb,i)=>{
+    const cx=x0+slot*i+slot/2, v=data[i];
+    if(v!=null){
+      const y=Y(v), h=Math.max(0,y1-y), isHl=lb===hl, isMed=lb==='Median';
+      const fill=isHl?`url(#${uid}hl)`:(isMed?`url(#${uid}med)`:`url(#${uid}neu)`);
+      const flt=isHl?` filter="url(#${uid}glow)"`:'';
+      body+=`<g style="transform-box:fill-box;transform-origin:center bottom;animation:${uid}grow .7s ${(0.15+i*0.07).toFixed(2)}s cubic-bezier(.2,.7,.2,1) both"><rect x="${(cx-bw/2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="7"${flt} fill="${fill}"><title>${lb}: ${_fmt(v)} ${unit}</title></rect><rect x="${(cx-bw/2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="3" rx="1.5" fill="rgba(255,255,255,${P.topHi})"/></g>`;
+      body+=`<text x="${cx.toFixed(1)}" y="${(y-9).toFixed(1)}" text-anchor="middle" fill="${isHl?P.goldTxt:P.txtStrong}" font-size="10.5" font-weight="700" font-family="'JetBrains Mono',monospace" opacity="0" style="animation:${uid}fade .4s ${(0.5+i*0.07).toFixed(2)}s ease forwards">${_fmt(v)}</text>`;
+      if(isHl && median!=null){
+        const dp=Math.round((v/median-1)*100), below=dp<=0, col=below?'#3FA56C':'#B86250';
+        const t2=(below?'':'+')+dp+' % ggü. Median', fw=18+t2.length*6.0, fx=Math.min(Math.max(cx-fw/2,x0),x1-fw), fy=y-52;
+        body+=`<g opacity="0" style="animation:${uid}fade .5s 1s ease forwards"><rect x="${fx.toFixed(1)}" y="${fy.toFixed(1)}" width="${fw.toFixed(1)}" height="19" rx="9.5" fill="${P.pillBg}" stroke="${col}" stroke-width="1.1"/><text x="${(fx+fw/2).toFixed(1)}" y="${(fy+13).toFixed(1)}" text-anchor="middle" fill="${col}" font-size="10" font-weight="700" font-family="'JetBrains Mono',monospace">${t2}</text><path d="M${cx.toFixed(1)},${(fy+19).toFixed(1)} l-4,6 l8,0 z" fill="${P.pillBg}" stroke="${col}" stroke-width="1.1"/></g>`;
+      }
+    }
+    body+=`<text x="${cx.toFixed(1)}" y="${y1+18}" text-anchor="middle" fill="${lb===hl?P.goldTxt:P.txt}" font-size="10.5" font-weight="${lb===hl?'600':'400'}" font-family="'Space Grotesk',sans-serif">${lb}</text>`;
+  });
+  if(median!=null){ const yy=Y(median);
+    body+=`<line x1="${x0}" y1="${yy.toFixed(1)}" x2="${x1}" y2="${yy.toFixed(1)}" stroke="${P.medLine}" stroke-width="1.2" stroke-dasharray="5 4"/>`;
+    const lbl='MEDIAN '+_fmt(median), pw=18+lbl.length*6.0;
+    body+=`<rect x="${(x1-pw).toFixed(1)}" y="${(yy-21).toFixed(1)}" width="${pw.toFixed(1)}" height="16" rx="8" fill="${P.pillBg}" stroke="${P.bandStroke}" stroke-width="1"/><text x="${(x1-8).toFixed(1)}" y="${(yy-10).toFixed(1)}" text-anchor="end" fill="${P.axisGold}" font-size="9.5" font-weight="700" font-family="'JetBrains Mono',monospace" letter-spacing=".3">${lbl}</text>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;overflow:visible;"><style>@keyframes ${uid}grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes ${uid}fade{to{opacity:1}}</style><defs>${defs}</defs>${body}</svg>`;
+}
+
 // --- Marktentwicklung (echte GeoMap-Historie) ---
 let histChart;
 function renderHistory(d) {
   const h = d.market_history;
   const title = $('histTitle'), note = $('histNote'), cv = $('histChart');
   const hasPrice = h && h.price && h.price.some((p) => p.median != null);
-  if (!h || !h.usable || !hasPrice) {
-    title.classList.add('hide'); cv.classList.add('hide'); note.classList.add('hide');
-    if (histChart) { histChart.destroy(); histChart = null; }
-    return;
-  }
+  if (!h || !h.usable || !hasPrice) { title.classList.add('hide'); cv.classList.add('hide'); note.classList.add('hide'); return; }
   title.classList.remove('hide'); cv.classList.remove('hide'); note.classList.remove('hide');
-  _ensureChartDefaults();
-  const labels = h.price.map((p) => p.year);
-  const goldFill = (ctx) => {
-    const ch = ctx.chart, ca = ch.chartArea;
-    if (!ca) return 'rgba(201,168,76,.10)';
-    const g = ch.ctx.createLinearGradient(0, ca.top, 0, ca.bottom);
-    g.addColorStop(0, 'rgba(201,168,76,.32)'); g.addColorStop(0.55, 'rgba(201,168,76,.10)'); g.addColorStop(1, 'rgba(201,168,76,0)');
-    return g;
-  };
-  const datasets = [{ label: 'Kaufpreis €/m²', data: h.price.map((p) => p.median),
-    borderColor: '#C9A84C', backgroundColor: goldFill, cubicInterpolationMode: 'monotone', tension: .35,
-    spanGaps: true, fill: true, borderWidth: 2.6, borderCapStyle: 'round', borderJoinStyle: 'round',
-    pointRadius: 0, pointBackgroundColor: '#C9A84C', pointBorderColor: '#0a0a0c', pointBorderWidth: 1.4,
-    pointHoverRadius: 6, pointHoverBackgroundColor: '#C9A84C', pointHoverBorderColor: '#0a0a0c', pointHoverBorderWidth: 2 }];
-  if (h.rent && h.rent.some((p) => p.median != null))
-    datasets.push({ label: 'Miete €/m²', data: h.rent.map((p) => p.median),
-      borderColor: '#A89F8E', backgroundColor: 'transparent', cubicInterpolationMode: 'monotone', tension: .35,
-      spanGaps: true, yAxisID: 'y1', borderWidth: 2.0, borderDash: [5, 4], borderCapStyle: 'round',
-      pointRadius: 0, pointBackgroundColor: '#A89F8E', pointBorderColor: '#0a0a0c', pointBorderWidth: 1.2,
-      pointHoverRadius: 5, pointHoverBackgroundColor: '#A89F8E', pointHoverBorderColor: '#0a0a0c', pointHoverBorderWidth: 2 });
-  if (histChart) histChart.destroy();
-  histChart = new Chart(cv, {
-    type: 'line', data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: true, devicePixelRatio: 2.6,
-      layout: { padding: { top: 8, right: 6, bottom: 2, left: 2 } },
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { position: 'top', align: 'end', labels: { color: '#9a9aa3', boxWidth: 8, usePointStyle: true, font: { family: "'Space Grotesk'", size: 11 } } },
-        tooltip: { backgroundColor: 'rgba(10,10,14,.96)', borderColor: 'rgba(201,168,76,.45)', borderWidth: 1,
-          titleColor: '#C9A84C', bodyColor: '#e8e8ea', padding: 11, cornerRadius: 9, displayColors: false,
-          titleFont: { family: "'Space Grotesk'", weight: '600', size: 12 }, bodyFont: { family: "'JetBrains Mono'", size: 11.5 },
-          callbacks: { label: (c) => c.dataset.label + ': ' + (c.parsed.y != null ? c.parsed.y.toLocaleString('de-DE') : '\u2013') } },
-      },
-      scales: {
-        x: { ticks: { color: '#8a8a93', font: { size: 10.5 } }, grid: { display: false }, border: { color: '#26262e' } },
-        y: { ticks: { color: '#8a8a93', font: { size: 10.5 }, padding: 6 }, grid: { color: 'rgba(255,255,255,.04)' }, border: { display: false },
-          title: { display: true, text: '€/m² Kauf', color: '#C9A84C', font: { size: 10.5, weight: '600' } } },
-        y1: { position: 'right', ticks: { color: '#A89F8E', font: { size: 10.5 } }, grid: { drawOnChartArea: false }, border: { display: false },
-          title: { display: true, text: '€/m² Miete', color: '#A89F8E', font: { size: 10.5, weight: '600' } } },
-      },
-    },
-  });
+  const host = _svgHost(cv);
+  const years = h.price.map((p) => p.year);
+  const priceS = h.price.map((p) => p.median);
+  const rentS = (h.rent && h.rent.some((p) => p.median != null)) ? h.rent.map((p) => p.median) : null;
+  const series = [{ name: 'Kaufpreis \u20ac/m\u00b2', vals: priceS, color: '#C9A84C', axis: 'L', fill: true }];
+  if (rentS) series.push({ name: 'Miete \u20ac/m\u00b2', vals: rentS, color: '#A89F8E', axis: 'R', dash: true });
+  host.innerHTML = _svgDualLine({ labels: years, series, leftTitle: '\u20ac/m\u00b2 KAUF', rightTitle: rentS ? '\u20ac/m\u00b2 MIETE' : null });
   const dom = d.market_dynamics && d.market_dynamics.days_on_market;
   const parts = [];
   if (h.price_cagr_pct != null) parts.push(`Preistrend: ${h.price_cagr_pct > 0 ? '+' : ''}${h.price_cagr_pct} %/Jahr seit ${h.start_year}`);
   if (h.rent_cagr_pct != null) parts.push(`Miettrend: ${h.rent_cagr_pct > 0 ? '+' : ''}${h.rent_cagr_pct} %/Jahr`);
-  if (dom != null) parts.push(`Ø Vermarktungsdauer: ${Math.round(dom)} Tage (Markttempo)`);
-  note.textContent = parts.join('   ·   ');
+  if (dom != null) parts.push(`\u00d8 Vermarktungsdauer: ${Math.round(dom)} Tage (Markttempo)`);
+  note.textContent = parts.join('   \u00b7   ');
 }
 
 // --- Lage & Infrastruktur (6 Gruppen) ---
@@ -687,34 +803,22 @@ async function renderObjectHistory(out) {
   const t = $('objHistTitle'), c = $('objHistChart'), note = $('objHistNote');
   if (!key) { [t, c, note].forEach((e) => e.classList.add('hide')); return; }
   let hist = [];
-  try {
-    const res = await fetch(API + '/objects/history?key=' + encodeURIComponent(key));
-    const j = await res.json();
-    hist = j.history || [];
-  } catch { return; }
+  try { const res = await fetch(API + '/objects/history?key=' + encodeURIComponent(key)); const j = await res.json(); hist = j.history || []; } catch { return; }
   if (hist.length < 2) {
     t.classList.remove('hide'); note.classList.remove('hide'); c.classList.add('hide');
-    note.textContent = 'Erster gespeicherter Stand. Der Marktwert-Verlauf wird ab dem nächsten Bericht für dieses Objekt sichtbar.';
+    note.textContent = 'Erster gespeicherter Stand. Der Marktwert-Verlauf wird ab dem n\u00e4chsten Bericht f\u00fcr dieses Objekt sichtbar.';
     return;
   }
   [t, c, note].forEach((e) => e.classList.remove('hide'));
-  _ensureChartDefaults();
+  const host = _svgHost(c);
   const labels = hist.map((h) => new Date(h.created_at).toLocaleDateString('de-DE'));
-  if (objHistChartObj) objHistChartObj.destroy();
-  objHistChartObj = new Chart(c.getContext('2d'), {
-    type: 'line',
-    data: { labels, datasets: [
-      { label: 'Marktwert €', data: hist.map((h) => h.market_value), borderColor: '#C9A84C', backgroundColor: 'rgba(201,168,76,.12)', yAxisID: 'y', tension: .35, fill: true, borderWidth: 2.4, pointRadius: 0, pointHoverRadius: 5 },
-      { label: 'Deal-Score', data: hist.map((h) => h.deal_score), borderColor: '#3FA56C', yAxisID: 'y1', tension: .35, borderWidth: 2.2, pointRadius: 0, pointHoverRadius: 5 },
-    ] },
-    options: { plugins: { legend: { labels: { color: '#9a9aa3', font: { size: 11 } } } },
-      scales: {
-        x: { ticks: { color: '#8a8a93' }, grid: { color: '#1c1c22' } },
-        y: { ticks: { color: '#8a8a93', callback: (v) => v.toLocaleString('de-DE') }, grid: { color: '#1c1c22' }, title: { display: true, text: 'Marktwert €', color: '#C9A84C' } },
-        y1: { position: 'right', min: 0, max: 100, ticks: { color: '#3FA56C' }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Score', color: '#3FA56C' } },
-      } },
-  });
-  note.textContent = hist.length + ' gespeicherte Stände · ältester ' + labels[0] + ', neuester ' + labels[labels.length - 1];
+  const mv = hist.map((h) => h.market_value);
+  const sc = hist.map((h) => h.deal_score);
+  host.innerHTML = _svgDualLine({ labels,
+    series: [ { name: 'Marktwert \u20ac', vals: mv, color: '#C9A84C', axis: 'L', fill: true },
+              { name: 'Deal-Score', vals: sc, color: '#3FA56C', axis: 'R' } ],
+    leftTitle: 'MARKTWERT \u20ac', rightTitle: 'SCORE', rightMin: 0, rightMax: 100 });
+  note.textContent = hist.length + ' gespeicherte St\u00e4nde \u00b7 \u00e4ltester ' + labels[0] + ', neuester ' + labels[labels.length - 1];
 }
 
 // --- .dpkt-Upload -> Bericht aus DealPilot-Objekt ---
@@ -855,67 +959,13 @@ function _ensureChartDefaults() {
 }
 
 function drawChart(sale, objSqm) {
-  _ensureChartDefaults();
-  const ctx = $('chart').getContext('2d');
-  if (chart) chart.destroy();
-  const stat = [
-    ['Minimum', sale.min_per_sqm], ['25 %-Quartil', sale.q25_per_sqm],
-    ['Median', sale.median_per_sqm], ['75 %-Quartil', sale.q75_per_sqm],
-    ['Maximum', sale.max_per_sqm], ['Dieses Objekt', objSqm],
-  ];
+  const host = _svgHost($('chart'));
+  const stat = [ ['Minimum', sale.min_per_sqm], ['25 %', sale.q25_per_sqm], ['Median', sale.median_per_sqm],
+    ['75 %', sale.q75_per_sqm], ['Maximum', sale.max_per_sqm], ['Dieses Objekt', objSqm] ];
   const labels = stat.map((s) => s[0]);
   const data = stat.map((s) => (s[1] != null ? Math.round(s[1]) : null));
   const median = sale.median_per_sqm != null ? Math.round(sale.median_per_sqm) : null;
-  // Gold-Verlauf fuers eigene Objekt, warmer Stein fuer die Verteilung, dunkles Gold fuer Median.
-  const bg = (c) => {
-    const s0 = stat[c.dataIndex] ? stat[c.dataIndex][0] : '';
-    const a = c.chart.chartArea;
-    if (s0 === 'Dieses Objekt' && a) {
-      const g = c.chart.ctx.createLinearGradient(0, a.bottom, 0, a.top);
-      g.addColorStop(0, '#a8842c'); g.addColorStop(1, '#E8CC7A'); return g;
-    }
-    return s0 === 'Median' ? '#9a7f33' : '#5A5350';
-  };
-  // Inline-Plugin: Wert-Labels ueber den Balken + gestrichelte Median-Linie.
-  const deco = {
-    id: 'mbDeco',
-    afterDatasetsDraw(ch) {
-      const x = ch.ctx, a = ch.chartArea, scales = ch.scales; if (!a) return;
-      const meta = ch.getDatasetMeta(0);
-      x.save();
-      x.font = "700 10.5px 'JetBrains Mono',monospace"; x.textAlign = 'center';
-      meta.data.forEach((bar, i) => {
-        const v = data[i]; if (v == null) return;
-        x.fillStyle = labels[i] === 'Dieses Objekt' ? '#E8CC7A' : '#b8b0a0';
-        x.fillText(v.toLocaleString('de-DE'), bar.x, bar.y - 7);
-      });
-      if (median != null && scales.y) {
-        const yy = scales.y.getPixelForValue(median);
-        x.strokeStyle = 'rgba(201,168,76,.6)'; x.lineWidth = 1; x.setLineDash([4, 4]);
-        x.beginPath(); x.moveTo(a.left, yy); x.lineTo(a.right, yy); x.stroke(); x.setLineDash([]);
-        x.fillStyle = '#C9A84C'; x.textAlign = 'right';
-        x.fillText('Median ' + median.toLocaleString('de-DE'), a.right - 2, yy - 5);
-      }
-      x.restore();
-    }
-  };
-  chart = new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets: [{ label: 'Kaufpreis \u20ac/m\u00b2', data, backgroundColor: bg, borderColor: bg, borderWidth: 0, borderRadius: 7, maxBarThickness: 66 }] },
-    options: {
-      layout: { padding: { top: 22 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: (c) => (c.parsed.y != null ? c.parsed.y.toLocaleString('de-DE') + ' \u20ac/m\u00b2' : '\u2013') } },
-      },
-      scales: {
-        x: { ticks: { color: '#8a8a93', font: { size: 11 } }, grid: { display: false }, border: { display: false } },
-        y: { ticks: { color: '#8a8a93', callback: (v) => v.toLocaleString('de-DE') }, grid: { color: 'rgba(255,255,255,.04)' }, border: { display: false },
-             title: { display: true, text: '\u20ac/m\u00b2', color: '#8a8a93' } },
-      },
-    },
-    plugins: [deco],
-  });
+  host.innerHTML = _svgBars({ labels, data, median, band: { lo: sale.q25_per_sqm != null ? Math.round(sale.q25_per_sqm) : null, hi: sale.q75_per_sqm != null ? Math.round(sale.q75_per_sqm) : null }, highlight: 'Dieses Objekt', unit: '\u20ac/m\u00b2' });
 }
 
 // Mini-Markdown -> HTML (Überschriften, Listen, fett). Bewusst klein gehalten.
