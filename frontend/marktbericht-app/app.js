@@ -46,6 +46,7 @@ async function generate() {
   btn.innerHTML = '<span class="spin"></span> erstelle…';
 
   const body = {
+    external_ref: (function(){ try{ var r=new URLSearchParams(location.search).get('ref'); return r||undefined; }catch(e){ return undefined; } })(), /* v895f-reportslist */
     address: $('address').value,
     property_type: $('ptype').value,
     usage_type: $('usage').value,
@@ -364,6 +365,8 @@ function render(out) {
   $('reportMd').innerHTML = mdToHtml(out.report_md || '');
   renderProvenance(out);
   window._lastOut = out;
+  try { _installMbSaveObject(); } catch (e) {}
+  try { if (out && out.object_key) _mbLoadReportsList({ key: out.object_key }); } catch (e) {}
   // Letzte Ausgabe lokal sichern (ohne grosse Karten) -> jederzeit gratis neu ladbar.
   try {
     const slim = Object.assign({}, out); delete slim._covMap; delete slim._lightMap;
@@ -419,21 +422,24 @@ function _arcPts(cx, cy, r, t0, t1, n) {
   return p.join(' ');
 }
 // Halbkreis-Tacho: Skala lo..hi, Farbzonen, Zeiger bei value (+ optional Marker)
-function svgGauge(value, lo, hi, opts) {
+function svgGauge(value, lo, hi, opts) { /*v895d-p1*/
   opts = opts || {};
   if (lo == null || hi == null || hi <= lo || value == null) return '';
   const cx = 110, cy = 104, r = 86, t = Math.max(0, Math.min(1, (value - lo) / (hi - lo)));
-  const zones = opts.zones || [[0, 0.34, '#3FA56C'], [0.34, 0.66, '#C9A84C'], [0.66, 1, '#B86250']];
+  const _l = (typeof _mbLight === 'function') ? _mbLight() : false;
+  const cNeedle = _l ? '#3a3630' : '#e8e8ea', cVal = _l ? '#2a2727' : '#e8e8ea', cCap = _l ? '#8a857c' : '#6a6a72', cLab = _l ? '#8a857c' : '#8a8a93';
+  const cMk = _l ? '#9a7d28' : '#E8E2D4', cMkS = _l ? '#ffffff' : '#0a0a0c';
+  const zones = opts.zones || [[0, 0.4, '#b8932f'], [0.4, 0.72, '#C9A84C'], [0.72, 1, '#E8CC7A']];
   const arcs = zones.map(([a, b, c]) => `<polyline points="${_arcPts(cx, cy, r, a, b, 16)}" fill="none" stroke="${c}" stroke-width="12" stroke-linecap="butt"/>`).join('');
   const w = Math.PI * (1 - t), nx = cx + (r - 8) * Math.cos(w), ny = cy - (r - 8) * Math.sin(w);
-  const needle = `<line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#e8e8ea" stroke-width="2.6" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="5" fill="#e8e8ea"/>`;
+  const needle = `<line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${cNeedle}" stroke-width="2.6" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="5" fill="${cNeedle}"/>`;
   let marker = '';
-  if (opts.marker != null) { const tm = Math.max(0, Math.min(1, (opts.marker - lo) / (hi - lo))), wm = Math.PI * (1 - tm); marker = `<circle cx="${(cx + r * Math.cos(wm)).toFixed(1)}" cy="${(cy - r * Math.sin(wm)).toFixed(1)}" r="5" fill="#E8E2D4" stroke="#0a0a0c" stroke-width="1.6"/>`; }
+  if (opts.marker != null) { const tm = Math.max(0, Math.min(1, (opts.marker - lo) / (hi - lo))), wm = Math.PI * (1 - tm); marker = `<circle cx="${(cx + r * Math.cos(wm)).toFixed(1)}" cy="${(cy - r * Math.sin(wm)).toFixed(1)}" r="5" fill="${cMk}" stroke="${cMkS}" stroke-width="1.6"/>`; }
   return `<svg viewBox="0 0 220 122" style="width:100%;max-width:230px;display:block;margin:0 auto;">${arcs}${marker}${needle}
-    <text x="${cx}" y="${cy - 12}" text-anchor="middle" fill="#e8e8ea" font-family="Space Grotesk" font-weight="700" font-size="19">${opts.valueText != null ? opts.valueText : value}</text>
-    ${opts.caption ? `<text x="${cx}" y="${cy + 13}" text-anchor="middle" fill="#6a6a72" font-size="9">${opts.caption}</text>` : ''}
-    <text x="20" y="119" text-anchor="middle" fill="#8a8a93" font-size="9.5">${opts.loLabel || ''}</text>
-    <text x="200" y="119" text-anchor="middle" fill="#8a8a93" font-size="9.5">${opts.hiLabel || ''}</text>
+    <text x="${cx}" y="${cy - 12}" text-anchor="middle" fill="${cVal}" font-family="Space Grotesk" font-weight="700" font-size="19">${opts.valueText != null ? opts.valueText : value}</text>
+    ${opts.caption ? `<text x="${cx}" y="${cy + 13}" text-anchor="middle" fill="${cCap}" font-size="9">${opts.caption}</text>` : ''}
+    <text x="20" y="119" text-anchor="middle" fill="${cLab}" font-size="9.5">${opts.loLabel || ''}</text>
+    <text x="200" y="119" text-anchor="middle" fill="${cLab}" font-size="9.5">${opts.hiLabel || ''}</text>
   </svg>`;
 }
 // Spannenbalken (HTML) mit Min/Median/Max + optionalem Marker
@@ -532,8 +538,7 @@ function renderValuation(d) {
     const lo = r.q25_per_sqm != null ? Math.round(r.q25_per_sqm * area) : null;
     const hi = r.q75_per_sqm != null ? Math.round(r.q75_per_sqm * area) : null;
     const gaugeM = (lo != null && hi != null)
-      ? svgGauge(est, lo, hi, { caption: 'Mietspanne', loLabel: lo + '€', hiLabel: hi + '€', valueText: euro(est),
-          zones: [[0, 0.34, '#B86250'], [0.34, 0.66, '#C9A84C'], [0.66, 1, '#3FA56C']] })
+      ? svgGauge(est, lo, hi, { caption: 'Mietspanne', loLabel: lo + '€', hiLabel: hi + '€', valueText: euro(est) }) /*v895e-goldmiete*/
       : '';
     mmInner = `<div class="cap">Marktmiete kalt (Monat)</div>
       ${gaugeM}
@@ -594,7 +599,7 @@ function rateClass(label, val) {
 }
 
 /* v895c-svgcharts : theme-aware Hochglanz-SVG-Diagramme (?theme=light|dark, Default dunkel, Hell=Weiss) */
-function _mbLight(){ try{ var t=new URLSearchParams(location.search).get('theme'); if(t==='light')return true; if(t==='dark')return false; }catch(e){} return false; }
+function _mbLight(){ try{ var a=document.documentElement.getAttribute('data-mb-theme'); if(a==='light')return true; if(a==='dark')return false; }catch(e){} try{ var t=new URLSearchParams(location.search).get('theme'); if(t==='light')return true; if(t==='dark')return false; }catch(e){} return false; }
 function _svgHost(el){ if(el&&el.tagName==='CANVAS'){ var d=document.createElement('div'); d.id=el.id; d.className=el.className; d.style.width='100%'; el.parentNode.replaceChild(d,el); return d; } return el; }
 function _fmt(v){ return (v==null||isNaN(v)) ? '\u2013' : Number(v).toLocaleString('de-DE'); }
 function _niceTicks(min,max,count){
@@ -855,6 +860,111 @@ $('dpktFile').addEventListener('change', async (e) => {
 // Eingabefelder aus einem DealPilot-Objekt vorbefuellen, damit sichtbar ist, was geladen wurde.
 // Task 6: geladenen Bericht (Replay/.dpkt/Generate) in die Eingabefelder spiegeln,
 // damit immer sichtbar ist, um WELCHES Objekt es geht.
+/* v895d-saveobj: Marktbericht -> Portfolio-Objekt (POST /objects mit ji_token, same-origin) */
+var _mbObjartMap = { ETW:'etw', EFH:'efh', MFH:'mfh', DHH:'dhh', RH:'rh', BUERO:'gewerbe', GESCH:'gewerbe', HOTEL:'gewerbe', GEW:'gewerbe', GAR:'garage' };
+function _mbParseAddr(a) {
+  a = (a || '').trim(); var str='', hnr='', plz='', ort='';
+  var parts = a.split(','); var p0 = (parts[0] || '').trim();
+  var m = p0.match(/^(.*?)\s+(\d+\s*[a-zA-Z]?)$/);
+  if (m) { str = m[1].trim(); hnr = m[2].replace(/\s+/g, ''); } else { str = p0; }
+  var rest = parts.slice(1).join(',').trim();
+  var mp = rest.match(/(\d{5})\s+(.+)/);
+  if (mp) { plz = mp[1]; ort = mp[2].trim(); } else if (rest) { ort = rest; }
+  return { str: str, hnr: hnr, plz: plz, ort: ort };
+}
+function _mbBuildObjData() {
+  var val = function (id) { var el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; };
+  var a = _mbParseAddr(val('address')); var ptype = val('ptype');
+  var data = {
+    plz: a.plz, ort: a.ort, str: a.str, hnr: a.hnr,
+    objart: _mbObjartMap[ptype] || 'etw',
+    wfl: val('area'), baujahr: val('year'), zimmer: val('rooms'), etage: val('floor'),
+    gsfl: val('plot'), einheiten: val('units'),
+    kp: val('price'), nkm: val('rent'),
+    ds2_energie: (val('energy') || '').toUpperCase(),
+    _mb_source: 'marktbericht'
+  };
+  Object.keys(data).forEach(function (k) { if (data[k] == null || data[k] === '') delete data[k]; });
+  return data;
+}
+async function _mbSaveAsObject(btn) {
+  var tok = ''; try { tok = localStorage.getItem('ji_token') || ''; } catch (e) {}
+  if (!tok) { alert('Bitte zuerst im DealPilot-Cockpit einloggen, dann erneut speichern.'); return; }
+  var data = _mbBuildObjData();
+  if (!data.str && !data.ort) { alert('Bitte zuerst eine Adresse eingeben.'); return; }
+  var aiText = null; try { var o = window._lastOut; if (o && o.report_md) aiText = o.report_md; } catch (e) {}
+  var old = btn.textContent; btn.textContent = 'Speichere…'; btn.disabled = true;
+  try {
+    var res = await fetch('/api/v1/objects', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
+      body: JSON.stringify({ data: data, aiAnalysis: aiText, photos: [] })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    await res.json();
+    btn.textContent = '\u2713 Im Portfolio gespeichert'; btn.disabled = true;
+  } catch (e) {
+    try { console.error('[mb saveObj]', e); } catch (_) {}
+    btn.textContent = 'Fehler \u2014 erneut?'; btn.disabled = false;
+    setTimeout(function () { btn.textContent = old; }, 2600);
+  }
+}
+function _installMbSaveObject() {
+  var anchor = document.getElementById('saveFileBtn');
+  if (!anchor || document.getElementById('mbSaveObjBtn')) return;
+  var b = document.createElement('button'); b.id = 'mbSaveObjBtn'; b.type = 'button'; b.textContent = '\u2605 Als Objekt speichern';
+  b.style.cssText = 'flex:1 1 100%;min-width:104px;margin-bottom:8px;border:none;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#1a1508;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);';
+  b.addEventListener('click', function () { _mbSaveAsObject(b); });
+  anchor.parentNode.insertBefore(b, anchor);
+}
+/* v895f-reportslist: Liste vorhandener Marktberichte zu diesem Objekt (links) + Abruf via /reports/one */
+function _mbFmtDate(s){ try{ var d=new Date(s); return d.toLocaleDateString('de-DE')+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return s||''; } }
+function _mbEnsureReportsPanel(){
+  var p=document.getElementById('mbReportsPanel'); if(p) return p;
+  var panels=document.querySelectorAll('.panel'), target=null;
+  for(var i=0;i<panels.length;i++){ var h=panels[i].querySelector('h1'); if(h && /Objekt eingeben/i.test(h.textContent)){ target=panels[i]; break; } }
+  if(!target) return null;
+  if(!document.getElementById('mbReportsStyle')){
+    var st=document.createElement('style'); st.id='mbReportsStyle';
+    st.textContent='#mbReportsPanel .mbrep-h{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#9a7d28;margin-bottom:8px}'
+     +'#mbReportsPanel .mbrep-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid rgba(201,168,76,.18)}'
+     +'#mbReportsPanel .mbrep-date{font-size:12.5px;color:#4a443c}'
+     +'#mbReportsPanel .mbrep-act{display:flex;gap:6px}'
+     +'#mbReportsPanel button{border:1px solid #C9A84C;background:transparent;color:#9a7d28;border-radius:999px;padding:4px 12px;font-size:11.5px;font-weight:600;cursor:pointer}'
+     +'#mbReportsPanel .mbrep-pdf{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1508;border:none}';
+    document.head.appendChild(st);
+  }
+  p=document.createElement('div'); p.className='panel'; p.id='mbReportsPanel'; p.style.display='none';
+  target.parentNode.insertBefore(p, target);
+  return p;
+}
+async function _mbOpenReport(rid, asPdf){
+  try{
+    var res=await fetch(API + '/reports/one?id=' + encodeURIComponent(rid));
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    var out=await res.json(); render(out);
+    if(asPdf){ try{ await exportPdf(out); }catch(e){ alert('PDF-Fehler: '+e.message); } }
+    else { try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(_){ } }
+  }catch(e){ alert('Bericht konnte nicht geladen werden: '+e.message); }
+}
+async function _mbLoadReportsList(opts){
+  opts=opts||{};
+  var qs=opts.key?('key='+encodeURIComponent(opts.key)):(opts.ref?('ref='+encodeURIComponent(opts.ref)):null);
+  if(!qs) return;
+  var host=_mbEnsureReportsPanel(); if(!host) return;
+  try{
+    var res=await fetch(API + '/objects/history?' + qs); var j=await res.json();
+    var reps=((j&&j.history)||[]).filter(function(h){ return h && h.report_id!=null; });
+    if(!reps.length){ host.style.display='none'; host.innerHTML=''; return; }
+    reps.sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); });
+    var rows=reps.map(function(h){ return '<div class="mbrep-row"><span class="mbrep-date">'+_mbFmtDate(h.created_at)+'</span>'
+      +'<span class="mbrep-act"><button type="button" class="mbrep-view" data-rid="'+h.report_id+'">Ansehen</button>'
+      +'<button type="button" class="mbrep-pdf" data-rid="'+h.report_id+'">PDF</button></span></div>'; }).join('');
+    host.innerHTML='<div class="mbrep-h">Vorhandene Marktberichte ('+reps.length+')</div>'+rows; host.style.display='';
+    host.querySelectorAll('.mbrep-view').forEach(function(b){ b.addEventListener('click',function(){ _mbOpenReport(b.getAttribute('data-rid'),false); }); });
+    host.querySelectorAll('.mbrep-pdf').forEach(function(b){ b.addEventListener('click',function(){ _mbOpenReport(b.getAttribute('data-rid'),true); }); });
+  }catch(e){ try{ console.warn('[mb reportslist]',e); }catch(_){ } }
+}
+
 function fillInputsFromReport(out) {
   const ref = out && out.data && out.data.ref;
   if (!ref) return;
@@ -976,7 +1086,7 @@ function mdToHtml(md) {
   let html = '', inList = false;
   for (let raw of lines) {
     let line = raw.trimEnd();
-    if (/^#\s+/.test(line)) { html += closeL(); html += '<h1>' + inline(esc(line.replace(/^#\s+/, ''))) + '</h1>'; continue; }
+    if (/^#\s+/.test(line)) { html += closeL(); html += '<h1>' + inline(esc(line.replace(/^#\s+/, '').replace(/^[A-Z]\d?\)\s*/, ''))) + '</h1>'; continue; }
     if (/^##\s+/.test(line)) { html += closeL(); html += '<h2>' + inline(esc(line.replace(/^##\s+/, '').replace(/^[A-Z]\d?\)\s*/, ''))) + '</h2>'; continue; }
     if (/^[-*]\s+/.test(line)) { if (!inList) { html += '<ul>'; inList = true; } html += '<li>' + inline(esc(line.replace(/^[-*]\s+/, ''))) + '</li>'; continue; }
     html += closeL();
@@ -2645,3 +2755,9 @@ function mdToPdfLines(md) {
 })();
 
 /* v570-prog */
+
+/* v895f-reportslist: beim Laden Berichte-Liste ziehen, wenn ?ref uebergeben wurde */
+try { (function () { var _r; try { _r = new URLSearchParams(location.search).get('ref'); } catch (e) {}
+  if (_r) { if (document.readyState !== 'loading') { try { _mbLoadReportsList({ ref: _r }); } catch (e) {} }
+    else document.addEventListener('DOMContentLoaded', function () { try { _mbLoadReportsList({ ref: _r }); } catch (e) {} }); }
+})(); } catch (e) {}

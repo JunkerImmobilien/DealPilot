@@ -175,7 +175,9 @@ async function callOpenAI(payload, opts = {}) {
       '\n\n---\nERZEUGE JETZT AUSSCHLIESSLICH DIESE KAPITEL – in genau dieser Reihenfolge und ' +
       'mit exakt diesen Markdown-Ueberschriften. Keine weiteren Kapitel, keine Vorrede, ' +
       'kein Codeblock drumherum. Schreibe jedes Kapitel als zusammenhaengenden Fliesstext ' +
-      'gemaess den Laengen-/Stilvorgaben im System-Prompt (mehrere Saetze, KEINE Stichpunkte, ' +
+      /* v895f-kurz */
+      'DEUTLICH KUERZER als ueblich \u2014 hoechstens 4-6 Saetze pro Kapitel, insgesamt etwa halb so lang. ' +
+      'Jede Aussage nur EINMAL (keine Wiederholungen; jede Ueberschrift nur einmal verwenden). KEINE Stichpunkte, ' +
       'KEINE Score-Zahlen wie "85/100" im Text, Zahlen in den Text einweben):\n' + headings + extra;
     const md = await callOneGroup(userMsg);
     onStep(`report: "${g.titel}" fertig`);
@@ -207,7 +209,7 @@ async function callOneGroup(userMsg) {
   ];
   const isNewModel = /^(gpt-5|o\d|gpt-4\.1)/.test(cfg.ai.model || '');
   const isReasoningModel = /^(gpt-5|o\d)/.test(cfg.ai.model || ''); // 4.1-Familie kennt KEIN reasoning_effort
-  const maxTok = parseInt(process.env.OPENAI_MAX_TOKENS_PER_GROUP || '3500', 10);
+  const maxTok = parseInt(process.env.OPENAI_MAX_TOKENS_PER_GROUP || '1800', 10); /* v895f-kurz */
   // 'low' ist bei gpt-5.5 gueltig ('minimal' NICHT -> 400). Erlaubt: none|low|medium|high|xhigh.
   const effortEnv = (process.env.OPENAI_REASONING_EFFORT || 'low').trim().toLowerCase();
 

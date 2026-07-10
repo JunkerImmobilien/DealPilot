@@ -107,6 +107,8 @@
         '<div class="dab-smart-body">' + docs + '</div>' +
       '</div></div>' +
 
+      band('doc', 'Marktberichte', 'Erzeugte Berichte als PDF') +
+      '<div class="dab-panel"><div id="dab-mb-host" class="dab-mb-host"><div class="dab-mb-empty">L\u00e4dt \u2026</div></div></div>' +
       '<div id="dab-uew-slot"></div>' +
 
       band('doc2', 'Bordkarte &amp; Unterlagen', 'Bankgespr\u00e4ch vorbereiten') +
@@ -724,6 +726,7 @@
     } catch (e) {}
     try { if (typeof window._dpDealShareRefresh === 'function') setTimeout(window._dpDealShareRefresh, 350); } catch (e) {}
     try { loadNetwork(); } catch (e) {}
+    try { mountMarktberichte(); } catch (e) {}
   }
 
   function injectCss() {
@@ -752,6 +755,68 @@
     window.open(u, '_blank', 'noopener');
   }
 
+  /* v895g-mbreports: Marktberichte je Objekt in Deal-Aktion + PDF aus report_md (jsPDF) */
+  function _mbReportPdf(reportMd, meta) {
+    var NS = window.jspdf || window.jsPDF || {};
+    var JS = NS.jsPDF || NS;
+    var doc = new JS({ unit: 'pt', format: 'a4' });
+    var W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+    var m = 48, y = m, maxw = W - 2 * m;
+    function nl(h) { y += h; if (y > H - m) { doc.addPage(); y = m; } }
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(30, 30, 30);
+    doc.text('Marktbericht', m, y); nl(20);
+    if (meta && meta.date) { doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 120, 120); doc.text(meta.date, m, y); nl(18); }
+    String(reportMd || 'Kein Berichtstext.').replace(/\r/g, '').split('\n').forEach(function (ln) {
+      ln = ln.replace(/\*\*/g, '').replace(/^\s*[-*]\s+/, '\u2022 ');
+      var h1 = ln.match(/^#\s+(.*)/), h2 = ln.match(/^##\s+(.*)/), h3 = ln.match(/^###\s+(.*)/);
+      if (h1) { nl(8); doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(154, 125, 40); doc.text(h1[1].replace(/^[A-Z]\d?\)\s*/, ''), m, y); nl(18); return; }
+      if (h2) { nl(6); doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setTextColor(60, 60, 60); doc.text(h2[1].replace(/^[A-Z]\d?\)\s*/, ''), m, y); nl(15); return; }
+      if (h3) { doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(80, 80, 80); doc.text(h3[1], m, y); nl(14); return; }
+      if (!ln.trim()) { nl(7); return; }
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(40, 40, 40);
+      doc.splitTextToSize(ln, maxw).forEach(function (w) { doc.text(w, m, y); nl(13.5); });
+    });
+    return doc;
+  }
+  function _mbInjectCss() {
+    if (document.getElementById('dab-mb-css')) return;
+    var st = document.createElement('style'); st.id = 'dab-mb-css';
+    st.textContent = '#s8 .dab-mb-host{padding:6px 2px}#s8 .dab-mb-empty{color:#8a8378;font-size:13px;padding:8px 2px}'
+      + '#s8 .dab-mb-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 2px;border-top:1px solid rgba(201,168,76,.16)}'
+      + '#s8 .dab-mb-row:first-child{border-top:none}#s8 .dab-mb-d{font-weight:600;color:#2c2822;font-size:13.5px}'
+      + '#s8 .dab-mb-mv{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#9a7f33}';
+    document.head.appendChild(st);
+  }
+  async function mountMarktberichte() {
+    var host = document.getElementById('dab-mb-host'); if (!host) return;
+    _mbInjectCss();
+    var id = currentObjId();
+    if (!id) { host.innerHTML = '<div class="dab-mb-empty">Kein Objekt aktiv.</div>'; return; }
+    host.innerHTML = '<div class="dab-mb-empty">Marktberichte werden geladen \u2026</div>';
+    try {
+      var t = token(); var res = await fetch('/api/v1/marktbericht/objects/history?ref=' + encodeURIComponent(id), { headers: t ? { Authorization: 'Bearer ' + t } : {} });
+      var j = await res.json();
+      var reps = ((j && j.history) || []).filter(function (h) { return h && h.report_id != null; });
+      if (!reps.length) { host.innerHTML = '<div class="dab-mb-empty">Noch keine Marktberichte f\u00fcr dieses Objekt \u2014 im Bewertung-Tab einen erstellen.</div>'; return; }
+      reps.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+      host.innerHTML = reps.map(function (h) {
+        var d = new Date(h.created_at); var ds = d.toLocaleDateString('de-DE') + ' ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        var mv = h.market_value ? new Intl.NumberFormat('de-DE').format(Math.round(h.market_value)) + ' \u20ac' : '';
+        return '<div class="dab-mb-row"><div><div class="dab-mb-d">' + ds + '</div><div class="dab-mb-mv">' + mv + '</div></div>'
+          + '<button class="dab-doc-btn gold" onclick="DealActionBoarding.downloadReport(' + (h.report_id | 0) + ')">' + ICO.dl + 'PDF</button></div>';
+      }).join('');
+    } catch (e) { host.innerHTML = '<div class="dab-mb-empty">Konnte Marktberichte nicht laden.</div>'; }
+  }
+  async function downloadReport(rid) {
+    try {
+      var t = token(); var res = await fetch('/api/v1/marktbericht/reports/one?id=' + encodeURIComponent(rid), { headers: t ? { Authorization: 'Bearer ' + t } : {} });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var out = await res.json();
+      var doc = _mbReportPdf(out.report_md, {});
+      doc.save('Marktbericht.pdf');
+    } catch (e) { alert('Marktbericht-PDF fehlgeschlagen: ' + e.message); }
+  }
+
   window.DealActionBoarding = {
     linkOut: linkOut,
     buildTop: buildTop,
@@ -766,7 +831,8 @@
     closeSheet: closeSheet,
     fixReq: fixReq,
     toggleCustomDoc: toggleCustomDoc,
-    partnerInterest: partnerInterest
+    partnerInterest: partnerInterest,
+    downloadReport: downloadReport
   };
 
   /* ────────────────── Styles ────────────────── */

@@ -441,6 +441,20 @@ router.get('/reports/replay', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// GET /reports/one?id=<report_id> — EINEN gespeicherten Bericht per market_reports.id holen. /* v895g-reportbyid */
+// MUSS vor /reports/:propertyId stehen, sonst faengt die :propertyId-Route es ab.
+router.get('/reports/one', async (req, res) => {
+  try {
+    const id = parseInt(req.query.id, 10);
+    if (!id) return res.status(400).json({ error: 'id erforderlich' });
+    const r = await q1('SELECT id, property_id, ai_mode, payload, report_md FROM mb.market_reports WHERE id = $1', [id]);
+    if (!r) return res.status(404).json({ error: 'kein Bericht (id=' + id + ')' });
+    let data = r.payload;
+    if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) {} }
+    res.json({ data: data, report_md: r.report_md, ai_mode: r.ai_mode, report_id: r.id, _replay: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // GET /reports/:propertyId — letzten Bericht zu einem Objekt holen
 router.get('/reports/:propertyId', async (req, res) => {
   const r = await q1(
