@@ -850,7 +850,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     document.addEventListener('click', function(e){ var b=e.target.closest&&e.target.closest('#mb-board-save'); if(b){ e.preventDefault(); mbSave(); } var a=e.target.closest&&e.target.closest('[data-avm]'); if(a){ e.preventDefault(); mbAvm(a.getAttribute('data-avm')); } });
     if(typeof window.go==='function' && !window.__mobGoWrapped){
       var _og=window.go;
-      window.go=function(name){ if(name==='boarding-result'){ try{ var _l=mbCompute(); if(!_l) return; }catch(e){} } var r=_og.apply(this,arguments); if(name==='detail'){ try{ fillDetail(window.__mobSel); }catch(e){} } if(name==='boarding-result'){ try{ mbFillResult(window.__mbLast); }catch(e){} } if(name==='markt'){ try{ mkPrefill(); }catch(e){} } return r; };
+      window.go=function(name){ if(name==='boarding-result'){ try{ var _l=mbCompute(); if(!_l) return; }catch(e){} } var r=_og.apply(this,arguments); if(name==='detail'){ try{ fillDetail(window.__mobSel); }catch(e){} try{ window.__detRow=window.__mobSel; _detFlipRender(); }catch(e){} } if(name==='boarding-result'){ try{ mbFillResult(window.__mbLast); }catch(e){} } if(name==='markt'){ try{ mkPrefill(); }catch(e){} } return r; };
       window.__mobGoWrapped=true;
     }
   }
@@ -936,6 +936,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     var btn=document.getElementById('mb-board-save'); if(btn){ btn.disabled=true; }
     var _mp=(window.__mbPhotos||[]).slice(); if(window.__mbEditPhotos&&window.__mbEditPhotos.length) _mp=_mp.concat(window.__mbEditPhotos);
     if(_mp.length){ data._thumb=(window.__mbThumb||_mp[0]); }
+    var _nz=(document.getElementById('mb_notizen')||{}).value||''; if(_nz.trim()) data.notizen=_nz.trim(); else if(window.__mbEditId) data.notizen='';
     var _ise=!!window.__mbEditId; var _pth=_ise?('/objects/'+window.__mbEditId):'/objects'; var _mth=_ise?'PUT':'POST';
     A().apiCall(_pth,{method:_mth,body:{data:data, aiAnalysis:null, photos:_mp}}).then(function(saved){
       mobToast('\u2713 '+(window.__mbEditId?'Objekt aktualisiert':'Objekt an Bord')+': '+(data.kuerzel||''));
@@ -1079,7 +1080,8 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
       var ex=(data&&data.extracted)?data.extracted:(data||{});
       applyExtractToBoarding(ex);
       pdfHide();
-      if(typeof window.go==='function') window.go('boarding');
+      if(window.__qc&&window.__qc.on){ _qcStep(); }
+      else if(typeof window.go==='function') window.go('boarding');
       mobToast('Eckdaten aus Expos\u00e9 \u00fcbernommen \u2014 pr\u00fcfen & Boarding starten.');
     }catch(err){
       var m=(err&&err.message)||'Fehler';
@@ -1351,6 +1353,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
       var kb=document.querySelector('[data-view="voice"] .cta .ke'); if(kb) kb.textContent=n+' Felder';
       _vScreenActive=false;
       try{ loadKerosin(); }catch(e){}
+      if(window.__qc&&window.__qc.on){ setTimeout(function(){ try{_qcStep();}catch(e){} },900); }
     }).catch(function(err){
       var s=err&&err.status;
       _vStatus((s===402||s===403)?'Nicht genug Kerosin (1\u00a0L)':(s===401?'Nicht eingeloggt':(s===502?'KI nicht erreichbar':'Auswertung fehlgeschlagen')));
@@ -1368,7 +1371,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
   // data-Feld -> mb_-Input (Umkehrung des mbSave-Mappings)
   var MB_LOAD = {str:'mb_str',hnr:'mb_hnr',plz:'mb_plz',ort:'mb_ort',objart:'mb_objart',wfl:'mb_wfl',
     baujahr:'mb_bj',kp:'mb_kp',nkm:'mb_nkm',ze:'mb_ze',ek:'mb_ek',hg_ul:'mb_hg',hg_nul:'mb_hgsplit',
-    d1z:'mb_zins',d1t:'mb_tilg',ji_p:'mb_knk'};
+    d1z:'mb_zins',d1t:'mb_tilg',ji_p:'mb_knk',notizen:'mb_notizen'};
   function _mbSetF(mbId,v){ var e=document.getElementById(mbId); if(!e||v==null||String(v).trim()==='')return;
     var raw=v; if(typeof v==='number'&&!Number.isInteger(v)) raw=String(v).replace('.',','); e.value=String(raw); }
   function _mbLoadInto(data){ if(!data)return; for(var k in MB_LOAD){ if(Object.prototype.hasOwnProperty.call(MB_LOAD,k)&&data[k]!=null) _mbSetF(MB_LOAD[k],data[k]); } }
@@ -1561,10 +1564,408 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     var checked={}; [].slice.call(document.querySelectorAll('#immo-fields .immo-cb')).forEach(function(cb){ if(cb.checked) checked[cb.getAttribute('data-k')]=true; });
     var n=0;
     IMO_ORDER.forEach(function(k){ if(checked[k] && dp[k]!=null && IMO_MAP[k]){ var e=document.getElementById(IMO_MAP[k]); if(e){ e.value=String(dp[k]); n++; } } });
-    if(typeof window.go==='function') window.go('boarding');
+    if(window.__qc&&window.__qc.on){ _qcStep(); }
+    else if(typeof window.go==='function') window.go('boarding');
     mobToast('\u2713 '+n+' Feld'+(n===1?'':'er')+' aus ImmoMetrica \u00fcbernommen.');
   }
   // MA23:end
+
+  // MA24:start \u2014 kombinierter QuickCheck-Flow (Chips + Abrufen) + Profil-Einstellung
+  window.__qc = window.__qc || {queue:[], on:false};
+  window.__qcSel = window.__qcSel || {};
+  // Kachel-Key -> {order, label, go}
+  var QC_SRC = {
+    'import-pdf':{k:'expose', order:1, label:'Expos\u00e9'},
+    'voice':{k:'voice', order:2, label:'Sprache'},
+    'import-immo':{k:'immo', order:3, label:'ImmoMetrica'},
+    'markt':{k:'dealpilot', order:4, label:'DealPilot Markteinsch\u00e4tzung'}
+  };
+  var QC_ORDER=['expose','voice','immo','dealpilot'];
+  function _qcSaveDefault(){ try{ var on=[]; for(var g in QC_SRC){ if(window.__qcSel[QC_SRC[g].k]) on.push(QC_SRC[g].k); } localStorage.setItem('dp_qb_sources', on.join(',')); }catch(e){} }
+  function _qcLoadDefault(){ try{ var s=(localStorage.getItem('dp_qb_sources')||'').split(',').filter(Boolean); s.forEach(function(k){ window.__qcSel[k]=true; }); }catch(e){} }
+
+  function _qcTiles(){ return [].slice.call(document.querySelectorAll('[data-view="hub"] .act[data-go]')).filter(function(t){ return QC_SRC[t.getAttribute('data-go')]; }); }
+  function _qcMeta(key){ for(var g in QC_SRC){ if(QC_SRC[g].k===key) return QC_SRC[g]; } return null; }
+  function _qcSync(){
+    _qcTiles().forEach(function(t){ var key=t.getAttribute('data-goqc')||_qcTileKey(t); var meta=_qcMeta(key); if(!meta) return;
+      var on=!!window.__qcSel[meta.k];
+      t.style.position='relative';
+      var led=t.querySelector('.led');
+      if(!led){ led=document.createElement('span'); led.className='led'; t.insertBefore(led, t.firstChild); }
+      led.style.background=on?'var(--green,#3FA56C)':'rgba(255,255,255,.16)';
+      led.style.boxShadow=on?'0 0 8px 1px rgba(63,165,108,.75)':'none';
+      t.style.outline=on?'1.5px solid var(--gold-hi)':''; t.style.outlineOffset=on?'-1px':'';
+      var b=t.querySelector('.qc-check'); if(b) b.remove();
+    });
+    var n=0; for(var g in QC_SRC){ if(window.__qcSel[QC_SRC[g].k]) n++; }
+    var bar=document.getElementById('qc-run-bar'); if(bar){ bar.style.display=n?'block':'none'; var lb=document.getElementById('qc-run-lbl'); if(lb) lb.textContent='Abrufen \u00b7 '+n+' Quelle'+(n===1?'':'n'); }
+  }
+  function installQuickCheck(){
+    var hub=document.querySelector('[data-view="hub"] .pad'); if(!hub) return;
+    _qcLoadDefault();
+    // Kacheln auswaehlbar machen (statt Direkt-Navigation)
+    _qcTiles().forEach(function(t){ if(t.__qc24) return; t.__qc24=1; t.setAttribute('data-go','');
+      t.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); var meta=QC_SRC[t.getAttribute('data-goqc')]; if(!meta) return;
+        window.__qcSel[meta.k]=!window.__qcSel[meta.k]; _qcSaveDefault(); _qcSync(); },true);
+      t.setAttribute('data-goqc', _qcTileKey(t)); });
+    // Abrufen-Leiste (einmal)
+    if(!document.getElementById('qc-run-bar')){
+      var bar=document.createElement('div'); bar.id='qc-run-bar'; bar.style.cssText='display:none;position:sticky;bottom:0;margin:14px -2px 0;padding:12px 0';
+      bar.innerHTML='<button id="qc-run" style="width:100%;background:var(--runway);color:#1a1407;font-family:var(--disp);font-weight:700;font-size:15px;border:none;border-radius:13px;padding:14px;cursor:pointer;box-shadow:0 8px 24px -10px rgba(201,168,76,.6)"><span id="qc-run-lbl">Abrufen</span> \u2192</button>';
+      hub.appendChild(bar);
+      document.getElementById('qc-run').addEventListener('click', mbQcStart);
+    }
+    _qcSync();
+  }
+  function _qcTileKey(t){ // data-go wurde geleert -> Key aus Label/Icon rekonstruieren via urspruenglicher Reihenfolge
+    var nm=(t.querySelector('.nm')||{}).textContent||'';
+    if(/Expos/i.test(nm)) return 'import-pdf'; if(/Sprache/i.test(nm)) return 'voice';
+    if(/ImmoMetrica/i.test(nm)) return 'import-immo'; if(/Markt/i.test(nm)) return 'markt'; return '';
+  }
+
+  function mbQcStart(){
+    var sel=[]; QC_ORDER.forEach(function(k){ if(window.__qcSel[k]) sel.push(k); });
+    if(!sel.length){ mobToast('Bitte mind. eine Quelle w\u00e4hlen.'); return; }
+    window.__qc={queue:sel.slice(), on:true};
+    mobToast('Abruf gestartet \u2014 '+sel.length+' Quelle'+(sel.length===1?'':'n')+'.');
+    _qcStep();
+  }
+  function _qcStep(){
+    if(!window.__qc||!window.__qc.on) return;
+    if(!window.__qc.queue.length){ window.__qc.on=false;
+      if(typeof window.go==='function') window.go('boarding');
+      mobToast('\u2713 Alle Quellen abgerufen \u2014 Boarding starten.'); return; }
+    var k=window.__qc.queue.shift();
+    if(k==='expose'){ if(typeof window.go==='function') window.go('import-pdf'); mobToast('Expos\u00e9: PDF w\u00e4hlen.'); }
+    else if(k==='voice'){ if(typeof mbVoiceOpen==='function') mbVoiceOpen(); else _qcStep(); }
+    else if(k==='immo'){ if(typeof mbImmoOpen==='function') mbImmoOpen(); else _qcStep(); }
+    else if(k==='dealpilot'){ _qcDealPilot(); }
+    else { _qcStep(); }
+  }
+  function _qcVal(id){ var e=document.getElementById(id); return e?(e.value||'').trim():''; }
+  function _qcNum(id){ var v=_qcVal(id).replace(/\./g,'').replace(',','.'); var n=parseFloat(v); return isFinite(n)?n:null; }
+  function _qcDealPilot(){
+    var inputs={ plz:_qcVal('mb_plz'), ort:_qcVal('mb_ort'), str:_qcVal('mb_str'), hnr:_qcVal('mb_hnr'),
+      objektart:_qcVal('mb_objart'), wfl:_qcNum('mb_wfl'), baujahr:_qcNum('mb_bj') };
+    var kp=_qcNum('mb_kp'); if(kp!=null) inputs.kp=kp;
+    var miss=['plz','ort','objektart','wfl'].filter(function(f){ return !inputs[f]||String(inputs[f]).trim()===''; });
+    if(miss.length){ mobToast('DealPilot Markteinsch\u00e4tzung: erst Adresse/Wohnfl\u00e4che erfassen.'); _qcStep(); return; }
+    mobToast('DealPilot Markteinsch\u00e4tzung l\u00e4uft \u2026');
+    A().apiCall('/avm/dealpilot',{method:'POST',body:{inputs:inputs, objectId:(window.__mobSel&&window.__mobSel.it)?window.__mobSel.it.id:null}}).then(function(data){
+      var r=data&&data.result; window.__qcMarkt=r||null;
+      if(r&&r.marktwert!=null){ mobToast('\u2713 Marktwert \u2248 '+new Intl.NumberFormat('de-DE').format(Math.round(r.marktwert))+' \u20ac'); }
+      if(data&&data.mode!=='stub'){ try{ loadKerosin(); }catch(e){} }
+      _qcStep();
+    }).catch(function(err){
+      mobToast('Markteinsch\u00e4tzung fehlgeschlagen'+((err&&err.status===402)?' (Kerosin)':'')); _qcStep();
+    });
+  }
+
+  // Profil: Quickboarding-Standard-Auswahl
+  function installQcSettings(){
+    var pv=document.querySelector('[data-view="profil"]'); if(!pv) return;
+    var pad=pv.querySelector('.pad'); if(!pad || document.getElementById('qc-settings')) return;
+    _qcLoadDefault();
+    var box=document.createElement('div'); box.id='qc-settings'; box.style.cssText='margin-top:14px';
+    box.innerHTML='<div class="lbl-sec" style="margin-bottom:8px">Quickboarding \u2014 Standard-Quellen</div>'
+      +'<div style="color:var(--mut);font-size:11px;font-family:var(--mono);margin-bottom:8px">Diese Quellen sind im QuickCheck vorausgew\u00e4hlt.</div>'
+      +'<div id="qc-set-list"></div>';
+    pad.appendChild(box);
+    var list=document.getElementById('qc-set-list');
+    var items=[['expose','Expos\u00e9 / PDF'],['voice','Sprache'],['immo','ImmoMetrica'],['dealpilot','DealPilot Markteinsch\u00e4tzung']];
+    list.innerHTML=items.map(function(it){ var on=!!window.__qcSel[it[0]];
+      return '<label style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)">'
+        +'<input type="checkbox" class="qc-set-cb" data-k="'+it[0]+'"'+(on?' checked':'')+' style="width:18px;height:18px;accent-color:var(--gold-hi)">'
+        +'<span style="flex:1;color:var(--txt);font-family:var(--body,sans-serif);font-size:14px">'+it[1]+'</span></label>'; }).join('');
+    [].slice.call(list.querySelectorAll('.qc-set-cb')).forEach(function(cb){ cb.addEventListener('change',function(){
+      window.__qcSel[cb.getAttribute('data-k')]=cb.checked; _qcSaveDefault(); try{_qcSync();}catch(e){} }); });
+  }
+  // MA24:end
+
+  // MA25:start \u2014 Wechselkarten im Detail (Score / Rendite / Cashflow flippen)
+  window.__detScoreMode = window.__detScoreMode || 'investor';  // 'investor' | 'deal'
+  window.__detRendMode  = window.__detRendMode  || 'brutto';    // 'brutto'   | 'netto'
+  window.__detCfMode    = window.__detCfMode    || 'ns';        // 'ns'       | 'vs'
+  var _FLIP='<span style="color:var(--gold-hi);font-size:11px;margin-left:5px">\u21c4</span>';
+
+  function _detFlipRender(){
+    var row=window.__detRow; if(!row) return; var it=row.it||{}, d=row.data||{};
+    var dv=document.querySelector('[data-view="detail"]'); if(!dv) return;
+
+    // ── Score-Box ──
+    var invest=(it.ds2_score_persist!=null)?Math.round(+it.ds2_score_persist):null;
+    var deal=(it.dealpilot_score!=null)?Math.round(+it.dealpilot_score):null;
+    var haveBoth=(invest!=null && deal!=null);
+    var sMode=window.__detScoreMode; var sc=(sMode==='deal')?deal:invest; if(sc==null) sc=(invest!=null?invest:deal);
+    var dd=dv.querySelector('#det-dial'); if(dd) dd.innerHTML=(sc!=null&&typeof dial==='function')?dial(sc,90):'';
+    var kEl=dv.querySelector('.scorebox .tx .k');
+    if(kEl) kEl.innerHTML=(sMode==='deal'?'Deal Score':'Investor Deal Score')+(haveBoth?_FLIP:'');
+    var vEl=dv.querySelector('.scorebox .tx .v');
+    if(vEl){ vEl.textContent=(sc==null)?'Noch nicht bewertet':(sc>=70?'Gr\u00fcn \u00b7 Kaufempfehlung':sc>=50?'Gold \u00b7 Solide':'Rot \u00b7 Kritisch'); if(sc!=null&&typeof th==='function') vEl.style.color=th(sc); }
+
+    var ki=dv.querySelectorAll('.kgrid .ki');
+    // ── Rendite-Kachel (ki[0]) ──
+    if(ki[0]){
+      var bmy=numOr(d&&d._kpis_bmy); if(bmy==null) bmy=numOr(it&&it.bmy);
+      var nmy=numOr(d&&d._kpis_nmy); if(nmy==null) nmy=numOr(it&&it.nmy);
+      var haveN=(nmy!=null); var rMode=window.__detRendMode; var rv=(rMode==='netto')?nmy:bmy;
+      var kk=ki[0].querySelector('.k'), vv=ki[0].querySelector('.v');
+      if(kk) kk.innerHTML=(rMode==='netto'?'Nettorendite':'Bruttorendite')+(haveN?_FLIP:'');
+      if(vv) vv.textContent=fmtPct(rv);
+      ki[0].__hasFlip=haveN;
+    }
+    // ── Cashflow-Kachel (ki[1]) ──
+    if(ki[1]){
+      var ns=numOr(d&&d._kpis_cf_ns), vs=numOr(d&&d._kpis_cf_vs);
+      var haveV=(vs!=null); var cMode=window.__detCfMode;
+      var cfE=(cMode==='vs')?vs:ns; var cfM=(cfE!=null)?cfE/12:cfMonat(it,d);
+      var cc=fmtCf(cfM); var kk1=ki[1].querySelector('.k'), vv1=ki[1].querySelector('.v');
+      if(kk1) kk1.innerHTML=(cMode==='vs'?'Cashflow v.St.':'Cashflow n.St.')+(haveV?_FLIP:'');
+      if(vv1){ vv1.textContent=cc.s; vv1.className='v'+(cc.p?(' '+cc.p):''); }
+      ki[1].__hasFlip=haveV;
+    }
+    var _bar=dv.querySelector('.barsd');
+    if(_bar){ var _raw=(sMode==='deal')?(d._dp_categories||d._ds2_categories):(d._ds2_categories||d._dp_categories); var _cats=_ma28Cats(_raw);
+      if(_cats){ var _ord=[['rendite','Rendite'],['finanzierung','Finanzierung'],['risiko','Risiko'],['lage','Lage'],['upside','Upside']];
+        var _h=_ord.map(function(o){ var s=_cats[o[0]]; if(s==null)return ''; s=Math.round(s); return '<div class="bl"><div class="tp"><span>'+o[1]+'</span><b>'+s+'</b></div><div class="tr"><i style="width:'+s+'%;background:'+catColor(s)+'"></i></div></div>'; }).join('');
+        if(_h) _bar.innerHTML=_h; } }
+  }
+
+  function installFlipCards(){
+    var dv=document.querySelector('[data-view="detail"]'); if(!dv) return;
+    var sb=dv.querySelector('.scorebox');
+    if(sb && !sb.__flip){ sb.__flip=1; sb.style.cursor='pointer';
+      sb.addEventListener('click',function(){ window.__detScoreMode=(window.__detScoreMode==='deal')?'investor':'deal'; _detFlipRender(); }); }
+    var ki=dv.querySelectorAll('.kgrid .ki');
+    if(ki[0] && !ki[0].__flip){ ki[0].__flip=1; ki[0].style.cursor='pointer';
+      ki[0].addEventListener('click',function(){ if(ki[0].__hasFlip===false) return; window.__detRendMode=(window.__detRendMode==='netto')?'brutto':'netto'; _detFlipRender(); }); }
+    if(ki[1] && !ki[1].__flip){ ki[1].__flip=1; ki[1].style.cursor='pointer';
+      ki[1].addEventListener('click',function(){ if(ki[1].__hasFlip===false) return; window.__detCfMode=(window.__detCfMode==='vs')?'ns':'vs'; _detFlipRender(); }); }
+  }
+  // MA25:end
+
+  // MA26:start \u2014 Boarding-Pass teilen + QR (pro Objekt)
+  function _shHost(){ return document.getElementById('screen')||document.body; }
+  function _shEnsureQr(cb){ if(window.QRCode){ cb(); return; }
+    var s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    s.onload=cb; s.onerror=cb; document.head.appendChild(s); }
+
+  function installShare(){
+    var box=document.getElementById('mb-life-actions');
+    if(box && !document.getElementById('mb-share')){
+      var b=document.createElement('button'); b.id='mb-share'; b.className='ghost';
+      b.style.cssText='flex:1;min-width:120px'; b.innerHTML='\u2708 Teilen';
+      box.appendChild(b);
+      b.addEventListener('click', mbShareCurrent);
+    }
+  }
+  function _mbCurShare(){ return (window.__mobSel&&window.__mobSel.it)?window.__mobSel.it:null; }
+
+  function _shOv(){
+    var g=document.getElementById('mb-share-ov');
+    if(!g){ g=document.createElement('div'); g.id='mb-share-ov';
+      g.style.cssText='position:absolute;inset:0;z-index:9998;background:rgba(5,5,5,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;gap:14px';
+      _shHost().appendChild(g); g.addEventListener('click',function(e){ if(e.target===g) _shHide(); }); }
+    return g;
+  }
+  function _shHide(){ var g=document.getElementById('mb-share-ov'); if(g) g.remove(); }
+  function _shBusy(t){ var g=_shOv(); g.innerHTML='<div style="font-family:var(--disp);font-weight:600;color:var(--gold-hi);font-size:16px">'+esc(t)+'</div><div style="color:var(--mut);font-family:var(--mono);font-size:12px">einen Moment \u2026</div>'; }
+  function _shErr(t){ var g=_shOv(); g.innerHTML='<div style="font-family:var(--disp);font-weight:600;color:var(--neg);font-size:15px">'+esc(t)+'</div><button id="mb-sh-x" style="margin-top:6px;background:var(--soft);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-family:var(--disp);cursor:pointer">Schlie\u00dfen</button>'; var x=document.getElementById('mb-sh-x'); if(x)x.addEventListener('click',_shHide); }
+
+  function _shShow(code){
+    var url=location.origin+'/pass.html?c='+encodeURIComponent(code);
+    var g=_shOv();
+    g.innerHTML='<div style="font-family:var(--disp);font-weight:700;font-size:17px;color:var(--txt)">Boarding-Pass geteilt</div>'
+      +'<div id="mb-sh-qr" style="width:190px;height:190px;background:#fff;border-radius:14px;padding:10px;display:flex;align-items:center;justify-content:center"></div>'
+      +'<div style="font-family:var(--mono);font-size:12px;color:var(--gold-hi)">Pass '+esc(code)+'</div>'
+      +'<div style="color:var(--mut);font-size:12px;max-width:80%;line-height:1.5">Wer Code oder QR hat, sieht den \u00f6ffentlichen Boarding-Pass.</div>'
+      +'<a href="'+url+'" target="_blank" rel="noopener" style="color:var(--gold-hi);font-size:12px;font-family:var(--mono);word-break:break-all;max-width:82%">'+esc(url)+'</a>'
+      +'<div style="display:flex;gap:10px;margin-top:6px">'
+      +'<button id="mb-sh-end" style="background:transparent;color:var(--neg);border:1px solid var(--neg);border-radius:11px;padding:11px 16px;font-family:var(--disp);cursor:pointer">Teilen beenden</button>'
+      +'<button id="mb-sh-close" style="background:var(--soft);color:var(--txt);border:1px solid var(--line);border-radius:11px;padding:11px 18px;font-family:var(--disp);cursor:pointer">Fertig</button>'
+      +'</div>';
+    document.getElementById('mb-sh-close').addEventListener('click',_shHide);
+    document.getElementById('mb-sh-end').addEventListener('click',function(){ _shEnd(code); });
+    _shEnsureQr(function(){ var el=document.getElementById('mb-sh-qr'); if(!el) return;
+      if(window.QRCode){ try{ el.innerHTML=''; new QRCode(el,{text:url,width:170,height:170,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M}); return; }catch(e){} }
+      el.innerHTML='<span style="color:#0a0a0a;font-family:monospace;font-size:11px">QR nicht ladbar \u2014 Link nutzen</span>';
+    });
+  }
+
+  function mbShareCurrent(){
+    var it=_mbCurShare(); if(!it){ mobToast('Kein Objekt gew\u00e4hlt.'); return; }
+    _shBusy('Boarding-Pass wird vorbereitet');
+    A().apiCall('/passes',{method:'GET'}).then(function(res){
+      var items=(res&&res.items)||[], now=Date.now(), m=null;
+      for(var i=0;i<items.length;i++){ var p=items[i]; if(p.object_id===it.id && !p.revoked_at && new Date(p.expires_at).getTime()>now){ m=p; break; } }
+      if(m){ _shShow(m.code); return null; }
+      return A().apiCall('/passes',{method:'POST',body:{objectId:it.id}}).then(function(np){ _shShow((np&&(np.code||(np.pass&&np.pass.code)))||''); });
+    }).catch(function(err){ _shErr('Teilen fehlgeschlagen'+((err&&err.status===401)?' (bitte neu anmelden)':'')); });
+  }
+  function _shEnd(code){
+    if(!confirm('Teilen beenden? Link und QR werden sofort ung\u00fcltig.')) return;
+    _shBusy('Teilen wird beendet');
+    A().apiCall('/passes/'+encodeURIComponent(code),{method:'DELETE'}).then(function(){ _shHide(); mobToast('Teilen beendet.'); })
+    .catch(function(){ A().apiCall('/passes/'+encodeURIComponent(code)+'/revoke',{method:'POST'}).then(function(){ _shHide(); mobToast('Teilen beendet.'); })
+      .catch(function(){ _shErr('Konnte Teilen nicht beenden.'); }); });
+  }
+  // MA26:end
+
+  // MA27:start \u2014 Objekt-PDFs mobil ueber die echte Desktop-Engine (offscreen iframe)
+  var PDF_FN = { invest:['exportPDF'], tax:['exportWerbungskostenPDF','all'], track:['exportTrackRecordPDF'] };
+  var PDF_LBL = { invest:'Investment-PDF', tax:'Finanzamt-PDF (alle Jahre)', track:'Track Record' };
+  function _pdfHostM(){ return document.getElementById('screen')||document.body; }
+
+  function installPdfExport(){
+    var box=document.getElementById('mb-life-actions');
+    if(box && !document.getElementById('mb-pdf-btn')){
+      var b=document.createElement('button'); b.id='mb-pdf-btn'; b.className='ghost';
+      b.style.cssText='flex:1;min-width:120px'; b.innerHTML='\u2193 PDFs';
+      box.appendChild(b);
+      b.addEventListener('click', _pdfSheet);
+    }
+  }
+  function _pdfSheet(){
+    var it=(window.__mobSel&&window.__mobSel.it)?window.__mobSel.it:null;
+    if(!it){ mobToast('Kein Objekt gew\u00e4hlt.'); return; }
+    var g=document.createElement('div'); g.id='mb-pdf-sheet';
+    g.style.cssText='position:absolute;inset:0;z-index:9998;background:rgba(5,5,5,.9);display:flex;flex-direction:column;justify-content:flex-end';
+    g.innerHTML='<div style="background:var(--card,#0f0f10);border-top-left-radius:18px;border-top-right-radius:18px;border-top:1px solid var(--line);padding:18px 18px 26px">'
+      +'<div style="width:38px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px"></div>'
+      +'<div style="font-family:var(--disp);font-weight:700;font-size:16px;color:var(--txt);margin-bottom:2px">Dokumente & Exporte</div>'
+      +'<div style="color:var(--mut);font-size:12px;font-family:var(--mono);margin-bottom:14px">Mit den aktuellen Objektdaten \u2014 erzeugt von der echten Engine.</div>'
+      +'<button class="mb-pdf-opt" data-k="invest" style="'+_optCss()+'"><b>Investment-PDF</b><span style="color:var(--mut);font-size:11.5px">Business-Case, bankfertig: Kaufpreis, Finanzierung, Cashflow, DSCR/LTV, Stress-Test.</span></button>'
+      +'<button class="mb-pdf-opt" data-k="tax" style="'+_optCss()+'"><b>Finanzamt-PDF (Steuer)</b><span style="color:var(--mut);font-size:11.5px">Werbungskosten fuer die Anlage V \u2014 Gesamtuebersicht (alle Jahre).</span></button>'
+      +'<button class="mb-pdf-opt" data-k="track" style="'+_optCss()+'"><b>Track Record</b><span style="color:var(--mut);font-size:11.5px">Gewonnene Deals als PDF.</span></button>'
+      +'<button id="mb-pdf-cancel" style="width:100%;margin-top:6px;background:transparent;color:var(--mut);border:none;padding:12px;font-family:var(--disp);cursor:pointer">Abbrechen</button>'
+      +'</div>';
+    _pdfHostM().appendChild(g);
+    g.addEventListener('click',function(e){ if(e.target===g) g.remove(); });
+    document.getElementById('mb-pdf-cancel').addEventListener('click',function(){ g.remove(); });
+    [].slice.call(g.querySelectorAll('.mb-pdf-opt')).forEach(function(o){ o.addEventListener('click',function(){ var k=o.getAttribute('data-k'); g.remove(); mbPdfExport(k, it.id); }); });
+  }
+  function _optCss(){ return 'display:flex;flex-direction:column;gap:4px;text-align:left;width:100%;background:linear-gradient(180deg,rgba(201,168,76,.12),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.32);border-left:3px solid var(--gold-hi);border-radius:13px;padding:14px 16px;margin-bottom:10px;cursor:pointer;color:var(--gold-hi);font-family:var(--disp),sans-serif;font-weight:700;font-size:14px'; }
+
+  function _pdfOv(main,sub){
+    var g=document.getElementById('mb-pdf-ov');
+    if(!g){ g=document.createElement('div'); g.id='mb-pdf-ov';
+      g.style.cssText='position:absolute;inset:0;z-index:9999;background:rgba(5,5,5,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:12px';
+      _pdfHostM().appendChild(g); }
+    g.innerHTML='<div style="font-family:var(--disp);font-weight:600;font-size:16px;color:var(--gold-hi)">'+esc(main)+'</div>'
+      +(sub?'<div style="color:var(--mut);font-size:12px;font-family:var(--mono);max-width:80%;line-height:1.5">'+esc(sub)+'</div>':'')
+      +'<div style="width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--gold-hi);border-radius:50%;animation:mbspin 0.9s linear infinite;margin-top:6px"></div>';
+    if(!document.getElementById('mb-spin-anim')){ var s=document.createElement('style'); s.id='mb-spin-anim'; s.textContent='@keyframes mbspin{to{transform:rotate(360deg)}}'; document.head.appendChild(s); }
+    return g;
+  }
+  function _pdfHideOv(){ var g=document.getElementById('mb-pdf-ov'); if(g) g.remove(); }
+  function _pdfErrOv(msg){ var g=_pdfOv('',''); g.innerHTML='<div style="font-family:var(--disp);font-weight:600;color:var(--neg);font-size:15px">'+esc(msg)+'</div><button id="mb-pdf-x" style="margin-top:8px;background:var(--soft);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-family:var(--disp);cursor:pointer">Schlie\u00dfen</button>'; var x=document.getElementById('mb-pdf-x'); if(x)x.addEventListener('click',_pdfHideOv); }
+
+  function mbPdfExport(kind, objId){
+    var spec=PDF_FN[kind]; if(!spec){ return; }
+    _pdfOv('PDF wird erzeugt \u2026','Die Rechen-Engine l\u00e4dt einmalig im Hintergrund. Beim ersten Mal dauert es einen Moment.');
+    _pdfEngine(objId, spec, function(ok,reason){
+      if(ok){ _pdfHideOv(); mobToast('\u2713 '+(PDF_LBL[kind]||'PDF')+' \u2014 Download l\u00e4uft.'); }
+      else { _pdfErrOv('PDF konnte nicht erzeugt werden'+(reason?(' ('+reason+')'):'')+'. Bitte erneut versuchen.'); }
+    });
+  }
+
+  function _pdfEngine(objId, spec, done){
+    var old=document.getElementById('mb-pdf-frame'); if(old){ try{ old.remove(); }catch(e){} }
+    var f=document.createElement('iframe'); f.id='mb-pdf-frame';
+    f.style.cssText='position:fixed;left:-10000px;top:0;width:1200px;height:900px;opacity:0;pointer-events:none;border:0';
+    f.src='/index.html';
+    document.body.appendChild(f);
+    var settled=false;
+    function finish(ok,reason){ if(settled) return; settled=true; done(ok,reason);
+      setTimeout(function(){ try{ f.remove(); }catch(e){} }, ok?5000:500); }
+    var guard=setTimeout(function(){ finish(false,'Timeout'); }, 30000);
+    f.onload=function(){
+      var win; try{ win=f.contentWindow; }catch(e){ clearTimeout(guard); return finish(false,'Frame'); }
+      var tries=0;
+      var iv=setInterval(function(){ tries++;
+        var ready=false; try{ ready = win && typeof win.loadSaved==='function' && typeof win[spec[0]]==='function'; }catch(e){}
+        if(ready){ clearInterval(iv);
+          try{
+            Promise.resolve(win.loadSaved(objId)).then(function(){
+              var t2=0;
+              var iv2=setInterval(function(){ t2++;
+                var calc=false; try{ calc = !!(win.State && win.State.kpis && win.State.kpis.kp); }catch(e){}
+                var plan=false; try{ var ck=win.DealPilotConfig&&win.DealPilotConfig.pricing&&win.DealPilotConfig.pricing.currentKey&&win.DealPilotConfig.pricing.currentKey(); plan=!!(ck&&ck!=='free'); }catch(e){}
+                if((calc && (plan || t2>16)) || t2>44){ clearInterval(iv2);
+                  setTimeout(function(){
+                    try{ var fn=win[spec[0]]; fn.apply(win, spec.slice(1)); }catch(e){ clearTimeout(guard); return finish(false,'Export'); }
+                    clearTimeout(guard); finish(true);
+                  }, 700);
+                }
+              }, 250);
+            }).catch(function(){ clearTimeout(guard); finish(false,'Laden'); });
+          }catch(e){ clearTimeout(guard); finish(false,'Aufruf'); }
+        } else if(tries>80){ clearInterval(iv); clearTimeout(guard); finish(false,'App-Boot'); }
+      }, 250);
+    };
+    f.onerror=function(){ clearTimeout(guard); finish(false,'Laden'); };
+  }
+  // MA27:end
+
+  // MA28:start \u2014 DealPilot-Markt-Button + Kategorie-Helfer
+  function _ma28Cats(raw){ if(!raw) return null; var out={};
+    if(Array.isArray(raw)){ raw.forEach(function(c){ if(c&&c.key!=null) out[c.key]=(c.score!=null?+c.score:(c.value!=null?+c.value:null)); }); }
+    else if(typeof raw==='object'){ Object.keys(raw).forEach(function(k){ var c=raw[k]; out[k]=(c&&c.score!=null)?+c.score:(typeof c==='number'?c:null); }); }
+    return Object.keys(out).length?out:null; }
+  function installMarktDp(){
+    var mv=document.querySelector('[data-view="markt"]'); if(!mv) return;
+    if(document.getElementById('mk-dp-btn')) return;
+    var status=mv.querySelector('#mk-status'); if(!status) return;
+    var b=document.createElement('button'); b.id='mk-dp-btn'; b.className='cta';
+    b.style.cssText='width:100%;margin:8px 0 4px';
+    b.innerHTML='DealPilot Markteinsch\u00e4tzung <span class="ke">2 L</span>';
+    status.parentNode.insertBefore(b, status.nextSibling);
+    b.addEventListener('click',function(){ if(typeof mbAvm==='function') mbAvm('dealpilot'); });
+  }
+  // MA28:end
+
+  // MA29:start \u2014 Anbieter-Neutralitaet: SN/PH nicht namentlich nach aussen (Markt-Screen)
+  function installMarktNeutral(){
+    var mv=document.querySelector('[data-view="markt"]'); if(!mv) return;
+    var sn=mv.querySelector('[data-avm="sprengnetter"]');
+    var ph=mv.querySelector('[data-avm="pricehubble"]');
+    var row=(sn&&sn.closest)?sn.closest('.row2'):null;
+    if(row){ row.style.display='none'; }
+    else { if(sn) sn.style.display='none'; if(ph) ph.style.display='none'; }
+    if(ph && (!row || (ph.closest&&ph.closest('.row2')!==row))) ph.style.display='none';
+  }
+  // MA29:end
+
+  // MA30:start \u2014 Erweiterte Bearbeitung: Boarding in klappbare Abschnitte + Notizen
+  function installBoardingSections(){
+    var form=document.getElementById('mb-board-form'); if(!form||form.__ma30) return; form.__ma30=1;
+    if(!document.getElementById('mb_notizen')){
+      var nf=document.createElement('div'); nf.className='field';
+      nf.innerHTML='<label>Notizen</label><div class="inp" style="align-items:stretch"><textarea id="mb_notizen" rows="3" placeholder="z.B. Sanierungsstau, Verhandlungsstand \u2026" style="width:100%;background:transparent;border:none;color:var(--txt);font-family:var(--body,sans-serif);font-size:14px;resize:vertical;outline:none;padding:2px 0"></textarea></div>';
+      form.appendChild(nf);
+    }
+    var SECS=[
+      ['Objekt & Adresse',['mb_str','mb_hnr','mb_plz','mb_ort','mb_objart','mb_wfl','mb_bj']],
+      ['Kaufpreis & Finanzierung',['mb_kp','mb_knk','mb_ek','mb_zins','mb_tilg']],
+      ['Miete & Kosten',['mb_nkm','mb_ze','mb_hg','mb_hgsplit']],
+      ['Notizen',['mb_notizen']]
+    ];
+    var insBefore=document.getElementById('mb-board-err')||document.getElementById('mb-board-save');
+    SECS.forEach(function(sec,si){
+      var wrap=document.createElement('div'); wrap.className='mb-sec'; wrap.style.cssText='border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden';
+      var head=document.createElement('button'); head.type='button';
+      head.style.cssText='width:100%;display:flex;align-items:center;justify-content:space-between;background:rgba(201,168,76,.06);border:none;color:var(--txt);font-family:var(--disp),sans-serif;font-weight:600;font-size:13px;padding:12px 14px;cursor:pointer';
+      head.innerHTML='<span>'+sec[0]+'</span><span class="mb-ar" style="color:var(--gold-hi);transition:transform .2s">\u25be</span>';
+      var body=document.createElement('div'); body.style.cssText='padding:12px 14px 6px';
+      sec[1].forEach(function(id){ var el=document.getElementById(id); if(!el) return; var f=el.closest('.field'); if(f){ f.style.maxWidth=''; body.appendChild(f); } });
+      if(!body.children.length) return;
+      head.addEventListener('click',function(){ var open=body.style.display!=='none'; body.style.display=open?'none':''; var ar=head.querySelector('.mb-ar'); if(ar) ar.style.transform=open?'rotate(-90deg)':''; });
+      wrap.appendChild(head); wrap.appendChild(body);
+      if(insBefore&&insBefore.parentNode) insBefore.parentNode.insertBefore(wrap, insBefore); else form.appendChild(wrap);
+    });
+    [].slice.call(form.querySelectorAll('.row2')).forEach(function(r){ if(!r.querySelector('.field')) r.remove(); });
+  }
+  // MA30:end
 
   function boot(){
     var a=A();
@@ -1576,6 +1977,14 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     installPdfImport();
     installProfil();
     installLifecycle();
+    installBoardingSections();
+    installQuickCheck();
+    installQcSettings();
+    installFlipCards();
+    installShare();
+    installPdfExport();
+    installMarktDp();
+    installMarktNeutral();
     greetName(sess);
     loadFlotte();
     loadKerosin();
