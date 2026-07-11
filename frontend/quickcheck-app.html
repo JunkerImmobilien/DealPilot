@@ -6243,17 +6243,19 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   if(document.readyState!=='loading') move();
 })();
 </script>
-<script id="qc-ph-enable">/* v764-ph: PriceHubble ist live -> Kachel waehlbar machen */
+<script id="qc-ph-enable">/* v895h-avm-soon: PriceHubble + Sprengnetter konfigurierbar "Coming soon" (Staging aus / Prod an). Override: window.DP_AVM_PREFLIGHT_SOON = true|false */
 (function(){'use strict';
-  function en(){
-    var lab=document.querySelector('.dp-pf-tile[data-src="ph"]'); if(!lab) return false;
-    lab.classList.remove('dp-pf-soon-on','dp-pf-disabled');
-    lab.setAttribute('title','PriceHubble');
-    var cb=lab.querySelector('input'); if(cb) cb.disabled=false;
-    return true;
-  }
-  var t=0, iv=setInterval(function(){ t++; if(en()||t>40) clearInterval(iv); },250);
-  if(document.readyState!=='loading') en();
+  var SOON = (typeof window!=='undefined' && window.DP_AVM_PREFLIGHT_SOON!=null)
+    ? !!window.DP_AVM_PREFLIGHT_SOON
+    : !/staging/i.test(String((typeof location!=='undefined' && location.hostname)||''));
+  function chip(src){ return document.querySelector('.dp-pf-tile[data-src="'+src+'"]'); }
+  function grey(lab){ if(!lab) return; lab.classList.add('dp-pf-soon-on'); lab.classList.remove('on'); lab.setAttribute('title','Coming soon'); var cb=lab.querySelector('input'); if(cb){ cb.checked=false; cb.disabled=true; } }
+  function enable(lab,title){ if(!lab) return; lab.classList.remove('dp-pf-soon-on','dp-pf-disabled'); lab.setAttribute('title',title); var cb=lab.querySelector('input'); if(cb) cb.disabled=false; }
+  function apply(){ var ph=chip('ph'), sp=chip('spr'); if(!ph && !sp) return false;
+    if(SOON){ grey(ph); grey(sp); } else { enable(ph,'PriceHubble'); }
+    return true; }
+  var t=0, iv=setInterval(function(){ t++; if(apply()||t>40) clearInterval(iv); },250);
+  if(document.readyState!=='loading') apply();
 })();
 </script>
 </body>
