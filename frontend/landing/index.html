@@ -1101,6 +1101,97 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
   </script>
   <hr class="rw">
 
+<!-- dpfk-appcta:start  ==  DealPilot "App holen"-Abschnitt (self-contained, in Landing vor </body> einfuegen) -->
+<section class="dp-appcta" id="app">
+<style>
+.dp-appcta{--g:#C9A84C;--gh:#E8CC7A;--ink:#1a1407;--mut:#94907f;
+  font-family:Inter,system-ui,sans-serif;color:#F5F3EE;
+  background:radial-gradient(800px 500px at 15% 0%,rgba(201,168,76,.1),transparent 60%),#070606;
+  padding:72px 24px;position:relative;overflow:hidden}
+.dp-appcta::before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background:repeating-linear-gradient(102deg,rgba(201,168,76,.05) 0 1px,transparent 1px 13px)}
+.dp-appcta *{box-sizing:border-box}
+.dpc-wrap{max-width:1080px;margin:0 auto;position:relative;z-index:2;display:flex;gap:56px;align-items:center;flex-wrap:wrap}
+.dpc-left{flex:1;min-width:320px}
+.dpc-kick{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--gh)}
+.dpc-left h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:44px;line-height:1.08;letter-spacing:-.01em;margin:16px 0 0}
+.dpc-left h2 em{font-style:normal;color:transparent;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text}
+.dpc-left p{font-size:17px;line-height:1.6;color:#c9c3b4;margin-top:16px;max-width:520px}
+.dpc-benes{list-style:none;padding:0;margin:22px 0 30px;display:flex;flex-direction:column;gap:11px}
+.dpc-benes li{display:flex;align-items:center;gap:11px;font-size:15.5px}
+.dpc-benes svg{width:22px;height:22px;flex:none;fill:none;stroke:#5BD98E;stroke-width:2}
+.dpc-cta{display:inline-flex;align-items:center;gap:11px;border:none;cursor:pointer;text-decoration:none;
+  background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:var(--ink);
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;border-radius:14px;padding:16px 26px;
+  box-shadow:0 18px 40px -16px rgba(201,168,76,.6)}
+.dpc-cta svg{width:22px;height:22px;fill:var(--ink)}
+.dpc-ios{display:flex;align-items:center;gap:12px;margin-top:18px;border:1px solid rgba(201,168,76,.24);
+  border-radius:13px;padding:13px 15px;background:rgba(201,168,76,.04);max-width:520px}
+.dpc-ios .ic{width:34px;height:34px;flex:none;border-radius:9px;background:rgba(201,168,76,.12);display:grid;place-items:center}
+.dpc-ios .ic svg{width:18px;height:18px;stroke:var(--gh);fill:none;stroke-width:1.8}
+.dpc-ios .tx{font-size:13.5px;line-height:1.5;color:#c9c3b4}
+.dpc-ios .tx b{color:#F5F3EE}
+.dpc-right{flex:none;display:flex;flex-direction:column;align-items:center;gap:18px}
+.dpc-icon{width:132px;height:132px;border-radius:32px;display:grid;place-items:center;
+  background:radial-gradient(120% 120% at 50% 25%,#14110b,#050505);box-shadow:0 24px 60px -22px rgba(0,0,0,.7),0 0 0 1px rgba(201,168,76,.25)}
+.dpc-icon svg{width:74px;height:74px}
+.dpc-qr{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.2);border-radius:16px;padding:14px}
+.dpc-qr .q{width:104px;height:104px;background:#fff;border-radius:10px;padding:7px;flex:none}
+.dpc-qr .q svg,.dpc-qr .q canvas,.dpc-qr .q img{width:100%;height:100%;display:block}
+.dpc-qr .qt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut);line-height:1.6}
+.dpc-qr .qt b{color:var(--gh);display:block;font-size:13px;margin-bottom:2px}
+@media(max-width:760px){.dp-appcta{padding:54px 20px}.dpc-left h2{font-size:34px}.dpc-right{width:100%}}
+</style>
+
+<div class="dpc-wrap">
+  <div class="dpc-left">
+    <div class="dpc-kick">DealPilot App</div>
+    <h2>Nimm dein Cockpit<br><em>mit aufs Handy.</em></h2>
+    <p>Objekte einlesen, Quick Check vor Ort, Marktwert und DealScore sofort. Installiere DealPilot in Sekunden auf dem Startbildschirm &mdash; ohne App-Store, kostenlos.</p>
+    <ul class="dpc-benes">
+      <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Quick Check direkt bei der Besichtigung</li>
+      <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Alle Deals als Boarding-Pässe im Blick</li>
+      <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Marktwert-Korridor auf Knopfdruck</li>
+    </ul>
+    <a class="dpc-cta" id="dpc-install" href="https://app.dealpilot.junker-immobilien.io/mobile-demo.html">
+      <svg viewBox="0 0 24 24"><path d="M12 2L4 21l8-4 8 4z"/></svg> App installieren
+    </a>
+    <div class="dpc-ios">
+      <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 14v4a2 2 0 002 2h12a2 2 0 002-2v-4"/></svg></div>
+      <div class="tx"><b>iPhone:</b> in Safari &ouml;ffnen, unten das Teilen-Symbol antippen, dann &bdquo;Zum Home-Bildschirm&ldquo;.</div>
+    </div>
+  </div>
+  <div class="dpc-right">
+    <div class="dpc-icon">
+      <svg viewBox="0 0 24 24"><defs><linearGradient id="dpcg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8CC7A"/><stop offset="1" stop-color="#b8932f"/></linearGradient></defs><path d="M12 2L4 21l8-4 8 4z" fill="url(#dpcg)"/></svg>
+    </div>
+    <div class="dpc-qr"><div class="q" id="dpc-qr"></div><div class="qt"><b>Scan mit dem Handy</b>app.dealpilot.junker-immobilien.io</div></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var APP=(location.hostname.indexOf('staging')>-1?'https://app.staging.dealpilot.junker-immobilien.io':'https://app.dealpilot.junker-immobilien.io')+'/mobile-demo.html'; /*v896-appurl*/
+  try{ var _ib=document.getElementById('dpc-install'); if(_ib) _ib.href=APP; }catch(e){}
+  try{ var _qt=document.querySelector('.dpc-qr .qt'); if(_qt) _qt.innerHTML='<b>Scan mit dem Handy</b>'+APP.replace(/^https?:\/\//,'').replace(/\/mobile-demo\.html$/,''); }catch(e){}
+  // Android/Desktop auf App-Origin: nativen Install-Prompt abfangen
+  var deferred=null, btn=document.getElementById('dpc-install');
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;});
+  btn.addEventListener('click',function(e){
+    if(deferred){e.preventDefault();deferred.prompt();deferred.userChoice.finally(function(){deferred=null;});}
+    // sonst: normaler Link -> App oeffnet sich, dort installieren
+  });
+  // QR
+  function qr(){var el=document.getElementById('dpc-qr');
+    if(window.QRCode){try{new QRCode(el,{text:APP,width:90,height:90,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});return}catch(e){}}
+    var n=23,s='';for(var y=0;y<n;y++)for(var x=0;x<n;x++){if(((x*7+y*13+((x*y)%5))%3)===0)s+='<rect x="'+x+'" y="'+y+'" width="1" height="1"/>';}
+    el.innerHTML='<svg viewBox="0 0 '+n+' '+n+'" shape-rendering="crispEdges"><rect width="'+n+'" height="'+n+'" fill="#fff"/><g fill="#0a0a0a">'+s+'</g></svg>';}
+  if(window.QRCode){qr();}else{var sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.onload=qr;sc.onerror=qr;document.head.appendChild(sc);}
+})();
+</script>
+</section>
+<!-- dpfk-appcta:end -->
+
   <!-- PARTNER (hell) -->
   <section class="sec sec-paper" id="partner">
     <div class="wrap">
@@ -3806,93 +3897,5 @@ html{scroll-behavior:smooth}
 })();
 </script>
 
-<!-- dpfk-appcta:start  ==  DealPilot "App holen"-Abschnitt (self-contained, in Landing vor </body> einfuegen) -->
-<section class="dp-appcta" id="app">
-<style>
-.dp-appcta{--g:#C9A84C;--gh:#E8CC7A;--ink:#1a1407;--mut:#94907f;
-  font-family:Inter,system-ui,sans-serif;color:#F5F3EE;
-  background:radial-gradient(800px 500px at 15% 0%,rgba(201,168,76,.1),transparent 60%),#070606;
-  padding:72px 24px;position:relative;overflow:hidden}
-.dp-appcta::before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
-  background:repeating-linear-gradient(102deg,rgba(201,168,76,.05) 0 1px,transparent 1px 13px)}
-.dp-appcta *{box-sizing:border-box}
-.dpc-wrap{max-width:1080px;margin:0 auto;position:relative;z-index:2;display:flex;gap:56px;align-items:center;flex-wrap:wrap}
-.dpc-left{flex:1;min-width:320px}
-.dpc-kick{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--gh)}
-.dpc-left h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:44px;line-height:1.08;letter-spacing:-.01em;margin:16px 0 0}
-.dpc-left h2 em{font-style:normal;color:transparent;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text}
-.dpc-left p{font-size:17px;line-height:1.6;color:#c9c3b4;margin-top:16px;max-width:520px}
-.dpc-benes{list-style:none;padding:0;margin:22px 0 30px;display:flex;flex-direction:column;gap:11px}
-.dpc-benes li{display:flex;align-items:center;gap:11px;font-size:15.5px}
-.dpc-benes svg{width:22px;height:22px;flex:none;fill:none;stroke:#5BD98E;stroke-width:2}
-.dpc-cta{display:inline-flex;align-items:center;gap:11px;border:none;cursor:pointer;text-decoration:none;
-  background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:var(--ink);
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;border-radius:14px;padding:16px 26px;
-  box-shadow:0 18px 40px -16px rgba(201,168,76,.6)}
-.dpc-cta svg{width:22px;height:22px;fill:var(--ink)}
-.dpc-ios{display:flex;align-items:center;gap:12px;margin-top:18px;border:1px solid rgba(201,168,76,.24);
-  border-radius:13px;padding:13px 15px;background:rgba(201,168,76,.04);max-width:520px}
-.dpc-ios .ic{width:34px;height:34px;flex:none;border-radius:9px;background:rgba(201,168,76,.12);display:grid;place-items:center}
-.dpc-ios .ic svg{width:18px;height:18px;stroke:var(--gh);fill:none;stroke-width:1.8}
-.dpc-ios .tx{font-size:13.5px;line-height:1.5;color:#c9c3b4}
-.dpc-ios .tx b{color:#F5F3EE}
-.dpc-right{flex:none;display:flex;flex-direction:column;align-items:center;gap:18px}
-.dpc-icon{width:132px;height:132px;border-radius:32px;display:grid;place-items:center;
-  background:radial-gradient(120% 120% at 50% 25%,#14110b,#050505);box-shadow:0 24px 60px -22px rgba(0,0,0,.7),0 0 0 1px rgba(201,168,76,.25)}
-.dpc-icon svg{width:74px;height:74px}
-.dpc-qr{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.2);border-radius:16px;padding:14px}
-.dpc-qr .q{width:104px;height:104px;background:#fff;border-radius:10px;padding:7px;flex:none}
-.dpc-qr .q svg,.dpc-qr .q canvas,.dpc-qr .q img{width:100%;height:100%;display:block}
-.dpc-qr .qt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut);line-height:1.6}
-.dpc-qr .qt b{color:var(--gh);display:block;font-size:13px;margin-bottom:2px}
-@media(max-width:760px){.dp-appcta{padding:54px 20px}.dpc-left h2{font-size:34px}.dpc-right{width:100%}}
-</style>
-
-<div class="dpc-wrap">
-  <div class="dpc-left">
-    <div class="dpc-kick">DealPilot App</div>
-    <h2>Nimm dein Cockpit<br><em>mit aufs Handy.</em></h2>
-    <p>Objekte einlesen, Quick Check vor Ort, Marktwert und DealScore sofort. Installiere DealPilot in Sekunden auf dem Startbildschirm &mdash; ohne App-Store, kostenlos.</p>
-    <ul class="dpc-benes">
-      <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Quick Check direkt bei der Besichtigung</li>
-      <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Alle Deals als Boarding-Pässe im Blick</li>
-      <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Marktwert-Korridor auf Knopfdruck</li>
-    </ul>
-    <a class="dpc-cta" id="dpc-install" href="https://app.dealpilot.junker-immobilien.io/mobile-demo.html">
-      <svg viewBox="0 0 24 24"><path d="M12 2L4 21l8-4 8 4z"/></svg> App installieren
-    </a>
-    <div class="dpc-ios">
-      <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 14v4a2 2 0 002 2h12a2 2 0 002-2v-4"/></svg></div>
-      <div class="tx"><b>iPhone:</b> in Safari &ouml;ffnen, unten das Teilen-Symbol antippen, dann &bdquo;Zum Home-Bildschirm&ldquo;.</div>
-    </div>
-  </div>
-  <div class="dpc-right">
-    <div class="dpc-icon">
-      <svg viewBox="0 0 24 24"><defs><linearGradient id="dpcg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8CC7A"/><stop offset="1" stop-color="#b8932f"/></linearGradient></defs><path d="M12 2L4 21l8-4 8 4z" fill="url(#dpcg)"/></svg>
-    </div>
-    <div class="dpc-qr"><div class="q" id="dpc-qr"></div><div class="qt"><b>Scan mit dem Handy</b>app.dealpilot.junker-immobilien.io</div></div>
-  </div>
-</div>
-
-<script>
-(function(){
-  var APP='https://app.dealpilot.junker-immobilien.io/mobile-demo.html';
-  // Android/Desktop auf App-Origin: nativen Install-Prompt abfangen
-  var deferred=null, btn=document.getElementById('dpc-install');
-  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;});
-  btn.addEventListener('click',function(e){
-    if(deferred){e.preventDefault();deferred.prompt();deferred.userChoice.finally(function(){deferred=null;});}
-    // sonst: normaler Link -> App oeffnet sich, dort installieren
-  });
-  // QR
-  function qr(){var el=document.getElementById('dpc-qr');
-    if(window.QRCode){try{new QRCode(el,{text:APP,width:90,height:90,colorDark:'#0a0a0a',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});return}catch(e){}}
-    var n=23,s='';for(var y=0;y<n;y++)for(var x=0;x<n;x++){if(((x*7+y*13+((x*y)%5))%3)===0)s+='<rect x="'+x+'" y="'+y+'" width="1" height="1"/>';}
-    el.innerHTML='<svg viewBox="0 0 '+n+' '+n+'" shape-rendering="crispEdges"><rect width="'+n+'" height="'+n+'" fill="#fff"/><g fill="#0a0a0a">'+s+'</g></svg>';}
-  if(window.QRCode){qr();}else{var sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.onload=qr;sc.onerror=qr;document.head.appendChild(sc);}
-})();
-</script>
-</section>
-<!-- dpfk-appcta:end -->
 </body>
 </html>
