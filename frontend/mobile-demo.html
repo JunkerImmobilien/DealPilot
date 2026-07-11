@@ -850,7 +850,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     document.addEventListener('click', function(e){ var b=e.target.closest&&e.target.closest('#mb-board-save'); if(b){ e.preventDefault(); mbSave(); } var a=e.target.closest&&e.target.closest('[data-avm]'); if(a){ e.preventDefault(); mbAvm(a.getAttribute('data-avm')); } });
     if(typeof window.go==='function' && !window.__mobGoWrapped){
       var _og=window.go;
-      window.go=function(name){ if(name==='boarding-result'){ try{ var _l=mbCompute(); if(!_l) return; }catch(e){} } var r=_og.apply(this,arguments); if(name==='detail'){ try{ fillDetail(window.__mobSel); }catch(e){} try{ window.__detRow=window.__mobSel; _detFlipRender(); }catch(e){} } if(name==='boarding-result'){ try{ mbFillResult(window.__mbLast); }catch(e){} } if(name==='markt'){ try{ mkPrefill(); }catch(e){} } return r; };
+      window.go=function(name){ if(name==='boarding-result'){ try{ var _l=mbCompute(); if(!_l) return; }catch(e){} } var r=_og.apply(this,arguments); if(name==='detail'){ try{ fillDetail(window.__mobSel); }catch(e){} try{ window.__detRow=window.__mobSel; _detFlipRender(); }catch(e){} try{ _detExtras(); }catch(e){} } if(name==='boarding-result'){ try{ mbFillResult(window.__mbLast); }catch(e){} } if(name==='markt'){ try{ mkPrefill(); }catch(e){} } return r; };
       window.__mobGoWrapped=true;
     }
   }
@@ -1002,6 +1002,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
       var r=data&&data.result; if(!r){ mkStatus('Keine Bewertung erhalten.',true); return; }
       mkStatus('',false);
       mkRenderCorridor(r,data,provider,selKp);
+      if(provider==='dealpilot' && window.__mobSel && window.__mobSel.it){ try{ _persistDpMarkt(r); }catch(e){} }
       if(data.mode!=='stub'){ try{ loadKerosin(); }catch(e){} }
     }).catch(function(err){
       if(err&&(err.status===402||err.status===403)){ mkStatus('Nicht genug Kerosin f\u00fcr diesen Abruf.',true); return; }
@@ -1967,6 +1968,76 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
   }
   // MA30:end
 
+  // MA31:start \u2014 Profil-Einstellungen funktional (Externe Anbieter / Tarif)
+  function installSettingsActions(){
+    var pv=document.querySelector('[data-view="profil"]'); if(!pv) return;
+    var rows=[].slice.call(pv.querySelectorAll('.setrow'));
+    rows.forEach(function(r){
+      if(r.__ma31) return;
+      var nm=((r.querySelector('.nm')||{}).textContent||'');
+      if(/Externe Anbieter/i.test(nm)){ r.__ma31=1; r.style.cursor='pointer';
+        r.addEventListener('click',function(){ mbImmoCreds(); }); }
+      else if(/Tarif/i.test(nm)){ r.__ma31=1; r.style.cursor='pointer';
+        r.addEventListener('click',function(){ mobToast('Tarif & Rechnungen \u2014 im Cockpit \u00f6ffnen \u2026'); setTimeout(function(){ location.href='/'; },500); }); }
+    });
+  }
+  // MA31:end
+
+  // MA32:start \u2014 ImmoMetrica-Credentials, DealPilot-Markt persistent, Notizen im Detail
+  function _eur0(v){ var n=Math.round(+v); return isFinite(n)?new Intl.NumberFormat('de-DE').format(n)+' \u20ac':'\u2014'; }
+  function _persistDpMarkt(r){
+    var it=window.__mobSel&&window.__mobSel.it; if(!it||!r||r.marktwert==null) return;
+    A().apiCall('/objects/'+it.id).then(function(full){
+      var data=(full&&full.data)||{};
+      data._dp_markt={marktwert:r.marktwert,low:r.low,high:r.high,at:new Date().toISOString()};
+      if(window.__mobSel&&window.__mobSel.data) window.__mobSel.data._dp_markt=data._dp_markt;
+      return A().apiCall('/objects/'+it.id,{method:'PUT',body:{data:data,aiAnalysis:(full&&full.ai_analysis)||null,photos:(full&&full.photos)||[]}});
+    }).then(function(){ try{ _detExtras(); }catch(e){} }).catch(function(){});
+  }
+  function _detExtras(){
+    var dv=document.querySelector('[data-view="detail"]'); var row=window.__detRow; if(!dv||!row) return;
+    var d=row.data||{};
+    var host=document.getElementById('mb-det-extras');
+    if(!host){ var bars=dv.querySelector('.barsd'); if(!bars) return; host=document.createElement('div'); host.id='mb-det-extras'; host.style.cssText='margin-top:12px'; bars.parentNode.insertBefore(host, bars.nextSibling); }
+    var html='';
+    var m=d._dp_markt;
+    if(m&&m.marktwert!=null){ html+='<div style="background:linear-gradient(180deg,rgba(201,168,76,.10),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.28);border-radius:13px;padding:13px 15px;margin-bottom:10px">'
+      +'<div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--gold-hi);text-transform:uppercase;margin-bottom:4px">DealPilot Markteinsch\u00e4tzung</div>'
+      +'<div style="font-family:var(--disp);font-weight:700;font-size:20px;color:var(--txt)">'+_eur0(m.marktwert)+'</div>'
+      +((m.low!=null&&m.high!=null)?'<div style="color:var(--mut);font-family:var(--mono);font-size:11px;margin-top:2px">Spanne '+_eur0(m.low)+' \u2013 '+_eur0(m.high)+'</div>':'')
+      +'</div>'; }
+    if(d.notizen&&String(d.notizen).trim()){ html+='<div style="background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin-bottom:10px">'
+      +'<div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase;margin-bottom:5px">Notizen</div>'
+      +'<div style="color:var(--txt);font-size:13.5px;line-height:1.5;white-space:pre-wrap">'+esc(d.notizen)+'</div></div>'; }
+    host.innerHTML=html;
+  }
+  function mbImmoCreds(){
+    var g=document.createElement('div'); g.id='mb-imc'; g.style.cssText='position:absolute;inset:0;z-index:9998;background:rgba(5,5,5,.92);display:flex;flex-direction:column;justify-content:flex-end';
+    g.innerHTML='<div style="background:var(--card,#0f0f10);border-top-left-radius:18px;border-top-right-radius:18px;border-top:1px solid var(--line);padding:18px 18px 26px">'
+      +'<div style="width:38px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px"></div>'
+      +'<div style="font-family:var(--disp);font-weight:700;font-size:16px;color:var(--txt)">ImmoMetrica-Zugang</div>'
+      +'<div id="imc-status" style="color:var(--mut);font-size:12px;font-family:var(--mono);margin:4px 0 14px">Status wird geladen \u2026</div>'
+      +'<input id="imc-token" type="text" placeholder="ImmoMetrica API-Token" autocomplete="off" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--txt);font-family:var(--mono);font-size:13px;box-sizing:border-box;margin-bottom:10px">'
+      +'<button id="imc-save" style="width:100%;background:var(--runway);color:#1a1407;font-family:var(--disp);font-weight:700;font-size:15px;border:none;border-radius:12px;padding:13px;cursor:pointer;margin-bottom:8px">Speichern</button>'
+      +'<div style="display:flex;gap:8px"><button id="imc-del" style="flex:1;background:transparent;color:var(--neg);border:1px solid var(--neg);border-radius:11px;padding:11px;font-family:var(--disp);cursor:pointer">Trennen</button>'
+      +'<button id="imc-close" style="flex:1;background:rgba(255,255,255,.05);color:var(--txt);border:1px solid var(--line);border-radius:11px;padding:11px;font-family:var(--disp);cursor:pointer">Schlie\u00dfen</button></div>'
+      +'<div id="imc-err" style="color:var(--neg);font-size:11.5px;font-family:var(--mono);min-height:14px;margin-top:8px"></div></div>';
+    (document.getElementById('screen')||document.body).appendChild(g);
+    g.addEventListener('click',function(e){ if(e.target===g) g.remove(); });
+    document.getElementById('imc-close').addEventListener('click',function(){ g.remove(); });
+    A().apiCall('/immometrica/credentials').then(function(res){ var m=res&&res.immometrica; var has=m&&(m.has_credential||m.hasCredential||m.exists||m.connected||m.updated_at); var s=document.getElementById('imc-status'); if(s) s.textContent=has?'\u2713 Verbunden':'Nicht verbunden'; }).catch(function(){ var s=document.getElementById('imc-status'); if(s) s.textContent='Status unbekannt'; });
+    document.getElementById('imc-save').addEventListener('click',function(){
+      var t=((document.getElementById('imc-token')||{}).value||''); var er=document.getElementById('imc-err');
+      if(!t.trim()){ if(er)er.textContent='Token eingeben.'; return; } if(er)er.textContent='';
+      A().apiCall('/immometrica/credentials',{method:'PUT',body:{token:t.trim()}}).then(function(){ mobToast('\u2713 ImmoMetrica verbunden.'); g.remove(); }).catch(function(err){ if(er)er.textContent=(err&&err.status===400)?'Token ung\u00fcltig.':'Speichern fehlgeschlagen.'; });
+    });
+    document.getElementById('imc-del').addEventListener('click',function(){
+      if(!confirm('ImmoMetrica-Zugang trennen?')) return;
+      A().apiCall('/immometrica/credentials',{method:'DELETE'}).then(function(){ mobToast('Zugang getrennt.'); g.remove(); }).catch(function(){ var er=document.getElementById('imc-err'); if(er)er.textContent='Trennen fehlgeschlagen.'; });
+    });
+  }
+  // MA32:end
+
   function boot(){
     var a=A();
     if(!a||!a.apiCall){ showGate('App-Anbindung fehlt'); return; }
@@ -1978,6 +2049,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     installProfil();
     installLifecycle();
     installBoardingSections();
+    installSettingsActions();
     installQuickCheck();
     installQcSettings();
     installFlipCards();
