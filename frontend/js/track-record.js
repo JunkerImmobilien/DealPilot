@@ -131,7 +131,7 @@ function renderCoverPage(doc, objects, W, H, C) {
     { label: 'Anzahl Objekte', val: totals.count + '', color: C.CH },
     { label: 'Investment-Volumen', val: _fmtKEU(totals.kp), color: C.CH },
     { label: 'Marktwert gesamt', val: _fmtKEU(totals.marktw), color: C.GREEN },
-    { label: 'Cashflow / Jahr', val: (totals.cf_jahr >= 0 ? '+' : '') + _fmtKEU(totals.cf_jahr), color: totals.cf_jahr >= 0 ? C.GREEN : C.RED }
+    { label: 'Cashflow / Jahr (n. St.)', val: (totals.cf_jahr >= 0 ? '+' : '') + _fmtKEU(totals.cf_jahr), color: totals.cf_jahr >= 0 ? C.GREEN : C.RED } /*v898-p4*/
   ];
 
   tiles.forEach(function(t, i) {
@@ -290,7 +290,7 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
     ['Baujahr', d.baujahr || '–'],
     ['Kaufdatum', d.kaufdat ? new Date(d.kaufdat).toLocaleDateString('de-DE') : '–'],
     ['Kaufpreis', _euro(d.kp)],
-    ['Marktwert (Bank)', _euro(d.bankval) || _euro(d.svwert) || '–'],
+    ['Marktwert (Bank)', d.bankval ? _euro(d.bankval) : (d.svwert ? _euro(d.svwert) : '–')], /*v898-p5*/
     ['Eigenkapital', _euro(d.ek)],
     ['Finanzierung', _euro(d.d1) + (parseFloat(d.d2) > 0 ? ' + ' + _euro(d.d2) : '')]
   ];
@@ -326,12 +326,12 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
   var dscr = k.dscr || 0;
   var darl = (parseFloat(d.d1) || 0) + (parseFloat(d.d2) || 0);
   var marktw = parseFloat(d.bankval) || parseFloat(d.svwert) || parseFloat(d.kp) || 0;
-  var ltv = marktw > 0 ? (darl / marktw * 100) : 0;
+  var ltv = (k.ltv != null && !isNaN(k.ltv)) ? parseFloat(k.ltv) : (marktw > 0 ? (darl / marktw * 100) : 0); /*v898-p5*/
 
   var kpiCards = [
     { label: 'Bruttomietrendite', val: bmy, color: C.GREEN },
     { label: 'Cashflow n.St. p.a.', val: (cfNs >= 0 ? '+' : '') + _euro(cfNs), color: cfNs >= 0 ? C.GREEN : C.RED },
-    { label: 'Cashflow / Monat', val: (cfNsM >= 0 ? '+' : '') + _euro(cfNsM), color: cfNsM >= 0 ? C.GREEN : C.RED },
+    { label: 'Cashflow / Mon. (n.St.)', val: (cfNsM >= 0 ? '+' : '') + _euro(cfNsM), color: cfNsM >= 0 ? C.GREEN : C.RED }, /*v898-p5*/
     { label: 'DSCR', val: dscr.toFixed(2).replace('.', ','), color: C.CH },
     { label: 'LTV', val: ltv.toFixed(1).replace('.', ',') + ' %', color: C.CH }
   ];

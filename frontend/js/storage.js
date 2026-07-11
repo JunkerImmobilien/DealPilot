@@ -2134,6 +2134,81 @@ function exportPortfolioCSV() {
 // ═══════════════════════════════════════════════════
 // GLOBAL BANKEXPORT VIEW (alle Objekte aggregiert)
 // ═══════════════════════════════════════════════════
+/* ===== v898-modal-theme: Boarding-Modal-Shell + Theme-Config (reseller-ready) ===== */
+var DP_ICO = {
+  bank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M4 21V10M9 21V10M15 21V10M20 21V10"/><path d="M12 3 21 8H3z"/></svg>',
+  award:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v3a4 4 0 0 1-8 0z"/><path d="M8 5H5v1a3 3 0 0 0 3 3M16 5h3v1a3 3 0 0 1-3 3"/><path d="M12 11v4M9 20h6M10 20l.6-3h2.8l.6 3"/></svg>',
+  csv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11M4 14h16"/></svg>',
+  xlsx:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 8l8 8M16 8l-8 8"/></svg>',
+  pdf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15h6"/></svg>',
+  dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+};
+function DP_BAR(ctx, modalId){
+  return '<div class="dpm-bar"><span class="dpm-logo">Deal<b>Pilot</b></span>'
+    + '<div class="dpm-bar-right"><span class="dpm-ctx">'+ctx+'</span>'
+    + '<button class="dpm-x" onclick="var m=document.getElementById(\''+modalId+'\');if(m)m.remove()">'+DP_ICO.x+'</button></div></div>';
+}
+function DP_HERO(kick, title, desc, iconSvg){
+  return '<div class="dpm-hero">'
+    + (iconSvg ? '<div class="dpm-hero-badge">'+iconSvg+'</div>' : '')
+    + '<div class="dpm-kick">'+kick+'</div><h2 class="dpm-h">'+title+'</h2>'
+    + (desc ? '<p class="dpm-desc">'+desc+'</p>' : '') + '</div>';
+}
+function _dpApplyThemeVars(){
+  try{
+    var b=(window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.get) ? DealPilotConfig.branding.get() : null;
+    var th=b && b.theme; if(!th) return;
+    var r=document.documentElement.style;
+    if(th.accent) r.setProperty('--dp-accent',th.accent);
+    if(th.accentHi) r.setProperty('--dp-accent-hi',th.accentHi);
+    if(th.accentLo) r.setProperty('--dp-accent-lo',th.accentLo);
+    if(th.obsidian) r.setProperty('--dp-obsidian',th.obsidian);
+  }catch(e){}
+}
+function _dpModalCss(){
+  if(document.getElementById('dp-modal-theme')){ _dpApplyThemeVars(); return; }
+  var st=document.createElement('style'); st.id='dp-modal-theme';
+  st.textContent=[
+    ':root{--dp-obsidian:#070707;--dp-accent:#C9A84C;--dp-accent-hi:#E8CC7A;--dp-accent-lo:#b8932f;',
+      '--dp-hero:linear-gradient(150deg,var(--dp-accent-hi),var(--dp-accent) 45%,var(--dp-accent-lo));',
+      '--dp-runway:linear-gradient(110deg,var(--dp-accent-hi),var(--dp-accent) 55%,var(--dp-accent-lo));',
+      '--dp-surface:#fff;--dp-surface-2:#FAF6EC;--dp-line:#E6DFCE;--dp-ink:#1c1a14;--dp-ink-soft:#8a8473;',
+      '--dp-hero-ink:#1a1407;--dp-hero-ink-soft:#3a2e08;--dp-hero-kick:#5a4a14;}',
+    '.dpm-shell{padding:0 !important;overflow:hidden !important;background:var(--dp-surface) !important}',
+    '.dpm-bar{background:var(--dp-obsidian);display:flex;align-items:center;justify-content:space-between;padding:14px 22px}',
+    '.dpm-logo{font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:18px;color:#FDFCFA}.dpm-logo b{color:var(--dp-accent)}',
+    '.dpm-bar-right{display:flex;align-items:center;gap:15px}',
+    '.dpm-ctx{font-family:\'JetBrains Mono\',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dp-accent)}',
+    '.dpm-x{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:transparent;color:#cfcfce;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}.dpm-x svg{width:14px;height:14px}',
+    '.dpm-hero{background:var(--dp-hero);padding:22px 26px 24px;position:relative}',
+    '.dpm-hero-badge{position:absolute;right:22px;top:20px;width:44px;height:44px;border-radius:12px;background:rgba(26,20,7,.12);border:1px solid rgba(26,20,7,.18);display:flex;align-items:center;justify-content:center;color:var(--dp-hero-ink)}.dpm-hero-badge svg{width:23px;height:23px}',
+    '.dpm-kick{font-family:\'JetBrains Mono\',monospace;font-size:10.5px;letter-spacing:3px;text-transform:uppercase;color:var(--dp-hero-kick);font-weight:700;margin-bottom:7px}',
+    '.dpm-h{font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px;line-height:1.05;color:var(--dp-hero-ink);margin:0}',
+    '.dpm-desc{font-size:13px;line-height:1.5;color:var(--dp-hero-ink-soft);margin:9px 0 0;max-width:78ch}',
+    '.dpm-body{padding:20px 26px 26px}',
+    '.dpm-shell .bank-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}',
+    '.dpm-shell .bank-sum-card{background:#fff;border:1px solid var(--dp-line);border-radius:11px;padding:14px 15px;position:relative;overflow:hidden}',
+    '.dpm-shell .bank-sum-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--dp-runway)}',
+    '.dpm-shell .bank-sum-label{font-family:\'JetBrains Mono\',monospace;font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--dp-ink-soft);margin-bottom:7px}',
+    '.dpm-shell .bank-sum-val{font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:21px;color:var(--dp-accent-lo)}',
+    '.dpm-btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 17px;font-weight:600;font-size:13px;cursor:pointer;border:1px solid var(--dp-line);background:#fff;color:var(--dp-ink)}.dpm-btn svg{width:15px;height:15px}.dpm-btn:hover{border-color:var(--dp-accent)}',
+    '.dpm-btn.primary{background:var(--dp-runway);color:#1a1508;border-color:transparent}',
+    '.dpm-shell .bank-table-full thead th{background:var(--dp-obsidian);color:var(--dp-accent-hi);font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:.5px;text-transform:uppercase}',
+    '.dpm-shell .trackrec-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}',
+    '.dpm-shell .trackrec-sum-tile{background:#fff;border:1px solid var(--dp-line);border-radius:11px;padding:14px 15px;position:relative;overflow:hidden}',
+    '.dpm-shell .trackrec-sum-tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--dp-runway)}',
+    '.dpm-shell .trackrec-sum-l{font-family:\'JetBrains Mono\',monospace;font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--dp-ink-soft);margin-bottom:7px}',
+    '.dpm-shell .trackrec-sum-v{font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:21px;color:var(--dp-accent-lo)}',
+    /*v898-p3*/ '.dpm-shell .trackrec-card-img-empty svg{stroke:#3a3a3a}',
+    /*v898-p4*/ '.dpm-shell .trackrec-card-pdf{display:inline-flex !important;align-items:center;justify-content:center;gap:6px}',
+    '.dpm-shell .trackrec-card-pdf svg{width:14px !important;height:14px !important;flex:none}',
+    '@media(max-width:720px){.dpm-shell .bank-summary-grid{grid-template-columns:repeat(2,1fr)}}'
+  ].join('');
+  document.head.appendChild(st);
+  _dpApplyThemeVars();
+}
+
 async function showBankexportView() {
   // V63.82: Plan-Gate — Bankexport ist Investor+ (Starter hat ihn nicht; Free nur mit Wasserzeichen)
   if (typeof Plan !== 'undefined') {
@@ -2202,7 +2277,7 @@ async function showBankexportView() {
     '<div class="bank-filter-bar" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:8px 0 14px;padding:12px 14px;background:var(--surface,#F8F6F1);border:1px solid var(--line,#E5DFD0);border-radius:8px">' +
       '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">' +
         '<input type="checkbox" id="bank-include-all" ' + (includeAll ? 'checked' : '') + ' onchange="_bankexportToggleAll(this.checked)">' +
-        '<span><strong>Alle Objekte zeigen</strong> (statt nur Zuschlag-bekommen-Deals)</span>' +
+        '<span><strong>Alle Objekte anzeigen</strong> — sonst nur gewonnene Deals (mit Zuschlag)</span>' + /*v898-p4*/
       '</label>' +
       '<span style="margin-left:auto;font-size:12px;color:var(--muted,#7A7370)">' +
         wonObjects.length + ' Won · ' + allObjects.length + ' Total · <strong>' + objects.length + ' Objekte · ' + rows.length + ' Zeilen</strong>' +
@@ -2212,21 +2287,23 @@ async function showBankexportView() {
   var modal = document.createElement('div');
   modal.id = 'bankexport-modal';
   modal.className = 'global-view-overlay';
+  _dpModalCss();
   modal.innerHTML =
-    '<div class="global-view-modal" style="max-width:1500px">' +
-      '<button class="pricing-close" onclick="document.getElementById(\'bankexport-modal\').remove()">×</button>' +
-      '<h2>🏦 Bankexport · alle Objekte (Format: AuswertungBank)</h2>' +
+    '<div class="global-view-modal dpm-shell" style="max-width:1500px">' +
+      DP_BAR('Finanzierung · Export','bankexport-modal') +
+      DP_HERO('Finanzierung · Export','Bankexport · alle Objekte','Alle Darlehen deiner Objekte im Format AuswertungBank — als CSV, Excel oder PDF für Bankgespräch und Finanzierungsanfrage. Einzelne Darlehen per Häkchen abwählbar.', DP_ICO.bank) +
+      '<div class="dpm-body">' +
       filterBar +
       '<div class="bank-summary-grid">' +
-        '<div class="bank-sum-card"><div class="bank-sum-label">Anzahl Objekte</div><div class="bank-sum-val">' + t.count + '</div></div>' +
+        '<div class="bank-sum-card"><div class="bank-sum-label">Objekte mit Darlehen</div><div class="bank-sum-val">' + t.count + ' <span style="font-size:14px;color:var(--dp-ink-soft)">/ ' + objects.length + '</span></div></div>' +
         '<div class="bank-sum-card"><div class="bank-sum-label">Anzahl Darlehen</div><div class="bank-sum-val">' + rows.length + '</div></div>' +
         '<div class="bank-sum-card"><div class="bank-sum-label">Summe Kaufpreis</div><div class="bank-sum-val">' + fE(t.kp, 0) + '</div></div>' +
         '<div class="bank-sum-card"><div class="bank-sum-label">Summe Restschuld</div><div class="bank-sum-val">' + fE(t.rest, 0) + '</div></div>' +
       '</div>' +
       '<div class="global-view-actions">' +
-        '<button class="btn btn-outline" onclick="exportGlobalBankCSV()">📊 CSV exportieren</button>' +
-        '<button class="btn btn-outline" onclick="exportGlobalBankXLSX()">📗 Excel exportieren</button>' +
-        '<button class="btn btn-outline" onclick="exportGlobalBankPDF()">📄 PDF erstellen</button>' +
+        '<button class="dpm-btn" onclick="exportGlobalBankCSV()">'+DP_ICO.csv+'CSV exportieren</button>' +
+        '<button class="dpm-btn" onclick="exportGlobalBankXLSX()">'+DP_ICO.xlsx+'Excel exportieren</button>' +
+        '<button class="dpm-btn primary" onclick="exportGlobalBankPDF()">'+DP_ICO.pdf+'PDF erstellen</button>' +
       '</div>' +
       '<p class="hint" style="font-size:11.5px;margin:6px 0 4px;color:var(--muted)">Tipp: Häkchen in der ersten Spalte um einzelne Darlehen aus dem Export zu nehmen.</p>' +
       '<div style="overflow-x:auto;font-size:10.5px">' +
@@ -2294,6 +2371,7 @@ async function showBankexportView() {
             }).join('') +
           '</tbody>' +
         '</table>' +
+      '</div>' +
       '</div>' +
 
     '</div>';
@@ -2370,7 +2448,8 @@ async function exportGlobalBankPDF() {
   doc.setTextColor(201, 168, 76);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.text('JUNKER IMMOBILIEN · Bankexport · Portfolio-Übersicht', 12, 14);
+  var _bxB = (typeof _getBranding === 'function') ? _getBranding() : { company: 'DealPilot' }; /*v898-p3*/
+  doc.text(((_bxB.company || 'DealPilot').toUpperCase()) + ' · Bankexport · Portfolio-Übersicht', 12, 14);
   doc.setFontSize(8);
   doc.setTextColor(180, 180, 180);
   doc.text('Erstellt: ' + new Date().toLocaleDateString('de-DE'), 250, 14);
@@ -2444,7 +2523,9 @@ async function exportGlobalBankPDF() {
   doc.setTextColor(150, 150, 150);
   doc.text((typeof _getUserContact === 'function' ? _formatContact(_getUserContact()) : 'Junker Immobilien · Hermannstr. 9 · 32609 Hüllhorst · www.junker-immobilien.io'), 12, pageHeight - 6);
 
-  doc.save('Junker_Bankexport_Portfolio_' + new Date().toISOString().slice(0, 10) + '.pdf');
+  if (typeof _applyWatermarkIfFree === 'function') { try { var _np=doc.internal.getNumberOfPages(); for(var _p=1;_p<=_np;_p++){ doc.setPage(_p); _applyWatermarkIfFree(doc, 297); } } catch(e){} } /*v898-p4*/
+  var _bxCo = ((typeof _getBranding === 'function') ? (_getBranding().company || 'DealPilot') : 'DealPilot').replace(/[^a-zA-Z0-9]/g, '_');
+  doc.save(_bxCo + '_Bankexport_Portfolio_' + new Date().toISOString().slice(0, 10) + '.pdf');
   toast('✓ PDF erstellt');
 }
 
@@ -2488,7 +2569,7 @@ async function showTrackRecordView() {
     '<div class="trackrec-filter-bar" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:8px 0 14px;padding:12px 14px;background:var(--surface,#F8F6F1);border:1px solid var(--line,#E5DFD0);border-radius:8px">' +
       '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">' +
         '<input type="checkbox" id="trackrec-include-all" ' + (includeAll ? 'checked' : '') + ' onchange="_trackRecordToggleAll(this.checked)">' +
-        '<span><strong>Alle Objekte zeigen</strong> (statt nur Zuschlag-bekommen-Deals)</span>' +
+        '<span><strong>Alle Objekte anzeigen</strong> — sonst nur gewonnene Deals (mit Zuschlag)</span>' + /*v898-p4*/
       '</label>' +
       '<span style="margin-left:auto;font-size:12px;color:var(--muted,#7A7370)">' +
         wonObjects.length + ' Won · ' + allObjects.length + ' Total · <strong>' + objects.length + ' angezeigt</strong>' +
@@ -2498,10 +2579,12 @@ async function showTrackRecordView() {
   var modal = document.createElement('div');
   modal.id = 'trackrecord-modal';
   modal.className = 'global-view-overlay';
+  _dpModalCss();
   modal.innerHTML =
-    '<div class="global-view-modal">' +
-      '<button class="pricing-close" onclick="document.getElementById(\'trackrecord-modal\').remove()">×</button>' +
-      '<h2>🏆 Track Record</h2>' +
+    '<div class="global-view-modal dpm-shell">' +
+      DP_BAR('Portfolio · Track Record','trackrecord-modal') +
+      DP_HERO('Portfolio · Nachweis','Track Record','Alle Objekte deines Portfolios mit Score, Investment und Rendite — einzeln als PDF oder gesammelt als Nachweis für Bank, Partner und Netzwerk.', DP_ICO.award) +
+      '<div class="dpm-body">' +
       filterBar +
       '<div class="trackrec-summary">' +
         '<div class="trackrec-sum-tile"><div class="trackrec-sum-l">Objekte</div><div class="trackrec-sum-v">' + objects.length + '</div></div>' +
@@ -2510,13 +2593,14 @@ async function showTrackRecordView() {
       '</div>' +
       '<p class="hint" style="margin:14px 0 8px">Klick auf eine Karte: Einzel-PDF — oder unten Sammel-PDF.</p>' +
       '<div class="global-view-actions" style="margin-bottom:14px">' +
-        '<button class="btn btn-gold" onclick="exportTrackRecordAll()">📄 Sammel-PDF (alle angezeigten Objekte)</button>' +
+        '<button class="dpm-btn primary" onclick="exportTrackRecordAll()">'+DP_ICO.dl+'Sammel-PDF (alle angezeigten Objekte)</button>' +
       '</div>' +
       '<div class="trackrec-cards-grid">' +
         (objects.length === 0
           ? '<div style="padding:40px;text-align:center;color:var(--muted)">Keine Objekte mit Zuschlag-Status. Markiere im Tab <strong>Deal-Aktion</strong> die Objekte für die du den Zuschlag bekommen hast — oder hake oben "Alle Objekte zeigen" an.</div>'
           : objects.map(function(o, i) { return _renderTrackRecordCard(o, i); }).join('')
         ) +
+      '</div>' +
       '</div>' +
     '</div>';
   document.body.appendChild(modal);
@@ -2563,7 +2647,7 @@ function _renderTrackRecordCard(o, idx) {
 
   var thumbHtml = thumbSrc
     ? '<div class="trackrec-card-img" style="background-image:url(\'' + _escAttrTr(thumbSrc) + '\')"></div>'
-    : '<div class="trackrec-card-img trackrec-card-img-empty"><span>📷</span><small>Kein Foto</small></div>';
+    : '<div class="trackrec-card-img trackrec-card-img-empty"><span><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a2 2 0 0 1 2-2h1l1.5-2h9L18 7h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.2"/></svg></span><small>Kein Foto</small></div>';
 
   return '<div class="trackrec-card-v40" onclick="exportTrackRecordOne(' + idx + ')" role="button" tabindex="0">' +
     thumbHtml +
@@ -2582,7 +2666,7 @@ function _renderTrackRecordCard(o, idx) {
         '<div class="trackrec-card-kpi"><div class="trackrec-card-kpi-l">Bruttorendite</div><div class="trackrec-card-kpi-v">' + (bmr > 0 ? bmr.toFixed(2).replace('.', ',') + ' %' : '—') + '</div></div>' +
         '<div class="trackrec-card-kpi"><div class="trackrec-card-kpi-l">Fotos</div><div class="trackrec-card-kpi-v">' + photoCount + '</div></div>' +
       '</div>' +
-      '<button class="btn btn-outline btn-sm trackrec-card-pdf" onclick="event.stopPropagation();exportTrackRecordOne(' + idx + ')">📄 Einzel-PDF</button>' +
+      '<button class="btn btn-outline btn-sm trackrec-card-pdf" onclick="event.stopPropagation();exportTrackRecordOne(' + idx + ')">'+DP_ICO.pdf+' Einzel-PDF</button>' +
     '</div>' +
   '</div>';
 }
@@ -2934,7 +3018,8 @@ async function exportGlobalBankPDF() {
   doc.setTextColor(201, 168, 76);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.text('JUNKER IMMOBILIEN · AuswertungBank · alle Objekte', 12, 14);
+  var _axB = (typeof _getBranding === 'function') ? _getBranding() : { company: 'DealPilot' }; /*v898-p3*/
+  doc.text(((_axB.company || 'DealPilot').toUpperCase()) + ' · AuswertungBank · alle Objekte', 12, 14);
   doc.setFontSize(8);
   doc.setTextColor(180, 180, 180);
   doc.text('Erstellt: ' + new Date().toLocaleDateString('de-DE'), 360, 14);
