@@ -319,6 +319,17 @@ body{font-family:var(--body);color:#e8e6df;background:radial-gradient(900px 700p
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:430px){body{padding:0;gap:0;background:#000}.intro,.note{display:none}.phone{width:100vw;height:100vh;border-radius:0;padding:0}.screen{border-radius:0}}
 </style>
+  <!-- PWA:start -->
+  <link rel="manifest" href="/dp-mobile.webmanifest">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DealPilot">
+  <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
+  <link rel="icon" type="image/png" href="/assets/dp-pwa-192.png">
+  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/dp-mobile-sw.js",{scope:"/mobile-demo.html"}).catch(function(){});});}</script>
+  <!-- PWA:end -->
 </head>
 <body>
 

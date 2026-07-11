@@ -1,0 +1,17 @@
+{
+  "name": "DealPilot",
+  "short_name": "DealPilot",
+  "description": "Immobilienentscheidungen sind zu gross fuer ein Bauchgefuehl - Quick Check, Marktwert & DealScore vor Ort.",
+  "lang": "de",
+  "start_url": "/mobile-demo.html",
+  "scope": "/mobile-demo.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050505",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    { "src": "/assets/dp-pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/dp-pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/dp-pwa-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
