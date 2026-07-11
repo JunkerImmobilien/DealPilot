@@ -19,7 +19,13 @@
   var _avmHealth = null;
   /* v644-avm-soon: PriceHubble bleibt "coming soon", bis echter Client + Zugang da sind. */
   var PH_COMING_SOON = false; /* v741-ph-soon-off: folgt jetzt /health (Client live+ready) */
+  /* v895h-avm-soon: Sprengnetter+PriceHubble als "Coming soon" ausgrauen (nicht auswaehlbar).
+     Standard: auf Staging-Host AUS (SN/PH bleiben wie bisher), sonst AN. Manuell: window.DP_AVM_PREFLIGHT_SOON = true|false. */
+  var AVM_PREFLIGHT_SOON = (typeof window !== 'undefined' && window.DP_AVM_PREFLIGHT_SOON != null)
+    ? !!window.DP_AVM_PREFLIGHT_SOON
+    : !/staging/i.test(String((typeof location !== 'undefined' && location.hostname) || ''));
   function provComingSoon(p) {
+    if ((p === 'pricehubble' || p === 'sprengnetter') && AVM_PREFLIGHT_SOON) return true; /* v895h-avm-soon */
     if (p === 'pricehubble' && PH_COMING_SOON) return true;
     try { return !!(_avmHealth && _avmHealth.providers && _avmHealth.providers[p] && _avmHealth.providers[p].coming_soon); } catch (e) { return false; }
   }
@@ -291,8 +297,8 @@
         '<div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot \u00b7 Boarding</span></div><span class="dp-pf-perf"></span>' + /* v572-leadtext */
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">' +
           /* v752-order */ pfTileLogo('dealpilot', _dpInner, false, 'Marktpreisbewertung') +
-          pfTileLogo('sprengnetter', _snInner, avmOff, avmOff ? 'Marktradar derzeit deaktiviert' : 'Sprengnetter') +
-          pfTileLogo('pricehubble', _phInner, (avmOff || provComingSoon('pricehubble')), provComingSoon('pricehubble') ? 'Demnächst verfügbar' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble'), provComingSoon('pricehubble') ? 'dp-pf-soon-on' : '') +
+          pfTileLogo('sprengnetter', _snInner, (avmOff || provComingSoon('sprengnetter')), provComingSoon('sprengnetter') ? 'Coming soon' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'Sprengnetter'), provComingSoon('sprengnetter') ? 'dp-pf-soon-on' : '') + /* v895h-avm-soon */
+          pfTileLogo('pricehubble', _phInner, (avmOff || provComingSoon('pricehubble')), provComingSoon('pricehubble') ? 'Coming soon' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble'), provComingSoon('pricehubble') ? 'dp-pf-soon-on' : '') +
         '</div></div>' +
         '<div class="dp-pf-sep"></div>' +
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">' +
@@ -304,6 +310,7 @@
       '</div></div>' +
       '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
       (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Marktradar (PriceHubble/Sprengnetter) ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
+      ((!avmOff && (provComingSoon('sprengnetter') || provComingSoon('pricehubble'))) ? '<div class="oab-note" style="margin:-6px 0 12px">Marktbewertung aktuell \u00fcber die DealPilot-Markteinsch\u00e4tzung \u2014 Sprengnetter &amp; PriceHubble folgen in K\u00fcrze.</div>' : '') + /* v895h-avm-soon */
       '<div class="oab-prog" id="oab-prog" style="display:none"></div>' +
       '<div class="oab-results" id="oab-results"></div>';
     // v570-pf: initial .on synchronisieren (DealPilot default aktiv) + LED-Kopplung sicherstellen
