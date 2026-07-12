@@ -1596,7 +1596,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
   function _qcSaveDefault(){ try{ var on=[]; for(var g in QC_SRC){ if(window.__qcSel[QC_SRC[g].k]) on.push(QC_SRC[g].k); } localStorage.setItem('dp_qb_sources', on.join(',')); }catch(e){} }
   function _qcLoadDefault(){ try{ var s=(localStorage.getItem('dp_qb_sources')||'').split(',').filter(Boolean); s.forEach(function(k){ window.__qcSel[k]=true; }); }catch(e){} }
 
-  function _qcTiles(){ return [].slice.call(document.querySelectorAll('[data-view="hub"] .act[data-go]')).filter(function(t){ return QC_SRC[t.getAttribute('data-go')]; }); }
+  function _qcTiles(){ return [].slice.call(document.querySelectorAll('[data-view="hub"] .act[data-go]')).filter(function(t){ return !!_qcMeta(t.getAttribute('data-goqc')||_qcTileKey(t)); }); }
   function _qcMeta(key){ for(var g in QC_SRC){ if(QC_SRC[g].k===key) return QC_SRC[g]; } return null; }
   function _qcSync(){
     _qcTiles().forEach(function(t){ var key=t.getAttribute('data-goqc')||_qcTileKey(t); var meta=_qcMeta(key); if(!meta) return;
@@ -1737,10 +1737,9 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
       ki[1].__hasFlip=haveV;
     }
     var _bar=dv.querySelector('.barsd');
-    if(_bar){ var _raw=(sMode==='deal')?(d._dp_categories||d._ds2_categories):(d._ds2_categories||d._dp_categories); var _cats=_ma28Cats(_raw);
-      if(_cats){ var _ord=[['rendite','Rendite'],['finanzierung','Finanzierung'],['risiko','Risiko'],['lage','Lage'],['upside','Upside']];
-        var _h=_ord.map(function(o){ var s=_cats[o[0]]; if(s==null)return ''; s=Math.round(s); return '<div class="bl"><div class="tp"><span>'+o[1]+'</span><b>'+s+'</b></div><div class="tr"><i style="width:'+s+'%;background:'+catColor(s)+'"></i></div></div>'; }).join('');
-        if(_h) _bar.innerHTML=_h; } }
+    if(_bar){ var _raw=(sMode==='deal')?(d._dp_categories||d._ds2_categories):(d._ds2_categories||d._dp_categories);
+      var _h=_catBarsHtml(_raw);
+      _bar.innerHTML=_h||'<div style="color:var(--mut);font-family:var(--mono);font-size:11px;padding:8px 0">Kategorie-Details \u00b7 folgt</div>'; }
   }
 
   function installFlipCards(){
@@ -1989,7 +1988,7 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
       if(/Externe Anbieter/i.test(nm)){ r.__ma31=1; r.style.cursor='pointer';
         r.addEventListener('click',function(){ mbImmoCreds(); }); }
       else if(/Tarif/i.test(nm)){ r.__ma31=1; r.style.cursor='pointer';
-        r.addEventListener('click',function(){ mobToast('Tarif & Rechnungen \u2014 im Cockpit \u00f6ffnen \u2026'); setTimeout(function(){ location.href='/'; },500); }); }
+        r.addEventListener('click',function(){ mobToast('Tarif & Rechnungen \u2014 im Cockpit \u00f6ffnen \u2026'); setTimeout(function(){ try{ window.open(location.origin+'/','_blank'); }catch(e){ location.href='/'; } },400); }); }
     });
   }
   // MA31:end
@@ -2048,6 +2047,19 @@ buildStack('cockpit-list');buildStack('objekte-list');buildImmo();fillDials();ma
     });
   }
   // MA32:end
+
+  // MA34:start \u2014 generischer Kategorie-Renderer (echte Keys, alle KPIs)
+  function _cap(k){ k=String(k).replace(/[_-]+/g,' ').trim(); return k.charAt(0).toUpperCase()+k.slice(1); }
+  function _catBarsHtml(raw){
+    if(!raw) return '';
+    var LBL={rendite:'Rendite',cashflow:'Cashflow',lage:'Lage & Markt',standort:'Standort',finanzierung:'Finanzierung',substanz:'Substanz',zustand:'Zustand',risiko:'Risiko',upside:'Upside',markt:'Markt',mieter:'Mieter',entwicklung:'Entwicklung',objekt:'Objekt',qualitaet:'Qualit\u00e4t',energie:'Energie'};
+    var e=[];
+    function push(k,label,s){ if(k==null||k==='' || s==null || isNaN(+s)) return; e.push([k, label || LBL[String(k).toLowerCase()] || _cap(k), +s]); }
+    if(Array.isArray(raw)){ raw.forEach(function(c){ if(!c) return; var k=(c.key!=null?c.key:(c.name!=null?c.name:'')); var s=(c.score!=null?c.score:(c.value!=null?c.value:(c.pct!=null?c.pct:null))); push(k, c.label, s); }); }
+    else if(typeof raw==='object'){ Object.keys(raw).forEach(function(k){ var c=raw[k]; var s=(c&&c.score!=null)?c.score:((typeof c==='number')?c:((c&&c.value!=null)?c.value:null)); push(k, (c&&c.label), s); }); }
+    return e.map(function(o){ var s=Math.round(o[2]); var w=Math.max(0,Math.min(100,s)); return '<div class="bl"><div class="tp"><span>'+esc(o[1])+'</span><b>'+s+'</b></div><div class="tr"><i style="width:'+w+'%;background:'+catColor(s)+'"></i></div></div>'; }).join('');
+  }
+  // MA34:end
 
   function boot(){
     var a=A();
