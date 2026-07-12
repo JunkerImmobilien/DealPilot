@@ -334,6 +334,7 @@ window.DealPilotConfig = (function() {
         watermark:     false
       },
       features: {
+        theme_palette:       true,    /*v901-theme*/
         marktreport: true, rnd_full: true, json_backup: true, excel_import: true, // v494-matrix
         full_calc:                  true,
         deal_score_v2:              true,
@@ -787,3 +788,63 @@ window.Plan = {
     return !this.can(featureKey);
   }
 };
+
+
+/* ═══════════════════ v901-theme — zentrales Theme-Fundament (Phase 2a) ═══════════════════
+   Skin (Hell/Dunkel) fuer ALLE Plaene · Akzent-Palette nur Pro (theme_palette).
+   Faerbt app-weit via --gold (setzt v900 voraus) + Modale via storage._dpApplyThemeVars. */
+(function(){
+  if(!window.DealPilotConfig || !DealPilotConfig.branding) return;
+  var DPC = window.DealPilotConfig;
+  var SKINS = ['obsidian','hell','slate','mono'];
+  var DEF  = { skin:'obsidian', accent:'#C9A84C', obsidian:'#070707' };
+
+  function _rgb(h){h=(h||'').replace('#','');if(h.length===3)h=h.split('').map(function(c){return c+c;}).join('');
+    return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
+  function _hex(r,g,b){function c(x){x=Math.max(0,Math.min(255,Math.round(x)));return ('0'+x.toString(16)).slice(-2);}return '#'+c(r)+c(g)+c(b);}
+  function _lighten(h,p){var a=_rgb(h);return _hex(a[0]+(255-a[0])*p/100,a[1]+(255-a[1])*p/100,a[2]+(255-a[2])*p/100);}
+  function _darken(h,p){var a=_rgb(h);return _hex(a[0]*(1-p/100),a[1]*(1-p/100),a[2]*(1-p/100));}
+
+  function _isPalette(){ try{ return !!DPC.pricing.hasFeature('theme_palette'); }catch(e){ return false; } }
+  function _validSkin(s){ return SKINS.indexOf(s)>=0 ? s : DEF.skin; }
+
+  function getTheme(){
+    var skin = _validSkin(localStorage.getItem('dp_theme_skin') || DEF.skin);   // alle Plaene
+    var acc  = DEF.accent;                                                       // Palette nur Pro
+    if(_isPalette()){ var a=localStorage.getItem('dp_theme_accent'); if(a && /^#[0-9a-fA-F]{6}$/.test(a)) acc=a; }
+    return { skin:skin, accent:acc, accentHi:_lighten(acc,22), accentLo:_darken(acc,16), obsidian:DEF.obsidian };
+  }
+
+  function setTheme(patch){
+    patch = patch || {};
+    if(typeof patch.skin === 'string') localStorage.setItem('dp_theme_skin', _validSkin(patch.skin));
+    if(typeof patch.accent === 'string' && /^#[0-9a-fA-F]{6}$/.test(patch.accent)){
+      if(_isPalette()) localStorage.setItem('dp_theme_accent', patch.accent);   // sonst ignoriert (gated)
+    }
+    applyTheme();
+    return getTheme();
+  }
+
+  function applyTheme(){
+    var t = getTheme(), r = document.documentElement.style;
+    r.setProperty('--gold',    t.accent);
+    r.setProperty('--gold-hi', t.accentHi);
+    r.setProperty('--gold-lo', t.accentLo);
+    if(document.body) document.body.setAttribute('data-dp-skin', t.skin);
+    if(typeof window._dpApplyThemeVars === 'function'){ try{ window._dpApplyThemeVars(); }catch(e){} }
+  }
+
+  // theme in branding.get() einhaengen (storage._dpApplyThemeVars liest b.theme)
+  var _origGet = DPC.branding.get;
+  if(typeof _origGet === 'function'){
+    DPC.branding.get = function(){ var b = _origGet.apply(this, arguments) || {}; b.theme = getTheme(); return b; };
+  }
+  DPC.branding.getTheme   = getTheme;
+  DPC.branding.setTheme   = setTheme;
+  DPC.branding.applyTheme = applyTheme;
+
+  function boot(){ applyTheme(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  setTimeout(boot, 1600);   // nochmal nach Plan-/Sub-Load (Palette-Gating kann sich aendern)
+})();
+/* ═══════════════════ /v901-theme ═══════════════════ */

@@ -1,3 +1,5 @@
+<!--v902-goldshades-->
+<!--v900-accent-central-->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -41,8 +43,8 @@
   gap: 12px;
   margin: 0 0 14px 0;
   padding: 14px 16px;
-  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(201,168,76,0.04));
-  border: 1px solid rgba(201,168,76,0.35);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 10%, transparent), color-mix(in srgb, var(--gold) 4%, transparent));
+  border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
   border-radius: 8px;
   position: relative;
 }
@@ -78,7 +80,7 @@
   .afa-neubau-hint-actions { min-width: 0; }
 }
 
-#afa_deg_preview_wrap[open] summary { background: rgba(201,168,76,0.16); }
+#afa_deg_preview_wrap[open] summary { background: color-mix(in srgb, var(--gold) 16%, transparent); }
 
 #afa_deg_preview_body table {
   width: 100%;
@@ -89,7 +91,7 @@
 #afa_deg_preview_body td {
   padding: 4px 8px;
   text-align: right;
-  border-bottom: 1px solid rgba(201,168,76,0.15);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold) 15%, transparent);
 }
 #afa_deg_preview_body th { font-weight: 600; color: var(--ch); }
 #afa_deg_preview_body td.tal { text-align: left; }
@@ -110,7 +112,7 @@
   margin-left: 4px;
   padding: 0;
   border: none;
-  background: rgba(201,168,76,0.15);
+  background: color-mix(in srgb, var(--gold) 15%, transparent);
   color: var(--gold, #c9a84c);
   border-radius: 50%;
   font-size: 10px;
@@ -122,7 +124,7 @@
   flex-shrink: 0;
 }
 .dp-tip:hover {
-  background: rgba(201,168,76,0.30);
+  background: color-mix(in srgb, var(--gold) 30%, transparent);
   transform: scale(1.10);
 }
 .dp-tip:focus {
@@ -142,7 +144,7 @@
   width: 320px;
   max-width: calc(100vw - 32px);
   background: #FFFFFF;
-  border: 1px solid rgba(201,168,76,0.40);
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(42,39,39,0.18), 0 2px 6px rgba(42,39,39,0.10);
   padding: 0;
@@ -160,8 +162,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(201,168,76,0.04));
-  border-bottom: 1px solid rgba(201,168,76,0.20);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 10%, transparent), color-mix(in srgb, var(--gold) 4%, transparent));
+  border-bottom: 1px solid color-mix(in srgb, var(--gold) 20%, transparent);
   border-radius: 8px 8px 0 0;
 }
 .dp-tip-popup-title {
@@ -209,7 +211,7 @@
 .dp-tip-infobox {
   margin: 8px 0 0 0;
   padding: 10px 12px;
-  background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(201,168,76,0.02));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 6%, transparent), color-mix(in srgb, var(--gold) 2%, transparent));
   border-left: 3px solid var(--gold, #c9a84c);
   border-radius: 4px;
   font-size: 12px;
@@ -268,7 +270,7 @@ body.dp-tt-off .dp-tip-infobox {
 .dp-tt-mode-btn {
   flex: 1;
   padding: 10px 12px;
-  border: 1.5px solid rgba(201,168,76,0.30);
+  border: 1.5px solid color-mix(in srgb, var(--gold) 30%, transparent);
   background: white;
   border-radius: 8px;
   cursor: pointer;
@@ -280,11 +282,11 @@ body.dp-tt-off .dp-tip-infobox {
 }
 .dp-tt-mode-btn:hover {
   border-color: var(--gold);
-  background: rgba(201,168,76,0.05);
+  background: color-mix(in srgb, var(--gold) 5%, transparent);
 }
 .dp-tt-mode-btn.active {
   border-color: var(--gold);
-  background: rgba(201,168,76,0.12);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
   font-weight: 600;
   box-shadow: inset 0 0 0 1px var(--gold);
 }
@@ -302,8 +304,8 @@ body.dp-tt-off .dp-tip-infobox {
   display: none;
   margin-top: 8px;
   padding: 10px 12px;
-  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(245,236,208,0.50));
-  border: 1px solid rgba(201,168,76,0.30);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 10%, transparent), rgba(245,236,208,0.50));
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
   border-left: 3px solid var(--gold, #C9A84C);
   border-radius: 6px;
   font-size: 12.5px;
@@ -322,8 +324,8 @@ body.dp-tt-off .dp-tip-infobox {
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  background: rgba(201,168,76,0.10);
-  border: 1px solid rgba(201,168,76,0.35);
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
   border-radius: 6px;
   color: var(--gold-3, #9a7f33);
   font-size: 12.5px;
@@ -334,7 +336,7 @@ body.dp-tt-off .dp-tip-infobox {
   transition: all 0.15s ease;
 }
 .v234-customer-portal-link:hover {
-  background: rgba(201,168,76,0.18);
+  background: color-mix(in srgb, var(--gold) 18%, transparent);
   border-color: var(--gold, #C9A84C);
   color: var(--gold-d, #8a6f27);
 }
@@ -367,7 +369,7 @@ input.v236-qc-loaded,
 select.v236-qc-loaded,
 textarea.v236-qc-loaded {
   border-left: 3px solid var(--gold, #C9A84C) !important;
-  background: linear-gradient(90deg, rgba(201,168,76,0.05), transparent 30%) !important;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--gold) 5%, transparent), transparent 30%) !important;
   position: relative;
 }
 
@@ -383,7 +385,7 @@ textarea.v236-qc-loaded {
   font-weight: 600;
   color: var(--gold-3, #9a7f33);
   background: var(--gold-bg, #FAF5E8);
-  border: 1px solid rgba(201,168,76,0.30);
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
   border-radius: 10px;
   padding: 1px 7px;
   letter-spacing: 0.3px;
@@ -1267,14 +1269,14 @@ label.dp-required.qc-required::after {
             <div class="kv"><span>Status</span><span class="kv-v" id="san_limit_status">—</span></div>
 
             <!-- V63.99: Aufschlüsselung der Berechnung — wird nur gezeigt wenn Küche aktiviert oder bei größeren Beträgen -->
-            <div id="ahk_detail_block" style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(201,168,76,0.30);display:none">
+            <div id="ahk_detail_block" style="margin-top:10px;padding-top:10px;border-top:1px dashed color-mix(in srgb, var(--gold) 30%, transparent);display:none">
               <div class="hint" style="font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;font-size:10px;margin-bottom:6px">So wird die Grenze berechnet</div>
               <div class="kv" style="font-size:12px"><span>Gebäudeanteil (Standard 80%)</span><span class="kv-v" id="ahk_geb_anteil">—</span></div>
               <div class="kv" style="font-size:12px"><span id="ahk_geb_label">Gebäude (vor Küchen-Abzug)</span><span class="kv-v" id="ahk_geb_brutto">—</span></div>
               <div class="kv" style="font-size:12px;display:none" id="ahk_kueche_row"><span>− Küche (separates Wirtschaftsgut)</span><span class="kv-v" id="ahk_kueche_val">—</span></div>
               <div class="kv" style="font-size:12px;display:none" id="ahk_geb_netto_row"><span>= Gebäude ohne Küche</span><span class="kv-v" id="ahk_geb_netto">—</span></div>
               <div class="kv" style="font-size:12px"><span>+ Anteilige Nebenkosten (Gebäudeanteil)</span><span class="kv-v" id="ahk_nk_anteil">—</span></div>
-              <div class="kv" style="font-size:12px;font-weight:600;border-top:1px dashed rgba(201,168,76,0.30);padding-top:5px;margin-top:5px"><span>= Gebäude-Anschaffungskosten</span><span class="kv-v" id="ahk_basis">—</span></div>
+              <div class="kv" style="font-size:12px;font-weight:600;border-top:1px dashed color-mix(in srgb, var(--gold) 30%, transparent);padding-top:5px;margin-top:5px"><span>= Gebäude-Anschaffungskosten</span><span class="kv-v" id="ahk_basis">—</span></div>
               <div class="kv" style="font-size:12px;font-weight:600;color:var(--gold)"><span>× 15%</span><span class="kv-v c-gold" id="ahk_15pct">—</span></div>
             </div>
 
@@ -1320,7 +1322,7 @@ label.dp-required.qc-required::after {
               </select>
             </div>
           </div>
-          <div id="inv_detail_body" style="display:none;margin-top:12px;padding-top:12px;border-top:1px dashed rgba(201,168,76,.3)">
+          <div id="inv_detail_body" style="display:none;margin-top:12px;padding-top:12px;border-top:1px dashed color-mix(in srgb, var(--gold) 30%, transparent)">
           <p class="hint" style="margin-bottom:10px">
             Detaillierte Aufschlüsselung — die Felder summieren sich automatisch und füllen die Inventarkosten oben.
           </p>
@@ -1527,7 +1529,7 @@ label.dp-required.qc-required::after {
     <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-user"/></svg></span>Persönliche Steuer</div>
     <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
     <div class="g2">
-      <div class="zve-banner" style="grid-column:1/-1;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:start;gap:12px;font-family:var(--font-main,'IBM Plex Sans',sans-serif)">
+      <div class="zve-banner" style="grid-column:1/-1;background:color-mix(in srgb, var(--gold) 6%, transparent);border:1px solid color-mix(in srgb, var(--gold) 25%, transparent);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:start;gap:12px;font-family:var(--font-main,'IBM Plex Sans',sans-serif)">
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--gold,#C9A84C);flex-shrink:0;margin-top:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.5" fill="currentColor"/></svg>
   <div style="flex:1;font-size:12.5px;line-height:1.5">
     <strong style="font-weight:600">Dein zvE wird zentral im Profil gespeichert.</strong>
@@ -1627,16 +1629,16 @@ label.dp-required.qc-required::after {
 
     <!-- V227: Wenn degressiv aktiv: kleine Vorschau-Tabelle erste 10 Jahre -->
     <details id="afa_deg_preview_wrap" style="margin-top:10px;display:none">
-      <summary style="cursor:pointer;padding:8px 12px;background:rgba(201,168,76,0.08);border-radius:6px;font-size:13px;font-weight:600;color:var(--ch)">
+      <summary style="cursor:pointer;padding:8px 12px;background:color-mix(in srgb, var(--gold) 8%, transparent);border-radius:6px;font-size:13px;font-weight:600;color:var(--ch)">
         <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg> AfA-Verlauf erste 10 Jahre ansehen</span>
       </summary>
-      <div id="afa_deg_preview_body" style="margin-top:8px;padding:10px;background:rgba(201,168,76,0.04);border-radius:6px;font-size:12px">
+      <div id="afa_deg_preview_body" style="margin-top:8px;padding:10px;background:color-mix(in srgb, var(--gold) 4%, transparent);border-radius:6px;font-size:12px">
         <!-- befüllt via JS -->
       </div>
     </details>
 
     <!-- V227: § 7b Sonder-AfA Block (collapsible) -->
-    <details id="afa_sonder7b_wrap" style="margin-top:14px;border:1px solid rgba(201,168,76,0.25);border-radius:8px;padding:10px 14px;background:rgba(201,168,76,0.04)">
+    <details id="afa_sonder7b_wrap" style="margin-top:14px;border:1px solid color-mix(in srgb, var(--gold) 25%, transparent);border-radius:8px;padding:10px 14px;background:color-mix(in srgb, var(--gold) 4%, transparent)">
       <summary style="cursor:pointer;font-weight:600;font-size:13px;color:var(--ch);list-style:none;display:flex;justify-content:space-between;align-items:center">
         <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg> Sonder-AfA § 7b EStG (zusätzlich +5% in den ersten 4 Jahren)</span>
         <span class="cf-hint" style="font-weight:400;font-size:11px">klick zum Aufklappen</span>
@@ -1651,7 +1653,7 @@ label.dp-required.qc-required::after {
             <span>§ 7b Sonder-AfA aktivieren</span>
           </label>
         </div>
-        <div id="afa_sonder7b_details" style="display:none;margin-top:10px;padding:10px;background:white;border-radius:6px;border:1px solid rgba(201,168,76,0.2)">
+        <div id="afa_sonder7b_details" style="display:none;margin-top:10px;padding:10px;background:white;border-radius:6px;border:1px solid color-mix(in srgb, var(--gold) 20%, transparent)">
           <p class="hint" style="font-weight:600;color:var(--ch);margin-bottom:8px">Voraussetzungen bestätigen:</p>
           <div class="f checkbox-row">
             <label class="cb-label">
@@ -1880,7 +1882,7 @@ label.dp-required.qc-required::after {
       <div class="mr-chart-toggles" role="group" aria-label="Zinsbindungs-Linien">
         <button type="button" class="mr-toggle active" data-bucket="var"    style="--mr-color:#7C8EA3" onclick="toggleRateLine('var')">variabel/1J</button>
         <button type="button" class="mr-toggle active" data-bucket="1_5"    style="--mr-color:#5BA89F" onclick="toggleRateLine('1_5')">1–5 J</button>
-        <button type="button" class="mr-toggle active" data-bucket="5_10"   style="--mr-color:#C9A84C" onclick="toggleRateLine('5_10')">5–10 J</button>
+        <button type="button" class="mr-toggle active" data-bucket="5_10"   style="--mr-color:var(--gold)" onclick="toggleRateLine('5_10')">5–10 J</button>
         <button type="button" class="mr-toggle active" data-bucket="over10" style="--mr-color:#B8625C" onclick="toggleRateLine('over10')">über 10 J</button>
       </div>
     </div>
@@ -2131,8 +2133,8 @@ label.dp-required.qc-required::after {
           <div class="f"><label>Tilgung Bauspardarlehen (%)</label><div class="iw"><input id="bspar_dar_t" type="text" inputmode="decimal" value="6" step="0.1" class="tr" oninput="calc()"><span class="sfx">%</span></div><div class="hint" style="font-size:11px;margin-top:4px">Hohe Tilgung typisch (5-7 %)</div></div>
         </div>
         <div class="g2">
-          <div class="f"><label>Zuteilungsdatum (auto berechnet)</label><div class="cf" id="bspar_zuteil_auto" style="background:rgba(201,168,76,0.08); color:var(--ch); font-weight:600">—</div></div>
-          <div class="f"><label>Rate Bauspardarlehen / Monat (auto)</label><div class="cf" id="bspar_dar_rate" style="background:rgba(201,168,76,0.08); color:var(--ch); font-weight:600">—</div></div>
+          <div class="f"><label>Zuteilungsdatum (auto berechnet)</label><div class="cf" id="bspar_zuteil_auto" style="background:color-mix(in srgb, var(--gold) 8%, transparent); color:var(--ch); font-weight:600">—</div></div>
+          <div class="f"><label>Rate Bauspardarlehen / Monat (auto)</label><div class="cf" id="bspar_dar_rate" style="background:color-mix(in srgb, var(--gold) 8%, transparent); color:var(--ch); font-weight:600">—</div></div>
         </div>
 
         <div class="info-box info-gold" style="margin-top:12px">
@@ -2642,11 +2644,11 @@ label.dp-required.qc-required::after {
 
     <!-- V63.57: Aufstellung Cashflow-Überschuss — einklappbar -->
     <details class="vz-explainer" style="margin-top:18px">
-      <summary style="cursor:pointer;padding:10px 14px;background:var(--surface);border-radius:8px;border:1px solid rgba(201,168,76,.25);font-weight:600;font-size:.9em;color:var(--ch);list-style:none;display:flex;align-items:center;justify-content:space-between">
+      <summary style="cursor:pointer;padding:10px 14px;background:var(--surface);border-radius:8px;border:1px solid color-mix(in srgb, var(--gold) 25%, transparent);font-weight:600;font-size:.9em;color:var(--ch);list-style:none;display:flex;align-items:center;justify-content:space-between">
         <span><span class="vz-arrow">▶</span> Wie der Cashflow-Überschuss entsteht (kumuliert über <span id="vz-jahre3">10</span> Jahre)</span>
         <span class="cf-hint" style="font-weight:400">klick zum Aufklappen</span>
       </summary>
-      <div style="margin-top:6px;padding:12px 14px;background:var(--surface);border-radius:8px;border:1px solid rgba(201,168,76,.25)">
+      <div style="margin-top:6px;padding:12px 14px;background:var(--surface);border-radius:8px;border:1px solid color-mix(in srgb, var(--gold) 25%, transparent)">
         <div class="kv" style="font-size:.86em"><span>Kumulierte Mieteinnahmen <span class="cf-hint">(NKM + Zus.Einn., mit <span id="vz-info-mstg-pct">1,5</span> % p.a. Mietsteigerung)</span></span><span class="kv-v" id="vz-info-miete">—</span></div>
         <div class="kv" style="font-size:.86em"><span>– Bewirtschaftung n.uml. <span class="cf-hint">(eigene Kosten, mit <span id="vz-info-kstg-pct">1,0</span> % p.a. Kostensteigerung)</span></span><span class="kv-v c-red" id="vz-info-bwk">—</span></div>
         <div class="kv" style="font-size:.86em"><span>– Zinsen <span class="cf-hint">(über die Laufzeit)</span></span><span class="kv-v c-red" id="vz-info-zins">—</span></div>
@@ -2905,7 +2907,7 @@ label.dp-required.qc-required::after {
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=814"></script>
-<script src="js/config.js?v=669"></script>
+<script src="js/config.js?v=901"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
