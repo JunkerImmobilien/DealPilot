@@ -146,6 +146,7 @@ function collectData() {
     d._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs: CF vor Steuer (Jahr) fuers Cockpit */
     d._kpis_dscr = State.kpis.dscr;
     d._kpis_ltv = State.kpis.ltv;       // V110: LTV mitspeichern für Sidebar-Toggle DSCR↔LTV
+    d._kpis_bwk_y = (State.kpis && State.kpis.bwk != null) ? Math.abs(State.kpis.bwk) : 0; /*v899b-bwk: volle BWK Gesamt/Jahr (State.kpis.bwk) statt Y1-anteilig*/
   }
   // V276.6-snapshot-in-save: steuer_snapshot mitspeichern damit Backend wk-aggregate ihn sieht
   try {
@@ -2310,7 +2311,6 @@ async function showBankexportView() {
         '<table class="bank-table bank-table-full">' +
           '<thead><tr>' +
             '<th style="width:32px"></th>' +    // V105: Checkbox-Spalte
-            '<th>Datum</th>' +
             '<th>Nr</th>' +
             '<th>PLZ</th>' +
             '<th>Ort</th>' +
@@ -2320,7 +2320,7 @@ async function showBankexportView() {
             '<th class="num">Größe [qm]</th>' +
             '<th class="num">Nettokaltmiete</th>' +
             '<th class="num">€/qm</th>' +
-            '<th class="num">Nebenkosten</th>' +
+            '<th class="num">Nebenkosten (BWK)/Mon</th>' +
             '<th>Bank</th>' +
             '<th>Art</th>' +
             '<th>Finanzierungsdatum</th>' +
@@ -2342,7 +2342,6 @@ async function showBankexportView() {
               var rowKey = _rowKey(r);
               return '<tr' + (excluded ? ' style="opacity:0.4;text-decoration:line-through"' : '') + '>' +
                 '<td class="center"><input type="checkbox" ' + (excluded ? '' : 'checked') + ' onchange="_bankexportToggleRow(\'' + rowKey + '\', this.checked)" title="Diese Zeile in den Export aufnehmen"></td>' +
-                '<td>' + r.datum + '</td>' +
                 '<td class="center">' + r.nr + '</td>' +
                 '<td>' + r.plz + '</td>' +
                 '<td>' + r.ort + '</td>' +
@@ -2740,6 +2739,21 @@ async function exportTrackRecordAll() {
 // AUSWERTUNGBANK: Build rows for the full Excel-style export
 // 25 columns matching AuswertungBank-worksheet
 // ═══════════════════════════════════════════════════
+/* v899-bankexport: monatsgenaue Restschuld HEUTE fuer Annuitaetendarlehen (jeden Monat Zins/Tilgung) */
+function _restschuldMonatsgenau(darl, zinsDec, tilgDec, monate) {
+  if (!(darl > 0) || !(monate > 0)) return darl || 0;
+  var zm = zinsDec / 12;
+  var ann_m = darl * (zinsDec + tilgDec) / 12;
+  var rest = darl;
+  for (var i = 0; i < monate; i++) {
+    var zins_i = rest * zm;
+    var tilg_i = ann_m - zins_i;
+    rest -= tilg_i;
+    if (rest <= 0) return 0;
+  }
+  return rest;
+}
+
 function _buildBankExportRows(objects) {
   var datum = new Date().toLocaleDateString('de-DE');
   var rows = [];
@@ -2757,7 +2771,7 @@ function _buildBankExportRows(objects) {
       qm: parseFloat(d.wfl) || 0,
       nkm: (parseFloat(d.nkm) || 0),
       eur_qm: d.wfl > 0 ? (parseFloat(d.nkm) || 0) / parseFloat(d.wfl) : 0,
-      nebenkosten: parseFloat(d.nk) || 0,
+      nebenkosten: (parseFloat(d._kpis_bwk_y) || 0) / 12, /*v899-bankexport: BWK gesamt/Jahr -> pro Monat*/
       fin_datum: d.kaufdat ? new Date(d.kaufdat).toLocaleDateString('de-DE') : '–',
       monate: d.kaufdat ? _monthsBetween(new Date(d.kaufdat), new Date()) : 0
     };
@@ -2789,7 +2803,7 @@ function _buildBankExportRows(objects) {
         tilgung: d1t / 100,
         kapitaldienst: rate_m,
         zinsbindung: bindj,
-        akt_restschuld: d1,  // wenn Kauf gerade war = volle Summe
+        akt_restschuld: _restschuldMonatsgenau(d1, d1z / 100, d1t / 100, commonFields.monate), /*v899-bankexport*/
         laufzeit: bindEnd.toLocaleDateString('de-DE'),
         restschuld_ende: restAfterBind,
         volltilgung: volltilg
@@ -2821,7 +2835,7 @@ function _buildBankExportRows(objects) {
         tilgung: d2t / 100,
         kapitaldienst: d2_rate_m,
         zinsbindung: d2bindj,
-        akt_restschuld: d2,
+        akt_restschuld: _restschuldMonatsgenau(d2, d2z / 100, d2t / 100, commonFields.monate), /*v899-bankexport*/
         laufzeit: d2bindEnd.toLocaleDateString('de-DE'),
         restschuld_ende: d2_restEnd,
         volltilgung: d2_volltilg
@@ -2938,14 +2952,14 @@ function _estimateVolltilgung(darl, zins, tilg, startDate) {
 function exportGlobalBankCSV() {
   if (!window._bankexportData) return;
   var rows = window._bankexportData.rows;
-  var header = ['Datum','Nr','PLZ','Ort','Straße','Hn.','Bezeichnung','Größe_qm','Nettokaltmiete_€',
+  var header = ['Nr','PLZ','Ort','Straße','Hn.','Bezeichnung','Größe_qm','Nettokaltmiete_€',
     '€_pro_qm','Nebenkosten_€','Bank','Art','Finanzierungsdatum','Monate','Vertragsnummer',
     'Darlehenssumme','Zins','Tilgung','Kapitaldienst_Monat','Zinsbindung_Jahre','Aktuelle_Restschuld',
     'Laufzeit_Zuteilung','Restschuld_Ende','Jahr_Volltilgung'];
   var lines = [header];
   rows.forEach(function(r) {
     lines.push([
-      r.datum, r.nr, r.plz, r.ort, r.strasse, r.hnr, r.bez,
+      r.nr, r.plz, r.ort, r.strasse, r.hnr, r.bez,
       r.qm.toFixed(2), r.nkm.toFixed(2), r.eur_qm.toFixed(2), r.nebenkosten.toFixed(2),
       r.bank, r.art, r.fin_datum, r.monate, r.vertragsnr,
       (r.darl_summe || 0).toFixed(0),
@@ -2962,7 +2976,7 @@ function exportGlobalBankCSV() {
   var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'Junker_AuswertungBank_' + new Date().toISOString().slice(0, 10) + '.csv';
+  a.download = ((((typeof _getBranding==='function')?(_getBranding().company||'DealPilot'):'DealPilot').replace(/[^a-zA-Z0-9]/g,'_'))+'_AuswertungBank_') + new Date().toISOString().slice(0, 10) + '.csv';
   a.click();
   toast('✓ CSV exportiert');
 }
@@ -2979,14 +2993,14 @@ function exportGlobalBankXLSX() {
   }
   if (!window._bankexportData) return;
   var rows = window._bankexportData.rows;
-  var header = ['Datum','Nr','PLZ','Ort','Straße','Hn.','Bezeichnung','Größe [qm]','Nettokaltmiete',
+  var header = ['Nr','PLZ','Ort','Straße','Hn.','Bezeichnung','Größe [qm]','Nettokaltmiete',
     '€/qm','Nebenkosten','Bank','Art','Finanzierungsdatum','Monate','Vertragsnummer',
     'Darlehenssumme','Zins','Tilgung','Kapitaldienst','Zinsbindung','Akt. Restschuld',
     'Laufzeit/Zuteilung','Restschuld Ende','Jahr Volltilgung'];
   var aoa = [header];
   rows.forEach(function(r) {
     aoa.push([
-      r.datum, r.nr, r.plz, r.ort, r.strasse, r.hnr, r.bez,
+      r.nr, r.plz, r.ort, r.strasse, r.hnr, r.bez,
       r.qm, r.nkm, r.eur_qm, r.nebenkosten,
       r.bank, r.art, r.fin_datum, r.monate, r.vertragsnr,
       r.darl_summe, r.zins, r.tilgung, r.kapitaldienst,
@@ -2997,7 +3011,7 @@ function exportGlobalBankXLSX() {
   var ws = XLSX.utils.aoa_to_sheet(aoa);
   var wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'AuswertungBank');
-  XLSX.writeFile(wb, 'Junker_AuswertungBank_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+  XLSX.writeFile(wb, ((((typeof _getBranding==='function')?(_getBranding().company||'DealPilot'):'DealPilot').replace(/[^a-zA-Z0-9]/g,'_'))+'_AuswertungBank_') + new Date().toISOString().slice(0, 10) + '.xlsx');
   toast('✓ Excel exportiert');
 }
 
@@ -3053,7 +3067,7 @@ async function exportGlobalBankPDF() {
   // Build rows
   var pdfRows = data.rows.map(function(r) {
     return [
-      r.datum, r.nr, r.plz, r.ort, r.strasse, r.hnr, r.bez,
+      r.nr, r.plz, r.ort, r.strasse, r.hnr, r.bez,
       r.qm.toFixed(2),
       r.nkm.toFixed(2),
       r.eur_qm.toFixed(2),
@@ -3072,7 +3086,7 @@ async function exportGlobalBankPDF() {
 
   doc.autoTable({
     startY: 47,
-    head: [['Datum','Nr','PLZ','Ort','Straße','Hn.','Bez.','m²','Miete €','€/m²','NK €',
+    head: [['Nr','PLZ','Ort','Straße','Hn.','Bez.','m²','Miete €','€/m²','NK €',
       'Bank','Art','Fin.Datum','Mon','Vertragsnr','Darlehen','Zins','Tilg.','Kap.dienst',
       'Bindg','Akt.Rest','Laufzeit/Zut.','Rest Ende','Volltilg.']],
     body: pdfRows,
@@ -3081,10 +3095,10 @@ async function exportGlobalBankPDF() {
     bodyStyles: { fontSize: 6.5, cellPadding: 1.2 },
     alternateRowStyles: { fillColor: [248, 246, 240] },
     margin: { left: 6, right: 6 },
-    columnStyles: {
-      7: { halign: 'right' }, 8: { halign: 'right' }, 9: { halign: 'right' }, 10: { halign: 'right' },
-      16: { halign: 'right' }, 17: { halign: 'right' }, 18: { halign: 'right' },
-      19: { halign: 'right' }, 21: { halign: 'right' }, 23: { halign: 'right' }
+    columnStyles: { /*v899-bankexport: Indizes -1 nach Datum-Entfernung*/
+      6: { halign: 'right' }, 7: { halign: 'right' }, 8: { halign: 'right' }, 9: { halign: 'right' },
+      15: { halign: 'right' }, 16: { halign: 'right' }, 17: { halign: 'right' },
+      18: { halign: 'right' }, 20: { halign: 'right' }, 22: { halign: 'right' }
     }
   });
 
@@ -3094,7 +3108,8 @@ async function exportGlobalBankPDF() {
   doc.setTextColor(150, 150, 150);
   doc.text((typeof _getUserContact === 'function' ? _formatContact(_getUserContact()) : 'Junker Immobilien · Hermannstr. 9 · 32609 Hüllhorst · www.junker-immobilien.io'), 12, pageH - 6);
 
-  doc.save('Junker_AuswertungBank_' + new Date().toISOString().slice(0, 10) + '.pdf');
+  if (typeof _applyWatermarkIfFree === 'function') { try { var _npA=doc.internal.getNumberOfPages(); for(var _pA=1;_pA<=_npA;_pA++){ doc.setPage(_pA); _applyWatermarkIfFree(doc, doc.internal.pageSize.getWidth()); } } catch(e){} } /*v899-bankexport*/
+  doc.save(((((typeof _getBranding==='function')?(_getBranding().company||'DealPilot'):'DealPilot').replace(/[^a-zA-Z0-9]/g,'_'))+'_AuswertungBank_') + new Date().toISOString().slice(0, 10) + '.pdf');
   toast('✓ PDF erstellt (A3 Querformat)');
 }
 
