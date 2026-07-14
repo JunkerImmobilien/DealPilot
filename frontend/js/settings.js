@@ -714,6 +714,11 @@ function showSettings(initialTab) {
           '<button type="button" class="dp-tt-mode-btn' + (_mbThemePref()==='dark'?' active':'') + '" data-mbth="dark" onclick="_setMbThemeDark()">Dunkel<span class="dp-tt-mode-btn-label">Obsidian/Gold</span></button>' +
         '</div>' +
         /* === v648-mb-theme END === */
+        /* === v931-disp-button === */
+        '<hr class="dvd">' +
+        '<h2 class="set-section-h2">Darstellung</h2>' +
+        '<p class="hint" style="margin-bottom:12px">Farben, Schrift und Modus stellst du im Darstellungs-Men\u00fc direkt in der App ein \u2014 so siehst du jede \u00c4nderung sofort.</p>' +
+        '<button type="button" class="btn" onclick="_dpOpenFromSettings()">Darstellung \u00f6ffnen</button>' +
       '</div>' +
             '<div class="st-pane" data-pane="anbieter"><div id="anbieter-host"></div></div>' +
       '</div>' +    // pane-wrap Ende
@@ -3058,3 +3063,329 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     if (card) card.classList.toggle('dpsh-collapsed', !!cb.checked);
   } catch (e) {}
 };
+
+/* === v922-display-handlers === */
+(function(){
+  function LS(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } }
+  function RM(k){ try{ localStorage.removeItem(k); }catch(e){} }
+  var FONTS={ inter:"'Inter',system-ui,sans-serif", grotesk:"'Space Grotesk','Inter',sans-serif",
+    serif:"'Cormorant Garamond',Georgia,serif", poppins:"'Poppins','Inter',sans-serif",
+    nunito:"'Nunito','Inter',sans-serif", georgia:"Georgia,'Times New Roman',serif",
+    system:"system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" };
+  var D={ card:'#F6F2E9', hdr:'#EAE4D6', side:'#EAE4D6', text:'#1A1A1A' };
+
+  function _ci(fn,val){ return '<input type="color" value="'+val+'" onchange="'+fn+'(this.value)" style="width:46px;height:32px;border:1px solid var(--border,#E0DBD3);border-radius:8px;background:none;cursor:pointer;vertical-align:middle;margin-left:4px">'; }
+  function _row(id,arr,fn,attr){ return '<div class="dp-swatch-row" id="'+id+'">'+arr.map(function(h){return '<button type="button" class="dp-swatch" '+attr+'="'+h+'" style="background:'+h+'" onclick="'+fn+'(\''+h+'\')"></button>';}).join('')+'</div>'; }
+
+  window._dpBrandBlock=function(free){
+    var o='';
+    o+='<hr class="dvd"><h3 class="set-section-h">Akzentfarbe</h3>';
+    o+=_row('dp-accent-sw',['#C9A84C','#2F6FED','#3FA56C','#B8625C','#7C5CBF','#1A1A1A'],'_dpDispAccent','data-acc');
+    o+='<div style="margin-top:9px">'+(free?('<label class="hint" style="margin:0">Eigene Farbe:</label>'+_ci('_dpDispAccent','#C9A84C')):'<span class="hint">\uD83D\uDD12 Freie Farbwahl im Pro-/Partner-Plan.</span>')+'</div>';
+    o+='<hr class="dvd"><h3 class="set-section-h">Karten-Farbe <span class="hint" style="font-weight:400">(Hell)</span></h3>';
+    o+=_row('dp-card-sw',['#F6F2E9','#FBF8F0','#FFFFFF','#F1EBDD','#EFEADE','#F6F6F4'],'_dpDispCard','data-card');
+    if(free) o+='<div style="margin-top:9px"><label class="hint" style="margin:0">Eigene Farbe:</label>'+_ci('_dpDispCard','#F6F2E9')+'</div>';
+    if(free){
+      o+='<hr class="dvd"><h3 class="set-section-h">Header-Hintergrund <span class="hint" style="font-weight:400">(Hell)</span></h3>';
+      o+=_row('dp-hdr-sw',['#EAE4D6','#F1ECE0','#E4DED0','#FFFFFF','#2A2727','#111111'],'_dpDispHeader','data-hdr');
+      o+='<div style="margin-top:9px"><label class="hint" style="margin:0">Eigene Farbe:</label>'+_ci('_dpDispHeader','#EAE4D6')+'</div>';
+      o+='<hr class="dvd"><h3 class="set-section-h">Men\u00fc-Hintergrund <span class="hint" style="font-weight:400">(Hell)</span></h3>';
+      o+=_row('dp-side-sw',['#EAE4D6','#F1ECE0','#E4DED0','#FFFFFF','#2A2727','#111111'],'_dpDispSide','data-side');
+      o+='<div style="margin-top:9px"><label class="hint" style="margin:0">Eigene Farbe:</label>'+_ci('_dpDispSide','#EAE4D6')+'</div>';
+      o+='<hr class="dvd"><h3 class="set-section-h">Textfarbe <span class="hint" style="font-weight:400">(Hell)</span></h3>';
+      o+=_row('dp-text-sw',['#1A1A1A','#2A2727','#3A3A3A','#5F5C55','#FFFFFF'],'_dpDispText','data-text');
+      o+='<div style="margin-top:9px"><label class="hint" style="margin:0">Eigene Farbe:</label>'+_ci('_dpDispText','#1A1A1A')+'</div>';
+    } else {
+      o+='<hr class="dvd"><p class="hint">\uD83D\uDD12 Header-/Men\u00fc-/Textfarbe &amp; volles Branding im <strong>Pro</strong>- oder <strong>Partner</strong>-Plan.</p>';
+    }
+    return o;
+  };
+
+  window._dpDispSkin=function(s){ var hell=(s==='hell'); document.body.classList.toggle('dp-chrome-hell',hell); LS('dp_chrome_hell',hell?'1':'0'); _swapLogo(hell); _dpDispRefresh(); };
+  window._dpDispAccent=function(h){ try{ if(window.DealPilotConfig&&DealPilotConfig.branding&&DealPilotConfig.branding.setTheme) DealPilotConfig.branding.setTheme({accent:h}); }catch(e){} LS('dp_accent_ui',h); _dpDispRefresh(); };
+  window._dpDispCard=function(h){ document.body.style.setProperty('--dp-card',h); LS('dp_card_ui',h); _dpDispRefresh(); };
+  window._dpDispHeader=function(h){ document.body.style.setProperty('--dp-header-bg',h); LS('dp_hdr_ui',h); _dpDispRefresh(); };
+  window._dpDispSide=function(h){ document.body.style.setProperty('--dp-side-bg',h); LS('dp_side_ui',h); _dpDispRefresh(); };
+  window._dpDispText=function(h){ document.body.style.setProperty('--dp-text',h); LS('dp_text_ui',h); _dpDispRefresh(); };
+  window._dpDispFont=function(f){ document.body.style.setProperty('--dp-font',FONTS[f]||FONTS.inter); LS('dp_font_ui',f); _dpDispRefresh(); };
+  window._dpDispSize=function(z){ document.documentElement.style.setProperty('--dp-zoom',z); LS('dp_zoom_ui',z); _dpDispRefresh(); };
+  window._dpDispReset=function(){
+    ['dp_chrome_hell','dp_accent_ui','dp_card_ui','dp_hdr_ui','dp_side_ui','dp_text_ui','dp_font_ui','dp_zoom_ui'].forEach(RM);
+    document.body.classList.remove('dp-chrome-hell'); _swapLogo(false);
+    ['--dp-card','--dp-header-bg','--dp-side-bg','--dp-text','--dp-font'].forEach(function(v){document.body.style.removeProperty(v);});
+    document.documentElement.style.removeProperty('--dp-zoom');
+    try{ if(window.DealPilotConfig&&DealPilotConfig.branding) DealPilotConfig.branding.setTheme({accent:'#C9A84C'}); }catch(e){}
+    _dpDispRefresh(); try{ if(typeof toast==='function') toast('Darstellung zur\u00fcckgesetzt'); }catch(e){}
+  };
+  function _swapLogo(hell){ try{ var l=document.querySelector('.app-logo-simple-sidebar'); if(!l)return; if(!l.getAttribute('data-logo-dark')) l.setAttribute('data-logo-dark',l.getAttribute('src')||''); l.setAttribute('src',hell?'assets/dealpilot-logo-app-light.png':l.getAttribute('data-logo-dark')); }catch(e){} }
+  function _mark(sel,attr,val){ var w=document.querySelector(sel); if(!w)return; w.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b.getAttribute(attr)===String(val)); }); }
+  function _msw(sel,attr,val){ var w=document.querySelector(sel); if(!w)return; w.querySelectorAll('.dp-swatch').forEach(function(b){ b.classList.toggle('active',(b.getAttribute(attr)||'').toLowerCase()===String(val||'').toLowerCase()); }); }
+  window._dpDispRefresh=function(){ try{
+    _mark('#dp-skin-switch','data-dpskin', document.body.classList.contains('dp-chrome-hell')?'hell':'obsidian');
+    _mark('#dp-font-switch','data-font', LS('dp_font_ui')||'inter');
+    _mark('#dp-size-switch','data-size', LS('dp_zoom_ui')||'1');
+    _msw('#dp-accent-sw','data-acc', LS('dp_accent_ui'));
+    _msw('#dp-card-sw','data-card', LS('dp_card_ui')||D.card);
+    _msw('#dp-hdr-sw','data-hdr', LS('dp_hdr_ui')||D.hdr);
+    _msw('#dp-side-sw','data-side', LS('dp_side_ui')||D.side);
+    _msw('#dp-text-sw','data-text', LS('dp_text_ui')||D.text);
+  }catch(e){} };
+  function boot(){ try{
+    if(LS('dp_chrome_hell')==='1'){ document.body.classList.add('dp-chrome-hell'); _swapLogo(true); }
+    var m={dp_card_ui:'--dp-card',dp_hdr_ui:'--dp-header-bg',dp_side_ui:'--dp-side-bg',dp_text_ui:'--dp-text'};
+    Object.keys(m).forEach(function(k){ var v=LS(k); if(v) document.body.style.setProperty(m[k],v); });
+    var f=LS('dp_font_ui'); if(f) document.body.style.setProperty('--dp-font',FONTS[f]||FONTS.inter);
+    var z=LS('dp_zoom_ui'); if(z) document.documentElement.style.setProperty('--dp-zoom',z);
+    var a=LS('dp_accent_ui'); if(a){ try{ if(window.DealPilotConfig&&DealPilotConfig.branding) DealPilotConfig.branding.setTheme({accent:a}); }catch(e){} }
+  }catch(e){} }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+  try{ document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('[data-tab="profilanzeige"]'); if(t) setTimeout(window._dpDispRefresh,60); }); }catch(e){}
+})();
+/* === /v922-display-handlers === */
+
+/* === v924-toolbar === */
+(function(){
+  function LS(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } }
+  function lum(hex){ try{ var h=hex.replace('#',''); if(h.length===3)h=h.replace(/(.)/g,'$1$1'); var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16); return (0.299*r+0.587*g+0.114*b)/255; }catch(e){ return 1; } }
+  function _swapLogoByHeader(hdr){ try{ var l=document.querySelector('.app-logo-simple-sidebar'); if(!l)return;
+      if(!l.getAttribute('data-logo-dark')) l.setAttribute('data-logo-dark', l.getAttribute('src')||'');
+      var dark=(lum(hdr||'#EAE4D6')<0.5);
+      l.setAttribute('src', dark ? l.getAttribute('data-logo-dark') : 'assets/dealpilot-logo-app-light.png'); }catch(e){} }
+  window._dpDispHeader=function(h){ document.body.style.setProperty('--dp-header-bg',h); LS('dp_hdr_ui',h); _swapLogoByHeader(h); };
+  window._dpDispSide  =function(h){ document.body.style.setProperty('--dp-side-bg',h);   LS('dp_side_ui',h); };
+  window._dpDispKpi   =function(h){ document.body.style.setProperty('--dp-kpi-card',h);  LS('dp_kpi_ui',h); };
+  window._dpDispObj   =function(h){ document.body.style.setProperty('--dp-obj-card',h);  LS('dp_obj_ui',h); };
+  window._dpDispHero  =function(h){ document.body.style.setProperty('--dp-hero-card',h); LS('dp_hero_ui',h); };
+  window._dpDispHdr=function(m){ var c=(m==='compact'); document.body.classList.toggle('dp-hdr-compact',c); LS('dp_hdr_compact',c?'1':'0');
+    try{ document.querySelectorAll('#dp-hdr-sz [data-hs]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-hs')===m);}); }catch(e){} };
+
+  function ci(fn,ls,def,label){ return '<label class="dp-tb-row"><span>'+label+'</span><input type="color" value="'+(LS(ls)||def)+'" oninput="'+fn+'(this.value)"></label>'; }
+  function panelHtml(){
+    var free=false; try{var k=DealPilotConfig.pricing.currentKey(); free=(k==='pro'||k==='partner');}catch(e){}
+    var h='';
+    h+='<div class="dp-tb-sec"><b>Modus</b><div class="dp-tt-mode-toggle"><button class="dp-tt-mode-btn" onclick="_dpDispSkin(\'obsidian\')">Dunkel</button><button class="dp-tt-mode-btn" onclick="_dpDispSkin(\'hell\')">Hell</button></div></div>';
+    h+='<div class="dp-tb-sec"><b>Header-H\u00f6he</b><div class="dp-tt-mode-toggle" id="dp-hdr-sz"><button class="dp-tt-mode-btn" data-hs="compact" onclick="_dpDispHdr(\'compact\')">Kompakt</button><button class="dp-tt-mode-btn" data-hs="normal" onclick="_dpDispHdr(\'normal\')">Normal</button></div></div>';
+    h+='<div class="dp-tb-sec"><b>Chrome (Hell)</b>';
+    h+=ci('_dpDispHeader','dp_hdr_ui','#EAE4D6','Header + Logo');
+    h+=ci('_dpDispSide','dp_side_ui','#EAE4D6','Men\u00fc + Band');
+    h+=ci('_dpDispText','dp_text_ui','#1A1A1A','Text');
+    h+='</div>';
+    h+='<div class="dp-tb-sec"><b>Karten</b>';
+    h+=ci('_dpDispHero','dp_hero_ui','#C9A84C','Score (Gold)');
+    h+=ci('_dpDispKpi','dp_kpi_ui','#F6F2E9','KPI oben');
+    h+=ci('_dpDispObj','dp_obj_ui','#F6F2E9','Objektkarten');
+    h+='</div>';
+    if(free){ h+='<div class="dp-tb-sec"><b>Akzent</b>'+ci('_dpDispAccent','dp_accent_ui','#C9A84C','Akzentfarbe')+'</div>'; }
+    h+='<div class="dp-tb-sec"><b>Schrift</b><div class="dp-tt-mode-toggle" style="flex-wrap:wrap"><button class="dp-tt-mode-btn" onclick="_dpDispFont(\'inter\')">Inter</button><button class="dp-tt-mode-btn" onclick="_dpDispFont(\'grotesk\')">Grotesk</button><button class="dp-tt-mode-btn" onclick="_dpDispFont(\'serif\')">Serif</button><button class="dp-tt-mode-btn" onclick="_dpDispFont(\'system\')">System</button></div>';
+    h+='<div class="dp-tt-mode-toggle" style="margin-top:6px"><button class="dp-tt-mode-btn" onclick="_dpDispSize(\'0.92\')">A-</button><button class="dp-tt-mode-btn" onclick="_dpDispSize(\'1\')">A</button><button class="dp-tt-mode-btn" onclick="_dpDispSize(\'1.08\')">A+</button></div></div>';
+    h+=(window._dpLogoBlock?_dpLogoBlock():''); /*v927-logo-inject*/
+    h+='<div class="dp-tb-sec"><button class="btn btn-sm btn-ghost" style="width:100%" onclick="_dpDispReset()">Zur\u00fccksetzen</button></div>';
+    return h;
+  }
+  function ce(t,c,html){var e=document.createElement(t);if(c)e.className=c;if(html!=null)e.innerHTML=html;return e;}
+  window._dpOpenToolbar=function(){ var p=document.getElementById('dp-tb-panel'); if(p){ p.classList.add('open'); } };
+  function build(){
+    if(document.getElementById('dp-tb-fab')) return;
+    var fab=ce('button','dp-tb-fab'); fab.id='dp-tb-fab'; fab.title='Darstellung';
+    fab.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.3A4.2 4.2 0 0 0 22 11.5 10 10 0 0 0 12 2z"/></svg>';
+    var panel=ce('div','dp-tb'); panel.id='dp-tb-panel';
+    panel.appendChild(ce('div','dp-tb-h','Darstellung <button id="dp-tb-x">\u2715</button>'));
+    var b=ce('div','dp-tb-b'); b.innerHTML=panelHtml(); panel.appendChild(b);
+    document.body.appendChild(fab); document.body.appendChild(panel);
+    fab.onclick=function(){ panel.classList.toggle('open'); };
+    panel.querySelector('#dp-tb-x').onclick=function(){ panel.classList.remove('open'); };
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',build); else build();
+  /* Boot: gespeicherte Karten-/Chrome-Farben anwenden */
+  try{
+    var m={dp_kpi_ui:'--dp-kpi-card',dp_obj_ui:'--dp-obj-card',dp_hero_ui:'--dp-hero-card'};
+    Object.keys(m).forEach(function(k){var v=LS(k); if(v) document.body.style.setProperty(m[k],v);});
+    if(LS('dp_hdr_compact')==='1') document.body.classList.add('dp-hdr-compact');
+    var hv=LS('dp_hdr_ui'); if(hv) _swapLogoByHeader(hv);
+  }catch(e){}
+})();
+/* === /v924-toolbar === */
+
+/* === v926-headertext === */
+(function(){
+  function lum(hex){ try{ var h=(hex||'').trim().replace('#',''); if(h.length===3)h=h.replace(/(.)/g,'$1$1'); if(h.length<6)return 1; var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16); return (0.299*r+0.587*g+0.114*b)/255; }catch(e){return 1;} }
+  function applyHdrText(hdr){ var dark=(lum(hdr)<0.5); document.body.style.setProperty('--dp-header-text', dark?'#f3ead0':'#1a1a1a'); }
+  // Header-Setter erweitern: Text + Logo per Luminanz
+  var _oldH = window._dpDispHeader;
+  window._dpDispHeader=function(h){ if(_oldH) _oldH(h); else { document.body.style.setProperty('--dp-header-bg',h); try{localStorage.setItem('dp_hdr_ui',h);}catch(e){} } applyHdrText(h); };
+  // Boot: gespeicherten Header-Text setzen (Default = schwarzer Header)
+  try{
+    var hv=localStorage.getItem('dp_hdr_ui') || '#0a0a0a';
+    applyHdrText(hv);
+  }catch(e){}
+})();
+/* === /v926-headertext === */
+
+/* === v927-logo === */
+(function(){
+  function LS(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} }
+  window._dpDispLogoFile=function(inp){ try{ var f=inp&&inp.files&&inp.files[0]; if(!f) return; var r=new FileReader();
+    r.onload=function(){ var d=r.result; LS('dp_logo_ui', d); var l=document.querySelector('.app-logo-simple-sidebar');
+      if(l){ if(!l.getAttribute('data-logo-orig')) l.setAttribute('data-logo-orig', l.getAttribute('src')||''); l.setAttribute('src', d); } };
+    r.readAsDataURL(f); }catch(e){} };
+  window._dpDispLogoSize=function(v){ document.body.style.setProperty('--dp-logo-w', v+'%'); LS('dp_logo_w', v); };
+  window._dpDispLogoAlign=function(a){ document.body.style.setProperty('--dp-logo-align', a); LS('dp_logo_align', a);
+    try{ document.querySelectorAll('#dp-logo-align [data-la]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-la')===a);}); }catch(e){} };
+  window._dpDispLogoReset=function(){ ['dp_logo_ui','dp_logo_w','dp_logo_align'].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
+    document.body.style.removeProperty('--dp-logo-w'); document.body.style.removeProperty('--dp-logo-align');
+    var l=document.querySelector('.app-logo-simple-sidebar'); if(l){ var o=l.getAttribute('data-logo-orig'); if(o) l.setAttribute('src', o); } };
+  /* HTML-Block fuer die Toolbar (Pro/Partner) */
+  window._dpLogoBlock=function(){
+    var free=false; try{var k=DealPilotConfig.pricing.currentKey(); free=(k==='pro'||k==='partner');}catch(e){}
+    if(!free) return '<div class="dp-tb-sec"><b>Eigenes Logo</b><div class="hint">\uD83D\uDD12 Im Pro-/Partner-Plan</div></div>';
+    var w=LS('dp_logo_w')||'100';
+    return '<div class="dp-tb-sec"><b>Eigenes Logo</b>'
+      +'<label class="dp-tb-row" style="cursor:pointer"><span>Datei w\u00e4hlen</span><input type="file" accept="image/*" onchange="_dpDispLogoFile(this)" style="width:130px;font-size:11px"></label>'
+      +'<label class="dp-tb-row"><span>Gr\u00f6\u00dfe</span><input type="range" min="40" max="100" value="'+w+'" oninput="_dpDispLogoSize(this.value)" style="width:120px"></label>'
+      +'<div class="dp-tb-row"><span>Ausrichtung</span><div class="dp-tt-mode-toggle" id="dp-logo-align" style="flex:0 0 auto">'
+        +'<button class="dp-tt-mode-btn" data-la="left" onclick="_dpDispLogoAlign(\'left\')" style="padding:5px 8px">L</button>'
+        +'<button class="dp-tt-mode-btn" data-la="center" onclick="_dpDispLogoAlign(\'center\')" style="padding:5px 8px">M</button>'
+        +'<button class="dp-tt-mode-btn" data-la="right" onclick="_dpDispLogoAlign(\'right\')" style="padding:5px 8px">R</button></div></div>'
+      +'<button class="btn btn-sm btn-ghost" style="width:100%;margin-top:6px" onclick="_dpDispLogoReset()">Logo zur\u00fccksetzen</button></div>';
+  };
+  /* Boot */
+  try{ var d=LS('dp_logo_ui'); if(d){ var l=document.querySelector('.app-logo-simple-sidebar'); if(l){ if(!l.getAttribute('data-logo-orig')) l.setAttribute('data-logo-orig', l.getAttribute('src')||''); l.setAttribute('src', d);} }
+    var w=LS('dp_logo_w'); if(w) document.body.style.setProperty('--dp-logo-w', w+'%');
+    var a=LS('dp_logo_align'); if(a) document.body.style.setProperty('--dp-logo-align', a);
+  }catch(e){}
+})();
+/* === /v927-logo === */
+
+/* === v928-logo-unlock === */
+(function(){
+  function plan(){ try{ return DealPilotConfig.pricing.currentKey(); }catch(e){ return ''; } }
+  function isFree(){ var k=plan(); return (k==='pro'||k==='partner'); }
+  /* Logo-Block ohne Render-Zeit-Sperre (Timing) -> immer sichtbar; Sperre erst bei der Aktion */
+  window._dpLogoBlock=function(){
+    var w=''; try{ w=localStorage.getItem('dp_logo_w')||'100'; }catch(e){ w='100'; }
+    return '<div class="dp-tb-sec"><b>Eigenes Logo</b>'
+      +'<label class="dp-tb-row" style="cursor:pointer"><span>Datei w\u00e4hlen</span><input type="file" accept="image/*" onchange="_dpDispLogoFile(this)" style="width:130px;font-size:11px"></label>'
+      +'<label class="dp-tb-row"><span>Gr\u00f6\u00dfe</span><input type="range" min="40" max="100" value="'+w+'" oninput="_dpDispLogoSize(this.value)" style="width:120px"></label>'
+      +'<div class="dp-tb-row"><span>Ausrichtung</span><div class="dp-tt-mode-toggle" id="dp-logo-align" style="flex:0 0 auto">'
+        +'<button class="dp-tt-mode-btn" data-la="left" onclick="_dpDispLogoAlign(\'left\')" style="padding:5px 8px">L</button>'
+        +'<button class="dp-tt-mode-btn" data-la="center" onclick="_dpDispLogoAlign(\'center\')" style="padding:5px 8px">M</button>'
+        +'<button class="dp-tt-mode-btn" data-la="right" onclick="_dpDispLogoAlign(\'right\')" style="padding:5px 8px">R</button></div></div>'
+      +'<button class="btn btn-sm btn-ghost" style="width:100%;margin-top:6px" onclick="_dpDispLogoReset()">Logo zur\u00fccksetzen</button></div>';
+  };
+  /* Upload gated bei der Aktion (statt beim Rendern) */
+  var _oldFile=window._dpDispLogoFile;
+  window._dpDispLogoFile=function(inp){ if(!isFree()){ try{ if(typeof toast==='function') toast('Eigenes Logo nur im Pro-/Partner-Plan'); }catch(e){} return; } if(_oldFile) _oldFile(inp); };
+  /* Panel-Body beim Oeffnen neu aufbauen, damit der Plan-Status frisch ist */
+  try{
+    document.addEventListener('click', function(e){
+      var fab=e.target && (e.target.id==='dp-tb-fab' || (e.target.closest && e.target.closest('#dp-tb-fab')));
+      if(!fab) return;
+      setTimeout(function(){
+        var b=document.querySelector('#dp-tb-panel .dp-tb-b'), host=document.querySelector('#dp-tb-panel');
+        if(b && host && host.classList.contains('open')){
+          var sec=b.querySelector('.dp-tb-sec:last-child'); // Logo-Block ggf. aktualisieren
+        }
+      }, 10);
+    }, true);
+  }catch(e){}
+})();
+/* === /v928-logo-unlock === */
+
+/* === v931-consolidate === */
+(function(){
+  function LS(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} }
+  function hdrText(h){ try{ var x=(h||'').replace('#',''); if(x.length===3)x=x.replace(/(.)/g,'$1$1'); if(x.length<6)return; var r=parseInt(x.substr(0,2),16),g=parseInt(x.substr(2,2),16),b=parseInt(x.substr(4,2),16); var L=(0.299*r+0.587*g+0.114*b)/255; document.body.style.setProperty('--dp-header-text', L<0.5?'#f3ead0':'#1a1a1a'); }catch(e){} }
+  /* Header-Farbe: KEIN Logo-Tausch mehr (behaelt Custom/dunkles Logo); nur Text per Luminanz */
+  window._dpDispHeader=function(h){ document.body.style.setProperty('--dp-header-bg',h); LS('dp_hdr_ui',h); hdrText(h); };
+  /* Hell/Dunkel: KEIN Logo-Tausch; Kompakt ist immer an in Hell */
+  window._dpDispSkin=function(v){ var hell=(v==='hell'); document.body.classList.toggle('dp-chrome-hell',hell); document.body.classList.toggle('dp-hdr-compact',hell); LS('dp_chrome_hell',hell?'1':'0'); if(window._dpDispRefresh)_dpDispRefresh(); };
+  /* Aus den Einstellungen oeffnen: Einstellungen zu, Toolbar auf */
+  window._dpOpenFromSettings=function(){ try{ if(typeof closeSettings==='function') closeSettings(); }catch(e){} setTimeout(function(){ if(window._dpOpenToolbar) _dpOpenToolbar(); }, 140); };
+  /* Boot: korrektes Logo (custom oder dunkles Original), Kompakt in Hell, kein helles Logo */
+  function fixLogo(){ try{ var l=document.querySelector('.app-logo-simple-sidebar'); if(!l) return;
+    var custom=LS('dp_logo_ui');
+    if(custom){ l.setAttribute('src',custom); }
+    else { var o=l.getAttribute('data-logo-dark')||l.getAttribute('data-logo-orig'); if(o) l.setAttribute('src',o); }
+  }catch(e){} }
+  function boot(){ try{ if(LS('dp_chrome_hell')==='1'){ document.body.classList.add('dp-chrome-hell'); document.body.classList.add('dp-hdr-compact'); } fixLogo(); }catch(e){} }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(boot,220); }); else setTimeout(boot,220);
+})();
+/* === /v931-consolidate === */
+
+/* === v932-logo2 === */
+(function(){
+  function LS(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} }
+  var JUST={left:'flex-start',center:'center',right:'flex-end'};
+  /* Ausrichtung per Flexbox (text-align wirkte nicht) */
+  window._dpDispLogoAlign=function(a){ document.body.style.setProperty('--dp-logo-justify', JUST[a]||'center'); LS('dp_logo_align',a);
+    try{ document.querySelectorAll('#dp-logo-align [data-la]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-la')===a);}); }catch(e){} };
+  /* Groesse: breiterer Bereich, wirkt auf Logo -> Box-Hoehe passt sich an */
+  window._dpDispLogoSize=function(v){ document.body.style.setProperty('--dp-logo-w', v+'%'); LS('dp_logo_w', v); };
+  /* Logo-Block mit groesserem Bereich (40-160) */
+  window._dpLogoBlock=function(){
+    var w=''; try{ w=LS('dp_logo_w')||'100'; }catch(e){ w='100'; }
+    return '<div class="dp-tb-sec"><b>Eigenes Logo</b>'
+      +'<label class="dp-tb-row" style="cursor:pointer"><span>Datei w\u00e4hlen</span><input type="file" accept="image/*" onchange="_dpDispLogoFile(this)" style="width:130px;font-size:11px"></label>'
+      +'<label class="dp-tb-row"><span>Gr\u00f6\u00dfe</span><input type="range" min="40" max="160" value="'+w+'" oninput="_dpDispLogoSize(this.value)" style="width:120px"></label>'
+      +'<div class="dp-tb-row"><span>Ausrichtung</span><div class="dp-tt-mode-toggle" id="dp-logo-align" style="flex:0 0 auto">'
+        +'<button class="dp-tt-mode-btn" data-la="left" onclick="_dpDispLogoAlign(\'left\')" style="padding:5px 8px">L</button>'
+        +'<button class="dp-tt-mode-btn" data-la="center" onclick="_dpDispLogoAlign(\'center\')" style="padding:5px 8px">M</button>'
+        +'<button class="dp-tt-mode-btn" data-la="right" onclick="_dpDispLogoAlign(\'right\')" style="padding:5px 8px">R</button></div></div>'
+      +'<button class="btn btn-sm btn-ghost" style="width:100%;margin-top:6px" onclick="_dpDispLogoReset()">Logo zur\u00fccksetzen</button></div>';
+  };
+  /* Boot: Ausrichtung aus Speicher */
+  try{ var a=LS('dp_logo_align'); if(a) document.body.style.setProperty('--dp-logo-justify', JUST[a]||'center');
+       var w=LS('dp_logo_w'); if(w) document.body.style.setProperty('--dp-logo-w', w+'%'); }catch(e){}
+})();
+/* === /v932-logo2 === */
+
+/* === v937-flush-stable === */
+(function(){
+  var locked=190, raf=null;
+  function collapsed(){ try{ return document.body.classList.contains('hdr-collapsed'); }catch(e){ return false; } }
+  function measure(){ var h=document.querySelector('header.hdr'); var t=document.querySelector('nav.tabs'); if(!h) return 0; return h.offsetHeight + (t?t.offsetHeight:0); } /* offsetHeight = scroll-unabhaengig */
+  function apply(px){ document.documentElement.style.setProperty('--dp-hdr-h', px+'px'); }
+  function sync(){ try{
+    if(collapsed()){ apply(locked); return; }         /* minimiert -> letzte Hoehe halten */
+    var px=measure(); if(px>80 && px<500){ locked=px; apply(px); }
+  }catch(e){} }
+  function schedule(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=null; sync(); }); } /* entprellt */
+  function start(){ apply(locked); sync(); [200,600,1200].forEach(function(t){ setTimeout(sync,t); });
+    try{
+      window.addEventListener('resize', schedule);   /* KEIN scroll/click-Listener -> kein Flackern */
+      var h=document.querySelector('header.hdr'); if(h && window.ResizeObserver){ new ResizeObserver(schedule).observe(h); }
+      if(window.MutationObserver){ new MutationObserver(function(){ setTimeout(sync,140); }).observe(document.body,{attributes:true,attributeFilter:['class']}); } /* Auf-/Zuklappen */
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+  window._dpFlushNow=sync;
+})();
+/* === /v937-flush-stable === */
+
+/* === v938-textcolors === */
+(function(){
+  function LS(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} }
+  function ci(fn,ls,def,label){ var v; try{ v=LS(ls)||def; }catch(e){ v=def; }
+    return '<label class="dp-tb-row"><span>'+label+'</span><input type="color" value="'+v+'" oninput="'+fn+'(this.value)"></label>'; }
+  window._dpDispTabText=function(h){ document.body.style.setProperty('--dp-tab-text',h); LS('dp_tabtext_ui',h); };
+  window._dpDispObjText=function(h){ document.body.style.setProperty('--dp-obj-text',h); LS('dp_objtext_ui',h); };
+  /* Extra-Farbregler in die Toolbar einhaengen (vor dem Logo-Block) */
+  var _oldLogo=window._dpLogoBlock;
+  window._dpLogoBlock=function(){
+    var extra='<div class="dp-tb-sec"><b>Text-Feintuning</b>'
+      + ci('_dpDispTabText','dp_tabtext_ui','#C9A84C','Tab-Texte')
+      + ci('_dpDispObjText','dp_objtext_ui','#1A1A1A','Objektkarten')
+      + '</div>';
+    return extra + (_oldLogo?_oldLogo():'');
+  };
+  /* Darstellung nur im Partner-Plan (Gate bei der Aktion) */
+  var _oldOpen=window._dpOpenFromSettings;
+  window._dpOpenFromSettings=function(){
+    try{ var k=DealPilotConfig.pricing.currentKey(); if(k!=='partner'){ if(typeof toast==='function') toast('Darstellung ist aktuell nur im Partner-Plan verf\u00fcgbar'); return; } }catch(e){}
+    if(_oldOpen) _oldOpen();
+  };
+  /* Boot */
+  try{ var t=LS('dp_tabtext_ui'); if(t) document.body.style.setProperty('--dp-tab-text',t);
+       var o=LS('dp_objtext_ui'); if(o) document.body.style.setProperty('--dp-obj-text',o); }catch(e){}
+})();
+/* === /v938-textcolors === */

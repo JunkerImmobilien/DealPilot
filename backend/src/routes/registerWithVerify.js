@@ -196,8 +196,8 @@ router.get('/verify-email', async (req, res) => {
         const freePlan = await query(`SELECT id FROM plans WHERE id = 'free'`);
         if (freePlan.rowCount > 0) {
           await query(
-            `INSERT INTO subscriptions (user_id, plan_id, status, current_period_start, current_period_end)
-             VALUES ($1, 'free', 'active', NOW(), NOW() + INTERVAL '100 years')`,
+            `INSERT INTO subscriptions (user_id, plan_id, billing_interval, status, current_period_start, current_period_end)
+             VALUES ($1, 'free', 'monthly', 'active', NOW(), NOW() + INTERVAL '100 years')`,
             [userId]
           );
         }

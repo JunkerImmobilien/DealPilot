@@ -805,12 +805,20 @@ window.Plan = {
   function _lighten(h,p){var a=_rgb(h);return _hex(a[0]+(255-a[0])*p/100,a[1]+(255-a[1])*p/100,a[2]+(255-a[2])*p/100);}
   function _darken(h,p){var a=_rgb(h);return _hex(a[0]*(1-p/100),a[1]*(1-p/100),a[2]*(1-p/100));}
 
-  function _isPalette(){ try{ return !!DPC.pricing.hasFeature('theme_palette'); }catch(e){ return false; } }
+  function _isPalette(){ /*v904-palette-fix*/
+    if(window.DP_THEME_PALETTE_FORCE===true) return true;            // Test/Dev-Bypass
+    try{
+      if(DPC.pricing.currentKey && DPC.pricing.currentKey()==='pro') return true;   // Frontend-only: an Plan-Key
+      if(DPC.pricing.hasFeature && DPC.pricing.hasFeature('theme_palette')) return true;  // spaeter, wenn Backend es kennt
+    }catch(e){}
+    return false;
+  }
   function _validSkin(s){ return SKINS.indexOf(s)>=0 ? s : DEF.skin; }
 
   function getTheme(){
     var skin = _validSkin(localStorage.getItem('dp_theme_skin') || DEF.skin);   // alle Plaene
-    var acc  = DEF.accent;                                                       // Palette nur Pro
+    var SKIN_ACCENT = { obsidian:'#C9A84C', hell:'#C9A84C', slate:'#2F6FED', mono:'#1A1A1A' }; /*v907-skin-accent*//*v909-hell-gold*/
+    var acc = SKIN_ACCENT[skin] || DEF.accent;                                  // Skin-Default; Palette (Pro) ueberschreibt unten
     if(_isPalette()){ var a=localStorage.getItem('dp_theme_accent'); if(a && /^#[0-9a-fA-F]{6}$/.test(a)) acc=a; }
     return { skin:skin, accent:acc, accentHi:_lighten(acc,22), accentLo:_darken(acc,16), obsidian:DEF.obsidian };
   }
@@ -827,11 +835,26 @@ window.Plan = {
 
   function applyTheme(){
     var t = getTheme(), r = document.documentElement.style;
-    r.setProperty('--gold',    t.accent);
-    r.setProperty('--gold-hi', t.accentHi);
-    r.setProperty('--gold-lo', t.accentLo);
+    var _gd = (String(t.accent).toLowerCase() === '#c9a84c'); /*v908-goldfam*/
+    if(_gd){
+      r.setProperty('--gold','#C9A84C'); r.setProperty('--gold-hi','#E8CC7A'); r.setProperty('--gold-lo','#b8932f');
+      r.setProperty('--gold-l','#E2C97E'); r.setProperty('--gold-2','#E8C964'); r.setProperty('--gold-3','#9a7f33'); r.setProperty('--gold-bg','#FAF5E8');
+    } else {
+      r.setProperty('--gold',t.accent); r.setProperty('--gold-hi',t.accentHi); r.setProperty('--gold-lo',t.accentLo);
+      r.setProperty('--gold-l',_lighten(t.accent,15)); r.setProperty('--gold-2',_lighten(t.accent,8));
+      r.setProperty('--gold-3',_darken(t.accent,26)); r.setProperty('--gold-bg',_lighten(t.accent,88));
+    }
     if(document.body) document.body.setAttribute('data-dp-skin', t.skin);
     if(typeof window._dpApplyThemeVars === 'function'){ try{ window._dpApplyThemeVars(); }catch(e){} }
+    try{ /*v911-logo-swap*/
+      var _lg=document.querySelector('.app-logo-simple-sidebar');
+      if(_lg){
+        if(!_lg.getAttribute('data-logo-dark')) _lg.setAttribute('data-logo-dark', _lg.getAttribute('src')||'');
+        var _dark=_lg.getAttribute('data-logo-dark');
+        var _light='assets/dealpilot-logo-app-light.png';
+        _lg.setAttribute('src', (t.skin==='hell') ? _light : _dark);
+      }
+    }catch(e){}
   }
 
   // theme in branding.get() einhaengen (storage._dpApplyThemeVars liest b.theme)

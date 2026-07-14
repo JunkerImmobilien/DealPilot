@@ -141,6 +141,7 @@
 
     document.body.appendChild(modal);
     // V173: Punkt-Visibility updaten (Register-Modal ist jetzt sichtbar)
+    try { _applyInviteBranding(modal); } catch (e) {}
     setTimeout(_updateEasterEggVisibility, 50);
 
     // Close-Handler
@@ -182,6 +183,22 @@
       var first = document.getElementById('dp-reg-name');
       if (first) first.focus();
     }, 100);
+  }
+
+  /* p17-invite-brand: Modal-Kopf fuer eingeladene Mandanten auf Reseller-Branding */
+  function _applyInviteBranding(modal) {
+    var token = null;
+    try { token = new URLSearchParams(location.search).get('rp_invite') || localStorage.getItem('rp_invite_token'); } catch (e) {}
+    if (!token) return;
+    fetch('/api/v1/reseller-invite/info?token=' + encodeURIComponent(token))
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (info) {
+        if (!info || !info.valid || !info.brand_name) return;
+        var sub = modal.querySelector('.auth-sub-v39');
+        if (sub) sub.innerHTML = '<strong style="color:#C9A84C">' + _esc(info.brand_name) + '</strong> l\u00e4dt dich zu DealPilot ein.<br>Leg dein Konto an, um loszulegen.';
+        var by = modal.querySelector('.auth-logo-by');
+        if (by) by.textContent = 'auf Einladung von ' + info.brand_name;
+      }).catch(function () {});
   }
 
   async function _handleSubmit() {
@@ -256,6 +273,9 @@
       emailEl.parentNode.parentNode.style.display = 'none';
       passEl.parentNode.parentNode.style.display = 'none';
       btn.style.display = 'none';
+      /* p17-hide-consent: Zustimmungs-/News-Checkboxen nach Erfolg ausblenden */
+      var _agbL = document.getElementById('dp-reg-consent-label'); if (_agbL) _agbL.style.display = 'none';
+      var _nlI = document.getElementById('dp-reg-newsletter'); if (_nlI && _nlI.closest) { var _nlL = _nlI.closest('label'); if (_nlL) _nlL.style.display = 'none'; }
     } catch (e) {
       _error(errEl, 'Netzwerkfehler — bitte später erneut versuchen');
       btn.disabled = false;

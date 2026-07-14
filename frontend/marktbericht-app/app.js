@@ -2318,56 +2318,73 @@ async function exportPdf(out) {
   // ---------- Bericht (Fließtext) ----------
   if (out.report_md) {
     sectionTitle('Ausführlicher Marktbericht');
-    const lines = mdToPdfLines(out.report_md);
-    // Teil-Score je Kapitel: macht sichtbar, woraus sich der Gesamtscore speist.
-    const bd = ds.breakdown || {};
-    const SECTION_SCORE = {}; // keine Teil-Score-Pillen mehr — ein maßgeblicher Score (Seite 1)
-    const partialScore = (key) => {
-      const mk = SECTION_SCORE[key]; if (!mk) return null;
-      const v = mk === 'overall' ? ds.score : bd[mk];
-      return v == null ? null : Math.round(v);
+    /*v895d-mbfmt: KI-Bericht sauber rendern (Fett/Tabellen/num.Listen/Callouts) */
+    const RMW = W - 2 * M, RLH = 4.9, RSZ = 9.5;
+    const _drawRich = (text, x, maxW, color) => {
+      const lay = _mbLayoutRuns(doc, _mbParseRuns(text), maxW, RSZ);
+      for (const line of lay.lines) {
+        need(RLH); let cx = x; const yy = y;
+        for (const tok of line) {
+          doc.setFont('helvetica', tok.bold ? 'bold' : 'normal');
+          doc.setTextColor(color[0], color[1], color[2]);
+          doc.text(tok.t, cx, yy); cx += tok.w + lay.spaceW;
+        }
+        y = yy + RLH;
+      }
     };
-    const tierRgb = (s) => s >= 70 ? [63, 165, 108] : s >= 50 ? GOLD : [184, 98, 80];
-    doc.setFontSize(9.5);
-    for (const ln of lines) {
-      if (ln.h) {
-        // Überschrift nie allein am Seitenende: Platz für Titel + ~3 Textzeilen reservieren
-        need(22);
-        y += 3.5; // etwas Luft vor der Überschrift
-        doc.setFont('helvetica', 'bold'); doc.setTextColor(...GOLD); doc.setFontSize(11);
-        doc.text(ln.t, M, y);
-        // dezenter kurzer Gold-Akzent statt voller Linie über die ganze Breite
-        doc.setDrawColor(...GOLD); doc.setLineWidth(0.6); doc.line(M, y + 2.6, M + 14, y + 2.6);
-        y += 8.5;
-        doc.setFont('helvetica', 'normal'); doc.setTextColor(...TXT); doc.setFontSize(9.5);
+    doc.setFontSize(RSZ);
+    for (const b of mdToPdfLines(out.report_md)) {
+      if (b.type === 'h') {
+        let t = b.text;
+        if (b.level <= 2) { const m = t.match(/^([A-P])\)\s*(.*)$/); t = m ? (PDF_SECTION_TITLES[m[1]] || m[2]) : t.replace(/^[A-Z]\d?\)\s*/, ''); }
+        else t = t.replace(/^[A-Z]\d?\)\s*/, '');
+        need(14); y += (b.level >= 3 ? 2.5 : 4.5);
+        doc.setFont('helvetica', 'bold'); doc.setTextColor(...GOLD); doc.setFontSize(b.level >= 3 ? 10 : 11);
+        doc.text(t, M, y);
+        doc.setDrawColor(...GOLD); doc.setLineWidth(0.6); doc.line(M, y + 2.6, M + (b.level >= 3 ? 10 : 14), y + 2.6);
+        y += 8.2; doc.setFont('helvetica', 'normal'); doc.setTextColor(...TXT); doc.setFontSize(RSZ);
         continue;
       }
-      if (ln.bullet) {
-        const wrapped = doc.splitTextToSize('•  ' + ln.t, W - 2 * M - 3);
-        need(wrapped.length * 4.8 + 3.4); doc.text(wrapped, M + 3, y); y += wrapped.length * 4.8 + 3.4;
-        continue;
+      if (b.type === 'ul') {
+        for (const it of b.items) {
+          if (/^Fakten:/i.test(it)) continue;
+          need(RLH); doc.setFillColor(...GOLD); doc.circle(M + 1.1, y - 1.4, 0.8, 'F');
+          _drawRich(it, M + 5, RMW - 5, TXT);
+        }
+        y += 2.2; continue;
       }
-      // "Fakten:"-Zeilen NICHT mehr rendern (Marcel: keine Eckdaten-Wiederholung im Bericht)
-      if (/^Fakten:/i.test(ln.t)) { continue; }
-      if (false) {
-        const body = ln.t.replace(/^Fakten:\s*/i, '');
-        const wrapped = doc.splitTextToSize(body, W - 2 * M - 9);
-        const boxH = wrapped.length * 4.0 + 8; need(boxH + 2);
-        doc.setFillColor(247, 245, 239); doc.roundedRect(M, y - 3, W - 2 * M, boxH, 1.6, 1.6, 'F');
-        doc.setFillColor(...GOLD); doc.roundedRect(M, y - 3, 1.6, boxH, 0.8, 0.8, 'F');
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setTextColor(...GOLD);
-        doc.text('ECKDATEN', M + 5, y + 0.8, { charSpace: 0.8 });
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(95, 95, 103);
-        doc.text(wrapped, M + 5, y + 5.4);
-        y += boxH + 2;
-        doc.setFontSize(9.5); doc.setTextColor(...TXT);
-        continue;
+      if (b.type === 'ol') {
+        let _n = 0;
+        for (const it of b.items) {
+          _n++; need(RLH); doc.setFont('helvetica', 'bold'); doc.setFontSize(RSZ); doc.setTextColor(184, 147, 47);
+          doc.text(_n + '.', M, y);
+          _drawRich(it, M + 6, RMW - 6, TXT);
+        }
+        y += 2.2; continue;
       }
-      // Fließtext im BLOCKSATZ (jsPDF: maxWidth + align justify; letzte Zeile bleibt ungestreckt)
-      const wrapped = doc.splitTextToSize(ln.t, W - 2 * M);
-      need(wrapped.length * 4.8 + 3.4);
-      doc.text(ln.t, M, y, { maxWidth: W - 2 * M, align: 'justify' });
-      y += wrapped.length * 4.8 + 3.4;
+      if (b.type === 'callout') {
+        doc.setFontSize(9);
+        const ls = doc.splitTextToSize(b.text.replace(/\*\*(.+?)\*\*/g, '$1'), RMW - 12);
+        const boxH = ls.length * 4.4 + 8; need(boxH + 2);
+        doc.setFillColor(247, 245, 239); doc.roundedRect(M, y - 1, RMW, boxH, 1.6, 1.6, 'F');
+        doc.setFillColor(...GOLD); doc.roundedRect(M, y - 1, 1.6, boxH, 0.8, 0.8, 'F');
+        doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(95, 95, 103);
+        doc.text(ls, M + 6, y + 5); doc.setFont('helvetica', 'normal');
+        y += boxH + 3; doc.setFontSize(RSZ); doc.setTextColor(...TXT); continue;
+      }
+      if (b.type === 'table') {
+        need(20);
+        doc.autoTable({
+          startY: y, margin: { left: M, right: M, bottom: 20 },
+          head: [b.head], body: b.rows,
+          headStyles: { fillColor: INK, textColor: 255, fontSize: 8.5 },
+          styles: { fontSize: 8.5, cellPadding: 2, textColor: TXT },
+          alternateRowStyles: { fillColor: [245, 244, 240] },
+        });
+        y = doc.lastAutoTable.finalY + 5; continue;
+      }
+      if (/^Fakten:/i.test(b.text)) continue;
+      _drawRich(b.text, M, RMW, TXT); y += 2.4;
     }
     y += 3.5;
   }
@@ -2426,25 +2443,65 @@ async function exportPdf(out) {
 const PDF_SECTION_TITLES = {
   A: 'Zusammenfassung & Empfehlung', B: 'Objekt, Lage & Markt', C: 'Bewertung, Rendite & Ausblick',
 };
-// Markdown grob in PDF-Zeilen ({h:bool, bullet:bool, t:string, sectionKey})
+// v895d-mbfmt: Markdown -> typisierte Bloecke (Ueberschrift/UL/OL/Tabelle/Callout/Absatz)
 function mdToPdfLines(md) {
-  const out = [];
-  md.split('\n').forEach((raw) => {
-    let l = raw.trim();
-    if (!l) return;
-    const strip = (s) => s.replace(/\*\*(.+?)\*\*/g, '$1').replace(/(?<![A-Za-z0-9])_([^_]+?)_(?![A-Za-z0-9])/g, '$1').replace(/`/g, '');
-    if (/^#{1,3}\s/.test(l)) {
-      let t = strip(l.replace(/^#{1,3}\s/, ''));
-      const m = t.match(/^([A-P])\)\s*(.*)$/);  // "A) Executive Summary"
-      let key = null;
-      if (m) { key = m[1]; t = PDF_SECTION_TITLES[key] || m[2]; }
-      else t = t.replace(/^[A-Z]\d?\)\s*/, '');  // z.B. "D2) Lage…" -> "Lage…"
-      out.push({ h: true, t, sectionKey: key });
+  const L = String(md).split(/\r?\n/); const B = []; let i = 0;
+  while (i < L.length) {
+    const ln = L[i];
+    if (/^\s*$/.test(ln)) { i++; continue; }
+    if (/^\s*\|.*\|\s*$/.test(ln)) {
+      const t = []; while (i < L.length && /^\s*\|.*\|\s*$/.test(L[i])) { t.push(L[i]); i++; }
+      const rows = t.map((r) => r.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim()))
+                    .filter((r) => !r.every((c) => /^:?-+:?$/.test(c) || c === ''));
+      if (rows.length) B.push({ type: 'table', head: rows.shift(), rows });
+      continue;
     }
-    else if (/^[-*]\s/.test(l)) out.push({ bullet: true, t: strip(l.replace(/^[-*]\s/, '')) });
-    else out.push({ t: strip(l) });
+    if (/^\s*>\s?/.test(ln)) {
+      const q = []; while (i < L.length && /^\s*>\s?/.test(L[i])) { q.push(L[i].replace(/^\s*>\s?/, '')); i++; }
+      B.push({ type: 'callout', text: q.join(' ') }); continue;
+    }
+    if (/^\s*---+\s*$/.test(ln)) { i++; continue; }
+    const h = ln.match(/^\s*(#{1,3})\s+(.*)$/);
+    if (h) { B.push({ type: 'h', level: h[1].length, text: h[2].trim() }); i++; continue; }
+    if (/^\s*\d{1,2}[\).]\s+/.test(ln)) {
+      const ol = []; while (i < L.length && /^\s*\d{1,2}[\).]\s+/.test(L[i])) { ol.push(L[i].replace(/^\s*\d{1,2}[\).]\s+/, '')); i++; }
+      B.push({ type: 'ol', items: ol }); continue;
+    }
+    if (/^\s*[-*]\s+/.test(ln)) {
+      const ul = []; while (i < L.length && /^\s*[-*]\s+/.test(L[i])) { ul.push(L[i].replace(/^\s*[-*]\s+/, '')); i++; }
+      B.push({ type: 'ul', items: ul }); continue;
+    }
+    const p = [ln]; i++;
+    while (i < L.length && !/^\s*$/.test(L[i]) && !/^\s*(#{1,3}\s|>|[-*]\s|\|)/.test(L[i]) && !/^\s*\d{1,2}[\).]\s/.test(L[i])) { p.push(L[i]); i++; }
+    B.push({ type: 'p', text: p.join(' ') });
+  }
+  return B;
+}
+// v895d-mbfmt: inline **fett** -> Runs [{t,bold}]
+function _mbParseRuns(text) {
+  const runs = []; const re = /\*\*(.+?)\*\*/g; let last = 0, m;
+  while ((m = re.exec(text))) {
+    if (m.index > last) runs.push({ t: text.slice(last, m.index), bold: false });
+    runs.push({ t: m[1], bold: true }); last = re.lastIndex;
+  }
+  if (last < text.length) runs.push({ t: text.slice(last), bold: false });
+  runs.forEach((r) => { r.t = r.t.replace(/`/g, '').replace(/(?<![A-Za-z0-9])_([^_]+?)_(?![A-Za-z0-9])/g, '$1'); });
+  return runs.length ? runs : [{ t: text, bold: false }];
+}
+// v895d-mbfmt: Runs -> umbrochene Zeilen (gemischt normal/fett), Wortbreite je Font
+function _mbLayoutRuns(doc, runs, maxW, size) {
+  doc.setFontSize(size); doc.setFont('helvetica', 'normal'); const spaceW = doc.getTextWidth(' ');
+  const lines = []; let cur = [], cw = 0;
+  runs.forEach((run) => {
+    run.t.split(/\s+/).filter(Boolean).forEach((word) => {
+      doc.setFont('helvetica', run.bold ? 'bold' : 'normal');
+      const ww = doc.getTextWidth(word); let add = (cur.length ? spaceW : 0) + ww;
+      if (cw + add > maxW && cur.length) { lines.push(cur); cur = []; cw = 0; add = ww; }
+      cur.push({ t: word, bold: run.bold, w: ww }); cw += add;
+    });
   });
-  return out;
+  if (cur.length) lines.push(cur);
+  return { lines, spaceW };
 }
 
 // ===== Präzisierung: Ausklappen + Live-Genauigkeitsanzeige =====
