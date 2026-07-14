@@ -118,6 +118,9 @@ app.use('/api/v1/avm', avmRoutes);  // V326: AVM-Integration
 app.use('/api/v1/immometrica', require('./routes/immometrica'));  // v655: ImmoMetrica
 app.use('/api/v1/marktbericht', marktberichtRoutes);  // v539: Marktbericht-Proxy
 app.use('/api/v1', resellerRoutes);  // V200
+app.use('/api/v1/reseller', require('./routes/resellerPortal'));  // reseller-portal-p3
+app.use('/api/v1/reseller-invite', require('./routes/resellerInvite'));  // reseller-invite-p5
+app.use('/api/v1/admin-reseller', require('./routes/resellerAdminPanel'));  // reseller-admin-panel-p7
 app.set('db', pool);
 
 // API root info

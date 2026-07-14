@@ -717,10 +717,12 @@
       const u = r.user;
       const audit = r.audit || [];
 
-      /* v859-plan-filter: nur die vier echten Plaene anzeigen */
-      const planOptions = (window._plans || []).filter(p => ['starter', 'investor', 'pro'].includes(p.id)).map(p =>
-        `<option value="${p.id}" ${u.plan_id === p.id ? 'selected' : ''}>${escapeHtml(p.name)}</option>`
-      ).join('');
+      /* v859-plan-filter + v11-partner-plan: Starter/Investor/Pro/Partner (Partner garantiert) */
+      var _pById = {}; (window._plans || []).forEach(function(p){ _pById[p.id] = p; });
+      const planOptions = [['starter','Starter'],['investor','Investor'],['pro','Pro'],['partner','Partner']].map(function(e){
+        var p = _pById[e[0]]; var nm = p ? p.name : e[1];
+        return '<option value="'+e[0]+'"'+(u.plan_id===e[0]?' selected':'')+'>'+escapeHtml(nm)+'</option>';
+      }).join('');
 
       $('#user-detail-content').innerHTML = `
         <div class="user-detail-grid">
