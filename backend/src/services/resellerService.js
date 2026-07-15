@@ -254,9 +254,23 @@ async function createMandantShare(userId, objectId) {
       WHERE reseller_id = $1 AND object_id = $2 AND status IN ('eingereicht','bestaetigt') LIMIT 1`,
     [client.reseller_id, objectId]);
   if (ex.rowCount) return ex.rows[0];
+  /* W14-reshare: Die Vorpruefung oben findet nur 'eingereicht'/'bestaetigt'.
+     Ein WIDERRUFENES oder zurueckgegebenes Share bleibt als Zeile bestehen —
+     object_shares hat UNIQUE(object_id, reseller_id), der INSERT lief also in
+     einen Duplicate-Key. Ergebnis: ein einmal widerrufenes Objekt konnte NIE
+     wieder freigegeben werden. Jetzt: UPSERT, der die alte Zeile reaktiviert
+     und die Zeitstempel der Vorrunde sauber zuruecksetzt. */
   const r = await query(
-    `INSERT INTO object_shares (reseller_id, client_id, object_id, status)
-     VALUES ($1, $2, $3, 'eingereicht') RETURNING *`,
+    `INSERT INTO object_shares (reseller_id, client_id, object_id, status, submitted_at)
+     VALUES ($1, $2, $3, 'eingereicht', now())
+     ON CONFLICT (object_id, reseller_id) DO UPDATE SET
+       status       = 'eingereicht',
+       client_id    = EXCLUDED.client_id,
+       submitted_at = now(),
+       reviewed_at  = NULL,
+       revoked_at   = NULL,
+       updated_at   = now()
+     RETURNING *`,
     [client.reseller_id, client.id, objectId]);
   try { await _audit(r.rows[0].id, userId, 'eingereicht', {}); } catch (e) {}
   return r.rows[0];

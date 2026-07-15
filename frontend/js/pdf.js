@@ -598,8 +598,9 @@ function pN(n, d) { d = d || 1; return isNaN(n) ? '-' : n.toFixed(d).replace('.'
 /* ── PAGE TEMPLATE ──────────────────────────────── */
 function pageTpl(doc, num, subtitle, W, M) {
   W = W || 210; M = M || 15;
+  /* W14-pagelight: Kopf-/Fussbalken folgen dem Deckblatt (brand_pdf_light). */
   // Header
-  doc.setFillColor.apply(doc, C.CH);
+  doc.setFillColor.apply(doc, _cv(C.CH, C.SURF2));
   doc.rect(0, 0, W, 22, 'F');
   doc.setFillColor.apply(doc, C.GOLD);
   doc.rect(0, 22, W, 0.8, 'F');
@@ -620,7 +621,7 @@ function pageTpl(doc, num, subtitle, W, M) {
   // Seitenbezeichnung mittig
   if (subtitle) {
     doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
-    doc.setTextColor.apply(doc, C.WHITE);
+    doc.setTextColor.apply(doc, _cv(C.WHITE, C.CH));
     doc.text(subtitle.toUpperCase(), W / 2, 13, { align: 'center' });
   }
   // Seitennummer rechts
@@ -628,12 +629,12 @@ function pageTpl(doc, num, subtitle, W, M) {
   doc.setTextColor.apply(doc, C.MID);
   doc.text('Seite ' + num, W - M, 17, { align: 'right' });
   // Footer
-  doc.setFillColor.apply(doc, C.CH);
+  doc.setFillColor.apply(doc, _cv(C.CH, C.SURF2));
   doc.rect(0, 285, W, 12, 'F');
   doc.setFillColor.apply(doc, C.GOLD);
   doc.rect(0, 285, W, 0.4, 'F');
   doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5);
-  doc.setTextColor(120, 110, 90);
+  doc.setTextColor.apply(doc, _cv([120, 110, 90], C.MUTED));
   doc.text(_formatContact(_getUserContact()), W / 2, 290, { align: 'center' });
   doc.text('Alle Angaben ohne Gew\u00e4hr \u00b7 Keine Steuer- oder Anlageberatung \u00b7 Vertraulich', W / 2, 294, { align: 'center' });
   return 27;
