@@ -205,7 +205,7 @@
       '<div class="dab-rowflex"><div class="dab-donut"><svg width="96" height="96" viewBox="0 0 96 96">' +
         '<circle cx="48" cy="48" r="40" fill="none" stroke="rgba(111,214,160,.15)" stroke-width="7"/>' +
         '<circle class="ring" cx="48" cy="48" r="40" fill="none" stroke="var(--dab-m2)" stroke-width="7" stroke-linecap="round" stroke-dasharray="' + c1.toFixed(1) + '" stroke-dashoffset="' + o1 + '"/>' +
-        '<circle cx="48" cy="48" r="31" fill="none" stroke="rgba(201,168,76,.2)" stroke-width="5"/>' +
+        '<circle cx="48" cy="48" r="31" fill="none" style="stroke:color-mix(in srgb,var(--gold,#C9A84C) 20%,transparent)" stroke-width="5"/>' +
         '<circle cx="48" cy="48" r="31" fill="none" stroke="var(--dab-gold)" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + c2.toFixed(1) + '" stroke-dashoffset="0"/>' +
       '</svg><div class="dab-donut-v"><b>' + pct + '</b><span>/ 100</span><small>FELDER ' + filled + ' / ' + total + '</small></div></div>' +
       '<div class="dab-rmain"><div class="dab-kick">Vorflug-Check</div><div class="dab-rtitle">Bereit f\u00fcr die Bank?</div><div class="dab-count"><b>' + filled + '</b> / ' + total + ' Grundfelder bef\u00fcllt</div>' +
@@ -837,7 +837,10 @@
 
   /* ────────────────── Styles ────────────────── */
   var DAB_CSS = [
-    '#s8{--dab-ob:#0a0a0a;--dab-m2:#6fd6a0;--dab-glow:rgba(111,214,160,.5);--dab-gold:#C9A84C;--dab-goldhi:#E8CC7A;--dab-gold3:#9a7f33;--dab-green:#3FA56C;--dab-red:#B86250;--dab-run:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);--dab-fd:"Cormorant Garamond",serif;--dab-fs:"Space Grotesk",sans-serif;--dab-fm:"JetBrains Mono",monospace;}',
+    /* W5-dabgold: die --dab-*-Variablen waren ein eigener Namensraum, der --gold
+   ignorierte -> Deal-Aktion blieb gold, waehrend der Rest der App den Reseller-
+   Akzent trug. Jetzt erben sie vom globalen Token (Fallback = DealPilot-Gold). */
+    '#s8{--dab-ob:#0a0a0a;--dab-m2:#6fd6a0;--dab-glow:rgba(111,214,160,.5);--dab-gold:var(--gold,#C9A84C);--dab-goldhi:var(--gold-hi,#E8CC7A);--dab-gold3:var(--gold-3,#9a7f33);--dab-green:#3FA56C;--dab-red:#B86250;--dab-run:linear-gradient(110deg,var(--gold-hi,#E8CC7A),var(--gold,#C9A84C) 55%,var(--gold-lo,#b8932f));--dab-fd:"Cormorant Garamond",serif;--dab-fs:"Space Grotesk",sans-serif;--dab-fm:"JetBrains Mono",monospace;}',
     '#s8 .dab-cockpit{background:radial-gradient(120% 90% at 50% -10%,#17181a 0%,var(--dab-ob) 55%);border:1px solid rgba(201,168,76,.2);border-radius:18px;overflow:hidden;margin:0 0 24px;box-shadow:0 14px 50px rgba(0,0,0,.16);transition:box-shadow .5s}',
     '#s8 .dab-cockpit.ready{box-shadow:0 14px 50px rgba(0,0,0,.16),0 0 40px var(--dab-glow)}',
     '#s8 .dab-strip{position:relative;overflow:hidden;background:var(--dab-run);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}',
@@ -883,7 +886,7 @@
     '@media(max-width:900px){#s8 .dab-status-grid{grid-template-columns:1fr}}',
     '#s8 #dab-share-slot{display:block;min-width:0}',
     '#s8 #dab-share-slot > div{margin:0 !important;height:100%;box-sizing:border-box}',
-    '#s8 .dab-perf{height:0;border-top:1.5px dashed rgba(201,168,76,.28);margin:24px -26px;position:relative}',
+    '#s8 .dab-perf{height:0;border-top:1.5px dashed color-mix(in srgb,var(--gold,#C9A84C) 28%,transparent);margin:24px -26px;position:relative}',
     '#s8 .dab-perf::before,#s8 .dab-perf::after{content:"";position:absolute;top:-9px;width:18px;height:18px;border-radius:50%;background:var(--dab-ob)}',
     '#s8 .dab-perf::before{left:-9px}#s8 .dab-perf::after{right:-9px}',
     '#s8 .dab-sthead{margin-bottom:14px}',

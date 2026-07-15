@@ -135,6 +135,7 @@ async function listClients(resellerId) {
 }
 
 // ── Seat zuweisen / entziehen ───────────────────────────────────
+/* W1a-investor: Seat = Investor-Tier (59-EUR-Referenz aus dem Konzept), nicht Starter */
 async function assignSeat(resellerId, clientId) {
   // Client muss zum Reseller gehören
   const c = await query(
@@ -150,7 +151,7 @@ async function assignSeat(resellerId, clientId) {
     [resellerId, clientId]
   );
   if (ex.rowCount) {
-    try { if (c.rows[0].user_id) await planService.setUserPlanManual(c.rows[0].user_id, 'starter', 'monthly', 3650); } catch (e) {}
+    try { if (c.rows[0].user_id) await planService.setUserPlanManual(c.rows[0].user_id, 'investor', 'monthly', 3650); } catch (e) {}
     return ex.rows[0];
   }
 
@@ -168,7 +169,7 @@ async function assignSeat(resellerId, clientId) {
   if (!r.rowCount) { const e = new Error('Kein freier Seat im Pool'); e.status = 409; throw e; }
 
   // Mandant bekommt durch den Seat mindestens Starter
-  try { if (c.rows[0].user_id) await planService.setUserPlanManual(c.rows[0].user_id, 'starter', 'monthly', 3650); } catch (e) { /* Plan best-effort */ }
+  try { if (c.rows[0].user_id) await planService.setUserPlanManual(c.rows[0].user_id, 'investor', 'monthly', 3650); } catch (e) { /* Plan best-effort */ }
   return r.rows[0];
 }
 

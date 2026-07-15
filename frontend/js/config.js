@@ -429,6 +429,19 @@ window.DealPilotConfig = (function() {
       return 'free';
     }
     if (override && PRICING[override]) return override;
+    /* W4-nosilent: NIE wortlos auf free herabstufen. Sub.getCurrentSync() lieferte
+       null, sobald der Cache geleert war (5 Aufrufer) -> zahlende Kunden bekamen
+       Wasserzeichen + gesperrte Features, ohne dass irgendwo etwas geloggt wurde. */
+    try {
+      var _lk = localStorage.getItem('dp_last_plan');
+      if (_lk && PRICING[_lk]) {
+        if (!getCurrentPlanKey._warned) {
+          getCurrentPlanKey._warned = true;
+          console.warn('[Plan] Subscription nicht im Cache — nutze letzten bekannten Plan:', _lk);
+        }
+        return _lk;
+      }
+    } catch (e) {}
     return 'free';
   }
 

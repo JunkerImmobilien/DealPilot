@@ -18,6 +18,7 @@
 var Sub = (function() {
   var _cache = null;
   var _cacheTime = 0;
+  var _syncRefetching = false;   /* W4-lastplan */
   var CACHE_TTL_MS = 30 * 1000;  // 30 seconds
 
   function isApiMode() {
@@ -91,6 +92,8 @@ var Sub = (function() {
       var resp = await Auth.apiCall('/subscription');
       _cache = resp.subscription;
       _cacheTime = Date.now();
+      /* W4-lastplan: ueberlebt clearCache() — echtes Downgrade schreibt hier 'free' */
+      try { if (_cache && _cache.plan_id) localStorage.setItem('dp_last_plan', _cache.plan_id); } catch (e) {}
 
       // V185: Frontend-Override mit Backend-Plan syncen (sonst zeigt UI 'free')
       // Nur wenn KEIN lokaler Override gesetzt ist (Dev-Mode-Override hat Vorrang).
@@ -255,7 +258,23 @@ var Sub = (function() {
      * Muss VORHER mindestens einmal getCurrent() awaited haben damit Cache gefüllt ist.
      */
     getCurrentSync: function() {
-      if (_cache && _cache.plan_id) return _cache.plan_id;
+      /* W4-lastplan: Frueher lieferte diese Funktion null, sobald _cache leer war
+         (clearCache() gibt es an 5 Stellen: settings, pricing-modal, stripe-success,
+         Logout, ...). config.js:getCurrentPlanKey() fiel dann WORTLOS auf 'free'
+         zurueck -> zahlende Kunden bekamen ploetzlich Wasserzeichen + Sperren.
+         Jetzt: letzter bekannter Plan gilt weiter + Nachladen im Hintergrund. */
+      if (_cache && _cache.plan_id && !_cache._fallback) return _cache.plan_id;
+      var lk = null;
+      try { lk = localStorage.getItem('dp_last_plan'); } catch (e) {}
+      if (lk) {
+        if (!_syncRefetching) {            // genau EIN Nachladen, keine Schleife
+          _syncRefetching = true;
+          try { getCurrent(true).catch(function () {}).finally(function () { _syncRefetching = false; }); }
+          catch (e) { _syncRefetching = false; }
+        }
+        return lk;
+      }
+      if (_cache && _cache.plan_id) return _cache.plan_id;   // synthetisches free
       return null;
     },
     /**

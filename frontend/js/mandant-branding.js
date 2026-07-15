@@ -44,6 +44,14 @@
     var acc = _b.brand_accent;
     var hi = _ok(_b.brand_accent_hi) ? _b.brand_accent_hi : _lighten(acc, 22);
     var lo = _ok(_b.brand_accent_lo) ? _b.brand_accent_lo : _darken(acc, 16);
+    /* W6-override: die zentralen Tokens reichen nicht — 25+ Module haben ihr Gold
+       fest verdrahtet (object-actions 54x, dpsh-score-hero 37x, deal-action 29x ...).
+       Die Override-Ebene fegt CSSOM + Inline-Styles + SVG-Attribute nach. */
+    try {
+      if (window.DealPilotWhitelabel && window.DealPilotWhitelabel.apply({
+        accent: acc, accentHi: hi, accentLo: lo, obsidian: _b.brand_obsidian
+      })) return;   // Override hat die Tokens schon gesetzt
+    } catch (e) {}
     var r = document.documentElement.style;
     r.setProperty('--gold', acc);
     r.setProperty('--gold-hi', hi);
@@ -64,8 +72,35 @@
       DPC.branding.get = function () {
         var b = orig.apply(this, arguments) || {};
         if (_b) {
+          /* W1a-allfields: config.js liefert fuer Free/Starter/Investor HART die Junker-Defaults
+             (nur Pro bekommt Custom). Der Mandant ist aber per Reseller-Vertrag Whitelabel,
+             nicht per eigenem Plan -> hier ALLE Felder ueberschreiben, sonst steht ein fremder
+             Firmenname ueber der Junker-Adresse im PDF-Footer. */
           if (_b.brand_name) { b.company = _b.brand_name; b.product_name = _b.brand_name; }
+          if (_b.brand_company) b.company = _b.brand_company;   // Rechtsname schlaegt Markenname
           if (_b.brand_logo_b64) b.logo_b64 = _b.brand_logo_b64;
+          if (_b.brand_tagline) b.tagline = _b.brand_tagline;
+          if (_b.brand_address) b.address = _b.brand_address;
+          if (_b.brand_plz)     b.plz     = _b.brand_plz;
+          if (_b.brand_city)    b.city    = _b.brand_city;
+          if (_b.brand_phone)   b.phone   = _b.brand_phone;
+          if (_b.brand_email)   b.email   = _b.brand_email;
+          if (_b.brand_website) b.website = _b.brand_website;
+          /* Akzent fuer die PDF-Engine (pdf.js liest window._dpPdfColors) */
+          if (_b.brand_accent)    b.accent    = _b.brand_accent;
+          if (_b.brand_accent_hi) b.accent_hi = _b.brand_accent_hi;
+          if (_b.brand_accent_lo) b.accent_lo = _b.brand_accent_lo;
+          /* Junker-Reste entfernen, die der Reseller NICHT gepflegt hat:
+             lieber leer als fremde Adresse. name/role sind Personendaten -> raus. */
+          if (_b.brand_address || _b.brand_city || _b.brand_phone || _b.brand_email) {
+            if (!_b.brand_address) b.address = '';
+            if (!_b.brand_plz)     b.plz     = '';
+            if (!_b.brand_city)    b.city    = '';
+            if (!_b.brand_phone)   b.phone   = '';
+            if (!_b.brand_email)   b.email   = '';
+            if (!_b.brand_website) b.website = '';
+            b.name = ''; b.role = '';
+          }
           b.is_custom = true;
         }
         return b;
@@ -73,6 +108,24 @@
       return true;
     } catch (e) { return false; }
   }
+
+  /* W1a-pdfaccent: Akzent in die jsPDF-Palette schieben (pdf.js exportiert sie als
+     window._dpPdfSetAccent). Ohne das bleibt jedes Mandanten-PDF DealPilot-gold.
+     Selbststartend mit Retry: _b wird erst von boot() asynchron gefuellt, und
+     pdf.js kann spaeter geladen sein als dieses Modul. */
+  function applyPdfAccent() {
+    try {
+      if (!_b || !_b.brand_accent) return false;
+      if (typeof window._dpPdfSetAccent !== 'function') return false;
+      window._dpPdfSetAccent(_b.brand_accent, _b.brand_accent_hi, _b.brand_accent_lo);
+      return true;
+    } catch (e) { return false; }
+  }
+  (function _pdfAccentPoll(n) {
+    if (applyPdfAccent()) return;              // fertig
+    if ((n || 0) > 20) return;                 // ~20s, dann aufgeben (kein Mandant / kein Akzent)
+    setTimeout(function () { _pdfAccentPoll((n || 0) + 1); }, 1000);
+  })(0);
 
   async function boot() {
     try { if (!localStorage.getItem('ji_token')) return; } catch (e) { return; }
