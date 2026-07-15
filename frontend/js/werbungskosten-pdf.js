@@ -8,6 +8,12 @@
 ═══════════════════════════════════════════════════ */
 
 async function exportWerbungskostenPDF(mode) {
+  /* v939-wk-gate: Werbungskosten-PDF ist Investor+ (config werbungskosten_pdf) */
+  if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('werbungskosten_pdf')) {
+    if (typeof toast === 'function') toast('\ud83d\udd12 Werbungskosten-PDF ist im Investor-Plan enthalten');
+    if (typeof openPricingModal === 'function') setTimeout(openPricingModal, 600);
+    return;
+  }
   if (typeof Paywall !== 'undefined' && !Paywall.gate('exports')) return;
 
   if (typeof window.jspdf === 'undefined') {
