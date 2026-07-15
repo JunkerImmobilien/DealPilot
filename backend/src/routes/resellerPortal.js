@@ -204,10 +204,40 @@ router.post('/clients/:id/remove', async (req, res, next) => {
 });
 
 // ── Whitelabel-Branding ─────────────────────────────────────
+/* W1a-contact: eigene Route fuer Kontaktdaten - bewusst getrennt von PUT /branding,
+   damit die bestehende Logo-/Accent-Logik unangetastet bleibt. */
+router.put('/branding-contact', async (req, res, next) => {
+  try {
+    const b = req.body || {};
+    const t = (v, n) => { const x = String(v == null ? '' : v).trim().slice(0, n); return x === '' ? null : x; };
+    const mail = t(b.brand_email, 160);
+    if (mail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) {
+      return res.status(400).json({ error: 'email_invalid', message: 'E-Mail-Adresse ist ungueltig.' });
+    }
+    /* W8-mailaccent: Mail-Farbe ist vom App-Akzent entkoppelt. NULL = nicht
+       gepflegt -> der Mail-Code faellt auf brand_accent zurueck. */
+    const macc = /^#[0-9a-fA-F]{6}$/.test(b.brand_mail_accent || '') ? b.brand_mail_accent : null;
+    await query(
+      `UPDATE resellers SET
+         brand_company = $2, brand_address = $3, brand_plz = $4, brand_city = $5,
+         brand_phone = $6, brand_email = $7, brand_website = $8, brand_tagline = $9,
+         brand_mail_accent = COALESCE($10, brand_mail_accent),
+         updated_at = now()
+       WHERE id = $1`,
+      [req.reseller.id, t(b.brand_company,120), t(b.brand_address,160), t(b.brand_plz,12),
+       t(b.brand_city,80), t(b.brand_phone,60), mail, t(b.brand_website,160), t(b.brand_tagline,120),
+       macc]);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+
 router.get('/branding', async (req, res, next) => {
   try {
     const r = await query(
-      `SELECT brand_name, whitelabel_enabled, brand_logo_b64, brand_accent, brand_accent_hi, brand_accent_lo, brand_obsidian
+      /* W1a-contact */
+      `SELECT brand_name, whitelabel_enabled, brand_logo_b64, brand_accent, brand_accent_hi, brand_accent_lo, brand_obsidian,
+              brand_company, brand_address, brand_plz, brand_city, brand_phone, brand_email, brand_website, brand_tagline,
+              brand_mail_accent /*W8-mailaccent*/
          FROM resellers WHERE id=$1`, [req.reseller.id]);
     res.json({ branding: r.rows[0] || {} });
   } catch (e) { next(e); }

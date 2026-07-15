@@ -517,11 +517,25 @@
       injectPillCss();
       if (window.DealPilotConfig && DealPilotConfig.pricing && DealPilotConfig.pricing.plans &&
           !DealPilotConfig.pricing.plans.partner) {
+        /* W9-partnerfeatures: hier standen NUR drei Features
+           (reseller/reseller_whitelabel/custom_logo) — alles andere war fuer den
+           Partner damit GESPERRT ("Portfolio: alle KPIs ab Investor-Plan", Deal
+           Score, Track-Record ...). Die DB-Zeile 'partner' hat laengst alle
+           Features (Migration 056), das Frontend hat sie ueberschrieben.
+           Partner ist ein erweiterter Pro -> Pro KLONEN statt eine Liste pflegen,
+           die beim naechsten Pro-Feature wieder veraltet ist. */
+        var _pro = DealPilotConfig.pricing.plans.pro || {};
+        var _pf = {}, _pl = {};
+        try { _pf = JSON.parse(JSON.stringify(_pro.features || {})); } catch (e) { _pf = {}; }
+        try { _pl = JSON.parse(JSON.stringify(_pro.limits   || {})); } catch (e) { _pl = {}; }
+        _pf.reseller = true; _pf.reseller_whitelabel = true; _pf.custom_logo = true;
+        _pl.objects = -1; _pl.max_saves = -1; _pl.ai_credits = 100;
+        _pl.photos_per_obj = 30; _pl.watermark = false;
         DealPilotConfig.pricing.plans.partner = {
           key: 'partner', label: 'Partner', tagline: 'Makler · Steuerberater · Finanzierer',
           price_monthly_eur: 149, price_yearly_eur: 1490, sort_order: 5,
-          limits: { objects: -1, max_saves: -1, ai_credits: 100, photos_per_obj: 30, watermark: false },
-          features: { reseller: true, reseller_whitelabel: true, custom_logo: true },
+          limits: _pl,
+          features: _pf,
           stripe_price_id_monthly: null, stripe_price_id_yearly: null
         };
       }
@@ -558,29 +572,96 @@
       var inp = 'width:100%;padding:9px 11px;border:1px solid #e6e0d4;border-radius:8px;font:400 13px Inter;outline:none';
       var pick = 'width:100%;height:38px;border:1px solid #e6e0d4;border-radius:8px;background:#fff;cursor:pointer';
       w.innerHTML =
-        '<p class="rp-intro">Dein Whitelabel — Logo und Akzentfarbe erben deine Mandanten und deine Einladungs-Mails.</p>' +
+        '<p class="rp-intro">Dein Whitelabel — Logo, Akzentfarbe und Kontaktdaten erben deine Mandanten: in der App, in den Einladungs-Mails und im Fuß jedes PDFs.</p>' +
         '<div class="rp-panel">' +
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-wl"' + (b.whitelabel_enabled ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:#C9A84C">' +
             '<span>Whitelabel aktiv — eigenes Branding statt DealPilot</span></label>' +
           '<div style="display:flex;gap:12px;margin-top:16px">' +
             '<div style="flex:1"><div class="rp-fl">Marken-/Kanzleiname</div><input id="rp-b-name" value="' + esc(b.brand_name || '') + '" style="' + inp + '"></div>' +
-            '<div style="width:104px"><div class="rp-fl">Akzentfarbe</div><input type="color" id="rp-b-accent" value="' + esc(accent) + '" style="' + pick + '"></div>' +
-            '<div style="width:104px"><div class="rp-fl">Header-Farbe</div><input type="color" id="rp-b-obsidian" value="' + esc(obsidian) + '" style="' + pick + '"></div>' +
+            /* W8-editor: Farbwaehler sassen hier, wo man das Ergebnis NICHT sieht.
+               Jetzt: Knopf -> Editor mit Live-Vorschau. Die IDs bleiben als
+               Hidden-Felder erhalten, damit saveBranding() unveraendert weiterlaeuft. */
+            '<div style="flex:1"><div class="rp-fl">Farben &amp; Darstellung</div>' +
+              '<button type="button" id="rp-b-disp" style="width:100%;text-align:left;padding:9px 11px;border:1px solid #e6e0d4;border-radius:8px;background:#fff;cursor:pointer;font:400 13px Inter;color:#3a352c">' +
+                '<span id="rp-b-dot" style="display:inline-block;width:13px;height:13px;border-radius:3px;background:' + esc(accent) + ';vertical-align:-2px;margin-right:8px;border:1px solid rgba(0,0,0,.14)"></span>' +
+                'Darstellung öffnen — live einstellen →</button></div>' +
           '</div>' +
+          '<input type="hidden" id="rp-b-accent" value="' + esc(accent) + '">' +
+          '<input type="hidden" id="rp-b-obsidian" value="' + esc(obsidian) + '">' +
+          '<input type="hidden" id="rp-b-mail" value="' + esc(b.brand_mail_accent || accent) + '">' +
           '<div style="margin-top:14px"><div class="rp-fl">Logo (PNG/SVG, max ~300 KB)</div>' +
             '<input type="file" id="rp-b-logo" accept="image/*" style="font:400 12px Inter">' +
             '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">entfernen</button></div>' +
         '</div>' +
+        /* W1b-contact-ui: Kontaktdaten fuer den PDF-Footer der Mandanten.
+           Ohne die faellt config.js auf JUNKER_DEFAULTS zurueck. */
+        '<p class="rp-label" style="margin-top:22px">Impressum / PDF-Footer</p>' +
+        '<p class="rp-intro" style="margin-top:4px">Diese Angaben stehen im Fuß jedes PDFs, das deine Mandanten erzeugen. Leer gelassene Felder bleiben leer — es wird nichts von DealPilot eingesetzt.</p>' +
+        '<div class="rp-panel">' +
+          '<div style="display:flex;gap:12px">' +
+            '<div style="flex:2"><div class="rp-fl">Firma (rechtlich, falls abweichend)</div><input id="rp-b-company" value="' + esc(b.brand_company || '') + '" placeholder="' + esc(b.brand_name || 'Kanzlei Muster GmbH') + '" style="' + inp + '"></div>' +
+            '<div style="flex:2"><div class="rp-fl">Claim / Untertitel</div><input id="rp-b-tagline" value="' + esc(b.brand_tagline || '') + '" placeholder="Ihre Kanzlei fuer Immobilien" style="' + inp + '"></div>' +
+          '</div>' +
+          '<div style="display:flex;gap:12px;margin-top:12px">' +
+            '<div style="flex:3"><div class="rp-fl">Straße &amp; Hausnummer</div><input id="rp-b-address" value="' + esc(b.brand_address || '') + '" style="' + inp + '"></div>' +
+            '<div style="width:96px"><div class="rp-fl">PLZ</div><input id="rp-b-plz" value="' + esc(b.brand_plz || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:2"><div class="rp-fl">Ort</div><input id="rp-b-city" value="' + esc(b.brand_city || '') + '" style="' + inp + '"></div>' +
+          '</div>' +
+          '<div style="display:flex;gap:12px;margin-top:12px">' +
+            '<div style="flex:1"><div class="rp-fl">Telefon</div><input id="rp-b-phone" value="' + esc(b.brand_phone || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:1"><div class="rp-fl">E-Mail</div><input id="rp-b-email" type="email" value="' + esc(b.brand_email || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:1"><div class="rp-fl">Website</div><input id="rp-b-website" value="' + esc(b.brand_website || '') + '" style="' + inp + '"></div>' +
+          '</div>' +
+          '<div id="rp-b-foot" style="margin-top:14px;padding:11px 13px;background:#faf8f3;border:1px dashed #ddd6c8;border-radius:8px;font:400 11.5px/1.6 Inter;color:#6b6558"></div>' +
+        '</div>' +
         '<p class="rp-label" style="margin-top:22px">Vorschau (Einladungs-Mail)</p><div id="rp-b-preview"></div>' +
+        /* W6-preview: Der Owner sieht sein eigenes Whitelabel sonst NIE — /my-branding
+           liefert nur fuer reseller_clients etwas. Ohne das muesste er sich als Mandant
+           einloggen, um sein eigenes Branding zu pruefen. */
+        '<div class="rp-panel" style="margin-top:18px">' +
+          '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
+            '<input type="checkbox" id="rp-b-prev" style="width:18px;height:18px;accent-color:var(--gold,#C9A84C)">' +
+            '<span><b>Ansicht meiner Mandanten</b> — die App in meinem Branding anzeigen</span></label>' +
+          '<div style="font-size:11.5px;color:#8a8473;margin-top:7px;padding-left:28px">Nur fuer dich, nur in diesem Browser. Zum Zuruecksetzen Haken entfernen.</div>' +
+        '</div>' +
         '<div style="margin-top:18px"><button class="rp-checkout" id="rp-b-save">Branding speichern</button></div>';
-      var upd = function () { _brandPreview(); };
+      var upd = function () { _brandPreview(); try { if (_previewOn()) _applyPreview(); } catch (e) {} };  /*W7-livepreview*/
       $('rp-b-wl').addEventListener('change', upd);
       $('rp-b-name').addEventListener('input', upd);
-      $('rp-b-accent').addEventListener('input', upd);
-      $('rp-b-obsidian').addEventListener('input', upd);
+      /* W8-editor: die Farb-Inputs sind jetzt hidden -> kein 'input'-Event. */
+      $('rp-b-disp').addEventListener('click', function () {
+        if (!window.DealPilotBrandingEditor) { toast('Editor konnte nicht geladen werden'); return; }
+        window.DealPilotBrandingEditor.open({
+          accent: _v('rp-b-accent'), obsidian: _v('rp-b-obsidian'), mail: _v('rp-b-mail'),
+          name: _v('rp-b-name') || 'Deine Kanzlei', logo: _currentLogo()
+        }, function (res) {
+          if (!res) return;
+          $('rp-b-accent').value = res.accent;
+          $('rp-b-obsidian').value = res.obsidian;
+          $('rp-b-mail').value = res.mail;
+          var dot = $('rp-b-dot'); if (dot) dot.style.background = res.accent;
+          upd();
+          toast('Übernommen — jetzt noch „Branding speichern"');
+        });
+      });
       $('rp-b-logo').addEventListener('change', function (e) { _brandLogoPick(e, upd); });
       $('rp-b-logo-x').addEventListener('click', function () { _brandState.logo = ''; var f = $('rp-b-logo'); if (f) f.value = ''; upd(); });
+      ['rp-b-company','rp-b-address','rp-b-plz','rp-b-city','rp-b-phone','rp-b-email','rp-b-website','rp-b-tagline']
+        .forEach(function (id) { var el = $(id); if (el) el.addEventListener('input', _footPreview); });
+      _footPreview();
+      (function () {
+        var pv = $('rp-b-prev'); if (!pv) return;
+        var on = false;
+        try { on = localStorage.getItem('dp_wl_preview') === '1'; } catch (e) {}
+        pv.checked = on;
+        if (on) _applyPreview();
+        pv.addEventListener('change', function () {
+          try { localStorage.setItem('dp_wl_preview', pv.checked ? '1' : '0'); } catch (e) {}
+          if (pv.checked) { _applyPreview(); toast('Ansicht deiner Mandanten aktiv'); }
+          else { location.reload(); }   // sauber zurueck = neu laden
+        });
+      })();
       $('rp-b-save').addEventListener('click', saveBranding);
       _brandPreview();
     } catch (e) { w.innerHTML = '<p class="rp-ph">Branding konnte nicht geladen werden.</p>'; }
@@ -610,6 +691,34 @@
           '<div style="margin-top:12px"><span style="background:' + esc(accent) + ';color:#241c05;font-weight:700;padding:9px 16px;border-radius:8px;font-size:13px;display:inline-block">Einladung annehmen</span></div>' +
         '</div></div>';
   }
+  function _v(id) { var el = $(id); return el && el.value ? String(el.value).trim() : ''; }
+  function _footPreview() {
+    var host = $('rp-b-foot'); if (!host) return;
+    var comp = _v('rp-b-company') || _v('rp-b-name') || 'Deine Kanzlei';
+    var line2 = [_v('rp-b-address'), [_v('rp-b-plz'), _v('rp-b-city')].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+    var line3 = [_v('rp-b-phone'), _v('rp-b-email'), _v('rp-b-website')].filter(Boolean).join(' · ');
+    host.innerHTML = '<b style="color:#3a352c">So sieht der PDF-Footer beim Mandanten aus:</b><br>' +
+      '<span style="color:#2a2727;font-weight:600">' + esc(comp) + '</span>' +
+      (_v('rp-b-tagline') ? '<br>' + esc(_v('rp-b-tagline')) : '') +
+      (line2 ? '<br>' + esc(line2) : '') +
+      (line3 ? '<br>' + esc(line3) : '') +
+      (!line2 && !line3 ? '<br><i style="color:#b8625c">Noch keine Kontaktdaten — der Footer bleibt leer.</i>' : '');
+  }
+  /* W7-livepreview: las vorher das beim Tab-Oeffnen geladene Objekt -> ein
+     Farbwechsel im Waehler kam nie an (W6-Bug). Jetzt LIVE aus dem Formular. */
+  function _previewOn() { var el = $('rp-b-prev'); return !!(el && el.checked); }
+  function _applyPreview() {
+    try {
+      if (!window.DealPilotWhitelabel) return;
+      var acc = _v('rp-b-accent');
+      if (!/^#[0-9a-fA-F]{6}$/.test(acc)) return;
+      var obs = _v('rp-b-obsidian');
+      window.DealPilotWhitelabel.apply({
+        accent: acc,
+        obsidian: /^#[0-9a-fA-F]{6}$/.test(obs) ? obs : null
+      });
+    } catch (e) {}
+  }
   async function saveBranding() {
     var body = {
       brand_name: ($('rp-b-name') || {}).value || '',
@@ -620,7 +729,15 @@
     if (_brandState.logo !== undefined) body.brand_logo_b64 = _brandState.logo;
     try {
       await api('/branding', { method: 'PUT', body: body });
+      /* W1b-contact-ui: Kontaktdaten ueber die eigene Route (laesst Logo-/Accent-Logik unangetastet) */
+      await api('/branding-contact', { method: 'PUT', body: {
+        brand_company: _v('rp-b-company'), brand_tagline: _v('rp-b-tagline'),
+        brand_address: _v('rp-b-address'), brand_plz: _v('rp-b-plz'), brand_city: _v('rp-b-city'),
+        brand_phone: _v('rp-b-phone'), brand_email: _v('rp-b-email'), brand_website: _v('rp-b-website'),
+        brand_mail_accent: _v('rp-b-mail')   /*W8-editor*/
+      } });
       toast('✓ Branding gespeichert');
+      try { if (_previewOn()) _applyPreview(); } catch (e) {}   /*W7-livepreview*/
       if (_brandState.logo !== undefined) { _brandState.current_logo = _brandState.logo; _brandState.logo = undefined; }
     } catch (e) { toast(e && e.status === 413 ? 'Logo zu groß (max ~300 KB)' : 'Speichern fehlgeschlagen'); }
   }
@@ -725,15 +842,27 @@
   async function boot() {
     try {
       await handleInvite();
-      _st.gated = await isPartner(); if (!_st.gated) return;
+      _st.gated = await isPartner(); if (!_st.gated) return false;
       fixPlanLabel();
       handleReturn();
       _mo.observe(document.body, { childList: true, subtree: true });
       ensureEntry();
-    } catch (e) {}
+      return true;
+    } catch (e) { return false; }
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  /* W7-bootretry: boot() lief GENAU EINMAL. isPartner() wartet auf Sub.getCurrent() —
+     ist Auth.isLoggedIn() da noch nicht bereit, liefert getCurrent() das synthetische
+     'free' OHNE Fetch -> _st.gated=false -> return -> der MutationObserver startete nie
+     und ensureEntry() lief nie. Ergebnis: Partner-Portal erst nach Hard-Reload.
+     Jetzt: nachfassen, bis der Plan wirklich bekannt ist. */
+  async function _bootRetry(n) {
+    if (_st.gated) return;
+    var ok = await boot();
+    if (ok || (n || 0) >= 6) return;
+    setTimeout(function () { _bootRetry((n || 0) + 1); }, 1200);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { _bootRetry(0); });
+  else _bootRetry(0);
 
   // Partner-Config SOFORT & ungated einspritzen (gegen Free->Partner-Race ohne Hard-Reload)
   function _earlyPill() {

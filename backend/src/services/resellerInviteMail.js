@@ -27,7 +27,10 @@ async function sendInvite(p) {
   var r = p.reseller || {};
   var wl = r.whitelabel_enabled && r.brand_name;
   var brandName = wl ? r.brand_name : (r.name || 'DealPilot');
-  var accent = (wl && r.brand_accent) ? r.brand_accent : '#C9A84C';
+  /* W9-mailaccent: Die Mail-Farbe ist vom App-Akzent entkoppelt (Entscheidung 15.07.).
+     brand_mail_accent hat Vorrang; leer/NULL -> Fallback auf brand_accent. */
+  var _macc = (r.brand_mail_accent || r.brand_accent);
+  var accent = (wl && _macc) ? _macc : '#C9A84C';
   var logo = (wl && r.brand_logo_b64) ? r.brand_logo_b64 : null;
 
   var logoHtml = logo

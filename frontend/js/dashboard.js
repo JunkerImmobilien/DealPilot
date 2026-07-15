@@ -511,7 +511,10 @@
     if(!arr.length){ host.innerHTML='<div class="health-sub" style="grid-column:1/-1">Keine Detaildaten verfuegbar.</div>'; return; }
     var P=plan();
     if(!P.full){
-      host.innerHTML='<div class="health-lock" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Portfolio-Health-KPIs (ROE, Cash-on-Cash, Ø-Zins, ESG …) ab Investor-Plan freigeschaltet</div>';
+      /* W10-lockfix: das SVG hatte KEIN width/height -> im Grid-Container blaehte es
+   sich bildschirmfuellend auf. Free-User sahen ein schwarzes Riesen-Schloss
+   statt der Upsell-Botschaft. */
+    host.innerHTML='<div class="health-lock" style="grid-column:1/-1;display:flex;align-items:center;gap:9px"><svg viewBox="0 0 24 24" width="18" height="18" style="flex:none" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Portfolio-Health-KPIs (ROE, Cash-on-Cash, Ø-Zins, ESG …) ab Investor-Plan freigeschaltet</div>';
       return;
     }
 

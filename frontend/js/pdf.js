@@ -196,6 +196,17 @@ function _applyWatermarkIfFree(doc, W) {
 }
 window._applyWatermarkIfFree = _applyWatermarkIfFree;
 
+/* W3-nodp: Bei Whitelabel darf "DealPilot" nicht neben dem Reseller-Namen stehen.
+   Eine Kanzlei zahlt fuer die eigene Marke — _pn() liefert den Produktnamen. */
+function _pn() {
+  try {
+    var b = _getBranding();
+    if (b && b.is_custom && b.product_name) return b.product_name;
+  } catch (e) {}
+  return 'DealPilot';
+}
+window._pn = _pn;
+
 
 
 // V182: Fotos beim Laden auf vernünftige Größe runter-resampeln, damit das
@@ -519,6 +530,28 @@ var C = {
   BORDER:   [224,219,211]
 };
 
+/* W1a-brandcolor: PDF-Gold war hart verdrahtet -> Whitelabel-Reseller bekamen
+   goldene PDFs. Die Palette wird jetzt nach aussen gegeben; mandant-branding.js
+   (bzw. jeder Aufrufer) kann die Akzentfarbe hineinschreiben. Die Arrays werden
+   IN PLACE mutiert, damit alle bestehenden Referenzen mitziehen. */
+window._dpPdfColors = C;
+window._dpPdfSetAccent = function (hex, hexHi, hexLo) {
+  function rgb(h) {
+    if (!h || !/^#[0-9a-fA-F]{6}$/.test(h)) return null;
+    return [parseInt(h.substr(1,2),16), parseInt(h.substr(3,2),16), parseInt(h.substr(5,2),16)];
+  }
+  function put(target, src) { if (src) { target[0]=src[0]; target[1]=src[1]; target[2]=src[2]; } }
+  put(C.GOLD,   rgb(hex));
+  put(C.GOLD_L, rgb(hexHi) || (rgb(hex) ? rgb(hex).map(function(v){ return Math.min(255, Math.round(v + (255-v)*0.45)); }) : null));
+  put(C.GOLD_D, rgb(hexLo) || (rgb(hex) ? rgb(hex).map(function(v){ return Math.round(v*0.7); }) : null));
+};
+/* beim Laden einmal aus dem Branding ziehen (falls schon bekannt) */
+try {
+  var _b0 = (window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.get) ? DealPilotConfig.branding.get() : null;
+  if (_b0 && _b0.accent) window._dpPdfSetAccent(_b0.accent, _b0.accent_hi, _b0.accent_lo);
+} catch (e) {}
+
+
 /* ── HELPER ─────────────────────────────────────── */
 function pE(n, sgn) {
   if (n === null || n === undefined || isNaN(n)) return '-';
@@ -714,7 +747,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
 
   function block(title, text, bgColor, accentColor, isDarkBg) {
     if (typeof _dpPdfSectionOn === 'function' && !_dpPdfSectionOn(title)) return; /* v603-gate */
-    bgColor = [255, 255, 255]; accentColor = [201, 168, 76]; isDarkBg = false; /* v596-pdf-clean */
+    bgColor = [255, 255, 255]; accentColor = C.GOLD; isDarkBg = false; /* v596-pdf-clean */
     if (!text) return;
     // V63.71: Schriftgröße VOR splitTextToSize setzen - sonst nimmt jsPDF die alte Größe
     doc.setFont('helvetica', 'normal');
@@ -753,7 +786,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
 
   function bulletBlock(title, items, bgColor, accentColor) {
     if (typeof _dpPdfSectionOn === 'function' && !_dpPdfSectionOn(title)) return; /* v603-gate2 */
-    bgColor = [255, 255, 255]; accentColor = [201, 168, 76]; /* v596-pdf-clean2 */
+    bgColor = [255, 255, 255]; accentColor = C.GOLD; /* v596-pdf-clean2 */
     if (!Array.isArray(items) || !items.length) return;
     // V63.71: Schriftgröße VOR splitTextToSize
     doc.setFont('helvetica', 'normal');
@@ -813,7 +846,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     var sz = '';
     if (a.szenarien.worst_case) sz += 'Worst Case (Miete -10%, Zins +1%): ' + clean(a.szenarien.worst_case) + '\n\n';
     if (a.szenarien.best_case)  sz += 'Best Case (Miete +5%, höhere Wertsteigerung): ' + clean(a.szenarien.best_case);
-    if (sz) block('Szenario-Analyse', sz, [248, 244, 232], [201, 168, 76]);
+    if (sz) block('Szenario-Analyse', sz, [248, 244, 232], C.GOLD);
   }
 
   // 5. Investor-Fit
@@ -829,7 +862,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   // 6. Empfehlung
   if (a.empfehlung || a.empfehlung_begruendung) {
     var emp = clean(a.empfehlung || '').toUpperCase() + '\n\n' + clean(a.empfehlung_begruendung || '');
-    block('Empfehlung', emp, [248, 244, 232], [201, 168, 76]);
+    block('Empfehlung', emp, [248, 244, 232], C.GOLD);
   }
 
   // V29: Klassische Sektionen aus der alten KI-Analyse
@@ -837,7 +870,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     block('Investmentbewertung', clean(a.investmentbewertung), [235, 241, 248], [60, 102, 148]);
   }
   if (a.verhandlungsempfehlung) {
-    block('Verhandlungsempfehlung', clean(a.verhandlungsempfehlung), [250, 244, 230], [201, 168, 76]);
+    block('Verhandlungsempfehlung', clean(a.verhandlungsempfehlung), [250, 244, 230], C.GOLD);
   }
   if (a.kaufpreis_offerte && typeof a.kaufpreis_offerte === 'object') {
     var kpo = a.kaufpreis_offerte;
@@ -856,7 +889,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
 
   // 7. DealPilot-Insight (V63.45: dunkler Hintergrund mit hellem Text)
   if (a.dealpilot_insight) {
-    block('DealPilot-Insight', clean(a.dealpilot_insight), [40, 38, 38], [201, 168, 76], true);
+    block('DealPilot-Insight', clean(a.dealpilot_insight), [40, 38, 38], C.GOLD, true);
   }
 
   return cy;
@@ -1004,7 +1037,7 @@ async function _exportPDFInner() {
   // Datum & Kürzel
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
   doc.setTextColor(120, 110, 90);
-  (function(){var uc=_getBranding();var creator=uc.name||uc.company||'DealPilot';doc.text('Erstellt am ' + new Date().toLocaleDateString('de-DE') + '  \u00b7  K\u00fcrzel: ' + (g('kuerzel') || '-') + '  \u00b7  DealPilot \u00b7 ' + creator, W / 2, 258, { align: 'center' });})();
+  (function(){var uc=_getBranding();var creator=uc.name||uc.company||'DealPilot';doc.text('Erstellt am ' + new Date().toLocaleDateString('de-DE') + '  \u00b7  K\u00fcrzel: ' + (g('kuerzel') || '-') + '  \u00b7  ' + _pn() + (creator && creator !== _pn() ? ' \u00b7 ' + creator : '') /*W4-dedup*/, W / 2, 258, { align: 'center' });})();
   doc.text('Vertraulich \u00b7 Nur f\u00fcr den internen Gebrauch', W / 2, 264, { align: 'center' });
 
   // Footer Deckblatt - zeigt Branding-Daten aus den Settings
@@ -1260,7 +1293,7 @@ async function _exportPDFInner() {
   }
   doc.setFillColor.apply(doc, C.SURF2);
   doc.roundedRect(M, cy, CW, 12, 1.8, 1.8, 'F');
-  doc.setFillColor.apply(doc, [201, 168, 76]);
+  doc.setFillColor.apply(doc, C.GOLD);
   doc.rect(M, cy, 2, 12, 'F');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
   doc.setTextColor.apply(doc, [42, 39, 39]);
@@ -1417,7 +1450,7 @@ async function _exportPDFInner() {
                     cf_op: K.cf_op_an, steuer: K.ster_an, cf_ns: K.cf_ns_an, bspar: _bsparY };
 
   drawCFCard(M,                cy, 'HEUTE (' + new Date().getFullYear() + ')',     C.GREEN,         heuteData);
-  drawCFCard(M + cfColW + 4,   cy, 'ENDE ZINSBINDUNG',                              [201,168,76],     ezbData);
+  drawCFCard(M + cfColW + 4,   cy, 'ENDE ZINSBINDUNG',                              C.GOLD,     ezbData);
   drawCFCard(M + (cfColW+4)*2, cy, 'ANSCHLUSS (' + pP(v('anschl_z'), 1) + ')',     [231,111,81],     anData);
 
   cy += (_bsparY > 0 ? 110 : 100);
@@ -1526,7 +1559,7 @@ async function _exportPDFInner() {
       head: [['Kennzahl', 'Heute', 'Ende Zinsbindung', 'Anschluss']],
       body: rows,
       theme: 'striped',
-      headStyles: { fillColor: [42, 39, 39], textColor: [201, 168, 76], fontSize: 9, fontStyle: 'bold' },
+      headStyles: { fillColor: [42, 39, 39], textColor: C.GOLD, fontSize: 9, fontStyle: 'bold' },
       bodyStyles: { fontSize: 8.5, cellPadding: 2 },
       alternateRowStyles: { fillColor: [248, 246, 240] },
       columnStyles: {
@@ -1610,7 +1643,7 @@ async function _exportPDFInner() {
         head: [['Kennzahl', 'Heute', 'Ende Zinsbindung', 'Anschluss']],
         body: zaerRows,
         theme: 'striped',
-        headStyles: { fillColor: [42, 39, 39], textColor: [201, 168, 76], fontSize: 9, fontStyle: 'bold' },
+        headStyles: { fillColor: [42, 39, 39], textColor: C.GOLD, fontSize: 9, fontStyle: 'bold' },
         bodyStyles: { fontSize: 8.5, cellPadding: 2 },
         alternateRowStyles: { fillColor: [248, 246, 240] },
         columnStyles: {
@@ -1778,7 +1811,7 @@ async function _exportPDFInner() {
       tableWidth: _tblW,
       headStyles: {
         fillColor: [42, 39, 39],
-        textColor: [201, 168, 76],
+        textColor: C.GOLD,
         fontSize: 7.0,
         fontStyle: 'bold',
         font: 'helvetica',
@@ -2214,7 +2247,7 @@ async function _exportPDFInner() {
 
         var border;
         if (d >= 1.2)      border = [63, 165, 108];
-        else if (d >= 1.0) border = [201, 168, 76];
+        else if (d >= 1.0) border = C.GOLD;
         else if (d >= 0.8) border = [220, 130, 80];
         else               border = [184, 98, 92];
 
@@ -2252,7 +2285,7 @@ async function _exportPDFInner() {
     var legSpacing = 42;
     var legends = [
       { color: [63, 165, 108],  bg: [232, 246, 237], label: 'DSCR >= 1,2 (gut)' },
-      { color: [201, 168, 76],  bg: [248, 240, 210], label: 'DSCR 1,0-1,2 (knapp)' },
+      { color: C.GOLD,  bg: [248, 240, 210], label: 'DSCR 1,0-1,2 (knapp)' },
       { color: [220, 130, 80],  bg: [248, 220, 185], label: 'DSCR 0,8-1,0 (warn)' },
       { color: [184, 98, 92],   bg: [248, 220, 215], label: 'DSCR < 0,8 (Stress)' }
     ];
@@ -2342,11 +2375,11 @@ async function _exportPDFInner() {
       // Liefert {label, color: [r,g,b]}
       if (kind === 'dscr') {
         if (value >= 1.2) return { label: 'SOLIDE',  rgb: [63, 165, 108] };
-        if (value >= 1.0) return { label: 'KNAPP',   rgb: [201, 168, 76] };
+        if (value >= 1.0) return { label: 'KNAPP',   rgb: C.GOLD };
         return                  { label: 'KRITISCH', rgb: [184, 98, 92] };
       } else {
         if (value < 85)  return { label: 'SOLIDE',  rgb: [63, 165, 108] };
-        if (value <= 100) return { label: 'GRENZ',   rgb: [201, 168, 76] };
+        if (value <= 100) return { label: 'GRENZ',   rgb: C.GOLD };
         return                  { label: 'HEBEL HOCH', rgb: [184, 98, 92] };
       }
     }
@@ -2469,13 +2502,13 @@ async function _exportPDFInner() {
     }
     function _dscrColor(v) {
       if (v >= 1.2) return [63, 165, 108];
-      if (v >= 1.0) return [201, 168, 76];
+      if (v >= 1.0) return C.GOLD;
       return [184, 98, 92];
     }
     function _ltvColor(v) {
       if (v < 60) return [63, 165, 108];
       if (v <= 85) return [63, 165, 108];
-      if (v <= 100) return [201, 168, 76];
+      if (v <= 100) return C.GOLD;
       return [184, 98, 92];
     }
     var bindIdx = data.bindj || 10;
@@ -2605,7 +2638,7 @@ async function _exportPDFInner() {
       years: data.years,
       thresholdLines: [
         { value: 1.2, color: [63, 165, 108], label: '>= 1,2 (gut)' },
-        { value: 1.0, color: [201, 168, 76], label: '1,0 (knapp)' }
+        { value: 1.0, color: C.GOLD, label: '1,0 (knapp)' }
       ],
       formatY: function(v) { return v.toFixed(2).replace('.', ','); }
     });
@@ -2621,7 +2654,7 @@ async function _exportPDFInner() {
       ezbIdx: bindIdx - 1,
       years: data.years,
       thresholdLines: [
-        { value: 85, color: [201, 168, 76], label: '85 %' },
+        { value: 85, color: C.GOLD, label: '85 %' },
         { value: 60, color: [63, 165, 108], label: '60 %' }
       ],
       formatY: function(v) { return v.toFixed(0) + ' %'; }
@@ -2978,7 +3011,7 @@ async function _exportPDFInner() {
   doc.text('KI-INVESTMENT-ANALYSE', M + 5, cy + 9);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
   doc.setTextColor(140, 130, 110);
-  (function(){var b=_getBranding();doc.text('KI-Analyse via DealPilot \u00b7 ' + (b.company || 'DealPilot'), W - M, cy + 9, { align: 'right' });})();
+  (function(){var b=_getBranding();doc.text('KI-Analyse via ' + _pn() + ' \u00b7 ' + (b.company || 'DealPilot'), W - M, cy + 9, { align: 'right' });})();
   cy += 16;
 
   // V27: Wenn neues JSON-Format (_aiAnalysis) vorliegt -> strukturiert rendern und Section-Parser überspringen
@@ -3244,7 +3277,7 @@ async function _exportPDFInner() {
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, C.MID);
   doc.text(
     'Erstellt: ' + new Date().toLocaleDateString('de-DE') + ' ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) +
-    '  \u00b7  DealPilot' + (_getBranding().company && _getBranding().company !== 'DealPilot' ? ' \u00b7 ' + _getBranding().company : '') + (_getBranding().website ? '  \u00b7  ' + _getBranding().website : ''),
+    '  \u00b7  ' + _pn() + (_getBranding().company && _getBranding().company !== _pn() ? ' \u00b7 ' + _getBranding().company : '') + (_getBranding().website ? '  \u00b7  ' + _getBranding().website : ''),
     M, cy
   );
   setPdfProgress(90);
