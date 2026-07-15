@@ -169,6 +169,35 @@
     });
   }
 
+  /* ── 5) Bild-Logos ────────────────────────────────────────────
+     W15: Der Wortmarken-Sweep prueft textContent === "DealPilot". Ein <img> hat
+     KEINEN Text -> wurde nie angefasst. Genau so blieb .app-logo-simple-sidebar
+     auf assets/dealpilot-logo-app.png stehen. (mandant-branding.js sucht
+     ".sidebar-logo" — die Klasse heisst aber ".app-logo-simple-sidebar".)
+     Zusatzfalle: config.js applyTheme() schreibt die src bei JEDEM Aufruf zurueck
+     (1600-ms-Timer, jeder Hell/Dunkel-Wechsel). Deshalb KEIN Einmal-Marker,
+     sondern: solange src nicht unser Logo ist, wird gesetzt. Der Observer
+     (attributeFilter mit 'src') zieht nach. Kein Loop — steht unser Logo drin,
+     kehrt die Funktion sofort um. */
+  var LOGO_SEL = 'img.app-logo-simple-sidebar,img[class*="-logo"],[class*="-logo"] img,' +
+                 'img[src*="dealpilot-logo"],img[src*="dealpilot_logo"]';
+  function sweepLogoImgs(root) {
+    if (!_logo) return;
+    var imgs;
+    try { imgs = (root || document).querySelectorAll(LOGO_SEL); } catch (e) { return; }
+    Array.prototype.forEach.call(imgs, function (img) {
+      var cur = img.getAttribute('src') || '';
+      if (cur === _logo) return;                     // schon unseres -> Loop-Schutz
+      if (cur.indexOf('data:') === 0) return;        // fremdes Inline-Bild nicht anfassen
+      if (!img.getAttribute('data-wl-orig')) img.setAttribute('data-wl-orig', cur);
+      img.setAttribute('src', _logo);
+      /* applyTheme() liest data-logo-dark und schreibt es nach src zurueck —
+         mitziehen, sonst kaempfen wir gegen den Theme-Boot. */
+      if (img.hasAttribute('data-logo-dark')) img.setAttribute('data-logo-dark', _logo);
+      if (_label) img.setAttribute('alt', _label);
+    });
+  }
+
   /* ── Gesamt-Sweep (gedrosselt) ────────────────────────────── */
   function sweep() {
     if (!_active) return;
@@ -176,6 +205,7 @@
     try { sweepInline(); } catch (e) {}
     try { sweepSvg(); } catch (e) {}
     try { sweepWordmark(); } catch (e) {}   /* W11-wordmark */
+    try { sweepLogoImgs(); } catch (e) {}   /* W15-logoimg */
   }
   function sweepThrottled() {
     if (_timer) return;
@@ -189,7 +219,7 @@
        seine Marke setzen, ohne die Farbe zu aendern. */
     if (b.name) _label = b.name;
     if (b.logo) _logo = b.logo;
-    if (!_ok(b.accent)) { if (_label || _logo) { _active = true; sweepWordmark(); _watch(); return true; } return false; }
+    if (!_ok(b.accent)) { if (_label || _logo) { _active = true; sweepWordmark(); sweepLogoImgs(); _watch(); return true; } return false; }
     _acc = b.accent;
     _hi  = _ok(b.accentHi) ? b.accentHi : _lighten(_acc, 22);
     _lo  = _ok(b.accentLo) ? b.accentLo : _darken(_acc, 16);
@@ -218,7 +248,8 @@
     /* Module rendern spaeter nach -> beobachten */
     try {
       new MutationObserver(sweepThrottled).observe(document.documentElement, {
-        childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'fill', 'stroke']
+        childList: true, subtree: true, attributes: true,
+        attributeFilter: ['style', 'fill', 'stroke', 'src']   /* W15: applyTheme setzt src zurueck */
       });
     } catch (e) {}
     [700, 2000, 4500].forEach(function (ms) { setTimeout(sweep, ms); });
@@ -229,6 +260,7 @@
     isActive: function () { return _active; },
     resweep: sweep,
     sweepWordmark: sweepWordmark,
+    sweepLogoImgs: sweepLogoImgs,
     accent: function () { return _acc; }
   };
 })();
