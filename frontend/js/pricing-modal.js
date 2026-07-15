@@ -40,7 +40,6 @@
         '5 Objekte',
         'DealPilot Score (5 Faktoren)',
         'Investment-PDF ohne Wasserzeichen',
-        'Werbungskosten-PDF ohne Wasserzeichen',
         'Werbungskosten-Modul vollständig',
         'Mietspiegel-Vergleich (manuell)',
         'Manuelle Marktzinsen',
