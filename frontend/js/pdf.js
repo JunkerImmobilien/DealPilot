@@ -535,6 +535,13 @@ var C = {
    (bzw. jeder Aufrufer) kann die Akzentfarbe hineinschreiben. Die Arrays werden
    IN PLACE mutiert, damit alle bestehenden Referenzen mitziehen. */
 window._dpPdfColors = C;
+
+/* W12-pdflight: Deckblatt + Seitenkoepfe hell/dunkel. Der Reseller entscheidet
+   (resellers.brand_pdf_light), es gilt fuer alle seine Mandanten. Default =
+   dunkel -> fuer normale User aendert sich NICHTS. */
+window._dpPdfLight = false;
+window._dpPdfSetLight = function (on) { window._dpPdfLight = !!on; };
+function _cv(dark, light) { return window._dpPdfLight ? light : dark; }
 window._dpPdfSetAccent = function (hex, hexHi, hexLo) {
   function rgb(h) {
     if (!h || !/^#[0-9a-fA-F]{6}$/.test(h)) return null;
@@ -969,7 +976,7 @@ async function _exportPDFInner() {
      SEITE 1: DECKBLATT
   ══════════════════════════════════════════════════ */
   pageNum++;
-  doc.setFillColor.apply(doc, C.CH); doc.rect(0, 0, W, 297, 'F');
+  doc.setFillColor.apply(doc, _cv(C.CH, C.WHITE)); doc.rect(0, 0, W, 297, 'F');  /*W12-pdflight*/
 
   // Goldlinien
   doc.setFillColor.apply(doc, C.GOLD);
@@ -990,13 +997,13 @@ async function _exportPDFInner() {
 
   // Objektname groß
   doc.setFont('helvetica', 'bold'); doc.setFontSize(22);
-  doc.setTextColor.apply(doc, C.WHITE);
+  doc.setTextColor.apply(doc, _cv(C.WHITE, C.CH));
   var nl = doc.splitTextToSize(objName.toUpperCase(), CW - 10);
   doc.text(nl, W / 2, 76, { align: 'center' });
 
   // Details
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
-  doc.setTextColor(165, 155, 135);
+  doc.setTextColor.apply(doc, _cv([165, 155, 135], C.MID));
   doc.text(objDetail, W / 2, 87, { align: 'center' });
 
   // 4 Cover-KPIs
@@ -1008,9 +1015,9 @@ async function _exportPDFInner() {
     { l: 'Bruttomietrendite',v: pP(K.bmy) }
   ].forEach(function(k, i) {
     var x = M + i * (cw4 + 4), yy = 102;
-    doc.setFillColor(52, 49, 49); doc.roundedRect(x, yy, cw4, 20, 2, 2, 'F');
+    doc.setFillColor.apply(doc, _cv([52, 49, 49], C.SURF)); doc.roundedRect(x, yy, cw4, 20, 2, 2, 'F');
     doc.setFillColor.apply(doc, C.GOLD); doc.rect(x, yy, cw4, 1.2, 'F');
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(120, 110, 90);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor.apply(doc, _cv([120, 110, 90], C.MUTED));
     doc.text(k.l.toUpperCase(), x + 3, yy + 7);
     doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
     doc.setTextColor.apply(doc, C.GOLD);
@@ -1029,19 +1036,19 @@ async function _exportPDFInner() {
   var thesis = g('thesis');
   if (thesis) {
     doc.setFont('helvetica', 'italic'); doc.setFontSize(9);
-    doc.setTextColor(185, 175, 155);
+    doc.setTextColor.apply(doc, _cv([185, 175, 155], C.MID));
     var tl = doc.splitTextToSize('"' + thesis + '"', CW - 10);
     doc.text(tl.slice(0, 4), W / 2, Math.max(cy + 6, 198), { align: 'center' });
   }
 
   // Datum & Kürzel
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
-  doc.setTextColor(120, 110, 90);
+  doc.setTextColor.apply(doc, _cv([120, 110, 90], C.MUTED));
   (function(){var uc=_getBranding();var creator=uc.name||uc.company||'DealPilot';doc.text('Erstellt am ' + new Date().toLocaleDateString('de-DE') + '  \u00b7  K\u00fcrzel: ' + (g('kuerzel') || '-') + '  \u00b7  ' + _pn() + (creator && creator !== _pn() ? ' \u00b7 ' + creator : '') /*W4-dedup*/, W / 2, 258, { align: 'center' });})();
   doc.text('Vertraulich \u00b7 Nur f\u00fcr den internen Gebrauch', W / 2, 264, { align: 'center' });
 
   // Footer Deckblatt - zeigt Branding-Daten aus den Settings
-  doc.setFillColor.apply(doc, C.CH2); doc.rect(0, 270, W, 27, 'F');
+  doc.setFillColor.apply(doc, _cv(C.CH2, C.SURF2)); doc.rect(0, 270, W, 27, 'F');
   doc.setFillColor.apply(doc, C.GOLD); doc.rect(0, 270, W, 0.5, 'F');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor.apply(doc, C.GOLD);
   (function(){

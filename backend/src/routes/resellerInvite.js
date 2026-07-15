@@ -23,7 +23,8 @@ router.get('/my-branding', authenticate, async (req, res, next) => {
       `SELECT rs.whitelabel_enabled, rs.brand_name, rs.brand_logo_b64,
               rs.brand_accent, rs.brand_accent_hi, rs.brand_accent_lo, rs.brand_obsidian,
               rs.brand_company, rs.brand_address, rs.brand_plz, rs.brand_city,
-              rs.brand_phone, rs.brand_email, rs.brand_website, rs.brand_tagline
+              rs.brand_phone, rs.brand_email, rs.brand_website, rs.brand_tagline,
+              rs.brand_pdf_light /*W12-pdflight*/
          FROM reseller_clients rc JOIN resellers rs ON rs.id = rc.reseller_id
         WHERE rc.user_id = $1
         LIMIT 1`, [req.user.id]);
