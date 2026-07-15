@@ -590,6 +590,7 @@
           '<input type="hidden" id="rp-b-accent" value="' + esc(accent) + '">' +
           '<input type="hidden" id="rp-b-obsidian" value="' + esc(obsidian) + '">' +
           '<input type="hidden" id="rp-b-mail" value="' + esc(b.brand_mail_accent || accent) + '">' +
+          '<input type="hidden" id="rp-b-pdflight" value="' + (b.brand_pdf_light ? '1' : '0') + '">' +   /*W12-portallight*/
           '<div style="margin-top:14px"><div class="rp-fl">Logo (PNG/SVG, max ~300 KB)</div>' +
             '<input type="file" id="rp-b-logo" accept="image/*" style="font:400 12px Inter">' +
             '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">entfernen</button></div>' +
@@ -634,12 +635,14 @@
         if (!window.DealPilotBrandingEditor) { toast('Editor konnte nicht geladen werden'); return; }
         window.DealPilotBrandingEditor.open({
           accent: _v('rp-b-accent'), obsidian: _v('rp-b-obsidian'), mail: _v('rp-b-mail'),
-          name: _v('rp-b-name') || 'Deine Kanzlei', logo: _currentLogo()
+          name: _v('rp-b-name') || 'Deine Kanzlei', logo: _currentLogo(),
+          pdfLight: _v('rp-b-pdflight') === '1'   /*W12-portallight*/
         }, function (res) {
           if (!res) return;
           $('rp-b-accent').value = res.accent;
           $('rp-b-obsidian').value = res.obsidian;
           $('rp-b-mail').value = res.mail;
+          $('rp-b-pdflight').value = res.pdfLight ? '1' : '0';
           var dot = $('rp-b-dot'); if (dot) dot.style.background = res.accent;
           upd();
           toast('Übernommen — jetzt noch „Branding speichern"');
@@ -734,7 +737,8 @@
         brand_company: _v('rp-b-company'), brand_tagline: _v('rp-b-tagline'),
         brand_address: _v('rp-b-address'), brand_plz: _v('rp-b-plz'), brand_city: _v('rp-b-city'),
         brand_phone: _v('rp-b-phone'), brand_email: _v('rp-b-email'), brand_website: _v('rp-b-website'),
-        brand_mail_accent: _v('rp-b-mail')   /*W8-editor*/
+        brand_mail_accent: _v('rp-b-mail'),   /*W8-editor*/
+        brand_pdf_light: _v('rp-b-pdflight') === '1'   /*W12-portallight*/
       } });
       toast('✓ Branding gespeichert');
       try { if (_previewOn()) _applyPreview(); } catch (e) {}   /*W7-livepreview*/

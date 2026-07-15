@@ -19,6 +19,7 @@
  */
 (function () {
   var _acc = null, _hi = null, _lo = null, _obs = null;
+  var _label = '', _logo = '';   /* W11-wordmark */
   var _active = false;
   var _seen = new WeakSet();      // bereits gefegte Stylesheets/Regeln
   var _timer = null;
@@ -136,12 +137,45 @@
     });
   }
 
+  /* ── 4) Wortmarken ────────────────────────────────────────────
+     Es gibt ZEHN verschiedene Implementierungen des "DealPilot"-Schriftzugs:
+     .dp-wordmark-auth (auth.js), .fb-bb-logo (feedback-modal.js), .mf-logo
+     (mandant-freigaben.js), .dpmb-logo (marktbewertung-card.js), .dpx-logo
+     (dealpilot-mb.js/-mb-qc.js), .rp-logo (reseller-portal.js), .dp-mtb-brand
+     (help.js) ... Jede einzeln zu patchen waere wieder Whack-a-Mole.
+     Deshalb: nach TEXT suchen, nicht nach Klasse. */
+  var WM_SEL = '.dp-wordmark,.dp-wordmark-auth,.sb-logo,.hdr-brand,.hdr-logo,.sidebar-logo,' +
+               '.brand-logo,.rp-logo,.fb-bb-logo,.mf-logo,.dpmb-logo,.dpx-logo,.dp-mtb-brand,' +
+               '[class*="wordmark"],[class*="-logo"],[class*="-brand"]';
+  function sweepWordmark(root) {
+    if (!_label && !_logo) return;
+    var nodes;
+    try { nodes = (root || document).querySelectorAll(WM_SEL); } catch (e) { return; }
+    Array.prototype.forEach.call(nodes, function (el) {
+      if (el.getAttribute('data-wlw') === '1') return;
+      /* NUR echte Wortmarken: der Text muss GENAU "DealPilot" sein.
+         Sonst wuerden Ueberschriften wie "DealPilot Markteinschaetzung" oder
+         "Co-Pilot" mit ersetzt. */
+      var t = (el.textContent || '').replace(/\s+/g, '');
+      if (t !== 'DealPilot') return;
+      if (el.querySelector('img')) return;              // schon ein Logo drin
+      el.setAttribute('data-wlw', '1');
+      if (_logo) {
+        el.innerHTML = '<img src="' + String(_logo).replace(/"/g, '&quot;') +
+                       '" alt="" style="max-height:1.5em;max-width:150px;vertical-align:middle">';
+      } else {
+        el.textContent = _label;
+      }
+    });
+  }
+
   /* ── Gesamt-Sweep (gedrosselt) ────────────────────────────── */
   function sweep() {
     if (!_active) return;
     try { sweepSheets(); } catch (e) {}
     try { sweepInline(); } catch (e) {}
     try { sweepSvg(); } catch (e) {}
+    try { sweepWordmark(); } catch (e) {}   /* W11-wordmark */
   }
   function sweepThrottled() {
     if (_timer) return;
@@ -150,7 +184,12 @@
 
   /* ── Oeffentliche API ─────────────────────────────────────── */
   function apply(b) {
-    if (!b || !_ok(b.accent)) return false;
+    if (!b) return false;
+    /* W11-wordmark: Name/Logo auch ohne Akzent uebernehmen — ein Reseller kann
+       seine Marke setzen, ohne die Farbe zu aendern. */
+    if (b.name) _label = b.name;
+    if (b.logo) _logo = b.logo;
+    if (!_ok(b.accent)) { if (_label || _logo) { _active = true; sweepWordmark(); _watch(); return true; } return false; }
     _acc = b.accent;
     _hi  = _ok(b.accentHi) ? b.accentHi : _lighten(_acc, 22);
     _lo  = _ok(b.accentLo) ? b.accentLo : _darken(_acc, 16);
@@ -170,6 +209,12 @@
     if (_obs) r.setProperty('--obsidian', _obs);
 
     sweep();
+    _watch();
+    return true;
+  }
+  var _watching = false;
+  function _watch() {
+    if (_watching) return; _watching = true;
     /* Module rendern spaeter nach -> beobachten */
     try {
       new MutationObserver(sweepThrottled).observe(document.documentElement, {
@@ -177,13 +222,13 @@
       });
     } catch (e) {}
     [700, 2000, 4500].forEach(function (ms) { setTimeout(sweep, ms); });
-    return true;
   }
 
   window.DealPilotWhitelabel = {
     apply: apply,
     isActive: function () { return _active; },
     resweep: sweep,
+    sweepWordmark: sweepWordmark,
     accent: function () { return _acc; }
   };
 })();

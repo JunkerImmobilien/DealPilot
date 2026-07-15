@@ -49,7 +49,11 @@
        Die Override-Ebene fegt CSSOM + Inline-Styles + SVG-Attribute nach. */
     try {
       if (window.DealPilotWhitelabel && window.DealPilotWhitelabel.apply({
-        accent: acc, accentHi: hi, accentLo: lo, obsidian: _b.brand_obsidian
+        accent: acc, accentHi: hi, accentLo: lo, obsidian: _b.brand_obsidian,
+        /* W11-passname: Name+Logo mitgeben -> der Sweeper ersetzt ALLE zehn
+           Wortmarken-Varianten (.fb-bb-logo, .mf-logo, .dpmb-logo, .dpx-logo,
+           .rp-logo, .dp-mtb-brand ...), die replaceWordmark() nie erwischt hat. */
+        name: _b.brand_name || '', logo: _b.brand_logo_b64 || ''
       })) return;   // Override hat die Tokens schon gesetzt
     } catch (e) {}
     var r = document.documentElement.style;
@@ -118,6 +122,8 @@
       if (!_b || !_b.brand_accent) return false;
       if (typeof window._dpPdfSetAccent !== 'function') return false;
       window._dpPdfSetAccent(_b.brand_accent, _b.brand_accent_hi, _b.brand_accent_lo);
+      /* W12-mandantlight: helles Deckblatt, wenn der Reseller es so will. */
+      try { if (typeof window._dpPdfSetLight === 'function') window._dpPdfSetLight(!!_b.brand_pdf_light); } catch (e) {}
       return true;
     } catch (e) { return false; }
   }

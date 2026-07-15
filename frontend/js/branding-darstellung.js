@@ -117,6 +117,12 @@
           '<div class="dpbe-fg"><div class="dpbe-fl">Mail-Farbe</div>' +
             '<input type="color" class="dpbe-pick" id="dpbe-mail" value="' + esc(_prev.mail) + '">' +
             '<div class="dpbe-hint">Bewusst getrennt vom App-Akzent — Mail und App sind verschiedene Bühnen.</div></div>' +
+          /* W12-editorlight */
+          '<div class="dpbe-fg"><div class="dpbe-fl">PDF-Deckblatt</div>' +
+            '<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;color:#3a352c">' +
+              '<input type="checkbox" id="dpbe-light" style="width:17px;height:17px;accent-color:var(--gold,#C9A84C)"' + (init.pdfLight ? ' checked' : '') + '>' +
+              '<span>Helles Deckblatt</span></label>' +
+            '<div class="dpbe-hint">Standard ist dunkel (Obsidian). Gilt für alle PDFs deiner Mandanten.</div></div>' +
           '<div class="dpbe-fg"><div class="dpbe-fl">Schnell übernehmen</div>' +
             '<div class="dpbe-pre">' +
               '<button type="button" data-p="#b33d29|#141210"><i style="background:#b33d29"></i>Kanzlei-Rot</button>' +
@@ -179,7 +185,8 @@
   function close(apply) {
     var out = null;
     if (apply) {
-      out = { accent: $('dpbe-acc').value, obsidian: $('dpbe-obs').value, mail: $('dpbe-mail').value };
+      out = { accent: $('dpbe-acc').value, obsidian: $('dpbe-obs').value, mail: $('dpbe-mail').value,
+               pdfLight: !!($('dpbe-light') && $('dpbe-light').checked) };   /*W12-editorlight*/
     } else if (_prev) {
       /* Abbrechen: App auf den vorherigen Stand zuruecksetzen */
       try {
