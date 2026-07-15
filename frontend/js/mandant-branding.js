@@ -24,7 +24,13 @@
     var label = _b.brand_name || '';
     var logo = _b.brand_logo_b64 || '';
     if (!label && !logo) return;
-    var sels = ['.dp-wordmark', '.sb-logo', '.hdr-brand', '.hdr-logo', '.sidebar-logo', '.brand-logo', '[class*="wordmark"]'];
+    /* W16-selectors: '.sidebar-logo' gab es nie — die Sidebar-Wortmarke heisst
+       '.app-logo-simple-sidebar'. Deshalb blieb dort ewig das DealPilot-Logo
+       stehen, obwohl branding.get() das Reseller-Logo korrekt lieferte.
+       (Der Sweeper in whitelabel-override.js faengt es zusaetzlich ab — das ist
+       die Notbremse, hier ist die Ursache.) */
+    var sels = ['.dp-wordmark', '.sb-logo', '.hdr-brand', '.hdr-logo', '.sidebar-logo',
+                '.app-logo-simple-sidebar', '.brand-logo', '[class*="wordmark"]'];
     sels.forEach(function (sel) {
       var nodes; try { nodes = document.querySelectorAll(sel); } catch (e) { return; }
       Array.prototype.forEach.call(nodes, function (el) {
