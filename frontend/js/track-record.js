@@ -1,4 +1,19 @@
 'use strict';
+/* W39-pdf-gold: jsPDF kennt kein CSS — dort stehen nackte RGB-Tripel
+   (doc.setTextColor(201,168,76)). Der Tokenisierer und der Waechter sehen die
+   nicht. pdf.js gibt seit W1 seine Palette nach aussen und _dpPdfSetAccent()
+   mutiert C.GOLD IN PLACE. Diese Funktion liest sie zur BAU-Zeit des PDFs.
+   Ohne Whitelabel liefert sie [201,168,76] — also exakt wie bisher. */
+if (!window._pdfGold) {
+  window._pdfGold = function () {
+    try {
+      var c = window._dpPdfColors;
+      if (c && c.GOLD && c.GOLD.length === 3) return [c.GOLD[0], c.GOLD[1], c.GOLD[2]];
+    } catch (e) {}
+    return [201, 168, 76];
+  };
+}
+
 /* ═══════════════════════════════════════════════════
    JUNKER IMMOBILIEN – track-record.js V12
    Generates professional 1-page Track Record PDFs per object
@@ -25,7 +40,7 @@ async function exportTrackRecordPDF(objects) {
   var jsPDF = window.jspdf.jsPDF;
   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   var W = 210, H = 297;
-  var GOLD = [201, 168, 76];
+  var GOLD = window._pdfGold();   /* W39: war [201,168,76] — Mandanten-PDFs blieben gold */
   var CH = [42, 39, 39];
   var MUTED = [122, 115, 112];
   var GREEN = [42, 154, 90];
@@ -179,7 +194,7 @@ function renderCoverPage(doc, objects, W, H, C) {
     head: [['Nr', 'Bezeichnung', 'Adresse', 'Ort', 'Kaufpreis']],
     body: objRows,
     theme: 'striped',
-    headStyles: { fillColor: [42, 39, 39], textColor: [201, 168, 76], fontSize: 9, fontStyle: 'bold' },
+    headStyles: { fillColor: [42, 39, 39], textColor: window._pdfGold(), fontSize: 9, fontStyle: 'bold' },
     bodyStyles: { fontSize: 9, cellPadding: 2.2 },
     alternateRowStyles: { fillColor: [248, 246, 240] },
     columnStyles: {
@@ -395,7 +410,7 @@ async function renderTrackRecordPage(doc, obj, pageNum, totalPages, W, H, C) {
     head: [['Jahr', 'Miete/Monat', 'Immobilienwert', 'Restschuld', 'Eigenkapital']],
     body: rows,
     theme: 'striped',
-    headStyles: { fillColor: [42, 39, 39], textColor: [201, 168, 76], fontSize: 8.5, fontStyle: 'bold' },
+    headStyles: { fillColor: [42, 39, 39], textColor: window._pdfGold(), fontSize: 8.5, fontStyle: 'bold' },
     bodyStyles: { fontSize: 8.5, cellPadding: 1.8 },
     alternateRowStyles: { fillColor: [248, 246, 240] },
     columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' } },

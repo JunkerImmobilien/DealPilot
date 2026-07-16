@@ -19,6 +19,7 @@ var Sub = (function() {
   var _cache = null;
   var _cacheTime = 0;
   var _syncRefetching = false;   /* W4-lastplan */
+  var _lastAnnounced = null;     /* W17-planready: zuletzt gemeldeter Plan */
   var CACHE_TTL_MS = 30 * 1000;  // 30 seconds
 
   function isApiMode() {
@@ -33,6 +34,10 @@ var Sub = (function() {
     // V314-token-check: Vor Login KEIN /subscription-Fetch → spart 401-Noise.
     // Synthetisches 'free' zurueckgeben (gleiches Pattern wie Catch-Block Z.111).
     if (!window.Auth || typeof window.Auth.isLoggedIn !== 'function' || !window.Auth.isLoggedIn()) {
+      /* W17-logoutfix: nicht eingeloggt = Logout. Merker MUSS weg, sonst erbt der
+         naechste User am selben Browser den Plan des vorigen (W4-Luecke). */
+      try { localStorage.removeItem('dp_last_plan'); } catch (e) {}
+      _lastAnnounced = null; try { delete window.DealPilotPlanReady; } catch (e) {}
       if (_cache && _cache._fallback) return _cache;
       _cache = {
         plan_id: 'free', plan_name: 'Free',
@@ -119,6 +124,38 @@ var Sub = (function() {
           window.renderSubscriptionBadge();
         }
       } catch(e) { console.warn('[Sub V185] FeatureGate-Refresh fehlgeschlagen:', e); }
+
+      /* ── W17-planready ────────────────────────────────────────────────────
+         Am 15.07. gab es DREI Bugs derselben Familie an EINEM Tag: ueberall
+         wurde auf den Plan reagiert, BEVOR er geladen war, und der Fehlschlag
+         still als "free / kein Partner" interpretiert:
+           · Wasserzeichen (W4): "DealPilot Free" auf dem Bank-PDF eines Investors
+           · Deal-Aktion-Gate (W3): Investor sah dauerhaft Schloesser
+           · Partner-Portal (W7): Portal erst nach Hard-Reload
+         Jedes davon wurde einzeln geflickt — mit Timern und Retry-Schleifen, die
+         man nie zuverlaessig gewinnt. Das hier ist der Vertrag, den es vorher
+         nicht gab: EIN Signal, sobald der Plan wirklich bekannt ist.
+
+         window.addEventListener('dp:plan-ready', function (e) {
+           e.detail.plan      // 'investor'
+           e.detail.features  // Backend-Features
+           e.detail.first     // true beim ersten Laden
+         });
+         Bereits geladen? -> window.DealPilotPlanReady ist dann gesetzt.
+         'dp:plan-changed' wird mitgefeuert (bestehende Hoerer aus W3). */
+      try {
+        var _pk = _cache && _cache.plan_id;
+        if (_pk) {
+          var _first = (_lastAnnounced === null);
+          if (_pk !== _lastAnnounced) {
+            _lastAnnounced = _pk;
+            window.DealPilotPlanReady = { plan: _pk, features: _cache.plan_features || {}, at: Date.now() };
+            var _d = { plan: _pk, features: _cache.plan_features || {}, first: _first };
+            window.dispatchEvent(new CustomEvent('dp:plan-ready',   { detail: _d }));
+            window.dispatchEvent(new CustomEvent('dp:plan-changed', { detail: _d }));
+          }
+        }
+      } catch (e) { /* Signal ist Kuer, nie App-blockierend */ }
 
       return _cache;
     } catch (e) {

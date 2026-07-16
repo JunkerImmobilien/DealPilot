@@ -215,7 +215,17 @@ window.DealPilotConfig = (function() {
         deal_score_basic:    true,    // V112: Free zeigt BEIDE Scores (DS1 + DS2-Demo) — Marcels Wunsch
         ai_analysis_tab:     'full',  // V159: Free hat vollen Umfang als Demo
         market_data_fields:  true,    // V159: Free darf Marktdaten sehen (Demo)
-        bmf_calc_export:     true,    // V159: BMF-Demo verfügbar
+        bmf_calc_export:     false,   // W42-free-bmf: Entscheidung 16.07.2026 —
+                                      //   Free bekommt keinen BMF-Rechner. Vorher stand hier
+                                      //   true ("V159: BMF-Demo verfuegbar"), waehrend Landing
+                                      //   (Z.2850) UND pricing-modal (Z.264/508) bei Free '–'
+                                      //   sagen. Der Free-User durfte etwas, das ihm nirgends
+                                      //   versprochen wurde. Jetzt sagen alle drei dasselbe.
+        bmf_advanced:        false,   // W41: Advanced ist Pro+
+        /* W41-bmf-gate: 'bmf_advanced' stand in KEINEM Plan. hasFeature()
+           liest zuerst die DB und faellt sonst hierher zurueck — kannte die
+           DB den Schluessel nicht, war er fuer JEDEN false, auch fuer Pro.
+           Damit konnte niemand den BMF-Rechner oeffnen. */
         export_pdf:          true,    // mit Wasserzeichen
         export_csv:          false,   // v494-matrix: Rohdatenexport nur Pro
         custom_finance_models: true,  // V159: ✅ zum Ausprobieren (Bauspar/Tilgungsaussetzung)
@@ -254,6 +264,7 @@ window.DealPilotConfig = (function() {
         ai_market_analysis:  true,         // v494-matrix: Matrix — Lagebewertung ab Starter
         market_data_fields:  false,        // V63.82: ausgegraut
         bmf_calc_export:     false,        // V63.82: BMF nur Investor+
+        bmf_advanced:        false,        // W41
         bankexport:          false,        // V168: explizit (war undefined)
         export_pdf:          true,
         export_csv:          false,   // v494-matrix
@@ -312,6 +323,8 @@ window.DealPilotConfig = (function() {
         ai_analysis_tab:     'full',     // V63.82
         market_data_fields:  true,        // V63.82: Live-Marktdaten
         bmf_calc_export:     true,        // V63.82: BMF-Rechner & -Export
+        bmf_advanced:        false,       // W41: Landing Z.2850 sagt Investor '✓',
+                                          //      Pro '✓ Advanced'. Genau das gilt jetzt.
         ai_market_analysis:  true,        // V63.82: KI-Marktanalysen
         investment_thesis_ai: true,
         mietspiegel_vergleich: 'auto'
@@ -358,6 +371,8 @@ window.DealPilotConfig = (function() {
         ai_analysis_tab:            'full',   // V63.82
         market_data_fields:         true,     // V63.82
         bmf_calc_export:            true,     // V63.82
+        bmf_advanced:               true,     // W41: das Pro-Extra. Der Partner-Klon
+                                              //      (W9) erbt es automatisch mit.
         ai_market_analysis:         true,     // V63.82
         custom_finance_models:      true,     // V63.82: personalisierte Zinsmodelle
         custom_imports:             true,     // V63.82: CSV/JSON Import

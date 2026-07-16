@@ -1,3 +1,24 @@
+/* W36-wl-token: Whitelabel-Farbe zur Laufzeit.
+   Canvas und SVG-Praesentationsattribute verstehen kein var().
+   _wlrgbaH(hex, alpha) ist neu: die Partikel brauchen auch var(--wl-e8c766, #E8C766) als rgba,
+   nicht nur das Basisgold. Eigener Guard, damit es sich neben dem schon
+   ausgelieferten _wlrgba(alpha) installiert. */
+if (!window._wlc) {
+  window._wlc = function (h) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--wl-' + h.slice(1).toLowerCase());
+      v = (v || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) return v;
+    } catch (e) {}
+    return h;
+  };
+}
+if (!window._wlrgbaH) {
+  window._wlrgbaH = function (h, a) {
+    var c = window._wlc(h);
+    return 'rgba(' + parseInt(c.substr(1, 2), 16) + ',' + parseInt(c.substr(3, 2), 16) + ',' + parseInt(c.substr(5, 2), 16) + ',' + a + ')';
+  };
+}
 /* =====================================================================
    DealPilot · Marktbewertung-Karte  —  Komponente (Vanilla JS, kein Build)
    Nutzung:
@@ -45,15 +66,15 @@
     function size() { const r = canvas.getBoundingClientRect(); if (!r.width) return; w = r.width; h = r.height; canvas.width = w * DP; canvas.height = h * DP; x.setTransform(DP, 0, 0, DP, 0, 0);
       const n = Math.max(12, Math.min(34, Math.floor(w * h / 9000))); ps = Array.from({ length: n }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .15, vy: (Math.random() - .5) * .15, r: Math.random() * 1.3 + .4, o: Math.random() * .5 + .16, g: Math.random() > .45 })); }
     function loop() { if (w) { x.clearRect(0, 0, w, h);
-      for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) { const a = ps[i], b = ps[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy); if (d < 76) { x.strokeStyle = `rgba(201,168,76,${(1 - d / 76) * .12})`; x.lineWidth = .55; x.beginPath(); x.moveTo(a.x, a.y); x.lineTo(b.x, b.y); x.stroke(); } }
-      for (const p of ps) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > w) p.vx *= -1; if (p.y < 0 || p.y > h) p.vy *= -1; x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7); x.fillStyle = p.g ? `rgba(232,199,102,${p.o})` : `rgba(205,205,215,${p.o * .45})`; x.fill(); } }
+      for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) { const a = ps[i], b = ps[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy); if (d < 76) { x.strokeStyle = window._wlrgbaH('var(--wl-c9a84c, #C9A84C)', (1 - d / 76) * .12); x.lineWidth = .55; x.beginPath(); x.moveTo(a.x, a.y); x.lineTo(b.x, b.y); x.stroke(); } }
+      for (const p of ps) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > w) p.vx *= -1; if (p.y < 0 || p.y > h) p.vy *= -1; x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7); x.fillStyle = p.g ? window._wlrgbaH('#E8C766', p.o) : `rgba(205,205,215,${p.o * .45})`; x.fill(); } }
       requestAnimationFrame(loop); }
     if ('ResizeObserver' in global) new ResizeObserver(size).observe(canvas); else global.addEventListener('resize', size);
     size(); loop();
   }
 
   const LOGO = '<span class="dpmb-logo"><span class="dpmb-d">Deal</span><span class="dpmb-p">Pilot</span></span>';
-  const ICON_HOME = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" style="vertical-align:-2px;margin-right:5px"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>';
+  const ICON_HOME = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' + window._wlc('#C9A84C') + '" stroke-width="2" style="vertical-align:-2px;margin-right:5px"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>';
   const ICON_RENT = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#83838e" stroke-width="2" style="vertical-align:-2px;margin-right:5px"><path d="M4 21V9l8-6 8 6v12M9 21v-6h6v6"/></svg>';
 
   function mount(target, data) {

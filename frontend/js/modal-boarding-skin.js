@@ -1,4 +1,6 @@
 'use strict';
+/* W35-wl-token: Gold zeigt auf die Whitelabel-Ebene. */
+
 /* modal-boarding-skin.js (v666)
    Legt den "Boarding-Look" (Obsidian-Brand-Bar + Gold-Hero + Obsidian-CTA, wie die
    welcome-mail / ImmoMetrica-Demo) ueber ALLE oabi-Modale: Exposé/Marktbericht-Import,
@@ -13,11 +15,11 @@
       ".oabi-ov.oabi-boarding .oabi-modal{display:flex;flex-direction:column;overflow:hidden;padding:0;background:#fff}",
       ".oabi-boarding .bdg-brand{flex:none;background:#070707;padding:14px 22px;display:flex;align-items:center;gap:12px}",
       ".oabi-boarding .bdg-brand .logo{font:700 17px 'Space Grotesk','DM Sans',system-ui,sans-serif;color:#fff;letter-spacing:.3px}",
-      ".oabi-boarding .bdg-brand .logo b{color:#E8CC7A;font-weight:700}",
-      ".oabi-boarding .bdg-brand .tag{margin-left:auto;font:700 10px 'JetBrains Mono',monospace;letter-spacing:2px;color:#C9A84C}",
+      ".oabi-boarding .bdg-brand .logo b{color:var(--wl-e8cc7a, #E8CC7A);font-weight:700}",
+      ".oabi-boarding .bdg-brand .tag{margin-left:auto;font:700 10px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--wl-c9a84c, #C9A84C)}",
       ".oabi-boarding .bdg-brand .x{background:none;border:0;color:#8a8a90;font-size:24px;line-height:1;cursor:pointer;padding:0 2px;margin-left:8px}",
       ".oabi-boarding .bdg-brand .x:hover{color:#fff}",
-      ".oabi-boarding .bdg-hero{flex:none;background:linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f)}",
+      ".oabi-boarding .bdg-hero{flex:none;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 60%,var(--wl-b8932f, #b8932f))}",
       ".oabi-boarding .bdg-hero .oabi-head{background:none;padding:16px 22px 4px;margin:0;display:block}",
       ".oabi-boarding .bdg-hero .oabi-head>span{display:none}",
       ".oabi-boarding #imo-x{display:none}",
@@ -26,7 +28,7 @@
       ".oabi-boarding .bdg-hero .oabi-sub{background:none;color:#3a2e08;padding:3px 22px 16px;margin:0;font-size:13px;line-height:1.5}",
       ".oabi-boarding .oabi-body{flex:1 1 auto;min-height:0;overflow:auto;background:#fff}",
       ".oabi-boarding .oabi-foot{flex:none;background:#fff}",
-      ".oabi-boarding .oabi-btn.primary{background:#0a0a0a;color:#E8CC7A;border-color:transparent}",
+      ".oabi-boarding .oabi-btn.primary{background:#0a0a0a;color:var(--wl-e8cc7a, #E8CC7A);border-color:transparent}",
       ".oabi-boarding .oabi-btn.primary:hover{background:#141414}",
       ".oabi-boarding .oabi-btn.primary[disabled]{opacity:.5}"
     ].join('\n');

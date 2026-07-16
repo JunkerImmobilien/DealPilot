@@ -30,7 +30,7 @@
 #d2_type:focus {
   outline: none !important;
   border-color: var(--gold, #C9A84C) !important;
-  box-shadow: 0 0 0 3px rgba(201,168,76,0.15) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent) !important;
 }
 
 /* Sicherheits-Reset: falls inheritende Höhe-Regeln das Select kaputt machen */

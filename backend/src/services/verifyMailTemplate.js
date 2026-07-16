@@ -17,22 +17,56 @@ function subject() {
   return 'Dein Boarding-Pass \u2014 Check-in bestätigen';
 }
 
-function renderVerifyText(firstName, verifyUrl) {
+/* W21-verifytext: Die Text-Variante leckte "DealPilot" zweimal plus die Prod-URL.
+   Ein Mandant, dessen Mail-Programm HTML blockt, las also im Reseller-Onboarding
+   "dein DealPilot-Team". Jetzt optional gebrandet; OHNE brand byte-identisch. */
+function renderVerifyText(firstName, verifyUrl, brand) {
   var fn = (firstName || '').toString().trim() || 'Pilot';
+  var nm = (brand && brand.name) ? brand.name : 'DealPilot';
+  var url = (brand && brand.website) ? brand.website : 'https://dealpilot.junker-immobilien.io';
   return (
     'Hallo ' + fn + ',\n\n' +
-    'dein Check-in bei DealPilot ist fast fertig \u2014 bitte bestätige deine E-Mail-Adresse,\n' +
+    'dein Check-in bei ' + nm + ' ist fast fertig \u2014 bitte bestätige deine E-Mail-Adresse,\n' +
     'um dein Cockpit zu aktivieren:\n\n' +
     verifyUrl + '\n\n' +
     'Der Link ist 24 Stunden gültig. Falls du dich nicht angemeldet hast, ignoriere diese Mail.\n\n' +
-    'Guten Flug \u2014 dein DealPilot-Team\n' +
-    'https://dealpilot.junker-immobilien.io'
+    'Guten Flug \u2014 dein ' + nm + '-Team\n' +
+    url
   );
 }
 
-function renderVerifyMail(firstName, verifyUrl) {
+/* W19-mailbrand: Der Mandant bekam die Einladung im Reseller-Branding und danach
+   eine DealPilot-Verify-Mail — Bruch mitten im Onboarding. Jetzt optional:
+     renderVerifyMail(name, url, { accent, name, brandTag, footerNote, supportEmail })
+   OHNE brand ist die Ausgabe byte-identisch zu vorher. */
+function _b_hx(h) { return /^#[0-9a-fA-F]{6}$/.test(h || '') ? h : null; }
+function _b_mix(hex, p) {
+  var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  function f(v) {
+    var x = p > 0 ? v + (255 - v) * p : v * (1 + p);
+    return ('0' + Math.max(0, Math.min(255, Math.round(x))).toString(16)).slice(-2);
+  }
+  return '#' + f(r) + f(g) + f(b);
+}
+function _brand(o) {
+  o = o || {};
+  var a = _b_hx(o.accent);
+  return {
+    acc:  a || '#C9A84C',
+    hi:   a ? _b_mix(a, 0.22)  : '#E8CC7A',
+    lo:   a ? _b_mix(a, -0.16) : '#b8932f',
+    wordmark: o.name ? _esc(o.name)
+            : 'Deal<span style="color:' + (a ? _b_mix(a, 0.22) : '#E8CC7A') + ';">Pilot</span>',
+    tag:  _esc(o.brandTag || 'DEALPILOT'),
+    foot: o.footerNote || null,
+    sup:  o.supportEmail || 'support@junker-immobilien.io'
+  };
+}
+
+function renderVerifyMail(firstName, verifyUrl, brand) {
   var fn = _esc((firstName || '').toString().trim() || 'Pilot');
   var url = verifyUrl;
+  var B = _brand(brand);
   return '' +
 '<!DOCTYPE html>\n' +
 '<html lang="de" xmlns="http://www.w3.org/1999/xhtml">\n' +
@@ -69,16 +103,16 @@ function renderVerifyMail(firstName, verifyUrl) {
 '      <td style="background:#070707;border-radius:16px 16px 0 0;padding:18px 26px;" class="px">\n' +
 '        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>\n' +
 '          <td align="left" style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:18px;font-weight:700;color:#ffffff;letter-spacing:.3px;">\n' +
-'            Deal<span style="color:#E8CC7A;">Pilot</span>\n' +
+'            ' + B.wordmark + '\n' +
 '          </td>\n' +
-'          <td align="right" style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:10px;letter-spacing:2px;color:#C9A84C;">\n' +
+'          <td align="right" style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:10px;letter-spacing:2px;color:' + B.acc + ';">\n' +
 '            PRE-FLIGHT &middot; CHECK-IN\n' +
 '          </td>\n' +
 '        </tr></table>\n' +
 '      </td>\n' +
 '    </tr>\n' +
 '    <tr>\n' +
-'      <td style="background:#C9A84C;background:linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f);padding:30px 26px 26px;" class="px">\n' +
+'      <td style="background:' + B.acc + ';background:linear-gradient(110deg,' + B.hi + ',' + B.acc + ' 60%,' + B.lo + ');padding:30px 26px 26px;" class="px">\n' +
 '        <div style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:11px;letter-spacing:3px;color:#5a4a14;font-weight:700;">BOARDING PASS \u00b7 CHECK-IN</div>\n' +
 '        <div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:27px;line-height:1.2;font-weight:700;color:#1a1407;margin-top:8px;">\n' +
 '          Willkommen an Bord,&nbsp;' + fn + '.\n' +
@@ -94,7 +128,7 @@ function renderVerifyMail(firstName, verifyUrl) {
 '          <tr>\n' +
 '            <td class="stub" width="170" valign="middle" style="background:#070707;border-radius:14px 0 0 14px;padding:20px 18px;">\n' +
 '              <div style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:8px;letter-spacing:2px;color:#9a8f6a;">PASSENGER</div>\n' +
-'              <div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#E8CC7A;margin-top:3px;">' + fn + '</div>\n' +
+'              <div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:' + B.hi + ';margin-top:3px;">' + fn + '</div>\n' +
 '              <div style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:8px;letter-spacing:1px;color:#9a8f6a;margin-top:12px;">FLIGHT</div>\n' +
 '              <div style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:13px;font-weight:700;color:#ffffff;margin-top:2px;">DP \u00b7 BOARDING</div>\n' +
 '            </td>\n' +
@@ -108,7 +142,7 @@ function renderVerifyMail(firstName, verifyUrl) {
 '                  TANK<br><span style="font-size:13px;color:#1a1407;font-weight:700;">KEROSIN \u2713</span>\n' +
 '                </td>\n' +
 '                <td style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:8px;letter-spacing:1px;color:#8a8473;">\n' +
-'                  STATUS<br><span style="font-size:13px;color:#C9A84C;font-weight:700;">CHECK-IN</span>\n' +
+'                  STATUS<br><span style="font-size:13px;color:' + B.acc + ';font-weight:700;">CHECK-IN</span>\n' +
 '                </td>\n' +
 '              </tr></table>\n' +
 '              <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#4a4536;margin-top:14px;">\n' +
@@ -124,7 +158,7 @@ function renderVerifyMail(firstName, verifyUrl) {
 '        <table role="presentation" cellpadding="0" cellspacing="0"><tr>\n' +
 '          <td align="center" bgcolor="#0a0a0a" style="border-radius:11px;">\n' +
 '            <a href="' + url + '" target="_blank"\n' +
-'               style="display:inline-block;font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#E8CC7A;padding:14px 30px;border-radius:11px;">\n' +
+'               style="display:inline-block;font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:' + B.hi + ';padding:14px 30px;border-radius:11px;">\n' +
 '              \u2708&nbsp;&nbsp;Check-in abschließen\n' +
 '            </a>\n' +
 '          </td>\n' +
@@ -140,15 +174,15 @@ function renderVerifyMail(firstName, verifyUrl) {
 '        <div style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:10px;letter-spacing:2px;color:#8d7430;font-weight:700;margin-bottom:14px;">DEIN PRE-FLIGHT-CHECK</div>\n' +
 '        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">\n' +
 '          <tr>\n' +
-'            <td valign="top" width="28" style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#C9A84C;">1</td>\n' +
+'            <td valign="top" width="28" style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:' + B.acc + ';">1</td>\n' +
 '            <td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#4a4536;padding-bottom:10px;"><b style="color:#1a1407;">Objekt einlesen</b> \u2014 Exposé/Marktbericht hochladen oder per Sprache erfassen.</td>\n' +
 '          </tr>\n' +
 '          <tr>\n' +
-'            <td valign="top" width="28" style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#C9A84C;">2</td>\n' +
+'            <td valign="top" width="28" style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:' + B.acc + ';">2</td>\n' +
 '            <td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#4a4536;padding-bottom:10px;"><b style="color:#1a1407;">Marktwert abrufen</b> \u2014 Marktbewertung &amp; DealScore auf Knopfdruck.</td>\n' +
 '          </tr>\n' +
 '          <tr>\n' +
-'            <td valign="top" width="28" style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#C9A84C;">3</td>\n' +
+'            <td valign="top" width="28" style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:' + B.acc + ';">3</td>\n' +
 '            <td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#4a4536;"><b style="color:#1a1407;">Abheben</b> \u2014 bankfertige Analyse als PDF, mit Co-Pilot an deiner Seite.</td>\n' +
 '          </tr>\n' +
 '        </table>\n' +
@@ -159,7 +193,7 @@ function renderVerifyMail(firstName, verifyUrl) {
 '        <div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#ffffff;">Guten Flug \u2014 dein DealPilot-Team \u2708</div>\n' +
 '        <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#9a8f6a;margin-top:12px;">\n' +
 '          Fragen? Antworte einfach auf diese Mail oder schreib an\n' +
-'          <a href="mailto:support@junker-immobilien.io" style="color:#C9A84C;">support@junker-immobilien.io</a>.\n' +
+'          <a href="mailto:' + B.sup + '" style="color:' + B.acc + ';">' + B.sup + '</a>.\n' +
 '        </div>\n' +
 '        <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.6;color:#6a6453;margin-top:14px;border-top:1px solid #1f1c14;padding-top:14px;">\n' +
 '          Junker Immobilien \u00b7 DealPilot<br>\n' +

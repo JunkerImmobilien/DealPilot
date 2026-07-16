@@ -99,7 +99,23 @@
   function catBarColor(s){ return s>=70?'var(--dp-green)':s>=50?'var(--dp-gold)':'var(--dp-red)'; }
   function _dl(){return '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>';}
   function _qrSvg(text,px){try{if(window.DpQr&&DpQr.svg)return DpQr.svg(String(text||'DealPilot'),{px:px||3,ecc:'M',border:2,dark:'#0c0b09',light:'#ffffff'});}catch(e){}return '<div style="width:74px;height:74px;border-radius:4px;background:repeating-linear-gradient(45deg,#0c0b09 0 3px,#fff 3px 6px)"></div>';}
-  function _tierBg(tt){return tt==='lo'?'rgba(184,98,80,.16)':tt==='mid'?'rgba(201,168,76,.16)':'rgba(63,165,108,.16)';}
+  /* W30-wl-token: Whitelabel-Farbe zur Laufzeit aufloesen.
+     Chart.js malt auf Canvas, SVG-Praesentationsattribute sind keine CSS-Props —
+     beide verstehen KEIN var(). Ohne Whitelabel liefert _wlc() das Literal zurueck. */
+  function _wlc(h) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--wl-' + h.slice(1).toLowerCase());
+      v = (v || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) return v;
+    } catch (e) {}
+    return h;
+  }
+  function _wlrgba(a) {
+    var h = _wlc('#C9A84C');
+    return 'rgba(' + parseInt(h.substr(1, 2), 16) + ',' + parseInt(h.substr(3, 2), 16) + ',' + parseInt(h.substr(5, 2), 16) + ',' + a + ')';
+  }
+
+  function _tierBg(tt){return tt==='lo'?'rgba(184,98,80,.16)':tt==='mid'?'color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent)':'rgba(63,165,108,.16)';}
   var _passByObj = {};
   function _passRest(exp){ var ms=new Date(exp).getTime()-Date.now(); if(!(ms>0))return 'abgelaufen'; var d=Math.round(ms/86400000); return d+' Tag'+(d===1?'':'e'); }
   function loadPasses(){
@@ -661,8 +677,8 @@
   function isDark(){ return document.body.classList.contains('dp-theme-dark'); }
   function chartPalette(){
     return isDark()
-      ? ['#C9A84C','#E8C964','#9a7f33','#D8D2C7','#F2ECDC','#A89F8E','#6E665A','#8F8576']
-      : ['#C9A84C','#9a7f33','#2A2727','#7A7370','#B8B0A4','#5A5350','#E0BE7C','#9A9390'];
+      ? [_wlc('#C9A84C'),_wlc('#E8C964'),_wlc('#9a7f33'),'#D8D2C7','#F2ECDC','#A89F8E','#6E665A','#8F8576']
+      : [_wlc('#C9A84C'),_wlc('#9a7f33'),'#2A2727','#7A7370','#B8B0A4','#5A5350',_wlc('#E0BE7C'),'#9A9390'];
   }
   function destroyCharts(){ _charts.forEach(function(c){try{c.destroy();}catch(e){}}); _charts=[]; }
 
@@ -688,7 +704,7 @@
     Chart.defaults.plugins.tooltip.backgroundColor=ttBg;
     Chart.defaults.plugins.tooltip.titleColor='#F2ECDC';
     Chart.defaults.plugins.tooltip.bodyColor='#F2ECDC';
-    Chart.defaults.plugins.tooltip.borderColor='rgba(201,168,76,.45)';
+    Chart.defaults.plugins.tooltip.borderColor=_wlrgba(.45);
     Chart.defaults.plugins.tooltip.borderWidth=1;
     Chart.defaults.plugins.tooltip.padding=11;
     Chart.defaults.plugins.tooltip.cornerRadius=8;
@@ -705,7 +721,7 @@
     // Y-Achsen-Kurzformat (90.000.000 -> "90 Mio", 500000 -> "500k")
     function yfmt(v){ var a=Math.abs(v); if(a>=1e6)return (v/1e6).toFixed(a>=1e7?0:1).replace('.',',')+' Mio'; if(a>=1e3)return Math.round(v/1e3)+'k'; return ''+Math.round(v); }
     var axisCol = isDark() ? 'rgba(232,226,212,.55)' : '#7A7370';
-    var gridCol = isDark() ? 'rgba(201,168,76,.10)' : 'rgba(122,115,112,.12)';
+    var gridCol = isDark() ? _wlrgba(.10) : 'rgba(122,115,112,.12)';
     // gemeinsame Achsen-Optionen fuer Linien/Bar-Charts
     function axes(opts){
       opts=opts||{};
@@ -753,7 +769,7 @@
     ]},options:{cutout:'68%',plugins:{legend:{display:true,position:'right'}}}});
 
     // 6) Steuer-Verlauf
-    var TAX_OHNE=isDark()?'#A89F8E':'#7A7370', TAX_MIT='#C9A84C';
+    var TAX_OHNE=isDark()?'#A89F8E':'#7A7370', TAX_MIT=_wlc('#C9A84C');
     mk('dpc-steuer',{type:'line',data:{labels:labels,datasets:[
       {label:'Steuereffekt',data:PR.map(function(r){return Math.round(r.steuereffekt);}),borderColor:TAX_MIT,backgroundColor:TAX_MIT+'2e',tension:.3,fill:true,pointRadius:0,borderWidth:2},
       {label:'EStG mit Immo',data:PR.map(function(r){return Math.round(r.estg);}),borderColor:TAX_OHNE,tension:.3,fill:false,pointRadius:0,borderWidth:1.6,borderDash:[4,4]}
@@ -793,7 +809,7 @@
     if(sc==null) return '';
     var dash=(sc/100*81.7).toFixed(1);
     return '<div class="oc-ring" style="color:'+col+'" title="Score '+sc+'/100">'
-      + '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="rgba(201,168,76,.18)" stroke-width="2.5"/>'
+      + '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke='+"'"+_wlrgba(.18)+"'"+' stroke-width="2.5"/>'
       + '<circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="'+dash+' 81.7" stroke-linecap="round" transform="rotate(-90 16 16)"/></svg>'
       + '<span class="oc-ring-num">'+sc+'</span></div>';
   }
@@ -1263,7 +1279,7 @@
     var meta=catMeta();
     var totalKpi=0; Object.keys(meta).forEach(function(k){ totalKpi+=meta[k].count||0; });
     var total=(ag && ag.total!=null)?ag.total:null;
-    var tcol=total==null?'var(--dp-gold)':(total>=70?'#3FA56C':total>=50?'#C9A84C':'#B86250');
+    var tcol=total==null?'var(--dp-gold)':(total>=70?'#3FA56C':total>=50?'var(--wl-c9a84c, #C9A84C)':'#B86250');
     var tlab=total==null?'\u2013':(total>=85?'Sehr gut':total>=70?'Gut':total>=50?'Solide':'Schwach');
     var head='<div class="dp-sd-total">Gesamt <b style="color:'+tcol+'">'+(total==null?'\u2013':total)+'/100</b> \u00b7 '+tlab
       +' \u2014 gewichteter Durchschnitt \u00fcber alle Kategorien und '+totalKpi+' KPIs</div>';
@@ -1330,7 +1346,7 @@
     var d=Math.round(ms/86400000);
     return d+' Tag'+(d===1?'':'e');
   }
-  var BTN="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.35);color:#E8CC7A;border-radius:7px;padding:3px 9px;font-size:11.5px;cursor:pointer";
+  var BTN="background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);color:var(--wl-e8cc7a, #E8CC7A);border-radius:7px;padding:3px 9px;font-size:11.5px;cursor:pointer";
   var BTN_D="background:rgba(184,98,80,0.12);border:1px solid rgba(184,98,80,0.40);color:#D9685F;border-radius:7px;padding:3px 9px;font-size:11.5px;cursor:pointer;margin-left:6px";
   var LABEL='<div class="dp-section-label">Geteilte Objekte <span class="dp-model-tag">Quick Boarding</span></div>';
   function host(){ return document.getElementById('dp-shared-passes'); }

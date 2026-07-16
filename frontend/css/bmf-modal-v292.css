@@ -72,7 +72,7 @@
 .v292-inv-hint {
   margin-top: 14px;
   padding: 8px 12px;
-  background: rgba(201, 168, 76, 0.08);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);
   border-radius: 4px;
   color: var(--muted, #7A7370);
 }
@@ -128,7 +128,7 @@
   color: var(--ch, #2D2622);
 }
 
-.v292-vergleich-tbl tbody tr:hover { background: rgba(201, 168, 76, 0.04); }
+.v292-vergleich-tbl tbody tr:hover { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 4%, transparent); }
 
 .v292-row-bold td {
   font-weight: 700;
@@ -171,7 +171,7 @@
 
 .v292-var-card:hover {
   border-color: var(--gold, #C9A84C);
-  background: rgba(201, 168, 76, 0.04);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 4%, transparent);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
@@ -180,7 +180,7 @@
   border-color: var(--gold, #C9A84C) !important;
   border-width: 3px !important;
   background: var(--gold-bg, #FFF7E0) !important;
-  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.2);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 20%, transparent);
 }
 
 .v292-var-radio {
@@ -225,7 +225,7 @@
 }
 
 .v292-var-row-hi {
-  background: rgba(201, 168, 76, 0.08);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);
   margin: 4px -6px;
   padding: 6px 6px;
   border-radius: 4px;
@@ -599,8 +599,8 @@ input.from-tab,
 input.from-quickcheck,
 select.from-tab,
 select.from-quickcheck {
-  background: rgba(201, 168, 76, 0.08) !important;
-  border-color: rgba(201, 168, 76, 0.35) !important;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent) !important;
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent) !important;
 }
 
 input.from-tab:focus,
@@ -620,8 +620,8 @@ span.auto-tag {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--gold-d, #8A7340);
-  background: rgba(201, 168, 76, 0.12);
-  border: 1px solid rgba(201, 168, 76, 0.3);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);
   padding: 1px 6px;
   border-radius: 99px;
   margin-left: 6px;
@@ -650,14 +650,14 @@ span.auto-tag {
  * Klar als "uebernommen" erkennbar, Wert gut lesbar, kein Tipp-Cursor.
  * ════════════════════════════════════════════════════════════════ */
 .bmf-modal input[readonly][data-auto] {
-  background: rgba(201, 168, 76, 0.06) !important;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent) !important;
   color: var(--text, #2A2727) !important;
   cursor: default !important;
-  border-color: rgba(201, 168, 76, 0.25) !important;
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent) !important;
 }
 .bmf-modal input[readonly][data-auto]:focus {
   box-shadow: none !important;
-  border-color: rgba(201, 168, 76, 0.25) !important;
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent) !important;
 }
 
 /* V300-required-style: Pflichtfeld (Miete bei Leerstand) — roter Rand bis ausgefuellt */

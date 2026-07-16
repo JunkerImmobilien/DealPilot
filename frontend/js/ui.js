@@ -1,4 +1,7 @@
 'use strict';
+/* W31-wl-token: Gold-Literale zeigen auf die Whitelabel-Ebene
+   (var(--wl-<hex>, #<hex>)). Ohne Whitelabel greift der Fallback. */
+
 
 /* ═══════════════════════════════════════════════════
    JUNKER IMMOBILIEN – ui.js V5.2
@@ -516,11 +519,11 @@ var AI_COLORS = {
   'STÄRKEN':                '#2A9A5A',
   STAERKEN:                 '#2A9A5A',
   RISIKEN:                  '#C94C4C',
-  VERHANDLUNGSEMPFEHLUNG:   '#C9A84C',
+  VERHANDLUNGSEMPFEHLUNG:   'var(--wl-c9a84c, #C9A84C)',
   'KAUFPREIS-OFFERTE':      '#7A5AB5',
   'KAUFPREIS_OFFERTE':      '#7A5AB5',
   BANKARGUMENTE:            '#2A9A5A',
-  FAZIT:                    '#C9A84C'
+  FAZIT:                    'var(--wl-c9a84c, #C9A84C)'
 };
 
 function saveKey() {
@@ -627,7 +630,7 @@ function renderAIResponse(text) {
     var m = text.match(rx);
     if (!m) return;
     var body = m[1].trim().replace(/\n/g, '<br>');
-    var col = AI_COLORS[sec] || '#C9A84C';
+    var col = AI_COLORS[sec] || 'var(--wl-c9a84c, #C9A84C)';
     html += '<div class="ai-section">' +
       '<div class="ai-section-label" style="color:' + col + '">' + sec + '</div>' +
       '<div class="ai-body">' + body + '</div>' +
@@ -936,7 +939,7 @@ function _renderAIServerAnalysis(a) {
     var v = String(value).toLowerCase().trim(), color, label;
     if (v.indexOf('ja') === 0) { color = '#2F8E5A'; label = 'Ja'; }
     else if (v.indexOf('nein') === 0) { color = '#B8625C'; label = 'Nein'; }
-    else { color = '#C9A84C'; label = 'Teilweise'; }
+    else { color = 'var(--wl-c9a84c, #C9A84C)'; label = 'Teilweise'; }
     return '<span class="dp-pa-pill" style="background:' + color + '">' + label + '</span>';
   }
   function fitReason(value) {
@@ -951,10 +954,10 @@ function _renderAIServerAnalysis(a) {
     return _escClean(v);
   }
   function empfBadge(emp) {
-    var e = String(emp || '').toLowerCase(), color = '#C9A84C', label = emp || '\u2014';
+    var e = String(emp || '').toLowerCase(), color = 'var(--wl-c9a84c, #C9A84C)', label = emp || '\u2014';
     if (e.indexOf('kaufen') === 0) { color = '#2F8E5A'; label = 'KAUFEN'; }
     else if (e.indexOf('nicht') === 0) { color = '#B8625C'; label = 'NICHT KAUFEN'; }
-    else if (e.indexOf('pr\u00fcfen') >= 0 || e.indexOf('pruefen') >= 0) { color = '#C9A84C'; label = 'PR\u00dcFEN'; }
+    else if (e.indexOf('pr\u00fcfen') >= 0 || e.indexOf('pruefen') >= 0) { color = 'var(--wl-c9a84c, #C9A84C)'; label = 'PR\u00dcFEN'; }
     return '<span class="dp-pa-empf" style="background:' + color + '">' + label + '</span>';
   }
   function sec(cls, icon, label) {
@@ -1129,10 +1132,10 @@ function _renderMiniAI(a) {
   function _miniEsc(s) { return _escClean(s); }
   function _miniEmpfBadge(emp) {
     var e = String(emp || '').toLowerCase();
-    var color = '#C9A84C', label = emp || '—';
+    var color = 'var(--wl-c9a84c, #C9A84C)', label = emp || '—';
     if (e.indexOf('kaufen') === 0)     { color = '#3FA56C'; label = 'KAUFEN'; }
     else if (e.indexOf('nicht') === 0) { color = '#B8625C'; label = 'NICHT KAUFEN'; }
-    else if (e.indexOf('prüfen') >= 0 || e.indexOf('pruefen') >= 0) { color = '#C9A84C'; label = 'PRÜFEN'; }
+    else if (e.indexOf('prüfen') >= 0 || e.indexOf('pruefen') >= 0) { color = 'var(--wl-c9a84c, #C9A84C)'; label = 'PRÜFEN'; }
     return '<span class="ai-mini-empf" style="background:' + color + '">' + label + '</span>';
   }
   function _miniList(arr, max) {
@@ -1342,8 +1345,8 @@ async function _runAIClient(btn) {
 
   } catch(e) {
     var msg = '⚠ Fehler: ' + e.message + '<br><br>' +
-      'API-Key prüfen: <a href="https://platform.openai.com/api-keys" target="_blank" style="color:#C9A84C">platform.openai.com/api-keys →</a><br><br>' +
-      'Guthaben prüfen: <a href="https://platform.openai.com/settings/organization/billing" target="_blank" style="color:#C9A84C">Billing →</a>';
+      'API-Key prüfen: <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--wl-c9a84c, #C9A84C)">platform.openai.com/api-keys →</a><br><br>' +
+      'Guthaben prüfen: <a href="https://platform.openai.com/settings/organization/billing" target="_blank" style="color:var(--wl-c9a84c, #C9A84C)">Billing →</a>';
     document.getElementById('ai-content').innerHTML = '<div class="ai-body" style="color:#f08080">' + msg + '</div>';
   }
 

@@ -141,9 +141,9 @@
     if (!panel) return false;
     var box = document.createElement('div');
     box.id = 'mbow-host';
-    box.style.cssText = 'margin:0 0 16px;padding:12px 14px;border:1px solid rgba(201,168,76,.3);border-radius:12px;background:rgba(201,168,76,.05);';
+    box.style.cssText = 'margin:0 0 16px;padding:12px 14px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);border-radius:12px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent);';
     box.innerHTML =
-      '<label style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#C9A84C;margin-bottom:7px;font-weight:600;">Objekt aus Bestand laden</label>' +
+      '<label style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C);margin-bottom:7px;font-weight:600;">Objekt aus Bestand laden</label>' +
       '<select id="mbow-select" style="width:100%;padding:9px 11px;border-radius:9px;background:#0f0f13;color:#e8e8ea;border:1px solid #26262c;font-size:13px;"><option>\u2026</option></select>' +
       '<div id="mbow-note" style="font-size:11.5px;color:#8a8a93;margin-top:7px;"></div>';
     panel.insertBefore(box, panel.firstChild);

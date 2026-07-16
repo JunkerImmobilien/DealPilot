@@ -139,15 +139,106 @@
     setTimeout(function () { _pdfAccentPoll((n || 0) + 1); }, 1000);
   })(0);
 
+  /* W20-mandantdisplay: Der Reseller stellt die Darstellung im Panel ein
+     ("Meine Mandanten"), sie liegt als resellers.brand_display. Hier wird sie beim
+     Mandanten angewandt — ueber DIESELBEN Handler, die auch das Panel benutzt.
+     Kein zweiter Rendering-Pfad, keine Doppel-Wahrheit.
+     WICHTIG: nur, wenn der Mandant NICHT selbst schon etwas eingestellt hat —
+     seine eigene Wahl schlaegt die Vorgabe des Resellers. Sonst wuerde ihm bei
+     jedem Login seine Einstellung weggenommen. */
+  function applyResellerDisplay() {
+    try {
+      if (!_b) return;
+      var d = _b.brand_display;
+      if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { return; } }
+      if (!d || typeof d !== 'object' || !Object.keys(d).length) return;
+      var MAP = {
+        dp_chrome_hell: function (v) { c('_dpDispSkin', v === '1' ? 'hell' : 'obsidian'); },
+        dp_hdr_compact: function (v) { c('_dpDispHdr', v === '1' ? 'compact' : 'normal'); },
+        dp_hdr_ui: function (v) { c('_dpDispHeader', v); },
+        dp_side_ui: function (v) { c('_dpDispSide', v); },
+        dp_text_ui: function (v) { c('_dpDispText', v); },
+        dp_hero_ui: function (v) { c('_dpDispHero', v); },
+        dp_kpi_ui: function (v) { c('_dpDispKpi', v); },
+        dp_obj_ui: function (v) { c('_dpDispObj', v); },
+        dp_objtext_ui: function (v) { c('_dpDispObjText', v); },
+        dp_tabtext_ui: function (v) { c('_dpDispTabText', v); },
+        dp_card_ui: function (v) { c('_dpDispCard', v); },
+        dp_accent_ui: function (v) { c('_dpDispAccent', v); },
+        dp_font_ui: function (v) { c('_dpDispFont', v); },
+        dp_zoom_ui: function (v) { c('_dpDispSize', v); }
+      };
+      function c(fn, v) { try { if (typeof window[fn] === 'function' && v) window[fn](v); } catch (e) {} }
+      var seen = false;
+      try { seen = localStorage.getItem('dp_wl_display_seen') === '1'; } catch (e) {}
+      if (seen) return;                       // Mandant hat es schon bekommen -> seine Wahl gilt
+      Object.keys(d).forEach(function (k) { if (MAP[k] && d[k]) MAP[k](d[k]); });
+      try { localStorage.setItem('dp_wl_display_seen', '1'); } catch (e) {}
+      try { if (window._dpDispRefresh) _dpDispRefresh(); } catch (e) {}
+    } catch (e) {}
+  }
+  (function _dispPoll(n) {
+    try {
+      if (_b && typeof window._dpDispHeader === 'function') { applyResellerDisplay(); return; }
+    } catch (e) {}
+    if ((n || 0) > 20) return;
+    setTimeout(function () { _dispPoll((n || 0) + 1); }, 800);
+  })(0);
+
+  /* W25-fouc: laeuft SOFORT beim Script-Laden — vor jedem Netzwerk-Aufruf.
+     Der gemerkte Stand vom letzten Mal wird angewandt; der Fetch korrigiert
+     danach, falls der Reseller etwas geaendert hat. Beim Logout raeumt boot()
+     den Cache weg (kein fremdes Branding fuer den naechsten Nutzer). */
+  (function _fromCache() {
+    try {
+      if (!localStorage.getItem('ji_token')) { localStorage.removeItem('dp_wl_cache'); return; }
+      var raw = localStorage.getItem('dp_wl_cache'); if (!raw) return;
+      var c = JSON.parse(raw); if (!c || !c.whitelabel_enabled) return;
+      _b = c;
+      var go = function () {
+        if (!window.DealPilotWhitelabel) return setTimeout(go, 30);
+        try {
+          window.DealPilotWhitelabel.apply({
+            accent: c.brand_accent, accentHi: c.brand_accent_hi, accentLo: c.brand_accent_lo,
+            obsidian: c.brand_obsidian, name: c.brand_name, logo: c.brand_logo_b64
+          });
+        } catch (e) {}
+      };
+      go();
+    } catch (e) {}
+  })();
+
+  /* W37-plan-ready: boot() lief GENAU EINMAL, 700 ms nach dem Seitenladen.
+     Beim Login gibt es da noch keinen Token -> return, fuer immer. Erst der
+     Reload half. Vierter Fall der W3/W4/W7-Familie: reagiert, bevor die
+     Daten da sind, und deutet den Fehlschlag still als "kein Mandant".
+     _bootDone verhindert doppelte Fetches, wenn Timer und Ereignis beide
+     zuenden. */
+  var _bootDone = false;
   async function boot() {
-    try { if (!localStorage.getItem('ji_token')) return; } catch (e) { return; }
+    if (_bootDone) return;
+    try { if (!localStorage.getItem('ji_token')) { localStorage.removeItem('dp_wl_cache'); return; } } catch (e) { return; }
     // Wrap früh installieren (liest _b dynamisch)
     if (!overrideBranding()) setTimeout(overrideBranding, 1000);
     try {
       var r = await Auth.apiCall('/reseller-invite/my-branding');
       _b = r && r.branding;
+      /* W25-fouc: Branding merken, damit der naechste Login SOFORT faerbt statt
+         erst nach dem Fetch. Ohne das sieht der Mandant ~1s DealPilot-Design und
+         dann einen Umschlag — das wirkt wie ein Fehler, nicht wie seine Kanzlei. */
+      try {
+        if (_b) localStorage.setItem('dp_wl_cache', JSON.stringify(_b));
+        else localStorage.removeItem('dp_wl_cache');
+      } catch (e) {}
     } catch (e) { return; }
+    _bootDone = true;   /* W37: erst NACH erfolgreichem Fetch sperren */
     if (!_b) return;
+    /* W39-pdf-gold: _pdfAccentPoll gibt nach ~20s auf. Wer laenger am
+       Login-Bildschirm steht — also jeder — bekam den Akzent NIE in die
+       PDF-Palette, und das Bank-PDF blieb DealPilot-gold. Hier ist _b
+       nachweislich da, also setzen wir ihn selbst. Fuenfter Fall der
+       W3/W4/W7/W37-Familie: ein Timer, den man nie zuverlaessig gewinnt. */
+    try { applyPdfAccent(); } catch (e) {}
     overrideBranding();
     applyAccent();
     replaceWordmark();
@@ -158,4 +249,14 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(boot, 700); });
   else setTimeout(boot, 700);
+
+  /* W37-plan-ready: DER eigentliche Fix. Der 700-ms-Timer oben deckt nur den
+     Reload ab (Token schon da). Nach einem frischen Login existiert der Token
+     erst SPAETER — dafuer gibt es seit W17 den Vertrag, den reseller-portal.js
+     (Z.927) laengst nutzt und der hier fehlte. subscription.js feuert ihn,
+     sobald der Plan wirklich bekannt ist. Kein neuer Timer, keine Retry-
+     Schleife — die gewinnt man nie zuverlaessig. */
+  window.addEventListener('dp:plan-ready', function () { boot(); });
+  /* War der Plan schon da, bevor dieses Modul geladen wurde? */
+  if (window.DealPilotPlanReady) boot();
 })();

@@ -49,7 +49,19 @@ router.get('/', validate({ query: listQuerySchema }), async (req, res, next) => 
  */
 router.get('/:id', validate({ params: idParamSchema }), async (req, res, next) => {
   try {
-    const obj = await objectService.getById(req.user.id, req.params.id);
+    let obj = await objectService.getById(req.user.id, req.params.id);
+    /* W27-sharedget: Kein eigenes Objekt? Dann pruefen, ob es dem Anfragenden ueber
+       eine AKTIVE Reseller-Freigabe zusteht. Dieselbe Regel wie getSharedObject
+       (widerrufen/zurueckgegeben = kein Zugriff) — nur an zweiter Stelle angewandt.
+       Damit kann die Rechen-Engine im Frontend das Objekt normal laden und der
+       Partner die echten PDFs ziehen. Ohne Freigabe bleibt es bei 404. */
+    if (!obj) {
+      try {
+        const reseller = require('../services/resellerService');
+        const ownerId = await reseller.sharedObjectOwner(req.user.id, req.params.id);
+        if (ownerId) obj = await objectService.getById(ownerId, req.params.id);
+      } catch (e) { /* Freigabe-Pfad ist Zusatz, nie blockierend */ }
+    }
     if (!obj) throw new HttpError(404, 'Object not found');
     res.json(obj);
   } catch (err) { next(err); }

@@ -1,4 +1,23 @@
 'use strict';
+/* W35-wl-token: Whitelabel-Farbe zur Laufzeit. SVG-Praesentationsattribute
+   (stroke="..." / fill="...") sind KEINE CSS-Eigenschaften — var() ist dort
+   wirkungslos. Ohne Whitelabel liefert _wlc() das Literal zurueck.
+   Idempotent global: mehrere Module duerfen das laden. */
+if (!window._wlc) {
+  window._wlc = function (h) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--wl-' + h.slice(1).toLowerCase());
+      v = (v || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) return v;
+    } catch (e) {}
+    return h;
+  };
+  window._wlrgba = function (a) {
+    var h = window._wlc('#C9A84C');
+    return 'rgba(' + parseInt(h.substr(1, 2), 16) + ',' + parseInt(h.substr(3, 2), 16) + ',' + parseInt(h.substr(5, 2), 16) + ',' + a + ')';
+  };
+}
+
 /* ═══════════════════════════════════════════════════════════════
    DealPilot V25 — bank-charts.js
    Bank-taugliche SVG-Charts (4 Stück), ersetzt Chart.js-Defaults:
@@ -300,8 +319,8 @@
               '<path d="' + eqAreaPath + '" fill="url(#bc-eq-grad)"/>' +
               // EZB-Marker (gestrichelte Linie + Label)
               (ezbX ? '<g>' +
-                '<line x1="' + ezbX.toFixed(1) + '" y1="50" x2="' + ezbX.toFixed(1) + '" y2="320" stroke="#C9A84C" stroke-width="1" stroke-dasharray="2 4" opacity="0.55"/>' +
-                '<rect x="' + (ezbX - 38).toFixed(1) + '" y="35" width="76" height="18" rx="3" fill="#C9A84C" opacity="0.95"/>' +
+                '<line x1="' + ezbX.toFixed(1) + '" y1="50" x2="' + ezbX.toFixed(1) + '" y2="320" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1" stroke-dasharray="2 4" opacity="0.55"/>' +
+                '<rect x="' + (ezbX - 38).toFixed(1) + '" y="35" width="76" height="18" rx="3" fill="' + window._wlc('#C9A84C') + '" opacity="0.95"/>' +
                 '<text x="' + ezbX.toFixed(1) + '" y="48" font-family="DM Sans" font-size="9.5" fill="#1A1414" font-weight="700" text-anchor="middle" letter-spacing="0.10em">EZB · ' + ((cfRows[ezbIdx] && cfRows[ezbIdx].cal ? cfRows[ezbIdx].cal : new Date().getFullYear()) + 1) + '</text>' +
               '</g>' : '') +
               // Equity-Label IN der Fläche
@@ -330,10 +349,10 @@
               '</g>' +
               // Equity-Klammer rechts (zwischen den Endpunkten)
               '<g>' +
-                '<line x1="' + (px(n-1) - 35).toFixed(1) + '" y1="' + py(endWert).toFixed(1) + '" x2="' + (px(n-1) - 35).toFixed(1) + '" y2="' + py(endRs).toFixed(1) + '" stroke="#C9A84C" stroke-width="1.5" stroke-dasharray="3 3"/>' +
-                '<line x1="' + (px(n-1) - 40).toFixed(1) + '" y1="' + py(endWert).toFixed(1) + '" x2="' + (px(n-1) - 30).toFixed(1) + '" y2="' + py(endWert).toFixed(1) + '" stroke="#C9A84C" stroke-width="1.5"/>' +
-                '<line x1="' + (px(n-1) - 40).toFixed(1) + '" y1="' + py(endRs).toFixed(1) + '" x2="' + (px(n-1) - 30).toFixed(1) + '" y2="' + py(endRs).toFixed(1) + '" stroke="#C9A84C" stroke-width="1.5"/>' +
-                '<rect x="' + (px(n-1) - 75).toFixed(1) + '" y="' + ((py(endWert) + py(endRs)) / 2 - 17).toFixed(1) + '" width="80" height="34" rx="6" fill="#C9A84C"/>' +
+                '<line x1="' + (px(n-1) - 35).toFixed(1) + '" y1="' + py(endWert).toFixed(1) + '" x2="' + (px(n-1) - 35).toFixed(1) + '" y2="' + py(endRs).toFixed(1) + '" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1.5" stroke-dasharray="3 3"/>' +
+                '<line x1="' + (px(n-1) - 40).toFixed(1) + '" y1="' + py(endWert).toFixed(1) + '" x2="' + (px(n-1) - 30).toFixed(1) + '" y2="' + py(endWert).toFixed(1) + '" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1.5"/>' +
+                '<line x1="' + (px(n-1) - 40).toFixed(1) + '" y1="' + py(endRs).toFixed(1) + '" x2="' + (px(n-1) - 30).toFixed(1) + '" y2="' + py(endRs).toFixed(1) + '" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1.5"/>' +
+                '<rect x="' + (px(n-1) - 75).toFixed(1) + '" y="' + ((py(endWert) + py(endRs)) / 2 - 17).toFixed(1) + '" width="80" height="34" rx="6" fill="' + window._wlc('#C9A84C') + '"/>' +
                 '<text x="' + (px(n-1) - 35).toFixed(1) + '" y="' + ((py(endWert) + py(endRs)) / 2 - 3).toFixed(1) + '" font-family="DM Sans" font-size="13" fill="#1A1414" font-weight="800" text-anchor="middle">' + _fmtK(equityGain, true) + '</text>' +
                 '<text x="' + (px(n-1) - 35).toFixed(1) + '" y="' + ((py(endWert) + py(endRs)) / 2 + 11).toFixed(1) + '" font-family="DM Sans" font-size="9" fill="#1A1414" font-weight="600" text-anchor="middle" letter-spacing="0.10em">EQUITY</text>' +
               '</g>' +
@@ -512,7 +531,7 @@
           '<text x="535" y="' + (thY2 - 3).toFixed(1) + '" font-family="DM Sans" font-size="9" fill="' + thresholdLine2.color + '" text-anchor="end" font-weight="600">' + _esc(thresholdLine2.label) + '</text>' : '') +
         '<path d="' + areaPath + '" fill="url(#' + gradId + ')"/>' +
         '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' +
-        (ezbX != null ? '<line x1="' + ezbX.toFixed(1) + '" y1="0" x2="' + ezbX.toFixed(1) + '" y2="100" stroke="#C9A84C" stroke-width="1" stroke-dasharray="2 4" opacity="0.55"/>' : '') +
+        (ezbX != null ? '<line x1="' + ezbX.toFixed(1) + '" y1="0" x2="' + ezbX.toFixed(1) + '" y2="100" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1" stroke-dasharray="2 4" opacity="0.55"/>' : '') +
         '<circle cx="0" cy="' + py(values[0]).toFixed(1) + '" r="3.5" fill="' + color + '" stroke="#FAFAF7" stroke-width="2"/>' +
         '<circle cx="540" cy="' + py(values[n-1]).toFixed(1) + '" r="4" fill="' + color + '" stroke="#FAFAF7" stroke-width="2"/>' +
       '</svg>';
@@ -597,7 +616,7 @@
               _miniTrend(dscrArr, {
                 color: '#3FA56C',
                 thresholdLine: { value: 1.0, color: '#B8625C', label: 'DSCR 1,0' },
-                thresholdLine2: { value: 1.2, color: '#C9A84C', label: 'DSCR 1,2' }
+                thresholdLine2: { value: 1.2, color: window._wlc('#C9A84C'), label: 'DSCR 1,2' }
               }) +
               '<div class="bc-kpi-trend-bench">' +
                 '<div class="bc-kpi-trend-bench-cell"><span class="bc-kpi-trend-bench-label">Heute</span><span class="bc-kpi-trend-bench-val">' + _fmtNum(dscrToday, 2) + '</span></div>' +
@@ -632,9 +651,9 @@
                 '</span>' +
               '</div>' +
               _miniTrend(ltvArr, {
-                color: '#A68A36',
+                color: window._wlc('#A68A36'),
                 thresholdLine: { value: 85, color: '#B8625C', label: 'LTV 85%' },
-                thresholdLine2: { value: 60, color: '#C9A84C', label: 'LTV 60%' }
+                thresholdLine2: { value: 60, color: window._wlc('#C9A84C'), label: 'LTV 60%' }
               }) +
               '<div class="bc-kpi-trend-bench">' +
                 '<div class="bc-kpi-trend-bench-cell"><span class="bc-kpi-trend-bench-label">Heute</span><span class="bc-kpi-trend-bench-val ' + (ltvToday > 100 ? 'red' : '') + '">' + _fmtPct(ltvToday, 0) + '</span></div>' +
@@ -743,10 +762,10 @@
           '<div class="bc-svg-wrap" style="height: 380px;">' +
             '<svg viewBox="0 0 1100 380" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">' +
               '<defs>' +
-                '<linearGradient id="bc-wf-bar1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E2C97E"/><stop offset="100%" stop-color="#C9A84C"/></linearGradient>' +
+                '<linearGradient id="bc-wf-bar1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + window._wlc('#E2C97E') + '"/><stop offset="100%" stop-color="' + window._wlc('#C9A84C') + '"/></linearGradient>' +
                 '<linearGradient id="bc-wf-bar2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5BC089"/><stop offset="100%" stop-color="#3FA56C"/></linearGradient>' +
                 '<linearGradient id="bc-wf-bar3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#79CDA0"/><stop offset="100%" stop-color="#3FA56C"/></linearGradient>' +
-                '<linearGradient id="bc-wf-total" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#A68A36"/><stop offset="100%" stop-color="#7A6628"/></linearGradient>' +
+                '<linearGradient id="bc-wf-total" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + window._wlc('#A68A36') + '"/><stop offset="100%" stop-color="' + window._wlc('#7A6628') + '"/></linearGradient>' +
                 '<filter id="bc-wf-shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15"/></filter>' +
               '</defs>' +
               // Y-Grid (4 Linien)
@@ -769,7 +788,7 @@
               // Bar 1: Tilgung + BSV
               '<g filter="url(#bc-wf-shadow)">' +
                 '<rect x="' + bar1X + '" y="' + bar1Top.toFixed(1) + '" width="' + barW + '" height="' + bar1H.toFixed(1) + '" rx="6" fill="url(#bc-wf-bar1)"/>' +
-                '<rect x="' + bar1X + '" y="' + bar1Top.toFixed(1) + '" width="' + barW + '" height="3" rx="6" fill="#FFE9A0" opacity="0.7"/>' +
+                '<rect x="' + bar1X + '" y="' + bar1Top.toFixed(1) + '" width="' + barW + '" height="3" rx="6" fill="' + window._wlc('#FFE9A0') + '" opacity="0.7"/>' +
               '</g>' +
               '<line x1="' + (bar1X + barW) + '" y1="' + bar1Top.toFixed(1) + '" x2="' + bar2X + '" y2="' + bar1Top.toFixed(1) + '" stroke="#2A2727" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.40"/>' +
               // Bar 2: CF vor Steuern (Banker-CF)
@@ -801,14 +820,14 @@
                 '<rect x="' + bar4X + '" y="' + bar4Top.toFixed(1) + '" width="' + barW + '" height="' + bar4H.toFixed(1) + '" rx="6" fill="url(#bc-wf-bar3)"/>' +
                 '<rect x="' + bar4X + '" y="' + bar4Top.toFixed(1) + '" width="' + barW + '" height="3" rx="6" fill="#A0F0BE" opacity="0.7"/>' +
               '</g>' +
-              '<line x1="' + (bar4X + barW) + '" y1="' + bar4Top.toFixed(1) + '" x2="' + bar5X + '" y2="' + bar4Top.toFixed(1) + '" stroke="#C9A84C" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.7"/>' +
+              '<line x1="' + (bar4X + barW) + '" y1="' + bar4Top.toFixed(1) + '" x2="' + bar5X + '" y2="' + bar4Top.toFixed(1) + '" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.7"/>' +
               // Bar 5: Total
               '<g filter="url(#bc-wf-shadow)">' +
                 '<rect x="' + bar5X + '" y="' + bar5Top.toFixed(1) + '" width="' + barW5 + '" height="' + bar5H.toFixed(1) + '" rx="6" fill="url(#bc-wf-total)"/>' +
-                '<rect x="' + bar5X + '" y="' + bar5Top.toFixed(1) + '" width="' + barW5 + '" height="3" rx="6" fill="#FFE9A0" opacity="0.85"/>' +
+                '<rect x="' + bar5X + '" y="' + bar5Top.toFixed(1) + '" width="' + barW5 + '" height="3" rx="6" fill="' + window._wlc('#FFE9A0') + '" opacity="0.85"/>' +
                 '<g transform="translate(' + (bar5X + barW5/2 - 10) + ', ' + (bar5Top + bar5H/2 + 25) + ')">' +
                   '<circle cx="10" cy="10" r="14" fill="rgba(255,255,255,0.10)"/>' +
-                  '<path d="M 10 0 L 13 7 L 20 8 L 15 13 L 16 20 L 10 17 L 4 20 L 5 13 L 0 8 L 7 7 Z" fill="#FFE9A0" opacity="0.85"/>' +
+                  '<path d="M 10 0 L 13 7 L 20 8 L 15 13 L 16 20 L 10 17 L 4 20 L 5 13 L 0 8 L 7 7 Z" fill="' + window._wlc('#FFE9A0') + '" opacity="0.85"/>' +
                 '</g>' +
               '</g>' +
               // X-Labels
@@ -821,8 +840,8 @@
                 '<text x="' + (bar3X + barW/2) + '" y="340" font-size="9" fill="#9C9590" font-weight="500" letter-spacing="0.05em">' + (taxBar >= 0 ? 'ERSTATTUNG · ' : 'ZAHLUNG · ') + n + 'J</text>' +
                 '<text x="' + (bar4X + barW/2) + '" y="325">Wertsteigerung</text>' +
                 '<text x="' + (bar4X + barW/2) + '" y="340" font-size="9" fill="#9C9590" font-weight="500" letter-spacing="0.05em">MARKTWERT − ANKER</text>' +
-                '<text x="' + (bar5X + barW5/2) + '" y="325" font-weight="700" fill="#A68A36">Gesamt</text>' +
-                '<text x="' + (bar5X + barW5/2) + '" y="340" font-size="9" fill="#A68A36" font-weight="600" letter-spacing="0.05em">VERMÖGENSZUWACHS</text>' +
+                '<text x="' + (bar5X + barW5/2) + '" y="325" font-weight="700" fill="' + window._wlc('#A68A36') + '">Gesamt</text>' +
+                '<text x="' + (bar5X + barW5/2) + '" y="340" font-size="9" fill="' + window._wlc('#A68A36') + '" font-weight="600" letter-spacing="0.05em">VERMÖGENSZUWACHS</text>' +
               '</g>' +
               // Werte AUF den Bars
               '<g font-family="DM Sans" font-weight="700" text-anchor="middle">' +
@@ -832,7 +851,7 @@
                 (Math.abs(taxBar) > 50 ? '<text x="' + (bar3X + barW/2) + '" y="' + (bar3TopRender - 6).toFixed(1) + '" font-size="13" fill="#1A1414" font-weight="700">' + _fmtK(taxBar, true) + '</text>' : '') +
                 '<text x="' + (bar4X + barW/2) + '" y="' + (bar4Top + Math.min(30, bar4H/2 + 5)).toFixed(1) + '" font-size="14" fill="#FAFAF7">' + _fmtK(ws, true) + '</text>' +
                 '<text x="' + (bar5X + barW5/2) + '" y="' + (bar5Top + bar5H/2 - 5).toFixed(1) + '" font-size="20" fill="#FAFAF7" font-family="Cormorant Garamond">' + _fmtK(total, true) + '</text>' +
-                '<text x="' + (bar5X + barW5/2) + '" y="' + (bar5Top + bar5H/2 + 55).toFixed(1) + '" font-size="11" fill="#FFE9A0" font-weight="500">Multiple ' + multipleStr + '</text>' +
+                '<text x="' + (bar5X + barW5/2) + '" y="' + (bar5Top + bar5H/2 + 55).toFixed(1) + '" font-size="11" fill="' + window._wlc('#FFE9A0') + '" font-weight="500">Multiple ' + multipleStr + '</text>' +
               '</g>' +
             '</svg>' +
           '</div>' +
@@ -1005,7 +1024,7 @@
             '<div class="bc-legend-scale">' +
               '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(63,165,108,0.30); border-color: rgba(63,165,108,0.40)"></span>DSCR ≥ 1,2 (gut)</div>' +
               '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(63,165,108,0.15); border-color: rgba(63,165,108,0.25)"></span>DSCR 1,0–1,2 (knapp)</div>' +
-              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(201,168,76,0.18); border-color: rgba(201,168,76,0.30)"></span>DSCR 0,8–1,0 (warn)</div>' +
+              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent); border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)"></span>DSCR 0,8–1,0 (warn)</div>' +
               '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(184,98,92,0.18); border-color: rgba(184,98,92,0.30)"></span>DSCR &lt; 0,8 (Stress)</div>' +
             '</div>' +
             '<div class="bc-bank-tag">' +

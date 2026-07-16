@@ -1,4 +1,25 @@
 'use strict';
+/* W40-pdf-svg: jsPDF kennt kein CSS — dort stehen RGB-Tripel. Im Hauptdokument
+   liefert pdf.js seine Palette (W1) und _dpPdfSetAccent() mutiert C.GOLD in
+   place. Im Marktbericht-iframe gibt es pdf.js nicht — dort faellt die Funktion
+   auf --wl-c9a84c zurueck, das die Bruecke aus W36 setzt.
+   Ohne Whitelabel: [201,168,76], also unveraendert. */
+if (!window._pdfGold) {
+  window._pdfGold = function () {
+    try {
+      var c = window._dpPdfColors;
+      if (c && c.GOLD && c.GOLD.length === 3) return [c.GOLD[0], c.GOLD[1], c.GOLD[2]];
+    } catch (e) {}
+    try {
+      var v = (getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c') || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) {
+        return [parseInt(v.substr(1, 2), 16), parseInt(v.substr(3, 2), 16), parseInt(v.substr(5, 2), 16)];
+      }
+    } catch (e) {}
+    return [201, 168, 76];
+  };
+}
+
 /**
  * reseller-portal.js — Partner-Portal als EIGENES Modal (Paket 4)
  *
@@ -351,12 +372,43 @@
     document.head.appendChild(s);
   }
 
+  /* W27-modalpdf */
+  function _osPdfBar(o) {
+    var host = $('rp-os-pdfs'); if (!host || !o || !o.id) return;
+    if (!window.DealPilotResellerPdf) {
+      host.innerHTML = '<span style="font:400 11px Inter;color:#8a8473">PDF-Engine nicht geladen</span>';
+      return;
+    }
+    var years = window.DealPilotResellerPdf.yearsFor(o);
+    var opts = '<option value="all">Alle Jahre</option>' +
+      years.map(function (y) { return '<option value="' + y + '">' + y + '</option>'; }).join('');
+    host.innerHTML =
+      '<button class="rp-act" id="rp-os-pdf-inv">\u2193 Investment-PDF</button>' +
+      '<span style="display:inline-flex;align-items:center;gap:0">' +
+        '<select id="rp-os-year" style="background:#1a1a1a;color:#e8e2d6;border:1px solid #2f2f2f;' +
+          'border-right:0;border-radius:8px 0 0 8px;padding:6px 8px;font:600 11.5px Inter;cursor:pointer">' + opts + '</select>' +
+        '<button class="rp-act" id="rp-os-pdf-tax" style="border-radius:0 8px 8px 0">\u2193 Werbungskosten</button>' +
+      '</span>';
+    $('rp-os-pdf-inv').addEventListener('click', function () {
+      window.DealPilotResellerPdf.export('invest', o.id);
+    });
+    $('rp-os-pdf-tax').addEventListener('click', function () {
+      var y = ($('rp-os-year') || {}).value || 'all';
+      window.DealPilotResellerPdf.export('tax', o.id, y);
+    });
+  }
+
   async function openSharedObject(shareId) {
     _osCss();
     var ex = $('rp-os-ov'); if (ex) ex.remove();
     var ov = document.createElement('div'); ov.className = 'rp-os-ov'; ov.id = 'rp-os-ov';
+    /* W27-modalpdf: Hier stand EIN Knopf, der ein selbstgebautes Kurz-PDF erzeugte.
+       Ein Steuerberater braucht das echte Investment-PDF und die Werbungskosten
+       PRO JAHR (Anlage V). Beides kann nur die Rechen-Engine -> rp-pdf-engine.js.
+       Track Record fehlt BEWUSST: der enthaelt das ganze Portfolio des Mandanten,
+       nicht nur das freigegebene Objekt. */
     ov.innerHTML = '<div class="rp-os"><div class="rp-os-bar"><span class="l">Deal<b>Pilot</b></span>' +
-      '<button class="rp-act" id="rp-os-pdf" disabled style="margin-left:auto;opacity:.5;cursor:not-allowed">⬇ PDF</button>' +
+      '<span id="rp-os-pdfs" style="margin-left:auto;display:flex;gap:8px;align-items:center"></span>' +
       '<button class="x" id="rp-os-x" style="margin-left:14px">✕</button></div>' +
       '<div class="rp-os-body" id="rp-os-body"><p class="rp-ph">Lade Objekt…</p></div></div>';
     document.body.appendChild(ov);
@@ -365,6 +417,7 @@
     try {
       var r = await api('/shares/' + shareId + '/object'); var o = r.object || {};
       var d = o.data || {};
+      _osPdfBar(o);   /*W27-modalpdf*/
       var nm = o.name || o.kuerzel || 'Objekt';
       var adr = [ (d.str || '') + ' ' + (d.hnr || ''), [(d.plz || ''), (d.ort || o.ort || '')].join(' ').trim() ].map(function (x) { return (x || '').trim(); }).filter(Boolean).join(', ');
 
@@ -411,7 +464,7 @@
       var W = 210, M = 16;
       var b = (window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.get) ? DealPilotConfig.branding.get() : {};
       var company = b.company || b.product_name || 'DealPilot';
-      var INK = [28, 26, 23], MUT = [122, 115, 112], GOLD = [201, 168, 76];
+      var INK = [28, 26, 23], MUT = [122, 115, 112], GOLD = window._pdfGold();
       var d = o.data || {};
       var nm = o.name || o.kuerzel || 'Objekt';
       var adr = [ (d.str || '') + ' ' + (d.hnr || ''), [(d.plz || ''), (d.ort || o.ort || '')].join(' ').trim() ].map(function (x) { return (x || '').trim(); }).filter(Boolean).join(', ');
@@ -419,8 +472,8 @@
       // Header
       doc.setFillColor(11, 11, 10); doc.rect(0, 0, W, 26, 'F');
       doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.text('DealPilot', M, 16);
-      doc.setTextColor(201, 168, 76); doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.text(String(company), W - M, 16, { align: 'right' });
-      doc.setFillColor(201, 168, 76); doc.rect(0, 26, W, 1.2, 'F');
+      doc.setTextColor.apply(doc, window._pdfGold()); doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.text(String(company), W - M, 16, { align: 'right' });
+      doc.setFillColor.apply(doc, window._pdfGold()); doc.rect(0, 26, W, 1.2, 'F');
 
       var y = 40;
       doc.setTextColor.apply(doc, INK); doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.text(String(nm), M, y);
@@ -591,7 +644,15 @@
           '<input type="hidden" id="rp-b-obsidian" value="' + esc(obsidian) + '">' +
           '<input type="hidden" id="rp-b-mail" value="' + esc(b.brand_mail_accent || accent) + '">' +
           '<input type="hidden" id="rp-b-pdflight" value="' + (b.brand_pdf_light ? '1' : '0') + '">' +   /*W12-portallight*/
+          /* W22-logoprev: Hier stand NUR ein <input type="file"> — das zeigt nach dem
+             Neuoeffnen immer "Keine Datei ausgewaehlt". Das Logo lag laengst in der DB
+             und wurde in der App auch angezeigt, aber im Tab sah es aus, als waere es
+             weg. Jetzt: echte Vorschau des gespeicherten Logos. */
           '<div style="margin-top:14px"><div class="rp-fl">Logo (PNG/SVG, max ~300 KB)</div>' +
+            '<div id="rp-b-logo-prev" style="display:flex;align-items:center;gap:12px;margin-bottom:9px">' +
+              '<div id="rp-b-logo-box" style="width:132px;height:44px;border:1px dashed #ddd6c8;border-radius:8px;background:#151515;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden"></div>' +
+              '<div id="rp-b-logo-txt" style="font:400 11.5px Inter;color:#8a8473;line-height:1.5"></div>' +
+            '</div>' +
             '<input type="file" id="rp-b-logo" accept="image/*" style="font:400 12px Inter">' +
             '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">entfernen</button></div>' +
         '</div>' +
@@ -627,7 +688,7 @@
           '<div style="font-size:11.5px;color:#8a8473;margin-top:7px;padding-left:28px">Nur fuer dich, nur in diesem Browser. Zum Zuruecksetzen Haken entfernen.</div>' +
         '</div>' +
         '<div style="margin-top:18px"><button class="rp-checkout" id="rp-b-save">Branding speichern</button></div>';
-      var upd = function () { _brandPreview(); try { if (_previewOn()) _applyPreview(); } catch (e) {} };  /*W7-livepreview*/
+      var upd = function () { _brandPreview(); _logoPrev(); try { if (_previewOn()) _applyPreview(); } catch (e) {} };  /*W7-livepreview W22-logoprev*/
       $('rp-b-wl').addEventListener('change', upd);
       $('rp-b-name').addEventListener('input', upd);
       /* W8-editor: die Farb-Inputs sind jetzt hidden -> kein 'input'-Event. */
@@ -666,8 +727,24 @@
         });
       })();
       $('rp-b-save').addEventListener('click', saveBranding);
-      _brandPreview();
+      _brandPreview(); _logoPrev();   /*W22-logoprev*/
     } catch (e) { w.innerHTML = '<p class="rp-ph">Branding konnte nicht geladen werden.</p>'; }
+  }
+  /* W22-logoprev */
+  function _logoPrev() {
+    var box = $('rp-b-logo-box'), txt = $('rp-b-logo-txt'); if (!box) return;
+    var l = _currentLogo();
+    if (l) {
+      box.innerHTML = '<img src="' + esc(l) + '" alt="" style="max-width:120px;max-height:36px">';
+      box.style.borderStyle = 'solid';
+      if (txt) txt.innerHTML = (_brandState.logo !== undefined
+        ? '<b style="color:#3FA56C">Neu gew\u00e4hlt</b> \u2014 noch nicht gespeichert.'
+        : 'Gespeichert. Neue Datei w\u00e4hlen ersetzt es.');
+    } else {
+      box.innerHTML = '<span style="font:400 10px Inter;color:#6f6a60">kein Logo</span>';
+      box.style.borderStyle = 'dashed';
+      if (txt) txt.textContent = 'Ohne Logo erscheint dein Marken-/Kanzleiname als Schriftzug.';
+    }
   }
   function _brandLogoPick(e, cb) {
     var f = e.target.files && e.target.files[0]; if (!f) return;
@@ -865,6 +942,10 @@
     if (ok || (n || 0) >= 6) return;
     setTimeout(function () { _bootRetry((n || 0) + 1); }, 1200);
   }
+  /* W17-portallisten: Statt nur zu pollen (W7) hoeren wir jetzt auf das Signal.
+     Der Retry bleibt als zweites Netz — falls das Event schon gefeuert hat,
+     bevor dieses Modul geladen war, faengt DealPilotPlanReady das ab. */
+  window.addEventListener('dp:plan-ready', function () { _bootRetry(0); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { _bootRetry(0); });
   else _bootRetry(0);
 
@@ -875,6 +956,30 @@
   }
   _earlyPill();
   [400, 1200, 2500, 4000].forEach(function (ms) { setTimeout(_earlyPill, ms); });
+
+  /* ── W26-ownerboot ────────────────────────────────────────────────────
+     Gemessen am 16.07.: Der Partner meldet sich an -> DealPilot-Gold. Erst beim
+     Klick auf Einstellungen -> Partner-Portal -> Branding faerbte es sich
+     ploetzlich um. Grund: _applyPreview() haengt an loadBranding(), und das laeuft
+     NUR, wenn der Tab geoeffnet wird. Der Haken "Ansicht meiner Mandanten" stand
+     laengst auf 1 — es hat ihn nur niemand beim Login ausgewertet.
+     Jetzt: beim Start pruefen und anwenden. */
+  (function _ownerBoot(n) {
+    var on = false;
+    try { on = localStorage.getItem('dp_wl_preview') === '1'; } catch (e) {}
+    if (!on) return;
+    if (!window.DealPilotWhitelabel || !window.Auth || !Auth.apiCall) {
+      if ((n || 0) > 20) return;
+      return setTimeout(function () { _ownerBoot((n || 0) + 1); }, 700);
+    }
+    Auth.apiCall('/reseller/branding').then(function (r) {
+      var b = r && r.branding; if (!b || !b.brand_accent) return;
+      window.DealPilotWhitelabel.apply({
+        accent: b.brand_accent, accentHi: b.brand_accent_hi, accentLo: b.brand_accent_lo,
+        obsidian: b.brand_obsidian, name: b.brand_name, logo: b.brand_logo_b64
+      });
+    }).catch(function () { /* kein Partner / kein Branding -> normal weiter */ });
+  })(0);
 
   window.openResellerPortal = openResellerPortal;
   window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal };

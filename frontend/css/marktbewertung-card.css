@@ -5,9 +5,9 @@
    sollten in der App geladen sein (sind sie bei DealPilot bereits).
    ===================================================================== */
 .dpmb-card{
-  --dpmb-gold:#C9A84C; --dpmb-gold2:#E8C766; --dpmb-gold-deep:#a8761f;
-  --dpmb-green:#43B77C; --dpmb-gold-t:#D9B45A; --dpmb-red:#D9685F;
-  --dpmb-txt:#ECECEF; --dpmb-mut:#83838e; --dpmb-line:rgba(201,168,76,.14);
+  --dpmb-gold:var(--wl-c9a84c, #C9A84C); --dpmb-gold2:var(--wl-e8c766, #E8C766); --dpmb-gold-deep:var(--wl-a8761f, #a8761f);
+  --dpmb-green:#43B77C; --dpmb-gold-t:var(--wl-d9b45a, #D9B45A); --dpmb-red:#D9685F;
+  --dpmb-txt:#ECECEF; --dpmb-mut:#83838e; --dpmb-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
   position:relative; border-radius:18px; overflow:hidden;
   background:radial-gradient(130% 130% at 10% -10%,#0c0c11,#060608 55%,#020203);
   border:1px solid var(--dpmb-line);
@@ -15,8 +15,8 @@
   color:var(--dpmb-txt); font-family:'Inter',system-ui,sans-serif;
   transition:transform .4s, box-shadow .4s, border-color .4s;
 }
-.dpmb-card:hover{transform:translateY(-2px);border-color:rgba(201,168,76,.3);
-  box-shadow:0 40px 90px -36px #000, 0 0 46px -20px rgba(201,168,76,.35)}
+.dpmb-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);
+  box-shadow:0 40px 90px -36px #000, 0 0 46px -20px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)}
 .dpmb-card *{box-sizing:border-box}
 .dpmb-cfx{position:absolute;inset:0;z-index:0;pointer-events:none}
 .dpmb-sheen{position:absolute;top:0;left:0;height:1.4px;width:100%;z-index:2;pointer-events:none;
@@ -55,7 +55,7 @@
 .dpmb-b{display:flex;align-items:center;gap:13px;padding:12px 14px;border:1px solid rgba(255,255,255,.06);border-radius:14px;background:linear-gradient(150deg,rgba(255,255,255,.028),transparent)}
 .dpmb-mg{flex:0 0 104px} .dpmb-mg svg{width:100%;height:auto;display:block;overflow:visible}
 .dpmb-val{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:21px;letter-spacing:-.01em;line-height:1.1}
-.dpmb-mw .dpmb-val{color:var(--dpmb-gold);text-shadow:0 0 20px rgba(201,168,76,.45)}
+.dpmb-mw .dpmb-val{color:var(--dpmb-gold);text-shadow:0 0 20px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent)}
 .dpmb-mm .dpmb-val{color:var(--dpmb-txt)}
 .dpmb-sqm{font-size:11px;color:var(--dpmb-mut);font-family:'JetBrains Mono',monospace}
 
@@ -64,7 +64,7 @@
 
 /* ---- Optionaler Standortfinder-Rahmen (Demo) ---- */
 .dpmb-finder{position:relative;border-radius:18px;overflow:hidden;padding:18px 20px;margin-bottom:18px;
-  background:radial-gradient(120% 140% at 0% 0%,#0c0c11,#060608 60%);border:1px solid rgba(201,168,76,.14);
+  background:radial-gradient(120% 140% at 0% 0%,#0c0c11,#060608 60%);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
   color:#ECECEF;font-family:'Inter',system-ui,sans-serif}
 .dpmb-finder .dpmb-cfx{position:absolute;inset:0;z-index:0}
 .dpmb-finder .dpmb-fi{position:relative;z-index:1}
@@ -72,10 +72,10 @@
 .dpmb-finder .dpmb-ttl .dpmb-logo{font-size:17px}
 .dpmb-finder .dpmb-ttl span{color:#83838e;font-size:12px}
 .dpmb-frow{display:flex;gap:10px;margin-top:13px;flex-wrap:wrap}
-.dpmb-frow input{flex:1;min-width:200px;background:rgba(0,0,0,.45);border:1px solid rgba(201,168,76,.14);border-radius:11px;padding:11px 14px;color:#ECECEF;font-family:'Inter';font-size:14px;outline:none}
-.dpmb-frow input:focus{border-color:rgba(201,168,76,.5)}
+.dpmb-frow input{flex:1;min-width:200px;background:rgba(0,0,0,.45);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);border-radius:11px;padding:11px 14px;color:#ECECEF;font-family:'Inter';font-size:14px;outline:none}
+.dpmb-frow input:focus{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent)}
 .dpmb-frow input::placeholder{color:#6a6a74}
-.dpmb-frow button{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;padding:11px 20px;border:none;border-radius:11px;cursor:pointer;color:#1a1407;background:linear-gradient(#E8C766,#a8761f);box-shadow:0 4px 18px -4px rgba(201,168,76,.7)}
+.dpmb-frow button{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;padding:11px 20px;border:none;border-radius:11px;cursor:pointer;color:#1a1407;background:linear-gradient(var(--wl-e8c766, #E8C766),var(--wl-a8761f, #a8761f));box-shadow:0 4px 18px -4px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent)}
 
 /* ===== v49e: Karte kompakter (weniger hoch), wirkt durch breiteres Layout grosszuegiger ===== */
 .dpmb-inner{padding:13px 18px}

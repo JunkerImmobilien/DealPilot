@@ -42,6 +42,18 @@ function toast(msg){
    ────────────────────────────────────────────────────── */
 
 // V289.2 PRODUCTION: Plan-Check via DealPilotConfig statt _SIMULATED_PLAN
+/* W41-bmf-gate: Der EINFACHE Rechner fragte bisher nach 'bmf_advanced' —
+   dem Pro-Extra. Der Toast sagte 'Investor-Plan', der Schluessel fragte nach
+   Pro. Ein Kopierfehler, der Investor komplett ausgesperrt hat.
+   Rechner = bmf_calc_export (Investor+) · Advanced = bmf_advanced (Pro+). */
+function _hasBmfCalc(){
+  try {
+    if(window.DealPilotConfig && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.hasFeature === 'function'){
+      return DealPilotConfig.pricing.hasFeature('bmf_calc_export');
+    }
+  } catch(_) {}
+  return false;
+}
 function _hasBmfAdvanced(){
   try {
     if(window.DealPilotConfig && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.hasFeature === 'function'){
@@ -71,7 +83,7 @@ function openBMFFromMode(mode){
     toast('🔒 Detaillierte Berechnung ist Teil des Pro-Plans');
     return;
   }
-  if(mode === 'simple' && !_hasBmfAdvanced()){
+  if(mode === 'simple' && !_hasBmfCalc()){
     toast('🔒 BMF-Rechner ist Teil des Investor-Plans oder höher');
     return;
   }
@@ -1576,10 +1588,12 @@ function _ensureModalLoaded(callback){
 
 function openBMFModal(){
   // V289.2.1: Plan-Check defensiv beim Klick
-  // _hasBmfAdvanced() returnt initial false weil Sub.hasCachedFeature async lädt.
-  if(!_hasBmfAdvanced()){
-    toast('🔒 Detaillierte Berechnung ist Teil des Pro-Plans — Upgrade in Settings');
-    console.warn('[bmf-modal] bmf_advanced feature not available — user not Pro?');
+  // W41-bmf-gate: hier stand der Advanced-Check — das Pro-Extra. Damit war der
+  //               ganze Rechner Pro-only, obwohl die Landing (Z.2850) Investor
+  //               'BMF-Rechner & Export' verspricht. Jetzt bmf_calc_export.
+  if(!_hasBmfCalc()){
+    toast('🔒 BMF-Rechner ist Teil des Investor-Plans oder höher');
+    console.warn('[bmf-modal] bmf_calc_export nicht verfuegbar — Plan unter Investor?');
     return;
   }
 
