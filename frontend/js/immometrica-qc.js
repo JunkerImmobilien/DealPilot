@@ -1,4 +1,6 @@
 'use strict';
+/* W30-wl-token: Gold-Literale zeigen auf die Whitelabel-Ebene
+   (var(--wl-<hex>, #<hex>)). Ohne Whitelabel greift der Fallback = unveraendert. */
 /* immometrica-qc.js — laeuft IM QuickCheck-iframe.
    Haengt den ImmoMetrica-Chip zur Laufzeit an #qc7-sources (kein Markup-Patch),
    nutzt den Picker im Parent (window.parent.ImmoMetricaImport) und schreibt die
@@ -36,7 +38,7 @@
       '}',
       /* Abrufen-Button = goldenes Pill wie Objekt-Tab (v601 ist nur auf #obj-action-bar
          gescoped; QC fiel auf die weisse v597-Regel zurueck). Gilt auch auf Mobile. */
-      '#qc7-sources .dp-pf-launch,#qc7-sources .dp-pf-launch:hover,#qc7-sources .dp-pf-launch:focus,#qc7-sources .dp-pf-launch:active{background:linear-gradient(180deg,#E8CC7A,#C9A84C) !important;color:#1a1407 !important;border:none !important;box-shadow:0 2px 6px -2px rgba(0,0,0,.30) !important;filter:none !important;opacity:1 !important}',
+      '#qc7-sources .dp-pf-launch,#qc7-sources .dp-pf-launch:hover,#qc7-sources .dp-pf-launch:focus,#qc7-sources .dp-pf-launch:active{background:linear-gradient(180deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C)) !important;color:#1a1407 !important;border:none !important;box-shadow:0 2px 6px -2px rgba(0,0,0,.30) !important;filter:none !important;opacity:1 !important}',
       '#qc7-sources .dp-pf-launch:hover{filter:brightness(1.04) !important}',
       '#qc7-sources .dp-pf-launch .dp-pf-ic,#qc7-sources .dp-pf-launch .dp-pf-ic svg{color:#1a1407 !important;stroke:#1a1407 !important}'
     ].join('\n');

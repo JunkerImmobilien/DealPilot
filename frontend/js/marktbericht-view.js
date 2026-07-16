@@ -1,3 +1,4 @@
+/* W35-wl-token: Gold zeigt auf die Whitelabel-Ebene. */
 /* v649 (Boarding-Band): Marktbericht inline im PRE-FLIGHT/Boarding-Stil.
  * - Obsidian-Stub + Gold-Band + grosse Ueberschrift + Kosten-Chip + PDF-Export + "Zurueck".
  * - PDF-Export in der Band klickt intern den iframe-Button #mbTopPdf (same-origin).
@@ -18,22 +19,31 @@
       'body.mb-standalone-active #s-marktbericht{display:block!important;background:#fff;min-height:auto;padding:0}',
       '#s-marktbericht{background:#fff}',
       /* Boarding-Band */
-      '.mbv-band{position:relative;display:flex;align-items:stretch;border-radius:16px;overflow:visible;border:1px solid rgba(201,168,76,.45);margin:8px 0 16px;box-shadow:0 12px 30px -18px rgba(0,0,0,.4)}',
+      '.mbv-band{position:relative;display:flex;align-items:stretch;border-radius:16px;overflow:visible;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);margin:8px 0 16px;box-shadow:0 12px 30px -18px rgba(0,0,0,.4)}',
       /* v653-klassik: Reisszone + QR + Stanzkerben + closex */
       '.mbv-rz{position:relative;display:flex;align-items:center;gap:14px;padding:0 18px;background:#fff;border-left:2px dashed rgba(26,20,7,.32);border-radius:0 16px 16px 0;min-width:150px}',
       '.mbv-qr svg{width:54px;height:54px;display:block;border-radius:7px;border:1px solid rgba(5,5,5,.2);background:#fff;padding:2px;box-shadow:0 4px 12px -6px rgba(0,0,0,.4)}',
-      '.mbv-closex{position:absolute;top:-10px;right:-10px;width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid rgba(201,168,76,.55);color:#7a6a3a;font-family:"JetBrains Mono",monospace;font-weight:700;font-size:15px;line-height:1;display:grid;place-items:center;cursor:pointer;z-index:7;box-shadow:0 2px 8px rgba(0,0,0,.18);padding:0}',
-      '.mbv-closex:hover{background:#fff7e6;color:#1a1407}',
-      '.mbv-stub::before,.mbv-stub::after,.mbv-rz::before,.mbv-rz::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;border:1px solid rgba(201,168,76,.35);z-index:6}',
+      '.mbv-closex{position:absolute;top:-10px;right:-10px;width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);color:var(--wl-7a6a3a, #7a6a3a);font-family:"JetBrains Mono",monospace;font-weight:700;font-size:15px;line-height:1;display:grid;place-items:center;cursor:pointer;z-index:7;box-shadow:0 2px 8px rgba(0,0,0,.18);padding:0}',
+      '.mbv-closex:hover{background:var(--wl-fff7e6, #fff7e6);color:#1a1407}',
+      '.mbv-stub::before,.mbv-stub::after,.mbv-rz::before,.mbv-rz::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);z-index:6}',
       '.mbv-stub::before{top:-8px;right:-9px}',
       '.mbv-stub::after{bottom:-8px;right:-9px}',
       '.mbv-rz::before{top:-8px;left:-9px}',
       '.mbv-rz::after{bottom:-8px;left:-9px}',
       '.mbv-stub{position:relative;background:#0a0a0a;color:#e9e3d2;padding:16px 22px;display:flex;flex-direction:column;justify-content:center;gap:3px;border-right:2px dashed rgba(255,255,255,.30);min-width:172px;border-radius:16px 0 0 16px}',
-      '.mbv-stub .bp{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.2em;color:#bda767}',
+      '.mbv-stub .bp{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.2em;color:var(--wl-bda767, #bda767)}',
       '.mbv-stub .k{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:30px;color:#fff;line-height:1}',
-      '.mbv-stub .s{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.1em;color:#cdbb85}',
-      '.mbv-bandmain{flex:1;background:linear-gradient(100deg,#C9A84C,#d8bd66 55%,#C9A84C);display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 24px;flex-wrap:wrap}',
+      '.mbv-stub .s{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.1em;color:var(--wl-cdbb85, #cdbb85)}',
+      /* W43-stub-logo: Die Wortmarke stand zusammen mit dem Zusatz in EINEM
+         span mit class="s". Der Sweeper (W11) schaut nur in WM_SEL — da ist
+         "s" nicht drin — und verlangt ausserdem, dass der Text GENAU
+         "DealPilot" ist. Beides traf nicht zu, also blieb der Stub gold
+         beschriftet. Jetzt traegt die Wortmarke ein eigenes .dp-wordmark.
+         Der Sweeper setzt dort ein <img max-height:1.5em> inline; 1.5em von
+         9px = 13,5px — passt. Nur die max-width von 150px ist fuer den
+         schmalen Stub zu grosszuegig. !important, weil inline sonst gewinnt. */
+      '.mbv-stub .s .dp-wordmark img{max-width:92px !important;max-height:13px !important;vertical-align:-2px}',
+      '.mbv-bandmain{flex:1;background:linear-gradient(100deg,var(--wl-c9a84c, #C9A84C),var(--wl-d8bd66, #d8bd66) 55%,var(--wl-c9a84c, #C9A84C));display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 24px;flex-wrap:wrap}',
       '.mbv-bandmain .ttl{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:30px;color:#1a1407;line-height:1.05}',
       '.mbv-bandmain .ttl .sub{display:block;font-weight:500;font-size:13px;color:#3a2f12;opacity:.9;margin-top:5px;font-family:"Inter",sans-serif;max-width:560px}',
       '.mbv-band-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}',
@@ -41,7 +51,7 @@
       '.mbv-bc{width:84px;height:36px;background:repeating-linear-gradient(90deg,#0a0a0a 0 2px,transparent 2px 4px);opacity:.65;border-radius:3px}',
       '.mbv-back{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(26,20,7,.5);background:rgba(255,255,255,.88);color:#1a1407;border-radius:10px;padding:9px 15px;cursor:pointer;font-weight:700;font-size:13px;font-family:inherit}',
       '.mbv-back:hover{background:#fff}',
-      '.mbv-pdf{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(26,20,7,.55);background:#0a0a0a;color:#E8CC7A;border-radius:10px;padding:9px 15px;cursor:pointer;font-weight:700;font-size:13px;font-family:inherit}',
+      '.mbv-pdf{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(26,20,7,.55);background:#0a0a0a;color:var(--wl-e8cc7a, #E8CC7A);border-radius:10px;padding:9px 15px;cursor:pointer;font-weight:700;font-size:13px;font-family:inherit}',
       '.mbv-pdf:hover{background:#161310}',
       '.mbv-frame{width:100%;border:0;display:block;height:640px;background:#fff;border-radius:14px;overflow:hidden}',
       '@media (max-width:760px){.mbv-band{flex-direction:column}.mbv-stub{border-right:0;border-bottom:2px dashed rgba(255,255,255,.30);flex-direction:row;align-items:center;gap:10px;border-radius:16px 16px 0 0}.mbv-stub .k{font-size:22px}.mbv-bandmain{padding:14px 16px}.mbv-bandmain .ttl{font-size:24px}.mbv-bc{display:none}.mbv-stub::before,.mbv-stub::after,.mbv-rz::before,.mbv-rz::after{display:none}.mbv-rz{border-left:0;border-top:2px dashed rgba(26,20,7,.32);border-radius:0 0 16px 16px;justify-content:center;padding:12px 16px}}'
@@ -70,7 +80,7 @@
   }
 
   function frameSrc(query) {
-    return '/marktbericht-app/index.html?v=900&theme=' + mbTheme() + (query ? '&' + query : '');
+    return '/marktbericht-app/index.html?v=W36&theme=' + mbTheme() + (query ? '&' + query : '');
   }
 
   // iframe waechst auf Content-Hoehe -> kein innerer Scrollbalken, Seite scrollt
@@ -104,7 +114,7 @@
     var host = $('s-marktbericht'); if (!host) return;
     host.innerHTML =
       '<div class="mbv-band">' +
-        '<div class="mbv-stub"><span class="bp">BOARDING PASS</span><span class="k">MB</span><span class="s">DealPilot \u00b7 Bericht</span></div>' +
+        '<div class="mbv-stub"><span class="bp">BOARDING PASS</span><span class="k">MB</span><span class="s"><span class="dp-wordmark">DealPilot</span> \u00b7 Bericht</span></div>' +
         '<div class="mbv-bandmain">' +
           '<div class="ttl">Marktbericht<span class="sub">Voller Marktbericht \u2013 Daten aus dem gew\u00e4hlten Objekt vorbef\u00fcllt, im Bericht anpassbar.</span></div>' +
           '<div class="mbv-band-actions">' +

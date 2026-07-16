@@ -223,11 +223,16 @@ router.put('/branding-contact', async (req, res, next) => {
          brand_phone = $6, brand_email = $7, brand_website = $8, brand_tagline = $9,
          brand_mail_accent = COALESCE($10, brand_mail_accent),
          brand_pdf_light = COALESCE($11, brand_pdf_light),   /*W12-pdflight*/
+         brand_display   = COALESCE($12, brand_display),     /*W20-display*/
          updated_at = now()
        WHERE id = $1`,
       [req.reseller.id, t(b.brand_company,120), t(b.brand_address,160), t(b.brand_plz,12),
        t(b.brand_city,80), t(b.brand_phone,60), mail, t(b.brand_website,160), t(b.brand_tagline,120),
-       macc, (typeof b.brand_pdf_light === 'boolean' ? b.brand_pdf_light : null)]);
+       macc, (typeof b.brand_pdf_light === 'boolean' ? b.brand_pdf_light : null),
+       /* W20-display: nur ein echtes Objekt akzeptieren — kein Array, kein String.
+          Sonst schriebe ein Tippfehler im Frontend Muell in die jsonb-Spalte. */
+       (b.brand_display && typeof b.brand_display === 'object' && !Array.isArray(b.brand_display)
+          ? JSON.stringify(b.brand_display) : null)]);
     res.json({ ok: true });
   } catch (e) { next(e); }
 });
@@ -238,7 +243,7 @@ router.get('/branding', async (req, res, next) => {
       /* W1a-contact */
       `SELECT brand_name, whitelabel_enabled, brand_logo_b64, brand_accent, brand_accent_hi, brand_accent_lo, brand_obsidian,
               brand_company, brand_address, brand_plz, brand_city, brand_phone, brand_email, brand_website, brand_tagline,
-              brand_mail_accent, brand_pdf_light /*W8-mailaccent W12-pdflight*/
+              brand_mail_accent, brand_pdf_light, brand_display /*W8 W12 W20-display*/
          FROM resellers WHERE id=$1`, [req.reseller.id]);
     res.json({ branding: r.rows[0] || {} });
   } catch (e) { next(e); }

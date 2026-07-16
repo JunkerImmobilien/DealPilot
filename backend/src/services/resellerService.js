@@ -313,6 +313,29 @@ async function listSharesForReseller(resellerId) {
 }
 
 // Cross-Account: freigegebenes Objekt read-only holen (nur eigene, aktive Freigabe)
+/* W27-sharedowner: Der Partner soll die ECHTEN Engine-PDFs eines freigegebenen
+   Objekts ziehen koennen (Investment, Werbungskosten pro Jahr). Die Engine laeuft
+   im Frontend und laedt ueber GET /objects/:id — dort bekommt der Partner heute
+   404, weil das Objekt dem Mandanten gehoert.
+   Diese Funktion liefert die USER-ID DES EIGENTUEMERS, wenn eine AKTIVE Freigabe
+   besteht — sonst null. Die Route ruft damit dieselbe getById()-Funktion wie sonst
+   auch: gleiche Datenform, gleicher Codepfad, kein Parallelweg.
+   Regel identisch zu getSharedObject(): widerrufen/zurueckgegeben = kein Zugriff. */
+async function sharedObjectOwner(userId, objectId) {
+  try {
+    const rs = await getResellerForUser(userId);
+    if (!rs) return null;
+    const s = await query(
+      `SELECT status FROM object_shares WHERE object_id = $1 AND reseller_id = $2 LIMIT 1`,
+      [objectId, rs.id]);
+    if (!s.rowCount) return null;
+    const st = s.rows[0].status;
+    if (st === 'widerrufen' || st === 'zurueckgegeben') return null;
+    const o = await query(`SELECT user_id FROM objects WHERE id = $1`, [objectId]);
+    return o.rowCount ? o.rows[0].user_id : null;
+  } catch (e) { return null; }
+}
+
 async function getSharedObject(resellerId, shareId) {
   const s = await query(`SELECT object_id, status FROM object_shares WHERE id = $1 AND reseller_id = $2`, [shareId, resellerId]);
   if (!s.rowCount) { const e = new Error('share_not_found'); e.status = 404; throw e; }
@@ -438,6 +461,7 @@ module.exports = {
   revokeMandantShare,
   listSharesForReseller,
   getSharedObject,
+  sharedObjectOwner,   /*W27-sharedowner*/
   createInvite,
   listInvites,
   revokeInvite,

@@ -28,10 +28,27 @@ function wrap(o) {
   var preheader = o.preheader || '';
   var footer    = o.footerNote || 'DealPilot \u00b7 Junker Immobilien \u00b7 <a href="https://www.junker-immobilien.io" style="color:#b8932f;text-decoration:none;">junker-immobilien.io</a>';
 
+  /* W18-mailbrand: der Hero-Verlauf war hart auf DealPilot-Gold. brandTag und
+     footerNote waren laengst parametrisierbar — die Farbe nicht. Jetzt:
+       wrap({ accent:'#b53636', brandTag:'SCHMIDT & PARTNER', footerNote:'...' })
+     Ohne accent bleibt alles exakt wie bisher (DealPilot-Gold). */
+  function _hx(h) { return /^#[0-9a-fA-F]{6}$/.test(h || '') ? h : null; }
+  function _mix(hex, p) {
+    var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    function f(v) {
+      var x = p > 0 ? v + (255 - v) * p : v * (1 + p);
+      return ('0' + Math.max(0, Math.min(255, Math.round(x))).toString(16)).slice(-2);
+    }
+    return '#' + f(r) + f(g) + f(b);
+  }
+  var acc   = _hx(o.accent)   || '#C9A84C';
+  var accHi = _hx(o.accentHi) || (o.accent ? _mix(acc, 0.22) : '#E8CC7A');
+  var accLo = _hx(o.accentLo) || (o.accent ? _mix(acc, -0.16) : '#b8932f');
+
   var hero = '';
   if (kicker || title || sub) {
     hero =
-    '<tr><td style="background:#C9A84C;background:linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f);padding:30px 26px 26px;">' +
+    '<tr><td style="background:' + acc + ';background:linear-gradient(110deg,' + accHi + ',' + acc + ' 60%,' + accLo + ');padding:30px 26px 26px;">' +
       (kicker ? '<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;letter-spacing:3px;color:#5a4a14;font-weight:700;">' + _esc(kicker) + '</div>' : '') +
       (title ? '<div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:25px;line-height:1.2;font-weight:700;color:#1a1407;margin-top:8px;">' + _esc(title) + '</div>' : '') +
       (sub ? '<div style="font-size:14px;line-height:1.5;color:#3a2e08;margin-top:8px;">' + sub + '</div>' : '') +

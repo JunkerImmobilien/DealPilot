@@ -1,3 +1,63 @@
+/* W40-pdf-svg: Whitelabel-Farbe als Hex zur Laufzeit. Ein Hex ist ueberall
+   gueltig — in SVG-Praesentationsattributen, in CSS, in Leaflet. var() ist es
+   nicht. Genau daran ist W36 hier gescheitert. */
+if (!window._wlc) {
+  window._wlc = function (h) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--wl-' + h.slice(1).toLowerCase());
+      v = (v || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) return v;
+    } catch (e) {}
+    return h;
+  };
+}
+if (!window._wlrgbaH) {
+  window._wlrgbaH = function (h, a) {
+    var c = window._wlc(h);
+    return 'rgba(' + parseInt(c.substr(1, 2), 16) + ',' + parseInt(c.substr(3, 2), 16) + ',' + parseInt(c.substr(5, 2), 16) + ',' + a + ')';
+  };
+}
+/* W40-pdf-svg: jsPDF kennt kein CSS — dort stehen RGB-Tripel. Im Hauptdokument
+   liefert pdf.js seine Palette (W1) und _dpPdfSetAccent() mutiert C.GOLD in
+   place. Im Marktbericht-iframe gibt es pdf.js nicht — dort faellt die Funktion
+   auf --wl-c9a84c zurueck, das die Bruecke aus W36 setzt.
+   Ohne Whitelabel: [201,168,76], also unveraendert. */
+if (!window._pdfGold) {
+  window._pdfGold = function () {
+    try {
+      var c = window._dpPdfColors;
+      if (c && c.GOLD && c.GOLD.length === 3) return [c.GOLD[0], c.GOLD[1], c.GOLD[2]];
+    } catch (e) {}
+    try {
+      var v = (getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c') || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) {
+        return [parseInt(v.substr(1, 2), 16), parseInt(v.substr(3, 2), 16), parseInt(v.substr(5, 2), 16)];
+      }
+    } catch (e) {}
+    return [201, 168, 76];
+  };
+}
+/* W36-wl-token: Whitelabel-Farbe zur Laufzeit.
+   Canvas und SVG-Praesentationsattribute verstehen kein var().
+   _wlrgbaH(hex, alpha) ist neu: die Partikel brauchen auch var(--wl-e8c766, #E8C766) als rgba,
+   nicht nur das Basisgold. Eigener Guard, damit es sich neben dem schon
+   ausgelieferten _wlrgba(alpha) installiert. */
+if (!window._wlc) {
+  window._wlc = function (h) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--wl-' + h.slice(1).toLowerCase());
+      v = (v || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) return v;
+    } catch (e) {}
+    return h;
+  };
+}
+if (!window._wlrgbaH) {
+  window._wlrgbaH = function (h, a) {
+    var c = window._wlc(h);
+    return 'rgba(' + parseInt(c.substr(1, 2), 16) + ',' + parseInt(c.substr(3, 2), 16) + ',' + parseInt(c.substr(5, 2), 16) + ',' + a + ')';
+  };
+}
 // app.js — Dashboard-Logik (Vanilla JS, kein Build-Step; passt zu DealPilot).
 const API = '/api/v1/marktbericht';
 let map, marker, compLayer, chart;
@@ -99,7 +159,7 @@ async function generate() {
       const mark = isLast
         ? '<span class="spin" style="width:11px;height:11px;"></span>'
         : '<span style="color:#3FA56C;">✓</span>';
-      const col = isLast ? '#C9A84C' : '#7a7a83';
+      const col = isLast ? window._wlc('#C9A84C') : '#7a7a83';
       return `<div style="font-size:12px;color:${col};padding:2px 0;display:flex;gap:7px;align-items:center;">${mark}<span>${s}</span></div>`;
     }).join('');
   };
@@ -111,7 +171,7 @@ async function generate() {
       if (rb) { rb.classList.remove('hide'); if (prog.parentNode !== rb) rb.insertBefore(prog, rb.firstChild); }
     } catch (e) {}
     prog.classList.remove('hide');
-    prog.innerHTML = '<div style="height:8px;background:#16161b;border-radius:999px;overflow:hidden;margin-bottom:12px;box-shadow:inset 0 1px 3px rgba(0,0,0,.4);"><div id="genProgBar" style="height:100%;width:4%;background:linear-gradient(90deg,#bd9a3e,#C9A84C 50%,#E8CC7A);border-radius:999px;transition:width .65s cubic-bezier(.22,.61,.36,1);box-shadow:0 0 10px rgba(201,168,76,.55);"></div></div><div id="genProgSteps"></div>';
+    prog.innerHTML = '<div style="height:8px;background:#16161b;border-radius:999px;overflow:hidden;margin-bottom:12px;box-shadow:inset 0 1px 3px rgba(0,0,0,.4);"><div id="genProgBar" style="height:100%;width:4%;background:linear-gradient(90deg,var(--wl-bd9a3e, #bd9a3e),var(--wl-c9a84c, #C9A84C) 50%,var(--wl-e8cc7a, #E8CC7A));border-radius:999px;transition:width .65s cubic-bezier(.22,.61,.36,1);box-shadow:0 0 10px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);"></div></div><div id="genProgSteps"></div>';
   }
   var EXPECTED_STEPS = 14;
 
@@ -226,9 +286,9 @@ function render(out) {
       ].filter(Boolean).map(([n, v]) =>
         `<span style="background:#1a1a1f;border:1px solid #2a2a30;border-radius:8px;padding:4px 10px;font-size:12px;color:#cfcfd6;">${n}: <b style="color:#fff;">${v}</b></span>`).join(' ');
       dm.classList.remove('hide');
-      dm.innerHTML = `<div style="background:linear-gradient(135deg,#16210f,#1a1a1f);border:1px solid #C9A84C;border-radius:12px;padding:14px 16px;">
+      dm.innerHTML = `<div style="background:linear-gradient(135deg,#16210f,#1a1a1f);border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:12px;padding:14px 16px;">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-          <span style="font-family:'Space Grotesk';font-weight:700;font-size:22px;color:#C9A84C;">DealScore 2: ${m.value}</span>
+          <span style="font-family:'Space Grotesk';font-weight:700;font-size:22px;color:var(--wl-c9a84c, #C9A84C);">DealScore 2: ${m.value}</span>
           <span style="font-size:12px;color:#8a8a93;">aus DealPilot übernommen${m.kpis_complete ? ' · vollständige Finanzierungsdaten' : ''}</span>
         </div>
         ${kpiChips ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">${kpiChips}</div>` : ''}
@@ -264,7 +324,7 @@ function render(out) {
   if (osEl) { osEl.classList.add('hide'); } /* v569-appbeh: Objektkarte aus */
   if (false) {
     const rf = d.ref || {}, adr = (d.address && d.address.formatted) || rf.address || '–';
-    const chip = (t) => `<span style="display:inline-block;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.35);color:#e7e2d4;border-radius:999px;padding:3px 10px;font-size:11.5px;font-family:'JetBrains Mono';">${t}</span>`;
+    const chip = (t) => `<span style="display:inline-block;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);color:#e7e2d4;border-radius:999px;padding:3px 10px;font-size:11.5px;font-family:'JetBrains Mono';">${t}</span>`;
     const facts = [
       rf.property_type, rf.living_area ? rf.living_area + ' m²' : null, rf.rooms ? rf.rooms + ' Zi.' : null,
       rf.build_year ? 'Bj. ' + rf.build_year : null, rf.floor != null ? rf.floor + '. Etage' : null,
@@ -284,13 +344,13 @@ function render(out) {
     ].filter(Boolean);
     osEl.classList.remove('hide');
     osEl.style.cssText = 'position:relative;overflow:hidden;margin-bottom:16px;padding:16px 18px;border-radius:14px;'
-      + 'border:1px solid rgba(201,168,76,.35);background-color:#070708;background-image:'
-      + 'radial-gradient(circle at 18% 22%,rgba(201,168,76,.13),transparent 42%),'
+      + 'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);background-color:#070708;background-image:'
+      + 'radial-gradient(circle at 18% 22%,color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent),transparent 42%),'
       + 'radial-gradient(circle at 88% 78%,rgba(70,100,120,.12),transparent 46%),'
       + 'radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);'
       + 'background-size:auto,auto,22px 22px;';
     osEl.innerHTML = `
-      <div style="font-size:10px;letter-spacing:1.4px;color:#C9A84C;font-weight:700;margin-bottom:4px;">OBJEKT</div>
+      <div style="font-size:10px;letter-spacing:1.4px;color:var(--wl-c9a84c, #C9A84C);font-weight:700;margin-bottom:4px;">OBJEKT</div>
       <div style="font-family:'Space Grotesk';font-weight:700;font-size:17px;color:#fff;margin-bottom:10px;">${adr}</div>
       <div style="display:flex;flex-wrap:wrap;gap:7px;">${facts.map(chip).join('')}</div>`;
   }
@@ -383,20 +443,22 @@ function confInfo(c) {
   if (c == null) return null;
   if (c >= 0.85) return { label: 'Hoch', color: '#3FA56C', text: 'Große Vergleichsstichprobe – belastbare Marktwertindikation.' };
   if (c >= 0.65) return { label: 'Gut', color: '#3FA56C', text: 'Solide Datenbasis – gute Indikation mit geringer Unsicherheit.' };
-  if (c >= 0.45) return { label: 'Mittel', color: '#C9A84C', text: 'Eingeschränkte Stichprobe – als Orientierung zu verstehen, nicht als exakter Wert.' };
+  if (c >= 0.45) return { label: 'Mittel', color: window._wlc('#C9A84C'), text: 'Eingeschränkte Stichprobe – als Orientierung zu verstehen, nicht als exakter Wert.' };
   return { label: 'Gering', color: '#B86250', text: 'Kleine Stichprobe – nur grobe Orientierung, mit Vorsicht zu nutzen.' };
 }
 
 // ===== SVG-Visualisierungen (DealPilot-Stil) =====
 // DealPilot-Statuslogik (aus Design-Handoff): >=70 gruen, 50-69 gold, <50 rot.
-const DP_GREEN = '#3FA56C', DP_GOLD = '#C9A84C', DP_RED = '#B86250';
-function _scoreCol(s) { s = s || 0; return s >= 70 ? DP_GREEN : s >= 50 ? DP_GOLD : DP_RED; }
+const DP_GREEN = '#3FA56C', DP_RED = '#B86250';
+/* W40-pdf-svg: DP_GOLD war top-level und wurde beim LADEN ausgewertet — also
+   vor dem Branding. Die Aufloesung sitzt jetzt in _scoreCol() (pro Render). */
+function _scoreCol(s) { s = s || 0; return s >= 70 ? DP_GREEN : s >= 50 ? window._wlc('#C9A84C') : DP_RED; }
 function _scoreTier(s) { s = s || 0; return s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : 'Schwach'; }
 function _kiRaet(s) { s = s || 0; return s >= 85 ? 'Aktiv ausbauen' : s >= 70 ? 'Kauf erwägen' : s >= 50 ? 'Genau prüfen' : 'Zurückhaltung'; }
 // Donut-Ring im DealPilot-Stil: dicker Ring, tier-farbig, Score gross, Tier-Pille unten.
 function svgDonut(score, conf) { /*v895-doublering*/
   const s = Math.max(0, Math.min(100, score || 0)), cx = 85, cy = 85, col = _scoreCol(s), tier = _scoreTier(s);
-  const rO = 68, rI = 51, hasConf = (conf != null && !isNaN(conf)), cCol = '#C9A84C';
+  const rO = 68, rI = 51, hasConf = (conf != null && !isNaN(conf)), cCol = window._wlc('#C9A84C');
   const arc = (r, pct) => {
     const p = Math.max(0, Math.min(100, pct || 0)), n = Math.max(2, Math.round(p / 100 * 90)), pts = [];
     for (let i = 0; i <= n; i++) { const a = -Math.PI / 2 + (p / 100) * 2 * Math.PI * i / n; pts.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1)); }
@@ -428,8 +490,8 @@ function svgGauge(value, lo, hi, opts) { /*v895d-p1*/
   const cx = 110, cy = 104, r = 86, t = Math.max(0, Math.min(1, (value - lo) / (hi - lo)));
   const _l = (typeof _mbLight === 'function') ? _mbLight() : false;
   const cNeedle = _l ? '#3a3630' : '#e8e8ea', cVal = _l ? '#2a2727' : '#e8e8ea', cCap = _l ? '#8a857c' : '#6a6a72', cLab = _l ? '#8a857c' : '#8a8a93';
-  const cMk = _l ? '#9a7d28' : '#E8E2D4', cMkS = _l ? '#ffffff' : '#0a0a0c';
-  const zones = opts.zones || [[0, 0.4, '#b8932f'], [0.4, 0.72, '#C9A84C'], [0.72, 1, '#E8CC7A']];
+  const cMk = _l ? window._wlc('#9a7d28') : '#E8E2D4', cMkS = _l ? '#ffffff' : '#0a0a0c';
+  const zones = opts.zones || [[0, 0.4, window._wlc('#b8932f')], [0.4, 0.72, window._wlc('#C9A84C')], [0.72, 1, window._wlc('#E8CC7A')]];
   const arcs = zones.map(([a, b, c]) => `<polyline points="${_arcPts(cx, cy, r, a, b, 16)}" fill="none" stroke="${c}" stroke-width="12" stroke-linecap="butt"/>`).join('');
   const w = Math.PI * (1 - t), nx = cx + (r - 8) * Math.cos(w), ny = cy - (r - 8) * Math.sin(w);
   const needle = `<line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${cNeedle}" stroke-width="2.6" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="5" fill="${cNeedle}"/>`;
@@ -450,7 +512,7 @@ function rangeStrip(lo, mid, hi, fmt, marker, markerLabel) {
   const mkl = (marker != null && markerLabel) ? `<div style="font-size:10px;color:#E8E2D4;text-align:center;margin-top:2px;">${markerLabel}</div>` : '';
   return `<div style="position:relative;height:8px;border-radius:999px;margin:8px 0 4px;overflow:visible;
       background:linear-gradient(90deg,#2f4030 0%,#2f4030 34%,#3d3a24 34%,#3d3a24 66%,#3f2a24 66%,#3f2a24 100%);">
-      <div style="position:absolute;top:50%;left:${pos(mid)}%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;background:#C9A84C;box-shadow:0 0 0 3px #141417;"></div>${mk}</div>
+      <div style="position:absolute;top:50%;left:${pos(mid)}%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;background:var(--wl-c9a84c, #C9A84C);box-shadow:0 0 0 3px #141417;"></div>${mk}</div>
     <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:10.5px;color:#8a8a93;">
       <span>${fmt(lo)}</span><span style="color:#e8e8ea;font-weight:600;">${fmt(mid)}</span><span>${fmt(hi)}</span></div>${mkl}`;
 }
@@ -466,7 +528,7 @@ function renderScore(d) { /*v895-doublering*/
   const confPct = (mv.confidence_pct != null) ? mv.confidence_pct : null;
   let confLbl = mv.confidence_label || null;
   if (!confLbl && confPct != null) { const ci = confInfo(confPct / 100); confLbl = ci ? ci.label : null; }
-  const confCol = (confPct == null) ? '#8a8a93' : (confPct >= 70 ? '#3FA56C' : confPct >= 55 ? '#C9A84C' : '#B86250');
+  const confCol = (confPct == null) ? '#8a8a93' : (confPct >= 70 ? '#3FA56C' : confPct >= 55 ? window._wlc('#C9A84C') : '#B86250');
   box.innerHTML = `
     <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;width:100%;">
       ${svgDonut(ds.score, confPct)}
@@ -480,7 +542,7 @@ function renderScore(d) { /*v895-doublering*/
         </div>
         <div style="display:flex;gap:15px;margin-top:10px;font-size:10.5px;color:#8a8a93;flex-wrap:wrap;">
           <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:2px;background:${col};display:inline-block;"></span>Score (Au\u00dfenring)</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:2px;background:#C9A84C;display:inline-block;"></span>Aussagekraft (Innenring)</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:2px;background:var(--wl-c9a84c, #C9A84C);display:inline-block;"></span>Aussagekraft (Innenring)</span>
         </div>` : ''}
       </div>
     </div>`;
@@ -520,14 +582,14 @@ function renderValuation(d) {
           </div>
           <div style="color:#9a9aa2;font-size:12px;margin-top:4px;line-height:1.4;">${ci.text}</div>` : '';
       }
-      const col = pct >= 70 ? '#3FA56C' : pct >= 55 ? '#C9A84C' : '#B86250';
+      const col = pct >= 70 ? '#3FA56C' : pct >= 55 ? window._wlc('#C9A84C') : '#B86250';
       const miss = mv.input_missing || [];
       return `<div style="margin-top:12px;display:flex;align-items:center;gap:8px;">
           <span style="width:11px;height:11px;border-radius:50%;background:${col};display:inline-block;box-shadow:0 0 8px ${col}66;"></span>
           <span style="font-weight:700;color:${col};">Aussagekraft: ${lbl} · ${pct}%</span>
           ${n ? `<span style="color:#8a8a93;font-size:12px;">(${n.toLocaleString('de-DE')} Vergleiche${mv.input_filled != null ? `, ${mv.input_filled}/${mv.input_total} Objektangaben` : ''})</span>` : ''}
         </div>
-        <div style="color:#9a9aa2;font-size:12px;margin-top:4px;line-height:1.4;">${miss.length ? 'Genauer wird die Bewertung mit: <b style="color:#c9a84c;">' + miss.join(', ') + '</b>.' : (ci ? ci.text : 'Alle wertrelevanten Objektangaben berücksichtigt.')}</div>`;
+        <div style="color:#9a9aa2;font-size:12px;margin-top:4px;line-height:1.4;">${miss.length ? 'Genauer wird die Bewertung mit: <b style="color:var(--wl-c9a84c, #c9a84c);">' + miss.join(', ') + '</b>.' : (ci ? ci.text : 'Alle wertrelevanten Objektangaben berücksichtigt.')}</div>`;
     })()}`;
 
   // -- Marktmiete-Karte --
@@ -625,21 +687,21 @@ function _smoothPath(pts){
 function _mbPalette(){
   const light = _mbLight();
   return light ? {
-    light:true, panel:'#FFFFFF', panelStroke:'rgba(201,168,76,.20)',
+    light:true, panel:'#FFFFFF', panelStroke:window._wlrgbaH('#C9A84C', 0.2),
     txt:'#8a8172', txtStrong:'#4a443c', grid:'rgba(90,72,20,.10)', base:'rgba(184,147,47,.45)',
-    pillBg:'#FFFFFF', pillBorder:'#b8932f', goldTxt:'#9a7d28', legBg:'rgba(120,96,30,.06)', legTxt:'#5a5348',
-    lineA:'#d9b95a', lineB:'#C9A84C', lineC:'#a8842c', dot:'#b8932f', dotStroke:'#ffffff',
-    areaTop:'.30', areaMid:'.12', barTop:'#d8cfbe', barBot:'#a89f8c', medTop:'#cdae4e', medBot:'#a8842c',
-    stone:'#8a8172', axisGold:'#b8932f', bandFill:'rgba(201,168,76,.16)', bandStroke:'rgba(184,147,47,.4)',
-    bandTxt:'#9a7d28', medLine:'rgba(184,147,47,.72)', glow:2.4, topHi:'.4'
+    pillBg:'#FFFFFF', pillBorder:window._wlc('#b8932f'), goldTxt:window._wlc('#9a7d28'), legBg:'rgba(120,96,30,.06)', legTxt:'#5a5348',
+    lineA:window._wlc('#d9b95a'), lineB:window._wlc('#C9A84C'), lineC:window._wlc('#a8842c'), dot:window._wlc('#b8932f'), dotStroke:'#ffffff',
+    areaTop:'.30', areaMid:'.12', barTop:'#d8cfbe', barBot:'#a89f8c', medTop:window._wlc('#cdae4e'), medBot:window._wlc('#a8842c'),
+    stone:'#8a8172', axisGold:window._wlc('#b8932f'), bandFill:window._wlrgbaH('#C9A84C', 0.16), bandStroke:'rgba(184,147,47,.4)',
+    bandTxt:window._wlc('#9a7d28'), medLine:'rgba(184,147,47,.72)', glow:2.4, topHi:'.4'
   } : {
     light:false, panel:null, panelStroke:null,
-    txt:'#8a8a93', txtStrong:'#c9c9d0', grid:'rgba(255,255,255,.05)', base:'rgba(201,168,76,.28)',
-    pillBg:'#0c0c10', pillBorder:'#C9A84C', goldTxt:'#E8CC7A', legBg:'rgba(255,255,255,.03)', legTxt:'#c9c9d0',
-    lineA:'#E8CC7A', lineB:'#C9A84C', lineC:'#b8932f', dot:'#E8CC7A', dotStroke:'#0a0a0c',
-    areaTop:'.42', areaMid:'.16', barTop:'#6a625d', barBot:'#3c3835', medTop:'#b89a3e', medBot:'#7a6428',
-    stone:'#A89F8E', axisGold:'#C9A84C', bandFill:'rgba(201,168,76,.07)', bandStroke:'rgba(201,168,76,.22)',
-    bandTxt:'rgba(201,168,76,.75)', medLine:'rgba(201,168,76,.65)', glow:3.2, topHi:'.18'
+    txt:'#8a8a93', txtStrong:'#c9c9d0', grid:'rgba(255,255,255,.05)', base:window._wlrgbaH('#C9A84C', 0.28),
+    pillBg:'#0c0c10', pillBorder:window._wlc('#C9A84C'), goldTxt:window._wlc('#E8CC7A'), legBg:'rgba(255,255,255,.03)', legTxt:'#c9c9d0',
+    lineA:window._wlc('#E8CC7A'), lineB:window._wlc('#C9A84C'), lineC:window._wlc('#b8932f'), dot:window._wlc('#E8CC7A'), dotStroke:'#0a0a0c',
+    areaTop:'.42', areaMid:'.16', barTop:'#6a625d', barBot:'#3c3835', medTop:window._wlc('#b89a3e'), medBot:window._wlc('#7a6428'),
+    stone:'#A89F8E', axisGold:window._wlc('#C9A84C'), bandFill:window._wlrgbaH('#C9A84C', 0.07), bandStroke:window._wlrgbaH('#C9A84C', 0.22),
+    bandTxt:window._wlrgbaH('#C9A84C', 0.75), medLine:window._wlrgbaH('#C9A84C', 0.65), glow:3.2, topHi:'.18'
   };
 }
 function _svgDualLine(cfg){
@@ -674,7 +736,7 @@ function _svgDualLine(cfg){
     if(!pts.length) return;
     const path=_smoothPath(pts), last=pts[pts.length-1];
     if(s.fill){
-      defs+=`<linearGradient id="${uid}area${si}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9A84C" stop-opacity="${P.areaTop}"/><stop offset=".45" stop-color="#C9A84C" stop-opacity="${P.areaMid}"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/></linearGradient>`;
+      defs+=`<linearGradient id="${uid}area${si}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + window._wlc('#C9A84C') + '" stop-opacity="${P.areaTop}"/><stop offset=".45" stop-color="' + window._wlc('#C9A84C') + '" stop-opacity="${P.areaMid}"/><stop offset="1" stop-color="' + window._wlc('#C9A84C') + '" stop-opacity="0"/></linearGradient>`;
       defs+=`<linearGradient id="${uid}stroke${si}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${P.lineA}"/><stop offset=".55" stop-color="${P.lineB}"/><stop offset="1" stop-color="${P.lineC}"/></linearGradient>`;
       const area=path+` L${last.x.toFixed(1)},${y1.toFixed(1)} L${pts[0].x.toFixed(1)},${y1.toFixed(1)} Z`;
       body+=`<path d="${area}" fill="url(#${uid}area${si})" opacity="0" style="animation:${uid}fade .9s .35s ease forwards"/>`;
@@ -685,7 +747,7 @@ function _svgDualLine(cfg){
     pts.forEach((p,pi)=>{
       const lastOne = pi===pts.length-1;
       if(lastOne && s.fill){
-        body+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="9" fill="#C9A84C" opacity=".18"><animate attributeName="r" values="7;12;7" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values=".22;.05;.22" dur="2.4s" repeatCount="indefinite"/></circle>`;
+        body+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="9" fill="' + window._wlc('#C9A84C') + '" opacity=".18"><animate attributeName="r" values="7;12;7" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values=".22;.05;.22" dur="2.4s" repeatCount="indefinite"/></circle>`;
         body+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.4" fill="${P.dot}" stroke="${P.dotStroke}" stroke-width="1.6"/>`;
       } else {
         body+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${s.fill?2.8:2.4}" fill="${s.color||P.dot}" stroke="${P.dotStroke}" stroke-width="1.2"/>`;
@@ -704,7 +766,7 @@ function _svgDualLine(cfg){
   }
   let lx=x1, ly=25;
   series.slice().reverse().forEach(s=>{ const w=15+s.name.length*6.2; lx-=w;
-    body+=`<rect x="${lx.toFixed(1)}" y="${ly-11}" width="${w-6}" height="20" rx="10" fill="${P.legBg}"/><circle cx="${(lx+9).toFixed(1)}" cy="${ly-1}" r="3.4" fill="${s.fill?'#C9A84C':s.color}"/><text x="${(lx+16).toFixed(1)}" y="${ly+2.5}" fill="${P.legTxt}" font-size="10.5" font-family="'Space Grotesk',sans-serif">${s.name}</text>`; lx-=6; });
+    body+=`<rect x="${lx.toFixed(1)}" y="${ly-11}" width="${w-6}" height="20" rx="10" fill="${P.legBg}"/><circle cx="${(lx+9).toFixed(1)}" cy="${ly-1}" r="3.4" fill="${s.fill?window._wlc('#C9A84C'):s.color}"/><text x="${(lx+16).toFixed(1)}" y="${ly+2.5}" fill="${P.legTxt}" font-size="10.5" font-family="'Space Grotesk',sans-serif">${s.name}</text>`; lx-=6; });
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;overflow:visible;"><style>@keyframes ${uid}draw{to{stroke-dashoffset:0}}@keyframes ${uid}fade{to{opacity:1}}</style><defs>${defs}</defs>${body}</svg>`;
 }
 function _svgBars(cfg){
@@ -718,7 +780,7 @@ function _svgBars(cfg){
   const slot=plotW/n, bw=Math.min(58, slot*0.56);
   let defs='', body='';
   if(P.panel) body+=`<rect x="1" y="1" width="${W-2}" height="${H-2}" rx="16" fill="${P.panel}" stroke="${P.panelStroke}" stroke-width="1"/>`;
-  defs+=`<linearGradient id="${uid}hl" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#9a751f"/><stop offset=".5" stop-color="#C9A84C"/><stop offset="1" stop-color="#E8CC7A"/></linearGradient>`;
+  defs+=`<linearGradient id="${uid}hl" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="' + window._wlc('#9a751f') + '"/><stop offset=".5" stop-color="' + window._wlc('#C9A84C') + '"/><stop offset="1" stop-color="' + window._wlc('#E8CC7A') + '"/></linearGradient>`;
   defs+=`<linearGradient id="${uid}med" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="${P.medBot}"/><stop offset="1" stop-color="${P.medTop}"/></linearGradient>`;
   defs+=`<linearGradient id="${uid}neu" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="${P.barBot}"/><stop offset="1" stop-color="${P.barTop}"/></linearGradient>`;
   defs+=`<filter id="${uid}glow" x="-60%" y="-30%" width="220%" height="160%"><feGaussianBlur stdDeviation="${P.glow+0.8}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
@@ -766,7 +828,7 @@ function renderHistory(d) {
   const years = h.price.map((p) => p.year);
   const priceS = h.price.map((p) => p.median);
   const rentS = (h.rent && h.rent.some((p) => p.median != null)) ? h.rent.map((p) => p.median) : null;
-  const series = [{ name: 'Kaufpreis \u20ac/m\u00b2', vals: priceS, color: '#C9A84C', axis: 'L', fill: true }];
+  const series = [{ name: 'Kaufpreis \u20ac/m\u00b2', vals: priceS, color: window._wlc('#C9A84C'), axis: 'L', fill: true }];
   if (rentS) series.push({ name: 'Miete \u20ac/m\u00b2', vals: rentS, color: '#A89F8E', axis: 'R', dash: true });
   host.innerHTML = _svgDualLine({ labels: years, series, leftTitle: '\u20ac/m\u00b2 KAUF', rightTitle: rentS ? '\u20ac/m\u00b2 MIETE' : null });
   const dom = d.market_dynamics && d.market_dynamics.days_on_market;
@@ -820,7 +882,7 @@ async function renderObjectHistory(out) {
   const mv = hist.map((h) => h.market_value);
   const sc = hist.map((h) => h.deal_score);
   host.innerHTML = _svgDualLine({ labels,
-    series: [ { name: 'Marktwert \u20ac', vals: mv, color: '#C9A84C', axis: 'L', fill: true },
+    series: [ { name: 'Marktwert \u20ac', vals: mv, color: window._wlc('#C9A84C'), axis: 'L', fill: true },
               { name: 'Deal-Score', vals: sc, color: '#3FA56C', axis: 'R' } ],
     leftTitle: 'MARKTWERT \u20ac', rightTitle: 'SCORE', rightMin: 0, rightMax: 100 });
   note.textContent = hist.length + ' gespeicherte St\u00e4nde \u00b7 \u00e4ltester ' + labels[0] + ', neuester ' + labels[labels.length - 1];
@@ -849,7 +911,7 @@ $('dpktFile').addEventListener('change', async (e) => {
         + 'und dann auf <b>\u201eMarktbericht erstellen\u201c</b> klicken.';
     }
     const btn = $('goBtn');
-    if (btn) { btn.style.boxShadow = '0 0 0 3px rgba(201,168,76,.4)'; btn.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    if (btn) { btn.style.boxShadow = '0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)'; btn.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   } catch (err) {
     $('errBox').textContent = '\u2717 ' + err.message; $('errBox').classList.remove('hide');
   } finally {
@@ -912,7 +974,7 @@ function _installMbSaveObject() {
   var anchor = document.getElementById('saveFileBtn');
   if (!anchor || document.getElementById('mbSaveObjBtn')) return;
   var b = document.createElement('button'); b.id = 'mbSaveObjBtn'; b.type = 'button'; b.textContent = '\u2605 Als Objekt speichern';
-  b.style.cssText = 'flex:1 1 100%;min-width:104px;margin-bottom:8px;border:none;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#1a1508;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);';
+  b.style.cssText = 'flex:1 1 100%;min-width:104px;margin-bottom:8px;border:none;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer;color:#1a1508;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));';
   b.addEventListener('click', function () { _mbSaveAsObject(b); });
   anchor.parentNode.insertBefore(b, anchor);
 }
@@ -925,12 +987,12 @@ function _mbEnsureReportsPanel(){
   if(!target) return null;
   if(!document.getElementById('mbReportsStyle')){
     var st=document.createElement('style'); st.id='mbReportsStyle';
-    st.textContent='#mbReportsPanel .mbrep-h{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#9a7d28;margin-bottom:8px}'
-     +'#mbReportsPanel .mbrep-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid rgba(201,168,76,.18)}'
+    st.textContent='#mbReportsPanel .mbrep-h{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--wl-9a7d28, #9a7d28);margin-bottom:8px}'
+     +'#mbReportsPanel .mbrep-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent)}'
      +'#mbReportsPanel .mbrep-date{font-size:12.5px;color:#4a443c}'
      +'#mbReportsPanel .mbrep-act{display:flex;gap:6px}'
-     +'#mbReportsPanel button{border:1px solid #C9A84C;background:transparent;color:#9a7d28;border-radius:999px;padding:4px 12px;font-size:11.5px;font-weight:600;cursor:pointer}'
-     +'#mbReportsPanel .mbrep-pdf{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1508;border:none}';
+     +'#mbReportsPanel button{border:1px solid var(--wl-c9a84c, #C9A84C);background:transparent;color:var(--wl-9a7d28, #9a7d28);border-radius:999px;padding:4px 12px;font-size:11.5px;font-weight:600;cursor:pointer}'
+     +'#mbReportsPanel .mbrep-pdf{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1508;border:none}';
     document.head.appendChild(st);
   }
   p=document.createElement('div'); p.className='panel'; p.id='mbReportsPanel'; p.style.display='none';
@@ -1035,7 +1097,7 @@ function drawMap(lat, lon, comps) {
   if (marker) map.removeLayer(marker);
   if (compLayer) map.removeLayer(compLayer);
 
-  marker = L.circleMarker([lat, lon], { radius: 10, color: '#C9A84C', fillColor: '#C9A84C', fillOpacity: 1 })
+  marker = L.circleMarker([lat, lon], { radius: 10, color: window._wlc('#C9A84C'), fillColor: window._wlc('#C9A84C'), fillOpacity: 1 })
     .addTo(map).bindPopup('<b>Objekt</b>');
 
   compLayer = L.layerGroup();
@@ -1060,7 +1122,7 @@ function _ensureChartDefaults() {
   Chart.defaults.font.weight = '500';
   Chart.defaults.color = '#8a8a93';
   const t = Chart.defaults.plugins.tooltip;
-  t.backgroundColor = 'rgba(10,10,12,.96)'; t.borderColor = 'rgba(201,168,76,.4)';
+  t.backgroundColor = 'rgba(10,10,12,.96)'; t.borderColor = window._wlrgbaH('#C9A84C', 0.4);
   t.borderWidth = 1; t.cornerRadius = 8; t.padding = 10; t.usePointStyle = true;
   t.titleColor = '#e8e8ea'; t.bodyColor = '#cfcfd6';
   const l = Chart.defaults.plugins.legend.labels;
@@ -1167,7 +1229,7 @@ async function exportPdf(out) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const W = 210, H = 297, M = 18;
-  const GOLD = [201, 168, 76], INK = [20, 20, 23], TXT = [34, 34, 38], MUT = [120, 120, 130];
+  const GOLD = window._pdfGold(), INK = [20, 20, 23], TXT = [34, 34, 38], MUT = [120, 120, 130];
   let y = 0;
   const euro = (n) => (n == null ? '–' : Number(n).toLocaleString('de-DE') + ' €');
   const a = d.address || {}, ref = d.ref || {}, mv = (d.valuation && d.valuation.market_value) || {},
@@ -1781,7 +1843,7 @@ async function exportPdf(out) {
     const pct = mv.confidence_pct;
     const lbl = mv.confidence_label || (ci && ci.label) || '';
     const cc = pct != null ? (pct >= 70 ? [63, 165, 108] : pct >= 55 ? GOLD : [184, 98, 80])
-      : (ci && ci.color === '#3FA56C' ? [63, 165, 108] : ci && ci.color === '#C9A84C' ? GOLD : [184, 98, 80]);
+      : (ci && ci.color === '#3FA56C' ? [63, 165, 108] : ci && ci.color === window._wlc('#C9A84C') ? GOLD : [184, 98, 80]);
     doc.setFillColor(...cc); doc.circle(M + 2, y - 1, 1.8, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...cc);
     const head = pct != null ? `${lbl} · ${pct} %` : `Konfidenz: ${lbl}`;
@@ -2537,7 +2599,7 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
         const missing = fields.filter(function (id) { return !isFilled(id); }).map(function (id) { return labels[id]; });
         hint.innerHTML = filled >= total
           ? 'Alle wertrelevanten Angaben gemacht \u2014 h\u00f6chste Eingabe-Konfidenz. Der exakte Wert ergibt sich mit der Vergleichsdatenbasis.'
-          : 'F\u00fcr h\u00f6here Genauigkeit erg\u00e4nzen: <b style="color:#c9a84c;">' + missing.join(', ') + '</b>.';
+          : 'F\u00fcr h\u00f6here Genauigkeit erg\u00e4nzen: <b style="color:var(--wl-c9a84c, #c9a84c);">' + missing.join(', ') + '</b>.';
       }
     }
     fields.forEach(function (id) { const e = document.getElementById(id); if (e) e.addEventListener('change', upd); });
@@ -2570,7 +2632,7 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
       if (!items.length) { hide(); return; }
       dd.innerHTML = items.map(function (it, i) {
         return '<div data-i="' + i + '" style="padding:9px 12px;cursor:pointer;font-size:13px;color:#e6e6ea;border-bottom:1px solid #1c1c22;">'
-          + '<span style="color:#C9A84C;margin-right:7px;">\u25CE</span>' + it.formatted + '</div>';
+          + '<span style="color:var(--wl-c9a84c, #C9A84C);margin-right:7px;">\u25CE</span>' + it.formatted + '</div>';
       }).join('');
       place(); dd.style.display = 'block';
       dd.querySelectorAll('[data-i]').forEach(function (el) {
@@ -2621,9 +2683,9 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
       vFinder.classList.toggle('hide', v !== 'finder');
       tabs.querySelectorAll('.mtab').forEach(function (b) {
         const on = b.getAttribute('data-view') === v;
-        b.style.background = on ? '#C9A84C' : 'transparent';
+        b.style.background = on ? window._wlc('#C9A84C') : 'transparent';
         b.style.color = on ? '#0a0a0a' : '#9a9aa3';
-        b.style.borderColor = on ? '#C9A84C' : '#2a2a30';
+        b.style.borderColor = on ? window._wlc('#C9A84C') : '#2a2a30';
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -2651,7 +2713,7 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
     }
     selI.addEventListener('change', updateDesc);
 
-    function col(s) { return s >= 70 ? '#3FA56C' : s >= 50 ? '#C9A84C' : '#B86250'; }
+    function col(s) { return s >= 70 ? '#3FA56C' : s >= 50 ? window._wlc('#C9A84C') : '#B86250'; }
 
     function card(r, rank) {
       const c = col(r.score);
@@ -2663,16 +2725,16 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
           + '<div style="height:5px;background:#1c1c22;border-radius:999px;overflow:hidden;"><div style="height:100%;width:' + Math.max(3, p[1]) + '%;background:' + col(p[1]) + ';"></div></div></div>';
       }).join('');
       const reasons = (r.reasons || []).slice(0, 5).map(function (x) {
-        return '<span style="display:inline-block;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);color:#e7e2d4;border-radius:999px;padding:2px 9px;font-size:11px;font-family:\'JetBrains Mono\';">' + x + '</span>';
+        return '<span style="display:inline-block;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);color:#e7e2d4;border-radius:999px;padding:2px 9px;font-size:11px;font-family:\'JetBrains Mono\';">' + x + '</span>';
       }).join(' ');
-      return '<div style="position:relative;overflow:hidden;padding:16px 18px;border-radius:14px;border:1px solid rgba(201,168,76,.3);'
-        + 'background-color:#070708;background-image:radial-gradient(circle at 16% 20%,rgba(201,168,76,.12),transparent 42%),radial-gradient(circle at 90% 80%,rgba(70,100,120,.10),transparent 46%),radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:auto,auto,22px 22px;">'
+      return '<div style="position:relative;overflow:hidden;padding:16px 18px;border-radius:14px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);'
+        + 'background-color:#070708;background-image:radial-gradient(circle at 16% 20%,color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent),transparent 42%),radial-gradient(circle at 90% 80%,rgba(70,100,120,.10),transparent 46%),radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:auto,auto,22px 22px;">'
         + '<div style="display:flex;align-items:center;gap:14px;">'
         + '<div style="width:54px;height:54px;border-radius:50%;border:3px solid ' + c + ';display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 0 14px ' + c + '55;">'
         + '<span style="font-family:\'Space Grotesk\';font-weight:700;font-size:19px;color:' + c + ';">' + r.score + '</span></div>'
         + '<div style="flex:1;"><div style="font-size:11px;color:#8a8a93;">#' + rank + ' · Match-Score</div>'
         + '<div style="font-family:\'Space Grotesk\';font-weight:700;font-size:18px;color:#fff;">' + r.name + '</div></div>'
-        + '<button data-city="' + r.name.replace(/"/g, '') + '" class="lfPick" style="background:transparent;border:1px solid #C9A84C;color:#C9A84C;border-radius:999px;padding:8px 14px;font-size:12px;cursor:pointer;white-space:nowrap;">Marktbericht erstellen →</button>'
+        + '<button data-city="' + r.name.replace(/"/g, '') + '" class="lfPick" style="background:transparent;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-c9a84c, #C9A84C);border-radius:999px;padding:8px 14px;font-size:12px;cursor:pointer;white-space:nowrap;">Marktbericht erstellen →</button>'
         + '</div>'
         + '<div style="display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;">' + bars + '</div>'
         + (reasons ? '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">' + reasons + '</div>' : '')
@@ -2694,7 +2756,7 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
         const note = d.geomap_calls
           ? '<div style="font-size:11.5px;color:#6a6a72;margin-top:10px;">GeoMap-Rendite für die Top-' + Math.min(5, list.length) + ' nachgeladen · ' + d.geomap_calls + ' Abrufe (~' + String(d.cost_hint_eur).replace('.', ',') + ' €). Übrige Standorte: kostenlose Signale (POI + Demografie).</div>'
           : '<div style="font-size:11.5px;color:#6a6a72;margin-top:10px;">Ranking aus kostenlosen Signalen (POI + Demografie). GeoMap-Rendite nicht aktiv/verfügbar.</div>';
-        resEl.innerHTML = '<div style="font-size:13px;color:#9a9aa3;margin-bottom:4px;">Top-Standorte für <b style="color:#C9A84C;">' + d.intentLabel + '</b> in ' + d.regionLabel + ':</div>'
+        resEl.innerHTML = '<div style="font-size:13px;color:#9a9aa3;margin-bottom:4px;">Top-Standorte für <b style="color:var(--wl-c9a84c, #C9A84C);">' + d.intentLabel + '</b> in ' + d.regionLabel + ':</div>'
           + list.map(function (x, i) { return card(x, i + 1); }).join('') + note;
         resEl.querySelectorAll('.lfPick').forEach(function (b) {
           b.addEventListener('click', function () {

@@ -126,8 +126,8 @@ button.dr-btn-primary,
 }
 .dr-btn-primary:hover,
 button.dr-btn-primary:hover {
-  background: #b59238 !important;
-  border-color: #b59238 !important;
+  background: var(--wl-b59238, #b59238) !important;
+  border-color: var(--wl-b59238, #b59238) !important;
   color: #fff !important;
 }
 .dr-btn-outline {
@@ -302,8 +302,8 @@ button.dr-btn-primary:hover {
 }
 .dr-da-warn {
   margin-top: 10px;
-  background: rgba(201, 168, 76, 0.1);
-  color: #8c6e2c;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);
+  color: var(--wl-8c6e2c, #8c6e2c);
   padding: 8px 12px;
   border-radius: 4px;
   font-size: 12px;
@@ -480,8 +480,8 @@ button.dr-btn-primary:hover {
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  background: rgba(201, 168, 76, 0.15);
-  color: #8c6e2c;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent);
+  color: var(--wl-8c6e2c, #8c6e2c);
   padding: 1px 5px;
   border-radius: 2px;
   flex-shrink: 0;
@@ -555,7 +555,7 @@ button.dr-btn-primary:hover {
   transition: background .15s ease;
 }
 .dr-da-check-item:hover {
-  background: rgba(201, 168, 76, 0.08);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);
 }
 .dr-da-check-item.is-checked .dr-da-check-lbl {
   color: var(--green, #3FA56C);
@@ -580,7 +580,7 @@ button.dr-btn-primary:hover {
 
 /* Empty-Chip */
 .da-dr-chip-empty {
-  background: rgba(201, 168, 76, 0.05);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent);
   border-style: dashed;
   color: var(--gold, #C9A84C);
 }
@@ -654,7 +654,7 @@ button.dr-btn-primary:hover {
 }
 .da-dr-banner-warn {
   background: var(--gold-dim, rgba(201,168,76,0.12));
-  color: #8e6e1f;
+  color: var(--wl-8e6e1f, #8e6e1f);
   border: 1px solid var(--gold-dim2, rgba(201,168,76,0.22));
 }
 .da-dr-banner-warn .da-dr-banner-ic {

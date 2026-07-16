@@ -1,3 +1,18 @@
+/* W39-pdf-gold: jsPDF kennt kein CSS — dort stehen nackte RGB-Tripel
+   (doc.setTextColor(201,168,76)). Der Tokenisierer und der Waechter sehen die
+   nicht. pdf.js gibt seit W1 seine Palette nach aussen und _dpPdfSetAccent()
+   mutiert C.GOLD IN PLACE. Diese Funktion liest sie zur BAU-Zeit des PDFs.
+   Ohne Whitelabel liefert sie [201,168,76] — also exakt wie bisher. */
+if (!window._pdfGold) {
+  window._pdfGold = function () {
+    try {
+      var c = window._dpPdfColors;
+      if (c && c.GOLD && c.GOLD.length === 3) return [c.GOLD[0], c.GOLD[1], c.GOLD[2]];
+    } catch (e) {}
+    return [201, 168, 76];
+  };
+}
+/* W35-wl-token: Gold zeigt auf die Whitelabel-Ebene. */
 /* V289-storage-marker */
 'use strict';
 /* ═══════════════════════════════════════════════════
@@ -2159,8 +2174,27 @@ function DP_HERO(kick, title, desc, iconSvg){
 function _dpApplyThemeVars(){
   try{
     var b=(window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.get) ? DealPilotConfig.branding.get() : null;
-    var th=b && b.theme; if(!th) return;
+    var th=b && b.theme;
     var r=document.documentElement.style;
+    /* W38-theme-vs-wl: GEMESSEN am 16.07. — --wl-c9a84c war #b33d29, --dp-accent
+       trotzdem #C9A84C. Grund: die Zeilen unten setzen --dp-accent als INLINE-
+       Style auf documentElement, und ein Inline-Style sticht jede :root-Regel
+       aus. Die Tokenisierung aus W35 steht in einer :root-Regel — sie konnte
+       nie gewinnen. th.accent ist ausserdem der THEME-Akzent (Hell/Dunkel), der
+       vom Reseller nichts weiss.
+       Fix: bei aktivem Whitelabel den Inline-Style WEGNEHMEN statt eine weitere
+       Farbe zu setzen. Dann greift :root{--dp-accent:var(--wl-c9a84c,#C9A84C)}.
+       --dp-obsidian bleibt am Theme: das ist die dunkle Leiste, kein Gold. */
+    var _wl='';
+    try{ _wl=(getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c')||'').trim(); }catch(e){}
+    if(/^#[0-9a-f]{6}$/i.test(_wl)){
+      r.removeProperty('--dp-accent');
+      r.removeProperty('--dp-accent-hi');
+      r.removeProperty('--dp-accent-lo');
+      if(th && th.obsidian) r.setProperty('--dp-obsidian',th.obsidian);
+      return;
+    }
+    if(!th) return;
     if(th.accent) r.setProperty('--dp-accent',th.accent);
     if(th.accentHi) r.setProperty('--dp-accent-hi',th.accentHi);
     if(th.accentLo) r.setProperty('--dp-accent-lo',th.accentLo);
@@ -2171,7 +2205,7 @@ function _dpModalCss(){
   if(document.getElementById('dp-modal-theme')){ _dpApplyThemeVars(); return; }
   var st=document.createElement('style'); st.id='dp-modal-theme';
   st.textContent=[
-    ':root{--dp-obsidian:#070707;--dp-accent:#C9A84C;--dp-accent-hi:#E8CC7A;--dp-accent-lo:#b8932f;',
+    ':root{--dp-obsidian:#070707;--dp-accent:var(--wl-c9a84c, #C9A84C);--dp-accent-hi:var(--wl-e8cc7a, #E8CC7A);--dp-accent-lo:var(--wl-b8932f, #b8932f);',
       '--dp-hero:linear-gradient(150deg,var(--dp-accent-hi),var(--dp-accent) 45%,var(--dp-accent-lo));',
       '--dp-runway:linear-gradient(110deg,var(--dp-accent-hi),var(--dp-accent) 55%,var(--dp-accent-lo));',
       '--dp-surface:#fff;--dp-surface-2:#FAF6EC;--dp-line:#E6DFCE;--dp-ink:#1c1a14;--dp-ink-soft:#8a8473;',
@@ -2444,7 +2478,7 @@ async function exportGlobalBankPDF() {
   // Header
   doc.setFillColor(42, 39, 39);
   doc.rect(0, 0, 297, 22, 'F');
-  doc.setTextColor(201, 168, 76);
+  doc.setTextColor.apply(doc, window._pdfGold());
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   var _bxB = (typeof _getBranding === 'function') ? _getBranding() : { company: 'DealPilot' }; /*v898-p3*/
@@ -2466,7 +2500,7 @@ async function exportGlobalBankPDF() {
     var x = 12 + i * 70;
     doc.setFillColor(245, 241, 230);
     doc.roundedRect(x, sy, 65, 16, 2, 2, 'F');
-    doc.setDrawColor(201, 168, 76);
+    doc.setDrawColor.apply(doc, window._pdfGold());
     doc.setLineWidth(0.4);
     doc.line(x, sy, x, sy + 16);
     doc.setTextColor(122, 115, 112);
@@ -2506,7 +2540,7 @@ async function exportGlobalBankPDF() {
     head: [['Objekt / Adresse', 'Kaufdatum', 'Kaufpreis €', 'Marktwert €', 'Bank', 'Vertrag', 'Darlehen €', 'Zins %', 'Bindung', 'CF n.St. €/J', 'LTV %']],
     body: rows,
     theme: 'striped',
-    headStyles: { fillColor: [42, 39, 39], textColor: [201, 168, 76], fontSize: 8.5, fontStyle: 'bold' },
+    headStyles: { fillColor: [42, 39, 39], textColor: window._pdfGold(), fontSize: 8.5, fontStyle: 'bold' },
     bodyStyles: { fontSize: 8, cellPadding: 1.8 },
     alternateRowStyles: { fillColor: [248, 246, 240] },
     columnStyles: {
@@ -3029,7 +3063,7 @@ async function exportGlobalBankPDF() {
   // Header
   doc.setFillColor(42, 39, 39);
   doc.rect(0, 0, 420, 22, 'F');
-  doc.setTextColor(201, 168, 76);
+  doc.setTextColor.apply(doc, window._pdfGold());
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   var _axB = (typeof _getBranding === 'function') ? _getBranding() : { company: 'DealPilot' }; /*v898-p3*/
@@ -3051,7 +3085,7 @@ async function exportGlobalBankPDF() {
     var x = 12 + i * 95;
     doc.setFillColor(245, 241, 230);
     doc.roundedRect(x, sy, 90, 14, 2, 2, 'F');
-    doc.setDrawColor(201, 168, 76);
+    doc.setDrawColor.apply(doc, window._pdfGold());
     doc.setLineWidth(0.4);
     doc.line(x, sy, x, sy + 14);
     doc.setTextColor(122, 115, 112);
@@ -3091,7 +3125,7 @@ async function exportGlobalBankPDF() {
       'Bindg','Akt.Rest','Laufzeit/Zut.','Rest Ende','Volltilg.']],
     body: pdfRows,
     theme: 'striped',
-    headStyles: { fillColor: [42, 39, 39], textColor: [201, 168, 76], fontSize: 7, fontStyle: 'bold' },
+    headStyles: { fillColor: [42, 39, 39], textColor: window._pdfGold(), fontSize: 7, fontStyle: 'bold' },
     bodyStyles: { fontSize: 6.5, cellPadding: 1.2 },
     alternateRowStyles: { fillColor: [248, 246, 240] },
     margin: { left: 6, right: 6 },

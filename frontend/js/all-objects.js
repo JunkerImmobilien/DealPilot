@@ -1,4 +1,7 @@
 'use strict';
+/* W31-wl-token: Gold-Literale zeigen auf die Whitelabel-Ebene
+   (var(--wl-<hex>, #<hex>)). Ohne Whitelabel greift der Fallback. */
+
 /* ═══════════════════════════════════════════════════
    DEALPILOT – all-objects.js
    Tabellarische Übersicht aller Objekte.
@@ -231,7 +234,7 @@
     window.Auth.apiCall('/passes', { method: 'GET' }).then(function (res) {
       var items = ((res && res.items) || []).filter(function (p) { return !p.revoked_at && new Date(p.expires_at).getTime() > Date.now(); });
       if (!items.length) {
-        host.innerHTML = HEAD.replace('<SUFFIX>', '') + '<div style="color:#9A9390;font-size:12.5px;padding:8px 12px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);border-radius:9px">Aktuell ist kein Objekt geteilt. Teile ein Objekt \u00fcber \u201eQuick Boarding teilen\u201c.</div>';
+        host.innerHTML = HEAD.replace('<SUFFIX>', '') + '<div style="color:#9A9390;font-size:12.5px;padding:8px 12px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);border-radius:9px">Aktuell ist kein Objekt geteilt. Teile ein Objekt \u00fcber \u201eQuick Boarding teilen\u201c.</div>';
         return;
       }
       var body = items.map(function (p) {
@@ -242,7 +245,7 @@
           '<td style="font-family:\'JetBrains Mono\',monospace;font-size:12px">' + c + '</td>' +
           '<td>' + datum + '</td><td>' + rest + '</td>' +
           '<td style="white-space:nowrap">' +
-            '<button type="button" style="font:600 11px/1 \'DM Sans\',sans-serif;padding:5px 9px;border-radius:7px;border:1px solid rgba(201,168,76,.45);background:#fff;color:#7a5d18;cursor:pointer" onclick="_aoPassExtend(\'' + c + '\')">Verl\u00e4ngern</button> ' +
+            '<button type="button" style="font:600 11px/1 \'DM Sans\',sans-serif;padding:5px 9px;border-radius:7px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);background:#fff;color:var(--wl-7a5d18, #7a5d18);cursor:pointer" onclick="_aoPassExtend(\'' + c + '\')">Verl\u00e4ngern</button> ' +
             '<button type="button" style="font:600 11px/1 \'DM Sans\',sans-serif;padding:5px 9px;border-radius:7px;border:1px solid rgba(184,98,92,.5);background:#fff;color:#B8625C;cursor:pointer" onclick="_aoPassRevoke(\'' + c + '\')">Beenden</button>' +
           '</td></tr>';
       }).join('');

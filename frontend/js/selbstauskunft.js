@@ -1,4 +1,25 @@
 'use strict';
+/* W40-pdf-svg: jsPDF kennt kein CSS — dort stehen RGB-Tripel. Im Hauptdokument
+   liefert pdf.js seine Palette (W1) und _dpPdfSetAccent() mutiert C.GOLD in
+   place. Im Marktbericht-iframe gibt es pdf.js nicht — dort faellt die Funktion
+   auf --wl-c9a84c zurueck, das die Bruecke aus W36 setzt.
+   Ohne Whitelabel: [201,168,76], also unveraendert. */
+if (!window._pdfGold) {
+  window._pdfGold = function () {
+    try {
+      var c = window._dpPdfColors;
+      if (c && c.GOLD && c.GOLD.length === 3) return [c.GOLD[0], c.GOLD[1], c.GOLD[2]];
+    } catch (e) {}
+    try {
+      var v = (getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c') || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) {
+        return [parseInt(v.substr(1, 2), 16), parseInt(v.substr(3, 2), 16), parseInt(v.substr(5, 2), 16)];
+      }
+    } catch (e) {}
+    return [201, 168, 76];
+  };
+}
+
 /* ═══════════════════════════════════════════════════════════════
    DealPilot V63.75 - selbstauskunft.js
    Generiert eine ausfüllbare Selbstauskunft als PDF.
@@ -33,7 +54,7 @@ window.SelbstauskunftPDF = (function() {
     var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
     var s = _userSettings();
-    var GOLD    = [201, 168, 76];
+    var GOLD    = window._pdfGold();
     var TEXT    = [42, 39, 39];
     var MUTED   = [120, 120, 120];
 

@@ -35,10 +35,10 @@ body.dp-tour-active {
   z-index: 99999;
   pointer-events: none;
   border-radius: 12px;
-  border: 2px solid #C9A84C;
+  border: 2px solid var(--wl-c9a84c, #C9A84C);
   box-shadow:
     0 0 0 1px rgba(0,0,0,0.3),
-    0 0 60px rgba(201,168,76,0.55),
+    0 0 60px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent),
     inset 0 0 0 1px rgba(255,255,255,0.1);
   transition: top 0.35s ease, left 0.35s ease, width 0.35s ease, height 0.35s ease;
   animation: dp-tour-pulse 2.4s ease-in-out infinite;
@@ -48,13 +48,13 @@ body.dp-tour-active {
   0%, 100% {
     box-shadow:
       0 0 0 1px rgba(0,0,0,0.3),
-      0 0 60px rgba(201,168,76,0.55),
+      0 0 60px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent),
       inset 0 0 0 1px rgba(255,255,255,0.1);
   }
   50% {
     box-shadow:
       0 0 0 1px rgba(0,0,0,0.3),
-      0 0 100px rgba(201,168,76,0.75),
+      0 0 100px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 75%, transparent),
       inset 0 0 0 1px rgba(255,255,255,0.15);
   }
 }
@@ -71,10 +71,10 @@ body.dp-tour-active {
   background:
     linear-gradient(135deg, rgba(15,12,5,1) 0%, rgba(8,6,4,1) 100%),
     #050404;
-  border: 1.5px solid #C9A84C;
+  border: 1.5px solid var(--wl-c9a84c, #C9A84C);
   box-shadow:
     0 30px 80px rgba(0,0,0,0.6),
-    0 0 0 1px rgba(201,168,76,0.2),
+    0 0 0 1px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 20%, transparent),
     inset 0 1px 0 rgba(255,255,255,0.05);
   color: #e8e2d4;
   font-family: -apple-system, BlinkMacSystemFont, "DM Sans", "Inter", "Segoe UI", sans-serif;
@@ -90,7 +90,7 @@ body.dp-tour-active {
   inset: 0;
   border-radius: 16px;
   background: radial-gradient(ellipse 400px 150px at 50% 0%,
-    rgba(201,168,76,0.18) 0%, transparent 70%);
+    color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -139,8 +139,8 @@ body.dp-tour-active {
 /* ─── Header ──────────────────────────────────────────────────────────── */
 .dp-tour-head {
   padding: 28px 30px 18px;
-  border-bottom: 1px solid rgba(201,168,76,0.15);
-  background: linear-gradient(180deg, rgba(201,168,76,0.06), transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent), transparent);
 }
 
 .dp-tour-eyebrow {
@@ -151,7 +151,7 @@ body.dp-tour-active {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #C9A84C;
+  color: var(--wl-c9a84c, #C9A84C);
   margin-bottom: 12px;
 }
 
@@ -161,10 +161,10 @@ body.dp-tour-active {
   justify-content: center;
   width: 22px;
   height: 22px;
-  background: rgba(201,168,76,0.12);
-  border: 1px solid rgba(201,168,76,0.35);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);
   border-radius: 6px;
-  color: #C9A84C;
+  color: var(--wl-c9a84c, #C9A84C);
 }
 .dp-tour-eyebrow-ic svg {
   width: 13px;
@@ -198,7 +198,7 @@ body.dp-tour-active {
 }
 
 .dp-tour-text em {
-  color: #C9A84C;
+  color: var(--wl-c9a84c, #C9A84C);
   font-style: normal;
   font-weight: 500;
 }
@@ -211,8 +211,8 @@ body.dp-tour-active {
 .dp-tour-more-toggle {
   margin-top: 14px;
   background: transparent;
-  border: 1px solid rgba(201,168,76,0.3);
-  color: #C9A84C;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);
+  color: var(--wl-c9a84c, #C9A84C);
   font-size: 12px;
   font-weight: 600;
   padding: 7px 12px;
@@ -226,8 +226,8 @@ body.dp-tour-active {
   letter-spacing: 0.02em;
 }
 .dp-tour-more-toggle:hover {
-  background: rgba(201,168,76,0.1);
-  border-color: #C9A84C;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);
+  border-color: var(--wl-c9a84c, #C9A84C);
 }
 .dp-tour-more-chevron {
   width: 13px;
@@ -241,7 +241,7 @@ body.dp-tour-active {
 .dp-tour-text-more {
   margin-top: 14px;
   padding-top: 14px;
-  border-top: 1px solid rgba(201,168,76,0.15);
+  border-top: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent);
   font-size: 13.5px;
   line-height: 1.65;
   color: rgba(255,255,255,0.7);
@@ -264,7 +264,7 @@ body.dp-tour-active {
 }
 .dp-tour-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #C9A84C, #E8C964);
+  background: linear-gradient(90deg, var(--wl-c9a84c, #C9A84C), var(--wl-e8c964, #E8C964));
   border-radius: 2px;
   transition: width 0.4s ease;
 }
@@ -303,13 +303,13 @@ body.dp-tour-active {
 }
 
 .dp-tour-btn-primary {
-  background: linear-gradient(135deg, #C9A84C, #b8964a);
+  background: linear-gradient(135deg, var(--wl-c9a84c, #C9A84C), var(--wl-b8964a, #b8964a));
   color: #1a1612;
-  box-shadow: 0 2px 8px rgba(201,168,76,0.35);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);
 }
 .dp-tour-btn-primary:hover {
-  background: linear-gradient(135deg, #E8C964, #C9A84C);
-  box-shadow: 0 4px 14px rgba(201,168,76,0.5);
+  background: linear-gradient(135deg, var(--wl-e8c964, #E8C964), var(--wl-c9a84c, #C9A84C));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent);
   transform: translateY(-1px);
 }
 
@@ -321,7 +321,7 @@ body.dp-tour-active {
 .dp-tour-btn-secondary:hover {
   background: rgba(255,255,255,0.1);
   color: #fff;
-  border-color: rgba(201,168,76,0.3);
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);
 }
 
 .dp-tour-btn-ghost {
@@ -331,7 +331,7 @@ body.dp-tour-active {
   font-size: 12px;
 }
 .dp-tour-btn-ghost:hover {
-  color: #C9A84C;
+  color: var(--wl-c9a84c, #C9A84C);
 }
 
 @media (max-width: 1400px) {
@@ -382,9 +382,9 @@ body.dp-tour-active {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.08));
-  border: 1px solid rgba(201,168,76,0.4);
-  color: #C9A84C;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent), color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent));
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);
+  color: var(--wl-c9a84c, #C9A84C);
   padding: 8px 14px;
   border-radius: 8px;
   font-size: 13px;
@@ -395,9 +395,9 @@ body.dp-tour-active {
   margin-right: 10px;
 }
 .dp-tour-restart-btn:hover {
-  background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.15));
-  color: #E8C964;
-  border-color: #E8C964;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent), color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent));
+  color: var(--wl-e8c964, #E8C964);
+  border-color: var(--wl-e8c964, #E8C964);
 }
 
 /* V239.6: Tool-Tip-Mode Toggle-Buttons in Tour-Bubble */
@@ -409,7 +409,7 @@ body.dp-tour-active {
 .dp-tour-toggle-btn {
   flex: 1;
   background: rgba(40, 32, 18, 0.6);
-  border: 1.5px solid rgba(201, 168, 76, 0.3);
+  border: 1.5px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);
   color: rgba(232, 220, 190, 0.85);
   padding: 10px 8px;
   border-radius: 8px;
@@ -421,14 +421,14 @@ body.dp-tour-active {
 }
 .dp-tour-toggle-btn:hover {
   background: rgba(60, 48, 24, 0.8);
-  border-color: rgba(201, 168, 76, 0.55);
-  color: #E8C964;
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);
+  color: var(--wl-e8c964, #E8C964);
 }
 .dp-tour-toggle-btn.active {
-  background: linear-gradient(135deg, rgba(201, 168, 76, 0.85), rgba(180, 144, 58, 0.85));
-  border-color: #E8C964;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 85%, transparent), rgba(180, 144, 58, 0.85));
+  border-color: var(--wl-e8c964, #E8C964);
   color: #1a140a;
-  box-shadow: 0 2px 8px rgba(201, 168, 76, 0.25);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);
 }
 .dp-tour-toggle-status {
   font-size: 12px;
@@ -438,5 +438,5 @@ body.dp-tour-active {
   text-align: center;
 }
 .dp-tour-toggle-status strong {
-  color: #E8C964;
+  color: var(--wl-e8c964, #E8C964);
 }

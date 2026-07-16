@@ -1,4 +1,7 @@
 'use strict';
+/* W33-wl-token: Gold-Literale zeigen auf die Whitelabel-Ebene
+   (var(--wl-<hex>, #<hex>)). Ohne Whitelabel greift der Fallback. */
+
 /* ═══════════════════════════════════════════════════════════════
    DealPilot V160 — Deal-Aktion Tab (s8)
 
@@ -290,10 +293,10 @@ window.DealPilotDealAction = (function() {
       // KP da aber kein Baujahr → eindeutige Lücke
       if (kp && kp >= 50000) {
         return [
-          '<div class="da-rnd-banner-info" style="margin:14px 0;background:#fff8e8;border:1px solid #C9A84C;border-radius:8px;padding:14px 18px;">',
+          '<div class="da-rnd-banner-info" style="margin:14px 0;background:#fff8e8;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:8px;padding:14px 18px;">',
           '  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">',
           '    <div style="font-family:Cormorant Garamond,serif;font-size:16px;font-weight:600;color:#2A2727;">RND-Analyse möglich — Baujahr fehlt</div>',
-          '    <button type="button" class="da-cta-mini" style="background:transparent;border:1px solid #C9A84C;color:#C9A84C;padding:5px 14px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit" onclick="DealPilotDealAction.gotoObjektTab()">→ Objekt-Tab öffnen</button>',
+          '    <button type="button" class="da-cta-mini" style="background:transparent;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-c9a84c, #C9A84C);padding:5px 14px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit" onclick="DealPilotDealAction.gotoObjektTab()">→ Objekt-Tab öffnen</button>',
           '  </div>',
           '  <div style="margin-top:6px;font-size:12px;color:#7A7370;line-height:1.5">',
           '    Mit Baujahr kann DealPilot prüfen, ob ein Restnutzungsdauer-Gutachten den AfA-Hebel erhöht — bei Objekten >40 J. oft sehr lohnend.',
@@ -360,7 +363,7 @@ window.DealPilotDealAction = (function() {
     // Nur empfehlen wenn ROI klar positiv (Amortisation < 2 J.)
     if (rndCmp.ampel === 'rot' || (amortJahre && amortJahre > 2)) return '';
 
-    var ampelColor = rndCmp.ampel === 'gruen' ? '#2A9A5A' : '#C9A84C';
+    var ampelColor = rndCmp.ampel === 'gruen' ? '#2A9A5A' : 'var(--wl-c9a84c, #C9A84C)';
     var ampelLabel = rndCmp.ampel === 'gruen' ? 'STARK EMPFOHLEN' : 'EMPFOHLEN';
 
     return [
@@ -370,11 +373,11 @@ window.DealPilotDealAction = (function() {
       '    <div style="font-family:Cormorant Garamond,serif;font-size:18px;font-weight:600;color:#2A2727;">Restnutzungsdauer-Gutachten lohnt sich für dieses Objekt</div>',
       '  </div>',
       '  <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">AfA-STEIGERUNG</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">+' + Math.round(afaSteigerungPct) + ' %</div></div>',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">STEUER-ERSPARNIS/J</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(rndCmp.steuerersparnis_jahr) + '</div></div>',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">GUTACHTER-KOSTEN</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(rndCmp.gutachterkosten) + '</div></div>',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">AMORTISATION</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + (amortJahre ? amortJahre.toFixed(1).replace('.', ',') + ' J.' : '–') + '</div></div>',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">BARWERT GESAMT</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(rndCmp.netto_vorteil) + '</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">AfA-STEIGERUNG</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">+' + Math.round(afaSteigerungPct) + ' %</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">STEUER-ERSPARNIS/J</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(rndCmp.steuerersparnis_jahr) + '</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">GUTACHTER-KOSTEN</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(rndCmp.gutachterkosten) + '</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">AMORTISATION</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + (amortJahre ? amortJahre.toFixed(1).replace('.', ',') + ' J.' : '–') + '</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">BARWERT GESAMT</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(rndCmp.netto_vorteil) + '</div></div>',
       '  </div>',
       '  <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">',
       '    <button type="button" class="da-cta" style="background:#2A2727;color:#fff;border:none;padding:10px 18px;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" onclick="DealPilotDealAction.openExpertWithRnd()">Gutachten direkt anfragen</button>',
@@ -407,7 +410,7 @@ window.DealPilotDealAction = (function() {
 
     // Wenn Gebäudeanteil ungewöhnlich niedrig (<60%) → besonders relevant
     var ampelColor = gebAntPct < 65 ? '#C94C4C'
-                    : gebAntPct < 75 ? '#C9A84C' : '#2A9A5A';
+                    : gebAntPct < 75 ? 'var(--wl-c9a84c, #C9A84C)' : '#2A9A5A';
     var ampelLabel = gebAntPct < 65 ? 'DRINGEND PRÜFEN'
                     : gebAntPct < 75 ? 'OPTIMIERUNG MÖGLICH' : 'OK, KLEINE OPTIMIERUNG MÖGLICH';
 
@@ -430,9 +433,9 @@ window.DealPilotDealAction = (function() {
     var datenStatus = '';
     var fehltSprung = '';
     if (!bodenrichtwert && !grundstueckGroesse) {
-      datenStatus = '<div style="margin-top:10px;padding:10px 12px;background:rgba(201,168,76,0.1);border-radius:4px;font-size:12px;color:#7A7370;line-height:1.5">' +
+      datenStatus = '<div style="margin-top:10px;padding:10px 12px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);border-radius:4px;font-size:12px;color:#7A7370;line-height:1.5">' +
         '<strong style="color:#2A2727">Hinweis:</strong> Für eine präzise Argumentation gegenüber dem Finanzamt fehlen Bodenrichtwert und Grundstücks­fläche. Diese im Objekt-Tab unter "Erweiterte Angaben" pflegen — dann kann auch eine konkrete BMF-konforme Aufteilung vorgeschlagen werden.';
-      fehltSprung = '<button type="button" class="da-cta-mini" style="background:transparent;border:1px solid #C9A84C;color:#C9A84C;padding:4px 10px;margin-left:8px;border-radius:3px;font-size:11px;cursor:pointer" onclick="DealPilotDealAction.gotoObjektTab()">→ Objekt-Tab öffnen</button>';
+      fehltSprung = '<button type="button" class="da-cta-mini" style="background:transparent;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-c9a84c, #C9A84C);padding:4px 10px;margin-left:8px;border-radius:3px;font-size:11px;cursor:pointer" onclick="DealPilotDealAction.gotoObjektTab()">→ Objekt-Tab öffnen</button>';
       datenStatus = datenStatus.replace('</div>', fehltSprung + '</div>');
     }
 
@@ -446,10 +449,10 @@ window.DealPilotDealAction = (function() {
       '    Aktuell ' + gebAntPct + ' % Gebäudeanteil. Mit Bodenrichtwert-Argumentation oder Sachverständigen-Gutachten lässt sich i.d.R. <strong>85 %</strong> ansetzen — höherer Anteil = mehr AfA-Basis = weniger Steuer über die ganze Halte­dauer.',
       '  </div>',
       '  <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">DIFFERENZ AfA-BASIS</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(diffBasis) + '</div></div>',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">MEHR STEUER/JAHR</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(mehrSteuerJahr) + '</div></div>',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">ÜBER 50 JAHRE</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(mehrSteuer50J) + '</div></div>',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">GRENZSTEUER-ANNAHME</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + Math.round(grenz * 100) + ' %</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">DIFFERENZ AfA-BASIS</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(diffBasis) + '</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">MEHR STEUER/JAHR</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(mehrSteuerJahr) + '</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">ÜBER 50 JAHRE</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(mehrSteuer50J) + '</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">GRENZSTEUER-ANNAHME</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + Math.round(grenz * 100) + ' %</div></div>',
       '  </div>',
       '  <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">',
       '    <button type="button" class="da-cta" style="background:#2A2727;color:#fff;border:none;padding:10px 18px;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" onclick="DealPilotDealAction.openExpertWithGutachten()">Gutachten zur Aufteilung anfragen</button>',
@@ -566,7 +569,7 @@ window.DealPilotDealAction = (function() {
           '<div class="da-stage-title">In Gesellschaft \u00fcberf\u00fchren</div>',
           '<div class="da-stage-sub">Privat-Objekt einfrieren + neues GmbH-Objekt anlegen (Werte, Fotos, KI \u00fcbernommen)</div>',
         '</div>',
-        '<div style="padding:4px 0 2px"><button type="button" class="da-cta" style="background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1b1408;border:none;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="if(window.DealPilotUeberfuehrung)DealPilotUeberfuehrung.open()">\u2708 \u00dcberf\u00fchrung starten</button></div>',
+        '<div style="padding:4px 0 2px"><button type="button" class="da-cta" style="background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1b1408;border:none;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit" onclick="if(window.DealPilotUeberfuehrung)DealPilotUeberfuehrung.open()">\u2708 \u00dcberf\u00fchrung starten</button></div>',
       '</div>',
       
       // v854: Stage 1+2 entfernt - Bankanfrage/Beratung/Gutachten laufen ueber die Netzwerk-Karten
@@ -2096,7 +2099,7 @@ window.DealPilotDealAction = (function() {
     var lohntFarbe = '#7A7370';
     if (afa) {
       if (afa.ampel === 'gruen') { lohntStufe = 'klar lohnenswert'; lohntFarbe = '#3FA56C'; }
-      else if (afa.ampel === 'gelb') { lohntStufe = 'grenzwertig'; lohntFarbe = '#C9A84C'; }
+      else if (afa.ampel === 'gelb') { lohntStufe = 'grenzwertig'; lohntFarbe = 'var(--wl-c9a84c, #C9A84C)'; }
       else { lohntStufe = 'nicht lohnenswert'; lohntFarbe = '#B8625C'; }
       lohntText = (afa.empfehlung || '');
     } else if (result.final_rnd && result.final_rnd <= 30) {
@@ -2105,7 +2108,7 @@ window.DealPilotDealAction = (function() {
       lohntText = 'RND ' + result.final_rnd + ' Jahre — i.d.R. attraktiver AfA-Hebel.';
     } else {
       lohntStufe = 'eher nicht lohnenswert';
-      lohntFarbe = '#C9A84C';
+      lohntFarbe = 'var(--wl-c9a84c, #C9A84C)';
       lohntText = 'RND ' + (result.final_rnd || '?') + ' Jahre — kaum Steuerhebel.';
     }
 
@@ -2123,10 +2126,10 @@ window.DealPilotDealAction = (function() {
     if (afa) {
       afaHtml = [
         '<div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px">',
-        '  <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">STANDARD-AfA</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:600;color:#2A2727">' + (afa.afa_standard.satz_pct || '–') + ' %</div><div style="font-size:12px;color:#7A7370">' + fmtE(afa.afa_standard.jahresbetrag) + '/Jahr</div></div>',
-        '  <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">KURZ-AfA (RND)</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:600;color:#2A2727">' + (afa.afa_kurz.satz_pct || '–') + ' %</div><div style="font-size:12px;color:#7A7370">' + fmtE(afa.afa_kurz.jahresbetrag) + '/Jahr</div></div>',
-        '  <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">MEHR STEUER/JAHR</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:600;color:#3FA56C">' + fmtE(afa.steuerersparnis_jahr) + '</div></div>',
-        '  <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">NETTO-VORTEIL</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:600;color:#2A2727">' + fmtE(afa.netto_vorteil) + '</div><div style="font-size:12px;color:#7A7370">nach Gutachter-Kosten</div></div>',
+        '  <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">STANDARD-AfA</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:600;color:#2A2727">' + (afa.afa_standard.satz_pct || '–') + ' %</div><div style="font-size:12px;color:#7A7370">' + fmtE(afa.afa_standard.jahresbetrag) + '/Jahr</div></div>',
+        '  <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">KURZ-AfA (RND)</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:600;color:#2A2727">' + (afa.afa_kurz.satz_pct || '–') + ' %</div><div style="font-size:12px;color:#7A7370">' + fmtE(afa.afa_kurz.jahresbetrag) + '/Jahr</div></div>',
+        '  <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">MEHR STEUER/JAHR</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:600;color:#3FA56C">' + fmtE(afa.steuerersparnis_jahr) + '</div></div>',
+        '  <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">NETTO-VORTEIL</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:600;color:#2A2727">' + fmtE(afa.netto_vorteil) + '</div><div style="font-size:12px;color:#7A7370">nach Gutachter-Kosten</div></div>',
         '</div>'
       ].join('');
     }
@@ -2146,9 +2149,9 @@ window.DealPilotDealAction = (function() {
       '    <div style="font-size:13px;margin-top:4px;opacity:0.95">' + lohntText + '</div>',
       '  </div>',
       '  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:8px">',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">RESTNUTZUNGSDAUER</div><div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:600;color:#2A2727">' + (result.final_rnd || '?') + ' J.</div></div>',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">GND</div><div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:600;color:#2A2727">' + (result.gnd || '?') + ' J.</div></div>',
-      '    <div><div style="font-size:10px;font-weight:700;color:#C9A84C;letter-spacing:0.6px">ALTER</div><div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:600;color:#2A2727">' + (result.alter || '?') + ' J.</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">RESTNUTZUNGSDAUER</div><div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:600;color:#2A2727">' + (result.final_rnd || '?') + ' J.</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">GND</div><div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:600;color:#2A2727">' + (result.gnd || '?') + ' J.</div></div>',
+      '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">ALTER</div><div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:600;color:#2A2727">' + (result.alter || '?') + ' J.</div></div>',
       '  </div>',
       afaHtml,
       '  <div style="margin-top:20px;padding:14px 18px;background:#FAF6E8;border-radius:4px;font-size:12px;color:#7A7370;line-height:1.5">',
@@ -2196,8 +2199,8 @@ window.DealPilotDealAction = (function() {
     confirmModal.id = 'rnd-anfrage-modal';
     confirmModal.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)';
     confirmModal.innerHTML =
-      '<div style="background:#fff;border-radius:12px;max-width:520px;width:100%;padding:32px;text-align:center;border:1px solid #C9A84C;box-shadow:0 30px 80px rgba(0,0,0,0.5)">' +
-      '  <div id="rnd-anfrage-spinner" style="width:48px;height:48px;border:4px solid #FAF6E8;border-top-color:#C9A84C;border-radius:50%;margin:0 auto 20px;animation:rnd-spin 0.8s linear infinite"></div>' +
+      '<div style="background:#fff;border-radius:12px;max-width:520px;width:100%;padding:32px;text-align:center;border:1px solid var(--wl-c9a84c, #C9A84C);box-shadow:0 30px 80px rgba(0,0,0,0.5)">' +
+      '  <div id="rnd-anfrage-spinner" style="width:48px;height:48px;border:4px solid #FAF6E8;border-top-color:var(--wl-c9a84c, #C9A84C);border-radius:50%;margin:0 auto 20px;animation:rnd-spin 0.8s linear infinite"></div>' +
       '  <h3 style="margin:0 0 8px;font-family:\'Cormorant Garamond\',serif;font-size:22px;color:#2A2727;font-weight:600">Anfrage wird gesendet…</h3>' +
       '  <p style="margin:0;font-size:13px;color:#7A7370;line-height:1.6">Die Wizard-Daten werden übermittelt für die Erstellung eines vollständigen RND-Gutachtens durch ' + _brandCompany() + '.</p>' +
       '  <style>@keyframes rnd-spin { to { transform: rotate(360deg) } }</style>' +
@@ -2247,14 +2250,14 @@ window.DealPilotDealAction = (function() {
     var filename = 'rnd-anfrage-' + new Date().toISOString().slice(0,10) + '.json';
 
     modal.innerHTML =
-      '<div style="background:#fff;border-radius:12px;max-width:560px;width:100%;padding:32px;border:1px solid #C9A84C;box-shadow:0 30px 80px rgba(0,0,0,0.5)">' +
+      '<div style="background:#fff;border-radius:12px;max-width:560px;width:100%;padding:32px;border:1px solid var(--wl-c9a84c, #C9A84C);box-shadow:0 30px 80px rgba(0,0,0,0.5)">' +
       '  <div style="width:56px;height:56px;background:#E8B84F;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff">!</div>' +
       '  <h3 style="margin:0 0 12px;font-family:\'Cormorant Garamond\',serif;font-size:22px;color:#2A2727;font-weight:600;text-align:center">Server zurzeit nicht erreichbar</h3>' +
       '  <p style="margin:0 0 18px;font-size:13px;color:#7A7370;line-height:1.6;text-align:center">' +
       '    Die Anfrage konnte nicht direkt an ' + _brandCompany() + ' gesendet werden ' +
       '    <span style="color:#a04943">(' + (err && err.message ? err.message : 'Verbindungsfehler') + ')</span>.<br><br>' +
       '    <strong style="color:#2A2727">Alternative:</strong> Bitte laden Sie die Daten herunter und senden sie per E-Mail an ' +
-      '    <a href="mailto:info@junker-immobilien.io" style="color:#C9A84C;text-decoration:none;font-weight:600">info@junker-immobilien.io</a>.' +
+      '    <a href="mailto:info@junker-immobilien.io" style="color:var(--wl-c9a84c, #C9A84C);text-decoration:none;font-weight:600">info@junker-immobilien.io</a>.' +
       '  </p>' +
       '  <div style="display:flex;gap:10px;justify-content:center">' +
       '    <button class="btn btn-outline" onclick="document.getElementById(\'rnd-anfrage-modal\').remove()">Abbrechen</button>' +

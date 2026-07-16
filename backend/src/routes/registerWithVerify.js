@@ -27,6 +27,7 @@ const userService = require('../services/userService');
 const emailVerifyService = require('../services/emailVerifyService');
 const mailerService = require('../services/mailerService');
 const verifyMailTemplate = require('../services/verifyMailTemplate'); // v627-verify-backend
+const resellerBrandLookup = require('../services/resellerBrandLookup'); // W21-wire
 const objectService = require('../services/objectService');
 const jwtUtil = require('../utils/jwt');
 const password = require('../utils/password');
@@ -110,11 +111,18 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
     // Mail an User
     try {
       const firstName = (user.name || '').trim().split(/\s+/)[0] || user.name || '';
+      /* W21-wire: Der Mandant bekam die Einladung im Reseller-Branding, klickte,
+         registrierte sich — und danach eine DealPilot-Verify-Mail. Bruch genau da,
+         wo Vertrauen entsteht. brandForEmail() sucht eine offene Reseller-Einladung
+         fuer diese Adresse; ohne Treffer kommt null -> alles bleibt DealPilot. */
+      let _brand = null;
+      try { _brand = await resellerBrandLookup.brandForEmail(user.email); }
+      catch (e) { /* Branding ist Kuer, nie mail-blockierend */ }
       await mailerService.sendMail({
         to: user.email,
         subject: verifyMailTemplate.subject(),
-        text: verifyMailTemplate.renderVerifyText(firstName, verifyUrl),
-        html: verifyMailTemplate.renderVerifyMail(firstName, verifyUrl)
+        text: verifyMailTemplate.renderVerifyText(firstName, verifyUrl, _brand),
+        html: verifyMailTemplate.renderVerifyMail(firstName, verifyUrl, _brand)
       });
       console.log('[register-verify] Verify-Mail gesendet an:', email);
     } catch (e) {

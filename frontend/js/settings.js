@@ -3163,6 +3163,9 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
   function panelHtml(){
     var free=false; try{var k=DealPilotConfig.pricing.currentKey(); free=(k==='pro'||k==='partner');}catch(e){}
     var h='';
+    h+=(window._dpResBlock?_dpResBlock():''); /*W20-reshook: Umschalter "Mich / Meine Mandanten",
+        nur fuer Partner. Gleiches Muster wie _dpLogoBlock (v927) — das Panel bleibt
+        unangetastet, der Anbau kommt von aussen. */
     h+='<div class="dp-tb-sec"><b>Modus</b><div class="dp-tt-mode-toggle"><button class="dp-tt-mode-btn" onclick="_dpDispSkin(\'obsidian\')">Dunkel</button><button class="dp-tt-mode-btn" onclick="_dpDispSkin(\'hell\')">Hell</button></div></div>';
     h+='<div class="dp-tb-sec"><b>Header-H\u00f6he</b><div class="dp-tt-mode-toggle" id="dp-hdr-sz"><button class="dp-tt-mode-btn" data-hs="compact" onclick="_dpDispHdr(\'compact\')">Kompakt</button><button class="dp-tt-mode-btn" data-hs="normal" onclick="_dpDispHdr(\'normal\')">Normal</button></div></div>';
     h+='<div class="dp-tb-sec"><b>Chrome (Hell)</b>';
@@ -3179,6 +3182,7 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     h+='<div class="dp-tb-sec"><b>Schrift</b><div class="dp-tt-mode-toggle" style="flex-wrap:wrap"><button class="dp-tt-mode-btn" onclick="_dpDispFont(\'inter\')">Inter</button><button class="dp-tt-mode-btn" onclick="_dpDispFont(\'grotesk\')">Grotesk</button><button class="dp-tt-mode-btn" onclick="_dpDispFont(\'serif\')">Serif</button><button class="dp-tt-mode-btn" onclick="_dpDispFont(\'system\')">System</button></div>';
     h+='<div class="dp-tt-mode-toggle" style="margin-top:6px"><button class="dp-tt-mode-btn" onclick="_dpDispSize(\'0.92\')">A-</button><button class="dp-tt-mode-btn" onclick="_dpDispSize(\'1\')">A</button><button class="dp-tt-mode-btn" onclick="_dpDispSize(\'1.08\')">A+</button></div></div>';
     h+=(window._dpLogoBlock?_dpLogoBlock():''); /*v927-logo-inject*/
+    h+=(window._dpResSave?_dpResSave():''); /*W20-reshook*/
     h+='<div class="dp-tb-sec"><button class="btn btn-sm btn-ghost" style="width:100%" onclick="_dpDispReset()">Zur\u00fccksetzen</button></div>';
     return h;
   }
@@ -3191,6 +3195,10 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     var panel=ce('div','dp-tb'); panel.id='dp-tb-panel';
     panel.appendChild(ce('div','dp-tb-h','Darstellung <button id="dp-tb-x">\u2715</button>'));
     var b=ce('div','dp-tb-b'); b.innerHTML=panelHtml(); panel.appendChild(b);
+    /*W20-reshook: panelHtml() ist modul-lokal — der Reseller-Modus braucht einen
+      sauberen Neuaufbau, statt am DOM herumzuflicken. */
+    window.panelHtmlRebuild=function(){ try{ b.innerHTML=panelHtml();
+      if(window._dpDispRefresh) _dpDispRefresh(); }catch(e){} };
     document.body.appendChild(fab); document.body.appendChild(panel);
     fab.onclick=function(){ panel.classList.toggle('open'); };
     panel.querySelector('#dp-tb-x').onclick=function(){ panel.classList.remove('open'); };

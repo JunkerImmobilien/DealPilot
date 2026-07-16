@@ -44,10 +44,10 @@
   max-width: 720px;
   max-height: 90vh;
   background: #FAF6E8;
-  border: 1px solid #C9A84C;
+  border: 1px solid var(--wl-c9a84c, #C9A84C);
   border-radius: 16px;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6),
-              0 0 0 1px rgba(201, 168, 76, 0.15);
+              0 0 0 1px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -61,13 +61,13 @@
 
 [data-theme="dark"] .dp-legal-dialog {
   background: #1c1a1a;
-  border-color: rgba(201, 168, 76, 0.45);
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);
 }
 
 /* ─── Header ────────────────────────────────────────────────── */
 .dp-legal-header {
   padding: 28px 32px 16px;
-  border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+  border-bottom: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);
   flex-shrink: 0;
 }
 
@@ -75,7 +75,7 @@
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #A8861E;
+  color: var(--wl-a8861e, #A8861E);
   font-weight: 700;
   margin-bottom: 8px;
 }
@@ -114,13 +114,13 @@
 .dp-legal-section {
   margin-bottom: 16px;
   padding: 14px 16px;
-  background: rgba(201, 168, 76, 0.05);
-  border-left: 3px solid #C9A84C;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent);
+  border-left: 3px solid var(--wl-c9a84c, #C9A84C);
   border-radius: 6px;
 }
 
 [data-theme="dark"] .dp-legal-section {
-  background: rgba(201, 168, 76, 0.10);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);
 }
 
 .dp-legal-section h3 {
@@ -128,11 +128,11 @@
   font-size: 17px;
   font-weight: 600;
   margin: 0 0 6px;
-  color: #A8861E;
+  color: var(--wl-a8861e, #A8861E);
 }
 
 [data-theme="dark"] .dp-legal-section h3 {
-  color: #E8C46C;
+  color: var(--wl-e8c46c, #E8C46C);
 }
 
 .dp-legal-section p {
@@ -152,13 +152,13 @@
 }
 
 [data-theme="dark"] .dp-legal-section strong {
-  color: #FFD96A;
+  color: var(--wl-ffd96a, #FFD96A);
 }
 
 /* ─── Footer mit Checkbox + Button ────────────────────────────── */
 .dp-legal-footer {
   padding: 18px 32px 24px;
-  border-top: 1px solid rgba(201, 168, 76, 0.25);
+  border-top: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);
   background: rgba(255, 255, 255, 0.5);
   flex-shrink: 0;
 }
@@ -188,7 +188,7 @@
   height: 18px;
   flex-shrink: 0;
   margin-top: 1px;
-  accent-color: #C9A84C;
+  accent-color: var(--wl-c9a84c, #C9A84C);
   cursor: pointer;
 }
 
@@ -207,14 +207,14 @@
 }
 
 .dp-legal-btn-primary {
-  background: linear-gradient(135deg, #C9A84C, #A8861E);
+  background: linear-gradient(135deg, var(--wl-c9a84c, #C9A84C), var(--wl-a8861e, #A8861E));
   color: #fff;
-  border-color: #C9A84C;
+  border-color: var(--wl-c9a84c, #C9A84C);
 }
 
 .dp-legal-btn-primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(201, 168, 76, 0.35);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);
 }
 
 .dp-legal-btn-primary:disabled {
@@ -241,15 +241,15 @@
 }
 
 .dp-legal-close:hover {
-  background: #C9A84C;
+  background: var(--wl-c9a84c, #C9A84C);
   color: #fff;
-  border-color: #C9A84C;
+  border-color: var(--wl-c9a84c, #C9A84C);
 }
 
 [data-theme="dark"] .dp-legal-close {
   background: #2A2727;
   color: #FAF6E8;
-  border-color: rgba(201, 168, 76, 0.30);
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);
 }
 
 /* ─── Persistenter Footer-Banner ──────────────────────────────── */
@@ -277,16 +277,16 @@
 
 .dp-legal-dialog {
   background: linear-gradient(180deg, #1A1717 0%, #131010 100%) !important;
-  border: 1px solid rgba(201, 168, 76, 0.40) !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent) !important;
   color: rgba(250, 246, 232, 0.92) !important;
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.75),
-    0 0 0 1px rgba(201, 168, 76, 0.10),
-    0 0 60px rgba(201, 168, 76, 0.08) !important;
+    0 0 0 1px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent),
+    0 0 60px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent) !important;
 }
 
 .dp-legal-eyebrow {
-  color: rgba(201, 168, 76, 0.85) !important;
+  color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 85%, transparent) !important;
 }
 
 .dp-legal-title {
@@ -299,7 +299,7 @@
 }
 
 .dp-legal-section h3 {
-  color: #C9A84C !important;
+  color: var(--wl-c9a84c, #C9A84C) !important;
   font-family: 'Cormorant Garamond', serif !important;
 }
 
@@ -313,17 +313,17 @@
 }
 
 .dp-legal-section a {
-  color: #C9A84C !important;
+  color: var(--wl-c9a84c, #C9A84C) !important;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .dp-legal-section a:hover {
-  color: #D4B65A !important;
+  color: var(--wl-d4b65a, #D4B65A) !important;
 }
 
 .dp-legal-footer {
-  border-top: 1px solid rgba(201, 168, 76, 0.20) !important;
+  border-top: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 20%, transparent) !important;
   background: rgba(20, 18, 18, 0.5) !important;
 }
 
@@ -336,25 +336,25 @@
 }
 
 .dp-legal-checkbox strong {
-  color: #C9A84C !important;
+  color: var(--wl-c9a84c, #C9A84C) !important;
 }
 
 .dp-legal-checkbox input[type="checkbox"] {
-  accent-color: #C9A84C !important;
+  accent-color: var(--wl-c9a84c, #C9A84C) !important;
 }
 
 .dp-legal-btn-primary {
-  background: linear-gradient(135deg, #C9A84C, #B89640) !important;
+  background: linear-gradient(135deg, var(--wl-c9a84c, #C9A84C), var(--wl-b89640, #B89640)) !important;
   color: #1A1717 !important;
-  border: 1px solid rgba(201, 168, 76, 0.7) !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent) !important;
   font-weight: 600 !important;
-  box-shadow: 0 4px 14px rgba(201, 168, 76, 0.3) !important;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent) !important;
   transition: all 0.2s !important;
 }
 
 .dp-legal-btn-primary:hover:not([disabled]) {
-  background: linear-gradient(135deg, #D4B65A, #C9A84C) !important;
-  box-shadow: 0 6px 20px rgba(201, 168, 76, 0.45) !important;
+  background: linear-gradient(135deg, var(--wl-d4b65a, #D4B65A), var(--wl-c9a84c, #C9A84C)) !important;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -379,13 +379,13 @@
 }
 
 .dp-legal-close:hover {
-  color: #C9A84C !important;
+  color: var(--wl-c9a84c, #C9A84C) !important;
 }
 
 /* Scroll-Bar in Body (modern) */
 .dp-legal-body {
   scrollbar-width: thin;
-  scrollbar-color: rgba(201, 168, 76, 0.4) transparent;
+  scrollbar-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent) transparent;
 }
 
 .dp-legal-body::-webkit-scrollbar {
@@ -393,6 +393,6 @@
 }
 
 .dp-legal-body::-webkit-scrollbar-thumb {
-  background: rgba(201, 168, 76, 0.4);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);
   border-radius: 3px;
 }

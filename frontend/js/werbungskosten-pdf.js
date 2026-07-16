@@ -1,4 +1,25 @@
 'use strict';
+/* W40-pdf-svg: jsPDF kennt kein CSS — dort stehen RGB-Tripel. Im Hauptdokument
+   liefert pdf.js seine Palette (W1) und _dpPdfSetAccent() mutiert C.GOLD in
+   place. Im Marktbericht-iframe gibt es pdf.js nicht — dort faellt die Funktion
+   auf --wl-c9a84c zurueck, das die Bruecke aus W36 setzt.
+   Ohne Whitelabel: [201,168,76], also unveraendert. */
+if (!window._pdfGold) {
+  window._pdfGold = function () {
+    try {
+      var c = window._dpPdfColors;
+      if (c && c.GOLD && c.GOLD.length === 3) return [c.GOLD[0], c.GOLD[1], c.GOLD[2]];
+    } catch (e) {}
+    try {
+      var v = (getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c') || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) {
+        return [parseInt(v.substr(1, 2), 16), parseInt(v.substr(3, 2), 16), parseInt(v.substr(5, 2), 16)];
+      }
+    } catch (e) {}
+    return [201, 168, 76];
+  };
+}
+
 /* ═══════════════════════════════════════════════════
    JUNKER IMMOBILIEN – werbungskosten-pdf.js
    Punkt 7: Aufschlüsselung der Werbungskosten als PDF
@@ -102,10 +123,10 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
   // ── HEADER ─────────────────────────────────────
   doc.setFillColor(42, 39, 39);
   doc.rect(0, 0, W, 26, 'F');
-  doc.setFillColor(201, 168, 76);
+  doc.setFillColor.apply(doc, window._pdfGold());
   doc.rect(0, 26, W, 1, 'F');
 
-  doc.setTextColor(201, 168, 76);
+  doc.setTextColor.apply(doc, window._pdfGold());
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
   doc.text('AUFSTELLUNG WERBUNGSKOSTEN', M, 13);
@@ -134,7 +155,7 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
 
   doc.setFillColor(248, 246, 240);
   doc.roundedRect(M, cy, CW, 22, 2, 2, 'F');
-  doc.setFillColor(201, 168, 76);
+  doc.setFillColor.apply(doc, window._pdfGold());
   doc.rect(M, cy, 2, 22, 'F');
 
   doc.setTextColor(122, 115, 112);
@@ -215,10 +236,10 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
 
   doc.setFillColor(42, 39, 39);
   doc.roundedRect(M, cy, CW, 26, 2, 2, 'F');
-  doc.setFillColor(201, 168, 76);
+  doc.setFillColor.apply(doc, window._pdfGold());
   doc.rect(M, cy, 2, 26, 'F');
 
-  doc.setTextColor(201, 168, 76);
+  doc.setTextColor.apply(doc, window._pdfGold());
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.text('SUMME WERBUNGSKOSTEN ' + year, M + 6, cy + 8);
@@ -251,7 +272,7 @@ function _renderWkSection(doc, cy, M, CW, title, items) {
   // Section header bar
   doc.setFillColor(42, 39, 39);
   doc.rect(M, cy, CW, 6, 'F');
-  doc.setTextColor(201, 168, 76);
+  doc.setTextColor.apply(doc, window._pdfGold());
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.text(title.toUpperCase(), M + 3, cy + 4.2);
@@ -295,7 +316,7 @@ function _renderWkSection(doc, cy, M, CW, title, items) {
   // Section subtotal
   doc.setFillColor(245, 241, 230);
   doc.rect(M, cy, CW, 6, 'F');
-  doc.setDrawColor(201, 168, 76);
+  doc.setDrawColor.apply(doc, window._pdfGold());
   doc.setLineWidth(0.4);
   doc.line(M, cy, M + CW, cy);
 
@@ -313,9 +334,9 @@ function _renderWerbungskostenSummaryPage(doc, startYear, nYears, W, H, M, CW) {
   // Header
   doc.setFillColor(42, 39, 39);
   doc.rect(0, 0, W, 26, 'F');
-  doc.setFillColor(201, 168, 76);
+  doc.setFillColor.apply(doc, window._pdfGold());
   doc.rect(0, 26, W, 1, 'F');
-  doc.setTextColor(201, 168, 76);
+  doc.setTextColor.apply(doc, window._pdfGold());
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
   doc.text('GESAMTÜBERSICHT WERBUNGSKOSTEN', M, 13);
@@ -363,7 +384,7 @@ function _renderWerbungskostenSummaryPage(doc, startYear, nYears, W, H, M, CW) {
     head: [['Jahr', '1. Finanz.', '2. Betr.', '3. Verw.', '4. Sonst.', '5./6. AfA', 'Summe WK', 'Einnahmen', '= Ergebnis']],
     body: rows,
     theme: 'striped',
-    headStyles: { fillColor: [42, 39, 39], textColor: [201, 168, 76], fontSize: 9, fontStyle: 'bold' },
+    headStyles: { fillColor: [42, 39, 39], textColor: window._pdfGold(), fontSize: 9, fontStyle: 'bold' },
     bodyStyles: { fontSize: 9, cellPadding: 2 },
     alternateRowStyles: { fillColor: [248, 246, 240] },
     margin: { left: M, right: M },

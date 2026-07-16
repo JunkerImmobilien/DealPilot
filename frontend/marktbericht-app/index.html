@@ -46,11 +46,11 @@
 <style>
   :root{
     --bg:#050505; --panel:#141417; --panel2:#1b1b20; --line:#2a2a31;
-    --gold:#C9A84C; --gold-soft:rgba(201,168,76,.14); --txt:#e8e8ea; --muted:#8a8a93;
+    --gold:var(--wl-c9a84c, #C9A84C); --gold-soft:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent); --txt:#e8e8ea; --muted:#8a8a93;
     --good:#4caf7d; --warn:#d9a441; --bad:#d9655b;
   }
   /* v605-mb-light */
-  html[data-mb-theme="light"]{--bg:#ffffff;--panel:#faf8f2;--panel2:#f3efe4;--line:#e6e0d3;--txt:#2a2727;--muted:#8a857c;--gold-soft:rgba(201,168,76,.12);}
+  html[data-mb-theme="light"]{--bg:#ffffff;--panel:#faf8f2;--panel2:#f3efe4;--line:#e6e0d3;--txt:#2a2727;--muted:#8a857c;--gold-soft:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);}
   html[data-mb-theme="light"] input,html[data-mb-theme="light"] select,html[data-mb-theme="light"] .kpi,html[data-mb-theme="light"] .report,html[data-mb-theme="light"] .valcard{background:#ffffff !important;}
   html[data-mb-theme="light"] .score-circle{background:conic-gradient(var(--gold) var(--deg,0deg),#e6e0d3 0) !important;}
   html[data-mb-theme="light"] .dpmb-logo .dpmb-d{color:#2a2727 !important;}
@@ -80,11 +80,11 @@
   .row>div>input:not([type=checkbox]),.row>div>select{margin-top:auto;}
   html[data-mb-theme="light"] input,html[data-mb-theme="light"] select,html[data-mb-theme="light"] textarea,html[data-mb-theme="light"] option{color:#161616 !important;}
   html[data-mb-theme="light"] select option{background:#ffffff !important;color:#161616 !important;}
-  html[data-mb-theme="light"] #saveFileBtn,html[data-mb-theme="light"] #loadFileBtn{color:#161616 !important;border-color:#C9A84C !important;background:#ffffff !important;}
+  html[data-mb-theme="light"] #saveFileBtn,html[data-mb-theme="light"] #loadFileBtn{color:#161616 !important;border-color:var(--wl-c9a84c, #C9A84C) !important;background:#ffffff !important;}
   #loadLastBtn{display:none !important;}
   html[data-mb-theme="light"] .pdfth-seg{background:#f3efe4 !important;}
   html[data-mb-theme="light"] #precHead,html[data-mb-theme="light"] #precMeter,html[data-mb-theme="light"] #genProgress,html[data-mb-theme="light"] #lfProgress{background:#f7f4ec !important;border-color:#e6e0d3 !important;}
-  html[data-mb-theme="light"] #precHead{color:#9a7f33 !important;}
+  html[data-mb-theme="light"] #precHead{color:var(--wl-9a7f33, #9a7f33) !important;}
   html[data-mb-theme="light"] .panel,html[data-mb-theme="light"] .report,html[data-mb-theme="light"] .valcard,html[data-mb-theme="light"] .kpi,html[data-mb-theme="light"] .assess{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
   /* v645: Buttons typografisch an die Haupt-App angleichen */
   html[data-mb-theme="light"] button{font-family:'Space Grotesk','Inter',system-ui,sans-serif !important;}
@@ -92,8 +92,8 @@
   body{margin:0;background:var(--bg);color:var(--txt);
     font-family:'Inter',system-ui,sans-serif;line-height:1.5;}
   body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-    background:radial-gradient(800px 500px at 80% -10%, rgba(201,168,76,.10), transparent 60%),
-               radial-gradient(700px 500px at -10% 110%, rgba(201,168,76,.06), transparent 55%);}
+    background:radial-gradient(800px 500px at 80% -10%, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent), transparent 60%),
+               radial-gradient(700px 500px at -10% 110%, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent), transparent 55%);}
   .wrap{position:relative;z-index:1;max-width:1340px;margin:0 auto;padding:28px 20px 80px;}
   header.top{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
   .logo{font-family:'Space Grotesk';font-weight:700;font-size:22px;letter-spacing:.5px;}
@@ -204,9 +204,9 @@
 
   /* ===== Redesign-Politur (DealPilot-Stil) ===== */
   body::before{background:
-    radial-gradient(900px 600px at 85% -12%, rgba(201,168,76,.13), transparent 60%),
-    radial-gradient(760px 560px at -12% 112%, rgba(201,168,76,.07), transparent 55%),
-    radial-gradient(500px 400px at 50% 50%, rgba(201,168,76,.02), transparent 70%);}
+    radial-gradient(900px 600px at 85% -12%, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent), transparent 60%),
+    radial-gradient(760px 560px at -12% 112%, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent), transparent 55%),
+    radial-gradient(500px 400px at 50% 50%, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 2%, transparent), transparent 70%);}
   .panel{background:linear-gradient(180deg,rgba(26,26,31,.92),rgba(20,20,24,.92));
     backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);
     box-shadow:0 16px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.03);}
@@ -214,13 +214,13 @@
   h1::before{content:'';width:14px;height:2px;background:var(--gold);border-radius:2px;display:inline-block;}
   /* Score-Bereich als eigenes Panel-im-Panel */
   .scorebox{background:linear-gradient(135deg,#17140e,#0a0908);/*v882-hero-b Obsidian*/
-    border:1px solid rgba(201,168,76,.22);border-radius:16px;padding:18px 20px;margin-bottom:18px;}
+    border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);border-radius:16px;padding:18px 20px;margin-bottom:18px;}
   /* KPI-Kacheln mit Hover + Gold-Akzent */
   .kpis{gap:11px;}
   .kpi{background:linear-gradient(180deg,#131316,#0e0e11);border:1px solid var(--line);
     border-radius:13px;padding:13px 14px;transition:.18s;position:relative;overflow:hidden;}
   .kpi::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;background:var(--gold);opacity:.6;}
-  .kpi:hover{border-color:rgba(201,168,76,.4);transform:translateY(-2px);
+  .kpi:hover{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);transform:translateY(-2px);
     box-shadow:0 8px 24px rgba(0,0,0,.3);}
   .kpi .v{font-size:19px;letter-spacing:.3px;}
   .kpi .l{margin-top:4px;letter-spacing:.3px;}
@@ -228,7 +228,7 @@
   .valbox{gap:16px;margin:16px 0 18px;}
   .valcard{background:linear-gradient(180deg,#131316,#0e0e11);border:1px solid var(--line);
     border-radius:16px;padding:18px 20px;transition:.18s;}
-  .valcard:hover{border-color:rgba(201,168,76,.28);}
+  .valcard:hover{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent);}
   .valcard .cap{font-size:11px;letter-spacing:.6px;font-weight:600;}
   .valcard .big{font-family:'Space Grotesk';font-weight:700;font-size:27px;margin:6px 0 2px;}
   /* Map edler */
@@ -237,12 +237,12 @@
   /* Score-Komponenten-Bars */
   .bar .lab{font-size:12px;letter-spacing:.2px;}
   .bar .track{height:8px;background:#202026;}
-  .bar .fill{background:linear-gradient(90deg,#a98e3a,var(--gold));box-shadow:0 0 10px rgba(201,168,76,.4);}
+  .bar .fill{background:linear-gradient(90deg,var(--wl-a98e3a, #a98e3a),var(--gold));box-shadow:0 0 10px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);}
   /* Assessment-Kacheln */
   .assess{background:linear-gradient(180deg,#131316,#0e0e11);transition:.18s;}
-  .assess:hover{border-color:rgba(201,168,76,.28);}
+  .assess:hover{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent);}
   /* Buttons edler */
-  button.go{box-shadow:0 8px 24px rgba(201,168,76,.25);letter-spacing:.3px;}
+  button.go{box-shadow:0 8px 24px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);letter-spacing:.3px;}
   #replayBtn:hover{border-color:var(--gold);color:var(--gold);}
   /* Report lesbarer */
   .report{padding:26px 28px;line-height:1.7;}
@@ -261,11 +261,11 @@
   #mb-orbs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
   .mb-orb{position:absolute;border-radius:50%;filter:blur(72px);opacity:.46;will-change:transform;}
   .mb-orb.o1{width:520px;height:520px;top:-150px;right:-110px;
-    background:radial-gradient(circle at 35% 30%,rgba(201,168,76,.30),transparent 70%);animation:mbDrift1 26s ease-in-out infinite;}
+    background:radial-gradient(circle at 35% 30%,color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent),transparent 70%);animation:mbDrift1 26s ease-in-out infinite;}
   .mb-orb.o2{width:460px;height:460px;bottom:-170px;left:-140px;
-    background:radial-gradient(circle at 50% 50%,rgba(201,168,76,.15),transparent 70%);animation:mbDrift2 33s ease-in-out infinite;}
+    background:radial-gradient(circle at 50% 50%,color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent),transparent 70%);animation:mbDrift2 33s ease-in-out infinite;}
   .mb-orb.o3{width:360px;height:360px;top:40%;left:48%;
-    background:radial-gradient(circle at 50% 50%,rgba(201,168,76,.045),transparent 70%);animation:mbDrift3 39s ease-in-out infinite;}
+    background:radial-gradient(circle at 50% 50%,color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 4.5%, transparent),transparent 70%);animation:mbDrift3 39s ease-in-out infinite;}
   @keyframes mbDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-42px,30px) scale(1.08)}}
   @keyframes mbDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(52px,-26px) scale(1.06)}}
   @keyframes mbDrift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,-42px) scale(1.1)}}
@@ -299,11 +299,11 @@
 
   <!-- v569-mbtabs: Standort-Finder raus, PDF + Schliessen rein -->
   <div id="mainTabs" style="display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;align-items:center;">
-    <button class="mtab" data-view="report" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;display:none;"><!-- v647-mb hidden -->Marktbericht</button>
-    <button id="mbTopPdf" type="button" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;display:none;"><!-- v649-mb -->PDF-Export</button>
-    <button id="mbThemeToggle" type="button" style="background:transparent;color:#C9A84C;border:1px solid #C9A84C;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;display:none;">Hell</button><!-- v605-mb-toggle v895e-hidden -->
+    <button class="mtab" data-view="report" style="background:var(--wl-c9a84c, #C9A84C);color:#0a0a0a;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;display:none;"><!-- v647-mb hidden -->Marktbericht</button>
+    <button id="mbTopPdf" type="button" style="background:var(--wl-c9a84c, #C9A84C);color:#0a0a0a;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;display:none;"><!-- v649-mb -->PDF-Export</button>
+    <button id="mbThemeToggle" type="button" style="background:transparent;color:var(--wl-c9a84c, #C9A84C);border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;display:none;">Hell</button><!-- v605-mb-toggle v895e-hidden -->
     <span style="flex:1"></span>
-    <button id="mbTopClose" type="button" style="background:#C9A84C;color:#0a0a0a;border:1px solid #C9A84C;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;display:none;">Schließen</button><!-- v571-mbui v649-mb -->
+    <button id="mbTopClose" type="button" style="background:var(--wl-c9a84c, #C9A84C);color:#0a0a0a;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;display:none;">Schließen</button><!-- v571-mbui v649-mb -->
   </div>
 
   <div id="view-report">
@@ -340,7 +340,7 @@
       </div>
 
       <!-- Genauere Angaben (optional) – heben die Konfidenz -->
-      <div id="precHead" style="margin-top:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#0f0f13;border:1px solid #26262c;border-radius:10px;font-size:12.5px;color:#c9a84c;">
+      <div id="precHead" style="margin-top:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#0f0f13;border:1px solid #26262c;border-radius:10px;font-size:12.5px;color:var(--wl-c9a84c, #c9a84c);">
         <span><span id="precCaret">▸</span> &nbsp;Erweiterte Angaben <span style="color:#6a6a72;">— optional, erhöhen die Genauigkeit</span></span>
         <span id="precCount" style="color:#8a8a93;font-size:11.5px;">0/4</span>
       </div>
@@ -413,21 +413,21 @@
       <!-- Live-Konfidenz-Anzeige -->
       <div id="precMeter" style="margin-top:12px;padding:10px 12px;background:#0f0f13;border:1px solid #26262c;border-radius:10px;">
         <div style="display:flex;justify-content:space-between;font-size:12px;color:#9a9aa2;margin-bottom:6px;">
-          <span>Voraussichtliche Genauigkeit</span><span id="precPct" style="font-weight:700;color:#c9a84c;">–</span>
+          <span>Voraussichtliche Genauigkeit</span><span id="precPct" style="font-weight:700;color:var(--wl-c9a84c, #c9a84c);">–</span>
         </div>
         <div style="height:7px;border-radius:4px;background:#1c1c22;overflow:hidden;">
-          <div id="precBar" style="height:100%;width:0%;background:linear-gradient(90deg,#A98E3A,#C9A84C);transition:width .25s;"></div>
+          <div id="precBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--wl-a98e3a, #A98E3A),var(--wl-c9a84c, #C9A84C));transition:width .25s;"></div>
         </div>
         <div id="precHint" style="font-size:11px;color:#6a6a72;margin-top:6px;line-height:1.4;">Mindestangaben genügen für eine erste Indikation. Jede zusätzliche Angabe erhöht die Konfidenz.</div>
       </div>
-      <div id="loadSignal" class="hide" style="margin-top:12px;padding:11px 13px;border-radius:10px;border:1px solid rgba(201,168,76,.5);background:rgba(201,168,76,.08);font-size:12.5px;color:#e7e2d4;line-height:1.45;"></div>
+      <div id="loadSignal" class="hide" style="margin-top:12px;padding:11px 13px;border-radius:10px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);font-size:12.5px;color:#e7e2d4;line-height:1.45;"></div>
       <button class="go" id="goBtn">Marktbericht erstellen</button>
       <button id="replayBtn" style="display:none!important;width:100%;margin-top:8px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:9px;font-size:12.5px;cursor:pointer;">↺ Letzten Bericht laden (gratis, Demo)</button>
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
         <button id="loadLastBtn" type="button" style="display:none;flex:1 1 30%;min-width:104px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11px;cursor:pointer;">⟳ Letzte&nbsp;Ausgabe</button>
         <button id="saveFileBtn" type="button" style="flex:1 1 30%;min-width:104px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11px;cursor:pointer;">⤓ Als&nbsp;Datei</button>
         <button id="loadFileBtn" type="button" style="flex:1 1 30%;min-width:104px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11px;cursor:pointer;">⤒ Datei&nbsp;laden</button>
-        <button id="shareBtn" type="button" data-v565-no-share style="display:none;flex:1 1 100%;background:transparent;border:1px solid #C9A84C;color:#C9A84C;border-radius:999px;padding:9px;font-size:12px;cursor:pointer;margin-top:2px;">🔗 Teilbares Angebot (Link) kopieren</button>
+        <button id="shareBtn" type="button" data-v565-no-share style="display:none;flex:1 1 100%;background:transparent;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-c9a84c, #C9A84C);border-radius:999px;padding:9px;font-size:12px;cursor:pointer;margin-top:2px;">🔗 Teilbares Angebot (Link) kopieren</button>
         <input type="file" id="loadFileInput" accept="application/json,.json" style="display:none;">
       </div>
       <div class="err hide" id="errBox"></div>
@@ -522,11 +522,37 @@
   </div>
 </div>
 
+<!-- W36-wl-token: Diese App laeuft in einem eigenen Dokument. Ohne diese
+     zwei Zeilen kommt das Reseller-Branding hier nie an. Muster: W18. -->
+<script>/* W36-wl-token: Whitelabel-Farbe zur Laufzeit.
+   Canvas und SVG-Praesentationsattribute verstehen kein var().
+   _wlrgbaH(hex, alpha) ist neu: die Partikel brauchen auch var(--wl-e8c766, #E8C766) als rgba,
+   nicht nur das Basisgold. Eigener Guard, damit es sich neben dem schon
+   ausgelieferten _wlrgba(alpha) installiert. */
+if (!window._wlc) {
+  window._wlc = function (h) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--wl-' + h.slice(1).toLowerCase());
+      v = (v || '').trim();
+      if (/^#[0-9a-f]{6}$/i.test(v)) return v;
+    } catch (e) {}
+    return h;
+  };
+}
+if (!window._wlrgbaH) {
+  window._wlrgbaH = function (h, a) {
+    var c = window._wlc(h);
+    return 'rgba(' + parseInt(c.substr(1, 2), 16) + ',' + parseInt(c.substr(3, 2), 16) + ',' + parseInt(c.substr(5, 2), 16) + ',' + a + ')';
+  };
+}
+</script>
+<script src="../js/whitelabel-override.js?v=W36"></script>
+<script src="../js/mb-whitelabel.js?v=W36"></script>
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
 <script src="vendor/jspdf.plugin.autotable.min.js"></script>
-<script src="app.js?v=901"></script>
-<script src="mb-objektwahl.js?v=568"></script><!-- v566-objektwahl -->
+<script src="app.js?v=W40"></script>
+<script src="mb-objektwahl.js?v=W37"></script><!-- v566-objektwahl -->
 <script>
 /* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
 (function () {
@@ -535,7 +561,7 @@
   var dpr = Math.min(window.devicePixelRatio || 1, 2), N = 46;
   function size() { w = c.width = innerWidth * dpr; h = c.height = innerHeight * dpr; c.style.width = innerWidth + 'px'; c.style.height = innerHeight + 'px'; }
   function init() { parts = []; for (var i = 0; i < N; i++) parts.push({ x: Math.random() * w, y: Math.random() * h, r: (Math.random() * 1.5 + 0.5) * dpr, vx: (Math.random() - 0.5) * 0.14 * dpr, vy: (Math.random() - 0.5) * 0.14 * dpr, a: Math.random() * 0.5 + 0.14 }); }
-  function paintOnce() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < parts.length; i++) { var p = parts[i]; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fillStyle = 'rgba(201,168,76,' + p.a + ')'; ctx.fill(); } }
+  function paintOnce() { ctx.clearRect(0, 0, w, h); for (var i = 0; i < parts.length; i++) { var p = parts[i]; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fillStyle = window._wlrgbaH('#C9A84C', p.a); ctx.fill(); } }
   function tick() { for (var i = 0; i < parts.length; i++) { var p = parts[i]; p.x += p.vx; p.y += p.vy; if (p.x < 0) p.x = w; else if (p.x > w) p.x = 0; if (p.y < 0) p.y = h; else if (p.y > h) p.y = 0; } paintOnce(); if (running) raf = requestAnimationFrame(tick); }
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   size(); init();
