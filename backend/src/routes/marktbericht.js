@@ -52,6 +52,62 @@ function qstr(req) {
   return s || null;
 }
 
+/* v942-userbind
+ * ──────────────────────────────────────────────────────────────────────────
+ * Bis v941 reichte der Proxy die Query BLIND weiter -> das mb-Backend kannte
+ * ueberhaupt keine Benutzer (grep user_id = 0 Treffer in api.js). Jeder
+ * eingeloggte Nutzer konnte /objects und /reports/one?id=N von JEDEM lesen.
+ * Ab jetzt: user_id kommt IMMER aus req.user.id, NIE aus der Browser-Query.
+ * Ein mitgeschickter user_id-Parameter wird bewusst ueberschrieben.
+ */
+function qstrUser(req) {
+  const p = new URLSearchParams(req.query || {});
+  p.set('user_id', String(req.user.id));
+  return p.toString();
+}
+
+/* Kuerzel-Auffrischung: die mb-DB (dealpilot-mb-db) kann nicht auf
+ * dealpilot-postgres.objects joinen. object_label ist im Snapshot eingefroren;
+ * hier holen wir den aktuellen Stand, solange das Objekt noch existiert.
+ * Geloeschtes Objekt -> der eingefrorene Wert bleibt lesbar. */
+async function labelMap(req, refs) {
+  const out = {};
+  const ids = [...new Set((refs || []).filter(function (r) {
+    return typeof r === 'string' && /^[0-9a-f-]{8,}$/i.test(r);
+  }))];
+  if (!ids.length) return out;
+  try {
+    const db = req.app.get('db');
+    if (!db) return out;
+    const r = await db.query(
+      'SELECT id, kuerzel, name, seq_no FROM objects WHERE user_id = $1 AND id = ANY($2::uuid[])',
+      [req.user.id, ids]
+    );
+    (r.rows || []).forEach(function (o) {
+      out[String(o.id)] = o.kuerzel || o.seq_no || o.name || null;
+    });
+  } catch (e) { console.warn('[marktbericht] labelMap:', e.message); }
+  return out;
+}
+
+function readGetLabelled(path, pick) {
+  return async function (req, res) {
+    try {
+      const out = await forward('GET', path, { query: qstrUser(req) });
+      if (out.status === 200 && out.data) {
+        const list = pick(out.data) || [];
+        const map = await labelMap(req, list.map(function (h) { return h && h.external_ref; }));
+        list.forEach(function (h) {
+          if (h && h.external_ref && map[String(h.external_ref)]) h.object_label = map[String(h.external_ref)];
+        });
+      }
+      res.status(out.status).json(out.data);
+    } catch (e) {
+      res.status(502).json({ error: 'mb_unreachable', message: e.message });
+    }
+  };
+}
+
 // ── Health (public, 0 L) ─────────────────────────────────────────────────────
 router.get('/health', async function (req, res) {
   try {
@@ -66,7 +122,7 @@ router.get('/health', async function (req, res) {
 function readGet(path) {
   return async function (req, res) {
     try {
-      const out = await forward('GET', path, { query: qstr(req) });
+      const out = await forward('GET', path, { query: qstrUser(req) }); /* v942 */
       res.status(out.status).json(out.data);
     } catch (e) {
       res.status(502).json({ error: 'mb_unreachable', message: e.message });
@@ -75,8 +131,8 @@ function readGet(path) {
 }
 router.get('/reports/replay', authenticate, readGet('/reports/replay'));
 router.get('/reports/fixtures', authenticate, readGet('/reports/fixtures'));
-router.get('/objects', authenticate, readGet('/objects'));
-router.get('/objects/history', authenticate, readGet('/objects/history'));
+router.get('/objects', authenticate, readGetLabelled('/objects', function (d) { return d.objects; }));           /* v942 */
+router.get('/objects/history', authenticate, readGetLabelled('/objects/history', function (d) { return d.history; })); /* v942 */
 router.get('/reports/one', authenticate, readGet('/reports/one')); /* v895g-reportbyid */
 
 // ── Abruf-Endpoints (auth + Kerosin) ─────────────────────────────────────────
@@ -104,16 +160,23 @@ async function runReport(req, res) {
     const obj = body.object || body.dealpilot || body;
     const externalRef = body.external_ref || body.objId ||
                         (obj && (obj.id || obj.objId)) || null;
+    /* v942-userbind: Besitzer + Kuerzel wandern mit in den Snapshot. */
+    const _lm = await labelMap(req, [externalRef]);
+    const objectLabel = (externalRef && _lm[String(externalRef)]) || null;
     let out;
     if (isRich) {
-      out = await forward('POST', '/reports/generate', { body: body });
+      out = await forward('POST', '/reports/generate', {
+        body: Object.assign({}, body, { user_id: req.user.id, object_label: objectLabel })
+      });
     } else {
       out = await forward('POST', '/reports/from-dealpilot', {
         body: {
           object: obj,
           overrides: Object.assign({}, body.overrides || {}, {
             external_ref: externalRef,
-            fast: fast
+            fast: fast,
+            user_id: req.user.id,
+            object_label: objectLabel
           })
         }
       });
@@ -212,7 +275,11 @@ router.post('/reports/generate-stream', authenticate, async function (req, res) 
   const isRich = (body.address != null || body.living_area != null || body.property_type != null) && !body.object && !body.dealpilot;
   const obj = body.object || body.dealpilot || body;
   const externalRef = body.external_ref || body.objId || (obj && (obj.id || obj.objId)) || null;
-  const mbBody = isRich ? body : { dealpilot: obj, external_ref: externalRef, fast: fast };
+  const _lm2 = await labelMap(req, [externalRef]);                      /* v942 */
+  const objectLabel = (externalRef && _lm2[String(externalRef)]) || null; /* v942 */
+  const mbBody = isRich
+    ? Object.assign({}, body, { user_id: req.user.id, object_label: objectLabel })
+    : { dealpilot: obj, external_ref: externalRef, fast: fast, user_id: req.user.id, object_label: objectLabel };
   const mbPath = isRich ? '/reports/generate-stream' : '/reports/generate-stream';
 
   res.writeHead(200, {

@@ -277,9 +277,12 @@ export const ReportOrchestrator = {
       [propertyId, JSON.stringify(valuation)]);
     await q('INSERT INTO mb.deal_scores (property_id,score,breakdown) VALUES ($1,$2,$3)',
       [propertyId, deal.score, JSON.stringify(deal.breakdown)]);
+    /* v942-userbind */
+    const _uid = (input.user_id != null && !isNaN(parseInt(input.user_id, 10))) ? parseInt(input.user_id, 10) : null;
+    const _label = (typeof input.object_label === 'string' && input.object_label.trim()) ? input.object_label.trim() : null;
     const rep = await q1(
-      'INSERT INTO mb.market_reports (property_id,ai_mode,payload,report_md) VALUES ($1,$2,$3,$4) RETURNING id',
-      [propertyId, report.mode, JSON.stringify(payload), report.report_md]
+      'INSERT INTO mb.market_reports (property_id,ai_mode,payload,report_md,user_id) VALUES ($1,$2,$3,$4,$5) RETURNING id',
+      [propertyId, report.mode, JSON.stringify(payload), report.report_md, _uid]
     );
 
     // 10b) Objekt-Snapshot fuer den Verlauf (gruppiert wiederkehrende Berichte ueber object_key)
@@ -295,15 +298,16 @@ export const ReportOrchestrator = {
         `INSERT INTO mb.object_snapshots
           (object_key,external_ref,property_id,report_id,address,lat,lon,property_type,living_area,build_year,
            market_value,market_value_low,market_value_high,median_sqm,gross_yield_pct,rent_multiplier,
-           deal_score,micro_score,macro_score,price_cagr_pct,confidence,comparable_group,ai_mode,data)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)`,
+           deal_score,micro_score,macro_score,price_cagr_pct,confidence,comparable_group,ai_mode,data,
+           user_id,object_label)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26)`,
         [objectKey, ext, propertyId, rep.id, payload.address?.formatted || null, lat, lon,
          ref.property_type, ref.living_area, ref.build_year,
          mvv.estimated ?? null, mvv.low ?? null, mvv.high ?? null, mvv.basis_median_sqm ?? null,
          yld.gross_yield_pct ?? null, yld.rent_multiplier ?? null,
          payload.deal_score?.score ?? null, payload.micro?.score ?? null, payload.macro?.score ?? null,
          hist.price_cagr_pct ?? null, mvv.confidence ?? null, payload.sale?.comparable_group ?? null,
-         report.mode, JSON.stringify(payload)]
+         report.mode, JSON.stringify(payload), _uid, _label]
       );
     } catch (e) { step('snapshot: ' + e.message); /* Snapshot ist optional, Bericht nicht blockieren */ }
     step('DONE');

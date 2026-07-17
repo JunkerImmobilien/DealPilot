@@ -62,6 +62,27 @@ var FIELDS = [
 ];
 
 var _currentObjKey = null;  // Local mode key OR API object id
+
+/* v946-objready
+ * ──────────────────────────────────────────────────────────────────────────
+ * DER VERTRAG. Bis v945 gab es keinen: Module, die _currentObjKey brauchen,
+ * lasen ihn einfach irgendwann — und wenn er noch nicht stand, deuteten sie
+ * das still als "kein Objekt" und werteten nie neu aus.
+ *   deal-action-boarding.js:794  -> "Kein Objekt aktiv." fuer immer
+ *   mandanten.js:715             -> setInterval alle 250ms, 16 Versuche, dann Aufgabe
+ * Sechster Bug derselben Familie (W3/W4/W7/W37/W39). Muster wie dp:plan-ready
+ * (W17, subscription.js:154): wer den Schluessel braucht, HOERT darauf.
+ *
+ *   window.addEventListener('dp:object-ready', function (e) { e.detail.key; });
+ *   // schon da? -> window._currentObjKey ist gesetzt
+ *
+ * Timer und Retry-Schleifen gewinnt man nie zuverlaessig.
+ */
+function _dpFireObjectReady(k) {
+  try {
+    window.dispatchEvent(new CustomEvent('dp:object-ready', { detail: { key: k || null } }));
+  } catch (e) {}
+}
 var _newObjSaveInflight = false;  /* v828-inflight-guard: laeuft gerade ein POST fuer ein NEUES Objekt? */
 var _objCache = {};         // Cache of full object data when in API mode
 
@@ -481,7 +502,7 @@ async function saveObj(opts) {
             method: 'POST',
             body: { data: data, aiAnalysis: aiText, photos: photos }
           });
-          _currentObjKey = saved.id;
+          _currentObjKey = saved.id; _dpFireObjectReady(saved.id); /* v946 */
         } finally {
           _newObjSaveInflight = false;  /* v828-inflight-guard: POST fertig (ok oder Fehler) */
         }
@@ -575,7 +596,7 @@ async function saveObj(opts) {
     var keyPrefix = (typeof Auth !== 'undefined' && Auth.isLoggedIn()) ? Auth.getStorageKey('obj_') : 'ji_';
     var key = _currentObjKey || (keyPrefix + Date.now());
     localStorage.setItem(key, JSON.stringify(d));
-    _currentObjKey = key;
+    _currentObjKey = key; _dpFireObjectReady(key); /* v946 */
     if (!silent) if (!silent) toast('✓ Gespeichert: ' + d._name);
     renderSaved(); if(typeof updateSidebarPortfolio==='function') updateSidebarPortfolio();
   }
@@ -608,7 +629,7 @@ function _clearFormForNewObject() {
   if (typeof imgs !== 'undefined') { imgs = []; if (typeof renderImgs === 'function') renderImgs(); }
   window._aiText = '';
   window._aiAnalysis = null;
-  _currentObjKey = null;
+  _currentObjKey = null; _dpFireObjectReady(null); /* v946 */
   /* v728-status-reset: neues Objekt IMMER Status offen. _currentObjData darf NICHT vom
      Vorgaenger erben (storage.js Fallback Z.126 liest sonst alten _deal_won/_deal_lost). */
   window._currentObjData = {};
@@ -659,7 +680,7 @@ function newObj() {
   if (typeof imgs !== 'undefined') { imgs = []; renderImgs(); }
   window._aiText = '';
   window._aiAnalysis = null;
-  _currentObjKey = null;
+  _currentObjKey = null; _dpFireObjectReady(null); /* v946 */
   /* v771-status-reset: newObj ruft _clearFormForNewObject NICHT -> Status hier auf offen */
   window._currentObjData = {};
   var _dwS = document.getElementById('_deal_won_state'); if (_dwS) _dwS.value = 'false';
@@ -1346,7 +1367,7 @@ async function loadSaved(k) {
         if (typeof renderImgs === 'function') renderImgs();
       }
       loadData(d);
-      _currentObjKey = k;
+      _currentObjKey = k; _dpFireObjectReady(k); /* v946 */
 
       // Load bemerkungen for this object (Migration 006)
       try {
@@ -1383,7 +1404,7 @@ async function loadSaved(k) {
       if (typeof renderImgs === 'function') renderImgs();
     }
     loadData(d);
-    _currentObjKey = k;
+    _currentObjKey = k; _dpFireObjectReady(k); /* v946 */
     // V63.8: QC-Host als nicht-gerendert markieren — beim nächsten QC-Besuch wird neu gerendert
       var __qcH = document.getElementById('qc-tab-host'); if (__qcH) __qcH.dataset.rendered = '0';
       // V63.48: Erst auf Einzelobjekt-View wechseln, dann auf Tab Objekt + WF-Update
@@ -1441,7 +1462,7 @@ async function delSaved(k) {
       await Auth.apiCall('/objects/' + k, { method: 'DELETE' });
       // V63.27: Wenn das aktuell geladene Objekt gelöscht wurde → Eingabemaske + Header leeren
       if (_currentObjKey === k) {
-        _currentObjKey = null;
+        _currentObjKey = null; _dpFireObjectReady(null); /* v946 */
         _resetUiAfterDelete();
       }
       invalidateRenderCache();  // V98
@@ -1455,7 +1476,7 @@ async function delSaved(k) {
     if (!confirm('"' + name + '" wirklich löschen?')) return;
     localStorage.removeItem(k);
     if (_currentObjKey === k) {
-      _currentObjKey = null;
+      _currentObjKey = null; _dpFireObjectReady(null); /* v946 */
       _resetUiAfterDelete();
     }
     invalidateRenderCache();  // V98

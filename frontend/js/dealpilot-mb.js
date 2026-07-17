@@ -125,8 +125,28 @@ if (!window._wlc) {
 
   /* ── Daten ── */
   function objId() {
+    /* v942-objid
+     * ────────────────────────────────────────────────────────────────────
+     * BUG bis v941: bmf-modal.js:53 deklariert `function _currentObjectId()`
+     * auf oberster Ebene -> window._currentObjectId IST die Funktion. Eine
+     * Funktion ist immer truthy, also gewann sie hier -> String(fn) lieferte
+     * ihren QUELLTEXT. 65 Snapshots in mb.object_snapshots trugen als
+     * object_key `dp:function _currentObjectId(){...}`, alle Objekte in
+     * einem Topf, der Marktwert-Verlauf zeigte die Vermischung.
+     * FIX: _currentObjKey zuerst (das ist laut Projekt-Invariante das
+     * EINZIGE verlaessliche Global und fehlte hier komplett), und alles,
+     * was keine brauchbare Zeichenkette ist, fliegt raus.
+     */
+    if (typeof global._currentObjKey === 'string' && global._currentObjKey) return global._currentObjKey;
     var c = [global.currentObjectId, global._currentObjectId, global.currentObjId, (global.State && (global.State.objectId || global.State.id))];
-    for (var i = 0; i < c.length; i++) if (c[i]) return String(c[i]);
+    for (var i = 0; i < c.length; i++) {
+      var v = c[i];
+      if (typeof v === 'function' || typeof v === 'object') continue;
+      if (v == null || v === '') continue;
+      var s = String(v);
+      if (!s || s.indexOf('function') === 0) continue;
+      return s;
+    }
     var el = $('obj-id') || $('object-id'); if (el && el.value) return String(el.value);
     return null;
   }

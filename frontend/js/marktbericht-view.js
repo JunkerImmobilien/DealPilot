@@ -71,7 +71,15 @@
     if (g('wfl')) q.set('area', g('wfl'));
     if (g('baujahr')) q.set('year', g('baujahr'));
     if (g('kp')) q.set('price', g('kp'));
-    var _id = d.id || d._id || d.objId || d.kuerzel; if (_id) q.set('ref', _id); /* v895f-reportslist */
+    /* v942-ref
+     * BUG bis v941: `d` ist window._currentObjData = das data-jsonb. Darin gibt
+     * es KEIN id/_id/objId -> es landete d.kuerzel ("2026-001") als ref. Die
+     * Gegenseite (deal-action-boarding.js:29) fragt aber mit _currentObjKey
+     * (UUID) -> Bericht unter "2026-001" abgelegt, Deal-Aktion sucht die UUID,
+     * findet nichts. Jetzt beide Seiten auf derselben Quelle. */
+    var _id = (typeof window._currentObjKey === 'string' && window._currentObjKey)
+              || d.id || d._id || d.objId || null;
+    if (_id) q.set('ref', _id);
     return q.toString();
   }
 
@@ -80,7 +88,7 @@
   }
 
   function frameSrc(query) {
-    return '/marktbericht-app/index.html?v=W36&theme=' + mbTheme() + (query ? '&' + query : '');
+    return '/marktbericht-app/index.html?v=942&theme=' + mbTheme() + (query ? '&' + query : '');
   }
 
   // iframe waechst auf Content-Hoehe -> kein innerer Scrollbalken, Seite scrollt
@@ -154,7 +162,21 @@
     document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
     var mb = $('s-marktbericht'); if (mb) { mb.classList.add('active'); }
     render();
-    window.scrollTo(0, 0);
+    /* v945-scroll: window.scrollTo tut hier NICHTS — html/body haben
+     * overflow:hidden, gescrollt wird .main-col (index.html:3178, V236).
+     * Zweimal: einmal sofort, einmal nachdem attachAutoHeight das iframe
+     * auf Inhaltshoehe gezogen hat (sonst springt die Position zurueck). */
+    _mbvScrollTop();
+    setTimeout(_mbvScrollTop, 220);
+  }
+
+  function _mbvScrollTop() {
+    try { if (typeof global._v236ScrollTop === 'function') { global._v236ScrollTop(); return; } } catch (e) {}
+    try {
+      var mc = document.querySelector('.main-col');
+      if (mc) { try { mc.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { mc.scrollTop = 0; } }
+    } catch (e) {}
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
   }
 
   function closeMarktberichtView() {
@@ -170,6 +192,7 @@
   global.openMarktberichtView = openMarktberichtView;
   window.addEventListener('message', function (ev) {
     try { if (ev.data && ev.data.type === 'mbv-close') closeMarktberichtView(); } catch (e) {}
+    try { if (ev.data && ev.data.type === 'mbv-scrolltop') _mbvScrollTop(); } catch (e) {} /* v945-scroll */
   });
   global.closeMarktberichtView = closeMarktberichtView;
 })(window);

@@ -125,7 +125,17 @@
       sel.innerHTML = opts.join('');
       host.style.display = '';  /* v570-dropfast: sichtbar sobald Liste da */
       sel.addEventListener('change', async function () {
-        var id = sel.value; if (!id) return;
+        var id = sel.value;
+        /* v942-publish
+         * BUG bis v941: die id wurde nur zum Nachladen der Daten benutzt und
+         * dann WEGGEWORFEN. app.js las external_ref ausschliesslich aus
+         * location.search -> ein ueber dieses Dropdown erzeugter Bericht hatte
+         * gar keinen Objektbezug und konnte in der Deal-Aktion nie auftauchen.
+         * Jetzt merken wir sie: app.js liest _mbwRef zuerst. */
+        window._mbwRef = id || null;
+        window._mbwLabel = (sel.options[sel.selectedIndex] && sel.options[sel.selectedIndex].text) || null;
+        try { window.dispatchEvent(new CustomEvent('mb:object-picked', { detail: { ref: id || null } })); } catch (e) {}
+        if (!id) return;
         var note = $('mbow-note'); if (note) { note.textContent = 'Lade Objektdaten \u2026'; note.style.color = '#8a8a93'; }
         var data = await loadDetail(id);
         if (data) fillFromData(data);
