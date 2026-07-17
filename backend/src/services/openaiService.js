@@ -38,6 +38,7 @@ function buildPrompt(payload) {
   const ds = payload.dealscore || {};
   const mb = payload.marktbewertung || {};
   const mr = payload.marktradar || [];
+  const mbr = payload.marktbericht || null;   /* v947-mbsource: der echte Bericht */
   const isc = payload.investor_score || null;
 
   // Kennzahlen sicher formatieren
@@ -179,6 +180,115 @@ function buildPrompt(payload) {
     f.d1t_pct != null ? 'Tilgung D1: ' + Number(f.d1t_pct).toFixed(2) + ' %' : '',
     f.restschuld_ezb != null ? 'Restschuld am Ende der Zinsbindung: ' + fmtEur(f.restschuld_ezb) : '',
     '',
+    /* v947-mbsource: Der DealPilot-Marktbericht ist die BESTE Quelle im Prompt —
+     * gemessene Vergleichsdaten statt Formularfelder. Er steht deshalb VOR der
+     * Marktbewertung. Alles hier ist gerechnet, nicht der KI zum Schaetzen
+     * ueberlassen: Abweichungen, Spanne und Zeitabstaende. */
+    ...(mbr ? (function () {
+      var a = mbr.aktuell || {};
+      var L = [];
+      L.push('## DEALPILOT-MARKTBERICHT (gemessene Daten — die BESTE Quelle hier, vor allem anderen nutzen)');
+      L.push('- Stand: ' + new Date(a.created_at).toLocaleString('de-DE') + ' · ' + mbr.anzahl + ' Bericht(e) zu diesem Objekt');
+      if (a.address) L.push('- Adresse laut Bericht: ' + a.address);
+      if (a.market_value != null) L.push('- Marktwert (Indikation): ' + fmtEur(a.market_value));
+      if (a.market_value_low != null && a.market_value_high != null) {
+        var lo = Number(a.market_value_low), hi = Number(a.market_value_high);
+        L.push('- Vergleichsspanne: ' + fmtEur(lo) + ' bis ' + fmtEur(hi));
+        if (lo > 0) {
+          var faktor = hi / lo;
+          L.push('- STREUUNG: das obere Ende ist das ' + faktor.toFixed(2).replace('.', ',') + '-fache des unteren.');
+          if (faktor > 1.5) {
+            L.push('  ACHTUNG: Diese Streuung ist GROSS. Der Punktwert ist eine Orientierung,');
+            L.push('  KEINE Aussage. Sage das deutlich. Fuer Kalkulation und Beleihung ist das');
+            L.push('  untere Drittel die belastbare Groesse — nicht der Punktwert.');
+          }
+        }
+      }
+      if (a.median_sqm != null) L.push('- Vergleichsmedian: ' + Math.round(Number(a.median_sqm)).toLocaleString('de-DE') + ' €/m²'); /* nicht fmtNum(x,0): `dec || 2` macht daraus 2 Nachkommastellen */
+      if (a.confidence_pct != null) L.push('- Aussagekraft laut Bericht: ' + a.confidence_pct + ' %');
+      if (a.micro_score != null) L.push('- Mikrolage: ' + a.micro_score + ' von 100');
+      if (a.macro_score != null) L.push('- Makrolage: ' + a.macro_score + ' von 100');
+      if (a.gross_yield_pct != null) L.push('- Bruttorendite laut Bericht: ' + fmtNum(a.gross_yield_pct, 1).replace('.', ',') + ' %');
+      if (a.rent_multiplier != null) L.push('- Kaufpreisfaktor laut Bericht: ' + fmtNum(a.rent_multiplier, 1).replace('.', ','));
+      if (a.deal_score != null) L.push('- Deal-Score laut Bericht: ' + a.deal_score);
+
+      /* ---- Verlauf: NUR wenn er etwas bedeutet ---------------------------- */
+      var v = (mbr.verlauf || []).filter(function (x) { return x.marktwert != null; });
+      if (v.length > 1) {
+        L.push('- Verlauf der Marktwert-Indikation:');
+        v.forEach(function (x) {
+          L.push('  • ' + new Date(x.datum).toLocaleString('de-DE') + ': ' + fmtEur(x.marktwert));
+        });
+        var erst = v[0], letzt = v[v.length - 1];
+        var tage = (new Date(letzt.datum) - new Date(erst.datum)) / 86400000;
+        var dPct = erst.marktwert > 0 ? ((letzt.marktwert - erst.marktwert) / erst.marktwert) * 100 : 0;
+        L.push('- Differenz erster zu letzter Bericht: ' + (dPct >= 0 ? '+' : '') + dPct.toFixed(1).replace('.', ',') +
+               ' % ueber ' + (tage < 1 ? 'weniger als einen Tag' : Math.round(tage) + ' Tage'));
+        if (tage < 30) {
+          L.push('  WICHTIG: Der zeitliche Abstand ist ZU KURZ fuer eine Marktaussage.');
+          L.push('  Diese Differenz kommt aus GEAENDERTEN EINGABEN, nicht aus dem Markt.');
+          L.push('  Nenne sie als solche und deute sie AUF KEINEN FALL als Wertentwicklung');
+          L.push('  oder Trend. Eine belastbare Wertentwicklung braucht Berichte ueber Monate.');
+        } else {
+          L.push('  Der Abstand traegt eine Aussage: gehe auf die Richtung ein und ordne sie ein.');
+        }
+      } else {
+        L.push('- Nur ein Bericht vorhanden -> KEINE Aussage zur Wertentwicklung moeglich.');
+        L.push('  Empfiehl, in einigen Monaten einen zweiten Bericht zu erstellen.');
+      }
+
+      /* ---- Mietabweichung: die eigentliche Aussage ------------------------ */
+      var marktM = null;
+      try { marktM = (a.data && a.data.rent && a.data.rent.median_sqm) || null; } catch (e) {}
+      if (marktM == null && mb.marktmiete_qm != null) marktM = Number(mb.marktmiete_qm);
+      var wfl = Number(o.wfl || (a.living_area != null ? a.living_area : 0)) || null;
+      /* nkm_j ist die JAHRES-Nettokaltmeite (calc.js State.kpis) -> /12 fuer den
+       * Monatsvergleich. NICHT k.bmy/k.nmy nehmen: das sind Renditen in Prozent. */
+      var istKalt = (k.nkm_j != null && Number(k.nkm_j) > 0) ? Number(k.nkm_j) / 12 : null;
+      if (marktM && wfl && istKalt) {
+        var istQm = istKalt / wfl;
+        var abw = ((istQm - marktM) / marktM) * 100;
+        L.push('');
+        L.push('## MIETNIVEAU — GERECHNET, NICHT GESCHAETZT');
+        L.push('- Marktmiete laut Bericht: ' + fmtNum(marktM, 2).replace('.', ',') + ' €/m²');
+        L.push('- Ist-Kaltmiete: ' + fmtEur(istKalt) + '/Monat auf ' + Math.round(wfl) + ' m² = ' + fmtNum(istQm, 2).replace('.', ',') + ' €/m²');
+        L.push('- Abweichung: ' + (abw >= 0 ? '+' : '') + abw.toFixed(1).replace('.', ',') + ' %');
+        if (abw < -8) {
+          L.push('- BEWERTUNG: Die Ist-Miete liegt UNTER Marktniveau. Das ist ein ECHTER HEBEL:');
+          L.push('  Mietsteigerungspotenzial bei Neuvermietung oder Anpassung im Bestand.');
+          L.push('  Beziffere es (Marktmiete × Flaeche gegen Ist), nenne die rechtlichen Grenzen');
+          L.push('  (Kappungsgrenze, Mietspiegel, Mieterhoehung nur in Schritten) und ordne ein,');
+          L.push('  wie schnell es realisierbar ist. Das gehoert in die Chancen.');
+        } else if (abw > 15) {
+          L.push('- BEWERTUNG: Die Ist-Miete liegt DEUTLICH UEBER Marktniveau. Zwei Lesarten,');
+          L.push('  und du musst beide nennen:');
+          L.push('  (a) Ein Sondereffekt erklaert es — moebliert, gewerblich, Kurzzeitvermietung.');
+          L.push('      Dann ist die Rendite echt, aber sie haengt an diesem Modell.');
+          L.push('  (b) Es ist ein Eingabefehler oder eine nicht haltbare Miete.');
+          L.push('  In beiden Faellen gilt: bei Neuvermietung faellt die Miete auf Marktniveau.');
+          L.push('  Es gibt KEIN Mietsteigerungspotenzial mehr — im Gegenteil, das ist ein RISIKO.');
+          L.push('  Rechne vor, was mit dem Cashflow passiert, wenn auf ' + fmtNum(marktM, 2).replace('.', ',') + ' €/m² neu vermietet wird.');
+          L.push('  Das gehoert in die Risiken, NICHT in die Chancen.');
+        } else {
+          L.push('- BEWERTUNG: Die Ist-Miete liegt auf Marktniveau. Kein nennenswerter Hebel');
+          L.push('  ueber die Miete, aber auch kein Rueckschlagrisiko bei Neuvermietung.');
+        }
+      }
+
+      L.push('');
+      L.push('## QUELLENPFLICHT');
+      L.push('- Sage bei JEDER Zahl aus diesem Block dazu, dass sie aus dem DealPilot-Marktbericht');
+      L.push('  vom ' + new Date(a.created_at).toLocaleDateString('de-DE') + ' stammt. Der Leser muss unterscheiden koennen,');
+      L.push('  was GEMESSEN ist und was du eingeordnet hast.');
+      L.push('- Sachwert und Ertragswert im Bericht sind ein PLAUSIBILITAETS-QUERCHECK,');
+      L.push('  kein Wertansatz. Nie als Verkehrswert darstellen.');
+      L.push('- Der Bericht ist eine Marktpreisindikation, KEIN Gutachten n. § 194 BauGB.');
+      L.push('');
+      return L;
+    })() : ['## DEALPILOT-MARKTBERICHT', '- Kein Marktbericht zu diesem Objekt vorhanden.',
+            '- Empfiehl im Fazit, einen zu erstellen (Tab Bewertung) — die Analyse steht sonst',
+            '  auf den Eingaben allein, ohne Vergleichsdaten.', '']),
+
     '## MARKTBEWERTUNG (falls hinterlegt — vorrangig vor Schätzungen nutzen)',
     mb.marktwert ? '- Hinterlegter Marktwert: ' + fmtEur(mb.marktwert) : '- Keine eigene Marktbewertung hinterlegt.',
     mb.marktmiete_qm ? '- Hinterlegte Marktmiete: ' + fmtNum(mb.marktmiete_qm, 2) + ' €/m²' : '',
@@ -192,6 +302,9 @@ function buildPrompt(payload) {
     (mr.length > 1) ? '- Es liegen MEHRERE Marktpreisindikationen vor — gehe auf ALLE ein, vergleiche sie, nenne jeweils Spanne und (falls vorhanden) Konfidenz und qualifiziere die Aussage. Es sind Marktpreisindikationen, KEIN Verkehrswert.' : '',
     '- Wenn ein Marktwert hinterlegt ist, nutze ihn als VORRANGIGEN Vergleichsanker',
     '  für Kaufpreis-Einordnung, Offerte und Bewertung — vor allgemeinen Annahmen.',
+    /* v947-mbsource: Rangfolge klarstellen. Der hinterlegte Marktwert ist ein
+     * Formularfeld — der Marktbericht sind 822 gemessene Vergleichspreise. */
+    mbr ? '- ACHTUNG RANGFOLGE: Liegt ein DealPilot-Marktbericht vor (Block oben), schlaegt dieser den hier hinterlegten Marktwert. Der hinterlegte Wert ist ein Formularfeld, der Bericht sind gemessene Vergleichsdaten. Weichen sie ab, nenne beide und sage, welcher woher kommt.' : '',
     '- Wenn Web-Recherche aktiv ist: leite Kaufpreisniveau und Mietspiegel aus den',
     '  recherchierten Quellen ab — qualifiziert mit Spanne/Konfidenz statt vager',
     '  Allgemeinplätze.',

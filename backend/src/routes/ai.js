@@ -22,6 +22,48 @@ const aiCreditsService = require('../services/aiCreditsService');  // V63.86
 const plzValidator = require('../services/plzValidator');  // V229: PLZ-Halluzinationsschutz
 const voiceExtractService = require('../services/voiceExtractService');  // v503-voice
 
+/* v947-mbsource
+ * ──────────────────────────────────────────────────────────────────────────
+ * Die Pilot-Analyse sah den Marktbericht bisher NICHT. payload.marktbewertung
+ * trug genau zwei handgetippte Formularfelder (svwert, ds2_marktmiete) — keine
+ * Vergleichsbasis, keine Spanne, keine Konfidenz, keine Historie.
+ * Hier holen wir den echten Stand aus dem mb-Backend. Same-Origin-Netz, der
+ * Browser ist daran nicht beteiligt.
+ * user_id kommt IMMER aus req.user.id, nie aus dem Body -> ein Nutzer kann sich
+ * keine fremden Berichte in seinen Prompt holen (User-Bindung v942).
+ */
+const MB_BASE = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
+
+async function _mbHistoryFor(userId, ref) {
+  if (!ref || !userId) return null;
+  try {
+    const url = MB_BASE + '/objects/history?user_id=' + encodeURIComponent(userId) +
+                '&ref=' + encodeURIComponent(ref);
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const j = await r.json();
+    const h = (j && j.history) || [];
+    const reps = h.filter(function (x) { return x && x.report_id != null; })
+                  .sort(function (a, b) { return new Date(a.created_at) - new Date(b.created_at); });
+    if (!reps.length) return null;
+    const last = reps[reps.length - 1];
+    return {
+      anzahl: reps.length,
+      aktuell: last,
+      verlauf: reps.map(function (x) {
+        return {
+          datum: x.created_at,
+          marktwert: x.market_value != null ? Number(x.market_value) : null,
+          deal_score: x.deal_score != null ? Number(x.deal_score) : null,
+        };
+      }),
+    };
+  } catch (e) {
+    console.warn('[ai] Marktbericht-Lookup fehlgeschlagen:', e.message);
+    return null;   /* Der Bericht ist Kuer — er darf die Analyse nie blockieren. */
+  }
+}
+
 const router = express.Router();
 
 // V204 SECURITY-FIX (H5): Extract-Endpoints (extract-expose, extract-market-data)
@@ -144,6 +186,14 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
         });
       }
     }
+
+    /* v947-mbsource: Marktbericht anhaengen, BEVOR der Prompt gebaut wird.
+     * objId kommt vom Client, user_id NICHT — die kommt aus dem Token. */
+    try {
+      const _mb = await _mbHistoryFor(req.user.id, payload.objId);
+      if (_mb) payload.marktbericht = _mb;
+    } catch (e) { console.warn('[ai] marktbericht attach:', e.message); }
+    delete payload.objId;   /* gehoert nicht in den Prompt */
 
     const result = await openaiService.analyze(payload, { userApiKey });
 

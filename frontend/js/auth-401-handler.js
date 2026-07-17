@@ -38,6 +38,23 @@
     return /^\/auth\/(login|register|logout|change-password|reset-password)/.test(path);
   }
 
+  /* v950-guard
+   * ──────────────────────────────────────────────────────────────────────────
+   * Diese Endpoints kosten KEROSIN. Ein stiller Retry nach Re-Login bucht dem
+   * Nutzer einen zweiten Liter ab, ohne dass er es merkt — und schickt denselben
+   * OpenAI-Auftrag zweimal los. Fuer GET /objects ist ein Retry harmlos, hier
+   * nicht: der Handler kennt den Preis nicht, also darf er nicht entscheiden.
+   *
+   * Gemessen: ein Klick auf Pilot-Analyse -> DREI /ai/analyze (2 Handler + 1 Retry).
+   *
+   * Der Nutzer bekommt den Fehler zu sehen und klickt selbst. Ein bezahlter
+   * Auftrag wird nicht hinter seinem Ruecken wiederholt.
+   */
+  function isPaidEndpoint(path) {
+    return /^\/ai\/(analyze|lage)\b/.test(path)
+        || /^\/marktbericht\/reports\/(generate|from-dealpilot)/.test(path);
+  }
+
   // Re-Login-Flow: Modal anzeigen, auf Erfolg warten
   function triggerReLogin() {
     if (pendingReloginPromise) return pendingReloginPromise;
@@ -153,6 +170,12 @@
         throw err;
       }
       if (!is401 || isAuthEndpoint(path) || options.noAuth) {
+        throw err;
+      }
+      /* v950-guard: kostenpflichtig -> Re-Login ja, Wiederholung NEIN. */
+      if (isPaidEndpoint(path)) {
+        console.warn('[401-handler] 401 bei kostenpflichtigem Aufruf', path,
+                     '— kein automatischer Retry (haette Kerosin gekostet). Nutzer muss erneut klicken.');
         throw err;
       }
       // Anti-Doppel-Retry: einmal ist genug
