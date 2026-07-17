@@ -783,17 +783,47 @@
   function _mbInjectCss() {
     if (document.getElementById('dab-mb-css')) return;
     var st = document.createElement('style'); st.id = 'dab-mb-css';
+    /* v942-mbrow: Look = .dab-doc-row (44er Kachel, Haarlinie rgba(42,39,39,.1)).
+       Gold ueber --dab-gold* -> zeigt seit W5 auf --gold, dreht also beim
+       Partner-Mandanten mit. Kein hartes rgba(201,168,76,..) mehr. */
     st.textContent = '#s8 .dab-mb-host{padding:6px 2px}#s8 .dab-mb-empty{color:#8a8378;font-size:13px;padding:8px 2px}'
-      + '#s8 .dab-mb-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 2px;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent)}'
-      + '#s8 .dab-mb-row:first-child{border-top:none}#s8 .dab-mb-d{font-weight:600;color:#2c2822;font-size:13.5px}'
-      + '#s8 .dab-mb-mv{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--wl-9a7f33, #9a7f33)}';
+      + '#s8 .dab-mb-row{display:flex;align-items:center;gap:14px;padding:14px 4px;border-top:1px solid rgba(42,39,39,.1)}'
+      + '#s8 .dab-mb-row:first-child{border-top:none}'
+      + '#s8 .dab-mb-icb{width:44px;height:44px;border-radius:11px;background:#F8F6F1;border:1px solid rgba(42,39,39,.12);display:flex;align-items:center;justify-content:center;color:var(--dab-gold3);flex-shrink:0}'
+      + '#s8 .dab-mb-main{flex:1;min-width:0}'
+      + '#s8 .dab-mb-l1{display:flex;align-items:center;gap:8px;margin-bottom:3px}'
+      + '#s8 .dab-mb-kz{font-family:var(--dab-fs);font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#1a1508;background:var(--dab-run);border-radius:4px;padding:2px 6px;white-space:nowrap}'
+      + '#s8 .dab-mb-kz.none{background:none;border:1px dashed rgba(42,39,39,.28);color:#8a8378}'
+      + '#s8 .dab-mb-addr{font-size:13.5px;font-weight:600;color:#2A2727;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+      + '#s8 .dab-mb-d{font-family:var(--dab-fm);font-size:11px;color:#8a8378;font-weight:400}'
+      + '#s8 .dab-mb-mv{font-family:var(--dab-fm);font-size:14.5px;font-weight:700;color:#2A2727;white-space:nowrap;text-align:right}'
+      + '#s8 .dab-mb-mv small{display:block;font-family:var(--dab-fs);font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--dab-gold3);margin-top:2px}'
+      + '#s8 .dab-mb-mv.nod{color:#8a8378;font-weight:500;font-size:11.5px}'
+      + '@media(max-width:600px){#s8 .dab-mb-row{flex-wrap:wrap}#s8 .dab-mb-mv{text-align:left}}';
     document.head.appendChild(st);
   }
+  /* v942-mbrow: eigenes Icon — die ICO-Tabelle traegt kein Dokument-Symbol. */
+  var _DAB_MB_DOC = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
+    + '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>';
+  /* v946-objready: EINMAL registrieren, nicht bei jedem Rendern neu.
+   * afterRender() laeuft genau einmal (Z.731) — wenn _currentObjKey da noch
+   * nicht steht, blieb "Kein Objekt aktiv." bis zum Hard-Reload stehen.
+   * Jetzt zeichnet das Band neu, sobald storage.js den Schluessel meldet. */
+  window._dabMbRefresh = function () { try { mountMarktberichte(); } catch (e) {} };
+  if (!window._dabMbBound) {
+    window._dabMbBound = 1;
+    window.addEventListener('dp:object-ready', function () { window._dabMbRefresh(); });
+  }
+
   async function mountMarktberichte() {
     var host = document.getElementById('dab-mb-host'); if (!host) return;
     _mbInjectCss();
     var id = currentObjId();
-    if (!id) { host.innerHTML = '<div class="dab-mb-empty">Kein Objekt aktiv.</div>'; return; }
+    if (!id) {
+      /* Kein Dead-End mehr: dp:object-ready holt uns hier wieder raus. */
+      host.innerHTML = '<div class="dab-mb-empty">Kein Objekt aktiv \u2014 links ein Objekt \u00f6ffnen.</div>';
+      return;
+    }
     host.innerHTML = '<div class="dab-mb-empty">Marktberichte werden geladen \u2026</div>';
     try {
       var t = token(); var res = await fetch('/api/v1/marktbericht/objects/history?ref=' + encodeURIComponent(id), { headers: t ? { Authorization: 'Bearer ' + t } : {} });
@@ -801,11 +831,23 @@
       var reps = ((j && j.history) || []).filter(function (h) { return h && h.report_id != null; });
       if (!reps.length) { host.innerHTML = '<div class="dab-mb-empty">Noch keine Marktberichte f\u00fcr dieses Objekt \u2014 im Bewertung-Tab einen erstellen.</div>'; return; }
       reps.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+      /* v942-mbrow: Kuerzel + Adresse + Datum + Marktwert statt nacktem Timestamp.
+       * Alle vier Werte liegen seit jeher in mb.object_snapshots — sie wurden nur
+       * nie durchgereicht (api.js SELECT) und nie gerendert. KEIN Filter hier:
+       * das Band heisst "zu diesem Objekt", da gehoert genau eins hin. */
       host.innerHTML = reps.map(function (h) {
-        var d = new Date(h.created_at); var ds = d.toLocaleDateString('de-DE') + ' ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-        var mv = h.market_value ? new Intl.NumberFormat('de-DE').format(Math.round(h.market_value)) + ' \u20ac' : '';
-        return '<div class="dab-mb-row"><div><div class="dab-mb-d">' + ds + '</div><div class="dab-mb-mv">' + mv + '</div></div>'
-          + '<button class="dab-doc-btn gold" onclick="DealActionBoarding.downloadReport(' + (h.report_id | 0) + ')">' + ICO.dl + 'PDF</button></div>';
+        var d = new Date(h.created_at); var ds = d.toLocaleDateString('de-DE') + ' \u00b7 ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        var kz = h.object_label
+          ? '<span class="dab-mb-kz">' + String(h.object_label).replace(/</g, '&lt;') + '</span>'
+          : '<span class="dab-mb-kz none">ohne Objekt</span>';
+        var addr = String(h.address || 'Adresse unbekannt').replace(/</g, '&lt;');
+        var mv = (h.market_value != null && h.market_value !== '')
+          ? '<div class="dab-mb-mv">' + new Intl.NumberFormat('de-DE').format(Math.round(h.market_value)) + ' \u20ac<small>Marktwert</small></div>'
+          : '<div class="dab-mb-mv nod">keine Daten</div>';
+        return '<div class="dab-mb-row"><span class="dab-mb-icb">' + _DAB_MB_DOC + '</span>'
+          + '<div class="dab-mb-main"><div class="dab-mb-l1">' + kz + '<span class="dab-mb-addr">' + addr + '</span></div>'
+          + '<div class="dab-mb-d">' + ds + '</div></div>' + mv
+          + '<button class="dab-doc-btn" onclick="DealActionBoarding.downloadReport(' + (h.report_id | 0) + ')">' + ICO.dl + 'PDF</button></div>';
       }).join('');
     } catch (e) { host.innerHTML = '<div class="dab-mb-empty">Konnte Marktberichte nicht laden.</div>'; }
   }

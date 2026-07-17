@@ -282,13 +282,19 @@ router.post('/location-finder', async (req, res) => {
 
 // GET /objects — Liste aller Objekte (gruppiert) mit dem jeweils neuesten Snapshot.
 router.get('/objects', async (req, res) => {
+  /* v942-userbind: user_id kommt vom DealPilot-Proxy (nie vom Browser). Ohne -> 400. */
+  const uid = parseInt(req.query.user_id, 10);
+  if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
   try {
     const r = await q(
-      `SELECT DISTINCT ON (object_key) object_key, external_ref, address, property_type,
+      `SELECT DISTINCT ON (object_key) object_key, external_ref, object_label, address, property_type,
               living_area, build_year, market_value, deal_score, created_at,
-              (SELECT count(*) FROM mb.object_snapshots s2 WHERE s2.object_key = s1.object_key) AS snapshots
+              (SELECT count(*) FROM mb.object_snapshots s2
+                WHERE s2.object_key = s1.object_key AND s2.user_id = s1.user_id) AS snapshots
          FROM mb.object_snapshots s1
-        ORDER BY object_key, created_at DESC`
+        WHERE s1.user_id = $1
+        ORDER BY object_key, created_at DESC`,
+      [uid]
     );
     res.json({ objects: r });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -296,17 +302,24 @@ router.get('/objects', async (req, res) => {
 
 // GET /objects/history?key=... (oder ?ref=DealPilot-ID) — zeitlicher Verlauf eines Objekts.
 router.get('/objects/history', async (req, res) => {
+  /* v942-userbind: user_id Pflicht. key/ref sind jetzt OPTIONAL -> ohne beides
+     liefert die Route ALLE Berichte des Users ("Alle"-Filter der Liste). */
+  const uid = parseInt(req.query.user_id, 10);
+  if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
   const key = req.query.key, ref = req.query.ref;
-  if (!key && !ref) return res.status(400).json({ error: 'key oder ref erforderlich' });
+  const cond = key ? ' AND object_key = $2' : (ref ? ' AND external_ref = $2' : '');
+  const args = cond ? [uid, (key || ref)] : [uid];
   try {
     const r = await q(
-      `SELECT id, report_id, created_at, market_value, market_value_low, market_value_high,
+      `SELECT id, report_id, created_at, object_key, external_ref, object_label, address,
+              property_type, living_area, build_year,
+              market_value, market_value_low, market_value_high,
               median_sqm, gross_yield_pct, rent_multiplier, deal_score, micro_score, macro_score,
               price_cagr_pct, confidence, comparable_group, ai_mode
          FROM mb.object_snapshots
-        WHERE ${key ? 'object_key = $1' : 'external_ref = $1'}
+        WHERE user_id = $1${cond}
         ORDER BY created_at ASC`,
-      [key || ref]
+      args
     );
     res.json({ key: key || null, ref: ref || null, count: r.length, history: r });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -447,7 +460,10 @@ router.get('/reports/one', async (req, res) => {
   try {
     const id = parseInt(req.query.id, 10);
     if (!id) return res.status(400).json({ error: 'id erforderlich' });
-    const r = await q1('SELECT id, property_id, ai_mode, payload, report_md FROM mb.market_reports WHERE id = $1', [id]);
+    /* v942-userbind: nur der Besitzer. 404 statt 403 -> verraet nicht, dass es die id gibt. */
+    const uid = parseInt(req.query.user_id, 10);
+    if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
+    const r = await q1('SELECT id, property_id, ai_mode, payload, report_md FROM mb.market_reports WHERE id = $1 AND user_id = $2', [id, uid]);
     if (!r) return res.status(404).json({ error: 'kein Bericht (id=' + id + ')' });
     let data = r.payload;
     if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) {} }

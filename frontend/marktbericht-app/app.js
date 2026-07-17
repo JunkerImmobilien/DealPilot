@@ -60,6 +60,29 @@ if (!window._wlrgbaH) {
 }
 // app.js — Dashboard-Logik (Vanilla JS, kein Build-Step; passt zu DealPilot).
 const API = '/api/v1/marktbericht';
+
+/* v945-scroll
+ * ──────────────────────────────────────────────────────────────────────────
+ * window.scrollTo() ist hier ZWEIMAL wirkungslos:
+ *   1. `window` ist das iframe-Dokument. marktbericht-view.js:93 setzt
+ *      fr.style.height auf die volle Inhaltshoehe -> das iframe hat gar keine
+ *      Scrollleiste, scrollTop bleibt 0.
+ *   2. Selbst im Elterndokument wuerde es nichts tun: html/body haben dort
+ *      overflow:hidden. Der echte Scroll-Container ist .main-col (V236).
+ * Deshalb reden wir mit der Elternseite — same-origin, direkter Aufruf;
+ * postMessage als zweites Netz (Muster: 'mbv-close', app.js unten).
+ * Standalone (ohne iframe) bleibt window.scrollTo als letzter Rueckfall.
+ */
+function _mbScrollTop() {
+  try {
+    if (window.parent && window.parent !== window && typeof window.parent._v236ScrollTop === 'function') {
+      window.parent._v236ScrollTop();
+      return;
+    }
+  } catch (e) {}
+  try { if (window.parent && window.parent !== window) { parent.postMessage({ type: 'mbv-scrolltop' }, '*'); return; } } catch (e) {}
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
+}
 let map, marker, compLayer, chart;
 
 const $ = (id) => document.getElementById(id);
@@ -94,10 +117,22 @@ $('replayBtn').addEventListener('click', async () => {
   }
 });
 
+/* v942-mbrep
+ * ──────────────────────────────────────────────────────────────────────────
+ * EINE Quelle fuer den Objektbezug. Bis v941 gab es zwei, die nichts
+ * voneinander wussten: app.js las nur ?ref aus der URL, mb-objektwahl.js warf
+ * die gewaehlte id weg. Ergebnis: ueber das Dropdown erzeugte Berichte hatten
+ * gar keinen Objektbezug.
+ */
+function _mbRef() {
+  if (window._mbwRef) return String(window._mbwRef);
+  try { return new URLSearchParams(location.search).get('ref') || null; } catch (e) { return null; }
+}
+
 async function generate() {
   /* v647-cost: Kostenhinweis vor dem kostenpflichtigen Abruf */
   if (!window.confirm('Marktbericht jetzt erstellen?\n\nKosten: 5 L Kerosin – nur wenn ein Marktwert ermittelt wird. Liegen keine Marktdaten vor, wird nichts abgebucht.')) return; /* v654-cost-text */
-  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} /* v569-appbeh scroll */
+  _mbScrollTop(); /* v945-scroll: war ein No-Op im iframe (v569-appbeh) */
   const btn = $('goBtn');
   $('errBox').classList.add('hide');
   const _sig = $('loadSignal'); if (_sig) _sig.classList.add('hide');
@@ -106,7 +141,8 @@ async function generate() {
   btn.innerHTML = '<span class="spin"></span> erstelle…';
 
   const body = {
-    external_ref: (function(){ try{ var r=new URLSearchParams(location.search).get('ref'); return r||undefined; }catch(e){ return undefined; } })(), /* v895f-reportslist */
+    external_ref: (function(){ return _mbRef() || undefined; })(), /* v942-mbrep: Dropdown schlaegt URL */
+    object_label: (function(){ return window._mbwLabel || undefined; })(),
     address: $('address').value,
     property_type: $('ptype').value,
     usage_type: $('usage').value,
@@ -949,11 +985,61 @@ function _mbBuildObjData() {
   Object.keys(data).forEach(function (k) { if (data[k] == null || data[k] === '') delete data[k]; });
   return data;
 }
+/* v942-mbrep: Dialog "Dieses Objekt gibt es schon".
+ * Bis v941 legte JEDER Klick wortlos ein neues Objekt an — auch beim zehnten
+ * Mal und auch dann, wenn das Objekt zwei Minuten vorher aus genau diesem
+ * Bestand ins Formular geladen wurde (die id war bekannt und wurde ignoriert).
+ * "Aktualisieren" setzt NUR svwert + Marktdaten: die Handeingaben (kp, nkm, ze,
+ * Finanzierung, Steuer) sind Arbeit, der Bericht ist eine Indikation. */
+function _mbAskExisting(ref, label) {
+  return new Promise(function (resolve) {
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(6,6,8,.66);display:flex;align-items:center;justify-content:center;padding:20px;z-index:99999';
+    var run = 'linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))';
+    var opt = 'display:flex;align-items:flex-start;gap:11px;border:1.5px solid rgba(42,39,39,.12);border-radius:11px;padding:11px 13px;cursor:pointer;background:#fff;text-align:left;width:100%;font-family:inherit';
+    ov.innerHTML =
+      '<div style="width:100%;max-width:475px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 40px 90px -30px rgba(0,0,0,.75)">'
+      + '<div style="background:#0a0a0a;padding:9px 16px;display:flex;align-items:center;justify-content:space-between">'
+      +   '<span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:14px;color:#fff">Deal<span style="background:'+run+';-webkit-background-clip:text;background-clip:text;color:transparent">Pilot</span></span>'
+      +   '<button data-a="x" style="background:none;border:none;color:#7d7668;font-size:19px;cursor:pointer;line-height:1">\u00d7</button></div>'
+      + '<div style="background:'+run+';padding:15px 20px">'
+      +   '<h3 style="font-family:\'Space Grotesk\',sans-serif;margin:0;font-size:19px;color:#1a1407">Dieses Objekt gibt es schon</h3>'
+      +   '<p style="margin:4px 0 0;font-size:12.5px;color:#4a3d18">Der Marktbericht geh\u00f6rt zu einem Objekt in deinem Bestand.</p></div>'
+      + '<div style="padding:18px 20px 19px">'
+      +   '<div style="border:1px solid rgba(42,39,39,.12);border-radius:11px;padding:11px 13px;background:#F8F6F1;margin-bottom:15px;font-size:13px;font-weight:600;color:#2A2727">'+String(label||ref).replace(/</g,'&lt;')+'</div>'
+      +   '<button data-a="upd" style="'+opt+'"><span style="width:26px;height:26px;border-radius:7px;display:grid;place-items:center;flex-shrink:0;background:#F8F6F1;border:1px solid rgba(42,39,39,.12);color:var(--wl-9a7f33, #9a7f33)">\u21bb</span>'
+      +     '<span><span style="font-family:\'Space Grotesk\',sans-serif;font-size:13px;font-weight:600;color:#2A2727;display:block;margin-bottom:2px">Objekt aktualisieren</span>'
+      +     '<span style="font-size:11.5px;color:#8a8378;line-height:1.45;display:block">Setzt den Marktwert. Finanzierung, Miete und Steuerdaten bleiben unangetastet.</span></span></button>'
+      +   '<button data-a="new" style="'+opt+';margin-top:9px"><span style="width:26px;height:26px;border-radius:7px;display:grid;place-items:center;flex-shrink:0;background:#F8F6F1;border:1px solid rgba(42,39,39,.12);color:#B86250">\uff0b</span>'
+      +     '<span><span style="font-family:\'Space Grotesk\',sans-serif;font-size:13px;font-weight:600;color:#2A2727;display:block;margin-bottom:2px">Trotzdem neu anlegen</span>'
+      +     '<span style="font-size:11.5px;color:#8a8378;line-height:1.45;display:block">Zweites Objekt mit derselben Adresse \u2014 z.B. f\u00fcr eine andere Einheit im Haus.</span></span></button>'
+      +   '<button data-a="x" style="margin-top:13px;width:100%;background:none;border:none;color:#8a8378;font-size:12.5px;cursor:pointer;font-family:inherit;padding:7px">Abbrechen</button>'
+      + '</div></div>';
+    function done(v) { try { ov.remove(); } catch (e) {} document.removeEventListener('keydown', esc); resolve(v); }
+    function esc(e) { if (e.key === 'Escape') done(null); }
+    ov.addEventListener('click', function (e) {
+      if (e.target === ov) return done(null);
+      var b = e.target.closest('button'); if (!b) return;
+      var a = b.getAttribute('data-a');
+      done(a === 'x' ? null : a);
+    });
+    document.addEventListener('keydown', esc);
+    document.body.appendChild(ov);
+  });
+}
+
 async function _mbSaveAsObject(btn) {
   var tok = ''; try { tok = localStorage.getItem('ji_token') || ''; } catch (e) {}
   if (!tok) { alert('Bitte zuerst im DealPilot-Cockpit einloggen, dann erneut speichern.'); return; }
   var data = _mbBuildObjData();
   if (!data.str && !data.ort) { alert('Bitte zuerst eine Adresse eingeben.'); return; }
+  /* v942-mbrep: kennen wir das Objekt schon? Dann fragen statt duplizieren. */
+  var _ref = _mbRef();
+  if (_ref) {
+    var _w = await _mbAskExisting(_ref, window._mbwLabel);
+    if (!_w) { return; }
+    if (_w === 'upd') { return _mbUpdateObject(btn, _ref); }
+  }
   var aiText = null; try { var o = window._lastOut; if (o && o.report_md) aiText = o.report_md; } catch (e) {}
   var old = btn.textContent; btn.textContent = 'Speichere…'; btn.disabled = true;
   try {
@@ -970,6 +1056,32 @@ async function _mbSaveAsObject(btn) {
     setTimeout(function () { btn.textContent = old; }, 2600);
   }
 }
+/* v942-mbrep: nur svwert + Marktdaten. PATCH statt PUT waere schoener, aber
+ * /api/v1/objects/:id nimmt PUT mit {data} — wir lesen, mergen, schreiben. */
+async function _mbUpdateObject(btn, ref) {
+  var tok = ''; try { tok = localStorage.getItem('ji_token') || ''; } catch (e) {}
+  var old = btn.textContent; btn.textContent = 'Aktualisiere\u2026'; btn.disabled = true;
+  try {
+    var g = await fetch('/api/v1/objects/' + encodeURIComponent(ref), { headers: { Authorization: 'Bearer ' + tok } });
+    if (!g.ok) throw new Error('HTTP ' + g.status);
+    var o = await g.json(); var cur = (o.item || o.object || o);
+    var d = Object.assign({}, cur.data || {});
+    var o2 = window._lastOut, mv = null;
+    try { mv = o2 && o2.data && o2.data.valuation && o2.data.valuation.market_value && o2.data.valuation.market_value.estimated; } catch (e) {}
+    if (mv != null) d.svwert = Math.round(mv);
+    var res = await fetch('/api/v1/objects/' + encodeURIComponent(ref), {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
+      body: JSON.stringify({ data: d })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    btn.textContent = '\u2713 Objekt aktualisiert'; btn.disabled = true;
+  } catch (e) {
+    try { console.error('[mb updObj]', e); } catch (_) {}
+    btn.textContent = 'Fehler \u2014 erneut?'; btn.disabled = false;
+    setTimeout(function () { btn.textContent = old; }, 2600);
+  }
+}
+
 function _installMbSaveObject() {
   var anchor = document.getElementById('saveFileBtn');
   if (!anchor || document.getElementById('mbSaveObjBtn')) return;
@@ -979,51 +1091,164 @@ function _installMbSaveObject() {
   anchor.parentNode.insertBefore(b, anchor);
 }
 /* v895f-reportslist: Liste vorhandener Marktberichte zu diesem Objekt (links) + Abruf via /reports/one */
+function _mbAuth(){ try{ var t=localStorage.getItem('ji_token')||''; return t?{Authorization:'Bearer '+t}:{}; }catch(e){ return {}; } } /* v942 */
 function _mbFmtDate(s){ try{ var d=new Date(s); return d.toLocaleDateString('de-DE')+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return s||''; } }
 function _mbEnsureReportsPanel(){
   var p=document.getElementById('mbReportsPanel'); if(p) return p;
-  var panels=document.querySelectorAll('.panel'), target=null;
-  for(var i=0;i<panels.length;i++){ var h=panels[i].querySelector('h1'); if(h && /Objekt eingeben/i.test(h.textContent)){ target=panels[i]; break; } }
-  if(!target) return null;
+  /* v943-layout
+   * ────────────────────────────────────────────────────────────────────────
+   * NICHT ins Grid haengen! .grid ist zweispaltig (380px 1fr). Ein drittes
+   * Kind schiebt das Formular in die 1fr-Spalte und das Ergebnis in die
+   * naechste Zeile auf 380px. Genau das ist bis v942 passiert.
+   * Anker ist deshalb das Grid selbst — die Liste kommt DAVOR, als
+   * Geschwister in #view-report: volle Breite, direkt unter der Karte.
+   */
+  var target=document.querySelector('#view-report .grid')||document.querySelector('.grid');
+  if(!target||!target.parentNode) return null;
   if(!document.getElementById('mbReportsStyle')){
     var st=document.createElement('style'); st.id='mbReportsStyle';
-    st.textContent='#mbReportsPanel .mbrep-h{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--wl-9a7d28, #9a7d28);margin-bottom:8px}'
-     +'#mbReportsPanel .mbrep-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent)}'
-     +'#mbReportsPanel .mbrep-date{font-size:12.5px;color:#4a443c}'
-     +'#mbReportsPanel .mbrep-act{display:flex;gap:6px}'
-     +'#mbReportsPanel button{border:1px solid var(--wl-c9a84c, #C9A84C);background:transparent;color:var(--wl-9a7d28, #9a7d28);border-radius:999px;padding:4px 12px;font-size:11.5px;font-weight:600;cursor:pointer}'
-     +'#mbReportsPanel .mbrep-pdf{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1508;border:none}';
+    /* v942-mbrep: Look = Deal-Aktion-Tab (.dab-panel/.dab-doc-row), reinweiss,
+       Gold ueber var(--wl-<hex>, #<hex>) — die W30-Konvention. Alle vier Toene
+       (C9A84C/E8CC7A/b8932f/9a7f33) stehen bereits in WL_TINTS, die Liste
+       bleibt unangetastet. */
+    st.textContent='#mbReportsPanel{background:#fff}'
+     +'#mbReportsPanel .mbrep-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}'
+     +'#mbReportsPanel .mbrep-h{font-family:"Space Grotesk",sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33)}'
+     +'#mbReportsPanel .mbrep-h b{color:#2A2727;font-family:"JetBrains Mono",monospace}'
+     +'#mbReportsPanel .mbrep-f{display:inline-flex;border:1.5px solid rgba(42,39,39,.12);border-radius:9px;overflow:hidden;background:#fff}'
+     +'#mbReportsPanel .mbrep-f button{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:11.5px;color:#8a8378;background:transparent;border:none;padding:6px 14px;cursor:pointer;border-radius:0}'
+     +'#mbReportsPanel .mbrep-f button.on{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1508}'
+     +'#mbReportsPanel .mbrep-row{display:flex;align-items:center;gap:14px;padding:14px 4px;border-top:1px solid rgba(42,39,39,.1)}'
+     +'#mbReportsPanel .mbrep-row:first-of-type{margin-top:14px}'
+     +'#mbReportsPanel .mbrep-icb{width:44px;height:44px;border-radius:11px;background:#F8F6F1;border:1px solid rgba(42,39,39,.12);display:flex;align-items:center;justify-content:center;color:var(--wl-9a7f33, #9a7f33);flex-shrink:0}'
+     +'#mbReportsPanel .mbrep-main{flex:1;min-width:0}'
+     +'#mbReportsPanel .mbrep-l1{display:flex;align-items:center;gap:8px;margin-bottom:3px}'
+     +'#mbReportsPanel .mbrep-kz{font-family:"Space Grotesk",sans-serif;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#1a1508;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));border-radius:4px;padding:2px 6px;white-space:nowrap}'
+     +'#mbReportsPanel .mbrep-kz.none{background:none;border:1px dashed rgba(42,39,39,.28);color:#8a8378}'
+     +'#mbReportsPanel .mbrep-addr{font-size:13.5px;font-weight:600;color:#2A2727;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+     +'#mbReportsPanel .mbrep-date{font-family:"JetBrains Mono",monospace;font-size:11px;color:#8a8378}'
+     +'#mbReportsPanel .mbrep-mv{font-family:"JetBrains Mono",monospace;font-size:14.5px;font-weight:700;color:#2A2727;white-space:nowrap;text-align:right}'
+     +'#mbReportsPanel .mbrep-mv small{display:block;font-family:"Space Grotesk",sans-serif;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-top:2px}'
+     +'#mbReportsPanel .mbrep-mv.nod{color:#8a8378;font-weight:500;font-size:11.5px}'
+     +'#mbReportsPanel .mbrep-act{display:flex;gap:7px;flex-shrink:0}'
+     +'#mbReportsPanel .mbrep-act button{font-family:"Space Grotesk",sans-serif;font-size:11.5px;font-weight:600;border:1.5px solid rgba(42,39,39,.12);background:#fff;color:#2A2727;border-radius:9px;padding:7px 13px;cursor:pointer}'
+     +'#mbReportsPanel .mbrep-act button:hover{border-color:var(--wl-c9a84c, #C9A84C);color:var(--wl-9a7f33, #9a7f33)}'
+     +'#mbReportsPanel .mbrep-empty{color:#8a8378;font-size:12.5px;padding:16px 4px;border-top:1px solid rgba(42,39,39,.1);margin-top:14px}'
+     /* v944-collapse: KEINE zwei Spalten — ein Bericht pro Zeile. "Volle Breite"
+        heisst volle Breite fuer die Zeile, nicht zwei Zeilen nebeneinander. */
+     +'#mbReportsPanel .mbrep-list{display:none}'
+     +'#mbReportsPanel.open .mbrep-list{display:block}'
+     +'#mbReportsPanel .mbrep-tog{display:inline-flex;align-items:center;gap:7px;font-family:"Space Grotesk",sans-serif;font-size:11.5px;font-weight:600;color:#8a8378;background:none;border:none;cursor:pointer;padding:6px 2px}'
+     +'#mbReportsPanel .mbrep-tog:hover{color:var(--wl-9a7f33, #9a7f33)}'
+     +'#mbReportsPanel .mbrep-tog .chev{display:inline-block;transition:transform .18s;font-size:9px}'
+     +'#mbReportsPanel.open .mbrep-tog .chev{transform:rotate(90deg)}'
+     +'#mbReportsPanel:not(.open) .mbrep-top{padding-bottom:0}'
+     +'@media(max-width:600px){#mbReportsPanel .mbrep-row{flex-wrap:wrap}#mbReportsPanel .mbrep-mv{text-align:left}}';
     document.head.appendChild(st);
   }
-  p=document.createElement('div'); p.className='panel'; p.id='mbReportsPanel'; p.style.display='none';
-  target.parentNode.insertBefore(p, target);
+  p=document.createElement('div'); p.className='panel'; p.id='mbReportsPanel'; p.style.display='none'; /* v942: wird von _mbLoadReportsList gesteuert */
+  p.style.margin='0 0 22px';                 /* v943: gleicher Abstand wie .grid gap */
+  target.parentNode.insertBefore(p, target);  /* VOR dem Grid -> volle Breite */
   return p;
 }
 async function _mbOpenReport(rid, asPdf){
   try{
-    var res=await fetch(API + '/reports/one?id=' + encodeURIComponent(rid));
+    var res=await fetch(API + '/reports/one?id=' + encodeURIComponent(rid), { headers:_mbAuth() }); /* v942 */
     if(!res.ok) throw new Error('HTTP '+res.status);
     var out=await res.json(); render(out);
     if(asPdf){ try{ await exportPdf(out); }catch(e){ alert('PDF-Fehler: '+e.message); } }
-    else { try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(_){ } }
+    else { _mbScrollTop(); } /* v945-scroll */
   }catch(e){ alert('Bericht konnte nicht geladen werden: '+e.message); }
 }
+/* v942-mbrep: Liste — EIN Aufruf-Pfad, drei Ausloeser (Boot, Objektwahl, nach
+ * dem Erstellen). Bis v941 gab es ZWEI Pfade, die verschiedene Spalten
+ * abfragten: Boot fragte ?ref=external_ref (fand nie was, weil dort das
+ * Kuerzel stand), render() fragte ?key=object_key (fand die geo-Gruppe).
+ * Deshalb erschien die Tabelle erst NACH dem Erstellen. */
+var _mbRepScope = 'obj';   /* 'obj' | 'all' */
+/* v944-collapse: zugeklappt per Default. Der Marktbericht ist die Hauptsache,
+   die Historie das Nachschlagewerk — die soll nicht jedes Mal den Blick verstellen.
+   Entscheidung haelt ueber Neuladen. */
+var _mbRepOpen = (function(){ try{ return localStorage.getItem('dp_mbrep_open') === '1'; }catch(e){ return false; } })();
+var _mbRepLast  = null;    /* letzte {key,ref} fuer Neuzeichnen beim Umschalten */
+
+function _mbEur(n){ try{ return new Intl.NumberFormat('de-DE').format(Math.round(n))+' \u20ac'; }catch(e){ return String(n); } }
+var _MB_DOC_ICO = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'
+  + '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>';
+
+function _mbRepRow(h){
+  var kz = h.object_label
+    ? '<span class="mbrep-kz">'+String(h.object_label).replace(/</g,'&lt;')+'</span>'
+    : '<span class="mbrep-kz none">ohne Objekt</span>';
+  var addr = String(h.address || 'Adresse unbekannt').replace(/</g,'&lt;');
+  var mv = (h.market_value != null && h.market_value !== '')
+    ? '<div class="mbrep-mv">'+_mbEur(h.market_value)+'<small>Marktwert</small></div>'
+    : '<div class="mbrep-mv nod">keine Daten</div>';
+  return '<div class="mbrep-row"><span class="mbrep-icb">'+_MB_DOC_ICO+'</span>'
+    + '<div class="mbrep-main"><div class="mbrep-l1">'+kz+'<span class="mbrep-addr">'+addr+'</span></div>'
+    + '<span class="mbrep-date">'+_mbFmtDate(h.created_at)+'</span></div>'+mv
+    + '<span class="mbrep-act"><button type="button" class="mbrep-view" data-rid="'+h.report_id+'">Ansehen</button>'
+    + '<button type="button" class="mbrep-pdf" data-rid="'+h.report_id+'">PDF</button></span></div>';
+}
+
 async function _mbLoadReportsList(opts){
   opts=opts||{};
-  var qs=opts.key?('key='+encodeURIComponent(opts.key)):(opts.ref?('ref='+encodeURIComponent(opts.ref)):null);
-  if(!qs) return;
+  if(opts.scope) _mbRepScope=opts.scope;
+  if(opts.key||opts.ref) _mbRepLast={key:opts.key||null, ref:opts.ref||null};
   var host=_mbEnsureReportsPanel(); if(!host) return;
-  try{
-    var res=await fetch(API + '/objects/history?' + qs); var j=await res.json();
-    var reps=((j&&j.history)||[]).filter(function(h){ return h && h.report_id!=null; });
-    if(!reps.length){ host.style.display='none'; host.innerHTML=''; return; }
-    reps.sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); });
-    var rows=reps.map(function(h){ return '<div class="mbrep-row"><span class="mbrep-date">'+_mbFmtDate(h.created_at)+'</span>'
-      +'<span class="mbrep-act"><button type="button" class="mbrep-view" data-rid="'+h.report_id+'">Ansehen</button>'
-      +'<button type="button" class="mbrep-pdf" data-rid="'+h.report_id+'">PDF</button></span></div>'; }).join('');
-    host.innerHTML='<div class="mbrep-h">Vorhandene Marktberichte ('+reps.length+')</div>'+rows; host.style.display='';
+
+  var key=(_mbRepLast&&_mbRepLast.key)||null;
+  var ref=(_mbRepLast&&_mbRepLast.ref)||_mbRef();
+  var qs='';
+  if(_mbRepScope==='obj'){
+    if(key) qs='key='+encodeURIComponent(key);
+    else if(ref) qs='ref='+encodeURIComponent(ref);
+  }
+  /* scope==='all' -> ohne key/ref: die Route liefert ALLE Berichte DIESES Users
+     (User-Filter sitzt im mb-Backend, v942-userbind). */
+
+  function head(n){
+    /* v944-collapse: Kopf zeigt Anzahl + Klapp-Umschalter. Filter nur sichtbar,
+       wenn aufgeklappt — zugeklappt waere er sinnlos. */
+    return '<div class="mbrep-top"><span class="mbrep-h">Vorhandene Marktberichte <b>('+n+')</b></span>'
+      + '<span style="display:flex;align-items:center;gap:12px">'
+      + (_mbRepOpen ? ('<span class="mbrep-f"><button type="button" data-scope="obj"'+(_mbRepScope==='obj'?' class="on"':'')+'>Dieses Objekt</button>'
+      + '<button type="button" data-scope="all"'+(_mbRepScope==='all'?' class="on"':'')+'>Alle</button></span>') : '')
+      + '<button type="button" class="mbrep-tog"><span class="chev">\u25B6</span>'+(_mbRepOpen?'Zuklappen':'Anzeigen')+'</button>'
+      + '</span></div>';
+  }
+  function wire(){
+    host.classList.toggle('open', !!_mbRepOpen);   /* v944-collapse */
+    var tg = host.querySelector('.mbrep-tog');
+    if (tg) tg.addEventListener('click', function(){
+      _mbRepOpen = !_mbRepOpen;
+      try { localStorage.setItem('dp_mbrep_open', _mbRepOpen ? '1' : '0'); } catch(e){}
+      _mbLoadReportsList({});
+    });
+    host.querySelectorAll('.mbrep-f button').forEach(function(b){
+      b.addEventListener('click',function(){ _mbLoadReportsList({scope:b.getAttribute('data-scope')}); });
+    });
     host.querySelectorAll('.mbrep-view').forEach(function(b){ b.addEventListener('click',function(){ _mbOpenReport(b.getAttribute('data-rid'),false); }); });
     host.querySelectorAll('.mbrep-pdf').forEach(function(b){ b.addEventListener('click',function(){ _mbOpenReport(b.getAttribute('data-rid'),true); }); });
+  }
+
+  if(_mbRepScope==='obj' && !qs){
+    host.innerHTML=head(0)+'<div class="mbrep-list"><div class="mbrep-empty">Kein Objekt gew\u00e4hlt \u2014 oben ein Bestandsobjekt laden oder auf \u201eAlle\u201c umschalten.</div></div>'; /* v944 */
+    host.style.display=''; wire(); return;
+  }
+  try{
+    var res=await fetch(API + '/objects/history' + (qs?('?'+qs):''), { headers:_mbAuth() });
+    var j=await res.json();
+    var reps=((j&&j.history)||[]).filter(function(h){ return h && h.report_id!=null; });
+    reps.sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); });
+    if(!reps.length){
+      host.innerHTML=head(0)+'<div class="mbrep-list"><div class="mbrep-empty">'
+        +(_mbRepScope==='all'?'Noch keine Marktberichte.':'Noch kein Marktbericht f\u00fcr dieses Objekt \u2014 Daten pr\u00fcfen und \u201eMarktbericht erstellen\u201c klicken.')
+        +'</div></div>'; /* v944 */
+      host.style.display=''; wire(); return;
+    }
+    host.innerHTML=head(reps.length)+'<div class="mbrep-list">'+reps.map(_mbRepRow).join('')+'</div>'; /* v943 */
+    host.style.display=''; wire();
   }catch(e){ try{ console.warn('[mb reportslist]',e); }catch(_){ } }
 }
 
@@ -2687,7 +2912,7 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
         b.style.color = on ? '#0a0a0a' : '#9a9aa3';
         b.style.borderColor = on ? window._wlc('#C9A84C') : '#2a2a30';
       });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      _mbScrollTop(); /* v945-scroll */
     }
     tabs.querySelectorAll('.mtab').forEach(function (b) {
       b.addEventListener('click', function () { setView(b.getAttribute('data-view')); });
@@ -2875,8 +3100,16 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
 
 /* v570-prog */
 
-/* v895f-reportslist: beim Laden Berichte-Liste ziehen, wenn ?ref uebergeben wurde */
-try { (function () { var _r; try { _r = new URLSearchParams(location.search).get('ref'); } catch (e) {}
-  if (_r) { if (document.readyState !== 'loading') { try { _mbLoadReportsList({ ref: _r }); } catch (e) {} }
-    else document.addEventListener('DOMContentLoaded', function () { try { _mbLoadReportsList({ ref: _r }); } catch (e) {} }); }
+/* v942-mbrep: Die Liste haengt jetzt an ALLEN drei Ausloesern statt an einem.
+ * (1) Boot — auch OHNE ?ref, dann eben mit dem Hinweis "kein Objekt gewaehlt".
+ * (2) Objektwahl im Dropdown (Event aus mb-objektwahl.js).
+ * (3) nach dem Erstellen (render(), s.o. _mbLoadReportsList({key:out.object_key})).
+ * Damit ist "mal ist die Tabelle da, mal nicht" strukturell weg. */
+try { (function () {
+  function boot(){ try { _mbLoadReportsList({}); } catch (e) {} }
+  if (document.readyState !== 'loading') boot();
+  else document.addEventListener('DOMContentLoaded', boot);
+  window.addEventListener('mb:object-picked', function (e) {
+    try { _mbLoadReportsList({ ref: (e && e.detail && e.detail.ref) || null, key: null }); } catch (x) {}
+  });
 })(); } catch (e) {}
