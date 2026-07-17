@@ -640,6 +640,36 @@ function renderAIResponse(text) {
 }
 
 async function runAI() {
+  /* v950-guard
+   * ────────────────────────────────────────────────────────────────────────
+   * GEMESSEN: ein Klick auf #ai-btn loeste DREI /ai/analyze aus.
+   *   getEventListeners('#ai-btn') -> { click: Array(2) }
+   *     index.html:2410  onclick="runAI()"
+   *     main.js:184      aiBtn.addEventListener('click', runAI)   <- v950 entfernt
+   *   + auth-401-handler.js:182 wiederholt nach Re-Login    <- v950 nimmt aus
+   * 2 Handler + 1 Retry = 3 Liter statt 1.
+   *
+   * Der Riegel sitzt HIER und nicht am Knopf: `btn.disabled = true` kommt zu
+   * spaet — beide Handler haengen am SELBEN Click-Event und laufen nacheinander,
+   * bevor disabled greift. Ein Flag beim Eintritt sieht der zweite sofort.
+   *
+   * Er bleibt auch dann drin, wenn main.js:184 weg ist: er deckt jeden Weg ab,
+   * auch den, den jemand in vier Wochen dazubaut. Ein Riegel gegen eine bekannte
+   * Ursache ist eine Kruecke — ein Riegel gegen die ganze Klasse ist eine Regel.
+   */
+  if (window._aiRunning) {
+    try { console.warn('[v950] Pilot-Analyse laeuft bereits — zweiter Aufruf verworfen (haette 1 L gekostet).'); } catch (e) {}
+    return;
+  }
+  window._aiRunning = true;
+  try {
+    return await _runAIGuarded();
+  } finally {
+    window._aiRunning = false;
+  }
+}
+
+async function _runAIGuarded() {
   if (typeof Paywall !== 'undefined' && !Paywall.gate('ai_calls')) return;
 
   if (!State.kpis || !State.kpis.kp) { toast('⚠ Bitte zuerst Kaufpreis eingeben'); return; }
@@ -686,13 +716,20 @@ function _buildAIPayload() {
     },
     kennzahlen: {
       kp: k.kp, gi: k.gi, ek: k.ek, bmy: k.bmy, nmy: k.nmy,
-      dscr: k.dscr, ltv: k.ltv, cf_m: k.cf_m, em: k.em
+      dscr: k.dscr, ltv: k.ltv, cf_m: k.cf_m, em: k.em,
+      nkm_j: k.nkm_j != null ? k.nkm_j : null, /* v947-mbsource: Nettokaltmiete/Jahr */
+      bwk: k.bwk != null ? k.bwk : null
     },
     finanzierung: {
       d1z_pct: k.d1z_pct, d1t_pct: k.d1t_pct, d1: k.d1,
       restschuld_ezb: (typeof State !== 'undefined' && State.rs1 != null) ? State.rs1 : ((typeof State !== 'undefined' && State.rs != null) ? State.rs : (parseDe(g('restschuld')) || null))
     },
     dealscore: dealscoreSnap || {},
+    /* v947-mbsource: NUR die Objekt-ID. Den Marktbericht holt /ai/analyze selbst
+     * aus dem mb-Backend — der Browser soll Marktdaten weder faelschen noch
+     * weglassen koennen, und es muss fuer JEDEN Aufrufer gelten, nicht nur fuer
+     * die zwei, die es heute gibt (ui.js:822 / ui.js:1236). */
+    objId: (typeof window._currentObjKey === 'string' && window._currentObjKey) ? window._currentObjKey : null,
     marktbewertung: {
       marktwert: parseDe(g('svwert')) || null,
       marktmiete_qm: parseDe(g('ds2_marktmiete')) || null
@@ -1197,6 +1234,22 @@ function _renderMiniAI(a) {
  * Mini-Block — und automatisch auch den Vollmodus in Tab s5.
  */
 async function runMiniAI() {
+  /* v950-guard: derselbe Endpoint, dieselbe Rechnung — derselbe Riegel.
+   * Beide Knoepfe teilen sich das Flag: waehrend die grosse Analyse laeuft,
+   * kann die Mini-Analyse nicht danebenfeuern und umgekehrt. */
+  if (window._aiRunning) {
+    try { console.warn('[v950] Pilot-Analyse laeuft bereits — zweiter Aufruf verworfen.'); } catch (e) {}
+    return;
+  }
+  window._aiRunning = true;
+  try {
+    return await _runMiniAIGuarded();
+  } finally {
+    window._aiRunning = false;
+  }
+}
+
+async function _runMiniAIGuarded() {
   var btn = document.getElementById('ai-mini-run');
   var body = document.getElementById('ai-mini-body');
   if (!btn || !body) return;

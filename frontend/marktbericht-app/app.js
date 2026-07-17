@@ -124,14 +124,90 @@ $('replayBtn').addEventListener('click', async () => {
  * die gewaehlte id weg. Ergebnis: ueber das Dropdown erzeugte Berichte hatten
  * gar keinen Objektbezug.
  */
+/* v951-checkup
+ * ──────────────────────────────────────────────────────────────────────────
+ * Plausibilitaet der Eingaben. Die Leiste "Genauigkeit" (app.js:2584) zaehlt
+ * bereits, was FEHLT — hier geht es darum, ob das Vorhandene zueinander passt.
+ *
+ * Real auf Prod: Kaltmiete 1.800 EUR auf 100 m² = 18,00 EUR/m², Marktmiete laut
+ * Bericht 6,86 EUR/m². Faktor 2,6. Der Bericht wurde klaglos erzeugt — 5 L fuer
+ * eine Zahl, die vermutlich ein Tippfehler war.
+ *
+ * Die Grenzen sind bewusst WEIT. Ein Checkup, der bei jedem zweiten Objekt
+ * anschlaegt, wird weggeklickt und ist damit schlechter als keiner. Er soll das
+ * Grobe fangen: vertauschte Felder, Tippfehler, Warmmiete statt Kaltmiete.
+ * Nichts blockiert — der Nutzer entscheidet, er sieht nur was er tut.
+ */
+function _mbCheckup() {
+  var n = function (id) { var e = $(id); if (!e) return null; var v = parseFloat(String(e.value).replace(/\./g, '').replace(',', '.')); return isFinite(v) && v > 0 ? v : null; };
+  var s = function (id) { var e = $(id); return e ? String(e.value || '').trim() : ''; };
+  var W = [], jetzt = new Date().getFullYear();
+
+  var wfl = n('area'), bj = n('year'), zi = n('rooms'), kp = n('price'), miete = n('rent');
+  var mod = n('modyear'), plot = n('plot'), etage = $('floor') ? parseFloat($('floor').value) : null;
+  var pt = s('ptype');
+  var istHaus = /EFH|DHH|RH|MFH|ZFH/i.test(pt);
+
+  if (bj && (bj < 1700 || bj > jetzt + 2))
+    W.push('Baujahr ' + bj + ' — bitte prüfen.');
+  if (bj && mod && mod < bj)
+    W.push('Modernisierung ' + mod + ' liegt vor dem Baujahr ' + bj + '.');
+  if (mod && mod > jetzt + 1)
+    W.push('Modernisierungsjahr ' + mod + ' liegt in der Zukunft.');
+  if (wfl && (wfl < 15 || wfl > 600))
+    W.push('Wohnfläche ' + wfl + ' m² — bitte prüfen.');
+  if (wfl && zi) {
+    var qz = wfl / zi;
+    if (qz < 10) W.push('Nur ' + qz.toFixed(0) + ' m² je Zimmer (' + wfl + ' m² auf ' + zi + ' Zimmer) — bitte prüfen.');
+    if (qz > 80) W.push(qz.toFixed(0) + ' m² je Zimmer (' + wfl + ' m² auf ' + zi + ' Zimmer) — bitte prüfen.');
+  }
+  if (wfl && miete) {
+    var qm = miete / wfl;
+    if (qm < 2) W.push('Kaltmiete ' + qm.toFixed(2).replace('.', ',') + ' €/m² — ungewöhnlich niedrig. Ist das die Monatsmiete?');
+    if (qm > 30) W.push('Kaltmiete ' + qm.toFixed(2).replace('.', ',') + ' €/m² — ungewöhnlich hoch. Warmmiete oder Jahresmiete eingetragen?');
+  }
+  if (wfl && kp) {
+    var qk = kp / wfl;
+    if (qk < 300) W.push('Kaufpreis ' + Math.round(qk).toLocaleString('de-DE') + ' €/m² — ungewöhnlich niedrig.');
+    if (qk > 20000) W.push('Kaufpreis ' + Math.round(qk).toLocaleString('de-DE') + ' €/m² — ungewöhnlich hoch.');
+  }
+  if (kp && miete) {
+    var fak = kp / (miete * 12);
+    if (fak < 8) W.push('Kaufpreisfaktor ' + fak.toFixed(1).replace('.', ',') + ' — sehr niedrig. Kaufpreis und Miete vertauscht?');
+    if (fak > 60) W.push('Kaufpreisfaktor ' + fak.toFixed(1).replace('.', ',') + ' — sehr hoch. Ist die Miete monatlich?');
+  }
+  if (!istHaus && plot)
+    W.push('Grundstücksfläche bei einer Wohnung — die fließt nur bei Häusern in die Bewertung ein.');
+  if (istHaus && plot && wfl && plot < wfl * 0.5)
+    W.push('Grundstück (' + plot + ' m²) kleiner als die halbe Wohnfläche (' + wfl + ' m²) — bitte prüfen.');
+  if (istHaus && etage > 0)
+    W.push('Etage bei einem Haus angegeben — wird ignoriert.');
+  if (etage > 30)
+    W.push('Etage ' + etage + ' — bitte prüfen.');
+
+  return W;
+}
+
 function _mbRef() {
   if (window._mbwRef) return String(window._mbwRef);
   try { return new URLSearchParams(location.search).get('ref') || null; } catch (e) { return null; }
 }
 
 async function generate() {
+  /* v951-checkup: Der Kostenhinweis war schon da — die Pruefung kommt hinein,
+   * nicht daneben. Zwei Dialoge hintereinander klickt niemand, er klickt sie weg.
+   * Sind die Zahlen sauber, bleibt der Dialog exakt wie vorher. */
+  var _w = [];
+  try { _w = _mbCheckup(); } catch (e) { try { console.warn('[v951] Checkup:', e.message); } catch (x) {} }
+  var _msg = 'Marktbericht jetzt erstellen?\n\nKosten: 5 L Kerosin – nur wenn ein Marktwert ermittelt wird. Liegen keine Marktdaten vor, wird nichts abgebucht.';
+  if (_w.length) {
+    _msg = '\u26a0 ' + _w.length + (_w.length === 1 ? ' Angabe sieht' : ' Angaben sehen') + ' ungew\u00f6hnlich aus:\n\n'
+         + _w.map(function (x, i) { return (i + 1) + '. ' + x; }).join('\n')
+         + '\n\n\u2014\n\n' + _msg
+         + '\n\nDer Bericht rechnet mit dem, was hier steht.';
+  }
   /* v647-cost: Kostenhinweis vor dem kostenpflichtigen Abruf */
-  if (!window.confirm('Marktbericht jetzt erstellen?\n\nKosten: 5 L Kerosin – nur wenn ein Marktwert ermittelt wird. Liegen keine Marktdaten vor, wird nichts abgebucht.')) return; /* v654-cost-text */
+  if (!window.confirm(_msg)) return; /* v654-cost-text */
   _mbScrollTop(); /* v945-scroll: war ein No-Op im iframe (v569-appbeh) */
   const btn = $('goBtn');
   $('errBox').classList.add('hide');
@@ -1158,7 +1234,13 @@ async function _mbOpenReport(rid, asPdf){
     var out=await res.json(); render(out);
     if(asPdf){ try{ await exportPdf(out); }catch(e){ alert('PDF-Fehler: '+e.message); } }
     else { _mbScrollTop(); } /* v945-scroll */
-  }catch(e){ alert('Bericht konnte nicht geladen werden: '+e.message); }
+  }catch(e){
+    /* v949-autopdf: im Offscreen-Betrieb gibt es niemanden, der ein alert() sieht.
+     * Fehler nach oben durchreichen, statt ihn in einem unsichtbaren iframe zu begraben. */
+    var _off = false; try { _off = new URLSearchParams(location.search).get('autopdf') === '1'; } catch (x) {}
+    if (_off) throw e;
+    alert('Bericht konnte nicht geladen werden: '+e.message);
+  }
 }
 /* v942-mbrep: Liste — EIN Aufruf-Pfad, drei Ausloeser (Boot, Objektwahl, nach
  * dem Erstellen). Bis v941 gab es ZWEI Pfade, die verschiedene Spalten
@@ -1534,10 +1616,21 @@ async function exportPdf(out) {
     doc.setDrawColor(225, 223, 217); doc.setLineWidth(0.3); doc.line(M + 9, y + 10.4, W - M, y + 10.4);
     y += 15; doc.setFont('helvetica', 'normal');
   }
-  function kv(label, val, x, w) {
+  function kv(label, val, x, w, accent) {
+    /* v952-kvaccent
+     * ──────────────────────────────────────────────────────────────────────
+     * Die Zeilen liefern ihren Akzent seit jeher mit (Z.1813 ['Marktwert', …, GOLD]),
+     * kv() hat ihn nur nie angenommen und die Aufrufer nie weitergereicht — jeder
+     * Wert wurde in TXT gemalt, auch der Marktwert, der die Hauptaussage ist.
+     * tile() (Z.1318) kann es laengst.
+     * Ohne Akzent bleibt TXT: eine Zeile, die vorher keine Farbe wollte, bekommt
+     * auch keine. Es aendert sich nur, was ohnehin gemeint war.
+     */
     doc.setFontSize(8); doc.setTextColor(...MUT); doc.text(label, x, y);
-    doc.setFontSize(11); doc.setTextColor(...TXT); doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11); doc.setTextColor(...(accent && accent.length === 3 ? accent : TXT));
+    doc.setFont('helvetica', 'bold');
     doc.text(String(val == null ? '–' : val), x, y + 5); doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...TXT); /* Farbe nicht an die naechste Zeile vererben */
   }
   // KPI-Kachel: weiße Karte mit Soft-Shadow + Tier-Akzentleiste (Hochglanz 07.06.)
   function tile(x, ty, w, h, label, value, accent) {
@@ -2114,7 +2207,7 @@ async function exportPdf(out) {
   rows.push(['Kaufpreis', euro(ref.purchase_price)], ['Kaltmiete/Monat', euro(ref.monthly_net_rent)]);
   for (let i = 0; i < rows.length; i += 3) {
     need(14);
-    for (let j = 0; j < 3 && i + j < rows.length; j++) kv(rows[i + j][0], rows[i + j][1], M + j * col, col);
+    for (let j = 0; j < 3 && i + j < rows.length; j++) kv(rows[i + j][0], rows[i + j][1], M + j * col, col, rows[i + j][2]); /* v952-kvaccent: [2] war schon da */
     y += 14;
   }
   y += 2;
@@ -2287,7 +2380,7 @@ async function exportPdf(out) {
     yld.rent_multiplier != null ? ['Kaufpreisfaktor', yld.rent_multiplier] : null,
     ds.score != null ? ['Deal-Score', ds.score + ' (' + (ds.rating ?? '–') + ')'] : null,
   ].filter(Boolean);
-  if (kpis.length) { kpis.forEach((k, i) => kv(k[0], k[1], M + i * col, col)); y += 16; }
+  if (kpis.length) { kpis.forEach((k, i) => kv(k[0], k[1], M + i * col, col, k[2])); y += 16; } /* v952-kvaccent */
 
   // ---------- Preisstrategie (Min — Marktwert — Max) ----------
   if (mv.estimated != null && mv.low != null && mv.high != null && mv.high > mv.low) {
@@ -2812,7 +2905,12 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
       const filled = fields.filter(isFilled).length;
       const total = fields.length;
       // gleiche Logik wie Backend (angenommene Marktdaten-Konfidenz ~0.9): 78%..100% des Datenwerts
-      const pct = Math.round(90 * (0.78 + 0.22 * (filled / total)));
+      /* v951-checkup: Diese Zahl misst NUR die Eingaben. Die Streuung der
+       * Vergleichsdaten kennt sie nicht — die entsteht erst im Bericht, und seit
+       * v948 druecken breite Spannen die Aussagekraft deutlich (Prod-Fall:
+       * 146-272 T€ -> 43 %). Wer hier 90 liest und dann 43 bekommt, glaubt
+       * keinem von beiden. Also: kein Versprechen auf das Ergebnis mehr. */
+      const pct = Math.round(100 * (0.78 + 0.22 * (filled / total)));
       const bar = document.getElementById('precBar');
       const pe = document.getElementById('precPct');
       const cnt = document.getElementById('precCount');
@@ -2822,12 +2920,30 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
       if (cnt) cnt.textContent = filled + '/' + total;
       if (hint) {
         const missing = fields.filter(function (id) { return !isFilled(id); }).map(function (id) { return labels[id]; });
-        hint.innerHTML = filled >= total
-          ? 'Alle wertrelevanten Angaben gemacht \u2014 h\u00f6chste Eingabe-Konfidenz. Der exakte Wert ergibt sich mit der Vergleichsdatenbasis.'
-          : 'F\u00fcr h\u00f6here Genauigkeit erg\u00e4nzen: <b style="color:var(--wl-c9a84c, #c9a84c);">' + missing.join(', ') + '</b>.';
+        /* v951-checkup: Plausibilitaet direkt in den Hinweis — der Nutzer sieht
+         * es BEIM Tippen, nicht erst im Dialog kurz vor der Abbuchung. */
+        var _pw = [];
+        try { _pw = _mbCheckup(); } catch (e) {}
+        var _base = filled >= total
+          ? 'Alle wertrelevanten Angaben gemacht \u2014 h\u00f6chste Eingabe-Konfidenz. Die Aussagekraft des Berichts h\u00e4ngt zus\u00e4tzlich an der Streuung der Vergleichsdaten.'
+          : 'F\u00fcr h\u00f6here Eingabe-Konfidenz erg\u00e4nzen: <b style="color:var(--wl-c9a84c, #c9a84c);">' + missing.join(', ') + '</b>.';
+        if (_pw.length) {
+          _base += '<div style="margin-top:9px;padding:8px 10px;border-left:2px solid #B86250;background:rgba(184,98,80,.07);border-radius:0 7px 7px 0">'
+                 + '<b style="color:#B86250">\u26a0 Bitte pr\u00fcfen:</b><br>'
+                 + _pw.map(function (x) { return '\u2022 ' + String(x).replace(/</g, '&lt;'); }).join('<br>')
+                 + '</div>';
+        }
+        hint.innerHTML = _base;
       }
     }
     fields.forEach(function (id) { const e = document.getElementById(id); if (e) e.addEventListener('change', upd); });
+    /* v951-checkup: Die Plausibilitaet haengt an den ZAHLEN-Feldern — die stehen
+     * nicht in `fields` (das sind die 12 Auswahlfelder fuer die Konfidenz).
+     * Ohne das hier wuerde die Warnung erst beim naechsten Zustands-Wechsel auffrischen. */
+    ['area', 'rooms', 'year', 'floor', 'price', 'rent', 'plot', 'modyear', 'ptype'].forEach(function (id) {
+      var e = document.getElementById(id);
+      if (e) { e.addEventListener('change', upd); e.addEventListener('blur', upd); }
+    });
     window._precUpd = upd;
     upd();
   }
@@ -3099,6 +3215,32 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
 })();
 
 /* v570-prog */
+
+/* v949-autopdf
+ * ──────────────────────────────────────────────────────────────────────────
+ * Offscreen-Betrieb: ?report=<id>&autopdf=1 laedt genau diesen Bericht und
+ * exportiert ihn mit der ECHTEN Engine (exportPdf, 11x addPage/addImage —
+ * Deckblatt, Karten, Tachos, Diagramme). Muster: MA27 (Mobile) und W27
+ * (freigegebene Objekte).
+ * Die Deal-Aktion baute sich bis v948 ein eigenes A4 aus dem Markdown-Text
+ * (_mbReportPdf) — eine Textabschrift, die der Mandant fuer den Bericht hielt.
+ * Rueckmeldung an die Elternseite ueber dieselbe Bruecke wie 'mbv-close'.
+ */
+try { (function () {
+  var q; try { q = new URLSearchParams(location.search); } catch (e) { return; }
+  var rid = q.get('report');
+  if (!rid || q.get('autopdf') !== '1') return;
+  function tell(type, msg) {
+    try { if (window.parent && window.parent !== window) parent.postMessage({ type: type, error: msg || null }, '*'); } catch (e) {}
+  }
+  function go() {
+    _mbOpenReport(rid, true)
+      .then(function () { tell('mbv-pdf-done'); })
+      .catch(function (e) { tell('mbv-pdf-fail', e && e.message); });
+  }
+  if (document.readyState !== 'loading') go();
+  else document.addEventListener('DOMContentLoaded', go);
+})(); } catch (e) {}
 
 /* v942-mbrep: Die Liste haengt jetzt an ALLEN drei Ausloesern statt an einem.
  * (1) Boot — auch OHNE ?ref, dann eben mit dem Hinweis "kein Objekt gewaehlt".

@@ -851,13 +851,58 @@
       }).join('');
     } catch (e) { host.innerHTML = '<div class="dab-mb-empty">Konnte Marktberichte nicht laden.</div>'; }
   }
+  /* v949-realpdf
+   * ────────────────────────────────────────────────────────────────────────
+   * Bis v948 baute _mbReportPdf() hier ein eigenes A4 aus dem Markdown-Fliesstext
+   * des Berichts. Der ECHTE Marktbericht entsteht in marktbericht-app/app.js
+   * (exportPdf, 11x addPage/addImage: Deckblatt, Karten, Tachos, Diagramme).
+   * Der Mandant bekam eine Textabschrift und hielt sie fuer seinen Bericht.
+   * Jetzt fragen wir die echte Engine — Offscreen-iframe, Muster MA27/W27.
+   */
+  function _mbEnginePdf(rid) {
+    return new Promise(function (resolve, reject) {
+      var fr = document.createElement('iframe');
+      fr.setAttribute('aria-hidden', 'true');
+      fr.style.cssText = 'position:fixed;left:-10000px;top:0;width:1280px;height:2000px;border:0;visibility:hidden';
+      var done = false, to = null;
+      function cleanup() {
+        if (done) return; done = true;
+        window.removeEventListener('message', onMsg);
+        if (to) clearTimeout(to);
+        setTimeout(function () { try { fr.remove(); } catch (e) {} }, 1500); /* save() braucht den Kontext noch */
+      }
+      function onMsg(ev) {
+        if (!ev.data) return;
+        if (ev.data.type === 'mbv-pdf-done') { cleanup(); resolve(); }
+        else if (ev.data.type === 'mbv-pdf-fail') { cleanup(); reject(new Error(ev.data.error || 'Engine-Fehler')); }
+      }
+      window.addEventListener('message', onMsg);
+      /* Der Bericht ist gross (Karten, Charts) — 90 s statt eines knappen Timers.
+       * Der Timer ist hier kein Rennen um Daten, sondern eine Notbremse gegen
+       * ein iframe, das gar nichts mehr meldet. */
+      to = setTimeout(function () { cleanup(); reject(new Error('Zeitueberschreitung')); }, 90000);
+      fr.src = '/marktbericht-app/index.html?v=949&theme=light&autopdf=1&report=' + encodeURIComponent(rid);
+      document.body.appendChild(fr);
+    });
+  }
+
   async function downloadReport(rid) {
     try {
+      try {
+        toast('Marktbericht wird erzeugt \u2026');
+        await _mbEnginePdf(rid);
+        return;   /* echte Engine hat geliefert */
+      } catch (e) {
+        try { console.warn('[dab] Engine-PDF fehlgeschlagen, Rueckfall auf Kurzfassung:', e.message); } catch (x) {}
+      }
+      /* Rueckfall: die alte Textabschrift. Der Nutzer MUSS erfahren, dass er
+       * nicht den vollen Bericht hat — sonst legt er die Kurzfassung der Bank vor. */
       var t = token(); var res = await fetch('/api/v1/marktbericht/reports/one?id=' + encodeURIComponent(rid), { headers: t ? { Authorization: 'Bearer ' + t } : {} });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       var out = await res.json();
       var doc = _mbReportPdf(out.report_md, {});
-      doc.save('Marktbericht.pdf');
+      doc.save('Marktbericht-Kurzfassung.pdf');
+      toast('\u26a0 Nur die Textfassung \u2014 der vollst\u00e4ndige Bericht konnte nicht erzeugt werden. Im Tab Bewertung erneut versuchen.');
     } catch (e) { alert('Marktbericht-PDF fehlgeschlagen: ' + e.message); }
   }
 

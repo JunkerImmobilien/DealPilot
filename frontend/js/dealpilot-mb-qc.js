@@ -128,8 +128,30 @@ if (!window._wlc) {
 
   /* ── Daten ── */
   function objId() {
+    /* v953-objid — Zwilling zu dealpilot-mb.js:127 (dort v942-objid).
+     * ────────────────────────────────────────────────────────────────────
+     * bmf-modal.js:53 deklariert `function _currentObjectId()` auf oberster
+     * Ebene -> window._currentObjectId IST die Funktion. Eine Funktion ist
+     * truthy, also gewann sie hier, und String(fn) lieferte ihren QUELLTEXT.
+     * In dealpilot-mb.js landete das als object_key in der DB (65 Snapshots
+     * `dp:function _currentObjectId(){...}`).
+     * Dieser Zwilling schickt external_ref: null (Z.282) und KANN den Bug nicht
+     * ausloesen — deshalb liess v942 ihn aus. Das war ehrlich, aber zwei Dateien,
+     * die dasselbe tun sollen, duerfen nicht auseinanderdriften: die naechste
+     * Aenderung erbt sonst die Luecke.
+     * _currentObjKey ist laut Projekt-Invariante das EINZIGE verlaessliche
+     * Global — es fehlte in beiden Zwillingen komplett.
+     */
+    if (typeof global._currentObjKey === 'string' && global._currentObjKey) return global._currentObjKey;
     var c = [global.currentObjectId, global._currentObjectId, global.currentObjId, (global.State && (global.State.objectId || global.State.id))];
-    for (var i = 0; i < c.length; i++) if (c[i]) return String(c[i]);
+    for (var i = 0; i < c.length; i++) {
+      var v = c[i];
+      if (typeof v === 'function' || typeof v === 'object') continue;
+      if (v == null || v === '') continue;
+      var s = String(v);
+      if (!s || s.indexOf('function') === 0) continue;
+      return s;
+    }
     var el = $('obj-id') || $('object-id'); if (el && el.value) return String(el.value);
     return null;
   }

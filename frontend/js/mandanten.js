@@ -710,12 +710,37 @@
     if (!clicked) {
       if (typeof toast === 'function') toast('Bitte das Objekt links in der Sidebar \u00f6ffnen \u2014 der Wizard startet dann.');
     }
-    var tries = 0;
-    var t = setInterval(function () {
-      tries++;
-      if (window._currentObjKey === objId) { clearInterval(t); open(); }
-      else if (tries > 16) { clearInterval(t); if (btn) { btn.disabled = false; btn.style.opacity = ''; } }
-    }, 250);
+    /* v953-objready
+     * ────────────────────────────────────────────────────────────────────────
+     * Bis v952 stand hier setInterval alle 250 ms, nach 16 Versuchen Aufgabe.
+     * Bei einem langsamen Objekt (grosses Portfolio, schwache Leitung) war nach
+     * 4 s Schluss und der Wizard startete nicht — ohne dass jemand erfuhr warum.
+     * Genau das Muster, gegen das v946 den Vertrag gebaut hat:
+     *   storage.js feuert dp:object-ready, sobald _currentObjKey wirklich steht.
+     * "Timer und Retry-Schleifen gewinnt man nie zuverlaessig."
+     *
+     * Die Notbremse bleibt, aber grosszuegig und mit Ansage: sie faengt den Fall,
+     * dass das Objekt gar nicht laedt (Klick ging ins Leere) — nicht ein Rennen.
+     */
+    var _fertig = false;
+    function _onReady(e) {
+      if (_fertig) return;
+      if (!e || !e.detail || e.detail.key !== objId) return;
+      _fertig = true;
+      window.removeEventListener('dp:object-ready', _onReady);
+      clearTimeout(_bremse);
+      open();
+    }
+    window.addEventListener('dp:object-ready', _onReady);
+    /* Schon da? Dann feuert kein Event mehr. */
+    if (window._currentObjKey === objId) { _fertig = true; window.removeEventListener('dp:object-ready', _onReady); open(); }
+    var _bremse = setTimeout(function () {
+      if (_fertig) return;
+      _fertig = true;
+      window.removeEventListener('dp:object-ready', _onReady);
+      if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+      if (typeof toast === 'function') toast('\u26a0 Objekt konnte nicht geladen werden \u2014 bitte links in der Sidebar \u00f6ffnen.');
+    }, 20000);
   }
 
   window.DealPilotMandanten = {

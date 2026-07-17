@@ -184,12 +184,61 @@ export const ValuationService = {
       const filled = PRECISION.filter(([k]) => has(k));
       const completeness = filled.length / PRECISION.length;
       const dataConf = sale.confidence != null ? sale.confidence : 0.5;
-      const combined = _clamp(dataConf * (0.78 + 0.22 * completeness), 0, 0.98);
+
+      /* v948-spread
+       * ────────────────────────────────────────────────────────────────────
+       * Bis v947 war die Aussagekraft = Stichprobe x Eingabe-Vollstaendigkeit.
+       * Die STREUUNG kam nicht vor. Real auf Prod: Marktwert 197.000 € bei einer
+       * Spanne von 146.000-272.000 € (Faktor 1,86) -> "Aussagekraft: Hoch · 80 %".
+       * Bei der Spanne ist der Punktwert eine Orientierung, keine Aussage.
+       *
+       * Bezug ist (high-low)/estimated: die Breite RELATIV zu der Aussage, die
+       * getroffen wird. Nicht high/low — ein Verhaeltnis sagt nichts darueber,
+       * wie weit der Punkt danebenliegen kann.
+       *   bis 25 %  -> voll (typische Quartilsbreite, homogener Markt)
+       *   darueber  -> linearer Abschlag, Boden 0,45
+       *
+       * PAUSCHALE Spanne (kein q25/q75 -> +/-10 % erfunden): die ist rechnerisch
+       * die engste von allen und bekaeme sonst die BESTE Note. Verkehrt herum —
+       * keine Quartile heisst weniger Wissen, nicht mehr. Eigener Abschlag.
+       */
+      let spreadFactor = 1.0, spreadPct = null;
+      if (out.market_value.range_basis === 'pauschal') {
+        spreadFactor = 0.82;
+        out.notes.push('Keine Vergleichsquartile verfügbar – Spanne pauschal mit ±10 % angesetzt. Die Aussagekraft ist deshalb gedämpft: eine erfundene Spanne ist kein Beleg für Genauigkeit.');
+      } else if (out.market_value.low != null && out.market_value.high != null && ev > 0) {
+        spreadPct = (out.market_value.high - out.market_value.low) / ev;
+        spreadFactor = _clamp(1 - Math.max(0, spreadPct - 0.25) * 1.2, 0.45, 1.0);
+      }
+      out.market_value.spread_pct = spreadPct != null ? round(spreadPct * 100, 1) : null;
+      out.market_value.spread_factor = round(spreadFactor, 2);
+      out.market_value.spread_label =
+        spreadPct == null ? null
+        : spreadPct <= 0.25 ? 'eng'
+        : spreadPct <= 0.40 ? 'normal'
+        : spreadPct <= 0.60 ? 'weit' : 'sehr weit';
+      if (spreadPct != null && spreadPct > 0.40) {
+        out.notes.push(
+          'Vergleichsspanne ' + Math.round(spreadPct * 100) + ' % des Marktwerts (' +
+          Math.round(out.market_value.low).toLocaleString('de-DE') + ' – ' +
+          Math.round(out.market_value.high).toLocaleString('de-DE') + ' €). Der Punktwert ist bei dieser Streuung ' +
+          'eine Orientierung, keine Aussage — die Aussagekraft ist entsprechend gemindert. ' +
+          'Für Kalkulation und Beleihung ist das untere Ende die belastbare Größe.'
+        );
+      }
+
+      const combined = _clamp(dataConf * (0.78 + 0.22 * completeness) * spreadFactor, 0, 0.98);
       out.market_value.data_confidence = round(dataConf, 2);
       out.market_value.input_filled = filled.length;
       out.market_value.input_total = PRECISION.length;
       out.market_value.input_completeness = round(completeness, 2);
       out.market_value.input_missing = PRECISION.filter(([k]) => !has(k)).map(([, l]) => l);
+      /* v948-spread: nachvollziehbar statt Blackbox — wer 43 % liest, soll sehen warum. */
+      out.market_value.confidence_parts = {
+        marktdaten: round(dataConf, 2),
+        eingaben: round(0.78 + 0.22 * completeness, 2),
+        streuung: round(spreadFactor, 2),
+      };
       out.market_value.confidence_pct = Math.round(combined * 100);
       out.market_value.confidence_label =
         out.market_value.confidence_pct >= 85 ? 'Sehr hoch'

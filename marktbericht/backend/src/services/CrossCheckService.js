@@ -13,6 +13,10 @@ const RND_MIN = 10;               // Mindest-Restnutzungsdauer
 const SACHWERTFAKTOR = 1.0;       // Marktanpassung (ohne lokale GAA-Daten neutral = 1,0)
 const BWK_QUOTE = 0.23;           // Bewirtschaftungskosten inkl. Mietausfallwagnis, % v. Rohertrag
 const LIEGENSCHAFTSZINS = 0.03;   // EFH-typisch 2,5–3,5 % -> 3,0 %
+/* v955-etw: Der Zinssatz ist EFH-begruendet. Fuer Eigentumswohnungen liegen
+ * Liegenschaftszinsen typischerweise HOEHER (3,5-5 %) — ein zu niedriger Zins
+ * rechnet den Ertragswert nach OBEN. Der Hinweis steht im Output, damit niemand
+ * die Zahl fuer eine Aussage haelt, die sie nicht ist. */
 
 const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
 
@@ -33,6 +37,11 @@ export const CrossCheckService = {
       notes: ['Vereinfachtes Sachwert-/Ertragswertverfahren nach ImmoWertV-Logik als Plausibilitäts-Quercheck. Indikativ, kein Gutachten n. § 194 BauGB.'],
     };
 
+    /* v955-etw: Die Objektart kam in dieser Datei bisher NICHT vor (grep = 0).
+     * Gerechnet wurde alles als EFH — auch jede Eigentumswohnung. */
+    const _pt = String(ref.property_type || '').toLowerCase().trim();
+    const istWohnung = /etw|wohnung|whg|apartment|appartement/.test(_pt);
+    const istHaus = /efh|dhh|\brh\b|reihen|zfh|mfh|haus|villa/.test(_pt);
     const wfl = _num(ref.living_area);
     const buildYear = _num(ref.build_year);
     const plot = _num(ref.plot_area);
@@ -56,7 +65,28 @@ export const CrossCheckService = {
     }
 
     // ================= SACHWERT =================
-    if (wfl && buildYear) {
+    /* v955-etw
+     * ────────────────────────────────────────────────────────────────────────
+     * Bei einer Eigentumswohnung wird der Sachwert NICHT gerechnet, sondern
+     * weggelassen. Die Konstanten oben sagen selbst, wofuer sie gelten:
+     *     NHK_EFH_BGF = 835     "EFH Standardstufe 3"
+     *     BGF_FAKTOR  = 1.35    "EFH-Faustwert"
+     * Eine ETW hat keinen eigenen Dachstuhl und kein eigenes Fundament; ihr
+     * Anteil an Treppenhaus und Keller steckt anders in der Flaeche. Mit der
+     * EFH-Tabelle kaeme eine Zahl heraus, die aussieht wie eine zweite Meinung
+     * und doch nur dieselbe Flaeche mit der falschen Tabelle ist.
+     *
+     * Ein falsch gerechneter Quercheck ist schlechter als keiner: er beruhigt.
+     * Der Ertragswert bleibt — der rechnet aus Rohertrag und Liegenschaftszins
+     * und gilt fuer eine ETW genauso.
+     */
+    if (istWohnung) {
+      out.sachwert = {
+        available: false,
+        grund: 'Sachwertverfahren für Eigentumswohnungen nicht anwendbar (NHK-Tabelle und BGF-Faktor gelten für Einfamilienhäuser).',
+      };
+      out.notes.push('Sachwert nicht ausgewiesen: Das vereinfachte Sachwertverfahren arbeitet mit den Normalherstellungskosten für Einfamilienhäuser (NHK 2010, Standardstufe 3) und dem EFH-Faustwert BGF ≈ Wohnfläche × 1,35. Für eine Eigentumswohnung ist das die falsche Grundlage – lieber keine Zahl als eine falsche. Der Ertragswert-Quercheck bleibt.');
+    } else if (wfl && buildYear) {
       const bgf = wfl * BGF_FAKTOR;
       const hkNeubau = bgf * NHK_EFH_BGF * BAUPREISINDEX;
       const alterswertfaktor = rnd != null ? rnd / GND_JAHRE : null;
@@ -78,6 +108,11 @@ export const CrossCheckService = {
           bodenwert_fehlt: bodenwert == null,
         };
         if (bodenwert == null) out.notes.push('Sachwert OHNE Bodenwert (Grundstücksfläche oder Bodenrichtwert fehlt) – nur Gebäudesachwert ausgewiesen.');
+        /* v955-etw: SACHWERTFAKTOR = 1.0 heisst "keine Marktanpassung", nicht
+         * "Marktanpassung ergibt 1,0". Real liegt er je nach Lage bei 0,8-1,3.
+         * Wer das nicht weiss, liest den Sachwert als Verkehrswert. */
+        out.notes.push('Sachwertfaktor 1,0 angesetzt: Ohne Daten des örtlichen Gutachterausschusses erfolgt KEINE Marktanpassung. Reale Sachwertfaktoren liegen je nach Lage zwischen 0,8 und 1,3 – der ausgewiesene Sachwert ist deshalb unangepasst und weicht systematisch vom Verkehrswert ab.');
+        if (!istHaus && !istWohnung) out.notes.push('Objektart nicht eindeutig – Sachwert mit EFH-Ansatz gerechnet. Bei Nicht-Wohnnutzung ist er nicht belastbar.');
       }
     }
 

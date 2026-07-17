@@ -180,8 +180,13 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // AI Button
-  var aiBtn = document.getElementById('ai-btn');
-  if (aiBtn) aiBtn.addEventListener('click', runAI);
+  /* v950-guard: addEventListener ENTFERNT. #ai-btn traegt bereits
+   * onclick="runAI()" (index.html:2410) — zwei Bindungen am selben Knopf
+   * bedeuteten zwei Analysen und zwei Liter pro Klick.
+   * Das onclick bleibt die Verdrahtung: es steht sichtbar am Element und wird
+   * beim Lesen des HTML gefunden. Ein Listener 300 Zeilen entfernt nicht. */
+  // var aiBtn = document.getElementById('ai-btn');
+  // if (aiBtn) aiBtn.addEventListener('click', runAI);
 
   var btnIJ = document.getElementById('btn-import-json');
   var impFile = document.getElementById('imp-file');
