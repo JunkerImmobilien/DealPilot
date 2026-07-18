@@ -134,6 +134,19 @@ router.get('/reports/fixtures', authenticate, readGet('/reports/fixtures'));
 router.get('/objects', authenticate, readGetLabelled('/objects', function (d) { return d.objects; }));           /* v942 */
 router.get('/objects/history', authenticate, readGetLabelled('/objects/history', function (d) { return d.history; })); /* v942 */
 router.get('/reports/one', authenticate, readGet('/reports/one')); /* v895g-reportbyid */
+/* v966-delete: Marktbericht endgueltig loeschen. Durchgereicht an das
+ * mb-backend (dort Transaktion + Besitz-Nachweis am Snapshot). user_id haengt
+ * qstrUser() an — aus dem Token, nie aus dem Browser (v942-userbind). 0 L. */
+router.delete('/reports/:id', authenticate, async function (req, res) {
+  try {
+    const rid = parseInt(req.params.id, 10);
+    if (!rid) return res.status(400).json({ error: 'report_id erforderlich' });
+    const out = await forward('DELETE', '/reports/' + rid, { query: qstrUser(req) });
+    res.status(out.status).json(out.data);
+  } catch (e) {
+    res.status(502).json({ error: 'mb_unreachable', message: e.message });
+  }
+});
 
 // ── Abruf-Endpoints (auth + Kerosin) ─────────────────────────────────────────
 async function runReport(req, res) {

@@ -551,12 +551,59 @@ function render(out) {
 }
 
 // Konfidenz-Ampel: 0..1 -> Label, Farbe, Erklärung
-function confInfo(c) {
+/* v956-onesource
+ * ──────────────────────────────────────────────────────────────────────────
+ * EINE Quelle fuer Zahl, Farbe UND Text.
+ *
+ * Bis v955 gab es zwei Felder mit fast demselben Namen:
+ *   mv.confidence       = sale.confidence  -> die ROHE Stichprobengroesse (~0,9)
+ *   mv.confidence_pct   = kombiniert       -> Stichprobe x Eingaben x Streuung (47)
+ * Der Header las confidence_pct ("Niedrig · 47 %"), die Karte las confidence
+ * ("Hoch — Große Vergleichsstichprobe, belastbare Marktwertindikation").
+ * Bis v948 lagen beide nah beieinander. v948 hat die eine ehrlich gemacht und
+ * die andere stehen lassen -> 43 Punkte Widerspruch auf einem Bildschirm.
+ *
+ * Die Schwellen folgen jetzt dem Backend (ValuationService: 85/70/55), sonst
+ * heisst dieselbe Zahl hier anders als dort.
+ *
+ * Und der Text ERKLAERT: "Niedrig" heisst nicht "schlechte Daten" — bei 822
+ * Vergleichen ist die Stichprobe gross. Es heisst: die Vergleiche streuen so
+ * weit, dass der Punktwert wenig aussagt. Das ist der Unterschied, den der
+ * Nutzer verstehen muss, und genau den hat die alte Fassung verschwiegen.
+ */
+function confInfo(c, parts) {
   if (c == null) return null;
-  if (c >= 0.85) return { label: 'Hoch', color: '#3FA56C', text: 'Große Vergleichsstichprobe – belastbare Marktwertindikation.' };
-  if (c >= 0.65) return { label: 'Gut', color: '#3FA56C', text: 'Solide Datenbasis – gute Indikation mit geringer Unsicherheit.' };
-  if (c >= 0.45) return { label: 'Mittel', color: window._wlc('#C9A84C'), text: 'Eingeschränkte Stichprobe – als Orientierung zu verstehen, nicht als exakter Wert.' };
-  return { label: 'Gering', color: '#B86250', text: 'Kleine Stichprobe – nur grobe Orientierung, mit Vorsicht zu nutzen.' };
+  var p = parts || {};
+  var stichprobe = (p.marktdaten != null) ? p.marktdaten : null;
+  var streuung   = (p.streuung   != null) ? p.streuung   : null;
+  var eingaben   = (p.eingaben   != null) ? p.eingaben   : null;
+
+  /* Woran liegt es? Der schwaechste Faktor bekommt das Wort. */
+  function warum() {
+    var g = [];
+    if (streuung != null && streuung < 0.8) {
+      g.push('die Vergleichsobjekte streuen weit auseinander — der Punktwert ist eine Orientierung, keine Aussage');
+    }
+    if (eingaben != null && eingaben < 0.95) g.push('es fehlen wertrelevante Objektangaben');
+    if (stichprobe != null && stichprobe < 0.7) g.push('die Vergleichsstichprobe ist klein');
+    if (!g.length) return '';
+    return ' Grund: ' + g.join('; ') + '.';
+  }
+  function gut() {
+    return (stichprobe != null && stichprobe >= 0.8)
+      ? ' Die Vergleichsstichprobe selbst ist groß — die Unsicherheit kommt nicht aus zu wenig Daten.'
+      : '';
+  }
+
+  if (c >= 0.85) return { label: 'Sehr hoch', color: '#3FA56C',
+    text: 'Große, eng beieinander liegende Vergleichsstichprobe – belastbare Marktwertindikation.' };
+  if (c >= 0.70) return { label: 'Hoch', color: '#3FA56C',
+    text: 'Solide Datenbasis mit überschaubarer Streuung – gute Indikation.' };
+  if (c >= 0.55) return { label: 'Mittel', color: window._wlc('#C9A84C'),
+    text: 'Als Orientierung zu verstehen, nicht als exakter Wert.' + warum() };
+  return { label: 'Niedrig', color: '#B86250',
+    text: 'Nur grobe Orientierung.' + warum() + gut()
+        + ' Für Kalkulation und Beleihung ist das untere Ende der Spanne die belastbare Größe.' };
 }
 
 // ===== SVG-Visualisierungen (DealPilot-Stil) =====
@@ -639,8 +686,11 @@ function renderScore(d) { /*v895-doublering*/
   const mv = (d.valuation && d.valuation.market_value) || {};
   const confPct = (mv.confidence_pct != null) ? mv.confidence_pct : null;
   let confLbl = mv.confidence_label || null;
-  if (!confLbl && confPct != null) { const ci = confInfo(confPct / 100); confLbl = ci ? ci.label : null; }
-  const confCol = (confPct == null) ? '#8a8a93' : (confPct >= 70 ? '#3FA56C' : confPct >= 55 ? window._wlc('#C9A84C') : '#B86250');
+  /* v956-onesource: Farbe aus confInfo statt aus einer zweiten Schwellen-Kette
+   * daneben — sonst faerbt der Header anders ein als die Karte darunter. */
+  const _hci = (confPct != null) ? confInfo(confPct / 100, mv.confidence_parts) : null;
+  if (!confLbl && _hci) confLbl = _hci.label;
+  const confCol = _hci ? _hci.color : '#8a8a93';
   box.innerHTML = `
     <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;width:100%;">
       ${svgDonut(ds.score, confPct)}
@@ -672,9 +722,13 @@ function renderValuation(d) {
   const k = (n) => n != null ? Math.round(n / 1000) + 'k' : '';
 
   // -- Marktwert-Karte --
-  const conf = mv.confidence != null ? mv.confidence : (d.sale && d.sale.confidence);
+  /* v956-onesource: confidence_pct (kombiniert), NICHT mv.confidence (rohe
+   * Stichprobe). Genau diese Verwechslung liess die Karte "belastbar" sagen,
+   * waehrend der Header daneben "Niedrig · 47 %" anzeigte. */
+  const conf = (mv.confidence_pct != null) ? (mv.confidence_pct / 100)
+             : (mv.confidence != null ? mv.confidence : (d.sale && d.sale.confidence));
   const n = d.sale && d.sale.sample_size;
-  const ci = confInfo(conf);
+  const ci = confInfo(conf, mv.confidence_parts);
   const gaugeW = (mv.low != null && mv.high != null)
     ? svgGauge(mv.estimated, mv.low, mv.high, { caption: 'Lage in der Spanne', loLabel: k(mv.low), hiLabel: k(mv.high), valueText: euro(mv.estimated), marker: kaufpreis })
     : '';
@@ -1219,6 +1273,10 @@ function _mbEnsureReportsPanel(){
      +'#mbReportsPanel .mbrep-tog .chev{display:inline-block;transition:transform .18s;font-size:9px}'
      +'#mbReportsPanel.open .mbrep-tog .chev{transform:rotate(90deg)}'
      +'#mbReportsPanel:not(.open) .mbrep-top{padding-bottom:0}'
+     /* v967-delcss: Loeschen grau in Ruhe, rot beim Hover — Rot ist Statusfarbe,
+        bleibt hart (keine WL_TINTS). */
+     +'#mbReportsPanel .mbrep-del{width:34px;height:34px;flex:0 0 auto;border:1px solid rgba(42,39,39,.16);border-radius:9px;background:none;color:#9a9288;font-size:14px;line-height:1;cursor:pointer}'
+     +'#mbReportsPanel .mbrep-del:hover{color:#B8625C;border-color:#B8625C;background:#FBF3F2}'
      +'@media(max-width:600px){#mbReportsPanel .mbrep-row{flex-wrap:wrap}#mbReportsPanel .mbrep-mv{text-align:left}}';
     document.head.appendChild(st);
   }
@@ -1270,7 +1328,9 @@ function _mbRepRow(h){
     + '<div class="mbrep-main"><div class="mbrep-l1">'+kz+'<span class="mbrep-addr">'+addr+'</span></div>'
     + '<span class="mbrep-date">'+_mbFmtDate(h.created_at)+'</span></div>'+mv
     + '<span class="mbrep-act"><button type="button" class="mbrep-view" data-rid="'+h.report_id+'">Ansehen</button>'
-    + '<button type="button" class="mbrep-pdf" data-rid="'+h.report_id+'">PDF</button></span></div>';
+    + '<button type="button" class="mbrep-pdf" data-rid="'+h.report_id+'">PDF</button>'
+    /* v967-delbtn: endgueltig loeschen — Rueckfrage in _mbDeleteReport(). */
+    + '<button type="button" class="mbrep-del" title="Bericht endg\u00fcltig l\u00f6schen" data-rid="'+h.report_id+'">\u2715</button></span></div>';
 }
 
 async function _mbLoadReportsList(opts){
@@ -1312,6 +1372,7 @@ async function _mbLoadReportsList(opts){
     });
     host.querySelectorAll('.mbrep-view').forEach(function(b){ b.addEventListener('click',function(){ _mbOpenReport(b.getAttribute('data-rid'),false); }); });
     host.querySelectorAll('.mbrep-pdf').forEach(function(b){ b.addEventListener('click',function(){ _mbOpenReport(b.getAttribute('data-rid'),true); }); });
+    host.querySelectorAll('.mbrep-del').forEach(function(b){ b.addEventListener('click',function(){ _mbDeleteReport(b); }); }); /* v967-delwire */
   }
 
   if(_mbRepScope==='obj' && !qs){
@@ -1332,6 +1393,36 @@ async function _mbLoadReportsList(opts){
     host.innerHTML=head(reps.length)+'<div class="mbrep-list">'+reps.map(_mbRepRow).join('')+'</div>'; /* v943 */
     host.style.display=''; wire();
   }catch(e){ try{ console.warn('[mb reportslist]',e); }catch(_){ } }
+}
+
+/* v967-delreport
+ * Loescht einen Marktbericht ENDGUELTIG — dieselbe v966-Route wie der Knopf
+ * in Deal-Aktion: der Proxy setzt user_id aus dem Token (v942-userbind), das
+ * mb-backend prueft den Besitz am Snapshot und loescht in einer Transaktion
+ * ueber alle sechs Tabellen. 404 -> fremd/unbekannt, nichts geloescht.
+ * Die Rueckfrage nennt Adresse+Datum der Zeile — bei sechs gleich aussehenden
+ * Eintraegen trifft sonst jemand den falschen. */
+async function _mbDeleteReport(btn) {
+  try {
+    var rid = parseInt(btn.getAttribute('data-rid'), 10);
+    if (!rid) return;
+    var row = btn.closest('.mbrep-row');
+    var was = '';
+    if (row) {
+      var a = row.querySelector('.mbrep-addr'); var d = row.querySelector('.mbrep-date');
+      was = '\n\n' + ((a && a.textContent) || '') + '\n' + ((d && d.textContent) || '');
+    }
+    if (!window.confirm('Diesen Marktbericht endg\u00fcltig l\u00f6schen?' + was + '\n\nDas kann nicht r\u00fcckg\u00e4ngig gemacht werden.')) return;
+    var res = await fetch(API + '/reports/' + rid, { method: 'DELETE', headers: _mbAuth() });
+    if (!res.ok) {
+      var err = null; try { err = await res.json(); } catch (e) {}
+      alert('L\u00f6schen fehlgeschlagen' + (err && err.error ? ': ' + err.error : ' (' + res.status + ')'));
+      return;
+    }
+    _mbLoadReportsList({}); // Liste + Zaehler im Kopf neu
+  } catch (e) {
+    try { alert('L\u00f6schen fehlgeschlagen: ' + e.message); } catch (x) {}
+  }
 }
 
 function fillInputsFromReport(out) {
@@ -1537,6 +1628,13 @@ async function exportPdf(out) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const W = 210, H = 297, M = 18;
   const GOLD = window._pdfGold(), INK = [20, 20, 23], TXT = [34, 34, 38], MUT = [120, 120, 130];
+  /* v963-wlrgb: EINE Quelle fuer die Gold-Familie als RGB-Tripel.
+   * jsPDF kennt kein var(), deshalb der Laufzeit-Hex ueber _wlc() — derselbe
+   * Weg wie im Web. Ohne Whitelabel: #b8932f / #C9A84C / #E8CC7A unveraendert.
+   * v961/v962 hatten die Funktion zweimal lokal; zwei Kopien sind zwei
+   * Wahrheiten, und genau daran ist heute schon der Konfidenz-Wert gescheitert. */
+  const _wlRgb = (h) => { const c = window._wlc(h); return [parseInt(c.substr(1, 2), 16), parseInt(c.substr(3, 2), 16), parseInt(c.substr(5, 2), 16)]; };
+  const GOLD_D = () => _wlRgb('#b8932f'), GOLD_M = () => _wlRgb('#C9A84C'), GOLD_L = () => _wlRgb('#E8CC7A');
   let y = 0;
   const euro = (n) => (n == null ? '–' : Number(n).toLocaleString('de-DE') + ' €');
   const a = d.address || {}, ref = d.ref || {}, mv = (d.valuation && d.valuation.market_value) || {},
@@ -1586,6 +1684,20 @@ async function exportPdf(out) {
   }
 
   function footer(pageNo) {
+    /* v957-fontleak
+     * ──────────────────────────────────────────
+     * footer() hat die Schriftgroesse auf 7.5 gesetzt und NIE zurueckgestellt.
+     * newPage() ruft footer() -> JEDER Seitenumbruch hat 7.5 geerbt.
+     * Sichtbar auf Seite 7 des Prod-Berichts: der Absatz, der von Seite 6
+     * herueberlaeuft, steht klein gedruckt mit klaffenden Wortluecken. Die
+     * Wortbreiten kommen aus _mbLayoutRuns (gemessen bei RSZ=9.5), die
+     * Glyphen aus footer (7.5). Ab der ersten Ueberschrift auf Seite 7 ist
+     * alles heil — der h-Zweig setzt doc.setFontSize(RSZ) neu.
+     * Fix an der Ursache: footer() ist wieder zustandsneutral (Groesse).
+     * Fuer alle anderen need()-Stellen ein No-Op — die setzen ihre Groesse
+     * ohnehin selbst (geprueft: _drawRich war die einzige Ausnahme).
+     */
+    const _fsPrev = (typeof doc.getFontSize === 'function') ? doc.getFontSize() : null;
     doc.setDrawColor(228, 226, 220); doc.setLineWidth(0.3); doc.line(M, H - 11, W - M, H - 11);
     doc.setFillColor(...GOLD); doc.circle(M + 1, H - 8.3, 0.9, 'F');
     doc.setFontSize(7.5); doc.setTextColor(...MUT); doc.setFont('helvetica', 'normal');
@@ -1593,6 +1705,7 @@ async function exportPdf(out) {
     doc.setTextColor(...GOLD); doc.setFont('helvetica', 'bold');
     doc.text('Seite ' + pageNo, W - M, H - 8, { align: 'right' });
     doc.setFont('helvetica', 'normal');
+    if (_fsPrev != null) doc.setFontSize(_fsPrev); // v957-fontleak: Groesse zurueckgeben
   }
   let page = 1;
   function newPage() { footer(page); doc.addPage(); page++; y = M; contentBg(); }
@@ -1659,18 +1772,43 @@ async function exportPdf(out) {
     }
   }
   // Score-Donut im DealPilot-Look: grauer Ring + farbiger Fortschrittsbogen + Zahl in der Mitte
-  function scoreDonut(cx, cy, r, score) {
+  /* v961-doublering
+   * ──────────────────────────────────────────────────────────────
+   * Vorbild ist svgDonut() (Z.618, v895-doublering) aus der Ergebnis-Ansicht:
+   *   Aussenring = Score (tier-farbig) · Innenring = Aussagekraft (Gold)
+   *   darunter die Tier-Pille (Top / Gut / Solide / Schwach).
+   * Die Verhaeltnisse stammen aus dem Web und werden auf r skaliert, damit
+   * beide Anzeigen dieselbe Bildsprache haben:
+   *   Web rO=68 rI=51 swO=11 swI=7.5  ->  rI = 0.75*r, swO = 0.185*r, swI = 0.143*r
+   * conf ist optional: ohne Wert bleibt es beim Einfachring (kein leerer
+   * Innenring, der eine Aussage vortaeuscht, die es nicht gibt).
+   */
+  function scoreDonut(cx, cy, r, score, conf) {
     const s = Math.max(0, Math.min(100, score || 0));
     const col = s >= 70 ? [63, 165, 108] : s >= 50 ? GOLD : [184, 98, 80];
+    const tier = s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : 'Schwach'; // = _scoreTier(), Z.615
+    const swO = Math.max(1.6, r * 0.185), rI = r * 0.75, swI = Math.max(1.2, r * 0.143);
     doc.setLineCap('round');
-    doc.setLineWidth(4.8);
-    doc.setDrawColor(44, 44, 52); arc(cx, cy, r, 0, 360);              // Hintergrundring
-    doc.setDrawColor(...col); arc(cx, cy, r, -90, -90 + s / 100 * 360); // Fortschritt ab oben
+    doc.setLineWidth(swO);
+    doc.setDrawColor(34, 34, 42); arc(cx, cy, r, 0, 360);               // Track aussen (Web #22222a)
+    doc.setDrawColor(...col); arc(cx, cy, r, -90, -90 + s / 100 * 360); // Score ab oben
+    if (conf != null && !isNaN(conf)) {
+      const c2 = Math.max(0, Math.min(100, conf));
+      doc.setLineWidth(swI);
+      doc.setDrawColor(27, 27, 33); arc(cx, cy, rI, 0, 360);              // Track innen (Web #1b1b21)
+      doc.setDrawColor(...GOLD); arc(cx, cy, rI, -90, -90 + c2 / 100 * 360);
+    }
     doc.setLineCap('butt');
-    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
-    doc.text(String(score ?? '–'), cx, cy + 1.5, { align: 'center' });
-    doc.setTextColor(150, 150, 160); doc.setFont('helvetica', 'normal'); doc.setFontSize(6);
-    doc.text('/ 100', cx, cy + 7, { align: 'center' });
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(17);
+    doc.text(String(score ?? '–'), cx, cy + 1.2, { align: 'center' });
+    doc.setTextColor(150, 150, 160); doc.setFont('helvetica', 'normal'); doc.setFontSize(5.5);
+    doc.text('/ 100', cx, cy + 5.8, { align: 'center' });
+    // Tier-Pille unter dem Ring (Web: cy + rO + 17, Pille 60x23 bei rO=68)
+    const bw = r * 0.88, bh = r * 0.34, bx = cx - bw / 2, by = cy + r + r * 0.1;
+    doc.setFillColor(10, 10, 12); doc.setDrawColor(...col); doc.setLineWidth(0.35);
+    doc.roundedRect(bx, by, bw, bh, bh / 2, bh / 2, 'FD');
+    doc.setTextColor(...col); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.8);
+    doc.text(tier, cx, by + bh * 0.7, { align: 'center' });
   }
 
   // Kleiner Kategorie-Ring für die helle Lage-Seite (Score 0..100, Anzeige txt zentriert)
@@ -1728,27 +1866,48 @@ async function exportPdf(out) {
     const ratio = (v) => (clamp(v) - lo) / (hi - lo);
     const ang = (v) => 180 + ratio(v) * 180; // 180°=links .. 360°=rechts (oben über 270°)
     const pt = (t, rad) => { const a = (180 + t * 180) * Math.PI / 180; return [cx + rad * Math.cos(a), cy + rad * Math.sin(a)]; };
-    const zones = opts.zones || [[0, 0.34, GREEN], [0.34, 0.66, GOLDT], [0.66, 1, REDT]];
-    // Instrument-Tacho (Variante 3): dünner Track-Bogen + Gold-Füllung bis zum Wert +
-    // Skalenstriche (lang bei 0/50/100 %) + schlanke weiße Nadel + Gold-Nabe.
+    /* v962-goldzonen — DER Tacho-Fix.
+     * ────────────────────────────────────────────────────────────
+     * v961 hat segMW/segMiete auf Gold gestellt — das ist aber der BALKEN.
+     * v963-komment: hier stand "Der einzige Aufrufer" — falsch, es sind ZWEI. Der zweite
+     * (Marktmiete) uebergab seine Zonen inline und hat den Default nie gesehen.
+     * Der Marktwert-Aufrufer uebergibt `zones: undefined, segs: segMW`.
+     * Der Tacho landete also IMMER hier im Default: gruen/gold/rot.
+     * Jetzt die Gold-Familie der Web-Karte (svgGauge Z.653), Grenzen 0.4/0.72.
+     *
+     * Warum ueberhaupt Gold: die Ampel musste eine WERTUNG ausdruecken
+     * ("teuer = rot"), die die Anzeige gar nicht treffen kann — ein Marktwert am
+     * oberen Ende der Spanne ist nicht schlecht, er liegt nur oben. Der Beweis
+     * war die invertierte Mietskala. Die Gold-Familie zeigt nur die Lage.
+     *
+     * _wlc() macht die Toene whitelabel-faehig (jsPDF kennt kein var(), deshalb
+     * der Laufzeit-Hex). Ohne Whitelabel: #b8932f / #C9A84C / #E8CC7A.
+     * GREEN/GOLDT/REDT bleiben stehen — ein Aufrufer, der eigene zones uebergibt,
+     * bekommt weiter genau das, was er verlangt.
+     */
+    // v963-gaugesrc: Toene aus der zentralen Quelle (oben bei GOLD), nicht lokal.
+    const zones = opts.zones || [[0, 0.4, GOLD_D()], [0.4, 0.72, GOLD_M()], [0.72, 1, GOLD_L()]];
+    /* v962-komment: hier stand noch die Beschreibung von "Variante 3" — Track-
+     * Bogen, Skalenstriche, Gold-Nabe. Alle drei gibt es seit v961 nicht mehr.
+     * Der Kommentar hat prompt die erste Pruefung nach v961 falsch ausschlagen
+     * lassen (grep auf "Skalenstriche" traf ihn statt den Code). */
     const t = ratio(val);
-    const sw = Math.max(2.0, r * 0.11);
-    doc.setLineCap('round');
-    // Ampel-Bogen (Zonen) wie Web-Karte: grün→gold→rot (bei Miete invertiert)
-    zones.forEach(([f, to, c]) => { doc.setLineWidth(sw); doc.setDrawColor(...c); arc(cx, cy, r, 180 + f * 180, 180 + to * 180); });
+    /* v961-goldtacho: der Bogen ist jetzt der der Web-Karte (svgGauge Z.646).
+     * Weg sind die elf Skalenstriche (die Web-Karte hat keine) und der runde
+     * Cap an den Zonen (Web: stroke-linecap="butt").
+     * Bogenstaerke aus dem Web-Verhaeltnis: 12/86 = 0,14 · r. */
+    const sw = Math.max(2.0, r * 0.14);
     doc.setLineCap('butt');
-    // Skalenstriche
-    for (let i = 0; i <= 10; i++) {
-      const lng = (i % 5 === 0);
-      const a1 = pt(i / 10, r - sw / 2 - 1.2), a2 = pt(i / 10, r - sw / 2 - 1.2 - (lng ? 2.6 : 1.5));
-      doc.setLineWidth(lng ? 0.5 : 0.35); doc.setDrawColor(...(dark ? (lng ? [165, 165, 175] : [95, 95, 105]) : (lng ? [120, 120, 130] : [180, 178, 170])));
-      doc.line(a1[0], a1[1], a2[0], a2[1]);
-    }
+    zones.forEach(([f, to, c]) => { doc.setLineWidth(sw); doc.setDrawColor(...c); arc(cx, cy, r, 180 + f * 180, 180 + to * 180); });
     // optionaler Marker (Kaufpreis)
     if (opts.marker != null) {
       const mp = pt(ratio(opts.marker), r);
+      /* v961-goldtacho: Ring um den Marker wie im Web (stroke 1.6 auf #0a0a0c).
+       * Ohne ihn verschwindet der Kaufpreis-Punkt auf dem Gold-Bogen — bei der
+       * alten Ampel lag er noch auf Gruen oder Rot. */
       doc.setFillColor(...(opts.markerColor || (dark ? [232, 226, 212] : [150, 142, 120])));
-      doc.circle(mp[0], mp[1], 1.6, 'F');
+      doc.setDrawColor(...(dark ? [10, 10, 12] : [255, 255, 255])); doc.setLineWidth(0.5);
+      doc.circle(mp[0], mp[1], 1.6, 'FD');
     }
     // Dünne, durchgehende Nadel wie in der Web-Anzeige — KEIN Glow, kleine helle Nabe
     const tip = pt(t, r - sw * 0.9);
@@ -1756,8 +1915,9 @@ async function exportPdf(out) {
     doc.setLineCap('round');
     doc.setDrawColor(...needleCol); doc.setLineWidth(0.4); doc.line(cx, cy, tip[0], tip[1]);
     doc.setLineCap('butt');
+    /* v961-nabe: der goldene Punkt in der Nabe ist raus — die Web-Karte hat
+     * eine schlichte Nabe in Nadelfarbe (circle r=5, Z.656). */
     doc.setFillColor(...needleCol); doc.circle(cx, cy, 0.95, 'F');
-    doc.setFillColor(...GOLD); doc.circle(cx, cy, 0.42, 'F');
     // Wert mittig im Tacho (wie Web-Karte) — über der Nadel, mit feinem dunklem Halo für Lesbarkeit
     if (opts.valueText) {
       doc.setFont('helvetica', 'bold');
@@ -2052,27 +2212,40 @@ async function exportPdf(out) {
   const _sc = ds.score || 0, _scol = _sc >= 70 ? [63, 165, 108] : _sc >= 50 ? GOLD : [184, 98, 80];
   const panH = 46;
   doc.setFillColor(10, 10, 13); doc.roundedRect(M, y, W - 2 * M, panH, 2.5, 2.5, 'F');
-  [[0.55, 0.25], [0.7, 0.7], [0.8, 0.4], [0.9, 0.75], [0.62, 0.5], [0.86, 0.2], [0.74, 0.88], [0.48, 0.8]].forEach(([px, py], i) => {
-    doc.setFillColor(i % 3 === 0 ? 60 : 40, i % 3 === 0 ? 54 : 40, i % 3 === 0 ? 34 : 48);
-    doc.circle(M + px * (W - 2 * M), y + py * panH, i % 3 === 0 ? 0.7 : 0.45, 'F');
-  });
+  /* v962-nopartikel: die acht Streupunkte sind raus. Sie stammen aus der Zeit,
+   * als das Panel allein auf der Seite stand; neben dem Doppelring sind sie nur
+   * Unruhe. Der Hintergrund ist jetzt durchgehend Obsidian. */
   doc.setDrawColor(...GOLD); doc.setLineWidth(0.3); doc.roundedRect(M, y, W - 2 * M, panH, 2.5, 2.5, 'S');
   doc.setFillColor(...GOLD); doc.roundedRect(M, y + 6, 2, panH - 12, 1, 1, 'F');
-  glowOrb(M + 30, y + 23, 17, _scol, [10, 10, 13], 0.18); // Score-Glow hinter Donut
-  scoreDonut(M + 30, y + 23, 16, ds.score);
+  /* v961-scorepanel: Panel wie die Ergebnis-Ansicht. Der Donut rutscht 2 mm
+   * hoch, damit die Tier-Pille unter ihm noch ins 46-mm-Panel passt. */
+  glowOrb(M + 30, y + 21, 17, _scol, [10, 10, 13], 0.18); // Score-Glow hinter Donut
+  scoreDonut(M + 30, y + 21, 16, ds.score, mv.confidence_pct);
   const sbx = M + 58;
-  doc.setTextColor(...GOLD); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
-  doc.text('DEAL-SCORE', sbx, y + 12, { charSpace: 1.2 });
+  // DEAL-SCORE als Pille (Web) statt als nackter Gold-Text
+  doc.setDrawColor(..._scol); doc.setLineWidth(0.35); doc.setFillColor(10, 10, 13);
+  doc.roundedRect(sbx, y + 8.4, 29, 5.6, 2.8, 2.8, 'FD');
+  doc.setTextColor(..._scol); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6);
+  doc.text('DEAL-SCORE', sbx + 14.5, y + 12.2, { align: 'center', charSpace: 0.4 });
   doc.setTextColor(..._scol); doc.setFont('helvetica', 'bold'); doc.setFontSize(22);
-  doc.text(ds.rating ?? '–', sbx, y + 25);
-  const _rw = doc.getTextWidth(ds.rating ?? '–'); doc.setFillColor(..._scol); doc.rect(sbx, y + 28, Math.min(_rw, 70), 0.8, 'F');
+  doc.text(ds.rating ?? '–', sbx, y + 23);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(178, 178, 188);
-  const scoreText = (ds.score >= 75) ? 'Sehr attraktives Chance-Risiko-Profil.'
-    : (ds.score >= 60) ? 'Attraktives Objekt mit solider Ausgangslage.'
-    : (ds.score >= 45) ? 'Durchschnittliches Profil – Detailprüfung empfohlen.'
-    : 'Erhöhtes Risiko – kritische Prüfung nötig.';
-  const stl = doc.splitTextToSize(scoreText, W - 2 * M - (sbx - M) - 8);
-  doc.text(stl, sbx, y + 35);
+  doc.text('Markt- & Chance-Risiko-Bewertung dieses Objekts', sbx, y + 29);
+  /* Aussagekraft jetzt IM Panel, nicht erst 20 mm weiter unten als Textzeile.
+   * Schwellen identisch zu Z.2217 (70/55) — eine Wahrheit, keine zweite Kette. */
+  if (mv.confidence_pct != null) {
+    const _cp = mv.confidence_pct;
+    const _cc = _cp >= 70 ? [63, 165, 108] : _cp >= 55 ? GOLD : [184, 98, 80];
+    doc.setFillColor(..._cc); doc.circle(sbx + 1.3, y + 34.3, 1.3, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(..._cc);
+    doc.text('Aussagekraft: ' + (mv.confidence_label || '–') + ' · ' + _cp + ' %', sbx + 4.2, y + 35.4);
+  }
+  // Legende: ohne sie ist der Innenring nur ein zweiter Ring
+  doc.setFillColor(..._scol); doc.roundedRect(sbx, y + 39.8, 2.6, 2.6, 0.5, 0.5, 'F');
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setTextColor(138, 138, 147);
+  doc.text('Score (Außenring)', sbx + 4.2, y + 42);
+  doc.setFillColor(...GOLD); doc.roundedRect(sbx + 32, y + 39.8, 2.6, 2.6, 0.5, 0.5, 'F');
+  doc.text('Aussagekraft (Innenring)', sbx + 36.2, y + 42);
   y += panH + 7;
   // Score-Zusammensetzung: macht sichtbar, woraus sich der Deal-Score speist (Backend-Breakdown)
   {
@@ -2107,18 +2280,35 @@ async function exportPdf(out) {
   // DealScore 2 (DealPilot) bzw. Vereinfacht-Hinweis
   const dsm = d.dealscore_meta;
   if (dsm && !dsm.simplified) {
-    need(13);
-    doc.setFillColor(245, 242, 232); doc.roundedRect(M, y, W - 2 * M, 11, 2, 2, 'F');
+    /* v964-ds2kontext
+     * ──────────────────────────────────────────────────────────────
+     * Auf Seite 2 stehen zwei Score-Zahlen: der Markt-Score im Ring und der
+     * DealScore 2 hier. Das ist Absicht — die Ergebnis-Ansicht macht es genauso
+     * (dsMeta-Box, Z.401-408). Sie ERKLAERT es aber, und das PDF tat es nicht:
+     *   Z.404  "aus DealPilot uebernommen [· vollstaendige Finanzierungsdaten]"
+     *   Z.407  "Markt-Score dieses Berichts (ohne Finanzierung): X"
+     * Zwei Zahlen ohne Erklaerung sehen aus wie ein Widerspruch. Der Mandant
+     * legt das Blatt seiner Bank vor — er muss nicht raten, welche Zahl was misst.
+     * Die Leiste waechst dafuer von 11 auf 15 mm (y: 16 -> 20).
+     */
+    need(17);
+    doc.setFillColor(245, 242, 232); doc.roundedRect(M, y, W - 2 * M, 15, 2, 2, 'F');
+    doc.setFillColor(...GOLD); doc.roundedRect(M, y, 1.6, 15, 0.8, 0.8, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(...INK);
-    doc.text('DealScore 2 (DealPilot): ' + dsm.value + ' / 100', M + 4, y + 7);
+    doc.text('DealScore 2 (DealPilot): ' + dsm.value + ' / 100', M + 4, y + 6.5);
     const k = dsm.kpis || {};
     const parts = [];
     if (k.dscr != null) parts.push('DSCR ' + (k.dscr.toFixed ? k.dscr.toFixed(2) : k.dscr));
     if (k.ltv_pct != null) parts.push('LTV ' + Math.round(k.ltv_pct) + ' %');
     if (k.cashflow_monthly != null) parts.push('Cashflow ' + Math.round(k.cashflow_monthly) + ' €/M');
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(90, 90, 98);
-    if (parts.length) doc.text(parts.join('   ·   '), W - M - 4, y + 7, { align: 'right' });
-    y += 16;
+    if (parts.length) doc.text(parts.join('   ·   '), W - M - 4, y + 6.5, { align: 'right' });
+    // Die Erklaerzeile aus der Ergebnis-Ansicht — woertlich, damit beide dasselbe sagen.
+    doc.setFontSize(7.2); doc.setTextColor(120, 116, 108);
+    doc.text('aus DealPilot übernommen' + (dsm.kpis_complete ? ' · vollständige Finanzierungsdaten' : '')
+      + (dsm.market_score != null ? '   ·   Markt-Score dieses Berichts (ohne Finanzierung): ' + dsm.market_score : ''),
+      M + 4, y + 12);
+    y += 20;
   } else if (dsm && dsm.simplified) {
     need(11);
     doc.setFontSize(8); doc.setTextColor(150, 150, 160);
@@ -2154,8 +2344,20 @@ async function exportPdf(out) {
     }
   }
   // Aussagekraft: kombinierte Konfidenz (Marktdaten-Stichprobe + Vollständigkeit der Objektangaben)
-  const cval = mv.confidence != null ? mv.confidence : (d.sale && d.sale.confidence);
-  const ci = confInfo(cval);
+  /* v959-confsource
+   * Hier stand: mv.confidence — die ROHE Stichproben-Konfidenz (~0,9).
+   * confInfo() liefert damit den >=0.85-Zweig, also den Satz "Grosse, eng
+   * beieinander liegende Vergleichsstichprobe – belastbare Marktwert-
+   * indikation." Die Zahl daneben kommt aber aus mv.confidence_pct (47).
+   * Ergebnis auf Seite 2 des Prod-Berichts: rote LED "Niedrig · 47 %" und
+   * direkt darunter "belastbar". Genau der Widerspruch, den der Kommentar
+   * bei confInfo() (Z.558-564) als behoben beschreibt — v955/v956 haben das
+   * Dashboard geheilt und diese Zeile vergessen.
+   * Jetzt Zeichen fuer Zeichen dieselbe Kette wie das Dashboard (Z.731).
+   */
+  const cval = (mv.confidence_pct != null) ? (mv.confidence_pct / 100)
+             : (mv.confidence != null ? mv.confidence : (d.sale && d.sale.confidence));
+  const ci = confInfo(cval, (out.data && out.data.valuation && out.data.valuation.market_value && out.data.valuation.market_value.confidence_parts) || null); /* v956-onesource */
   if (mv.confidence_pct != null || ci) {
     need(24); doc.setFontSize(8); doc.setTextColor(...MUT); doc.text('AUSSAGEKRAFT DER INDIKATION', M, y); y += 5;
     const pct = mv.confidence_pct;
@@ -2254,8 +2456,29 @@ async function exportPdf(out) {
     need(ch + 6);
     const sale = d.sale || {};
     const fmtSqm = (v, dec) => (v != null ? (dec ? v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Math.round(v).toLocaleString('de-DE')) : null);
-    const segMW = [[0, 0.33, [67, 183, 124]], [0.34, 0.66, [201, 168, 76]], [0.67, 1, [217, 104, 95]]];
-    const segMiete = [[0, 0.33, [217, 104, 95]], [0.34, 0.66, [201, 168, 76]], [0.67, 1, [67, 183, 124]]];
+    /* v961-goldzonen
+     * ────────────────────────────────────────────────────────────
+     * Bis hierher stand hier die Ampel: gruen→gold→rot, bei der Miete invertiert.
+     * Die Invertierung war der Beweis, dass die Skala nicht passt — sie musste
+     * eine WERTUNG ausdruecken ("teuer = rot", "hohe Miete = gruen"), die die
+     * Anzeige gar nicht treffen kann: ein Marktwert am oberen Ende der Spanne
+     * ist nicht "schlecht", er liegt nur oben.
+     * Die Web-Karte (svgGauge Z.653) macht es richtig: eine Gold-Familie von
+     * dunkel nach hell, die nur die LAGE IN DER SPANNE zeigt. Grenzen 0.4/0.72
+     * sind die des Webs, nicht die alten 0.33/0.66.
+     * _wlc() macht die Toene whitelabel-faehig — genau wie im Web. jsPDF kennt
+     * kein var(), deshalb hier der Umweg ueber den Laufzeit-Hex. */
+    /* v962-balkenampel: zurueck auf den Stand vor v961.
+     * segMW/segMiete fuettern NICHT den Tacho, sondern den waagerechten Balken
+     * unter dem Wert (`segs: segMW`). Der SOLL Ampel bleiben — die Web-Karte
+     * macht es genauso (rangeStrip Z.673: #2f4030 / #3d3a24 / #3f2a24).
+     * v961 hat ihn vergoldet und den Tacho nicht angefasst: falsches Ziel. */
+    /* v963-goldbalken: der Spannbalken in der Karte bekommt dieselbe Gold-
+     * Familie wie der Tacho. Grenzen 0.4/0.72 wie dort, LUECKENLOS (vorher
+     * 0.33->0.34: die Luecke war der Grund, warum es wie drei Pillen aussah).
+     * Keine Invertierung mehr: die Skala zeigt die Lage, sie wertet nicht. */
+    const segMW = [[0, 0.4, GOLD_D()], [0.4, 0.72, GOLD_M()], [0.72, 1, GOLD_L()]];
+    const segMiete = segMW;
     const drawValueCard = (x, o) => {
       obsidianCard(x, y, hw, ch);
       const ix = x + 8, iw = hw - 16;
@@ -2280,13 +2503,24 @@ async function exportPdf(out) {
       // Spannen-Balken mit Gold-Punkt (Wert) + weissem Dreieck (Kaufpreis)
       if (o.lo != null && o.hi != null && o.hi > o.lo) {
         const by = y + 72.5, bh = 2.6;
-        o.segs.forEach(([f, t, c]) => {
-          doc.setFillColor(...c);
-          doc.roundedRect(ix + iw * f, by, iw * (t - f), bh, bh / 2, bh / 2, 'F');
+        /* v963-spannschieber: ein durchgehender Track mit gerundeten Enden statt
+         * drei einzeln gerundeter Pillen. Basis in der dunkelsten Stufe, die
+         * beiden helleren als gerade Rechtecke darueber, rechte Kappe hell. */
+        const _r = bh / 2;
+        doc.setFillColor(...o.segs[0][2]);
+        doc.roundedRect(ix, by, iw, bh, _r, _r, 'F');
+        o.segs.slice(1).forEach(([f, t, c]) => {
+          const w2 = iw * (t - f) - (t >= 1 ? _r : 0);
+          if (w2 > 0) { doc.setFillColor(...c); doc.rect(ix + iw * f, by, w2, bh, 'F'); }
         });
+        doc.setFillColor(...o.segs[o.segs.length - 1][2]);
+        doc.roundedRect(ix + iw - bh, by, bh, bh, _r, _r, 'F');
         const frac = Math.max(0, Math.min(1, (o.val - o.lo) / (o.hi - o.lo)));
         const mxp = ix + iw * frac;
-        if (doc.GState) { doc.setGState(new doc.GState({ opacity: 0.28 })); doc.setFillColor(...GOLD); doc.circle(mxp, by + bh / 2, 2.6, 'F'); doc.setGState(new doc.GState({ opacity: 1 })); }
+        /* Gold auf Gold ist unsichtbar. Die Web-Karte loest das mit einem dunklen
+         * Ring um den Knopf (rangeStrip Z.674: box-shadow 0 0 0 3px #141417) —
+         * genau der ersetzt hier den alten Gold-Glow, der jetzt nichts mehr traegt. */
+        doc.setFillColor(20, 20, 23); doc.circle(mxp, by + bh / 2, 2.5, 'F');
         doc.setFillColor(...GOLD); doc.circle(mxp, by + bh / 2, 1.7, 'F');
         doc.setFillColor(255, 255, 255); doc.circle(mxp, by + bh / 2, 0.6, 'F');
         if (o.marker != null && o.marker >= o.lo && o.marker <= o.hi) {
@@ -2329,7 +2563,15 @@ async function exportPdf(out) {
         valTxt: rMonth != null ? euro(rMonth) : rmed.toLocaleString('de-DE') + ' €/m²',
         valCol: [255, 255, 255], caption: 'Mietspanne',
         loLbl: rLo != null ? rLo + '€' : null, hiLbl: rHi != null ? rHi + '€' : null,
-        marker: null, zones: [[0, 0.34, [184, 98, 80]], [0.34, 0.66, [201, 168, 76]], [0.66, 1, [46, 168, 104]]],
+        /* v963-mietetacho
+         * ──────────────────────────────────────────────────────────
+         * Hier standen die Zonen INLINE: rot -> gold -> gruen (invertierte Ampel).
+         * Damit war opts.zones gesetzt und der Gold-Default aus v962 griff nie —
+         * der Marktwert-Tacho wurde gold, der Miet-Tacho blieb Ampel.
+         * Es gibt ZWEI drawValueCard-Aufrufe. Ich hatte nur den ersten gelesen.
+         * zones: undefined -> beide holen sich denselben Default aus gauge().
+         */
+        marker: null, zones: undefined,
         segs: segMiete,
         medLine: fmtSqm(rmed, true) + ' €/m²  ·  Median',
         spanLine: (d.rent.q25_per_sqm != null && d.rent.q75_per_sqm != null)
@@ -2485,7 +2727,33 @@ async function exportPdf(out) {
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
       doc.setTextColor(...(lead ? [185, 185, 192] : [110, 110, 118]));
       let ly = y + 22;
-      lines.filter(Boolean).slice(0, 4).forEach((l) => { doc.text(l, x + 6, ly); ly += 4.4; });
+      /* v959-cardwrap: die Zeilen wurden roh gemalt. Die Begruendung aus v956
+       * ("Sachwertverfahren fuer Eigentumswohnungen nicht anwendbar (NHK-
+       * Tabelle und BGF-Faktor gelten fuer Einfamilienhaeuser)") ist EIN
+       * langer String -> lief quer ueber die Nachbarkarte. Jetzt umbrochen
+       * auf die Kartenbreite. Die 4-Zeilen-Grenze bleibt wie gehabt. */
+      /* v962-cardfit
+       * ────────────────────────────────────────────────────────
+       * v959 hat den Text umbrochen, aber `slice(0, 4)` hat ihn danach wortlos
+       * abgeschnitten — im Prod-PDF endet der Sachwert-Hinweis mitten im Satz:
+       * "...BGF-Faktor gelten für". Ein Hinweis, der mittendrin aufhoert, ist
+       * schlimmer als keiner: er sieht aus, als stimme er.
+       * Jetzt wird die Schrift verkleinert, bis der GANZE Text in die Karte passt.
+       * Karten mit drei kurzen Zeilen bleiben bei 7 pt — unveraendert. Nur die
+       * lange Begruendung schrumpft.
+       */
+      const _avail = cardH - 24; // von ly = y+22 bis zum Kartenfuss
+      let _fs = 7, _lh = 4.4, _cl = [];
+      for (;;) {
+        doc.setFontSize(_fs);
+        _cl = [];
+        lines.filter(Boolean).forEach((l) => {
+          doc.splitTextToSize(String(l), cardW - 12).forEach((w) => _cl.push(w));
+        });
+        if (_cl.length * _lh <= _avail || _fs <= 4.6) break;
+        _fs -= 0.4; _lh = _fs * 0.63;
+      }
+      _cl.forEach((l) => { doc.text(l, x + 6, ly); ly += _lh; });
     };
     const sw = cc.sachwert || {}, ew = cc.ertragswert || {};
     card3(M, 'VERGLEICHSWERT · FÜHREND', cc.comparison.vergleichswert_eur, [
@@ -2497,12 +2765,12 @@ async function exportPdf(out) {
       sw.bodenwert_eur != null ? 'Bodenwert ' + euro(sw.bodenwert_eur) : 'ohne Bodenwert',
       'Gebäude ' + euro(sw.gebaeude_sachwert_eur),
       'RND ' + sw.restnutzungsdauer_jahre + ' J. / GND ' + (cc.assumptions.gnd_jahre) + ' J.',
-    ] : ['nicht berechenbar']);
+    ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar']); /* v956: v955 liefert eine Begruendung — die gehoert hin */
     card3(M + 2 * (cardW + 6), 'ERTRAGSWERT · INDIKATIV', ew.available ? ew.value_eur : null, ew.available ? [
       'Rohertrag ' + euro(ew.rohertrag_pa_eur) + ' p.a.',
       'Reinertrag ' + euro(ew.reinertrag_pa_eur) + ' p.a.',
       'LZ ' + ew.liegenschaftszins_pct + ' % · V ' + ew.vervielfaeltiger,
-    ] : ['nicht berechenbar']);
+    ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar']); /* v956: v955 liefert eine Begruendung — die gehoert hin */
     y += cardH + 5;
     if (cc.comparison.spread_pct != null) {
       doc.setFontSize(8); doc.setTextColor(...TXT);
@@ -2514,10 +2782,15 @@ async function exportPdf(out) {
       y += 7;
     }
     doc.setFontSize(6.5); doc.setTextColor(...MUT);
-    doc.text('Vereinfachte Verfahren n. ImmoWertV-Logik (indikativ): NHK 2010 ' + cc.assumptions.nhk_efh_bgf_eur + ' €/m² BGF × Baupreisindex ' +
+    /* v959-footnote: stand als EIN doc.text() da und lief rechts aus dem Satz-
+     * spiegel — im Prod-Bericht endet Seite 4 mit "Kein Gutachten n. § 194 Bau".
+     * Jetzt auf die Blockbreite umbrochen. Bei einer Zeile ist y += 5 + 1*3 = 8,
+     * also exakt der alte Wert; nur laengere Fussnoten schieben nach. */
+    const _fn = doc.splitTextToSize('Vereinfachte Verfahren n. ImmoWertV-Logik (indikativ): NHK 2010 ' + cc.assumptions.nhk_efh_bgf_eur + ' €/m² BGF × Baupreisindex ' +
       cc.assumptions.baupreisindex_2010_heute + ' · BWK ' + Math.round(cc.assumptions.bwk_quote * 100) + ' % · Liegenschaftszins ' +
-      (cc.assumptions.liegenschaftszins * 100) + ' % · Sachwertfaktor ' + cc.assumptions.sachwertfaktor + '. Kein Gutachten n. § 194 BauGB.', M, y + 3);
-    y += 8;
+      (cc.assumptions.liegenschaftszins * 100) + ' % · Sachwertfaktor ' + cc.assumptions.sachwertfaktor + '. Kein Gutachten n. § 194 BauGB.', blockW);
+    doc.text(_fn, M, y + 3);
+    y += 5 + _fn.length * 3;
   }
 
   // ---------- Lage-/Potenzialbewertung ----------
@@ -2703,7 +2976,9 @@ async function exportPdf(out) {
     const _drawRich = (text, x, maxW, color) => {
       const lay = _mbLayoutRuns(doc, _mbParseRuns(text), maxW, RSZ);
       for (const line of lay.lines) {
-        need(RLH); let cx = x; const yy = y;
+        // v957-fontleak: need() kann umbrechen. Die Breiten in lay stammen aus
+        // RSZ — also muss auch gezeichnet werden bei RSZ, egal was dazwischen war.
+        need(RLH); doc.setFontSize(RSZ); let cx = x; const yy = y;
         for (const tok of line) {
           doc.setFont('helvetica', tok.bold ? 'bold' : 'normal');
           doc.setTextColor(color[0], color[1], color[2]);
@@ -2736,7 +3011,10 @@ async function exportPdf(out) {
       if (b.type === 'ol') {
         let _n = 0;
         for (const it of b.items) {
-          _n++; need(RLH); doc.setFont('helvetica', 'bold'); doc.setFontSize(RSZ); doc.setTextColor(184, 147, 47);
+          // v964-goldlit: war hart [184,147,47]. Einziges Markengold im PDF-Pfad,
+          // das am Whitelabel vorbeilief (der Waechter sieht keine RGB-Tripel).
+          // Statusfarben (gruen/gold/rot in den Ampeln) bleiben absichtlich hart.
+          _n++; need(RLH); doc.setFont('helvetica', 'bold'); doc.setFontSize(RSZ); doc.setTextColor(...GOLD_D());
           doc.text(_n + '.', M, y);
           _drawRich(it, M + 6, RMW - 6, TXT);
         }
@@ -2791,8 +3069,10 @@ async function exportPdf(out) {
       try { doc.addImage(objImg, 'PNG', 0, 0, W, H); } catch (e) { /* optional */ }
       doc.setGState(new doc.GState({ opacity: 1 }));
     }
-    if (dark) glowOrb(W - 26, 64, 44, [201, 168, 76], OBS, 0.16);
-    radarPin(W - 30, 58, T.num); // dezenter Pin oben rechts (Mockup)
+    /* v962-nopin: Glow-Orb und Radar-Pin oben rechts sind raus — das Briefpapier
+     * (Version 4, bgDarkAsset) laeuft jetzt durch. Der Pin war ein Vektor-Nachbau
+     * aus der Zeit, als das Asset noch keinen eigenen hatte; im aktuellen Asset
+     * sass er als heller Fleck ueber der Skyline. */
     let ty = M + 18;
     doc.setFont('helvetica', 'bold'); doc.setFontSize(30); doc.setTextColor(...T.head);
     doc.text('Inhalt', M, ty, { charSpace: 0.2 });

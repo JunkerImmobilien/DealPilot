@@ -147,6 +147,46 @@ const CHAPTER_GROUPS = [
   { id: 'g3', titel: 'Bewertung, Rendite & Ausblick', kapitel: ['C) Bewertung, Rendite & Ausblick'] },
 ];
 
+/* v960-chapterguard
+ * ────────────────────────────────────────────────────────────────────────────
+ * Die Kapitelgrenze stand bisher NUR im Prompt ("ERZEUGE JETZT AUSSCHLIESSLICH
+ * DIESE KAPITEL ... Keine weiteren Kapitel"). Geprueft hat sie niemand.
+ * Im Prod-Bericht vom 17.7. hatten sich zwei von drei Gruppen nicht daran
+ * gehalten und je den GANZEN Bericht geschrieben:
+ *     g1 -> A B C ·  g2 -> B ·  g3 -> A B C
+ * merged = A B C B A B C  -> der Mandant bekommt den Bericht dreifach
+ * verschraenkt, mit sich widersprechenden Aussagen ("niedrige Aussagekraft"
+ * auf Seite 6, "umfassend und zuverlaessig" auf Seite 7).
+ *
+ * Ein Prompt ist eine Bitte, keine Zusicherung. Was zaehlt, entscheidet der Code.
+ *
+ * Konservativ: findet der Filter das erwartete Kapitel nicht, bleibt die
+ * Antwort unveraendert. Der Filter kann Doppelungen entfernen — nie ein
+ * Kapitel verlieren.
+ */
+function keepOnlyChapters(md, kapitel) {
+  const want = new Set(
+    (kapitel || [])
+      .map((k) => (String(k).match(/^\s*([A-Z])\)/) || [])[1])
+      .filter(Boolean),
+  );
+  if (!want.size) return md;
+
+  const HD = /^\s{0,3}#{1,6}\s*([A-Z])\)/;
+  const lines = String(md).split(/\r?\n/);
+  const out = [];
+  let keep = false, sawWanted = false;
+
+  for (const ln of lines) {
+    const m = ln.match(HD);
+    if (m) keep = want.has(m[1]);
+    if (keep) { out.push(ln); if (m) sawWanted = true; }
+  }
+
+  if (!sawWanted) return md; // Modell hat das Kapitel nicht als Ueberschrift gesetzt -> nichts anfassen
+  return out.join('\n').trim();
+}
+
 async function callOpenAI(payload, opts = {}) {
   const onStep = (typeof opts.onStep === 'function') ? opts.onStep : () => {};
   const userJson = 'STRUKTURIERTE DATEN (JSON):\n\n' + JSON.stringify(payload, null, 2);
@@ -179,7 +219,14 @@ async function callOpenAI(payload, opts = {}) {
       'DEUTLICH KUERZER als ueblich \u2014 hoechstens 4-6 Saetze pro Kapitel, insgesamt etwa halb so lang. ' +
       'Jede Aussage nur EINMAL (keine Wiederholungen; jede Ueberschrift nur einmal verwenden). KEINE Stichpunkte, ' +
       'KEINE Score-Zahlen wie "85/100" im Text, Zahlen in den Text einweben):\n' + headings + extra;
-    const md = await callOneGroup(userMsg);
+    const raw = await callOneGroup(userMsg);
+    /* v960-chapterguard: die Gruppe liefert, was sie liefert — der Code
+     * entscheidet, was davon uebernommen wird. Fremde Kapitel fliegen raus. */
+    const md = keepOnlyChapters(raw, g.kapitel);
+    if (md !== raw) {
+      console.warn(`[openai] Gruppe ${g.id} lieferte fremde Kapitel mit `
+        + `(${raw.length} -> ${md.length} Zeichen) — verworfen.`);
+    }
     onStep(`report: "${g.titel}" fertig`);
     return { id: g.id, md };
   }));
