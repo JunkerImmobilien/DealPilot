@@ -3269,25 +3269,25 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
               <div class="sub-v" id="sub-cashflow-v">—</div>
               <div class="sub-tiny">/100</div>
             </div>
-            <div class="sub" data-tier="" id="sub-sicherheit">
-              <div class="sub-ic" id="sub-sicherheit-ic"></div>
-              <div class="sub-l">Sicherheit</div>
-              <div class="qc-mini" id="qc-mini-sicherheit"></div>
-              <div class="sub-v" id="sub-sicherheit-v">—</div>
+            <div class="sub" data-tier="" id="sub-ltv">
+              <div class="sub-ic" id="sub-ltv-ic"></div>
+              <div class="sub-l">LTV</div>
+              <div class="qc-mini" id="qc-mini-ltv"></div>
+              <div class="sub-v" id="sub-ltv-v">—</div>
               <div class="sub-tiny">/100</div>
             </div>
-            <div class="sub" data-tier="" id="sub-finanzierung">
-              <div class="sub-ic" id="sub-finanzierung-ic"></div>
-              <div class="sub-l">Finanz.</div>
-              <div class="qc-mini" id="qc-mini-finanzierung"></div>
-              <div class="sub-v" id="sub-finanzierung-v">—</div>
+            <div class="sub" data-tier="" id="sub-risiko">
+              <div class="sub-ic" id="sub-risiko-ic"></div>
+              <div class="sub-l">Risiko</div>
+              <div class="qc-mini" id="qc-mini-risiko"></div>
+              <div class="sub-v" id="sub-risiko-v">—</div>
               <div class="sub-tiny">/100</div>
             </div>
-            <div class="sub" data-tier="" id="sub-effizienz">
-              <div class="sub-ic" id="sub-effizienz-ic"></div>
-              <div class="sub-l">Effizienz</div>
-              <div class="qc-mini" id="qc-mini-effizienz"></div>
-              <div class="sub-v" id="sub-effizienz-v">—</div>
+            <div class="sub" data-tier="" id="sub-potenzial">
+              <div class="sub-ic" id="sub-potenzial-ic"></div>
+              <div class="sub-l">Potenzial</div>
+              <div class="qc-mini" id="qc-mini-potenzial"></div>
+              <div class="sub-v" id="sub-potenzial-v">—</div>
               <div class="sub-tiny">/100</div>
             </div>
           </div>
@@ -4039,7 +4039,9 @@ const QcApp = (function() {
 
   function updateAll() {
     const inputs = QcEngine.getInputs();
-    const score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
+    /* v969n: DealPilot Score (V1) im iframe. DealKpis -> computeFromKpis. Fallback: computeScore. */
+    const score = window._dpPilotScore ? window._dpPilotScore(inputs, (_avmResults[0]||null))
+                                        : QcEngine.computeScore(inputs, (_avmResults[0]||null));
     const stage = QcEngine.stage(inputs);
     const comp = QcEngine.completeness(inputs);
     const avmReady = QcEngine.isAvmReady(inputs);
@@ -4077,7 +4079,7 @@ const QcApp = (function() {
     else if (stage === 'live')   st.textContent = today + ' · Live · ' + score.label;
     else                          st.textContent = today + ' · Vollständig · ' + score.label;
 
-    ['rendite', 'cashflow', 'sicherheit', 'finanzierung', 'effizienz'].forEach(name => {
+    ['cashflow', 'rendite', 'ltv', 'risiko', 'potenzial'].forEach(name => {
       const row = document.getElementById('sub-' + name);
       const val = document.getElementById('sub-' + name + '-v');
       const v = gated ? null : score.sub[name];
@@ -5381,6 +5383,10 @@ function renderTransferList() {
       _buildPendingTransfer(_avmResults[0], QcEngine.getInputs());
       renderAvmResults();
       if (typeof scheduleUpdate === 'function') scheduleUpdate();
+    } else if (_selectedSources().indexOf('dpmb') !== -1) {
+      /* v969b: Einzelquelle DealPilot (kein _avmResults) -> Spannenwechsel schreibt den Wert direkt */
+      _applyConsensusToQc();
+      if (typeof scheduleUpdate === 'function') scheduleUpdate();
     }
   }
 
@@ -6006,6 +6012,9 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
 
 
+  <script src="js/dscr-engine.js?v=969n"></script>
+  <script src="js/deal-kpis.js?v=969n"></script>
+  <script src="js/dealscore.js?v=969n"></script>
   <script src="js/avm-section.js?v=W33"></script>
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
      kommt hier nicht rein. Deshalb laedt der iframe die Override-Ebene selbst
@@ -6287,6 +6296,34 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     return true; }
   var t=0, iv=setInterval(function(){ t++; if(apply()||t>40) clearInterval(iv); },250);
   if(document.readyState!=='loading') apply();
+})();
+</script>
+<script>
+/* v969n: DealPilot Score (V1) im QC-iframe. Inputs -> DealKpis (SSoT) -> computeFromKpis = die Karte. */
+(function(){
+  'use strict';
+  function n(v){ var x=parseFloat(String(v==null?"":v).replace(",", ".")); return isFinite(x)?x:0; }
+  function r1(x){ return (x==null)?null:Math.round(x*10)/10; }
+  window._dpPilotScore = function(inputs, avm){
+    var i = inputs||{};
+    if (!window.DealKpis || !window.DealScore || typeof window.DealScore.computeFromKpis!=="function") return null;
+    var kp=n(i.kp), nkm=n(i.nkm);
+    if (!kp || !nkm) return { score:null, label:"\u2013", tier:null, sub:{}, kpi:{} };
+    var hgY=n(i.hg)*12, split=(n(i.hg_split)||22)/100, knk=(n(i.knk)||10.5)/100;
+    var gesamt=kp*(1+knk), ek=n(i.ek), darlehen=Math.max(0,gesamt-ek);
+    var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, nkm:nkm, ze:0,
+      bwk_ul:hgY*(1-split), bwk_nul:hgY*split, d1:darlehen, d1z:(n(i.zins)||3.8), d1t:(n(i.tilg)||1.5),
+      ek:ek, svw:(avm&&avm.marktwert)||0, afa:0, grenz:0 });
+    var mw = (avm&&avm.marktwert)||0;
+    var K = { kp:kp, cf_m:k.cf_m, nmy:k.nmy, ltv:k.ltv, dscr:k.dscr, wp_kpi:(mw>kp?mw-kp:0), mstg:1.5 };
+    var r = window.DealScore.computeFromKpis(K);
+    var sub = {}; (r.breakdown||[]).forEach(function(c){ sub[c.key] = (c.score!=null)?Math.round(c.score):null; });
+    var bwkPct = (k.nkm_j>0)?(k.bwk/k.nkm_j*100):null;
+    return { score:r.score, label:r.label, tier:r.color, sub:sub,
+      kpi:{ bmr:r1(k.bmy), nmr:r1(k.nmy), ekr:r1(k.ekr), cfMon:Math.round(k.cf_m),
+            dscr:(k.dscr!=null)?Math.round(k.dscr*100)/100:null, ltvPct:Math.round(k.ltv),
+            bwkPctOfNkm:(bwkPct!=null)?Math.round(bwkPct):null } };
+  };
 })();
 </script>
 </body>

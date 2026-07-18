@@ -133,6 +133,22 @@ router.get('/reports/replay', authenticate, readGet('/reports/replay'));
 router.get('/reports/fixtures', authenticate, readGet('/reports/fixtures'));
 router.get('/objects', authenticate, readGetLabelled('/objects', function (d) { return d.objects; }));           /* v942 */
 router.get('/objects/history', authenticate, readGetLabelled('/objects/history', function (d) { return d.history; })); /* v942 */
+
+/* v972b: KI-Trend-Text - 1 L Kerosin, user_id via qstrUser (Token). */
+router.post('/verlauf-text', authenticate, async function (req, res) {
+  const VCOST = 1;
+  try {
+    const status = await aiCreditsService.getStatus(req.user.id);
+    if (status.total_remaining < VCOST) {
+      return res.status(402).json({ error: 'Nicht genug Kerosin im Tank.', needs_credits: true, required: VCOST, credits: status });
+    }
+    const out = await forward('POST', '/verlauf-text', { query: qstrUser(req), body: req.body || {} });
+    if (out.status >= 400) return res.status(out.status).json(out.data);
+    const gotText = !!(out.data && out.data.text);
+    if (gotText) { try { await aiCreditsService.consume(req.user.id, VCOST, 'marktbericht:verlauf-text', { cost: VCOST }); } catch (e) {} }
+    res.status(200).json(Object.assign({}, out.data, { _kerosin: { charged: gotText ? VCOST : 0 } }));
+  } catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
+});
 router.get('/reports/one', authenticate, readGet('/reports/one')); /* v895g-reportbyid */
 /* v966-delete: Marktbericht endgueltig loeschen. Durchgereicht an das
  * mb-backend (dort Transaktion + Besitz-Nachweis am Snapshot). user_id haengt

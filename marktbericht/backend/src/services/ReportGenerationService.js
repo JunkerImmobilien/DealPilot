@@ -315,3 +315,29 @@ export async function openaiSelfCheck() {
              diagnose: 'HTTP-/Netzfehler. Wenn 400 zu reasoning_effort: OPENAI_REASONING_EFFORT=off setzen.' };
   }
 }
+
+/* v972b: kurzer, EHRLICHER Trend-Text aus den Verlaufsdaten. Reused rawCompletion(). */
+export async function generateVerlaufText(payload) {
+  if (!aiEnabled()) return { text: '', error: 'KI im mb-Backend nicht aktiv.' };
+  const p = payload || {};
+  const labels = p.labels || {};
+  const series = Array.isArray(p.series) ? p.series : [];
+  const metrics = Array.isArray(p.metrics) ? p.metrics : [];
+  if (series.length < 2) return { text: '', error: 'Zu wenig Berichte.' };
+  const lines = series.map((row, i) => {
+    const parts = metrics.map((k) => (labels[k] || k) + '=' + (row[k] == null ? '-' : row[k]));
+    return `Bericht ${i + 1} (${row.date || '?'}): ` + parts.join(', ');
+  }).join('\n');
+  const sys = 'Du bist ein nuechterner Immobilien-Analyst. Fasse die Entwicklung der Marktberichte eines Objekts in 3-5 Saetzen ehrlich zusammen. '
+    + 'Sage klar, ob Kennzahlen STEIGEN, FALLEN, SCHWANKEN oder STABIL sind - erfinde keinen Trend, wenn die Werte nur schwanken. '
+    + 'Nenne konkrete Zahlen (Marktwert, Score). Keine Anlageberatung, keine Ueberschrift, nur Fliesstext auf Deutsch.';
+  const messages = [{ role: 'system', content: sys }, { role: 'user', content: 'Verlaufsdaten:\n' + lines }];
+  const isNewModel = /^(gpt-5|o\d|gpt-4\.1)/.test(cfg.ai.model || '');
+  const isReasoning = /^(gpt-5|o\d)/.test(cfg.ai.model || '');
+  const effort = (process.env.OPENAI_REASONING_EFFORT || 'low').trim().toLowerCase();
+  try {
+    let r = await rawCompletion(messages, { maxTok: parseInt(process.env.OPENAI_MAX_TOKENS_PER_GROUP || '2000', 10), effort: isReasoning ? effort : null, isNewModel });
+    if (!r.content) r = await rawCompletion(messages, { maxTok: 3000, effort: null, isNewModel });
+    return { text: (r.content || '').trim() };
+  } catch (e) { return { text: '', error: e.message }; }
+}

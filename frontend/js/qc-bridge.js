@@ -28,7 +28,7 @@
  *        window.qcImportPdfTrigger() → Werte zurück in die iframe-Felder.
  */
 (function () {
-  var IFRAME_SRC = 'quickcheck-app.html?v=953';
+  var IFRAME_SRC = 'quickcheck-app.html?v=969b';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
@@ -478,6 +478,8 @@
     ov.querySelector('#qcpm-ok').onclick=function(){
       var keys=[]; [].forEach.call(ov.querySelectorAll('.qcpm-cb'),function(cb){ if(cb.checked) keys.push(cb.getAttribute('data-key')); });
       _postToFrame({source:'dp-qc-parent',type:'qc-save-confirm',checkedKeys:keys,avmSource:state.src,avmSpan:state.span});
+      /* v969c: gewaehlte Spanne als Vorwahl fuer die Objekt-Marktbewertung merken */
+      try { var _sp = (state.span === 'low' || state.span === 'high') ? state.span : 'med'; localStorage.setItem('dp_mb_pref_span', _sp); } catch (e) {}
       _closeSaveOverlay();
     };
   }

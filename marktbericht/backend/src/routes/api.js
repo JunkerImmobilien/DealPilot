@@ -8,7 +8,7 @@ import { MarketAnalysisService } from '../services/MarketAnalysisService.js';
 import { MicroLocationService } from '../services/MicroLocationService.js';
 import { GeocodingService } from '../services/GeocodingService.js';
 import { DealPilotImportService } from '../services/DealPilotImportService.js';
-import { openaiSelfCheck } from '../services/ReportGenerationService.js';
+import { openaiSelfCheck, generateVerlaufText } from '../services/ReportGenerationService.js';
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { runLimited, limiterStats } from '../lib/limiter.js';
@@ -322,6 +322,16 @@ router.get('/objects/history', async (req, res) => {
       args
     );
     res.json({ key: key || null, ref: ref || null, count: r.length, history: r });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/verlauf-text', async (req, res) => {
+  const uid = parseInt(req.query.user_id, 10);
+  if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
+  try {
+    const out = await generateVerlaufText(req.body || {});
+    if (out.error && !out.text) return res.status(502).json({ error: out.error });
+    res.json({ text: out.text || '' });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
