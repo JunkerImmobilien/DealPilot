@@ -1,7 +1,7 @@
 // api.js — alle REST-Endpunkte. Bewusst /api/v1/marktbericht-Prefix,
 // damit es 1:1 als zusätzlicher Router in DealPilots Express-Backend passt.
 import express from 'express';
-import { q, q1, ping } from '../lib/db.js';
+import { q, q1, ping, pool } from '../lib/db.js'; /* v966-delete: pool fuer die Transaktion */
 import { cfg, aiEnabled, geoEnabled, geomapEnabled, destatisEnabled } from '../lib/config.js';
 import { ReportOrchestrator } from '../services/ReportOrchestrator.js';
 import { MarketAnalysisService } from '../services/MarketAnalysisService.js';
@@ -469,6 +469,73 @@ router.get('/reports/one', async (req, res) => {
     if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) {} }
     res.json({ data: data, report_md: r.report_md, ai_mode: r.ai_mode, report_id: r.id, _replay: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* v966-delete
+ * ────────────────────────────────────────────────────────────────────────────
+ * DELETE /reports/:id?user_id=N — loescht einen Marktbericht ENDGUELTIG.
+ *
+ * Warum ueber property_id geloescht werden DARF: ReportOrchestrator legt je Lauf
+ * eine neue Property an (blankes INSERT, kein ON CONFLICT). In der Prod-DB
+ * gemessen: 10 Snapshots / 10 Properties / 10 Reports — 1:1. Ein Loeschen kann
+ * die anderen Berichte desselben Objekts nicht mitreissen.
+ *
+ * Reihenfolge ist zwingend (keine FK hat ON DELETE CASCADE): Kinder zuerst,
+ * properties zuletzt. Eine falsche Reihenfolge scheitert am Constraint und
+ * loescht NICHTS — der sichere Fehlerfall.
+ *
+ * addresses wird NICHT angefasst: Geocoding-Cache, den sich Properties teilen.
+ *
+ * Der Besitz wird ZUERST bewiesen (Snapshot mit user_id). properties,
+ * valuation_results, deal_scores und micro_locations tragen keinen Besitzer —
+ * ohne diesen Nachweis waere die Route ein Loeschknopf fuer fremde Berichte.
+ */
+router.delete('/reports/:id', async (req, res) => {
+  const uid = parseInt(req.query.user_id, 10);
+  if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
+  const rid = parseInt(req.params.id, 10);
+  if (!Number.isFinite(rid) || rid <= 0) return res.status(400).json({ error: 'report_id ungültig' });
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    /* Besitz-Nachweis. 404 statt 403 — verraet nicht, dass es die id gibt (wie /reports/one). */
+    const own = await client.query(
+      'SELECT id, property_id FROM mb.object_snapshots WHERE report_id = $1 AND user_id = $2',
+      [rid, uid]
+    );
+    if (!own.rows.length) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'kein Bericht (id=' + rid + ')' });
+    }
+    const pid = own.rows[0].property_id;
+
+    const del = {};
+    const step = async (label, sql, args) => {
+      const r = await client.query(sql, args);
+      del[label] = r.rowCount;
+    };
+
+    await step('object_snapshots', 'DELETE FROM mb.object_snapshots WHERE report_id = $1 AND user_id = $2', [rid, uid]);
+    await step('market_reports',   'DELETE FROM mb.market_reports   WHERE id = $1 AND user_id = $2',        [rid, uid]);
+    if (pid != null) {
+      await step('valuation_results', 'DELETE FROM mb.valuation_results WHERE property_id = $1', [pid]);
+      await step('deal_scores',       'DELETE FROM mb.deal_scores       WHERE property_id = $1', [pid]);
+      await step('micro_locations',   'DELETE FROM mb.micro_locations   WHERE property_id = $1', [pid]);
+      await step('properties',        'DELETE FROM mb.properties        WHERE id = $1',          [pid]);
+    }
+
+    await client.query('COMMIT');
+    console.log('[mb] report ' + rid + ' geloescht (user ' + uid + '):', JSON.stringify(del));
+    res.json({ deleted: true, report_id: rid, property_id: pid, rows: del });
+  } catch (e) {
+    try { await client.query('ROLLBACK'); } catch (x) {}
+    console.warn('[mb] delete report ' + rid + ' fehlgeschlagen:', e.message);
+    res.status(500).json({ error: e.message });
+  } finally {
+    client.release();
+  }
 });
 
 // GET /reports/:propertyId — letzten Bericht zu einem Objekt holen

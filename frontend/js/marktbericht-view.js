@@ -88,7 +88,7 @@
   }
 
   function frameSrc(query) {
-    return '/marktbericht-app/index.html?v=942&theme=' + mbTheme() + (query ? '&' + query : '');
+    return '/marktbericht-app/index.html?v=967&theme=' + mbTheme() + (query ? '&' + query : '');
   }
 
   // iframe waechst auf Content-Hoehe -> kein innerer Scrollbalken, Seite scrollt

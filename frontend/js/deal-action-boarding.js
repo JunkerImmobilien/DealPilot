@@ -799,7 +799,24 @@
       + '#s8 .dab-mb-mv{font-family:var(--dab-fm);font-size:14.5px;font-weight:700;color:#2A2727;white-space:nowrap;text-align:right}'
       + '#s8 .dab-mb-mv small{display:block;font-family:var(--dab-fs);font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--dab-gold3);margin-top:2px}'
       + '#s8 .dab-mb-mv.nod{color:#8a8378;font-weight:500;font-size:11.5px}'
-      + '@media(max-width:600px){#s8 .dab-mb-row{flex-wrap:wrap}#s8 .dab-mb-mv{text-align:left}}';
+      + '@media(max-width:600px){#s8 .dab-mb-row{flex-wrap:wrap}#s8 .dab-mb-mv{text-align:left}}'
+      /* v965-mbcss: der gefaltete Rest + der Knopf. Gold ueber --dab-gold*, wie
+         der Rest der Sektion — dreht beim Partner-Mandanten mit. */
+      + '#s8 .dab-mb-more{display:none}'
+      + '#s8 .dab-mb-host.mb-open .dab-mb-more{display:block}'
+      + '#s8 .dab-mb-tog{display:block;width:100%;margin-top:8px;padding:9px 4px;background:none;'
+        + 'border:1px dashed rgba(42,39,39,.22);border-radius:9px;cursor:pointer;'
+        + 'font-family:var(--dab-fs);font-size:11.5px;font-weight:700;letter-spacing:.4px;'
+        + 'text-transform:uppercase;color:var(--dab-gold3)}'
+      + '#s8 .dab-mb-tog:hover{background:#F8F6F1;border-style:solid}'
+      + '#s8 .dab-mb-tog .lbl-less{display:none}'
+      + '#s8 .dab-mb-host.mb-open .dab-mb-tog .lbl-more{display:none}'
+      + '#s8 .dab-mb-host.mb-open .dab-mb-tog .lbl-less{display:inline}'
+      /* v966-delcss: Loeschen-Knopf. Grau in Ruhe, rot erst beim Hover — wer
+         trifft, trifft absichtlich. Rot = Statusfarbe, bleibt hart. */
+      + '#s8 .dab-mb-del{margin-left:6px;width:34px;height:34px;flex:0 0 auto;border:1px solid rgba(42,39,39,.16);'
+        + 'border-radius:9px;background:none;color:#9a9288;font-size:14px;line-height:1;cursor:pointer}'
+      + '#s8 .dab-mb-del:hover{color:#B8625C;border-color:#B8625C;background:#FBF3F2}';
     document.head.appendChild(st);
   }
   /* v942-mbrow: eigenes Icon — die ICO-Tabelle traegt kein Dokument-Symbol. */
@@ -835,7 +852,15 @@
        * Alle vier Werte liegen seit jeher in mb.object_snapshots — sie wurden nur
        * nie durchgereicht (api.js SELECT) und nie gerendert. KEIN Filter hier:
        * das Band heisst "zu diesem Objekt", da gehoert genau eins hin. */
-      host.innerHTML = reps.map(function (h) {
+      /* v965-mbfold
+       * ────────────────────────────────────────────────────────
+       * Bis hierher wurde JEDER Bericht gerendert. Wer an einem Tag sechsmal
+       * erzeugt, bekommt sechs Zeilen mit derselben Adresse und schiebt sich
+       * alles darunter aus dem Bild. Die 3 neuesten stehen offen (reps ist eine
+       * Zeile davor absteigend sortiert), der Rest liegt gefaltet darunter.
+       * Kein Filter, kein Verlust: aufgeklappt ist alles wieder da.
+       */
+      var _row = function (h) {
         var d = new Date(h.created_at); var ds = d.toLocaleDateString('de-DE') + ' \u00b7 ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
         var kz = h.object_label
           ? '<span class="dab-mb-kz">' + String(h.object_label).replace(/</g, '&lt;') + '</span>'
@@ -847,8 +872,23 @@
         return '<div class="dab-mb-row"><span class="dab-mb-icb">' + _DAB_MB_DOC + '</span>'
           + '<div class="dab-mb-main"><div class="dab-mb-l1">' + kz + '<span class="dab-mb-addr">' + addr + '</span></div>'
           + '<div class="dab-mb-d">' + ds + '</div></div>' + mv
-          + '<button class="dab-doc-btn" onclick="DealActionBoarding.downloadReport(' + (h.report_id | 0) + ')">' + ICO.dl + 'PDF</button></div>';
-      }).join('');
+          + '<button class="dab-doc-btn" onclick="DealActionBoarding.downloadReport(' + (h.report_id | 0) + ')">' + ICO.dl + 'PDF</button>'
+          /* v966-delbtn: endgueltiges Loeschen — Rueckfrage in deleteReport(). */
+          + '<button class="dab-mb-del" title="Bericht endg\u00fcltig l\u00f6schen" onclick="DealActionBoarding.deleteReport(' + (h.report_id | 0) + ')">\u2715</button></div>';
+      };
+      /* v965-mbfold-join: 3 offen, Rest in einen eigenen Block. */
+      var OFFEN = 3;
+      var _head = reps.slice(0, OFFEN).map(_row).join('');
+      var _rest = reps.slice(OFFEN);
+      var _tail = '';
+      if (_rest.length) {
+        _tail = '<div class="dab-mb-more">' + _rest.map(_row).join('') + '</div>'
+          + '<button type="button" class="dab-mb-tog" onclick="DealActionBoarding.toggleReports(this)">'
+          + '<span class="lbl-more">' + _rest.length + ' weitere anzeigen</span>'
+          + '<span class="lbl-less">weniger anzeigen</span></button>';
+      }
+      host.className = 'dab-mb-host';
+      host.innerHTML = _head + _tail;
     } catch (e) { host.innerHTML = '<div class="dab-mb-empty">Konnte Marktberichte nicht laden.</div>'; }
   }
   /* v949-realpdf
@@ -886,6 +926,46 @@
     });
   }
 
+  /* v966-delreport
+   * Loescht einen Marktbericht ENDGUELTIG (Entscheidung 17.07.: "komplett in
+   * der db loeschen"). Der Proxy setzt user_id aus dem Token (v942-userbind),
+   * das mb-backend prueft den Besitz am Snapshot und loescht in einer
+   * Transaktion ueber alle sechs Tabellen. 404 -> fremder oder unbekannter
+   * Bericht, nichts geloescht.
+   * Die Rueckfrage nennt Adresse+Datum der Zeile, damit niemand den falschen
+   * von sechs gleich aussehenden Eintraegen trifft. */
+  async function deleteReport(rid) {
+    try {
+      var row = null;
+      try {
+        var btns = document.querySelectorAll('#dab-mb-host .dab-mb-del');
+        for (var i = 0; i < btns.length; i++) {
+          if ((btns[i].getAttribute('onclick') || '').indexOf('(' + rid + ')') >= 0) { row = btns[i].closest('.dab-mb-row'); break; }
+        }
+      } catch (e) {}
+      var was = '';
+      if (row) {
+        var a = row.querySelector('.dab-mb-addr'); var d = row.querySelector('.dab-mb-d');
+        was = '\n\n' + ((a && a.textContent) || '') + '\n' + ((d && d.textContent) || '');
+      }
+      if (!window.confirm('Diesen Marktbericht endg\u00fcltig l\u00f6schen?' + was + '\n\nDas kann nicht r\u00fcckg\u00e4ngig gemacht werden.')) return;
+      var t = token();
+      var res = await fetch('/api/v1/marktbericht/reports/' + (rid | 0), {
+        method: 'DELETE',
+        headers: t ? { Authorization: 'Bearer ' + t } : {}
+      });
+      if (!res.ok) {
+        var err = null; try { err = await res.json(); } catch (e) {}
+        toast('L\u00f6schen fehlgeschlagen' + (err && err.error ? ': ' + err.error : ' (' + res.status + ')'));
+        return;
+      }
+      toast('Marktbericht gel\u00f6scht.');
+      try { window._dabMbRefresh(); } catch (e) {}
+    } catch (e) {
+      toast('L\u00f6schen fehlgeschlagen: ' + e.message);
+    }
+  }
+
   async function downloadReport(rid) {
     try {
       try {
@@ -906,7 +986,16 @@
     } catch (e) { alert('Marktbericht-PDF fehlgeschlagen: ' + e.message); }
   }
 
+  /* v965-mbtog: klappt den Rest der Marktberichte auf/zu. Nur eine Klasse am
+   * Host — kein Fetch, kein Re-Render, der Zustand ueberlebt kein Neuladen der
+   * Liste, und genau das ist gewollt: nach dem Tab-Wechsel wieder eingeklappt. */
+  function toggleReports(btn) {
+    var host = document.getElementById('dab-mb-host');
+    if (host) host.classList.toggle('mb-open');
+    if (btn) btn.blur();
+  }
   window.DealActionBoarding = {
+    toggleReports: toggleReports,
     linkOut: linkOut,
     buildTop: buildTop,
     afterRender: afterRender,
@@ -921,7 +1010,8 @@
     fixReq: fixReq,
     toggleCustomDoc: toggleCustomDoc,
     partnerInterest: partnerInterest,
-    downloadReport: downloadReport
+    downloadReport: downloadReport,
+    deleteReport: deleteReport /* v966-delexport */
   };
 
   /* ────────────────── Styles ────────────────── */
