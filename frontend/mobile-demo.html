@@ -332,6 +332,32 @@ body{font-family:var(--body);color:#e8e6df;background:radial-gradient(900px 700p
   <!-- PWA:end -->
 </head>
 <body>
+<script>
+/* MA35-mobile-block: Direktzugriff auf die (im Aufbau befindliche) Mobile-App auf echten
+   Handys sperren. Nur echtes Phone (schmal + coarse pointer) -> Overlay. Desktop/Tablet
+   (Maus/breit) sehen die Demo weiter. Laeuft frueh (direkt nach <body>), kein Flackern. */
+(function(){
+  try {
+    var mm = window.matchMedia;
+    var isPhone = mm && mm("(max-width:700px)").matches && mm("(pointer:coarse)").matches;
+    if (!isPhone) return;
+    var add = function(){
+      if (!document.body || document.getElementById("dp-mobile-block")) return;
+      var ov = document.createElement("div"); ov.id = "dp-mobile-block";
+      ov.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#050505;color:#FDFCFA;"
+        + "display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;"
+        + "padding:32px;gap:12px;font-family:-apple-system,system-ui,sans-serif";
+      ov.innerHTML =
+        '<div style="font-family:\'Space Grotesk\',system-ui,sans-serif;font-weight:700;font-size:23px;letter-spacing:.5px">Deal<span style="color:#C9A84C">Pilot</span></div>'
+        + '<div style="font-size:17px;font-weight:600;margin-top:10px">Mobile-Version im Aufbau</div>'
+        + '<div style="font-size:14px;color:#b5b0a4;line-height:1.55;max-width:300px">Die App fuer das Handy ist noch nicht fertig. Bitte oeffne DealPilot auf einem Tablet oder Rechner.</div>';
+      document.body.appendChild(ov);
+      try { document.documentElement.style.overflow = "hidden"; } catch(e){}
+    };
+    if (document.body) add(); else document.addEventListener("DOMContentLoaded", add);
+  } catch(e){}
+})();
+</script>
 
 <div class="intro">
   <div class="ey">DealPilot · Mobile App</div>

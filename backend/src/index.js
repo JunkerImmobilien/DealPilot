@@ -100,6 +100,7 @@ app.use('/api/v1/tax-records', taxRecordsRoutes);
 app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/market-rates', marketRatesRoutes);
 app.use('/api/v1/beta-signup', betaSignupRoutes);
+app.use('/api/v1/track', rateLimit({ windowMs: 60000, max: 120 }), require('./routes/track')); // v973
 app.use('/api/v1/deal-action', dealActionRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/listing', scrapeRoutes);  // V63.85: URL-Scraper für Quick-Check

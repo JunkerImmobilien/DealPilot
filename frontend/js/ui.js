@@ -1115,6 +1115,7 @@ function _renderAIServerAnalysis(a) {
     return '<section class="dp-pa-panel' + (active ? ' active' : '') + '" id="dp-pa-' + id + '">' + inner + '</section>';
   }
 
+  try { setTimeout(window._dpLoadVerlauf, 0); } catch (e) {} /* v972a */
   return '<div class="dp-pa-wrap">' +
     '<nav class="dp-pa-rail">' +
       tab('briefing', 'Briefing', true) +
@@ -1123,6 +1124,7 @@ function _renderAIServerAnalysis(a) {
       tab('loc', 'Lage &amp; Markt', false) +
       tab('verh', 'Verhandlung &amp; Offerte', false) +
       tab('bank', 'Bank', false) +
+      '<button type="button" class="dp-pa-tab" id="dp-pa-tab-verlauf" style="display:none" onclick="_dpPaTab(\'verlauf\',this)">Marktbericht-Verlauf</button>' +
     '</nav>' +
     '<div class="dp-pa-content">' +
       panel('briefing', pB, true) +
@@ -1131,6 +1133,7 @@ function _renderAIServerAnalysis(a) {
       panel('loc', pL, false) +
       panel('verh', pV, false) +
       panel('bank', pK, false) +
+      panel('verlauf', '<div class="dp-pa-card" id="dp-pa-verlauf-body"><p class="dp-pa-p" style="color:#8b8678">Lade Marktbericht-Verlauf \u2026</p></div>', false) +
     '</div>' +
   '</div>';
 }
@@ -1860,3 +1863,240 @@ window.syncKuecheToMoebl = function(){
 
 /* v790-buildpayload-global: Hilfe-Agent nutzt denselben Objekt-Kontext wie Pilot-Analyse */
 try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
+
+/* ===== v972b: Marktbericht-Verlauf (Fix + KI-Text) ===== */
+/* v972b: Marktbericht-Verlauf - Lesbarkeit theme-aware (heller/dunkler Hintergrund) + KI-Trend-Text.
+   Chart via window.Chart (Cockpit-Stil). Farben aus der ECHTEN Kartenhelligkeit (getComputedStyle).
+   KI-Text: POST /marktbericht/verlauf-text (1 L Kerosin, Proxy+mb-backend). */
+(function () {
+  'use strict';
+  var METRICS = [
+    { key: 'market_value', label: 'Marktwert',   color: '#C9A84C', fmt: function (v) { return _dpVEur(v) + ' \u20ac'; } },
+    { key: 'deal_score',   label: 'DealPilot-Score', color: '#3FA56C', fmt: function (v) { return Math.round(v) + ' / 100'; } },
+    { key: 'micro_score',  label: 'Lage (Mikro)', color: '#9b6fd4', fmt: function (v) { return Math.round(v) + ' / 100'; } },
+    { key: 'macro_score',  label: 'Lage (Makro)', color: '#5a7fd4', fmt: function (v) { return Math.round(v) + ' / 100'; } },
+    { key: 'price_cagr_pct', label: 'Markt (Wertentw.)', color: '#c98a2f', fmt: function (v) { return _dpVNum(v, 1) + ' %'; } },
+    { key: 'gross_yield_pct', label: 'Bruttorendite', color: '#3f8ea5', fmt: function (v) { return _dpVNum(v, 1) + ' %'; } },
+    { key: 'rent_multiplier', label: 'Faktor', color: '#8a8f5a', fmt: function (v) { return _dpVNum(v, 1) + '\u00d7'; } }
+  ];
+
+  function _dpVEur(v) { try { return new Intl.NumberFormat('de-DE').format(Math.round(v)); } catch (e) { return String(v); } }
+  function _dpVNum(v, d) { var n = Number(v); return isFinite(n) ? n.toFixed(d).replace('.', ',') : '\u2013'; }
+  function _dpVDate(s) { try { var d = new Date(s); var p = function (x) { return (x < 10 ? '0' : '') + x; };
+    return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '. ' + p(d.getHours()) + ':' + p(d.getMinutes()); } catch (e) { return '\u2013'; } }
+  function _gv(id) { var el = document.getElementById(id); return el ? String(el.value == null ? '' : el.value).trim() : ''; }
+  function _numDe(s) { var n = parseFloat(String(s == null ? '' : s).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : null; }
+
+  // echte Hintergrundhelligkeit der Karte -> hell/dunkel (statt Skin raten)
+  function _dpVIsLight(el) {
+    try {
+      var node = el; for (var i = 0; i < 6 && node; i++) {
+        var c = getComputedStyle(node).backgroundColor || '';
+        var m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
+        if (m && (m[4] === undefined || parseFloat(m[4]) > 0.2)) {
+          var lum = 0.299 * +m[1] + 0.587 * +m[2] + 0.114 * +m[3];
+          return lum > 140;
+        }
+        node = node.parentElement;
+      }
+    } catch (e) {}
+    return true; // Default: hell (Pilot-Analyse ist i.d.R. hell)
+  }
+
+  function _dpVActiveMetrics(hist) {
+    return METRICS.filter(function (m) {
+      var n = 0; hist.forEach(function (h) { if (h[m.key] != null && isFinite(Number(h[m.key]))) n++; });
+      return n >= 2;
+    });
+  }
+
+  window._dpVerlaufAbgleich = function (hist) {
+    var snap = hist[hist.length - 1] || {}, diffs = [];
+    var snWfl = (snap.living_area != null) ? Number(snap.living_area) : null, curWfl = _numDe(_gv('wfl'));
+    if (snWfl != null && curWfl != null && Math.abs(snWfl - curWfl) > 0.6)
+      diffs.push('Wohnfl\u00e4che ' + _dpVNum(snWfl, 0) + ' \u2192 jetzt ' + _dpVNum(curWfl, 0) + ' m\u00b2');
+    var snBj = (snap.build_year != null) ? parseInt(snap.build_year, 10) : null, curBj = _numDe(_gv('baujahr'));
+    if (snBj && curBj && snBj !== curBj) diffs.push('Baujahr ' + snBj + ' \u2192 jetzt ' + Math.round(curBj));
+    var checked = (snWfl != null && curWfl != null) || (snBj && curBj);
+    if (!checked) return '<div class="dpv-abgl dpv-abgl-neutral"><span class="dpv-abgl-ic">\u25CB</span>Objektdaten nicht vergleichbar (Felder leer).</div>';
+    if (!diffs.length) return '<div class="dpv-abgl dpv-abgl-ok"><span class="dpv-abgl-ic">\u2713</span>Neuester Bericht basiert auf den aktuellen Objektdaten (Wohnfl\u00e4che, Baujahr).</div>';
+    return '<div class="dpv-abgl dpv-abgl-warn"><span class="dpv-abgl-ic">\u26A0</span>Objektdaten weichen vom neuesten Bericht ab: ' + diffs.join(' \u00b7 ') + '. Ein neuer Marktbericht w\u00e4re aussagekr\u00e4ftiger.</div>';
+  };
+
+  window._dpVerlaufHtml = function (hist) {
+    var mets = _dpVActiveMetrics(hist);
+    if (!mets.length) return '<p class="dp-pa-p" style="color:#8b8678">Keine vergleichbaren Kennzahlen in den Berichten.</p>';
+    var chips = mets.map(function (m, i) {
+      return '<button type="button" class="dpv-chip' + (i < 2 ? ' on' : '') + '" data-k="' + m.key + '" style="color:' + m.color + '"><span class="dpv-dot"></span>' + m.label + '</button>';
+    }).join('');
+    var head = '<tr><th>Kennzahl</th>' + hist.map(function (h, i) { return '<th>' + (i + 1) + '. \u00b7 ' + _dpVDate(h.created_at) + '</th>'; }).join('') + '<th class="dpv-dcol">\u0394 gesamt</th></tr>';
+    var body = mets.map(function (m) {
+      var cells = hist.map(function (h) { return '<td class="dpv-val">' + (h[m.key] != null ? m.fmt(Number(h[m.key])) : '\u2013') + '</td>'; }).join('');
+      var a = Number(hist[0][m.key]), b = Number(hist[hist.length - 1][m.key]);
+      var pct = (a && isFinite(a)) ? ((b - a) / Math.abs(a) * 100) : 0;
+      var cls = pct > 0.5 ? 'up' : pct < -0.5 ? 'down' : 'flat', arr = pct > 0.5 ? '\u25b2' : pct < -0.5 ? '\u25bc' : '\u2013';
+      return '<tr data-mrow="' + m.key + '"><td><span class="dpv-mdot" style="background:' + m.color + '"></span>' + m.label + '</td>' + cells + '<td class="dpv-dcol dpv-delta ' + cls + '">' + arr + ' ' + (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%</td></tr>';
+    }).join('');
+    return '' +
+      window._dpVerlaufAbgleich(hist) +
+      '<div class="dp-pa-card dpv-card">' +
+        '<div class="dpv-h">Entwicklung im Zeitverlauf</div>' +
+        '<div class="dpv-sub">Indexiert auf den ersten Bericht (= 100) \u2014 vergleichbar \u00fcber alle Kennzahlen</div>' +
+        '<div class="dpv-chips">' + chips + '</div>' +
+        '<div class="dpv-chartbox"><canvas class="dpv-canvas"></canvas></div>' +
+        '<div class="dpv-note">Index 100 = Wert im ersten Bericht \u00b7 112 = +12 % seither. Absolutwerte in der Tabelle.</div>' +
+      '</div>' +
+      '<div class="dp-pa-card dpv-card">' +
+        '<div class="dpv-h">KI-Einordnung des Verlaufs</div>' +
+        '<div class="dpv-sub">Kurze Zusammenfassung der Entwicklung \u00b7 kostet 1 L Kerosin</div>' +
+        '<div id="dpv-txt" class="dpv-txt"></div>' +
+        '<button type="button" id="dpv-ki-btn" class="dpv-kibtn">Trend-Text erzeugen <span class="dpv-l">1 L</span></button>' +
+      '</div>' +
+      '<div class="dp-pa-card dpv-card">' +
+        '<div class="dpv-h">Absolutwerte &amp; \u0394</div>' +
+        '<div class="dpv-sub">Jeder Marktbericht als Spalte \u00b7 \u0394 = erster \u2192 letzter</div>' +
+        '<div style="overflow-x:auto"><table class="dpv-tbl"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
+      '</div>';
+  };
+
+  window._dpVerlaufWire = function (root, hist) {
+    var mets = _dpVActiveMetrics(hist);
+    var cv = root.querySelector('.dpv-canvas');
+    var light = _dpVIsLight(root.querySelector('.dpv-card') || root);
+    root.classList.toggle('dpv-light', light); root.classList.toggle('dpv-dark', !light);
+    function idx(m, h) { var base = Number(hist[0][m.key]); return (base && isFinite(base)) ? (Number(h[m.key]) / base * 100) : 100; }
+    function wireChips(chart) {
+      root.querySelectorAll('.dpv-chip').forEach(function (ch, i) {
+        ch.addEventListener('click', function () {
+          var on = !ch.classList.contains('on'); ch.classList.toggle('on', on);
+          var row = root.querySelector('[data-mrow="' + ch.getAttribute('data-k') + '"]'); if (row) row.style.opacity = on ? '1' : '.45';
+          if (chart) { chart.setDatasetVisibility(i, on); chart.update(); }
+        });
+      });
+    }
+    // KI-Text-Knopf
+    var kbtn = root.querySelector('#dpv-ki-btn'), ktxt = root.querySelector('#dpv-txt');
+    if (kbtn) kbtn.addEventListener('click', function () { _dpVerlaufKiText(hist, mets, kbtn, ktxt); });
+
+    if (!cv || typeof window.Chart === 'undefined') { wireChips(null); return; }
+    var gridCol = light ? 'rgba(122,115,112,.14)' : 'rgba(201,168,76,.10)';
+    var axisCol = light ? '#5A5350' : 'rgba(232,226,212,.6)';
+    var pointBorder = light ? '#fff' : '#0a0a0a';
+    var labels = hist.map(function (h, i) { return (i + 1) + '. ' + _dpVDate(h.created_at); });
+    var datasets = mets.map(function (m, i) {
+      return { label: m.label, data: hist.map(function (h) { return (h[m.key] != null) ? Math.round(idx(m, h) * 10) / 10 : null; }),
+        borderColor: m.color, backgroundColor: m.color + '22', tension: 0.35, fill: (i === 0),
+        pointRadius: 3, pointHoverRadius: 5, pointBackgroundColor: m.color, pointBorderColor: pointBorder, pointBorderWidth: 2,
+        borderWidth: 2.4, hidden: (i >= 2), _metKey: m.key };
+    });
+    try {
+      var chart = new window.Chart(cv, { type: 'line', data: { labels: labels, datasets: datasets }, options: {
+        responsive: true, maintainAspectRatio: false, devicePixelRatio: 2, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { display: false }, tooltip: {
+          backgroundColor: 'rgba(10,8,5,.96)', titleColor: '#F2ECDC', bodyColor: '#F2ECDC', borderColor: 'rgba(201,168,76,.45)', borderWidth: 1,
+          padding: 11, cornerRadius: 8, usePointStyle: true, titleFont: { size: 12, weight: '700' }, bodyFont: { size: 12, weight: '500' },
+          callbacks: { label: function (ctx) { var m = mets[ctx.datasetIndex], h = hist[ctx.dataIndex];
+            var abs = (h && h[m.key] != null) ? m.fmt(Number(h[m.key])) : '\u2013';
+            return ' ' + m.label + ': ' + abs + ' \u00b7 Index ' + (ctx.parsed.y != null ? ctx.parsed.y.toFixed(1) : '\u2013'); } } } },
+        scales: { x: { grid: { color: gridCol, drawBorder: false }, ticks: { color: axisCol, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
+                  y: { grid: { color: gridCol, drawBorder: false }, ticks: { color: axisCol },
+                       title: { display: true, text: 'Index (1. Bericht = 100)', color: axisCol, font: { size: 10 } } } },
+        animation: { duration: 800, easing: 'easeOutQuart' } } });
+      wireChips(chart);
+    } catch (e) { wireChips(null); }
+  };
+
+  function _dpVerlaufKiText(hist, mets, btn, out) {
+    if (typeof Auth === 'undefined' || !Auth.apiCall) return;
+    btn.disabled = true; btn.textContent = 'Erzeuge Trend-Text \u2026';
+    var payload = { metrics: mets.map(function (m) { return m.key; }),
+      series: hist.map(function (h) { var o = { date: h.created_at }; mets.forEach(function (m) { o[m.key] = h[m.key]; }); return o; }),
+      labels: mets.reduce(function (a, m) { a[m.key] = m.label; return a; }, {}) };
+    Auth.apiCall('/marktbericht/verlauf-text', { method: 'POST', body: payload })
+      .then(function (data) {
+        if (data && data.needs_credits) { out.innerHTML = '<span class="dpv-err">Nicht genug Kerosin (1 L n\u00f6tig).</span>'; return; }
+        var t = (data && (data.text || data.report_md)) || '';
+        out.innerHTML = t ? _dpVEscP(t) : '<span class="dpv-err">Kein Text erhalten.</span>';
+        if (t) { btn.style.display = 'none'; }
+      })
+      .catch(function () { out.innerHTML = '<span class="dpv-err">Fehler beim Erzeugen.</span>'; })
+      .finally(function () { btn.disabled = false; if (btn.style.display !== 'none') btn.textContent = 'Neu erzeugen'; });
+  }
+  function _dpVEscP(t) {
+    var esc = String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return esc.split(/\n{2,}/).map(function (p) { return '<p>' + p.replace(/\n/g, '<br>') + '</p>'; }).join('');
+  }
+
+  window._dpLoadVerlauf = function () {
+    var body = document.getElementById('dp-pa-verlauf-body');
+    var tabBtn = document.getElementById('dp-pa-tab-verlauf');
+    if (!body) return;
+    _dpVerlaufCss();
+    var objKey = (typeof window._currentObjKey === 'string' && window._currentObjKey) ? window._currentObjKey : null;
+    if (!objKey || typeof Auth === 'undefined' || !Auth.apiCall) { if (tabBtn) tabBtn.style.display = 'none'; return; }
+    Auth.apiCall('/marktbericht/objects/history?key=' + encodeURIComponent('dp:' + objKey), { method: 'GET' })
+      .then(function (data) {
+        var hist = (data && data.history) || [];
+        hist = hist.filter(function (h) { return h && h.market_value != null; });
+        if (hist.length < 2) { if (tabBtn) tabBtn.style.display = 'none'; return; }
+        if (tabBtn) tabBtn.style.display = '';
+        body.innerHTML = window._dpVerlaufHtml(hist);
+        window._dpVerlaufWire(body, hist);
+        _dpVerlaufLocLine(hist);
+      })
+      .catch(function () { if (tabBtn) tabBtn.style.display = 'none'; });
+  };
+
+  // Entwicklungszeile in "Lage & Markt" (Panel dp-pa-loc), sobald History da ist
+  function _dpVerlaufLocLine(hist) {
+    try {
+      var loc = document.getElementById('dp-pa-loc');
+      if (!loc || loc.querySelector('.dpv-locdev')) return;
+      var mw0 = Number(hist[0].market_value), mw1 = Number(hist[hist.length - 1].market_value);
+      var pct = (mw0 && isFinite(mw0)) ? ((mw1 - mw0) / mw0 * 100) : 0;
+      var trend = Math.abs(pct) < 0.5 ? 'stabil' : (pct > 0 ? '+' + pct.toFixed(1) + '%' : pct.toFixed(1) + '%');
+      var note = document.createElement('div'); note.className = 'dpv-locdev';
+      note.style.cssText = 'margin-top:12px;padding:11px 14px;border-radius:11px;background:rgba(201,168,76,.09);border:1px solid rgba(201,168,76,.32);font-size:12.5px;line-height:1.5';
+      note.innerHTML = '<b>Entwicklung \u00fcber ' + hist.length + ' Marktberichte:</b> Marktwert ' + _dpVEur(mw0) + ' \u2192 ' + _dpVEur(mw1) + ' \u20ac (' + trend + '). ' +
+        'Vollst\u00e4ndiger Verlauf im Tab \u201eMarktbericht-Verlauf\u201c.';
+      loc.appendChild(note);
+    } catch (e) {}
+  }
+
+  function _dpVerlaufCss() {
+    if (document.getElementById('dp-verlauf-css')) return;
+    var st = document.createElement('style'); st.id = 'dp-verlauf-css';
+    st.textContent = [
+      '.dpv-h{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:15px;margin:0 0 2px}',
+      '.dpv-light .dpv-h{color:#2A2727}.dpv-dark .dpv-h{color:#FDFCFA}',
+      '.dpv-sub{color:#8b8678;font-size:12px;font-family:"JetBrains Mono",monospace;margin-bottom:14px}',
+      '.dpv-abgl{display:flex;align-items:flex-start;gap:10px;padding:12px 15px;border-radius:12px;margin-bottom:16px;font-size:13px;line-height:1.5;border:1px solid rgba(140,134,120,.3)}',
+      '.dpv-abgl-ic{flex:0 0 auto;font-size:15px;line-height:1.4}',
+      '.dpv-abgl-ok{background:rgba(63,165,108,.12);border-color:rgba(63,165,108,.4);color:#2e7d52}',
+      '.dpv-dark .dpv-abgl-ok{color:#8fd9b0}',
+      '.dpv-abgl-warn{background:rgba(201,150,40,.13);border-color:rgba(201,150,40,.45);color:#96690f}',
+      '.dpv-dark .dpv-abgl-warn{color:#e6c67a}',
+      '.dpv-abgl-neutral{background:rgba(140,134,120,.08);color:#8b8678}',
+      '.dpv-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}',
+      '.dpv-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid rgba(140,134,120,.35);border-radius:9px;background:rgba(140,134,120,.06);color:#8b8678;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}',
+      '.dpv-chip .dpv-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.35}',
+      '.dpv-chip.on{border-color:transparent;background:rgba(201,168,76,.16)}.dpv-chip.on .dpv-dot{opacity:1}',
+      '.dpv-chartbox{position:relative;height:300px}.dpv-canvas{width:100%!important;height:300px!important;display:block}',
+      '.dpv-note{font-family:"JetBrains Mono",monospace;font-size:11px;color:#8b8678;margin-top:10px}',
+      '.dpv-txt{font-size:13.5px;line-height:1.6;margin-bottom:12px}.dpv-light .dpv-txt{color:#2A2727}.dpv-dark .dpv-txt{color:#E8E2D4}.dpv-txt p{margin:0 0 9px}',
+      '.dpv-err{color:#B8625C;font-family:"JetBrains Mono",monospace;font-size:12px}',
+      '.dpv-kibtn{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1407;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:13px;padding:10px 16px;border:0;border-radius:11px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}',
+      '.dpv-kibtn:disabled{opacity:.6;cursor:default}.dpv-kibtn .dpv-l{font-family:"JetBrains Mono",monospace;font-size:11px;background:rgba(0,0,0,.16);padding:2px 7px;border-radius:5px}',
+      '.dpv-tbl{width:100%;border-collapse:collapse;font-size:12.5px}',
+      '.dpv-tbl th,.dpv-tbl td{text-align:right;padding:9px 11px;border-bottom:1px solid rgba(140,134,120,.28)}',
+      '.dpv-tbl th:first-child,.dpv-tbl td:first-child{text-align:left}',
+      '.dpv-light .dpv-tbl td:first-child{color:#2A2727}.dpv-dark .dpv-tbl td:first-child{color:#F2ECDC}',
+      '.dpv-tbl thead th{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:#8b8678;font-weight:500;border-bottom:1px solid #b8932f}',
+      '.dpv-mdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}',
+      '.dpv-val,.dpv-delta{font-family:"JetBrains Mono",monospace}.dpv-light .dpv-val{color:#3a3630}.dpv-dark .dpv-val{color:#D8D2C7}.dpv-delta{font-weight:700}',
+      '.dpv-up{color:#2e7d52}.dpv-dark .dpv-up{color:#3FA56C}.dpv-down{color:#B8625C}.dpv-flat{color:#8b8678}',
+      '.dpv-dcol{background:rgba(201,168,76,.06)}'
+    ].join('');
+    document.head.appendChild(st);
+  }
+})();

@@ -299,6 +299,8 @@ if (!window._wlc) {
   function snapshot(extra) {
     return Object.assign({ ts: Date.now(), card: D, mode: mode, collapsed: collapsed }, extra || {});
   }
+  /* v969c: Vorwahl-Spanne aus dem Uebernehmen (einmalig konsumiert, ueberlebt .run()) */
+  function _prefSpan() { try { var p = localStorage.getItem('dp_mb_pref_span'); if (p === 'low' || p === 'med' || p === 'high') { localStorage.removeItem('dp_mb_pref_span'); return p; } } catch (e) {} return null; }
   function persistLight() { // nur Zustand (mode/collapsed) ohne neuen Abruf
     var el = $(STATE_ID); if (!el || !el.value) return;
     try { var s = JSON.parse(el.value); s.mode = mode; s.collapsed = collapsed; el.value = JSON.stringify(s); lastJson = el.value; el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
@@ -320,7 +322,7 @@ if (!window._wlc) {
             mikro: (c.meta && c.meta.mikro) || '–', makro: (c.meta && c.meta.makro) || '–', trend: (c.meta && c.meta.trend) || '–',
             mw: c.marktwert || null, mm: c.miete || null, area: numDe(vIn('wfl')) || 0 };
     }
-    D = c; mode = s.mode || 'med'; collapsed = true; /* v564-collapsed-default */ render();
+    D = c; mode = s.mode || _prefSpan() || 'med'; collapsed = true; /* v564-collapsed-default; v969c */ render();
   }
 
   /* v772-dpmb-stub: DealPilot-Marktbewertung Demo bei AVM_MODE=stub (kein Microservice/Kerosin). */
@@ -386,7 +388,7 @@ if (!window._wlc) {
         return;
       }
       var payload = data.data || data;
-      D = mapCard(payload); mode = 'med'; collapsed = false; /* v830-mb-expanded: nach Abruf offen */
+      D = mapCard(payload); mode = (_prefSpan() || 'med'); collapsed = false; /* v830-mb-expanded; v969c: Vorwahl-Spanne */
       render();
       persistFull({
         object_key: data.object_key || null, cost: (typeof data.cost === 'number' ? data.cost : (data.charged || data.liters || 0)),

@@ -1555,4 +1555,64 @@ router.get('/network-stats', requireAdmin, async (req, res) => {
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+/* v973: Landing-Analytics (anonym). Besucher, Funnel, Zeitverlauf, CTA, Geraete/Referrer. */
+router.get('/landing-analytics', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  let days = parseInt(req.query.days, 10); if (!days || days < 1 || days > 365) days = 30;
+  const since = `NOW() - INTERVAL '${days} days'`;
+  try {
+    const kpi = await db.query(
+      `SELECT
+         COUNT(DISTINCT session_id) FILTER (WHERE event_type='pageview') AS visitors,
+         COUNT(*) FILTER (WHERE event_type='pageview') AS pageviews,
+         AVG(value) FILTER (WHERE event_type='exit' AND value IS NOT NULL) AS avg_duration
+       FROM landing_events WHERE created_at > ${since}`);
+    // Bounce = Sessions mit hoechstens 1 gesehener Section
+    const bounce = await db.query(
+      `WITH s AS (
+         SELECT session_id, COUNT(DISTINCT section) AS secs
+         FROM landing_events WHERE created_at > ${since} AND event_type='section' GROUP BY session_id),
+       v AS (SELECT DISTINCT session_id FROM landing_events WHERE created_at > ${since} AND event_type='pageview')
+       SELECT
+         (SELECT COUNT(*) FROM v) AS total,
+         (SELECT COUNT(*) FROM v WHERE session_id NOT IN (SELECT session_id FROM s WHERE secs>1)) AS bounced`);
+    const timeline = await db.query(
+      `SELECT to_char(date_trunc('day', created_at),'DD.MM') AS day,
+              COUNT(DISTINCT session_id) FILTER (WHERE event_type='pageview') AS visitors
+       FROM landing_events WHERE created_at > ${since}
+       GROUP BY date_trunc('day', created_at) ORDER BY date_trunc('day', created_at)`);
+    const funnel = await db.query(
+      `SELECT section, COUNT(DISTINCT session_id) AS sessions
+       FROM landing_events WHERE created_at > ${since} AND event_type='section' AND section IS NOT NULL
+       GROUP BY section ORDER BY sessions DESC LIMIT 12`);
+    const dropoff = await db.query(
+      `SELECT section, COUNT(*) AS n FROM landing_events
+       WHERE created_at > ${since} AND event_type='exit' AND section IS NOT NULL
+       GROUP BY section ORDER BY n DESC LIMIT 10`);
+    const cta = await db.query(
+      `SELECT section, COUNT(*) AS n FROM landing_events
+       WHERE created_at > ${since} AND event_type='cta' GROUP BY section ORDER BY n DESC LIMIT 12`);
+    const devices = await db.query(
+      `SELECT COALESCE(device,'?') AS device, COUNT(DISTINCT session_id) AS n
+       FROM landing_events WHERE created_at > ${since} AND event_type='pageview' GROUP BY device ORDER BY n DESC`);
+    const referrers = await db.query(
+      `SELECT COALESCE(referrer,'?') AS referrer, COUNT(DISTINCT session_id) AS n
+       FROM landing_events WHERE created_at > ${since} AND event_type='pageview' GROUP BY referrer ORDER BY n DESC LIMIT 10`);
+    const bk = bounce.rows[0] || {};
+    const bounceRate = (bk.total > 0) ? (Number(bk.bounced) / Number(bk.total) * 100) : null;
+    res.json({
+      days,
+      kpis: { visitors: Number(kpi.rows[0].visitors || 0), pageviews: Number(kpi.rows[0].pageviews || 0),
+              avg_duration: kpi.rows[0].avg_duration != null ? Number(kpi.rows[0].avg_duration) : null,
+              bounce_rate: bounceRate },
+      timeline: timeline.rows.map(r => ({ day: r.day, visitors: Number(r.visitors) })),
+      funnel: funnel.rows.map(r => ({ section: r.section, sessions: Number(r.sessions) })),
+      dropoff: dropoff.rows.map(r => ({ section: r.section, n: Number(r.n) })),
+      cta: cta.rows.map(r => ({ section: r.section, n: Number(r.n) })),
+      devices: devices.rows.map(r => ({ device: r.device, n: Number(r.n) })),
+      referrers: referrers.rows.map(r => ({ referrer: r.referrer, n: Number(r.n) }))
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = router;
