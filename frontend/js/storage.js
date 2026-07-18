@@ -399,6 +399,9 @@ function loadData(d) {
 // ══════════════════════════════════════════════════
 async function saveObj(opts) {
   opts = opts || {};
+  /* v968-qc-takeover: waehrend QC-Uebernehmen (_handleSave) nur der EINE finale Save (_qcFinal) durch.
+     Alle Auto-Save-/Sofort-Anlage-/Wrapper-saveObj werden stillgelegt -> genau eine Anlage, kein Doppel. */
+  if (window._qcTakeover && !(opts && opts._qcFinal)) { return; }
   var silent = !!opts.silent || !!window._autoSaveActive;
   /* v828-inflight-guard: Doppel-Anlage verhindern. Wenn bereits ein POST fuer ein NEUES
      Objekt laeuft (_currentObjKey noch null), keinen zweiten POST starten. */

@@ -175,6 +175,9 @@
     _handleSave._busy = true;
     try { setTimeout(function () { _handleSave._busy = false; }, 6000); } catch (e) { _handleSave._busy = false; }
     inputs = inputs || {};
+    /* v968-qc-takeover: Sofort-Anlage/Auto-Save stilllegen; genau ein finaler Save unten (Schritt 7). */
+    window._qcTakeover = true;
+    try { setTimeout(function () { window._qcTakeover = false; }, 8000); } catch (e) {}
 
     // (1) ÜBERSCHREIB-SCHUTZ: echtes newObj() STILL aufrufen. Nur newObj() setzt die
     // storage.js-interne Variable _currentObjKey auf null (Closure — nicht über window
@@ -262,8 +265,14 @@
     } catch (e) { console.warn('[qc-bridge] applyQcPending:', e); }
 
     if (typeof window.saveObj === 'function') {
-      try { window.saveObj(true); } catch (e) { console.warn('[qc-bridge] saveObj:', e); }
-    }
+      /* v968-qc-takeover: der EINE finale Save; _qcFinal umgeht das Gate, danach Flag loesen. */
+      try {
+        var _pFinal = window.saveObj({ _qcFinal: true });
+        if (_pFinal && typeof _pFinal.then === 'function') {
+          _pFinal.then(function () { window._qcTakeover = false; }, function () { window._qcTakeover = false; });
+        } else { window._qcTakeover = false; }
+      } catch (e) { window._qcTakeover = false; console.warn('[qc-bridge] saveObj:', e); }
+    } else { window._qcTakeover = false; }
   }
 
   // ── (2) Exposé-Import: echten Import auslösen, Ergebnis an iframe zurück ──
