@@ -253,8 +253,15 @@ function calcAk(){
     var el = $(id); if(!el) return;
     total += parseDe(el.value);
   });
-  setText('ak_total', '€ ' + fmtEur(total,2).replace(' €',''));
+  /* v994-total: Leiste = AK(+HK), Rohwert ohne HK in dataset.raw fuer alle internen Leser */
+  (function(){
+    var _e = $('ak_total'); var _h = (typeof _bmfHk === 'function') ? _bmfHk() : 0;
+    if(_e){ _e.dataset.raw = String(total); _e.textContent = '€ ' + fmtEur(total + _h, 2).replace(' €',''); }
+    var _l = $('ak_total_label');
+    if(_l) _l.textContent = (_h > 0) ? 'Anschaffungs- & Herstellungskosten insgesamt' : 'Anschaffungskosten insgesamt';
+  })();
   setText('r_ak_show', fmtEur(total,2));
+  setText('bmf_ak_ctx', fmtEur(total,2));  /* v985 */
   // AfA-Vorschau aktualisieren
   updateAfaPreview(total);
 }
@@ -382,9 +389,21 @@ function runBmf(){
     })(),
     miete_bekannt: ($('bmf_miete') && parseDe($('bmf_miete').value) > 0) ? 'Ja' : 'Nein',
     miete_monatlich: parseDe(($('bmf_miete') || {}).value),
-    vergleichsfaktor_vorhanden: 'Nein',
+    /* v974-bmf-wiring: LZ korrekt (war sachwertfaktor), SWF aus gaa_swf, Modernisierung + Vergleichsfaktor mitschicken */
+    liegenschaftszinssatz: parseDe(($('bmf_lzs') || {}).value) || parseDe(($('gaa_lzs') || {}).value) || '',
+    sachwertfaktor: (parseDe(($('gaa_swf') || {}).value) > 0 ? parseDe(($('gaa_swf') || {}).value) : 1),
     regionalfaktor: 1,
-    sachwertfaktor: parseDe(($('bmf_lzs') || {}).value) > 0 ? parseDe(($('bmf_lzs') || {}).value) : 1
+    vergleichsfaktor_vorhanden: (parseDe(($('bmf_vergl') || {}).value) > 0) ? 'Ja' : 'Nein',
+    vergleichsfaktor: parseDe(($('bmf_vergl') || {}).value) || '',
+    bezugsmassstab: 'Wohn- bzw. Nutzfl\u00e4che',
+    mod_dach:          (($('mod_dach')  || {}).value) || 'nein',
+    mod_fenster:       (($('mod_fenster')|| {}).value) || 'nein',
+    mod_leitungen:     (($('mod_leit')  || {}).value) || 'nein',
+    mod_heizung:       (($('mod_heiz')  || {}).value) || 'nein',
+    mod_waermedaemmung:(($('mod_daemm') || {}).value) || 'nein',
+    mod_baeder:        (($('mod_bad')   || {}).value) || 'nein',
+    mod_innenausbau:   (($('mod_innen') || {}).value) || 'nein',
+    mod_grundriss:     (($('mod_grdr')  || {}).value) || 'nein'
   };
 
   // V289.2.5 Issue #6: für späteren XLSX-Download
@@ -461,6 +480,7 @@ function exportBmfPdf(){
       anschaffung: {
         kp:        parseDe(($('ak_kp') || {}).value),
         ahk:       parseDe(($('ak_ahk') || {}).value),
+        hk:        parseDe(($('bmf_hk') || {}).value),   /* v976-hk: Herstellungskosten 100% Gebaeude */
         grest:     parseDe(($('ak_grest') || {}).value),
         notar:     parseDe(($('ak_notar') || {}).value),
         gba:       parseDe(($('ak_gba') || {}).value),
@@ -471,8 +491,8 @@ function exportBmfPdf(){
         hotel:     parseDe(($('ak_hotel') || {}).value),
         gutachten: parseDe(($('ak_gutachten') || {}).value),
         anwalt:    parseDe(($('ak_anwalt') || {}).value),
-        sonst:     parseDe(($('ak_sonst') || {}).value),
-        total:     parseDe((($('ak_total') || {}).textContent || '').replace(/[€\s.]/g, '').replace(',', '.'))
+        sonst:     (parseDe(($('ak_sonst') || {}).value) || parseDe((document.getElementById('ji_e') || {}).value)),  /* v990: Auto-Sync-Fallback */
+        total:     (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : parseDe(((e || {}).textContent || '').replace(/[€\s.]/g, '').replace(',', '.')); })(),  /* v994 */
       }
     },
     results: window._lastBmfResults,
@@ -491,12 +511,13 @@ function _mockupRenderBmfResult(r, demoLabel){
   setText('leg_geb', fmtPct(r.geb_pct));
 
   // KP-Anteile auf die AKTUELLE AK-Summe rechnen (nicht nur den Notarpreis-KP)
-  var akTotal = parseDe($('ak_total').textContent.replace('€','').trim()) || parseDe($('ak_kp').value);
+  var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || parseDe($('ak_kp').value)); })();  /* v994 */
   var kpGeb = akTotal * r.geb_pct / 100;
   var kpGrund = akTotal - kpGeb;
   setText('r_kp_grund', fmtEur(kpGrund,2));
   setText('r_kp_geb', fmtEur(kpGeb,2));
   setText('r_ak_show', fmtEur(akTotal,2));
+  setText('bmf_ak_ctx', fmtEur(akTotal,2));  /* v985 */
 
   setText('r_bw', fmtEurInt(r.bodenwert));
   setText('r_sw', fmtEurInt(r.sachwert));
@@ -671,13 +692,14 @@ function downloadXlsx(){
 /* ──────────────────────────────────────────────────────
    AfA-Vorschau
    ────────────────────────────────────────────────────── */
+function _bmfHk(){ try{ var v = parseDe((document.getElementById('bmf_hk')||{}).value); return (v > 0) ? v : 0; }catch(e){ return 0; } }  /* v988-hk-calc */
 function updateAfaPreview(ak_total){
   var r = window._lastBmf;
   var ak = ak_total != null ? ak_total : 94224.83;
   var geb_pct = r ? r.geb_pct : 80;
   var afa_satz = parseDe($('afa_satz').value) || 3.0;
 
-  var afa_basis = ak * geb_pct / 100;
+  var afa_basis = ak * geb_pct / 100 + _bmfHk();  /* v988: HK 100% Gebaeude */
   var afa_jahr = afa_basis * afa_satz / 100;
   var grenz = 0.4045;
   var save = afa_jahr * grenz;
@@ -691,7 +713,58 @@ function updateAfaPreview(ak_total){
   setText('afa_basis', fmtEurInt(afa_basis));
   setText('afa_jahr_big', fmtEur(afa_jahr,2));
   setText('afa_total', fmtEurInt(afa_jahr * 50));
+  try{ _dpInjectTreeHk(); }catch(e){}  /* v990-fixes */
 }
+/* v990-fixes: HK-Zeile im Prognose-AK-Baum — DOM-Injektor, unabhaengig von der Renderstelle */
+function _dpInjectTreeHk(){  /* v992-tree2 */
+  var fin = document.querySelector('#bmfOverlay .v292-row-final');
+  if(!fin || !fin.parentElement) return;
+  var box = fin.parentElement;
+  Array.prototype.slice.call(box.querySelectorAll('.v990-hk-row')).forEach(function(r){ r.remove(); });
+  /* v993-cleanup: klassenlose Alt-Zeilen (v989) ebenfalls entfernen */
+  Array.prototype.slice.call(box.querySelectorAll('.v292-row:not(.v292-row-final)')).forEach(function(r){
+    if(r.textContent && r.textContent.indexOf('Herstellungskosten Geb') >= 0) r.remove();
+  });
+  var hk = _bmfHk();
+  /* Basiswert der Endzeile merken (Re-Render ersetzt den Knoten -> dataset weg -> frisch parsen) */
+  var base;  /* v994-total: gleiche Quelle wie die Leiste (sofort + steuerlich vollstaendig) */
+  var _et = $('ak_total');
+  if(_et && _et.dataset && _et.dataset.raw){ base = parseFloat(_et.dataset.raw); }
+  else { var m = (fin.textContent || '').match(/([\d.]+)\s*\u20ac/); base = m ? parseFloat(m[1].replace(/\./g, '')) : 0; }
+  /* HK-Zeile direkt unter '= Immobilien-KP' */
+  if(hk > 0){
+    var kpRow = null;
+    Array.prototype.slice.call(box.children).forEach(function(r){
+      if(!kpRow && r.textContent && r.textContent.indexOf('Immobilien-KP') >= 0) kpRow = r;
+    });
+    if(kpRow){
+      var d = document.createElement('div');
+      d.className = 'v292-row v990-hk-row';
+      d.style.cssText = 'display:flex;justify-content:space-between;margin-top:2px;padding-top:4px;border-top:1px dashed var(--wl-c9a84c, #C9A84C)';
+      d.innerHTML = '<span><b>+ Herstellungskosten Geb\u00e4ude</b> <span class="v292-arrow">\u00a7 255 II \u00b7 100 % Geb\u00e4ude</span></span><span><b>' + fmtEur(hk, 0) + '</b></span>';
+      kpRow.insertAdjacentElement('afterend', d);
+    }
+  }
+  /* Endzeile: Anschaffungs- & Herstellungskosten (inkl. HK) statt Prognose/Gesamtaufwand */
+  var label = (hk > 0) ? '= Anschaffungs- & Herstellungskosten' : '= Anschaffungskosten';
+  fin.innerHTML = '<span><b>' + label + '</b> <span class="v292-arrow">\u2192 Basis f\u00fcr AfA</span></span><span class="v292-final-value"><b>' + fmtEur(base + hk, 0) + '</b></span>';
+}
+document.addEventListener('click', function(e){
+  var t = e.target; if(t && t.closest && t.closest('.bmfmo-close-top')){ e.preventDefault(); try{ closeBMFModal(); }catch(_e){} }
+}, true);  /* v990-fixes: X robust */
+var _dpPipeT = null;  /* v992-tree2: alle AK-Eingaben -> Pipeline (debounced) -> Baum live */
+document.addEventListener('input', function(e){
+  var id = e.target && e.target.id;
+  if(!id) return;
+  if(id === 'bmf_hk' || id.indexOf('ak_') === 0){
+    try{ if(typeof calcAk === 'function') calcAk(); }catch(_e){}
+    try{ _dpInjectTreeHk(); }catch(_e){}
+    if(_dpPipeT) clearTimeout(_dpPipeT);
+    _dpPipeT = setTimeout(function(){
+      try{ if(typeof window._v292Pipeline === 'function') window._v292Pipeline(); }catch(_e){}
+    }, 400);
+  }
+});
 
 
 /* ──────────────────────────────────────────────────────
@@ -873,7 +946,7 @@ function renderVarGrid(){
 
   // NK-Anteil pro Variante: Gebäude-NK = immobilienbezogene NK × Gebäudequote
   // (immobilienbezogene NK = AK-Total − Brutto-Kaufpreis, also nur die NK ohne KP)
-  var akTotal = parseDe($('ak_total').textContent.replace('€','').trim()) || 94224.83;
+  var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
   var nkImmo = Math.max(0, akTotal - bruttoKp);
 
@@ -891,7 +964,7 @@ function renderVarGrid(){
 
   var html = '';
   varianten.forEach(function(va){
-    var gebAk = va.gebEur + (nkImmo * va.gebPct/100);
+    var gebAk = va.gebEur + (nkImmo * va.gebPct/100) + _bmfHk();  /* v988 */
     var afaJahr = gebAk * afaSatz/100;
     var delta = afaJahr - bmfAfa;
     var isActive = (va.key === _varChoice);
@@ -939,13 +1012,14 @@ function renderVarImpact(){
   if(!chosen) return;
   var bmf = varianten[0];
   var afaSatz = parseDe($('afa_satz').value) || 2.0;
-  var akTotal = parseDe($('ak_total').textContent.replace('€','').trim()) || 94224.83;
+  var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
   var nkImmo = Math.max(0, akTotal - bruttoKp);
   var grenz = 0.4045;
 
-  var gebAkChosen = chosen.gebEur + (nkImmo * chosen.gebPct/100);
-  var gebAkBmf = bmf.gebEur + (nkImmo * bmf.gebPct/100);
+  var _hk988 = _bmfHk();
+  var gebAkChosen = chosen.gebEur + (nkImmo * chosen.gebPct/100) + _hk988;
+  var gebAkBmf = bmf.gebEur + (nkImmo * bmf.gebPct/100) + _hk988;
   var afaChosen = gebAkChosen * afaSatz/100;
   var afaBmf = gebAkBmf * afaSatz/100;
   var deltaAfa = afaChosen - afaBmf;
@@ -972,7 +1046,7 @@ function updateG15(){
   var varianten = _varianten();
   var chosen = varianten.find(function(v){ return v.key === _varChoice; }) || varianten[0];
   if(!chosen) return;
-  var akTotal = parseDe($('ak_total').textContent.replace('€','').trim()) || 94224.83;
+  var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
   var nkImmo = Math.max(0, akTotal - bruttoKp);
   var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
@@ -1041,7 +1115,7 @@ function updateTabInvestSync(){
       var varianten = (typeof _varianten === 'function') ? _varianten() : [];
       var chosen = varianten.find(function(v){ return v.key === _varChoice; }) || varianten[0];
       if(chosen){
-        var akTotal = parseDe($('ak_total').textContent.replace('€','').trim()) || 94224.83;
+        var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
         var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
         var nkImmo = Math.max(0, akTotal - bruttoKp);
         var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
@@ -1111,7 +1185,7 @@ function renderRiskGrid(){
 
   // 3) 15-%-Grenze
   if($('risk_15')){
-    var akTotal = parseDe($('ak_total').textContent.replace('€','').trim()) || 94224.83;
+    var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
     var nkImmo = Math.max(0, akTotal - bruttoKp);
     var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
     var max15 = gebAk * 0.15;
@@ -1184,7 +1258,7 @@ function renderEmpfehlung(){
   }
 
   // 15-%-Grenze
-  var akTotal = parseDe($('ak_total').textContent.replace('€','').trim()) || 94224.83;
+  var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
   var nkImmo = Math.max(0, akTotal - bruttoKp);
   var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
   var max15 = gebAk * 0.15;
@@ -1564,7 +1638,7 @@ function _ensureModalLoaded(callback){
   _bmfModalLoading = true;
   console.log('[bmf-modal] Modal-HTML wird geladen...');
 
-  fetch('/js/bmf-modal-html.html?v=303', { cache: 'no-store' })
+  fetch('/js/bmf-modal-html.html?v=v994', { cache: 'no-store' })
     .then(function(r){
       if(!r.ok){ throw new Error('HTTP ' + r.status); }
       return r.text();

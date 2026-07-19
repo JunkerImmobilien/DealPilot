@@ -613,6 +613,8 @@
   window._v292RenderAll = function(){
     try {
       _renderPane1();
+      /* v993-render-hook: HK-Zeilen/Endzeile nach jedem Render neu setzen */
+      try{ if(typeof _dpInjectTreeHk === 'function') setTimeout(_dpInjectTreeHk, 0); }catch(_e){}
       _renderPane2();
       _renderPane3();
       _renderPane4();

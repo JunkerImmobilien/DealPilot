@@ -3,6 +3,8 @@
 <div class="bmf-modal-overlay bmfmo-overlay" id="bmfOverlay">
   <div class="bmfmo-modal" role="dialog" aria-labelledby="modal-ttl">
 
+    <!-- v984-modal-obsidian: schwarze Top-Bar (Obsidian/Gold/Weiss) -->
+    <div class="bmfmo-topbar"><span class="bmfmo-brandtxt">Deal<b>Pilot</b></span><span class="bmfmo-crumbs">PRE-FLIGHT · <b>STEUER</b></span><button class="bmfmo-close-top" onclick="closeBMFModal()" aria-label="Schließen">×</button></div>
     <div class="bmfmo-head">
       <div class="ico">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7l9-4 9 4M3 7v10l9 4 9-4V7M3 7l9 4 9-4"/></svg>
@@ -42,6 +44,12 @@
             <label>Anschaffungsnahe Herstellkosten <span class="badge badge-blue" style="margin-left:6px">§ 6 Abs. 1 Nr. 1a EStG</span></label>
             <div class="iw"><span class="pfx">€</span><input id="ak_ahk" type="text" inputmode="decimal" value="0,00" class="trl tr" oninput="calcAk()" readonly data-auto></div>
             <span class="hint">15-%-Grenze wird im Sanierungs-Modul geprüft</span>
+          </div>
+          <!-- v976-hk: Herstellungskosten § 255 Abs. 2 (100 % Gebäude, kein Split) -->
+          <div class="f">
+            <label>Herstellungskosten Gebäude <span class="badge badge-blue" style="margin-left:6px">§ 255 Abs. 2 HGB</span></label>
+            <div class="iw"><span class="pfx">€</span><input id="bmf_hk" type="text" inputmode="decimal" value="0,00" class="trl tr"></div>
+            <span class="hint">Erweiterung / Standardhebung → 100 % Gebäude, kein Grund-Split, keine 15-%-Prüfung</span>
           </div>
         </div>
 
@@ -128,7 +136,7 @@
         </details>
 
         <div class="total-bar">
-          <span>Anschaffungskosten insgesamt</span>
+          <span id="ak_total_label">Anschaffungskosten insgesamt</span>
           <span class="total-val" id="ak_total">€ 94.224,83</span>
         </div>
 
@@ -138,21 +146,22 @@
       <!-- ═══ PANE 2: BMF-AUFTEILUNG ═══ -->
       <div class="bmfmo-pane" id="p-bmf">
 
-        <div class="banner info">
-          <strong>Die BMF-Arbeitshilfe rechnet automatisch <em>ein</em> Verfahren als maßgebend</strong> — je nach verfügbaren Daten. Bei Mietobjekten ist das in der Regel der Ertragswert. Hier kannst du das voreingestellte Verfahren manuell überschreiben.
+        <!-- v985-pane2-kuerzen: AK-Kontext zuerst (wie Demo), Verfahren kompakt im Aufklapper -->
+        <div class="kpi-grid">
+          <div class="kpi highlight"><div class="kpi-label">Anschaffungskosten (aus Schritt 1)</div><div class="kpi-value" id="bmf_ak_ctx">—</div></div>
+          <div class="kpi"><div class="kpi-label">Maßgebendes Verfahren</div><div class="kpi-value" id="bmf_verf_ctx" style="font-size:15px">automatisch (BMF-Logik)</div></div>
         </div>
-
-        <!-- V293e-verf-readonly: reine Anzeige des massgebenden Verfahrens.
-             onclick entfernt (setVerf bewirkte nichts — kein Backend-Override).
-             _renderPane2 markiert .active dynamisch aus phase4_bmf.verfahren. -->
-        <div class="bmfmo-verf-toggle" style="pointer-events:none;opacity:1" aria-readonly="true" title="Das massgebende Verfahren wird automatisch nach BMF-Logik gewaehlt.">
-          <button type="button" class="bmfmo-verf-btn" data-verf="ertrag" id="vb-ertrag" tabindex="-1" style="cursor:default">Ertragswert</button>
-          <button type="button" class="bmfmo-verf-btn" data-verf="sach" id="vb-sach" tabindex="-1" style="cursor:default">Sachwert</button>
-          <button type="button" class="bmfmo-verf-btn" data-verf="vergl" id="vb-vergl" tabindex="-1" style="cursor:default">Vergleichswert</button>
-        </div>
-        <div class="verf-info" id="verf-info">
-          Das <strong>maßgebende Verfahren</strong> wird automatisch nach BMF-Logik gewählt (bekannte Miete → Ertragswert, Vergleichsfaktor → Vergleichswert, sonst Sachwert). <strong>Alle drei werden berechnet</strong>; das hervorgehobene ist maßgebend für AfA und Klausel.
-        </div>
+        <details class="fold">
+          <summary>Verfahren &amp; BMF-Logik</summary>
+          <div style="margin-top:6px">
+            <div class="bmfmo-verf-toggle" style="pointer-events:none;opacity:1" aria-readonly="true" title="Das massgebende Verfahren wird automatisch nach BMF-Logik gewaehlt.">
+              <button type="button" class="bmfmo-verf-btn" data-verf="ertrag" id="vb-ertrag" tabindex="-1" style="cursor:default">Ertragswert</button>
+              <button type="button" class="bmfmo-verf-btn" data-verf="sach" id="vb-sach" tabindex="-1" style="cursor:default">Sachwert</button>
+              <button type="button" class="bmfmo-verf-btn" data-verf="vergl" id="vb-vergl" tabindex="-1" style="cursor:default">Vergleichswert</button>
+            </div>
+            <p class="hint" id="verf-info" style="margin-top:8px;font-size:11px">Bekannte Miete → Ertragswert, Vergleichsfaktor → Vergleichswert, sonst Sachwert. Alle drei werden berechnet; das hervorgehobene ist maßgebend für AfA und Klausel.</p>
+          </div>
+        </details>
 
         <!-- V293e-demo-removed: Demo-Row entfernt -->
 
@@ -217,6 +226,11 @@
           <div class="f">
             <label>Liegenschaftszins <span class="hint" style="display:inline;font-style:italic">(optional)</span></label>
             <div class="iw"><input id="bmf_lzs" type="text" inputmode="decimal" placeholder="leer = Modellwert" class="tr"><span class="sfx">%</span></div>
+          </div>
+          <!-- v974-bmf-wiring: Vergleichsfaktor-Eingabe (aktiviert das Vergleichswertverfahren) -->
+          <div class="f">
+            <label>Vergleichsfaktor <span class="hint" style="display:inline;font-style:italic">(optional · GAA)</span></label>
+            <div class="iw"><input id="bmf_vergl" type="text" inputmode="decimal" placeholder="leer = kein Vergleichswert" class="tr"><span class="sfx">€/m²</span></div>
           </div>
         </div>
 
@@ -328,16 +342,21 @@
             </div>
           </div>
 
+          <!-- v984-fields: massgebender Wert + tragende Verfahren sichtbar, Details aufklappbar -->
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin:16px 0 6px">Bewertung (BMF-Arbeitshilfe)</div>
+          <div class="kpi-grid">
+            <div class="kpi highlight"><div class="kpi-label">Maßgebender Verkehrswert</div><div class="kpi-value" id="r_vw">—</div></div>
+            <div class="kpi"><div class="kpi-label">Bodenwert</div><div class="kpi-value" id="r_bw">—</div></div>
+            <div class="kpi"><div class="kpi-label">Sachwert (marktangepasst)</div><div class="kpi-value" id="r_sw">—</div></div>
+          </div>
           <details class="fold">
-            <summary>Verprobung mit anderen Verfahren (alle drei wurden gerechnet)</summary>
+            <summary>Details / Plausibilität: Ertrags- &amp; Vergleichswert</summary>
             <div style="margin-top:6px">
               <div class="kpi-grid">
-                <div class="kpi"><div class="kpi-label">Bodenwert</div><div class="kpi-value" id="r_bw">—</div></div>
-                <div class="kpi"><div class="kpi-label">Maßgebender Verkehrswert</div><div class="kpi-value" id="r_vw">—</div></div>
-                <div class="kpi"><div class="kpi-label">Sachwert (marktangepasst)</div><div class="kpi-value" id="r_sw">—</div></div>
                 <div class="kpi"><div class="kpi-label">Ertragswert</div><div class="kpi-value" id="r_ew">—</div></div>
+                <div class="kpi"><div class="kpi-label">Vergleichswert</div><div class="kpi-value" id="r_vgw">—</div></div>
               </div>
-              <p class="hint" style="margin-top:8px;font-size:11px">Die BMF-Arbeitshilfe nutzt das <strong>Ertragswertverfahren</strong> wenn Miete bekannt ist (Standard). Die anderen Verfahren werden parallel gerechnet, dienen aber nur zur Verprobung. Bei Verkehrswert-Gutachten oder Vergleichsfaktor wird das jeweilige Verfahren maßgebend.</p>
+              <p class="hint" style="margin-top:8px;font-size:11px">Die BMF-Arbeitshilfe nutzt das <strong>Ertragswertverfahren</strong>, wenn die Miete bekannt ist (Standard). Ertrags- und Vergleichswert sind interne Plausi-Werte für den maßgebenden Verkehrswert; ohne Vergleichsfaktor bleibt der Vergleichswert leer.</p>
             </div>
           </details>
         </div>
@@ -568,7 +587,7 @@
       <!-- V289.2.3: Pane-Navigation -->
       <button class="btn btn-outline" onclick="bmfPaneBack()" id="btnBmfBack" style="display:none">← Zurück</button>
       <button class="btn btn-outline" onclick="exportBmfPdf()" id="btnBmfPdf" style="display:none">📄 PDF-Anlage erstellen</button>
-      <button class="btn btn-outline" onclick="closeBMFModal()" id="btnBmfCancel">Abbrechen</button>
+      <!-- v990: Abbrechen entfernt (X schliesst) -->
       <button class="btn btn-gold" onclick="bmfPaneNext()" id="btnBmfNext">Weiter →</button>
       <button class="btn btn-gold" onclick="applyToTax()" id="btnBmfApply" style="display:none">✓ Übernehmen</button>
     </div>
