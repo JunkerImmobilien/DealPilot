@@ -26,6 +26,16 @@
             header_up X-Forwarded-Host {host}
         }
     }
+    # v973: Landing-Tracking (anonymes Analytics-Beacon, POST) ans Backend
+    handle /api/v1/track* {
+        request_body {
+            max_size 64KB
+        }
+        reverse_proxy backend:3001 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+        }
+    }
 
     # Legal-Pages (Datenschutz, Impressum, AGB, Reseller)
     handle /datenschutz.html {
