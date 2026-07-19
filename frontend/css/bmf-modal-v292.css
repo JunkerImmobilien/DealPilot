@@ -669,3 +669,111 @@ span.auto-tag {
   color: var(--red, #B8625C);
   opacity: 0.7;
 }
+
+
+/* ===== v978c-bmf-restyle ===== */
+/* Kopf Gold-Hero ueber --wl-* (folgt dem Partner-White-Label) + ID-Spezifitaet/!important */
+#bmfOverlay .bmfmo-head{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))!important;border-bottom:1px solid rgba(44,36,16,.15)!important}
+#bmfOverlay .bmfmo-head .ico{background:rgba(255,255,255,.30);color:#2c2410}
+#bmfOverlay .bmfmo-head h2{color:#2c2410}
+#bmfOverlay .bmfmo-head .sub{color:rgba(44,36,16,.82)}
+#bmfOverlay .bmfmo-close{color:#2c2410}
+#bmfOverlay .bmfmo-close:hover{background:rgba(44,36,16,.12)}
+/* HK-Feld: Rand + subtiler Akzent-Tint, beides White-Label-tauglich */
+#bmfOverlay .iw:has(#bmf_hk){border-color:var(--wl-c9a84c, #C9A84C)!important;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, #fff)!important}
+#bmfOverlay #bmf_hk{font-weight:700}
+/* massgebender Verkehrswert prominent (Akzent) */
+#bmfOverlay #r_vw{font-size:24px;font-weight:700;color:var(--wl-b8932f, #b8932f);letter-spacing:-.2px}
+/* ===== /v978c-bmf-restyle ===== */
+
+/* ===== v983-modal-hell ===== */
+/* Heller Demo-v1-Look: warme Flaeche, Mono-Labels, Karten, Gold via --wl-* (White-Label folgt) */
+#bmfOverlay .bmfmo-modal{background:#FDFCFA!important}
+#bmfOverlay .bmfmo-body{background:#FDFCFA!important}
+#bmfOverlay .bmfmo-modal{--muted:#8a8272;--gold:var(--wl-c9a84c, #C9A84C)}
+/* Tabs als Ordner-Reiter (Demo) */
+#bmfOverlay .bmfmo-tabs{gap:6px!important;border-bottom:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)!important;padding-bottom:0!important}
+#bmfOverlay .bmfmo-tab{font-family:"JetBrains Mono",ui-monospace,monospace!important;font-size:12px!important;letter-spacing:.6px!important;padding:10px 16px!important;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent)!important;border-bottom:none!important;border-radius:10px 10px 0 0!important;background:transparent!important;color:#8a8272!important}
+#bmfOverlay .bmfmo-tab.active{background:#fff!important;color:var(--wl-b8932f, #b8932f)!important;font-weight:600!important}
+#bmfOverlay .bmfmo-tab .mtab-num{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, #fff)!important;color:var(--wl-b8932f, #b8932f)!important;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)!important}
+#bmfOverlay .bmfmo-tab.active .mtab-num{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))!important;color:#2c2410!important;border-color:transparent!important}
+#bmfOverlay .bmfmo-pane{background:#fff!important;border:1px solid #ece5d4!important;border-top:none!important;border-radius:0 12px 12px 12px!important;padding:18px 18px 14px!important}
+/* Felder: Mono-Uppercase-Labels + weisse Inputs mit Gold-Rand (Demo) */
+#bmfOverlay .f label{font-family:"JetBrains Mono",ui-monospace,monospace!important;font-size:9.5px!important;letter-spacing:.6px!important;text-transform:uppercase!important;color:#8a8272!important;font-weight:600!important}
+#bmfOverlay .iw{background:#fff!important;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)!important;border-radius:9px!important}
+#bmfOverlay .iw input,#bmfOverlay .iw select{font-family:"JetBrains Mono",ui-monospace,monospace!important;font-weight:600!important;color:#1e1a12!important;background:transparent!important}
+#bmfOverlay .iw:focus-within{border-color:var(--wl-c9a84c, #C9A84C)!important;box-shadow:0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent)!important}
+#bmfOverlay .iw .pfx,#bmfOverlay .iw .sfx{color:#a39a86!important;font-family:"JetBrains Mono",ui-monospace,monospace!important}
+#bmfOverlay input[readonly][data-auto]{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, #fff)!important}
+#bmfOverlay .iw:has(input[readonly][data-auto]){background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, #fff)!important;border-style:dashed!important}
+#bmfOverlay .auto{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, #fff)!important;color:var(--wl-b8932f, #b8932f)!important;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)!important;border-radius:99px!important;font-family:"JetBrains Mono",ui-monospace,monospace!important}
+#bmfOverlay .hint{color:#a39a86!important;font-size:10.5px!important}
+#bmfOverlay hr.dvd{border:none!important;border-top:1px solid #ece5d4!important}
+/* Info-Banner: heller Kasten mit Gold-Balken links (statt blau) */
+#bmfOverlay .banner.info{background:#FBF6E9!important;border:none!important;border-left:3px solid var(--wl-c9a84c, #C9A84C)!important;border-radius:0 8px 8px 0!important;color:#5f5844!important}
+/* Ergebnis-KPIs als Karten (Demo) */
+#bmfOverlay .kpi{background:#fff!important;border:1px solid #e7e0d2!important;border-radius:14px!important}
+#bmfOverlay .kpi-label{font-family:"JetBrains Mono",ui-monospace,monospace!important;font-size:9.5px!important;letter-spacing:.8px!important;text-transform:uppercase!important;color:#8a8272!important}
+#bmfOverlay .kpi-value{font-weight:700!important;color:#1e1a12!important}
+#bmfOverlay .kpi.highlight{border-color:var(--wl-c9a84c, #C9A84C)!important;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, #fff)!important}
+#bmfOverlay .kpi.highlight .kpi-value{color:var(--wl-b8932f, #b8932f)!important}
+/* Verfahren-Buttons als Mono-Pills */
+#bmfOverlay .bmfmo-verf-btn{font-family:"JetBrains Mono",ui-monospace,monospace!important;font-size:11px!important;letter-spacing:.5px!important;border-radius:99px!important;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)!important;background:#fff!important;color:#6b6350!important}
+#bmfOverlay .bmfmo-verf-btn.active,#bmfOverlay .bmfmo-verf-btn[aria-pressed="true"]{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))!important;color:#2c2410!important;border-color:transparent!important;font-weight:700!important}
+/* Fusszeile: warmer Balken + Gold-Primaerknopf (Demo) */
+#bmfOverlay .bmfmo-foot{background:#F5EFE1!important;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)!important}
+#bmfOverlay .bmfmo-foot .btn{border-radius:11px!important;font-weight:600!important}
+#bmfOverlay .bmfmo-foot .btn-outline{border:1px solid #d8d0bd!important;background:#fff!important;color:#6b6350!important}
+#bmfOverlay .btn-gold,#bmfOverlay .btn.primary,#bmfOverlay .bmfmo-foot .btn[class*="gold"]{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))!important;color:#2c2410!important;border:none!important;font-weight:700!important}
+/* Pane-4-Sektionen an den hellen Look angleichen */
+#bmfOverlay .p4-section{background:#fff!important;border:1px solid #ece5d4!important;border-radius:12px!important}
+#bmfOverlay .p4-section-head{font-family:"JetBrains Mono",ui-monospace,monospace!important;letter-spacing:1px!important;text-transform:uppercase!important;color:var(--wl-b8932f, #b8932f)!important}
+#bmfOverlay .p4-v-gold{color:var(--wl-b8932f, #b8932f)!important}
+/* ===== /v983-modal-hell ===== */
+
+/* ===== v984-modal-css ===== */
+/* Schwarze Top-Bar (wie Voice-Modal): Obsidian + Marke + Krumen + Schliessen */
+#bmfOverlay .bmfmo-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 20px;background:#0a0a0a}
+#bmfOverlay .bmfmo-brandtxt{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;font-size:16px;color:#fff}
+#bmfOverlay .bmfmo-brandtxt b{color:var(--wl-c9a84c, #C9A84C)}
+#bmfOverlay .bmfmo-crumbs{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:2px;color:#8a8378}
+#bmfOverlay .bmfmo-crumbs b{color:var(--wl-c9a84c, #C9A84C);font-weight:600}
+#bmfOverlay .bmfmo-close-top{border:none;background:transparent;color:#cbc4b8;font-size:19px;line-height:1;cursor:pointer;padding:4px 9px;border-radius:8px}
+#bmfOverlay .bmfmo-close-top:hover{background:#1c1a16;color:#fff}
+#bmfOverlay .bmfmo-head .bmfmo-close{display:none!important}  /* Schliessen wandert in die Top-Bar */
+/* Schwarze Fusszeile (Obsidian) — ueberstimmt v983-warm */
+#bmfOverlay .bmfmo-foot{background:#0a0a0a!important;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)!important;color:#cbc4b8!important}
+#bmfOverlay .bmfmo-foot .left{color:#cbc4b8!important}
+#bmfOverlay .bmfmo-foot .left b{color:#fff}
+#bmfOverlay .bmfmo-foot .left em{color:var(--wl-c9a84c, #C9A84C)!important}
+#bmfOverlay .bmfmo-foot .btn-outline{background:transparent!important;border:1px solid #3a3a3a!important;color:#cbc4b8!important}
+#bmfOverlay .bmfmo-foot .btn-outline:hover{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent)!important;color:#fff!important}
+#bmfOverlay .bmfmo-foot .btn-gold{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))!important;color:#2c2410!important;border:none!important;font-weight:700!important}
+/* ===== /v984-modal-css ===== */
+
+/* ===== v988-layout ===== */
+/* Ein Scrollbereich: Overlay viewportfest, Modal Hilfe-/Einstellungs-Format, Body scrollt allein */
+/* v992-close: Sichtbarkeit haengt an .open — sonst blockiert die ID-Regel das Schliessen */
+#bmfOverlay.open{position:fixed!important;inset:0!important;overflow:hidden!important;overscroll-behavior:contain;display:flex!important;align-items:center;justify-content:center;padding:2vh 2vw}
+#bmfOverlay:not(.open){display:none!important}
+#bmfOverlay .bmfmo-modal{width:min(1160px,96vw)!important;max-width:96vw!important;height:94vh!important;max-height:94vh!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;margin:0!important}
+#bmfOverlay .bmfmo-topbar,#bmfOverlay .bmfmo-head,#bmfOverlay .bmfmo-tabs,#bmfOverlay .bmfmo-foot{flex:0 0 auto}
+#bmfOverlay .bmfmo-body{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain}
+/* Kopf kompakter, damit oben mehr Inhalt sichtbar ist */
+#bmfOverlay .bmfmo-head{padding:12px 22px 10px!important}
+#bmfOverlay .bmfmo-head .sub{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+/* HK-Feld = aktives Eingabefeld: weiss + solider Gold-Rand (nicht grau/gestrichelt) */
+#bmfOverlay .iw:has(#bmf_hk){background:#fff!important;border:1.5px solid var(--wl-c9a84c, #C9A84C)!important;border-style:solid!important}
+#bmfOverlay #bmf_hk{background:#fff!important;font-weight:700}
+/* ===== /v988-layout ===== */
+
+/* ===== v991-x ===== */
+#bmfOverlay .bmfmo-topbar{position:relative;z-index:60}
+#bmfOverlay .bmfmo-close-top{position:relative;z-index:61;pointer-events:auto!important;cursor:pointer}
+#bmfOverlay .bmfmo-head{position:relative;z-index:1}
+/* ===== /v991-x ===== */
+
+/* ===== v994-lzs ===== */
+/* Miete volle Zeile -> LZS + Vergleichsfaktor ruecken nebeneinander (2er-Grid) */
+#bmfOverlay #p-bmf .f:has(#bmf_miete){grid-column:1 / -1}
+/* ===== /v994-lzs ===== */

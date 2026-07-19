@@ -114,72 +114,80 @@
     var s = document.createElement('style');
     s.id = 'vi-style';
     s.textContent = [
-      '.vi-status{display:flex;align-items:center;gap:10px;margin:4px 0 10px;font-size:13px;font-weight:600;color:#2A2727}',
-      '.vi-dot{width:10px;height:10px;border-radius:50%;background:#D9685F;animation:viPulse 1.2s infinite;flex:none}',
+      /* v974-voice-orbit: Sprachaufzeichnung als Mikro-Orbit, theme-aware */
+      '.oabi-ov.vi-mode{--vi-surface:#0a0a0a;--vi-card:#151412;--vi-text:#FDFCFA;--vi-muted:#A89F8E;--vi-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);--vi-track:#1c1a16;--vi-accent:var(--wl-c9a84c, #C9A84C);--vi-donebd:rgba(63,165,108,.7);--vi-donebg:rgba(63,165,108,.14);--vi-donetx:#c9f0d8}',
+      'body[data-dp-skin="hell"] .oabi-ov.vi-mode{--vi-surface:#FDFCFA;--vi-card:#FFFFFF;--vi-text:#1e1a12;--vi-muted:#8a8272;--vi-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);--vi-track:#ECE4D2;--vi-accent:#9a7a24;--vi-donebd:rgba(63,165,108,.6);--vi-donebg:rgba(63,165,108,.14);--vi-donetx:#1c6b41}',
+      '.oabi-ov.vi-mode .oabi-modal{background:var(--vi-surface)}',
+      '.oabi-ov.vi-mode .oabi-head h3{color:var(--vi-text)}',
+      '.oabi-ov.vi-mode .oabi-sub{color:var(--vi-muted)}',
+      '.oabi-ov.vi-mode .oabi-foot{background:var(--vi-surface);border-top:1px solid var(--vi-line)}',
+      '.oabi-ov.vi-mode .oabi-btn{border-radius:10px}',
+      /* Recorder-Status (kompakt) */
+      '.oabi-ov.vi-mode .vi-status{display:flex;align-items:center;gap:9px;margin:2px 0 8px;font:600 12.5px/1 "DM Sans",Inter,system-ui,sans-serif;color:var(--vi-muted)}',
+      '.vi-dot{width:9px;height:9px;border-radius:50%;background:#D9685F;animation:viPulse 1.2s infinite;flex:none}',
       '.vi-status.paused .vi-dot{animation:none;background:#E5A847}',
       '.vi-status.stopped .vi-dot{animation:none;background:#3FA56C}',
-      '.vi-time{font-variant-numeric:tabular-nums;color:#9a7f33}',
+      '.vi-time{font-variant-numeric:tabular-nums;color:var(--vi-accent)}',
       '@keyframes viPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,104,95,.45)}50%{box-shadow:0 0 0 7px rgba(217,104,95,0)}}',
-      '#vi-live{width:100%;min-height:130px;max-height:220px;resize:vertical;border:1px solid #E7E2DC;border-radius:8px;padding:10px 12px;font:13px/1.5 "DM Sans",system-ui,sans-serif;color:#2A2727;background:#FBFAF8}',
-      '#vi-live:focus{outline:none;border-color:#C9A84C}',
-      '.vi-livehint{font-size:11px;color:#7A7370;margin:4px 0 10px}',
-      '#vi-level{height:6px;border-radius:3px;background:#EFEAE3;overflow:hidden;margin:6px 0 10px}',
-      '#vi-level i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#C9A84C,#E8CC7A);transition:width .08s linear}',
-      '.vi-recbtns{display:flex;gap:8px;margin-bottom:6px}',
-      '.vi-rbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid #E7E2DC;border-radius:8px;background:#fff;font:600 12.5px/1 "DM Sans",system-ui,sans-serif;cursor:pointer;color:#2A2727}',
-      '.vi-rbtn:hover{border-color:#C9A84C}',
+      /* Kategorie-Zeile */
+      '.vi-catline{text-align:center;font:600 12px/1.3 "JetBrains Mono",monospace;letter-spacing:.18em;color:var(--vi-accent);margin:4px 0 2px}',
+      '.vi-catline b{letter-spacing:.22em}',
+      '.vi-catsub{display:block;font-size:10.5px;letter-spacing:.08em;color:var(--vi-muted);margin-top:3px}',
+      /* Orbit-Buehne */
+      '.vi-orbit{position:relative;width:100%;max-width:480px;height:446px;margin:2px auto 0}',
+      '.vi-rings{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}',
+      '.vi-rings i{position:absolute;width:150px;height:150px;border-radius:50%;border:1.5px solid var(--vi-line);animation:viRing 2.6s ease-out infinite}',
+      '.vi-rings i:nth-child(2){animation-delay:.9s}.vi-rings i:nth-child(3){animation-delay:1.8s}',
+      '@keyframes viRing{0%{transform:scale(.8);opacity:.5}100%{transform:scale(2.4);opacity:0}}',
+      '.vi-status.stopped ~ .vi-orbit .vi-rings i{animation:none;opacity:.25}',
+      '.vi-mic{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:110px;height:110px;border-radius:50%;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));display:grid;place-items:center;box-shadow:0 14px 40px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent),inset 0 0 0 1px rgba(255,255,255,.25);z-index:3}',
+      '.vi-mic svg{width:40px;height:40px}',
+      /* Chips im Orbit (absolut positioniert per JS) */
+      '.oabi-ov.vi-mode .vi-chips{position:absolute;inset:0;margin:0;max-height:none;overflow:visible;display:block}',
+      /* v975-voice-nachzug: coolere, immer lesbare Chips */
+      '.oabi-ov.vi-mode .vi-chip{position:absolute;width:auto;max-width:134px;transform:translate(-50%,-50%);background:linear-gradient(180deg,#413b32,#332e27);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent);border-radius:12px;padding:6px 9px;text-align:left;white-space:nowrap;font:600 10.5px/1.2 "JetBrains Mono",monospace;color:#fff;opacity:.94;box-shadow:0 4px 13px rgba(0,0,0,.2);transition:all .3s ease;z-index:2}',
+      '.oabi-ov.vi-darkbg .vi-chip{background:linear-gradient(180deg,#1b1a17,#121110);border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);box-shadow:0 4px 13px rgba(0,0,0,.5)}',
+      '.oabi-ov.vi-mode .vi-chip .vi-ck{display:inline-block;color:#3FA56C;font-weight:700;opacity:0;margin-right:3px}',
+      '.oabi-ov.vi-mode .vi-chip.on,.oabi-ov.vi-mode .vi-chip.pre{opacity:1;border-color:#2f8f5c;background:linear-gradient(180deg,#37a06a,#2f8f5c);color:#fff;box-shadow:0 6px 18px rgba(47,143,92,.45);transform:translate(-50%,-50%) scale(1.06)}',
+      '.oabi-ov.vi-mode .vi-chip.on .vi-ck,.oabi-ov.vi-mode .vi-chip.pre .vi-ck{color:#fff}',
+      '.oabi-ov.vi-mode .vi-chip.on .vi-ck,.oabi-ov.vi-mode .vi-chip.pre .vi-ck{opacity:1}',
+      /* Hoert-zu Zeile + Punkte */
+      '.vi-listen{text-align:center;font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--vi-muted);margin:6px 0 14px}',
+      '.vi-dots{display:inline-flex;gap:3px;margin-left:6px}',
+      '.vi-dots i{width:4px;height:4px;border-radius:50%;background:var(--vi-accent);animation:viBlink 1.4s infinite}',
+      '.vi-dots i:nth-child(2){animation-delay:.2s}.vi-dots i:nth-child(3){animation-delay:.4s}',
+      '@keyframes viBlink{0%,60%,100%{opacity:.25}30%{opacity:1}}',
+      /* Fortschrittsbalken (statt Tachos) */
+      '.vi-prog{max-width:440px;margin:0 auto 4px}',
+      '.vi-prog-row{display:flex;justify-content:space-between;font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.06em;color:var(--vi-muted);margin-bottom:6px}',
+      '.vi-prog-row b{color:var(--vi-accent)}',
+      '#vi-prog-pct{color:var(--vi-accent)}',
+      '.vi-track{height:9px;border-radius:99px;background:var(--vi-track);overflow:hidden;border:1px solid var(--vi-line)}',
+      '#vi-fill{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));transition:width .4s ease}',
+      '.vi-nkhint{max-width:440px;margin:8px auto 0;font-size:10.5px;color:var(--vi-muted);text-align:center;line-height:1.4;font-style:italic}',
+      /* Transkript einklappbar (Default zu) */
+      '.oabi-ov.vi-mode .vi-transcript{max-width:520px;margin:12px auto 2px;border-top:1px solid var(--vi-line);padding-top:8px}',
+      '.oabi-ov.vi-mode .vi-transcript>summary{cursor:pointer;font:600 11.5px/1 "JetBrains Mono",monospace;letter-spacing:.08em;color:var(--wl-b8932f, #b8932f);text-decoration:underline;list-style:none;text-align:center}',
+      '.oabi-ov.vi-mode .vi-transcript>summary::-webkit-details-marker{display:none}',
+      '#vi-level{height:6px;border-radius:3px;background:var(--vi-track);overflow:hidden;margin:8px 0}',
+      '#vi-level i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--wl-c9a84c, #C9A84C),var(--wl-e8cc7a, #E8CC7A));transition:width .08s linear}',
+      '.oabi-ov.vi-mode #vi-live{width:100%;min-height:90px;max-height:200px;resize:vertical;border:1px solid #e2ddd2;border-radius:8px;padding:9px 11px;font:13px/1.5 "DM Sans",Inter,system-ui,sans-serif;color:#2A2727;background:#faf7f0}',
+      '.oabi-ov.vi-mode #vi-live:focus{outline:none;border-color:var(--wl-c9a84c, #C9A84C);background:#fff}',
+      '.oabi-ov.vi-darkbg #vi-live{color:#FDFCFA;background:#151412;border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent)}',
+      '.oabi-ov.vi-mode #vi-live:focus{outline:none;border-color:var(--vi-accent)}',
+      '.vi-livehint{font-size:10.5px;color:var(--vi-muted);margin:4px 0 0}',
+      /* Recorder-Knoepfe */
+      '.vi-recbtns{display:flex;gap:8px;justify-content:center;margin:12px 0 2px}',
+      '.oabi-ov.vi-mode .vi-rbtn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border:1px solid #cdbf9a;border-radius:10px;background:#fff;font:600 12px/1 "DM Sans",Inter,system-ui,sans-serif;cursor:pointer;color:#2A2727}',
+      '.oabi-ov.vi-darkbg .vi-rbtn{background:#1b1a17;border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);color:#FDFCFA}',
+      '.oabi-ov.vi-mode .vi-rbtn:hover{border-color:var(--vi-accent);color:var(--vi-accent)}',
       '.vi-rbtn[disabled]{opacity:.45;cursor:not-allowed}',
       '.vi-rbtn svg{flex:none}',
-      '#vi-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#161310;color:#E8CC7A;padding:10px 18px;border-radius:999px;border:1px solid rgba(201,168,76,.5);font-size:13px;font-weight:600;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,.4)}',
-      /* v504-white: Sprach-Modal weiss mit Creme-Akzenten, Buttons wie Tab Objekt.
-         Gescoped auf .vi-mode — das Import-Modal bleibt unveraendert. */
-      '.oabi-ov.vi-mode .oabi-modal{background:#fff}',
-      '.oabi-ov.vi-mode .oabi-head h3{color:#2A2727}',
-      '.oabi-ov.vi-mode .oabi-sub{color:#7A7370}',
-      '.oabi-ov.vi-mode .vi-status{background:#FAF6EE;border:1px solid #EFE6D6;border-radius:10px;padding:9px 14px;margin:2px 0 12px}',
-      '.oabi-ov.vi-mode #vi-live{background:#FAF6EE;border-color:#EFE6D6}',
-      '.oabi-ov.vi-mode #vi-level{background:#F1ECE2}',
-      '.oabi-ov.vi-mode .vi-rbtn{border:1px solid #E7E2DC;border-radius:10px;background:#fff;color:#2A2727;padding:9px 16px}',
-      '.oabi-ov.vi-mode .vi-rbtn:hover{border-color:#C9A84C;color:#9a7f33}',
-      '.oabi-ov.vi-mode .vi-rbtn[disabled]:hover{border-color:#E7E2DC;color:#2A2727}',
-      '.oabi-ov.vi-mode .oabi-btn{border-radius:10px}',
-      '.oabi-ov.vi-mode .oabi-foot{background:#fff;border-top:1px solid #F1ECE2}',
-      /* v507: Chip-Wolke (beantwortet? -> gruen) */
-      '.vi-chips{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 2px;max-height:104px;overflow:auto;scroll-behavior:smooth}',
-      '.vi-chip{font-size:11px;line-height:1;padding:5px 9px;border-radius:999px;border:1px solid #E2DCCF;background:#fff;color:#7A7370;white-space:nowrap;transition:all .2s}',
-      '.vi-chip.pre{border-color:#9ED3B4;color:#2F8559;background:#F2FBF6}',
-      '.vi-chip.on{border-color:#3FA56C;background:#3FA56C;color:#fff;font-weight:600}',
-      '.vi-chip .vi-ck{opacity:0;margin-right:2px}',
-      '.vi-chip.on .vi-ck,.vi-chip.pre .vi-ck{opacity:1}',
-      '.vi-chips-head{font-size:11px;color:#7A7370;margin:10px 0 2px;display:flex;justify-content:space-between;align-items:center}',
-      '.vi-chips-head b{color:#3FA56C}',
-      '.vi-grp{width:100%;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#9A9088;margin:9px 0 1px}',
-      '.vi-nkhint{width:100%;font-size:10.5px;color:#9a8a6a;margin:8px 2px 0;line-height:1.4;font-style:italic}',
-      /* v517: Modal groesser + Footer immer sichtbar (Body scrollt) */
-      '.oabi-ov.vi-mode .oabi-modal{width:min(960px,100%);max-height:94vh;overflow:hidden;display:flex;flex-direction:column}',
+      '#vi-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#161310;color:var(--wl-e8cc7a, #E8CC7A);padding:10px 18px;border-radius:999px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent);font-size:13px;font-weight:600;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,.4)}',
+      /* Modal groesser + Footer sichtbar (Body scrollt) */
+      '.oabi-ov.vi-mode .oabi-modal{width:min(760px,100%);max-height:94vh;overflow:hidden;display:flex;flex-direction:column}',
       '.oabi-ov.vi-mode .oabi-body{flex:1 1 auto;min-height:0;overflow:auto}',
-      '.oabi-ov.vi-mode .oabi-foot{flex:none}',
-      /* v517: Gruppen-Header Done-Status + aktiver Marker */
-      '.vi-grp{display:flex;align-items:center;gap:6px}',
-      '.vi-grp.done{color:#3FA56C}',
-      '.vi-grp.done::after{content:"\u2713";color:#3FA56C;font-weight:700}',
-      '.vi-grp.active{color:#9a7f33}',
-      /* v514: dunkle Instrument-Karte (DealPilot-Optik) auf hellem Modal */
-      '.vi-gauge{position:relative;display:block;margin:12px 0 2px;padding:0;border:1px solid #1c1c22;border-radius:16px;overflow:hidden;background:#050505;box-shadow:0 16px 40px -22px #000}',  /* v523: pures Obsidian, nur Partikel */
-      '.vi-parts{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}',
-      '.vi-dark-body{position:relative;padding:16px 18px 18px}',
-      '.vg-status{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;font-size:15px}',
-      '.vg-txt{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:#8a8a93;margin-top:3px}',
-      '.vi-gauge-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}',
-      '.vi-tip{margin-top:8px;font-size:12px;color:#7A7370}',
-      '.vi-tip b{color:#9a7f33}',
-      '.vi-tip-ok{color:#3FA56C}',
-      '.vi-grpcards{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}',
-      '.vi-grpcard{flex:1 1 96px;min-width:90px;background:#0c0c0e;border:1px solid #232229;border-radius:13px;padding:7px 6px 8px;text-align:center}',  /* v523: solides Obsidian */
-      '.vi-grp-sugg{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;min-height:28px;margin-bottom:2px}',
-      '.vi-grp-sugg span{font-family:"JetBrains Mono",monospace;font-size:8.5px;color:#F2CF6C;background:#C9A84C18;border:1px solid #C9A84C3a;border-radius:999px;padding:2px 6px}',
-      '.vi-grp-ok{color:#56E89A;font-family:"JetBrains Mono",monospace;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center}',
-      '.vi-grp-name{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.6px;color:#8a8a93;text-transform:uppercase;margin-top:1px}'
+      '.oabi-ov.vi-mode .oabi-foot{flex:none}'
     ].join('\n');
     document.head.appendChild(s);
   }
@@ -321,12 +329,21 @@
         '<div class="oabi-body">' +
           '<div id="vi-rec">' +
             '<div class="vi-status" id="vi-status"><span class="vi-dot"></span><span class="vi-time" id="vi-time">00:00</span><span id="vi-statetxt">Aufnahme l\u00e4uft \u2026</span></div>' +
-            '<div id="vi-level"><i></i></div>' +
-            '<textarea id="vi-live" readonly placeholder="Gesprochener Text erscheint hier \u2026"></textarea>' +
-            '<div class="vi-livehint" id="vi-livehint">Live-Mitschrift \u2014 ausgewertet wird beim Klick auf Weiter die Audio-Aufnahme.</div>' +
-            '<div class="vi-chips-head"><span>Erkannte Felder</span><span id="vi-chips-count"></span></div>' +
-            '<div class="vi-chips" id="vi-chips"></div>' +
-            '<div class="vi-gauge" id="vi-gauge"></div>' +
+            '<div class="vi-catline" id="vi-catline"></div>' +
+            '<div class="vi-orbit" id="vi-orbit">' +
+              '<div class="vi-rings"><i></i><i></i><i></i></div>' +
+              '<div class="vi-mic" id="vi-mic">' + micSvg(40, '#1a1508') + '</div>' +
+              '<div class="vi-chips" id="vi-chips"></div>' +
+            '</div>' +
+            '<div class="vi-listen" id="vi-listen"><span id="vi-listen-txt">H\u00f6rt zu</span><span class="vi-dots"><i></i><i></i><i></i></span></div>' +
+            '<div class="vi-prog"><div class="vi-prog-row"><span id="vi-chips-count"></span><span id="vi-prog-pct"></span></div><div class="vi-track"><i id="vi-fill"></i></div></div>' +
+            '<div class="vi-nkhint" id="vi-nkhint"></div>' +
+            '<details class="vi-transcript">' +
+              '<summary>Mitschrift anzeigen / bearbeiten</summary>' +
+              '<div id="vi-level"><i></i></div>' +
+              '<textarea id="vi-live" placeholder="Gesprochener Text erscheint hier \u2026 (editierbar)"></textarea>' +
+              '<div class="vi-livehint" id="vi-livehint">Live-Mitschrift \u2014 ausgewertet wird beim Klick auf Weiter die Audio-Aufnahme.</div>' +
+            '</details>' +
             '<div class="vi-recbtns">' +
               '<button type="button" class="vi-rbtn" id="vi-pause">' + pauseSvg() + ' Pause</button>' +
               '<button type="button" class="vi-rbtn" id="vi-stop">' + stopSvg() + ' Stopp</button>' +
@@ -519,21 +536,23 @@
      Gruppen. Interne/kryptische Felder (_*, ai_*, kp1..kp4l, d2_az, bspar_*,
      me_*, rate_*, ji_p, kuerzel, thesis, exitstr, bankval ...) sind bewusst NICHT
      dabei. Reihenfolge = Anzeigereihenfolge; DS2/Markt kommt ans Ende. */
-  var WL_GROUPS = ['Stammdaten', 'Kauf & Nebenkosten', 'Miete', 'Finanzierung', 'Lage & Bewertung'];
+  /* v979-voice-merge: 5 -> 3 Kategorien; Kauf(1)+Finanzierung(3)+Lage(4) zusammengelegt */
+  var WL_GROUPS = ['Stammdaten', 'Kauf & Nebenkosten', 'Miete', 'Finanzierung', 'Lage & Bewertung'];  /* v998-groups: zurueck auf 5 */
   var WL = [
-    { id:'plz',        g:0, label:'PLZ',                 kw:['postleitzahl','plz'] },
-    { id:'ort',        g:0, label:'Ort',                 kw:['ort','stadt','gemeinde'] },
+    /* v977-voice-layout: Reihenfolge Objektart->Adresse->Flaechen; Aussenstellpl./Etage/Garagen ohne Chip; Kaufdatum/Uebergang -> Kauf */
+    { id:'objart',     g:0, label:'Objektart',           kw:['eigentumswohnung','mehrfamilien','einfamilien','wohnung','haus','etw','mfh','efh','reihenhaus'] },
     { id:'str',        g:0, label:'Strasse',             kw:['strasse','str'] },
     { id:'hnr',        g:0, label:'Hausnummer',          kw:['hausnummer','nummer'] },
-    { id:'objart',     g:0, label:'Objektart',           kw:['eigentumswohnung','mehrfamilien','einfamilien','wohnung','haus','etw','mfh','efh','reihenhaus'] },
+    { id:'plz',        g:0, label:'PLZ',                 kw:['postleitzahl','plz'] },
+    { id:'ort',        g:0, label:'Ort',                 kw:['ort','stadt','gemeinde'] },
     { id:'wfl',        g:0, label:'Wohnflaeche',         kw:['wohnflaeche','quadratmeter','qm','quadrat'] },
-    { id:'baujahr',    g:0, label:'Baujahr',             kw:['baujahr','gebaut','errichtet'] },
-    { id:'kaufdat',    g:0, label:'Kaufdatum',           kw:['kaufdatum','gekauft','erworben'] },
-    { id:'wirtschaftlicher_uebergang', g:0, label:'Wirtsch. Uebergang', kw:['wirtschaftlicher uebergang','nutzen lasten','nutzen und lasten','lastenwechsel','besitzuebergang','uebergang'] },
     { id:'zimmer',     g:0, label:'Zimmer',              kw:['zimmer'] },
-    { id:'etage',      g:0, label:'Etage',               kw:['etage','stock','geschoss','obergeschoss'] },
-    { id:'stellpl_aussen', g:0, label:'Aussenstellplaetze', kw:['stellplatz','aussenstellplatz','parkplatz'] },
-    { id:'garagen',    g:0, label:'Garagen',             kw:['garage','tiefgarage'] },
+    { id:'baujahr',    g:0, label:'Baujahr',             kw:['baujahr','gebaut','errichtet'] },
+    { id:'etage',      g:0, noc:1, label:'Etage',               kw:['etage','stock','geschoss','obergeschoss'] },
+    { id:'stellpl_aussen', g:0, noc:1, label:'Aussenstellplaetze', kw:['stellplatz','aussenstellplatz','parkplatz'] },
+    { id:'garagen',    g:0, noc:1, label:'Garagen',             kw:['garage','tiefgarage'] },
+    { id:'kaufdat',    g:1, label:'Kaufdatum',           kw:['kaufdatum','gekauft','erworben'] },
+    { id:'wirtschaftlicher_uebergang', g:1, label:'Wirtsch. Uebergang', kw:['wirtschaftlicher uebergang','nutzen lasten','nutzen und lasten','lastenwechsel','besitzuebergang','uebergang'] },
 
     { id:'kp',         g:1, label:'Kaufpreis',           kw:['kaufpreis','kostet','preis','kaufsumme'] },
     { id:'makler_p',   g:1, noc:1, label:'Maklerprovision %',   kw:['makler','maklerprovision','courtage'] },
@@ -627,28 +646,31 @@
   }
   function buildChips() {
     var host = $('vi-chips'); if (!host) return;
-    _activeGrp = -1;  /* v517: Auto-Scroll-Zustand zuruecksetzen */
+    /* v975-voice-nachzug: echte Body-Helligkeit messen (nicht Skin raten) */
+    setTimeout(function(){ try{ var ov=document.querySelector('.oabi-ov.vi-mode'); if(!ov) return;
+      var m=ov.querySelector('.oabi-modal')||ov; var bg=getComputedStyle(m).backgroundColor;
+      var c=/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(bg||'');
+      if(c){ var lum=0.299*+c[1]+0.587*+c[2]+0.114*+c[3]; ov.classList.toggle('vi-darkbg', lum<128); } }catch(e){} }, 60);
+    _activeGrp = -1;
     var byGroup = {};
     _catalog.forEach(function (e) {
-      if (e.noc) return;  /* v514: NK-Einzelfelder/Markt nicht als Chip */
-      var g = (typeof e.g === 'number') ? e.g : 0;
+      if (e.noc) return;  /* NK-Einzelfelder/Markt nicht als Chip */
+      var g0 = (typeof e.g === 'number') ? e.g : 0;
+      var g = g0;  /* v998-groups: Original-Zuordnung (v979-Remap zurueckgebaut) */
       (byGroup[g] = byGroup[g] || []).push(e);
     });
     var html = '';
     for (var gi = 0; gi < WL_GROUPS.length; gi++) {
       var items = byGroup[gi]; if (!items || !items.length) continue;
-      html += '<div class="vi-grp" data-g="' + gi + '">' + escH(WL_GROUPS[gi]) + '</div>';
       html += items.map(function (e) {
-        var pre = false;  /* v518: keine Vorbelegung — nur diktierte Felder werden gruen */
         var short = (e.label || e.id).split('(')[0].trim();
-        if (short.length > 24) short = short.slice(0, 23) + '\u2026';
-        return '<span class="vi-chip' + (pre ? ' pre' : '') + '" data-cid="' + escH(e.id) + '" title="' + escH(EXPLAIN[e.id] || e.label || e.id) + '"><span class="vi-ck">\u2713</span>' + escH(short) + '</span>';
+        if (short.length > 22) short = short.slice(0, 21) + '\u2026';
+        return '<span class="vi-chip" data-cid="' + escH(e.id) + '" data-g="' + gi + '" title="' + escH(EXPLAIN[e.id] || e.label || e.id) + '"><span class="vi-ck">\u2713</span>' + escH(short) + '</span>';
       }).join('');
     }
-    if (!_qcTarget) {
-      html += '<div class="vi-nkhint">Kaufnebenkosten (Makler/Notar/Grundbuch/Grunderwerbsteuer) werden automatisch gefuellt, wenn du sie nennst — sonst spaeter eintragbar.</div>';
-    }
     host.innerHTML = html;
+    var nk = $('vi-nkhint');
+    if (nk) nk.textContent = _qcTarget ? '' : 'Kaufnebenkosten (Makler/Notar/Grundbuch/Grunderwerbsteuer) werden automatisch gef\u00fcllt, wenn du sie nennst.';
     updateChipsCount();
   }
   function updateChipsFromText(txt) {
@@ -684,44 +706,61 @@
   /* v517: markiert komplette Gruppen + scrollt zur ersten offenen Gruppe (gefuehrte Hilfe) */
   function refreshGroupProgress() {
     var host = $('vi-chips'); if (!host) return;
-    var heads = host.querySelectorAll('.vi-grp');
-    var firstOpen = -1;
-    for (var i = 0; i < heads.length; i++) {
-      var h = heads[i], gi = +h.getAttribute('data-g');
-      var chips = [], n = h.nextSibling;
-      while (n) {
-        if (n.nodeType === 1) {
-          if (n.classList && n.classList.contains('vi-grp')) break;
-          if (n.classList && n.classList.contains('vi-chip')) chips.push(n);
-        }
-        n = n.nextSibling;
-      }
-      var done = chips.length > 0 && chips.every(function (c) { return c.classList.contains('on') || c.classList.contains('pre'); });
-      h.classList.toggle('done', done);
-      if (!done && firstOpen < 0) firstOpen = gi;
-      h.classList.toggle('active', !done && gi === firstOpen);
+    var chips = host.querySelectorAll('.vi-chip');
+    if (!chips.length) return;
+    var groups = {};
+    Array.prototype.forEach.call(chips, function (c) {
+      var g = +c.getAttribute('data-g');
+      (groups[g] = groups[g] || []).push(c);
+    });
+    var order = Object.keys(groups).map(Number).sort(function (a, b) { return a - b; });
+    function filled(c) { return c.classList.contains('on') || c.classList.contains('pre'); }
+    var active = order[order.length - 1];
+    for (var i = 0; i < order.length; i++) {
+      if (groups[order[i]].some(function (c) { return !filled(c); })) { active = order[i]; break; }
     }
-    if (firstOpen >= 0 && firstOpen !== _activeGrp) {
-      _activeGrp = firstOpen;
-      var target = host.querySelector('.vi-grp[data-g="' + firstOpen + '"]');
-      if (target) {
-        try {
-          var ct = host.getBoundingClientRect(), tt = target.getBoundingClientRect();
-          host.scrollTo({ top: host.scrollTop + (tt.top - ct.top) - 4, behavior: 'smooth' });
-        } catch (e) { host.scrollTop = target.offsetTop; }
-      }
+    _activeGrp = active;
+    var cl = $('vi-catline');
+    if (cl) {
+      cl.innerHTML = '<b>' + escH((WL_GROUPS[active] || '').toUpperCase()) + '</b>' +
+        '<span class="vi-catsub">Kategorie ' + (order.indexOf(active) + 1) + ' / ' + order.length + '</span>';
+    }
+    var ring = groups[active] || [];
+    var n = ring.length;
+    Array.prototype.forEach.call(chips, function (c) {
+      c.style.display = (+c.getAttribute('data-g') === active) ? '' : 'none';
+    });
+    if (n <= 9) {
+      var R = Math.min(168, 116 + n * 6);
+      ring.forEach(function (c, i) {
+        var ang = (-90 + i * 360 / n) * Math.PI / 180;
+        c.style.left = 'calc(50% + ' + Math.round(R * Math.cos(ang)) + 'px)';
+        c.style.top  = 'calc(50% + ' + Math.round(R * Math.sin(ang)) + 'px)';
+      });
+    } else {
+      /* v979-voice-merge: zwei Ringe fuer volle Merge-Orbits */
+      var inN = Math.ceil(n / 2);
+      ring.forEach(function (c, i) {
+        var inner = i < inN, idx = inner ? i : (i - inN), cnt = inner ? inN : (n - inN);
+        var R = inner ? 112 : 178, off = inner ? 0 : (180 / cnt);
+        var ang = (-90 + off + idx * 360 / cnt) * Math.PI / 180;
+        c.style.left = 'calc(50% + ' + Math.round(R * Math.cos(ang)) + 'px)';
+        c.style.top  = 'calc(50% + ' + Math.round(R * Math.sin(ang)) + 'px)';
+      });
     }
   }
-  function updateChipsCount() {
-    var host = $('vi-chips'), c = $('vi-chips-count'); if (host && c) {
-      var on = host.querySelectorAll('.vi-chip.on,.vi-chip.pre').length;
-      var tot = host.querySelectorAll('.vi-chip').length;
-      c.innerHTML = '<b>' + on + '</b> / ' + tot;
-    }
-    renderGauge();
+    function updateChipsCount() {
+    var host = $('vi-chips'); if (!host) return;
+    var on  = host.querySelectorAll('.vi-chip.on,.vi-chip.pre').length;
+    var tot = host.querySelectorAll('.vi-chip').length;
+    var c = $('vi-chips-count'); if (c) c.innerHTML = '<b>' + on + '</b> / ' + tot + ' Felder';
+    var pct = tot ? Math.round(on / tot * 100) : 0;
+    var fill = $('vi-fill'); if (fill) fill.style.width = pct + '%';
+    var pc = $('vi-prog-pct'); if (pc) pc.textContent = pct + ' %';
+    var lt = $('vi-listen-txt'); if (lt) lt.textContent = (tot && on >= tot) ? 'Alle Felder erkannt' : 'H\u00f6rt zu';
     refreshGroupProgress();
   }
-  function _chipMarked(id) {
+    function _chipMarked(id) {
     var host = $('vi-chips'); if (!host) return false;
     var chip = host.querySelector('.vi-chip[data-cid="' + id + '"]');
     return !!(chip && (chip.classList.contains('on') || chip.classList.contains('pre')));
@@ -839,7 +878,7 @@
   function scheduleQuickMatch() {
     if (qm.calls >= qm.max) return;
     if (qm.timer) clearTimeout(qm.timer);
-    qm.timer = setTimeout(runQuickMatch, 1500);
+    qm.timer = setTimeout(runQuickMatch, 600);  /* v996: schneller gruen */
   }
   function runQuickMatch() {
     if (qm.inflight || qm.calls >= qm.max) return;

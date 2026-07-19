@@ -86,6 +86,7 @@
     var docs =
       docRow('invest', 'Investment-PDF', 'Business-Case, bank-fertig: Kaufpreis, Finanzierung, Cashflow, DSCR/LTV, Stress-Test.', true) +
       faRow() +
+      docRow('kpa', 'Kaufpreisaufteilung (Finanzamt)', 'BMF-Anlage: Aufteilung Grund/Geb\u00e4ude, AfA-Bemessungsgrundlage &amp; Verprobung der 3 Verfahren.', false) +
       docRow('track', 'Track Record', 'Auswahl-Ansicht \u00f6ffnen: gewonnene Deals filtern, Einzel- oder Sammel-PDF erzeugen.', false);
 
     return '' +
@@ -640,6 +641,18 @@
           return window.exportWerbungskostenPDF(mode);
         }
         toast('Finanzamt-PDF-Modul nicht geladen.');
+        return;
+      }
+      if (which === 'kpa') {
+        /* v976: BMF-Kaufpreisaufteilung-Anlage -- Investor+ (bmf_calc_export), export-wenn-berechnet-sonst-Rechner */
+        try {
+          var _kOk = !(window.DealPilotConfig && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.hasFeature === 'function')
+            || DealPilotConfig.pricing.hasFeature('bmf_calc_export');
+          if (!_kOk) { toast('Kaufpreisaufteilung ist ab dem Investor-Plan verf\u00fcgbar.'); return; }
+        } catch (e) {}
+        if (window._lastBmfResults && typeof window.exportBmfPdf === 'function') return window.exportBmfPdf();
+        if (typeof window.openBMFModal === 'function') { window.openBMFModal(); toast('Erst berechnen lassen, dann als PDF-Anlage exportieren.'); return; }
+        toast('BMF-Rechner nicht geladen.');
         return;
       }
       if (which === 'track') {
