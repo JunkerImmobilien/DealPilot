@@ -1534,6 +1534,125 @@ async function copilotChat(payload, opts) {
 }
 /* v585-copilot END */
 
+/* ─────────────────────────────────────────────────────────────────────
+ * v1008-beleg: Vision-Extraktion für den KI-Beleg-Import.
+ * Nutzt dieselbe Responses-API wie callOpenAI, aber mit Bild-Input
+ * (input_image) und OHNE web_search. Gibt strukturiertes JSON je Beleg.
+ * ───────────────────────────────────────────────────────────────────── */
+async function _callOpenAIVision(contentParts, opts) {
+  opts = opts || {};
+  const apiKey = config.openai.apiKey || opts.userApiKey || null;
+  const keySource = config.openai.apiKey ? 'server' : (opts.userApiKey ? 'user' : 'none');
+  if (!apiKey) {
+    const err = new Error('Kein OpenAI-API-Key verfügbar.');
+    err.code = 'NO_API_KEY';
+    throw err;
+  }
+  const model = opts.model || config.openai.defaultModel;
+  const body = {
+    model: model,
+    input: [{ role: 'user', content: contentParts }],
+    max_output_tokens: opts.maxTokens || 700
+  };
+  const resp = await fetch(OPENAI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    body: JSON.stringify(body)
+  });
+  if (!resp.ok) {
+    const txt = await resp.text();
+    const err = new Error('OpenAI API Fehler ' + resp.status + ': ' + txt.slice(0, 300));
+    err.status = resp.status;
+    err.keySource = keySource;
+    throw err;
+  }
+  const data = await resp.json();
+  let text = '';
+  if (data.output_text) {
+    text = data.output_text;
+  } else if (Array.isArray(data.output)) {
+    for (const item of data.output) {
+      if (item.type === 'message' && Array.isArray(item.content)) {
+        for (const c of item.content) {
+          if (c.type === 'output_text' && c.text) text += c.text;
+        }
+      }
+    }
+  }
+  return { text: (text || '').trim(), raw: data, model: model };
+}
+
+const _BELEG_KATEGORIEN = ['Notar & Grundbuch', 'Maklergebühr', 'Grunderwerbsteuer', 'Fahrtkosten', 'Verpflegung', 'Unterkunft', 'Handwerker / Sanierung', 'Material / Sanierung', 'Herstellungskosten (Erweiterung)', 'Sonstiges'];
+
+const _BELEG_PROMPT =
+  'Du liest EIN Bild einer Seite mit deutschen Kauf-/Kostenbelegen im Immobilien-Kontext: ' +
+  'Rechnungen, Quittungen, Notar-, Grundbuch-, Makler-, Handwerkerbelege, Sammelrechnungen ' +
+  'UND Buchhaltungs-/Kontenlisten (OPOS-Konto / Rechnungswesen / Kontoauszug). Das Bild kann gedreht sein - lies es trotzdem. ' +
+  'Gib AUSSCHLIESSLICH ein JSON-Objekt zurueck, ohne Vorrede, ohne Markdown:\n' +
+  '{"positionen":[{"datum":"TT.MM.JJJJ oder null","aussteller":"string oder null","betrag_netto":Zahl oder null,"ust_betrag":Zahl oder null,"ust_satz":19 oder 7 oder 0 oder null,"betrag_brutto":Zahl oder null,"kategorie":"eine aus der Liste","konfidenz":"hoch oder mittel oder niedrig","beschreibung":"kurzer Hinweis"}]}\n' +
+  'Regeln:\n' +
+  '- ZUERST PRUEFEN - Buchhaltungs-/OPOS-/Kontenliste? Merkmale: Kopf wie "OPOS-Konto"/"Rechnungswesen"/"Kontenanzeige", ' +
+  'Spalten "Betrag Soll"/"Betrag Haben", und eine FUSSZEILE mit "JVZ Soll" und "JVZ Haben" (oft daneben "Summe offene Posten"/"EB-Wert"). ' +
+  'Wenn ja: IGNORIERE alle Einzelzeilen und gib GENAU EINE Position fuer die Seite zurueck: ' +
+  'datum = das Jahr (z.B. "2020"), aussteller = der Firmen-/Kontoname, ' +
+  'betrag_brutto = der Zahlenwert bei "JVZ Soll", betrag_netto = null, ust_betrag = null, ' +
+  'kategorie = "Material / Sanierung" (Baustoffe/Handwerk) sonst "Sonstiges", ' +
+  'beschreibung = "OPOS <Jahr> - JVZ Soll <Wert> / JVZ Haben <Wert>". Lies die beiden Fusszeilen-Werte GENAU ab, erfinde nichts. ' +
+  'Pro Seite also nur EINE Position, keine Einzelrechnungen.\n' +
+  '- NUR wenn es KEINE solche Liste ist (normale Belege/Quittungen/Rechnungen): lies ALLE erkennbaren Belege, ' +
+  'mehrere getrennte Quittungen im Bild -> je eine Position; Sammelrechnung -> Zeilen derselben Kategorie zu einer Summenposition, ' +
+  'Gesamtsumme nicht doppelt zu den Einzelposten.\n' +
+  '- betrag_brutto (bei normalen Belegen) = Gesamt-/Endbetrag ("Insgesamt"/"Total"/"Summe"/Rechnungsbetrag). ' +
+  'Wenn nur Brutto und "X MwSt inbegriffen" dasteht: ust_betrag = X, betrag_netto = brutto - X.\n' +
+  '- Betraege als Dezimalzahl mit Punkt (1234.56), ohne Waehrungszeichen.\n' +
+  '- Kategorie exakt eine aus: ' + _BELEG_KATEGORIEN.join(', ') + '.\n' +
+  '- Nicht sicher lesbar -> null und konfidenz "niedrig". Erfinde nichts.';
+
+async function _extractBelegPage(image, opts) {
+  const content = [{ type: 'input_text', text: _BELEG_PROMPT }, { type: 'input_image', image_url: image }];
+  const r = await _callOpenAIVision(content, { userApiKey: opts.userApiKey, model: opts.model, maxTokens: 4000 });
+  const parsed = extractJson(r.text);
+  if (parsed == null) { throw new Error('JSON-Parse (Antwort evtl. zu dicht/abgeschnitten)'); }
+  let pos = Array.isArray(parsed) ? parsed
+          : (Array.isArray(parsed.positionen) ? parsed.positionen
+          : ((parsed && (parsed.betrag_brutto != null || parsed.betrag_netto != null || parsed.aussteller)) ? [parsed] : []));
+  return Array.isArray(pos) ? pos : [];
+}
+
+/**
+ * v1008-beleg: extractBeleg — liest EIN Dokument (1..n Seiten) per Vision, EINE
+ * Vision-Anfrage PRO SEITE (begrenzt parallel), und aggregiert alle Positionen.
+ * So werden lange PDFs (Rechnungslisten) und dichte Tabellen vollstaendig gelesen.
+ * @returns { positionen: [...] }
+ */
+async function extractBeleg(images, opts) {
+  opts = opts || {};
+  const imgs = (images || []).slice(0, 30);
+  const out = new Array(imgs.length);
+  const err = new Array(imgs.length);
+  const CONC = 4;
+  let next = 0;
+  async function worker() {
+    while (next < imgs.length) {
+      const my = next++;
+      try { out[my] = await _extractBelegPage(imgs[my], opts); }
+      catch (e) { out[my] = []; err[my] = (e && e.message) ? String(e.message).slice(0, 120) : 'Fehler'; }
+    }
+  }
+  const runners = [];
+  for (let w = 0; w < Math.min(CONC, imgs.length); w++) runners.push(worker());
+  await Promise.all(runners);
+  let pos = []; let errN = 0; let firstErr = '';
+  out.forEach(function (r, i) {
+    if (Array.isArray(r) && r.length) { pos = pos.concat(r); }
+    else if (err[i]) { errN++; if (!firstErr) firstErr = err[i]; }
+  });
+  let diag = imgs.length + ' Seite(n)';
+  if (!pos.length) { diag += ', 0 Treffer'; if (errN) diag += ' - ' + errN + ' Seite(n) mit Fehler: ' + firstErr; }
+  return { positionen: pos, pages: imgs.length, diag: diag };
+}
+
+
 module.exports = {
   copilotChat,  /* v585 */
   analyze,
@@ -1545,5 +1664,6 @@ module.exports = {
   enrichMarketFields,
   buildPrompt,
   callOpenAI,
+  extractBeleg,
   extractJson
 };

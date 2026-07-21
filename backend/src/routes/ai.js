@@ -1062,4 +1062,62 @@ router.post('/copilot', authenticate, async (req, res, next) => {
 });
 /* v585-copilot-route END */
 
+/* ─────────────────────────────────────────────────────────────────────
+ * v1008-beleg: POST /api/v1/ai/extract-beleg — KI-Beleg-Import (Vision).
+ * Body: { belege: [ { name, images:[dataURL] } ] }. Plan-Gate Investor+/Pro.
+ * 1 Import-Lauf = 1 L Kerosin (nur wenn mindestens ein Beleg gelesen wurde).
+ * ───────────────────────────────────────────────────────────────────── */
+router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { query } = require('../db/pool');
+    // Plan-Gate: Investor+ / Pro / Partner
+    const pr = await query("SELECT plan_id FROM subscriptions WHERE user_id = $1 AND status = 'active' LIMIT 1", [req.user.id]);
+    const plan = pr.rowCount ? String(pr.rows[0].plan_id) : 'free';
+    if (plan === 'free' || plan === 'starter') {
+      return res.status(403).json({ error: 'Der KI-Beleg-Import ist ab dem Investor-Plan verfuegbar.' });
+    }
+    const belege = (req.body && Array.isArray(req.body.belege)) ? req.body.belege : [];
+    if (!belege.length) return res.status(400).json({ error: 'Keine Belege uebergeben.' });
+    if (belege.length > 40) return res.status(400).json({ error: 'Zu viele Belege pro Lauf (max. 40).' });
+
+    // Kerosin-Verfuegbarkeit vorab pruefen (1 L pro Lauf), noch nicht abbuchen.
+    try {
+      const st = await aiCreditsService.getStatus(req.user.id);
+      if (!st || st.total_remaining < 1) {
+        return res.status(402).json({ error: 'Nicht genug Kerosin fuer diesen Import-Lauf.', status: st });
+      }
+    } catch (e) { /* getStatus-Fehler nicht blockierend */ }
+
+    const userApiKey = (req.body && req.body.userApiKey) || undefined;
+    const results = [];
+    let okCount = 0;
+    for (let i = 0; i < belege.length; i++) {
+      const b = belege[i] || {};
+      const imgs = Array.isArray(b.images) ? b.images : [];
+      const nm = b.name || ('Beleg ' + (i + 1));
+      if (!imgs.length) { results.push({ name: nm, ok: false, error: 'keine Bilddaten' }); continue; }
+      try {
+        const out = await openaiService.extractBeleg(imgs, { userApiKey });
+        const positionen = (out && Array.isArray(out.positionen)) ? out.positionen : [];
+        results.push({ name: nm, ok: positionen.length > 0, positionen: positionen, pages: (out && out.pages) || imgs.length, diag: (out && out.diag) || '' });
+        if (positionen.length > 0) okCount++;
+      } catch (e) {
+        results.push({ name: nm, ok: false, error: (e && e.message) ? String(e.message).slice(0, 160) : 'Lesefehler', diag: 'Fehler: ' + ((e && e.message) ? String(e.message).slice(0, 120) : '') });
+      }
+    }
+
+    // 1 L pro Lauf — nur wenn mindestens ein Beleg erfolgreich gelesen wurde.
+    let charged = false;
+    if (okCount > 0) {
+      try {
+        const c = await aiCreditsService.consume(req.user.id, 1, 'extract-beleg', { belege: belege.length, ok: okCount });
+        charged = !!(c && c.ok);
+      } catch (e) { /* Abbuchung fehlgeschlagen -> nicht blockierend */ }
+    }
+
+    return res.json({ results: results, ok_count: okCount, charged: charged });
+  } catch (err) { next(err); }
+});
+
+
 module.exports = router;
