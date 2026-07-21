@@ -222,6 +222,7 @@ window.DealPilotConfig = (function() {
                                       //   sagen. Der Free-User durfte etwas, das ihm nirgends
                                       //   versprochen wurde. Jetzt sagen alle drei dasselbe.
         bmf_advanced:        false,   // W41: Advanced ist Pro+
+        beleg_import:        false,   // v1007-beleg: KI-Beleg-Import (Investor+)
         /* W41-bmf-gate: 'bmf_advanced' stand in KEINEM Plan. hasFeature()
            liest zuerst die DB und faellt sonst hierher zurueck — kannte die
            DB den Schluessel nicht, war er fuer JEDEN false, auch fuer Pro.
@@ -264,6 +265,7 @@ window.DealPilotConfig = (function() {
         ai_market_analysis:  true,         // v494-matrix: Matrix — Lagebewertung ab Starter
         market_data_fields:  false,        // V63.82: ausgegraut
         bmf_calc_export:     false,        // V63.82: BMF nur Investor+
+        beleg_import:        false,   // v1007-beleg
         bmf_advanced:        false,        // W41
         bankexport:          false,        // V168: explizit (war undefined)
         export_pdf:          true,
@@ -323,6 +325,7 @@ window.DealPilotConfig = (function() {
         ai_analysis_tab:     'full',     // V63.82
         market_data_fields:  true,        // V63.82: Live-Marktdaten
         bmf_calc_export:     true,        // V63.82: BMF-Rechner & -Export
+        beleg_import:        true,    // v1007-beleg
         bmf_advanced:        false,       // W41: Landing Z.2850 sagt Investor '✓',
                                           //      Pro '✓ Advanced'. Genau das gilt jetzt.
         ai_market_analysis:  true,        // V63.82: KI-Marktanalysen
@@ -371,6 +374,7 @@ window.DealPilotConfig = (function() {
         ai_analysis_tab:            'full',   // V63.82
         market_data_fields:         true,     // V63.82
         bmf_calc_export:            true,     // V63.82
+        beleg_import:                true,     // v1007-beleg
         bmf_advanced:               true,     // W41: das Pro-Extra. Der Partner-Klon
                                               //      (W9) erbt es automatisch mit.
         ai_market_analysis:         true,     // V63.82
