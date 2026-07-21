@@ -27,7 +27,7 @@
   'use strict';
 
   var NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
-  var USER_AGENT_NOTE = 'DealPilot/V158 (Immobilien-Analyse-Tool, Marcel Junker, dealpilot@junker-immobilien.io)';
+  var USER_AGENT_NOTE = 'DealPilot/V158 (Immobilien-Analyse-Tool, Marcel Junker, info@dealpilot.immo)';
   var DEBOUNCE_MS = 350;
   var MIN_QUERY_LENGTH = 3;
   var MAX_RESULTS = 6;

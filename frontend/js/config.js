@@ -54,7 +54,7 @@ window.DealPilotConfig = (function() {
     plz: '32609',
     city: 'Hüllhorst',
     phone: '+49 151 298 200 57',
-    email: 'info@junker-immobilien.io',
+    email: 'info@dealpilot.immo',
     website: 'https://www.junker-immobilien.io'
   };
 
@@ -621,7 +621,7 @@ window.DealPilotConfig = (function() {
         website: 'https://www.junker-immobilien.io',
         // Zentrale E-Mail – aktuell alles hier rein. Über die Felder unten
         // (bankPartner.email etc.) kann später pro Anfragetyp differenziert werden.
-        centralEmail: 'info@junker-immobilien.io'
+        centralEmail: 'info@dealpilot.immo'
       },
       // V63.75: Calendly für Beratungs-Termine (statt Stripe)
       calendly: {
@@ -630,20 +630,20 @@ window.DealPilotConfig = (function() {
         priceLabel: '89 € pro Stunde'
       },
       // Empfänger pro Anfragetyp – aktuell alle = centralEmail.
-      // V185: Alle Mail-Empfänger auf info@junker-immobilien.io vereinheitlicht.
+      // V185: Alle Mail-Empfänger auf info@dealpilot.immo vereinheitlicht.
       // Marcel kann hier später pro Typ unterschiedliche Adressen hinterlegen.
       bankPartner: {
         name: 'Junker Immobilien — Finanzierung',
-        email: 'info@junker-immobilien.io',
-        fbEmail: 'info@junker-immobilien.io'
+        email: 'info@dealpilot.immo',
+        fbEmail: 'info@dealpilot.immo'
       },
       expert: {
         name: 'Junker Immobilien',
-        email: 'info@junker-immobilien.io'
+        email: 'info@dealpilot.immo'
       },
       consult: {
         name: 'Junker Immobilien',
-        email: 'info@junker-immobilien.io',
+        email: 'info@dealpilot.immo',
         priceQuick: 0,    // Schnell-Check kostenlos (Pro/Business)
         price60: 89       // 60-Min-Termin (entspricht Calendly)
       },

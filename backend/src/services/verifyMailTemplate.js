@@ -2,7 +2,7 @@
 /**
  * v627 — Verify-Mail im Boarding-Pass-Design.
  * Wird von registerWithVerify.js genutzt: subject() / renderVerifyText() / renderVerifyMail().
- * Absender setzt mailerService (BETA_MAIL_FROM = "DealPilot <dealpilot@junker-immobilien.io>").
+ * Absender setzt mailerService (BETA_MAIL_FROM = "DealPilot <info@dealpilot.immo>").
  */
 
 function _esc(s) {
@@ -59,7 +59,7 @@ function _brand(o) {
             : 'Deal<span style="color:' + (a ? _b_mix(a, 0.22) : '#E8CC7A') + ';">Pilot</span>',
     tag:  _esc(o.brandTag || 'DEALPILOT'),
     foot: o.footerNote || null,
-    sup:  o.supportEmail || 'support@junker-immobilien.io'
+    sup:  o.supportEmail || 'support@dealpilot.immo'
   };
 }
 

@@ -585,8 +585,8 @@
 
     // V63.77: Adressen typspezifisch — Support an support@, Feedback an dealpilot@
     var mailtoTo = payload.type === 'support'
-      ? 'support@junker-immobilien.io'
-      : 'dealpilot@junker-immobilien.io';
+      ? 'support@dealpilot.immo'
+      : 'info@dealpilot.immo';
     var mailto = 'mailto:' + mailtoTo + '?subject=' +
       encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 

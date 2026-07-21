@@ -142,7 +142,7 @@ async function _fetchOneSeries(seriesSuffix) {
   // 1. Bundesbank
   try {
     const url = BUNDESBANK_BASE + '/' + seriesSuffix +
-                '?format=sdmx-csv&detail=dataonly&lastNObservations=12';
+                '?format=sdmx_csv&detail=dataonly&lastNObservations=12';
     const res = await fetch(url, {
       headers: { 'Accept': 'text/csv', 'User-Agent': 'DealPilot/1.0' },
       // 8s Timeout — wir wollen nicht ewig warten, ECB als Fallback ist da
@@ -388,7 +388,7 @@ function clearCache() {
 // Pfandbrief-Rendite + Marge ≈ marktüblicher Bauzins.
 //
 // Bundesbank-API: BBSIS-Flow mit Key-Schema
-//   D.I.ZAR.ZI.EUR.S1311.B.A604.R{NN}XX.R.A.A._Z._Z.A
+//   D.I.ZAR.ZI.EUR.S122.B.A100.R{NN}XX.R.A.A._Z._Z.A
 // wobei {NN} die Restlaufzeit in Jahren ist (R05XX, R10XX, R15XX, R20XX).
 //
 // Marge-Modell: 3 Stufen (Premium/Standard/Schwach) → User wählt im UI.
@@ -401,10 +401,10 @@ const BBSIS_BASE = 'https://api.statistiken.bundesbank.de/rest/data/BBSIS';
 // "R{NN}XX" (mit "XX"-Suffix) liefert HTTP 200 + Daten.
 // Andere Schreibweisen (R{NN}10, R{NN}00) liefern HTTP 404.
 const PFANDBRIEF_SERIES_VARIANTS = {
-  '5':  ['D.I.ZAR.ZI.EUR.S1311.B.A604.R05XX.R.A.A._Z._Z.A'],
-  '10': ['D.I.ZAR.ZI.EUR.S1311.B.A604.R10XX.R.A.A._Z._Z.A'],
-  '15': ['D.I.ZAR.ZI.EUR.S1311.B.A604.R15XX.R.A.A._Z._Z.A'],
-  '20': ['D.I.ZAR.ZI.EUR.S1311.B.A604.R20XX.R.A.A._Z._Z.A']
+  '5':  ['D.I.ZAR.ZI.EUR.S122.B.A100.R05XX.R.A.A._Z._Z.A'],
+  '10': ['D.I.ZAR.ZI.EUR.S122.B.A100.R10XX.R.A.A._Z._Z.A'],
+  '15': ['D.I.ZAR.ZI.EUR.S122.B.A100.R15XX.R.A.A._Z._Z.A'],
+  '20': ['D.I.ZAR.ZI.EUR.S122.B.A100.R20XX.R.A.A._Z._Z.A']
 };
 
 // Legacy-Map für die Rückwärts-Kompatibilität (export)
@@ -428,9 +428,9 @@ const STATIC_PFANDBRIEF_AS_OF = '2026-05';
 
 // Marge-Modell — wird im Frontend wählbar gemacht
 const MARGINS = {
-  premium:  0.40,  // LTV ≤ 60%, Top-Bonität
-  standard: 0.70,  // LTV 60-80%, normale Bonität
-  schwach:  1.00   // LTV > 90% oder Bonität mittel
+  premium:  0.20,  // LTV ≤ 60%, Top-Bonität
+  standard: 0.30,  // LTV 60-80%, normale Bonität
+  schwach:  0.55   // LTV > 90% oder Bonität mittel
 };
 
 const SOURCE_PFANDBRIEF_LIVE = {

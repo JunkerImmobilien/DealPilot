@@ -167,7 +167,7 @@ async function scan(opts) {
         await query('UPDATE users SET deleted_at = NOW() WHERE id = $1 AND deleted_at IS NULL', [c.user_id]);
         await _send(c.email, 'KONTO DEAKTIVIERT', 'Dein DealPilot-Konto wurde deaktiviert',
           'Hallo' + (c.name ? ' ' + c.name : '') + ',\n\ndein Konto wurde wegen l\u00e4ngerer Inaktivit\u00e4t deaktiviert. Melde dich, wenn du es reaktivieren m\u00f6chtest.\n\nDein DealPilot-Team',
-          'Kontaktiere support@junker-immobilien.io zur Reaktivierung.');
+          'Kontaktiere support@dealpilot.immo zur Reaktivierung.');
       });
       continue;
     }

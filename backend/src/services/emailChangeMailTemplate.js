@@ -52,7 +52,7 @@ function renderNoticeText(firstName, newEmail) {
   var fn = (firstName || '').toString().trim() || 'Pilot';
   return 'Hallo ' + fn + ',\n\n' +
     'die Login-Adresse deines DealPilot-Accounts wurde soeben auf ' + newEmail + ' geändert.\n\n' +
-    'Warst du das nicht? Dann melde dich SOFORT bei support@junker-immobilien.io \u2014 wir helfen dir, deinen Account zu sichern.\n\n\u2014 DealPilot';
+    'Warst du das nicht? Dann melde dich SOFORT bei support@dealpilot.immo \u2014 wir helfen dir, deinen Account zu sichern.\n\n\u2014 DealPilot';
 }
 
 function renderNoticeMail(firstName, newEmail) {
@@ -72,7 +72,7 @@ function renderNoticeMail(firstName, newEmail) {
   '<div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:20px;font-weight:700;color:#1a1407;">Hallo ' + fn + ',</div>' +
   '<div style="font-size:14px;line-height:1.6;color:#3a2e08;margin-top:10px;">die Login-Adresse deines DealPilot-Accounts wurde soeben auf <b>' + _esc(newEmail) + '</b> ge\u00e4ndert.</div>' +
   '<div style="font-size:14px;line-height:1.6;color:#B86250;margin-top:14px;font-weight:700;">Warst du das nicht?</div>' +
-  '<div style="font-size:14px;line-height:1.6;color:#3a2e08;margin-top:4px;">Melde dich sofort bei <a href="mailto:support@junker-immobilien.io" style="color:#b8932f;font-weight:700;">support@junker-immobilien.io</a> \u2014 wir sichern deinen Account.</div>' +
+  '<div style="font-size:14px;line-height:1.6;color:#3a2e08;margin-top:4px;">Melde dich sofort bei <a href="mailto:support@dealpilot.immo" style="color:#b8932f;font-weight:700;">support@dealpilot.immo</a> \u2014 wir sichern deinen Account.</div>' +
 '</td></tr>' +
 '</table></td></tr></table></body></html>';
 }

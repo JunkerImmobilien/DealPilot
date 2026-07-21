@@ -101,7 +101,7 @@ function getAllowedRecipients() {
 function resolveRecipient(requested) {
   const allow = getAllowedRecipients();
   const fallback = process.env.DEAL_ACTION_FALLBACK
-                || 'dealpilot@junker-immobilien.io';
+                || 'info@dealpilot.immo';
 
   if (!requested) return fallback;
   if (!allow)     return requested;        // keine Whitelist → durchreichen

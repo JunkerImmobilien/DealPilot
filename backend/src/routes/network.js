@@ -181,7 +181,7 @@ router.post('/einreichen', async (req, res) => {
     if (mailerService && typeof mailerService.sendMail === 'function') {
       try {
         await mailerService.sendMail({
-          to: 'dealpilot@junker-immobilien.io',
+          to: 'info@dealpilot.immo',
           subject: 'Neue Netzwerk-Karten-Einreichung: ' + card.name,
           text: 'Neue Einreichung ueber die App.\n\nName: ' + card.name +
             '\nVon: ' + (userEmail || 'unbekannt') +
@@ -205,7 +205,7 @@ router.post('/partner-interest', async (req, res) => {
     if (mailerService && typeof mailerService.sendMail === 'function') {
       try {
         await mailerService.sendMail({
-          to: 'dealpilot@junker-immobilien.io',
+          to: 'info@dealpilot.immo',
           subject: 'Partner-werden-Anfrage' + (userEmail ? (' von ' + userEmail) : ''),
           text: 'Anfrage verschickt',
           replyTo: userEmail || undefined

@@ -59,7 +59,7 @@ const config = {
   // Email (placeholder - to be implemented when provider is configured)
   email: {
     provider: process.env.EMAIL_PROVIDER || '',  // 'resend', 'sendgrid', 'smtp'
-    fromAddress: process.env.EMAIL_FROM || 'noreply@junker-immobilien.io',
+    fromAddress: process.env.EMAIL_FROM || 'info@dealpilot.immo',
     apiKey: process.env.EMAIL_API_KEY || ''
   }
 };

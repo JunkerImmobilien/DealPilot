@@ -511,7 +511,7 @@ function handleManualUpgrade(planId, interval) {
 function handleManualUpgradeSafe(planId, interval) {
   try {
     var b = (window.DealPilotConfig && DealPilotConfig.branding) ? DealPilotConfig.branding.get() : {};
-    var to = b.email || 'dealpilot@junker-immobilien.io';
+    var to = b.email || 'info@dealpilot.immo';
     var user = (Auth && Auth.getUser) ? (Auth.getUser() || {}) : {};
     var planLabel = planId.charAt(0).toUpperCase() + planId.slice(1);
     var intervalLabel = (interval === 'yearly') ? 'Jahresabo' : 'Monatsabo';
@@ -590,7 +590,7 @@ function _escAttr(s) {
  */
 function handleDowngradeToFree() {
   var b = (window.DealPilotConfig && DealPilotConfig.branding) ? DealPilotConfig.branding.get() : {};
-  var to = b.email || 'dealpilot@junker-immobilien.io';
+  var to = b.email || 'info@dealpilot.immo';
   var user = (Auth && Auth.getUser) ? (Auth.getUser() || {}) : {};
   var subject = 'Plan-Downgrade auf Free';
   var body =

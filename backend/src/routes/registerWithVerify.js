@@ -10,7 +10,7 @@
  *  1. User schickt {name, email, password} → User wird mit is_active=false angelegt
  *  2. Verify-Token wird generiert, in email_tokens gespeichert
  *  3. Mail an User mit Verify-Link
- *  4. Notification-Mail an Admin (dealpilot@junker-immobilien.io)
+ *  4. Notification-Mail an Admin (info@dealpilot.immo)
  *  5. User klickt Link → User auf is_active=true → JWT-Cookie/Token, Redirect zur App
  *
  * Schutz:
@@ -131,7 +131,7 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
 
     // Admin-Notification (Marcel bekommt Bescheid bei jeder Anmeldung)
     try {
-      const adminMail = process.env.BETA_MAIL_TO || 'dealpilot@junker-immobilien.io';
+      const adminMail = process.env.BETA_MAIL_TO || 'info@dealpilot.immo';
       await mailerService.sendMail({
         to: adminMail,
         subject: '[DealPilot] Neuer Check-in: ' + name,

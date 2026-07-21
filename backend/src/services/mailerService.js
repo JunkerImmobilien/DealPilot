@@ -8,8 +8,8 @@
  *   BETA_SMTP_SECURE     "true" für 465, sonst false (default)
  *   BETA_SMTP_USER       Benutzername
  *   BETA_SMTP_PASS       Passwort
- *   BETA_MAIL_FROM       Absender, z.B. "DealPilot <noreply@junker-immobilien.io>"
- *   BETA_MAIL_TO         Empfänger, default "info@junker-immobilien.io"
+ *   BETA_MAIL_FROM       Absender, z.B. "DealPilot <info@dealpilot.immo>"
+ *   BETA_MAIL_TO         Empfänger, default "info@dealpilot.immo"
  *
  * Wenn HOST/USER/PASS nicht gesetzt sind, läuft der Mailer im DRY-RUN-Modus:
  * loggt die Mail in die Konsole und antwortet mit success:true (für Smoke-Tests).
@@ -74,7 +74,7 @@ function getStatus() {
     configured: Boolean(host && user && pass),
     host: host ? host : null,
     from: process.env.BETA_MAIL_FROM || null,
-    to:   process.env.BETA_MAIL_TO   || 'info@junker-immobilien.io'
+    to:   process.env.BETA_MAIL_TO   || 'info@dealpilot.immo'
   };
 }
 
@@ -85,7 +85,7 @@ function getStatus() {
 async function sendMail(opts) {
   const t = _getTransporter();
   const from = process.env.BETA_MAIL_FROM || (opts.from || 'noreply@example.com');
-  const to   = opts.to || process.env.BETA_MAIL_TO || 'dealpilot@junker-immobilien.io';
+  const to   = opts.to || process.env.BETA_MAIL_TO || 'info@dealpilot.immo';
 
   if (!t) {
     if (process.env.NODE_ENV === 'production' && process.env.MAIL_DRY_RUN_ALLOW !== 'true') {

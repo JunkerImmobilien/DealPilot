@@ -195,9 +195,9 @@ router.post('/', fbLimiter, (req, res) => {
 
       var to;
       if (payload.type === 'support') {
-        to = process.env.SUPPORT_MAIL_TO || 'support@junker-immobilien.io';
+        to = process.env.SUPPORT_MAIL_TO || 'support@dealpilot.immo';
       } else {
-        to = process.env.FEEDBACK_MAIL_TO || 'dealpilot@junker-immobilien.io';
+        to = process.env.FEEDBACK_MAIL_TO || 'info@dealpilot.immo';
       }
 
       await mailerService.sendMail({

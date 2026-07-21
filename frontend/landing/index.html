@@ -877,7 +877,36 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
           </div>
         </div>
       </div>
-      <div class="cond-foot"><span class="badge"><i></i>Live &middot; Bundesbank</span> <span>&middot; Stand Feb&nbsp;2026 &middot; indikative Sch&auml;tzung, kein Bankangebot &middot; keine Finanzierungsberatung (&sect;&nbsp;34c GewO)</span></div>
+      <div class="cond-foot"><span class="badge"><i></i>Live &middot; Bundesbank</span> <span>&middot; <span id="mz-asof">Stand Feb&nbsp;2026</span> &middot; indikative Sch&auml;tzung, kein Bankangebot &middot; keine Finanzierungsberatung (&sect;&nbsp;34c GewO)</span></div>
+<script id="v-marktzins-live">
+(function(){
+  function pct(v){return (Math.round(v*100)/100).toFixed(2).replace(".",",")+"\u00a0%";}
+  function mon(iso){var d=new Date(iso);if(isNaN(d.getTime()))return null;var m=["Jan","Feb","M\u00e4r","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];return "Stand "+m[d.getMonth()]+"\u00a0"+d.getFullYear();}
+  try{
+    fetch("/api/v1/market-rates/pfandbrief?maturities=5,10,15,20")
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(res){
+        if(!res)return;
+        // defensiv: Nutzdaten evtl. top-level oder in .data/.pfandbrief
+        var d=res.indicativeRates?res:(res.data&&res.data.indicativeRates?res.data:(res.pfandbrief&&res.pfandbrief.indicativeRates?res.pfandbrief:null));
+        if(!d||!d.indicativeRates)return; // Fallback: HTML-Werte bleiben
+        var order=["5","10","15","20"];
+        var tiles=document.querySelectorAll(".cond-tiles .cond-tile");
+        var marge=(d.margins&&typeof d.margins.schwach==="number")?d.margins.schwach:1.00;
+        order.forEach(function(m,i){
+          var t=tiles[i]; if(!t)return;
+          var ind=d.indicativeRates[m]; var y=d.yields&&d.yields[m];
+          if(!ind||typeof ind.schwach!=="number"||y==null)return;
+          var rr=t.querySelector(".ct-r"); if(rr)rr.innerHTML=pct(ind.schwach);
+          var dd=t.querySelector(".ct-d"); if(dd)dd.innerHTML="Pfandbrief "+pct(y)+" + Marge "+pct(marge);
+        });
+        var as=document.getElementById("mz-asof");
+        if(as&&d.asOf){var s=mon(d.asOf); if(s)as.innerHTML=s;}
+      })
+      .catch(function(){});
+  }catch(e){}
+})();
+</script>
     </section>
   <hr class="rw">
 
@@ -1057,7 +1086,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
                 <li>Mandanten-Seats separat &mdash; ab 24 &euro; je Mandant</li>
                 <li>Schnittstellen &amp; Anpassungen auf Wunsch &mdash; nach Aufwand</li>
               </ul>
-              <a class="dp-pcta" href="mailto:dealpilot@junker-immobilien.io?subject=Partner-Anfrage%20%E2%80%93%20DealPilot&amp;body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20den%20Partner-Plan.%0A%0AName%3A%0AKanzlei%20%2F%20B%C3%BCro%3A%0ARolle%20(Steuerberater%20%2F%20Makler%20%2F%20Finanzierer%20%2F%20Hausverwalter)%3A%0AEtwa%20wie%20viele%20Mandanten%3A%0A%0AMeine%20Frage%3A%0A">Unverbindlich anfragen &rarr;</a>
+              <a class="dp-pcta" href="mailto:info@dealpilot.immo?subject=Partner-Anfrage%20%E2%80%93%20DealPilot&amp;body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20den%20Partner-Plan.%0A%0AName%3A%0AKanzlei%20%2F%20B%C3%BCro%3A%0ARolle%20(Steuerberater%20%2F%20Makler%20%2F%20Finanzierer%20%2F%20Hausverwalter)%3A%0AEtwa%20wie%20viele%20Mandanten%3A%0A%0AMeine%20Frage%3A%0A">Unverbindlich anfragen &rarr;</a>
               <button class="dp-pcta-off" type="button" disabled>Direkt buchen &middot; demn&auml;chst</button>
               <div class="dp-poff-hint">Partner schalten wir derzeit <b>pers&ouml;nlich</b> frei &mdash; inklusive Einrichtung Ihres Brandings und einer kurzen Einweisung. Direktbuchung folgt.</div>
               <div class="dp-pbar"><span class="dp-pbc">||||| |||| ||||</span><span class="dp-pbl">&#9992; BOARDING PASS &middot; DP-P1</span></div>
@@ -1257,7 +1286,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
 
 <script>
 (function(){
-  var APP=(location.hostname.indexOf('staging')>-1?'https://app.staging.dealpilot.junker-immobilien.io':'https://app.dealpilot.junker-immobilien.io')+'/mobile-demo.html'; /*v896-appurl*/
+  var APP='https://'+((location.hostname||'').toLowerCase().indexOf('app.')===0?location.hostname:'app.'+location.hostname)+'/mobile-demo.html'; /*v896-appurl immo-aware*/
   try{ var _ib=document.getElementById('dpc-install'); if(_ib) _ib.href=APP; }catch(e){}
   try{ var _qt=document.querySelector('.dpc-qr .qt'); if(_qt) _qt.innerHTML='<b>Scan mit dem Handy</b>'+APP.replace(/^https?:\/\//,'').replace(/\/mobile-demo\.html$/,''); }catch(e){}
   // Android/Desktop auf App-Origin: nativen Install-Prompt abfangen
@@ -1312,8 +1341,8 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
           <p class="footer-tag">Immobilien-Investmentanalyse f&uuml;r strukturierte Entscheidungen. Entwickelt von Junker Immobilien &middot; Sachverst&auml;ndigenb&uuml;ro &amp; Projektentwicklung.</p>
         </div>
         <div class="footer-col"><h4>Produkt</h4><a data-scroll="workflow">So funktioniert's</a><a data-scroll="features">Features</a><a data-view="lu" style="cursor:pointer">Leistungsumfang</a><a data-scroll="pricing">Preise</a><a data-scroll="app">App</a></div>
-        <div class="footer-col"><h4>Junker Immobilien</h4><a href="https://junker-immobilien.io">Hauptseite</a><a href="#">Kapitalanlage</a><a href="#">Projektentwicklung</a><a href="#">Kontakt</a></div>
-        <div class="footer-col"><h4>Kontakt</h4><a href="mailto:support@junker-immobilien.io">support@junker-immobilien.io</a><a href="mailto:dealpilot@junker-immobilien.io">dealpilot@junker-immobilien.io</a><a href="#">Impressum</a><a href="#">Datenschutz</a></div>
+        <div class="footer-col"><h4>Junker Immobilien</h4><a href="https://junker-immobilien.io">Hauptseite</a><a href="https://junker-immobilien.io" target="_blank" rel="noopener">Kapitalanlage</a><a href="https://junker-immobilien.io" target="_blank" rel="noopener">Projektentwicklung</a><a href="mailto:info@dealpilot.immo">Kontakt</a></div>
+        <div class="footer-col"><h4>Kontakt</h4><a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a><a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a><a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a></div>
       </div>
       <div class="footer-bottom"><div>© 2026 Junker Immobilien</div><div>Keine Steuer- oder Finanzberatung. Analyse-Tool f&uuml;r eigene Kalkulationen.</div></div>
     </div>
@@ -1414,7 +1443,7 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
               <div class="c"><h3>Das kann sie heute</h3><p>Vollen Lese- und Schreibzugriff auf deine Objekte (CRUD), Summaries mit letztem KPI-Stand, Fotos und KI-Analyse-Text inklusive. Ideal für Import, Sync und eigenes Reporting.</p></div>
               <div class="c"><h3>Berechnungen</h3><p>Deal Score, DSCR, Cashflow und Steuer werden in der App gerechnet. Die API liefert Rohdaten plus den zuletzt gespeicherten KPI-Stand — eine On-Demand-Berechnung per API gibt es noch nicht.</p></div>
               <div class="c"><h3>Noch nicht per API</h3><p>KI-Co-Pilot und AVM-Marktbewertungen, PDF-Export-Erzeugung, Webhooks bei Änderungen sowie Volltextsuche/Filter (aktuell <code>limit</code>/<code>offset</code>).</p></div>
-              <div class="c"><h3>Roadmap</h3><p>Genau diese Punkte stehen auf der Ausbauliste. Du brauchst einen davon zuerst? Schreib an <a href="mailto:dealpilot@junker-immobilien.io">dealpilot@junker-immobilien.io</a> — API-Wünsche fließen direkt in die Priorisierung.</p></div>
+              <div class="c"><h3>Roadmap</h3><p>Genau diese Punkte stehen auf der Ausbauliste. Du brauchst einen davon zuerst? Schreib an <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a> — API-Wünsche fließen direkt in die Priorisierung.</p></div>
             </div>
           </div>
         </div>
@@ -4062,14 +4091,17 @@ html{scroll-behavior:smooth}
      per setAttribute/innerHTML erzeugt). Auf staging schickt das Tester ins
      LIVE-System. Kein window.open/location.href in der Datei -> ein a[href]-Sweep
      erwischt wirklich alles. Auf Prod passiert nichts. */
-  var STG = /(^|\.)staging\./i.test(location.hostname);
+  /* immo-aware: App-Host = 'app.' + Landing-Host (deckt alle 4 Domains) */
+  var _lph=(location.hostname||'').toLowerCase();
+  var _appHost=_lph.indexOf('app.')===0?_lph:'app.'+_lph;
+  var _isDp=/dealpilot/.test(_lph);
   function relink(root){
-    if(!STG) return;
-    var as; try{ as=(root||document).querySelectorAll('a[href*="app.dealpilot.junker-immobilien.io"]'); }catch(e){ return; }
+    if(!_isDp) return;
+    var as; try{ as=(root||document).querySelectorAll('a[href*="dealpilot.junker-immobilien.io"]'); }catch(e){ return; }
     Array.prototype.forEach.call(as, function(a){
       if(a.getAttribute('data-stg')) return;
       a.setAttribute('data-stg','1');
-      a.href = a.href.replace('//app.dealpilot.', '//app.staging.dealpilot.');
+      a.href = a.href.replace(/app\.(staging\.)?dealpilot\.junker-immobilien\.io/gi, _appHost);
     });
   }
 

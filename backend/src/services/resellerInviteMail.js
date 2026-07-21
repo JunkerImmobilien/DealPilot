@@ -14,7 +14,7 @@ function esc(s) {
 
 function getMailFrom(brandName) {
   var name = brandName || process.env.MAIL_FROM_NAME || 'DealPilot';
-  var addr = process.env.MAIL_FROM_ADDRESS || process.env.BETA_SMTP_USER || 'dealpilot@junker-immobilien.io';
+  var addr = process.env.MAIL_FROM_ADDRESS || process.env.BETA_SMTP_USER || 'info@dealpilot.immo';
   return '"' + name.replace(/"/g, '') + '" <' + addr + '>';
 }
 

@@ -34,9 +34,8 @@
   // ─── App-URL für aktuelles Environment ─────────────────────────
   // path: optionaler Pfad oder Query, z.B. "?register=1"
   function appUrl(path) {
-    var base = isStaging()
-      ? 'https://app.staging.dealpilot.junker-immobilien.io/'
-      : 'https://app.dealpilot.junker-immobilien.io/';
+    var _lph=(location.hostname||'').toLowerCase();
+    var base = 'https://' + (_lph.indexOf('app.')===0?_lph:'app.'+_lph) + '/';
 
     if (!path) return base;
 
@@ -48,9 +47,7 @@
 
   // ─── Marketing-URL (für Cross-Linking innerhalb Marketing) ─────
   function marketingUrl(path) {
-    var base = isStaging()
-      ? 'https://staging.dealpilot.junker-immobilien.io/'
-      : 'https://dealpilot.junker-immobilien.io/';
+    var base = 'https://' + (location.hostname||'dealpilot.junker-immobilien.io') + '/';
 
     if (!path) return base;
     if (path.charAt(0) === '/') path = path.substring(1);

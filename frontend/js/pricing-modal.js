@@ -919,7 +919,7 @@
       console.error('[pricing-modal stripe-checkout] error:', e);
       var msg = (e && e.message) ? e.message : 'Stripe-Checkout fehlgeschlagen';
       if (msg.indexOf('not yet available') >= 0 || msg.indexOf('503') >= 0) {
-        msg = 'Dieser Plan kann aktuell nicht online abonniert werden. Bitte info@junker-immobilien.io kontaktieren.';
+        msg = 'Dieser Plan kann aktuell nicht online abonniert werden. Bitte info@dealpilot.immo kontaktieren.';
       }
       if (typeof toast === 'function') toast('❌ ' + msg);
     }
