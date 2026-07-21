@@ -518,7 +518,7 @@
   function buildExportCard() {
     // V185: PDF-Export entfernt — User darf das Gutachten nicht selbst herunterladen.
     // Stattdessen "Anfrage stellen" — RND-Daten + Objekt-JSON gehen als Mail an
-    // info@junker-immobilien.io. Antwort/Gutachten kommt per Mail vom Sachverständigen.
+    // info@dealpilot.immo. Antwort/Gutachten kommt per Mail vom Sachverständigen.
     return ''
       + '<div class="rnd-card rnd-export-card">'
       + '  <h3>Restnutzungsdauer-Gutachten anfragen</h3>'
@@ -531,7 +531,7 @@
       + '  <div class="rnd-help" style="margin-top:10px;font-size:11px;color:#8c7a4a;">'
       +    '<strong>Datenversand:</strong> Übermittelt werden die Adresse, Bewertungs-Eingaben '
       +    'und das vollständige Objekt-Datenblatt (JSON) an '
-      +    '<strong>info@junker-immobilien.io</strong>. Eine Kopie geht an deine '
+      +    '<strong>info@dealpilot.immo</strong>. Eine Kopie geht an deine '
       +    'hinterlegte E-Mail-Adresse.'
       + '  </div>'
       + '</div>';
@@ -649,7 +649,7 @@
     renderFull(renderTarget);
   }
 
-  // V185: RND-Anfrage stellen — sendet alle Daten als Mail an info@junker-immobilien.io.
+  // V185: RND-Anfrage stellen — sendet alle Daten als Mail an info@dealpilot.immo.
   // V186: Nutzt jetzt den dedizierten /api/v1/rnd-request-Endpoint (statt
   // /api/v1/deal-action/submit zu hijacken). Mailto-Fallback bei Backend-Fehler.
   function onSubmitRequest() {

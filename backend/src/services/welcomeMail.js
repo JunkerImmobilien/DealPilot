@@ -20,7 +20,7 @@ const mailLayout = require('./mailLayout'); // v893q-kerosin
 
 function getMailFrom() {
   const name = process.env.MAIL_FROM_NAME || 'DealPilot';
-  const addr = process.env.MAIL_FROM_ADDRESS || process.env.BETA_SMTP_USER || 'dealpilot@junker-immobilien.io';
+  const addr = process.env.MAIL_FROM_ADDRESS || process.env.BETA_SMTP_USER || 'info@dealpilot.immo';
   return `"${name}" <${addr}>`;
 }
 
@@ -119,7 +119,7 @@ async function sendSubscriptionWelcome(db, { userId, planName, planId, amountCen
     plan_price: fmtMoney(amountCents),
     billing_interval: intervalLabel,
     app_url: appUrl,
-    support_email: process.env.SUPPORT_MAIL_TO || 'support@junker-immobilien.io',
+    support_email: process.env.SUPPORT_MAIL_TO || 'support@dealpilot.immo',
     current_year: new Date().getFullYear()
   });
 

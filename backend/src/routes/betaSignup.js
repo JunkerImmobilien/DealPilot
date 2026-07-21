@@ -11,7 +11,7 @@
  *   - Rate-Limit: 5 Anfragen pro IP pro Stunde
  *   - Validation per Zod
  *
- * Sendet Mail an info@junker-immobilien.io (oder BETA_MAIL_TO).
+ * Sendet Mail an info@dealpilot.immo (oder BETA_MAIL_TO).
  * Bei fehlender SMTP-Konfig in production → 503.
  */
 
@@ -89,7 +89,7 @@ router.post('/', betaLimiter, async (req, res) => {
   try {
     await mailerService.sendMail({
       // V63.77: Beta-Anfragen gehen explizit an dealpilot@…
-      to: process.env.BETA_MAIL_TO || 'dealpilot@junker-immobilien.io',
+      to: process.env.BETA_MAIL_TO || 'info@dealpilot.immo',
       subject: subject,
       text: text,
       html: html,
@@ -110,11 +110,11 @@ router.post('/', betaLimiter, async (req, res) => {
     console.error('[beta-signup] Mail-Fehler:', err.message);
     if (err.code === 'NO_SMTP') {
       return res.status(503).json({
-        error: 'Mail-Versand ist gerade nicht konfiguriert. Bitte schreibe direkt an info@junker-immobilien.io oder versuche es später erneut.'
+        error: 'Mail-Versand ist gerade nicht konfiguriert. Bitte schreibe direkt an info@dealpilot.immo oder versuche es später erneut.'
       });
     }
     return res.status(502).json({
-      error: 'Mail konnte nicht versendet werden. Bitte versuche es in ein paar Minuten erneut oder schreibe direkt an info@junker-immobilien.io.'
+      error: 'Mail konnte nicht versendet werden. Bitte versuche es in ein paar Minuten erneut oder schreibe direkt an info@dealpilot.immo.'
     });
   }
 });

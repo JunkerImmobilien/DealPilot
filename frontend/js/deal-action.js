@@ -66,7 +66,7 @@ window.DealPilotDealAction = (function() {
       
       // Deep-Clone von base damit wir nicht den Original-Config mutieren
       var c = JSON.parse(JSON.stringify(base));
-      var defaultEmail = s.pdf_email || (c.brand && c.brand.centralEmail) || 'info@junker-immobilien.io';
+      var defaultEmail = s.pdf_email || (c.brand && c.brand.centralEmail) || 'info@dealpilot.immo';
       
       // Brand-Name (für Submit-Buttons "An [Firma] senden")
       if (s.user_company) {
@@ -124,7 +124,7 @@ window.DealPilotDealAction = (function() {
   // V63.75: Brand-Empfänger / Webseite zentral abrufen
   function brand() {
     var c = cfg();
-    return (c.brand) || { name: 'Junker Immobilien', website: 'https://www.junker-immobilien.io', centralEmail: 'info@junker-immobilien.io' };
+    return (c.brand) || { name: 'Junker Immobilien', website: 'https://www.junker-immobilien.io', centralEmail: 'info@dealpilot.immo' };
   }
   
   // V192: Helper für aktuellen Firmennamen (aus Branding) — fallback Junker
@@ -2257,7 +2257,7 @@ window.DealPilotDealAction = (function() {
       '    Die Anfrage konnte nicht direkt an ' + _brandCompany() + ' gesendet werden ' +
       '    <span style="color:#a04943">(' + (err && err.message ? err.message : 'Verbindungsfehler') + ')</span>.<br><br>' +
       '    <strong style="color:#2A2727">Alternative:</strong> Bitte laden Sie die Daten herunter und senden sie per E-Mail an ' +
-      '    <a href="mailto:info@junker-immobilien.io" style="color:var(--wl-c9a84c, #C9A84C);text-decoration:none;font-weight:600">info@junker-immobilien.io</a>.' +
+      '    <a href="mailto:info@dealpilot.immo" style="color:var(--wl-c9a84c, #C9A84C);text-decoration:none;font-weight:600">info@dealpilot.immo</a>.' +
       '  </p>' +
       '  <div style="display:flex;gap:10px;justify-content:center">' +
       '    <button class="btn btn-outline" onclick="document.getElementById(\'rnd-anfrage-modal\').remove()">Abbrechen</button>' +

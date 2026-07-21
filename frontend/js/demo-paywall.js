@@ -345,7 +345,7 @@ var Paywall = (function() {
           '<div class="up-feat">✓ Bank-PDFs in Premium-Layout</div>' +
         '</div>' +
         '<div style="text-align:center;margin-top:18px">' +
-          '<a class="btn btn-gold" href="mailto:info@junker-immobilien.io?subject=Dealpilot Premium Interesse" style="text-decoration:none">📧 Interesse bekunden</a>' +
+          '<a class="btn btn-gold" href="mailto:info@dealpilot.immo?subject=Dealpilot Premium Interesse" style="text-decoration:none">📧 Interesse bekunden</a>' +
         '</div>' +
       '</div>';
     document.body.appendChild(modal);

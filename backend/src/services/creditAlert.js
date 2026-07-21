@@ -10,7 +10,7 @@ const { sendMail } = require('./mailerService');
 const GEOMAP_BASE  = (process.env.GEOMAP_BASE || 'https://api.geomap.immo').replace(/\/+$/, '');
 const GEOMAP_TOKEN = process.env.GEOMAP_TOKEN || '';
 const THRESHOLD    = parseFloat(process.env.GEOMAP_ALERT_THRESHOLD_EUR || '10');
-const ALERT_TO     = process.env.CREDIT_ALERT_TO || 'info@junker-immobilien.io';
+const ALERT_TO     = process.env.CREDIT_ALERT_TO || 'info@dealpilot.immo';
 
 // Holt das GeoMap-Restguthaben (EUR netto) oder null.
 async function fetchGeomapBalance() {

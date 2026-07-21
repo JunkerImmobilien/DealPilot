@@ -16,7 +16,7 @@
  * Authentifiziert (User muss eingeloggt sein).
  * Speichert die Anfrage als JSON im Verzeichnis /data/rnd-requests/
  * für späteren Import ins RND-Modul.
- * Sendet Mail-Notification an info@junker-immobilien.io.
+ * Sendet Mail-Notification an info@dealpilot.immo.
  */
 
 const express = require('express');
@@ -170,7 +170,7 @@ router.post('/', authenticate, rndLimiter, async (req, res) => {
   // Mail senden
   try {
     await mailerService.sendMail({
-      to: process.env.RND_REQUEST_MAIL_TO || 'info@junker-immobilien.io',  // V189
+      to: process.env.RND_REQUEST_MAIL_TO || 'info@dealpilot.immo',  // V189
       subject: subject,
       text: text,
       html: html,

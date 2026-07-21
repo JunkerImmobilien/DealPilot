@@ -94,7 +94,7 @@
               'Abrechnung) oder einem Jahr (jährliche Abrechnung). Verbraucher können kostenpflichtige ' +
               'Verträge nach der ersten Mindestlaufzeit jederzeit mit einer Frist von einem Monat ' +
               'zum Monatsende kündigen. Kündigung über das Stripe-Customer-Portal oder per E-Mail an ' +
-              '<a href="mailto:info@junker-immobilien.io">info@junker-immobilien.io</a>.'
+              '<a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>.'
       },
       {
         titel: '8. Datenverarbeitung (DSGVO)',

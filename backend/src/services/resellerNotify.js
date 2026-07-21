@@ -18,14 +18,14 @@ function escapeHtml(s) {
 
 function getMailFrom() {
   const name = process.env.MAIL_FROM_NAME || 'DealPilot';
-  const addr = process.env.MAIL_FROM_ADDRESS || process.env.BETA_SMTP_USER || 'dealpilot@junker-immobilien.io';
+  const addr = process.env.MAIL_FROM_ADDRESS || process.env.BETA_SMTP_USER || 'info@dealpilot.immo';
   return `"${name}" <${addr}>`;
 }
 
 async function notifyAdminAboutReseller(db, { id, contact_name, email, company, message, goals }) {
   const adminEmail = process.env.RESELLER_NOTIFY_EMAIL ||
                      process.env.SUPPORT_MAIL_TO ||
-                     'support@junker-immobilien.io';
+                     'support@dealpilot.immo';
   const appUrl = process.env.APP_URL || 'https://dealpilot.junker-immobilien.io';
 
   const html = `
@@ -59,7 +59,7 @@ async function notifyAdminAboutReseller(db, { id, contact_name, email, company, 
 
 async function sendResellerAcknowledgement(db, { contact_name, email }) {
   const appUrl = process.env.APP_URL || 'https://dealpilot.junker-immobilien.io';
-  const supportEmail = process.env.SUPPORT_MAIL_TO || 'support@junker-immobilien.io';
+  const supportEmail = process.env.SUPPORT_MAIL_TO || 'support@dealpilot.immo';
 
   const html = `
 <!DOCTYPE html>

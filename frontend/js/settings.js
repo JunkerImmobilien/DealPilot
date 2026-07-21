@@ -1775,7 +1775,7 @@ function _renderPlanPane() {
     if (isCurrent) {
       html += '<button class="btn btn-outline btn-sm" disabled>✓ Aktueller Plan</button>';
     } else if (key === 'free') {
-      html += '<button class="btn btn-outline btn-sm" disabled title="Downgrade per Mail: dealpilot@junker-immobilien.io">Downgrade auf Anfrage</button>';
+      html += '<button class="btn btn-outline btn-sm" disabled title="Downgrade per Mail: info@dealpilot.immo">Downgrade auf Anfrage</button>';
     } else {
       html += '<button class="btn btn-gold btn-sm" onclick="_startStripeCheckout(\'' + key + '\')">' +
               (billingCycle === 'yearly' ? 'Jährlich abonnieren' : 'Monatlich abonnieren') + '</button>';
@@ -1910,7 +1910,7 @@ async function _startStripeCheckout(planKey) {
     console.error('[stripe-checkout] error:', e);
     var msg = e && e.message ? e.message : 'Stripe-Checkout fehlgeschlagen';
     if (msg.indexOf('not yet available') >= 0 || msg.indexOf('503') >= 0) {
-      msg = 'Dieser Plan kann aktuell nicht online abonniert werden. Bitte dealpilot@junker-immobilien.io kontaktieren.';
+      msg = 'Dieser Plan kann aktuell nicht online abonniert werden. Bitte info@dealpilot.immo kontaktieren.';
     }
     if (typeof toast === 'function') toast('❌ ' + msg);
     if (btn) {
@@ -2160,7 +2160,7 @@ function _renderRechtlichesPane() {
 
         '<h4>Kontakt</h4>' +
         '<p>Telefon: +49 151 29820057<br>' +
-        'E-Mail: dealpilot@junker-immobilien.io<br>' +
+        'E-Mail: info@dealpilot.immo<br>' +
         'Website: www.junker-immobilien.io</p>' +
 
         '<h4>Umsatzsteuer</h4>' +
@@ -2192,7 +2192,7 @@ function _renderRechtlichesPane() {
       '<div class="info-legal-text">' +
         '<h4>1. Verantwortlicher</h4>' +
         '<p>Junker Immobilien, Inhaber: Marcel Junker, Hermannstraße 9, 32609 Hüllhorst, Deutschland<br>' +
-        'Telefon: +49 151 29820057, E-Mail: dealpilot@junker-immobilien.io</p>' +
+        'Telefon: +49 151 29820057, E-Mail: info@dealpilot.immo</p>' +
 
         '<h4>2. Allgemeine Hinweise zur Datenverarbeitung</h4>' +
         '<p>Wir verarbeiten personenbezogene Daten ausschließlich im Rahmen der geltenden Datenschutzgesetze (insbesondere DSGVO). Personenbezogene Daten sind alle Informationen, mit denen Sie persönlich identifiziert werden können.</p>' +
@@ -2284,7 +2284,7 @@ function _renderRechtlichesPane() {
       '<div class="info-section-title" style="font-weight:600;font-size:15px;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><use href="#i-file-text"/></svg>Deine Zustimmung</div>' +
       '<div class="info-legal-text">' +
         '<p>' + _dpGetConsentStatusHTML() + '</p>' +
-        '<p style="font-size:12px;color:#888;margin-top:8px">Bei Fragen wende dich an <a href="mailto:dealpilot@junker-immobilien.io" style="color:#C9A84C">dealpilot@junker-immobilien.io</a>.</p>' +
+        '<p style="font-size:12px;color:#888;margin-top:8px">Bei Fragen wende dich an <a href="mailto:info@dealpilot.immo" style="color:#C9A84C">info@dealpilot.immo</a>.</p>' +
       '</div>' +
     '</div>'
   );

@@ -1034,7 +1034,7 @@ router.post('/tickets/:id/reply', requireAdmin, _tkUpload, async (req, res) => {
         const mailer = require('../services/mailerService');
         await mailer.sendMail({
           to: t.contact_email,
-          replyTo: process.env.SUPPORT_MAIL_TO || 'support@junker-immobilien.io',
+          replyTo: process.env.SUPPORT_MAIL_TO || 'support@dealpilot.immo',
           subject: 'Re: [DP-' + String(req.params.id).slice(0, 8) + '] ' + (t.subject || 'Deine Anfrage'),
           text: String(body) + '\n\n-- DealPilot Support, Junker Immobilien',
           html: mailLayout.wrap({
