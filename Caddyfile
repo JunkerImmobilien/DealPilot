@@ -36,6 +36,13 @@
             header_up X-Forwarded-Host {host}
         }
     }
+    # marktzins: Live-Pfandbriefzinsen fuer die Landing (GET) ans Backend
+    handle /api/v1/market-rates* {
+        reverse_proxy backend:3001 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+        }
+    }
 
     # Legal-Pages (Datenschutz, Impressum, AGB, Reseller)
     handle /datenschutz.html {
@@ -43,6 +50,10 @@
         file_server
     }
     handle /impressum.html {
+        root * /srv/frontend
+        file_server
+    }
+    handle /agb.html {
         root * /srv/frontend
         file_server
     }
