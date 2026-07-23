@@ -1,0 +1,79 @@
+/* ============================================================================
+   landing-mobile.css — Mobil-Feinschliff der Landing
+   Wird im <head> geladen, also VOR den Inline-<style>-Bloecken im Body. Damit
+   die Regeln trotzdem greifen, ist jede an eine ID (#pricing, #app) oder an
+   eine neue eigene Klasse gebunden — kein Sammelselektor auf Container-Kinder
+   (die :not(#id)-Lehre vom 23.07.).
+
+   Der eigentliche Fehler — .tkg blieb auf dem Handy zweispaltig — ist NICHT
+   hier, sondern direkt in index.html behoben. Ursache statt Symptom.
+   ========================================================================= */
+
+/* ── Handy ─────────────────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+
+  /* Preiszeile: .tk-price ist ein Flex ohne Umbruch. Seit der Promo schiebt
+     promo-erstflug.js den durchgestrichenen Altpreis davor — das passte in
+     121 px nutzbare Breite nie. Jetzt darf es umbrechen. */
+  #pricing .tk-price { flex-wrap: wrap; row-gap: 2px; }
+  #pricing .tk-price b { font-size: 38px; }
+  #pricing .tk-price .dpp-old { font-size: 15px; margin-right: 9px; }
+
+  /* Perforationszeile: white-space:nowrap war eine garantierte Ueberlaufquelle */
+  #pricing .tk-rip { padding-left: 14px; padding-right: 14px; }
+  #pricing .tk-rip .bar { max-width: 38%; }
+  #pricing .tk-rip .bp-txt { white-space: normal; text-align: right; line-height: 1.5; }
+
+  /* Etwas engere Innenabstaende — gewinnt rund 8 px Textbreite je Ticket */
+  #pricing .tk-body { padding: 15px 17px 18px; }
+  #pricing .tk-stub { padding: 13px 17px 11px; }
+  #pricing .tk-name { font-size: 21px; }
+  #pricing .tk-ker  { padding: 6px 9px; }
+
+  /* Rabatt-Chip darf brechen statt zu schieben */
+  #pricing .dpp-badge { white-space: normal; line-height: 1.4; }
+
+  /* Einklappbare Leistungen: ab dem dritten Punkt eingeklappt.
+     Die Klasse setzt landing-mobile.js, das Ausblenden macht CSS —
+     dadurch verhaelt sich Drehen des Geraets ohne weiteres Zutun richtig. */
+  #pricing .tk-feat.tkf-collapsed > li:nth-child(n+3) { display: none; }
+  #pricing .tk-feat.tkf-collapsed { margin-bottom: 10px; }
+}
+
+/* ── Der Aufklapp-Knopf ────────────────────────────────────────────────── */
+.tkf-more {
+  display: block;
+  width: 100%;
+  margin: -8px 0 16px;
+  padding: 9px 10px;
+  background: transparent;
+  border: 1px dashed rgba(201, 168, 76, .45);
+  border-radius: 9px;
+  color: #8a6d24;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .04em;
+  cursor: pointer;
+  text-align: center;
+  transition: background .16s, border-color .16s;
+}
+.tkf-more:hover { background: rgba(201, 168, 76, .1); border-color: rgba(201, 168, 76, .75); }
+.tkf-more:focus-visible { outline: 2px solid #C9A84C; outline-offset: 2px; }
+.tkf-more .chev { display: inline-block; margin-left: 5px; transition: transform .18s; }
+.tkf-more[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+/* Ab Tablet aufwaerts ist nichts eingeklappt — der Knopf hat dort nichts zu tun */
+@media (min-width: 561px) { .tkf-more { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tkf-more, .tkf-more .chev { transition: none; }
+}
+
+/* ── Querscroll auf kleinen Geraeten ───────────────────────────────────────
+   .dpc-left traegt min-width:320px. Unter rund 360 px Viewport passt das
+   nicht mehr in den Container und die ganze Seite laesst sich seitlich
+   schieben. Der Fix steht in index.html (min(320px,100%)); hier bleibt nur
+   die Absicherung fuer den Fall, dass der Block anderswo wiederverwendet wird. */
+@media (max-width: 380px) {
+  #app .dpc-wrap { gap: 30px; }
+}
