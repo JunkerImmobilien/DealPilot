@@ -684,6 +684,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
 </style>
 <style id="v897-hide-app">/*v897-hide-app: App-Bereich temporaer ausgeblendet, zum Live-Gang wieder einblenden (Style entfernen)*/ a[data-scroll="app"],#app,.dp-appcta{display:none !important}</style>
   <link rel="stylesheet" href="landing-motion.css?v=4">
+<link rel="stylesheet" href="landing-mobile.css?v=1">
 </head>
 <body class="intro-lock">
 
@@ -989,7 +990,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
 .mxlbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.01em;color:#6b5410;font-weight:600;background:rgba(201,168,76,.16);border:1px solid rgba(201,168,76,.32);border-radius:6px;padding:3px 8px;display:inline-block;line-height:1.35}
 .mx-foot{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.55);margin-top:12px;text-align:center}
 @media(max-width:900px){.tkg{grid-template-columns:1fr 1fr}.bw{grid-template-columns:150px 16px 1fr}.bw-gate{grid-column:1/-1;border-left:0;border-top:1px dashed rgba(27,24,21,.22);flex-direction:row;justify-content:space-between}.bw-body{grid-template-columns:1fr}.bw-col{border-right:0;border-bottom:1px solid rgba(27,24,21,.08)}.bw-col:last-child{border-bottom:0}}
-@media(max-width:520px){.tkg,.bw-segs{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.tkg{grid-template-columns:1fr}}@media(max-width:520px){.bw-segs{grid-template-columns:1fr 1fr}}
 </style>
 
   <!-- TRUST-BAND — v23 -->
@@ -1227,7 +1228,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
   background:repeating-linear-gradient(102deg,rgba(201,168,76,.05) 0 1px,transparent 1px 13px)}
 .dp-appcta *{box-sizing:border-box}
 .dpc-wrap{max-width:1080px;margin:0 auto;position:relative;z-index:2;display:flex;gap:56px;align-items:center;flex-wrap:wrap}
-.dpc-left{flex:1;min-width:320px}
+.dpc-left{flex:1;min-width:min(320px,100%)}
 .dpc-kick{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--gh)}
 .dpc-left h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:44px;line-height:1.08;letter-spacing:-.01em;margin:16px 0 0}
 .dpc-left h2 em{font-style:normal;color:transparent;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text}
@@ -4170,5 +4171,6 @@ html{scroll-behavior:smooth}
 
 </body><script src="landing-motion.js?v=9"></script>
 <script src="promo-erstflug.js?v=6"></script>
+<script src="landing-mobile.js?v=1"></script>
 </body>
 </html>
