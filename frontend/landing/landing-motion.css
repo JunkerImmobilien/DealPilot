@@ -1,0 +1,105 @@
+/* landing-motion.css — Cockpit-Intro + Hero-Video.
+   Rabatt-Optik liegt in promo-erstflug.js (selbst injiziert, .dpp-*).
+   Gold immer ueber die --wl-Ebene (White-Label-Pflicht). */
+:root{--dpm-gold:var(--wl-c9a84c,#C9A84C);--dpm-gold-l:var(--wl-e8cc7a,#E8CC7A);
+ --dpm-runway:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));
+ --dpm-planeY:100%;--dpm-planeZ:1}
+
+/* v3: Altes Licht-Intro HART aus. Vorher hing das an body.dpm-on, die Klasse
+   setzt aber erst das JS am Seitenende -> das alte Intro blitzte bis dahin auf
+   (position:fixed, z-index:9999). Jetzt greift die Regel ab dem ersten Frame.
+   Das Markup bleibt stehen, Rollback holt es zurueck. */
+#intro{display:none!important}
+body.intro-lock{overflow:auto!important}
+
+/* ── Cockpit-Intro ── */
+#dp-intro{position:fixed;inset:0;z-index:99000;background:#000;overflow:hidden}
+#dp-intro.dpm-out{transition:opacity 1.1s cubic-bezier(.4,0,.2,1);opacity:0}
+#dp-intro .bg{position:absolute;inset:-8%;width:116%;height:116%;object-fit:cover;
+ filter:blur(58px) saturate(1.25) brightness(.48);opacity:.85;transition:opacity .9s,transform 1.2s cubic-bezier(.4,0,.2,1)}
+#dp-intro .tint{position:absolute;inset:0;transition:opacity .9s;
+ background:radial-gradient(ellipse at 50% 48%,rgba(0,0,0,.22),rgba(0,0,0,.86) 72%,#000 100%)}
+#dp-intro .feed{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.97);opacity:0;
+ height:min(80vh,700px);aspect-ratio:720/1280;border:1px solid rgba(201,168,76,.3);border-radius:3px;overflow:hidden;
+ box-shadow:0 40px 120px -30px #000,0 0 90px -20px rgba(201,168,76,.22)}
+#dp-intro .feed video{width:100%;height:100%;object-fit:cover;display:block;filter:contrast(1.06) saturate(.95)}
+#dp-intro .feed:after{content:'';position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 26%,transparent 70%,rgba(0,0,0,.5))}
+#dp-intro .lab{position:absolute;left:10px;bottom:9px;z-index:3;font:500 8.5px/1 'JetBrains Mono',monospace;
+ letter-spacing:.2em;color:rgba(232,204,122,.9);transition:opacity .4s}
+#dp-intro .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#e05a4f;margin-right:6px;animation:dpmBlink 1.1s infinite}
+@keyframes dpmBlink{0%,100%{opacity:1}50%{opacity:.15}}
+#dp-intro .snd{position:absolute;z-index:20;top:26px;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:9px;
+ cursor:pointer;font:600 11.5px/1 Inter,sans-serif;color:#2c2410;background:var(--dpm-runway);border:0;padding:11px 18px;border-radius:999px;
+ box-shadow:0 12px 34px -10px rgba(201,168,76,.6)}
+#dp-intro .snd.hide{display:none}
+#dp-intro .skip{position:absolute;z-index:20;right:22px;top:24px;cursor:pointer;background:transparent;
+ border:1px solid rgba(255,255,255,.18);color:#b8b1a4;font:500 11px/1 Inter,sans-serif;padding:9px 14px;border-radius:8px}
+#dp-intro .scan{position:absolute;left:0;right:0;height:130px;top:-140px;pointer-events:none;z-index:4;
+ background:linear-gradient(180deg,transparent,rgba(232,204,122,.14) 45%,rgba(232,204,122,.42) 50%,rgba(232,204,122,.14) 55%,transparent)}
+#dp-intro .br{position:absolute;width:60px;height:60px;border:1.5px solid var(--dpm-gold);opacity:0}
+#dp-intro .br.a{top:40px;left:40px;border-right:0;border-bottom:0}
+#dp-intro .br.b{top:40px;right:40px;border-left:0;border-bottom:0}
+#dp-intro .br.c{bottom:40px;left:40px;border-right:0;border-top:0}
+#dp-intro .br.d{bottom:40px;right:40px;border-left:0;border-top:0}
+#dp-intro .ro{position:absolute;font:500 10px/1.95 'JetBrains Mono',monospace;letter-spacing:.14em;
+ color:rgba(232,204,122,.85);opacity:0;z-index:5}
+#dp-intro .ro.l{top:48px;left:118px}
+#dp-intro .ro.r{bottom:48px;right:118px;text-align:right}
+#dp-intro .ro s{text-decoration:none;color:#3FA56C}
+#dp-intro .ro u{text-decoration:none;color:#726c60}
+#dp-intro .ret{position:absolute;background:rgba(232,204,122,.45);z-index:5}
+#dp-intro .ret.h{height:1px;left:50%;top:50%;width:0;transform:translate(-50%,-50%)}
+#dp-intro .ret.v{width:1px;left:50%;top:50%;height:0;transform:translate(-50%,-50%)}
+#dp-intro .core{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:22px;z-index:6;pointer-events:none}
+#dp-intro .rw{position:relative;width:230px;height:230px;margin:0 auto 32px;opacity:0;transform:scale(.85)}
+#dp-intro .rw svg{transform:rotate(-90deg);filter:drop-shadow(0 0 26px rgba(201,168,76,.45))}
+#dp-intro .trk{fill:none;stroke:rgba(201,168,76,.14);stroke-width:6}
+#dp-intro .val{fill:none;stroke:url(#dpmRg);stroke-width:6;stroke-linecap:round;stroke-dasharray:672;stroke-dashoffset:672}
+#dp-intro .num{position:absolute;inset:0;display:grid;place-items:center}
+#dp-intro .num b{font:700 62px/1 'JetBrains Mono',monospace;color:var(--dpm-gold-l);
+ text-shadow:0 2px 34px rgba(0,0,0,.9),0 0 30px rgba(201,168,76,.45)}
+#dp-intro .num small{display:block;font:600 9px/1 Inter,sans-serif;letter-spacing:.26em;color:#a8a196;margin-top:10px;text-shadow:0 2px 12px #000}
+#dp-intro .wmk{font:700 clamp(32px,6.2vw,68px)/1 'Space Grotesk',sans-serif;letter-spacing:-.028em;opacity:0;
+ transform:translateY(16px);text-shadow:0 4px 40px rgba(0,0,0,.85)}
+#dp-intro .wmk span{background:var(--dpm-runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+#dp-intro .clm{margin-top:15px;font:400 clamp(13px,1.6vw,17px)/1.55 Inter,sans-serif;color:#b3ac9f;opacity:0;
+ transform:translateY(14px);text-shadow:0 2px 20px #000}
+#dp-intro .clm em{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--dpm-gold-l);font-size:1.2em}
+#dp-intro .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:7}
+#dp-intro .sweep{position:absolute;left:-30%;top:0;width:30%;height:100%;z-index:8;pointer-events:none;opacity:0;filter:blur(2px);
+ background:linear-gradient(90deg,transparent,rgba(232,204,122,.5),rgba(255,255,255,.75),rgba(232,204,122,.5),transparent)}
+
+/* ── Hero-Video ── */
+.hero{position:relative}
+/* v3: Video voll sichtbar (vorher .68 -> wirkte matt) */
+#dpm-flug{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;
+ object-position:50% var(--dpm-planeY);opacity:1;filter:contrast(1.06) saturate(1.06);transform:scale(var(--dpm-planeZ))}
+/* v3: das alte COMING-SOON-Standbild komplett raus (lag als base64 im Markup) */
+body.dpm-on .hero-bg{display:none!important}
+/* v3: Schleier nur links, damit der Text lesbar bleibt und der Flieger frei steht */
+body.dpm-on .hero-veil{background:linear-gradient(90deg,rgba(7,7,7,.94) 0%,rgba(7,7,7,.82) 34%,rgba(7,7,7,.28) 62%,rgba(7,7,7,.06) 100%)!important}
+/* v2-FIX: NIE eine Sammelregel auf .hero>* — ':not(#id)' erbt ID-Spezifitaet (110)
+   und ueberstimmt .hero-orb/.hero-bg/.hero-veil {position:absolute} (10).
+   Die beiden Orbs (420px + 340px) rutschten dadurch in den Fluss und haben den
+   Hero-Inhalt um exakt 760px nach unten geschoben. Jetzt nur noch der Inhalt: */
+.hero .wrap{position:relative;z-index:3}
+
+
+/* ── DealScore-Karte: Einflug-Animation (v2) ──
+   Animiert die ECHTE HTML-Karte, kein Video: bleibt gestochen scharf,
+   skaliert mit, kostet 0 KB Bandbreite. */
+.idscard.dpm-anim .ids-dial .pg{transition:stroke-dashoffset 1500ms cubic-bezier(.2,.9,.25,1)}
+.idscard.dpm-anim .ids-bar .track i{transition:width 900ms cubic-bezier(.2,.85,.25,1)}
+.idscard.dpm-anim .ids-badge,
+.idscard.dpm-anim .ids-eval{opacity:0;transform:translateY(8px);
+ transition:opacity .55s ease,transform .7s cubic-bezier(.2,.85,.25,1)}
+.idscard.dpm-anim.dpm-in .ids-badge,
+.idscard.dpm-anim.dpm-in .ids-eval{opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){
+ .idscard.dpm-anim .ids-dial .pg,
+ .idscard.dpm-anim .ids-bar .track i{transition:none}
+ .idscard.dpm-anim .ids-badge,
+ .idscard.dpm-anim .ids-eval{opacity:1;transform:none}}
+
+@media(prefers-reduced-motion:reduce){#dp-intro{display:none!important}}

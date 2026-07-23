@@ -683,6 +683,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
 
 </style>
 <style id="v897-hide-app">/*v897-hide-app: App-Bereich temporaer ausgeblendet, zum Live-Gang wieder einblenden (Style entfernen)*/ a[data-scroll="app"],#app,.dp-appcta{display:none !important}</style>
+  <link rel="stylesheet" href="landing-motion.css?v=4">
 </head>
 <body class="intro-lock">
 
@@ -883,7 +884,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
   function pct(v){return (Math.round(v*100)/100).toFixed(2).replace(".",",")+"\u00a0%";}
   function mon(iso){var d=new Date(iso);if(isNaN(d.getTime()))return null;var m=["Jan","Feb","M\u00e4r","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];return "Stand "+m[d.getMonth()]+"\u00a0"+d.getFullYear();}
   try{
-    fetch("/api/v1/market-rates/pfandbrief?maturities=5,10,15,20")
+    fetch(/*dpm-mzhost*/"https://"+(function(){var h=(location.hostname||"").toLowerCase();return h.indexOf("app.")===0?h:"app."+h;})()+"/api/v1/market-rates/pfandbrief?maturities=5,10,15,20")
       .then(function(r){return r.ok?r.json():null;})
       .then(function(res){
         if(!res)return;
@@ -1050,7 +1051,6 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
       <div class="head ctr">
         <span class="eye">// An Bord: dein Tarif</span>
         <h2>Vier Pakete. <span class="ac">Ein Cockpit.</span></h2>
-        <p>Vom kostenlosen Testflug bis zum Profi-Cockpit f&uuml;r Sachverst&auml;ndige. Jederzeit wechselbar, kein Abo-Kleingedrucktes.</p>
         <div class="ptoggle" id="ptoggle"><button class="on" data-p="monthly">Monatlich</button><button data-p="yearly">J&auml;hrlich <span class="save-pill">&minus;&nbsp;17&nbsp;%</span></button></div>
       </div>
       <!-- v944-partner-toggle -->
@@ -3980,7 +3980,7 @@ html{scroll-behavior:smooth}
 <!-- v10: Live-Marktzinsen (Predesign) — fuellt .ct-r + .ct-d aus Pfandbrief-Endpoint, still fallback -->
 <script>
 (function(){
-  var URL='https://app.dealpilot.junker-immobilien.io/api/v1/market-rates/pfandbrief?maturities=5,10,15,20';
+  var URL=/*dpm-mzhost*/"https://"+(function(){var h=(location.hostname||"").toLowerCase();return h.indexOf("app.")===0?h:"app."+h;})()+'/api/v1/market-rates/pfandbrief?maturities=5,10,15,20';
   function fp(v){return (Math.round(v*100)/100).toFixed(2).replace('.',',');}
   function pick(d,m){try{
     if(d.indicativeRates&&d.indicativeRates[m]&&d.indicativeRates[m].schwach!=null)return d.indicativeRates[m].schwach;
@@ -4168,5 +4168,7 @@ html{scroll-behavior:smooth}
 })();
 </script>
 
-</body></body>
+</body><script src="landing-motion.js?v=9"></script>
+<script src="promo-erstflug.js?v=6"></script>
+</body>
 </html>

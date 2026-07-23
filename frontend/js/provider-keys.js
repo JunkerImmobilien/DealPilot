@@ -51,19 +51,26 @@
   }
 
   function load() {
+    /* v982-netauth: ueber Auth.apiCall -> zentraler 401-Handler. Fallback = alter Weg. */
     var body = document.getElementById('pk-imo-body');
     if (body) body.innerHTML = '<p class="hint">Lade Status…</p>';
+    var _apply = function (d) {
+      var m = (d && d.immometrica) || { exists: false };
+      if (m.exists) { document.getElementById('pk-imo-body').innerHTML = bodySaved(m.hint); setBadge('on'); }
+      else { document.getElementById('pk-imo-body').innerHTML = bodyEmpty(); setBadge('off'); }
+    };
+    var _fail = function () {
+      var b = document.getElementById('pk-imo-body');
+      if (b) b.innerHTML = bodyEmpty(); setBadge('off');
+    };
+    if (window.Auth && typeof Auth.apiCall === 'function') {
+      Auth.apiCall('/immometrica/credentials', { method: 'GET' }).then(_apply).catch(_fail);
+      return;
+    }
     fetch(API + '/credentials', { headers: hdr() })
       .then(function (r) { return r.json(); })
-      .then(function (d) {
-        var m = (d && d.immometrica) || { exists: false };
-        if (m.exists) { document.getElementById('pk-imo-body').innerHTML = bodySaved(m.hint); setBadge('on'); }
-        else { document.getElementById('pk-imo-body').innerHTML = bodyEmpty(); setBadge('off'); }
-      })
-      .catch(function () {
-        var b = document.getElementById('pk-imo-body');
-        if (b) b.innerHTML = bodyEmpty(); setBadge('off');
-      });
+      .then(_apply)
+      .catch(_fail);
   }
 
   var api = {

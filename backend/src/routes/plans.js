@@ -5,6 +5,86 @@ const planService = require('../services/planService');
 
 const router = express.Router();
 
+/* ── promo-erstflug ────────────────────────────────────────────────────
+ * GET /plans/promo  — OEFFENTLICH (Landing + App, kein Token noetig).
+ * Die Wahrheit ueber den Founding-Rabatt steht in STRIPE, nicht bei uns.
+ * Kein aktiver Code / kein Stripe / Plaetze aufgebraucht -> active:false,
+ * und das Frontend zeigt dann GAR NICHTS an (fail closed). Lieber keine
+ * Werbung als ein Code, den es im aktuellen Stripe-Modus nicht gibt.
+ * In-Memory-Cache 5 min, damit die Landing Stripe nicht flutet.
+ * ------------------------------------------------------------------ */
+const PROMO_CODE = process.env.PROMO_CODE || 'ERSTFLUG';
+const PROMO_TTL_MS = 5 * 60 * 1000;
+let _promoCache = null;
+let _promoAt = 0;
+
+async function _readPromoFromStripe() {
+  const off = { active: false, code: PROMO_CODE };
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return off;
+  let stripe;
+  try { stripe = require('stripe')(key); } catch (e) { return off; }
+
+  const list = await stripe.promotionCodes.list({ code: PROMO_CODE, active: true, limit: 1 });
+  const pc = list && list.data && list.data[0];
+  if (!pc) return off;
+
+  /* promo-coupon-resolve: Der Coupon haengt je nach Stripe-API-Version an einer
+   * von drei Stellen. Frueher pc.coupon (Objekt), heute pc.promotion.coupon —
+   * und zwar meist nur als ID-String. Alle Faelle abdecken, sonst faellt die
+   * Funktion still auf active:false zurueck (genau das ist passiert). */
+  let c = null;
+  if (pc.coupon && typeof pc.coupon === 'object') {
+    c = pc.coupon;
+  } else if (pc.promotion && typeof pc.promotion.coupon === 'object' && pc.promotion.coupon) {
+    c = pc.promotion.coupon;
+  } else {
+    const cid = (pc.promotion && typeof pc.promotion.coupon === 'string')
+      ? pc.promotion.coupon
+      : (typeof pc.coupon === 'string' ? pc.coupon : null);
+    if (cid) {
+      try { c = await stripe.coupons.retrieve(cid); }
+      catch (e) { console.warn('[promo] coupon retrieve failed:', e.message); }
+    }
+  }
+  if (!c || c.valid === false) return off;
+  const percent = c.percent_off || 0;
+  if (!percent) return off;                       // nur prozentuale Codes
+
+  // Schranke kann am Promotion-Code ODER am Coupon haengen
+  const hasPcMax = (pc.max_redemptions !== null && pc.max_redemptions !== undefined);
+  const max  = hasPcMax ? pc.max_redemptions : (c.max_redemptions != null ? c.max_redemptions : null);
+  const used = (hasPcMax ? pc.times_redeemed : c.times_redeemed) || 0;
+  const left = (max != null) ? Math.max(0, max - used) : null;
+  if (left !== null && left <= 0) return off;     // Plaetze weg -> Banner weg
+
+  return {
+    active: true,
+    code: pc.code || PROMO_CODE,
+    percent: percent,
+    duration: c.duration || null,
+    max: max,
+    used: used,
+    left: left
+  };
+}
+
+router.get('/promo', async (req, res) => {
+  try {
+    if (_promoCache && (Date.now() - _promoAt) < PROMO_TTL_MS) {
+      return res.json({ promo: _promoCache });
+    }
+    const p = await _readPromoFromStripe();
+    _promoCache = p;
+    _promoAt = Date.now();
+    res.json({ promo: p });
+  } catch (e) {
+    console.warn('[promo] Stripe-Abfrage fehlgeschlagen:', e.message);
+    res.json({ promo: { active: false, code: PROMO_CODE } });
+  }
+});
+/* ── promo-erstflug ENDE ─────────────────────────────────────────── */
+
 /**
  * GET /plans - public list of plans (for pricing page)
  */

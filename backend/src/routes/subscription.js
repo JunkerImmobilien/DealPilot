@@ -14,6 +14,54 @@ const router = express.Router();
 
 router.use(authenticate);
 
+/* ── promo-erstflug ────────────────────────────────────────────────────
+ * GET /subscription/promo — hat DIESER Kunde den Founding-Rabatt?
+ * Steht bewusst NICHT in unserer DB (kein neues Feld, keine Migration):
+ * der Rabatt lebt an der Stripe-Subscription, dort lesen wir ihn.
+ * Kein Abo / kein Stripe / Fehler -> { founding:false } (nie 500).
+ * Bewusst GANZ OBEN eingehaengt, damit keine spaetere /:param-Route
+ * '/promo' verschluckt. 5 min je User gecacht.
+ * ------------------------------------------------------------------ */
+const _foundingCache = new Map();
+const FOUNDING_TTL_MS = 5 * 60 * 1000;
+
+router.get('/promo', async (req, res) => {
+  const uid = req.user && req.user.id;
+  try {
+    const hit = _foundingCache.get(uid);
+    if (hit && (Date.now() - hit.t) < FOUNDING_TTL_MS) return res.json(hit.d);
+
+    let out = { founding: false };
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (key && uid) {
+      const { query } = require('../db/pool');
+      const r = await query(
+        'SELECT stripe_subscription_id FROM subscriptions WHERE user_id = $1 LIMIT 1', [uid]
+      );
+      const subId = r.rows[0] && r.rows[0].stripe_subscription_id;
+      if (subId) {
+        const stripe = require('stripe')(key);
+        const s = await stripe.subscriptions.retrieve(subId);
+        // je nach API-Version: s.discount (Objekt) oder s.discounts (Array)
+        let d = s.discount || null;
+        if (!d && Array.isArray(s.discounts)) {
+          d = s.discounts.find(function (x) { return x && typeof x === 'object'; }) || null;
+        }
+        const c = d && d.coupon;
+        if (c && c.percent_off) {
+          out = { founding: true, percent: c.percent_off, forever: c.duration === 'forever' };
+        }
+      }
+    }
+    _foundingCache.set(uid, { t: Date.now(), d: out });
+    res.json(out);
+  } catch (e) {
+    console.warn('[promo/subscription]', e.message);
+    res.json({ founding: false });
+  }
+});
+/* ── promo-erstflug ENDE ─────────────────────────────────────────── */
+
 // ── Schemas ──────────────────────────────────────────
 const checkoutSchema = z.object({
   planId: z.string().min(1),

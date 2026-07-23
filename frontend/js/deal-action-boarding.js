@@ -350,28 +350,35 @@
   /* ────────────────── Netzwerk laden + Karten ────────────────── */
   var _cats = [];
   function loadNetwork() {
+    /* v982-netauth: ueber Auth.apiCall -> zentraler 401-Handler (Re-Login + Retry)
+       statt totem "Seite neu laden"-Text. Fallback = alter Weg, falls Auth fehlt. */
+    var _fail = function (msg) {
+      var h = document.getElementById('dab-rails-host');
+      if (h) h.innerHTML = '<div class="dab-net-load">' + msg + '</div>';
+    };
+    var _apply = function (data) {
+      _cards = (data && data.cards) || [];
+      _cats = (data && data.categories) || [];
+      buildRails();
+    };
+    if (window.Auth && typeof Auth.apiCall === 'function') {
+      Auth.apiCall('/network-cards', { method: 'GET' })
+        .then(_apply)
+        .catch(function () { _fail('Netzwerk aktuell nicht erreichbar.'); });
+      return;
+    }
     var headers = {};
     var t = token(); if (t) headers['Authorization'] = 'Bearer ' + t;
     fetch('/api/v1/network-cards', { headers: headers })
       .then(function (r) {
         if (r.status === 401) {
-          /* v870: abgelaufene Sitzung ehrlich melden statt "Noch keine Partner" */
-          var h = document.getElementById('dab-rails-host');
-          if (h) h.innerHTML = '<div class="dab-net-load">Sitzung abgelaufen \u2014 bitte einmal neu anmelden (Seite neu laden), dann erscheint dein Netzwerk wieder.</div>';
+          _fail('Sitzung abgelaufen \u2014 bitte einmal neu anmelden (Seite neu laden), dann erscheint dein Netzwerk wieder.');
           return null;
         }
         return r.ok ? r.json() : { cards: [], categories: [] };
       })
-      .then(function (data) {
-        if (data === null) return;
-        _cards = (data && data.cards) || [];
-        _cats = (data && data.categories) || [];
-        buildRails();
-      })
-      .catch(function () {
-        var h = document.getElementById('dab-rails-host');
-        if (h) h.innerHTML = '<div class="dab-net-load">Netzwerk aktuell nicht erreichbar.</div>';
-      });
+      .then(function (data) { if (data !== null) _apply(data); })
+      .catch(function () { _fail('Netzwerk aktuell nicht erreichbar.'); });
   }
   /* v878-rotate: Netzwerk-Karten mischen + rotieren */
   var _dabRotTimer = null, _dabRotPaused = false;
