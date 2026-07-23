@@ -28,6 +28,27 @@ async function createUser({ email, plainPassword, name, newsletter }) {
      RETURNING id, email, name, role, created_at`,
     [emailLower, hash, name.trim(), role, wantsNews, wantsNews ? new Date() : null]
   );
+
+  /* TR7-trial: 7 Tage Pro ab Registrierung.
+     Sitzt BEWUSST hier und nicht in einer Route. Die App registriert ueber
+     registerWithVerify.js, nicht ueber auth.js — ein Grant in nur einer der
+     beiden Routen feuert nie (Fehler vom 23.07.). createUser ist der
+     einzige Trichter, durch den jeder Weg laeuft, auch kuenftige.
+     WHERE NOT EXISTS -> keine Mehrfachvergabe.
+     Fehler werden geloggt, nicht geworfen: ein fehlender Trial ist ein
+     Schoenheitsfehler, ein geplatztes Konto waere ein echter Schaden. */
+  try {
+    await query(
+      "INSERT INTO plan_trials (user_id, granted_plan, expires_at) " +
+      "SELECT $1::uuid, 'pro', NOW() + INTERVAL '7 days' " +
+      "WHERE NOT EXISTS (SELECT 1 FROM plan_trials WHERE user_id = $1::uuid)",
+      [r.rows[0].id]
+    );
+    console.log('[TR7-trial] Testphase 7 Tage Pro gewaehrt fuer', r.rows[0].email);
+  } catch (trialErr) {
+    console.warn('[TR7-trial] Auto-Grant fehlgeschlagen:', trialErr.message);
+  }
+
   return r.rows[0];
 }
 

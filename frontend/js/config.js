@@ -422,7 +422,10 @@ window.DealPilotConfig = (function() {
     currency: 'EUR',
     yearly_discount_label: '~17% gespart',  // Anzeigetext beim Toggle
     show_yearly_toggle: true,
-    trial_days: 0               // 0 = keine Testphase
+    trial_days: 7               // TR7-trial: 7 Tage Pro ab Registrierung.
+                                // Reine ANZEIGE-Wahrheit fuer die UI — die
+                                // verbindliche Laufzeit steht in plan_trials
+                                // (Backend). Hier nichts berechnen.
   };
 
   function getPlan(key) {

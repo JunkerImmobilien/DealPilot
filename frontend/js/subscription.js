@@ -314,6 +314,20 @@ var Sub = (function() {
       if (_cache && _cache.plan_id) return _cache.plan_id;   // synthetisches free
       return null;
     },
+    /* TR7-trial: Der Trial-Zustand kommt aus derselben /subscription-Antwort
+       wie der Plan. KEINE eigene Route, kein zweiter Cache, keine Uhr im
+       Browser — die Restlaufzeit rechnet das Backend. */
+    isTrial: function() {
+      return !!(_cache && _cache.trial === true);
+    },
+    trialDaysLeft: function() {
+      if (!_cache || _cache.trial !== true) return 0;
+      var d = parseInt(_cache.trial_days_left, 10);
+      return isNaN(d) ? 0 : Math.max(0, d);
+    },
+    trialEndsAt: function() {
+      return (_cache && _cache.trial_ends_at) ? _cache.trial_ends_at : null;
+    },
     /**
      * V186: Synchroner Lookup auf cached Backend-Features.
      */
@@ -698,6 +712,16 @@ async function renderSubscriptionBadge() {
     if (existingPill) existingPill.remove();
 
     var label = sub.plan_name + (sub.cancel_at_period_end ? ' · kündigt' : '');
+    /* TR7-trial: Restlaufzeit direkt in der Plan-Pille — kein zweites Element,
+       kein eigener Platz im Header noetig. */
+    var _isTr = false, _tdl = 0;
+    try {
+      _isTr = (typeof Sub !== 'undefined' && Sub.isTrial && Sub.isTrial());
+      _tdl  = _isTr ? Sub.trialDaysLeft() : 0;
+    } catch (e) {}
+    if (_isTr) {
+      label = sub.plan_name + ' · noch ' + _tdl + (_tdl === 1 ? ' Tag' : ' Tage');
+    }
     // V63.6: Klick auf Pill öffnet IMMER das Pricing-Modal (egal welcher Plan)
     var clickHandler = 'event.stopPropagation();openPricingModal()';
     var pill = document.createElement('span');

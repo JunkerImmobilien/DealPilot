@@ -94,6 +94,13 @@ router.get('/', async (req, res, next) => {
         current_period_start: sub.current_period_start,
         current_period_end: sub.current_period_end,
         trial_end: sub.trial_end,
+        /* TR7-trial: Die Antwort ist eine FESTE Feldliste — was hier nicht
+           steht, kommt im Browser nicht an. getEffectivePlan lieferte die
+           drei Felder bereits, sie fielen hier still raus. Sub.isTrial()
+           blieb dadurch false, obwohl die Testphase lief. */
+        trial: sub.trial === true,
+        trial_ends_at: sub.trial_ends_at || null,
+        trial_days_left: (sub.trial_days_left != null ? sub.trial_days_left : 0),
         is_active: subscriptionService.isActive(sub),
         synthetic: sub.synthetic || false,
         downgraded: sub.downgraded || false,

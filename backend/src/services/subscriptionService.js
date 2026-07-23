@@ -76,20 +76,59 @@ function isActive(sub) {
 async function getEffectivePlan(userId) {
   /* mand v811b: aktiver Pro-Test ueberschreibt den realen Plan voruebergehend.
      Die echte subscriptions-Zeile bleibt unangetastet -> nach Ablauf gilt sie wieder. */
+  /* TR7-trial: Testphase 7 Tage Pro, automatisch ab Registrierung.
+     DREI Abweichungen gegenueber rohem Pro — bewusst:
+       1. Ein AKTIVES BEZAHLTES Abo schlaegt die Testphase. Sonst wuerde ein
+          Reseller-Mandant (Investor per Seat) sieben Tage lang "Pro" sehen
+          und danach sichtbar herabgestuft — der Reseller hat bezahlt.
+       2. export_csv / json_backup / excel_import bleiben AUS. Diese Exporte
+          sind Pro-Verkaufsargumente und tragen kein Wasserzeichen.
+       3. KI-Kontingent bleibt auf Free-Niveau (Kerosin wird nicht verschenkt).
+     Das Wasserzeichen bleibt waehrend der Testphase aktiv (trial:true wird
+     im Frontend gelesen) — getestet wird der Funktionsumfang, nicht der Export. */
   try {
-    const _t = await query("SELECT granted_plan FROM plan_trials WHERE user_id=$1 AND revoked_at IS NULL AND expires_at > NOW() ORDER BY expires_at DESC LIMIT 1", [userId]);
+    const _t = await query(
+      "SELECT granted_plan, expires_at FROM plan_trials WHERE user_id=$1 AND revoked_at IS NULL AND expires_at > NOW() ORDER BY expires_at DESC LIMIT 1",
+      [userId]
+    );
     if (_t.rowCount) {
-      const _tp = await planService.getPlan(_t.rows[0].granted_plan);
-      if (_tp) {
-        return {
-          plan_id: _tp.id, plan_name: _tp.name, plan_features: _tp.features,
-          status: 'trialing', cancel_at_period_end: false,
-          max_objects: _tp.max_objects, max_users: _tp.max_users,
-          max_ai_analyses_monthly: _tp.max_ai_analyses_monthly,
-          max_pdf_exports_monthly: _tp.max_pdf_exports_monthly,
-          max_photo_uploads_per_object: _tp.max_photo_uploads_per_object,
-          trial: true
-        };
+      let _paidWins = false;
+      try {
+        const _real = await getCurrentSubscription(userId);
+        if (_real && !_real.synthetic && isActive(_real) &&
+            _real.plan_id && _real.plan_id !== 'free') {
+          _paidWins = true;
+        }
+      } catch (_e2) { /* im Zweifel gilt die Testphase */ }
+
+      if (!_paidWins) {
+        const _tp = await planService.getPlan(_t.rows[0].granted_plan);
+        const _free = await planService.getPlan('free');
+        if (_tp) {
+          const _feat = Object.assign({}, _tp.features || {});
+          _feat.export_csv = false;
+          _feat.json_backup = false;
+          _feat.excel_import = false;
+
+          const _exp = _t.rows[0].expires_at;
+          let _daysLeft = 0;
+          try {
+            _daysLeft = Math.max(0, Math.ceil(
+              (new Date(_exp).getTime() - Date.now()) / 86400000));
+          } catch (_e3) { _daysLeft = 0; }
+
+          return {
+            plan_id: _tp.id, plan_name: _tp.name, plan_features: _feat,
+            status: 'trialing', cancel_at_period_end: false,
+            max_objects: _tp.max_objects, max_users: _tp.max_users,
+            max_ai_analyses_monthly: (_free ? _free.max_ai_analyses_monthly : 0),
+            max_pdf_exports_monthly: _tp.max_pdf_exports_monthly,
+            max_photo_uploads_per_object: _tp.max_photo_uploads_per_object,
+            trial: true,
+            trial_ends_at: _exp,
+            trial_days_left: _daysLeft
+          };
+        }
       }
     }
   } catch (_e) { /* Tabelle evtl. noch nicht da -> normal weiter */ }

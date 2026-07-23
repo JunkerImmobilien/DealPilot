@@ -58,6 +58,23 @@ router.post('/register', validate({ body: registerSchema }), async (req, res, ne
       name
     });
 
+    /* TR7-trial: 7 Tage Pro automatisch ab Registrierung.
+       Nur wenn fuer diesen User noch NIE eine Testphase existierte.
+       Schlaegt der Insert fehl, wird die Registrierung NICHT abgebrochen —
+       ein fehlender Trial ist ein Schoenheitsfehler, ein geplatztes
+       Konto waere ein echter Schaden. */
+    try {
+      const _db = require('../db/pool');
+      await _db.query(
+        "INSERT INTO plan_trials (user_id, granted_plan, expires_at) " +
+        "SELECT $1, 'pro', NOW() + INTERVAL '7 days' " +
+        "WHERE NOT EXISTS (SELECT 1 FROM plan_trials WHERE user_id = $1)",
+        [user.id]
+      );
+    } catch (_trialErr) {
+      console.warn('[TR7-trial] Auto-Grant fehlgeschlagen:', _trialErr.message);
+    }
+
     const token = jwtUtil.sign(sessionFromUser(user));
     await objectService.logAudit({
       userId: user.id,
