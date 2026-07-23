@@ -30,7 +30,8 @@
       not_included: null,
       result: 'Sie sehen die volle Tiefe von DealPilot — und entscheiden danach, ob Sie upgraden.',
       ctaText: 'Kostenlos starten',
-      footnote: 'Keine Kreditkarte nötig'
+      /* TR7-trial */
+      footnote: '7 Tage Pro inklusive · danach automatisch Free · keine Kreditkarte'
     },
     {
       key: 'starter', letter: 'S', label: 'Starter', tag: 'Privat-Investor', title: 'Starter',

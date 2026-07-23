@@ -166,12 +166,18 @@ window._getBrandingLogo = _getBrandingLogo;
 // Wasserzeichen für Free-Plan (auf jeder Seite diagonal)
 function _applyWatermarkIfFree(doc, W) {
   try {
-    var planKey = window.DealPilotConfig && DealPilotConfig.pricing
-                    ? DealPilotConfig.pricing.currentKey() : 'free';
-    if (planKey !== 'free') return;
+    /* TR7-trial: Das Wasserzeichen hing am PLAN-SCHLUESSEL ("planKey !== free").
+       Waehrend der 7-Tage-Testphase ist der Schluessel 'pro' — das Wasserzeichen
+       waere komplett ausgefallen. Jetzt entscheidet das LIMIT plus der
+       Trial-Zustand. Bezahlte Plaene bleiben unveraendert sauber. */
+    if (doc.__dpWmDone) return;          // Doppel-Stempel verhindern
+    var _isTrial = false;
+    try { _isTrial = (typeof Sub !== 'undefined' && Sub.isTrial && Sub.isTrial()); }
+    catch (e) {}
     var limits = (window.DealPilotConfig && DealPilotConfig.pricing
                     ? DealPilotConfig.pricing.current().limits : { watermark: true });
-    if (limits.watermark === false) return;
+    if (limits.watermark === false && !_isTrial) return;
+    doc.__dpWmDone = true;
     var pages = doc.internal.getNumberOfPages();
     for (var i = 1; i <= pages; i++) {
       doc.setPage(i);
@@ -186,15 +192,58 @@ function _applyWatermarkIfFree(doc, W) {
         doc.setFontSize(72);
         doc.setTextColor(120, 120, 120);
         // Drei Wasserzeichen auf der Seite verteilt (oben, Mitte, unten) - 30° gedreht
-        doc.text('DealPilot Free', W / 2, 80,  { align: 'center', angle: 30 });
-        doc.text('DealPilot Free', W / 2, 165, { align: 'center', angle: 30 });
-        doc.text('DealPilot Free', W / 2, 250, { align: 'center', angle: 30 });
+        /* TR7-trial: Text folgt dem Zustand. Waehrend der Testphase ist
+           "DealPilot Free" schlicht falsch. _pn() respektiert Whitelabel. */
+        var _wmTxt = (typeof _pn === 'function' ? _pn() : 'DealPilot') +
+                     (_isTrial ? ' Testphase' : ' Free');
+        doc.text(_wmTxt, W / 2, 80,  { align: 'center', angle: 30 });
+        doc.text(_wmTxt, W / 2, 165, { align: 'center', angle: 30 });
+        doc.text(_wmTxt, W / 2, 250, { align: 'center', angle: 30 });
       } catch(e) {}
       doc.restoreGraphicsState && doc.restoreGraphicsState();
     }
   } catch(e) { console.warn('Watermark failed:', e.message); }
 }
 window._applyWatermarkIfFree = _applyWatermarkIfFree;
+
+/* ── TR7-trial: EINE Quelle statt neun Kopien ──────────────────────────────
+   Von zehn PDF-Erzeugern trugen nur drei ein Wasserzeichen (pdf.js + 2x
+   storage.js). BMF-Anlage, Track-Record, Werbungskosten, Selbstauskunft,
+   RnD und Marktbericht gingen sauber raus — obwohl die Preistabelle seit
+   Monaten "Wasserzeichen" verspricht.
+   Statt sechs Einzeleingriffe (und jeder kuenftige PDF-Pfad waere wieder
+   vergessen worden): einmal an jsPDF.prototype.save haengen.
+   Der Doppel-Stempel-Schutz sitzt in _applyWatermarkIfFree (__dpWmDone),
+   die bestehenden expliziten Aufrufe bleiben also gefahrlos stehen.
+   Reseller-PDFs sind automatisch aussen vor: Partner hat watermark:false
+   und nie einen Trial. */
+(function _dpArmWatermarkHook() {
+  var tries = 0;
+  function arm() {
+    tries++;
+    try {
+      if (window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.prototype) {
+        var P = window.jspdf.jsPDF.prototype;
+        if (!P.__dpWmHook) {
+          var _origSave = P.save;
+          P.save = function () {
+            try {
+              var w = 210;
+              try { w = this.internal.pageSize.getWidth(); } catch (e) {}
+              _applyWatermarkIfFree(this, w);
+            } catch (e) {}
+            return _origSave.apply(this, arguments);
+          };
+          P.__dpWmHook = true;
+        }
+        return true;
+      }
+    } catch (e) {}
+    if (tries < 40) setTimeout(arm, 250);   // jsPDF laedt evtl. spaeter
+    return false;
+  }
+  arm();
+})();
 
 /* W3-nodp: Bei Whitelabel darf "DealPilot" nicht neben dem Reseller-Namen stehen.
    Eine Kanzlei zahlt fuer die eigene Marke — _pn() liefert den Produktnamen. */
