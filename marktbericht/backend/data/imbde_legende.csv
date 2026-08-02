@@ -1,0 +1,52 @@
+# imbde_legende.csv  (OD-02)
+#
+# Die AK-OGA-CSV benennt ihre Spalten nach Abbildungsnummern des Berichts
+# ("Abb_4_14"). Ohne diese Zuordnung ist jede Spalte ein Zahlenfeld ohne
+# Bedeutung. Sie wird deshalb HIER von Hand gepflegt - genau wie bei
+# zensus2022_kreise.csv.
+#
+# Woher die Zuordnung kommt:
+#   1. Immobilienmarktbericht Deutschland 2025 oeffnen (PDF, kostenfrei)
+#   2. Abbildung mit der Nummer aufschlagen, z. B. "Abbildung 4.14"
+#   3. Bildunterschrift lesen -> das ist die Kennzahl, Einheit steht an der Achse
+#
+# Solange eine Zeile leer bleibt, wird die Spalte mit kennzahl='imbde:Abb_4_14'
+# und semantik_offen=true gespeichert. Sie ist damit da, aber sie taucht in
+# keiner Auswertung als benannter Wert auf. NICHT raten - eine falsch
+# beschriftete Zahl ist schlimmer als gar keine.
+#
+# Erlaubte Kennzahlen: liegenschaftszinssatz, sachwertfaktor, vergleichsfaktor,
+#   bewirtschaftungskosten, restnutzungsdauer, marktmiete, kaufpreisniveau,
+#   transaktionen, geldumsatz, marktintensitaet
+# Objektart: alle, etw, efh, zfh, dhh, rh, mfh, gewerbe, bauland
+#
+abb_id;kennzahl;objektart;einheit
+Abb_4_14;;;
+Abb_4_15;;;
+Abb_4_31;;;
+Abb_4_32;;;
+Abb_4_47;;;
+Abb_4_48;;;
+Abb_4_55;;;
+Abb_4_60;;;
+Abb_4_79;;;
+Abb_4_80;;;
+Abb_4_86;;;
+Abb_4_92;;;
+Abb_4_108;;;
+Abb_4_109;;;
+Abb_4_115;;;
+Abb_4_121;;;
+Abb_4_140;;;
+Abb_4_152;;;
+Abb_4_153;;;
+Abb_4_165;;;
+Abb_4_166;;;
+Abb_4_188;;;
+Abb_4_199;;;
+Abb_4_206;;;
+Abb_4_215;;;
+Abb_4_231;;;
+Abb_4_232;;;
+Abb_4_248;;;
+Abb_4_265;;;

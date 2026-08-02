@@ -7,6 +7,10 @@
 // Jede Zwischengroesse wird einzeln ausgewiesen — das PDF druckt die Staffel Zeile
 // fuer Zeile, und wer nachrechnen will, muss es koennen.
 
+/* v1048-WBWK-1 · Ohne diesen Import laeuft der Block unten auf einen
+ * ReferenceError. node --check sieht fehlende Importe nicht: kein
+ * Syntaxfehler, sondern ein fehlender Bezeichner. */
+import { bewirtschaftungskosten as nrwBwk } from '../lib/nrw_modell.js';
 import {
   BWK_TABELLE, GND_TABELLE, MODELL,
   barwertfaktor, abzinsungsfaktor, gnd, rnd, lzsNach256,
@@ -162,11 +166,18 @@ export const ErtragswertService = {
       return out;
     }
 
-    const rohertrag = round0(mieteMarkt + gewerbe + stellplatz + sonstige);
+    /* v1057-WSON-1 · Sonstige Ertraege gehoeren NICHT in den kapitalisierten
+     * Rohertrag. Sie haften an einer Sache, nicht am Gebaeude: eine
+     * Einbaukueche haelt fuenfzehn Jahre, das Gebaeude fuenfzig. Bei einem
+     * Barwertfaktor von 30 hiesse Mitkapitalisieren, die Kueche dreissigmal
+     * zu bezahlen. Sie werden weiter unten mit eigener Dauer angesetzt. */
+    const rohertrag = round0(mieteMarkt + gewerbe + stellplatz);
     out.staffel.push({ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: round0(mieteMarkt) });
     if (gewerbe) out.staffel.push({ pos: 'Rohertrag Gewerbe', wert: round0(gewerbe) });
     if (stellplatz) out.staffel.push({ pos: `Stellplätze (${spAnz} × ${spMiete} €/Monat)`, wert: stellplatz });
-    if (sonstige) out.staffel.push({ pos: 'Sonstige Erträge', wert: round0(sonstige) });
+    /* v1057-WSON-2 · Diese Zeile stand im Rohertrag und wurde damit ueber
+     * die volle Restnutzungsdauer kapitalisiert. Der Ansatz steht jetzt
+     * weiter unten mit eigener Laufzeit. */
     out.staffel.push({ pos: '= Rohertrag', wert: rohertrag, summe: true });
 
     // Ist-Miete nur als Hinweis — sie gehoert NICHT in den Rohertrag.
@@ -185,7 +196,16 @@ export const ErtragswertService = {
     let bwk, bwkDetail = [];
     if (String(ein.bwk_modus) === 'manuell' && pos(ein.bwk_gesamt_jahr)) {
       bwk = round0(pos(ein.bwk_gesamt_jahr));
-      bwkDetail.push({ pos: 'Bewirtschaftungskosten (eigene Kalkulation)', wert: bwk });
+      /* v1052-WBWK-1 · "eigene Kalkulation" ist die nichtssagendste Zeile
+       * im ganzen Bericht — und steht ausgerechnet dort, wo die amtliche
+       * Quote des Gutachterausschusses gerechnet wird. */
+      bwkDetail.push({
+        pos: ein.bwk_quote_herkunft
+          ? 'Bewirtschaftungskosten (' + (ein.bwk_quote_pct != null
+              ? String(ein.bwk_quote_pct).replace('.', ',') + ' % · ' : '')
+            + 'Angabe des Gutachterausschusses)'
+          : 'Bewirtschaftungskosten (eigene Kalkulation)',
+        wert: bwk });
       out.hinweise.push('Die Bewirtschaftungskosten wurden aus der eigenen Objektkalkulation übernommen. Die ImmoWertV sieht dafür normierte Ansätze vor (Anlage 3) — die Abweichung ist gewollt, sollte im Dossier aber benannt werden.');
     } else {
       /* v1018 · Verwaltungskosten gelten je Wohneinheit — aber bewertet wird
@@ -198,7 +218,35 @@ export const ErtragswertService = {
       const _istEinheit = /etw|wohnung|whg|apartment/i.test(String(ein.objektart || ''));
       const we = _istEinheit ? 1 : (pos(ein.anzahl_we) || 1);
       const wfl = pos(ein.wohnflaeche_qm) || 0;
-      const vJeWe = num(ein.bwk_verwaltung_je_we) ?? BWK_TABELLE.verwaltung_je_we_eur;
+      /* v1047-WBWK-2 · Bei Wohnungseigentum gilt der hoehere Ansatz aus
+       * Anlage 3 I.1 — WEG-Verwaltung, Eigentuemerversammlung,
+       * Jahresabrechnung. */
+      const _istWhg = /etw|wohnung|whg|apartment|appartement/i.test(String(ein.objektart || ''));
+
+      /* v1048-WBWK-2 · Traegt der Zinssatz den Vermerk agvga_nrw_2016,
+       * gelten dessen Bewirtschaftungskosten — nicht die der ImmoWertV.
+       * Paragraf 10: dieselben Modellansaetze, die der Ableitung zugrunde
+       * lagen. Sonst rechnet man mit einem amtlichen Zinssatz und fremden
+       * Kosten, und das Ergebnis sieht amtlich aus, ohne es zu sein. */
+      let _nrw = null;
+      if (String(ein.modellversion || '') === 'agvga_nrw_2016') {
+        _nrw = nrwBwk({
+          rohertrag_eur: rohertrag, wohnflaeche_qm: wfl, ist_eigentumswohnung: _istWhg,
+          wohneinheiten: we, garagen: pos(ein.garagen_anz) || 0,
+          stellplaetze: pos(ein.aussen_anz) || 0,
+          stichtag_jahr: ein.stichtag_jahr,
+        });
+      }
+      if (_nrw) {
+        bwk = _nrw.summe_eur;
+        _nrw.posten.forEach((x) => out.staffel.push(x));
+        out.bwk_modell = { modell: _nrw.modell, stand: _nrw.stand,
+          fortgeschrieben: _nrw.fortgeschrieben, anteil_pct: _nrw.anteil_pct,
+          hinweis: _nrw.hinweis, beleg: _nrw.beleg };
+        out.hinweise.push(_nrw.hinweis);
+      } else {
+      const vJeWe = num(ein.bwk_verwaltung_je_we)
+        ?? (_istWhg ? BWK_TABELLE.verwaltung_je_etw_eur : BWK_TABELLE.verwaltung_je_we_eur);
 
       /* v1026 · Was im Objekt schon gepflegt ist, wird genutzt: die eigene
        * Instandhaltungsruecklage und die Leerstandsannahme aus der Prognose.
@@ -241,6 +289,7 @@ export const ErtragswertService = {
       if (betriebNul) bwkDetail.push({ pos: 'Nicht umlagefähige Betriebskosten', wert: betriebNul });
 
       bwk = verwaltung + instand + mietausfall + betriebNul;
+      }   /* v1048-WBWK-3 · Ende des Zweigs ohne Modellvorgabe */
 
       if (!BWK_TABELLE.geprueft) {
         out.warnungen.push('Die normierten Bewirtschaftungskosten-Ansätze sind noch nicht gegen den Verordnungstext (Anlage 3 ImmoWertV) verifiziert und nicht indexiert. Das Ergebnis ist insoweit vorläufig.');
@@ -291,7 +340,10 @@ export const ErtragswertService = {
     let R = istNeubau(ein.baustatus) ? null : pos(ein.rnd_jahre);
     let rndInfo = null;
     if (!R) {
-      rndInfo = rnd(G, ein.baujahr, ein.baustatus, ein.stichtag_jahr);
+      rndInfo = rnd(G, ein.baujahr, ein.baustatus, ein.stichtag_jahr,
+        /* v1047-WA2-2 */
+        { mod_punkte: ein.mod_punkte, kernsaniert: ein.kernsaniert,
+          sanierungsjahr: ein.sanierungsjahr });
       R = rndInfo.jahre;
       if (rndInfo.hinweis) out.hinweise.push(rndInfo.hinweis);
     }
@@ -312,7 +364,25 @@ export const ErtragswertService = {
     out.staffel.push({ pos: '= Gebäudeertragswert', wert: gebErtragswert, summe: true });
 
     /* ── 6 · Ertragswert ────────────────────────────────────────────────── */
-    let ertragswert = gebErtragswert + bw;
+    /* v1057-WSON-3 · Sonstige Ertraege mit EIGENER Dauer. Eine Kueche haelt
+     * fuenfzehn Jahre, das Gebaeude fuenfzig; sie ueber den Barwertfaktor des
+     * Gebaeudes zu kapitalisieren waere eine Ueberbewertung um ein Vielfaches.
+     * Vorgabe 15 Jahre, ueber sonstige_dauer_jahre einstellbar. */
+    let sonstigeBarwert = 0;
+    if (sonstige > 0) {
+      const _dauer = Math.min(pos(ein.sonstige_dauer_jahre) || 15, R);
+      const _vS = barwertfaktor(lzs, _dauer);
+      sonstigeBarwert = round0(sonstige * _vS);
+      out.staffel.push({ pos: '+ sonstige Erträge (' + round0(sonstige).toLocaleString('de-DE')
+        + ' € × Barwertfaktor ' + _vS.toFixed(2).replace('.', ',') + ' für ' + _dauer + ' Jahre)',
+        wert: sonstigeBarwert });
+      out.hinweise.push('Sonstige Erträge (z. B. Küche, Möblierung) sind mit einer eigenen '
+        + 'Laufzeit von ' + _dauer + ' Jahren angesetzt, nicht über die Restnutzungsdauer des '
+        + 'Gebäudes. Sie haften an einer Sache, nicht am Bauwerk.');
+      out.sonstige_ertraege = { jahr: round0(sonstige), dauer_jahre: _dauer,
+                                barwertfaktor: _vS, barwert_eur: sonstigeBarwert };
+    }
+    let ertragswert = gebErtragswert + bw + sonstigeBarwert;
     if (hatBw) out.staffel.push({ pos: '+ Bodenwert', wert: bw });
     /* WPDF12-4 · Ohne Bodenwert und ohne boG ist "vorlaeufiger Ertragswert"
      * dieselbe Zahl wie der Gebaeudeertragswert eine Zeile darueber. */

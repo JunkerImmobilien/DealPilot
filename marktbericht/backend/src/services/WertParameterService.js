@@ -13,6 +13,7 @@
 
 import { q } from '../lib/db.js';
 import { lzsNach256, MODELL } from '../lib/immowertv.js';
+import { stufeNachStreuung } from '../lib/nrw_modell.js';   /* v1048-WSTR-1 */
 
 const RANG = { A: 1, B: 2, C: 3, D: 4 };
 const MIN_FALLZAHL_C = 10;   // Konzept Kap. 5.3 — darunter kein Wert aus eigener Ableitung
@@ -44,6 +45,70 @@ function agsKette(ags) {
   if (a.length >= 2) kette.push({ ags: a.slice(0, 2), ebene: 'land' });
   kette.push({ ags: '00000', ebene: 'bund' });
   return kette;
+}
+
+/* v1044-WNBW-2 · Abschaltbar, damit sich auf Staging vergleichen laesst,
+ * was der Nachbarwert an den Zahlen aendert — ohne Rollout. */
+const NACHBARWERT_AN = (process.env.NACHBARWERT || '1') !== '0';
+
+/** Achtstelligen Gemeindeschluessel herausziehen, falls vorhanden. */
+function a8(ags) {
+  const a = String(ags ?? '').replace(/\D/g, '');
+  return a.length >= 8 ? a.slice(0, 8) : null;
+}
+
+/**
+ * Amtlicher Wert einer anderen Gemeinde desselben Gutachterausschusses.
+ * Stufe C — indikativ. Nicht 'eigene Marktableitung': der Wert IST amtlich,
+ * nur nicht fuer diese Gemeinde ermittelt. Der Standardhinweis fuer C
+ * waere hier schlicht falsch, deshalb ein eigener Text.
+ */
+async function nachbarwert(ags8, art, tag) {
+  if (!ags8) return null;
+  let rows = [];
+  try {
+    rows = await q(
+      `SELECT p.wert, p.wert_min, p.wert_max, p.fallzahl, p.quelle_text,
+              p.quelle_url, p.modellversion, p.ags AS herkunft_ags,
+              s.name AS gaa, n.name AS herkunft_ort
+         FROM mb.gaa_sources s
+         JOIN mb.wert_parameter p ON p.ags = ANY(s.ags_liste)
+         LEFT JOIN mb.ags_namen n ON n.ags = p.ags
+        WHERE $1 = ANY(s.ags_liste)
+          AND p.ags <> $1
+          AND p.typ = 'lzs'
+          AND p.objektart IN ($2, 'alle')
+          AND p.qualitaet IN ('A','B')
+          AND p.gueltig_von <= $3::date
+          AND (p.gueltig_bis IS NULL OR p.gueltig_bis >= $3::date)
+        ORDER BY p.fallzahl DESC NULLS LAST, p.gueltig_von DESC
+        LIMIT 1`, [ags8, art, tag]) || [];
+  } catch (e) { return null; }
+
+  const r = rows[0];
+  if (!r) return null;
+  /* Dieselbe Schwelle wie fuer jeden anderen C-Wert. Ein Zinssatz aus vier
+   * Kauffaellen wandert nicht in den Nachbarort. */
+  if (Number(r.fallzahl || 0) < MIN_FALLZAHL_C) return null;
+
+  const ort = r.herkunft_ort || r.herkunft_ags;
+  return {
+    wert: Number(r.wert),
+    min: r.wert_min != null ? Number(r.wert_min) : null,
+    max: r.wert_max != null ? Number(r.wert_max) : null,
+    stufe: 'C',
+    quelle: r.quelle_text || null,
+    quelle_url: r.quelle_url || null,
+    parameter_id: null,
+    modellversion: r.modellversion || MODELL.IMMOWERTV_2021,
+    fallzahl: r.fallzahl != null ? Number(r.fallzahl) : null,
+    ebene: 'gutachterausschuss',
+    hinweis: 'Fuer diese Gemeinde hat der Gutachterausschuss keinen eigenen '
+      + 'Liegenschaftszinssatz abgeleitet. Verwendet wird der Wert fuer '
+      + ort + ' (N = ' + (r.fallzahl || '?') + ') aus dem Bericht desselben '
+      + 'Ausschusses: ' + (r.gaa || 'unbekannt') + '. Amtlich ermittelt, aber '
+      + 'nicht fuer diesen Ort — daher indikativ.',
+  };
 }
 
 export const WertParameterService = {
@@ -91,20 +156,52 @@ export const WertParameterService = {
 
       for (const row of rows) {
         if (row.qualitaet === 'C' && Number(row.fallzahl || 0) < MIN_FALLZAHL_C) continue;
+        /* v1048-WSTR-2 · Ein amtlicher Mittelwert mit grosser Streuung ist
+         * nicht objektscharf belastbar. Kreis Minden-Luebbecke, Eigentums-
+         * wohnungen: 2,2 Prozent bei einer Standardabweichung von 1,1.
+         * Das Modell der AGVGA.NRW weist selbst darauf hin, dass die
+         * Mittelwerte betraechtliche Standardabweichungen aufweisen. */
+        const _str = stufeNachStreuung({ wert: row.wert, wert_min: row.wert_min,
+                                         wert_max: row.wert_max, qualitaet: row.qualitaet });
         return {
           wert: Number(row.wert),
           min: row.wert_min != null ? Number(row.wert_min) : null,
           max: row.wert_max != null ? Number(row.wert_max) : null,
-          stufe: row.qualitaet,
+          stufe: _str.qualitaet,
+          stufe_roh: row.qualitaet,
+          streuung_pct: _str.streuung_pct,
+          herabgestuft: _str.herabgestuft,
+          /* v1052-WSPN-1 · Gelesen wurden sie schon, zurueckgegeben nie.
+           * Das PDF zeigte deshalb nur "Streuung ±50 % des Mittelwerts"
+           * statt der eigentlichen Aussage "Spanne 1,1 bis 3,3 %". */
+          wert_min: row.wert_min != null ? Number(row.wert_min) : null,
+          wert_max: row.wert_max != null ? Number(row.wert_max) : null,
           quelle: row.quelle_text || null,
           quelle_url: row.quelle_url || null,
           parameter_id: Number(row.id),
           modellversion: row.modellversion || MODELL.IMMOWERTV_2021,
           fallzahl: row.fallzahl != null ? Number(row.fallzahl) : null,
           ebene,
-          hinweis: hinweisZurStufe(row.qualitaet, ebene, row.fallzahl),
+          hinweis: _str.herabgestuft ? _str.hinweis
+                                     : hinweisZurStufe(_str.qualitaet, ebene, row.fallzahl),
         };
       }
+    }
+
+    /* v1044-WNBW-1 · Nachbarwert aus DEMSELBEN Gutachterausschuss.
+     *
+     * Erst hier, nach der ganzen Kaskade: der Nachbarwert soll Paragraf 256
+     * ersetzen, nicht einen amtlichen Wert. Stuende er weiter oben, wuerde
+     * ein Stufe-C-Wert aus dem Nachbarort ein Stufe-A des eigenen Kreises
+     * schlagen — das waere schlechter als der Zustand vorher.
+     *
+     * NIE ueber Ausschussgrenzen hinweg: die Ableitung gilt fuer den Markt,
+     * den dieser Ausschuss beobachtet. Und nichts davon wird geschrieben —
+     * sonst staenden bald 355 abgeleitete Zeilen neben 72 echten und
+     * niemand koennte sie auseinanderhalten. */
+    if (typ === 'lzs' && NACHBARWERT_AN) {
+      const nb = await nachbarwert(a8(ags), art, tag);
+      if (nb) return nb;
     }
 
     // Nichts in der Tabelle: gesetzlicher Auffangwert direkt rechnen.

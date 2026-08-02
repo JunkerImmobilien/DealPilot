@@ -21,6 +21,7 @@ import { BorisConnector } from '../connectors/BorisConnector.js';
 import { DealPilotObjectMapper } from './DealPilotObjectMapper.js';
 import { MarketInsightsService } from './MarketInsightsService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
+import { IrwConnector } from '../connectors/IrwConnector.js';   /* v1053-WIRW-1 */
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
 
@@ -118,6 +119,14 @@ export const ReportOrchestrator = {
       nhk_typ: input.nhk_typ || null,
       keller_dg: input.keller_dg || null,
       standardstufe: input.standardstufe ? Number(input.standardstufe) : null,
+      /* v1055-WFELD-2 · Grundrissart und Modernisierungspunkte. Die
+       * Standardstufe stand hier schon; diese beiden nicht. */
+      grundriss: input.grundriss || null,
+      /* v1057-WSON-6 */
+      sonstige_jahr: input.sonstige_jahr ? Number(input.sonstige_jahr) : null,
+      sonstige_dauer_jahre: input.sonstige_dauer_jahre ? Number(input.sonstige_dauer_jahre) : null,
+      mod_punkte: input.mod_punkte != null && input.mod_punkte !== ''
+        ? Number(input.mod_punkte) : null,
       bgf: input.bgf ? Number(input.bgf) : null,
       regionalfaktor: input.regionalfaktor ? Number(input.regionalfaktor) : null,
       sachwertfaktor: input.sachwertfaktor ? Number(input.sachwertfaktor) : null,
@@ -228,12 +237,100 @@ export const ReportOrchestrator = {
      * Faellt der Lesezugriff aus, rechnet der Quercheck mit seinen Pauschalen
      * weiter — der Bericht darf an einem fehlenden Parameter nicht scheitern. */
     let _wertParams = null;
+
+    /* v1047-WAGS-1 · Ohne Schluessel laeuft die ganze Kaskade ins Leere.
+     * ref.ags ist leer — das Formular kennt kein solches Feld. Der
+     * Schluessel liegt aber zweimal vor:
+     *   BORIS  properties_raw.Gemeindekennzeichen  (8-stellig, exakt)
+     *   PLZ    AgsResolver.fromPostcode()          (5-stellig, Kreis)
+     * Beide wurden bisher fuer anderes benutzt. Reihenfolge: genauer zuerst. */
+    let _agsWert = String(ref.ags || '').replace(/\D/g, '');
+    if (!_agsWert) {
+      const _bp0 = (landValue && landValue.properties_raw) || {};
+      _agsWert = String(_bp0.Gemeindekennzeichen || _bp0.gemeindekennzeichen
+        || _bp0['Gemeindeschlüssel'] || _bp0.Gemeindeschluessel || '').replace(/\D/g, '');
+    }
+    if (!_agsWert) {
+      try {
+        const _ai = await agsP;
+        _agsWert = String((_ai && (_ai.gemeinde_ags || _ai.kreis_ags)) || '').replace(/\D/g, '');
+      } catch (e) { /* ohne Schluessel bleibt es beim Auffangwert */ }
+    }
+    step('wertparameter: ags=' + (_agsWert || 'KEINER'));
+
+    /* v1053-WIRW-2 · Immobilienrichtwert. Anders als der Vergleichswert
+     * aus Inseraten stammt er aus beurkundeten Kaufpreisen — Paragraf 20
+     * ImmoWertV. Beim Wohnungseigentum einschliesslich Miteigentumsanteil.
+     * Faellt der Abruf aus, laeuft der Bericht unveraendert weiter: eine
+     * zusaetzliche Quelle darf nie das Ganze kippen. */
+    let _irw = null;
+    try {
+      /* lat/lon stehen ab Z. 62 bereit; BorisConnector nutzt sie genauso. */
+      const _la = Number(lat), _lo = Number(lon);
+      if (Number.isFinite(_la) && Number.isFinite(_lo)) {
+        _irw = await IrwConnector.hole({ lat: _la, lon: _lo,
+          objektart: ref.property_type, anzahlWe: ref.units });
+        if (_irw && _irw.verfuegbar) {
+          _irw.abweichung = IrwConnector.abweichung(_irw, ref);
+          step('irw: ' + _irw.wert_qm + ' EUR/m2, Stichtag ' + (_irw.stichtag || '?'));
+        } else {
+          step('irw: kein Wert (' + ((_irw && _irw.grund) || 'unbekannt') + ')');
+        }
+      }
+    } catch (e) { _irw = null; }
+
+    /* v1049-WFLA-1 · BORIS liefert die Grundstuecksgroesse des
+     * Bodenrichtwertgrundstuecks mit — die marktuebliche Groesse der Zone.
+     * Huellhorst: 700 m2 gegen 950 m2 tatsaechlich. Nach Paragraf 41
+     * ImmoWertV kommt fuer eine erhebliche Ueberschreitung eine getrennte
+     * Bewertung in Betracht. Wir setzen weiter die volle Flaeche an — aber
+     * der Bericht sagt es, statt es zu verschweigen. */
+    let _flaeche = null;
+    try {
+      const _bp2 = (landValue && landValue.properties_raw) || {};
+      const _refQm = parseFloat(String(_bp2['Fläche'] || _bp2.Flaeche || '').replace(',', '.'));
+      const _istQm = parseFloat(ref.plot_area);
+      if (_refQm > 0 && _istQm > 0) {
+        const _ueber = Math.round((_istQm / _refQm - 1) * 100);
+        _flaeche = {
+          richtwertgrundstueck_qm: _refQm, objekt_qm: _istQm, ueberschreitung_pct: _ueber,
+          erheblich: _ueber >= 30,
+          geschosszahl: _bp2.Geschosszahl || null,
+          lagebeurteilung: _bp2.Lagebeurteilung || null,
+          umrechnungsvorschrift_url: _bp2['Link zur Umrechnungsvorschrift'] || null,
+          hinweis: _ueber >= 30
+            ? 'Das Grundstück ist mit ' + _istQm + ' m² um ' + _ueber + ' % größer als das '
+              + 'Bodenrichtwertgrundstück dieser Zone (' + _refQm + ' m²). Der Bodenwert setzt '
+              + 'die gesamte Fläche zum vollen Bodenrichtwert an. Nach § 41 ImmoWertV kommt '
+              + 'für die Mehrfläche eine getrennte Bewertung in Betracht — hier nicht vorgenommen.'
+            : null,
+        };
+        step('flaeche: ' + _istQm + ' m2 gegen ' + _refQm + ' m2 Richtwertgrundstueck ('
+          + (_ueber >= 0 ? '+' : '') + _ueber + ' %)');
+      }
+    } catch (e) { /* eine Nebenangabe darf den Bericht nie kippen */ }
+
     try {
       const _lzs = await WertParameterService.liegenschaftszins({
-        ags: ref.ags || null, objektart: ref.property_type, anzahlWe: ref.units,
+        ags: _agsWert || null, objektart: ref.property_type, anzahlWe: ref.units,
         brwSqm: landValue && landValue.available ? landValue.value_sqm : null,
         nutzerwert: ref.lzs_pct || null,
       });
+      /* v1049-WBWK-1 · Die Bewirtschaftungskostenquote, die der
+       * Gutachterausschuss selbst gemessen hat. Sie steht als eigener
+       * Parameter in derselben Ernte wie der Zinssatz und ist der beste
+       * verfuegbare Ansatz: nicht nur modellkonform, sondern das Modell
+       * dieses Ausschusses. Faellt sie aus, greift der Modellansatz. */
+      let _bwkPct = null;
+      try {
+        const _b = await WertParameterService.hole({
+          typ: 'bwk_pct', ags: _agsWert || null,
+          objektart: ref.property_type, anzahlWe: ref.units,
+        });
+        if (_b && _b.wert > 0) _bwkPct = _b;
+      } catch (e) { /* ohne Quote bleibt es beim Modellansatz */ }
+      step('bwk-quote: ' + (_bwkPct ? _bwkPct.wert + ' % (Stufe ' + _bwkPct.stufe + ')' : 'keine'));
+
       const _bw = ErtragswertService.bodenwert({
         flaeche_qm: ref.plot_area,
         brw_sqm: landValue && landValue.available ? landValue.value_sqm : null,
@@ -255,7 +352,7 @@ export const ReportOrchestrator = {
       let _swf = null;
       try {
         _swf = await WertParameterService.sachwertfaktor({
-          ags: ref.ags || null, objektart: ref.property_type, anzahlWe: ref.units,
+          ags: _agsWert || null, objektart: ref.property_type, anzahlWe: ref.units,
           nutzerwert: ref.sachwertfaktor || null,
         });
       } catch (e) { /* ohne Faktor bleibt es beim vorlaeufigen Sachwert */ }
@@ -264,13 +361,23 @@ export const ReportOrchestrator = {
        * duerfen den Bericht nie kippen — es ist eine Nebenbuchung. */
       try {
         const _bp = landValue && landValue.properties_raw;
-        if (_bp && (_bp.Gutachterausschussname || _bp.gutachterausschussname)) {
+        /* v1047-WAGS-2 · BORIS nennt die Felder anders, als v1036 annahm:
+         * 'Bezeichnung des Gutachterausschusses' statt 'Gutachterausschussname'.
+         * Deshalb hat sich die Ausschussliste nie aus der Nutzung gefuellt —
+         * die Abfrage lief, fand nie etwas und meldete auch nichts. */
+        const _gaaName = _bp && (_bp['Bezeichnung des Gutachterausschusses']
+          || _bp.Gutachterausschussname || _bp.gutachterausschussname
+          || _bp['Bezeichnung des Gutachterausschusses '.trim()]);
+        if (_bp && _gaaName) {
           await HarvestService.merkeAusschuss({
-            name: _bp.Gutachterausschussname || _bp.gutachterausschussname,
-            nummer: _bp.Gutachterausschussnummer || _bp.gutachterausschussnummer || null,
-            ags: String(_bp['Gemeindeschlüssel'] || _bp.Gemeindeschluessel || _bp.gemeindeschluessel || '').slice(0, 5) || null,
+            name: _gaaName,   /* v1047-WAGS-3 */
+            nummer: _bp.Gutachterausschusskennziffer || _bp.gutachterausschusskennziffer
+              || _bp.Gutachterausschussnummer || _bp.gutachterausschussnummer || null,
+            ags: String(_bp.Gemeindekennzeichen || _bp.gemeindekennzeichen
+              || _bp['Gemeindeschlüssel'] || _bp.Gemeindeschluessel
+              || _bp.gemeindeschluessel || '').replace(/\D/g, '').slice(0, 5) || null,
             bundesland: _bp.LAND_KENNUNG || _bp.land_kennung || null,
-            gemeinde: _bp.Gemeindename || _bp.gemeindename || null,
+            gemeinde: _bp.Gemeinde || _bp.Gemeindename || _bp.gemeindename || null,
             hinweis_url: _bp.Dateiname || null,
           });
         }
@@ -279,8 +386,24 @@ export const ReportOrchestrator = {
       if (_lzs) {
         _wertParams = {
           lzs_pct: _lzs.wert, lzs_quelle: _lzs.quelle, lzs_stufe: _lzs.stufe,
+          /* v1049-WBWK-2 */
+          /* v1050-WSTR-1 · Die Streuung aus der Kaskade weiterreichen. */
+          lzs_streuung_pct: _lzs.streuung_pct != null ? _lzs.streuung_pct : null,
+          lzs_min: _lzs.wert_min != null ? _lzs.wert_min : null,
+          lzs_max: _lzs.wert_max != null ? _lzs.wert_max : null,
+          lzs_herabgestuft: !!_lzs.herabgestuft,
+          bwk_quote_pct: _bwkPct ? _bwkPct.wert : null,
+          bwk_quote_stufe: _bwkPct ? _bwkPct.stufe : null,
+          bwk_quote_quelle: _bwkPct ? _bwkPct.quelle : null,
+          modellversion: _lzs.modellversion || null,
           lzs_parameter_id: _lzs.parameter_id, lzs_hinweis: _lzs.hinweis,
           bodenwert: _bw,
+          flaeche: _flaeche,   /* v1049-WFLA-2 */
+          /* v1055-WSPL-1 · Hinweis, wenn Stellplaetze da sind und kein
+           * Ertrag dafuer angesetzt wurde. */
+          stellplatz_ertrag_fehlt: ((Number(ref.garages) || 0) + (Number(ref.outdoor_parking) || 0)) > 0
+            && !(Number(ref.stellplatz_miete_monat) > 0),
+          irw: _irw,           /* v1053-WIRW-3 */
           bwk_modus: ref.bwk_modus || null,
           bwk_verwaltung_je_we: ref.bwk_verwaltung_je_we || null,
           bwk_instandhaltung_je_qm: ref.bwk_instandhaltung_je_qm || null,

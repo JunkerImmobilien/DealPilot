@@ -315,6 +315,13 @@
         <input type="file" id="dpktFile" accept=".dpkt,.json" style="display:none" />
         <b>DealPilot-Objekt (.dpkt)</b> laden — Bericht automatisch erstellen
       </div>
+      <!-- v1047-WBTN-1 · Hierher verschoben, aus dem Block unter
+           "Marktbericht erstellen". Die IDs bleiben, damit die Bindung
+           in app.js weiter greift. -->
+      <div style="display:flex;gap:6px;margin-top:9px;">
+        <button id="saveFileBtn" type="button" style="flex:1;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11.5px;cursor:pointer;">⤓ Eingaben sichern</button>
+        <button id="loadFileBtn" type="button" style="flex:1;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11.5px;cursor:pointer;">⤒ Eingaben laden</button>
+      </div>
       <div class="sep">oder manuell eingeben</div>
       <label>Adresse</label>
       <input id="address" placeholder="Hermannstr. 9, 32609 Hüllhorst" value="Hermannstr. 9, 32609 Hüllhorst" />
@@ -335,7 +342,7 @@
         <div><label>Etage</label><input id="floor" type="number" placeholder="z. B. 1" /></div>
       </div>
       <div class="row">
-        <div><label>Kaltmiete/Monat (€) <span style="color:#6a6a72;font-weight:400;font-size:11px;">— optional, sonst Marktmiete</span></label><input id="rent" type="number" placeholder="falls vermietet" /></div>
+        <div><label>Kaltmiete/Monat (€) <span style="color:#6a6a72;font-weight:400;font-size:11px;">— optional, sonst Marktmiete</span><span style="color:#6a6a72;font-weight:400;font-size:11px;display:block;margin-top:2px;line-height:1.4;">Nur Wohnraum, netto kalt — ohne Stellplatz, Küche oder Möblierung. Die Vergleichsmiete stammt aus reinen Wohnungsangeboten; Zuschläge hier würden eine Abweichung melden, die keine ist.</span></label><input id="rent" type="number" placeholder="falls vermietet" /></div>
         <div><label>Kaufpreis (€) <span style="color:#6a6a72;font-weight:400;font-size:11px;">— optional</span></label><input id="price" type="number" placeholder="falls bekannt" /></div>
       </div>
 
@@ -354,7 +361,15 @@
           </div>
         </div>
         <div class="row"><!-- v736-mb-eq -->
-          <div><label>Heizung</label>
+          <!-- v1047-WFELD-2 · Der Energietraeger fehlte. Abgefragt wurde nur
+               das Verteilsystem — "Zentralheizung" sagt nichts darueber, ob
+               Gas, Oel oder eine Waermepumpe dahintersteht. Er entscheidet
+               ueber GEG-Risiko, Betriebskosten und das Gewerk "Heizung"
+               bei der Standardstufe. -->
+          <div><label>Energieträger</label>
+            <select id="eq_energie"><option value="" selected>– keine Angabe –</option><option value="GAS">Gas</option><option value="OEL">Öl</option><option value="FERNWAERME">Fernwärme</option><option value="WAERMEPUMPE">Wärmepumpe</option><option value="PELLETS">Pellets / Holz</option><option value="STROM">Strom (direkt)</option><option value="SONSTIGE">Sonstige</option></select>
+          </div>
+          <div><label>Heizung – Verteilung</label>
             <select id="eq_heating"><option value="" selected>– keine Angabe –</option><option value="FUSSBODENHEIZUNG">Fußbodenheizung</option><option value="ZENTRALHEIZUNG">Zentralheizung</option><option value="EINZELOEFEN">Einzelöfen</option><option value="SONSTIGE">Sonstige</option></select>
           </div>
           <div><label>Verglasung</label>
@@ -388,6 +403,12 @@
         <div class="row"><!-- v736-mb-eq -->
           <div><label>Außenwände</label>
             <select id="eq_walls"><option value="" selected>– keine Angabe –</option><option value="AUSSENWAENDE_GEDAEMMT">Gedämmt</option><option value="AUSSENWAENDE_NICHT_GEDAEMMT">Nicht gedämmt</option></select>
+          </div>
+          <!-- v1047-WFELD-3 · Die Dachform fehlte. Sie haengt mit dem
+               Dachgeschossausbau zusammen und geht damit in den
+               NHK-Kennwert ein — anders als die Eindeckung. -->
+          <div><label>Dachform</label>
+            <select id="eq_dachform"><option value="" selected>– keine Angabe –</option><option value="SATTEL">Satteldach</option><option value="WALM">Walmdach</option><option value="KRUEPPELWALM">Krüppelwalmdach</option><option value="PULT">Pultdach</option><option value="FLACH">Flachdach</option><option value="MANSARD">Mansarddach</option></select>
           </div>
           <div><label>Dacheindeckung</label>
             <select id="eq_roof"><option value="" selected>– keine Angabe –</option><option value="DACHPFANNEN">Dachpfannen</option><option value="SCHIEFER">Schiefer</option><option value="METALL">Metall</option><option value="DACHPAPPE">Dachpappe</option><option value="SONSTIGE">Sonstige</option></select>
@@ -425,8 +446,7 @@
       <button id="replayBtn" style="display:none!important;width:100%;margin-top:8px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:9px;font-size:12.5px;cursor:pointer;">↺ Letzten Bericht laden (gratis, Demo)</button>
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
         <button id="loadLastBtn" type="button" style="display:none;flex:1 1 30%;min-width:104px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11px;cursor:pointer;">⟳ Letzte&nbsp;Ausgabe</button>
-        <button id="saveFileBtn" type="button" style="flex:1 1 30%;min-width:104px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11px;cursor:pointer;">⤓ Als&nbsp;Datei</button>
-        <button id="loadFileBtn" type="button" style="flex:1 1 30%;min-width:104px;background:transparent;border:1px solid #2a2a30;color:#9a9aa3;border-radius:999px;padding:8px 6px;font-size:11px;cursor:pointer;">⤒ Datei&nbsp;laden</button>
+        <!-- v1047-WBTN-2 · nach oben zur Objekteingabe verschoben -->
         <button id="shareBtn" type="button" data-v565-no-share style="display:none;flex:1 1 100%;background:transparent;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-c9a84c, #C9A84C);border-radius:999px;padding:9px;font-size:12px;cursor:pointer;margin-top:2px;">🔗 Teilbares Angebot (Link) kopieren</button>
         <input type="file" id="loadFileInput" accept="application/json,.json" style="display:none;">
       </div>
@@ -551,7 +571,7 @@ if (!window._wlrgbaH) {
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
 <script src="vendor/jspdf.plugin.autotable.min.js"></script>
-<script src="app.js?v=967"></script>
+<script src="app.js?v=1057"></script>
 <script src="mb-objektwahl.js?v=942"></script><!-- v566-objektwahl -->
 <script>
 /* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
@@ -580,6 +600,6 @@ try{var _u=new URLSearchParams(location.search).get('theme');if(_u==='light'||_u
 })();</script>
 <!-- WUI10-1 · Wertermittlung: Zielfrage, Stufenfelder, Pflichtfeld-Ampel -->
 <script src="feldhilfe.js?v=1010"></script>
-<script src="wertermittlung.js?v=1010"></script>
+<script src="wertermittlung.js?v=1057"></script>
 </body>
 </html>
