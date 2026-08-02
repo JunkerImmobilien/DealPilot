@@ -72,13 +72,41 @@ export const GeoMapConnector = {
     // Praezisierungs-Filter fuer eine engere Vergleichsgruppe (alle laut GeoMap-Doku):
     // propertySpaceRange / usableSpaceRange {from,to}, numberOfRoomsRange {from,to},
     // constructionYearRange {from,to}.
+    /* WSEG10-1 · Filter, gegen die echte API verifiziert (31.07.2026, Leipzig).
+     * ────────────────────────────────────────────────────────────────────────
+     * DREI GEMESSENE FEHLER im bisherigen Stand:
+     *
+     * 1) propertySpaceRange ist die GRUNDSTUECKSflaeche, nicht die Wohnflaeche.
+     *    Bei Wohnungen ist sie fast nie gefuellt. Gemessen: propertySpace 55-95
+     *    -> n=3, usableSpace 55-95 -> n=65.237. Die enge Stufe der Kaskade lief
+     *    dadurch IMMER leer und fiel still auf die ungefilterte Stufe zurueck.
+     *    Die Wohnflaeche heisst usableSpaceRange.
+     *
+     * 2) Erstbezug und saniert gibt es sehr wohl: firstTimeUse / refurbished
+     *    (schlichte Booleans, keine *Range/*State-Felder).
+     *
+     * 3) Ohne onlineDateRange aggregiert GeoMap ALLE Angebote seit 2015.
+     *    Gemessen: ohne Fenster Median 8,17 EUR/m2, mit 12 Monaten 11,08 (+36 %).
+     *    Das Zeitfenster setzt der Aufrufer ueber `period`.
+     */
     if (filters) {
+      const r = (a, b) => ({ ...(a != null ? { from: a } : {}), ...(b != null ? { to: b } : {}) });
       if (filters.spaceFrom != null || filters.spaceTo != null)
-        body.propertySpaceRange = { ...(filters.spaceFrom != null ? { from: filters.spaceFrom } : {}), ...(filters.spaceTo != null ? { to: filters.spaceTo } : {}) };
+        body.usableSpaceRange = r(filters.spaceFrom, filters.spaceTo);
+      if (filters.plotFrom != null || filters.plotTo != null)
+        body.propertySpaceRange = r(filters.plotFrom, filters.plotTo);
       if (filters.roomsFrom != null || filters.roomsTo != null)
-        body.numberOfRoomsRange = { ...(filters.roomsFrom != null ? { from: filters.roomsFrom } : {}), ...(filters.roomsTo != null ? { to: filters.roomsTo } : {}) };
+        body.numberOfRoomsRange = r(filters.roomsFrom, filters.roomsTo);
       if (filters.yearFrom != null || filters.yearTo != null)
-        body.constructionYearRange = { ...(filters.yearFrom != null ? { from: filters.yearFrom } : {}), ...(filters.yearTo != null ? { to: filters.yearTo } : {}) };
+        body.constructionYearRange = r(filters.yearFrom, filters.yearTo);
+      if (filters.sanFrom != null || filters.sanTo != null)
+        body.reconstructionYearRange = r(filters.sanFrom, filters.sanTo);
+      if (filters.erstbezug != null) body.firstTimeUse = !!filters.erstbezug;
+      if (filters.saniert != null) body.refurbished = !!filters.saniert;
+      if (filters.denkmal != null) body.preservationOrder = !!filters.denkmal;
+      if (filters.objectTypes && filters.objectTypes.length) body.objectTypes = filters.objectTypes;
+      if (filters.heatingTypes && filters.heatingTypes.length) body.heatingTypes = filters.heatingTypes;
+      if (filters.energyRatings && filters.energyRatings.length) body.energyRatings = filters.energyRatings;
     }
     let d;
     try {
@@ -121,7 +149,7 @@ export const GeoMapConnector = {
   // Holt echte Vergleichsangebote um einen Punkt.
   // params: { lat, lon, radiusKm, offerType:'Kauf'|'Miete', maxDetails }
   // Gibt { offers:[...], totalResults, fetchedDetails } zurück.
-  async marketOffers({ lat, lon, radiusKm, offerType, maxDetails }) {
+  async marketOffers({ lat, lon, radiusKm, offerType, maxDetails, filters, period, objectClasses }) {   /* WSEG12-1 */
     if (!geomapEnabled()) return { offers: [], totalResults: 0, fetchedDetails: 0, reason: 'no_token' };
 
     const radius = radiusKm || cfg.geomap.radiusKm;
@@ -132,12 +160,26 @@ export const GeoMapConnector = {
       coordinate: { lat, lon },
       radiusInKm: radius,
       objectCategories: ['Wohnen'],
-      objectClasses: ['Wohnung', 'Haus'],
+      /* WSEG12-2 */
+      objectClasses: (objectClasses && objectClasses.length) ? objectClasses : ['Wohnung', 'Haus'],
       offerTypes: [offerType], // 'Kauf' | 'Miete'
       size: Math.min(1000, Math.max(cap, 50)),
       sortField: 'DATUM',
       sortOrder: 'AB', // neueste zuerst
     };
+    /* WSEG12-3 · Dieselbe Segmentierung wie bei der KPI-Abfrage. Ohne sie zeigt
+     * die Beispielliste etwas voellig anderes als der Median darueber. */
+    if (period && period.from) body.onlineDateRange = { from: period.from, to: period.to };
+    if (filters) {
+      const r = (a, b) => ({ ...(a != null ? { from: a } : {}), ...(b != null ? { to: b } : {}) });
+      if (filters.spaceFrom != null || filters.spaceTo != null)
+        body.usableSpaceRange = r(filters.spaceFrom, filters.spaceTo);
+      if (filters.yearFrom != null || filters.yearTo != null)
+        body.constructionYearRange = r(filters.yearFrom, filters.yearTo);
+      if (filters.sanFrom != null) body.reconstructionYearRange = r(filters.sanFrom, filters.sanTo);
+      if (filters.erstbezug != null) body.firstTimeUse = !!filters.erstbezug;
+      if (filters.saniert != null) body.refurbished = !!filters.saniert;
+    }
 
     let idResp;
     try {

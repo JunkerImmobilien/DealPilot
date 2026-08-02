@@ -6,6 +6,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cfg } from './lib/config.js';
+/* WADM-4 */
+import { starteHarvestScheduler } from './lib/harvestScheduler.js';
 import { router } from './routes/api.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -21,7 +23,9 @@ const FRONTEND_DIR = FRONTEND_CANDIDATES.find((p) => {
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '5mb' }));
+/* WIMP-5 · 80 MB fuer den PDF-Import. Ein Grundstuecksmarktbericht hat
+ * 100 bis 250 Seiten; base64 legt nochmal ein Drittel drauf. */
+app.use(express.json({ limit: process.env.MB_BODY_LIMIT || '80mb' }));
 
 app.use('/api/v1/marktbericht', router);
 
@@ -33,6 +37,9 @@ const server = app.listen(cfg.port, () => {
   console.log(`[marktbericht] dashboard  http://localhost:${cfg.port}/`);
   console.log(`[marktbericht] api        http://localhost:${cfg.port}/api/v1/marktbericht/health`);
   console.log(`[marktbericht] frontend   ${FRONTEND_DIR} (${fs.existsSync(path.join(FRONTEND_DIR, 'index.html')) ? 'gefunden' : 'FEHLT'})`);
+    /* WADM-3 · Taktgeber der Discovery. Laeuft neben dem Server, nie im
+   * Anfragepfad — ein haengendes Landesportal darf keinen Bericht blockieren. */
+  try { starteHarvestScheduler(); } catch (e) { console.log('[harvest] Start fehlgeschlagen:', e.message); }
   console.log(`[marktbericht] ai_mode=${cfg.ai.mode}  geo=${cfg.geoapify.key ? 'geoapify' : 'none'}  market=${cfg.market.source}`);
 });
 // Lange Berichte (GeoMap-Calls + bis zu 3 min OpenAI) nicht serverseitig abschneiden.

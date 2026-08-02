@@ -35504,3 +35504,39 @@ body.dp-chrome-hell aside.sidebar .sb-card .sbc-title,
 body.dp-chrome-hell aside.sidebar .sb-card [class*="addr"],
 body.dp-chrome-hell aside.sidebar .sb-card [class*="price"]{ color: var(--dp-obj-text, inherit) !important; }
 /* /v938-textcolors-css */
+
+/* === drawer-fix-20260731 START =========================================================
+   Objektliste auf Tablets im Hochformat (769-900px).
+   Bis hierher war die Sidebar dort position:fixed bei left:-280px und wurde
+   NUR von .sidebar.open geoeffnet -- einer Klasse, die kein Code setzt.
+   Additiv: keine bestehende Regel wird veraendert, Rollback = Block loeschen.
+   Statusfarben und Gold bleiben unberuehrt (kein Farbwert in diesem Block).
+   ==================================================================== */
+@media (min-width: 769px) and (max-width: 900px) {
+  /* Alle drei Toggle-Mechaniken gelten, egal welche gewinnt. */
+  body .app-wrap.sb-mobile-open #sidebar.sidebar,
+  body #sidebar.sidebar.sb-mobile-open,
+  body #sidebar.sidebar.mobile-open,
+  body #sidebar.sidebar.open {
+    left: 0 !important;
+    box-shadow: 2px 0 20px rgba(0,0,0,0.4) !important;
+  }
+
+  /* Ohne sichtbaren Ausloeser bliebe die Liste trotzdem unerreichbar.
+     Unterhalb 769px greifen die bestehenden display:none-Regeln weiter. */
+  body .mobile-hamburger {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Der Abdunkler ist bisher nur bis 768px gestylt. */
+  body .mobile-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    display: none;
+  }
+  body .mobile-overlay.active { display: block; }
+}
+/* === drawer-fix-20260731 END ========================================================== */

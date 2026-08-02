@@ -92,7 +92,7 @@ body.intro-lock{overflow:hidden}
 .hero-eye{display:inline-flex;align-items:center;gap:9px;color:var(--gdh);margin-bottom:22px}
 .hero-eye .d{width:7px;height:7px;border-radius:50%;background:var(--grnh);box-shadow:0 0 9px 1px rgba(91,217,142,.9);animation:blink 1.6s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-.hero h1{font-size:clamp(36px,5.2vw,62px);font-weight:700;color:#fff;line-height:1.03}
+.hero h1{font-size:clamp(30px,5.2vw,62px);font-weight:700;color:#fff;line-height:1.03;hyphens:auto;-webkit-hyphens:auto;overflow-wrap:break-word}
 .hero h1 .thin{font-family:var(--ser);font-style:italic;font-weight:500;color:var(--gdh)}
 .hero .lead{color:var(--mdk);font-size:16.5px;line-height:1.65;max-width:52ch;margin:24px 0 30px}
 .hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
@@ -187,7 +187,7 @@ body.intro-lock{overflow:hidden}
 /* FEATURE BOARDING-PÄSSE */
 .bpg{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
 @media(max-width:1040px){.bpg{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:560px){.bpg{grid-template-columns:1fr}}
+@media(max-width:560px){.bpg{grid-template-columns:1fr 1fr;gap:11px;grid-auto-rows:1fr}}
 .bp{background:#fff;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 26px 50px -30px rgba(0,0,0,.7);transition:.18s}
 .bp:hover{transform:translateY(-4px);box-shadow:0 34px 60px -28px rgba(0,0,0,.8)}
 .bp-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 14px;background:var(--runway);color:var(--gold-on)}
@@ -570,7 +570,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
 .idscard .ids-band{padding:8px 18px}
 .idscard .ids-head{padding:12px 18px 6px}
 .idscard .ids-title{font-size:16px}
-.idscard .ids-body{grid-template-columns:172px 1fr;gap:22px;padding:6px 20px 14px}
+.idscard .ids-body{grid-template-columns:172px 1fr;gap:22px;padding:6px 20px 14px}@media(max-width:560px){.idscard .ids-body{grid-template-columns:1fr;gap:16px;padding:6px 16px 14px}.idscard .ids-left{flex-direction:row;justify-content:center;gap:18px;flex-wrap:wrap}}
 .idscard .ids-dial{width:112px;height:112px}
 .idscard .ids-dial svg{width:112px;height:112px;transform:rotate(-90deg)}
 .idscard .ids-dial .tr{fill:none;stroke:#efe9dc;stroke-width:7}
@@ -684,7 +684,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
 </style>
 <style id="v897-hide-app">/*v897-hide-app: App-Bereich temporaer ausgeblendet, zum Live-Gang wieder einblenden (Style entfernen)*/ a[data-scroll="app"],#app,.dp-appcta{display:none !important}</style>
   <link rel="stylesheet" href="landing-motion.css?v=4">
-<link rel="stylesheet" href="landing-mobile.css?v=1">
+<link rel="stylesheet" href="landing-mobile.css?v=3">
 </head>
 <body class="intro-lock">
 
@@ -4171,6 +4171,6 @@ html{scroll-behavior:smooth}
 
 </body><script src="landing-motion.js?v=9"></script>
 <script src="promo-erstflug.js?v=6"></script>
-<script src="landing-mobile.js?v=1"></script>
+<script src="landing-mobile.js?v=3"></script>
 </body>
 </html>

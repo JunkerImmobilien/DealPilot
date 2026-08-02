@@ -29,7 +29,15 @@ const router = express.Router();
 const MB_BASE = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
 
 // Kerosin-Tarife in Litern.
-const COST = { fast: 2, full: 5 }; // v554: Vollbericht 4->5 L
+/* WKERO-1 · Kerosin nach Stufe. Die Stufe kommt aus der Zielfrage im
+ * Formular (wert_stufe 1..3) und steht im Berichts-Payload. */
+const COST = { fast: 2, full: 5, wertermittlung: 12 }; // v554: Vollbericht 4->5 L
+
+function _kerosinKosten(body) {
+  if (body && (body.fast || body.schnell)) return COST.fast;
+  var st = parseInt((body && body.wert_stufe) || 1, 10);
+  return st >= 3 ? COST.wertermittlung : COST.full;
+}
 
 // Generischer Forward an den mb-backend. Nutzt globalen fetch (Node >=18).
 async function forward(method, path, opts) {
@@ -169,7 +177,7 @@ async function runReport(req, res) {
   try {
     const body = req.body || {};
     const fast = !!(body.fast || body.schnell);
-    const cost = fast ? COST.fast : COST.full;
+    const cost = _kerosinKosten(body);   /* WKERO-2 */
 
     // Kerosin-Vorabpruefung (Muster avm.js)
     const status = await aiCreditsService.getStatus(req.user.id);
@@ -291,7 +299,7 @@ router.post('/location-finder', authenticate, async function (req, res) {
 router.post('/reports/generate-stream', authenticate, async function (req, res) {
   const body = req.body || {};
   const fast = !!(body.fast || body.schnell);
-  const cost = fast ? COST.fast : COST.full;
+  const cost = _kerosinKosten(body);   /* WKERO-3 */
   // Vorab-Check Kerosin
   let status;
   try {

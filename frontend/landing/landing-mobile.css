@@ -77,3 +77,188 @@
 @media (max-width: 380px) {
   #app .dpc-wrap { gap: 30px; }
 }
+
+/* ============================================================================
+   FASSUNG 2 — Kopfzeile, Ueberschrift, Score-Karte, drehbare Modulkarten
+   ========================================================================= */
+
+/* ── Kopfzeile ──────────────────────────────────────────────────────────
+   Die Regel in index.html Z.78 blendet ab 920 px die Sprung-Links aus,
+   behaelt aber alles mit [data-view] — also API und LEISTUNGSUMFANG — plus
+   den Gold-Button. Auf 414 px sind das rund 490 px Inhalt in 362 px Platz,
+   ohne Umbruch: der Button haengt halb draussen. Beide Links stehen im
+   Footer, hier koennen sie weg. */
+@media (max-width: 620px) {
+  .nav-in { padding: 12px 16px; gap: 10px; }
+  .nav-links a[data-view] { display: none; }
+  .nav-cta { font-size: 12px; padding: 9px 13px; }
+}
+
+/* ── Modulkarten: zwei Spalten, drehbar ────────────────────────────────
+   Die Karten entstehen zur Laufzeit (#feats.innerHTML). landing-mobile.js
+   haengt nachtraeglich eine Rueckseite an, statt den Generator im
+   Inline-Block anzufassen.
+
+   WICHTIG — die Wrapper sind AUF JEDER BREITE im DOM. Damit der Desktop
+   unveraendert bleibt, sind sie dort schlicht durchlaessig: derselbe
+   Flex-Fluss wie vorher, Rueckseite ausgeblendet. */
+#feats .bp-flip,
+#feats .bp-face { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+#feats .bp-back { display: none; }
+
+@media (max-width: 560px) {
+  /* Alle Karten gleich gross: grid-auto-rows:1fr gibt jeder Reihe die Hoehe
+     der hoechsten. Zusammen mit height:100% durch alle Ebenen sitzt jede
+     Karte im selben Rechteck — unabhaengig von Titel- oder Textlaenge. */
+  #feats .bp {
+    height: 100%;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    perspective: 1000px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #feats .bp-flip {
+    position: relative;
+    display: grid;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform .55s cubic-bezier(.2, .8, .25, 1);
+  }
+  #feats .bp.is-flipped .bp-flip { transform: rotateY(180deg); }
+
+  /* Beide Seiten in DERSELBEN Grid-Zelle -> gleiche Hoehe, kein Springen */
+  #feats .bp-face {
+    grid-area: 1 / 1;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: 0 22px 44px -30px rgba(0, 0, 0, .75);
+  }
+  #feats .bp-back { display: flex; transform: rotateY(180deg); }
+
+  /* Kompaktere Vorderseite — die Details stehen jetzt hinten */
+  #feats .bp-top   { font-size: 7.5px; padding: 5px 10px; }
+  #feats .bp-main  { padding: 11px 11px 12px; }
+  #feats .bp-ico   { width: 28px; height: 28px; font-size: 14px; border-radius: 8px; }
+  #feats .bp-main h3 { font-size: 13.5px; margin: 7px 0 2px; }
+  #feats .bp-sub   { font-size: 10.5px; line-height: 1.35; }
+  #feats .bp-front .bp-feats { display: none; }
+  #feats .bp-stub  { font-size: 7.5px; padding: 6px 11px 8px; }
+
+  /* Rueckseite */
+  #feats .bp-back .bp-main { display: flex; flex-direction: column; justify-content: center; }
+  #feats .bp-back .bp-feats { display: grid; gap: 6px; list-style: none; padding: 0; margin: 0; }
+  #feats .bp-back .bp-feats li { font-size: 10.5px; line-height: 1.4; }
+  #feats .bp-back .bp-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 12px; color: #1a1305; margin-bottom: 8px; }
+
+  /* Drehhinweis — ohne ihn probiert es niemand aus */
+  .bp-turn {
+    margin-top: 9px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #b8932f;
+  }
+  .bp-turn .r { display: inline-block; transition: transform .4s; }
+  #feats .bp.is-flipped .bp-turn .r { transform: rotate(180deg); }
+}
+
+@media (min-width: 561px) { .bp-turn { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  #feats .bp-flip { transition: none; }
+  #feats .bp.is-flipped .bp-flip { transform: none; }
+  #feats .bp.is-flipped .bp-front { visibility: hidden; }
+  #feats .bp-back { transform: none; }
+  .bp-turn .r { transition: none; }
+}
+
+/* ============================================================================
+   FASSUNG 3 — Handy-Menue und Zurueck-nach-oben
+   Beide Bauteile werden von landing-mobile.js erzeugt; hier nur die Optik.
+   z-index-Ordnung der Seite: .nav = 120, #dp-intro = 99000.
+   Panel 118, Knopf 110 — beides bleibt unter der Kopfzeile.
+   ========================================================================= */
+
+/* ── Burger ────────────────────────────────────────────────────────────── */
+.nav-burger{
+  display:none;
+  width:40px;height:40px;flex:none;margin-left:auto;
+  background:transparent;border:1px solid rgba(255,255,255,.22);border-radius:10px;
+  cursor:pointer;padding:0;position:relative;
+}
+.nav-burger:focus-visible{outline:2px solid var(--wl-c9a84c, #C9A84C);outline-offset:2px}
+.nav-burger i{
+  position:absolute;left:11px;right:11px;height:2px;border-radius:2px;
+  background:#e9e3d8;transition:transform .28s cubic-bezier(.2,.8,.25,1),opacity .18s;
+}
+.nav-burger i:nth-child(1){top:13px}
+.nav-burger i:nth-child(2){top:19px}
+.nav-burger i:nth-child(3){top:25px}
+.nav-burger.on i:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.nav-burger.on i:nth-child(2){opacity:0}
+.nav-burger.on i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+/* ── Panel ─────────────────────────────────────────────────────────────── */
+.nav-sheet{
+  position:fixed;left:0;right:0;top:0;bottom:0;z-index:118;
+  background:rgba(7,7,7,.97);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  padding:76px 22px calc(30px + env(safe-area-inset-bottom));
+  overflow-y:auto;
+  opacity:0;visibility:hidden;transform:translateY(-8px);
+  transition:opacity .24s ease,transform .28s cubic-bezier(.2,.8,.25,1),visibility 0s .28s;
+}
+.nav-sheet.on{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+.nav-sheet a{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:15px 4px;color:#e9e3d8;text-decoration:none;
+  font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:19px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.nav-sheet a:after{content:"\203A";color:var(--wl-c9a84c, #C9A84C);font-size:20px;line-height:1}
+.nav-sheet a:active{color:#fff}
+.nav-sheet .sheet-cta{
+  margin-top:22px;justify-content:center;border-bottom:0;border-radius:12px;
+  background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));
+  color:#2c2410;font-weight:700;font-size:17px;padding:16px;
+}
+.nav-sheet .sheet-cta:after{content:none}
+body.nav-open{overflow:hidden}
+
+/* ── Zurueck nach oben ─────────────────────────────────────────────────── */
+.to-top{
+  position:fixed;right:16px;z-index:110;
+  bottom:calc(30px + env(safe-area-inset-bottom));
+  width:46px;height:46px;border-radius:50%;cursor:pointer;padding:0;
+  border:1px solid rgba(201,168,76,.5);
+  background:rgba(10,10,10,.82);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  color:var(--wl-c9a84c, #C9A84C);font-size:19px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transform:translateY(10px);
+  transition:opacity .25s ease,transform .25s ease,visibility 0s .25s;
+}
+.to-top.on{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+.to-top:focus-visible{outline:2px solid var(--wl-c9a84c, #C9A84C);outline-offset:3px}
+
+/* Nur auf dem Handy — Desktop und Tablet bleiben unberuehrt */
+@media (max-width: 620px){
+  .nav-burger{display:block}
+}
+@media (min-width: 621px){
+  .nav-sheet,.to-top{display:none!important}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .nav-burger i,.nav-sheet,.to-top{transition:none}
+}
