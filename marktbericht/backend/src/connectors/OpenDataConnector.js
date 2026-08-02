@@ -85,6 +85,10 @@ export const OPENDATA_QUELLEN = [
     ckan: 'https://ckan.open.nrw.de/api/3/action/package_show?id=ad760913-eb7b-4843-b3b7-dc9100b788ca',
     lizenz: 'dl-de/zero-2-0',
     format: 'nrw-gmd',
+    /* v1041-WQR-1 · Ressourcenmuster gehoert zur Quelle, nicht in den Code.
+     * Vorher stand /GMDNRW_CSV\.zip$/ fest in findeDatei() — ein zweites
+     * Land haette dort nie etwas gefunden. */
+    datei_muster: /GMDNRW_CSV\.zip$/i,
     /* Fallback, falls die API einmal nicht antwortet. */
     direkt: 'https://www.opengeodata.nrw.de/produkte/infrastruktur_bauen_wohnen/boris/GMD/GMDNRW_CSV.zip',
   },
@@ -154,7 +158,8 @@ export const OpenDataConnector = {
       const j = JSON.parse(b.toString('utf-8'));
       const res = (j.result && j.result.resources) || [];
       /* Die aktuelle Fassung heisst ohne Jahrgang; die mit Jahr sind Archiv. */
-      const akt = res.find((x) => /GMDNRW_CSV\.zip$/i.test(x.url || ''));
+      const muster = quelle.datei_muster || /\.zip$/i;
+      const akt = res.find((x) => muster.test(x.url || ''));
       if (akt) return { url: akt.url, stand: j.result.metadata_modified || null };
     } catch (e) { /* Fallback unten */ }
     return { url: quelle.direkt, stand: null };
@@ -168,6 +173,17 @@ export const OpenDataConnector = {
   async importiere({ land = 'NW', trockenlauf = false } = {}) {
     const quelle = OPENDATA_QUELLEN.find((x) => x.land === land);
     if (!quelle) return { ok: false, grund: `Keine Open-Data-Quelle fuer ${land}` };
+
+    /* v1041-WQR-2 · Der Rumpf unten liest NRWs Spaltenschema (quellArt +
+     * '_lzs', '_bwk', '_rnd' ...). Ein anderes Land hat andere Spalten.
+     * Ohne diese Sperre laeuft der Import durch, findet nichts und meldet
+     * Erfolg mit null Zeilen — der teuerste aller Fehler, weil er wie ein
+     * leerer Datensatz aussieht statt wie ein Programmfehler.
+     * Neues Land = neuer Parser HIER, nicht nur ein Eintrag in der Liste. */
+    if (quelle.format !== 'nrw-gmd') {
+      return { ok: false, grund: `Format "${quelle.format}" hat noch keinen Parser. `
+        + `Die Spaltennamen der Quelle muessen erst gemessen werden — geraten waere schlimmer als eine Luecke.` };
+    }
 
     const datei = await this.findeDatei(quelle);
     let buf, eintraege;
@@ -187,12 +203,36 @@ export const OpenDataConnector = {
     const schlTxt = hol('schluessel.csv');
     if (!lzsTxt) return { ok: false, grund: 'lzs.csv nicht im Archiv' };
 
+    /* v1043-WTDZ-1 · Zaehler VOR dem Namensblock. In v1042 stand dort
+     * bericht.namen — aber `bericht` wird erst rund 20 Zeilen spaeter
+     * deklariert. Temporale Todeszone: node --check hat es durchgewunken,
+     * der erste echte Erntelauf ist abgestuerzt. */
+    let namenAngelegt = 0;
+
     /* Gemeinde -> Gutachterausschuss, fuer die Quellenangabe. */
     const gaa = {};
     if (schlTxt) {
       csvLesen(schlTxt).forEach((z) => {
         if (z.ags) gaa[z.ags] = { name: z.gaa_name, kreis: z.kreis_kreisfreiestadt };
       });
+      /* v1042-WNAM-2 · Kreisnamen nebenbei mitschreiben. Fehler hier duerfen
+       * den Import nie kippen — es ist eine Anzeigehilfe, keine Rechengroesse.
+       * Deshalb je Zeile ein eigenes catch und kein Abbruch. */
+      if (!trockenlauf) {
+        const gesehen = new Set();
+        for (const z of csvLesen(schlTxt)) {
+          const k5 = String(z.ags || '').slice(0, 5);
+          const nam = (z.kreis_kreisfreiestadt || '').trim();
+          if (!k5 || k5.length < 5 || !nam || gesehen.has(k5)) continue;
+          gesehen.add(k5);
+          await q1(`INSERT INTO mb.ags_namen (ags, name, ebene, bundesland, quelle, stand)
+                    VALUES ($1,$2,'kreis',$3,$4,CURRENT_DATE)
+                    ON CONFLICT (ags) DO NOTHING RETURNING ags`,
+                   [k5, nam, k5.slice(0, 2) === '05' ? 'NW' : null,
+                    'schluessel.csv, ' + quelle.name]).catch(() => {});
+        }
+        namenAngelegt = gesehen.size;
+      }
     }
 
     const zeilen = csvLesen(lzsTxt);
@@ -201,6 +241,7 @@ export const OpenDataConnector = {
       stand: datei.stand, gemeinden: zeilen.length,
       angelegt: 0, uebersprungen: 0, unplausibel: 0, unsicher: 0, arten: {},
     };
+    bericht.namen = namenAngelegt;   /* v1043-WTDZ-2 */
 
     for (const z of zeilen) {
       const ags = String(z.ags || '').trim();

@@ -126,6 +126,9 @@ async function main() {
   console.log('  --discover [--land XX] [--limit N] [--archiv]');
   console.log('  --ki   --ags 14627 --art etw [--kreis "Landkreis Meissen"]   (Stufe C, unbestaetigt)');
   console.log('  --wert --ags 14627 --art etw --lzs 2.5 --stichtag 2024-01-01 --quelle "..."   (Stufe A)');
+  console.log('');
+  console.log('  Quellzeilen einspielen (eigenes Skript, v1041):');
+  console.log('    node src/lib/quellen-import.js --datei /tmp/quellen-ni.csv [--trocken]');
 }
 
 main().then(() => process.exit(0)).catch((e) => { console.error('FEHLER:', e.message); process.exit(1); });

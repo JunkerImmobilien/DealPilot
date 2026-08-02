@@ -87,12 +87,20 @@ router.get('/harvest/status', async (req, res) => {
              s.letzter_check, s.letzter_fund, s.status,
              (SELECT count(*)::int FROM mb.gaa_documents d WHERE d.source_id = s.id) AS dokumente
         FROM mb.gaa_sources s ORDER BY s.bundesland, s.name`);
+    /* v1042-WNAM-1 · Klartextnamen mitliefern. Reine Anzeigehilfe —
+     * kein Rechenweg haengt daran, und was fehlt, bleibt eine Nummer. */
+    const nm = await qMb('SELECT ags, name, ebene FROM mb.ags_namen');
     const w = await qMb(`SELECT ags, objektart, typ, wert, einheit, qualitaet, stichtag, quelle_text
         FROM mb.wert_parameter
        WHERE (gueltig_bis IS NULL OR gueltig_bis >= CURRENT_DATE)
        ORDER BY qualitaet, ags LIMIT 300`);
     res.json({ parameter: s.parameter, dokumente: s.dokumente,
-               quellen: q.rows || [], werte: w.rows || [] });
+               /* v1041 · q() liefert die ZEILEN direkt (db.js gibt res.rows
+                * zurueck). Mit .rows kam hier immer [] an — der Reiter war
+                * nicht leer, er war blind. Gegenprobe: HarvestService.js
+                * traegt denselben Befund seit v1031. */
+               quellen: q || [], werte: w || [],
+               namen: (nm || []).reduce((a, r) => { a[r.ags] = r.name; return a; }, {}) });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

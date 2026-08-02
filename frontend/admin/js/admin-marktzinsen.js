@@ -88,31 +88,71 @@
     return '<div class="mz-bar">' + reihe + '</div><div class="mz-legs">' + legende + '</div>';
   }
 
+  /* v1041-WQR-5 */
+  var STAND = {
+    geprueft: { t: 'geprüft',  f: '#3FA56C', h: 'Adresse hat geantwortet, Zugang und Preis am Portal abgelesen.' },
+    gemeldet: { t: 'gemeldet', f: '#C9A84C', h: 'Aus einem amtlichen Verzeichnis übernommen, Portal noch nicht selbst aufgerufen.' },
+    offen:    { t: 'offen',    f: '#8A8178', h: 'Gerüstzeile. Nichts davon ist belegt.' }
+  };
+
+  function standAbzeichen(s) {
+    var k = STAND[s.pruefstand] || STAND.offen;
+    var d = s.geprueft_am ? ' · ' + datum(s.geprueft_am) : '';
+    return '<span class="mz-stand" style="color:' + k.f + '" title="'
+      + esc(k.h + (s.geprueft_quelle ? ' Beleg: ' + s.geprueft_quelle : '')) + '">'
+      + k.t + d + '</span>';
+  }
+
+  function preisText(s) {
+    /* Leer heisst UNBEKANNT, nicht kostenlos. Wer das gleichsetzt, laesst
+     * genau die Kreise aus der Kaufliste fallen, die man kaufen muesste. */
+    if (s.preis_eur != null && s.preis_eur !== '') {
+      return '<b>' + String(s.preis_eur).replace('.', ',') + ' €</b>';
+    }
+    if (s.zugang === 'frei' || s.zugang === 'namensnennung') return '<span class="mz-frei">frei</span>';
+    if (s.zugang === 'kostenpflichtig') return '<span class="mz-warn">Preis unbekannt</span>';
+    return '<span class="mz-leer">–</span>';
+  }
+
   function quellenTabelle(q) {
     if (!q || !q.length) return '<p class="mz-leer">Noch keine Quellen erfasst.</p>';
     var z = q.map(function (s) {
       var zg = ZUGANG[s.zugang] || ZUGANG.unbekannt;
       var kauf = (s.zugang === 'kostenpflichtig' || s.zugang === 'auf_anfrage');
       var tage = tageSeit(s.letzter_fund);
-      var veraltet = s.letzter_fund == null || (tage != null && tage > 540);
-      return '<tr' + (veraltet ? ' class="mz-alt"' : '') + '>' +
+      /* v1043-WSTU-2 */
+      var nie = !s.letzter_fund && !s.letzter_check;
+      var veraltet = !nie && (s.letzter_fund == null || (tage != null && tage > 540));
+      return '<tr data-zg="' + esc(s.zugang || 'unbekannt') + '"'
+        + (veraltet ? ' class="mz-alt"' : '') + '>' +
         '<td><b>' + esc(s.bundesland) + '</b></td>' +
         '<td>' + esc(s.name) +
           (s.notiz ? '<div class="mz-not">' + esc(s.notiz) + '</div>' : '') + '</td>' +
         '<td><span class="mz-tag" style="background:' + zg.f + '22;color:' + zg.f + '">' + zg.t + '</span></td>' +
         '<td>' + datum(s.letzter_check) + '</td>' +
         '<td>' + datum(s.letzter_fund) +
-          (veraltet ? '<div class="mz-warn">seit über 18 Monaten nichts</div>' : '') + '</td>' +
+          (veraltet ? '<div class="mz-warn">seit über 18 Monaten nichts</div>'
+                    : (nie ? '<div class="mz-not">noch nicht geerntet</div>' : '')) + '</td>' +
         '<td>' + (s.dokumente || 0) + '</td>' +
+        '<td class="mz-preis">' + preisText(s) + '</td>' +
+        '<td>' + standAbzeichen(s) + '</td>' +
         '<td class="mz-akt">' +
-          (kauf && s.portal_url
-            ? '<a href="' + esc(s.portal_url) + '" target="_blank" rel="noopener" class="mz-btn mz-kauf">Bericht kaufen ↗</a>'
+          (kauf && (s.bestell_url || s.portal_url)
+            ? '<a href="' + esc(s.bestell_url || s.portal_url) + '" target="_blank" rel="noopener" class="mz-btn mz-kauf">Bericht kaufen ↗</a>'
             : '<button class="mz-btn" data-pruefen="' + s.id + '">jetzt prüfen</button>') +
         '</td></tr>';
     }).join('');
-    return '<table class="data-table mz-tab"><thead><tr>' +
+    /* v1041-WQR-4 · Der Filter blendet per CSS aus statt neu zu zeichnen.
+     * Zwei Renderer auf derselben Tabelle enden erfahrungsgemaess im Chaos. */
+    var kaufN = q.filter(function (s) {
+      return s.zugang === 'kostenpflichtig' || s.zugang === 'auf_anfrage';
+    }).length;
+    return '<label class="mz-filter"><input type="checkbox" id="mz-nur-kauf"> '
+      + 'nur kostenpflichtige zeigen <b>(' + kaufN + ')</b></label>' +
+      '<table class="data-table mz-tab" id="mz-quellen"><thead><tr>' +
       '<th>Land</th><th>Gutachterausschuss</th><th>Zugang</th>' +
-      '<th>zuletzt geprüft</th><th>zuletzt gefunden</th><th>Dok.</th><th></th>' +
+      '<th>zuletzt geprüft</th><th>zuletzt gefunden</th><th>Dok.</th>' +
+      '<th>Preis</th><th>Prüfstand</th><th></th>' +
       '</tr></thead><tbody>' + z + '</tbody></table>';
   }
 
@@ -125,11 +165,11 @@
     NW: 'https://www.boris.nrw.de/boris-nrw',
     NI: 'https://www.immobilienmarkt.niedersachsen.de/',
     BE: 'https://www.berlin.de/gutachterausschuss/marktinformationen/marktanalyse/',
-    BB: 'https://www.gutachterausschuesse-bb.de/',
+    BB: 'https://gutachterausschuss.brandenburg.de/',   /* v1041-WQR-3 */
     HH: 'https://www.hamburg.de/gutachterausschuss/',
     HB: 'https://www.gutachterausschuss.bremen.de/',
     HE: 'https://www.gutachterausschuesse.hessen.de/',
-    MV: 'https://www.gutachterausschuesse-mv.de/',
+    MV: 'https://www.laiv-mv.de/Geoinformation/Wertermittlung/Grundstuecksmarktberichte/',
     RP: 'https://gutachterausschuesse.rlp.de/',
     SN: 'https://www.boris.sachsen.de/',
     ST: 'https://www.landesrecht.sachsen-anhalt.de/',
@@ -147,17 +187,58 @@
     return 'https://duckduckgo.com/?q=' + q;
   }
 
+  /* v1042-WNAM-3 · Was fuer eine Groesse steht da eigentlich? */
+  var TYP = {
+    lzs:              { t: 'Liegenschaftszins',    k: 'LZS' },
+    bwk_pct:          { t: 'Bewirtschaftungskosten', k: 'BWK' },
+    rnd:              { t: 'Restnutzungsdauer',    k: 'RND' },
+    gnd:              { t: 'Gesamtnutzungsdauer',  k: 'GND' },
+    miete_qm:         { t: 'Marktmiete',           k: 'Miete' },
+    kp_qm:            { t: 'Kaufpreisniveau',      k: 'Preis' },
+    sachwertfaktor:   { t: 'Sachwertfaktor',       k: 'SWF' },
+    vergleichsfaktor: { t: 'Vergleichsfaktor',     k: 'VGF' },
+    rohertragsfaktor: { t: 'Rohertragsfaktor',     k: 'REF' },
+    indexreihe:       { t: 'Indexreihe',           k: 'Index' }
+  };
+
+  /* Die Einheit MUSS immer mit. Vorher stand hinter einer
+   * Gesamtnutzungsdauer von 80 Jahren gar nichts — und daneben ein
+   * Liegenschaftszins mit Prozentzeichen. Wer die Spalte ueberfliegt,
+   * liest 80 Prozent. */
+  var EINHEIT = { prozent: ' %', jahre: ' Jahre', eur_qm: ' €/m²', faktor: '' };
+
+  function typLabel(t) {
+    var d = TYP[t];
+    if (!d) return '<span class="mz-not">' + esc(t || '?') + '</span>';
+    return '<span class="mz-typ" title="' + esc(d.t) + '">' + d.k + '</span>';
+  }
+
+  /* Namen aus dem Endpunkt. Fehlt einer, bleibt die Nummer stehen. */
+  var NAMEN = {};
+  function agsName(ags) {
+    var a = String(ags || '');
+    var n = NAMEN[a] || NAMEN[a.slice(0, 5)] || null;
+    return n ? esc(n) + ' <span class="mz-not">' + esc(a) + '</span>' : '<b>' + esc(a) + '</b>';
+  }
+
   function kreisTabelle(w, q) {
     /* Kreise aus den hinterlegten Werten UND den erfassten Ausschuessen. */
     var kreise = {};
     (w || []).forEach(function (r) {
-      var k = r.ags;
+      /* v1042-WNAM-4 · Auf Kreisebene zusammenfassen. Die Werte kommen
+       * gemeindescharf (05111000 = Duesseldorf), die Ausschuesse sind
+       * kreisscharf hinterlegt (05111). Ohne das Kuerzen fanden sich die
+       * beiden nie und die Spalte Gutachterausschuss blieb leer. */
+      var k = String(r.ags || '').slice(0, 5);
+      if (!k) return;
       if (!kreise[k]) kreise[k] = { ags: k, stufen: {}, typen: {} };
       kreise[k].stufen[r.qualitaet] = (kreise[k].stufen[r.qualitaet] || 0) + 1;
       kreise[k].typen[r.typ] = true;
     });
     (q || []).forEach(function (s) {
-      (s.ags_liste || []).forEach(function (k) {
+      (s.ags_liste || []).forEach(function (k0) {
+        var k = String(k0 || '').slice(0, 5);
+        if (!k) return;
         if (!kreise[k]) kreise[k] = { ags: k, stufen: {}, typen: {} };
         kreise[k].ausschuss = s.name;
         kreise[k].land = s.bundesland;
@@ -180,7 +261,7 @@
       return sb - sa;
     });
     return '<table class="data-table mz-tab"><thead><tr>' +
-      '<th>Kreis (AGS)</th><th>Gutachterausschuss</th><th>Stufen</th>' +
+      '<th>Kreis</th><th>Gutachterausschuss</th><th>Stufen</th>' +
       '<th>Zugang</th><th>Bericht holen</th></tr></thead><tbody>' +
       liste.map(function (r) {
         var st = Object.keys(r.stufen).sort().map(function (x) {
@@ -191,7 +272,7 @@
         var portal = r.portal || LAND_PORTAL[r.land] || null;
         var offen = !r.stufen.A && !r.stufen.B;
         return '<tr' + (offen ? ' class="mz-alt"' : '') + '>' +
-          '<td><b>' + esc(r.ags) + '</b></td>' +
+          '<td>' + agsName(r.ags) + '</td>' +
           '<td>' + esc(r.ausschuss || '–') + (r.land ? ' <span class="mz-not">' + esc(r.land) + '</span>' : '') + '</td>' +
           '<td>' + st + '</td>' +
           '<td><span class="mz-tag" style="background:' + zg.f + '22;color:' + zg.f + '">' + zg.t + '</span></td>' +
@@ -204,17 +285,29 @@
 
   function werteTabelle(w) {
     if (!w || !w.length) return '<p class="mz-leer">Noch keine Werte hinterlegt.</p>';
+    /* v1042-WNAM-5 · Spalte GROESSE ergaenzt. Ohne sie standen Zinssatz,
+     * Kostenquote, Nutzungsdauer und Miete unterschiedslos untereinander. */
     return '<table class="data-table mz-tab"><thead><tr>' +
-      '<th>Kreis</th><th>Objektart</th><th>Wert</th><th>Stufe</th>' +
+      '<th>Kreis</th><th>Größe</th><th>Objektart</th><th>Wert</th><th>Stufe</th>' +
       '<th>Stichtag</th><th>Quelle</th></tr></thead><tbody>' +
       w.map(function (r) {
         var st = STUFE[r.qualitaet] || STUFE.E;
-        return '<tr><td>' + esc(r.ags) + '</td><td>' + esc(r.objektart) + '</td>' +
-          '<td><b>' + String(r.wert).replace('.', ',') + (r.einheit === 'prozent' ? ' %' : '') + '</b></td>' +
+        var eh = EINHEIT[r.einheit];
+        if (eh === undefined) eh = r.einheit ? ' ' + r.einheit : '';
+        var qt = String(r.quelle_text || '');
+        /* Der Quellentext ist bei jeder Zeile fast gleich und sehr lang.
+         * Sichtbar bleibt der Kern bis zum ersten Komma, der Rest haengt
+         * im Tooltip — abgeschnitten ohne Zugang war er wertlos. */
+        var qk = qt.split(',')[0];
+        if (qk.length > 52) qk = qk.slice(0, 52) + '…';
+        return '<tr><td>' + agsName(r.ags) + '</td>' +
+          '<td>' + typLabel(r.typ) + '</td>' +
+          '<td>' + esc(r.objektart) + '</td>' +
+          '<td class="mz-wert"><b>' + String(r.wert).replace('.', ',') + eh + '</b></td>' +
           '<td><span class="mz-tag" style="background:' + st.f + '22;color:' + st.f + '">'
             + r.qualitaet + ' · ' + st.t + '</span></td>' +
           '<td>' + datum(r.stichtag) + '</td>' +
-          '<td class="mz-q">' + esc((r.quelle_text || '').slice(0, 90)) + '</td></tr>';
+          '<td class="mz-q" title="' + esc(qt) + '">' + esc(qk) + '</td></tr>';
       }).join('') + '</tbody></table>';
   }
 
@@ -321,21 +414,28 @@
   function zeichne(d) {
     var body = document.getElementById('mz-body');
     if (!body) return;
+    NAMEN = d.namen || {};   /* v1042-WNAM-6 · vor dem Zeichnen setzen */
     var par = (d.parameter || []);
     var q = (d.quellen || []);
     var frei = q.filter(function (s) { return s.zugang === 'frei' || s.zugang === 'namensnennung'; }).length;
     var kauf = q.filter(function (s) { return s.zugang === 'kostenpflichtig' || s.zugang === 'auf_anfrage'; }).length;
+    /* v1043-WSTU-1 · Nie geerntet ist nicht dasselbe wie stumm geworden.
+     * Ohne die Unterscheidung meldet der Waechter fast jede Zeile und
+     * wird dadurch wertlos. */
     var alt = q.filter(function (s) {
+      if (!s.letzter_fund && !s.letzter_check) return false;   // nie geerntet
       var t = tageSeit(s.letzter_fund);
       return s.letzter_fund == null || (t != null && t > 540);
     }).length;
+    var neu = q.filter(function (s) { return !s.letzter_fund && !s.letzter_check; }).length;
 
     body.innerHTML =
       '<div class="mz-ks">' +
         kachel('Quellen gesamt', q.length) +
         kachel('frei abrufbar', frei, 'werden automatisch geprüft') +
         kachel('kostenpflichtig', kauf, 'nur manuell nach Kauf') +
-        kachel('nicht aktuell', alt, 'seit über 18 Monaten ohne Fund') +
+        kachel('nicht aktuell', alt, neu ? neu + ' weitere noch nie geerntet'
+                                        : 'seit über 18 Monaten ohne Fund') +
       '</div>' +
       '<h3 class="mz-h">Abdeckung nach Stufe</h3>' + abdeckungsBalken(par) +
       '<h3 class="mz-h">Quellen' +
@@ -345,6 +445,7 @@
       '<h3 class="mz-h">Bericht einlesen</h3>' + importBlock() +
       '<h3 class="mz-h">Hinterlegte Werte</h3>' + werteTabelle(d.werte || []);
 
+    filterBinden();   /* v1041-WQR-8 */
     var lb = document.getElementById('mz-lesen');
     if (lb) lb.addEventListener('click', auslesen);
     body.querySelectorAll('[data-pruefen]').forEach(function (b) {
@@ -405,7 +506,21 @@
       '#view-marktzinsen .mz-imp-r input[type=text]{padding:5px 9px;border-radius:5px;width:170px;' +
         'border:1px solid rgba(255,255,255,.14);background:transparent;color:#F2ECDC;font-size:12px}' +
       '#view-marktzinsen .mz-imp-k{margin:12px 0 6px;font-size:12.5px;color:#E8CC7A}' +
-      '#view-marktzinsen .mz-imp-f{display:flex;align-items:center;gap:14px;margin-top:10px}';
+      '#view-marktzinsen .mz-imp-f{display:flex;align-items:center;gap:14px;margin-top:10px}' +
+      /* v1041-WQR-7 */
+      '#view-marktzinsen .mz-filter{display:inline-flex;align-items:center;gap:8px;'
+        + 'margin:0 0 10px;font-size:13px;color:#A89F8E;cursor:pointer}' +
+      '#view-marktzinsen .mz-only-kauf tbody tr:not([data-zg="kostenpflichtig"])'
+        + ':not([data-zg="auf_anfrage"]){display:none}' +
+      '#view-marktzinsen .mz-stand{font-size:11.5px;white-space:nowrap;cursor:help}' +
+      '#view-marktzinsen .mz-preis{white-space:nowrap;font-size:12.5px;color:#F2ECDC}' +
+      '#view-marktzinsen .mz-frei{color:#3FA56C;font-size:12px}' +
+      /* v1042-WNAM-7 */
+      '#view-marktzinsen .mz-typ{display:inline-block;padding:1px 7px;border-radius:4px;'
+        + 'font-size:11px;letter-spacing:.4px;background:rgba(201,168,76,.14);'
+        + 'color:#E8CC7A;cursor:help;white-space:nowrap}' +
+      '#view-marktzinsen .mz-wert{white-space:nowrap}' +
+      '#view-marktzinsen .mz-q{cursor:help}';
     document.head.appendChild(s);
   }
 
@@ -418,6 +533,16 @@
       .catch(function (e) {
         body.innerHTML = '<p class="mz-leer">Konnte nicht geladen werden: ' + esc(e.message) + '</p>';
       });
+  }
+
+  /* v1041-WQR-6 */
+  function filterBinden() {
+    var cb = document.getElementById('mz-nur-kauf');
+    var tb = document.getElementById('mz-quellen');
+    if (!cb || !tb) return;
+    cb.addEventListener('change', function () {
+      tb.classList.toggle('mz-only-kauf', cb.checked);
+    });
   }
 
   function init() {
