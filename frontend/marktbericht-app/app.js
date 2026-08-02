@@ -235,6 +235,13 @@ async function generate() {
     balcony_area: $('balcony') ? (parseFloat($('balcony').value) || null) : null,
     garden_area: $('garden') ? (parseFloat($('garden').value) || null) : null,
     plot_area: $('plot') ? (parseFloat($('plot').value) || null) : null,
+    /* WUI10-2 · Wertermittlung. Die Felder erzeugt wertermittlung.js dynamisch je
+       gewaehlter Stufe; alle Zugriffe sind deshalb null-sicher. */
+    ...(window.Wertermittlung ? window.Wertermittlung.payload() : {}),
+    /* WBRW-1 · Manueller Bodenrichtwert. Der Orchestrator liest
+       land_value_manual seit jeher — nur gefragt hat ihn niemand. */
+    land_value_manual: $('brwManuell') ? (parseFloat($('brwManuell').value) || null) : null,
+    land_value_stichtag: $('brwStichtag') ? ($('brwStichtag').value || null) : null,
     units: $('units') ? (parseInt($('units').value, 10) || null) : null,
     elevator: $('elevator') ? $('elevator').checked : false,
     garages: $('garages') ? (parseFloat($('garages').value) || null) : null,
@@ -375,12 +382,177 @@ function _scoreWord(s) {
   if (s == null) return '';
   return s >= 80 ? 'sehr gut' : s >= 65 ? 'gut' : s >= 45 ? 'durchschnittlich' : s >= 25 ? 'schwach' : 'sehr schwach';
 }
+/* WERG27-2 · Bodenwert und Wertverfahren am Bildschirm.
+ * Jedes Verfahren mit einer eingeklappten Erklaerung — wer Vergleichswert
+ * und Ertragswert nebeneinander sieht und 45 % Abstand liest, haelt sonst
+ * einen davon fuer falsch. */
+function _wvErklaerung(art) {
+  var t = {
+    vergleich: 'Das Vergleichswertverfahren fragt: was zahlen Kaeufer gerade fuer aehnliche '
+      + 'Objekte? Grundlage sind tatsächliche Angebote im Umkreis, zugeschnitten auf '
+      + 'Wohnfläche, Baujahr, Zustand und Erstbezug. Bei Eigentumswohnungen ist es das '
+      + 'führende Verfahren, weil es dafür viele Vergleichsfälle gibt. Es bildet den '
+      + 'Markt ab — mit allem, was der Markt gerade einpreist, auch Erwartungen an die '
+      + 'künftige Wertentwicklung.',
+    ertrag: 'Das Ertragswertverfahren fragt: was wirft die Immobilie ab? Von der '
+      + 'marktüblich erzielbaren Miete werden die Bewirtschaftungskosten abgezogen, der '
+      + 'Bodenwert wird verzinst abgesetzt, und was das Gebäude übrig lässt, wird über '
+      + 'die Restnutzungsdauer kapitalisiert. Es ist das Verfahren für Kapitalanlagen. '
+      + 'Weil es nur den laufenden Ertrag abbildet und keine Wertsteigerung, liegt es bei '
+      + 'Neubauten in Wachstumsregionen regelmäßig unter dem Vergleichswert — zwanzig '
+      + 'bis vierzig Prozent Abstand sind dort normal.',
+    sach: 'Das Sachwertverfahren fragt: was kostet es, das Gebäude neu zu errichten, '
+      + 'abzüglich Alterswertminderung, zuzüglich Bodenwert? Es ist das Verfahren für '
+      + 'selbstgenutzte Ein- und Zweifamilienhäuser, wo Vergleichsfälle fehlen. Bei '
+      + 'Wohnungseigentum wird es kaum verwendet: die Herstellungskosten beziehen sich auf '
+      + 'das ganze Gebäude, nicht auf eine Einheit.',
+  };
+  return t[art] || '';
+}
+
+/* WKIV-2 · Zweitmeinung Zeile fuer Zeile. Nicht das Endergebnis allein —
+ * zwei Wege koennen sich auf dieselbe Zahl zubewegen und trotzdem beide
+ * falsch liegen. Auffaellig ab 10 % Abweichung je Zwischengroesse. */
+function _renderGegenrechnung(d) {
+  var g = d.ki_gegenrechnung;
+  var wrap = document.getElementById('resultBody');
+  if (!wrap) return;
+  var alt = document.getElementById('kig-box');
+  if (alt) alt.remove();
+  if (!g) return;
+
+  var box = document.createElement('div');
+  box.id = 'kig-box';
+  box.style.cssText = 'margin-top:22px;padding:13px 15px;border-radius:8px;'
+    + 'border:1px solid rgba(128,128,128,.22)';
+
+  if (!g.verfuegbar) {
+    box.innerHTML = '<div style="font-size:12px;opacity:.7">Zweitmeinung nicht verf\u00fcgbar: '
+      + (g.grund || '\u2013') + '</div>';
+    wrap.appendChild(box); return;
+  }
+
+  var v = g.vergleich || {};
+  var zeilen = (v.zeilen || []).map(function (z) {
+    var abw = z.abweichung_pct;
+    var farbe = z.auffaellig ? '#B8625C' : '#3FA56C';
+    var f = function (n) {
+      return n == null ? '\u2013'
+        : (Math.abs(n) >= 1000 ? new Intl.NumberFormat('de-DE').format(Math.round(n)) : String(n).replace('.', ','));
+    };
+    return '<tr><td>' + z.pos + '</td><td style="text-align:right">' + f(z.unser) + '</td>'
+      + '<td style="text-align:right;opacity:.8">' + f(z.ki) + '</td>'
+      + '<td style="text-align:right;color:' + (abw == null ? 'inherit' : farbe) + '">'
+      + (abw == null ? '\u2013' : (abw > 0 ? '+' : '') + String(abw).replace('.', ',') + ' %')
+      + '</td></tr>';
+  }).join('');
+
+  box.innerHTML =
+    '<div style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6">'
+    + 'Zweitmeinung \u00b7 unabh\u00e4ngig nachgerechnet</div>'
+    + '<div style="font-size:11.5px;opacity:.75;margin:5px 0 10px">'
+    + 'Ein Sprachmodell rechnet mit denselben Eingangsgr\u00f6\u00dfen unabh\u00e4ngig nach. '
+    + 'Der Bericht rechnet unver\u00e4ndert mit der eigenen Engine \u2014 eine Abweichung '
+    + 'ist ein Pr\u00fcfsignal, kein Schiedsspruch.</div>'
+    + (zeilen ? ('<table class="data-table" style="font-size:12px"><thead><tr>'
+        + '<th>Position</th><th style="text-align:right">DealPilot</th>'
+        + '<th style="text-align:right">Zweitmeinung</th>'
+        + '<th style="text-align:right">Abweichung</th></tr></thead><tbody>'
+        + zeilen + '</tbody></table>') : '')
+    + (v.urteil ? '<div style="font-size:11.5px;margin-top:9px;opacity:.85">' + v.urteil + '</div>' : '');
+  wrap.appendChild(box);
+}
+
+function _renderWertverfahren(d) {
+  var wrap = document.getElementById('resultBody');
+  if (!wrap) return;
+  var alt = document.getElementById('wv-box');
+  if (alt) alt.remove();
+  var cc = d.cross_check || {};
+  var lv = d.land_value || {};
+  var hk = d.wertermittlung_herkunft || {};
+  var e = cc.ertragswert || {}, sw = cc.sachwert || {};
+  var v = d.valuation && d.valuation.market_value ? d.valuation.market_value.estimated : null;
+
+  function eur(n) {
+    return n == null ? '\u2013' : new Intl.NumberFormat('de-DE').format(Math.round(n)) + ' \u20ac';
+  }
+  function karte(kennung, titel, wert, unten, art) {
+    return '<div class="wv-k">'
+      + '<div class="wv-t">' + titel + '</div>'
+      + '<div class="wv-v">' + wert + '</div>'
+      + '<div class="wv-s">' + (unten || '') + '</div>'
+      + '<div class="wv-mehr" data-wv="' + kennung + '">\u25b8 was bedeutet das?</div>'
+      + '<div class="wv-erk" id="wv-e-' + kennung + '">' + _wvErklaerung(art) + '</div>'
+      + '</div>';
+  }
+
+  var box = document.createElement('div');
+  box.id = 'wv-box';
+  var bodenZeile = lv.available
+    ? eur(lv.value_sqm) + '/m\u00b2 \u00b7 amtlich \u00b7 Stichtag ' + (lv.stichtag || '\u2013')
+    : 'kein amtlicher Bodenrichtwert verf\u00fcgbar';
+
+  box.innerHTML =
+    '<h3 class="wv-h">Bodenwert</h3>'
+    + '<div class="wv-boden"><b>' + (e.bodenwert_eur != null ? eur(e.bodenwert_eur) : '\u2013')
+    + '</b><span>' + bodenZeile + '</span></div>'
+    + (hk.kurz ? '<div class="wv-hk">Liegenschaftszinssatz: '
+        + (hk.liegenschaftszins_pct != null ? String(hk.liegenschaftszins_pct).replace('.', ',') + ' % \u00b7 ' : '')
+        + hk.kurz + (hk.indikativ ? ' (indikativ)' : '') + '</div>' : '')
+    + '<h3 class="wv-h">Wertverfahren im Vergleich</h3>'
+    + '<div class="wv-g">'
+    + karte('vgl', 'Vergleichswert', eur(v), 'f\u00fchrend bei Eigentumswohnungen', 'vergleich')
+    + karte('ert', 'Ertragswert', e.available ? eur(e.value_eur) : '\u2013',
+        e.available ? ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.') : (e.grund || ''), 'ertrag')
+    + karte('sac', 'Sachwert', sw.available ? eur(sw.value_eur) : '\u2013',
+        sw.available ? '' : (sw.grund || 'nicht ausgewiesen'), 'sach')
+    + '</div>';
+
+  if (!document.getElementById('wv-css')) {
+    var st = document.createElement('style'); st.id = 'wv-css';
+    st.textContent = '#wv-box .wv-h{margin:22px 0 10px;font-size:12px;letter-spacing:.05em;'
+      + 'text-transform:uppercase;opacity:.65}'
+      + '#wv-box .wv-boden{display:flex;align-items:baseline;gap:14px}'
+      + '#wv-box .wv-boden b{font-size:22px}'
+      + '#wv-box .wv-boden span{font-size:12px;opacity:.7}'
+      + '#wv-box .wv-hk{margin-top:6px;font-size:12px;opacity:.75}'
+      + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
+      + '#wv-box .wv-k{padding:13px 15px;border:1px solid rgba(128,128,128,.22);border-radius:8px}'
+      + '#wv-box .wv-t{font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}'
+      + '#wv-box .wv-v{font-size:20px;font-weight:600;margin:4px 0 2px}'
+      + '#wv-box .wv-s{font-size:11.5px;opacity:.7;min-height:16px}'
+      + '#wv-box .wv-mehr{margin-top:8px;font-size:11.5px;cursor:pointer;'
+      + 'color:var(--wl-c9a84c,#C9A84C)}'
+      + '#wv-box .wv-erk{display:none;margin-top:7px;font-size:11.5px;line-height:1.55;opacity:.85}';
+    document.head.appendChild(st);
+  }
+  wrap.appendChild(box);
+
+  box.querySelectorAll('.wv-mehr').forEach(function (m) {
+    m.addEventListener('click', function () {
+      var z = document.getElementById('wv-e-' + m.getAttribute('data-wv'));
+      var auf = z.style.display !== 'block';
+      z.style.display = auf ? 'block' : 'none';
+      m.textContent = (auf ? '\u25be' : '\u25b8') + ' was bedeutet das?';
+    });
+  });
+}
+
 function render(out) {
   const d = out.data;
   try { fillFormFromOut(d); } catch (e) { /* Formular-Befuellung optional */ }
   $('placeholder').classList.add('hide');
   $('resultBody').classList.remove('hide');
   $('reportPanel').classList.remove('hide');
+
+  /* WKIV-1 · Die KI-Gegenrechnung stand seit v1021 im Bericht unter
+   * ki_gegenrechnung, wurde aber nirgends dargestellt. Auch eingeschaltet
+   * sah man nur eine Zeile im Log. */
+  try { _renderGegenrechnung(d); } catch (e) { /* Anzeige darf nie kippen */ }
+
+  /* WERG27-1 · Bodenwert und Wertverfahren im Ergebnis. */
+  try { _renderWertverfahren(d); } catch (e) { /* Anzeige darf den Bericht nie kippen */ }
 
   // v565-no-mbcard: Mini-Marktbewertung-Karte entfernt (echte Tachos via renderValuation bleiben)
   try { var _h = $('mbCard'); if (_h) _h.style.display = 'none'; } catch (e) {}
@@ -1054,6 +1226,44 @@ async function renderObjectHistory(out) {
   note.textContent = hist.length + ' gespeicherte St\u00e4nde \u00b7 \u00e4ltester ' + labels[0] + ', neuester ' + labels[labels.length - 1];
 }
 
+/* WDAT-2 · Schnappschuss aller Eingabefelder, auch der dynamisch
+ * erzeugten. Kein fester Namensliste — was im Formular steht, kommt mit. */
+function _sammleEingaben() {
+  const o = {};
+  document.querySelectorAll('input[id], select[id], textarea[id]').forEach((e) => {
+    if (e.type === 'file' || e.type === 'button' || e.type === 'submit') return;
+    if (/^(mz-|lf|dpktFile|loadFileInput)/.test(e.id)) return;
+    o[e.id] = (e.type === 'checkbox') ? !!e.checked : e.value;
+  });
+  o._stufe = (window.Wertermittlung && window.Wertermittlung.stufe) ? window.Wertermittlung.stufe() : 1;
+  return o;
+}
+
+function _setzeEingaben(o) {
+  if (!o) return;
+  /* Erst die Stufe, dann die Felder: die Wertermittlungsfelder gibt es
+   * nur, wenn die Stufe sie erzeugt hat. */
+  if (o._stufe && window.Wertermittlung && window.Wertermittlung.setStufe) {
+    try { window.Wertermittlung.setStufe(Number(o._stufe)); } catch (e) {}
+  }
+  const setzen = () => {
+    Object.keys(o).forEach((k) => {
+      if (k === '_stufe') return;
+      const e = document.getElementById(k);
+      if (!e) return;
+      if (e.type === 'checkbox') e.checked = !!o[k];
+      else e.value = o[k] == null ? '' : o[k];
+    });
+    /* Damit Ampel, Pflichtfeld-Sperre und abhaengige Bloecke nachziehen. */
+    ['ptype', 'area', 'year', 'baustatus', 'mea'].forEach((id) => {
+      const e = document.getElementById(id);
+      if (e) e.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  };
+  setzen();
+  setTimeout(setzen, 60);   // nach dem Neuzeichnen der Stufenfelder
+}
+
 // --- .dpkt-Upload -> Bericht aus DealPilot-Objekt ---
 $('dpktDrop').addEventListener('click', () => $('dpktFile').click());
 $('dpktFile').addEventListener('change', async (e) => {
@@ -1110,6 +1320,26 @@ function _mbBuildObjData() {
     gsfl: val('plot'), einheiten: val('units'),
     kp: val('price'), nkm: val('rent'),
     ds2_energie: (val('energy') || '').toUpperCase(),
+    /* WFELD-3 · Rueckweg. Bisher eine Einbahnstrasse: was im Marktbericht
+     * ergaenzt wurde, landete nicht im Objekt und musste beim naechsten
+     * Bericht erneut getippt werden. */
+    garagen: val('garages'), stellpl_aussen: val('outdoor'),
+    balkon: val('balcony'), garten: val('garden'), baeder: val('baths'),
+    ausstattung: val('quality'), modernis: val('modyear'),
+    eq_roof: val('eq_roof'), eq_walls: val('eq_walls'), eq_windows: val('eq_windows'),
+    eq_heating: val('eq_heating'), eq_bath: val('eq_bath'), eq_floor: val('eq_floor'),
+    eq_guest_wc: val('eq_guest_wc'), eq_store_room: val('eq_store_room'),
+    baustatus: val('baustatus'), mea_pct: val('mea'), lzs_pct: val('lzs'),
+    /* WSAVE31-1 · die restlichen zehn */
+    brw_manuell: val('brwManuell'), brw_stichtag: val('brwStichtag'),
+    brw_anpassung_pct: val('brwAnp'), brw_anpassung_grund: val('brwAnpGrund'),
+    stellplatz_miete_monat: val('spMiete'), sanierungsjahr: val('sanierungsjahr'),
+    zustand: val('cond'), nutzung: val('usage'), modernis_grad: val('modern'),
+    eq_elevator: (function () {
+      var e = document.getElementById('elevator');
+      if (!e) return null;
+      return (e.type === 'checkbox' ? e.checked : /^(ja|1|true)$/i.test(e.value)) ? 1 : 0;
+    })(),
     _mb_source: 'marktbericht'
   };
   Object.keys(data).forEach(function (k) { if (data[k] == null || data[k] === '') delete data[k]; });
@@ -1467,8 +1697,12 @@ function fillInputsFromDpkt(o) {
     addr = [[str, hnr].filter(Boolean).join(' '), [plz, ort].filter(Boolean).join(' ')].filter(Boolean).join(', ');
   }
   set('address', addr);
-  const pt = g(['objekttyp', 'property_type', 'typ', 'objektart', 'art']);
-  if (pt && /haus/i.test(String(pt))) set('ptype', 'haus'); else if (pt) set('ptype', 'wohnung');
+  /* WFELD-1 · 'objart' war der fehlende Alias — genau so heisst das Feld im
+   * Objekt. Ohne ihn blieb der Objekttyp leer, und daran hing die halbe
+   * Fehlerkette im Bericht. */
+  const pt = g(['objart', 'objekttyp', 'objektart', 'property_type', 'typ', 'art']);
+  if (pt && /haus|efh|zfh|dhh|reihen|mfh|mehrfamilien/i.test(String(pt))) set('ptype', 'haus');
+  else if (pt) set('ptype', 'wohnung');
   const us = g(['nutzung', 'usage_type', 'usage', 'nutzungsart']);
   if (us && /eigen/i.test(String(us))) set('usage', 'eigennutzung'); else if (us) set('usage', 'kapitalanlage');
   set('area', g(['wohnflaeche', 'wohnflaeche_qm', 'wohnflaeche_m2', 'flaeche', 'living_area', 'wfl']));
@@ -1479,6 +1713,49 @@ function fillInputsFromDpkt(o) {
   set('rent', g(['kaltmiete', 'kaltmiete_monat', 'nettokaltmiete', 'miete', 'rent', 'monatsmiete']));
   const en = g(['ds2_energie', 'energieklasse', 'energie_label', 'energy_class', 'energieeffizienzklasse']);
   if (en) set('energy', String(en).toUpperCase().trim()[0]);
+
+  /* WFELD-2 · Die uebrigen 19 Felder. Gemessen: von 34 Formularfeldern wurden
+   * 11 uebernommen. Der Rest musste bei jedem Bericht neu getippt werden —
+   * darunter die Gewerkefelder, die das Anlage-2-Modell fuer die
+   * Restnutzungsdauer fuettern. Die heissen beidseitig gleich. */
+  set('plot', g(['gsfl', 'grundstueck', 'grundstuecksflaeche', 'grundstucksflache', 'plot_area', 'gs_flaeche']));
+  /* WSAVE31-2 · Gegenstueck zum Rueckweg. Speichern ohne Laden ist folgenlos. */
+  set('brwManuell', g(['brw_manuell', 'brw', 'bodenrichtwert']));
+  set('brwStichtag', g(['brw_stichtag', 'bodenrichtwert_stichtag']));
+  set('brwAnp', g(['brw_anpassung_pct']));
+  set('brwAnpGrund', g(['brw_anpassung_grund']));
+  set('spMiete', g(['stellplatz_miete_monat']));
+  set('sanierungsjahr', g(['sanierungsjahr', 'modernis']));
+  set('usage', g(['nutzung', 'usage', 'nutzungsart']));
+  set('modern', g(['modernis_grad', 'modernisierung']));
+  set('mea', g(['mea_pct', 'mea', 'miteigentumsanteil']));
+  set('lzs', g(['lzs_pct', 'liegenschaftszins']));
+  set('baustatus', g(['baustatus']));
+  set('units', g(['einheiten', 'anzahl_we', 'we', 'wohneinheiten', 'units']));
+  set('garages', g(['garagen', 'garage', 'tg_stellplaetze', 'garages']));
+  set('outdoor', g(['stellpl_aussen', 'aussenstellplaetze', 'stellplaetze_aussen', 'outdoor_spaces']));
+  set('balcony', g(['balkon', 'balkon_qm', 'balkonflaeche', 'terrasse', 'balcony_area']));
+  set('garden', g(['garten', 'garten_qm', 'gartenflaeche', 'garden_area']));
+  set('baths', g(['baeder', 'badezimmer', 'anzahl_baeder', 'bathrooms']));
+  set('modyear', g(['modernis', 'modernisierungsjahr', 'sanierungsjahr', 'modernization_year']));
+  const _lift = g(['eq_elevator', 'aufzug', 'elevator', 'fahrstuhl']);
+  if (_lift != null) {
+    const _el = $('elevator');
+    if (_el) {
+      const _ja = /^(1|true|ja|yes|vorhanden)$/i.test(String(_lift));
+      if (_el.type === 'checkbox') _el.checked = _ja; else _el.value = _ja ? 'ja' : 'nein';
+    }
+  }
+  const _qual = g(['ausstattung', 'qualitaet', 'quality', 'ausstattungsstandard']);
+  if (_qual) {
+    const _qs = String(_qual).toLowerCase();
+    const _q = /gehoben|hochwertig|luxus|stark/.test(_qs) ? 'gehoben'
+      : /einfach|schlicht|niedrig/.test(_qs) ? 'einfach' : 'normal';
+    set('quality', _q);
+  }
+  /* Gewerke: Feldnamen beidseitig identisch, deshalb ohne Uebersetzung. */
+  ['eq_roof', 'eq_walls', 'eq_windows', 'eq_heating', 'eq_bath', 'eq_floor',
+   'eq_guest_wc', 'eq_store_room'].forEach(function (k) { set(k, g([k])); });
   const zu = g(['zustand', 'condition']);
   if (zu) { const z = String(zu).toLowerCase().trim(); const opt = ['gepflegt', 'neuwertig', 'saniert', 'modernisiert', 'normal', 'renovierungsbeduerftig'].find((x) => x === z || z.includes(x.slice(0, 5))); if (opt) set('cond', opt); }
 }
@@ -1712,8 +1989,16 @@ async function exportPdf(out) {
   function need(h) { if (y + h > H - 16) newPage(); }
   let secNo = 0;
   const tocEntries = [];
+  /* WPDF29-1 · Umbruch an der Kapitelgrenze statt nach Restplatz.
+   * Seite 4 trug zuletzt Preisstrategie, Bodenrichtwert, Wertverfahren UND
+   * den ganzen Ertragswert-Rechenweg. Ein Kapitel, das nicht mehr sinnvoll
+   * auf die Seite passt, faengt jetzt oben auf der naechsten an. */
+  var _MIN_KAPITEL = 62;   // mm Restplatz, unter dem ein Kapitel umbricht
+
   function sectionTitle(t, reserve) {
-    if (reserve && y + reserve > H - 16) newPage(); // Überschrift nicht allein am Seitenende lassen
+    /* WPDF29-2 · Jedes Kapitel beginnt mit genug Platz oder auf neuer Seite. */
+    var _rest = H - 16 - y;
+    if (_rest < (reserve || _MIN_KAPITEL)) newPage();
     need(20);
     secNo++;
     const num = String(secNo).padStart(2, '0');
@@ -2626,7 +2911,7 @@ async function exportPdf(out) {
 
   // ---------- Preisstrategie (Min — Marktwert — Max) ----------
   if (mv.estimated != null && mv.low != null && mv.high != null && mv.high > mv.low) {
-    sectionTitle('Preisstrategie', 46);
+    sectionTitle('Preisstrategie', 999);   /* v1040: immer neue Seite */
     need(40);
     const pw = blockW, ph = 7, py0 = y + 16;
     const span = mv.high - mv.low;
@@ -2693,7 +2978,14 @@ async function exportPdf(out) {
       doc.text('Grundstück ' + Math.round(lcomp.plot_area_sqm).toLocaleString('de-DE') + ' m² · Bodenwert ' + euro(lcomp.land_value_total_eur), M + 60, y + 16);
     } else {
       const bodenAnteil = area && lv.value_sqm ? Math.round(lv.value_sqm * area) : null;
-      if (bodenAnteil != null) doc.text('Rechnerischer Bodenwertanteil (' + area + ' m²): ' + euro(bodenAnteil), M + 60, y + 16);
+    /* WPDF26-1 · Diese Zeile rechnete Wohnflaeche x Bodenrichtwert, was
+     * fachlich nichts bedeutet — und stand im Widerspruch zum Bodenwert in
+     * der Ertragswert-Staffel (11.450 gegen 160.300 im selben Dokument).
+     * Jetzt wird der Wert aus der Rechnung gezeigt, sonst gar keiner. */
+    const _bwEcht = d.cross_check && d.cross_check.ertragswert
+      && d.cross_check.ertragswert.bodenwert_eur;
+    if (_bwEcht) doc.text('Bodenwertanteil dieses Objekts: ' + euro(_bwEcht), M + 90, y + 12);
+      if (false) doc.text('Rechnerischer Bodenwertanteil (' + area + ' m²): ' + euro(bodenAnteil), M + 60, y + 16);
     }
     doc.setFontSize(7); doc.setTextColor(150, 150, 160);
     if (lv.license) doc.text(lv.license, M + 60, y + 22);
@@ -2791,6 +3083,118 @@ async function exportPdf(out) {
       (cc.assumptions.liegenschaftszins * 100) + ' % · Sachwertfaktor ' + cc.assumptions.sachwertfaktor + '. Kein Gutachten n. § 194 BauGB.', blockW);
     doc.text(_fn, M, y + 3);
     y += 5 + _fn.length * 3;
+  }
+
+  /* WPDF-1 · Rechenweg Ertragswertverfahren.
+   * Bisher zeigte das PDF nur das Ergebnis. Fuer ein Dossier, das vor einer Bank
+   * besteht, muss der Weg dastehen — Zeile fuer Zeile, mit der Herkunft des
+   * Liegenschaftszinses. Eine Zahl ohne Herleitung ist im Dossier wertlos. */
+  const _ew = d.cross_check && d.cross_check.ertragswert;
+  if (_ew && _ew.available && _ew.staffel && _ew.staffel.length) {
+    /* WPDF26-2 · Erklaertext. Ein Kunde, der Vergleichswert und Ertragswert
+     * nebeneinander sieht und 45 % Abstand liest, braucht die Einordnung —
+     * sonst haelt er einen davon fuer falsch. */
+    sectionTitle('Ertragswertverfahren — Rechenweg', 150);
+    need(26);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2); doc.setTextColor(...MUT);
+    const _erk = doc.splitTextToSize(
+      'Das Vergleichswertverfahren fragt, was ähnliche Objekte am Markt kosten. Das '
+      + 'Ertragswertverfahren fragt, was die Immobilie an laufendem Ertrag abwirft, und '
+      + 'kapitalisiert ihn über die Restnutzungsdauer. Beide Wege führen selten zum '
+      + 'gleichen Ergebnis: der Markt preist bei Neubauten in Wachstumsregionen auch '
+      + 'Wertsteigerung ein, das Ertragswertverfahren tut das nicht. Ein Abstand von '
+      + 'zwanzig bis vierzig Prozent ist dort normal. Wird er größer, lohnt ein '
+      + 'zweiter Blick auf die Miete oder den Liegenschaftszinssatz.', blockW);
+    doc.text(_erk, M, y); y += _erk.length * 3.4 + 4;
+    need(70);
+
+    const _stufeTxt = { A: 'amtlich, kreisscharf', B: 'amtlich, regional',
+      C: 'aus eigener Marktableitung', D: 'gesetzlicher Auffangwert n. § 256 BewG',
+      E: 'eigene Angabe' };
+
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUT);
+    doc.text((_ew.verfahren || 'allgemeines Ertragswertverfahren')
+      + '  ·  §§ 27–34 ImmoWertV 2021', M, y); y += 6;
+
+    /* Staffel */
+    _ew.staffel.forEach((z) => {
+      need(9);
+      const summe = !!z.summe;
+      doc.setFont('helvetica', summe ? 'bold' : 'normal');
+      doc.setFontSize(summe ? 8.4 : 7.8);
+      doc.setTextColor(...(summe ? TXT : [110, 110, 118]));
+      /* WPDF12-1 · U+2212 durch ASCII-Minus ersetzen (jsPDF-Helvetica). */
+      const label = doc.splitTextToSize(String(z.pos).replace(/\u2212/g, '-'), blockW - 42);
+      doc.text(label[0], M + 2, y);
+      let rechts = '';
+      if (z.faktor != null) rechts = String(z.faktor).replace('.', ',');
+      else if (z.wert != null) rechts = euro(z.wert);
+      if (rechts) {
+        doc.setTextColor(...(summe ? GOLD : TXT));
+        doc.text(rechts, M + blockW - 2, y, { align: 'right' });
+      }
+      if (z.detail) {
+        y += 3.6; doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6);
+        doc.setTextColor(...MUT); doc.text(String(z.detail), M + 4, y);
+      }
+      y += summe ? 6 : 5;
+      if (summe) {
+        doc.setDrawColor(225, 221, 212); doc.setLineWidth(0.2);
+        doc.line(M, y - 3.4, M + blockW, y - 3.4);
+      }
+    });
+
+    y += 3; need(30);
+
+    /* Herkunft des Zinssatzes — die Zahl, an der alles haengt */
+    doc.setFillColor(245, 243, 238); doc.roundedRect(M, y, blockW, 15, 2, 2, 'F');
+    doc.setFillColor(...GOLD); doc.roundedRect(M, y, 1.6, 15, 0.8, 0.8, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(120, 113, 100);
+    doc.text('LIEGENSCHAFTSZINSSATZ', M + 5, y + 5, { charSpace: 0.3 });
+    /* WPDF12-2 · charSpace wirkt sonst in den Folgeaufrufen weiter — die
+     * Abzugszeile erschien gesperrt und brach nicht mehr um. */
+    doc.setCharSpace(0);
+    doc.setFontSize(9); doc.setTextColor(...TXT);
+    doc.text(String(_ew.liegenschaftszins_pct).replace('.', ',') + ' %', M + 5, y + 11.5);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+    doc.setTextColor(110, 110, 118);
+    const _q = (_stufeTxt[_ew.liegenschaftszins_stufe] || _ew.liegenschaftszins_quelle || '–');
+    doc.text(doc.splitTextToSize('Herkunft: ' + _q, blockW - 40), M + 30, y + 11.5);
+    y += 19;
+
+    /* Belastbarkeit und Sensitivitaet */
+    if (_ew.belastbarkeit) {
+      need(12);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
+      doc.text('Belastbarkeit ' + _ew.belastbarkeit.pct + ' % ('
+        + _ew.belastbarkeit.label + ')', M, y);
+      y += 4.5;
+      if (_ew.belastbarkeit.abzuege && _ew.belastbarkeit.abzuege.length) {
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(...MUT);
+        doc.setCharSpace(0);   /* WPDF12-3 */
+        const _ab = doc.splitTextToSize(
+          _ew.belastbarkeit.abzuege.join(' · ').replace(/−/g, '-'), blockW - 2);
+        doc.text(_ab, M, y); y += _ab.length * 3 + 2;
+      }
+    }
+    if (_ew.sensitivitaet && _ew.sensitivitaet.lzs_plus_05) {
+      need(10);
+      const _s = _ew.sensitivitaet.lzs_plus_05;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2); doc.setTextColor(...TXT);
+      doc.text('Ein halber Zinspunkt mehr (' + String(_s.lzs_pct).replace('.', ',')
+        + ' %) ergibt ' + euro(_s.wert) + ' — '
+        + String(_s.abweichung_pct).replace('.', ',') + ' %.', M, y);
+      y += 6;
+    }
+
+    /* Haftungsrahmen — gehoert auf jede Wertermittlungsseite */
+    need(12);
+    doc.setFontSize(6.5); doc.setTextColor(...MUT);
+    const _hr = doc.splitTextToSize('Diese Berechnung folgt den Verfahren der ImmoWertV 2021, '
+      + 'ersetzt jedoch keine Wertermittlung nach § 194 BauGB durch einen Sachverständigen. '
+      + 'Ohne Ortsbesichtigung, Bauakten- und Grundbucheinsicht. Grundlage sind die erfassten Angaben.', blockW);
+    doc.text(_hr, M, y + 3);
+    y += 5 + _hr.length * 3;
   }
 
   // ---------- Lage-/Potenzialbewertung ----------
@@ -3434,6 +3838,9 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
     const old = sb.innerHTML; sb.disabled = true; sb.textContent = 'speichere…';
     try {
       await ensureMaps(out);
+      /* WDAT-1 · Eingaben mitgeben. Ohne sie ist die Datei eine Momentaufnahme
+       * des Ergebnisses, aus der man nicht weiterarbeiten kann. */
+      try { out._eingaben = _sammleEingaben(); } catch (e) {}
       const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const ad = document.createElement('a');
@@ -3450,7 +3857,8 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
     fi.addEventListener('change', () => {
       const f = fi.files && fi.files[0]; if (!f) return;
       const r = new FileReader();
-      r.onload = () => { try { render(JSON.parse(r.result)); } catch (e) { alert('Ungueltige Datei: ' + e.message); } };
+      /* WDAT-3 · Beim Laden auch die Eingaben zuruecksetzen. */
+      r.onload = () => { try { const _d = JSON.parse(r.result); render(_d); _setzeEingaben(_d._eingaben); } catch (e) { alert('Ungueltige Datei: ' + e.message); } };
       r.onerror = () => alert('Datei konnte nicht gelesen werden.');
       r.readAsText(f); fi.value = '';
     });

@@ -24,7 +24,9 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=W35">
+<link rel="stylesheet" href="css/style.css?v=W37">
+    <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
+    <link rel="stylesheet" href="css/ui-varianten.css?v=1">
 <link rel="stylesheet" href="css/bmf-modal.css?v=W34">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=v994"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
@@ -604,7 +606,9 @@ label.dp-required.qc-required::after {
 })();
 </script>
 <!-- V63.85: Mobile-Hamburger zum Öffnen der Sidebar auf Smartphones -->
-<button class="mobile-hamburger" id="mobile-hamburger-btn" onclick="document.querySelector('.sidebar')?.classList.toggle('mobile-open')" aria-label="Menü">☰</button>
+<!-- drawer-fix-20260731: Handler auf die zentrale Funktion; 'mobile-open' war eine vierte,
+     nirgends gestylte Klasse. toggleMobileSidebar() schaltet Drawer + Overlay. -->
+<button class="mobile-hamburger" id="mobile-hamburger-btn" onclick="toggleMobileSidebar()" aria-label="Objektliste öffnen" aria-controls="sidebar">☰</button>
 <!-- V32: autocomplete=off auf Body-Ebene unterdrückt Browser-Adress-Speichern-Popup -->
 <form id="dp-noform" autocomplete="off" onsubmit="return false" style="display:contents">
 <div class="app-wrap">
@@ -1146,7 +1150,24 @@ label.dp-required.qc-required::after {
               <div id="brw-ki-result" class="brw-ki-result" style="display:none"></div>
             </div>
         <div class="f"><label>Miteigentumsanteil (%) <button type="button" class="dp-tip" data-tip-id="tab1.miteigentumsanteil" tabindex="-1" aria-label="Hilfe zu tab1.miteigentumsanteil"></button></label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7.06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-        <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+        <!-- WOBJ32-1 · Wertermittlung: Baustatus, BRW-Stichtag, Wohneinheiten,
+     Bruttogrundflaeche, Standardstufe. Alle optional bis auf den Baustatus,
+     der den Vergleichspool steuert. -->
+<div class="f"><label>Baustatus</label><div class="iw"><select id="baustatus" onchange="calc()">
+<option value="bestand">Bestand</option>
+<option value="bestand_erstbezug_saniert">Bestand – Erstbezug nach Sanierung</option>
+<option value="neubau_erstbezug">Neubau – Erstbezug</option>
+<option value="neubau_im_bau">Neubau – im Bau</option>
+<option value="geplant">Geplant / Bauträger</option>
+</select></div></div>
+<div class="f"><label>Stichtag Bodenrichtwert</label><div class="iw"><input id="brw_stichtag" type="text" placeholder="2024-01-01" class="tr" oninput="calc()"></div></div>
+<div class="f"><label>Wohneinheiten im Gebäude</label><div class="iw"><input id="einheiten" type="text" inputmode="numeric" placeholder="10" class="tr" oninput="calc()"></div></div>
+<div class="f"><label>Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für Sachwert" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+<div class="f"><label>Standardstufe (NHK)</label><div class="iw"><select id="standardstufe" onchange="calc()">
+<option value="">—</option><option value="3">3 · durchschnittlich</option>
+<option value="4">4 · gehoben</option><option value="5">5 · stark gehoben</option>
+</select></div></div>
+<div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
         <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
       </div></div>
@@ -3441,6 +3462,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <script src="js/mandant-branding.js?v=W39"></script><!--W3-cb-->
     <script src="js/mandant-freigaben.js?v=W33"></script>
     <script src="js/mobile-redirect.js"></script>
+    <script src="js/ui-varianten.js?v=1"></script>
     <script src="js/deal-action-pdf-gate.js?v=W3"></script>
 </body>
 </html>

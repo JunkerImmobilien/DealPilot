@@ -13,6 +13,12 @@ import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { runLimited, limiterStats } from '../lib/limiter.js';
 import { BorisConnector } from '../connectors/BorisConnector.js';
+/* WADM-2 */
+import { HarvestService } from '../services/HarvestService.js';
+/* WIMP-3 */
+import { MarktberichtImportService } from '../services/MarktberichtImportService.js';
+import { sperreRest, merkeLauf } from '../lib/harvestScheduler.js';
+import { q as qMb } from '../lib/db.js';
 import { DestatisConnector } from '../connectors/stubConnectors.js';
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
@@ -72,6 +78,65 @@ router.get('/boris/verify-all', async (req, res) => {
 });
 
 // GET /boris/coverage — Abdeckungsuebersicht aller Bundeslaender (live / vorbereitet / manuell).
+/* WADM-1 · Ernte-Endpunkte fuer das Admin. Lesend offen im Docker-Netz,
+ * der Zugriff von aussen laeuft ueber den Admin-Proxy mit Token. */
+router.get('/harvest/status', async (req, res) => {
+  try {
+    const s = await HarvestService.status();
+    const q = await qMb(`SELECT s.id, s.name, s.bundesland, s.zugang, s.portal_url, s.notiz,
+             s.letzter_check, s.letzter_fund, s.status,
+             (SELECT count(*)::int FROM mb.gaa_documents d WHERE d.source_id = s.id) AS dokumente
+        FROM mb.gaa_sources s ORDER BY s.bundesland, s.name`);
+    /* v1042-WNAM-1 · Klartextnamen mitliefern. Reine Anzeigehilfe —
+     * kein Rechenweg haengt daran, und was fehlt, bleibt eine Nummer. */
+    const nm = await qMb('SELECT ags, name, ebene FROM mb.ags_namen');
+    const w = await qMb(`SELECT ags, objektart, typ, wert, einheit, qualitaet, stichtag, quelle_text
+        FROM mb.wert_parameter
+       WHERE (gueltig_bis IS NULL OR gueltig_bis >= CURRENT_DATE)
+       ORDER BY qualitaet, ags LIMIT 300`);
+    res.json({ parameter: s.parameter, dokumente: s.dokumente,
+               /* v1041 · q() liefert die ZEILEN direkt (db.js gibt res.rows
+                * zurueck). Mit .rows kam hier immer [] an — der Reiter war
+                * nicht leer, er war blind. Gegenprobe: HarvestService.js
+                * traegt denselben Befund seit v1031. */
+               quellen: q || [], werte: w || [],
+               namen: (nm || []).reduce((a, r) => { a[r.ags] = r.name; return a; }, {}) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/harvest/discover', async (req, res) => {
+  try {
+    const b = req.body || {};
+    const id = b.source_id ? String(b.source_id) : null;
+    if (id) {
+      const rest = sperreRest(id);
+      if (rest) return res.json({ eingereiht: false, gesperrt: rest });
+      merkeLauf(id);
+    }
+    /* Nicht auf das Ergebnis warten — die Discovery laeuft mit einem Abruf
+     * je Sekunde und darf die Oberflaeche nicht blockieren. */
+    HarvestService.discover({ limit: id ? 1 : 12, quelleId: id }).catch(() => {});
+    res.json({ eingereiht: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* WIMP-1 · Bericht auslesen. Liefert eine Vorschlagsliste, schreibt nichts. */
+router.post('/harvest/import', async (req, res) => {
+  try { res.json(await MarktberichtImportService.lesen(req.body || {})); }
+  catch (e) { res.status(400).json({ ok: false, grund: e.message }); }
+});
+
+/* WIMP-2 · Bestaetigte Vorschlaege uebernehmen — als Stufe A. */
+router.post('/harvest/uebernehmen', async (req, res) => {
+  try { res.json(await MarktberichtImportService.uebernehmen(req.body || {})); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+router.post('/harvest/wert', async (req, res) => {
+  try { res.json(await HarvestService.wertEintragen(req.body || {})); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
 router.get('/boris/coverage', (req, res) => {
   const list = BorisConnector.status();
   const sum = { live: 0, vorbereitet: 0, manuell: 0 };

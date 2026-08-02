@@ -6,6 +6,13 @@ import { GeocodingService } from './GeocodingService.js';
 import { MarketAnalysisService } from './MarketAnalysisService.js';
 import { MicroLocationService } from './MicroLocationService.js';
 import { ValuationService } from './ValuationService.js';
+/* WPARAM-2 */
+import { WertParameterService } from './WertParameterService.js';
+/* WGAA-2 */
+import { HarvestService } from './HarvestService.js';
+/* WKIGEG-4 */
+import { KiGegenrechnungService } from './KiGegenrechnungService.js';
+import { ErtragswertService } from './ErtragswertService.js';
 import { CrossCheckService } from './CrossCheckService.js';
 import { ScoringService } from './ScoringService.js';
 import { ReportGenerationService } from './ReportGenerationService.js';
@@ -87,6 +94,39 @@ export const ReportOrchestrator = {
       vacancy: !!input.vacancy,
       // Manuell in DealPilot eingegebener Bodenrichtwert (Feld "brw") als BORIS-Fallback
       land_value_manual: input.land_value_manual ?? input.brw ?? null,
+
+      /* WREF-1 · Wertermittlung Stufe 2/3. Diese Felder fehlten hier komplett:
+       * das Frontend schickte sie, der Orchestrator liess sie fallen. Sichtbar
+       * wurde es daran, dass Neubau und Bestand denselben Wert lieferten —
+       * ref.baustatus war undefined, also griff der Erstbezug-Filter nie. */
+      baustatus: input.baustatus || null,
+      first_time_use: input.first_time_use === true || input.first_time_use === 'true' || null,
+      refurbished: input.refurbished === true || input.refurbished === 'true' || null,
+      reconstruction_year: input.reconstruction_year ? Number(input.reconstruction_year) : null,
+      mea_pct: input.mea_pct ? Number(input.mea_pct) : null,
+      lzs_pct: input.lzs_pct ? Number(input.lzs_pct) : null,
+      brw_anpassung_pct: input.brw_anpassung_pct ? Number(input.brw_anpassung_pct) : null,
+      brw_anpassung_grund: input.brw_anpassung_grund || null,
+      gfz_koeff: input.gfz_koeff ? Number(input.gfz_koeff) : null,
+      beitrag_abzug_eur: input.beitrag_abzug_eur ? Number(input.beitrag_abzug_eur) : null,
+      stellplatz_miete_monat: input.stellplatz_miete_monat ? Number(input.stellplatz_miete_monat) : null,
+      bwk_modus: input.bwk_modus || null,
+      bog_eur: input.bog_eur ? Number(input.bog_eur) : null,
+      bog_grund: input.bog_grund || null,
+      wert_stufe: input.wert_stufe ? Number(input.wert_stufe) : 1,
+      /* WNHK-3 · Sachwertfelder aus dem Formular */
+      nhk_typ: input.nhk_typ || null,
+      keller_dg: input.keller_dg || null,
+      standardstufe: input.standardstufe ? Number(input.standardstufe) : null,
+      bgf: input.bgf ? Number(input.bgf) : null,
+      regionalfaktor: input.regionalfaktor ? Number(input.regionalfaktor) : null,
+      sachwertfaktor: input.sachwertfaktor ? Number(input.sachwertfaktor) : null,
+      bes_bauteile: input.bes_bauteile ? Number(input.bes_bauteile) : null,
+      aussenanlagen: input.aussenanlagen ? Number(input.aussenanlagen) : null,
+      /* WBW26-3 · aus den Objekt-Tabs Bewirtschaftung und Miete */
+      instandhaltung_ruecklage_jahr: input.instandhaltung_ruecklage_jahr
+        ?? input.inst ?? input.instandhaltung ?? null,
+      leerstand_pct: input.leerstand_pct ?? input.leerstand ?? input.mietausfall ?? null,
     };
 
     // 2) Property persistieren
@@ -183,8 +223,111 @@ export const ReportOrchestrator = {
     // 6) Bewertung (inkl. Grundstuecks-Mehrflaechenkorrektur ueber BORIS-BRW)
     const valuation = ValuationService.compute(ref, sale, rent, landValue);
 
+    /* WPARAM-1 · Wertermittlungsparameter nach der Abdeckungs-Kaskade
+     * (A amtlich kreisscharf ... D gesetzlicher Auffangwert, E Nutzereingabe).
+     * Faellt der Lesezugriff aus, rechnet der Quercheck mit seinen Pauschalen
+     * weiter — der Bericht darf an einem fehlenden Parameter nicht scheitern. */
+    let _wertParams = null;
+    try {
+      const _lzs = await WertParameterService.liegenschaftszins({
+        ags: ref.ags || null, objektart: ref.property_type, anzahlWe: ref.units,
+        brwSqm: landValue && landValue.available ? landValue.value_sqm : null,
+        nutzerwert: ref.lzs_pct || null,
+      });
+      const _bw = ErtragswertService.bodenwert({
+        flaeche_qm: ref.plot_area,
+        brw_sqm: landValue && landValue.available ? landValue.value_sqm : null,
+        brw_stichtag: landValue ? landValue.stichtag : null,
+        brw_zone: landValue ? landValue.zone : null,
+        brw_quelle: landValue && landValue.available ? 'boris' : 'manuell',
+        /* WBW26-1 · ist_wohnung entscheidet, ob der volle Grundstueckswert
+         * ueberhaupt angesetzt werden darf. Ohne diese Angabe rechnete eine
+         * 50-m2-Wohnung mit 700 m2 Grundstueck. */
+        ist_wohnung: /etw|wohnung|whg|apartment/i.test(String(ref.property_type || '')),
+        mea_pct: ref.mea_pct || null, gfz_koeff: ref.gfz_koeff || null,
+        beitrag_abzug_eur: ref.beitrag_abzug_eur || null,
+        anpassung_pct: ref.brw_anpassung_pct || null,
+        anpassung_grund: ref.brw_anpassung_grund || null,
+      });
+      /* WNHK-1 · Sachwertfaktor aus derselben Kaskade wie der Zinssatz.
+       * Er steht in denselben Grundstuecksmarktberichten — die Ernte
+       * liefert beides oder keines. */
+      let _swf = null;
+      try {
+        _swf = await WertParameterService.sachwertfaktor({
+          ags: ref.ags || null, objektart: ref.property_type, anzahlWe: ref.units,
+          nutzerwert: ref.sachwertfaktor || null,
+        });
+      } catch (e) { /* ohne Faktor bleibt es beim vorlaeufigen Sachwert */ }
+
+      /* WGAA-1 · Zustaendigen Gutachterausschuss vermerken. Fehler hier
+       * duerfen den Bericht nie kippen — es ist eine Nebenbuchung. */
+      try {
+        const _bp = landValue && landValue.properties_raw;
+        if (_bp && (_bp.Gutachterausschussname || _bp.gutachterausschussname)) {
+          await HarvestService.merkeAusschuss({
+            name: _bp.Gutachterausschussname || _bp.gutachterausschussname,
+            nummer: _bp.Gutachterausschussnummer || _bp.gutachterausschussnummer || null,
+            ags: String(_bp['Gemeindeschlüssel'] || _bp.Gemeindeschluessel || _bp.gemeindeschluessel || '').slice(0, 5) || null,
+            bundesland: _bp.LAND_KENNUNG || _bp.land_kennung || null,
+            gemeinde: _bp.Gemeindename || _bp.gemeindename || null,
+            hinweis_url: _bp.Dateiname || null,
+          });
+        }
+      } catch (e) { /* Nebenbuchung */ }
+
+      if (_lzs) {
+        _wertParams = {
+          lzs_pct: _lzs.wert, lzs_quelle: _lzs.quelle, lzs_stufe: _lzs.stufe,
+          lzs_parameter_id: _lzs.parameter_id, lzs_hinweis: _lzs.hinweis,
+          bodenwert: _bw,
+          bwk_modus: ref.bwk_modus || null,
+          bwk_verwaltung_je_we: ref.bwk_verwaltung_je_we || null,
+          bwk_instandhaltung_je_qm: ref.bwk_instandhaltung_je_qm || null,
+          bwk_mietausfall_pct: ref.bwk_mietausfall_pct || null,
+          bwk_betrieb_nul_jahr: ref.bwk_betrieb_nul_jahr || null,
+          stellplatz_miete_monat: ref.stellplatz_miete_monat || null,
+          /* WBW26-2 · Was im Objekt gepflegt ist, schlaegt die Tabellenwerte. */
+          instandhaltung_ruecklage_jahr: ref.instandhaltung_ruecklage_jahr || null,
+          leerstand_pct: ref.leerstand_pct || null,
+          bog_eur: ref.bog_eur || null, bog_grund: ref.bog_grund || null,
+          /* WNHK-2 · Sachwert-Eingaben */
+          sachwertfaktor_param: _swf,
+          nhk_typ: ref.nhk_typ || null, keller_dg: ref.keller_dg || null,
+          standardstufe: ref.standardstufe || null, bgf_direkt: ref.bgf || null,
+          regionalfaktor: ref.regionalfaktor || null,
+          bes_bauteile: ref.bes_bauteile || null, aussenanlagen: ref.aussenanlagen || null,
+        };
+        step('wertparameter: LZS ' + _lzs.wert + ' % (Stufe ' + _lzs.stufe + ')'
+             + (_bw && _bw.vollstaendig ? ', Bodenwert ' + _bw.wert + ' EUR' : ', kein Bodenwert'));
+      }
+    } catch (e) {
+      step('wertparameter: nicht verfuegbar (' + (e && e.message ? e.message : 'Fehler') + ')');
+    }
+
+    /* WKIGEG-1 · Zweitmeinung. Nur wenn ausdruecklich eingeschaltet. */
+    let _kiGegen = null;
+
     // 6b) Sachwert/Ertragswert-Quercheck (reine Rechnung, keine API-Kosten)
-    const crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation);
+    const crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
+
+    /* WKIGEG-3 · Zweitmeinung einholen, wenn eingeschaltet. Faellt sie aus,
+     * laeuft der Bericht unveraendert weiter — sie ist eine Probe, kein
+     * Bestandteil der Rechnung. */
+    if (String(process.env.KI_GEGENRECHNUNG || '0') === '1') {
+      try {
+        const _ein = KiGegenrechnungService.baueEingabe(ref, landValue, sale, rent, _wertParams);
+        _kiGegen = await KiGegenrechnungService.rechne(_ein, crossCheck);
+        const _v = _kiGegen && _kiGegen.vergleich;
+        step('ki-gegenrechnung: ' + (_kiGegen && _kiGegen.verfuegbar
+          ? ((_v && _v.auffaellige && _v.auffaellige.length)
+              ? 'Abweichung bei ' + _v.auffaellige.join(', ')
+              : 'deckungsgleich')
+          : (_kiGegen ? _kiGegen.grund : 'kein Ergebnis')));
+      } catch (e) {
+        step('ki-gegenrechnung: fehlgeschlagen (' + String(e.message).slice(0, 60) + ')');
+      }
+    }
     if (crossCheck.available) {
       const c = crossCheck.comparison;
       step(`quercheck: Vergleich ${c.vergleichswert_eur ?? '–'} / Sachwert ${c.sachwert_eur ?? '–'} / Ertrag ${c.ertragswert_eur ?? '–'}${c.spread_pct != null ? ' (Spread ' + c.spread_pct + '%)' : ''}`);
@@ -220,6 +363,30 @@ export const ReportOrchestrator = {
       object_image: (geoEnabled() && lat != null && lon != null)
         ? `/api/v1/marktbericht/static-map?lat=${lat}&lon=${lon}` : null,
       sale, rent, micro, macro,
+        /* WETIK-1 · Herkunft der Wertermittlungsparameter im Klartext.
+       * A/B sind amtlich, C/D/E sind indikativ — das muss im Bericht und
+       * im PDF stehen, nicht nur als Buchstabe im Datensatz. */
+      wertermittlung_herkunft: (function () {
+        var st = (_wertParams && _wertParams.lzs_stufe) || 'D';
+        var e = { A: ['amtlich', 'amtlicher Wert des zustaendigen Gutachterausschusses', false],
+                  B: ['amtlich, regional', 'amtlicher Wert auf Landesebene', false],
+                  C: ['indikativ, marktabgeleitet', 'aus dem regionalen Marktgeschehen zurueckgerechnet', true],
+                  D: ['indikativ, gesetzlicher Auffangwert', 'nach § 256 BewG, nicht marktabgeleitet', true],
+                  E: ['eigene Angabe', 'vom Nutzer gesetzt', true] }[st]
+                || ['indikativ', 'Herkunft nicht bestimmbar', true];
+        return { stufe: st, kurz: e[0], lang: e[1], indikativ: e[2],
+                 liegenschaftszins_pct: _wertParams ? _wertParams.lzs_pct : null,
+                 quelle: _wertParams ? _wertParams.lzs_quelle : null };
+      })(),
+    /* WKIGEG-2 · Zweitmeinung im Bericht, klar getrennt vom Ergebnis. */
+      ki_gegenrechnung: _kiGegen,
+      /* WSEED-5 · Herkunft der Marktdaten, gezaehlt statt behauptet.
+       * Bisher trug der Bericht keine Angabe dazu — ein Bericht aus echten
+       * GeoMap-Daten sah aus wie einer aus dem Fallback, und der Fallback
+       * konnte erfundene Seed-Zeilen enthalten. */
+      datenherkunft: (sale && sale.datenherkunft) || (rent && rent.datenherkunft) || 'keine',
+      enthaelt_demodaten: !!((sale && sale.enthaelt_demodaten) || (rent && rent.enthaelt_demodaten)),
+      datenquellen: Object.assign({}, (sale && sale.quellen) || {}, (rent && rent.quellen) || {}),
       land_value: landValue,
       zensus,                // Zensus 2022: Leerstand/Eigentuemerquote/Ø-Miete (gratis, offline-CSV)
       valuation,

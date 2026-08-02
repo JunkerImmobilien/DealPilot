@@ -1556,6 +1556,45 @@ router.get('/network-stats', requireAdmin, async (req, res) => {
 });
 
 /* v973: Landing-Analytics (anonym). Besucher, Funnel, Zeitverlauf, CTA, Geraete/Referrer. */
+/* WADM-5 · Marktzinsen. Durchgriff auf das mb-Backend; die Ernte-Daten
+ * liegen in der mb-DB, nicht in der Haupt-Datenbank. */
+const _MB = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht');
+async function _mbCall(method, pfad, body) {
+  const init = { method: method, headers: {} };
+  if (body !== undefined) { init.headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(body); }
+  const r = await fetch(_MB + pfad, init);
+  const t = await r.text();
+  let d; try { d = t ? JSON.parse(t) : {}; } catch (e) { d = { raw: t }; }
+  return { status: r.status, data: d };
+}
+
+router.get('/marktzinsen/uebersicht', requireAdmin, async (req, res) => {
+  try { const o = await _mbCall('GET', '/harvest/status'); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }
+});
+
+router.post('/marktzinsen/pruefen', requireAdmin, async (req, res) => {
+  try { const o = await _mbCall('POST', '/harvest/discover', req.body || {}); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }
+});
+
+router.post('/marktzinsen/wert', requireAdmin, async (req, res) => {
+  try { const o = await _mbCall('POST', '/harvest/wert', req.body || {}); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }
+});
+
+/* WIMP-4 · Durchgriff fuer den PDF-Import. Grenze hochgesetzt, ein
+ * Grundstuecksmarktbericht kann 30 MB haben. */
+router.post('/marktzinsen/import', requireAdmin, express.json({ limit: '60mb' }), async (req, res) => {
+  try { const o = await _mbCall('POST', '/harvest/import', req.body || {}); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ ok: false, grund: 'mb-Backend nicht erreichbar: ' + e.message }); }
+});
+
+router.post('/marktzinsen/uebernehmen', requireAdmin, async (req, res) => {
+  try { const o = await _mbCall('POST', '/harvest/uebernehmen', req.body || {}); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }
+});
+
 router.get('/landing-analytics', requireAdmin, async (req, res) => {
   const db = req.app.get('db');
   let days = parseInt(req.query.days, 10); if (!days || days < 1 || days > 365) days = 30;

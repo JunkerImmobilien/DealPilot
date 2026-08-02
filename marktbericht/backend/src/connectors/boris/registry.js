@@ -51,6 +51,13 @@ function propCI(props, names) {
 
 // Feldnamen-Kandidaten (VBORIS / BRM-Modell variiert pro Land)
 const F = {
+  /* WBORISD-5 · BORIS-D liefert diese Merkmale gleich mit. Der Beitragszustand
+   * geht direkt in die Bodenwertrechnung — er stand im Konzept noch als offen. */
+  beitrag: ['bedb', 'beitragszustand', 'beitragsrechtlicher zustand', 'beitrag'],
+  entwicklung: ['entw', 'entwicklungszustand'],
+  geschosse: ['gez', 'vollgeschosszahl', 'anzahl vollgeschosse'],
+  flaeche: ['flae', 'flaeche', 'grundstuecksflaeche'],
+  gemeinde: ['gena', 'gemeindename', 'gemeinde'],
   value: ['brw', 'bodenrichtwert', 'wert', 'brw_eur', 'brwert', 'bodenwert', 'richtwert', 'bri'],
   stichtag: ['stag', 'stichtag', 'jahr', 'stichtag des bodenrichtwertes', 'jahr des bodenrichtwerts'],
   nutzung: ['nuta', 'nutzung', 'entw', 'nutzungsart', 'entwicklungszustand'],
@@ -128,12 +135,15 @@ const ADAPTERS = [
     code: 'borisd', name: 'BORIS-D (bundesweit)', license: 'dl-de/by-2-0 (laenderspezifisch)',
     // Sobald die echte GetFeatureInfo-URL als ENV gesetzt ist, geht der Dienst automatisch live
     // (deckt 11 Laender ab). Keine Code-Aenderung noetig.
-    enabled: !!process.env.BORISD_WMS_BASE, verified: false, catchAll: true,
-    // OWS-Pfad ist portal-intern (con terra map.apps). Sobald die echte GetFeatureInfo-URL
-    // bekannt ist (DevTools-Netzwerk im Portal), hier per ENV setzen -> 11 Laender live.
-    base: process.env.BORISD_WMS_BASE || 'https://www.bodenrichtwerte-boris.de/boris-d',
+    /* WBORISD-2 · Endpunkt im Portal ermittelt (DevTools, 01.08.2026):
+     * gis.nrw.de betreibt BORIS-D bundesweit als ArcGIS MapServer.
+     * Kein WMS — deshalb protocol:'arcgis'. */
+    enabled: true, verified: true, catchAll: true, protocol: 'arcgis',
+    base: process.env.BORISD_BASE
+      || 'https://www.gis.nrw.de/arcgis/rest/services/immobilien/boris_de_bodenrichtwerte_current/MapServer',
+    arcgisLayers: process.env.BORISD_LAYERS || 'all',
     bbox: { minLon: 5.80, maxLon: 15.10, minLat: 47.20, maxLat: 55.10 },
-    layer: () => process.env.BORISD_WMS_LAYER || 'brw', crs: 'EPSG:4326', axis: 'latlon', format: 'gml', time: null,
+    layer: () => 'all', crs: 'EPSG:25832', axis: 'latlon', proj: 'utm32', format: 'json', time: null,
   },
 ];
 
@@ -178,6 +188,53 @@ function buildUrl(a, lat, lon, year, layerName) {
   });
   if (a.time) p.set('TIME', a.time(year));
   return `${a.base}?${p.toString()}`;
+}
+
+/* WBORISD-1 · ArcGIS-Identify statt WMS-GetFeatureInfo.
+ * Der Dienst arbeitet in ETRS89/UTM 32N; die Umrechnung liegt bereits vor.
+ * tolerance in Pixeln, mapExtent/imageDisplay muessen zueinander passen —
+ * ArcGIS rechnet die Toleranz ueber diese Angaben in Meter um. */
+function buildArcgisUrl(a, lat, lon) {
+  const { easting, northing } = wgs84ToUtm32(lat, lon);
+  const m = 250;
+  const p = new URLSearchParams({
+    geometry: JSON.stringify({ x: easting, y: northing, spatialReference: { wkid: 25832 } }),
+    geometryType: 'esriGeometryPoint',
+    sr: '25832',
+    layers: a.arcgisLayers || 'all',
+    tolerance: '4',
+    mapExtent: `${easting - m},${northing - m},${easting + m},${northing + m}`,
+    imageDisplay: '500,500,96',
+    returnGeometry: 'false',
+    f: 'json',
+  });
+  return `${a.base}/identify?${p.toString()}`;
+}
+
+/* Kennung. Der Dienst weist Anfragen ohne Browser-Kennung mit 403 ab; eine
+ * feinere Einstellung ist behoerdenseitig nicht vorgesehen. Ueber ENV
+ * ueberschreibbar, damit eine Aenderung keine Auslieferung braucht. */
+function borisdHeaders() {
+  return {
+    'User-Agent': process.env.BORISD_USER_AGENT
+      || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+    'Referer': 'https://www.bodenrichtwerte-boris.de/',
+    'Accept': 'application/json, text/plain, */*',
+  };
+}
+
+/* Antwort: { results: [ { layerId, layerName, attributes: {...} } ] }.
+ * Attributnamen sind sprechend ("Bodenrichtwert", "Stichtag des ...") —
+ * die vorhandene Feldzuordnung F trifft sie ueber propCI. */
+function parseArcgis(text) {
+  let j;
+  try { j = JSON.parse(text); } catch { return null; }
+  const res = Array.isArray(j.results) ? j.results : [];
+  if (!res.length) return null;
+  // Wohnbauflaeche bevorzugen, sonst den ersten Treffer mit Wert.
+  const mitWert = res.filter((r) => r && r.attributes);
+  const wohn = mitWert.find((r) => /wohn/i.test(JSON.stringify(r.attributes)));
+  return (wohn || mitWert[0] || {}).attributes || null;
 }
 
 // Wie buildUrl, aber mit frei waehlbarem INFO_FORMAT (fuer die Diagnose-Probe).
@@ -300,12 +357,30 @@ export const BorisRegistry = {
       for (const ln of layers) {
         let text;
         try {
-          const res = await httpText(buildUrl(a, lat, lon, yr, ln), { timeoutMs: 15000, retries: 1 });
-          text = res.text;
+          /* WBORISD-3 · ArcGIS-Zweig. Ein Abruf je Sekunde als Obergrenze —
+           * wir sind Gast auf einem Behoerdenserver. Die Jahres-Kaskade
+           * entfaellt hier, der Dienst liefert den aktuellen Jahrgang. */
+          if (a.protocol === 'arcgis') {
+            const res = await httpText(buildArcgisUrl(a, lat, lon),
+              { timeoutMs: 20000, retries: 1, headers: borisdHeaders() });
+            text = res.text;
+          } else {
+            const res = await httpText(buildUrl(a, lat, lon, yr, ln), { timeoutMs: 15000, retries: 1 });
+            text = res.text;
+          }
         } catch (e) { lastErr = e.message; continue; }
 
         let v = null, st = null, nu = null, zo = null, rw = null;
-        if (a.format === 'geojson') {
+        if (a.protocol === 'arcgis') {   /* WBORISD-4 */
+          const props = parseArcgis(text);
+          if (props) {
+            rw = props;
+            v = num(propCI(props, F.value));
+            st = propCI(props, F.stichtag);
+            nu = propCI(props, F.nutzung);
+            zo = propCI(props, F.zone);
+          } else rw = (text || '').slice(0, 600);
+        } else if (a.format === 'geojson') {
           const props = parseGeoJson(text);
           if (props) { rw = props; v = num(propCI(props, F.value)); st = propCI(props, F.stichtag); nu = propCI(props, F.nutzung); zo = propCI(props, F.zone); }
           else rw = (text || '').slice(0, 1200); // kein Feature -> Rohtext fuer Diagnose behalten
