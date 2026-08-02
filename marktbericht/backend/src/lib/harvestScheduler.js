@@ -46,8 +46,13 @@ async function durchgang() {
   try {
     const b = await HarvestService.discover({ limit: faelligeAnzahl() });
     if (b && (b.neu || b.fehler.length)) {
+      /* v1047-WOUT-2 · Bisher stand nur die Anzahl da. Der Taktgeber laeuft
+       * alle sechs Stunden gegen fremde Behoerdenserver — wogegen er
+       * scheitert, gehoert ins Log, sonst kann es niemand abstellen. */
       console.log(`[harvest] ${b.geprueft} geprueft, ${b.neu} neu`
         + (b.fehler.length ? `, ${b.fehler.length} Fehler` : ''));
+      b.fehler.slice(0, 5).forEach((f) => console.log('[harvest]   ! ' + f));
+      if (b.fehler.length > 5) console.log(`[harvest]   ... und ${b.fehler.length - 5} weitere`);
     }
   } catch (e) {
     console.log('[harvest] Durchgang fehlgeschlagen:', e.message);

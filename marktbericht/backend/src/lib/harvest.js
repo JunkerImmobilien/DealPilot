@@ -57,7 +57,13 @@ async function main() {
     console.log('');
     console.log('  Quelle    ' + b.quelle + '  (' + b.lizenz + ')');
     console.log('  Stand     ' + (b.stand || 'unbekannt'));
-    console.log('  Gemeinden ' + b.gemeinden);
+    /* v1047-WOUT-1 · Das Feld heisst seit v1044 wertzeilen — hier stand
+     * weiter b.gemeinden und damit 'undefined'. Aufrufer immer mitlesen,
+     * wenn eine Datenstruktur umbenannt wird. */
+    console.log('  Wertzeilen ' + (b.wertzeilen != null ? b.wertzeilen : '?')
+      + '   (Kreis- und Gemeindeschluessel gemischt)');
+    if (b.ausschuesse != null) console.log('  Ausschuesse ' + b.ausschuesse);
+    if (b.namen != null) console.log('  Kreisnamen ' + b.namen);
     console.log('  angelegt  ' + b.angelegt + '   uebersprungen ' + b.uebersprungen
       + '   unplausibel ' + b.unplausibel + '   unsicher ' + b.unsicher);
     console.log('');

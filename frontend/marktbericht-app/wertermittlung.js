@@ -63,6 +63,45 @@
         platzhalter: 'nur f\u00fcr den Sachwert bei H\u00e4usern' },
       { id: 'spMiete', label: 'Stellplatzmiete (\u20ac/Monat)', typ: 'number',
         wenn: function () { return (parseFloat(wert('garages')) || 0) + (parseFloat(wert('outdoor')) || 0) > 0; } },
+
+      /* v1047-WFELD-1 · Ohne Standardstufe kein Sachwert. Vorher wurde
+       * stillschweigend Stufe 3 gerechnet — 42.000 EUR Unterschied bei
+       * einer 165-m2-Wohnung, ausgewiesen als waere er ermittelt. Die
+       * Sperre ohne dieses Feld waere eine Sackgasse gewesen. */
+      /* v1057-WSON-5 · Kueche, Moeblierung, Werbeflaeche, Antennenanlage. */
+      { id: 'sonstEinnahmen', label: 'Sonstige Einnahmen (\u20ac/Jahr)', typ: 'number' },
+
+      { id: 'standardstufe', label: 'Standardstufe (NHK 2010)', typ: 'select',
+        opt: [['', '\u2013 keine Angabe \u2013'],
+                   ['3', '3 \u00b7 Standard'],
+                   ['4', '4 \u00b7 gehoben'],
+                   ['5', '5 \u00b7 stark gehoben']],
+        hilfe: 'standardstufe' },
+
+      /* Korrekturfaktor aus Anlage 4, Fussnote 5 — lag fertig im Rechenkern
+       * und hatte nie ein Feld. Die Beschriftung erklaert ihn, statt nur
+       * den Fachbegriff hinzustellen. */
+      { id: 'grundriss', label: 'Grundrissart', typ: 'select',
+        opt: [['', '\u2013 keine Angabe \u2013'],
+                   ['einspaenner', 'Einsp\u00e4nner \u00b7 1 Wohnung je Treppenhaus (\u00d7 1,05)'],
+                   ['zweispaenner', 'Zweisp\u00e4nner \u00b7 2 Wohnungen (\u00d7 1,00)'],
+                   ['dreispaenner', 'Dreisp\u00e4nner \u00b7 3 Wohnungen (\u00d7 0,97)'],
+                   ['vierspaenner', 'Viersp\u00e4nner \u00b7 4 Wohnungen (\u00d7 0,95)']],
+        hilfe: 'grundriss',
+        wenn: function () { return istWohnung() || (parseFloat(wert('units')) || 0) > 2; } },
+
+      /* Anlage 2 laesst ausdruecklich beide Wege zu: Punktevergabe je
+       * Bauteil ODER sachverstaendige Einschaetzung des Grades. Der zweite
+       * ist im Formular zumutbar, der erste waere ein eigener Dialog.
+       * Die Zahlen sind die Mitten der Baender aus Tabelle 2. */
+      { id: 'modGrad', label: 'Modernisierungsgrad (Anlage 2)', typ: 'select',
+        opt: [['', '\u2013 keine Angabe, wird gesch\u00e4tzt \u2013'],
+                   ['0', 'nicht modernisiert'],
+                   ['4', 'kleine Modernisierungen im Rahmen der Instandhaltung'],
+                   ['8', 'mittlerer Modernisierungsgrad'],
+                   ['14', '\u00fcberwiegend modernisiert'],
+                   ['19', 'umfassend modernisiert']],
+        hilfe: 'modGrad' },
     ],
 
     /* Nur fuer den Ausnahmefall — eingeklappt, klar beschriftet. */
@@ -458,6 +497,18 @@
       bgf: parseFloat(wert('bgf')) || null,
       sachwertfaktor: parseFloat(wert('sachwertfaktor')) || null,
       stellplatz_miete_monat: parseFloat(wert('spMiete')) || null,
+      /* v1055-WFELD-1 · Seit v1047 stehen diese drei im Formular und wurden
+       * nie mitgeschickt. app.js sammelt den Block nicht selbst ein, sondern
+       * uebernimmt payload() als Ganzes — wer hier fehlt, existiert fuer den
+       * Bericht nicht. */
+      /* v1057-WSON-4 · Kueche, Moeblierung, Werbeflaeche. Getrennt von der
+       * Kaltmiete, weil die Vergleichsmiete aus reinen Wohnungsangeboten
+       * stammt — und getrennt kapitalisiert, weil sie nicht am Gebaeude
+       * haengt. */
+      sonstige_jahr: parseFloat(wert('sonstEinnahmen')) || null,
+      standardstufe: parseFloat(wert('standardstufe')) || null,
+      grundriss: wert('grundriss') || null,
+      mod_punkte: wert('modGrad') !== '' ? parseFloat(wert('modGrad')) : null,
       bwk_modus: stufe() >= 3 ? 'normiert' : null,
     };
   }

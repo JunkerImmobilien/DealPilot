@@ -85,6 +85,10 @@ export const OPENDATA_QUELLEN = [
     ckan: 'https://ckan.open.nrw.de/api/3/action/package_show?id=ad760913-eb7b-4843-b3b7-dc9100b788ca',
     lizenz: 'dl-de/zero-2-0',
     format: 'nrw-gmd',
+    /* v1048-WMOD-1 · Modell zur Ableitung von Liegenschaftszinssaetzen,
+     * AGVGA.NRW, Stand 21.06.2016. Landesweit einheitlich fuer alle
+     * nordrhein-westfaelischen Gutachterausschuesse. */
+    modell: 'agvga_nrw_2016',
     /* v1041-WQR-1 · Ressourcenmuster gehoert zur Quelle, nicht in den Code.
      * Vorher stand /GMDNRW_CSV\.zip$/ fest in findeDatei() — ein zweites
      * Land haette dort nie etwas gefunden. */
@@ -208,6 +212,7 @@ export const OpenDataConnector = {
      * deklariert. Temporale Todeszone: node --check hat es durchgewunken,
      * der erste echte Erntelauf ist abgestuerzt. */
     let namenAngelegt = 0;
+    let gaaAngelegt = 0;   /* v1044-WZUS-1 · vor dem Block, siehe v1043 */
 
     /* Gemeinde -> Gutachterausschuss, fuer die Quellenangabe. */
     const gaa = {};
@@ -233,19 +238,62 @@ export const OpenDataConnector = {
         }
         namenAngelegt = gesehen.size;
       }
+
+      /* v1044-WZUS-2 · Zustaendigkeitskarte. Je gaa_name eine Quellzeile
+       * mit allen Gemeinden ihres Bereichs. Damit weiss der Bericht auch
+       * fuer die 355 Gemeinden OHNE eigenen Zinssatz, wer zustaendig ist —
+       * statt kommentarlos auf Paragraf 256 zu fallen. */
+      if (!trockenlauf) {
+        const proAusschuss = new Map();
+        for (const z of csvLesen(schlTxt)) {
+          const nm = (z.gaa_name || '').trim();
+          const ag = String(z.ags || '').trim();
+          if (!nm || ag.length !== 8) continue;
+          if (!proAusschuss.has(nm)) proAusschuss.set(nm, []);
+          proAusschuss.get(nm).push(ag);
+        }
+        for (const [nm, liste] of proAusschuss) {
+          await q1(
+            `INSERT INTO mb.gaa_sources
+               (name, bundesland, ebene, ags_liste, portal_url, zugang, lizenz,
+                pruefstand, geprueft_am, geprueft_quelle, notiz)
+             VALUES ($1,'NW','kreis',$2,$3,'frei',$4,'geprueft',CURRENT_DATE,$5,$6)
+             ON CONFLICT (name, bundesland) DO UPDATE
+               SET ags_liste = EXCLUDED.ags_liste,
+                   pruefstand = 'geprueft',
+                   geprueft_am = CURRENT_DATE
+             RETURNING id`,
+            [nm, liste, 'https://www.boris.nrw.de/borisplus/', quelle.lizenz,
+             'schluessel.csv aus ' + quelle.name,
+             liste.length + ' Gemeinden im Zustaendigkeitsbereich.']).catch(() => {});
+          gaaAngelegt++;
+        }
+      }
     }
 
     const zeilen = csvLesen(lzsTxt);
     const bericht = {
       ok: true, quelle: quelle.name, lizenz: quelle.lizenz, datei: datei.url,
-      stand: datei.stand, gemeinden: zeilen.length,
+      /* v1044-WZUS-3 · frueher hiess das Feld 'gemeinden' und meldete 73.
+       * 73 ist die Zeilenzahl der lzs.csv — NRW hat 427 Gemeinden, und nur
+       * 72 davon tragen ueberhaupt einen Zinssatz. Das Etikett hat eine
+       * Abdeckung von 18 Prozent wie Vollstaendigkeit aussehen lassen. */
+      stand: datei.stand, wertzeilen: zeilen.length,
       angelegt: 0, uebersprungen: 0, unplausibel: 0, unsicher: 0, arten: {},
     };
     bericht.namen = namenAngelegt;   /* v1043-WTDZ-2 */
+    bericht.ausschuesse = gaaAngelegt;
 
     for (const z of zeilen) {
       const ags = String(z.ags || '').trim();
       if (!ags) continue;
+      /* v1047-WKRS-1 · Ein achtstelliger Schluessel auf drei Nullen ist der
+       * KREIS, nicht eine Gemeinde: 05770000 = Kreis Minden-Luebbecke.
+       * Als Gemeinde abgelegt findet ihn niemand — Huellhorst ist 05770016.
+       * Belegt: 52 der 71 NRW-Schluessel sind Kreiswerte. */
+      const _istKreis = ags.length === 8 && ags.slice(5) === '000';
+      const zielAgs = _istKreis ? ags.slice(0, 5) : ags;
+      const zielEbene = _istKreis ? 'kreis' : 'gemeinde';
       const jahr = parseInt(z.berichtsjahr, 10) || null;
       const stichtag = jahr ? `${jahr}-12-31` : null;
       const g = gaa[ags] || {};
@@ -281,13 +329,15 @@ export const OpenDataConnector = {
                  (ags, ags_ebene, objektart, typ, wert, wert_min, wert_max, einheit,
                   qualitaet, fallzahl, quelle_text, quelle_url, modellversion,
                   stichtag, gueltig_von, geprueft_am)
-               VALUES ($1,'gemeinde',$2,'lzs',$3,$4,$5,'prozent',$6,$7,$8,$9,
-                       'immowertv2021',$10::date, COALESCE($10::date, CURRENT_DATE), now())
+               VALUES ($1,$11,$2,'lzs',$3,$4,$5,'prozent',$6,$7,$8,$9,
+                       /* v1048-WMOD-2 · nicht mehr fest immowertv2021 */
+                       $12,$10::date, COALESCE($10::date, CURRENT_DATE), now())
                ON CONFLICT DO NOTHING RETURNING id`,
-              [ags, art, lzs,
+              [zielAgs, art, lzs,
                stabw != null ? Math.max(0.1, lzs - stabw) : null,
                stabw != null ? lzs + stabw : null,
-               unsicher ? 'B' : 'A', fall, quelleText, datei.url, stichtag]);
+               unsicher ? 'B' : 'A', fall, quelleText, datei.url, stichtag, zielEbene,
+               quelle.modell || 'immowertv2021']);
             bericht.angelegt++;
 
             /* Die uebrigen Kennzahlen als eigene Parameter — sie machen den
@@ -304,11 +354,14 @@ export const OpenDataConnector = {
                 `INSERT INTO mb.wert_parameter
                    (ags, ags_ebene, objektart, typ, wert, einheit, qualitaet,
                     fallzahl, quelle_text, quelle_url, modellversion, stichtag, gueltig_von)
-                 VALUES ($1,'gemeinde',$2,$3,$4,$5,$6,$7,$8,$9,'immowertv2021',$10::date,
+                 /* v1049-WMOD-1 · Die zweite Einfuegung schrieb den Vermerk
+                  * weiter fest. v1048 hat nur die erste erwischt. */
+                 VALUES ($1,$11,$2,$3,$4,$5,$6,$7,$8,$9,$12,$10::date,
                          COALESCE($10::date, CURRENT_DATE))
                  ON CONFLICT DO NOTHING RETURNING id`,
-                [ags, art, typ, wert, einheit, unsicher ? 'B' : 'A', fall,
-                 quelleText, datei.url, stichtag]).catch(() => {});
+                [zielAgs, art, typ, wert, einheit, unsicher ? 'B' : 'A', fall,
+                 quelleText, datei.url, stichtag, zielEbene,
+                 quelle.modell || 'immowertv2021']).catch(() => {});
             }
           } catch (e) { /* eine Zeile kippt den Lauf nicht */ }
         }

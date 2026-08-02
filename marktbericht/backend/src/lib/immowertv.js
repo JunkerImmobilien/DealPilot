@@ -49,6 +49,12 @@ export const BWK_TABELLE = {
   geprueft: false,
   basisjahr: 2010,
   verwaltung_je_we_eur: 230,
+  /* v1047-WBWK-1 · Anlage 3 I.1 nennt zwei verschiedene Betraege: 230 EUR
+   * je Wohnung bzw. je Wohngebaeude bei Ein- und Zweifamilienhaeusern,
+   * aber 275 EUR je EIGENTUMSWOHNUNG (Basiswerte; fuer 2021 gelten 298
+   * bzw. 357 EUR). Wir haben immer 230 gerechnet, auch bei Wohnungs-
+   * eigentum — der falsche der beiden Modellansaetze. */
+  verwaltung_je_etw_eur: 275,
   verwaltung_je_stellplatz_eur: 30,
   instandhaltung_je_qm_wfl_eur: 9.0,
   instandhaltung_je_stellplatz_eur: 68,
@@ -187,9 +193,34 @@ export function abzinsungsfaktor(zinsPct, rndJahre) {
  * @param {string} baustatus
  * @param {number|null} stichtagJahr
  */
-export function rnd(gndJahre, baujahr, baustatus = 'bestand', stichtagJahr = null) {
+/* v1047 · Anlage 2 als eigenes Modul, damit die Verordnungstabellen an
+ * einer Stelle stehen und einzeln pruefbar bleiben. */
+import { restnutzungsdauer as _anlage2 } from './anlage2.js';
+
+export function rnd(gndJahre, baujahr, baustatus = 'bestand', stichtagJahr = null, opt = null) {
   const G = Number(gndJahre) || GND_TABELLE.default;
   const jahr = Number(stichtagJahr) || new Date().getFullYear();
+
+  /* v1047-WA2-1 · Liegt eine Modernisierungspunktzahl vor, gilt das Modell
+   * der Anlage 2 — die Verordnung sagt "zugrunde zu legen", nicht "kann".
+   * Ohne Punktzahl bleibt es bei der bisherigen Schaetzung; sie ist nicht
+   * falsch, nur unschaerfer, und ohne Eingabe gibt es nichts Besseres. */
+  if (opt && opt.mod_punkte != null && Number.isFinite(Number(opt.mod_punkte))) {
+    const bjA2 = opt.kernsaniert && Number(opt.sanierungsjahr) > 1500
+      ? Number(opt.sanierungsjahr)     // Anlage 2 II.1: Baujahr = Jahr der Sanierung
+      : Number(baujahr);
+    if (Number.isFinite(bjA2) && bjA2 > 1500) {
+      const alterA2 = Math.max(0, jahr - bjA2);
+      const a2 = _anlage2({ gnd: G, alter: alterA2,
+                            punkte: Number(opt.mod_punkte), kernsaniert: !!opt.kernsaniert });
+      if (a2) {
+        return { jahre: a2.rnd, alter: alterA2, modell: 'anlage2',
+                 punkte: a2.punkte, grad: a2.grad, weg: a2.weg,
+                 hinweis: 'Restnutzungsdauer nach Anlage 2 ImmoWertV \u2014 ' + a2.grad
+                   + ', ' + a2.punkte + ' von 20 Modernisierungspunkten. ' + a2.hinweis };
+      }
+    }
+  }
 
   // Neubau: volle Nutzungsdauer, keine Alterswertminderung.
   if (istNeubau(baustatus)) {

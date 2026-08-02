@@ -8,6 +8,7 @@ import { round } from '../lib/stats.js';
 import { ErtragswertService } from './ErtragswertService.js';
 /* WNHK-4 */
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
+import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';   /* v1056-WRND-3 */
 
 // ---- Annahmen (dokumentiert, anpassbar) ----
 const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
@@ -29,6 +30,13 @@ export const CrossCheckService = {
   // ref: Objektdaten; landValue: BORIS ({available, value_sqm}); rent: GeoMap-Mietstats;
   // valuation: Ergebnis des Vergleichswertverfahrens (fuer die Gegenueberstellung)
   compute(ref, landValue, rent, valuation, params) {   /* WKERN-3: params optional */
+    /* v1047-WTDZ-1 · `p` stand bis hierher erst weit unten (Z. 174), wurde
+     * aber schon in der NHK-Rechnung (Z. 103) gelesen. Temporale Todeszone.
+     * Sie hat nie gefeuert, weil der Block hinter !istWohnung lag und alle
+     * Berichte Eigentumswohnungen waren. Bei einem Einfamilienhaus waere
+     * sie sofort abgestuerzt — der Sachwert fuer Haeuser war latent kaputt,
+     * seit `params` eingefuehrt wurde. Deklaration gehoert an den Anfang. */
+    const p = params || {};
     const out = {
       available: false,
       sachwert: { available: false },
@@ -98,13 +106,40 @@ export const CrossCheckService = {
     let _nhkFertig = false;
     /* WNHK-5 · Sobald die NHK-Tabelle steht, rechnet der richtige Sachwert.
      * Bis dahin bleibt der bisherige vereinfachte Weg fuer Haeuser. */
-    if (NHK_2010.geprueft && ref.property_type && !istWohnung) {
+    /* v1047-WSWE-1 · Wohnungen zugelassen, sobald eine BGF vorliegt.
+     * Ohne BGF bleibt es gesperrt: die Naeherung aus der Wohnflaeche ist
+     * bei einem Mehrfamilienhaus unbrauchbar (Treppenhaus, Keller,
+     * Gemeinschaftsflaechen), und ein zu genau aussehender falscher Wert
+     * ist schlimmer als keiner. */
+    /* v1056-WRND-2 · Anlage 2, wenn Punkte vorliegen — sonst die
+     * bisherige Schaetzung. Dieselbe Quelle wie beim Ertragswert. */
+    const _rndEinheitlich = () => {
+      const _mp = _num(ref.mod_punkte);
+      if (_mp == null) return rnd;
+      const _kern = /kernsaniert/i.test(String(ref.modernization || '')) && _mp >= 18;
+      const _bj = _kern && _num(ref.modernization_year) > 1500
+        ? _num(ref.modernization_year) : _num(ref.build_year);
+      if (!(_bj > 1500)) return rnd;
+      const _a2 = anlage2Rnd({ gnd: GND_JAHRE, alter: Math.max(0, (new Date().getFullYear()) - _bj),
+                               punkte: _mp, kernsaniert: _kern });
+      return _a2 && _a2.rnd != null ? _a2.rnd : rnd;
+    };
+    const _bgfWhg = Number((p && p.bgf_direkt) || ref.bgf || 0);
+    const _nhkTypWhg = (u) => (u > 20 ? '4.3' : (u > 6 ? '4.2' : '4.1'));
+    if (NHK_2010.geprueft && ref.property_type && (!istWohnung || _bgfWhg > 0)) {
       const _sw = nhkSachwert({
-        nhk_typ: (p && p.nhk_typ) || ref.nhk_typ, keller_dg: (p && p.keller_dg) || ref.keller_dg,
+        nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
+          || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null), keller_dg: (p && p.keller_dg) || ref.keller_dg,
         standardstufe: (p && p.standardstufe) || ref.standardstufe,
         bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl, objektart: ref.property_type,
         baupreisindex: BAUPREISINDEX, regionalfaktor: (p && p.regionalfaktor) || null,
-        gnd_jahre: GND_JAHRE, rnd_jahre: rnd,
+        /* v1056-WRND-1 · Bisher bekam der Sachwert die alte Schaetzung,
+         * waehrend der Ertragswert seit v1052 nach Anlage 2 rechnet: 38
+         * gegen 49,6 Jahre fuer dasselbe Gebaeude. Zwei Alterswerte fuer
+         * ein Haus sind in keinem Verfahren zu rechtfertigen; der Sachwert
+         * lag dadurch rund 50.000 EUR zu niedrig. Liegen
+         * Modernisierungspunkte vor, gilt Anlage 2 fuer BEIDE. */
+        gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
         bes_bauteile: (p && p.bes_bauteile) || null, aussenanlagen: (p && p.aussenanlagen) || null,
       }, (p && p.bodenwert) || null, (p && p.sachwertfaktor_param) || null);
       if (_sw.wert != null) {
@@ -112,6 +147,19 @@ export const CrossCheckService = {
           available: true, value_eur: _sw.wert, staffel: _sw.staffel,
           marktangepasst: _sw.marktangepasst, sachwertfaktor: _sw.sachwertfaktor || null,
           verfahren: _sw.verfahren,
+          /* v1056-WSW-3 · Die Zwischenwerte, die die Karte braucht. */
+          bodenwert_eur: _sw.bodenwert_eur != null ? _sw.bodenwert_eur : null,
+          gebaeude_sachwert_eur: _sw.gebaeude_sachwert_eur != null ? _sw.gebaeude_sachwert_eur : null,
+          restnutzungsdauer_jahre: _sw.restnutzungsdauer_jahre != null ? _sw.restnutzungsdauer_jahre : null,
+          gesamtnutzungsdauer_jahre: _sw.gesamtnutzungsdauer_jahre != null ? _sw.gesamtnutzungsdauer_jahre : null,
+          /* Ohne Sachwertfaktor ist es eine Herstellungskostenrechnung.
+           * Das steht so in den Warnungen des Rechenkerns — der Bericht
+           * muss es genauso sagen und darf die Zahl nicht als drittes
+           * gleichrangiges Verfahren fuehren. */
+          vorlaeufig: !_sw.marktangepasst,
+          bezeichnung: _sw.marktangepasst ? 'Sachwert' : 'vorläufiger Sachwert',
+          hinweis_kurz: _sw.marktangepasst ? null
+            : 'ohne Sachwertfaktor — Herstellungskosten, kein Marktwert',
         };
         _sw.warnungen.forEach((w) => { if (out.notes.indexOf(w) < 0) out.notes.push(w); });
         _sw.hinweise.forEach((h) => { if (out.notes.indexOf(h) < 0) out.notes.push(h); });
@@ -131,7 +179,24 @@ export const CrossCheckService = {
     } else if (istWohnung) {
       out.sachwert = {
         available: false,
-        grund: /* WSACH-4 */ 'Sachwert bei Wohnungseigentum nicht ausgewiesen: unsere NHK-Tabelle ist für Ein- und Zweifamilienhäuser hinterlegt. Rechenbar wäre er über den Sachwert des gesamten Gebäudes mal Miteigentumsanteil — dafür fehlt die Bruttogrundfläche des Gebäudes. Beim Wohnungseigentum führt ohnehin das Vergleichswertverfahren.',
+        /* v1047-WSWE-2 · Der alte Text behauptete, die Bruttogrundflaeche
+         * fehle — auch dann, wenn sie laengst im Formular stand. Er stammt
+         * aus der Zeit, als das Feld noch gar nicht erfassbar war. */
+        grund: _bgfWhg > 0
+          ? 'Sachwert nicht ausgewiesen: die Bruttogrundfläche liegt vor, aber die '
+            + 'Standardstufe fehlt. Ohne sie ist nicht bestimmbar, welcher der drei '
+            /* v1052-WSTD-1 · Bei Mehrfamilienhaeusern (4.1 bis 4.3) kennt
+             * Anlage 4 nur die Stufen 3 bis 5 — drei Kennwerte, nicht fuenf.
+             * Der Text stammt aus der Zeit, als der Sachwert nur fuer
+             * Haeuser lief. Zwischen Stufe 3 und 5 liegen bei 4.1 rund
+             * 44 Prozent (825 gegen 1.190 EUR je m2 BGF). */
+            + 'NHK-Kennwerte gilt — zwischen Stufe 3 und Stufe 5 liegen rund 44 Prozent, zu viel, '
+            + 'um sie zu mitteln. Standardstufe ergänzen, dann rechnet er.'
+          : 'Sachwert nicht ausgewiesen: für eine Eigentumswohnung wird die '
+            + 'Bruttogrundfläche der Wohnung benötigt. Die Näherung aus der '
+            + 'Wohnfläche ist im Mehrfamilienhaus zu ungenau (Treppenhaus, Keller, '
+            + 'Gemeinschaftsflächen). Beim Wohnungseigentum führt ohnehin das '
+            + 'Vergleichswertverfahren.',
       };
       out.notes.push('Sachwert nicht ausgewiesen: Das vereinfachte Sachwertverfahren arbeitet mit den Normalherstellungskosten für Einfamilienhäuser (NHK 2010, Standardstufe 3) und dem EFH-Faustwert BGF ≈ Wohnfläche × 1,35. Für eine Eigentumswohnung ist das die falsche Grundlage – lieber keine Zahl als eine falsche. Der Ertragswert-Quercheck bleibt.');
     } else if (wfl && buildYear) {
@@ -171,7 +236,7 @@ export const CrossCheckService = {
      * greifen dieselben Pauschalen wie bisher. Ein Kern, zwei Genauigkeitsgrade.
      */
     const rentSqm = rent && _num(rent.median_per_sqm);
-    const p = params || {};
+    /* v1047 · `p` steht jetzt am Anfang der Funktion. */
     if (wfl && rentSqm && rnd != null) {
       const rohertrag = Math.round(rentSqm * wfl * 12);
       const lzsPct = _num(p.lzs_pct) != null ? Number(p.lzs_pct) : LIEGENSCHAFTSZINS * 100;
@@ -184,12 +249,57 @@ export const CrossCheckService = {
         objektart: ref.property_type, baujahr: buildYear, baustatus: ref.baustatus || 'bestand',
         wohnflaeche_qm: wfl, anzahl_we: _num(ref.units) || 1, stichtag_jahr: nowYear,
         miete_markt_jahr: rohertrag,
-        stellplatz_anz: _num(ref.garages), stellplatz_miete_monat: _num(p.stellplatz_miete_monat),
-        rnd_jahre: rnd,
+        /* v1048-WSPL-1 · Vorher nur ref.garages — die Aussenstellplaetze
+         * fielen unter den Tisch. Das PDF meldete "1 Stellpl." bei einem
+         * Objekt mit einer Garage UND zwei Aussenplaetzen. */
+        stellplatz_anz: (_num(ref.garages) || 0) + (_num(ref.outdoor_parking) || 0),
+        garagen_anz: _num(ref.garages) || 0,
+        aussen_anz: _num(ref.outdoor_parking) || 0,
+        stellplatz_miete_monat: _num(p.stellplatz_miete_monat),
+        /* Nach welchem Modell der Zinssatz abgeleitet wurde. */
+        modellversion: p.modellversion || null,
+        /* v1052-WA2-1 · rnd_jahre wird BEWUSST nicht gesetzt, wenn
+         * Modernisierungspunkte vorliegen: der Ertragswertdienst betritt
+         * den Anlage-2-Zweig nur, wenn keine Restnutzungsdauer vorgegeben
+         * ist (`if (!R)`). Mit vorgegebener Dauer blieb es bei der
+         * Schaetzung, obwohl die Punkte durchgereicht wurden — der Wert
+         * kam an und wurde trotzdem nicht benutzt. */
+        rnd_jahre: (_num(ref.mod_punkte) != null ? null : rnd),
+        /* v1057-WSON-7 */
+        sonstige_jahr: _num(ref.sonstige_jahr),
+        sonstige_dauer_jahre: _num(ref.sonstige_dauer_jahre),
+        mod_punkte: _num(ref.mod_punkte),
+        /* v1052-WA2-2 · Kernsanierung nur, wenn die Punkte sie auch tragen.
+         * Anlage 2 versteht darunter einen Zustand, der NAHEZU EINEM NEUEN
+         * GEBAEUDE entspricht, und erlaubt dafuer 90 statt 70 Prozent der
+         * Gesamtnutzungsdauer. Gemessen am Testobjekt: das Wort allein hob
+         * die Restnutzungsdauer von 49,6 auf 72 Jahre und den Ertragswert
+         * um rund dreissig Prozent — bei 14 von 20 Punkten und ohne
+         * Aussenwanddaemmung. Ein Auswahlfeld darf das nicht koennen. */
+        kernsaniert: /kernsaniert/i.test(String(ref.modernization || ''))
+          && (_num(ref.mod_punkte) || 0) >= 18,
+        sanierungsjahr: _num(ref.modernization_year) || _num(ref.reconstruction_year) || null,
         lzs_pct: lzsPct, lzs_quelle: p.lzs_quelle || 'pauschal', lzs_stufe: p.lzs_stufe || null,
         bog_eur: _num(p.bog_eur), bog_grund: p.bog_grund || null,
       };
-      if (p.bwk_modus !== 'normiert') {
+      /* v1048-WMOD-3 */
+      const _hatModell = ['agvga_nrw_2016'].indexOf(String(p.modellversion || '')) >= 0;
+      /* v1049-WBWK-3 · Hat der Ausschuss seine eigene Quote veroeffentlicht,
+       * ist sie der genaueste Ansatz — genauer als jeder Modellwert, weil
+       * sie aus denselben Kauffaellen stammt wie der Zinssatz. */
+      const _quote = _num(p.bwk_quote_pct);
+      if (_quote > 0) {
+        ein.bwk_modus = 'manuell';
+        ein.bwk_gesamt_jahr = Math.round(rohertrag * _quote / 100);
+        ein.bwk_quote_herkunft = p.bwk_quote_quelle || null;
+        ein.bwk_quote_pct = _quote;   /* v1052-WBWK-2 */
+        out.notes.push('Bewirtschaftungskosten mit der Quote von '
+          + String(_quote).replace('.', ',') + ' % gerechnet'
+          + (p.bwk_quote_quelle ? ' — Quelle: ' + p.bwk_quote_quelle : '')
+          + '. Sie stammt aus denselben Kauffällen wie der Liegenschaftszinssatz '
+          + 'und ist damit der modellkonformste verfügbare Ansatz.');
+      } else
+      if (!_hatModell && p.bwk_modus !== 'normiert') {
         ein.bwk_modus = 'manuell';
         ein.bwk_gesamt_jahr = Math.round(rohertrag * BWK_QUOTE);
       } else {
@@ -212,6 +322,12 @@ export const CrossCheckService = {
           reinertrag_pa_eur: hol('= Reinertrag'),
           liegenschaftszins_pct: kern.lzs ? kern.lzs.pct : lzsPct,
           liegenschaftszins_stufe: kern.lzs ? kern.lzs.stufe : null,
+          /* v1050-WSTR-2 · Ohne diese vier Zeilen bleibt die Spanne im PDF
+           * leer — die Kaskade kennt sie, die Karte sah sie nie. */
+          streuung_pct: _num(p.lzs_streuung_pct),
+          liegenschaftszins_min: _num(p.lzs_min),
+          liegenschaftszins_max: _num(p.lzs_max),
+          liegenschaftszins_herabgestuft: !!p.lzs_herabgestuft,
           liegenschaftszins_quelle: kern.lzs ? kern.lzs.quelle : null,
           restnutzungsdauer_jahre: kern.nutzungsdauer ? kern.nutzungsdauer.rnd : rnd,
           vervielfaeltiger: kern.barwertfaktor,
@@ -234,10 +350,38 @@ export const CrossCheckService = {
     // ================= VERGLEICH =================
     const vgl = valuation && valuation.market_value ? valuation.market_value.estimated : null;
     if (out.sachwert.available || out.ertragswert.available) {
-      out.available = true;
+      /* v1049-WFLA-3 · Der Flaechenbefund gehoert in den Bericht, nicht nur
+     * ins Log. Eine stille Annahme ueber den Bodenwert ist dieselbe Sorte
+     * Fehler wie die stille Standardstufe 3. */
+    /* v1053-WIRW-4 · Der Immobilienrichtwert gehoert in den Bericht — auch
+     * und gerade dann, wenn es keinen gibt. "Fuer diese Gemeinde noch
+     * nicht beschlossen" ist eine Auskunft, kein Fehler. */
+    if (p.irw) {
+      out.irw = p.irw;
+      if (p.irw.verfuegbar && p.irw.abweichung && p.irw.abweichung.hinweis
+          && out.notes.indexOf(p.irw.abweichung.hinweis) < 0) {
+        out.notes.push(p.irw.abweichung.hinweis);
+      } else if (!p.irw.verfuegbar && p.irw.hinweis
+                 && out.notes.indexOf(p.irw.hinweis) < 0) {
+        out.notes.push(p.irw.hinweis);
+      }
+    }
+    if (p.flaeche) {
+      out.flaeche = p.flaeche;
+      if (p.flaeche.hinweis && out.notes.indexOf(p.flaeche.hinweis) < 0) {
+        out.notes.push(p.flaeche.hinweis);
+      }
+    }
+    out.available = true;
       const vals = [
         ['vergleichswert', vgl],
-        ['sachwert', out.sachwert.available ? out.sachwert.value_eur : null],
+        /* v1056-WSPR-1 · Ein vorlaeufiger Sachwert gehoert NICHT in den
+         * Spread. Er ist eine Herstellungskostenrechnung; ihn gegen zwei
+         * Marktwerte zu stellen misst Aepfel gegen Birnen und meldet dann
+         * eine "grosse Abweichung", die keine Aussage traegt. Gemessen:
+         * 46,8 Prozent allein aus diesem Vergleich. */
+        ['sachwert', (out.sachwert.available && !out.sachwert.vorlaeufig)
+          ? out.sachwert.value_eur : null],
         ['ertragswert', out.ertragswert.available ? out.ertragswert.value_eur : null],
       ].filter(([, v]) => v != null);
       const nums = vals.map(([, v]) => v);

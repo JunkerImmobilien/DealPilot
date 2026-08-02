@@ -276,7 +276,15 @@ export const NHK_2010 = {
  * haeuser (1.x-3.x), und genau deren Tabelle fehlt noch. */
 export function nhkKennwert(typ, kellerDg, stufe) {
   if (!NHK_2010.geprueft) return null;
-  const st = Math.min(5, Math.max(3, Number(stufe) || 3));   // Tabelle kennt 3-5
+  /* v1047-WSTD-1 · Vorher: `Number(stufe) || 3`. Eine fehlende Angabe
+   * wurde damit zu Stufe 3 — still. Gemessen an einer 165-m2-Wohnung:
+   * 216.978 EUR statt 259.059 EUR bei Stufe 4. Zwischen Stufe 3 und 5
+   * liegen bei 4.1 rund 44 Prozent; das laesst sich nicht mitteln. Ohne
+   * Angabe erscheint das Verfahren nicht, wie bei jeder anderen fehlenden
+   * Pflichtangabe auch. */
+  const roh = Number(stufe);
+  if (!Number.isFinite(roh) || roh < 1) return null;
+  const st = Math.min(5, Math.max(3, Math.round(roh)));   // Tabelle kennt 3-5
   const v = NHK_2010.WERTE[`${typ}|${st}`];
   return Number.isFinite(v) ? v : null;
 }
@@ -387,11 +395,21 @@ export function sachwert(ein, bodenwertErgebnis, param) {
     || (NHK_2010.aussenanlagen_pct ? Math.round(geb * NHK_2010.aussenanlagen_pct / 100) : 0);
   if (aussen) { geb += aussen; out.staffel.push({ pos: '+ Außenanlagen', wert: aussen }); }
   out.staffel.push({ pos: '= Gebäudesachwert', wert: geb, summe: true });
+  /* v1056-WSW-1 · Diese Werte gab es nur als lokale Variablen. Die
+   * Ergebniskarte las sw.gebaeude_sachwert_eur und bekam undefined —
+   * sichtbar als "Gebäude –" neben einer korrekten Staffel. */
+  out.gebaeude_sachwert_eur = geb;
+  out.restnutzungsdauer_jahre = rnd;
+  out.gesamtnutzungsdauer_jahre = gnd;
+  out.alterswertminderung_eur = minderung;
+  out.herstellungskosten_eur = herst;
 
   const bw = (bodenwertErgebnis && bodenwertErgebnis.vollstaendig) ? bodenwertErgebnis.wert : 0;
   if (!bw) out.warnungen.push('Ohne Bodenwert ist der Sachwert unvollständig — er besteht aus Gebäude UND Boden.');
   out.staffel.push({ pos: '+ Bodenwert', wert: bw });
+  out.bodenwert_eur = bw || null;   /* v1056-WSW-2 */
   const vorlaeufig = geb + bw;
+  out.vorlaeufiger_sachwert_eur = vorlaeufig;
   out.staffel.push({ pos: '= vorläufiger Sachwert', wert: vorlaeufig, summe: true });
 
   /* Marktanpassung. Ohne Sachwertfaktor bleibt es beim vorlaeufigen Sachwert —
