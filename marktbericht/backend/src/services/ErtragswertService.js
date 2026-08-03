@@ -50,8 +50,54 @@ export const ErtragswertService = {
     if (!brw) out.hinweise.push('Bodenrichtwert fehlt — über BORIS abrufen oder aus dem Grundstücksmarktbericht eintragen.');
     if (!flaeche || !brw) return out;
 
-    let wert = flaeche * brw;
-    out.schritte.push({ pos: 'Grundstücksfläche × Bodenrichtwert', detail: `${flaeche} m² × ${brw} €/m²`, wert: round0(wert) });
+    /* v1070-WUK-1 · Bis hierher ging die GESAMTE Flaeche zum vollen
+     * Bodenrichtwert in den Bodenwert — auch die 928 m2 Hinterland hinter
+     * einem 170-m2-Haus. Der Gutachterausschuss sagt etwas anderes:
+     * Umrechnungskoeffizienten gelten bis zum 1,5-fachen der Bezugsgroesse,
+     * die Flaeche darueber ist "wertmaessig wie eine private Gruenflaeche
+     * einzusetzen" (Abschnitt 4.6.4, § 41 ImmoWertV).
+     *
+     * Gemessen bei 1.628 m2, Bezugsgroesse 700 m2, 100 EUR/m2:
+     *   bisher 162.800 EUR — nach Modell 101.328 EUR.
+     *
+     * ZWEI Effekte, nicht einer: der Koeffizient druckt den EUR/m2 fuer das
+     * groessere Baulandgrundstueck UND die Restflaeche zaehlt nur mit dem
+     * Gruenflaechenwert. Wer nur einen ansetzt, rechnet falsch.
+     *
+     * Liegt keine Aufteilung vor, bleibt es exakt beim alten Weg. */
+    const _auf = grund.groessenanpassung;
+    let wert;
+    if (_auf && _auf.verfuegbar && _auf.gruen_qm > 0) {
+      wert = _auf.wert_eur;
+      out.schritte.push({
+        pos: 'Bauland × angepasster Bodenwert',
+        detail: `${_auf.bauland_qm} m² × ${_auf.bodenwert_eur_qm} €/m²`
+          + (_auf.koeffizient_angewandt
+            ? ` (${brw} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`
+            : ''),
+        wert: round0(_auf.wert_bauland_eur),
+      });
+      out.schritte.push({
+        pos: '+ überschüssige Fläche als private Grünfläche',
+        detail: `${_auf.gruen_qm} m² × ${_auf.gruen_eur_qm} €/m²`,
+        wert: round0(_auf.wert_gruen_eur),
+      });
+      out.hinweise.push(_auf.hinweis);
+      out.flaechenaufteilung = _auf;
+    } else if (_auf && _auf.verfuegbar && _auf.koeffizient_angewandt && _auf.faktor !== 1) {
+      wert = _auf.wert_eur;
+      out.schritte.push({
+        pos: 'Grundstücksfläche × angepasster Bodenwert',
+        detail: `${flaeche} m² × ${_auf.bodenwert_eur_qm} €/m²`
+          + ` (${brw} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`,
+        wert: round0(wert),
+      });
+      out.hinweise.push(_auf.hinweis);
+      out.flaechenaufteilung = _auf;
+    } else {
+      wert = flaeche * brw;
+      out.schritte.push({ pos: 'Grundstücksfläche × Bodenrichtwert', detail: `${flaeche} m² × ${brw} €/m²`, wert: round0(wert) });
+    }
 
     // GFZ-Umrechnung nur mit ausdruecklich angegebenem Koeffizienten. Wir erfinden
     // keinen — die Umrechnungstabellen sind regional und gehoeren zum Marktbericht.
@@ -83,6 +129,17 @@ export const ErtragswertService = {
     }
 
     out.bodenwert_gesamt = round0(wert);
+
+    /* v1072-WREN-2 · Der rentierliche Teil. Ohne Aufteilung ist er der
+     * ganze Bodenwert — das alte Verhalten, unveraendert. */
+    if (_auf && _auf.verfuegbar && _auf.wert_gruen_eur > 0 && _auf.rentierlich === false) {
+      out.wert_rentierlich = round0(wert - _auf.wert_gruen_eur);
+      out.hinweise.push('Die zusätzliche Grundstücksfläche ist als nicht rentierlich '
+        + 'gekennzeichnet: sie geht in den Bodenwert ein, unterliegt aber nicht der '
+        + 'Bodenwertverzinsung im Ertragswertverfahren (§ 41 ImmoWertV).');
+    } else {
+      out.wert_rentierlich = round0(wert);
+    }
 
     // Miteigentumsanteil (ETW)
     /* v1026 · Bei einer Eigentumswohnung ist der VOLLE Grundstueckswert immer
@@ -319,8 +376,34 @@ export const ErtragswertService = {
     out.lzs = { pct: lzs, quelle: lzsQuelle, stufe: lzsStufe };
 
     /* ── 4 · Bodenwertverzinsung ────────────────────────────────────────── */
-    const bwVerzinsung = hatBw ? round0(bw * lzs / 100) : 0;
-    if (hatBw) out.staffel.push({ pos: `− Bodenwertverzinsung (${bw.toLocaleString('de-DE')} € × ${lzs} %)`, wert: -bwVerzinsung, summe: true });
+    /* v1072-WREN-1 · NUR DER RENTIERLICHE BODENWERT WIRD VERZINST.
+     *
+     * Gemessen an Loehner Str. 278: das PDF rechnete "Bodenwertverzinsung
+     * (144.780 EUR x 1,7 %)" — darin steckten die 826 m2 Hinterland. Mein
+     * eigener Hinweistext aus v1071 behauptete das Gegenteil.
+     *
+     * Eine nicht selbstaendig bebaubare Gartenflaeche wirft keinen Ertrag
+     * ab; sie ueber die Bodenwertverzinsung gegen den Gebaeudeertrag zu
+     * rechnen, mindert den Ertragswert um etwas, das gar nicht ertragen
+     * soll. Im Werkzeug des Sachverstaendigen ist das der Haken
+     * "rentierlich"; § 41 ImmoWertV verlangt die getrennte Bewertung.
+     *
+     * Der VOLLE Bodenwert bleibt Summand am Ende — nur die Verzinsung
+     * greift auf den rentierlichen Teil zu. */
+    const _bwRent = (bodenwertErgebnis && Number.isFinite(Number(bodenwertErgebnis.wert_rentierlich)))
+      ? Number(bodenwertErgebnis.wert_rentierlich) : bw;
+    const bwVerzinsung = hatBw ? round0(_bwRent * lzs / 100) : 0;
+    if (hatBw) {
+      out.staffel.push({
+        pos: `− Bodenwertverzinsung (${_bwRent.toLocaleString('de-DE')} € × ${lzs} %)`,
+        detail: _bwRent !== bw
+          ? 'nur der rentierliche Bodenwert; ' + (bw - _bwRent).toLocaleString('de-DE')
+            + ' € nicht rentierliche Fläche bleiben außen vor (§ 41 ImmoWertV)'
+          : null,
+        wert: -bwVerzinsung, summe: true,
+      });
+      if (_bwRent !== bw) out.bodenwert_rentierlich_eur = _bwRent;
+    }
 
     const gebReinertrag = round0(reinertrag - bwVerzinsung);
     if (hatBw) out.staffel.push({ pos: '= Gebäudereinertrag', wert: gebReinertrag, summe: true });

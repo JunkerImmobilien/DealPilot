@@ -181,13 +181,23 @@ export function angepassterZins({
   };
 
   /* Alter: der Bericht nennt "alt / sehr alt" und "sehr neu". */
-  const alt = Number(gebaeudealter);
-  bewerte('alter', Number.isFinite(alt)
+  /* v1062-WZIN-1 · Number(null) ist 0 und besteht Number.isFinite. Ohne
+   * Baujahr wurde das Gebaeude damit als "sehr neu" eingestuft und der
+   * Zinssatz um 0,33 Punkte gesenkt — eine Aussage ueber ein Merkmal, das
+   * niemand erhoben hat. Fehlt die Angabe, faellt das Merkmal aus. */
+  const alt = (gebaeudealter === null || gebaeudealter === undefined
+    || gebaeudealter === '') ? NaN : Number(gebaeudealter);
+  bewerte('alter', (Number.isFinite(alt) && alt >= 0)
     ? spanne(alt, [[10, -1], [25, -0.5], [45, 0], [65, 0.5], [Infinity, 1]]) : null);
 
   /* Wohnlage: unser Mikrolage-Score als Naeherung. */
-  const lage = Number(mikrolage_score);
-  bewerte('wohnlage', Number.isFinite(lage)
+  /* v1062-WZIN-2 · Dieselbe Falle, teurer: ein fehlender Mikrolage-Score
+   * wurde als 0 gelesen und damit als schlechteste denkbare Wohnlage —
+   * der staerkste Einzelbeitrag des ganzen Katalogs (+0,275), begruendet
+   * im Klartext mit "die Wohnlage ist eher maessig". */
+  const lage = (mikrolage_score === null || mikrolage_score === undefined
+    || mikrolage_score === '') ? NaN : Number(mikrolage_score);
+  bewerte('wohnlage', (Number.isFinite(lage) && lage > 0)
     ? spanne(lage, [[35, 1], [50, 0.5], [70, 0], [85, -0.5], [Infinity, -1]]) : null);
 
   /* Nutzung. */

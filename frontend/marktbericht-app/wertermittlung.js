@@ -1,3 +1,37 @@
+/* v1072-WHIL-2 · Feldhilfen fuer die Flaechen- und Sachwertfelder.
+ * Sie werden an window.MB_FELDHILFE angehaengt, damit die bestehende
+ * Feldhilfe-Mechanik (data-fh) sie findet. */
+window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
+  hinterland: 'Nur die Fläche AUSSERHALB des Baulands. Beispiel Löhner Straße: '
+    + '1.628 m² gesamt, davon 800 m² dem Haus zuzuordnendes Bauland und 828 m² '
+    + 'rückwärtiges Garten- bzw. Hinterland. Hier gehören die 828 hinein, oben '
+    + 'die 800. Nicht die gesamte Grundstücksfläche eintragen — sie würde doppelt '
+    + 'gezählt.',
+  hinterlandRent: 'Rentierlich heißt: die Fläche wirft einen Ertrag ab, etwa weil '
+    + 'sie verpachtet ist. Das ist die Ausnahme. Eine nicht rentierliche Fläche '
+    + 'geht in den Bodenwert ein, unterliegt aber nicht der Bodenwertverzinsung im '
+    + 'Ertragswertverfahren (§ 41 ImmoWertV) — sonst mindert sie den '
+    + 'Gebäudeertrag, obwohl sie gar keinen tragen soll.',
+  hinterlandWert: 'Der Wertansatz je Quadratmeter. Übliche Größenordnung ist ein '
+    + 'Bruchteil des Bodenrichtwerts: der Gutachterausschuss Minden-Lübbecke weist '
+    + 'für private Grünflächen 5 €/m² aus (Spanne 1 bis 12); in Gutachten sind '
+    + 'auch 20 Prozent des Bodenrichtwerts üblich. Ohne Angabe wird nicht '
+    + 'geschätzt — der Wert hängt von Zuschnitt, Zuwegung und Nutzbarkeit ab.',
+  garagenBgf: 'Länge × Breite aller Garagen zusammen, nicht die Zahl der '
+    + 'Stellplätze. Die NHK 2010 führen für Garagen eigene Kostenkennwerte '
+    + '(Gebäudeart 14.1) und eine eigene Gesamtnutzungsdauer von 60 Jahren — eine '
+    + 'Garage hält nicht so lange wie das Wohnhaus. Ohne Fläche wird sie nicht '
+    + 'angesetzt.',
+  garagenStufe: 'Stufe 3 sind Fertiggaragen, Stufe 4 Massivbauweise, Stufe 5 '
+    + 'massiv mit besonderer Ausführung (Ziegel- oder Gründach, Fliesen, Wasser '
+    + 'und Heizung). Kostenkennwerte 245 / 485 / 780 €/m² BGF, Stand 2010.',
+  aussenPct: 'Wege, Hofflächen, Einfriedungen, Ver- und Entsorgungsanlagen. '
+    + 'Übliche Ansätze liegen zwischen 5 und 7 Prozent des Gebäudesachwerts; '
+    + 'manche Gutachterausschüsse geben stattdessen feste Beträge vor '
+    + '(Minden-Lübbecke: Kanal 2.900 €, Einfahrt 2.500 €, Terrasse 2.000 €). '
+    + 'Ist oben ein Eurobetrag eingetragen, hat der Vorrang.',
+});
+
 /* wertermittlung.js — Zielfrage, Stufenfelder, Pflichtfeld-Ampel.
  * ────────────────────────────────────────────────────────────────────────────
  * Aufbau nach Konzept: EINE Frage am Anfang statt Checkboxen mittendrin.
@@ -71,12 +105,94 @@
       /* v1057-WSON-5 · Kueche, Moeblierung, Werbeflaeche, Antennenanlage. */
       { id: 'sonstEinnahmen', label: 'Sonstige Einnahmen (\u20ac/Jahr)', typ: 'number' },
 
+      /* v1067-WSW-4 · Ohne Gebaeudeart kein Sachwert fuer Haeuser.
+       * CrossCheckService leitet sie nur fuer Wohnungen ab (4.1/4.2/4.3
+       * nach Zahl der Einheiten) und uebergab fuer Haeuser null — der
+       * Sachwert war fuer den haeufigsten Objekttyp im Markt tot
+       * verdrahtet. Ableiten laesst sie sich nicht: die Typennummer der
+       * NHK 2010 kodiert die Geometrie, nicht die Hausform. */
+      /* v1068-WNHK-4 · Statt einer Liste mit 36 Eintraegen drei Fragen,
+       * die die Typennummer bilden. Ein Sachverstaendiger weiss, ob das
+       * Haus unterkellert ist und wie das Dach aussieht — er weiss nicht
+       * auswendig, dass das "2.13" heisst. */
+      /* v1071-WHIN-5 · Zwei Felder statt einer Vermutung. */
+      /* v1072-WHIL-1 · Die Texte zu 'hinterland' und den neuen Feldern
+       * fehlten — der Marker stand da, der Text nicht. */
+      { id: 'hinterlandFlaeche', label: 'Zus\u00e4tzliche Grundst\u00fccksfl\u00e4che / Hinterland (m\u00b2)',
+        typ: 'number', hilfe: 'hinterland',
+        platzhalter: 'nur die Fl\u00e4che AUSSERHALB des Baulands' },
+      /* v1072-WREN-6 · Der Haken aus dem Werkzeug des Sachverstaendigen. */
+      { id: 'hinterlandRent', label: 'Zusatzfl\u00e4che ist rentierlich', typ: 'select',
+        opt: [['', 'nein \u00b7 wirft keinen Ertrag ab (Standard)'],
+                   ['ja', 'ja \u00b7 wird vermietet oder verpachtet']],
+        hilfe: 'hinterlandRent',
+        wenn: function () { return !!wert('hinterlandFlaeche'); } },
+      { id: 'hinterlandWert', label: 'Wertansatz Hinterland (\u20ac/m\u00b2)', typ: 'number',
+        platzhalter: 'z. B. 5 \u20ac/m\u00b2 (Gr\u00fcnfl\u00e4che Minden-L\u00fcbbecke)',
+        pflichtWenn: function () { return !!wert('hinterlandFlaeche'); } },
+
+      /* v1072-WGAR-6 · Ohne Bruttogrundflaeche der Garage wird nicht
+       * geschaetzt — die Zahl der Stellplaetze sagt nichts ueber die
+       * Flaeche. Im Gutachten sind es 64,58 m2 fuer zwei Garagen. */
+      { id: 'garagenBgf', label: 'Garage / Carport \u2013 Bruttogrundfl\u00e4che (m\u00b2)',
+        typ: 'number', hilfe: 'garagenBgf',
+        platzhalter: 'L\u00e4nge \u00d7 Breite, alle Garagen zusammen' },
+      { id: 'garagenStufe', label: 'Garage \u2013 Standardstufe', typ: 'select',
+        opt: [['', '\u2013 keine Angabe \u2013'],
+                   ['3', '3 \u00b7 Fertiggarage'],
+                   ['4', '4 \u00b7 Massivbauweise'],
+                   ['5', '5 \u00b7 Massiv mit besonderer Ausf\u00fchrung']],
+        hilfe: 'garagenStufe',
+        wenn: function () { return !!wert('garagenBgf'); },
+        pflichtWenn: function () { return !!wert('garagenBgf'); } },
+      { id: 'aussenPct', label: 'Au\u00dfenanlagen (% des Geb\u00e4udesachwerts)',
+        typ: 'number', hilfe: 'aussenPct',
+        platzhalter: 'z. B. 5 bis 7 \u2013 alternativ Betrag oben' },
+
+      { id: 'nhkHaus', label: 'Hausform (NHK 2010)', typ: 'select',
+        opt: [['', '\u2013 keine Angabe \u2013'],
+                   ['1', 'freistehendes Ein-/Zweifamilienhaus'],
+                   ['2', 'Doppelhaus / Reihenendhaus'],
+                   ['3', 'Reihenmittelhaus']],
+        wenn: function () { return !istWohnung(); },
+        pflichtWenn: function () { return !istWohnung(); } },
+      { id: 'nhkGeschosse', label: 'Geschosse und Unterkellerung', typ: 'select',
+        opt: [['', '\u2013 keine Angabe \u2013'],
+                   ['0', 'Keller- und Erdgeschoss'],
+                   ['1', 'Keller-, Erd- und Obergeschoss'],
+                   ['2', 'Erdgeschoss, nicht unterkellert'],
+                   ['3', 'Erd- und Obergeschoss, nicht unterkellert']],
+        wenn: function () { return !istWohnung(); },
+        pflichtWenn: function () { return !istWohnung(); } },
+      { id: 'nhkDach', label: 'Dachausbildung', typ: 'select',
+        opt: [['', '\u2013 keine Angabe \u2013'],
+                   ['1', 'Dachgeschoss voll ausgebaut'],
+                   ['2', 'Dachgeschoss nicht ausgebaut'],
+                   ['3', 'Flachdach oder flach geneigtes Dach']],
+        wenn: function () { return !istWohnung(); },
+        pflichtWenn: function () { return !istWohnung(); } },
+
+      /* v1067-WSW-5 · Die Stufen 1 und 2 gibt es nur fuer Haeuser. Sie
+       * hier anzubieten, wo die Tabelle sie nicht hat, waere eine
+       * Einladung zu einem stillen Ersatzwert. */
       { id: 'standardstufe', label: 'Standardstufe (NHK 2010)', typ: 'select',
         opt: [['', '\u2013 keine Angabe \u2013'],
+                   ['1', '1 \u00b7 sehr einfach (nur H\u00e4user)'],
+                   ['2', '2 \u00b7 einfach (nur H\u00e4user)'],
                    ['3', '3 \u00b7 Standard'],
                    ['4', '4 \u00b7 gehoben'],
                    ['5', '5 \u00b7 stark gehoben']],
         hilfe: 'standardstufe' },
+
+      /* v1062-WAUS-1 · Beide Betraege gehen seit jeher durch nhk2010.js und
+       * hatten nie ein Feld — der Sachwert rechnete sie mit 0.
+       * KEINE Baunebenkosten hier: die NHK-2010-Kennwerte enthalten sie
+       * bereits (NHK_2010.baunebenkosten_enthalten). Ein eigenes Feld waere
+       * eine Doppelzaehlung. */
+      { id: 'aussenanlagen', label: 'Au\u00dfenanlagen (\u20ac)', typ: 'number',
+        platzhalter: 'Wege, Einfriedung, Ver- und Entsorgung' },
+      { id: 'besBauteile', label: 'Besondere Bauteile (\u20ac)', typ: 'number',
+        platzhalter: 'z. B. Aufzug \u00b7 ohne Baunebenkosten (in NHK enthalten)' },
 
       /* Korrekturfaktor aus Anlage 4, Fussnote 5 — lag fertig im Rechenkern
        * und hatte nie ein Feld. Die Beschriftung erklaert ihn, statt nur
@@ -506,9 +622,34 @@
        * stammt — und getrennt kapitalisiert, weil sie nicht am Gebaeude
        * haengt. */
       sonstige_jahr: parseFloat(wert('sonstEinnahmen')) || null,
+      /* v1067-WSW-6 · app.js uebernimmt payload() als Ganzes. Wer hier
+       * fehlt, existiert fuer den Bericht nicht — dieselbe Lehre wie
+       * v1055 und v1062. */
+      /* v1068-WNHK-5 · Typennummer <Haustyp>.<Geschosse><Dach>.
+       * Fehlt eine der drei Angaben, wird KEINE Nummer gebildet — eine
+       * halb geratene Gebaeudeart waere schlimmer als gar keine. */
+      /* v1071-WHIN-4 · Zusaetzliche Grundstuecksflaeche. Ableiten laesst
+       * sich das nicht — bei einer Wohnung ist "Garten" ein Teil des
+       * Grundstuecks, bei einem Haus koennen 928 m2 Hinterland daneben
+       * liegen. Deshalb gefragt, nicht geraten. */
+      hinterland_qm: parseFloat(wert('hinterlandFlaeche')) || null,
+      hinterland_eur_qm: parseFloat(wert('hinterlandWert')) || null,
+      hinterland_rentierlich: wert('hinterlandRent') === 'ja',   /* v1072-WREN-7 */
+      garagen_bgf_qm: parseFloat(wert('garagenBgf')) || null,
+      garagen_stufe: parseFloat(wert('garagenStufe')) || null,
+      aussenanlagen_pct: parseFloat(wert('aussenPct')) || null,
+      nhk_typ: (function () {
+        var h = wert('nhkHaus'), g = wert('nhkGeschosse'), d = wert('nhkDach');
+        return (h && g && d) ? (h + '.' + g + d) : null;
+      })(),
       standardstufe: parseFloat(wert('standardstufe')) || null,
       grundriss: wert('grundriss') || null,
       mod_punkte: wert('modGrad') !== '' ? parseFloat(wert('modGrad')) : null,
+      /* v1062-WAUS-2 · app.js sammelt den Block nicht selbst ein, es
+       * uebernimmt payload() als Ganzes. Wer hier fehlt, existiert fuer den
+       * Bericht nicht — genau wie v1055 es fuer drei andere Felder gelernt hat. */
+      aussenanlagen: parseFloat(wert('aussenanlagen')) || null,
+      bes_bauteile: parseFloat(wert('besBauteile')) || null,
       bwk_modus: stufe() >= 3 ? 'normiert' : null,
     };
   }

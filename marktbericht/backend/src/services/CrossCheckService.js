@@ -10,6 +10,12 @@ import { ErtragswertService } from './ErtragswertService.js';
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
 import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';   /* v1056-WRND-3 */
 import { fuehrendesVerfahren, angepassterZins } from '../lib/verfahrenswahl.js';   /* v1061-WVER-1 */
+/* v1069-WSWF-1 · Sachwertfaktoren nach § 21 Abs. 3 ImmoWertV. */
+/* v1073-WGAA-1 · Nicht mehr ein Modul, sondern der Aufloeser. Er
+ * entscheidet nach dem Gemeindeschluessel, welcher Ausschuss zustaendig
+ * ist, und gibt immer dieselbe Form zurueck. Kein Treffer heisst KEIN
+ * WERT — nie ein Nachbarkreis, nie ein Landesmittel. */
+import { sachwertfaktor as swfNachTabelle } from '../lib/gutachterausschuss.js';
 
 // ---- Annahmen (dokumentiert, anpassbar) ----
 const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
@@ -142,11 +148,91 @@ export const CrossCheckService = {
          * Modernisierungspunkte vor, gilt Anlage 2 fuer BEIDE. */
         gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
         bes_bauteile: (p && p.bes_bauteile) || null, aussenanlagen: (p && p.aussenanlagen) || null,
+        /* v1072-WGAR-5 · Die Kette von A nach B — ohne diese vier Zeilen
+         * waere der ganze Garagen- und Aussenanlagenblock wirkungslos. */
+        aussenanlagen_pct: (p && p.aussenanlagen_pct) || ref.aussenanlagen_pct || null,
+        garagen_bgf_qm: (p && p.garagen_bgf_qm) || ref.garagen_bgf_qm || null,
+        garagen_stufe: (p && p.garagen_stufe) || ref.garagen_stufe || null,
       }, (p && p.bodenwert) || null, (p && p.sachwertfaktor_param) || null);
+
+      /* v1069-WSWF-2 · Der Sachwertfaktor haengt vom vorlaeufigen Sachwert
+       * ab — er laesst sich nicht vorab aus einer Tabelle holen. Deshalb
+       * zwei Laeufe: der erste liefert den vorlaeufigen Sachwert und die
+       * Restnutzungsdauer, damit wird der Faktor nachgeschlagen, der zweite
+       * rechnet mit ihm.
+       *
+       * Ein gepflegter Wert aus der Parametertabelle hat Vorrang: die
+       * Tabelle ist kuratiert, die Matrix gilt fuer genau einen Kreis. */
+      let _swfTab = null;
+      if (!(p && p.sachwertfaktor_param && p.sachwertfaktor_param.sachwertfaktor)
+          && _sw && _sw.vorlaeufiger_sachwert_eur != null) {
+        _swfTab = swfNachTabelle({
+          ags: (p && p.ags) || ref.ags || null,
+          sachwert_eur: _sw.vorlaeufiger_sachwert_eur,
+          rnd_jahre: _sw.restnutzungsdauer_jahre,
+          objektart: ref.property_type,
+          /* v1073-WGAA-2 · Herford braucht zwei weitere Groessen: die
+           * Lagequalitaet ueber den Bodenrichtwert und die
+           * Bruttogrundflaeche. Minden-Luebbecke ignoriert beide — der
+           * Aufloeser reicht durch, das Modul nimmt sich, was es kennt.
+           * Ohne diese zwei Zeilen bliebe der Herforder Faktor fuer immer
+           * bei 'brw_fehlt'. */
+          brw_eur_qm: (p && p.bodenwert && p.bodenwert.quelle && p.bodenwert.quelle.brw_sqm)
+            || (p && p.brw_sqm) || ref.brw_sqm || null,
+          bgf_qm: (p && p.bgf_direkt) || ref.bgf || null,
+        });
+        if (_swfTab && _swfTab.verfuegbar) {
+          const _sw2 = nhkSachwert({
+            nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
+              || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null),
+            keller_dg: (p && p.keller_dg) || ref.keller_dg,
+            standardstufe: (p && p.standardstufe) || ref.standardstufe,
+            bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl,
+            objektart: ref.property_type, baupreisindex: BAUPREISINDEX,
+            regionalfaktor: (p && p.regionalfaktor) || null,
+            gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
+            bes_bauteile: (p && p.bes_bauteile) || null,
+            aussenanlagen: (p && p.aussenanlagen) || null,
+          }, (p && p.bodenwert) || null, {
+            sachwertfaktor: _swfTab.wert, stufe: _swfTab.stufe,
+            quelle: _swfTab.quelle_text,
+          });
+          /* Nur uebernehmen, wenn der zweite Lauf denselben vorlaeufigen
+           * Sachwert liefert — sonst haette sich zwischen den Laeufen etwas
+           * geaendert, und das waere ein Fehler, kein Ergebnis. */
+          if (_sw2 && _sw2.wert != null
+              && _sw2.vorlaeufiger_sachwert_eur === _sw.vorlaeufiger_sachwert_eur) {
+            _sw = _sw2;
+          } else {
+            _swfTab = { verfuegbar: false, grund: 'zweiter_lauf_abweichend' };
+          }
+        }
+      }
+
       if (_sw.wert != null) {
         out.sachwert = {
           available: true, value_eur: _sw.wert, staffel: _sw.staffel,
           marktangepasst: _sw.marktangepasst, sachwertfaktor: _sw.sachwertfaktor || null,
+          /* v1069-WSWF-3 · Bleibt der Sachwert vorlaeufig, soll dastehen
+           * WARUM. "ohne Sachwertfaktor" ist keine Begruendung, sondern eine
+           * Feststellung — der Grund unterscheidet, ob der Ausschuss keinen
+           * abgeleitet hat, ob das Objekt aus der Spanne faellt oder ob es
+           * gar nicht sein Zustaendigkeitsbereich ist. */
+          sachwertfaktor_grund: (_swfTab && !_swfTab.verfuegbar) ? _swfTab.grund : null,
+          sachwertfaktor_hinweis: (_swfTab && !_swfTab.verfuegbar) ? (_swfTab.hinweis || null)
+            : (_swfTab && _swfTab.verfuegbar ? _swfTab.hinweis : null),
+          sachwertfaktor_stuetzstellen: (_swfTab && _swfTab.verfuegbar)
+            ? _swfTab.stuetzstellen : null,
+          /* v1073-WGAA-3 · Welcher Ausschuss den Faktor abgeleitet hat,
+           * gehoert an die Zahl — sonst sieht ein Leser nicht, ob sie
+           * ueberhaupt fuer seinen Ort gilt. */
+          sachwertfaktor_ausschuss: (_swfTab && _swfTab.ausschuss) || null,
+          sachwertfaktor_tabellenwert: (_swfTab && _swfTab.tabellenwert) || null,
+          sachwertfaktor_korrekturen: (_swfTab && _swfTab.verfuegbar
+            && (_swfTab.korrektur_rnd != null || _swfTab.korrektur_bgf != null))
+            ? { rnd: _swfTab.korrektur_rnd, bgf: _swfTab.korrektur_bgf,
+                nicht_korrigiert: _swfTab.nicht_korrigiert || null }
+            : null,
           verfahren: _sw.verfahren,
           /* v1056-WSW-3 · Die Zwischenwerte, die die Karte braucht. */
           bodenwert_eur: _sw.bodenwert_eur != null ? _sw.bodenwert_eur : null,
@@ -251,6 +337,36 @@ export const CrossCheckService = {
     const mieteQuelle = _amtFuehrt
       ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten';
     /* v1047 · `p` steht jetzt am Anfang der Funktion. */
+    /* v1072-WERT-1 · KEINE ERTRAGSWERT-ZAHL OHNE ERFASSTE MIETE.
+     *
+     * Gemessen an Loehner Str. 278: keine Miete eingegeben, kein Kaufpreis,
+     * und trotzdem stand ein Ertragswert von 530.000 EUR im Bericht — die
+     * groesste der drei Zahlen, neben einem fuehrenden Sachwert von
+     * 337.713 EUR. Der Rohertrag stammte vollstaendig aus Portalangeboten
+     * fuer WOHNUNGEN, hochgerechnet auf 233 m2 Haus.
+     *
+     * Das Verkehrswertgutachten zu demselben Objekt sagt es klar: unter
+     * "Das Ertragswertverfahren § 27ff." steht die Definition und dann
+     * "Ein stuetzendes Wertermittlungsverfahren wurde nicht angewandt."
+     * Fuer ein selbstgenutztes Zweifamilienhaus rechnet ein
+     * Sachverstaendiger keinen Ertragswert.
+     *
+     * v1071 hat die Mietquelle nur gekennzeichnet. Das reicht nicht: wer
+     * drei Zahlen nebeneinander sieht, liest die groesste. Bei Ein- und
+     * Zweifamilienhaeusern ohne erfasste Miete erscheint deshalb KEINE
+     * Zahl mehr — der Rechenweg bleibt, mit Begruendung.
+     *
+     * Bei Mehrfamilienhaeusern und Wohnungen bleibt es beim Portalwert:
+     * dort IST der Ertrag preisbildend, und § 31 Abs. 2 verlangt ohnehin
+     * die marktueblich erzielbare statt der Ist-Miete. */
+    /* v1072 · _pt ist in dieser Funktion bereits vergeben (Sachwertzweig) —
+     * node --check in apply.sh hat die Kollision gefangen. */
+    const _ptEw = String(ref.property_type || '').toLowerCase();
+    const _eigennutz = /efh|zfh|dhh|^rh$|reihen|doppel|einfamilien|zweifamilien|haus/.test(_ptEw)
+      && !/mfh|mehrfamilien/.test(_ptEw);
+    const _mieteErfasst = _num(ref.monthly_net_rent) > 0 || !!_amtFuehrt;
+    const _ertragUnterdruecken = _eigennutz && !_mieteErfasst;
+
     if (wfl && mieteQm && rnd != null) {
       /* v1059-WMIET-6 */
       const rohertrag = Math.round(mieteQm * wfl * 12);
@@ -341,7 +457,24 @@ export const CrossCheckService = {
       const kern = ErtragswertService.ertragswert(ein, bwErgebnis);
       out.ertragswert_kern = kern;
 
-      if (kern.vollstaendig && kern.wert != null) {
+      if (kern.vollstaendig && kern.wert != null && _ertragUnterdruecken) {
+        /* v1072-WERT-2 · Der Rechenweg bleibt, die Zahl nicht. */
+        out.ertragswert = {
+          available: false,
+          unterdrueckt: true,
+          grund: 'keine_miete_erfasst',
+          staffel: kern.staffel,
+          miete_quelle: mieteQuelle,
+          hinweis: 'Für dieses Objekt ist keine Miete erfasst. Ein- und '
+            + 'Zweifamilienhäuser werden in der Regel nicht unter '
+            + 'Renditegesichtspunkten gehandelt (§ 6 Abs. 1 ImmoWertV); ein '
+            + 'Ertragswert aus abgeleiteten Angebotsmieten wäre eine Aussage über '
+            + 'etwas, das nicht erhoben wurde. Der Rechenweg ist unten dargestellt, '
+            + 'ein Wert wird nicht ausgewiesen. Wird eine Miete eingetragen, '
+            + 'erscheint er.',
+        };
+        kern.warnungen.forEach((w) => { if (out.notes.indexOf(w) < 0) out.notes.push(w); });
+      } else if (kern.vollstaendig && kern.wert != null) {
         const hol = (t) => { const r = kern.staffel.find((s) => s.pos.indexOf(t) >= 0); return r ? r.wert : null; };
         out.ertragswert = {
           available: true,
@@ -357,6 +490,18 @@ export const CrossCheckService = {
           liegenschaftszins_max: _num(p.lzs_max),
           liegenschaftszins_herabgestuft: !!p.lzs_herabgestuft,
           liegenschaftszins_quelle: kern.lzs ? kern.lzs.quelle : null,
+          /* v1071-WMIE-1 · mieteQuelle wird seit v1059 bestimmt und war
+           * nirgends sichtbar. Bei Loehner Strasse 278 war KEINE Miete
+           * erfasst — der Rohertrag von 27.065 EUR stammt vollstaendig aus
+           * Portalangeboten fuer Wohnungen, angewandt auf ein 233-m2-Haus,
+           * und ergab einen Ertragswert von 496.000 EUR neben einem
+           * fuehrenden Sachwert von 287.433 EUR. Wer drei Zahlen sieht, muss
+           * erkennen koennen, welche auf Angaben beruht. */
+          miete_quelle: mieteQuelle,
+          miete_erfasst: !!(p && p.ist_miete_erfasst),
+          miete_modellkonform: mieteQuelle === 'Mietpreisübersicht des Gutachterausschusses',
+          /* v1063-WOD-8 · dritte Station der Kette */
+          liegenschaftszins_einordnung: p.lzs_einordnung || null,
           restnutzungsdauer_jahre: kern.nutzungsdauer ? kern.nutzungsdauer.rnd : rnd,
           vervielfaeltiger: kern.barwertfaktor,
           bodenwert_eur: bwErgebnis.vollstaendig ? bwErgebnis.wert : null,

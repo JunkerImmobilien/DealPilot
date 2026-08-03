@@ -56,24 +56,51 @@ export function splitCsvZeile(zeile, trenner = ';') {
  * Die Datei ist ein R-Export. Hamburg steht dort als "2e+07" statt 20000000.
  * Wer das mit parseInt liest, bekommt 2. Das ist die Falle dieser Datei.
  */
+/* v1064-WP1-2 · Die Stellenzahl steht an EINER Stelle. Sie kam vorher
+ * dreimal als nackte Ziffer vor (padStart 8, length !== 8, slice(5)) — und
+ * beim Reparieren faellt so etwas erfahrungsgemaess einmal hinten runter. */
+export const ID_STELLEN = 9;
+
 export function subkreisId(roh) {
   if (roh == null) return null;
   const t = String(roh).trim().replace(/"/g, '');
   if (!t) return null;
   let n;
-  if (/e\+?\d+$/i.test(t)) n = Number(t);      // 2e+07 -> 20000000
+  /* v1064-WP1-1 · ZWEI Messfehler auf einmal.
+   *
+   * (a) Die ID ist NEUNSTELLIG: 5 Stellen AGS + 4 Stellen Subkreis.
+   *     Bei den Laendern 01 bis 09 faellt die fuehrende Null im R-Export
+   *     weg — Flensburg steht als 10010000 statt 010010000. Auf acht
+   *     Stellen aufgefuellt ergab das den Gemeindeschluessel 10010 statt
+   *     01001: um eine Stelle verschoben, plausibel aussehend, falsch.
+   *     Gepruefte Gegenproben: Flensburg 01001, Kiel 01002, Hamburg 02000,
+   *     Muenchen 09162, Berlin 11000.
+   *
+   * (b) '1,1e+08' traegt ein deutsches Dezimalkomma. Number() macht daraus
+   *     NaN, und die Zeile verschwand ohne Ton — Berlin fehlte vollstaendig.
+   *     '2e+07' ging durch, weil es kein Komma hat. Eine Datei, zwei
+   *     Schreibweisen; die eine war behandelt, die andere nicht.
+   *
+   * Laenger als neun Stellen kann keine gueltige ID sein (16077 + 9999).
+   * Solche Zeilen werden gezaehlt und uebersprungen, nicht gekuerzt. */
+  if (/e\+?\d+$/i.test(t)) n = Number(t.replace(',', '.'));
   else if (/^\d+$/.test(t)) n = Number(t);
   else return null;
   if (!Number.isFinite(n) || n <= 0) return null;
-  return String(Math.round(n)).padStart(8, '0');
+  const ganz = String(Math.round(n));
+  if (ganz.length > ID_STELLEN) return null;
+  return ganz.padStart(ID_STELLEN, '0');
 }
 
 /** 8-stellige Subkreis-ID -> { ags5, subkreis, istSubkreis } */
 export function agsAusSubkreis(id8) {
-  if (!id8 || id8.length !== 8) return null;
+  /* v1064-WP1-3 · Vier Stellen Subkreis, nicht drei. Gemessen: 652 von
+   * 1.010 Zeilen enden auf '0000' (ganzer Kreis), der Rest auf 0001 bis
+   * 0007. Mit drei Stellen waere aus jedem Kreis ein Subkreis geworden. */
+  if (!id8 || id8.length !== ID_STELLEN) return null;
   const ags5 = id8.slice(0, 5);
   const sub = id8.slice(5);
-  return { ags5, subkreis: sub, istSubkreis: sub !== '000' };
+  return { ags5, subkreis: sub, istSubkreis: sub !== '0000' };
 }
 
 /**
@@ -147,6 +174,12 @@ export function parse(csvText, opt = {}) {
     const id8 = subkreisId(s[iId]);
     if (!id8) { kaputteId++; continue; }
     const teil = agsAusSubkreis(id8);
+    /* v1064-WP1-4 · agsAusSubkreis darf null liefern, und niemand hat es
+     * geprueft: "Cannot read properties of null (reading 'istSubkreis')".
+     * Der Absturz war das kleinere Uebel — er hat den Rest gerettet.
+     * Jetzt wird gezaehlt und weitergemacht; die Zahl steht in den
+     * Warnungen, damit nichts lautlos verschwindet. */
+    if (!teil) { kaputteId++; continue; }
     const landName = String(s[iLand] || '').trim().replace(/"/g, '').toLowerCase();
     const landCode = LAND[landName] || null;
     if (!landCode) { unbekanntesLand++; continue; }

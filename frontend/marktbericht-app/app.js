@@ -1330,6 +1330,16 @@ function _mbBuildObjData() {
     eq_heating: val('eq_heating'), eq_bath: val('eq_bath'), eq_floor: val('eq_floor'),
     eq_guest_wc: val('eq_guest_wc'), eq_store_room: val('eq_store_room'),
     baustatus: val('baustatus'), mea_pct: val('mea'), lzs_pct: val('lzs'),
+    /* v1072-WSAV-1 · _mbBuildObjData sammelt ueber DOM-Ids ein und kannte
+     * die Felder aus v1067 bis v1072 nicht. Der BERICHT rechnete damit —
+     * er bekommt payload() als Ganzes —, das gespeicherte
+     * Portfolio-Objekt verlor sie. Beim naechsten Oeffnen waren die
+     * 828 m2 Hinterland weg. */
+    hinterland_qm: val('hinterlandFlaeche'), hinterland_eur_qm: val('hinterlandWert'),
+    hinterland_rentierlich: val('hinterlandRent'),
+    garagen_bgf_qm: val('garagenBgf'), garagen_stufe: val('garagenStufe'),
+    aussenanlagen_pct: val('aussenPct'),
+    nhk_haus: val('nhkHaus'), nhk_geschosse: val('nhkGeschosse'), nhk_dach: val('nhkDach'),
     /* WSAVE31-1 · die restlichen zehn */
     brw_manuell: val('brwManuell'), brw_stichtag: val('brwStichtag'),
     brw_anpassung_pct: val('brwAnp'), brw_anpassung_grund: val('brwAnpGrund'),
@@ -3055,6 +3065,13 @@ async function exportPdf(out) {
       }
       _cl.forEach((l) => { doc.text(l, x + 6, ly); ly += _lh; });
     };
+    /* v1062-WFUE-1 · Die erste Karte war immer die fuehrende: "lead" stand
+     * fest am Vergleichswert. Paragraf 6 Abs. 1 ImmoWertV waehlt das Verfahren
+     * aber nach der Art des Objekts, und cross_check.verfahrenswahl rechnet
+     * das seit v1061 aus — es stand nur nirgends im Dokument. */
+    const _vw = cc.verfahrenswahl || null;
+    const _vwKey = (_vw && _vw.verfahren) ? _vw.verfahren : null;
+    const _fuehrt = (k) => (_vwKey ? _vwKey === k : k === 'vergleichswert');
     const sw = cc.sachwert || {}, ew = cc.ertragswert || {};
     /* v1057-WVGL-1 · Oben steht die Marktpreisindikation aus Angeboten —
      * das ist richtig und aktuell. Hier unten steht der Verfahrensvergleich
@@ -3079,7 +3096,7 @@ async function exportPdf(out) {
         kein_wert: 'Immobilienrichtwert ohne Betrag',
         technisch: 'Immobilienrichtwert derzeit nicht abrufbar',
       }[cc.irw.grund] || null) : null,
-    ], true);
+    ], _fuehrt('vergleichswert'));   /* v1062-WFUE-2 */
     card3(M + cardW + 6, 'SACHWERT · INDIKATIV', sw.available ? sw.value_eur : null, sw.available ? [
       /* v1056-WKRT-1 · Die drei Felder gab es im Ergebnis nicht; die Karte
        * zeigte "ohne Bodenwert · Gebäude – · RND undefined J." neben einer
@@ -3091,13 +3108,35 @@ async function exportPdf(out) {
         ? 'RND ' + String(sw.restnutzungsdauer_jahre).replace('.', ',') + ' J. / GND '
           + sw.gesamtnutzungsdauer_jahre + ' J.'
         : null,
-    ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar']); /* v956: v955 liefert eine Begruendung — die gehoert hin */
+    ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar'],
+      _fuehrt('sachwert'));   /* v1062-WFUE-3 */
     card3(M + 2 * (cardW + 6), 'ERTRAGSWERT · INDIKATIV', ew.available ? ew.value_eur : null, ew.available ? [
       'Rohertrag ' + euro(ew.rohertrag_pa_eur) + ' p.a.',
       'Reinertrag ' + euro(ew.reinertrag_pa_eur) + ' p.a.',
       'LZ ' + ew.liegenschaftszins_pct + ' % · V ' + ew.vervielfaeltiger,
-    ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar']); /* v956: v955 liefert eine Begruendung — die gehoert hin */
+    ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar'],
+      _fuehrt('ertragswert'));   /* v1062-WFUE-4 */
     y += cardH + 5;
+
+    /* v1062-WFUE-5 · Drei Karten nebeneinander ohne Rangfolge lesen sich wie
+     * drei Meinungen. Der Bericht sagt jetzt, welche fuehrt und warum. */
+    if (_vw && _vw.verfahren) {
+      const _vwName = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',
+        vergleichswert: 'Vergleichswertverfahren' }[_vw.verfahren] || _vw.verfahren;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setCharSpace(0);
+      const _vwT = doc.splitTextToSize(String(_vw.grund || '')
+        + (_vw.quelle ? '  (' + _vw.quelle + ')' : ''), blockW - 10);
+      const _vwH = 8.5 + _vwT.length * 3.1;
+      need(_vwH + 4);
+      doc.setFillColor(247, 243, 233); doc.roundedRect(M, y, blockW, _vwH, 2, 2, 'F');
+      doc.setFillColor(...GOLD); doc.roundedRect(M, y, 1.6, _vwH, 0.8, 0.8, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
+      doc.text('Führendes Verfahren: ' + _vwName, M + 5, y + 5);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(...MUT);
+      doc.text(_vwT, M + 5, y + 9.8);
+      y += _vwH + 4;
+      doc.setFontSize(8);
+    }
     if (cc.comparison.spread_pct != null) {
       doc.setFontSize(8); doc.setTextColor(...TXT);
       const sp = cc.comparison.spread_pct;
@@ -3107,6 +3146,63 @@ async function exportPdf(out) {
           : 'große Abweichung; Wert nur mit weiterer Prüfung verwenden.'), M, y + 3);
       y += 7;
     }
+    /* v1062-WAMT-1 · Amtliche Miete (v1059) und amtlicher Vergleichsfaktor
+     * (v1060) liegen vollstaendig im Ergebnis und standen nirgends im
+     * Dokument. Beide sind Auskuenfte des Gutachterausschusses — auch dort,
+     * wo das Objekt aus seinem Anwendungsbereich faellt. Gerade dann. */
+    const _am = cc.amtliche_miete, _avf = cc.amtlicher_vergleichsfaktor;
+    const _amtZeilen = [];
+    if (_am && _am.verfuegbar) {
+      _amtZeilen.push([
+        'Marktüblich erzielbare Miete · Mietpreisübersicht',
+        String(_am.miete_qm).replace('.', ',') + ' €/m²'
+          + (_am.miete_monat != null ? '  ·  ' + euro(Math.round(_am.miete_monat)) + '/Monat' : ''),
+        (_am.staffel || []).map((s) => s.pos
+          + (s.faktor != null ? '  ' + String(s.faktor).replace('.', ',')
+            : (s.wert != null ? '  ' + String(s.wert).replace('.', ',') : ''))).join('   ·   '),
+        _am.ausserhalb_tabelle ? (_am.ausserhalb_hinweis || '') : (_am.hinweis || ''),
+      ]);
+    }
+    if (_avf && _avf.verfuegbar) {
+      _amtZeilen.push([
+        'Vergleichsfaktor § 20 ImmoWertV',
+        euro(_avf.wert_eur) + (_avf.rechnung ? '   (' + _avf.rechnung + ')' : ''),
+        [_avf.teilmarkt, _avf.baujahresklasse, _avf.gemeinde_quelle].filter(Boolean).join('   ·   '),
+        _avf.ausserhalb_grenzen
+          ? (_avf.ausserhalb_gruende || []).join(' ')
+          : (_avf.hinweis || ''),
+      ]);
+    }
+    if (_amtZeilen.length) {
+      need(16);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(120, 113, 100);
+      doc.setCharSpace(0.3);
+      doc.text('AMTLICHE WERTE DES GUTACHTERAUSSCHUSSES', M, y + 3);
+      doc.setCharSpace(0);
+      y += 7;
+      _amtZeilen.forEach((_z) => {
+        need(8);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(7.6); doc.setTextColor(...TXT);
+        doc.text(_z[0], M, y + 3);
+        doc.text(_z[1], M + blockW, y + 3, { align: 'right' });
+        y += 5;
+        if (_z[2]) {
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setTextColor(...MUT);
+          const _zl = doc.splitTextToSize(_z[2], blockW);
+          need(_zl.length * 3 + 3);
+          doc.text(_zl, M, y + 2); y += _zl.length * 3 + 1;
+        }
+        if (_z[3]) {
+          doc.setFont('helvetica', 'italic'); doc.setFontSize(6.4); doc.setTextColor(150, 143, 130);
+          const _zh = doc.splitTextToSize(_z[3], blockW);
+          need(_zh.length * 3 + 4);
+          doc.text(_zh, M, y + 2); y += _zh.length * 3 + 3;
+          doc.setFont('helvetica', 'normal');
+        }
+      });
+      y += 2;
+    }
+
     doc.setFontSize(6.5); doc.setTextColor(...MUT);
     /* v959-footnote: stand als EIN doc.text() da und lief rechts aus dem Satz-
      * spiegel — im Prod-Bericht endet Seite 4 mit "Kein Gutachten n. § 194 Bau".
@@ -3251,6 +3347,93 @@ async function exportPdf(out) {
       doc.text(_sp, M + 5, y + 17.5);
     }
     y += _kastenH + 4;
+
+    /* v1062-WZIN-3 · Die Anpassung nach Paragraf 33 lag vollstaendig im
+     * Ergebnis und wurde nirgends gezeigt. Sie ersetzt die Rechnung NICHT:
+     * gerechnet wird weiter mit dem amtlichen Zinssatz, der angepasste ist
+     * Stufe C und steht als Einordnung daneben. Jedes Merkmal einzeln, und
+     * die nicht bewertbaren ausdruecklich benannt. */
+    const _za = d.cross_check && d.cross_check.zins_anpassung;
+    if (_za && _za.verfuegbar && _za.merkmale && _za.merkmale.length) {
+      const _mName = { alter: 'Gebäudealter', wohnlage: 'Wohnlage', nutzung: 'Nutzung',
+        wohneinheiten: 'Wohneinheiten', groesse: 'Objektgröße' };
+      need(24);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(120, 113, 100);
+      doc.setCharSpace(0.3);
+      doc.text('OBJEKTSPEZIFISCH ANGEPASSTER ZINSSATZ (§ 33 IMMOWERTV) · STUFE '
+        + (_za.stufe || 'C'), M, y + 3);
+      doc.setCharSpace(0);
+      y += 7;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
+      doc.text(String(_za.basis_pct).replace('.', ',') + ' % amtlich'
+        + ((_za.anpassung_pct >= 0) ? '   +   ' : '   -   ')
+        + String(Math.abs(_za.anpassung_pct)).replace('.', ',') + ' Punkte   =   '
+        + String(_za.zins_pct).replace('.', ',') + ' %'
+        + (_za.gedeckelt ? '   (auf eine Standardabweichung gedeckelt)' : ''), M, y + 3);
+      y += 6;
+      doc.setFontSize(6.6);
+      _za.merkmale.forEach((_mk) => {
+        need(5);
+        doc.setFont('helvetica', 'normal'); doc.setTextColor(...MUT);
+        doc.text((_mName[_mk.id] || _mk.id) + ' — ' + String(_mk.text || ''), M + 3, y + 2);
+        /* Statusfarben bleiben hart (rot rauf, gruen runter) — sie sind
+         * bewusst nicht im WL_TINTS-Satz. */
+        if (_mk.beitrag_pct >= 0) doc.setTextColor(184, 98, 92);
+        else doc.setTextColor(63, 165, 108);
+        doc.text(((_mk.beitrag_pct >= 0) ? '+' : '-')
+          + String(Math.abs(_mk.beitrag_pct)).replace('.', ',')
+          + '  (Gewicht ' + String(_mk.gewicht).replace('.', ',') + ')',
+          M + blockW, y + 2, { align: 'right' });
+        y += 3.7;
+      });
+      const _fehlt = ['alter', 'wohnlage', 'nutzung', 'wohneinheiten', 'groesse']
+        .filter((_id) => !_za.merkmale.some((_mk) => _mk.id === _id))
+        .map((_id) => _mName[_id] || _id);
+      if (_fehlt.length) {
+        doc.setFont('helvetica', 'italic'); doc.setFontSize(6.4); doc.setTextColor(...MUT);
+        const _fl = doc.splitTextToSize('Nicht bewertbar mangels Angabe: ' + _fehlt.join(', ')
+          + '. Diese Merkmale bleiben unberücksichtigt — ein Ersatzwert wäre eine Aussage '
+          + 'über etwas, das nicht erhoben wurde.', blockW - 3);
+        need(_fl.length * 3 + 4);
+        doc.text(_fl, M + 3, y + 2); y += _fl.length * 3 + 2;
+        doc.setFont('helvetica', 'normal');
+      }
+      if (_za.hinweis) {
+        doc.setFontSize(6.2); doc.setTextColor(150, 143, 130);
+        const _zh = doc.splitTextToSize(String(_za.hinweis), blockW);
+        need(_zh.length * 2.9 + 4);
+        doc.text(_zh, M, y + 2); y += _zh.length * 2.9 + 3;
+      }
+      y += 2;
+      doc.setFontSize(7.4); doc.setTextColor(...TXT);
+    }
+
+    /* v1063-WOD-9 · Vierte und letzte Station: sichtbar machen. Ein Wert,
+     * der nur klassiert veroeffentlicht ist, gehoert in den Bericht — als
+     * Einordnung, ausdruecklich nicht als Rechengroesse. Wer ihn weglaesst,
+     * verschweigt eine amtliche Auskunft; wer ihn mitrechnet, erfindet eine
+     * Klassenmitte. */
+    const _oe = _ew.liegenschaftszins_einordnung;
+    if (_oe && (_oe.klasse || _oe.quelle)) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setCharSpace(0);
+      const _oeT = doc.splitTextToSize(String(_oe.hinweis || ''), blockW - 10);
+      const _oeH = 9 + _oeT.length * 3;
+      need(_oeH + 4);
+      doc.setFillColor(248, 247, 244); doc.roundedRect(M, y, blockW, _oeH, 2, 2, 'F');
+      doc.setFillColor(190, 186, 176); doc.roundedRect(M, y, 1.6, _oeH, 0.8, 0.8, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.9); doc.setTextColor(...TXT);
+      doc.text('Bundesweite Einordnung · Stufe ' + (_oe.stufe || 'C')
+        + ' · nicht gerechnet', M + 5, y + 5);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(...MUT);
+      doc.text([_oe.klasse ? String(_oe.klasse) + (_oe.einheit ? ' ' + _oe.einheit : '') : null,
+        _oe.gebiet || null, _oe.quelle || null,
+        _oe.berichtsjahr ? String(_oe.berichtsjahr) : null]
+        .filter(Boolean).join('   ·   '), M + blockW - 2, y + 5, { align: 'right' });
+      doc.setFontSize(6.4); doc.setTextColor(150, 143, 130);
+      doc.text(_oeT, M + 5, y + 9.5);
+      y += _oeH + 4;
+      doc.setFontSize(7.4); doc.setTextColor(...TXT);
+    }
 
     /* Belastbarkeit und Sensitivitaet */
     if (_ew.belastbarkeit) {

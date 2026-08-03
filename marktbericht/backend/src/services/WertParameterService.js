@@ -14,6 +14,12 @@
 import { q } from '../lib/db.js';
 import { lzsNach256, MODELL } from '../lib/immowertv.js';
 import { stufeNachStreuung } from '../lib/nrw_modell.js';   /* v1048-WSTR-1 */
+/* v1063-WOD-1 · Die Open-Data-Tabelle wurde in v1054 angelegt, gefuellt hat
+ * sie nie jemand und gelesen hat sie niemand. Ab hier liest sie die Kaskade
+ * — ueber das Repository, nicht mit eigenem SQL. */
+import { machRepository } from '../connectors/opendata/param-repository.js';
+import { kennzahlFuerTyp, objektartFuerOd, einheitPasst, wertPlausibel }
+  from '../connectors/opendata/kennzahlen.js';
 
 const RANG = { A: 1, B: 2, C: 3, D: 4 };
 const MIN_FALLZAHL_C = 10;   // Konzept Kap. 5.3 — darunter kein Wert aus eigener Ableitung
@@ -111,6 +117,101 @@ async function nachbarwert(ags8, art, tag) {
   };
 }
 
+/* v1063-WOD-2 · Abschaltbar, wie der Nachbarwert. Auf Staging laesst sich
+ * damit vergleichen, was die Open-Data-Ebene an den Zahlen aendert. */
+const OPENDATA_AN = (process.env.OPENDATA_KASKADE || '1') !== '0';
+
+let _odRepoCache = null;
+function odRepo() {
+  if (!_odRepoCache) _odRepoCache = machRepository(q);
+  return _odRepoCache;
+}
+
+/**
+ * Ein Satz aus mb.param_werte, uebersetzt in die Sprache der Kaskade.
+ *
+ * ZWEI DINGE, DIE NICHT AUFGEWEICHT WERDEN:
+ *
+ * 1) KLASSIERTE SAETZE RECHNEN NICHT. Der Immobilienmarktbericht Deutschland
+ *    liefert "2500 und mehr". Das ist kein Wert 2500 und auch keine 3000 —
+ *    es ist eine Klasse. Die Mitte zu nehmen waere eine Erfindung mit
+ *    Nachkommastelle. Solche Saetze kommen als EINORDNUNG zurueck: sichtbar
+ *    im Bericht, ausserhalb der Rechnung.
+ *
+ * 2) EINHEIT UND WERTEBEREICH WERDEN GEPRUEFT. Ein "Liegenschaftszinssatz"
+ *    von 45 ist keiner, sondern eine falsch zugeordnete Spalte. In der
+ *    Datenbank sieht beides gleich aus; auffallen wuerde es erst im
+ *    Kundenbericht.
+ *
+ * Rueckgabe: { wert, ... } zum Rechnen ODER { einordnung } ODER null.
+ */
+async function opendataWert(typ, ags, art) {
+  if (!OPENDATA_AN) return null;
+  const kz = kennzahlFuerTyp(typ);
+  if (!kz) return null;
+
+  let r = null;
+  try {
+    r = await odRepo().hole(kz, ags, objektartFuerOd(art));
+  } catch (e) {
+    /* Tabelle fehlt, Migration nicht gelaufen, DB weg: die Wertermittlung
+     * darf davon nicht mitgerissen werden. Wie beim Hauptzweig oben. */
+    return null;
+  }
+  if (!r) return null;
+
+  const quelle = r.quellenvermerk || r.gaa_name || r.gebiet_name
+    || ('Open Data ' + String(r.land_code || '').toUpperCase());
+
+  if (r.klassiert || r.wert_num == null) {
+    const von = r.wert_min != null ? Number(r.wert_min) : null;
+    const bis = r.wert_max != null ? Number(r.wert_max) : null;
+    let text = r.wert_roh || null;
+    if (!text) {
+      if (von != null && bis != null) text = von + ' bis ' + bis;
+      else if (von != null) text = von + ' und mehr';
+      else if (bis != null) text = 'bis ' + bis;
+    }
+    return {
+      einordnung: {
+        kennzahl: kz, klasse: text, einheit: r.einheit || null,
+        stufe: r.stufe, ebene: r.ebene, gebiet: r.gebiet_name || null,
+        quelle, quelle_url: r.quelle_url || null,
+        berichtsjahr: r.berichtsjahr || null,
+        hinweis: 'Die Quelle veröffentlicht diesen Wert nur klassiert. '
+          + 'Eine Klassenmitte wäre eine Erfindung — der Wert dient der '
+          + 'Einordnung und geht nicht in die Rechnung ein.',
+      },
+    };
+  }
+
+  const wert = Number(r.wert_num);
+  if (!einheitPasst(kz, r.einheit) || !wertPlausibel(kz, wert)) return null;
+
+  return {
+    wert,
+    min: r.wert_min != null ? Number(r.wert_min) : null,
+    max: r.wert_max != null ? Number(r.wert_max) : null,
+    wert_min: r.wert_min != null ? Number(r.wert_min) : null,
+    wert_max: r.wert_max != null ? Number(r.wert_max) : null,
+    stufe: r.stufe,
+    streuung_pct: null,
+    herabgestuft: false,
+    quelle,
+    quelle_url: r.quelle_url || null,
+    parameter_id: null,
+    modellversion: MODELL.IMMOWERTV_2021,
+    fallzahl: null,
+    ebene: r.ebene || 'opendata',
+    herkunft: 'opendata',
+    hinweis: 'Wert aus einer offenen amtlichen Veröffentlichung ('
+      + quelle + (r.berichtsjahr ? ', ' + r.berichtsjahr : '') + '), Ebene '
+      + (r.ebene || '?') + '. Für diese Gemeinde liegt kein Wert des '
+      + 'zuständigen Gutachterausschusses in der gepflegten Parametertabelle '
+      + 'vor; der Modellvermerk der Quelle ist zu beachten (§ 10 ImmoWertV).',
+  };
+}
+
 export const WertParameterService = {
 
   /**
@@ -129,6 +230,13 @@ export const WertParameterService = {
   async hole({ typ, ags, objektart, anzahlWe = null, stichtag = null, brwSqm = null }) {
     const art = parameterObjektart(objektart, anzahlWe);
     const tag = stichtag || new Date().toISOString().slice(0, 10);
+
+    /* v1063-WOD-3 · Einmal fragen, vor der Kaskade. Der klassierte Satz ist
+     * auch NEBEN einem amtlichen Wert eine Auskunft und haengt deshalb an
+     * jedem Rueckgabeweg — nicht nur am Rueckfall. */
+    const _od = await opendataWert(typ, ags, art);
+    const _odRechen = (_od && _od.wert != null) ? _od : null;
+    const _odEinordnung = (_od && _od.einordnung) ? _od.einordnung : null;
 
     for (const { ags: a, ebene } of agsKette(ags)) {
       let rows = [];
@@ -184,6 +292,7 @@ export const WertParameterService = {
           ebene,
           hinweis: _str.herabgestuft ? _str.hinweis
                                      : hinweisZurStufe(_str.qualitaet, ebene, row.fallzahl),
+          einordnung: _odEinordnung,   /* v1063-WOD-4 */
         };
       }
     }
@@ -199,9 +308,33 @@ export const WertParameterService = {
      * den dieser Ausschuss beobachtet. Und nichts davon wird geschrieben —
      * sonst staenden bald 355 abgeleitete Zeilen neben 72 echten und
      * niemand koennte sie auseinanderhalten. */
+    /* v1063-WOD-5 · DIE RANGFOLGE, und warum sie so ist.
+     *
+     * Ein amtlich veroeffentlichter Punktwert (Stufe A oder B) aus einer
+     * offenen Quelle schlaegt den Nachbarwert: der Nachbarwert ist zwar
+     * amtlich, aber fuer einen ANDEREN Ort ermittelt (Stufe C). Ein Wert
+     * fuer diesen Ort ist besser als ein Wert fuer den Nachbarort.
+     *
+     * Ein Stufe-C-Satz aus Open Data schlaegt ihn NICHT: der Nachbarwert
+     * stammt aus demselben Gutachterausschuss und damit aus demselben
+     * beobachteten Markt. Eine bundesweite Ableitung tut das nicht.
+     *
+     * Beides schlaegt Paragraf 256. Genau dafuer ist die Ebene da: fuenfzehn
+     * Bundeslaender fallen heute auf den gesetzlichen Auffangwert, und der
+     * liegt nach unseren NRW-Zahlen durchweg zu hoch (3,0 gegen 2,2). */
+    if (_odRechen && (_odRechen.stufe === 'A' || _odRechen.stufe === 'B')) {
+      _odRechen.einordnung = _odEinordnung;
+      return _odRechen;
+    }
+
     if (typ === 'lzs' && NACHBARWERT_AN) {
       const nb = await nachbarwert(a8(ags), art, tag);
-      if (nb) return nb;
+      if (nb) { nb.einordnung = _odEinordnung; return nb; }
+    }
+
+    if (_odRechen) {
+      _odRechen.einordnung = _odEinordnung;
+      return _odRechen;
     }
 
     // Nichts in der Tabelle: gesetzlicher Auffangwert direkt rechnen.
@@ -212,6 +345,7 @@ export const WertParameterService = {
         quelle: '§ 256 BewG', quelle_url: null, parameter_id: null,
         modellversion: MODELL.IMMOWERTV_2021, fallzahl: null, ebene: 'bund',
         hinweis: fb.hinweis,
+        einordnung: _odEinordnung,   /* v1063-WOD-6 */
       };
     }
     return null;

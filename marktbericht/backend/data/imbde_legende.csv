@@ -1,52 +1,87 @@
-# imbde_legende.csv  (OD-02)
-#
-# Die AK-OGA-CSV benennt ihre Spalten nach Abbildungsnummern des Berichts
-# ("Abb_4_14"). Ohne diese Zuordnung ist jede Spalte ein Zahlenfeld ohne
-# Bedeutung. Sie wird deshalb HIER von Hand gepflegt - genau wie bei
-# zensus2022_kreise.csv.
-#
-# Woher die Zuordnung kommt:
-#   1. Immobilienmarktbericht Deutschland 2025 oeffnen (PDF, kostenfrei)
-#   2. Abbildung mit der Nummer aufschlagen, z. B. "Abbildung 4.14"
-#   3. Bildunterschrift lesen -> das ist die Kennzahl, Einheit steht an der Achse
-#
-# Solange eine Zeile leer bleibt, wird die Spalte mit kennzahl='imbde:Abb_4_14'
-# und semantik_offen=true gespeichert. Sie ist damit da, aber sie taucht in
-# keiner Auswertung als benannter Wert auf. NICHT raten - eine falsch
-# beschriftete Zahl ist schlimmer als gar keine.
-#
-# Erlaubte Kennzahlen: liegenschaftszinssatz, sachwertfaktor, vergleichsfaktor,
-#   bewirtschaftungskosten, restnutzungsdauer, marktmiete, kaufpreisniveau,
-#   transaktionen, geldumsatz, marktintensitaet
-# Objektart: alle, etw, efh, zfh, dhh, rh, mfh, gewerbe, bauland
-#
 abb_id;kennzahl;objektart;einheit
-Abb_4_14;;;
-Abb_4_15;;;
-Abb_4_31;;;
-Abb_4_32;;;
-Abb_4_47;;;
-Abb_4_48;;;
-Abb_4_55;;;
-Abb_4_60;;;
-Abb_4_79;;;
-Abb_4_80;;;
-Abb_4_86;;;
-Abb_4_92;;;
-Abb_4_108;;;
-Abb_4_109;;;
-Abb_4_115;;;
-Abb_4_121;;;
-Abb_4_140;;;
-Abb_4_152;;;
-Abb_4_153;;;
-Abb_4_165;;;
-Abb_4_166;;;
-Abb_4_188;;;
-Abb_4_199;;;
-Abb_4_206;;;
-Abb_4_215;;;
-Abb_4_231;;;
-Abb_4_232;;;
-Abb_4_248;;;
-Abb_4_265;;;
+Abb_4_55;kaufpreis_qm;efh;EUR/m²
+Abb_4_86;kaufpreis_qm;etw_neubau;EUR/m²
+Abb_4_92;kaufpreis_qm;etw;EUR/m²
+Abb_4_115;kaufpreis_qm;mfh;EUR/m²
+Abb_4_199;baulandpreis_qm;efh;EUR/m²
+Abb_4_215;baulandpreis_qm;mfh;EUR/m²
+# ---------------------------------------------------------------------------
+# imbde_legende.csv — Bedeutung der Spalten des AK-OGA-Datensatzes
+# Quelle der Beschriftungen: Immobilienmarktbericht Deutschland 2025,
+# Abbildungsverzeichnis (PDF, 277 Seiten, Stand 09.12.2025).
+#
+# SECHS SPALTEN SIND ZUGEORDNET, 23 NICHT. Das ist Absicht.
+#
+# Zugeordnet wurde nur, wo ZWEI unabhaengige Belege uebereinstimmen:
+#   1) die Bildunterschrift im Bericht, und
+#   2) die Klassengrenzen der Kartenlegende, verglichen mit den
+#      Klassengrenzen der CSV-Spalte.
+#
+# Wo nur einer von beiden passte, steht die Spalte bewusst NICHT hier.
+# Sie bleibt semantik_offen und wird von der Kaskade nicht gelesen.
+# Eine falsch beschriftete Zahl ist schlimmer als gar keine, weil sie
+# plausibel aussieht.
+#
+# DREI WIDERSPRUECHE, DIE DESHALB OFFEN BLEIBEN
+#   Abb_4_60   Unterschrift: "Datenbereitstellung der Gutachterausschuesse zu
+#              Wohnflaechenpreisen fuer Reihenhaeuser und Doppelhaushaelften".
+#              Die Daten sind aber Preisklassen (1300 bis 3500). Eine
+#              Datenbereitstellungs-Karte hat keine Preisklassen. Der Bericht
+#              kennt fuer RH/DHH keine eigene Kreiskarte mit Preisen.
+#   Abb_4_121  Unterschrift: "Wohnflaechenpreise fuer grosse Mehrfamilien-
+#              haeuser". Die Kartenlegende dort lautet 1300/1500/1750/2250.
+#              Die CSV-Spalte traegt 20/35/45/60/80/130 — das sind die
+#              Klassen von Abb. 4-139 (Geldumsatz Wirtschaftsimmobilien).
+#              Zwei Belege, die sich widersprechen.
+#   Abb_4_188  Unterschrift passt und Legende passt, aber es ist eine
+#              TRANSAKTIONSZAHL. Dafuer gibt es in der Wertermittlung keine
+#              Kennzahl — sie waere Marktbeobachtung, nicht Parameter.
+#
+# ALLE 29 BESCHRIFTUNGEN, damit die Arbeit nicht zweimal gemacht wird
+#   Abb_4_14   Anzahl der Transaktionen ueber alle Immobilienarten
+#   Abb_4_15   Geldumsatz ueber alle Immobilienarten
+#   Abb_4_31   Anzahl der Transaktionen bei Verkaeufen von Wohnimmobilien
+#   Abb_4_32   Geldumsatz bei Verkaeufen von Wohnimmobilien
+#   Abb_4_47   Anzahl der Transaktionen bei Verkaeufen von Eigenheimen
+#   Abb_4_48   Geldumsatz bei Verkaeufen von Eigenheimen
+#   Abb_4_55   Wohnflaechenpreise freistehende Ein- und Zweifamilienhaeuser  <- zugeordnet
+#   Abb_4_60   Datenbereitstellung ... Reihenhaeuser und Doppelhaushaelften  <- Widerspruch
+#   Abb_4_79   Anzahl der Transaktionen bei Verkaeufen von Eigentumswohnungen
+#   Abb_4_80   Geldumsatz bei Verkaeufen von Eigentumswohnungen
+#   Abb_4_86   Wohnflaechenpreise fuer neue Eigentumswohnungen              <- zugeordnet
+#   Abb_4_92   Wohnflaechenpreise fuer gebrauchte Eigentumswohnungen        <- zugeordnet
+#   Abb_4_108  Anzahl der Transaktionen bei Verkaeufen von Mehrfamilienhaeusern
+#   Abb_4_109  Geldumsatz bei Verkaeufen von Mehrfamilienhaeusern
+#   Abb_4_115  Wohnflaechenpreise fuer kleine Mehrfamilienhaeuser           <- zugeordnet
+#   Abb_4_121  Wohnflaechenpreise fuer grosse Mehrfamilienhaeuser           <- Widerspruch
+#   Abb_4_140  Anzahl der Transaktionen, bebaute Wirtschaftsimmobilien
+#   Abb_4_152  Anzahl der Transaktionen von Bueroimmobilien
+#   Abb_4_153  Geldumsatz in Mio. Euro bei Bueroimmobilien
+#   Abb_4_165  Anzahl der Transaktionen von Handelsimmobilien (Subkreise)
+#   Abb_4_166  Geldumsatz bei Verkaeufen von Handelsimmobilien (Subkreise)
+#   Abb_4_188  Anzahl der Transaktionen Baugrundstuecke Eigenheime, MI/MK
+#   Abb_4_199  Preisniveau Baugrundstuecke Eigenheime und MI-/MK-Gebiete    <- zugeordnet
+#   Abb_4_206  Anzahl der Transaktionen Baugrundstuecke Mehrfamilienhaeuser
+#   Abb_4_215  Preisniveau Baugrundstuecke Mehrfamilienhaeuser, mittl. Lagen <- zugeordnet
+#   Abb_4_231  Anzahl der Transaktionen land- und forstwirtschaftl. Flaechen
+#   Abb_4_232  Geldumsatz land- und forstwirtschaftlich genutzte Flaechen
+#   Abb_4_248  Preisniveau fuer Ackerflaechen
+#   Abb_4_265  Preisniveau fuer Gruenlandflaechen
+#
+# ERLAUBTE KENNZAHLEN — GENAU DIESE SCHREIBWEISE
+#   liegenschaftszinssatz  sachwertfaktor  vergleichsfaktor
+#   bewirtschaftungskostenquote  marktmiete  kaufpreis_qm
+#   baulandpreis_qm  bodenrichtwert  restnutzungsdauer  gesamtnutzungsdauer
+# Das Vokabular steht in src/connectors/opendata/kennzahlen.js.
+#
+# ERLAUBTE OBJEKTARTEN
+#   etw · etw_neubau · efh · zfh · dhh · rh · mfh · alle
+#   'etw_neubau' ist Archiv: die Kaskade fragt fuer eine Eigentumswohnung
+#   nach 'etw'. Ein Neubaupreis gehoert nicht neben einen Bestandsverkauf.
+#
+# ALLE WERTE DIESER QUELLE SIND KLASSIERT. Sie erscheinen als Einordnung
+# im Bericht, nie als Rechenwert — auch mit Legende nicht. Das ist keine
+# Einschraenkung des Parsers, sondern der Quelle.
+#
+# Zeilen mit # sind Kommentar. Trennzeichen ist das Semikolon.
+# ---------------------------------------------------------------------------
