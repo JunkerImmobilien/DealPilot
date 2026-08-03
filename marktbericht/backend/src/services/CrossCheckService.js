@@ -134,7 +134,7 @@ export const CrossCheckService = {
     const _bgfWhg = Number((p && p.bgf_direkt) || ref.bgf || 0);
     const _nhkTypWhg = (u) => (u > 20 ? '4.3' : (u > 6 ? '4.2' : '4.1'));
     if (NHK_2010.geprueft && ref.property_type && (!istWohnung || _bgfWhg > 0)) {
-      const _sw = nhkSachwert({
+      let _sw = nhkSachwert({   /* v1076-WLET-1 · weiter unten steht _sw = _sw2 */
         nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
           || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null), keller_dg: (p && p.keller_dg) || ref.keller_dg,
         standardstufe: (p && p.standardstufe) || ref.standardstufe,
@@ -249,6 +249,16 @@ export const CrossCheckService = {
                 nicht_korrigiert: _swfTab.nicht_korrigiert || null }
             : null,
           verfahren: _sw.verfahren,
+          /* v1075-WHER-1 · Herkunft durchreichen: gewogene Stufe, Bauteile,
+           * Garage, Aussenanlagen, Hinweise. Die Staffel kam an, ihr Weg
+           * nicht — Zahlen ohne Herleitung sind im Dossier wertlos. */
+          hinweise: (_sw.hinweise && _sw.hinweise.length) ? _sw.hinweise : null,
+          ausstattung_gewogen: _sw.ausstattung_gewogen || null,
+          bauteile_hk_eur: _sw.bauteile_hk_eur != null ? _sw.bauteile_hk_eur : null,
+          bauteile_detail: _sw.bauteile_detail || null,
+          garage: _sw.garage || null,
+          aussenanlagen_eur: _sw.aussenanlagen_eur != null ? _sw.aussenanlagen_eur : null,
+          aussenanlagen_herkunft: _sw.aussenanlagen_herkunft || null,
           /* v1056-WSW-3 · Die Zwischenwerte, die die Karte braucht. */
           bodenwert_eur: _sw.bodenwert_eur != null ? _sw.bodenwert_eur : null,
           gebaeude_sachwert_eur: _sw.gebaeude_sachwert_eur != null ? _sw.gebaeude_sachwert_eur : null,

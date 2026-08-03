@@ -279,6 +279,12 @@ export const ReportOrchestrator = {
       } catch (e) { /* ohne Schluessel bleibt es beim Auffangwert */ }
     }
     step('wertparameter: ags=' + (_agsWert || 'KEINER'));
+    /* v1075-WAGS-1 · ref.ags war NIE gesetzt (kein Formularfeld, keine
+     * Zuweisung) — alle 'ags: ref.ags'-Stellen dahinter (Hinterland, UK,
+     * IRW, Vergleichsfaktoren, Sachwertfaktor im CrossCheck) liefen mit
+     * null. Der aufgeloeste Schluessel wird jetzt zurueckgeschrieben; die
+     * Aufloesung selbst (BORIS vor PLZ) bleibt unveraendert. */
+    ref.ags = ref.ags || _agsWert || null;
 
     /* v1053-WIRW-2 · Immobilienrichtwert. Anders als der Vergleichswert
      * aus Inseraten stammt er aus beurkundeten Kaufpreisen — Paragraf 20
@@ -569,6 +575,7 @@ export const ReportOrchestrator = {
           ausstattung: ref.ausstattung || null,
           bauteile_hk: ref.bauteile_hk || null,
           bauteile_detail: ref.bauteile_detail || null,
+          ags: ref.ags || null,   /* v1075-WAGS-2 · Kette bis swfNachTabelle */
           /* v1062-WMIK-1 · Zwei Felder, die der Quercheck seit v1061 liest und
            * die nie jemand geschrieben hat. Der Mikrolage-Score liegt seit dem
            * Promise.all bereit. normobjekt_qm hat keine belegte Quelle und

@@ -3248,6 +3248,54 @@ async function exportPdf(out) {
     y += 5 + _fn.length * 3;
   }
 
+  /* v1075-WHER-2 · Rechenweg Sachwertverfahren. Bei Ein- und Zweifamilien-
+   * haeusern FUEHRT der Sachwert (Paragraf 6 Abs. 1) — sein Weg stand
+   * trotzdem nie im PDF, nur die Ergebniskarte. Muster wie der
+   * Ertragswert-Block darunter. */
+  const _swx = d.cross_check && d.cross_check.sachwert;
+  if (_swx && _swx.available && _swx.staffel && _swx.staffel.length) {
+    sectionTitle('Sachwertverfahren — Rechenweg', 120);
+    need(20);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUT);
+    doc.text((_swx.verfahren || 'Sachwertverfahren') + '  ·  §§ 35–39 ImmoWertV 2021', M, y); y += 6;
+    if (_swx.ausstattung_gewogen && _swx.ausstattung_gewogen.gewogene_stufe != null) {
+      doc.setFontSize(7);
+      const _agz = doc.splitTextToSize('Kostenkennwert gewogen aus neun Gewerken nach SW-RL 2012 '
+        + 'Anlage 2 — gewogene Standardstufe '
+        + String(_swx.ausstattung_gewogen.gewogene_stufe).replace('.', ',') + '.', blockW);
+      need(_agz.length * 3.4 + 4); doc.text(_agz, M, y); y += _agz.length * 3.4 + 3;
+      doc.setFontSize(7.5);
+    }
+    _swx.staffel.forEach((z) => {
+      need(9);
+      const _sm = !!z.summe;
+      doc.setFont('helvetica', _sm ? 'bold' : 'normal');
+      doc.setFontSize(_sm ? 8.4 : 7.8);
+      doc.setTextColor(...(_sm ? TXT : [110, 110, 118]));
+      const _lb = doc.splitTextToSize(String(z.pos).replace(/\u2212/g, '-'), blockW - 42);
+      doc.text(_lb[0], M + 2, y);
+      let _re = '';
+      if (z.faktor != null) _re = String(z.faktor).replace('.', ',');
+      else if (z.wert != null) _re = euro(z.wert);
+      if (_re) { doc.setTextColor(...(_sm ? GOLD : TXT)); doc.text(_re, M + blockW - 2, y, { align: 'right' }); }
+      if (z.detail) {
+        y += 3.6; doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6);
+        doc.setTextColor(...MUT); doc.text(String(z.detail).slice(0, 120), M + 4, y);
+      }
+      y += _sm ? 6 : 5;
+      if (_sm) { doc.setDrawColor(225, 221, 212); doc.setLineWidth(0.2); doc.line(M, y - 3.4, M + blockW, y - 3.4); }
+    });
+    if (_swx.hinweise && _swx.hinweise.length) {
+      y += 1;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8); doc.setTextColor(...MUT);
+      _swx.hinweise.forEach((h) => {
+        const _hz = doc.splitTextToSize('· ' + String(h), blockW);
+        need(_hz.length * 3.2 + 3); doc.text(_hz, M, y); y += _hz.length * 3.2 + 2;
+      });
+    }
+    y += 4;
+  }
+
   /* WPDF-1 · Rechenweg Ertragswertverfahren.
    * Bisher zeigte das PDF nur das Ergebnis. Fuer ein Dossier, das vor einer Bank
    * besteht, muss der Weg dastehen — Zeile fuer Zeile, mit der Herkunft des
