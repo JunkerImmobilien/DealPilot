@@ -399,6 +399,7 @@ export function sachwert(ein, bodenwertErgebnis, param) {
    * Ergebniskarte las sw.gebaeude_sachwert_eur und bekam undefined —
    * sichtbar als "Gebäude –" neben einer korrekten Staffel. */
   out.gebaeude_sachwert_eur = geb;
+  out.nhk_eur_qm_bgf = kw;   /* v1061-WFUS-4 · der tatsaechlich benutzte Kennwert */
   out.restnutzungsdauer_jahre = rnd;
   out.gesamtnutzungsdauer_jahre = gnd;
   out.alterswertminderung_eur = minderung;

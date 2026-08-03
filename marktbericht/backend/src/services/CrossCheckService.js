@@ -9,6 +9,7 @@ import { ErtragswertService } from './ErtragswertService.js';
 /* WNHK-4 */
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
 import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';   /* v1056-WRND-3 */
+import { fuehrendesVerfahren, angepassterZins } from '../lib/verfahrenswahl.js';   /* v1061-WVER-1 */
 
 // ---- Annahmen (dokumentiert, anpassbar) ----
 const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
@@ -152,6 +153,8 @@ export const CrossCheckService = {
           gebaeude_sachwert_eur: _sw.gebaeude_sachwert_eur != null ? _sw.gebaeude_sachwert_eur : null,
           restnutzungsdauer_jahre: _sw.restnutzungsdauer_jahre != null ? _sw.restnutzungsdauer_jahre : null,
           gesamtnutzungsdauer_jahre: _sw.gesamtnutzungsdauer_jahre != null ? _sw.gesamtnutzungsdauer_jahre : null,
+          /* v1061-WFUS-3 · Der tatsaechlich verwendete NHK-Kennwert. */
+          nhk_eur_qm_bgf: _sw.nhk_eur_qm_bgf != null ? _sw.nhk_eur_qm_bgf : null,
           /* Ohne Sachwertfaktor ist es eine Herstellungskostenrechnung.
            * Das steht so in den Warnungen des Rechenkerns — der Bericht
            * muss es genauso sagen und darf die Zahl nicht als drittes
@@ -236,9 +239,21 @@ export const CrossCheckService = {
      * greifen dieselben Pauschalen wie bisher. Ein Kern, zwei Genauigkeitsgrade.
      */
     const rentSqm = rent && _num(rent.median_per_sqm);
+    /* v1059-WMIET-5 · Die Miete, die der Ertragswert kapitalisiert.
+     * Traegt der Zinssatz den Vermerk agvga_nrw_2016 und liegt eine
+     * Mietpreisuebersicht vor, fuehrt die amtliche Miete — Paragraf 10:
+     * derselbe Modellansatz, aus dem der Zinssatz abgeleitet wurde.
+     * Sonst bleibt es beim Portalangebot, unveraendert. */
+    const _amtFuehrt = !!(p.amtliche_miete && p.amtliche_miete.verfuegbar
+      && p.amtliche_miete.fuehrend !== false
+      && ['agvga_nrw_2016'].indexOf(String(p.modellversion || '')) >= 0);
+    const mieteQm = _amtFuehrt ? p.amtliche_miete.miete_qm : rentSqm;
+    const mieteQuelle = _amtFuehrt
+      ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten';
     /* v1047 · `p` steht jetzt am Anfang der Funktion. */
-    if (wfl && rentSqm && rnd != null) {
-      const rohertrag = Math.round(rentSqm * wfl * 12);
+    if (wfl && mieteQm && rnd != null) {
+      /* v1059-WMIET-6 */
+      const rohertrag = Math.round(mieteQm * wfl * 12);
       const lzsPct = _num(p.lzs_pct) != null ? Number(p.lzs_pct) : LIEGENSCHAFTSZINS * 100;
       const bwErgebnis = (p.bodenwert && p.bodenwert.vollstaendig)
         ? p.bodenwert
@@ -249,6 +264,7 @@ export const CrossCheckService = {
         objektart: ref.property_type, baujahr: buildYear, baustatus: ref.baustatus || 'bestand',
         wohnflaeche_qm: wfl, anzahl_we: _num(ref.units) || 1, stichtag_jahr: nowYear,
         miete_markt_jahr: rohertrag,
+        miete_markt_qm: mieteQm, miete_quelle: mieteQuelle,   /* v1059-WMIET-7 */
         /* v1048-WSPL-1 · Vorher nur ref.garages — die Aussenstellplaetze
          * fielen unter den Tisch. Das PDF meldete "1 Stellpl." bei einem
          * Objekt mit einer Garage UND zwei Aussenplaetzen. */
@@ -290,7 +306,19 @@ export const CrossCheckService = {
       const _quote = _num(p.bwk_quote_pct);
       if (_quote > 0) {
         ein.bwk_modus = 'manuell';
-        ein.bwk_gesamt_jahr = Math.round(rohertrag * _quote / 100);
+        /* v1061-WBWK-1 · Die Quote gehoert auf den GESAMTEN Rohertrag.
+         * `rohertrag` enthaelt hier nur die Wohnung; die Stellplaetze kommen
+         * erst im Ertragswertdienst dazu. Der Bericht wies deshalb '27 %'
+         * aus und rechnete 23,1 % — 729 EUR zu wenig Kosten und ueber den
+         * Barwertfaktor rund 22.000 EUR zu viel Ertragswert.
+         *
+         * Der Ausschuss rechnet mit dem normierten Kaufpreis, der 'typische
+         * Nebengebaeude wie Garagen' enthaelt — Stellplaetze gehoeren also
+         * in die Bezugsgroesse. */
+        const _spEinnahme = (_num(p.stellplatz_miete_monat) || 0)
+          * ((_num(ref.garages) || 0) + (_num(ref.outdoor_parking) || 0)) * 12;
+        ein.bwk_gesamt_jahr = Math.round((rohertrag + _spEinnahme) * _quote / 100);
+        ein.bwk_bezugsgroesse_jahr = Math.round(rohertrag + _spEinnahme);
         ein.bwk_quote_herkunft = p.bwk_quote_quelle || null;
         ein.bwk_quote_pct = _quote;   /* v1052-WBWK-2 */
         out.notes.push('Bewirtschaftungskosten mit der Quote von '
@@ -364,6 +392,65 @@ export const CrossCheckService = {
       } else if (!p.irw.verfuegbar && p.irw.hinweis
                  && out.notes.indexOf(p.irw.hinweis) < 0) {
         out.notes.push(p.irw.hinweis);
+      }
+    }
+    /* v1059-WMIET-4 · Traegt der Zinssatz den Modellvermerk und liegt eine
+     * Mietpreisuebersicht vor, fuehrt die amtliche Miete den Ertragswert.
+     * Paragraf 10: derselbe Modellansatz, aus dem der Zinssatz stammt.
+     * Die Portalmiete bleibt sichtbar — der Abstand ist selbst eine
+     * Aussage ueber den Markt. */
+    /* v1060-WVF-4 · Der amtliche Vergleichsfaktor gehoert in den Bericht —
+     * auch dann, wenn er nicht fuehrt. Dass ein Objekt aus dem
+     * Anwendungsbereich des Ausschusses faellt, ist selbst eine Auskunft. */
+    /* v1061-WVER-2 · Paragraf 6 Abs. 1 ImmoWertV: die Verfahren sind nach
+     * der Art des Objekts zu waehlen. Der Marktbericht gibt die Regel vor —
+     * Ein- und Zweifamilienhaeuser ueber den Sachwert, Renditeobjekte ueber
+     * den Ertragswert, typisches Wohnungseigentum ueber den Vergleich.
+     * Feste Regel, kein Gefuehl: derselbe Objekttyp bekommt immer dieselbe
+     * Behandlung. */
+    out.verfahrenswahl = fuehrendesVerfahren({
+      objektart: ref.property_type, wohneinheiten: ref.units, nutzung: ref.usage_type,
+    });
+    if (out.verfahrenswahl && out.verfahrenswahl.grund) {
+      out.notes.push('Führendes Verfahren: ' + ({ sachwert: 'Sachwertverfahren',
+        ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren' }
+        [out.verfahrenswahl.verfahren] || '—') + '. ' + out.verfahrenswahl.grund);
+    }
+
+    /* v1061-WVER-3 · Objektspezifisch angepasster Zinssatz nach Paragraf 33.
+     * Ausgangswert bleibt der amtliche; die Anpassung folgt dem Katalog des
+     * Ausschusses und bleibt in seiner Streuung. Ergebnis ist Stufe C —
+     * marktabgeleitet, nie amtlich. */
+    if (p.lzs_pct > 0 && p.lzs_min != null && p.lzs_max != null) {
+      const _stabw = (Number(p.lzs_max) - Number(p.lzs_min)) / 2;
+      const _an = angepassterZins({
+        basis_pct: Number(p.lzs_pct), stabw_pct: _stabw,
+        gebaeudealter: ref.build_year ? (new Date()).getFullYear() - Number(ref.build_year) : null,
+        mikrolage_score: p.mikrolage_score != null ? Number(p.mikrolage_score) : null,
+        nutzung: ref.usage_type, wohneinheiten: ref.units,
+        wohnflaeche_qm: ref.living_area, normobjekt_qm: p.normobjekt_qm || null,
+      });
+      if (_an && _an.verfuegbar) out.zins_anpassung = _an;
+    }
+
+    if (p.amtlicher_vergleichsfaktor) {
+      out.amtlicher_vergleichsfaktor = p.amtlicher_vergleichsfaktor;
+      const _vf = p.amtlicher_vergleichsfaktor;
+      if (_vf.verfuegbar && _vf.hinweis && out.notes.indexOf(_vf.hinweis) < 0) {
+        out.notes.push(_vf.hinweis);
+      }
+    }
+    if (p.amtliche_miete) {
+      out.amtliche_miete = p.amtliche_miete;
+      if (p.amtliche_miete.verfuegbar && rentSqm > 0) {
+        const _ab = Math.round((rentSqm / p.amtliche_miete.miete_qm - 1) * 100);
+        out.amtliche_miete.abweichung_pct = _ab;
+        out.notes.push('Die Angebotsmiete liegt mit '
+          + String(rentSqm).replace('.', ',') + ' €/m² um ' + (_ab > 0 ? '+' : '') + _ab
+          + ' % über der Mietpreisübersicht des Gutachterausschusses ('
+          + String(p.amtliche_miete.miete_qm).replace('.', ',') + ' €/m²). '
+          + 'Der Liegenschaftszinssatz wurde auf Grundlage der amtlichen Übersicht '
+          + 'abgeleitet; der Ertragswert folgt ihr deshalb (§ 10 ImmoWertV).');
       }
     }
     if (p.flaeche) {

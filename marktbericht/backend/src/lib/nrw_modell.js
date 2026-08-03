@@ -62,6 +62,27 @@ export const AGVGA_STAENDE = {
 export const VPI_OKTOBER = {
   2001: 87.5,
   2014: 106.7,
+  /* v1058-WVPI-1 · Oktober 2025 = 123, belegt aus einem Verkehrswert-
+   * gutachten vom 04.03.2026, das die Fortschreibung nach Anlage 3
+   * ausdruecklich vorrechnet.
+   *
+   * ACHTUNG, ZWEI BASEN: dieses Gutachten rechnet gegen Oktober 2001 = 77,1
+   * (ImmoWertV Anlage 3), dieses Modell gegen 87,5 (AGVGA.NRW). Dasselbe
+   * Datum, zwei Indexstaende — die Verordnung nutzt eine andere
+   * Reihenbasis. Der Index 123 gehoert zur 77,1er-Reihe.
+   *
+   * Umgerechnet auf die NRW-Basis: 123 x (87,5 / 77,1) = 139,6. Nur so
+   * bleiben die im Modell nachgerechneten Werte fuer 2015 gueltig
+   * (230 x 106,7/87,5 = 280). Wer die 123 direkt gegen 87,5 rechnet,
+   * verliert zwoelf Prozent. */
+  2025: 139.6,
+};
+
+/* Dieselbe Reihe auf der Basis der ImmoWertV Anlage 3 (Oktober 2001 = 77,1).
+ * Getrennt gehalten, damit niemand die beiden Basen mischt. */
+export const VPI_OKTOBER_IMMOWERTV = {
+  2001: 77.1,
+  2025: 123,
 };
 
 /**

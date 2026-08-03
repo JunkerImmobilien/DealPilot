@@ -21,7 +21,9 @@ import { BorisConnector } from '../connectors/BorisConnector.js';
 import { DealPilotObjectMapper } from './DealPilotObjectMapper.js';
 import { MarketInsightsService } from './MarketInsightsService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
-import { IrwConnector } from '../connectors/IrwConnector.js';   /* v1053-WIRW-1 */
+import { IrwConnector } from '../connectors/IrwConnector.js';
+import { marktmiete as amtlicheMiete } from '../lib/mietmodell_nrw.js';   /* v1059-WMIET-1 */
+import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';   /* v1060-WVF-1 */   /* v1053-WIRW-1 */
 import { AgsResolver } from '../connectors/AgsResolver.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
 
@@ -263,6 +265,61 @@ export const ReportOrchestrator = {
      * ImmoWertV. Beim Wohnungseigentum einschliesslich Miteigentumsanteil.
      * Faellt der Abruf aus, laeuft der Bericht unveraendert weiter: eine
      * zusaetzliche Quelle darf nie das Ganze kippen. */
+    /* v1059-WMIET-2 · Die Miete, auf der der Ausschuss seinen Zinssatz
+     * abgeleitet hat. Sie wird IMMER gerechnet, auch wenn sie nicht fuehrt —
+     * der Vergleich mit der Portalmiete ist selbst eine Aussage. */
+    let _amtMiete = null;
+    try {
+      const _bp3 = (landValue && landValue.properties_raw) || {};
+      const _gem = _bp3.Gemeinde || _bp3.GENA
+        || (address && (address.city || address.town)) || null;
+      if (_gem && ref.build_year && ref.living_area) {
+        const _kl = ref.mod_punkte != null
+          ? (Number(ref.mod_punkte) <= 1 ? 1 : Number(ref.mod_punkte) <= 5 ? 2
+             : Number(ref.mod_punkte) <= 10 ? 3 : Number(ref.mod_punkte) <= 17 ? 4 : 5)
+          : null;
+        const _lage = _bp3.Lagebeurteilung != null
+          ? (Number(_bp3.Lagebeurteilung) >= 4 ? 'sehr_gut'
+             : Number(_bp3.Lagebeurteilung) === 3 ? 'gut'
+             : Number(_bp3.Lagebeurteilung) === 2 ? 'mittel' : 'einfach')
+          : 'mittel';
+        _amtMiete = amtlicheMiete({
+          gemeinde: _gem, baujahr: ref.build_year, wohnflaeche_qm: ref.living_area,
+          modernisierung_klasse: _kl,
+          kernsaniert: /kernsaniert/i.test(String(ref.modernization || ''))
+            && Number(ref.mod_punkte || 0) >= 18,
+          sanierungsjahr: ref.modernization_year || null,
+          wohnlage: _lage, stichtag_jahr: (new Date()).getFullYear(),
+        });
+        step('amtliche miete: ' + (_amtMiete.verfuegbar
+          ? _amtMiete.miete_qm + ' EUR/m2 (fiktives Bj ' + _amtMiete.fiktives_baujahr + ')'
+          : 'keine (' + _amtMiete.grund + ')'));
+      }
+    } catch (e) { _amtMiete = null; }
+
+    /* v1060-WVF-2 · Der Vergleichsfaktor des Ausschusses. Anders als der
+     * Immobilienrichtwert liegt er fuer Minden-Luebbecke vor — als Tabelle
+     * im Marktbericht statt als Geodatensatz. Dieselbe Rechtsgrundlage:
+     * Paragraf 20 ImmoWertV, abgeleitet aus der Kaufpreissammlung. */
+    let _amtVf = null;
+    try {
+      const _bp4 = (landValue && landValue.properties_raw) || {};
+      const _gem4 = _bp4.Gemeinde || _bp4.GENA
+        || (address && (address.city || address.town)) || null;
+      if (_gem4 && ref.build_year && ref.living_area) {
+        _amtVf = amtlicherVf({
+          objektart: ref.property_type, gemeinde: _gem4,
+          baujahr: ref.build_year, wohnflaeche_qm: ref.living_area,
+          wohneinheiten: ref.units, grundstuecksflaeche_qm: ref.plot_area,
+          erstverkauf: /erstbezug|neubau|erstverkauf/i.test(String(ref.baustatus || '')),
+        });
+        step('vergleichsfaktor: ' + (_amtVf.verfuegbar
+          ? _amtVf.faktor_qm + ' EUR/m2 -> ' + _amtVf.wert_eur + ' EUR'
+            + (_amtVf.fuehrend ? ' (fuehrend)' : ' (nur Orientierung)')
+          : 'keiner (' + _amtVf.grund + ')'));
+      }
+    } catch (e) { _amtVf = null; }
+
     let _irw = null;
     try {
       /* lat/lon stehen ab Z. 62 bereit; BorisConnector nutzt sie genauso. */
@@ -404,6 +461,8 @@ export const ReportOrchestrator = {
           stellplatz_ertrag_fehlt: ((Number(ref.garages) || 0) + (Number(ref.outdoor_parking) || 0)) > 0
             && !(Number(ref.stellplatz_miete_monat) > 0),
           irw: _irw,           /* v1053-WIRW-3 */
+          amtliche_miete: _amtMiete,   /* v1059-WMIET-3 */
+          amtlicher_vergleichsfaktor: _amtVf,   /* v1060-WVF-3 */
           bwk_modus: ref.bwk_modus || null,
           bwk_verwaltung_je_we: ref.bwk_verwaltung_je_we || null,
           bwk_instandhaltung_je_qm: ref.bwk_instandhaltung_je_qm || null,
