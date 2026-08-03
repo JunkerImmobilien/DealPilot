@@ -82,3 +82,5 @@ backup_*.sql
 /files/
 /README-v*.md
 *.bak
+
+tools/deploy-staging.ps1
