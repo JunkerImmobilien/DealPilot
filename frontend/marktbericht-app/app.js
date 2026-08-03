@@ -1340,6 +1340,17 @@ function _mbBuildObjData() {
     garagen_bgf_qm: val('garagenBgf'), garagen_stufe: val('garagenStufe'),
     aussenanlagen_pct: val('aussenPct'),
     nhk_haus: val('nhkHaus'), nhk_geschosse: val('nhkGeschosse'), nhk_dach: val('nhkDach'),
+    /* v1074-WSAV-1 · Rueckweg ins Portfolio fuer die 14 neuen Felder —
+     * dieselbe Lehre wie v1072-WSAV-1: der Bericht bekommt payload(), das
+     * gespeicherte Objekt bekommt NUR, was hier steht. */
+    ausst_aussenwaende: val('ausstAussenwaende'), ausst_dach: val('ausstDach'),
+    ausst_fenster: val('ausstFenster'), ausst_innenwaende: val('ausstInnenwaende'),
+    ausst_decken: val('ausstDecken'), ausst_fussboeden: val('ausstFussboeden'),
+    ausst_sanitaer: val('ausstSanitaer'), ausst_heizung: val('ausstHeizung'),
+    ausst_technik: val('ausstTechnik'),
+    btl_gauben: val('btlGauben'), btl_balkone: val('btlBalkone'),
+    btl_vordach: val('btlVordach'), btl_terrassen: val('btlTerrassen'),
+    btl_sonstige: val('btlSonstige'),
     /* WSAVE31-1 · die restlichen zehn */
     brw_manuell: val('brwManuell'), brw_stichtag: val('brwStichtag'),
     brw_anpassung_pct: val('brwAnp'), brw_anpassung_grund: val('brwAnpGrund'),

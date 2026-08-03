@@ -148,6 +148,10 @@ export const CrossCheckService = {
          * Modernisierungspunkte vor, gilt Anlage 2 fuer BEIDE. */
         gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
         bes_bauteile: (p && p.bes_bauteile) || null, aussenanlagen: (p && p.aussenanlagen) || null,
+        /* v1074-WAUS9-5 · Kette. */
+        ausstattung: (p && p.ausstattung) || ref.ausstattung || null,
+        bauteile_hk: (p && p.bauteile_hk) || ref.bauteile_hk || null,
+        bauteile_detail: (p && p.bauteile_detail) || ref.bauteile_detail || null,
         /* v1072-WGAR-5 · Die Kette von A nach B — ohne diese vier Zeilen
          * waere der ganze Garagen- und Aussenanlagenblock wirkungslos. */
         aussenanlagen_pct: (p && p.aussenanlagen_pct) || ref.aussenanlagen_pct || null,
@@ -193,6 +197,17 @@ export const CrossCheckService = {
             gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
             bes_bauteile: (p && p.bes_bauteile) || null,
             aussenanlagen: (p && p.aussenanlagen) || null,
+            /* v1074-WFIX-1 · Der zweite Lauf (mit amtlichem Sachwertfaktor)
+             * kannte die v1072er-Felder nicht. Mit Garage oder Aussenanlagen-
+             * Prozent wich sein vorlaeufiger Sachwert vom ersten Lauf ab, und
+             * die Uebernahme-Bedingung verwarf den amtlichen Faktor still. */
+            aussenanlagen_pct: (p && p.aussenanlagen_pct) || ref.aussenanlagen_pct || null,
+            garagen_bgf_qm: (p && p.garagen_bgf_qm) || ref.garagen_bgf_qm || null,
+            garagen_stufe: (p && p.garagen_stufe) || ref.garagen_stufe || null,
+            /* v1074-WAUS9-9 · Kette, zweiter Lauf. */
+            ausstattung: (p && p.ausstattung) || ref.ausstattung || null,
+            bauteile_hk: (p && p.bauteile_hk) || ref.bauteile_hk || null,
+            bauteile_detail: (p && p.bauteile_detail) || ref.bauteile_detail || null,
           }, (p && p.bodenwert) || null, {
             sachwertfaktor: _swfTab.wert, stufe: _swfTab.stufe,
             quelle: _swfTab.quelle_text,

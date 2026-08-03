@@ -149,6 +149,11 @@ export const ReportOrchestrator = {
       garagen_stufe: input.garagen_stufe ? Number(input.garagen_stufe) : null,
       aussenanlagen_pct: input.aussenanlagen_pct ? Number(input.aussenanlagen_pct) : null,
       aussenanlagen: input.aussenanlagen ? Number(input.aussenanlagen) : null,
+      /* v1074-WAUS9-3 · Die ref-Liste ist ausdruecklich — wer hier fehlt,
+       * kommt nicht an (Lehre aus v1071). */
+      ausstattung: (input.ausstattung && typeof input.ausstattung === 'object') ? input.ausstattung : null,
+      bauteile_hk: input.bauteile_hk ? Number(input.bauteile_hk) : null,
+      bauteile_detail: (input.bauteile_detail && typeof input.bauteile_detail === 'object') ? input.bauteile_detail : null,
       /* WBW26-3 · aus den Objekt-Tabs Bewirtschaftung und Miete */
       instandhaltung_ruecklage_jahr: input.instandhaltung_ruecklage_jahr
         ?? input.inst ?? input.instandhaltung ?? null,
@@ -560,6 +565,10 @@ export const ReportOrchestrator = {
           standardstufe: ref.standardstufe || null, bgf_direkt: ref.bgf || null,
           regionalfaktor: ref.regionalfaktor || null,
           bes_bauteile: ref.bes_bauteile || null, aussenanlagen: ref.aussenanlagen || null,
+          /* v1074-WAUS9-4 · Kette von A nach B. */
+          ausstattung: ref.ausstattung || null,
+          bauteile_hk: ref.bauteile_hk || null,
+          bauteile_detail: ref.bauteile_detail || null,
           /* v1062-WMIK-1 · Zwei Felder, die der Quercheck seit v1061 liest und
            * die nie jemand geschrieben hat. Der Mikrolage-Score liegt seit dem
            * Promise.all bereit. normobjekt_qm hat keine belegte Quelle und

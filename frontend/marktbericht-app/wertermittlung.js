@@ -30,6 +30,16 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     + 'manche Gutachterausschüsse geben stattdessen feste Beträge vor '
     + '(Minden-Lübbecke: Kanal 2.900 €, Einfahrt 2.500 €, Terrasse 2.000 €). '
     + 'Ist oben ein Eurobetrag eingetragen, hat der Vorrang.',
+  /* v1074-WAUS9-10 · Hilfen fuer die neuen Felder. */
+  ausstGewerk: 'Feinere Alternative zur glatten Standardstufe nach SW-RL: je '
+    + 'Gewerk eine Stufe 1–5, halbe Stufen erlaubt. Gerechnet wird nur, wenn '
+    + 'alle neun Gewerke gesetzt sind — sonst gilt die glatte Standardstufe '
+    + 'oben. Die Gewichte stehen in der Feldbezeichnung (Außenwände 23 % … '
+    + 'sonstige Technik 6 %). Quelle: SW-RL 2012 Anlage 2.',
+  bauteilHk: 'Herstellungskosten zum heutigen Stichtag, ohne erneute '
+    + 'Indexierung. Sie unterliegen derselben Alterswertminderung wie das '
+    + 'Gebäude. Größenordnung Beispiel Löhner Straße: Gauben 51.000, '
+    + 'Balkone 13.000, Vordach 10.000, Terrassen 18.000, Sonstiges 3.000 €.',
 });
 
 /* wertermittlung.js — Zielfrage, Stufenfelder, Pflichtfeld-Ampel.
@@ -184,6 +194,36 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
                    ['5', '5 \u00b7 stark gehoben']],
         hilfe: 'standardstufe' },
 
+      /* v1074-WAUS9-6 · Ausstattung nach Gewerken (SW-RL 2012 Anlage 2).
+       * Alle neun oder gar nicht — sonst gilt die glatte Stufe oben. */
+      { id: 'ausstAussenwaende', label: 'Ausstattung \u00b7 Au\u00dfenw\u00e4nde (23 %)', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstDach', label: 'Ausstattung \u00b7 Dach (15 %)', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstFenster', label: 'Ausstattung \u00b7 Fenster und Au\u00dfent\u00fcren (11 %)', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstInnenwaende', label: 'Ausstattung \u00b7 Innenw\u00e4nde und -t\u00fcren (11 %)', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstDecken', label: 'Ausstattung \u00b7 Decken und Treppen (11 %)', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstFussboeden', label: 'Ausstattung \u00b7 Fu\u00dfb\u00f6den (5 %)', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstSanitaer', label: 'Ausstattung \u00b7 Sanit\u00e4r (9 %)', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstHeizung', label: 'Ausstattung \u00b7 Heizung (9 %)', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstTechnik', label: 'Ausstattung \u00b7 sonstige Technik (6 %)', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+
       /* v1062-WAUS-1 · Beide Betraege gehen seit jeher durch nhk2010.js und
        * hatten nie ein Feld — der Sachwert rechnete sie mit 0.
        * KEINE Baunebenkosten hier: die NHK-2010-Kennwerte enthalten sie
@@ -193,6 +233,19 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
         platzhalter: 'Wege, Einfriedung, Ver- und Entsorgung' },
       { id: 'besBauteile', label: 'Besondere Bauteile (\u20ac)', typ: 'number',
         platzhalter: 'z. B. Aufzug \u00b7 ohne Baunebenkosten (in NHK enthalten)' },
+
+      /* v1074-WBTL-6 · Sonstige Bauteile: Herstellungskosten HEUTE,
+       * gleiche Alterswertminderung wie das Gebaeude (vor dem Abzug). */
+      { id: 'btlGauben', label: 'Dachgauben (\u20ac, Herstellungskosten heute)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
+      { id: 'btlBalkone', label: 'Balkone (\u20ac)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
+      { id: 'btlVordach', label: 'Vord\u00e4cher / Eingangsvorbau (\u20ac)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
+      { id: 'btlTerrassen', label: 'Terrassen (\u20ac)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
+      { id: 'btlSonstige', label: 'Weitere Bauteile (\u20ac)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
 
       /* Korrekturfaktor aus Anlage 4, Fussnote 5 — lag fertig im Rechenkern
        * und hatte nie ein Feld. Die Beschriftung erklaert ihn, statt nur
@@ -650,6 +703,36 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
        * Bericht nicht — genau wie v1055 es fuer drei andere Felder gelernt hat. */
       aussenanlagen: parseFloat(wert('aussenanlagen')) || null,
       bes_bauteile: parseFloat(wert('besBauteile')) || null,
+      /* v1074-WAUS9-7 · payload() ist die einzige Tuer zum Bericht —
+       * dieselbe Lehre wie v1055, v1062, v1067. */
+      ausstattung: (function () {
+        var m = { aussenwaende: 'ausstAussenwaende', dach: 'ausstDach',
+                  fenster_tueren: 'ausstFenster', innenwaende: 'ausstInnenwaende',
+                  decken_treppen: 'ausstDecken', fussboeden: 'ausstFussboeden',
+                  sanitaer: 'ausstSanitaer', heizung: 'ausstHeizung',
+                  sonstige_technik: 'ausstTechnik' };
+        var o = {}, n = 0;
+        Object.keys(m).forEach(function (k) {
+          var v = parseFloat(wert(m[k]));
+          if (isFinite(v) && v >= 1 && v <= 5) { o[k] = v; n++; }
+        });
+        return n > 0 ? o : null;
+      })(),
+      bauteile_hk: (function () {
+        var s = 0;
+        ['btlGauben', 'btlBalkone', 'btlVordach', 'btlTerrassen', 'btlSonstige']
+          .forEach(function (id) { s += parseFloat(wert(id)) || 0; });
+        return s > 0 ? Math.round(s) : null;
+      })(),
+      bauteile_detail: (function () {
+        var d = { gauben: parseFloat(wert('btlGauben')) || null,
+                  balkone: parseFloat(wert('btlBalkone')) || null,
+                  vordaecher: parseFloat(wert('btlVordach')) || null,
+                  terrassen: parseFloat(wert('btlTerrassen')) || null,
+                  sonstige: parseFloat(wert('btlSonstige')) || null };
+        var hat = Object.keys(d).some(function (k) { return d[k]; });
+        return hat ? d : null;
+      })(),
       bwk_modus: stufe() >= 3 ? 'normiert' : null,
     };
   }
