@@ -156,10 +156,22 @@ function groesseFaktor(qm) {
  * @param {number} [o.stichtag_jahr]
  */
 export function marktmiete({
-  gemeinde, baujahr, wohnflaeche_qm, modernisierung_klasse = null,
+  gemeinde, baujahr, wohnflaeche_qm, ags = null, modernisierung_klasse = null,
   sanierungsjahr = null, kernsaniert = false,
   wohnlage = 'mittel', dachgeschoss = false, stichtag_jahr = null,
 }) {
+  /* v1071-WZUS-4 · Der Gemeindename allein ist kein Beleg fuer die
+   * Zustaendigkeit — "Lauenau", "Hille" und andere Namen gibt es mehrfach
+   * in Deutschland. Hier hat bisher nichts geblutet, weil die Tabelle bei
+   * unbekannten Namen ohnehin aussteigt; die Pruefung schliesst die Luecke,
+   * bevor sie jemand aufmacht. */
+  const _kreisM = String(ags || '').replace(/\D/g, '').slice(0, 5);
+  if (ags && _kreisM !== MIETMODELL_STAND.ags_kreis) {
+    return { verfuegbar: false, grund: 'anderer_ausschuss',
+      hinweis: 'Die Mietpreisübersicht gilt nur im Zuständigkeitsbereich des '
+        + 'Gutachterausschusses, der sie aufgestellt hat. Jeder Ausschuss '
+        + 'veröffentlicht seine eigene; sie sind nicht übertragbar.' };
+  }
   const reihe = TABELLE[String(gemeinde || '').trim()];
   if (!reihe) {
     return { verfuegbar: false, grund: 'gemeinde_unbekannt',

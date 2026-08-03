@@ -116,6 +116,69 @@ export function machRepository(q) {
       return null;
     },
 
+    /* v1066-WP2-1 · Modelle sind keine Werte.
+     *
+     * Berlin veroeffentlicht eine Regressionsgleichung statt einer Zahl.
+     * Sie in mb.param_werte zu pressen hiesse, eine Stuetzstelle fuer den
+     * Wert zu halten — und damit einen Zinssatz zu verwenden, der fuer eine
+     * Miete von 4,00 EUR/m2 gilt, bei einem Objekt mit 12,00.
+     *
+     * Deshalb eine eigene Tabelle. Und ein eigener CHECK in Migration 014:
+     * ohne Belege wird kein Modell gespeichert. */
+    async schreibeModelle(modelle) {
+      let uebernommen = 0; let verworfen = 0;
+      for (const m of modelle) {
+        if (!m.quelle_url || !m.kennzahl || !m.ags || !m.land_code
+            || !m.formel || !m.belege || !m.belege.length) { verworfen++; continue; }
+        try {
+          await q(
+            `INSERT INTO mb.param_modell
+               (land_code, ags, ebene, gebiet_name, gaa_name, kennzahl, zweig,
+                formel, korrekturen, modellansaetze, geltungsbereich, belege,
+                stufe, fallzahl, stichtag, berichtsjahr, modellversion,
+                quelle_url, quelle_parser, quellenvermerk, lizenz)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)
+             ON CONFLICT (land_code, ags, kennzahl, zweig,
+                          COALESCE(berichtsjahr, -1), quelle_url)
+             DO UPDATE SET
+               formel = EXCLUDED.formel, korrekturen = EXCLUDED.korrekturen,
+               modellansaetze = EXCLUDED.modellansaetze,
+               geltungsbereich = EXCLUDED.geltungsbereich,
+               belege = EXCLUDED.belege, stufe = EXCLUDED.stufe,
+               fallzahl = EXCLUDED.fallzahl, stichtag = EXCLUDED.stichtag,
+               modellversion = EXCLUDED.modellversion, erfasst_am = now()`,
+            [m.land_code, m.ags, m.ebene, m.gebiet_name || null, m.gaa_name || null,
+             m.kennzahl, m.zweig || 'standard',
+             JSON.stringify(m.formel), JSON.stringify(m.korrekturen || {}),
+             JSON.stringify(m.modellansaetze || {}), JSON.stringify(m.geltungsbereich || {}),
+             JSON.stringify(m.belege),
+             m.stufe, m.fallzahl || null, m.stichtag || null, m.berichtsjahr || null,
+             m.modellversion, m.quelle_url, m.quelle_parser,
+             m.quellenvermerk || null, m.lizenz || null]
+          );
+          uebernommen++;
+        } catch (e) {
+          verworfen++;
+          if (verworfen <= 3) console.error('  Modell verworfen:', m.zweig, e.message);
+        }
+      }
+      return { uebernommen, verworfen };
+    },
+
+    /** Modelle zu einem Gebiet, feinste Ebene zuerst. */
+    async holeModelle(kennzahl, ags) {
+      for (const s of kaskadeSchluessel(ags)) {
+        const rows = await q(
+          `SELECT * FROM mb.param_modell
+            WHERE kennzahl = $1 AND ags = $2
+            ORDER BY berichtsjahr DESC NULLS LAST, zweig`,
+          [kennzahl, s]
+        );
+        if (rows && rows.length) return rows;
+      }
+      return [];
+    },
+
     /** Alles zu einem Gebiet, fuer die Admin-Ansicht. */
     async listeGebiet(ags) {
       return q(

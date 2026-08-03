@@ -107,7 +107,19 @@ export const ValuationService = {
       // TYPISCHES EFH-Grundstueck mit ein. Uebergroesse (ueber ~650 m²) wird vom Markt
       // separat verguetet — additiv ueber den amtlichen Bodenrichtwert, mit Marktabschlag
       // (Uebergroesse wird nicht 1:1 bezahlt). Sanity-Deckel: max. 35 % des Vergleichswerts.
-      const TYPICAL_PLOT_SQM = 650, EXCESS_MARKET_FACTOR = 0.40;
+      /* v1071-WMFL-1 · Die 650 m2 und der Faktor 0,40 standen in keiner
+       * Quelle. BORIS liefert die tatsaechliche Bezugsgroesse der Zone frei
+       * Haus mit (Feld "Flaeche"; bei Loehner Strasse 278 sind es 700 m2,
+       * nicht 650). Sie wird jetzt bevorzugt; die 650 bleiben nur als
+       * Rueckfall, wenn BORIS nichts liefert — und der Hinweistext sagt,
+       * welcher der beiden gegriffen hat. */
+      const _bezugBoris = Number(
+        (landValue && landValue.properties_raw
+          && (landValue.properties_raw['Fläche'] || landValue.properties_raw.Flaeche)) || 0);
+      const TYPICAL_PLOT_SQM = _bezugBoris > 0 ? _bezugBoris : 650;
+      const TYPICAL_QUELLE = _bezugBoris > 0
+        ? 'Bezugsgröße des Bodenrichtwertgrundstücks' : 'Annahme mangels Angabe';
+      const EXCESS_MARKET_FACTOR = 0.40;
       const _pt = _norm(ref.property_type);
       const isHouse = _pt.includes('haus') || ['efh', 'dhh', 'rh', 'zfh', 'mfh'].includes(_pt);
       const plotArea = _num(ref.plot_area);
@@ -125,7 +137,7 @@ export const ValuationService = {
           land_value_total_eur: Math.round(plotArea * brwSqm),
         };
         if (landExcessValue > 0) {
-          out.notes.push(`Grundstücks-Mehrfläche: ${excess} m² über typischem EFH-Grundstück (${TYPICAL_PLOT_SQM} m²) × BRW ${brwSqm} €/m² × Marktfaktor ${EXCESS_MARKET_FACTOR} = +${landExcessValue.toLocaleString('de-DE')} € (additiv).`);
+          out.notes.push(`Grundstücks-Mehrfläche: ${excess} m² über ${TYPICAL_PLOT_SQM} m² (${TYPICAL_QUELLE}) × BRW ${brwSqm} €/m² × Marktfaktor ${EXCESS_MARKET_FACTOR} = +${landExcessValue.toLocaleString('de-DE')} € (additiv). Der Marktfaktor ist eine Festlegung von DealPilot, keine Angabe des Gutachterausschusses.`);   /* v1071-WMFL-2 */
         }
       } else if (isHouse && plotArea > 0 && !brwSqm) {
         out.notes.push('Grundstücksfläche angegeben, aber kein Bodenrichtwert verfügbar – Mehrflächenkorrektur nicht berechenbar.');

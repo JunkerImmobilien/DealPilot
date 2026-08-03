@@ -69,7 +69,15 @@ const F = {
 // VORBEREITET (Endpunkt bekannt, GetFeatureInfo-Felder beim 1. echten Call zu pruefen): be, he
 const ADAPTERS = [
   {
-    code: 'nrw', name: 'BORIS-NRW', license: 'dl-de/zero-2-0', enabled: true, verified: true,
+    /* v1071-WLIZ-1 · BORIS-NRW stellt die Bodenrichtwerte unter
+     * "Datenlizenz Deutschland Namensnennung 2.0" (dl-de/by-2-0), nicht
+     * unter Zero. by-2-0 verlangt einen Quellenvermerk — wir haben Zero
+     * ausgewiesen und ihn weggelassen. Die GRUNDSTUECKSMARKTBERICHTE
+     * derselben Stelle sind Zero 2.0; das sind zwei verschiedene Lizenzen
+     * aus demselben Haus, und wir hatten die falsche am falschen Produkt. */
+    code: 'nrw', name: 'BORIS-NRW', license: 'dl-de/by-2-0', enabled: true, verified: true,
+    quellenvermerk: 'Der obere Gutachterausschuss für Grundstückswerte im Land '
+      + 'Nordrhein-Westfalen (www.boris.nrw.de), dl-de/by-2-0',
     base: 'https://www.wms.nrw.de/boris/wms-t_nw_brw',
     bbox: { minLon: 5.70, maxLon: 9.52, minLat: 50.25, maxLat: 52.60 },
     // Laut Capabilities sind die abfragbaren BRW-Layer: brw_sonstige_flaechen (Bauland/bebaut,
@@ -350,7 +358,19 @@ export const BorisRegistry = {
     // daher die letzten Jahre durchprobieren (neuestes zuerst). Ersten Treffer nehmen.
     const layers = a.layers ? a.layers(year) : [a.layer(year)];
     const nowY = new Date().getFullYear();
-    const yearCandidates = year ? [year] : [nowY - 1, nowY - 2, nowY - 3, nowY];
+    /* v1071-WBRW-1 · Der AKTUELLE Jahrgang stand an letzter Stelle — damit
+     * gewann immer der vorjaehrige. Gemessen im August 2026: Bodenrichtwert
+     * mit Stichtag 01.01.2025 (135 EUR/m2), waehrend derselbe Bericht den
+     * Immobilienrichtwert bereits zum 01.01.2026 auswies. Elf Prozent
+     * Unterschied, und sie gehen in Bodenwert, Bodenwertverzinsung und
+     * Sachwert.
+     *
+     * Die alte Reihenfolge war eine Kruecke fuer die Monate, in denen der
+     * neue Jahrgang noch nicht veroeffentlicht ist (BORIS-NRW: bis Ende
+     * Maerz). Die braucht es nicht — die Kaskade probiert der Reihe nach und
+     * nimmt den ersten Treffer. Ist 2026 noch nicht da, faellt sie von
+     * selbst auf 2025. */
+    const yearCandidates = year ? [year] : [nowY, nowY - 1, nowY - 2, nowY - 3];
     let value = null, stichtag = null, nutzung = null, zone = null, raw = null, usedLayer = null, usedYear = null, lastErr = null;
     outer:
     for (const yr of yearCandidates) {
@@ -405,6 +425,7 @@ export const BorisRegistry = {
 
     return {
       available: true, source: a.name, license: a.license, verified: a.verified,
+      quellenvermerk: a.quellenvermerk || null,   /* v1071-WLIZ-2 */
       value_sqm: value, stichtag, nutzung, zone, used_layer: usedLayer, used_year: usedYear, properties_raw: raw,
     };
   },

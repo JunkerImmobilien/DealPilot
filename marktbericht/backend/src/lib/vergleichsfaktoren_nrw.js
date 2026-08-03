@@ -116,9 +116,31 @@ function klasseFuer(klassen, baujahr) {
  * @param {boolean} [o.erstverkauf]
  */
 export function vergleichsfaktor({
-  objektart, gemeinde, baujahr, wohnflaeche_qm,
+  objektart, gemeinde, baujahr, wohnflaeche_qm, ags = null,
   wohneinheiten = null, grundstuecksflaeche_qm = null, erstverkauf = false,
 }) {
+  /* v1071-WZUS-1 · DIE ZUSTAENDIGKEITSPRUEFUNG, DIE HIER GEFEHLT HAT.
+   *
+   * Gemessen an Loehner Strasse 278, Hiddenhausen (Kreis Herford, AGS
+   * 05758016): der Vergleichsfaktor 337.850 EUR aus Minden-Luebbecke stand
+   * im Kunden-PDF unter "AMTLICHE WERTE DES GUTACHTERAUSSCHUSSES".
+   *
+   * Ursache war der Rueckfall weiter unten: ist die Gemeinde nicht in der
+   * Tabelle, greift HAUS_TABELLE['_kreis'] — und das gilt fuer jeden Ort in
+   * Deutschland, nicht nur fuer die zehn Gemeinden dieses Kreises.
+   *
+   * Ein Vergleichsfaktor ist an den Ausschuss gebunden, der ihn abgeleitet
+   * hat (§ 10 ImmoWertV). Ohne AGS wird nicht mehr geraten: fehlt er, gilt
+   * nur ein Treffer auf den Gemeindenamen, kein Kreis-Rueckfall. */
+  const _kreis = String(ags || '').replace(/\D/g, '').slice(0, 5);
+  if (ags && _kreis !== VF_STAND.ags_kreis) {
+    return { verfuegbar: false, grund: 'anderer_ausschuss',
+      hinweis: 'Für diesen Ort liegt kein Vergleichsfaktor vor. Vergleichsfaktoren '
+        + 'gelten nur im Zuständigkeitsbereich des Gutachterausschusses, der sie '
+        + 'abgeleitet hat; sie sind nicht auf andere Kreise übertragbar '
+        + '(§ 10 ImmoWertV).' };
+  }
+  const _ohneAgs = !ags;
   const wfl = Number(wohnflaeche_qm);
   const gem = String(gemeinde || '').trim();
   const istWohnung = /etw|eigentumswohnung|wohnung|whg/i.test(String(objektart || ''));
@@ -152,8 +174,10 @@ export function vergleichsfaktor({
 
     let reihe = WE_TABELLE[gem];
     let quelleGem = gem;
-    if (!reihe || reihe[idx] == null) { reihe = WE_TABELLE['_andere']; quelleGem = 'andere Gemeinden'; }
-    if (!reihe || reihe[idx] == null) { reihe = WE_TABELLE['_kreis']; quelleGem = 'Kreis (ohne Stadt Minden)'; }
+    /* v1071-WZUS-3 · "andere Gemeinden" heisst: andere Gemeinden DIESES
+     * Kreises. Ohne AGS ist nicht belegt, dass das Objekt dazugehoert. */
+    if ((!reihe || reihe[idx] == null) && !_ohneAgs) { reihe = WE_TABELLE['_andere']; quelleGem = 'andere Gemeinden'; }
+    if ((!reihe || reihe[idx] == null) && !_ohneAgs) { reihe = WE_TABELLE['_kreis']; quelleGem = 'Kreis (ohne Stadt Minden)'; }
     const wert = reihe ? reihe[idx] : null;
     if (wert == null) return { verfuegbar: false, grund: 'keine_angabe',
       hinweis: 'Der Gutachterausschuss weist für diese Kombination aus Gemeinde und '
@@ -176,7 +200,11 @@ export function vergleichsfaktor({
 
     let reihe = HAUS_TABELLE[gem];
     let quelleGem = gem;
-    if (!reihe || reihe[idx] == null) { reihe = HAUS_TABELLE['_kreis']; quelleGem = 'Kreis (ohne Stadt Minden)'; }
+    /* v1071-WZUS-2 · Ohne AGS kein Kreis-Rueckfall. Er war der Weg, auf dem
+     * ein Haus in Hiddenhausen den Faktor von Minden-Luebbecke bekam. */
+    if ((!reihe || reihe[idx] == null) && !_ohneAgs) {
+      reihe = HAUS_TABELLE['_kreis']; quelleGem = 'Kreis (ohne Stadt Minden)';
+    }
     const wert = reihe ? reihe[idx] : null;
     if (wert == null) return { verfuegbar: false, grund: 'keine_angabe' };
 

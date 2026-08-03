@@ -14,6 +14,12 @@ import { HarvestService } from './HarvestService.js';
 import { KiGegenrechnungService } from './KiGegenrechnungService.js';
 import { ErtragswertService } from './ErtragswertService.js';
 import { CrossCheckService } from './CrossCheckService.js';
+/* v1070-WUK-4 · Umrechnungskoeffizienten und Hinterland-Abgrenzung. */
+import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
+/* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
+ * zustaendigen Grundstuecksmarktbericht. */
+import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig }
+  from '../lib/gutachterausschuss.js';
 import { ScoringService } from './ScoringService.js';
 import { ReportGenerationService } from './ReportGenerationService.js';
 import { DestatisConnector } from '../connectors/stubConnectors.js';
@@ -133,6 +139,15 @@ export const ReportOrchestrator = {
       regionalfaktor: input.regionalfaktor ? Number(input.regionalfaktor) : null,
       sachwertfaktor: input.sachwertfaktor ? Number(input.sachwertfaktor) : null,
       bes_bauteile: input.bes_bauteile ? Number(input.bes_bauteile) : null,
+      /* v1071-WHIN-3 · Zusaetzliche Grundstuecksflaeche mit eigenem Ansatz. */
+      hinterland_qm: input.hinterland_qm ? Number(input.hinterland_qm) : null,
+      hinterland_eur_qm: input.hinterland_eur_qm ? Number(input.hinterland_eur_qm) : null,
+      hinterland_rentierlich: input.hinterland_rentierlich === true
+        || input.hinterland_rentierlich === 'ja',   /* v1072-WREN-5 */
+      /* v1072-WGAR-4 · Garage als eigene bauliche Anlage. */
+      garagen_bgf_qm: input.garagen_bgf_qm ? Number(input.garagen_bgf_qm) : null,
+      garagen_stufe: input.garagen_stufe ? Number(input.garagen_stufe) : null,
+      aussenanlagen_pct: input.aussenanlagen_pct ? Number(input.aussenanlagen_pct) : null,
       aussenanlagen: input.aussenanlagen ? Number(input.aussenanlagen) : null,
       /* WBW26-3 · aus den Objekt-Tabs Bewirtschaftung und Miete */
       instandhaltung_ruecklage_jahr: input.instandhaltung_ruecklage_jahr
@@ -284,6 +299,7 @@ export const ReportOrchestrator = {
              : Number(_bp3.Lagebeurteilung) === 2 ? 'mittel' : 'einfach')
           : 'mittel';
         _amtMiete = amtlicheMiete({
+          ags: ref.ags || null,   /* v1071-WZUS-5 */
           gemeinde: _gem, baujahr: ref.build_year, wohnflaeche_qm: ref.living_area,
           modernisierung_klasse: _kl,
           kernsaniert: /kernsaniert/i.test(String(ref.modernization || ''))
@@ -308,6 +324,9 @@ export const ReportOrchestrator = {
         || (address && (address.city || address.town)) || null;
       if (_gem4 && ref.build_year && ref.living_area) {
         _amtVf = amtlicherVf({
+          /* v1071-WZUS-6 · Ohne diesen Parameter blieb die Pruefung im Modul
+           * wirkungslos — der Weg von A nach B, den node --check nie findet. */
+          ags: ref.ags || null,
           objektart: ref.property_type, gemeinde: _gem4,
           baujahr: ref.build_year, wohnflaeche_qm: ref.living_area,
           wohneinheiten: ref.units, grundstuecksflaeche_qm: ref.plot_area,
@@ -388,7 +407,69 @@ export const ReportOrchestrator = {
       } catch (e) { /* ohne Quote bleibt es beim Modellansatz */ }
       step('bwk-quote: ' + (_bwkPct ? _bwkPct.wert + ' % (Stufe ' + _bwkPct.stufe + ')' : 'keine'));
 
+      /* v1070-WUK-2 · Die Bezugsgroesse liegt seit v1049 vor (_flaeche aus
+       * dem BORIS-Datensatz), wurde aber nur fuer einen Hinweistext benutzt.
+       * Jetzt rechnet sie mit. */
+      let _uk = null;
+      try {
+        _uk = flaechenaufteilung({
+          ags: ref.ags || null,
+          brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+          flaeche_qm: ref.plot_area,
+          bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
+          ist_wohnung: /etw|wohnung|whg|apartment/i.test(String(ref.property_type || '')),
+        });
+        /* v1071-WHIN-2 · Die ausdrueckliche Angabe schlaegt die Ableitung
+         * aus der Bezugsgroesse. Wer 928 m2 Hinterland eintraegt, weiss es
+         * besser als eine Tabelle. */
+        /* v1073-WGAA-5 · Ohne eigenen Wertansatz schlaegt der zustaendige
+         * Ausschuss einen vor. Der Kreis Herford nennt "im Mittel rd. 20 %
+         * des zugehoerigen beitragsfreien Bodenrichtwerts" — bei 150 EUR/m2
+         * sind das genau die 30 EUR/m2 aus dem Gutachten zur Loehner
+         * Strasse. Minden-Luebbecke nennt stattdessen 5 EUR/m2 pauschal,
+         * "die Kaufpreise weisen keine lagemaessige Abhaengigkeit auf".
+         *
+         * VORSCHLAG, nicht Rechnung: er fuellt nur, was leer ist. */
+        let _garten = null;
+        if (Number(ref.hinterland_qm) > 0) {
+          try {
+            _garten = gartenlandVorschlag({
+              ags: ref.ags || null,
+              brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+            });
+            if (_garten && _garten.verfuegbar) {
+              step('gartenland: Vorschlag ' + _garten.vorschlag_eur_qm + ' EUR/m2 ('
+                + (_garten.pct ? _garten.pct + ' % des BRW' : 'pauschal') + ')');
+            }
+          } catch (e) { _garten = null; }
+        }
+        if (Number(ref.hinterland_qm) > 0) {
+          const _man = manuelleAufteilung({
+            flaeche_qm: ref.plot_area, hinterland_qm: ref.hinterland_qm,
+            /* v1073-WGAA-6 · Die eigene Angabe schlaegt den Vorschlag. */
+            hinterland_eur_qm: ref.hinterland_eur_qm
+              || (_garten && _garten.verfuegbar ? _garten.vorschlag_eur_qm : null),
+            rentierlich: ref.hinterland_rentierlich === true,   /* v1072-WREN-4 */
+            brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+            ags: ref.ags || null,
+          });
+          if (_man && _man.verfuegbar) _uk = _man;
+          else if (_man && _man.hinweis) step('hinterland: ' + _man.grund);
+        }
+        /* v1073-WGAA-7 · Woher der Wertansatz kam, gehoert ins Ergebnis. */
+        if (_uk && _uk.verfuegbar && _garten && _garten.verfuegbar && !ref.hinterland_eur_qm) {
+          _uk.wertansatz_quelle = _garten.quelle_text;
+          _uk.wertansatz_hinweis = _garten.hinweis;
+          _uk.quelle_art = 'Vorschlag des Gutachterausschusses';
+        }
+        if (_uk && _uk.verfuegbar) {
+          step('flaechenaufteilung: ' + _uk.bauland_qm + ' m2 Bauland zu '
+            + _uk.bodenwert_eur_qm + ' EUR/m2 + ' + _uk.gruen_qm + ' m2 Gruenflaeche');
+        }
+      } catch (e) { _uk = null; }
+
       const _bw = ErtragswertService.bodenwert({
+        groessenanpassung: _uk,   /* v1070-WUK-3 */
         flaeche_qm: ref.plot_area,
         brw_sqm: landValue && landValue.available ? landValue.value_sqm : null,
         brw_stichtag: landValue ? landValue.stichtag : null,
@@ -479,6 +560,18 @@ export const ReportOrchestrator = {
           standardstufe: ref.standardstufe || null, bgf_direkt: ref.bgf || null,
           regionalfaktor: ref.regionalfaktor || null,
           bes_bauteile: ref.bes_bauteile || null, aussenanlagen: ref.aussenanlagen || null,
+          /* v1062-WMIK-1 · Zwei Felder, die der Quercheck seit v1061 liest und
+           * die nie jemand geschrieben hat. Der Mikrolage-Score liegt seit dem
+           * Promise.all bereit. normobjekt_qm hat keine belegte Quelle und
+           * bleibt deshalb null — das Merkmal faellt aus und wird im Bericht
+           * als nicht bewertbar ausgewiesen. */
+          mikrolage_score: (micro && micro.score != null) ? Number(micro.score) : null,
+          normobjekt_qm: null,
+          /* v1063-WOD-7 · Die bundesweite Einordnung aus mb.param_werte.
+           * Der Wert der Kaskade traegt sie mit; hier wird sie in den
+           * Berichtsweg gehoben. Ohne diese Zeile bleibt sie in hole()
+           * liegen — der Fehler, den v1062 zweimal reparieren musste. */
+          lzs_einordnung: (_lzs && _lzs.einordnung) ? _lzs.einordnung : null,
         };
         step('wertparameter: LZS ' + _lzs.wert + ' % (Stufe ' + _lzs.stufe + ')'
              + (_bw && _bw.vollstaendig ? ', Bodenwert ' + _bw.wert + ' EUR' : ', kein Bodenwert'));
