@@ -1,0 +1,249 @@
+# DealPilot — Arbeitsregeln
+
+DealPilot ist eine deutsche PropTech-SaaS für Immobilien-Investitionsanalyse
+(DACH). Betreiber: Marcel Junker, **Junker Solution** — Einzelunternehmen,
+Kleinunternehmer § 19 UStG. **Keine UG.** Junker Immobilien, DealPilot und
+Junker Digital sind Marken darunter.
+
+Antworte auf **Deutsch**, im Du.
+
+---
+
+## Die fünf Regeln, die immer gelten
+
+**1 · Erst messen, dann bauen.**
+Struktur wird **nie angenommen, immer ausgelesen**. DOM per `outerHTML`,
+Klassen aus `index.html`, Farbwerte per `getComputedStyle`, Marker per `grep`.
+Zählen ist keine Messung: „das Token hat 133 Verwendungen" sagt nichts
+darüber, *wo* es greift.
+
+**2 · Ursache statt Symptom.**
+Nach zwei bis drei Fehlversuchen: **STOPP**, Diagnose. Nicht weiterpatchen.
+`getComputedStyle`, `getBoundingClientRect`, `elementFromPoint`.
+
+**3 · Staging-first. Immer.**
+Produktion wird nie direkt angefasst.
+
+**4 · Fehler offen zugeben, besonders die eigenen.**
+Eine falsche Diagnose wird **ausdrücklich zurückgenommen**, nicht
+stillschweigend ersetzt. Wenn zwei gleiche Fehler hintereinander passieren,
+ist die Sitzung zu lang — abschließen, übergeben, Schluss.
+
+**5 · Große Pakete, keine Kleinstschritte.**
+Ein Feature = ein Paket. Neuer Inhalt heißt **neue Versionsnummer** — nie
+geänderten Inhalt unter altem Namen ausliefern, sonst halten Marker und
+Cache-Buster den neuen Stand für den alten.
+
+---
+
+## Arbeitsweise
+
+Marcel ist **nicht-technisch** und schreibt oft per Spracheingabe mit
+Tippfehlern — **Intent parsen, nicht Wortlaut**. „ja weiter", „hau rein",
+„ok los" heißt: ohne Rückfrage fortfahren.
+
+Er ist **DESAG-zertifizierter Sachverständiger**. Bei Bewertungsfragen weiß er
+es besser, bei Code nicht. Sagt er „das ist für mich Quatsch", genau hinsehen.
+
+Optik, Produkt, Geld, Preise → **Demo-first oder nachfragen, nie raten.**
+
+Terminal-Ausgaben unter ~40 Zeilen halten: filtern, zählen, kürzen.
+
+---
+
+## Deploy
+
+- Frontend ist **volume-mounted** → `git pull` = sofort live, kein Rebuild
+- Backend-Änderung → `docker compose -f docker-compose.prod.yml up -d --build`
+- Neue Migration → Rebuild (Migrationen sind ins Image gebacken)
+- Ausrollen auf Staging: `.\tools\deploy-staging.ps1`
+- **Nach jeder JS/CSS-Änderung den Cache-Buster hochziehen**, sonst kommt sie
+  im Browser nicht an
+- **NIE** `git add -A` oder `git add .` — Dateien einzeln stagen
+- **Nie committen:** `auto-save.js`, `docker-compose.prod.yml`, `Caddyfile`,
+  `*.pre-*`, `patchesold/`
+- Vor dem Commit: `git diff --cached --name-only` gegenlesen
+
+## Server
+
+| | |
+|---|---|
+| Staging | `root@116.203.214.11` · `/opt/dealpilot` · Zweig `staging` |
+| Produktion | `root@157.90.117.167` (`DealPilot-Prod-neu`) · Zweig `main` · SSH **read-only** |
+
+Getaggt wird **nur auf Staging**.
+Host-Node ist 18, Container-Node 22.
+
+**Zwei Datenbanken:**
+- `dealpilot-postgres` (Haupt-DB), Migrationstabelle `schema_migrations`
+- `dealpilot-mb-db` (Marktbericht, Schema `mb.`), Migrationstabelle
+  `public._mb_migrations` — führt **Dateinamen**, keine Versionsnummern.
+  **Steht in keinem Backup-Skript** → vor jedem Eingriff eigener `pg_dump`.
+
+---
+
+## Nicht anfassen
+
+- **Handy-Sperre** `js/mobile-redirect.js` (v970) + MA35. Bewusst aktiv.
+  Kein Redirect trotz des Namens — ein Overlay. Regeln: `pointer:coarse` oder
+  `hover:none`, dazu `innerWidth ≤ 700` **oder** kurze Kante ≤ 1400 physische
+  Pixel. Tablets sind damit frei. Umgehung zum Testen: `?nomobileblock`
+- `calc.js` BSV `startMonth`/`startYear` ~Z.440 (V267-05-Crash)
+- § 7b Sonder-AfA Wfl-Cap 4.000 €/m² (V227.1)
+- `avm-section.js`, `qc-bridge.js` `qcpm`-Overlay
+- `js/bmf-modal-v292.js` — die UI-Schicht des BMF-Modals. Wurde einmal
+  fälschlich als „Leiche" gelöscht. **Nie wieder.**
+
+## Rechenkerne — nie duplizieren
+
+- **DSCR** → `window.Dscr.compute()` (BSV-Sparrate in ALLEN Callern)
+- **KPI** → `DealKpis.compute()`
+- **Score** → `DealScore.computeFromKpis()`
+- **Sachwertfaktor** → nur über `lib/gutachterausschuss.js`, nie ein Modul direkt
+
+## Namensräume nie mischen
+
+`vNNN` Haupt-App · `MA` Mobile · `vNNN` Marktbericht · `P-NN`/`W-NN`
+Reseller/Whitelabel · Landing nach Feature-Name · Admin `vNNN`
+
+---
+
+## Bekannte Fallen (teuer bezahlt)
+
+### CSS
+- **`style.css` hat 35.000 Zeilen, 4.198 `!important`, 226 Media-Queries auf
+  25 Breakpoints.** Token-Überschreibungen reichen **nicht** — farbtragende
+  Flächen müssen **einzeln benannt** werden.
+- Die dunkle Fassung hängt **nicht** an `--surface`/`--border`, sondern an
+  später gesetzten, harten Regeln. `header.hdr`, `nav.tabs`, `aside.sidebar`.
+- Ein heller Skin existiert bereits: `body.dp-chrome-hell`, 103 Regeln,
+  API `window._dpDispSkin('hell'|'obsidian')`, Merker `dp_chrome_hell`.
+- **Bei gleicher Spezifität gewinnt die spätere Regel.** Lieber Spezifität
+  erhöhen (`#app[...]`) als auf Ladereihenfolge bauen.
+- **`:not(#id)` erbt ID-Spezifität** — nie Sammelregeln auf Container-Kinder.
+- **Flex-Kinder in `overflow:auto`-Containern schrumpfen, statt zu scrollen.**
+  Der Inhalt wird dann still abgeschnitten → `flex:0 0 auto` setzen.
+- **`align-items:center` lässt leere `::before`-Pseudoelemente auf null Höhe
+  schrumpfen** → `align-self:stretch`, sonst ist der Verlauf unsichtbar.
+- `var()` funktioniert **nicht** in: SVG-Präsentationsattributen, Canvas,
+  Leaflet, jsPDF, Data-URIs.
+
+### JavaScript
+- **`_euro(null)` ergibt `"–"` und ist damit truthy** — nie `||`-Fallback.
+- **`Number(null)` ist 0 und besteht `Number.isFinite`** — erst auf
+  Abwesenheit prüfen, dann rechnen.
+- Baujahr und Jahreszahlen nie durch `Intl.NumberFormat`.
+- `window._currentObjKey` ist die einzige verlässliche Objektreferenz.
+- `Auth.apiCall` stringifiziert selbst; `getApiBase()` enthält `/api/v1`.
+- **Nacktes `fetch` umgeht den zentralen 401-Handler.**
+- `dp:plan-ready` (`subscription.js:154`) statt Timer oder Polling.
+- **Unbekannter Feature-Schlüssel = für jeden `false`**, auch für Pro.
+
+### Struktur der Objektkarte (gemessen, nicht angenommen)
+```
+.sb-card
+  .sbc-score-overlay          <- DIREKTES Kind der Karte
+    .sbc-mini-score (Ring-SVG + .sbc-mini-score-num)
+    .sbc-score-label
+  .sbc-top
+    .sbc-thumb (.sbc-thumb-empty > .sbc-thumb-icon | .sbc-thumb-photo)
+    .sbc-top-body
+      .sbc-top-line1 (.sbc-seq .sbc-ai-badge .sbc-ds2-hint .sbc-arrow)
+      .sbc-address
+      .sbc-halter
+      .sbc-kp-row > .sbc-kp   <- der PREIS
+  .sbc-mini-grid              <- BEHÄLTER der drei Kacheln
+    .sbcm[data-mode] x3       <- die Kacheln
+  .sbc-actions                position:absolute
+```
+Gebaut wird sie in `js/storage.js` von `_renderRichCard()` ab Z.866.
+
+### Bash und Node
+- `grep -q X && { exit 1; }` bricht unter `set -e` ab, wenn grep **nichts**
+  findet — also im guten Fall. Die if-Form tut das nicht.
+- `grep -c` mit null Treffern gibt Rückgabewert 1 → `|| true`.
+- **`grep -q` in einer Pipe kappt die Pipe** — der Sender stirbt an
+  `BrokenPipeError`. Ausgabe erst in eine Datei, dann zählen.
+- Marktbericht-Backend ist **ESM** → `package.json` mit `{"type":"module"}`
+  in jede Arbeitskopie unter `/tmp`.
+- `node --check` prüft nur Syntax. **Verträge prüft nur ein echter Lauf.**
+- `.env` lässt sich **nicht** mit `source` einlesen. `$` im Wert → `$$`.
+- `docker compose up -d` erzeugt den Container **nicht** neu, wenn sich die
+  Konfiguration nicht geändert hat → `--force-recreate`. `printenv` **im**
+  Container ist die Wahrheit.
+- Kein `#` in Einzeiler-Pastes, kein `!` in doppelten Quotes.
+
+---
+
+## Marke und Design
+
+**Farben:** Obsidian `#050505` · Gold `#C9A84C` mit `#E8CC7A` hell und
+`#b8932f` dunkel · Grün `#3FA56C` · Rot `#B8625C` / `#D8564C` ·
+Creme `#FDFCFA` · Karte `#FBF6E9`.
+Runway: `linear-gradient(110deg, #E8CC7A, #C9A84C 55%, #b8932f)`.
+**`--ch=#2A2727` nie auf Obsidian.**
+
+**Schriften:** Space Grotesk (Display) · JetBrains Mono (Mono/Labels) ·
+Inter (Body) · Cormorant Garamond (Serif).
+
+**Bildsprache Luftfahrt durchgehend:** Kerosin (KI-Guthaben) · Cockpit ·
+Boarding / QuickBoarding · Co-Pilot · Runway · Pre-Flight · Score-Dial.
+
+**Score-Stufen:** STARK / SOLIDE / SCHWACH bei ≥ 70 / ≥ 50 / < 50.
+
+### Whitelabel-Pflicht
+Jedes Gold-Literal steht als `var(--wl-<hex>, #<hex>)`. Tokens stehen in
+**keinem** `:root`; nur `whitelabel-override.js` setzt sie.
+`DealPilotWhitelabel.apply()` setzt `--gold`, `--gold-hi/-lo/-l/-2/-3/-bg/-d/-soft`,
+`--obsidian` und 25 `--wl-<hex>`-Tokens am `<html>`.
+Vor jedem Rollout: `python3 tools/gold-audit.py`, RC=0 ist sauber.
+**Statusfarben nie tokenisieren** — Grün und Rot bleiben in jeder Marke gleich.
+
+**Anbieter-Neutralität:** Sprengnetter und PriceHubble nie namentlich nach
+außen — „unabhängige Bewertungspartner". ImmoMetrica darf genannt werden.
+
+---
+
+## Wertermittlung (Marktbericht)
+
+**Modellkonformität ist das Leitprinzip** (§ 10 ImmoWertV). Jeder Parameter
+trägt einen Modellvermerk.
+
+**Der Prüfmaßstab ist das Anwendungsbeispiel des amtlichen Dokuments** — nie
+eine selbst ausgerechnete Zahl.
+
+- **Kein Verfahren rechnet halb.** Fehlt eine Pflichtangabe, erscheint das
+  Verfahren nicht.
+- **Wo die Quelle endet, endet die Rechnung.**
+- **Kein Treffer heißt kein Wert** — nie ein Nachbarkreis, nie ein Landesmittel.
+- Jede Zahl trägt Herkunft: Stufe A–E, Modellvermerk, `indikativ`, Ausschuss.
+- Eine Restnutzungsdauer für alle Verfahren.
+- BWK-Quoten stehen auf dem **gesamten** Rohertrag inklusive Stellplätzen.
+- Verwaltungskosten je **bewerteter** Einheit.
+- ETW ohne Miteigentumsanteil: **kein** Bodenwert.
+- Nur der **rentierliche** Bodenwert wird verzinst (§ 41).
+
+**Testobjekte für jede Prüfstrecke:**
+- **Hüllhorst**, Hermannstr. 9, 32609, ETW 165 m², Bj 1968 — Sachwert
+  305.937 / 348.687 €, Zinsanpassung 2,56 %, Miete 4,83 €/m²
+- **Löhner Str. 278**, 32120 Hiddenhausen, ZFH 233 m², Bj 1964 —
+  Verkehrswert 350.094,36 €, BGF 346,62 m², Bodenwert 144.840 €
+
+---
+
+## Auslieferung von Paketen
+
+- **`apply.sh` = alles oder nichts:** Kopien unter `/tmp` patchen, alle
+  Prüfungen, dann tauschen.
+- **Anker:** Python `str_replace` mit `count == 1` — Fehltreffer bricht ab,
+  nichts wird geschrieben. **Pfadbasiert routen, nicht per basename.**
+- **Marker sagen „hier war ich", nicht „hier ist alles gut."** Marker gehören
+  in Kommentare, **nie in Nutztext**.
+- **Backups `.pre-<paket>` nur anlegen, wenn keins existiert** — nie
+  überschreiben.
+- **Rollback über `git checkout --`**, nicht über die Backups.
+- **Prüfstrecke vor jeder Auslieferung:** `node --check`, Doppellauf muss
+  `skip` melden, echter Funktionslauf gegen das Anwendungsbeispiel,
+  Kettenprüfung (kommt der Wert an?), Klammerbilanz.
+- **Beweisen statt behaupten.** Untestbares ehrlich als Staging-Abnahmepunkt
+  kennzeichnen.
