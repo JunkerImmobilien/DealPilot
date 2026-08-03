@@ -30,6 +30,16 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     + 'manche Gutachterausschüsse geben stattdessen feste Beträge vor '
     + '(Minden-Lübbecke: Kanal 2.900 €, Einfahrt 2.500 €, Terrasse 2.000 €). '
     + 'Ist oben ein Eurobetrag eingetragen, hat der Vorrang.',
+  /* v1074-WAUS9-10 · Hilfen fuer die neuen Felder. */
+  ausstGewerk: 'Feinere Alternative zur glatten Standardstufe nach SW-RL: je '
+    + 'Gewerk eine Stufe 1–5, halbe Stufen erlaubt. Gerechnet wird nur, wenn '
+    + 'alle neun Gewerke gesetzt sind — sonst gilt die glatte Standardstufe '
+    + 'oben. Die Gewichte stehen in der Feldbezeichnung (Außenwände 23 % … '
+    + 'sonstige Technik 6 %). Quelle: SW-RL 2012 Anlage 2.',
+  bauteilHk: 'Herstellungskosten zum heutigen Stichtag, ohne erneute '
+    + 'Indexierung. Sie unterliegen derselben Alterswertminderung wie das '
+    + 'Gebäude. Größenordnung Beispiel Löhner Straße: Gauben 51.000, '
+    + 'Balkone 13.000, Vordach 10.000, Terrassen 18.000, Sonstiges 3.000 €.',
 });
 
 /* wertermittlung.js — Zielfrage, Stufenfelder, Pflichtfeld-Ampel.
@@ -184,6 +194,36 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
                    ['5', '5 \u00b7 stark gehoben']],
         hilfe: 'standardstufe' },
 
+      /* v1074-WAUS9-6 · Ausstattung nach Gewerken (SW-RL 2012 Anlage 2).
+       * Alle neun oder gar nicht — sonst gilt die glatte Stufe oben. */
+      { id: 'ausstAussenwaende', label: 'Au\u00dfenw\u00e4nde \u00b7 23 %', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstDach', label: 'Dach \u00b7 15 %', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstFenster', label: 'Fenster/Au\u00dfent\u00fcren \u00b7 11 %', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstInnenwaende', label: 'Innenw\u00e4nde \u00b7 11 %', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstDecken', label: 'Decken/Treppen \u00b7 11 %', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstFussboeden', label: 'Fu\u00dfb\u00f6den \u00b7 5 %', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstSanitaer', label: 'Sanit\u00e4r \u00b7 9 %', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstHeizung', label: 'Heizung \u00b7 9 %', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+      { id: 'ausstTechnik', label: 'sonst. Technik \u00b7 6 %', typ: 'select',
+        opt: [['', '\u2013'], ['1', '1'], ['1.5', '1,5'], ['2', '2'], ['2.5', '2,5'], ['3', '3'], ['3.5', '3,5'], ['4', '4'], ['4.5', '4,5'], ['5', '5']],
+        wenn: function () { return !istWohnung(); }, hilfe: 'ausstGewerk' },
+
       /* v1062-WAUS-1 · Beide Betraege gehen seit jeher durch nhk2010.js und
        * hatten nie ein Feld — der Sachwert rechnete sie mit 0.
        * KEINE Baunebenkosten hier: die NHK-2010-Kennwerte enthalten sie
@@ -193,6 +233,19 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
         platzhalter: 'Wege, Einfriedung, Ver- und Entsorgung' },
       { id: 'besBauteile', label: 'Besondere Bauteile (\u20ac)', typ: 'number',
         platzhalter: 'z. B. Aufzug \u00b7 ohne Baunebenkosten (in NHK enthalten)' },
+
+      /* v1074-WBTL-6 · Sonstige Bauteile: Herstellungskosten HEUTE,
+       * gleiche Alterswertminderung wie das Gebaeude (vor dem Abzug). */
+      { id: 'btlGauben', label: 'Dachgauben (\u20ac)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
+      { id: 'btlBalkone', label: 'Balkone (\u20ac)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
+      { id: 'btlVordach', label: 'Vord\u00e4cher / Eingangsvorbau (\u20ac)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
+      { id: 'btlTerrassen', label: 'Terrassen (\u20ac)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
+      { id: 'btlSonstige', label: 'Weitere Bauteile (\u20ac)', typ: 'number',
+        wenn: function () { return !istWohnung(); }, hilfe: 'bauteilHk' },
 
       /* Korrekturfaktor aus Anlage 4, Fussnote 5 — lag fertig im Rechenkern
        * und hatte nie ein Feld. Die Beschriftung erklaert ihn, statt nur
@@ -650,6 +703,36 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
        * Bericht nicht — genau wie v1055 es fuer drei andere Felder gelernt hat. */
       aussenanlagen: parseFloat(wert('aussenanlagen')) || null,
       bes_bauteile: parseFloat(wert('besBauteile')) || null,
+      /* v1074-WAUS9-7 · payload() ist die einzige Tuer zum Bericht —
+       * dieselbe Lehre wie v1055, v1062, v1067. */
+      ausstattung: (function () {
+        var m = { aussenwaende: 'ausstAussenwaende', dach: 'ausstDach',
+                  fenster_tueren: 'ausstFenster', innenwaende: 'ausstInnenwaende',
+                  decken_treppen: 'ausstDecken', fussboeden: 'ausstFussboeden',
+                  sanitaer: 'ausstSanitaer', heizung: 'ausstHeizung',
+                  sonstige_technik: 'ausstTechnik' };
+        var o = {}, n = 0;
+        Object.keys(m).forEach(function (k) {
+          var v = parseFloat(wert(m[k]));
+          if (isFinite(v) && v >= 1 && v <= 5) { o[k] = v; n++; }
+        });
+        return n > 0 ? o : null;
+      })(),
+      bauteile_hk: (function () {
+        var s = 0;
+        ['btlGauben', 'btlBalkone', 'btlVordach', 'btlTerrassen', 'btlSonstige']
+          .forEach(function (id) { s += parseFloat(wert(id)) || 0; });
+        return s > 0 ? Math.round(s) : null;
+      })(),
+      bauteile_detail: (function () {
+        var d = { gauben: parseFloat(wert('btlGauben')) || null,
+                  balkone: parseFloat(wert('btlBalkone')) || null,
+                  vordaecher: parseFloat(wert('btlVordach')) || null,
+                  terrassen: parseFloat(wert('btlTerrassen')) || null,
+                  sonstige: parseFloat(wert('btlSonstige')) || null };
+        var hat = Object.keys(d).some(function (k) { return d[k]; });
+        return hat ? d : null;
+      })(),
       bwk_modus: stufe() >= 3 ? 'normiert' : null,
     };
   }
@@ -689,6 +772,112 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
+
+  /* v1075-WUI-1 · Feinjustierung als Klappbloecke. Rein darstellend:
+   * die 14 Felder aus v1074 werden nach jedem Zeichnen in zwei
+   * zugeklappte Container verschoben (Wrapper wm-w-<id> bleiben ganz,
+   * payload() liest weiter ueber die ids). Zugeklappt gilt die glatte
+   * Standardstufe; der Chip im Kopf zeigt den Zustand ohne Aufklappen. */
+  (function () {
+    var GEW = ['ausstAussenwaende', 'ausstDach', 'ausstFenster', 'ausstInnenwaende',
+      'ausstDecken', 'ausstFussboeden', 'ausstSanitaer', 'ausstHeizung', 'ausstTechnik'];
+    var GWT = { ausstAussenwaende: 23, ausstDach: 15, ausstFenster: 11, ausstInnenwaende: 11,
+      ausstDecken: 11, ausstFussboeden: 5, ausstSanitaer: 9, ausstHeizung: 9, ausstTechnik: 6 };
+    var BTL = ['btlGauben', 'btlBalkone', 'btlVordach', 'btlTerrassen', 'btlSonstige'];
+    var CSS_KOPF = 'display:flex;align-items:center;gap:9px;padding:10px 12px;cursor:pointer;'
+      + 'user-select:none;border:1.5px solid rgba(42,39,39,.14);border-radius:10px;background:#fff';
+    var CSS_CHIP_AUS = 'margin-left:auto;font:600 10px monospace;letter-spacing:.4px;padding:3px 8px;'
+      + 'border-radius:99px;background:#FBF6E9;color:#8a8378;border:1px solid rgba(42,39,39,.14);white-space:nowrap';
+    var CSS_CHIP_AN = 'margin-left:auto;font:600 10px monospace;letter-spacing:.4px;padding:3px 8px;'
+      + 'border-radius:99px;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),'
+      + 'var(--wl-c9a84c, #C9A84C) 60%,var(--wl-b8932f, #b8932f));color:#1a1407;'
+      + 'border:1px solid var(--wl-b8932f, #b8932f);white-space:nowrap';
+    /* v1076-WUI-2 · Kopf einzeilig (ellipsis), Inhalt als Raster statt
+     * Endlosliste — Befund vom 03.08.: die neun Felder liefen in voller
+     * Breite untereinander, der Kopf brach vierzeilig um. */
+    function kasten(id, titel, sub) {
+      if (!document.getElementById('wm-klapp-css')) {
+        var st = document.createElement('style');
+        st.id = 'wm-klapp-css';
+        st.textContent = '.wm-klapp-in{display:none;grid-template-columns:repeat(3,minmax(0,1fr));'
+          + 'gap:7px 8px;padding:9px 2px 4px}'
+          + '#wm-klapp-bauteile .wm-klapp-in{grid-template-columns:repeat(2,minmax(0,1fr))}'
+          + '.wm-klapp-in .wm-f{margin:0}'
+          + '.wm-klapp-in .wm-f label{font-size:10px;line-height:1.3;display:block;min-height:26px}'
+          + '.wm-klapp-in .wm-f select,.wm-klapp-in .wm-f input{width:100%;padding:6px;font-size:12.5px}';
+        document.head.appendChild(st);
+      }
+      var k = document.createElement('div');
+      k.id = id; k.style.cssText = 'margin:10px 0';
+      k.innerHTML = '<div class="wm-klapp-kopf" style="' + CSS_KOPF + '">'
+        + '<span class="wm-klapp-pf" style="color:var(--wl-b8932f, #b8932f);font-size:10px;flex-shrink:0">\u25b6</span>'
+        + '<span style="flex:1;min-width:0">'
+        + '<b style="font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + titel + '</b>'
+        + '<span style="font-size:10px;color:#8a8378;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + sub + '</span>'
+        + '</span>'
+        + '<span class="wm-klapp-chip" style="' + CSS_CHIP_AUS + '"></span></div>'
+        + '<div class="wm-klapp-in"></div>';
+      k.querySelector('.wm-klapp-kopf').addEventListener('click', function () {
+        var inn = k.querySelector('.wm-klapp-in');
+        var offen = inn.style.display === 'grid';
+        inn.style.display = offen ? '' : 'grid';
+        k.querySelector('.wm-klapp-pf').textContent = offen ? '\u25b6' : '\u25bc';
+      });
+      return k;
+    }
+    function chips() {
+      var k1 = $('wm-klapp-gewerke'), k2 = $('wm-klapp-bauteile');
+      if (k1) {
+        var sum = 0, n = 0;
+        GEW.forEach(function (id) {
+          var v = parseFloat(wert(id));
+          if (isFinite(v) && v >= 1) { sum += v * GWT[id] / 100; n++; }
+        });
+        var c = k1.querySelector('.wm-klapp-chip');
+        if (n === 9) { c.style.cssText = CSS_CHIP_AN; c.textContent = 'GEWOGEN \u00b7 STUFE ' + sum.toFixed(2).replace('.', ','); }
+        else if (n > 0) { c.style.cssText = CSS_CHIP_AUS; c.textContent = n + ' / 9 \u2014 NOCH GLATTE STUFE'; }
+        else { c.style.cssText = CSS_CHIP_AUS; c.textContent = 'AUS \u00b7 GLATTE STUFE'; }
+      }
+      if (k2) {
+        var s = 0;
+        BTL.forEach(function (id) { s += parseFloat(wert(id)) || 0; });
+        var c2 = k2.querySelector('.wm-klapp-chip');
+        c2.style.cssText = s > 0 ? CSS_CHIP_AN : CSS_CHIP_AUS;
+        c2.textContent = s > 0 ? ('+ ' + Math.round(s).toLocaleString('de-DE') + ' \u20ac') : 'KEINE';
+      }
+    }
+    function bauen() {
+      var e1 = $('wm-w-ausstAussenwaende');
+      if (e1 && !$('wm-klapp-gewerke')) {
+        var k = kasten('wm-klapp-gewerke', 'Feinjustierung nach Gewerken',
+          'SW-RL Anlage 2 \u00b7 zugeklappt gilt die glatte Stufe');
+        e1.parentNode.insertBefore(k, e1);
+        var inn = k.querySelector('.wm-klapp-in');
+        GEW.forEach(function (id) { var w = $('wm-w-' + id); if (w) inn.appendChild(w); });
+      }
+      var b1 = $('wm-w-btlGauben');
+      if (b1 && !$('wm-klapp-bauteile')) {
+        var k2 = kasten('wm-klapp-bauteile', 'Sonstige Bauteile',
+          'HK heute \u00b7 gleiche Alterswertminderung wie das Geb\u00e4ude');
+        b1.parentNode.insertBefore(k2, b1);
+        var in2 = k2.querySelector('.wm-klapp-in');
+        BTL.forEach(function (id) { var w = $('wm-w-' + id); if (w) in2.appendChild(w); });
+      }
+      chips();
+    }
+    document.addEventListener('change', function (e) {
+      if (e.target && /^(ausst|btl)/.test(e.target.id || '')) chips();
+    });
+    document.addEventListener('input', function (e) {
+      if (e.target && /^btl/.test(e.target.id || '')) chips();
+    });
+    var mo = new MutationObserver(function () {
+      if (($('wm-w-ausstAussenwaende') && !$('wm-klapp-gewerke'))
+        || ($('wm-w-btlGauben') && !$('wm-klapp-bauteile'))) bauen();
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+    setTimeout(bauen, 0);
+  })();
 
   window.Wertermittlung = { payload: payload, stufe: stufe, setStufe: setStufe, neuZeichnen: zeichnen };
 })();

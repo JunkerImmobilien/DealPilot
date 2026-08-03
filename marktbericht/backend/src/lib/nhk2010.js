@@ -524,10 +524,16 @@ export const NHK_2010 = {
 
   /* Gewichtung der neun Gewerke fuer die Standardstufe (Anlage 4).
    * Ebenfalls gegen den Verordnungstext zu pruefen. */
+  /* v1074-WAUS9-1 · Waegungsanteile der neun Gewerke, SW-RL 2012 Anlage 2
+   * Tabelle 1 (BAnz AT 18.10.2012 B1). Summe exakt 100. Belegt gegen das
+   * Anwendungsbeispiel derselben Anlage: gewogener Kostenkennwert 880 EUR/m2
+   * BGF fuer Gebaeudeart 1.01 — nachgerechnet in gewogenerKennwert().
+   * Die Verordnung gibt die Anteile nur fuer Ein- und Zweifamilienhaeuser;
+   * fuer andere Gebaeudearten bleibt der gewogene Weg deshalb aus. */
   gewerke_gewicht: {
-    aussenwaende: null, dach: null, fenster_tueren: null,
-    innenwaende: null, decken_treppen: null, fussboeden: null,
-    sanitaer: null, heizung: null, sonstige_technik: null,
+    aussenwaende: 23, dach: 15, fenster_tueren: 11,
+    innenwaende: 11, decken_treppen: 11, fussboeden: 5,
+    sanitaer: 9, heizung: 9, sonstige_technik: 6,
   },
 
   /* Korrekturfaktoren aus Anlage 4, Fussnoten zu den Wohngebaeuden.
@@ -589,6 +595,56 @@ export function nhkKennwert(typ, kellerDg, stufe) {
   return Number.isFinite(v) ? v : null;
 }
 
+/* v1074-WAUS9-2 · Gewogener Kostenkennwert nach SW-RL 2012 Anlage 2:
+ * je Gewerk eine Standardstufe (halbe Stufen erlaubt, linear interpoliert),
+ * der Kennwert ist die Summe der gewichteten Einzelkennwerte. Belegt gegen
+ * das Anwendungsbeispiel der Anlage 2, Gebaeudeart 1.01: 880 EUR/m2 BGF.
+ * NUR fuer die Gebaeudearten 1. bis 3. — die Verordnung gibt die
+ * Waegungsanteile nur fuer Ein- und Zweifamilienhaeuser. */
+export function gewogenerKennwert(typ, ausstattung) {
+  if (!/^[123]\./.test(String(typ || ''))) {
+    return { verfuegbar: false,
+      grund: 'Wägungsanteile sind nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser belegt.' };
+  }
+  const G = NHK_2010.gewerke_gewicht;
+  const keys = Object.keys(G);
+  const a = ausstattung || {};
+  const fehlt = keys.filter((k) => {
+    const v = Number(a[k]);
+    return !(Number.isFinite(v) && v >= 1 && v <= 5);
+  });
+  if (fehlt.length) {
+    return { verfuegbar: false, fehlt,
+      grund: 'Ausstattung nach Gewerken unvollständig ('
+        + (keys.length - fehlt.length) + ' von 9 Stufen angegeben).' };
+  }
+  const kwStufe = (st) => {
+    const lo = Math.floor(st), hi = Math.ceil(st);
+    const w1 = NHK_2010.WERTE[typ + '|' + lo], w2 = NHK_2010.WERTE[typ + '|' + hi];
+    if (!Number.isFinite(w1) || !Number.isFinite(w2)) return null;
+    return w1 + (w2 - w1) * (st - lo);
+  };
+  let kw = 0, stufe = 0;
+  const teile = [];
+  for (const k of keys) {
+    const st = Number(a[k]);
+    const einzel = kwStufe(st);
+    if (einzel == null) {
+      return { verfuegbar: false,
+        grund: 'Für ' + typ + ' fehlt ein Kostenkennwert der Stufe ' + st + '.' };
+    }
+    kw += (G[k] / 100) * einzel;
+    stufe += (G[k] / 100) * st;
+    teile.push({ gewerk: k, gewicht_pct: G[k], stufe: st,
+      kennwert_eur_qm: Math.round(einzel * 100) / 100 });
+  }
+  return { verfuegbar: true,
+    /* Rundung auf volle Euro wie im Anwendungsbeispiel der SW-RL (880). */
+    kennwert_eur_qm: Math.round(kw),
+    gewogene_stufe: Math.round(stufe * 100) / 100, teile,
+    quelle: 'SW-RL 2012 Anlage 2 (Wägungsanteile), NHK 2010' };
+}
+
 /* Korrekturfaktoren fuer Wohngebaeude (Anlage 4, Fussnoten).
  * Wohnungsgroesse linear zwischen 35, 50 und 135 m2 WF je WE. */
 export function korrekturWohnung({ wohnflaeche_je_we, grundriss }) {
@@ -648,7 +704,24 @@ export function sachwert(ein, bodenwertErgebnis, param) {
     return out;
   }
 
-  const kw = nhkKennwert(ein.nhk_typ, ein.keller_dg, ein.standardstufe);
+  /* v1074-WAUS9-8 · Erst der gewogene Ausstattungsgrad (alle neun
+   * Gewerke), sonst die glatte Standardstufe. KEIN halber Weg: fehlt ein
+   * Gewerk, wird glatt gerechnet und der Umstand ausgewiesen. */
+  let _gewogen = null;
+  if (ein.ausstattung) {
+    const _g = gewogenerKennwert(ein.nhk_typ, ein.ausstattung);
+    if (_g.verfuegbar) _gewogen = _g;
+    else out.hinweise.push('Ausstattung nach Gewerken nicht verwendet: ' + _g.grund
+      + ' Gerechnet wurde mit der glatten Standardstufe.');
+  }
+  const kw = _gewogen ? _gewogen.kennwert_eur_qm
+    : nhkKennwert(ein.nhk_typ, ein.keller_dg, ein.standardstufe);
+  if (_gewogen) {
+    out.ausstattung_gewogen = { gewogene_stufe: _gewogen.gewogene_stufe,
+      teile: _gewogen.teile, quelle: _gewogen.quelle };
+    out.hinweise.push('Kostenkennwert gewogen aus neun Gewerken (gewogene Standardstufe '
+      + String(_gewogen.gewogene_stufe).replace('.', ',') + ') nach SW-RL 2012 Anlage 2.');
+  }
   if (kw == null) {
     const istEfh = /^[123]\./.test(String(ein.nhk_typ || ''));
     out.grund = istEfh
@@ -678,11 +751,24 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   if (!index) { out.grund = 'Ohne Baupreisindex kein Sachwert.'; return out; }
   const regional = Number(ein.regionalfaktor) || 1.0;
 
-  const herst = Math.round(kw * f.wert * index * regional * korr);
+  let herst = Math.round(kw * f.wert * index * regional * korr);   /* v1074-WBTL-2 · let: Bauteile kommen dazu */
   out.staffel.push({ pos: `Normalherstellungskosten (${kw} €/m² BGF × ${f.wert} m²)`, wert: Math.round(kw * f.wert) });
   if (korr !== 1) out.staffel.push({ pos: `× Korrektur Wohnungsgröße / Grundriss`, faktor: korr, wert: null });
   out.staffel.push({ pos: `× Baupreisindex ${index}`, faktor: index, wert: null });
   if (regional !== 1) out.staffel.push({ pos: `× Regionalfaktor ${regional}`, faktor: regional, wert: null });
+  /* v1074-WBTL-1 · Sonstige Bauteile (Gauben, Balkone, Vordaecher,
+   * Terrassen) als HERSTELLUNGSKOSTEN zum Stichtag — sie unterliegen
+   * derselben Alterswertminderung wie das Gebaeude und stehen deshalb VOR
+   * dem Abzug. bes_bauteile weiter unten bleibt der Zeitwert-Weg (Aufzug
+   * u. ae.) und steht NACH dem Abzug. Eingaben sind heutige Preise; der
+   * Baupreisindex wird NICHT noch einmal angewandt. */
+  const _bauteile = Math.round(Number(ein.bauteile_hk) || 0);
+  if (_bauteile > 0) {
+    herst += _bauteile;
+    out.staffel.push({ pos: '+ sonstige Bauteile (Gauben, Balkone, Vordächer, Terrassen)', wert: _bauteile });
+    out.bauteile_hk_eur = _bauteile;
+    if (ein.bauteile_detail) out.bauteile_detail = ein.bauteile_detail;
+  }
   out.staffel.push({ pos: '= Herstellungskosten Gebäude', wert: herst, summe: true });
 
   const gnd = Number(ein.gnd_jahre), rnd = Number(ein.rnd_jahre);

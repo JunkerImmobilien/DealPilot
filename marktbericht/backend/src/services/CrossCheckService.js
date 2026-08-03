@@ -134,7 +134,7 @@ export const CrossCheckService = {
     const _bgfWhg = Number((p && p.bgf_direkt) || ref.bgf || 0);
     const _nhkTypWhg = (u) => (u > 20 ? '4.3' : (u > 6 ? '4.2' : '4.1'));
     if (NHK_2010.geprueft && ref.property_type && (!istWohnung || _bgfWhg > 0)) {
-      const _sw = nhkSachwert({
+      let _sw = nhkSachwert({   /* v1076-WLET-1 · weiter unten steht _sw = _sw2 */
         nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
           || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null), keller_dg: (p && p.keller_dg) || ref.keller_dg,
         standardstufe: (p && p.standardstufe) || ref.standardstufe,
@@ -148,6 +148,10 @@ export const CrossCheckService = {
          * Modernisierungspunkte vor, gilt Anlage 2 fuer BEIDE. */
         gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
         bes_bauteile: (p && p.bes_bauteile) || null, aussenanlagen: (p && p.aussenanlagen) || null,
+        /* v1074-WAUS9-5 · Kette. */
+        ausstattung: (p && p.ausstattung) || ref.ausstattung || null,
+        bauteile_hk: (p && p.bauteile_hk) || ref.bauteile_hk || null,
+        bauteile_detail: (p && p.bauteile_detail) || ref.bauteile_detail || null,
         /* v1072-WGAR-5 · Die Kette von A nach B — ohne diese vier Zeilen
          * waere der ganze Garagen- und Aussenanlagenblock wirkungslos. */
         aussenanlagen_pct: (p && p.aussenanlagen_pct) || ref.aussenanlagen_pct || null,
@@ -193,6 +197,17 @@ export const CrossCheckService = {
             gnd_jahre: GND_JAHRE, rnd_jahre: _rndEinheitlich(),
             bes_bauteile: (p && p.bes_bauteile) || null,
             aussenanlagen: (p && p.aussenanlagen) || null,
+            /* v1074-WFIX-1 · Der zweite Lauf (mit amtlichem Sachwertfaktor)
+             * kannte die v1072er-Felder nicht. Mit Garage oder Aussenanlagen-
+             * Prozent wich sein vorlaeufiger Sachwert vom ersten Lauf ab, und
+             * die Uebernahme-Bedingung verwarf den amtlichen Faktor still. */
+            aussenanlagen_pct: (p && p.aussenanlagen_pct) || ref.aussenanlagen_pct || null,
+            garagen_bgf_qm: (p && p.garagen_bgf_qm) || ref.garagen_bgf_qm || null,
+            garagen_stufe: (p && p.garagen_stufe) || ref.garagen_stufe || null,
+            /* v1074-WAUS9-9 · Kette, zweiter Lauf. */
+            ausstattung: (p && p.ausstattung) || ref.ausstattung || null,
+            bauteile_hk: (p && p.bauteile_hk) || ref.bauteile_hk || null,
+            bauteile_detail: (p && p.bauteile_detail) || ref.bauteile_detail || null,
           }, (p && p.bodenwert) || null, {
             sachwertfaktor: _swfTab.wert, stufe: _swfTab.stufe,
             quelle: _swfTab.quelle_text,
@@ -234,6 +249,16 @@ export const CrossCheckService = {
                 nicht_korrigiert: _swfTab.nicht_korrigiert || null }
             : null,
           verfahren: _sw.verfahren,
+          /* v1075-WHER-1 · Herkunft durchreichen: gewogene Stufe, Bauteile,
+           * Garage, Aussenanlagen, Hinweise. Die Staffel kam an, ihr Weg
+           * nicht — Zahlen ohne Herleitung sind im Dossier wertlos. */
+          hinweise: (_sw.hinweise && _sw.hinweise.length) ? _sw.hinweise : null,
+          ausstattung_gewogen: _sw.ausstattung_gewogen || null,
+          bauteile_hk_eur: _sw.bauteile_hk_eur != null ? _sw.bauteile_hk_eur : null,
+          bauteile_detail: _sw.bauteile_detail || null,
+          garage: _sw.garage || null,
+          aussenanlagen_eur: _sw.aussenanlagen_eur != null ? _sw.aussenanlagen_eur : null,
+          aussenanlagen_herkunft: _sw.aussenanlagen_herkunft || null,
           /* v1056-WSW-3 · Die Zwischenwerte, die die Karte braucht. */
           bodenwert_eur: _sw.bodenwert_eur != null ? _sw.bodenwert_eur : null,
           gebaeude_sachwert_eur: _sw.gebaeude_sachwert_eur != null ? _sw.gebaeude_sachwert_eur : null,
