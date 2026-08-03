@@ -3071,7 +3071,14 @@ async function exportPdf(out) {
       _irwOk
         ? 'Immobilienrichtwert ' + cc.irw.wert_qm + ' €/m² · Stichtag ' + (cc.irw.stichtag || '?')
         : 'Angebotspreise — keine beurkundeten Kaufpreise (§ 25 ImmoWertV)',
-      (!_irwOk && cc.irw && cc.irw.hinweis) ? 'Immobilienrichtwerte: ' + cc.irw.grund : null,
+      /* v1061-WTXT-1 · Hier stand der rohe Bezeichner: "Immobilienrichtwerte:
+       * nicht_beschlossen". Ein Datenbankwert im Kundenbericht. */
+      (!_irwOk && cc.irw) ? ({
+        nicht_beschlossen: 'Immobilienrichtwerte für diese Gemeinde noch nicht beschlossen',
+        kein_treffer: 'kein Immobilienrichtwert an dieser Stelle',
+        kein_wert: 'Immobilienrichtwert ohne Betrag',
+        technisch: 'Immobilienrichtwert derzeit nicht abrufbar',
+      }[cc.irw.grund] || null) : null,
     ], true);
     card3(M + cardW + 6, 'SACHWERT · INDIKATIV', sw.available ? sw.value_eur : null, sw.available ? [
       /* v1056-WKRT-1 · Die drei Felder gab es im Ergebnis nicht; die Karte
@@ -3105,7 +3112,12 @@ async function exportPdf(out) {
      * spiegel — im Prod-Bericht endet Seite 4 mit "Kein Gutachten n. § 194 Bau".
      * Jetzt auf die Blockbreite umbrochen. Bei einer Zeile ist y += 5 + 1*3 = 8,
      * also exakt der alte Wert; nur laengere Fussnoten schieben nach. */
-    const _fn = doc.splitTextToSize('Vereinfachte Verfahren n. ImmoWertV-Logik (indikativ): NHK 2010 ' + cc.assumptions.nhk_efh_bgf_eur + ' €/m² BGF × Baupreisindex ' +
+    const _fn = doc.splitTextToSize('Vereinfachte Verfahren n. ImmoWertV-Logik (indikativ): NHK 2010 ' +       /* v1061-WFUS-1 · Die Fussnote nannte 835 EUR/m2 (Stufe 3), gerechnet
+       * wurde mit 985 (Stufe 4). Wie bei Quote und Zinssatz: aus dem
+       * Ergebnis nehmen, nicht aus der Annahme. */
+((cc.sachwert && cc.sachwert.available && cc.sachwert.nhk_eur_qm_bgf)
+        ? cc.sachwert.nhk_eur_qm_bgf : cc.assumptions.nhk_efh_bgf_eur)
+      + ' €/m² BGF × Baupreisindex ' +
       /* v1050-WFUS-1 · Vorher stand hier der Modellvorgabewert, auch wenn
        * ganz anders gerechnet wurde: bei Huellhorst 23 statt der aus der
        * Ernte stammenden 23,5 Prozent und 3,0 statt 2,2. Eine Annahme, die
@@ -3122,7 +3134,9 @@ async function exportPdf(out) {
       + (((cc.ertragswert && cc.ertragswert.available && cc.ertragswert.liegenschaftszins_pct != null)
           ? cc.ertragswert.liegenschaftszins_pct
           : (cc.assumptions.liegenschaftszins * 100)).toLocaleString('de-DE'))
-      + ' % · Sachwertfaktor ' + cc.assumptions.sachwertfaktor + '. Kein Gutachten n. § 194 BauGB.', blockW);
+      + ' % · ' + ((cc.sachwert && cc.sachwert.vorlaeufig)
+        ? 'ohne Sachwertfaktor'   /* v1061-WFUS-2 */
+        : 'Sachwertfaktor ' + cc.assumptions.sachwertfaktor) + '. Kein Gutachten n. § 194 BauGB.', blockW);
     doc.text(_fn, M, y + 3);
     y += 5 + _fn.length * 3;
   }
