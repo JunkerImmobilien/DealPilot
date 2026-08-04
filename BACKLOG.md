@@ -27,48 +27,8 @@ Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
 
 ---
 
-### 1 · Neues Logo einsetzen, altes entfernen
 
-**Ganz oben, weil es überall sichtbar ist und Platz schafft.** Die Messung aus
-der erledigten Fußzeilen-Aufgabe hat es beziffert: der Logo-Header ist **201 px hoch** — ein Drittel
-des Handy-Viewports, bevor überhaupt ein Objekt zu sehen ist. Das ist der
-größte Einzelposten der festen Höhen, die dort oben stehen.
-
-**Die neuen Dateien liegen in `design/logo/`:**
-
-| Datei | Einsatz |
-|---|---|
-| `dealpilot-logo-rahmen-transparent.png` | **Standard** — auf dunklem Untergrund (Fassung DealPilot) |
-| `dealpilot-logo-rahmen-512.png` | Dunkles Logo mit Rahmen — auf **hellem** Untergrund (Kontor, Panel, Kanzlei …) |
-
-**Was zu tun ist:**
-1. Beide Dateien nach `frontend/assets/` kopieren
-2. `index.html:623` umstellen — heute `assets/dealpilot-logo-app.png`
-3. `_swapLogo()` in `settings.js:3120` auf die neuen Dateien zeigen lassen.
-   Die Funktion tauscht bereits zwischen hell und dunkel, sie braucht nur die
-   neuen Pfade — **keinen neuen Mechanismus bauen**
-4. Höhe in der Seitenleiste deutlich zurücknehmen: `.app-logo-simple`,
-   `.app-logo-simple-sidebar`, `.app-logo-simple-wrap-sidebar`, `.sb-header`.
-   Jeder gesparte Pixel kommt der Objektliste zugute — die Fußzeilen-Messung hat gezeigt,
-   dass es dort auf jeden Pixel ankommt
-5. Alte Dateien erst entfernen, **nachdem** geprüft ist, dass sie nirgends
-   sonst referenziert werden: `dealpilot-logo-app.png`,
-   `dealpilot-logo-app-light.png`. **`dealpilot-logo.png` wird von Landing und
-   PDFs genutzt — nicht anfassen.**
-
-**Muss auf allen Größen sitzen:**
-- **390 px** bei kleiner Viewport-Höhe (556 px war der engste gemessene Fall)
-- **820 px** und **1024 px** — im Drawer wie in der festen Spalte
-- **Eingeklappte Leiste** — dort passt nur die Bildmarke, keine Wortmarke
-- Keine Verzerrung, kein Beschnitt, scharf auf Retina
-
-**Fertig, wenn:** In jeder Fassung sitzt das passende Logo, `.sb-header` ist
-spürbar niedriger als 201 px, und auf 390 / 820 / 1024 px ist es sauber — auch
-eingeklappt und bei 556 px Höhe.
-
----
-
-### 2 · Aktionen-Akkordeon klappt in die falsche Richtung
+### 1 · Aktionen-Akkordeon klappt in die falsche Richtung
 
 `ui.js:1582` trägt den Kommentar „klappt NACH OBEN aus", der Trigger zeigt ▲ —
 das Verhalten widerspricht dem. Kommentare sind kein `getBoundingClientRect`.
@@ -78,7 +38,7 @@ scrollbar wenn es länger als der Schirm ist, und schließt bei Objektwahl.
 
 ---
 
-### 3 · Objektliste auf dem Tablet erreichbar machen
+### 2 · Objektliste auf dem Tablet erreichbar machen
 
 Im Band **769–900 px** liegt die Sidebar `position:fixed` bei `left:-280px`
 und wird ausschließlich über `.sidebar.open` geöffnet — eine Klasse, die **kein
@@ -107,7 +67,7 @@ mehrfach hintereinander, und beim Drehen auf 1024 px steht wieder die Spalte.
 
 ---
 
-### 4 · Kopfleiste auf dem Handy entlasten
+### 3 · Kopfleiste auf dem Handy entlasten
 
 Die Kopfleiste trägt zu viel für 390 px.
 
@@ -124,7 +84,7 @@ Objektname ist lesbar.
 
 ---
 
-### 5 · Alle neun Objekt-Tabs handytauglich
+### 4 · Alle neun Objekt-Tabs handytauglich
 
 Objekt · Investition · Miete · Finanzierung · Bewirtschaftung · Steuer ·
 Pilot-Analyse · Bewertung · Deal-Aktion.
@@ -147,7 +107,7 @@ bedienbar ist und kein Eingabefeld beim Antippen hineinzoomt.
 
 ---
 
-### 6 · Portfolio-Cockpit auf Handy und Tablet
+### 5 · Portfolio-Cockpit auf Handy und Tablet
 
 Eigene Ansicht mit eigenen Kacheln, Tabellen und Diagrammen — von den
 Tab-Regeln nicht miterfasst.
@@ -162,7 +122,7 @@ Tab-Regeln nicht miterfasst.
 
 ---
 
-### 7 · Marktbericht auf Handy und Tablet
+### 6 · Marktbericht auf Handy und Tablet
 
 Eigene Anwendung unter `frontend/marktbericht-app/` mit eigenem CSS.
 **Eigener Namensraum `vNNN` (Marktbericht) — nicht mit der Haupt-App mischen.**
@@ -181,7 +141,7 @@ angesehen werden kann.
 
 ---
 
-### 8 · Übrige Seiten und Bereiche
+### 7 · Übrige Seiten und Bereiche
 
 Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
@@ -190,7 +150,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 - Quick Boarding / Quick Check
 - Track Record
 - Datenraum
-- Netzwerk (siehe Punkt 9)
+- Netzwerk (siehe Punkt 8)
 - Anmeldung, Registrierung, Passwort vergessen
 - Preise und Upgrade-Fenster
 - Rechtliches (Impressum, Datenschutz, AGB)
@@ -202,7 +162,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
 ## Fehler
 
-### 9 · Partner-Netzwerk lädt nicht
+### 8 · Partner-Netzwerk lädt nicht
 
 **Zuerst Diagnose, kein Umbau.** Ursache ist unbekannt.
 
@@ -233,7 +193,7 @@ Zielzustand. Nicht danebenbauen, dagegen bauen.
 
 ---
 
-### 10 · Darstellungs-Modal mit festen UI-Vorlagen
+### 9 · Darstellungs-Modal mit festen UI-Vorlagen
 
 **Das Kernstück.** Heute ist die Oberfläche B2C-Optik: Obsidian, Gold,
 Leuchten, Verläufe. Ein Berater, der sie vor dem Mandanten öffnet, braucht
@@ -290,7 +250,7 @@ Objektkarten und Logo, die Farbeinstellungen greifen darüber,
 
 ---
 
-### 11 · Aktionen-Menü gliedern
+### 10 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -305,7 +265,7 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 12 · Objektkarten-Modi: Kompakt · Standard · Wallet
+### 11 · Objektkarten-Modi: Kompakt · Standard · Wallet
 
 Ein Markup, drei Optiken, **reines CSS**. Die gemessene Struktur von
 `_renderRichCard` (`storage.js:866`) steht in CLAUDE.md — nicht neu raten.
@@ -321,7 +281,7 @@ Desktop, Tablet und Handy.
 
 ---
 
-### 13 · Kartenfläche: Passend · Weiß
+### 12 · Kartenfläche: Passend · Weiß
 
 Karten folgen der Fassung oder bleiben weiß, auch im dunklen Modus.
 
@@ -330,7 +290,7 @@ scopen statt auf Ladereihenfolge bauen.
 
 ---
 
-### 14 · Zugang zum Darstellungs-Modal und Plan-Schranken
+### 13 · Zugang zum Darstellungs-Modal und Plan-Schranken
 
 Modal für **alle** Pläne öffnen, den **Farbteil darin** sperren. Heute bricht
 der Wrapper in `settings.js:3391` bei `currentKey() !== 'partner'` das ganze
@@ -353,9 +313,9 @@ Sonst laufen beide auseinander.
 
 ---
 
-### 15 · Handy-Sperre plan-abhängig lösen
+### 14 · Handy-Sperre plan-abhängig lösen
 
-Erst wenn 1–8 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
+Erst wenn 1–7 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
 
 Freigabe ab Partner-Plan, gilt auch für dessen Mandanten. Der Haken: die Sperre
@@ -414,5 +374,44 @@ nichts Falsches auf.
   unverändert.
 
   **Offen daneben:** Trefferfläche der Icon-Knöpfe ist 34 × 44 px — die Breite
-  liegt unter den 44 px aus Punkt 5, gehört dorthin. Der Logo-Header frisst mit
+  liegt unter den 44 px aus Punkt 4, gehört dorthin. Der Logo-Header frisst mit
   201 px weiter ein Drittel des Handy-Viewports (Optik, nicht angefasst).
+
+- [2026-08-04] **Neues Logo einsetzen, altes entfernen** — `7a86e7b`, `56a9c04`
+
+  **Befund (gemessen, nicht angenommen):** Der Logo-Kopf war **207 px** bei
+  390 px Viewport und **221 px** auf dem Desktop. Zwei Ursachen: das alte PNG
+  hat Seitenverhältnis **2,18 : 1**, und `.app-logo-simple-sidebar` stand auf
+  `width:100%` ohne Deckel (v931/v932/v937, alle mit `!important`) — das Logo
+  wuchs also mit jeder Leistenbreite und riss den Kopf mit hoch.
+
+  Zweiter Befund, beim Prüfen aufgefallen: `settings.js:3309` (v931)
+  **überschreibt** `_dpDispSkin` aus `:3104` und lässt den Logo-Tausch bewusst
+  weg („KEIN Logo-Tausch mehr"). Mit dem neuen Rahmen-Logo geht das nicht mehr
+  — dessen Wortmarke „Deal" ist **weiß**, auf hellem Grund wäre die halbe
+  Marke unsichtbar.
+
+  **Fix (v646, `style.css` W39→W40, `settings.js` W20→W22, `config.js` TR7→TR8):**
+  Neue Dateien `assets/dealpilot-logo-rahmen.png` (dunkler Grund) und
+  `assets/dealpilot-logo-rahmen-hell.png` (heller Grund), Seitenverhältnis
+  **3,18 : 1**. Dazu ein Breitendeckel (232 px Desktop · 220 px ≤ 900 px ·
+  176 px bei ≤ 620 px Höhe) — der hält nebenbei das 512-px-Asset auf ≥ 2× für
+  Retina. Spezifität `body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar`,
+  damit die späteren `!important`-Blöcke nicht gewinnen; die eingeklappte
+  Leiste ist ausgenommen und behält die DP-Bildmarke aus v610.
+
+  Der Logo-Tausch entscheidet jetzt **nach gemessener Hintergrundhelligkeit**
+  (`getComputedStyle` die Elternkette hoch bis zur ersten deckenden Farbe)
+  statt nach Klassen — greift damit auch bei frei gewählter Kopfleistenfarbe.
+  Eigenes Upload-Logo und Whitelabel-Logo bleiben unangetastet.
+
+  **Nachgemessen auf Staging (W40):** `.sb-header` 390 px → **87 px**
+  (vorher 207), 820 px → **84 px**, 1024 px → **88 px**, 390 × 556 px →
+  **65 px** und Nutzerblock weiterhin `abgeschnitten = 0 px`. Objektliste
+  wächst bei 390 px von 439 auf **559 px**. Eingeklappt unverändert
+  (Logo `display:none`, DP-Badge da, Leiste 66 px). Heller Kopf lädt
+  `-hell.png`, dunkler `-rahmen.png` — beides im Browser geprüft.
+
+  Alte Dateien `dealpilot-logo-app.png` und `dealpilot-logo-app-light.png`
+  entfernt; es verwiesen nur noch zwei Kommentare darauf.
+  `dealpilot-logo.png` (Landing, PDFs) unangetastet.
