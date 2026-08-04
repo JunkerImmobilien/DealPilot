@@ -7,6 +7,15 @@ Junker Digital sind Marken darunter.
 
 Antworte auf **Deutsch**, im Du.
 
+## Backlog und Vorlagen
+
+**Backlog:** `BACKLOG.md`. Der oberste offene Punkt wird bearbeitet. Nach
+Abschluss selbst nach "Fertig" verschieben, mit Datum und Commit-Hash,
+und committen.
+
+**Vorlagen:** `design/mockups/` zeigt den Zielzustand. Bei Layoutfragen dort
+nachsehen statt raten. `design/logo/` enthaelt die Logo-Varianten.
+Uebernommen wird die Gestaltung, nicht der Code — die Mockups sind Neubauten.
 ---
 
 ## Die fünf Regeln, die immer gelten
