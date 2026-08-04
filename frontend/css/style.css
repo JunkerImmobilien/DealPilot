@@ -36115,3 +36115,24 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
 @media (max-width: 768px) {
   #dp-app-legal-footer a { min-height: 44px !important; line-height: 20px !important; }
 }
+
+/* v650f: BMF-Modal auf dem Handy.
+   GEMESSEN bei 390px: .bmfmo-tabs ist 325px breit, flex-wrap:nowrap,
+   scrollWidth 549 - die vier Reiter liefen bis 579px hinaus und der
+   vierte war nicht erreichbar. Der Kasten selbst passt (374x793) und
+   .bmfmo-body scrollt bereits.
+   Loesung wie bei der Haupt-Tab-Leiste: waagerecht scrollen mit Snap. */
+@media (max-width: 768px) {
+  .bmfmo-tabs {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x proximity !important;
+    scrollbar-width: none !important;
+  }
+  .bmfmo-tabs::-webkit-scrollbar { display: none !important; }
+  .bmfmo-tab {
+    flex: 0 0 auto !important;
+    scroll-snap-align: start !important;
+    min-height: 44px !important;
+  }
+}
