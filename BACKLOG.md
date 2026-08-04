@@ -28,17 +28,8 @@ Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
 ---
 
 
-### 1 · Aktionen-Akkordeon klappt in die falsche Richtung
 
-`ui.js:1582` trägt den Kommentar „klappt NACH OBEN aus", der Trigger zeigt ▲ —
-das Verhalten widerspricht dem. Kommentare sind kein `getBoundingClientRect`.
-
-**Fertig, wenn:** Das Menü öffnet nach oben, steht vollständig im Bild, ist
-scrollbar wenn es länger als der Schirm ist, und schließt bei Objektwahl.
-
----
-
-### 2 · Objektliste auf dem Tablet erreichbar machen
+### 1 · Objektliste auf dem Tablet erreichbar machen
 
 Im Band **769–900 px** liegt die Sidebar `position:fixed` bei `left:-280px`
 und wird ausschließlich über `.sidebar.open` geöffnet — eine Klasse, die **kein
@@ -67,7 +58,7 @@ mehrfach hintereinander, und beim Drehen auf 1024 px steht wieder die Spalte.
 
 ---
 
-### 3 · Kopfleiste auf dem Handy entlasten
+### 2 · Kopfleiste auf dem Handy entlasten
 
 Die Kopfleiste trägt zu viel für 390 px.
 
@@ -84,7 +75,7 @@ Objektname ist lesbar.
 
 ---
 
-### 4 · Alle neun Objekt-Tabs handytauglich
+### 3 · Alle neun Objekt-Tabs handytauglich
 
 Objekt · Investition · Miete · Finanzierung · Bewirtschaftung · Steuer ·
 Pilot-Analyse · Bewertung · Deal-Aktion.
@@ -107,7 +98,7 @@ bedienbar ist und kein Eingabefeld beim Antippen hineinzoomt.
 
 ---
 
-### 5 · Portfolio-Cockpit auf Handy und Tablet
+### 4 · Portfolio-Cockpit auf Handy und Tablet
 
 Eigene Ansicht mit eigenen Kacheln, Tabellen und Diagrammen — von den
 Tab-Regeln nicht miterfasst.
@@ -122,7 +113,7 @@ Tab-Regeln nicht miterfasst.
 
 ---
 
-### 6 · Marktbericht auf Handy und Tablet
+### 5 · Marktbericht auf Handy und Tablet
 
 Eigene Anwendung unter `frontend/marktbericht-app/` mit eigenem CSS.
 **Eigener Namensraum `vNNN` (Marktbericht) — nicht mit der Haupt-App mischen.**
@@ -141,7 +132,7 @@ angesehen werden kann.
 
 ---
 
-### 7 · Übrige Seiten und Bereiche
+### 6 · Übrige Seiten und Bereiche
 
 Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
@@ -150,7 +141,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 - Quick Boarding / Quick Check
 - Track Record
 - Datenraum
-- Netzwerk (siehe Punkt 8)
+- Netzwerk (siehe Punkt 7)
 - Anmeldung, Registrierung, Passwort vergessen
 - Preise und Upgrade-Fenster
 - Rechtliches (Impressum, Datenschutz, AGB)
@@ -162,7 +153,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
 ## Fehler
 
-### 8 · Partner-Netzwerk lädt nicht
+### 7 · Partner-Netzwerk lädt nicht
 
 **Zuerst Diagnose, kein Umbau.** Ursache ist unbekannt.
 
@@ -193,7 +184,7 @@ Zielzustand. Nicht danebenbauen, dagegen bauen.
 
 ---
 
-### 9 · Darstellungs-Modal mit festen UI-Vorlagen
+### 8 · Darstellungs-Modal mit festen UI-Vorlagen
 
 **Das Kernstück.** Heute ist die Oberfläche B2C-Optik: Obsidian, Gold,
 Leuchten, Verläufe. Ein Berater, der sie vor dem Mandanten öffnet, braucht
@@ -250,7 +241,7 @@ Objektkarten und Logo, die Farbeinstellungen greifen darüber,
 
 ---
 
-### 10 · Aktionen-Menü gliedern
+### 9 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -265,7 +256,7 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 11 · Objektkarten-Modi: Kompakt · Standard · Wallet
+### 10 · Objektkarten-Modi: Kompakt · Standard · Wallet
 
 Ein Markup, drei Optiken, **reines CSS**. Die gemessene Struktur von
 `_renderRichCard` (`storage.js:866`) steht in CLAUDE.md — nicht neu raten.
@@ -281,7 +272,7 @@ Desktop, Tablet und Handy.
 
 ---
 
-### 12 · Kartenfläche: Passend · Weiß
+### 11 · Kartenfläche: Passend · Weiß
 
 Karten folgen der Fassung oder bleiben weiß, auch im dunklen Modus.
 
@@ -290,7 +281,7 @@ scopen statt auf Ladereihenfolge bauen.
 
 ---
 
-### 13 · Zugang zum Darstellungs-Modal und Plan-Schranken
+### 12 · Zugang zum Darstellungs-Modal und Plan-Schranken
 
 Modal für **alle** Pläne öffnen, den **Farbteil darin** sperren. Heute bricht
 der Wrapper in `settings.js:3391` bei `currentKey() !== 'partner'` das ganze
@@ -313,9 +304,9 @@ Sonst laufen beide auseinander.
 
 ---
 
-### 14 · Handy-Sperre plan-abhängig lösen
+### 13 · Handy-Sperre plan-abhängig lösen
 
-Erst wenn 1–7 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
+Erst wenn 1–6 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
 
 Freigabe ab Partner-Plan, gilt auch für dessen Mandanten. Der Haken: die Sperre
@@ -374,7 +365,7 @@ nichts Falsches auf.
   unverändert.
 
   **Offen daneben:** Trefferfläche der Icon-Knöpfe ist 34 × 44 px — die Breite
-  liegt unter den 44 px aus Punkt 4, gehört dorthin. Der Logo-Header frisst mit
+  liegt unter den 44 px aus Punkt 3, gehört dorthin. Der Logo-Header frisst mit
   201 px weiter ein Drittel des Handy-Viewports (Optik, nicht angefasst).
 
 - [2026-08-04] **Neues Logo einsetzen, altes entfernen** — `7a86e7b`, `56a9c04`
@@ -415,3 +406,47 @@ nichts Falsches auf.
   Alte Dateien `dealpilot-logo-app.png` und `dealpilot-logo-app-light.png`
   entfernt; es verwiesen nur noch zwei Kommentare darauf.
   `dealpilot-logo.png` (Landing, PDFs) unangetastet.
+
+- [2026-08-04] **Aktionen-Akkordeon klappt in die falsche Richtung** — `983d681`, `69996ee`
+
+  **Befund — der Verdacht war falsch, ich nehme ihn ausdrücklich zurück.**
+  Gemessen bei 390 × 844 mit offenem Drawer: das Panel klappt sehr wohl
+  **nach oben** — `top 58`, Inhalt bis `591`, Trigger erst bei `709`.
+  Ebenso bei 820 px und auf dem Desktop (1400 × 730 und 1400 × 520). Der
+  Pfeil dreht sich auch bereits (`[aria-expanded="true"] → rotate(180deg)`,
+  `style.css:11599`). Das hatten v642/v644 schon erledigt, nur stand es
+  nicht im Backlog.
+
+  **Der echte Fehler lag darunter:** eine **114 px hohe Totzone** zwischen
+  dem Ende des sichtbaren Menüs (591) und dem Ende des Kastens (705).
+  `elementFromPoint(180, 621)` lieferte dort `#sb-actions-accordion` statt
+  der Objektliste. Klicks versandeten, und das Menü schloss dabei nicht
+  einmal — `_sbActionsOutsideClick` überspringt alles, was in `acc` liegt.
+
+  **Ursache:** `sbActionsToggle()` setzte `bottom` inline **mit
+  `important`** (V73-fix). Inline-`!important` schlägt jede
+  Stylesheet-Regel, also auch das `bottom:auto !important` aus v642, das im
+  Drawer den Fixed-Overlay-Modus herstellt. Damit galten gleichzeitig
+  `top:58px` **und** `bottom:139,5px` auf einem `fixed`-Element mit
+  `height:auto` → Box auf 647 px gestreckt, Inhalt 533 px.
+
+  **Zweiter Befund:** der CSS-Deckel `calc(100dvh - 58px - 110px)` ist
+  geraten. Bei 390 × 556 endete das Menü bei 446 px, der Trigger begann
+  aber schon bei 409 px — 37 px Überlappung.
+
+  **Fix (v647, `ui.js` 972b→973b):** Neues `_sbActionsDock()` entscheidet
+  nach `getComputedStyle().position`. `absolute` (Desktop, Tablet): `bottom`
+  wie bisher an den Trigger andocken. `fixed` (Drawer ≤ 768 px): kein
+  Inline-`bottom`, stattdessen `max-height` aus der **gemessenen**
+  Trigger-Oberkante minus 8 px Spalt. `static` (eingeklappte Leiste): beides
+  weg, das CSS macht die Position. Dazu Neuberechnung bei `resize`.
+
+  **Nachgemessen auf Staging (973b):** Überhang **0 px** in allen Fassungen.
+  390 × 844: Menü 58–591, Trigger 697. 390 × 556: Menü 58–401, Trigger 409,
+  scrollt in sich. 1400 × 520: 15–385, Trigger 389, scrollt. 820 × 1180:
+  528–981, Trigger 985. Klick unter dem Menü trifft wieder `#sb-list`,
+  Objektwahl schließt das Menü, Pfeil steht auf `rotate(180deg)`.
+
+  **Nebenbefund, noch offen:** `css/ui-varianten.css` und `js/ui-varianten.js`
+  sind in `index.html` (Z. 29 und 3466) verlinkt, existieren aber weder im
+  Repo noch auf dem Server — zwei 404 bei jedem Seitenaufruf.
