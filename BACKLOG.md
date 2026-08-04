@@ -12,46 +12,9 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 ---
 
-## Jetzt — Handy und Tablet zum Laufen bringen
-
-Ziel des Blocks: die **bestehende** Oberfläche auf Telefon und Tablet
-bedienbar machen — **alle Seiten, alle Tabs, alle Bereiche.** Losgelöst von
-der MA-Reihe und `mobile-demo.html`, die bleiben unberührt.
-
-Zum Testen: `https://app.staging.dealpilot.immo/?nomobileblock`
-(in der Geräteemulation gilt der Browser als `pointer:coarse`, sonst legt sich
-das Handy-Overlay drüber). Die Sperre selbst wird **nicht** angefasst.
-
-Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
-**1024 px** (Tablet quer).
-
----
-
-
-
-
-### 1 · Übrige Seiten und Bereiche
-
-Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
-
-- Einstellungen (alle Abschnitte, das Modal selbst)
-- Alle Objekte (Karten-, Listen-, Kanban-Ansicht)
-- Quick Boarding / Quick Check
-- Track Record
-- Datenraum
-- Netzwerk (siehe Punkt 2)
-- Anmeldung, Registrierung, Passwort vergessen
-- Preise und Upgrade-Fenster
-- Rechtliches (Impressum, Datenschutz, AGB)
-- Reseller-Portal
-
-**Fertig, wenn:** Jede Seite bei 390 px erreichbar, lesbar und bedienbar ist.
-
----
-
 ## Fehler
 
-### 2 · Partner-Netzwerk lädt nicht
+### 1 · Partner-Netzwerk lädt nicht
 
 **Zuerst Diagnose, kein Umbau.** Ursache ist unbekannt.
 
@@ -82,7 +45,7 @@ Zielzustand. Nicht danebenbauen, dagegen bauen.
 
 ---
 
-### 3 · Darstellungs-Modal mit festen UI-Vorlagen
+### 2 · Darstellungs-Modal mit festen UI-Vorlagen
 
 **Das Kernstück.** Heute ist die Oberfläche B2C-Optik: Obsidian, Gold,
 Leuchten, Verläufe. Ein Berater, der sie vor dem Mandanten öffnet, braucht
@@ -139,7 +102,7 @@ Objektkarten und Logo, die Farbeinstellungen greifen darüber,
 
 ---
 
-### 4 · Aktionen-Menü gliedern
+### 3 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -154,7 +117,7 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 5 · Objektkarten-Modi: Kompakt · Standard · Wallet
+### 4 · Objektkarten-Modi: Kompakt · Standard · Wallet
 
 Ein Markup, drei Optiken, **reines CSS**. Die gemessene Struktur von
 `_renderRichCard` (`storage.js:866`) steht in CLAUDE.md — nicht neu raten.
@@ -170,7 +133,7 @@ Desktop, Tablet und Handy.
 
 ---
 
-### 6 · Kartenfläche: Passend · Weiß
+### 5 · Kartenfläche: Passend · Weiß
 
 Karten folgen der Fassung oder bleiben weiß, auch im dunklen Modus.
 
@@ -179,7 +142,7 @@ scopen statt auf Ladereihenfolge bauen.
 
 ---
 
-### 7 · Zugang zum Darstellungs-Modal und Plan-Schranken
+### 6 · Zugang zum Darstellungs-Modal und Plan-Schranken
 
 Modal für **alle** Pläne öffnen, den **Farbteil darin** sperren. Heute bricht
 der Wrapper in `settings.js:3391` bei `currentKey() !== 'partner'` das ganze
@@ -202,7 +165,7 @@ Sonst laufen beide auseinander.
 
 ---
 
-### 8 · Handy-Sperre plan-abhängig lösen
+### 7 · Handy-Sperre plan-abhängig lösen
 
 Erst wenn 1–2 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
@@ -223,9 +186,17 @@ nichts Falsches auf.
 
 - **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
   Aktionen als Popover statt Blatt von unten
-- ~~**Vier Umschalt-Mechaniken endgültig aufräumen**~~ — in v648 miterledigt
+- **Kopfleiste auf dem Tablet** — bei 820 px ist `header.hdr` **589 px** hoch,
+  `#hdr-badges` allein 492 px, weil die fünf KPI-Pillen dort zu je zwei
+  umbrechen. Der Score soll auf dem Tablet bleiben, die Höhe nicht
 - **Widersprüchliche Regeln in den ≤768-Blöcken** — `.sb-list` trägt
   `height:40vh !important` **und** `height:0 !important`, die letzte gewinnt
+- **`css/ui-varianten.css` und `js/ui-varianten.js`** sind in `index.html`
+  (Z. 29 und 3466) verlinkt, existieren aber weder im Repo noch auf dem
+  Server — zwei 404 bei jedem Seitenaufruf
+- **Einstellungs-Abschnitte hintereinander rendern** ließ den Prüf-Browser
+  zweimal einfrieren (`anbieter`, `mandanten`, `plan`, `rechtliches`, `help`).
+  Einzeln unauffällig — auf einem echten Gerät nachstellen
 - **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
   Vorhaben mit eigener Prüfstrecke, nicht nebenbei
 - **Admin-Oberfläche** auf Tablet prüfen
@@ -639,3 +610,58 @@ nichts Falsches auf.
      die Browser-Steuerung blockiert. Geprüft wurde stattdessen ein
      bereits gespeicherter Bericht — dieselbe Renderstrecke, gleiche
      Darstellung.
+
+- [2026-08-04] **Übrige Seiten und Bereiche** — `30d1d69`, `6069a7a`, `a3651c9`, `60c0b80`
+
+  **Befund (gemessen bei 390 × 844, Bereich für Bereich durchgeklickt):**
+  Waagerechter Überlauf gab es fast nirgends mehr — die Sammelursachen
+  hatte v650 schon erledigt. Übrig blieben Felder unter 16 px und Knöpfe
+  unter 44 px, und die sitzen alle **außerhalb von `.body`**, weshalb der
+  v650-Block sie nicht erwischt hat:
+
+  | Bereich | Befund |
+  |---|---|
+  | Alle Objekte · Track Record · Bankexport · Quick Check | `#sb-search-input` **12,5 px** |
+  | Einstellungen, alle 11 Abschnitte | `set_user_*`, `set_pwd_*`, `dp-ec-*` u. a. **13 px**; `.set-modal-close` und `.help-sidebar-item` unter 44 px |
+  | Anmeldung · Registrierung · Passwort vergessen | `auth-email`, `auth-password`, `pw-reset-email` **13,5 px** |
+  | Bankexport · Quick Check | `.dpm-x` unter 44 px |
+  | Preise / Upgrade | `.pricing-modal-close`, `a.bw-cta` unter 44 px |
+  | Reseller-Portal | acht Felder **14 px**, eines 13,3 px; Rücklink unter 44 px |
+  | Rechtliches (Impressum · Datenschutz · AGB) | Rück- und Fußzeilen-Links unter 44 px |
+  | **Datenschutz** | Tabelle der Auftragsverarbeiter: `body.scrollWidth` **430** statt 375 — echt breiter als der Schirm |
+  | **Alle Objekte, Listenansicht** | `.ao-table` ist **700 px** breit und scrollt in `.ao-table-wrap` — ohne sichtbaren Hinweis |
+
+  **Fix (v652, `style.css` W45→W47, dazu die vier eigenständigen Seiten):**
+  Felder in `#auth-modal`, `#settings-modal`, `.set-modal-cream`,
+  `.global-view-overlay` und `#sb-search-input` auf **16 px** — mit
+  `:not()` für Kontrollkästchen, Schalter, Farb- und Dateifelder, bei denen
+  iOS ohnehin nicht zoomt. Trefferflächen wie in v650 über ein unsichtbares
+  `::after` mit `max(100%,44px)`, damit die Optik unverändert bleibt.
+  Die Objekttabelle bekommt einen Verlaufs-Hinweis am rechten Rand.
+  `impressum.html`, `datenschutz.html`, `agb.html` und `reseller.html`
+  tragen jeweils einen eigenen `@media (max-width:768px)`-Block — sie haben
+  kein gemeinsames Stylesheet.
+
+  **Nachgemessen auf Staging (W47), jeder Bereich einzeln:**
+
+  | Bereich | Überlauf | Felder < 16 px | Ziele < 44 px |
+  |---|---|---|---|
+  | Alle Objekte | 0 | 0 | 0 |
+  | Einstellungen | 0 | 0 | 0 |
+  | Track Record | 0 | 0 | 0 |
+  | Bankexport | 0 | 0 | 0 |
+  | Quick Check | 0 | 0 | 0 |
+  | Anmeldung / Registrierung / Passwort | 0 | 0 | 0 |
+  | Preise / Upgrade | 0 | 0 | 0 |
+  | Datenraum | 0 | 0 | 0 |
+  | Impressum | `bodySW 375` | – | 0 |
+  | Datenschutz | `bodySW 378` (vorher 430) | – | 0 |
+  | AGB | `bodySW 375` | – | 0 |
+  | Reseller-Portal | `bodySW 375` | 0 | 0 |
+
+  **Nebenbefund, noch offen:** Beim Durchklicken der Einstellungs-Abschnitte
+  fror der Prüf-Browser zweimal ein, sobald mehrere der hinteren Abschnitte
+  (`anbieter`, `mandanten`, `plan`, `rechtliches`, `help`) in einem Zug
+  gerendert wurden. Einzeln geöffnet ist jeder unauffällig. Das kann ein
+  Artefakt der Automatisierung sein oder ein echter Rendering-Kostenpunkt —
+  nicht weiter verfolgt, gehört auf ein echtes Gerät.
