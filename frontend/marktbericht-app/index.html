@@ -336,6 +336,22 @@
     /* Klappbloecke v1075/v1076 duerfen nicht ueberlaufen */
     .mbrep-head, .mbrep-body { max-width:100% !important; overflow-wrap:break-word; }
     .mbrep-head { flex-wrap:wrap !important; row-gap:6px !important; }
+
+    /* Der FERTIGE Bericht — gemessen an einem gespeicherten Bericht bei 390px.
+       body.scrollWidth war 639 statt 375. Vier Stellen, alle derselbe Fall:
+       ein Rasterkind mit min-width:auto zieht die Spur auf.
+         .grid           Spur wurde 646px breit statt 347
+         #addrAC         Vorschlagsliste am body, 602px breit
+         #microGrid      zwei Spalten 238 + 354 = 592 in 305px
+         .wv-g           drei Spalten 153 + 140 + 110 = 402 in 305px
+       Danach gemessen: body.scrollWidth 375 = clientWidth. */
+    .grid { grid-template-columns:minmax(0,1fr) !important; }
+    .grid > * { min-width:0 !important; }
+    .report { max-width:100% !important; }
+    #addrAC { max-width:calc(100vw - 24px) !important; box-sizing:border-box; }
+    #microGrid { grid-template-columns:minmax(0,1fr) !important; }
+    .wv-g { grid-template-columns:minmax(0,1fr) !important; }
+    #resultPanel > *, #resultBody > * { min-width:0 !important; max-width:100% !important; }
   }
   /* ── /v1077-mb-touch ── */
 </style>
@@ -620,7 +636,7 @@ if (!window._wlrgbaH) {
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
 <script src="vendor/jspdf.plugin.autotable.min.js"></script>
-<script src="app.js?v=1077"></script>
+<script src="app.js?v=1077b"></script>
 <script src="mb-objektwahl.js?v=942"></script><!-- v566-objektwahl -->
 <script>
 /* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
