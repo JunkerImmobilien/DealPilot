@@ -35612,3 +35612,75 @@ body.dp-chrome-hell aside.sidebar .sb-card [class*="price"]{ color: var(--dp-obj
   }
 }
 /* ===== v645-sb-footer-mobile END ===== */
+
+/* ═══════════════════════════════════════════════════════════════════
+   v646-logo-rahmen — Backlog Punkt 1
+   Neues Rahmen-Logo (Seitenverhaeltnis 3.18:1 statt 2.18:1) plus
+   deutlich flacherer Logo-Kopf.
+
+   GEMESSEN vorher (390px-Viewport, Drawer offen):
+     .sb-header 207px  ·  Logo 326x149px  ·  Sidebar 351px breit
+     Desktop 1920px:  .sb-header 221px
+   Der Kopf war damit ein Viertel des Handy-Viewports, bevor ein Objekt
+   sichtbar wurde (siehe Befund der Fusszeilen-Aufgabe, v645).
+
+   Zwei Hebel:
+     1) Das neue Logo ist flacher -> bei gleicher Breite ~32% weniger Hoehe
+     2) Breitendeckel (max-width) statt 100% -> haelt das 512px-Asset
+        (helle Fassung) bei >=2x auf Retina und drueckt die Hoehe weiter
+
+   Spezifitaet bewusst hoch (aside.sidebar#sidebar), damit die spaeteren
+   !important-Bloecke aus v931/v932/v937 nicht gewinnen. Ausgenommen ist
+   die eingeklappte Leiste: dort steht die DP-Bildmarke aus v610, die
+   Wortmarke passt in 66px Breite ohnehin nicht.
+   ═══════════════════════════════════════════════════════════════════ */
+
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 12px 14px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: var(--dp-logo-justify, center) !important;
+}
+
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+  width: var(--dp-logo-w, 100%) !important;
+  max-width: var(--dp-logo-max, 232px) !important;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* Handy und Tablet hoch: Drawer ist breiter als die Desktop-Spalte, der
+   Deckel muss deshalb explizit mit — sonst waechst der Kopf wieder. */
+@media (max-width: 900px) {
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
+    padding: 10px 14px 8px !important;
+  }
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+    max-width: var(--dp-logo-max, 220px) !important;
+  }
+}
+
+/* Sehr flache Viewports (Handy quer, 556px-Fall aus v645): noch flacher. */
+@media (max-width: 900px) and (max-height: 620px) {
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
+    padding: 6px 14px 4px !important;
+  }
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+    max-width: var(--dp-logo-max, 176px) !important;
+  }
+}
+/* ===== v646-logo-rahmen END ===== */
