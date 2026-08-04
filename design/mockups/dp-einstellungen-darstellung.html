@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Einstellungen → Darstellung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;font-family:'Inter',system-ui,sans-serif;color:#e8e6df;padding-bottom:50px}
+.bar{position:sticky;top:0;z-index:900;background:rgba(10,10,10,.97);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(201,168,76,.22);padding:10px 20px}
+.bar-in{max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;gap:13px;align-items:center}
+.bar .brand{font-family:'Space Grotesk';font-weight:700;font-size:15px}
+.bar .brand span{color:#C9A84C}
+.grp{display:flex;align-items:center;gap:5px}
+.grp>label{font-family:'JetBrains Mono';font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#7d7768;margin-right:2px}
+.ib{font-family:'JetBrains Mono';font-size:10.5px;font-weight:600;padding:7px 10px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.14);background:transparent;color:#b9b3a4;cursor:pointer;transition:.16s}
+.ib:hover{border-color:rgba(201,168,76,.6);color:#E8CC7A}
+.ib.on{background:#C9A84C;border-color:#C9A84C;color:#1a1407}
+.stage{max-width:1400px;margin:22px auto 0;padding:0 20px}
+.lead{margin-bottom:15px}
+.lead h2{font-family:'Space Grotesk';font-size:19px;font-weight:600;color:#f3efe6}
+.lead p{font-size:12.5px;line-height:1.6;color:#a39d8b;max-width:900px;margin-top:5px}
+
+/* ═══════ Einstellungs-Modal ═══════ */
+.modal{max-width:1180px;margin:0 auto;border-radius:14px;overflow:hidden;background:#FDFCFA;color:#1a1712;
+  box-shadow:0 34px 74px -30px rgba(0,0,0,.95);border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;height:830px}
+.set-top{flex:none;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#0E0D0B}
+.set-top .lg{font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#F2EFE6}
+.set-top .lg i{color:#C9A84C;font-style:normal}
+.set-top .rt{display:flex;align-items:center;gap:14px}
+.set-top .rt span{font-family:'JetBrains Mono';font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#8E887A}
+.set-top .rt b{color:#B4AE9E;font-size:15px;cursor:pointer;font-weight:400}
+.set-band{flex:none;padding:14px 22px;background:linear-gradient(100deg,#E4C866,#C9A84C 60%,#B4923E)}
+.set-band h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:600;color:#241C08}
+.set-band p{font-size:11.5px;color:#4A3A12;margin-top:2px}
+.set-mid{flex:1;display:grid;grid-template-columns:278px 1fr;min-height:0}
+
+/* Linke Navigation */
+.set-nav{background:#14120F;padding:10px 12px;display:flex;flex-direction:column;overflow-y:auto}
+.nv{display:flex;gap:11px;align-items:flex-start;padding:10px 11px;border-radius:9px;border:1px solid transparent;cursor:pointer}
+.nv:hover{background:rgba(255,255,255,.03)}
+.nv.on{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.45)}
+.nv svg{width:16px;height:16px;stroke:#8E887A;fill:none;stroke-width:1.7;flex:none;margin-top:2px}
+.nv.on svg{stroke:#C9A84C}
+.nv b{display:block;font-size:12.5px;font-weight:600;color:#E9E5DA}
+.nv.on b{color:#F2EFE6}
+.nv span{display:block;font-size:10.5px;color:#7C7669;margin-top:2px}
+.nv-foot{margin-top:auto;border-top:1px solid rgba(255,255,255,.07);padding-top:11px;display:flex;align-items:center;gap:10px}
+.nv-foot .av{width:32px;height:32px;border-radius:50%;background:#C9A84C;color:#1a1407;display:grid;place-items:center;
+  font-family:'JetBrains Mono';font-size:12px;font-weight:700;flex:none}
+.nv-foot b{display:block;font-size:12px;color:#E9E5DA}
+.nv-foot span{display:block;font-size:10px;color:#7C7669}
+.pl{font-family:'JetBrains Mono';font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 7px;border-radius:4px;background:rgba(201,168,76,.16);color:#C9A84C;margin-top:5px;display:inline-block}
+
+/* Inhalt */
+.set-body{overflow-y:auto;padding:22px 26px 26px;min-height:0}
+.dvd{border:0;border-top:1px solid #E9E4D9;margin:22px 0}
+.set-section-h{font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:.17em;
+  text-transform:uppercase;color:#96762F;margin-bottom:6px}
+.set-section-h2{font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;font-weight:600;color:#1a1712;margin-bottom:5px}
+.hint{font-size:12.5px;line-height:1.6;color:#8b8577;font-style:italic}
+.dp-tt-mode-toggle{display:grid;gap:10px;margin-top:11px}
+.dp-tt-mode-toggle.c2{grid-template-columns:1fr 1fr}
+.dp-tt-mode-toggle.c3{grid-template-columns:1fr 1fr 1fr}
+.dp-tt-mode-btn{position:relative;padding:13px 14px;border:1px solid #E0DACB;border-radius:8px;background:#fff;
+  cursor:pointer;text-align:center;font-family:'Inter',sans-serif;transition:.15s}
+.dp-tt-mode-btn:hover{border-color:#C9A84C}
+.dp-tt-mode-btn b{display:block;font-size:13.5px;font-weight:600;color:#1a1712}
+.dp-tt-mode-btn small{display:block;font-size:11px;color:#8b8577;margin-top:2px}
+.dp-tt-mode-btn.active{background:#FBF6E9;border-color:#C9A84C;box-shadow:0 0 0 1px rgba(201,168,76,.35)}
+.dp-tt-mode-btn.locked{opacity:.5;cursor:not-allowed}
+.dp-tt-mode-btn .lk{position:absolute;top:7px;right:8px;font-family:'JetBrains Mono';font-size:7.5px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:#EFEADE;color:#8b8577}
+.chk{display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border:1px solid #E8DFC4;border-radius:8px;
+  background:#FEFCF6;margin-top:11px;cursor:pointer}
+.chk .bx{width:19px;height:19px;flex:none;border-radius:4px;border:1.5px solid #C9A84C;background:#C9A84C;
+  display:grid;place-items:center;color:#1a1407;font-size:12px;font-weight:700;margin-top:1px}
+.chk.off .bx{background:#fff;color:transparent}
+.chk b{display:block;font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#7d6224}
+.chk span{display:block;font-size:11.5px;line-height:1.55;color:#8b8577;margin-top:4px}
+.btn{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;padding:10px 16px;border-radius:8px;
+  border:1px solid #DCD5C4;background:#F7F4EC;color:#3d382f;cursor:pointer;margin-top:12px}
+.btn:hover{border-color:#C9A84C}
+.btn-gold{background:#C9A84C;border-color:#C9A84C;color:#1a1407}
+.pgate{margin-top:12px;padding:12px 14px;border:1px dashed #D9CFA8;border-radius:8px;background:#FCF9F0;
+  display:flex;gap:11px;align-items:flex-start}
+.pgate svg{width:16px;height:16px;stroke:#96762F;fill:none;stroke-width:1.8;flex:none;margin-top:1px}
+.pgate b{display:block;font-size:12.5px;font-weight:600;color:#5c4a18}
+.pgate span{display:block;font-size:11.5px;line-height:1.55;color:#8b8577;margin-top:3px}
+.set-foot{flex:none;display:flex;align-items:center;gap:14px;padding:12px 20px;background:#14120F}
+.set-foot .inf{flex:1;display:flex;align-items:center;gap:11px;font-size:11.5px;color:#8E887A}
+.set-foot .dots{display:flex;gap:4px}
+.set-foot .dots i{width:6px;height:6px;border-radius:50%;background:#3FA56C}
+.set-foot .dots i:nth-child(2){background:#C9A84C}
+.set-foot .dots i:nth-child(3){background:#4a4740}
+.fbtn{font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:8px;cursor:pointer;border:1px solid rgba(255,255,255,.16);
+  background:transparent;color:#B4AE9E}
+.fbtn.gold{background:#C9A84C;border-color:#C9A84C;color:#1a1407}
+
+/* ═══════ Darstellungs-Panel ═══════ */
+.dpanel{position:fixed;inset:0;z-index:800;display:grid;place-items:center;padding:24px;
+  background:rgba(6,5,4,.72);opacity:0;pointer-events:none;transition:opacity .2s}
+.dpanel.open{opacity:1;pointer-events:auto}
+.dp-in{width:min(940px,100%);max-height:86vh;overflow:hidden;border-radius:14px;background:#FDFCFA;color:#1a1712;
+  display:grid;grid-template-columns:1fr 330px;box-shadow:0 34px 74px -26px rgba(0,0,0,.9)}
+.dp-l{padding:22px 24px;overflow-y:auto}
+.dp-l h2{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600}
+.dp-l>p{font-size:12.5px;color:#8b8577;font-style:italic;margin-top:4px}
+.swrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:11px}
+.sw{width:38px;height:38px;border-radius:9px;border:2px solid #E0DACB;cursor:pointer;padding:0;transition:.15s}
+.sw:hover{transform:scale(1.07)}
+.sw.on{border-color:#1a1712;box-shadow:0 0 0 3px rgba(201,168,76,.3)}
+.hexrow{display:flex;align-items:center;gap:9px;margin-top:11px}
+.hexrow input{font-family:'JetBrains Mono';font-size:13px;padding:9px 11px;border:1px solid #E0DACB;border-radius:8px;
+  background:#fff;color:#1a1712;width:120px;outline:none}
+.hexrow input:focus{border-color:#C9A84C}
+.hexrow span{font-size:11.5px;color:#8b8577}
+.dp-r{background:#F4F1EA;border-left:1px solid #E9E4D9;padding:18px;display:flex;flex-direction:column;gap:11px;overflow-y:auto}
+.dp-r .cap{font-family:'JetBrains Mono';font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#8b8577}
+.prev{border-radius:11px;overflow:hidden;border:1px solid #DDD6C7;background:var(--pv-chr);box-shadow:0 6px 18px -12px rgba(0,0,0,.5)}
+.prev .ph{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid var(--pv-line)}
+.prev .ph .mk{width:24px;height:24px;border-radius:6px;background:var(--pv-run);display:grid;place-items:center;
+  font-family:'Space Grotesk';font-weight:700;font-size:11px;color:var(--pv-on)}
+.prev .ph b{font-size:11.5px;color:var(--pv-ink);font-weight:600}
+.prev .ph .k{margin-left:auto;font-family:'JetBrains Mono';font-size:9.5px;font-weight:700;color:var(--pv-acc)}
+.prev .pc{padding:9px;background:var(--pv-chr)}
+.pcard{border:1px solid var(--pv-cl);border-radius:9px;background:var(--pv-card);overflow:hidden}
+.pcard .hd2{display:flex;align-items:center;gap:8px;padding:7px 9px;background:var(--pv-run)}
+.pcard .hd2 .rg{width:26px;height:26px;border-radius:50%;background:#fff;display:grid;place-items:center;
+  font-family:'JetBrains Mono';font-size:10px;font-weight:700;color:#1e1a12}
+.pcard .hd2 b{font-size:11px;color:var(--pv-on);font-weight:600}
+.pcard .bd2{padding:8px 9px}
+.pcard .bd2 .p{font-family:'JetBrains Mono';font-size:12px;font-weight:700;color:var(--pv-pink)}
+.pcard .bd2 .s{font-size:9.5px;color:var(--pv-mut);margin-top:1px}
+.ptiles{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:0 9px 9px}
+.ptiles div{background:var(--pv-tile);border:1px solid var(--pv-tl);border-radius:6px;padding:5px 6px}
+.ptiles i{display:block;font-family:'JetBrains Mono';font-size:6.5px;letter-spacing:.1em;color:var(--pv-mut);font-style:normal}
+.ptiles b{display:block;font-family:'JetBrains Mono';font-size:10px;font-weight:700;color:var(--pv-pink);margin-top:2px}
+.dp-foot{grid-column:1/-1;display:flex;gap:9px;justify-content:flex-end;padding:13px 20px;background:#F4F1EA;border-top:1px solid #E9E4D9}
+
+.notes{max-width:1400px;margin:28px auto 0;padding:19px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.02)}
+.notes h3{font-family:'Space Grotesk';font-size:13.5px;color:#E8CC7A;margin:0 0 8px}
+.notes h3~h3{margin-top:17px}
+.notes ul{list-style:none;display:grid;gap:6px}
+.notes li{font-size:12.5px;line-height:1.55;color:#9b9585;padding-left:16px;position:relative}
+.notes li::before{content:"→";position:absolute;left:0;color:#C9A84C}
+.notes b{color:#cdc6b4} .notes code{font-family:'JetBrains Mono';font-size:11.5px;color:#bdb6a4}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="bar-in">
+  <div class="brand">Deal<span>Pilot</span> · Einstellungen</div>
+  <div class="grp"><label>Plan des Nutzers</label>
+    <button class="ib" data-plan="investor">Investor</button>
+    <button class="ib" data-plan="pro">Pro</button>
+    <button class="ib on" data-plan="partner">Partner</button>
+    <button class="ib" data-plan="mandant">Mandant eines Partners</button></div>
+</div></div>
+
+<div class="stage">
+  <div class="lead"><h2 id="l-t"></h2><p id="l-p"></p></div>
+
+  <div class="modal">
+    <div class="set-top"><div class="lg">Deal<i>Pilot</i></div>
+      <div class="rt"><span>Einstellungen</span><b>✕</b></div></div>
+    <div class="set-band"><h1>Profil &amp; Anzeige</h1><p>Investmentprofil und Anzeige-Einstellungen.</p></div>
+
+    <div class="set-mid">
+      <nav class="set-nav">
+        <div class="nv"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg>
+          <div><b>Account &amp; Sicherheit</b><span>Login, Passwort, Zwei-Faktor</span></div></div>
+        <div class="nv"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <div><b>Kontakt &amp; Logo</b><span>PDF-Ersteller, Firmenlogo</span></div></div>
+        <div class="nv"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/></svg>
+          <div><b>Co-Pilot (KI)</b><span>Tonalität, Fokus, Instruktionen</span></div></div>
+        <div class="nv"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7"/></svg>
+          <div><b>Deal Score</b><span>Gewichtung, Schwellenwerte</span></div></div>
+        <div class="nv on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+          <div><b>Profil &amp; Anzeige</b><span>Sichtbarkeit, Darstellung</span></div></div>
+        <div class="nv"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8L15.8 7.2M8.2 13.2l7.6 3.6"/></svg>
+          <div><b>Datenraum</b><span>Freigaben, Zugriffe</span></div></div>
+        <div class="nv"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4z"/><path d="M9 7V4h6v3"/></svg>
+          <div><b>Mandanten</b><span>Seats, Freigaben</span></div></div>
+        <div class="nv"><svg viewBox="0 0 24 24"><path d="M12 4l2.3 5.3L20 10l-4.4 3.7L17 20l-5-3-5 3 1.4-6.3L4 10l5.7-.7z"/></svg>
+          <div><b>Plan</b><span>Abo, Kerosin, Abrechnung</span></div></div>
+        <div class="nv-foot"><div class="av">M</div>
+          <div style="flex:1;min-width:0"><b>Marcel Junker</b><span>info@dealpilot.immo</span>
+            <span class="pl" id="nv-plan">Partner</span></div></div>
+      </nav>
+
+      <div class="set-body">
+        <h3 class="set-section-h">Marktbericht-Design</h3>
+        <p class="hint">Hell oder Dunkel für den Marktbericht-Bereich. Änderung wird beim nächsten Öffnen aktiv.</p>
+        <div class="dp-tt-mode-toggle c2">
+          <button class="dp-tt-mode-btn active"><b>Hell</b><small>Wie Objekt-Tab</small></button>
+          <button class="dp-tt-mode-btn"><b>Dunkel</b><small>Obsidian/Gold</small></button>
+        </div>
+
+        <hr class="dvd">
+        <h2 class="set-section-h2">Darstellung</h2>
+        <p class="hint">Aufbau und Dichte der App. Farben und Schrift stellst du im Darstellungs-Menü ein — dort siehst du jede Änderung sofort.</p>
+
+        <div style="margin-top:18px">
+          <h3 class="set-section-h">App-Darstellung</h3>
+          <div class="dp-tt-mode-toggle c3" id="sw-look">
+            <button class="dp-tt-mode-btn active" data-look="dp"><b>DealPilot</b><small>Obsidian &amp; Gold</small></button>
+            <button class="dp-tt-mode-btn" data-look="kontor"><b>Kontor</b><small>Weiß, flach</small></button>
+            <button class="dp-tt-mode-btn" data-look="panel"><b>Panel</b><small>Kühl, Karten</small></button>
+          </div>
+        </div>
+
+        <div style="margin-top:18px">
+          <h3 class="set-section-h">Objektkarten</h3>
+          <div class="dp-tt-mode-toggle c3" id="sw-cards">
+            <button class="dp-tt-mode-btn" data-cards="kompakt"><b>Kompakt</b><small>Meiste Objekte</small></button>
+            <button class="dp-tt-mode-btn active" data-cards="standard"><b>Standard</b><small>Foto &amp; Kennzahlen</small></button>
+            <button class="dp-tt-mode-btn" data-cards="wallet"><b>Wallet</b><small>Farbige Kopfzeile</small></button>
+          </div>
+        </div>
+
+        <div style="margin-top:18px">
+          <h3 class="set-section-h">Kartenfläche</h3>
+          <div class="dp-tt-mode-toggle c2" id="sw-surf">
+            <button class="dp-tt-mode-btn active" data-surf="auto"><b>Passend</b><small>Folgt der Darstellung</small></button>
+            <button class="dp-tt-mode-btn" data-surf="light"><b>Weiß</b><small>Auch im dunklen Modus</small></button>
+          </div>
+        </div>
+
+        <hr class="dvd">
+        <h3 class="set-section-h">Handy &amp; Tablet</h3>
+        <p class="hint">Die volle App auf kleinen Bildschirmen — Objektliste als Blatt, Aktionen als Menü von unten. Nicht die abgespeckte Demo.</p>
+        <div class="chk" id="chk-mobile"><span class="bx">✓</span>
+          <div><b>Mobile Ansicht freischalten</b>
+            <span>Auf dem Telefon wird die Hauptansicht statt des Hinweises „nur am Desktop" geladen. Auf Tablets ist sie ohnehin aktiv.</span></div></div>
+        <div class="pgate" id="gate-mobile" style="display:none">
+          <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          <div><b>Ab Partner verfügbar</b><span>Die mobile Hauptansicht ist Teil des Partner-Pakets und gilt auch für alle Mandanten dieses Partners.</span></div>
+        </div>
+
+        <hr class="dvd">
+        <h3 class="set-section-h">Farben</h3>
+        <p class="hint">Akzent- und Grundfarbe für die gesamte App, PDF-Ausgaben und Mails.</p>
+        <button class="btn" id="open-dp">Darstellung öffnen</button>
+
+        <div id="partner-block">
+          <hr class="dvd">
+          <h3 class="set-section-h">Für Mandanten</h3>
+          <p class="hint">Als Partner legst du fest, was deine Mandanten sehen und was sie selbst ändern dürfen.</p>
+          <div class="chk" id="chk-lock"><span class="bx">✓</span>
+            <div><b>Darstellung vorgeben</b>
+              <span>Mandanten übernehmen deine Auswahl und können sie nicht ändern. Aus = jeder Mandant wählt selbst.</span></div></div>
+          <div class="chk off" id="chk-colors"><span class="bx">✓</span>
+            <div><b>Farben freigeben</b>
+              <span>Mandanten dürfen Akzent und Grundfarbe selbst setzen. Normalerweise aus — die Farben sind deine Marke.</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="set-foot">
+      <div class="inf"><span class="dots"><i></i><i></i><i></i></span>
+        <span>Auto-Save aktiv · Änderungen werden direkt übernommen</span></div>
+      <button class="fbtn">Abbrechen</button>
+      <button class="fbtn gold">✓ Speichern</button>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h3>Was hier aus Vorhandenem gebaut ist</h3>
+    <ul>
+      <li><b>Die Schalter sind kein neues Bauteil.</b> <code>dp-tt-mode-toggle</code> mit <code>dp-tt-mode-btn</code> trägt heute schon Tooltip-Hilfe und Marktbericht-Design. Die drei neuen Blöcke erben Optik und Verhalten — nur die Spaltenzahl ändert sich.</li>
+      <li><b>Der Abschnitt „Darstellung" existiert bereits</b> (v931, settings.js ~Z.719) mit <code>_dpOpenFromSettings()</code>. Die neuen Blöcke kommen darüber, der Knopf bleibt wo er ist und heißt weiter „Darstellung öffnen".</li>
+      <li><b>Trennung wie gehabt:</b> hier Form (Aufbau, Dichte, Kartenmodus), dort Farbe. Die Farbe liegt schon auf der <code>--gold*</code>/<code>--obsidian</code>-Ebene, die <code>DealPilotWhitelabel.apply()</code> setzt.</li>
+    </ul>
+    <h3>Ein Haken bei der mobilen Freigabe</h3>
+    <ul>
+      <li><b>Die Handy-Sperre feuert, bevor der Plan bekannt ist.</b> <code>v970</code> prüft Bildschirmbreite und Zeigergerät beim Laden — der Plan kommt erst mit <code>dp:plan-ready</code>. Eine plan-abhängige Freigabe braucht deshalb den gecachten Merker <code>dp_last_plan</code>, sonst blitzt entweder die Sperre kurz auf oder die App zeigt sich jemandem, der sie nicht haben soll.</li>
+      <li><b>Mein Vorschlag:</b> Sperre entscheidet aus <code>dp_last_plan</code> und korrigiert sich still, sobald <code>dp:plan-ready</code> feuert. Beim allerersten Login auf einem neuen Gerät greift dann einmal der Standard — das ist der ehrlichste Kompromiss und gehört in den Testfall.</li>
+      <li><b>„Nicht die MA":</b> gemeint ist die echte Hauptansicht responsiv, nicht <code>mobile-demo.html</code>. Die MA-Reihe bleibt unberührt, ebenso ihr eigener Direktaufruf-Block aus MA35.</li>
+    </ul>
+    <h3>Offene Entscheidungen</h3>
+    <ul>
+      <li><b>Wer darf was?</b> Oben in der Leiste kannst du den Plan durchschalten und sehen, was jeder sieht. Aktuell angenommen: Darstellung und Karten für alle, Farben ab Partner, mobile Freigabe ab Partner.</li>
+      <li><b>Vorgabe oder Wahl?</b> „Darstellung vorgeben" nimmt dem Mandanten die Auswahl. Konsequent fürs Whitelabel, aber ein Mandant mit 40 Objekten hätte gern Kompakt.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Darstellungs-Panel -->
+<div class="dpanel" id="dpanel">
+  <div class="dp-in">
+    <div class="dp-l">
+      <h2>Darstellung</h2>
+      <p>Farben für App, PDF-Ausgaben und Mails. Jede Änderung ist sofort sichtbar.</p>
+
+      <div style="margin-top:20px">
+        <h3 class="set-section-h">Akzentfarbe</h3>
+        <div class="swrow" id="sw-acc">
+          <button class="sw on" data-acc="#C9A84C" style="background:#C9A84C"></button>
+          <button class="sw" data-acc="#1F4E79" style="background:#1F4E79"></button>
+          <button class="sw" data-acc="#0F6E6E" style="background:#0F6E6E"></button>
+          <button class="sw" data-acc="#7B2D3B" style="background:#7B2D3B"></button>
+          <button class="sw" data-acc="#3A4250" style="background:#3A4250"></button>
+          <button class="sw" data-acc="#5B7C3A" style="background:#5B7C3A"></button>
+        </div>
+        <div class="hexrow"><input id="hex-acc" value="#C9A84C"><span>Ersetzt Gold in der gesamten Oberfläche.</span></div>
+      </div>
+
+      <div style="margin-top:22px">
+        <h3 class="set-section-h">Grundfarbe (Obsidian)</h3>
+        <div class="swrow" id="sw-obs">
+          <button class="sw on" data-obs="#050505" style="background:#050505"></button>
+          <button class="sw" data-obs="#0B1220" style="background:#0B1220"></button>
+          <button class="sw" data-obs="#16110B" style="background:#16110B"></button>
+          <button class="sw" data-obs="#0D1512" style="background:#0D1512"></button>
+        </div>
+        <div class="hexrow"><input id="hex-obs" value="#050505"><span>Nur wirksam in der Darstellung „DealPilot".</span></div>
+      </div>
+
+      <div style="margin-top:22px">
+        <h3 class="set-section-h">Mail-Akzent</h3>
+        <p class="hint">Kopfzeile in Kunden-Mails. Standard = Akzentfarbe.</p>
+        <div class="hexrow"><input id="hex-mail" value="#C9A84C"><span>Getrennt einstellbar, falls Mails ruhiger sein sollen.</span></div>
+      </div>
+    </div>
+
+    <div class="dp-r">
+      <div class="cap">Sofortvorschau</div>
+      <div class="prev" id="prev">
+        <div class="ph"><div class="mk">D</div><b>DealPilot</b><span class="k">89 L</span></div>
+        <div class="pc">
+          <div class="pcard">
+            <div class="hd2"><span class="rg">70</span><b>Dealstreet 999</b></div>
+            <div class="bd2"><div class="p">180.000 €</div><div class="s">Dealhausen · privat</div></div>
+            <div class="ptiles"><div><i>DSCR</i><b>1,25</b></div><div><i>CF/J</i><b style="color:#3FA56C">+764 €</b></div>
+              <div><i>BMR</i><b>6,27 %</b></div></div>
+          </div>
+        </div>
+      </div>
+      <p class="hint" style="font-size:11.5px">Die Vorschau zeigt die aktive Darstellung mit deinen Farben. Statusfarben — Grün und Rot — bleiben in jeder Marke gleich.</p>
+    </div>
+
+    <div class="dp-foot">
+      <button class="fbtn" style="border-color:#DCD5C4;color:#3d382f" id="close-dp">Schließen</button>
+      <button class="fbtn gold" id="close-dp2">Übernehmen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var PLAN={
+ investor:{t:'Investor',
+  l:'Investor-Plan',
+  p:'Darstellung und Kartenmodus stehen jedem zahlenden Nutzer offen — das ist reine Bequemlichkeit, keine Leistung. Farben und die mobile Freigabe sind gesperrt.',
+  colors:0,mobile:0,partner:0},
+ pro:{t:'Pro',l:'Pro-Plan',
+  p:'Wie Investor. Farben bleiben dem Partner-Paket vorbehalten, weil sie zur Weitergabe an Mandanten gehören, nicht zur Eigennutzung.',
+  colors:0,mobile:0,partner:0},
+ partner:{t:'Partner',l:'Partner-Plan',
+  p:'Voller Zugriff: Darstellung, Karten, Farben und die mobile Freigabe. Zusätzlich der Block „Für Mandanten" — hier entscheidest du, was deine Mandanten sehen und was sie selbst ändern dürfen.',
+  colors:1,mobile:1,partner:1},
+ mandant:{t:'Mandant',l:'Mandant eines Partners',
+  p:'Sieht die Marke seines Partners. Ob er die Darstellung wechseln darf, hängt an dessen Schalter „Darstellung vorgeben". Farben sind hier gesperrt — sie sind die Marke des Partners, nicht seine.',
+  colors:0,mobile:1,partner:0}
+};
+
+function mix(h,to,a){var r=parseInt(h.substr(1,2),16),g=parseInt(h.substr(3,2),16),b=parseInt(h.substr(5,2),16),
+ t=to==='w'?255:0,f=function(c){return Math.round(c+(t-c)*a);},x=function(c){return ('0'+f(c).toString(16)).slice(-2);};
+ return '#'+x(r)+x(g)+x(b);}
+function lum(h){return (0.299*parseInt(h.substr(1,2),16)+0.587*parseInt(h.substr(3,2),16)+0.114*parseInt(h.substr(5,2),16))/255;}
+
+var acc='#C9A84C', obs='#050505', look='dp', plan='partner';
+
+function paintPreview(){
+ var p=document.getElementById('prev'), lt=lum(acc)>0.62, dark=(look==='dp');
+ p.style.setProperty('--pv-run','linear-gradient(120deg,'+mix(acc,'w',.28)+','+acc+' 60%,'+mix(acc,'b',.2)+')');
+ p.style.setProperty('--pv-on',lt?'#1a1407':'#fff');
+ p.style.setProperty('--pv-acc',dark?(lum(acc)<0.5?mix(acc,'w',.42):acc):(lt?mix(acc,'b',.4):acc));
+ if(dark){
+  p.style.setProperty('--pv-chr',obs);
+  p.style.setProperty('--pv-line','rgba(201,168,76,.16)');
+  p.style.setProperty('--pv-ink','#F2EFE6');
+  p.style.setProperty('--pv-card',mix(obs,'w',.05));
+  p.style.setProperty('--pv-cl','rgba(201,168,76,.2)');
+  p.style.setProperty('--pv-pink','#F0EADC');
+  p.style.setProperty('--pv-mut','#7C7669');
+  p.style.setProperty('--pv-tile','rgba(255,255,255,.04)');
+  p.style.setProperty('--pv-tl','rgba(255,255,255,.08)');
+ } else {
+  var cool=(look==='panel');
+  p.style.setProperty('--pv-chr',cool?'#F3F5F7':'#FFFFFF');
+  p.style.setProperty('--pv-line',cool?'#E2E7ED':'#E7E4DD');
+  p.style.setProperty('--pv-ink',cool?'#151a20':'#141310');
+  p.style.setProperty('--pv-card','#FFFFFF');
+  p.style.setProperty('--pv-cl',cool?'#E2E7ED':'#E7E4DD');
+  p.style.setProperty('--pv-pink',cool?'#151a20':'#141310');
+  p.style.setProperty('--pv-mut',cool?'#8a95a2':'#918d84');
+  p.style.setProperty('--pv-tile',cool?'#F8F9FB':'#FAF9F7');
+  p.style.setProperty('--pv-tl',cool?'#E2E7ED':'#E7E4DD');
+ }
+}
+function setPlan(k){
+ plan=k; var P=PLAN[k];
+ document.querySelectorAll('.ib[data-plan]').forEach(function(x){x.classList.toggle('on',x.dataset.plan===k);});
+ document.getElementById('l-t').textContent='Einstellungen → Profil & Anzeige · '+P.l;
+ document.getElementById('l-p').textContent=P.p;
+ document.getElementById('nv-plan').textContent=P.t;
+ document.getElementById('partner-block').style.display=P.partner?'block':'none';
+ document.getElementById('chk-mobile').style.display=P.mobile?'flex':'none';
+ document.getElementById('gate-mobile').style.display=P.mobile?'none':'flex';
+ var b=document.getElementById('open-dp');
+ b.disabled=!P.colors; b.style.opacity=P.colors?1:.45; b.style.cursor=P.colors?'pointer':'not-allowed';
+ b.textContent=P.colors?'Darstellung öffnen':'Darstellung öffnen · ab Partner';
+}
+function seg(id,attr,cb){
+ document.getElementById(id).addEventListener('click',function(e){
+  var b=e.target.closest('.dp-tt-mode-btn'); if(!b) return;
+  this.querySelectorAll('.dp-tt-mode-btn').forEach(function(x){x.classList.remove('active');});
+  b.classList.add('active'); if(cb) cb(b.dataset[attr]);
+ });
+}
+seg('sw-look','look',function(v){look=v;paintPreview();});
+seg('sw-cards','cards');
+seg('sw-surf','surf');
+
+document.querySelectorAll('.ib[data-plan]').forEach(function(b){b.addEventListener('click',function(){setPlan(b.dataset.plan);});});
+document.querySelectorAll('.chk').forEach(function(c){c.addEventListener('click',function(){c.classList.toggle('off');});});
+document.getElementById('open-dp').addEventListener('click',function(){
+ if(this.disabled) return; document.getElementById('dpanel').classList.add('open');});
+document.getElementById('close-dp').addEventListener('click',function(){document.getElementById('dpanel').classList.remove('open');});
+document.getElementById('close-dp2').addEventListener('click',function(){document.getElementById('dpanel').classList.remove('open');});
+document.getElementById('dpanel').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+document.getElementById('sw-acc').addEventListener('click',function(e){
+ var b=e.target.closest('.sw'); if(!b) return;
+ this.querySelectorAll('.sw').forEach(function(x){x.classList.remove('on');}); b.classList.add('on');
+ acc=b.dataset.acc; document.getElementById('hex-acc').value=acc; document.getElementById('hex-mail').value=acc; paintPreview();});
+document.getElementById('sw-obs').addEventListener('click',function(e){
+ var b=e.target.closest('.sw'); if(!b) return;
+ this.querySelectorAll('.sw').forEach(function(x){x.classList.remove('on');}); b.classList.add('on');
+ obs=b.dataset.obs; document.getElementById('hex-obs').value=obs; paintPreview();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')document.getElementById('dpanel').classList.remove('open');});
+
+setPlan('partner'); paintPreview();
+</script>
+</body>
+</html>

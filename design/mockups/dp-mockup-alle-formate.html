@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Handyversion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;font-family:'Inter',system-ui,sans-serif;color:#e8e6df;padding-bottom:50px}
+
+/* ══ Demo-Leiste ══ */
+.bar{position:sticky;top:0;z-index:900;background:rgba(10,10,10,.97);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(201,168,76,.22);padding:10px 20px}
+.bar-in{max-width:1500px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.bar .brand{font-family:'Space Grotesk';font-weight:700;font-size:15px;white-space:nowrap}
+.bar .brand span{color:#C9A84C}
+.grp{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.grp>label{font-family:'JetBrains Mono';font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#7d7768;margin-right:2px}
+.ib{font-family:'JetBrains Mono';font-size:10.5px;font-weight:600;padding:7px 10px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.14);background:transparent;color:#b9b3a4;cursor:pointer;transition:.16s}
+.ib:hover{border-color:rgba(201,168,76,.6);color:#E8CC7A}
+.ib.on{background:#C9A84C;border-color:#C9A84C;color:#1a1407}
+.sw{width:23px;height:23px;border-radius:50%;border:2px solid rgba(255,255,255,.18);cursor:pointer;padding:0;transition:.16s}
+.sw:hover{transform:scale(1.12)} .sw.on{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.16)}
+
+.stage{max-width:1500px;margin:22px auto 0;padding:0 20px}
+.head{margin-bottom:16px}
+.head h2{font-family:'Space Grotesk';font-size:19px;font-weight:600;color:#f3efe6}
+.head p{font-size:12.5px;line-height:1.6;color:#a39d8b;max-width:860px;margin-top:5px}
+.rack{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+.slot{display:flex;flex-direction:column;align-items:center;gap:9px}
+.slot .cap{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8d8778}
+.slot .cap b{color:#C9A84C;font-weight:700}
+
+/* ══ Telefon ══ */
+.phone{position:relative;flex:none;overflow:hidden;background:#000;
+  box-shadow:0 32px 66px -30px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.06)}
+.phone[data-vp="p"]{width:390px;height:800px;border-radius:36px;border:9px solid #17171a}
+.phone[data-vp="tp"]{width:790px;height:940px;border-radius:22px;border:11px solid #17171a}
+.phone[data-vp="t"]{width:1020px;height:730px;border-radius:20px;border:11px solid #17171a}
+.phone[data-vp="d"]{width:1340px;height:830px;border-radius:12px;border:1px solid rgba(255,255,255,.12)}
+.phone:not([data-vp="p"]) .notch{display:none}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:112px;height:24px;
+  background:#17171a;border-radius:0 0 15px 15px;z-index:200}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--pane);color:var(--ink);font-family:var(--f-body)}
+.stat{height:28px;flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;background:var(--chr);color:var(--c-ink);font-family:var(--f-num);font-size:10px;font-weight:600}
+.stat .r{display:flex;gap:5px;align-items:center;opacity:.75}
+
+/* ── Kopfleiste ── */
+.hd{flex:none;display:flex;align-items:center;gap:9px;padding:0 11px;height:50px;
+  background:var(--chr);border-bottom:1px solid var(--c-line)}
+.hbtn{width:38px;height:38px;flex:none;border-radius:9px;border:1px solid var(--c-line2);
+  background:var(--c-surf);color:var(--c-ink2);display:grid;place-items:center;cursor:pointer}
+.hbtn:active{background:var(--acc-tint)}
+.hbtn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9}
+.htxt{flex:1;min-width:0}
+.htxt b{display:block;font-family:var(--f-disp);font-size:13.5px;font-weight:600;color:var(--c-ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+.htxt span{display:block;font-family:var(--f-num);font-size:9px;color:var(--c-mut);margin-top:2px}
+.kero{flex:none;display:flex;align-items:center;gap:5px;padding:6px 9px;border-radius:8px;
+  background:var(--c-surf);border:1px solid var(--c-line2)}
+.kero svg{width:12px;height:12px;stroke:var(--gold);fill:none;stroke-width:1.8}
+.kero b{font-family:var(--f-num);font-size:11px;font-weight:700;color:var(--gold)}
+
+/* ── Fortschritt ── */
+.prog{flex:none;display:flex;align-items:center;gap:9px;padding:7px 13px;
+  background:var(--c-surf);border-bottom:1px solid var(--c-line)}
+.prog .l{font-family:var(--f-num);font-size:9.5px;font-weight:600;color:var(--c-ink2);white-space:nowrap}
+.trk{flex:1;height:4px;border-radius:3px;background:var(--c-track);overflow:hidden}
+.trk i{display:block;height:100%;border-radius:3px;background:#3FA56C}
+
+/* ── Tabs ── */
+.tabwrap{flex:none;display:flex;background:var(--chr);border-bottom:1px solid var(--c-line)}
+.tabs{flex:1;min-width:0;display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
+.tabs::-webkit-scrollbar{display:none}
+.tab{position:relative;flex:none;display:flex;align-items:center;gap:6px;border:0;background:none;
+  cursor:pointer;color:var(--c-mut);font-family:var(--f-body);font-size:11.5px;font-weight:500;
+  padding:12px 11px;white-space:nowrap;scroll-snap-align:center}
+.tab svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7}
+.tab.on{color:var(--gold);font-weight:600}
+.tab.on::after{content:"";position:absolute;left:8px;right:8px;bottom:0;height:2px;background:var(--gold)}
+.tab .ok{color:#3FA56C;font-size:10px}
+.tabgrid-btn{flex:none;width:42px;border:0;border-left:1px solid var(--c-line);background:var(--c-surf);
+  color:var(--c-ink2);cursor:pointer;display:grid;place-items:center}
+.tabgrid-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+/* ── Inhalt ── */
+.body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 12px 84px;background:var(--pane)}
+.sech{border-left:3px solid var(--gold);padding-left:11px;margin-bottom:15px}
+.sech h1{font-family:var(--f-h1);font-size:var(--h1s);font-weight:var(--h1w);color:var(--ink);line-height:1.15}
+.sech p{font-size:11.5px;color:var(--mut);margin-top:4px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:14px 13px;margin-bottom:11px;box-shadow:var(--sh)}
+.card>h3{display:flex;align-items:center;gap:8px;font-family:var(--f-num);font-size:9.5px;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--ink2);padding-bottom:10px;
+  border-bottom:1px solid var(--line);margin-bottom:13px}
+.card>h3 .bx{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:var(--gold-tint);flex:none}
+.card>h3 .bx svg{width:12px;height:12px;stroke:var(--gold-ink);fill:none;stroke-width:1.9}
+.fld{margin-bottom:11px}
+.fld:last-child{margin-bottom:0}
+.fld label{display:block;font-size:11.5px;font-weight:500;color:var(--ink2);margin-bottom:5px}
+.fld label em{color:#B8625C;font-style:normal}
+.fld input,.fld select{width:100%;font-family:var(--f-body);font-size:16px;color:var(--ink);
+  padding:11px;border:1px solid var(--line2);border-radius:var(--rs);background:var(--surf2);outline:none}
+.fld input:focus,.fld select:focus{border-color:var(--gold);background:var(--surf)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.duo .fld{margin-bottom:0}
+.star{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:9px 0;border-bottom:1px solid var(--line)}
+.star:last-child{border-bottom:0}
+.star .n{font-size:12px;color:var(--ink2)}
+.star .s{display:flex;gap:3px}.star .s span{font-size:19px;color:var(--line2)}.star .s span.f{color:var(--gold)}
+
+/* ── Fußleiste ── */
+.foot{position:absolute;left:0;right:0;bottom:0;z-index:70;display:flex;align-items:center;gap:8px;
+  padding:9px 11px 13px;background:var(--chr);border-top:1px solid var(--c-line)}
+.foot .cur{flex:1;min-width:0;display:flex;align-items:center;gap:9px;padding:7px 10px;min-height:46px;
+  border:1px solid var(--c-line2);border-radius:10px;background:var(--c-surf);cursor:pointer}
+.foot .cur .rg{flex:none}
+.foot .cur .t{min-width:0}
+.foot .cur .t b{display:block;font-size:11.5px;font-weight:600;color:var(--c-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.foot .cur .t span{display:block;font-family:var(--f-num);font-size:9px;color:var(--c-mut);margin-top:1px}
+.foot .act{flex:none;width:46px;height:46px;border-radius:10px;border:0;background:var(--gold);
+  color:var(--on-gold);cursor:pointer;display:grid;place-items:center}
+.foot .act svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.1}
+
+/* ── Overlays ── */
+.bd{position:absolute;inset:0;background:rgba(4,3,2,.6);opacity:0;pointer-events:none;transition:opacity .22s;z-index:80}
+.scr.open-list .bd,.scr.open-act .bd,.scr.open-tabs .bd{opacity:1;pointer-events:auto}
+
+/* Objektliste als Vollbild-Blatt */
+.list{position:absolute;inset:0;z-index:90;background:var(--chr);display:flex;flex-direction:column;
+  transform:translateX(-100%);transition:transform .26s cubic-bezier(.2,.8,.3,1)}
+.scr.open-list .list{transform:none}
+.list-hd{flex:none;display:flex;align-items:center;gap:10px;padding:12px 12px;border-bottom:1px solid var(--c-line)}
+.logo{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+.logo .mk{width:36px;height:36px;flex:none;border-radius:9px;display:grid;place-items:center;
+  background:var(--runway);font-family:var(--f-disp);font-weight:700;font-size:16px;color:var(--on-gold);
+  box-shadow:var(--mk-glow)}
+.logo .tx b{display:block;font-family:var(--f-disp);font-size:15px;font-weight:700;color:var(--c-ink);line-height:1.1}
+.logo .tx b i{color:var(--gold);font-style:normal}
+.logo .tx span{display:block;font-size:9.5px;color:var(--c-mut);margin-top:2px}
+.list-tools{flex:none;display:flex;gap:7px;padding:10px 12px;border-bottom:1px solid var(--c-line)}
+.srch{flex:1;position:relative}
+.srch input{width:100%;font-family:var(--f-body);font-size:16px;color:var(--c-ink);padding:10px 11px 10px 30px;
+  border:1px solid var(--c-line2);border-radius:9px;background:var(--c-surf);outline:none}
+.srch input::placeholder{color:var(--c-mut)}
+.srch::before{content:"⌕";position:absolute;left:10px;top:9px;color:var(--c-mut);font-size:15px}
+.tbtn{width:44px;height:44px;flex:none;border-radius:9px;border:1px solid var(--c-line2);
+  background:var(--c-surf);color:var(--c-mut);display:grid;place-items:center;cursor:pointer}
+.tbtn.on{border-color:var(--gold);color:var(--gold);background:var(--gold-tint)}
+.tbtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8}
+.list-sec{flex:none;display:flex;align-items:center;justify-content:space-between;padding:11px 14px 7px}
+.list-sec span{font-family:var(--f-num);font-size:9px;letter-spacing:.19em;text-transform:uppercase;color:var(--c-mut)}
+.list-sec b{font-family:var(--f-num);font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:20px;
+  background:var(--gold-tint);color:var(--gold)}
+.list-body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 11px 16px;
+  display:flex;flex-direction:column;gap:9px}
+.list-foot{flex:none;border-top:1px solid var(--c-line);padding:10px 12px 14px;display:flex;align-items:center;gap:10px}
+.ava{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--f-num);font-size:12px;font-weight:700;background:var(--gold);color:var(--on-gold)}
+.list-foot .t{flex:1;min-width:0}
+.list-foot .t b{display:block;font-size:12px;font-weight:600;color:var(--c-ink)}
+.list-foot .t span{display:block;font-size:10px;color:var(--c-mut);margin-top:1px}
+.pbadge{font-family:var(--f-num);font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 8px;border-radius:5px;background:var(--gold-tint);color:var(--gold);flex:none}
+
+/* ── Objektkarte (Klassen wie _renderRichCard) ── */
+.sb-card{position:relative;flex:0 0 auto;background:var(--k-bg);border:1px solid var(--k-line);
+  border-radius:var(--r);overflow:hidden;cursor:pointer;box-shadow:var(--k-sh)}
+.sb-card.active{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),var(--k-sh)}
+.sbc-ribs{display:flex;align-items:center;gap:6px;padding:7px 10px 0}
+.sbc-won-ribbon,.sbc-lost-ribbon{font-family:var(--f-num);font-size:8px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:3px 7px;border-radius:5px}
+.sbc-won-ribbon{background:rgba(63,165,108,.16);color:#3FA56C}
+.sbc-lost-ribbon{background:rgba(184,98,92,.16);color:#B8625C}
+.sbc-investor-ribbon{margin-left:auto;font-family:var(--f-num);font-size:8px;font-weight:700;letter-spacing:.08em;
+  padding:3px 7px;border-radius:5px;background:var(--gold-tint);color:var(--gold)}
+.sbc-top{display:flex;align-items:center;gap:10px;padding:9px 10px}
+.sbc-thumb{position:relative;width:52px;height:52px;flex:none}
+.sbc-thumb-photo{width:100%;height:100%;border-radius:8px;background:var(--thumb)}
+.sbc-top-body{flex:1;min-width:0}
+.sbc-top-line1{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.sbc-seq{font-family:var(--f-num);font-size:8.5px;font-weight:700;letter-spacing:.04em;padding:2px 6px;
+  border-radius:4px;background:var(--k-tile);border:1px solid var(--k-tline);color:var(--k-ink2)}
+.sbc-date{font-family:var(--f-num);font-size:8.5px;color:var(--k-mut)}
+.sbc-address{font-size:12.5px;font-weight:600;color:var(--k-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbc-halter{font-size:9.5px;color:var(--k-mut);margin-top:2px}
+.sbc-kp{font-family:var(--f-num);font-size:15px;font-weight:700;color:var(--k-price);margin-top:3px;letter-spacing:-.02em}
+.sbc-score-overlay{flex:none;text-align:center}
+.sbc-mini-score{position:relative;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center}
+.sbc-mini-score svg{position:absolute;inset:0}
+.sbc-mini-score-num{position:relative;z-index:2;font-family:var(--f-num);font-size:13px;font-weight:700;color:currentColor}
+.sbc-score-green{color:#3FA56C}.sbc-score-gold{color:var(--gold)}.sbc-score-red{color:#B8625C}
+.sbc-score-label{display:block;font-family:var(--f-num);font-size:7.5px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--k-mut);margin-top:3px}
+.sbc-kp-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 10px 11px;align-items:stretch}
+.sbc-mini-grid{background:var(--k-tile);border:1px solid var(--k-tline);border-radius:7px;
+  padding:7px 7px 7px;display:flex;flex-direction:column;min-height:64px}
+.sbc-mini-grid i{display:block;font-family:var(--f-num);font-size:7px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--k-mut);font-style:normal}
+.sbc-mini-grid b{display:block;font-family:var(--f-num);font-size:12.5px;font-weight:700;margin:3px 0 6px;color:var(--k-ink)}
+.sbcm-viz{margin-top:auto}
+.sbcm-scale{height:3px;border-radius:2px;background:var(--k-tline);position:relative;overflow:visible}
+.sbcm-scale i{position:absolute;top:-2px;width:2px;height:7px;border-radius:1px;background:currentColor}
+.sbcm-spark{width:100%;height:15px;display:block;overflow:visible}
+.sbcm-tick{display:flex;justify-content:space-between;font-family:var(--f-num);font-size:7.5px;
+  color:var(--k-mut);margin-top:4px;line-height:1}
+
+/* Aktionen-Sheet */
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:95;background:var(--sheet-bg);
+  border-top:1px solid var(--c-line2);border-radius:20px 20px 0 0;max-height:82%;overflow-y:auto;
+  transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.3,1);padding-bottom:16px}
+.scr.open-act .sheet{transform:none}
+.sheet-h{position:sticky;top:0;background:var(--sheet-bg);padding:10px 0 0;z-index:2}
+.sheet-h i{display:block;width:38px;height:4px;border-radius:3px;background:var(--c-line2);margin:0 auto}
+.sheet-h b{display:block;text-align:center;font-family:var(--f-num);font-size:9.5px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--c-mut);margin-top:10px;padding-bottom:10px;border-bottom:1px solid var(--c-line)}
+.sgrp{padding:12px}
+.sgrp+.sgrp{border-top:1px solid var(--c-line)}
+.sgrp h4{font-family:var(--f-num);font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--c-mut);margin-bottom:9px}
+.stiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stile{position:relative;min-height:80px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;
+  padding:11px;border:1px solid var(--c-line2);border-radius:11px;background:var(--c-surf);
+  color:var(--c-ink2);cursor:pointer;text-align:left;font-family:var(--f-body)}
+.stile:active{border-color:var(--gold);background:var(--gold-tint)}
+.stile.cur{border-color:var(--gold)}
+.stile svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;opacity:.9}
+.stile.acc svg{stroke:var(--gold);opacity:1}
+.stile b{display:block;font-size:12.5px;font-weight:600;color:var(--c-ink)}
+.stile em{display:block;font-style:normal;font-size:9.5px;line-height:1.35;color:var(--c-mut);margin-top:3px}
+.stile .tg{position:absolute;top:9px;right:9px;font-family:var(--f-num);font-size:7.5px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;padding:3px 6px;border-radius:4px;background:var(--gold-tint);color:var(--gold)}
+.stile .tg.gate{background:var(--c-track);color:var(--c-mut)}
+
+/* Tab-Übersicht */
+.tabsheet{position:absolute;left:0;right:0;bottom:0;z-index:95;background:var(--sheet-bg);
+  border-top:1px solid var(--c-line2);border-radius:20px 20px 0 0;transform:translateY(100%);
+  transition:transform .26s cubic-bezier(.2,.8,.3,1);padding-bottom:16px}
+.scr.open-tabs .tabsheet{transform:none}
+.tabsheet .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+.tt{position:relative;display:flex;align-items:center;gap:9px;padding:12px 11px;border-radius:10px;
+  border:1px solid var(--c-line2);background:var(--c-surf);color:var(--c-ink2);cursor:pointer;
+  font-family:var(--f-body);font-size:12.5px;font-weight:500;text-align:left;min-height:48px}
+.tt svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7;flex:none}
+.tt.on{border-color:var(--gold);color:var(--gold);background:var(--gold-tint);font-weight:600}
+.tt .ok{margin-left:auto;color:#3FA56C;font-size:11px}
+.tt .todo{margin-left:auto;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+
+/* ═════════ LOOK · DEALPILOT (dunkel, wie heute) ═════════ */
+[data-look="dp"]{
+  --chr:var(--obsidian);--c-ink:#F2EFE6;--c-ink2:#B4AE9E;--c-mut:#736E61;
+  --c-line:rgba(201,168,76,.15);--c-line2:rgba(201,168,76,.25);--c-surf:var(--obs-surf);
+  --c-track:rgba(255,255,255,.1);--sheet-bg:var(--obs-card);
+  --pane:#FDFCFA;--surf:#FFFFFF;--surf2:#FAF8F3;--ink:#1a1712;--ink2:#4e4940;--mut:#8f897c;
+  --line:#EAE5DA;--line2:#DDD6C7;--r:11px;--rs:8px;--sh:0 2px 10px -8px rgba(30,24,10,.3);
+  --f-body:'Inter',sans-serif;--f-disp:'Space Grotesk',sans-serif;--f-num:'JetBrains Mono',monospace;
+  --f-h1:'Cormorant Garamond',Georgia,serif;--h1s:26px;--h1w:600;
+  --thumb:linear-gradient(135deg,#3a352d,#22201c);--mk-glow:0 0 0 1px rgba(201,168,76,.4),0 0 20px -6px var(--gold);
+  --k-bg:var(--obs-card);--k-line:rgba(201,168,76,.18);--k-ink:#F2EFE6;--k-ink2:#B4AE9E;--k-mut:#736E61;
+  --k-tile:rgba(255,255,255,.035);--k-tline:rgba(255,255,255,.08);--k-price:#F0EADC;
+  --k-sh:0 3px 14px -9px rgba(0,0,0,.8)}
+
+/* ═════════ LOOK · KONTOR (weiß, flach) ═════════ */
+[data-look="kontor"]{
+  --chr:#FFFFFF;--c-ink:#141310;--c-ink2:#4a4740;--c-mut:#918d84;
+  --c-line:#E7E4DD;--c-line2:#D9D5CC;--c-surf:#FAF9F7;--c-track:#EDEAE3;--sheet-bg:#FFFFFF;
+  --pane:#FFFFFF;--surf:#FFFFFF;--surf2:#FAF9F7;--ink:#141310;--ink2:#4a4740;--mut:#918d84;
+  --line:#E7E4DD;--line2:#D9D5CC;--r:3px;--rs:3px;--sh:none;
+  --f-body:'Inter',sans-serif;--f-disp:'Space Grotesk',sans-serif;--f-num:'JetBrains Mono',monospace;
+  --f-h1:'Space Grotesk',sans-serif;--h1s:21px;--h1w:600;
+  --thumb:linear-gradient(135deg,#dcd8d0,#b0aba1);--mk-glow:none;
+  --k-bg:#FFFFFF;--k-line:#E7E4DD;--k-ink:#141310;--k-ink2:#4a4740;--k-mut:#918d84;
+  --k-tile:#FAF9F7;--k-tline:#E7E4DD;--k-price:#141310;--k-sh:none}
+[data-look="kontor"] .sb-card{border-radius:3px}
+[data-look="kontor"] .card{border-radius:3px}
+
+/* ═════════ LOOK · PANEL (kühl, Karten) ═════════ */
+[data-look="panel"]{
+  --chr:#FFFFFF;--c-ink:#151a20;--c-ink2:#4a535e;--c-mut:#8a95a2;
+  --c-line:#E2E7ED;--c-line2:#D3DAE2;--c-surf:#F8F9FB;--c-track:#E7ECF1;--sheet-bg:#FFFFFF;
+  --pane:#F3F5F7;--surf:#FFFFFF;--surf2:#F8F9FB;--ink:#151a20;--ink2:#4a535e;--mut:#8a95a2;
+  --line:#E2E7ED;--line2:#D3DAE2;--r:12px;--rs:8px;--sh:0 1px 2px rgba(21,26,32,.05),0 4px 12px -8px rgba(21,26,32,.14);
+  --f-body:'Inter',sans-serif;--f-disp:'Inter',sans-serif;--f-num:'JetBrains Mono',monospace;
+  --f-h1:'Inter',sans-serif;--h1s:20px;--h1w:700;
+  --thumb:linear-gradient(135deg,#dee3e9,#b3bcc7);--mk-glow:none;
+  --k-bg:#FFFFFF;--k-line:#E2E7ED;--k-ink:#151a20;--k-ink2:#4a535e;--k-mut:#8a95a2;
+  --k-tile:#F8F9FB;--k-tline:#E2E7ED;--k-price:#151a20;
+  --k-sh:0 1px 2px rgba(21,26,32,.05),0 4px 12px -8px rgba(21,26,32,.14)}
+
+/* ═════════ KARTENMODUS · KOMPAKT ═════════ */
+[data-cards="kompakt"] .sbc-thumb{display:none}
+[data-cards="kompakt"] .sbc-ribs{padding:7px 10px 0}
+[data-cards="kompakt"] .sbc-halter{display:none}
+[data-cards="kompakt"] .sbc-top{padding:8px 10px}
+[data-cards="kompakt"] .sbc-kp{font-size:13px;font-weight:600;color:var(--k-ink2)}
+[data-cards="kompakt"] .sbc-mini-score{width:32px!important;height:32px!important}
+[data-cards="kompakt"] .sbc-score-label{display:none}
+[data-cards="kompakt"] .sbcm-viz{display:none}
+[data-cards="kompakt"] .sbc-mini-grid{min-height:0;padding:6px 8px;flex-direction:row;align-items:baseline;gap:6px}
+[data-cards="kompakt"] .sbc-mini-grid b{margin:0;font-size:11.5px}
+
+/* ═════════ KARTENMODUS · WALLET ═════════ */
+[data-cards="wallet"] .sb-card{display:flex;flex-direction:column}
+[data-cards="wallet"] .sbc-ribs{order:3;padding:0 10px 10px}
+[data-cards="wallet"] .sbc-top{order:1;display:grid;grid-template-columns:auto 1fr auto;
+  grid-template-rows:auto auto auto auto;align-items:center;gap:0 9px;padding:0;position:relative}
+[data-cards="wallet"] .sbc-top::before{content:"";grid-row:1/3;grid-column:1/-1;background:var(--runway);
+  z-index:0;align-self:stretch;justify-self:stretch}
+[data-cards="wallet"] .sbc-top::after{content:"";grid-row:1/3;grid-column:1/-1;z-index:1;pointer-events:none;
+  align-self:stretch;justify-self:stretch;opacity:.28;
+  background:repeating-linear-gradient(102deg,rgba(255,255,255,.18) 0 1px,transparent 1px 9px)}
+[data-cards="wallet"] .sbc-thumb{display:contents}
+[data-cards="wallet"] .sbc-top-body{display:contents}
+[data-cards="wallet"] .sbc-score-overlay{display:contents}
+[data-cards="wallet"] .sbc-mini-score{grid-row:1/3;grid-column:1;z-index:2;margin:9px 0 9px 10px;
+  width:42px!important;height:42px!important;border-radius:50%;background:#fff;
+  box-shadow:0 2px 9px -3px rgba(0,0,0,.5)}
+[data-cards="wallet"] .sbc-mini-score-num{font-size:14px;color:#1e1a12}
+[data-cards="wallet"] .sbc-address{grid-row:1;grid-column:2;z-index:2;color:var(--on-gold);
+  font-family:var(--f-disp);font-size:13.5px;padding-top:9px}
+[data-cards="wallet"] .sbc-top-line1{grid-row:2;grid-column:2;z-index:2;margin:0;padding-bottom:9px}
+[data-cards="wallet"] .sbc-seq{background:rgba(255,255,255,.2);border-color:transparent;color:var(--on-gold)}
+[data-cards="wallet"] .sbc-date{color:var(--on-gold);opacity:.78}
+[data-cards="wallet"] .sbc-score-label{grid-row:1/3;grid-column:3;z-index:2;align-self:center;margin:0 10px 0 0;
+  padding:5px 9px;border-radius:6px;background:#141310;color:currentColor;font-size:8px}
+[data-cards="wallet"] .sbc-thumb-photo{grid-row:3/5;grid-column:1;width:46px;height:46px;margin:10px 0 10px 10px}
+[data-cards="wallet"] .sbc-kp{grid-row:3;grid-column:2/4;margin:10px 10px 0 0;font-size:17px;align-self:end}
+[data-cards="wallet"] .sbc-halter{grid-row:4;grid-column:2/4;margin:2px 10px 10px 0;align-self:start}
+[data-cards="wallet"] .sbc-kp-row{order:2;padding:0 10px 10px}
+
+/* ═════════ KARTENFLÄCHE WEISS ═════════ */
+[data-surface="light"]{--k-bg:#FFFFFF;--k-line:var(--gold-soft);--k-ink:#1a1712;--k-ink2:#4e4940;
+  --k-mut:#8f897c;--k-tile:#FAF8F3;--k-tline:#E9E4D9;--k-price:#1a1712;
+  --k-sh:0 3px 12px -8px rgba(20,16,8,.45);--thumb:linear-gradient(135deg,#dcd7ce,#b3ada2)}
+
+/* ═════════ GERÄTE ═════════ */
+.maincol{flex:1;min-width:0;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.scr:not([data-vp="p"]) .stat{display:none}
+.scr:not([data-vp="p"]) .foot{display:none}
+.scr:not([data-vp="p"]) .body{padding-bottom:26px}
+.scr:not([data-vp="p"]) .hd{height:56px;padding:0 14px}
+.scr:not([data-vp="p"]) .hbtn,.scr:not([data-vp="p"]) .tbtn{width:42px;height:42px}
+
+/* Formular zweispaltig ab Tablet */
+.scr:not([data-vp="p"]) .body{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;align-content:start}
+.scr:not([data-vp="p"]) .sech{grid-column:1/-1}
+.scr[data-vp="d"] .body{padding:20px 22px 30px}
+
+/* Aktionen: auf Tablet/Desktop Popover statt Blatt von unten */
+.scr:not([data-vp="p"]) .sheet{left:9px;right:auto;width:312px;bottom:74px;max-height:64%;
+  border:1px solid var(--c-line2);border-radius:13px;transform:translateY(9px) scale(.99);opacity:0;pointer-events:none;
+  box-shadow:0 26px 56px -22px rgba(0,0,0,.75)}
+.scr:not([data-vp="p"]).open-act .sheet{transform:none;opacity:1;pointer-events:auto}
+.scr:not([data-vp="p"]) .sheet-h i{display:none}
+.scr:not([data-vp="p"]) .tabsheet{left:50%;right:auto;transform:translate(-50%,12px);width:520px;bottom:auto;top:120px;
+  border-radius:14px;border:1px solid var(--c-line2);opacity:0;pointer-events:none;
+  box-shadow:0 26px 56px -22px rgba(0,0,0,.75)}
+.scr:not([data-vp="p"]).open-tabs .tabsheet{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.scr:not([data-vp="p"]) .tabsheet .grid{grid-template-columns:1fr 1fr 1fr}
+
+/* Aktionen-Auslöser in der Liste (ersetzt die Handy-Fußleiste) */
+.list-act{display:none;align-items:center;gap:9px;width:100%;border:0;border-top:1px solid var(--c-line);
+  background:var(--c-surf);color:var(--c-ink2);padding:12px 14px;cursor:pointer;text-align:left;min-height:48px}
+.scr:not([data-vp="p"]) .list-act{display:flex}
+.list-act svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2}
+.list-act b{font-family:var(--f-num);font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.list-act span{margin-left:auto;font-size:11px;color:var(--c-mut)}
+.scr.open-act .list-act{background:var(--gold-tint);color:var(--gold)}
+
+/* Tablet: Liste bleibt Overlay-Drawer */
+.scr[data-vp="tp"] .list,.scr[data-vp="t"] .list{width:352px;box-shadow:16px 0 46px -24px rgba(0,0,0,.7)}
+
+/* Desktop: Liste ist feste Spalte */
+.scr[data-vp="d"]{flex-direction:row}
+.scr[data-vp="d"] .list{position:relative;transform:none;width:336px;flex:none;
+  border-right:1px solid var(--c-line);z-index:5}
+.scr[data-vp="d"] .bd{display:none}
+.scr[data-vp="d"] .list-hd .tbtn[data-o=""]{display:none}
+.scr[data-vp="d"] .hbtn[data-o="list"]{display:none}
+.scr[data-vp="d"] .tabgrid-btn{display:none}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.notes{max-width:1500px;margin:30px auto 0;padding:20px;border:1px solid rgba(255,255,255,.09);
+  border-radius:12px;background:rgba(255,255,255,.02)}
+.notes h3{font-family:'Space Grotesk';font-size:13.5px;color:#E8CC7A;margin:0 0 8px}
+.notes h3~h3{margin-top:17px}
+.notes ul{list-style:none;display:grid;gap:6px}
+.notes li{font-size:12.5px;line-height:1.55;color:#9b9585;padding-left:16px;position:relative}
+.notes li::before{content:"→";position:absolute;left:0;color:#C9A84C}
+.notes b{color:#cdc6b4} .notes code{font-family:'JetBrains Mono';font-size:11.5px;color:#bdb6a4}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="bar-in">
+  <div class="brand">Deal<span>Pilot</span> · Handyversion</div>
+  <div class="grp"><label>Gerät</label>
+    <button class="ib on" data-vp="p">Handy</button>
+    <button class="ib" data-vp="tp">Tablet hoch</button>
+    <button class="ib" data-vp="t">Tablet quer</button>
+    <button class="ib" data-vp="d">Desktop</button></div>
+  <div class="grp"><label>Look</label>
+    <button class="ib on" data-look="dp">DealPilot</button>
+    <button class="ib" data-look="kontor">Kontor</button>
+    <button class="ib" data-look="panel">Panel</button></div>
+  <div class="grp"><label>Karten</label>
+    <button class="ib" data-cards="kompakt">Kompakt</button>
+    <button class="ib on" data-cards="standard">Standard</button>
+    <button class="ib" data-cards="wallet">Wallet</button></div>
+  <div class="grp"><label>Fläche</label>
+    <button class="ib on" data-surface="auto">Passend</button>
+    <button class="ib" data-surface="light">Weiß</button></div>
+  <div class="grp"><label>Akzent</label>
+    <button class="sw on" data-acc="#C9A84C" style="background:#C9A84C" title="DealPilot Gold"></button>
+    <button class="sw" data-acc="#4E86C6" style="background:#4E86C6" title="Partner Blau"></button>
+    <button class="sw" data-acc="#3FA9A0" style="background:#3FA9A0" title="Partner Petrol"></button>
+    <button class="sw" data-acc="#C0697A" style="background:#C0697A" title="Partner Rosé"></button></div>
+  <div class="grp"><label>Obsidian</label>
+    <button class="sw on" data-obs="#050505" style="background:#050505" title="Standard"></button>
+    <button class="sw" data-obs="#0B1220" style="background:#0B1220" title="Nachtblau"></button>
+    <button class="sw" data-obs="#16110B" style="background:#16110B" title="Warmbraun"></button></div>
+</div></div>
+
+<div class="stage">
+  <div class="head">
+    <h2 id="h-t"></h2>
+    <p id="h-p"></p>
+    <p id="h-x" style="font-size:12px;color:#8d8778;border-left:2px solid rgba(201,168,76,.4);padding-left:10px;margin-top:8px;line-height:1.55"></p>
+  </div>
+
+  <div class="rack" id="rack"></div>
+
+  <div class="notes">
+    <h3>Was auf dem Handy nicht eins zu eins geht — und wie es hier gelöst ist</h3>
+    <ul>
+      <li><b>Neun Tabs passen nicht nebeneinander.</b> Sie scrollen mit Snap, aber man verliert den Überblick. Deshalb sitzt rechts am Tab-Streifen ein Raster-Knopf, der alle neun als Kacheln zeigt — mit Haken für erledigt und Punkt für offen. Zwei Antippen statt langem Wischen.</li>
+      <li><b>Die Objektliste ist keine Seitenleiste mehr,</b> sondern ein Vollbild-Blatt von links. Sie trägt die vollständige Karte inklusive Score-Ring, DSCR-Skala, Cashflow-Verlauf und BMR-Balken — auf dem Handy ist Platz für die volle Karte, weil sie nicht neben dem Formular liegen muss.</li>
+      <li><b>Aktionen wandern von oben nach unten.</b> Als Sheet über die feste Fußleiste, Kacheln statt Liste, Daumenreichweite. Der Bauteil existiert schon: <code>bsheetToggle</code> mit <code>bsheet-grid</code>.</li>
+      <li><b>Die Kopfleiste trägt heute zu viel.</b> Kürzel-Chip und Feldanzeige fliegen raus, der Feldfortschritt bekommt eine eigene schmale Zeile, Kerosin bleibt als Zahl.</li>
+      <li><b>Formulare fallen auf eine Spalte,</b> außer bei kurzen Paaren wie PLZ/Ort. Eingabefelder stehen auf 16 px — darunter zoomt iOS Safari beim Antippen hinein und der Nutzer landet verschoben.</li>
+      <li><b>Trefferflächen mindestens 44 px,</b> Hover-Zustände haben ein <code>:active</code>-Gegenstück.</li>
+    </ul>
+    <h3>Farben kommen aus der Partner-Konfiguration</h3>
+    <ul>
+      <li>Die Schalter oben sind keine Spielerei — <b>Akzent und Obsidian sind genau das, was ein Partner einstellt.</b> <code>DealPilotWhitelabel.apply()</code> setzt beides schon heute am <code>&lt;html&gt;</code>. Der Look bringt nur Form mit, die Farbe kommt von dort.</li>
+      <li>Probier <b>DealPilot + Nachtblau + Blau</b> — so sähe ein Partner-Mandant auf dem Handy aus.</li>
+      <li><b>Statusfarben bleiben hart:</b> Grün #3FA56C, Rot #B8625C. In jedem Look, bei jedem Partner.</li>
+    </ul>
+    <h3>Zum Bauen</h3>
+    <ul>
+      <li>Die Objektkarte nutzt weiter <b>ein Markup</b> — <code>sb-card</code>, <code>sbc-thumb</code>, <code>sbc-mini-score</code>, <code>sbc-kp-row</code>, die Ribbons. Der Score-Ring ist der vorhandene SVG mit berechnetem <code>stroke-dasharray</code>.</li>
+      <li><b>Die Handy-Sperre bleibt aktiv,</b> bis du sie bewusst aufhebst. Dieses Mockup ist der Entwurf für den Moment, in dem sie fällt.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+var IC={
+ home:'<path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/>',
+ coins:'<ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7"/><path d="M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
+ euro:'<path d="M17 6.5A6 6 0 1 0 17 17.5"/><path d="M4 10h8M4 14h8"/>',
+ bank:'<path d="M3 9l9-5 9 5"/><path d="M5 9v9M10 9v9M14 9v9M19 9v9"/><path d="M3 20h18"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M21 12h-2M5 12H3M18.4 5.6l-1.4 1.4M7 17l-1.4 1.4M18.4 18.4L17 17M7 7L5.6 5.6"/>',
+ doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/>',
+ pilot:'<circle cx="12" cy="12" r="8"/><path d="M15 9l-2.2 5.8L7 17l2.2-5.8z"/>',
+ chart:'<path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/>',
+ target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+ menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+ grid4:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+ fuel:'<path d="M5 20V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v15"/><path d="M3 20h12"/><path d="M16 9h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ sort:'<path d="M4 7h16M7 12h10M10 17h4"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ spark:'<path d="M12 4l1.8 4.7L18.5 10l-4.7 1.8L12 16.5l-1.8-4.7L5.5 10l4.7-1.3z"/>',
+ map:'<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+ trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/><path d="M10 14v3h4v-3M8 20h8"/>',
+ up:'<path d="M12 19V6"/><path d="M6.5 11.5L12 6l5.5 5.5"/><path d="M4 21h16"/>',
+ down:'<path d="M12 5v13"/><path d="M17.5 12.5L12 18l-5.5-5.5"/><path d="M4 21h16"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>'
+};
+var TABS=[['Objekt','home',1],['Investition','coins',1],['Miete','euro',1],['Finanzierung','bank',1],
+ ['Bewirtschaftung','gear',1],['Steuer','doc',1],['Pilot-Analyse','pilot',0],['Bewertung','chart',0],['Deal-Aktion','target',0]];
+var ACTS=[
+ {g:null,it:[['plus','Neues Objekt','Leeres Objekt starten','',''],
+  ['spark','Quick Boarding','30-Sekunden-Check','acc',''],
+  ['grid4','Portfolio-Cockpit','Alles auf einen Blick','',''],
+  ['map','Marktbericht','Mikro- und Makrolage','','2 L'],
+  ['home','Einzelobjekt','Das aktive Objekt','cur',''],
+  ['trophy','Track Record','Nachweise für die Bank','','Investor'],
+  ['bank','Bankexport','Selbstauskunft','','Investor']]},
+ {g:'Daten',it:[['up','Import','Excel oder JSON','',''],['down','Export','PDF, CSV, Sicherung','','Starter']]},
+ {g:'App',it:[['gear','Einstellungen','Darstellung, Plan','',''],['chat','Feedback','Direkter Draht','','']]}
+];
+var GATES={Investor:1,Starter:1};
+var OBJ=[
+ {seq:'2026-999',nm:'Dealstreet 999, Dealhausen',ort:'Dealhausen',dt:'23.12.2024',kp:'180.000 €',sc:70,lbl:'Gut',cls:'green',
+  dscr:1.25,dscrT:'1,25',cf:'+764 €',cfp:1,spark:[38,44,41,52,58,63,71,74],bmr:6.27,bmrT:'6,27 %',deal:'won',inv:1,act:1},
+ {seq:'2026-004',nm:'Bäckerstr. 7, Musterhausen',ort:'Musterhausen',dt:'30.09.2025',kp:'195.000 €',sc:48,lbl:'Schwach',cls:'red',
+  dscr:0.84,dscrT:'0,84',cf:'−2.550 €',cfp:-1,spark:[62,58,55,52,49,46,44,42],bmr:4.95,bmrT:'4,95 %',deal:'lost',inv:1,act:0},
+ {seq:'2026-1002',nm:'Am Markt 8, Kirchlengern',ort:'Kirchlengern',dt:'07.07.2024',kp:'134.500 €',sc:83,lbl:'Stark',cls:'green',
+  dscr:1.41,dscrT:'1,41',cf:'+1.180 €',cfp:1,spark:[52,55,61,64,70,74,79,83],bmr:7.10,bmrT:'7,10 %',deal:'won',inv:1,act:0}
+];
+
+function ring(o,sz){
+ sz=sz||38; var r=13, C=81.7, dash=(o.sc/100*C).toFixed(1);
+ return '<div class="sbc-mini-score sbc-score-'+o.cls+'" style="width:'+sz+'px;height:'+sz+'px">'
+  +'<svg viewBox="0 0 32 32" width="'+sz+'" height="'+sz+'">'
+  +'<circle cx="16" cy="16" r="'+r+'" fill="none" stroke="rgba(150,140,120,.28)" stroke-width="2.6"/>'
+  +'<circle cx="16" cy="16" r="'+r+'" fill="none" stroke="currentColor" stroke-width="2.6" '
+  +'stroke-dasharray="'+dash+' '+C+'" stroke-linecap="round" transform="rotate(-90 16 16)"/></svg>'
+  +'<span class="sbc-mini-score-num">'+o.sc+'</span></div>';
+}
+function sparkSvg(p,pos){
+ var w=100,h=30,mn=Math.min.apply(null,p),mx=Math.max.apply(null,p),sp=(mx-mn)||1;
+ var d=p.map(function(v,i){return (i/(p.length-1)*w).toFixed(1)+','+(h-((v-mn)/sp)*h).toFixed(1);}).join(' ');
+ return '<svg class="sbcm-spark" viewBox="0 0 100 30" preserveAspectRatio="none">'
+  +'<polyline points="'+d+'" fill="none" stroke="'+(pos>0?'#3FA56C':'#B8625C')+'" stroke-width="2.4" '
+  +'stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>';
+}
+function card(o){
+ var dp=Math.max(0,Math.min(100,(o.dscr/2)*100));
+ var bp=Math.max(0,Math.min(100,(o.bmr/10)*100));
+ var col=o.cls==='green'?'#3FA56C':(o.cls==='red'?'#B8625C':'var(--gold)');
+ return '<div class="sb-card'+(o.act?' active':'')+'" data-key="'+o.seq+'">'
+  +'<div class="sbc-ribs">'
+  +(o.deal==='won'?'<span class="sbc-won-ribbon">✓ Won</span>':'')
+  +(o.deal==='lost'?'<span class="sbc-lost-ribbon">✕ Lost</span>':'')
+  +(o.inv?'<span class="sbc-investor-ribbon">★ Investor</span>':'')+'</div>'
+  +'<div class="sbc-top">'
+  +'<div class="sbc-thumb"><div class="sbc-thumb-photo"></div></div>'
+  +'<div class="sbc-top-body">'
+  +'<div class="sbc-top-line1"><span class="sbc-seq">'+o.seq+'</span><span class="sbc-date">'+o.dt+'</span></div>'
+  +'<div class="sbc-address">'+o.nm+'</div>'
+  +'<div class="sbc-halter">'+o.ort+' · privat</div>'
+  +'<div class="sbc-kp">'+o.kp+'</div></div>'
+  +'<div class="sbc-score-overlay">'+ring(o)+'<span class="sbc-score-label">'+o.lbl+'</span></div>'
+  +'</div>'
+  +'<div class="sbc-kp-row">'
+  +'<div class="sbc-mini-grid" style="color:'+col+'"><i>DSCR</i><b>'+o.dscrT+'</b>'
+  +'<div class="sbcm-viz"><div class="sbcm-scale"><i style="left:'+dp+'%"></i></div>'
+  +'<div class="sbcm-tick"><span>0</span><span>1</span><span>2+</span></div></div></div>'
+  +'<div class="sbc-mini-grid"><i>CF / J</i><b style="color:'+(o.cfp>0?'#3FA56C':'#B8625C')+'">'+o.cf+'</b>'
+  +'<div class="sbcm-viz">'+sparkSvg(o.spark,o.cfp)
+  +'<div class="sbcm-tick"><span>5 J.</span><span>heute</span></div></div></div>'
+  +'<div class="sbc-mini-grid" style="color:'+col+'"><i>BMR</i><b>'+o.bmrT+'</b>'
+  +'<div class="sbcm-viz"><div class="sbcm-scale"><i style="left:'+bp+'%"></i></div>'
+  +'<div class="sbcm-tick"><span>0%</span><span>5%</span><span>10%</span></div></div></div>'
+  +'</div></div>';
+}
+
+function phone(id,cap,open,vp){
+ return '<div class="slot"><div class="cap">'+cap+'</div>'
+ +'<div class="phone" data-vp="'+vp+'"><div class="notch"></div>'
+ +'<div class="scr'+(open?' open-'+open:'')+'" data-vp="'+vp+'" id="'+id+'">'
+
+ +'<div class="list"><div class="list-hd"><div class="logo"><div class="mk">D</div>'
+ +'<div class="tx"><b>Deal<i>Pilot</i></b><span>by Junker Immobilien</span></div></div>'
+ +'<button class="tbtn" data-o=""><svg viewBox="0 0 24 24">'+IC.x+'</svg></button></div>'
+ +'<div class="list-tools"><div class="srch"><input placeholder="Objekt, Ort, Kürzel …"></div>'
+ +'<button class="tbtn on"><svg viewBox="0 0 24 24">'+IC.clock+'</svg></button>'
+ +'<button class="tbtn"><svg viewBox="0 0 24 24">'+IC.sort+'</svg></button></div>'
+ +'<div class="list-sec"><span>Portfolio</span><b>3 Objekte</b></div>'
+ +'<div class="list-body">'+OBJ.map(card).join('')+'</div>'
+ +'<button class="list-act" data-o="act"><svg viewBox="0 0 24 24">'+IC.menu+'</svg>'
+ +'<b>Aktionen</b><span>▲</span></button>'
+ +'<div class="list-foot"><div class="ava">M</div><div class="t"><b>Marcel Junker</b>'
+ +'<span>info@dealpilot.immo</span></div><span class="pbadge">Partner</span></div></div>'
+
+ +'<div class="maincol">'
+ +'<div class="stat"><span>15:50</span><span class="r"><span>LTE</span><span>69 %</span></span></div>'
+ +'<div class="hd">'
+ +'<button class="hbtn" data-o="list"><svg viewBox="0 0 24 24">'+IC.menu+'</svg></button>'
+ +'<div class="htxt"><b>Dealstreet 999, Dealhausen</b><span>2026-999 · ETW · 95 m²</span></div>'
+ +'<div class="kero"><svg viewBox="0 0 24 24">'+IC.fuel+'</svg><b>89 L</b></div></div>'
+ +'<div class="prog"><span class="l">24 / 24 Felder</span><div class="trk"><i style="width:100%"></i></div>'
+ +'<span class="l">100 %</span></div>'
+ +'<div class="tabwrap"><div class="tabs">'
+ + TABS.map(function(t,i){return '<button class="tab'+(i===0?' on':'')+'"><svg viewBox="0 0 24 24">'+IC[t[1]]+'</svg>'
+   +t[0]+(t[2]?'<span class="ok">✓</span>':'')+'</button>';}).join('')
+ +'</div><button class="tabgrid-btn" data-o="tabs"><svg viewBox="0 0 24 24">'+IC.grid4+'</svg></button></div>'
+ +'<div class="body">'
+ +'<div class="sech"><h1>Objekt &amp; Fotos</h1><p>Grunddaten, Lage und Fotos für den Bankexport.</p></div>'
+ +'<div class="card"><h3><span class="bx"><svg viewBox="0 0 24 24">'+IC.home+'</svg></span>Objektdaten</h3>'
+ +'<div class="duo"><div class="fld"><label>PLZ <em>*</em></label><input value="00000"></div>'
+ +'<div class="fld"><label>Ort <em>*</em></label><input value="Dealhausen"></div></div>'
+ +'<div class="fld" style="margin-top:11px"><label>Straße <em>*</em></label><input value="Dealstreet"></div>'
+ +'<div class="duo"><div class="fld"><label>Hausnummer</label><input value="999"></div>'
+ +'<div class="fld"><label>Baujahr <em>*</em></label><input value="1994"></div></div>'
+ +'<div class="fld" style="margin-top:11px"><label>Objektart</label><select><option>Eigentumswohnung (ETW)</option></select></div>'
+ +'<div class="duo"><div class="fld"><label>Wohnfläche m² <em>*</em></label><input value="95"></div>'
+ +'<div class="fld"><label>Zimmer</label><input value="3"></div></div></div>'
+ +'<div class="card"><h3><span class="bx"><svg viewBox="0 0 24 24">'+IC.target+'</svg></span>Qualität &amp; Zustand</h3>'
+ +'<div class="fld"><label>Zustand der Wohnung <em>*</em></label><select><option>Guter Zustand</option></select></div>'
+ +'<div class="fld"><label>Vermietungsstand</label><select><option>Vollvermietet</option></select></div>'
+ +'<div class="star"><span class="n">Küche</span><span class="s"><span class="f">★</span><span class="f">★</span><span class="f">★</span><span>★</span><span>★</span></span></div>'
+ +'<div class="star"><span class="n">Badezimmer</span><span class="s"><span class="f">★</span><span class="f">★</span><span class="f">★</span><span>★</span><span>★</span></span></div>'
+ +'<div class="star"><span class="n">Fußboden</span><span class="s"><span class="f">★</span><span class="f">★</span><span>★</span><span>★</span><span>★</span></span></div>'
+ +'</div></div>'
+ +'<div class="foot"><div class="cur" data-o="list"><span class="rg">'+ring(OBJ[0],32)+'</span>'
+ +'<span class="t"><b>Dealstreet 999</b><span>2026-999 · 180.000 €</span></span></div>'
+ +'<button class="act" data-o="act"><svg viewBox="0 0 24 24">'+IC.menu+'</svg></button></div>'
+ +'</div>'
+
+ +'<div class="bd" data-o=""></div>'
+
+ +'<div class="sheet"><div class="sheet-h"><i></i><b>Aktionen</b></div>'
+ + ACTS.map(function(g){return '<div class="sgrp">'+(g.g?'<h4>'+g.g+'</h4>':'')+'<div class="stiles">'
+   + g.it.map(function(t){
+     var cls=(t[3]==='cur'?' cur':'')+(t[3]==='acc'?' acc':'');
+     var tg=t[4]?'<span class="tg'+(GATES[t[4]]?' gate':'')+'">'+t[4]+'</span>':'';
+     return '<button class="stile'+cls+'"><svg viewBox="0 0 24 24">'+IC[t[0]]+'</svg>'
+      +'<span><b>'+t[1]+'</b><em>'+t[2]+'</em></span>'+tg+'</button>';}).join('')
+   +'</div></div>';}).join('')
+ +'</div>'
+
+ +'<div class="tabsheet"><div class="sheet-h"><i></i><b>Bereiche</b></div><div class="grid">'
+ + TABS.map(function(t,i){return '<button class="tt'+(i===0?' on':'')+'"><svg viewBox="0 0 24 24">'+IC[t[1]]+'</svg>'
+   +t[0]+(t[2]?'<span class="ok">✓</span>':'<span class="todo"></span>')+'</button>';}).join('')
+ +'</div></div>'
+
+ +'</div></div></div>';
+}
+
+var LOOK={
+ dp:{t:'DealPilot · der heutige Look, fürs Handy gebaut',
+  p:'Obsidian-Fassung mit Gold für Kopfleiste, Tabs, Objektliste und Aktionen — heller Arbeitsbereich für das Formular. Genau das Muster deiner Live-App, nur auf 390 Pixel gebracht. Die drei Telefone zeigen die Bildschirme, die es dafür braucht: Formular, Objektliste, Aktionen.'},
+ kontor:{t:'Kontor · weiß und flach',
+  p:'Dieselbe Struktur, weiße Fassung, Haarlinien statt Karten, null Radius. Für den, dem die dunkle Leiste auf dem Handy zu schwer ist.'},
+ panel:{t:'Panel · kühl und neutral',
+  p:'Grau-Weiß, weiche Radien, feiner Schatten. Der neutralste Untergrund, wenn ein Partner seine eigene Farbe darüberlegt.'}
+};
+
+var rack=document.getElementById('rack'), look='dp', vp='p', cards='standard', surf='auto';
+function build(){
+ rack.innerHTML = (vp==='p')
+  ? phone('p1','Formular','','p')+phone('p2','Objektliste','list','p')+phone('p3','Aktionen','act','p')
+  : phone('p1', vp==='d'?'Desktop':(vp==='t'?'Tablet quer · Liste offen':'Tablet hoch · Liste offen'),
+          vp==='d'?'':'list', vp);
+ setAcc(document.querySelector('.sw[data-acc].on').dataset.acc);
+ setObs(document.querySelector('.sw[data-obs].on').dataset.obs);
+ document.querySelectorAll('.scr').forEach(function(s){
+  s.setAttribute('data-look',look); s.setAttribute('data-cards',cards); s.setAttribute('data-surface',surf);});
+}
+
+function mix(h,to,a){var r=parseInt(h.substr(1,2),16),g=parseInt(h.substr(3,2),16),b=parseInt(h.substr(5,2),16),
+ t=to==='w'?255:0,f=function(c){return Math.round(c+(t-c)*a);},x=function(c){return ('0'+f(c).toString(16)).slice(-2);};
+ return '#'+x(r)+x(g)+x(b);}
+function rgba(h,a){return 'rgba('+parseInt(h.substr(1,2),16)+','+parseInt(h.substr(3,2),16)+','+parseInt(h.substr(5,2),16)+','+a+')';}
+function lum(h){return (0.299*parseInt(h.substr(1,2),16)+0.587*parseInt(h.substr(3,2),16)+0.114*parseInt(h.substr(5,2),16))/255;}
+
+function setAcc(hex){
+ var lt=lum(hex)>0.62;
+ document.querySelectorAll('.scr').forEach(function(s){
+  s.style.setProperty('--gold',hex);
+  s.style.setProperty('--gold-ink',lt?mix(hex,'b',.40):hex);
+  s.style.setProperty('--gold-tint',rgba(hex,lt?.18:.13));
+  s.style.setProperty('--acc-tint',rgba(hex,.15));
+  s.style.setProperty('--on-gold',lt?'#1a1407':'#FFFFFF');
+  s.style.setProperty('--gold-soft',rgba(hex,.45));
+  s.style.setProperty('--runway','linear-gradient(135deg,'+mix(hex,'w',.28)+','+hex+' 60%,'+mix(hex,'b',.20)+')');
+ });
+ document.querySelectorAll('.sw[data-acc]').forEach(function(x){x.classList.toggle('on',x.dataset.acc===hex);});
+}
+function setObs(hex){
+ document.querySelectorAll('.scr').forEach(function(s){
+  s.style.setProperty('--obsidian',hex);
+  s.style.setProperty('--obs-surf',mix(hex,'w',.08));
+  s.style.setProperty('--obs-card',mix(hex,'w',.05));
+ });
+ document.querySelectorAll('.sw[data-obs]').forEach(function(x){x.classList.toggle('on',x.dataset.obs===hex);});
+}
+function setVp(v){
+ vp=v; document.querySelectorAll('.ib[data-vp]').forEach(function(x){x.classList.toggle('on',x.dataset.vp===v);});
+ build(); note();
+}
+function setCards(c){
+ cards=c; document.querySelectorAll('.scr').forEach(function(s){s.setAttribute('data-cards',c);});
+ document.querySelectorAll('.ib[data-cards]').forEach(function(x){x.classList.toggle('on',x.dataset.cards===c);});
+ note();
+}
+function setSurface(f){
+ surf=f; document.querySelectorAll('.scr').forEach(function(s){s.setAttribute('data-surface',f);});
+ document.querySelectorAll('.ib[data-surface]').forEach(function(x){x.classList.toggle('on',x.dataset.surface===f);});
+ note();
+}
+function note(){
+ var c=document.querySelector('.ib[data-cards].on'), f=document.querySelector('.ib[data-surface].on');
+ var el=document.getElementById('h-x');
+ var v=document.querySelector('.ib[data-vp].on');
+ if(el) el.textContent=(v?v.textContent+' · ':'')+'Karten: '+(c?c.textContent:'') + ' · Fläche: '+(f?f.textContent:'')
+   + (CARDN[c&&c.dataset.cards]?' — '+CARDN[c.dataset.cards]:'');
+}
+var CARDN={kompakt:'Foto und Achsen weg, Kennzahlen einzeilig — die meisten Objekte pro Bildschirm.',
+ standard:'Foto, Score-Ring rechts, darunter die drei Kacheln mit Skala, Verlauf und Balken.',
+ wallet:'Kopfzeile im Markenverlauf mit Ring links und Stufen-Pille rechts, darunter Foto, Preis und die Kacheln.'};
+function setLook(l){
+ look=l;
+ document.querySelectorAll('.scr').forEach(function(s){s.setAttribute('data-look',l);});
+ document.querySelectorAll('.ib[data-look]').forEach(function(x){x.classList.toggle('on',x.dataset.look===l);});
+ document.getElementById('h-t').textContent=LOOK[l].t;
+ document.getElementById('h-p').textContent=LOOK[l].p;
+}
+
+document.querySelectorAll('.ib[data-vp]').forEach(function(b){b.addEventListener('click',function(){setVp(b.dataset.vp);});});
+document.querySelectorAll('.ib[data-look]').forEach(function(b){b.addEventListener('click',function(){setLook(b.dataset.look);});});
+document.querySelectorAll('.ib[data-cards]').forEach(function(b){b.addEventListener('click',function(){setCards(b.dataset.cards);});});
+document.querySelectorAll('.ib[data-surface]').forEach(function(b){b.addEventListener('click',function(){setSurface(b.dataset.surface);});});
+document.querySelectorAll('.sw[data-acc]').forEach(function(b){b.addEventListener('click',function(){setAcc(b.dataset.acc);});});
+document.querySelectorAll('.sw[data-obs]').forEach(function(b){b.addEventListener('click',function(){setObs(b.dataset.obs);});});
+
+document.addEventListener('click',function(e){
+ var t=e.target.closest&&e.target.closest('[data-o]');
+ if(t){
+  var scr=t.closest('.scr'); if(!scr) return;
+  scr.classList.remove('open-list','open-act','open-tabs');
+  var v=t.getAttribute('data-o'); if(v) scr.classList.add('open-'+v);
+  return;
+ }
+ var tab=e.target.closest&&e.target.closest('.tab,.tt');
+ if(tab){var sc=tab.closest('.scr');
+  sc.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on');});
+  sc.querySelectorAll('.tt').forEach(function(x){x.classList.remove('on');});
+  tab.classList.add('on'); sc.classList.remove('open-tabs'); return;}
+ var c=e.target.closest&&e.target.closest('.sb-card');
+ if(c){var s2=c.closest('.scr');
+  s2.querySelectorAll('.sb-card').forEach(function(x){x.classList.remove('active');});
+  c.classList.add('active');}
+ var st=e.target.closest&&e.target.closest('.stile');
+ if(st){var s3=st.closest('.scr');
+  s3.querySelectorAll('.stile').forEach(function(x){x.classList.remove('cur');});
+  st.classList.add('cur');}
+});
+
+build(); setAcc('#C9A84C'); setObs('#050505'); setCards('standard'); setSurface('auto'); setLook('dp'); note();
+</script>
+</body>
+</html>
