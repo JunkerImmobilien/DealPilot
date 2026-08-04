@@ -55,6 +55,27 @@
       main { box-shadow: none; padding: 16px; max-width: 100%; }
       .back { display: none; }
     }
+    /* v652-mobil — gemessen bei 390 x 844.
+       Die Seite selbst lief nicht ueber, aber die Ruecklinks und der
+       Fusszeilen-Link lagen unter 44px Trefferflaeche. Auf der
+       Datenschutz-Seite kam die Tabelle der Auftragsverarbeiter dazu:
+       body.scrollWidth war 430 statt 375 - sie ist echt breiter als der
+       Schirm und braucht einen eigenen Scroller. */
+    @media (max-width: 768px) {
+      body { padding: 20px 12px; }
+      main { padding: 24px 16px; }
+      .back, footer a, main a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 <body>

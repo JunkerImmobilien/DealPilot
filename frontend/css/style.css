@@ -36186,3 +36186,88 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   }
 }
 /* ===== v651b-preflight-erreichbar END ===== */
+
+/* ═══════════════════════════════════════════════════════════════════
+   v652-uebrige-mobile — Backlog Punkt 1 (Übrige Seiten und Bereiche)
+
+   GEMESSEN bei 390 x 844, Bereich fuer Bereich durchgeklickt. Ueberlauf
+   gab es fast nirgends mehr — v650 hat die Sammelursachen erledigt.
+   Uebrig blieben Felder unter 16px und Knoepfe unter 44px, und die
+   sitzen alle AUSSERHALB von .body, weshalb v650 sie nicht erwischt hat:
+
+     Alle Objekte / Track Record / Bankexport / QuickCheck
+        #sb-search-input                          12,5 px
+     Einstellungen (alle 11 Abschnitte)
+        set_user_name, set_pwd_*, dp-ec-* u.a.      13 px
+        .set-modal-close, .help-sidebar-item      unter 44 px
+     Anmeldung / Registrierung / Passwort vergessen
+        auth-email, auth-password, pw-reset-email 13,5 px
+     Bankexport / QuickCheck
+        .dpm-x                                    unter 44 px
+
+   Ueberlauf blieb an einer Stelle: die Tabelle in "Alle Objekte"
+   (Listenansicht) ist 700px breit und scrollt in ihrem Behaelter — ohne
+   sichtbaren Hinweis, dass rechts noch etwas kommt.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* (1) Eingabefelder ausserhalb von .body — derselbe iOS-Zoom-Grund
+     wie in v650, nur andere Behaelter. Die ID-Selektoren sind noetig,
+     weil einzelne Felder mit ID-Spezifitaet gesetzt sind. */
+  #sb-search-input,
+  #auth-modal input,
+  #auth-modal select,
+  #auth-modal textarea,
+  #settings-modal input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  #settings-modal select,
+  #settings-modal textarea,
+  .set-modal-cream input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  .set-modal-cream select,
+  .set-modal-cream textarea,
+  .global-view-overlay input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  .global-view-overlay select,
+  .global-view-overlay textarea {
+    font-size: 16px !important;
+  }
+
+  /* (2) Trefferflaechen. Schliessen-Knoepfe und Hilfe-Eintraege behalten
+     ihre Optik, bekommen aber die 44er-Flaeche per unsichtbarem ::after. */
+  .set-modal-close,
+  .help-sidebar-item,
+  .dpm-x,
+  .auth-close,
+  .gv-close { position: relative !important; }
+  .set-modal-close::after,
+  .help-sidebar-item::after,
+  .dpm-x::after,
+  .auth-close::after,
+  .gv-close::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    background: transparent;
+  }
+
+  /* (3) Alle Objekte, Listenansicht: die Tabelle ist mit 700px echt
+     breiter als der Schirm. Sie wird nicht gequetscht, sondern scrollt
+     MIT sichtbarem Hinweis am rechten Rand. */
+  .ao-table-wrap,
+  .ao-list-wrap {
+    position: relative !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .ao-table-wrap::after,
+  .ao-list-wrap::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; right: 0;
+    width: 26px;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.38));
+  }
+}
+/* ===== v652-uebrige-mobile END ===== */
