@@ -36052,3 +36052,11 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   .body .cf-mode-btn { flex: 1 1 auto !important; min-width: 0 !important; }
 }
 /* ===== v650-tabs-mobile END ===== */
+
+/* v650b: Zwei Auswahlfelder blieben auf 13px, weil #d1_type,#d2_type mit
+   ID-Spezifitaet (1,0,0) und !important gesetzt sind - .body select (0,2,1)
+   verliert dagegen. Mit der ID im Selektor (1,2,1) sitzt es. */
+@media (max-width: 768px) {
+  .body select#d1_type,
+  .body select#d2_type { font-size: 16px !important; }
+}
