@@ -24,7 +24,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=W40"><!-- v646-logo-rahmen -->
+<link rel="stylesheet" href="css/style.css?v=W41"><!-- v648-tablet-shell -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=1">
 <link rel="stylesheet" href="css/bmf-modal.css?v=W34">  <!-- V289 -->
@@ -605,10 +605,10 @@ label.dp-required.qc-required::after {
   window.addEventListener('resize', updateToolbarHeight);
 })();
 </script>
-<!-- V63.85: Mobile-Hamburger zum Öffnen der Sidebar auf Smartphones -->
-<!-- drawer-fix-20260731: Handler auf die zentrale Funktion; 'mobile-open' war eine vierte,
-     nirgends gestylte Klasse. toggleMobileSidebar() schaltet Drawer + Overlay. -->
-<button class="mobile-hamburger" id="mobile-hamburger-btn" onclick="toggleMobileSidebar()" aria-label="Objektliste öffnen" aria-controls="sidebar">☰</button>
+<!-- v648: Der zweite Hamburger (.mobile-hamburger, V63.85) ist raus. Er war in
+     jedem Band per display:none abgeschaltet und damit nie sichtbar — es blieb
+     ein toter Umschalter. Bedient wird ausschliesslich ueber #hdr-mobile-menu
+     in der Kopfleiste. -->
 <!-- V32: autocomplete=off auf Body-Ebene unterdrückt Browser-Adress-Speichern-Popup -->
 <form id="dp-noform" autocomplete="off" onsubmit="return false" style="display:contents">
 <div class="app-wrap">
@@ -868,7 +868,8 @@ label.dp-required.qc-required::after {
   <span class="mt-title">DealPilot</span>
   <span class="mt-spacer"></span>
 </div>
-<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileSidebar()"></div>
+<!-- v648: #mobile-overlay entfernt. Es war der Backdrop der zweiten, nie
+     wirksamen toggleMobileSidebar-Fassung aus ui.js. Backdrop ist #sb-backdrop. -->
 
 <!-- ═══════════ STANDALONE QUICK-CHECK VIEW (V63.76) ═══════════
      Wird per Sidebar-Aktion"Quick Check" geöffnet (enterQuickCheckMode()).
@@ -2964,7 +2965,7 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=973b"></script>
+<script src="js/ui.js?v=974"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=946"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
@@ -3038,7 +3039,7 @@ label.dp-required.qc-required::after {
 <script src="js/investment-profile.js?v=717"></script>
 <script src="js/dashboard.js?v=W33"></script>
 <script src="js/score-fx.js?v=464"></script>
-<script src="js/main.js?v=950"></script>
+<script src="js/main.js?v=951"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=W33"></script>

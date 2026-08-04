@@ -1747,19 +1747,19 @@ function sbActionsAction(action) {
 window.sbActionsToggle = sbActionsToggle;
 window.sbActionsAction = sbActionsAction;
 
-/* V63.44: Mobile-Sidebar Drawer-Toggle */
-window.toggleMobileSidebar = function() {
-  var sb = document.getElementById('sidebar');
-  var ov = document.getElementById('mobile-overlay');
-  if (!sb || !ov) return;
-  var isOpen = sb.classList.toggle('sb-mobile-open');
-  ov.classList.toggle('active', isOpen);
-};
+/* v648: Die zweite toggleMobileSidebar-Fassung (V63.44) ist ersatzlos raus.
+   Sie setzte .sb-mobile-open auf dem FALSCHEN Element (#sidebar statt
+   .app-wrap) und schaltete #mobile-overlay statt #sb-backdrop. Wirksam war
+   sie ohnehin nie: ui.js laedt vor main.js, main.js definierte sie danach
+   erneut. Genau so entstanden die vier parallelen Umschalt-Mechaniken.
+   Kanonisch ist ab jetzt main.js: .app-wrap.sb-mobile-open + #sb-backdrop. */
 
 // Mobile-Sidebar schließt sich nach Aktion
 (function() {
   function closeMobileSidebarOnAction() {
-    if (window.innerWidth > 768) return;
+    // v648: Das Drawer-Band reicht jetzt bis 900px (Tablet hoch), nicht mehr
+    // nur bis 768px — sonst blieb der Drawer auf dem iPad nach Objektwahl offen.
+    if (window.innerWidth > 900) return;
     // v634-autoclose: Der echte Drawer-Toggle ist .app-wrap.sb-mobile-open (main.js),
     // NICHT .sidebar.sb-mobile-open -> hier beide Mechanismen sauber schliessen,
     // sonst bleibt der Drawer nach Objektwahl/Tab-Klick offen.

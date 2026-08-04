@@ -471,7 +471,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
     width: 260px;
     transition: left 0.25s;
   }
-  .sidebar.open { left: 0; box-shadow: 2px 0 20px rgba(0,0,0,0.4); }
+  /* v648: .sidebar.open war toter CSS-Code - keine Zeile im Projekt setzt die Klasse. */
   .app-wrap.sb-collapsed { grid-template-columns: 1fr; }
   .app-wrap.sb-collapsed .sidebar { display: none; }
 
@@ -32909,7 +32909,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* ===== v622-mobile-shell BEGIN ===== */
 /* Handy-Shell konsolidiert: EIN Menue (oberer Header-Hamburger), Sidebar = sauberer Vollbild-naher
    Drawer, scrollbar (AKTIONEN/Cockpit erreichbar). Ueberstimmt die widerspruechlichen Alt-Bloecke. */
-@media (max-width:768px){
+@media (max-width: 900px){
   /* doppeltes Menue weg: untere mobile-topbar ("DealPilot") + redundanter Hamburger raus */
   .mobile-topbar{display:none !important}
   .mobile-hamburger{display:none !important}
@@ -32968,7 +32968,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* ===== v625-mobile-iconrail BEGIN ===== */
 /* Icon-Rail (66px, v607) als dritter Zustand auf dem Handy. Toggle = FAB unten-links
    (kollidiert nicht mit Header-Hamburger). Eingeklappt: Rail IN-FLOW statt Drawer (v622). */
-@media (max-width:768px){
+@media (max-width: 900px){
   /* v607-Toggle wieder zeigen, als FAB unten-links */
   body:not(.qc-standalone-active):not(.dp-dash-fullscreen) #dp-sb-toggle{
     display:flex !important; top:auto !important; bottom:16px !important;
@@ -33001,7 +33001,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
    position:absolute ist (aus dem Fluss, top:662 h:0 -> liegt ueber sb-list/sb-user).
    Diagnose: sb-list rel top232 h449, accordion ABSOLUTE, sb-user top774, footer top860.
    Fix: im Drawer alles in den normalen Fluss (static) + saubere Spalten-Stapelung. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-actions-accordion,
   body #sidebar.sidebar.sb-mobile-open .sb-actions-accordion {
     position: static !important;
@@ -33047,7 +33047,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* Bug (Console): #sb-portfolio (top681,h45,bottom726) ueberlappt .sb-actions-trigger
    (top666,h36,bottom702) um ~21px - beide relative, aber im Drawer kein sauberer Abstand.
    Fix: im mobilen Drawer beide mit klarer Reihenfolge + Abstand stapeln. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar #sb-portfolio,
   body aside.sidebar.sb-mobile-open #sb-portfolio {
     position: static !important;
@@ -33126,7 +33126,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 
 /* (2) Sidebar-Objektliste im Drawer: ohne max-height waechst sie ueber alle Objekte,
    AKTIONEN/COCKPIT erst nach langem Scrollen erreichbar. -> begrenzen + eigener Scroll. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar .sb-list,
   body aside.sidebar.sb-mobile-open .sb-list {
     max-height: 42vh !important;
@@ -33138,7 +33138,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 
 /* (3) Button-Groessen Cockpit (sb-collapsible-header) vs Aktionen (sb-actions-trigger)
    im Drawer vereinheitlichen (gleiche Hoehe/Padding/Radius). */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-trigger,
   body aside.sidebar.sb-mobile-open .sb-actions-trigger,
   body .app-wrap.sb-mobile-open aside.sidebar .sb-portfolio-collapsible .sb-collapsible-header,
@@ -33207,7 +33207,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* (2) Accordion soll im Drawer NACH OBEN aufklappen (ueber dem Trigger schweben),
    nicht nach unten. v634 hatte es 'static' gemacht (-> nach unten). Zuruecknehmen:
    absolute, bottom:100% relativ zum Trigger-Container. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-accordion,
   body aside.sidebar.sb-mobile-open .sb-actions-accordion {
     position: absolute !important;
@@ -33233,7 +33233,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 
 /* (3) Objektliste: max-height greift nicht, weil .sb-list-grow overflow-y:visible +
    .sb-portfolio-collapsible max-height:none gewinnen. Hier spezifisch beide Klassen fangen. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar .sb-list.sb-list-grow,
   body aside.sidebar.sb-mobile-open .sb-list.sb-list-grow,
   body .app-wrap.sb-mobile-open aside.sidebar #sb-list,
@@ -33246,7 +33246,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 }
 
 /* (4) Settings-Tabs: Scroll-Hinweis (Fade rechts) damit ersichtlich ist, dass es weitergeht. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .set-modal-cream .modal-side { position: relative !important; }
   .set-modal-cream .settings-tabs.ms-tabs { position: relative !important; }
   .set-modal-cream .modal-side::after {
@@ -33277,7 +33277,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
    und damit ueber v633 ((1,4,1) bzw. (1,3,1)). Kein Gleichstand, keine
    Abhaengigkeit von der Ladereihenfolge. Greift nur auf .sb-actions-open,
    der geschlossene Stapel-Zustand von v633 bleibt unveraendert. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-actions-accordion.sb-actions-open,
   body #sidebar.sidebar.sb-mobile-open .sb-actions-accordion.sb-actions-open {
     position: fixed !important;
@@ -33318,7 +33318,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 }
 
 /* Settings-Tabs: ICONS-ONLY auf Mobile (10 Tabs passen in eine Zeile, kein Raten ob scrollbar) */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .set-modal-cream .settings-tabs.ms-tabs {
     display: flex !important; flex-wrap: nowrap !important;
     justify-content: space-between !important;
@@ -35514,41 +35514,15 @@ body.dp-chrome-hell aside.sidebar .sb-card [class*="addr"],
 body.dp-chrome-hell aside.sidebar .sb-card [class*="price"]{ color: var(--dp-obj-text, inherit) !important; }
 /* /v938-textcolors-css */
 
-/* === drawer-fix-20260731 START =========================================================
-   Objektliste auf Tablets im Hochformat (769-900px).
-   Bis hierher war die Sidebar dort position:fixed bei left:-280px und wurde
-   NUR von .sidebar.open geoeffnet -- einer Klasse, die kein Code setzt.
-   Additiv: keine bestehende Regel wird veraendert, Rollback = Block loeschen.
-   Statusfarben und Gold bleiben unberuehrt (kein Farbwert in diesem Block).
+/* === drawer-fix-20260731 — v648 zurueckgenommen ========================
+   Der Block setzte im Band 769-900px  left:0  auf die Sidebar und blendete
+   .mobile-hamburger ein. Beides greift nicht mehr:
+     - Die Leiste steht dort nicht auf left:-280px, sondern auf
+       position:relative mit transform:translateX(-100%) — left tut nichts.
+     - .mobile-hamburger ist in v648 aus dem Markup entfernt (toter Knopf).
+     - .mobile-overlay ist ebenfalls raus, Backdrop ist #sb-backdrop.
+   Ersetzt durch v648-tablet-shell am Dateiende.
    ==================================================================== */
-@media (min-width: 769px) and (max-width: 900px) {
-  /* Alle drei Toggle-Mechaniken gelten, egal welche gewinnt. */
-  body .app-wrap.sb-mobile-open #sidebar.sidebar,
-  body #sidebar.sidebar.sb-mobile-open,
-  body #sidebar.sidebar.mobile-open,
-  body #sidebar.sidebar.open {
-    left: 0 !important;
-    box-shadow: 2px 0 20px rgba(0,0,0,0.4) !important;
-  }
-
-  /* Ohne sichtbaren Ausloeser bliebe die Liste trotzdem unerreichbar.
-     Unterhalb 769px greifen die bestehenden display:none-Regeln weiter. */
-  body .mobile-hamburger {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* Der Abdunkler ist bisher nur bis 768px gestylt. */
-  body .mobile-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 1000;
-    display: none;
-  }
-  body .mobile-overlay.active { display: block; }
-}
-/* === drawer-fix-20260731 END ========================================================== */
 
 /* ===== v645-sb-footer-mobile BEGIN =====================================================
    Punkt 1: Nutzerblock (Name, Plan, Abmelden) ist auf dem Handy nicht erreichbar.
@@ -35571,7 +35545,7 @@ body.dp-chrome-hell aside.sidebar .sb-card [class*="price"]{ color: var(--dp-obj
    Spezifitaet bewusst hoeher als v639 (aside.sidebar#sidebar), nicht auf
    Ladereihenfolge gebaut. Nur ≤768px und nur im geoeffneten Drawer.
    ==================================================================== */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar#sidebar,
   body aside.sidebar#sidebar.sb-mobile-open {
     display: flex !important;
@@ -35684,3 +35658,97 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   }
 }
 /* ===== v646-logo-rahmen END ===== */
+
+/* ═══════════════════════════════════════════════════════════════════
+   v648-tablet-shell — Backlog Punkt 1 (Objektliste auf dem Tablet)
+
+   BEFUND (gemessen, nicht angenommen). Der Backlog nahm an, dass nur
+   769–900 px kaputt sei und 901–1024 px als feste Spalte stehe. Beides
+   ist falsch — es war SCHLIMMER:
+
+     820 x 1180:  .app-wrap grid-template-columns = "820px" (EINE Spalte)
+                  #sidebar  position:relative, transform -240px, Hoehe 1180
+                  .main-col top = 1180  ->  die App beginnt eine volle
+                  Bildschirmhoehe UNTER dem Falz. Sichtbar: leere Flaeche.
+     1024 x 768:  identisch, .main-col top = 768.
+     1025 x 768:  erst hier greift wieder "380px 645px" — zwei Spalten.
+
+   Also war das ganze Band 769–1024 px eine weisse Seite, nicht nur eine
+   unerreichbare Objektliste.
+
+   URSACHE (drei Regeln, die sich gegenseitig ausgehebelt haben):
+     1. @media (max-width:1024px) .app-wrap{grid-template-columns:1fr}
+        -> Leiste und Inhalt stapeln sich untereinander.
+     2. @media (max-width:1024px) .sidebar{position:fixed} sollte die
+        Leiste aus dem Fluss nehmen — wird aber von der SPAETEREN,
+        medienlosen Regel `aside.sidebar{position:relative}` geschlagen:
+        (0,1,1) gegen (0,1,0). Eine Media-Query erhoeht die Spezifitaet
+        nicht. Die Leiste blieb also im Fluss.
+     3. Nur unterhalb 768 px zieht v622 mit `body #sidebar.sidebar
+        {position:fixed !important}` (1,2,1) den Kopf aus der Schlinge.
+        Deshalb lief das Handy, das Tablet nicht.
+
+   FIX, zweigeteilt:
+     769–900 px  ->  der v622-Drawer. Dafuer wurden die Media-Queries der
+                     Drawer-Bloecke v622/v625/v633/v637/v638/v639/v642/v645
+                     von 768 auf 900 gehoben (statt sie hier zu doppeln).
+     901–1024 px ->  echte zweispaltige Fassung, siehe unten. Damit steht
+                     auf dem iPad quer wieder die Spalte, wie im Backlog
+                     gewuenscht — nur eben zum ersten Mal wirklich.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 901px) and (max-width: 1024px) {
+
+  /* (1) Zwei Spalten zurueckholen. 260px Leiste laesst dem Inhalt bei
+     1024px noch 764px — genug fuer die zweispaltigen Formulare. */
+  body .app-wrap {
+    grid-template-columns: 260px minmax(0, 1fr) !important;
+  }
+
+  /* (2) Die Leiste steht wieder als Spalte im Fluss. Spezifitaet
+     body #sidebar.sidebar = (1,2,1), damit die medienlose Regel
+     aside.sidebar{position:relative} nicht mehr dazwischenfunkt. */
+  body #sidebar.sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    width: auto !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    z-index: 250 !important;
+    box-shadow: none !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  body .main-col { grid-column: auto !important; }
+
+  /* (3) Kein Drawer, also auch keine Drawer-Bedienelemente und kein
+     Backdrop. Sonst liegt ein unsichtbarer Schleier ueber der Seite,
+     wenn jemand aus dem Drawer-Band herdreht. */
+  body .hdr-mobile-menu,
+  body .mobile-hamburger,
+  body .mobile-topbar { display: none !important; }
+  body #sb-backdrop,
+  body #mobile-overlay { display: none !important; }
+
+  /* (4) Eingeklappte Leiste bleibt auch hier moeglich (66px Rail). */
+  body.dp-sidebar-collapsed .app-wrap { grid-template-columns: 66px minmax(0,1fr) !important; }
+  body.dp-sidebar-collapsed #sidebar.sidebar { width: 66px !important; max-width: 66px !important; }
+}
+
+/* Der Backdrop war ueberhaupt nur bis 768px gestylt (Backlog-Hinweis zu
+   .mobile-overlay). Im neuen Drawer-Band 769–900 braucht er eigene
+   Regeln, sonst schliesst der Tipp neben den Drawer nicht. */
+@media (min-width: 769px) and (max-width: 900px) {
+  body #sb-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0,0,0,0.45) !important;
+    z-index: 1055 !important;
+  }
+  body #mobile-overlay { display: none !important; }
+}
+/* ===== v648-tablet-shell END ===== */
