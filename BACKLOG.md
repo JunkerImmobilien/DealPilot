@@ -29,22 +29,8 @@ Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
 
 
 
-### 1 · Portfolio-Cockpit auf Handy und Tablet
 
-Eigene Ansicht mit eigenen Kacheln, Tabellen und Diagrammen — von den
-Tab-Regeln nicht miterfasst.
-
-- Kacheln untereinander statt nebeneinander
-- Tabellen entweder waagerecht scrollbar **mit sichtbarem Hinweis** oder als
-  Kartenliste umbrechen
-- Diagramme skalieren mit, keine feste Pixelbreite
-- Filter und Sortierung erreichbar, nicht abgeschnitten
-
-**Fertig, wenn:** Bei 390 px und 820 px vollständig lesbar und bedienbar.
-
----
-
-### 2 · Marktbericht auf Handy und Tablet
+### 1 · Marktbericht auf Handy und Tablet
 
 Eigene Anwendung unter `frontend/marktbericht-app/` mit eigenem CSS.
 **Eigener Namensraum `vNNN` (Marktbericht) — nicht mit der Haupt-App mischen.**
@@ -63,7 +49,7 @@ angesehen werden kann.
 
 ---
 
-### 3 · Übrige Seiten und Bereiche
+### 2 · Übrige Seiten und Bereiche
 
 Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
@@ -72,7 +58,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 - Quick Boarding / Quick Check
 - Track Record
 - Datenraum
-- Netzwerk (siehe Punkt 4)
+- Netzwerk (siehe Punkt 3)
 - Anmeldung, Registrierung, Passwort vergessen
 - Preise und Upgrade-Fenster
 - Rechtliches (Impressum, Datenschutz, AGB)
@@ -84,7 +70,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
 ## Fehler
 
-### 4 · Partner-Netzwerk lädt nicht
+### 3 · Partner-Netzwerk lädt nicht
 
 **Zuerst Diagnose, kein Umbau.** Ursache ist unbekannt.
 
@@ -115,7 +101,7 @@ Zielzustand. Nicht danebenbauen, dagegen bauen.
 
 ---
 
-### 5 · Darstellungs-Modal mit festen UI-Vorlagen
+### 4 · Darstellungs-Modal mit festen UI-Vorlagen
 
 **Das Kernstück.** Heute ist die Oberfläche B2C-Optik: Obsidian, Gold,
 Leuchten, Verläufe. Ein Berater, der sie vor dem Mandanten öffnet, braucht
@@ -172,7 +158,7 @@ Objektkarten und Logo, die Farbeinstellungen greifen darüber,
 
 ---
 
-### 6 · Aktionen-Menü gliedern
+### 5 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -187,7 +173,7 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 7 · Objektkarten-Modi: Kompakt · Standard · Wallet
+### 6 · Objektkarten-Modi: Kompakt · Standard · Wallet
 
 Ein Markup, drei Optiken, **reines CSS**. Die gemessene Struktur von
 `_renderRichCard` (`storage.js:866`) steht in CLAUDE.md — nicht neu raten.
@@ -203,7 +189,7 @@ Desktop, Tablet und Handy.
 
 ---
 
-### 8 · Kartenfläche: Passend · Weiß
+### 7 · Kartenfläche: Passend · Weiß
 
 Karten folgen der Fassung oder bleiben weiß, auch im dunklen Modus.
 
@@ -212,7 +198,7 @@ scopen statt auf Ladereihenfolge bauen.
 
 ---
 
-### 9 · Zugang zum Darstellungs-Modal und Plan-Schranken
+### 8 · Zugang zum Darstellungs-Modal und Plan-Schranken
 
 Modal für **alle** Pläne öffnen, den **Farbteil darin** sperren. Heute bricht
 der Wrapper in `settings.js:3391` bei `currentKey() !== 'partner'` das ganze
@@ -235,9 +221,9 @@ Sonst laufen beide auseinander.
 
 ---
 
-### 10 · Handy-Sperre plan-abhängig lösen
+### 9 · Handy-Sperre plan-abhängig lösen
 
-Erst wenn 1–3 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
+Erst wenn 1–2 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
 
 Freigabe ab Partner-Plan, gilt auch für dessen Mandanten. Der Haken: die Sperre
@@ -553,3 +539,63 @@ nichts Falsches auf.
   `scroll-snap-align:start` und Reiter von 73 × 44 px — sie funktioniert
   gemessen. Eine zweite Navigationsform daneben wäre eine Produktentscheidung,
   keine Reparatur.
+
+- [2026-08-04] **Portfolio-Cockpit auf Handy und Tablet** — `ac0a0b8`, `6afb7a5`
+
+  **Befund — die Ursache war ein Parserfehler, kein fehlendes Responsive-CSS.**
+  `dashboard.css:431` stand als
+
+  ```
+  #dashboard-main .pick, #dashboard-main @media(max-width:880px){ … }
+  ```
+
+  — eine `@media`-Regel **mitten in einer Selektorliste**. Der Parser
+  verwirft den kompletten Block. Nachgewiesen im Browser: `cssRules` von
+  `dashboard.css` enthielt 351 Regeln und genau diesen
+  `(max-width:880px)`-Block **nicht**, während die drei anderen
+  880er-Blöcke (Z. 500 / 581 / 610) da waren. Entstanden ist es beim
+  nachträglichen Voranstellen von `#dashboard-main` vor alle Selektoren.
+
+  Damit war die ganze Mobilfassung des Cockpits tot. Gemessen bei 390 px:
+
+  | Element | soll | war |
+  |---|---|---|
+  | `.gates` (Kanban) | 1 Spalte | `344px 103px 99px` = 545 px in 353 px, Spalten bis **590** |
+  | `.kpis` | 2 Spalten | 4 Spalten à 79 px |
+  | `.charts` | 1 Spalte | 2 Spalten, Diagramm bis **560** |
+
+  `.pick` kommt weder im Markup noch sonst im Stylesheet vor — beim
+  Reparieren geht nichts verloren.
+
+  **Fix (v651, `dashboard.css` W34→W35):** Block als sauberes
+  `@media(max-width:880px)` mit `#dashboard-main`-Präfix wiederhergestellt.
+  Dazu ein v651-Block für die Reste: Diagramme und Canvas auf
+  `max-width:100%`, Abschnittskopfzeilen umbrechend (`#dp-proj-years` lief
+  bis 393), Übersichtskacheln zweispaltig, Tabellenbereiche waagerecht
+  scrollbar.
+
+  **Nebenbefund, betrifft nicht nur Mobil — und war der schwerere:**
+  Der Boarding-Pass `#oab-bar` trägt seit v593 `overflow:hidden` und seit
+  v578 `flex-wrap:nowrap`, sein Inhalt ist rund **1240 px** breit.
+
+  | Viewport | sichtbar | Inhalt | Folge |
+  |---|---|---|---|
+  | 390 px | — | — | v619 stapelt, alles erreichbar |
+  | 820 px | 747 | 1208 | abgeschnitten |
+  | 1024 px | 691 | 1208 | abgeschnitten |
+  | **1440 px** | 1015 | 1240 | abgeschnitten, `#oab-run` bei x 1485–1587 |
+
+  Der Startknopf „Abrufen" der PRE-FLIGHT-Strecke war damit auf **jedem
+  Schirm unter rund 1620 px** unerreichbar — auch auf einem normalen
+  Notebook mit 1366 oder 1440 px. Jetzt (v651b) waagerecht scrollbar mit
+  Snap und einem Verlauf am rechten Rand als Hinweis; wo der Inhalt passt,
+  ändert sich nichts.
+
+  **Nachgemessen auf Staging (W45 / dashboard W35):**
+  Cockpit bei 390 px, 820 px und 1024 px — **kein** Überlauf, kein
+  Seiten-Scrollen. Objekt-Ansicht ebenso; `#oab-bar` erscheint jetzt als
+  echter Scroller (747 / 1208 bei 820 px), und bei 1024 px liegt
+  `#oab-run` nach dem Scrollen bei x 830–932, also **im Bild**.
+
+  **Nicht geprüft:** die Tabelle der geteilten Pässe war im Testkonto leer.
+  Die Scroll-Regel dafür steht, der Nachweis fehlt.
