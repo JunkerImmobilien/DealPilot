@@ -28,30 +28,8 @@ Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
 ---
 
 
-### 1 · Alle neun Objekt-Tabs handytauglich
 
-Objekt · Investition · Miete · Finanzierung · Bewirtschaftung · Steuer ·
-Pilot-Analyse · Bewertung · Deal-Aktion.
-
-- Formulare auf eine Spalte, außer kurze Paare wie PLZ/Ort
-- **Eingabefelder auf 16 px** — darunter zoomt iOS Safari beim Antippen hinein
-- Trefferflächen mindestens 44 px, jedes `:hover` braucht ein `:active`.
-  **Bereits gefunden:** die Icon-Knöpfe in der Seitenleiste sind
-  34 × 44 px — die Breite liegt unter dem Maß und gehört hierher
-- Tabs scrollen mit Snap; neun Reiter passen nicht nebeneinander →
-  Raster-Übersicht als Ausweg (`design/mockups/dp-handy-mockup-v2.html`)
-- Tabellen, Diagramme und breite Kacheln dürfen nicht seitlich überlaufen
-- Aufklappbereiche und Modals müssen ins Bild passen und scrollen können
-
-**Tab für Tab prüfen, nicht stichprobenartig.** Jeder erledigte Tab wird hier
-namentlich vermerkt.
-
-**Fertig, wenn:** Jede der neun Seiten bei 390 px ohne waagerechtes Scrollen
-bedienbar ist und kein Eingabefeld beim Antippen hineinzoomt.
-
----
-
-### 2 · Portfolio-Cockpit auf Handy und Tablet
+### 1 · Portfolio-Cockpit auf Handy und Tablet
 
 Eigene Ansicht mit eigenen Kacheln, Tabellen und Diagrammen — von den
 Tab-Regeln nicht miterfasst.
@@ -66,7 +44,7 @@ Tab-Regeln nicht miterfasst.
 
 ---
 
-### 3 · Marktbericht auf Handy und Tablet
+### 2 · Marktbericht auf Handy und Tablet
 
 Eigene Anwendung unter `frontend/marktbericht-app/` mit eigenem CSS.
 **Eigener Namensraum `vNNN` (Marktbericht) — nicht mit der Haupt-App mischen.**
@@ -85,7 +63,7 @@ angesehen werden kann.
 
 ---
 
-### 4 · Übrige Seiten und Bereiche
+### 3 · Übrige Seiten und Bereiche
 
 Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
@@ -94,7 +72,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 - Quick Boarding / Quick Check
 - Track Record
 - Datenraum
-- Netzwerk (siehe Punkt 5)
+- Netzwerk (siehe Punkt 4)
 - Anmeldung, Registrierung, Passwort vergessen
 - Preise und Upgrade-Fenster
 - Rechtliches (Impressum, Datenschutz, AGB)
@@ -106,7 +84,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
 ## Fehler
 
-### 5 · Partner-Netzwerk lädt nicht
+### 4 · Partner-Netzwerk lädt nicht
 
 **Zuerst Diagnose, kein Umbau.** Ursache ist unbekannt.
 
@@ -137,7 +115,7 @@ Zielzustand. Nicht danebenbauen, dagegen bauen.
 
 ---
 
-### 6 · Darstellungs-Modal mit festen UI-Vorlagen
+### 5 · Darstellungs-Modal mit festen UI-Vorlagen
 
 **Das Kernstück.** Heute ist die Oberfläche B2C-Optik: Obsidian, Gold,
 Leuchten, Verläufe. Ein Berater, der sie vor dem Mandanten öffnet, braucht
@@ -194,7 +172,7 @@ Objektkarten und Logo, die Farbeinstellungen greifen darüber,
 
 ---
 
-### 7 · Aktionen-Menü gliedern
+### 6 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -209,7 +187,7 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 8 · Objektkarten-Modi: Kompakt · Standard · Wallet
+### 7 · Objektkarten-Modi: Kompakt · Standard · Wallet
 
 Ein Markup, drei Optiken, **reines CSS**. Die gemessene Struktur von
 `_renderRichCard` (`storage.js:866`) steht in CLAUDE.md — nicht neu raten.
@@ -225,7 +203,7 @@ Desktop, Tablet und Handy.
 
 ---
 
-### 9 · Kartenfläche: Passend · Weiß
+### 8 · Kartenfläche: Passend · Weiß
 
 Karten folgen der Fassung oder bleiben weiß, auch im dunklen Modus.
 
@@ -234,7 +212,7 @@ scopen statt auf Ladereihenfolge bauen.
 
 ---
 
-### 10 · Zugang zum Darstellungs-Modal und Plan-Schranken
+### 9 · Zugang zum Darstellungs-Modal und Plan-Schranken
 
 Modal für **alle** Pläne öffnen, den **Farbteil darin** sperren. Heute bricht
 der Wrapper in `settings.js:3391` bei `currentKey() !== 'partner'` das ganze
@@ -257,9 +235,9 @@ Sonst laufen beide auseinander.
 
 ---
 
-### 11 · Handy-Sperre plan-abhängig lösen
+### 10 · Handy-Sperre plan-abhängig lösen
 
-Erst wenn 1–4 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
+Erst wenn 1–3 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
 
 Freigabe ab Partner-Plan, gilt auch für dessen Mandanten. Der Haken: die Sperre
@@ -490,3 +468,88 @@ nichts Falsches auf.
   `#hdr-badges` allein 492 px, weil die fünf KPI-Pillen dort zu je zwei
   nebeneinander umbrechen. Der Backlog will den Score auf dem Tablet
   behalten, deshalb nicht angefasst. Gehört zu „Tablet-Fassung feinziehen".
+
+- [2026-08-04] **Alle neun Objekt-Tabs handytauglich** — `366285e`, `f3aa78b`, `0677c88`, `2464cac`, `6b1d14f`, `0183da0`
+
+  **Befund (gemessen bei 390 × 844, Objekt geladen, Tab für Tab durchgeklickt):**
+
+  Kein Tab hatte waagerechtes **Seiten**-Scrollen — `documentElement.scrollWidth`
+  war überall gleich `innerWidth`. Der Inhalt lief aber trotzdem über den
+  rechten Rand hinaus und wurde still abgeschnitten:
+
+  | Tab | Element | rechte Kante |
+  |---|---|---|
+  | Objekt | `.qz-label` | 553 |
+  | Miete | `#ki-miete-box` | 394 |
+  | Finanzierung | `.dpfk-ctrl` / `.dpfk-ltv` | **606** (`.body` 193 px über) |
+  | Finanzierung | `.mrpf-top-tile` | 578 |
+  | Steuer | `.fa-pdf-ctrl` | 537 |
+  | Bewertung | `table.kpi-eval-table` | 562 |
+  | Bewertung | `.cf-mode-btns` | 490 |
+
+  Dazu **240 Eingabefelder mit 12,5 px bzw. 13,3 px** Schrift — iOS Safari
+  zoomt bei jedem Antippen hinein, sobald ein Feld unter 16 px liegt. Und
+  **19 Knopfarten unter 44 px** Trefferfläche, darunter die im Backlog
+  vermerkten Seitenleisten-Icons.
+
+  **Drei getrennte Ursachen, nicht eine:**
+  1. **`min-width:auto` auf Rasterkindern** — die Voreinstellung. Ein breites
+     Enkelkind schiebt die ganze Spalte auf. `#ki-miete-box` war dadurch
+     368 px breit in einer 333-px-Spalte. Sammelfall hinter mehreren Zeilen
+     der Tabelle.
+  2. **`flex: 1 1 0%` beim Konditionsband.** `.dpfk-band` bricht um (333 px),
+     `.dpfk-stub` belegt davon 331 px. Weil die Flex-Basis **0** ist, passt
+     `.dpfk-body` rechnerisch noch auf dieselbe Zeile — es bekommt 0 px
+     Breite und der Inhalt läuft bis 606 px hinaus, statt umzubrechen.
+     Flex-Basis 100 % erzwingt die eigene Zeile.
+  3. **`grid-template-columns:170px 1fr auto !important` ohne Media-Query**
+     (`style.css:9421`) schlug den Mobilblock bei ≤ 720 px, der kein
+     `!important` trägt. Mit `.qz-label{min-width:200px !important}` ergab
+     das 553 px auf einem 390-px-Schirm.
+
+  **Fix (v650, `style.css` W43→W44f), nur ≤ 768 px:**
+  - Alle Textfelder, Auswahlfelder und Textbereiche auf **16 px**. Zwei
+    Auswahlfelder blieben zunächst auf 13 px — `#d1_type,#d2_type` sind mit
+    **ID-Spezifität** (1,0,0) und `!important` gesetzt, `.body select`
+    (0,2,1) verliert dagegen. Mit der ID im Selektor sitzt es.
+  - Trefferflächen: unsichtbares `::after` mit `max(100%,44px)` legt die
+    Fläche auf 44 × 44, ohne die Optik zu ändern. Wo Höhe wachsen darf
+    (Akkordeon-Zeilen, Aktionen-Trigger), stattdessen `min-height`.
+  - `:active`-Rückmeldung für alle Knopfarten unter `@media (hover:none)` —
+    auf Touch gibt es kein Hover, ohne Rückmeldung wirkt jeder Tipp folgenlos.
+  - Kurze Paare nebeneinander: das Adressraster wird zu vier Spalten,
+    PLZ spannt 1, Ort 3, Straße 3, Hausnummer 1, alles andere volle Breite.
+    Ohne `:has()`-Unterstützung fällt es sauber auf eine Spalte zurück.
+  - Die KPI-Tabelle ist mit 535 px **echt** breiter als der Schirm. Sie wird
+    nicht gequetscht, sondern bekommt einen eigenen Scroller **mit sichtbarem
+    Verlaufs-Hinweis** am rechten Rand.
+  - BMF-Modal: `.bmfmo-tabs` war 325 px breit bei `scrollWidth` 549 und
+    `flex-wrap:nowrap` — der vierte Reiter war nicht erreichbar. Jetzt
+    waagerecht scrollend mit Snap, wie die Haupt-Tab-Leiste.
+
+  **Nachgemessen auf Staging (W44f), Tab für Tab:**
+
+  | Tab | Seiten-Scroll | `.body`-Scroll | Überlauf |
+  |---|---|---|---|
+  | Objekt | 0 | 0 | keiner |
+  | Investition | 0 | 0 | keiner |
+  | Miete | 0 | 0 | keiner |
+  | Finanzierung | 0 | 0 | keiner |
+  | Bewirtschaftung | 0 | 0 | keiner |
+  | Steuer | 0 | 0 | keiner |
+  | Pilot-Analyse | 0 | 0 | keiner |
+  | Bewertung | 0 | 0 | keiner |
+  | Deal-Aktion | 0 | 0 | keiner |
+
+  Eingabefelder: **187 × 16 px**, kein Feld mehr darunter (der einzige Rest
+  ist `input[type=range]`, bei dem iOS nicht zoomt). Trefferflächen: keine
+  unter 44 px mehr. Adressraster gemessen: PLZ 68 px + Ort 225 px in einer
+  Zeile, Straße 225 px + Hausnummer 68 px in der nächsten, alles andere
+  303 px voll. BMF-Modal 374 × 793 in 390 × 844, Reiter scrollen, Rumpf
+  scrollt.
+
+  **Nicht gebaut, bewusst:** die Raster-Übersicht als Ausweg für die neun
+  Reiter. Die Tab-Leiste hat bereits `scroll-snap-type:x` mit
+  `scroll-snap-align:start` und Reiter von 73 × 44 px — sie funktioniert
+  gemessen. Eine zweite Navigationsform daneben wäre eine Produktentscheidung,
+  keine Reparatur.
