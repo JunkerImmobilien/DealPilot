@@ -35549,3 +35549,66 @@ body.dp-chrome-hell aside.sidebar .sb-card [class*="price"]{ color: var(--dp-obj
   body .mobile-overlay.active { display: block; }
 }
 /* === drawer-fix-20260731 END ========================================================== */
+
+/* ===== v645-sb-footer-mobile BEGIN =====================================================
+   Punkt 1: Nutzerblock (Name, Plan, Abmelden) ist auf dem Handy nicht erreichbar.
+
+   GEMESSEN (390px-Viewport, Drawer offen, 8 Objekte):
+   - #sb-user EXISTIERT, [V245] meldet Erfolg -> der JS-Abbruchpfad in auth.js:495
+     ist NICHT die Ursache. Erster Verdacht aus dem Backlog widerlegt.
+   - .sb-list ist bereits gedeckelt (v639: max-height:40vh, overflow-y:auto) ->
+     auch der zweite Verdacht (overflow:visible/max-height:none) trifft nicht mehr zu.
+   - Echte Ursache: ueber dem Nutzerblock stehen NUR FIXE Hoehen -
+     .sb-header 201px + .sb-section-title 64px + .sb-actions-trigger 36px
+     + #sb-user 81px = 382px fix, dazu die Liste mit 40vh.
+     Bedingung fuers Hineinpassen: 0.4*vh + 382 <= vh  ->  vh >= 637px.
+     Gemessen: vh 840/696 = sichtbar. vh 660 = 3px ab, vh 616 = 29px ab,
+     vh 556 = 65px ab (der Abmelde-Knopf). Genau der iPhone-Safari-Bereich.
+
+   FIX: Die Liste bekommt statt der festen 40vh den RESTPLATZ (flex:1 1 auto,
+   min-height:0) und scrollt in sich. Damit ist der Nutzerblock bei jeder
+   Viewporthoehe unten verankert und ohne Scrollen erreichbar.
+   Spezifitaet bewusst hoeher als v639 (aside.sidebar#sidebar), nicht auf
+   Ladereihenfolge gebaut. Nur ≤768px und nur im geoeffneten Drawer.
+   ==================================================================== */
+@media (max-width: 768px) {
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar,
+  body aside.sidebar#sidebar.sb-mobile-open {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Liste nimmt den Rest und scrollt selbst -- ersetzt die feste 40vh-Deckelung aus v639 */
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar .sb-list,
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar .sb-list.sb-list-grow,
+  body aside.sidebar#sidebar.sb-mobile-open .sb-list,
+  body aside.sidebar#sidebar.sb-mobile-open .sb-list.sb-list-grow {
+    flex: 1 1 auto !important;
+    min-height: 72px !important;      /* mind. eine Karte bleibt sichtbar */
+    max-height: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Alles unterhalb der Liste darf NICHT schrumpfen (CLAUDE.md: Flex-Kinder in
+     overflow:auto-Containern schrumpfen still, statt zu scrollen). */
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar .sb-actions-trigger,
+  body aside.sidebar#sidebar.sb-mobile-open .sb-actions-trigger {
+    flex: 0 0 auto !important;
+    order: 97 !important;
+  }
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar #sb-user,
+  body aside.sidebar#sidebar.sb-mobile-open #sb-user {
+    flex: 0 0 auto !important;
+    order: 98 !important;
+    margin-bottom: max(6px, env(safe-area-inset-bottom)) !important;
+  }
+  /* Der leere Platzhalter aus index.html:712 sass in der Flex-Reihenfolge vor
+     dem Nutzerblock -- ans Ende, damit er nichts verschiebt. */
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar #sb-footer-spacer,
+  body aside.sidebar#sidebar.sb-mobile-open #sb-footer-spacer {
+    flex: 0 0 auto !important;
+    order: 99 !important;
+  }
+}
+/* ===== v645-sb-footer-mobile END ===== */
