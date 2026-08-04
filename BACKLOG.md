@@ -28,26 +28,7 @@ Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
 ---
 
 
-
-
-### 1 · Kopfleiste auf dem Handy entlasten
-
-Die Kopfleiste trägt zu viel für 390 px.
-
-- Kürzel-Chip (`.hdr-obj-num`) und Feldanzeige (`.hdr-completeness`) raus
-- Feldfortschritt bekommt eine eigene schmale Zeile darunter
-- Kerosin bleibt, aber nur als Zahl ohne Balken
-- **Investor Deal Score darf auf dem Handy raus.** Wenn die Anzeige in
-  `#hdr-badges` den Platz sprengt, auf ≤768 px ausblenden — die Zahl steht
-  ohnehin auf jeder Objektkarte und im Tab „Bewertung". Auf Tablet bleibt sie.
-- Autosave-Anzeige auf den Punkt reduzieren, Text weg
-
-**Fertig, wenn:** Bei 390 px passt die Kopfleiste in eine Zeile und der
-Objektname ist lesbar.
-
----
-
-### 2 · Alle neun Objekt-Tabs handytauglich
+### 1 · Alle neun Objekt-Tabs handytauglich
 
 Objekt · Investition · Miete · Finanzierung · Bewirtschaftung · Steuer ·
 Pilot-Analyse · Bewertung · Deal-Aktion.
@@ -70,7 +51,7 @@ bedienbar ist und kein Eingabefeld beim Antippen hineinzoomt.
 
 ---
 
-### 3 · Portfolio-Cockpit auf Handy und Tablet
+### 2 · Portfolio-Cockpit auf Handy und Tablet
 
 Eigene Ansicht mit eigenen Kacheln, Tabellen und Diagrammen — von den
 Tab-Regeln nicht miterfasst.
@@ -85,7 +66,7 @@ Tab-Regeln nicht miterfasst.
 
 ---
 
-### 4 · Marktbericht auf Handy und Tablet
+### 3 · Marktbericht auf Handy und Tablet
 
 Eigene Anwendung unter `frontend/marktbericht-app/` mit eigenem CSS.
 **Eigener Namensraum `vNNN` (Marktbericht) — nicht mit der Haupt-App mischen.**
@@ -104,7 +85,7 @@ angesehen werden kann.
 
 ---
 
-### 5 · Übrige Seiten und Bereiche
+### 4 · Übrige Seiten und Bereiche
 
 Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
@@ -113,7 +94,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 - Quick Boarding / Quick Check
 - Track Record
 - Datenraum
-- Netzwerk (siehe Punkt 6)
+- Netzwerk (siehe Punkt 5)
 - Anmeldung, Registrierung, Passwort vergessen
 - Preise und Upgrade-Fenster
 - Rechtliches (Impressum, Datenschutz, AGB)
@@ -125,7 +106,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
 ## Fehler
 
-### 6 · Partner-Netzwerk lädt nicht
+### 5 · Partner-Netzwerk lädt nicht
 
 **Zuerst Diagnose, kein Umbau.** Ursache ist unbekannt.
 
@@ -156,7 +137,7 @@ Zielzustand. Nicht danebenbauen, dagegen bauen.
 
 ---
 
-### 7 · Darstellungs-Modal mit festen UI-Vorlagen
+### 6 · Darstellungs-Modal mit festen UI-Vorlagen
 
 **Das Kernstück.** Heute ist die Oberfläche B2C-Optik: Obsidian, Gold,
 Leuchten, Verläufe. Ein Berater, der sie vor dem Mandanten öffnet, braucht
@@ -213,7 +194,7 @@ Objektkarten und Logo, die Farbeinstellungen greifen darüber,
 
 ---
 
-### 8 · Aktionen-Menü gliedern
+### 7 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -228,7 +209,7 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 9 · Objektkarten-Modi: Kompakt · Standard · Wallet
+### 8 · Objektkarten-Modi: Kompakt · Standard · Wallet
 
 Ein Markup, drei Optiken, **reines CSS**. Die gemessene Struktur von
 `_renderRichCard` (`storage.js:866`) steht in CLAUDE.md — nicht neu raten.
@@ -244,7 +225,7 @@ Desktop, Tablet und Handy.
 
 ---
 
-### 10 · Kartenfläche: Passend · Weiß
+### 9 · Kartenfläche: Passend · Weiß
 
 Karten folgen der Fassung oder bleiben weiß, auch im dunklen Modus.
 
@@ -253,7 +234,7 @@ scopen statt auf Ladereihenfolge bauen.
 
 ---
 
-### 11 · Zugang zum Darstellungs-Modal und Plan-Schranken
+### 10 · Zugang zum Darstellungs-Modal und Plan-Schranken
 
 Modal für **alle** Pläne öffnen, den **Farbteil darin** sperren. Heute bricht
 der Wrapper in `settings.js:3391` bei `currentKey() !== 'partner'` das ganze
@@ -276,9 +257,9 @@ Sonst laufen beide auseinander.
 
 ---
 
-### 12 · Handy-Sperre plan-abhängig lösen
+### 11 · Handy-Sperre plan-abhängig lösen
 
-Erst wenn 1–5 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
+Erst wenn 1–4 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
 
 Freigabe ab Partner-Plan, gilt auch für dessen Mandanten. Der Haken: die Sperre
@@ -482,3 +463,30 @@ nichts Falsches auf.
   greift, kein waagerechtes Scrollen · 901 × 800 und 1024 × 768 zwei Spalten
   `260px + 641/764px`, Hamburger aus, `.body` bündig · 1440 × 800 unverändert
   `380px + 1060px`.
+
+- [2026-08-04] **Kopfleiste auf dem Handy entlasten** — `15c197a`
+
+  **Befund (gemessen, 390 × 844, Objekt Dealstreet 999 geladen):**
+  `header.hdr` war **385 × 279 px** — ein volles Drittel des Viewports, bevor
+  ein Formularfeld sichtbar wurde. `.hdr-v61-row1` brach auf **drei** Zeilen
+  um (151 px): Hamburger 32 × 44 + Kürzel-Chip 73 × 27 + Name 222 × 22 /
+  Autosave 127 × 25 + Feldanzeige 198 × 27 / Kerosin-Pille 107 × 44.
+  Darunter `#hdr-badges` mit **128 px** Score-Karte.
+
+  **Fix (v649, `style.css` W42→W43), nur ≤ 768 px:**
+  Kürzel-Chip und Trenner raus · Objektname `flex:1 1 auto` mit
+  Auslassungspunkten · Autosave nur noch der Punkt · Kerosin ohne Balken ·
+  Feldfortschritt über `order:99` + `flex:1 0 100%` in eine **eigene schmale
+  Zeile** umgebrochen, ganz ohne Markup-Änderung · Investor Deal Score aus
+  (`#hdr-badges > *:not(.hdr-incomplete-banner)`) — der Hinweis „bitte 70 %
+  ausfüllen" bleibt, das ist eine Handlungsaufforderung und keine Kennzahl.
+
+  **Nachgemessen auf Staging (W43):** `header.hdr` 390 px → **76 px**
+  (279 vorher). Eine Zeile: Hamburger · Objektname 224 px lesbar ·
+  Autosave-Punkt · „37 L". Darunter 17 px Fortschrittszeile
+  „24 / 24 Felder · 100 %". Tablet 820 px unverändert.
+
+  **Nebenbefund, offen:** Auf 820 px ist die Kopfleiste **589 px** hoch —
+  `#hdr-badges` allein 492 px, weil die fünf KPI-Pillen dort zu je zwei
+  nebeneinander umbrechen. Der Backlog will den Score auf dem Tablet
+  behalten, deshalb nicht angefasst. Gehört zu „Tablet-Fassung feinziehen".
