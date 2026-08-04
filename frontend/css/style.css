@@ -36092,3 +36092,20 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   .body a.legal-link,
   #legal-footer a { display: inline-block; padding: 12px 6px !important; }
 }
+
+/* v650d: Zwei Nachzuegler.
+   1) .sb-actions-trigger blieb 36px: `aside.sidebar .sb-actions-trigger`
+      (0,2,1) mit !important schlaegt `.sb-actions-trigger` (0,1,0).
+      Mit demselben Praefix und der ID (1,2,1) sitzt es.
+   2) Impressum/Datenschutz liegen in #dp-app-legal-footer, nicht in den
+      geratenen Klassen aus v650c. */
+@media (max-width: 768px) {
+  body aside.sidebar#sidebar .sb-actions-trigger {
+    min-height: 44px !important;
+    height: auto !important;
+  }
+  #dp-app-legal-footer a {
+    display: inline-block !important;
+    padding: 14px 8px !important;
+  }
+}
