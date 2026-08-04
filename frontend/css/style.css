@@ -36109,3 +36109,9 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
     padding: 14px 8px !important;
   }
 }
+
+/* v650e: die beiden Rechtliches-Links kamen auf 43px - eine Zeilenhoehe von
+   14px plus 2x14px Innenabstand ergibt 42, plus Rand 43. Explizit deckeln. */
+@media (max-width: 768px) {
+  #dp-app-legal-footer a { min-height: 44px !important; line-height: 20px !important; }
+}
