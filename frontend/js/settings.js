@@ -3397,3 +3397,86 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
        var o=LS('dp_objtext_ui'); if(o) document.body.style.setProperty('--dp-obj-text',o); }catch(e){}
 })();
 /* === /v938-textcolors === */
+
+/* === v646-logo-rahmen ==============================================
+   Backlog Punkt 1: "In jeder Fassung sitzt das passende Logo."
+
+   BEFUND: settings.js:3309 (v931) ueberschreibt _dpDispSkin aus 3104 und
+   laesst den Logo-Tausch bewusst weg ("KEIN Logo-Tausch mehr"). Mit dem
+   alten Logo war das vertretbar. Das neue Rahmen-Logo hat aber WEISSE
+   "Deal"-Buchstaben auf transparentem Grund - auf hellem Untergrund ist
+   die halbe Wortmarke unsichtbar. Der Tausch muss also zurueck.
+
+   Statt an Klassen zu raten wird die tatsaechliche Hintergrundfarbe
+   hinter dem Logo gemessen (getComputedStyle, Elternkette hoch bis zur
+   ersten deckenden Farbe). Damit greift es auch bei frei gewaehlter
+   Kopfleistenfarbe aus der Darstellungs-Toolbar, nicht nur bei
+   .dp-chrome-hell / data-dp-skin.
+
+   Eigenes Logo (dp_logo_ui) und Partner-Logo (whitelabel-override.js)
+   werden NICHT angefasst - erkennbar daran, dass die src dann nicht auf
+   dealpilot-logo-rahmen zeigt.
+   =================================================================== */
+(function(){
+  var DARK  = 'assets/dealpilot-logo-rahmen.png';       /* weisse Wortmarke -> dunkler Grund */
+  var LIGHT = 'assets/dealpilot-logo-rahmen-hell.png';  /* dunkle Wortmarke -> heller Grund  */
+
+  function lumOf(el){
+    var guard = 0;
+    while (el && el !== document.documentElement && guard++ < 12){
+      var c = '';
+      try { c = getComputedStyle(el).backgroundColor || ''; } catch(e){}
+      var m = c.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,/\s]+([\d.%]+))?\s*\)/);
+      if (m){
+        var a = m[4] === undefined ? 1 : (String(m[4]).indexOf('%') > -1 ? parseFloat(m[4])/100 : parseFloat(m[4]));
+        if (a > 0.5) return (0.299*(+m[1]) + 0.587*(+m[2]) + 0.114*(+m[3])) / 255;
+      }
+      el = el.parentElement;
+    }
+    return 0; /* nichts Deckendes gefunden -> Obsidian annehmen */
+  }
+
+  var busy = false;
+  function sync(){
+    if (busy) return;
+    try{
+      var l = document.querySelector('.app-logo-simple-sidebar');
+      if (!l) return;
+      var src = l.getAttribute('src') || '';
+      /* Fremdes Logo (eigenes Upload / Whitelabel) bleibt unangetastet */
+      if (src.indexOf('dealpilot-logo-rahmen') < 0) return;
+      /* Damit config.js applyTheme() und v931 fixLogo() den richtigen
+         Ruecksprungwert haben, statt versehentlich das helle festzuhalten */
+      l.setAttribute('data-logo-dark', DARK);
+      var want = (lumOf(l.parentElement || l) >= 0.5) ? LIGHT : DARK;
+      if (src !== want){ busy = true; l.setAttribute('src', want); busy = false; }
+    }catch(e){ busy = false; }
+  }
+  window._dpLogoSync = sync;
+
+  /* An alle Umschalter haengen, ohne deren Verhalten zu aendern */
+  ['_dpDispSkin','_dpDispHeader','_dpDispReset','_dpDispLogoReset'].forEach(function(fn){
+    var old = window[fn];
+    if (typeof old !== 'function') return;
+    window[fn] = function(){ var r = old.apply(this, arguments); setTimeout(sync, 0); return r; };
+  });
+
+  /* v931 fixLogo() laeuft bei DOMContentLoaded+220ms und setzt hart auf
+     data-logo-dark zurueck; config.js applyTheme() schreibt ebenfalls.
+     Deshalb ein Beobachter auf src statt eines Einmal-Laufs. */
+  function boot(){
+    sync();
+    setTimeout(sync, 400);
+    setTimeout(sync, 1800);   /* nach dem 1600-ms-Timer aus config.js */
+    try{
+      var l = document.querySelector('.app-logo-simple-sidebar');
+      if (l) new MutationObserver(function(){ if(!busy) sync(); })
+              .observe(l, { attributes:true, attributeFilter:['src'] });
+      if (document.body) new MutationObserver(function(){ if(!busy) sync(); })
+              .observe(document.body, { attributes:true, attributeFilter:['class','data-dp-skin','style'] });
+    }catch(e){}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+/* === /v646-logo-rahmen === */
