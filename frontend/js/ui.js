@@ -1592,30 +1592,55 @@ function sbActionsToggle() {
   if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 
   if (open) {
-    // V69-fix: Akkordeon-bottom dynamisch direkt über dem Trigger andocken.
-    // Sidebar ist position:relative, Akkordeon position:absolute → bottom 0 wäre
-    // unten am Sidebar-Rand. Wir setzen bottom = (Sidebar-Höhe - Trigger-Top) + 4px Spalt.
-    try {
-      var sidebar = document.querySelector('.sidebar') || document.getElementById('sidebar');
-      if (btn && sidebar) {
-        var sbRect = sidebar.getBoundingClientRect();
-        var btnRect = btn.getBoundingClientRect();
-        var bottomPx = (sbRect.bottom - btnRect.top) + 4;
-        // V73-fix: setProperty mit 'important' priority — sonst gewinnt das CSS-bottom-!important
-        acc.style.setProperty('bottom', bottomPx + 'px', 'important');
-      }
-    } catch (e) { /* fallback to CSS bottom */ }
-
+    _sbActionsDock();
     _sbActionsRenderIcons();
     _sbActionsSyncActive();
+    window.addEventListener('resize', _sbActionsDock);
     setTimeout(function() {
       document.addEventListener('click', _sbActionsOutsideClick);
       document.addEventListener('keydown', _sbActionsEscHandler);
     }, 10);
   } else {
+    acc.style.removeProperty('bottom');
+    window.removeEventListener('resize', _sbActionsDock);
     document.removeEventListener('click', _sbActionsOutsideClick);
     document.removeEventListener('keydown', _sbActionsEscHandler);
   }
+}
+
+/* v647 — Andocken je nach tatsaechlicher Positionierung.
+
+   BEFUND (gemessen, 390x844, Drawer offen): Das Panel klappt korrekt nach
+   OBEN auf (top 58, Inhalt bis 591, Trigger bei 709) — der Kommentar in
+   ui.js stimmt also. Der Fehler sass woanders: unter dem sichtbaren Menue
+   lag eine 114px hohe TOTZONE. elementFromPoint(180, 621) lieferte dort
+   #sb-actions-accordion statt der Objektliste darunter.
+
+   Ursache: das inline gesetzte bottom trug 'important'. Inline-!important
+   schlaegt JEDE Stylesheet-Regel — auch das bottom:auto !important aus
+   v642, das im Drawer den fixed-Overlay-Modus herstellt. Damit galten
+   gleichzeitig top:58px UND bottom:139.5px auf einem fixed-Element mit
+   height:auto: die Box wurde auf 647px gestreckt, der Inhalt blieb 533px.
+   Der Ueberhang schluckte Klicks und schloss das Menue nicht einmal —
+   _sbActionsOutsideClick ueberspringt alles, was in acc liegt.
+
+   Fix: bottom nur setzen, wenn das Panel wirklich absolut in der Leiste
+   haengt. Im fixed-Overlay (<=768px) und im statischen Rail-Modus
+   (eingeklappte Leiste) macht das CSS die Position — dort wird das
+   Inline-bottom entfernt statt gesetzt. */
+function _sbActionsDock() {
+  try {
+    var acc = document.getElementById('sb-actions-accordion');
+    var btn = document.getElementById('sb-actions-trigger-btn');
+    if (!acc) return;
+    var pos = getComputedStyle(acc).position;
+    if (pos !== 'absolute') { acc.style.removeProperty('bottom'); return; }
+    var sidebar = document.getElementById('sidebar') || document.querySelector('.sidebar');
+    if (!btn || !sidebar) return;
+    var bottomPx = (sidebar.getBoundingClientRect().bottom - btn.getBoundingClientRect().top) + 4;
+    // 'important' bleibt noetig: aside.sidebar .sb-actions-accordion setzt bottom:86px !important
+    acc.style.setProperty('bottom', bottomPx + 'px', 'important');
+  } catch (e) { /* fallback auf das CSS-bottom */ }
 }
 
 function _sbActionsOutsideClick(e) {
