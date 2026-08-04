@@ -30,26 +30,7 @@ Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
 
 
 
-### 1 · Marktbericht auf Handy und Tablet
-
-Eigene Anwendung unter `frontend/marktbericht-app/` mit eigenem CSS.
-**Eigener Namensraum `vNNN` (Marktbericht) — nicht mit der Haupt-App mischen.**
-
-- Eingabestrecke und Objektwahl bedienbar
-- Karten (Leaflet) auf Touch bedienbar, Zoom ohne Konflikt mit dem Seitenscroll
-- Diagramme (Chart.js) skalieren mit
-- PDF-Erzeugung auslösbar, Ergebnis erreichbar
-- Klappblöcke aus v1075/v1076 auf schmalem Schirm prüfen
-
-**Achtung:** `var()` greift nicht in Leaflet und jsPDF — dort stehen feste
-Werte, die beim Umbau nicht verlorengehen dürfen.
-
-**Fertig, wenn:** Ein vollständiger Marktbericht bei 390 px erzeugt und
-angesehen werden kann.
-
----
-
-### 2 · Übrige Seiten und Bereiche
+### 1 · Übrige Seiten und Bereiche
 
 Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
@@ -58,7 +39,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 - Quick Boarding / Quick Check
 - Track Record
 - Datenraum
-- Netzwerk (siehe Punkt 3)
+- Netzwerk (siehe Punkt 2)
 - Anmeldung, Registrierung, Passwort vergessen
 - Preise und Upgrade-Fenster
 - Rechtliches (Impressum, Datenschutz, AGB)
@@ -70,7 +51,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
 ## Fehler
 
-### 3 · Partner-Netzwerk lädt nicht
+### 2 · Partner-Netzwerk lädt nicht
 
 **Zuerst Diagnose, kein Umbau.** Ursache ist unbekannt.
 
@@ -101,7 +82,7 @@ Zielzustand. Nicht danebenbauen, dagegen bauen.
 
 ---
 
-### 4 · Darstellungs-Modal mit festen UI-Vorlagen
+### 3 · Darstellungs-Modal mit festen UI-Vorlagen
 
 **Das Kernstück.** Heute ist die Oberfläche B2C-Optik: Obsidian, Gold,
 Leuchten, Verläufe. Ein Berater, der sie vor dem Mandanten öffnet, braucht
@@ -158,7 +139,7 @@ Objektkarten und Logo, die Farbeinstellungen greifen darüber,
 
 ---
 
-### 5 · Aktionen-Menü gliedern
+### 4 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -173,7 +154,7 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 6 · Objektkarten-Modi: Kompakt · Standard · Wallet
+### 5 · Objektkarten-Modi: Kompakt · Standard · Wallet
 
 Ein Markup, drei Optiken, **reines CSS**. Die gemessene Struktur von
 `_renderRichCard` (`storage.js:866`) steht in CLAUDE.md — nicht neu raten.
@@ -189,7 +170,7 @@ Desktop, Tablet und Handy.
 
 ---
 
-### 7 · Kartenfläche: Passend · Weiß
+### 6 · Kartenfläche: Passend · Weiß
 
 Karten folgen der Fassung oder bleiben weiß, auch im dunklen Modus.
 
@@ -198,7 +179,7 @@ scopen statt auf Ladereihenfolge bauen.
 
 ---
 
-### 8 · Zugang zum Darstellungs-Modal und Plan-Schranken
+### 7 · Zugang zum Darstellungs-Modal und Plan-Schranken
 
 Modal für **alle** Pläne öffnen, den **Farbteil darin** sperren. Heute bricht
 der Wrapper in `settings.js:3391` bei `currentKey() !== 'partner'` das ganze
@@ -221,7 +202,7 @@ Sonst laufen beide auseinander.
 
 ---
 
-### 9 · Handy-Sperre plan-abhängig lösen
+### 8 · Handy-Sperre plan-abhängig lösen
 
 Erst wenn 1–2 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
@@ -599,3 +580,62 @@ nichts Falsches auf.
 
   **Nicht geprüft:** die Tabelle der geteilten Pässe war im Testkonto leer.
   Die Scroll-Regel dafür steht, der Nachweis fehlt.
+
+- [2026-08-04] **Marktbericht auf Handy und Tablet** — `e669327`, `e9a4d7b`
+
+  Eigener Namensraum **v1077 (Marktbericht)**, nichts mit der Haupt-App
+  gemischt.
+
+  **Befund Eingabestrecke (gemessen bei 390 × 844, dieselbe Strecke, die
+  im iframe der App läuft):** kein waagerechter Überlauf — v620 sitzt.
+  Aber **54 Eingabefelder auf 15 px** und eines auf 13 px → iOS Safari
+  zoomt bei jedem Antippen hinein. Und drei Knöpfe unter 44 px:
+  `.mbrep-tog` 70 × 26, `#saveFileBtn` und `#loadFileBtn` je 150 × 32.
+
+  **Befund fertiger Bericht (an einem gespeicherten Bericht gemessen, ohne
+  neuen Kerosin-Abruf):** `body.scrollWidth` **639** statt 375. Vier
+  Stellen, alle derselbe Fall — ein Rasterkind mit `min-width:auto` zieht
+  die Spur auf:
+
+  | Element | war |
+  |---|---|
+  | `.grid` | Spur 646 px statt 347 |
+  | `#addrAC` (Vorschlagsliste am `body`) | 602 px breit |
+  | `#microGrid` | zwei Spalten 238 + 354 = **592** in 305 px |
+  | `.wv-g` | drei Spalten 153 + 140 + 110 = **402** in 305 px |
+
+  **Befund Karte:** Leaflet zieht per Voreinstellung schon mit **einem**
+  Finger. In einer 3 200 px langen Berichtsseite heißt das: wer beim
+  Scrollen die Karte trifft, bleibt darin hängen.
+
+  **Fix (v1077, `marktbericht-app` 1076→1077b):**
+  Neuer Block `v1077-mb-touch` bei ≤ 768 px — Felder auf 16 px,
+  Trefferflächen auf 44 px, Karte auf 60 vh mit 40-px-Zoomknöpfen,
+  Diagramme und Tabellen auch **oberhalb** 560 px begrenzt (v620 deckte
+  nur ≤ 560 ab), Klappblöcke v1075/v1076 umbrechend, dazu die vier
+  Raster-Stellen des fertigen Berichts.
+  Karte: ein Finger scrollt die Seite, **zwei** Finger bewegen und zoomen,
+  mit kurzem Hinweis beim Ein-Finger-Versuch — nur auf Zeigern ohne Hover,
+  auf Maus und Trackpad bleibt alles wie gehabt. Kneifen zum Zoomen bleibt
+  in jedem Fall an. Keine Farbwerte angefasst (`var()` greift in Leaflet
+  nicht).
+
+  **Nachgemessen auf Staging (1077b), fertiger Bericht bei 390 px:**
+  `docScroll = 0`, `body.scrollWidth = 375 = clientWidth`, **kein**
+  Element über dem rechten Rand. Bericht 3 194 px hoch, Karte 420 px,
+  PDF-Knopf 44 px hoch. `#microGrid` und `.wv-g` einspaltig (305 px).
+  Eingabestrecke: kein Feld mehr unter 16 px, kein Ziel mehr unter 44 px.
+
+  **Staging-Abnahmepunkte — hier ehrlich offen:**
+  1. **PDF-Erzeugung.** Der Knopf steht und ist 44 px hoch, ein echter
+     Klick lädt eine Datei herunter — das habe ich nicht ausgelöst.
+  2. **Zwei-Finger-Geste auf der Karte.** Der Pfad hängt an
+     `matchMedia('(hover:none)')` und greift deshalb im Prüfbrowser nicht.
+     Die Regeln sind gemessen (`#map` steht auf `touch-action:pan-y`, der
+     Hinweis auf `position:absolute; z-index:1000`), die Geste selbst
+     gehört auf ein echtes Telefon.
+  3. **Erzeugen eines neuen Berichts bei 390 px.** Bewusst nicht erzwungen:
+     der Lauf kostet 5 L Kerosin und hängt an einem `window.confirm`, das
+     die Browser-Steuerung blockiert. Geprüft wurde stattdessen ein
+     bereits gespeicherter Bericht — dieselbe Renderstrecke, gleiche
+     Darstellung.
