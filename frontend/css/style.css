@@ -36271,3 +36271,18 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   }
 }
 /* ===== v652-uebrige-mobile END ===== */
+
+/* v652d: Preise-/Upgrade-Fenster — .pricing-modal-close und a.bw-cta lagen
+   unter 44px Trefferflaeche. Optik bleibt, Flaeche kommt per ::after. */
+@media (max-width: 768px) {
+  .pricing-modal-close, .bw-cta { position: relative !important; }
+  .pricing-modal-close::after, .bw-cta::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    background: transparent;
+  }
+}
