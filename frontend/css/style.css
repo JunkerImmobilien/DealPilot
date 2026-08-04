@@ -36136,3 +36136,53 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
     min-height: 44px !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v651b-preflight-erreichbar
+
+   NEBENBEFUND beim Cockpit-Durchgang, betrifft nicht nur Mobil:
+   Der Boarding-Pass #oab-bar (.dp-pfbar) traegt seit v593 overflow:hidden
+   und seit v578 flex-wrap:nowrap. Sein Inhalt ist rund 1240px breit.
+   GEMESSEN:
+       390px  -> v619 stapelt, alles erreichbar (ok)
+       820px  -> sichtbar 747, Inhalt 1208  -> abgeschnitten
+      1024px  -> sichtbar 691, Inhalt 1208  -> abgeschnitten
+      1440px  -> sichtbar 1015, Inhalt 1240 -> abgeschnitten,
+                 #oab-run ("Abrufen") liegt bei x 1485-1587
+   Der Startknopf der PRE-FLIGHT-Strecke ist damit auf jedem Schirm
+   unter rund 1620px Breite NICHT erreichbar - auch auf einem normalen
+   Notebook mit 1366 oder 1440px.
+
+   Fix: waagerecht scrollbar statt abgeschnitten, mit Snap und einem
+   sichtbaren Verlauf am rechten Rand als Hinweis. Wo der Inhalt passt,
+   aendert sich nichts - dann gibt es weder Scrollbalken noch Hinweis.
+   Unter 769px bleibt v619 (gestapelt) unberuehrt.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) {
+  #obj-action-bar .dp-pfbar,
+  .dp-pfbar {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x proximity !important;
+    scrollbar-width: thin !important;
+  }
+  .dp-pfbar > * { scroll-snap-align: start; }
+  .dp-pfbar::-webkit-scrollbar { height: 6px; }
+  .dp-pfbar::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,.28);
+    border-radius: 3px;
+  }
+  /* Sichtbarer Hinweis, dass rechts noch etwas kommt. Sitzt auf dem
+     Wrapper, nicht auf der scrollenden Leiste, damit er stehen bleibt. */
+  .dp-pf-scroll { position: relative !important; }
+  .dp-pf-scroll:has(.dp-pfbar)::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; right: 0;
+    width: 34px;
+    pointer-events: none;
+    border-radius: 0 16px 16px 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.22));
+  }
+}
+/* ===== v651b-preflight-erreichbar END ===== */
