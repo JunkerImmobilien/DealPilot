@@ -25,27 +25,6 @@ Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
 
 ---
 
-### 1 · Sidebar-Fußzeile auf dem Handy sichtbar machen
-
-Bei 390 px fehlt der Nutzerblock unten in der Sidebar. Abmelden nicht möglich.
-
-**Erster Verdacht — vor jeder CSS-Änderung prüfen:** Die Fußzeile ist im HTML
-leer (`index.html:712` ist nur ein Platzhalter). Der Nutzerblock wird
-nachträglich von `updateUserDisplay` (`auth.js:489`) hineingerendert, und dort
-gibt es einen Abbruchpfad nach zwanzig Versuchen (`auth.js:495`). In der
-Konsole nach `[V244]` schauen.
-
-Zweiter Verdacht, falls das JS durchläuft: bei ≤768 px trägt
-`body #sidebar .sb-list` ein `overflow:visible !important` und
-`max-height:none !important`. Damit wächst die Liste über die Höhe hinaus und
-schiebt die Fußzeile aus dem Bild. Sidebar als Flex-Spalte, Liste
-`flex:1; min-height:0; overflow-y:auto`, Fußzeile unten verankert.
-
-**Fertig, wenn:** Bei 390 px sind Nutzername, Plan-Kennzeichnung und
-Abmelde-Knopf sichtbar und antippbar, ohne zu scrollen.
-
----
-
 ### 2 · Aktionen-Akkordeon klappt in die falsche Richtung
 
 `ui.js:1582` trägt den Kommentar „klappt NACH OBEN aus", der Trigger zeigt ▲ —
@@ -375,3 +354,32 @@ nichts Falsches auf.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-04] **1 · Sidebar-Fußzeile auf dem Handy sichtbar machen** — `159f6c0`
+
+  **Befund (gemessen, beide Verdachtsmomente widerlegt):** `#sb-user` wird
+  sauber gerendert, `[V245]` meldet Erfolg — der Abbruchpfad in `auth.js:495`
+  war es nicht. Die Liste war seit v639 bereits auf `40vh` gedeckelt und
+  scrollte selbst — das `overflow:visible` aus v622 greift also nicht mehr.
+
+  Die Ursache lag darüber: über dem Nutzerblock stehen ausschließlich **feste
+  Höhen** — `.sb-header` 201 px + `.sb-section-title` 64 px +
+  `.sb-actions-trigger` 36 px + `#sb-user` 81 px = 382 px, dazu die Liste mit
+  40 vh. Bedingung fürs Hineinpassen: `0,4·vh + 382 ≤ vh`, also **vh ≥ 637 px**.
+  Gemessen bei 390 px Breite: 696 px sichtbar · 660 px 3 px ab · 616 px 29 px
+  ab · 556 px 65 px ab. Genau der iPhone-Safari-Bereich — auf dem Desktop mit
+  844 px Höhe war nie etwas zu sehen.
+
+  **Fix (v645, `style.css` W38→W39):** Die Liste bekommt den Restplatz
+  (`flex:1 1 auto`, `min-height:72px`) statt der festen 40 vh, Trigger und
+  Nutzerblock werden unten verankert und dürfen nicht schrumpfen. Nur ≤ 768 px
+  und nur im geöffneten Drawer.
+
+  **Nachgemessen auf Staging (W39):** bei 844/700/664/620/560/476 px Höhe
+  durchgehend `abgeschnitten = 0 px`, Abmelden per `elementFromPoint`
+  getroffen, Liste scrollt in sich. Tablet 820 px und Desktop 1024/1200 px
+  unverändert.
+
+  **Offen daneben:** Trefferfläche der Icon-Knöpfe ist 34 × 44 px — die Breite
+  liegt unter den 44 px aus Punkt 5, gehört dorthin. Der Logo-Header frisst mit
+  201 px weiter ein Drittel des Handy-Viewports (Optik, nicht angefasst).
