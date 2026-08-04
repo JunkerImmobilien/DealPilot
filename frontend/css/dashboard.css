@@ -428,11 +428,26 @@
 #dashboard-main .hpass{flex-basis:auto}
 }
 
-  #dashboard-main .pick, #dashboard-main @media(max-width:880px){
-    .kpis{grid-template-columns:repeat(2,1fr)}.gates{grid-template-columns:1fr}
-    .hbody{flex-direction:column}.hgate{border-right:none;border-bottom:2px dashed var(--c-line);padding-right:0;padding-bottom:14px}
-    .shared{grid-template-columns:1fr}.shq{border-left:none;border-top:1px dashed var(--c-line);flex-direction:row}
-    .charts{grid-template-columns:1fr}.shr{grid-template-columns:1fr auto}.shr .cd,.shr .rt{display:none}
+  /* v651-FIX: Diese Regel war kaputt und damit KOMPLETT WIRKUNGSLOS. Sie stand als
+       #dashboard-main .pick, #dashboard-main @media(max-width:880px){ ... }
+     - eine @media-Regel mitten in einer Selektorliste. Der Parser verwirft den
+     ganzen Block: gemessen im Browser fehlte genau dieser (max-width:880px)-Block
+     in sheet.cssRules, waehrend die drei anderen 880er-Bloecke da waren.
+     Entstanden ist es beim nachtraeglichen Voranstellen von #dashboard-main.
+     Folge: auf dem Handy blieb .gates dreispaltig (344+103+99 = 545px in einer
+     353px breiten Spalte) und .kpis vierspaltig mit 79px-Kacheln.
+     .pick kommt weder im Markup noch sonst im Stylesheet vor - da geht nichts
+     verloren. */
+  @media(max-width:880px){
+    #dashboard-main .kpis{grid-template-columns:repeat(2,1fr)}
+    #dashboard-main .gates{grid-template-columns:1fr}
+    #dashboard-main .hbody{flex-direction:column}
+    #dashboard-main .hgate{border-right:none;border-bottom:2px dashed var(--c-line);padding-right:0;padding-bottom:14px}
+    #dashboard-main .shared{grid-template-columns:1fr}
+    #dashboard-main .shq{border-left:none;border-top:1px dashed var(--c-line);flex-direction:row}
+    #dashboard-main .charts{grid-template-columns:1fr}
+    #dashboard-main .shr{grid-template-columns:1fr auto}
+    #dashboard-main .shr .cd,#dashboard-main .shr .rt{display:none}
   }
 
   @media(prefers-reduced-motion:reduce){#dashboard-main *{animation:none!important}
@@ -677,3 +692,48 @@
 #dashboard-main .stage.fc .sl{position:relative;overflow:hidden}
 #dashboard-main .stage.fc .sl::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(125deg,rgba(255,255,255,.12) 0 1px,transparent 1px 11px);pointer-events:none;border-radius:9px}
 #dashboard-main .stage.fc .sl>*{position:relative;z-index:1}
+
+/* ═══════════════════════════════════════════════════════════════════
+   v651-cockpit-mobile — Backlog Punkt 1 (Portfolio-Cockpit)
+   Gemessen bei 390 x 844 im Cockpit. Reste nach der Reparatur des
+   kaputten 880er-Blocks weiter oben.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Diagramme skalieren mit, keine feste Pixelbreite.
+     .chart-box stand auf 284px in einer 316px-Spalte, das Canvas darin
+     behielt seine gerenderte Breite und lief bis 560px hinaus. */
+  #dashboard-main .charts,
+  #dashboard-main .chart,
+  #dashboard-main .chart-box { min-width: 0 !important; max-width: 100% !important; }
+  #dashboard-main .chart-box { width: 100% !important; }
+  #dashboard-main canvas,
+  #dashboard-main .chart svg { max-width: 100% !important; height: auto !important; }
+
+  /* Kopfzeilen der Abschnitte duerfen umbrechen — #dp-proj-years (137px)
+     lief in der 345px-Zeile bis 393px hinaus. */
+  #dashboard-main .sl,
+  #dashboard-main .sl-head,
+  #dashboard-main .dp-charts-summary { flex-wrap: wrap !important; row-gap: 6px !important; }
+  #dashboard-main .yrs,
+  #dashboard-main .sl-yrs,
+  #dashboard-main .dp-charts-hint { min-width: 0 !important; max-width: 100% !important; }
+
+  /* Kacheln untereinander statt nebeneinander: vier 79px-Kacheln sind auf
+     390px nicht lesbar. Zwei pro Zeile. */
+  #dashboard-main .kpis { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  #dashboard-main #dp-overview-strip { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  #dashboard-main .gates { grid-template-columns: minmax(0,1fr) !important; }
+  #dashboard-main .gcol,
+  #dashboard-main .gcol > * { min-width: 0 !important; }
+
+  /* Tabellenzeilen: waagerecht scrollbar MIT sichtbarem Hinweis, statt
+     stumm abzuschneiden. */
+  #dashboard-main .sh-table-wrap,
+  #dashboard-main .shared {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  /* Filter und Sortierung bleiben erreichbar */
+  #dashboard-main .dp-filterbar,
+  #dashboard-main .filters { flex-wrap: wrap !important; row-gap: 8px !important; }
+}
