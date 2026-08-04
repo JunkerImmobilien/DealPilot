@@ -36060,3 +36060,35 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   .body select#d1_type,
   .body select#d2_type { font-size: 16px !important; }
 }
+
+/* v650c: Restliche Trefferflaechen unter 44px, nachgemessen nach v650.
+   Zwei Sorten: die einen duerfen einfach hoeher werden (Akkordeon-Zeilen,
+   Aktionen-Trigger), die anderen sollen ihre kompakte Optik behalten und
+   bekommen nur die unsichtbare ::after-Flaeche (Kerosin-Pille, Toolbar). */
+@media (max-width: 768px) {
+  .sb-actions-trigger,
+  .obj-extra-acc,
+  .qz-acc { min-height: 44px !important; }
+  .obj-extra-acc,
+  .qz-acc { display: flex !important; align-items: center !important; }
+
+  .hdr-credits-pill,
+  .dp-tt-mode-btn,
+  #dp-tb-x { position: relative !important; }
+  .hdr-credits-pill::after,
+  .dp-tt-mode-btn::after,
+  #dp-tb-x::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    background: transparent;
+  }
+
+  /* Rechtliches im Seitenfuss: zwei Links mit 12px Zeilenhoehe. */
+  .body .dp-legal-links a,
+  .body a.legal-link,
+  #legal-footer a { display: inline-block; padding: 12px 6px !important; }
+}
