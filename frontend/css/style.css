@@ -35868,3 +35868,187 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   header.hdr .hdr-toggle-btn { display: none !important; }
 }
 /* ===== v649-hdr-mobile END ===== */
+
+/* ═══════════════════════════════════════════════════════════════════
+   v650-tabs-mobile — Backlog Punkt 1 (Alle neun Objekt-Tabs handytauglich)
+
+   GEMESSEN bei 390 x 844, Objekt geladen, Tab fuer Tab durchgeklickt.
+   Kein Tab hatte waagerechtes Seiten-Scrollen (documentElement.scrollWidth
+   == innerWidth ueberall), aber fuenf hatten Inhalt, der ueber den rechten
+   Rand hinauslief und damit abgeschnitten war:
+
+     Objekt        .qz-label                 rechts bis 553
+     Miete         #ki-miete-box             rechts bis 394
+     Finanzierung  .dpfk-ctrl / .dpfk-ltv    rechts bis 606  (.body 193px ueber)
+                   .mrpf-top-tile            rechts bis 578
+     Steuer        .fa-pdf-ctrl              rechts bis 537
+     Bewertung     table.kpi-eval-table      rechts bis 562
+                   .cf-mode-btns             rechts bis 490
+
+   Dazu: 240 Eingabefelder mit 12,5 px bzw. 13,3 px Schrift. iOS Safari
+   zoomt bei jedem Antippen hinein, sobald ein Feld unter 16 px liegt.
+   Und 19 Knopfarten unter 44 px Trefferflaeche.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── (1) Eingabefelder auf 16px ────────────────────────────────────
+     Der einzige Wert, bei dem iOS Safari NICHT hineinzoomt. Nur Groesse,
+     keine Farbe, keine Hoehe — die Felder wachsen von selbst mit. */
+  .body input[type="text"],
+  .body input[type="number"],
+  .body input[type="tel"],
+  .body input[type="email"],
+  .body input[type="date"],
+  .body input[type="password"],
+  .body input[type="search"],
+  .body input:not([type]),
+  .body select,
+  .body textarea {
+    font-size: 16px !important;
+  }
+
+  /* ── (2) Trefferflaechen auf 44px ──────────────────────────────────
+     Ohne die Optik zu aendern: ein unsichtbares ::after legt die
+     Trefferflaeche auf mindestens 44 x 44, das Bild bleibt klein.
+     .dp-tip nutzt bereits ::before fuer das Fragezeichen, ::after ist frei. */
+  .dp-tip,
+  .sb-sort-btn,
+  .sbc-btn,
+  .sb-user-icon-btn,
+  .hdr-mobile-menu,
+  .img-del,
+  .dp-sidebar-toggle,
+  #dp-sb-toggle,
+  .btn.btn-sm {
+    position: relative !important;
+  }
+  .dp-tip::after,
+  .sb-sort-btn::after,
+  .sbc-btn::after,
+  .sb-user-icon-btn::after,
+  .hdr-mobile-menu::after,
+  .img-del::after,
+  .dp-sidebar-toggle::after,
+  #dp-sb-toggle::after,
+  .btn.btn-sm::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    background: transparent;
+    pointer-events: auto;
+  }
+
+  /* ── (3) Jedes :hover braucht ein :active ──────────────────────────
+     Auf Touch gibt es kein Hover. Ohne Rueckmeldung wirkt jeder Tipp,
+     als waere nichts passiert. Nur auf Geraeten ohne Hover. */
+  @media (hover: none) {
+    .btn:active,
+    .tab:active,
+    .sb-card:active,
+    .sb-act-item:active,
+    .sbc-btn:active,
+    .dp-tip:active,
+    .hdr-icon-btn:active,
+    .sb-actions-trigger:active,
+    .hdr-credits-pill:active,
+    .qz-star:active {
+      filter: brightness(1.35);
+      transition: none !important;
+    }
+    .sb-card:active,
+    .tab:active { transform: scale(0.985); }
+  }
+
+  /* ── (4) Raster-Kinder duerfen schrumpfen ──────────────────────────
+     GEMESSEN: #ki-miete-box war 368px breit in einer 333px-Spalte.
+     Ursache ist nicht die Box, sondern die Voreinstellung min-width:auto
+     auf Rasterkindern: ein breites Enkelkind schiebt die ganze Spalte auf.
+     Das ist der Sammelfall hinter mehreren der Ueberlaeufe oben. */
+  .body .col2 > *,
+  .body .g2 > *,
+  .body .g3 > *,
+  .body .grid > *,
+  .body .kpi-grid > * { min-width: 0 !important; }
+
+  /* ── (5) Kurze Paare bleiben nebeneinander ─────────────────────────
+     Backlog: Formulare auf eine Spalte, ausser kurze Paare wie PLZ/Ort.
+     Vier Spalten als Raster: PLZ 1, Ort 3, Strasse 3, Hausnummer 1,
+     alles andere volle Breite. Ohne :has()-Unterstuetzung faellt es
+     sauber auf eine Spalte zurueck. */
+  .body .g2:has(> .f #plz) {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    column-gap: 10px !important;
+  }
+  .body .g2:has(> .f #plz) > * { grid-column: span 4; }
+  .body .g2:has(> .f #plz) > .f:has(#plz) { grid-column: span 1; }
+  .body .g2:has(> .f #plz) > .f:has(#ort) { grid-column: span 3; }
+  .body .g2:has(> .f #plz) > .f:has(#str) { grid-column: span 3; }
+  .body .g2:has(> .f #plz) > .f:has(#hnr) { grid-column: span 1; }
+
+  /* ── (6) Objekt: Sterne-Bewertung ──────────────────────────────────
+     .qz-row stand auf 170px 1fr auto mit !important OHNE Media-Query
+     (style.css:9421) und schlug damit den Mobilblock bei <=720px, der
+     kein !important traegt. Dazu .qz-label mit min-width:200px !important.
+     170 + Sterne + 200 = 553px auf einem 390px-Schirm. */
+  .body .qz-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 4px !important;
+  }
+  .body .qz-label {
+    min-width: 0 !important;
+    padding-left: 0 !important;
+    text-align: left !important;
+  }
+  .body .qz-stars { justify-content: flex-start !important; }
+
+  /* ── (7) Finanzierung: das Konditionsband ──────────────────────────
+     GEMESSEN: .dpfk-band ist ein umbrechender Flex-Container (333px).
+     .dpfk-stub belegt davon 331px, .dpfk-body steht auf flex:1 1 0%.
+     Weil die Flex-Basis 0 ist, PASST der Koerper rechnerisch noch auf
+     dieselbe Zeile — er bekommt 0px Breite und sein Inhalt laeuft bis
+     606px hinaus, statt umzubrechen. Flex-Basis 100% erzwingt die
+     eigene Zeile, danach liegen 333px an. */
+  .body .dpfk-body {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
+  .body .dpfk-head,
+  .body .dpfk-ctrl,
+  .body .dpfk-ltv { flex-wrap: wrap !important; min-width: 0 !important; }
+  .body .mrpf-top-strip,
+  .body .dpfk-strip { grid-template-columns: minmax(0, 1fr) !important; }
+  .body .mrpf-top-tile { max-width: 100% !important; }
+
+  /* ── (8) Steuer: PDF-Knopfleiste ───────────────────────────────────
+     .fa-pdf-ctrl (324px) sass in einem .ct-row mit flex-wrap:nowrap
+     (303px) und lief bis 537px. */
+  .body .ct-row { flex-wrap: wrap !important; row-gap: 8px !important; }
+  .body .fa-pdf-ctrl { flex: 1 1 100% !important; min-width: 0 !important; }
+
+  /* ── (9) Bewertung: KPI-Tabelle und Modus-Schalter ─────────────────
+     Die Tabelle ist mit 535px echt breiter als der Schirm — sie wird
+     nicht gequetscht, sondern bekommt einen eigenen Scroller MIT
+     sichtbarem Hinweis (Verlauf am rechten Rand). */
+  .body .kpi-eval-body {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: relative !important;
+  }
+  .body .kpi-eval-card { position: relative !important; }
+  .body .kpi-eval-card::after {
+    content: "";
+    position: absolute;
+    right: 14px; top: 0; bottom: 0;
+    width: 26px;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.45));
+  }
+  .body .cf-switcher,
+  .body .cf-mode-btns { flex-wrap: wrap !important; min-width: 0 !important; }
+  .body .cf-mode-btn { flex: 1 1 auto !important; min-width: 0 !important; }
+}
+/* ===== v650-tabs-mobile END ===== */
