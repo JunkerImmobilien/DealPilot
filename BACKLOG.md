@@ -29,36 +29,8 @@ Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
 
 
 
-### 1 · Objektliste auf dem Tablet erreichbar machen
 
-Im Band **769–900 px** liegt die Sidebar `position:fixed` bei `left:-280px`
-und wird ausschließlich über `.sidebar.open` geöffnet — eine Klasse, die **kein
-Code setzt**. iPad im Hochformat sind 810–834 px, also mitten drin.
-
-Vier Umschalt-Mechaniken nebeneinander:
-
-| Klasse | Ausgelöst von | Status |
-|---|---|---|
-| `.sidebar.open` | niemandem | toter CSS-Code |
-| `.app-wrap.sb-mobile-open` | `main.js:230` | der richtige |
-| `.sidebar.sb-mobile-open` | `ui.js:1712` | falsches Element |
-| `.sidebar.mobile-open` | Inline-`onclick`, `index.html:607` | Knopf nie sichtbar |
-
-Auf **eine** reduzieren. Bei ≤768 px gibt es bereits einen
-Vereinheitlichungs-Block mit dem Kommentar „EIN einheitlicher Drawer" — daran
-anschließen, nicht neu erfinden.
-
-**Achtung:** Bei 901–1024 px steht die Leiste heute als feste Spalte. Das ist
-auf dem iPad quer richtig und soll **so bleiben** — nur 769–900 wird repariert.
-
-`.mobile-overlay` ist nur bis 768 px gestylt und braucht im neuen Band Regeln.
-
-**Fertig, wenn:** Bei 820 px öffnet und schließt die Liste zuverlässig,
-mehrfach hintereinander, und beim Drehen auf 1024 px steht wieder die Spalte.
-
----
-
-### 2 · Kopfleiste auf dem Handy entlasten
+### 1 · Kopfleiste auf dem Handy entlasten
 
 Die Kopfleiste trägt zu viel für 390 px.
 
@@ -75,7 +47,7 @@ Objektname ist lesbar.
 
 ---
 
-### 3 · Alle neun Objekt-Tabs handytauglich
+### 2 · Alle neun Objekt-Tabs handytauglich
 
 Objekt · Investition · Miete · Finanzierung · Bewirtschaftung · Steuer ·
 Pilot-Analyse · Bewertung · Deal-Aktion.
@@ -98,7 +70,7 @@ bedienbar ist und kein Eingabefeld beim Antippen hineinzoomt.
 
 ---
 
-### 4 · Portfolio-Cockpit auf Handy und Tablet
+### 3 · Portfolio-Cockpit auf Handy und Tablet
 
 Eigene Ansicht mit eigenen Kacheln, Tabellen und Diagrammen — von den
 Tab-Regeln nicht miterfasst.
@@ -113,7 +85,7 @@ Tab-Regeln nicht miterfasst.
 
 ---
 
-### 5 · Marktbericht auf Handy und Tablet
+### 4 · Marktbericht auf Handy und Tablet
 
 Eigene Anwendung unter `frontend/marktbericht-app/` mit eigenem CSS.
 **Eigener Namensraum `vNNN` (Marktbericht) — nicht mit der Haupt-App mischen.**
@@ -132,7 +104,7 @@ angesehen werden kann.
 
 ---
 
-### 6 · Übrige Seiten und Bereiche
+### 5 · Übrige Seiten und Bereiche
 
 Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
@@ -141,7 +113,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 - Quick Boarding / Quick Check
 - Track Record
 - Datenraum
-- Netzwerk (siehe Punkt 7)
+- Netzwerk (siehe Punkt 6)
 - Anmeldung, Registrierung, Passwort vergessen
 - Preise und Upgrade-Fenster
 - Rechtliches (Impressum, Datenschutz, AGB)
@@ -153,7 +125,7 @@ Alles, was nicht Objekt-Tab, Cockpit oder Marktbericht ist:
 
 ## Fehler
 
-### 7 · Partner-Netzwerk lädt nicht
+### 6 · Partner-Netzwerk lädt nicht
 
 **Zuerst Diagnose, kein Umbau.** Ursache ist unbekannt.
 
@@ -184,7 +156,7 @@ Zielzustand. Nicht danebenbauen, dagegen bauen.
 
 ---
 
-### 8 · Darstellungs-Modal mit festen UI-Vorlagen
+### 7 · Darstellungs-Modal mit festen UI-Vorlagen
 
 **Das Kernstück.** Heute ist die Oberfläche B2C-Optik: Obsidian, Gold,
 Leuchten, Verläufe. Ein Berater, der sie vor dem Mandanten öffnet, braucht
@@ -241,7 +213,7 @@ Objektkarten und Logo, die Farbeinstellungen greifen darüber,
 
 ---
 
-### 9 · Aktionen-Menü gliedern
+### 8 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -256,7 +228,7 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 10 · Objektkarten-Modi: Kompakt · Standard · Wallet
+### 9 · Objektkarten-Modi: Kompakt · Standard · Wallet
 
 Ein Markup, drei Optiken, **reines CSS**. Die gemessene Struktur von
 `_renderRichCard` (`storage.js:866`) steht in CLAUDE.md — nicht neu raten.
@@ -272,7 +244,7 @@ Desktop, Tablet und Handy.
 
 ---
 
-### 11 · Kartenfläche: Passend · Weiß
+### 10 · Kartenfläche: Passend · Weiß
 
 Karten folgen der Fassung oder bleiben weiß, auch im dunklen Modus.
 
@@ -281,7 +253,7 @@ scopen statt auf Ladereihenfolge bauen.
 
 ---
 
-### 12 · Zugang zum Darstellungs-Modal und Plan-Schranken
+### 11 · Zugang zum Darstellungs-Modal und Plan-Schranken
 
 Modal für **alle** Pläne öffnen, den **Farbteil darin** sperren. Heute bricht
 der Wrapper in `settings.js:3391` bei `currentKey() !== 'partner'` das ganze
@@ -304,9 +276,9 @@ Sonst laufen beide auseinander.
 
 ---
 
-### 13 · Handy-Sperre plan-abhängig lösen
+### 12 · Handy-Sperre plan-abhängig lösen
 
-Erst wenn 1–6 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
+Erst wenn 1–5 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
 
 Freigabe ab Partner-Plan, gilt auch für dessen Mandanten. Der Haken: die Sperre
@@ -325,8 +297,7 @@ nichts Falsches auf.
 
 - **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
   Aktionen als Popover statt Blatt von unten
-- **Vier Umschalt-Mechaniken endgültig aufräumen** — toter `.sidebar.open`-Code
-  raus, Inline-Handler weg, eine Funktion
+- ~~**Vier Umschalt-Mechaniken endgültig aufräumen**~~ — in v648 miterledigt
 - **Widersprüchliche Regeln in den ≤768-Blöcken** — `.sb-list` trägt
   `height:40vh !important` **und** `height:0 !important`, die letzte gewinnt
 - **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
@@ -365,7 +336,7 @@ nichts Falsches auf.
   unverändert.
 
   **Offen daneben:** Trefferfläche der Icon-Knöpfe ist 34 × 44 px — die Breite
-  liegt unter den 44 px aus Punkt 3, gehört dorthin. Der Logo-Header frisst mit
+  liegt unter den 44 px aus Punkt 2, gehört dorthin. Der Logo-Header frisst mit
   201 px weiter ein Drittel des Handy-Viewports (Optik, nicht angefasst).
 
 - [2026-08-04] **Neues Logo einsetzen, altes entfernen** — `7a86e7b`, `56a9c04`
@@ -450,3 +421,64 @@ nichts Falsches auf.
   **Nebenbefund, noch offen:** `css/ui-varianten.css` und `js/ui-varianten.js`
   sind in `index.html` (Z. 29 und 3466) verlinkt, existieren aber weder im
   Repo noch auf dem Server — zwei 404 bei jedem Seitenaufruf.
+
+- [2026-08-04] **Objektliste auf dem Tablet erreichbar machen** — `6bffd55`, `dfcea21`
+
+  **Befund — deutlich schlimmer als angenommen.** Es war nicht „die Liste ist
+  unerreichbar", sondern **die ganze App war im Band 769–1024 px eine leere
+  Seite.** Gemessen:
+
+  | Viewport | `.app-wrap` Spalten | `#sidebar` | `.main-col` oben |
+  |---|---|---|---|
+  | 820 × 1180 | `820px` (**eine**) | `relative`, `translateX(-240px)`, Höhe 1180 | **1180** |
+  | 1024 × 768 | `1024px` (**eine**) | dito | **768** |
+  | 1025 × 768 | `380px 645px` | `relative`, sichtbar | 0 |
+
+  Der Inhalt begann also eine **volle Bildschirmhöhe unter dem Falz**.
+  Damit ist auch die Backlog-Annahme „bei 901–1024 px steht die Leiste als
+  feste Spalte" widerlegt — dort war es genauso kaputt.
+
+  **Ursache, drei Regeln, die sich gegenseitig aushebeln:**
+  1. `@media (max-width:1024px) .app-wrap{grid-template-columns:1fr}` —
+     Leiste und Inhalt stapeln sich untereinander.
+  2. `@media (max-width:1024px) .sidebar{position:fixed}` sollte die Leiste
+     aus dem Fluss nehmen, wird aber von der **späteren, medienlosen**
+     Regel `aside.sidebar{position:relative}` geschlagen: (0,1,1) gegen
+     (0,1,0). **Eine Media-Query erhöht die Spezifität nicht.**
+  3. Nur unter 768 px zieht v622 mit `body #sidebar.sidebar
+     {position:fixed !important}` (1,2,1) den Kopf aus der Schlinge —
+     deshalb lief das Handy und das Tablet nicht.
+
+  **Vierter Befund:** `@media (max-width:1024px) .body{margin-left:240px
+  !important}`, ein Rest aus der Zeit der fixen 240-px-Leiste. Bei 1024 px
+  begann `.body` dadurch bei 500 statt 260 und war 519 statt 764 px breit.
+  Unter 768 px war das längst zurückgenommen, im Band dazwischen nicht.
+
+  **Fix (v648, `style.css` W40→W42, `ui.js` 973b→974, `main.js` 950→951):**
+  - **769–900 px** bekommt den vorhandenen v622-Drawer. Statt ihn zu doppeln,
+    wandern die Media-Queries der Drawer-Blöcke v622 · v625 · v633 · v637 ·
+    v638 · v639 · v642 · v645 von 768 auf **900 px**.
+  - **901–1024 px** bekommt den neuen Block `v648-tablet-shell`: echte zwei
+    Spalten (`260px minmax(0,1fr)`), Leiste `sticky` im Fluss, keine
+    Drawer-Bedienelemente, kein Backdrop.
+  - `.body`-Randabzug im ganzen Band auf 0.
+
+  **Vier Umschalt-Mechaniken auf eine reduziert** (der „Später"-Punkt ist
+  damit miterledigt):
+  - `ui.js:1751 toggleMobileSidebar` gelöscht — setzte `.sb-mobile-open` auf
+    `#sidebar` statt `.app-wrap` und war ohnehin wirkungslos, weil `main.js`
+    danach lädt und neu definiert. Genau so entstanden die vier Mechaniken.
+  - `.mobile-hamburger` aus dem Markup — in jedem Band `display:none`.
+  - `#mobile-overlay` aus dem Markup — Backdrop ist `#sb-backdrop`.
+  - `.sidebar.open`-Regel entfernt — keine Zeile setzt die Klasse.
+  - `drawer-fix-20260731` zurückgenommen — setzte `left:0` auf ein Element,
+    das per `transform` verschoben wird, und blendete den toten Hamburger ein.
+  - Schwellen 768 → 900 in `main.js` (resize-Reset) und `ui.js`
+    (`closeMobileSidebarOnAction`).
+
+  **Nachgemessen auf Staging (W42):**
+  390 × 844 unverändert (Inhalt oben, Drawer auf/zu, Aktionen-Menü ohne
+  Überhang) · 820 × 1180 Inhalt bei `top 0`, Drawer mehrfach auf/zu, Backdrop
+  greift, kein waagerechtes Scrollen · 901 × 800 und 1024 × 768 zwei Spalten
+  `260px + 641/764px`, Hamburger aus, `.body` bündig · 1440 × 800 unverändert
+  `380px + 1060px`.
