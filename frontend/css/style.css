@@ -35752,3 +35752,15 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   body #mobile-overlay { display: none !important; }
 }
 /* ===== v648-tablet-shell END ===== */
+
+/* v648b — Der Inhalt sass 240px zu weit rechts.
+   GEMESSEN bei 1024px: .main-col beginnt bei 260, .body aber bei 500 und ist
+   nur 519px breit statt 764. Ursache: @media (max-width:1024px) .body
+   {margin-left:240px !important} — ein Rest aus der Zeit, als die Leiste dort
+   position:fixed mit 240px Breite war. Unterhalb 768px war der Rand bereits
+   auf 0 zurueckgenommen, im Band 769-1024 nicht.
+   Jetzt gilt: kein Randabzug, solange die Leiste entweder Drawer (769-900)
+   oder echte Rasterspalte (901-1024) ist. */
+@media (max-width: 1024px) {
+  body .body { margin-left: 0 !important; }
+}
