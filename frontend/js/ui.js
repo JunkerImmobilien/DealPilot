@@ -1602,6 +1602,9 @@ function sbActionsToggle() {
     }, 10);
   } else {
     acc.style.removeProperty('bottom');
+    acc.style.removeProperty('max-height');
+    var _inner = acc.querySelector('.sb-actions-accordion-inner');
+    if (_inner) _inner.style.removeProperty('max-height');
     window.removeEventListener('resize', _sbActionsDock);
     document.removeEventListener('click', _sbActionsOutsideClick);
     document.removeEventListener('keydown', _sbActionsEscHandler);
@@ -1633,8 +1636,23 @@ function _sbActionsDock() {
     var acc = document.getElementById('sb-actions-accordion');
     var btn = document.getElementById('sb-actions-trigger-btn');
     if (!acc) return;
-    var pos = getComputedStyle(acc).position;
-    if (pos !== 'absolute') { acc.style.removeProperty('bottom'); return; }
+    var inner = acc.querySelector('.sb-actions-accordion-inner');
+    var cs = getComputedStyle(acc);
+    if (cs.position === 'fixed') {
+      /* Drawer-Overlay: das CSS deckelt mit calc(100dvh - 58px - 110px). Die
+         110px sind geraten — bei 390x556 lag die Unterkante des Menues bei
+         446px, der Trigger begann aber schon bei 409px. Deshalb hier gegen die
+         GEMESSENE Trigger-Oberkante deckeln statt gegen eine feste Zahl. */
+      acc.style.removeProperty('bottom');
+      if (btn) {
+        var topPx = parseFloat(cs.top) || 0;
+        var avail = Math.max(160, Math.round(btn.getBoundingClientRect().top - topPx - 8));
+        acc.style.setProperty('max-height', avail + 'px', 'important');
+        if (inner) inner.style.setProperty('max-height', avail + 'px', 'important');
+      }
+      return;
+    }
+    if (cs.position !== 'absolute') { acc.style.removeProperty('bottom'); return; }
     var sidebar = document.getElementById('sidebar') || document.querySelector('.sidebar');
     if (!btn || !sidebar) return;
     var bottomPx = (sidebar.getBoundingClientRect().bottom - btn.getBoundingClientRect().top) + 4;
