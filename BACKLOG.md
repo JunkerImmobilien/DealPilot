@@ -2,8 +2,10 @@
 
 **Reihenfolge = Priorität.** Der oberste offene Punkt wird bearbeitet.
 
-Nach Abschluss wandert ein Punkt nach unten unter **Fertig**, mit Datum und
-Commit-Hash. Hängt etwas, kommt `**BLOCKIERT:**` mit einem Satz Begründung
+Nach Abschluss wandert ein Punkt nach unten unter **Fertig**, mit Datum,
+Commit-Hash und dem **Befund** — was war die Ursache, was wurde gemessen.
+Dort **ohne** Nummer: Nummern sind Reihenfolge, kein Name. Die verbleibenden
+Punkte werden fortlaufend neu durchnummeriert. Hängt etwas, kommt `**BLOCKIERT:**` mit einem Satz Begründung
 direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 **Vorlagen und Bilder:** `design/` (Mockups, Logos). Siehe `design/README.md`.
@@ -22,6 +24,47 @@ das Handy-Overlay drüber). Die Sperre selbst wird **nicht** angefasst.
 
 Prüfgrößen durchgehend: **390 px** (Handy), **820 px** (Tablet hoch),
 **1024 px** (Tablet quer).
+
+---
+
+### 1 · Neues Logo einsetzen, altes entfernen
+
+**Ganz oben, weil es überall sichtbar ist und Platz schafft.** Die Messung aus
+der erledigten Fußzeilen-Aufgabe hat es beziffert: der Logo-Header ist **201 px hoch** — ein Drittel
+des Handy-Viewports, bevor überhaupt ein Objekt zu sehen ist. Das ist der
+größte Einzelposten der festen Höhen, die dort oben stehen.
+
+**Die neuen Dateien liegen in `design/logo/`:**
+
+| Datei | Einsatz |
+|---|---|
+| `dealpilot-logo-rahmen-transparent.png` | **Standard** — auf dunklem Untergrund (Fassung DealPilot) |
+| `dealpilot-logo-rahmen-512.png` | Dunkles Logo mit Rahmen — auf **hellem** Untergrund (Kontor, Panel, Kanzlei …) |
+
+**Was zu tun ist:**
+1. Beide Dateien nach `frontend/assets/` kopieren
+2. `index.html:623` umstellen — heute `assets/dealpilot-logo-app.png`
+3. `_swapLogo()` in `settings.js:3120` auf die neuen Dateien zeigen lassen.
+   Die Funktion tauscht bereits zwischen hell und dunkel, sie braucht nur die
+   neuen Pfade — **keinen neuen Mechanismus bauen**
+4. Höhe in der Seitenleiste deutlich zurücknehmen: `.app-logo-simple`,
+   `.app-logo-simple-sidebar`, `.app-logo-simple-wrap-sidebar`, `.sb-header`.
+   Jeder gesparte Pixel kommt der Objektliste zugute — die Fußzeilen-Messung hat gezeigt,
+   dass es dort auf jeden Pixel ankommt
+5. Alte Dateien erst entfernen, **nachdem** geprüft ist, dass sie nirgends
+   sonst referenziert werden: `dealpilot-logo-app.png`,
+   `dealpilot-logo-app-light.png`. **`dealpilot-logo.png` wird von Landing und
+   PDFs genutzt — nicht anfassen.**
+
+**Muss auf allen Größen sitzen:**
+- **390 px** bei kleiner Viewport-Höhe (556 px war der engste gemessene Fall)
+- **820 px** und **1024 px** — im Drawer wie in der festen Spalte
+- **Eingeklappte Leiste** — dort passt nur die Bildmarke, keine Wortmarke
+- Keine Verzerrung, kein Beschnitt, scharf auf Retina
+
+**Fertig, wenn:** In jeder Fassung sitzt das passende Logo, `.sb-header` ist
+spürbar niedriger als 201 px, und auf 390 / 820 / 1024 px ist es sauber — auch
+eingeklappt und bei 556 px Höhe.
 
 ---
 
@@ -88,7 +131,9 @@ Pilot-Analyse · Bewertung · Deal-Aktion.
 
 - Formulare auf eine Spalte, außer kurze Paare wie PLZ/Ort
 - **Eingabefelder auf 16 px** — darunter zoomt iOS Safari beim Antippen hinein
-- Trefferflächen mindestens 44 px, jedes `:hover` braucht ein `:active`
+- Trefferflächen mindestens 44 px, jedes `:hover` braucht ein `:active`.
+  **Bereits gefunden:** die Icon-Knöpfe in der Seitenleiste sind
+  34 × 44 px — die Breite liegt unter dem Maß und gehört hierher
 - Tabs scrollen mit Snap; neun Reiter passen nicht nebeneinander →
   Raster-Übersicht als Ausweg (`design/mockups/dp-handy-mockup-v2.html`)
 - Tabellen, Diagramme und breite Kacheln dürfen nicht seitlich überlaufen
@@ -308,19 +353,7 @@ Sonst laufen beide auseinander.
 
 ---
 
-### 15 · Kleineres Logo für die helle Fassung
-
-Das heutige Logo ist für die dunkle Leiste gebaut. In Kontor und Panel braucht
-es eine kompaktere, helle Variante.
-
-Dateien in `design/logo/`, Auswahl über die Fassung.
-
-**Fertig, wenn:** In jeder der drei Fassungen sitzt das passende Logo, ohne
-Verzerrung, auch bei eingeklappter Leiste und auf dem Handy.
-
----
-
-### 16 · Handy-Sperre plan-abhängig lösen
+### 15 · Handy-Sperre plan-abhängig lösen
 
 Erst wenn 1–8 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
@@ -355,7 +388,7 @@ nichts Falsches auf.
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
 
-- [2026-08-04] **1 · Sidebar-Fußzeile auf dem Handy sichtbar machen** — `159f6c0`
+- [2026-08-04] **Sidebar-Fußzeile auf dem Handy sichtbar machen** — `159f6c0`
 
   **Befund (gemessen, beide Verdachtsmomente widerlegt):** `#sb-user` wird
   sauber gerendert, `[V245]` meldet Erfolg — der Abbruchpfad in `auth.js:495`
