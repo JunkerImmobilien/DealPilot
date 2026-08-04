@@ -256,3 +256,29 @@ eine selbst ausgerechnete Zahl.
   Kettenprüfung (kommt der Wert an?), Klammerbilanz.
 - **Beweisen statt behaupten.** Untestbares ehrlich als Staging-Abnahmepunkt
   kennzeichnen.
+
+## Arbeitsmodus — durchziehen statt nachfragen
+
+**Standard ist: machen.** Nicht fragen, ob gebaut werden soll — bauen,
+ausrollen, prüfen, nachbessern, bis es steht.
+
+Der Kreislauf pro Aufgabe:
+1. Messen (DOM, Konsole, getBoundingClientRect) und den Befund nennen
+2. Ändern
+3. `.\tools\deploy-staging.ps1`
+4. Im Browser nachmessen, ob es wirklich wirkt
+5. Bei Abweichung: zurück zu 1 — **nicht** fragen, ob weitergemacht werden soll
+
+Erst melden, wenn es **funktioniert** oder wenn du **nicht weiterkommst**.
+Zwischenstände nur, wenn ein Befund die Richtung ändert.
+
+**Nachfragen nur bei:**
+- Produktion, Datenbank-Eingriffen, Geld, Preisen, Kündigungen
+- Optik und Produktentscheidungen ohne klare Vorgabe → Demo bauen und zeigen
+- Etwas aus „Nicht anfassen" müsste angefasst werden
+- Nach drei erfolglosen Anläufen: STOPP, Diagnose, melden
+
+**Nicht nachfragen bei:** Datei-Änderungen im Repo, Commits, Ausrollen auf
+Staging, Messen im Browser, Zwischenversionen. Das ist der Auftrag.
+
+Staging darf kaputtgehen. Dafür ist es da.
