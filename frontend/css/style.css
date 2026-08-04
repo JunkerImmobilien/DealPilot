@@ -35764,3 +35764,107 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
 @media (max-width: 1024px) {
   body .body { margin-left: 0 !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v649-hdr-mobile — Backlog Punkt 1 (Kopfleiste auf dem Handy entlasten)
+
+   GEMESSEN bei 390 x 844 mit geladenem Objekt (Dealstreet 999):
+     header.hdr            385 x 279   <- ein Drittel des Viewports
+       .hdr-v61-row1       385 x 151   <- bricht auf DREI Zeilen um:
+           Hamburger 32x44 · #hdr-obj-num 73x27 · Name 222x22
+           #hdr-autosave 127x25 · #hdr-completeness 198x27
+           .hdr-actions-v61 107x44 (Kerosin-Pille)
+       #hdr-badges         385 x 128   <- Investor-Deal-Score-Karte
+
+   Ziel: eine Zeile plus eine schmale Fortschrittszeile.
+   Nur <=768px. Tablet und Desktop bleiben unberuehrt.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* (1) Kuerzel-Chip und sein Trenner raus — die Nummer steht auf der
+     Objektkarte und im Tab "Objekt". */
+  header.hdr .hdr-obj-num,
+  header.hdr .hdr-sep { display: none !important; }
+
+  /* (2) Erste Zeile bleibt EINE Zeile. Der Objektname bekommt den Rest und
+     kuerzt mit Auslassungspunkten, statt die Zeile zu sprengen. */
+  header.hdr .hdr-v61-row1 {
+    flex-wrap: wrap !important;      /* nur fuer die Fortschrittszeile unten */
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 6px 12px !important;
+    row-gap: 0 !important;
+  }
+  header.hdr .hdr-obj-name {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 15px !important;
+  }
+  header.hdr .hdr-spacer { display: none !important; }
+  header.hdr .hdr-actions-v61 {
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    order: 8 !important;
+  }
+
+  /* (3) Autosave nur noch als Punkt. */
+  header.hdr .hdr-autosave-text { display: none !important; }
+  header.hdr .hdr-autosave {
+    flex: 0 0 auto !important;
+    order: 7 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: 14px !important;
+    background: none !important;
+    border: 0 !important;
+  }
+
+  /* (4) Kerosin: Zahl ja, Balken nein. */
+  header.hdr .fuel-pill-bar,
+  header.hdr #hdr-credits-pill-bar { display: none !important; }
+  header.hdr .hdr-credits-pill {
+    padding: 4px 8px !important;
+    gap: 5px !important;
+    min-height: 32px !important;
+  }
+
+  /* (5) Feldfortschritt: eigene schmale Zeile unter der ersten.
+     order 99 + flex-basis 100% laesst ihn in der Flexbox umbrechen —
+     ohne das Markup anzufassen. */
+  header.hdr .hdr-completeness {
+    order: 99 !important;
+    flex: 1 0 100% !important;
+    width: 100% !important;
+    margin: 2px 0 0 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  header.hdr .hdr-completeness .hdr-comp-text {
+    font-size: 10px !important;
+    letter-spacing: .02em !important;
+    flex: 0 0 auto !important;
+  }
+  header.hdr .hdr-completeness .hdr-comp-bar {
+    flex: 1 1 auto !important;
+    height: 3px !important;
+    min-width: 0 !important;
+  }
+
+  /* (6) Investor Deal Score raus — die Zahl steht auf jeder Objektkarte und
+     im Tab "Bewertung". Der Hinweis "bitte 70 % ausfuellen" bleibt, der ist
+     eine Handlungsaufforderung und keine Kennzahl. */
+  header.hdr #hdr-badges > *:not(.hdr-incomplete-banner) { display: none !important; }
+  header.hdr #hdr-badges { padding: 0 !important; }
+  header.hdr #hdr-badges:not(:has(.hdr-incomplete-banner)) { display: none !important; }
+  header.hdr .hdr-toggle-btn { display: none !important; }
+}
+/* ===== v649-hdr-mobile END ===== */
