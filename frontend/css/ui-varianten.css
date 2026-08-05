@@ -339,6 +339,19 @@ html[data-ui-theme="kanzlei"] body .card { border-color: transparent !important;
    in CLAUDE.md gemessene (storage.js:_renderRichCard ab Z.866) — hier wird
    nichts geraten, nur eingefaerbt. */
 html[data-ui-theme] body aside.sidebar .sb-card {
+  /* v1082d — HIER LAG EIN ECHTER FEHLER, und meine erste Messung war blind
+     dafuer. Die Karte traegt ihre Farbe NICHT als background-color (die ist
+     gemessen rgba(0,0,0,0), also transparent), sondern als
+       background-image: linear-gradient(135deg, rgba(20,15,5,.6), rgba(0,0,0,.7))
+     v1082 hat deshalb nur ueber --dp-obj-card gefaerbt — der Gradient lag
+     darueber und blieb dunkel. Auf hellen Vorlagen stand die Karte damit
+     weiter schwarz in einer hellen Leiste.
+     Der Kontrastlauf hat es nicht gefunden, weil er backgroundColor liest:
+     er sah die transparente Karte, stieg zur hellen Sidebar hoch und rechnete
+     gegen Weiss, waehrend real ein dunkler Verlauf dazwischenlag.
+     Ein background-image muss also ausdruecklich abgeraeumt werden. */
+  background-image: none !important;
+  background-color: var(--uv-card) !important;
   border: 1px solid var(--uv-card-line) !important;
   border-radius: var(--uv-r) !important;
   box-shadow: var(--uv-sh) !important;
@@ -403,6 +416,8 @@ html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-l
    statt auf Ladereihenfolge gebaut.
    ------------------------------------------------------------------------ */
 html[data-ui-surface="light"] body aside.sidebar .sb-card {
+  /* Kurzform setzt background-image mit auf none — hier absichtlich, siehe
+     den Befund zum Karten-Verlauf weiter oben. */
   background: #FFFFFF !important;
   --uv-card-ink:  #1a1712;
   --uv-card-ink2: #4e4940;
