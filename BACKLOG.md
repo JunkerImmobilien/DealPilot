@@ -232,6 +232,37 @@ nichts Falsches auf.
   umgefärbten Ton, genau den, den man ersetzen will. Stand jetzt **484**.
   RC=0 insgesamt ist ein eigenes Vorhaben.
 
+  **Nachbesserung nach Marcels Bildern (`v1082g`–`v1082k`, `4e3f050`,
+  `5261fcf`, `ada1638`, `cc87747`, `b58a289`):** Der Screenshot zeigte, dass
+  die Wallet-Karten die halbe Karte zudeckten. Vier Ursachen, alle aus
+  **einem** Fehler — ich hatte die Regeln aus dem Mockup übernommen, statt
+  die echte Struktur auszulesen:
+
+  | Was | Warum |
+  |---|---|
+  | Investor-Ribbon abgeschnitten | `overflow:hidden` auf der Karte — das Ribbon sitzt gemessen bei `top:-7px` und ragt absichtlich hinaus |
+  | Foto, Preis, Kacheln fehlten | das `::before` lag mit `inset:0` über der **ganzen** `.sbc-top`; im Mockup deckt es nur zwei Rasterzeilen |
+  | Foto 130 px statt 64 | Rasterzellen strecken ihren Inhalt per Voreinstellung |
+  | Stufen-Pille über der Objektnummer | `.sbc-score-label` ist `display:block` mit `margin-top`, und `align-items` allein reichte nicht — Richtung und Umbruch mussten ausdrücklich gesetzt werden |
+
+  **Der Grund, warum Abschreiben hier scheitern musste:** Im Mockup liegt
+  `.sbc-score-overlay` **innerhalb** `.sbc-top`. In der echten App ist es ein
+  **direktes Kind der Karte** und absolut positioniert. Genau die Stelle war
+  nicht übertragbar — „übernommen wird die Gestaltung, nicht der Code".
+
+  Dazu ein fünfter, eigenständiger Fehler: **„Kompakt" sparte nur 10 px**
+  (198 gegen 208). Die Regel zielte auf `.sbc-mini-grid`, den **Behälter** —
+  die Höhe steckt aber in den **Kacheln** `.sbcm` (67 von 77 px). CLAUDE.md
+  nennt beide ausdrücklich getrennt; ich hatte das eine für das andere
+  genommen.
+
+  **Nachgemessen (Wallet, angemeldet, echte Objekte):** Band 53 px, Ring
+  links (x 9), Score-Zahl lesbar, Nummer und Datum auf Gold, Pille rechts am
+  Bandende, Foto 64 × 64 ohne Überlappung, Preis und alle drei Kacheln
+  sichtbar, Investor-Ribbon ragt wie vorgesehen hinaus.
+  Kartenhöhen: **Kompakt 171 · Standard 211 · Wallet 247 px** — die drei
+  Modi unterscheiden sich jetzt sichtbar.
+
   **Nicht gebaut, bewusst:** die Kopplung von Skin-Schalter und Vorlage.
   Beide greifen gleichzeitig, die Vorlage gewinnt (Spezifität), aber es sind
   zwei Mechaniken für dieselbe Frage. Steht jetzt als eigener Punkt 3 —
