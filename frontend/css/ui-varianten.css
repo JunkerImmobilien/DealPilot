@@ -795,3 +795,92 @@ html[data-ui-theme="kanzlei"]  body:not(.dp-sidebar-collapsed) aside.sidebar#sid
 html[data-ui-theme="boarding"] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   filter: invert(1) hue-rotate(180deg) !important;
 }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   9 · v1088 — heller Text auf hellem Grund in Leiste, Kopfzeile und Tabs
+   ══════════════════════════════════════════════════════════════════════════
+   Derselbe halbe Skin wie in der Objektkarte (v1082b), nur eine Etage
+   hoeher. Kontrastlauf ueber #sidebar, header.hdr und nav.tabs:
+
+     dealpilot / konsole (dunkel):  1-2 Fundstellen
+     kontor / panel / kanzlei / boarding:  11-12
+
+   Drei Klassen, alle mit derselben Ursache — die FLAECHE wurde aufgehellt,
+   die Schrift darauf ist fuer dunklen Grund gebaut:
+
+     #FFFFFF auf #FFFFFF          k=1.00   .sb-user-name .hdr-obj-name .sc-v
+     rgb(232,201,100) auf Weiss   k=1.62   .hdr-obj-num .sc-tip
+       (das aufgehellte Gold #E8C964)
+     rgb(94,217,146) auf Weiss    k=1.78   .hdr-autosave-text .hdr-comp-text
+       (aufgehelltes Gruen)                .sc-grade .sc-pill-v
+                                           .tabs-status-text
+
+   Statusfarben werden NICHT tokenisiert und NICHT umgefaerbt: Gruen bleibt
+   Gruen. Getauscht wird nur die fuer hellen Untergrund vorgesehene Fassung
+   gegen die fuer dunklen — genau wie in Abschnitt 7.
+   "konsole" ist dunkel und deshalb ausgenommen.
+   ------------------------------------------------------------------------ */
+
+/* (a) Text, der schlicht weiss ist */
+html[data-ui-theme="kontor"]   body #sidebar .sb-user-name,
+html[data-ui-theme="panel"]    body #sidebar .sb-user-name,
+html[data-ui-theme="kanzlei"]  body #sidebar .sb-user-name,
+html[data-ui-theme="boarding"] body #sidebar .sb-user-name {
+  color: var(--uv-chrome-ink) !important;
+}
+html[data-ui-theme="kontor"]   body header.hdr .hdr-obj-name,
+html[data-ui-theme="panel"]    body header.hdr .hdr-obj-name,
+html[data-ui-theme="kanzlei"]  body header.hdr .hdr-obj-name,
+html[data-ui-theme="boarding"] body header.hdr .hdr-obj-name,
+html[data-ui-theme="kontor"]   body header.hdr .sc-v,
+html[data-ui-theme="panel"]    body header.hdr .sc-v,
+html[data-ui-theme="kanzlei"]  body header.hdr .sc-v,
+html[data-ui-theme="boarding"] body header.hdr .sc-v {
+  color: var(--uv-chrome-ink) !important;
+}
+
+/* (b) Das aufgehellte Gold — auf Weiss praktisch unsichtbar. Der dunklere
+   Ton steht in WL_TINTS und faerbt damit im Whitelabel korrekt mit. */
+html[data-ui-theme="kontor"]   body header.hdr .hdr-obj-num,
+html[data-ui-theme="panel"]    body header.hdr .hdr-obj-num,
+html[data-ui-theme="kanzlei"]  body header.hdr .hdr-obj-num,
+html[data-ui-theme="boarding"] body header.hdr .hdr-obj-num,
+html[data-ui-theme="kontor"]   body header.hdr .sc-tip,
+html[data-ui-theme="panel"]    body header.hdr .sc-tip,
+html[data-ui-theme="kanzlei"]  body header.hdr .sc-tip,
+html[data-ui-theme="boarding"] body header.hdr .sc-tip {
+  color: var(--wl-9a7f33, #9a7f33) !important;
+}
+
+/* (c) Das aufgehellte Gruen — Statusfarbe in der Fassung fuer hellen Grund */
+html[data-ui-theme="kontor"]   body .hdr-autosave-text,
+html[data-ui-theme="panel"]    body .hdr-autosave-text,
+html[data-ui-theme="kanzlei"]  body .hdr-autosave-text,
+html[data-ui-theme="boarding"] body .hdr-autosave-text,
+html[data-ui-theme="kontor"]   body .hdr-comp-text,
+html[data-ui-theme="panel"]    body .hdr-comp-text,
+html[data-ui-theme="kanzlei"]  body .hdr-comp-text,
+html[data-ui-theme="boarding"] body .hdr-comp-text,
+html[data-ui-theme="kontor"]   body .tabs-status-text,
+html[data-ui-theme="panel"]    body .tabs-status-text,
+html[data-ui-theme="kanzlei"]  body .tabs-status-text,
+html[data-ui-theme="boarding"] body .tabs-status-text,
+html[data-ui-theme="kontor"]   body header.hdr .sc-grade,
+html[data-ui-theme="panel"]    body header.hdr .sc-grade,
+html[data-ui-theme="kanzlei"]  body header.hdr .sc-grade,
+html[data-ui-theme="boarding"] body header.hdr .sc-grade,
+html[data-ui-theme="kontor"]   body header.hdr .sc-pill-v,
+html[data-ui-theme="panel"]    body header.hdr .sc-pill-v,
+html[data-ui-theme="kanzlei"]  body header.hdr .sc-pill-v,
+html[data-ui-theme="boarding"] body header.hdr .sc-pill-v {
+  color: #2E8455 !important;
+}
+/* Rot-Stufen behalten ihre eigene Farbe — sie sind auf Weiss schon lesbar,
+   werden hier aber der Vollstaendigkeit halber auf den Kanonwert gesetzt. */
+html[data-ui-theme="kontor"]   body header.hdr .tier-red .sc-pill-v,
+html[data-ui-theme="panel"]    body header.hdr .tier-red .sc-pill-v,
+html[data-ui-theme="kanzlei"]  body header.hdr .tier-red .sc-pill-v,
+html[data-ui-theme="boarding"] body header.hdr .tier-red .sc-pill-v {
+  color: #B8625C !important;
+}
