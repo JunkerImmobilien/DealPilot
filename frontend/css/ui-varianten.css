@@ -456,51 +456,128 @@ html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-mini-grid {
 }
 
 /* ── Wallet · Kopfzeile im Markenverlauf, Score-Ring links ──
-   Die Falle steht in CLAUDE.md und im Backlog: align-items:center liesse
-   das leere ::before auf NULL HOEHE schrumpfen, das Goldband waere
-   unsichtbar. align-self:stretch ist deshalb Pflicht, nicht Kosmetik. */
+   v1082g — NEU GEBAUT gegen die GEMESSENE Struktur. Der erste Anlauf war
+   gegen die Mockup-Struktur gebaut und hat die halbe Karte zugedeckt.
+
+   Was im Bild schiefging (Screenshot 2026-08-05 152120.png):
+     * overflow:hidden auf der Karte schnitt das Investor-Ribbon ab — das
+       sitzt gemessen bei top:-7px und ragt absichtlich hinaus.
+     * Das ::before lag mit inset:0 ueber der GANZEN .sbc-top und deckte
+       damit Foto, Preis und Kacheln zu.
+     * Die Score-Zahl war nicht ueber der weissen Ringscheibe lesbar.
+
+   GEMESSENE Struktur (345x211, display:flex) — sie weicht von der Vorlage
+   ab, deshalb ist die Vorlage NICHT abschreibbar:
+     .sb-card
+       .sbc-investor-ribbon   absolut, top -7   <- ragt HINAUS
+       .sbc-won-ribbon        absolut, top 1
+       .sbc-score-overlay     absolut, top 14, left 259 (rechts)
+       .sbc-top               relativ, 321x100
+         .sbc-thumb           64x80
+         .sbc-top-body        225 breit
+           .sbc-top-line1  .sbc-address  .sbc-halter  .sbc-kp-row
+       .sbc-mini-grid         321x75
+   Im Mockup liegt .sbc-score-overlay INNERHALB .sbc-top — hier ist es ein
+   direktes Kind der Karte. Genau daran waere ein Abschreiben gescheitert.
+
+   Aufbau jetzt: .sbc-top wird ein Raster mit vier Zeilen. Das ::before
+   belegt Zeile 1-2 UND die Inhalte liegen in denselben Zellen — Raster
+   erlauben Ueberlappung, dafuer braucht es kein position:absolute.
+   Der Ring wandert per left/right nach links auf das Band.
+   ------------------------------------------------------------------ */
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card {
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
+  /* KEIN overflow:hidden — das Investor-Ribbon sitzt bei top:-7px. */
+  overflow: visible !important;
 }
-html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-top {
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-top {
+  display: grid !important;
+  grid-template-columns: 64px minmax(0, 1fr) !important;
+  grid-template-rows: auto auto auto auto !important;
+  gap: 0 10px !important;
+  padding: 0 !important;
   position: relative !important;
-  padding: 9px !important;
 }
-html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-top::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  align-self: stretch;
-  background: linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--gold) 55%, var(--wl-b8932f, #b8932f));
-  z-index: 0;
+/* Das Band. align-self/justify-self:stretch sind PFLICHT — ein leeres
+   ::before ohne Eigenhoehe schrumpft in einem Raster mit zentrierter
+   Ausrichtung auf null, und der Verlauf waere unsichtbar (CLAUDE.md). */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-top::before {
+  content: "" !important;
+  grid-row: 1 / 3 !important;
+  grid-column: 1 / -1 !important;
+  align-self: stretch !important;
+  justify-self: stretch !important;
+  background: linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--gold) 55%, var(--wl-b8932f, #b8932f)) !important;
+  z-index: 0 !important;
+  margin: 0 !important;
 }
-html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-top > * { position: relative; z-index: 2; }
-html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-address,
-html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-halter {
+/* Der Rumpf loest sich auf, damit seine Kinder direkt im Raster liegen. */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-top > .sbc-top-body {
+  display: contents !important;
+}
+/* Zeile 1+2 = Band: Nummer/Datum oben, Adresse darunter. Beide beginnen in
+   Spalte 2, damit links der Ring Platz hat. */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-top-line1 {
+  grid-row: 1 !important; grid-column: 2 !important;
+  z-index: 2 !important; margin: 0 !important; padding: 8px 9px 0 0 !important;
+}
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-address {
+  grid-row: 2 !important; grid-column: 2 !important;
+  z-index: 2 !important; margin: 0 !important; padding: 0 9px 8px 0 !important;
   color: #1a1407 !important;
+}
+/* Zeile 3+4 = Rumpf auf der Kartenflaeche: Foto links, Halter und Preis rechts. */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-thumb {
+  grid-row: 3 / 5 !important; grid-column: 1 !important;
+  z-index: 2 !important; margin: 9px 0 9px 9px !important;
+}
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-halter {
+  grid-row: 3 !important; grid-column: 2 !important;
+  z-index: 2 !important; margin: 9px 9px 0 0 !important; align-self: end !important;
+}
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-kp-row {
+  grid-row: 4 !important; grid-column: 2 !important;
+  z-index: 2 !important; margin: 1px 9px 9px 0 !important; align-self: start !important;
+}
+/* Der Ring wandert auf das Band nach links. Er ist ein direktes Kind der
+   KARTE und absolut positioniert — deshalb hier ueber left/right, nicht
+   ueber das Raster. */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-score-overlay {
+  left: 9px !important;
+  right: auto !important;
+  top: 8px !important;
+  z-index: 3 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  width: auto !important;
 }
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-mini-score {
   background: #FFFFFF !important;
   border-radius: 50% !important;
   box-shadow: 0 2px 8px -3px rgba(0,0,0,.5) !important;
 }
-/* v1082e — im Bild geprueft und dabei aufgefallen: die Ringe standen LEER da.
-   Die Score-Zahl erbt currentColor und ist im Dunkelmodus weiss; der
-   Wallet-Ring bekommt hier aber eine weisse Scheibe untergelegt -> weiss auf
-   weiss. Der Kontrastlauf hat es nicht gemeldet, weil er nur die vier hellen
-   Vorlagen abdeckte und hier "konsole" aktiv war — der Fehler haengt aber am
-   KARTENMODUS, nicht an der Vorlage. Deshalb ohne Theme-Bedingung.
-   Steht so auch im Mockup (.sbc-mini-score-num{color:#1e1a12}). */
+/* Die Zahl auf der weissen Scheibe — sie erbt sonst currentColor und ist im
+   Dunkelmodus weiss. Haengt am KARTENMODUS, nicht an der Vorlage. */
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-mini-score-num {
   color: #1e1a12 !important;
 }
-/* Das Datum lag mit seinem Grauton fast unsichtbar auf dem Goldband. */
-html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-date {
-  color: #1a1407 !important;
-  opacity: .8 !important;
+/* Die Stufen-Pille auf dunklem Grund, damit sie auf dem Gold nicht ausbleicht. */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-score-label {
+  background: #141310 !important;
+  padding: 3px 7px !important;
+  border-radius: 5px !important;
+  margin: 0 !important;
 }
+/* Nummer und Datum lagen mit ihrem Grauton fast unsichtbar auf dem Band. */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-date {
+  color: #1a1407 !important; opacity: .8 !important;
+}
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-seq {
+  background: rgba(255,255,255,.28) !important;
+  border-color: transparent !important;
+  color: #1a1407 !important;
+}
+
 
 
 /* ══════════════════════════════════════════════════════════════════════════
