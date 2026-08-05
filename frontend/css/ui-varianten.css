@@ -1,0 +1,486 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ui-varianten.css — v1082 · Backlog Punkt 2 (Darstellungs-Vorlagen)
+   Vorlage: design/mockups/dp-darstellung-panel.html (abgenommen 2026-08-05)
+
+   Diese Datei war seit 20260801 in index.html:29 verlinkt und existierte
+   nicht — einer der beiden 404 aus dem Backlog. Der Kommentar dort sagt
+   schon "nach style.css, damit html[data-ui-*] greift". Genau das ist sie.
+
+   ─── BAUFORM (gemessen, nicht geraten) ────────────────────────────────────
+   Im laufenden DOM bei 1920px gezaehlt: 65 Elemente mit DECKENDER
+   Hintergrundfarbe. Der Grossteil davon sind Formularfelder und div.card,
+   alle #FFFFFF — die folgen der Flaeche. Tragend ist wenig:
+
+     #sidebar          rgb(0,0,0)        <- haengt an --dp-s0 / --dp-s1
+     nav.tabs          rgb(10,8,5)       <- HART, kein Token
+     .app-wrap .body   rgb(248,246,241)
+     .main-col #s0     #FFFFFF
+     .sb-card          haengt an --dp-obj-card / --dp-card
+
+   Deshalb NICHT 6 x 65 Regeln, sondern EIN Satz Flaechenregeln, der Tokens
+   liest, plus 6 x ~30 Token-Zeilen. Das ist die Architektur des Mockups.
+
+   ─── DIE ZWEI FALLEN AUS CLAUDE.md ────────────────────────────────────────
+   1) "Token-Ueberschreibungen reichen NICHT." Stimmt — aber nicht ueberall.
+      Gemessen: aside.sidebar{background:var(--dp-s0)!important} (0,1,1) und
+      .sb-card{background:var(--dp-obj-card,...)!important} lesen sehr wohl
+      Tokens. Fuer die gilt der Token-Weg.
+      nav.tabs dagegen gewinnt ueber
+      header.hdr.has-v64-score + nav.tabs{background:rgb(10,8,5)!important}
+      — (0,2,2), hart kodiert. Die wird hier EINZELN benannt.
+   2) "Bei gleicher Spezifitaet gewinnt die spaetere Regel." Diese Datei
+      laedt nach style.css, aber darauf wird sich NICHT verlassen: jeder
+      Selektor traegt html[data-ui-theme="…"] und liegt damit ueber
+      body.dp-chrome-hell (0,2,0) bzw. den v622-Bloecken.
+
+   ─── ZWINGEND (Backlog) ───────────────────────────────────────────────────
+   * "dealpilot" traegt KEIN Attribut. Ohne data-ui-theme greift hier keine
+     einzige Regel -> wer nicht umschaltet, bekommt die App bitgenau wie
+     heute. Das ist der Grund fuer das [data-ui-theme] an JEDEM Selektor.
+   * Gold bleibt var(--gold), damit Whitelabel weiter mitfaerbt.
+   * Statusfarben #3FA56C und #B8625C werden NIE angefasst.
+   * Goldnahe Literale stehen als var(--wl-<hex>, #<hex>) — die Hexwerte
+     dafuer stammen aus WL_TINTS (whitelabel-override.js:64). Neutrale
+     Grautoene sind dort NICHT enthalten und bleiben roh.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1 · TOKEN-SAETZE — eine Vorlage = ein Block, sonst nichts
+   ══════════════════════════════════════════════════════════════════════════
+   "dealpilot" fehlt hier absichtlich. Kein Attribut, keine Regel, kein Diff.
+   ------------------------------------------------------------------------ */
+
+/* ── Kontor · Reinweiss, Haarlinien, kein Radius, kein Schatten ──
+   Fuer den Bestandshalter mit vielen Objekten: maximale Ruhe, die Liste
+   traegt sich selbst. Karten ohne Seitenrahmen, nur Trennlinien. */
+html[data-ui-theme="kontor"] {
+  --uv-chrome:      #FFFFFF;
+  --uv-chrome-ink:  #141310;
+  --uv-chrome-ink2: #4a4740;
+  --uv-chrome-mut:  #918d84;
+  --uv-chrome-line: #E7E4DD;
+  --uv-pane:        #FFFFFF;
+  --uv-surf:        #FFFFFF;
+  --uv-surf2:       #FAF9F7;
+  --uv-ink:         #141310;
+  --uv-ink2:        #4a4740;
+  --uv-mut:         #918d84;
+  --uv-line:        #E7E4DD;
+  --uv-line2:       #D9D5CC;
+  --uv-r:           3px;
+  --uv-rs:          3px;
+  --uv-sh:          none;
+  --uv-card:        #FFFFFF;
+  --uv-card-line:   #E7E4DD;
+  --uv-card-ink:    #141310;
+  --uv-card-ink2:   #4a4740;
+  --uv-card-mut:    #918d84;
+  --uv-card-tile:   #FAF9F7;
+  --uv-card-tl:     #E7E4DD;
+  --uv-f-body:      'Inter', system-ui, sans-serif;
+  --uv-f-disp:      'Space Grotesk', 'Inter', sans-serif;
+  --uv-f-h1:        'Space Grotesk', 'Inter', sans-serif;
+  --uv-logo-box:    #050505;
+}
+
+/* ── Panel · Kuehles Grau-Weiss, weiche Radien, feiner Schatten ──
+   Der neutralste Untergrund. Kein Braun-, kein Cremestich, damit ein
+   fremder Partnerakzent nicht gegen den Untergrund arbeitet. */
+html[data-ui-theme="panel"] {
+  --uv-chrome:      #FFFFFF;
+  --uv-chrome-ink:  #151a20;
+  --uv-chrome-ink2: #4a535e;
+  --uv-chrome-mut:  #8a95a2;
+  --uv-chrome-line: #E2E7ED;
+  --uv-pane:        #F3F5F7;
+  --uv-surf:        #FFFFFF;
+  --uv-surf2:       #F8F9FB;
+  --uv-ink:         #151a20;
+  --uv-ink2:        #4a535e;
+  --uv-mut:         #8a95a2;
+  --uv-line:        #E2E7ED;
+  --uv-line2:       #D3DAE2;
+  --uv-r:           11px;
+  --uv-rs:          7px;
+  --uv-sh:          0 1px 2px rgba(21,26,32,.05), 0 4px 12px -8px rgba(21,26,32,.14);
+  --uv-card:        #FFFFFF;
+  --uv-card-line:   #E2E7ED;
+  --uv-card-ink:    #151a20;
+  --uv-card-ink2:   #4a535e;
+  --uv-card-mut:    #8a95a2;
+  --uv-card-tile:   #F8F9FB;
+  --uv-card-tl:     #E2E7ED;
+  --uv-f-body:      'Inter', system-ui, sans-serif;
+  --uv-f-disp:      'Inter', system-ui, sans-serif;
+  --uv-f-h1:        'Inter', system-ui, sans-serif;
+  --uv-logo-box:    #050505;
+}
+
+/* ── Kanzlei · Hell mit Serife, viel Weissraum, Panels ohne Rahmen ──
+   Fuer den Berater vor dem Mandanten. Die Flaechen setzen sich durch
+   Helligkeit ab, nicht durch Linien — deshalb --uv-line sehr zurueckhaltend
+   und die Panel-Rahmen weiter unten ganz aus. */
+html[data-ui-theme="kanzlei"] {
+  --uv-chrome:      #FBFAF7;
+  --uv-chrome-ink:  #1c1a16;
+  --uv-chrome-ink2: #55504a;
+  --uv-chrome-mut:  #928d84;
+  --uv-chrome-line: #E8E4DC;
+  --uv-pane:        #F7F5F1;
+  --uv-surf:        #FFFFFF;
+  --uv-surf2:       #FBFAF7;
+  --uv-ink:         #1c1a16;
+  --uv-ink2:        #55504a;
+  --uv-mut:         #928d84;
+  --uv-line:        #EDE9E1;
+  --uv-line2:       #E2DDD3;
+  --uv-r:           8px;
+  --uv-rs:          6px;
+  --uv-sh:          none;
+  --uv-card:        #FFFFFF;
+  --uv-card-line:   #EDE9E1;
+  --uv-card-ink:    #1c1a16;
+  --uv-card-ink2:   #55504a;
+  --uv-card-mut:    #928d84;
+  --uv-card-tile:   #FBFAF7;
+  --uv-card-tl:     #EDE9E1;
+  --uv-f-body:      'Inter', system-ui, sans-serif;
+  --uv-f-disp:      'Cormorant Garamond', Georgia, serif;
+  --uv-f-h1:        'Cormorant Garamond', Georgia, serif;
+  --uv-logo-box:    #050505;
+}
+
+/* ── Boarding · Creme, Markenstreifen, Ticket-Karten ──
+   Markentreu, aber hell. Die Cremetoene stehen als var(--wl-…), damit ein
+   Reseller-Akzent sie mitfaerbt — sie sind Teil der Marke, nicht neutral. */
+html[data-ui-theme="boarding"] {
+  --uv-chrome:      var(--wl-faf5e8, #FAF5E8);
+  --uv-chrome-ink:  #1e1a12;
+  --uv-chrome-ink2: #554d3a;
+  --uv-chrome-mut:  #8d8471;
+  --uv-chrome-line: var(--wl-ece0c2, #ECE0C2);
+  --uv-pane:        #FDFCFA;
+  --uv-surf:        #FFFFFF;
+  --uv-surf2:       var(--wl-faf5e8, #FAF5E8);
+  --uv-ink:         #1e1a12;
+  --uv-ink2:        #554d3a;
+  --uv-mut:         #8d8471;
+  --uv-line:        var(--wl-ece0c2, #ECE0C2);
+  --uv-line2:       var(--wl-e8d9a8, #E8D9A8);
+  --uv-r:           12px;
+  --uv-rs:          8px;
+  --uv-sh:          0 2px 10px -8px rgba(30,24,10,.34);
+  --uv-card:        var(--wl-fbf6e9, #FBF6E9);
+  --uv-card-line:   var(--wl-e8d9a8, #E8D9A8);
+  --uv-card-ink:    #1e1a12;
+  --uv-card-ink2:   #554d3a;
+  --uv-card-mut:    #8d8471;
+  --uv-card-tile:   #FFFFFF;
+  --uv-card-tl:     var(--wl-ece0c2, #ECE0C2);
+  --uv-f-body:      'Inter', system-ui, sans-serif;
+  --uv-f-disp:      'Space Grotesk', 'Inter', sans-serif;
+  --uv-f-h1:        'Space Grotesk', 'Inter', sans-serif;
+  --uv-logo-box:    #050505;
+}
+
+/* ── Konsole · Dicht, Monospace, ohne Fotos ──
+   Fuer 40+ Objekte. Bleibt bewusst dunkel: wer so arbeitet, sitzt lange
+   davor. Kein Creme, kein Gold-Untergrund — nur Akzent auf Anthrazit. */
+html[data-ui-theme="konsole"] {
+  --uv-chrome:      #16181C;
+  --uv-chrome-ink:  #E6E8EA;
+  --uv-chrome-ink2: #A7ACB3;
+  --uv-chrome-mut:  #6E747C;
+  --uv-chrome-line: #262A30;
+  --uv-pane:        #101215;
+  --uv-surf:        #1A1D22;
+  --uv-surf2:       #14171B;
+  --uv-ink:         #E6E8EA;
+  --uv-ink2:        #A7ACB3;
+  --uv-mut:         #6E747C;
+  --uv-line:        #262A30;
+  --uv-line2:       #313640;
+  --uv-r:           4px;
+  --uv-rs:          3px;
+  --uv-sh:          none;
+  --uv-card:        #1A1D22;
+  --uv-card-line:   #262A30;
+  --uv-card-ink:    #E6E8EA;
+  --uv-card-ink2:   #A7ACB3;
+  --uv-card-mut:    #6E747C;
+  --uv-card-tile:   #14171B;
+  --uv-card-tl:     #262A30;
+  --uv-f-body:      'JetBrains Mono', ui-monospace, monospace;
+  --uv-f-disp:      'JetBrains Mono', ui-monospace, monospace;
+  --uv-f-h1:        'JetBrains Mono', ui-monospace, monospace;
+  --uv-logo-box:    transparent;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2 · DIE TOKENS, DIE DIE BESTEHENDE FASSUNG SCHON LIEST
+   ══════════════════════════════════════════════════════════════════════════
+   Gemessen: aside.sidebar und .sb-card lesen --dp-s0/--dp-s1 bzw.
+   --dp-obj-card. Diese Bruecke spart rund 20 Einzelregeln — und sie ist
+   praeziser, weil sie genau dort greift, wo die Fassung ohnehin nachsieht.
+   ------------------------------------------------------------------------ */
+html[data-ui-theme] body {
+  --dp-s0:       var(--uv-chrome);
+  --dp-s1:       var(--uv-chrome);
+  --dp-card:     var(--uv-card);
+  --dp-obj-card: var(--uv-card);
+  --surface:     var(--uv-surf);
+  --border:      var(--uv-line);
+  --muted:       var(--uv-mut);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3 · FLAECHEN, DIE KEINE TOKENS LESEN — einzeln benannt
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Grundflaeche ── */
+html[data-ui-theme] body,
+html[data-ui-theme] body .app-wrap {
+  background: var(--uv-pane) !important;
+  color: var(--uv-ink) !important;
+  font-family: var(--uv-f-body) !important;
+}
+html[data-ui-theme] body .main-col { background: var(--uv-pane) !important; }
+html[data-ui-theme] body .body     { background: var(--uv-pane) !important; }
+
+/* ── Kopfleiste ──
+   header.hdr ist gemessen TRANSPARENT (49px, has-v64-score) und sitzt auf
+   .main-col. Sie bekommt hier trotzdem eine eigene Flaeche, damit die
+   Vorlage die Kopfzeile vom Arbeitsbereich absetzen kann. */
+html[data-ui-theme] body header.hdr {
+  background: var(--uv-chrome) !important;
+  color: var(--uv-chrome-ink) !important;
+  border-bottom: 1px solid var(--uv-chrome-line) !important;
+}
+html[data-ui-theme] body header.hdr .hdr-v61-row1,
+html[data-ui-theme] body header.hdr .hdr-v61-row2 { background: transparent !important; }
+html[data-ui-theme] body header.hdr .hdr-obj-name,
+html[data-ui-theme] body header.hdr b { color: var(--uv-chrome-ink) !important; }
+
+/* ── Tab-Leiste ──
+   Der harte Fall: header.hdr.has-v64-score + nav.tabs traegt rgb(10,8,5)
+   mit !important, Spezifitaet (0,2,2). Deshalb hier mit demselben
+   Nachbarschafts-Selektor PLUS html[data-ui-theme] davor. */
+html[data-ui-theme] body nav.tabs,
+html[data-ui-theme] body .main-col > nav.tabs,
+html[data-ui-theme] body header.hdr.has-v64-score + nav.tabs,
+html[data-ui-theme] body header.hdr.has-v64-score + nav.tabs.tabs {
+  background: var(--uv-chrome) !important;
+  border-bottom: 1px solid var(--uv-chrome-line) !important;
+}
+html[data-ui-theme] body nav.tabs .tab,
+html[data-ui-theme] body header.hdr.has-v64-score + nav.tabs .tab {
+  color: var(--uv-chrome-mut) !important;
+  font-family: var(--uv-f-body) !important;
+}
+html[data-ui-theme] body nav.tabs .tab.active,
+html[data-ui-theme] body header.hdr.has-v64-score + nav.tabs .tab.active {
+  color: var(--gold) !important;
+  background: transparent !important;
+}
+
+/* ── Seitenleiste ──
+   Der Flaechenwert kommt ueber --dp-s0 aus Abschnitt 2. Hier nur, was
+   die Fassung nicht ueber Tokens loest: Text, Linien, Suchfeld. */
+html[data-ui-theme] body aside.sidebar#sidebar {
+  border-right: 1px solid var(--uv-chrome-line) !important;
+  color: var(--uv-chrome-ink) !important;
+}
+html[data-ui-theme] body aside.sidebar .sb-header,
+html[data-ui-theme] body aside.sidebar .sb-section-title,
+html[data-ui-theme] body aside.sidebar .sb-actions-trigger,
+html[data-ui-theme] body aside.sidebar #sb-user {
+  background: transparent !important;
+  border-color: var(--uv-chrome-line) !important;
+  color: var(--uv-chrome-ink) !important;
+}
+html[data-ui-theme] body aside.sidebar .sb-section-title { color: var(--uv-chrome-mut) !important; }
+html[data-ui-theme] body #sb-search-input {
+  background: var(--uv-surf2) !important;
+  border: 1px solid var(--uv-chrome-line) !important;
+  color: var(--uv-chrome-ink) !important;
+}
+html[data-ui-theme] body #sb-search-input::placeholder { color: var(--uv-chrome-mut) !important; }
+
+/* ── Panels und Formularfelder ──
+   Das ist die Sammelmenge der 65 gemessenen Flaechen: div.card und die
+   Eingabefelder. Sie folgen der Flaeche, brauchen also nur EINE Regel. */
+html[data-ui-theme] body .card,
+html[data-ui-theme] body .qz-card {
+  background: var(--uv-surf) !important;
+  border: 1px solid var(--uv-line) !important;
+  border-radius: var(--uv-r) !important;
+  box-shadow: var(--uv-sh) !important;
+  color: var(--uv-ink) !important;
+}
+html[data-ui-theme] body .body input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),
+html[data-ui-theme] body .body select,
+html[data-ui-theme] body .body textarea {
+  background: var(--uv-surf2) !important;
+  border: 1px solid var(--uv-line2) !important;
+  border-radius: var(--uv-rs) !important;
+  color: var(--uv-ink) !important;
+}
+html[data-ui-theme] body label,
+html[data-ui-theme] body .hint { color: var(--uv-ink2) !important; }
+
+/* Kanzlei: Panels setzen sich ueber Weissraum ab, nicht ueber Linien. */
+html[data-ui-theme="kanzlei"] body .card { border-color: transparent !important; }
+
+/* ── Objektkarte ──
+   Flaeche kommt ueber --dp-obj-card aus Abschnitt 2. Die Struktur ist die
+   in CLAUDE.md gemessene (storage.js:_renderRichCard ab Z.866) — hier wird
+   nichts geraten, nur eingefaerbt. */
+html[data-ui-theme] body aside.sidebar .sb-card {
+  border: 1px solid var(--uv-card-line) !important;
+  border-radius: var(--uv-r) !important;
+  box-shadow: var(--uv-sh) !important;
+}
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-address { color: var(--uv-card-ink) !important; }
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-halter,
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-score-label { color: var(--uv-card-mut) !important; }
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-kp { color: var(--uv-card-ink) !important; }
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-mini-grid,
+html[data-ui-theme] body aside.sidebar .sb-card .sbcm {
+  background: var(--uv-card-tile) !important;
+  border-color: var(--uv-card-tl) !important;
+}
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-seq {
+  background: var(--uv-card-tile) !important;
+  border-color: var(--uv-card-tl) !important;
+  color: var(--uv-card-ink2) !important;
+}
+
+/* Kontor: Karten ohne Seitenrahmen, nur Trennlinie — die Liste wird ruhiger. */
+html[data-ui-theme="kontor"] body aside.sidebar .sb-card {
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+}
+/* Boarding: Markenstreifen als Kartenkopf. align-self:stretch ist Pflicht —
+   align-items:center liesse das leere ::before auf null Hoehe schrumpfen
+   und der Verlauf waere unsichtbar (CLAUDE.md, teuer bezahlt). */
+html[data-ui-theme="boarding"] body aside.sidebar .sb-card { overflow: hidden !important; }
+html[data-ui-theme="boarding"] body aside.sidebar .sb-card::before {
+  content: "";
+  display: block;
+  align-self: stretch;
+  height: 4px;
+  background: linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--gold) 55%, var(--wl-b8932f, #b8932f));
+}
+/* Konsole: ohne Fotos — der Platz gehoert den Zahlen. */
+html[data-ui-theme="konsole"] body aside.sidebar .sb-card .sbc-thumb { display: none !important; }
+
+/* ── Typografie ── */
+html[data-ui-theme] body h1,
+html[data-ui-theme] body .set-section-h2 { font-family: var(--uv-f-h1) !important; color: var(--uv-ink) !important; }
+html[data-ui-theme] body .sbc-address    { font-family: var(--uv-f-disp) !important; }
+
+/* ── Logo-Kasten ──
+   v1079 zeichnet den Goldrahmen aus CSS und legt im Hellmodus einen
+   schwarzen Kasten dahinter, damit die weisse Wortmarke lesbar bleibt.
+   Dieselbe Ueberlegung gilt fuer jede helle Vorlage. "konsole" ist dunkel
+   genug und setzt --uv-logo-box deshalb auf transparent. */
+html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+  background: var(--uv-logo-box) !important;
+  border-color: var(--wl-c9a84c, #C9A84C) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4 · KARTENFLAECHE — Backlog Punkt 5
+   ══════════════════════════════════════════════════════════════════════════
+   "Passend" ist der Normalfall und steht oben. "Weiss" heisst: Karten
+   bleiben weiss, auch wenn die Vorlage dunkel ist. Ueber html[…] gescopt
+   statt auf Ladereihenfolge gebaut.
+   ------------------------------------------------------------------------ */
+html[data-ui-surface="light"] body aside.sidebar .sb-card {
+  background: #FFFFFF !important;
+  --uv-card-ink:  #1a1712;
+  --uv-card-ink2: #4e4940;
+  --uv-card-mut:  #8f897c;
+  --uv-card-tile: #FAF8F3;
+  --uv-card-tl:   #E9E4D9;
+}
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbc-address,
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbc-kp { color: #1a1712 !important; }
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbc-halter,
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbc-score-label { color: #8f897c !important; }
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbc-mini-grid,
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm {
+  background: #FAF8F3 !important;
+  border-color: #E9E4D9 !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5 · OBJEKTKARTEN-MODI — Backlog Punkt 4
+   ══════════════════════════════════════════════════════════════════════════
+   Ein Markup, drei Optiken, reines CSS. "standard" ist der Istzustand und
+   traegt deshalb — wie "dealpilot" — KEIN Attribut.
+   ------------------------------------------------------------------------ */
+
+/* ── Kompakt · die meisten Objekte auf einen Blick ── */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-thumb,
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-halter,
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-score-label { display: none !important; }
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-mini-grid {
+  min-height: 0 !important;
+  flex-direction: row !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+  padding: 5px 7px !important;
+}
+
+/* ── Wallet · Kopfzeile im Markenverlauf, Score-Ring links ──
+   Die Falle steht in CLAUDE.md und im Backlog: align-items:center liesse
+   das leere ::before auf NULL HOEHE schrumpfen, das Goldband waere
+   unsichtbar. align-self:stretch ist deshalb Pflicht, nicht Kosmetik. */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-top {
+  position: relative !important;
+  padding: 9px !important;
+}
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-top::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  align-self: stretch;
+  background: linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--gold) 55%, var(--wl-b8932f, #b8932f));
+  z-index: 0;
+}
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-top > * { position: relative; z-index: 2; }
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-address,
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-halter {
+  color: #1a1407 !important;
+}
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-mini-score {
+  background: #FFFFFF !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px -3px rgba(0,0,0,.5) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6 · HANDY UND TABLET
+   ══════════════════════════════════════════════════════════════════════════
+   Die Vorlagen aendern Farbe und Form, nicht das Layout — die Arbeit aus
+   v645/v648/v650/v652 bleibt unangetastet. Nur zwei Dinge muessen mit:
+   der Drawer-Hintergrund und die Trefferflaeche der Vorlagenknoepfe.
+   ------------------------------------------------------------------------ */
+@media (max-width: 900px) {
+  html[data-ui-theme] body #sb-backdrop { background: rgba(0,0,0,.5) !important; }
+  html[data-ui-theme] body aside.sidebar#sidebar { box-shadow: 0 0 40px -8px rgba(0,0,0,.6) !important; }
+}

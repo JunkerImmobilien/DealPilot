@@ -3390,10 +3390,17 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
       + '</div>';
     return extra + (_oldLogo?_oldLogo():'');
   };
-  /* Darstellung nur im Partner-Plan (Gate bei der Aktion) */
+  /* v1082-uv: Die Partner-Schranke ist von hier auf die FARBSEKTION im Panel
+     gewandert (ui-varianten.js, gateSetzen()). Grund steht im Backlog Punkt 6:
+     lag die ganze Darstellung dahinter, waeren Vorlagenwahl und Kartenmodus
+     ploetzlich Partner-Funktionen \u2014 das sind sie nicht, das ist Bequemlichkeit.
+     Jetzt gilt: Vorlagen waehlen darf jeder, Farben aendern erst ab Partner,
+     und die Farbsektion bleibt dabei SICHTBAR und ausgegraut.
+     Der Wrapper wurde nicht entfernt, sondern entschaerft \u2014 ein Anker, eine
+     Bedingung, nur an einer anderen Stelle. ui-varianten.js laedt nach dieser
+     Datei und setzt _dpOpenFromSettings auf das neue Panel. */
   var _oldOpen=window._dpOpenFromSettings;
   window._dpOpenFromSettings=function(){
-    try{ var k=DealPilotConfig.pricing.currentKey(); if(k!=='partner'){ if(typeof toast==='function') toast('Darstellung ist aktuell nur im Partner-Plan verf\u00fcgbar'); return; } }catch(e){}
     if(_oldOpen) _oldOpen();
   };
   /* Boot */

@@ -26,7 +26,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=W49"><!-- v650-tabs-mobile -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
-    <link rel="stylesheet" href="css/ui-varianten.css?v=1">
+    <link rel="stylesheet" href="css/ui-varianten.css?v=v1082">
+    <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
+         Neuladen kurz die DealPilot-Fassung auf, bevor die Vorlage greift.
+         Leerer Wert = Attribut gar nicht setzen: "dealpilot"/"standard"/"auto"
+         sind die Istzustaende und tragen bewusst KEIN Attribut. -->
+    <script>(function(){try{var s=JSON.parse(localStorage.getItem('dp_user_settings')||'{}')||{},r=document.documentElement,
+      m={'data-ui-theme':['kontor','panel','kanzlei','boarding','konsole'],'data-ui-cards':['kompakt','wallet'],'data-ui-surface':['light']},
+      f={'data-ui-theme':s.ui_theme,'data-ui-cards':s.ui_cards,'data-ui-surface':s.ui_surface};
+      Object.keys(m).forEach(function(a){var v=f[a]||'';if(m[a].indexOf(v)>=0)r.setAttribute(a,v);});}catch(e){}})();</script>
 <link rel="stylesheet" href="css/bmf-modal.css?v=W34">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=v994"><!-- V292-modal-refactor -->
   <link rel="stylesheet" href="css/legal.css?v=W34">
@@ -2952,7 +2960,7 @@ label.dp-required.qc-required::after {
   <script src="js/mandanten.js?v=953"></script>
   <script src="js/ueberfuehrung-wizard.js?v=816i"></script>
   <script src="js/apikeys.js?v=811"></script>
-  <script src="js/settings.js?v=W23"></script>
+  <script src="js/settings.js?v=W24"></script>
 <script src="js/pricing-modal.js?v=TR7"></script>
   <script src="js/promo-erstflug.js?v=1"></script>
 <script src="js/stripe-success.js?v=183"></script>
@@ -3465,7 +3473,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <script src="js/mandant-branding.js?v=W39"></script><!--W3-cb-->
     <script src="js/mandant-freigaben.js?v=W33"></script>
     <script src="js/mobile-redirect.js"></script>
-    <script src="js/ui-varianten.js?v=1"></script>
+    <script src="js/ui-varianten.js?v=v1082"></script>
     <script src="js/deal-action-pdf-gate.js?v=W3"></script>
 </body>
 </html>
