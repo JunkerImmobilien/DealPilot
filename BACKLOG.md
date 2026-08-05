@@ -22,11 +22,6 @@ nächsten Vorhaben stehen unter **Später**._
 
 - **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
   Aktionen als Popover statt Blatt von unten
-- **Kopfleiste auf dem Tablet** — bei 820 px ist `header.hdr` **589 px** hoch,
-  `#hdr-badges` allein 492 px, weil die fünf KPI-Pillen dort zu je zwei
-  umbrechen. Der Score soll auf dem Tablet bleiben, die Höhe nicht
-- **Widersprüchliche Regeln in den ≤768-Blöcken** — `.sb-list` trägt
-  `height:40vh !important` **und** `height:0 !important`, die letzte gewinnt
 - **Einstellungs-Abschnitte hintereinander rendern** ließ den Prüf-Browser
   zweimal einfrieren (`anbieter`, `mandanten`, `plan`, `rechtliches`, `help`).
   Einzeln unauffällig — auf einem echten Gerät nachstellen
@@ -39,6 +34,85 @@ nächsten Vorhaben stehen unter **Später**._
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-05] **Kopfleiste auf dem Tablet** — `fc36d12`
+
+  **Befund (gemessen bei 820 × 1180 mit geladenem Objekt):**
+
+  | Element | war |
+  |---|---|
+  | `header.hdr` | **815 × 589** — die halbe Bildschirmhöhe |
+  | `#hdr-badges` | 815 × 492 |
+  | `.scores` | `grid-template-columns: 381.5px 381.5px` — **zwei** Spalten |
+  | `.sc-main` | 771 × 121, spannt beide Spalten |
+  | `.sc-pill` × 5 | 382 × 109 → bei zwei Spalten **drei Zeilen** |
+
+  Eine Pille trägt Label 15 px + Wert 33 px + Unterzeile 15 px + Balken 4 px
+  = 67 px Inhalt in einem 109-px-Kasten. Inhaltlich ist sie schmal
+  („RENDITE / 98 % / 4 von 4 KPIs") — sie braucht keine 382 px Breite. Bei
+  771 px verfügbarer Breite passen **fünf** zu je rund 147 px nebeneinander.
+
+  **Fix (v1087b):** fünf Spalten statt zwei, Score-Karte spannt darüber.
+  `minmax(0,1fr)` statt `1fr`, sonst greift `min-width:auto` und ein breiter
+  Inhalt sprengt die Spalte — der Sammelfall aus v650.
+
+  **Einen ersten Anlauf nehme ich zurück (v1087):** Ich hatte die Pillen in
+  eine waagerecht scrollende Spur gelegt, nach dem Muster des Boarding-Passes
+  aus v651b. Die Kopfzeile war danach zwar 365 statt 589 px — aber `.sc-main`
+  wurde **1118 px breit** und lief aus dem Bild, weil `min-width:max-content`
+  den Container auf die Summe aller Pillen zieht und die Score-Karte mit
+  `flex:1 0 100%` davon 100 % nimmt. Ein Scroller war hier schlicht das
+  falsche Mittel: die Pillen passen ja.
+
+  **Nachgemessen:** 820 × 1180 → `header.hdr` **348 px** (vorher 589), alle
+  fünf Pillen à 149 px in **einer** Zeile, Score-Karte wieder 771 px und im
+  Bild, kein waagerechtes Scrollen. Gegenprobe unverändert: 390 px → 76 px
+  (v649-Arbeit, Pillen dort ausgeblendet) · 1440 px → 243 px · 1920 px →
+  190 px.
+
+- [2026-08-05] **Kompakter Logo-Kopf in den Vorlagen** — `20dbb4c`, `49c1944`
+
+  Marcels Vorgabe: die Vorlagen sollen aussehen wie `UI-Ansicht.png`, „auch
+  das Logo darf klein werden".
+
+  **Befund:** Die Vorlage hatte den Logo-Kopf **gar nicht angefasst** —
+  `.sb-header` 379 × 125 in *jeder* Fassung, Rahmen 323 × 83, Bild 287 × 53.
+  Soll laut `dp-mockup-alle-formate.html:138-145`: `.list-hd` mit 12 px
+  Polsterung und Trennlinie, also rund 60 px. Das war der auffälligste
+  Unterschied zum Bild.
+
+  **Fix:** flacher Kopf, kleines linksbündiges Logo, kein Goldrahmen. Höhe
+  führt, Breite folgt (`height:26px` / `width:auto`) — sonst zieht die
+  Leistenbreite das Logo wieder auf, das war der v646-Befund. In den vier
+  hellen Vorlagen wird die Wortmarke invertiert, weil ihr „Deal" weiß ist
+  und auf hellem Grund verschwände; `hue-rotate(180deg)` dreht den Goldton
+  zurück.
+
+  **Nachgemessen:** `.sb-header` **125 → 49 px**, Logo 141 × 26, Abstand von
+  links 13 px, kein Rahmen. Die Objektliste gewinnt dadurch 76 px.
+  „dealpilot" trägt kein Attribut — Rahmen, Wortmarke und Größenregler aus
+  v1079/v1080 bleiben dort unangetastet.
+
+  **Zum zweiten Mal derselbe Fehler, deshalb hier notiert:** Das Logo saß
+  zuerst bei x = 119 statt 13 — exakt die Mitte. `justify-content:flex-start`
+  stand auf Header *und* Wrapper, lief aber ins Leere, weil die
+  **Flex-Richtung** nicht gesetzt war: bei `column` steuert `align-items` die
+  waagerechte Achse, und das geerbte `center` gewann. Dieselbe Ursache wie
+  bei der Wallet-Stufenpille (v1082i). **Regel für künftige Arbeit: wo
+  Ausrichtung gesetzt wird, gehört die Richtung dazu.**
+
+  **Nicht gebaut, bewusst:** das „D"-Badge und die Zeile „by Junker
+  Immobilien" aus dem Mockup. Beides ist Markeninhalt — per CSS `content`
+  eingesetzt stünde bei jedem Whitelabel-Mandanten der falsche Name in der
+  Leiste. Das gehört an die Branding-Daten, nicht ins Stylesheet.
+
+- [2026-08-05] **Widersprüchliche `.sb-list`-Regeln** — *keine Änderung nötig*
+
+  Der Punkt ist veraltet. `height:40vh !important` und `height:0 !important`
+  stehen nicht mehr im Stylesheet; die einzige Fundstelle ist ein Kommentar.
+  Gemessen bei 390 × 844 mit offenem Drawer: `flex: 1 1 auto`,
+  `min-height: 72px`, `overflow-y: auto`, Höhe 511 px, scrollt in sich.
+  Das hat **v645** bereits erledigt, als die Liste den Restplatz bekam.
 
 - [2026-08-05] **Handy-Sperre plan-abhängig lösen** — `9f6b3ba`
 
