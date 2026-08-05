@@ -124,9 +124,66 @@ Hell-Skin `body.dp-chrome-hell`.
 **Vorlage:** `design/mockups/dp-darstellung-panel.html` — Panel rechts, App
 links live. Genau dieses Verhalten ist gemeint.
 
+**Namen und Zuschnitt sind am 2026-08-05 abgenommen** — die sechs oben stehen.
+
+---
+
+**Vorarbeit 2026-08-05 — die Architektur ist gemessen, nicht mehr geraten.**
+Damit ist der Bauplan festgelegt; es fehlt nur noch die Umsetzung und die
+Abnahme.
+
+**1 · Die zwei Dateien sind bereits verlinkt und leer.**
+`index.html:29` lädt `css/ui-varianten.css`, `:3466` lädt
+`js/ui-varianten.js` — beide existieren nicht (die zwei 404 aus „Später").
+Das CSS liegt **direkt nach `style.css`**, der Kommentar dort sagt schon
+„damit `html[data-ui-*]` greift". Der Platz ist also vorbereitet. Diese zwei
+Dateien zu füllen erledigt den 404-Punkt gleich mit.
+
+**2 · Die Flächenzahl stimmt.** Im laufenden DOM bei 1920 px gemessen:
+**65 Elemente mit deckender Hintergrundfarbe** (CLAUDE.md sagt „rund 51").
+Der Großteil davon sind Formularfelder und `div.card`, alle `#FFFFFF` — die
+folgen der Fläche. Die tragende Struktur ist klein:
+
+| Fläche | heute |
+|---|---|
+| `#sidebar` | `rgb(0,0,0)` |
+| `nav.tabs` | `rgb(10,8,5)` |
+| `div.app-wrap` · `div.body` | `rgb(248,246,241)` |
+| `div.main-col` · `#s0` · `div.card` | `#FFFFFF` |
+| Boarding-Pass (`.dp-pf-lead`, `.dp-pf-logo`, `.dp-pf-tile.tool`, `#oab-imo-tile`) | dunkel, eigener Satz |
+
+**3 · Ein Teil ist schon tokenisiert — das war nicht bekannt.**
+Die Sidebar hängt an **`--dp-s0` / `--dp-s1`**:
+`aside.sidebar{background:var(--dp-s0) !important}` (0,1,1). Gesetzt werden
+sie in `:root` (`#000` / `var(--ch)`) und vom Hell-Skin über
+`body.dp-chrome-hell{--dp-s0:var(--dp-header-bg,#EAE4D6)}` (0,2,0).
+**Für die Sidebar genügt also der Token-Weg** — CLAUDE.mds Warnung gilt dort
+nicht.
+
+Die Tab-Leiste dagegen **nicht**: sie gewinnt über
+`header.hdr.has-v64-score + nav.tabs{background:rgb(10,8,5) !important}` —
+(0,2,2), **hart kodiert, kein Token**. Genau der Fall aus CLAUDE.md. Sie muss
+einzeln benannt werden.
+
+**4 · Daraus folgt die Bauform:** nicht 6 × 65 Regeln, sondern **ein Satz
+Flächenregeln, der Tokens liest, plus 6 × ~30 Token-Zeilen** — die Architektur
+des Mockups (`[data-look="…"]` setzt nur Variablen). Spezifität
+`html[data-ui-theme="…"] body …` = (0,2,1) und damit über
+`body.dp-chrome-hell`; die Ladereihenfolge (nach `style.css`) kommt als
+zweites Netz dazu, wird aber nicht als Argument benutzt.
+
+**5 · Offen für die Abnahme:** Kopfleiste mit Score und Objektkarten rendern
+erst mit geladenem Objekt, also nur in einer **angemeldeten Sitzung**. Zwei
+der fünf Pflichtflächen sind ohne Konto nur synthetisch prüfbar.
+
 **Fertig, wenn:** Alle Vorlagen wirken auf Kopfleiste, Tabs, Sidebar,
 Objektkarten und Logo, die Farbeinstellungen greifen darüber,
 `gold-audit.py` gibt RC=0, und nirgends steht heller Text auf hellem Grund.
+
+**Zu `gold-audit.py` RC=0:** heute steht der Lauf auf **RC=1 mit 483
+Fundstellen in 56 Dateien** — eine Altlast, die nichts mit diesem Punkt zu tun
+hat. Dieses Paket darf keine neue Fundstelle hinzufügen (jedes Gold-Literal als
+`var(--wl-<hex>, #<hex>)`); RC=0 insgesamt ist ein eigenes Vorhaben.
 
 ---
 
