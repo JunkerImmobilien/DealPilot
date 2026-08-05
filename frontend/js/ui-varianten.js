@@ -51,8 +51,22 @@
     { key: '',       name: 'Passend', sub: 'Folgt der Vorlage' },
     { key: 'light',  name: 'Weiß', sub: 'Auch im Dunkeln' }
   ];
-  var AKZENTE  = ['#C9A84C', '#1F4E79', '#0F6E6E', '#7B2D3B', '#3A4250', '#5B7C3A'];
-  var GRUNDFARBEN = ['#050505', '#0B1220', '#16110B', '#0D1512', '#1C2027', '#241C16'];
+  /* v1082f · GOLD_STD ist ein DATENwert, kein Stilwert — und deshalb bewusst
+     ein rohes Literal.
+     Es ist der Ausgangs-Akzent, den DealPilotWhitelabel.apply() gesetzt
+     bekommt, wenn jemand "DealPilot-Gold" waehlt oder zuruecksetzt. Die
+     Tokenform var(--wl-c9a84c, …) und die Hilfsfunktion window._wlc() liefern
+     beide den BEREITS UMGEFAERBTEN Ton — genau den, den wir hier ersetzen
+     wollen. Wer auf das Goldfeld tippt, meint DealPilot-Gold, nicht "die
+     Farbe, die gerade eingestellt ist".
+     Deshalb steht das Literal hier EINMAL statt siebenmal: tools/gold-audit.py
+     meldet dadurch eine Fundstelle in dieser Datei statt sieben, und die eine
+     ist erklaerbar. */
+  var GOLD_STD = '#C9A84C';
+  var OBSIDIAN_STD = '#050505';
+
+  var AKZENTE  = [GOLD_STD, '#1F4E79', '#0F6E6E', '#7B2D3B', '#3A4250', '#5B7C3A'];
+  var GRUNDFARBEN = [OBSIDIAN_STD, '#0B1220', '#16110B', '#0D1512', '#1C2027', '#241C16'];
 
   /* ── Speicherung ──────────────────────────────────────────────────────
      Dasselbe Feld wie DealPilotBgMode (settings.js:2915) — ein JSON unter
@@ -145,7 +159,7 @@
     '.dpuv-lbl{font-size:11px;font-weight:600;color:#5c574d;margin-bottom:6px}',
     '.dpuv-swrow{display:flex;gap:7px;flex-wrap:wrap}',
     '.dpuv-sw{width:44px;height:44px;border-radius:8px;border:2px solid #E0DACB;cursor:pointer;padding:0;transition:.14s}',
-    '.dpuv-sw.on{border-color:#1a1712;box-shadow:0 0 0 3px rgba(201,168,76,.3)}',
+    '.dpuv-sw.on{border-color:#1a1712;box-shadow:0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)}',
     '#dpuv-f{flex:0 0 auto;display:flex;gap:8px;padding:12px 18px;border-top:1px solid #E9E4D9;background:#F6F3EC}',
     '.dpuv-pf{flex:1;font-size:12.5px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px;',
       'border:1px solid #DCD5C4;background:#fff;color:#3d382f}',
@@ -222,9 +236,9 @@
           '<p class="dpuv-hint">Akzent und Grundfarbe für App, PDF und Mails.</p>' +
           '<div class="dpuv-lock" id="dpuv-lock"><div class="dpuv-inner">' +
             '<div class="dpuv-lbl">Akzent</div>' +
-            swHtml('dpuv-acc', AKZENTE, s.ui_accent || '#C9A84C') +
+            swHtml('dpuv-acc', AKZENTE, s.ui_accent || GOLD_STD) +
             '<div class="dpuv-lbl" style="margin-top:14px">Grundfarbe (Obsidian)</div>' +
-            swHtml('dpuv-obs', GRUNDFARBEN, s.ui_obsidian || '#050505') +
+            swHtml('dpuv-obs', GRUNDFARBEN, s.ui_obsidian || OBSIDIAN_STD) +
           '</div></div>' +
           '<div class="dpuv-lockbar"><div><b>Farben ab Partner</b>' +
             '<span>Akzent und Grundfarbe gehören zum Partner-Paket und gelten dann ' +
@@ -263,7 +277,7 @@
         var v = b.getAttribute('data-v');
         var patch = {}; patch[feld] = v; save(patch);
         var st = load();
-        farbenAnwenden(st.ui_accent || '#C9A84C', st.ui_obsidian || '#050505');
+        farbenAnwenden(st.ui_accent || GOLD_STD, st.ui_obsidian || OBSIDIAN_STD);
       });
     }
     swBinden('dpuv-acc', 'ui_accent');
@@ -273,15 +287,15 @@
     document.getElementById('dpuv-done').addEventListener('click', schliessen);
     back.addEventListener('click', schliessen);
     document.getElementById('dpuv-reset').addEventListener('click', function () {
-      save({ ui_theme: '', ui_cards: '', ui_surface: '', ui_accent: '#C9A84C', ui_obsidian: '#050505' });
+      save({ ui_theme: '', ui_cards: '', ui_surface: '', ui_accent: GOLD_STD, ui_obsidian: OBSIDIAN_STD });
       anwenden();
-      farbenAnwenden('#C9A84C', '#050505');
+      farbenAnwenden(GOLD_STD, OBSIDIAN_STD);
       [['dpuv-theme', ''], ['dpuv-cards', ''], ['dpuv-surface', '']].forEach(function (pair) {
         document.querySelectorAll('#' + pair[0] + ' .dpuv-sgb').forEach(function (x) {
           x.classList.toggle('on', (x.getAttribute('data-v') || '') === pair[1]);
         });
       });
-      [['dpuv-acc', '#c9a84c'], ['dpuv-obs', '#050505']].forEach(function (pair) {
+      [['dpuv-acc', GOLD_STD.toLowerCase()], ['dpuv-obs', OBSIDIAN_STD.toLowerCase()]].forEach(function (pair) {
         document.querySelectorAll('#' + pair[0] + ' .dpuv-sw').forEach(function (x) {
           x.classList.toggle('on', (x.getAttribute('data-v') || '').toLowerCase() === pair[1]);
         });
