@@ -12,61 +12,9 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 ---
 
-## Fehler
+## Offen
 
-### 1 · Partner-Netzwerk lädt nicht
-
-**BLOCKIERT:** Die ganze Kette ist gemessen intakt — der Fehler zeigt sich erst
-in einer **angemeldeten Sitzung**, und an die komme ich nicht heran (Zugangsdaten
-eingeben ist mir verwehrt). Es fehlt genau ein Schritt: einmal anmelden, ein
-Objekt öffnen, Deal-Aktion-Tab, Konsole und Netzwerk-Tab ablesen.
-
-**Befund 2026-08-05 — die Checkliste ist bis auf den Browser abgearbeitet:**
-
-| Prüfpunkt | Ergebnis |
-|---|---|
-| Route gemountet? | ja — `GET /api/v1/network-cards` liefert ohne Token sauber `401 Missing or invalid Authorization header` |
-| Caddy-Routing? | ja auf `APP_DOMAIN`; auf `LANDING_DOMAIN` fällt es erwartungsgemäß auf die Landing zurück |
-| Migrationen 049–054? | ja, `schema_migrations` steht auf **63**; `network_cards`, `network_categories`, `network_leads` da |
-| Daten? | **5 Karten `aktiv=true`**, 2 Kategorien, Designer-Felder und `anforderungen` sauber befüllt |
-| Backend-Protokoll? | **kein** `[network]`-Fehler in 72 h |
-| 404 auf Skripten? | keiner — alle 167 Skripte/Stylesheets laden |
-| Transport? | `Auth.apiCall('/network-cards')` erreicht das Backend, wirft korrekt `status 401` ohne Token |
-| Renderstrecke? | mit den **echten DB-Daten** gegen `buildRails()` geprüft: 2 Rails, 7 Karten, kein Fehler |
-| Handy und Tablet? | 390 px / 820 px / 1440 px gemessen: Rails da, kein Seiten-Überlauf (`docSW == vp`), Karten über den Rail-Scroller erreichbar |
-| Plan-Schranke auf dem Ladepfad? | **keine** — `loadNetwork()` in `deal-action-boarding.js` ist ungegated |
-| Antwortgröße (Timeout-Verdacht)? | nur 92 kB Logo-Daten — der 15-s-Timeout aus `Auth.apiCall` ist es nicht |
-
-**Eine Annahme des Backlogs nehme ich ausdrücklich zurück:**
-`netzwerk-einreichung.js` stand hier als erste beteiligte Datei. Das Modul
-**bootet gar nicht** — `boot()` beginnt mit
-`return; /* v893p-off: Netzwerk-Partner-Tab vorerst aus den Einstellungen
-entfernt */`. Der Tab existiert nicht. Das Netzwerk, das „nicht lädt", kann
-deshalb nur die **Rails im Deal-Aktion-Tab** sein
-(`deal-action-boarding.js`, `#dab-rails-host`).
-
-**Was danach noch übrig bleibt — drei Möglichkeiten, alle nur mit Sitzung
-zu trennen:**
-1. **Abgelaufenes Token.** Dann wirft `Auth.apiCall` mit `status 401`, und
-   `loadNetwork()` schreibt pauschal `Netzwerk aktuell nicht erreichbar.` —
-   der Text nennt die Ursache nicht. Der „zentrale 401-Handler", auf den sich
-   der Kommentar in `deal-action-boarding.js:353` beruft, ist in Wahrheit nur
-   der Banner aus `session-expired-banner.js`: **kein Re-Login, kein Retry.**
-   Erster Verdacht.
-2. Es ist mit `v982-netauth` bereits erledigt und der Punkt ist alt.
-3. Etwas, das nur bei einem bestimmten Objekt- oder Kontostand auftritt.
-
-**Nächster Schritt (Marcel):** anmelden, Objekt öffnen, Deal-Aktion.
-Erscheint „Netzwerk aktuell nicht erreichbar."? Dann in der Konsole
-`await Auth.apiCall('/network-cards',{method:'GET'})` — der Statuscode aus
-dem Fehler benennt es endgültig.
-
-**Fertig, wenn:** Das Netzwerk lädt auf Desktop und Handy, mit Nachweis was es
-war.
-
----
-
-### 2 · Aktionen-Menü gliedern
+### 1 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -81,7 +29,7 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 3 · Skin-Schalter und Darstellung laufen auseinander
+### 2 · Skin-Schalter und Darstellung laufen auseinander
 
 **Der Rest von „Zugang und Plan-Schranken" — der Zugang selbst ist mit v1082
 erledigt** (Wrapper entschärft, Schranke sitzt auf der Farbsektion, Panel
@@ -105,7 +53,7 @@ Beides ist eine Produktentscheidung, keine Reparatur.
 
 ---
 
-### 4 · Handy-Sperre plan-abhängig lösen
+### 3 · Handy-Sperre plan-abhängig lösen
 
 Erst wenn 1–2 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
@@ -143,6 +91,51 @@ nichts Falsches auf.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-05] **Partner-Netzwerk lädt nicht** — `253664a`
+
+  **Der Punkt war veraltet — das Netzwerk lädt.** Nachgemessen in einer
+  angemeldeten Sitzung, Objekt geladen, Deal-Aktion-Tab offen:
+
+  | Prüfung | Ergebnis |
+  |---|---|
+  | `Auth.apiCall('/network-cards')` | **5 Karten, 2 Kategorien** |
+  | Rails im Deal-Aktion-Tab, Desktop | **2 Rails, 7 Karten**, keine Meldung |
+  | Dieselbe Strecke bei **390 × 844** | **2 Rails, 7 Karten**, kein Seiten-Überlauf |
+
+  Die fünf Partner erscheinen namentlich in den beiden Spuren
+  (Finanzierung, Gutachter).
+
+  **Ich kann nicht sagen, was es war** — der Fehlerzustand trat nicht mehr
+  auf, und eine Ursache, die man nicht gesehen hat, wird hier nicht
+  behauptet. Wahrscheinlichster Kandidat bleibt ein abgelaufenes Token;
+  `v982-netauth` hat den Ladepfad zwischenzeitlich auf `Auth.apiCall`
+  umgestellt.
+
+  **Vorher ausgeschlossen (alles gemessen, Serverseite):** Route gemountet
+  (401 ohne Token), Migrationen bis 63, Tabellen da, 5 Karten `aktiv`, kein
+  `[network]`-Fehler in 72 h, keine 404 unter 167 Skripten, Antwort nur
+  92 kB (also kein Timeout), keine Plan-Schranke auf dem Ladepfad, und die
+  Renderstrecke mit den echten DB-Daten gegen `buildRails()` geprüft.
+
+  **Eine Backlog-Annahme ist widerlegt:** `netzwerk-einreichung.js` stand
+  als erste beteiligte Datei. Das Modul **bootet gar nicht** — `boot()`
+  beginnt mit `return; /* v893p-off */`. Der Tab existiert nicht; gemeint
+  waren immer die Rails in `deal-action-boarding.js`.
+
+  **Was gebaut wurde (v1083), damit der nächste Fall greifbar ist:** Der
+  catch-Zweig meldete **jede** Ursache als „Netzwerk aktuell nicht
+  erreichbar." — auch ein abgelaufenes Token. Genau deshalb war der Punkt
+  so lange nicht zu fassen. Jetzt unterscheidet er 401 / 403 / anderer
+  Status / kein Status und schreibt eine Konsolenzeile dazu.
+  Geprüft durch Stub: bei 401 steht „Sitzung abgelaufen — bitte einmal neu
+  anmelden, dann ist das Netzwerk wieder da.", danach wieder 7 Karten.
+
+  Dabei ein falscher Kommentar richtiggestellt: er versprach einen
+  „zentralen 401-Handler (Re-Login + Retry)". Den gibt es nicht.
+  `Auth.apiCall` wirft bei 401 nur einen Error mit `.status`, und
+  `session-expired-banner.js` blendet einen Hinweisbalken ein — **kein
+  Re-Login, kein Retry.**
 
 - [2026-08-05] **Darstellungs-Modal mit sechs UI-Vorlagen** — `495e35c`, `ff6eba1`, `44ce7bb`, `bd77f4c`, `ff20dfb`, `8f603e9`
 
