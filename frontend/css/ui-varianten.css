@@ -690,3 +690,93 @@ html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbcm-info { color: #
 /* Der Score-Ring selbst: die Ringfarbe darf hell bleiben (sie liegt auf der
    Ringbahn, nicht auf der Kachel), die ZAHL darin nicht — die steht oben
    schon auf --uv-card-ink. */
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   8 · KOMPAKTER LOGO-KOPF — v1086
+   ══════════════════════════════════════════════════════════════════════════
+   Marcel, 2026-08-05: "die UI unter design/mockups UI-Ansicht soll im
+   DealPilot genauso aussehen wenn man es umstellt. Auch das Logo darf klein
+   werden."
+
+   GEMESSEN, Ist gegen Soll:
+     Ist (jede Vorlage):  .sb-header 379x125, Rahmen 323x83, Bild 287x53
+     Soll (dp-mockup-alle-formate.html:138-145):
+       .list-hd  padding 12px, border-bottom, flex  -> rund 60px
+       .mk       36x36 Bildmarke
+       .tx b     Wortmarke 15px
+   Die Vorlage hat den Logo-Kopf bisher gar nicht angefasst — 125px in jeder
+   Fassung. Das ist der auffaelligste Unterschied zum Bild.
+
+   WAS HIER PASSIERT: Der Kopf wird flach und das Logo klein und linksbuendig,
+   wie im Mockup. Der gezeichnete Goldrahmen aus v1079 faellt in den Vorlagen
+   weg — er ist die Signatur der DealPilot-Fassung, und genau die soll eine
+   Vorlage ja ablegen.
+
+   WAS BEWUSST BLEIBT: "dealpilot" traegt kein Attribut, also greift hier
+   nichts. Der Rahmen, die Wortmarke und die Groessenregler aus v1079/v1080
+   bleiben dort unangetastet — so wie zugesagt.
+   ------------------------------------------------------------------------ */
+html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
+  padding: 11px 13px !important;
+  min-height: 0 !important;
+  justify-content: flex-start !important;
+  border-bottom: 1px solid var(--uv-chrome-line) !important;
+}
+html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+  /* Rahmen, Kasten und Radius aus v1079 zuruecknehmen — in der Vorlage
+     traegt der Kopf keine Signatur mehr, nur noch die Marke. */
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  justify-content: flex-start !important;
+}
+html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+  /* Hoehe fuehrt, Breite folgt — sonst zieht die Leistenbreite das Logo
+     wieder auf, das war der v646-Befund. Der Groessenregler bleibt wirksam:
+     --dp-logo-w skaliert die Hoehe mit. */
+  height: calc(26px * var(--dp-logo-scale, 1)) !important;
+  width: auto !important;
+  max-width: min(200px, 100%) !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+}
+
+/* Sehr flache Viewports: noch eine Stufe kleiner, damit der Kopf der Liste
+   nicht den Platz nimmt (dieselbe Ueberlegung wie v1080). */
+@media (max-width: 900px) and (max-height: 620px) {
+  html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
+    padding: 7px 12px !important;
+  }
+  html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+    height: calc(21px * var(--dp-logo-scale, 1)) !important;
+  }
+}
+
+/* Der Hellmodus-Kasten aus v1079 legt in hellen Fassungen Schwarz hinter das
+   Logo. Ohne Rahmen daneben saehe das aus wie ein vergessener Balken —
+   deshalb hier ebenfalls zurueckgenommen. Die Wortmarke ist weiss, sie
+   braucht auf hellem Grund einen dunklen Traeger: das uebernimmt in den
+   hellen Vorlagen der Filter, nicht ein Kasten. */
+html[data-ui-theme="kontor"]   body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar,
+html[data-ui-theme="panel"]    body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar,
+html[data-ui-theme="kanzlei"]  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar,
+html[data-ui-theme="boarding"] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+  background: transparent !important;
+}
+/* Die Wortmarke traegt ihr "Deal" in Weiss. Auf hellem Grund waere die halbe
+   Marke unsichtbar — invertiert bleibt sie lesbar und behaelt das Gold.
+   Gemessen an der Datei: dealpilot-wortmarke.png, weisser Schriftzug plus
+   goldenes "Pilot". invert(1) macht daraus dunkles "Deal" und blaues
+   "Pilot" — deshalb zusaetzlich hue-rotate, das den Goldton zurueckdreht. */
+html[data-ui-theme="kontor"]   body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar,
+html[data-ui-theme="panel"]    body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar,
+html[data-ui-theme="kanzlei"]  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar,
+html[data-ui-theme="boarding"] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
