@@ -304,7 +304,15 @@
     gateSetzen();
     var p = document.getElementById('dpuv-panel'), b = document.getElementById('dpuv-back');
     if (!p) return;
-    requestAnimationFrame(function () { p.classList.add('open'); if (b) b.classList.add('on'); });
+    /* v1082c: Hier stand requestAnimationFrame. Gemessen: in einem
+       gedrosselten Tab feuert rAF NICHT (rafGefeuert=false nach 700ms) —
+       das Panel waere dann gar nicht aufgegangen. Ein erzwungener Reflow
+       tut dasselbe fuer die Transition, aber synchron und ohne Zeitplaner:
+       offsetWidth lesen zwingt den Browser, den Startzustand zu setzen,
+       bevor die Klasse den Zielzustand bringt. */
+    void p.offsetWidth;
+    p.classList.add('open');
+    if (b) b.classList.add('on');
   }
   function schliessen() {
     var p = document.getElementById('dpuv-panel'), b = document.getElementById('dpuv-back');
