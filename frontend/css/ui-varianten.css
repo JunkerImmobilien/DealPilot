@@ -484,3 +484,56 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-mini-score {
   html[data-ui-theme] body #sb-backdrop { background: rgba(0,0,0,.5) !important; }
   html[data-ui-theme] body aside.sidebar#sidebar { box-shadow: 0 0 40px -8px rgba(0,0,0,.6) !important; }
 }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7 · NACHBESSERUNG v1082b — heller Text auf hellem Grund
+   ══════════════════════════════════════════════════════════════════════════
+   GEMESSEN auf Staging, Kontrastlauf ueber alle Textknoten der Objektkarte
+   (Vordergrund gegen die erste deckende Elternflaeche, WCAG-Relativluminanz):
+
+     .sbc-mini-score-num   #FFFFFF auf #FFFFFF          Kontrast 1.00  UNSICHTBAR
+     .sbcm-label           rgba(255,255,255,.7) auf #FAF9F7  1.05  UNSICHTBAR
+     .sbcm-val             #69C291 auf #FAF9F7                2.05  zu schwach
+
+   Ursache: die Kachel-Innereien der Objektkarte sind fuer DUNKLEN Grund
+   gebaut — .sbcm-label steht fest auf Weiss, .sbcm-val erbt currentColor
+   von .sbcm-good / .sbcm-bad / .sbcm-info, deren Toene aufgehellt sind.
+   Abschnitt 3 hat die Kachel-FLAECHE aufgehellt, die Schrift darauf aber
+   nicht — der klassische halbe Skin.
+
+   WICHTIG zu den Statusfarben: sie werden hier NICHT tokenisiert und NICHT
+   umgefaerbt. Gruen bleibt Gruen, Rot bleibt Rot, in jeder Marke gleich —
+   es sind exakt die Kanonwerte #3FA56C und #B8625C aus CLAUDE.md. Getauscht
+   wird nur die fuer hellen Untergrund vorgesehene Fassung gegen die fuer
+   dunklen. "konsole" ist dunkel und deshalb ausgenommen.
+   ------------------------------------------------------------------------ */
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-card .sbcm-label,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-card .sbcm-label,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-card .sbcm-label,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbcm-label {
+  color: var(--uv-card-mut) !important;
+}
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-card .sbc-mini-score-num,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-card .sbc-mini-score-num,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-card .sbc-mini-score-num,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbc-mini-score-num {
+  color: var(--uv-card-ink) !important;
+}
+/* Statusfarben in der Fassung fuer hellen Grund — dieselben Farben, nur
+   nicht die aufgehellte Variante. */
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-card .sbcm-good,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-card .sbcm-good,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-card .sbcm-good,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbcm-good { color: #2E8455 !important; }
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-card .sbcm-bad,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-card .sbcm-bad,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-card .sbcm-bad,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbcm-bad { color: #B8625C !important; }
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-card .sbcm-info,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-card .sbcm-info,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-card .sbcm-info,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbcm-info { color: #2F6E9B !important; }
+/* Der Score-Ring selbst: die Ringfarbe darf hell bleiben (sie liegt auf der
+   Ringbahn, nicht auf der Kachel), die ZAHL darin nicht — die steht oben
+   schon auf --uv-card-ink. */
