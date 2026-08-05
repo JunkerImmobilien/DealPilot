@@ -554,9 +554,16 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-score-overlay {
   top: 8px !important;
   z-index: 3 !important;
   display: flex !important;
+  /* v1082i: align-items allein reichte nicht — das Overlay erbt anderswoher
+     eine Spaltenrichtung, die Pille stand dadurch weiter UNTER dem Ring
+     (gemessen: Ring bis y=58, Pille ab y=64). Richtung und Umbruch muessen
+     ausdruecklich gesetzt werden. */
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
   align-items: center !important;
   gap: 6px !important;
   width: auto !important;
+  text-align: left !important;
 }
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-mini-score {
   background: #FFFFFF !important;
