@@ -127,9 +127,38 @@
     try { document.documentElement.style.overflow = ''; } catch (e) {}
   }
 
+  /* ── v1085-planfrei · Backlog: "Handy-Sperre plan-abhaengig loesen" ──
+     Freigabe ab Partner-Plan, und zwar auch fuer dessen Mandanten.
+
+     DER HAKEN, den der Backlog benennt: Diese Datei laeuft BEWUSST ohne
+     setTimeout ("bei einer Sperre darf es kein offenes Zeitfenster geben").
+     Der Plan steht zu diesem Zeitpunkt aber noch nicht fest — Sub.getCurrent
+     ist ein Netzaufruf. Deshalb wird hier NUR aus dem Cache entschieden:
+
+       dp_last_plan   der zuletzt bekannte Plan (subscription.js:101)
+       dp_wl_cache    das Reseller-Branding. Es existiert AUSSCHLIESSLICH
+                      bei einem reseller_client (mandant-branding.js:230,
+                      das Backend liefert fuer Owner null) — damit ist es
+                      das gecachte Kennzeichen "Mandant eines Partners".
+
+     IMMER ERST SPERREN, DANN FREIGEBEN. Ist der Cache leer — erster Login
+     auf einem neuen Geraet —, greift die Sperre. Kommt danach dp:plan-ready,
+     wird neu bewertet und ggf. freigegeben. Der umgekehrte Weg (erst offen,
+     dann zu) wuerde die App fuer einen Wimpernschlag preisgeben; genau das
+     war der Fehler der alten v939-Weiche. */
+  function freigeschaltet() {
+    try {
+      if (localStorage.getItem('dp_last_plan') === 'partner') return true;
+      var wl = localStorage.getItem('dp_wl_cache');
+      if (wl && wl.length > 2) return true;      // Mandant eines Partners
+    } catch (e) {}
+    return false;
+  }
+
   function evaluate() {
     if (alreadyOnPwa()) return;   // dort greift MA35
     if (bypassed()) return;
+    if (freigeschaltet()) { hide(); return; }
     if (isPhone()) show(); else hide();
   }
 
@@ -161,6 +190,12 @@
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) evaluate();
   });
+
+  /* v1085-planfrei: Der Korrekturpfad. Beim ersten Login auf einem neuen
+     Geraet ist dp_last_plan noch leer, die Sperre steht also zu Recht.
+     Sobald der Plan da ist, wird neu bewertet — dp:plan-ready
+     (subscription.js:154) statt Timer oder Polling. */
+  window.addEventListener('dp:plan-ready', evaluate);
 
   window._dpMobileBlock = { mark: MARK, isPhone: isPhone, evaluate: evaluate };
 })();

@@ -259,6 +259,10 @@
         b.classList.add('on');
         var patch = {}; patch[feld] = b.getAttribute('data-v') || '';
         save(patch); anwenden();
+        /* v1085: Wer eine Vorlage waehlt, setzt damit auch die Helligkeit —
+           sonst zeigt der Skin-Schalter in den Einstellungen anschliessend
+           etwas anderes an als die App. */
+        if (feld === 'ui_theme') { try { skinNachziehen(); } catch (e) {} }
         if (nachher) nachher();
       });
     }
@@ -289,6 +293,7 @@
     document.getElementById('dpuv-reset').addEventListener('click', function () {
       save({ ui_theme: '', ui_cards: '', ui_surface: '', ui_accent: GOLD_STD, ui_obsidian: OBSIDIAN_STD });
       anwenden();
+      try { skinNachziehen(); } catch (e) {}   /* v1085: auch beim Zuruecksetzen */
       farbenAnwenden(GOLD_STD, OBSIDIAN_STD);
       [['dpuv-theme', ''], ['dpuv-cards', ''], ['dpuv-surface', '']].forEach(function (pair) {
         document.querySelectorAll('#' + pair[0] + ' .dpuv-sgb').forEach(function (x) {
@@ -333,6 +338,79 @@
     if (p) p.classList.remove('open');
     if (b) b.classList.remove('on');
   }
+
+  /* ── Kopplung an den Skin-Schalter ────────────────────────────────────
+     v1085 · Backlog: "Der Skin-Schalter Hell/Obsidian existiert bereits
+     separat. Entweder er verschwindet, oder er wird an die Darstellung
+     gekoppelt. Sonst laufen beide auseinander."
+
+     ENTSCHIEDEN: koppeln, NICHT loeschen. Drei Gruende:
+       * body.dp-chrome-hell traegt 105 gewachsene Regeln. Die zu entfernen
+         waere ein eigenes Vorhaben mit eigener Pruefstrecke, kein Nebenzug.
+       * darstellung-reseller.js:29 und mandant-branding.js:156 rufen
+         _dpDispSkin, um die Marke eines Partners an dessen Mandanten
+         durchzureichen. Faellt die Funktion weg, bricht das Whitelabel.
+       * Gemessen stoeren sich beide nicht — html[data-ui-theme] (0,2,1)
+         liegt ueber body.dp-chrome-hell (0,2,0), die Vorlage gewinnt. Das
+         Problem ist nicht Kollision, sondern AUSEINANDERLAUFEN: "Hell"
+         schalten und "Konsole" waehlen ergab Konsole, der Schalter wirkte
+         folgenlos.
+
+     Ab hier gibt es eine Wahrheit: Skin und Vorlage ziehen einander nach.
+     Umhuellt wird nach dem Muster aus settings.js:3469 — das Verhalten der
+     Originalfunktion bleibt unangetastet, es kommt nur etwas dahinter. */
+  var HELLE = ['kontor', 'panel', 'kanzlei', 'boarding'];
+  var _sync = false;   /* Waechter: sonst rufen sich beide Seiten im Kreis */
+
+  function istHell(theme) { return HELLE.indexOf(theme) >= 0; }
+
+  /* Vorlage -> Skin-Merker nachziehen. */
+  function skinNachziehen() {
+    if (_sync) return;
+    var theme = get('ui_theme', THEMES);
+    var soll = istHell(theme) ? 'hell' : 'obsidian';
+    var ist = '';
+    try { ist = (localStorage.getItem('dp_chrome_hell') === '1') ? 'hell' : 'obsidian'; } catch (e) {}
+    if (soll === ist) return;
+    _sync = true;
+    try { if (typeof window._dpDispSkin === 'function') window._dpDispSkin(soll); } catch (e) {}
+    _sync = false;
+  }
+
+  /* Skin -> Vorlage nachziehen. Nur wenn die aktuelle Vorlage der neuen
+     Helligkeit widerspricht — wer "Hell" schaltet und schon auf "Panel"
+     steht, soll Panel behalten und nicht nach Kontor geworfen werden. */
+  function vorlageNachziehen(hell) {
+    if (_sync) return;
+    var theme = get('ui_theme', THEMES);
+    if (hell && istHell(theme)) return;
+    if (!hell && !istHell(theme)) return;
+    _sync = true;
+    save({ ui_theme: hell ? 'kontor' : '' });
+    anwenden();
+    _sync = false;
+    /* Wenn das Panel offen ist, muss die Markierung mitgehen — sonst zeigt
+       es eine Vorlage an, die nicht mehr gilt. */
+    try {
+      var host = document.getElementById('dpuv-theme');
+      if (host) {
+        var jetzt = get('ui_theme', THEMES);
+        host.querySelectorAll('.dpuv-sgb').forEach(function (x) {
+          x.classList.toggle('on', (x.getAttribute('data-v') || '') === jetzt);
+        });
+      }
+    } catch (e) {}
+  }
+
+  (function koppeln() {
+    var alt = window._dpDispSkin;
+    if (typeof alt !== 'function') return;
+    window._dpDispSkin = function (v) {
+      var r = alt.apply(this, arguments);
+      try { vorlageNachziehen(v === 'hell'); } catch (e) {}
+      return r;
+    };
+  })();
 
   /* ── Boot ─────────────────────────────────────────────────────────────
      Die Attribute so frueh wie moeglich setzen. Der Inline-Boot im <head>
