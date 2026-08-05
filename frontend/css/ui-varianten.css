@@ -486,6 +486,21 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-mini-score {
   border-radius: 50% !important;
   box-shadow: 0 2px 8px -3px rgba(0,0,0,.5) !important;
 }
+/* v1082e — im Bild geprueft und dabei aufgefallen: die Ringe standen LEER da.
+   Die Score-Zahl erbt currentColor und ist im Dunkelmodus weiss; der
+   Wallet-Ring bekommt hier aber eine weisse Scheibe untergelegt -> weiss auf
+   weiss. Der Kontrastlauf hat es nicht gemeldet, weil er nur die vier hellen
+   Vorlagen abdeckte und hier "konsole" aktiv war — der Fehler haengt aber am
+   KARTENMODUS, nicht an der Vorlage. Deshalb ohne Theme-Bedingung.
+   Steht so auch im Mockup (.sbc-mini-score-num{color:#1e1a12}). */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-mini-score-num {
+  color: #1e1a12 !important;
+}
+/* Das Datum lag mit seinem Grauton fast unsichtbar auf dem Goldband. */
+html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-date {
+  color: #1a1407 !important;
+  opacity: .8 !important;
+}
 
 
 /* ══════════════════════════════════════════════════════════════════════════
