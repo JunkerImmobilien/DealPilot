@@ -16,22 +16,50 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 ### 1 · Partner-Netzwerk lädt nicht
 
-**Zuerst Diagnose, kein Umbau.** Ursache ist unbekannt.
+**BLOCKIERT:** Die ganze Kette ist gemessen intakt — der Fehler zeigt sich erst
+in einer **angemeldeten Sitzung**, und an die komme ich nicht heran (Zugangsdaten
+eingeben ist mir verwehrt). Es fehlt genau ein Schritt: einmal anmelden, ein
+Objekt öffnen, Deal-Aktion-Tab, Konsole und Netzwerk-Tab ablesen.
 
-Beteiligt: `frontend/js/netzwerk-einreichung.js` (in `index.html:2993`),
-`backend/src/routes/network.js`, `services/networkCardsService.js`,
-Migrationen 049–054.
+**Befund 2026-08-05 — die Checkliste ist bis auf den Browser abgearbeitet:**
 
-Zu klären, in dieser Reihenfolge:
-1. Kommt in der Browser-Konsole ein Fehler? Welcher?
-2. Wird die API überhaupt gerufen? Netzwerk-Tab: Status, Antwortkörper
-3. Antwortet das Backend 401, 403, 404 oder 500?
-4. Bei 403: greift eine Plan-Schranke? **Unbekannter Feature-Schlüssel ist für
-   jeden `false`, auch für Pro** — häufiger Fall
-5. Bei 500: Serverprotokoll ansehen
-6. Sind die Netzwerk-Tabellen auf Staging überhaupt migriert?
+| Prüfpunkt | Ergebnis |
+|---|---|
+| Route gemountet? | ja — `GET /api/v1/network-cards` liefert ohne Token sauber `401 Missing or invalid Authorization header` |
+| Caddy-Routing? | ja auf `APP_DOMAIN`; auf `LANDING_DOMAIN` fällt es erwartungsgemäß auf die Landing zurück |
+| Migrationen 049–054? | ja, `schema_migrations` steht auf **63**; `network_cards`, `network_categories`, `network_leads` da |
+| Daten? | **5 Karten `aktiv=true`**, 2 Kategorien, Designer-Felder und `anforderungen` sauber befüllt |
+| Backend-Protokoll? | **kein** `[network]`-Fehler in 72 h |
+| 404 auf Skripten? | keiner — alle 167 Skripte/Stylesheets laden |
+| Transport? | `Auth.apiCall('/network-cards')` erreicht das Backend, wirft korrekt `status 401` ohne Token |
+| Renderstrecke? | mit den **echten DB-Daten** gegen `buildRails()` geprüft: 2 Rails, 7 Karten, kein Fehler |
+| Handy und Tablet? | 390 px / 820 px / 1440 px gemessen: Rails da, kein Seiten-Überlauf (`docSW == vp`), Karten über den Rail-Scroller erreichbar |
+| Plan-Schranke auf dem Ladepfad? | **keine** — `loadNetwork()` in `deal-action-boarding.js` ist ungegated |
+| Antwortgröße (Timeout-Verdacht)? | nur 92 kB Logo-Daten — der 15-s-Timeout aus `Auth.apiCall` ist es nicht |
 
-**Erst wenn die Ursache benannt ist, wird gebaut.** Befund hier eintragen.
+**Eine Annahme des Backlogs nehme ich ausdrücklich zurück:**
+`netzwerk-einreichung.js` stand hier als erste beteiligte Datei. Das Modul
+**bootet gar nicht** — `boot()` beginnt mit
+`return; /* v893p-off: Netzwerk-Partner-Tab vorerst aus den Einstellungen
+entfernt */`. Der Tab existiert nicht. Das Netzwerk, das „nicht lädt", kann
+deshalb nur die **Rails im Deal-Aktion-Tab** sein
+(`deal-action-boarding.js`, `#dab-rails-host`).
+
+**Was danach noch übrig bleibt — drei Möglichkeiten, alle nur mit Sitzung
+zu trennen:**
+1. **Abgelaufenes Token.** Dann wirft `Auth.apiCall` mit `status 401`, und
+   `loadNetwork()` schreibt pauschal `Netzwerk aktuell nicht erreichbar.` —
+   der Text nennt die Ursache nicht. Der „zentrale 401-Handler", auf den sich
+   der Kommentar in `deal-action-boarding.js:353` beruft, ist in Wahrheit nur
+   der Banner aus `session-expired-banner.js`: **kein Re-Login, kein Retry.**
+   Erster Verdacht.
+2. Es ist mit `v982-netauth` bereits erledigt und der Punkt ist alt.
+3. Etwas, das nur bei einem bestimmten Objekt- oder Kontostand auftritt.
+
+**Nächster Schritt (Marcel):** anmelden, Objekt öffnen, Deal-Aktion.
+Erscheint „Netzwerk aktuell nicht erreichbar."? Dann in der Konsole
+`await Auth.apiCall('/network-cards',{method:'GET'})` — der Statuscode aus
+dem Fehler benennt es endgültig.
 
 **Fertig, wenn:** Das Netzwerk lädt auf Desktop und Handy, mit Nachweis was es
 war.
@@ -206,6 +234,91 @@ nichts Falsches auf.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-05] **Partner-Plan wurde von fünf Pro-Schranken ausgesperrt** — `f96e981`
+
+  Nebenbefund aus der Diagnose zu Punkt 1, aber ein eigenständiger Fehler und
+  deutlich größer als der Anlass.
+
+  **Befund (gemessen an der DB, nicht angenommen):** Die `plans`-Tabelle führt
+  **sieben** Pläne (`free starter investor pro partner business enterprise`),
+  `PRICING` in `config.js` kennt **vier** (`free starter investor pro`).
+  `partner` fehlt dort *bewusst* — `reseller-portal.js:568` spritzt ihn
+  nachträglich ein und **klont dabei die Pro-Features** („Partner ist ein
+  erweiterter Pro"). `pricing.plans` ist dieselbe Referenz wie `PRICING`,
+  deshalb liefert `currentKey()` danach korrekt `'partner'`.
+
+  **Fünf Stellen verglichen trotzdem hart auf `currentKey() === 'pro'`** und
+  sperrten damit ausgerechnet den **höheren** Plan aus:
+
+  | Datei | Was dem Partner fehlte |
+  |---|---|
+  | `netzwerk-einreichung.js:26` | Teaser „Pro freischalten" statt Einreichungsformular |
+  | `deal-action.js:60` | Deal-Aktion-Konfiguration |
+  | `apikeys.js:12` | API-Zugang — obwohl `api_access` in der DB-Zeile `true` ist |
+  | `settings.js:1360` | Branding-Routing |
+  | `config.js:846` | Farbpalette (`_isPalette`) |
+
+  `settings.js:3164` und `:3247` machen es richtig
+  (`(k==='pro'||k==='partner')`) — das war die Vorlage. `settings.js:3392`
+  prüft sogar auf `!== 'partner'` und funktioniert nur, weil
+  `reseller-portal.js` vorher einspritzt. Es waren also zwei Muster im Umlauf.
+
+  Auf Staging betrifft das **2 aktive Partner-Abos** — der teuerste Plan.
+
+  **Fix (v1081):** eine Quelle statt fünf Vergleichen. Neu
+  `DealPilotConfig.pricing.isProOrAbove()` mit der Liste `PRO_FAMILIE` in
+  `config.js`; alle fünf Stellen darauf umgestellt, jede mit Inline-Rückfall
+  auf `(k==='pro'||k==='partner')`, falls `config.js` einmal älter ausgeliefert
+  wird. `config` TR8→TR9, `apikeys` 810→811, `settings` W22→W23,
+  `deal-action` W33→W34, `netzwerk-einreichung` 893p→v1081.
+
+  **Nachgemessen auf Staging:** `Sub.getCurrentSync()` der Reihe nach auf jeden
+  Plan gestellt — `free`/`starter`/`investor` → `false`, `pro`/`partner` →
+  **`true`**. `pricing.plans` enthält alle fünf Schlüssel. `node --check` auf
+  allen fünf Dateien sauber.
+
+  **Nicht bewiesen:** dass das die Ursache von Punkt 1 ist. Die
+  Einreichungsstrecke, die hier am sichtbarsten betroffen wäre, ist per
+  `v893p-off` ohnehin abgeschaltet. Der Fix steht für sich.
+
+- [2026-08-05] **Logo-Rahmen auf flachen Viewports, Ausrichtungs-Regler wieder wirksam** — `a4b1291`
+
+  Nachtrag zu v1079 (rahmenlose Wortmarke + gezeichneter Goldrahmen). Die
+  **Gestaltung bleibt unangetastet**, nur die Größe hängt jetzt am Viewport.
+
+  **Befund (gemessen auf Staging, gleich-Origin-iframe, Drawer offen):**
+
+  | Viewport | `.sb-header` | Rahmen | Bild |
+  |---|---|---|---|
+  | 390 × 844 | 116 | 296 × 78 | 260 × 48 |
+  | 390 × 556 | **108** | 296 × 78 | 260 × 48 |
+  | 390 × 476 | **108** | 296 × 78 | 260 × 48 |
+  | 820 × 1180 | 121 | 323 × 83 | 287 × 53 |
+  | 1024 × 768 | 104 | 213 × 62 | 177 × 32 |
+  | 1440 × 900 | 125 | 323 × 83 | 287 × 53 |
+
+  Kein waagerechter Überlauf in irgendeiner Fassung, eingeklappte Leiste
+  unverändert (66 px, Logo `display:none`, „D"/„P" aus `::before`/`::after`,
+  **kein** Goldrahmen), Hellmodus zieht den schwarzen Kasten aus CSS.
+
+  **Zwei Fehler in den Zeilen dazwischen:**
+  1. `--dp-logo-max` (v646) ist **tot**. Der Deckel saß auf dem *Bild*; die
+     gleichnamige v1079-Regel am Dateiende setzt `max-width:100%` und gewinnt
+     bei gleicher Spezifität als spätere. Deshalb blieb der Kopf auf flachen
+     Viewports bei 108 px stehen, statt weiter nachzugeben — bei 476 px Höhe
+     ein knappes Viertel des Schirms. Der Deckel gehört seit v1079 ohnehin
+     nicht mehr aufs Bild: das Bild füllt den Rahmen, ein gedeckeltes Bild
+     würde darin schwimmen. Jetzt schrumpft der **Rahmen**, das Bild folgt.
+  2. `justify-content` stand in v1079 fest auf `center` und hat den
+     **Ausrichtungs-Regler** (`--dp-logo-justify`, `settings.js:3328`) still
+     totgelegt. Gemessen: `flex-start` gesetzt, computed blieb `center`.
+
+  **Nachgemessen auf Staging (W49):** 390 × 556 → `.sb-header` **81 px**
+  (vorher 108), Liste 327 → **354 px** · 390 × 476 → **66 px** (vorher 108),
+  Liste 247 → **289 px**. 390 × 844, 820, 1024, 1440 unverändert.
+  Ausrichtung: `flex-start` → Bild bei 18 px vom Rahmenrand, `flex-end` → 133 px.
+  Größen-Regler weiter wirksam (60 % → 106 statt 177 px).
 
 - [2026-08-04] **Sidebar-Fußzeile auf dem Handy sichtbar machen** — `159f6c0`
 
