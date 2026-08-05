@@ -35643,9 +35643,11 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
     padding: 10px 14px 8px !important;
   }
-  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
-    max-width: var(--dp-logo-max, 220px) !important;
-  }
+  /* v1080-LOGO: Der Deckel --dp-logo-max saß auf dem BILD und ist seit v1079
+     tot — die gleichnamige Regel am Dateiende setzt max-width:100% und
+     gewinnt bei gleicher Spezifitaet als spaetere. Er wird auch nicht mehr
+     gebraucht: die Breite kommt jetzt vom Rahmen, und ein gedeckeltes Bild
+     wuerde im Rahmen schwimmen. Die Hoehe regelt v1080 am Rahmen. */
 }
 
 /* Sehr flache Viewports (Handy quer, 556px-Fall aus v645): noch flacher. */
@@ -35653,9 +35655,7 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
     padding: 6px 14px 4px !important;
   }
-  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
-    max-width: var(--dp-logo-max, 176px) !important;
-  }
+  /* v1080-LOGO: siehe oben — Deckel tot, Ersatz steht am Dateiende. */
 }
 /* ===== v646-logo-rahmen END ===== */
 
@@ -36306,7 +36306,11 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-side
   min-height: 0 !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
+  /* v1080-LOGO: war fest "center" und hat den Ausrichtungs-Regler aus
+     settings.js (--dp-logo-justify) still totgelegt — gemessen: flex-start
+     gesetzt, computed blieb center. Sichtbar wird die Ausrichtung, sobald
+     der Groessen-Regler unter 100 % steht. */
+  justify-content: var(--dp-logo-justify, center) !important;
   border: 2px solid var(--wl-c9a84c, #C9A84C) !important;
   border-radius: 14px !important;
   background: transparent !important;
@@ -36324,4 +36328,48 @@ body.dp-chrome-hell:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-s
 body[data-dp-skin="hell"]:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
   background: #050505 !important;
   border-color: var(--wl-c9a84c, #C9A84C) !important;
+}
+
+
+/* ═══ v1080-LOGO ═══════════════════════════════════════════════
+   Nachtrag zu v1079 (Wortmarke + gezeichneter Rahmen), rein responsiv.
+   Die Gestaltung des Logos bleibt unangetastet — hier wird nur die
+   Groesse an flache Viewports gehaengt.
+
+   BEFUND (gemessen auf Staging, gleich-Origin-iframe, Drawer offen):
+     390x844  .sb-header 116px  ·  Rahmen 296x78  ·  Bild 260x48
+     390x556  .sb-header 108px  ·  Rahmen 296x78  ·  Bild 260x48
+     390x476  .sb-header 108px  ·  Rahmen 296x78  ·  Bild 260x48
+     820x1180 .sb-header 121px  ·  Rahmen 323x83  ·  Bild 287x53
+     1024x768 .sb-header 104px  ·  Rahmen 213x62  ·  Bild 177x32
+     1440x900 .sb-header 125px  ·  Rahmen 323x83  ·  Bild 287x53
+   Kein waagerechter Ueberlauf in irgendeiner Fassung (docSW == vp).
+
+   Das Problem steckt in der dritten Zeile: v646 liess den Kopf auf flachen
+   Viewports schrumpfen, indem es das BILD deckelte (--dp-logo-max 176px).
+   Seit v1079 sitzt der Deckel auf max-width:100% und die spaetere Regel
+   gewinnt — der Kopf blieb bei 108px stehen, statt weiter nachzugeben.
+   Bei 476px Hoehe frisst er damit 23 % des Viewports.
+
+   Der Deckel gehoert seit v1079 ohnehin nicht mehr aufs Bild: das Bild
+   fuellt den Rahmen, ein gedeckeltes Bild wuerde darin schwimmen. Also
+   schrumpft hier der RAHMEN, das Bild folgt von selbst.
+   ------------------------------------------------------------------ */
+@media (max-width: 900px) and (max-height: 620px) {
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+    width: 74% !important;
+    margin: 6px auto !important;
+    padding: 8px 12px !important;
+    border-radius: 11px !important;
+  }
+}
+/* Handy quer: unter 480px Hoehe bleibt fast nichts fuer die Objektliste.
+   Dann traegt der Rahmen nur noch die Wortmarke, ohne Luft drumherum. */
+@media (max-width: 900px) and (max-height: 480px) {
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+    width: 62% !important;
+    margin: 4px auto !important;
+    padding: 6px 10px !important;
+    border-radius: 9px !important;
+  }
 }
