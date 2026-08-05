@@ -36460,7 +36460,7 @@ body:not(.dp-chrome-hell) #sb-actions-accordion .sb-act-kero {
 }
 
 
-/* ═══ v1087-tablet-kopf ═════════════════════════════════════════════
+/* ═══ v1087b-tablet-kopf ═══════════════════════════════════════════
    Backlog "Später": Kopfleiste auf dem Tablet.
 
    GEMESSEN bei 820x1180 mit geladenem Objekt:
@@ -36471,60 +36471,47 @@ body:not(.dp-chrome-hell) #sb-actions-accordion .sb-act-kero {
      .sc-pill      382 x 109    x5  -> bei ZWEI Spalten drei Zeilen
 
    Eine Pille traegt: Label 15px + Wert 33px + Unterzeile 15px + Balken 4px
-   = 67px Inhalt in 109px Kasten. Inhaltlich ist sie schmal ("RENDITE /
-   98 % / 4 von 4 KPIs") — sie braucht keine 382px Breite.
+   = 67px Inhalt in einem 109px-Kasten. Inhaltlich ist sie schmal
+   ("RENDITE / 98 % / 4 von 4 KPIs") — sie braucht keine 382px Breite.
+   Bei 771px verfuegbarer Breite passen FUENF Pillen zu je rund 147px
+   nebeneinander. Damit reicht EINE Zeile, und es braucht gar keinen
+   Scroller.
 
-   Der Backlog-Punkt sagt: "Der Score soll auf dem Tablet bleiben, die Hoehe
-   nicht." Deshalb wird nichts ausgeblendet, sondern die Pillenreihe wird
-   waagerecht scrollend — dasselbe Muster wie beim Boarding-Pass in v651b,
-   inklusive Snap und Verlaufshinweis am rechten Rand. Alles bleibt sichtbar
-   und erreichbar, die Hoehe faellt von 589 auf rund 240px.
+   ERSTER ANLAUF ZURUECKGENOMMEN (v1087): Ich hatte die Pillen in eine
+   waagerecht scrollende Spur gelegt, nach dem Muster des Boarding-Passes
+   aus v651b. Gemessen war die Kopfzeile danach zwar 365 statt 589px —
+   aber .sc-main wurde 1118px BREIT und lief aus dem Bild, weil
+   min-width:max-content den Container auf die Summe aller Pillen zieht
+   und die Score-Karte mit flex:1 0 100% davon 100 % nimmt. Ein Scroller
+   ist hier schlicht das falsche Mittel: die Pillen passen ja.
+
+   Der Backlog-Punkt sagt: "Der Score soll auf dem Tablet bleiben, die
+   Hoehe nicht." Beides erfuellt — nichts ausgeblendet, nichts versteckt,
+   nur richtig verteilt.
    ------------------------------------------------------------------ */
 @media (min-width: 769px) and (max-width: 1024px) {
+  /* Fuenf gleiche Spalten. Die Score-Karte spannt darueber. */
   body header.hdr .scores {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    min-width: 0 !important;
   }
-  /* Die Score-Karte behaelt die volle Breite und ihre eigene Zeile. */
   body header.hdr .scores > .sc-main {
-    flex: 1 0 100% !important;
+    grid-column: 1 / -1 !important;
   }
-  /* Die Pillen wandern in eine eigene, waagerecht scrollende Spur.
-     flex:0 0 auto ist Pflicht: Flex-Kinder in overflow-Containern
-     SCHRUMPFEN sonst, statt zu scrollen — der Inhalt wird dann still
-     abgeschnitten (CLAUDE.md, teuer bezahlt). */
+  /* minmax(0,1fr) statt 1fr: sonst greift min-width:auto und ein breiter
+     Inhalt sprengt die Spalte auf — genau der Sammelfall aus v650. */
   body header.hdr .scores > .sc-pill {
-    flex: 0 0 auto !important;
-    width: 158px !important;
-    min-width: 158px !important;
-    scroll-snap-align: start;
+    min-width: 0 !important;
+    padding: 9px 10px !important;
   }
-  /* Der Scroll-Kasten entsteht ohne Markup-Aenderung: die Pillen liegen
-     hinter der 100-%-Score-Karte in derselben Flex-Zeile, und die Zeile
-     bekommt hier ihre eigene Scrollachse. */
-  body header.hdr #hdr-badges {
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    position: relative;
+  body header.hdr .scores > .sc-pill .sc-pill-l,
+  body header.hdr .scores > .sc-pill .sc-pill-sub {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  body header.hdr .scores { min-width: max-content !important; }
-  /* Hinweis, dass rechts noch etwas steht. Reine Zeichnung, kein Markup. */
-  body header.hdr #hdr-badges::after {
-    content: "";
-    position: sticky;
-    right: 0;
-    top: 0;
-    float: right;
-    width: 26px;
-    height: 100%;
-    margin-left: -26px;
-    pointer-events: none;
-    background: linear-gradient(to right, transparent, var(--dp-s0, #000) 78%);
-  }
-  /* Die Kopfzeile selbst darf jetzt eng sitzen. */
-  body header.hdr { max-height: 46vh !important; }
+  body header.hdr #hdr-badges { overflow: visible !important; }
 }
+
