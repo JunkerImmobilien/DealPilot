@@ -36440,3 +36440,21 @@ body:not(.dp-chrome-hell) #sb-actions-accordion .sb-act-kero {
   #sb-actions-accordion .sb-act-kero { font-size: 10px; padding: 4px 7px; }
   #sb-actions-accordion .sb-act-item.sb-act-locked .sb-act-lock { width: 15px; height: 17px; }
 }
+
+/* ── v1084b · Trefferflaechen im Drawer-Band 769–900px ──
+   BEFUND (gemessen): bei 390px sind alle Eintraege des Aktionen-Menues
+   44px hoch, bei 820px nur 36px — obwohl dort derselbe Drawer laeuft und
+   damit dasselbe Touch-Geraet. Ursache: v650 hat die Trefferflaechen auf
+   @media (max-width:768px) gelegt, v648 hat den Drawer aber auf 900px
+   gezogen. Im Band dazwischen fehlt die Regel.
+
+   Bestand schon vor v1084 — faellt hier auf, weil "funktioniert auf
+   Desktop, Tablet und Handy" zum Abnahmemass des Punktes gehoert.
+   min-height statt ::after, weil diese Zeilen wachsen duerfen (so haelt
+   es v650 fuer Akkordeon-Zeilen auch). */
+@media (min-width: 769px) and (max-width: 900px) {
+  #sb-actions-accordion .sb-act-item,
+  aside.sidebar .sb-actions-trigger {
+    min-height: 44px;
+  }
+}
