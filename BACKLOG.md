@@ -14,22 +14,7 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 ## Offen
 
-### 1 · Aktionen-Menü gliedern
-
-Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
-lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
-System**.
-
-Plan-Schranken sichtbar markieren statt verstecken — die `data-feature`-Marker
-(`track_record_pdf`, `bank_pdf_a3`, `export_csv`) stehen bereits im Markup.
-Kerosin-Kosten am Eintrag anzeigen, wo welche anfallen (Marktbericht).
-
-**Fertig, wenn:** Das Menü ist gegliedert, Schranken sind erkennbar, und es
-funktioniert auf Desktop, Tablet und Handy.
-
----
-
-### 2 · Skin-Schalter und Darstellung laufen auseinander
+### 1 · Skin-Schalter und Darstellung laufen auseinander
 
 **Der Rest von „Zugang und Plan-Schranken" — der Zugang selbst ist mit v1082
 erledigt** (Wrapper entschärft, Schranke sitzt auf der Farbsektion, Panel
@@ -53,7 +38,7 @@ Beides ist eine Produktentscheidung, keine Reparatur.
 
 ---
 
-### 3 · Handy-Sperre plan-abhängig lösen
+### 2 · Handy-Sperre plan-abhängig lösen
 
 Erst wenn 1–2 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
@@ -91,6 +76,78 @@ nichts Falsches auf.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-05] **Aktionen-Menü gliedern** — `599821f`, `bf6b546`
+
+  **Befund vorab — zwei Annahmen des Punktes stimmten nicht:**
+  Das Menü hat **11 Einträge**, nicht „eine lange Liste". Und die
+  Gliederungs-Mechanik **existierte bereits**: `.sb-act-section-title` stand
+  schon vor „Daten" und „App", nur waren die ersten sieben Einträge
+  ungruppiert. Es wurde deshalb nichts neu erfunden, sondern die vorhandene
+  Mechanik durchgezogen.
+
+  **Gliederung** nach der Backlog-Vorgabe:
+
+  | Gruppe | Einträge |
+  |---|---|
+  | Ansichten | Einzelobjekt · Portfolio-Cockpit |
+  | Analyse | Marktbericht |
+  | Anlegen | Neues Objekt · Quick Boarding · Import |
+  | Ausgeben | Track Record · Bankexport · Export |
+  | System | Einstellungen · Feedback & Support |
+
+  **Plan-Schranken — `dp-plan-gates.js` komplett neu.** Die alte Fassung
+  hatte drei Fehler auf einmal:
+  1. Sie **versteckte** per `display:none`. Der Punkt will das Gegenteil.
+  2. Sie erkannte den Eintrag über einen **Textvergleich**
+     (`textContent === 'Export'`) auf sichtbarem Nutztext — obwohl die
+     `data-feature`-Marker die ganze Zeit daneben im Markup standen. Jede
+     Umbenennung hätte sie ins Leere laufen lassen.
+  3. Sie behandelte **nur** „Export". `track_record_pdf` und `bank_pdf_a3`
+     trugen ihren Marker, wurden aber nie ausgewertet.
+
+  Jetzt bleiben gesperrte Einträge **sichtbar**, ausgegraut, mit Schloss,
+  und der Klick führt zu den Plänen statt ins Leere.
+
+  **Die Falle dabei, ausdrücklich abgesichert:** CLAUDE.md — „Unbekannter
+  Feature-Schlüssel ist für jeden `false`, auch für Pro." `hasFeature()`
+  würde bei einem Tippfehler im Marker **allen zahlenden Kunden** den
+  Eintrag wegnehmen. Deshalb wird nur gesperrt, wenn der Schlüssel
+  nachweislich in den Features irgendeines bekannten Plans vorkommt.
+  Unbekannt = offen lassen. Nachgemessen: Marker auf
+  `tippfehler_gibt_es_nicht` gesetzt → **nicht** gesperrt.
+
+  **Kerosin am Marktbericht: „ab 2 L".** Die Staffel steht in
+  `backend/src/routes/marktbericht.js:34`
+  (`COST = {fast:2, full:5, wertermittlung:12}`) — deshalb eine Spanne und
+  keine erfundene feste Zahl, die volle Staffel steht im `title`.
+
+  **Nachgemessen auf Staging, angemeldet:**
+
+  | Viewport | Ergebnis |
+  |---|---|
+  | 1440 × 900 | 5 Gruppen, 0 versteckt, Kerosin am Marktbericht |
+  | 390 × 844 | Menü 58–689, Trigger 697, **Überhang 0**, kein Ziel < 44 px |
+  | 390 × 556 | Kasten 343 px, Inhalt 686 px — scrollt in sich, letzter Eintrag per `elementFromPoint` getroffen, 44 px hoch |
+  | 820 × 1180 | alle Einträge **44 px**, 5 Gruppen, kein Überlauf |
+
+  Sperr-Pfad mit gestubbtem Plan geprüft: alle drei Einträge **sichtbar**
+  (`display` ≠ `none`), Deckkraft 0,5, Schloss da, `onclick` beiseitegelegt.
+
+  **Eine Zwischendiagnose nehme ich ausdrücklich zurück:** Ich hatte bei
+  390 × 556 „383 px abgeschnitten" gemeldet. Falsch — der innere Container
+  scrollt (`scrollHeight 686`, `clientHeight 341`, `overflow-y:auto`); ich
+  hatte ungescrollten Inhalt für abgeschnittenen gehalten. Ebenso war das
+  gleichzeitige `max-height` **und** `bottom` am Kasten ein Artefakt meiner
+  iframe-Messkabine: `resize` feuert im gedrosselten Tab nicht, also lief
+  `_sbActionsDock()` nach dem Verkleinern nie neu. Nach manuellem Aufruf
+  stand nur noch `max-height` — der v647-Code ist in Ordnung.
+
+  **Nebenbefund, mitbehoben (v1084b):** Bei 820 px waren alle Einträge nur
+  **36 px** hoch, bei 390 px dagegen 44. v650 hatte die Trefferflächen auf
+  `max-width:768px` gelegt, v648 den Drawer aber auf 900 px gezogen — im
+  Band dazwischen fehlte die Regel. Bestand schon vorher; gehört hierher,
+  weil „funktioniert auf Desktop, Tablet und Handy" das Abnahmemaß ist.
 
 - [2026-08-05] **Partner-Netzwerk lädt nicht** — `253664a`
 
