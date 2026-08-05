@@ -32744,7 +32744,7 @@ body.dp-sidebar-collapsed .main-col { grid-column: auto !important; }
 /* Header/Logo: DP-Logo bleibt, geschrumpft + zentriert */
 body.dp-sidebar-collapsed #sidebar .sb-header { padding:8px 0 !important; min-height:0 !important; }
 body.dp-sidebar-collapsed #sidebar .app-logo-simple-wrap-sidebar { margin:6px auto !important; justify-content:center; }
-body.dp-sidebar-collapsed #sidebar .app-logo-simple-sidebar { height:auto !important; width:46px !important; object-fit:contain; }
+/* v1079-LOGO: tote Regel entfernt — die spaetere display:none-Regel gewinnt ohnehin. */
 
 /* Portfolio-Titel: Icon bleibt, Text + Sortier-Toggle aus */
 body.dp-sidebar-collapsed #sidebar .sb-section-title { font-size:0 !important; justify-content:center !important; padding:8px 0 !important; }
@@ -35630,7 +35630,7 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-side
 
 body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   width: var(--dp-logo-w, 100%) !important;
-  max-width: var(--dp-logo-max, 232px) !important;
+  max-width: 100% !important;   /* v1079-LOGO: Deckel 232px raus, Breite kommt vom Kasten */
   height: auto !important;
   max-height: none !important;
   object-fit: contain !important;
@@ -36285,4 +36285,43 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
     height: max(100%, 44px);
     background: transparent;
   }
+}
+
+
+/* ═══ v1079-LOGO ═══════════════════════════════════════════════
+   Der Goldrahmen der Sidebar-Wortmarke wird ab hier gezeichnet, nicht mehr
+   aus dem PNG geholt. Bei jedem Zoom und jeder DPI exakt 2px scharf, und er
+   erbt die Whitelabel-Farbe, statt den DealPilot-Ton fest ins Bild zu backen.
+   Steht bewusst am Dateiende — die dp-chrome-hell-Regel weiter oben setzt
+   border-color auf die Header-Farbe und wuerde den Rahmen sonst wegfaerben.
+   Der eingeklappte Zustand ist per :not() ausgenommen und zeigt weiter die
+   Buchstaben "D"/"P" aus ::before/::after.
+   ------------------------------------------------------------------ */
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+  box-sizing: border-box !important;
+  width: 92% !important;
+  margin: 10px auto !important;
+  padding: 13px 16px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 2px solid var(--wl-c9a84c, #C9A84C) !important;
+  border-radius: 14px !important;
+  background: transparent !important;
+}
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+  width: var(--dp-logo-w, 100%) !important;   /* Groesse-Regler bleibt wirksam */
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+/* Hellmodus: schwarzer Kasten aus CSS statt zweiter Bilddatei. */
+body.dp-chrome-hell:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar,
+body[data-dp-skin="hell"]:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+  background: #050505 !important;
+  border-color: var(--wl-c9a84c, #C9A84C) !important;
 }

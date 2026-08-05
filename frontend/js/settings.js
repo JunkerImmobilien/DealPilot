@@ -3117,7 +3117,7 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     try{ if(window.DealPilotConfig&&DealPilotConfig.branding) DealPilotConfig.branding.setTheme({accent:'#C9A84C'}); }catch(e){}
     _dpDispRefresh(); try{ if(typeof toast==='function') toast('Darstellung zur\u00fcckgesetzt'); }catch(e){}
   };
-  function _swapLogo(hell){ try{ var l=document.querySelector('.app-logo-simple-sidebar'); if(!l)return; if(!l.getAttribute('data-logo-dark')) l.setAttribute('data-logo-dark',l.getAttribute('src')||''); l.setAttribute('src',hell?'assets/dealpilot-logo-rahmen-hell.png':l.getAttribute('data-logo-dark')); }catch(e){} }
+  function _swapLogo(hell){ try{ var l=document.querySelector('.app-logo-simple-sidebar'); if(!l)return; if(!l.getAttribute('data-logo-dark')) l.setAttribute('data-logo-dark',l.getAttribute('src')||''); l.setAttribute('src','assets/dealpilot-wortmarke.png'); /* v1079-LOGO: kein Tausch mehr noetig */ }catch(e){} }
   function _mark(sel,attr,val){ var w=document.querySelector(sel); if(!w)return; w.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b.getAttribute(attr)===String(val)); }); }
   function _msw(sel,attr,val){ var w=document.querySelector(sel); if(!w)return; w.querySelectorAll('.dp-swatch').forEach(function(b){ b.classList.toggle('active',(b.getAttribute(attr)||'').toLowerCase()===String(val||'').toLowerCase()); }); }
   window._dpDispRefresh=function(){ try{
@@ -3150,7 +3150,7 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
   function _swapLogoByHeader(hdr){ try{ var l=document.querySelector('.app-logo-simple-sidebar'); if(!l)return;
       if(!l.getAttribute('data-logo-dark')) l.setAttribute('data-logo-dark', l.getAttribute('src')||'');
       var dark=(lum(hdr||'#EAE4D6')<0.5);
-      l.setAttribute('src', dark ? l.getAttribute('data-logo-dark') : 'assets/dealpilot-logo-rahmen-hell.png'); }catch(e){} }
+      l.setAttribute('src', 'assets/dealpilot-wortmarke.png'); /* v1079-LOGO */ }catch(e){} }
   window._dpDispHeader=function(h){ document.body.style.setProperty('--dp-header-bg',h); LS('dp_hdr_ui',h); _swapLogoByHeader(h); };
   window._dpDispSide  =function(h){ document.body.style.setProperty('--dp-side-bg',h);   LS('dp_side_ui',h); };
   window._dpDispKpi   =function(h){ document.body.style.setProperty('--dp-kpi-card',h);  LS('dp_kpi_ui',h); };
@@ -3418,8 +3418,8 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
    dealpilot-logo-rahmen zeigt.
    =================================================================== */
 (function(){
-  var DARK  = 'assets/dealpilot-logo-rahmen.png';       /* weisse Wortmarke -> dunkler Grund */
-  var LIGHT = 'assets/dealpilot-logo-rahmen-hell.png';  /* dunkle Wortmarke -> heller Grund  */
+  var DARK  = 'assets/dealpilot-wortmarke.png';   /* v1079-LOGO: eine Datei, Kasten aus CSS */       /* weisse Wortmarke -> dunkler Grund */
+  var LIGHT = 'assets/dealpilot-wortmarke.png';   /* v1079-LOGO */  /* dunkle Wortmarke -> heller Grund  */
 
   function lumOf(el){
     var guard = 0;
@@ -3444,7 +3444,7 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
       if (!l) return;
       var src = l.getAttribute('src') || '';
       /* Fremdes Logo (eigenes Upload / Whitelabel) bleibt unangetastet */
-      if (src.indexOf('dealpilot-logo-rahmen') < 0) return;
+      if (src.indexOf('dealpilot-logo-rahmen') < 0 && src.indexOf('dealpilot-wortmarke') < 0) return;   /* v1079-LOGO */
       /* Damit config.js applyTheme() und v931 fixLogo() den richtigen
          Ruecksprungwert haben, statt versehentlich das helle festzuhalten */
       l.setAttribute('data-logo-dark', DARK);
