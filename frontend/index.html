@@ -24,7 +24,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=W49"><!-- v650-tabs-mobile -->
+<link rel="stylesheet" href="css/style.css?v=W50"><!-- v650-tabs-mobile -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1082k">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -658,23 +658,46 @@ label.dp-required.qc-required::after {
   <!-- V63.57: Aktionen-Akkordeon mit neuer Reihenfolge + Import/Export-Sektionen -->
   <div class="sb-actions-accordion" id="sb-actions-accordion">
     <div class="sb-actions-accordion-inner">
-      <!-- Hauptaktionen (Dashboard entfernt - jetzt ueber Portfolio-Cockpit in der Sidebar) -->
+      <!-- v1084-aktionen: gegliedert nach Ansichten · Analyse · Anlegen ·
+           Ausgeben · System (Backlog Punkt 1).
+           Die Gliederungs-Mechanik gab es SCHON — .sb-act-section-title stand
+           bereits vor "Daten" und "App", nur waren die ersten sieben Eintraege
+           ungruppiert. Hier wird sie durchgezogen, nicht neu erfunden.
+           Reihenfolge und Namen der Gruppen kommen aus dem Backlog.
+           data-feature bleibt unveraendert — dp-plan-gates.js liest es jetzt
+           aus, statt Eintraege am Text zu erkennen. -->
+
+      <div class="sb-act-section-title">Ansichten</div>
+      <button class="sb-act-item" type="button" data-act="view-single" onclick="sbActionsAction('view-single')">
+        <span class="sb-act-ico" data-icon="single"></span><span class="sb-act-l">Einzelobjekt</span>
+      </button>
+      <!-- v844-cockpit-action: Portfolio-Cockpit als Aktion -->
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('cockpit')">
+        <span class="sb-act-ico" data-icon="cockpit"></span><span class="sb-act-l">Portfolio-Cockpit</span>
+      </button>
+
+      <div class="sb-act-section-title">Analyse</div>
+      <!-- Kerosin steht am Eintrag, weil hier welches anfaellt. Die Staffel
+           kommt aus backend/src/routes/marktbericht.js:34
+           (COST = { fast: 2, full: 5, wertermittlung: 12 }) — deshalb "ab 2 L"
+           und keine feste Zahl. -->
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('marktbericht')">
+        <span class="sb-act-ico" data-icon="market"></span><span class="sb-act-l">Marktbericht</span><span class="sb-act-kero" title="Kerosin-Kosten je nach Umfang: 2 L Kurzbericht, 5 L Vollbericht, 12 L mit Wertermittlung">ab 2 L</span>
+      </button>
+
+      <div class="sb-act-section-title">Anlegen</div>
       <button class="sb-act-item" type="button" onclick="sbActionsAction('new')">
         <span class="sb-act-ico" data-icon="new"></span><span class="sb-act-l">Neues Objekt</span>
       </button>
       <button class="sb-act-item sb-act-accent" type="button" onclick="sbActionsAction('quickcheck')">
         <span class="sb-act-ico" data-icon="quickcheck"></span><span class="sb-act-l">Quick Boarding</span>
       </button>
-      <!-- v844-cockpit-action: Portfolio-Cockpit als Aktion (dritte Stelle) -->
-      <button class="sb-act-item" type="button" onclick="sbActionsAction('cockpit')">
-        <span class="sb-act-ico" data-icon="cockpit"></span><span class="sb-act-l">Portfolio-Cockpit</span>
+      <!-- V63.57: Import & Export jeweils EIN Hub-Button — oeffnen Modal mit Karten -->
+      <button class="sb-act-item" type="button" onclick="sbActionsAction('hub-import')">
+        <span class="sb-act-ico" data-icon="import-hub"></span><span class="sb-act-l">Import</span>
       </button>
-      <button class="sb-act-item" type="button" onclick="sbActionsAction('marktbericht')">
-        <span class="sb-act-ico" data-icon="market"></span><span class="sb-act-l">Marktbericht</span>
-      </button>
-      <button class="sb-act-item" type="button" data-act="view-single" onclick="sbActionsAction('view-single')">
-        <span class="sb-act-ico" data-icon="single"></span><span class="sb-act-l">Einzelobjekt</span>
-      </button>
+
+      <div class="sb-act-section-title">Ausgeben</div>
       <!-- v816h-no-allobjects: Akkordeon-Eintrag entfernt -->
       <button class="sb-act-item" type="button" onclick="sbActionsAction('trackrec')" data-feature="track_record_pdf">
         <span class="sb-act-ico" data-icon="trackrec"></span><span class="sb-act-l">Track Record</span>
@@ -682,18 +705,12 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item" type="button" onclick="sbActionsAction('bankexport')" data-feature="bank_pdf_a3">
         <span class="sb-act-ico" data-icon="bankexport"></span><span class="sb-act-l">Bankexport</span>
       </button>
-
-      <!-- V63.57: Import & Export jeweils EIN Hub-Button — öffnen Modal mit Karten -->
-      <div class="sb-act-section-title">Daten</div>
-      <button class="sb-act-item" type="button" onclick="sbActionsAction('hub-import')">
-        <span class="sb-act-ico" data-icon="import-hub"></span><span class="sb-act-l">Import</span>
-      </button>
       <button class="sb-act-item" type="button" data-feature="export_csv" onclick="sbActionsAction('hub-export')">
         <span class="sb-act-ico" data-icon="export-hub"></span><span class="sb-act-l">Export</span>
       </button>
 
       <!-- V63.73: App-Bereich — Einstellungen, Hilfe, Feedback -->
-      <div class="sb-act-section-title">App</div>
+      <div class="sb-act-section-title">System</div>
       <button class="sb-act-item" type="button" onclick="sbActionsAction('settings')">
         <span class="sb-act-ico" data-icon="settings"></span><span class="sb-act-l">Einstellungen</span>
       </button>
@@ -3011,7 +3028,7 @@ label.dp-required.qc-required::after {
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
 <script src="js/help.js?v=860"></script>
   <script src="js/dp-band-fix.js?v=863"></script> <!-- v863-band-fix -->
-  <script src="js/dp-plan-gates.js?v=875"></script> <!-- v874-plan-gates -->
+  <script src="js/dp-plan-gates.js?v=v1084"></script> <!-- v874-plan-gates -->
   <script src="js/tour-engine.js?v=872"></script>
   <script src="js/tour-content.js?v=873"></script>
 <!-- V63.73: Feedback & Support Modal -->

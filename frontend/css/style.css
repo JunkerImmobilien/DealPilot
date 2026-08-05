@@ -36373,3 +36373,70 @@ body[data-dp-skin="hell"]:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-
     border-radius: 9px !important;
   }
 }
+
+
+/* ═══ v1084-aktionen ═══════════════════════════════════════════════
+   Backlog Punkt 1 — Aktionen-Menue gegliedert, Schranken sichtbar,
+   Kerosin am Eintrag.
+
+   Die Gliederung selbst brauchte KEIN neues CSS: .sb-act-section-title
+   gab es schon (stand vor "Daten" und "App"), sie war nur nicht
+   durchgezogen. Hier kommen nur die zwei neuen Teile dazu.
+   ------------------------------------------------------------------ */
+
+/* Kerosin-Hinweis am Eintrag. Steht rechts, druckt sich nicht vor das
+   Label und schrumpft nie unter die Lesbarkeit. */
+#sb-actions-accordion .sb-act-kero {
+  margin-left: auto;
+  flex: 0 0 auto;
+  font: 700 9.5px/1 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: .06em;
+  padding: 3px 6px;
+  border-radius: 5px;
+  color: var(--wl-9a7f33, #9a7f33);
+  background: var(--wl-faf5e8, #FAF5E8);
+  border: 1px solid var(--wl-ece0c2, #ECE0C2);
+  white-space: nowrap;
+}
+/* Auf dunklem Grund traegt der Cremeton nicht — dort als Kontur. */
+body:not(.dp-chrome-hell) #sb-actions-accordion .sb-act-kero {
+  color: var(--gold);
+  background: transparent;
+  border-color: color-mix(in srgb, var(--gold) 40%, transparent);
+}
+
+/* ── Gesperrte Eintraege ──
+   SICHTBAR gesperrt, nicht versteckt. Der Eintrag bleibt lesbar und
+   anklickbar (der Klick zeigt die Plaene), wirkt aber deutlich
+   zurueckgenommen. Kein display:none — das war der alte Fehler. */
+#sb-actions-accordion .sb-act-item.sb-act-locked {
+  opacity: .5;
+  cursor: pointer;
+}
+#sb-actions-accordion .sb-act-item.sb-act-locked .sb-act-l {
+  text-decoration: none;
+}
+#sb-actions-accordion .sb-act-item.sb-act-locked .sb-act-lock {
+  margin-left: auto;
+  flex: 0 0 auto;
+  font-size: 0;                 /* der Punkt aus dem Markup verschwindet */
+  line-height: 1;
+  width: 13px;
+  height: 15px;
+  align-self: center;
+  /* Schloss als Zeichnung, damit es bei jeder DPI scharf ist und die
+     Whitelabel-Farbe erbt. var() greift in SVG-Praesentationsattributen
+     nicht — deshalb currentColor plus color am Traeger. */
+  color: var(--wl-9a7f33, #9a7f33);
+  background: currentColor;
+  -webkit-mask: no-repeat center / 13px 15px url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E");
+          mask: no-repeat center / 13px 15px url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E");
+}
+#sb-actions-accordion .sb-act-item.sb-act-locked:hover { opacity: .72; }
+
+/* Handy: der Kerosin-Hinweis und das Schloss duerfen die Trefferflaeche
+   nicht schmaeler machen — die 44px aus v650 bleiben unangetastet. */
+@media (max-width: 900px) {
+  #sb-actions-accordion .sb-act-kero { font-size: 10px; padding: 4px 7px; }
+  #sb-actions-accordion .sb-act-item.sb-act-locked .sb-act-lock { width: 15px; height: 17px; }
+}
