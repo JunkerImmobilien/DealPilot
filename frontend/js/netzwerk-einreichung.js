@@ -22,8 +22,13 @@
   function token() { try { return localStorage.getItem('ji_token') || ''; } catch (e) { return ''; } }
   function isPro() {
     try {
-      if (window.DealPilotConfig && DealPilotConfig.pricing && typeof DealPilotConfig.pricing.currentKey === 'function') {
-        return DealPilotConfig.pricing.currentKey() === 'pro';
+      /* v1081-planfamilie: war === 'pro'. Der Partner-Plan ist ein erweiterter
+         Pro — er bekam hier den "Pro freischalten"-Teaser statt des Formulars
+         und konnte keine Partnerkarte einreichen. */
+      var p = window.DealPilotConfig && DealPilotConfig.pricing;
+      if (p && typeof p.isProOrAbove === 'function') return p.isProOrAbove();
+      if (p && typeof p.currentKey === 'function') {
+        var k = p.currentKey(); return (k === 'pro' || k === 'partner');
       }
     } catch (e) {}
     return false;

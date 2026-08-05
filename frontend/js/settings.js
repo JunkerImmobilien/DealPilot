@@ -1356,8 +1356,12 @@ function _v192ShowProHintIfNeeded() {
     // Plan checken
     var isPro = false;
     try {
-      if (window.DealPilotConfig && window.DealPilotConfig.pricing) {
-        isPro = (window.DealPilotConfig.pricing.currentKey() === 'pro');
+      /* v1081-planfamilie: war === 'pro' und sperrte den Partner aus */
+      var _p = window.DealPilotConfig && window.DealPilotConfig.pricing;
+      if (_p && typeof _p.isProOrAbove === 'function') {
+        isPro = _p.isProOrAbove();
+      } else if (_p && _p.currentKey) {
+        var _k = _p.currentKey(); isPro = (_k === 'pro' || _k === 'partner');
       }
     } catch(e){}
     

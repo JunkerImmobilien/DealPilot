@@ -467,6 +467,24 @@ window.DealPilotConfig = (function() {
     return 'free';
   }
 
+  /* ═══ v1081-planfamilie ═══════════════════════════════════════════
+     'partner' ist ein ERWEITERTER 'pro' — reseller-portal.js:568 klont dafuer
+     die Pro-Features in PRICING.partner ("Partner ist ein erweiterter Pro").
+     Fuenf Stellen verglichen trotzdem hart auf currentKey() === 'pro' und
+     sperrten damit ausgerechnet den HOEHEREN Plan aus:
+       netzwerk-einreichung.js:26  Netzwerk-Einreichung -> Teaser statt Formular
+       deal-action.js:60           Deal-Aktion-Konfiguration
+       apikeys.js:12               API-Zugang (Partner hat api_access in der DB)
+       settings.js:1360            Branding-Routing
+       config.js:846               Farbpalette (_isPalette)
+     settings.js:3164/3247 machen es richtig ((k==='pro'||k==='partner')) —
+     das ist die Vorlage. Ab hier gibt es dafuer EINE Quelle.
+     Erweitert sich die Familie, steht die Liste an genau einer Stelle. */
+  var PRO_FAMILIE = ['pro', 'partner'];
+  function isProOrAbove() {
+    try { return PRO_FAMILIE.indexOf(getCurrentPlanKey()) >= 0; } catch (e) { return false; }
+  }
+
   function setPlanOverride(key) {
     if (PRICING[key]) {
       localStorage.setItem('dp_plan_override', key);
@@ -531,6 +549,7 @@ window.DealPilotConfig = (function() {
       get: getPlan,
       current: getCurrentPlan,
       currentKey: getCurrentPlanKey,
+      isProOrAbove: isProOrAbove,   /* v1081-planfamilie: 'pro' ODER 'partner' */
       setOverride: setPlanOverride,
       getPrice: getPrice,
       getEffectiveMonthlyPrice: getEffectiveMonthlyPrice,
@@ -843,7 +862,8 @@ window.Plan = {
   function _isPalette(){ /*v904-palette-fix*/
     if(window.DP_THEME_PALETTE_FORCE===true) return true;            // Test/Dev-Bypass
     try{
-      if(DPC.pricing.currentKey && DPC.pricing.currentKey()==='pro') return true;   // Frontend-only: an Plan-Key
+      /* v1081-planfamilie: war ==='pro' und sperrte den Partner (hoeherer Plan) aus */
+      if(DPC.pricing.isProOrAbove && DPC.pricing.isProOrAbove()) return true;   // Frontend-only: an Plan-Key
       if(DPC.pricing.hasFeature && DPC.pricing.hasFeature('theme_palette')) return true;  // spaeter, wenn Backend es kennt
     }catch(e){}
     return false;

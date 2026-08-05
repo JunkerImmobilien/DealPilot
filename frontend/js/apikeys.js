@@ -8,8 +8,12 @@
 
   function _isPro() {
     try {
-      var c = window.DealPilotConfig;
-      return !!(c && c.pricing && c.pricing.currentKey && c.pricing.currentKey() === 'pro');
+      /* v1081-planfamilie: war === 'pro'. Der Partner hat api_access in der DB,
+         wurde hier aber trotzdem ausgesperrt. */
+      var p = window.DealPilotConfig && window.DealPilotConfig.pricing;
+      if (p && typeof p.isProOrAbove === 'function') return p.isProOrAbove();
+      if (p && p.currentKey) { var k = p.currentKey(); return (k === 'pro' || k === 'partner'); }
+      return false;
     } catch (e) { return false; }
   }
   function _esc(s) {

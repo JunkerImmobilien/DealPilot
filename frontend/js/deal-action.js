@@ -55,9 +55,12 @@ window.DealPilotDealAction = (function() {
     try {
       // Plan-Check
       var isPro = false;
-      if (window.DealPilotConfig && window.DealPilotConfig.pricing &&
-          typeof window.DealPilotConfig.pricing.currentKey === 'function') {
-        isPro = (window.DealPilotConfig.pricing.currentKey() === 'pro');
+      /* v1081-planfamilie: war === 'pro' und sperrte den Partner aus */
+      var _p = window.DealPilotConfig && window.DealPilotConfig.pricing;
+      if (_p && typeof _p.isProOrAbove === 'function') {
+        isPro = _p.isProOrAbove();
+      } else if (_p && typeof _p.currentKey === 'function') {
+        var _k = _p.currentKey(); isPro = (_k === 'pro' || _k === 'partner');
       }
       if (!isPro) return base;
       
