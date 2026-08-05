@@ -518,7 +518,7 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-top > .sbc-top-b
    Spalte 2, damit links der Ring Platz hat. */
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-top-line1 {
   grid-row: 1 !important; grid-column: 2 !important;
-  z-index: 2 !important; margin: 0 !important; padding: 8px 9px 0 0 !important;
+  z-index: 2 !important; margin: 0 !important; padding: 8px 86px 0 0 !important;
 }
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-address {
   grid-row: 2 !important; grid-column: 2 !important;
@@ -549,9 +549,15 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-kp-row {
    KARTE und absolut positioniert — deshalb hier ueber left/right, nicht
    ueber das Raster. */
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-score-overlay {
+  /* v1082j: Ring links, Stufen-Pille RECHTS ans Bandende — so steht es
+     auch im Mockup. Zuvor stand die Pille direkt neben dem Ring und
+     ueberdeckte dort die Objektnummer (gemessen: Pille x 65-127,
+     Nummer ab x 84). Das Overlay spannt deshalb ueber die volle
+     Bandbreite und schiebt die beiden auseinander. */
   left: 9px !important;
-  right: auto !important;
+  right: 9px !important;
   top: 8px !important;
+  justify-content: space-between !important;
   z-index: 3 !important;
   display: flex !important;
   /* v1082i: align-items allein reichte nicht — das Overlay erbt anderswoher
