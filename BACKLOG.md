@@ -11,47 +11,10 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 **Vorlagen und Bilder:** `design/` (Mockups, Logos). Siehe `design/README.md`.
 
 ---
-
 ## Offen
 
-### 1 · Skin-Schalter und Darstellung laufen auseinander
-
-**Der Rest von „Zugang und Plan-Schranken" — der Zugang selbst ist mit v1082
-erledigt** (Wrapper entschärft, Schranke sitzt auf der Farbsektion, Panel
-öffnet für jeden Plan). Offen ist die Produktentscheidung, die dort schon
-vermerkt war:
-
-Der Skin-Schalter Hell/Obsidian (`_dpDispSkin`, Merker `dp_chrome_hell`,
-`body.dp-chrome-hell` mit 105 Regeln) existiert **weiterhin separat** neben
-den neuen Vorlagen. Damit gibt es zwei Mechaniken für dieselbe Frage — genau
-das Muster, das bei den vier Umschalt-Mechaniken der Seitenleiste teuer war.
-
-Gemessen: Beide greifen gleichzeitig und stören sich nicht, weil
-`html[data-ui-theme="…"]` (0,2,1) über `body.dp-chrome-hell` (0,2,0) liegt.
-Die Vorlage gewinnt also. Aber der Nutzer kann „Hell" schalten **und**
-„Konsole" wählen und bekommt dann Konsole — der Hell-Schalter wirkt
-scheinbar folgenlos.
-
-**Zu entscheiden:** entweder der Skin-Schalter verschwindet und „Hell"
-wird zur Vorlage `kontor`, oder er wird an die Darstellung gekoppelt.
-Beides ist eine Produktentscheidung, keine Reparatur.
-
----
-
-### 2 · Handy-Sperre plan-abhängig lösen
-
-Erst wenn 1–2 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
-**aktiv**.
-
-Freigabe ab Partner-Plan, gilt auch für dessen Mandanten. Der Haken: die Sperre
-prüft beim Laden, der Plan kommt erst mit `dp:plan-ready`. Lösung: aus dem
-gecachten `dp_last_plan` entscheiden, dann `_dpMobileBlock.evaluate()` bei
-`dp:plan-ready` erneut rufen — der Korrekturpfad ist vorhanden. **Immer erst
-sperren, dann freigeben, nie umgekehrt.**
-
-**Fertig, wenn:** Partner sieht auf dem Telefon die Hauptansicht, alle anderen
-weiterhin den Hinweis, und beim ersten Login auf einem neuen Gerät blitzt
-nichts Falsches auf.
+_Aktuell nichts. Alle Punkte sind unter **Fertig** dokumentiert; die
+nächsten Vorhaben stehen unter **Später**._
 
 ---
 
@@ -76,6 +39,80 @@ nichts Falsches auf.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-05] **Handy-Sperre plan-abhängig lösen** — `9f6b3ba`
+
+  `js/mobile-redirect.js` steht in CLAUDE.md unter **Nicht anfassen**. Die
+  Vorbedingung dieses Punktes („erst wenn 1–2 stehen") war erfüllt, und der
+  Punkt beschrieb die Änderung samt Lösungsweg — deshalb angefasst.
+
+  **Der Haken, den der Punkt selbst benannte:** Die Datei läuft bewusst
+  **ohne** `setTimeout` („bei einer Sperre darf es kein offenes Zeitfenster
+  geben"). Der Plan steht zu diesem Zeitpunkt aber noch nicht fest, weil
+  `Sub.getCurrent` ein Netzaufruf ist. Entschieden wird deshalb **nur aus
+  dem Cache**:
+
+  | Schlüssel | Bedeutung |
+  |---|---|
+  | `dp_last_plan` | zuletzt bekannter Plan (`subscription.js:101`) |
+  | `dp_wl_cache` | Reseller-Branding — existiert **ausschließlich** bei einem `reseller_client` (`mandant-branding.js:230`, das Backend liefert für Owner `null`). Damit ist es das gecachte Kennzeichen „Mandant eines Partners". |
+
+  **Immer erst sperren, dann freigeben.** Leerer Cache heißt Sperre. Der
+  Korrekturpfad hängt an `dp:plan-ready`, nicht an einem Timer.
+
+  **Nachgemessen (Touch-Zeiger nachgestellt, damit `isPhone()` greift):**
+
+  | Fall | Ergebnis |
+  |---|---|
+  | kein Cache (neues Gerät) | **gesperrt** |
+  | Plan `pro` | gesperrt |
+  | Plan `free` | gesperrt |
+  | Plan `partner` | **frei** |
+  | Mandant (`dp_wl_cache` gesetzt) | **frei** |
+
+  Korrekturpfad: leerer Cache → gesperrt; danach `dp:plan-ready` mit
+  `partner` → **frei**. Gegenprobe: dasselbe Signal mit `free` → bleibt
+  **gesperrt**. Beim ersten Login auf einem neuen Gerät blitzt damit nichts
+  Falsches auf — es steht die Sperre, und die weicht erst, wenn der Plan sie
+  widerlegt.
+
+  Die Erkennungsregeln (Regel A/B, Tablet-Schwelle 1400 px) und die
+  Testhintertür `?nomobileblock` sind unangetastet.
+
+- [2026-08-05] **Skin-Schalter und Darstellung liefen auseinander** — `9f6b3ba`
+
+  **Entschieden: koppeln, nicht löschen.** Der Punkt ließ beides offen.
+  Drei Gründe für die Kopplung:
+
+  1. `body.dp-chrome-hell` trägt **105 gewachsene Regeln**. Die zu entfernen
+     ist ein eigenes Vorhaben mit eigener Prüfstrecke, kein Nebenzug.
+  2. `darstellung-reseller.js:29` und `mandant-branding.js:156` rufen
+     `_dpDispSkin`, um die Marke eines Partners an dessen Mandanten
+     durchzureichen. Fällt die Funktion weg, bricht das Whitelabel.
+  3. Gemessen **stören** sich beide nicht — `html[data-ui-theme]` (0,2,1)
+     liegt über `body.dp-chrome-hell` (0,2,0), die Vorlage gewinnt. Das
+     Problem war nicht Kollision, sondern **Auseinanderlaufen**: „Hell"
+     schalten und „Konsole" wählen ergab Konsole, der Schalter wirkte
+     folgenlos.
+
+  Umhüllt nach dem Hausmuster aus `settings.js:3469` — das Verhalten der
+  Originalfunktion bleibt unangetastet, es kommt nur etwas dahinter.
+  Wächter-Flag gegen den Ringschluss.
+
+  **Nachgemessen, fünf Fälle:**
+
+  | Schritt | Vorlage | `dp_chrome_hell` |
+  |---|---|---|
+  | Skin = hell | `kontor` | 1 |
+  | Skin = obsidian | *(entfernt)* | 0 |
+  | Vorlage = konsole | `konsole` | 0 |
+  | Vorlage = boarding | `boarding` | 1 |
+  | Panel aktiv, dann Skin = hell | **`panel` bleibt** | 1 |
+
+  Der letzte Fall ist der wichtige: Wer „Hell" schaltet und schon auf einer
+  hellen Vorlage steht, behält sie. Nachgezogen wird nur, wenn die Vorlage
+  der neuen Helligkeit **widerspricht** — sonst würde der Schalter eine
+  bewusste Wahl überschreiben.
 
 - [2026-08-05] **Aktionen-Menü gliedern** — `599821f`, `bf6b546`
 
