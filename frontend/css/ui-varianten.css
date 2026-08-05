@@ -720,6 +720,18 @@ html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbcm-info { color: #
 html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
   padding: 11px 13px !important;
   min-height: 0 !important;
+  /* v1086b — ZUM ZWEITEN MAL derselbe Fehler, deshalb hier ausdruecklich:
+     justify-content allein reichte nicht. Gemessen sass das Logo bei 119px
+     statt 13 — exakt die Mitte von 353px Innenbreite bei 141px Logo. Ursache:
+     die Flex-RICHTUNG war nicht gesetzt. Steht sie auf column, steuert
+     justify-content die senkrechte und align-items die waagerechte Achse —
+     das geerbte align-items:center hat also zentriert, waehrend mein
+     justify-content:flex-start auf der anderen Achse ins Leere lief.
+     Dieselbe Ursache wie bei der Wallet-Stufenpille (v1082i). Ab jetzt wird
+     die Richtung mitgesetzt, wo Ausrichtung gesetzt wird. */
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
   justify-content: flex-start !important;
   border-bottom: 1px solid var(--uv-chrome-line) !important;
 }
@@ -733,6 +745,9 @@ html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-l
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
   justify-content: flex-start !important;
 }
 html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
