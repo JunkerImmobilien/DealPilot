@@ -66,128 +66,7 @@ war.
 
 ---
 
-## Als Nächstes — die neue Darstellung
-
-Vorlage: `design/mockups/dp-darstellung-panel.html` — der abgenommene
-Zielzustand. Nicht danebenbauen, dagegen bauen.
-
----
-
-### 2 · Darstellungs-Modal mit festen UI-Vorlagen
-
-**Das Kernstück.** Heute ist die Oberfläche B2C-Optik: Obsidian, Gold,
-Leuchten, Verläufe. Ein Berater, der sie vor dem Mandanten öffnet, braucht
-etwas Ruhigeres. Deshalb **fünf bis sechs fertige Vorlagen** zur Auswahl —
-nicht einzelne Schalter, die man selbst zusammenstellen muss.
-
-**Wo:** Einstellungen → Profil & Anzeige → „Darstellung öffnen". Das
-Einstellungsfenster schließt, das Darstellungs-Modal geht auf. Dort die
-Vorlagen zur Auswahl, darunter die Farbeinstellungen.
-
-**Eine Vorlage stellt gemeinsam um:**
-- Kopfleiste (Farbe, Höhe, Radien, welche Anzeigen sichtbar sind)
-- Seitenleiste und Aktionen-Menü
-- Objektkarten-Modus
-- Logo-Variante (hell / dunkel / nur Bildmarke)
-- Radien, Schatten, Randstärken, Typografie
-
-**Vorschlag für die Vorlagen** — Namen und Zuschnitt vor der Umsetzung
-abstimmen:
-
-| Vorlage | Charakter | Für wen |
-|---|---|---|
-| **DealPilot** | Obsidian & Gold, wie heute | Standard, niemand muss umstellen |
-| **Kontor** | Reinweiß, Haarlinien, kein Radius, kein Schatten | maximale Ruhe, viele Objekte |
-| **Panel** | Kühles Grau-Weiß, weiche Radien, feiner Schatten | neutralster Untergrund fürs Whitelabel |
-| **Kanzlei** | Hell mit Serife, viel Weißraum, Panels ohne Rahmen | Berater vor dem Mandanten |
-| **Boarding** | Creme, Markenstreifen, Ticket-Karten | markentreu, aber hell |
-| **Konsole** | Dicht, Monospace, ohne Fotos | Bestandshalter mit 40+ Objekten |
-
-**Darüber liegen die Farbeinstellungen:** Akzent, Obsidian/Grundfarbe,
-Mail-Akzent. Jede Vorlage lässt sich damit an das Branding des Partners
-anpassen — die Vorlage bestimmt die **Form**, die Farbe kommt vom Partner.
-
-**Zwingend:**
-- `dealpilot` trägt **kein** Attribut → wer nicht umschaltet, bekommt die App
-  bitgenau wie heute
-- Gold bleibt `var(--gold)`, damit Whitelabel weiter mitfärbt
-- Statusfarben Grün `#3FA56C` und Rot `#B8625C` werden nie angefasst
-- Die Wahl bleibt gespeichert und überlebt das Neuladen
-
-**Teuer bezahlt, steht auch in CLAUDE.md:** Token zu überschreiben reicht
-**nicht**. `--surface`, `--border`, `--muted` landen korrekt, werden von der
-dunklen Fassung aber nicht benutzt. Kopfleiste, Tabs und Sidebar hängen an
-später gesetzten, harten Regeln. Jede farbtragende Fläche muss **einzeln
-benannt** werden — rund 51 Selektoren, die Liste steckt im vorhandenen
-Hell-Skin `body.dp-chrome-hell`.
-
-**Vorlage:** `design/mockups/dp-darstellung-panel.html` — Panel rechts, App
-links live. Genau dieses Verhalten ist gemeint.
-
-**Namen und Zuschnitt sind am 2026-08-05 abgenommen** — die sechs oben stehen.
-
----
-
-**Vorarbeit 2026-08-05 — die Architektur ist gemessen, nicht mehr geraten.**
-Damit ist der Bauplan festgelegt; es fehlt nur noch die Umsetzung und die
-Abnahme.
-
-**1 · Die zwei Dateien sind bereits verlinkt und leer.**
-`index.html:29` lädt `css/ui-varianten.css`, `:3466` lädt
-`js/ui-varianten.js` — beide existieren nicht (die zwei 404 aus „Später").
-Das CSS liegt **direkt nach `style.css`**, der Kommentar dort sagt schon
-„damit `html[data-ui-*]` greift". Der Platz ist also vorbereitet. Diese zwei
-Dateien zu füllen erledigt den 404-Punkt gleich mit.
-
-**2 · Die Flächenzahl stimmt.** Im laufenden DOM bei 1920 px gemessen:
-**65 Elemente mit deckender Hintergrundfarbe** (CLAUDE.md sagt „rund 51").
-Der Großteil davon sind Formularfelder und `div.card`, alle `#FFFFFF` — die
-folgen der Fläche. Die tragende Struktur ist klein:
-
-| Fläche | heute |
-|---|---|
-| `#sidebar` | `rgb(0,0,0)` |
-| `nav.tabs` | `rgb(10,8,5)` |
-| `div.app-wrap` · `div.body` | `rgb(248,246,241)` |
-| `div.main-col` · `#s0` · `div.card` | `#FFFFFF` |
-| Boarding-Pass (`.dp-pf-lead`, `.dp-pf-logo`, `.dp-pf-tile.tool`, `#oab-imo-tile`) | dunkel, eigener Satz |
-
-**3 · Ein Teil ist schon tokenisiert — das war nicht bekannt.**
-Die Sidebar hängt an **`--dp-s0` / `--dp-s1`**:
-`aside.sidebar{background:var(--dp-s0) !important}` (0,1,1). Gesetzt werden
-sie in `:root` (`#000` / `var(--ch)`) und vom Hell-Skin über
-`body.dp-chrome-hell{--dp-s0:var(--dp-header-bg,#EAE4D6)}` (0,2,0).
-**Für die Sidebar genügt also der Token-Weg** — CLAUDE.mds Warnung gilt dort
-nicht.
-
-Die Tab-Leiste dagegen **nicht**: sie gewinnt über
-`header.hdr.has-v64-score + nav.tabs{background:rgb(10,8,5) !important}` —
-(0,2,2), **hart kodiert, kein Token**. Genau der Fall aus CLAUDE.md. Sie muss
-einzeln benannt werden.
-
-**4 · Daraus folgt die Bauform:** nicht 6 × 65 Regeln, sondern **ein Satz
-Flächenregeln, der Tokens liest, plus 6 × ~30 Token-Zeilen** — die Architektur
-des Mockups (`[data-look="…"]` setzt nur Variablen). Spezifität
-`html[data-ui-theme="…"] body …` = (0,2,1) und damit über
-`body.dp-chrome-hell`; die Ladereihenfolge (nach `style.css`) kommt als
-zweites Netz dazu, wird aber nicht als Argument benutzt.
-
-**5 · Offen für die Abnahme:** Kopfleiste mit Score und Objektkarten rendern
-erst mit geladenem Objekt, also nur in einer **angemeldeten Sitzung**. Zwei
-der fünf Pflichtflächen sind ohne Konto nur synthetisch prüfbar.
-
-**Fertig, wenn:** Alle Vorlagen wirken auf Kopfleiste, Tabs, Sidebar,
-Objektkarten und Logo, die Farbeinstellungen greifen darüber,
-`gold-audit.py` gibt RC=0, und nirgends steht heller Text auf hellem Grund.
-
-**Zu `gold-audit.py` RC=0:** heute steht der Lauf auf **RC=1 mit 483
-Fundstellen in 56 Dateien** — eine Altlast, die nichts mit diesem Punkt zu tun
-hat. Dieses Paket darf keine neue Fundstelle hinzufügen (jedes Gold-Literal als
-`var(--wl-<hex>, #<hex>)`); RC=0 insgesamt ist ein eigenes Vorhaben.
-
----
-
-### 3 · Aktionen-Menü gliedern
+### 2 · Aktionen-Menü gliedern
 
 Gehört zu jeder hellen Vorlage, betrifft aber alle: das Menü ist heute eine
 lange Liste. Gruppieren nach **Ansichten · Analyse · Anlegen · Ausgeben ·
@@ -202,55 +81,31 @@ funktioniert auf Desktop, Tablet und Handy.
 
 ---
 
-### 4 · Objektkarten-Modi: Kompakt · Standard · Wallet
+### 3 · Skin-Schalter und Darstellung laufen auseinander
 
-Ein Markup, drei Optiken, **reines CSS**. Die gemessene Struktur von
-`_renderRichCard` (`storage.js:866`) steht in CLAUDE.md — nicht neu raten.
+**Der Rest von „Zugang und Plan-Schranken" — der Zugang selbst ist mit v1082
+erledigt** (Wrapper entschärft, Schranke sitzt auf der Farbsektion, Panel
+öffnet für jeden Plan). Offen ist die Produktentscheidung, die dort schon
+vermerkt war:
 
-Wallet: Kopfzeile im Markenverlauf, Score-Ring links, Stufen-Pille rechts.
-Der Ring ist der vorhandene SVG mit berechnetem `stroke-dasharray`.
+Der Skin-Schalter Hell/Obsidian (`_dpDispSkin`, Merker `dp_chrome_hell`,
+`body.dp-chrome-hell` mit 105 Regeln) existiert **weiterhin separat** neben
+den neuen Vorlagen. Damit gibt es zwei Mechaniken für dieselbe Frage — genau
+das Muster, das bei den vier Umschalt-Mechaniken der Seitenleiste teuer war.
 
-**Falle:** `align-items:center` lässt ein leeres `::before` auf null Höhe
-schrumpfen — das Goldband wäre unsichtbar. `align-self:stretch` ist Pflicht.
+Gemessen: Beide greifen gleichzeitig und stören sich nicht, weil
+`html[data-ui-theme="…"]` (0,2,1) über `body.dp-chrome-hell` (0,2,0) liegt.
+Die Vorlage gewinnt also. Aber der Nutzer kann „Hell" schalten **und**
+„Konsole" wählen und bekommt dann Konsole — der Hell-Schalter wirkt
+scheinbar folgenlos.
 
-**Fertig, wenn:** Alle drei Modi in allen drei Fassungen sauber aussehen, auf
-Desktop, Tablet und Handy.
-
----
-
-### 5 · Kartenfläche: Passend · Weiß
-
-Karten folgen der Fassung oder bleiben weiß, auch im dunklen Modus.
-
-**Falle:** Bei gleicher Spezifität gewinnt die spätere Regel. Über `html[...]`
-scopen statt auf Ladereihenfolge bauen.
-
----
-
-### 6 · Zugang zum Darstellungs-Modal und Plan-Schranken
-
-Modal für **alle** Pläne öffnen, den **Farbteil darin** sperren. Heute bricht
-der Wrapper in `settings.js:3391` bei `currentKey() !== 'partner'` das ganze
-Panel ab — die Prüfung wandert von „Panel öffnen" auf „Farbsektion
-freischalten".
-
-Damit gilt: **Vorlagen wählen darf jeder**, **Farben ändern erst ab Partner.**
-Die Farbsektion bleibt für andere sichtbar, aber ausgegraut — sichtbar
-gesperrt ist ehrlicher als versteckt.
-
-Farben laufen weiter über `DealPilotBrandingEditor.open()` und
-`DealPilotWhitelabel.apply({accent, obsidian})`.
-
-In den Einstellungen bleibt nur Verwaltung: der Knopf, das Häkchen
-„Handy & Tablet freischalten", der Partner-Block „Für Mandanten".
-
-**Offene Entscheidung:** Der Skin-Schalter Hell/Obsidian existiert bereits
-separat. Entweder er verschwindet, oder er wird an die Darstellung gekoppelt.
-Sonst laufen beide auseinander.
+**Zu entscheiden:** entweder der Skin-Schalter verschwindet und „Hell"
+wird zur Vorlage `kontor`, oder er wird an die Darstellung gekoppelt.
+Beides ist eine Produktentscheidung, keine Reparatur.
 
 ---
 
-### 7 · Handy-Sperre plan-abhängig lösen
+### 4 · Handy-Sperre plan-abhängig lösen
 
 Erst wenn 1–2 stehen. Die Sperre (`js/mobile-redirect.js`) bleibt bis dahin
 **aktiv**.
@@ -276,9 +131,6 @@ nichts Falsches auf.
   umbrechen. Der Score soll auf dem Tablet bleiben, die Höhe nicht
 - **Widersprüchliche Regeln in den ≤768-Blöcken** — `.sb-list` trägt
   `height:40vh !important` **und** `height:0 !important`, die letzte gewinnt
-- **`css/ui-varianten.css` und `js/ui-varianten.js`** sind in `index.html`
-  (Z. 29 und 3466) verlinkt, existieren aber weder im Repo noch auf dem
-  Server — zwei 404 bei jedem Seitenaufruf
 - **Einstellungs-Abschnitte hintereinander rendern** ließ den Prüf-Browser
   zweimal einfrieren (`anbieter`, `mandanten`, `plan`, `rechtliches`, `help`).
   Einzeln unauffällig — auf einem echten Gerät nachstellen
@@ -291,6 +143,106 @@ nichts Falsches auf.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-05] **Darstellungs-Modal mit sechs UI-Vorlagen** — `495e35c`, `ff6eba1`, `44ce7bb`, `bd77f4c`, `ff20dfb`, `8f603e9`
+
+  Gebaut gegen `design/mockups/dp-darstellung-panel.html`. Die sechs Namen
+  und ihr Zuschnitt sind am 2026-08-05 abgenommen. **Punkt 4 (Kartenmodi)
+  und Punkt 5 (Kartenfläche) sind miterledigt** — sie hängen an denselben
+  Attributen und wären getrennt eine zweite Mechanik gewesen. Der
+  „Später"-Punkt mit den zwei 404 ebenfalls.
+
+  **Befund vorab (gemessen, nicht geraten):** `css/ui-varianten.css` und
+  `js/ui-varianten.js` waren seit 20260801 in `index.html:29` und `:3466`
+  verlinkt und existierten nicht. Der Kommentar dort sagte schon „nach
+  style.css, damit `html[data-ui-*]` greift" — der Platz war vorbereitet.
+
+  Im DOM bei 1920 px gezählt: **65 Elemente mit deckender Hintergrundfarbe**
+  (CLAUDE.md schätzte „rund 51"). Der Großteil sind Formularfelder und
+  `div.card`, alle weiß — die folgen der Fläche. Deshalb **nicht 6 × 65
+  Regeln, sondern ein Satz Flächenregeln plus 6 × ~30 Token-Zeilen.**
+
+  **Die CLAUDE.md-Warnung „Token-Überschreibungen reichen nicht" gilt
+  differenzierter als gedacht:**
+
+  | Fläche | liest Tokens? |
+  |---|---|
+  | `aside.sidebar{background:var(--dp-s0)!important}` | **ja** |
+  | `.sb-card{background:var(--dp-obj-card,…)!important}` | ja, aber siehe unten |
+  | `header.hdr.has-v64-score + nav.tabs{background:rgb(10,8,5)!important}` | **nein, hart** |
+
+  Die Tab-Leiste wurde deshalb einzeln benannt — mit demselben
+  Nachbarschafts-Selektor plus `html[data-ui-theme]` davor, statt sich auf
+  die Ladereihenfolge zu verlassen.
+
+  **Vier Fehler, jeder erst durch Messung gefunden:**
+
+  1. **v1082b · Halber Skin in der Objektkarte.** Kontrastlauf über alle
+     Textknoten: `.sbc-mini-score-num` #FFFFFF auf #FFFFFF = **1.00**,
+     `.sbcm-label` rgba(255,255,255,.7) auf #FAF9F7 = **1.05**. Die
+     Kachel*fläche* war aufgehellt, die Schrift darauf nicht.
+  2. **v1082c · Panel ging im gedrosselten Tab nicht auf.**
+     `requestAnimationFrame` feuerte nach 700 ms **nicht**, die `open`-Klasse
+     kam nie. Ersetzt durch erzwungenen Reflow (`void p.offsetWidth`) —
+     synchron, ohne Zeitplaner.
+  3. **v1082d · Die Objektkarte trägt ihre Farbe als Verlauf.** Gemessen:
+     `background-color: rgba(0,0,0,0)` — transparent — und
+     `background-image: linear-gradient(135deg, rgba(20,15,5,.6), rgba(0,0,0,.7))`.
+     Das Token färbt nur `background-color`, der Verlauf lag darüber: auf
+     hellen Vorlagen stand weiter eine **schwarze Karte in heller Leiste**.
+     **Und meine eigene Messung war dafür blind** — sie las `backgroundColor`,
+     sah die transparente Karte, stieg zur hellen Sidebar hoch und rechnete
+     gegen Weiß. Der Kontrastlauf wurde nachgezogen, damit er Verläufe sieht.
+  4. **v1082e · Wallet-Ringe standen leer.** Die Score-Zahl erbt
+     `currentColor` (weiß) und der Wallet-Ring bekommt eine weiße Scheibe
+     untergelegt. Im Bild gesehen, nicht gemessen — der Kontrastlauf deckte
+     nur die vier hellen Vorlagen ab, der Fehler hängt aber am
+     **Kartenmodus**. Im Mockup stand die Regel bereits; ich hatte sie beim
+     Übertragen übersehen.
+
+  **Nachgemessen auf Staging, angemeldet, mit fünf echten Objekten:**
+
+  | Vorlage | Sidebar | Tabs | Karte |
+  |---|---|---|---|
+  | DealPilot (kein Attribut) | `0,0,0` | `10,8,5` | Verlauf, unverändert |
+  | Kontor | `255,255,255` | `255,255,255` | `#FFFFFF` |
+  | Panel | `255,255,255` | `255,255,255` | `#FFFFFF` |
+  | Kanzlei | `251,250,247` | `251,250,247` | `#FFFFFF` |
+  | Boarding | `250,245,232` | `250,245,232` | Creme |
+  | Konsole | `22,24,28` | `22,24,28` | `#1A1D22` |
+
+  Kontrastlauf über Objektkarte in allen sechs: **keine Stelle unter 2.5**.
+  Alle Vorlagen auch bei **390 px und 820 px** gemessen, kein waagerechter
+  Überlauf (`scrollWidth == innerWidth`). Panel auf dem Handy als Blatt von
+  unten (390 × 658), keine Trefferfläche unter 44 px. Persistenz überlebt
+  das Neuladen (alle drei Attribute), Inline-Boot im `<head>` verhindert das
+  Aufblitzen.
+
+  **Die wichtigste Zusicherung, ausdrücklich nachgemessen:** Nach
+  „Zurücksetzen" sind alle drei Attribute `null` — **entfernt, nicht leer
+  gesetzt** — und der Istzustand ist bitgenau zurück: Sidebar `rgb(0,0,0)`,
+  Tabs `rgb(10,8,5)`, Karte transparent mit dem originalen Verlauf. Wer nicht
+  umschaltet, merkt von diesem Paket nichts.
+
+  **Punkt 6 teilweise:** Die Partner-Schranke ist von „Panel öffnen"
+  (`settings.js:3395`, brach für jeden außer Partner ab) auf die
+  **Farbsektion** gewandert. Vorlagen wählen darf jeder, Farben ab Partner,
+  die Sektion bleibt sichtbar und ausgegraut — geprüft: `locked=true` ohne
+  Partner-Plan, Hinweisleiste sichtbar.
+
+  **Zu `gold-audit.py`:** Der Lauf stand vorher auf RC=1 mit **483**
+  Fundstellen (Altlast in 56 Dateien). v1082 brachte **sieben neue** — meine
+  eigene Vorgabe verletzt. Mit v1082f auf **eine** reduziert: der Fokusring
+  auf `color-mix(… var(--wl-c9a84c, #C9A84C) …)`, die sechs Vorgabewerte auf
+  eine Konstante `GOLD_STD`. Die bleibt bewusst ein rohes Literal — sie ist
+  ein *Daten*wert: `var(--wl-…)` und `_wlc()` liefern beide den bereits
+  umgefärbten Ton, genau den, den man ersetzen will. Stand jetzt **484**.
+  RC=0 insgesamt ist ein eigenes Vorhaben.
+
+  **Nicht gebaut, bewusst:** die Kopplung von Skin-Schalter und Vorlage.
+  Beide greifen gleichzeitig, die Vorlage gewinnt (Spezifität), aber es sind
+  zwei Mechaniken für dieselbe Frage. Steht jetzt als eigener Punkt 3 —
+  das ist eine Produktentscheidung, keine Reparatur.
 
 - [2026-08-05] **Partner-Plan wurde von fünf Pro-Schranken ausgesperrt** — `f96e981`
 
