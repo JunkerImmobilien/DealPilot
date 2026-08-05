@@ -471,7 +471,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
     width: 260px;
     transition: left 0.25s;
   }
-  .sidebar.open { left: 0; box-shadow: 2px 0 20px rgba(0,0,0,0.4); }
+  /* v648: .sidebar.open war toter CSS-Code - keine Zeile im Projekt setzt die Klasse. */
   .app-wrap.sb-collapsed { grid-template-columns: 1fr; }
   .app-wrap.sb-collapsed .sidebar { display: none; }
 
@@ -32744,7 +32744,7 @@ body.dp-sidebar-collapsed .main-col { grid-column: auto !important; }
 /* Header/Logo: DP-Logo bleibt, geschrumpft + zentriert */
 body.dp-sidebar-collapsed #sidebar .sb-header { padding:8px 0 !important; min-height:0 !important; }
 body.dp-sidebar-collapsed #sidebar .app-logo-simple-wrap-sidebar { margin:6px auto !important; justify-content:center; }
-body.dp-sidebar-collapsed #sidebar .app-logo-simple-sidebar { height:auto !important; width:46px !important; object-fit:contain; }
+/* v1079-LOGO: tote Regel entfernt — die spaetere display:none-Regel gewinnt ohnehin. */
 
 /* Portfolio-Titel: Icon bleibt, Text + Sortier-Toggle aus */
 body.dp-sidebar-collapsed #sidebar .sb-section-title { font-size:0 !important; justify-content:center !important; padding:8px 0 !important; }
@@ -32909,7 +32909,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* ===== v622-mobile-shell BEGIN ===== */
 /* Handy-Shell konsolidiert: EIN Menue (oberer Header-Hamburger), Sidebar = sauberer Vollbild-naher
    Drawer, scrollbar (AKTIONEN/Cockpit erreichbar). Ueberstimmt die widerspruechlichen Alt-Bloecke. */
-@media (max-width:768px){
+@media (max-width: 900px){
   /* doppeltes Menue weg: untere mobile-topbar ("DealPilot") + redundanter Hamburger raus */
   .mobile-topbar{display:none !important}
   .mobile-hamburger{display:none !important}
@@ -32968,7 +32968,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* ===== v625-mobile-iconrail BEGIN ===== */
 /* Icon-Rail (66px, v607) als dritter Zustand auf dem Handy. Toggle = FAB unten-links
    (kollidiert nicht mit Header-Hamburger). Eingeklappt: Rail IN-FLOW statt Drawer (v622). */
-@media (max-width:768px){
+@media (max-width: 900px){
   /* v607-Toggle wieder zeigen, als FAB unten-links */
   body:not(.qc-standalone-active):not(.dp-dash-fullscreen) #dp-sb-toggle{
     display:flex !important; top:auto !important; bottom:16px !important;
@@ -33001,7 +33001,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
    position:absolute ist (aus dem Fluss, top:662 h:0 -> liegt ueber sb-list/sb-user).
    Diagnose: sb-list rel top232 h449, accordion ABSOLUTE, sb-user top774, footer top860.
    Fix: im Drawer alles in den normalen Fluss (static) + saubere Spalten-Stapelung. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-actions-accordion,
   body #sidebar.sidebar.sb-mobile-open .sb-actions-accordion {
     position: static !important;
@@ -33047,7 +33047,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* Bug (Console): #sb-portfolio (top681,h45,bottom726) ueberlappt .sb-actions-trigger
    (top666,h36,bottom702) um ~21px - beide relative, aber im Drawer kein sauberer Abstand.
    Fix: im mobilen Drawer beide mit klarer Reihenfolge + Abstand stapeln. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar #sb-portfolio,
   body aside.sidebar.sb-mobile-open #sb-portfolio {
     position: static !important;
@@ -33126,7 +33126,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 
 /* (2) Sidebar-Objektliste im Drawer: ohne max-height waechst sie ueber alle Objekte,
    AKTIONEN/COCKPIT erst nach langem Scrollen erreichbar. -> begrenzen + eigener Scroll. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar .sb-list,
   body aside.sidebar.sb-mobile-open .sb-list {
     max-height: 42vh !important;
@@ -33138,7 +33138,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 
 /* (3) Button-Groessen Cockpit (sb-collapsible-header) vs Aktionen (sb-actions-trigger)
    im Drawer vereinheitlichen (gleiche Hoehe/Padding/Radius). */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-trigger,
   body aside.sidebar.sb-mobile-open .sb-actions-trigger,
   body .app-wrap.sb-mobile-open aside.sidebar .sb-portfolio-collapsible .sb-collapsible-header,
@@ -33207,7 +33207,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* (2) Accordion soll im Drawer NACH OBEN aufklappen (ueber dem Trigger schweben),
    nicht nach unten. v634 hatte es 'static' gemacht (-> nach unten). Zuruecknehmen:
    absolute, bottom:100% relativ zum Trigger-Container. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar .sb-actions-accordion,
   body aside.sidebar.sb-mobile-open .sb-actions-accordion {
     position: absolute !important;
@@ -33233,7 +33233,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 
 /* (3) Objektliste: max-height greift nicht, weil .sb-list-grow overflow-y:visible +
    .sb-portfolio-collapsible max-height:none gewinnen. Hier spezifisch beide Klassen fangen. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body .app-wrap.sb-mobile-open aside.sidebar .sb-list.sb-list-grow,
   body aside.sidebar.sb-mobile-open .sb-list.sb-list-grow,
   body .app-wrap.sb-mobile-open aside.sidebar #sb-list,
@@ -33246,7 +33246,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 }
 
 /* (4) Settings-Tabs: Scroll-Hinweis (Fade rechts) damit ersichtlich ist, dass es weitergeht. */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .set-modal-cream .modal-side { position: relative !important; }
   .set-modal-cream .settings-tabs.ms-tabs { position: relative !important; }
   .set-modal-cream .modal-side::after {
@@ -33267,10 +33267,19 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 /* ===== v642-accordion-overlay BEGIN ===== */
 /* Accordion als FIXED-Overlay nach oben (scrollt NICHT mit, klebt am Viewport).
    Gemessen: Trigger top:98, Viewport h:861. Overlay reicht von unter dem Header (top:58)
-   bis knapp ueber den Trigger, eigener Scroll bei vielen Eintraegen. */
-@media (max-width: 768px) {
-  body .app-wrap.sb-mobile-open aside.sidebar.sidebar .sb-actions-accordion.sb-actions-open,
-  body aside.sidebar.sidebar.sb-mobile-open .sb-actions-accordion.sb-actions-open {
+   bis knapp ueber den Trigger, eigener Scroll bei vielen Eintraegen.
+
+   v644-spezifitaet-fix: Die Selektoren standen auf aside.sidebar.sidebar = (0,6,2).
+   v633-drawer-qc (oben, Z.33005) setzt position:static !important mit #sidebar = (1,4,1).
+   Eine ID schlaegt beliebig viele Klassen -> v633 gewann trotz frueherer Position,
+   das Panel blieb im Flow und schob Trigger + User-Box aus dem Viewport.
+   aside.sidebar.sidebar -> #sidebar.sidebar hebt v642 auf (1,5,1) bzw. (1,4,1)
+   und damit ueber v633 ((1,4,1) bzw. (1,3,1)). Kein Gleichstand, keine
+   Abhaengigkeit von der Ladereihenfolge. Greift nur auf .sb-actions-open,
+   der geschlossene Stapel-Zustand von v633 bleibt unveraendert. */
+@media (max-width: 900px) {
+  body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-actions-accordion.sb-actions-open,
+  body #sidebar.sidebar.sb-mobile-open .sb-actions-accordion.sb-actions-open {
     position: fixed !important;
     top: 58px !important;
     left: 12px !important;
@@ -33282,15 +33291,15 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
     margin: 0 !important;
     z-index: 1200 !important;
   }
-  body .app-wrap.sb-mobile-open aside.sidebar.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner,
-  body aside.sidebar.sidebar.sb-mobile-open .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner {
+  body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner,
+  body #sidebar.sidebar.sb-mobile-open .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner {
     display: block !important;
     max-height: calc(100dvh - 58px - 110px) !important;
     overflow-y: auto !important; -webkit-overflow-scrolling: touch !important;
     margin: 0 !important;
   }
-  body .app-wrap.sb-mobile-open aside.sidebar.sidebar .sb-actions-accordion:not(.sb-actions-open),
-  body aside.sidebar.sidebar.sb-mobile-open .sb-actions-accordion:not(.sb-actions-open) {
+  body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-actions-accordion:not(.sb-actions-open),
+  body #sidebar.sidebar.sb-mobile-open .sb-actions-accordion:not(.sb-actions-open) {
     display: none !important;
   }
 
@@ -33309,7 +33318,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 }
 
 /* Settings-Tabs: ICONS-ONLY auf Mobile (10 Tabs passen in eine Zeile, kein Raten ob scrollbar) */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .set-modal-cream .settings-tabs.ms-tabs {
     display: flex !important; flex-wrap: nowrap !important;
     justify-content: space-between !important;
@@ -35505,38 +35514,814 @@ body.dp-chrome-hell aside.sidebar .sb-card [class*="addr"],
 body.dp-chrome-hell aside.sidebar .sb-card [class*="price"]{ color: var(--dp-obj-text, inherit) !important; }
 /* /v938-textcolors-css */
 
-/* === drawer-fix-20260731 START =========================================================
-   Objektliste auf Tablets im Hochformat (769-900px).
-   Bis hierher war die Sidebar dort position:fixed bei left:-280px und wurde
-   NUR von .sidebar.open geoeffnet -- einer Klasse, die kein Code setzt.
-   Additiv: keine bestehende Regel wird veraendert, Rollback = Block loeschen.
-   Statusfarben und Gold bleiben unberuehrt (kein Farbwert in diesem Block).
+/* === drawer-fix-20260731 — v648 zurueckgenommen ========================
+   Der Block setzte im Band 769-900px  left:0  auf die Sidebar und blendete
+   .mobile-hamburger ein. Beides greift nicht mehr:
+     - Die Leiste steht dort nicht auf left:-280px, sondern auf
+       position:relative mit transform:translateX(-100%) — left tut nichts.
+     - .mobile-hamburger ist in v648 aus dem Markup entfernt (toter Knopf).
+     - .mobile-overlay ist ebenfalls raus, Backdrop ist #sb-backdrop.
+   Ersetzt durch v648-tablet-shell am Dateiende.
    ==================================================================== */
-@media (min-width: 769px) and (max-width: 900px) {
-  /* Alle drei Toggle-Mechaniken gelten, egal welche gewinnt. */
-  body .app-wrap.sb-mobile-open #sidebar.sidebar,
-  body #sidebar.sidebar.sb-mobile-open,
-  body #sidebar.sidebar.mobile-open,
-  body #sidebar.sidebar.open {
-    left: 0 !important;
-    box-shadow: 2px 0 20px rgba(0,0,0,0.4) !important;
-  }
 
-  /* Ohne sichtbaren Ausloeser bliebe die Liste trotzdem unerreichbar.
-     Unterhalb 769px greifen die bestehenden display:none-Regeln weiter. */
-  body .mobile-hamburger {
+/* ===== v645-sb-footer-mobile BEGIN =====================================================
+   Punkt 1: Nutzerblock (Name, Plan, Abmelden) ist auf dem Handy nicht erreichbar.
+
+   GEMESSEN (390px-Viewport, Drawer offen, 8 Objekte):
+   - #sb-user EXISTIERT, [V245] meldet Erfolg -> der JS-Abbruchpfad in auth.js:495
+     ist NICHT die Ursache. Erster Verdacht aus dem Backlog widerlegt.
+   - .sb-list ist bereits gedeckelt (v639: max-height:40vh, overflow-y:auto) ->
+     auch der zweite Verdacht (overflow:visible/max-height:none) trifft nicht mehr zu.
+   - Echte Ursache: ueber dem Nutzerblock stehen NUR FIXE Hoehen -
+     .sb-header 201px + .sb-section-title 64px + .sb-actions-trigger 36px
+     + #sb-user 81px = 382px fix, dazu die Liste mit 40vh.
+     Bedingung fuers Hineinpassen: 0.4*vh + 382 <= vh  ->  vh >= 637px.
+     Gemessen: vh 840/696 = sichtbar. vh 660 = 3px ab, vh 616 = 29px ab,
+     vh 556 = 65px ab (der Abmelde-Knopf). Genau der iPhone-Safari-Bereich.
+
+   FIX: Die Liste bekommt statt der festen 40vh den RESTPLATZ (flex:1 1 auto,
+   min-height:0) und scrollt in sich. Damit ist der Nutzerblock bei jeder
+   Viewporthoehe unten verankert und ohne Scrollen erreichbar.
+   Spezifitaet bewusst hoeher als v639 (aside.sidebar#sidebar), nicht auf
+   Ladereihenfolge gebaut. Nur ≤768px und nur im geoeffneten Drawer.
+   ==================================================================== */
+@media (max-width: 900px) {
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar,
+  body aside.sidebar#sidebar.sb-mobile-open {
     display: flex !important;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column !important;
   }
 
-  /* Der Abdunkler ist bisher nur bis 768px gestylt. */
-  body .mobile-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 1000;
-    display: none;
+  /* Liste nimmt den Rest und scrollt selbst -- ersetzt die feste 40vh-Deckelung aus v639 */
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar .sb-list,
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar .sb-list.sb-list-grow,
+  body aside.sidebar#sidebar.sb-mobile-open .sb-list,
+  body aside.sidebar#sidebar.sb-mobile-open .sb-list.sb-list-grow {
+    flex: 1 1 auto !important;
+    min-height: 72px !important;      /* mind. eine Karte bleibt sichtbar */
+    max-height: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
-  body .mobile-overlay.active { display: block; }
+
+  /* Alles unterhalb der Liste darf NICHT schrumpfen (CLAUDE.md: Flex-Kinder in
+     overflow:auto-Containern schrumpfen still, statt zu scrollen). */
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar .sb-actions-trigger,
+  body aside.sidebar#sidebar.sb-mobile-open .sb-actions-trigger {
+    flex: 0 0 auto !important;
+    order: 97 !important;
+  }
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar #sb-user,
+  body aside.sidebar#sidebar.sb-mobile-open #sb-user {
+    flex: 0 0 auto !important;
+    order: 98 !important;
+    margin-bottom: max(6px, env(safe-area-inset-bottom)) !important;
+  }
+  /* Der leere Platzhalter aus index.html:712 sass in der Flex-Reihenfolge vor
+     dem Nutzerblock -- ans Ende, damit er nichts verschiebt. */
+  body .app-wrap.sb-mobile-open aside.sidebar#sidebar #sb-footer-spacer,
+  body aside.sidebar#sidebar.sb-mobile-open #sb-footer-spacer {
+    flex: 0 0 auto !important;
+    order: 99 !important;
+  }
 }
-/* === drawer-fix-20260731 END ========================================================== */
+/* ===== v645-sb-footer-mobile END ===== */
+
+/* ═══════════════════════════════════════════════════════════════════
+   v646-logo-rahmen — Backlog Punkt 1
+   Neues Rahmen-Logo (Seitenverhaeltnis 3.18:1 statt 2.18:1) plus
+   deutlich flacherer Logo-Kopf.
+
+   GEMESSEN vorher (390px-Viewport, Drawer offen):
+     .sb-header 207px  ·  Logo 326x149px  ·  Sidebar 351px breit
+     Desktop 1920px:  .sb-header 221px
+   Der Kopf war damit ein Viertel des Handy-Viewports, bevor ein Objekt
+   sichtbar wurde (siehe Befund der Fusszeilen-Aufgabe, v645).
+
+   Zwei Hebel:
+     1) Das neue Logo ist flacher -> bei gleicher Breite ~32% weniger Hoehe
+     2) Breitendeckel (max-width) statt 100% -> haelt das 512px-Asset
+        (helle Fassung) bei >=2x auf Retina und drueckt die Hoehe weiter
+
+   Spezifitaet bewusst hoch (aside.sidebar#sidebar), damit die spaeteren
+   !important-Bloecke aus v931/v932/v937 nicht gewinnen. Ausgenommen ist
+   die eingeklappte Leiste: dort steht die DP-Bildmarke aus v610, die
+   Wortmarke passt in 66px Breite ohnehin nicht.
+   ═══════════════════════════════════════════════════════════════════ */
+
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 12px 14px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: var(--dp-logo-justify, center) !important;
+}
+
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+  width: var(--dp-logo-w, 100%) !important;
+  max-width: 100% !important;   /* v1079-LOGO: Deckel 232px raus, Breite kommt vom Kasten */
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* Handy und Tablet hoch: Drawer ist breiter als die Desktop-Spalte, der
+   Deckel muss deshalb explizit mit — sonst waechst der Kopf wieder. */
+@media (max-width: 900px) {
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
+    padding: 10px 14px 8px !important;
+  }
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+    max-width: var(--dp-logo-max, 220px) !important;
+  }
+}
+
+/* Sehr flache Viewports (Handy quer, 556px-Fall aus v645): noch flacher. */
+@media (max-width: 900px) and (max-height: 620px) {
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-header {
+    padding: 6px 14px 4px !important;
+  }
+  body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+    max-width: var(--dp-logo-max, 176px) !important;
+  }
+}
+/* ===== v646-logo-rahmen END ===== */
+
+/* ═══════════════════════════════════════════════════════════════════
+   v648-tablet-shell — Backlog Punkt 1 (Objektliste auf dem Tablet)
+
+   BEFUND (gemessen, nicht angenommen). Der Backlog nahm an, dass nur
+   769–900 px kaputt sei und 901–1024 px als feste Spalte stehe. Beides
+   ist falsch — es war SCHLIMMER:
+
+     820 x 1180:  .app-wrap grid-template-columns = "820px" (EINE Spalte)
+                  #sidebar  position:relative, transform -240px, Hoehe 1180
+                  .main-col top = 1180  ->  die App beginnt eine volle
+                  Bildschirmhoehe UNTER dem Falz. Sichtbar: leere Flaeche.
+     1024 x 768:  identisch, .main-col top = 768.
+     1025 x 768:  erst hier greift wieder "380px 645px" — zwei Spalten.
+
+   Also war das ganze Band 769–1024 px eine weisse Seite, nicht nur eine
+   unerreichbare Objektliste.
+
+   URSACHE (drei Regeln, die sich gegenseitig ausgehebelt haben):
+     1. @media (max-width:1024px) .app-wrap{grid-template-columns:1fr}
+        -> Leiste und Inhalt stapeln sich untereinander.
+     2. @media (max-width:1024px) .sidebar{position:fixed} sollte die
+        Leiste aus dem Fluss nehmen — wird aber von der SPAETEREN,
+        medienlosen Regel `aside.sidebar{position:relative}` geschlagen:
+        (0,1,1) gegen (0,1,0). Eine Media-Query erhoeht die Spezifitaet
+        nicht. Die Leiste blieb also im Fluss.
+     3. Nur unterhalb 768 px zieht v622 mit `body #sidebar.sidebar
+        {position:fixed !important}` (1,2,1) den Kopf aus der Schlinge.
+        Deshalb lief das Handy, das Tablet nicht.
+
+   FIX, zweigeteilt:
+     769–900 px  ->  der v622-Drawer. Dafuer wurden die Media-Queries der
+                     Drawer-Bloecke v622/v625/v633/v637/v638/v639/v642/v645
+                     von 768 auf 900 gehoben (statt sie hier zu doppeln).
+     901–1024 px ->  echte zweispaltige Fassung, siehe unten. Damit steht
+                     auf dem iPad quer wieder die Spalte, wie im Backlog
+                     gewuenscht — nur eben zum ersten Mal wirklich.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 901px) and (max-width: 1024px) {
+
+  /* (1) Zwei Spalten zurueckholen. 260px Leiste laesst dem Inhalt bei
+     1024px noch 764px — genug fuer die zweispaltigen Formulare. */
+  body .app-wrap {
+    grid-template-columns: 260px minmax(0, 1fr) !important;
+  }
+
+  /* (2) Die Leiste steht wieder als Spalte im Fluss. Spezifitaet
+     body #sidebar.sidebar = (1,2,1), damit die medienlose Regel
+     aside.sidebar{position:relative} nicht mehr dazwischenfunkt. */
+  body #sidebar.sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    width: auto !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    z-index: 250 !important;
+    box-shadow: none !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  body .main-col { grid-column: auto !important; }
+
+  /* (3) Kein Drawer, also auch keine Drawer-Bedienelemente und kein
+     Backdrop. Sonst liegt ein unsichtbarer Schleier ueber der Seite,
+     wenn jemand aus dem Drawer-Band herdreht. */
+  body .hdr-mobile-menu,
+  body .mobile-hamburger,
+  body .mobile-topbar { display: none !important; }
+  body #sb-backdrop,
+  body #mobile-overlay { display: none !important; }
+
+  /* (4) Eingeklappte Leiste bleibt auch hier moeglich (66px Rail). */
+  body.dp-sidebar-collapsed .app-wrap { grid-template-columns: 66px minmax(0,1fr) !important; }
+  body.dp-sidebar-collapsed #sidebar.sidebar { width: 66px !important; max-width: 66px !important; }
+}
+
+/* Der Backdrop war ueberhaupt nur bis 768px gestylt (Backlog-Hinweis zu
+   .mobile-overlay). Im neuen Drawer-Band 769–900 braucht er eigene
+   Regeln, sonst schliesst der Tipp neben den Drawer nicht. */
+@media (min-width: 769px) and (max-width: 900px) {
+  body #sb-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0,0,0,0.45) !important;
+    z-index: 1055 !important;
+  }
+  body #mobile-overlay { display: none !important; }
+}
+/* ===== v648-tablet-shell END ===== */
+
+/* v648b — Der Inhalt sass 240px zu weit rechts.
+   GEMESSEN bei 1024px: .main-col beginnt bei 260, .body aber bei 500 und ist
+   nur 519px breit statt 764. Ursache: @media (max-width:1024px) .body
+   {margin-left:240px !important} — ein Rest aus der Zeit, als die Leiste dort
+   position:fixed mit 240px Breite war. Unterhalb 768px war der Rand bereits
+   auf 0 zurueckgenommen, im Band 769-1024 nicht.
+   Jetzt gilt: kein Randabzug, solange die Leiste entweder Drawer (769-900)
+   oder echte Rasterspalte (901-1024) ist. */
+@media (max-width: 1024px) {
+  body .body { margin-left: 0 !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   v649-hdr-mobile — Backlog Punkt 1 (Kopfleiste auf dem Handy entlasten)
+
+   GEMESSEN bei 390 x 844 mit geladenem Objekt (Dealstreet 999):
+     header.hdr            385 x 279   <- ein Drittel des Viewports
+       .hdr-v61-row1       385 x 151   <- bricht auf DREI Zeilen um:
+           Hamburger 32x44 · #hdr-obj-num 73x27 · Name 222x22
+           #hdr-autosave 127x25 · #hdr-completeness 198x27
+           .hdr-actions-v61 107x44 (Kerosin-Pille)
+       #hdr-badges         385 x 128   <- Investor-Deal-Score-Karte
+
+   Ziel: eine Zeile plus eine schmale Fortschrittszeile.
+   Nur <=768px. Tablet und Desktop bleiben unberuehrt.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* (1) Kuerzel-Chip und sein Trenner raus — die Nummer steht auf der
+     Objektkarte und im Tab "Objekt". */
+  header.hdr .hdr-obj-num,
+  header.hdr .hdr-sep { display: none !important; }
+
+  /* (2) Erste Zeile bleibt EINE Zeile. Der Objektname bekommt den Rest und
+     kuerzt mit Auslassungspunkten, statt die Zeile zu sprengen. */
+  header.hdr .hdr-v61-row1 {
+    flex-wrap: wrap !important;      /* nur fuer die Fortschrittszeile unten */
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 6px 12px !important;
+    row-gap: 0 !important;
+  }
+  header.hdr .hdr-obj-name {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 15px !important;
+  }
+  header.hdr .hdr-spacer { display: none !important; }
+  header.hdr .hdr-actions-v61 {
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    order: 8 !important;
+  }
+
+  /* (3) Autosave nur noch als Punkt. */
+  header.hdr .hdr-autosave-text { display: none !important; }
+  header.hdr .hdr-autosave {
+    flex: 0 0 auto !important;
+    order: 7 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: 14px !important;
+    background: none !important;
+    border: 0 !important;
+  }
+
+  /* (4) Kerosin: Zahl ja, Balken nein. */
+  header.hdr .fuel-pill-bar,
+  header.hdr #hdr-credits-pill-bar { display: none !important; }
+  header.hdr .hdr-credits-pill {
+    padding: 4px 8px !important;
+    gap: 5px !important;
+    min-height: 32px !important;
+  }
+
+  /* (5) Feldfortschritt: eigene schmale Zeile unter der ersten.
+     order 99 + flex-basis 100% laesst ihn in der Flexbox umbrechen —
+     ohne das Markup anzufassen. */
+  header.hdr .hdr-completeness {
+    order: 99 !important;
+    flex: 1 0 100% !important;
+    width: 100% !important;
+    margin: 2px 0 0 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  header.hdr .hdr-completeness .hdr-comp-text {
+    font-size: 10px !important;
+    letter-spacing: .02em !important;
+    flex: 0 0 auto !important;
+  }
+  header.hdr .hdr-completeness .hdr-comp-bar {
+    flex: 1 1 auto !important;
+    height: 3px !important;
+    min-width: 0 !important;
+  }
+
+  /* (6) Investor Deal Score raus — die Zahl steht auf jeder Objektkarte und
+     im Tab "Bewertung". Der Hinweis "bitte 70 % ausfuellen" bleibt, der ist
+     eine Handlungsaufforderung und keine Kennzahl. */
+  header.hdr #hdr-badges > *:not(.hdr-incomplete-banner) { display: none !important; }
+  header.hdr #hdr-badges { padding: 0 !important; }
+  header.hdr #hdr-badges:not(:has(.hdr-incomplete-banner)) { display: none !important; }
+  header.hdr .hdr-toggle-btn { display: none !important; }
+}
+/* ===== v649-hdr-mobile END ===== */
+
+/* ═══════════════════════════════════════════════════════════════════
+   v650-tabs-mobile — Backlog Punkt 1 (Alle neun Objekt-Tabs handytauglich)
+
+   GEMESSEN bei 390 x 844, Objekt geladen, Tab fuer Tab durchgeklickt.
+   Kein Tab hatte waagerechtes Seiten-Scrollen (documentElement.scrollWidth
+   == innerWidth ueberall), aber fuenf hatten Inhalt, der ueber den rechten
+   Rand hinauslief und damit abgeschnitten war:
+
+     Objekt        .qz-label                 rechts bis 553
+     Miete         #ki-miete-box             rechts bis 394
+     Finanzierung  .dpfk-ctrl / .dpfk-ltv    rechts bis 606  (.body 193px ueber)
+                   .mrpf-top-tile            rechts bis 578
+     Steuer        .fa-pdf-ctrl              rechts bis 537
+     Bewertung     table.kpi-eval-table      rechts bis 562
+                   .cf-mode-btns             rechts bis 490
+
+   Dazu: 240 Eingabefelder mit 12,5 px bzw. 13,3 px Schrift. iOS Safari
+   zoomt bei jedem Antippen hinein, sobald ein Feld unter 16 px liegt.
+   Und 19 Knopfarten unter 44 px Trefferflaeche.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── (1) Eingabefelder auf 16px ────────────────────────────────────
+     Der einzige Wert, bei dem iOS Safari NICHT hineinzoomt. Nur Groesse,
+     keine Farbe, keine Hoehe — die Felder wachsen von selbst mit. */
+  .body input[type="text"],
+  .body input[type="number"],
+  .body input[type="tel"],
+  .body input[type="email"],
+  .body input[type="date"],
+  .body input[type="password"],
+  .body input[type="search"],
+  .body input:not([type]),
+  .body select,
+  .body textarea {
+    font-size: 16px !important;
+  }
+
+  /* ── (2) Trefferflaechen auf 44px ──────────────────────────────────
+     Ohne die Optik zu aendern: ein unsichtbares ::after legt die
+     Trefferflaeche auf mindestens 44 x 44, das Bild bleibt klein.
+     .dp-tip nutzt bereits ::before fuer das Fragezeichen, ::after ist frei. */
+  .dp-tip,
+  .sb-sort-btn,
+  .sbc-btn,
+  .sb-user-icon-btn,
+  .hdr-mobile-menu,
+  .img-del,
+  .dp-sidebar-toggle,
+  #dp-sb-toggle,
+  .btn.btn-sm {
+    position: relative !important;
+  }
+  .dp-tip::after,
+  .sb-sort-btn::after,
+  .sbc-btn::after,
+  .sb-user-icon-btn::after,
+  .hdr-mobile-menu::after,
+  .img-del::after,
+  .dp-sidebar-toggle::after,
+  #dp-sb-toggle::after,
+  .btn.btn-sm::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    background: transparent;
+    pointer-events: auto;
+  }
+
+  /* ── (3) Jedes :hover braucht ein :active ──────────────────────────
+     Auf Touch gibt es kein Hover. Ohne Rueckmeldung wirkt jeder Tipp,
+     als waere nichts passiert. Nur auf Geraeten ohne Hover. */
+  @media (hover: none) {
+    .btn:active,
+    .tab:active,
+    .sb-card:active,
+    .sb-act-item:active,
+    .sbc-btn:active,
+    .dp-tip:active,
+    .hdr-icon-btn:active,
+    .sb-actions-trigger:active,
+    .hdr-credits-pill:active,
+    .qz-star:active {
+      filter: brightness(1.35);
+      transition: none !important;
+    }
+    .sb-card:active,
+    .tab:active { transform: scale(0.985); }
+  }
+
+  /* ── (4) Raster-Kinder duerfen schrumpfen ──────────────────────────
+     GEMESSEN: #ki-miete-box war 368px breit in einer 333px-Spalte.
+     Ursache ist nicht die Box, sondern die Voreinstellung min-width:auto
+     auf Rasterkindern: ein breites Enkelkind schiebt die ganze Spalte auf.
+     Das ist der Sammelfall hinter mehreren der Ueberlaeufe oben. */
+  .body .col2 > *,
+  .body .g2 > *,
+  .body .g3 > *,
+  .body .grid > *,
+  .body .kpi-grid > * { min-width: 0 !important; }
+
+  /* ── (5) Kurze Paare bleiben nebeneinander ─────────────────────────
+     Backlog: Formulare auf eine Spalte, ausser kurze Paare wie PLZ/Ort.
+     Vier Spalten als Raster: PLZ 1, Ort 3, Strasse 3, Hausnummer 1,
+     alles andere volle Breite. Ohne :has()-Unterstuetzung faellt es
+     sauber auf eine Spalte zurueck. */
+  .body .g2:has(> .f #plz) {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    column-gap: 10px !important;
+  }
+  .body .g2:has(> .f #plz) > * { grid-column: span 4; }
+  .body .g2:has(> .f #plz) > .f:has(#plz) { grid-column: span 1; }
+  .body .g2:has(> .f #plz) > .f:has(#ort) { grid-column: span 3; }
+  .body .g2:has(> .f #plz) > .f:has(#str) { grid-column: span 3; }
+  .body .g2:has(> .f #plz) > .f:has(#hnr) { grid-column: span 1; }
+
+  /* ── (6) Objekt: Sterne-Bewertung ──────────────────────────────────
+     .qz-row stand auf 170px 1fr auto mit !important OHNE Media-Query
+     (style.css:9421) und schlug damit den Mobilblock bei <=720px, der
+     kein !important traegt. Dazu .qz-label mit min-width:200px !important.
+     170 + Sterne + 200 = 553px auf einem 390px-Schirm. */
+  .body .qz-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 4px !important;
+  }
+  .body .qz-label {
+    min-width: 0 !important;
+    padding-left: 0 !important;
+    text-align: left !important;
+  }
+  .body .qz-stars { justify-content: flex-start !important; }
+
+  /* ── (7) Finanzierung: das Konditionsband ──────────────────────────
+     GEMESSEN: .dpfk-band ist ein umbrechender Flex-Container (333px).
+     .dpfk-stub belegt davon 331px, .dpfk-body steht auf flex:1 1 0%.
+     Weil die Flex-Basis 0 ist, PASST der Koerper rechnerisch noch auf
+     dieselbe Zeile — er bekommt 0px Breite und sein Inhalt laeuft bis
+     606px hinaus, statt umzubrechen. Flex-Basis 100% erzwingt die
+     eigene Zeile, danach liegen 333px an. */
+  .body .dpfk-body {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
+  .body .dpfk-head,
+  .body .dpfk-ctrl,
+  .body .dpfk-ltv { flex-wrap: wrap !important; min-width: 0 !important; }
+  .body .mrpf-top-strip,
+  .body .dpfk-strip { grid-template-columns: minmax(0, 1fr) !important; }
+  .body .mrpf-top-tile { max-width: 100% !important; }
+
+  /* ── (8) Steuer: PDF-Knopfleiste ───────────────────────────────────
+     .fa-pdf-ctrl (324px) sass in einem .ct-row mit flex-wrap:nowrap
+     (303px) und lief bis 537px. */
+  .body .ct-row { flex-wrap: wrap !important; row-gap: 8px !important; }
+  .body .fa-pdf-ctrl { flex: 1 1 100% !important; min-width: 0 !important; }
+
+  /* ── (9) Bewertung: KPI-Tabelle und Modus-Schalter ─────────────────
+     Die Tabelle ist mit 535px echt breiter als der Schirm — sie wird
+     nicht gequetscht, sondern bekommt einen eigenen Scroller MIT
+     sichtbarem Hinweis (Verlauf am rechten Rand). */
+  .body .kpi-eval-body {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: relative !important;
+  }
+  .body .kpi-eval-card { position: relative !important; }
+  .body .kpi-eval-card::after {
+    content: "";
+    position: absolute;
+    right: 14px; top: 0; bottom: 0;
+    width: 26px;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.45));
+  }
+  .body .cf-switcher,
+  .body .cf-mode-btns { flex-wrap: wrap !important; min-width: 0 !important; }
+  .body .cf-mode-btn { flex: 1 1 auto !important; min-width: 0 !important; }
+}
+/* ===== v650-tabs-mobile END ===== */
+
+/* v650b: Zwei Auswahlfelder blieben auf 13px, weil #d1_type,#d2_type mit
+   ID-Spezifitaet (1,0,0) und !important gesetzt sind - .body select (0,2,1)
+   verliert dagegen. Mit der ID im Selektor (1,2,1) sitzt es. */
+@media (max-width: 768px) {
+  .body select#d1_type,
+  .body select#d2_type { font-size: 16px !important; }
+}
+
+/* v650c: Restliche Trefferflaechen unter 44px, nachgemessen nach v650.
+   Zwei Sorten: die einen duerfen einfach hoeher werden (Akkordeon-Zeilen,
+   Aktionen-Trigger), die anderen sollen ihre kompakte Optik behalten und
+   bekommen nur die unsichtbare ::after-Flaeche (Kerosin-Pille, Toolbar). */
+@media (max-width: 768px) {
+  .sb-actions-trigger,
+  .obj-extra-acc,
+  .qz-acc { min-height: 44px !important; }
+  .obj-extra-acc,
+  .qz-acc { display: flex !important; align-items: center !important; }
+
+  .hdr-credits-pill,
+  .dp-tt-mode-btn,
+  #dp-tb-x { position: relative !important; }
+  .hdr-credits-pill::after,
+  .dp-tt-mode-btn::after,
+  #dp-tb-x::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    background: transparent;
+  }
+
+  /* Rechtliches im Seitenfuss: zwei Links mit 12px Zeilenhoehe. */
+  .body .dp-legal-links a,
+  .body a.legal-link,
+  #legal-footer a { display: inline-block; padding: 12px 6px !important; }
+}
+
+/* v650d: Zwei Nachzuegler.
+   1) .sb-actions-trigger blieb 36px: `aside.sidebar .sb-actions-trigger`
+      (0,2,1) mit !important schlaegt `.sb-actions-trigger` (0,1,0).
+      Mit demselben Praefix und der ID (1,2,1) sitzt es.
+   2) Impressum/Datenschutz liegen in #dp-app-legal-footer, nicht in den
+      geratenen Klassen aus v650c. */
+@media (max-width: 768px) {
+  body aside.sidebar#sidebar .sb-actions-trigger {
+    min-height: 44px !important;
+    height: auto !important;
+  }
+  #dp-app-legal-footer a {
+    display: inline-block !important;
+    padding: 14px 8px !important;
+  }
+}
+
+/* v650e: die beiden Rechtliches-Links kamen auf 43px - eine Zeilenhoehe von
+   14px plus 2x14px Innenabstand ergibt 42, plus Rand 43. Explizit deckeln. */
+@media (max-width: 768px) {
+  #dp-app-legal-footer a { min-height: 44px !important; line-height: 20px !important; }
+}
+
+/* v650f: BMF-Modal auf dem Handy.
+   GEMESSEN bei 390px: .bmfmo-tabs ist 325px breit, flex-wrap:nowrap,
+   scrollWidth 549 - die vier Reiter liefen bis 579px hinaus und der
+   vierte war nicht erreichbar. Der Kasten selbst passt (374x793) und
+   .bmfmo-body scrollt bereits.
+   Loesung wie bei der Haupt-Tab-Leiste: waagerecht scrollen mit Snap. */
+@media (max-width: 768px) {
+  .bmfmo-tabs {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x proximity !important;
+    scrollbar-width: none !important;
+  }
+  .bmfmo-tabs::-webkit-scrollbar { display: none !important; }
+  .bmfmo-tab {
+    flex: 0 0 auto !important;
+    scroll-snap-align: start !important;
+    min-height: 44px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   v651b-preflight-erreichbar
+
+   NEBENBEFUND beim Cockpit-Durchgang, betrifft nicht nur Mobil:
+   Der Boarding-Pass #oab-bar (.dp-pfbar) traegt seit v593 overflow:hidden
+   und seit v578 flex-wrap:nowrap. Sein Inhalt ist rund 1240px breit.
+   GEMESSEN:
+       390px  -> v619 stapelt, alles erreichbar (ok)
+       820px  -> sichtbar 747, Inhalt 1208  -> abgeschnitten
+      1024px  -> sichtbar 691, Inhalt 1208  -> abgeschnitten
+      1440px  -> sichtbar 1015, Inhalt 1240 -> abgeschnitten,
+                 #oab-run ("Abrufen") liegt bei x 1485-1587
+   Der Startknopf der PRE-FLIGHT-Strecke ist damit auf jedem Schirm
+   unter rund 1620px Breite NICHT erreichbar - auch auf einem normalen
+   Notebook mit 1366 oder 1440px.
+
+   Fix: waagerecht scrollbar statt abgeschnitten, mit Snap und einem
+   sichtbaren Verlauf am rechten Rand als Hinweis. Wo der Inhalt passt,
+   aendert sich nichts - dann gibt es weder Scrollbalken noch Hinweis.
+   Unter 769px bleibt v619 (gestapelt) unberuehrt.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) {
+  #obj-action-bar .dp-pfbar,
+  .dp-pfbar {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x proximity !important;
+    scrollbar-width: thin !important;
+  }
+  .dp-pfbar > * { scroll-snap-align: start; }
+  .dp-pfbar::-webkit-scrollbar { height: 6px; }
+  .dp-pfbar::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,.28);
+    border-radius: 3px;
+  }
+  /* Sichtbarer Hinweis, dass rechts noch etwas kommt. Sitzt auf dem
+     Wrapper, nicht auf der scrollenden Leiste, damit er stehen bleibt. */
+  .dp-pf-scroll { position: relative !important; }
+  .dp-pf-scroll:has(.dp-pfbar)::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; right: 0;
+    width: 34px;
+    pointer-events: none;
+    border-radius: 0 16px 16px 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.22));
+  }
+}
+/* ===== v651b-preflight-erreichbar END ===== */
+
+/* ═══════════════════════════════════════════════════════════════════
+   v652-uebrige-mobile — Backlog Punkt 1 (Übrige Seiten und Bereiche)
+
+   GEMESSEN bei 390 x 844, Bereich fuer Bereich durchgeklickt. Ueberlauf
+   gab es fast nirgends mehr — v650 hat die Sammelursachen erledigt.
+   Uebrig blieben Felder unter 16px und Knoepfe unter 44px, und die
+   sitzen alle AUSSERHALB von .body, weshalb v650 sie nicht erwischt hat:
+
+     Alle Objekte / Track Record / Bankexport / QuickCheck
+        #sb-search-input                          12,5 px
+     Einstellungen (alle 11 Abschnitte)
+        set_user_name, set_pwd_*, dp-ec-* u.a.      13 px
+        .set-modal-close, .help-sidebar-item      unter 44 px
+     Anmeldung / Registrierung / Passwort vergessen
+        auth-email, auth-password, pw-reset-email 13,5 px
+     Bankexport / QuickCheck
+        .dpm-x                                    unter 44 px
+
+   Ueberlauf blieb an einer Stelle: die Tabelle in "Alle Objekte"
+   (Listenansicht) ist 700px breit und scrollt in ihrem Behaelter — ohne
+   sichtbaren Hinweis, dass rechts noch etwas kommt.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* (1) Eingabefelder ausserhalb von .body — derselbe iOS-Zoom-Grund
+     wie in v650, nur andere Behaelter. Die ID-Selektoren sind noetig,
+     weil einzelne Felder mit ID-Spezifitaet gesetzt sind. */
+  #sb-search-input,
+  #auth-modal input,
+  #auth-modal select,
+  #auth-modal textarea,
+  #settings-modal input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  #settings-modal select,
+  #settings-modal textarea,
+  .set-modal-cream input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  .set-modal-cream select,
+  .set-modal-cream textarea,
+  .global-view-overlay input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  .global-view-overlay select,
+  .global-view-overlay textarea {
+    font-size: 16px !important;
+  }
+
+  /* (2) Trefferflaechen. Schliessen-Knoepfe und Hilfe-Eintraege behalten
+     ihre Optik, bekommen aber die 44er-Flaeche per unsichtbarem ::after. */
+  .set-modal-close,
+  .help-sidebar-item,
+  .dpm-x,
+  .auth-close,
+  .gv-close { position: relative !important; }
+  .set-modal-close::after,
+  .help-sidebar-item::after,
+  .dpm-x::after,
+  .auth-close::after,
+  .gv-close::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    background: transparent;
+  }
+
+  /* (3) Alle Objekte, Listenansicht: die Tabelle ist mit 700px echt
+     breiter als der Schirm. Sie wird nicht gequetscht, sondern scrollt
+     MIT sichtbarem Hinweis am rechten Rand. */
+  .ao-table-wrap,
+  .ao-list-wrap {
+    position: relative !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .ao-table-wrap::after,
+  .ao-list-wrap::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; right: 0;
+    width: 26px;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.38));
+  }
+}
+/* ===== v652-uebrige-mobile END ===== */
+
+/* v652d: Preise-/Upgrade-Fenster — .pricing-modal-close und a.bw-cta lagen
+   unter 44px Trefferflaeche. Optik bleibt, Flaeche kommt per ::after. */
+@media (max-width: 768px) {
+  .pricing-modal-close, .bw-cta { position: relative !important; }
+  .pricing-modal-close::after, .bw-cta::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    background: transparent;
+  }
+}
+
+
+/* ═══ v1079-LOGO ═══════════════════════════════════════════════
+   Der Goldrahmen der Sidebar-Wortmarke wird ab hier gezeichnet, nicht mehr
+   aus dem PNG geholt. Bei jedem Zoom und jeder DPI exakt 2px scharf, und er
+   erbt die Whitelabel-Farbe, statt den DealPilot-Ton fest ins Bild zu backen.
+   Steht bewusst am Dateiende — die dp-chrome-hell-Regel weiter oben setzt
+   border-color auf die Header-Farbe und wuerde den Rahmen sonst wegfaerben.
+   Der eingeklappte Zustand ist per :not() ausgenommen und zeigt weiter die
+   Buchstaben "D"/"P" aus ::before/::after.
+   ------------------------------------------------------------------ */
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+  box-sizing: border-box !important;
+  width: 92% !important;
+  margin: 10px auto !important;
+  padding: 13px 16px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 2px solid var(--wl-c9a84c, #C9A84C) !important;
+  border-radius: 14px !important;
+  background: transparent !important;
+}
+body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
+  width: var(--dp-logo-w, 100%) !important;   /* Groesse-Regler bleibt wirksam */
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+/* Hellmodus: schwarzer Kasten aus CSS statt zweiter Bilddatei. */
+body.dp-chrome-hell:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar,
+body[data-dp-skin="hell"]:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
+  background: #050505 !important;
+  border-color: var(--wl-c9a84c, #C9A84C) !important;
+}

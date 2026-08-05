@@ -24,7 +24,7 @@
 <title>Dealpilot · Junker Immobilien</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=W37">
+<link rel="stylesheet" href="css/style.css?v=W48"><!-- v650-tabs-mobile -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=1">
 <link rel="stylesheet" href="css/bmf-modal.css?v=W34">  <!-- V289 -->
@@ -462,7 +462,7 @@ label.dp-required.qc-required::after {
 <!-- V292.6.5-cache-applied -->
 <!-- V292.6.6-cache-applied -->
 <!-- V292.6.8-cache-applied -->
-  <link rel="stylesheet" href="css/dashboard.css?v=W34">
+  <link rel="stylesheet" href="css/dashboard.css?v=W35">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"><!--v922-fonts-->
 </head>
 <body>
@@ -605,10 +605,10 @@ label.dp-required.qc-required::after {
   window.addEventListener('resize', updateToolbarHeight);
 })();
 </script>
-<!-- V63.85: Mobile-Hamburger zum Öffnen der Sidebar auf Smartphones -->
-<!-- drawer-fix-20260731: Handler auf die zentrale Funktion; 'mobile-open' war eine vierte,
-     nirgends gestylte Klasse. toggleMobileSidebar() schaltet Drawer + Overlay. -->
-<button class="mobile-hamburger" id="mobile-hamburger-btn" onclick="toggleMobileSidebar()" aria-label="Objektliste öffnen" aria-controls="sidebar">☰</button>
+<!-- v648: Der zweite Hamburger (.mobile-hamburger, V63.85) ist raus. Er war in
+     jedem Band per display:none abgeschaltet und damit nie sichtbar — es blieb
+     ein toter Umschalter. Bedient wird ausschliesslich ueber #hdr-mobile-menu
+     in der Kopfleiste. -->
 <!-- V32: autocomplete=off auf Body-Ebene unterdrückt Browser-Adress-Speichern-Popup -->
 <form id="dp-noform" autocomplete="off" onsubmit="return false" style="display:contents">
 <div class="app-wrap">
@@ -624,7 +624,9 @@ label.dp-required.qc-required::after {
     <!-- V203: Landing-Hero-Look — PNG mit Sternschnuppe-Ring -->
     <!-- V213/V215: App-Logo (HD-PNG mit eingebackenem Rahmen) -->
     <div class="app-logo-simple-wrap app-logo-simple-wrap-sidebar">
-      <img class="app-logo-simple app-logo-simple-sidebar" src="assets/dealpilot-logo-app.png" alt="DealPilot by Junker Immobilien" />
+      <!-- v646: Rahmen-Logo. Hell/Dunkel-Tausch macht _swapLogo() (settings.js) bzw. config.js applyTheme(). -->
+      <!-- v1079-LOGO: rahmenlose Wortmarke, der Goldrahmen kommt aus style.css -->
+      <img class="app-logo-simple app-logo-simple-sidebar" src="assets/dealpilot-wortmarke.png" alt="DealPilot by Junker Immobilien" />
     </div>
   </div>
 
@@ -867,7 +869,8 @@ label.dp-required.qc-required::after {
   <span class="mt-title">DealPilot</span>
   <span class="mt-spacer"></span>
 </div>
-<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileSidebar()"></div>
+<!-- v648: #mobile-overlay entfernt. Es war der Backdrop der zweiten, nie
+     wirksamen toggleMobileSidebar-Fassung aus ui.js. Backdrop ist #sb-backdrop. -->
 
 <!-- ═══════════ STANDALONE QUICK-CHECK VIEW (V63.76) ═══════════
      Wird per Sidebar-Aktion"Quick Check" geöffnet (enterQuickCheckMode()).
@@ -2929,7 +2932,7 @@ label.dp-required.qc-required::after {
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=814"></script>
-<script src="js/config.js?v=TR7"></script>
+<script src="js/config.js?v=TR8"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -2949,7 +2952,7 @@ label.dp-required.qc-required::after {
   <script src="js/mandanten.js?v=953"></script>
   <script src="js/ueberfuehrung-wizard.js?v=816i"></script>
   <script src="js/apikeys.js?v=810"></script>
-  <script src="js/settings.js?v=W20"></script>
+  <script src="js/settings.js?v=W22"></script>
 <script src="js/pricing-modal.js?v=TR7"></script>
   <script src="js/promo-erstflug.js?v=1"></script>
 <script src="js/stripe-success.js?v=183"></script>
@@ -2963,7 +2966,7 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=972b"></script>
+<script src="js/ui.js?v=974"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=946"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
@@ -3021,7 +3024,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktbewertung-card.js?v=540"></script>
 <script src="js/avm-section.js?v=W33"></script>
 <script src="js/dealpilot-mb.js?v=969c"></script>
-  <script src="js/marktbericht-view.js?v=1076"></script>
+  <script src="js/marktbericht-view.js?v=1077b"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=W40"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
@@ -3037,7 +3040,7 @@ label.dp-required.qc-required::after {
 <script src="js/investment-profile.js?v=717"></script>
 <script src="js/dashboard.js?v=W33"></script>
 <script src="js/score-fx.js?v=464"></script>
-<script src="js/main.js?v=950"></script>
+<script src="js/main.js?v=951"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=W33"></script>

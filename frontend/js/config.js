@@ -886,7 +886,7 @@ window.Plan = {
       if(_lg){
         if(!_lg.getAttribute('data-logo-dark')) _lg.setAttribute('data-logo-dark', _lg.getAttribute('src')||'');
         var _dark=_lg.getAttribute('data-logo-dark');
-        var _light='assets/dealpilot-logo-app-light.png';
+        var _light='assets/dealpilot-wortmarke.png';   /* v1079-LOGO: eine Datei fuer hell und dunkel, Kasten macht CSS */
         _lg.setAttribute('src', (t.skin==='hell') ? _light : _dark);
       }
     }catch(e){}

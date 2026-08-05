@@ -1789,12 +1789,52 @@ function fillInputsFromDpkt(o) {
   if (zu) { const z = String(zu).toLowerCase().trim(); const opt = ['gepflegt', 'neuwertig', 'saniert', 'modernisiert', 'normal', 'renovierungsbeduerftig'].find((x) => x === z || z.includes(x.slice(0, 5))); if (opt) set('cond', opt); }
 }
 
+/* v1077-mb-touch — Karte auf dem Telefon bedienbar machen.
+
+   Leaflet zieht die Karte per Voreinstellung schon mit EINEM Finger. In
+   einer langen Berichtsseite heisst das: wer beim Scrollen die Karte
+   trifft, bleibt darin haengen und kommt nicht weiter. Deshalb wie bei
+   Google Maps: ein Finger scrollt die Seite, zwei Finger bewegen und
+   zoomen die Karte. Ein kurzer Hinweis erscheint, wenn jemand es mit
+   einem Finger versucht.
+
+   Nur auf Zeigern ohne Hover — auf Maus und Trackpad bleibt alles wie
+   gehabt. touchZoom (Kneifen) bleibt in jedem Fall an. */
+function _mbMapTouch(m) {
+  try {
+    if (!m || !window.matchMedia || !window.matchMedia('(hover: none)').matches) return;
+    var el = m.getContainer();
+    if (!el) return;
+    m.dragging.disable();
+
+    var hint = document.createElement('div');
+    hint.className = 'mb-map-hint';
+    hint.textContent = 'Mit zwei Fingern bewegen und zoomen';
+    el.appendChild(hint);
+    var hideTimer = null;
+    function flash() {
+      hint.classList.add('on');
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(function () { hint.classList.remove('on'); }, 1200);
+    }
+
+    el.addEventListener('touchstart', function (e) {
+      if (e.touches && e.touches.length > 1) { m.dragging.enable(); hint.classList.remove('on'); }
+      else { m.dragging.disable(); flash(); }
+    }, { passive: true });
+    el.addEventListener('touchend', function (e) {
+      if (!e.touches || e.touches.length < 2) m.dragging.disable();
+    }, { passive: true });
+  } catch (e) { /* ohne Touch-Sonderweg bleibt die Karte wie bisher */ }
+}
+
 function drawMap(lat, lon, comps) {
   if (!map) {
     map = L.map('map', { zoomControl: true }).setView([lat, lon], 16);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© OpenStreetMap, © CARTO', maxZoom: 19,
     }).addTo(map);
+    _mbMapTouch(map);
   } else {
     map.setView([lat, lon], 14);
   }

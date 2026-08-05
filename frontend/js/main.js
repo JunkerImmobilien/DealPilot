@@ -235,8 +235,10 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Auf Resize: wenn auf Desktop zurück, Mobile-State zurücksetzen
+  // v648: Schwelle 1024 -> 900. Ab 901px steht die Leiste als feste Spalte,
+  // ein zurueckgebliebenes .sb-mobile-open haette dort den Backdrop stehen lassen.
   window.addEventListener('resize', function() {
-    if (window.innerWidth > 1024) {
+    if (window.innerWidth > 900) {
       var aw = document.querySelector('.app-wrap');
       var bd = document.getElementById('sb-backdrop');
       if (aw && aw.classList.contains('sb-mobile-open')) {
