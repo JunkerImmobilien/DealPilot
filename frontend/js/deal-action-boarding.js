@@ -350,8 +350,18 @@
   /* ────────────────── Netzwerk laden + Karten ────────────────── */
   var _cats = [];
   function loadNetwork() {
-    /* v982-netauth: ueber Auth.apiCall -> zentraler 401-Handler (Re-Login + Retry)
-       statt totem "Seite neu laden"-Text. Fallback = alter Weg, falls Auth fehlt. */
+    /* v982-netauth: ueber Auth.apiCall statt nacktem fetch.
+       v1083-netmsg — der Kommentar hier sprach von einem "zentralen
+       401-Handler (Re-Login + Retry)". Den gibt es so NICHT: Auth.apiCall
+       (auth.js:27-71) wirft bei 401 nur einen Error mit .status, und
+       session-expired-banner.js haengt einen fetch-Wrapper davor, der EINEN
+       Hinweisbalken einblendet — kein Re-Login, kein Retry. Der Kommentar
+       hat mehr versprochen, als der Code haelt; das ist hier richtiggestellt.
+
+       Folge fuer die Diagnose: der catch-Zweig meldete jede Ursache als
+       "Netzwerk aktuell nicht erreichbar." — auch ein abgelaufenes Token.
+       Genau daran war Backlog-Punkt 1 nicht zu greifen. Ab jetzt sagt die
+       Meldung, was los ist. */
     var _fail = function (msg) {
       var h = document.getElementById('dab-rails-host');
       if (h) h.innerHTML = '<div class="dab-net-load">' + msg + '</div>';
@@ -364,7 +374,21 @@
     if (window.Auth && typeof Auth.apiCall === 'function') {
       Auth.apiCall('/network-cards', { method: 'GET' })
         .then(_apply)
-        .catch(function () { _fail('Netzwerk aktuell nicht erreichbar.'); });
+        .catch(function (err) {
+          var st = err && err.status;
+          if (st === 401) {
+            _fail('Sitzung abgelaufen — bitte einmal neu anmelden, dann ist das Netzwerk wieder da.');
+          } else if (st === 403) {
+            _fail('Das Netzwerk ist für diesen Plan nicht freigeschaltet.');
+          } else if (st) {
+            _fail('Netzwerk aktuell nicht erreichbar (Fehler ' + st + ').');
+          } else {
+            /* Kein Status = Netzwerkabbruch oder der 15-s-Timeout aus
+               Auth.apiCall. Beides ist "erreichbar später nochmal". */
+            _fail('Netzwerk aktuell nicht erreichbar.');
+          }
+          try { console.warn('[network] laden fehlgeschlagen:', st || '(kein Status)', err && err.message); } catch (e) {}
+        });
       return;
     }
     var headers = {};
