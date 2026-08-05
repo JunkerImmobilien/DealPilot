@@ -20,6 +20,27 @@ nächsten Vorhaben stehen unter **Später**._
 
 ## Später
 
+- **Zwei Kopfzeilen-Elemente bleiben in den hellen Vorlagen weiß** —
+  `.hdr-obj-name` (weiß auf weiß, Kontrast 1,00) und `.hdr-obj-num`
+  (aufgehelltes Gold `#E8C964`, Kontrast 1,62). Der Rest ist mit v1088
+  erledigt: 11–12 Fundstellen → 2–4, der Referenzwert der DealPilot-Fassung
+  liegt bei 1–2.
+
+  **Diagnose steckt fest, deshalb hier statt weiterzuraten.** Gemessen:
+  `--uv-chrome-ink` löst am Element korrekt auf `#141310` auf; die
+  Regel-Auswertung über `element.matches()` zeigt meine v1088-Regel als
+  gewinnend (`!important`, Spezifität (0,3,3) gegen (0,2,0) der
+  konkurrierenden `.hdr-v61-row1 .hdr-obj-name`); kein Inline-Style am
+  Element; `header.hdr` selbst trägt korrekt `rgb(20,19,16)`. Und trotzdem
+  ist die berechnete Farbe des Kindes `rgb(255,255,255)`.
+
+  Nächster Schritt: mit `getMatchedCSSRules`-Ersatz über die
+  DevTools-Protokollebene prüfen, welche Deklaration wirklich zieht — die
+  Zählung über `matches()` findet Regeln, sagt aber nichts über die
+  Kaskade. Verdacht: eine Regel in einem Block, den der Walker nicht
+  betritt (verschachtelte `@media`/`@supports`), oder ein zweites
+  Stylesheet mit demselben Selektor.
+
 - **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
   Aktionen als Popover statt Blatt von unten
 - **Einstellungs-Abschnitte hintereinander rendern** ließ den Prüf-Browser
