@@ -249,8 +249,11 @@
     '#dpuv-b .dp-tb-row{display:flex;align-items:center;justify-content:space-between;gap:10px;',
       'padding:7px 0;font-size:12px;color:#3d382f}',
     '#dpuv-b .dp-tb-row+.dp-tb-row{border-top:1px solid #EFEBE1}',
-    '#dpuv-b .dp-tb-row input[type=color]{width:52px;height:30px;padding:0;border:1px solid #E0DACB;',
-      'border-radius:6px;background:#fff;cursor:pointer;flex:none}',
+    /* 44px, nicht 30 — im 390er-iframe gemessen: acht Farbfelder lagen
+       unter der Mindestgroesse fuer Trefferflaechen, die das Panel sonst
+       ueberall einhaelt (.dpuv-sgb, .dpuv-sw, .dpuv-pf: min-height 44). */
+    '#dpuv-b .dp-tb-row input[type=color]{width:56px;height:44px;padding:2px;border:1px solid #E0DACB;',
+      'border-radius:7px;background:#fff;cursor:pointer;flex:none}',
     '#dpuv-b .dp-tb-row input[type=range]{flex:1;max-width:150px}',
     '#dpuv-b .dp-tb-sec{margin-top:14px}',
     '#dpuv-b .dp-tb-sec>b{display:block;font-family:"JetBrains Mono",monospace;font-size:9.5px;',
