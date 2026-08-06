@@ -13,12 +13,8 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ---
 ## Offen
 
-1. **Stapel-Modus feinziehen** — `v1095`/`v1095b` steht (siehe **Fertig**).
-   Offen bleibt der Vergleich mit `design/mockups/handy2.jpg` im Detail:
-   dort tragen die KPI-Kacheln im Rumpf **dunkle** Flächen, hier folgen sie
-   der Vorlagenfarbe. Dazu fehlen „Im Rennen" und „Detail öffnen →" — beide
-   gibt es auf der Leistenkarte nicht, sie kämen aus `storage.js`. Erst
-   entscheiden, ob sie überhaupt in die Leiste gehören.
+*Nichts offen.* Die Punkte unter **Später** sind Vorhaben mit eigener
+Prüfstrecke, keine Restarbeiten.
 
 ---
 
@@ -66,6 +62,62 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-06] **Stapel-Modus feinziehen** — `v1105` bis `v1105c`
+
+  Zwei Fassungen gebaut und gezeigt, **Marcels Wahl: „B — Abgesetzt"**.
+  Fassung A (rahmenlose Kacheln, nur Trennstriche) und das
+  Vergleichs-Attribut `data-uv-stapel` sind entfernt.
+
+  **Eine Annahme des Punktes ist widerlegt.** Er sagte, im Mockup trügen
+  die KPI-Kacheln **dunkle** Flächen, in der App folgten sie der Vorlage.
+  Nachgesehen in `design/mockups/dp-handy-mockup-v2.html`: dort ist
+  `--k-tile` **pro Fassung** definiert —
+
+  | Fassung | `--k-tile` |
+  |---|---|
+  | dunkel | `rgba(255,255,255,.035)` (Aufhellung) |
+  | kontor | `#FAF9F7` auf `--k-bg #FFFFFF` |
+  | panel | `#F8F9FB` |
+
+  Das Mockup macht es also genauso wie die App. Der Eindruck stammt aus
+  `handy2.jpg`, das nur die dunkle Fassung zeigte — die Datei ist
+  inzwischen nicht mehr im Repo. Gemessen in „panel": Kachel
+  `rgb(248,249,251)` auf Karte `rgb(255,255,255)`, Abstand **6**, exakt wie
+  im Mockup.
+
+  **Der echte Punkt war ein anderer:** der goldene Kopf nimmt **159 von
+  257 px** der aufgeklappten Karte ein, der Rumpf hatte dagegen kaum
+  Eigengewicht. Fassung B macht das Raster zu einem eigenen Block mit
+  Rahmen und setzt die Kacheln darin nochmal ab.
+
+  **Die Töne werden aus `--uv-card-ink` gemischt, nicht gesetzt** — damit
+  wirkt dasselbe Muster in beide Richtungen: auf hellen Vorlagen eine Spur
+  dunkler, auf dunklen eine Spur heller, ohne je Vorlage eigene Werte. Das
+  ist die Verallgemeinerung dessen, was das Mockup in seiner dunklen
+  Fassung mit `rgba(255,255,255,.035)` tut.
+
+  **Ein Folgefehler, im direkten Vorher/Nachher gefunden (`v1105c`):**
+  Fassung B brachte **6 neue Fundstellen** unter k = 3, ausnahmslos
+  `.sbcm-label`. Es steht auf `--uv-card-mut` und kam gegen die getönte
+  Kachel nur auf **2,75**. Der Ton wird jetzt aus denselben zwei Tokens
+  gemischt wie die Kachel — 62 % ergeben **4,31**. Nachgemessen:
+  Label-Treffer **0** in kontor, boarding und konsole; kontor wieder auf
+  dem Ausgangswert 34.
+
+  **Nicht gebaut, bewusst:** „Im Rennen" und „Detail öffnen →". Beide
+  kommen im Mockup nicht vor (nachgesehen, kein Treffer) und müssten aus
+  `storage.js` nachgerüstet werden. Eine Leistenkarte ist eine Übersicht;
+  der Weg ins Detail ist der Klick auf die Karte selbst.
+
+  **Ein Messfehler von mir, und es ist derselbe wie in v1082d:** Der
+  Kontrastlauf meldete in „konsole" 49 Fundstellen, darunter `.sbc-address`,
+  `.sbc-date` und `.sbc-arrow` mit k = 1,08. Falsch — diese Elemente stehen
+  auf dem **Goldband**, und das ist ein `::before`. Mein Grund-Parser läuft
+  die Elternkette ab und findet Pseudoelemente nicht, rechnet also gegen
+  die dunkle Karte darunter. Gegen die echte Bandfarbe gemessen steht die
+  Adresse bei **k = 8,01**. Wer den Lauf wiederverwendet, muss
+  `::before`/`::after` mit einbeziehen.
 
 - [2026-08-06] **Konsole-Befund, altes Panel abgeklemmt, alle Einstellungen
   durchgeprüft** — `v1099` bis `v1104`
