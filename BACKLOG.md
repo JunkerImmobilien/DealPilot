@@ -45,6 +45,75 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
    Ordnung. Das leere `onclick` am Partner-Reiter ist Absicht
    (`reseller-portal.js:557` entfernt es und hängt einen Listener an).
 
+   ### Bauanleitung
+
+   **Die beiden Panels im Vergleich — gemessen, nicht angenommen:**
+
+   | | alt | neu |
+   |---|---|---|
+   | Baut | `settings.js:3167` `panelHtml()` | `ui-varianten.js:225` `p.innerHTML` |
+   | Wurzel | `#dp-tb-panel`, Rumpf `.dp-tb-b` | `#dpuv-panel`, Rumpf `#dpuv-b` |
+   | Abschnitt | `.dp-tb-sec` + `<b>` | `.dpuv-g` + `<h3>` |
+   | Neu zeichnen | `window.panelHtmlRebuild()` | `oeffnen()` (`:325`) |
+   | Speichert | Einzelschlüssel `dp_*_ui` | ein JSON `dp_user_settings` |
+   | Öffnet | `window._dpOpenToolbar()` | `DealPilotUiVarianten` |
+
+   **Das alte Panel hat drei Einhängepunkte, die schon genau dafür
+   gebaut wurden** — dasselbe Muster nutzt der neue Abschnitt:
+   `_dpResBlock()` (`:3170`), `_dpLogoBlock()` (`:3188`), `_dpResSave()`
+   (`:3189`). Alle drei sind global, liefern fertiges HTML und wurden
+   nachweislich sauber gerendert.
+
+   **Schritt für Schritt:**
+
+   1. **Nichts löschen.** Das alte Panel bleibt zunächst, wie es ist —
+      sonst hängt bei jedem Fehlschlag die ganze Darstellung. Erst wenn
+      der neue Abschnitt steht und geprüft ist, wird der Aufruf des alten
+      Panels entfernt.
+   2. **Abschnitt „Marke" in `ui-varianten.js`** hinter der Farbsektion
+      einhängen, als weiteres `<div class="dpuv-g"><h3>Marke</h3>…`.
+      Inhalt: Logo (Datei + Ausrichtung + Größe), Kartenfarbe, Schrift,
+      Akzent.
+   3. **Bedienelemente nicht neu erfinden.** Die Handler sind alle global
+      und funktionieren: `_dpDispHeader`, `_dpDispSide`, `_dpDispText`,
+      `_dpDispHero`, `_dpDispKpi`, `_dpDispObj`, `_dpDispAccent`,
+      `_dpDispFont`, `_dpDispSize`, `_dpDispLogoAlign`, `_dpDispLogoReset`,
+      `_dpDispRefresh`, `_dpDispTarget`, `_dpResCommit`. Für Farbzeilen
+      reicht das Muster aus `settings.js:3166` `ci(fn, lsKey, default,
+      label)` — eine `<input type="color">` mit `oninput`.
+   4. **Reseller-Umschalter mitnehmen:** `_dpResBlock()` liefert „Mich /
+      Meine Mandanten", `_dpResSave()` den Speichern-Knopf. Beide geben
+      Leerstring zurück, wenn kein Partner — das Ausblenden erledigt sich
+      damit von selbst.
+   5. **Sperre sichtbar statt versteckt.** Für Nicht-Partner bleibt der
+      Abschnitt stehen und wird ausgegraut, genau wie die Farbsektion es
+      heute macht. Tor ist `Plan.can('reseller')`
+      (`darstellung-reseller.js:48` `isPartner()`).
+   6. **Farb-Editor anbinden:** `DealPilotBrandingEditor.open({accent,
+      obsidian, mail, name, logo}, onApply)`. „Abbrechen" stellt den
+      vorherigen Zustand selbst wieder her.
+   7. **Nach dem Umbau** den Aufruf im Partner-Portal (`rp-b-disp`) auf
+      das neue Panel umbiegen, damit es nur noch einen Weg gibt.
+
+   **Fallen, die schon einmal Zeit gekostet haben:**
+
+   - **`free` in `settings.js:3168` heißt nicht „kostenlos".** Es ist
+     `(k==='pro'||k==='partner')`, also „darf den Akzent sehen". Beim
+     Übernehmen nicht als Gratis-Prüfung missverstehen.
+   - **Die Speicherorte sind verschieden.** Alt schreibt Einzelschlüssel
+     `dp_*_ui`, neu ein JSON unter `dp_user_settings`. Solange beide Panels
+     existieren, muss die Marke im **alten** Format bleiben — sonst sieht
+     das alte Panel die Werte nicht mehr, und der Mandanten-Abgleich in
+     `darstellung-reseller.js` (`MAP`, `:40`) liest genau diese Schlüssel.
+   - **Der Sweeper ist Pflicht.** `_dpDisp*` setzt nur CSS-Variablen;
+     Module mit hart verdrahtetem Gold ignorieren die. Deshalb ruft
+     `applySet()` zusätzlich `DealPilotWhitelabel.apply()` bzw. `.reset()`.
+     Wer die Marke woanders anwendet, muss das mitnehmen.
+   - **Gold-Literale nur als `var(--wl-<hex>, #<hex>)`.** Vor dem Rollout
+     `python3 tools/gold-audit.py`, RC=0 ist sauber.
+   - **Zum Prüfen wird ein Partner-Konto gebraucht** — mit PRO ist der
+     ganze Abschnitt unsichtbar und man misst ins Leere.
+
 3. **Stapel-Modus feinziehen** — `v1095`/`v1095b` steht (siehe **Fertig**).
    Offen bleibt der Vergleich mit `design/mockups/handy2.jpg` im Detail:
    dort tragen die KPI-Kacheln im Rumpf **dunkle** Flächen, hier folgen sie
