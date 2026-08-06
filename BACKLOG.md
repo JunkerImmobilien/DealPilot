@@ -13,90 +13,30 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ---
 ## Offen
 
-1. **Branding unter „Darstellung" zusammenlegen.** Es gibt zwei Panels:
-   das alte `#dp-tb-panel` (`settings.js` `_dpDisp*`, v927) mit Logo,
-   Logogröße, Schriften, Akzent und dem Reseller-Block, und das neue aus
-   `ui-varianten.js` mit Vorlage, Karten, Fläche. Marcels Vorgabe: ein
-   Abschnitt **Marke** im neuen Panel — Logo, Logogröße, Kartenfarbe,
-   Schrift, Akzent. Für alle sichtbar, für Nicht-Partner ausgegraut (wie
-   die Farbsektion es heute schon macht). `_dpResBlock` und `_dpLogoBlock`
-   werden **umgehängt, nicht neu gebaut** — beide liefern nachweislich
-   sauberes HTML.
+1. **Altes Darstellungs-Panel abklemmen.** Der Abschnitt **Marke** steht im
+   neuen Panel (v1098, siehe **Fertig**) und ist geprüft. Damit ist die
+   Voraussetzung aus Schritt 1 der alten Bauanleitung erfüllt: „Erst wenn
+   der neue Abschnitt steht und geprüft ist, wird der Aufruf des alten
+   Panels entfernt."
 
-   **Kein Defekt in der Bedienung:** mit Partner-Konto durchgeklickt sind
-   Reiter, Branding-Panel, gespeichertes Logo und Farb-Editor alle in
-   Ordnung. Das leere `onclick` am Partner-Reiter ist Absicht
-   (`reseller-portal.js:557` entfernt es und hängt einen Listener an).
+   Offen ist genau das: `#dp-tb-fab` (der Farbklecks-Knopf) und
+   `#dp-tb-panel` aus `settings.js:3195` `build()` werden weiter gebaut, es
+   gibt also zwei Wege zur selben Einstellung. **Bewusst noch nicht
+   angefasst** — das ist eine sichtbare Produktänderung, und solange beide
+   existieren, hängt bei einem Fehlschlag nicht die ganze Darstellung.
 
-   ### Bauanleitung
+   **Nicht entfernen, nur den Aufruf:** die Funktionen `_dpDisp*`,
+   `_dpLogoBlock` und `_dpResBlock` werden vom neuen Panel **benutzt** und
+   müssen bleiben. Weg darf nur `build()` bzw. dessen `fab.onclick`.
 
-   **Die beiden Panels im Vergleich — gemessen, nicht angenommen:**
-
-   | | alt | neu |
-   |---|---|---|
-   | Baut | `settings.js:3167` `panelHtml()` | `ui-varianten.js:225` `p.innerHTML` |
-   | Wurzel | `#dp-tb-panel`, Rumpf `.dp-tb-b` | `#dpuv-panel`, Rumpf `#dpuv-b` |
-   | Abschnitt | `.dp-tb-sec` + `<b>` | `.dpuv-g` + `<h3>` |
-   | Neu zeichnen | `window.panelHtmlRebuild()` | `oeffnen()` (`:325`) |
-   | Speichert | Einzelschlüssel `dp_*_ui` | ein JSON `dp_user_settings` |
-   | Öffnet | `window._dpOpenToolbar()` | `DealPilotUiVarianten` |
-
-   **Das alte Panel hat drei Einhängepunkte, die schon genau dafür
-   gebaut wurden** — dasselbe Muster nutzt der neue Abschnitt:
-   `_dpResBlock()` (`:3170`), `_dpLogoBlock()` (`:3188`), `_dpResSave()`
-   (`:3189`). Alle drei sind global, liefern fertiges HTML und wurden
-   nachweislich sauber gerendert.
-
-   **Schritt für Schritt:**
-
-   1. **Nichts löschen.** Das alte Panel bleibt zunächst, wie es ist —
-      sonst hängt bei jedem Fehlschlag die ganze Darstellung. Erst wenn
-      der neue Abschnitt steht und geprüft ist, wird der Aufruf des alten
-      Panels entfernt.
-   2. **Abschnitt „Marke" in `ui-varianten.js`** hinter der Farbsektion
-      einhängen, als weiteres `<div class="dpuv-g"><h3>Marke</h3>…`.
-      Inhalt: Logo (Datei + Ausrichtung + Größe), Kartenfarbe, Schrift,
-      Akzent.
-   3. **Bedienelemente nicht neu erfinden.** Die Handler sind alle global
-      und funktionieren: `_dpDispHeader`, `_dpDispSide`, `_dpDispText`,
-      `_dpDispHero`, `_dpDispKpi`, `_dpDispObj`, `_dpDispAccent`,
-      `_dpDispFont`, `_dpDispSize`, `_dpDispLogoAlign`, `_dpDispLogoReset`,
-      `_dpDispRefresh`, `_dpDispTarget`, `_dpResCommit`. Für Farbzeilen
-      reicht das Muster aus `settings.js:3166` `ci(fn, lsKey, default,
-      label)` — eine `<input type="color">` mit `oninput`.
-   4. **Reseller-Umschalter mitnehmen:** `_dpResBlock()` liefert „Mich /
-      Meine Mandanten", `_dpResSave()` den Speichern-Knopf. Beide geben
-      Leerstring zurück, wenn kein Partner — das Ausblenden erledigt sich
-      damit von selbst.
-   5. **Sperre sichtbar statt versteckt.** Für Nicht-Partner bleibt der
-      Abschnitt stehen und wird ausgegraut, genau wie die Farbsektion es
-      heute macht. Tor ist `Plan.can('reseller')`
-      (`darstellung-reseller.js:48` `isPartner()`).
-   6. **Farb-Editor anbinden:** `DealPilotBrandingEditor.open({accent,
-      obsidian, mail, name, logo}, onApply)`. „Abbrechen" stellt den
-      vorherigen Zustand selbst wieder her.
-   7. **Nach dem Umbau** den Aufruf im Partner-Portal (`rp-b-disp`) auf
-      das neue Panel umbiegen, damit es nur noch einen Weg gibt.
-
-   **Fallen, die schon einmal Zeit gekostet haben:**
-
-   - **`free` in `settings.js:3168` heißt nicht „kostenlos".** Es ist
-     `(k==='pro'||k==='partner')`, also „darf den Akzent sehen". Beim
-     Übernehmen nicht als Gratis-Prüfung missverstehen.
-   - **Die Speicherorte sind verschieden.** Alt schreibt Einzelschlüssel
-     `dp_*_ui`, neu ein JSON unter `dp_user_settings`. Solange beide Panels
-     existieren, muss die Marke im **alten** Format bleiben — sonst sieht
-     das alte Panel die Werte nicht mehr, und der Mandanten-Abgleich in
-     `darstellung-reseller.js` (`MAP`, `:40`) liest genau diese Schlüssel.
-   - **Der Sweeper ist Pflicht.** `_dpDisp*` setzt nur CSS-Variablen;
-     Module mit hart verdrahtetem Gold ignorieren die. Deshalb ruft
-     `applySet()` zusätzlich `DealPilotWhitelabel.apply()` bzw. `.reset()`.
-     Wer die Marke woanders anwendet, muss das mitnehmen.
-   - **Gold-Literale nur als `var(--wl-<hex>, #<hex>)`.** Vor dem Rollout
-     `python3 tools/gold-audit.py`, RC=0 ist sauber.
-   - **Zum Prüfen wird ein Partner-Konto gebraucht** — mit PRO ist der
-     ganze Abschnitt unsichtbar und man misst ins Leere.
-
+   **Achtung, eine Annahme der alten Bauanleitung ist widerlegt:** Schritt 7
+   sagte, der Aufruf im Partner-Portal (`rp-b-disp`) sei „auf das neue Panel
+   umzubiegen, damit es nur noch einen Weg gibt". Gemessen öffnet
+   `rp-b-disp` (`reseller-portal.js:695`) aber gar nicht das alte Panel,
+   sondern `DealPilotBrandingEditor.open()` — die Oberfläche, mit der ein
+   Partner die Marke **seiner Mandanten** setzt, inklusive Mail-Farbe, Name
+   und PDF-Hell. Das ist ein anderer Zweck als die persönliche Darstellung.
+   Dort ist **nichts umzubiegen.**
 2. **Stapel-Modus feinziehen** — `v1095`/`v1095b` steht (siehe **Fertig**).
    Offen bleibt der Vergleich mit `design/mockups/handy2.jpg` im Detail:
    dort tragen die KPI-Kacheln im Rumpf **dunkle** Flächen, hier folgen sie
@@ -150,6 +90,76 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-06] **Abschnitt „Marke" im Darstellungs-Panel, dazu Form und
+  Schrift** — `v1098` bis `v1098d`
+
+  Backlog Punkt 1 plus Marcels Zusatz: „vielleicht die Farbe auch
+  einstellbar für die verschiedenen Bereiche, Farbe, Form".
+
+  **Umgehängt, nicht neu gebaut**, genau wie die Bauanleitung es vorgab:
+  die sechs Bereichsfarben nutzen dieselben globalen `_dpDisp*`-Handler und
+  dieselben Einzelschlüssel `dp_*_ui`. Das **muss** so bleiben —
+  `darstellung-reseller.js` liest in seiner `MAP` genau diese Schlüssel für
+  den Mandanten-Abgleich. `_dpResBlock`, `_dpLogoBlock` und `_dpResSave`
+  liefern fertiges HTML und werden eingehängt; die Optik dafür kam als
+  **Stilbrücke** ins neue Panel, statt drüben etwas anzufassen.
+
+  **Aufgeteilt nach Zuständigkeit, nicht nach Herkunft:** Form und Schrift
+  sind Bequemlichkeit und bleiben für **jeden** frei — dieselbe Überlegung,
+  nach der schon Vorlage und Kartenmodus frei sind. Farben und Logo sind
+  die Marke und stehen sichtbar-ausgegraut hinter dem Partner-Plan.
+
+  **„Form" braucht genau eine Regel.** Gemessen lesen *alle* Radien dieser
+  Datei `--uv-r`/`--uv-rs` (sieben Fundstellen) — es reicht also, die zwei
+  Tokens zu überschreiben, statt je Fläche eine Regel zu schreiben.
+  Spezifität statt Ladereihenfolge: `:root[data-ui-form="…"]` (0,2,0)
+  schlägt die Token-Sätze der Vorlagen (0,1,1). **Grenze, ehrlich benannt:**
+  das wirkt nur *mit* einer Vorlage — ohne `data-ui-theme` liest keine Regel
+  dieser Datei `--uv-r`. Steht als Hinweis im Panel, nicht nur im Code.
+
+  **Drei Befunde nebenbei, alle gemessen:**
+
+  1. `darstellung-reseller.js` `repaint()` (`:107`) sucht **zuerst** das
+     alte Panel und ruft dessen `panelHtmlRebuild()`. Da das alte Panel
+     vorerst bestehen bleibt, greift immer dieser Zweig — der neue
+     Abschnitt wäre beim Umschalten „Mich / Meine Mandanten" nie
+     aufgefrischt worden. Eigener Aufbau, umhüllt nach Hausmuster.
+  2. **`_dpDispReset` hat nie ganz zurückgesetzt.** Es räumt acht
+     Schlüssel, lässt aber `dp_kpi_ui`, `dp_obj_ui`, `dp_hero_ui`,
+     `dp_tabtext_ui` und `dp_objtext_ui` stehen — der Boot-Block
+     (`settings.js:3213`) setzt sie beim nächsten Start wieder. Per
+     Umhüllung behoben, wirkt damit in **beiden** Panels.
+  3. **Zwei Tore für dieselbe Frage.** Das neue Panel prüfte
+     `currentKey()==='partner'`, `darstellung-reseller.js:48` prüft
+     `Plan.can('reseller')`. Mit gestubbtem `currentKey` war die Marke
+     gesperrt, der Reseller-Umschalter darin aber sichtbar. Jetzt führt
+     `Plan.can`, `currentKey` bleibt Rückfall — im Zweifel sperren.
+
+  **Zwei eigene Fehler, im Bild bzw. beim Messen gefunden:** „Text-Feintuning"
+  stand **doppelt** (`_dpLogoBlock` liefert es selbst, meine Liste hatte es
+  nochmal), und die acht Farbfelder standen auf **30 px** statt der 44 px,
+  die das Panel sonst überall einhält.
+
+  **Nachgemessen auf Staging, angemeldet, Partner-Konto:**
+
+  | Prüfung | Ergebnis |
+  |---|---|
+  | Abschnitte | 6 — App-Darstellung, Objektkarten, Kartenfläche, **Form**, **Schrift**, **Marke** |
+  | Form kantig / passend / rund | `--uv-r` 0 / 3 / 16 px, an der echten Objektkarte 0 / 3 / 16 px |
+  | Bereichsfarbe setzen | schreibt Einzelschlüssel **und** CSS-Variable |
+  | Zurücksetzen | **alle elf** Schlüssel weg, Variablen entfernt, Felder auf Standard |
+  | Persistenz über Neuladen | Vorlage, Form, Radius, Bereichsfarbe, Schrift — alle da, Bedienelemente zeigen den Stand |
+  | Ohne Partner | Marke gesperrt, **sichtbar**, Deckkraft 0,42, keine Klicks, Hinweis da, Reseller-Blöcke leer; Form und Schrift **frei** |
+  | 390 × 844 | Panel als Blatt von unten im Bild, 51 Bedienelemente, **0** unter 44 px, Rumpf scrollt, kein Querüberlauf |
+
+  **Ein Messfehler, zurückgenommen:** Ich hatte das Panel bei 390 px
+  zunächst außerhalb des Bildes gemessen (`y=840` bei 840 px Höhe). Das war
+  wieder die eingefrorene Transition im gedrosselten iframe — nach
+  `getAnimations().finish()` steht es bei `y=185`.
+
+  **Nicht gebaut, bewusst:** das Abklemmen des alten Panels. Steht als
+  eigener Punkt 1, samt der widerlegten Annahme über `rp-b-disp`.
 
 - [2026-08-06] **Partner-Akzent lesbar machen** — `v1097`, `v1097b`
 
