@@ -2019,3 +2019,13 @@ html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbcm {
   border: 1px solid color-mix(in srgb, var(--uv-card-ink) 14%, var(--uv-card)) !important;
   border-radius: var(--uv-rs, 7px) !important;
 }
+/* Das Kachel-Label muss auf der ABGESETZTEN Flaeche noch tragen.
+   GEMESSEN im direkten Vorher/Nachher: Fassung B brachte 6 neue
+   Fundstellen unter k=3, ausnahmslos .sbcm-label — es steht auf
+   --uv-card-mut (#918d84) und kam gegen die getoente Kachel nur auf 2,75.
+   Der Ton wird deshalb aus denselben zwei Tokens gemischt wie die Kachel
+   selbst; 62 % ergeben 4,31 und wirken in beide Helligkeiten, weil
+   --uv-card-ink auf dunklen Vorlagen hell ist. */
+html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbcm .sbcm-label {
+  color: color-mix(in srgb, var(--uv-card-ink) 62%, var(--uv-card)) !important;
+}
