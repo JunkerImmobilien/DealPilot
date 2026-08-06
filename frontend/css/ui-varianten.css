@@ -884,3 +884,55 @@ html[data-ui-theme="kanzlei"]  body header.hdr .tier-red .sc-pill-v,
 html[data-ui-theme="boarding"] body header.hdr .tier-red .sc-pill-v {
   color: #B8625C !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1089 — die beiden letzten weissen Kopfzeilen-Elemente
+
+   BEFUND (statisch gemessen, nicht geraten). Meine v1088-Diagnose war am
+   FALSCHEN GEGNER gemessen und wird hiermit zurueckgenommen: ich hatte
+   .hdr-v61-row1 .hdr-obj-name (0,2,0) als konkurrierende Regel geprueft.
+   Die Regel, die wirklich gewinnt, steht in style.css:24136/24145/24064
+   und selektiert ueber die ID:
+
+     header.hdr.has-v64-score #hdr-obj      -> (1,2,1)  color:var(--dp-ink-1)
+     header.hdr.has-v64-score #hdr-obj-num  -> (1,2,1)  color:var(--gold-2,#E8C964)
+     header.hdr.has-v64-score .hdr-sep      -> (0,3,1)  color:var(--dp-ink-1)
+
+   index.html:807/813 traegt an denselben Elementen BEIDES:
+     <span class="hdr-obj-num" id="hdr-obj-num">
+     <div  class="hdr-obj-name" id="hdr-obj">
+
+   Meine v1088-Selektoren waren rein klassenbasiert (0,3,3) und verlieren
+   damit gegen jede ID — !important auf beiden Seiten, also entscheidet
+   die Spezifitaet. Deshalb loeste --uv-chrome-ink am Element korrekt auf
+   und blieb trotzdem wirkungslos: die Deklaration kam nie zum Zug.
+
+   FIX: dieselben Farben ueber Selektoren mit ID, (1,2,3) schlaegt (1,2,1).
+   "konsole" und "dealpilot" sind dunkel und bleiben ausgenommen.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* (a) Objektname — weiss auf weiss, Kontrast 1,00 */
+html[data-ui-theme="kontor"]   body header.hdr #hdr-obj,
+html[data-ui-theme="panel"]    body header.hdr #hdr-obj,
+html[data-ui-theme="kanzlei"]  body header.hdr #hdr-obj,
+html[data-ui-theme="boarding"] body header.hdr #hdr-obj {
+  color: var(--uv-chrome-ink) !important;
+}
+
+/* (b) Objektnummer — aufgehelltes Gold #E8C964, Kontrast 1,62.
+   var(--wl-9a7f33) steht in WL_TINTS und faerbt im Whitelabel mit. */
+html[data-ui-theme="kontor"]   body header.hdr #hdr-obj-num,
+html[data-ui-theme="panel"]    body header.hdr #hdr-obj-num,
+html[data-ui-theme="kanzlei"]  body header.hdr #hdr-obj-num,
+html[data-ui-theme="boarding"] body header.hdr #hdr-obj-num {
+  color: var(--wl-9a7f33, #9a7f33) !important;
+}
+
+/* (c) Der Trenner zwischen beiden haengt an derselben Ursache
+   (style.css:24065, var(--dp-ink-1)) und war in v1088 gar nicht erfasst. */
+html[data-ui-theme="kontor"]   body header.hdr .hdr-sep,
+html[data-ui-theme="panel"]    body header.hdr .hdr-sep,
+html[data-ui-theme="kanzlei"]  body header.hdr .hdr-sep,
+html[data-ui-theme="boarding"] body header.hdr .hdr-sep {
+  color: var(--uv-chrome-ink2) !important;
+}
