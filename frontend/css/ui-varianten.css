@@ -1211,3 +1211,30 @@ html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbc-mini-grid
   border-top: 1px solid var(--uv-card-tl, #E9E4D9) !important;
   padding-top: 8px !important;
 }
+
+/* v1092c — GEMESSEN im Bild: im aufgeklappten Rumpf brachen die KPI-Werte
+   um ("+4.037 €" und "8,00 %" jeweils auf zwei Zeilen). Ursache ist die
+   Zeilenform aus v1082k (.sbcm als row mit Label und Wert nebeneinander)
+   bei drei Kacheln auf 325 px. Der Wert darf nicht umbrechen, das Label
+   darf schrumpfen. */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbc-mini-grid {
+  gap: 4px !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbcm {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbcm-head,
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbcm-label {
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbcm-val,
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbcm-v {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  font-size: 11.5px !important;
+}
