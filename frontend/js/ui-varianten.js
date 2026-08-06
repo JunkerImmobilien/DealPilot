@@ -154,10 +154,22 @@
      Nur die FARBEN haengen am Partner-Plan. Vorlagen, Kartenmodus und
      Kartenflaeche darf jeder — das ist Bequemlichkeit, keine Leistung. */
   function istPartner() {
+    /* v1098: Erst Plan.can('reseller') — das ist dasselbe Tor, das
+       darstellung-reseller.js:48 benutzt, und der Backlog nennt es
+       ausdruecklich. Vorher stand hier nur currentKey()==='partner'.
+       GEMESSEN, dass das eine zweite Wahrheit war: mit gestubbtem
+       currentKey blieb die Marke gesperrt, der Reseller-Umschalter darin
+       aber sichtbar — die beiden Tests waren verschiedener Meinung.
+       currentKey bleibt als Rueckfall, falls Plan noch nicht geladen ist:
+       im Zweifel sperren, nicht oeffnen. */
+    try {
+      if (window.Plan && typeof Plan.can === 'function') return !!Plan.can('reseller');
+    } catch (e) {}
     try {
       var p = window.DealPilotConfig && DealPilotConfig.pricing;
       return !!(p && p.currentKey && p.currentKey() === 'partner');
-    } catch (e) { return false; }
+    } catch (e) {}
+    return false;
   }
 
   /* ── Farben ───────────────────────────────────────────────────────────
