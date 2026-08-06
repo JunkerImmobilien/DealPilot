@@ -581,6 +581,41 @@ html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-good .sbcm-val {
 html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-info .sbcm-val { color: #4f90b8 !important; }
 html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-bad  .sbcm-val { color: #ba726d !important; }
 
+/* ── v1107b · dasselbe fuer JEDE Vorlage, nicht nur fuer "weiss" ─────────
+   Die Gegenprobe hat den Punkt groesser gemacht, als er im Backlog stand:
+
+     dealpilot (Grundfassung, dunkle Karte)  19 Fundstellen  <- Istzustand
+     kontor  (helle Karte, OHNE "weiss")     14 Fundstellen  <- Fehler
+     konsole (dunkle Karte)                   3 Fundstellen
+
+   In "kontor" standen dieselben sieben Skalen-Beschriftungen bei k=1,00
+   wie bei "weiss". Die Vorlage macht die Karte hell und setzt --uv-card-*,
+   aber die Kachel-Texte lasen die Tokens nicht — sie behielten ihre
+   Grundfassung, die fuer die dunkle Karte gebaut ist.
+
+   Hier deshalb ueber --uv-card-mut statt ueber einen festen Wert: in den
+   hellen Vorlagen ist der Ton dunkel, in "konsole" hell. Eine Regel, beide
+   Richtungen. Die Grundfassung ohne Vorlage bleibt unberuehrt — dort ist
+   die Karte dunkel und die Toene sind dafuer gebaut. */
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-date,
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-arrow,
+html[data-ui-theme] body aside.sidebar .sb-card .sbcm-label,
+html[data-ui-theme] body aside.sidebar .sb-card .sbcm-toggle-ico,
+html[data-ui-theme] body aside.sidebar .sb-card .sbcm-scale span,
+html[data-ui-theme] body aside.sidebar .sb-card .sbcm-tick {
+  color: var(--uv-card-mut) !important;
+}
+
+/* Und die Marken-Elemente auf einer WEISSEN Karte in einer DUNKLEN Vorlage.
+   GEMESSEN in konsole + weiss: .sbc-seq k=1,40 und .sbc-kp k=1,62 — die
+   v1093/v1096-Regeln setzen dort --gold-2, den hellen Markenton, und der
+   steht dann auf einer weissen Karte. Die Kartenflaeche ist die spaetere
+   und ausdruecklichere Wahl, also gewinnt sie: dunkler Markenton. */
+html[data-ui-theme="konsole"][data-ui-surface="light"] body aside.sidebar .sb-card .sbc-seq,
+html[data-ui-theme="konsole"][data-ui-surface="light"] body aside.sidebar .sb-card .sbc-kp {
+  color: var(--uv-marke-d) !important;
+}
+
 
 /* ══════════════════════════════════════════════════════════════════════════
    5 · OBJEKTKARTEN-MODI — Backlog Punkt 4
