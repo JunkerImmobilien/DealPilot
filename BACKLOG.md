@@ -45,13 +45,12 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
    Ordnung. Das leere `onclick` am Partner-Reiter ist Absicht
    (`reseller-portal.js:557` entfernt es und hängt einen Listener an).
 
-3. **`handy2` als vierter Kartenmodus** — `design/mockups/handy2.jpg`,
-   Auszug aus der Mobile-Fassung (MA-Pakete). Goldene Zeile mit Score-Ring
-   links und Stufen-Abzeichen (STARK/SCHWACH) rechts; aufgeklappt Foto,
-   Preis, Stufen-Abzeichen und drei dunkle KPI-Kacheln (RENDITE, CASHFLOW,
-   DSCR), dazu „Im Rennen" und „Detail öffnen →". In hell **und** dunkel,
-   unter Einstellungen wählbar. Reiht sich neben `kompakt`/`standard`/
-   `wallet` in `CARDS` (`ui-varianten.js:45`) ein.
+3. **Stapel-Modus feinziehen** — `v1095`/`v1095b` steht (siehe **Fertig**).
+   Offen bleibt der Vergleich mit `design/mockups/handy2.jpg` im Detail:
+   dort tragen die KPI-Kacheln im Rumpf **dunkle** Flächen, hier folgen sie
+   der Vorlagenfarbe. Dazu fehlen „Im Rennen" und „Detail öffnen →" — beide
+   gibt es auf der Leistenkarte nicht, sie kämen aus `storage.js`. Erst
+   entscheiden, ob sie überhaupt in die Leiste gehören.
 
 ---
 
@@ -1142,3 +1141,28 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
   gerendert wurden. Einzeln geöffnet ist jeder unauffällig. Das kann ein
   Artefakt der Automatisierung sein oder ein echter Rendering-Kostenpunkt —
   nicht weiter verfolgt, gehört auf ein echtes Gerät.
+
+- [2026-08-06] **Kartenmodus „Stapel" (Handy-Optik)** — `v1095`, `v1095b`
+
+  Vorlage `design/mockups/handy2.jpg`. Zugeklappt eine goldene Zeile mit
+  Score-Ring links auf dem Verlauf, Adresse fett daneben, Nummer und Datum
+  klein darunter, Stufen-Abzeichen rechts, Chevron außen.
+
+  **Nachgemessen:** zu **61 px**, offen **255 px**; Band 343 × 59; Ring
+  x 21, Abzeichen x 305–336, Chevron x 330. Aufgeklappt sind Foto, Preis,
+  Halter und KPI-Kacheln alle da. Das Goldband ist in **allen vier**
+  geprüften Vorlagen identisch (`rgb(232,204,122) → rgb(201,…)`) — es ist
+  das Kennzeichen des Modus, hell wie dunkel. Der Rumpf folgt dagegen der
+  Vorlagenfarbe, damit Kontor keinen schwarzen Block bekommt.
+
+  Aufgeklappt wird über dieselbe Mechanik wie „Kompakt"
+  (`js/karten-kompakt.js`, Klasse `.uv-open`); `kompaktAn()` nimmt jetzt
+  beide Modi. `CARDS` in `ui-varianten.js:45` um `{ key:'stapel' }`
+  erweitert — der Umschalter zeichnet den vierten Knopf von selbst.
+
+  **Ein Fehler unterwegs (v1095b):** das Stufen-Abzeichen stand bei x 0.
+  Mein `position:absolute` bezog sich auf `.sbc-score-overlay` — das ist
+  selbst absolut und damit der positionierte Vorfahr, nicht die Karte. Bei
+  `left:8px` und automatischer Breite schob `right:30px` es aus dem Bild.
+  Richtig ist das Muster aus v1082j: das Overlay spannt über die Bandbreite
+  und schiebt Ring und Abzeichen per `space-between` auseinander.
