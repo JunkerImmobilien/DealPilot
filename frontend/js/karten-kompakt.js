@@ -2,7 +2,9 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    karten-kompakt.js — v1092 · Kompakt-Karten zum Aufklappen
 
-   VORLAGE: design/mockups/Screenshot 1.png (offen) und Screenshot 2.png (zu).
+   VORLAGE: Marcels zwei Bilder vom 06.08., aufgeklappt und zu.
+   Die Dateien sind inzwischen aus design/mockups entfernt — der Befund
+   und alle Messwerte stehen im BACKLOG unter Fertig.
    Das ist die Karte aus dem Portfolio-Cockpit (js/dashboard.js:836,
    kanbanCardHtml -> .kc / .kc-flat / .kc-body, umgeschaltet per
    classList.toggle('open')). Uebernommen wird die GESTALTUNG, nicht der Code —

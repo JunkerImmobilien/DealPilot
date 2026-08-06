@@ -234,7 +234,8 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 - [2026-08-05] **Kompakter Logo-Kopf in den Vorlagen** — `20dbb4c`, `49c1944`
 
-  Marcels Vorgabe: die Vorlagen sollen aussehen wie `UI-Ansicht.png`, „auch
+  Marcels Vorgabe: die Vorlagen sollen aussehen wie sein Bild `UI-Ansicht.png`
+  (inzwischen entfernt), „auch
   das Logo darf klein werden".
 
   **Befund:** Die Vorlage hatte den Logo-Kopf **gar nicht angefasst** —

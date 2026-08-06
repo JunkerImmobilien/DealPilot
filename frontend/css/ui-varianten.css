@@ -479,7 +479,7 @@ html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbcm-head {
    v1082g — NEU GEBAUT gegen die GEMESSENE Struktur. Der erste Anlauf war
    gegen die Mockup-Struktur gebaut und hat die halbe Karte zugedeckt.
 
-   Was im Bild schiefging (Screenshot 2026-08-05 152120.png):
+   Was im Bild schiefging (Marcels Screenshot vom 05.08., inzwischen entfernt):
      * overflow:hidden auf der Karte schnitt das Investor-Ribbon ab — das
        sitzt gemessen bei top:-7px und ragt absichtlich hinaus.
      * Das ::before lag mit inset:0 ueber der GANZEN .sbc-top und deckte
@@ -1097,7 +1097,8 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-address {
 /* ═══════════════════════════════════════════════════════════════════════
    v1092 — Kompakt wird eine schmale Zeile zum Aufklappen
 
-   VORLAGE: design/mockups/Screenshot 1.png (offen) / Screenshot 2.png (zu).
+   VORLAGE: Marcels zwei Bilder vom 06.08., aufgeklappt und zu (Dateien
+   inzwischen entfernt, Befund im BACKLOG unter Fertig).
    Das ist die Karte aus dem Portfolio-Cockpit (js/dashboard.js:836,
    kanbanCardHtml). Uebernommen wird die Gestaltung, nicht der Code — die
    Leistenkarte hat eine andere Struktur (CLAUDE.md, storage.js:866).
@@ -1330,7 +1331,8 @@ html[data-ui-theme="boarding"] body aside.sidebar .sb-section-title {
 
 /* ═══════════════════════════════════════════════════════════════════════
    v1094 — die zugeklappte Kompakt-Zeile nach der Vorlage
-   design/mockups/Screenshot 2.png: Adresse fett zuerst, darunter klein
+   Marcels Bild der zugeklappten Zeile (inzwischen entfernt):
+   Adresse fett zuerst, darunter klein
    "Ort · Nummer", rechts der Ring, ganz rechts der Chevron.
    Bisher stand die Nummernpille UEBER der Adresse — das ist die
    Reihenfolge aus dem Renderer (.sbc-top-line1 vor .sbc-address,
