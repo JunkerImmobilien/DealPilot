@@ -38,8 +38,11 @@
   var OFFEN = Object.create(null);   /* data-key -> true, ueberlebt Neuzeichnen */
   var KLASSE = 'uv-open';
 
+  /* v1095: "stapel" (Handy-Optik nach handy2.jpg) klappt genauso auf wie
+     "kompakt" — dieselbe Mechanik, andere Optik. Deshalb hier beide. */
   function kompaktAn() {
-    return document.documentElement.getAttribute('data-ui-cards') === 'kompakt';
+    var m = document.documentElement.getAttribute('data-ui-cards');
+    return m === 'kompakt' || m === 'stapel';
   }
 
   function karteVon(el) {

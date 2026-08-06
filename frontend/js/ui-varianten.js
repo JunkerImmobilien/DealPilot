@@ -45,7 +45,11 @@
   var CARDS = [
     { key: 'kompakt',  name: 'Kompakt',  sub: 'Meiste'      },
     { key: '',         name: 'Standard', sub: 'Foto & KPI'  },
-    { key: 'wallet',   name: 'Wallet',   sub: 'Farbkopf'    }
+    { key: 'wallet',   name: 'Wallet',   sub: 'Farbkopf'    },
+    /* v1095 — Vorlage design/mockups/handy2.jpg, Auszug aus der
+       Mobile-Fassung (MA-Pakete). Goldene Zeile, Ring links,
+       Stufen-Abzeichen rechts, aufklappbar wie "kompakt". */
+    { key: 'stapel',   name: 'Stapel',   sub: 'Handy-Optik' }
   ];
   var SURFACE = [
     { key: '',       name: 'Passend', sub: 'Folgt der Vorlage' },
