@@ -1754,3 +1754,35 @@ html[data-ui-theme="kanzlei"]  body nav.tabs .tabs-status-done .tabs-status-text
 html[data-ui-theme="boarding"] body nav.tabs .tabs-status-done .tabs-status-text {
   color: #2E8455 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1098 — "Form": der Radius wird waehlbar
+
+   Marcels Zusatz zum Backlog-Punkt ("vielleicht die Farbe auch einstellbar
+   fuer die verschiedenen Bereiche, Farbe, Form"). Der Radius steckte
+   bisher nur IN der Vorlage: --uv-r 3px in "kontor", 11px in "panel", 12px
+   in "boarding".
+
+   GEMESSEN, dass EINE Regel reicht: alle Radien in dieser Datei lesen
+   --uv-r bzw. --uv-rs (Fundstellen 376, 385, 413, 1092, 1110, 1483, 1487).
+   Es braucht also keine Regel je Flaeche, sondern nur die zwei Tokens.
+
+   SPEZIFITAET, nicht Ladereihenfolge (CLAUDE.md): die Token-Saetze der
+   Vorlagen stehen auf html[data-ui-theme="…"] = (0,1,1). Hier steht
+   :root[data-ui-form="…"] = (0,2,0) und gewinnt damit unabhaengig davon,
+   wer spaeter in der Datei steht.
+
+   GRENZE, ehrlich benannt: das wirkt nur MIT einer Vorlage. Ohne
+   data-ui-theme liest keine Regel dieser Datei --uv-r, die App nutzt dann
+   ihre eigenen Radien aus style.css. Das ist genau die Zusicherung "wer
+   nicht umschaltet, merkt nichts" — deshalb steht der Hinweis auch im
+   Panel und nicht nur hier.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root[data-ui-form="kantig"] {
+  --uv-r:  0px;
+  --uv-rs: 0px;
+}
+:root[data-ui-form="rund"] {
+  --uv-r:  16px;
+  --uv-rs: 11px;
+}

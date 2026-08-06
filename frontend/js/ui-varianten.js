@@ -72,6 +72,51 @@
   var AKZENTE  = [GOLD_STD, '#1F4E79', '#0F6E6E', '#7B2D3B', '#3A4250', '#5B7C3A'];
   var GRUNDFARBEN = [OBSIDIAN_STD, '#0B1220', '#16110B', '#0D1512', '#1C2027', '#241C16'];
 
+  /* ── v1098 · Die Bereiche aus dem alten Panel ─────────────────────────
+     Backlog Punkt 1: die beiden Darstellungs-Panels zusammenlegen.
+     Diese sechs Farbzeilen standen bisher im alten #dp-tb-panel
+     (settings.js:3175-3184) unter "Chrome (Hell)" und "Karten". Sie werden
+     UMGEHAENGT, nicht neu gebaut: dieselben globalen Handler, dieselben
+     localStorage-Schluessel.
+
+     WARUM DIE ALTEN SCHLUESSEL BLEIBEN MUESSEN (Backlog, "Fallen"): das
+     neue Panel speichert sonst alles als ein JSON unter dp_user_settings —
+     aber darstellung-reseller.js liest in seiner MAP (:40) genau diese
+     Einzelschluessel, um die Marke eines Partners an dessen Mandanten
+     durchzureichen. Ein zweites Format haette den Mandanten-Abgleich still
+     abgehaengt. */
+  var BEREICHE = [
+    { fn: '_dpDispHeader',  ls: 'dp_hdr_ui',     def: '#EAE4D6', label: 'Kopfleiste + Logo' },
+    { fn: '_dpDispSide',    ls: 'dp_side_ui',    def: '#EAE4D6', label: 'Objektleiste + Band' },
+    { fn: '_dpDispText',    ls: 'dp_text_ui',    def: '#1A1A1A', label: 'Text' },
+    { fn: '_dpDispHero',    ls: 'dp_hero_ui',    def: GOLD_STD,  label: 'Score-Karte' },
+    { fn: '_dpDispKpi',     ls: 'dp_kpi_ui',     def: '#F6F2E9', label: 'KPI-Karten' },
+    { fn: '_dpDispObj',     ls: 'dp_obj_ui',     def: '#F6F2E9', label: 'Objektkarten' },
+    { fn: '_dpDispTabText', ls: 'dp_tabtext_ui', def: GOLD_STD,  label: 'Reitertexte' },
+    { fn: '_dpDispObjText', ls: 'dp_objtext_ui', def: '#1A1A1A', label: 'Text auf Objektkarten' }
+  ];
+
+  var SCHRIFTEN = [
+    { key: 'inter',   name: 'Inter',   sub: 'Neutral' },
+    { key: 'grotesk', name: 'Grotesk', sub: 'Marke'   },
+    { key: 'serif',   name: 'Serif',   sub: 'Klassisch' },
+    { key: 'system',  name: 'System',  sub: 'Gerät'   }
+  ];
+  var GROESSEN = [
+    { key: '0.92', name: 'A−', sub: 'Kompakt' },
+    { key: '1',    name: 'A',  sub: 'Normal'  },
+    { key: '1.08', name: 'A+', sub: 'Größer'  }
+  ];
+  /* v1098 · "Form" — Marcels Zusatz zum Backlog-Punkt. Der Radius steckte
+     bisher nur als --uv-r/--uv-rs IN der Vorlage und war nicht waehlbar.
+     Leerer Schluessel heisst wie ueberall: kein Attribut, die Vorlage
+     entscheidet. */
+  var FORMEN = [
+    { key: 'kantig', name: 'Kantig', sub: 'Ohne Radius' },
+    { key: '',       name: 'Passend', sub: 'Folgt der Vorlage' },
+    { key: 'rund',   name: 'Rund',   sub: 'Weiche Ecken' }
+  ];
+
   /* ── Speicherung ──────────────────────────────────────────────────────
      Dasselbe Feld wie DealPilotBgMode (settings.js:2915) — ein JSON unter
      dp_user_settings statt eines weiteren Einzelschluessels. */
@@ -100,6 +145,7 @@
     attr('data-ui-theme',   get('ui_theme',   THEMES));
     attr('data-ui-cards',   get('ui_cards',   CARDS));
     attr('data-ui-surface', get('ui_surface', SURFACE));
+    attr('data-ui-form',    get('ui_form',    FORMEN));   /* v1098 */
   }
 
   /* ── Plan-Schranke ────────────────────────────────────────────────────
@@ -177,7 +223,32 @@
       '#dpuv-panel{top:auto;left:0;width:auto;max-width:none;height:78vh;border-left:0;',
         'border-top:1px solid rgba(0,0,0,.14);border-radius:14px 14px 0 0;transform:translateY(100%)}',
       '#dpuv-panel.open{transform:translateY(0)}}',
-    '@media (prefers-reduced-motion:reduce){#dpuv-panel,#dpuv-back{transition:none}}'
+    '@media (prefers-reduced-motion:reduce){#dpuv-panel,#dpuv-back{transition:none}}',
+
+    /* ── v1098 · Farbzeilen und Stilbruecke ───────────────────────────────
+       Die Farbzeile ist neu, aber sie traegt dieselbe Klasse .dp-tb-row wie
+       im alten Panel — damit passen die umgehaengten Bloecke (_dpLogoBlock,
+       _dpResBlock, _dpResSave) ohne Aenderung hinein. Die liefern fertiges
+       HTML mit den alten Klassen; die Vorgabe im Backlog lautet
+       ausdruecklich "umgehaengt, nicht neu gebaut". Also kommt die Optik
+       hierher, statt dass drueben etwas angefasst wird. */
+    '#dpuv-b .dp-tb-row{display:flex;align-items:center;justify-content:space-between;gap:10px;',
+      'padding:7px 0;font-size:12px;color:#3d382f}',
+    '#dpuv-b .dp-tb-row+.dp-tb-row{border-top:1px solid #EFEBE1}',
+    '#dpuv-b .dp-tb-row input[type=color]{width:52px;height:30px;padding:0;border:1px solid #E0DACB;',
+      'border-radius:6px;background:#fff;cursor:pointer;flex:none}',
+    '#dpuv-b .dp-tb-row input[type=range]{flex:1;max-width:150px}',
+    '#dpuv-b .dp-tb-sec{margin-top:14px}',
+    '#dpuv-b .dp-tb-sec>b{display:block;font-family:"JetBrains Mono",monospace;font-size:9.5px;',
+      'font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8b8577;margin:0 0 7px}',
+    '#dpuv-b .dp-tt-mode-toggle{display:flex;gap:7px;flex-wrap:wrap}',
+    '#dpuv-b .dp-tt-mode-btn{flex:1 1 auto;min-height:44px;padding:9px 8px;border:1px solid #E0DACB;',
+      'border-radius:7px;background:#fff;color:#3d382f;font-size:12px;font-weight:600;cursor:pointer}',
+    '#dpuv-b .dp-tt-mode-btn.active{background:var(--wl-fbf6e9, #FBF6E9);',
+      'border-color:var(--wl-c9a84c, #C9A84C);box-shadow:0 0 0 1px var(--wl-c9a84c, #C9A84C)}',
+    '#dpuv-b .btn{min-height:44px;border-radius:8px;border:1px solid #DCD5C4;background:#fff;',
+      'color:#3d382f;font-size:12.5px;font-weight:600;cursor:pointer;padding:11px}',
+    '#dpuv-b .dp-tb-sec img{max-width:100%;height:auto}'
   ].join('');
 
   function cssEinspritzen() {
@@ -209,6 +280,25 @@
       }).join('') + '</div>';
   }
 
+  /* ── v1098 · Eine Farbzeile, exakt nach dem Muster aus settings.js:3166 ──
+     Dort heisst sie ci(fn, lsKey, default, label) und ist eine <input
+     type="color"> mit oninput. Der Backlog nennt sie als Vorlage, weil die
+     Handler global sind und bereits funktionieren. Einziger Unterschied:
+     hier wird der Wert per Listener gebunden statt per oninput-Attribut —
+     inline-Handler haetten sonst als Text im HTML gestanden. */
+  function farbzeile(b) {
+    var wert = '';
+    try { wert = localStorage.getItem(b.ls) || b.def; } catch (e) { wert = b.def; }
+    return '<label class="dp-tb-row"><span>' + esc(b.label) + '</span>' +
+      '<input type="color" value="' + esc(wert) + '" data-fn="' + esc(b.fn) + '" data-ls="' + esc(b.ls) + '"></label>';
+  }
+
+  /* Die umgehaengten Bloecke liefern Leerstring, wenn kein Partner —
+     das Ausblenden erledigt sich damit von selbst (Backlog, Schritt 4). */
+  function fremdBlock(name) {
+    try { return (typeof window[name] === 'function') ? (window[name]() || '') : ''; } catch (e) { return ''; }
+  }
+
   function bauen() {
     cssEinspritzen();
     if (document.getElementById('dpuv-panel')) return;
@@ -236,16 +326,47 @@
         '<div class="dpuv-g"><h3>Kartenfläche</h3>' +
           '<p class="dpuv-hint">Karten folgen der Vorlage oder bleiben weiß.</p>' +
           segHtml('dpuv-surface', SURFACE, get('ui_surface', SURFACE), 2) + '</div>' +
-        '<div class="dpuv-g"><h3>Farben</h3>' +
-          '<p class="dpuv-hint">Akzent und Grundfarbe für App, PDF und Mails.</p>' +
+        /* v1098 · "Form" — frei fuer jeden. Radius ist Bequemlichkeit,
+           keine Marke, und faellt damit unter dieselbe Ueberlegung wie
+           Vorlage und Kartenmodus. */
+        '<div class="dpuv-g"><h3>Form</h3>' +
+          '<p class="dpuv-hint">Wie weich Karten, Felder und Knöpfe an den Ecken sind. ' +
+            'Wirkt zusammen mit einer Vorlage — „DealPilot" behält seine eigenen Ecken.</p>' +
+          segHtml('dpuv-form', FORMEN, get('ui_form', FORMEN)) + '</div>' +
+        '<div class="dpuv-g"><h3>Schrift</h3>' +
+          '<p class="dpuv-hint">Schriftfamilie und Textgröße der gesamten Oberfläche.</p>' +
+          '<div class="dp-tt-mode-toggle" id="dpuv-font">' +
+            SCHRIFTEN.map(function (f) {
+              return '<button type="button" class="dp-tt-mode-btn" data-v="' + esc(f.key) + '">' + esc(f.name) + '</button>';
+            }).join('') + '</div>' +
+          '<div class="dp-tt-mode-toggle" id="dpuv-size" style="margin-top:7px">' +
+            GROESSEN.map(function (g) {
+              return '<button type="button" class="dp-tt-mode-btn" data-v="' + esc(g.key) + '">' + esc(g.name) + '</button>';
+            }).join('') + '</div></div>' +
+
+        /* ── Marke ────────────────────────────────────────────────────────
+           Backlog Punkt 1. Alles, was die MARKE ausmacht, an einer Stelle:
+           Akzent, Grundfarbe, die acht Bereiche und das Logo. Schrift und
+           Form stehen bewusst DARUEBER und ausserhalb der Sperre — sie sind
+           Bequemlichkeit, keine Marke.
+           Der Reseller-Umschalter steht ganz oben im Abschnitt, weil er
+           bestimmt, WEN alles Folgende betrifft (mich oder meine
+           Mandanten). */
+        '<div class="dpuv-g"><h3>Marke</h3>' +
+          '<p class="dpuv-hint">Farben und Logo für App, PDF und Mails.</p>' +
           '<div class="dpuv-lock" id="dpuv-lock"><div class="dpuv-inner">' +
-            '<div class="dpuv-lbl">Akzent</div>' +
+            '<div id="dpuv-res">' + fremdBlock('_dpResBlock') + '</div>' +
+            '<div class="dpuv-lbl" style="margin-top:12px">Akzent</div>' +
             swHtml('dpuv-acc', AKZENTE, s.ui_accent || GOLD_STD) +
             '<div class="dpuv-lbl" style="margin-top:14px">Grundfarbe (Obsidian)</div>' +
             swHtml('dpuv-obs', GRUNDFARBEN, s.ui_obsidian || OBSIDIAN_STD) +
+            '<div class="dp-tb-sec" id="dpuv-bereiche"><b>Einzelne Bereiche</b>' +
+              BEREICHE.map(farbzeile).join('') + '</div>' +
+            '<div id="dpuv-logo">' + fremdBlock('_dpLogoBlock') + '</div>' +
+            '<div id="dpuv-ressave">' + fremdBlock('_dpResSave') + '</div>' +
           '</div></div>' +
-          '<div class="dpuv-lockbar"><div><b>Farben ab Partner</b>' +
-            '<span>Akzent und Grundfarbe gehören zum Partner-Paket und gelten dann ' +
+          '<div class="dpuv-lockbar"><div><b>Marke ab Partner</b>' +
+            '<span>Farben und Logo gehören zum Partner-Paket und gelten dann ' +
             'auch für alle Mandanten.</span></div></div>' +
         '</div>' +
       '</div>' +
@@ -273,6 +394,43 @@
     segBinden('dpuv-theme',   'ui_theme',   THEMES);
     segBinden('dpuv-cards',   'ui_cards',   CARDS);
     segBinden('dpuv-surface', 'ui_surface', SURFACE);
+    segBinden('dpuv-form',    'ui_form',    FORMEN);      /* v1098 */
+
+    /* ── v1098 · Bereichsfarben ───────────────────────────────────────────
+       Ein Listener am Abschnitt statt acht an den Feldern. Der Handler ist
+       der GLOBALE aus settings.js — er setzt die CSS-Variable UND schreibt
+       den alten Einzelschluessel. Deshalb wird hier nichts zusaetzlich
+       gespeichert: zwei Speicherorte fuer denselben Wert waeren genau die
+       zweite Wahrheit, vor der der Backlog warnt. */
+    var bereiche = document.getElementById('dpuv-bereiche');
+    if (bereiche) bereiche.addEventListener('input', function (ev) {
+      var el = ev.target;
+      if (!el || el.type !== 'color') return;
+      var fn = el.getAttribute('data-fn');
+      try { if (typeof window[fn] === 'function') window[fn](el.value); } catch (e) {}
+    });
+
+    /* ── Schrift und Groesse ──────────────────────────────────────────────
+       Ebenfalls die globalen Handler (_dpDispFont/_dpDispSize), die ihre
+       Werte selbst unter dp_font_ui / dp_zoom_ui ablegen. */
+    function knopfReihe(id, ls, fn, standard) {
+      var host = document.getElementById(id);
+      if (!host) return;
+      var aktiv = standard;
+      try { aktiv = localStorage.getItem(ls) || standard; } catch (e) {}
+      host.querySelectorAll('.dp-tt-mode-btn').forEach(function (b) {
+        b.classList.toggle('active', b.getAttribute('data-v') === String(aktiv));
+      });
+      host.addEventListener('click', function (ev) {
+        var b = ev.target.closest ? ev.target.closest('.dp-tt-mode-btn') : null;
+        if (!b) return;
+        host.querySelectorAll('.dp-tt-mode-btn').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        try { if (typeof window[fn] === 'function') window[fn](b.getAttribute('data-v')); } catch (e) {}
+      });
+    }
+    knopfReihe('dpuv-font', 'dp_font_ui', '_dpDispFont', 'inter');
+    knopfReihe('dpuv-size', 'dp_zoom_ui', '_dpDispSize', '1');
 
     /* Farbfelder */
     function swBinden(id, feld) {
@@ -295,11 +453,25 @@
     document.getElementById('dpuv-done').addEventListener('click', schliessen);
     back.addEventListener('click', schliessen);
     document.getElementById('dpuv-reset').addEventListener('click', function () {
-      save({ ui_theme: '', ui_cards: '', ui_surface: '', ui_accent: GOLD_STD, ui_obsidian: OBSIDIAN_STD });
+      save({ ui_theme: '', ui_cards: '', ui_surface: '', ui_form: '', ui_accent: GOLD_STD, ui_obsidian: OBSIDIAN_STD });
       anwenden();
       try { skinNachziehen(); } catch (e) {}   /* v1085: auch beim Zuruecksetzen */
       farbenAnwenden(GOLD_STD, OBSIDIAN_STD);
-      [['dpuv-theme', ''], ['dpuv-cards', ''], ['dpuv-surface', '']].forEach(function (pair) {
+      /* v1098: Die Bereiche, Schrift und Groesse liegen in den ALTEN
+         Einzelschluesseln — dafuer gibt es _dpDispReset (settings.js:3116),
+         den zustaendigen Rueckbau. Nicht nachgebaut, sondern gerufen. */
+      try { if (typeof window._dpDispReset === 'function') window._dpDispReset(); } catch (e) {}
+      var bb = document.getElementById('dpuv-bereiche');
+      if (bb) BEREICHE.forEach(function (def) {
+        var f = bb.querySelector('input[data-ls="' + def.ls + '"]');
+        if (f) f.value = def.def;
+      });
+      [['dpuv-font', 'inter'], ['dpuv-size', '1']].forEach(function (pair) {
+        document.querySelectorAll('#' + pair[0] + ' .dp-tt-mode-btn').forEach(function (x) {
+          x.classList.toggle('active', x.getAttribute('data-v') === pair[1]);
+        });
+      });
+      [['dpuv-theme', ''], ['dpuv-cards', ''], ['dpuv-surface', ''], ['dpuv-form', '']].forEach(function (pair) {
         document.querySelectorAll('#' + pair[0] + ' .dpuv-sgb').forEach(function (x) {
           x.classList.toggle('on', (x.getAttribute('data-v') || '') === pair[1]);
         });
@@ -322,9 +494,82 @@
     if (l) l.classList.toggle('locked', !istPartner());
   }
 
+  /* ── v1098 · Die umgehaengten Bloecke auffrischen ─────────────────────
+     GEMESSEN, warum das noetig ist: darstellung-reseller.js repaint()
+     (:107) sucht ZUERST das alte Panel und ruft dessen panelHtmlRebuild().
+     Das alte Panel bleibt vorerst bestehen (Backlog, Schritt 1: nichts
+     loeschen) — also greift dort immer der erste Zweig und der neue
+     Abschnitt bliebe stehen, wie er war. Beim Umschalten "Mich /
+     Meine Mandanten" haette er den falschen Zustand gezeigt.
+
+     Deshalb hier ein eigener Aufbau der drei Fremdbloecke. Er laeuft bei
+     jedem Oeffnen und zusaetzlich hinter _dpDispTarget — umhuellt nach dem
+     Hausmuster aus settings.js:3469, das Original bleibt unangetastet. */
+  function markeAuffrischen() {
+    [['dpuv-res', '_dpResBlock'], ['dpuv-logo', '_dpLogoBlock'], ['dpuv-ressave', '_dpResSave']]
+      .forEach(function (paar) {
+        var host = document.getElementById(paar[0]);
+        if (host) host.innerHTML = fremdBlock(paar[1]);
+      });
+    /* Die Farbfelder tragen den Wert, der beim Bauen galt. Nach einem
+       Wechsel auf die Mandanten-Ansicht steht in den Einzelschluesseln
+       etwas anderes — also nachziehen, sonst zeigt das Feld die alte Farbe
+       und ein Klick darauf schriebe sie zurueck. */
+    var b = document.getElementById('dpuv-bereiche');
+    if (b) BEREICHE.forEach(function (def) {
+      var f = b.querySelector('input[data-ls="' + def.ls + '"]');
+      if (!f) return;
+      var v = ''; try { v = localStorage.getItem(def.ls) || def.def; } catch (e) { v = def.def; }
+      f.value = v;
+    });
+  }
+
+  /* ── v1098 · Luecke im Zuruecksetzen, gemessen ────────────────────────
+     _dpDispReset (settings.js:3116) raeumt acht Schluessel weg, aber NICHT
+     dp_kpi_ui, dp_obj_ui, dp_hero_ui, dp_tabtext_ui und dp_objtext_ui —
+     die fuenf Karten- und Textfarben bleiben stehen und werden beim
+     naechsten Start aus dem Boot-Block (settings.js:3213) wieder gesetzt.
+     "Zuruecksetzen" hat also nie ganz zurueckgesetzt.
+
+     Behoben per Umhuellung statt im neuen Panel umgangen: so ist der
+     Defekt in BEIDEN Panels weg und settings.js bleibt unangetastet. */
+  function resetUmhuellen() {
+    if (window.__dpuvResetHook) return;
+    var orig = window._dpDispReset;
+    if (typeof orig !== 'function') return;
+    window.__dpuvResetHook = true;
+    window._dpDispReset = function () {
+      try {
+        ['dp_kpi_ui', 'dp_obj_ui', 'dp_hero_ui', 'dp_tabtext_ui', 'dp_objtext_ui']
+          .forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+        ['--dp-kpi-card', '--dp-obj-card', '--dp-hero-card', '--dp-tab-text', '--dp-obj-text']
+          .forEach(function (v) { document.body.style.removeProperty(v); });
+      } catch (e) {}
+      return orig.apply(this, arguments);
+    };
+  }
+
+  function targetUmhuellen() {
+    if (window.__dpuvTargetHook) return;          /* Waechter gegen Ringschluss */
+    var orig = window._dpDispTarget;
+    if (typeof orig !== 'function') return;
+    window.__dpuvTargetHook = true;
+    window._dpDispTarget = function (t) {
+      var r;
+      try { r = orig.apply(this, arguments); } catch (e) {}
+      /* _dpDispTarget laedt ueber das Netz und faerbt erst danach um —
+         deshalb nicht sofort, sondern nachgelagert auffrischen. */
+      [120, 600, 1400].forEach(function (ms) { setTimeout(markeAuffrischen, ms); });
+      return r;
+    };
+  }
+
   function oeffnen() {
     bauen();
     gateSetzen();
+    markeAuffrischen();      /* v1098: Reseller-Zustand und Logo sind aeusserer Zustand */
+    targetUmhuellen();       /* v1098: erst hier, damit reseller-portal.js sicher geladen ist */
+    resetUmhuellen();
     var p = document.getElementById('dpuv-panel'), b = document.getElementById('dpuv-back');
     if (!p) return;
     /* v1082c: Hier stand requestAnimationFrame. Gemessen: in einem
