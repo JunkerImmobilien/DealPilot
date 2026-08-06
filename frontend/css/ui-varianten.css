@@ -1922,3 +1922,44 @@ html[data-ui-theme] body .sec .ki-lage-tag {
   background: var(--uv-surf2) !important;
   color: var(--uv-ink) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1103 — der Hell-Skin ueberstimmt die Vorlage an drei Flaechen
+
+   GEMESSEN in "kanzlei", einmal mit und einmal ohne body.dp-chrome-hell,
+   sonst identischer Zustand:
+
+     aside.sidebar   #FBFAF7 (Vorlage)  ->  #ffffff       Skin gewinnt
+     .sb-footer      transparent        ->  #ffffff       Skin gewinnt
+     nav.tabs        #FBFAF7 (Vorlage)  ->  rgb(10,10,10) SCHWARZ
+
+   DAS TRIFFT JEDEN, der ueber das Panel wechselt: v1085 koppelt den
+   Skin an die Vorlage, eine helle Vorlage setzt also dp-chrome-hell —
+   und dann steht in kontor, panel, kanzlei und boarding eine SCHWARZE
+   Tab-Leiste unter einer hellen Kopfzeile.
+
+   Es ist derselbe Fall wie v1091 (A): dort habe ich Kopf und Badges vom
+   Skin zurueckgeholt, die Leiste und die Tabs aber uebersehen. Die
+   Gegner stehen bei (0,2,2) bzw. (0,4,3) mit !important, meine bisherigen
+   Vorlagenregeln bei (0,1,2) bzw. (0,2,3) — sie verlieren.
+
+   Wie in v1091: die Vorlage ist die spaetere und ausdrueckliche Wahl und
+   gewinnt. Ohne Vorlage bleibt der Skin unangetastet.
+   ═══════════════════════════════════════════════════════════════════════ */
+html[data-ui-theme] body.dp-chrome-hell aside.sidebar#sidebar {
+  background: var(--dp-side-bg, var(--uv-chrome)) !important;
+}
+html[data-ui-theme] body.dp-chrome-hell aside.sidebar#sidebar .sb-footer,
+html[data-ui-theme] body.dp-chrome-hell aside.sidebar#sidebar #sb-user {
+  background: transparent !important;
+}
+html[data-ui-theme] body.dp-chrome-hell nav.tabs,
+html[data-ui-theme] body.dp-chrome-hell .main-col > nav.tabs,
+html[data-ui-theme] body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs,
+html[data-ui-theme] body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs.tabs {
+  background: var(--dp-header-bg, var(--uv-chrome)) !important;
+}
+html[data-ui-theme] body.dp-chrome-hell header.hdr,
+html[data-ui-theme] body.dp-chrome-hell header.hdr.has-v64-score {
+  background: var(--dp-header-bg, var(--uv-chrome)) !important;
+}
