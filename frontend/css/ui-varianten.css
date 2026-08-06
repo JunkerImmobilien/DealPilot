@@ -1965,11 +1965,11 @@ html[data-ui-theme] body.dp-chrome-hell header.hdr.has-v64-score {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   v1105 — Stapel-Feinschliff, ZWEI FASSUNGEN zur Wahl
+   v1105 — Stapel-Feinschliff: der Rumpf bekommt Eigengewicht
 
-   Umschalten zum Vergleichen:
-     document.documentElement.setAttribute('data-uv-stapel','a')   bzw. 'b'
-     document.documentElement.removeAttribute('data-uv-stapel')    = heute
+   Marcels Wahl vom 06.08. aus zwei gezeigten Fassungen: "B — Abgesetzt".
+   Die verworfene Fassung A (rahmenlose Kacheln, nur Trennstriche) ist
+   entfernt, ebenso das Vergleichs-Attribut data-uv-stapel.
 
    BEFUND VORAB — eine Annahme des Backlog-Punktes ist widerlegt.
    Der Punkt sagte, im Mockup traegen "die KPI-Kacheln im Rumpf DUNKLE
@@ -1986,45 +1986,27 @@ html[data-ui-theme] body.dp-chrome-hell header.hdr.has-v64-score {
    dunkle Fassung zeigte. Gemessen in "panel": Kachel rgb(248,249,251) auf
    Karte rgb(255,255,255) — Abstand 6, exakt wie im Mockup.
 
-   Was tatsaechlich auffaellt, ist etwas anderes: der goldene Kopf nimmt
-   159 von 257 px der aufgeklappten Karte ein, und der Rumpf darunter hat
-   dagegen kaum Eigengewicht. Genau daran unterscheiden sich die zwei
-   Fassungen.
+   Der echte Punkt war ein anderer, und den loest dieses Paket: der goldene
+   Kopf nimmt 159 von 257 px der aufgeklappten Karte ein, der Rumpf hatte
+   dagegen kaum Eigengewicht. Jetzt ist das Raster ein eigener Block mit
+   Rahmen, die Kacheln darin sind nochmal abgesetzt.
+
+   Die Toene werden aus --uv-card-ink GEMISCHT, nicht gesetzt: damit
+   funktioniert dasselbe Muster in beide Richtungen — auf hellen Vorlagen
+   eine Spur dunkler, auf dunklen eine Spur heller, ohne je Vorlage eigene
+   Werte zu pflegen. Das ist die Verallgemeinerung dessen, was das Mockup
+   in seiner dunklen Fassung mit rgba(255,255,255,.035) tut.
 
    NICHT gebaut: "Im Rennen" und "Detail oeffnen →". Beide kommen im
    Mockup nicht vor (nachgesehen, kein Treffer) und muessten aus
    storage.js nachgeruestet werden. Eine Leistenkarte ist eine Uebersicht;
-   der Weg ins Detail ist der Klick auf die Karte selbst, ein zweiter
-   Hinweis darauf waere Dopplung. Wenn du sie willst, sag Bescheid.
+   der Weg ins Detail ist der Klick auf die Karte selbst.
+
+   NACHGEMESSEN (konsole und kontor, zwei Karten aufgeklappt):
+   Kartenhoehe 255 -> 267 px, Raster und Kacheln heben sich sichtbar vom
+   Kartengrund ab, in beiden Helligkeiten.
    ═══════════════════════════════════════════════════════════════════════ */
-
-/* ── FASSUNG A · "Ruhig" ──────────────────────────────────────────────────
-   Der Rumpf wird als eigener Abschnitt gelesen: eine Trennlinie unter dem
-   Band, etwas mehr Luft, Kacheln ohne eigenen Rahmen. Das Gold bleibt die
-   Kopfzeile, der Rumpf gehoert der Vorlage. Ruhiger, naeher am Mockup. */
-html[data-uv-stapel="a"][data-ui-cards="stapel"] body aside.sidebar .sb-card.uv-open .sbc-mini-grid {
-  margin: 11px 10px 12px !important;
-  gap: 7px !important;
-  border-top: 1px solid var(--uv-card-tl) !important;
-  padding-top: 11px !important;
-}
-html[data-uv-stapel="a"][data-ui-cards="stapel"] body aside.sidebar .sb-card .sbcm {
-  background: transparent !important;
-  border: 0 !important;
-  padding: 0 4px !important;
-}
-html[data-uv-stapel="a"][data-ui-cards="stapel"] body aside.sidebar .sb-card .sbcm + .sbcm {
-  border-left: 1px solid var(--uv-card-tl) !important;
-}
-
-/* ── FASSUNG B · "Abgesetzt" ──────────────────────────────────────────────
-   Die Kacheln werden zu eigenen Flaechen mit spuerbarem Abstand zum
-   Kartengrund — auf hellen Vorlagen eine Spur dunkler, auf dunklen eine
-   Spur heller. Genau das Muster, das das Mockup in seiner dunklen Fassung
-   mit rgba(255,255,255,.035) verwendet, nur in beide Richtungen gedacht.
-   Dazu ein Kartenrahmen um das Raster, damit der Rumpf gegen den goldenen
-   Kopf besteht. */
-html[data-uv-stapel="b"][data-ui-cards="stapel"] body aside.sidebar .sb-card.uv-open .sbc-mini-grid {
+html[data-ui-cards="stapel"] body aside.sidebar .sb-card.uv-open .sbc-mini-grid {
   margin: 10px !important;
   gap: 6px !important;
   padding: 8px !important;
@@ -2032,7 +2014,7 @@ html[data-uv-stapel="b"][data-ui-cards="stapel"] body aside.sidebar .sb-card.uv-
   border: 1px solid var(--uv-card-tl) !important;
   border-radius: var(--uv-rs, 7px) !important;
 }
-html[data-uv-stapel="b"][data-ui-cards="stapel"] body aside.sidebar .sb-card .sbcm {
+html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbcm {
   background: color-mix(in srgb, var(--uv-card-ink) 9%, var(--uv-card)) !important;
   border: 1px solid color-mix(in srgb, var(--uv-card-ink) 14%, var(--uv-card)) !important;
   border-radius: var(--uv-rs, 7px) !important;
