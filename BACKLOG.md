@@ -108,15 +108,14 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 ## Später
 
-- **Ein sehr dunkler Partner-Akzent ist auf dunklem Grund kaum lesbar.**
-  Gemessen mit `#7B2D3B` (dem Akzent aus dem alten Punkt 1): in `konsole`
-  liegt der Kontrast der Marken-Elemente bei **2,26–2,37**. Das ist
-  **nicht** durch v1096 entstanden — **ohne** Vorlage ist derselbe Akzent
-  noch schlechter: Preis **1,31**, Aktionen-Knopf 2,8. Es trifft also die
-  Grundfassung genauso und ist ein Whitelabel-Thema, kein Vorlagen-Thema:
-  `--gold-2` hellt einen ohnehin dunklen Markenton zu wenig auf. Kandidat
-  wäre ein Mindest-Helligkeitsabstand statt einer festen Ableitung. Eigener
-  Punkt, weil er die Marken-Ableitung insgesamt betrifft.
+- **Vier der 66 Whitelabel-Tints reißen bei einem extrem hellen Akzent.**
+  Gemessen mit `#F0D000`: `#c08a2f`, `#a6842d`, `#a68a36` und `#a98e3a`
+  landen als Text auf hellem Grund bei **2,57–2,98**. Der Tint-Weg
+  (`_recolor`, HSL-relativ) kennt keinen Mindestkontrast — v1097 hat nur
+  `--gold-2`/`--gold-d` geprüft. Eine **pauschale** Regel auf alle 66 wäre
+  falsch: darunter sind die Cremetöne, also Flächen, die hell bleiben
+  müssen. Nötig wäre eine Einstufung je Ton (Fläche / Text-auf-hell /
+  Text-auf-dunkel) — eigenes Vorhaben mit eigener Prüfstrecke.
 
 - **„privat" liegt auf dem Preis** — im Wallet-Modus überlappt `.sbc-halter`
   die `.sbc-kp-row`. Steht so auch auf Marcels Screenshots vom 06.08. und
@@ -151,6 +150,75 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-06] **Partner-Akzent lesbar machen** — `v1097`, `v1097b`
+
+  Marcels Auftrag, direkt im Anschluss an den Punkt oben. Der dort als
+  „Später" notierte Kontrastbefund war nur die halbe Geschichte — gemessen
+  gibt es ihn **in beide Richtungen**:
+
+  | Token | Ableitung | Fundstellen | Problemfall |
+  |---|---|---|---|
+  | `--gold-2` | `_lighten(akzent, 8)` | 33, **alle** auf dunklem Grund | `#7B2D3B` → `#863e4b`, Kontrast **2,26** |
+  | `--gold-d` | `_darken(akzent, 9)` | 19, **alle** auf hellem Grund | `#F0D000` → `#dabd00`, Kontrast **1,86** |
+
+  **Die Ursache ist die feste Prozent-Ableitung.** „8 % heller als der
+  Akzent" sagt nichts darüber, ob der Ton auf seinem Grund lesbar *ist*:
+  bei einem ohnehin dunklen Akzent bleibt `--gold-2` dunkel, bei einem
+  hellen bleibt `--gold-d` hell.
+
+  **Fix:** erst den bisherigen Wert bilden — und nur wenn der die Schwelle
+  verfehlt, die Helligkeit nachziehen. Nicht in RGB, sondern in **OKLab**,
+  weil dort Farbton und Sättigung erhalten bleiben: `#7B2D3B` ergibt
+  `#c0727e` mit Sättigung 0,41 statt `#ab7982` mit 0,29.
+
+  **Die Schwellen sind an der eigenen Marke gemessen, nicht geraten:** das
+  Haus-Dunkelgold `#9a7f33` liegt auf Weiß bei **3,85** → Schwelle 3,8. Auf
+  der dunklen Seite wäre das Haus-Gold `#E8C964` mit **10,44** für jeden
+  farbigen Akzent unerreichbar, dort gilt die übliche 4,5.
+
+  Die OKLab-Rechnung steht in `config.js` als **eine** Quelle für beide
+  Wege; `whitelabel-override.js` ruft sie mit Inline-Rückfall (Muster aus
+  v1081). Gegen die CSS-Referenz `oklch(from …)` im Browser geprüft:
+  Abweichung **0** auf allen drei Kanälen. Bewusst in JS statt per CSS —
+  das Ergebnis muss als Hex in Tokens *und* in den Sweeper, und
+  `var()`/`oklch()` trägt nicht überall.
+
+  **v1097b legt zwei Töne zu einem zusammen.** Der Tint-Weg `--wl-9a7f33`
+  kennt keinen Mindestkontrast (er verschiebt seine 66 Töne nur relativ in
+  HSL): mit Hellgelb kam der Aktionen-Knopf darüber auf 3,27, der
+  Fortschritt auf 3,15. Es waren ohnehin zwei verschiedene Dunkeltöne für
+  dieselbe Sache — der Knopf stand auf `#451b23`, der Preis daneben auf
+  `#702936`. Sichtbare Folge: die v1089/v1090-Stellen werden **unter einer
+  Vorlage** eine Spur heller und stehen jetzt auf demselben Ton wie Preis
+  und Nummernpille. Außerhalb der Vorlagen ist nichts angefasst.
+
+  **Nachgemessen** (angemeldet, Partner-Konto, Modus „standard", acht
+  Marken-Elemente je Lauf — Preis, Knopf, Pille, Abschnitt, Fortschritt,
+  Pfeil, Objektnummer, Kerosin-Pille):
+
+  | Akzent | Fassung | vorher | nachher |
+  |---|---|---|---|
+  | Rot `#7B2D3B` | ohne Vorlage | 1,31–2,80 | **5,21–5,95** |
+  | Rot `#7B2D3B` | konsole | 2,26–2,37 | **4,61–5,04** |
+  | Rot `#7B2D3B` | kontor | 4,35–14,64 | 7,20–10,20 |
+  | Hellgelb `#F0D000` | kontor | **1,86** | **3,56–3,90** |
+  | Hellgelb `#F0D000` | boarding | 1,86 | 3,31–3,69 |
+
+  **Standard-Gold ist bitgenau unverändert** — es erfüllt beide Schwellen
+  schon vorher und läuft durch den unveränderten Zweig: `konsole`
+  7,58–10,98, `kontor` 3,30–3,83, ohne Vorlage 9,01–12,97. Dasselbe gilt
+  für Statusgrün und Status-Rot.
+
+  `boarding` liegt mit 3,31 knapp unter der Schwelle, weil dessen Grund
+  cremefarben statt weiß ist und die Schwelle gegen Weiß rechnet — das
+  Haus-Dunkelgold liegt dort gleichauf, es ist also kein Rückschritt.
+
+  **Ein Messfehler von mir, zurückgenommen:** Ich hatte zwischendurch
+  gemeldet, der Preis stehe ohne Vorlage bei 2,78. Falsch — mein
+  Untergrund-Parser hat die **Winkelangabe** `135deg` des Kartenverlaufs
+  als Farbwert gelesen. Mit einem Parser, der nur echte Farbnotationen
+  nimmt und die Deckungen von unten nach oben mischt, sind es 5,63.
 
 - [2026-08-06] **Marke kommt unter einer Vorlage nicht durch — Rest der
   Fundstellen** — `300bfc3`, `f0a6631`
