@@ -116,15 +116,20 @@
      Kein Timer, kein Polling: der Beobachter haengt an der Liste selbst.
      Er feuert auch, wenn die Vorlage umgeschaltet wird (dann sind die
      Karten dieselben, aber data-ui-cards hat sich geaendert). */
+  /* v1092b — GEMESSEN: requestAnimationFrame feuert in einem gedrosselten
+     oder im Hintergrund liegenden Tab NICHT. Im Pruef-Browser blieb dadurch
+     role/tabindex am Pfeil leer und der offene Zustand waere nach einem
+     Neuzeichnen verloren gewesen. setTimeout wird gedrosselt, aber es
+     feuert. Zusammenlegen tut es genauso. */
   var geplant = false;
   function anstossen() {
     if (geplant) return;
     geplant = true;
-    requestAnimationFrame(function () {
+    setTimeout(function () {
       geplant = false;
       pfeileHerrichten();
       wiederherstellen();
-    });
+    }, 0);
   }
 
   function beobachten() {
