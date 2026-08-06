@@ -233,6 +233,23 @@ html[data-ui-theme] body {
   --surface:     var(--uv-surf);
   --border:      var(--uv-line);
   --muted:       var(--uv-mut);
+  /* v1099 · Die zwei TEXT-Tokens fehlten hier. Sichtbar wurde das erst,
+     als v1099 den Arbeitsbereich der Vorlage folgen liess: vorher stand
+     dunkler Text auf weissem #s0 und war lesbar, danach dunkel auf dunkel.
+
+     GEMESSEN in "konsole", Kontrastlauf ueber #s0 mit Schwelle 3:
+     13 Fundstellen, die schlimmste bei 1,08 — und die Mehrheit stand auf
+     rgb(42,39,39). Das ist --ch #2A2727, also genau die Falle, die
+     CLAUDE.md benennt: "--ch nie auf Obsidian".
+
+       .sec-title   liest var(--ch)                   (0,1,0)
+       .qz-card label liest var(--text, #1a1a1a)      (0,2,1)
+
+     Beide lesen ihr Token — hier greift die Bruecke also nachweislich,
+     anders als bei den Flaechen. Wo die Spezifitaet trotzdem nicht reicht,
+     steht weiter unten eine eigene Regel. */
+  --ch:          var(--uv-ink);
+  --text:        var(--uv-ink);
 }
 
 /* ── v1096b · Der Markenton fuer helle Vorlagen, auf BEIDEN Bedienwegen ──
