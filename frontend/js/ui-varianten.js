@@ -566,6 +566,68 @@
     };
   }
 
+  /* ── v1101 · Die Logo-Regler unter einer Vorlage ──────────────────────
+     GEMESSEN, und es ist ein Fehler von v1082:
+
+       ohne Vorlage   Groesse 60% -> Logo 159x29, 140% -> 266x49   wirkt
+       mit "konsole"  Groesse 60% -> 130x24, 140% -> 130x24        tot
+                      Ausrichtung left/right -> justify bleibt flex-start
+
+     Ursache sind meine eigenen Regeln aus dem kompakten Logo-Kopf:
+       height: calc(26px * var(--dp-logo-scale, 1))   <- setzt NIEMAND
+       justify-content: flex-start !important          <- haelt den Regler fest
+
+     Der Kommentar daneben behauptete sogar "der Groessenregler bleibt
+     wirksam: --dp-logo-w skaliert die Hoehe mit". Das war falsch: der
+     Regler setzt --dp-logo-w (eine Breite in Prozent), gelesen wurde
+     --dp-logo-scale. Zwei Namen, kein Bezug.
+
+     Und es ist DERSELBE Fehler wie in v1080 ("justify-content stand fest
+     auf center und hat den Ausrichtungs-Regler still totgelegt") — nur
+     eine Ebene hoeher, in der Vorlage statt im Grundstil.
+
+     Behoben ohne settings.js anzufassen: die beiden globalen Handler
+     werden umhuellt und setzen zusaetzlich zwei Variablen, die die
+     Vorlagenregeln lesen koennen — --dp-logo-scale als reine ZAHL (px mal
+     Zahl geht in jedem Browser, anders als eine Division durch Prozent)
+     und --dp-logo-justify als flex-tauglicher Wert. */
+  function logoUmhuellen() {
+    if (window.__dpuvLogoHook) return;
+    window.__dpuvLogoHook = true;
+    var JUSTIFY = { left: 'flex-start', center: 'center', right: 'flex-end' };
+    function scaleSetzen(v) {
+      var z = parseFloat(v);
+      if (!isFinite(z) || z <= 0) z = 100;
+      document.body.style.setProperty('--dp-logo-scale', String(z / 100));
+    }
+    function justifySetzen(a) {
+      document.body.style.setProperty('--dp-logo-justify', JUSTIFY[a] || 'flex-start');
+    }
+    var origSize = window._dpDispLogoSize;
+    if (typeof origSize === 'function') {
+      window._dpDispLogoSize = function (v) { var r = origSize.apply(this, arguments); scaleSetzen(v); return r; };
+    }
+    var origAlign = window._dpDispLogoAlign;
+    if (typeof origAlign === 'function') {
+      window._dpDispLogoAlign = function (a) { var r = origAlign.apply(this, arguments); justifySetzen(a); return r; };
+    }
+    var origLogoReset = window._dpDispLogoReset;
+    if (typeof origLogoReset === 'function') {
+      window._dpDispLogoReset = function () {
+        var r = origLogoReset.apply(this, arguments);
+        document.body.style.removeProperty('--dp-logo-scale');
+        document.body.style.removeProperty('--dp-logo-justify');
+        return r;
+      };
+    }
+    /* Beim Start einmal nachziehen — settings.js:3293 liest die alten
+       Schluessel schon selbst, die neuen Variablen kennt es nicht. */
+    try {
+      var w = localStorage.getItem('dp_logo_w'); if (w) scaleSetzen(w);
+      var al = localStorage.getItem('dp_logo_align'); if (al) justifySetzen(al);
+    } catch (e) {}
+  }
+
   function targetUmhuellen() {
     if (window.__dpuvTargetHook) return;          /* Waechter gegen Ringschluss */
     var orig = window._dpDispTarget;
@@ -683,6 +745,14 @@
      von index.html macht das bereits vor dem ersten Paint; dieser Aufruf
      ist das zweite Netz, falls der Inline-Boot einmal fehlt. */
   anwenden();
+
+  /* v1101: Die Logo-Umhuellung muss beim START laufen, nicht erst beim
+     Oeffnen des Panels — die gespeicherte Groesse und Ausrichtung wirken
+     ja sofort, nicht erst wenn jemand die Einstellungen aufmacht.
+     settings.js baut seine Handler beim Laden auf; diese Datei laedt
+     danach, der Zugriff ist also sicher. */
+  if (document.body) logoUmhuellen();
+  else document.addEventListener('DOMContentLoaded', logoUmhuellen);
 
   /* Der Plan steht beim Laden noch nicht fest — nachziehen, wenn er kommt.
      dp:plan-ready statt Timer oder Polling (CLAUDE.md). */

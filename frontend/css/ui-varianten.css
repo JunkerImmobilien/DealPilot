@@ -849,12 +849,24 @@ html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-l
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  justify-content: flex-start !important;
+  /* v1101: war hart flex-start und hat damit den Ausrichtungs-Regler
+     stillgelegt — zum zweiten Mal derselbe Fehler nach v1080. Der Handler
+     setzt --dp-logo-align auf left/center/right; die flex-taugliche
+     Entsprechung liefert die Umhuellung in ui-varianten.js als
+     --dp-logo-justify. Der Fallback haelt die v1082-Gestaltung, wenn nie
+     etwas eingestellt wurde. */
+  justify-content: var(--dp-logo-justify, flex-start) !important;
 }
 html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
   /* Hoehe fuehrt, Breite folgt — sonst zieht die Leistenbreite das Logo
-     wieder auf, das war der v646-Befund. Der Groessenregler bleibt wirksam:
-     --dp-logo-w skaliert die Hoehe mit. */
+     wieder auf, das war der v646-Befund.
+
+     v1101 · KORREKTUR: hier stand "der Groessenregler bleibt wirksam:
+     --dp-logo-w skaliert die Hoehe mit". Das war falsch. Der Regler setzt
+     --dp-logo-w, eine BREITE in Prozent; gelesen wurde --dp-logo-scale,
+     das niemand setzte. Gemessen: 60 % und 140 % ergaben unter einer
+     Vorlage beide 130x24. Jetzt setzt die Umhuellung --dp-logo-scale als
+     reine Zahl, und der Regler wirkt auf die Hoehe wie beschrieben. */
   height: calc(26px * var(--dp-logo-scale, 1)) !important;
   width: auto !important;
   max-width: min(200px, 100%) !important;
