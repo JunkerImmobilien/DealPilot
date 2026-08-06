@@ -772,8 +772,15 @@
      ja sofort, nicht erst wenn jemand die Einstellungen aufmacht.
      settings.js baut seine Handler beim Laden auf; diese Datei laedt
      danach, der Zugriff ist also sicher. */
-  if (document.body) { logoUmhuellen(); chromeFarbenBooten(); }
-  else document.addEventListener('DOMContentLoaded', function () { logoUmhuellen(); chromeFarbenBooten(); });
+  /* v1102c: resetUmhuellen gehoert ebenfalls hierher, NICHT nach oeffnen().
+     GEMESSEN: _dpDispReset vor dem ersten Oeffnen des Panels gerufen liess
+     dp_obj_ui, dp_kpi_ui und dp_hero_ui stehen — die Umhuellung, die genau
+     diese Luecke schliesst (v1098), war zu dem Zeitpunkt noch nicht
+     installiert. Ein Rueckbau muss aber immer vollstaendig sein, egal von
+     wo er ausgeloest wird. */
+  function startAufbau() { logoUmhuellen(); chromeFarbenBooten(); resetUmhuellen(); }
+  if (document.body) startAufbau();
+  else document.addEventListener('DOMContentLoaded', startAufbau);
 
   /* Der Plan steht beim Laden noch nicht fest — nachziehen, wenn er kommt.
      dp:plan-ready statt Timer oder Polling (CLAUDE.md). */
