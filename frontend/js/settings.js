@@ -3191,7 +3191,13 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     return h;
   }
   function ce(t,c,html){var e=document.createElement(t);if(c)e.className=c;if(html!=null)e.innerHTML=html;return e;}
-  window._dpOpenToolbar=function(){ var p=document.getElementById('dp-tb-panel'); if(p){ p.classList.add('open'); } };
+  /* v1100: fuehrt jetzt zum neuen Panel. Das alte wird nicht mehr gebaut,
+     ein Aufruf liefe sonst ins Leere. Rueckfall auf das alte Verhalten,
+     falls ui-varianten.js einmal nicht geladen ist. */
+  window._dpOpenToolbar=function(){
+    try{ if(window.DealPilotUiVarianten && DealPilotUiVarianten.open){ DealPilotUiVarianten.open(); return; } }catch(e){}
+    var p=document.getElementById('dp-tb-panel'); if(p){ p.classList.add('open'); }
+  };
   function build(){
     if(document.getElementById('dp-tb-fab')) return;
     var fab=ce('button','dp-tb-fab'); fab.id='dp-tb-fab'; fab.title='Darstellung';
@@ -3207,7 +3213,30 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     fab.onclick=function(){ panel.classList.toggle('open'); };
     panel.querySelector('#dp-tb-x').onclick=function(){ panel.classList.remove('open'); };
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',build); else build();
+  /* ── v1100 · Das alte Panel wird nicht mehr gebaut ──────────────────────
+     Backlog Punkt 1, letzter Schritt. Der Abschnitt "Marke" steht seit
+     v1098 im neuen Panel und ist geprueft; damit gibt es keinen Grund
+     mehr fuer zwei Wege zur selben Einstellung.
+
+     ENTFERNT wird NUR der Aufbau: der schwebende Knopf #dp-tb-fab und der
+     Rumpf #dp-tb-panel. Alles andere in dieser Datei bleibt, denn das neue
+     Panel BENUTZT es — _dpDispHeader/-Side/-Text/-Hero/-Kpi/-Obj,
+     _dpDispFont, _dpDispSize, _dpDispReset, _dpLogoBlock und die
+     Logo-Handler. panelHtml() bleibt ebenfalls stehen: sie ist der Bauplan,
+     aus dem _dpLogoBlock und _dpResBlock stammen, und wird von
+     panelHtmlRebuild noch referenziert.
+
+     Was dadurch woanders passiert, nachgesehen statt angenommen:
+       * darstellung-reseller.js repaint() (:107) sucht zuerst
+         "#dp-tb-panel .dp-tb-b". Findet es das nicht, faellt es auf den
+         zweiten Zweig und zeichnet #dp-res-sec / #dp-res-save einzeln neu
+         — und genau diese IDs liefert _dpResBlock() auch im NEUEN Panel.
+         Der Pfad trifft also weiterhin.
+       * _dpOpenFromSettings (der Knopf in den Einstellungen) zeigt seit
+         v1082 ohnehin auf das neue Panel (ui-varianten.js).
+       * _dpOpenToolbar wird unten auf das neue Panel umgebogen, damit ein
+         alter Aufruf nicht ins Leere laeuft. */
+  window.__dpAltesPanelAus = true;
   /* Boot: gespeicherte Karten-/Chrome-Farben anwenden */
   try{
     var m={dp_kpi_ui:'--dp-kpi-card',dp_obj_ui:'--dp-obj-card',dp_hero_ui:'--dp-hero-card'};
