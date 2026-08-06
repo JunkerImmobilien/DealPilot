@@ -13,8 +13,45 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ---
 ## Offen
 
-_Aktuell nichts. Alle Punkte sind unter **Fertig** dokumentiert; die
-nächsten Vorhaben stehen unter **Später**._
+1. **Marke kommt unter einer Vorlage nicht durch — Rest der Fundstellen.**
+   Gemessen mit Partner-Konto und Akzent `#7B2D3B`: über `#sidebar`,
+   `header.hdr` und `nav.tabs` verlieren **33 Stellen** die Markenfarbe,
+   sobald `data-ui-theme` gesetzt ist. Ursache sind die neutralen
+   `--uv-*`-Tokens aus v1082. v1093 hat die zwei größten Gruppen erledigt
+   (Tabs 8, Objektnummer 5) plus Abschnittsüberschrift.
+
+   **Achtung, mein Audit hatte Fehltreffer:** `.hdr-obj-num`,
+   `.hdr-credits-pill` und `.sb-actions-arrow` stehen auf
+   `var(--wl-9a7f33, …)` und färben **korrekt mit** (unter Rot gemessen
+   `#451b23`) — mein Regex hat den abgedunkelten Ton nicht als „Marke"
+   erkannt. Vor dem Nacharbeiten also je Stelle prüfen, ob sie wirklich
+   neutral wird, statt der Liste blind zu folgen.
+
+   **Regel:** Vorlage bestimmt Fläche und Neutraltöne, Marke bestimmt den
+   Akzent. `--gold-d` auf hellen Vorlagen, `--gold-2` auf den dunklen.
+
+2. **Branding unter „Darstellung" zusammenlegen.** Es gibt zwei Panels:
+   das alte `#dp-tb-panel` (`settings.js` `_dpDisp*`, v927) mit Logo,
+   Logogröße, Schriften, Akzent und dem Reseller-Block, und das neue aus
+   `ui-varianten.js` mit Vorlage, Karten, Fläche. Marcels Vorgabe: ein
+   Abschnitt **Marke** im neuen Panel — Logo, Logogröße, Kartenfarbe,
+   Schrift, Akzent. Für alle sichtbar, für Nicht-Partner ausgegraut (wie
+   die Farbsektion es heute schon macht). `_dpResBlock` und `_dpLogoBlock`
+   werden **umgehängt, nicht neu gebaut** — beide liefern nachweislich
+   sauberes HTML.
+
+   **Kein Defekt in der Bedienung:** mit Partner-Konto durchgeklickt sind
+   Reiter, Branding-Panel, gespeichertes Logo und Farb-Editor alle in
+   Ordnung. Das leere `onclick` am Partner-Reiter ist Absicht
+   (`reseller-portal.js:557` entfernt es und hängt einen Listener an).
+
+3. **`handy2` als vierter Kartenmodus** — `design/mockups/handy2.jpg`,
+   Auszug aus der Mobile-Fassung (MA-Pakete). Goldene Zeile mit Score-Ring
+   links und Stufen-Abzeichen (STARK/SCHWACH) rechts; aufgeklappt Foto,
+   Preis, Stufen-Abzeichen und drei dunkle KPI-Kacheln (RENDITE, CASHFLOW,
+   DSCR), dazu „Im Rennen" und „Detail öffnen →". In hell **und** dunkel,
+   unter Einstellungen wählbar. Reiht sich neben `kompakt`/`standard`/
+   `wallet` in `CARDS` (`ui-varianten.js:45`) ein.
 
 ---
 
