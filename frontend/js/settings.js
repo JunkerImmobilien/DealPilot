@@ -67,7 +67,29 @@ function _setIsDirty() {
   var saved = Settings.get();
   var d = window._SetDraft.current;
   for (var k in d) {
-    if (d.hasOwnProperty(k) && d[k] !== saved[k]) return true;
+    if (!d.hasOwnProperty(k)) continue;
+    var a = d[k], b = saved[k];
+    /* v1110: Arrays INHALTLICH vergleichen. Vorher stand hier nur
+       d[k] !== saved[k] — bei einem Array vergleicht das die Referenz, und
+       die kann nie gleich sein, weil _setCollectFormIntoDraft() das Feld
+       ai_focus_areas bei JEDEM Aufruf neu aus den Checkboxen aufbaut.
+
+       GEMESSEN: Einstellungen oeffnen, EINEN Tab wechseln, nichts anfassen
+       -> dirty=true, und genau ein Feld weicht ab: ai_focus_areas mit
+       ["Lage","Mietmarkt","Risiken"] gegen ["Lage","Mietmarkt","Risiken"].
+       Inhaltlich identisch, als Referenz verschieden.
+
+       Folge fuer jeden Nutzer: Einstellungen oeffnen, durch die Abschnitte
+       klicken, schliessen — und es kommt "Du hast ungespeicherte
+       Aenderungen. Trotzdem schliessen?", obwohl nichts geaendert wurde.
+       Das war auch der vermeintliche "Browser-Freeze" aus dem Backlog: der
+       confirm()-Dialog blockiert den Prueflauf, bis das CDP-Zeitlimit
+       greift (gemessen 74 und 84 Sekunden). Kein Freeze, ein Dialog. */
+    if (Array.isArray(a) || Array.isArray(b)) {
+      if (JSON.stringify(a || []) !== JSON.stringify(b || [])) return true;
+      continue;
+    }
+    if (a !== b) return true;
   }
   return false;
 }
