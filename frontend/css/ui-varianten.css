@@ -1077,10 +1077,16 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-score-overlay {
   width: auto !important;
   text-align: center !important;
 }
-/* Die Stufen-Pille steht damit wieder UNTER dem Ring statt neben ihm. */
+/* Die Stufen-Pille steht damit wieder UNTER dem Ring statt neben ihm.
+   v1091b — GEMESSEN nach dem ersten Anlauf: mit display:inline-block (aus
+   dem Wallet-Block von v1082h) flossen Ring und Pille in EINE Zeile,
+   Ring x 226-276, Pille x 276-343. Im Standard ist die Pille display:block
+   und stapelt sich dadurch unter den Ring. */
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-score-label {
-  display: inline-block !important;
-  margin: 4px 0 0 !important;
+  display: block !important;
+  margin: 4px auto 0 !important;
+  width: -moz-fit-content !important;
+  width: fit-content !important;
 }
 /* Nummer, Datum und Adresse muessen dem Ring rechts ausweichen — er steht
    jetzt dort, wo vorher die Pille stand. */
