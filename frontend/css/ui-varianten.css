@@ -839,7 +839,13 @@ html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .sb-he
 html[data-ui-theme] body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-wrap-sidebar {
   /* Rahmen, Kasten und Radius aus v1079 zuruecknehmen — in der Vorlage
      traegt der Kopf keine Signatur mehr, nur noch die Marke. */
-  width: auto !important;
+  /* v1101b · width war "auto". GEMESSEN: der Wrapper wurde damit exakt so
+     breit wie das Bild (78 px in einem 349 px breiten Kopf) — und
+     justify-content hatte keinen Platz zu verteilen. Die Ausrichtung
+     setzte den richtigen Wert und bewegte trotzdem nichts. Mit voller
+     Breite verteilt sie wieder; sichtbar wird nichts zusaetzlich, der
+     Wrapper ist seit v1082 ohnehin transparent und rahmenlos. */
+  width: 100% !important;
   max-width: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
