@@ -91,9 +91,11 @@
     { fn: '_dpDispText',    ls: 'dp_text_ui',    def: '#1A1A1A', label: 'Text' },
     { fn: '_dpDispHero',    ls: 'dp_hero_ui',    def: GOLD_STD,  label: 'Score-Karte' },
     { fn: '_dpDispKpi',     ls: 'dp_kpi_ui',     def: '#F6F2E9', label: 'KPI-Karten' },
-    { fn: '_dpDispObj',     ls: 'dp_obj_ui',     def: '#F6F2E9', label: 'Objektkarten' },
-    { fn: '_dpDispTabText', ls: 'dp_tabtext_ui', def: GOLD_STD,  label: 'Reitertexte' },
-    { fn: '_dpDispObjText', ls: 'dp_objtext_ui', def: '#1A1A1A', label: 'Text auf Objektkarten' }
+    { fn: '_dpDispObj',     ls: 'dp_obj_ui',     def: '#F6F2E9', label: 'Objektkarten' }
+    /* NICHT hier: _dpDispTabText und _dpDispObjText. Die liefert
+       _dpLogoBlock() (settings.js:3386) bereits selbst als eigenen Block
+       "Text-Feintuning" — beim ersten Anlauf standen sie dadurch doppelt
+       im Panel. Im Bild gesehen, nicht im Code vermutet. */
   ];
 
   var SCHRIFTEN = [
