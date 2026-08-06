@@ -13,55 +13,161 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ---
 ## Offen
 
-*Nichts offen.* Die Punkte unter **Später** sind Vorhaben mit eigener
-Prüfstrecke, keine Restarbeiten.
+1. **Partner-Flow: Whitelabel und Darstellung zusammenbringen.**
+   Analyse und drei Wege liegen in
+   `design/Vorschläge/partner-flow-darstellung.md`. **Empfehlung dort:**
+   erst C (die vier neuen Schlüssel `ui_theme`, `ui_cards`, `ui_surface`,
+   `ui_form` in die `MAP` des Mandanten-Abgleichs — klein, keine
+   Produktentscheidung), dann A (Marke gesperrt, Komfort frei).
+   Marcels Entscheidung steht noch aus.
+
+2. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
+   Aktionen als Popover statt Blatt von unten. Dazu die Admin-Oberfläche
+   auf Tablet prüfen. **Nicht angefangen:** das ist Gestaltungsarbeit mit
+   eigener Prüfstrecke, kein Defekt — und ohne Vorlage im `design/`-Ordner
+   wäre es geraten.
 
 ---
 
 ## Später
 
-- **Vier der 66 Whitelabel-Tints reißen bei einem extrem hellen Akzent.**
-  Gemessen mit `#F0D000`: `#c08a2f`, `#a6842d`, `#a68a36` und `#a98e3a`
-  landen als Text auf hellem Grund bei **2,57–2,98**. Der Tint-Weg
-  (`_recolor`, HSL-relativ) kennt keinen Mindestkontrast — v1097 hat nur
-  `--gold-2`/`--gold-d` geprüft. Eine **pauschale** Regel auf alle 66 wäre
-  falsch: darunter sind die Cremetöne, also Flächen, die hell bleiben
-  müssen. Nötig wäre eine Einstufung je Ton (Fläche / Text-auf-hell /
-  Text-auf-dunkel) — eigenes Vorhaben mit eigener Prüfstrecke.
-
-- **„privat" liegt auf dem Preis** — im Wallet-Modus überlappt `.sbc-halter`
-  die `.sbc-kp-row`. Steht so auch auf Marcels Screenshots vom 06.08. und
-  ist damit älter als v1091. Eigener Punkt, weil es das Raster von v1082
-  betrifft, nicht die Farbe.
-
-- **`.sbcm-label` in der dunklen Fassung mit Kartenfläche „Weiß"** —
-  Kontrast 1,06. Die Karte wird weiß, das Kachel-Label bleibt hell.
-  Betrifft nur die Kombination `dealpilot`/`konsole` + `ui_surface:light`,
-  in allen hellen Vorlagen sauber.
-
-- **Aktionen-Aufklapper in der dunklen Fassung nachsehen** —
-  `.sb-actions-accordion-inner` misst `rgb(255,255,255)` **auch** in
-  `dealpilot` und `konsole`, also weiße Fläche in der dunklen Leiste. Die
-  Einträge darin (`.sb-act-item`) tragen aufgehelltes Gold `#E8C964`. Im
-  geschlossenen Zustand nicht sichtbar (`display:none`, Rechteck 0×0),
-  deshalb bei den Kontrastläufen nie aufgefallen. **Mit geöffnetem Menü
-  nachmessen**, vorher nichts ändern — v1084 hat das Menü gebaut und war
-  abgenommen.
-
-- **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
-  Aktionen als Popover statt Blatt von unten
-- **Einstellungs-Abschnitte hintereinander rendern** ließ den Prüf-Browser
-  zweimal einfrieren (`anbieter`, `mandanten`, `plan`, `rechtliches`, `help`).
-  Einzeln unauffällig — auf einem echten Gerät nachstellen
 - **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
   Vorhaben mit eigener Prüfstrecke, nicht nebenbei
-- **Admin-Oberfläche** auf Tablet prüfen
+
+- **`gold-audit.py` auf RC=0 bringen** — 484 Fundstellen in 57 Dateien,
+  Altlast. Die neuen Dateien tragen davon **keine einzige**. Eigenes
+  Vorhaben, weil jede Fundstelle einzeln beurteilt werden muss.
 
 ---
 
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-06] **Die „Später"-Punkte der Reihe nach** — `v1106` bis `v1110`
+
+  Fünf Punkte abgearbeitet. **Vier der fünf Backlog-Beschreibungen waren
+  sachlich falsch** — jede hätte, blind umgesetzt, an der falschen Stelle
+  repariert.
+
+  ### (1) Wallet: „privat" liegt auf dem Preis — `v1106`
+
+  **Beschreibung widerlegt.** Der Punkt sagte, `.sbc-halter` überlappe
+  `.sbc-kp-row`. Gemessen endet der Halter bei y=395 und die Preiszeile
+  beginnt bei 396. Es ist der **Score-Ring über der Adresse**: Ring
+  x 277–344, Adresse x 87–356 — **67 px, auf jeder der fünf Karten**.
+
+  Ursache war eine Inkonsistenz in derselben Rasterspalte: `.sbc-top-line1`
+  hielt mit `padding-right:86px` bereits genau den Abstand zum Ring frei,
+  nur `.sbc-address` war mit 9 px ausgenommen.
+
+  **Zwei eigene Messfehler dabei, beide zurückgenommen:** Ich habe zuerst
+  Randboxen statt Textkästen verglichen — `getBoundingClientRect()` misst
+  das Padding mit, also sah es nach Überlappung aus, wo der Text längst
+  endete. Und danach meldete ein `Range` über die Textknoten weiter 15 px,
+  obwohl `overflow:hidden` und `ellipsis` gesetzt sind: **ein Range misst
+  den vollen Text, auch wenn er sichtbar abgeschnitten ist.**
+
+  ### (2) `.sbcm-label` bei Kartenfläche „Weiß" — `v1107`, `v1107b`, `v1108`
+
+  **Größer als beschrieben.** Der Punkt nannte eine Klasse mit k=1,06 und
+  „nur die Kombination dealpilot/konsole + weiß". Gemessen sind es sechs
+  Sachverhalte, und der schlimmste stand nicht drin:
+
+  | Element | k | Stellen |
+  |---|---|---|
+  | `.sbcm-scale span` | **1,00** | 7 |
+  | `.sbcm-label` | 1,86 | 3 |
+  | `.sbc-date` / `.sbc-arrow` | 1,67 / 1,46 | 2 |
+  | `.sbcm-val` grün / blau | 2,03 / 2,25 | 3 |
+
+  Und es betraf **nicht nur „weiß"**: `kontor` ohne alles stand bei 14
+  Fundstellen mit denselben unsichtbaren Skalen-Beschriftungen. Die Vorlage
+  macht die Karte hell und setzt `--uv-card-*`, aber die Kachel-Texte lasen
+  die Tokens nicht. Jetzt über `--uv-card-mut` — in hellen Vorlagen dunkel,
+  in `konsole` hell, eine Regel für beide Richtungen.
+
+  Statusfarben wurden **nicht** tokenisiert: getauscht wurde nur die für
+  dunklen Grund gebaute Fassung gegen eine für hellen, in OKLab abgesenkt.
+
+  Dazu zwei Funde beim Gegenmessen: die **Score-Zahl** stand in `konsole`
+  bei **k=1,03** (dunkle Ziffer auf dunkler Karte — derselbe Fall wie
+  v1082e), und das **Investor-Ribbon** bei 1,32 (heller Text auf goldenem
+  Grund).
+
+  **Ein eigener Fehler, zurückgenommen:** Ich hatte das Stufen-Label auf
+  `--uv-card-ink2` gesetzt und es damit von 2,03 auf **1,02
+  verschlechtert** — die Pille trägt eine eigene grüne Fläche, nicht die
+  Kartenfläche.
+
+  **Nachgemessen, Kontrastlauf über die Objektkarte, Schwelle 3:**
+
+  | Fassung | vorher | nachher |
+  |---|---|---|
+  | kontor / panel / kanzlei / boarding | 14 / 15 / 2 / 2 | je **2** |
+  | dieselben + „weiß" | 20 | je **2** |
+  | konsole | 3 | **1** |
+
+  Die verbleibenden 2 sind die Aktionsknöpfe auf der Karte (k=2,7), in
+  jeder Fassung gleich und älter als diese Arbeit.
+
+  ### (3) Aktionen-Aufklapper — **Befund widerlegt, nichts geändert**
+
+  Der Punkt sagte, `.sb-actions-accordion-inner` messe `rgb(255,255,255)`
+  auch in den dunklen Fassungen. Mit **geöffnetem** Menü gemessen — wie der
+  Punkt es verlangte — ist es **transparent**, sein effektiver Grund ist
+  `rgb(10,8,5)`, und die Einträge stehen bei **k=12,35**. In allen sechs
+  Fassungen sauber.
+
+  Was bleibt, ist eine reine Gestaltungsfrage: das Menü bleibt auch in
+  hellen Vorlagen dunkel. Das ist ein übliches Muster für Kontextmenüs und
+  wurde bewusst nicht angefasst.
+
+  ### (4) Vier Whitelabel-Tints bei hellem Akzent — `v1109`
+
+  Der Punkt verlangte eine **Einstufung je Ton** statt einer pauschalen
+  Regel, weil unter den 66 Tönen auch Flächen sind. Genau so gebaut, und
+  das Kriterium kommt aus dem Ton selbst: **war der Originalton auf Weiß
+  lesbar (k ≥ 3), ist er ein Text-Ton und muss es bleiben; war er es nicht,
+  ist er eine Fläche und bleibt unangetastet.** Kein Ton bekommt eine neue
+  Aufgabe.
+
+  **Nachgemessen** mit Hellgelb `#F0D000`, Partner-Rot `#7B2D3B` und
+  Standard-Gold: 19 Text-Töne, 47 Flächen, **0 Reißer** bei allen dreien.
+  Flächen bleiben hell (`#fff5be`), Text-Töne wurden abgesenkt
+  (`#a57900`), der Akzent selbst ist unverändert.
+
+  ### (5) „Browser-Freeze" in den Einstellungen — `v1110`
+
+  **Es war kein Freeze, und es lag nicht an der Reihenfolge.** Gemessen mit
+  einem Protokoll, das nach jedem Schritt in `localStorage` schreibt und
+  deshalb den Abbruch überlebt:
+
+  | Abschnitt | Klick |
+  |---|---|
+  | anbieter / mandanten / plan / rechtliches | 5 / 2 / 1 / 1 ms |
+  | **`closeSettings()`** | **83.942 ms** |
+
+  Das Schließen ruft `confirm('Du hast ungespeicherte Änderungen…')` — ein
+  **blockierender Dialog**, der auf eine Antwort wartet, die ein
+  automatisierter Prüflauf nie gibt. Die 74 und 84 Sekunden waren das
+  CDP-Zeitlimit, nicht die Rechenzeit.
+
+  **Dahinter steckt aber ein echter Alltagsfehler:** `_setIsDirty()`
+  verglich mit `!==`, und bei einem Array ist das ein **Referenzvergleich**.
+  `_setCollectFormIntoDraft()` baut `ai_focus_areas` bei jedem Aufruf neu
+  aus den Checkboxen — es war also **nie** gleich. Gemessen: Einstellungen
+  öffnen, **einen** Tab wechseln, nichts anfassen → `dirty=true`, und genau
+  ein Feld weicht ab: `["Lage","Mietmarkt","Risiken"]` gegen
+  `["Lage","Mietmarkt","Risiken"]`.
+
+  Folge für jeden Nutzer: durch die Abschnitte klicken, schließen — und es
+  kommt „Du hast ungespeicherte Änderungen. Trotzdem schließen?", obwohl
+  nichts geändert wurde.
+
+  **Nachgemessen:** `dirty=false`, `closeSettings` in **1 ms** statt
+  83.942. Gegenprobe, dass die Warnung noch funktioniert: echte Änderung →
+  `dirty=true` und Hinweis sichtbar, Rücknahme → `dirty=false`.
 
 - [2026-08-06] **Stapel-Modus feinziehen** — `v1105` bis `v1105c`
 
