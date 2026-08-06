@@ -1883,6 +1883,15 @@ html[data-ui-theme] body .dp-pf-mtrigger {
 html[data-ui-theme="konsole"] {
   --uv-mut: #9AA1AA;
 }
+/* Gegenprobe ueber alle sechs Fassungen hat noch eine gefunden: "panel"
+   stand bei 10 Fundstellen unter 3, waehrend ohne Vorlage 5 und in den
+   uebrigen hellen Vorlagen 4 stehen. Die sechs zusaetzlichen waren alle
+   --uv-mut #8a95a2 mit k=2,78 — der kuehle Grauton ist auf der hellen
+   Flaeche zu blass. Nur panel angefasst, die anderen liegen bereits auf
+   Referenzniveau. */
+html[data-ui-theme="panel"] {
+  --uv-mut: #6B7683;
+}
 /* Ein weisses Etikett auf hellem Grund — eigene Flaeche, eigener Ton. */
 html[data-ui-theme] body .sec .ki-lage-tag {
   background: var(--uv-surf2) !important;
