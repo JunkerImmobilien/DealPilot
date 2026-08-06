@@ -543,6 +543,44 @@ html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm {
   border-color: #E9E4D9 !important;
 }
 
+/* ── v1107 · Die Kachel-Texte fehlten in dieser Aufzaehlung ───────────────
+   Der Block oben dreht Adresse, Preis, Halter und Stufen-Label auf dunkle
+   Toene, weil die Karte weiss wird — die Texte IN den Kacheln blieben aber
+   auf ihrer Fassung fuer dunklen Grund.
+
+   GEMESSEN (Grundfassung + Kartenflaeche "weiss", Kontrastlauf ueber die
+   ganze Karte, Schwelle 3):
+
+     .sbcm-scale span   rgba(168,162,153,.65)   k = 1,00   7 Stellen
+     .sbcm-label        rgba(255,255,255,.70)   k = 1,86   3 Stellen
+     .sbc-date          rgba(168,162,153,.85)   k = 1,67
+     .sbc-arrow         rgba(168,162,153,.45)   k = 1,46
+     .sbcm-val (gruen)  rgb(105,194,145)        k = 2,03
+     .sbcm-val (blau)   rgb(110,175,217)        k = 2,25
+
+   Der Backlog nannte nur .sbcm-label mit 1,06 und nur die Kombination
+   dealpilot/konsole. Gemessen sind es sechs Sachverhalte, und die sieben
+   Skalen-Beschriftungen mit k=1,00 sind der schlimmste — die waren schlicht
+   unsichtbar.
+
+   STATUSFARBEN werden dabei NICHT tokenisiert und NICHT umgefaerbt: Gruen
+   bleibt Gruen, Rot bleibt Rot. Getauscht wird nur die fuer dunklen Grund
+   gebaute Fassung gegen eine fuer hellen — dasselbe Vorgehen wie in
+   v1082 Abschnitt (c). Die drei Werte sind in OKLab abgesenkt, bis sie
+   gegen die Kachelflaeche #FAF8F3 auf 3,2 kommen; Farbton und Saettigung
+   bleiben damit erhalten. */
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbc-date,
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbc-arrow,
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-label,
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-toggle-ico,
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-scale span,
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-tick {
+  color: #8f897c !important;
+}
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-good .sbcm-val { color: #3b9667 !important; }
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-info .sbcm-val { color: #4f90b8 !important; }
+html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-bad  .sbcm-val { color: #ba726d !important; }
+
 
 /* ══════════════════════════════════════════════════════════════════════════
    5 · OBJEKTKARTEN-MODI — Backlog Punkt 4
