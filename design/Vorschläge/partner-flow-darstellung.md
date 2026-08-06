@@ -1,5 +1,11 @@
 # Partner-Whitelabel und Darstellung — Befund und drei Wege
 
+> **Stand 2026-08-06: C und A sind umgesetzt** (`v1111`, siehe BACKLOG).
+> **B bleibt offen** und ist von dort aus nachrüstbar, ohne etwas
+> umzubauen — A ist genau seine Voreinstellung. Der in Abschnitt 6
+> benannte Reset-Fall ist mit erledigt.
+
+
 *2026-08-06 · Auftrag von Marcel: „Im Partner-Portal kann man ja das
 Whitelabel setzen und das wird auch übernommen für die Einstellungen, also
 die Menüs etc. Das sollte sich nicht mit unserem unter Profil & Anzeige →
