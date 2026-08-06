@@ -859,6 +859,93 @@ window.Plan = {
   function _lighten(h,p){var a=_rgb(h);return _hex(a[0]+(255-a[0])*p/100,a[1]+(255-a[1])*p/100,a[2]+(255-a[2])*p/100);}
   function _darken(h,p){var a=_rgb(h);return _hex(a[0]*(1-p/100),a[1]*(1-p/100),a[2]*(1-p/100));}
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     v1097 · Markentoene mit Mindestkontrast (TR9 -> TR10)
+
+     BEFUND, gemessen mit Partner-Rot #7B2D3B und mit Hellgelb #F0D000:
+
+       --gold-2 = _lighten(akzent, 8)   33 Stellen, ALLE auf dunklem Grund
+                                        bei #7B2D3B -> #863e4b, Kontrast 2,26
+       --gold-d = _darken(akzent, 9)    19 Stellen, ALLE auf hellem Grund
+                                        bei #F0D000 -> #dabd00, Kontrast 1,86
+
+     Der Fehler ist die feste Prozent-Ableitung: "8 % heller als der Akzent"
+     sagt nichts darueber, ob der Ton auf seinem Grund lesbar IST. Bei einem
+     ohnehin dunklen Akzent bleibt --gold-2 dunkel, bei einem hellen bleibt
+     --gold-d hell.
+
+     Deshalb: erst den bisherigen Wert bilden, und NUR wenn der den
+     Mindestkontrast verfehlt, die Helligkeit nachziehen — in OKLab, damit
+     der Farbton und moeglichst viel Saettigung erhalten bleiben. Gemessen
+     gegen die RGB-Aufhellung: #7B2D3B ergibt ueber OKLab #c0727e mit
+     Saettigung 0,41 statt #ab7982 mit 0,29.
+
+     DIE SCHWELLEN STEHEN NICHT WILLKUERLICH, sie sind an der eigenen Marke
+     gemessen: das Haus-Dunkelgold #9a7f33 liegt auf Weiss bei 3,85 -> 3,8.
+     Auf der dunklen Seite waere das Haus-Gold #E8C964 mit 10,44 fuer jeden
+     farbigen Akzent unerreichbar, dort gilt die uebliche Schwelle 4,5.
+
+     WER NICHTS AENDERT, MERKT NICHTS: Standard-Gold, Statusgruen und
+     Status-Rot erfuellen die Schwellen bereits und kommen unveraendert
+     heraus (nachgemessen, siehe BACKLOG).
+     ═══════════════════════════════════════════════════════════════════════ */
+  var _GRUND_DUNKEL = [26,29,34];   /* #1A1D22 — die HELLSTE dunkle Flaeche
+                                       (Objektkarte in "konsole"). Gegen
+                                       Schwarz ist der Kontrast dann besser,
+                                       nie schlechter. */
+  var _GRUND_HELL   = [255,255,255];
+  var _MIN_DUNKEL = 4.5, _MIN_HELL = 3.8;
+
+  function _lum(a){function f(x){x/=255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);}
+    return 0.2126*f(a[0])+0.7152*f(a[1])+0.0722*f(a[2]);}
+  function _kontrast(a,b){var l1=_lum(a),l2=_lum(b);
+    return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05);}
+
+  /* sRGB <-> OKLab (Ottosson). Gegen die CSS-Referenz oklch(from ...) im
+     Browser geprueft: Abweichung 0 auf allen drei Kanaelen. Bewusst in
+     JS gerechnet und nicht per CSS — das Ergebnis muss als Hex in Tokens
+     UND in den Sweeper, und var()/oklch() traegt nicht ueberall
+     (SVG-Attribute, Canvas, jsPDF). */
+  function _s2l(c){c/=255;return c<=0.04045?c/12.92:Math.pow((c+0.055)/1.055,2.4);}
+  function _l2s(c){c=c<=0.0031308?c*12.92:1.055*Math.pow(c,1/2.4)-0.055;
+    return Math.round(Math.max(0,Math.min(1,c))*255);}
+  function _toLab(a){var r=_s2l(a[0]),g=_s2l(a[1]),b=_s2l(a[2]);
+    var l=Math.cbrt(0.4122214708*r+0.5363325363*g+0.0514459929*b);
+    var m=Math.cbrt(0.2119034982*r+0.6806995451*g+0.1073969566*b);
+    var s=Math.cbrt(0.0883024619*r+0.2817188376*g+0.6299787005*b);
+    return [0.2104542553*l+0.7936177850*m-0.0040720468*s,
+            1.9779984951*l-2.4285922050*m+0.4505937099*s,
+            0.0259040371*l+0.7827717662*m-0.8086757660*s];}
+  function _fromLab(L,A,B){var l=Math.pow(L+0.3963377774*A+0.2158037573*B,3);
+    var m=Math.pow(L-0.1055613458*A-0.0638541728*B,3);
+    var s=Math.pow(L-0.0894841775*A-1.2914855480*B,3);
+    return [_l2s( 4.0767416621*l-3.3077115913*m+0.2309699292*s),
+            _l2s(-1.2684380046*l+2.6097574011*m-0.3413193965*s),
+            _l2s(-0.0041960863*l-0.7034186147*m+1.7076147010*s)];}
+
+  /* Der Ton fuer DUNKLE Flaechen: heller ziehen, bis er traegt. */
+  function tonAufDunkel(akzent){
+    var start = _lighten(akzent, 8);                      /* wie bisher */
+    if(_kontrast(_rgb(start), _GRUND_DUNKEL) >= _MIN_DUNKEL) return start;
+    var lab = _toLab(_rgb(start));
+    for(var L = lab[0] + 0.02; L <= 0.95; L += 0.02){
+      var c = _fromLab(L, lab[1], lab[2]);
+      if(_kontrast(c, _GRUND_DUNKEL) >= _MIN_DUNKEL) return _hex(c[0],c[1],c[2]);
+    }
+    var e = _fromLab(0.95, lab[1], lab[2]); return _hex(e[0],e[1],e[2]);
+  }
+  /* Der Ton fuer HELLE Flaechen: dunkler ziehen, bis er traegt. */
+  function tonAufHell(akzent){
+    var start = _darken(akzent, 9);                       /* wie bisher */
+    if(_kontrast(_rgb(start), _GRUND_HELL) >= _MIN_HELL) return start;
+    var lab = _toLab(_rgb(start));
+    for(var L = lab[0] - 0.02; L >= 0.08; L -= 0.02){
+      var c = _fromLab(L, lab[1], lab[2]);
+      if(_kontrast(c, _GRUND_HELL) >= _MIN_HELL) return _hex(c[0],c[1],c[2]);
+    }
+    var e = _fromLab(0.08, lab[1], lab[2]); return _hex(e[0],e[1],e[2]);
+  }
+
   function _isPalette(){ /*v904-palette-fix*/
     if(window.DP_THEME_PALETTE_FORCE===true) return true;            // Test/Dev-Bypass
     try{
@@ -896,8 +983,15 @@ window.Plan = {
       r.setProperty('--gold-l','#E2C97E'); r.setProperty('--gold-2','#E8C964'); r.setProperty('--gold-3','#9a7f33'); r.setProperty('--gold-bg','#FAF5E8');
     } else {
       r.setProperty('--gold',t.accent); r.setProperty('--gold-hi',t.accentHi); r.setProperty('--gold-lo',t.accentLo);
-      r.setProperty('--gold-l',_lighten(t.accent,15)); r.setProperty('--gold-2',_lighten(t.accent,8));
+      r.setProperty('--gold-l',_lighten(t.accent,15));
+      /* v1097: nicht mehr _lighten(...,8) — der Ton muss auf dunklem Grund
+         TRAGEN, nicht "8 % heller als der Akzent" sein. */
+      r.setProperty('--gold-2',tonAufDunkel(t.accent));
       r.setProperty('--gold-3',_darken(t.accent,26)); r.setProperty('--gold-bg',_lighten(t.accent,88));
+      /* v1097: --gold-d wurde hier bisher GAR NICHT gesetzt. Genau das war
+         das Loch aus v1096b — ueber diesen Weg fielen alle Regeln mit
+         var(--gold-d, ...) auf das Standard-Dunkelgold zurueck. */
+      r.setProperty('--gold-d',tonAufHell(t.accent));
     }
     if(document.body) document.body.setAttribute('data-dp-skin', t.skin);
     if(typeof window._dpApplyThemeVars === 'function'){ try{ window._dpApplyThemeVars(); }catch(e){} }
@@ -920,6 +1014,10 @@ window.Plan = {
   DPC.branding.getTheme   = getTheme;
   DPC.branding.setTheme   = setTheme;
   DPC.branding.applyTheme = applyTheme;
+  /* v1097: eine Quelle fuer die kontrastgeprueften Markentoene.
+     whitelabel-override.js ruft genau diese beiden. */
+  DPC.branding.tonAufDunkel = tonAufDunkel;
+  DPC.branding.tonAufHell   = tonAufHell;
 
   function boot(){ applyTheme(); }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

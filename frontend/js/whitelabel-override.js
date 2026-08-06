@@ -379,6 +379,21 @@
     _active = false;
   }
 
+  /* v1097: die Toene mit Mindestkontrast kommen aus config.js — eine
+     Quelle, damit Regler-Weg und Sweeper-Weg NICHT auseinanderlaufen.
+     Das war der Fehler, den v1096b aufgedeckt hat. Der Rueckfall bildet
+     exakt das alte Verhalten ab, falls config.js einmal aelter ist. */
+  function _tonDunkel(a) {
+    try { if (window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.tonAufDunkel)
+            return DealPilotConfig.branding.tonAufDunkel(a); } catch (e) {}
+    return _lighten(a, 8);
+  }
+  function _tonHell(a) {
+    try { if (window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.tonAufHell)
+            return DealPilotConfig.branding.tonAufHell(a); } catch (e) {}
+    return _darken(a, 9);
+  }
+
   function apply(b) {
     if (!b) return false;
     /* W22-reapply: schon aktiv mit anderer Farbe? -> erst Originale zurueck. */
@@ -401,12 +416,19 @@
     r.setProperty('--gold-hi', _hi);
     r.setProperty('--gold-lo', _lo);
     r.setProperty('--gold-l', _lighten(_acc, 15));
-    r.setProperty('--gold-2', _lighten(_acc, 8));
+    /* v1097: Mindestkontrast statt fester Prozent-Ableitung. Gemessen war
+       --gold-2 bei Partner-Rot #7B2D3B auf #863e4b und stand damit auf der
+       dunklen Karte bei Kontrast 2,26; --gold-d bei Hellgelb #F0D000 auf
+       #dabd00, auf Weiss 1,86. Die Rechenkerne stehen in config.js, damit
+       der Regler-Weg (branding.applyTheme) dieselben Toene bildet — mit
+       Inline-Rueckfall nach dem Muster aus v1081, falls config.js einmal
+       aelter ausgeliefert wird. */
+    r.setProperty('--gold-2', _tonDunkel(_acc));
     r.setProperty('--gold-3', _darken(_acc, 26));
     r.setProperty('--gold-bg', _lighten(_acc, 88));
     /* W29-gold-token: der QC nutzt --gold-d (14x) und --gold-soft (1x).
        Ohne diese zwei Zeilen bleiben genau die Stellen gold. */
-    r.setProperty('--gold-d', _darken(_acc, 9));
+    r.setProperty('--gold-d', _tonHell(_acc));
     r.setProperty('--gold-soft', _lighten(_acc, 82));
     setWlTokens(r);
     if (_obs) r.setProperty('--obsidian', _obs);
