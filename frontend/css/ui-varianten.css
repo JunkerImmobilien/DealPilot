@@ -616,6 +616,25 @@ html[data-ui-theme="konsole"][data-ui-surface="light"] body aside.sidebar .sb-ca
   color: var(--uv-marke-d) !important;
 }
 
+/* ── v1108 · Die Score-Zahl in der dunklen Vorlage ───────────────────────
+   GEMESSEN auf der Objektkarte, Ziffer gegen Kartenflaeche:
+
+     dealpilot  rgb(26,26,26)   k = 17,40   (dunkle Ziffer, helle Scheibe)
+     kontor     rgb(20,19,16)   k = 18,58   folgt --uv-card-ink
+     panel      rgb(21,26,32)   k = 17,49   folgt --uv-card-ink
+     konsole    rgb(26,26,26)   k =  1,03   <- dunkle Ziffer auf dunkler Karte
+
+   In den hellen Vorlagen zieht die Ziffer den Kartenton mit, in "konsole"
+   blieb sie auf ihrem festen Dunkelwert stehen — dort ist die Karte aber
+   selbst dunkel. Es ist derselbe Fall wie v1082e ("Wallet-Ringe standen
+   leer"), nur in der dunklen Vorlage statt im Wallet-Modus. */
+html[data-ui-theme="konsole"] body aside.sidebar .sb-card .sbc-mini-score-num {
+  color: var(--uv-card-ink) !important;
+}
+html[data-ui-theme="konsole"] body aside.sidebar .sb-card .sbc-score-label {
+  color: var(--uv-card-ink2) !important;
+}
+
 
 /* ══════════════════════════════════════════════════════════════════════════
    5 · OBJEKTKARTEN-MODI — Backlog Punkt 4
@@ -1995,6 +2014,11 @@ html[data-ui-theme="konsole"] {
    Referenzniveau. */
 html[data-ui-theme="panel"] {
   --uv-mut: #6B7683;
+  /* v1108: --uv-card-mut war beim Abdunkeln in v1099d uebersehen worden.
+     GEMESSEN auf der Objektkarte: 15 Fundstellen bei k=2,89 — knapp unter
+     der Schwelle, aber durchgaengig. Derselbe Grund wie beim Geschwister-
+     Token: der kuehle Grauton ist auf heller Flaeche zu blass. */
+  --uv-card-mut: #6B7683;
 }
 /* Ein weisses Etikett auf hellem Grund — eigene Flaeche, eigener Ton. */
 html[data-ui-theme] body .sec .ki-lage-tag {
