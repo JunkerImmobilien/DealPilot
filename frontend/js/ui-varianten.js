@@ -480,6 +480,22 @@
          Einzelschluesseln — dafuer gibt es _dpDispReset (settings.js:3116),
          den zustaendigen Rueckbau. Nicht nachgebaut, sondern gerufen. */
       try { if (typeof window._dpDispReset === 'function') window._dpDispReset(); } catch (e) {}
+
+      /* v1111: Beim MANDANTEN eines Partners heisst "Zuruecksetzen" nicht
+         "DealPilot-Standard", sondern "zurueck auf die Marke meines
+         Partners". Sonst raeumt der Rueckbau gerade das weg, was der
+         Partner vorgibt — bis zum naechsten Laden, dann kommt es wieder.
+         Das sah aus wie ein Fehler und war einer.
+         Der Marker muss mit weg, sonst gilt die Marke als "schon gesehen"
+         und der Komfort-Teil wuerde nicht neu gesetzt. */
+      if (istMandant()) {
+        try { localStorage.removeItem('dp_wl_display_seen'); } catch (e) {}
+        try {
+          if (window.DealPilotMandantBranding && DealPilotMandantBranding.reapply) {
+            DealPilotMandantBranding.reapply();
+          }
+        } catch (e) {}
+      }
       var bb = document.getElementById('dpuv-bereiche');
       if (bb) BEREICHE.forEach(function (def) {
         var f = bb.querySelector('input[data-ls="' + def.ls + '"]');
@@ -508,9 +524,39 @@
     });
   }
 
+  /* ── v1111 · Bin ich Mandant eines Partners? ─────────────────────────
+     dp_wl_cache existiert AUSSCHLIESSLICH bei einem reseller_client — das
+     Backend liefert es fuer Owner null (mandant-branding.js:230). Es ist
+     damit das gecachte Kennzeichen "Mandant eines Partners", und die
+     Handy-Sperre nutzt es bereits genau so. */
+  function istMandant() {
+    try {
+      var v = localStorage.getItem('dp_wl_cache');
+      return !!(v && v !== 'null' && v !== '{}');
+    } catch (e) { return false; }
+  }
+
   function gateSetzen() {
     var l = document.getElementById('dpuv-lock');
-    if (l) l.classList.toggle('locked', !istPartner());
+    if (!l) return;
+    /* Gesperrt ist der Abschnitt Marke fuer ZWEI Gruppen, aus verschiedenen
+       Gruenden — deshalb auch zwei Texte:
+         kein Partner   -> die Marke gehoert zum Partner-Paket
+         Mandant        -> die Marke gehoert dem Partner, nicht ihm
+       Ein Partner, der selbst Mandant waere, bleibt Partner: die
+       Partner-Pruefung kommt zuerst. */
+    var partner = istPartner();
+    var mandant = !partner && istMandant();
+    l.classList.toggle('locked', !partner);
+    var bar = document.querySelector('.dpuv-lockbar');
+    if (bar) {
+      bar.innerHTML = mandant
+        ? '<div><b>Von deinem Partner vorgegeben</b><span>Farben und Logo kommen aus dem ' +
+          'Branding deines Partners und gelten für alle seine Mandanten. Vorlage, Karten, ' +
+          'Form und Schrift kannst du frei wählen.</span></div>'
+        : '<div><b>Marke ab Partner</b><span>Farben und Logo gehören zum Partner-Paket und ' +
+          'gelten dann auch für alle Mandanten.</span></div>';
+    }
   }
 
   /* ── v1098 · Die umgehaengten Bloecke auffrischen ─────────────────────

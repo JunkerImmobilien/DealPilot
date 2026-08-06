@@ -169,11 +169,50 @@
         dp_zoom_ui: function (v) { c('_dpDispSize', v); }
       };
       function c(fn, v) { try { if (typeof window[fn] === 'function' && v) window[fn](v); } catch (e) {} }
+
+      /* ── v1111 · Marke und Komfort werden verschieden behandelt ─────────
+         Bisher galt fuer ALLES: einmal setzen, danach gilt die Wahl des
+         Mandanten (dp_wl_display_seen). Das macht die Marke des Partners zu
+         einer blossen Voreinstellung — sie war nach der ersten eigenen
+         Aenderung weg.
+
+         Ab hier die Trennung aus design/Vorschlaege/partner-flow-darstellung.md,
+         Weg A:
+
+           MARKE   Farben, Logo, Schrift  -> gilt IMMER, bei jedem Laden.
+                   Der Mandant kann sie nicht mehr aendern, der Abschnitt
+                   ist im Panel gesperrt (ui-varianten.js, gateSetzen).
+           KOMFORT Vorlage, Karten, Flaeche, Form -> nur beim ERSTEN Mal
+                   als Voreinstellung. Danach gehoert die Entscheidung dem
+                   Mandanten, denn das ist Bequemlichkeit, keine Marke.
+
+         Genau deshalb bleibt dp_wl_display_seen erhalten — es steuert jetzt
+         nur noch den Komfort-Teil. */
+      var KOMFORT = {
+        ui_theme:   function (v) { uvSetzen('ui_theme', v); },
+        ui_cards:   function (v) { uvSetzen('ui_cards', v); },
+        ui_surface: function (v) { uvSetzen('ui_surface', v); },
+        ui_form:    function (v) { uvSetzen('ui_form', v); }
+      };
+      function uvSetzen(feld, v) {
+        try {
+          var s = JSON.parse(localStorage.getItem('dp_user_settings') || '{}') || {};
+          s[feld] = (v === '-' || v === undefined || v === null) ? '' : String(v);
+          localStorage.setItem('dp_user_settings', JSON.stringify(s));
+          if (window.DealPilotUiVarianten && DealPilotUiVarianten.apply) DealPilotUiVarianten.apply();
+        } catch (e) {}
+      }
+
+      /* Die Marke: jedes Mal. */
+      Object.keys(d).forEach(function (k) { if (MAP[k] && d[k]) MAP[k](d[k]); });
+
       var seen = false;
       try { seen = localStorage.getItem('dp_wl_display_seen') === '1'; } catch (e) {}
-      if (seen) return;                       // Mandant hat es schon bekommen -> seine Wahl gilt
-      Object.keys(d).forEach(function (k) { if (MAP[k] && d[k]) MAP[k](d[k]); });
-      try { localStorage.setItem('dp_wl_display_seen', '1'); } catch (e) {}
+      if (!seen) {
+        /* Der Komfort: einmal als Voreinstellung, danach nie wieder. */
+        Object.keys(d).forEach(function (k) { if (KOMFORT[k]) KOMFORT[k](d[k]); });
+        try { localStorage.setItem('dp_wl_display_seen', '1'); } catch (e) {}
+      }
       try { if (window._dpDispRefresh) _dpDispRefresh(); } catch (e) {}
     } catch (e) {}
   }
@@ -259,4 +298,15 @@
   window.addEventListener('dp:plan-ready', function () { boot(); });
   /* War der Plan schon da, bevor dieses Modul geladen wurde? */
   if (window.DealPilotPlanReady) boot();
+
+  /* v1111: Eine kleine API, damit das Darstellungs-Panel die Marke des
+     Partners wiederherstellen kann. Sie wird beim "Zuruecksetzen" eines
+     MANDANTEN gerufen — dort heisst Zuruecksetzen nicht
+     "DealPilot-Standard", sondern "zurueck auf die Marke meines Partners".
+     Bewusst nur diese eine Funktion nach aussen: applyResellerDisplay
+     liest _b, das das Modul selbst gefuellt hat. */
+  window.DealPilotMandantBranding = window.DealPilotMandantBranding || {};
+  window.DealPilotMandantBranding.reapply = function () {
+    try { applyResellerDisplay(); } catch (e) {}
+  };
 })();

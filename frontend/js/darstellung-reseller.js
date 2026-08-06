@@ -23,6 +23,10 @@
   var _snap = null;           // Foto der persoenlichen Werte
   var _busy = false;
 
+  /* v1111: MUSS vor der MAP stehen — die MAP wird beim Laden ausgewertet,
+     und ein spaeter zugewiesenes var waere dort noch undefined. */
+  var UV_LEER = '-';
+
   /* Schluessel -> Handler + Default. Reihenfolge zaehlt: Skin zuerst, weil
      _dpDispSkin() ein _dpDispRefresh() ausloest. */
   var MAP = [
@@ -39,11 +43,56 @@
     ['dp_card_ui',     function (v) { call('_dpDispCard', v); },   ''],
     ['dp_accent_ui',   function (v) { call('_dpDispAccent', v); }, '#C9A84C'],
     ['dp_font_ui',     function (v) { call('_dpDispFont', v); },   'inter'],
-    ['dp_zoom_ui',     function (v) { call('_dpDispSize', v); },   '1']
+    ['dp_zoom_ui',     function (v) { call('_dpDispSize', v); },   '1'],
+
+    /* ── v1111 · Die vier Werte des neuen Darstellungs-Panels ────────────
+       Bis hierher reichte der Partner seinen Mandanten 14 Werte durch —
+       Farben, Schrift, Logo. Die Vorlage, den Kartenmodus, die
+       Kartenflaeche und die Form NICHT, obwohl genau die den Gesamteindruck
+       am staerksten praegen. Gemessen: weder dieses Modul noch
+       mandant-branding.js enthielt ui_theme, ui_cards, ui_surface oder
+       ui_form.
+
+       Sie liegen nicht als Einzelschluessel, sondern zusammen in einem JSON
+       unter dp_user_settings. Deshalb ein VIRTUELLER Schluessel mit dem
+       Praefix "uv:" — LSget() und der Handler unten uebersetzen ihn, das
+       Muster der MAP bleibt unangetastet.
+
+       UV_LEER ist noetig, weil bei diesen vier "leer" ein GUELTIGER Wert
+       ist: kein Attribut heisst "DealPilot" bzw. "Standard". applySet()
+       ueberspringt aber leere Werte (if (v) …), sonst wuerde ein Partner,
+       der bewusst DealPilot vorgibt, gar nichts uebertragen. */
+    ['uv:ui_theme',   function (v) { uvSetzen('ui_theme',   v); }, UV_LEER],
+    ['uv:ui_cards',   function (v) { uvSetzen('ui_cards',   v); }, UV_LEER],
+    ['uv:ui_surface', function (v) { uvSetzen('ui_surface', v); }, UV_LEER],
+    ['uv:ui_form',    function (v) { uvSetzen('ui_form',    v); }, UV_LEER]
   ];
 
   function call(fn, v) { try { if (typeof window[fn] === 'function' && v) window[fn](v); } catch (e) {} }
-  function LSget(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  /* v1111: virtuelle Schluessel auf das JSON abbilden. */
+  function uvLesen(feld) {
+    try {
+      var s = JSON.parse(localStorage.getItem('dp_user_settings') || '{}') || {};
+      var v = s[feld];
+      return (v === undefined || v === null || v === '') ? UV_LEER : String(v);
+    } catch (e) { return UV_LEER; }
+  }
+  function uvSetzen(feld, v) {
+    try {
+      var s = JSON.parse(localStorage.getItem('dp_user_settings') || '{}') || {};
+      s[feld] = (v === UV_LEER || v === undefined || v === null) ? '' : String(v);
+      localStorage.setItem('dp_user_settings', JSON.stringify(s));
+      if (window.DealPilotUiVarianten && DealPilotUiVarianten.apply) DealPilotUiVarianten.apply();
+    } catch (e) {}
+  }
+
+  function LSget(k) {
+    try {
+      if (k.indexOf('uv:') === 0) return uvLesen(k.slice(3));
+      return localStorage.getItem(k);
+    } catch (e) { return null; }
+  }
   function isPartner() {
     try { return !!(window.Plan && Plan.can && Plan.can('reseller')); } catch (e) { return false; }
   }
