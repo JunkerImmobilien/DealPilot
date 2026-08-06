@@ -1265,3 +1265,65 @@ html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbcm-label {
 html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbcm-track {
   display: block !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1093 — die Vorlage darf die Marke nicht totsetzen
+
+   GEMESSEN mit Partner-Konto und Marken-Akzent #7B2D3B (Kanzlei-Rot):
+
+     ohne Vorlage   .sbc-seq -> rgb(134,62,75)   Marke kommt durch
+     mit "kontor"   .sbc-seq -> rgb(78,73,64)    neutrales Grau
+
+   Der Akzent steht korrekt in den Tokens (--gold und --wl-c9a84c waren
+   beide #7B2D3B) — meine eigenen v1082-Regeln haben ihn danach mit
+   neutralen --uv-*-Tokens ueberschrieben. Ueber #sidebar, header.hdr und
+   nav.tabs verlieren so 33 Stellen die Markenfarbe, die groessten Gruppen
+   sind die Tabs (8) und die Objektnummer (5).
+
+   ZURUECKGENOMMEN: ich hatte zwischendurch var(--wl-9a7f33, #9a7f33) aus
+   v1089/v1090 als "fest verdrahtetes Dunkelgold" verdaechtigt. Falsch —
+   das Token faerbt mit (unter Rot gemessen: #451b23). Das Literal ist nur
+   der Rueckfallwert ohne Whitelabel.
+
+   REGEL AB HIER: die Vorlage bestimmt Flaeche und Neutraltoene, die Marke
+   bestimmt den Akzent. Wo ein Element vorher Gold trug, traegt es jetzt
+   den Akzent — in der fuer den Untergrund passenden Helligkeit:
+   --gold-d auf hellen Vorlagen, --gold-2 auf den dunklen.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Objektnummer auf der Karte — trug Gold, nicht Grau. */
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-card .sbc-seq,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-card .sbc-seq,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-card .sbc-seq,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbc-seq {
+  color: var(--gold-d, #9a7f33) !important;
+}
+html[data-ui-theme="konsole"] body aside.sidebar .sb-card .sbc-seq {
+  color: var(--gold-2, #E8C964) !important;
+}
+
+/* Aktiver Tab — der Akzent ist das, was den aktiven Reiter ausmacht. */
+html[data-ui-theme="kontor"]   body nav.tabs .tab.active,
+html[data-ui-theme="panel"]    body nav.tabs .tab.active,
+html[data-ui-theme="kanzlei"]  body nav.tabs .tab.active,
+html[data-ui-theme="boarding"] body nav.tabs .tab.active,
+html[data-ui-theme="kontor"]   body header.hdr.has-v64-score + nav.tabs .tab.active,
+html[data-ui-theme="panel"]    body header.hdr.has-v64-score + nav.tabs .tab.active,
+html[data-ui-theme="kanzlei"]  body header.hdr.has-v64-score + nav.tabs .tab.active,
+html[data-ui-theme="boarding"] body header.hdr.has-v64-score + nav.tabs .tab.active {
+  color: var(--gold-d, #9a7f33) !important;
+  border-bottom-color: var(--gold, #C9A84C) !important;
+}
+html[data-ui-theme="konsole"] body nav.tabs .tab.active,
+html[data-ui-theme="konsole"] body header.hdr.has-v64-score + nav.tabs .tab.active {
+  color: var(--gold-2, #E8C964) !important;
+  border-bottom-color: var(--gold, #C9A84C) !important;
+}
+
+/* Abschnittsueberschrift und Statuszeile trugen ebenfalls den Akzent. */
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-section-title,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-section-title,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-section-title,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-section-title {
+  color: var(--gold-d, #9a7f33) !important;
+}
