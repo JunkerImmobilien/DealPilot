@@ -235,6 +235,41 @@ html[data-ui-theme] body {
   --muted:       var(--uv-mut);
 }
 
+/* ── v1096b · Der Markenton fuer helle Vorlagen, auf BEIDEN Bedienwegen ──
+   GEMESSEN, und es war ein Loch in v1089/v1090/v1093 und im ersten Anlauf
+   von v1096: die Marke kam nur durch, wenn sie ueber den Sweeper gesetzt
+   wurde. Es gibt aber zwei Wege, den Akzent zu setzen:
+
+     DealPilotWhitelabel.apply()   setzt --gold, --gold-2, --gold-d
+                                   und die 25 --wl-<hex>            -> alles da
+     _dpDispAccent() (settings.js:3109, das alte Panel) ruft nur
+       DealPilotConfig.branding.setTheme({accent}) und setzt damit
+       --gold, --gold-hi/-lo/-l/-2/-3/-bg                -> KEIN --gold-d,
+                                                            KEIN --wl-*
+
+   Nachgestellt mit violettem Akzent ueber den Regler und Vorlage "kontor":
+   --gold stand auf #7C5CBF, --gold-d und --wl-9a7f33 waren nicht gesetzt,
+   und JEDE Regel fiel auf ihr Literal #9a7f33 zurueck — Objektnummer,
+   aktiver Reiter, Preis, Aktionen-Knopf und Fortschritt standen alle auf
+   rgb(154,127,51), also Standard-Gold neben einem violetten Akzent.
+
+   Deshalb haengt der Ton ab hier an --gold, das auf beiden Wegen steht,
+   und wird nur dann selbst gerechnet, wenn das Spezialtoken fehlt.
+   Ist es da (Whitelabel), gewinnt es unveraendert — v1089/v1090 sehen
+   also bitgenau aus wie vorher.
+
+   Die 76 % sind an #9a7f33 gemessen und nicht geschaetzt:
+   color-mix(in srgb, #C9A84C 76%, #000) = rgb(153,128,58) gegen das
+   bisherige Literal rgb(154,127,51).
+
+   Zwei Tokens statt einem, weil --gold-d und --wl-9a7f33 im Whitelabel
+   NICHT denselben Wert haben (unter Rot gemessen: #702936 gegen #451b23).
+   Sie zusammenzulegen haette das Aussehen abgenommener Pakete veraendert. */
+html[data-ui-theme] {
+  --uv-marke-d:  var(--gold-d,    color-mix(in srgb, var(--gold, #C9A84C) 76%, #000));
+  --uv-marke-dd: var(--wl-9a7f33, color-mix(in srgb, var(--gold, #C9A84C) 76%, #000));
+}
+
 
 /* ══════════════════════════════════════════════════════════════════════════
    3 · FLAECHEN, DIE KEINE TOKENS LESEN — einzeln benannt
@@ -850,7 +885,7 @@ html[data-ui-theme="kontor"]   body header.hdr .sc-tip,
 html[data-ui-theme="panel"]    body header.hdr .sc-tip,
 html[data-ui-theme="kanzlei"]  body header.hdr .sc-tip,
 html[data-ui-theme="boarding"] body header.hdr .sc-tip {
-  color: var(--wl-9a7f33, #9a7f33) !important;
+  color: var(--uv-marke-dd) !important;
 }
 
 /* (c) Das aufgehellte Gruen — Statusfarbe in der Fassung fuer hellen Grund */
@@ -925,7 +960,7 @@ html[data-ui-theme="kontor"]   body header.hdr #hdr-obj-num,
 html[data-ui-theme="panel"]    body header.hdr #hdr-obj-num,
 html[data-ui-theme="kanzlei"]  body header.hdr #hdr-obj-num,
 html[data-ui-theme="boarding"] body header.hdr #hdr-obj-num {
-  color: var(--wl-9a7f33, #9a7f33) !important;
+  color: var(--uv-marke-dd) !important;
 }
 
 /* (c) Der Trenner zwischen beiden haengt an derselben Ursache
@@ -965,7 +1000,7 @@ html[data-ui-theme="kontor"]   body header.hdr .hdr-credits-pill,
 html[data-ui-theme="panel"]    body header.hdr .hdr-credits-pill,
 html[data-ui-theme="kanzlei"]  body header.hdr .hdr-credits-pill,
 html[data-ui-theme="boarding"] body header.hdr .hdr-credits-pill {
-  color: var(--wl-9a7f33, #9a7f33) !important;
+  color: var(--uv-marke-dd) !important;
 }
 
 /* (b) Pfeil am Aktionen-Aufklapper — (0,4,4) schlaegt (0,3,1) */
@@ -973,7 +1008,7 @@ html[data-ui-theme="kontor"]   body aside.sidebar .sb-actions-trigger .sb-action
 html[data-ui-theme="panel"]    body aside.sidebar .sb-actions-trigger .sb-actions-arrow,
 html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-actions-trigger .sb-actions-arrow,
 html[data-ui-theme="boarding"] body aside.sidebar .sb-actions-trigger .sb-actions-arrow {
-  color: var(--wl-9a7f33, #9a7f33) !important;
+  color: var(--uv-marke-dd) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1281,7 +1316,7 @@ html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbcm-track {
    nav.tabs verlieren so 33 Stellen die Markenfarbe, die groessten Gruppen
    sind die Tabs (8) und die Objektnummer (5).
 
-   ZURUECKGENOMMEN: ich hatte zwischendurch var(--wl-9a7f33, #9a7f33) aus
+   ZURUECKGENOMMEN: ich hatte zwischendurch var(--uv-marke-dd) aus
    v1089/v1090 als "fest verdrahtetes Dunkelgold" verdaechtigt. Falsch —
    das Token faerbt mit (unter Rot gemessen: #451b23). Das Literal ist nur
    der Rueckfallwert ohne Whitelabel.
@@ -1297,7 +1332,7 @@ html[data-ui-theme="kontor"]   body aside.sidebar .sb-card .sbc-seq,
 html[data-ui-theme="panel"]    body aside.sidebar .sb-card .sbc-seq,
 html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-card .sbc-seq,
 html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbc-seq {
-  color: var(--gold-d, #9a7f33) !important;
+  color: var(--uv-marke-d) !important;
 }
 html[data-ui-theme="konsole"] body aside.sidebar .sb-card .sbc-seq {
   color: var(--gold-2, #E8C964) !important;
@@ -1312,7 +1347,7 @@ html[data-ui-theme="kontor"]   body header.hdr.has-v64-score + nav.tabs .tab.act
 html[data-ui-theme="panel"]    body header.hdr.has-v64-score + nav.tabs .tab.active,
 html[data-ui-theme="kanzlei"]  body header.hdr.has-v64-score + nav.tabs .tab.active,
 html[data-ui-theme="boarding"] body header.hdr.has-v64-score + nav.tabs .tab.active {
-  color: var(--gold-d, #9a7f33) !important;
+  color: var(--uv-marke-d) !important;
   border-bottom-color: var(--gold, #C9A84C) !important;
 }
 html[data-ui-theme="konsole"] body nav.tabs .tab.active,
@@ -1326,7 +1361,7 @@ html[data-ui-theme="kontor"]   body aside.sidebar .sb-section-title,
 html[data-ui-theme="panel"]    body aside.sidebar .sb-section-title,
 html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-section-title,
 html[data-ui-theme="boarding"] body aside.sidebar .sb-section-title {
-  color: var(--gold-d, #9a7f33) !important;
+  color: var(--uv-marke-d) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1612,7 +1647,7 @@ html[data-ui-theme="kontor"]   body aside.sidebar .sb-card .sbc-kp,
 html[data-ui-theme="panel"]    body aside.sidebar .sb-card .sbc-kp,
 html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-card .sbc-kp,
 html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbc-kp {
-  color: var(--gold-d, #9a7f33) !important;
+  color: var(--uv-marke-d) !important;
 }
 html[data-ui-theme="konsole"] body aside.sidebar .sb-card .sbc-kp {
   color: var(--gold-2, #E8C964) !important;
@@ -1638,7 +1673,7 @@ html[data-ui-theme="kontor"]   body aside.sidebar .sb-actions-trigger .sb-action
 html[data-ui-theme="panel"]    body aside.sidebar .sb-actions-trigger .sb-actions-l,
 html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-actions-trigger .sb-actions-l,
 html[data-ui-theme="boarding"] body aside.sidebar .sb-actions-trigger .sb-actions-l {
-  color: var(--wl-9a7f33, #9a7f33) !important;
+  color: var(--uv-marke-dd) !important;
 }
 html[data-ui-theme="konsole"] body aside.sidebar .sb-actions-trigger,
 html[data-ui-theme="konsole"] body aside.sidebar .sb-actions-trigger .sb-actions-l {
@@ -1689,7 +1724,7 @@ html[data-ui-theme="kontor"]   body nav.tabs .tabs-status-text,
 html[data-ui-theme="panel"]    body nav.tabs .tabs-status-text,
 html[data-ui-theme="kanzlei"]  body nav.tabs .tabs-status-text,
 html[data-ui-theme="boarding"] body nav.tabs .tabs-status-text {
-  color: var(--wl-9a7f33, #9a7f33) !important;
+  color: var(--uv-marke-dd) !important;
 }
 html[data-ui-theme="kontor"]   body nav.tabs .tabs-status-done .tabs-status-text,
 html[data-ui-theme="panel"]    body nav.tabs .tabs-status-done .tabs-status-text,
