@@ -13,24 +13,7 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ---
 ## Offen
 
-1. **Marke kommt unter einer Vorlage nicht durch — Rest der Fundstellen.**
-   Gemessen mit Partner-Konto und Akzent `#7B2D3B`: über `#sidebar`,
-   `header.hdr` und `nav.tabs` verlieren **33 Stellen** die Markenfarbe,
-   sobald `data-ui-theme` gesetzt ist. Ursache sind die neutralen
-   `--uv-*`-Tokens aus v1082. v1093 hat die zwei größten Gruppen erledigt
-   (Tabs 8, Objektnummer 5) plus Abschnittsüberschrift.
-
-   **Achtung, mein Audit hatte Fehltreffer:** `.hdr-obj-num`,
-   `.hdr-credits-pill` und `.sb-actions-arrow` stehen auf
-   `var(--wl-9a7f33, …)` und färben **korrekt mit** (unter Rot gemessen
-   `#451b23`) — mein Regex hat den abgedunkelten Ton nicht als „Marke"
-   erkannt. Vor dem Nacharbeiten also je Stelle prüfen, ob sie wirklich
-   neutral wird, statt der Liste blind zu folgen.
-
-   **Regel:** Vorlage bestimmt Fläche und Neutraltöne, Marke bestimmt den
-   Akzent. `--gold-d` auf hellen Vorlagen, `--gold-2` auf den dunklen.
-
-2. **Branding unter „Darstellung" zusammenlegen.** Es gibt zwei Panels:
+1. **Branding unter „Darstellung" zusammenlegen.** Es gibt zwei Panels:
    das alte `#dp-tb-panel` (`settings.js` `_dpDisp*`, v927) mit Logo,
    Logogröße, Schriften, Akzent und dem Reseller-Block, und das neue aus
    `ui-varianten.js` mit Vorlage, Karten, Fläche. Marcels Vorgabe: ein
@@ -114,7 +97,7 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
    - **Zum Prüfen wird ein Partner-Konto gebraucht** — mit PRO ist der
      ganze Abschnitt unsichtbar und man misst ins Leere.
 
-3. **Stapel-Modus feinziehen** — `v1095`/`v1095b` steht (siehe **Fertig**).
+2. **Stapel-Modus feinziehen** — `v1095`/`v1095b` steht (siehe **Fertig**).
    Offen bleibt der Vergleich mit `design/mockups/handy2.jpg` im Detail:
    dort tragen die KPI-Kacheln im Rumpf **dunkle** Flächen, hier folgen sie
    der Vorlagenfarbe. Dazu fehlen „Im Rennen" und „Detail öffnen →" — beide
@@ -124,6 +107,16 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ---
 
 ## Später
+
+- **Ein sehr dunkler Partner-Akzent ist auf dunklem Grund kaum lesbar.**
+  Gemessen mit `#7B2D3B` (dem Akzent aus dem alten Punkt 1): in `konsole`
+  liegt der Kontrast der Marken-Elemente bei **2,26–2,37**. Das ist
+  **nicht** durch v1096 entstanden — **ohne** Vorlage ist derselbe Akzent
+  noch schlechter: Preis **1,31**, Aktionen-Knopf 2,8. Es trifft also die
+  Grundfassung genauso und ist ein Whitelabel-Thema, kein Vorlagen-Thema:
+  `--gold-2` hellt einen ohnehin dunklen Markenton zu wenig auf. Kandidat
+  wäre ein Mindest-Helligkeitsabstand statt einer festen Ableitung. Eigener
+  Punkt, weil er die Marken-Ableitung insgesamt betrifft.
 
 - **„privat" liegt auf dem Preis** — im Wallet-Modus überlappt `.sbc-halter`
   die `.sbc-kp-row`. Steht so auch auf Marcels Screenshots vom 06.08. und
@@ -158,6 +151,100 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-06] **Marke kommt unter einer Vorlage nicht durch — Rest der
+  Fundstellen** — `300bfc3`, `f0a6631`
+
+  **Neu gemessen statt der alten Liste gefolgt.** Der Punkt warnte selbst
+  vor Fehltreffern seines Regex-Audits, deshalb diesmal im laufenden DOM:
+  Akzent setzen, Momentaufnahme **ohne** Vorlage, dann je Vorlage erneut,
+  Vergleich je Element und Eigenschaft. Ergebnis sind **13 Elemente**, nicht
+  33 Stellen — die alte Zahl zählte jede Vererbungsstufe und jede der vier
+  Rahmenseiten einzeln.
+
+  **Zwei Messfehler, die ich dabei zuerst selbst gebaut habe:**
+
+  1. „Neutral" als **Grau** definiert (max − min ≤ 8). Damit meldete
+     `panel` **null** Treffer — dessen Neutralton ist `rgb(21,26,32)`, ein
+     Blaustich mit Abstand 11, und `boarding` ist cremefarben. Richtig ist
+     der Vergleich über den **Farbton**: trägt die Farbe noch den Ton des
+     Akzents (± 30°) oder nicht.
+  2. Mit dem roten Akzent `#7B2D3B` aus dem Punkt ist die Marke **nicht
+     vom Status-Rot zu trennen** — `.sb-card.deal-lost` mit
+     `rgba(200,66,61,.65)` erschien als Markenverlust. Gemessen wurde
+     deshalb mit **Violett** `#7C5CBF`; Grün und Rot bleiben dann eindeutig
+     Statusfarben. Gegenprobe mit Rot: identische Liste bis auf genau
+     diesen einen Fehltreffer.
+
+  Dazu zwei Filter, ohne die die Liste Phantome enthält: Rahmenfarbe zählt
+  nur bei `border-width > 0`, `color` nur bei **eigenem** Textknoten. Ohne
+  den ersten meldet der Logo-Rahmen einen „Verlust", obwohl die Vorlage ihn
+  per `border:0` bewusst ganz abräumt.
+
+  **Fünf Sachverhalte, alle behoben (v1096):**
+
+  | Stelle | Befund |
+  |---|---|
+  | `.sbc-kp` | der **Preis** auf der Karte, prominenteste Zahl |
+  | `.sb-actions-trigger` + `.sb-actions-l` | Aktionen-Knopf |
+  | `.sbc-seq` | **Fläche** der Nummernpille — v1093 hatte nur die Schrift |
+  | `.sb-section-title` | nur `konsole`, v1093 ließ die dunkle Vorlage aus |
+  | `.tabs-status-text` | siehe unten, eigener Fehler |
+
+  Der Aktionen-Knopf war schon vorher sichtbar falsch: **v1090 hat den
+  Pfeil im selben Knopf golden gesetzt, der Text daneben blieb grau** —
+  gemessen Pfeil `#451b23`, Label `rgb(20,19,16)`. Ein Knopf, zwei Farben.
+
+  **Einen eigenen v1082-Fehler nehme ich ausdrücklich zurück:**
+  `.tabs-status-text` stand dort in der Gruppe „aufgehelltes Grün" und
+  wurde auf `#2E8455` gesetzt. Gemessen ist der Normalzustand aber **Gold**
+  (`style.css:25776`); grün wird der Text erst im *fertigen* Zustand über
+  `.tabs-status-done .tabs-status-text` (`:25784`). Ich hatte die
+  Zustandsfarbe für die Grundfarbe gehalten — Folge: in allen vier hellen
+  Vorlagen stand „0 / 6 · 0 %" in Grün. Jetzt trägt der Grundzustand den
+  Akzent, Grün bleibt dem Zustand `done`.
+
+  **Der größere Fund kam erst bei der Abnahme (v1096b).** Er betrifft
+  **auch v1089, v1090 und v1093**, nicht nur dieses Paket: die Marke kam
+  nur durch, wenn der Akzent über den Sweeper gesetzt wurde. Es gibt aber
+  **zwei Wege**:
+
+  | Weg | setzt |
+  |---|---|
+  | `DealPilotWhitelabel.apply()` | `--gold`, `--gold-2`, `--gold-d`, 25 × `--wl-<hex>` |
+  | `_dpDispAccent()` (`settings.js:3109`, altes Panel) | nur `--gold` und `--gold-hi/-lo/-l/-2/-3/-bg` — **kein** `--gold-d`, **keine** `--wl-*` |
+
+  Nachgestellt mit violettem Akzent über den Regler: `--gold` stand auf
+  `#7C5CBF`, und Objektnummer, aktiver Reiter, Preis, Aktionen-Knopf und
+  Fortschritt fielen **alle** auf ihr Literal `#9a7f33` zurück —
+  Standard-Gold neben einem violetten Akzent. Genau der Fehler, den dieser
+  Punkt beheben sollte, nur an anderer Stelle.
+
+  Der Ton hängt jetzt an `--gold`, das auf beiden Wegen steht, und wird nur
+  gerechnet, wenn das Spezialtoken fehlt: `--uv-marke-d` und
+  `--uv-marke-dd`. Ist das Token da, gewinnt es unverändert — **v1089 und
+  v1090 sehen bitgenau aus wie vorher** (nachgemessen: `#451b23` bzw.
+  `#702936`). Zwei Tokens statt einem, weil `--gold-d` und `--wl-9a7f33` im
+  Whitelabel **nicht** denselben Wert haben.
+
+  **Nicht geändert, weil Fläche und nicht Marke:** die sieben Rahmen und
+  Trennlinien (`aside#sidebar`, `header.hdr`, `nav.tabs`, `#sb-user`,
+  `.sb-card`, `.sbcm`, Knopfrahmen). Sie trugen Gold bei **10–55 %
+  Deckung**, also einen Neutralton — und die Vorlage bestimmt die Fläche.
+
+  **Nachgemessen auf Staging, angemeldet, Partner-Konto, fünf Objekte,
+  Modus „standard", über den Regler-Weg** (also den, der vorher versagte):
+
+  | Vorlage | Treffer gesamt | davon außerhalb der Rahmen |
+  |---|---|---|
+  | kontor · panel · kanzlei · boarding · konsole | je 9 | **0** |
+
+  Kontrastlauf über die fünf geänderten Stellen, Standard-Gold: hell
+  3,36–3,85 · konsole 9,08–10,98. Mit Partner-Rot: hell 4,35–14,64.
+  Ohne Vorlage ist der Istzustand bitgenau erhalten — Sidebar `rgb(0,0,0)`,
+  Tabs `rgb(10,8,5)`, Karte transparent mit dem originalen Verlauf, alle
+  Marken-Elemente auf `#E8C964`. `gold-audit.py` unverändert bei **484**;
+  `ui-varianten.css` trägt davon **keine einzige** Fundstelle.
 
 - [2026-08-06] **Vier Befunde aus Marcels Screenshots** — `2131dfd`, `0982845`
 
