@@ -631,8 +631,21 @@ html[data-ui-theme="konsole"][data-ui-surface="light"] body aside.sidebar .sb-ca
 html[data-ui-theme="konsole"] body aside.sidebar .sb-card .sbc-mini-score-num {
   color: var(--uv-card-ink) !important;
 }
-html[data-ui-theme="konsole"] body aside.sidebar .sb-card .sbc-score-label {
-  color: var(--uv-card-ink2) !important;
+
+/* v1108b · EIGENER FEHLER, zurueckgenommen: hier stand zusaetzlich
+   .sbc-score-label auf var(--uv-card-ink2). Das hat es VERSCHLECHTERT —
+   von k=2,03 auf 1,02. Grund: die Stufen-Pille traegt eine eigene Flaeche
+   (gemessen rgba(63,165,108,.18), gemischt rgb(82,190,133) — helles
+   Gruen), nicht die Kartenflaeche. Ein heller Kartenton gehoert dort
+   nicht hin. Die Pille bleibt, wie sie war.
+
+   Das Investor-Ribbon dagegen ist ein echter Fund: sein Grund ist GOLD
+   (gemessen rgb(232,201,100)), und in "konsole" stand der Text darauf mit
+   rgb(230,232,234) bei k=1,32. In den hellen Vorlagen ist er dunkel und
+   kommt auf 11. Auf Gold gehoert ein dunkler Text, unabhaengig davon, wie
+   hell die Vorlage sonst ist. */
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-investor-ribbon {
+  color: #1a1407 !important;
 }
 
 
