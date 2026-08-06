@@ -13,15 +13,7 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ---
 ## Offen
 
-1. **Partner-Flow: Whitelabel und Darstellung zusammenbringen.**
-   Analyse und drei Wege liegen in
-   `design/Vorschläge/partner-flow-darstellung.md`. **Empfehlung dort:**
-   erst C (die vier neuen Schlüssel `ui_theme`, `ui_cards`, `ui_surface`,
-   `ui_form` in die `MAP` des Mandanten-Abgleichs — klein, keine
-   Produktentscheidung), dann A (Marke gesperrt, Komfort frei).
-   Marcels Entscheidung steht noch aus.
-
-2. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
+1. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
    Aktionen als Popover statt Blatt von unten. Dazu die Admin-Oberfläche
    auf Tablet prüfen. **Nicht angefangen:** das ist Gestaltungsarbeit mit
    eigener Prüfstrecke, kein Defekt — und ohne Vorlage im `design/`-Ordner
@@ -43,6 +35,76 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-06] **Partner-Flow: Whitelabel und Darstellung zusammengebracht**
+  — `v1111`
+
+  Analyse und drei Wege stehen in
+  `design/Vorschläge/partner-flow-darstellung.md`. Umgesetzt sind **C und
+  A**, wie dort empfohlen; **B** (drei Freiheitsstufen je Partner) bleibt
+  offen und ist von hier aus nachrüstbar, ohne etwas umzubauen — A ist
+  genau seine Voreinstellung.
+
+  **Der Befund, der es ausgelöst hat:** weder `darstellung-reseller.js`
+  noch `mandant-branding.js` enthielt `ui_theme`, `ui_cards`, `ui_surface`
+  oder `ui_form`. Ein Partner konnte seinen Mandanten **14 Werte**
+  vorgeben — Farben, Schrift, Logo — aber nicht die Vorlage, den
+  Kartenmodus, die Fläche oder die Form. Also gerade das, was den
+  Gesamteindruck am stärksten prägt.
+
+  ### C · Die vier Werte wandern in den Abgleich
+
+  Sie liegen nicht als Einzelschlüssel, sondern gemeinsam in einem JSON
+  unter `dp_user_settings`. Statt die `MAP` umzubauen bekommen sie einen
+  **virtuellen Schlüssel** mit Präfix `uv:`, den `LSget()` übersetzt — das
+  Muster der MAP bleibt unangetastet.
+
+  **`UV_LEER` ist dabei kein Schönheitsfehler, sondern nötig:** bei diesen
+  vier ist *leer* ein **gültiger** Wert (kein Attribut = „DealPilot" bzw.
+  „Standard"). `applySet()` überspringt aber leere Werte (`if (v) …`) —
+  ohne Sentinel hätte ein Partner, der bewusst DealPilot vorgibt, gar
+  nichts übertragen. Nachgemessen: eingesammelt wird `-`, angewandt wird
+  wieder `null` und die Leiste ist `rgb(0,0,0)`.
+
+  **Ein eigener Fehler beim Bauen:** `UV_LEER` stand zuerst *hinter* der
+  MAP. Die MAP wird beim Laden ausgewertet, ein `var` ist dort noch
+  `undefined` — die vier Defaults wären leer gewesen. Vor die MAP gezogen.
+
+  ### A · Marke gilt, Komfort ist frei
+
+  | | wer bestimmt | wann |
+  |---|---|---|
+  | **Marke** — Farben, Logo, Schrift | der Partner | **bei jedem Laden**, beim Mandanten im Panel gesperrt |
+  | **Komfort** — Vorlage, Karten, Fläche, Form | der Mandant | Partner gibt sie **einmal** als Voreinstellung |
+
+  Vorher galt für *alles* „einmal setzen, danach gilt die Wahl des
+  Mandanten" (`dp_wl_display_seen`) — die Marke des Partners war damit
+  nach der ersten eigenen Änderung weg. Der Marker bleibt erhalten,
+  steuert jetzt aber nur noch den Komfort-Teil.
+
+  Die Sperre unterscheidet **zwei Gruppen mit zwei Texten**: „Marke ab
+  Partner" für Nicht-Partner, „Von deinem Partner vorgegeben" für
+  Mandanten. Kennzeichen ist `dp_wl_cache` — es existiert ausschließlich
+  beim `reseller_client`, genau so nutzt es die Handy-Sperre bereits.
+
+  ### Dazu der Reset-Fall, der im Vorschlag als offen benannt war
+
+  Beim Mandanten heißt „Zurücksetzen" jetzt **zurück auf die Marke des
+  Partners**, nicht auf den DealPilot-Standard. Vorher räumte es gerade
+  das weg, was der Partner vorgibt — bis zum nächsten Laden, dann kam es
+  wieder. Das sah aus wie ein Fehler und war einer. Dafür eine kleine
+  `reapply`-API in `mandant-branding.js`.
+
+  **Nachgemessen auf Staging, beide Rollen:**
+
+  | Rolle | Marke | Hinweis | Vorlage / Form / Schrift |
+  |---|---|---|---|
+  | Partner | **frei**, Umschalter da | „Marke ab Partner" | frei |
+  | Mandant (gestubbt) | **gesperrt**, sichtbar, Deckkraft 0,42 | „Von deinem Partner vorgegeben" | **frei** |
+
+  Brücke geprüft: alle vier Werte werden eingesammelt (`kanzlei`, `stapel`,
+  `light`, `rund`) und wieder angewandt (`--uv-r` 16 px). Sentinel in beide
+  Richtungen: eingesammelt `-`, angewandt `null`.
 
 - [2026-08-06] **Die „Später"-Punkte der Reihe nach** — `v1106` bis `v1110`
 
