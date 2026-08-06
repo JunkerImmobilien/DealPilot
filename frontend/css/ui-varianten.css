@@ -1830,3 +1830,61 @@ html[data-ui-theme="boarding"] body nav.tabs .tabs-status-done .tabs-status-text
   --uv-r:  16px;
   --uv-rs: 11px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1099c — die letzten weissen Flaechen im Arbeitsbereich
+
+   Nach v1099/v1099b stand der Kontrastlauf ueber #s0 in "konsole" bei 14
+   Fundstellen — alle mit HELLEM Text rgb(230,232,234) auf einer weiss
+   gebliebenen Flaeche. Der Text folgt seit v1099b der Vorlage, die Flaeche
+   darunter nicht. Zwei Gruppen, beide gemessen:
+
+   (a) ALLE Knoepfe im Arbeitsbereich. style.css:29839 (V258-02) setzt
+       background:#ffffff!important und color:var(--ch)!important auf einer
+       Kette mit sieben :not() — Spezifitaet (0,15,1). Genau der Fall, vor
+       dem CLAUDE.md warnt: ":not(#id) erbt ID-Spezifitaet" gilt hier zwar
+       nicht, aber die schiere Zahl der Teilselektoren macht die Regel
+       praktisch unschlagbar. Deshalb wird die Kette hier UEBERNOMMEN und
+       nur um das Vorlagen-Praefix erweitert: (0,17,3) schlaegt (0,15,1),
+       und es ist bitgenau dieselbe Elementmenge — keine Regel trifft
+       plötzlich mehr oder weniger Knoepfe als vorher.
+       Die Farbe kommt aus --uv-surf, nicht aus --uv-card: ein Knopf ist
+       eine Bedienflaeche, keine Karte.
+
+   (b) Die Boarding-Leiste. .dp-pfbar .dp-pf-tile und .dp-pf-rz stehen bei
+       (0,2,0), hier reicht das Hausmuster (0,2,2).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* (a) Knoepfe — dieselbe Kette wie style.css:29839, plus Praefix */
+html[data-ui-theme] body .sec button:not(.dp-tip):not(.tab):not(.sb-action-btn):not(.fb-modal-close):not(.modal-close):not(.btn-clean):not(.fab-btn),
+html[data-ui-theme] body .sec .v235-next-btn,
+html[data-ui-theme] body .sec .da-card-cta,
+html[data-ui-theme] body .sec .da-bank-pdf-btn,
+html[data-ui-theme] body .sec .btn-gold,
+html[data-ui-theme] body .sec .btn-primary,
+html[data-ui-theme] body .sec .ai-btn {
+  background: var(--uv-surf) !important;
+  color: var(--uv-ink) !important;
+}
+
+/* (b) Boarding-Leiste im Arbeitsbereich */
+html[data-ui-theme] body .dp-pf-tile,
+html[data-ui-theme] body .dp-pf-rz,
+html[data-ui-theme] body .dp-pf-mtrigger {
+  background: var(--uv-surf) !important;
+  color: var(--uv-ink) !important;
+  border-color: var(--uv-line) !important;
+}
+
+/* (c) Zwei Resttoene, die auf der dunklen Flaeche nicht mehr trugen.
+   --uv-mut ist in "konsole" #6E747C und lag damit unter 3 gegen die
+   Arbeitsflaeche #101215. Nur DORT angehoben — in den hellen Vorlagen
+   steht derselbe Token auf hellem Grund und ist unauffaellig. */
+html[data-ui-theme="konsole"] {
+  --uv-mut: #9AA1AA;
+}
+/* Ein weisses Etikett auf hellem Grund — eigene Flaeche, eigener Ton. */
+html[data-ui-theme] body .sec .ki-lage-tag {
+  background: var(--uv-surf2) !important;
+  color: var(--uv-ink) !important;
+}
