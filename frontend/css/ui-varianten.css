@@ -1238,3 +1238,30 @@ html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbcm-v {
   white-space: nowrap !important;
   font-size: 11.5px !important;
 }
+
+/* v1092d — MEINE v1092c-KORREKTUR WAR FALSCH und wird zurueckgenommen.
+   nowrap auf dem Wert plus ellipsis auf dem Label hat den Umbruch zwar
+   beseitigt, dafuer die Beschriftungen auf ein Zeichen zusammengedrueckt
+   ("[", "C...") — gemessen 100 px Kachelbreite fuer Label, Wert und Skala
+   in EINER Zeile. Das ist zu wenig.
+
+   Richtig ist: die Zeilenform aus v1082k war eine Sparmassnahme fuer die
+   DAUERHAFT sichtbare Kachelreihe. Seit v1092 stehen die Kacheln nur noch
+   im aufgeklappten Rumpf — dort ist Platz fuer die normale, gestapelte
+   Kachel wie im Standard. */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbcm {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 2px !important;
+  padding: 6px 8px !important;
+  overflow: visible !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbcm-head,
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbcm-label {
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbcm-track {
+  display: block !important;
+}
