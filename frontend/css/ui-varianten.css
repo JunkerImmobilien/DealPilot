@@ -1559,3 +1559,141 @@ html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-score-label {
   top: auto !important;
   align-self: center !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1096 — der Rest der Fundstellen aus Punkt 1
+
+   NEU GEMESSEN, weil das v1093-Audit ausdruecklich Fehltreffer hatte.
+   Diesmal nicht per Regex ueber die Datei, sondern im laufenden DOM:
+   Akzent gesetzt, Momentaufnahme OHNE Vorlage, dann je Vorlage erneut,
+   und verglichen wird je Element und Eigenschaft.
+
+   ZWEI MESSFEHLER, die ich dabei zuerst selbst gebaut habe:
+
+   1) "neutral" als GRAU definiert (max-min <= 8). Damit meldete "panel"
+      NULL Treffer — dessen Neutralton ist rgb(21,26,32), ein Blaustich
+      mit Abstand 11, und "boarding" ist cremefarben. Richtig ist der
+      Vergleich ueber den FARBTON: traegt die Farbe noch den Ton des
+      Akzents (+-30 Grad) oder nicht.
+   2) Mit rotem Akzent (#7B2D3B, der Wert aus v1093) ist die Marke nicht
+      vom Status-Rot zu trennen — .sb-card.deal-lost rgba(200,66,61,.65)
+      erschien als Markenverlust. Gemessen wird deshalb mit einem
+      violetten Akzent (#7C5CBF): Gruen und Rot bleiben dann eindeutig
+      Statusfarben. Gegenprobe mit Rot: identische Liste bis auf genau
+      diesen einen Fehltreffer.
+
+   Dazu zwei Filter, ohne die die Liste Phantome enthaelt:
+     * Rahmenfarbe zaehlt nur bei border-width > 0 und style != none.
+       Sonst meldet der Logo-Rahmen einen "Verlust", obwohl die Vorlage
+       ihn per border:0 (Z.745) bewusst ganz abraeumt.
+     * color zaehlt nur, wo das Element einen EIGENEN Textknoten hat oder
+       ein SVG ist. Sonst zaehlt jede Vererbungsstufe als eigene Stelle —
+       so kamen die "33".
+
+   ERGEBNIS (Modus standard, ohne data-ui-surface, Objekt geladen,
+   1535 breit): 13 Elemente, davon fuenf Sachverhalte echt:
+
+     .sbc-kp             der PREIS auf der Karte      alle Vorlagen
+     .sb-actions-trigger Aktionen-Knopf + Label       alle Vorlagen
+     .sbc-seq            FLAECHE der Nummernpille     alle Vorlagen
+     .sb-section-title   nur "konsole" (v1093 liess die dunkle aus)
+     .tabs-status-text   in v1082 als Gruen fehleingestuft, siehe (E)
+
+   NICHT geaendert, weil Flaeche und nicht Marke: die sieben Rahmen und
+   Trennlinien (aside#sidebar, header.hdr, nav.tabs, #sb-user, .sb-card,
+   .sbcm, Knopfrahmen). Sie trugen Gold bei 10-55 % Deckung, also einen
+   Neutralton — und "die Vorlage bestimmt Flaeche und Neutraltoene".
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── (A) Der Preis auf der Objektkarte ────────────────────────────────────
+   Gegner ist meine eigene Sammelregel aus Abschnitt 5 auf .sbc-kp.
+   Die prominenteste Zahl der Karte stand ohne Vorlage im Akzent. */
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-card .sbc-kp,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-card .sbc-kp,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-card .sbc-kp,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-card .sbc-kp {
+  color: var(--gold-d, #9a7f33) !important;
+}
+html[data-ui-theme="konsole"] body aside.sidebar .sb-card .sbc-kp {
+  color: var(--gold-2, #E8C964) !important;
+}
+
+/* ── (B) Aktionen-Knopf ───────────────────────────────────────────────────
+   URSACHE ist Z.296-303: .sb-header, .sb-section-title, .sb-actions-trigger
+   und #sb-user teilen sich dort eine Regel mit color:var(--uv-chrome-ink).
+   Fuer die drei anderen ist das richtig, fuer den Knopf nicht — er ist ein
+   Bedienelement im Akzent.
+
+   Sichtbar falsch war es schon vorher: v1090 hat den PFEIL im selben Knopf
+   auf var(--wl-9a7f33) gesetzt (Z.972-977), der Text daneben blieb grau.
+   Gemessen: Pfeil #451b23, Label rgb(20,19,16) — ein Knopf, zwei Farben.
+   Deshalb hier derselbe Ton wie beim Pfeil, nicht --gold-d.
+   .sb-actions-l traegt keine eigene Regel und erbt vom Knopf; benannt wird
+   es trotzdem, weil style.css es getrennt faerbt (0,2,1). */
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-actions-trigger,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-actions-trigger,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-actions-trigger,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-actions-trigger,
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-actions-trigger .sb-actions-l,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-actions-trigger .sb-actions-l,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-actions-trigger .sb-actions-l,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-actions-trigger .sb-actions-l {
+  color: var(--wl-9a7f33, #9a7f33) !important;
+}
+html[data-ui-theme="konsole"] body aside.sidebar .sb-actions-trigger,
+html[data-ui-theme="konsole"] body aside.sidebar .sb-actions-trigger .sb-actions-l {
+  color: var(--gold-2, #E8C964) !important;
+}
+
+/* ── (C) Flaeche der Nummernpille ─────────────────────────────────────────
+   v1093 hat die SCHRIFT der Pille auf den Akzent gestellt, die Flaeche
+   darunter blieb der Kachelton — dunkelgoldene Ziffern auf Cremeweiss.
+   Gemessen war die Flaeche urspruenglich color-mix(var(--gold) 12%,
+   transparent), also eine TOENUNG, kein Vollton. Genau das wird sie auch
+   hier: 12 % Akzent auf dem Kachelton der Vorlage, statt reinem Gold auf
+   Weiss. Damit bleibt die Vorlage Herr ueber die Helligkeit.
+
+   ACHTUNG, Werkzeugbefund: der Kaskaden-Walker findet diese Stelle NICHT
+   ueber background-color. CSSOM expandiert die Kurzschrift `background`
+   in getPropertyValue() nicht — gesucht werden muss nach `background`.
+   Deshalb hier ebenfalls die Kurzschrift, sonst gewinnt Z.~600 wieder. */
+html[data-ui-theme] body aside.sidebar .sb-card .sbc-seq {
+  background: color-mix(in srgb, var(--gold, #C9A84C) 12%, var(--uv-card-tile)) !important;
+  border-color: color-mix(in srgb, var(--gold, #C9A84C) 26%, var(--uv-card-tile)) !important;
+}
+
+/* ── (D) Abschnittsueberschrift in der dunklen Vorlage ────────────────────
+   v1093 hat .sb-section-title fuer die vier hellen Vorlagen gesetzt und
+   "konsole" ausgelassen. Dort gewinnt weiter Z.304 (--uv-chrome-mut).
+   Gemessen faerbt das auch die Lupe im Suchfeld mit: .sb-search-box > svg
+   traegt keine eigene Farbe, sie erbt ueber .sb-section-title. Eine
+   Ursache, vier Knoten (span "Portfolio", svg, circle, line). */
+html[data-ui-theme="konsole"] body aside.sidebar .sb-section-title {
+  color: var(--gold-2, #E8C964) !important;
+}
+
+/* ── (E) Der Fortschrittstext in der Tab-Leiste ───────────────────────────
+   EIGENER FEHLER AUS v1082, ausdruecklich zurueckgenommen: .tabs-status-text
+   steht dort in Gruppe (c) "aufgehelltes Gruen" (Z.865-868) und wird auf
+   #2E8455 gesetzt. Gemessen ist der Normalzustand aber GOLD —
+   style.css:25776 .tabs-status-text{color:var(--gold-2,#E8C964)}; gruen wird
+   der Text erst im FERTIGEN Zustand ueber style.css:25784
+   .tabs-status-done .tabs-status-text{color:var(--green-2,#5ed992)}.
+   Ich hatte die Zustandsfarbe fuer die Grundfarbe gehalten. Folge: in allen
+   vier hellen Vorlagen stand "0 / 6 · 0 %" in Gruen.
+
+   Richtig gestellt: Grundzustand traegt den Akzent, Gruen bleibt dem
+   Zustand `done` vorbehalten — und bleibt Statusfarbe, wird also nicht
+   tokenisiert. Spezifitaet (0,3,2) schlaegt die v1082-Regel (0,2,2). */
+html[data-ui-theme="kontor"]   body nav.tabs .tabs-status-text,
+html[data-ui-theme="panel"]    body nav.tabs .tabs-status-text,
+html[data-ui-theme="kanzlei"]  body nav.tabs .tabs-status-text,
+html[data-ui-theme="boarding"] body nav.tabs .tabs-status-text {
+  color: var(--wl-9a7f33, #9a7f33) !important;
+}
+html[data-ui-theme="kontor"]   body nav.tabs .tabs-status-done .tabs-status-text,
+html[data-ui-theme="panel"]    body nav.tabs .tabs-status-done .tabs-status-text,
+html[data-ui-theme="kanzlei"]  body nav.tabs .tabs-status-done .tabs-status-text,
+html[data-ui-theme="boarding"] body nav.tabs .tabs-status-done .tabs-status-text {
+  color: #2E8455 !important;
+}
