@@ -20,6 +20,16 @@ nächsten Vorhaben stehen unter **Später**._
 
 ## Später
 
+- **„privat" liegt auf dem Preis** — im Wallet-Modus überlappt `.sbc-halter`
+  die `.sbc-kp-row`. Steht so auch auf Marcels Screenshots vom 06.08. und
+  ist damit älter als v1091. Eigener Punkt, weil es das Raster von v1082
+  betrifft, nicht die Farbe.
+
+- **`.sbcm-label` in der dunklen Fassung mit Kartenfläche „Weiß"** —
+  Kontrast 1,06. Die Karte wird weiß, das Kachel-Label bleibt hell.
+  Betrifft nur die Kombination `dealpilot`/`konsole` + `ui_surface:light`,
+  in allen hellen Vorlagen sauber.
+
 - **Aktionen-Aufklapper in der dunklen Fassung nachsehen** —
   `.sb-actions-accordion-inner` misst `rgb(255,255,255)` **auch** in
   `dealpilot` und `konsole`, also weiße Fläche in der dunklen Leiste. Die
@@ -43,6 +53,55 @@ nächsten Vorhaben stehen unter **Später**._
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-06] **Vier Befunde aus Marcels Screenshots** — `2131dfd`, `0982845`
+
+  Zustand nachgestellt: Kontor + Objektkarten „Wallet" + Kartenfläche
+  „Weiß", Objekt geladen (`header.hdr.has-v64-score`), 1920 breit.
+
+  **(A) Der Investor Deal Score stand auf Schwarz.** Ursache ist
+  **v927-headerblack**, `style.css:35410-35416`: der *alte* helle Skin
+  `body.dp-chrome-hell` setzt `--dp-header-bg:#0a0a0a` und färbt damit Kopf,
+  beide Reihen und `#hdr-badges` schwarz —
+  `body.dp-chrome-hell header.hdr.has-v64-score` (0,3,2) und
+  `body.dp-chrome-hell #hdr-badges` (1,1,1). Meine Vorlagen-Regel steht bei
+  (0,2,3) und verliert gegen beide. **v1085 hat den Skin-Schalter an die
+  Darstellung gekoppelt** — seitdem trifft es jeden, der eine helle Vorlage
+  wählt. Gemessen mit gesetztem `dp-chrome-hell`: genau drei Flächen auf
+  `rgb(10,10,10)`, alles andere weiß. Das war auch der Grund, warum der
+  Objektname auf seinen Bildern kaum lesbar war — v1089 hatte ihn dunkel
+  gefärbt, der Kopf darunter blieb schwarz. Die Vorlage ist die spätere und
+  ausdrückliche Wahl und gewinnt jetzt; der Hell-Skin **ohne** Vorlage
+  behält seinen schwarzen Kopf.
+
+  **(B) Objektkarten ohne Umrahmung.** Ursache war meine eigene
+  v1082-Regel „Kontor: Karten ohne Seitenrahmen, nur Trennlinie". Gemessen:
+  `dealpilot` 2 px / Radius 11 px / Schatten gegen `kontor` 0 / 0 / keiner.
+  Damit fällt die Gestaltungsentscheidung von v1082 — Marcel will den
+  Rahmen. Die Karte nimmt Haarlinie und Radius aus den Tokens.
+
+  **(C) Das Gold lief nicht bis zum Kartenrand.** Gemessen: `.sb-card`
+  345 px, `.sbc-top` 325 px und 14 px unter der Oberkante — das Band ist
+  dessen `::before` und damit ebenso 325 px. Ursache ist die
+  Kartenpolsterung `14px 10px 10px`. Band per negativem Außenabstand an die
+  Kante gezogen, die Ecken bekommt das Band selbst: `overflow:hidden` ist
+  gesperrt, weil das Investor-Ribbon bei `top:-7px` sitzt.
+  **Nachgemessen: Rand links/rechts/oben je 2 px — das ist der Rahmen.**
+
+  **(D) Der Score-Ring sprang nach oben links.** Gemessen: `Standard`
+  `right:12px` → Ring x 284, **rechts**; `Wallet` `left:9px` → Ring x 21,
+  **links**. v1082j hatte ihn bewusst aufs Band geschoben und wird
+  zurückgenommen. **Nachgemessen: Ring x 285–335, Stufen-Pille darunter bei
+  y 172–197 — Lage wie im Standard (284–334).**
+
+  **Ein Zwischenstand war falsch (v1091 → v1091b):** mit
+  `display:inline-block` (aus dem Wallet-Block von v1082h) flossen Ring und
+  Pille in *eine* Zeile, Ring x 226–276, Pille x 276–343. Im Standard ist
+  die Pille `display:block` und stapelt sich dadurch unter den Ring.
+
+  **Gegenprobe** über alle sechs Fassungen, Kontrastlauf k < 2 in
+  `#sidebar`/`header.hdr`/`nav.tabs`: hell 1, dunkel 3 Fundstellen — beide
+  Reste sind unter **Später** eingetragen und älter als dieses Paket.
 
 - [2026-08-06] **Heller Text auf hellem Grund — der Rest aus v1088** —
   `1a13207`, `49d5c3a`
