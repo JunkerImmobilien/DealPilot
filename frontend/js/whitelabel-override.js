@@ -88,6 +88,43 @@
     var g = _toHsl(WL_BASE), l = _toHsl(lit), a = _toHsl(acc);
     return _fromHsl(a[0] + (l[0] - g[0]), g[1] > 0 ? a[1] * (l[1] / g[1]) : a[1], a[2] + (l[2] - g[2]));
   }
+  /* ── v1109 · Einstufung je Ton statt pauschaler Regel ──────────────────
+     BEFUND (Backlog): mit einem extrem hellen Akzent wie #F0D000 reissen
+     vier der 66 Toene. Gemessen als Text auf hellem Grund:
+
+       #c08a2f -> #ca9900  k = 2,60
+       #a6842d -> #ae9400  k = 2,98
+       #a68a36 -> #b29e05  k = 2,70
+       #a98e3a -> #b6a208  k = 2,57
+
+     Eine pauschale Kontrastregel auf alle 66 waere falsch — darunter sind
+     die Cremetoene (#FAF5E8, #FBF6E9 …), also FLAECHEN, die hell bleiben
+     muessen. Deshalb entscheidet der ORIGINALTON ueber seine Funktion:
+
+       war er auf Weiss lesbar (k >= 3)?  -> er ist ein TEXT-Ton auf hell,
+                                             und das muss er bleiben
+       war er es nicht?                   -> Flaeche, unangetastet
+
+     Das ist funktionserhaltend: kein Ton bekommt eine neue Aufgabe, jeder
+     behaelt nur die, die er im Original hatte. Die Rechenkerne kommen aus
+     config.js (v1097), damit es dieselbe Quelle ist wie fuer --gold-d. */
+  var _WEISS = [255, 255, 255];
+  function _lum2(a) {
+    function f(x) { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }
+    return 0.2126 * f(a[0]) + 0.7152 * f(a[1]) + 0.0722 * f(a[2]);
+  }
+  function _k2(a, b) { var l1 = _lum2(a), l2 = _lum2(b);
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05); }
+  /* Welche Toene waren im Original Text auf hellem Grund? Einmal berechnet. */
+  var _TEXT_AUF_HELL = null;
+  function _textAufHell(h) {
+    if (!_TEXT_AUF_HELL) {
+      _TEXT_AUF_HELL = {};
+      WL_TINTS.forEach(function (t) { _TEXT_AUF_HELL[t] = _k2(_rgbArr(t), _WEISS) >= 3; });
+    }
+    return !!_TEXT_AUF_HELL[h];
+  }
+
   function setWlTokens(r) {
     WL_TINTS.forEach(function (h) {
       var v;
@@ -96,6 +133,18 @@
       else if (h === '#E8CC7A') v = _hi;
       else if (h === '#b8932f') v = _lo;
       else v = _recolor(h, _acc);
+      /* v1109: war der Originalton auf Weiss lesbar, muss es der neue auch
+         sein. Der Schwellwert ist derselbe wie fuer --gold-d (3,8, am
+         Haus-Dunkelgold #9a7f33 gemessen), die Absenkung ebenfalls in
+         OKLab — Farbton und Saettigung bleiben. */
+      try {
+        if (_textAufHell(h) && _k2(_rgbArr(v), _WEISS) < 3.8 &&
+            window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.tonAufHell) {
+          /* tonAufHell erwartet den AKZENT und dunkelt selbst um 9 % vor;
+             hier ist v schon der fertige Ton, also direkt absenken. */
+          v = DealPilotConfig.branding.tonAufHell(v);
+        }
+      } catch (e) {}
       r.setProperty('--wl-' + h.slice(1).toLowerCase(), v);
     });
   }
