@@ -378,6 +378,8 @@
             '<div class="dpuv-lbl" style="margin-top:14px">Grundfarbe (Obsidian)</div>' +
             swHtml('dpuv-obs', GRUNDFARBEN, s.ui_obsidian || OBSIDIAN_STD) +
             '<div class="dp-tb-sec" id="dpuv-bereiche"><b>Einzelne Bereiche</b>' +
+              '<p class="dpuv-hint" style="margin:0 0 6px">Übersteuert die Vorlage. ' +
+              'Wirkt zusammen mit einer Vorlage — „DealPilot" behält seine eigenen Flächen.</p>' +
               BEREICHE.map(farbzeile).join('') + '</div>' +
             '<div id="dpuv-logo">' + fremdBlock('_dpLogoBlock') + '</div>' +
             '<div id="dpuv-ressave">' + fremdBlock('_dpResSave') + '</div>' +
