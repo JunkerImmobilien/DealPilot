@@ -936,3 +936,42 @@ html[data-ui-theme="kanzlei"]  body header.hdr .hdr-sep,
 html[data-ui-theme="boarding"] body header.hdr .hdr-sep {
   color: var(--uv-chrome-ink2) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1090 — die letzten zwei Goldflaechen, im Prüf-Browser nachgemessen
+
+   Kontrastlauf ueber #sidebar, header.hdr, nav.tabs bei 1920 (k < 2):
+
+     dealpilot / konsole (Referenz, dunkel):  2 Fundstellen
+     kontor / panel / kanzlei / boarding:     2 Fundstellen  <- mit v1089
+                                              (vor v1089: 4)
+
+   Beide Reste sind derselbe Fall wie die Objektnummer in v1089:
+   aufgehelltes Gold #E8C964, gebaut fuer dunklen Grund.
+
+     #hdr-credits-pill-label  k=1,49-1,62   erbt von .hdr-credits-pill
+       Gegner: header.hdr.has-v64-score .hdr-credits-pill  (0,3,1) !
+     .sb-actions-arrow        k=1,49-1,62   eigene Regel
+       Gegner: aside.sidebar .sb-actions-trigger .sb-actions-arrow (0,3,1) !
+
+   Beide Ziele tragen KEINE ID, hier reicht Klassen-Spezifitaet — anders
+   als in v1089. Nachgeprueft statt angenommen: der Kaskaden-Walker liest
+   alle Stylesheets rekursiv, matcht je Teilselektor und sortiert nach
+   !important, dann Spezifitaet, dann Reihenfolge.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* (a) Kerosin-Pille in der Kopfzeile — (0,3,3) schlaegt (0,3,1) */
+html[data-ui-theme="kontor"]   body header.hdr .hdr-credits-pill,
+html[data-ui-theme="panel"]    body header.hdr .hdr-credits-pill,
+html[data-ui-theme="kanzlei"]  body header.hdr .hdr-credits-pill,
+html[data-ui-theme="boarding"] body header.hdr .hdr-credits-pill {
+  color: var(--wl-9a7f33, #9a7f33) !important;
+}
+
+/* (b) Pfeil am Aktionen-Aufklapper — (0,4,4) schlaegt (0,3,1) */
+html[data-ui-theme="kontor"]   body aside.sidebar .sb-actions-trigger .sb-actions-arrow,
+html[data-ui-theme="panel"]    body aside.sidebar .sb-actions-trigger .sb-actions-arrow,
+html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-actions-trigger .sb-actions-arrow,
+html[data-ui-theme="boarding"] body aside.sidebar .sb-actions-trigger .sb-actions-arrow {
+  color: var(--wl-9a7f33, #9a7f33) !important;
+}
