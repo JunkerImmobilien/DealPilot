@@ -628,6 +628,25 @@
     } catch (e) {}
   }
 
+  /* ── v1102 · Die drei Chrome-Farben ueberlebten das Neuladen nicht ─────
+     GEMESSEN: der Boot-Block in settings.js:3213 stellt nur drei der sechs
+     Bereichsfarben wieder her —
+
+       var m = {dp_kpi_ui:'--dp-kpi-card', dp_obj_ui:'--dp-obj-card',
+                dp_hero_ui:'--dp-hero-card'}
+
+     dp_hdr_ui, dp_side_ui und dp_text_ui fehlen dort. Wer die Kopfleiste
+     oder die Objektleiste einfaerbt, sieht die Farbe bis zum naechsten
+     Neuladen — danach ist sie weg, obwohl sie gespeichert IST. Das war
+     schon vor dem Zusammenlegen so und faellt jetzt auf, weil die Regler
+     im neuen Panel ueberhaupt erst wirken (siehe ui-varianten.css). */
+  function chromeFarbenBooten() {
+    var m = { dp_hdr_ui: '--dp-header-bg', dp_side_ui: '--dp-side-bg', dp_text_ui: '--dp-text' };
+    Object.keys(m).forEach(function (k) {
+      try { var v = localStorage.getItem(k); if (v) document.body.style.setProperty(m[k], v); } catch (e) {}
+    });
+  }
+
   function targetUmhuellen() {
     if (window.__dpuvTargetHook) return;          /* Waechter gegen Ringschluss */
     var orig = window._dpDispTarget;
@@ -751,8 +770,8 @@
      ja sofort, nicht erst wenn jemand die Einstellungen aufmacht.
      settings.js baut seine Handler beim Laden auf; diese Datei laedt
      danach, der Zugriff ist also sicher. */
-  if (document.body) logoUmhuellen();
-  else document.addEventListener('DOMContentLoaded', logoUmhuellen);
+  if (document.body) { logoUmhuellen(); chromeFarbenBooten(); }
+  else document.addEventListener('DOMContentLoaded', function () { logoUmhuellen(); chromeFarbenBooten(); });
 
   /* Der Plan steht beim Laden noch nicht fest — nachziehen, wenn er kommt.
      dp:plan-ready statt Timer oder Polling (CLAUDE.md). */

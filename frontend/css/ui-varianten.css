@@ -226,10 +226,15 @@ html[data-ui-theme="konsole"] {
    praeziser, weil sie genau dort greift, wo die Fassung ohnehin nachsieht.
    ------------------------------------------------------------------------ */
 html[data-ui-theme] body {
-  --dp-s0:       var(--uv-chrome);
-  --dp-s1:       var(--uv-chrome);
-  --dp-card:     var(--uv-card);
-  --dp-obj-card: var(--uv-card);
+  /* v1102: die Seitenleiste liest --dp-s0/--dp-s1. Der Bereichsregler
+     "Objektleiste" setzt --dp-side-bg — der bekommt hier den Vortritt,
+     sonst waere er unter jeder Vorlage wirkungslos. */
+  --dp-s0:       var(--dp-side-bg, var(--uv-chrome));
+  --dp-s1:       var(--dp-side-bg, var(--uv-chrome));
+  --dp-card:     var(--dp-kpi-card, var(--uv-card));
+  /* --dp-obj-card NICHT hier: der Regler setzt genau diesen Namen inline
+     am body, ein Eintrag hier waere ein Selbstbezug. Die Kartenregel liest
+     ihn direkt (siehe .sb-card weiter unten). */
   --surface:     var(--uv-surf);
   --border:      var(--uv-line);
   --muted:       var(--uv-mut);
@@ -356,7 +361,9 @@ html[data-ui-theme] body .sec { background: var(--uv-pane) !important; }
    .main-col. Sie bekommt hier trotzdem eine eigene Flaeche, damit die
    Vorlage die Kopfzeile vom Arbeitsbereich absetzen kann. */
 html[data-ui-theme] body header.hdr {
-  background: var(--uv-chrome) !important;
+  /* v1102: --dp-header-bg zuerst. Siehe Block "Bereichsfarben" am
+     Dateiende — der Regler muss die Vorlage uebersteuern duerfen. */
+  background: var(--dp-header-bg, var(--uv-chrome)) !important;
   color: var(--uv-chrome-ink) !important;
   border-bottom: 1px solid var(--uv-chrome-line) !important;
 }
@@ -373,7 +380,7 @@ html[data-ui-theme] body nav.tabs,
 html[data-ui-theme] body .main-col > nav.tabs,
 html[data-ui-theme] body header.hdr.has-v64-score + nav.tabs,
 html[data-ui-theme] body header.hdr.has-v64-score + nav.tabs.tabs {
-  background: var(--uv-chrome) !important;
+  background: var(--dp-header-bg, var(--uv-chrome)) !important;   /* v1102 */
   border-bottom: 1px solid var(--uv-chrome-line) !important;
 }
 html[data-ui-theme] body nav.tabs .tab,
@@ -452,7 +459,7 @@ html[data-ui-theme] body aside.sidebar .sb-card {
      gegen Weiss, waehrend real ein dunkler Verlauf dazwischenlag.
      Ein background-image muss also ausdruecklich abgeraeumt werden. */
   background-image: none !important;
-  background-color: var(--uv-card) !important;
+  background-color: var(--dp-obj-card, var(--uv-card)) !important;   /* v1102 */
   border: 1px solid var(--uv-card-line) !important;
   border-radius: var(--uv-r) !important;
   box-shadow: var(--uv-sh) !important;
