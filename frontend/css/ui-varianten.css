@@ -1093,3 +1093,121 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-score-label {
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-address {
   padding: 0 86px 8px 0 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1092 — Kompakt wird eine schmale Zeile zum Aufklappen
+
+   VORLAGE: design/mockups/Screenshot 1.png (offen) / Screenshot 2.png (zu).
+   Das ist die Karte aus dem Portfolio-Cockpit (js/dashboard.js:836,
+   kanbanCardHtml). Uebernommen wird die Gestaltung, nicht der Code — die
+   Leistenkarte hat eine andere Struktur (CLAUDE.md, storage.js:866).
+
+   GEMESSEN (Abgleich Standard gegen Kompakt, 06.08.): Kompakt blendete
+   gegenueber Standard GENAU DREI Dinge aus — .sbc-thumb, .sbc-halter und
+   .sbc-score-label. Alles andere war identisch. Das war Marcels Frage
+   "was fehlt uns gegenueber der Standardansicht": nur diese drei.
+   Jetzt kommen Foto und Halter im aufgeklappten Rumpf zurueck, die Stufe
+   steht wie in der Vorlage dauerhaft unter dem Ring.
+
+   Das Umschalten macht js/karten-kompakt.js ueber die Klasse .uv-open.
+   Ohne die Datei bleibt die Karte zu — sie ist dann wieder das, was
+   "Kompakt" vorher war, nur ohne KPI-Kacheln.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Die Stufe gehoert jetzt DAZU — v1082 hatte sie ausgeblendet. */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-score-label {
+  display: inline-block !important;
+}
+
+/* ── Zugeklappt: nur Adresse, Nummer, Ring, Stufe, Chevron ── */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card:not(.uv-open) .sbc-thumb,
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card:not(.uv-open) .sbc-halter,
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card:not(.uv-open) .sbc-kp-row,
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card:not(.uv-open) .sbc-mini-grid {
+  display: none !important;
+}
+/* Aufgeklappt kommt alles zurueck — auch Foto und Halter, die im alten
+   Kompakt dauerhaft weg waren. */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbc-thumb {
+  display: block !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbc-halter {
+  display: block !important;
+}
+
+/* Die Karte wird flach: die Polsterung traegt sonst die halbe Hoehe. */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card {
+  padding: 8px 10px !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open {
+  padding: 8px 10px 10px !important;
+}
+
+/* ── Der Chevron ──
+   Die Karte bringt bereits <span class="sbc-arrow">›</span> mit
+   (storage.js:1044). Kein neues Element: der Renderer wuerde es beim
+   naechsten Zeichnen wegwerfen. Das ">" wird per Drehung zum "v". */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-arrow {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 22px !important;
+  height: 22px !important;
+  margin-left: auto !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transform: rotate(90deg);
+  transition: transform .18s ease, background-color .18s ease;
+  color: var(--uv-card-mut, #8f897c) !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-arrow:hover,
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-arrow:focus-visible {
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent) !important;
+  color: var(--uv-card-ink, #1a1712) !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbc-arrow {
+  transform: rotate(-90deg);
+}
+
+/* ── Kopfzeile der schmalen Karte ──
+   Adresse fuehrt, Nummer und Datum darunter klein — wie in der Vorlage.
+   Der Ring sitzt rechts, die Stufe darunter. */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-address {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  padding-right: 84px !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-top-line1 {
+  gap: 6px !important;
+  padding-right: 84px !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card > .sbc-score-overlay {
+  left: auto !important;
+  right: 10px !important;
+  top: 8px !important;
+  display: block !important;
+  width: auto !important;
+  text-align: center !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-mini-score {
+  width: 38px !important;
+  height: 38px !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-score-label {
+  display: block !important;
+  margin: 3px auto 0 !important;
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+  font-size: 8.5px !important;
+  padding: 2px 6px !important;
+}
+
+/* Der aufgeklappte Rumpf setzt sich als eigene Flaeche ab — in der Vorlage
+   ist er dunkel. Hier folgt er der Vorlagenfarbe, damit Kontor nicht
+   ploetzlich einen schwarzen Block in der weissen Leiste hat. */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card.uv-open .sbc-mini-grid {
+  margin-top: 8px !important;
+  border-top: 1px solid var(--uv-card-tl, #E9E4D9) !important;
+  padding-top: 8px !important;
+}
