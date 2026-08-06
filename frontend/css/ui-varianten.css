@@ -1327,3 +1327,43 @@ html[data-ui-theme="kanzlei"]  body aside.sidebar .sb-section-title,
 html[data-ui-theme="boarding"] body aside.sidebar .sb-section-title {
   color: var(--gold-d, #9a7f33) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1094 — die zugeklappte Kompakt-Zeile nach der Vorlage
+   design/mockups/Screenshot 2.png: Adresse fett zuerst, darunter klein
+   "Ort · Nummer", rechts der Ring, ganz rechts der Chevron.
+   Bisher stand die Nummernpille UEBER der Adresse — das ist die
+   Reihenfolge aus dem Renderer (.sbc-top-line1 vor .sbc-address,
+   storage.js:1038-1045). Umgestellt wird per order, nicht im Markup.
+   ═══════════════════════════════════════════════════════════════════════ */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card > .sbc-top > .sbc-top-body {
+  display: flex !important;
+  flex-direction: column !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-address {
+  order: 1 !important;
+  margin: 0 0 1px !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-top-line1 {
+  order: 2 !important;
+  font-size: 9.5px !important;
+  opacity: .85 !important;
+  flex-wrap: nowrap !important;
+}
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-kp-row { order: 3 !important; }
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-halter  { order: 4 !important; }
+
+/* Ring nach links ruecken, damit der Chevron rechts daneben Platz hat. */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card > .sbc-score-overlay {
+  right: 34px !important;
+}
+/* Der Chevron verlaesst die Textzeile und steht rechts aussen, senkrecht
+   mittig — die Karte ist position:relative (das Score-Overlay haengt
+   bereits daran). */
+html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-arrow {
+  position: absolute !important;
+  right: 6px !important;
+  top: 22px !important;
+  margin-left: 0 !important;
+  z-index: 4 !important;
+}
