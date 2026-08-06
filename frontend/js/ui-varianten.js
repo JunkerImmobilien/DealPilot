@@ -563,6 +563,7 @@
           .forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
         ['--dp-kpi-card', '--dp-obj-card', '--dp-hero-card', '--dp-tab-text', '--dp-obj-text']
           .forEach(function (v) { document.body.style.removeProperty(v); });
+        bereicheRaeumen();          /* v1104: auch den eigenen Namensraum */
       } catch (e) {}
       return orig.apply(this, arguments);
     };
@@ -646,6 +647,68 @@
     var m = { dp_hdr_ui: '--dp-header-bg', dp_side_ui: '--dp-side-bg', dp_text_ui: '--dp-text' };
     Object.keys(m).forEach(function (k) {
       try { var v = localStorage.getItem(k); if (v) document.body.style.setProperty(m[k], v); } catch (e) {}
+    });
+  }
+
+  /* ── v1104 · Ein eigener Namensraum fuer die Bereichsfarben ───────────
+     v1102 liess die Flaechen var(--dp-header-bg, var(--uv-chrome)) lesen.
+     Das war falsch, und der Fehler war im Bild sofort da: beim Wechsel
+     UEBER DAS PANEL wurden Kopf und Tab-Leiste in allen vier hellen
+     Vorlagen schwarz.
+
+     GEMESSEN, warum: --dp-header-bg hat ZWEI Bedeutungen. Der Regler setzt
+     ihn als Nutzerwert inline am body — aber style.css setzt ihn auch
+     selbst:
+
+       body.dp-chrome-hell { --dp-header-bg: #0a0a0a }   (v927-headerblack)
+
+     Und v1085 koppelt den Skin an die Vorlage, eine helle Vorlage schaltet
+     also dp-chrome-hell ein. Mein "Nutzer-Vorrang" las damit den
+     Skin-Wert. Ueber setAttribute war nichts zu sehen, weil dabei kein
+     Skin nachgezogen wird — nur der echte Bedienweg zeigte es.
+
+     Deshalb bekommen die Bereichsfarben einen eigenen Namen: --dpuv-*.
+     Den setzt ausschliesslich der Regler, niemand sonst. Die alten
+     --dp-*-Tokens werden weiter mitgeschrieben, damit der Hell-Skin und
+     der Mandanten-Abgleich unveraendert weiterlaufen. */
+  var BEREICH_VARS = {
+    _dpDispHeader: '--dpuv-header-bg',
+    _dpDispSide:   '--dpuv-side-bg',
+    _dpDispText:   '--dpuv-text',
+    _dpDispKpi:    '--dpuv-kpi-card',
+    _dpDispObj:    '--dpuv-obj-card',
+    _dpDispHero:   '--dpuv-hero-card'
+  };
+  var BEREICH_LS = {
+    dp_hdr_ui:     '--dpuv-header-bg',
+    dp_side_ui:    '--dpuv-side-bg',
+    dp_text_ui:    '--dpuv-text',
+    dp_kpi_ui:     '--dpuv-kpi-card',
+    dp_obj_ui:     '--dpuv-obj-card',
+    dp_hero_ui:    '--dpuv-hero-card'
+  };
+  function bereicheUmhuellen() {
+    if (window.__dpuvBereichHook) return;
+    window.__dpuvBereichHook = true;
+    Object.keys(BEREICH_VARS).forEach(function (fn) {
+      var orig = window[fn];
+      if (typeof orig !== 'function') return;
+      window[fn] = function (h) {
+        var r = orig.apply(this, arguments);
+        try { if (h) document.body.style.setProperty(BEREICH_VARS[fn], h); } catch (e) {}
+        return r;
+      };
+    });
+    /* Beim Start aus den gespeicherten Werten nachziehen. */
+    Object.keys(BEREICH_LS).forEach(function (k) {
+      try { var v = localStorage.getItem(k); if (v) document.body.style.setProperty(BEREICH_LS[k], v); } catch (e) {}
+    });
+  }
+  /* Der Rueckbau muss die neuen Namen mitnehmen — sonst bliebe die Farbe
+     nach "Zuruecksetzen" stehen, obwohl der Schluessel weg ist. */
+  function bereicheRaeumen() {
+    Object.keys(BEREICH_LS).forEach(function (k) {
+      try { document.body.style.removeProperty(BEREICH_LS[k]); } catch (e) {}
     });
   }
 
@@ -778,7 +841,7 @@
      diese Luecke schliesst (v1098), war zu dem Zeitpunkt noch nicht
      installiert. Ein Rueckbau muss aber immer vollstaendig sein, egal von
      wo er ausgeloest wird. */
-  function startAufbau() { logoUmhuellen(); chromeFarbenBooten(); resetUmhuellen(); }
+  function startAufbau() { logoUmhuellen(); chromeFarbenBooten(); bereicheUmhuellen(); resetUmhuellen(); }
   if (document.body) startAufbau();
   else document.addEventListener('DOMContentLoaded', startAufbau);
 
