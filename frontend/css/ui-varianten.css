@@ -307,6 +307,33 @@ html[data-ui-theme] body .app-wrap {
 html[data-ui-theme] body .main-col { background: var(--uv-pane) !important; }
 html[data-ui-theme] body .body     { background: var(--uv-pane) !important; }
 
+/* ── v1099 · Der Arbeitsbereich selbst ────────────────────────────────────
+   MARCELS BEFUND vom 06.08. (design/mockups/Screenshot 2026-08-06 112337):
+   in "konsole" bleibt ein Teil des Arbeitsbereichs weiss.
+
+   GEMESSEN: #s0.sec ist 1280x2462 und steht auf rgb(255,255,255) — in
+   ALLEN fuenf Vorlagen, nicht nur in der dunklen. body und .main-col
+   folgen korrekt der Vorlage, .sec nicht.
+
+   URSACHE ist ein ZWEITES Attribut aus einer aelteren Funktion:
+     style.css:29762  html[data-bg="white"] .sec {background:#fff!important}
+   Das ist der Hintergrund-Umschalter V257-06 (settings.js:2915,
+   DealPilotBgMode) — und "white" ist dort der STANDARD. Es traf also
+   jeden, nicht nur denjenigen, der einmal umgeschaltet hat.
+
+   Warum body und .main-col trotzdem stimmten: dort steht der Gegner bei
+   (0,1,2) und meine Regel ebenfalls — bei Gleichstand gewinnt die
+   spaetere, und diese Datei laedt nach style.css. Bei .sec liegt der
+   Gegner aber bei (0,2,1) und gewinnt damit. .sec fehlte in v1082
+   schlicht in der Aufzaehlung — und genau davor warnt CLAUDE.md:
+   farbtragende Flaechen muessen EINZELN benannt werden.
+
+   Hier auf (0,2,2) gehoben, also ueber den Gegner — nicht ueber die
+   Ladereihenfolge. Derselbe Fall wie v1091 (A) mit dem Hell-Skin: die
+   Vorlage ist die spaetere und ausdrueckliche Wahl und gewinnt. Ohne
+   Vorlage bleibt data-bg unangetastet wirksam. */
+html[data-ui-theme] body .sec { background: var(--uv-pane) !important; }
+
 /* ── Kopfleiste ──
    header.hdr ist gemessen TRANSPARENT (49px, has-v64-score) und sitzt auf
    .main-col. Sie bekommt hier trotzdem eine eigene Flaeche, damit die
