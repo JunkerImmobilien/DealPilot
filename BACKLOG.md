@@ -13,31 +13,7 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ---
 ## Offen
 
-1. **Altes Darstellungs-Panel abklemmen.** Der Abschnitt **Marke** steht im
-   neuen Panel (v1098, siehe **Fertig**) und ist geprüft. Damit ist die
-   Voraussetzung aus Schritt 1 der alten Bauanleitung erfüllt: „Erst wenn
-   der neue Abschnitt steht und geprüft ist, wird der Aufruf des alten
-   Panels entfernt."
-
-   Offen ist genau das: `#dp-tb-fab` (der Farbklecks-Knopf) und
-   `#dp-tb-panel` aus `settings.js:3195` `build()` werden weiter gebaut, es
-   gibt also zwei Wege zur selben Einstellung. **Bewusst noch nicht
-   angefasst** — das ist eine sichtbare Produktänderung, und solange beide
-   existieren, hängt bei einem Fehlschlag nicht die ganze Darstellung.
-
-   **Nicht entfernen, nur den Aufruf:** die Funktionen `_dpDisp*`,
-   `_dpLogoBlock` und `_dpResBlock` werden vom neuen Panel **benutzt** und
-   müssen bleiben. Weg darf nur `build()` bzw. dessen `fab.onclick`.
-
-   **Achtung, eine Annahme der alten Bauanleitung ist widerlegt:** Schritt 7
-   sagte, der Aufruf im Partner-Portal (`rp-b-disp`) sei „auf das neue Panel
-   umzubiegen, damit es nur noch einen Weg gibt". Gemessen öffnet
-   `rp-b-disp` (`reseller-portal.js:695`) aber gar nicht das alte Panel,
-   sondern `DealPilotBrandingEditor.open()` — die Oberfläche, mit der ein
-   Partner die Marke **seiner Mandanten** setzt, inklusive Mail-Farbe, Name
-   und PDF-Hell. Das ist ein anderer Zweck als die persönliche Darstellung.
-   Dort ist **nichts umzubiegen.**
-2. **Stapel-Modus feinziehen** — `v1095`/`v1095b` steht (siehe **Fertig**).
+1. **Stapel-Modus feinziehen** — `v1095`/`v1095b` steht (siehe **Fertig**).
    Offen bleibt der Vergleich mit `design/mockups/handy2.jpg` im Detail:
    dort tragen die KPI-Kacheln im Rumpf **dunkle** Flächen, hier folgen sie
    der Vorlagenfarbe. Dazu fehlen „Im Rennen" und „Detail öffnen →" — beide
@@ -90,6 +66,115 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-06] **Konsole-Befund, altes Panel abgeklemmt, alle Einstellungen
+  durchgeprüft** — `v1099` bis `v1104`
+
+  **Marcels Befund** (`design/mockups/Screenshot 2026-08-06 112337.png`):
+  in „Konsole" bleibt ein Teil des Arbeitsbereichs weiß. Gemessen war
+  `#s0.sec` 1280 × 2462 auf `rgb(255,255,255)` — **in allen fünf Vorlagen**,
+  nicht nur in der dunklen.
+
+  **Ursache: ein zweites Attribut aus einer älteren Funktion.**
+  `html[data-bg="white"] .sec` (`style.css:29762`, Hintergrund-Modus
+  V257-06) mit `!important` bei (0,2,1). Und `white` ist dort der
+  **Standard** — es traf also jeden. `body` und `.main-col` stimmten nur,
+  weil Gegner und eigene Regel dort bei (0,1,2) gleichauf liegen und diese
+  Datei später lädt; bei `.sec` gewinnt der Gegner. `.sec` fehlte in v1082
+  schlicht in der Aufzählung.
+
+  Das legte zwei weitere Schichten frei, die vorher unsichtbar waren, weil
+  dunkler Text auf weißem Grund stand:
+
+  | Paket | Befund |
+  |---|---|
+  | `v1099b` | 13 Fundstellen k < 3, schlimmste **1,08** — Mehrheit auf `--ch #2A2727`, genau die Falle „`--ch` nie auf Obsidian". `--ch` und `--text` in die Token-Brücke. |
+  | `v1099c` | 14 Fundstellen, alle heller Text auf weiß gebliebener Fläche. Knöpfe: `style.css:29839` setzt `background:#ffffff!important` auf einer Kette mit **sieben `:not()`**, Spezifität **(0,15,1)**. Kette übernommen und nur um das Vorlagen-Präfix erweitert → (0,17,3), bitgenau dieselbe Elementmenge. |
+  | `v1099d` | Gegenprobe über alle sechs: `panel` stand bei 10 statt 4–5. Die sechs zusätzlichen alle `--uv-mut #8a95a2` mit k = 2,78. |
+
+  **Ergebnis in „konsole": 14 → 0 Fundstellen, 8 → 0 weiße Flächen.**
+
+  ### Das alte Panel ist abgeklemmt (`v1100`)
+
+  `#dp-tb-fab` und `#dp-tb-panel` werden nicht mehr gebaut. **Nur der
+  Aufbau** — die `_dpDisp*`-Handler, `_dpLogoBlock` und `_dpResBlock`
+  bleiben, das neue Panel benutzt sie. Nachgesehen: `repaint()` fällt ohne
+  das alte Panel auf seinen zweiten Zweig und zeichnet `#dp-res-sec` /
+  `#dp-res-save` einzeln neu — genau diese IDs liefert `_dpResBlock()` auch
+  im neuen Panel. `_dpOpenToolbar` zeigt jetzt aufs neue Panel.
+
+  ### Beim Durchprüfen aller Einstellungen: fünf weitere Defekte
+
+  1. **Die Logo-Regler waren unter jeder Vorlage tot** (`v1101`). Gemessen:
+     ohne Vorlage 60 % → 159 × 29 und 140 % → 266 × 49, mit „konsole" beide
+     **130 × 24**. Ursache sind meine eigenen v1082-Regeln:
+     `height: calc(26px * var(--dp-logo-scale,1))` — das Token setzte
+     **niemand**; der Regler setzt `--dp-logo-w`, eine *Breite* in Prozent.
+     Zwei Namen, kein Bezug. Der Kommentar daneben behauptete sogar das
+     Gegenteil. **Und es ist derselbe Fehler wie v1080**, nur eine Ebene
+     höher. Dazu hielt `justify-content: flex-start !important` den
+     Ausrichtungs-Regler fest.
+  2. **Der Wrapper war exakt bildbreit** (`v1101b`) — 78 px in einem 349-px-
+     Kopf. `justify-content` setzte den richtigen Wert und bewegte nichts.
+  3. **Die sechs Bereichsfarben wirkten überhaupt nicht** (`v1102`).
+     Gemessen mit auffälligen Testfarben: kein einziger Regler bewirkte
+     etwas, weder mit noch ohne Vorlage. **Jeder** Leser der Tokens hängt in
+     `style.css` an `body.dp-chrome-hell` — die Regler wirkten nur im alten
+     Hell-Skin, der Abschnitt hieß dort auch „Chrome (Hell)".
+  4. **Drei der sechs Farben überlebten das Neuladen nicht** (`v1102`). Der
+     Boot-Block `settings.js:3213` stellt nur `dp_kpi_ui`, `dp_obj_ui` und
+     `dp_hero_ui` wieder her; `dp_hdr_ui`, `dp_side_ui`, `dp_text_ui`
+     fehlen. Die Farbe war gespeichert und nach dem Neuladen weg.
+  5. **Die Reset-Umhüllung wurde zu spät installiert** (`v1102c`) — erst
+     beim Öffnen des Panels. Ein Reset davor ließ drei Schlüssel stehen.
+
+  ### Der Fehler, den erst der echte Bedienweg zeigte (`v1103`, `v1104`)
+
+  Nach `v1102` wurden Kopf und Tab-Leiste in **allen vier hellen Vorlagen
+  schwarz** (`rgb(10,10,10)`) — aber nur beim Wechsel **über das Panel**,
+  nicht per `setAttribute`. Über Attribute war nichts zu sehen, weil dabei
+  kein Skin nachgezogen wird.
+
+  **Ursache: ein Tokenname mit zwei Bedeutungen.** `--dp-header-bg` ist der
+  Nutzerwert des Reglers *und* eine Interna des Skins —
+  `body.dp-chrome-hell { --dp-header-bg: #0a0a0a }` (v927-headerblack). Da
+  v1085 den Skin an die Vorlage koppelt, las mein „Nutzer-Vorrang" den
+  Skin-Wert. Die Bereichsfarben haben jetzt einen **eigenen Namensraum**
+  `--dpuv-*`, den ausschließlich der Regler setzt; die alten Tokens werden
+  weiter mitgeschrieben, damit Hell-Skin und Mandanten-Abgleich unverändert
+  laufen.
+
+  `v1103` holt zusätzlich drei Flächen vom Skin zurück, die v1091 (A)
+  übersehen hatte: `aside.sidebar`, `.sb-footer` und `nav.tabs`.
+
+  **Nachgemessen, über den echten Bedienweg (Panel-Klicks):**
+
+  | Vorlage | Soll `--uv-chrome` | Leiste / Kopf / Tabs |
+  |---|---|---|
+  | kontor | `#FFFFFF` | alle `rgb(255,255,255)` |
+  | panel | `#FFFFFF` | alle `rgb(255,255,255)` |
+  | kanzlei | `#FBFAF7` | alle `rgb(251,250,247)` |
+  | boarding | `#FAF5E8` | alle `rgb(250,245,232)` |
+  | konsole | `#16181C` | alle `rgb(22,24,28)` |
+  | dealpilot | — | unverändert `0,0,0` / transparent / `10,8,5` |
+
+  **Alle Bedienelemente einzeln geprüft:** 6 Vorlagen · 4 Kartenmodi
+  (79 / 209 / 231 / 61 px) · 2 Kartenflächen · 3 Formen (`--uv-r` 0 / 3 /
+  16 px, an der echten Karte nachgemessen) · 4 Schriften · 3 Größen ·
+  6 Bereichsfarben (Leiste, Kopf, Tabs, Karte je auf den Sollwert) ·
+  **Logo: Datei-Upload** (echte PNG erzeugt und hochgeladen — gespeichert
+  und im DOM), **Größe** (60/100/140 % → 78×14 / 130×24 / 182×33),
+  **Ausrichtung** (x12 / x135 / x259), **Zurücksetzen** (Originalbild, alle
+  Schlüssel und Variablen weg) · Reseller-Umschalter · „Zurücksetzen" räumt
+  **alle elf** Schlüssel, auch vor dem ersten Öffnen des Panels.
+
+  Sperre ohne Partner: Marke gesperrt und **sichtbar**, Deckkraft 0,42,
+  keine Klicks, Hinweis da, Reseller-Blöcke leer — Form und Schrift frei.
+
+  **Zwei Messfehler von mir, zurückgenommen:** Ich hatte `kanzlei` einmal
+  mit weißer Leiste gemeldet (Transitions-Artefakt, zu früh gemessen) und
+  die Objektkarte als „folgt dem Regler nicht" (die Karte wird beim
+  Vorlagenwechsel neu gerendert, die Messung lief davor). Beide stimmen.
 
 - [2026-08-06] **Abschnitt „Marke" im Darstellungs-Panel, dazu Form und
   Schrift** — `v1098` bis `v1098d`
