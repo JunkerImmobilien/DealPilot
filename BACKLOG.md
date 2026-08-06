@@ -20,26 +20,14 @@ nächsten Vorhaben stehen unter **Später**._
 
 ## Später
 
-- **Zwei Kopfzeilen-Elemente bleiben in den hellen Vorlagen weiß** —
-  `.hdr-obj-name` (weiß auf weiß, Kontrast 1,00) und `.hdr-obj-num`
-  (aufgehelltes Gold `#E8C964`, Kontrast 1,62). Der Rest ist mit v1088
-  erledigt: 11–12 Fundstellen → 2–4, der Referenzwert der DealPilot-Fassung
-  liegt bei 1–2.
-
-  **Diagnose steckt fest, deshalb hier statt weiterzuraten.** Gemessen:
-  `--uv-chrome-ink` löst am Element korrekt auf `#141310` auf; die
-  Regel-Auswertung über `element.matches()` zeigt meine v1088-Regel als
-  gewinnend (`!important`, Spezifität (0,3,3) gegen (0,2,0) der
-  konkurrierenden `.hdr-v61-row1 .hdr-obj-name`); kein Inline-Style am
-  Element; `header.hdr` selbst trägt korrekt `rgb(20,19,16)`. Und trotzdem
-  ist die berechnete Farbe des Kindes `rgb(255,255,255)`.
-
-  Nächster Schritt: mit `getMatchedCSSRules`-Ersatz über die
-  DevTools-Protokollebene prüfen, welche Deklaration wirklich zieht — die
-  Zählung über `matches()` findet Regeln, sagt aber nichts über die
-  Kaskade. Verdacht: eine Regel in einem Block, den der Walker nicht
-  betritt (verschachtelte `@media`/`@supports`), oder ein zweites
-  Stylesheet mit demselben Selektor.
+- **Aktionen-Aufklapper in der dunklen Fassung nachsehen** —
+  `.sb-actions-accordion-inner` misst `rgb(255,255,255)` **auch** in
+  `dealpilot` und `konsole`, also weiße Fläche in der dunklen Leiste. Die
+  Einträge darin (`.sb-act-item`) tragen aufgehelltes Gold `#E8C964`. Im
+  geschlossenen Zustand nicht sichtbar (`display:none`, Rechteck 0×0),
+  deshalb bei den Kontrastläufen nie aufgefallen. **Mit geöffnetem Menü
+  nachmessen**, vorher nichts ändern — v1084 hat das Menü gebaut und war
+  abgenommen.
 
 - **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
   Aktionen als Popover statt Blatt von unten
@@ -55,6 +43,64 @@ nächsten Vorhaben stehen unter **Später**._
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-06] **Heller Text auf hellem Grund — der Rest aus v1088** —
+  `1a13207`, `49d5c3a`
+
+  **Meine v1088-Diagnose war am falschen Gegner gemessen und wird
+  ausdrücklich zurückgenommen.** Ich hatte `.hdr-v61-row1 .hdr-obj-name`
+  (0,2,0) als konkurrierende Regel geprüft und daraus geschlossen, meine
+  Regel gewinne. Die Regel, die wirklich gewinnt, selektiert über die
+  **ID** — und die Elemente tragen Klasse *und* ID:
+
+  | Datei | Selektor | Spez. |
+  |---|---|---|
+  | `style.css:24145` | `header.hdr.has-v64-score #hdr-obj` | (1,2,1) |
+  | `style.css:24136` | `header.hdr.has-v64-score #hdr-obj-num` | (1,2,1) |
+  | `style.css:24065` | `header.hdr.has-v64-score .hdr-sep` | (0,3,1) |
+
+  `index.html:807/813`: `<span class="hdr-obj-num" id="hdr-obj-num">` und
+  `<div class="hdr-obj-name" id="hdr-obj">`. Meine v1088-Selektoren waren
+  rein klassenbasiert (0,3,3) und verlieren gegen jede ID — `!important`
+  steht auf beiden Seiten, also entscheidet die Spezifität. Deshalb löste
+  `--uv-chrome-ink` am Element korrekt auf und blieb trotzdem wirkungslos:
+  die Deklaration kam nie zum Zug. **v1089** fixt über Selektoren mit ID,
+  (1,2,3) schlägt (1,2,1). Der Trenner `.hdr-sep` hängt an derselben
+  Ursache und war in v1088 gar nicht erfasst.
+
+  **v1090** räumt die zwei Reste ab, die der saubere Lauf danach zeigte —
+  beide derselbe Fall wie die Objektnummer, aufgehelltes Gold `#E8C964`
+  auf hellem Grund: `#hdr-credits-pill-label` (erbt von
+  `.hdr-credits-pill`) und `.sb-actions-arrow`. Beide Gegner sind (0,3,1)
+  und tragen keine ID, hier reicht Klassen-Spezifität.
+
+  **Das Werkzeug, das gefehlt hat:** ein Kaskaden-Walker, der *alle*
+  Stylesheets rekursiv durchgeht (auch `@media`/`@supports`), je
+  **Teilselektor** matcht und nach `!important` → Spezifität → Reihenfolge
+  sortiert. `element.matches()` findet Regeln, sagt aber nichts über die
+  Kaskade — das war der Denkfehler.
+
+  **Zwei eigene Messfehler nehme ich zurück,** die ich zwischendurch als
+  Befund hatte: `.sb-user-name` (angeblich dunkel auf schwarzem `#sb-user`)
+  und `.sb-actions-l`. Beides Artefakte des gedrosselten Prüf-Tabs —
+  **eingefrorene Transitions überschreiben sogar Inline-`!important`**, ein
+  `background:transparent !important` mit höchster Spezifität blieb ohne
+  Wirkung. Nach `document.getAnimations().forEach(a => a.finish())` sind
+  beide sauber. `.sb-act-l` war ein Fehlalarm meines Scanners: liegt in
+  einem `display:none`-Aufklapper, Rechteck 0×0. Der Scanner filtert das
+  jetzt.
+
+  **Nachgemessen** (Kontrastlauf über `#sidebar`, `header.hdr`, `nav.tabs`,
+  Schwelle k < 2, im gleich-Origin-iframe bei 1440 / 820 / 390):
+
+  | Fassung | vor v1089 | nach v1090 |
+  |---|---|---|
+  | kontor · panel · kanzlei · boarding | 4 | **0** |
+  | dealpilot · konsole (Referenz, dunkel) | 2 | 1 |
+
+  Der eine verbleibende Treffer in der dunklen Fassung ist
+  `.sb-version-badge` (Gold bei 70 % Deckung auf einem Gold-8-%-Plättchen)
+  — so gebaut, in den hellen Fassungen gar nicht auffällig.
 
 - [2026-08-05] **Kopfleiste auf dem Tablet** — `fc36d12`
 
