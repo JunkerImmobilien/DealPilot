@@ -262,12 +262,34 @@ html[data-ui-theme] body {
    color-mix(in srgb, #C9A84C 76%, #000) = rgb(153,128,58) gegen das
    bisherige Literal rgb(154,127,51).
 
-   Zwei Tokens statt einem, weil --gold-d und --wl-9a7f33 im Whitelabel
-   NICHT denselben Wert haben (unter Rot gemessen: #702936 gegen #451b23).
-   Sie zusammenzulegen haette das Aussehen abgenommener Pakete veraendert. */
+   v1096b hatte hier ZWEI Toene, weil --gold-d und --wl-9a7f33 im Whitelabel
+   verschiedene Werte tragen (unter Rot: #702936 gegen #451b23).
+
+   v1097 legt sie zusammen, und zwar auf --gold-d. Zwei Gruende, beide
+   gemessen:
+
+   1) --gold-d traegt seit v1097 einen MINDESTKONTRAST (config.js), der
+      Tint-Weg --wl-9a7f33 dagegen nicht: er verschiebt alle 66 Toene nur
+      relativ in HSL. Mit Hellgelb #F0D000 als Akzent kam der Aktionen-Knopf
+      darueber auf Kontrast 3,27, der Fortschritt auf 3,15 — unter der
+      Hausschwelle 3,8, waehrend --gold-d 3,90 lieferte.
+   2) Es waren zwei verschiedene Dunkeltoene fuer dieselbe Sache: "Marke auf
+      hellem Grund". Der Knopf stand auf #451b23, der Preis daneben auf
+      #702936.
+
+   Was sich dadurch sichtbar aendert: die v1089/v1090-Stellen (Objektnummer
+   im Kopf, Kerosin-Pille, Pfeil am Aktionen-Knopf) werden unter einer
+   Vorlage eine Spur heller und stehen jetzt auf demselben Ton wie Preis und
+   Nummernpille. Ausserhalb der Vorlagen ist nichts angefasst — dort greift
+   keine dieser Regeln.
+
+   Der Tint-Weg selbst bleibt unberuehrt: unter den 66 Toenen sind auch
+   Flaechen (die Cremetoene), eine pauschale Kontrastregel waere dort
+   falsch. Die vier Toene, die bei einem extrem hellen Akzent reissen,
+   stehen als Restpunkt im BACKLOG. */
 html[data-ui-theme] {
-  --uv-marke-d:  var(--gold-d,    color-mix(in srgb, var(--gold, #C9A84C) 76%, #000));
-  --uv-marke-dd: var(--wl-9a7f33, color-mix(in srgb, var(--gold, #C9A84C) 76%, #000));
+  --uv-marke-d:  var(--gold-d, color-mix(in srgb, var(--gold, #C9A84C) 76%, #000));
+  --uv-marke-dd: var(--uv-marke-d);
 }
 
 
