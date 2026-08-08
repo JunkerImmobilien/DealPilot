@@ -9,15 +9,135 @@ Punkte werden fortlaufend neu durchnummeriert. Hängt etwas, kommt `**BLOCKIERT:
 direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 **Vorlagen und Bilder:** `design/` (Mockups, Logos). Siehe `design/README.md`.
+Marcel legt seine Screenshots **jedes Mal** in `design/mockups/` ab (lokal
+`E:\DealPilot\repo\design\mockups`). Vor jedem Punkt, der Optik betrifft,
+zuerst dort nachsehen — und **den Dateinamen in den Punkt schreiben**. Ein
+Optik-Befund ohne Bildbezug ist eine Vermutung; beim Stapel-Modus kam die
+falsche Annahme aus `handy2.jpg`, einer Datei, die gar nicht mehr im Repo
+lag.
+
+**Bildzuordnung erledigt (2026-08-08).** Der Ordner enthielt drei
+Screenshots ohne Bezug. Zugeordnet:
+
+| Datei | Punkt | was darauf zu sehen ist |
+|---|---|---|
+| `Screenshot 2026-08-08 075255.png` | **1** | Einstellungen bei Handybreite: 12 Reiter hochkant nebeneinander, Inhaltsfläche leer |
+| `Screenshot 2026-08-06 144507.png` | **2** | Hero-Score-Kachel, rot umkringelt: „INVESTOR SCORE" und die Zeile darunter — Gold auf Gold |
+| `Screenshot 2026-08-08 075210.png` | **7** | Handy-Kennzahlen: Kachel-Labels überlappen (`GESAMTINVESTITION`/`RESTSCHULD`, `BRUTTO-`/`NETTOMIETRENDITE`), Werte laufen aus der Kachel |
+
+Zu den Punkten 3–6 liegt **kein** Bild vor. Das ist kein Mangel — es sind
+Ketten- und Funktionsbefunde, keine Optikbefunde.
 
 ---
 ## Offen
 
-1. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare,
-   Aktionen als Popover statt Blatt von unten. Dazu die Admin-Oberfläche
-   auf Tablet prüfen. **Nicht angefangen:** das ist Gestaltungsarbeit mit
-   eigener Prüfstrecke, kein Defekt — und ohne Vorlage im `design/`-Ordner
-   wäre es geraten.
+1. **Die Einstellungen werden auf dem Handy nicht richtig dargestellt**
+   (MA-Serie). Marcels Wort: sie „funktionieren nicht" — gemeint ist die
+   Darstellung, nicht die Logik. Vor dem ersten Patch **messen, nicht
+   raten**: `getComputedStyle`, `getBoundingClientRect`, `elementFromPoint`
+   auf die Stellen aus dem Bild. Eine Spur aus der Vorgeschichte, noch zu
+   bestätigen: die Einstellungen sind **einzeln** auf 390 px geprüft
+   (v652 — Felder auf 16 px, Trefferflächen 44 px), **unter Vorlage** auf
+   kleinem Schirm aber nie. Genau diese Kombination hat schon zweimal etwas
+   freigelegt.
+
+2. **„Darstellung → Profil und Anzeige" ist unvollständig — Gold auf Gold.**
+   Nicht alle Reiter, Farben und Texte sind änderbar bzw. überhaupt
+   aufgeführt. Marcels Beispiel aus dem Bild: **die Schriftfarbe lässt sich
+   nicht setzen**, dadurch steht goldener Text auf goldenem Grund. Zwei
+   Arbeiten, in dieser Reihenfolge: **erst der Abgleich** — welche Werte
+   setzt der Bereich heute, welche Tokens gibt es, wo klafft die Lücke (die
+   vier Vorlagen-Werte `ui_theme`, `ui_cards`, `ui_surface`, `ui_form` sind
+   mit v1111 gerade erst in den Abgleich gewandert; dieselbe Frage jetzt
+   für Schrift- und Textfarben) — **dann der Kontrastlauf** aus v1099 über
+   alle Vorlagen. Gold auf Gold ist ein Kontrastfehler, kein
+   Geschmacksthema: hier wird gemessen, nicht nach Augenmaß entschieden.
+   Beim Messen `::before`/`::after` mitnehmen, sonst zählt der Lauf
+   Phantome (v1105c).
+
+3. **Die Branding-Einstellungen des Partners greifen nicht**
+   (Reseller/Whitelabel, `P-NN`/`W-NN`). Vier Befunde, die zusammengehören,
+   aber nicht dieselbe Ursache haben müssen:
+   - **Zu wenig Farben zur Auswahl.** Der Bereich bietet deutlich weniger
+     Regler als „Darstellung" — dort sechs Bereichsfarben (`--dpuv-*`,
+     v1102/v1103), im Partner-Abgleich 14 Werte (v1111). Erst
+     gegenüberstellen, was es wo gibt, dann entscheiden, was fehlt.
+   - **Einzeln geänderte Farben wirken nicht.** Der Kern des Punktes, ein
+     Defekt, kein Ausbau.
+   - **Erst nach dem Neuladen sieht man die Änderung.** Die `--wl-`Tokens
+     stehen in keinem `:root`; **nur `whitelabel-override.js` setzt sie**
+     (`setWlTokens` in `apply()`). Verdacht, noch zu belegen: das Speichern
+     schreibt den Wert, ruft aber `apply()` bzw. den Repaint nicht nach.
+     Zweite Spur: die **fünf `var()`-Fallen** (SVG-Attribute, Canvas,
+     Leaflet, jsPDF, Data-URIs) ziehen auch bei richtigem Token nicht mit,
+     sie brauchen einen echten Neuaufbau. Beides einzeln nachmessen.
+   - **Logo und Hintergrund lassen sich fürs Branding nicht ändern.**
+
+   **Rückfrage, ein Satz von dir genügt:** „das Logo darf nicht verändert
+   werden, auch nicht der Hintergrund" ist zweideutig. Ich habe es als
+   **Defekt** aufgenommen (beides *lässt sich* nicht ändern, soll es aber).
+   War es als **Regel** gemeint — für Partner gesperrt —, dreht sich der
+   Punkt um und wird zu einer Sperre, die zu prüfen statt zu beheben ist.
+
+4. **Das „×" oben links soll professioneller aussehen** (MA-Serie). Es
+   schließt heute die Ansicht, wirkt aber wie ein Platzhalter. Kandidat aus
+   der v652-Messung: `.dpm-x` — dasselbe Element sitzt auch im Bankexport
+   und im Quick Check, also **erst zählen, wie oft es vorkommt**, dann
+   tauschen („eine Datei, zwei Stellen"). Beim Neubau die 44-px-Trefferfläche
+   halten, die v650/v652 hergestellt haben, und die Farbe über die
+   `--wl-`Ebene führen, nicht hart golden. **Optikentscheidung →
+   Demo-first**, zwei oder drei Fassungen zeigen.
+
+5. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
+   Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
+   ein **Kettenbefund, kein Optikbefund**, und die Kette wird von hinten
+   aufgerollt: was steht im Objekt (`objects.data`), was kommt beim
+   Erzeuger an, was landet auf dem Pass. Erst die Lücke benennen, dann
+   patchen. **Kein Feld nachträglich mit einem stillen Standardwert
+   füllen** — fehlt eine Angabe, gehört sie sichtbar als fehlend
+   ausgewiesen.
+
+6. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+   Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
+   Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
+   aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
+   Abgleich: welche Felder gibt es, welche fehlen.** Die Prüfliste steht:
+
+   | Gruppe | Felder |
+   |---|---|
+   | Grundlagen | `mea`, `bgf`, `spMiete`, `sonstEinnahmen`, `standardstufe`, `grundriss`, `modGrad` |
+   | NHK | `nhkHaus`, `nhkGeschosse`, `nhkDach` |
+   | Hinterland / Garage / Außen | `hinterlandFlaeche`, `hinterlandWert`, `hinterlandRent`, `garagenBgf`, `garagenStufe`, `aussenPct` |
+   | Feinjustierung Gewerke (9) | `ausstAussenwaende`, `ausstDach`, `ausstFenster`, `ausstInnenwaende`, `ausstDecken`, `ausstFussboeden`, `ausstSanitaer`, `ausstHeizung`, `ausstTechnik` |
+   | Sonstige Bauteile (5) | `btlGauben`, `btlBalkone`, `btlVordach`, `btlTerrassen`, `btlSonstige` |
+
+   **Die Stelle, an der so etwas schon einmal verlorenging, ist bekannt:**
+   `payload()` in `wertermittlung.js` reicht die Felder an den Bericht, der
+   Rückweg ins Portfolio läuft aber über `_mbBuildObjData()` in `app.js`,
+   und zwar über DOM-Ids. Was dort fehlt, rechnet im Bericht mit und ist im
+   gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
+   Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
+
+7. **Vollständiger Durchgang durch die Mobile-App** (MA-Serie). Marcels
+   Rahmen um die Punkte 1–6: einmal komplett durch, jeder Bereich, jede
+   Einstellung. Steht bewusst als eigener Punkt **nach** den Einzelfixes
+   und prüft, was sonst noch auffällt. Die Handy-Sperre der Haupt-App
+   bleibt dabei aktiv (v970 + MA35), sie wird nicht nebenbei aufgeweicht.
+
+8. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
+   `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
+   v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
+   ist genau seine Voreinstellung. Gehört sachlich zu Punkt 3, ist aber
+   Ausbau und kein Defekt, deshalb dahinter.
+
+9. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+   als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
+   prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
+   kein Defekt — und ohne Vorlage im `design/`-Ordner wäre es geraten.
+   **Ein gemessener Befund gehört hierher:** auf 820 px ist die Kopfleiste
+   **589 px** hoch, `#hdr-badges` allein 492 px, weil die fünf KPI-Pillen
+   dort zu je zwei umbrechen (W43). Bewusst nicht angefasst, weil der Score
+   auf dem Tablet bleiben soll.
 
 ---
 
@@ -29,6 +149,23 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 - **`gold-audit.py` auf RC=0 bringen** — 484 Fundstellen in 57 Dateien,
   Altlast. Die neuen Dateien tragen davon **keine einzige**. Eigenes
   Vorhaben, weil jede Fundstelle einzeln beurteilt werden muss.
+
+- **`body.dp-chrome-hell` auflösen** — 105 gewachsene Regeln hängen daran.
+  Bei „Skin-Schalter und Darstellung" wurde bewusst **gekoppelt statt
+  gelöscht**; das Entfernen bleibt ein eigenes Vorhaben mit eigener
+  Prüfstrecke.
+
+- **Drei Nachweise, die aus Abnahmen offen geblieben sind** — jeweils
+  gemessen und beschrieben, nur nie am echten Gerät bzw. mit echten Daten
+  bestätigt:
+  - **Marktbericht auf dem Handy (v1077):** ein echter Klick auf den
+    PDF-Knopf (Datei lädt herunter), die **Zwei-Finger-Geste** auf der
+    Karte (hängt an `matchMedia('(hover:none)')`, greift im Prüfbrowser
+    nicht) und das **Erzeugen** eines neuen Berichts bei 390 px (kostet
+    5 L und hängt an einem `window.confirm`). Eigener Namensraum v1077,
+    nicht mit der Haupt-App mischen.
+  - **Tabelle der geteilten Pässe** — die Scroll-Regel steht, das
+    Testkonto war leer, der Nachweis fehlt.
 
 ---
 
