@@ -32,13 +32,42 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
 ## Offen
 
 1. **Das „×" oben links soll professioneller aussehen** (MA-Serie). Es
-   schließt heute die Ansicht, wirkt aber wie ein Platzhalter. Kandidat aus
-   der v652-Messung: `.dpm-x` — dasselbe Element sitzt auch im Bankexport
-   und im Quick Check, also **erst zählen, wie oft es vorkommt**, dann
-   tauschen („eine Datei, zwei Stellen"). Beim Neubau die 44-px-Trefferfläche
-   halten, die v650/v652 hergestellt haben, und die Farbe über die
-   `--wl-`Ebene führen, nicht hart golden. **Optikentscheidung →
-   Demo-first**, zwei oder drei Fassungen zeigen.
+   schließt heute die Ansicht, wirkt aber wie ein Platzhalter. Beim Neubau
+   die 44-px-Trefferfläche halten, die v650/v652 hergestellt haben, und die
+   Farbe über die `--wl-`Ebene führen, nicht hart golden.
+
+   **BLOCKIERT: Die Demo steht, es fehlt Marcels Auswahl.**
+   `v1115` (`a1f3d4e`) →
+   `/demo-close-v1115.html` auf Staging. Zu beantworten: welcher der sechs
+   Ist-Knöpfe ist gemeint, welche Fassung (A Ring / B Kachel / C
+   Cockpit-Schalter), und nur dort tauschen oder überall.
+
+   **Gemessen 2026-08-08, drei Annahmen des Punktes korrigiert:**
+
+   - `.dpm-x` wird an **einer** Stelle gebaut — `DP_BAR()`,
+     `js/storage.js:2190` — und **zweimal** gerufen: **Bankexport** und
+     **Track Record**. **Nicht** im Quick Check. „Eine Datei, zwei Stellen"
+     trägt also, nur die zweite Stelle ist eine andere.
+   - `.auth-close` und `.gv-close` stehen in der v652-Regel in `style.css`,
+     werden im Frontend aber von **niemandem** mehr erzeugt. Tote Selektoren.
+   - **„oben links" ließ sich nicht bestätigen.** Kein einziger der Knöpfe
+     ist per CSS links positioniert — alle sitzen rechts, über
+     `margin-left:auto` oder `right:`. Die Handy-Vorlage
+     `dp-handy-mockup-v2.html` hat gar keinen. Deshalb die Rückfrage.
+
+   **Der eigentliche Befund ist größer als der Punkt:** die App hat
+   **25 Schließen-Knöpfe** mit 25 Klassennamen in **sechs Bauarten** — SVG
+   im Kreis (`.dpm-x`, 30 px), SVG in Goldkachel (`.dp-band-close`, 28 px,
+   Einstellungen und Hilfe), heller Kreis (`.dp-legal-close`, 32 px) und
+   **drei nackte Text-×** ohne Fläche und ohne Rahmen (`.bdg-brand .x`
+   24 px `#8a8a90`, `.bi-x` 22 px, `.dpshp-x` 22 px). **Genau die drei sind
+   der Platzhalter-Eindruck** — ein Schriftzeichen sieht nicht nach Knopf
+   aus, weil es keiner ist.
+
+   **Empfehlung:** Fassung **B**, weil sie in Einstellungen und Hilfe schon
+   steht und damit nach innen vereinheitlicht — und **zuerst nur die drei
+   nackten Text-×**. Alle 25 wären ein eigenes Paket über 20 Dateien mit
+   eigener Prüfstrecke.
 
 2. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
    Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
