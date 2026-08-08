@@ -21,27 +21,17 @@ Screenshots ohne Bezug. Zugeordnet:
 
 | Datei | Punkt | was darauf zu sehen ist |
 |---|---|---|
-| `Screenshot 2026-08-08 075255.png` | **1** | Einstellungen bei Handybreite: 12 Reiter hochkant nebeneinander, Inhaltsfläche leer |
-| `Screenshot 2026-08-06 144507.png` | **2** | Hero-Score-Kachel, rot umkringelt: „INVESTOR SCORE" und die Zeile darunter — Gold auf Gold |
-| `Screenshot 2026-08-08 075210.png` | **7** | Handy-Kennzahlen: Kachel-Labels überlappen (`GESAMTINVESTITION`/`RESTSCHULD`, `BRUTTO-`/`NETTOMIETRENDITE`), Werte laufen aus der Kachel |
+| `Screenshot 2026-08-08 075255.png` | **erledigt** (v1112) | Einstellungen bei Handybreite: 12 Reiter hochkant nebeneinander, Inhaltsfläche leer |
+| `Screenshot 2026-08-06 144507.png` | **1** | Hero-Score-Kachel, rot umkringelt: „INVESTOR SCORE" und die Zeile darunter — Gold auf Gold |
+| `Screenshot 2026-08-08 075210.png` | **6** | Handy-Kennzahlen: Kachel-Labels überlappen (`GESAMTINVESTITION`/`RESTSCHULD`, `BRUTTO-`/`NETTOMIETRENDITE`), Werte laufen aus der Kachel |
 
-Zu den Punkten 3–6 liegt **kein** Bild vor. Das ist kein Mangel — es sind
+Zu den Punkten 2–5 liegt **kein** Bild vor. Das ist kein Mangel — es sind
 Ketten- und Funktionsbefunde, keine Optikbefunde.
 
 ---
 ## Offen
 
-1. **Die Einstellungen werden auf dem Handy nicht richtig dargestellt**
-   (MA-Serie). Marcels Wort: sie „funktionieren nicht" — gemeint ist die
-   Darstellung, nicht die Logik. Vor dem ersten Patch **messen, nicht
-   raten**: `getComputedStyle`, `getBoundingClientRect`, `elementFromPoint`
-   auf die Stellen aus dem Bild. Eine Spur aus der Vorgeschichte, noch zu
-   bestätigen: die Einstellungen sind **einzeln** auf 390 px geprüft
-   (v652 — Felder auf 16 px, Trefferflächen 44 px), **unter Vorlage** auf
-   kleinem Schirm aber nie. Genau diese Kombination hat schon zweimal etwas
-   freigelegt.
-
-2. **„Darstellung → Profil und Anzeige" ist unvollständig — Gold auf Gold.**
+1. **„Darstellung → Profil und Anzeige" ist unvollständig — Gold auf Gold.**
    Nicht alle Reiter, Farben und Texte sind änderbar bzw. überhaupt
    aufgeführt. Marcels Beispiel aus dem Bild: **die Schriftfarbe lässt sich
    nicht setzen**, dadurch steht goldener Text auf goldenem Grund. Zwei
@@ -55,7 +45,7 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
    Beim Messen `::before`/`::after` mitnehmen, sonst zählt der Lauf
    Phantome (v1105c).
 
-3. **Die Branding-Einstellungen des Partners greifen nicht**
+2. **Die Branding-Einstellungen des Partners greifen nicht**
    (Reseller/Whitelabel, `P-NN`/`W-NN`). Vier Befunde, die zusammengehören,
    aber nicht dieselbe Ursache haben müssen:
    - **Zu wenig Farben zur Auswahl.** Der Bereich bietet deutlich weniger
@@ -79,7 +69,7 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
    War es als **Regel** gemeint — für Partner gesperrt —, dreht sich der
    Punkt um und wird zu einer Sperre, die zu prüfen statt zu beheben ist.
 
-4. **Das „×" oben links soll professioneller aussehen** (MA-Serie). Es
+3. **Das „×" oben links soll professioneller aussehen** (MA-Serie). Es
    schließt heute die Ansicht, wirkt aber wie ein Platzhalter. Kandidat aus
    der v652-Messung: `.dpm-x` — dasselbe Element sitzt auch im Bankexport
    und im Quick Check, also **erst zählen, wie oft es vorkommt**, dann
@@ -88,7 +78,7 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
    `--wl-`Ebene führen, nicht hart golden. **Optikentscheidung →
    Demo-first**, zwei oder drei Fassungen zeigen.
 
-5. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
+4. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
    Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
    ein **Kettenbefund, kein Optikbefund**, und die Kette wird von hinten
    aufgerollt: was steht im Objekt (`objects.data`), was kommt beim
@@ -97,7 +87,7 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
    füllen** — fehlt eine Angabe, gehört sie sichtbar als fehlend
    ausgewiesen.
 
-6. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+5. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -118,19 +108,19 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
    gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
    Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
 
-7. **Vollständiger Durchgang durch die Mobile-App** (MA-Serie). Marcels
-   Rahmen um die Punkte 1–6: einmal komplett durch, jeder Bereich, jede
+6. **Vollständiger Durchgang durch die Mobile-App** (MA-Serie). Marcels
+   Rahmen um die Punkte davor: einmal komplett durch, jeder Bereich, jede
    Einstellung. Steht bewusst als eigener Punkt **nach** den Einzelfixes
    und prüft, was sonst noch auffällt. Die Handy-Sperre der Haupt-App
    bleibt dabei aktiv (v970 + MA35), sie wird nicht nebenbei aufgeweicht.
 
-8. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
+7. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
    `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
    v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
-   ist genau seine Voreinstellung. Gehört sachlich zu Punkt 3, ist aber
+   ist genau seine Voreinstellung. Gehört sachlich zu Punkt 2, ist aber
    Ausbau und kein Defekt, deshalb dahinter.
 
-9. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+8. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
    kein Defekt — und ohne Vorlage im `design/`-Ordner wäre es geraten.
@@ -172,6 +162,72 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-08] **Die Einstellungen auf dem Handy** — `v1112`, `v1112b`
+  (`03b83a9`, `4da3f5e`)
+
+  Bild: `design/mockups/Screenshot 2026-08-08 075255.png`. Gemessen bei
+  370 px im echten Fenster, angemeldet, Partner-Konto.
+
+  **Die Vermutung des Punktes ist widerlegt.** Er nannte die MA-Serie und
+  vermutete die Kombination „Einstellungen **unter Vorlage** auf kleinem
+  Schirm". Es ist weder die Mobile-App noch die Vorlage: betroffen ist das
+  Einstellungs-Modal der Haupt-App (`settings.js`), und der Defekt steht
+  **ohne** jede Vorlage genauso da. Gegengemessen über den echten
+  Bedienweg (Panel-Klicks) in allen sechs Fassungen — kontor, panel,
+  kanzlei, boarding, konsole und ohne Vorlage — überall bitgleich:
+  Modal 370, Leiste 64, Inhalt 546 px, Querlauf 0.
+
+  ### Vier Ursachen, alle Kaskade, keine davon Logik
+
+  | # | Befund | gemessen |
+  |---|---|---|
+  | 1 | `#settings-modal` hat `padding:30px` + `align-items:center`; das Modal ist Flex-Kind mit `flex-shrink:1`, deshalb wurde v638s `width:100vw!important` gestaucht | Modal **305 px** in einem 370-px-Schirm |
+  | 2 | `.settings-modal.set-modal-v2 .modal-side{height:100%!important}` (0,3,0) schlägt die Mobilregel `.set-modal-cream .modal-side{height:auto}` (0,2,0, **ohne** `!important`) | Seitenleiste **737 px**, `.set-modal-content` auf Höhe **0** bei **y=846** — außerhalb des Modals |
+  | 3 | `.set-modal-cream .ms-tabs{flex:1 1 0%}` lässt die Leiste im Spalten-Container wachsen | Leiste **718 px** hoch |
+  | 4 | v642 „ICONS-ONLY" (`@media 900px`, `flex:1 1 0`) hat **dieselbe Spezifität (0,4,0)** wie v638 (`@media 768px`, `flex:0 0 auto`) und steht später in der Datei | 12 Reiter à **22 px**, hochkant |
+
+  Befund 2 ist die leere schwarze Fläche im Bild: **der Inhalt war da, er
+  stand nur unterhalb des unteren Randes.**
+
+  Befund 4 ist die Falle „bei gleicher Spezifität gewinnt die spätere
+  Regel", diesmal zwischen zwei Media-Queries mit unterschiedlicher
+  Schwelle. Der Kommentar der v642-Regel rechnet ausdrücklich mit **zehn**
+  Reitern — es sind inzwischen **zwölf**. Damit ist Icons-only nicht mehr
+  Geschmack, sondern rechnerisch nicht tragbar: 370/12 = **30,8 px**
+  unterschreitet die 44-px-Trefferfläche aus v650/v652. Zurück auf die
+  Absicht von v638: waagerecht scrollbare Leiste mit Text. Die
+  Beschreibungszeile (`.help-sidebar-item-desc`) gehört zur vertikalen
+  Desktop-Liste und macht jeden Reiter ~200 px breit und zweizeilig — auf
+  dem Handy aus.
+
+  ### Alle zwölf Reiter durchgeprüft
+
+  Kein Querüberlauf (`scrollWidth` 368 = `clientWidth` 368, `body` 370 =
+  Viewport 370), kein Textfeld unter 16 px, kein Knopf unter 44 px. Die
+  gemeldeten „Elemente unter 44 px" sind ausnahmslos Checkboxen (16–18 px)
+  mit eigenem Label als Trefferfläche.
+
+  **Ein eigener Messfehler, zurückgenommen:** Ich hatte in „Rechtliches"
+  15 Elemente als Querüberlauf gemeldet. Falsch — die Tabelle sitzt in
+  einem Elternteil mit eigenem `overflow-x:auto`. Ein Detektor, der nur
+  `getBoundingClientRect().right > innerWidth` prüft, zählt jeden
+  waagerechten Scroll-Container als Überlauf. Mit Vorfahrenprüfung: **0**.
+
+  ### v1112b — Partner-Portal, beim Durchgang gefunden
+
+  Reiter 10 (`data-rp="1"`) öffnet ein **eigenes** Modal aus
+  `reseller-portal.js`. Die Datei enthielt **keine einzige Media-Query** —
+  das Partner-Portal war nie für kleine Schirme gebaut. Gemessen:
+  `.rp-ov` mit `padding:22px` + `align-items:center` → Modal **325,6 px**;
+  im `.rp-body` (flex-row) hält `.rp-side` ihre festen **238 px**
+  (`flex-shrink:0`), für `.rp-work` bleiben **86 px**. Folge: ein Wort je
+  Zeile, Zahlen aus der Kachel gelaufen.
+
+  Derselbe Sachverhalt wie oben, nur ein anderes Modal — deshalb nach
+  demselben Muster behoben. Nachgemessen: Modal 370, Navigationsleiste 65
+  hoch und scrollbar (Inhalt 600 px), alle fünf Einträge **44 px** hoch,
+  Arbeitsfläche 370 breit, Querlauf **0**.
 
 - [2026-08-06] **Partner-Flow: Whitelabel und Darstellung zusammengebracht**
   — `v1111`
