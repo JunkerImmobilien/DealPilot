@@ -23,7 +23,7 @@ Screenshots ohne Bezug. Zugeordnet:
 |---|---|---|
 | `Screenshot 2026-08-08 075255.png` | **erledigt** (v1112) | Einstellungen bei Handybreite: 12 Reiter hochkant nebeneinander, Inhaltsfläche leer |
 | `Screenshot 2026-08-06 144507.png` | **erledigt** (v1113) | Hero-Score-Kachel, rot umkringelt: „INVESTOR SCORE" und die Zeile darunter — Gold auf Gold |
-| `Screenshot 2026-08-08 075210.png` | **5** | Handy-Kennzahlen: Kachel-Labels überlappen (`GESAMTINVESTITION`/`RESTSCHULD`, `BRUTTO-`/`NETTOMIETRENDITE`), Werte laufen aus der Kachel |
+| `Screenshot 2026-08-08 075210.png` | **4** | Handy-Kennzahlen: Kachel-Labels überlappen (`GESAMTINVESTITION`/`RESTSCHULD`, `BRUTTO-`/`NETTOMIETRENDITE`), Werte laufen aus der Kachel |
 
 Zu den übrigen offenen Punkten liegt **kein** Bild vor. Das ist kein
 Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
@@ -31,31 +31,7 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Die Branding-Einstellungen des Partners greifen nicht**
-   (Reseller/Whitelabel, `P-NN`/`W-NN`). Vier Befunde, die zusammengehören,
-   aber nicht dieselbe Ursache haben müssen:
-   - **Zu wenig Farben zur Auswahl.** Der Bereich bietet deutlich weniger
-     Regler als „Darstellung" — dort sechs Bereichsfarben (`--dpuv-*`,
-     v1102/v1103), im Partner-Abgleich 14 Werte (v1111). Erst
-     gegenüberstellen, was es wo gibt, dann entscheiden, was fehlt.
-   - **Einzeln geänderte Farben wirken nicht.** Der Kern des Punktes, ein
-     Defekt, kein Ausbau.
-   - **Erst nach dem Neuladen sieht man die Änderung.** Die `--wl-`Tokens
-     stehen in keinem `:root`; **nur `whitelabel-override.js` setzt sie**
-     (`setWlTokens` in `apply()`). Verdacht, noch zu belegen: das Speichern
-     schreibt den Wert, ruft aber `apply()` bzw. den Repaint nicht nach.
-     Zweite Spur: die **fünf `var()`-Fallen** (SVG-Attribute, Canvas,
-     Leaflet, jsPDF, Data-URIs) ziehen auch bei richtigem Token nicht mit,
-     sie brauchen einen echten Neuaufbau. Beides einzeln nachmessen.
-   - **Logo und Hintergrund lassen sich fürs Branding nicht ändern.**
-
-   **Rückfrage, ein Satz von dir genügt:** „das Logo darf nicht verändert
-   werden, auch nicht der Hintergrund" ist zweideutig. Ich habe es als
-   **Defekt** aufgenommen (beides *lässt sich* nicht ändern, soll es aber).
-   War es als **Regel** gemeint — für Partner gesperrt —, dreht sich der
-   Punkt um und wird zu einer Sperre, die zu prüfen statt zu beheben ist.
-
-2. **Das „×" oben links soll professioneller aussehen** (MA-Serie). Es
+1. **Das „×" oben links soll professioneller aussehen** (MA-Serie). Es
    schließt heute die Ansicht, wirkt aber wie ein Platzhalter. Kandidat aus
    der v652-Messung: `.dpm-x` — dasselbe Element sitzt auch im Bankexport
    und im Quick Check, also **erst zählen, wie oft es vorkommt**, dann
@@ -64,7 +40,7 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    `--wl-`Ebene führen, nicht hart golden. **Optikentscheidung →
    Demo-first**, zwei oder drei Fassungen zeigen.
 
-3. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
+2. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
    Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
    ein **Kettenbefund, kein Optikbefund**, und die Kette wird von hinten
    aufgerollt: was steht im Objekt (`objects.data`), was kommt beim
@@ -73,7 +49,7 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    füllen** — fehlt eine Angabe, gehört sie sichtbar als fehlend
    ausgewiesen.
 
-4. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+3. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -94,19 +70,32 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
    Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
 
-5. **Vollständiger Durchgang durch die Mobile-App** (MA-Serie). Marcels
+4. **Vollständiger Durchgang durch die Mobile-App** (MA-Serie). Marcels
    Rahmen um die Punkte davor: einmal komplett durch, jeder Bereich, jede
    Einstellung. Steht bewusst als eigener Punkt **nach** den Einzelfixes
    und prüft, was sonst noch auffällt. Die Handy-Sperre der Haupt-App
    bleibt dabei aktiv (v970 + MA35), sie wird nicht nebenbei aufgeweicht.
 
-6. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
+5. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
    `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
    v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
-   ist genau seine Voreinstellung. Gehört sachlich zu Punkt 1, ist aber
-   Ausbau und kein Defekt, deshalb dahinter.
+   ist genau seine Voreinstellung.
 
-7. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
+   **Hierher gehört auch „zu wenig Farben zur Auswahl"** — der vierte
+   Befund aus dem Branding-Punkt, der mit `v1114` nicht behoben wurde,
+   weil er kein Defekt ist. Gegenübergestellt (2026-08-08, gezählt):
+
+   | Oberfläche | Farben |
+   |---|---|
+   | Partner-Portal → Branding → Editor | **3** (Akzent, Header/Sidebar, Mail) |
+   | Darstellungs-Panel (eigene App) | **8** |
+   | Mandanten-Abgleich `darstellung-reseller.js` MAP | **10** Farbschlüssel von 18 Werten |
+
+   **Der Partner kann seinen Mandanten also längst zehn Farben vorgeben** —
+   nur nicht dort, wo er sein Branding einstellt. Es fehlt keine Funktion,
+   es sind **zwei Oberflächen für dieselbe Sache**. Genau das ist Weg B.
+
+6. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
    Der Rest von „Darstellung → Profil und Anzeige ist unvollständig",
    nachdem der Kontrastfehler mit `v1113` behoben ist. **Der Abgleich
    steht** (2026-08-08, im Panel gezählt): acht Farbfelder, davon **fünf
@@ -122,7 +111,7 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    Produktfrage: gibt der Regler die Farbe frei, oder nur innerhalb dessen,
    was noch trägt? **→ Demo bauen und zeigen, nicht raten.**
 
-8. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+7. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -136,7 +125,7 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
    kein Nachschlag.
 
-9. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+8. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
    kein Defekt — und ohne Vorlage im `design/`-Ordner wäre es geraten.
@@ -178,6 +167,107 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-08] **Die Branding-Einstellungen des Partners greifen nicht**
+  — `v1114` (`6f42ed1`)
+
+  **Marcels Rückfrage ist beantwortet:** „das Logo darf nicht verändert
+  werden" bezog sich auf das **DealPilot-Logo** — das bleibt. Beim
+  Partner-Branding *soll* getauscht werden. Also ein **Defekt**, wie
+  aufgenommen.
+
+  Gemessen im Partner-Konto mit vollständig eingerichtetem Whitelabel
+  (Akzent `#b33d29`, Obsidian `#141210`, Logo und Name in der DB).
+  **Drei Befunde, drei verschiedene Ursachen** — der Punkt hatte richtig
+  vermutet, dass sie nicht zusammengehören.
+
+  ### 1 · Der Akzent hielt 746 Millisekunden
+
+  Nicht gepollt, sondern `setProperty` mitgeschnitten:
+
+  ```
+  1089 ms  --gold=#b33d29      whitelabel-override.js:497  <- _ownerBoot
+  1096 ms  --obsidian=#141210  whitelabel-override.js:517  <- _ownerBoot
+  1835 ms  --gold=#C9A84C      config.js                   <- setTimeout(boot,1600)
+  ```
+
+  `applyTheme()` weiß nichts vom Whitelabel: `getTheme()` liest
+  `dp_theme_accent`, das Whitelabel liegt in der DB des Partners. Es setzte
+  deshalb Standard-Gold zurück.
+
+  **Sichtbare Folge und genau „einzeln geänderte Farben wirken nicht":**
+  ein **gemischter** Zustand. Die **443** vom Sweeper direkt angefassten
+  Elemente behalten die Partnerfarbe (er schreibt Literale), alles
+  Tokenbasierte fällt auf DealPilot-Gold zurück. `applyTheme()` übernimmt
+  jetzt den Sweeper-Akzent, wenn er aktiv ist — `isActive()` und
+  `accent()` gab es bereits.
+
+  ### 2 · „Erst nach dem Neuladen" — es fehlte der halbe Datensatz
+
+  Die Vermutung des Punktes (Speichern ruft `apply()` nicht nach) ist
+  **widerlegt**: `apply()` wird gerufen, nur mit zwei von fünf Werten.
+
+  | Aufruf | accent | hi/lo | obsidian | name | logo |
+  |---|---|---|---|---|---|
+  | `mandant-branding.js:57` · `:240` · `_ownerBoot` | ✓ | ✓ | ✓ | ✓ | ✓ |
+  | **`_applyPreview()`** | ✓ | — | ✓ | **—** | **—** |
+
+  Gemessen: nach dem Speichern **0** ersetzte Wortmarken und das alte
+  Logo; nach dem Neuladen beides da — weil dann `_ownerBoot` mit dem
+  vollständigen Satz läuft. Derselbe Fehlertyp wie v1096b: zwei Wege,
+  einer unvollständig. Die zweite Spur des Punktes (die fünf
+  `var()`-Fallen) war **nicht** die Ursache.
+
+  ### 3 · `var(--obsidian)` liest niemand
+
+  **0 Treffer** in `style.css`, **0** in `ui-varianten.css`. Den Namen
+  benutzen nur eigenständige Seiten mit eigenem `:root` —
+  `mobile-demo.html`, `pass.html`, `landing/api-docs.html`. Der Sweeper
+  setzt das Token seit jeher, gelesen hat es nie jemand. Der Regler heißt
+  im Editor wörtlich **„Header & Sidebar-Fläche"** und bewegte weder
+  Header noch Sidebar.
+
+  Die Flächen lesen bereits Tokens (`aside.sidebar` → `var(--dp-s0)`,
+  `.main-col > header.hdr` → `var(--dp-s1)`); nur `nav.tabs` trägt ein
+  hartes `rgb(10,8,5)` bei (0,3,2). Deshalb **chirurgisch die drei
+  Flächen**, statt `--dp-s0`/`--dp-s1` global umzubiegen — die hängen an
+  über zwanzig weiteren Stellen.
+
+  ### Nachgemessen
+
+  | | vorher | nachher |
+  |---|---|---|
+  | Akzent nach 6 s | `#C9A84C` | **`#b33d29`** |
+  | Sidebar | `rgb(0,0,0)` | **`rgb(20,18,16)`** = `#141210` |
+  | Tab-Leiste | `rgb(10,8,5)` | **`rgb(29,27,26)`** |
+  | Kopf-Verlauf | `rgb(10,8,5)→#000` | **`rgb(29,27,26)→rgb(8,7,6)`** |
+  | Logo / Wortmarken | nein / 0 | **ja / 2** |
+
+  **Ohne Whitelabel bitgenau unverändert** (die wichtigere Probe):
+  Sidebar `rgb(0,0,0)`, Tabs `rgb(10,8,5)`, Kopf
+  `linear-gradient(rgb(10,8,5) 0%, rgb(0,0,0) 100%)`, Akzent `#C9A84C`.
+  Die Fallbacks im CSS sind genau diese abgelesenen Werte.
+
+  **Ohne Neuladen, ein Klick auf den Vorschau-Haken:** Gold, Logo,
+  **2** Wortmarken und der Hintergrund kommen gleichzeitig. Vorher kam nur
+  Gold, und das auch nur für 746 ms.
+
+  **Grenze, ehrlich benannt:** Der Hintergrund wirkt nur **ohne Vorlage**.
+  Unter einer Vorlage bestimmt `--uv-chrome` die Fläche („die Vorlage
+  bestimmt die Fläche", v1096) — nachgemessen unter `kontor`: alle drei
+  Flächen weiß, Partner-Akzent bleibt. Ein dunkler Partner-Hintergrund
+  unter einer hellen Vorlage wäre ein Bruch, kein Branding.
+
+  **Nicht behoben, weil kein Defekt:** „zu wenig Farben zur Auswahl". Die
+  Gegenüberstellung steht jetzt bei Punkt 5 (Partner-Flow B) — der Partner
+  kann seinen Mandanten längst **zehn** Farben vorgeben, nur nicht dort,
+  wo er sein Branding einstellt.
+
+  **Nicht prüfbar, ehrlich vermerkt:** der Name-Pfad des Sweepers. Im
+  Testkonto liegt ein Logo, und das Bild schlägt den Namen — die zwei
+  Wortmarken werden durch das Logo ersetzt, nicht durch Text. Das ist
+  gewolltes Verhalten; ein Konto ohne Logo wäre nötig, um den Textweg zu
+  sehen.
 
 - [2026-08-08] **Gold auf Gold in der Score-Karte** — `v1113` bis `v1113f`
   (`2fdcb10`, `3e9e78d`, `161d116`, `f3a6b01`, `6f60f25`, `c06e2c2`)
