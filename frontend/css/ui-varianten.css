@@ -2246,7 +2246,19 @@ body.dp-chrome-hell #hdr-badges .sc-pill-sub {
    oben: (1,1,2) gegen (1,2,1). Ist die Karte golden, gewinnen die dunklen
    Toene; ist sie dunkel, greift diese Regel. */
 html body #hdr-badges .sc-l,
-html body #hdr-badges .sc-tip,
-html body #hdr-badges .sc-pill-v {
+html body #hdr-badges .sc-tip {
+  color: var(--uv-sc-akz, var(--gold)) !important;
+}
+
+/* EIGENER FEHLER, ZURUECKGENOMMEN (v1113f):
+   .sc-pill-v stand in der Regel oben mit drin. Falsch — ich hatte es nach
+   der konsole-Messung als "auf dunklem Grund" eingeordnet. Unter den
+   HELLEN Vorlagen sitzen die KPI-Pillen aber auf WEISS, nicht auf der
+   Markenflaeche. Gemessen hat v1113e damit fuenf Stellen von "traegt" auf
+   2,29 verschlechtert — ein Rueckschritt, den erst der Vorher/Nachher-Lauf
+   in kontor gezeigt hat.
+   Die Regel gilt deshalb nur ausserhalb des Hell-Skins. Kein :not() auf
+   einer ID (CLAUDE.md), nur auf der Skin-Klasse. */
+html body:not(.dp-chrome-hell) #hdr-badges .sc-pill-v {
   color: var(--uv-sc-akz, var(--gold)) !important;
 }
