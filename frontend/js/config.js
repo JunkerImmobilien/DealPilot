@@ -1065,6 +1065,11 @@ window.Plan = {
        neutral abgedunkelt — Weiss hat in OKLab a=b=0, der Ton bleibt also
        neutral und nimmt keinen Markenstich an. */
     r.setProperty('--uv-sc-txt', tonAufMarke(t.accent, '#ffffff', 7.0));
+    /* Und die Gegenrichtung: Markenakzent auf DUNKLEM Grund (konsole und
+       "ohne Vorlage" — dort ist die Score-Karte nicht golden). Gerechnet
+       gegen _GRUND_DUNKEL wie TR9. Standard-Gold und Hellgelb erfuellen die
+       Schwelle bereits und kommen bitgenau unveraendert heraus. */
+    r.setProperty('--uv-sc-akz', tonFuerGrund(t.accent, _GRUND_DUNKEL, 4.5));
     if(document.body) document.body.setAttribute('data-dp-skin', t.skin);
     if(typeof window._dpApplyThemeVars === 'function'){ try{ window._dpApplyThemeVars(); }catch(e){} }
     try{ /*v911-logo-swap*/

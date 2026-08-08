@@ -2230,3 +2230,23 @@ body.dp-chrome-hell #hdr-badges .sc-pill-l {
 body.dp-chrome-hell #hdr-badges .sc-pill-sub {
   color: #7d766a !important;
 }
+
+/* v1113e · Die GEGENRICHTUNG: Markenakzent auf dunklem Grund.
+   In der Rot-Gegenprobe OHNE Hell-Skin gemessen (konsole und "ohne
+   Vorlage"): .sc-l 1,93 / 2,28 · .sc-tip 2,86 · .sc-pill-v 2,86. Dort ist
+   die Score-Karte nicht golden, die drei lesen aber var(--gold) direkt —
+   ein dunkler Akzent auf dunklem Grund.
+
+   --uv-sc-akz zieht den Akzent gegen den dunklen Grund nach (dieselbe
+   Rechnung wie TR9). NACHGEMESSEN, dass die Hausmarke unberuehrt bleibt:
+   Standard-Gold #C9A84C -> #c9a84c, Hellgelb #F0D000 -> #f0d000, beide
+   bitgenau unveraendert. Nur Partner-Rot wandert (#7B2D3B -> #c36d78).
+
+   Die Spezifitaet ist ABSICHTLICH niedriger als die der Hell-Skin-Regeln
+   oben: (1,1,2) gegen (1,2,1). Ist die Karte golden, gewinnen die dunklen
+   Toene; ist sie dunkel, greift diese Regel. */
+html body #hdr-badges .sc-l,
+html body #hdr-badges .sc-tip,
+html body #hdr-badges .sc-pill-v {
+  color: var(--uv-sc-akz, var(--gold)) !important;
+}

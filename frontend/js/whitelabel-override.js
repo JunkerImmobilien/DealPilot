@@ -414,7 +414,7 @@
     try {
       var r = document.documentElement.style;
       ['--gold','--gold-hi','--gold-lo','--gold-l','--gold-2','--gold-3','--gold-bg','--gold-d','--gold-soft','--obsidian',
-       '--uv-sc-ink','--uv-sc-mut','--uv-sc-ok','--uv-sc-txt']   /* v1113 */
+       '--uv-sc-ink','--uv-sc-mut','--uv-sc-ok','--uv-sc-txt','--uv-sc-akz']   /* v1113 */
         .forEach(function (v) { r.removeProperty(v); });
       clearWlTokens(r);
     } catch (e) {}
@@ -466,6 +466,14 @@
       var v = _tonMarke(akzent, paare[i][1], paare[i][2]);
       if (v) r.setProperty(paare[i][0], v);
     }
+    /* Gegenrichtung: Markenakzent auf DUNKLEM Grund (konsole / ohne
+       Vorlage). Standard-Gold und Hellgelb kommen unveraendert heraus. */
+    try {
+      if (window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.tonFuerGrund) {
+        r.setProperty('--uv-sc-akz',
+          DealPilotConfig.branding.tonFuerGrund(akzent, [26, 29, 34], 4.5));
+      }
+    } catch (e) {}
   }
 
   function apply(b) {
