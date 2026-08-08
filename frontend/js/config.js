@@ -1060,6 +1060,11 @@ window.Plan = {
     r.setProperty('--uv-sc-ink', tonAufMarke(t.accent, t.accent,  4.5));
     r.setProperty('--uv-sc-mut', tonAufMarke(t.accent, '#a8a299', 4.0));
     r.setProperty('--uv-sc-ok',  tonAufMarke(t.accent, '#3FA56C', 4.0));
+    /* Der Hauptwert der Karte. Start Weiss und Schwelle 7: auf einer
+       dunklen Markenflaeche bleibt Weiss stehen, auf einer hellen wird es
+       neutral abgedunkelt — Weiss hat in OKLab a=b=0, der Ton bleibt also
+       neutral und nimmt keinen Markenstich an. */
+    r.setProperty('--uv-sc-txt', tonAufMarke(t.accent, '#ffffff', 7.0));
     if(document.body) document.body.setAttribute('data-dp-skin', t.skin);
     if(typeof window._dpApplyThemeVars === 'function'){ try{ window._dpApplyThemeVars(); }catch(e){} }
     try{ /*v911-logo-swap*/

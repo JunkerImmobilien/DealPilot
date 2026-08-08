@@ -2201,6 +2201,16 @@ body.dp-chrome-hell #hdr-badges .sc-tip {
   color: var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06)) !important;
 }
 
+/* .sc-v ist der Hauptwert der Karte ("Gute Bewertung"). Bei Standard-Gold
+   trug er (der Hell-Skin setzt ihn dunkel), aber die Gegenprobe mit
+   Partner-Rot #7B2D3B zeigte k = 2,28: dort ist die Markenflaeche DUNKEL,
+   der Text blieb trotzdem dunkel. Deshalb auch hier ueber die Ableitung,
+   mit neutralem Start (Weiss) und Schwelle 7 — der prominenteste Text der
+   Karte soll nicht nur knapp bestehen. */
+body.dp-chrome-hell #hdr-badges .sc-v {
+  color: var(--uv-sc-txt, #1c1a17) !important;
+}
+
 /* .sc-investor-badge — der Fall aus der GEGENRICHTUNG, in "konsole"
    gemessen: k = 1,93, heller Text rgb(230,232,234) auf goldener Pille.
    Gewinner war "#hdr-badges .sc-investor-badge{color:var(--ch)}" — also

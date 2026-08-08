@@ -414,7 +414,7 @@
     try {
       var r = document.documentElement.style;
       ['--gold','--gold-hi','--gold-lo','--gold-l','--gold-2','--gold-3','--gold-bg','--gold-d','--gold-soft','--obsidian',
-       '--uv-sc-ink','--uv-sc-mut','--uv-sc-ok']   /* v1113 */
+       '--uv-sc-ink','--uv-sc-mut','--uv-sc-ok','--uv-sc-txt']   /* v1113 */
         .forEach(function (v) { r.removeProperty(v); });
       clearWlTokens(r);
     } catch (e) {}
@@ -458,8 +458,9 @@
     var paare = [
       ['--uv-sc-ink', akzent,    4.5],   /* Label in Markenrolle (.sc-l) */
       ['--uv-sc-mut', '#a8a299', 4.0],   /* gedaempfte Zeile (.sc-sub)   */
-      ['--uv-sc-ok',  '#3FA56C', 4.0]    /* Statusgruen (.sc-grade) — bleibt
+      ['--uv-sc-ok',  '#3FA56C', 4.0],   /* Statusgruen (.sc-grade) — bleibt
                                             Gruen, nur die Helligkeit wandert */
+      ['--uv-sc-txt', '#ffffff', 7.0]    /* Hauptwert (.sc-v), neutral */
     ];
     for (var i = 0; i < paare.length; i++) {
       var v = _tonMarke(akzent, paare[i][1], paare[i][2]);
