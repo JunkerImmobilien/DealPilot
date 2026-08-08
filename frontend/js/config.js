@@ -1037,7 +1037,38 @@ window.Plan = {
 
   function applyTheme(){
     var t = getTheme(), r = document.documentElement.style;
-    var _gd = (String(t.accent).toLowerCase() === '#c9a84c'); /*v908-goldfam*/
+    /* ═══════════════════════════════════════════════════════════════════
+       v1114 · Ein aktives Whitelabel darf hier NICHT ueberschrieben werden.
+
+       GEMESSEN (Mitschnitt auf setProperty, Partner-Konto mit Akzent
+       #b33d29):
+         1089 ms  --gold=#b33d29   whitelabel-override.js:497 <- _ownerBoot
+         1096 ms  --obsidian=…     whitelabel-override.js:517 <- _ownerBoot
+         1835 ms  --gold=#C9A84C   config.js  <- setTimeout(boot,1600)
+
+       applyTheme() weiss nichts vom Whitelabel: getTheme() liest
+       dp_theme_accent, das Whitelabel liegt aber in der DB des Partners.
+       Es setzte deshalb 746 ms nach dem Sweeper wieder Standard-Gold.
+
+       Sichtbare Folge und genau Marcels Befund "einzeln geaenderte Farben
+       wirken nicht": ein GEMISCHTER Zustand. Die 443 vom Sweeper direkt
+       angefassten Elemente behalten die Partnerfarbe (er schreibt
+       Literale), alles Tokenbasierte faellt auf DealPilot-Gold zurueck.
+
+       Der Akzent-Teil wird deshalb uebersprungen, sobald der Sweeper aktiv
+       ist. Alles andere in dieser Funktion (Skin-Attribut, Logo-Tausch,
+       die v1113-Markentoene) laeuft weiter — die haengen an --gold, das
+       dann eben das Whitelabel-Gold ist. */
+    var _wlAktiv = false;
+    try { _wlAktiv = !!(window.DealPilotWhitelabel && DealPilotWhitelabel.isActive()); } catch(e){}
+    if(_wlAktiv){
+      var _wlAcc = null;
+      try { _wlAcc = DealPilotWhitelabel.accent(); } catch(e){}
+      if(_wlAcc) t = { skin: t.skin, accent: _wlAcc,
+                       accentHi: _lighten(_wlAcc,22), accentLo: _darken(_wlAcc,16),
+                       obsidian: t.obsidian, _wl: true };
+    }
+    var _gd = (!t._wl) && (String(t.accent).toLowerCase() === '#c9a84c'); /*v908-goldfam*/
     if(_gd){
       r.setProperty('--gold','#C9A84C'); r.setProperty('--gold-hi','#E8CC7A'); r.setProperty('--gold-lo','#b8932f');
       r.setProperty('--gold-l','#E2C97E'); r.setProperty('--gold-2','#E8C964'); r.setProperty('--gold-3','#9a7f33'); r.setProperty('--gold-bg','#FAF5E8');

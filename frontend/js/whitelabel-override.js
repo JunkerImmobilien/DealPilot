@@ -414,7 +414,8 @@
     try {
       var r = document.documentElement.style;
       ['--gold','--gold-hi','--gold-lo','--gold-l','--gold-2','--gold-3','--gold-bg','--gold-d','--gold-soft','--obsidian',
-       '--uv-sc-ink','--uv-sc-mut','--uv-sc-ok','--uv-sc-txt','--uv-sc-akz']   /* v1113 */
+       '--uv-sc-ink','--uv-sc-mut','--uv-sc-ok','--uv-sc-txt','--uv-sc-akz',   /* v1113 */
+       '--wl-obs-hi','--wl-obs-lo']                                            /* v1114 */
         .forEach(function (v) { r.removeProperty(v); });
       clearWlTokens(r);
     } catch (e) {}
@@ -514,7 +515,15 @@
     r.setProperty('--gold-soft', _lighten(_acc, 82));
     _setzeMarkentoene(r, _acc);   /* v1113 */
     setWlTokens(r);
-    if (_obs) r.setProperty('--obsidian', _obs);
+    if (_obs) {
+      r.setProperty('--obsidian', _obs);
+      /* v1114: die zwei Toene, die die Chrome-Flaechen brauchen. Der Kopf
+         traegt einen Verlauf (heute rgb(10,8,5) -> #000), die Tab-Leiste
+         den helleren der beiden. Aus --obsidian abgeleitet, damit die
+         Abstufung erhalten bleibt statt alle drei Flaechen einzuebnen. */
+      r.setProperty('--wl-obs-hi', _lighten(_obs, 4));
+      r.setProperty('--wl-obs-lo', _darken(_obs, 60));
+    }
 
     sweep();
     _watch();

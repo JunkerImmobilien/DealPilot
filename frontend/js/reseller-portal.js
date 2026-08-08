@@ -812,6 +812,17 @@ if (!window._pdfGold) {
   /* W7-livepreview: las vorher das beim Tab-Oeffnen geladene Objekt -> ein
      Farbwechsel im Waehler kam nie an (W6-Bug). Jetzt LIVE aus dem Formular. */
   function _previewOn() { var el = $('rp-b-prev'); return !!(el && el.checked); }
+  /* v1114: reichte NUR accent und obsidian durch — von fuenf Werten zwei.
+     Die drei anderen Aufrufer derselben API geben alles mit
+     (mandant-branding.js:57 und :240, _ownerBoot unten in dieser Datei).
+
+     GEMESSEN, Partner-Konto mit gespeichertem Logo und Namen: nach
+     "Branding speichern" blieb die Wortmarke DealPilot und das Logo das
+     alte (0 ersetzte Wortmarken, Logo keine Data-URI). Nach dem NEULADEN
+     kam beides — weil dann _ownerBoot mit dem vollstaendigen Satz laeuft.
+     Das ist Marcels "erst nach dem Neuladen sieht man die Aenderung": es
+     fehlt nicht der Repaint, es fehlt der halbe Datensatz. Derselbe
+     Fehlertyp wie v1096b — zwei Wege, einer unvollstaendig. */
   function _applyPreview() {
     try {
       if (!window.DealPilotWhitelabel) return;
@@ -820,7 +831,9 @@ if (!window._pdfGold) {
       var obs = _v('rp-b-obsidian');
       window.DealPilotWhitelabel.apply({
         accent: acc,
-        obsidian: /^#[0-9a-fA-F]{6}$/.test(obs) ? obs : null
+        obsidian: /^#[0-9a-fA-F]{6}$/.test(obs) ? obs : null,
+        name: _v('rp-b-name') || '',
+        logo: _currentLogo() || ''
       });
     } catch (e) {}
   }

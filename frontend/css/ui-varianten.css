@@ -2262,3 +2262,48 @@ html body #hdr-badges .sc-tip {
 html body:not(.dp-chrome-hell) #hdr-badges .sc-pill-v {
   color: var(--uv-sc-akz, var(--gold)) !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1114 · Der Partner-Regler "Header & Sidebar-Fläche" bewegt nichts.
+
+   GEMESSEN (Partner-Konto, Whitelabel aktiv, Obsidian #2E4A7D gesetzt):
+     --gold      #C9A84C -> #7B2D3B   der Akzent WIRKT
+     --obsidian  (leer)  -> #2E4A7D   das Token STEHT
+     header.hdr / aside.sidebar / nav.tabs   BITGENAU UNVERAENDERT
+
+   URSACHE: "var(--obsidian)" kommt in der ganzen App in KEINER einzigen
+   CSS-Regel vor (style.css 0 Treffer, ui-varianten.css 0 Treffer). Nur
+   eigenstaendige Seiten mit eigenem :root benutzen den Namen —
+   mobile-demo.html, pass.html, landing/api-docs.html. Der Sweeper setzt
+   das Token seit jeher (whitelabel-override.js:517), gelesen hat es nie
+   jemand. Der Regler heisst im Editor woertlich "Header & Sidebar-Fläche".
+
+   Die Flaechen selbst lesen bereits Tokens — aside.sidebar var(--dp-s0),
+   .main-col > header.hdr var(--dp-s1) —, nur nav.tabs traegt ein hartes
+   rgb(10,8,5) bei (0,3,2). Deshalb hier chirurgisch die drei Flaechen
+   statt --dp-s0/--dp-s1 global umzubiegen: die beiden haengen an ueber
+   zwanzig weiteren Stellen.
+
+   DIE FALLBACKS SIND DIE HEUTIGEN WERTE, gemessen abgelesen:
+   Sidebar #000000, Tabs rgb(10,8,5), Header-Verlauf rgb(10,8,5)->#000.
+   Ohne Whitelabel ist damit bitgenau nichts geaendert.
+
+   GRENZE, ehrlich benannt: das wirkt nur OHNE Vorlage. Unter einer
+   Vorlage sind diese Flaechen hell und --uv-chrome bestimmt sie — "die
+   Vorlage bestimmt die Flaeche" (v1096). Ein dunkler Partner-Hintergrund
+   unter einer hellen Vorlage waere ein Bruch, kein Branding. */
+html:not([data-ui-theme]) body aside.sidebar,
+html:not([data-ui-theme]) body #sidebar.sidebar {
+  background: var(--obsidian, #000000) !important;
+}
+/* (0,3,3) gegen den Nachbarschafts-Selektor header.hdr.has-v64-score +
+   nav.tabs (0,3,2) — eine Stelle mehr, sonst gewinnt das Literal. */
+html:not([data-ui-theme]) body nav.tabs,
+html:not([data-ui-theme]) body header.hdr.has-v64-score + nav.tabs,
+html:not([data-ui-theme]) body header.hdr.has-v64-score + nav.tabs.tabs {
+  background: var(--wl-obs-hi, #0a0805) !important;
+}
+html:not([data-ui-theme]) body .main-col > header.hdr {
+  background: linear-gradient(var(--wl-obs-hi, #0a0805) 0%, var(--wl-obs-lo, #000000) 100%) !important;
+}
