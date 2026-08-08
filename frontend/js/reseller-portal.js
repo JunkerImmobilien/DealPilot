@@ -117,7 +117,32 @@ if (!window._pdfGold) {
       '.rp-foot{background:#FAF7F0;border-top:1px solid #e6e0d4;padding:12px 28px;display:flex;align-items:center;gap:12px}',
       '.rp-foot .st{font-size:12px;color:#6f685d;display:flex;align-items:center;gap:8px}.rp-foot .st .d{width:8px;height:8px;border-radius:50%;background:#3FA56C}',
       '.rp-foot .close{margin-left:auto;border:1px solid #e6e0d4;background:#fff;font:600 13px Inter;padding:9px 18px;border-radius:9px;cursor:pointer}',
-      '.rp-sec{display:none}.rp-sec.on{display:block}'
+      '.rp-sec{display:none}.rp-sec.on{display:block}',
+      /* v1112b-rp-mobile: Diese Datei hatte KEINE einzige Media-Query — das
+         Partner-Portal war nie fuer das Handy gebaut. Gemessen bei 370 px:
+         .rp-ov traegt padding:22px und align-items:center, .rp-modal hat
+         width:100% mit flex-shrink:1 -> 325,6 px statt 370. Im .rp-body
+         (flex-row) haelt .rp-side ihre festen 238 px mit flex-shrink:0,
+         fuer .rp-work bleiben 86 px: der Text bricht auf EIN Wort je Zeile,
+         Zahlen laufen aus der Kachel. Derselbe Sachverhalt wie v1112 im
+         Einstellungs-Modal, nur ein anderes Modal.
+         Fix: Vollbild, Navigation als waagerecht scrollbare Leiste oben,
+         Arbeitsflaeche darunter ueber die volle Breite. 44-px-Trefferflaeche
+         aus v650/v652 gehalten. */
+      '@media (max-width:768px){',
+      '  .rp-ov{padding:0!important;align-items:stretch!important;justify-content:stretch!important}',
+      '  .rp-modal{width:100%!important;max-width:100%!important;max-height:100dvh!important;height:100dvh!important;border-radius:0!important;border:none!important;flex:1 1 auto!important}',
+      '  .rp-hero{padding:14px 16px!important}',
+      '  .rp-hero h1{font-size:22px!important}',
+      '  .rp-bar{padding:12px 16px!important}',
+      '  .rp-body{flex-direction:column!important}',
+      '  .rp-side{width:100%!important;flex:0 0 auto!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;padding:8px 10px!important;gap:6px!important;-webkit-overflow-scrolling:touch}',
+      '  .rp-nav{width:auto!important;flex:0 0 auto!important;min-width:44px!important;min-height:44px!important;white-space:nowrap!important;margin-bottom:0!important;padding:9px 12px!important}',
+      '  .rp-nav .s{display:none!important}',
+      '  .rp-nav.on{box-shadow:inset 0 -2px 0 #C9A84C!important}',
+      '  .rp-work{flex:1 1 auto!important;min-height:0!important;padding:18px 16px!important}',
+      '  .rp-foot{padding:10px 16px!important}',
+      '}'
     ].join('\n');
     document.head.appendChild(st);
   }
