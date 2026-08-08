@@ -31,43 +31,13 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Das „×" oben links soll professioneller aussehen** (MA-Serie). Es
-   schließt heute die Ansicht, wirkt aber wie ein Platzhalter. Beim Neubau
-   die 44-px-Trefferfläche halten, die v650/v652 hergestellt haben, und die
-   Farbe über die `--wl-`Ebene führen, nicht hart golden.
-
-   **BLOCKIERT: Die Demo steht, es fehlt Marcels Auswahl.**
-   `v1115` (`a1f3d4e`) →
-   `/demo-close-v1115.html` auf Staging. Zu beantworten: welcher der sechs
-   Ist-Knöpfe ist gemeint, welche Fassung (A Ring / B Kachel / C
-   Cockpit-Schalter), und nur dort tauschen oder überall.
-
-   **Gemessen 2026-08-08, drei Annahmen des Punktes korrigiert:**
-
-   - `.dpm-x` wird an **einer** Stelle gebaut — `DP_BAR()`,
-     `js/storage.js:2190` — und **zweimal** gerufen: **Bankexport** und
-     **Track Record**. **Nicht** im Quick Check. „Eine Datei, zwei Stellen"
-     trägt also, nur die zweite Stelle ist eine andere.
-   - `.auth-close` und `.gv-close` stehen in der v652-Regel in `style.css`,
-     werden im Frontend aber von **niemandem** mehr erzeugt. Tote Selektoren.
-   - **„oben links" ließ sich nicht bestätigen.** Kein einziger der Knöpfe
-     ist per CSS links positioniert — alle sitzen rechts, über
-     `margin-left:auto` oder `right:`. Die Handy-Vorlage
-     `dp-handy-mockup-v2.html` hat gar keinen. Deshalb die Rückfrage.
-
-   **Der eigentliche Befund ist größer als der Punkt:** die App hat
-   **25 Schließen-Knöpfe** mit 25 Klassennamen in **sechs Bauarten** — SVG
-   im Kreis (`.dpm-x`, 30 px), SVG in Goldkachel (`.dp-band-close`, 28 px,
-   Einstellungen und Hilfe), heller Kreis (`.dp-legal-close`, 32 px) und
-   **drei nackte Text-×** ohne Fläche und ohne Rahmen (`.bdg-brand .x`
-   24 px `#8a8a90`, `.bi-x` 22 px, `.dpshp-x` 22 px). **Genau die drei sind
-   der Platzhalter-Eindruck** — ein Schriftzeichen sieht nicht nach Knopf
-   aus, weil es keiner ist.
-
-   **Empfehlung:** Fassung **B**, weil sie in Einstellungen und Hilfe schon
-   steht und damit nach innen vereinheitlicht — und **zuerst nur die drei
-   nackten Text-×**. Alle 25 wären ein eigenes Paket über 20 Dateien mit
-   eigener Prüfstrecke.
+1. **Browser-Abnahme des Schließen-Knopfs** — der Rest von `v1116`.
+   Der Umbau steht und ist ausgerollt, **im Browser nachgemessen wurde er
+   nicht**: die Chrome-Erweiterung war in der Sitzung nicht verbunden.
+   Anzusehen sind die sieben Stellen: Bankexport, Track Record,
+   Boarding-Skin, Beleg-Import, Score-Hero (zwei Modale), QuickBoarding-
+   Teilen (der auf Gold) und die Einstellungen (dort nur 28→32 px).
+   Vorher **Strg+Shift+R** — sechs Cache-Buster sind hochgezogen.
 
 2. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
    Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
@@ -196,6 +166,62 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-08] **Das „×" soll professioneller aussehen** — `v1115` Demo
+  (`a1f3d4e`), `v1116` Umbau (`b261653`).
+  **Die Browser-Abnahme steht noch aus und ist Punkt 1.**
+
+  ### Drei Annahmen des Punktes waren falsch
+
+  - `.dpm-x` wird an **einer** Stelle gebaut — `DP_BAR()`,
+    `js/storage.js:2190` — und **zweimal** gerufen: **Bankexport** und
+    **Track Record**. **Nicht** im Quick Check. „Eine Datei, zwei Stellen"
+    trägt also, nur die zweite Stelle ist eine andere.
+  - `.auth-close` und `.gv-close` stehen in der v652-Regel in `style.css`,
+    werden im Frontend aber von **niemandem** mehr erzeugt. Tote Selektoren.
+  - **„oben links" ließ sich nicht bestätigen.** Kein einziger Knopf ist
+    per CSS links positioniert — alle sitzen rechts, über
+    `margin-left:auto` oder `right:`. Die Handy-Vorlage
+    `dp-handy-mockup-v2.html` hat gar keinen.
+
+  ### Der Befund war größer als der Punkt
+
+  Die App hatte **25 Schließen-Knöpfe** mit 25 Klassennamen in **sechs
+  Bauarten**. Der Platzhalter-Eindruck kam von **fünf nackten Text-×**
+  ohne Fläche und ohne Rahmen — ein Schriftzeichen sieht nicht nach Knopf
+  aus, weil es keiner ist.
+
+  ### Umgesetzt: Fassung B (Marcels Auswahl aus der Demo)
+
+  | Klasse | Datei | war | Grund |
+  |---|---|---|---|
+  | `.dpshm-x` | `dpsh-score-hero.js` | 24 px `#9a9488` | `#070707` |
+  | `.dpshp-x` | `dpsh-score-hero.js` | 22 px `#8a8378` | `#070707` |
+  | `.bdg-brand .x` | `modal-boarding-skin.js` | 24 px `#8a8a90` | `#070707` |
+  | `.bi-x` | `beleg-import.js` | 22 px `#fff` | `#141414` |
+  | `.qbs-h .x` | `quick-boarding-share.js` | 20 px `#5a4a14` | **Gold** |
+  | `.dpm-x` | `storage.js` | 30-px-Ring | `#070707` |
+
+  Alle sechs jetzt 32×32, Radius 9, `#17130d`, 1,5 px Goldkante über die
+  `--wl-`Ebene, SVG-× 15 px statt Schriftzeichen, **44-px-Trefferfläche
+  per `::after`** (bisher nur unter 768 px aus v652) und `:active`-Scale.
+
+  `.qbs-h .x` ist die **einzige** Stelle auf Gold-Verlauf — eine Goldkante
+  wäre dort unsichtbar, deshalb dieselbe Kachel mit **dunkler** Kante.
+  Form, Größe und Trefferfläche bleiben identisch.
+
+  Dazu `.dp-band-close` (Einstellungen, Hilfe): war bereits Bauart B, nur
+  28 px. Auf 32/9/15 nachgezogen, Goldkante von nacktem `rgba()` auf die
+  `--wl-`Ebene. `transform:none` bleibt (sichert v843) — diese eine Stelle
+  trägt deshalb bewusst kein `:active`-Scale.
+
+  **Bewusst ausgelassen:** `.dp-legal-close` (Rechtstexte, heller Kreis auf
+  hellem Grund — kein Platzhalter, eigener Kontext) und `.bmfmo-close-top`
+  (das BMF-Modal steht unter „Nicht anfassen"). Beide bleiben damit
+  abweichend; wenn sie mit sollen, ist das ein Nachschlag.
+
+  `node --check` auf allen fünf JS-Dateien: **OK** (auf dem Staging-Host,
+  lokal ist kein Node installiert).
 
 - [2026-08-08] **Die Branding-Einstellungen des Partners greifen nicht**
   — `v1114` (`6f42ed1`)
