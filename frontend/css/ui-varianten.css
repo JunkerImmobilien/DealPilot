@@ -2200,6 +2200,19 @@ body.dp-chrome-hell #hdr-badges .sc-grade {
 body.dp-chrome-hell #hdr-badges .sc-tip {
   color: var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06)) !important;
 }
+
+/* .sc-investor-badge — der Fall aus der GEGENRICHTUNG, in "konsole"
+   gemessen: k = 1,93, heller Text rgb(230,232,234) auf goldener Pille.
+   Gewinner war "#hdr-badges .sc-investor-badge{color:var(--ch)}" — also
+   erneut --ch, die Falle aus CLAUDE.md und v1099b. Die Pille ist in JEDER
+   Fassung golden, --ch schaltet aber mit der Vorlage mit: in konsole wird
+   heller Text auf eine goldene Flaeche gesetzt.
+   Deshalb hier OHNE Skin-Bedingung, fuer alle sechs Fassungen. Gemessen
+   aendert das den funktionierenden Zustand praktisch nicht (ohne Vorlage
+   6,24 -> 6,07), beseitigt aber die Vorlagenabhaengigkeit ganz. */
+html body #hdr-badges .sc-investor-badge {
+  color: var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06)) !important;
+}
 /* Die weissen KPI-Pillen — unabhaengig von der Marke. */
 body.dp-chrome-hell #hdr-badges .sc-pill-l {
   color: #6f685d !important;
