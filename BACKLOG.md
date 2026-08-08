@@ -22,30 +22,16 @@ Screenshots ohne Bezug. Zugeordnet:
 | Datei | Punkt | was darauf zu sehen ist |
 |---|---|---|
 | `Screenshot 2026-08-08 075255.png` | **erledigt** (v1112) | Einstellungen bei Handybreite: 12 Reiter hochkant nebeneinander, Inhaltsfläche leer |
-| `Screenshot 2026-08-06 144507.png` | **1** | Hero-Score-Kachel, rot umkringelt: „INVESTOR SCORE" und die Zeile darunter — Gold auf Gold |
-| `Screenshot 2026-08-08 075210.png` | **6** | Handy-Kennzahlen: Kachel-Labels überlappen (`GESAMTINVESTITION`/`RESTSCHULD`, `BRUTTO-`/`NETTOMIETRENDITE`), Werte laufen aus der Kachel |
+| `Screenshot 2026-08-06 144507.png` | **erledigt** (v1113) | Hero-Score-Kachel, rot umkringelt: „INVESTOR SCORE" und die Zeile darunter — Gold auf Gold |
+| `Screenshot 2026-08-08 075210.png` | **5** | Handy-Kennzahlen: Kachel-Labels überlappen (`GESAMTINVESTITION`/`RESTSCHULD`, `BRUTTO-`/`NETTOMIETRENDITE`), Werte laufen aus der Kachel |
 
-Zu den Punkten 2–5 liegt **kein** Bild vor. Das ist kein Mangel — es sind
-Ketten- und Funktionsbefunde, keine Optikbefunde.
+Zu den übrigen offenen Punkten liegt **kein** Bild vor. Das ist kein
+Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
 
 ---
 ## Offen
 
-1. **„Darstellung → Profil und Anzeige" ist unvollständig — Gold auf Gold.**
-   Nicht alle Reiter, Farben und Texte sind änderbar bzw. überhaupt
-   aufgeführt. Marcels Beispiel aus dem Bild: **die Schriftfarbe lässt sich
-   nicht setzen**, dadurch steht goldener Text auf goldenem Grund. Zwei
-   Arbeiten, in dieser Reihenfolge: **erst der Abgleich** — welche Werte
-   setzt der Bereich heute, welche Tokens gibt es, wo klafft die Lücke (die
-   vier Vorlagen-Werte `ui_theme`, `ui_cards`, `ui_surface`, `ui_form` sind
-   mit v1111 gerade erst in den Abgleich gewandert; dieselbe Frage jetzt
-   für Schrift- und Textfarben) — **dann der Kontrastlauf** aus v1099 über
-   alle Vorlagen. Gold auf Gold ist ein Kontrastfehler, kein
-   Geschmacksthema: hier wird gemessen, nicht nach Augenmaß entschieden.
-   Beim Messen `::before`/`::after` mitnehmen, sonst zählt der Lauf
-   Phantome (v1105c).
-
-2. **Die Branding-Einstellungen des Partners greifen nicht**
+1. **Die Branding-Einstellungen des Partners greifen nicht**
    (Reseller/Whitelabel, `P-NN`/`W-NN`). Vier Befunde, die zusammengehören,
    aber nicht dieselbe Ursache haben müssen:
    - **Zu wenig Farben zur Auswahl.** Der Bereich bietet deutlich weniger
@@ -69,7 +55,7 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
    War es als **Regel** gemeint — für Partner gesperrt —, dreht sich der
    Punkt um und wird zu einer Sperre, die zu prüfen statt zu beheben ist.
 
-3. **Das „×" oben links soll professioneller aussehen** (MA-Serie). Es
+2. **Das „×" oben links soll professioneller aussehen** (MA-Serie). Es
    schließt heute die Ansicht, wirkt aber wie ein Platzhalter. Kandidat aus
    der v652-Messung: `.dpm-x` — dasselbe Element sitzt auch im Bankexport
    und im Quick Check, also **erst zählen, wie oft es vorkommt**, dann
@@ -78,7 +64,7 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
    `--wl-`Ebene führen, nicht hart golden. **Optikentscheidung →
    Demo-first**, zwei oder drei Fassungen zeigen.
 
-4. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
+3. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
    Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
    ein **Kettenbefund, kein Optikbefund**, und die Kette wird von hinten
    aufgerollt: was steht im Objekt (`objects.data`), was kommt beim
@@ -87,7 +73,7 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
    füllen** — fehlt eine Angabe, gehört sie sichtbar als fehlend
    ausgewiesen.
 
-5. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+4. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -108,19 +94,49 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
    gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
    Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
 
-6. **Vollständiger Durchgang durch die Mobile-App** (MA-Serie). Marcels
+5. **Vollständiger Durchgang durch die Mobile-App** (MA-Serie). Marcels
    Rahmen um die Punkte davor: einmal komplett durch, jeder Bereich, jede
    Einstellung. Steht bewusst als eigener Punkt **nach** den Einzelfixes
    und prüft, was sonst noch auffällt. Die Handy-Sperre der Haupt-App
    bleibt dabei aktiv (v970 + MA35), sie wird nicht nebenbei aufgeweicht.
 
-7. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
+6. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
    `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
    v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
-   ist genau seine Voreinstellung. Gehört sachlich zu Punkt 2, ist aber
+   ist genau seine Voreinstellung. Gehört sachlich zu Punkt 1, ist aber
    Ausbau und kein Defekt, deshalb dahinter.
 
-8. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+7. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
+   Der Rest von „Darstellung → Profil und Anzeige ist unvollständig",
+   nachdem der Kontrastfehler mit `v1113` behoben ist. **Der Abgleich
+   steht** (2026-08-08, im Panel gezählt): acht Farbfelder, davon **fünf
+   für Flächen** (Kopfleiste + Logo, Objektleiste + Band, Score-Karte,
+   KPI-Karten, Objektkarten) und **drei für Text** (Text, Tab-Texte,
+   Objektkarten-Text). Für Score-Karte und KPI-Karten gibt es also eine
+   Fläche, aber keinen Text — genau Marcels „die Schriftfarbe lässt sich
+   nicht setzen".
+
+   **Ausbau, kein Defekt** — deshalb hinter den Defekten. Die Lesbarkeit
+   stellt seit `v1113` die Ableitung `--uv-sc-*` sicher; ein Regler müsste
+   sie überstimmen dürfen, ohne sie auszuhebeln. Genau das ist die
+   Produktfrage: gibt der Regler die Farbe frei, oder nur innerhalb dessen,
+   was noch trägt? **→ Demo bauen und zeigen, nicht raten.**
+
+8. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+   Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
+   in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
+   `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
+   sauber, weil der Ton dort nachgezogen wird.
+
+   **Die Ursache ist bekannt und benannt:** `tonAufHell` aus v1097 rechnet
+   gegen **Weiß**, vier Vorlagen haben aber keinen weißen Grund — v1097
+   hat das für boarding selbst so vermerkt („kein Rückschritt"). Der
+   saubere Weg wäre, die Schwelle gegen den **tatsächlichen** Grund der
+   Vorlage zu rechnen statt gegen Weiß. Das betrifft `--gold-d` an 19
+   Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
+   kein Nachschlag.
+
+9. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
    kein Defekt — und ohne Vorlage im `design/`-Ordner wäre es geraten.
@@ -162,6 +178,103 @@ Ketten- und Funktionsbefunde, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-08] **Gold auf Gold in der Score-Karte** — `v1113` bis `v1113f`
+  (`2fdcb10`, `3e9e78d`, `161d116`, `f3a6b01`, `6f60f25`, `c06e2c2`)
+
+  Bild: `design/mockups/Screenshot 2026-08-06 144507.png`. Gemessen in der
+  Messkabine (1600 px), angemeldet, Partner-Konto, über den echten
+  Bedienweg (Panel-Klicks).
+
+  ### Erst der Abgleich, wie der Punkt es verlangte
+
+  Im Panel gezählt: **acht Farbfelder — fünf für Flächen, drei für Text.**
+  Für Score-Karte und KPI-Karten gibt es eine Fläche, aber keinen Text.
+  Das ist Marcels „die Schriftfarbe lässt sich nicht setzen", und es
+  bleibt als **Ausbau** offen (jetzt Punkt 7). Der Kontrastfehler selbst
+  ist damit aber nicht erklärt — der hat eine eigene Ursache.
+
+  ### Die Ursache
+
+  `body.dp-chrome-hell #hdr-badges .sc-main` macht die Score-Karte zur
+  **Markenfläche** (`linear-gradient` aus `--gold-hi`/`--gold`/`--gold-lo`),
+  Spezifität (1,2,1) mit `!important`. Seit v1085 hängt der Skin an der
+  Vorlage — es trifft also **jede helle Vorlage**. Die Texte darauf sind
+  die für dunklen Grund gebauten geblieben:
+
+  | Stelle | Wert | k |
+  |---|---|---|
+  | `.sc-l` „Investor Deal Score" | `var(--gold)` | **1,06** |
+  | `.sc-sub` | `rgba(168,162,153,.95)` | **1,16** |
+  | `.sc-tip` | `#9a7f33` | 1,77 |
+  | `.sc-grade` | Statusgrün `#2E8455` | 1,97 |
+  | `.sc-pill-sub` ×5 · Pillen-Label ×5 | Graustufen auf weiß | 2,16 / 2,40 |
+
+  ### Warum v1097 hier nicht reicht
+
+  `tonAufDunkel`/`tonAufHell` rechnen gegen **zwei feste Gründe** (`#1A1D22`
+  und Weiß). Hier ist der Grund die **Marke selbst** — bei Gold hell
+  (`rgb(206,173,82)`), bei Partner-Rot dunkel (`rgb(126,58,70)`).
+  **Gemessen: ein fest dunkler Ton, der auf Gold 5,78 erreicht, fällt auf
+  Partner-Rot auf 2,16.** Das ist derselbe Denkfehler wie die feste
+  Prozent-Ableitung aus v1097, nur eine Ebene weiter.
+
+  Deshalb `tonFuerGrund()`/`tonAufMarke()` in `config.js` als **dritte
+  Ableitung**: Richtung aus der Helligkeit des Grundes, gezogen in OKLab,
+  gegen **alle drei Verlaufsstopps**. Erfüllt der Startwert die Schwelle
+  schon, kommt er unverändert zurück. Gesetzt auf **beiden** Wegen
+  (`apply()` und `applyTheme()`), sonst laufen Regler- und Sweeper-Weg
+  auseinander — der v1096b-Fehler. `reset()` räumt die fünf Tokens mit.
+
+  Statusgrün läuft durch **dieselbe** Funktion und bleibt dabei Grün: nur
+  die Helligkeit wandert, Farbton und Sättigung bleiben. Das ist
+  ausdrücklich **kein** Tokenisieren der Statusfarben.
+
+  **Die Hausmarke bleibt unberührt, nachgerechnet:** Standard-Gold
+  `#C9A84C` → `#c9a84c`, Hellgelb `#F0D000` → `#f0d000`, beide bitgenau.
+  Nur Partner-Rot wandert (`#7B2D3B` → `#c36d78`).
+
+  ### Zwei eigene Fehler, beide zurückgenommen
+
+  **1 — Mein Messlauf hatte einen blinden Fleck.** Der erste Kontrastlauf
+  meldete `.sc-tip` **nicht**. Nicht weil es sauber war: mein Grund-Parser
+  konnte `color(srgb …)` nicht lesen — die Form, die Chrome für
+  `color-mix()` zurückgibt. **Ein übersprungenes Element sah aus wie ein
+  bestandenes.** Die Ausgangszahl war 14, nicht 13. Der Lauf zählt seither
+  die ungeprüften Elemente mit und meldet sie; in allen Abnahmeläufen
+  steht dort **0**.
+
+  **2 — `v1113e` war ein Rückschritt.** Ich hatte `.sc-pill-v` in die
+  Gegenrichtungs-Regel aufgenommen, weil ich es in `konsole` gemessen
+  hatte. Unter den **hellen** Vorlagen sitzen die KPI-Pillen aber auf
+  **Weiß**, nicht auf der Markenfläche. Gemessen hat das fünf Stellen von
+  „trägt" auf **2,29** verschlechtert. Erst der Vorher/Nachher-Lauf in
+  kontor hat es gezeigt — `v1113f` nimmt es zurück.
+
+  Dazu zwei Funde aus der Gegenrichtung, die erst die Rot-Gegenprobe
+  sichtbar machte: `.sc-v` (der Hauptwert) stand bei Rot auf **2,28**, weil
+  dort die Markenfläche dunkel ist und der Text trotzdem dunkel blieb; und
+  `.sc-investor-badge` stand in `konsole` bei **1,93** — Gewinner war
+  `color:var(--ch)`, also erneut `--ch`, die Falle aus CLAUDE.md und
+  v1099b. Die Pille ist in jeder Fassung golden, `--ch` schaltet aber mit
+  der Vorlage mit.
+
+  ### Nachgemessen, zwei Marken × sechs Fassungen, Schwelle 3
+
+  | Marke | Fassung | vorher | nachher |
+  |---|---|---|---|
+  | Gold | ohne Vorlage | 0 | **0** |
+  | Gold | kontor · panel | 14 | **0** |
+  | Gold | kanzlei · boarding | 14 | **1** |
+  | Gold | konsole | 1 | **0** |
+  | Partner-Rot | alle sechs | — | **0** |
+
+  Die verbleibende 1 ist `hdr-obj-num` (2,98 bzw. 2,88) und **nicht** Teil
+  dieser Arbeit: die v1097-Schwelle rechnet gegen Weiß, kanzlei und
+  boarding haben aber cremefarbenen Grund. v1097 hat das selbst so
+  vermerkt. Steht jetzt als eigener Punkt 8.
+
+  Ungeprüfte Elemente in jedem Lauf: **0**.
 
 - [2026-08-08] **Die Einstellungen auf dem Handy** — `v1112`, `v1112b`
   (`03b83a9`, `4da3f5e`)
