@@ -946,6 +946,66 @@ window.Plan = {
     var e = _fromLab(0.08, lab[1], lab[2]); return _hex(e[0],e[1],e[2]);
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     v1113 · Text AUF der Markenflaeche (dritte Ableitung neben TR9/TR10)
+
+     BEFUND (Backlog "Gold auf Gold", Bild Screenshot 2026-08-06 144507):
+     Unter jeder hellen Vorlage macht body.dp-chrome-hell die Score-Karte
+     zur Markenflaeche (linear-gradient aus --gold-hi/--gold/--gold-lo).
+     Die Texte darauf blieben die fuer DUNKLEN Grund gebauten:
+
+       #hdr-badges .sc-l   color:var(--gold)             k = 1,06
+       #hdr-badges .sc-sub color:rgba(168,162,153,.95)   k = 1,16
+       .sc-grade           Statusgruen #2E8455           k = 1,97
+
+     tonAufDunkel/tonAufHell helfen hier NICHT: sie rechnen gegen zwei feste
+     Gruende (#1A1D22 und Weiss). Der Grund ist hier die Marke selbst — und
+     die ist mal hell (Gold rgb(206,173,82)) und mal dunkel (Partner-Rot
+     rgb(126,58,70)). GEMESSEN: ein fest dunkler Ton, der auf Gold 5,78
+     erreicht, faellt auf Partner-Rot auf 2,16. Es ist derselbe Denkfehler
+     wie die feste Prozent-Ableitung aus v1097, nur eine Ebene weiter.
+
+     Deshalb entscheidet die Helligkeit des GRUNDES die Richtung, und
+     gezogen wird wieder in OKLab. Das gilt fuer jede Farbe, nicht nur fuer
+     den Akzent — Statusgruen laeuft durch dieselbe Funktion und bleibt
+     dabei Gruen (nur die Helligkeit wandert, Farbton und Saettigung
+     bleiben). Das ist ausdruecklich KEIN Tokenisieren der Statusfarben.
+     ═══════════════════════════════════════════════════════════════════════ */
+  var _MIN_MARKE = 4.5;
+
+  /* Zieht `farbe` so lange in OKLab, bis sie auf `grund` traegt.
+     Richtung aus der Helligkeit des Grundes: heller Grund -> dunkler ziehen.
+     Erfuellt der Startwert die Schwelle schon, kommt er unveraendert
+     zurueck — wer nichts aendert, merkt nichts (Muster aus v1097). */
+  function tonFuerGrund(farbe, grund, min){
+    var f = _rgb(farbe), g = (typeof grund === 'string') ? _rgb(grund) : grund;
+    min = min || _MIN_MARKE;
+    if(_kontrast(f, g) >= min) return _hex(f[0],f[1],f[2]);
+    var lab = _toLab(f);
+    var runter = _lum(g) > 0.18;                 /* heller Grund -> abdunkeln */
+    var schritt = runter ? -0.02 : 0.02;
+    var ende    = runter ?  0.04 : 0.99;
+    for(var L = lab[0] + schritt; runter ? L >= ende : L <= ende; L += schritt){
+      var c = _fromLab(L, lab[1], lab[2]);
+      if(_kontrast(c, g) >= min) return _hex(c[0],c[1],c[2]);
+    }
+    var e = _fromLab(ende, lab[1], lab[2]); return _hex(e[0],e[1],e[2]);
+  }
+
+  /* Die Markenflaeche ist ein Verlauf. Gerechnet wird gegen den Stopp, der
+     dem Text am naechsten kommt — sonst traegt der Ton nur im Mittel und
+     versagt an einem Ende der Karte. */
+  function grundDerMarke(akzent){
+    var stopps = [_rgb(akzent), _rgb(_lighten(akzent,22)), _rgb(_darken(akzent,16))];
+    return stopps;
+  }
+  function tonAufMarke(akzent, startfarbe, min){
+    var stopps = grundDerMarke(akzent), ton = startfarbe || akzent;
+    /* je Stopp nachziehen, der strengste gewinnt */
+    for(var i = 0; i < stopps.length; i++) ton = tonFuerGrund(ton, stopps[i], min);
+    return ton;
+  }
+
   function _isPalette(){ /*v904-palette-fix*/
     if(window.DP_THEME_PALETTE_FORCE===true) return true;            // Test/Dev-Bypass
     try{
@@ -993,6 +1053,13 @@ window.Plan = {
          var(--gold-d, ...) auf das Standard-Dunkelgold zurueck. */
       r.setProperty('--gold-d',tonAufHell(t.accent));
     }
+    /* v1113: Text auf der Markenflaeche — auf BEIDEN Wegen setzen, sonst
+       laufen Regler-Weg und Sweeper-Weg auseinander (der v1096b-Fehler).
+       Auch im Gold-Zweig: die Score-Karte ist unter jeder hellen Vorlage
+       golden, unabhaengig davon ob ein Whitelabel aktiv ist. */
+    r.setProperty('--uv-sc-ink', tonAufMarke(t.accent, t.accent,  4.5));
+    r.setProperty('--uv-sc-mut', tonAufMarke(t.accent, '#a8a299', 4.0));
+    r.setProperty('--uv-sc-ok',  tonAufMarke(t.accent, '#3FA56C', 4.0));
     if(document.body) document.body.setAttribute('data-dp-skin', t.skin);
     if(typeof window._dpApplyThemeVars === 'function'){ try{ window._dpApplyThemeVars(); }catch(e){} }
     try{ /*v911-logo-swap*/
@@ -1018,6 +1085,9 @@ window.Plan = {
      whitelabel-override.js ruft genau diese beiden. */
   DPC.branding.tonAufDunkel = tonAufDunkel;
   DPC.branding.tonAufHell   = tonAufHell;
+  /* v1113: dritte Ableitung — Text AUF der Markenflaeche. */
+  DPC.branding.tonFuerGrund = tonFuerGrund;
+  DPC.branding.tonAufMarke  = tonAufMarke;
 
   function boot(){ applyTheme(); }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

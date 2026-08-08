@@ -2145,3 +2145,55 @@ html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbcm {
 html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbcm .sbcm-label {
   color: color-mix(in srgb, var(--uv-card-ink) 62%, var(--uv-card)) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1113 · Gold auf Gold in der Score-Karte
+   Backlog Punkt "Darstellung → Profil und Anzeige ist unvollstaendig",
+   Bild design/mockups/Screenshot 2026-08-06 144507.png (rot umkringelt:
+   die Zeile "INVESTOR SCORE" und die Zeile darunter).
+
+   URSACHE, gemessen im Kaskaden-Walker: body.dp-chrome-hell macht
+   #hdr-badges .sc-main zur Markenflaeche —
+     background: linear-gradient(135deg,var(--gold-hi),var(--gold) 55%,…)
+   bei Spezifitaet (1,2,1) mit !important. Seit v1085 haengt der Skin an
+   der Vorlage, also trifft das JEDE helle Vorlage. Die Texte darauf sind
+   aber die fuer dunklen Grund gebauten geblieben:
+
+     #hdr-badges .sc-l   color:var(--gold)            k = 1,06  <- Gold auf Gold
+     #hdr-badges .sc-sub rgba(168,162,153,.95)        k = 1,16
+     .sc-grade           Statusgruen #2E8455          k = 1,97
+     .sc-pill-l / -sub   Graustufen auf weisser Pille k = 2,40 / 2,16
+
+   Gemessen ueber den echten Bedienweg in allen sechs Fassungen:
+     ohne Vorlage 0 · kontor/panel/kanzlei/boarding je 13 · konsole 1.
+
+   Die drei Toene auf der Markenflaeche kommen aus --uv-sc-*, die
+   config.js in OKLab nachzieht (v1113, dritte Ableitung neben TR9/TR10).
+   Der Rueckfall im var() ist der fuer Standard-Gold richtige Wert — ist
+   das Token da, gewinnt es (Muster aus v1096b).
+
+   Die beiden Pillen-Toene stehen auf WEISS, nicht auf der Marke, und
+   brauchen deshalb keine Ableitung: #6f685d/#7d766a sind die Haus-Graus
+   und liefern gemessen 5,51 und 4,50. Sie sind neutral, kein Gold —
+   damit auch kein Fall fuer die Whitelabel-Pflicht.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* (1,2,1) schlaegt #hdr-badges .sc-l (0,1,1) und die Vorlagen-Regel
+   html[data-ui-theme="…"] body header.hdr .sc-grade (0,3,3, !important) —
+   die ID zaehlt hoeher als drei Klassen. */
+body.dp-chrome-hell #hdr-badges .sc-l {
+  color: var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06)) !important;
+}
+body.dp-chrome-hell #hdr-badges .sc-sub {
+  color: var(--uv-sc-mut, color-mix(in srgb, var(--gold) 40%, #0b0a06)) !important;
+}
+body.dp-chrome-hell #hdr-badges .sc-grade {
+  color: var(--uv-sc-ok, #17472c) !important;
+}
+/* Die weissen KPI-Pillen — unabhaengig von der Marke. */
+body.dp-chrome-hell #hdr-badges .sc-pill-l {
+  color: #6f685d !important;
+}
+body.dp-chrome-hell #hdr-badges .sc-pill-sub {
+  color: #7d766a !important;
+}

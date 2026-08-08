@@ -413,7 +413,8 @@
     _touched = []; _touchedAttr = []; _seen = new WeakSet();
     try {
       var r = document.documentElement.style;
-      ['--gold','--gold-hi','--gold-lo','--gold-l','--gold-2','--gold-3','--gold-bg','--gold-d','--gold-soft','--obsidian']
+      ['--gold','--gold-hi','--gold-lo','--gold-l','--gold-2','--gold-3','--gold-bg','--gold-d','--gold-soft','--obsidian',
+       '--uv-sc-ink','--uv-sc-mut','--uv-sc-ok']   /* v1113 */
         .forEach(function (v) { r.removeProperty(v); });
       clearWlTokens(r);
     } catch (e) {}
@@ -441,6 +442,29 @@
     try { if (window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.tonAufHell)
             return DealPilotConfig.branding.tonAufHell(a); } catch (e) {}
     return _darken(a, 9);
+  }
+  /* v1113: Text AUF der Markenflaeche. Ohne config.js gibt es keinen
+     sinnvollen Rueckfall — die Richtung haengt an der Helligkeit des
+     Grundes, das laesst sich nicht mit _darken() nachbilden. Dann lieber
+     null zurueckgeben: das CSS faellt auf seinen eigenen Standardwert
+     zurueck (Muster aus v1096b — ist das Token da, gewinnt es). */
+  function _tonMarke(a, start, min) {
+    try { if (window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.tonAufMarke)
+            return DealPilotConfig.branding.tonAufMarke(a, start, min); } catch (e) {}
+    return null;
+  }
+  /* Eine Stelle fuer beide Wege (apply() hier, applyTheme() in config.js). */
+  function _setzeMarkentoene(r, akzent) {
+    var paare = [
+      ['--uv-sc-ink', akzent,    4.5],   /* Label in Markenrolle (.sc-l) */
+      ['--uv-sc-mut', '#a8a299', 4.0],   /* gedaempfte Zeile (.sc-sub)   */
+      ['--uv-sc-ok',  '#3FA56C', 4.0]    /* Statusgruen (.sc-grade) — bleibt
+                                            Gruen, nur die Helligkeit wandert */
+    ];
+    for (var i = 0; i < paare.length; i++) {
+      var v = _tonMarke(akzent, paare[i][1], paare[i][2]);
+      if (v) r.setProperty(paare[i][0], v);
+    }
   }
 
   function apply(b) {
@@ -479,6 +503,7 @@
        Ohne diese zwei Zeilen bleiben genau die Stellen gold. */
     r.setProperty('--gold-d', _tonHell(_acc));
     r.setProperty('--gold-soft', _lighten(_acc, 82));
+    _setzeMarkentoene(r, _acc);   /* v1113 */
     setWlTokens(r);
     if (_obs) r.setProperty('--obsidian', _obs);
 
