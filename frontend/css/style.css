@@ -34672,11 +34672,18 @@ html body #help-modal .help-sidebar-list::-webkit-scrollbar-thumb:hover {
 /* Schwarzes Brand-Band als Flex-Zeile: Logo links, Tag + X rechts, ALLE mittig auf einer Linie */
 .dp-mtb-brand{display:flex !important;align-items:center !important;position:relative !important;}
 .dp-mtb-brand .dp-mtb-tag{margin-left:auto !important;margin-right:14px !important;position:static !important;right:auto !important;top:auto !important;}
-.dp-mtb-brand .dp-band-close{position:static !important;top:auto !important;right:auto !important;transform:none !important;margin:0 !important;flex-shrink:0 !important;width:28px !important;height:28px !important;background:#17130d !important;border:1.5px solid rgba(232,204,122,.8) !important;color:var(--gold-hi) !important;border-radius:8px !important;box-shadow:0 2px 8px rgba(0,0,0,.45) !important;z-index:20 !important;display:flex !important;align-items:center !important;justify-content:center !important;padding:0 !important;cursor:pointer !important;}
-.dp-mtb-brand .dp-band-close svg{width:13px !important;height:13px !important;}
+/* v1116-x: Diese Fassung WAR schon die gewaehlte Bauart B — sie war nur
+   28 px gross, waehrend die sechs neu gezogenen Stellen 32 px haben.
+   Hier nur Groesse (28->32), Radius (8->9) und Zeichen (13->15)
+   nachgezogen, damit B ueberall bitgleich ist. Die Goldkante lief als
+   nacktes rgba(232,204,122,.8) und liegt jetzt auf der --wl-Ebene.
+   transform:none bleibt: das sichert die v843-Positionierung ab, deshalb
+   traegt diese eine Stelle bewusst kein :active-Scale. */
+.dp-mtb-brand .dp-band-close{position:static !important;top:auto !important;right:auto !important;transform:none !important;margin:0 !important;flex-shrink:0 !important;width:32px !important;height:32px !important;background:#17130d !important;border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8)) !important;color:var(--gold-hi) !important;border-radius:9px !important;box-shadow:0 2px 8px rgba(0,0,0,.45) !important;z-index:20 !important;display:flex !important;align-items:center !important;justify-content:center !important;padding:0 !important;cursor:pointer !important;}
+.dp-mtb-brand .dp-band-close svg{width:15px !important;height:15px !important;}
 .dp-mtb-brand .dp-band-close:hover{background:var(--gold) !important;border-color:var(--gold-hi) !important;color:#1a1508 !important;}
 /* Fallback: Button noch ausserhalb des Brand-Bands (Cache) */
-.dp-modal-topband > .dp-band-close{top:9px !important;transform:none !important;right:16px !important;width:28px !important;height:28px !important;}
+.dp-modal-topband > .dp-band-close{top:9px !important;transform:none !important;right:16px !important;width:32px !important;height:32px !important;}
 /* v861-band-close END */
 
 

@@ -24,7 +24,16 @@
       '.qbs-modal{width:100%;max-width:440px;border-radius:18px;overflow:hidden;border:1px solid rgba(201,168,76,.22);background:linear-gradient(180deg,#15110a,#0a0908);color:#fff;box-shadow:0 40px 90px -40px #000}',
       '.qbs-h{position:relative;overflow:hidden;display:flex;align-items:center;gap:9px;padding:13px 16px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 52%,#b8932f)}',
       '.qbs-h .t{font:700 11px/1 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#5a4a14}',
-      '.qbs-h .x{margin-left:auto;background:none;border:0;color:#5a4a14;font-size:20px;cursor:pointer;line-height:1}',
+      /* v1116-x: Fassung B, gewaehlt am 08.08.2026 — aber als EINZIGE der
+         sechs Stellen sitzt dieser Knopf auf dem Gold-Runway (.qbs-h ist
+         der Verlauf, gemessen). Eine Goldkante auf Gold ist unsichtbar,
+         deshalb hier dieselbe Kachel mit DUNKLER Kante. Form, Groesse und
+         Trefferflaeche sind identisch mit den anderen fuenf. */
+      '.qbs-h .x{margin-left:auto;width:32px;height:32px;border-radius:9px;background:#17130d;border:1.5px solid rgba(26,20,7,.38);color:var(--wl-e8cc7a, #E8CC7A);box-shadow:0 2px 8px rgba(26,20,7,.28);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;position:relative;flex:0 0 auto;transition:background .16s,border-color .16s,transform .16s}',
+      '.qbs-h .x svg{width:15px;height:15px;pointer-events:none}',
+      '.qbs-h .x::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px);background:transparent}',
+      '.qbs-h .x:hover{background:#241d0c;border-color:rgba(26,20,7,.62)}',
+      '.qbs-h .x:active{transform:scale(.94)}',
       '.qbs-h .fly{position:absolute;top:50%;color:#070707;transform:translate(-50%,-50%);animation:qbsfly 5s ease-in-out infinite}.qbs-h .fly svg{height:16px}',
       '@keyframes qbsfly{0%{left:12%;opacity:.25}10%{opacity:1}55%{left:52%;opacity:1}55.01%{opacity:0}56%{left:12%}66%{opacity:.25}100%{left:12%;opacity:.25}}',
       '.qbs-b{padding:18px}',
@@ -78,7 +87,7 @@
   function shellHtml(inner) {
     return '<div class="qbs-modal" role="dialog" aria-modal="true">' +
       '<div class="qbs-h"><span class="fly">' + plane() + '</span><span class="t" id="qbs-title">Quick Boarding Pass teilen</span>' +
-      '<button class="x" id="qbs-x" aria-label="Schlie\u00dfen">\u00d7</button></div>' +
+      '<button class="x" id="qbs-x" aria-label="Schlie\u00dfen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' + /* v1116-x */
       '<div class="qbs-b" id="qbs-body">' + inner + '</div></div>';
   }
 

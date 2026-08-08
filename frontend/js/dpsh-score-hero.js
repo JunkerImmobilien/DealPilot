@@ -138,7 +138,7 @@
       '<div class="dpshp-modal" role="dialog" aria-modal="true">' +
         '<div class="dpshp-head"><div><div class="dpshp-eye">Beteiligte Felder</div>' +
           '<div class="dpshp-title">' + esc(p.title) + '</div></div>' +
-          '<button class="dpshp-x" type="button" aria-label="Schliessen" onclick="DealPilotScoreHero.closeParts()">\u00d7</button></div>' +
+          '<button class="dpshp-x" type="button" aria-label="Schliessen" onclick="DealPilotScoreHero.closeParts()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' + /* v1116-x */
         '<div class="dpshp-formula"><span>Formel</span>' + esc(p.formula) + '</div>' +
         '<div class="dpshp-items">' + items + '</div>' +
         '<div class="dpshp-note">Diese Kennzahl wird berechnet \u2014 w\u00e4hle ein Feld, um es zu bearbeiten.</div>' +
@@ -392,7 +392,7 @@
     return '<div class="dpshm-overlay" id="dpsh-kpi-overlay">' +
       '<div class="dpshm-modal" role="dialog" aria-modal="true">' +
         '<div class="dpshm-brandbar"><span class="dpshm-brand">Investor <b>Deal Score</b></span>' +
-          '<button class="dpshm-x" type="button" aria-label="Schliessen" onclick="DealPilotScoreHero.closeKpi()">\u00d7</button></div>' +
+          '<button class="dpshm-x" type="button" aria-label="Schliessen" onclick="DealPilotScoreHero.closeKpi()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' + /* v1116-x */
         '<div class="dpshm-hero">' +
           '<div><div class="dpshm-hero-eye">Alle KPIs</div>' +
             '<div class="dpshm-hero-title">' + score + '<span>/100</span> \u00b7 ' + esc(r2.label) + '</div></div>' +
@@ -643,8 +643,14 @@
 '.dpshm-brandbar{background:#070707;padding:10px 18px;display:flex;align-items:center;justify-content:space-between}',
 '.dpshm-brand{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:.5px}',
 '.dpshm-brand b{color:var(--gold, #C9A84C);font-weight:700}',
-'.dpshm-x{background:transparent;border:none;color:#9a9488;font-size:24px;line-height:1;cursor:pointer;padding:0 4px}',
-'.dpshm-x:hover{color:#fff}',
+/* v1116-x: war ein nacktes Text-x (24px, #9a9488, ohne Flaeche) und sah
+   deshalb nach Platzhalter aus. Jetzt Fassung B, gewaehlt am 08.08.2026:
+   Kachel mit Goldkante, 44-px-Trefferflaeche per ::after wie v650/v652. */
+'.dpshm-x{width:32px;height:32px;border-radius:9px;background:#17130d;border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8));color:var(--wl-e8cc7a, #E8CC7A);box-shadow:0 2px 8px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;position:relative;flex:0 0 auto;transition:background .16s,border-color .16s,color .16s,transform .16s}',
+'.dpshm-x svg{width:15px;height:15px;pointer-events:none}',
+'.dpshm-x::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px);background:transparent}',
+'.dpshm-x:hover{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-e8cc7a, #E8CC7A);color:#1a1508}',
+'.dpshm-x:active{transform:scale(.94)}',
 '.dpshm-hero{background:linear-gradient(110deg,var(--gold-hi, #E8CC7A),var(--gold, #C9A84C) 55%,var(--gold-lo, #b8932f));padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}',
 '.dpshm-hero-eye{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#2c2410;margin-bottom:3px}',
 '.dpshm-hero-title{font-family:"Space Grotesk",sans-serif;font-size:22px;font-weight:700;color:#1b1408}',
@@ -699,8 +705,12 @@
 '.dpshp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:15px 18px 12px;background:#070707}',
 '.dpshp-eye{font-family:"JetBrains Mono",monospace;font-size:9.5px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold, #C9A84C);margin-bottom:4px}',
 '.dpshp-title{font-family:"Space Grotesk",sans-serif;font-size:18px;font-weight:700;color:#fff}',
-'.dpshp-x{background:transparent;border:none;color:#8a8378;font-size:22px;line-height:1;cursor:pointer;padding:0 2px}',
-'.dpshp-x:hover{color:#fff}',
+/* v1116-x: dito — war nacktes Text-x (22px, #8a8378). Fassung B. */
+'.dpshp-x{width:32px;height:32px;border-radius:9px;background:#17130d;border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8));color:var(--wl-e8cc7a, #E8CC7A);box-shadow:0 2px 8px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;position:relative;flex:0 0 auto;transition:background .16s,border-color .16s,color .16s,transform .16s}',
+'.dpshp-x svg{width:15px;height:15px;pointer-events:none}',
+'.dpshp-x::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px);background:transparent}',
+'.dpshp-x:hover{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-e8cc7a, #E8CC7A);color:#1a1508}',
+'.dpshp-x:active{transform:scale(.94)}',
 '.dpshp-formula{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:#5a5247;line-height:1.5;padding:11px 18px;background:color-mix(in srgb, var(--gold, #C9A84C) 7%, transparent);border-bottom:1px solid rgba(0,0,0,.05)}',
 '.dpshp-formula span{display:block;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold-lo, #b8932f);margin-bottom:3px}',
 '.dpshp-items{padding:8px 12px}',

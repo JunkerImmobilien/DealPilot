@@ -2239,7 +2239,14 @@ function _dpModalCss(){
     '.dpm-logo{font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:18px;color:#FDFCFA}.dpm-logo b{color:var(--dp-accent)}',
     '.dpm-bar-right{display:flex;align-items:center;gap:15px}',
     '.dpm-ctx{font-family:\'JetBrains Mono\',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dp-accent)}',
-    '.dpm-x{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:transparent;color:#cfcfce;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}.dpm-x svg{width:14px;height:14px}',
+    /* v1116-x: war ein 30-px-Ring mit rgba(255,255,255,.14) und #cfcfce —
+       nicht falsch, aber die sechste von sechs Bauarten. Fassung B,
+       gewaehlt am 08.08.2026. Die Trefferflaeche kommt ab jetzt aus der
+       eigenen Regel und nicht mehr nur aus der 768er-Media-Query (v652). */
+    '.dpm-x{width:32px;height:32px;border-radius:9px;background:#17130d;border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8));color:var(--wl-e8cc7a, #E8CC7A);box-shadow:0 2px 8px rgba(0,0,0,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;position:relative;flex:0 0 auto;transition:background .16s,border-color .16s,color .16s,transform .16s}.dpm-x svg{width:15px;height:15px;pointer-events:none}',
+    '.dpm-x::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px);background:transparent}',
+    '.dpm-x:hover{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-e8cc7a, #E8CC7A);color:#1a1508}',
+    '.dpm-x:active{transform:scale(.94)}',
     '.dpm-hero{background:var(--dp-hero);padding:22px 26px 24px;position:relative}',
     '.dpm-hero-badge{position:absolute;right:22px;top:20px;width:44px;height:44px;border-radius:12px;background:rgba(26,20,7,.12);border:1px solid rgba(26,20,7,.18);display:flex;align-items:center;justify-content:center;color:var(--dp-hero-ink)}.dpm-hero-badge svg{width:23px;height:23px}',
     '.dpm-kick{font-family:\'JetBrains Mono\',monospace;font-size:10.5px;letter-spacing:3px;text-transform:uppercase;color:var(--dp-hero-kick);font-weight:700;margin-bottom:7px}',

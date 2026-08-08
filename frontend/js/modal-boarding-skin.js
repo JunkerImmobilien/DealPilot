@@ -17,7 +17,14 @@
       ".oabi-boarding .bdg-brand .logo{font:700 17px 'Space Grotesk','DM Sans',system-ui,sans-serif;color:#fff;letter-spacing:.3px}",
       ".oabi-boarding .bdg-brand .logo b{color:var(--wl-e8cc7a, #E8CC7A);font-weight:700}",
       ".oabi-boarding .bdg-brand .tag{margin-left:auto;font:700 10px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--wl-c9a84c, #C9A84C)}",
-      ".oabi-boarding .bdg-brand .x{background:none;border:0;color:#8a8a90;font-size:24px;line-height:1;cursor:pointer;padding:0 2px;margin-left:8px}",
+      /* v1116-x: war ein nacktes Text-x (24px, #8a8a90, ohne Flaeche).
+         Fassung B, gewaehlt am 08.08.2026. margin-left bleibt — das ist
+         Layout, nicht Optik. */
+      ".oabi-boarding .bdg-brand .x{width:32px;height:32px;border-radius:9px;background:#17130d;border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8));color:var(--wl-e8cc7a, #E8CC7A);box-shadow:0 2px 8px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:0;margin-left:8px;cursor:pointer;position:relative;flex:0 0 auto;transition:background .16s,border-color .16s,color .16s,transform .16s}",
+      ".oabi-boarding .bdg-brand .x svg{width:15px;height:15px;pointer-events:none}",
+      ".oabi-boarding .bdg-brand .x::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px);background:transparent}",
+      ".oabi-boarding .bdg-brand .x:hover{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-e8cc7a, #E8CC7A);color:#1a1508}",
+      ".oabi-boarding .bdg-brand .x:active{transform:scale(.94)}",
       ".oabi-boarding .bdg-brand .x:hover{color:#fff}",
       ".oabi-boarding .bdg-hero{flex:none;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 60%,var(--wl-b8932f, #b8932f))}",
       ".oabi-boarding .bdg-hero .oabi-head{background:none;padding:16px 22px 4px;margin:0;display:block}",
@@ -57,7 +64,8 @@
     brand.className = 'bdg-brand';
     brand.innerHTML = '<span class="logo">Deal<b>Pilot</b></span>' +
       '<span class="tag">PRE-FLIGHT \u00b7 BOARDING</span>' +
-      '<button type="button" class="x" aria-label="Schlie\u00dfen">\u00d7</button>';
+      '<button type="button" class="x" aria-label="Schlie\u00dfen">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'; /* v1116-x */
     modal.insertBefore(brand, modal.firstChild);
 
     // Gold-Hero um head + sub

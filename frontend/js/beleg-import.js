@@ -163,8 +163,14 @@
       '#beleg-import-ov .bi-card{background:#FDFCFA;width:min(920px,96vw);max-height:92vh;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.5)}' +
       '#beleg-import-ov .bi-bar{background:#141414;color:#fff;display:flex;align-items:center;gap:10px;padding:14px 18px}' +
       '#beleg-import-ov .bi-bar .bi-t{font-weight:700;font-size:15px;letter-spacing:.2px}' +
-      '#beleg-import-ov .bi-bar .bi-x{margin-left:auto;background:none;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;opacity:.75}' +
-      '#beleg-import-ov .bi-bar .bi-x:hover{opacity:1}' +
+      /* v1116-x: war ein nacktes Text-x (22px, #fff, opacity .75).
+         Fassung B, gewaehlt am 08.08.2026. margin-left:auto bleibt —
+         das schiebt den Knopf nach rechts und ist Layout, nicht Optik. */
+      '#beleg-import-ov .bi-bar .bi-x{margin-left:auto;width:32px;height:32px;border-radius:9px;background:#17130d;border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8));color:var(--wl-e8cc7a, #E8CC7A);box-shadow:0 2px 8px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;position:relative;flex:0 0 auto;transition:background .16s,border-color .16s,color .16s,transform .16s}' +
+      '#beleg-import-ov .bi-bar .bi-x svg{width:15px;height:15px;pointer-events:none}' +
+      '#beleg-import-ov .bi-bar .bi-x::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px);background:transparent}' +
+      '#beleg-import-ov .bi-bar .bi-x:hover{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-e8cc7a, #E8CC7A);color:#1a1508}' +
+      '#beleg-import-ov .bi-bar .bi-x:active{transform:scale(.94)}' +
       '#beleg-import-ov .bi-hero{background:' + GRAD + ';color:#2c2410;padding:10px 18px;font-size:12.5px;font-weight:600}' +
       '#beleg-import-ov .bi-body{padding:18px;overflow:auto}' +
       '#beleg-import-ov .bi-drop{border:2px dashed ' + GOLD + ';border-radius:10px;padding:34px 18px;text-align:center;color:#555}' +
@@ -209,7 +215,7 @@
     ov.innerHTML =
       '<div class="bi-card">' +
         '<div class="bi-bar"><span class="bi-t">📎 Belege importieren</span>' +
-          '<button class="bi-x" type="button" onclick="DealPilotBelegImport.close()" aria-label="Schließen">×</button></div>' +
+          '<button class="bi-x" type="button" onclick="DealPilotBelegImport.close()" aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' + /* v1116-x */
         '<div class="bi-hero">KI liest Datum · Betrag · USt · Aussteller · Kategorie — du bestätigst jede Zeile, bevor sie in die Anschaffungskosten fließt.</div>' +
         '<div class="bi-body">' +
           '<div class="bi-drop" id="bi-drop">' +
