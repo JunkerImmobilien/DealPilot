@@ -2190,6 +2190,16 @@ body.dp-chrome-hell #hdr-badges .sc-sub {
 body.dp-chrome-hell #hdr-badges .sc-grade {
   color: var(--uv-sc-ok, #17472c) !important;
 }
+/* NACHTRAG, ehrlich vermerkt: .sc-tip ("KI raet: Kauf erwaegen") stand in
+   meinem ersten Lauf NICHT in der Liste — nicht weil es sauber war,
+   sondern weil mein Grund-Parser color(srgb …) nicht lesen konnte, die
+   Form in der Chrome color-mix() zurueckgibt. Ein uebersprungenes Element
+   sah aus wie ein bestandenes. Mit erweitertem Parser gemessen: 1,77
+   (#99803a auf Gold). Die Ausgangszahl war also 14, nicht 13.
+   .sc-tip traegt die Akzentrolle wie .sc-l und bekommt denselben Ton. */
+body.dp-chrome-hell #hdr-badges .sc-tip {
+  color: var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06)) !important;
+}
 /* Die weissen KPI-Pillen — unabhaengig von der Marke. */
 body.dp-chrome-hell #hdr-badges .sc-pill-l {
   color: #6f685d !important;
