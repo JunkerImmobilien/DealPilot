@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Schließen-Knopf · Demo v1115</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   v1115 · Demo Schließen-Knopf
+   Gold-Literale stehen als var(--wl-<hex>, #<hex>) — Whitelabel-Pflicht.
+   Tokens werden hier NICHT in :root gesetzt; das tut nur
+   whitelabel-override.js in der echten App.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --ob:#050505;
+  --ob-2:#0d0c0b;
+  --creme:#FDFCFA;
+  --karte:#FBF6E9;
+  --line-d:rgba(255,255,255,.10);
+  --line-h:#E6DFCE;
+  --ink:#1c1a14;
+  --ink-soft:#8a8473;
+  --disp:'Space Grotesk',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --body:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#0a0a0a;color:#e9e6df;font-family:var(--body);font-size:15px;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:34px 22px 90px}
+
+h1{font-family:var(--disp);font-weight:700;font-size:30px;line-height:1.1;margin:0 0 6px}
+.kick{font-family:var(--mono);font-size:10.5px;letter-spacing:3px;text-transform:uppercase;
+      color:var(--wl-c9a84c, #C9A84C);font-weight:700;margin-bottom:10px}
+h2{font-family:var(--disp);font-weight:600;font-size:21px;margin:44px 0 4px;
+   padding-top:22px;border-top:1px solid var(--line-d)}
+h2 .n{font-family:var(--mono);font-size:12px;color:var(--wl-c9a84c, #C9A84C);margin-right:10px}
+p{margin:8px 0 0;max-width:76ch;color:#c9c5bc}
+p b{color:#f2efe8;font-weight:600}
+.lead{font-size:16px}
+
+/* Befundtabelle */
+table{border-collapse:collapse;width:100%;margin:16px 0 0;font-size:13.5px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-d);vertical-align:top}
+th{font-family:var(--mono);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;
+   color:var(--wl-c9a84c, #C9A84C);font-weight:700}
+td code{font-family:var(--mono);font-size:12px;color:#e8cc7a}
+.num{font-family:var(--mono);font-weight:700;color:#fff}
+
+/* Musterflächen */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;margin-top:20px}
+.spec{border:1px solid var(--line-d);border-radius:14px;overflow:hidden;background:#111}
+.spec-h{padding:10px 14px;font-family:var(--mono);font-size:10px;letter-spacing:1.6px;
+        text-transform:uppercase;color:#8f8a80;border-bottom:1px solid var(--line-d)}
+.spec-h b{color:#e9e6df;font-weight:700}
+.spec-b{padding:0}
+.spec-f{padding:9px 14px 11px;font-size:12px;color:#8f8a80;border-top:1px solid var(--line-d);
+        font-family:var(--mono);line-height:1.5}
+
+/* nachgebaute Leisten — die Maße stammen aus den echten Regeln */
+.bar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--ob)}
+.bar.hell{background:var(--karte);border-bottom:1px solid var(--line-h)}
+.bar .logo{font-family:var(--disp);font-weight:700;font-size:17px;color:#FDFCFA}
+.bar .logo b{color:var(--wl-c9a84c, #C9A84C)}
+.bar.hell .logo{color:var(--ink)}
+.bar .rechts{display:flex;align-items:center;gap:14px}
+.bar .ctx{font-family:var(--mono);font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;
+          color:var(--wl-c9a84c, #C9A84C)}
+
+/* ══ IST-ZUSTAND — 1:1 aus den gemessenen Regeln ══ */
+.ist-dpm-x{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.14);
+  background:transparent;color:#cfcfce;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;padding:0}
+.ist-dpm-x svg{width:14px;height:14px}
+.ist-band{width:28px;height:28px;background:#17130d;border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8));
+  color:var(--wl-e8cc7a, #E8CC7A);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.45);
+  display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.ist-band svg{width:13px;height:13px}
+.ist-text{background:none;border:0;color:#8a8a90;font-size:24px;line-height:1;cursor:pointer;padding:0 2px}
+.ist-text2{background:none;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;opacity:.75}
+.ist-text3{background:transparent;border:none;color:#8a8378;font-size:22px;line-height:1;cursor:pointer;padding:0 2px}
+.ist-legal{width:32px;height:32px;border-radius:50%;border:1px solid rgba(42,39,39,.15);background:#fff;
+  color:#2A2727;font-size:20px;line-height:1;cursor:pointer}
+.ist-bmf{border:none;background:transparent;color:#cbc4b8;font-size:19px;line-height:1;cursor:pointer;
+  padding:4px 9px;border-radius:8px}
+
+/* ══ VORSCHLÄGE ══════════════════════════════════════════════ */
+/* gemeinsame Grundlage: 44-px-Trefferfläche per ::after, wie v650/v652 */
+.x-neu{position:relative;cursor:pointer;padding:0;display:flex;align-items:center;
+       justify-content:center;transition:background .16s,border-color .16s,color .16s,transform .16s}
+.x-neu::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:max(100%,44px);height:max(100%,44px);background:transparent}
+body.zeig .x-neu::after{background:rgba(232,204,122,.16);outline:1px dashed rgba(232,204,122,.55)}
+.x-neu svg{width:15px;height:15px;pointer-events:none}
+.x-neu:active{transform:scale(.94)}
+
+/* A · Ring — 32 px Kreis, Rand in Markenton, Fläche leer */
+.xa{width:32px;height:32px;border-radius:50%;background:transparent;
+    border:1px solid var(--wl-c9a84c, rgba(201,168,76,.55));color:var(--wl-e8cc7a, #E8CC7A)}
+.xa:hover{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-e8cc7a, #E8CC7A);color:#1a1508}
+.hell .xa{border-color:var(--wl-b8932f, rgba(184,147,47,.55));color:var(--wl-b8932f, #b8932f)}
+.hell .xa:hover{background:var(--wl-c9a84c, #C9A84C);color:#1a1508}
+
+/* B · Kachel — 32 px, dunkle Fläche, Goldkante. Baut auf .dp-band-close auf,
+      das in Einstellungen und Hilfe bereits steht. */
+.xb{width:32px;height:32px;border-radius:9px;background:#17130d;
+    border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8));color:var(--wl-e8cc7a, #E8CC7A);
+    box-shadow:0 2px 8px rgba(0,0,0,.45)}
+.xb:hover{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-e8cc7a, #E8CC7A);color:#1a1508}
+.hell .xb{background:var(--ob-2);border-color:var(--wl-c9a84c, rgba(201,168,76,.85))}
+
+/* C · Cockpit-Schalter — Wortmarke statt Zeichen */
+.xc{height:32px;border-radius:8px;gap:8px;padding:0 12px;background:transparent;
+    border:1px solid rgba(255,255,255,.16);color:#cfcbc2;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:2.2px;font-weight:700;text-transform:uppercase}
+.xc svg{width:12px;height:12px}
+.xc:hover{border-color:var(--wl-c9a84c, #C9A84C);color:var(--wl-e8cc7a, #E8CC7A);
+          background:rgba(201,168,76,.10)}
+.hell .xc{border-color:rgba(28,26,20,.22);color:var(--ink-soft)}
+.hell .xc:hover{border-color:var(--wl-b8932f, #b8932f);color:var(--wl-b8932f, #b8932f);
+                background:rgba(201,168,76,.14)}
+
+/* Schalterleiste */
+.tools{position:sticky;top:0;z-index:5;background:rgba(10,10,10,.94);backdrop-filter:blur(8px);
+       border-bottom:1px solid var(--line-d);padding:10px 0;margin:0 0 8px}
+.tools-in{max-width:1080px;margin:0 auto;padding:0 22px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tg{font-family:var(--mono);font-size:10px;letter-spacing:1.8px;text-transform:uppercase;
+    padding:8px 13px;border-radius:8px;border:1px solid var(--line-d);background:transparent;
+    color:#c9c5bc;cursor:pointer}
+.tg.an{border-color:var(--wl-c9a84c, #C9A84C);color:var(--wl-e8cc7a, #E8CC7A);background:rgba(201,168,76,.12)}
+.tools-in .hint{font-size:12px;color:#7d7871;font-family:var(--mono)}
+
+.frage{margin-top:34px;border:1px solid var(--wl-c9a84c, rgba(201,168,76,.45));border-radius:14px;
+       padding:18px 20px;background:rgba(201,168,76,.06)}
+.frage h3{font-family:var(--disp);font-size:17px;margin:0 0 8px;color:#fff}
+.frage ol{margin:8px 0 0;padding-left:20px}
+.frage li{margin:5px 0;color:#d6d2c9}
+</style>
+</head>
+<body>
+
+<div class="tools"><div class="tools-in">
+  <button class="tg" id="tg-flaeche" type="button">44-px-Fläche zeigen</button>
+  <span class="hint">v1115 · Demo, nicht verdrahtet</span>
+</div></div>
+
+<div class="wrap">
+
+  <div class="kick">Backlog Punkt 1 · Demo</div>
+  <h1>Der Schließen-Knopf</h1>
+  <p class="lead">Gemessen am 8. August 2026 im Repo, nicht geschätzt. Der Punkt nannte
+  <code>.dpm-x</code> als Kandidaten und „Bankexport und Quick Check". <b>Beides stimmt nur zum
+  Teil</b> — und der eigentliche Befund ist größer als der Punkt annahm.</p>
+
+  <h2><span class="n">01</span>Was die Messung ergeben hat</h2>
+
+  <p><b>Erstens:</b> <code>.dpm-x</code> wird an <b>einer</b> Stelle gebaut — in
+  <code>DP_BAR()</code>, <code>js/storage.js:2190</code> — und von dort <b>zweimal</b> gerufen:
+  <b>Bankexport</b> und <b>Track&nbsp;Record</b>. <b>Nicht</b> im Quick&nbsp;Check. Die Vermutung
+  „eine Datei, zwei Stellen" trägt also, nur die zweite Stelle ist eine andere.</p>
+
+  <p><b>Zweitens:</b> <code>.auth-close</code> und <code>.gv-close</code> stehen in
+  <code>style.css</code> in der 44-px-Regel aus v652 — im Frontend erzeugt sie
+  <b>niemand mehr</b>. Zwei tote Selektoren.</p>
+
+  <p><b>Drittens — und das ist der eigentliche Befund:</b> die App hat nicht einen
+  Schließen-Knopf, sondern <b class="num">25</b>. Sie tragen 25 verschiedene Klassennamen und
+  zerfallen in <b>sechs Bauarten</b>, die nichts miteinander zu tun haben:</p>
+
+  <table>
+    <tr><th>Bauart</th><th>Klasse</th><th>Maße / Farbe wie gemessen</th><th>wo</th></tr>
+    <tr><td>SVG im Kreis</td><td><code>.dpm-x</code></td><td>30×30, Rand <code>rgba(255,255,255,.14)</code>, <code>#cfcfce</code></td><td>Bankexport, Track Record</td></tr>
+    <tr><td>SVG in Goldkachel</td><td><code>.dp-band-close</code></td><td>28×28, <code>#17130d</code>, Rand 1,5 px gold</td><td>Einstellungen, Hilfe</td></tr>
+    <tr><td>nacktes Text-×</td><td><code>.bdg-brand .x</code></td><td>24 px, <code>#8a8a90</code>, kein Rahmen</td><td>Boarding-Skin</td></tr>
+    <tr><td>nacktes Text-×</td><td><code>.bi-x</code></td><td>22 px, <code>#fff</code>, <code>opacity .75</code></td><td>Beleg-Import</td></tr>
+    <tr><td>nacktes Text-×</td><td><code>.dpshp-x</code></td><td>22 px, <code>#8a8378</code></td><td>Score-Hero</td></tr>
+    <tr><td>heller Kreis</td><td><code>.dp-legal-close</code></td><td>32×32, weiß, <code>#2A2727</code></td><td>Rechtstexte</td></tr>
+  </table>
+
+  <p style="margin-top:14px"><b>Genau die drei „nackten Text-×" sind der Platzhalter-Eindruck.</b>
+  Ein <code>×</code> als Schriftzeichen, grau, ohne Fläche, ohne Rahmen — das sieht nicht nach
+  Knopf aus, weil es keiner ist.</p>
+
+  <p><b>Was ich nicht bestätigen konnte:</b> „oben <b>links</b>". Kein einziger dieser
+  25 Knöpfe ist per CSS links positioniert — alle sitzen rechts, entweder über
+  <code>margin-left:auto</code> oder <code>right:</code>. Die Handy-Vorlage
+  <code>dp-handy-mockup-v2.html</code> hat gar keinen. Ich sage das offen, statt es
+  wegzuerklären: <b>welches × gemeint ist, weiß ich noch nicht sicher.</b> Deshalb steht der
+  Ist-Zustand unten zum Wiedererkennen daneben.</p>
+
+  <h2><span class="n">02</span>Ist-Zustand — sechs Bauarten nebeneinander</h2>
+  <p>Aus den echten Regeln nachgebaut, gleiche Maße, gleiche Farben. Erkennst du hier
+  deinen Knopf wieder?</p>
+
+  <div class="grid">
+    <div class="spec"><div class="spec-h"><b>1</b> · SVG im Kreis</div><div class="spec-b">
+      <div class="bar"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><span class="ctx">Finanzierung · Export</span>
+        <button class="ist-dpm-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div>
+    </div><div class="spec-f">.dpm-x · Bankexport, Track Record</div></div>
+
+    <div class="spec"><div class="spec-h"><b>2</b> · SVG in Goldkachel</div><div class="spec-b">
+      <div class="bar"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><span class="ctx">Einstellungen</span>
+        <button class="ist-band"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div>
+    </div><div class="spec-f">.dp-band-close · Einstellungen, Hilfe</div></div>
+
+    <div class="spec"><div class="spec-h"><b>3</b> · nacktes Text-×</div><div class="spec-b">
+      <div class="bar"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><span class="ctx">Pre-Flight · Boarding</span>
+        <button class="ist-text">×</button></span></div>
+    </div><div class="spec-f">.bdg-brand .x · Boarding-Skin</div></div>
+
+    <div class="spec"><div class="spec-h"><b>4</b> · nacktes Text-×</div><div class="spec-b">
+      <div class="bar"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><button class="ist-text2">×</button></span></div>
+    </div><div class="spec-f">.bi-x · Beleg-Import</div></div>
+
+    <div class="spec"><div class="spec-h"><b>5</b> · nacktes Text-×</div><div class="spec-b">
+      <div class="bar hell"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><button class="ist-text3">×</button></span></div>
+    </div><div class="spec-f">.dpshp-x · Score-Hero</div></div>
+
+    <div class="spec"><div class="spec-h"><b>6</b> · heller Kreis</div><div class="spec-b">
+      <div class="bar hell"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><button class="ist-legal">×</button></span></div>
+    </div><div class="spec-f">.dp-legal-close · Rechtstexte</div></div>
+  </div>
+
+  <h2><span class="n">03</span>Drei Fassungen zur Auswahl</h2>
+  <p>Alle drei halten die <b>44-px-Trefferfläche</b> aus v650/v652 — sichtbar über den
+  Schalter oben. Alle drei führen die Farbe über die <code>--wl-</code>Ebene, nicht hart
+  golden, damit Partner-Branding greift. Jede Fassung steht auf beiden Gründen, weil beide
+  in der App vorkommen.</p>
+
+  <div class="grid">
+    <div class="spec"><div class="spec-h"><b>A</b> · Ring</div><div class="spec-b">
+      <div class="bar"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><span class="ctx">Finanzierung · Export</span>
+        <button class="x-neu xa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div>
+      <div class="bar hell"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><button class="x-neu xa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div>
+    </div><div class="spec-f">32 px, leerer Ring im Markenton.<br>Der heutige <code>.dpm-x</code>, richtig gemacht:<br>zurückhaltend, füllt sich erst beim Zeigen.</div></div>
+
+    <div class="spec"><div class="spec-h"><b>B</b> · Kachel</div><div class="spec-b">
+      <div class="bar"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><span class="ctx">Finanzierung · Export</span>
+        <button class="x-neu xb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div>
+      <div class="bar hell"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><button class="x-neu xb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div>
+    </div><div class="spec-f">32 px, dunkle Fläche mit Goldkante.<br><b>Steht schon</b> in Einstellungen und Hilfe —<br>diese Fassung <b>vereinheitlicht nach innen</b>.</div></div>
+
+    <div class="spec"><div class="spec-h"><b>C</b> · Cockpit-Schalter</div><div class="spec-b">
+      <div class="bar"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><span class="ctx">Finanzierung · Export</span>
+        <button class="x-neu xc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Schließen</button></span></div>
+      <div class="bar hell"><span class="logo">Deal<b>Pilot</b></span>
+        <span class="rechts"><button class="x-neu xc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Schließen</button></span></div>
+    </div><div class="spec-f">Wort statt Zeichen, Mono-Versalien.<br>Am weitesten weg vom Platzhalter-Eindruck,<br>braucht aber Platz — auf 370 px eng.</div></div>
+  </div>
+
+  <div class="frage">
+    <h3>Was ich von dir brauche</h3>
+    <ol>
+      <li><b>Welcher Knopf ist deiner?</b> Nummer 1 bis 6 aus dem Ist-Zustand reicht — oder
+      ein Screenshot in <code>design/mockups/</code>.</li>
+      <li><b>Welche Fassung?</b> A, B oder C.</li>
+      <li><b>Nur dort tauschen oder überall?</b> Wenn überall, wird aus dem Punkt ein
+      Paket über 25 Fundstellen in 20 Dateien — machbar, aber mit eigener Prüfstrecke.
+      Mein Vorschlag: <b>B</b>, und <b>zuerst die drei nackten Text-×</b>, weil genau die
+      wie Platzhalter aussehen.</li>
+    </ol>
+  </div>
+
+</div>
+
+<script>
+/* v1115: nur der Sichtbarkeitsschalter für die Trefferfläche. */
+document.getElementById('tg-flaeche').addEventListener('click', function(){
+  document.body.classList.toggle('zeig');
+  this.classList.toggle('an', document.body.classList.contains('zeig'));
+});
+</script>
+</body>
+</html>
