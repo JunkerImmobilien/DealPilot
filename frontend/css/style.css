@@ -36614,3 +36614,54 @@ body:not(.dp-chrome-hell) #sb-actions-accordion .sb-act-kero {
   }
 }
 /* ===== v1112-settings-mobile END ===== */
+
+/* ===== v1117-band-close: Fassung B kommt an der siebten Stelle wirklich an =====
+   Bei der Browser-Abnahme von v1116 gemessen: der Schliessen-Knopf der
+   Einstellungen stand weiter auf 28x28, Flaeche rgba(42,39,39,.06), SVG 13 px
+   und ohne Trefferflaeche. Zwei Sieger, nicht einer:
+
+   1) v793i-xbtn-small `html .settings-modal.set-modal-v2 .set-modal-close`
+      (0,3,1, !important) schlaegt die v1116-Regel `.dp-mtb-brand
+      .dp-band-close` (0,2,0). Von dort kamen Flaeche, Kante, SVG 18 px und
+      overflow:hidden.
+   2) dp-band-fix.js (v863) schreibt Groesse und SVG INLINE mit !important.
+      Inline-!important schlaegt jedes Stylesheet — Groesse und Zeichen sind
+      deshalb dort auf 32/15 nachgezogen, nicht hier.
+
+   Deshalb hier `html body` + `.dp-mtb-brand` davor: (0,4,2) bzw. (1,2,2),
+   beides ueber v793i. `overflow:visible` ist Pflicht — v793i setzt
+   overflow:hidden und wuerde das 44-px-::after abschneiden.
+   Kein :active-Scale: transform bleibt none, das sichert v843/v863. */
+html body .settings-modal.set-modal-v2 .dp-mtb-brand .dp-band-close,
+html body #help-modal .dp-mtb-brand .dp-band-close,
+html body .set-modal-cream .dp-mtb-brand .dp-band-close{
+  background:#17130d !important;
+  border:1.5px solid var(--wl-e8cc7a, rgba(232,204,122,.8)) !important;
+  border-radius:9px !important;
+  color:var(--wl-e8cc7a, #E8CC7A) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.45) !important;
+  overflow:visible !important;
+  max-width:none !important; max-height:none !important;
+}
+html body .settings-modal.set-modal-v2 .dp-mtb-brand .dp-band-close svg,
+html body #help-modal .dp-mtb-brand .dp-band-close svg,
+html body .set-modal-cream .dp-mtb-brand .dp-band-close svg{
+  width:15px !important; height:15px !important;
+}
+html body .settings-modal.set-modal-v2 .dp-mtb-brand .dp-band-close::after,
+html body #help-modal .dp-mtb-brand .dp-band-close::after,
+html body .set-modal-cream .dp-mtb-brand .dp-band-close::after{
+  content:'' !important; position:absolute !important;
+  left:50% !important; top:50% !important;
+  transform:translate(-50%,-50%) !important;
+  width:max(100%,44px) !important; height:max(100%,44px) !important;
+  background:transparent !important;
+}
+html body .settings-modal.set-modal-v2 .dp-mtb-brand .dp-band-close:hover,
+html body #help-modal .dp-mtb-brand .dp-band-close:hover,
+html body .set-modal-cream .dp-mtb-brand .dp-band-close:hover{
+  background:var(--wl-c9a84c, #C9A84C) !important;
+  border-color:var(--wl-e8cc7a, #E8CC7A) !important;
+  color:#1a1508 !important;
+}
+/* ===== v1117-band-close END ===== */

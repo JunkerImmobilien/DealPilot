@@ -8,7 +8,11 @@
    ============================================================================ */
 (function () {
   'use strict';
-  var X_SIZE = 28, X_RIGHT = 16, GAP = 18;
+  /* v1117: 28 -> 32 und SVG 13 -> 15. Diese Datei schreibt INLINE mit
+     '!important' und schlaegt damit jedes Stylesheet — die v1116-Regel in
+     css/style.css kam an dieser Stelle deshalb nie an (im Browser gemessen).
+     Wer die Groesse aendern will, aendert sie hier, nicht im CSS. */
+  var X_SIZE = 32, X_RIGHT = 16, GAP = 18;
 
   function fixOne(tb) {
     var brand = tb.querySelector('.dp-mtb-brand');
@@ -38,7 +42,7 @@
     imp(x, 'padding', '0');
     imp(x, 'z-index', '30');
     var svg = x.querySelector('svg');
-    if (svg) { imp(svg, 'width', '13px'); imp(svg, 'height', '13px'); }
+    if (svg) { imp(svg, 'width', '15px'); imp(svg, 'height', '15px'); }   /* v1117 */
 
     if (tag) {
       imp(tag, 'position', 'absolute');
