@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marktbericht · zehn Gestaltungsideen</title>
+<!--
+  DealPilot · Vorschlag zu Backlog-Punkt „Marktbericht: neun bis zehn
+  Gestaltungsideen als Mockups“.  Stand 2026-08-10.
+
+  ZWEI DINGE VORWEG:
+
+  1. Alle Zahlen unten sind AM LAUFENDEN STAND GEMESSEN, nicht geschaetzt.
+     Quelle: frontend/marktbericht-app/wertermittlung.js und ein Messlauf
+     auf Staging.
+  2. Beim Messen sind zwei echte Defekte aufgefallen; sie sind mit v1119
+     behoben, BEVOR dieses Dokument entstand. Ein Wizard haette sie sonst
+     geerbt. Siehe Abschnitt „Was das Messen zutage gefoerdert hat“.
+
+  Die Demos hier sind Neubauten. Uebernommen wird die GESTALTUNG, nicht
+  der Code — genau wie bei den Mockups im design/-Ordner.
+-->
+<style>
+  :root{
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --obsidian:#050505; --creme:#FDFCFA; --karte:#FBF6E9;
+    --gruen:#3FA56C; --rot:#B8625C; --gelb:#E8B84F;
+    --ink:#1c1a17; --ink2:#5d5852; --ink3:#8a847c;
+    --linie:#e4ded1; --flaeche:#fff;
+    --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--creme);color:var(--ink);
+    font:15px/1.65 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 24px 90px}
+  h1{font-family:"Space Grotesk",system-ui,sans-serif;font-size:34px;line-height:1.15;margin:0 0 6px;letter-spacing:-.5px}
+  h1 b{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kick{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--gold-lo);margin-bottom:10px}
+  .rw{height:3px;width:74px;border-radius:2px;background:var(--runway);margin:16px 0 26px}
+  h2{font-family:"Space Grotesk",system-ui,sans-serif;font-size:22px;margin:52px 0 4px;letter-spacing:-.2px}
+  h3{font-family:"Space Grotesk",system-ui,sans-serif;font-size:16px;margin:26px 0 8px}
+  p{margin:0 0 12px;max-width:78ch}
+  .lead{font-size:16.5px;color:var(--ink2)}
+  code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.88em;
+    background:#f2ede1;padding:1px 5px;border-radius:4px}
+  table{border-collapse:collapse;width:100%;margin:14px 0 20px;font-size:14px}
+  th,td{border:1px solid var(--linie);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#f6f1e4;font-weight:600;font-size:12.5px;letter-spacing:.02em}
+  .tab-scroll{overflow-x:auto}
+  .karte{background:var(--flaeche);border:1px solid var(--linie);border-radius:12px;
+    padding:22px 24px;margin:18px 0}
+  .warn{border-left:3px solid var(--rot);background:#fdf6f5}
+  .ok{border-left:3px solid var(--gruen);background:#f5faf7}
+  .merk{border-left:3px solid var(--gold);background:#fdfaf0}
+
+  /* ── Ideen-Raster ─────────────────────────────────────────── */
+  .idee{background:var(--flaeche);border:1px solid var(--linie);border-radius:14px;
+    margin:26px 0;overflow:hidden}
+  .idee-kopf{padding:18px 24px;border-bottom:1px solid var(--linie);
+    display:flex;align-items:flex-start;gap:14px;background:#fcfaf4}
+  .nr{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--obsidian);
+    color:var(--gold-hi);display:flex;align-items:center;justify-content:center;
+    font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:700}
+  .idee-kopf h3{margin:0;font-size:18px}
+  .idee-kopf .sub{color:var(--ink2);font-size:13.5px;margin-top:3px}
+  .idee-koerper{padding:20px 24px}
+  .demo{border:1px solid var(--linie);border-radius:10px;background:#fff;
+    padding:16px;margin:14px 0;position:relative}
+  .demo::before{content:'Anklickbar';position:absolute;right:10px;top:-9px;
+    background:var(--gold);color:#2c2410;font:600 9.5px/1 "JetBrains Mono",monospace;
+    letter-spacing:.1em;padding:4px 7px;border-radius:4px;text-transform:uppercase}
+  .fuer{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13.5px}
+  .fuer div{flex:1 1 240px}
+  .fuer b{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink3);margin-bottom:3px}
+
+  /* ── gemeinsame Demo-Bausteine ────────────────────────────── */
+  .f{margin-bottom:10px}
+  .f label{display:block;font-size:12px;color:var(--ink2);margin-bottom:3px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid #d8d2c4;border-radius:7px;
+    font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+  .f .pf{color:var(--rot);margin-left:2px}
+  .f.neu{animation:rein .35s ease}
+  @keyframes rein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  .knopf{appearance:none;border:0;border-radius:8px;padding:10px 16px;font:inherit;
+    font-size:13.5px;font-weight:600;cursor:pointer;background:var(--runway);color:#2c2410}
+  .knopf.leise{background:#f2ede1;color:var(--ink)}
+  .knopf:active{transform:scale(.97)}
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;
+    font-size:11.5px;font-weight:600}
+  .p-ok{background:#e6f4ec;color:#237049}
+  .p-warn{background:#fdf3df;color:#8a6410}
+  .p-nein{background:#f1efeb;color:#77716a}
+
+  /* 1 Wizard */
+  .wz-schritte{display:flex;gap:0;border-bottom:2px solid var(--linie);margin-bottom:16px;overflow-x:auto}
+  .wz-s{flex:0 0 auto;padding:9px 15px;font-size:13px;color:var(--ink3);cursor:pointer;
+    border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;background:none;border-top:0;border-left:0;border-right:0}
+  .wz-s.an{color:var(--ink);font-weight:600;border-bottom-color:var(--gold)}
+  .wz-s .n{font-family:"JetBrains Mono",monospace;font-size:11px;opacity:.6;margin-right:5px}
+  .wz-s.fertig .n::after{content:' ✓';color:var(--gruen);opacity:1}
+  .wz-bal{height:4px;background:#eee7d8;border-radius:2px;margin-bottom:16px;overflow:hidden}
+  .wz-bal i{display:block;height:100%;background:var(--runway);transition:width .3s}
+
+  /* 2 Split */
+  .sp{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .sp-vor{background:var(--karte);border-radius:10px;padding:16px;font-size:13.5px}
+  .sp-korridor{height:34px;border-radius:6px;background:linear-gradient(90deg,#efe7d0,#C9A84C,#efe7d0);
+    position:relative;margin:10px 0}
+  .sp-korridor i{position:absolute;top:-5px;width:2px;height:44px;background:var(--obsidian);transition:left .35s}
+  .sp-zahl{font-family:"Space Grotesk",system-ui,sans-serif;font-size:26px;font-weight:700}
+
+  /* 3 Verfahren */
+  .vf{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+  .vf-k{border:1px solid var(--linie);border-radius:10px;padding:14px;background:#fff;cursor:pointer;transition:.16s}
+  .vf-k:hover{border-color:var(--gold);box-shadow:0 3px 12px rgba(201,168,76,.15)}
+  .vf-k h4{margin:0 0 4px;font-size:14.5px}
+  .vf-k .fehlt{font-size:12px;color:var(--rot);margin-top:6px}
+
+  /* 4 Akkordeon */
+  .ak-z{border:1px solid var(--linie);border-radius:9px;margin-bottom:8px;overflow:hidden}
+  .ak-k{width:100%;text-align:left;background:#fcfaf4;border:0;padding:12px 14px;cursor:pointer;
+    display:flex;align-items:center;gap:10px;font:inherit;font-size:14px}
+  .ak-k .pfeil{transition:transform .2s;color:var(--ink3)}
+  .ak-z.auf .ak-k .pfeil{transform:rotate(90deg)}
+  .ak-in{display:none;padding:14px}
+  .ak-z.auf .ak-in{display:block}
+  .ak-k .rest{margin-left:auto}
+
+  /* 5 Ein Feld pro Bild */
+  .ef{min-height:200px;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:20px}
+  .ef h4{font-family:"Space Grotesk",system-ui,sans-serif;font-size:22px;margin:0 0 6px}
+  .ef .hint{color:var(--ink2);font-size:13.5px;margin-bottom:16px}
+  .ef input,.ef select{max-width:320px;margin:0 auto;font-size:18px !important;text-align:center}
+  .ef-nav{margin-top:18px;display:flex;gap:8px;justify-content:center}
+  .ef-zaehl{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink3);margin-top:12px}
+
+  /* 6 Zweig */
+  .zw{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+  .zw-a{flex:1 1 200px;border:2px solid var(--linie);border-radius:10px;padding:14px;cursor:pointer;background:#fff}
+  .zw-a.an{border-color:var(--gold);background:#fdfaf0}
+  .zw-a h4{margin:0 0 4px;font-size:15px}
+  .zw-a p{font-size:12.5px;color:var(--ink2);margin:0}
+  .zw-weg{margin-top:14px;padding:12px 14px;border-left:3px solid var(--gold);background:#fdfaf0;font-size:13.5px}
+
+  /* 7 Datenblatt */
+  .db{font-size:13px}
+  .db td{padding:5px 8px}
+  .db .g{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ink3)}
+  .db tr.fehlt td{background:#fdf6f5}
+  .db-filter{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+
+  /* 8 Checkliste */
+  .cl{display:grid;grid-template-columns:260px 1fr;gap:16px}
+  .cl-l{border-right:1px solid var(--linie);padding-right:16px}
+  .cl-e{padding:7px 9px;border-radius:6px;cursor:pointer;font-size:13.5px;display:flex;gap:7px;align-items:center}
+  .cl-e:hover{background:#faf7ee}
+  .cl-e.an{background:#fdfaf0;font-weight:600}
+
+  /* 9 Stapel */
+  .st{position:relative;height:210px}
+  .st-k{position:absolute;inset:0;background:#fff;border:1px solid var(--linie);border-radius:12px;
+    padding:16px;box-shadow:0 4px 18px rgba(0,0,0,.07);transition:.3s}
+  .st-k h4{margin:0 0 8px;font-size:15px}
+
+  /* 10 Kopilot */
+  .kp{max-height:290px;overflow-y:auto;padding-right:4px}
+  .kp-b{display:flex;gap:9px;margin-bottom:10px;align-items:flex-start}
+  .kp-av{flex:0 0 26px;height:26px;border-radius:7px;background:var(--obsidian);color:var(--gold-hi);
+    display:flex;align-items:center;justify-content:center;font-size:12px}
+  .kp-t{background:#f6f1e4;border-radius:10px;padding:9px 12px;font-size:13.5px;max-width:78%}
+  .kp-b.ich{flex-direction:row-reverse}
+  .kp-b.ich .kp-t{background:var(--obsidian);color:var(--creme)}
+  .kp-b.ich .kp-av{background:#e8e2d4;color:var(--ink)}
+  .kp-wirkung{font-size:11px;color:var(--gold-lo);font-weight:600;margin-top:4px}
+
+  @media(max-width:760px){
+    .sp,.cl{grid-template-columns:1fr}
+    .cl-l{border-right:0;border-bottom:1px solid var(--linie);padding:0 0 14px}
+    h1{font-size:26px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="kick">DealPilot · Vorschlag · 2026-08-10</div>
+<h1>Marktbericht — <b>zehn Gestaltungsideen</b></h1>
+<div class="rw"></div>
+<p class="lead">Zehn ernsthaft verschiedene Antworten auf dieselbe Frage, nicht sieben
+Varianten derselben. Jede ist anklickbar. <b>Die Auswahl trifft Marcel.</b></p>
+
+<h2>Erst messen, dann entwerfen</h2>
+<p>Der Backlog-Punkt verlangt das ausdrücklich. Gemessen am laufenden Stand
+(<code>wertermittlung.js</code>, 840 Zeilen, plus ein Lauf auf Staging):</p>
+
+<div class="tab-scroll">
+<table>
+<tr><th>Was</th><th>Gemessen</th></tr>
+<tr><td>Felder im Wertermittlungs-Katalog</td><td><b>42</b> in vier Abschnitten: <code>stufe1</code> 1 · <code>stufe2</code> 1 · <code>stufe3</code> 34 · <code>experte</code> 6</td></tr>
+<tr><td>Sichtbare Eingaben insgesamt (Stufe 3)</td><td><b>46</b> — der Katalog kommt zu den Grundfeldern hinzu</td></tr>
+<tr><td>Davon <b>bedingt</b></td><td><b>27 von 42</b> (<code>wenn:</code> 22, <code>pflichtWenn:</code> 8, teils beides)</td></tr>
+<tr><td>Seitenhöhe bei Stufe 3</td><td><b>4.608 px</b> — ein durchgehender Scroll</td></tr>
+<tr><td>Breite der Formularspalte</td><td><b>338 px</b>, bei 1.920 px Fenster</td></tr>
+<tr><td>Fläche rechts daneben</td><td><b>rund 730 px leer</b>, solange kein Bericht da ist</td></tr>
+<tr><td>Stufen der Zielfrage</td><td>3 (Schnelle Einschätzung · Genaue Preisindikation · Wertermittlung)</td></tr>
+</table>
+</div>
+
+<h3>Die Abhängigkeiten — das eigentliche Risiko jedes Wizards</h3>
+<p><b><code>istWohnung()</code> spaltet den Katalog in zwei Hälften.</b> Das ist die
+wichtigste Zahl im Dokument:</p>
+
+<div class="tab-scroll">
+<table>
+<tr><th>Bedingung</th><th>schaltet</th><th>Felder</th></tr>
+<tr><td><code>!istWohnung()</code> — Haus</td><td>17 Felder <b>nur für Häuser</b></td><td><code>nhkHaus</code> <code>nhkGeschosse</code> <code>nhkDach</code> · neun <code>ausst*</code> · fünf <code>btl*</code></td></tr>
+<tr><td><code>!istWohnung()</code></td><td>1 Expertenfeld</td><td><code>sachwertfaktor</code></td></tr>
+<tr><td><code>istWohnung()</code> — Wohnung</td><td>2 Felder <b>nur für Wohnungen</b></td><td><code>mea</code> (Pflicht) · <code>grundriss</code></td></tr>
+<tr><td><code>hinterlandFlaeche</code> gefüllt</td><td>2 Folgefelder</td><td><code>hinterlandRent</code> · <code>hinterlandWert</code> (Pflicht)</td></tr>
+<tr><td><code>garagenBgf</code> gefüllt</td><td>1 Folgefeld</td><td><code>garagenStufe</code> (Pflicht)</td></tr>
+<tr><td><code>baustatus</code> enthält „saniert“</td><td>1 Folgefeld</td><td><code>sanierungsjahr</code></td></tr>
+<tr><td><code>brwManuell</code> / <code>brwAnp</code> gefüllt</td><td>je 1 Folgefeld (Pflicht)</td><td><code>brwStichtag</code> · <code>brwAnpGrund</code></td></tr>
+<tr><td>Stellplätze &gt; 0</td><td>1 Folgefeld</td><td><code>spMiete</code></td></tr>
+</table>
+</div>
+
+<div class="karte warn">
+<h3 style="margin-top:0">Was das Messen zutage gefördert hat</h3>
+<p><b>Zwei echte Defekte, beide mit <code>v1119</code> behoben, bevor dieses
+Dokument entstand.</b> Ein Wizard hätte sie sonst geerbt — und zwar unsichtbar,
+weil er dieselben <code>wenn:</code>-Funktionen benutzt.</p>
+<p><b>1 · Die Bedingung wurde gegen ein gelöschtes Feld geprüft.</b>
+<code>zeichnen()</code> entfernte die Blöcke <code>wm-b1/b2/b3</code>, <em>bevor</em>
+die <code>wenn:</code>-Funktionen liefen. <code>wert(id)</code> las per
+<code>getElementById</code> — das Element war weg, also kam immer <code>""</code>
+zurück. Betroffen: <code>hinterlandRent</code>, <code>garagenStufe</code>,
+<code>sanierungsjahr</code>, <code>brwStichtag</code>, <code>brwAnpGrund</code>.
+<b>Der Backlog-Punkt nahm an, diese Felder „erscheinen nur nach echter
+Nutzereingabe“. Gemessen erschienen sie überhaupt nicht</b> —
+<code>garagenStufe</code> und <code>hinterlandWert</code> sind dabei
+<code>pflichtWenn</code>, also Pflichtfelder, die nie auftauchen konnten.</p>
+<p><b>2 · Der Auslöser fehlte.</b> <code>ptype</code> stand nicht in der Liste der
+Felder, deren <code>change</code> neu zeichnet. Objektart von Wohnung auf Haus
+umstellen ⇒ die 17 Hausfelder erschienen nicht, <code>mea</code> blieb stehen.
+Drei der fehlenden sind Pflicht; ohne sie rechnet der Sachwert nicht — und
+„kein Verfahren rechnet halb“.</p>
+<p style="margin-bottom:0"><b>Konsequenz für jeden Entwurf hier:</b> die
+Sichtbarkeitsregel muss <em>eine</em> Stelle haben, die nach jeder Eingabe neu
+ausgewertet wird — nicht eine Liste von Auslösern, die jemand pflegen muss.</p>
+</div>
+
+<div class="karte merk">
+<h3 style="margin-top:0">Zwei Randbedingungen, die für alle zehn gelten</h3>
+<p><b>Die Marktbericht-App ist immer hell</b> und lädt
+<code>whitelabel-override.js</code> <b>nicht</b>. Farbe kommt ausschließlich über
+<code>mb-whitelabel.js</code>. Kein Entwurf hier setzt ein eigenes dunkles Thema.</p>
+<p style="margin-bottom:0"><b><code>payload()</code> bleibt die Sammelstelle.</b>
+Keine neue Oberfläche darf Feldnamen ändern — <code>app.js</code> übernimmt
+<code>payload()</code> als Ganzes, und wer dort fehlt, existiert für den Bericht
+nicht (die Lehre aus v1055, v1062, v1067). Alle zehn Entwürfe ordnen nur
+<b>um</b>, sie benennen nichts <b>neu</b>.</p>
+</div>
+
+<h2>Die zehn Ideen</h2>
+
+<!-- ══════════════════ 1 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">1</div>
+    <div><h3>Wizard mit Reitern im Arbeitsbereich</h3>
+      <div class="sub">Marcels Richtung: mehrere Stufen, die man durchklickt. Fünf Schritte, jeder eine eigene Seite.</div></div>
+  </div>
+  <div class="idee-koerper">
+    <p>Der Fortschritt ist immer sichtbar, jeder Schritt ist einzeln erreichbar (kein
+    Zwang zur Reihenfolge), und ein Schritt trägt seinen Zustand im Reiter. Der
+    Sprung ans Ende bleibt jederzeit möglich — Sachverständige arbeiten nicht linear.</p>
+    <div class="demo" id="d1">
+      <div class="wz-schritte" id="d1-tabs"></div>
+      <div class="wz-bal"><i id="d1-bal" style="width:20%"></i></div>
+      <div id="d1-inhalt"></div>
+      <div style="margin-top:16px;display:flex;gap:8px">
+        <button class="knopf leise" id="d1-zur">← Zurück</button>
+        <button class="knopf" id="d1-vor">Weiter →</button>
+      </div>
+    </div>
+    <div class="fuer">
+      <div><b>Stark</b> Ordnung, Fortschritt, kurze Seiten. Die 4.608 px zerfallen in fünf verdauliche Stücke.</div>
+      <div><b>Schwach</b> Der Überblick geht verloren — wer alles auf einmal sehen will, klickt fünfmal.</div>
+      <div><b>Abhängigkeiten</b> Der Objekttyp muss in <b>Schritt 1</b> stehen, sonst baut Schritt 3 die falschen Felder.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 2 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">2</div>
+    <div><h3>Zwei Spalten: Eingabe links, lebende Vorschau rechts</h3>
+      <div class="sub">Nutzt die rund 730 px, die heute leer bleiben, bis ein Bericht da ist.</div></div>
+  </div>
+  <div class="idee-koerper">
+    <p>Der stärkste Hebel gegen „sieht nicht gut aus“ ist nicht die Form der Felder,
+    sondern <b>die leere Fläche</b>. Rechts steht ab der ersten Eingabe ein
+    Wertkorridor, der sich bei jeder Änderung bewegt. Das macht sichtbar, was ein
+    Feld überhaupt bewirkt — und beantwortet nebenbei die Frage, warum man es
+    ausfüllen soll.</p>
+    <div class="demo">
+      <div class="sp">
+        <div>
+          <div class="f"><label>Wohnfläche (m²)</label><input type="number" id="d2-a" value="165"></div>
+          <div class="f"><label>Baujahr</label><input type="number" id="d2-b" value="1968"></div>
+          <div class="f"><label>Zustand</label>
+            <select id="d2-c"><option value="1">einfach</option><option value="2" selected>normal</option><option value="3">gehoben</option></select></div>
+        </div>
+        <div class="sp-vor">
+          <div style="font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#8a6410">Marktwert-Korridor</div>
+          <div class="sp-zahl" id="d2-wert">305.900 €</div>
+          <div class="sp-korridor"><i id="d2-nadel" style="left:50%"></i></div>
+          <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#77716a">
+            <span id="d2-min">274.000 €</span><span id="d2-max">338.000 €</span></div>
+          <div style="margin-top:12px;font-size:12px;color:#5d5852" id="d2-hinweis">
+            Noch <b>3</b> Angaben bis zum Sachwertverfahren.</div>
+        </div>
+      </div>
+    </div>
+    <div class="fuer">
+      <div><b>Stark</b> Beantwortet „warum soll ich das ausfüllen“ ohne ein Wort Erklärung.</div>
+      <div><b>Schwach</b> Braucht eine belastbare Zwischenrechnung. Eine erfundene Zahl wäre schlimmer als eine leere Fläche.</div>
+      <div><b>Kombinierbar</b> Passt unter <b>jede</b> der anderen neun Ideen — es ist eine Flächen-, keine Ablauffrage.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 3 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">3</div>
+    <div><h3>Verfahrensgetrieben statt feldgetrieben</h3>
+      <div class="sub">Nicht „Gruppe 4 von 7“, sondern: welches Verfahren rechnet gleich, und was fehlt ihm noch?</div></div>
+  </div>
+  <div class="idee-koerper">
+    <p>Der Nutzer will kein Formular ausfüllen, er will ein Ergebnis. Diese Fassung
+    dreht die Oberfläche um: drei Karten für Vergleichs-, Ertrags- und
+    Sachwertverfahren, jede mit ihrem Zustand und ihrer Lücke. Ein Klick auf eine
+    Lücke springt ins Feld. <b>Das ist die Ampel von heute, zur Hauptsache gemacht.</b></p>
+    <div class="demo">
+      <div class="vf" id="d3">
+        <div class="vf-k" data-v="vergleich"><h4>Vergleichswert</h4>
+          <span class="pill p-ok">✓ rechnet</span>
+          <div style="font-size:12px;color:#5d5852;margin-top:6px">Alle Pflichtangaben liegen vor.</div></div>
+        <div class="vf-k" data-v="ertrag"><h4>Ertragswert</h4>
+          <span class="pill p-warn">! ungenau</span>
+          <div class="fehlt">Ohne Liegenschaftszins wird pauschal gerechnet →</div></div>
+        <div class="vf-k" data-v="sach"><h4>Sachwert</h4>
+          <span class="pill p-nein">— rechnet nicht</span>
+          <div class="fehlt">Es fehlen: Standardstufe, Hausform, Geschosse →</div></div>
+      </div>
+      <div id="d3-ziel" style="margin-top:14px"></div>
+    </div>
+    <div class="fuer">
+      <div><b>Stark</b> Trägt „kein Verfahren rechnet halb“ direkt in die Oberfläche. Jede Eingabe hat einen erkennbaren Zweck.</div>
+      <div><b>Schwach</b> Ein Feld gehört oft zu mehreren Verfahren — es taucht dann mehrfach auf oder braucht eine Regel dafür.</div>
+      <div><b>Für wen</b> Sachverständige. Wer nur eine Hausnummer will, versteht die Karten nicht.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 4 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">4</div>
+    <div><h3>Akkordeon mit Ampel je Abschnitt</h3>
+      <div class="sub">Der kleinste Eingriff: der heutige Aufbau, aber jeder Block klappt zu und trägt seinen Zustand.</div></div>
+  </div>
+  <div class="idee-koerper">
+    <p>Kein neuer Ablauf, keine neue Navigation — nur Struktur. Aus 4.608 px werden
+    sieben Zeilen, von denen eine offen ist. Der Rest ist zusammengefaltet und sagt
+    trotzdem, was drinsteckt. <b>Das ist die Idee mit dem kleinsten Risiko und dem
+    schnellsten Ergebnis.</b></p>
+    <div class="demo" id="d4"></div>
+    <div class="fuer">
+      <div><b>Stark</b> Sofort baubar, keine Ablaufänderung, kein neues Zustandsmodell.</div>
+      <div><b>Schwach</b> Löst die eigentliche Klage nicht — es sieht danach aufgeräumt aus, aber nicht gut.</div>
+      <div><b>Wert</b> Als <b>Zwischenschritt</b>, falls eine der großen Ideen länger braucht.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 5 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">5</div>
+    <div><h3>Ein Feld pro Bild</h3>
+      <div class="sub">Maximale Ruhe: eine Frage, groß, mittig. Enter führt weiter.</div></div>
+  </div>
+  <div class="idee-koerper">
+    <p>Die radikalste Antwort auf 46 Eingaben: immer nur eine zeigen. Die Ablenkung
+    fällt weg, die Hilfe hat Platz, und die Abhängigkeit löst sich von selbst — die
+    nächste Frage wird erst bestimmt, wenn die vorige beantwortet ist.
+    <b>Genau das macht diese Fassung gegen Abhängigkeitsfehler immun.</b></p>
+    <div class="demo">
+      <div class="ef" id="d5">
+        <h4 id="d5-frage">Was für ein Objekt ist es?</h4>
+        <div class="hint" id="d5-hint">Davon hängt ab, welche Angaben danach kommen.</div>
+        <div id="d5-eingabe"></div>
+        <div class="ef-nav">
+          <button class="knopf leise" id="d5-zur">← Zurück</button>
+          <button class="knopf" id="d5-vor">Weiter →</button>
+        </div>
+        <div class="ef-zaehl" id="d5-zaehl">Frage 1 von 8</div>
+      </div>
+    </div>
+    <div class="fuer">
+      <div><b>Stark</b> Auf dem Handy die mit Abstand beste Fassung. Und der beste Ort für die Feldhilfe.</div>
+      <div><b>Schwach</b> Für 46 Felder zu langsam. Ein Sachverständiger, der zehn Objekte am Tag rechnet, hasst es.</div>
+      <div><b>Also</b> Als <b>zweite</b> Fassung neben einer dichten — nicht als einzige.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 6 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">6</div>
+    <div><h3>Der sichtbare Zweig</h3>
+      <div class="sub">Die Objektart ist die erste Frage — und der Weg teilt sich <em>sichtbar</em>.</div>
+  </div></div>
+  <div class="idee-koerper">
+    <p>Nimmt den gemessenen Befund ernst: <code>istWohnung()</code> entscheidet über
+    <b>20 von 42</b> Feldern. Heute passiert diese Verzweigung stumm — und war bis
+    v1119 sogar kaputt. Hier wird sie zur Hauptsache: man sieht vorher, welchen Weg
+    man einschlägt und wie lang er ist.</p>
+    <div class="demo">
+      <div class="zw" id="d6">
+        <div class="zw-a" data-t="etw"><h4>Eigentumswohnung</h4><p>Miteigentumsanteil und Grundriss. <b>Kein</b> Sachwert.</p></div>
+        <div class="zw-a" data-t="haus"><h4>Haus</h4><p>NHK-Typennummer, neun Gewerke, fünf Bauteile.</p></div>
+      </div>
+      <div class="zw-weg" id="d6-weg">Wähle oben — der Weg erscheint hier.</div>
+    </div>
+    <div class="fuer">
+      <div><b>Stark</b> Macht die teuerste Verzweigung der App unübersehbar. Niemand füllt 17 Felder umsonst.</div>
+      <div><b>Schwach</b> Ein Wechsel der Objektart mitten im Vorgang muss sauber aufräumen — sonst reist <code>mea</code> ins Haus mit.</div>
+      <div><b>Belegt</b> Genau dieser Fehler stand bis v1119 im Code.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 7 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">7</div>
+    <div><h3>Datenblatt</h3>
+      <div class="sub">Alle 42 Felder als dichte Tabelle. Filter statt Navigation.</div></div>
+  </div>
+  <div class="idee-koerper">
+    <p>Die Gegenthese zu Idee 5. Für den, der weiß, was er tut: kein Ablauf, keine
+    Schritte, sondern <b>Übersicht und Tastatur</b>. Ein Filter zeigt nur das
+    Fehlende, ein zweiter nur die Pflichtfelder. Tabulator läuft durch.</p>
+    <div class="demo">
+      <div class="db-filter">
+        <button class="knopf leise" data-f="alle">Alle (42)</button>
+        <button class="knopf leise" data-f="fehlt">Nur fehlende</button>
+        <button class="knopf leise" data-f="pflicht">Nur Pflicht</button>
+      </div>
+      <table class="db" id="d7"></table>
+    </div>
+    <div class="fuer">
+      <div><b>Stark</b> Schnellste Fassung für Wiederholer. Zeigt als einzige alles auf einmal.</div>
+      <div><b>Schwach</b> Schreckt jeden ab, der zum ersten Mal einen Bericht macht.</div>
+      <div><b>Also</b> Als <b>Expertenansicht</b> neben einer geführten — ein Umschalter, zwei Wege, ein Datenmodell.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 8 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">8</div>
+    <div><h3>Checkliste mit Sprungmarken</h3>
+      <div class="sub">Links steht, was fehlt. Rechts steht das Formular. Ein Klick verbindet beides.</div></div>
+  </div>
+  <div class="idee-koerper">
+    <p>Behält das durchgehende Formular — es hat den Vorteil, dass man scrollen und
+    überfliegen kann — und stellt ihm eine mitlaufende Liste des Fehlenden zur Seite.
+    Die Liste schrumpft beim Ausfüllen. <b>Der Fortschritt ist eine Zahl, die kleiner
+    wird, statt eines Balkens, der wächst.</b></p>
+    <div class="demo">
+      <div class="cl">
+        <div class="cl-l">
+          <div style="font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#8a6410;margin-bottom:9px">
+            Noch offen (<span id="d8-n">4</span>)</div>
+          <div id="d8-liste"></div>
+        </div>
+        <div id="d8-form"></div>
+      </div>
+    </div>
+    <div class="fuer">
+      <div><b>Stark</b> Kein neuer Ablauf, aber echte Führung. Und die leere Fläche wird sinnvoll gefüllt.</div>
+      <div><b>Schwach</b> Bei 46 Feldern wird die Liste selbst lang — sie braucht eigene Gruppierung.</div>
+      <div><b>Nah dran</b> Am heutigen Zustand, deshalb günstig zu bauen.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 9 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">9</div>
+    <div><h3>Kartenstapel</h3>
+      <div class="sub">Jede Feldgruppe eine Karte. Abgearbeitete Karten wandern nach hinten.</div></div>
+  </div>
+  <div class="idee-koerper">
+    <p>Zwischen Wizard und Ein-Feld-pro-Bild: sieben Karten, jede mit drei bis sechs
+    Feldern, jede abschließbar. Der Stapel zeigt, wie viel noch kommt, ohne eine
+    Reiterleiste zu brauchen — und passt auf dem Handy genauso wie am Rechner.
+    <b>Es ist der Boarding-Gedanke der Marke, auf ein Formular angewendet.</b></p>
+    <div class="demo">
+      <div class="st" id="d9"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <button class="knopf" id="d9-vor">Karte abschließen →</button>
+        <button class="knopf leise" id="d9-reset">Von vorn</button>
+        <span style="font-size:12px;color:#77716a" id="d9-stand"></span>
+      </div>
+    </div>
+    <div class="fuer">
+      <div><b>Stark</b> Trägt die Bildsprache der Marke, ohne aufgesetzt zu wirken. Eine Fassung für beide Bildschirmgrößen.</div>
+      <div><b>Schwach</b> Zurückspringen ist umständlicher als bei Reitern.</div>
+      <div><b>Bedingung</b> Braucht dieselbe Ausnahme wie Idee 1: der Objekttyp muss auf Karte 1.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 10 ══════════════════ -->
+<div class="idee">
+  <div class="idee-kopf">
+    <div class="nr">10</div>
+    <div><h3>Der Co-Pilot fragt</h3>
+      <div class="sub">Kein Formular, ein Gespräch — und zwar <em>in der Reihenfolge der Wirkung auf den Wert</em>.</div></div>
+  </div>
+  <div class="idee-koerper">
+    <p>Die App weiß, welches Feld den Wert am stärksten bewegt. Der gemessene Beleg
+    steht im Quelltext: Baustatus wurde in Stufe 1 gezogen, weil Erstbezug gegen
+    Bestand <b>41 Prozent</b> Unterschied macht (Leipzig, 12 Monate, gleiche Fläche) —
+    „kein Feld aus Stufe 2 bewegt den Wert annähernd so stark, und es kostet einen
+    Klick“. Diese Fassung macht daraus das Ordnungsprinzip: <b>gefragt wird nach
+    Hebelwirkung, nicht nach Feldgruppe</b>, und jede Frage sagt, was sie bringt.</p>
+    <div class="demo">
+      <div class="kp" id="d10"></div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="knopf" id="d10-vor">Antworten</button>
+        <button class="knopf leise" id="d10-reset">Von vorn</button>
+      </div>
+    </div>
+    <div class="fuer">
+      <div><b>Stark</b> Die einzige Fassung, die begründet, <em>warum</em> gerade jetzt diese Frage kommt. Passt zur Co-Pilot-Bildsprache.</div>
+      <div><b>Schwach</b> Braucht eine belastbare Rangfolge der Hebelwirkung. Ohne sie ist es ein Wizard mit Sprechblasen.</div>
+      <div><b>Offen</b> Ob die Rangfolge fest ist oder aus dem Objekt folgt — das ist eine eigene Frage.</div>
+    </div>
+  </div>
+</div>
+
+<h2>Gegenüberstellung</h2>
+<div class="tab-scroll">
+<table>
+<tr><th>#</th><th>Idee</th><th>Aufwand</th><th>Löst „sieht nicht gut aus“</th><th>Robust gegen Abhängigkeiten</th><th>Handy</th></tr>
+<tr><td>1</td><td>Wizard mit Reitern</td><td>mittel</td><td>ja</td><td>nur mit Typ in Schritt 1</td><td>gut</td></tr>
+<tr><td>2</td><td>Zwei Spalten mit Vorschau</td><td>mittel–hoch</td><td><b>am stärksten</b></td><td>neutral</td><td>fällt auf eine Spalte</td></tr>
+<tr><td>3</td><td>Verfahrensgetrieben</td><td>hoch</td><td>ja</td><td><b>ja</b> — Lücke ist das Thema</td><td>gut</td></tr>
+<tr><td>4</td><td>Akkordeon mit Ampel</td><td><b>gering</b></td><td>teilweise</td><td>neutral</td><td>gut</td></tr>
+<tr><td>5</td><td>Ein Feld pro Bild</td><td>mittel</td><td>ja</td><td><b>von Natur aus</b></td><td><b>sehr gut</b></td></tr>
+<tr><td>6</td><td>Sichtbarer Zweig</td><td>gering</td><td>teilweise</td><td><b>ja</b> — genau dafür gebaut</td><td>gut</td></tr>
+<tr><td>7</td><td>Datenblatt</td><td>gering</td><td>nein (bewusst)</td><td>neutral</td><td>schlecht</td></tr>
+<tr><td>8</td><td>Checkliste mit Sprungmarken</td><td>gering–mittel</td><td>teilweise</td><td>gut</td><td>mäßig</td></tr>
+<tr><td>9</td><td>Kartenstapel</td><td>mittel</td><td>ja</td><td>nur mit Typ auf Karte 1</td><td><b>sehr gut</b></td></tr>
+<tr><td>10</td><td>Co-Pilot fragt</td><td>hoch</td><td>ja</td><td><b>von Natur aus</b></td><td>sehr gut</td></tr>
+</table>
+</div>
+
+<div class="karte ok">
+<h3 style="margin-top:0">Wenn ich wählen müsste</h3>
+<p><b>Es sind nicht zehn Alternativen — es sind zwei Entscheidungen.</b></p>
+<p><b>Erstens der Ablauf:</b> <b>1 (Wizard)</b> oder <b>9 (Kartenstapel)</b>, beide mit
+dem Zweig aus <b>6</b> als erstem Schritt. Sie unterscheiden sich fast nur in der
+Navigation; die Gliederung ist dieselbe.</p>
+<p><b>Zweitens die Fläche:</b> <b>2 (lebende Vorschau)</b> — das ist der Teil, der die
+eigentliche Klage beantwortet. Die 730 px rechts sind heute das Auffälligste am
+Bericht, und keine Umsortierung der Felder ändert daran etwas.</p>
+<p style="margin-bottom:0"><b>7 (Datenblatt)</b> gehört als Umschalter daneben, nicht
+als Alternative — ein Datenmodell, zwei Ansichten. <b>4</b> ist der ehrliche
+Zwischenschritt, falls die große Fassung Zeit braucht. <b>3</b>, <b>5</b>, <b>8</b>
+und <b>10</b> sind eigenständig gut, aber jede zieht einen größeren Rattenschwanz
+nach sich als die Kombination oben.</p>
+</div>
+
+<h2>Was vor dem Bauen noch zu klären ist</h2>
+<ol>
+<li><b>Bleiben die drei Stufen?</b> Ein Wizard mit fünf Schritten <em>und</em> einer
+Stufenfrage davor sind zwei Fortschrittsbegriffe nebeneinander. Entweder die Stufe
+wird Schritt 1, oder sie verschwindet und ergibt sich aus dem, was ausgefüllt ist.</li>
+<li><b>Woher kommt die Zahl in der Vorschau (Idee 2)?</b> Eine erfundene
+Zwischenrechnung wäre schlimmer als eine leere Fläche — „wo die Quelle endet, endet
+die Rechnung“.</li>
+<li><b>Gilt die Rangfolge der Hebelwirkung (Idee 10) fest oder je Objekt?</b></li>
+<li><b>Wird gespeichert, während man ausfüllt?</b> Ein Wizard ohne Zwischenstand
+verliert bei jedem Abbruch alles — heute hält das durchgehende Formular
+wenigstens den DOM-Zustand.</li>
+</ol>
+
+<p style="margin-top:36px;font-size:12.5px;color:#8a847c">
+Alle Demos sind Neubauten und laufen ohne Netz. Sie zeigen die Gestaltung, nicht
+den späteren Code. Gemessene Werte: Stand <code>d9e83a2</code> (v1119) auf Staging.</p>
+
+</div>
+
+<script>
+'use strict';
+/* Alle Demos sind bewusst klein gehalten: sie sollen die IDEE zeigen,
+   nicht die Feldlogik nachbauen. Feldnamen entsprechen aber dem echten
+   Katalog aus wertermittlung.js — damit beim Vergleich nichts verrutscht. */
+
+/* ── 1 · Wizard ─────────────────────────────────────────────── */
+(function () {
+  var SCHRITTE = [
+    { t: 'Objekt', f: [['ptype', 'Objektart', 'select', ['Eigentumswohnung', 'Einfamilienhaus', 'Mehrfamilienhaus']],
+                       ['area', 'Wohnfläche (m²)', 'number'], ['year', 'Baujahr', 'number']] },
+    { t: 'Zustand', f: [['baustatus', 'Baustatus', 'select', ['Bestand', 'Erstbezug nach Sanierung', 'Neubau']],
+                        ['cond', 'Zustand', 'select', ['einfach', 'normal', 'gehoben']]] },
+    { t: 'Grundstück', f: [['plot', 'Grundstücksfläche (m²)', 'number'],
+                           ['hinterlandFlaeche', 'Hinterland (m²)', 'number']] },
+    { t: 'Gebäude', f: [['bgf', 'Bruttogrundfläche (m²)', 'number'],
+                        ['standardstufe', 'Standardstufe', 'select', ['1', '2', '3', '4', '5']]] },
+    { t: 'Feinjustierung', f: [['lzs', 'Liegenschaftszins (%)', 'number'],
+                               ['sachwertfaktor', 'Sachwertfaktor', 'number']] }
+  ];
+  var i = 0;
+  var tabs = document.getElementById('d1-tabs');
+  var inh = document.getElementById('d1-inhalt');
+  var bal = document.getElementById('d1-bal');
+  if (!tabs) return;
+
+  function zeichne() {
+    tabs.innerHTML = '';
+    SCHRITTE.forEach(function (s, n) {
+      var b = document.createElement('button');
+      b.className = 'wz-s' + (n === i ? ' an' : '') + (n < i ? ' fertig' : '');
+      b.innerHTML = '<span class="n">' + (n + 1) + '</span>' + s.t;
+      b.addEventListener('click', function () { i = n; zeichne(); });
+      tabs.appendChild(b);
+    });
+    bal.style.width = Math.round(((i + 1) / SCHRITTE.length) * 100) + '%';
+    inh.innerHTML = SCHRITTE[i].f.map(function (f) {
+      var e = f[2] === 'select'
+        ? '<select id="w-' + f[0] + '">' + f[3].map(function (o) { return '<option>' + o + '</option>'; }).join('') + '</select>'
+        : '<input type="' + f[2] + '" id="w-' + f[0] + '">';
+      return '<div class="f"><label>' + f[1] + ' <code style="font-size:10px">' + f[0] + '</code></label>' + e + '</div>';
+    }).join('');
+  }
+  document.getElementById('d1-vor').addEventListener('click', function () {
+    if (i < SCHRITTE.length - 1) { i++; zeichne(); }
+  });
+  document.getElementById('d1-zur').addEventListener('click', function () {
+    if (i > 0) { i--; zeichne(); }
+  });
+  zeichne();
+})();
+
+/* ── 2 · Lebende Vorschau ───────────────────────────────────── */
+(function () {
+  var a = document.getElementById('d2-a'), b = document.getElementById('d2-b'), c = document.getElementById('d2-c');
+  if (!a) return;
+  var wert = document.getElementById('d2-wert'), nadel = document.getElementById('d2-nadel'),
+      mn = document.getElementById('d2-min'), mx = document.getElementById('d2-max'),
+      hw = document.getElementById('d2-hinweis');
+  function eur(n) { return Math.round(n).toLocaleString('de-DE') + ' €'; }
+  function rechne() {
+    var A = parseFloat(a.value) || 0, J = parseFloat(b.value) || 1970, Z = parseFloat(c.value) || 2;
+    /* Bewusst eine SICHTBAR einfache Schaufensterrechnung — sie steht hier
+       nur, damit sich die Nadel bewegt. Siehe offene Frage 2. */
+    var basis = A * (1300 + (J - 1950) * 9) * (0.86 + Z * 0.09);
+    var spanne = basis * 0.105;
+    wert.textContent = eur(basis);
+    mn.textContent = eur(basis - spanne);
+    mx.textContent = eur(basis + spanne);
+    nadel.style.left = Math.max(4, Math.min(96, 50 + (Z - 2) * 20)) + '%';
+    hw.innerHTML = 'Noch <b>' + (Z >= 3 ? 2 : 3) + '</b> Angaben bis zum Sachwertverfahren.';
+  }
+  [a, b, c].forEach(function (e) { e.addEventListener('input', rechne); e.addEventListener('change', rechne); });
+  rechne();
+})();
+
+/* ── 3 · Verfahrenskarten ───────────────────────────────────── */
+(function () {
+  var wo = document.getElementById('d3'), ziel = document.getElementById('d3-ziel');
+  if (!wo) return;
+  var TEXT = {
+    vergleich: '<div class="karte ok" style="margin:0"><b>Vergleichswert</b> — nichts zu tun. Pflicht: <code>ptype</code>, <code>area</code>, <code>year</code>, <code>baustatus</code>.</div>',
+    ertrag: '<div class="karte merk" style="margin:0"><b>Ertragswert</b> rechnet, aber mit Pauschalen. Für echte Parameter fehlt <code>lzs</code> — kommt sonst aus der amtlichen Tabelle.</div>',
+    sach: '<div class="karte warn" style="margin:0"><b>Sachwert</b> rechnet nicht. Es fehlen <code>standardstufe</code>, <code>nhkHaus</code>, <code>nhkGeschosse</code>. Bei einer Eigentumswohnung erscheint das Verfahren gar nicht erst.</div>'
+  };
+  wo.addEventListener('click', function (e) {
+    var k = e.target.closest('.vf-k'); if (!k) return;
+    ziel.innerHTML = TEXT[k.getAttribute('data-v')] || '';
+  });
+})();
+
+/* ── 4 · Akkordeon ──────────────────────────────────────────── */
+(function () {
+  var wo = document.getElementById('d4'); if (!wo) return;
+  var G = [
+    ['Grundlagen', 7, 'ok'], ['Baustatus und Zustand', 2, 'ok'],
+    ['Grundstück und Hinterland', 4, 'warn'], ['Gebäude · NHK', 3, 'nein'],
+    ['Feinjustierung Gewerke', 9, 'nein'], ['Sonstige Bauteile', 5, 'nein'],
+    ['Werte selbst setzen', 6, 'ok']
+  ];
+  var P = { ok: '<span class="pill p-ok">vollständig</span>',
+            warn: '<span class="pill p-warn">1 offen</span>',
+            nein: '<span class="pill p-nein">nicht begonnen</span>' };
+  wo.innerHTML = G.map(function (g, n) {
+    return '<div class="ak-z' + (n === 2 ? ' auf' : '') + '">' +
+      '<button class="ak-k"><span class="pfeil">▸</span><b>' + g[0] + '</b>' +
+      '<span style="color:#8a847c;font-size:12.5px">' + g[1] + ' Felder</span>' +
+      '<span class="rest">' + P[g[2]] + '</span></button>' +
+      '<div class="ak-in"><div class="f"><label>Zusätzliche Grundstücksfläche / Hinterland (m²) <code style="font-size:10px">hinterlandFlaeche</code></label>' +
+      '<input type="number" class="d4-hf" placeholder="nur die Fläche AUSSERHALB des Baulands"></div>' +
+      '<div class="d4-folge"></div></div></div>';
+  }).join('');
+  wo.addEventListener('click', function (e) {
+    var k = e.target.closest('.ak-k'); if (!k) return;
+    k.parentNode.classList.toggle('auf');
+  });
+  /* Die echte Abhängigkeit, live: hinterlandFlaeche -> hinterlandRent */
+  wo.addEventListener('input', function (e) {
+    if (!e.target.classList.contains('d4-hf')) return;
+    var f = e.target.closest('.ak-in').querySelector('.d4-folge');
+    if (e.target.value) {
+      if (!f.innerHTML) f.innerHTML =
+        '<div class="f neu"><label>Zusatzfläche ist rentierlich <code style="font-size:10px">hinterlandRent</code></label>' +
+        '<select><option>nein · wirft keinen Ertrag ab</option><option>ja · wird vermietet</option></select></div>' +
+        '<div class="f neu"><label>Wertansatz Hinterland (€/m²) <span class="pf">*</span> <code style="font-size:10px">hinterlandWert</code></label>' +
+        '<input type="number" placeholder="z. B. 5 €/m²"></div>';
+    } else { f.innerHTML = ''; }
+  });
+})();
+
+/* ── 5 · Ein Feld pro Bild ──────────────────────────────────── */
+(function () {
+  var F = [
+    ['Was für ein Objekt ist es?', 'Davon hängt ab, welche Angaben danach kommen.', 'select', ['Eigentumswohnung', 'Einfamilienhaus', 'Doppelhaushälfte', 'Mehrfamilienhaus']],
+    ['Wie groß ist die Wohnfläche?', 'In Quadratmetern, nach WoFlV.', 'number'],
+    ['Baujahr?', 'Das Jahr der Fertigstellung.', 'number'],
+    ['Baustatus?', 'Erstbezug gegen Bestand macht rund 41 % Unterschied.', 'select', ['Bestand', 'Erstbezug nach Sanierung', 'Neubau – Erstbezug']],
+    ['Grundstücksfläche?', 'Nur das Bauland.', 'number'],
+    ['Gibt es Hinterland?', 'Fläche außerhalb des Baulands. 0 wenn nicht.', 'number'],
+    ['Standardstufe?', 'Ohne sie rechnet der Sachwert nicht.', 'select', ['1', '2', '3', '4', '5']],
+    ['Miteigentumsanteil?', 'Nur bei Eigentumswohnungen. Ohne ihn kein Bodenwert.', 'number']
+  ];
+  var i = 0;
+  var fr = document.getElementById('d5-frage'), hi = document.getElementById('d5-hint'),
+      ei = document.getElementById('d5-eingabe'), za = document.getElementById('d5-zaehl');
+  if (!fr) return;
+  function zeichne() {
+    var f = F[i];
+    fr.textContent = f[0]; hi.textContent = f[1];
+    ei.innerHTML = f[2] === 'select'
+      ? '<div class="f"><select>' + f[3].map(function (o) { return '<option>' + o + '</option>'; }).join('') + '</select></div>'
+      : '<div class="f"><input type="number"></div>';
+    za.textContent = 'Frage ' + (i + 1) + ' von ' + F.length;
+  }
+  document.getElementById('d5-vor').addEventListener('click', function () { if (i < F.length - 1) { i++; zeichne(); } });
+  document.getElementById('d5-zur').addEventListener('click', function () { if (i > 0) { i--; zeichne(); } });
+  zeichne();
+})();
+
+/* ── 6 · Sichtbarer Zweig ───────────────────────────────────── */
+(function () {
+  var wo = document.getElementById('d6'), weg = document.getElementById('d6-weg');
+  if (!wo) return;
+  var T = {
+    etw: '<b>Weg „Eigentumswohnung“ · 2 zusätzliche Felder</b><br>' +
+      '<code>mea</code> (Pflicht) und <code>grundriss</code>. ' +
+      'Die 17 Hausfelder entfallen — <b>und das Sachwertverfahren erscheint gar nicht</b> ' +
+      '(<code>nichtWenn: istWohnung()</code>). Ohne Miteigentumsanteil kein Bodenwert.',
+    haus: '<b>Weg „Haus“ · 17 zusätzliche Felder</b><br>' +
+      '<code>nhkHaus</code>, <code>nhkGeschosse</code>, <code>nhkDach</code> — alle drei <b>Pflicht</b>, ' +
+      'sie bilden zusammen die NHK-Typennummer. Dazu neun <code>ausst*</code>-Gewerke und ' +
+      'fünf <code>btl*</code>-Bauteile. <code>mea</code> und <code>grundriss</code> entfallen.'
+  };
+  wo.addEventListener('click', function (e) {
+    var a = e.target.closest('.zw-a'); if (!a) return;
+    wo.querySelectorAll('.zw-a').forEach(function (x) { x.classList.remove('an'); });
+    a.classList.add('an');
+    weg.innerHTML = T[a.getAttribute('data-t')];
+  });
+})();
+
+/* ── 7 · Datenblatt ─────────────────────────────────────────── */
+(function () {
+  var tb = document.getElementById('d7'); if (!tb) return;
+  var F = [
+    ['ptype', 'Objektart', 'Grundlagen', 1, 1], ['area', 'Wohnfläche', 'Grundlagen', 1, 1],
+    ['year', 'Baujahr', 'Grundlagen', 1, 1], ['baustatus', 'Baustatus', 'Grundlagen', 1, 1],
+    ['plot', 'Grundstücksfläche', 'Grundstück', 1, 1], ['units', 'Wohneinheiten', 'Grundlagen', 1, 1],
+    ['mea', 'Miteigentumsanteil', 'Grundlagen', 1, 0], ['bgf', 'Bruttogrundfläche', 'Gebäude', 0, 0],
+    ['hinterlandFlaeche', 'Hinterland', 'Grundstück', 0, 0], ['hinterlandWert', 'Wertansatz Hinterland', 'Grundstück', 1, 0],
+    ['garagenBgf', 'Garage BGF', 'Außen', 0, 0], ['garagenStufe', 'Garage Standardstufe', 'Außen', 1, 0],
+    ['standardstufe', 'Standardstufe', 'Gebäude', 1, 0], ['nhkHaus', 'Hausform NHK', 'Gebäude', 1, 0],
+    ['nhkGeschosse', 'Geschosse', 'Gebäude', 1, 0], ['nhkDach', 'Dachausbildung', 'Gebäude', 1, 0],
+    ['lzs', 'Liegenschaftszins', 'Experte', 0, 0], ['sachwertfaktor', 'Sachwertfaktor', 'Experte', 0, 0]
+  ];
+  function zeichne(filter) {
+    var l = F.filter(function (f) {
+      if (filter === 'fehlt') return !f[4];
+      if (filter === 'pflicht') return !!f[3];
+      return true;
+    });
+    tb.innerHTML = '<tr><th>Feld</th><th>Bezeichnung</th><th>Gruppe</th><th>Pflicht</th><th>Wert</th></tr>' +
+      l.map(function (f) {
+        return '<tr' + (f[4] ? '' : ' class="fehlt"') + '><td class="g">' + f[0] + '</td><td>' + f[1] + '</td>' +
+          '<td>' + f[2] + '</td><td>' + (f[3] ? '<span class="pf" style="color:#B8625C">*</span>' : '') + '</td>' +
+          '<td>' + (f[4] ? '<span style="color:#237049">✓ gesetzt</span>' : '<span style="color:#B8625C">offen</span>') + '</td></tr>';
+      }).join('') +
+      '<tr><td colspan="5" style="font-size:11.5px;color:#8a847c">' + l.length +
+      ' von 42 gezeigt — die Demo führt 18 stellvertretend.</td></tr>';
+  }
+  document.querySelectorAll('[data-f]').forEach(function (b) {
+    b.addEventListener('click', function () { zeichne(b.getAttribute('data-f')); });
+  });
+  zeichne('alle');
+})();
+
+/* ── 8 · Checkliste ─────────────────────────────────────────── */
+(function () {
+  var li = document.getElementById('d8-liste'), fo = document.getElementById('d8-form'),
+      za = document.getElementById('d8-n');
+  if (!li) return;
+  var OFFEN = [
+    ['standardstufe', 'Standardstufe', 'Ohne sie rechnet der Sachwert nicht.'],
+    ['nhkHaus', 'Hausform (NHK 2010)', 'Bildet mit Geschossen und Dach die Typennummer.'],
+    ['nhkGeschosse', 'Geschosse und Unterkellerung', 'Teil der Typennummer.'],
+    ['hinterlandWert', 'Wertansatz Hinterland', 'Pflicht, sobald eine Hinterlandfläche steht.']
+  ];
+  function zeichne(aktiv) {
+    li.innerHTML = OFFEN.map(function (o, n) {
+      return '<div class="cl-e' + (n === aktiv ? ' an' : '') + '" data-n="' + n + '">' +
+        '<span style="color:#B8625C">●</span>' + o[1] + '</div>';
+    }).join('');
+    za.textContent = OFFEN.length;
+    var o = OFFEN[aktiv];
+    fo.innerHTML = '<div class="f"><label>' + o[1] + ' <span class="pf">*</span> <code style="font-size:10px">' + o[0] + '</code></label>' +
+      '<input type="text" placeholder="…"></div>' +
+      '<div style="font-size:12.5px;color:#5d5852">' + o[2] + '</div>';
+  }
+  li.addEventListener('click', function (e) {
+    var x = e.target.closest('.cl-e'); if (!x) return;
+    zeichne(parseInt(x.getAttribute('data-n'), 10));
+  });
+  zeichne(0);
+})();
+
+/* ── 9 · Kartenstapel ───────────────────────────────────────── */
+(function () {
+  var wo = document.getElementById('d9'), st = document.getElementById('d9-stand');
+  if (!wo) return;
+  var K = [
+    ['Objekt', 'Objektart, Wohnfläche, Baujahr — <b>der Typ entscheidet über 20 der 42 Felder</b>.'],
+    ['Zustand', 'Baustatus, Zustand, Qualität. Baustatus bewegt den Wert am stärksten.'],
+    ['Grundstück', 'Fläche, Hinterland, Bodenrichtwert.'],
+    ['Gebäude', 'BGF, Standardstufe, NHK-Typennummer.'],
+    ['Feinjustierung', 'Neun Gewerke, fünf Bauteile — nur bei Häusern.']
+  ];
+  var i = 0;
+  function zeichne() {
+    wo.innerHTML = K.map(function (k, n) {
+      if (n < i) return '';
+      var d = n - i;
+      if (d > 2) return '';
+      return '<div class="st-k" style="transform:translateY(' + (d * 9) + 'px) scale(' + (1 - d * 0.035) + ');' +
+        'opacity:' + (d === 0 ? 1 : 0.55 - d * 0.15) + ';z-index:' + (10 - d) + '">' +
+        '<h4>' + (n + 1) + ' · ' + k[0] + '</h4>' +
+        (d === 0 ? '<div style="font-size:13px;color:#5d5852;margin-bottom:10px">' + k[1] + '</div>' +
+          '<div class="f"><label>Beispielfeld</label><input type="text"></div>' : '') +
+        '</div>';
+    }).join('');
+    st.textContent = 'Karte ' + Math.min(i + 1, K.length) + ' von ' + K.length +
+      (i >= K.length ? ' — fertig' : '');
+  }
+  document.getElementById('d9-vor').addEventListener('click', function () { if (i < K.length) { i++; zeichne(); } });
+  document.getElementById('d9-reset').addEventListener('click', function () { i = 0; zeichne(); });
+  zeichne();
+})();
+
+/* ── 10 · Co-Pilot ──────────────────────────────────────────── */
+(function () {
+  var wo = document.getElementById('d10'); if (!wo) return;
+  var DIALOG = [
+    ['co', 'Moin. Ich habe Adresse, Fläche und Baujahr — daraus steht schon eine grobe Spanne. Drei Fragen bringen sie deutlich enger.', 'Spanne jetzt: ±18 %'],
+    ['ich', 'Leg los.'],
+    ['co', '<b>Ist das ein Erstbezug oder Bestand?</b> Das ist die Frage mit dem größten Hebel: gemessen 14,47 gegen 10,28 €/m² bei gleicher Fläche.', 'Wirkung: bis 41 %'],
+    ['ich', 'Bestand.'],
+    ['co', '<b>Wohnung oder Haus?</b> Danach richtet sich, ob ich das Sachwertverfahren überhaupt anbieten kann — bei einer Wohnung ohne Miteigentumsanteil gibt es keinen Bodenwert.', 'Schaltet 20 Felder'],
+    ['ich', 'Haus.'],
+    ['co', 'Dann brauche ich die <b>Standardstufe</b>. Ohne sie rechne ich den Sachwert nicht — vorher wurde stillschweigend Stufe 3 angenommen, das waren 42.000 € Unterschied.', 'Wirkung: bis 14 %'],
+    ['co', 'Die restlichen 14 Angaben sind Feinschliff. Willst du sie jetzt oder soll ich den Bericht so erstellen?', 'Spanne jetzt: ±7 %']
+  ];
+  var i = 0;
+  function zeichne() {
+    wo.innerHTML = DIALOG.slice(0, i + 1).map(function (d) {
+      return '<div class="kp-b ' + (d[0] === 'ich' ? 'ich' : '') + '">' +
+        '<div class="kp-av">' + (d[0] === 'ich' ? 'MJ' : '✈') + '</div>' +
+        '<div class="kp-t">' + d[1] +
+        (d[2] ? '<div class="kp-wirkung">' + d[2] + '</div>' : '') + '</div></div>';
+    }).join('');
+    wo.scrollTop = wo.scrollHeight;
+  }
+  document.getElementById('d10-vor').addEventListener('click', function () {
+    if (i < DIALOG.length - 1) { i++; zeichne(); }
+  });
+  document.getElementById('d10-reset').addEventListener('click', function () { i = 0; zeichne(); });
+  zeichne();
+})();
+</script>
+</body>
+</html>
