@@ -87,21 +87,22 @@
      gesetzt ist. Ohne das haette ein var()-Rueckfall den Normalzustand
      angefasst, um einen Sonderfall zu bedienen — .sc-pill-v hat in
      ui-varianten.css gar keine eigene Regel. */
-  function kennzeichen(an) {
+  function kennzeichen(name, an) {
     try {
-      if (an) document.body.setAttribute('data-dp-kpitext', '1');
-      else document.body.removeAttribute('data-dp-kpitext');
+      if (an) document.body.setAttribute(name, '1');
+      else document.body.removeAttribute(name);
     } catch (e) {}
   }
 
   function setzen(tokenLg, tokenSm, farbe, aufMarke) {
     var r = document.documentElement.style;
+    var marke = (tokenLg === T_KPI_LG) ? 'data-dp-kpitext' : 'data-dp-herotext';
     if (!farbe) {
       r.removeProperty(tokenLg); r.removeProperty(tokenSm);
-      if (tokenLg === T_KPI_LG) kennzeichen(false);
+      kennzeichen(marke, false);
       return null;
     }
-    if (tokenLg === T_KPI_LG) kennzeichen(true);
+    kennzeichen(marke, true);
     var f = aufMarke ? tonAufMarke : tonAufWeiss;
     /* Weg B: der korrigierte Wert wandert ins Token.
        Weg C: der Rohwert wandert ins Token, die Korrektur dient nur der Warnung. */

@@ -2280,6 +2280,13 @@ body[data-dp-kpitext] #hdr-badges .sc-pill-sub {
 body[data-dp-kpitext] #hdr-badges .sc-pill-v {
   color: var(--dp-kpi-text-lg) !important;
 }
+/* v1123c · .sc-v ("Gute Bewertung") braucht dasselbe Kennzeichen.
+   Gemessen: ohne Hell-Skin gilt nur `#hdr-badges .sc-v{color:var(--dp-ink-1)}`
+   (1,1,0, ohne !important) — die Hell-Skin-Regel oben greift dort nicht.
+   Ohne Nutzerfarbe bleibt es bei --dp-ink-1, die Regel existiert dann nicht. */
+body[data-dp-herotext] #hdr-badges .sc-v {
+  color: var(--dp-hero-text-sm) !important;
+}
 
 /* v1113e · Die GEGENRICHTUNG: Markenakzent auf dunklem Grund.
    In der Rot-Gegenprobe OHNE Hell-Skin gemessen (konsole und "ohne
