@@ -45,6 +45,19 @@
   var _faellig = null;      /* vom Server, je Stufe */
   var _bezahlt = 0;
   var _letzte = 0;
+  /* ── v1126c · Das Henne-Ei-Problem, im Durchgang gefunden ───────────────
+     Stufe 3 verlangt `plot` und — je nach Objektart — `mea` bzw.
+     `standardstufe`/`nhkHaus`. Die liegen aber ALLE im Block `wm-b3`, und
+     den baut wertermittlung.js erst `if (s >= 3)`. Die Felder, die
+     hochstufen, gibt es vor dem Hochstufen also gar nicht: **Stufe 3 war
+     rein rechnerisch unerreichbar.**
+
+     Aufloesung ohne Frage vorweg: der Meilenstein ist ANKLICKBAR. Ein Klick
+     ist kein Fragebogen, sondern „ich will tiefer" — dasselbe „Vertiefen"
+     wie in der Uebersicht des Entwurfs. Danach entscheiden wieder die
+     Felder, ob die Stufe wirklich vollstaendig ist.
+     _angestrebt ist deshalb eine UNTERGRENZE, nie eine Behauptung. */
+  var _angestrebt = 0;
 
   function $(id) { return document.getElementById(id); }
   function wert(id) { var e = $(id); return e ? String(e.value || '').trim() : ''; }
@@ -133,7 +146,8 @@
     var ms = [1, 2, 3].map(function (n) {
       var an = s >= n;
       var p = preisFuer(n);
-      return '<div class="mbst-ms' + (an ? ' an' : '') + '" style="left:' + pos[n] + '%">' +
+      return '<div class="mbst-ms' + (an ? ' an' : '') + '" style="left:' + pos[n] + '%" ' +
+        'data-mbst-ziel="' + n + '" title="' + (an ? NAMEN[n] : 'Angaben für ' + NAMEN[n] + ' einblenden') + '">' +
         '<div class="mbst-pkt">' + (an ? '✓' : n) + '</div>' +
         '<div class="mbst-lbl">' + NAMEN[n] +
         '<span class="mbst-kero">' + (p === 0 ? 'bezahlt' : p + ' L') + '</span></div></div>';
@@ -182,7 +196,10 @@
      jedem Tastendruck zu tun waere teuer und wuerde den Fokus kosten. */
   function melden() {
     var s = erreicht();
-    var ziel = Math.max(1, s);
+    /* _angestrebt ist die Untergrenze: der Nutzer hat den Meilenstein
+       angeklickt und will die Felder sehen. Was davon ausgefuellt ist,
+       entscheidet weiter allein erreicht(). */
+    var ziel = Math.max(1, s, _angestrebt);
     if (ziel === _letzte) { zeichnen(); return; }
     _letzte = ziel;
     try {
@@ -203,6 +220,15 @@
     if (!$('wm-ziel')) { setTimeout(start, 400); return; }
     document.addEventListener('input', angestossen, true);
     document.addEventListener('change', angestossen, true);
+    /* Klick auf einen Meilenstein blendet dessen Angaben ein. */
+    document.addEventListener('click', function (ev) {
+      var m = ev.target && ev.target.closest ? ev.target.closest('[data-mbst-ziel]') : null;
+      if (!m) return;
+      var n = parseInt(m.getAttribute('data-mbst-ziel'), 10);
+      if (!(n >= 1 && n <= 3)) return;
+      _angestrebt = n;
+      melden();
+    }, true);
     _letzte = 0;
     melden();
     preisHolen();
