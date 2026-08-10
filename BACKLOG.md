@@ -37,66 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Spalt zwischen Tab-Leiste und Score-Karte in der Kopfleiste.**
-   Bild: **`Spalt`** in `design/mockups/` (2026-08-10). Zu sehen ist ein
-   Zwischenraum zwischen der Reiterleiste und dem „INVESTOR DEAL SCORE" —
-   die Score-Karte steht nicht bündig, sondern muss **weiter eingerückt**
-   werden. Marcel ist das schon mehrfach aufgefallen, es tritt also nicht
-   nur in einer Ansicht auf.
-
-   **Erst messen, dann patchen** — nach zwei Fehlversuchen ist Schluss mit
-   Raten: `getBoundingClientRect()` auf beide Kästen, `elementFromPoint` in
-   den Spalt hinein, `getComputedStyle` auf den Gewinner. Die Frage lautet,
-   **wer den Abstand erzeugt**: ein `gap` im Raster der Kopfleiste, ein
-   Rand an `#hdr-badges`, oder eine Breitenbegrenzung, die nicht bis an
-   den Rand reicht.
-
-   **Bei mehreren Breiten nachsehen.** „Teilweise schon aufgefallen"
-   klingt nach einer Regel, die nur in einem Bereich greift — 390, 820,
-   1024, 1400 und 1920 px gegenprüfen, bevor irgendetwas geändert wird.
-   Und die Kopfleiste ist der Bereich, in dem der Tablet-Punkt ohnehin
-   Zahlen erhoben hat (348 px hoch, `#hdr-badges` 251 px) — die passen
-   dazu.
-
-   **BLOCKIERT: Der Spalt aus dem Bild ist nicht reproduzierbar.**
-   Gemessen 2026-08-11, angemeldet, Objekt geladen, vier Breiten im
-   gleich-Origin-iframe, jeweils auf- **und** zugeklappte Kopfleiste:
-
-   | Breite | `#hdr-badges` → `nav.tabs` | KPI-Kacheln → `nav.tabs` | links `.sc-main` | links `nav.tabs` |
-   |---|---|---|---|---|
-   | 830 | **1 px** | 11 px | 22 | 0 |
-   | 1024 | **1 px** | 11 px | 282 | 260 |
-   | 1400 | **1 px** | 11 px | 402 | 380 |
-   | 1920 | **1 px** | 11 px | 402 | 380 |
-
-   Der Abstand ist überall **derselbe** und besteht ausschließlich aus dem
-   `padding:10px 22px` von `#hdr-badges`. Auf dem Bild sind es sichtbar
-   **rund 50 px**. Ein Bildschirmfoto meines Standes bei 830 px zeigt die
-   Kacheln direkt über der Reiterleiste — **kein schwarzer Streifen**.
-
-   **Was die Messung dagegen zeigt und was Marcels Beschreibung stützt:**
-   `.sc-main` steht **22 px eingerückt**, die Reiterleiste **bündig bei 0**.
-   Die beiden fluchten also nicht. Genau dasselbe `padding:22px` erzeugt
-   beides — die 22 px links und die 10 px unten.
-
-   **Ein eigener Messfehler, gleich zurückgenommen:** Bei 1400 px meldete
-   ich zuerst einen Spalt von **49 px**. Falsch — `body.hdr-collapsed` war
-   noch von meinem eigenen Zuklapp-Test gesetzt und hatte den Reload
-   überlebt; die Score-Karte stand auf `display:none`, und die 49 px waren
-   schlicht die Höhe der ersten Kopfzeile. **Zustand aus einem früheren
-   Prüfschritt ist eine Fehlerquelle wie jede andere** — vor jeder Messung
-   `body.className` mitlesen.
-
-   **Zwei Fragen an Marcel, bevor irgendetwas geändert wird:**
-   1. **Bei welcher Fensterbreite** ist das Bild entstanden, und war die
-      Seitenleiste dabei ein- oder ausgeklappt? Der Streifen im Bild ist
-      viermal so hoch wie alles, was ich messen kann.
-   2. **Soll die Score-Karte an die Reiterleiste heran** (Einrückung von 22
-      auf 0) oder **die Reiterleiste an die Karte** (0 auf 22)? „Weiter
-      eingerückt" liest sich nach dem Zweiten — dann wandert aber die
-      ganze Reiterleiste, nicht die Karte.
-
-2. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+1. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -159,7 +100,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
    JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
 
-3. **Finanzamt-PDF unter „Steuern": Plausibilität prüfen und die
+2. **Finanzamt-PDF unter „Steuern": Plausibilität prüfen und die
    Ergebnisdarstellung neu bauen.** Drei Arbeiten an einer Datei, in dieser
    Reihenfolge:
 
@@ -188,7 +129,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Bevor gebaut wird, das PDF und die Immokalk-Datei tatsächlich lesen.**
    Beide liegen im Ordner; ein Umbau nach Beschreibung wäre geraten.
 
-4. **Ein Testobjekt vollständig anlegen und alle Rechenwege
+3. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
    Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
    richtig, wird unter „Bewertung" alles passend angezeigt, sind die
@@ -219,7 +160,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
    Steuerteil.
 
-5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -317,7 +258,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -352,7 +293,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -386,7 +327,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-8. **Marktbericht neu gestalten — ausdrücklich der letzte Punkt.**
+7. **Marktbericht neu gestalten — ausdrücklich der letzte Punkt.**
    **Marcels Festlegung vom 2026-08-10:** wird erst aufgegriffen, wenn
    alles andere abgeschlossen ist. Er denkt bis dahin selbst darüber nach.
 
@@ -448,6 +389,71 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-11] **Spalt zwischen Tab-Leiste und Score-Karte** — `v1124`
+  (`efabe66`), `v1124b` (`9832e76`). Bild:
+  `design/mockups/spalt2.png`.
+
+  ### Der Mechanismus war richtig, nur der Wert stand still
+
+  `.main-col > nav.tabs` klebt mit `top: var(--hdr-h) !important` — es gibt
+  also längst eine gemessene Kopfhöhe (V63.4). **Gemessen bei 890 px stand
+  `--hdr-h` auf 308 px, während die Kopfleiste 348 px hoch war.** Die
+  **40 px** Differenz sind genau der schwarze Streifen im Bild.
+
+  **Ursache:** `_updateHdrHeight()` läuft nur bei `resize` und beim Laden
+  (+100/+500 ms). Die Kopfleiste ändert ihre Höhe aber noch bei vielen
+  anderen Anlässen — ein Objekt wird geladen und die Score-Karte erscheint,
+  eine Vorlage wird umgeschaltet, der Kopf wird zu- oder aufgeklappt, die
+  KPI-Pillen brechen um. Nach jedem davon bleibt der Wert stehen: die
+  Leiste sitzt zu tief (**Spalt**) oder zu hoch (**sie rutscht unter den
+  Kopf**).
+
+  **Das erklärt beides** — warum es Marcel „schon mehrfach" auffiel, und
+  warum ich es in vier sauberen Messläufen nie sah: dort lief kurz vorher
+  immer ein `resize`.
+
+  ### Behebung: ein Beobachter statt einer Zahlentabelle
+
+  `ResizeObserver` auf der Kopfleiste, dazu ein `MutationObserver`, damit er
+  mitwandert, wenn der Kopf neu gerendert wird. Er feuert genau dann, wenn
+  sich die Höhe wirklich ändert — **unabhängig vom Anlass und damit auf
+  Handy und Tablet gleichermaßen** (Marcels Vorgabe zu Frage 2). Keine neue
+  Zahl, keine 26. Breakpoint-Schwelle, kein Timer.
+
+  **Kein `requestAnimationFrame`** — das feuert im verborgenen Tab nicht
+  (gemessen, `dp-band-fix.js` v1092b). Der `ResizeObserver` bündelt selbst.
+  **Die Messung bleibt `_updateHdrHeight()`** — eine Stelle, eine Wahrheit;
+  hier kommen nur Anlässe dazu.
+
+  ### `v1124b` — der Gegenfall, beim Prüfen gefunden
+
+  Bei **zugeklapptem** Kopf gewann `body.hdr-collapsed .main-col >
+  nav.tabs{top:48px!important}` (0,3,2). Gemessen ist der zugeklappte Kopf
+  bei 890 px aber **97 px** hoch — die Leiste saß **49 px zu hoch**.
+  Und es war schon vorher widersprüchlich: bei **1400 px** gewann die
+  `--hdr-h`-Regel und es passte (92/92), bei **890 px** die harte 48.
+  **Eine Tabelle fester Zahlen kann das nicht leisten** — die Kopfhöhe
+  hängt an Breite, Vorlage, Score und Zustand. Jetzt läuft auch dieser Fall
+  über den live gemessenen Wert; `48px` bleibt als Rückfall für Browser
+  ohne `ResizeObserver`.
+
+  ### Nachgemessen bei 890 px
+
+  | Zustand | Kopfhöhe | `nav.tabs` `top` | deckt sich |
+  |---|---|---|---|
+  | aufgeklappt | 348 | **348 px** | ✓ |
+  | zugeklappt | 57 / 308 | **57 / 308 px** | ✓ |
+  | 60 px künstlich angebaut | 408 | **408 px** | ✓ |
+  | wieder entfernt | 348 | **348 px** | ✓ |
+
+  Gescrollt bei 890 px: sichtbarer Abstand **11 px** — das ist der
+  `padding:10px 22px` von `#hdr-badges`, kein Spalt mehr. Zoom-Aufnahme
+  bestätigt: die KPI-Kacheln sitzen direkt über der Reiterleiste.
+
+  **Frage 2 aus dem Punkt ist damit gegenstandslos:** Es ging nie um die
+  Einrückung. Die 22 px seitlicher Versatz von `.sc-main` sind derselbe
+  `padding` und gewollt.
 
 - [2026-08-11] **Textfarben-Regler für Score-Karte und KPI-Karten gebaut**
   — `v1123` bis `v1123e` (`32598a0`, `e4241a8`, `c661b44`, `d8dfd72`,
