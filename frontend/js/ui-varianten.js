@@ -382,6 +382,9 @@
               'Wirkt zusammen mit einer Vorlage — „DealPilot" behält seine eigenen Flächen.</p>' +
               BEREICHE.map(farbzeile).join('') + '</div>' +
             '<div id="dpuv-logo">' + fremdBlock('_dpLogoBlock') + '</div>' +
+            /* v1122 · Weg B: die drei Freiheitsstufen, direkt ueber dem
+               Speichern-Knopf — beides gilt nur in der Mandanten-Ansicht. */
+            '<div id="dpuv-resfrei">' + fremdBlock('_dpResFreiheitBlock') + '</div>' +
             '<div id="dpuv-ressave">' + fremdBlock('_dpResSave') + '</div>' +
           '</div></div>' +
           '<div class="dpuv-lockbar"><div><b>Marke ab Partner</b>' +
@@ -547,15 +550,38 @@
        Partner-Pruefung kommt zuerst. */
     var partner = istPartner();
     var mandant = !partner && istMandant();
-    l.classList.toggle('locked', !partner);
+
+    /* ── v1122 · Weg B: die Sperre folgt der Stufe des Partners ──────────
+       mandant-branding.js legt sie beim Anwenden als dp_wl_freiheit ab.
+       Fehlt sie, gilt 'komfort' — also genau das Verhalten seit v1111.
+
+       Der Fall, der es noetig macht: bei 'alles' ist die Marke des
+       Partners nur noch Voreinstellung. Ein gesperrter Abschnitt haette
+       dem Mandanten dann etwas verboten, was er laut Partner darf — die
+       Sperre haette die Freigabe ueberstimmt. */
+    var frei = 'komfort';
+    try { var f = localStorage.getItem('dp_wl_freiheit'); if (f) frei = String(f); } catch (e) {}
+    var markeFrei = mandant && frei === 'alles';
+
+    l.classList.toggle('locked', !partner && !markeFrei);
     var bar = document.querySelector('.dpuv-lockbar');
     if (bar) {
-      bar.innerHTML = mandant
-        ? '<div><b>Von deinem Partner vorgegeben</b><span>Farben und Logo kommen aus dem ' +
+      var txt;
+      if (markeFrei) {
+        txt = '<div><b>Von deinem Partner freigegeben</b><span>Farben und Logo deines ' +
+          'Partners sind nur die Voreinstellung — du kannst alles selbst ändern.</span></div>';
+      } else if (mandant && frei === 'keine') {
+        txt = '<div><b>Von deinem Partner vorgegeben</b><span>Farben, Logo <b>und</b> die ' +
+          'Darstellung kommen aus dem Branding deines Partners und gelten unverändert.</span></div>';
+      } else if (mandant) {
+        txt = '<div><b>Von deinem Partner vorgegeben</b><span>Farben und Logo kommen aus dem ' +
           'Branding deines Partners und gelten für alle seine Mandanten. Vorlage, Karten, ' +
-          'Form und Schrift kannst du frei wählen.</span></div>'
-        : '<div><b>Marke ab Partner</b><span>Farben und Logo gehören zum Partner-Paket und ' +
+          'Form und Schrift kannst du frei wählen.</span></div>';
+      } else {
+        txt = '<div><b>Marke ab Partner</b><span>Farben und Logo gehören zum Partner-Paket und ' +
           'gelten dann auch für alle Mandanten.</span></div>';
+      }
+      bar.innerHTML = txt;
     }
   }
 
@@ -571,7 +597,8 @@
      jedem Oeffnen und zusaetzlich hinter _dpDispTarget — umhuellt nach dem
      Hausmuster aus settings.js:3469, das Original bleibt unangetastet. */
   function markeAuffrischen() {
-    [['dpuv-res', '_dpResBlock'], ['dpuv-logo', '_dpLogoBlock'], ['dpuv-ressave', '_dpResSave']]
+    [['dpuv-res', '_dpResBlock'], ['dpuv-logo', '_dpLogoBlock'],
+     ['dpuv-resfrei', '_dpResFreiheitBlock'], ['dpuv-ressave', '_dpResSave']]   /* v1122 */
       .forEach(function (paar) {
         var host = document.getElementById(paar[0]);
         if (host) host.innerHTML = fremdBlock(paar[1]);

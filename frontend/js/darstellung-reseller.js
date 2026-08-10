@@ -125,6 +125,7 @@
   function currentSet() {
     var o = {};
     MAP.forEach(function (m) { var v = LSget(m[0]); if (v) o[m[0]] = v; });
+    o.wl_freiheit = _frei;   /* v1122 · reist im vorhandenen jsonb mit */
     return o;
   }
 
@@ -139,6 +140,66 @@
       '<div id="dp-res-hint" style="font-size:10.5px;line-height:1.5;color:#8a8473;margin-top:6px">' +
         _hint() + '</div></div>';
   };
+  /* ═══════════════════════════════════════════════════════════════════════
+     v1122 · Weg B aus design/Vorschlaege/partner-flow-darstellung.md
+
+     Der Partner bestimmt selbst, wie viel Freiheit seine Mandanten haben.
+     Drei Stufen, EIN Schluessel: wl_freiheit.
+
+       keine    Marke UND Komfort gelten bei jedem Laden. Der Mandant
+                aendert nichts.
+       komfort  Marke gilt immer, Komfort ist nach dem ersten Mal frei.
+                = Weg A = das Verhalten seit v1111 = VOREINSTELLUNG.
+       alles    Marke ist nur Voreinstellung, danach gehoert alles dem
+                Mandanten.
+
+     EINE ANNAHME DES VORSCHLAGS IST WIDERLEGT: er veranschlagte
+     "ein Feld mehr im Branding-Datensatz, also Backend-Migration".
+     Gemessen — resellers.brand_display ist jsonb, und die Migration
+     062_reseller_display.sql sagt das ausdruecklich dazu: "jsonb, weil das
+     Panel waechst: neue Regler brauchen dann keine Migration."
+     wl_freiheit reist also im vorhandenen JSON mit. Keine Migration,
+     kein Backend-Eingriff, keine Produktionsberuehrung.
+
+     wl_freiheit steht bewusst NICHT in der MAP: die MAP bildet
+     Darstellungswerte auf _dpDisp*-Handler ab. Eine Freigaberegel ist
+     kein Darstellungswert — sie wuerde dort nur einen Handler brauchen,
+     den es nicht gibt. */
+  var FREI_STD = 'komfort';
+  var _frei = FREI_STD;
+  var FREI_TXT = {
+    keine:   ['Nichts', 'Meine Marke und meine Darstellung gelten unverändert.'],
+    komfort: ['Vorlage und Karten', 'Farben und Logo bleiben meine. Voreinstellung.'],
+    alles:   ['Alles', 'Meine Marke ist nur die Voreinstellung.']
+  };
+  window._dpResFreiheit = function (v) {
+    if (!FREI_TXT[v]) return;
+    _frei = v;
+    repaint();
+  };
+  window._dpResFreiheitBlock = function () {
+    if (!isPartner() || TARGET !== 'mandanten') return '';
+    var opt = Object.keys(FREI_TXT).map(function (k) {
+      var an = (_frei === k);
+      return '<label class="dp-frei-opt' + (an ? ' an' : '') + '" ' +
+        'onclick="_dpResFreiheit(\'' + k + '\')">' +
+        '<span class="dp-frei-dot">' + (an ? '●' : '○') + '</span>' +
+        '<span><b>' + FREI_TXT[k][0] + '</b><small>' + FREI_TXT[k][1] + '</small></span></label>';
+    }).join('');
+    return '<div class="dp-tb-sec" id="dp-res-frei">' +
+      '<b>Was dürfen deine Mandanten selbst ändern?</b>' +
+      '<style>#dp-res-frei .dp-frei-opt{display:flex;gap:8px;align-items:flex-start;' +
+      'padding:7px 8px;margin:4px 0;border-radius:6px;cursor:pointer;font-size:11.5px;line-height:1.45}' +
+      '#dp-res-frei .dp-frei-opt:hover{background:rgba(201,168,76,.08)}' +
+      '#dp-res-frei .dp-frei-opt.an{background:rgba(201,168,76,.14);' +
+      'border-left:2px solid var(--wl-c9a84c, #C9A84C)}' +
+      '#dp-res-frei .dp-frei-dot{color:var(--wl-c9a84c, #C9A84C);flex:0 0 auto}' +
+      '#dp-res-frei .dp-frei-opt small{display:block;color:#8a8473;font-size:10.5px;margin-top:1px}' +
+      '</style>' + opt +
+      '<div style="font-size:10.5px;color:#8a8473;margin-top:6px;line-height:1.5">' +
+      'Wird zusammen mit der Darstellung gespeichert.</div></div>';
+  };
+
   window._dpResSave = function () {
     if (!isPartner() || TARGET !== 'mandanten') return '';
     return '<div class="dp-tb-sec" id="dp-res-save">' +
@@ -161,6 +222,15 @@
       var sec = document.getElementById('dp-res-sec');
       if (sec) {
         var t = sec.parentNode; sec.outerHTML = window._dpResBlock();
+      }
+      /* v1122 · Der Freiheits-Block folgt derselben Mechanik wie der
+         Speichern-Block: er existiert nur in der Mandanten-Ansicht. */
+      var fr = document.getElementById('dp-res-frei');
+      var frHtml = window._dpResFreiheitBlock();
+      if (fr) { if (frHtml) fr.outerHTML = frHtml; else fr.remove(); }
+      else if (frHtml) {
+        var fhost = document.querySelector('#dp-tb-panel .dp-tb-b');
+        if (fhost) fhost.insertAdjacentHTML('beforeend', frHtml);
       }
       var sv = document.getElementById('dp-res-save');
       var html = window._dpResSave();
@@ -217,6 +287,11 @@
         if (b.brand_accent)   d.dp_accent_ui = b.brand_accent;
         if (b.brand_obsidian) d.dp_hdr_ui = b.brand_obsidian;
       }
+      /* v1122 · Die gespeicherte Freiheitsstufe in den Regler zuruecklesen.
+         Fehlt sie — jeder Partner von vor v1122 —, gilt die Voreinstellung
+         'komfort', also genau das Verhalten seit v1111. Niemand merkt
+         etwas, bis er die Stufe bewusst aendert. */
+      _frei = FREI_TXT[d.wl_freiheit] ? d.wl_freiheit : FREI_STD;
       return d;
     });
   }

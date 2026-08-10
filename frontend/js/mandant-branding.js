@@ -203,16 +203,45 @@
         } catch (e) {}
       }
 
-      /* Die Marke: jedes Mal. */
-      Object.keys(d).forEach(function (k) { if (MAP[k] && d[k]) MAP[k](d[k]); });
+      /* ── v1122 · Weg B: drei Freiheitsstufen je Partner ─────────────────
+         Bis v1111 galt Weg A fuer alle gleich. Jetzt entscheidet der
+         Partner, und der kennt seine Mandanten: ein Steuerberater mit
+         Kanzlei-CI waehlt "keine", ein Vertrieb mit vielen Endkunden
+         "alles".
+
+           keine    Marke UND Komfort bei JEDEM Laden
+           komfort  Marke immer, Komfort einmal   <- Weg A, VOREINSTELLUNG
+           alles    Marke nur einmal, danach frei
+
+         Fehlt der Schluessel — jeder Partner, der vor v1122 gespeichert
+         hat —, gilt 'komfort'. Damit aendert sich fuer bestehende Konten
+         nichts, bis der Partner die Stufe bewusst setzt.
+
+         'alles' benutzt bewusst DENSELBEN Merker dp_wl_display_seen wie
+         der Komfort-Teil: "einmal als Voreinstellung" ist genau dieselbe
+         Frage, nur auf die Marke angewandt. Ein zweiter Merker waere eine
+         zweite Wahrheit ueber denselben Sachverhalt. */
+      var frei = String(d.wl_freiheit || 'komfort');
+      if (frei !== 'keine' && frei !== 'alles') frei = 'komfort';
 
       var seen = false;
       try { seen = localStorage.getItem('dp_wl_display_seen') === '1'; } catch (e) {}
-      if (!seen) {
-        /* Der Komfort: einmal als Voreinstellung, danach nie wieder. */
-        Object.keys(d).forEach(function (k) { if (KOMFORT[k]) KOMFORT[k](d[k]); });
-        try { localStorage.setItem('dp_wl_display_seen', '1'); } catch (e) {}
+
+      /* Die Marke: bei 'keine' und 'komfort' jedes Mal, bei 'alles' nur
+         das erste Mal. */
+      if (frei !== 'alles' || !seen) {
+        Object.keys(d).forEach(function (k) { if (MAP[k] && d[k]) MAP[k](d[k]); });
       }
+
+      /* Der Komfort: bei 'keine' jedes Mal, sonst nur das erste Mal. */
+      if (frei === 'keine' || !seen) {
+        Object.keys(d).forEach(function (k) { if (KOMFORT[k]) KOMFORT[k](d[k]); });
+      }
+      if (!seen) { try { localStorage.setItem('dp_wl_display_seen', '1'); } catch (e) {} }
+
+      /* Damit das Panel dieselbe Stufe sieht, ohne den Branding-Satz
+         erneut zu parsen (ui-varianten.js, gateSetzen). */
+      try { localStorage.setItem('dp_wl_freiheit', frei); } catch (e) {}
       try { if (window._dpDispRefresh) _dpDispRefresh(); } catch (e) {}
     } catch (e) {}
   }
