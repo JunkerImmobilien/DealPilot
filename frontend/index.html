@@ -22,6 +22,17 @@
   <meta name="ji-api-base" content="/api/v1">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Dealpilot · Junker Immobilien</title>
+<!-- v1118-ma-ausbau: Die normale Ansicht traegt jetzt auch das Handy, also
+     gehoert ihr das PWA-Manifest. Es lag bisher nur an mobile-demo.html und
+     zeigte dorthin; Geltungsbereich und Startadresse stehen jetzt auf "/".
+     Die drei Symbole liegen unveraendert unter /assets/dp-pwa-*.png. -->
+<link rel="manifest" href="/dp-mobile.webmanifest">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DealPilot">
+<link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=W56"><!-- v1117-band-close -->
@@ -3489,7 +3500,11 @@ document.addEventListener('DOMContentLoaded', function(){
     <script src="js/darstellung-reseller.js?v=W23"></script>
     <script src="js/mandant-branding.js?v=W40"></script><!--W3-cb-->
     <script src="js/mandant-freigaben.js?v=W33"></script>
-    <script src="js/mobile-redirect.js?v=v1085"></script>
+    <!-- v1118-ma-ausbau: js/mobile-redirect.js (v970 "MB1-hardblock") entfernt.
+         Die Handy-Sperre der Haupt-App ist aufgehoben; die normale Ansicht ist
+         seit v650/v652, v1077 und v1112 bis v1117 handytauglich gebaut.
+         ACHTUNG: ui-varianten.js liest dasselbe Kennzeichen dp_wl_cache fuer
+         die Whitelabel-Sperre der Mandanten (v1111). Das bleibt. -->
     <script src="js/ui-varianten.js?v=v1111"></script>
     <script src="js/karten-kompakt.js?v=v1095c"></script><!--v1092-kompakt-aufklappbar-->
     <script src="js/deal-action-pdf-gate.js?v=W3"></script>

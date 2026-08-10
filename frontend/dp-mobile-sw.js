@@ -1,28 +1,36 @@
-/* DealPilot Mobile PWA Service Worker - Scope /mobile-demo.html (kontrolliert NUR die Mobile-App). */
-var CACHE = 'dp-mobile-v1';
-var SHELL = ['/mobile-demo.html'];
-self.addEventListener('install', function (e) {
+/* DealPilot v1118 — Selbstabmeldung des Mobile-Service-Workers.
+ *
+ * Die MA-Fassung ist ausgebaut; die normale Ansicht traegt das Handy allein.
+ * Diese Datei ersetzt den alten Shell-Cache-Worker (Geltungsbereich
+ * /mobile-demo.html) und tut nur noch eines: sich selbst und seinen Cache
+ * abraeumen und offene Fenster auf die normale App schicken.
+ *
+ * WARUM NICHT EINFACH LOESCHEN: Ein registrierter Service Worker liegt auf
+ * dem GERAET, nicht auf dem Server. Der alte Worker beantwortete jede
+ * Navigation aus dem Cache, wenn das Netz die Huelle nicht hergab. Waere die
+ * Datei ersatzlos verschwunden, haetten installierte Handy-Apps dauerhaft auf
+ * einer Fassung gestanden, die es nicht mehr gibt — und kein Rollout haette
+ * diese Geraete je wieder erreicht.
+ *
+ * Diese Fassung muss deshalb stehen bleiben, bis mit hinreichender Sicherheit
+ * jedes Geraet sie einmal gesehen hat. KEIN fetch-Handler: ab sofort geht
+ * jede Anfrage am Worker vorbei ans Netz.
+ */
+self.addEventListener('install', function () {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL).catch(function () {}); }));
 });
+
 self.addEventListener('activate', function (e) {
-  e.waitUntil(caches.keys().then(function (keys) {
-    return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
-  }).then(function () { return self.clients.claim(); }));
-});
-self.addEventListener('fetch', function (e) {
-  var req = e.request;
-  if (req.method !== 'GET') return;                 // POST/PUT etc. -> Browser-Default (API unberuehrt)
-  if (req.mode === 'navigate' || /\/mobile-demo\.html/.test(req.url)) {
-    // App-Shell: network-first, Cache als Offline-Fallback
-    e.respondWith(
-      fetch(req).then(function (res) {
-        var copy = res.clone();
-        caches.open(CACHE).then(function (c) { c.put('/mobile-demo.html', copy); });
-        return res;
-      }).catch(function () { return caches.match('/mobile-demo.html'); })
-    );
-    return;
-  }
-  // Alles andere (JS/Assets/API): durchreichen, kein Caching.
+  e.waitUntil(
+    caches.keys()
+      .then(function (keys) {
+        return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+      })
+      .then(function () { return self.registration.unregister(); })
+      .then(function () { return self.clients.matchAll({ type: 'window' }); })
+      .then(function (cs) {
+        cs.forEach(function (c) { try { c.navigate('/'); } catch (err) {} });
+      })
+      .catch(function () {})
+  );
 });

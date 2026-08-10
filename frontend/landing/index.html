@@ -1269,7 +1269,9 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
       <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Alle Deals als Boarding-Pässe im Blick</li>
       <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Marktwert-Korridor auf Knopfdruck</li>
     </ul>
-    <a class="dpc-cta" id="dpc-install" href="https://app.dealpilot.junker-immobilien.io/mobile-demo.html">
+    <!-- v1118-ma-ausbau: zeigte auf /mobile-demo.html (die ausgebaute MA-Fassung),
+         jetzt auf die normale App. Sie traegt das Handy seit v1112 bis v1117 selbst. -->
+    <a class="dpc-cta" id="dpc-install" href="https://app.dealpilot.junker-immobilien.io/">
       <svg viewBox="0 0 24 24"><path d="M12 2L4 21l8-4 8 4z"/></svg> App installieren
     </a>
     <div class="dpc-ios">
@@ -1287,9 +1289,11 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
 
 <script>
 (function(){
-  var APP='https://'+((location.hostname||'').toLowerCase().indexOf('app.')===0?location.hostname:'app.'+location.hostname)+'/mobile-demo.html'; /*v896-appurl immo-aware*/
+  /* v1118-ma-ausbau: Ziel ist die normale App, nicht mehr /mobile-demo.html.
+     Damit faellt auch das Wegschneiden des Dateinamens im QR-Text weg. */
+  var APP='https://'+((location.hostname||'').toLowerCase().indexOf('app.')===0?location.hostname:'app.'+location.hostname)+'/'; /*v896-appurl immo-aware*/
   try{ var _ib=document.getElementById('dpc-install'); if(_ib) _ib.href=APP; }catch(e){}
-  try{ var _qt=document.querySelector('.dpc-qr .qt'); if(_qt) _qt.innerHTML='<b>Scan mit dem Handy</b>'+APP.replace(/^https?:\/\//,'').replace(/\/mobile-demo\.html$/,''); }catch(e){}
+  try{ var _qt=document.querySelector('.dpc-qr .qt'); if(_qt) _qt.innerHTML='<b>Scan mit dem Handy</b>'+APP.replace(/^https?:\/\//,'').replace(/\/$/,''); }catch(e){}
   // Android/Desktop auf App-Origin: nativen Install-Prompt abfangen
   var deferred=null, btn=document.getElementById('dpc-install');
   window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;});

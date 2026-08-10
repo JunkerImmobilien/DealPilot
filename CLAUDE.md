@@ -93,15 +93,24 @@ Host-Node ist 18, Container-Node 22.
 
 ## Nicht anfassen
 
-- **Handy-Sperre** `js/mobile-redirect.js` (v970) + MA35. Bewusst aktiv.
-  Kein Redirect trotz des Namens — ein Overlay. Regeln: `pointer:coarse` oder
-  `hover:none`, dazu `innerWidth ≤ 700` **oder** kurze Kante ≤ 1400 physische
-  Pixel. Tablets sind damit frei. Umgehung zum Testen: `?nomobileblock`
+- **`frontend/dp-mobile-sw.js` und `frontend/mobile-demo.html`** — die
+  Selbstabmeldung des alten Mobile-Service-Workers (v1118). Ein registrierter
+  Service Worker liegt auf dem **Gerät**; er wird nur abgeräumt, wenn das Gerät
+  die Seite noch erreicht. **Beide fallen zusammen oder gar nicht**, und erst,
+  wenn jedes Gerät sie einmal gesehen hat.
 - `calc.js` BSV `startMonth`/`startYear` ~Z.440 (V267-05-Crash)
 - § 7b Sonder-AfA Wfl-Cap 4.000 €/m² (V227.1)
 - `avm-section.js`, `qc-bridge.js` `qcpm`-Overlay
 - `js/bmf-modal-v292.js` — die UI-Schicht des BMF-Modals. Wurde einmal
   fälschlich als „Leiche" gelöscht. **Nie wieder.**
+
+**Handy-Sperre entfernt (v1118).** `js/mobile-redirect.js` (v970,
+„MB1-hardblock") und MA35 sind weg, die normale Ansicht trägt das Handy
+allein. `?nomobileblock` gibt es nicht mehr — bei 390 px wird direkt geprüft.
+Die Vorlage der alten Mobile-Fassung liegt als
+`design/mockups/dp-handy-mockup-ma.html`. **`dp_wl_cache` liest weiterhin
+`ui-varianten.js`** für die Whitelabel-Sperre der Mandanten (v1111) — das ist
+ein anderer Zweck, es darf nicht mitfallen.
 
 ## Rechenkerne — nie duplizieren
 
