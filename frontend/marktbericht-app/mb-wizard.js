@@ -45,13 +45,15 @@
   /* Was in welchen Reiter gehoert. Reihenfolge = Reihenfolge im Reiter.
      Ids und Klassen sind die vorhandenen — nichts davon ist neu erfunden. */
   var ZUORDNUNG = {
-    1: ['#mbow-host', '#dpktDrop', '.mbw-sichern', '.sep', '.mbw-adresse', '#address', '.row'],
+    1: ['.mbw-h1', '#mbow-host', '#dpktDrop', '.mbw-sichern', '.sep', '.mbw-adresse', '#address', '.row'],
     2: ['#wm-b1', '#precHead', '#precBox', '#precMeter'],
     3: ['#wm-b3']
   };
-  /* Diese bleiben UNTEN und gehoeren keinem Reiter — sie gelten immer. */
+  /* Diese bleiben UNTEN und gehoeren keinem Reiter — sie gelten immer.
+     .mbw-aktionen ist die Zeile "Letzte Ausgabe / Teilbares Angebot";
+     sie hat weder Id noch Klasse und wird in markieren() ausgezeichnet. */
   var FUSS = ['#wm-fehlt', '#goBtn', '#replayBtn', '#errBox', '#genProgress',
-              '#srcChips', '#costNote', '#loadSignal'];
+              '#srcChips', '#costNote', '#loadSignal', '.mbw-aktionen'];
 
   var _aktiv = 1;
   var _panel = null;
@@ -101,6 +103,18 @@
     var sv = id('saveFileBtn');
     if (sv && sv.parentElement && !sv.parentElement.classList.contains('mbw-sichern')) {
       sv.parentElement.classList.add('mbw-sichern');
+    }
+    /* Die Aktionszeile "Letzte Ausgabe / Teilbares Angebot" hat weder Id
+       noch Klasse — erkennbar nur am versteckten Datei-Eingabefeld darin. */
+    var lf = id('loadFileInput');
+    if (lf && lf.parentElement && !lf.parentElement.classList.contains('mbw-aktionen')) {
+      lf.parentElement.classList.add('mbw-aktionen');
+    }
+    /* Die Ueberschrift "Objekt eingeben" doppelt jetzt den Reiternamen —
+       sie wandert mit hinein, statt darueber stehenzubleiben. */
+    if (_panel) {
+      var h = _panel.querySelector(':scope > h1');
+      if (h && !h.classList.contains('mbw-h1')) h.classList.add('mbw-h1');
     }
   }
 
