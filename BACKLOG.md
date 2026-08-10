@@ -433,6 +433,66 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
 
+- [2026-08-11] **Wizard, Schritt 1: die Stufenfrage wird zur
+  Meilensteinleiste** — `v1126` (`7f4343b`), `v1126b` (`2e03655`),
+  `v1126c` (`5699bfe`), Lese-Endpunkt (`stufenpreis`).
+
+  Der Kern von Marcels Entscheidung: **die drei Stufen vereint, nicht
+  vorher abgefragt.** Man füllt aus, und die Stufe **ergibt sich**; am
+  Erzeugen-Knopf steht, was sie kostet.
+
+  **Kein zweites Stufenmodell:** `stufe()` und `setStufe()` aus
+  `wertermittlung.js` bleiben die einzige Wahrheit. Der neue Baustein
+  rechnet die Stufe nur aus und meldet sie dorthin — Blöcke, Ampel und
+  `payload()` folgen unverändert. Die Bedingungen sind bewusst dieselben
+  wie die der Verfahrensampel, sonst zeigte die Leiste etwas anderes an als
+  die Ampel darunter.
+
+  **Der Preis kommt vom Server.** `GET /marktbericht/stufenpreis?ref=…`
+  liefert die bezahlte Stufe und den fälligen Betrag je Stufe. Der Browser
+  rechnet die Ermäßigung **nicht** selbst — er kennt die bezahlte Stufe
+  nicht und soll sie nicht kennen. Antwortet der Server nicht, stehen die
+  vollen Preise da. **Nutzertrennung nachgewiesen:** ein Objekt eines
+  anderen Nutzers liefert `bezahlte_stufe: 0`, geprüft an zwei echten
+  Objektkennungen aus dem Log.
+
+  ### Zwei eigene Fehler, beide erst im Durchgang sichtbar
+
+  1. **Der Preis stand nie am Knopf** (`v1126b`). Mein Riegel prüfte auf
+     `b.disabled`. Gemessen ist der Erzeugen-Knopf aber auch im
+     Normalzustand deaktiviert, solange Pflichtangaben fehlen — der Preis
+     wäre nie zu sehen gewesen. Überschrieben werden darf nur der
+     **laufende** Abruf; `app.js` setzt dort ein `span.spin` hinein.
+  2. **Stufe 3 war unerreichbar** (`v1126c`) — ein Henne-Ei-Problem.
+     Stufe 3 verlangt `plot` und je nach Objektart `mea` bzw.
+     `standardstufe`/`nhkHaus`. Die liegen **alle** im Block `wm-b3`, und
+     den baut `wertermittlung.js` erst `if (s >= 3)`. **Die Felder, die
+     hochstufen, gab es vor dem Hochstufen gar nicht.**
+
+     Auflösung ohne Frage vorweg: **der Meilenstein ist anklickbar** und
+     blendet seine Angaben ein. Ein Klick ist kein Fragebogen, sondern das
+     „Vertiefen" aus dem Entwurf; danach entscheiden wieder die Felder.
+
+  ### Nachgemessen, ganze Leiter
+
+  | Schritt | Stufe | Knopf |
+  |---|---|---|
+  | Adresse + Fläche | 1 | „· 2 L" |
+  | + Baustatus + Zustand | 2 | „· 5 L" |
+  | Klick auf „Wertermittlung" | 2 | Block erscheint, `plot`/`mea` da |
+  | + Grundstück + MEA | **3** | **„· 12 L"** |
+
+  `dp_mb_stufe` folgt jeweils, die Punkte leuchten auf, der Hinweistext
+  nennt, was für die nächste Stufe fehlt.
+
+  **Ein eigener Messfehler, zum zweiten Mal derselbe:** ich habe `7,06` mit
+  Komma in ein `type="number"`-Feld gesetzt. Der Browser verwirft das, das
+  Feld bleibt leer — es sah nach einem Fehler im Code aus. **Zahlen in
+  Prüfläufen immer mit Punkt.**
+
+  **Als Nächstes:** die fünf Reiter (die vorhandenen Felder werden
+  umgehängt, nicht neu gebaut), dann die Übersicht.
+
 - [2026-08-11] **GELD · Drei echte Stufenpreise, Vertiefen kostet die
   Differenz** — `v1125` (`75bbcd0`), `v1125b` (Riegel), `v1125c`
   (`35ecc22`). **Marcels Entscheidung: Weg 3.**
