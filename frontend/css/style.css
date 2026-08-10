@@ -36710,3 +36710,29 @@ html body .set-modal-cream .dp-mtb-brand .dp-band-close:hover{
   }
 }
 /* ===== v1118b-handy-trefferflaechen END ===== */
+
+
+/* ===== v1124b-hdrsync-collapsed ==========================================
+   Der Gegenfall zum Spalt: bei ZUGEKLAPPTEM Kopf gewinnt
+   `body.hdr-collapsed .main-col > nav.tabs{top:48px!important}` (0,3,2).
+   Gemessen bei 890 px ist der zugeklappte Kopf aber 97 px hoch (Zeile 1
+   mit 48 px plus die Zeile mit dem Auf-/Zuklapper). Die Reiterleiste sass
+   damit 49 px zu hoch und rutschte unter den Kopf — dieselbe Ursache wie
+   der Spalt, nur andersherum.
+
+   Dass es widerspruechlich ist, zeigt der Vergleich der Breiten: bei
+   1400 px gewann die --hdr-h-Regel und der zugeklappte Kopf passte (92/92),
+   bei 890 px die harte 48. Eine Tabelle fester Zahlen kann das nicht
+   leisten — die Kopfhoehe haengt an Breite, Vorlage, Score und Zustand.
+
+   Deshalb auch dieser Fall ueber den LIVE gemessenen Wert. --hdr-h wird
+   seit v1124 von einem ResizeObserver nachgefuehrt und stimmt in jedem
+   Zustand; der Rueckfall 48px bleibt fuer Browser ohne ResizeObserver.
+   Spezifitaet gleich (0,3,2), aber spaeter in der Datei — hier ist das
+   richtig, weil es dieselbe Regel fuer denselben Fall ist, nur mit dem
+   gemessenen statt dem geratenen Wert. */
+body.hdr-collapsed .main-col > nav.tabs,
+body.hdr-collapsed .main-col > .tabs {
+  top: var(--hdr-h, 48px) !important;
+}
+/* ===== v1124b-hdrsync-collapsed END ===== */
