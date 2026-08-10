@@ -444,9 +444,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   **Kein zweites Stufenmodell:** `stufe()` und `setStufe()` aus
   `wertermittlung.js` bleiben die einzige Wahrheit. Der neue Baustein
   rechnet die Stufe nur aus und meldet sie dorthin — Blöcke, Ampel und
-  `payload()` folgen unverändert. Die Bedingungen sind bewusst dieselben
-  wie die der Verfahrensampel, sonst zeigte die Leiste etwas anderes an als
-  die Ampel darunter.
+  `payload()` folgen unverändert.
+
+  > **Diese Behauptung stand hier zuerst falsch.** Ich hatte geschrieben,
+  > die Bedingungen seien „dieselben wie die der Verfahrensampel". Sie
+  > waren es **nicht** — siehe `v1126d` unten.
 
   **Der Preis kommt vom Server.** `GET /marktbericht/stufenpreis?ref=…`
   liefert die bezahlte Stufe und den fälligen Betrag je Stufe. Der Browser
@@ -489,6 +491,45 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Komma in ein `type="number"`-Feld gesetzt. Der Browser verwirft das, das
   Feld bleibt leer — es sah nach einem Fehler im Code aus. **Zahlen in
   Prüfläufen immer mit Punkt.**
+
+  ### `v1126d` — Marcels Befund, beides bestätigt
+
+  Sein Eindruck: „ich sehe kaum Unterschied, nur oben ist anders — und das
+  ist komisch." Beides stimmte.
+
+  **1 · Die Leiste behauptete mehr, als da war.** Sie meldete
+  „Wertermittlung erreicht" bei einem halb leeren Formular **ohne
+  Baujahr**. Ursache: mein `erreicht()` prüfte nur `address`, `ptype`,
+  `area` — nicht die echten Pflichtangaben. **Mein Satz oben, die
+  Bedingungen seien dieselben wie die der Ampel, war schlicht falsch.**
+
+  Jetzt aus `VERFAHREN` in `wertermittlung.js` abgeschrieben:
+
+  | Verfahren | Pflicht | empfohlen |
+  |---|---|---|
+  | markt | `ptype`, `area`, `year`, `baustatus` | `cond`, `quality` |
+  | ertrag | `plot`, `units` | |
+  | sach | `plot`, `year` | (bei ETW nicht anwendbar) |
+
+  **Eine Leiste, die mehr behauptet als da ist, ist schlimmer als keine.**
+
+  **2 · Waagerecht passte sie nicht.** Gemessen: die Spalte ist **338 px**
+  breit, drei Beschriftungen brauchten je 120 px — sie klebten aneinander.
+  Jetzt eine **Liste** statt einer Bahn. Derselbe Inhalt, liest sich ruhig,
+  und es ist Platz für das Nützlichste: **was jeder Stufe konkret fehlt**,
+  Feld für Feld benannt („fehlt: Baujahr").
+
+  Dazu `FEHLT_TEXT` gelöscht — eine zweite, von Hand gepflegte Liste
+  derselben Pflichtangaben, die prompt auseinanderlief. Was fehlt, sagt
+  jetzt `fehlend()` aus `BEDARF`, aus **einer** Quelle.
+
+  **Nachgemessen:** leeres Formular → Stufe 0, jede Zeile nennt ihr
+  fehlendes Feld, kein Überlauf im 338-px-Kasten. Baujahr eintragen →
+  **Stufe 1, „· 2 L"**. Zustand und Qualität dazu → **Stufe 2, „· 5 L"**.
+
+  **Zu „kaum Unterschied":** völlig richtig — bisher ist **nur** die
+  Stufenfrage ersetzt. Alles darunter ist unverändert, die fünf Reiter
+  kommen erst.
 
   **Als Nächstes:** die fünf Reiter (die vorhandenen Felder werden
   umgehängt, nicht neu gebaut), dann die Übersicht.
