@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Textfarben für Score- und KPI-Karten</title>
+<!--
+  DealPilot · Vorschlag zum Backlog-Punkt „Textfarben fuer Score-Karte und
+  KPI-Karten sind nicht regelbar". Stand 2026-08-10.
+
+  Der Punkt ist ausdruecklich KEIN Defekt, sondern eine PRODUKTFRAGE:
+  „gibt der Regler die Farbe frei, oder nur innerhalb dessen, was noch
+  traegt?" — und er verlangt genau deshalb eine Demo statt einer Vermutung.
+
+  Die drei Antworten sind unten anklickbar. Der Kontrast wird live nach
+  WCAG gerechnet, an derselben Formel wie die Abnahmelaeufe.
+-->
+<style>
+  :root{
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --creme:#FDFCFA; --ink:#1c1a17; --ink2:#5d5852; --ink3:#8a847c;
+    --linie:#e4ded1; --gruen:#3FA56C; --rot:#B8625C; --gelb:#E8B84F;
+    --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--creme);color:var(--ink);
+    font:15px/1.65 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+  .wrap{max-width:1060px;margin:0 auto;padding:40px 24px 90px}
+  h1{font-family:"Space Grotesk",system-ui,sans-serif;font-size:32px;line-height:1.15;margin:0 0 6px;letter-spacing:-.5px}
+  h1 b{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kick{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--gold-lo);margin-bottom:10px}
+  .rw{height:3px;width:74px;border-radius:2px;background:var(--runway);margin:16px 0 26px}
+  h2{font-family:"Space Grotesk",system-ui,sans-serif;font-size:21px;margin:46px 0 6px}
+  h3{font-family:"Space Grotesk",system-ui,sans-serif;font-size:16px;margin:24px 0 6px}
+  p{margin:0 0 12px;max-width:78ch}
+  .lead{font-size:16.5px;color:var(--ink2)}
+  code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.88em;
+    background:#f2ede1;padding:1px 5px;border-radius:4px}
+  table{border-collapse:collapse;width:100%;margin:14px 0 20px;font-size:14px}
+  th,td{border:1px solid var(--linie);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#f6f1e4;font-weight:600;font-size:12.5px}
+  .tab-scroll{overflow-x:auto}
+  .karte{background:#fff;border:1px solid var(--linie);border-radius:12px;padding:20px 22px;margin:18px 0}
+  .merk{border-left:3px solid var(--gold);background:#fdfaf0}
+  .ok{border-left:3px solid var(--gruen);background:#f5faf7}
+
+  .weg{background:#fff;border:1px solid var(--linie);border-radius:14px;margin:24px 0;overflow:hidden}
+  .weg-kopf{padding:16px 22px;border-bottom:1px solid var(--linie);display:flex;gap:13px;align-items:flex-start;background:#fcfaf4}
+  .nr{flex:0 0 auto;width:32px;height:32px;border-radius:9px;background:#050505;color:var(--gold-hi);
+    display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace;font-weight:700}
+  .weg-kopf h3{margin:0;font-size:17px}
+  .weg-kopf .sub{color:var(--ink2);font-size:13.5px;margin-top:3px}
+  .weg-koerper{padding:18px 22px}
+  .fuer{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:13.5px}
+  .fuer div{flex:1 1 230px}
+  .fuer b{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+
+  /* Laborbereich */
+  .labor{display:grid;grid-template-columns:250px 1fr;gap:20px;align-items:start}
+  .steuer label{display:block;font-size:12px;color:var(--ink2);margin:10px 0 3px}
+  .steuer input[type=color]{width:100%;height:34px;padding:0;border:1px solid #d8d2c4;border-radius:6px;background:#fff}
+  .steuer .zeile{display:flex;gap:8px;align-items:center}
+  .steuer .zeile input[type=color]{flex:1}
+  .steuer .hex{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink3)}
+
+  /* Score-Karte, nachgebaut */
+  .sc{border-radius:12px;padding:16px 18px;min-height:150px}
+  .sc-l{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+  .sc-v{font-family:"Space Grotesk",system-ui,sans-serif;font-size:42px;font-weight:700;line-height:1.05;margin:4px 0 2px}
+  .sc-sub{font-size:12px}
+  .sc-grade{font-size:12px;font-weight:700;margin-top:6px}
+  .kpi-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .kpi{flex:1 1 82px;border-radius:8px;padding:8px 9px;min-width:82px}
+  .kpi .l{font-family:"JetBrains Mono",monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+  .kpi .v{font-size:15px;font-weight:700;margin-top:2px}
+
+  .messwert{margin-top:12px;font-size:12.5px;font-family:"JetBrains Mono",monospace}
+  .messwert span{display:inline-block;padding:2px 8px;border-radius:5px;margin-right:6px;margin-bottom:5px}
+  .m-ok{background:#e6f4ec;color:#1c6844}
+  .m-warn{background:#fdf3df;color:#7d5a0c}
+  .m-bad{background:#fbeceb;color:#8f3a34}
+  .hinweis{margin-top:10px;font-size:12.5px;padding:8px 10px;border-radius:7px}
+  .knopf{appearance:none;border:0;border-radius:8px;padding:9px 14px;font:inherit;font-size:13px;
+    font-weight:600;cursor:pointer;background:var(--runway);color:#2c2410;margin-top:8px}
+  .knopf.leise{background:#f2ede1;color:var(--ink)}
+  @media(max-width:720px){ .labor{grid-template-columns:1fr} h1{font-size:25px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="kick">DealPilot · Vorschlag · 2026-08-10</div>
+<h1>Textfarben für <b>Score- und KPI-Karten</b></h1>
+<div class="rw"></div>
+<p class="lead">Der Punkt ist kein Defekt, sondern eine Produktfrage —
+<b>gibt der Regler die Farbe frei, oder nur innerhalb dessen, was noch trägt?</b>
+Drei Antworten, alle anklickbar. <b>Die Auswahl trifft Marcel.</b></p>
+
+<h2>Der Abgleich — nachgezählt, nicht übernommen</h2>
+<p>Im Panel gezählt (2026-08-10, Partner-Konto, Panel geöffnet): <b>acht
+Farbfelder.</b> Genau wie beim <code>v1113</code>-Abgleich, und die Aufteilung
+bestätigt sich:</p>
+
+<div class="tab-scroll">
+<table>
+<tr><th>Abschnitt</th><th>Feld</th><th>steuert</th></tr>
+<tr><td rowspan="6">Einzelne Bereiche</td><td>Kopfleiste + Logo</td><td>Fläche</td></tr>
+<tr><td>Objektleiste + Band</td><td>Fläche</td></tr>
+<tr><td><b>Text</b></td><td><b>Text</b> (global)</td></tr>
+<tr><td><b>Score-Karte</b></td><td>Fläche — <b>kein Text</b></td></tr>
+<tr><td><b>KPI-Karten</b></td><td>Fläche — <b>kein Text</b></td></tr>
+<tr><td>Objektkarten</td><td>Fläche</td></tr>
+<tr><td rowspan="2">Text-Feintuning</td><td>Tab-Texte</td><td>Text (<code>_dpDispTabText</code>)</td></tr>
+<tr><td>Objektkarten-Text</td><td>Text (<code>_dpDispObjText</code>)</td></tr>
+</table>
+</div>
+
+<p><b>Fünf Flächen, drei Texte.</b> Für Objektkarten gibt es beides — Fläche
+<em>und</em> Text. Für Score-Karte und KPI-Karten nur die Fläche. Das ist
+Marcels „die Schriftfarbe lässt sich nicht setzen", und es ist eine
+<b>Lücke im Muster</b>, nicht in der Logik: die Vorlage für einen solchen
+Regler steht mit <code>_dpDispObjText</code> längst daneben.</p>
+
+<div class="karte merk">
+<h3 style="margin-top:0">Warum es nicht einfach ein neunter Regler ist</h3>
+<p>Seit <code>v1113</code> leitet <code>tonAufMarke()</code> fünf Tokens ab —
+<code>--uv-sc-ink</code>, <code>-mut</code>, <code>-ok</code>, <code>-txt</code>,
+<code>-akz</code> — und zwar <b>gegen alle drei Verlaufsstopps der
+Markenfläche</b>. Das war nötig, weil die Score-Karte unter jeder hellen
+Vorlage zur Markenfläche wird: bei Gold hell, bei Partner-Rot dunkel.
+<b>Gemessen wurde damals: ein fest dunkler Ton, der auf Gold 5,78 erreicht,
+fällt auf Partner-Rot auf 2,16.</b></p>
+<p style="margin-bottom:0">Ein Regler, der diese Ableitung einfach
+überschreibt, macht genau diesen Fehler wieder — nur diesmal auf Wunsch des
+Nutzers. <b>Das ist die Frage, die dieses Dokument beantworten soll.</b></p>
+</div>
+
+<h2>Das Labor</h2>
+<p>Unten steht die Score-Karte nachgebaut. Fläche und Textfarbe sind frei
+wählbar, der Kontrast wird live gerechnet (WCAG, relative Leuchtdichte).
+<b>Die drei Wege unterscheiden sich nur darin, was mit deiner Wahl
+passiert.</b></p>
+
+<!-- ═══════════ Weg A ═══════════ -->
+<div class="weg">
+  <div class="weg-kopf"><div class="nr">A</div>
+    <div><h3>Frei — deine Wahl gilt</h3>
+      <div class="sub">Der Regler überschreibt die Ableitung. Was du wählst, steht da. Auch wenn es nicht lesbar ist.</div></div></div>
+  <div class="weg-koerper">
+    <div class="labor">
+      <div class="steuer">
+        <label>Fläche der Score-Karte</label>
+        <div class="zeile"><input type="color" id="a-bg" value="#C9A84C"><span class="hex" id="a-bg-h">#C9A84C</span></div>
+        <label>Textfarbe</label>
+        <div class="zeile"><input type="color" id="a-fg" value="#B39445"><span class="hex" id="a-fg-h">#B39445</span></div>
+        <button class="knopf leise" onclick="a_setz('#B39445')">Schlechter Wert</button>
+        <button class="knopf leise" onclick="a_setz('#1a1508')">Guter Wert</button>
+      </div>
+      <div>
+        <div class="sc" id="a-karte"><div class="sc-l">Investor Deal Score</div>
+          <div class="sc-v">69</div><div class="sc-sub">Solide · über dem Marktmittel</div>
+          <div class="sc-grade">SOLIDE</div>
+          <div class="kpi-row" id="a-kpis"></div></div>
+        <div class="messwert" id="a-mess"></div>
+        <div class="hinweis" id="a-hin"></div>
+      </div>
+    </div>
+    <div class="fuer">
+      <div><b>Dafür</b> Ehrlich und vorhersagbar. Ein Regler, der nicht tut, was er sagt, ist schlimmer als keiner.</div>
+      <div><b>Dagegen</b> Hebelt <code>v1113</code> aus. Der Partner stellt es einmal ein — und <b>alle seine Mandanten</b> sehen es.</div>
+      <div><b>Risiko</b> Der Fehler, den v1113 behoben hat, kommt zurück. Nur diesmal steht er im Protokoll als gewollt.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ Weg B ═══════════ -->
+<div class="weg">
+  <div class="weg-kopf"><div class="nr">B</div>
+    <div><h3>Geführt — deine Wahl wird nachgezogen</h3>
+      <div class="sub">Der Regler bestimmt Farbton und Sättigung, die Ableitung korrigiert nur die Helligkeit, bis der Ton trägt.</div></div></div>
+  <div class="weg-koerper">
+    <div class="labor">
+      <div class="steuer">
+        <label>Fläche der Score-Karte</label>
+        <div class="zeile"><input type="color" id="b-bg" value="#C9A84C"><span class="hex" id="b-bg-h">#C9A84C</span></div>
+        <label>Textfarbe (dein Wunsch)</label>
+        <div class="zeile"><input type="color" id="b-fg" value="#B39445"><span class="hex" id="b-fg-h">#B39445</span></div>
+        <label>Schwelle</label>
+        <div class="zeile"><input type="range" id="b-min" min="3" max="7" step="0.5" value="4.5" style="flex:1"><span class="hex" id="b-min-h">4,5</span></div>
+      </div>
+      <div>
+        <div class="sc" id="b-karte"><div class="sc-l">Investor Deal Score</div>
+          <div class="sc-v">69</div><div class="sc-sub">Solide · über dem Marktmittel</div>
+          <div class="sc-grade">SOLIDE</div>
+          <div class="kpi-row" id="b-kpis"></div></div>
+        <div class="messwert" id="b-mess"></div>
+        <div class="hinweis" id="b-hin"></div>
+      </div>
+    </div>
+    <div class="fuer">
+      <div><b>Dafür</b> Nutzt genau die Mechanik, die es seit v1113 gibt — <code>tonFuerGrund()</code>. <b>Kein neuer Rechenweg.</b></div>
+      <div><b>Dafür</b> Der Farbton bleibt die Wahl des Nutzers; nur die Helligkeit wandert. In OKLab nimmt sie den Ton nicht mit.</div>
+      <div><b>Dagegen</b> Das Farbfeld zeigt einen Wert, die Karte einen anderen. Das irritiert, wenn es nicht erklärt wird.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ Weg C ═══════════ -->
+<div class="weg">
+  <div class="weg-kopf"><div class="nr">C</div>
+    <div><h3>Frei mit Warnung — deine Wahl gilt, aber du siehst es</h3>
+      <div class="sub">Wie A, plus ein sichtbarer Messwert und ein Knopf, der auf den nächsten tragenden Ton zieht.</div></div></div>
+  <div class="weg-koerper">
+    <div class="labor">
+      <div class="steuer">
+        <label>Fläche der Score-Karte</label>
+        <div class="zeile"><input type="color" id="c-bg" value="#C9A84C"><span class="hex" id="c-bg-h">#C9A84C</span></div>
+        <label>Textfarbe</label>
+        <div class="zeile"><input type="color" id="c-fg" value="#B39445"><span class="hex" id="c-fg-h">#B39445</span></div>
+        <button class="knopf" id="c-fix">Ton anheben, bis er trägt</button>
+      </div>
+      <div>
+        <div class="sc" id="c-karte"><div class="sc-l">Investor Deal Score</div>
+          <div class="sc-v">69</div><div class="sc-sub">Solide · über dem Marktmittel</div>
+          <div class="sc-grade">SOLIDE</div>
+          <div class="kpi-row" id="c-kpis"></div></div>
+        <div class="messwert" id="c-mess"></div>
+        <div class="hinweis" id="c-hin"></div>
+      </div>
+    </div>
+    <div class="fuer">
+      <div><b>Dafür</b> Der Regler tut, was er sagt — und der Nutzer <b>weiß</b>, was er tut. Ein Klick repariert es.</div>
+      <div><b>Dafür</b> Baut auf beidem auf: A ist das Verhalten, B ist der Knopf.</div>
+      <div><b>Dagegen</b> Mehr Oberfläche. Und beim <b>Partner</b> hilft die Warnung nur ihm, nicht seinen Mandanten.</div>
+    </div>
+  </div>
+</div>
+
+<h2>Gegenüberstellung</h2>
+<div class="tab-scroll">
+<table>
+<tr><th></th><th>A · Frei</th><th>B · Geführt</th><th>C · Frei mit Warnung</th></tr>
+<tr><td>Regler tut, was er sagt</td><td><b>ja</b></td><td>nein</td><td><b>ja</b></td></tr>
+<tr><td>Unlesbares möglich</td><td>ja</td><td><b>nein</b></td><td>ja, aber sichtbar</td></tr>
+<tr><td>Neuer Rechenweg nötig</td><td>nein</td><td>nein — <code>tonFuerGrund()</code></td><td>nein</td></tr>
+<tr><td>Aufwand</td><td><b>klein</b></td><td>klein</td><td>mittel</td></tr>
+<tr><td>Schützt die Mandanten des Partners</td><td>nein</td><td><b>ja</b></td><td>nein</td></tr>
+<tr><td>Passt zum Muster von <code>_dpDispObjText</code></td><td>ja</td><td>nein</td><td>ja</td></tr>
+</table>
+</div>
+
+<div class="karte ok">
+<h3 style="margin-top:0">Meine Empfehlung</h3>
+<p><b>B für den Partner, C für den einzelnen Nutzer.</b> Die Zeile
+„schützt die Mandanten" ist der Unterschied, der zählt: Wer nur für sich
+einstellt, darf sich vertun — es trifft niemanden sonst, und C sagt es ihm.
+Wer <b>für alle seine Mandanten</b> einstellt, trifft eine Entscheidung für
+Leute, die sie nicht korrigieren können.</p>
+<p style="margin-bottom:0">Technisch ist das <b>ein</b> Regler mit einem
+Schalter, nicht zwei Bauwerke: derselbe Wert, und in der Mandanten-Ansicht
+(<code>_dpResTarget() === 'mandanten'</code>) läuft er zusätzlich durch
+<code>tonFuerGrund()</code>. Das passt genau zu <b>Weg B des Partner-Flows</b>
+(<code>v1122</code>): dort entscheidet der Partner ohnehin schon, wie viel
+Freiheit seine Mandanten haben.</p>
+</div>
+
+<h2>Was vor dem Bauen zu klären ist</h2>
+<ol>
+<li><b>Ein Regler oder zwei?</b> Score-Karte und KPI-Karten haben je eine
+eigene Fläche. Der Text darauf könnte einer sein („Text auf Karten") oder
+zwei. <b>Zwei wäre konsequent</b> zur Flächen-Seite, einer wäre weniger
+Oberfläche.</li>
+<li><b>Was ist die Schwelle?</b> v1113 rechnet mit 4,5 für
+<code>--uv-sc-ink</code>, 4,0 für <code>-mut</code>/<code>-ok</code> und 7,0
+für den Hauptwert. Ein Regler braucht <b>eine</b> Zahl — 4,5 ist der übliche
+Wert für Fließtext, der Hauptwert ist groß genug für 3,0.</li>
+<li><b>Und die abgeleiteten Nebentöne?</b> <code>--uv-sc-mut</code> (die
+Unterzeile) und <code>--uv-sc-ok</code> (Statusgrün) hängen mit dran. Zieht
+der Regler sie mit, oder bleiben sie abgeleitet? <b>Vorschlag: sie bleiben
+abgeleitet</b> — Statusfarben werden nie tokenisiert, das steht so in der
+Projektanweisung.</li>
+<li><b>Zurücksetzen.</b> „Zurück auf abgeleitet" muss ein eigener Zustand
+sein, nicht ein Farbwert, der zufällig passt.</li>
+</ol>
+
+<p style="margin-top:34px;font-size:12.5px;color:#8a847c">
+Die Demos sind Neubauten und laufen ohne Netz. Die Kontrastformel ist
+dieselbe wie in den Abnahmeläufen (WCAG 2.1, relative Leuchtdichte). Die
+Helligkeitswanderung in B und C läuft in OKLab, damit der Farbton erhalten
+bleibt — wie in <code>tonFuerGrund()</code>.</p>
+
+</div>
+
+<script>
+'use strict';
+/* ── Farbwerkzeug ─────────────────────────────────────────────── */
+function rgb(h){ h=String(h).replace('#',''); if(h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+function hex(r,g,b){ function z(n){ n=Math.max(0,Math.min(255,Math.round(n))); return ('0'+n.toString(16)).slice(-2); }
+  return '#'+z(r)+z(g)+z(b); }
+function lum(c){ var a=c.map(function(v){ v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); });
+  return 0.2126*a[0]+0.7152*a[1]+0.0722*a[2]; }
+function k(a,b){ var l1=lum(a),l2=lum(b); if(l1<l2){ var t=l1; l1=l2; l2=t; } return (l1+0.05)/(l2+0.05); }
+
+/* OKLab — Helligkeit wandern lassen, Farbton behalten */
+function toLab(c){ var r=c[0]/255,g=c[1]/255,b=c[2]/255;
+  function f(v){ return v<=0.04045 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); }
+  r=f(r); g=f(g); b=f(b);
+  var l=Math.cbrt(0.4122214708*r+0.5363325363*g+0.0514459929*b);
+  var m=Math.cbrt(0.2119034982*r+0.6806995451*g+0.1073969566*b);
+  var s=Math.cbrt(0.0883024619*r+0.2817188376*g+0.6299787005*b);
+  return [0.2104542553*l+0.7936177850*m-0.0040720468*s,
+          1.9779984951*l-2.4285922050*m+0.4505937099*s,
+          0.0259040371*l+0.7827717662*m-0.8086757660*s]; }
+function fromLab(L,a,bb){
+  var l=Math.pow(L+0.3963377774*a+0.2158037573*bb,3);
+  var m=Math.pow(L-0.1055613458*a-0.0638541728*bb,3);
+  var s=Math.pow(L-0.0894841775*a-1.2914855480*bb,3);
+  var r= 4.0767416621*l-3.3077115913*m+0.2309699292*s;
+  var g=-1.2684380046*l+2.6097574011*m-0.3413193965*s;
+  var b=-0.0041960863*l-0.7034186147*m+1.7076147010*s;
+  function f(v){ return v<=0.0031308 ? 12.92*v : 1.055*Math.pow(v,1/2.4)-0.055; }
+  return [f(r)*255,f(g)*255,f(b)*255]; }
+
+/* Genau das Muster aus tonFuerGrund(): Richtung aus der Helligkeit des Grundes */
+function tonFuerGrund(farbe, grund, min){
+  var f=rgb(farbe), g=rgb(grund);
+  if(k(f,g)>=min) return hex(f[0],f[1],f[2]);
+  var lab=toLab(f);
+  var runter = lum(g) > 0.18;
+  var schritt = runter ? -0.02 : 0.02;
+  var ende = runter ? 0.04 : 0.99;
+  for(var L=lab[0]+schritt; runter ? L>=ende : L<=ende; L+=schritt){
+    var c=fromLab(L,lab[1],lab[2]);
+    if(k(c,g)>=min) return hex(c[0],c[1],c[2]);
+  }
+  var e=fromLab(ende,lab[1],lab[2]); return hex(e[0],e[1],e[2]);
+}
+
+function pill(name,wert,schwelle){
+  var cls = wert>=schwelle ? 'm-ok' : (wert>=3 ? 'm-warn' : 'm-bad');
+  return '<span class="'+cls+'">'+name+' '+wert.toFixed(2).replace('.',',')+'</span>';
+}
+function kpisHtml(bg,fg){
+  var d=[['Rendite','4,8 %'],['Cashflow','+412 €'],['LTV','78 %']];
+  return d.map(function(x){
+    return '<div class="kpi" style="background:'+bg+';color:'+fg+'">'+
+      '<div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>';
+  }).join('');
+}
+/* Die KPI-Kacheln sitzen auf einer eigenen, helleren Flaeche — genau wie
+   in der App. Deshalb wird ihr Kontrast getrennt gerechnet. */
+function kpiFlaeche(bg){ var c=rgb(bg), lab=toLab(c);
+  var L=Math.min(0.99, lab[0]+0.10); var x=fromLab(L,lab[1]*0.6,lab[2]*0.6);
+  return hex(x[0],x[1],x[2]); }
+
+function zeichne(pre, modus, opt){
+  var bg=document.getElementById(pre+'-bg').value;
+  var fgWunsch=document.getElementById(pre+'-fg').value;
+  var min = opt && opt.min ? opt.min : 4.5;
+  var fg = fgWunsch;
+  if(modus==='gefuehrt') fg = tonFuerGrund(fgWunsch, bg, min);
+
+  var karte=document.getElementById(pre+'-karte');
+  karte.style.background=bg; karte.style.color=fg;
+  var kbg=kpiFlaeche(bg);
+  document.getElementById(pre+'-kpis').innerHTML=kpisHtml(kbg,fg);
+
+  document.getElementById(pre+'-bg-h').textContent=bg.toUpperCase();
+  document.getElementById(pre+'-fg-h').textContent=fgWunsch.toUpperCase();
+
+  var kKarte=k(rgb(fg),rgb(bg)), kKpi=k(rgb(fg),rgb(kbg));
+  document.getElementById(pre+'-mess').innerHTML =
+    pill('Score-Karte',kKarte,min)+pill('KPI-Kachel',kKpi,min)+
+    (modus==='gefuehrt' && fg.toLowerCase()!==fgWunsch.toLowerCase()
+      ? '<span class="m-warn">nachgezogen auf '+fg.toUpperCase()+'</span>' : '');
+
+  var h=document.getElementById(pre+'-hin');
+  var schlecht = kKarte<min || kKpi<min;
+  if(modus==='frei'){
+    h.style.background = schlecht ? '#fbeceb' : '#f5faf7';
+    h.style.color = schlecht ? '#8f3a34' : '#1c6844';
+    h.textContent = schlecht
+      ? 'Der Wert steht so da. Unter 3 ist die Zeile praktisch unsichtbar — genau der Zustand, den v1113 behoben hat.'
+      : 'Trägt. In diesem Weg prüft aber niemand nach — bei einer anderen Marke kann derselbe Ton kippen.';
+  } else if(modus==='gefuehrt'){
+    h.style.background='#f5faf7'; h.style.color='#1c6844';
+    h.textContent = fg.toLowerCase()===fgWunsch.toLowerCase()
+      ? 'Dein Wunschton trägt bereits — er kommt unverändert durch.'
+      : 'Dein Farbton bleibt, nur die Helligkeit ist gewandert (OKLab). Unlesbar kann hier nichts werden.';
+  } else {
+    h.style.background = schlecht ? '#fdf3df' : '#f5faf7';
+    h.style.color = schlecht ? '#7d5a0c' : '#1c6844';
+    h.textContent = schlecht
+      ? 'Trägt nicht — der Knopf links zieht auf den nächsten Ton, der trägt. Deine Entscheidung.'
+      : 'Trägt.';
+  }
+}
+
+/* A */
+['a-bg','a-fg'].forEach(function(id){ document.getElementById(id)
+  .addEventListener('input',function(){ zeichne('a','frei'); }); });
+window.a_setz=function(v){ document.getElementById('a-fg').value=v; zeichne('a','frei'); };
+zeichne('a','frei');
+
+/* B */
+function bZeichne(){
+  var min=parseFloat(document.getElementById('b-min').value);
+  document.getElementById('b-min-h').textContent=String(min).replace('.',',');
+  zeichne('b','gefuehrt',{min:min});
+}
+['b-bg','b-fg','b-min'].forEach(function(id){ document.getElementById(id).addEventListener('input',bZeichne); });
+bZeichne();
+
+/* C */
+['c-bg','c-fg'].forEach(function(id){ document.getElementById(id)
+  .addEventListener('input',function(){ zeichne('c','warn'); }); });
+document.getElementById('c-fix').addEventListener('click',function(){
+  var bg=document.getElementById('c-bg').value, fg=document.getElementById('c-fg').value;
+  document.getElementById('c-fg').value=tonFuerGrund(fg,bg,4.5);
+  zeichne('c','warn');
+});
+zeichne('c','warn');
+</script>
+</body>
+</html>
