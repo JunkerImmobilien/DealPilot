@@ -37,7 +37,28 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+1. **Spalt zwischen Tab-Leiste und Score-Karte in der Kopfleiste.**
+   Bild: **`Spalt`** in `design/mockups/` (2026-08-10). Zu sehen ist ein
+   Zwischenraum zwischen der Reiterleiste und dem „INVESTOR DEAL SCORE" —
+   die Score-Karte steht nicht bündig, sondern muss **weiter eingerückt**
+   werden. Marcel ist das schon mehrfach aufgefallen, es tritt also nicht
+   nur in einer Ansicht auf.
+
+   **Erst messen, dann patchen** — nach zwei Fehlversuchen ist Schluss mit
+   Raten: `getBoundingClientRect()` auf beide Kästen, `elementFromPoint` in
+   den Spalt hinein, `getComputedStyle` auf den Gewinner. Die Frage lautet,
+   **wer den Abstand erzeugt**: ein `gap` im Raster der Kopfleiste, ein
+   Rand an `#hdr-badges`, oder eine Breitenbegrenzung, die nicht bis an
+   den Rand reicht.
+
+   **Bei mehreren Breiten nachsehen.** „Teilweise schon aufgefallen"
+   klingt nach einer Regel, die nur in einem Bereich greift — 390, 820,
+   1024, 1400 und 1920 px gegenprüfen, bevor irgendetwas geändert wird.
+   Und die Kopfleiste ist der Bereich, in dem der Tablet-Punkt ohnehin
+   Zahlen erhoben hat (348 px hoch, `#hdr-badges` 251 px) — die passen
+   dazu.
+
+2. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -57,13 +78,19 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    und zwar über DOM-Ids. Was dort fehlt, rechnet im Bericht mit und ist im
    gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
    Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
-   **Hängt mit dem Marktbericht-Vorschlag zusammen** — wer die Felder für einen Wizard neu
-   gruppiert, hat den Abgleich ohnehin gemacht.
+   **Berührt Punkt 9** — wer die Felder für den Wizard neu gruppiert, hat
+   den Abgleich ohnehin gemacht. Der Reiter wartet aber **nicht** darauf,
+   siehe unten.
 
-   **BLOCKIERT:** Der Reiter selbst wartet auf Marcels Auswahl aus
-   `design/Vorschläge/marktbericht-gestaltung-10-ideen.html` — wer die 42
-   Felder für einen Wizard neu gruppiert, gruppiert sie damit auch für den
-   Reiter. Zwei Gruppierungen nacheinander wären doppelte Arbeit.
+   **BLOCKIERT aufgehoben (2026-08-10).** Der Punkt hing an der Auswahl aus
+   `design/Vorschläge/marktbericht-gestaltung-10-ideen.html`. Der
+   Marktbericht ist jetzt aber auf Marcels Wunsch der **letzte** Punkt —
+   damit hinge dieser hier hinter allem anderen. Deshalb: **der Reiter wird
+   nach der bestehenden Gruppierung der Prüfliste gebaut** (die fünf
+   Gruppen oben). Der Preis ist benannt: gruppiert der spätere Wizard
+   anders, ist der Reiter nachzuziehen. Das ist eine kleine Nacharbeit an
+   einer Darstellung, kein Umbau — und billiger, als den Punkt hinten
+   anzustellen.
 
    **Der Abgleich ist erledigt (2026-08-10, `v1121`, `4049eb1`).** Beide
    Seiten gegeneinander gezählt, wie der Punkt es verlangt. **Fünf Felder
@@ -94,7 +121,67 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
    JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
 
-2. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+3. **Finanzamt-PDF unter „Steuern": Plausibilität prüfen und die
+   Ergebnisdarstellung neu bauen.** Drei Arbeiten an einer Datei, in dieser
+   Reihenfolge:
+
+   1. **Die Rechnung prüfen.** Das PDF, wie es heute aussieht, liegt im
+      Mockup-Ordner. **Der Prüfmaßstab ist nicht meine eigene Rechnung**,
+      sondern Marcels angehängte Berechnung
+      **`Immokalk_GK_AmMarkt11_WEH22_11_2025`** (ebenfalls
+      `design/mockups/`). Zahl für Zahl dagegenhalten, Abweichungen
+      benennen — nicht stillschweigend anpassen.
+   2. **Die Zusammenfassung unten neu darstellen.** Marcels Urteil: die
+      Ergebnisanzeige ist nicht gut gelungen. **`Immokalk_…` ist die
+      Vorlage**, wie es zusammengefasst und dargestellt werden soll.
+   3. **Zeilen mit Null verschwinden.** Ausgegeben wird nur, wozu es auch
+      eine Angabe gibt. **Aufpassen bei der Umsetzung:** `_euro(null)`
+      liefert `"–"` und ist damit **truthy** — wer auf den formatierten
+      Wert prüft statt auf den Rohwert, blendet nichts aus. Und eine echte
+      Null ist nicht dasselbe wie eine fehlende Angabe: **ein Wert, der
+      berechnet 0 ergibt, darf nicht mit einem leeren Feld verwechselt
+      werden.** Im Zweifel die Zeile behalten und Marcel fragen.
+
+   **Randbedingungen aus dem PDF-Bau:** jsPDF kennt nur Helvetica, **kein
+   U+2212** (Pfeile als `->`), `charSpace` wirkt über den Aufruf hinaus und
+   muss zurückgesetzt werden, und Gold läuft dort über `_pdfGold()` —
+   `var()` gilt in jsPDF nicht.
+
+   **Bevor gebaut wird, das PDF und die Immokalk-Datei tatsächlich lesen.**
+   Beide liegen im Ordner; ein Umbau nach Beschreibung wäre geraten.
+
+4. **Ein Testobjekt vollständig anlegen und alle Rechenwege
+   gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
+   Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
+   richtig, wird unter „Bewertung" alles passend angezeigt, sind die
+   Ergebnisse plausibel und korrekt dargestellt?**
+
+   **Das ist ein Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste;
+   was daraus zu reparieren ist, wird danach als eigener Punkt gefasst.
+   Fünf Dinge, die dabei erfahrungsgemäß auffallen und deshalb gezielt
+   angesehen werden:
+
+   - **KPI und BWK werden beim Speichern eingefroren.** Ein Objekt, das vor
+     einer Modul-Änderung angelegt wurde, zeigt alte Werte, bis es erneut
+     gespeichert wird. Beim Prüfen also **nach jeder Änderung neu
+     speichern**, sonst wird ein Anzeigefehler gemeldet, der keiner ist.
+   - **DSCR kommt ausschließlich aus `window.Dscr.compute()`.** Weicht ein
+     Anzeigeort ab, ist dort eine zweite Formel entstanden — genau das
+     darf es nicht geben.
+   - **Einheiten:** `kaufpreis` und `cf_ns` stehen in **Cent**, `kp` und
+     `nkm` in rohen **Euro**. Ein Faktor 100 an einer Anzeigestelle hat
+     fast immer hier seine Ursache.
+   - **BWK-Zuordnung:** umlagefähig = `hg_ul + grundsteuer + ul_sonst`,
+     nicht umlagefähig = `hg_nul + eigen_r + mietausfall + nul_sonst`. Der
+     Bankexport teilt durch 12.
+   - **Jahreszahlen** dürfen nie durch `Intl.NumberFormat` laufen, sonst
+     steht „1.964" statt 1964 im Bild.
+
+   **Sinnvoll mit dem Finanzamt-PDF zusammen zu fahren** — dasselbe Objekt,
+   dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
+   Steuerteil.
+
+5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -192,7 +279,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-3. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -227,7 +314,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-4. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -260,6 +347,32 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Kartenkörper öffnet das Objekt. Eine 44-px-Pseudofläche würde der
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
+
+8. **Marktbericht neu gestalten — ausdrücklich der letzte Punkt.**
+   **Marcels Festlegung vom 2026-08-10:** wird erst aufgegriffen, wenn
+   alles andere abgeschlossen ist. Er denkt bis dahin selbst darüber nach.
+
+   **Die Richtung steht schon, und sie ist enger als die zehn Ideen:**
+
+   - **Stufe 1 und 2 bleiben, wie sie sind** — die schnelle Bewertung und
+     die Marktpreisindikation funktionieren. Dort wird nichts umgebaut.
+   - **Nur die genaue Wertermittlung bekommt einen Wizard**, der den
+     Nutzer durchführt. Das ist die Stufe mit den 42 Feldern; die beiden
+     schnellen Stufen tragen den Aufwand nicht.
+   - **Marcel möchte dazu noch ein Mockup.** Also eine neue, zugespitzte
+     Fassung nach `design/Vorschläge/` — nicht die zehn Ideen erneut,
+     sondern ein Entwurf für genau diesen Wizard.
+
+   **Was vor dem Entwurf gemessen sein muss:** welche Felder voneinander
+   abhängen. `garagenStufe` und `hinterlandRent` erscheinen nur nach echter
+   Nutzereingabe und werden bei programmatischem Setzen **nicht**
+   nachgezeichnet — ein Wizard, der das übersieht, verliert Eingaben.
+
+   **Zwei feste Randbedingungen:** die Marktbericht-App ist **immer hell**
+   und lädt `whitelabel-override.js` **nicht** (Farbe läuft über
+   `mb-whitelabel.js`). Und `payload()` in `wertermittlung.js` bleibt die
+   Sammelstelle — **eine neue Oberfläche darf die Feldnamen nicht ändern**,
+   sonst hängt der Rechenkern daran.
 
 ---
 
@@ -297,6 +410,106 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-11] **Textfarben-Regler für Score-Karte und KPI-Karten gebaut**
+  — `v1123` bis `v1123e` (`32598a0`, `e4241a8`, `c661b44`, `d8dfd72`,
+  `cb8c87a`). Alle vier Entscheidungen umgesetzt.
+
+  ### Die Schwelle hängt jetzt an der Schriftgröße, nicht an einer Liste
+
+  **Mein eigener Vorschlag im Punkt war richtig gedacht, aber ungenau.** Er
+  lautete „Score-Zahl 3,0, Labels 4,5". Nachgelesen bei **w3.org**
+  (WCAG 2.2, 1.4.3 Contrast Minimum) statt aus dem Gedächtnis: 4,5:1 für
+  normalen Text, 3:1 **nur** für großen — und groß heißt **≥ 18 pt (24 px)
+  oder ≥ 14 pt fett (18,5 px)**.
+
+  Im Browser nachgemessen:
+
+  | Element | Größe | Norm |
+  |---|---|---|
+  | `.sc-pill-v` ×5 | 22 px / 800 | **groß → 3,0** |
+  | `.sc-v` | **16 px / 700** | **normal → 4,5** (16 < 18,5) |
+  | `.sc-l` | 10,5 px / 800 | normal → 4,5 |
+  | `.sc-sub` · `.sc-grade` · Pillen-Labels · `.sc-pill-sub` | 10–11 px | normal → 4,5 |
+
+  **Eine Namensliste hätte `.sc-v` falsch eingestuft.** Aus **einer**
+  Nutzerfarbe entstehen deshalb **zwei** korrigierte Töne (`-lg`, `-sm`).
+  Der Nutzer wählt eine Farbe, die App wendet sie so großzügig an, wie die
+  Norm zulässt — das ist „relativ breit", ohne zu raten.
+
+  ### Vier eigene Fehler beim Bauen, alle gemessen und zurückgenommen
+
+  1. **Score-Zahl falsch eingeordnet.** Ich hatte sie als großen Text auf
+     der Markenfläche eingeplant. Gemessen sitzt sie **weiß im Donut-Ring**
+     (`.sc-donut > span`, ohne Klasse) und gehört gar nicht zu diesem
+     Regler. In der Score-Karte ist damit **kein** Text groß im Sinne der
+     Norm.
+  2. **`var(--token, inherit)` hätte den Normalzustand verändert.**
+     `.sc-pill-v` hat in `ui-varianten.css` gar keine eigene Regel. Jetzt
+     über die Kennzeichen `body[data-dp-kpitext]` / `[data-dp-herotext]`:
+     ohne Nutzerfarbe existiert die Regel nicht, alles bleibt bitgenau.
+  3. **Der Regler wirkte nur unter hellen Vorlagen.** Ohne Vorlage gewinnen
+     die v1113e-Gegenrichtungsregeln (1,1,2) bzw. (1,2,2) — meine
+     Kennzeichen-Regel stand bei (1,2,1) und verlor. Nutzerebene jetzt auch
+     dort davor. **Ein Regler, der ohne Vorlage nichts tut, ist ein
+     kaputter Regler.**
+  4. **Der falsche Modulname — und das war der teuerste.** Ich hatte
+     `window.DPC` abgefragt. Den Namen gibt es im Seiten-Scope nicht;
+     `DPC` ist nur ein modul-interner Alias (`config.js:852`), außen heißt
+     es **`window.DealPilotConfig`**. Folge: **jede Korrektur fiel still
+     auf den Rohwert zurück, und die Warnung kam nie** — bei einem
+     gemessenen Kontrast von **1,00**. Gefunden, weil ich die Funktion im
+     Browser direkt aufgerufen habe, statt der Anzeige zu glauben. Ein
+     fehlendes Modul meldet sich jetzt in der Konsole, statt im `catch` zu
+     verschwinden.
+
+  **Dazu ein Werkzeugfehler, gleich mitbehoben:** beim Hochziehen eines
+  Cache-Busters hatte ich `Set-Content -Encoding UTF8` benutzt. Das hat
+  `index.html` komplett neu geschrieben — jedes Nicht-ASCII-Zeichen doppelt
+  kodiert (aus dem Titel wurde „Dealpilot Â· Junker Immobilien") und ein
+  BOM vorangestellt, **711 Zeilen statt einer**. Datei aus `HEAD~1`
+  zurückgeholt, Buster über `System.IO.File` gesetzt.
+  **In dieser Codebasis nie `Set-Content` auf Dateien mit Umlauten.**
+
+  ### Nachgemessen — beide Nachweise, die der Punkt verlangt hat
+
+  **1 · Der Rundlauf** (der, an dem `v1122` hing): nach dem Neuladen stehen
+  `#2a64b8` und `#1e7a4a` wieder in den Feldern, und die Farben sind
+  angewandt.
+
+  **2 · Weg B unter allen sechs Vorlagen**, Wunschton `#C9A84C` (Gold) und
+  `#EDEDED` (fast Weiß):
+
+  | Fassung | Hell-Skin | Score-Text | KPI-Label |
+  |---|---|---|---|
+  | ohne Vorlage | nein | Gold bleibt Gold — trägt auf Dunkel | `#767676` |
+  | kontor · panel · kanzlei · boarding | ja | **auf `#402300` gezogen** | `#767676` |
+  | konsole | nein | Gold bleibt Gold | `#767676` |
+
+  Genau die v1113-Zweiteilung: unter hellen Vorlagen ist die Score-Karte
+  Markenfläche, sonst sitzt sie auf dem dunklen Chrome. **Der Grund
+  entscheidet, nicht der Name.**
+
+  **Weg C** (eigene Ansicht): der Wunschton gilt **roh**, und die Warnung
+  nennt den tragenden Ersatz — „Kleine Beschriftungen tragen nicht —
+  lesbar wäre #402300."
+
+  **Weg B** (Mandanten-Ansicht): still korrigiert, mit zwei Schwellen —
+  `#EDEDED` wird `#767676` für kleine Texte und `#949494` für den großen
+  Wert.
+
+  **Zurücksetzen:** Tokens weg, Kennzeichen weg, `localStorage` leer, alle
+  Farben zurück auf die Ableitung — bitgenau wie vorher.
+
+  **`.sc-sub` und `.sc-grade` bleiben in jedem Zustand abgeleitet.**
+  Das Panel ist von **acht auf zehn** Farbfelder gewachsen; die Lücke im
+  Muster ist zu.
+
+  **Eine Beobachtung fürs Bedienen, kein Fehler:** der Rücksprung von
+  „Meine Mandanten" auf „Mich" stellt den persönlichen Stand wieder her —
+  auch Kartentexte, die man zwischendurch zurückgesetzt hat. Das ist die
+  gewollte Foto-Mechanik aus v1111, hat mich beim Aufräumen aber einmal
+  überrascht.
 
 - [2026-08-10] **Textfarben für Score-Karte und KPI-Karten** — Demo
   `design/Vorschläge/textfarben-score-kpi.html`.
