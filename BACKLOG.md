@@ -94,26 +94,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
    JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
 
-2. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
-   `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
-   v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
-   ist genau seine Voreinstellung.
-
-   **Hierher gehört auch „zu wenig Farben zur Auswahl"** — der vierte
-   Befund aus dem Branding-Punkt, der mit `v1114` nicht behoben wurde,
-   weil er kein Defekt ist. Gegenübergestellt (2026-08-08, gezählt):
-
-   | Oberfläche | Farben |
-   |---|---|
-   | Partner-Portal → Branding → Editor | **3** (Akzent, Header/Sidebar, Mail) |
-   | Darstellungs-Panel (eigene App) | **8** |
-   | Mandanten-Abgleich `darstellung-reseller.js` MAP | **10** Farbschlüssel von 18 Werten |
-
-   **Der Partner kann seinen Mandanten also längst zehn Farben vorgeben** —
-   nur nicht dort, wo er sein Branding einstellt. Es fehlt keine Funktion,
-   es sind **zwei Oberflächen für dieselbe Sache**. Genau das ist Weg B.
-
-3. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
+2. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
    Der Rest von „Darstellung → Profil und Anzeige ist unvollständig",
    nachdem der Kontrastfehler mit `v1113` behoben ist. **Der Abgleich
    steht** (2026-08-08, im Panel gezählt): acht Farbfelder, davon **fünf
@@ -129,7 +110,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Produktfrage: gibt der Regler die Farbe frei, oder nur innerhalb dessen,
    was noch trägt? **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+3. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -177,7 +158,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    danach entscheiden, ob der Ton über `--gold-2`, `--gold-d` oder einen
    eigenen `--uv-num-*` läuft.
 
-5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+4. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
    kein Defekt — Entwurf gehört nach `design/Vorschläge/`, sonst wäre es
@@ -186,7 +167,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    KPI-Pillen dort zu je zwei umbrechen (W43). Bewusst nicht angefasst,
    weil der Score auf dem Tablet bleiben soll.
 
-6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+5. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -239,6 +220,77 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-10] **Partner-Flow B: drei Freiheitsstufen je Partner** —
+  `v1122` (`ad95ec9`). Aus
+  `design/Vorschläge/partner-flow-darstellung.md`; C und A standen seit
+  `v1111`, B blieb offen.
+
+  ### Eine Annahme des Vorschlags ist widerlegt
+
+  Er veranschlagte für B „**ein Feld mehr im Branding-Datensatz, also
+  Backend-Migration**". Gemessen: `resellers.brand_display` ist **`jsonb`**,
+  und `062_reseller_display.sql` sagt das ausdrücklich dazu — „jsonb, weil
+  das Panel wächst: neue Regler brauchen dann keine Migration."
+
+  **`wl_freiheit` reist im vorhandenen JSON mit. Keine Migration, kein
+  Backend-Eingriff, keine Berührung der Produktion.** Der Aufwand fällt
+  damit von „mittel" auf „klein".
+
+  ### Drei Stufen, ein Schlüssel
+
+  | Stufe | Marke | Komfort |
+  |---|---|---|
+  | `keine` | bei **jedem** Laden | bei **jedem** Laden |
+  | `komfort` | bei jedem Laden | einmal als Voreinstellung |
+  | `alles` | einmal als Voreinstellung | einmal als Voreinstellung |
+
+  **`komfort` ist die Voreinstellung** und ist bitgenau Weg A, also das
+  Verhalten seit v1111. Fehlt der Schlüssel — jeder Partner, der vor v1122
+  gespeichert hat —, gilt er. Für bestehende Konten ändert sich nichts, bis
+  der Partner die Stufe bewusst setzt.
+
+  **Vier Stellen, keine davon ein Umbau:** der Regler in der
+  Mandanten-Ansicht (`darstellung-reseller.js`), der Panel-Host
+  (`ui-varianten.js`), die Wirkung beim Mandanten
+  (`mandant-branding.js`) und die Sperre (`gateSetzen`).
+
+  **Zwei bewusste Entscheidungen:**
+  - `wl_freiheit` steht **nicht** in der `MAP`. Die bildet Darstellungs­werte
+    auf `_dpDisp*`-Handler ab; eine **Freigaberegel ist kein
+    Darstellungswert** und bräuchte dort einen Handler, den es nicht gibt.
+  - `alles` benutzt **denselben** Merker `dp_wl_display_seen` wie der
+    Komfort-Teil. „Einmal als Voreinstellung" ist dieselbe Frage, nur auf
+    die Marke angewandt — ein zweiter Merker wäre eine zweite Wahrheit über
+    denselben Sachverhalt.
+
+  **Der Fall, der die Gate-Änderung nötig macht:** bei `alles` hätte die
+  Sperre dem Mandanten verboten, was der Partner ihm gerade erlaubt.
+
+  ### Nachgemessen auf Staging, Partner-Konto, über den echten Bedienweg
+
+  | Prüfung | Ergebnis |
+  |---|---|
+  | Regler erscheint nur in der Mandanten-Ansicht | ✓ (in „Mich" leer) |
+  | Voreinstellung ohne gespeicherten Wert | **`komfort`** |
+  | Speichern → Backend | `wl_freiheit:"alles"` **neben den 16 anderen Schlüsseln** |
+  | Rundlauf: neu geladen | „Alles" stand wieder im Regler |
+  | Sperre bei `keine` / `komfort` / `alles` | **zu / zu / offen**, je eigener Text |
+  | **Partner selbst** | **nicht gesperrt** — unverändert |
+  | **Normaler Nutzer** (kein Partner, kein `dp_wl_cache`) | gesperrt, alter Text — **unverändert** |
+
+  Das Testkonto steht danach wieder auf `komfort`.
+
+  **Ehrlich offen, Staging-Abnahmepunkt:** die Wirkung der drei Stufen
+  **beim echten Mandanten**. Die Panel-Sperre ist gestubbt geprüft (wie bei
+  der v1111-Abnahme), das Anwenden in `applyResellerDisplay()` hängt am
+  Branding-Satz eines `reseller_client` — dafür braucht es ein zweites
+  Konto. **Nicht behoben, weil kein Defekt:** „zu wenig Farben zur Auswahl".
+  Der Punkt hat es selbst richtig eingeordnet — es sind zwei Oberflächen
+  für dieselbe Sache. Mit v1122 ist das **Panel** die Stelle, an der der
+  Partner Darstellung *und* Freiheitsgrad setzt; der Branding-Editor im
+  Portal mit seinen drei Farben bleibt daneben stehen. Ihn abzulösen ist
+  ein eigener Punkt, kein Nachschlag.
 
 - [2026-08-10] **Boarding-Pass: prüfen, ob beim Erzeugen alles mitgeht** —
   `v1120` (`6ff6ce8`)
@@ -691,7 +743,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   unter einer hellen Vorlage wäre ein Bruch, kein Branding.
 
   **Nicht behoben, weil kein Defekt:** „zu wenig Farben zur Auswahl". Die
-  Gegenüberstellung steht jetzt bei Punkt 2 (Partner-Flow B) — der Partner
+  Gegenüberstellung steht jetzt bei Partner-Flow B (mit v1122 erledigt) — der Partner
   kann seinen Mandanten längst **zehn** Farben vorgeben, nur nicht dort,
   wo er sein Branding einstellt.
 
@@ -713,7 +765,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Im Panel gezählt: **acht Farbfelder — fünf für Flächen, drei für Text.**
   Für Score-Karte und KPI-Karten gibt es eine Fläche, aber keinen Text.
   Das ist Marcels „die Schriftfarbe lässt sich nicht setzen", und es
-  bleibt als **Ausbau** offen (jetzt Punkt 3). Der Kontrastfehler selbst
+  bleibt als **Ausbau** offen (jetzt Punkt 2). Der Kontrastfehler selbst
   ist damit aber nicht erklärt — der hat eine eigene Ursache.
 
   ### Die Ursache
@@ -794,7 +846,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Die verbleibende 1 ist `hdr-obj-num` (2,98 bzw. 2,88) und **nicht** Teil
   dieser Arbeit: die v1097-Schwelle rechnet gegen Weiß, kanzlei und
   boarding haben aber cremefarbenen Grund. v1097 hat das selbst so
-  vermerkt. Steht jetzt als eigener Punkt 4.
+  vermerkt. Steht jetzt als eigener Punkt 3.
 
   Ungeprüfte Elemente in jedem Lauf: **0**.
 
