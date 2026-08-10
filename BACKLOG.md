@@ -37,41 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Die MA-Serie ausbauen und die normale Ansicht fürs Handy freigeben.**
-   **Entscheidung von Marcel, 2026-08-08.** Die Haupt-App ist inzwischen
-   handytauglich gebaut (v650/v652, v1077, v1112 bis v1116) — die separate
-   Mobile-Fassung hat damit keinen Zweck mehr. Sie fliegt raus, die Sperre
-   fällt, jeder landet auf der normalen Ansicht.
-
-   **Zuerst ein Vorschlag nach `design/Vorschläge/`, dann bauen.** Das ist
-   kein Formalismus: hier werden zwei Sperren entfernt, die absichtlich
-   gesetzt wurden, und die Abbaureihenfolge entscheidet, ob dabei ein Loch
-   entsteht. Was das Dokument klären muss:
-   - **Zwei Sperren, nicht eine.** `v970` blockt die Haupt-App auf
-     schmalem Schirm mit grobem Zeiger; `MA35` blockt den direkten Aufruf
-     von `mobile-demo.html`. Beide gehören weg, aber **in der richtigen
-     Reihenfolge** — erst die Umleitung auf die normale Ansicht, dann die
-     Sperre. Andersherum steht ein Zeitfenster offen, in dem beides
-     erreichbar ist.
-   - **Die Erkennungsregeln hängen nicht nur an der Sperre.** Regel A/B,
-     die Tablet-Schwelle 1400 px und die Testhintertür `?nomobileblock`
-     sind mitgewachsen. Vor dem Löschen zählen, **wer sie sonst noch
-     liest** — die Whitelabel-Sperre für Mandanten nutzt dasselbe
-     Kennzeichen `dp_wl_cache` wie die Handy-Sperre. Die darf nicht
-     mitfallen.
-   - **Was wird aus `mobile-demo.html` und den MA-Dateien?** Löschen oder
-     als Vorlage im `design/`-Ordner ablegen. Vorschlag: ablegen, nicht
-     löschen — die Fassung war Marcels Bildvorlage für mehrere Umbauten.
-   - **Die Projektanweisung sagt heute das Gegenteil** („Handy-Sperre
-     bewusst AKTIV, nicht aufweichen"). Sie gehört mit derselben Änderung
-     angepasst, sonst widerspricht sie sich in der nächsten Sitzung selbst.
-
-   **Danach der vollständige Durchgang** durch die freigegebene Ansicht bei
-   390 px — jeder Bereich, jede Einstellung. Das ersetzt den alten Punkt
-   „Durchgang durch die Mobile-App": geprüft wird jetzt die normale
-   Ansicht, nicht die MA-Fassung.
-
-2. **Marktbericht: neun bis zehn Gestaltungsideen als Mockups.** Der
+1. **Marktbericht: neun bis zehn Gestaltungsideen als Mockups.** Der
    Bericht sieht optisch nicht gut aus. Marcels Richtung: **mehrere
    Stufen**, möglicherweise ein **Wizard im Arbeitsbereich**, den man mit
    mehreren Reitern durchklickt. Nach `design/Vorschläge/`, als HTML zum
@@ -93,7 +59,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Auswahl trifft Marcel**, nicht ich. Neun bis zehn Ideen heißt neun bis
    zehn ernsthafte, nicht sieben Varianten derselben.
 
-3. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
+2. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
    Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
    ein **Kettenbefund, kein Optikbefund**, und die Kette wird von hinten
    aufgerollt: was steht im Objekt (`objects.data`), was kommt beim
@@ -102,7 +68,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    füllen** — fehlt eine Angabe, gehört sie sichtbar als fehlend
    ausgewiesen.
 
-4. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+3. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -122,10 +88,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    und zwar über DOM-Ids. Was dort fehlt, rechnet im Bericht mit und ist im
    gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
    Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
-   **Hängt mit Punkt 2 zusammen** — wer die Felder für einen Wizard neu
+   **Hängt mit Punkt 1 zusammen** — wer die Felder für einen Wizard neu
    gruppiert, hat den Abgleich ohnehin gemacht.
 
-5. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
+4. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
    `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
    v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
    ist genau seine Voreinstellung.
@@ -144,7 +110,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    nur nicht dort, wo er sein Branding einstellt. Es fehlt keine Funktion,
    es sind **zwei Oberflächen für dieselbe Sache**. Genau das ist Weg B.
 
-6. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
+5. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
    Der Rest von „Darstellung → Profil und Anzeige ist unvollständig",
    nachdem der Kontrastfehler mit `v1113` behoben ist. **Der Abgleich
    steht** (2026-08-08, im Panel gezählt): acht Farbfelder, davon **fünf
@@ -160,7 +126,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Produktfrage: gibt der Regler die Farbe frei, oder nur innerhalb dessen,
    was noch trägt? **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-7. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+6. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -174,7 +140,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
    kein Nachschlag.
 
-8. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+7. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
    kein Defekt — Entwurf gehört nach `design/Vorschläge/`, sonst wäre es
@@ -183,12 +149,29 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    KPI-Pillen dort zu je zwei umbrechen (W43). Bewusst nicht angefasst,
    weil der Score auf dem Tablet bleiben soll.
 
+8. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+   Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
+   Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
+
+   - **23 Ankreuzfelder messen 13 × 13 px**, verteilt über fünf Reiter
+     (Investition, Miete, Finanzierung, Steuer, Pilot-Analyse). Jedes hat
+     ein Label, aber die Labels sind **16 bis 36 px** hoch — also selbst
+     unter 44. `v1112` hat diese Bauart im Einstellungs-Modal ausdrücklich
+     als tragbar abgenommen („Checkboxen mit eigenem Label als
+     Trefferfläche"); im Formularbereich trägt das Argument schwächer, weil
+     die Zeilen dichter stehen. Sie app-weit zu vergrößern ändert die
+     Zeilenhöhe überall — **das ist eine Gestaltungsentscheidung.**
+   - **`.sbc-arrow` trägt `role="button"`, ist aber ein `<span>` ohne
+     eigenen Klick.** Das Ziel ist die 326 px breite Karte. Für die Maus
+     harmlos, für einen Screenreader ein Knopf, der nichts tut. Gehört mit
+     einer Prüfstrecke für Barrierefreiheit angefasst, nicht einzeln.
+
 ---
 
 ## Später
 
 - **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
-  Vorhaben mit eigener Prüfstrecke, nicht nebenbei. **Wird durch Punkt 1
+  Vorhaben mit eigener Prüfstrecke, nicht nebenbei. **Wird durch die Handy-Freigabe (v1118)
   größer, nicht kleiner** — mit der Freigabe fürs Handy trägt die normale
   Ansicht allein, was vorher auf zwei Fassungen verteilt war.
 
@@ -209,7 +192,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
     Karte (hängt an `matchMedia('(hover:none)')`, greift im Prüfbrowser
     nicht) und das **Erzeugen** eines neuen Berichts bei 390 px (kostet
     5 L und hängt an einem `window.confirm`). Eigener Namensraum v1077,
-    nicht mit der Haupt-App mischen. **Wird mit Punkt 1 dringender:** nach
+    nicht mit der Haupt-App mischen. **Wird mit der Handy-Freigabe (v1118) dringender:** nach
     der Freigabe kommen echte Nutzer auf diesem Weg an.
   - **Tabelle der geteilten Pässe** — die Scroll-Regel steht, das
     Testkonto war leer, der Nachweis fehlt.
@@ -219,6 +202,120 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-10] **MA-Serie ausgebaut, normale Ansicht fürs Handy frei** —
+  `v1118` (`6a7d044`), `v1118b` (`3ab3279`), `v1118c` (`9db60e6`).
+  Vorschlag: `design/Vorschläge/ma-ausbau-handy-freigabe.md`.
+
+  ### Der Punkt nannte zwei Sperren und eine Datei — es waren neun Fundstellen in sieben Dateien
+
+  Zwei davon kannte der Punkt nicht, und **beide reißen ein Loch, wenn man
+  sie übersieht:**
+
+  - **`dp-mobile-sw.js` ist ein Service Worker.** Er liegt auf dem **Gerät**,
+    nicht auf dem Server, hatte den Geltungsbereich `/mobile-demo.html` und
+    beantwortete jede Navigation aus seinem Cache, wenn das Netz die Hülle
+    nicht hergab. Ersatzloses Löschen hätte installierte Handy-Apps
+    **dauerhaft** auf einer Fassung stehen lassen, die es nicht mehr gibt —
+    kein Rollout hätte diese Geräte je wieder erreicht. **Das ist der
+    einzige Schritt, der sich nicht nachholen lässt**, deshalb steht er an
+    Position 1 und nicht am Ende.
+  - **Die Landingpage wirbt aktiv für die MA.** „App installieren"
+    (Z. 1272) und der QR-Code (Z. 1290–1292) zeigten auf
+    `mobile-demo.html` — der sichtbarste Weg, auf dem überhaupt jemand dort
+    ankam.
+
+  ### Entwarnung bei `dp_wl_cache` — die Warnung des Punktes war richtig und ist entschärft
+
+  Drei Leser gemessen: `mandant-branding.js` (Eigentümer, schreibt und
+  räumt), **`ui-varianten.js` (Whitelabel-Sperre der Mandanten, v1111)** und
+  `mobile-redirect.js` (Plan-Freigabe der Handy-Sperre, v1085). Es fällt
+  **eine von drei** Lesestellen. Die Mandanten-Sperre hängt an
+  `ui-varianten.js` und bleibt unberührt.
+
+  ### Umgesetzt, in dieser Reihenfolge
+
+  | # | was | warum so herum |
+  |---|---|---|
+  | 1 | `dp-mobile-sw.js` meldet sich selbst ab, räumt seine Caches, schickt offene Fenster auf `/`. **Kein `fetch`-Handler mehr.** | siehe oben |
+  | 2 | `mobile-demo.html` ist keine App mehr, sondern eine **Umleitung mit Aufräumauftrag**. Notbremse: nach 2,5 s geht es in jedem Fall weiter. | damit installierte Apps nicht vor einem 404 stehen |
+  | 3 | `dp-mobile.webmanifest`: `start_url`/`scope` auf `/`, `orientation` auf `any`. `index.html` trägt das Manifest jetzt selbst. | **installierte Handy-Apps werden zur echten App, statt zu brechen** |
+  | 4 | `js/mobile-redirect.js` (v970) gelöscht, Eintrag aus `index.html` | mit ihm fallen `?nomobileblock`, `dp_mb_bypass`, die Schwellen 700/1400 |
+  | 5 | `js/mobile-branding.js` gelöscht | nur die MA-Fassung las es |
+  | 6 | Landing-CTA und QR auf die normale App | der QR wird aus derselben Variable gebaut und zieht mit |
+  | 7 | Vorlage gesichert: `design/mockups/dp-handy-mockup-ma.html` (2.829 Z., ohne MA35, ohne PWA-Block) | Marcels Bildvorlage bleibt |
+  | 8 | `CLAUDE.md`: der „Nicht anfassen"-Eintrag zur Handy-Sperre ist **ersetzt** — er sagte das Gegenteil | jetzt geschützt sind stattdessen SW und Umleitung |
+
+  **`mobile-demo.html` und `dp-mobile-sw.js` fallen zusammen oder gar
+  nicht**, und erst, wenn jedes Gerät sie einmal gesehen hat. Das steht so
+  in CLAUDE.md.
+
+  ### Der Durchgang bei 390 px — gemessen im gleich-Origin-iframe
+
+  Alle **neun Reiter**, der **Drawer** (351 px, über den echten Bedienweg
+  geöffnet) und das **Einstellungs-Modal** (390 × 844, Leiste 387 × 64,
+  zwölf Reiter, Schließen-Knopf 32 × 32 — v1117 kommt auch im iframe an).
+
+  **Sauber überall:** `scrollWidth 390 = clientWidth 390` in **jedem**
+  Bereich, kein Textfeld unter 16 px.
+
+  Unter der 44-px-Trefferfläche aus v650/v652 standen **fünf echte
+  Bedienelemente, 20 Stück**:
+
+  | Element | war | Anzahl | Reiter |
+  |---|---|---|---|
+  | `.dab-chip` | 117 × **22** | 10 | Deal-Aktion |
+  | `.dab-bp-web` | 157 × **14** | 5 | Deal-Aktion |
+  | `.dpfk-ltv-btn` | 74 × **35** | 3 | Finanzierung |
+  | `.v10-zc-btn` | 178 × **35** | 1 | Finanzierung |
+  | `a.v842-tax-link` | 191 × **35** | 1 | Steuer |
+
+  **Kein `::after` wie in v1116:** die Chips stehen mit 7 px Abstand und
+  **29 px Zeilenabstand** — eine 44-px-Pseudofläche hätte der Nachbarzeile
+  den Klick geklaut. Alle fünf sind `display:flex` mit
+  `align-items:center`, `min-height` zentriert also von selbst.
+
+  ### Zwei Nachzügler, beide mit eigener Ursache
+
+  `v1118b` erreichte nur drei von fünf. Ausgelesen statt vermutet:
+
+  - **`.dab-chip` blieb bei 22 px — nicht die Kaskade.**
+    `deal-action-boarding.js` setzt seit **v857** `min-height:0` **inline**
+    mit `!important` („schlägt JEDE CSS-Regel"). Derselbe Fallentyp wie
+    `dp-band-fix.js` bei v1117. Die Zeile stand da, um die Handy-Regel
+    `button{min-height:44px}` zu schlagen — richtig, **solange das Handy
+    gesperrt war**. Gemessen setzt **oberhalb von 768 px keine einzige
+    Regel** `min-height`: die Zeile wirkte ausschließlich auf dem Handy,
+    und dort genau falsch herum. Ersatzlos raus.
+  - **`.v10-zc-btn` blieb bei 35 px — hier war es die Kaskade.** Der Knopf
+    trägt zusätzlich `.dpfk-mkt`, und `.dpfk-head .dpfk-mkt{min-height:0
+    !important}` (0,2,0) schlägt die Sammelregel (0,1,0). Nachgezogen mit
+    (0,3,0), **nicht** über die Ladereihenfolge.
+
+  ### Nachgemessen
+
+  | | 390 px | 1400 px (Gegenprobe) |
+  |---|---|---|
+  | `.dab-chip` ×10 | **44** | 22 |
+  | `.dab-bp-web` ×5 | **44** | 14 |
+  | `.dpfk-ltv-btn` ×3 | **44** | 35 |
+  | `.v10-zc-btn` | **44** | 35 |
+  | `a.v842-tax-link` | **44** | 16 |
+  | Querlauf | 390/390 | — |
+
+  **Der Desktop ist bitgleich geblieben** — die Änderung wirkt nur unter
+  768 px. Die Sperre ist weg: `window._dpMobileBlock` ist `undefined`, kein
+  Overlay, das Skript wird nicht mehr geladen.
+
+  **Ehrlich offen, nicht geprüft:** **Registrierung und Login bei 390 px.**
+  Der Prüflauf war angemeldet, und Abmelden hätte die Sitzung beendet.
+  Genau dort saß der alte v939-Fehler („die volle Desktop-App stand auf dem
+  Handy offen — auch direkt nach Registrierung/Login"). **Das ist ein
+  Staging-Abnahmepunkt.** Ebenso der **Marktbericht auf dem Handy** — er
+  steht unter „Später" und wird mit dieser Freigabe dringend.
+
+  Zwei weitere Befunde stehen als **Punkt 8** offen: 23 Ankreuzfelder mit
+  13 × 13 px und das irreführende `role="button"` auf `.sbc-arrow`.
 
 - [2026-08-10] **Browser-Abnahme des Schließen-Knopfs** — `v1117`
   (`a33394d`). Gemessen auf Staging, angemeldet, Partner-Konto, jede Stelle
@@ -430,7 +527,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   unter einer hellen Vorlage wäre ein Bruch, kein Branding.
 
   **Nicht behoben, weil kein Defekt:** „zu wenig Farben zur Auswahl". Die
-  Gegenüberstellung steht jetzt bei Punkt 5 (Partner-Flow B) — der Partner
+  Gegenüberstellung steht jetzt bei Punkt 4 (Partner-Flow B) — der Partner
   kann seinen Mandanten längst **zehn** Farben vorgeben, nur nicht dort,
   wo er sein Branding einstellt.
 
@@ -452,7 +549,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Im Panel gezählt: **acht Farbfelder — fünf für Flächen, drei für Text.**
   Für Score-Karte und KPI-Karten gibt es eine Fläche, aber keinen Text.
   Das ist Marcels „die Schriftfarbe lässt sich nicht setzen", und es
-  bleibt als **Ausbau** offen (jetzt Punkt 6). Der Kontrastfehler selbst
+  bleibt als **Ausbau** offen (jetzt Punkt 5). Der Kontrastfehler selbst
   ist damit aber nicht erklärt — der hat eine eigene Ursache.
 
   ### Die Ursache
@@ -533,7 +630,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Die verbleibende 1 ist `hdr-obj-num` (2,98 bzw. 2,88) und **nicht** Teil
   dieser Arbeit: die v1097-Schwelle rechnet gegen Weiß, kanzlei und
   boarding haben aber cremefarbenen Grund. v1097 hat das selbst so
-  vermerkt. Steht jetzt als eigener Punkt 7.
+  vermerkt. Steht jetzt als eigener Punkt 6.
 
   Ungeprüfte Elemente in jedem Lauf: **0**.
 
