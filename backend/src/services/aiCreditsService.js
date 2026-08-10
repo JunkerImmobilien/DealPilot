@@ -123,8 +123,23 @@ async function consume(userId, cost, endpoint, meta) {
      macht die Einzelzeile allerdings kleiner als den Gesamtpreis — deshalb
      wird je Bericht (endpoint+ts-Sekunde) SUMMIERT, bevor zurueckgerechnet
      wird. */
+/* Nur plausible Kennzeichen zaehlen. GEMESSEN im Log: 39 Buchungen liegen
+   unter einem Kennzeichen, das der QUELLTEXT einer JavaScript-Funktion ist
+   (`function _currentObjectId(){ … }`) — der Fehler aus der Zeit vor v941,
+   als window._currentObjectId die Funktion selbst war und eine Funktion
+   truthy ist. Behoben ist er, die Altzeilen bleiben (09.06.–15.07.2026).
+   Ohne diesen Riegel waeren alle Objekte, die je diesen Weg genommen
+   haben, EIN Objekt — und ab dem zweiten Bericht kostenlos. */
+function _refTaugt(ref) {
+  if (typeof ref !== 'string') return false;
+  var s = ref.trim();
+  if (!s || s.length > 64) return false;
+  if (/\s/.test(s)) return false;            /* kein Fliesstext, kein Quelltext */
+  return /^[A-Za-z0-9._:-]+$/.test(s);
+}
+
 async function bezahlteStufeMarktbericht(userId, externalRef) {
-  if (!externalRef) return 0;
+  if (!_refTaugt(externalRef)) return 0;
   try {
     const r = await query(
       `WITH je_bericht AS (
