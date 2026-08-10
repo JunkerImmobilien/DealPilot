@@ -34,13 +34,9 @@
     2: 'Zusätzlich Baustatus, Zustand und Qualität — deutlich engere Spanne.',
     3: 'Zusätzlich Boden-, Ertrags- und Sachwert nach ImmoWertV, mit Rechenweg im PDF.'
   };
-  /* Was fuer die naechste Stufe noch fehlt — dieselben Pflichtangaben, die
-     die Ampel prueft, nur in Worten. */
-  var FEHLT_TEXT = {
-    1: 'Adresse, Objektart und Wohnfläche',
-    2: 'Baustatus und Zustand',
-    3: 'Grundstücksfläche und — je nach Objektart — Standardstufe bzw. Miteigentumsanteil'
-  };
+  /* v1126d: Der fruehere FEHLT_TEXT ist raus. Er war eine zweite, von Hand
+     gepflegte Liste derselben Pflichtangaben — und lief prompt auseinander.
+     Was fehlt, sagt jetzt fehlend() aus BEDARF, also aus einer Quelle. */
 
   var _faellig = null;      /* vom Server, je Stufe */
   var _bezahlt = 0;
@@ -63,21 +59,40 @@
   function wert(id) { var e = $(id); return e ? String(e.value || '').trim() : ''; }
   function istWohnung() { return /wohnung|etw/i.test(wert('ptype')); }
 
-  /* ── Die erreichte Stufe, aus dem Ausgefuellten ────────────────────────
-     Bewusst dieselben Bedingungen wie die Verfahrensampel in
-     wertermittlung.js — nicht strenger und nicht laxer, sonst zeigt die
-     Leiste etwas anderes an als die Ampel darunter. */
+  /* ── Was jede Stufe WIRKLICH braucht ───────────────────────────────────
+     v1126d · EIGENER FEHLER, ZURUECKGENOMMEN. Ich hatte behauptet, hier
+     staenden „dieselben Bedingungen wie die Verfahrensampel". Das stimmte
+     nicht: geprueft wurden nur address, ptype und area. Folge — die Leiste
+     meldete „Wertermittlung erreicht" bei einem halb leeren Formular, ohne
+     Baujahr. Genau das ist Marcel aufgefallen.
+
+     Jetzt aus VERFAHREN in wertermittlung.js abgeschrieben:
+       markt   pflicht ptype, area, year, baustatus · empfohlen cond, quality
+       ertrag  pflicht plot, units
+       sach    pflicht plot, year (bei ETW nicht anwendbar)
+
+     Eine Leiste, die mehr behauptet als da ist, ist schlimmer als keine. */
+  var BEDARF = {
+    1: [['address', 'Adresse'], ['ptype', 'Objektart'], ['area', 'Wohnfläche'], ['year', 'Baujahr']],
+    2: [['baustatus', 'Baustatus'], ['cond', 'Zustand'], ['quality', 'Qualität']],
+    3: [['plot', 'Grundstücksfläche'], ['units', 'Wohneinheiten']]
+  };
+  /* Die objektartabhaengigen Pflichtangaben der Wertermittlung. */
+  function bedarf3() {
+    var l = BEDARF[3].slice();
+    if (istWohnung()) l.push(['mea', 'Miteigentumsanteil']);
+    else { l.push(['standardstufe', 'Standardstufe']); l.push(['nhkHaus', 'Hausform (NHK)']); }
+    return l;
+  }
+  function fehlend(n) {
+    var l = (n === 3) ? bedarf3() : BEDARF[n];
+    return l.filter(function (f) { return !wert(f[0]); }).map(function (f) { return f[1]; });
+  }
   function erreicht() {
-    if (!(wert('address') && wert('ptype') && wert('area'))) return 0;
-    var s = 1;
-    if (wert('baustatus') && wert('cond')) s = 2;
-    if (s === 2 && wert('plot')) {
-      var sachOk = istWohnung()
-        ? !!wert('mea')
-        : (!!wert('standardstufe') && !!wert('nhkHaus'));
-      if (sachOk) s = 3;
-    }
-    return s;
+    if (fehlend(1).length) return 0;
+    if (fehlend(2).length) return 1;
+    if (fehlend(3).length) return 2;
+    return 3;
   }
 
   function ref() {
@@ -111,22 +126,33 @@
     if ($('mbst-css')) return;
     var s = document.createElement('style');
     s.id = 'mbst-css';
+    /* v1126d · WAAGERECHT PASST NICHT. Gemessen: die Spalte ist 338 px
+       breit, drei Beschriftungen brauchten je 120 px — sie klebten
+       aneinander, "Marktpreisindikation" beruehrte die Nachbarn. Deshalb
+       eine LISTE statt einer Bahn. Sie hat denselben Inhalt, liest sich in
+       der schmalen Spalte aber ruhig und hat Platz fuer das Wichtigste:
+       was der jeweiligen Stufe noch fehlt. */
     s.textContent = [
       '.mbst{margin:0 0 16px;padding:14px 16px;border:1px solid rgba(201,168,76,.25);',
         'border-radius:8px;background:rgba(201,168,76,.04)}',
-      '.mbst h4{margin:0 0 14px;font-size:13px;color:var(--wl-e8cc7a,#E8CC7A);font-weight:600}',
-      '.mbst-bahn{position:relative;height:44px;margin:0 6px 6px}',
-      '.mbst-linie{position:absolute;left:0;right:0;top:9px;height:4px;border-radius:3px;background:rgba(128,128,128,.25)}',
-      '.mbst-fuell{position:absolute;left:0;top:9px;height:4px;border-radius:3px;',
-        'background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));transition:width .35s}',
-      '.mbst-ms{position:absolute;top:0;transform:translateX(-50%);text-align:center;width:120px}',
-      '.mbst-pkt{width:22px;height:22px;border-radius:50%;background:rgba(128,128,128,.25);',
-        'margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:11px;transition:.3s}',
+      '.mbst h4{margin:0 0 4px;font-size:13px;color:var(--wl-e8cc7a,#E8CC7A);font-weight:600}',
+      '.mbst-sub{font-size:11px;opacity:.65;margin-bottom:11px;line-height:1.45}',
+      '.mbst-ms{display:flex;gap:10px;align-items:flex-start;padding:8px 9px;margin:4px 0;',
+        'border-radius:6px;cursor:pointer;transition:background .15s}',
+      '.mbst-ms:hover{background:rgba(201,168,76,.09)}',
+      '.mbst-ms.an{background:rgba(201,168,76,.13)}',
+      '.mbst-pkt{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:rgba(128,128,128,.28);',
+        'display:flex;align-items:center;justify-content:center;font-size:10.5px;margin-top:1px;transition:.25s}',
       '.mbst-ms.an .mbst-pkt{background:var(--wl-c9a84c,#C9A84C);color:#2c2410;font-weight:700}',
-      '.mbst-lbl{font-size:10.5px;line-height:1.3;margin-top:5px;opacity:.65}',
-      '.mbst-ms.an .mbst-lbl{opacity:1;font-weight:600}',
-      '.mbst-kero{font-family:"JetBrains Mono",monospace;font-size:10px;opacity:.75;display:block}',
-      '.mbst-info{margin-top:8px;padding:8px 10px;border-radius:6px;background:rgba(201,168,76,.10);',
+      '.mbst-txt{flex:1 1 auto;min-width:0}',
+      '.mbst-zeile{display:flex;gap:8px;align-items:baseline}',
+      '.mbst-name{font-size:12.5px;font-weight:600;opacity:.7}',
+      '.mbst-ms.an .mbst-name{opacity:1}',
+      '.mbst-kero{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:11px;',
+        'font-weight:600;color:var(--wl-c9a84c,#C9A84C);white-space:nowrap}',
+      '.mbst-was{font-size:10.5px;line-height:1.45;opacity:.6;margin-top:2px}',
+      '.mbst-fehlt{font-size:10.5px;line-height:1.45;margin-top:2px;color:var(--wl-b8625c,#B8625C)}',
+      '.mbst-info{margin-top:9px;padding:8px 10px;border-radius:6px;background:rgba(201,168,76,.10);',
         'font-size:11.5px;line-height:1.5}',
       '.mbst-info b{color:var(--wl-e8cc7a,#E8CC7A)}'
     ].join('');
@@ -142,35 +168,35 @@
     wo.className = 'mbst';
     var s = erreicht();
 
-    var pos = { 1: 12, 2: 50, 3: 88 };
     var ms = [1, 2, 3].map(function (n) {
       var an = s >= n;
       var p = preisFuer(n);
-      return '<div class="mbst-ms' + (an ? ' an' : '') + '" style="left:' + pos[n] + '%" ' +
-        'data-mbst-ziel="' + n + '" title="' + (an ? NAMEN[n] : 'Angaben für ' + NAMEN[n] + ' einblenden') + '">' +
+      var f = fehlend(n);
+      return '<div class="mbst-ms' + (an ? ' an' : '') + '" data-mbst-ziel="' + n + '" ' +
+          'title="' + (an ? NAMEN[n] + ' erreicht' : 'Angaben für ' + NAMEN[n] + ' einblenden') + '">' +
         '<div class="mbst-pkt">' + (an ? '✓' : n) + '</div>' +
-        '<div class="mbst-lbl">' + NAMEN[n] +
-        '<span class="mbst-kero">' + (p === 0 ? 'bezahlt' : p + ' L') + '</span></div></div>';
+        '<div class="mbst-txt">' +
+          '<div class="mbst-zeile"><span class="mbst-name">' + NAMEN[n] + '</span>' +
+            '<span class="mbst-kero">' + (p === 0 ? 'bezahlt' : p + ' L') + '</span></div>' +
+          (an
+            ? '<div class="mbst-was">' + WAS[n] + '</div>'
+            : '<div class="mbst-fehlt">fehlt: ' + f.join(', ') + '</div>') +
+        '</div></div>';
     }).join('');
 
     var info;
-    if (s === 0) {
-      info = '<b>Noch nichts erreicht.</b> Es fehlen ' + FEHLT_TEXT[1] + '.';
-    } else if (s < 3) {
-      info = '<b>' + NAMEN[s] + ' erreicht.</b> ' + WAS[s] +
-             ' Für <b>' + NAMEN[s + 1] + '</b> fehlen noch ' + FEHLT_TEXT[s + 1] + '.';
-    } else {
-      info = '<b>Wertermittlung erreicht.</b> ' + WAS[3];
-    }
+    if (s === 0) info = '<b>Noch nichts erreicht.</b> Die Angaben oben füllen — die Stufe ergibt sich daraus.';
+    else if (s < 3) info = '<b>' + NAMEN[s] + '</b> ist erreicht. Eine Zeile tiefer klicken blendet die nächsten Angaben ein.';
+    else info = '<b>Wertermittlung erreicht</b> — alle drei Verfahren rechnen mit echten Parametern.';
     if (_bezahlt > 0) {
       info += '<br>Für dieses Objekt ist <b>' + NAMEN[_bezahlt] + '</b> bereits bezahlt — ' +
               'eine höhere Stufe kostet nur die Differenz.';
     }
 
     wo.innerHTML =
-      '<h4>Was der Bericht leisten soll — es ergibt sich aus deinen Angaben</h4>' +
-      '<div class="mbst-bahn"><div class="mbst-linie"></div>' +
-        '<div class="mbst-fuell" style="width:' + (s ? pos[s] : 0) + '%"></div>' + ms + '</div>' +
+      '<h4>Was der Bericht leisten soll</h4>' +
+      '<div class="mbst-sub">Kein Vorab-Klick nötig — die Stufe ergibt sich aus deinen Angaben.</div>' +
+      ms +
       '<div class="mbst-info">' + info + '</div>';
 
     knopf(s);
