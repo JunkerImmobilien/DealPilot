@@ -37,7 +37,53 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+1. **GELD · Die Stufenfrage bewirbt 2 L, abgebucht werden 5 L.**
+   **Gefunden 2026-08-11 beim Bauen des Wizards, gemessen an Frontend und
+   Backend. Nichts angefasst — Preise sind Marcels Sache.**
+
+   | Stufe | Oberfläche bewirbt | Backend bucht ab |
+   |---|---|---|
+   | 1 · Schnelle Einschätzung | **2 L** | **5 L** |
+   | 2 · Genaue Preisindikation | 5 L | 5 L ✓ |
+   | 3 · Wertermittlung | 12 L | 12 L ✓ |
+
+   **Die Kette, Glied für Glied:**
+   - `wertermittlung.js:397` — `KEROSIN = { 1: 2, 2: 5, 3: 12 }`, das steht
+     als „2 L" an der Stufenwahl.
+   - `wertermittlung.js:695` — `payload()` schickt `wert_stufe: stufe()`.
+   - `backend/src/routes/marktbericht.js:36` — `_kerosinKosten(body)`:
+     `if (body.fast || body.schnell) return COST.fast;` sonst
+     `st >= 3 ? 12 : 5`. **Für Stufe 1 gibt es keinen eigenen Zweig.**
+   - `marktbericht-app/app.js:251` — `fast: $('fastMode') ? … : false`.
+     **`fastMode` existiert nirgends sonst im Frontend** (ein einziger
+     Treffer im ganzen Ordner, und das ist diese Abfrage selbst). Im DOM
+     nachgesehen: nicht vorhanden. `fast` ist damit **dauerhaft `false`**,
+     und `COST.fast = 2` ist toter Code.
+
+   **Dazu ein zweiter, kleinerer Fehler:** der Bestätigungsdialog
+   (`app.js:202`) nennt **fest „5 L"** — auch bei Stufe 3, wo 12 L
+   abgebucht werden.
+
+   **Das blockiert den Wizard**, weil die Meilensteinleiste den Preis
+   anzeigen soll. Ich würde denselben Fehler nur schöner darstellen.
+
+   **Drei mögliche Auflösungen — Marcels Entscheidung:**
+   1. **Der Preis stimmt, die Anzeige nicht** → `KEROSIN[1]` auf 5, und
+      Stufe 1 kostet wie Stufe 2. Dann ist die Stufe 1 als eigener Preis
+      sinnlos.
+   2. **Die Anzeige stimmt, der Preis nicht** → das `fast`-Kennzeichen
+      wieder anschließen, also bei `wert_stufe === 1` senden. **Achtung:**
+      `COST.fast` steuert im Backend womöglich auch den Umfang des
+      Berichts, nicht nur den Preis — das gehört vorher geprüft.
+   3. **Drei echte Preise** → im Backend einen eigenen Zweig für Stufe 1.
+      Sauberste Lösung, aber eine Backend-Änderung.
+
+   **Und die neue Regel vom 2026-08-11 kommt obendrauf:** abgerechnet wird
+   beim Erzeugen nach erreichter Stufe, und **Vertiefen kostet nur die
+   Differenz**. Das braucht ohnehin einen Backend-Eingriff — dort ist die
+   Gelegenheit, den Stufe-1-Preis mitzuklären.
+
+2. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -100,7 +146,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
    JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
 
-2. **Finanzamt-PDF unter „Steuern": Plausibilität prüfen und die
+3. **Finanzamt-PDF unter „Steuern": Plausibilität prüfen und die
    Ergebnisdarstellung neu bauen.** Drei Arbeiten an einer Datei, in dieser
    Reihenfolge:
 
@@ -129,7 +175,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Bevor gebaut wird, das PDF und die Immokalk-Datei tatsächlich lesen.**
    Beide liegen im Ordner; ein Umbau nach Beschreibung wäre geraten.
 
-3. **Ein Testobjekt vollständig anlegen und alle Rechenwege
+4. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
    Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
    richtig, wird unter „Bewertung" alles passend angezeigt, sind die
@@ -160,7 +206,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
    Steuerteil.
 
-4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -258,7 +304,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -293,7 +339,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -327,7 +373,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-7. **Marktbericht neu gestalten.**
+8. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
