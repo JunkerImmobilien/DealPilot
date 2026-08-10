@@ -192,17 +192,51 @@ function render(pass){
     ['Preis/m²', k.eurm2?eur(k.eurm2):'—'],
     ['Baujahr', k.bj||'—'],
     ['Eigenkapital', k.ek?eur(k.ek):'—'],
-    ['Objektart', data.objektart||'—'],
+    /* v1120-PASSFELD: las `objektart` — das Objekt fuehrt `objart`. Der
+       Ruecklesename bleibt als Rueckfall stehen, aeltere Snapshots koennen
+       ihn tragen. */
+    ['Objektart', data.objart||data.objektart||'—'],
     ['Zimmer', data.zimmer||'—']
   ];
 
   /* qb-stammdaten: alle vorhandenen Felder ausklappbar */
-  var _allF=[['Objektart',data.objektart],['Zimmer',data.zimmer],['Energieklasse',data.energieklasse?String(data.energieklasse).toUpperCase():''],['Stellplatz',data.stellplatz],['Hausgeld',data.hg?(num(data.hg)?eur(num(data.hg))+'/Mo':data.hg):''],['Eigenkapital',k.ek?eur(k.ek):''],['Zinssatz',data.zins?(String(data.zins).replace('.',',')+' %'):''],['Tilgung',data.tilg?(String(data.tilg).replace('.',',')+' %'):''],['Kaufnebenkosten',data.knk?(String(data.knk).replace('.',',')+' %'):''],
+  /* ── v1120-PASSFELD · Der Pass las Namen, die es im Objekt nicht gibt ──
+     Gemessen an einem echten Objekt: objects.data traegt 181 Schluessel,
+     102 davon befuellt. pass.html las 38 Namen — 18 davon existieren im
+     Objekt UEBERHAUPT NICHT. Die Werte lagen also vor und kamen nie an.
+     Das ist Marcels "Stammdaten und Werte fehlen", und es ist kein
+     Optikfehler, sondern ein Namensfehler.
+
+       Pass las            Objekt fuehrt      Wert im Testobjekt
+       objektart           objart             ETW
+       ausstattung         ausst              Normal
+       vermietungsstand    vermstand          Vollvermietet
+       grundstueck/gst_flae gsfl              1570
+       hg                  hg_ul / hg_nul     1391 / 1599,46
+       energieklasse       ds2_energie        B
+       modernisierung      modernis           (leer)
+       zins                d1z                3,5
+       tilg                d1t                1
+
+     Die alten Namen bleiben als Rueckfall stehen — aeltere Snapshots
+     koennen sie tragen, und ein Snapshot ist eingefroren.
+
+     KEIN stiller Standardwert: fehlt eine Angabe, bleibt die Zeile leer
+     und faellt unten aus der Liste (der Filter auf nicht-leere Werte
+     stand schon da). `knk` ist BEWUSST NICHT gemappt — die App fuehrt
+     keine Kaufnebenkosten als Einzelwert, sondern makler_p, notar_p und
+     die Grunderwerbsteuer getrennt. Eine Summe zu bilden waere geraten,
+     nicht gemessen. */
+  var _hg = data.hg_ul || data.hg_nul || data.hg;
+  var _allF=[['Objektart',data.objart||data.objektart],['Zimmer',data.zimmer],['Energieklasse',(data.ds2_energie||data.energieklasse)?String(data.ds2_energie||data.energieklasse).toUpperCase():''],['Stellplatz',data.garagen||data.stellpl_aussen||data.stellplatz],['Hausgeld',_hg?(num(_hg)?eur(num(_hg))+'/Mo':_hg):''],['Eigenkapital',k.ek?eur(k.ek):''],['Zinssatz',(data.d1z||data.zins)?(String(data.d1z||data.zins).replace('.',',')+' %'):''],['Tilgung',(data.d1t||data.tilg)?(String(data.d1t||data.tilg).replace('.',',')+' %'):''],['Kaufnebenkosten',data.knk?(String(data.knk).replace('.',',')+' %'):''],
     ['Bäder',data.baeder||data.bad||''],['Etage',data.etage||''],['Kaufdatum',_deDate(data.kaufdat)],
     ['Kürzel',data.kuerzel||''],['Zustand',data.ds2_zustand||data.zustand||''],
-    ['Ausstattung',data.ausstattung||''],['Nettokaltmiete',data.nkm&&num(data.nkm)?eur(num(data.nkm))+'/Mo':''],
+    ['Ausstattung',data.ausst||data.ausstattung||''],['Nettokaltmiete',data.nkm&&num(data.nkm)?eur(num(data.nkm))+'/Mo':''],
+    /* v1120-PASSFELD: befuellt, aber bisher von niemandem gelesen. */
+    ['Halter',data.halter||''],['Miteigentumsanteil',data.mea?(String(data.mea).replace('.',',')+' %'):''],
+    ['Darlehen',data.d1&&num(data.d1)?eur(num(data.d1)):''],
     ['Sonst. Einnahmen',data.ze&&num(data.ze)?eur(num(data.ze))+'/Mo':''],
-    ['Modernisierung',data.modernisierung||data.mod_jahr||''],['Vermietungsstand',data.vermietungsstand||''],/* v893p-more */['Verkehrswert',data.svwert&&num(data.svwert)?eur(num(data.svwert)):''],['Wertentwicklung p.a.',data.ds2_wertsteigerung?(String(data.ds2_wertsteigerung).replace('.',',')+' %'):''],['Grundstücksfläche',data.grundstueck?(String(data.grundstueck).replace('.',',')+' m²'):(data.gst_flae?(String(data.gst_flae).replace('.',',')+' m²'):'')],['Balkon/Terrasse',data.balkon_flae?(String(data.balkon_flae).replace('.',',')+' m²'):''],['Etagen gesamt',data.etagen_ges||''],['Bäder (Anzahl)',data.bad_anz||'']];
+    ['Modernisierung',data.modernis||data.modernisierung||data.mod_jahr||''],['Vermietungsstand',data.vermstand||data.vermietungsstand||''],/* v893p-more */['Verkehrswert',data.svwert&&num(data.svwert)?eur(num(data.svwert)):''],['Wertentwicklung p.a.',data.ds2_wertsteigerung?(String(data.ds2_wertsteigerung).replace('.',',')+' %'):''],['Grundstücksfläche',(data.gsfl||data.grundstueck||data.gst_flae)?(String(data.gsfl||data.grundstueck||data.gst_flae).replace('.',',')+' m²'):''],['Balkon/Terrasse',data.balkon_flae?(String(data.balkon_flae).replace('.',',')+' m²'):''],['Etagen gesamt',data.etagen_ges||''],['Bäder (Anzahl)',data.bad_anz||'']];
   var _ds2r=[]; try { var _pd=data.__ds2pending; if(_pd&&typeof _pd==='object'){ Object.keys(_pd).forEach(function(id){ var it=_pd[id]; if(it&&it.value!=null&&String(it.value).trim()!==''){ _ds2r.push([it.label||id, String(it.value), id]); } }); } } catch(e){}
   var _mrows=_allF.filter(function(f){return f[1]!=null && String(f[1]).trim()!=='';}).concat(_ds2r);
   /* qb-sort: Objektdaten -> Ausstattung -> Finanzen -> Markt/Lage -> Qualitaet+Zustand paarweise */
@@ -211,8 +245,10 @@ function render(pass){
   _mrows.sort(function(a,b){ var ka=(a[2]!=null?a[2]:a[0]), kb=(b[2]!=null?b[2]:b[0]); var ra=(_SDORD[ka]!=null?_SDORD[ka]:99), rb=(_SDORD[kb]!=null?_SDORD[kb]:99); return ra!==rb ? ra-rb : a.__i-b.__i; });
   /* v883-rubriken: Stammdaten in Rubriken gruppieren */
   var _RUB=[
-    ['Objekt & Ausstattung',['Objektart','Zimmer','Energieklasse','Etage','etage','etagen_ges','Stellplatz','garagen','stellpl_aussen','B\u00e4der','bad_anz','balkon_flae','Ausstattung','Modernisierung','modernis','Vermietungsstand','K\u00fcrzel']],
-    ['Finanzierung',['Eigenkapital','Hausgeld','Zinssatz','Tilgung','Kaufnebenkosten','Nettokaltmiete','Sonst. Einnahmen','Kaufdatum']],
+    /* v1120-PASSFELD: Halter, Miteigentumsanteil und Darlehen einsortiert \u2014
+       sonst landen die drei neuen Zeilen unter "Weitere". */
+    ['Objekt & Ausstattung',['Objektart','Zimmer','Energieklasse','Etage','etage','etagen_ges','Stellplatz','garagen','stellpl_aussen','B\u00e4der','bad_anz','balkon_flae','Ausstattung','Modernisierung','modernis','Vermietungsstand','K\u00fcrzel','Halter','Miteigentumsanteil']],
+    ['Finanzierung',['Eigenkapital','Hausgeld','Zinssatz','Tilgung','Kaufnebenkosten','Nettokaltmiete','Sonst. Einnahmen','Kaufdatum','Darlehen']],
     ['Lage & Markt',['makrolage','mikrolage','ds2_marktmiete','svwert','ds2_wertsteigerung','ds2_bevoelkerung','ds2_nachfrage','ds2_entwicklung']],
     ['Qualit\u00e4t & Zustand',['Zustand','ds2_zustand','qual_kueche','rate_kueche','qual_bad','rate_bad','qual_boden','rate_boden','qual_fenster','rate_fenster']]
   ];
