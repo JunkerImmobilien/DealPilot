@@ -36665,3 +36665,41 @@ html body .set-modal-cream .dp-mtb-brand .dp-band-close:hover{
   color:#1a1508 !important;
 }
 /* ===== v1117-band-close END ===== */
+
+/* ===== v1118b-handy-trefferflaechen =========================================
+   Aus dem Durchgang bei 390 px, nachdem die Handy-Sperre gefallen ist (v1118).
+   Gemessen wurden alle neun Reiter, der Drawer und das Einstellungs-Modal:
+   kein Querlauf (390/390 ueberall), kein Textfeld unter 16 px. Was blieb,
+   sind fuenf echte Bedienelemente unter der 44-px-Trefferflaeche aus
+   v650/v652:
+
+   | Element            | war     | Anzahl | Reiter        |
+   |--------------------|---------|--------|---------------|
+   | .dab-chip          | 117x22  | 10     | Deal-Aktion   |
+   | .dab-bp-web        | 157x14  |  5     | Deal-Aktion   |
+   | .dpfk-ltv-btn      |  74x35  |  3     | Finanzierung  |
+   | .v10-zc-btn        | 178x35  |  1     | Finanzierung  |
+   | a.v842-tax-link    | 191x35  |  1     | Steuer        |
+
+   KEIN ::after wie in v1116: die Chips stehen mit 7 px Abstand und 29 px
+   Zeilenabstand: eine 44-px-Pseudoflaeche wuerde der Nachbarzeile den Klick
+   klauen. Alle fuenf sind display:flex mit align-items:center — min-height
+   zentriert den Inhalt von selbst, die Optik bleibt sonst unberuehrt.
+
+   Nur unter 768 px. Auf dem Desktop ist der Zeiger fein, dort waeren 44 px
+   plump und wuerden das Raster sprengen. */
+@media (max-width:768px){
+  .dab-chip,
+  .dab-bp-web,
+  .dpfk-ltv-btn,
+  .v10-zc-btn{
+    min-height:44px !important;
+  }
+  /* Fliesstext-Link: braucht erst eine eigene Box, bevor min-height greift. */
+  a.v842-tax-link{
+    display:inline-flex !important;
+    align-items:center !important;
+    min-height:44px !important;
+  }
+}
+/* ===== v1118b-handy-trefferflaechen END ===== */
