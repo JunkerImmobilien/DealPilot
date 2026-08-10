@@ -37,15 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Browser-Abnahme des Schließen-Knopfs** — der Rest von `v1116`.
-   Der Umbau steht und ist ausgerollt, **im Browser nachgemessen wurde er
-   nicht**: die Chrome-Erweiterung war in der Sitzung nicht verbunden.
-   Anzusehen sind die sieben Stellen: Bankexport, Track Record,
-   Boarding-Skin, Beleg-Import, Score-Hero (zwei Modale), QuickBoarding-
-   Teilen (der auf Gold) und die Einstellungen (dort nur 28→32 px).
-   Vorher **Strg+Shift+R** — sechs Cache-Buster sind hochgezogen.
-
-2. **Die MA-Serie ausbauen und die normale Ansicht fürs Handy freigeben.**
+1. **Die MA-Serie ausbauen und die normale Ansicht fürs Handy freigeben.**
    **Entscheidung von Marcel, 2026-08-08.** Die Haupt-App ist inzwischen
    handytauglich gebaut (v650/v652, v1077, v1112 bis v1116) — die separate
    Mobile-Fassung hat damit keinen Zweck mehr. Sie fliegt raus, die Sperre
@@ -79,7 +71,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    „Durchgang durch die Mobile-App": geprüft wird jetzt die normale
    Ansicht, nicht die MA-Fassung.
 
-3. **Marktbericht: neun bis zehn Gestaltungsideen als Mockups.** Der
+2. **Marktbericht: neun bis zehn Gestaltungsideen als Mockups.** Der
    Bericht sieht optisch nicht gut aus. Marcels Richtung: **mehrere
    Stufen**, möglicherweise ein **Wizard im Arbeitsbereich**, den man mit
    mehreren Reitern durchklickt. Nach `design/Vorschläge/`, als HTML zum
@@ -101,7 +93,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Auswahl trifft Marcel**, nicht ich. Neun bis zehn Ideen heißt neun bis
    zehn ernsthafte, nicht sieben Varianten derselben.
 
-4. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
+3. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
    Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
    ein **Kettenbefund, kein Optikbefund**, und die Kette wird von hinten
    aufgerollt: was steht im Objekt (`objects.data`), was kommt beim
@@ -110,7 +102,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    füllen** — fehlt eine Angabe, gehört sie sichtbar als fehlend
    ausgewiesen.
 
-5. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+4. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -130,10 +122,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    und zwar über DOM-Ids. Was dort fehlt, rechnet im Bericht mit und ist im
    gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
    Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
-   **Hängt mit Punkt 3 zusammen** — wer die Felder für einen Wizard neu
+   **Hängt mit Punkt 2 zusammen** — wer die Felder für einen Wizard neu
    gruppiert, hat den Abgleich ohnehin gemacht.
 
-6. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
+5. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
    `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
    v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
    ist genau seine Voreinstellung.
@@ -152,7 +144,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    nur nicht dort, wo er sein Branding einstellt. Es fehlt keine Funktion,
    es sind **zwei Oberflächen für dieselbe Sache**. Genau das ist Weg B.
 
-7. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
+6. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
    Der Rest von „Darstellung → Profil und Anzeige ist unvollständig",
    nachdem der Kontrastfehler mit `v1113` behoben ist. **Der Abgleich
    steht** (2026-08-08, im Panel gezählt): acht Farbfelder, davon **fünf
@@ -168,7 +160,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Produktfrage: gibt der Regler die Farbe frei, oder nur innerhalb dessen,
    was noch trägt? **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-8. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+7. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -182,7 +174,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
    kein Nachschlag.
 
-9. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+8. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
    kein Defekt — Entwurf gehört nach `design/Vorschläge/`, sonst wäre es
@@ -196,7 +188,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Später
 
 - **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
-  Vorhaben mit eigener Prüfstrecke, nicht nebenbei. **Wird durch Punkt 2
+  Vorhaben mit eigener Prüfstrecke, nicht nebenbei. **Wird durch Punkt 1
   größer, nicht kleiner** — mit der Freigabe fürs Handy trägt die normale
   Ansicht allein, was vorher auf zwei Fassungen verteilt war.
 
@@ -217,7 +209,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
     Karte (hängt an `matchMedia('(hover:none)')`, greift im Prüfbrowser
     nicht) und das **Erzeugen** eines neuen Berichts bei 390 px (kostet
     5 L und hängt an einem `window.confirm`). Eigener Namensraum v1077,
-    nicht mit der Haupt-App mischen. **Wird mit Punkt 2 dringender:** nach
+    nicht mit der Haupt-App mischen. **Wird mit Punkt 1 dringender:** nach
     der Freigabe kommen echte Nutzer auf diesem Weg an.
   - **Tabelle der geteilten Pässe** — die Scroll-Regel steht, das
     Testkonto war leer, der Nachweis fehlt.
@@ -228,9 +220,72 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
 
+- [2026-08-10] **Browser-Abnahme des Schließen-Knopfs** — `v1117`
+  (`a33394d`). Gemessen auf Staging, angemeldet, Partner-Konto, jede Stelle
+  über den echten Bedienweg geöffnet und über den Knopf selbst geschlossen.
+
+  ### Sechs Stellen trugen Fassung B, die siebte nicht
+
+  Bankexport, Track Record, Boarding-Skin, Beleg-Import, Score-Hero (beide
+  Modale) und QuickBoarding-Teilen standen bitgleich: **32×32, Radius 9,
+  `#17130d`, SVG 15 px, Trefferfläche 44×44** — und jeder schließt auf
+  Klick. Der auf Gold (`.qbs-h .x`) trägt wie gebaut die dunkle Kante.
+
+  **`.dp-band-close` (Einstellungen und Hilfe) stand unverändert da:**
+  28×28, Fläche `rgba(42,39,39,.06)`, SVG 13 px, **keine** Trefferfläche.
+  v1116 hatte an dieser Stelle **nichts** bewirkt. Das ist mein Fehler aus
+  v1116 — dort steht „auf 32/9/15 nachgezogen", nachgemessen war es nie.
+
+  ### Zwei Sieger, nicht einer
+
+  | Sieger | Spezifität | setzte |
+  |---|---|---|
+  | `html .settings-modal.set-modal-v2 .set-modal-close` (v793i) | (0,3,1) `!important` | Fläche, Kante, SVG 18, `overflow:hidden` |
+  | `dp-band-fix.js` (v863), **inline** `!important` | schlägt jedes Stylesheet | 28×28, SVG 13 |
+
+  Die v1116-Regel `.dp-mtb-brand .dp-band-close` steht bei (0,2,0) und kam
+  gegen beide nicht an. Deshalb **zwei Stellen** statt einer: Größe und
+  Zeichen in `dp-band-fix.js` (32/15), Aussehen im CSS mit `html body` +
+  `.dp-mtb-brand` davor — (0,4,2) bzw. (1,2,2), beides über v793i.
+  `overflow:visible` ist Pflicht, sonst schneidet v793i das 44-px-`::after`
+  ab. `transform` bleibt `none`, kein `:active`-Scale — das sichert v843.
+
+  ### Nachgemessen, alle neun Stellen
+
+  | Stelle | w×h | Radius | Fläche | SVG | Treffer | schließt |
+  |---|---|---|---|---|---|---|
+  | Bankexport `.dpm-x` | 32×32 | 9 | `#17130d` | 15 | 44×44 | ✓ |
+  | Track Record `.dpm-x` | 32×32 | 9 | `#17130d` | 15 | 44×44 | ✓ |
+  | Boarding `.bdg-brand .x` | 32×32 | 9 | `#17130d` | 15 | 44×44 | ✓ |
+  | Beleg-Import `.bi-x` | 32×32 | 9 | `#17130d` | 15 | 44×44 | ✓ |
+  | Score-Hero KPI `.dpshm-x` | 32×32 | 9 | `#17130d` | 15 | 44×44 | ✓ |
+  | Score-Hero Teile `.dpshp-x` | 32×32 | 9 | `#17130d` | 15 | 44×44 | ✓ |
+  | Teilen `.qbs-h .x` (auf Gold) | 32×32 | 9 | `#17130d` | 15 | 44×44 | ✓ |
+  | **Einstellungen** `.dp-band-close` | **32×32** | 9 | `#17130d` | **15** | **44×44** | ✓ |
+  | **Hilfe** `.dp-band-close` | **32×32** | 9 | `#17130d` | **15** | **44×44** | ✓ |
+
+  ### Zwei Messfallen, damit sie niemanden noch einmal kosten
+
+  - **`getComputedStyle` meldet die 1,5-px-Goldkante als `1px`.** Nicht die
+    Kante ist falsch — Chrome rundet bei `devicePixelRatio 1` auf ganze
+    Gerätepixel. Mit einer Probe-`div` mit `border:1.5px` gegengeprüft:
+    dieselbe Meldung. **Die berechnete Kantenbreite taugt hier nicht als
+    Prüfwert**, die Quelle trägt 1,5 px.
+  - **Der Prüf-Tab ist `hidden`, und dort feuert `requestAnimationFrame`
+    nie** (gemessen: kein Rückruf binnen 2 s). `dp-band-fix.js` plant
+    seinen Lauf per rAF — der Knopf blieb deshalb im Prüfbrowser auf dem
+    CSS-Rückfallwert 36 px stehen. **Kein Produktfehler**, ein Artefakt der
+    Messung; nach `window._dpBandFix()` stimmt jeder Wert. Im sichtbaren
+    Tab läuft rAF binnen ~16 ms.
+
+  Cache-Buster: `css/style.css` W55 → **W56**, `dp-band-fix.js` 863 →
+  **1117**. Die nackte URL liefert weiter ein zwischengespeichertes
+  `index.html` — **Strg+Shift+R** ist nötig, sonst kommt W56 nicht an.
+
 - [2026-08-08] **Das „×" soll professioneller aussehen** — `v1115` Demo
   (`a1f3d4e`), `v1116` Umbau (`b261653`).
-  **Die Browser-Abnahme steht noch aus und ist Punkt 1.**
+  **Die Browser-Abnahme steht als eigener Eintrag darüber** (`v1117`) — sie
+  hat die siebte Stelle als nicht angekommen entlarvt.
 
   ### Drei Annahmen des Punktes waren falsch
 
@@ -397,7 +452,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Im Panel gezählt: **acht Farbfelder — fünf für Flächen, drei für Text.**
   Für Score-Karte und KPI-Karten gibt es eine Fläche, aber keinen Text.
   Das ist Marcels „die Schriftfarbe lässt sich nicht setzen", und es
-  bleibt als **Ausbau** offen (jetzt Punkt 7). Der Kontrastfehler selbst
+  bleibt als **Ausbau** offen (jetzt Punkt 6). Der Kontrastfehler selbst
   ist damit aber nicht erklärt — der hat eine eigene Ursache.
 
   ### Die Ursache
@@ -478,7 +533,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Die verbleibende 1 ist `hdr-obj-num` (2,98 bzw. 2,88) und **nicht** Teil
   dieser Arbeit: die v1097-Schwelle rechnet gegen Weiß, kanzlei und
   boarding haben aber cremefarbenen Grund. v1097 hat das selbst so
-  vermerkt. Steht jetzt als eigener Punkt 8.
+  vermerkt. Steht jetzt als eigener Punkt 7.
 
   Ungeprüfte Elemente in jedem Lauf: **0**.
 
