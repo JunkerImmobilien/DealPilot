@@ -68,10 +68,14 @@
     var s = document.createElement('style');
     s.id = 'mbw-css';
     s.textContent = [
-      '.mbw-reiter{display:flex;gap:0;border-bottom:2px solid rgba(128,128,128,.22);',
-        'margin:0 0 14px;overflow-x:auto;scrollbar-width:none}',
-      '.mbw-reiter::-webkit-scrollbar{display:none}',
-      '.mbw-r{flex:0 0 auto;padding:9px 13px;font:inherit;font-size:12.5px;cursor:pointer;',
+      /* v1127c · UMBRECHEN, NICHT ABSCHNEIDEN. Gemessen: die Spalte ist
+         338 px breit, die drei Reiter brauchen zusammen rund 372 px — mit
+         `overflow-x:auto` war der dritte angeschnitten und nur durch
+         seitliches Scrollen erreichbar. Ein Reiter, den man nicht sieht,
+         ist kein Reiter. Mit flex-wrap rutscht er in die zweite Zeile. */
+      '.mbw-reiter{display:flex;flex-wrap:wrap;gap:0 2px;',
+        'border-bottom:2px solid rgba(128,128,128,.22);margin:0 0 14px}',
+      '.mbw-r{flex:0 0 auto;padding:9px 11px;font:inherit;font-size:12.5px;cursor:pointer;',
         'background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-2px;',
         'color:inherit;opacity:.55;white-space:nowrap;transition:.15s}',
       '.mbw-r:hover{opacity:.85}',
