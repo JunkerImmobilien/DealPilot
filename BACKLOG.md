@@ -327,20 +327,63 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-7. **Marktbericht neu gestalten — ausdrücklich der letzte Punkt.**
-   **Marcels Festlegung vom 2026-08-10:** wird erst aufgegriffen, wenn
-   alles andere abgeschlossen ist. Er denkt bis dahin selbst darüber nach.
+7. **Marktbericht neu gestalten.**
+   **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
+   (2026-08-11, anklickbar, im Browser durchgeprüft).
 
-   **Die Richtung steht schon, und sie ist enger als die zehn Ideen:**
+   ### Marcels Entscheidung vom 2026-08-11 — sie ersetzt die vom 2026-08-10
 
-   - **Stufe 1 und 2 bleiben, wie sie sind** — die schnelle Bewertung und
-     die Marktpreisindikation funktionieren. Dort wird nichts umgebaut.
-   - **Nur die genaue Wertermittlung bekommt einen Wizard**, der den
-     Nutzer durchführt. Das ist die Stufe mit den 42 Feldern; die beiden
-     schnellen Stufen tragen den Aufwand nicht.
-   - **Marcel möchte dazu noch ein Mockup.** Also eine neue, zugespitzte
-     Fassung nach `design/Vorschläge/` — nicht die zehn Ideen erneut,
-     sondern ein Entwurf für genau diesen Wizard.
+   „Nummer 1 und dein Vorschlag" — also **Idee 1 (Wizard mit Reitern)**,
+   kombiniert mit **Idee 2 (lebende Vorschau)** und **Idee 6 (sichtbarer
+   Zweig)**, wie empfohlen. Wörtlich dazu:
+
+   - **Die drei Stufen sollen vereint werden**, nicht vorher abgefragt:
+     einfache Bewertung, erweiterte Marktpreisindikation und genaue
+     Wertermittlung in **einem** Weg.
+   - **Es soll übersichtlich sein.**
+   - **Am Schluss das Ergebnis wie jetzt.**
+   - **Die Übersicht bleibt vollständig:** Objekte einlesen, die Tabelle
+     der vorhandenen Marktberichte, und ein angelegtes Objekt direkt
+     auswählen. „Das ist ja quasi die Übersicht."
+
+   **Damit ist die Festlegung vom 2026-08-10 überholt** — dort hieß es noch
+   „nur die genaue Wertermittlung bekommt einen Wizard, Stufe 1 und 2
+   bleiben". Jetzt ist es **ein** Weg für alle drei.
+
+   ### Wie die Stufen vereint werden
+
+   Als **drei Meilensteine auf einem Weg** statt als Frage vorweg. Man kann
+   an jedem stehenbleiben und erzeugen:
+
+   | Meilenstein | erreicht nach | heute |
+   |---|---|---|
+   | Einschätzung | Schritt 1 | Stufe 1 · 2 L |
+   | Marktpreisindikation | Schritt 2 | Stufe 2 · 5 L |
+   | Wertermittlung | Schritt 4 | Stufe 3 · 12 L |
+
+   **Niemand muss vorher wissen, was er braucht** — und wer bei
+   „Einschätzung" anfängt, sieht am Balken, dass zwei Angaben mehr die
+   Spanne halbieren.
+
+   **Die Objektart steht in Schritt 1 und nirgends sonst**, weil
+   `istWohnung()` über **20 der 42 Felder** entscheidet. Ein Wizard, der
+   sie später fragt, müsste alles dahinter neu aufbauen.
+
+   ### Im Browser durchgeprüft
+
+   Übersicht → Wizard → Ergebnis → zurück. Zweig gemessen: **ETW ergibt
+   vier Reiter** (Feinjustierung entfällt), **Haus fünf**; `mea` ist beim
+   Haus weg. Folgefelder: `hinterlandFlaeche=828` bringt `hinterlandRent`
+   und `hinterlandWert`, **und der getippte Wert bleibt erhalten** — die
+   Fokusfalle beim Neuzeichnen ist im Entwurf schon gelöst. Kein Querlauf,
+   keine Konsolenfehler.
+
+   **BLOCKIERT auf zwei Fragen, beide betreffen Geld:**
+   1. **Wann wird abgerechnet**, wenn die Stufe sich erst am Ende ergibt?
+      Vorschlag: beim Erzeugen, nach erreichter Stufe, Preis am Knopf.
+   2. **Darf man später vertiefen** — erst „Einschätzung", dasselbe Objekt
+      später auf „Wertermittlung" hochziehen — **und was kostet das dann?**
+      Vorschlag: nur die Differenz.
 
    **Was vor dem Entwurf gemessen sein muss:** welche Felder voneinander
    abhängen. `garagenStufe` und `hinterlandRent` erscheinen nur nach echter
