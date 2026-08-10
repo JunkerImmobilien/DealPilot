@@ -387,6 +387,80 @@ function _updateHdrHeight() {
 }
 window._updateHdrHeight = _updateHdrHeight;
 
+/* ─── v1124-hdrsync · Der Spalt zwischen Kopfleiste und Reiterleiste ───────
+   BEFUND (Bild design/mockups/spalt2.png, gemessen 2026-08-11 bei 890 px):
+   `.main-col > nav.tabs` klebt mit `top: var(--hdr-h) !important`. Der
+   Mechanismus ist also richtig — nur stand --hdr-h auf 308px, waehrend die
+   Kopfleiste 348px hoch war. 40 px Unterschied, und genau die sieht man als
+   schwarzen Streifen ueber der Reiterleiste.
+
+   URSACHE: V63.4 misst nur bei `resize` und beim Laden (+100/+500 ms).
+   Die Kopfleiste aendert ihre Hoehe aber noch bei vielen anderen Anlaessen:
+   ein Objekt wird geladen und die Score-Karte erscheint, eine Vorlage wird
+   umgeschaltet, der Kopf wird zu- oder aufgeklappt, die KPI-Pillen brechen
+   um. Nach jedem davon bleibt --hdr-h stehen — die Leiste sitzt dann zu
+   tief (Spalt) oder zu hoch (sie rutscht unter den Kopf).
+   Das erklaert auch, warum es "schon mehrfach" auffiel und in einem
+   frischen Prueflauf nie: bei uns lief kurz vorher immer ein resize.
+
+   BEHEBUNG: ein ResizeObserver auf der Kopfleiste. Er feuert genau dann,
+   wenn sich die Hoehe wirklich aendert — unabhaengig vom Anlass, und damit
+   auf Handy und Tablet gleichermassen (Marcels Vorgabe). Keine neue Zahl,
+   keine 26. Breakpoint-Schwelle, kein Timer.
+
+   KEIN requestAnimationFrame: das feuert in einem verborgenen oder
+   gedrosselten Tab nicht (gemessen, siehe dp-band-fix.js v1092b). Der
+   ResizeObserver buendelt ohnehin selbst.
+
+   Die Messung selbst bleibt _updateHdrHeight() — eine Stelle, eine
+   Wahrheit. Hier kommen nur Anlaesse dazu. */
+(function () {
+  var _beobachtet = null;
+
+  function anhaengen() {
+    var hdr = document.querySelector('.main-col > header.hdr') || document.querySelector('header.hdr');
+    if (!hdr || hdr === _beobachtet) return;
+    if (!window.ResizeObserver) return;          /* alte Browser: es bleibt beim Alt-Verhalten */
+    try {
+      if (!anhaengen._ro) {
+        anhaengen._ro = new ResizeObserver(function () { _updateHdrHeight(); });
+      }
+      if (_beobachtet) { try { anhaengen._ro.unobserve(_beobachtet); } catch (e) {} }
+      anhaengen._ro.observe(hdr);
+      _beobachtet = hdr;
+      _updateHdrHeight();
+    } catch (e) {}
+  }
+
+  /* Die Kopfleiste wird beim Rendern ersetzt — dann muss der Beobachter
+     mitwandern. Deshalb zusaetzlich am DOM lauschen, wie es
+     modal-boarding-skin.js und karten-kompakt.js schon tun. */
+  function beobachterStarten() {
+    anhaengen();
+    try {
+      new MutationObserver(function () { anhaengen(); })
+        .observe(document.body, { childList: true, subtree: true });
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', beobachterStarten);
+  else beobachterStarten();
+
+  /* Anlaesse, die keine Groessenaenderung ausloesen muessen, es aber koennen */
+  window.addEventListener('orientationchange', function () { setTimeout(_updateHdrHeight, 120); });
+  window.addEventListener('dp:plan-ready', function () { setTimeout(_updateHdrHeight, 120); });
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) setTimeout(_updateHdrHeight, 120);
+  });
+  window._dpHdrSyncStatus = function () {
+    var hdr = document.querySelector('.main-col > header.hdr') || document.querySelector('header.hdr');
+    return {
+      beobachtet: !!_beobachtet,
+      hdrHoehe: hdr ? hdr.offsetHeight : null,
+      token: getComputedStyle(document.documentElement).getPropertyValue('--hdr-h').trim()
+    };
+  };
+})();
+
 // V63.4: Bei Window-Resize Header-Höhe neu messen
 window.addEventListener('resize', function() {
   if (typeof _updateHdrHeight === 'function') _updateHdrHeight();
