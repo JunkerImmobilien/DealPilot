@@ -36695,6 +36695,13 @@ html body .set-modal-cream .dp-mtb-brand .dp-band-close:hover{
   .v10-zc-btn{
     min-height:44px !important;
   }
+  /* .v10-zc-btn traegt zusaetzlich .dpfk-mkt, und
+     `.dpfk-head .dpfk-mkt{min-height:0!important}` (0,2,0) schlaegt die
+     Sammelregel oben (0,1,0). Gemessen, nicht vermutet — deshalb hier
+     (0,3,0) statt auf die spaetere Zeile zu bauen. */
+  .dpfk-head .v10-zc-btn.dpfk-mkt{
+    min-height:44px !important;
+  }
   /* Fliesstext-Link: braucht erst eine eigene Box, bevor min-height greift. */
   a.v842-tax-link{
     display:inline-flex !important;

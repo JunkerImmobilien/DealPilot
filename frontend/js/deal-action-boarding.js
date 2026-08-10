@@ -224,7 +224,14 @@
         b.style.setProperty('border', '1px solid rgba(111,214,160,.45)', 'important');
         b.style.setProperty('font-size', '10px', 'important');
         b.style.setProperty('padding', '3px 10px', 'important');
-        b.style.setProperty('min-height', '0', 'important');
+        /* v1118b: min-height:0 ist HIER RAUS. Es stand nur da, um die
+           Handy-Regel `button{min-height:44px}` zu schlagen — sinnvoll,
+           solange die Haupt-App auf dem Handy gesperrt war (v970). Seit
+           v1118 ist sie es nicht mehr, und der Chip stand mit 22 px unter
+           der 44-px-Trefferflaeche aus v650/v652.
+           OBERHALB 768 px aendert sich dadurch nichts: gemessen setzt dort
+           KEINE Regel min-height, der Wert ist ohnehin 0. Die Zeile wirkte
+           ausschliesslich auf dem Handy — und dort genau falsch herum. */
         b.style.setProperty('border-radius', '99px', 'important');
       });
     } catch (e) {}
