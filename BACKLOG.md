@@ -37,53 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **GELD · Die Stufenfrage bewirbt 2 L, abgebucht werden 5 L.**
-   **Gefunden 2026-08-11 beim Bauen des Wizards, gemessen an Frontend und
-   Backend. Nichts angefasst — Preise sind Marcels Sache.**
-
-   | Stufe | Oberfläche bewirbt | Backend bucht ab |
-   |---|---|---|
-   | 1 · Schnelle Einschätzung | **2 L** | **5 L** |
-   | 2 · Genaue Preisindikation | 5 L | 5 L ✓ |
-   | 3 · Wertermittlung | 12 L | 12 L ✓ |
-
-   **Die Kette, Glied für Glied:**
-   - `wertermittlung.js:397` — `KEROSIN = { 1: 2, 2: 5, 3: 12 }`, das steht
-     als „2 L" an der Stufenwahl.
-   - `wertermittlung.js:695` — `payload()` schickt `wert_stufe: stufe()`.
-   - `backend/src/routes/marktbericht.js:36` — `_kerosinKosten(body)`:
-     `if (body.fast || body.schnell) return COST.fast;` sonst
-     `st >= 3 ? 12 : 5`. **Für Stufe 1 gibt es keinen eigenen Zweig.**
-   - `marktbericht-app/app.js:251` — `fast: $('fastMode') ? … : false`.
-     **`fastMode` existiert nirgends sonst im Frontend** (ein einziger
-     Treffer im ganzen Ordner, und das ist diese Abfrage selbst). Im DOM
-     nachgesehen: nicht vorhanden. `fast` ist damit **dauerhaft `false`**,
-     und `COST.fast = 2` ist toter Code.
-
-   **Dazu ein zweiter, kleinerer Fehler:** der Bestätigungsdialog
-   (`app.js:202`) nennt **fest „5 L"** — auch bei Stufe 3, wo 12 L
-   abgebucht werden.
-
-   **Das blockiert den Wizard**, weil die Meilensteinleiste den Preis
-   anzeigen soll. Ich würde denselben Fehler nur schöner darstellen.
-
-   **Drei mögliche Auflösungen — Marcels Entscheidung:**
-   1. **Der Preis stimmt, die Anzeige nicht** → `KEROSIN[1]` auf 5, und
-      Stufe 1 kostet wie Stufe 2. Dann ist die Stufe 1 als eigener Preis
-      sinnlos.
-   2. **Die Anzeige stimmt, der Preis nicht** → das `fast`-Kennzeichen
-      wieder anschließen, also bei `wert_stufe === 1` senden. **Achtung:**
-      `COST.fast` steuert im Backend womöglich auch den Umfang des
-      Berichts, nicht nur den Preis — das gehört vorher geprüft.
-   3. **Drei echte Preise** → im Backend einen eigenen Zweig für Stufe 1.
-      Sauberste Lösung, aber eine Backend-Änderung.
-
-   **Und die neue Regel vom 2026-08-11 kommt obendrauf:** abgerechnet wird
-   beim Erzeugen nach erreichter Stufe, und **Vertiefen kostet nur die
-   Differenz**. Das braucht ohnehin einen Backend-Eingriff — dort ist die
-   Gelegenheit, den Stufe-1-Preis mitzuklären.
-
-2. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+1. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -146,7 +100,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
    JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
 
-3. **Finanzamt-PDF unter „Steuern": Plausibilität prüfen und die
+2. **Finanzamt-PDF unter „Steuern": Plausibilität prüfen und die
    Ergebnisdarstellung neu bauen.** Drei Arbeiten an einer Datei, in dieser
    Reihenfolge:
 
@@ -175,7 +129,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Bevor gebaut wird, das PDF und die Immokalk-Datei tatsächlich lesen.**
    Beide liegen im Ordner; ein Umbau nach Beschreibung wäre geraten.
 
-4. **Ein Testobjekt vollständig anlegen und alle Rechenwege
+3. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
    Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
    richtig, wird unter „Bewertung" alles passend angezeigt, sind die
@@ -206,7 +160,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
    Steuerteil.
 
-5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -304,7 +258,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -339,7 +293,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -373,7 +327,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-8. **Marktbericht neu gestalten.**
+7. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -478,6 +432,69 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-11] **GELD · Drei echte Stufenpreise, Vertiefen kostet die
+  Differenz** — `v1125` (`75bbcd0`), `v1125b` (Riegel), `v1125c`
+  (`35ecc22`). **Marcels Entscheidung: Weg 3.**
+
+  ### Der Befund
+
+  Die Oberfläche bewarb Stufe 1 mit **2 L**, abgebucht wurden **5 L**. Der
+  2-L-Zweig hing am Kennzeichen `fast` — und das kam nie an: `fastMode`
+  existiert im ganzen Frontend **nur in der Zeile, die es abfragt**
+  (`app.js:251`). `COST.fast` war toter Code. Dazu nannte der
+  Bestätigungsdialog **fest „5 L"**, auch bei Stufe 3 mit 12 L.
+
+  ### Umgesetzt
+
+  **Backend** (`routes/marktbericht.js`): `STUFENPREIS = {1:2, 2:5, 3:12}`,
+  ein eigener Zweig für Stufe 1. `_kerosinKosten` ist jetzt `async` und
+  bekommt `userId` + `externalRef` — **in beiden Routen wandert die
+  Objektkennung deshalb vor den Preis**. Bei `cost === 0` wird **gar nicht
+  gebucht**: `consume()` zieht intern `Math.max(1, cost)`, ein Aufruf mit 0
+  hätte 1 L gekostet und aus „schon bezahlt" ein „kostet doch was" gemacht.
+  `wert_stufe` wandert in die `meta`.
+
+  **Die schon bezahlte Stufe kommt aus dem eigenen Kerosin-Log, niemals vom
+  Client.** Eine vom Browser mitgeschickte „ich habe schon Stufe 3 bezahlt"
+  wäre ein Freifahrtschein für jeden Bericht.
+
+  Zwei Feinheiten, beide am echten Log gemessen:
+  - `consume()` teilt eine Buchung auf Monats- und Bonustank auf und
+    schreibt dann **zwei Zeilen** für denselben Bericht. Deshalb wird je
+    Bericht (Endpoint + Sekunde) summiert, bevor zurückgerechnet wird.
+  - Alte Zeilen tragen kein `wert_stufe`. Für sie wird die Stufe aus der
+    Summe zurückgerechnet (≥12→3, ≥5→2, ≥2→1), damit bestehende Objekte
+    nicht doppelt zahlen.
+
+  ### `v1125b` — ein Riegel, den erst der Blick ins Log erzwungen hat
+
+  **39 Buchungen liegen unter einem `external_ref`, der der QUELLTEXT einer
+  JavaScript-Funktion ist** (`function _currentObjectId(){ … }`) — der
+  Fehler aus der Zeit vor `v941`, als `window._currentObjectId` die
+  Funktion selbst war und eine Funktion truthy ist. Behoben ist er, die
+  Altzeilen bleiben (09.06.–15.07.2026, keine neuen).
+
+  **Ohne Riegel wären alle Objekte, die je diesen Weg genommen haben, EIN
+  Objekt — und ab dem zweiten Bericht kostenlos.** Jetzt zählen nur
+  Kennzeichen ohne Leerraum, höchstens 64 Zeichen, aus `[A-Za-z0-9._:-]`.
+
+  ### Nachgemessen
+
+  | Prüfung | Ergebnis |
+  |---|---|
+  | Spaltenname `ai_credits_log` | `used_at`, **nicht** `created_at` — erst falsch geschrieben, vor dem Ausrollen korrigiert |
+  | SQL gegen das echte Schema | läuft, **177** Buchungen, höchste Stufe 3 |
+  | Zuordnung je Objekt | stimmt: 12 L → Stufe 3, 5 L → Stufe 2 |
+  | Dialog bei Stufe 1 / 2 / 3 | **2 L / 5 L / 12 L**, mit Differenz-Hinweis |
+  | Kerosin im Prüflauf | **0 L** — `confirm` abgefangen und abgelehnt |
+  | Backend im Container | `STUFENPREIS` und `_refTaugt` vorhanden, Server läuft |
+
+  **Noch offen:** die **exakte** Ermäßigung im Dialog. Der Browser kennt die
+  bezahlte Stufe nicht (und soll es nicht), deshalb wird die Differenz als
+  Möglichkeit genannt, nicht als Zahl behauptet. Ein kleiner Lese-Endpunkt
+  `GET /marktbericht/stufenpreis?ref=…` würde den genauen Betrag an den
+  Knopf bringen — Teil des Wizard-Umbaus.
 
 - [2026-08-11] **Spalt zwischen Tab-Leiste und Score-Karte** — `v1124`
   (`efabe66`), `v1124b` (`9832e76`). Bild:
