@@ -105,6 +105,57 @@ async function consume(userId, cost, endpoint, meta) {
   return { ok: true, source: fromBonus > 0 && fromMonthly === 0 ? 'bonus' : (fromBonus === 0 ? 'monthly' : 'mixed') };
 }
 
+/* ─── v1125-stufenpreis · Welche Marktbericht-Stufe ist fuer dieses Objekt
+   schon bezahlt? ───────────────────────────────────────────────────────────
+   Marcels Regel vom 2026-08-11: "man darf spaeter vertiefen und es kostet
+   nur die Differenz."
+
+   DIE ANTWORT KOMMT AUS DEM EIGENEN LOG, NIEMALS VOM CLIENT. Eine vom
+   Browser mitgeschickte "ich habe schon Stufe 3 bezahlt" waere ein
+   Freifahrtschein fuer jeden Bericht.
+
+   Zwei Feinheiten, beide gemessen:
+   - consume() teilt eine Buchung auf Monats- und Bonustank auf und schreibt
+     dann ZWEI Zeilen fuer denselben Bericht. MAX() ist dagegen unempfindlich.
+   - Alte Zeilen tragen kein wert_stufe (das kam erst mit v1125). Fuer sie
+     wird die Stufe aus den gebuchten Kosten zurueckgerechnet, damit
+     bestehende Objekte nicht doppelt zahlen. Die Aufteilung auf zwei Toepfe
+     macht die Einzelzeile allerdings kleiner als den Gesamtpreis — deshalb
+     wird je Bericht (endpoint+ts-Sekunde) SUMMIERT, bevor zurueckgerechnet
+     wird. */
+async function bezahlteStufeMarktbericht(userId, externalRef) {
+  if (!externalRef) return 0;
+  try {
+    const r = await query(
+      `WITH je_bericht AS (
+         SELECT COALESCE(MAX((meta->>'wert_stufe')::int), 0) AS stufe,
+                SUM(cost) AS summe
+           FROM ai_credits_log
+          WHERE user_id = $1
+            AND endpoint LIKE 'marktbericht:%'
+            AND meta->>'external_ref' = $2
+            AND cost > 0
+          GROUP BY date_trunc('second', used_at), endpoint
+       )
+       SELECT COALESCE(MAX(GREATEST(
+                stufe,
+                CASE WHEN summe >= 12 THEN 3
+                     WHEN summe >= 5  THEN 2
+                     WHEN summe >= 2  THEN 1
+                     ELSE 0 END)), 0) AS stufe
+         FROM je_bericht`,
+      [userId, String(externalRef)]
+    );
+    const s = r && r.rows && r.rows[0] ? parseInt(r.rows[0].stufe, 10) : 0;
+    return (s >= 1 && s <= 3) ? s : 0;
+  } catch (e) {
+    /* Im Zweifel NICHTS gutschreiben: lieber einmal zu viel verlangt als
+       ein Bericht umsonst. Der Fehler wird gemeldet, nicht verschluckt. */
+    try { console.warn('[v1125] bezahlteStufeMarktbericht:', e.message); } catch (x) {}
+    return 0;
+  }
+}
+
 // Admin / Stripe-Webhook-Hook: Bonus-Credits gutschreiben (Kauf)
 async function addBonus(userId, amount, ref) {
   amount = Math.max(0, parseInt(amount, 10) || 0);
@@ -145,5 +196,6 @@ module.exports = {
   consume,
   addBonus,
   logExtract,
+  bezahlteStufeMarktbericht,   /* v1125-stufenpreis */
   PLAN_LIMITS
 };

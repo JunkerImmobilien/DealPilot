@@ -33,10 +33,37 @@ const MB_BASE = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/ma
  * Formular (wert_stufe 1..3) und steht im Berichts-Payload. */
 const COST = { fast: 2, full: 5, wertermittlung: 12 }; // v554: Vollbericht 4->5 L
 
-function _kerosinKosten(body) {
-  if (body && (body.fast || body.schnell)) return COST.fast;
-  var st = parseInt((body && body.wert_stufe) || 1, 10);
-  return st >= 3 ? COST.wertermittlung : COST.full;
+/* ─── v1125-stufenpreis ───────────────────────────────────────────────────
+   BEFUND (2026-08-11, an beiden Enden gemessen): die Oberflaeche bewarb
+   Stufe 1 mit 2 L, abgebucht wurden 5 L. Grund: der 2-L-Zweig hing am
+   Kennzeichen `fast`, und das kam nie an — `fastMode` existiert im ganzen
+   Frontend nur in der Zeile, die es abfragt. `COST.fast` war toter Code.
+
+   Marcels Entscheidung: DREI ECHTE PREISE (Weg 3), plus "spaeter vertiefen
+   kostet nur die Differenz".
+
+   `fast`/`schnell` bleiben als Altlast gueltig und bedeuten Stufe 1 — sonst
+   wuerde ein alter Aufruf ohne wert_stufe teurer. */
+const STUFENPREIS = { 1: COST.fast, 2: COST.full, 3: COST.wertermittlung };
+
+function _stufeAus(body) {
+  var st = parseInt((body && body.wert_stufe) || 0, 10);
+  if (!(st >= 1 && st <= 3)) st = (body && (body.fast || body.schnell)) ? 1 : 2;
+  if (body && (body.fast || body.schnell)) st = Math.min(st, 1);
+  return st;
+}
+
+/* Der Preis. Die schon bezahlte Stufe kommt aus dem eigenen Kerosin-Log,
+   NIEMALS aus dem Body — sonst behauptet der Client einfach, er habe
+   bezahlt. Rueckgabe 0 heisst: nichts nachzufordern. */
+async function _kerosinKosten(userId, body, externalRef) {
+  var st = _stufeAus(body);
+  var voll = STUFENPREIS[st] || COST.full;
+  var bezahlt = 0;
+  try { bezahlt = await aiCreditsService.bezahlteStufeMarktbericht(userId, externalRef); } catch (e) { bezahlt = 0; }
+  if (bezahlt >= st) return 0;                       /* diese Tiefe ist bezahlt */
+  if (bezahlt >= 1) return Math.max(0, voll - (STUFENPREIS[bezahlt] || 0));
+  return voll;
 }
 
 // Generischer Forward an den mb-backend. Nutzt globalen fetch (Node >=18).
@@ -177,18 +204,6 @@ async function runReport(req, res) {
   try {
     const body = req.body || {};
     const fast = !!(body.fast || body.schnell);
-    const cost = _kerosinKosten(body);   /* WKERO-2 */
-
-    // Kerosin-Vorabpruefung (Muster avm.js)
-    const status = await aiCreditsService.getStatus(req.user.id);
-    if (status.total_remaining < cost) {
-      return res.status(402).json({
-        error: 'Nicht genug Kerosin im Tank.',
-        needs_credits: true,
-        required: cost,
-        credits: status
-      });
-    }
 
     // v557-rich-body: zwei Eingabeformen.
     // (1) Rich-Body (eingebettetes Marktbericht-Frontend): {address, living_area, ...} -> mb /reports/generate
@@ -197,6 +212,21 @@ async function runReport(req, res) {
     const obj = body.object || body.dealpilot || body;
     const externalRef = body.external_ref || body.objId ||
                         (obj && (obj.id || obj.objId)) || null;
+
+    /* v1125-stufenpreis: externalRef muss VOR dem Preis stehen — die schon
+       bezahlte Stufe haengt daran. Deshalb ist der Block hierher gewandert. */
+    const cost = await _kerosinKosten(req.user.id, body, externalRef);   /* WKERO-2 */
+
+    // Kerosin-Vorabpruefung (Muster avm.js)
+    const status = await aiCreditsService.getStatus(req.user.id);
+    if (cost > 0 && status.total_remaining < cost) {
+      return res.status(402).json({
+        error: 'Nicht genug Kerosin im Tank.',
+        needs_credits: true,
+        required: cost,
+        credits: status
+      });
+    }
     /* v942-userbind: Besitzer + Kuerzel wandern mit in den Snapshot. */
     const _lm = await labelMap(req, [externalRef]);
     const objectLabel = (externalRef && _lm[String(externalRef)]) || null;
@@ -247,14 +277,21 @@ async function runReport(req, res) {
     }
 
     // Erfolg -> Kerosin abziehen (best effort; blockt Bericht nicht).
-    try {
-      await aiCreditsService.consume(
-        req.user.id, cost,
-        'marktbericht:' + (fast ? 'fast' : 'full'),
-        { cost: cost, fast: fast, external_ref: externalRef }
-      );
-    } catch (e) {
-      console.warn('[marktbericht] credits consume failed:', e.message);
+    /* v1125-stufenpreis: Bei cost === 0 GAR NICHT buchen. consume() zieht
+       intern `Math.max(1, cost)` — ein Aufruf mit 0 wuerde 1 L kosten und
+       aus "schon bezahlt" ein "kostet doch was" machen.
+       wert_stufe wandert in die meta, damit die naechste Vertiefung die
+       bezahlte Tiefe kennt, ohne sie aus dem Preis zu erraten. */
+    if (cost > 0) {
+      try {
+        await aiCreditsService.consume(
+          req.user.id, cost,
+          'marktbericht:' + (fast ? 'fast' : 'full'),
+          { cost: cost, fast: fast, external_ref: externalRef, wert_stufe: _stufeAus(body) }
+        );
+      } catch (e) {
+        console.warn('[marktbericht] credits consume failed:', e.message);
+      }
     }
 
     // v554-cost-log: Kostentracking + Schwellen-Check
@@ -299,19 +336,22 @@ router.post('/location-finder', authenticate, async function (req, res) {
 router.post('/reports/generate-stream', authenticate, async function (req, res) {
   const body = req.body || {};
   const fast = !!(body.fast || body.schnell);
-  const cost = _kerosinKosten(body);   /* WKERO-3 */
+
+  /* v1125-stufenpreis: die Objektkennung zuerst — an ihr haengt die schon
+     bezahlte Stufe und damit der Preis. */
+  const isRich = (body.address != null || body.living_area != null || body.property_type != null) && !body.object && !body.dealpilot;
+  const obj = body.object || body.dealpilot || body;
+  const externalRef = body.external_ref || body.objId || (obj && (obj.id || obj.objId)) || null;
+
+  const cost = await _kerosinKosten(req.user.id, body, externalRef);   /* WKERO-3 */
   // Vorab-Check Kerosin
   let status;
   try {
     status = await aiCreditsService.getStatus(req.user.id);
-    if (status.total_remaining < cost) {
+    if (cost > 0 && status.total_remaining < cost) {
       return res.status(402).json({ error: 'Nicht genug Kerosin im Tank.', needs_credits: true, required: cost, credits: status });
     }
   } catch (e) { /* fail-open auf Status, aber weiter */ }
-
-  const isRich = (body.address != null || body.living_area != null || body.property_type != null) && !body.object && !body.dealpilot;
-  const obj = body.object || body.dealpilot || body;
-  const externalRef = body.external_ref || body.objId || (obj && (obj.id || obj.objId)) || null;
   const _lm2 = await labelMap(req, [externalRef]);                      /* v942 */
   const objectLabel = (externalRef && _lm2[String(externalRef)]) || null; /* v942 */
   const mbBody = isRich
@@ -382,7 +422,12 @@ router.post('/reports/generate-stream', authenticate, async function (req, res) 
         [req.user.id, (fast ? 'qc' : 'voll'), 0, (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal, _addr]
       );
     } else {
-      try { await aiCreditsService.consume(req.user.id, cost, 'marktbericht:' + (fast ? 'fast' : 'full'), { cost: cost, fast: fast, external_ref: externalRef, stream: true }); } catch (e) {}
+      /* v1125-stufenpreis: bei 0 nicht buchen — consume() macht daraus sonst
+         1 L. wert_stufe wandert mit, damit die naechste Vertiefung die
+         bezahlte Tiefe kennt. */
+      if (cost > 0) {
+        try { await aiCreditsService.consume(req.user.id, cost, 'marktbericht:' + (fast ? 'fast' : 'full'), { cost: cost, fast: fast, external_ref: externalRef, stream: true, wert_stufe: _stufeAus(body) }); } catch (e) {}
+      }
       if (db) {
         await db.query(
           'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok) VALUES ($1,$2,$3,$4,$5,$6,true)',
