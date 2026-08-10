@@ -239,10 +239,27 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Trefferfläche"); im Formularbereich trägt das Argument schwächer, weil
      die Zeilen dichter stehen. Sie app-weit zu vergrößern ändert die
      Zeilenhöhe überall — **das ist eine Gestaltungsentscheidung.**
-   - **`.sbc-arrow` trägt `role="button"`, ist aber ein `<span>` ohne
-     eigenen Klick.** Das Ziel ist die 326 px breite Karte. Für die Maus
-     harmlos, für einen Screenreader ein Knopf, der nichts tut. Gehört mit
-     einer Prüfstrecke für Barrierefreiheit angefasst, nicht einzeln.
+   - **`.sbc-arrow` misst 20 × 20 px und ist ein echtes Bedienelement.**
+
+     **Mein v1118-Befund war falsch und wird hiermit zurückgenommen.** Ich
+     hatte gemeldet, der Pfeil trage `role="button"` „ohne eigenen Klick"
+     und die Rolle sei irreführend. Nachgelesen in `karten-kompakt.js`
+     (v1092): Rolle, `tabindex="0"` und `aria-label` werden dort
+     **absichtlich** gesetzt — und zwar nur, wenn der Kartenmodus
+     `kompakt` oder `stapel` aktiv ist. Dort **klappt der Pfeil die Karte
+     auf und zu** (`umschalten()`), über einen **delegierten** Listener.
+     Mein Prüfausdruck hat nur `getAttribute('onclick')` abgefragt und
+     einen delegierten Handler deshalb nicht gesehen.
+
+     **Was bleibt, ist ein anderer, echter Befund:** ein Bedienelement mit
+     eigener Funktion misst **20 × 20 px** — deutlich unter der
+     44-px-Trefferfläche aus v650/v652.
+
+     **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:**
+     Pfeil und Karte tun **Verschiedenes** — der Pfeil klappt auf, der
+     Kartenkörper öffnet das Objekt. Eine 44-px-Pseudofläche würde der
+     Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
+     eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
 ---
 
