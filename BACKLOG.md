@@ -491,6 +491,37 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
     `overflow-x:auto` war er nur durch seitliches Scrollen erreichbar —
     **ein Reiter, den man nicht sieht, ist kein Reiter.** Jetzt `flex-wrap`.
 
+  ### `v1128` — Marcels Befund: „voll klein und gedrückt"
+
+  **Er hat recht, und es war mein Fehler.** Ich hatte die Reiter in die
+  **linke Spalte gequetscht**, statt dem Wizard die Fläche zu geben. Mein
+  eigener Entwurf zeigte ihn über die volle Breite — umgesetzt hatte ich
+  ihn im alten Korsett.
+
+  Gemessen: `.grid` steht auf **`380px 898px`**. Die Formularspalte ist fest
+  380 px breit, während daneben **898 px leer stehen**, solange kein
+  Bericht da ist.
+
+  **Jetzt drei Zustände, alle nachgemessen:**
+
+  | Zustand | Raster | Inhalt | Ergebnis-Spalte |
+  |---|---|---|---|
+  | Wizard | **1300 px, eine Spalte** | 760 px zentriert | verborgen |
+  | beim Erzeugen | dito, Wizard gedimmt | **Ladebalken 760 px** | verborgen |
+  | mit Ergebnis | zurück auf `380px 898px` | wie heute | **sichtbar** |
+
+  **Der Inhalt bleibt auf 760 px zentriert** — eine Formularzeile über
+  1.278 px wäre unlesbar. Dazu größere Reiter (14 px), größere Felder
+  (15 px), ein goldener „Weiter →" und ein **760 px breiter** Erzeugen-Knopf.
+
+  **Der Ladebalken war schon da** (`#genProgress` mit Fortschritt und
+  Schrittmeldungen) — er klebte nur unten in der schmalen Spalte. Jetzt
+  bekommt er die Bühne, und der Wizard dimmt währenddessen ab.
+
+  **Erkennung am vorhandenen Zustand, kein zweiter Merker:** `#resultBody`
+  trägt `hide`, solange kein Bericht vorliegt; `#genProgress` trägt `hide`,
+  solange nicht erzeugt wird. Das ist die Wahrheit der App.
+
   **Als Nächstes:** die Übersicht — Berichtstabelle, Objektwahl und
   Einlesen als Einstieg vor dem Wizard.
 
