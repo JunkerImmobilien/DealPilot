@@ -311,7 +311,26 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       nichtGrund: 'bei Eigentumswohnung nicht anwendbar' },
   ];
 
-  function wert(id) { var e = $(id); return e ? String(e.value || '').trim() : ''; }
+  /* ── v1119-WBED · Bedingungen gegen zerstoerte Felder ────────────────────
+   * zeichnen() entfernt wm-b1/b2/b3, BEVOR block() die wenn:-Funktionen
+   * auswertet. Jede Bedingung, die ein Feld INNERHALB dieser Bloecke liest,
+   * war damit immer falsch — das Feld konnte gar nicht erscheinen.
+   * Gemessen betraf das: hinterlandRent, garagenStufe (beide auch
+   * pflichtWenn!), sanierungsjahr ueber baustatus, brwStichtag, brwAnpGrund.
+   *
+   * _letzte haelt die Werte der gerade entfernten Bloecke. Es wird NUR
+   * waehrend des Neuzeichnens gelesen (_imNeuzeichnen). Ohne diese Sperre
+   * liefe payload() ueber denselben Weg und wuerde abgewaehlte Felder
+   * stillschweigend mitschicken — z. B. mea bei einem Haus. Genau das darf
+   * nicht passieren: fehlt eine Angabe, fehlt sie. */
+  var _letzte = {};
+  var _imNeuzeichnen = false;
+  function wert(id) {
+    var e = $(id);
+    if (e) return String(e.value || '').trim();
+    if (_imNeuzeichnen) return String(_letzte[id] || '').trim();
+    return '';
+  }
   function istWohnung() { return /wohnung|etw/i.test(wert('ptype')); }
   function stufe() {
     try { return parseInt(localStorage.getItem(STUFE_KEY), 10) || 1; } catch (e) { return 1; }
@@ -423,8 +442,16 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     var alt = {};
     ['wm-b1', 'wm-b2', 'wm-b3'].forEach(function (id) {
       var b = $(id);
-      if (b) { b.querySelectorAll('input,select').forEach(function (e) { alt[e.id] = e.value; }); b.remove(); }
+      if (b) {
+        b.querySelectorAll('input,select').forEach(function (e) {
+          alt[e.id] = e.value;
+          _letzte[e.id] = e.value;   /* v1119-WBED: siehe wert() */
+        });
+        b.remove();
+      }
     });
+    _imNeuzeichnen = true;   /* v1119-WBED: ab hier darf wert() auf _letzte zurueckfallen */
+    try {
 
     var anker = $('wm-ampel') || null;
     /* v1017 · Stufe-1-Block: gilt fuer JEDE Stufe, deshalb ohne Bedingung. */
@@ -471,10 +498,23 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
         wo.insertBefore(b3, anker);
       }
     }
+    } finally { _imNeuzeichnen = false; }   /* v1119-WBED */
+
     /* Eingetragenes zurückschreiben — Hochschalten darf nichts verlieren. */
     Object.keys(alt).forEach(function (k) { if ($(k) && alt[k]) $(k).value = alt[k]; });
 
-    ['baustatus', 'mea', 'lzs', 'brwAnp', 'brwAnpGrund', 'sanierungsjahr', 'spMiete', 'brwManuell', 'brwStichtag', 'bgf', 'sachwertfaktor'].forEach(function (id) {
+    /* v1119-WAUS · Die Ausloeserliste war unvollstaendig. Gemessen: ptype
+     * stand NICHT darin, obwohl istWohnung() daran haengt und damit 22
+     * Felder — 17 nur fuer Haeuser (nhkHaus/nhkGeschosse/nhkDach, neun
+     * ausst*, fuenf btl*, sachwertfaktor), zwei nur fuer Wohnungen (mea,
+     * grundriss). Wer die Objektart wechselte, sah die Hausfelder NIE, und
+     * drei davon sind pflichtWenn. Ebenso fehlten die Ausloeser fuer
+     * spMiete (garages/outdoor), grundriss (units) und sanierungsjahr
+     * (cond). hinterlandFlaeche und garagenBgf sind erst seit v1119-WBED
+     * ueberhaupt wirksam. */
+    ['ptype', 'cond', 'units', 'garages', 'outdoor',
+     'hinterlandFlaeche', 'garagenBgf',
+     'baustatus', 'mea', 'lzs', 'brwAnp', 'brwAnpGrund', 'sanierungsjahr', 'spMiete', 'brwManuell', 'brwStichtag', 'bgf', 'sachwertfaktor'].forEach(function (id) {
       var e = $(id);
       if (e && !e._wm) { e._wm = 1; e.addEventListener('change', function () { zeichnen(); ampel(); }); }
     });
