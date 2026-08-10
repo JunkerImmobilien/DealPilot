@@ -199,7 +199,21 @@ async function generate() {
    * Sind die Zahlen sauber, bleibt der Dialog exakt wie vorher. */
   var _w = [];
   try { _w = _mbCheckup(); } catch (e) { try { console.warn('[v951] Checkup:', e.message); } catch (x) {} }
-  var _msg = 'Marktbericht jetzt erstellen?\n\nKosten: 5 L Kerosin – nur wenn ein Marktwert ermittelt wird. Liegen keine Marktdaten vor, wird nichts abgebucht.';
+  /* v1125-stufenpreis: Der Dialog nannte FEST "5 L" — bei Stufe 1 zu viel,
+     bei Stufe 3 zu wenig (12 L). Seit v1125 bucht das Backend drei echte
+     Preise; hier steht jetzt derselbe Wert, der dort berechnet wird.
+     Die Ermaessigung beim Vertiefen kennt nur der Server (die bezahlte
+     Stufe kommt aus dem Kerosin-Log, nie aus dem Browser) — deshalb wird
+     sie als Moeglichkeit genannt, nicht als Zahl behauptet. */
+  var _STUFENPREIS = { 1: 2, 2: 5, 3: 12 };
+  var _st = 2;
+  try { _st = parseInt(window.Wertermittlung.payload().wert_stufe, 10) || 2; } catch (e) {}
+  if (!(_st >= 1 && _st <= 3)) _st = 2;
+  var _preis = _STUFENPREIS[_st];
+  var _msg = 'Marktbericht jetzt erstellen?\n\nKosten: ' + _preis + ' L Kerosin – nur wenn ein Marktwert '
+           + 'ermittelt wird. Liegen keine Marktdaten vor, wird nichts abgebucht.'
+           + '\n\nWurde fuer dieses Objekt schon eine niedrigere Stufe bezahlt, '
+           + 'wird nur die Differenz abgebucht.';
   if (_w.length) {
     _msg = '\u26a0 ' + _w.length + (_w.length === 1 ? ' Angabe sieht' : ' Angaben sehen') + ' ungew\u00f6hnlich aus:\n\n'
          + _w.map(function (x, i) { return (i + 1) + '. ' + x; }).join('\n')
