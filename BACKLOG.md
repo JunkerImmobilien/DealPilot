@@ -58,6 +58,44 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Zahlen erhoben hat (348 px hoch, `#hdr-badges` 251 px) — die passen
    dazu.
 
+   **BLOCKIERT: Der Spalt aus dem Bild ist nicht reproduzierbar.**
+   Gemessen 2026-08-11, angemeldet, Objekt geladen, vier Breiten im
+   gleich-Origin-iframe, jeweils auf- **und** zugeklappte Kopfleiste:
+
+   | Breite | `#hdr-badges` → `nav.tabs` | KPI-Kacheln → `nav.tabs` | links `.sc-main` | links `nav.tabs` |
+   |---|---|---|---|---|
+   | 830 | **1 px** | 11 px | 22 | 0 |
+   | 1024 | **1 px** | 11 px | 282 | 260 |
+   | 1400 | **1 px** | 11 px | 402 | 380 |
+   | 1920 | **1 px** | 11 px | 402 | 380 |
+
+   Der Abstand ist überall **derselbe** und besteht ausschließlich aus dem
+   `padding:10px 22px` von `#hdr-badges`. Auf dem Bild sind es sichtbar
+   **rund 50 px**. Ein Bildschirmfoto meines Standes bei 830 px zeigt die
+   Kacheln direkt über der Reiterleiste — **kein schwarzer Streifen**.
+
+   **Was die Messung dagegen zeigt und was Marcels Beschreibung stützt:**
+   `.sc-main` steht **22 px eingerückt**, die Reiterleiste **bündig bei 0**.
+   Die beiden fluchten also nicht. Genau dasselbe `padding:22px` erzeugt
+   beides — die 22 px links und die 10 px unten.
+
+   **Ein eigener Messfehler, gleich zurückgenommen:** Bei 1400 px meldete
+   ich zuerst einen Spalt von **49 px**. Falsch — `body.hdr-collapsed` war
+   noch von meinem eigenen Zuklapp-Test gesetzt und hatte den Reload
+   überlebt; die Score-Karte stand auf `display:none`, und die 49 px waren
+   schlicht die Höhe der ersten Kopfzeile. **Zustand aus einem früheren
+   Prüfschritt ist eine Fehlerquelle wie jede andere** — vor jeder Messung
+   `body.className` mitlesen.
+
+   **Zwei Fragen an Marcel, bevor irgendetwas geändert wird:**
+   1. **Bei welcher Fensterbreite** ist das Bild entstanden, und war die
+      Seitenleiste dabei ein- oder ausgeklappt? Der Streifen im Bild ist
+      viermal so hoch wie alles, was ich messen kann.
+   2. **Soll die Score-Karte an die Reiterleiste heran** (Einrückung von 22
+      auf 0) oder **die Reiterleiste an die Karte** (0 auf 22)? „Weiter
+      eingerückt" liest sich nach dem Zweiten — dann wandert aber die
+      ganze Reiterleiste, nicht die Karte.
+
 2. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
