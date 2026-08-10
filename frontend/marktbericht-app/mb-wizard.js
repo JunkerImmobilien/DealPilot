@@ -91,7 +91,44 @@
         'color:inherit;border-radius:999px;padding:8px 15px;font:inherit;font-size:12.5px;cursor:pointer}',
       '.mbw-nav button:disabled{opacity:.35;cursor:not-allowed}',
       '.mbw-nav button.weiter{border-color:var(--wl-c9a84c,#C9A84C);color:var(--wl-c9a84c,#C9A84C);font-weight:600}',
-      '.mbw-fuss{border-top:1px solid rgba(128,128,128,.18);padding-top:12px;margin-top:6px}'
+      '.mbw-fuss{border-top:1px solid rgba(128,128,128,.18);padding-top:12px;margin-top:6px}',
+
+      /* ── v1128 · BREIT-MODUS ────────────────────────────────────────────
+         Marcels Befund: „das ist voll klein und gedrueckt — ich dachte, wir
+         bauen einen grossen Wizard." Er hat recht, und es war mein Fehler:
+         ich habe die Reiter in die LINKE SPALTE gequetscht.
+
+         Gemessen: `.grid` steht auf `380px 898px`. Die Formularspalte ist
+         fest 380 px breit, waehrend daneben 898 px leer stehen, solange
+         kein Bericht da ist. Mein eigener Entwurf zeigte den Wizard ueber
+         die volle Breite — umgesetzt hatte ich ihn im alten Korsett.
+
+         Solange kein Ergebnis vorliegt, bekommt der Wizard die ganze
+         Flaeche. Der Inhalt bleibt dabei auf 760 px zentriert: eine
+         Formularzeile ueber 1.278 px waere unlesbar. Sobald das Ergebnis
+         da ist, kommt die zweispaltige Ansicht zurueck — „am Schluss das
+         Ergebnis wie jetzt". */
+      'html.mb-breit .grid{grid-template-columns:1fr !important}',
+      'html.mb-breit #resultPanel{display:none !important}',
+      'html.mb-breit .panel{max-width:none}',
+      'html.mb-breit #wm-ziel,html.mb-breit .mbw-reiter,html.mb-breit .mbw-blatt,',
+        'html.mb-breit .mbw-nav,html.mb-breit .mbw-fuss{max-width:760px;margin-left:auto;margin-right:auto}',
+      'html.mb-breit .mbw-r{font-size:14px;padding:13px 20px}',
+      'html.mb-breit .mbw-kurz{max-width:760px;margin-left:auto;margin-right:auto;font-size:12px}',
+      'html.mb-breit input:not([type=checkbox]):not([type=radio]),html.mb-breit select{',
+        'font-size:15px;padding:11px 12px}',
+      'html.mb-breit label{font-size:13px}',
+      /* Der Weiter-Knopf traegt den Weg — er darf gross sein. */
+      'html.mb-breit .mbw-nav{display:flex;gap:10px;padding-top:6px}',
+      'html.mb-breit .mbw-nav button{padding:12px 26px;font-size:14px}',
+      'html.mb-breit .mbw-nav button.weiter{background:linear-gradient(110deg,',
+        'var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));',
+        'color:#2c2410;border-color:transparent}',
+      'html.mb-breit #goBtn{width:100%;padding:15px 20px;font-size:15px}',
+      /* Der Ladebalken bekommt die Buehne, statt unten zu kleben. */
+      'html.mb-breit #genProgress{max-width:760px;margin:18px auto 0;padding:18px 20px}',
+      'html.mb-erzeugt .mbw-reiter,html.mb-erzeugt .mbw-blatt,html.mb-erzeugt .mbw-nav{',
+        'opacity:.35;pointer-events:none;transition:opacity .3s}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -206,11 +243,31 @@
     _plan = setTimeout(function () { einraeumen(); zeige(_aktiv); }, 120);
   }
 
+  /* ── v1128 · Breit, solange kein Ergebnis da ist ──────────────────────
+     Erkennung am vorhandenen Zustand, nicht an einem eigenen Merker:
+     `#resultBody` traegt die Klasse `hide`, solange kein Bericht vorliegt
+     (app.js). Das ist die Wahrheit der App — ein zweiter Merker waere eine
+     zweite Wahrheit. */
+  function ergebnisDa() {
+    var rb = id('resultBody');
+    return !!(rb && !rb.classList.contains('hide'));
+  }
+  function erzeugtGerade() {
+    var p = id('genProgress');
+    return !!(p && !p.classList.contains('hide'));
+  }
+  function breiteSetzen() {
+    var w = document.documentElement;
+    w.classList.toggle('mb-breit', !ergebnisDa());
+    w.classList.toggle('mb-erzeugt', erzeugtGerade() && !ergebnisDa());
+  }
+
   function start() {
     if (!id('wm-ziel')) { setTimeout(start, 400); return; }
     if (!bauen()) { setTimeout(start, 400); return; }
     einraeumen();
     zeige(1);
+    breiteSetzen();
     /* zeichnen() setzt wm-b1/b3 neu in die Panel-Spalte — zurueckholen. */
     try {
       new MutationObserver(function (muts) {
@@ -218,6 +275,13 @@
           if (muts[i].target === _panel && muts[i].addedNodes.length) { angestossen(); return; }
         }
       }).observe(_panel, { childList: true });
+    } catch (e) {}
+    /* Ergebnis und Ladebalken beobachten — beide schalten die Breite. */
+    try {
+      var beob = new MutationObserver(function () { breiteSetzen(); });
+      var rb = id('resultBody'), gp = id('genProgress');
+      if (rb) beob.observe(rb, { attributes: true, attributeFilter: ['class'] });
+      if (gp) beob.observe(gp, { attributes: true, attributeFilter: ['class'] });
     } catch (e) {}
     /* Die Reiter-Haken folgen der erreichten Stufe. */
     document.addEventListener('change', function () { setTimeout(function () { zeige(_aktiv); }, 250); }, true);
