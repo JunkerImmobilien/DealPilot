@@ -194,12 +194,38 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 3. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
-   prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
-   kein Defekt — Entwurf gehört nach `design/Vorschläge/`, sonst wäre es
-   geraten. **Ein gemessener Befund gehört hierher:** auf 820 px ist die
-   Kopfleiste **589 px** hoch, `#hdr-badges` allein 492 px, weil die fünf
-   KPI-Pillen dort zu je zwei umbrechen (W43). Bewusst nicht angefasst,
-   weil der Score auf dem Tablet bleiben soll.
+   prüfen. Der Score bleibt auf dem Tablet.
+
+   **Entwurf steht: `design/Vorschläge/tablet-fassung.md`** (2026-08-10,
+   gemessen bei 820 × 1180 im gleich-Origin-iframe).
+   **BLOCKIERT auf zwei Entscheidungen** — A (ab welcher Breite dockt die
+   Sidebar an) und B (wie wird der Score flacher). B braucht ein **Bild**,
+   weil es die auffälligste Fläche der App betrifft.
+
+   **Zwei Angaben dieses Punktes waren überholt und sind ersetzt:**
+
+   | stand hier | gemessen 2026-08-10 |
+   |---|---|
+   | Kopfleiste **589 px** | **348 px** — 41 % weniger |
+   | `#hdr-badges` **492 px** | **251 px** |
+   | „die fünf KPI-Pillen brechen zu je zwei um" (W43) | **falsch** — `.scores` ist `grid` mit `nowrap`, die fünf Pillen stehen **nebeneinander**, je 149 × 103 px |
+
+   **Der eigentliche Befund ist ein anderer:** das Tablet bekommt die
+   **Handy-Fassung, nur breiter**. Die Sidebar steht `position:fixed` bei
+   `left:-380px`, `.main-col` nimmt die vollen **820 px** für eine Spalte.
+   Für den Inhalt bleiben **776 von 1180 px** — die Kopfleiste frisst
+   29,5 % des Schirms.
+
+   **Ein eigener Rechenfehler, im Entwurf gleich zurückgenommen:** Ich
+   hatte für „Pillen neben den Hauptblock" 121 px geschätzt. Falsch —
+   zwei Pillenreihen sind `2 × 103 + 7 = 213` px und damit **höher als der
+   121-px-Hauptblock**. Die Umstellung allein spart **18 px**, nicht 130.
+   **Die Höhe des Blocks bestimmt die Pille, nicht der Hauptblock**; der
+   Gewinn (~110 px) kommt erst mit der flacheren Pille dazu.
+
+   **Die Admin-Oberfläche ist nicht gemessen** — sie hängt an einem
+   Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
+   dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
 4. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
