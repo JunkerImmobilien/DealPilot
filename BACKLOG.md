@@ -37,29 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Marktbericht: neun bis zehn Gestaltungsideen als Mockups.** Der
-   Bericht sieht optisch nicht gut aus. Marcels Richtung: **mehrere
-   Stufen**, möglicherweise ein **Wizard im Arbeitsbereich**, den man mit
-   mehreren Reitern durchklickt. Nach `design/Vorschläge/`, als HTML zum
-   Anklicken — nicht als Beschreibung.
-
-   **Erst messen, dann entwerfen:** wie viele Felder sind es heute, wie
-   sind sie gruppiert, welche hängen voneinander ab (die `wenn:`-Felder
-   `garagenStufe` und `hinterlandRent` erscheinen nur nach echter
-   Nutzereingabe). Ein Wizard, der eine bestehende Abhängigkeit übersieht,
-   verliert Eingaben.
-
-   **Zwei feste Randbedingungen für jeden Entwurf:** die Marktbericht-App
-   ist **immer hell** und lädt `whitelabel-override.js` **nicht** — was
-   dort an Farbe hineinkommt, muss über `mb-whitelabel.js` laufen. Und
-   `payload()` in `wertermittlung.js` bleibt die Sammelstelle: eine neue
-   Oberfläche darf die Feldnamen nicht ändern, sonst hängt der ganze
-   Rechenkern daran.
-
-   **Auswahl trifft Marcel**, nicht ich. Neun bis zehn Ideen heißt neun bis
-   zehn ernsthafte, nicht sieben Varianten derselben.
-
-2. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
+1. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
    Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
    ein **Kettenbefund, kein Optikbefund**, und die Kette wird von hinten
    aufgerollt: was steht im Objekt (`objects.data`), was kommt beim
@@ -68,7 +46,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    füllen** — fehlt eine Angabe, gehört sie sichtbar als fehlend
    ausgewiesen.
 
-3. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+2. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -88,10 +66,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    und zwar über DOM-Ids. Was dort fehlt, rechnet im Bericht mit und ist im
    gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
    Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
-   **Hängt mit Punkt 1 zusammen** — wer die Felder für einen Wizard neu
+   **Hängt mit dem Marktbericht-Vorschlag zusammen** — wer die Felder für einen Wizard neu
    gruppiert, hat den Abgleich ohnehin gemacht.
 
-4. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
+3. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
    `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
    v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
    ist genau seine Voreinstellung.
@@ -110,7 +88,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    nur nicht dort, wo er sein Branding einstellt. Es fehlt keine Funktion,
    es sind **zwei Oberflächen für dieselbe Sache**. Genau das ist Weg B.
 
-5. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
+4. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
    Der Rest von „Darstellung → Profil und Anzeige ist unvollständig",
    nachdem der Kontrastfehler mit `v1113` behoben ist. **Der Abgleich
    steht** (2026-08-08, im Panel gezählt): acht Farbfelder, davon **fünf
@@ -126,7 +104,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Produktfrage: gibt der Regler die Farbe frei, oder nur innerhalb dessen,
    was noch trägt? **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-6. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -140,7 +118,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
    kein Nachschlag.
 
-7. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
    kein Defekt — Entwurf gehört nach `design/Vorschläge/`, sonst wäre es
@@ -149,7 +127,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    KPI-Pillen dort zu je zwei umbrechen (W43). Bewusst nicht angefasst,
    weil der Score auf dem Tablet bleiben soll.
 
-8. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -202,6 +180,81 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-10] **Marktbericht: zehn Gestaltungsideen** — Vorschlag
+  `design/Vorschläge/marktbericht-gestaltung-10-ideen.html` (`d69ba74`),
+  dazu `v1119` (`d9e83a2`).
+  **BLOCKIERT auf Marcels Auswahl** — der Punkt sagt es selbst: „Auswahl
+  trifft Marcel, nicht ich."
+
+  ### Erst gemessen, wie der Punkt es verlangte
+
+  | | gemessen |
+  |---|---|
+  | Felder im Katalog | **42** — `stufe1` 1 · `stufe2` 1 · `stufe3` 34 · `experte` 6 |
+  | sichtbare Eingaben (Stufe 3) | **46** |
+  | davon **bedingt** | **27 von 42** |
+  | Seitenhöhe Stufe 3 | **4.608 px** in einer **338 px** breiten Spalte |
+  | Fläche rechts daneben | **rund 730 px leer**, bis ein Bericht da ist |
+
+  **`istWohnung()` spaltet den Katalog:** 17 Felder nur für Häuser
+  (`nhkHaus`/`nhkGeschosse`/`nhkDach` + neun `ausst*` + fünf `btl*`), plus
+  `sachwertfaktor`; 2 nur für Wohnungen (`mea`, `grundriss`).
+
+  ### Das Messen hat zwei echte Defekte gefunden — `v1119`
+
+  **Die Annahme des Punktes ist widerlegt.** Er sagte, `garagenStufe` und
+  `hinterlandRent` „erscheinen nur nach echter Nutzereingabe". Gemessen:
+  **sie erschienen überhaupt nicht.** Zwei getrennte Ursachen:
+
+  - **Die Bedingung wurde gegen ein gelöschtes Feld geprüft** (v1119-WBED).
+    `zeichnen()` entfernt `wm-b1/b2/b3`, **bevor** `block()` die
+    `wenn:`-Funktionen auswertet. `wert(id)` liest per `getElementById` —
+    das Element ist weg, also kommt immer `""` zurück. Betroffen:
+    `hinterlandRent`, `garagenStufe`, `sanierungsjahr`, `brwStichtag`,
+    `brwAnpGrund`. **`garagenStufe` und `hinterlandWert` sind
+    `pflichtWenn`** — Pflichtfelder, die nie auftauchen konnten.
+  - **Der Auslöser fehlte** (v1119-WAUS). `ptype` stand nicht in der Liste
+    der Felder, deren `change` neu zeichnet. Objektart von ETW auf EFH →
+    **19 Felder, unverändert**; erst ein erzwungenes `neuZeichnen()`
+    brachte die 17 Hausfelder und nahm `mea` weg. Wer ein Haus bewertete,
+    sah **drei Pflichtfelder nie** — ohne sie rechnet der Sachwert nicht.
+
+  Behoben über `_letzte` (die Werte der gerade entfernten Blöcke), das
+  **nur während des Neuzeichnens** gelesen wird (`_imNeuzeichnen`,
+  `try/finally`). **Ohne diese Sperre liefe `payload()` über denselben Weg**
+  und würde abgewählte Felder still mitschicken — genau das, was der
+  Backlog verbietet.
+
+  **Nachgemessen:** Typwechsel ETW→EFH bringt alle 17 Hausfelder und nimmt
+  `mea`; `hinterlandFlaeche=250` bringt `hinterlandRent`; `garagenBgf=64.58`
+  bringt `garagenStufe` **mit Pflichtmarke**; die Auslöserwerte bleiben
+  erhalten. **Gegenprobe: `mea_pct` ist beim Haus `null`** — kein
+  abgewählter Wert gerät in `payload()`.
+
+  *(Ein eigener Messfehler, zurückgenommen: mein erster Garagentest setzte
+  `64,58` mit Komma in ein `type="number"`-Feld. Der Browser verwirft das
+  und liefert `""` — es sah nach einem Fehler im Code aus, war aber mein
+  Testwert.)*
+
+  ### Die zehn Ideen
+
+  Wizard mit Reitern · zwei Spalten mit lebender Vorschau · verfahrens­
+  getrieben · Akkordeon mit Ampel · ein Feld pro Bild · sichtbarer Zweig ·
+  Datenblatt · Checkliste mit Sprungmarken · Kartenstapel · Co-Pilot fragt.
+  Alle zehn anklickbar, im Browser durchgeklickt: **keine Konsolenfehler,
+  kein Querlauf**, jede Demo reagiert.
+
+  **Meine Empfehlung, kurz:** es sind nicht zehn Alternativen, sondern zwei
+  Entscheidungen. **Ablauf** = 1 oder 9, beide mit dem Zweig aus 6 als
+  Schritt 1. **Fläche** = 2 — die 730 leeren Pixel sind das Auffälligste am
+  Bericht, und keine Umsortierung der Felder ändert daran etwas. 7 gehört
+  als Umschalter daneben, 4 ist der ehrliche Zwischenschritt.
+
+  **Vier Fragen stehen im Dokument offen**, zwei davon blockieren: bleiben
+  die drei Stufen neben einem Wizard, und woher kommt die Zahl in der
+  Vorschau (eine erfundene Zwischenrechnung wäre schlimmer als eine leere
+  Fläche).
 
 - [2026-08-10] **MA-Serie ausgebaut, normale Ansicht fürs Handy frei** —
   `v1118` (`6a7d044`), `v1118b` (`3ab3279`), `v1118c` (`9db60e6`).
@@ -527,7 +580,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   unter einer hellen Vorlage wäre ein Bruch, kein Branding.
 
   **Nicht behoben, weil kein Defekt:** „zu wenig Farben zur Auswahl". Die
-  Gegenüberstellung steht jetzt bei Punkt 4 (Partner-Flow B) — der Partner
+  Gegenüberstellung steht jetzt bei Punkt 3 (Partner-Flow B) — der Partner
   kann seinen Mandanten längst **zehn** Farben vorgeben, nur nicht dort,
   wo er sein Branding einstellt.
 
@@ -549,7 +602,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Im Panel gezählt: **acht Farbfelder — fünf für Flächen, drei für Text.**
   Für Score-Karte und KPI-Karten gibt es eine Fläche, aber keinen Text.
   Das ist Marcels „die Schriftfarbe lässt sich nicht setzen", und es
-  bleibt als **Ausbau** offen (jetzt Punkt 5). Der Kontrastfehler selbst
+  bleibt als **Ausbau** offen (jetzt Punkt 4). Der Kontrastfehler selbst
   ist damit aber nicht erklärt — der hat eine eigene Ursache.
 
   ### Die Ursache
@@ -630,7 +683,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Die verbleibende 1 ist `hdr-obj-num` (2,98 bzw. 2,88) und **nicht** Teil
   dieser Arbeit: die v1097-Schwelle rechnet gegen Weiß, kanzlei und
   boarding haben aber cremefarbenen Grund. v1097 hat das selbst so
-  vermerkt. Steht jetzt als eigener Punkt 6.
+  vermerkt. Steht jetzt als eigener Punkt 5.
 
   Ungeprüfte Elemente in jedem Lauf: **0**.
 
