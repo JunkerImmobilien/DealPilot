@@ -143,6 +143,40 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
    kein Nachschlag.
 
+   **Vorbefund 2026-08-10 — die Annahme des Punktes stimmt so nicht.**
+   Angefangen zu messen, dann bewusst abgebrochen und übergeben, weil der
+   erste Wert der Beschreibung widerspricht. Gemessen ohne Vorlage,
+   Partner-Konto, über den Kaskaden-Walker:
+
+   - Gewinner für `#hdr-obj-num` ist
+     `header.hdr.has-v64-score #hdr-obj-num{color:var(--gold-2,#E8C964)!important}`
+     — also **`--gold-2`, nicht `--gold-d`.** Die 19 `--gold-d`-Stellen
+     mögen ihr eigenes Problem haben, aber **dieses** Element hängt nicht
+     daran. Vor dem Bauen also erst prüfen, welcher Ton in **kanzlei** und
+     **boarding** tatsächlich gewinnt.
+   - **`--gold-d` wird im Gold-Zweig gar nicht gesetzt** (`config.js`
+     ~Z. 1072–1074): dort stehen `--gold`, `-hi`, `-lo`, `-l`, `-2`, `-3`
+     und `-bg`, aber kein `-d`. Nur der Whitelabel-Zweig (Z. 1085) setzt
+     es über `tonAufHell()`. Das erklärt, warum der Befund gerade mit
+     **Standard-Gold** auftrat und mit Partner-Rot sauber war — nicht
+     „weil der Ton dort nachgezogen wird", sondern weil er dort überhaupt
+     erst gesetzt wird.
+   - **`tonFuerGrund(farbe, grund, min)` gibt es seit v1113 bereits** und
+     rechnet gegen einen beliebigen Grund. Der Baustein für die Lösung ist
+     also da; es fehlt die Zuordnung „welche Vorlage hat welchen Grund".
+
+   **Eigener Messfehler, gleich mit vermerkt:** Mein Grund-Leser lief die
+   Vorfahren hoch und nahm die erste `background-color` ≠ transparent. Die
+   Kopfleiste trägt aber einen **Verlauf** (`background-image`), keine
+   Farbe — der Leser übersprang sie und meldete Weiß. **Ein Grund-Leser,
+   der `background-image` nicht auswertet, taugt für diesen Punkt nicht.**
+
+   **Nächster Schritt:** die sechs Fassungen über den echten Bedienweg
+   (Panel-Klicks, danach `getAnimations().forEach(a=>a.finish())`) setzen
+   und je Fassung den *effektiven* Grund samt Verlauf auslesen. Erst
+   danach entscheiden, ob der Ton über `--gold-2`, `--gold-d` oder einen
+   eigenen `--uv-num-*` läuft.
+
 5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
