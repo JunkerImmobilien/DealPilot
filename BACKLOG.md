@@ -94,23 +94,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
    JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
 
-2. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
-   Der Rest von „Darstellung → Profil und Anzeige ist unvollständig",
-   nachdem der Kontrastfehler mit `v1113` behoben ist. **Der Abgleich
-   steht** (2026-08-08, im Panel gezählt): acht Farbfelder, davon **fünf
-   für Flächen** (Kopfleiste + Logo, Objektleiste + Band, Score-Karte,
-   KPI-Karten, Objektkarten) und **drei für Text** (Text, Tab-Texte,
-   Objektkarten-Text). Für Score-Karte und KPI-Karten gibt es also eine
-   Fläche, aber keinen Text — genau Marcels „die Schriftfarbe lässt sich
-   nicht setzen".
-
-   **Ausbau, kein Defekt** — deshalb hinter den Defekten. Die Lesbarkeit
-   stellt seit `v1113` die Ableitung `--uv-sc-*` sicher; ein Regler müsste
-   sie überstimmen dürfen, ohne sie auszuhebeln. Genau das ist die
-   Produktfrage: gibt der Regler die Farbe frei, oder nur innerhalb dessen,
-   was noch trägt? **→ Demo nach `design/Vorschläge/`, nicht raten.**
-
-3. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+2. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -158,7 +142,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    danach entscheiden, ob der Ton über `--gold-2`, `--gold-d` oder einen
    eigenen `--uv-num-*` läuft.
 
-4. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+3. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
    kein Defekt — Entwurf gehört nach `design/Vorschläge/`, sonst wäre es
@@ -167,7 +151,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    KPI-Pillen dort zu je zwei umbrechen (W43). Bewusst nicht angefasst,
    weil der Score auf dem Tablet bleiben soll.
 
-5. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+4. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -220,6 +204,56 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-10] **Textfarben für Score-Karte und KPI-Karten** — Demo
+  `design/Vorschläge/textfarben-score-kpi.html`.
+  **BLOCKIERT auf Marcels Auswahl** — der Punkt verlangt genau das
+  („Demo nach `design/Vorschläge/`, nicht raten").
+
+  **Der Abgleich bestätigt sich, nachgezählt statt übernommen** (Panel
+  geöffnet, Partner-Konto): **acht Farbfelder, fünf Flächen und drei
+  Texte.** Für **Objektkarten** gibt es beides — Fläche *und* Text
+  (`_dpDispObjText`). Für Score-Karte und KPI-Karten nur die Fläche. Es ist
+  also eine **Lücke im Muster**, keine in der Logik: die Vorlage für so
+  einen Regler steht längst daneben.
+
+  ### Warum es nicht einfach ein neunter Regler ist
+
+  Seit `v1113` leitet `tonAufMarke()` fünf Tokens gegen **alle drei
+  Verlaufsstopps** der Markenfläche ab. Das war nötig, weil die Score-Karte
+  unter jeder hellen Vorlage zur Markenfläche wird — bei Gold hell, bei
+  Partner-Rot dunkel. Ein Regler, der das einfach überschreibt, macht
+  denselben Fehler wieder, nur auf Wunsch des Nutzers.
+
+  ### Drei Antworten, alle anklickbar
+
+  | | A · Frei | B · Geführt | C · Frei mit Warnung |
+  |---|---|---|---|
+  | Regler tut, was er sagt | **ja** | nein | **ja** |
+  | Unlesbares möglich | ja | **nein** | ja, aber sichtbar |
+  | Neuer Rechenweg nötig | nein | nein — `tonFuerGrund()` | nein |
+  | Schützt die Mandanten des Partners | nein | **ja** | nein |
+  | Aufwand | **klein** | klein | mittel |
+
+  **Im Browser durchgeklickt, gemessen:** Kontrastformel gegen bekannte
+  Werte geprüft (Schwarz auf Weiß **21,00**, gleiche Farbe **1,00**).
+  Wunschton `#B39445` auf Gold: **A lässt ihn bei k=1,27 stehen** — das ist
+  genau der v1113-Zustand, Gold auf Gold. **B zieht ihn auf `#543700`,
+  k=4,78**, Farbton bleibt. **C:** vorher 1,27, nach einem Klick 4,78.
+  Kein Querlauf, keine Konsolenfehler.
+
+  **Meine Empfehlung: B für den Partner, C für den einzelnen Nutzer.** Die
+  Zeile „schützt die Mandanten" ist der Unterschied, der zählt — wer nur
+  für sich einstellt, darf sich vertun; wer für alle seine Mandanten
+  einstellt, entscheidet für Leute, die es nicht korrigieren können.
+  Technisch **ein** Regler mit einem Schalter, nicht zwei Bauwerke: in der
+  Mandanten-Ansicht läuft er zusätzlich durch `tonFuerGrund()`. Das passt
+  genau zu `v1122`.
+
+  **Vier Fragen stehen im Dokument offen**, u. a. ob es ein Regler oder
+  zwei werden und ob die Nebentöne (`--uv-sc-mut`, `-ok`) mitgezogen
+  werden. **Vorschlag dort: sie bleiben abgeleitet** — Statusfarben werden
+  nie tokenisiert.
 
 - [2026-08-10] **Partner-Flow B: drei Freiheitsstufen je Partner** —
   `v1122` (`ad95ec9`). Aus
@@ -765,7 +799,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Im Panel gezählt: **acht Farbfelder — fünf für Flächen, drei für Text.**
   Für Score-Karte und KPI-Karten gibt es eine Fläche, aber keinen Text.
   Das ist Marcels „die Schriftfarbe lässt sich nicht setzen", und es
-  bleibt als **Ausbau** offen (jetzt Punkt 2). Der Kontrastfehler selbst
+  bleibt als **Ausbau** offen (Demo steht, siehe Fertig). Der Kontrastfehler selbst
   ist damit aber nicht erklärt — der hat eine eigene Ursache.
 
   ### Die Ursache
@@ -846,7 +880,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Die verbleibende 1 ist `hdr-obj-num` (2,98 bzw. 2,88) und **nicht** Teil
   dieser Arbeit: die v1097-Schwelle rechnet gegen Weiß, kanzlei und
   boarding haben aber cremefarbenen Grund. v1097 hat das selbst so
-  vermerkt. Steht jetzt als eigener Punkt 3.
+  vermerkt. Steht jetzt als eigener Punkt 2.
 
   Ungeprüfte Elemente in jedem Lauf: **0**.
 
