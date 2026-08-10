@@ -2297,7 +2297,11 @@ body[data-dp-kpitext] #hdr-badges .sc-pill-v {
    Toene; ist sie dunkel, greift diese Regel. */
 html body #hdr-badges .sc-l,
 html body #hdr-badges .sc-tip {
-  color: var(--uv-sc-akz, var(--gold)) !important;
+  /* v1123: Nutzerebene auch HIER davor. Gemessen — ohne das wirkte der
+     Regler nur unter hellen Vorlagen, weil diese Regel (1,1,2) die
+     Hell-Skin-Regel gar nicht braucht und immer greift. Ein Regler, der
+     ohne Vorlage nichts tut, ist ein kaputter Regler. */
+  color: var(--dp-hero-text-sm, var(--uv-sc-akz, var(--gold))) !important;
 }
 
 /* EIGENER FEHLER, ZURUECKGENOMMEN (v1113f):
@@ -2310,7 +2314,9 @@ html body #hdr-badges .sc-tip {
    Die Regel gilt deshalb nur ausserhalb des Hell-Skins. Kein :not() auf
    einer ID (CLAUDE.md), nur auf der Skin-Klasse. */
 html body:not(.dp-chrome-hell) #hdr-badges .sc-pill-v {
-  color: var(--uv-sc-akz, var(--gold)) !important;
+  /* v1123: dito. Diese Regel steht bei (1,2,2) und schlug meine
+     Kennzeichen-Regel (1,2,1) — gemessen, nicht vermutet. */
+  color: var(--dp-kpi-text-lg, var(--uv-sc-akz, var(--gold))) !important;
 }
 
 
