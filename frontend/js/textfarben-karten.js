@@ -62,10 +62,30 @@
       return /^#[0-9a-fA-F]{6}$/.test(a) ? a : '#C9A84C';
     } catch (e) { return '#C9A84C'; }
   }
+  /* v1123d · GEGEN WELCHEN GRUND gerechnet wird, entscheidet der Skin.
+     Erst falsch gebaut, dann gemessen: ich hatte immer gegen die
+     MARKENFLAECHE gerechnet. Die Score-Karte ist aber nur unter einer
+     HELLEN Vorlage eine Markenflaeche (body.dp-chrome-hell) — sonst sitzt
+     sie auf dem dunklen Chrome. Folge: Gold auf dunklem Grund traegt
+     (k ueber 8), meine Warnung rechnete es aber gegen Gold und meldete
+     trotzdem nichts, weil tonAufMarke den Startwert unveraendert
+     zurueckgab. Zwei Fehler, die sich gegenseitig verdeckt haben.
+
+     Dieselbe Zweiteilung macht v1113 selbst: Hell-Skin-Regeln gegen die
+     Marke, Gegenrichtungs-Regeln gegen #1A1D22 (_GRUND_DUNKEL). */
+  var GRUND_DUNKEL = '#1A1D22';
+  function hellSkin() {
+    try { return !!(document.body && document.body.classList.contains('dp-chrome-hell')); }
+    catch (e) { return false; }
+  }
   function tonAufMarke(farbe, min) {
     try {
-      if (window.DPC && DPC.branding && DPC.branding.tonAufMarke)
-        return DPC.branding.tonAufMarke(akzent(), farbe, min);
+      if (window.DPC && DPC.branding) {
+        if (hellSkin() && DPC.branding.tonAufMarke)
+          return DPC.branding.tonAufMarke(akzent(), farbe, min);
+        if (DPC.branding.tonFuerGrund)
+          return DPC.branding.tonFuerGrund(farbe, GRUND_DUNKEL, min);
+      }
     } catch (e) {}
     return farbe;
   }
