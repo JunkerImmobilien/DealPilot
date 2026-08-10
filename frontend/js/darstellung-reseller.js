@@ -39,6 +39,11 @@
     ['dp_kpi_ui',      function (v) { call('_dpDispKpi', v); },    '#F6F2E9'],
     ['dp_obj_ui',      function (v) { call('_dpDispObj', v); },    '#F6F2E9'],
     ['dp_objtext_ui',  function (v) { call('_dpDispObjText', v); }, ''],
+    /* v1123 · Die zwei neuen Kartentext-Regler. Ohne sie im MAP kaeme die
+       Farbe beim Mandanten nicht an — dieselbe Luecke wie ui_theme & Co.
+       bei v1111. Leerer Vorgabewert: keine Farbe heisst "abgeleitet". */
+    ['dp_herotext_ui', function (v) { call('_dpDispHeroText', v); }, ''],
+    ['dp_kpitext_ui',  function (v) { call('_dpDispKpiText', v); }, ''],
     ['dp_tabtext_ui',  function (v) { call('_dpDispTabText', v); }, ''],
     ['dp_card_ui',     function (v) { call('_dpDispCard', v); },   ''],
     ['dp_accent_ui',   function (v) { call('_dpDispAccent', v); }, '#C9A84C'],

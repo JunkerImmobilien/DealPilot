@@ -2182,7 +2182,8 @@ html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbcm .sbcm-label {
    html[data-ui-theme="…"] body header.hdr .sc-grade (0,3,3, !important) —
    die ID zaehlt hoeher als drei Klassen. */
 body.dp-chrome-hell #hdr-badges .sc-l {
-  color: var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06)) !important;
+  /* v1123: Nutzerebene davor, Ableitung bleibt der Rueckfall. */
+  color: var(--dp-hero-text-sm, var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06))) !important;
 }
 body.dp-chrome-hell #hdr-badges .sc-sub {
   color: var(--uv-sc-mut, color-mix(in srgb, var(--gold) 40%, #0b0a06)) !important;
@@ -2198,7 +2199,7 @@ body.dp-chrome-hell #hdr-badges .sc-grade {
    (#99803a auf Gold). Die Ausgangszahl war also 14, nicht 13.
    .sc-tip traegt die Akzentrolle wie .sc-l und bekommt denselben Ton. */
 body.dp-chrome-hell #hdr-badges .sc-tip {
-  color: var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06)) !important;
+  color: var(--dp-hero-text-sm, var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06))) !important;   /* v1123 */
 }
 
 /* .sc-v ist der Hauptwert der Karte ("Gute Bewertung"). Bei Standard-Gold
@@ -2208,7 +2209,7 @@ body.dp-chrome-hell #hdr-badges .sc-tip {
    mit neutralem Start (Weiss) und Schwelle 7 — der prominenteste Text der
    Karte soll nicht nur knapp bestehen. */
 body.dp-chrome-hell #hdr-badges .sc-v {
-  color: var(--uv-sc-txt, #1c1a17) !important;
+  color: var(--dp-hero-text-sm, var(--uv-sc-txt, #1c1a17)) !important;   /* v1123 */
 }
 
 /* .sc-investor-badge — der Fall aus der GEGENRICHTUNG, in "konsole"
@@ -2221,14 +2222,63 @@ body.dp-chrome-hell #hdr-badges .sc-v {
    aendert das den funktionierenden Zustand praktisch nicht (ohne Vorlage
    6,24 -> 6,07), beseitigt aber die Vorlagenabhaengigkeit ganz. */
 html body #hdr-badges .sc-investor-badge {
-  color: var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06)) !important;
+  color: var(--dp-hero-text-sm, var(--uv-sc-ink, color-mix(in srgb, var(--gold) 26%, #0b0a06))) !important;   /* v1123 */
 }
+/* ═══════════════════════════════════════════════════════════════════════
+   v1123-kartentext · Der Nutzerregler kommt VOR die Ableitung, nicht
+   statt ihr. Drei Ebenen, das Muster aus v1096b um eine erweitert:
+
+     var(--dp-hero-text-*, var(--uv-sc-*, <Rueckfall fuer Standard-Gold>))
+       1. Nutzerwert    gesetzt vom Regler (textfarben-karten.js)
+       2. Ableitung     tonAufMarke() aus v1113
+       3. Rueckfall     der fuer Standard-Gold richtige Wert
+
+   -lg gilt fuer GROSSEN Text (>= 18,5 px fett bzw. >= 24 px, WCAG 1.4.3),
+   -sm fuer normalen. Gemessen: .sc-v ist 16 px fett und damit NORMAL,
+   die Score-Zahl 21 px fett und damit gross.
+
+   NICHT dabei, und zwar mit Absicht (Marcels Entscheidung): .sc-sub
+   (--uv-sc-mut) und .sc-grade (--uv-sc-ok). Nebentoene und Statusfarben
+   bleiben abgeleitet — Statusfarben werden nie tokenisiert.
+
+   GEMESSEN, und es hat meine erste Fassung korrigiert: die Score-ZAHL
+   („83", 21 px fett) sitzt WEISS im Donut-Ring (.sc-donut > span, ohne
+   Klasse) und damit gar nicht auf der Markenflaeche. Sie gehoert nicht zu
+   diesem Regler. In der Score-Karte ist damit KEIN Text „gross" im Sinne
+   der Norm — .sc-v ist 16 px fett, also normal. Der -lg-Ton wird dort
+   folglich nie gebraucht; gebraucht wird er nur bei den KPI-Pillenwerten
+   (22 px fett).
+
+   Die Regeln der Score-Karte sind oben an Ort und Stelle um die
+   Nutzerebene ergaenzt, statt hier ein zweites Mal zu stehen — zwei
+   Regeln fuer dieselbe Sache waeren genau die Doppel-Wahrheit, die
+   v1096b gekostet hat.
+   ═══════════════════════════════════════════════════════════════════════ */
+
 /* Die weissen KPI-Pillen — unabhaengig von der Marke. */
 body.dp-chrome-hell #hdr-badges .sc-pill-l {
   color: #6f685d !important;
 }
 body.dp-chrome-hell #hdr-badges .sc-pill-sub {
   color: #7d766a !important;
+}
+
+/* v1123 · Die KPI-Pillen bekommen ihre Nutzerfarbe ueber ein KENNZEICHEN
+   am body, nicht ueber einen var()-Rueckfall.
+   Grund, gemessen: .sc-pill-v hat in diesem Block gar keine eigene Regel —
+   seine Farbe kommt von woanders. Ein `var(--token, inherit)` haette den
+   Wert ohne Nutzerfarbe VERAENDERT, also den Normalzustand angefasst, um
+   einen Sonderfall zu bedienen. Mit dem Kennzeichen greift die Regel
+   ueberhaupt erst, wenn eine Farbe gesetzt ist — ohne sie bleibt alles
+   bitgenau wie vorher.
+   -lg fuer den Wert (22 px fett = grosser Text, WCAG 3,0),
+   -sm fuer Label und Unterzeile (10 px = normal, WCAG 4,5). */
+body[data-dp-kpitext] #hdr-badges .sc-pill-l,
+body[data-dp-kpitext] #hdr-badges .sc-pill-sub {
+  color: var(--dp-kpi-text-sm) !important;
+}
+body[data-dp-kpitext] #hdr-badges .sc-pill-v {
+  color: var(--dp-kpi-text-lg) !important;
 }
 
 /* v1113e · Die GEGENRICHTUNG: Markenakzent auf dunklem Grund.

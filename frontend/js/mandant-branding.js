@@ -162,6 +162,11 @@
         dp_kpi_ui: function (v) { c('_dpDispKpi', v); },
         dp_obj_ui: function (v) { c('_dpDispObj', v); },
         dp_objtext_ui: function (v) { c('_dpDispObjText', v); },
+        /* v1123 · Kartentexte gehoeren zur MARKE, nicht zum Komfort — sie
+           stehen deshalb in MAP und gelten bei jedem Laden (Stufe keine
+           und komfort), nicht nur einmal. */
+        dp_herotext_ui: function (v) { c('_dpDispHeroText', v); },
+        dp_kpitext_ui: function (v) { c('_dpDispKpiText', v); },
         dp_tabtext_ui: function (v) { c('_dpDispTabText', v); },
         dp_card_ui: function (v) { c('_dpDispCard', v); },
         dp_accent_ui: function (v) { c('_dpDispAccent', v); },
