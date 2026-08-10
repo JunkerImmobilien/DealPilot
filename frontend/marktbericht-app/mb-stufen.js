@@ -165,8 +165,12 @@
   /* Der Preis wandert an den Erzeugen-Knopf — dort wird er ausgegeben. */
   function knopf(s) {
     var b = $('goBtn');
-    if (!b || b.disabled) return;
-    if (b.dataset.mbstBusy === '1') return;
+    if (!b) return;
+    /* NICHT auf `disabled` pruefen — gemessen ist der Knopf auch im
+       Normalzustand deaktiviert, solange Pflichtangaben fehlen, und dann
+       waere der Preis nie zu sehen. Ueberschrieben werden darf nur der
+       LAUFENDE Abruf: app.js setzt dort ein <span class="spin"> hinein. */
+    if (b.querySelector('.spin')) return;
     var p = s >= 1 ? preisFuer(s) : null;
     b.textContent = s >= 1
       ? ('Marktbericht erstellen · ' + (p === 0 ? 'ohne Aufpreis' : p + ' L'))
