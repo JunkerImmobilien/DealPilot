@@ -136,11 +136,61 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Farbe — der Leser übersprang sie und meldete Weiß. **Ein Grund-Leser,
    der `background-image` nicht auswertet, taugt für diesen Punkt nicht.**
 
-   **Nächster Schritt:** die sechs Fassungen über den echten Bedienweg
-   (Panel-Klicks, danach `getAnimations().forEach(a=>a.finish())`) setzen
-   und je Fassung den *effektiven* Grund samt Verlauf auslesen. Erst
-   danach entscheiden, ob der Ton über `--gold-2`, `--gold-d` oder einen
-   eigenen `--uv-num-*` läuft.
+   ---
+
+   ### Messlauf 2026-08-10, alle sechs Fassungen — **BLOCKIERT auf ein Konto ohne Whitelabel**
+
+   Über den echten Bedienweg gesetzt (Panel-Klicks, danach
+   `getAnimations().forEach(a=>a.finish())`), Objekt geladen, Partner-Konto:
+
+   | Fassung | Text | effektiver Grund | k |
+   |---|---|---|---|
+   | ohne Vorlage | `rgb(205,175,90)` | `rgb(56,50,31)` / `rgb(29,27,23)` | **6,01** |
+   | kontor | `rgb(152,123,34)` | `rgb(53,46,27)` / `rgb(25,24,18)` | **3,33** |
+   | panel | dito | dito | **3,33** |
+   | kanzlei | dito | dito | **3,33** |
+   | boarding | dito | dito | **3,33** |
+   | konsole | `rgb(205,175,90)` | dito | **6,34** |
+
+   **Auf diesem Konto ist der Punkt nicht reproduzierbar** — alle sechs
+   liegen über der Schwelle 3, die die v1113-Läufe benutzt haben.
+
+   **Der Grund ist bekannt und benannt:** seit `v1114` folgt die Kopfleiste
+   dem Obsidian des Partners. **Mit aktivem Whitelabel bleibt sie unter
+   *jeder* Vorlage dunkel** — der cremefarbene Grund, um den es im Punkt
+   geht, entsteht gar nicht erst. Der Befund braucht ein Konto **ohne**
+   Whitelabel. Genau diese Grenze hat der `v1114`-Eintrag selbst schon
+   vermerkt.
+
+   ### Zwei eigene Messfehler, beide zurückgenommen
+
+   Beide betrafen den Grund-Leser, nicht die App. Sie stehen hier, weil sie
+   den nächsten Lauf sonst genauso kosten:
+
+   1. **Ich habe den Elternteil gemessen, nicht das Element.**
+      `.hdr-obj-num` trägt einen **eigenen** `background-image`-Verlauf.
+      Ein Leser, der bei `el.parentElement` anfängt, sieht ihn nie und
+      meldet den Grund der Kopfleiste.
+   2. **Ich habe das Alpha verschluckt.** Der Verlauf lautet
+      `color(srgb 0.788 0.658 0.298 / 0.2)` — ein **20-prozentiger
+      Goldschleier**, keine goldene Fläche. Mein Parser las `color(srgb …)`,
+      filterte Alpha aber nur bei `rgba()`. Ergebnis: gemeldete **k=1,07**,
+      also „Gold auf Gold, unsichtbar" — physikalisch unmöglich, wie ein
+      Blick auf den Bildschirm sofort zeigt.
+
+   **Erst mit Überlagerung** (`a·vorn + (1−a)·hinten`, Schicht für Schicht
+   bis zum ersten deckenden Untergrund) kamen plausible Werte heraus.
+   **Ein Kontrastlauf, der Alpha ignoriert, taugt für dieses Element
+   nicht** — und die Zahlen 2,98 / 2,88 aus dem v1113-Lauf sind mit
+   demselben Vorbehalt zu lesen: ob sie den Schleier mitgerechnet haben,
+   ist offen.
+
+   ### Nächster Schritt
+
+   Ein **Konto ohne Whitelabel** anmelden, dieselben sechs Fassungen mit
+   dem Überlagerungs-Leser messen. Erst wenn dort ein Wert unter 3 steht,
+   ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
+   den *überlagerten* Grund, nicht gegen Weiß.
 
 3. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
