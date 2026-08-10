@@ -37,16 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
-   Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
-   ein **Kettenbefund, kein Optikbefund**, und die Kette wird von hinten
-   aufgerollt: was steht im Objekt (`objects.data`), was kommt beim
-   Erzeuger an, was landet auf dem Pass. Erst die Lücke benennen, dann
-   patchen. **Kein Feld nachträglich mit einem stillen Standardwert
-   füllen** — fehlt eine Angabe, gehört sie sichtbar als fehlend
-   ausgewiesen.
-
-2. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+1. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -69,7 +60,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Hängt mit dem Marktbericht-Vorschlag zusammen** — wer die Felder für einen Wizard neu
    gruppiert, hat den Abgleich ohnehin gemacht.
 
-3. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
+2. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
    `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
    v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
    ist genau seine Voreinstellung.
@@ -88,7 +79,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    nur nicht dort, wo er sein Branding einstellt. Es fehlt keine Funktion,
    es sind **zwei Oberflächen für dieselbe Sache**. Genau das ist Weg B.
 
-4. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
+3. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
    Der Rest von „Darstellung → Profil und Anzeige ist unvollständig",
    nachdem der Kontrastfehler mit `v1113` behoben ist. **Der Abgleich
    steht** (2026-08-08, im Panel gezählt): acht Farbfelder, davon **fünf
@@ -104,7 +95,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Produktfrage: gibt der Regler die Farbe frei, oder nur innerhalb dessen,
    was noch trägt? **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -118,7 +109,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
    kein Nachschlag.
 
-6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
    kein Defekt — Entwurf gehört nach `design/Vorschläge/`, sonst wäre es
@@ -127,7 +118,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    KPI-Pillen dort zu je zwei umbrechen (W43). Bewusst nicht angefasst,
    weil der Score auf dem Tablet bleiben soll.
 
-7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -180,6 +171,58 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-10] **Boarding-Pass: prüfen, ob beim Erzeugen alles mitgeht** —
+  `v1120` (`6ff6ce8`)
+
+  **Marcels Eindruck stimmt, und die Ursache ist eine andere als vermutet.**
+  Die Kette von hinten aufgerollt, wie der Punkt es verlangt:
+
+  | Glied | gemessen |
+  |---|---|
+  | `objects.data` | **181 Schlüssel**, davon **102 befüllt** |
+  | Snapshot im Backend (`sharedPassService.createForObject`) | trägt `obj.data` **vollständig** — hier geht nichts verloren |
+  | `pass.html` | liest **38 Namen**, davon **18 im Objekt gar nicht vorhanden** |
+  | Folge | **87 befüllte Felder erreichen den Pass nicht** |
+
+  **Die Verengung sitzt allein in `pass.html`, und es ist ein
+  Namensfehler.** Neun beweisbare Verfehlungen, jede mit einem echten Wert
+  im Testobjekt:
+
+  | Pass las | Objekt führt | Wert |
+  |---|---|---|
+  | `objektart` | **`objart`** | ETW |
+  | `ausstattung` | **`ausst`** | Normal |
+  | `vermietungsstand` | **`vermstand`** | Vollvermietet |
+  | `grundstueck` / `gst_flae` | **`gsfl`** | 1570 |
+  | `hg` | **`hg_ul` / `hg_nul`** | 1391 / 1599,46 |
+  | `energieklasse` | **`ds2_energie`** | B |
+  | `modernisierung` / `mod_jahr` | **`modernis`** | (leer) |
+  | `zins` | **`d1z`** | 3,5 |
+  | `tilg` | **`d1t`** | 1 |
+
+  Dazu drei befüllte Felder, die **niemand** las: `halter` (privat),
+  `mea` (7,06 %), `d1` (200.000 € Darlehen).
+
+  **Die alten Namen bleiben als Rückfall stehen** — ein Snapshot ist
+  eingefroren, ältere Pässe können sie tragen. Gegenprobe gefahren: ein
+  Snapshot mit ausschließlich den alten Namen zeigt weiterhin alle zehn
+  Zeilen.
+
+  **`knk` ist bewusst nicht gemappt.** Die App führt keine
+  Kaufnebenkosten als Einzelwert, sondern `makler_p`, `notar_p` und die
+  Grunderwerbsteuer getrennt. Eine Summe zu bilden wäre **geraten, nicht
+  gemessen** — und der Punkt verbietet ausdrücklich, ein Feld still zu
+  füllen. Die Zeile bleibt leer und fällt aus der Liste.
+
+  **Nachgemessen** durch direkten Aufruf von `render()` mit den echten
+  Objektdaten (kein Pass erzeugt, keine Nebenwirkung): **0 → 11 befüllte
+  Zeilen**, „Objektart = ETW" steht jetzt auch im Ticket. `pass.html`
+  parst sauber, alle Funktionen definiert.
+
+  **Kleinigkeit, nicht angefasst:** „Grundstücksfläche" landet in der
+  Rubrik „Weitere", weil sie in keiner Rubrikliste steht. Das war vorher
+  genauso und ist kein Rückschritt.
 
 - [2026-08-10] **Marktbericht: zehn Gestaltungsideen** — Vorschlag
   `design/Vorschläge/marktbericht-gestaltung-10-ideen.html` (`d69ba74`),
@@ -580,7 +623,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   unter einer hellen Vorlage wäre ein Bruch, kein Branding.
 
   **Nicht behoben, weil kein Defekt:** „zu wenig Farben zur Auswahl". Die
-  Gegenüberstellung steht jetzt bei Punkt 3 (Partner-Flow B) — der Partner
+  Gegenüberstellung steht jetzt bei Punkt 2 (Partner-Flow B) — der Partner
   kann seinen Mandanten längst **zehn** Farben vorgeben, nur nicht dort,
   wo er sein Branding einstellt.
 
@@ -602,7 +645,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Im Panel gezählt: **acht Farbfelder — fünf für Flächen, drei für Text.**
   Für Score-Karte und KPI-Karten gibt es eine Fläche, aber keinen Text.
   Das ist Marcels „die Schriftfarbe lässt sich nicht setzen", und es
-  bleibt als **Ausbau** offen (jetzt Punkt 4). Der Kontrastfehler selbst
+  bleibt als **Ausbau** offen (jetzt Punkt 3). Der Kontrastfehler selbst
   ist damit aber nicht erklärt — der hat eine eigene Ursache.
 
   ### Die Ursache
@@ -683,7 +726,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   Die verbleibende 1 ist `hdr-obj-num` (2,98 bzw. 2,88) und **nicht** Teil
   dieser Arbeit: die v1097-Schwelle rechnet gegen Weiß, kanzlei und
   boarding haben aber cremefarbenen Grund. v1097 hat das selbst so
-  vermerkt. Steht jetzt als eigener Punkt 5.
+  vermerkt. Steht jetzt als eigener Punkt 4.
 
   Ungeprüfte Elemente in jedem Lauf: **0**.
 
