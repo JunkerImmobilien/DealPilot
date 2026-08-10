@@ -1364,6 +1364,26 @@ function _mbBuildObjData() {
     standardstufe: val('standardstufe'),
     grundriss: val('grundriss'),
     mod_punkte: val('modGrad'),
+    /* v1121-WSAV-1 · Der Abgleich beider Seiten, den der Backlog verlangt
+     * ("Beide Seiten gegeneinander zaehlen, bevor ein Reiter gebaut wird").
+     * Gezaehlt: fuenf Felder stehen in payload(), rechnen also im BERICHT
+     * mit — und fehlten hier, gingen im gespeicherten Objekt also verloren.
+     * Das ist dieselbe Lehre wie v1072-WSAV-1 und v1074-WSAV-1, zum
+     * dritten Mal. Die Namen sind genau die, die payload() ohnehin an das
+     * Berichts-Backend schickt; nichts wird neu benannt.
+     *
+     *   Feld              payload() sendet als
+     *   bgf               bgf
+     *   sonstEinnahmen    sonstige_jahr
+     *   aussenanlagen     aussenanlagen
+     *   besBauteile       bes_bauteile
+     *   sachwertfaktor    sachwertfaktor
+     */
+    bgf: val('bgf'),
+    sonstige_jahr: val('sonstEinnahmen'),
+    aussenanlagen: val('aussenanlagen'),
+    bes_bauteile: val('besBauteile'),
+    sachwertfaktor: val('sachwertfaktor'),
     eq_elevator: (function () {
       var e = document.getElementById('elevator');
       if (!e) return null;
