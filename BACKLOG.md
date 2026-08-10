@@ -433,6 +433,67 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
 
+- [2026-08-11] **Wizard, Schritt 2: der Marktbericht bekommt Reiter** —
+  `v1127` (`8a68008`), `v1127b` (`7830ce4`), `v1127c` (`076878b`).
+
+  ### Drei Reiter, nicht fünf — die Struktur hat es besser gewusst
+
+  Der Entwurf zeigte fünf Schritte. Beim Bauen fiel auf: **die vorhandenen
+  Blöcke fallen genau auf die drei Stufen.** Damit entspricht jeder Reiter
+  einem Meilenstein aus `v1126`:
+
+  | Reiter | enthält | Meilenstein |
+  |---|---|---|
+  | 1 · Objekt | Objektwahl, `.dpkt`, Adresse, Eckdaten | Einschätzung |
+  | 2 · Zustand & Markt | `wm-b1`, Genauigkeitsblock | Marktpreisindikation |
+  | 3 · Wertermittlung | `wm-b3` (Grundstück, NHK, Feinjustierung) | Wertermittlung |
+
+  **Eine Gliederung, zwei Darstellungen** — statt zweier Gliederungen, die
+  auseinanderlaufen. Fünf Reiter hätten `wm-b3` zerlegen müssen, und den
+  baut `wertermittlung.js` bei jedem Stufenwechsel neu.
+
+  ### Es wird umgehängt, nicht neu gebaut
+
+  Die Felder bleiben **dieselben DOM-Knoten**, sie wandern nur in andere
+  Behälter. Damit gilt weiter: `payload()` liest dieselben Elemente über
+  dieselben Ids, jeder vorhandene Listener bleibt hängen, **kein zweiter
+  Feldkatalog**.
+
+  **Ein Beobachter ist nötig:** `zeichnen()` entfernt `wm-b1`/`wm-b3` und
+  setzt sie neu in die Panel-Spalte — bei jedem Stufenwechsel. Ohne
+  Nachführung lägen sie danach wieder außerhalb der Reiter. Dasselbe Muster
+  wie `karten-kompakt.js`. Kein `requestAnimationFrame`.
+
+  ### Nachgemessen
+
+  | Prüfung | Ergebnis |
+  |---|---|
+  | Felder je Reiter | 11 / 24 / 18 (Reiter 3 erst ab Stufe 3) |
+  | außerhalb der Reiter verblieben | **0** |
+  | `wm-b3` nach Neuzeichnen | landet **im dritten Reiter** |
+  | `payload()` über alle Reiter | `wert_stufe` 3, `mea_pct` 7.06, `bgf` 346.62 |
+  | Rückweg `_mbBuildObjData()` | `baujahr`, `gsfl`, `bgf`, `mea_pct`, `wfl` — alle da |
+  | Umschalten | Reiter 2 sichtbar, 1 und 3 verborgen |
+
+  **Der wichtigste Nachweis ist der vorletzte:** beide Sammelstellen lesen
+  quer über alle drei Reiter weiter alles. Genau dafür wurde umgehängt statt
+  neu gebaut.
+
+  ### Zwei Nachbesserungen, beide aus dem Nachmessen
+
+  - **`v1127b`:** zwei Blöcke lagen noch außerhalb — die Überschrift
+    „Objekt eingeben" (doppelt jetzt den Reiternamen, wandert in Reiter 1)
+    und die Aktionszeile „Letzte Ausgabe / Teilbares Angebot" (gehört in
+    den Fuß). Beide haben weder Id noch Klasse und werden über ein
+    enthaltenes Element erkannt.
+  - **`v1127c`:** der dritte Reiter war **angeschnitten**. Gemessen brauchen
+    die drei zusammen rund 372 px, die Spalte hat 338. Mit
+    `overflow-x:auto` war er nur durch seitliches Scrollen erreichbar —
+    **ein Reiter, den man nicht sieht, ist kein Reiter.** Jetzt `flex-wrap`.
+
+  **Als Nächstes:** die Übersicht — Berichtstabelle, Objektwahl und
+  Einlesen als Einstieg vor dem Wizard.
+
 - [2026-08-11] **Wizard, Schritt 1: die Stufenfrage wird zur
   Meilensteinleiste** — `v1126` (`7f4343b`), `v1126b` (`2e03655`),
   `v1126c` (`5699bfe`), Lese-Endpunkt (`stufenpreis`).
