@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marktbericht · Wizard — Entwurf</title>
+<!--
+  DealPilot · Entwurf zum Marktbericht-Umbau. Stand 2026-08-11.
+
+  MARCELS ENTSCHEIDUNG (2026-08-11):
+    "Nummer 1 und dein Vorschlag" — also Wizard mit Reitern (Idee 1),
+    kombiniert mit der lebenden Vorschau (Idee 2) und dem sichtbaren
+    Zweig (Idee 6). Dazu woertlich:
+      - die drei Stufen sollen VEREINT werden, nicht vorher abgefragt
+      - es soll uebersichtlich sein
+      - am Schluss das Ergebnis wie jetzt
+      - Objekte einlesen, die Tabelle der Marktberichte und die direkte
+        Auswahl eines angelegten Objekts muessen bleiben — "das ist ja
+        quasi die Uebersicht"
+
+  Dieser Entwurf ist ein Neubau zum Anklicken. Uebernommen wird die
+  GESTALTUNG, nicht der Code. Die Element- und Feldnamen sind aber die
+  echten aus wertermittlung.js und marktbericht-app/index.html, damit die
+  Umsetzung eine Uebersetzung wird und keine Neuerfindung.
+-->
+<style>
+  :root{
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --creme:#FDFCFA; --ink:#1c1a17; --ink2:#5d5852; --ink3:#8a847c;
+    --linie:#e4ded1; --gruen:#3FA56C; --rot:#B8625C; --gelb:#E8B84F;
+    --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--creme);color:var(--ink);
+    font:15px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:36px 22px 80px}
+  h1{font-family:"Space Grotesk",system-ui,sans-serif;font-size:31px;margin:0 0 6px;letter-spacing:-.5px}
+  h1 b{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kick{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--gold-lo);margin-bottom:9px}
+  .rw{height:3px;width:72px;border-radius:2px;background:var(--runway);margin:15px 0 24px}
+  h2{font-family:"Space Grotesk",system-ui,sans-serif;font-size:20px;margin:42px 0 6px}
+  h3{font-family:"Space Grotesk",system-ui,sans-serif;font-size:15.5px;margin:20px 0 6px}
+  p{margin:0 0 11px;max-width:76ch}
+  .lead{font-size:16px;color:var(--ink2)}
+  code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.87em;background:#f2ede1;padding:1px 5px;border-radius:4px}
+  table{border-collapse:collapse;width:100%;margin:12px 0 18px;font-size:13.5px}
+  th,td{border:1px solid var(--linie);padding:6px 9px;text-align:left;vertical-align:top}
+  th{background:#f6f1e4;font-weight:600;font-size:12px}
+  .scroll{overflow-x:auto}
+  .karte{background:#fff;border:1px solid var(--linie);border-radius:12px;padding:18px 20px;margin:16px 0}
+  .merk{border-left:3px solid var(--gold);background:#fdfaf0}
+  .ok{border-left:3px solid var(--gruen);background:#f5faf7}
+
+  /* ══ Der Prototyp ══ */
+  .app{border:1px solid var(--linie);border-radius:14px;overflow:hidden;background:#fff;margin:18px 0 6px;position:relative}
+  .app::before{content:'Anklickbarer Entwurf';position:absolute;right:12px;top:-9px;background:var(--gold);
+    color:#2c2410;font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.1em;padding:4px 7px;border-radius:4px;text-transform:uppercase;z-index:5}
+  .appkopf{background:#0d0c0a;color:#f3efe6;padding:11px 16px;display:flex;align-items:center;gap:12px;font-size:13px}
+  .appkopf .wm{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700}
+  .appkopf .wm i{color:var(--gold-hi);font-style:normal}
+  .appkopf .zurueck{margin-left:auto;background:#241f16;border:1px solid #3a3226;color:#e8e2d4;
+    border-radius:7px;padding:5px 11px;font:inherit;font-size:12px;cursor:pointer}
+  .buehne{padding:18px}
+
+  /* Übersicht */
+  .wege{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .weg{border:1px solid var(--linie);border-radius:10px;padding:14px;cursor:pointer;transition:.15s;background:#fff}
+  .weg:hover{border-color:var(--gold);box-shadow:0 3px 12px rgba(201,168,76,.14)}
+  .weg .ico{width:32px;height:32px;border-radius:9px;background:#17130d;color:var(--gold-hi);
+    display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:9px}
+  .weg h4{margin:0 0 3px;font-size:14.5px}
+  .weg p{margin:0;font-size:12.5px;color:var(--ink2)}
+  .uebersicht-tab{margin-top:20px}
+  .uebersicht-tab h4{font:600 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--gold-lo);margin:0 0 8px}
+  .mb-tab td .knopf{padding:4px 10px;font-size:12px}
+
+  /* Wizard */
+  .wz{display:grid;grid-template-columns:1fr 300px;gap:18px}
+  .wz-schritte{display:flex;border-bottom:2px solid var(--linie);margin-bottom:4px;overflow-x:auto}
+  .wz-s{flex:0 0 auto;padding:9px 14px;font-size:13px;color:var(--ink3);cursor:pointer;
+    border:0;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;background:none;font-family:inherit}
+  .wz-s.an{color:var(--ink);font-weight:600;border-bottom-color:var(--gold)}
+  .wz-s .n{font-family:"JetBrains Mono",monospace;font-size:11px;opacity:.55;margin-right:5px}
+  .wz-s.fertig .n::after{content:'✓';color:var(--gruen);opacity:1;margin-left:3px}
+  .wz-s:disabled{opacity:.35;cursor:not-allowed}
+
+  /* Der Stufen-Balken: die drei Stufen VEREINT, als Meilensteine */
+  .stufen{position:relative;height:38px;margin:12px 0 16px}
+  .stufen .bahn{position:absolute;left:0;right:0;top:15px;height:5px;border-radius:3px;background:#eee7d8}
+  .stufen .fuell{position:absolute;left:0;top:15px;height:5px;border-radius:3px;background:var(--runway);transition:width .35s}
+  .stufen .ms{position:absolute;top:8px;transform:translateX(-50%);text-align:center}
+  .stufen .pkt{width:19px;height:19px;border-radius:50%;background:#eee7d8;border:2px solid #fff;
+    box-shadow:0 0 0 1px var(--linie);margin:0 auto;transition:.3s;display:flex;align-items:center;justify-content:center;font-size:10px}
+  .stufen .ms.erreicht .pkt{background:var(--gold);box-shadow:0 0 0 1px var(--gold-lo);color:#2c2410}
+  .stufen .ms .lbl{font-size:10.5px;color:var(--ink3);margin-top:4px;white-space:nowrap}
+  .stufen .ms.erreicht .lbl{color:var(--ink);font-weight:600}
+
+  .f{margin-bottom:11px}
+  .f label{display:block;font-size:12px;color:var(--ink2);margin-bottom:3px}
+  .f label code{font-size:10px}
+  .f input,.f select{width:100%;padding:9px 10px;border:1px solid #d8d2c4;border-radius:7px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+  .f .pf{color:var(--rot);margin-left:2px}
+  .f.neu{animation:rein .3s ease}
+  @keyframes rein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  .zweispaltig{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+  .gruppe{border:1px solid var(--linie);border-radius:9px;padding:12px 13px;margin-bottom:12px}
+  .gruppe > b{display:block;font:600 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink3);margin-bottom:9px}
+
+  /* Rechte Spalte: lebende Vorschau + was rechnet schon */
+  .seite{position:sticky;top:12px;align-self:start}
+  .vorschau{background:#FBF6E9;border:1px solid #ece2c9;border-radius:11px;padding:14px;margin-bottom:12px}
+  .vorschau .k{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#8a6410}
+  .vorschau .z{font-family:"Space Grotesk",system-ui,sans-serif;font-size:25px;font-weight:700;margin:5px 0 2px}
+  .korridor{height:8px;border-radius:5px;background:linear-gradient(90deg,#efe7d0,#C9A84C,#efe7d0);position:relative;margin:9px 0 5px}
+  .korridor i{position:absolute;top:-4px;width:2px;height:16px;background:#1c1a17;transition:left .35s}
+  .spanne{display:flex;justify-content:space-between;font-size:11px;color:#77716a}
+  .verf{border:1px solid var(--linie);border-radius:11px;padding:12px 13px}
+  .verf > b{display:block;font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink3);margin-bottom:9px}
+  .vz{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:12.5px;line-height:1.45}
+  .vz .i{flex:0 0 15px;text-align:center}
+  .vz.ok .i{color:var(--gruen)} .vz.halb .i{color:var(--gelb)} .vz.nein{color:var(--ink3)}
+  .vz small{display:block;color:var(--ink3);font-size:11px}
+
+  .fuss{display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap}
+  .knopf{appearance:none;border:0;border-radius:8px;padding:9px 15px;font:inherit;font-size:13.5px;
+    font-weight:600;cursor:pointer;background:var(--runway);color:#2c2410}
+  .knopf.leise{background:#f2ede1;color:var(--ink)}
+  .knopf:disabled{opacity:.4;cursor:not-allowed}
+  .knopf:active{transform:scale(.97)}
+  .fuss .hin{font-size:11.5px;color:var(--ink3);margin-left:auto}
+
+  /* Ergebnis */
+  .erg-kopf{background:var(--runway);color:#2c2410;border-radius:11px;padding:14px 16px;margin-bottom:12px}
+  .erg-kopf .z{font-family:"Space Grotesk",system-ui,sans-serif;font-size:29px;font-weight:700}
+  .erg-gitter{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .erg-k{border:1px solid var(--linie);border-radius:9px;padding:11px 12px}
+  .erg-k .l{font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .erg-k .v{font-family:"Space Grotesk",system-ui,sans-serif;font-size:19px;font-weight:700;margin-top:4px}
+  .stufe-band{display:inline-block;font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.1em;
+    text-transform:uppercase;background:#17130d;color:var(--gold-hi);padding:5px 9px;border-radius:5px}
+
+  @media(max-width:820px){ .wz{grid-template-columns:1fr} .zweispaltig{grid-template-columns:1fr} .seite{position:static} h1{font-size:24px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="kick">DealPilot · Entwurf · 2026-08-11</div>
+<h1>Marktbericht — <b>ein Weg statt drei</b></h1>
+<div class="rw"></div>
+<p class="lead">Wizard mit Reitern (Idee 1), lebende Vorschau (Idee 2) und der
+sichtbare Zweig (Idee 6) in einem. <b>Die drei Stufen sind darin vereint</b> —
+sie werden nicht mehr vorher abgefragt, sondern <b>erreicht</b>.</p>
+
+<h2>Was sich ändert und was ausdrücklich bleibt</h2>
+<div class="scroll">
+<table>
+<tr><th>Bleibt</th><th>Ändert sich</th></tr>
+<tr>
+<td><b>Die Übersicht als Einstieg</b> — Tabelle der vorhandenen Marktberichte, Objekt aus dem Bestand wählen, <code>.dpkt</code> einlesen, Eingaben sichern und laden. Alle vier Wege stehen gleichberechtigt am Anfang.</td>
+<td><b>Die Zielfrage verschwindet.</b> Heute muss man vorab „Schnelle Einschätzung / Genaue Preisindikation / Wertermittlung“ wählen. Künftig füllt man aus, und die Stufe <b>ergibt sich</b>.</td>
+</tr>
+<tr>
+<td><b>Das Ergebnis am Schluss</b>, wie es heute aussieht — derselbe Aufbau, dieselben Zahlen.</td>
+<td><b>Aus 4.608 px Scroll werden fünf Reiter.</b> Jeder Schritt passt auf einen Blick.</td>
+</tr>
+<tr>
+<td><b><code>payload()</code> bleibt die Sammelstelle.</b> Kein Feldname ändert sich — die Oberfläche ordnet nur um.</td>
+<td><b>Die 730 px rechts werden gefüllt</b>: Wertkorridor und „was rechnet schon“ laufen mit.</td>
+</tr>
+</table>
+</div>
+
+<div class="karte merk">
+<h3 style="margin-top:0">Wie die drei Stufen vereint werden</h3>
+<p>Nicht als Frage vorweg, sondern als <b>drei Meilensteine auf einem Weg</b>.
+Man kann an jedem stehenbleiben und das Ergebnis erzeugen:</p>
+<div class="scroll">
+<table>
+<tr><th>Meilenstein</th><th>erreicht nach</th><th>was der Bericht dann kann</th><th>heute</th></tr>
+<tr><td><b>Einschätzung</b></td><td>Schritt 1</td><td>Lage und Marktpreisindikation</td><td>Stufe 1 · 2 L</td></tr>
+<tr><td><b>Marktpreisindikation</b></td><td>Schritt 2</td><td>zusätzlich Baustatus, Zustand, Qualität — deutlich engere Spanne</td><td>Stufe 2 · 5 L</td></tr>
+<tr><td><b>Wertermittlung</b></td><td>Schritt 4</td><td>zusätzlich Boden-, Ertrags- und Sachwert nach ImmoWertV mit Rechenweg</td><td>Stufe 3 · 12 L</td></tr>
+</table>
+</div>
+<p style="margin-bottom:0"><b>Der Vorteil gegenüber heute:</b> niemand muss vorher
+wissen, was er braucht. Und wer bei „Einschätzung“ anfängt, sieht am Balken,
+dass zwei Angaben mehr die Spanne halbieren — <b>statt einer Preisliste, die
+man vorher lesen muss</b>.</p>
+</div>
+
+<h2>Der Entwurf</h2>
+<p>Klick dich durch: Übersicht → Wizard → Ergebnis. Die Felder tragen die
+echten Namen aus <code>wertermittlung.js</code>.</p>
+
+<div class="app">
+  <div class="appkopf">
+    <span class="wm">Deal<i>Pilot</i></span>
+    <span style="opacity:.6">·</span>
+    <span id="kopf-titel">Marktbericht</span>
+    <button class="zurueck" id="zurUebersicht" style="display:none">← Übersicht</button>
+  </div>
+  <div class="buehne" id="buehne"></div>
+</div>
+
+<h2>Die Abhängigkeit, die den Zuschnitt bestimmt</h2>
+<p><b><code>istWohnung()</code> entscheidet über 20 der 42 Felder.</b> Deshalb steht
+die Objektart in <b>Schritt 1</b> und nirgends sonst — ein Wizard, der sie später
+fragt, müsste alles dahinter neu aufbauen. Gemessen:</p>
+<div class="scroll">
+<table>
+<tr><th>Objektart</th><th>zusätzliche Felder</th><th>welche</th></tr>
+<tr><td><b>Haus</b></td><td>17 + 1</td><td><code>nhkHaus</code> <code>nhkGeschosse</code> <code>nhkDach</code> (alle Pflicht) · neun <code>ausst*</code> · fünf <code>btl*</code> · <code>sachwertfaktor</code></td></tr>
+<tr><td><b>Eigentumswohnung</b></td><td>2</td><td><code>mea</code> (Pflicht) · <code>grundriss</code> — <b>und der Sachwert entfällt ganz</b></td></tr>
+</table>
+</div>
+<p>Die Folgefelder bleiben, wo sie hingehören: <code>hinterlandFlaeche</code> →
+<code>hinterlandRent</code> + <code>hinterlandWert</code>, <code>garagenBgf</code> →
+<code>garagenStufe</code>. <b>Seit <code>v1119</code> erscheinen sie überhaupt erst</b> —
+vorher wurde die Bedingung gegen ein gelöschtes Feld geprüft.</p>
+
+<div class="karte ok">
+<h3 style="margin-top:0">Was beim Bauen zu beachten ist</h3>
+<ul style="margin:0;padding-left:20px">
+<li><b>Ein Feldkatalog, eine Wahrheit.</b> Die Reiter sind nur eine andere
+Anordnung von <code>FELDER</code>. Kein zweiter Katalog, sonst laufen sie
+auseinander (die Lehre aus v1096b).</li>
+<li><b>Sichtbarkeit an <em>einer</em> Stelle auswerten.</b> Heute hängt sie an einer
+Auslöserliste, die jemand pflegen muss — genau daran ist <code>ptype</code> bis
+v1119 vergessen worden. Im Wizard wird nach jeder Eingabe neu bewertet.</li>
+<li><b>Zwischenstand sichern.</b> Ein Wizard ohne Speichern verliert bei jedem
+Abbruch alles; das durchgehende Formular hält heute wenigstens den DOM.
+Vorschlag: bei jedem Schrittwechsel in <code>dp_mb_entwurf</code>.</li>
+<li><b>Immer hell, kein <code>whitelabel-override.js</code>.</b> Farbe nur über
+<code>mb-whitelabel.js</code>.</li>
+</ul>
+</div>
+
+<h2>Was ich noch von Marcel brauche</h2>
+<ol>
+<li><b>Kosten der Stufen.</b> Heute steht 2 L / 5 L / 12 L an der Zielfrage. Wenn
+die Stufe sich erst am Ende ergibt — <b>wann wird abgerechnet?</b> Vorschlag: beim
+Erzeugen, nach der erreichten Stufe, und der Preis steht am Knopf.</li>
+<li><b>Darf man zurück und tiefer?</b> Also erst „Einschätzung“ erzeugen und
+später dasselbe Objekt auf „Wertermittlung“ hochziehen — <b>und was kostet das
+dann?</b> Vorschlag: nur die Differenz.</li>
+</ol>
+
+<p style="margin-top:30px;font-size:12.5px;color:#8a847c">
+Neubau, läuft ohne Netz. Zeigt die Gestaltung, nicht den späteren Code.
+Feld- und Element-Namen sind die echten. Gemessene Grundlage: 42 Felder,
+27 davon bedingt, Stand <code>d9e83a2</code> (v1119).</p>
+
+</div>
+
+<script>
+'use strict';
+
+/* ── Der Feldkatalog des Entwurfs — Auszug mit den ECHTEN Namen ──────────
+   Vollstaendig sind es 42; hier stehen die, die den Zuschnitt zeigen. */
+var SCHRITTE = [
+  { t:'Objekt', ms:0, gruppen:[
+      { b:'Adresse', f:[
+        ['address','Adresse','text','Hermannstr. 9, 32609 Hüllhorst'],
+        ['ptype','Objektart','select',['Eigentumswohnung','Einfamilienhaus','Doppelhaushälfte','Reihenhaus','Mehrfamilienhaus']] ]},
+      { b:'Eckdaten', f:[
+        ['area','Wohnfläche (m²)','number','165'],
+        ['year','Baujahr','number','1968'],
+        ['rooms','Zimmer','number','4'],
+        ['units','Anzahl Wohneinheiten','number','1'] ]}
+    ]},
+  { t:'Zustand & Markt', ms:1, gruppen:[
+      { b:'Zustand', f:[
+        ['baustatus','Baustatus','select',['Bestand','Bestand – Erstbezug nach Sanierung','Neubau – Erstbezug','Neubau – im Bau','Geplant / Bauträger']],
+        ['cond','Zustand','select',['einfach','normal','gehoben']],
+        ['quality','Ausstattungsqualität','select',['einfach','normal','gehoben','stark gehoben']] ]},
+      { b:'Miete', f:[
+        ['rent','Nettokaltmiete (€/Monat)','number','800'],
+        ['sonstEinnahmen','Sonstige Einnahmen (€/Jahr)','number',''] ]}
+    ]},
+  { t:'Grundstück', ms:2, gruppen:[
+      { b:'Fläche', f:[
+        ['plot','Grundstücksfläche (m²)','number','520', true],
+        ['mea','Miteigentumsanteil (%)','number','', true, 'etw'],
+        ['hinterlandFlaeche','Zusätzliche Fläche / Hinterland (m²)','number',''] ]},
+      { b:'Stellplätze', f:[
+        ['garages','Garagen','number','1'],
+        ['outdoor','Außenstellplätze','number','0'] ]}
+    ]},
+  { t:'Gebäude', ms:2, gruppen:[
+      { b:'Sachwert', f:[
+        ['bgf','Bruttogrundfläche (m²)','number',''],
+        ['standardstufe','Standardstufe','select',['– bitte wählen –','1','2','3','4','5'], true] ]},
+      { b:'NHK-Typennummer', nurHaus:true, f:[
+        ['nhkHaus','Hausform (NHK 2010)','select',['– keine Angabe –','freistehendes Ein-/Zweifamilienhaus','Doppelhaus / Reihenendhaus','Reihenmittelhaus'], true],
+        ['nhkGeschosse','Geschosse und Unterkellerung','select',['– keine Angabe –','Keller- und Erdgeschoss','Keller-, Erd- und Obergeschoss','Erdgeschoss, nicht unterkellert'], true],
+        ['nhkDach','Dachausbildung','select',['– keine Angabe –','Dachgeschoss voll ausgebaut','teilweise ausgebaut','nicht ausgebaut'], true] ]},
+      { b:'Garage und Außenanlagen', f:[
+        ['garagenBgf','Garage / Carport – BGF (m²)','number',''],
+        ['aussenPct','Außenanlagen (% des Gebäudesachwerts)','number',''] ]}
+    ]},
+  { t:'Feinjustierung', ms:3, nurHaus:true, gruppen:[
+      { b:'Gewerke (9)', f:[
+        ['ausstDach','Dach','select',['1','2','3','4','5']],
+        ['ausstFenster','Fenster','select',['1','2','3','4','5']],
+        ['ausstHeizung','Heizung','select',['1','2','3','4','5']],
+        ['ausstSanitaer','Sanitär','select',['1','2','3','4','5']] ]},
+      { b:'Sonstige Bauteile (5)', f:[
+        ['btlBalkone','Balkone','number',''],
+        ['btlGauben','Gauben','number',''] ]}
+    ]}
+];
+var MEILEN = ['Einschätzung','Marktpreisindikation','Wertermittlung'];
+
+var zustand = { ansicht:'uebersicht', schritt:0, werte:{}, istHaus:false, tiefste:0 };
+
+var buehne = document.getElementById('buehne');
+var kopfTitel = document.getElementById('kopf-titel');
+var zurueckKnopf = document.getElementById('zurUebersicht');
+zurueckKnopf.addEventListener('click', function(){ zustand.ansicht='uebersicht'; zeichne(); });
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function eur(n){ return Math.round(n).toLocaleString('de-DE')+' €'; }
+
+/* ── Übersicht ─────────────────────────────────────────────────────────── */
+function uebersicht(){
+  kopfTitel.textContent = 'Marktbericht · Übersicht';
+  zurueckKnopf.style.display = 'none';
+  return '' +
+  '<div class="wege">' +
+    '<div class="weg" data-start="bestand"><div class="ico">▤</div><h4>Objekt aus dem Bestand</h4>' +
+      '<p>Ein angelegtes DealPilot-Objekt wählen — alle Angaben sind schon da.</p></div>' +
+    '<div class="weg" data-start="dpkt"><div class="ico">⤓</div><h4>Objekt einlesen</h4>' +
+      '<p><code>.dpkt</code>-Datei laden oder gesicherte Eingaben zurückholen.</p></div>' +
+    '<div class="weg" data-start="neu"><div class="ico">✎</div><h4>Neu anlegen</h4>' +
+      '<p>Von Hand ausfüllen. Fünf Schritte, jederzeit unterbrechbar.</p></div>' +
+  '</div>' +
+  '<div class="uebersicht-tab"><h4>Vorhandene Marktberichte (3)</h4>' +
+    '<div class="scroll"><table class="mb-tab">' +
+    '<tr><th>Objekt</th><th>Stufe</th><th>Erstellt</th><th>Wert</th><th></th></tr>' +
+    zeile('Hermannstr. 9, 32609 Hüllhorst','Wertermittlung','14.07.2026','305.937 €') +
+    zeile('Löhner Str. 278, 32120 Hiddenhausen','Wertermittlung','02.07.2026','350.094 €') +
+    zeile('Am Markt 9, Kabelsketal','Einschätzung','28.06.2026','149.000 €') +
+    '</table></div>' +
+    '<p style="font-size:12px;color:#8a847c;margin-top:8px">Die Tabelle bleibt wie heute — ' +
+    'sie ist der Einstieg, nicht ein Anhang. Ein Klick auf „Öffnen“ zeigt das Ergebnis, ' +
+    '„Vertiefen“ setzt den Wizard dort fort, wo er stand.</p>' +
+  '</div>';
+}
+function zeile(o,s,d,w){
+  return '<tr><td>'+esc(o)+'</td><td><span class="stufe-band">'+esc(s)+'</span></td><td>'+esc(d)+'</td>' +
+    '<td><b>'+esc(w)+'</b></td><td style="white-space:nowrap">' +
+    '<button class="knopf leise" data-tab="oeffnen">Öffnen</button> ' +
+    '<button class="knopf leise" data-tab="vertiefen">Vertiefen</button></td></tr>';
+}
+
+/* ── Wizard ────────────────────────────────────────────────────────────── */
+function sichtbar(s){ return !(s.nurHaus && !zustand.istHaus); }
+function sichtbareSchritte(){ return SCHRITTE.filter(sichtbar); }
+
+function wizard(){
+  kopfTitel.textContent = 'Marktbericht · Angaben';
+  zurueckKnopf.style.display = '';
+  var liste = sichtbareSchritte();
+  var i = Math.min(zustand.schritt, liste.length-1);
+  var s = liste[i];
+
+  var reiter = liste.map(function(x,n){
+    return '<button class="wz-s'+(n===i?' an':'')+(n<i?' fertig':'')+'" data-schritt="'+n+'">' +
+      '<span class="n">'+(n+1)+'</span>'+esc(x.t)+'</button>';
+  }).join('');
+
+  var erreicht = zustand.tiefste;
+  var meilen = MEILEN.map(function(m,n){
+    var pos = [8, 50, 92][n];
+    return '<div class="ms'+(erreicht>=n+1?' erreicht':'')+'" style="left:'+pos+'%">' +
+      '<div class="pkt">'+(erreicht>=n+1?'✓':'')+'</div><div class="lbl">'+esc(m)+'</div></div>';
+  }).join('');
+  var fuellBreite = [0,8,50,92][Math.min(erreicht,3)] + '%';
+
+  var inhalt = s.gruppen.filter(function(g){ return !(g.nurHaus && !zustand.istHaus); })
+    .map(gruppeHtml).join('');
+
+  return '<div class="wz"><div>' +
+    '<div class="wz-schritte">'+reiter+'</div>' +
+    '<div class="stufen"><div class="bahn"></div><div class="fuell" style="width:'+fuellBreite+'"></div>'+meilen+'</div>' +
+    inhalt +
+    '<div class="fuss">' +
+      '<button class="knopf leise" id="zur" '+(i===0?'disabled':'')+'>← Zurück</button>' +
+      (i<liste.length-1 ? '<button class="knopf" id="vor">Weiter →</button>' : '') +
+      '<button class="knopf" id="fertig" '+(erreicht<1?'disabled':'')+'>Bericht erzeugen</button>' +
+      '<span class="hin">'+(erreicht<1?'Noch Pflichtangaben offen':'Stufe: '+MEILEN[erreicht-1])+'</span>' +
+    '</div>' +
+  '</div>' + seiteHtml() + '</div>';
+}
+
+function gruppeHtml(g){
+  var felder = g.f.map(function(f){
+    var id=f[0], label=f[1], typ=f[2], platz=f[3], pflicht=f[4], nur=f[5];
+    if(nur==='etw' && zustand.istHaus) return '';
+    if(nur==='haus' && !zustand.istHaus) return '';
+    var wert = zustand.werte[id] !== undefined ? zustand.werte[id] : '';
+    var ein;
+    if(typ==='select'){
+      ein = '<select data-id="'+id+'">' + platz.map(function(o){
+        return '<option'+(String(wert)===o?' selected':'')+'>'+esc(o)+'</option>'; }).join('') + '</select>';
+    } else {
+      ein = '<input type="'+typ+'" data-id="'+id+'" value="'+esc(wert)+'" placeholder="'+esc(typeof platz==='string'?platz:'')+'">';
+    }
+    return '<div class="f"><label>'+esc(label)+(pflicht?'<span class="pf">*</span>':'') +
+      ' <code>'+id+'</code></label>'+ein+'</div>' + folgefelder(id);
+  }).join('');
+  return '<div class="gruppe"><b>'+esc(g.b)+'</b><div class="zweispaltig">'+felder+'</div></div>';
+}
+
+/* Die echten Folgefelder — sie erscheinen erst nach einer Eingabe (v1119). */
+function folgefelder(id){
+  if(id==='hinterlandFlaeche' && zustand.werte.hinterlandFlaeche){
+    return '<div class="f neu"><label>Zusatzfläche ist rentierlich <code>hinterlandRent</code></label>' +
+      '<select data-id="hinterlandRent"><option>nein · wirft keinen Ertrag ab</option><option>ja · wird vermietet</option></select></div>' +
+      '<div class="f neu"><label>Wertansatz Hinterland (€/m²)<span class="pf">*</span> <code>hinterlandWert</code></label>' +
+      '<input type="number" data-id="hinterlandWert" placeholder="z. B. 5 €/m²"></div>';
+  }
+  if(id==='garagenBgf' && zustand.werte.garagenBgf){
+    return '<div class="f neu"><label>Garage – Standardstufe<span class="pf">*</span> <code>garagenStufe</code></label>' +
+      '<select data-id="garagenStufe"><option>– keine Angabe –</option><option>3 · Fertiggarage</option>' +
+      '<option>4 · Massivbauweise</option><option>5 · Massiv mit besonderer Ausführung</option></select></div>';
+  }
+  if(id==='baustatus' && /saniert/i.test(zustand.werte.baustatus||'')){
+    return '<div class="f neu"><label>Sanierungsjahr <code>sanierungsjahr</code></label>' +
+      '<input type="number" data-id="sanierungsjahr" placeholder="z. B. 2015"></div>';
+  }
+  return '';
+}
+
+/* Rechte Spalte: lebende Vorschau + was rechnet schon */
+function seiteHtml(){
+  var w = zustand.werte;
+  var A = parseFloat(w.area)||0, J = parseFloat(w.year)||1970;
+  var zStufe = {'einfach':1,'normal':2,'gehoben':3,'stark gehoben':4}[w.cond]||2;
+  var basis = A ? A*(1250+(J-1950)*9)*(0.88+zStufe*0.08) : 0;
+  var enge = [0.20, 0.20, 0.12, 0.12, 0.07][Math.min(zustand.schritt,4)];
+  var sp = basis*enge;
+
+  var verf = [
+    ['Vergleichswert', zustand.tiefste>=1, 'Pflicht: Objektart, Fläche, Baujahr, Baustatus'],
+    ['Ertragswert', !!(w.rent && w.plot), 'Braucht Miete und Grundstücksfläche'],
+    ['Sachwert', zustand.istHaus ? !!(w.standardstufe && w.standardstufe!=='– bitte wählen –' && w.nhkHaus && w.nhkHaus!=='– keine Angabe –') : null,
+      zustand.istHaus ? 'Braucht Standardstufe und NHK-Typennummer' : 'Bei Eigentumswohnung nicht anwendbar']
+  ];
+  var vzHtml = verf.map(function(v){
+    var kl = v[1]===null ? 'nein' : (v[1] ? 'ok' : 'halb');
+    var ic = v[1]===null ? '—' : (v[1] ? '✓' : '!');
+    return '<div class="vz '+kl+'"><span class="i">'+ic+'</span><span><b>'+esc(v[0])+'</b>' +
+      '<small>'+esc(v[2])+'</small></span></div>';
+  }).join('');
+
+  return '<div class="seite">' +
+    '<div class="vorschau"><div class="k">Marktwert-Korridor</div>' +
+      '<div class="z">'+(basis?eur(basis):'—')+'</div>' +
+      '<div class="korridor"><i style="left:'+(50)+'%"></i></div>' +
+      '<div class="spanne"><span>'+(basis?eur(basis-sp):'—')+'</span><span>'+(basis?eur(basis+sp):'—')+'</span></div>' +
+      '<div style="font-size:11.5px;color:#5d5852;margin-top:8px">' +
+        (basis? 'Spanne ±'+Math.round(enge*100)+' % — jede weitere Angabe verengt sie.' :
+                'Wohnfläche und Baujahr eintragen, dann rechnet die Vorschau mit.') +
+      '</div></div>' +
+    '<div class="verf"><b>Was rechnet schon</b>'+vzHtml+'</div>' +
+  '</div>';
+}
+
+/* ── Ergebnis ──────────────────────────────────────────────────────────── */
+function ergebnis(){
+  kopfTitel.textContent = 'Marktbericht · Ergebnis';
+  zurueckKnopf.style.display = '';
+  var w = zustand.werte;
+  var A = parseFloat(w.area)||165, J = parseFloat(w.year)||1968;
+  var basis = A*(1250+(J-1950)*9)*1.04;
+  return '<div class="erg-kopf"><div style="font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.14em;text-transform:uppercase;opacity:.75">Marktwert · '+esc(MEILEN[Math.max(zustand.tiefste,1)-1])+'</div>' +
+      '<div class="z">'+eur(basis)+'</div>' +
+      '<div style="font-size:12.5px;opacity:.8">'+esc(w.address||'Hermannstr. 9, 32609 Hüllhorst')+' · '+A+' m² · Bj '+J+'</div></div>' +
+    '<div class="erg-gitter">' +
+      erg('Vergleichswert', eur(basis)) +
+      erg('Ertragswert', w.rent? eur(basis*0.94):'—') +
+      erg('Sachwert', zustand.istHaus? eur(basis*1.06):'nicht anwendbar') +
+      erg('€/m²', Math.round(basis/A).toLocaleString('de-DE')+' €') +
+    '</div>' +
+    '<p style="font-size:12.5px;color:#5d5852;margin-top:14px">Ab hier ist alles wie heute — ' +
+    'Rechenweg, Modellvermerke, Herkunft je Zahl, PDF. <b>Der Umbau endet vor dem Ergebnis.</b></p>' +
+    '<div class="fuss"><button class="knopf leise" id="tiefer">Weiter zur nächsten Stufe</button>' +
+    '<button class="knopf" id="pdf">PDF erzeugen</button></div>';
+}
+function erg(l,v){ return '<div class="erg-k"><div class="l">'+esc(l)+'</div><div class="v">'+esc(v)+'</div></div>'; }
+
+/* ── Zustand und Bindung ───────────────────────────────────────────────── */
+function tiefeNeu(){
+  var w = zustand.werte, t = 0;
+  if (w.ptype && w.area && w.year) t = 1;
+  if (t===1 && w.baustatus && w.cond) t = 2;
+  var sachOk = zustand.istHaus
+    ? (w.standardstufe && w.standardstufe!=='– bitte wählen –' && w.nhkHaus && w.nhkHaus!=='– keine Angabe –')
+    : !!w.mea;
+  if (t===2 && w.plot && sachOk) t = 3;
+  zustand.tiefste = t;
+}
+
+function zeichne(){
+  tiefeNeu();
+  buehne.innerHTML = zustand.ansicht==='uebersicht' ? uebersicht()
+                   : zustand.ansicht==='ergebnis' ? ergebnis() : wizard();
+}
+
+buehne.addEventListener('click', function(e){
+  var w = e.target.closest('[data-start]');
+  if (w){ zustand.ansicht='wizard'; zustand.schritt=0;
+    if (w.getAttribute('data-start')!=='neu'){
+      zustand.werte = { address:'Hermannstr. 9, 32609 Hüllhorst', ptype:'Eigentumswohnung',
+        area:'165', year:'1968', rooms:'4', units:'1', rent:'800', cond:'normal',
+        baustatus:'Bestand', quality:'normal', plot:'520', garages:'1', outdoor:'0' };
+      zustand.istHaus = false;
+    } else { zustand.werte = {}; zustand.istHaus = false; }
+    zeichne(); return; }
+  var t = e.target.closest('[data-tab]');
+  if (t){ zustand.ansicht = t.getAttribute('data-tab')==='oeffnen' ? 'ergebnis' : 'wizard';
+    if (zustand.ansicht==='wizard') zustand.schritt=0;
+    zeichne(); return; }
+  var s = e.target.closest('[data-schritt]');
+  if (s){ zustand.schritt = parseInt(s.getAttribute('data-schritt'),10); zeichne(); return; }
+  if (e.target.id==='vor'){ zustand.schritt = Math.min(zustand.schritt+1, sichtbareSchritte().length-1); zeichne(); return; }
+  if (e.target.id==='zur'){ zustand.schritt = Math.max(zustand.schritt-1, 0); zeichne(); return; }
+  if (e.target.id==='fertig'){ zustand.ansicht='ergebnis'; zeichne(); return; }
+  if (e.target.id==='tiefer'){ zustand.ansicht='wizard'; zeichne(); return; }
+});
+
+buehne.addEventListener('input', function(e){
+  var id = e.target.getAttribute && e.target.getAttribute('data-id');
+  if (!id) return;
+  zustand.werte[id] = e.target.value;
+  if (id==='ptype') zustand.istHaus = !/wohnung/i.test(e.target.value);
+  /* Nur bei Feldern neu zeichnen, die etwas umschalten — sonst verliert das
+     Textfeld beim Tippen den Fokus. Genau die Falle, an der ein Wizard
+     sonst haengt. */
+  if (['ptype','hinterlandFlaeche','garagenBgf','baustatus','standardstufe','nhkHaus','cond','plot','mea','area','year','rent'].indexOf(id) >= 0){
+    var pos = e.target.selectionStart;
+    zeichne();
+    var neu = buehne.querySelector('[data-id="'+id+'"]');
+    if (neu){ try{ neu.focus(); if(pos!=null && neu.setSelectionRange) neu.setSelectionRange(pos,pos); }catch(err){} }
+  }
+});
+buehne.addEventListener('change', function(e){
+  var id = e.target.getAttribute && e.target.getAttribute('data-id');
+  if (!id) return;
+  zustand.werte[id] = e.target.value;
+  if (id==='ptype') zustand.istHaus = !/wohnung/i.test(e.target.value);
+  zeichne();
+});
+
+zeichne();
+</script>
+</body>
+</html>
