@@ -16,6 +16,12 @@ Optik-Befund ohne Bildbezug ist eine Vermutung; beim Stapel-Modus kam die
 falsche Annahme aus `handy2.jpg`, einer Datei, die gar nicht mehr im Repo
 lag.
 
+**Vorschläge und Mockup-Entwürfe gehören nach `design/Vorschläge/`** (lokal
+`E:\DealPilot\repo\design\Vorschläge`) — dort liegt schon
+`partner-flow-darstellung.md`. Wo ein Punkt eine Entscheidung braucht,
+entsteht **zuerst** dort ein Dokument oder eine HTML-Demo, und **danach**
+wird gebaut. Das ist die Demo-first-Regel als Ablageort.
+
 **Bildzuordnung erledigt (2026-08-08).** Der Ordner enthielt drei
 Screenshots ohne Bezug. Zugeordnet:
 
@@ -23,10 +29,10 @@ Screenshots ohne Bezug. Zugeordnet:
 |---|---|---|
 | `Screenshot 2026-08-08 075255.png` | **erledigt** (v1112) | Einstellungen bei Handybreite: 12 Reiter hochkant nebeneinander, Inhaltsfläche leer |
 | `Screenshot 2026-08-06 144507.png` | **erledigt** (v1113) | Hero-Score-Kachel, rot umkringelt: „INVESTOR SCORE" und die Zeile darunter — Gold auf Gold |
-| `Screenshot 2026-08-08 075210.png` | **4** | Handy-Kennzahlen: Kachel-Labels überlappen (`GESAMTINVESTITION`/`RESTSCHULD`, `BRUTTO-`/`NETTOMIETRENDITE`), Werte laufen aus der Kachel |
+| `Screenshot 2026-08-08 075210.png` | **erledigt** (v1116er Reihe) | Handy-Kennzahlen: Kachel-Labels überlappen, Werte laufen aus der Kachel |
 
-Zu den übrigen offenen Punkten liegt **kein** Bild vor. Das ist kein
-Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
+Zu den offenen Punkten liegt **kein** Bild vor. Das ist kein Mangel — es
+sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 ## Offen
@@ -39,7 +45,63 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    Teilen (der auf Gold) und die Einstellungen (dort nur 28→32 px).
    Vorher **Strg+Shift+R** — sechs Cache-Buster sind hochgezogen.
 
-2. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
+2. **Die MA-Serie ausbauen und die normale Ansicht fürs Handy freigeben.**
+   **Entscheidung von Marcel, 2026-08-08.** Die Haupt-App ist inzwischen
+   handytauglich gebaut (v650/v652, v1077, v1112 bis v1116) — die separate
+   Mobile-Fassung hat damit keinen Zweck mehr. Sie fliegt raus, die Sperre
+   fällt, jeder landet auf der normalen Ansicht.
+
+   **Zuerst ein Vorschlag nach `design/Vorschläge/`, dann bauen.** Das ist
+   kein Formalismus: hier werden zwei Sperren entfernt, die absichtlich
+   gesetzt wurden, und die Abbaureihenfolge entscheidet, ob dabei ein Loch
+   entsteht. Was das Dokument klären muss:
+   - **Zwei Sperren, nicht eine.** `v970` blockt die Haupt-App auf
+     schmalem Schirm mit grobem Zeiger; `MA35` blockt den direkten Aufruf
+     von `mobile-demo.html`. Beide gehören weg, aber **in der richtigen
+     Reihenfolge** — erst die Umleitung auf die normale Ansicht, dann die
+     Sperre. Andersherum steht ein Zeitfenster offen, in dem beides
+     erreichbar ist.
+   - **Die Erkennungsregeln hängen nicht nur an der Sperre.** Regel A/B,
+     die Tablet-Schwelle 1400 px und die Testhintertür `?nomobileblock`
+     sind mitgewachsen. Vor dem Löschen zählen, **wer sie sonst noch
+     liest** — die Whitelabel-Sperre für Mandanten nutzt dasselbe
+     Kennzeichen `dp_wl_cache` wie die Handy-Sperre. Die darf nicht
+     mitfallen.
+   - **Was wird aus `mobile-demo.html` und den MA-Dateien?** Löschen oder
+     als Vorlage im `design/`-Ordner ablegen. Vorschlag: ablegen, nicht
+     löschen — die Fassung war Marcels Bildvorlage für mehrere Umbauten.
+   - **Die Projektanweisung sagt heute das Gegenteil** („Handy-Sperre
+     bewusst AKTIV, nicht aufweichen"). Sie gehört mit derselben Änderung
+     angepasst, sonst widerspricht sie sich in der nächsten Sitzung selbst.
+
+   **Danach der vollständige Durchgang** durch die freigegebene Ansicht bei
+   390 px — jeder Bereich, jede Einstellung. Das ersetzt den alten Punkt
+   „Durchgang durch die Mobile-App": geprüft wird jetzt die normale
+   Ansicht, nicht die MA-Fassung.
+
+3. **Marktbericht: neun bis zehn Gestaltungsideen als Mockups.** Der
+   Bericht sieht optisch nicht gut aus. Marcels Richtung: **mehrere
+   Stufen**, möglicherweise ein **Wizard im Arbeitsbereich**, den man mit
+   mehreren Reitern durchklickt. Nach `design/Vorschläge/`, als HTML zum
+   Anklicken — nicht als Beschreibung.
+
+   **Erst messen, dann entwerfen:** wie viele Felder sind es heute, wie
+   sind sie gruppiert, welche hängen voneinander ab (die `wenn:`-Felder
+   `garagenStufe` und `hinterlandRent` erscheinen nur nach echter
+   Nutzereingabe). Ein Wizard, der eine bestehende Abhängigkeit übersieht,
+   verliert Eingaben.
+
+   **Zwei feste Randbedingungen für jeden Entwurf:** die Marktbericht-App
+   ist **immer hell** und lädt `whitelabel-override.js` **nicht** — was
+   dort an Farbe hineinkommt, muss über `mb-whitelabel.js` laufen. Und
+   `payload()` in `wertermittlung.js` bleibt die Sammelstelle: eine neue
+   Oberfläche darf die Feldnamen nicht ändern, sonst hängt der ganze
+   Rechenkern daran.
+
+   **Auswahl trifft Marcel**, nicht ich. Neun bis zehn Ideen heißt neun bis
+   zehn ernsthafte, nicht sieben Varianten derselben.
+
+4. **Boarding-Pass: prüfen, ob beim Erzeugen wirklich alles mitgeht.**
    Marcels Eindruck ist, dass Daten fehlen — Stammdaten und Werte. Das ist
    ein **Kettenbefund, kein Optikbefund**, und die Kette wird von hinten
    aufgerollt: was steht im Objekt (`objects.data`), was kommt beim
@@ -48,7 +110,7 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    füllen** — fehlt eine Angabe, gehört sie sichtbar als fehlend
    ausgewiesen.
 
-3. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
+5. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
    Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
    Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
    aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
@@ -68,14 +130,10 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    und zwar über DOM-Ids. Was dort fehlt, rechnet im Bericht mit und ist im
    gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
    Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
+   **Hängt mit Punkt 3 zusammen** — wer die Felder für einen Wizard neu
+   gruppiert, hat den Abgleich ohnehin gemacht.
 
-4. **Vollständiger Durchgang durch die Mobile-App** (MA-Serie). Marcels
-   Rahmen um die Punkte davor: einmal komplett durch, jeder Bereich, jede
-   Einstellung. Steht bewusst als eigener Punkt **nach** den Einzelfixes
-   und prüft, was sonst noch auffällt. Die Handy-Sperre der Haupt-App
-   bleibt dabei aktiv (v970 + MA35), sie wird nicht nebenbei aufgeweicht.
-
-5. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
+6. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
    `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
    v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
    ist genau seine Voreinstellung.
@@ -94,7 +152,7 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    nur nicht dort, wo er sein Branding einstellt. Es fehlt keine Funktion,
    es sind **zwei Oberflächen für dieselbe Sache**. Genau das ist Weg B.
 
-6. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
+7. **Textfarben für Score-Karte und KPI-Karten sind nicht regelbar.**
    Der Rest von „Darstellung → Profil und Anzeige ist unvollständig",
    nachdem der Kontrastfehler mit `v1113` behoben ist. **Der Abgleich
    steht** (2026-08-08, im Panel gezählt): acht Farbfelder, davon **fünf
@@ -108,9 +166,9 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    stellt seit `v1113` die Ableitung `--uv-sc-*` sicher; ein Regler müsste
    sie überstimmen dürfen, ohne sie auszuhebeln. Genau das ist die
    Produktfrage: gibt der Regler die Farbe frei, oder nur innerhalb dessen,
-   was noch trägt? **→ Demo bauen und zeigen, nicht raten.**
+   was noch trägt? **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-7. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+8. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -124,21 +182,23 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
    Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
    kein Nachschlag.
 
-8. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+9. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. **Nicht angefangen:** Gestaltungsarbeit mit eigener Prüfstrecke,
-   kein Defekt — und ohne Vorlage im `design/`-Ordner wäre es geraten.
-   **Ein gemessener Befund gehört hierher:** auf 820 px ist die Kopfleiste
-   **589 px** hoch, `#hdr-badges` allein 492 px, weil die fünf KPI-Pillen
-   dort zu je zwei umbrechen (W43). Bewusst nicht angefasst, weil der Score
-   auf dem Tablet bleiben soll.
+   kein Defekt — Entwurf gehört nach `design/Vorschläge/`, sonst wäre es
+   geraten. **Ein gemessener Befund gehört hierher:** auf 820 px ist die
+   Kopfleiste **589 px** hoch, `#hdr-badges` allein 492 px, weil die fünf
+   KPI-Pillen dort zu je zwei umbrechen (W43). Bewusst nicht angefasst,
+   weil der Score auf dem Tablet bleiben soll.
 
 ---
 
 ## Später
 
 - **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
-  Vorhaben mit eigener Prüfstrecke, nicht nebenbei
+  Vorhaben mit eigener Prüfstrecke, nicht nebenbei. **Wird durch Punkt 2
+  größer, nicht kleiner** — mit der Freigabe fürs Handy trägt die normale
+  Ansicht allein, was vorher auf zwei Fassungen verteilt war.
 
 - **`gold-audit.py` auf RC=0 bringen** — 484 Fundstellen in 57 Dateien,
   Altlast. Die neuen Dateien tragen davon **keine einzige**. Eigenes
@@ -149,7 +209,7 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
   gelöscht**; das Entfernen bleibt ein eigenes Vorhaben mit eigener
   Prüfstrecke.
 
-- **Drei Nachweise, die aus Abnahmen offen geblieben sind** — jeweils
+- **Zwei Nachweise, die aus Abnahmen offen geblieben sind** — jeweils
   gemessen und beschrieben, nur nie am echten Gerät bzw. mit echten Daten
   bestätigt:
   - **Marktbericht auf dem Handy (v1077):** ein echter Klick auf den
@@ -157,7 +217,8 @@ Mangel — es sind Ketten- und Funktionsbefunde, keine Optikbefunde.
     Karte (hängt an `matchMedia('(hover:none)')`, greift im Prüfbrowser
     nicht) und das **Erzeugen** eines neuen Berichts bei 390 px (kostet
     5 L und hängt an einem `window.confirm`). Eigener Namensraum v1077,
-    nicht mit der Haupt-App mischen.
+    nicht mit der Haupt-App mischen. **Wird mit Punkt 2 dringender:** nach
+    der Freigabe kommen echte Nutzer auf diesem Weg an.
   - **Tabelle der geteilten Pässe** — die Scroll-Regel steht, das
     Testkonto war leer, der Nachweis fehlt.
 
