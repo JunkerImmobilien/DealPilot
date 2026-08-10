@@ -60,6 +60,40 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Hängt mit dem Marktbericht-Vorschlag zusammen** — wer die Felder für einen Wizard neu
    gruppiert, hat den Abgleich ohnehin gemacht.
 
+   **BLOCKIERT:** Der Reiter selbst wartet auf Marcels Auswahl aus
+   `design/Vorschläge/marktbericht-gestaltung-10-ideen.html` — wer die 42
+   Felder für einen Wizard neu gruppiert, gruppiert sie damit auch für den
+   Reiter. Zwei Gruppierungen nacheinander wären doppelte Arbeit.
+
+   **Der Abgleich ist erledigt (2026-08-10, `v1121`, `4049eb1`).** Beide
+   Seiten gegeneinander gezählt, wie der Punkt es verlangt. **Fünf Felder
+   fehlten auf dem Rückweg** — sie rechneten im Bericht mit und waren im
+   gespeicherten Objekt weg:
+
+   | Feld | `payload()` | `_mbBuildObjData()` vorher | jetzt als |
+   |---|---|---|---|
+   | `bgf` | ✓ | **fehlte** | `bgf` |
+   | `sonstEinnahmen` | ✓ | **fehlte** | `sonstige_jahr` |
+   | `aussenanlagen` | ✓ | **fehlte** | `aussenanlagen` |
+   | `besBauteile` | ✓ | **fehlte** | `bes_bauteile` |
+   | `sachwertfaktor` | ✓ | **fehlte** | `sachwertfaktor` |
+
+   Dieselbe Lehre wie `v1072-WSAV-1` und `v1074-WSAV-1`, **zum dritten
+   Mal**. Benannt wurde nichts neu — die Namen sind genau die, die
+   `payload()` ohnehin ans Berichts-Backend schickt.
+
+   **Die übrigen 25 Felder der Prüfliste sind vollständig:** `mea`,
+   `spMiete`, `standardstufe`, `grundriss`, `modGrad`, die drei `nhk*`, die
+   drei `hinterland*`, `garagenBgf`, `garagenStufe`, `aussenPct`, alle neun
+   `ausst*` und alle fünf `btl*`.
+
+   **Ein eigener Messfehler, zurückgenommen:** Ich hatte gemeldet, 18
+   weitere Felder fehlten in `_mbBuildObjData()`. Falsch —
+   **die Funktion räumt leere Werte weg**, und ich hatte die Felder nicht
+   ausgefüllt. Nach dem Befüllen von sechs davon stieg die Schlüsselzahl
+   von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
+   JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
+
 2. **Partner-Flow B: drei Freiheitsstufen je Partner.** Aus
    `design/Vorschläge/partner-flow-darstellung.md`; **C und A sind mit
    v1111 umgesetzt, B blieb offen.** Nachrüstbar, ohne etwas umzubauen — A
