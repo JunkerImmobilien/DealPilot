@@ -199,6 +199,36 @@ router.delete('/reports/:id', authenticate, async function (req, res) {
   }
 });
 
+/* ─── v1126-stufenpreis-lesen ──────────────────────────────────────────────
+   Was kostet der naechste Bericht fuer dieses Objekt WIRKLICH?
+
+   Die Oberflaeche soll den faelligen Betrag am Knopf zeigen ("noch 10 L"),
+   statt die Ermaessigung nur zu behaupten. Dafuer muss sie die bezahlte
+   Stufe kennen — und die steht nur im Kerosin-Log.
+
+   REIN LESEND, und der Browser erfaehrt nichts, was er nicht ohnehin gleich
+   bezahlt. Die Objektkennung kommt aus der Query, die Benutzerkennung
+   IMMER aus req.user.id — nie aus dem Browser (dieselbe Regel wie
+   qstrUser, v942-userbind). Ein fremdes ref liefert damit hoechstens die
+   eigene Historie, nie die eines anderen Nutzers. */
+router.get('/stufenpreis', authenticate, async function (req, res) {
+  try {
+    const ref = (req.query && (req.query.ref || req.query.external_ref)) || null;
+    const bezahlt = await aiCreditsService.bezahlteStufeMarktbericht(req.user.id, ref);
+    const faellig = {};
+    for (var s = 1; s <= 3; s++) {
+      faellig[s] = (bezahlt >= s)
+        ? 0
+        : Math.max(0, STUFENPREIS[s] - (bezahlt >= 1 ? (STUFENPREIS[bezahlt] || 0) : 0));
+    }
+    res.json({ bezahlte_stufe: bezahlt, preise: STUFENPREIS, faellig: faellig });
+  } catch (e) {
+    /* Im Fehlerfall die vollen Preise melden — lieber zu viel angekuendigt
+       als eine Ermaessigung versprochen, die es nicht gibt. */
+    res.json({ bezahlte_stufe: 0, preise: STUFENPREIS, faellig: Object.assign({}, STUFENPREIS), _hinweis: 'fallback' });
+  }
+});
+
 // ── Abruf-Endpoints (auth + Kerosin) ─────────────────────────────────────────
 async function runReport(req, res) {
   try {
