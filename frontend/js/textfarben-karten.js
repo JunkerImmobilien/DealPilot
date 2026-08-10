@@ -78,23 +78,38 @@
     try { return !!(document.body && document.body.classList.contains('dp-chrome-hell')); }
     catch (e) { return false; }
   }
-  function tonAufMarke(farbe, min) {
-    try {
-      if (window.DPC && DPC.branding) {
-        if (hellSkin() && DPC.branding.tonAufMarke)
-          return DPC.branding.tonAufMarke(akzent(), farbe, min);
-        if (DPC.branding.tonFuerGrund)
-          return DPC.branding.tonFuerGrund(farbe, GRUND_DUNKEL, min);
+  /* v1123e · EIGENER FEHLER, laut statt still.
+     Ich hatte `window.DPC` abgefragt. Den Namen gibt es im Seiten-Scope
+     nicht — `DPC` ist nur ein modul-interner Alias in config.js:852, nach
+     aussen heisst es `window.DealPilotConfig`. Folge: jede Korrektur fiel
+     still auf den Rohwert zurueck, und die Warnung kam NIE — bei einem
+     gemessenen k von 1,00.
+     Genau deshalb meldet ein fehlendes Modul jetzt in die Konsole, statt
+     im catch zu verschwinden: ein stiller Rueckfall sieht aus wie ein
+     bestandener Lauf. (CLAUDE.md: "Marker sagen hier war ich, nicht hier
+     ist alles gut.") */
+  function branding() {
+    var b = null;
+    try { b = window.DealPilotConfig && window.DealPilotConfig.branding; } catch (e) {}
+    if (!b || !b.tonFuerGrund) {
+      if (!branding._gemeldet) {
+        branding._gemeldet = true;
+        try { console.warn('[v1123] DealPilotConfig.branding fehlt — Kartentexte werden NICHT nachgezogen.'); } catch (e) {}
       }
-    } catch (e) {}
-    return farbe;
+      return null;
+    }
+    return b;
+  }
+  function tonAufMarke(farbe, min) {
+    var b = branding(); if (!b) return farbe;
+    try {
+      if (hellSkin() && b.tonAufMarke) return b.tonAufMarke(akzent(), farbe, min);
+      return b.tonFuerGrund(farbe, GRUND_DUNKEL, min);
+    } catch (e) { return farbe; }
   }
   function tonAufWeiss(farbe, min) {
-    try {
-      if (window.DPC && DPC.branding && DPC.branding.tonFuerGrund)
-        return DPC.branding.tonFuerGrund(farbe, '#ffffff', min);
-    } catch (e) {}
-    return farbe;
+    var b = branding(); if (!b) return farbe;
+    try { return b.tonFuerGrund(farbe, '#ffffff', min); } catch (e) { return farbe; }
   }
 
   /* Mandanten-Ansicht? Dann Weg B — still korrigieren. Sonst Weg C. */
