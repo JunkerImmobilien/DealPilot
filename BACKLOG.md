@@ -538,6 +538,27 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    kam als **„saniert"** an. Beides in `v1136c` behoben, ausführlich unter
    Punkt 7 beschrieben.
 
+   **Auf Produktion ausgerollt am 2026-08-11** — `main` von `e682367`
+   (`v1111`) auf `51958c6`, **98 Commits auf einmal**: die Handy-Freigabe
+   `v1118`, die Steuer-PDFs `v1131`–`v1133` und die ganze
+   Marktbericht-Kette. Vorher gesichert: `/root/backup-pre-v1136.sql`
+   (11,3 MB) und `/root/backup-mb-pre-v1136.sql` (13,5 MB) — beide mit
+   Abschlussmarke geprüft, die mb-DB steht in keinem Backup-Skript.
+
+   **Keine Migration** in den 98 Commits, zwei Backend-Dateien geändert
+   (`routes/marktbericht.js`, `services/aiCreditsService.js`) → nur
+   `backend` neu gebaut, `mb-backend` unangetastet. Backend danach
+   *healthy*, „Migration complete", DB verbunden.
+
+   **Der befürchtete Datenverlust traf auf Produktion niemanden:** von 15
+   Objekten trug **keines** Wertermittlungsangaben, keines einen
+   Marktbericht-Snapshot. Nichts gelöscht — es gab nichts zu bereinigen.
+
+   **Offener Abnahmepunkt:** der eingeloggte Speicher- und Ladetest ist
+   nur auf Staging gefahren. Auf Produktion ist belegt, was ohne Anmeldung
+   messbar ist — Karte im HTML, `WM_FIELDS` 38, `FIELDS` 203, alle 38
+   Felder im DOM, keine Konsolenfehler.
+
 - [2026-08-11] **Finanzamt-PDF: Rechnung geprüft, Darstellung neu** — `v1131` (`534d7e3`), `v1132` (`6352e2a`), `v1133` (`de976c2`).
    Ergebnisdarstellung neu bauen.** Drei Arbeiten an einer Datei, in dieser
    Reihenfolge:
