@@ -149,9 +149,32 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
       Die Warnung „`kaufpreis` und `cf_ns` stehen in Cent" führt bei der
       nächsten Fehlersuche in die Irre und ist deshalb oben gestrichen.
 
-   **Noch nicht gefahren** und damit offen: **Bankexport** (die
-   BWK-Teilung durch 12), **PDF-Ausgabe**, die Kette in den
-   **Marktbericht** und die **Handy-Ansicht** desselben Objekts.
+   **Bankexport geprüft (2026-08-11) — sauber.** Der Haken „Alle Objekte
+   anzeigen" ist nötig, sonst zeigt der Export **nur gewonnene Deals**
+   und ein frisches Testobjekt fehlt wortlos. Zeile `PRUEF_1` gegen die
+   Handrechnung:
+
+   | Spalte | Export | Rechnung |
+   |---|---|---|
+   | **Nebenkosten (BWK)/Mon** | **339,67 €** | (2.100 + 1.976)/12 ✓ |
+   | Kapitaldienst | 1.009 € | 12.109,63/12 ✓ |
+   | €/qm | 10,63 € | 850/80 ✓ |
+   | Restschuld nach 10 J. | 168.516 € | 168.494 (jährlich gerechnet) |
+   | Volltilgung | 2056 | ~30,1 Jahre bei 3,5/2 ✓ |
+
+   Die 22 € Abweichung bei der Restschuld sind monatliche gegen
+   jährliche Verrechnung — kein Befund.
+
+   **Weiterhin offen:** **PDF-Ausgabe** (das Erzeugen löst einen Download
+   aus und braucht Marcels Freigabe), die Kette in den **Marktbericht**
+   und die **Handy-Ansicht** desselben Objekts.
+
+   **Warnung für den nächsten Durchgang:** Die Handy-Messung über eine
+   iframe-Messkabine mit der **vollen App** hat den Renderer des Tabs
+   **eingefroren** (CDP-Timeout nach 45 s, zweimal). Die App im iframe
+   startet ihre komplette Maschinerie ein zweites Mal. Für die
+   Handy-Ansicht deshalb ein **eigenes Fenster** in 390 px nehmen, nicht
+   die Kabine im selben Tab.
 
 2. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
