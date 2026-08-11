@@ -1706,8 +1706,25 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   margin-top: 4px;
   letter-spacing: 0.02em;
 }
+/* v1138c: Diese Regel war seit ihrem Einbau wirkungslos. Zwei spaetere
+   Regeln (Z. ~32116 und ~32186) setzen `repeat(3, 1fr) !important` OHNE
+   Media-Query — bei gleicher Spezifitaet gewinnt die spaetere, also standen
+   die drei Kacheln auch auf dem Handy nebeneinander. Dasselbe traf die
+   Tablet-Regel bei max-width:1024px.
+
+   Gemessen bei 390 px am Testobjekt PRUEF_1: Kachel 97 px breit, davon
+   57 px innen, Wert in 30 px Schrift. Ergebnis waren dreizeilige Umbrueche
+   wie „–“ / „274“ / „€“ — das Minuszeichen stand allein in einer Zeile und
+   der Betrag las sich als positiv. Beschriftungen brachen zu
+   „ENDE ZINSBINDUN“ ab.
+
+   Deshalb ueber SPEZIFITAET statt Position (`.sec .cf-phase-grid`): die
+   Probe gewann selbst als erstes Stylesheet gegen beide !important-Regeln.
+   Kein Verlass auf Ladereihenfolge. */
 @media (max-width: 700px) {
-  .cf-phase-grid { grid-template-columns: 1fr; }
+  .sec .cf-phase-grid { grid-template-columns: 1fr !important; }
+  .sec .cf-phase-val,
+  .sec .cf-phase-label { white-space: nowrap !important; }
 }
 
 /* ═══════════════════════════════════════════════════
