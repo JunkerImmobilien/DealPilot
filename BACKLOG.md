@@ -103,25 +103,46 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
    **Vier Befunde — als eigene Punkte zu fassen, hier nicht repariert:**
 
-   1. **Ein negativer Cashflow zeigt kein Minuszeichen.** `cf-vst-now`
-      steht als **„274 €"** da, wo −273,80 gemeint ist; positive Werte
-      tragen ein „+". Nur die **Farbe** (rot `rgb(217,104,95)` gegen grün
-      `rgb(63,165,108)`) unterscheidet — für Rot-Grün-Blinde sind die
-      beiden Fälle **nicht unterscheidbar**. Ursache steht fest:
-      `calc.js:3655` ruft `fE(v, 0)` ohne das Vorzeichen-Flag, und `fE`
-      formatiert intern `Math.abs(n)`. Der Aufruf müsste `fE(v, 0, true)`
-      lauten — dann liefert die Funktion „–274 €" und das manuelle „+"
-      entfällt. Betrifft alle sechs Phasen-Kacheln.
-   2. **Zwei Zahlen für dieselbe Größe.** Die kumulierten Mieteinnahmen
-      über 15 Jahre mit 3 % Steigerung stehen im selben Reiter zweimal:
-      `vz-info-miete` = **200.868 €**, `vz-plausi-mit` = **198.709 €**.
-      Differenz 2.159 €. 200.868 ist die geometrische Reihe
-      (10.800 × (1,03¹⁵−1)/0,03); woher 198.709 kommt, ist offen.
-   3. **Eine Nutzereingabe wird still überschrieben.** In „Umlagefähige
-      Kosten / Monat" 200 eingetragen — nach dem Rechnen steht dort
-      **175,00**, also 2.100/12 aus den umlagefähigen BWK. Die Warmmiete
-      zeigt entsprechend 12.900 € statt 13.200 €. Ob die Kopplung
-      gewollt ist, ist zu klären; **still überschreiben ist es nicht.**
+   1. **BEHOBEN in `v1137` (`70326cf`) — ein negativer Cashflow zeigte
+      kein Minuszeichen.** `cf-vst-now` stand als **„274 €"** da, wo
+      −273,80 gemeint war; positive Werte tragen ein „+". Nur die
+      **Farbe** (rot `rgb(217,104,95)` gegen grün `rgb(63,165,108)`)
+      unterschied — für Rot-Grün-Blinde sind die beiden Fälle **nicht
+      unterscheidbar**. Ursache: `calc.js:3655` rief `fE(v, 0)` ohne das
+      Vorzeichen-Flag, und `fE` formatiert intern `Math.abs(n)`. Jetzt
+      `fE(v, 0, true)`; das manuelle „+" entfällt. Nachgemessen: „–274 €",
+      „–173 €", „+238 €" an allen sechs Phasen-Kacheln.
+   2. **BEHOBEN in `v1137` — zwei Zahlen für dieselbe Größe.** Die
+      kumulierten Mieteinnahmen standen im selben Reiter zweimal:
+      `vz-info-miete` = 200.868 €, `vz-plausi-mit` = 198.709 €.
+      Ursache: **genau der Bäckerstr.-7-Fehler aus `V119`, eine Zeile
+      weiter vergessen** — `vz-plausi-mit` bekam weiter den Wert der
+      ersten Schleife (Quick-Methode), während die Aufschlüsselung
+      darüber längst aus `cfRows` kam. Jetzt zieht die Plausi-Zeile
+      denselben `_mieteKumNew`-Wert.
+
+      **Dabei kam heraus, dass BEIDE alten Zahlen zu hoch waren.** Die
+      echte Rechnung liefert **194.568 €**; an `State.cfRows` abgelesen:
+      **Jahr 1 = 4.500 €**, also 10.800 × 5/12 — das **anteilige
+      Erwerbsjahr** ab August. Ab Jahr 2 steigt es exakt mit 3 %
+      (11.124, 11.458, …). Die Quick-Methode rechnete das erste Jahr
+      voll.
+
+      **Kleiner Rest, bewusst offen gelassen:** Die Plausi-Zeile sagt
+      „Aktuelle NKM 10.800 €/J × 15 Jahre … mit 3,0 % p.a. wächst die
+      Miete auf 194.568 €" und **erwähnt das anteilige erste Jahr
+      nicht**. Wer nachrechnet, kommt auf 200.868 und hält die Zahl für
+      falsch. Das ist eine Beschriftungsfrage, kein Rechenfehler.
+   3. **ZURÜCKGENOMMEN — das war mein Messfehler, kein Befund der App.**
+      Ich hatte gemeldet, die Eingabe „Umlagefähige Kosten / Monat" werde
+      still von 200 auf 175 überschrieben. Der Grund steht in
+      `main.js:338` und ist eine **gewollte Zwei-Wege-Kopplung** (V187):
+      `umlagef` → schreibt `hg_ul`, und jede Änderung an den
+      UL-Feldern schreibt die Summe/12 zurück. **Mein Testaufbau hat
+      beide Seiten gleichzeitig per Skript gesetzt** — ein Mensch tippt
+      nacheinander, und dann tut die Kopplung genau das Richtige. Auch
+      die Warmmiete 12.900 € ist damit korrekt: Kalt 10.800 +
+      umlagefähige Erstattung 2.100.
    4. **Die Cent-Warnung oben in diesem Punkt stimmt nicht mehr.**
       Gemessen an der Staging-Datenbank und am API-Objekt: `kaufpreis` =
       `250000.00` und `cf_ns` = `-2075.13`, beide `numeric` in **Euro**.
