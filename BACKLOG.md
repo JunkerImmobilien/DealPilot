@@ -37,161 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Objekt-Tab: eigener Reiter für die Marktbericht-Felder.** Die
-   Zusatzangaben aus der Wertermittlung sollen **nicht** unter die
-   Grundwerte, aber auch nicht verloren gehen — ein zusätzlicher,
-   aufklappbarer Reiter am Objekt, der sie dauerhaft hält. **Zuerst der
-   Abgleich: welche Felder gibt es, welche fehlen.** Die Prüfliste steht:
-
-   | Gruppe | Felder |
-   |---|---|
-   | Grundlagen | `mea`, `bgf`, `spMiete`, `sonstEinnahmen`, `standardstufe`, `grundriss`, `modGrad` |
-   | NHK | `nhkHaus`, `nhkGeschosse`, `nhkDach` |
-   | Hinterland / Garage / Außen | `hinterlandFlaeche`, `hinterlandWert`, `hinterlandRent`, `garagenBgf`, `garagenStufe`, `aussenPct` |
-   | Feinjustierung Gewerke (9) | `ausstAussenwaende`, `ausstDach`, `ausstFenster`, `ausstInnenwaende`, `ausstDecken`, `ausstFussboeden`, `ausstSanitaer`, `ausstHeizung`, `ausstTechnik` |
-   | Sonstige Bauteile (5) | `btlGauben`, `btlBalkone`, `btlVordach`, `btlTerrassen`, `btlSonstige` |
-
-   **Die Stelle, an der so etwas schon einmal verlorenging, ist bekannt:**
-   `payload()` in `wertermittlung.js` reicht die Felder an den Bericht, der
-   Rückweg ins Portfolio läuft aber über `_mbBuildObjData()` in `app.js`,
-   und zwar über DOM-Ids. Was dort fehlt, rechnet im Bericht mit und ist im
-   gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
-   Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
-   **Berührt Punkt 8** — wer die Felder für den Wizard neu gruppiert, hat
-   den Abgleich ohnehin gemacht. Der Reiter wartet aber **nicht** darauf,
-   siehe unten.
-
-   **BLOCKIERT aufgehoben (2026-08-10).** Der Punkt hing an der Auswahl aus
-   `design/Vorschläge/marktbericht-gestaltung-10-ideen.html`. Der
-   Marktbericht ist jetzt aber auf Marcels Wunsch der **letzte** Punkt —
-   damit hinge dieser hier hinter allem anderen. Deshalb: **der Reiter wird
-   nach der bestehenden Gruppierung der Prüfliste gebaut** (die fünf
-   Gruppen oben). Der Preis ist benannt: gruppiert der spätere Wizard
-   anders, ist der Reiter nachzuziehen. Das ist eine kleine Nacharbeit an
-   einer Darstellung, kein Umbau — und billiger, als den Punkt hinten
-   anzustellen.
-
-   **Der Abgleich ist erledigt (2026-08-10, `v1121`, `4049eb1`).** Beide
-   Seiten gegeneinander gezählt, wie der Punkt es verlangt. **Fünf Felder
-   fehlten auf dem Rückweg** — sie rechneten im Bericht mit und waren im
-   gespeicherten Objekt weg:
-
-   | Feld | `payload()` | `_mbBuildObjData()` vorher | jetzt als |
-   |---|---|---|---|
-   | `bgf` | ✓ | **fehlte** | `bgf` |
-   | `sonstEinnahmen` | ✓ | **fehlte** | `sonstige_jahr` |
-   | `aussenanlagen` | ✓ | **fehlte** | `aussenanlagen` |
-   | `besBauteile` | ✓ | **fehlte** | `bes_bauteile` |
-   | `sachwertfaktor` | ✓ | **fehlte** | `sachwertfaktor` |
-
-   Dieselbe Lehre wie `v1072-WSAV-1` und `v1074-WSAV-1`, **zum dritten
-   Mal**. Benannt wurde nichts neu — die Namen sind genau die, die
-   `payload()` ohnehin ans Berichts-Backend schickt.
-
-   **Die übrigen 25 Felder der Prüfliste sind vollständig:** `mea`,
-   `spMiete`, `standardstufe`, `grundriss`, `modGrad`, die drei `nhk*`, die
-   drei `hinterland*`, `garagenBgf`, `garagenStufe`, `aussenPct`, alle neun
-   `ausst*` und alle fünf `btl*`.
-
-   **Ein eigener Messfehler, zurückgenommen:** Ich hatte gemeldet, 18
-   weitere Felder fehlten in `_mbBuildObjData()`. Falsch —
-   **die Funktion räumt leere Werte weg**, und ich hatte die Felder nicht
-   ausgefüllt. Nach dem Befüllen von sechs davon stieg die Schlüsselzahl
-   von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
-   JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
-
-   **Der Rückweg war trotzdem umsonst — behoben in `v1134` (`0822398`).**
-   Beim Bauen des Reiters gemessen: Der Marktbericht schrieb die Felder
-   korrekt ins Objekt, und **das Hauptprogramm löschte sie beim nächsten
-   Speichern wieder weg.** Die Kette, Stück für Stück ausgelesen:
-
-   | Stelle | Verhalten |
-   |---|---|
-   | `collectData()` (`storage.js:89`) | baut ein **frisches** `{}` aus der `FIELDS`-Whitelist |
-   | `saveObj()` | schickt `body:{ data: data }` |
-   | `objectService.update()` | setzt `data = $9` — **voller Ersatz, kein Merge** |
-
-   Am geladenen Objekt nachgezählt: **182 Schlüssel am Server, 179 aus
-   `collectData()`.** Die Differenz — `_thumb`, `_ds2_score`,
-   `_ds2_categories` — steht am Objekt und wurde nicht wieder erzeugt.
-   Keines der 38 Wertermittlungsfelder steht in der Whitelist.
-
-   Dass das Muster bekannt war, stand im Quelltext: `ai_lage_cache`
-   (V187-h2), `brw_ki_result` (V191) und `steuer_snapshot` (V276.6) sind
-   **drei einzeln von Hand gerettete Schlüssel**, jeder mit eigenem
-   `try/catch`. Beim vierten Fall hat niemand mehr daran gedacht. Jetzt
-   eine **Regel statt einer Liste**: was am geladenen Objekt steht und die
-   Whitelist nicht erzeugt, bleibt stehen.
-
-   Beide Richtungen im Browser bewiesen:
-   - **Nichts geht verloren** — 183 Schlüssel rein, 183 raus (vorher 182 → 179)
-   - **Geleertes bleibt geleert** — `plz` geleert ergibt `""`, nicht den Altwert
-
-   **Was das für bestehende Objekte heißt:** Wer vor `v1134` einen
-   Marktbericht erzeugt und das Objekt danach im Hauptprogramm gespeichert
-   hat, hat die Wertermittlungsangaben verloren — Hinterland, NHK, die neun
-   Gewerke, die fünf Bauteile. Sie sind nicht wiederherstellbar und müssen
-   einmal neu eingegeben werden. Ab jetzt bleiben sie.
-
-   **Die zweite Hälfte des Lecks — behoben in `v1135` (`b703134`),
-   `v1135b` (`70f0d63`).** Auch v1134 hätte allein nichts genützt: die
-   Objektwahl im Marktbericht (`mb-objektwahl.js`, `fillFromData`) setzte
-   **15 Grundfelder und las die 38 Wertermittlungsfelder nie**. Die Kette
-   war also dreifach repariert und trotzdem sinnlos — man fing bei jedem
-   Bericht wieder bei null an.
-
-   Dazu las die Objektwahl **zwei Felder unter falschem Namen**:
-   `_mbBuildObjData()` schreibt `baeder` und `ausstattung`, gelesen wurde
-   `bad_anz` und `ausst`. Beide jetzt als Rückfalle mit drin — der
-   Originalname behält Vorrang.
-
-   Neu ist `WM_MAP`, 50 Paare Speicherschlüssel → Formular-Id, 1:1 aus
-   `_mbBuildObjData()` abgeschrieben. **Nichts neu benannt.**
-
-   **Ein Beobachter statt eines einmaligen Befüllens.** Die
-   Wertermittlungsfelder liegen im Block `wm-b3` und existieren erst ab
-   Stufe 3 — wer nur einmal setzt, setzt ins Leere und merkt es nicht. Der
-   `MutationObserver` trägt nach, sobald die Felder entstehen, und trennt
-   sich selbst. Kein `requestAnimationFrame`: das feuert im verborgenen
-   Tab nie.
-
-   **Im Browser durchgemessen**, Objekt Am Markt 9 Kabelsketal, Testwerte
-   in die Objektantwort untergeschoben statt geschrieben — kein
-   Schreibzugriff, kein Kerosin:
-
-   | Zustand | Ergebnis |
-   |---|---|
-   | Direkt nach der Objektwahl | 19 Felder noch nicht im DOM — der Beobachter wartet |
-   | Nach Klick auf Stufe 3 | **11 von 11 vorhandenen Feldern korrekt**, keine Abweichung |
-   | Nach Wechsel ETW → EFH | die restlichen 8 entstehen und werden nachgetragen |
-
-   Dass bei einer **ETW** die NHK- und Gewerkefelder fehlen, ist richtig
-   und kein Mangel — das Sachwertverfahren ist dort nicht anwendbar.
-
-   **Drei eigene Messfehler, ausdrücklich zurückgenommen.** Ich hatte
-   nacheinander gemeldet, `hinterlandRent`, `grundriss`, `modGrad`, dann
-   `nhkHaus`, `nhkDach` und die drei `ausst*` würden nicht gesetzt. Falsch
-   — **meine erfundenen Testwerte waren keine gültigen Optionen.** Die
-   Selects führen Zahlencodes (`1`…`4`), nicht Klartext wie `gehoben`.
-   Einmal habe ich außerdem im selben Block geklickt und gemessen, also
-   vor der Antwort des Servers, und daraufhin „0 von 19" gemeldet.
-
-   Aus dem letzten Fehler kam eine echte Verbesserung: ein Auswahlfeld
-   nimmt einen unbekannten Wert **still** nicht an und bleibt leer. Das
-   passiert echt, wenn sich eine Optionsliste zwischen zwei Fassungen
-   ändert. `v1135b` warnt jetzt in der Konsole mit Feldname, Wert und der
-   Liste der gültigen Optionen. Verhalten unverändert, nur sichtbar.
-
-   **Offen bleibt der Reiter selbst.** Die Felder sind jetzt dauerhaft und
-   laufen in beide Richtungen — der ursprüngliche Zweck des Punktes ist
-   damit erfüllt. Was fehlt, ist das Ansehen und Ändern **ohne** den
-   Marktbericht: ein aufklappbarer Block am Objekt nach den fünf Gruppen
-   der Prüfliste. Die Eingabefelder müssen dabei als Id **den
-   Speicherschlüssel** tragen (`hinterland_qm`, nicht `hinterlandFlaeche`)
-   und in `FIELDS` in `storage.js` eingetragen werden — dann trägt der
-   bestehende Weg sie von selbst.
-
-2. **Accordion „Analyse → Marktbericht": das „2 L" weg, und die Farbe
+1. **Accordion „Analyse → Marktbericht": das „2 L" weg, und die Farbe
    soll der Optik folgen.** Bild im Mockup-Ordner (2026-08-11) — den
    Dateinamen beim Aufgreifen hier eintragen.
 
@@ -218,7 +64,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Umschaltung darf nur den Rahmen in der Haupt-App betreffen, nicht ins
    iframe durchschlagen.
 
-3. **Partner-Logo auf der Landingpage ergänzen: caretechthiel.**
+2. **Partner-Logo auf der Landingpage ergänzen: caretechthiel.**
    Unter „Partner" fehlt das Logo von `caretechthiel.de`. Es liegt im
    Mockup-Ordner. **Gleiche Größe wie die vorhandenen** — also nicht nach
    Augenmaß einsetzen, sondern die gerenderte Breite und Höhe der
@@ -231,7 +77,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    `rfind` arbeiten. Bild in denselben Ordner wie die übrigen Partnerlogos,
    Pfad relativ zur Landing-Seite prüfen.
 
-4. **Ein Testobjekt vollständig anlegen und alle Rechenwege
+3. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
    Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
    richtig, wird unter „Bewertung" alles passend angezeigt, sind die
@@ -262,7 +108,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
    Steuerteil.
 
-5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -360,7 +206,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -395,7 +241,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -429,7 +275,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-8. **Marktbericht neu gestalten.**
+7. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -520,6 +366,26 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
       wieder ein Pflichtdurchlauf und die Vereinigung der drei Stufen
       wertlos.
 
+      **Eine Ursache ist gefunden und behoben (2026-08-11, `v1136c`) —
+      wahrscheinlich nicht die einzige.** Beim Durchmessen der Kette für
+      den Objekt-Reiter gemessen: `mapCond()` in `mb-objektwahl.js` ordnete
+      den Zustand **„gut"** keiner einzigen Option des Berichtsfeldes zu und
+      ergab `null`. Der Zustand ist Pflicht für die Marktpreisindikation,
+      und `erreicht()` in `mb-stufen.js` ist eine **Kaskade** — ohne Stufe 2
+      ist Stufe 3 unerreichbar. Der **häufigste Zustandswert überhaupt**
+      hat den Bericht also gesperrt, und die Ampel zeigte an Stufe 3
+      „fehlt: " **ohne Inhalt**, weil dort tatsächlich nichts fehlte.
+
+      Zwei Lehren für den Wizard:
+      - **Eine Stufe kann vollständig sein und trotzdem gesperrt** — weil
+        eine frühere es nicht ist. Die Beschriftung muss den **wirklichen**
+        Grund nennen, nicht die leere Liste der eigenen Stufe.
+      - **Beide Optionslisten gehören gegeneinander geprüft**, nicht per
+        Heuristik verknüpft. Die alte Fassung verglich fünf
+        Anfangsbuchstaben, und „sanie" steckt auch in
+        „sanierungsbedürftig" — **„stark sanierungsbedürftig" kam als
+        „saniert" an**, ein Fehler mit falschem Vorzeichen.
+
    3. **Es muss auf dem Handy funktionieren.** Seit `v1118` landen echte
       Nutzer bei 390 px in der normalen Ansicht. Eine siebenteilige
       Schrittleiste nebeneinander und ein Handy schließen sich aus — der
@@ -552,6 +418,25 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Geldfragen oben (wann wird abgerechnet, was kostet das Vertiefen)
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
+
+8. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
+   Beim Ausrollen von `v1136` gemessen: `git status` auf
+   `root@116.203.214.11` meldet
+   `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
+   **319 Zeilen mehr, 42 weniger** als der Repo-Stand. Daneben liegen
+   `registry.js.pre-v1080` und `.pre-v1082a` — die Änderung stammt also
+   aus zwei Paketen, die nie zurückgeflossen sind.
+
+   **Warum das drängt:** `deploy-staging.ps1` bricht deshalb bei **jedem**
+   Ausrollen ab (der Pull lief nur nach Hand-Eingriff durch), und der
+   nächste, der die Datei im Repo anfasst, erzeugt einen Konflikt oder
+   überschreibt Arbeit, die es nur auf dem Server gibt. Eine Sicherung
+   liegt unter `/root/registry.js.bak-2026-08-11`.
+
+   **Zu tun:** Serverfassung gegen Repo-Fassung diffen, entscheiden was
+   gilt, ins Repo holen — und dann prüfen, ob dieselbe Drift auch auf der
+   **Produktion** liegt. Nicht nebenbei: es ist der BORIS-Anschluss, an
+   dem die Bodenrichtwerte hängen.
 
 ---
 
@@ -589,6 +474,69 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-11] **Objekt-Tab: eigener Reiter für die Marktbericht-Felder** — `v1121` (`4049eb1`), `v1134` (`0822398`), `v1135` (`b703134`), `v1135b` (`70f0d63`), `v1136` (`d11e1df`), `v1136b` (`111ca92`), `v1136c`.
+
+   Der Punkt lief über vier Ausbaustufen, weil die Kette an **vier**
+   Stellen gerissen war. Alle vier sind gemessen, nicht vermutet:
+
+   | Stelle | Was sie tat | Behoben in |
+   |---|---|---|
+   | `_mbBuildObjData()` | ließ fünf Felder aus, die im Bericht mitrechneten | `v1121` |
+   | `collectData()` / `objectService.update()` | voller Ersatz statt Merge — das Hauptprogramm löschte die Felder beim nächsten Speichern | `v1134` |
+   | `fillFromData()` | las die 38 Felder nie zurück ins Berichtsformular | `v1135` |
+   | `loadData()` | leerte beim Objektwechsel nur 17 Felder — der Rest trug den Wert des Vorgängers weiter | `v1136` |
+
+   **Der Reiter selbst** steht als aufklappbarer Block am Ende des
+   Objekt-Reiters, `data-collapsible="wm-obj"`, Standard zugeklappt. 38
+   Felder in sechs Gruppen. **Jede Id ist der Speicherschlüssel** aus
+   `_mbBuildObjData()`, jede Optionsliste 1:1 aus `wertermittlung.js` —
+   ein abweichender Wert käme im Bericht still als leer an (`v1135b`).
+
+   **Vier tote Felder gefunden.** `baustatus`, `bgf`, `standardstufe` und
+   `brw_stichtag` standen seit `WOBJ32-1` im HTML und in **keiner Zeile
+   JavaScript**: nie gespeichert, nie geladen, nur getippt. Gemessen mit
+   `grep` über `frontend/` — außerhalb von `index.html` kein einziger
+   Treffer. Die ersten drei sind in den neuen Block gewandert (sie gehören
+   zum Gebäude, nicht zum Boden), der Stichtag bleibt beim Bodenrichtwert.
+
+   **Die Falle, die der Eintrag in `FIELDS` erst geschaffen hätte:**
+   `loadData()` setzt nur, was das neue Objekt führt. Solange die Felder
+   gar nicht gespeichert wurden, war das harmlos — ab dem FIELDS-Eintrag
+   wären die 828 m² Hinterland von Objekt A beim Speichern an Objekt B
+   geklebt. Deshalb steht `WM_FIELDS` an **zwei** Stellen: in `FIELDS`
+   und in der Leerliste von `loadData()`.
+
+   **Im Browser durchgemessen, Objekt Hermannstr. 9 Hüllhorst:**
+
+   | Prüfung | Ergebnis |
+   |---|---|
+   | Alle 38 Ids im HTML, keine doppelt | 38/38, `uniq -d` leer |
+   | `collectData()` sammelt ein | 38/38 |
+   | Am Server nach dem Speichern | 38/38, 183 → 222 Schlüssel |
+   | Objektwechsel auf ein Objekt ohne diese Daten | **0 Felder tragen weiter** |
+   | Zurück zum Objekt | **38/38 korrekt**, keine Abweichung |
+   | Objektwahl im Marktbericht, Stufe 3 | **22/22 vorhandene Felder korrekt** |
+   | Handybreite 390 px (iframe-Messkabine) | eine Spalte, kein Querlauf |
+
+   Die 17 Felder, die im Bericht fehlen, sind die „nur Häuser"-Felder —
+   bei einer ETW richtig so.
+
+   **Zwei eigene Fehler, ausdrücklich benannt.** Der `mea`-Rückfall in
+   `v1136` stand in der Schleife von `fuelleWertermittlung()` und wirkte
+   deshalb nie: derselbe Datensatz geht an den Beobachter, der
+   `d[schlüssel]` **erneut** liest. Da die Felder vor Stufe 3 gar nicht im
+   DOM stehen, lief er immer ins Leere. In `v1136b` am Datensatz
+   normalisiert. Und der Marktbericht-Pfad ist **nicht**
+   `/marktbericht-app/` im Browser — er läuft als iframe im Reiter
+   „Analyse → Marktbericht"; die direkte URL liefert die Haupt-App ohne
+   Stile.
+
+   **Nebenbefund, der einem offenen Punkt gehört** (jetzt Punkt 7,
+   Marktbericht): `mapCond()` ordnete den Zustand **„gut"** keiner Option
+   zu und sperrte damit den Bericht, und **„stark sanierungsbedürftig"**
+   kam als **„saniert"** an. Beides in `v1136c` behoben, ausführlich unter
+   Punkt 7 beschrieben.
 
 - [2026-08-11] **Finanzamt-PDF: Rechnung geprüft, Darstellung neu** — `v1131` (`534d7e3`), `v1132` (`6352e2a`), `v1133` (`de976c2`).
    Ergebnisdarstellung neu bauen.** Drei Arbeiten an einer Datei, in dieser
