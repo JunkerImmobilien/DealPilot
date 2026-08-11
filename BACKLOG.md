@@ -110,9 +110,57 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
       **`Immokalk_GK_AmMarkt11_WEH22_11_2025`** (ebenfalls
       `design/mockups/`). Zahl für Zahl dagegenhalten, Abweichungen
       benennen — nicht stillschweigend anpassen.
+
+      **ERLEDIGT 2026-08-11, beide Dateien gelesen. Ein Fehler gefunden und
+      behoben (`v1131`, `534d7e3`).**
+
+      **Unser PDF ging nicht auf.** Die sechs Zwischensummen ergeben
+      `1.928 + 700 + 405 + 0 + 978 + 0 = 4.011 €`. Ausgewiesen waren
+      **5.511 €** — **1.500 € mehr, die in keiner Zeile standen.**
+      Ursache: `_computeYearTotal` (`tax.js:1056`) rechnet `nk_umlf`, die
+      **umlagefähigen** Nebenkosten, in die Summe ein; der Abschnitt
+      Betriebskosten zeigte aber nur `nk_n_umlf` und `betr_sonst`.
+
+      **Die Rechnung ist richtig, die Darstellung war es nicht.**
+      Nachgelesen statt angenommen: umlagefähige Nebenkosten gehören auf
+      **beide Seiten** — als Einnahme beim Zufluss (Anlage V Zeile 14) und
+      als Werbungskosten beim Abfluss (Zeile 33 ff.); **eine Saldierung ist
+      nicht zulässig** (§ 11 EStG, Zufluss-/Abflussprinzip).
+      **Marcels Immokalk macht es genauso** — dort steht
+      „Nebenkosten (Umlagefähige Kosten) 2.092,23 €" als eigene Zeile in
+      Abschnitt 2.0. Die Vorlage bestätigt die Korrektur.
+
+      Für den Leser war das Papier unprüfbar: ein Finanzamt, das
+      nachrechnet, findet eine Lücke von 1.500 €. Behoben an zwei Stellen —
+      die Zeile im Abschnitt 2 und die Aufschlüsselung der Einnahmen in
+      Kaltmiete + Umlagen. **Keine Zahl geändert, nur sichtbar gemacht.**
+
+      **Immokalk selbst nachgerechnet, geht auf:**
+      `2.941,84 + 2.092,23 + 415,00 + 816,08 + 3.190,34 + 2.200,00 =
+      11.655,49 €`; `8.296,12 − 11.655,49 = −3.359,37 €`. ✓
+
+      **Eine Unstimmigkeit in der Vorlage, ehrlich vermerkt:** dort steht
+      „Abschreibung **4 %**", gerechnet wird aber mit **3,85 %**
+      (`82.866 × 3,85 % = 3.190,34`). Die Bemerkung nennt den Grund
+      („AfA 3,85 % nach Restnutzungsdauergutachten"). **Wer das Layout
+      übernimmt, sollte den echten Satz zeigen, nicht den gerundeten.**
    2. **Die Zusammenfassung unten neu darstellen.** Marcels Urteil: die
       Ergebnisanzeige ist nicht gut gelungen. **`Immokalk_…` ist die
       Vorlage**, wie es zusammengefasst und dargestellt werden soll.
+
+      **Der Abgleich steht (2026-08-11). Drei Dinge kann die Vorlage, die
+      unser PDF nicht kann:**
+
+      | Immokalk zeigt | unser PDF |
+      |---|---|
+      | **Die Herleitung der AfA**: Kaufpreis + Grunderwerb + Notar + Fahrt + Verpflegung + Unterkunft → Anschaffungskosten **94.224,83 €** → BMF-Aufteilung **90,67 % Gebäude / 9,33 % Boden** → Satz → **AfA 3.190,34 €** | eine einzige Zeile „AfA Gebäude (linear) 978 €" — **ohne jede Herleitung** |
+      | **Die Steuerwirkung**: zvE vor/nach Investition, Grenzsteuersatz, ESt vor/nach, Steuersatz — und daraus **„Steuer Verlust/Überschuss pro Jahr 1.380 € · pro Monat 115 €"** | **fehlt vollständig** — das Papier endet bei der Werbungskosten-Summe |
+      | **Bemerkungsspalte** je Abschnitt („4 Fahrten zur Immobilie, Eigentümerversammlung") | Bemerkungen werden zwar gelesen (`bem.*`), aber nur klein an der Zeile |
+
+      **Das Wichtigste ist die zweite Zeile.** Marcels Blatt beantwortet
+      „was bringt mir das steuerlich im Monat?" — unseres hört davor auf.
+      `tax.js` **rechnet** die Steuerwirkung bereits (`baseIncome`, zvE je
+      Jahr über `DealPilotTaxPeriods`); sie kommt nur nicht aufs Papier.
    3. **Zeilen mit Null verschwinden.** Ausgegeben wird nur, wozu es auch
       eine Angabe gibt. **Aufpassen bei der Umsetzung:** `_euro(null)`
       liefert `"–"` und ist damit **truthy** — wer auf den formatierten
