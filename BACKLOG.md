@@ -522,6 +522,59 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   trägt `hide`, solange kein Bericht vorliegt; `#genProgress` trägt `hide`,
   solange nicht erzeugt wird. Das ist die Wahrheit der App.
 
+  ### `v1129` — mehr Reiter, Zusatzwerte, Prozent am Balken
+
+  Marcels drei Wünsche, alle umgesetzt.
+
+  **Sechs Reiter statt drei.** Gemessen trug „Zustand & Markt" **24 Felder**
+  — mehr als die anderen beiden zusammen. `precBox` besteht aber aus zehn
+  sauberen `.row`-Zeilen, die sich trennen lassen:
+
+  | Reiter | Felder | Stufe |
+  |---|---|---|
+  | 1 Objekt | 11 | Einschätzung |
+  | 2 Zustand | 7 | Marktpreisindikation |
+  | 3 Ausstattung | 8 | Marktpreisindikation |
+  | 4 Gebäude & Außen | 9 | Marktpreisindikation |
+  | 5 Wertermittlung | 12 | Wertermittlung |
+  | **6 Zusatzwerte** | 6 | Wertermittlung |
+
+  **Die Meilensteine bleiben drei** — mehrere Reiter zahlen auf dieselbe
+  Stufe ein. Reiter 6 trägt genau die gewünschten Werte:
+  `lzs` (Liegenschaftszins), `sachwertfaktor`, `brwManuell`, `brwStichtag`,
+  `brwAnp`, `brwAnpGrund`.
+
+  ### Zwei Befunde, die erst der Prüflauf gezeigt hat
+
+  **1 · Doppelte Ids** (`v1129b`). Der Expertenblock steckt in `wm-b3`, und
+  `wertermittlung.js` baut `wm-b3` bei **jedem** `zeichnen()` neu. Hatte
+  ich ihn vorher nach Reiter 6 verschoben, entstand daneben eine **zweite,
+  leere** Fassung mit denselben Ids. `getElementById` nimmt die erste —
+  `payload()` las damit die leere. **Gemessen: `lzs_pct` kam als `null` an,
+  obwohl 2,56 im Feld stand.** Jetzt wird vor jedem Einräumen aufgeräumt:
+  es darf nur eine geben, behalten wird die im Reiter.
+
+  **2 · Der Ladebalken hat nie existiert** (`v1129c`). `#genProgress` ist
+  im HTML ein **leeres `div`**. `app.js` sucht darin `#genProgBar` (Z. 283)
+  und `#genProgSteps` (Z. 289) — **beide gibt es nicht**. Der Balken-Code
+  lief ins Leere, die Schritte wurden per `innerHTML` direkt in den Kasten
+  geschrieben. **Es gab immer nur eine Schrittliste, nie einen Balken.**
+
+  Jetzt wird das Gerüst gebaut, das der vorhandene Code erwartet:
+  Kopfzeile mit Prozent, `#genProgBar`, `#genProgSteps`. `app.js` füllt
+  beides von selbst. **Die Prozentzahl wird aus der Balkenbreite gelesen,
+  nicht zweitgerechnet** — ein eigener Zähler wiche ab, sobald `app.js`
+  seine Kurve ändert.
+
+  **Nachgemessen:** 8 % → „8 %", 35 % → „35 %", 67 %, 92 % — die Anzeige
+  folgt exakt. Balken 760 px breit, Schritte darunter, Wizard gedimmt.
+
+  ### Dazu: der iframe zeigte auf den alten Stand
+
+  `marktbericht-view.js:91` trug einen **fest verdrahteten** Cache-Buster
+  `index.html?v=1077b`. **Im Hauptprogramm wäre weiter die alte Fassung
+  erschienen** — der Marktbericht läuft dort als iframe. Mitgezogen.
+
   **Als Nächstes:** die Übersicht — Berichtstabelle, Objektwahl und
   Einlesen als Einstieg vor dem Wizard.
 
