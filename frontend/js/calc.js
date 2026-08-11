@@ -2624,6 +2624,14 @@ function _calcImmediate(){
       //   identisch zur Hauptzeile.
       // Die DOM-Felder vz-info-miete/bwk/zins/tilg/bspar mit Pass-Werten aktualisieren
       st('vz-info-miete', fE(_mieteKumNew, 0));
+      /* v1137-plausi · Dieselbe Zeile eins weiter vergessen. Der
+       * Plausi-Check zeigte weiter den Wert aus der ERSTEN Schleife
+       * (Quick-Methode), waehrend die Aufschlüsselung darueber laengst
+       * aus cfRows kam — im Pruefdurchgang gemessen: 198.709 € gegen
+       * 200.868 € fuer dieselbe Groesse, sichtbar untereinander im
+       * selben Reiter. Genau der Bäckerstr.-7-Fehler aus V119, nur an
+       * einer weiteren Stelle. */
+      st('vz-plausi-mit', fE(_mieteKumNew, 0));
       st('vz-info-bwk',   '–' + fE(_bwkKumNew, 0));
       st('vz-info-zins',  '–' + fE(_zinsKumNew, 0));
       st('vz-info-tilg',  '–' + fE(Math.max(0, _tilgKumNew), 0));
@@ -3649,10 +3657,18 @@ function renderPhaseTable() {
 
   // Cache for PDF
   // Update prominent CF phase cards (Punkt 12 - Cashflow-Werte werden angezeigt)
+  /* v1137-vorzeichen · fE() formatiert INTERN Math.abs(n) und stellt nur
+   * dann ein Vorzeichen voran, wenn das dritte Argument true ist. Hier
+   * wurde es weggelassen und das Plus von Hand gesetzt — bei negativen
+   * Werten kam damit gar kein Zeichen an: −273,80 stand als "274 €" da,
+   * neben einem "+238 €" in der Nachbarkachel. Unterschieden hat die
+   * beiden Faelle nur die FARBE (rot gegen gruen), und die traegt fuer
+   * Rot-Gruen-Blinde nichts. Gemessen im Pruefdurchgang am Testobjekt
+   * PRUEF_1. fE(v, 0, true) liefert "+" bzw. "–" selbst. */
   function _setCfCard(id, val) {
     var elt = el(id); if (!elt) return;
     var v = val / 12;  // monatlich
-    elt.textContent = (v >= 0 ? '+' : '') + fE(v, 0);
+    elt.textContent = fE(v, 0, true);
     elt.classList.toggle('positive', v >= 0);
     elt.classList.toggle('negative', v < 0);
   }
