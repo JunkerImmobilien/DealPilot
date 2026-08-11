@@ -2380,11 +2380,12 @@ html body:not(.dp-chrome-hell) #hdr-badges .sc-pill-v {
    alles bitgenau wie bisher — die Fallbacks sind unangetastet.
 
    NUR DIE SIDEBAR, bewusst: Ich hatte denselben Zusatz zuerst auch an
-   Reiterband und Kopfzeile gesetzt und dann gemessen — beide bleiben mit
-   und ohne ihn bei rgb(10,10,10), dort bestimmt eine andere Regel die
-   Flaeche. Eine Aenderung ohne belegbare Wirkung gehoert in dieser Datei
-   nicht stehen, also wieder heraus. Dass Kopfzeile und Reiterband im
-   Hell-Skin dunkel bleiben, ist ausserdem gewollt: der Skin heisst
+   Reiterband und Kopfzeile gesetzt und dann gemessen — mit Zusatz stand
+   das Band bei rgb(10,10,10), ohne ihn bei rgb(10,8,5). Der Zusatz
+   schaltete dort also nur die gewollte Regel ab, ohne die Flaeche
+   aufzuhellen; eine andere Regel uebernahm mit einem praktisch gleichen
+   Dunkelton. Wirkung ohne Zweck, also wieder heraus. Dass Kopfzeile und
+   Reiterband im Hell-Skin dunkel bleiben, ist gewollt: der Skin heisst
    "Chrome hell" und meint Sidebar und Flaechen, nicht den Kopf. */
 html:not([data-ui-theme]) body:not(.dp-chrome-hell) aside.sidebar,
 html:not([data-ui-theme]) body:not(.dp-chrome-hell) #sidebar.sidebar {
