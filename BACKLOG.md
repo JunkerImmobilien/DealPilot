@@ -57,7 +57,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    und zwar über DOM-Ids. Was dort fehlt, rechnet im Bericht mit und ist im
    gespeicherten Objekt weg (v1072-Befund, in v1074 nachgezogen). **Beide
    Seiten gegeneinander zählen**, bevor ein Reiter gebaut wird.
-   **Berührt Punkt 9** — wer die Felder für den Wizard neu gruppiert, hat
+   **Berührt Punkt 8** — wer die Felder für den Wizard neu gruppiert, hat
    den Abgleich ohnehin gemacht. Der Reiter wartet aber **nicht** darauf,
    siehe unten.
 
@@ -191,7 +191,47 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    und in `FIELDS` in `storage.js` eingetragen werden — dann trägt der
    bestehende Weg sie von selbst.
 
-2. **Ein Testobjekt vollständig anlegen und alle Rechenwege
+2. **Accordion „Analyse → Marktbericht": das „2 L" weg, und die Farbe
+   soll der Optik folgen.** Bild im Mockup-Ordner (2026-08-11) — den
+   Dateinamen beim Aufgreifen hier eintragen.
+
+   Zwei Dinge an einer Stelle:
+
+   - **Das „2 L" entfernen.** Es steht als Kerosin-Hinweis am Kopf des
+     Aufklappers. **Der Preis geht dadurch nicht verloren:** er gehört an
+     den Erzeugen-Knopf, wo auch entschieden wird, welche Stufe erzeugt
+     wird (siehe die offene Geldfrage im Marktbericht-Punkt). Ein fester
+     Wert am Accordion wäre dort ohnehin falsch, sobald der Wizard drei
+     Stufen in einem Weg führt — 2 L gilt nur für die einfache
+     Einschätzung.
+   - **Der Aufklapper wechselt die Farbe nicht, wenn unter „Darstellung"
+     auf Hell umgestellt wird.** Marcel: „das sollte vielleicht auch
+     möglich sein."
+
+   **Vor dem Patch messen, welcher Selektor gewinnt** — `getComputedStyle`
+   auf Kopf und Fläche, in **beiden** Fassungen. Zwei Verdachtsspuren, beide
+   erst zu belegen: entweder hängt die Regel an `body.dp-chrome-hell` und
+   greift im neuen Weg nicht (dasselbe Muster wie bei den Logo-Reglern in
+   `v1101`), oder die Farbe steht als Literal statt als `var(--…)`. **Der
+   Marktbericht-Bereich ist hier besonders zu prüfen:** die eingebettete
+   App ist **immer hell** und lädt `whitelabel-override.js` **nicht** — die
+   Umschaltung darf nur den Rahmen in der Haupt-App betreffen, nicht ins
+   iframe durchschlagen.
+
+3. **Partner-Logo auf der Landingpage ergänzen: caretechthiel.**
+   Unter „Partner" fehlt das Logo von `caretechthiel.de`. Es liegt im
+   Mockup-Ordner. **Gleiche Größe wie die vorhandenen** — also nicht nach
+   Augenmaß einsetzen, sondern die gerenderte Breite und Höhe der
+   Nachbarlogos messen und treffen. Logos kommen in unterschiedlichen
+   Seitenverhältnissen; „gleich groß" heißt hier **gleiche optische
+   Höhe**, nicht gleiche Dateimaße.
+
+   **Zwei Fallstricke aus dieser Datei:** `landing/index.html` lädt `env.js`
+   **nicht**, und `</body>` kommt dort **dreimal** vor — beim Einfügen mit
+   `rfind` arbeiten. Bild in denselben Ordner wie die übrigen Partnerlogos,
+   Pfad relativ zur Landing-Seite prüfen.
+
+4. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
    Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
    richtig, wird unter „Bewertung" alles passend angezeigt, sind die
@@ -222,7 +262,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
    Steuerteil.
 
-3. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -320,7 +360,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-4. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -355,7 +395,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-5. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -389,7 +429,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-6. **Marktbericht neu gestalten.**
+8. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -457,6 +497,61 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    `mb-whitelabel.js`). Und `payload()` in `wertermittlung.js` bleibt die
    Sammelstelle — **eine neue Oberfläche darf die Feldnamen nicht ändern**,
    sonst hängt der Rechenkern daran.
+
+   ---
+
+   ### Nachlese aus Marcels Durchsicht des Entwurfs, 2026-08-11
+
+   Drei Befunde am Entwurf `marktbericht-wizard.html`, dazu eine
+   Verständnisfrage, die den Ablauf betrifft — **die ist die wichtigste.**
+
+   1. **Die Schrittleiste ist zu schmal.** „Die Punkte 1–7 sollten schon
+      nebeneinander passen." Sie brechen also um oder werden gestaucht.
+      **Messen, nicht schätzen:** die tatsächliche Breite der sieben
+      Marken bei 1024, 1280 und 1920 px, dann entscheiden, ob die Leiste
+      breiter wird, die Marken schmaler oder die Beschriftung kürzer. Eine
+      Leiste, die den Weg zeigen soll, darf ihn nicht selbst zerlegen.
+
+   2. **Der Erzeugen-Knopf lässt sich nicht klicken, obwohl die Angaben für
+      die einfache Einschätzung vollständig sind.** Marcel: „das muss ja
+      irgendwie möglich sein." **Das ist der Kern des ganzen
+      Meilenstein-Gedankens** — wer bei „Einschätzung" stehenbleiben will,
+      muss dort auch erzeugen können. Steht der Knopf still, ist der Wizard
+      wieder ein Pflichtdurchlauf und die Vereinigung der drei Stufen
+      wertlos.
+
+   3. **Es muss auf dem Handy funktionieren.** Seit `v1118` landen echte
+      Nutzer bei 390 px in der normalen Ansicht. Eine siebenteilige
+      Schrittleiste nebeneinander und ein Handy schließen sich aus — der
+      Entwurf braucht **zwei** Darstellungen derselben Führung, nicht eine
+      gequetschte.
+
+   **Und die Aufgabe, die über allen dreien steht: den Ablauf einmal
+   vollständig durchspielen.** Marcel: „das muss ja Sinn machen, auch von
+   der Reihenfolge her." Zu klären ist damit nicht die Optik, sondern die
+   **Freischaltlogik**:
+
+   - **Welche Felder machen welchen Meilenstein voll?** Für jede der drei
+     Stufen die Pflichtangaben benennen — aus dem, was das Backend
+     tatsächlich braucht, nicht aus dem Bauchgefühl. Solange das nicht
+     gemessen ist, ist jeder Freischaltzustand geraten.
+   - **Der Knopf zeigt, was er gerade erzeugt.** Beschriftung und Preis
+     wandern mit dem erreichten Meilenstein mit. Er ist **nie** tot,
+     solange mindestens die Einschätzung vollständig ist.
+   - **Die Reihenfolge der sieben Schritte muss den Meilensteinen folgen.**
+     Wenn Schritt 1 die Einschätzung trägt und Schritt 2 die
+     Marktpreisindikation, darf kein Pflichtfeld der Einschätzung in
+     Schritt 5 stehen. Genau das ist zu prüfen — und es ist der
+     wahrscheinlichste Grund dafür, dass der Knopf still bleibt.
+   - **Die Objektart bleibt in Schritt 1.** `istWohnung()` entscheidet über
+     20 der 42 Felder; sie später zu fragen hieße, alles dahinter neu
+     aufzubauen.
+
+   **Das gehört in den überarbeiteten Entwurf, nicht in den Code** — erst
+   die Führung durchspielen und zeigen, dann bauen. Die beiden offenen
+   Geldfragen oben (wann wird abgerechnet, was kostet das Vertiefen)
+   hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
+   feststeht, wann ein Meilenstein als erreicht gilt.
 
 ---
 
