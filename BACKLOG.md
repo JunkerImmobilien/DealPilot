@@ -100,6 +100,43 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
    JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
 
+   **Der Rückweg war trotzdem umsonst — behoben in `v1134` (`0822398`).**
+   Beim Bauen des Reiters gemessen: Der Marktbericht schrieb die Felder
+   korrekt ins Objekt, und **das Hauptprogramm löschte sie beim nächsten
+   Speichern wieder weg.** Die Kette, Stück für Stück ausgelesen:
+
+   | Stelle | Verhalten |
+   |---|---|
+   | `collectData()` (`storage.js:89`) | baut ein **frisches** `{}` aus der `FIELDS`-Whitelist |
+   | `saveObj()` | schickt `body:{ data: data }` |
+   | `objectService.update()` | setzt `data = $9` — **voller Ersatz, kein Merge** |
+
+   Am geladenen Objekt nachgezählt: **182 Schlüssel am Server, 179 aus
+   `collectData()`.** Die Differenz — `_thumb`, `_ds2_score`,
+   `_ds2_categories` — steht am Objekt und wurde nicht wieder erzeugt.
+   Keines der 38 Wertermittlungsfelder steht in der Whitelist.
+
+   Dass das Muster bekannt war, stand im Quelltext: `ai_lage_cache`
+   (V187-h2), `brw_ki_result` (V191) und `steuer_snapshot` (V276.6) sind
+   **drei einzeln von Hand gerettete Schlüssel**, jeder mit eigenem
+   `try/catch`. Beim vierten Fall hat niemand mehr daran gedacht. Jetzt
+   eine **Regel statt einer Liste**: was am geladenen Objekt steht und die
+   Whitelist nicht erzeugt, bleibt stehen.
+
+   Beide Richtungen im Browser bewiesen:
+   - **Nichts geht verloren** — 183 Schlüssel rein, 183 raus (vorher 182 → 179)
+   - **Geleertes bleibt geleert** — `plz` geleert ergibt `""`, nicht den Altwert
+
+   **Was das für bestehende Objekte heißt:** Wer vor `v1134` einen
+   Marktbericht erzeugt und das Objekt danach im Hauptprogramm gespeichert
+   hat, hat die Wertermittlungsangaben verloren — Hinterland, NHK, die neun
+   Gewerke, die fünf Bauteile. Sie sind nicht wiederherstellbar und müssen
+   einmal neu eingegeben werden. Ab jetzt bleiben sie.
+
+   **Offen bleibt der Reiter selbst** — die Felder sind gesichert, aber im
+   Hauptprogramm weiterhin nur über den Marktbericht erreichbar. Das ist
+   das nächste Paket.
+
 2. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
    Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
