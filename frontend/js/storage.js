@@ -190,6 +190,38 @@ function collectData() {
       d.steuer_snapshot = window._currentObjData.steuer_snapshot;
     }
   } catch(_) {}
+  /* v1134-FREMD-1 · Fremdfelder erhalten statt einzeln nachruesten.
+   *
+   * Gemessen, nicht vermutet: collectData() baut ein FRISCHES {} aus der
+   * FIELDS-Whitelist, saveObj schickt body:{data:data}, und das Backend
+   * setzt data = $9 als VOLLEN ERSATZ (objectService.update). Jeder
+   * Schluessel, den die Whitelist nicht kennt, ist nach dem naechsten
+   * Speichern im Hauptprogramm weg.
+   *
+   * Genau deshalb stehen hier drueber drei handgepflegte Rettungen —
+   * ai_lage_cache (V187-h2), brw_ki_result (V191), steuer_snapshot
+   * (V276.6). Drei Mal dasselbe Pflaster fuer je einen Schluessel.
+   *
+   * Betroffen sind vor allem die 38 Wertermittlungsfelder, die
+   * _mbBuildObjData() im Marktbericht einsammelt (v1072/v1074/v1121):
+   * Hinterland, NHK, die neun Gewerke, die fuenf Bauteile, Standardstufe.
+   * Der Rueckweg wurde dort drei Mal repariert — und das Hauptprogramm
+   * hat sie beim naechsten Speichern trotzdem wieder geloescht.
+   *
+   * Regel statt Liste: was am geladenen Objekt steht und die Whitelist
+   * nicht erzeugt, bleibt stehen. Ein leeres Feld erzeugt d[id] = '' und
+   * ist damit 'in d' — geleerte Felder werden also NICHT wiederbelebt.
+   * window._currentObjData wird bei jedem loadData() gesetzt und von
+   * newObj() auf {} zurueckgesetzt, kann also nichts vom Vorgaenger
+   * mitschleppen. */
+  try {
+    var _alt = window._currentObjData;
+    if (_alt && typeof _alt === 'object') {
+      Object.keys(_alt).forEach(function (k) {
+        if (!(k in d)) d[k] = _alt[k];
+      });
+    }
+  } catch(_) {}
   return d;
 }
 
