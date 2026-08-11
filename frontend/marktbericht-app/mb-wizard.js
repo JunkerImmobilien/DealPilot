@@ -149,9 +149,14 @@
       'html.mb-breit #genProgress{max-width:760px;margin:18px auto 0;padding:18px 20px}',
       'html.mb-erzeugt .mbw-reiter,html.mb-erzeugt .mbw-blatt,html.mb-erzeugt .mbw-nav{',
         'opacity:.35;pointer-events:none;transition:opacity .3s}',
-      /* v1129 · Prozentzahl am Balken. */
-      '.mbw-pct{float:right;font-family:"JetBrains Mono",monospace;font-size:12px;',
-        'font-weight:600;color:var(--wl-c9a84c,#C9A84C)}',
+      /* v1129c · Balken, Prozent und Schritte. */
+      '.mbw-pkopf{display:flex;align-items:baseline;gap:10px;font-size:12.5px;font-weight:600;margin-bottom:7px}',
+      '.mbw-pct{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:13px;',
+        'font-weight:700;color:var(--wl-c9a84c,#C9A84C)}',
+      '.mbw-pbahn{height:7px;border-radius:4px;background:rgba(128,128,128,.25);overflow:hidden;margin-bottom:9px}',
+      '.mbw-pbahn i{display:block;height:100%;border-radius:4px;transition:width .45s ease;',
+        'background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f))}',
+      '#genProgSteps{font-size:12px;line-height:1.7}',
       'html.mb-breit #genProgress{font-size:13px}'
     ].join('');
     document.head.appendChild(s);
@@ -356,21 +361,34 @@
      es schon (app.js setzt `#genProgBar.style.width` in Prozent) — die Zahl
      wird daraus GELESEN, nicht zweitgerechnet. Ein eigener Zaehler wuerde
      vom Balken abweichen, sobald app.js seine Kurve aendert. */
+  /* v1129c · DER LADEBALKEN HAT NIE EXISTIERT.
+     Gemessen: `#genProgress` ist im HTML ein LEERES div. app.js sucht darin
+     `#genProgBar` (Z. 283) und `#genProgSteps` (Z. 289) — beide gibt es
+     nicht. Folge: der Balken-Code lief ins Leere, und die Schritte wurden
+     mit `prog.innerHTML = …` direkt in den Kasten geschrieben. Es gab also
+     immer nur eine Schrittliste, nie einen Balken.
+
+     Hier wird das Geruest gebaut, das der vorhandene Code erwartet — dann
+     fuellt app.js beides von selbst, und nichts wird mehr ueberschrieben:
+       Kopfzeile  Beschriftung + Prozent
+       #genProgBar  der Balken
+       #genProgSteps  die Schritte (wie bisher) */
   var _pctBeob = null;
-  function prozent() {
-    var bar = id('genProgBar');
-    if (!bar) return;
+  function geruest() {
     var kopf = id('genProgress');
-    if (!kopf) return;
-    var lbl = id('mbw-pct');
-    if (!lbl) {
-      lbl = document.createElement('span');
-      lbl.id = 'mbw-pct';
-      lbl.className = 'mbw-pct';
-      kopf.insertBefore(lbl, kopf.firstChild);
-    }
+    if (!kopf || id('genProgBar')) return;
+    kopf.innerHTML =
+      '<div class="mbw-pkopf"><span>Bericht wird erstellt</span>' +
+        '<span class="mbw-pct" id="mbw-pct">0 %</span></div>' +
+      '<div class="mbw-pbahn"><i id="genProgBar" style="width:0%"></i></div>' +
+      '<div id="genProgSteps"></div>';
+  }
+  function prozent() {
+    geruest();
+    var bar = id('genProgBar'), lbl = id('mbw-pct');
+    if (!bar || !lbl) return;
     var w = Math.round(parseFloat(bar.style.width) || 0);
-    lbl.textContent = w > 0 ? w + ' %' : '';
+    lbl.textContent = w + ' %';
     if (!_pctBeob) {
       try {
         _pctBeob = new MutationObserver(function () { prozent(); });
