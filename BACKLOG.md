@@ -506,6 +506,273 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Produktion** liegt. Nicht nebenbei: es ist der BORIS-Anschluss, an
    dem die Bodenrichtwerte hängen.
 
+7. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
+
+   Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
+
+   **Der Defekt: der Darstellungs-Block nimmt die gewählte Farbe selbst an.**
+   Wählt Marcel Grün, wird das Gold am Kopf des Akzent-Bereichs mit grün.
+   **Das darf im Einstellblock nicht passieren** — wer eine Farbe *auswählt*,
+   braucht eine neutrale Umgebung, sonst beurteilt er die Farbe gegen sich
+   selbst. Die Bedienoberfläche ist kein Vorschaufeld.
+
+   Vor dem Patch messen, welche Regel greift: die `--wl-`Tokens werden
+   ausschließlich von `whitelabel-override.js` gesetzt (`setWlTokens` in
+   `apply()`), und der Block hängt vermutlich an denselben Tokens wie die App.
+   **Die Lösung ist ein eigener Satz fester Töne für das Panel**, nicht ein
+   Ausschalten der Vorschau — die Vorschauflächen *sollen* mitgehen, der
+   Rahmen darum nicht. Beide Bereiche also sauber trennen.
+
+   **Der Ausbau: sechs Farben reichen nicht.** Marcel will aus einer Palette
+   wählen können. Zu entscheiden ist, **welcher Art**:
+
+   | | |
+   |---|---|
+   | **freier Farbwähler** (`<input type=color>`) | jede Farbe, keine Kuratierung |
+   | **erweiterte Palette** | z. B. 24 abgestimmte Töne, alle geprüft |
+   | **beides** | Palette als Vorschlag, freier Wähler daneben |
+
+   **Das ist eine Produktentscheidung, keine technische.** Sie hat eine
+   gemessene Folge: `_recolor` rechnet HSL-relativ, und **vier der 66
+   WL_TINTS reißen schon heute bei einem extrem hellen Akzent** (`#F0D000`:
+   `#c08a2f`, `#a6842d`, `#a68a36`, `#a98e3a` landen bei k = 2,57–2,98). Ein
+   freier Wähler macht diesen Fall vom Sonderfall zum Regelfall. Er ist
+   trotzdem machbar — aber **dann muss der Tint-Weg vorher eine
+   Mindestkontrast-Regel bekommen**, sonst liefern wir eine Funktion aus, die
+   sich selbst unlesbar machen kann. Der Später-Punkt dazu wird damit zur
+   Voraussetzung.
+
+   **→ Demo nach `design/Vorschläge/`, nicht raten.**
+
+8. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+
+   Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
+   Defekt, keine Geschmacksfrage.
+
+   **Erst die Kette messen, dann patchen** — nicht am CSS anfangen. Vier
+   Stellen, in dieser Reihenfolge:
+
+   1. **Kommt der Klick an?** Feuert der Handler, wird ein Wert gesetzt?
+   2. **Wird gespeichert?** Steht der Wert nach dem Neuladen wieder da?
+   3. **Wird ein Token gesetzt?** `getComputedStyle(document.body)` auf den
+      erwarteten Namen, vorher/nachher.
+   4. **Liest das Token jemand?** Genau hier lag `v1101`: der Regler setzte
+      `--dp-logo-w`, gelesen wurde `--dp-logo-scale` — **zwei Namen für
+      dieselbe Sache**, und niemand merkte es, weil beide existierten.
+
+   Der wahrscheinlichste Fall ist wieder Punkt 4. Zweiter Kandidat: die Regel
+   hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
+   dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
+
+9. **Regler „Tab-Texte" wirkt nicht**
+
+   Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
+   Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
+   Bewertung**. Bei Marcel ändert sich nichts.
+
+   Gleiche Kette wie N2, gleiche Reihenfolge. **Ein zusätzlicher Verdacht,
+   der hier besonders naheliegt:** die Reiter tragen an mehreren Stellen
+   `!important`-Regeln (so gewinnt z. B. `header.hdr.has-v64-score
+   #hdr-obj-num` gegen alles andere). Ein Token, das korrekt gesetzt ist,
+   verliert dann trotzdem. **Deshalb den Kaskaden-Walker benutzen** — welche
+   Regel gewinnt tatsächlich für das Element —, nicht nur prüfen, ob die
+   Variable steht.
+
+   **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
+   Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
+
+10. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+
+   Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
+   schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
+   es der alte Befund in neuer Form ist.
+
+   **Am Raster messen, nicht am Farbtoken.** Ohne Vorlage ist der Bereich
+   sauber, erst mit umgestellter Vorlage rückt alles zusammen — die Ursache
+   liegt also im Abstandsraster, nicht in der Farbe. Und beim Nachmessen die
+   `v1105c`-Lehre mitnehmen: das Goldband ist ein `::before`, ein Leser, der
+   nur die Elternkette abläuft, sieht es nicht.
+
+   **Dazu Marcels zweite Vorgabe an derselben Karte:** *„achte darauf, dass
+   alle Werte immer angegeben werden, die wir brauchen."* Das ist ein eigener
+   Prüfschritt — **welche Angaben gehören auf die Karte, und fehlt eine
+   davon?** Die Liste gehört mit Marcel abgestimmt, nicht von mir geraten;
+   danach wird gezählt, ob jede tatsächlich erscheint (und was passiert, wenn
+   sie leer ist — `_euro(null)` liefert `"–"` und ist **truthy**, ein
+   `||`-Rückfall greift dort nie).
+
+   **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
+   Aufgreifen zusammenlegen, nicht doppelt bauen.
+
+11. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+
+   **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
+   führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
+   man auf dem × zum Löschen.
+
+   **Marcels Vorgabe: der Pfeil gehört nach unten.** Das löst zwei Dinge auf
+   einmal — die Kollision, und den bekannten Befund, dass `.sbc-arrow` mit
+   **20 × 20 px** deutlich unter der 44-px-Trefferfläche aus v650/v652 liegt.
+   Unten ist Platz, oben nicht.
+
+   **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:** Pfeil
+   und Karte tun Verschiedenes — der Pfeil klappt auf (`umschalten()` in
+   `karten-kompakt.js`, delegierter Listener), der Kartenkörper öffnet das
+   Objekt. Eine 44-px-Pseudofläche würde der Karte Klicks stehlen und die
+   falsche Aktion auslösen. Es ist eine Frage der Kartengestaltung.
+
+   **Vor dem Verschieben messen:** `getBoundingClientRect()` auf Pfeil und ×,
+   den Abstand beziffern, und mit `elementFromPoint` prüfen, **wer den Klick
+   in der Lücke bekommt**. Danach die neue Lage in allen drei Kartenmodi
+   gegenprüfen — der Pfeil erscheint nur bei `kompakt` und `stapel`.
+
+   **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
+   Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
+
+12. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+
+   Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
+   Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
+   **benannt statt beschrieben** — gut, denn dann muss sie nicht gestaltet,
+   sondern nur übernommen werden.
+
+   **Zuerst den Ist-Wert auslesen** (`.sb-act-item` bzw. der Kopf des
+   Aufklappers), dann als **gemeinsames Token** führen statt an zwei Stellen
+   zu pflegen. Zwei Stellen, die auseinanderlaufen, sind hier schon mehrfach
+   die Ursache gewesen.
+
+   **Ein bekannter Nebenbefund gehört mitgeprüft:**
+   `.sb-actions-accordion-inner` misst `rgb(255,255,255)` **auch** in den
+   dunklen Fassungen `dealpilot` und `konsole` — weiße Fläche in dunkler
+   Leiste, im geschlossenen Zustand unsichtbar (`display:none`, 0 × 0) und
+   deshalb bei allen Kontrastläufen durchgerutscht. **Mit geöffnetem Menü
+   messen.** Wer die Farbe von dort übernimmt, übernimmt sonst einen Wert aus
+   einem Zustand, den niemand geprüft hat.
+
+   **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
+   entschieden ist.
+
+13. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+
+   **Marcels Bild davon, wörtlich zusammengefasst:**
+
+   - **DealPilot wird im dunklen Modus ausgeliefert.** Das ist der Standard.
+   - **Daneben ein heller Modus**, umschaltbar mit einem Griff — hell/dunkel.
+   - **In der Darstellung sind das zwei Profile.**
+   - **Der helle Modus besteht aus:** App-Darstellung „Panel", Objektkarten
+     „Standard", und dem kleinen DealPilot-Logo oben in der Ecke.
+   - **Ort:** Einstellungen → Profil und Anzeige, oder direkt unter
+     Darstellung. Wer es individueller will, klickt dort weiter auf
+     „Darstellung öffnen" und stellt einzeln ein.
+
+   **Das ist der größte der neuen Punkte** — nicht wegen des Aufwands,
+   sondern weil er die Bedienlogik des ganzen Bereichs neu ordnet: **ein
+   Griff für 95 % der Leute, das volle Panel für den Rest.** Genau die
+   richtige Richtung; heute muss jeder durch alle acht Farbfelder, um zu
+   einem stimmigen Bild zu kommen.
+
+   **Drei Fragen, die vor dem Bauen zu klären sind:**
+
+   1. **Was passiert mit einer eigenen Einstellung, wenn jemand umschaltet?**
+      Überschreiben (einfach, aber Arbeit weg), daneben behalten (freundlich,
+      aber wo steht sie), oder je Profil eigene Werte (sauber, aber die
+      Speicherstruktur wächst). **Mein Vorschlag: je Profil eigene Werte** —
+      `brand_display` ist `jsonb`, kostet also keine Migration, und genau
+      deshalb wurde es damals so angelegt.
+   2. **Was ist „das kleine DealPilot-Logo oben in der Ecke"** — das
+      Wortmarken-Bild, das heute die Sidebar trägt? Ein Bild aus
+      `design/mockups/` würde das in einem Satz klären.
+   3. **Was sieht ein Partner-Mandant?** Der hat ein eigenes Branding. Der
+      Schalter darf ihn nicht aus der Marke seines Partners werfen. Das ist
+      dieselbe Grenze, die `v1114` und `v1122` schon einmal gezogen haben.
+
+   **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
+   dann bauen.**
+
+14. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+
+   **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
+
+   **Der Grund, warum das überfällig ist, steckt im Aufbau:** die Plangrenzen
+   stehen an **drei Stellen von Hand** — `config.js` (das Gate),
+   `pricing-modal.js` (zwei Matrizen) und `landing/index.html`. Drei
+   Wahrheiten, die nur so lange übereinstimmen, wie jemand sie pflegt.
+   **Der Abgleich gegen die Landingpage, den Marcel verlangt, ist genau der
+   richtige Maßstab** — sie ist das, was der Kunde gelesen hat, bevor er
+   bezahlt hat.
+
+   **Was gemessen wird:**
+
+   | | |
+   |---|---|
+   | **Gate gegen Versprechen** | jede Grenze aus `config.js` gegen die Landing-Tabelle, Zeile für Zeile |
+   | **DB gegen Datei** | `hasFeature` fragt **zuerst die Datenbank** (`Sub.hasCachedFeature`) und `config.js` nur bei `null` — beide Wege prüfen, sie können auseinanderlaufen |
+   | **Unbekannte Schlüssel** | ein Schlüssel, den niemand kennt, ist **für jeden false, auch für Pro**. Ein Tippfehler sperrt also still den teuersten Plan |
+   | **Partner** | ist ein **Pro-Klon** plus `reseller`, `reseller_whitelabel`, `custom_logo` |
+   | **Bekanntes Leck** | der Bankexport blockt nur `starter` — **Free rutscht mit Wasserzeichen durch.** Stand als offene Entscheidung, ist nie gefallen |
+
+   **Dazu Marcels Frage zum Starter: sieben Tage voller Pro-Status.** Er
+   meint, das sei so umgestellt worden. **Ich kann das nicht bestätigen** — in
+   meinen Unterlagen steht es nicht, und ich schreibe es nicht als Tatsache
+   auf. **Erst messen, ob es überhaupt eingebaut ist**, dann die zweite Frage
+   stellen: beibehalten oder anders lösen. Wenn es drinsteht, gehört
+   mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
+   wurden, dürfen nicht unerreichbar werden.
+
+15. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+
+   Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
+   Rechenweg.**
+
+   ### Was Marcel will
+
+   - **In der Pre-Flight-Karte** („Top-Objekt") sollen per Sprache **alle**
+     Felder befüllbar sein, die es in Objekt, Investition, Miete,
+     Finanzierung, Bewirtschaftung und Steuer gibt.
+   - **Genanntes einsortieren, nicht wegwerfen:** Risiken und Mängel gehören
+     unter **bekannte Risiken**, ein genanntes Vorhaben unter
+     **Investitionsthese**.
+   - **Der Rest wird ein ordentlicher Text** unter **zusätzliche Notizen** —
+     alles, was sich nicht auswerten ließ, statt es zu verlieren.
+   - **Im QuickBoarding gibt es weniger Felder** — aber **dieselbe
+     Rechenlogik im Hintergrund.**
+   - **Beim „Als Objekt speichern"** öffnet sich ohnehin ein kleines Modal.
+     Dort soll stehen: *es gibt weitere Werte, die mit übernommen werden* —
+     **mit Auflistung**, und mit den Texten der Zusammenfassung.
+
+   ### Was davon schon steht — und was das für den Punkt heißt
+
+   **Die Doppelstruktur existiert bereits**, das ist die gute Nachricht:
+   `buildCatalog` ist die kuratierte Liste für den Orbit, `buildFullCatalog`
+   nimmt **alle** `window.FIELDS` für die Auswertung. Im QuickCheck-Kontext
+   wird auf `QC_IDS` gefiltert. Der Weg „wenig Felder vorn, volle Auswertung
+   hinten" ist also **angelegt** — es geht nicht um einen Neubau, sondern um
+   Vollständigkeit und um das, was der Nutzer davon sieht.
+
+   **Deshalb ist der erste Schritt eine Zählung, kein Entwurf:** wie viele
+   Felder kennt `buildFullCatalog` heute, wie viele stehen in den sechs
+   Reitern, **und welche fehlen?** Erst diese Differenz macht den Punkt
+   bezifferbar.
+
+   **Drei Dinge, die dabei zu klären sind:**
+
+   1. **Freitext ist etwas anderes als ein Feld.** Risiken, These und Notizen
+      sind Prosa; die Zuordnung „das war ein Mangel" trifft das Modell, nicht
+      ein Muster. Das ist der Teil, der wirklich neu ist.
+   2. **Nichts stillschweigend verwerfen.** Marcels Kernsatz ist „eigentlich
+      soll alles vernünftig ausgewertet werden" — der Auffangtext unter
+      Notizen ist die Zusicherung, dass nichts verschwindet. **Er ist Teil
+      des Punktes, kein Beiwerk.**
+   3. **Kerosin.** Eine längere Auswertung über alle Felder kostet mehr als
+      die heutige. Ob das den Preis ändert, ist eine Geldfrage → Marcel.
+
+   **Das Übernahme-Modal im QuickBoarding ist der sichtbarste Teil** und
+   gleichzeitig der billigste: es zeigt, was ohnehin schon übertragen wird.
+   Wenn dort steht, was alles mitkommt, versteht der Nutzer zum ersten Mal,
+   was die Spracheingabe geleistet hat.
+
+   **→ Zählung zuerst, dann Demo des Modals, dann bauen.**
+
 ---
 
 ## Später
