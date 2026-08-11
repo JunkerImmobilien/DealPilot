@@ -257,8 +257,34 @@
     if (ziel.contains(el)) return;
     ziel.appendChild(el);
   }
+  /* ── v1129b · DOPPELTE IDs, im Prueflauf gefunden ──────────────────────
+     Der Expertenblock steckt in `wm-b3`, und wertermittlung.js baut `wm-b3`
+     bei jedem zeichnen() NEU. Hatte ich den Block vorher nach Reiter 6
+     verschoben, entstand daneben eine ZWEITE, leere Fassung — mit denselben
+     Ids. `getElementById` nimmt die erste; payload() las damit die leere.
+     Gemessen: lzs und sachwertfaktor waren zweimal da, der Wert stand in
+     der einen, gelesen wurde die andere. Ergebnis: lzs_pct = null.
+
+     Regel: Es darf immer nur EINE geben. Behalten wird die im Reiter — dort
+     stehen die Eingaben des Nutzers; die frisch gebaute ist leer. Ein
+     Wertabgleich ist nicht noetig, weil die neue nie Werte trug. */
+  function expertenDubletten(ziel) {
+    var alle = document.querySelectorAll('[id="wm-exp-box"]');
+    if (alle.length < 2 || !ziel) return;
+    var behalten = null;
+    Array.prototype.forEach.call(alle, function (b) { if (ziel.contains(b)) behalten = b; });
+    if (!behalten) behalten = alle[0];
+    Array.prototype.forEach.call(alle, function (b) {
+      if (b === behalten) return;
+      var huelle = b.parentElement;
+      if (huelle && huelle.parentElement) huelle.parentElement.removeChild(huelle);
+      else if (b.parentElement) b.parentElement.removeChild(b);
+    });
+  }
+
   function einraeumen() {
     if (!_panel || !id('mbw-blaetter')) return;
+    expertenDubletten(id('mbw-b6'));
     markieren();
     Object.keys(ZUORDNUNG).forEach(function (n) {
       var ziel = id('mbw-b' + n);
