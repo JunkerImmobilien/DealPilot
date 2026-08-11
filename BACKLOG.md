@@ -100,118 +100,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    von 16 auf 22, und alle kamen an. Ein leerer Wert sieht in einer
    JSON-Rückgabe aus wie ein fehlendes Feld; das ist er nicht.
 
-2. **Finanzamt-PDF unter „Steuern": Plausibilität prüfen und die
-   Ergebnisdarstellung neu bauen.** Drei Arbeiten an einer Datei, in dieser
-   Reihenfolge:
-
-   1. **Die Rechnung prüfen.** Das PDF, wie es heute aussieht, liegt im
-      Mockup-Ordner. **Der Prüfmaßstab ist nicht meine eigene Rechnung**,
-      sondern Marcels angehängte Berechnung
-      **`Immokalk_GK_AmMarkt11_WEH22_11_2025`** (ebenfalls
-      `design/mockups/`). Zahl für Zahl dagegenhalten, Abweichungen
-      benennen — nicht stillschweigend anpassen.
-
-      **ERLEDIGT 2026-08-11, beide Dateien gelesen. Ein Fehler gefunden und
-      behoben (`v1131`, `534d7e3`).**
-
-      **Unser PDF ging nicht auf.** Die sechs Zwischensummen ergeben
-      `1.928 + 700 + 405 + 0 + 978 + 0 = 4.011 €`. Ausgewiesen waren
-      **5.511 €** — **1.500 € mehr, die in keiner Zeile standen.**
-      Ursache: `_computeYearTotal` (`tax.js:1056`) rechnet `nk_umlf`, die
-      **umlagefähigen** Nebenkosten, in die Summe ein; der Abschnitt
-      Betriebskosten zeigte aber nur `nk_n_umlf` und `betr_sonst`.
-
-      **Die Rechnung ist richtig, die Darstellung war es nicht.**
-      Nachgelesen statt angenommen: umlagefähige Nebenkosten gehören auf
-      **beide Seiten** — als Einnahme beim Zufluss (Anlage V Zeile 14) und
-      als Werbungskosten beim Abfluss (Zeile 33 ff.); **eine Saldierung ist
-      nicht zulässig** (§ 11 EStG, Zufluss-/Abflussprinzip).
-      **Marcels Immokalk macht es genauso** — dort steht
-      „Nebenkosten (Umlagefähige Kosten) 2.092,23 €" als eigene Zeile in
-      Abschnitt 2.0. Die Vorlage bestätigt die Korrektur.
-
-      Für den Leser war das Papier unprüfbar: ein Finanzamt, das
-      nachrechnet, findet eine Lücke von 1.500 €. Behoben an zwei Stellen —
-      die Zeile im Abschnitt 2 und die Aufschlüsselung der Einnahmen in
-      Kaltmiete + Umlagen. **Keine Zahl geändert, nur sichtbar gemacht.**
-
-      **Immokalk selbst nachgerechnet, geht auf:**
-      `2.941,84 + 2.092,23 + 415,00 + 816,08 + 3.190,34 + 2.200,00 =
-      11.655,49 €`; `8.296,12 − 11.655,49 = −3.359,37 €`. ✓
-
-      **Eine Unstimmigkeit in der Vorlage, ehrlich vermerkt:** dort steht
-      „Abschreibung **4 %**", gerechnet wird aber mit **3,85 %**
-      (`82.866 × 3,85 % = 3.190,34`). Die Bemerkung nennt den Grund
-      („AfA 3,85 % nach Restnutzungsdauergutachten"). **Wer das Layout
-      übernimmt, sollte den echten Satz zeigen, nicht den gerundeten.**
-   2. **Die Zusammenfassung unten neu darstellen.** Marcels Urteil: die
-      Ergebnisanzeige ist nicht gut gelungen. **`Immokalk_…` ist die
-      Vorlage**, wie es zusammengefasst und dargestellt werden soll.
-
-      **Der Abgleich steht (2026-08-11). Drei Dinge kann die Vorlage, die
-      unser PDF nicht kann:**
-
-      | Immokalk zeigt | unser PDF |
-      |---|---|
-      | **Die Herleitung der AfA**: Kaufpreis + Grunderwerb + Notar + Fahrt + Verpflegung + Unterkunft → Anschaffungskosten **94.224,83 €** → BMF-Aufteilung **90,67 % Gebäude / 9,33 % Boden** → Satz → **AfA 3.190,34 €** | eine einzige Zeile „AfA Gebäude (linear) 978 €" — **ohne jede Herleitung** |
-      | **Die Steuerwirkung**: zvE vor/nach Investition, Grenzsteuersatz, ESt vor/nach, Steuersatz — und daraus **„Steuer Verlust/Überschuss pro Jahr 1.380 € · pro Monat 115 €"** | **fehlt vollständig** — das Papier endet bei der Werbungskosten-Summe |
-      | **Bemerkungsspalte** je Abschnitt („4 Fahrten zur Immobilie, Eigentümerversammlung") | Bemerkungen werden zwar gelesen (`bem.*`), aber nur klein an der Zeile |
-
-      **Das Wichtigste ist die zweite Zeile.** Marcels Blatt beantwortet
-      „was bringt mir das steuerlich im Monat?" — unseres hört davor auf.
-      `tax.js` **rechnet** die Steuerwirkung bereits (`baseIncome`, zvE je
-      Jahr über `DealPilotTaxPeriods`); sie kommt nur nicht aufs Papier.
-
-      **Die Steuerwirkung ist gebaut: `v1133` (`de976c2`).** Neuer Block
-      „STEUERWIRKUNG" nach dem Muster der Vorlage — zvE vor/nach,
-      Einkommensteuer vor/nach, Grenzsteuersatz, und als hervorgehobene
-      Zahl **Ersparnis pro Jahr und pro Monat**.
-
-      **Gerechnet wird nichts neu.** `calcImmoTaxImpact` (`tax.js:124`)
-      liefert `taxBefore`, `taxAfter`, beide Steuersätze und `refund`
-      längst — `_computeYearTotal` reichte davon nur zwei Werte weiter.
-      Jetzt kommen `zve` und die ganze Auskunft mit. **Eine eigene
-      Steuerformel im PDF wäre eine zweite Wahrheit.**
-
-      **Fehlt das zvE, fällt der Block ganz weg** — lieber keine Aussage
-      als eine Steuerersparnis auf einem geratenen Einkommen.
-
-      **Nachgemessen am Testobjekt:** `nk_umlf` = **1.500 €**, also genau
-      die zuvor unsichtbare Lücke. Einnahmen 3.700 + 1.500 = 5.200 ✓.
-      Die Aufstellung **geht jetzt auf**: Zeilensumme 5.511 = ausgewiesene
-      5.511. Steuerfelder: zvE 68.000 €, ESt 17.957 → 17.826,
-      Ersparnis 131 €/Jahr, 11 €/Monat.
-
-      **Noch offen aus diesem Abgleich:** die **AfA-Herleitung** (Anschaffungs­
-      kosten → BMF-Aufteilung → Satz → Betrag). Sie steht in der Vorlage
-      prominent und fehlt bei uns weiter — dafür müssen erst die
-      Einzelposten (Grunderwerb, Notar, Fahrtkosten zur Anschaffung)
-      erhoben werden, die `tax.js` heute nicht getrennt führt.
-   3. **Zeilen mit Null verschwinden.** **ERLEDIGT `v1132` (`6352e2a`).**
-      **Marcels Entscheidung 2026-08-11 auf Rückfrage: „alles was leer oder
-      eine 0 hat wird nicht angezeigt."** Damit ist der Zweifel im Punkt
-      aufgelöst — eine berechnete Null wird **nicht** anders behandelt als
-      ein leeres Feld.
-
-      Geprüft wird der **Rohwert**, nicht der formatierte (die Falle aus
-      diesem Punkt: `_euro(null)` liefert `"–"` und ist truthy). Und
-      `Number(null)` ist 0 und besteht `Number.isFinite`, deshalb zuerst
-      auf Abwesenheit prüfen, dann rechnen.
-
-      **Bleibt von einem Abschnitt keine Zeile übrig, fällt der ganze
-      Abschnitt weg** — Überschrift und Zwischensumme mit. Eine Überschrift
-      über einer leeren Fläche mit „Zwischensumme 0 €" ist genau das
-      Rauschen, das weg sollte.
-
-   **Randbedingungen aus dem PDF-Bau:** jsPDF kennt nur Helvetica, **kein
-   U+2212** (Pfeile als `->`), `charSpace` wirkt über den Aufruf hinaus und
-   muss zurückgesetzt werden, und Gold läuft dort über `_pdfGold()` —
-   `var()` gilt in jsPDF nicht.
-
-   **Bevor gebaut wird, das PDF und die Immokalk-Datei tatsächlich lesen.**
-   Beide liegen im Ordner; ein Umbau nach Beschreibung wäre geraten.
-
-3. **Ein Testobjekt vollständig anlegen und alle Rechenwege
+2. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
    Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
    richtig, wird unter „Bewertung" alles passend angezeigt, sind die
@@ -242,7 +131,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
    Steuerteil.
 
-4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+3. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -340,7 +229,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+4. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -375,7 +264,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+5. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -409,7 +298,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-7. **Marktbericht neu gestalten.**
+6. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -514,6 +403,121 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-11] **Finanzamt-PDF: Rechnung geprüft, Darstellung neu** — `v1131` (`534d7e3`), `v1132` (`6352e2a`), `v1133` (`de976c2`).
+   Ergebnisdarstellung neu bauen.** Drei Arbeiten an einer Datei, in dieser
+   Reihenfolge:
+
+   1. **Die Rechnung prüfen.** Das PDF, wie es heute aussieht, liegt im
+      Mockup-Ordner. **Der Prüfmaßstab ist nicht meine eigene Rechnung**,
+      sondern Marcels angehängte Berechnung
+      **`Immokalk_GK_AmMarkt11_WEH22_11_2025`** (ebenfalls
+      `design/mockups/`). Zahl für Zahl dagegenhalten, Abweichungen
+      benennen — nicht stillschweigend anpassen.
+
+      **ERLEDIGT 2026-08-11, beide Dateien gelesen. Ein Fehler gefunden und
+      behoben (`v1131`, `534d7e3`).**
+
+      **Unser PDF ging nicht auf.** Die sechs Zwischensummen ergeben
+      `1.928 + 700 + 405 + 0 + 978 + 0 = 4.011 €`. Ausgewiesen waren
+      **5.511 €** — **1.500 € mehr, die in keiner Zeile standen.**
+      Ursache: `_computeYearTotal` (`tax.js:1056`) rechnet `nk_umlf`, die
+      **umlagefähigen** Nebenkosten, in die Summe ein; der Abschnitt
+      Betriebskosten zeigte aber nur `nk_n_umlf` und `betr_sonst`.
+
+      **Die Rechnung ist richtig, die Darstellung war es nicht.**
+      Nachgelesen statt angenommen: umlagefähige Nebenkosten gehören auf
+      **beide Seiten** — als Einnahme beim Zufluss (Anlage V Zeile 14) und
+      als Werbungskosten beim Abfluss (Zeile 33 ff.); **eine Saldierung ist
+      nicht zulässig** (§ 11 EStG, Zufluss-/Abflussprinzip).
+      **Marcels Immokalk macht es genauso** — dort steht
+      „Nebenkosten (Umlagefähige Kosten) 2.092,23 €" als eigene Zeile in
+      Abschnitt 2.0. Die Vorlage bestätigt die Korrektur.
+
+      Für den Leser war das Papier unprüfbar: ein Finanzamt, das
+      nachrechnet, findet eine Lücke von 1.500 €. Behoben an zwei Stellen —
+      die Zeile im Abschnitt 2 und die Aufschlüsselung der Einnahmen in
+      Kaltmiete + Umlagen. **Keine Zahl geändert, nur sichtbar gemacht.**
+
+      **Immokalk selbst nachgerechnet, geht auf:**
+      `2.941,84 + 2.092,23 + 415,00 + 816,08 + 3.190,34 + 2.200,00 =
+      11.655,49 €`; `8.296,12 − 11.655,49 = −3.359,37 €`. ✓
+
+      **Eine Unstimmigkeit in der Vorlage, ehrlich vermerkt:** dort steht
+      „Abschreibung **4 %**", gerechnet wird aber mit **3,85 %**
+      (`82.866 × 3,85 % = 3.190,34`). Die Bemerkung nennt den Grund
+      („AfA 3,85 % nach Restnutzungsdauergutachten"). **Wer das Layout
+      übernimmt, sollte den echten Satz zeigen, nicht den gerundeten.**
+   2. **Die Zusammenfassung unten neu darstellen.** Marcels Urteil: die
+      Ergebnisanzeige ist nicht gut gelungen. **`Immokalk_…` ist die
+      Vorlage**, wie es zusammengefasst und dargestellt werden soll.
+
+      **Der Abgleich steht (2026-08-11). Drei Dinge kann die Vorlage, die
+      unser PDF nicht kann:**
+
+      | Immokalk zeigt | unser PDF |
+      |---|---|
+      | **Die Herleitung der AfA**: Kaufpreis + Grunderwerb + Notar + Fahrt + Verpflegung + Unterkunft → Anschaffungskosten **94.224,83 €** → BMF-Aufteilung **90,67 % Gebäude / 9,33 % Boden** → Satz → **AfA 3.190,34 €** | eine einzige Zeile „AfA Gebäude (linear) 978 €" — **ohne jede Herleitung** |
+      | **Die Steuerwirkung**: zvE vor/nach Investition, Grenzsteuersatz, ESt vor/nach, Steuersatz — und daraus **„Steuer Verlust/Überschuss pro Jahr 1.380 € · pro Monat 115 €"** | **fehlt vollständig** — das Papier endet bei der Werbungskosten-Summe |
+      | **Bemerkungsspalte** je Abschnitt („4 Fahrten zur Immobilie, Eigentümerversammlung") | Bemerkungen werden zwar gelesen (`bem.*`), aber nur klein an der Zeile |
+
+      **Das Wichtigste ist die zweite Zeile.** Marcels Blatt beantwortet
+      „was bringt mir das steuerlich im Monat?" — unseres hört davor auf.
+      `tax.js` **rechnet** die Steuerwirkung bereits (`baseIncome`, zvE je
+      Jahr über `DealPilotTaxPeriods`); sie kommt nur nicht aufs Papier.
+
+      **Die Steuerwirkung ist gebaut: `v1133` (`de976c2`).** Neuer Block
+      „STEUERWIRKUNG" nach dem Muster der Vorlage — zvE vor/nach,
+      Einkommensteuer vor/nach, Grenzsteuersatz, und als hervorgehobene
+      Zahl **Ersparnis pro Jahr und pro Monat**.
+
+      **Gerechnet wird nichts neu.** `calcImmoTaxImpact` (`tax.js:124`)
+      liefert `taxBefore`, `taxAfter`, beide Steuersätze und `refund`
+      längst — `_computeYearTotal` reichte davon nur zwei Werte weiter.
+      Jetzt kommen `zve` und die ganze Auskunft mit. **Eine eigene
+      Steuerformel im PDF wäre eine zweite Wahrheit.**
+
+      **Fehlt das zvE, fällt der Block ganz weg** — lieber keine Aussage
+      als eine Steuerersparnis auf einem geratenen Einkommen.
+
+      **Nachgemessen am Testobjekt:** `nk_umlf` = **1.500 €**, also genau
+      die zuvor unsichtbare Lücke. Einnahmen 3.700 + 1.500 = 5.200 ✓.
+      Die Aufstellung **geht jetzt auf**: Zeilensumme 5.511 = ausgewiesene
+      5.511. Steuerfelder: zvE 68.000 €, ESt 17.957 → 17.826,
+      Ersparnis 131 €/Jahr, 11 €/Monat.
+
+      **Die AfA-Herleitung bleibt bewusst außen vor.** Sie steht in der
+      Vorlage prominent (Anschaffungskosten → BMF-Aufteilung → Satz →
+      Betrag), ließe sich aber nicht nachbauen, ohne die Einzelposten
+      (Grunderwerbsteuer, Notar, Fahrtkosten zur Anschaffung) als neue
+      Eingabefelder zu erheben — `tax.js` führt sie heute nicht getrennt.
+      **Auf Rückfrage entschieden, 2026-08-11: „das bleibt erstmal so."**
+      Wenn es später doch kommt, ist es ein eigenes Paket mit eigener
+      Prüfstrecke, kein Nachschlag.
+   3. **Zeilen mit Null verschwinden.** **ERLEDIGT `v1132` (`6352e2a`).**
+      **Marcels Entscheidung 2026-08-11 auf Rückfrage: „alles was leer oder
+      eine 0 hat wird nicht angezeigt."** Damit ist der Zweifel im Punkt
+      aufgelöst — eine berechnete Null wird **nicht** anders behandelt als
+      ein leeres Feld.
+
+      Geprüft wird der **Rohwert**, nicht der formatierte (die Falle aus
+      diesem Punkt: `_euro(null)` liefert `"–"` und ist truthy). Und
+      `Number(null)` ist 0 und besteht `Number.isFinite`, deshalb zuerst
+      auf Abwesenheit prüfen, dann rechnen.
+
+      **Bleibt von einem Abschnitt keine Zeile übrig, fällt der ganze
+      Abschnitt weg** — Überschrift und Zwischensumme mit. Eine Überschrift
+      über einer leeren Fläche mit „Zwischensumme 0 €" ist genau das
+      Rauschen, das weg sollte.
+
+   **Randbedingungen aus dem PDF-Bau:** jsPDF kennt nur Helvetica, **kein
+   U+2212** (Pfeile als `->`), `charSpace` wirkt über den Aufruf hinaus und
+   muss zurückgesetzt werden, und Gold läuft dort über `_pdfGold()` —
+   `var()` gilt in jsPDF nicht.
+
+   **Bevor gebaut wird, das PDF und die Immokalk-Datei tatsächlich lesen.**
+   Beide liegen im Ordner; ein Umbau nach Beschreibung wäre geraten.
+
 
 - [2026-08-11] **Wizard, Schritt 2: der Marktbericht bekommt Reiter** —
   `v1127` (`8a68008`), `v1127b` (`7830ce4`), `v1127c` (`076878b`).
