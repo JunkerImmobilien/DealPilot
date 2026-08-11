@@ -92,8 +92,92 @@
     // Wohneinheiten (MFH)
     setVal('units', d.me_anz || d.einheiten);
 
+    /* v1135-WMBACK-1 \u00b7 Die Wertermittlungsangaben zurueck ins Formular.
+     *
+     * Bis hierher war die Objektwahl eine Einbahnstrasse in die andere
+     * Richtung: _mbBuildObjData() schreibt 38 Wertermittlungsfelder ins
+     * Objekt (v1072/v1074/v1121), v1134 sorgt dafuer, dass sie dort
+     * stehen bleiben \u2014 aber gelesen hat sie nie jemand. Wer sein Objekt
+     * hier waehlte, bekam 15 Grundfelder und musste Hinterland, NHK, die
+     * neun Gewerke und die fuenf Bauteile jedes Mal neu tippen.
+     *
+     * Zwei Namen las die Objektwahl ausserdem falsch: _mbBuildObjData()
+     * schreibt `baeder` und `ausstattung`, gelesen wurde `bad_anz` und
+     * `ausst`. Beide jetzt als Rueckfalle mit drin. */
+    setVal('baths', d.bad_anz || d.baeder);
+    if (!$('quality') || !$('quality').value) {
+      var au2 = d.ausst || d.ausstattung;
+      if (au2) {
+        var a2 = String(au2).toLowerCase();
+        var am2 = { 'einfach': 'einfach', 'normal': 'normal', 'gehoben': 'gehoben',
+                    'luxus': 'luxurioes', 'luxuri\u00f6s': 'luxurioes', 'stark gehoben': 'luxurioes' };
+        if (am2[a2]) setVal('quality', am2[a2]);
+      }
+    }
+    var offen = fuelleWertermittlung(d);
+    if (offen.length) beobachteFormular(d, offen);
+
     var note = $('mbow-note');
     if (note) { note.textContent = '\u2713 Objektdaten \u00fcbernommen \u2014 pr\u00fcfen und \u201eMarktbericht erstellen\u201c klicken.'; note.style.color = '#3FA56C'; }
+  }
+
+  /* Speicherschluessel -> Formular-Id. Die Namen stammen 1:1 aus
+   * _mbBuildObjData() in marktbericht-app/app.js; nichts ist neu benannt. */
+  var WM_MAP = [
+    ['mea_pct', 'mea'], ['lzs_pct', 'lzs'], ['baustatus', 'baustatus'],
+    ['bgf', 'bgf'], ['sonstige_jahr', 'sonstEinnahmen'],
+    ['stellplatz_miete_monat', 'spMiete'], ['sanierungsjahr', 'sanierungsjahr'],
+    ['nutzung', 'usage'], ['modernis_grad', 'modern'],
+    ['standardstufe', 'standardstufe'], ['grundriss', 'grundriss'], ['mod_punkte', 'modGrad'],
+    ['nhk_haus', 'nhkHaus'], ['nhk_geschosse', 'nhkGeschosse'], ['nhk_dach', 'nhkDach'],
+    ['hinterland_qm', 'hinterlandFlaeche'], ['hinterland_eur_qm', 'hinterlandWert'],
+    ['hinterland_rentierlich', 'hinterlandRent'],
+    ['garagen_bgf_qm', 'garagenBgf'], ['garagen_stufe', 'garagenStufe'],
+    ['aussenanlagen_pct', 'aussenPct'], ['aussenanlagen', 'aussenanlagen'],
+    ['bes_bauteile', 'besBauteile'], ['sachwertfaktor', 'sachwertfaktor'],
+    ['ausst_aussenwaende', 'ausstAussenwaende'], ['ausst_dach', 'ausstDach'],
+    ['ausst_fenster', 'ausstFenster'], ['ausst_innenwaende', 'ausstInnenwaende'],
+    ['ausst_decken', 'ausstDecken'], ['ausst_fussboeden', 'ausstFussboeden'],
+    ['ausst_sanitaer', 'ausstSanitaer'], ['ausst_heizung', 'ausstHeizung'],
+    ['ausst_technik', 'ausstTechnik'],
+    ['btl_gauben', 'btlGauben'], ['btl_balkone', 'btlBalkone'], ['btl_vordach', 'btlVordach'],
+    ['btl_terrassen', 'btlTerrassen'], ['btl_sonstige', 'btlSonstige'],
+    ['brw_manuell', 'brwManuell'], ['brw_stichtag', 'brwStichtag'],
+    ['brw_anpassung_pct', 'brwAnp'], ['brw_anpassung_grund', 'brwAnpGrund'],
+    ['eq_roof', 'eq_roof'], ['eq_walls', 'eq_walls'], ['eq_windows', 'eq_windows'],
+    ['eq_heating', 'eq_heating'], ['eq_bath', 'eq_bath'], ['eq_floor', 'eq_floor'],
+    ['eq_guest_wc', 'eq_guest_wc'], ['eq_store_room', 'eq_store_room']
+  ];
+
+  /* Setzt alles, was JETZT schon im DOM steht. Zurueck kommt, was noch fehlt. */
+  function fuelleWertermittlung(d) {
+    var offen = [];
+    WM_MAP.forEach(function (p) {
+      var v = d[p[0]];
+      if (v == null || v === '') return;
+      if ($(p[1])) setVal(p[1], v); else offen.push(p);
+    });
+    return offen;
+  }
+
+  /* Die Wertermittlungsfelder liegen im Block wm-b3 und existieren erst,
+   * wenn der Nutzer so weit ist. Ein einmaliges Befuellen verpufft also
+   * still. Deshalb ein Beobachter, der nachtraegt, sobald die Felder
+   * entstehen \u2014 kein requestAnimationFrame, das feuert im verborgenen
+   * Tab nie. Er trennt sich selbst, sobald nichts mehr offen ist. */
+  var _wmObs = null;
+  function beobachteFormular(d, offen) {
+    if (_wmObs) { try { _wmObs.disconnect(); } catch (e) {} _wmObs = null; }
+    var ziel = document.getElementById('wm-form') || document.body;
+    _wmObs = new MutationObserver(function () {
+      offen = offen.filter(function (p) {
+        if (!$(p[1])) return true;
+        setVal(p[1], d[p[0]]);
+        return false;
+      });
+      if (!offen.length) { try { _wmObs.disconnect(); } catch (e) {} _wmObs = null; }
+    });
+    try { _wmObs.observe(ziel, { childList: true, subtree: true }); } catch (e) { _wmObs = null; }
   }
 
   async function loadDetail(id) {
