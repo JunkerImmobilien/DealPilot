@@ -452,8 +452,19 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    |---|---|
    | PriceHubble · Sprengnetter | 45 px hoch |
    | Christian Sperling | 46 px |
-   | **CareTech Thiel** | **41 px** |
+   | **CareTech Thiel** | **47 px** (nach `v1136j`, vorher 41) |
    | ImmoMetrica · RealEstatePilot | 39 / 37 px |
+
+   **Nachgezogen auf Marcels Zuruf „etwas größer und mittig" — `v1136j`
+   (`c6cc503`). Die Ursache war der Zuschnitt, nicht die Größenregel.**
+   Mit `getBBox()` gemessen: der Inhalt reicht von x = 6 bis 250,8 und
+   y = 22,5 bis 72, die viewBox war aber 360 × 90. Also **109 px
+   Leerraum rechts** — 30 % der Bildbreite — und 22,5 oben. Der
+   Schriftzug füllte nur 68 % der Kachel und saß deshalb sichtbar links.
+   viewBox jetzt auf den Inhalt plus 6 px Rand; damit steht das Logo von
+   selbst mittig (gemessen: Ränder 15/15 und 31/31). Dazu 14 statt 26 px
+   Seitenpolster nur an dieser Kachel — bei 4,17:1 ergibt das 186 × 47.
+   **Das Original in `design/mockups/` bleibt unangetastet.**
 
    **Die Kachel ist dunkel — und das ist eine offene Frage an Marcel.**
    Die abgelegte Vorlage ist die **Dark-Mode-Fassung**: Schriftzug
