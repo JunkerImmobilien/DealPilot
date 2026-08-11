@@ -133,9 +133,63 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Gewerke, die fünf Bauteile. Sie sind nicht wiederherstellbar und müssen
    einmal neu eingegeben werden. Ab jetzt bleiben sie.
 
-   **Offen bleibt der Reiter selbst** — die Felder sind gesichert, aber im
-   Hauptprogramm weiterhin nur über den Marktbericht erreichbar. Das ist
-   das nächste Paket.
+   **Die zweite Hälfte des Lecks — behoben in `v1135` (`b703134`),
+   `v1135b` (`70f0d63`).** Auch v1134 hätte allein nichts genützt: die
+   Objektwahl im Marktbericht (`mb-objektwahl.js`, `fillFromData`) setzte
+   **15 Grundfelder und las die 38 Wertermittlungsfelder nie**. Die Kette
+   war also dreifach repariert und trotzdem sinnlos — man fing bei jedem
+   Bericht wieder bei null an.
+
+   Dazu las die Objektwahl **zwei Felder unter falschem Namen**:
+   `_mbBuildObjData()` schreibt `baeder` und `ausstattung`, gelesen wurde
+   `bad_anz` und `ausst`. Beide jetzt als Rückfalle mit drin — der
+   Originalname behält Vorrang.
+
+   Neu ist `WM_MAP`, 50 Paare Speicherschlüssel → Formular-Id, 1:1 aus
+   `_mbBuildObjData()` abgeschrieben. **Nichts neu benannt.**
+
+   **Ein Beobachter statt eines einmaligen Befüllens.** Die
+   Wertermittlungsfelder liegen im Block `wm-b3` und existieren erst ab
+   Stufe 3 — wer nur einmal setzt, setzt ins Leere und merkt es nicht. Der
+   `MutationObserver` trägt nach, sobald die Felder entstehen, und trennt
+   sich selbst. Kein `requestAnimationFrame`: das feuert im verborgenen
+   Tab nie.
+
+   **Im Browser durchgemessen**, Objekt Am Markt 9 Kabelsketal, Testwerte
+   in die Objektantwort untergeschoben statt geschrieben — kein
+   Schreibzugriff, kein Kerosin:
+
+   | Zustand | Ergebnis |
+   |---|---|
+   | Direkt nach der Objektwahl | 19 Felder noch nicht im DOM — der Beobachter wartet |
+   | Nach Klick auf Stufe 3 | **11 von 11 vorhandenen Feldern korrekt**, keine Abweichung |
+   | Nach Wechsel ETW → EFH | die restlichen 8 entstehen und werden nachgetragen |
+
+   Dass bei einer **ETW** die NHK- und Gewerkefelder fehlen, ist richtig
+   und kein Mangel — das Sachwertverfahren ist dort nicht anwendbar.
+
+   **Drei eigene Messfehler, ausdrücklich zurückgenommen.** Ich hatte
+   nacheinander gemeldet, `hinterlandRent`, `grundriss`, `modGrad`, dann
+   `nhkHaus`, `nhkDach` und die drei `ausst*` würden nicht gesetzt. Falsch
+   — **meine erfundenen Testwerte waren keine gültigen Optionen.** Die
+   Selects führen Zahlencodes (`1`…`4`), nicht Klartext wie `gehoben`.
+   Einmal habe ich außerdem im selben Block geklickt und gemessen, also
+   vor der Antwort des Servers, und daraufhin „0 von 19" gemeldet.
+
+   Aus dem letzten Fehler kam eine echte Verbesserung: ein Auswahlfeld
+   nimmt einen unbekannten Wert **still** nicht an und bleibt leer. Das
+   passiert echt, wenn sich eine Optionsliste zwischen zwei Fassungen
+   ändert. `v1135b` warnt jetzt in der Konsole mit Feldname, Wert und der
+   Liste der gültigen Optionen. Verhalten unverändert, nur sichtbar.
+
+   **Offen bleibt der Reiter selbst.** Die Felder sind jetzt dauerhaft und
+   laufen in beide Richtungen — der ursprüngliche Zweck des Punktes ist
+   damit erfüllt. Was fehlt, ist das Ansehen und Ändern **ohne** den
+   Marktbericht: ein aufklappbarer Block am Objekt nach den fünf Gruppen
+   der Prüfliste. Die Eingabefelder müssen dabei als Id **den
+   Speicherschlüssel** tragen (`hinterland_qm`, nicht `hinterlandFlaeche`)
+   und in `FIELDS` in `storage.js` eingetragen werden — dann trägt der
+   bestehende Weg sie von selbst.
 
 2. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
