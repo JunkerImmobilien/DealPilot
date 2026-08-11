@@ -36,23 +36,42 @@
   'use strict';
   if (window.DealPilotMbWizard) return;
 
+  /* ── v1129 · Mehr, kleinere Reiter ───────────────────────────────────────
+     Marcels Befund: „Zustand und Markt ist sehr gross mit vielen Angaben."
+     Gemessen: der Reiter trug 24 Felder — mehr als die anderen beiden
+     zusammen. `precBox` besteht aber aus ZEHN sauberen `.row`-Zeilen, die
+     sich thematisch trennen lassen. Und der Expertenblock (Liegenschafts-
+     zins, Sachwertfaktor, Bodenrichtwert) ist ein eigener Behaelter — er
+     bekommt einen eigenen Reiter, wie gewuenscht.
+
+     Aus drei Reitern werden sechs. Die Meilensteine bleiben drei: mehrere
+     Reiter koennen auf dieselbe Stufe einzahlen (`stufe`). */
   var SCHRITTE = [
-    { id: 1, t: 'Objekt',          kurz: 'Adresse, Eckdaten, Einlesen' },
-    { id: 2, t: 'Zustand & Markt', kurz: 'Baustatus, Zustand, Genauigkeit' },
-    { id: 3, t: 'Wertermittlung',  kurz: 'Grundstück, Gebäude, Feinjustierung' }
+    { id: 1, t: 'Objekt',        stufe: 1, kurz: 'Adresse, Eckdaten, Einlesen' },
+    { id: 2, t: 'Zustand',       stufe: 2, kurz: 'Baustatus, Zustand, Qualität, Modernisierung' },
+    { id: 3, t: 'Ausstattung',   stufe: 2, kurz: 'Energie, Heizung, Bad, Böden, Aufzug' },
+    { id: 4, t: 'Gebäude & Außen', stufe: 2, kurz: 'Dach, Wände, Balkon, Grundstück, Stellplätze' },
+    { id: 5, t: 'Wertermittlung', stufe: 3, kurz: 'Bodenwert, NHK, Feinjustierung' },
+    { id: 6, t: 'Zusatzwerte',   stufe: 3, kurz: 'Liegenschaftszins, Sachwertfaktor, Bodenrichtwert' }
   ];
 
-  /* Was in welchen Reiter gehoert. Reihenfolge = Reihenfolge im Reiter.
-     Ids und Klassen sind die vorhandenen — nichts davon ist neu erfunden. */
+  /* Was in welchen Reiter gehoert. Zwei Schreibweisen:
+       '#id' / '.klasse'  — das Element selbst
+       'zeile:feldId'     — die `.row`, die dieses Feld enthaelt
+     Ids und Klassen sind die vorhandenen — nichts ist neu erfunden. */
   var ZUORDNUNG = {
-    1: ['.mbw-h1', '#mbow-host', '#dpktDrop', '.mbw-sichern', '.sep', '.mbw-adresse', '#address', '.row'],
-    2: ['#wm-b1', '#precHead', '#precBox', '#precMeter'],
-    3: ['#wm-b3']
+    1: ['.mbw-h1', '#mbow-host', '#dpktDrop', '.mbw-sichern', '.sep', '.mbw-adresse', '#address',
+        'zeile:ptype', 'zeile:area', 'zeile:year', 'zeile:rent'],
+    2: ['#wm-b1', 'zeile:cond', 'zeile:quality', 'zeile:modyear'],
+    3: ['zeile:eq_energie', 'zeile:eq_floor', 'zeile:eq_guest_wc', '.mbw-aufzug'],
+    4: ['zeile:eq_walls', 'zeile:balcony', 'zeile:garages'],
+    5: ['#wm-b3'],
+    6: ['.mbw-experte']
   };
   /* Diese bleiben UNTEN und gehoeren keinem Reiter — sie gelten immer.
      .mbw-aktionen ist die Zeile "Letzte Ausgabe / Teilbares Angebot";
      sie hat weder Id noch Klasse und wird in markieren() ausgezeichnet. */
-  var FUSS = ['#wm-fehlt', '#goBtn', '#replayBtn', '#errBox', '#genProgress',
+  var FUSS = ['#precMeter', '#wm-fehlt', '#goBtn', '#replayBtn', '#errBox', '#genProgress',
               '#srcChips', '#costNote', '#loadSignal', '.mbw-aktionen'];
 
   var _aktiv = 1;
@@ -129,7 +148,11 @@
       /* Der Ladebalken bekommt die Buehne, statt unten zu kleben. */
       'html.mb-breit #genProgress{max-width:760px;margin:18px auto 0;padding:18px 20px}',
       'html.mb-erzeugt .mbw-reiter,html.mb-erzeugt .mbw-blatt,html.mb-erzeugt .mbw-nav{',
-        'opacity:.35;pointer-events:none;transition:opacity .3s}'
+        'opacity:.35;pointer-events:none;transition:opacity .3s}',
+      /* v1129 · Prozentzahl am Balken. */
+      '.mbw-pct{float:right;font-family:"JetBrains Mono",monospace;font-size:12px;',
+        'font-weight:600;color:var(--wl-c9a84c,#C9A84C)}',
+      'html.mb-breit #genProgress{font-size:13px}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -158,6 +181,29 @@
       var h = _panel.querySelector(':scope > h1');
       if (h && !h.classList.contains('mbw-h1')) h.classList.add('mbw-h1');
     }
+    /* v1129 · Die Aufzug-Zeile ist als einzige keine `.row`. */
+    var el = id('elevator');
+    if (el) {
+      var w = el.closest('div');
+      if (w && !w.classList.contains('mbw-aufzug') && !w.classList.contains('row')) w.classList.add('mbw-aufzug');
+    }
+    /* v1129 · Der Expertenblock bekommt einen eigenen Reiter. Er wird von
+       wertermittlung.js bei jedem zeichnen() NEU gebaut — deshalb wird er
+       bei jedem Einraeumen frisch ausgezeichnet, nicht einmalig. */
+    var eb = id('wm-exp-box');
+    if (eb && eb.parentElement) eb.parentElement.classList.add('mbw-experte');
+  }
+
+  /* 'zeile:feldId' -> die `.row`, die dieses Feld enthaelt.
+     Warum nicht `.row:has(#id)`: kuerzer, aber `:has()` faellt in aelteren
+     Browsern still aus — und ein still ausgefallener Selektor laesst Felder
+     unsichtbar im alten Behaelter zurueck. */
+  function aufloesen(sel) {
+    if (sel.indexOf('zeile:') !== 0) return _panel ? _panel.querySelectorAll(sel) : [];
+    var f = id(sel.slice(6));
+    if (!f) return [];
+    var z = f.closest('.row') || f.closest('div');
+    return z ? [z] : [];
   }
 
   function bauen() {
@@ -202,6 +248,15 @@
   }
 
   /* ── Umhaengen ──────────────────────────────────────────────────────── */
+  /* v1129: sucht im GANZEN Teilbaum, nicht nur unter den direkten Kindern.
+     Die Zeilen liegen verschachtelt in `precBox`, der Expertenblock in
+     `wm-b3`. Ein Element, das schon im richtigen Blatt sitzt, wird nicht
+     angefasst — sonst wanderte bei jedem Lauf der Fokus. */
+  function verschieben(el, ziel) {
+    if (!el || !ziel || el.parentElement === ziel) return;
+    if (ziel.contains(el)) return;
+    ziel.appendChild(el);
+  }
   function einraeumen() {
     if (!_panel || !id('mbw-blaetter')) return;
     markieren();
@@ -209,15 +264,21 @@
       var ziel = id('mbw-b' + n);
       if (!ziel) return;
       ZUORDNUNG[n].forEach(function (sel) {
-        _panel.querySelectorAll(':scope > ' + sel).forEach(function (el) { ziel.appendChild(el); });
+        Array.prototype.slice.call(aufloesen(sel)).forEach(function (el) { verschieben(el, ziel); });
       });
     });
     var fuss = id('mbw-fuss');
     if (fuss) {
       FUSS.forEach(function (sel) {
-        _panel.querySelectorAll(':scope > ' + sel).forEach(function (el) { fuss.appendChild(el); });
+        Array.prototype.slice.call(aufloesen(sel)).forEach(function (el) { verschieben(el, fuss); });
       });
     }
+    /* precHead/precBox haben ausgedient: die Reiter uebernehmen das
+       Auf- und Zuklappen. Der leere Behaelter bleibt stehen (app.js fasst
+       ihn an), wird aber nicht mehr gezeigt. */
+    ['precHead', 'precBox'].forEach(function (x) {
+      var e = id(x); if (e) { e.style.display = 'none'; verschieben(e, fuss || _panel); }
+    });
   }
 
   function zeige(n) {
@@ -261,6 +322,35 @@
     var w = document.documentElement;
     w.classList.toggle('mb-breit', !ergebnisDa());
     w.classList.toggle('mb-erzeugt', erzeugtGerade() && !ergebnisDa());
+    prozent();
+  }
+
+  /* ── v1129 · Prozentzahl am Ladebalken ────────────────────────────────
+     Marcels Wunsch: „am besten mit Prozentangabe". Der Balken selbst gibt
+     es schon (app.js setzt `#genProgBar.style.width` in Prozent) — die Zahl
+     wird daraus GELESEN, nicht zweitgerechnet. Ein eigener Zaehler wuerde
+     vom Balken abweichen, sobald app.js seine Kurve aendert. */
+  var _pctBeob = null;
+  function prozent() {
+    var bar = id('genProgBar');
+    if (!bar) return;
+    var kopf = id('genProgress');
+    if (!kopf) return;
+    var lbl = id('mbw-pct');
+    if (!lbl) {
+      lbl = document.createElement('span');
+      lbl.id = 'mbw-pct';
+      lbl.className = 'mbw-pct';
+      kopf.insertBefore(lbl, kopf.firstChild);
+    }
+    var w = Math.round(parseFloat(bar.style.width) || 0);
+    lbl.textContent = w > 0 ? w + ' %' : '';
+    if (!_pctBeob) {
+      try {
+        _pctBeob = new MutationObserver(function () { prozent(); });
+        _pctBeob.observe(bar, { attributes: true, attributeFilter: ['style'] });
+      } catch (e) {}
+    }
   }
 
   function start() {
