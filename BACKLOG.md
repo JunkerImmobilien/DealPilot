@@ -575,8 +575,41 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
   `index.html?v=1077b`. **Im Hauptprogramm wäre weiter die alte Fassung
   erschienen** — der Marktbericht läuft dort als iframe. Mitgezogen.
 
-  **Als Nächstes:** die Übersicht — Berichtstabelle, Objektwahl und
-  Einlesen als Einstieg vor dem Wizard.
+  ### `v1130` — die Übersicht wird der erste Reiter
+
+  Marcels Vorgabe: „die Objekte einlesen, die Tabelle mit den
+  Marktberichten und ein angelegtes Objekt direkt wählen — **das ist ja
+  quasi die Übersicht**."
+
+  Alle drei Wege standen **verstreut**: die Berichtstabelle als weißer
+  Balken über allem (`#mbReportsPanel`, Geschwister der `.grid`),
+  Objektwahl und Einlesen mitten im Objekt-Reiter. Sie stehen jetzt
+  zusammen als **Reiter 1**.
+
+  | Reiter | Felder |
+  |---|---|
+  | **1 Übersicht** | Berichtstabelle, Objektwahl, `.dpkt`, Sichern/Laden |
+  | 2 Objekt | 9 |
+  | 3 Zustand | 7 |
+  | 4 Ausstattung | 8 |
+  | 5 Gebäude & Außen | 9 |
+  | 6 Wertermittlung | 12 (ab Stufe 3) |
+  | 7 Zusatzwerte | 6 (ab Stufe 3) |
+
+  **Zwei Anpassungen im Unterbau:** der Auflöser sucht jetzt im ganzen
+  Dokument statt nur in der Formularspalte — die Berichtstabelle steht
+  außerhalb. Und die harten Grenzen `1` und `3` in der Navigation sind
+  durch `SCHRITTE.length` ersetzt: **eine Liste, eine Wahrheit** — sonst
+  hätte der siebte Reiter keinen „Weiter"-Knopf bekommen.
+
+  **Nachgemessen:** sieben Reiter, nichts außerhalb, Übersicht trägt alle
+  vier Bestandteile.
+
+  ### Damit ist Marcels Konzept vollständig
+
+  **Übersicht → Wizard → Ladebalken mit Prozent → Ergebnis.**
+  Was noch offen ist, steht als eigener Punkt im Backlog (Feinschliff der
+  Ergebnisdarstellung gehört zum Finanzamt-PDF-Punkt).
 
 - [2026-08-11] **Wizard, Schritt 1: die Stufenfrage wird zur
   Meilensteinleiste** — `v1126` (`7f4343b`), `v1126b` (`2e03655`),
