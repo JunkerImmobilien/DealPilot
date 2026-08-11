@@ -7,6 +7,10 @@
    - Felder-Mapping gegen die ECHTEN kurzen data-Keys (str/hnr/plz/ort/nkm/ze/kp/wfl/
      zimmer/baujahr/etage/gsfl/garagen/objart/ausst/modernis/ek).
    - Detail wird per /objects/{id} geladen (data-Objekt).
+
+   v1138-MBREF: Kommt der Aufruf mit ?ref aus der App, waehlt das Dropdown
+   das Objekt selbst vor und faehrt denselben Uebernahmeweg — vorher blieben
+   acht gepflegte Angaben leer, weil die App nur fuenf Werte an die URL haengt.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   function $(id) { return document.getElementById(id); }
@@ -303,24 +307,62 @@
       });
       sel.innerHTML = opts.join('');
       host.style.display = '';  /* v570-dropfast: sichtbar sobald Liste da */
-      sel.addEventListener('change', async function () {
-        var id = sel.value;
-        /* v942-publish
+      sel.addEventListener('change', uebernehmen);
+      /* v1138-MBREF · Der Aufruf aus der App fuellte den Bericht nur halb.
+       *
+       * Gemessen am Testobjekt PRUEF_1 (Aktionen -> Marktbericht bei
+       * GELADENEM Objekt): im Formular standen genau sechs Werte — Adresse,
+       * Objektart, Wohnflaeche, Zimmer, Baujahr, Kaufpreis. Leer blieben
+       * Etage, Kaltmiete, Grundstuecksflaeche, Wohneinheiten, Zustand,
+       * Qualitaet, Energieklasse und der Miteigentumsanteil, obwohl alle
+       * acht im Objekt gepflegt sind. Der Bericht meldete daraufhin
+       * "fehlt: Zustand, Qualitaet" und "fehlt: Grundstuecksflaeche,
+       * Wohneinheiten, Miteigentumsanteil" — der Nutzer sieht eine Stufe
+       * zu wenig und keinen Grund dafuer.
+       *
+       * URSACHE, nicht Symptom: es gab ZWEI Wege in dasselbe Formular.
+       * marktbericht-view.js:62 (currentObjAsQuery) haengt fuenf Werte an
+       * die iframe-URL; die vollstaendige Uebernahme steht in
+       * fillFromData() und hing ausschliesslich am change-Handler dieses
+       * Dropdowns. Wer sein Objekt in der App offen hatte, musste es hier
+       * ein zweites Mal auswaehlen, um seine eigenen Daten zu bekommen.
+       *
+       * Jetzt gibt es EINEN Weg: steht ein ?ref in der URL und liegt das
+       * Objekt in der Liste, waehlt das Dropdown es vor und laeuft durch
+       * denselben Handler. Kein zweiter Fuellpfad, der auseinanderlaufen
+       * kann. Ohne ?ref (Direktaufruf, geladener Bericht) aendert sich
+       * nichts. */
+      try {
+        var _ref = new URLSearchParams(location.search).get('ref') || '';
+        if (_ref) {
+          for (var _i = 1; _i < sel.options.length; _i++) {
+            if (sel.options[_i].value === _ref) {
+              sel.selectedIndex = _i;
+              sel.dispatchEvent(new Event('change', { bubbles: true }));
+              break;
+            }
+          }
+        }
+      } catch (e) {}
+    } catch (e) { host.style.display = 'none'; }
+
+    async function uebernehmen() {
+      var id = sel.value;
+      /* v942-publish
          * BUG bis v941: die id wurde nur zum Nachladen der Daten benutzt und
          * dann WEGGEWORFEN. app.js las external_ref ausschliesslich aus
          * location.search -> ein ueber dieses Dropdown erzeugter Bericht hatte
          * gar keinen Objektbezug und konnte in der Deal-Aktion nie auftauchen.
-         * Jetzt merken wir sie: app.js liest _mbwRef zuerst. */
-        window._mbwRef = id || null;
-        window._mbwLabel = (sel.options[sel.selectedIndex] && sel.options[sel.selectedIndex].text) || null;
-        try { window.dispatchEvent(new CustomEvent('mb:object-picked', { detail: { ref: id || null } })); } catch (e) {}
-        if (!id) return;
-        var note = $('mbow-note'); if (note) { note.textContent = 'Lade Objektdaten \u2026'; note.style.color = '#8a8a93'; }
-        var data = await loadDetail(id);
-        if (data) fillFromData(data);
-        else if (note) { note.textContent = '\u2717 Konnte Objektdaten nicht laden.'; note.style.color = '#B8625C'; }
-      });
-    } catch (e) { host.style.display = 'none'; }
+       * Jetzt merken wir sie: app.js liest _mbwRef zuerst. */
+      window._mbwRef = id || null;
+      window._mbwLabel = (sel.options[sel.selectedIndex] && sel.options[sel.selectedIndex].text) || null;
+      try { window.dispatchEvent(new CustomEvent('mb:object-picked', { detail: { ref: id || null } })); } catch (e) {}
+      if (!id) return;
+      var note = $('mbow-note'); if (note) { note.textContent = 'Lade Objektdaten \u2026'; note.style.color = '#8a8a93'; }
+      var data = await loadDetail(id);
+      if (data) fillFromData(data);
+      else if (note) { note.textContent = '\u2717 Konnte Objektdaten nicht laden.'; note.style.color = '#B8625C'; }
+    }
   }
 
   function mount() {
