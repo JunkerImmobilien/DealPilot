@@ -290,7 +290,29 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
     W / 2, H - 4, { align: 'center' });
 }
 
+/* ── v1132-nullzeilen · „alles was leer oder eine 0 hat wird nicht
+   angezeigt" (Marcel, 2026-08-11) ────────────────────────────────────────
+   Geprueft wird der ROHWERT, nicht der formatierte. Die Falle steht so im
+   Backlog: `_euro(null)` liefert „–" und ist damit TRUTHY — wer auf den
+   formatierten Wert prueft, blendet nichts aus. Hier kommen die Werte
+   ohnehin als Zahl herein; `Number(null)` ist 0 und besteht
+   `Number.isFinite`, deshalb wird zuerst auf Abwesenheit geprueft und erst
+   danach gerechnet.
+
+   Bleibt von einem Abschnitt KEINE Zeile uebrig, faellt der ganze
+   Abschnitt weg — samt Ueberschrift und Zwischensumme. Eine Ueberschrift
+   ueber einer leeren Flaeche mit „Zwischensumme 0 €" ist genau das
+   Rauschen, das weg sollte. */
+function _wkHatWert(v) {
+  if (v === null || v === undefined || v === '') return false;
+  var n = (typeof v === 'number') ? v : parseFloat(String(v).replace(',', '.'));
+  return isFinite(n) && Math.round(n) !== 0;
+}
+
 function _renderWkSection(doc, cy, M, CW, title, items) {
+  items = (items || []).filter(function (it) { return _wkHatWert(it && it[1]); });
+  if (!items.length) return cy;          /* leerer Abschnitt: gar nicht erst zeichnen */
+
   // Page break check
   if (cy > 250) { doc.addPage(); cy = 20; }
 
