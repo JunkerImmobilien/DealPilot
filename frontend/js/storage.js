@@ -20,6 +20,37 @@ if (!window._pdfGold) {
    Hybrid Storage: Backend API or localStorage
 ═══════════════════════════════════════════════════ */
 
+/* v1136-WMTAB-1 · Die Wertermittlungsangaben aus dem Marktbericht.
+ *
+ * Die Namen sind die SPEICHERSCHLUESSEL aus _mbBuildObjData()
+ * (marktbericht-app/app.js), nicht die Formular-Ids des Berichts —
+ * hinterland_qm, nicht hinterlandFlaeche. Der Block im Objekt-Reiter traegt
+ * genau diese Ids, damit collectData() und loadData() sie ohne Sonderweg
+ * mitnehmen.
+ *
+ * Vier davon (baustatus, bgf, standardstufe, brw_stichtag) standen seit
+ * WOBJ32-1 im HTML und in KEINER Zeile JavaScript: nie gespeichert, nie
+ * geladen, nur getippt. Gemessen mit grep ueber frontend/ — ausserhalb von
+ * index.html kein einziger Treffer.
+ *
+ * Eigene Liste, weil sie an ZWEI Stellen gebraucht wird: in FIELDS und in
+ * der Leerliste von loadData(). Ohne das Leeren waere der Eintrag in FIELDS
+ * gefaehrlich statt nuetzlich — loadData() setzt nur, was das neue Objekt
+ * fuehrt, und traegt sonst den Wert des vorigen weiter. Bis v1135 war das
+ * harmlos, weil die Felder gar nicht gespeichert wurden; ab jetzt wuerden
+ * die 828 m2 Hinterland von Objekt A beim Speichern an Objekt B kleben. */
+var WM_FIELDS = [
+  'baustatus','bgf','standardstufe','grundriss','mod_punkte',
+  'sachwertfaktor','stellplatz_miete_monat','sonstige_jahr',
+  'nhk_haus','nhk_geschosse','nhk_dach',
+  'hinterland_qm','hinterland_eur_qm','hinterland_rentierlich',
+  'garagen_bgf_qm','garagen_stufe','aussenanlagen_pct','aussenanlagen',
+  'ausst_aussenwaende','ausst_dach','ausst_fenster','ausst_innenwaende',
+  'ausst_decken','ausst_fussboeden','ausst_sanitaer','ausst_heizung','ausst_technik',
+  'bes_bauteile','btl_gauben','btl_balkone','btl_vordach','btl_terrassen','btl_sonstige',
+  'lzs_pct','brw_manuell','brw_anpassung_pct','brw_anpassung_grund','brw_stichtag'
+];
+
 var FIELDS = [
   'plz','ort','str','hnr','objart','wfl','baujahr','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
   'thesis','risiken','notizen','bankval','svwert','makrolage','mikrolage',
@@ -59,7 +90,7 @@ var FIELDS = [
   'ueberf_restschuld','ueberf_rest_zins',
   /* v816: Privat-Cut Enddatum + Wizard-Verknuepfung */
   'ueberf_ende','_ueberf_link'
-];
+].concat(WM_FIELDS);  /* v1136-WMTAB-1 · siehe oben */
 
 var _currentObjKey = null;  // Local mode key OR API object id
 
@@ -242,7 +273,7 @@ function loadData(d) {
     'weg_r',                                      // WEG-Rücklage (Info)
     'kp1', 'kp2', 'kp3', 'kp4',                   // Sonderkosten (calc.js Z.545)
     'kp1l', 'kp2l', 'kp3l', 'kp4l'                // Sonderkosten Labels
-  ];
+  ].concat(WM_FIELDS);  /* v1136-WMTAB-1: dieselbe Falle, siehe Kommentar an WM_FIELDS */
   resetFields.forEach(function(id) {
     var e = document.getElementById(id);
     if (e) e.value = '';

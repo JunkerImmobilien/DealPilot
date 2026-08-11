@@ -167,6 +167,13 @@
     var offen = [];
     WM_MAP.forEach(function (p) {
       var v = d[p[0]];
+      /* v1136-WMTAB-1 · Der Miteigentumsanteil steht an zwei Schluesseln:
+       * das Hauptprogramm fuehrt ihn seit jeher als `mea`, der Marktbericht
+       * schreibt ihn als `mea_pct` zurueck. Wer ihn im Objekt-Reiter
+       * gepflegt hat und nie einen Bericht erzeugte, hatte hier bisher ein
+       * leeres Feld. Gleiche Einheit (Prozent), der Originalname behaelt
+       * Vorrang — dieselbe Rueckfall-Form wie baeder/ausstattung in v1135b. */
+      if (p[0] === 'mea_pct' && (v == null || v === '')) v = d.mea;
       if (v == null || v === '') return;
       if ($(p[1])) setVal(p[1], v); else offen.push(p);
     });

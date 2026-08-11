@@ -1190,26 +1190,161 @@ label.dp-required.qc-required::after {
             </div>
         <div class="f"><label>Miteigentumsanteil (%) <button type="button" class="dp-tip" data-tip-id="tab1.miteigentumsanteil" tabindex="-1" aria-label="Hilfe zu tab1.miteigentumsanteil"></button></label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7.06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
         <!-- WOBJ32-1 · Wertermittlung: Baustatus, BRW-Stichtag, Wohneinheiten,
-     Bruttogrundflaeche, Standardstufe. Alle optional bis auf den Baustatus,
-     der den Vergleichspool steuert. -->
-<div class="f"><label>Baustatus</label><div class="iw"><select id="baustatus" onchange="calc()">
-<option value="bestand">Bestand</option>
-<option value="bestand_erstbezug_saniert">Bestand – Erstbezug nach Sanierung</option>
-<option value="neubau_erstbezug">Neubau – Erstbezug</option>
-<option value="neubau_im_bau">Neubau – im Bau</option>
-<option value="geplant">Geplant / Bauträger</option>
-</select></div></div>
+     Bruttogrundflaeche, Standardstufe.
+     v1136-WMTAB-1 · Baustatus, Bruttogrundflaeche und Standardstufe sind in
+     den Block "Wertermittlung (Marktbericht)" am Ende dieses Reiters
+     gewandert — sie gehoeren zum Gebaeude, nicht zum Boden, und standen
+     hier ohne Speicherweg. Der Stichtag bleibt beim Bodenrichtwert, zu dem
+     er gehoert; die Wohneinheiten bleiben, sie werden auch sonst gebraucht. -->
 <div class="f"><label>Stichtag Bodenrichtwert</label><div class="iw"><input id="brw_stichtag" type="text" placeholder="2024-01-01" class="tr" oninput="calc()"></div></div>
 <div class="f"><label>Wohneinheiten im Gebäude</label><div class="iw"><input id="einheiten" type="text" inputmode="numeric" placeholder="10" class="tr" oninput="calc()"></div></div>
-<div class="f"><label>Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für Sachwert" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
-<div class="f"><label>Standardstufe (NHK)</label><div class="iw"><select id="standardstufe" onchange="calc()">
-<option value="">—</option><option value="3">3 · durchschnittlich</option>
-<option value="4">4 · gehoben</option><option value="5">5 · stark gehoben</option>
-</select></div></div>
 <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
         <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
       </div></div>
+    </div>
+  </div>
+
+  <!-- ═══ v1136-WMTAB-1 · Wertermittlung am Objekt ═══════════════════════
+       Seit v1121/v1134/v1135 stehen die Wertermittlungsangaben dauerhaft am
+       Objekt und laufen in beide Richtungen — ansehen oder aendern konnte man
+       sie aber nur IM Marktbericht. Dieser Block holt sie ins Objekt.
+
+       Zwei Regeln, an denen der Block haengt:
+       1. Jede Id ist der SPEICHERSCHLUESSEL aus _mbBuildObjData()
+          (hinterland_qm, nicht hinterlandFlaeche). Zusammen mit dem Eintrag
+          in FIELDS (storage.js) traegt der bestehende Weg sie von selbst —
+          collectData() liest ueber genau diese Ids ein.
+       2. Die Optionswerte sind 1:1 aus marktbericht-app/wertermittlung.js
+          abgeschrieben. Ein abweichender Wert kaeme im Berichtsformular
+          still als leer an (der Befund aus v1135b).
+
+       Keine oninput="calc()"-Aufrufe: calc() liest keines dieser Felder.
+       Sie sind Wertermittlung, keine Investitionsrechnung. -->
+  <div class="card" data-collapsible="wm-obj" data-collapse-title="Wertermittlung (Marktbericht)">
+    <div class="ct-row">
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-calculator"/></svg></span>Wertermittlung (Marktbericht)</div>
+    </div>
+    <p class="sec-desc" style="margin:0 0 16px">Diese Angaben braucht der Marktbericht für Sachwert- und Ertragswertverfahren. Sie bleiben am Objekt gespeichert und werden bei der Objektwahl im Marktbericht wieder eingesetzt — hier lassen sie sich ansehen und ändern, ohne einen Bericht zu erzeugen. Alles freiwillig: was fehlt, rechnet der Bericht nicht halb, sondern gar nicht.</p>
+
+    <div class="card-title">Grundlagen</div>
+    <div class="g3">
+      <div class="f"><label>Baustatus</label><div class="iw"><select id="baustatus">
+        <option value="">— keine Angabe —</option>
+        <option value="bestand">Bestand</option>
+        <option value="bestand_erstbezug_saniert">Bestand – Erstbezug nach Sanierung</option>
+        <option value="neubau_erstbezug">Neubau – Erstbezug</option>
+        <option value="neubau_im_bau">Neubau – im Bau</option>
+        <option value="geplant">Geplant / Bauträger</option>
+      </select></div></div>
+      <div class="f"><label>Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für den Sachwert bei Häusern" class="tr"><span class="sfx">m²</span></div></div>
+      <div class="f"><label>Standardstufe (NHK 2010)</label><div class="iw"><select id="standardstufe">
+        <option value="">— keine Angabe —</option>
+        <option value="1">1 · sehr einfach (nur Häuser)</option>
+        <option value="2">2 · einfach (nur Häuser)</option>
+        <option value="3">3 · Standard</option>
+        <option value="4">4 · gehoben</option>
+        <option value="5">5 · stark gehoben</option>
+      </select></div></div>
+      <div class="f"><label>Grundrissart</label><div class="iw"><select id="grundriss">
+        <option value="">— keine Angabe —</option>
+        <option value="einspaenner">Einspänner · 1 Wohnung je Treppenhaus (× 1,05)</option>
+        <option value="zweispaenner">Zweispänner · 2 Wohnungen (× 1,00)</option>
+        <option value="dreispaenner">Dreispänner · 3 Wohnungen (× 0,97)</option>
+        <option value="vierspaenner">Vierspänner · 4 Wohnungen (× 0,95)</option>
+      </select></div></div>
+      <div class="f"><label>Modernisierungsgrad (Anlage 2)</label><div class="iw"><select id="mod_punkte">
+        <option value="">— keine Angabe, wird geschätzt —</option>
+        <option value="0">nicht modernisiert</option>
+        <option value="4">kleine Modernisierungen im Rahmen der Instandhaltung</option>
+        <option value="8">mittlerer Modernisierungsgrad</option>
+        <option value="14">überwiegend modernisiert</option>
+        <option value="19">umfassend modernisiert</option>
+      </select></div></div>
+      <div class="f"><label>Sachwertfaktor</label><div class="iw"><input id="sachwertfaktor" type="text" inputmode="decimal" placeholder="leer = aus der Parametertabelle" class="tr"></div></div>
+      <div class="f"><label>Stellplatzmiete (€/Monat)</label><div class="iw"><span class="pfx">€</span><input id="stellplatz_miete_monat" type="text" inputmode="decimal" placeholder="je Stellplatz" class="trl"></div></div>
+      <div class="f"><label>Sonstige Einnahmen (€/Jahr)</label><div class="iw"><span class="pfx">€</span><input id="sonstige_jahr" type="text" inputmode="decimal" placeholder="Werbefläche, Antennenanlage …" class="trl"></div></div>
+    </div>
+
+    <hr class="dvd">
+    <div class="card-title">Gebäudeart nach NHK 2010 · nur Häuser</div>
+    <div class="g3">
+      <div class="f"><label>Hausform</label><div class="iw"><select id="nhk_haus">
+        <option value="">— keine Angabe —</option>
+        <option value="1">freistehendes Ein-/Zweifamilienhaus</option>
+        <option value="2">Doppelhaus / Reihenendhaus</option>
+        <option value="3">Reihenmittelhaus</option>
+      </select></div></div>
+      <div class="f"><label>Geschosse und Unterkellerung</label><div class="iw"><select id="nhk_geschosse">
+        <option value="">— keine Angabe —</option>
+        <option value="0">Keller- und Erdgeschoss</option>
+        <option value="1">Keller-, Erd- und Obergeschoss</option>
+        <option value="2">Erdgeschoss, nicht unterkellert</option>
+        <option value="3">Erd- und Obergeschoss, nicht unterkellert</option>
+      </select></div></div>
+      <div class="f"><label>Dachausbildung</label><div class="iw"><select id="nhk_dach">
+        <option value="">— keine Angabe —</option>
+        <option value="1">Dachgeschoss voll ausgebaut</option>
+        <option value="2">Dachgeschoss nicht ausgebaut</option>
+        <option value="3">Flachdach oder flach geneigtes Dach</option>
+      </select></div></div>
+    </div>
+
+    <hr class="dvd">
+    <div class="card-title">Grundstück, Garage, Außenanlagen</div>
+    <div class="g3">
+      <div class="f"><label>Zusätzliche Fläche / Hinterland (m²)</label><div class="iw"><input id="hinterland_qm" type="text" inputmode="decimal" placeholder="nur die Fläche AUSSERHALB des Baulands" class="tr"><span class="sfx">m²</span></div></div>
+      <div class="f"><label>Wertansatz Hinterland (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="hinterland_eur_qm" type="text" inputmode="decimal" placeholder="z. B. 5 €/m²" class="trl"></div></div>
+      <div class="f"><label>Zusatzfläche ist rentierlich</label><div class="iw"><select id="hinterland_rentierlich">
+        <option value="">nein · wirft keinen Ertrag ab (Standard)</option>
+        <option value="ja">ja · wird vermietet oder verpachtet</option>
+      </select></div></div>
+      <div class="f"><label>Garage / Carport – Bruttogrundfläche (m²)</label><div class="iw"><input id="garagen_bgf_qm" type="text" inputmode="decimal" placeholder="Länge × Breite, alle zusammen" class="tr"><span class="sfx">m²</span></div></div>
+      <div class="f"><label>Garage – Standardstufe</label><div class="iw"><select id="garagen_stufe">
+        <option value="">— keine Angabe —</option>
+        <option value="3">3 · Fertiggarage</option>
+        <option value="4">4 · Massivbauweise</option>
+        <option value="5">5 · Massiv mit besonderer Ausführung</option>
+      </select></div></div>
+      <div class="f"><label>Außenanlagen (% des Gebäudesachwerts)</label><div class="iw"><input id="aussenanlagen_pct" type="text" inputmode="decimal" placeholder="z. B. 5 bis 7 – alternativ Betrag" class="tr"><span class="sfx">%</span></div></div>
+      <div class="f"><label>Außenanlagen (€)</label><div class="iw"><span class="pfx">€</span><input id="aussenanlagen" type="text" inputmode="decimal" placeholder="Wege, Einfriedung, Ver- und Entsorgung" class="trl"></div></div>
+    </div>
+
+    <hr class="dvd">
+    <div class="card-title">Ausstattung nach Gewerken · nur Häuser</div>
+    <p class="sec-desc" style="margin:-6px 0 12px">Stufen 1 bis 5 nach SW-RL 2012, Anlage 2, halbe Stufen erlaubt. <strong>Alle neun oder keins</strong> — bei einer Lücke rechnet der Bericht mit der glatten Standardstufe oben.</p>
+    <div class="g3">
+      <div class="f"><label>Außenwände · 23 %</label><div class="iw"><select id="ausst_aussenwaende"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
+      <div class="f"><label>Dach · 15 %</label><div class="iw"><select id="ausst_dach"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
+      <div class="f"><label>Fenster/Außentüren · 11 %</label><div class="iw"><select id="ausst_fenster"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
+      <div class="f"><label>Innenwände · 11 %</label><div class="iw"><select id="ausst_innenwaende"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
+      <div class="f"><label>Decken/Treppen · 11 %</label><div class="iw"><select id="ausst_decken"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
+      <div class="f"><label>Fußböden · 5 %</label><div class="iw"><select id="ausst_fussboeden"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
+      <div class="f"><label>Sanitär · 9 %</label><div class="iw"><select id="ausst_sanitaer"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
+      <div class="f"><label>Heizung · 9 %</label><div class="iw"><select id="ausst_heizung"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
+      <div class="f"><label>sonst. Technik · 6 %</label><div class="iw"><select id="ausst_technik"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
+    </div>
+
+    <hr class="dvd">
+    <div class="card-title">Besondere und sonstige Bauteile</div>
+    <p class="sec-desc" style="margin:-6px 0 12px">Herstellungskosten <strong>heute</strong>, ohne Baunebenkosten — die stecken in den NHK bereits drin.</p>
+    <div class="g3">
+      <div class="f"><label>Besondere Bauteile (€)</label><div class="iw"><span class="pfx">€</span><input id="bes_bauteile" type="text" inputmode="decimal" placeholder="z. B. Aufzug" class="trl"></div></div>
+      <div class="f"><label>Dachgauben (€)</label><div class="iw"><span class="pfx">€</span><input id="btl_gauben" type="text" inputmode="decimal" class="trl"></div></div>
+      <div class="f"><label>Balkone (€)</label><div class="iw"><span class="pfx">€</span><input id="btl_balkone" type="text" inputmode="decimal" class="trl"></div></div>
+      <div class="f"><label>Vordächer / Eingangsvorbau (€)</label><div class="iw"><span class="pfx">€</span><input id="btl_vordach" type="text" inputmode="decimal" class="trl"></div></div>
+      <div class="f"><label>Terrassen (€)</label><div class="iw"><span class="pfx">€</span><input id="btl_terrassen" type="text" inputmode="decimal" class="trl"></div></div>
+      <div class="f"><label>Weitere Bauteile (€)</label><div class="iw"><span class="pfx">€</span><input id="btl_sonstige" type="text" inputmode="decimal" class="trl"></div></div>
+    </div>
+
+    <hr class="dvd">
+    <div class="card-title">Ansätze des Sachverständigen</div>
+    <p class="sec-desc" style="margin:-6px 0 12px">Nur für den Ausnahmefall. Leer heißt: der Bericht holt den Wert selbst — Liegenschaftszins aus der Parametertabelle, Bodenrichtwert über BORIS.</p>
+    <div class="g3">
+      <div class="f"><label>Liegenschaftszinssatz (%)</label><div class="iw"><input id="lzs_pct" type="text" inputmode="decimal" placeholder="leer = amtlicher bzw. gesetzlicher Wert" class="tr"><span class="sfx">%</span></div></div>
+      <div class="f"><label>Bodenrichtwert manuell (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="brw_manuell" type="text" inputmode="decimal" placeholder="leer = amtlicher Abruf" class="trl"></div></div>
+      <div class="f"><label>Bodenwert-Anpassung (%)</label><div class="iw"><input id="brw_anpassung_pct" type="text" inputmode="decimal" placeholder="z. B. -10 für Lärmbelastung" class="tr"><span class="sfx">%</span></div></div>
+      <div class="f s2"><label>Begründung der Anpassung</label><div class="iw"><input id="brw_anpassung_grund" type="text" placeholder="Pflicht, sobald eine Anpassung eingetragen ist" class="tr"></div></div>
     </div>
   </div>
 
@@ -3004,7 +3139,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=974"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1134"></script>
+<script src="js/storage.js?v=v1136"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
