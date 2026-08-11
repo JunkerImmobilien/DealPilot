@@ -165,16 +165,97 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Die 22 € Abweichung bei der Restschuld sind monatliche gegen
    jährliche Verrechnung — kein Befund.
 
-   **Weiterhin offen:** **PDF-Ausgabe** (das Erzeugen löst einen Download
-   aus und braucht Marcels Freigabe), die Kette in den **Marktbericht**
-   und die **Handy-Ansicht** desselben Objekts.
+   ---
 
-   **Warnung für den nächsten Durchgang:** Die Handy-Messung über eine
-   iframe-Messkabine mit der **vollen App** hat den Renderer des Tabs
-   **eingefroren** (CDP-Timeout nach 45 s, zweimal). Die App im iframe
-   startet ihre komplette Maschinerie ein zweites Mal. Für die
-   Handy-Ansicht deshalb ein **eigenes Fenster** in 390 px nehmen, nicht
-   die Kabine im selben Tab.
+   ### Zweiter Durchgang (2026-08-11) — Marktbericht-Kette und Handy-Ansicht
+
+   **Die Messkabine funktioniert doch — mit einem leeren Träger.** Die
+   Warnung aus dem ersten Durchgang („eigenes Fenster in 390 px nehmen")
+   ist damit **überholt**: ein eigenes Fenster geht in dieser Umgebung
+   gar nicht, `resize_window` wirkt am maximierten Fenster nicht
+   (`innerWidth` blieb 1920, zwei Anläufe). Was **funktioniert**: die
+   Kabine in einem Tab, in dem die App **nicht schon läuft**. Träger ist
+   `/impressum.html` (7 KB, gleiches Origin), Inhalt gelöscht, iframe mit
+   390 × 844 eingesetzt. Genau das war die Ursache des Einfrierens — nicht
+   der iframe, sondern **zweimal dieselbe App im selben Renderer**. Ein
+   `?ref=<uuid>` als SPA-Pfad hilft übrigens nicht: jede unbekannte URL
+   liefert die volle App zurück, es gibt keine leere Seite auf dem Origin.
+
+   **Marktbericht-Kette: ein Bruch gefunden und behoben (`v1138`,
+   `e99d041`).** Beim Aufruf „Aktionen → Marktbericht" bei **geladenem**
+   Objekt standen im Bericht genau sechs Werte — Adresse, Objektart,
+   Wohnfläche, Zimmer, Baujahr, Kaufpreis. Leer blieben Etage, Kaltmiete,
+   Grundstücksfläche, Wohneinheiten, Zustand, Qualität, Energieklasse und
+   Miteigentumsanteil, **obwohl alle acht im Objekt gepflegt sind**. Der
+   Bericht meldete daraufhin „fehlt: Zustand, Qualität" und „fehlt:
+   Grundstücksfläche, Wohneinheiten, Miteigentumsanteil" — eine Stufe zu
+   wenig, ohne erkennbaren Grund. Ursache: **zwei Wege in dasselbe
+   Formular.** `marktbericht-view.js:62` hängt fünf Werte an die
+   iframe-URL, die vollständige Übernahme `fillFromData()` hing allein am
+   `change`-Handler des Dropdowns. Jetzt wählt das Dropdown bei
+   vorhandenem `?ref` selbst vor und läuft durch denselben Handler.
+   **Nachgemessen:** ohne einen einzigen Klick sind jetzt 13 Felder
+   gefüllt und **Stufe 2 (Marktpreisindikation) direkt erreicht.**
+
+   **Zustands-Zuordnung stimmt.** `ds2_zustand = 'gut'` kommt als
+   `cond = 'gepflegt'` an, `ausst = 'Normal'` als `quality = 'normal'`,
+   Energieklasse C direkt — die Tabelle aus `v1136c` greift.
+
+   **Kein Defekt, aber erklärungsbedürftig:** „fehlt: Miteigentumsanteil"
+   bleibt auch nach der Übernahme stehen. Das Feld `mea` entsteht erst,
+   wenn man die Zeile „Wertermittlung" anklickt; **dann** trägt der
+   Beobachter aus `v1136b` die 10 aus dem Objekt nach und die Stufe ist
+   erreicht (gemessen). Die Meldung nennt also etwas als fehlend, was
+   längst bekannt ist — eine Beschriftungsfrage wie beim anteiligen
+   ersten Jahr, kein Rechenfehler.
+
+   **Handy-Ansicht: vier Befunde, alle behoben.** Alle bei 390 px am
+   selben Objekt gemessen, alle nach dem Ausrollen gegengemessen.
+
+   | | Befund | Fassung |
+   |---|---|---|
+   | 1 | **Die Löschen-Schaltfläche lag auf der Score-Zahl.** `elementFromPoint` in deren Mitte lieferte `sbc-btn sbc-del` — wer den Score antippt, löst die Löschabfrage aus | `v1138b` `62cce64` |
+   | 2 | **Das Minuszeichen stand allein in einer Zeile.** Drei Cashflow-Kacheln à 97 px, Betrag in 30 px Schrift → „–" / „274" / „€" untereinander; wer die mittlere Zeile liest, sieht einen positiven Wert | `v1138c` `a266753` |
+   | 3 | **Die Sensitivitätsmatrix schnitt ihre rechte Spalte ab** — fünf von 25 Zellen hinter `overflow:hidden`, ohne Scrollbalken unerreichbar | `v1138d` `ccbca96` |
+   | 4 | **Zwei Stellen, an denen ein `flex:0 0 auto`-Nachbar alles zusammendrückt:** der Umschalter Prognose/Detail stand als „ognose" da, und die Zeile „Finanzamt-PDF" ließ ihrer Beschreibung 25 px | `v1138e` `0f2d698` |
+
+   **Zwei davon haben dieselbe Ursache — und sie ist bekannt:** eine
+   spätere `!important`-Regel gleicher Spezifität macht eine frühere
+   Korrektur wirkungslos. Bei 1 schlug die alte V80-Zeile (`top:12px`)
+   die V103-Korrektur (`top:38px`); bei 2 schlagen zwei Regeln mit
+   `repeat(3,1fr) !important` die Handy-Regel bei 700 px **und** die
+   Tablet-Regel bei 1024 px. Beide Korrekturen waren seit ihrem Einbau
+   wirkungslos. Deshalb jetzt über **Spezifität** (`.sec .cf-phase-grid`),
+   nicht über Position — im Browser bewiesen: die Regel gewann selbst
+   dann, als sie als **erstes** Stylesheet eingehängt war.
+
+   **Eigener Messfehler, ausdrücklich vermerkt:** Mein Überlauftest prüfte
+   gegen den **Viewport** und meldete „sauber", während fünf Matrixzellen
+   längst am `overflow:hidden` des Vorfahren abgeschnitten wurden.
+   **Ein Überlauftest muss gegen den klippenden Vorfahren prüfen**, und
+   `overflow-x:auto` darüber zählt nicht als Befund — dort ist der Inhalt
+   erwischbar. Mit dem korrigierten Maßstab sind alle **neun Reiter bei
+   390 px sauber**.
+
+   **Zweiter zurückgenommener Befund:** Ich hatte gemeldet, die
+   Bewertungs-Kommentare ragten 157 px über den Rand. Falsch — ihr
+   Container `kpi-eval-body` trägt `overflow-x:auto`, die Tabelle ist
+   seitwärts erreichbar. Kein Befund.
+
+   **Rechenwerte auf dem Handy identisch mit dem Desktop-Lauf:** DSCR
+   0,89, LTV 88,1 %, CF vor Steuern −274 €/Monat, Kartenkacheln −2.075 €
+   und 4,32 %. Der `v1137`-Vorzeichenfix wirkt auch hier.
+
+   **Neuer Befund, bewusst nicht gefixt — gehört zu Punkt 4:**
+   `.sbc-arrow` misst auf dem Handy **4 × 21 px** (auf dem Desktop
+   20 × 20). Ein Bedienelement von vier Pixeln Breite ist nicht treffbar.
+   Punkt 4 und Punkt 11 führen denselben Pfeil mit den Desktop-Maßen;
+   **beim Aufgreifen gilt der Handy-Wert als der schwerere.**
+
+   **Weiterhin offen und auf Marcels Freigabe wartend:** die
+   **PDF-Ausgabe** (löst einen Download aus) und der **eigentliche
+   Marktbericht-Abruf** (kostet Kerosin — Stufe 3 wären 12 L, das
+   Konto hat 12 L).
 
 2. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
