@@ -539,7 +539,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Punkt 7 beschrieben.
 
    **Auf Produktion ausgerollt am 2026-08-11** — `main` von `e682367`
-   (`v1111`) auf `51958c6`, **98 Commits auf einmal**: die Handy-Freigabe
+   (`v1111`) auf `5d98ada`, **98 Commits auf einmal**: die Handy-Freigabe
    `v1118`, die Steuer-PDFs `v1131`–`v1133` und die ganze
    Marktbericht-Kette. Vorher gesichert: `/root/backup-pre-v1136.sql`
    (11,3 MB) und `/root/backup-mb-pre-v1136.sql` (13,5 MB) — beide mit
@@ -554,10 +554,31 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Objekten trug **keines** Wertermittlungsangaben, keines einen
    Marktbericht-Snapshot. Nichts gelöscht — es gab nichts zu bereinigen.
 
-   **Offener Abnahmepunkt:** der eingeloggte Speicher- und Ladetest ist
-   nur auf Staging gefahren. Auf Produktion ist belegt, was ohne Anmeldung
-   messbar ist — Karte im HTML, `WM_FIELDS` 38, `FIELDS` 203, alle 38
-   Felder im DOM, keine Konsolenfehler.
+   **Auf Produktion angemeldet nachgeprüft** (Objekt Dealstreet 999,
+   2026-08-11): 38/38 gespeichert, 38/38 zurückgeladen, **0 Felder tragen
+   beim Objektwechsel weiter**, im Marktbericht 21/21 übernommen und
+   **alle drei Stufen erreicht**. Die Prüfwerte sind danach wieder
+   entfernt worden — 39 Felder geleert, die echten Objektdaten (`kp`,
+   `str`, `wfl`, `mea`) unangetastet.
+
+   **Dabei fiel der letzte Fehler der Kette auf — `v1136d` (`5d98ada`).**
+   Auf Staging hatte ich mit selbst gesetzten Werten gemessen, und die
+   hatte ich mit **Punkt** geschrieben. Ein echter Nutzer tippt Komma: das
+   Prod-Objekt führt `mea = "7,06"`. Ein `<input type="number">` lehnt das
+   **still** ab und bleibt leer — dieselbe Falle wie bei den
+   Auswahlfeldern in `v1135b`, nur eine Feldart weiter. Ohne
+   Miteigentumsanteil erreicht eine Wohnung Stufe 3 nicht; der Bericht war
+   also erneut gesperrt, aus einem ganz anderen Grund als in `v1136c`.
+   `setVal()` schreibt jetzt nach dem Fehlschlag die deutsche Schreibweise
+   um und warnt sonst in der Konsole.
+
+   **Bewusst offen gelassen: der Tausendertrenner.** `"1.570"` nimmt ein
+   `number`-Feld an — als **1,57**. Ob ein einzelner Punkt Tausender oder
+   Dezimale meint, lässt sich nicht ohne Raten entscheiden (`1.15` ist ein
+   gültiger Sachwertfaktor, `1.570` wären 1570 m²). Deshalb bleibt ein
+   Punkt unangetastet. **Wer das lösen will, muss an der Quelle ansetzen:**
+   die Haupt-App sollte Zahlen normalisiert speichern, statt die
+   Tippschreibweise durchzureichen.
 
 - [2026-08-11] **Finanzamt-PDF: Rechnung geprüft, Darstellung neu** — `v1131` (`534d7e3`), `v1132` (`6352e2a`), `v1133` (`de976c2`).
    Ergebnisdarstellung neu bauen.** Drei Arbeiten an einer Datei, in dieser
