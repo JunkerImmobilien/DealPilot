@@ -1092,7 +1092,14 @@ function _computeYearTotal(year, yearIdx) {
     einnahmen: einnahmen,
     ergebnis: ergebnis,
     refund: impact.refund,
-    taxDelta: impact.taxDelta
+    taxDelta: impact.taxDelta,
+    /* v1133-steuerwirkung: calcImmoTaxImpact rechnet ESt vorher/nachher und
+       beide Steuersaetze ohnehin — bisher wurden davon nur zwei Werte
+       weitergereicht. Das Finanzamt-PDF soll die Wirkung zeigen wie Marcels
+       Immokalk („Steuer Verlust/Ueberschuss pro Jahr / pro Monat"), und
+       dafuer braucht es die ganze Auskunft. Nichts neu gerechnet. */
+    zve: baseIncome,
+    impact: impact
   };
 }
 

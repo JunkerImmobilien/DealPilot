@@ -281,6 +281,9 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
   doc.text(ergebnisColor + ': ' + (totals.ergebnis >= 0 ? '+' : '') +
     Math.round(totals.ergebnis).toLocaleString('de-DE') + ' €', M + 6, cy + 24);
 
+  cy += 30;
+  cy = _renderSteuerwirkung(doc, cy, M, CW, totals);
+
   // ── FOOTER ─────────────────────────────────────
   doc.setFontSize(7);
   doc.setTextColor(150, 150, 150);
@@ -303,6 +306,86 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
    Abschnitt weg — samt Ueberschrift und Zwischensumme. Eine Ueberschrift
    ueber einer leeren Flaeche mit „Zwischensumme 0 €" ist genau das
    Rauschen, das weg sollte. */
+/* ── v1133-steuerwirkung · Was bringt es steuerlich? ──────────────────────
+   Marcels Immokalk beantwortet genau das — „Steuer Verlust/Ueberschuss pro
+   Jahr 1.380 €, pro Monat 115 €" — und ist ausdruecklich die Vorlage.
+   Unser Papier hoerte bei der Werbungskosten-Summe auf.
+
+   Gerechnet wird hier NICHTS: calcImmoTaxImpact liefert ESt vorher und
+   nachher sowie beide Steuersaetze; seit v1133 reicht _computeYearTotal
+   sie durch. Eine eigene Steuerformel im PDF waere eine zweite Wahrheit.
+
+   Fehlt das zvE, faellt der Block ganz weg — lieber keine Aussage als eine
+   Steuerersparnis, die auf einem geratenen Einkommen beruht. */
+function _renderSteuerwirkung(doc, cy, M, CW, totals) {
+  var imp = totals && totals.impact;
+  var zve = totals && totals.zve;
+  if (!imp || !zve || !isFinite(zve) || zve <= 0) return cy;
+
+  if (cy > 235) { doc.addPage(); cy = 20; }
+
+  function eur(n) { return Math.round(n).toLocaleString('de-DE') + ' €'; }
+  function pct(n) { return (Math.round(n * 100) / 100).toString().replace('.', ',') + ' %'; }
+
+  doc.setFillColor(42, 39, 39);
+  doc.rect(M, cy, CW, 6, 'F');
+  doc.setTextColor.apply(doc, window._pdfGold());
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('STEUERWIRKUNG', M + 3, cy + 4.2);
+  cy += 6;
+
+  var zveNach = zve + totals.ergebnis;
+  if (zveNach < 0) zveNach = 0;
+  var zeilen = [
+    ['zu versteuerndes Einkommen vor Investition', eur(zve), 'Einkommensteuer ' + eur(imp.taxBefore)],
+    [(totals.ergebnis >= 0 ? 'Überschuss' : 'Verlust') + ' aus Vermietung und Verpachtung',
+     (totals.ergebnis >= 0 ? '+' : '') + eur(totals.ergebnis), ''],
+    ['zu versteuerndes Einkommen nach Investition', eur(zveNach), 'Einkommensteuer ' + eur(imp.taxAfter)],
+    ['Grenzsteuersatz', pct(imp.grenzsteuersatzBefore * 100), 'danach ' + pct(imp.grenzsteuersatzAfter * 100)]
+  ];
+  zeilen.forEach(function (z, i) {
+    if (cy + 7 > 280) { doc.addPage(); cy = 20; }
+    doc.setFillColor(i % 2 === 0 ? 252 : 248, i % 2 === 0 ? 250 : 246, i % 2 === 0 ? 244 : 238);
+    doc.rect(M, cy, CW, 7, 'F');
+    doc.setTextColor(60, 55, 55);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.text(z[0], M + 3, cy + 4.5);
+    if (z[2]) {
+      doc.setTextColor(120, 110, 100);
+      doc.setFontSize(7.5);
+      doc.text(z[2], M + CW - 42, cy + 4.5, { align: 'right' });
+    }
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(42, 39, 39);
+    doc.text(z[1], M + CW - 3, cy + 4.5, { align: 'right' });
+    cy += 7;
+  });
+
+  /* Die Zahl, auf die es Marcel ankommt. */
+  var proJahr = imp.refund;                    /* > 0 = Erstattung */
+  var proMonat = proJahr / 12;
+  if (cy + 18 > 280) { doc.addPage(); cy = 20; }
+  doc.setFillColor(42, 39, 39);
+  doc.roundedRect(M, cy + 2, CW, 16, 2, 2, 'F');
+  doc.setFillColor.apply(doc, window._pdfGold());
+  doc.rect(M, cy + 2, 2, 16, 'F');
+  doc.setTextColor.apply(doc, window._pdfGold());
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text((proJahr >= 0 ? 'STEUERERSPARNIS' : 'STEUERNACHZAHLUNG') + ' PRO JAHR', M + 6, cy + 8.5);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(13);
+  doc.text(eur(Math.abs(proJahr)), M + CW - 6, cy + 9, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(220, 220, 220);
+  doc.text('pro Monat ' + eur(Math.abs(proMonat)), M + CW - 6, cy + 15, { align: 'right' });
+  return cy + 20;
+}
+
 function _wkHatWert(v) {
   if (v === null || v === undefined || v === '') return false;
   var n = (typeof v === 'number') ? v : parseFloat(String(v).replace(',', '.'));
