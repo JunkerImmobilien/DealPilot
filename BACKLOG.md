@@ -37,20 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Partner-Logo auf der Landingpage ergänzen: caretechthiel.**
-   Unter „Partner" fehlt das Logo von `caretechthiel.de`. Es liegt im
-   Mockup-Ordner. **Gleiche Größe wie die vorhandenen** — also nicht nach
-   Augenmaß einsetzen, sondern die gerenderte Breite und Höhe der
-   Nachbarlogos messen und treffen. Logos kommen in unterschiedlichen
-   Seitenverhältnissen; „gleich groß" heißt hier **gleiche optische
-   Höhe**, nicht gleiche Dateimaße.
-
-   **Zwei Fallstricke aus dieser Datei:** `landing/index.html` lädt `env.js`
-   **nicht**, und `</body>` kommt dort **dreimal** vor — beim Einfügen mit
-   `rfind` arbeiten. Bild in denselben Ordner wie die übrigen Partnerlogos,
-   Pfad relativ zur Landing-Seite prüfen.
-
-2. **Ein Testobjekt vollständig anlegen und alle Rechenwege
+1. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
    Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
    richtig, wird unter „Bewertung" alles passend angezeigt, sind die
@@ -81,7 +68,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
    Steuerteil.
 
-3. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+2. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -179,7 +166,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-4. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+3. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -214,7 +201,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-5. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+4. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -248,7 +235,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-6. **Marktbericht neu gestalten.**
+5. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -392,7 +379,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-7. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
+6. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
    Beim Ausrollen von `v1136` gemessen: `git status` auf
    `root@116.203.214.11` meldet
    `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
@@ -447,6 +434,44 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-11] **Partner-Logo caretechthiel auf der Landingpage** — `v1136i` (`0867d33`). Vorlage: `design/mockups/logo-dark.svg`, abgelegt als `frontend/landing/assets/caretechthiel-logo.svg`.
+
+   **Zweimal eingesetzt.** Das Partnerband ist ein Marquee, dessen Track
+   die Liste **doppelt** führt (20 Kacheln für 10 Partner) — ein einzelner
+   Eintrag hätte die Schleife verschoben. Eingeordnet neben Funck IT,
+   weil beide Technik sind.
+
+   **Größe: keine Sonderregel nötig, gemessen statt geschätzt.**
+   `.plogo` ist 216×108, `.plogo img` hat `max-width:100%` und
+   `max-height:62px`. Bei 26 px Seitenpolsterung bleiben 164 px Breite.
+   Das Logo hat 4:1 (viewBox 360×90) und landet damit bei **162×41** —
+   genau in der Reihe der übrigen Breitformate:
+
+   | Logo | gerendert |
+   |---|---|
+   | PriceHubble · Sprengnetter | 45 px hoch |
+   | Christian Sperling | 46 px |
+   | **CareTech Thiel** | **41 px** |
+   | ImmoMetrica · RealEstatePilot | 39 / 37 px |
+
+   **Die Kachel ist dunkel — und das ist eine offene Frage an Marcel.**
+   Die abgelegte Vorlage ist die **Dark-Mode-Fassung**: Schriftzug
+   `#F1F5F9`, Akzent `#10B981`. Auf der weißen Kachel aller anderen wäre
+   der Schriftzug mit **Kontrast 1,05** unsichtbar. Ein **fremdes Logo
+   färbt man nicht um**, also hat diese eine Kachel Obsidian bekommen
+   (`.plogo-dunkel`, Kontrast 18,6) — nicht das Slate des Logos, damit es
+   die Hausfarbe bleibt. **Liegt eine helle Fassung vor, fällt die Klasse
+   ersatzlos weg** und die Kachel ist weiß wie alle anderen.
+
+   **Die beiden Fallstricke aus dem Punkt haben nicht getragen:** Ein
+   `rfind` auf `</body>` war nicht nötig, weil der Eintrag mitten ins
+   Band gehört, nicht ans Dateiende — der Anker ist `alt="Funck IT"`.
+   Und `env.js` spielt keine Rolle: **alle** übrigen Partnerlogos stehen
+   als `data:image/png;base64` im HTML, es gibt gar keinen Logo-Ordner.
+   Das SVG liegt deshalb als **Datei** in `assets/` (942 Bytes) — kein
+   URL-Encoding von `#` in einer Data-URI, und im Browser mit HTTP 200
+   nachgeprüft.
 
 - [2026-08-11] **Aktionen-Aufklapper: „2 L" weg, Farbe folgt der Darstellung** — `v1136e` (`972cb9a`), `v1136f` (`eb63658`), `v1136g` (`86b7513`), `v1136h` (`4dac3cd`, `c8dd81f`). Bilder: `design/mockups/Screenshot 2026-08-11 145054.png` (das aufgeklappte Panel, schwarz in heller Sidebar) und `markt1.png`.
 
