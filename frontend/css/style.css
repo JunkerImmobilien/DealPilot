@@ -18467,6 +18467,34 @@ html body .body {
   .bc-matrix-cell-val { font-size: 13px; }
 }
 
+/* v1138d: Die Sensitivitaetsmatrix schnitt auf dem Handy ihre rechte Spalte ab.
+   Gemessen bei 390 px am Testobjekt PRUEF_1: die Matrix reichte bis x=414,
+   .bc-card klippt bei x=373 (overflow:hidden) — fuenf der 25 Zellen waren
+   unerreichbar, darunter die gesamte Spalte "+20 % Wachstum". Kein Scrollbalken,
+   also kein Weg heran.
+
+   Die Ursache lag NICHT an der Breitenangabe: `1fr` allein reicht nicht, weil
+   Grid-Items `min-width:auto` tragen und damit nie unter ihre Inhaltsbreite
+   schrumpfen. `.bc-matrix-grid` fuehrt ausserdem nur Zeilen, seine implizite
+   Spalte war max-content (249 px in einem 183-px-Container). Beides musste
+   ausdruecklich auf `minmax(0,1fr)` bzw. `min-width:0`.
+
+   Beim Messen selbst hereingefallen: ein Ueberlauftest, der nur gegen den
+   VIEWPORT prueft, meldet hier "sauber" — abgeschnitten wird am
+   overflow:hidden des Vorfahren, lange vor dem Fensterrand. Der naechste
+   Durchgang prueft gegen den klippenden Vorfahren. */
+@media (max-width: 700px) {
+  .bc-card .bc-matrix-wrap { grid-template-columns: 72px minmax(0, 1fr) !important; }
+  .bc-card .bc-matrix-grid { grid-template-columns: minmax(0, 1fr) !important; min-width: 0 !important; }
+  .bc-card .bc-matrix-row,
+  .bc-card .bc-matrix-cell { min-width: 0 !important; }
+  .bc-card .bc-matrix-axis-y-label { white-space: normal !important; overflow-wrap: anywhere !important; }
+  .bc-card .bc-delta { overflow-wrap: anywhere !important; min-width: 0 !important; }
+  /* Der Kartenkopf schrumpfte die Ueberschrift auf 87 px, obwohl 335 da waren */
+  .bc-card .bc-head { flex-wrap: wrap !important; }
+  .bc-card .bc-head-left { flex: 1 1 100% !important; }
+}
+
 /* PDF-print: Schatten und Effekte raus, optimiert für DIN-A4 */
 @media print {
   .bc-card { box-shadow: none; break-inside: avoid; }
