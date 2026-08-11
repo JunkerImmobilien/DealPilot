@@ -25653,9 +25653,17 @@ aside.sidebar .sb-card .sbc-top {
   gap: 12px !important;
 }
 /* V80: Score-Overlay rechts oben — absolute Position, darf Adresse-Zeile überlappen */
+/* v1138b: `top` steht hier NICHT MEHR. Diese Regel ist wortgleich mit der aus
+   V103 (Z. ~25057) und stand dahinter — bei gleicher Spezifitaet gewinnt die
+   spaetere, also schlug `top:12px` die Korrektur `top:38px` aus V103. Wirkung
+   gemessen bei 390 px am Testobjekt PRUEF_1: die Loesch-Schaltflaeche lag genau
+   ueber der Score-Zahl, `elementFromPoint` in deren Mitte lieferte
+   `sbc-btn sbc-del`. Wer den Score antippt, loest die Loeschabfrage aus — auf
+   dem Desktop faellt es nicht auf, weil die Knoepfe dort nur beim Hovern
+   erscheinen, auf dem Handy stehen sie dauerhaft (V101, `opacity:1`).
+   EINE Quelle fuer `top`: die V103-Regel. Nicht wieder hier setzen. */
 aside.sidebar .sb-card .sbc-score-overlay {
   position: absolute !important;
-  top: 12px !important;
   right: 12px !important;
   display: flex !important;
   flex-direction: column !important;
