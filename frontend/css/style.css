@@ -36767,12 +36767,17 @@ body.hdr-collapsed .main-col > .tabs {
    auf Schwarz. Kontraste nach dem Patch auf Weiss gemessen:
    Eintrag 18,6 · Sektionstitel 4,6 · Icon 3,9.
 
-   Zwei Traeger, weil es zwei Schalter gibt: html[data-bg] (Hintergrund
-   weiss/creme, V260-03) und body.dp-chrome-hell (Chrome-Skin). Sie sind
-   nicht zwingend gemeinsam gesetzt.
+   TRAEGER IST NUR body.dp-chrome-hell — ein eigener Fehler, gemessen und
+   zurueckgenommen: Die erste Fassung haengte die Regeln zusaetzlich an
+   `html[data-bg="white"]`. Das ist der falsche Schalter. `data-bg`
+   steuert die ARBEITSFLAECHE, der Chrome-Skin den RAHMEN, und beide sind
+   unabhaengig. Gemessen nach `_dpDispSkin('obsidian')`: `data-bg` blieb
+   `white`, die Sidebar wurde `rgb(0,0,0)` — das Panel waere hell in
+   schwarzer Sidebar stehengeblieben, also derselbe Fehler mit
+   umgekehrtem Vorzeichen. Die alte V260-03-Regel macht genau das, es
+   fiel nur nie auf, weil der schwarze Verlauf sie ohnehin uebermalte.
    ------------------------------------------------------------------ */
 
-html[data-bg="white"] aside.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner,
 body.dp-chrome-hell aside.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner {
   background: #ffffff !important;
   border: 1.5px solid color-mix(in srgb, var(--gold) 30%, transparent) !important;
@@ -36781,55 +36786,29 @@ body.dp-chrome-hell aside.sidebar .sb-actions-accordion.sb-actions-open .sb-acti
               inset 0 1px 0 rgba(255, 255, 255, .9) !important;
   backdrop-filter: none !important;
 }
-/* Creme-Grund: derselbe Weg, nur die Flaeche folgt --surface. */
-html[data-bg="cream"] aside.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner {
-  background: var(--surface, #F8F6F1) !important;
-  border: 1.5px solid color-mix(in srgb, var(--gold) 30%, transparent) !important;
-  box-shadow: 0 -6px 28px rgba(20, 19, 16, .14),
-              inset 0 1px 0 rgba(255, 255, 255, .8) !important;
-  backdrop-filter: none !important;
-}
 
 /* Eintraege: Tinte statt Gold. Derselbe Ton, den die helle Sidebar fuer
    die Objektadresse fuehrt (gemessen: rgb(20,19,16)). */
-html[data-bg="white"] aside.sidebar .sb-act-item,
-html[data-bg="cream"] aside.sidebar .sb-act-item,
 body.dp-chrome-hell aside.sidebar .sb-act-item,
-html[data-bg="white"] aside.sidebar .sb-act-item.sb-act-accent,
-html[data-bg="cream"] aside.sidebar .sb-act-item.sb-act-accent,
 body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent,
-html[data-bg="white"] aside.sidebar .sb-act-item:first-of-type,
-html[data-bg="cream"] aside.sidebar .sb-act-item:first-of-type,
 body.dp-chrome-hell aside.sidebar .sb-act-item:first-of-type {
   color: #141310 !important;
 }
 /* Ueberfahren: die Goldspur bleibt, sie traegt auf Weiss nur bei
    hoeherem Anteil. Die Schrift bleibt Tinte. */
-html[data-bg="white"] aside.sidebar .sb-act-item:hover,
-html[data-bg="cream"] aside.sidebar .sb-act-item:hover,
 body.dp-chrome-hell aside.sidebar .sb-act-item:hover,
-html[data-bg="white"] aside.sidebar .sb-act-item.sb-act-accent:hover,
-html[data-bg="cream"] aside.sidebar .sb-act-item.sb-act-accent:hover,
 body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent:hover,
-html[data-bg="white"] aside.sidebar .sb-act-item:first-of-type:hover,
-html[data-bg="cream"] aside.sidebar .sb-act-item:first-of-type:hover,
 body.dp-chrome-hell aside.sidebar .sb-act-item:first-of-type:hover {
   background: color-mix(in srgb, var(--gold) 14%, transparent) !important;
   color: #141310 !important;
 }
 /* Symbole: --gold traegt auf Weiss nicht (Kontrast 2,3). Der dunklere
    Goldton der Marke schon. */
-html[data-bg="white"] aside.sidebar .sb-act-item .sb-act-ico,
-html[data-bg="cream"] aside.sidebar .sb-act-item .sb-act-ico,
 body.dp-chrome-hell aside.sidebar .sb-act-item .sb-act-ico,
-html[data-bg="white"] aside.sidebar .sb-act-item.sb-act-accent .sb-act-ico,
-html[data-bg="cream"] aside.sidebar .sb-act-item.sb-act-accent .sb-act-ico,
 body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent .sb-act-ico {
   color: var(--wl-9a7f33, #9a7f33) !important;
 }
 /* Sektionstitel: 9,5px Versalien brauchen mehr als 2,5. */
-html[data-bg="white"] aside.sidebar .sb-act-section-title,
-html[data-bg="cream"] aside.sidebar .sb-act-section-title,
 body.dp-chrome-hell aside.sidebar .sb-act-section-title {
   color: #7A7370 !important;
   border-top-color: color-mix(in srgb, var(--gold) 22%, transparent) !important;
