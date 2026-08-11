@@ -36736,3 +36736,102 @@ body.hdr-collapsed .main-col > .tabs {
   top: var(--hdr-h, 48px) !important;
 }
 /* ===== v1124b-hdrsync-collapsed END ===== */
+
+/* ═══ v1136e-aktionen-hell ═══════════════════════════════════════════
+   Backlog Punkt 1 — das Aktionen-Panel folgt der hellen Darstellung.
+
+   GEMESSEN, nicht vermutet (Staging, Hell aktiv, nach Neuladen):
+     .sb-actions-accordion-inner  background-image: linear-gradient(
+                                    rgb(10,8,5) -> rgb(5,5,5))
+     .sb-act-item                 color rgb(232,201,100)  = Gold-hell
+     .sb-act-section-title        color rgba(168,162,153,.65)
+     .sb-act-ico                  color rgb(201,168,76)   = --gold
+
+   Das Panel ist als geschlossene DUNKLE Einheit gebaut: schwarzer Grund
+   plus goldene Schrift. In sich stimmig — nur folgt es dem Hell-Skin
+   nicht und steht als schwarzer Block in einer weissen Sidebar.
+
+   WARUM DIE VORHANDENE HELL-REGEL NICHT REICHT: V260-03 setzt
+   `html[data-bg="white"] .sb-actions-accordion-inner { background:#fff
+   !important }` — Spezifitaet (0,2,1). Die Dunkelregel
+   `aside.sidebar .sb-actions-accordion.sb-actions-open
+    .sb-actions-accordion-inner` hat (0,4,1) und ebenfalls !important,
+   gewinnt also. Deshalb hier dieselbe Kette PLUS der Skin-Traeger.
+
+   Und der Grund liegt im background-IMAGE, nicht in background-color —
+   ein Walker, der nur background-color liest, findet ihn nicht. Genau
+   daran bin ich beim Messen zuerst vorbeigelaufen.
+
+   BEIDE TEILE GEHOEREN ZUSAMMEN: nur den Grund aufhellen ergaebe Gold
+   auf Weiss (Kontrast 1,62), nur die Schrift abdunkeln ergaebe Schwarz
+   auf Schwarz. Kontraste nach dem Patch auf Weiss gemessen:
+   Eintrag 18,6 · Sektionstitel 4,6 · Icon 3,9.
+
+   Zwei Traeger, weil es zwei Schalter gibt: html[data-bg] (Hintergrund
+   weiss/creme, V260-03) und body.dp-chrome-hell (Chrome-Skin). Sie sind
+   nicht zwingend gemeinsam gesetzt.
+   ------------------------------------------------------------------ */
+
+html[data-bg="white"] aside.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner,
+body.dp-chrome-hell aside.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner {
+  background: #ffffff !important;
+  border: 1.5px solid color-mix(in srgb, var(--gold) 30%, transparent) !important;
+  box-shadow: 0 -6px 28px rgba(20, 19, 16, .14),
+              0 0 20px color-mix(in srgb, var(--gold) 8%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, .9) !important;
+  backdrop-filter: none !important;
+}
+/* Creme-Grund: derselbe Weg, nur die Flaeche folgt --surface. */
+html[data-bg="cream"] aside.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner {
+  background: var(--surface, #F8F6F1) !important;
+  border: 1.5px solid color-mix(in srgb, var(--gold) 30%, transparent) !important;
+  box-shadow: 0 -6px 28px rgba(20, 19, 16, .14),
+              inset 0 1px 0 rgba(255, 255, 255, .8) !important;
+  backdrop-filter: none !important;
+}
+
+/* Eintraege: Tinte statt Gold. Derselbe Ton, den die helle Sidebar fuer
+   die Objektadresse fuehrt (gemessen: rgb(20,19,16)). */
+html[data-bg="white"] aside.sidebar .sb-act-item,
+html[data-bg="cream"] aside.sidebar .sb-act-item,
+body.dp-chrome-hell aside.sidebar .sb-act-item,
+html[data-bg="white"] aside.sidebar .sb-act-item.sb-act-accent,
+html[data-bg="cream"] aside.sidebar .sb-act-item.sb-act-accent,
+body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent,
+html[data-bg="white"] aside.sidebar .sb-act-item:first-of-type,
+html[data-bg="cream"] aside.sidebar .sb-act-item:first-of-type,
+body.dp-chrome-hell aside.sidebar .sb-act-item:first-of-type {
+  color: #141310 !important;
+}
+/* Ueberfahren: die Goldspur bleibt, sie traegt auf Weiss nur bei
+   hoeherem Anteil. Die Schrift bleibt Tinte. */
+html[data-bg="white"] aside.sidebar .sb-act-item:hover,
+html[data-bg="cream"] aside.sidebar .sb-act-item:hover,
+body.dp-chrome-hell aside.sidebar .sb-act-item:hover,
+html[data-bg="white"] aside.sidebar .sb-act-item.sb-act-accent:hover,
+html[data-bg="cream"] aside.sidebar .sb-act-item.sb-act-accent:hover,
+body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent:hover,
+html[data-bg="white"] aside.sidebar .sb-act-item:first-of-type:hover,
+html[data-bg="cream"] aside.sidebar .sb-act-item:first-of-type:hover,
+body.dp-chrome-hell aside.sidebar .sb-act-item:first-of-type:hover {
+  background: color-mix(in srgb, var(--gold) 14%, transparent) !important;
+  color: #141310 !important;
+}
+/* Symbole: --gold traegt auf Weiss nicht (Kontrast 2,3). Der dunklere
+   Goldton der Marke schon. */
+html[data-bg="white"] aside.sidebar .sb-act-item .sb-act-ico,
+html[data-bg="cream"] aside.sidebar .sb-act-item .sb-act-ico,
+body.dp-chrome-hell aside.sidebar .sb-act-item .sb-act-ico,
+html[data-bg="white"] aside.sidebar .sb-act-item.sb-act-accent .sb-act-ico,
+html[data-bg="cream"] aside.sidebar .sb-act-item.sb-act-accent .sb-act-ico,
+body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent .sb-act-ico {
+  color: var(--wl-9a7f33, #9a7f33) !important;
+}
+/* Sektionstitel: 9,5px Versalien brauchen mehr als 2,5. */
+html[data-bg="white"] aside.sidebar .sb-act-section-title,
+html[data-bg="cream"] aside.sidebar .sb-act-section-title,
+body.dp-chrome-hell aside.sidebar .sb-act-section-title {
+  color: #7A7370 !important;
+  border-top-color: color-mix(in srgb, var(--gold) 22%, transparent) !important;
+}
+/* ===== v1136e-aktionen-hell END ===== */
