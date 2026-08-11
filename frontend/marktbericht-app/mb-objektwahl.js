@@ -24,6 +24,30 @@
      * sagte warum. Passiert echt, wenn eine Optionsliste sich zwischen
      * zwei Fassungen aendert. Kein Verhalten geaendert, nur sichtbar
      * gemacht. */
+    /* v1136d-WMTAB-1 · Dieselbe stille Ablehnung bei Zahlenfeldern. Ein
+     * <input type="number"> nimmt "7,06" NICHT an und bleibt leer — das
+     * Hauptprogramm speichert aber deutsche Schreibweise, so wie der
+     * Nutzer sie tippt. Auf Produktion gemessen: Objekt Dealstreet 999
+     * fuehrt mea = "7,06", das Berichtsfeld blieb leer, und ohne
+     * Miteigentumsanteil erreicht eine Wohnung Stufe 3 nicht.
+     *
+     * Nur der eindeutige Fall wird umgeschrieben: ist ein Komma da, ist es
+     * das Dezimaltrennzeichen und ein Punkt der Tausendertrenner. Ein
+     * Punkt ALLEIN bleibt unangetastet — "1.15" ist ein Sachwertfaktor,
+     * "1.570" waeren 1570 m2, und das laesst sich nicht unterscheiden,
+     * ohne zu raten. Der Fall steht als Rest im Backlog.
+     *
+     * Erst nach dem Fehlschlag, damit sich an funktionierenden Werten
+     * nichts aendert. */
+    if (el.tagName === 'INPUT' && el.type === 'number' && el.value === '' && /,/.test(String(v))) {
+      el.value = String(v).trim().replace(/\./g, '').replace(',', '.');
+    }
+    if (el.tagName === 'INPUT' && el.type === 'number' && el.value === '') {
+      try {
+        console.warn('[mbow] ' + id + ': gespeicherter Wert "' + v +
+          '" ist keine gueltige Zahl -> Feld bleibt leer.');
+      } catch (e) {}
+    }
     if (el.tagName === 'SELECT' && String(el.value) !== String(v)) {
       try {
         console.warn('[mbow] ' + id + ': gespeicherter Wert "' + v +
