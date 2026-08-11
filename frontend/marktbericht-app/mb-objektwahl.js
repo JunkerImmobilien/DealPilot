@@ -51,12 +51,54 @@
     if (/haus/.test(s)) return 'EFH';
     return null;
   }
+  /* v1136c-WMTAB-1 · Zwei gemessene Fehler in dieser Zuordnung.
+   *
+   * Die Haupt-App fuehrt fuenf Zustaende (ds2_zustand in index.html:991):
+   * neubau, gut, normal, renovierungsbeduerftig, stark_sanierungsbeduerftig.
+   * Das Berichtsfeld cond fuehrt sechs andere: neuwertig, saniert,
+   * modernisiert, gepflegt, normal, renovierungsbeduerftig.
+   *
+   * 1. `gut` traf keine einzige Regel und ergab null — das Feld blieb leer.
+   *    Zustand ist Pflicht fuer die Marktpreisindikation, und ohne Stufe 2
+   *    ist Stufe 3 unerreichbar: der haeufigste Zustandswert ueberhaupt
+   *    sperrte den Bericht. Im Browser gemessen an Hermannstr. 9
+   *    (ds2_zustand='gut'): cond leer, Stufe 2 "fehlt: Zustand",
+   *    Stufe 3 nicht erreichbar.
+   *
+   * 2. `stark_sanierungsbeduerftig` wurde zu `saniert`. Die alte
+   *    Schleife verglich fuenf Anfangsbuchstaben, und "sanie" steckt in
+   *    "sanierungsbeduerftig". Der schlechteste Zustand kam als
+   *    instandgesetzt an — ein Fehler mit falschem Vorzeichen, der den
+   *    Wert hebt statt ihn zu senken.
+   *
+   * Deshalb jetzt eine ausdrueckliche Tabelle statt einer Heuristik. Die
+   * beiden Zuordnungen, die eine fachliche Entscheidung sind:
+   *   gut                        -> gepflegt   (die Liste kennt kein "gut";
+   *                                 gepflegt ist der Nachbar unter neuwertig)
+   *   stark_sanierungsbeduerftig -> renovierungsbeduerftig (schlechteste
+   *                                 Stufe, die das Berichtsfeld anbietet)
+   * Der unscharfe Weg bleibt fuer Freitext aus Altbestaenden erhalten —
+   * aber erst NACH der Tabelle, und "sanierungsbeduerftig" wird vorher
+   * abgefangen. */
+  var COND_MAP = {
+    'neubau': 'neuwertig', 'kernsaniert': 'neuwertig', 'neuwertig': 'neuwertig',
+    'gut': 'gepflegt', 'gepflegt': 'gepflegt',
+    'normal': 'normal',
+    'saniert': 'saniert', 'modernisiert': 'modernisiert',
+    'renovierungsbeduerftig': 'renovierungsbeduerftig',
+    'stark_sanierungsbeduerftig': 'renovierungsbeduerftig',
+    'sanierungsbeduerftig': 'renovierungsbeduerftig'
+  };
   function mapCond(raw) {
     if (!raw) return null;
-    var s = String(raw).toLowerCase();
-    var opts = ['neuwertig', 'saniert', 'modernisiert', 'gepflegt', 'normal', 'renovierungsbeduerftig'];
-    for (var i = 0; i < opts.length; i++) { if (s === opts[i] || s.indexOf(opts[i].slice(0, 5)) > -1) return opts[i]; }
-    if (/neubau|kernsaniert/.test(s)) return 'neuwertig';
+    var s = String(raw).toLowerCase().trim();
+    if (COND_MAP[s]) return COND_MAP[s];
+    /* Freitext: bedarf zuerst — sonst gewinnt wieder "sanie" aus
+     * "sanierungsbeduerftig" gegen "saniert". */
+    if (/bed(ue|ü)rftig/.test(s)) return 'renovierungsbeduerftig';
+    if (/neubau|kernsaniert|neuwertig/.test(s)) return 'neuwertig';
+    var opts = ['modernisiert', 'gepflegt', 'saniert', 'normal'];
+    for (var i = 0; i < opts.length; i++) { if (s.indexOf(opts[i].slice(0, 5)) > -1) return opts[i]; }
     return null;
   }
 
