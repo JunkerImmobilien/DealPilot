@@ -46,13 +46,22 @@
 
      Aus drei Reitern werden sechs. Die Meilensteine bleiben drei: mehrere
      Reiter koennen auf dieselbe Stufe einzahlen (`stufe`). */
+  /* v1130 · Die Uebersicht wird der erste Reiter.
+     Marcels Vorgabe: „wichtig ist, dass man weiterhin die Objekte auch
+     einlesen kann, es die Tabelle gibt mit den Marktberichten und dass man
+     auch direkt ein angelegtes Objekt auswaehlen kann. Das ist ja quasi
+     die Uebersicht."
+     Alle drei Wege standen verstreut — die Tabelle als weisser Balken ueber
+     allem, Objektwahl und Einlesen mitten im Objekt-Reiter. Sie stehen
+     jetzt zusammen am Anfang. */
   var SCHRITTE = [
-    { id: 1, t: 'Objekt',        stufe: 1, kurz: 'Adresse, Eckdaten, Einlesen' },
-    { id: 2, t: 'Zustand',       stufe: 2, kurz: 'Baustatus, Zustand, Qualität, Modernisierung' },
-    { id: 3, t: 'Ausstattung',   stufe: 2, kurz: 'Energie, Heizung, Bad, Böden, Aufzug' },
-    { id: 4, t: 'Gebäude & Außen', stufe: 2, kurz: 'Dach, Wände, Balkon, Grundstück, Stellplätze' },
-    { id: 5, t: 'Wertermittlung', stufe: 3, kurz: 'Bodenwert, NHK, Feinjustierung' },
-    { id: 6, t: 'Zusatzwerte',   stufe: 3, kurz: 'Liegenschaftszins, Sachwertfaktor, Bodenrichtwert' }
+    { id: 1, t: 'Übersicht',     stufe: 0, kurz: 'Vorhandene Berichte, Objekt wählen oder einlesen' },
+    { id: 2, t: 'Objekt',        stufe: 1, kurz: 'Adresse und Eckdaten' },
+    { id: 3, t: 'Zustand',       stufe: 2, kurz: 'Baustatus, Zustand, Qualität, Modernisierung' },
+    { id: 4, t: 'Ausstattung',   stufe: 2, kurz: 'Energie, Heizung, Bad, Böden, Aufzug' },
+    { id: 5, t: 'Gebäude & Außen', stufe: 2, kurz: 'Dach, Wände, Balkon, Grundstück, Stellplätze' },
+    { id: 6, t: 'Wertermittlung', stufe: 3, kurz: 'Bodenwert, NHK, Feinjustierung' },
+    { id: 7, t: 'Zusatzwerte',   stufe: 3, kurz: 'Liegenschaftszins, Sachwertfaktor, Bodenrichtwert' }
   ];
 
   /* Was in welchen Reiter gehoert. Zwei Schreibweisen:
@@ -60,13 +69,13 @@
        'zeile:feldId'     — die `.row`, die dieses Feld enthaelt
      Ids und Klassen sind die vorhandenen — nichts ist neu erfunden. */
   var ZUORDNUNG = {
-    1: ['.mbw-h1', '#mbow-host', '#dpktDrop', '.mbw-sichern', '.sep', '.mbw-adresse', '#address',
-        'zeile:ptype', 'zeile:area', 'zeile:year', 'zeile:rent'],
-    2: ['#wm-b1', 'zeile:cond', 'zeile:quality', 'zeile:modyear'],
-    3: ['zeile:eq_energie', 'zeile:eq_floor', 'zeile:eq_guest_wc', '.mbw-aufzug'],
-    4: ['zeile:eq_walls', 'zeile:balcony', 'zeile:garages'],
-    5: ['#wm-b3'],
-    6: ['.mbw-experte']
+    1: ['#mbReportsPanel', '#mbow-host', '#dpktDrop', '.mbw-sichern', '.sep'],
+    2: ['.mbw-h1', '.mbw-adresse', '#address', 'zeile:ptype', 'zeile:area', 'zeile:year', 'zeile:rent'],
+    3: ['#wm-b1', 'zeile:cond', 'zeile:quality', 'zeile:modyear'],
+    4: ['zeile:eq_energie', 'zeile:eq_floor', 'zeile:eq_guest_wc', '.mbw-aufzug'],
+    5: ['zeile:eq_walls', 'zeile:balcony', 'zeile:garages'],
+    6: ['#wm-b3'],
+    7: ['.mbw-experte']
   };
   /* Diese bleiben UNTEN und gehoeren keinem Reiter — sie gelten immer.
      .mbw-aktionen ist die Zeile "Letzte Ausgabe / Teilbares Angebot";
@@ -204,7 +213,11 @@
      Browsern still aus — und ein still ausgefallener Selektor laesst Felder
      unsichtbar im alten Behaelter zurueck. */
   function aufloesen(sel) {
-    if (sel.indexOf('zeile:') !== 0) return _panel ? _panel.querySelectorAll(sel) : [];
+    /* v1130: im ganzen Dokument suchen, nicht nur in der Formularspalte —
+       `#mbReportsPanel` steht ausserhalb, als Geschwister der `.grid`.
+       Die Selektoren sind samt und sonders eigene Ids und Klassen; ein
+       Fehlgriff anderswo ist damit ausgeschlossen. */
+    if (sel.indexOf('zeile:') !== 0) return document.querySelectorAll(sel);
     var f = id(sel.slice(6));
     if (!f) return [];
     var z = f.closest('.row') || f.closest('div');
@@ -247,7 +260,7 @@
       var b = e.target.closest('[data-mbw]');
       if (b) zeige(parseInt(b.getAttribute('data-mbw'), 10));
     });
-    id('mbw-vor').addEventListener('click', function () { zeige(Math.min(3, _aktiv + 1)); });
+    id('mbw-vor').addEventListener('click', function () { zeige(Math.min(SCHRITTE.length, _aktiv + 1)); });
     id('mbw-zur').addEventListener('click', function () { zeige(Math.max(1, _aktiv - 1)); });
     return true;
   }
@@ -289,7 +302,7 @@
 
   function einraeumen() {
     if (!_panel || !id('mbw-blaetter')) return;
-    expertenDubletten(id('mbw-b6'));
+    expertenDubletten(id('mbw-b' + SCHRITTE[SCHRITTE.length - 1].id));
     markieren();
     Object.keys(ZUORDNUNG).forEach(function (n) {
       var ziel = id('mbw-b' + n);
@@ -327,7 +340,7 @@
     });
     var z = id('mbw-zur'), v = id('mbw-vor');
     if (z) z.disabled = (n === 1);
-    if (v) v.disabled = (n === 3);
+    if (v) v.disabled = (n === SCHRITTE.length);
     try { var w = id('mbw-reiter'); if (w) w.scrollIntoView({ block: 'nearest' }); } catch (e) {}
   }
 
