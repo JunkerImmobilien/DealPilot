@@ -18,6 +18,19 @@
   function setVal(id, v) {
     var el = $(id); if (!el || v == null || v === '') return;
     el.value = v;
+    /* v1135-WMBACK-2 · Ein Auswahlfeld nimmt einen unbekannten Wert nicht
+     * an — es bleibt STILL leer. Beim Messen selbst hereingefallen: die
+     * Werte standen im Objekt, das Feld war trotzdem leer, und nichts
+     * sagte warum. Passiert echt, wenn eine Optionsliste sich zwischen
+     * zwei Fassungen aendert. Kein Verhalten geaendert, nur sichtbar
+     * gemacht. */
+    if (el.tagName === 'SELECT' && String(el.value) !== String(v)) {
+      try {
+        console.warn('[mbow] ' + id + ': gespeicherter Wert "' + v +
+          '" ist keine gueltige Option -> Feld bleibt leer. Optionen: ' +
+          [].slice.call(el.options).map(function (o) { return o.value; }).join('|'));
+      } catch (e) {}
+    }
     try { el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
   }
   function num(v) { if (v == null || v === '') return 0; return parseFloat(String(v).replace(/\./g, '').replace(',', '.')) || 0; }
