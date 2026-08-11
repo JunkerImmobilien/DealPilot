@@ -191,8 +191,26 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
     ['Sonstiges', v.finanz_sonst, bem.finanz_sonst]
   ]);
 
-  // Section 2: Betriebskosten
+  /* ── v1131-wkumlage · Die Aufstellung ging nicht auf ──────────────────
+     GEMESSEN am Beispiel-PDF (Am Markt 9, 2024): die sechs Zwischensummen
+     ergeben 1.928 + 700 + 405 + 0 + 978 + 0 = 4.011 EUR. Ausgewiesen waren
+     aber 5.511 EUR — 1.500 EUR mehr, die in KEINER Zeile standen.
+
+     Ursache: `_computeYearTotal` (tax.js:1056) rechnet `nk_umlf`, die
+     UMLAGEFAEHIGEN Nebenkosten, in die Summe ein — dieser Abschnitt zeigte
+     aber nur `nk_n_umlf` und `betr_sonst`.
+
+     DIE RECHNUNG IST RICHTIG, DIE DARSTELLUNG WAR ES NICHT. Umlagefaehige
+     Nebenkosten gehoeren auf BEIDE Seiten: als Einnahme beim Zufluss
+     (Anlage V, Zeile 14) und als Werbungskosten beim Abfluss (Zeile 33 ff.).
+     Eine Saldierung ist ausdruecklich NICHT zulaessig (§ 11 EStG,
+     Zufluss-/Abflussprinzip). Nachgelesen, nicht angenommen.
+
+     Fuer den Leser war das Papier damit unpruefbar: die Summe liess sich
+     aus den gezeigten Zeilen nicht nachrechnen. Ein Finanzamt, das genau
+     das tut, findet eine Luecke von 1.500 EUR. Die Zeile steht jetzt da. */
   cy = _renderWkSection(doc, cy, M, CW, '2. Betriebskosten', [
+    ['Umlagefähige Nebenkosten (durchlaufend)', v.nk_umlf, bem.nk_umlf],
     ['Nicht-umlagefähige Nebenkosten', v.nk_n_umlf, bem.nk_n_umlf],
     ['Sonstige Betriebskosten', v.betr_sonst, bem.betr_sonst]
   ]);
@@ -251,7 +269,14 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW) {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(220, 220, 220);
-  doc.text('Einnahmen V+V: ' + Math.round(totals.einnahmen).toLocaleString('de-DE') + ' €', M + 6, cy + 20);
+  /* v1131-wkumlage: die Einnahmenseite aufgeschluesselt. Der durchlaufende
+     Posten steht damit auf BEIDEN Seiten sichtbar — sonst sieht es aus, als
+     wuerden 1.500 EUR Kosten ohne Gegenwert abgezogen. */
+  var _km = Math.round(v.einnahmen_km || 0);
+  var _nk = Math.round(v.einnahmen_nk || 0);
+  doc.text('Einnahmen V+V: ' + Math.round(totals.einnahmen).toLocaleString('de-DE') + ' €' +
+    (_nk > 0 ? '  (Kaltmiete ' + _km.toLocaleString('de-DE') + ' € + Umlagen ' +
+               _nk.toLocaleString('de-DE') + ' €)' : ''), M + 6, cy + 20);
   var ergebnisColor = totals.ergebnis >= 0 ? 'Überschuss' : 'Verlust';
   doc.text(ergebnisColor + ': ' + (totals.ergebnis >= 0 ? '+' : '') +
     Math.round(totals.ergebnis).toLocaleString('de-DE') + ' €', M + 6, cy + 24);
