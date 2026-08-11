@@ -2356,17 +2356,39 @@ html body:not(.dp-chrome-hell) #hdr-badges .sc-pill-v {
    Vorlage sind diese Flaechen hell und --uv-chrome bestimmt sie — "die
    Vorlage bestimmt die Flaeche" (v1096). Ein dunkler Partner-Hintergrund
    unter einer hellen Vorlage waere ein Bruch, kein Branding. */
-html:not([data-ui-theme]) body aside.sidebar,
-html:not([data-ui-theme]) body #sidebar.sidebar {
+/* v1136g-hellskin · `body:not(.dp-chrome-hell)` ergaenzt. GEMESSEN im
+   Browser, nicht vermutet: ohne Vorlage schlug die Regel hier den
+   Hell-Skin. Der Vergleich Selektor gegen Selektor —
+
+     body.dp-chrome-hell aside.sidebar          (0,2,2)  hell #EAE4D6
+     html:not([data-ui-theme]) body aside.sidebar (0,2,3) Obsidian #000
+
+   — eine TYPKOMPONENTE mehr auf der dunklen Seite, und `:not()` erbt die
+   Spezifitaet seines Inhalts nicht (ein Attributselektor waere (0,1,0)
+   gewesen). Ergebnis: wer "Hell" schaltete und KEINE Vorlage aktiv
+   hatte, bekam eine schwarze Sidebar — der Schalter wirkte nicht, und
+   das ist der eigentliche Grund fuer Marcels Beobachtung am
+   Aktionen-Aufklapper (Backlog Punkt 1).
+
+   Und "keine Vorlage" ist der Normalfall: die Standardvariante
+   "dealpilot" traegt bewusst KEIN data-ui-theme (siehe Kopf dieser
+   Datei). Der Hell-Skin war fuer Sidebar, Reiterband und Kopfzeile also
+   praktisch wirkungslos, solange niemand eine helle Vorlage gewaehlt
+   hatte.
+
+   Der Zusatz aendert NUR den Fall "Hell-Skin aktiv". Ohne ihn bleibt
+   alles bitgenau wie bisher — die Fallbacks sind unangetastet. */
+html:not([data-ui-theme]) body:not(.dp-chrome-hell) aside.sidebar,
+html:not([data-ui-theme]) body:not(.dp-chrome-hell) #sidebar.sidebar {
   background: var(--obsidian, #000000) !important;
 }
 /* (0,3,3) gegen den Nachbarschafts-Selektor header.hdr.has-v64-score +
    nav.tabs (0,3,2) — eine Stelle mehr, sonst gewinnt das Literal. */
-html:not([data-ui-theme]) body nav.tabs,
-html:not([data-ui-theme]) body header.hdr.has-v64-score + nav.tabs,
-html:not([data-ui-theme]) body header.hdr.has-v64-score + nav.tabs.tabs {
+html:not([data-ui-theme]) body:not(.dp-chrome-hell) nav.tabs,
+html:not([data-ui-theme]) body:not(.dp-chrome-hell) header.hdr.has-v64-score + nav.tabs,
+html:not([data-ui-theme]) body:not(.dp-chrome-hell) header.hdr.has-v64-score + nav.tabs.tabs {
   background: var(--wl-obs-hi, #0a0805) !important;
 }
-html:not([data-ui-theme]) body .main-col > header.hdr {
+html:not([data-ui-theme]) body:not(.dp-chrome-hell) .main-col > header.hdr {
   background: linear-gradient(var(--wl-obs-hi, #0a0805) 0%, var(--wl-obs-lo, #000000) 100%) !important;
 }
