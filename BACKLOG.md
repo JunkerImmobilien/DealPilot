@@ -161,13 +161,47 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
       „was bringt mir das steuerlich im Monat?" — unseres hört davor auf.
       `tax.js` **rechnet** die Steuerwirkung bereits (`baseIncome`, zvE je
       Jahr über `DealPilotTaxPeriods`); sie kommt nur nicht aufs Papier.
-   3. **Zeilen mit Null verschwinden.** Ausgegeben wird nur, wozu es auch
-      eine Angabe gibt. **Aufpassen bei der Umsetzung:** `_euro(null)`
-      liefert `"–"` und ist damit **truthy** — wer auf den formatierten
-      Wert prüft statt auf den Rohwert, blendet nichts aus. Und eine echte
-      Null ist nicht dasselbe wie eine fehlende Angabe: **ein Wert, der
-      berechnet 0 ergibt, darf nicht mit einem leeren Feld verwechselt
-      werden.** Im Zweifel die Zeile behalten und Marcel fragen.
+
+      **Die Steuerwirkung ist gebaut: `v1133` (`de976c2`).** Neuer Block
+      „STEUERWIRKUNG" nach dem Muster der Vorlage — zvE vor/nach,
+      Einkommensteuer vor/nach, Grenzsteuersatz, und als hervorgehobene
+      Zahl **Ersparnis pro Jahr und pro Monat**.
+
+      **Gerechnet wird nichts neu.** `calcImmoTaxImpact` (`tax.js:124`)
+      liefert `taxBefore`, `taxAfter`, beide Steuersätze und `refund`
+      längst — `_computeYearTotal` reichte davon nur zwei Werte weiter.
+      Jetzt kommen `zve` und die ganze Auskunft mit. **Eine eigene
+      Steuerformel im PDF wäre eine zweite Wahrheit.**
+
+      **Fehlt das zvE, fällt der Block ganz weg** — lieber keine Aussage
+      als eine Steuerersparnis auf einem geratenen Einkommen.
+
+      **Nachgemessen am Testobjekt:** `nk_umlf` = **1.500 €**, also genau
+      die zuvor unsichtbare Lücke. Einnahmen 3.700 + 1.500 = 5.200 ✓.
+      Die Aufstellung **geht jetzt auf**: Zeilensumme 5.511 = ausgewiesene
+      5.511. Steuerfelder: zvE 68.000 €, ESt 17.957 → 17.826,
+      Ersparnis 131 €/Jahr, 11 €/Monat.
+
+      **Noch offen aus diesem Abgleich:** die **AfA-Herleitung** (Anschaffungs­
+      kosten → BMF-Aufteilung → Satz → Betrag). Sie steht in der Vorlage
+      prominent und fehlt bei uns weiter — dafür müssen erst die
+      Einzelposten (Grunderwerb, Notar, Fahrtkosten zur Anschaffung)
+      erhoben werden, die `tax.js` heute nicht getrennt führt.
+   3. **Zeilen mit Null verschwinden.** **ERLEDIGT `v1132` (`6352e2a`).**
+      **Marcels Entscheidung 2026-08-11 auf Rückfrage: „alles was leer oder
+      eine 0 hat wird nicht angezeigt."** Damit ist der Zweifel im Punkt
+      aufgelöst — eine berechnete Null wird **nicht** anders behandelt als
+      ein leeres Feld.
+
+      Geprüft wird der **Rohwert**, nicht der formatierte (die Falle aus
+      diesem Punkt: `_euro(null)` liefert `"–"` und ist truthy). Und
+      `Number(null)` ist 0 und besteht `Number.isFinite`, deshalb zuerst
+      auf Abwesenheit prüfen, dann rechnen.
+
+      **Bleibt von einem Abschnitt keine Zeile übrig, fällt der ganze
+      Abschnitt weg** — Überschrift und Zwischensumme mit. Eine Überschrift
+      über einer leeren Fläche mit „Zwischensumme 0 €" ist genau das
+      Rauschen, das weg sollte.
 
    **Randbedingungen aus dem PDF-Bau:** jsPDF kennt nur Helvetica, **kein
    U+2212** (Pfeile als `->`), `charSpace` wirkt über den Aufruf hinaus und
