@@ -55,9 +55,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    - **DSCR kommt ausschließlich aus `window.Dscr.compute()`.** Weicht ein
      Anzeigeort ab, ist dort eine zweite Formel entstanden — genau das
      darf es nicht geben.
-   - **Einheiten:** `kaufpreis` und `cf_ns` stehen in **Cent**, `kp` und
-     `nkm` in rohen **Euro**. Ein Faktor 100 an einer Anzeigestelle hat
-     fast immer hier seine Ursache.
+   - ~~**Einheiten:** `kaufpreis` und `cf_ns` stehen in **Cent**~~ —
+     **am 2026-08-11 nachgemessen und widerlegt:** beide Spalten sind
+     `numeric` und führen **Euro** (`250000.00`, `-2075.13`). Ein Faktor
+     100 hat hier also **nicht** seine Ursache; die alte Warnung hätte
+     die nächste Fehlersuche in die falsche Richtung geschickt.
    - **BWK-Zuordnung:** umlagefähig = `hg_ul + grundsteuer + ul_sonst`,
      nicht umlagefähig = `hg_nul + eigen_r + mietausfall + nul_sonst`. Der
      Bankexport teilt durch 12.
@@ -67,6 +69,68 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Sinnvoll mit dem Finanzamt-PDF zusammen zu fahren** — dasselbe Objekt,
    dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
    Steuerteil.
+
+   ---
+
+   ### Erster Durchgang gefahren (2026-08-11) — Rechenkern und Reiter „Bewertung"
+
+   **Testobjekt auf Staging: `PRUEF_1`, Prüfstraße 1, 32120 Hiddenhausen**
+   (`a08fbce3`). Bewusst runde Zahlen, damit jede Zeile im Kopf
+   nachrechenbar ist: KP 250.000, Wfl 80 m², NKM 850 + 50 €/Monat, EK
+   60.000, Darlehen 220.175 zu 3,5 % / 2 %, BWK ul 2.100 und nul 1.976,
+   zvE 70.000 bei 42 %, AfA 2 % auf 80 % Gebäudeanteil.
+
+   **Was stimmt — Zeile für Zeile gegen Handrechnung geprüft:**
+
+   | Anzeige | App | Handrechnung |
+   |---|---|---|
+   | Nebenkosten | 30.175 € (12,1 %) | 8.925+3.750+1.250+16.250 |
+   | Bodenwert / Anteil | 15.000 € / 100 m² | 1000 m² × 10 % × 150 € |
+   | Kaltmiete → NOI | 10.800 → 8.824 € | −1.976 nicht umlagefähig |
+   | Zins / Tilgung Jahr 1 | 7.706 / 4.404 € | 220.175 × 3,5 % / 2 % |
+   | CF vor Steuer | −3.286 € | −3.285,63 |
+   | Steuerwirkung | +1.210 € | Verlust 2.882,13 × 42 % = 1.210,49 |
+   | CF nach Steuer | −2.075 € / −173 €/Mon. | −2.075,13 |
+   | BMR / NMR / LTV / Faktor | 4,32 / 3,15 / 88,1 % / 23,1 | alle exakt |
+   | Wertzuwachs 15 J. | +62.558 € | 250.000 × 1,015¹⁵ − 250.000 |
+
+   **DSCR: sauber, keine zweite Formel.** Der Kern liefert *brutto* und
+   *netto*; **0,89** steht an sechs Anzeigeorten (`kpi-dscr`,
+   `cr-dscr-val`, `r-dscr2`, Sidebar-Kachel, Badge, KPI-Bewertung),
+   **0,73** an zwei — und die sind ausdrücklich „netto" beschriftet.
+   Beide Werte decken sich exakt mit der Handrechnung. **Keine
+   Jahreszahl** lief durch `Intl.NumberFormat` (kein „1.995").
+
+   **Vier Befunde — als eigene Punkte zu fassen, hier nicht repariert:**
+
+   1. **Ein negativer Cashflow zeigt kein Minuszeichen.** `cf-vst-now`
+      steht als **„274 €"** da, wo −273,80 gemeint ist; positive Werte
+      tragen ein „+". Nur die **Farbe** (rot `rgb(217,104,95)` gegen grün
+      `rgb(63,165,108)`) unterscheidet — für Rot-Grün-Blinde sind die
+      beiden Fälle **nicht unterscheidbar**. Ursache steht fest:
+      `calc.js:3655` ruft `fE(v, 0)` ohne das Vorzeichen-Flag, und `fE`
+      formatiert intern `Math.abs(n)`. Der Aufruf müsste `fE(v, 0, true)`
+      lauten — dann liefert die Funktion „–274 €" und das manuelle „+"
+      entfällt. Betrifft alle sechs Phasen-Kacheln.
+   2. **Zwei Zahlen für dieselbe Größe.** Die kumulierten Mieteinnahmen
+      über 15 Jahre mit 3 % Steigerung stehen im selben Reiter zweimal:
+      `vz-info-miete` = **200.868 €**, `vz-plausi-mit` = **198.709 €**.
+      Differenz 2.159 €. 200.868 ist die geometrische Reihe
+      (10.800 × (1,03¹⁵−1)/0,03); woher 198.709 kommt, ist offen.
+   3. **Eine Nutzereingabe wird still überschrieben.** In „Umlagefähige
+      Kosten / Monat" 200 eingetragen — nach dem Rechnen steht dort
+      **175,00**, also 2.100/12 aus den umlagefähigen BWK. Die Warmmiete
+      zeigt entsprechend 12.900 € statt 13.200 €. Ob die Kopplung
+      gewollt ist, ist zu klären; **still überschreiben ist es nicht.**
+   4. **Die Cent-Warnung oben in diesem Punkt stimmt nicht mehr.**
+      Gemessen an der Staging-Datenbank und am API-Objekt: `kaufpreis` =
+      `250000.00` und `cf_ns` = `-2075.13`, beide `numeric` in **Euro**.
+      Die Warnung „`kaufpreis` und `cf_ns` stehen in Cent" führt bei der
+      nächsten Fehlersuche in die Irre und ist deshalb oben gestrichen.
+
+   **Noch nicht gefahren** und damit offen: **Bankexport** (die
+   BWK-Teilung durch 12), **PDF-Ausgabe**, die Kette in den
+   **Marktbericht** und die **Handy-Ansicht** desselben Objekts.
 
 2. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
