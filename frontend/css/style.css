@@ -18495,6 +18495,29 @@ html body .body {
   .bc-card .bc-head-left { flex: 1 1 100% !important; }
 }
 
+/* v1138e: Zwei weitere Stellen, an denen ein `flex:0 0 auto`-Nachbar auf dem
+   Handy alles andere zusammendrueckt. Beide bei 390 px am Testobjekt PRUEF_1
+   gemessen.
+
+   1. Reiter MIETE: die Ueberschrift MIETENTWICKLUNG und der Umschalter
+      Prognose/Detail teilen sich eine Zeile von 335 px. Der Umschalter braucht
+      161 px und wurde von `.me-mode-toggle` (overflow:hidden) links
+      angeschnitten — auf dem Bild stand "ognose" statt "Prognose".
+
+   2. Reiter DEAL-AKTION, Zeile "Finanzamt-PDF": die Knopfgruppe traegt dort
+      ZWEI Schaltflaechen ("Alle Jahre" und "PDF"), zusammen 188 px. Mit dem
+      44-px-Symbol blieben dem Text 25 px — die Beschreibung stand Wort fuer
+      Wort untereinander. Die drei anderen Zeilen derselben Liste haben nur
+      einen Knopf und waren deshalb unauffaellig: der Fehler zeigt sich nur an
+      der einen Zeile, die am meisten Platz braucht. */
+@media (max-width: 700px) {
+  .me-header { flex-wrap: wrap !important; }
+  .me-header .me-mode-toggle { flex: 0 0 auto !important; overflow: visible !important; }
+  .dab-doc-row { flex-wrap: wrap !important; }
+  .dab-doc-x { flex: 1 1 140px !important; min-width: 140px !important; }
+  .dab-doc-act { flex: 1 1 100% !important; justify-content: flex-end !important; }
+}
+
 /* PDF-print: Schatten und Effekte raus, optimiert für DIN-A4 */
 @media print {
   .bc-card { box-shadow: none; break-inside: avoid; }
