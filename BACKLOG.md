@@ -37,34 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Accordion „Analyse → Marktbericht": das „2 L" weg, und die Farbe
-   soll der Optik folgen.** Bild im Mockup-Ordner (2026-08-11) — den
-   Dateinamen beim Aufgreifen hier eintragen.
-
-   Zwei Dinge an einer Stelle:
-
-   - **Das „2 L" entfernen.** Es steht als Kerosin-Hinweis am Kopf des
-     Aufklappers. **Der Preis geht dadurch nicht verloren:** er gehört an
-     den Erzeugen-Knopf, wo auch entschieden wird, welche Stufe erzeugt
-     wird (siehe die offene Geldfrage im Marktbericht-Punkt). Ein fester
-     Wert am Accordion wäre dort ohnehin falsch, sobald der Wizard drei
-     Stufen in einem Weg führt — 2 L gilt nur für die einfache
-     Einschätzung.
-   - **Der Aufklapper wechselt die Farbe nicht, wenn unter „Darstellung"
-     auf Hell umgestellt wird.** Marcel: „das sollte vielleicht auch
-     möglich sein."
-
-   **Vor dem Patch messen, welcher Selektor gewinnt** — `getComputedStyle`
-   auf Kopf und Fläche, in **beiden** Fassungen. Zwei Verdachtsspuren, beide
-   erst zu belegen: entweder hängt die Regel an `body.dp-chrome-hell` und
-   greift im neuen Weg nicht (dasselbe Muster wie bei den Logo-Reglern in
-   `v1101`), oder die Farbe steht als Literal statt als `var(--…)`. **Der
-   Marktbericht-Bereich ist hier besonders zu prüfen:** die eingebettete
-   App ist **immer hell** und lädt `whitelabel-override.js` **nicht** — die
-   Umschaltung darf nur den Rahmen in der Haupt-App betreffen, nicht ins
-   iframe durchschlagen.
-
-2. **Partner-Logo auf der Landingpage ergänzen: caretechthiel.**
+1. **Partner-Logo auf der Landingpage ergänzen: caretechthiel.**
    Unter „Partner" fehlt das Logo von `caretechthiel.de`. Es liegt im
    Mockup-Ordner. **Gleiche Größe wie die vorhandenen** — also nicht nach
    Augenmaß einsetzen, sondern die gerenderte Breite und Höhe der
@@ -77,7 +50,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    `rfind` arbeiten. Bild in denselben Ordner wie die übrigen Partnerlogos,
    Pfad relativ zur Landing-Seite prüfen.
 
-3. **Ein Testobjekt vollständig anlegen und alle Rechenwege
+2. **Ein Testobjekt vollständig anlegen und alle Rechenwege
    gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
    Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
    richtig, wird unter „Bewertung" alles passend angezeigt, sind die
@@ -108,7 +81,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
    Steuerteil.
 
-4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+3. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -206,7 +179,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+4. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -241,7 +214,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+5. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -275,7 +248,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-7. **Marktbericht neu gestalten.**
+6. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -419,7 +392,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-8. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
+7. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
    Beim Ausrollen von `v1136` gemessen: `git status` auf
    `root@116.203.214.11` meldet
    `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
@@ -474,6 +447,66 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-11] **Aktionen-Aufklapper: „2 L" weg, Farbe folgt der Darstellung** — `v1136e` (`972cb9a`), `v1136f` (`eb63658`), `v1136g` (`86b7513`), `v1136h` (`4dac3cd`, `c8dd81f`). Bilder: `design/mockups/Screenshot 2026-08-11 145054.png` (das aufgeklappte Panel, schwarz in heller Sidebar) und `markt1.png`.
+
+   **Das „2 L" ist raus** (`index.html:696`). Der Bericht kennt drei
+   Stufen — 2 L Einschätzung, 5 L Marktpreisindikation, 12 L
+   Wertermittlung —, und welche erzeugt wird, ergibt sich erst aus den
+   Angaben. Ein fester Preis am Menüeintrag behauptet etwas, das an
+   dieser Stelle niemand wählt. Die CSS-Regeln zu `.sb-act-kero` bleiben
+   stehen: die Klasse ist allgemein.
+
+   **Die Farbe: die Ursache lag zwei Ebenen tiefer als der Aufklapper.**
+   Der Aufklapper war nur das Sichtbare. Gemessen, Selektor gegen
+   Selektor:
+
+   | Selektor | Spezifität | setzt |
+   |---|---|---|
+   | `body.dp-chrome-hell aside.sidebar` | (0,2,2) | hell `#EAE4D6` |
+   | `html:not([data-ui-theme]) body aside.sidebar` | **(0,2,3)** | Obsidian `#000` |
+
+   Eine **Typkomponente** mehr auf der dunklen Seite — und `:not()` erbt
+   die Spezifität seines Inhalts nicht. **Wer „Hell" schaltete und keine
+   Vorlage aktiv hatte, bekam eine schwarze Sidebar.** „Keine Vorlage"
+   ist dabei der Normalfall: die Standardvariante `dealpilot` trägt
+   bewusst kein `data-ui-theme`. Der Schalter war für die Sidebar also
+   praktisch wirkungslos. Behoben in `v1136g` mit
+   `body:not(.dp-chrome-hell)` — nur an der Sidebar.
+
+   **Das Panel selbst** (`v1136e`) ist als geschlossene dunkle Einheit
+   gebaut: schwarzer Verlauf plus goldene Schrift, in sich stimmig. Beide
+   Teile mussten zusammen umgestellt werden — nur den Grund aufhellen
+   ergäbe Gold auf Weiß (Kontrast 1,62), nur die Schrift abdunkeln
+   Schwarz auf Schwarz. Kontraste nach dem Patch: Eintrag **18,6**,
+   Sektionstitel **4,65**, Symbol **3,85**.
+
+   **Der Grund steckte im `background-image`, nicht in
+   `background-color`** — ein Kaskaden-Walker, der nur `background-color`
+   liest, findet ihn nicht. Genau daran bin ich zuerst vorbeigelaufen.
+
+   **Drei eigene Fehler, alle gemessen und zurückgenommen:**
+   1. `v1136e` hängte die Regeln zusätzlich an `html[data-bg="white"]`.
+      Falscher Schalter: `data-bg` steuert die **Arbeitsfläche**, der
+      Chrome-Skin den **Rahmen**. In `v1136f` entfernt. (Die alte
+      V260-03-Regel macht denselben Fehler; es fiel nie auf, weil der
+      schwarze Verlauf sie ohnehin übermalte.)
+   2. Ich hatte den `:not()`-Zusatz auch an Reiterband und Kopfzeile
+      gesetzt. Gemessen: dort ändert er nur den Dunkelton (rgb(10,8,5) →
+      rgb(10,10,10)), hellt aber nichts auf. In `v1136h` zurückgenommen.
+   3. **Drei widersprüchliche Messreihen**, weil ich im laufenden Tab
+      zwischen den Fassungen umgeschaltet habe. `style.disabled` setzt
+      den berechneten Stil nicht sauber zurück, und `_dpDispSkin()`
+      hinterlässt Inline-Variablen am `<body>`. **Nur nach Neuladen
+      messen, genau eine Fassung pro Ladevorgang.**
+
+   **Nebenwirkung an Marcels Einstellung, offen gelegt:**
+   `_dpDispSkin('obsidian')` ruft `vorlageNachziehen()` in
+   `ui-varianten.js` und setzt `ui_theme` auf `''` — meine Messaufrufe
+   haben die aktive Vorlage gelöscht. Genau die Falle, vor der die
+   eigene Notiz warnt („Vorlagen im Panel klicken, nicht per API"). Der
+   Zustand ist jetzt „keine Vorlage + Hell", und der sieht seit `v1136g`
+   richtig aus — eine gewünschte Vorlage muss aber neu gewählt werden.
 
 - [2026-08-11] **Objekt-Tab: eigener Reiter für die Marktbericht-Felder** — `v1121` (`4049eb1`), `v1134` (`0822398`), `v1135` (`b703134`), `v1135b` (`70f0d63`), `v1136` (`d11e1df`), `v1136b` (`111ca92`), `v1136c` (`6131f56`).
 
