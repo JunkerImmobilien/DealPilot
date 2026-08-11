@@ -475,7 +475,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
 
-- [2026-08-11] **Objekt-Tab: eigener Reiter für die Marktbericht-Felder** — `v1121` (`4049eb1`), `v1134` (`0822398`), `v1135` (`b703134`), `v1135b` (`70f0d63`), `v1136` (`d11e1df`), `v1136b` (`111ca92`), `v1136c`.
+- [2026-08-11] **Objekt-Tab: eigener Reiter für die Marktbericht-Felder** — `v1121` (`4049eb1`), `v1134` (`0822398`), `v1135` (`b703134`), `v1135b` (`70f0d63`), `v1136` (`d11e1df`), `v1136b` (`111ca92`), `v1136c` (`6131f56`).
 
    Der Punkt lief über vier Ausbaustufen, weil die Kette an **vier**
    Stellen gerissen war. Alle vier sind gemessen, nicht vermutet:
