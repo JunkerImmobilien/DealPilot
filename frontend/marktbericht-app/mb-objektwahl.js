@@ -164,16 +164,25 @@
 
   /* Setzt alles, was JETZT schon im DOM steht. Zurueck kommt, was noch fehlt. */
   function fuelleWertermittlung(d) {
+    /* v1136b-WMTAB-1 · Der Miteigentumsanteil steht an zwei Schluesseln: das
+     * Hauptprogramm fuehrt ihn seit jeher als `mea`, der Marktbericht
+     * schreibt ihn als `mea_pct` zurueck. Wer ihn im Objekt-Reiter gepflegt
+     * hat und nie einen Bericht erzeugte, hatte hier ein leeres Feld — und
+     * ohne Miteigentumsanteil erreicht eine Wohnung Stufe 3 gar nicht
+     * erst, der ganze Wertermittlungsblock erscheint dann nicht.
+     *
+     * Der Rueckfall steht am DATENSATZ, nicht in der Schleife unten. In
+     * v1136 stand er dort — gemessen im Browser blieb das Feld trotzdem
+     * leer: derselbe `d` geht an beobachteFormular(), und der Beobachter
+     * liest d[p[0]] erneut. Ein Rueckfall nur in der Schleife verfehlt also
+     * genau die Felder, die noch nicht im DOM stehen, und das sind vor dem
+     * Sprung auf Stufe 3 alle. Der Originalname behaelt Vorrang. */
+    if ((d.mea_pct == null || d.mea_pct === '') && d.mea != null && d.mea !== '') {
+      d.mea_pct = d.mea;
+    }
     var offen = [];
     WM_MAP.forEach(function (p) {
       var v = d[p[0]];
-      /* v1136-WMTAB-1 · Der Miteigentumsanteil steht an zwei Schluesseln:
-       * das Hauptprogramm fuehrt ihn seit jeher als `mea`, der Marktbericht
-       * schreibt ihn als `mea_pct` zurueck. Wer ihn im Objekt-Reiter
-       * gepflegt hat und nie einen Bericht erzeugte, hatte hier bisher ein
-       * leeres Feld. Gleiche Einheit (Prozent), der Originalname behaelt
-       * Vorrang — dieselbe Rueckfall-Form wie baeder/ausstattung in v1135b. */
-      if (p[0] === 'mea_pct' && (v == null || v === '')) v = d.mea;
       if (v == null || v === '') return;
       if ($(p[1])) setVal(p[1], v); else offen.push(p);
     });
