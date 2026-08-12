@@ -221,3 +221,51 @@ muss mitfärben. Und **beide Bedienwege** prüfen —
   und ließ einen Spalt von 49 px melden, den es nicht gab. Vor jeder Messung
   `document.body.className` und die einschlägigen Merker mitlesen — und im
   Befund nennen.
+
+---
+
+## 9 · „Das fehlt" ist die teuerste Vermutung — zweimal an einem Tag
+
+Am 12.08. zweimal derselbe Fehler: eine Lücke behauptet, die es nicht gab.
+
+- **Tablet-Punkt.** Der Backlog verlangte drei Dinge zu bauen (Sidebar
+  andocken, zweispaltige Formulare, Popover statt Blatt). **Alle drei waren
+  gebaut** — das Andocken seit `v648`, das Blatt seit `V46` per
+  `display:none!important` stillgelegt. Der zugrunde liegende Entwurf hatte
+  nur bei **820 px** gemessen, unterhalb der 901er-Schwelle.
+- **Sachwertfaktor.** Ich meldete, ein manuell eingegebener Faktor trage
+  **keine Herkunft**, weil in `CrossCheckService.js` alle sieben
+  `sachwertfaktor_*`-Felder am Tabellenweg hängen. Das stimmte — und war
+  trotzdem der falsche Schluss. Die Herkunft läuft über einen **anderen**
+  Weg: `WertParameterService.sachwertfaktor()` gibt beim eigenen Wert
+  `{wert, stufe:'E', quelle:'eigene Angabe'}`, `nhk2010.js:897` setzt daraus
+  `out.sachwertfaktor = {wert, stufe, quelle}`, und die Karte druckt
+  „· Faktor 1,15 · Stufe E". **Genau das hatte `v1144` hergestellt.**
+
+**Das Muster ist dasselbe:** ein Feld ist an der erwarteten Stelle leer, und
+daraus wird „die Funktion fehlt" — statt „ich habe den Weg noch nicht
+gefunden".
+
+**Woran es zu erkennen ist:** die Behauptung lautet „X wird nicht gesetzt",
+belegt durch **eine** Stelle. Ein Negativbefund über eine ganze Funktion
+lässt sich an einer Stelle aber nicht belegen.
+
+**Was hilft, in dieser Reihenfolge:**
+1. **Vom Verbraucher her suchen, nicht vom Erzeuger.** Wer stellt den Wert
+   dar? Die Anzeige (`app.js:592 ff.`) las die Stufe längst und beherrschte
+   sogar zwei Formen (Zahl **und** Objekt). Das allein hätte die Fehldiagnose
+   verhindert.
+2. **Nach dem Vokabular greppen, nicht nach dem Feldnamen.** `STUFEN_ETIKETT`
+   mit A–E steht in `WertParameterService.js` und beschreibt E als „eigene
+   Angabe, vom Nutzer gesetzt". Ein `grep -rn "'E'"` wäre schneller gewesen
+   als jede Weichenanalyse.
+3. **Die Commit-Historie nach dem Thema fragen.** `git log --oneline -S`
+   findet, wer den Weg gebaut hat. `v1144` trug es im Titel: „Der
+   Sachwertfaktor wurde nie angewandt — falscher Feldname an zwei Stellen."
+4. **Erst dann urteilen.** Und wenn geurteilt wurde: die Rücknahme
+   ausdrücklich, nicht stillschweigend.
+
+**Und die Konsequenz aus der Wiederholung:** `CLAUDE.md` sagt, zwei gleiche
+Fehler hintereinander heißen, die Sitzung ist zu lang — abschließen,
+übergeben, Schluss. **Das gilt auch dann, wenn der nächste Schritt klein und
+verlockend aussieht.** Genau dann irrt man weiter.

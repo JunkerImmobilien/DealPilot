@@ -36,9 +36,38 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → Hier weitermachen (Übergabe 2026-08-12)
+## → Hier weitermachen (Übergabe 2026-08-12, abends)
 
 **Stand:** lokal wie Staging, Zweig `staging`, Arbeitsverzeichnis sauber.
+Ausgeliefert an diesem Tag: `v1148` (1025-px-Sprung), `v1149` (§ 194-Hinweis
+nur auf Seite 1), dazu `PROJEKTANWEISUNG.md` als konsolidierter Gesamtstand
+mit fortlaufendem Rollout-Journal.
+
+**Diese Sitzung ist bewusst beendet worden, nicht ausgelaufen.** Zweimal
+hintereinander habe ich eine Lücke behauptet, die es nicht gab — beim
+Tablet-Punkt (A, C und D waren gebaut) und beim Sachwertfaktor (Stufe E läuft
+durch bis in die Anzeige). `CLAUDE.md` sagt für diesen Fall: abschließen,
+übergeben, Schluss. **Die Lehre steht als Punkt 9 in `FALLEN.md`** und ist
+die wichtigste Übergabe dieses Tages.
+
+**Der nächste Schritt ist deshalb klein und klar umrissen** — die zwei echten
+Restlücken aus Punkt 3, beide belegt:
+
+1. **Die Stufe des Sachwertfaktors ins PDF.** Auf dem Bildschirm steht
+   „· Faktor 1,15 · Stufe E", im PDF nicht. Reines Frontend (`app.js`).
+2. **Hinweistext beim manuellen Sachwertfaktor**, wie ihn der
+   Liegenschaftszins schon hat („bitte die Herkunft angeben —
+   Grundstücksmarktbericht, Jahr"). Eine Zeile in
+   `WertParameterService.js:473` → **mb-Backend, also Rebuild**, vorher
+   eigener `pg_dump` der mb-DB (sie steht in keinem Backup-Skript).
+
+**Vor dem Anfangen bitte `FALLEN.md` Punkt 9 lesen.** Er beschreibt genau den
+Fehler, den man in dieser Gegend macht: vom Erzeuger her suchen statt vom
+Verbraucher.
+
+**Was Geld kostet und deshalb angekündigt gehört:** der Nachweis, dass Stufe 2
+nach bezahlter Stufe 1 wirklich nur die Differenz (3 L) abbucht. Ein
+Klicktest am Testobjekt, echtes Kerosin. **Nicht nebenbei machen.**
 
 **Die Tablet-Fassung (Punkt 1) ist nachgemessen, und das Ergebnis ist:
 A, C und D waren längst gebaut.** Ab 901 px dockt die Sidebar an (`v648`,
@@ -262,26 +291,67 @@ die alle auf Marcels Durchgang zurückgehen.
      unerreichbar (v1126c).
    - **ERLEDIGT: die Preisindikation im PDF** — `v1149`, siehe Fertig.
 
-   ### Der Befund, der daraus am schwersten wiegt
+   ### Herkunft der manuellen Parameter — FEHLDIAGNOSE, ausdrücklich zurückgenommen
 
-   **Ein manuell eingegebener Sachwertfaktor trägt keine Herkunft.** Gemessen
-   in `CrossCheckService.js`: die Weiche `if (!(_swfEigen > 0) && …)`
-   überspringt bei eigenem Wert den Tabellenzweig, `_swfTab` bleibt `null` —
-   und **alle sieben** Herkunftsfelder von `out.sachwert` hängen daran
-   (`_grund`, `_hinweis`, `_stuetzstellen`, `_ausschuss`, `_tabellenwert`,
-   `_korrekturen`). Der Faktor wirkt, steht im PDF und in der Datenbank und
-   sagt nicht, woher er kommt. Beim Liegenschaftszins dasselbe eine Ebene
-   tiefer: das Formular sendet `lzs_pct` **ohne** `lzs_stufe`, also ist
-   `liegenschaftszins_stufe` bei manueller Eingabe `null` — obwohl das
-   Backend das Feld führt.
+   **Ich hatte gemeldet, ein manuell eingegebener Sachwertfaktor trage keine
+   Herkunft. Das ist falsch.** Die Rücknahme im Einzelnen, weil der Weg
+   wichtiger ist als der Irrtum:
 
-   **Das verstößt gegen zwei eigene Grundsätze** („jede Zahl trägt
-   Herkunft", „ein stiller Rückfall ist schlimmer als ein Fehler") und ist
-   der nächste Bauschritt: **Stufe E an der Zahl**, im Backend und im
-   Formular. Backend heißt **Rebuild** und vorher eigener `pg_dump` der
-   mb-DB. Der eigentliche **Abgleich** eigene ↔ amtliche Angabe ist ein
-   eigenes Vorhaben und hängt daran, dass `mb.valuation_inputs`
-   überhaupt beschrieben wird — heute passiert das nicht.
+   Belegt war nur **eine** Stelle: in `CrossCheckService.js` hängen die sieben
+   `sachwertfaktor_*`-Felder (`_grund`, `_hinweis`, `_stuetzstellen`,
+   `_ausschuss`, `_tabellenwert`, `_korrekturen`) am Tabellenzweig, und der
+   wird bei eigenem Wert übersprungen. **Das stimmt — trägt aber die
+   Schlussfolgerung nicht.** Die Herkunft läuft über einen anderen Weg:
+
+   ```
+   WertParameterService.sachwertfaktor({nutzerwert})
+     -> { wert, stufe: 'E', quelle: 'eigene Angabe' }
+   nhk2010.js:897
+     -> out.sachwertfaktor = { wert, stufe, quelle }
+   app.js:592 ff. (Karte "Sachwert")
+     -> "marktangepasst · Faktor 1,15 · Stufe E"
+   ```
+
+   Dasselbe beim Liegenschaftszins: `ReportOrchestrator.js:404` reicht
+   `nutzerwert: ref.lzs_pct` durch, der Service antwortet mit `stufe: 'E'`,
+   `quelle: 'eigene Angabe'` **und** dem Hinweis „Liegenschaftszinssatz
+   manuell gesetzt. Für das Dossier bitte die Herkunft angeben
+   (Grundstücksmarktbericht, Jahr)." Die Ausgabe führt ihn über
+   `kern.lzs.stufe`. Meine Aussage „das Formular sendet keine Stufe, also ist
+   sie null" war falsch — **die Stufe entsteht im Backend, nicht im
+   Formular.**
+
+   Dazu gibt es `STUFEN_ETIKETT` (A–E) in `WertParameterService.js`, wo
+   **E = „eigene Angabe · vom Nutzer gesetzt · indikativ"** definiert ist.
+   Hergestellt hat das `v1144` — der Commit-Titel sagt es wörtlich: „Der
+   Sachwertfaktor wurde nie angewandt — falscher Feldname an zwei Stellen."
+
+   **Marcels Vorgabe ist damit im Kern schon erfüllt.** Was übrig bleibt,
+   sind zwei kleine, echte Lücken:
+
+   1. **Im PDF fehlt die Stufe beim Sachwertfaktor.** Auf dem Bildschirm
+      steht „· Stufe E", im PDF nicht — gemessen: kein `doc.text` im
+      Export verbindet Faktor und Stufe. Die Zahl, die im Dossier landet,
+      trägt ihre Herkunft also **nicht** mit. Genau dort wird sie gebraucht.
+   2. **Der Hinweistext fehlt beim Sachwertfaktor.** Der LZS gibt bei
+      manueller Eingabe „bitte die Herkunft angeben (Grundstücksmarktbericht,
+      Jahr)", der Sachwertfaktor gibt `hinweis: ''`
+      (`WertParameterService.js:473`). Dieselbe Bitte gehört dorthin — das
+      ist der „Vermerk", den Marcel meint.
+
+   Beides ist klein. **Punkt 1 ist reines Frontend** (PDF-Export in `app.js`),
+   **Punkt 2 ist eine Zeile im mb-Backend** und damit ein Rebuild, vorher
+   eigener `pg_dump` der mb-DB.
+
+   Der eigentliche **Abgleich** eigene ↔ amtliche Angabe bleibt ein eigenes
+   Vorhaben und hängt daran, dass `mb.valuation_inputs` überhaupt beschrieben
+   wird — heute passiert das nicht.
+
+   > **Die Lehre steht als Punkt 9 in `FALLEN.md`:** „Das fehlt" ist die
+   > teuerste Vermutung. Vom **Verbraucher** her suchen (wer zeigt den Wert
+   > an?), nach dem **Vokabular** greppen (`STUFEN_ETIKETT`, `'E'`) und die
+   > **Commit-Historie** nach dem Thema fragen (`git log -S`) — jedes davon
+   > hätte den Irrtum in einer Minute beendet.
 
    ### Marcels Entscheidung vom 2026-08-11 — sie ersetzt die vom 2026-08-10
 
