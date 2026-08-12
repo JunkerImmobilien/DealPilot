@@ -231,6 +231,58 @@ die alle auf Marcels Durchgang zurückgehen.
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
+   ### ENTBLOCKIERT — Marcels Vorgaben vom 2026-08-12
+
+   Die beiden Geldfragen, auf denen der Punkt blockiert war, sind
+   beantwortet: **abgerechnet wird beim Erzeugen, Vertiefen kostet nur die
+   Differenz.** Dazu drei neue Vorgaben: Felder klar pro Stufe abgrenzen
+   samt Zusatzfeldern · manuelle Parameter erst vermerken, bis ein Abgleich
+   möglich ist · die Preisindikation steht im PDF drei- bis viermal.
+
+   **Alles vier ist gemessen und steht in
+   `design/Vorschläge/marktbericht-stufen-und-herkunft.md`.** Kurzfassung:
+
+   - **Die Abrechnung ist schon so gebaut** (v1125/v1126): der Preis kommt
+     vom Server (`GET /marktbericht/stufenpreis`), der Browser rechnet die
+     Ermäßigung **nicht** selbst, sie kommt aus dem Kerosin-Log. Vollpreise
+     2 / 5 / 12 L. **Nichts zu bauen — der Nachweis fehlt:** bucht Stufe 2
+     nach bezahlter Stufe 1 wirklich nur 3 L ab? Klicktest, **kostet echtes
+     Kerosin**, deshalb angekündigt und nicht nebenbei.
+   - **Pflichtfelder je Stufe stehen als eine Quelle** in `BEDARF`
+     (`mb-stufen.js`): Stufe 1 `address` `ptype` `area` `year` · Stufe 2
+     `baustatus` `cond` `quality` · Stufe 3 `plot` `units` und
+     objektartabhängig `mea` bzw. `standardstufe`+`nhkHaus`. **Keine zweite
+     Liste anlegen** — der frühere `FEHLT_TEXT` war genau das und lief
+     auseinander (v1126d).
+   - **22 Zusatzfelder hängen an der Objektart.** Sie sind im Entwurf nach
+     Gruppen aufgeschlüsselt. Drei Fallen: `ptype` gehört in die
+     Auslöserliste (v1119-WAUS), Felder mit `wenn:`-Bedingung erscheinen
+     **nur nach echter Nutzereingabe**, und `_angestrebt` in `mb-stufen.js`
+     ist eine **Untergrenze** — wer daran rührt, macht Stufe 3 wieder
+     unerreichbar (v1126c).
+   - **ERLEDIGT: die Preisindikation im PDF** — `v1149`, siehe Fertig.
+
+   ### Der Befund, der daraus am schwersten wiegt
+
+   **Ein manuell eingegebener Sachwertfaktor trägt keine Herkunft.** Gemessen
+   in `CrossCheckService.js`: die Weiche `if (!(_swfEigen > 0) && …)`
+   überspringt bei eigenem Wert den Tabellenzweig, `_swfTab` bleibt `null` —
+   und **alle sieben** Herkunftsfelder von `out.sachwert` hängen daran
+   (`_grund`, `_hinweis`, `_stuetzstellen`, `_ausschuss`, `_tabellenwert`,
+   `_korrekturen`). Der Faktor wirkt, steht im PDF und in der Datenbank und
+   sagt nicht, woher er kommt. Beim Liegenschaftszins dasselbe eine Ebene
+   tiefer: das Formular sendet `lzs_pct` **ohne** `lzs_stufe`, also ist
+   `liegenschaftszins_stufe` bei manueller Eingabe `null` — obwohl das
+   Backend das Feld führt.
+
+   **Das verstößt gegen zwei eigene Grundsätze** („jede Zahl trägt
+   Herkunft", „ein stiller Rückfall ist schlimmer als ein Fehler") und ist
+   der nächste Bauschritt: **Stufe E an der Zahl**, im Backend und im
+   Formular. Backend heißt **Rebuild** und vorher eigener `pg_dump` der
+   mb-DB. Der eigentliche **Abgleich** eigene ↔ amtliche Angabe ist ein
+   eigenes Vorhaben und hängt daran, dass `mb.valuation_inputs`
+   überhaupt beschrieben wird — heute passiert das nicht.
+
    ### Marcels Entscheidung vom 2026-08-11 — sie ersetzt die vom 2026-08-10
 
    „Nummer 1 und dein Vorschlag" — also **Idee 1 (Wizard mit Reitern)**,
@@ -874,6 +926,19 @@ die alle auf Marcels Durchgang zurückgehen.
 
 ## Später
 
+- **`exportPdf()` erzeugte bei einem wiedergegebenen Bericht keine Ausgabe.**
+  Beim Nachweis zu `v1149` gemessen: Report 73 über `/reports/one` geholt
+  (voller Datensatz: `ref` `meta` `rent` `sale` `macro` `micro` `zensus`
+  `address` `dealpilot` `valuation` `assessment` `deal_score` `land_value`
+  `cross_check` plus `report_md`), dann `exportPdf(out)` aufgerufen. **Kein
+  Fehler, aber null `doc.text`-Aufrufe** — die Funktion steigt still aus.
+  **Nicht getrennt ist, ob das am Produkt liegt oder am Messaufbau** (der
+  Patch überschrieb neben `text`/`addPage`/`save` auch `output()`, und wenn
+  `exportPdf` seinen Blob über `output()` holt, könnte das der Grund sein).
+  **Erst trennen, dann urteilen:** denselben Lauf ohne `output`-Patch
+  wiederholen. Ist es das Produkt, wäre es ein echter Befund — ein
+  wiedergegebener Bericht ohne PDF.
+
 - **Die eingeklappte Leiste hat kein Bedienelement.** Beim Regressionstest zu
   `v1148` gemessen (1100 px): die CSS-Regeln für den 66-px-Rail existieren
   (`css/style.css:32816` und `:33060`, `body.dp-sidebar-collapsed`) und
@@ -937,6 +1002,44 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Die Preisindikation stand im PDF auf jeder Seite** — `v1149`, `6777afe`.
+   **Marcels Befund** (12.08.): „beim Marktbericht steht nicht 3–4 mal die
+   Preisindikation. Das ist mir beim PDF aufgefallen, das ist etwas zu viel."
+
+   **Gemessen in `frontend/marktbericht-app/app.js`:** `footer()` läuft bei
+   **jedem** `newPage()` und druckte „DealPilot · Marktbericht —
+   Marktpreisindikation, kein Gutachten n. § 194 BauGB". Der Prod-Bericht hat
+   laut Kommentar in derselben Datei **sieben Seiten** — der Begriff kam allein
+   hier siebenmal. Dazu drei Textstellen im Fluss (Z. 900, 902, 3344), die
+   aber etwas anderes sagen: **wie belastbar** die Zahl ist. Das ist keine
+   Dopplung, nur ein gleiches Wort — sie bleiben.
+
+   **Gelöst:** der Satz ist rechtlich sinnvoll (§ 194 BauGB) und verschwindet
+   nicht, er steht nur noch **einmal** — auf Seite 1, wo ihn liest, wer den
+   Bericht in die Hand nimmt. Ab Seite 2 trägt die Fußzeile Marke und
+   Seitenzahl. Gebunden an `pageNo`, das dieselbe Funktion schon für die
+   sichtbare Seitenzahl nutzt. **`footer()` bleibt zustandsneutral** — der
+   v957-fontleak-Befund zeigt, dass eine Größenänderung dort auf die
+   Folgeseite durchschlägt und Wortlücken erzeugt.
+
+   **Buster-Kette alle vier Glieder gezogen:** `marktbericht-view.js` 1129 →
+   1149, iframe `marktbericht-app/index.html` 1135b → 1149, `app.js` 1143b →
+   1149. Laut Projektanweisung wurde diese Kette **viermal** vergessen.
+
+   **Nachweis:** auf dem Server `node --check` (Node 18) ok, Marker
+   `v1149-FUSS` vorhanden, Buster `app.js?v=1149` angekommen.
+
+   **Offen als Staging-Abnahmepunkt, ehrlich benannt:** der **Sichtnachweis am
+   PDF fehlt.** Versucht wurde, einen vorhandenen Bericht (`/reports/one`,
+   Report 73 des Testobjekts, kostenlos) durch `exportPdf(out)` zu schicken
+   und die gedruckten Texte über einen Patch auf `jsPDF.prototype.text` zu
+   zählen — bei abgefangenem `save()`, damit kein Download entsteht. Ergebnis:
+   **kein Fehler, aber null Textaufrufe.** Die Export-Funktion steigt bei
+   einem wiedergegebenen Bericht offenbar still aus. **Ob das am Produkt oder
+   am Messaufbau liegt (der Patch überschrieb auch `output()`), ist nicht
+   getrennt** — deshalb keine Behauptung, sondern ein eigener Punkt unter
+   „Später". Marcel sieht das Ergebnis beim nächsten echten PDF auf Seite 2.
 
 - [2026-08-12] **Der Inhalt wurde bei 1025 px schmaler als bei 1024 px** — `v1148`, `e4f3066`.
    **Befund:** Bei 1024 px greift der v648-Block (`css/style.css:35783`) mit
