@@ -590,9 +590,22 @@ function _renderWertverfahren(d) {
      * stand 1,15 im Feld und blieb wirkungslos. */
     + karte('sac', 'Sachwert', sw.available ? eur(sw.value_eur) : '\u2013',
         sw.available
+          /* v1143b \u00b7 EIGENER FEHLER. Ich hatte `sachwertfaktor` fuer eine Zahl
+           * gehalten \u2014 nhk2010.js:882 setzt aber ein OBJEKT
+           * `{ wert, stufe, quelle }`. Auf dem Bildschirm stand daraufhin
+           * "marktangepasst \u00b7 Faktor [object Object]". Aufgefallen im ersten
+           * Lauf, bei dem ueberhaupt ein Faktor griff (EFH Hiddenhausen,
+           * 0,925 Stufe A) \u2014 vorher gab es keinen Fall, der die Zeile
+           * erreicht haette. Beide Formen werden jetzt gelesen. */
           ? (sw.marktangepasst
-              ? ('marktangepasst' + (sw.sachwertfaktor != null
-                  ? ' \u00b7 Faktor ' + String(sw.sachwertfaktor).replace('.', ',') : ''))
+              ? ('marktangepasst' + (function () {
+                  var f = sw.sachwertfaktor;
+                  var z = (f && typeof f === 'object') ? f.wert : f;
+                  var s = (f && typeof f === 'object') ? f.stufe : null;
+                  if (z == null) return '';
+                  return ' \u00b7 Faktor ' + String(z).replace('.', ',')
+                       + (s ? ' \u00b7 Stufe ' + s : '');
+                })())
               : 'vorl\u00e4ufig \u00b7 ohne Sachwertfaktor, kein Marktwert')
           : (sw.grund || 'nicht ausgewiesen'),
         'sach', sw.staffel,
