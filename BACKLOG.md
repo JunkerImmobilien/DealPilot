@@ -38,7 +38,21 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → Hier weitermachen (Übergabe 2026-08-12, abends)
 
-**Stand:** lokal wie Staging, Zweig `staging`, Arbeitsverzeichnis sauber.
+> **ZUERST LESEN — der Server stand heute abend auf `main`.** Damit waren die
+> Frontend-Pakete `v1148` bis `v1153b` zeitweise **nicht ausgeliefert**,
+> obwohl jeder Deploy den richtigen Hash gemeldet hatte. Beim Zurückholen auf
+> `staging` lag dort ein **fremder Commit `0a55ee4`** — 920 Zeilen, das
+> v1083-Paket eines Parallel-Strangs (Ausschuss-Register NRW). **Beides ist
+> vereint und gesichert** (`ce821e3`, lokal = Server = GitHub, alle Marker
+> geprüft). **Der Prüfbefehl nach jedem Deploy liest ab jetzt den ZWEIG mit:**
+> ```
+> ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD'
+> ```
+> Erwartet wird `staging` **und** der eben gepushte Hash. Ein Hash ohne Zweig
+> ist bedeutungslos. Details in `FALLEN.md` Punkt 1.
+
+**Stand:** lokal wie Staging (`ce821e3`), Zweig `staging`, Arbeitsverzeichnis
+sauber.
 Ausgeliefert an diesem Tag: `v1148` (1025-px-Sprung), `v1149` (§ 194-Hinweis
 nur auf Seite 1), dazu `PROJEKTANWEISUNG.md` als konsolidierter Gesamtstand
 mit fortlaufendem Rollout-Journal.

@@ -39,6 +39,53 @@ ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --short HEAD'
 gegen den lokalen `HEAD`. Bricht das Skript nach dem Push ab, den Server-Pull
 von Hand nachziehen (`git pull --ff-only` in `/opt/dealpilot`).
 
+### Der Hash allein genügt nicht — den ZWEIG mitlesen
+
+Am 12.08. abends stand der Staging-Server plötzlich auf **`main`** statt
+`staging`, und damit auf `65ca0b0` — einem Stand von morgens. Alle
+Frontend-Pakete des Tages (`v1148` bis `v1153b`) waren nicht mehr
+ausgeliefert, obwohl jeder einzelne Deploy vorher den richtigen Hash gemeldet
+hatte. Aufgefallen ist es nur, weil der Prüfbefehl einen Hash zeigte, der
+nicht zum eben gepushten passte.
+
+**Ein `git pull --ff-only` auf dem falschen Zweig meldet Erfolg** — es holt
+brav `origin/main`, das sich nie bewegt. Der Prüfbefehl gehört deshalb
+erweitert:
+
+```
+ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD'
+```
+
+**Erwartet wird `staging` UND der eben gepushte Hash.** Stimmt der Zweig
+nicht, ist der Hash bedeutungslos.
+
+### Der Parallel-Chat committet auf dem Server
+
+Beim Zurückholen auf `staging` war der Zweig **divergiert**: auf dem Server
+lag ein fremder Commit `0a55ee4` — **920 Zeilen in 15 Dateien**, das
+v1083-Paket (Ausschuss-Register NRW, 493 LZS-Sätze, acht Auswerter für
+Sachwertfaktoren). Ein anderer Arbeitsstrang hatte direkt auf dem Server
+gearbeitet, committet und das mb-Backend neu gebaut.
+
+**Das ist die zweite Wiederholung.** `545d069` trägt denselben Fall („die 319
+Zeilen sind im Repo, Server wieder auf staging"), und die Projektanweisung
+warnt seit dem 12.08.: *„Nur EIN Chat fasst git an."*
+
+**Was in dieser Lage gilt:**
+- **Nichts wegwerfen.** `git reset --hard origin/staging` hätte 920 Zeilen
+  fremder Arbeit gelöscht. Erst `git log origin/staging..HEAD --stat` lesen.
+- **Prüfen, ob die Basis passt:** `git merge-base --is-ancestor <mein-commit>
+  <fremder-commit>`. Hier war es so — der fremde Strang hatte auf meinem
+  Stand aufgebaut, also war ein Merge gefahrlos.
+- **Konfliktrisiko an den Dateilisten ablesen**, nicht am Bauchgefühl. Hier
+  berührte der fremde Commit **keine** `.md`-Datei, mein letzter nur
+  Dokumentation → konfliktfreier Merge.
+- **Danach zurückpushen**, sonst liegt die fremde Arbeit weiter nur auf dem
+  Server und stirbt beim nächsten `--ff-only`-Abbruch.
+- **Und prüfen, ob ihr Container-Rebuild lief** — Code im Repo heißt nicht
+  Code im Container. Hier war er schon gebaut
+  (`docker exec dealpilot-mb-backend ls /app/src/lib/…`).
+
 ---
 
 ## 2 · Welche CSS-Regel gewinnt, sagt nur der Kaskaden-Walker
