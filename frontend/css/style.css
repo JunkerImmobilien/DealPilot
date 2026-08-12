@@ -36890,3 +36890,31 @@ body.dp-chrome-hell aside.sidebar .sb-act-section-title {
   border-top-color: color-mix(in srgb, var(--gold) 22%, transparent) !important;
 }
 /* ===== v1136e-aktionen-hell END ===== */
+
+/* ===== v1147-CB33 · Ankreuzfelder auf 33 px ==============================
+   Gemessen im v1118-Durchgang: 23 Ankreuzfelder in fuenf Reitern messen
+   13 x 13 px — die Labels daneben sind 16 bis 36 px hoch, liegen also
+   selbst unter der 44-px-Trefferflaeche aus v650/v652.
+
+   Ursache, am Markup nachgezaehlt: ALLE 37 Checkboxen sind nackte
+   <input type="checkbox"> ohne Klasse. Die Klasse `.cb-label` sitzt am
+   LABEL, nicht am Feld — ihre Regel (Z. 2191, 16 px) greift deshalb nur
+   fuer acht davon. Die uebrigen 29 standen auf Browser-Standard.
+
+   Marcels Entscheidung (2026-08-12): 33 px, nicht 44 — die volle
+   Trefferflaeche haette jede Formularzeile hoeher gemacht.
+
+   Schalter sind ausgenommen: `.ji-switch`, `.toggle-slim` und
+   `.fesh-tile` bauen aus demselben nackten Element eine ganz andere
+   Optik. Ihre Regeln stehen frueher in der Datei und haetten bei
+   gleicher Spezifitaet verloren — deshalb hier ausgeschlossen statt
+   dort verstaerkt.
+   ======================================================================== */
+#app input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):not(.fesh-tile input) {
+  width: 33px;
+  height: 33px;
+  accent-color: var(--gold);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+/* ===== v1147-CB33 END ===== */
