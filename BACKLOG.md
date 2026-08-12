@@ -81,9 +81,38 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Hinterland-Rentierlichkeit entscheiden erheblich mit, und
    `hinterlandRent` steuert direkt die Bodenwertverzinsung nach § 41.
 
-   **Zwei Dinge zu tun:** die neun Texte schreiben, und `textFuer()` beim
-   Fehlen eines Schlüssels **laut** sein lassen (`console.warn`) statt
-   still — ein stiller Rückfall sieht aus wie ein bestandener Lauf.
+   **BEHOBEN in `v1146` (`d868fbb`) und `v1146b` (`cbe57cf`).**
+
+   **Sechs der neun Texte gab es längst** — im `HILFE`-Block von
+   `wertermittlung.js`, wo sie nie jemand zu sehen bekam. Sie sind nach
+   `feldhilfe.js` überführt und in `kurz`/`lang` geteilt. Drei sind neu
+   geschrieben: **Standardstufe**, **Modernisierungsgrad**, **Grundriss** —
+   jeweils mit Rechtsgrundlage und der Angabe, was eine Stufe Unterschied
+   im Ergebnis ausmacht.
+
+   **`textFuer()` meldet einen fehlenden Schlüssel jetzt per
+   `console.warn`** statt still `null` zurückzugeben.
+
+   **`v1146b` — der Fix war eine Ebene zu hoch angesetzt.** Nach `v1146`
+   blieben drei Zeichen weiter wirkungslos, **ohne dass die neue Warnung
+   ansprang**: `hinterland`, `ausstGewerk` und `bauteilHk` sind
+   **Sammelschlüssel für Feldgruppen** — das ⓘ hängt dort 9× bzw. 5× an
+   verschiedenen Feldern (`ausstAussenwaende`, `btlGauben`, …). `box()`
+   suchte ein Element mit der **Id des Schlüssels** als Anker, fand keins
+   und baute still gar keinen Kasten. Der Text war da, die Warnung schwieg
+   zu Recht — und trotzdem passierte beim Klick nichts. Jetzt Rückfall auf
+   das angeklickte Zeichen selbst.
+
+   **Abgenommen auf Staging:** alle **13** bei Stufe 3 sichtbaren Zeichen
+   öffnen einen Kasten mit Text (400–424 Zeichen bei den drei
+   Gruppen-Schlüsseln), **keine Warnung**, kein leerer Kasten. Gegen die
+   Quelle gezählt: **18 Schlüssel, 19 Texte — keiner mehr ohne.**
+
+   **Eigener Messfehler, vermerkt:** Ein erster Prüflauf meldete vier
+   Felder ohne Kasten. Falsch — der Kasten ist ein **Umschalter**, und die
+   vier waren aus einem abgebrochenen Lauf noch offen; mein Klick hat sie
+   geschlossen. Zustand aus dem vorigen Prüflauf, genau die Falle aus
+   `FALLEN.md`. Vor der Messung `.fh-box` abräumen.
 
 3. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
