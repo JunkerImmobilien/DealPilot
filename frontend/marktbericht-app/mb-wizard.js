@@ -257,19 +257,32 @@
     try { return window.matchMedia('(max-width:900px)').matches; } catch (e) { return false; }
   }
   function klappBauen(reiter) {
-    if (id('mbw-klapp')) return;
+    if (id('mbw-klapp')) return true;
+    /* v1153b · Ohne Referenzknoten im Dokument gibt es keine Kopfzeile —
+       und dann darf `mbw-zu` NICHT gesetzt werden, sonst versteckt der
+       Zustand die Liste, ohne einen Ersatz anzubieten. Laut melden statt
+       still scheitern: ein stummes catch hat schon einmal eine Korrektur
+       nie laufen lassen (config.js/DPC). */
+    if (!reiter || !reiter.parentNode) {
+      try { console.warn('[v1153b] Klappleiste nicht gebaut: Reiterleiste hängt nicht im Dokument. ' +
+        'Die Leiste bleibt aufgeklappt — das ist der sichere Zustand.'); } catch (e) {}
+      document.documentElement.classList.remove('mbw-zu');
+      return false;
+    }
     var k = document.createElement('div');
     k.className = 'mbw-klapp';
     k.id = 'mbw-klapp';
     k.innerHTML = '<button type="button" class="mbw-klapp-kopf" id="mbw-klapp-kopf" aria-expanded="false">'
       + '<span class="n"></span><span class="t"></span><span class="pf">▸</span></button>'
       + '<div class="mbw-klapp-bahn"><i style="width:0"></i></div>';
-    if (reiter && reiter.parentNode) reiter.parentNode.insertBefore(k, reiter);
+    reiter.parentNode.insertBefore(k, reiter);
     k.querySelector('#mbw-klapp-kopf').addEventListener('click', function () {
       klappSetzen(!document.documentElement.classList.contains('mbw-zu'));
       klappNachziehen();
     });
     klappSetzen(klappZu());
+    klappNachziehen();
+    return true;
   }
   /* Kopfzeile an den aktiven Schritt anpassen. Klappt NICHT von selbst auf —
      sonst springt das Layout bei jedem „Weiter". */
@@ -353,10 +366,6 @@
         '<span class="n">' + s.id + '</span>' + s.t + '</button>';
     }).join('');
 
-    /* v1153-KLAPP · Die Kopfzeile gehoert VOR die Leiste, damit sie
-       zugeklappt allein steht. Sie wird nur unter 900 px gezeigt (CSS). */
-    klappBauen(reiter);
-
     var blaetter = document.createElement('div');
     blaetter.id = 'mbw-blaetter';
     blaetter.innerHTML = SCHRITTE.map(function (s) {
@@ -373,6 +382,14 @@
        gilt fuer alle Reiter. */
     var nachher = id('wm-ziel');
     nachher.parentNode.insertBefore(reiter, nachher.nextSibling);
+    /* v1153b · HIER, nicht früher. Der erste Anlauf rief klappBauen() auf,
+       während `reiter` noch nicht im Dokument hing — `reiter.parentNode` war
+       null, das insertBefore lief ins Leere, die Kopfzeile entstand nie.
+       Gesetzt wurde `html.mbw-zu` trotzdem, und damit war unter 900 px
+       ÜBERHAUPT keine Führung mehr sichtbar: die Liste versteckt, die
+       Kopfzeile nicht vorhanden. Ein stiller Fehlschlag, der schlimmer war
+       als der Zustand davor. */
+    klappBauen(reiter);
     reiter.parentNode.insertBefore(blaetter, reiter.nextSibling);
 
     reiter.addEventListener('click', function (e) {
