@@ -56,6 +56,20 @@
       lang: 'Der Bodenwert des Gesamtgrundstücks wird mit diesem Anteil multipliziert. Ohne Angabe rechnet die Wertermittlung mit dem vollen Grundstück und überschätzt den Wohnungswert erheblich.',
       grund: '§ 3 WEG'
     },
+    /* v1142-GARMEA · Das Feld trug ein ⓘ, das nichts tat: `garagenBgf` stand
+     * als Hilfe-Schlüssel in wertermittlung.js, aber nicht hier — und
+     * textFuer() kennt keinen Rückfall auf die dortigen Texte.
+     *
+     * Inhaltlich der Punkt, der den Hinweis nötig macht: lib/nhk2010.js
+     * kennt weder mea noch ist_wohnung, die Fläche geht also UNGEKÜRZT in
+     * den Sachwert. Beim Bodenwert wird der Miteigentumsanteil abgezogen,
+     * hier nicht, und dieser Unterschied stand nirgends. Am Prüfobjekt
+     * Hüllhorst standen 64,58 m² für eine von drei Einheiten. */
+    garagenBgf: {
+      kurz: 'Länge × Breite der Garagen, die zu <b>dieser</b> Bewertung gehören — nicht die Zahl der Stellplätze. Bei einer Eigentumswohnung also nur die eigene Garage oder der eigene Anteil; wird das ganze Gebäude bewertet, kommen alle hinein.',
+      lang: '<b>Der Miteigentumsanteil wird hier nicht automatisch abgezogen</b> — anders als beim Bodenwert. Die Fläche geht so in den Sachwert ein, wie sie hier steht. Die NHK 2010 führen für Garagen eigene Kostenkennwerte (Gebäudeart 14.1) und eine eigene Gesamtnutzungsdauer von 60 Jahren; eine Garage hält nicht so lange wie das Wohnhaus. Ohne Fläche wird sie nicht angesetzt.',
+      grund: '§ 36 ImmoWertV · NHK 2010, Gebäudeart 14.1'
+    },
     lzs: {
       kurz: 'Liegenschaftszinssatz in Prozent. Die größte Stellschraube im ganzen Verfahren — ein halber Punkt verschiebt den Ertragswert um rund acht Prozent.',
       lang: 'Er stammt aus dem Grundstücksmarktbericht des örtlichen Gutachterausschusses. Liegt keiner vor, greift der gesetzliche Auffangwert nach § 256 BewG — der ist nicht marktabgeleitet, liegt in der Regel darunter und erzeugt damit einen eher hohen Ertragswert. Die verwendete Stufe steht im Ergebnis und im PDF.',
@@ -145,6 +159,25 @@
         out.kurz = 'Hier gehört die Fläche des GESAMTEN Grundstücks hinein, nicht ein Anteil davon. Den Anteil trägst du separat als Miteigentumsanteil ein.';
       }
     }
+    /* v1145-SWFART · Ein Eingabefeld, das den Wert wegwirft, ist schlimmer
+     * als keins. Für Eigentumswohnungen (und MFH/Gewerbe) leitet kein
+     * Gutachterausschuss Sachwertfaktoren ab; seit v1144 wird ein
+     * eingetragener Wert deshalb verworfen — bis dahin verschluckte ihn
+     * ohnehin ein Feldname-Fehler. Am Prüfobjekt stand 1,15 im Feld und
+     * blieb wirkungslos, ohne dass irgendwo etwas dazu stand. */
+    if (feld === 'sachwertfaktor') {
+      var pt2 = $('ptype') ? String($('ptype').value).toLowerCase() : '';
+      if (/etw|wohnung|whg|mfh|mehrfamilien|gewerbe|buero/.test(pt2)) {
+        out.titel = 'Für diese Objektart ohne Wirkung';
+        out.kurz = 'Sachwertfaktoren werden nur für Ein- und Zweifamilien-, Doppel- und '
+          + 'Reihenhäuser abgeleitet (Abschnitt 5.1.4). Ein hier eingetragener Wert '
+          + '<b>wird nicht angewandt</b> — der Bericht weist den vorläufigen Sachwert aus.';
+        out.lang = 'Das ist kein Mangel des Berichts: bei einer Eigentumswohnung führt das '
+          + 'Vergleichswertverfahren, der Sachwert steht nur zur Einordnung daneben. Einen '
+          + 'Faktor aus der Häuser-Ableitung auf eine Wohnung anzuwenden wäre ein '
+          + 'Modellbruch (§ 10 ImmoWertV). ' + out.lang;
+      }
+    }
     return out;
   }
 
@@ -161,6 +194,31 @@
       (el.parentNode || document.body).appendChild(d);
     }
     d.textContent = t.anker[el.value] || '';
+  }
+
+  /* ── v1145-SWFART · Sichtbar, ohne Klick ────────────────────────────────
+   * Die Feldhilfe erklärt es erst auf Klick — gemerkt hat es aber niemand:
+   * am Prüfobjekt stand 1,15 im Feld und blieb wirkungslos. `ankerZeigen()`
+   * taugt hier nicht, es hängt am eigenen Feldwert; hier entscheidet die
+   * Objektart nebenan. Deshalb eine eigene kleine Anzeige, die derselben
+   * Klasse folgt. */
+  function swfWirkung() {
+    var el = $('sachwertfaktor');
+    var id = 'fh-swf-aus';
+    var d = $(id);
+    if (!el) { if (d) d.remove(); return; }
+    var pt = $('ptype') ? String($('ptype').value).toLowerCase() : '';
+    if (!/etw|wohnung|whg|mfh|mehrfamilien|gewerbe|buero/.test(pt)) {
+      if (d) d.remove();
+      return;
+    }
+    if (!d) {
+      d = document.createElement('div');
+      d.id = id; d.className = 'fh-anker';
+      (el.parentNode || document.body).appendChild(d);
+    }
+    d.textContent = 'Für diese Objektart ohne Wirkung — Sachwertfaktoren werden nur '
+      + 'für Ein- und Zweifamilien-, Doppel- und Reihenhäuser abgeleitet.';
   }
 
   /* Baustatus schaltet den Modernisierungsblock. */
@@ -210,6 +268,13 @@
       ankerZeigen(f);
       e.addEventListener('change', function () { ankerZeigen(f); });
     });
+    /* v1145-SWFART · Das Feld `sachwertfaktor` liegt im Block wm-b3 und
+     * entsteht erst beim Hochstufen — ein einmaliger Aufruf beim Start
+     * verpufft deshalb. Am `document` lauschen ist hier billiger als ein
+     * Beobachter: die Prüfung ist zwei Feldzugriffe lang. */
+    document.addEventListener('change', swfWirkung, true);
+    document.addEventListener('input', swfWirkung, true);
+    swfWirkung();
     var bs = $('baustatus');
     if (bs) { bs.addEventListener('change', baustatusAnwenden); baustatusAnwenden(); }
   }

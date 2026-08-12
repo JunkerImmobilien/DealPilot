@@ -495,6 +495,55 @@ export const ReportOrchestrator = {
         anpassung_pct: ref.brw_anpassung_pct || null,
         anpassung_grund: ref.brw_anpassung_grund || null,
       });
+      /* v1140-UKTEXT · Der Flaechenhinweis behauptete das Gegenteil dessen,
+       * was gerechnet wurde. Er entsteht oben allein aus der Ueberschreitung
+       * (>= 30 %) und sagt seither unveraendert "Der Bodenwert setzt die
+       * gesamte Flaeche zum vollen Bodenrichtwert an … hier nicht
+       * vorgenommen." Seit v1070 stimmt das nicht mehr: liegt eine
+       * Groessenanpassung vor, wird sehr wohl umgerechnet.
+       *
+       * Am Pruefobjekt gemessen (950 m2, Bezugsgroesse 700 m2): der Bericht
+       * setzte 84,92 EUR/m2 an — Bodenrichtwert 90 EUR/m2 mal Koeffizient
+       * 0,9436 — und schrieb daneben, er habe nichts umgerechnet. Ein
+       * Modellvermerk, der etwas anderes behauptet als er tut, ist schlimmer
+       * als keiner (§ 10 ImmoWertV).
+       *
+       * Erst hier korrigierbar: `_uk` entsteht nach dem Hinweis. */
+      if (_flaeche && _flaeche.hinweis && _uk && _uk.verfuegbar) {
+        const _kopf = 'Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '
+          + _flaeche.ueberschreitung_pct + ' % größer als das Bodenrichtwertgrundstück '
+          + 'dieser Zone (' + _flaeche.richtwertgrundstueck_qm + ' m²). ';
+        /* v1140b · Die beiden Aufteilungen sind NICHT dasselbe und dürfen
+         * nicht denselben Satz bekommen. `manuelleAufteilung()` setzt
+         * bauland_qm = volle Grundstücksfläche und legt die Hinterlandfläche
+         * ZUSÄTZLICH daneben (umrechnung_nrw.js Z. 221–232, „Zusätzliche
+         * Grundstücksfläche"). Die automatische Aufteilung dagegen SPALTET
+         * die vorhandene Fläche am 1,5-fachen der Bezugsgröße.
+         *
+         * Mein erster Anlauf gab beiden den Spaltungstext — beim Prüfobjekt
+         * stand dann „die überschüssigen 828 m²", obwohl die 828 m² gar
+         * nicht überschüssig sind, sondern hinzukommen. Ein falscher
+         * Modellvermerk gegen einen anderen getauscht. */
+        if (_uk.gruen_qm > 0 && _uk.quelle_art === 'eigene Angabe') {
+          _flaeche.hinweis = _kopf
+            + 'Das Grundstück selbst ist mit ' + _uk.bodenwert_eur_qm
+            + ' €/m² angesetzt; hinzu kommen ' + _uk.gruen_qm
+            + ' m² Hinterlandfläche zu ' + _uk.gruen_eur_qm
+            + ' €/m² (eigene Angabe) — getrennte Bewertung nach § 41 ImmoWertV.';
+        } else if (_uk.gruen_qm > 0) {
+          _flaeche.hinweis = _kopf
+            + 'Die Fläche bis zum 1,5-fachen der Bezugsgröße ist mit '
+            + _uk.bodenwert_eur_qm + ' €/m² angesetzt, die überschüssigen '
+            + _uk.gruen_qm + ' m² wertmäßig als private Grünfläche ('
+            + _uk.gruen_eur_qm + ' €/m²) — getrennte Bewertung nach § 41 ImmoWertV.';
+        } else if (_uk.koeffizient_angewandt) {
+          _flaeche.hinweis = _kopf
+            + 'Der Bodenrichtwert ist deshalb über den Umrechnungskoeffizienten '
+            + 'der Zone auf ' + _uk.bodenwert_eur_qm + ' €/m² angepasst ('
+            + (landValue && landValue.value_sqm) + ' €/m² × ' + _uk.faktor + ').';
+        }
+      }
+
       /* WNHK-1 · Sachwertfaktor aus derselben Kaskade wie der Zinssatz.
        * Er steht in denselben Grundstuecksmarktberichten — die Ernte
        * liefert beides oder keines. */
@@ -601,6 +650,29 @@ export const ReportOrchestrator = {
 
     // 6b) Sachwert/Ertragswert-Quercheck (reine Rechnung, keine API-Kosten)
     const crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
+
+    /* v1141b · Der Bodenwert-Rechenweg blieb im Backend liegen.
+     * `ErtragswertService.bodenwert()` protokolliert jeden Schritt in
+     * `schritte` — Fläche × Bodenrichtwert, Größenanpassung, Zuschnitt,
+     * Erschließungsbeitrag, Miteigentumsanteil. Ausgeliefert wurde davon
+     * nichts: `_wertParams` ist eine INTERNE Struktur, `crossCheck` gibt
+     * nur ausgewählte Felder heraus. Im ganzen Antwortbaum kam `schritte`
+     * kein einziges Mal vor (gemessen 2026-08-12).
+     *
+     * Genau an diesem Wert hing der v1140-Fehler. Sein Weg gehört deshalb
+     * sichtbar in die Ansicht — nicht nur ins PDF. Nur Lesefelder, keine
+     * Rechnung: der Bodenwert bleibt, was er ist. */
+    if (crossCheck && _wertParams && _wertParams.bodenwert) {
+      const _b = _wertParams.bodenwert;
+      crossCheck.bodenwert = {
+        wert: _b.wert,
+        wert_rentierlich: _b.wert_rentierlich,
+        bodenwert_gesamt: _b.bodenwert_gesamt,
+        vollstaendig: !!_b.vollstaendig,
+        schritte: Array.isArray(_b.schritte) ? _b.schritte : [],
+        hinweise: Array.isArray(_b.hinweise) ? _b.hinweise : [],
+      };
+    }
 
     /* WKIGEG-3 · Zweitmeinung einholen, wenn eingeschaltet. Faellt sie aus,
      * laeuft der Bericht unveraendert weiter — sie ist eine Probe, kein

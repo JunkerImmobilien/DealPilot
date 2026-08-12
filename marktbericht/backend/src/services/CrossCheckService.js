@@ -168,7 +168,16 @@ export const CrossCheckService = {
        * Ein gepflegter Wert aus der Parametertabelle hat Vorrang: die
        * Tabelle ist kuratiert, die Matrix gilt fuer genau einen Kreis. */
       let _swfTab = null;
-      if (!(p && p.sachwertfaktor_param && p.sachwertfaktor_param.sachwertfaktor)
+      /* v1144-SWFELD · Dieselbe Feldverwechslung wie in nhk2010.js:868.
+       * Geprüft wurde `.sachwertfaktor`, geliefert wird `.wert` — die Weiche
+       * stand deshalb IMMER auf Tabellenweg, auch wenn ein eigener Wert
+       * gepflegt war. Folge: der Vorrang des kuratierten Werts (Kommentar
+       * oben) hat nie gegriffen, und `sachwertfaktor_grund` meldete einen
+       * Tabellen-Fehlschlag, obwohl gar nicht die Tabelle gefragt war. */
+      const _swfEigen = Number(p && p.sachwertfaktor_param
+        && (p.sachwertfaktor_param.wert != null
+            ? p.sachwertfaktor_param.wert : p.sachwertfaktor_param.sachwertfaktor));
+      if (!(_swfEigen > 0)
           && _sw && _sw.vorlaeufiger_sachwert_eur != null) {
         _swfTab = swfNachTabelle({
           ags: (p && p.ags) || ref.ags || null,

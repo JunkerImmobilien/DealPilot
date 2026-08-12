@@ -1706,8 +1706,25 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   margin-top: 4px;
   letter-spacing: 0.02em;
 }
+/* v1138c: Diese Regel war seit ihrem Einbau wirkungslos. Zwei spaetere
+   Regeln (Z. ~32116 und ~32186) setzen `repeat(3, 1fr) !important` OHNE
+   Media-Query — bei gleicher Spezifitaet gewinnt die spaetere, also standen
+   die drei Kacheln auch auf dem Handy nebeneinander. Dasselbe traf die
+   Tablet-Regel bei max-width:1024px.
+
+   Gemessen bei 390 px am Testobjekt PRUEF_1: Kachel 97 px breit, davon
+   57 px innen, Wert in 30 px Schrift. Ergebnis waren dreizeilige Umbrueche
+   wie „–“ / „274“ / „€“ — das Minuszeichen stand allein in einer Zeile und
+   der Betrag las sich als positiv. Beschriftungen brachen zu
+   „ENDE ZINSBINDUN“ ab.
+
+   Deshalb ueber SPEZIFITAET statt Position (`.sec .cf-phase-grid`): die
+   Probe gewann selbst als erstes Stylesheet gegen beide !important-Regeln.
+   Kein Verlass auf Ladereihenfolge. */
 @media (max-width: 700px) {
-  .cf-phase-grid { grid-template-columns: 1fr; }
+  .sec .cf-phase-grid { grid-template-columns: 1fr !important; }
+  .sec .cf-phase-val,
+  .sec .cf-phase-label { white-space: nowrap !important; }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -18450,6 +18467,57 @@ html body .body {
   .bc-matrix-cell-val { font-size: 13px; }
 }
 
+/* v1138d: Die Sensitivitaetsmatrix schnitt auf dem Handy ihre rechte Spalte ab.
+   Gemessen bei 390 px am Testobjekt PRUEF_1: die Matrix reichte bis x=414,
+   .bc-card klippt bei x=373 (overflow:hidden) — fuenf der 25 Zellen waren
+   unerreichbar, darunter die gesamte Spalte "+20 % Wachstum". Kein Scrollbalken,
+   also kein Weg heran.
+
+   Die Ursache lag NICHT an der Breitenangabe: `1fr` allein reicht nicht, weil
+   Grid-Items `min-width:auto` tragen und damit nie unter ihre Inhaltsbreite
+   schrumpfen. `.bc-matrix-grid` fuehrt ausserdem nur Zeilen, seine implizite
+   Spalte war max-content (249 px in einem 183-px-Container). Beides musste
+   ausdruecklich auf `minmax(0,1fr)` bzw. `min-width:0`.
+
+   Beim Messen selbst hereingefallen: ein Ueberlauftest, der nur gegen den
+   VIEWPORT prueft, meldet hier "sauber" — abgeschnitten wird am
+   overflow:hidden des Vorfahren, lange vor dem Fensterrand. Der naechste
+   Durchgang prueft gegen den klippenden Vorfahren. */
+@media (max-width: 700px) {
+  .bc-card .bc-matrix-wrap { grid-template-columns: 72px minmax(0, 1fr) !important; }
+  .bc-card .bc-matrix-grid { grid-template-columns: minmax(0, 1fr) !important; min-width: 0 !important; }
+  .bc-card .bc-matrix-row,
+  .bc-card .bc-matrix-cell { min-width: 0 !important; }
+  .bc-card .bc-matrix-axis-y-label { white-space: normal !important; overflow-wrap: anywhere !important; }
+  .bc-card .bc-delta { overflow-wrap: anywhere !important; min-width: 0 !important; }
+  /* Der Kartenkopf schrumpfte die Ueberschrift auf 87 px, obwohl 335 da waren */
+  .bc-card .bc-head { flex-wrap: wrap !important; }
+  .bc-card .bc-head-left { flex: 1 1 100% !important; }
+}
+
+/* v1138e: Zwei weitere Stellen, an denen ein `flex:0 0 auto`-Nachbar auf dem
+   Handy alles andere zusammendrueckt. Beide bei 390 px am Testobjekt PRUEF_1
+   gemessen.
+
+   1. Reiter MIETE: die Ueberschrift MIETENTWICKLUNG und der Umschalter
+      Prognose/Detail teilen sich eine Zeile von 335 px. Der Umschalter braucht
+      161 px und wurde von `.me-mode-toggle` (overflow:hidden) links
+      angeschnitten — auf dem Bild stand "ognose" statt "Prognose".
+
+   2. Reiter DEAL-AKTION, Zeile "Finanzamt-PDF": die Knopfgruppe traegt dort
+      ZWEI Schaltflaechen ("Alle Jahre" und "PDF"), zusammen 188 px. Mit dem
+      44-px-Symbol blieben dem Text 25 px — die Beschreibung stand Wort fuer
+      Wort untereinander. Die drei anderen Zeilen derselben Liste haben nur
+      einen Knopf und waren deshalb unauffaellig: der Fehler zeigt sich nur an
+      der einen Zeile, die am meisten Platz braucht. */
+@media (max-width: 700px) {
+  .me-header { flex-wrap: wrap !important; }
+  .me-header .me-mode-toggle { flex: 0 0 auto !important; overflow: visible !important; }
+  .dab-doc-row { flex-wrap: wrap !important; }
+  .dab-doc-x { flex: 1 1 140px !important; min-width: 140px !important; }
+  .dab-doc-act { flex: 1 1 100% !important; justify-content: flex-end !important; }
+}
+
 /* PDF-print: Schatten und Effekte raus, optimiert für DIN-A4 */
 @media print {
   .bc-card { box-shadow: none; break-inside: avoid; }
@@ -25653,9 +25721,17 @@ aside.sidebar .sb-card .sbc-top {
   gap: 12px !important;
 }
 /* V80: Score-Overlay rechts oben — absolute Position, darf Adresse-Zeile überlappen */
+/* v1138b: `top` steht hier NICHT MEHR. Diese Regel ist wortgleich mit der aus
+   V103 (Z. ~25057) und stand dahinter — bei gleicher Spezifitaet gewinnt die
+   spaetere, also schlug `top:12px` die Korrektur `top:38px` aus V103. Wirkung
+   gemessen bei 390 px am Testobjekt PRUEF_1: die Loesch-Schaltflaeche lag genau
+   ueber der Score-Zahl, `elementFromPoint` in deren Mitte lieferte
+   `sbc-btn sbc-del`. Wer den Score antippt, loest die Loeschabfrage aus — auf
+   dem Desktop faellt es nicht auf, weil die Knoepfe dort nur beim Hovern
+   erscheinen, auf dem Handy stehen sie dauerhaft (V101, `opacity:1`).
+   EINE Quelle fuer `top`: die V103-Regel. Nicht wieder hier setzen. */
 aside.sidebar .sb-card .sbc-score-overlay {
   position: absolute !important;
-  top: 12px !important;
   right: 12px !important;
   display: flex !important;
   flex-direction: column !important;
@@ -36736,3 +36812,81 @@ body.hdr-collapsed .main-col > .tabs {
   top: var(--hdr-h, 48px) !important;
 }
 /* ===== v1124b-hdrsync-collapsed END ===== */
+
+/* ═══ v1136e-aktionen-hell ═══════════════════════════════════════════
+   Backlog Punkt 1 — das Aktionen-Panel folgt der hellen Darstellung.
+
+   GEMESSEN, nicht vermutet (Staging, Hell aktiv, nach Neuladen):
+     .sb-actions-accordion-inner  background-image: linear-gradient(
+                                    rgb(10,8,5) -> rgb(5,5,5))
+     .sb-act-item                 color rgb(232,201,100)  = Gold-hell
+     .sb-act-section-title        color rgba(168,162,153,.65)
+     .sb-act-ico                  color rgb(201,168,76)   = --gold
+
+   Das Panel ist als geschlossene DUNKLE Einheit gebaut: schwarzer Grund
+   plus goldene Schrift. In sich stimmig — nur folgt es dem Hell-Skin
+   nicht und steht als schwarzer Block in einer weissen Sidebar.
+
+   WARUM DIE VORHANDENE HELL-REGEL NICHT REICHT: V260-03 setzt
+   `html[data-bg="white"] .sb-actions-accordion-inner { background:#fff
+   !important }` — Spezifitaet (0,2,1). Die Dunkelregel
+   `aside.sidebar .sb-actions-accordion.sb-actions-open
+    .sb-actions-accordion-inner` hat (0,4,1) und ebenfalls !important,
+   gewinnt also. Deshalb hier dieselbe Kette PLUS der Skin-Traeger.
+
+   Und der Grund liegt im background-IMAGE, nicht in background-color —
+   ein Walker, der nur background-color liest, findet ihn nicht. Genau
+   daran bin ich beim Messen zuerst vorbeigelaufen.
+
+   BEIDE TEILE GEHOEREN ZUSAMMEN: nur den Grund aufhellen ergaebe Gold
+   auf Weiss (Kontrast 1,62), nur die Schrift abdunkeln ergaebe Schwarz
+   auf Schwarz. Kontraste nach dem Patch auf Weiss gemessen:
+   Eintrag 18,6 · Sektionstitel 4,6 · Icon 3,9.
+
+   TRAEGER IST NUR body.dp-chrome-hell — ein eigener Fehler, gemessen und
+   zurueckgenommen: Die erste Fassung haengte die Regeln zusaetzlich an
+   `html[data-bg="white"]`. Das ist der falsche Schalter. `data-bg`
+   steuert die ARBEITSFLAECHE, der Chrome-Skin den RAHMEN, und beide sind
+   unabhaengig. Gemessen nach `_dpDispSkin('obsidian')`: `data-bg` blieb
+   `white`, die Sidebar wurde `rgb(0,0,0)` — das Panel waere hell in
+   schwarzer Sidebar stehengeblieben, also derselbe Fehler mit
+   umgekehrtem Vorzeichen. Die alte V260-03-Regel macht genau das, es
+   fiel nur nie auf, weil der schwarze Verlauf sie ohnehin uebermalte.
+   ------------------------------------------------------------------ */
+
+body.dp-chrome-hell aside.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner {
+  background: #ffffff !important;
+  border: 1.5px solid color-mix(in srgb, var(--gold) 30%, transparent) !important;
+  box-shadow: 0 -6px 28px rgba(20, 19, 16, .14),
+              0 0 20px color-mix(in srgb, var(--gold) 8%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, .9) !important;
+  backdrop-filter: none !important;
+}
+
+/* Eintraege: Tinte statt Gold. Derselbe Ton, den die helle Sidebar fuer
+   die Objektadresse fuehrt (gemessen: rgb(20,19,16)). */
+body.dp-chrome-hell aside.sidebar .sb-act-item,
+body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent,
+body.dp-chrome-hell aside.sidebar .sb-act-item:first-of-type {
+  color: #141310 !important;
+}
+/* Ueberfahren: die Goldspur bleibt, sie traegt auf Weiss nur bei
+   hoeherem Anteil. Die Schrift bleibt Tinte. */
+body.dp-chrome-hell aside.sidebar .sb-act-item:hover,
+body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent:hover,
+body.dp-chrome-hell aside.sidebar .sb-act-item:first-of-type:hover {
+  background: color-mix(in srgb, var(--gold) 14%, transparent) !important;
+  color: #141310 !important;
+}
+/* Symbole: --gold traegt auf Weiss nicht (Kontrast 2,3). Der dunklere
+   Goldton der Marke schon. */
+body.dp-chrome-hell aside.sidebar .sb-act-item .sb-act-ico,
+body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent .sb-act-ico {
+  color: var(--wl-9a7f33, #9a7f33) !important;
+}
+/* Sektionstitel: 9,5px Versalien brauchen mehr als 2,5. */
+body.dp-chrome-hell aside.sidebar .sb-act-section-title {
+  color: #7A7370 !important;
+  border-top-color: color-mix(in srgb, var(--gold) 22%, transparent) !important;
+}
+/* ===== v1136e-aktionen-hell END ===== */

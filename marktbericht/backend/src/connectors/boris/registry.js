@@ -41,6 +41,30 @@ function parseGmlField(text, names) {
   }
   return null;
 }
+/* v1080-WHTM-1 · MapServer-Template-Antworten (text/html) in ein
+ * Properties-Objekt heben: style-Bloecke raus, Tags strippen, Entities
+ * aufloesen, dann "Label: Wert"-Paare ziehen. Gemessen am
+ * Saarland-Template 08.08.2026 (Wert: 520 EUR, Zone 1014294). */
+function parseHtmlProps(text) {
+  if (!text || text.indexOf(':') < 0) return null;
+  const t = String(text)
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&euro;/gi, '€').replace(/&auml;/gi, 'ä').replace(/&ouml;/gi, 'ö')
+    .replace(/&uuml;/gi, 'ü').replace(/&Auml;/g, 'Ä').replace(/&Ouml;/g, 'Ö')
+    .replace(/&Uuml;/g, 'Ü').replace(/&szlig;/gi, 'ß').replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ');
+  const props = {};
+  const re = /([A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß .-]{1,45}?):\s*(.*?)(?=\s[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß .-]{1,45}?:\s|$)/g;
+  let m;
+  while ((m = re.exec(t)) !== null) {
+    const k = m[1].trim(), v = m[2].trim();
+    if (k && props[k] == null) props[k] = v;
+  }
+  return Object.keys(props).length ? props : null;
+}
+
 // tolerantes Feld aus geo+json-Properties (case-insensitiv)
 function propCI(props, names) {
   const low = {};
@@ -60,8 +84,11 @@ const F = {
   gemeinde: ['gena', 'gemeindename', 'gemeinde'],
   value: ['brw', 'bodenrichtwert', 'wert', 'brw_eur', 'brwert', 'bodenwert', 'richtwert', 'bri'],
   stichtag: ['stag', 'stichtag', 'jahr', 'stichtag des bodenrichtwertes', 'jahr des bodenrichtwerts'],
-  nutzung: ['nuta', 'nutzung', 'entw', 'nutzungsart', 'entwicklungszustand'],
-  zone: ['brwznr', 'wnum', 'zone', 'bodenrichtwertzonen id', 'bodenrichtwertnummer', 'gemarkungsname', 'gemarkung'],
+  nutzung: ['nuta', 'nutzung', 'entw', 'nutzungsart', 'art der nutzung', 'entwicklungszustand'], // v1080-WFLD-1
+  zone: ['brwznr', 'wnum', 'zone', 'bodenrichtwertzonen id', 'bodenrichtwertnummer',
+    'bodenrichtwertzonename', /* v1077-WWMS-5 · BRM 3.0.1 (BORIS-D-WMS) */
+    'bodenrichtwertzonennummer', /* v1080-WFLD-1 · Saarland-Template */
+    'gemarkungsname', 'gemarkung'],
 };
 
 // ---- Laender-Konfiguration ----------------------------------------------
@@ -123,18 +150,114 @@ const ADAPTERS = [
     layer: () => 'bodenrichtwerte', crs: 'EPSG:4326', axis: 'latlon', format: 'gml', time: null,
   },
   // Restriktive Laender: kein freier Auto-Abruf -> sauberer Fallback auf manuellen BRW + klare Begruendung.
-  { code: 'sh', name: 'BORIS-Schleswig-Holstein', restricted: true, enabled: false, verified: false,
-    note: 'Schleswig-Holstein ist nicht im freien BORIS-D-Dienst enthalten — Bodenrichtwert bitte manuell eingeben.',
-    bbox: { minLon: 7.80, maxLon: 11.40, minLat: 53.30, maxLat: 55.10 } },
-  { code: 'by', name: 'BORIS-Bayern', restricted: true, enabled: false, verified: false,
-    note: 'Bayern: Bodenrichtwertauskunft ist gebuehrenpflichtig (BORIS-Bayern) — bitte manuell eingeben.',
-    bbox: { minLon: 10.50, maxLon: 13.90, minLat: 47.20, maxLat: 50.60 } },
-  { code: 'bw', name: 'BORIS-Baden-Wuerttemberg', restricted: true, enabled: false, verified: false,
-    note: 'Baden-Wuerttemberg: kein offener WMS; Massen-/Datensatz-Vermarktung untersagt. Einzelner Bodenrichtwert im konkreten Objektbezug (Gutachten/Expose) ist laut BORIS-BW-Nutzungsbedingungen zulaessig — Wert manuell aus boris-bw.de eintragen.',
-    bbox: { minLon: 7.50, maxLon: 10.50, minLat: 47.50, maxLat: 49.80 } },
-  { code: 'sl', name: 'BORIS-Saarland', restricted: true, enabled: false, verified: false,
-    note: 'Saarland ist nicht im freien BORIS-D-Dienst enthalten — bitte manuell eingeben.',
-    bbox: { minLon: 6.30, maxLon: 7.50, minLat: 49.10, maxLat: 49.70 } },
+  {
+    /* v1081-WSH-1 · SH LIVE. Aufloesung des v1080-WSH-1-Befunds: der
+     * DANord-Viewer nutzt die Dienstvariante WMS_SH_FD_VBORIS_DANORD —
+     * DIE liefert Sachdaten (die oeffentliche Variante antwortet leer).
+     * Gemessen 10.08.2026, Kiel: 670 EUR/m2, BRW-Nr. 5257, Stichtag
+     * 01.01.2026, Gemeindekennzeichen 01002000 (der AGS-Leser
+     * v1047-WAGS-1 liest genau dieses Feld). Layer je Stichtag
+     * (zweijaehrlich) — die Jahres-Kaskade v1080-WJR-1 traegt das.
+     * Freigabe der zustaendigen Stelle liegt vor (Aktennotiz Junker
+     * Solution; Az. bei M. Junker — bei Vorlage wortgleich nachtragen). */
+    code: 'sh', name: 'BORIS-Schleswig-Holstein',
+    license: 'Freigabe (Aktennotiz Junker Solution)',
+    enabled: true, verified: true,
+    quellenvermerk: 'Gutachterausschüsse für Grundstückswerte in Schleswig-Holstein, '
+      + 'DigitalerAtlasNord (danord.gdi-sh.de)',
+    base: 'https://service.gdi-sh.de/WMS_SH_FD_VBORIS_DANORD',
+    bbox: { minLon: 7.80, maxLon: 11.40, minLat: 53.30, maxLat: 55.10 },
+    layer: (y) => 'Bodenrichtwertzonen_' + (y || CURRENT_BRW_YEAR),
+    crs: 'EPSG:25832', proj: 'utm32', format: 'geojson',
+    /* v1081-WSHR-1 · Der Dienst verlangt den DANord-Referer — gemessen
+     * 10.08.2026 per curl-Doppeltest: ohne Referer 403, mit Referer 200. */
+    featureCount: '5',
+    headers: () => Object.assign(browserHeaders(), { 'Referer': 'https://danord.gdi-sh.de/' }),
+    time: null,
+  },
+  {
+    /* v1081-WBY-1 · Bayern LIVE. Der BayernAtlas laedt den GeoServer-WMS
+     * gdi.bayern.de/services/bodenrichtwerte/<JAHR>/vboris (gemessen
+     * 10.08.2026 ueber die georesources-API des Atlas). Die Werte sind
+     * KREISWEISE freigeschaltet: freigegebene Kreise liefern Zahlen
+     * (Neumarkt i.d.OPf.: 600 EUR/m2, Stichtag 01.01.2026, showbrw=true),
+     * gesperrte liefern "Information gebuehrenpflichtig" im Wertfeld —
+     * num() macht daraus null und die Kaskade endet regulaer bei
+     * "manuell eingeben". Kein AGS im Dienst -> PLZ-Aufloeser greift.
+     * INFO_FORMAT text/xml (GeoServer kennt den GML-Subtype nicht,
+     * v1081-WIF-1); Antwort ist GML mit Namespace bodenrichtwerte:.
+     * BBox-Korrektur: minLon 10.50 -> 8.95, Unterfranken (Aschaffenburg,
+     * Wuerzburg) lag ausserhalb und fiel faelschlich an den Catch-all.
+     * Freigabe der zustaendigen Stelle liegt vor (Aktennotiz Junker
+     * Solution; Az. bei M. Junker — bei Vorlage wortgleich nachtragen). */
+    code: 'by', name: 'BORIS-Bayern',
+    license: 'Freigabe (Aktennotiz Junker Solution)',
+    enabled: true, verified: true,
+    quellenvermerk: 'Gutachterausschüsse in Bayern, BayernAtlas / GDI Bayern '
+      + '(www.bodenrichtwerte.bayern.de)',
+    base: 'https://gdi.bayern.de/services/bodenrichtwerte',
+    baseFn: (y) => 'https://gdi.bayern.de/services/bodenrichtwerte/'
+      + (y || CURRENT_BRW_YEAR) + '/vboris',
+    bbox: { minLon: 8.95, maxLon: 13.90, minLat: 47.20, maxLat: 50.60 },
+    layer: (y) => 'bodenrichtwerte_' + (y || CURRENT_BRW_YEAR),
+    crs: 'EPSG:4326', axis: 'latlon', format: 'gml', infoFormat: 'text/xml',
+    featureCount: '5', headers: browserHeaders, time: null,
+  },
+  {
+    /* v1082-WBW-1 · BW LIVE: BORIS-BW-Viewer nutzt gis.nrw.de als
+     * Plattform — MapServer boris_bw_bodenrichtwerte_current, gleiche
+     * Machart wie der BORIS-D-Catch-all (protocol arcgis, borisdHeaders
+     * gegen die 403-Kennungspruefung). Gemessen 10.08.2026, Stuttgart:
+     * BRW 3000 EUR/m2, Zone WNUM 14604015, NUTA MI, GESL 081110001460.
+     * Felder = VBORIS-Kurzformat, vom F-Mapping abgedeckt. Einzelabruf im
+     * Objektbezug laut BORIS-BW-Nutzungsbedingungen zulaessig; Freigabe
+     * der zustaendigen Stelle liegt vor (Aktennotiz Junker Solution;
+     * Az. bei M. Junker — bei Vorlage wortgleich nachtragen). Open-Data-
+     * Download (GPKG/GML) ist laut Portal im Aufbau — sobald live, kann
+     * die Ernte auf Datensaetze umstellen. */
+    code: 'bw', name: 'BORIS-Baden-Wuerttemberg',
+    license: 'Freigabe (Aktennotiz Junker Solution)',
+    enabled: true, verified: true, protocol: 'arcgis',
+    quellenvermerk: 'Gutachterausschüsse in Baden-Württemberg, BORIS-BW '
+      + '(www.gutachterausschuesse-bw.de)',
+    base: process.env.BORISBW_BASE
+      || 'https://www.gis.nrw.de/arcgis/rest/services/immobilien/boris_bw_bodenrichtwerte_current/MapServer',
+    /* v1082-WBWR-1 · Der BW-MapServer prueft den Referer auf die
+     * BW-Portal-Domain (curl-Dreifachtest 10.08.2026: boris-Referer 403,
+     * bw-Referer 200, ohne 403). */
+    headers: () => Object.assign(browserHeaders(), { 'Referer': 'https://www.gutachterausschuesse-bw.de/' }),
+    arcgisLayers: 'all',
+    bbox: { minLon: 7.50, maxLon: 10.50, minLat: 47.50, maxLat: 49.80 },
+    layer: () => 'all', crs: 'EPSG:25832', axis: 'latlon', proj: 'utm32',
+    format: 'json', yearIndependent: true, time: null,
+  },
+  {
+    /* v1080-WSL-1 · Saarland LIVE: MapServer des Geoportals, je Stichtag
+     * eine eigene Map-Datei (boris<JAHR>.map; zweijaehrlich 2026/2024/2022 —
+     * die Jahres-Kaskade v1080-WJR-1 probiert die Zwischenjahre ergebnislos
+     * und faellt selbst weiter). WMS 1.1.1 mit SRS/X/Y und STYLES
+     * (v1080-WURL-1); GML liefert nur Geometrie, die Sachdaten stehen im
+     * text/html-Template (v1080-WHTM-1/3). Vermessen 08.08.2026:
+     * Saarbruecken 520 EUR/m2, Zone 1014294, Stichtag 01.01.2026.
+     * Freigabe der zustaendigen Stelle liegt vor (Aktennotiz Junker
+     * Solution; Az. bei M. Junker — bei Vorlage hier wortgleich nachtragen). */
+    code: 'sl', name: 'BORIS-Saarland', license: 'Freigabe (Aktennotiz Junker Solution)',
+    enabled: true, verified: true,
+    quellenvermerk: 'Gutachterausschuss für Grundstückswerte im Saarland, '
+      + 'Geoportal Saarland (geoportal.saarland.de)',
+    base: 'https://geoportal.saarland.de/gdi-sl/mapserv',
+    baseFn: (y) => 'https://geoportal.saarland.de/gdi-sl/mapserv?map=/mapfiles/gdisl/BORIS/boris'
+      + (y || CURRENT_BRW_YEAR) + '.map',
+    bbox: { minLon: 6.30, maxLon: 7.50, minLat: 49.10, maxLat: 49.70 },
+    layer: (y) => 'BORISSL' + (y || CURRENT_BRW_YEAR),
+    wmsVersion: '1.1.1', crs: 'EPSG:4326', axis: 'lonlat', format: 'html',
+    /* v1080-WSLH-1 · Der Geoportal-MapServer laesst Anfragen ohne
+     * Browser-Kennung haengen (Echtlauf 10.08.2026: Timeout; alle
+     * Messlaeufe trugen eine Kennung und antworteten). Dazu ein
+     * groesseres Zeitfenster — das CGI parst je Anfrage die Map-Datei. */
+    headers: browserHeaders, timeoutMs: 25000,
+    featureCount: '5', time: null,
+  },
   {
     // BUNDESWEITER Catch-all: BORIS-D deckt alle Laender AUSSER BY/BW/SL/SH/MV ab
     // (Berlin, Brandenburg, Bremen, Hamburg, Hessen, Niedersachsen, NRW, RLP, Sachsen,
@@ -152,6 +275,38 @@ const ADAPTERS = [
     arcgisLayers: process.env.BORISD_LAYERS || 'all',
     bbox: { minLon: 5.80, maxLon: 15.10, minLat: 47.20, maxLat: 55.10 },
     layer: () => 'all', crs: 'EPSG:25832', axis: 'latlon', proj: 'utm32', format: 'json', time: null,
+  },
+  {
+    /* v1077-WWMS-1 · ZWEITER Catch-all: der offizielle BORIS-D-WMS
+     * (News auf bodenrichtwerte-boris.de vom 22.07.2026), vermessen am
+     * 03.08.2026. Er greift NUR als Rueckfall hinter dem ArcGIS-Dienst
+     * (borisd steht davor im Array) bzw. hinter unverifizierten
+     * Landesadaptern — siehe v1077-WFBK-1 in landValue().
+     * Gemessen: EPSG:4326 liefert LEER -> nativ EPSG:25832 abfragen.
+     * INFO_FORMAT application/geo+json. Eine Adresse kann in JEDEM
+     * brw_*-Layer liegen (Hannover lag in der gemischten Bauweise, nicht
+     * in der Wohnbauflaeche) -> Layer-Gruppen kommagetrennt in EINEM
+     * Request, FEATURE_COUNT 5 (v1077-WWMS-2 in buildUrl). Feldnamen nach
+     * BRM 3.0.1: "Bodenrichtwert", "Gemeindeschlüssel" (mit Umlaut — der
+     * AGS-Leser im Orchestrator, v1047-WAGS-1, trifft genau diese
+     * Schreibweise), "bodenrichtwertzoneName", "BodenrichtwertNummer".
+     * BY/BW/SL/SH sind NICHT im Dienst enthalten — die restriktiven
+     * Marker davor gewinnen ohnehin. */
+    code: 'borisd_wms', name: 'BORIS-D WMS (bundesweit)',
+    license: 'dl-de/by-2-0 (laenderspezifisch)',
+    quellenvermerk: '© Daten der Gutachterausschüsse für Grundstückswerte '
+      + CURRENT_BRW_YEAR + ', dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0) '
+      + 'https://www.bodenrichtwerte-boris.de',
+    enabled: true, verified: true, catchAll: true,
+    base: process.env.BORISD_WMS_BASE || 'https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte',
+    bbox: { minLon: 5.80, maxLon: 15.10, minLat: 47.20, maxLat: 55.10 },
+    layers: () => [
+      'brw_wohnbauflaeche,brw_gemischte_bauweise,brw_gewerbliche_bauweise,'
+        + 'brw_sonderbauflaeche,brw_sonstige_flaechen',
+      'brw_landwirtschaftliche_flaeche,brw_forstwirtschaftliche_flaeche',
+    ],
+    crs: 'EPSG:25832', proj: 'utm32', format: 'geojson',
+    featureCount: '5', headers: borisdHeaders, yearIndependent: true, time: null,
   },
 ];
 
@@ -187,15 +342,30 @@ function buildUrl(a, lat, lon, year, layerName) {
       : `${lat - d},${lon - d},${lat + d},${lon + d}`;
   }
   const layer = layerName || (a.layers ? a.layers(year)[0] : a.layer(year));
-  const fmt = a.format === 'geojson' ? 'application/geo+json' : 'text/xml;subtype=gml/3.2.1';
-  const p = new URLSearchParams({
+  const fmt = a.infoFormat /* v1081-WIF-1 · GeoServer BY kennt den GML-Subtype nicht */
+    || (a.format === 'geojson' ? 'application/geo+json'
+    : a.format === 'html' ? 'text/html'   /* v1080-WHTM-2 · MapServer-Template */
+    : 'text/xml;subtype=gml/3.2.1');
+  /* v1080-WURL-1 · WMS 1.1.1 neben 1.3.0: SRS statt CRS, X/Y statt I/J,
+   * STYLES pflicht (so vermessen am Saarland-MapServer, 08.08.2026).
+   * FEATURE_COUNT aus dem Adapter (v1077-WWMS-2). Die Basis darf
+   * jahresabhaengig sein (baseFn -> boris<JAHR>.map) und bereits einen
+   * Query-String tragen. */
+  const ver = a.wmsVersion || '1.3.0';
+  const p = new URLSearchParams(ver === '1.1.1' ? {
+    SERVICE: 'WMS', VERSION: '1.1.1', REQUEST: 'GetFeatureInfo',
+    LAYERS: layer, QUERY_LAYERS: layer, STYLES: '', SRS: a.crs, BBOX: bbox,
+    WIDTH: '101', HEIGHT: '101', X: '50', Y: '50',
+    INFO_FORMAT: fmt, FEATURE_COUNT: a.featureCount || '1',
+  } : {
     SERVICE: 'WMS', VERSION: '1.3.0', REQUEST: 'GetFeatureInfo',
     LAYERS: layer, QUERY_LAYERS: layer, CRS: a.crs, BBOX: bbox,
     WIDTH: '101', HEIGHT: '101', I: '50', J: '50',
-    INFO_FORMAT: fmt, FEATURE_COUNT: '1',
+    INFO_FORMAT: fmt, FEATURE_COUNT: a.featureCount || '1',
   });
   if (a.time) p.set('TIME', a.time(year));
-  return `${a.base}?${p.toString()}`;
+  const base = a.baseFn ? a.baseFn(year) : a.base;
+  return base + (base.includes('?') ? '&' : '?') + p.toString();
 }
 
 /* WBORISD-1 · ArcGIS-Identify statt WMS-GetFeatureInfo.
@@ -217,6 +387,18 @@ function buildArcgisUrl(a, lat, lon) {
     f: 'json',
   });
   return `${a.base}/identify?${p.toString()}`;
+}
+
+/* v1080-WSLH-2 · Browser-Kennung OHNE den BORIS-D-Referer — fuer Dienste
+ * ausserhalb des BORIS-D-Portals (Saarland-Geoportal laesst kennungslose
+ * Anfragen haengen, Echtlauf 10.08.2026). Kennung wie ueberall ueber
+ * BORISD_USER_AGENT uebersteuerbar. */
+function browserHeaders() {
+  return {
+    'User-Agent': process.env.BORISD_USER_AGENT
+      || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+    'Accept': '*/*',
+  };
 }
 
 /* Kennung. Der Dienst weist Anfragen ohne Browser-Kennung mit 403 ab; eine
@@ -320,6 +502,10 @@ export const BorisRegistry = {
     if (spec) return spec;
     return ADAPTERS.find((a) => a.catchAll && inBox(lat, lon, a.bbox)) || null;
   },
+  /* v1077-WFBK-6 · Direktzugriff fuer Diagnose und Pruefstrecke: den
+   * zweiten Catch-all (borisd_wms) erreicht man ueber claim() nie. */
+  adapter(code) { return ADAPTERS.find((a) => a.code === code) || null; },
+
   // Nur die aktiven (fuer GetFeatureInfo nutzbaren) Adapter.
   pick(lat, lon) {
     const a = this.claim(lat, lon);
@@ -352,11 +538,76 @@ export const BorisRegistry = {
       fb.claimed_land = claimed.name;
       return fb;
     }
-    const a = claimed;
+    /* v1077-WFBK-1 · Adapterkette statt Einzeladapter. Ein UNVERIFIZIERTER
+     * Landesadapter (be/he/mv) darf bei kein_wert/request_failed auf die
+     * bundesweiten Catch-alls zurueckfallen (erst der ArcGIS-Dienst, dann
+     * der offizielle BORIS-D-WMS). VERIFIZIERTE Landesadapter (nrw, bb)
+     * fallen NICHT zurueck — ihr Landesdienst ist amtlich belegt; ein
+     * leeres Ergebnis dort ist ein Befund, kein Anlass fuer einen anderen
+     * Dienst. Restriktive Laender (BY/BW/SL/SH) erreichen diese Stelle nie
+     * (return weiter oben). Ist der zustaendige Adapter selbst ein
+     * Catch-all (z. B. Hannover -> ArcGIS), haengt der zweite Catch-all
+     * ebenfalls in der Kette. */
+    const chain = [claimed];
+    if (claimed.catchAll || !claimed.verified) {
+      for (const c of ADAPTERS) {
+        /* v1081-WFBK-7 · nicht nur Catch-alls: auch andere aktive
+         * Landesdienste mit passender Box (BBox-Ueberlapp an Grenzen —
+         * Wuerzburg liegt im Hessen-Rechteck, gehoert aber zu Bayern). */
+        if (c !== claimed && c.enabled && !c.restricted && inBox(lat, lon, c.bbox)) chain.push(c);
+      }
+    } else if (!claimed.catchAll) {
+      /* v1082-WFBK-8 · GRENZKORREKTUR unter verifizierten Landesdiensten:
+       * die Rechteck-Boxen koennen schraege Landesgrenzen nicht abbilden
+       * (Stuttgart liegt im erweiterten Bayern-Rechteck). Liefert der
+       * verifizierte Erstadapter nichts, duerfen ANDERE verifizierte
+       * LANDESdienste mit passender Box antworten — NIE die
+       * Bundes-Catch-alls: ein leeres NRW bleibt ein Befund. */
+      for (const c of ADAPTERS) {
+        if (c !== claimed && !c.catchAll && c.enabled && c.verified && inBox(lat, lon, c.bbox)) chain.push(c);
+      }
+    }
 
+    let hit = null, first = null;
+    for (const a of chain) {
+      const r = await this._queryAdapter(a, lat, lon, year);
+      if (first == null) first = r;
+      if (r.value != null) { hit = { a, r }; break; }
+    }
+
+    if (!hit) {
+      const r0 = first || {};
+      const fb = fallback(r0.lastErr ? 'request_failed:' + r0.lastErr : 'kein_wert_am_punkt');
+      fb.tried_source = chain.map((c) => c.name).join(' -> ');   /* v1077-WFBK-3 */
+      fb.tried_layers = r0.layers || null;
+      fb.tried_years = r0.years || null;
+      fb.properties_raw = r0.raw != null ? r0.raw : null; // damit das Mapping bei Bedarf justiert werden kann
+      return fb;
+    }
+
+    const out = {
+      available: true, source: hit.a.name, license: hit.a.license, verified: hit.a.verified,
+      quellenvermerk: hit.a.quellenvermerk || null,   /* v1071-WLIZ-2 */
+      value_sqm: hit.r.value, stichtag: hit.r.stichtag, nutzung: hit.r.nutzung, zone: hit.r.zone,
+      used_layer: hit.r.usedLayer, used_year: hit.r.usedYear, properties_raw: hit.r.raw,
+    };
+    if (hit.a !== chain[0]) {
+      /* v1077-WFBK-4 · Der Wert kam aus dem Rueckfall, nicht vom eigentlich
+       * zustaendigen (unverifizierten) Landesdienst — das gehoert in den
+       * Bericht, jede Zahl traegt ihre Herkunft. */
+      out.fallback_von = chain[0].name;
+      out.note = 'Landesdienst ' + chain[0].name + ' lieferte keinen Wert — Rueckfall auf ' + hit.a.name + '.';
+    }
+    return out;
+  },
+
+  /* v1077-WFBK-2 · Layer- + Jahr-Kaskade fuer EINEN Adapter — herausgeloest
+   * aus landValue, damit Adapterkette und verifyAll denselben Kern nutzen.
+   * Semantik unveraendert uebernommen (v1071-WBRW-1, WBORISD-3, WBORISD-4). */
+  async _queryAdapter(a, lat, lon, year) {
     // Layer- + Jahr-Kaskade: BRW zum aktuellen Stichtag sind oft noch nicht veroeffentlicht,
     // daher die letzten Jahre durchprobieren (neuestes zuerst). Ersten Treffer nehmen.
-    const layers = a.layers ? a.layers(year) : [a.layer(year)];
+    const layersInfo = a.layers ? a.layers(year) : [a.layer(year)]; // fuer die Diagnose-Rueckgabe
     const nowY = new Date().getFullYear();
     /* v1071-WBRW-1 · Der AKTUELLE Jahrgang stand an letzter Stelle — damit
      * gewann immer der vorjaehrige. Gemessen im August 2026: Bodenrichtwert
@@ -370,11 +621,22 @@ export const BorisRegistry = {
      * Maerz). Die braucht es nicht — die Kaskade probiert der Reihe nach und
      * nimmt den ersten Treffer. Ist 2026 noch nicht da, faellt sie von
      * selbst auf 2025. */
-    const yearCandidates = year ? [year] : [nowY, nowY - 1, nowY - 2, nowY - 3];
+    /* v1077-WWMS-4 · Adapter ohne Jahresbezug (kein TIME-Parameter, keine
+     * jahresabhaengigen Layer) stellen fuer jedes Kandidatenjahr dieselbe
+     * Anfrage — ein Durchlauf genuegt. Schont den Behoerdenserver
+     * (ein Abruf je Sekunde gilt unveraendert). */
+    const yearCandidates = year ? [year]
+      : (a.yearIndependent ? [nowY] : [nowY, nowY - 1, nowY - 2, nowY - 3]);
     let value = null, stichtag = null, nutzung = null, zone = null, raw = null, usedLayer = null, usedYear = null, lastErr = null;
     outer:
     for (const yr of yearCandidates) {
-      for (const ln of layers) {
+      /* v1080-WJR-1 · Layer je KANDIDATENJAHR aufloesen — erst damit greift
+       * die Jahres-Kaskade auch bei jahresabhaengigen Layern
+       * (bb: bbv_pg_zobau_<JAHR>, sl: BORISSL<JAHR>). Bisher wurde der
+       * Layer einmal vor der Schleife bestimmt und blieb beim aktuellen
+       * Jahrgang haengen. */
+      const lys = a.layers ? a.layers(yr) : [a.layer(yr)];
+      for (const ln of lys) {
         let text;
         try {
           /* WBORISD-3 · ArcGIS-Zweig. Ein Abruf je Sekunde als Obergrenze —
@@ -382,10 +644,18 @@ export const BorisRegistry = {
            * entfaellt hier, der Dienst liefert den aktuellen Jahrgang. */
           if (a.protocol === 'arcgis') {
             const res = await httpText(buildArcgisUrl(a, lat, lon),
-              { timeoutMs: 20000, retries: 1, headers: borisdHeaders() });
+              /* v1082-WBWR-2 · Adapter-Header gewinnen (BW: BW-Referer);
+               * ohne eigene Header wie bisher borisdHeaders. */
+              { timeoutMs: 20000, retries: 1, headers: a.headers ? a.headers() : borisdHeaders() });
             text = res.text;
           } else {
-            const res = await httpText(buildUrl(a, lat, lon, yr, ln), { timeoutMs: 15000, retries: 1 });
+            /* v1077-WWMS-3 · Adapter koennen eigene Header mitgeben. Der
+             * BORIS-D-WMS laeuft auf derselben Infrastruktur, die Anfragen
+             * ohne Browser-Kennung mit 403 abweist (Aktennotiz Marcel,
+             * BORISD_USER_AGENT). */
+            const res = await httpText(buildUrl(a, lat, lon, yr, ln),
+              { timeoutMs: a.timeoutMs || 15000, /* v1080-WSLH-3 */
+                retries: 1, headers: a.headers ? a.headers() : undefined });
             text = res.text;
           }
         } catch (e) { lastErr = e.message; continue; }
@@ -400,34 +670,31 @@ export const BorisRegistry = {
             nu = propCI(props, F.nutzung);
             zo = propCI(props, F.zone);
           } else rw = (text || '').slice(0, 600);
+        } else if (a.format === 'html') {
+          /* v1080-WHTM-3 · MapServer-Template: Sachdaten stehen NUR im
+           * text/html (GML liefert dort blosse Geometrie, gemessen SL). */
+          const props = parseHtmlProps(text);
+          if (props) { rw = props; v = num(propCI(props, F.value)); st = propCI(props, F.stichtag); nu = propCI(props, F.nutzung); zo = propCI(props, F.zone); }
+          else rw = (text || '').slice(0, 1200);
         } else if (a.format === 'geojson') {
           const props = parseGeoJson(text);
           if (props) { rw = props; v = num(propCI(props, F.value)); st = propCI(props, F.stichtag); nu = propCI(props, F.nutzung); zo = propCI(props, F.zone); }
           else rw = (text || '').slice(0, 1200); // kein Feature -> Rohtext fuer Diagnose behalten
         } else {
           rw = text.slice(0, 1200);
-          v = num(parseGmlField(text, F.value)); st = parseGmlField(text, F.stichtag);
+          const vRoh = parseGmlField(text, F.value);
+          /* v1081-WBY-2 · Sperrtexte ("Information gebuehrenpflichtig",
+           * auch als &#252;-Entitaet mit Ziffern) sind KEIN Wert. */
+          v = (vRoh && /geb(ührenpflichtig|uehrenpflichtig|&#252;hrenpflichtig)/i.test(String(vRoh)))
+            ? null : num(vRoh);
+          st = parseGmlField(text, F.stichtag);
           nu = parseGmlField(text, F.nutzung); zo = parseGmlField(text, F.zone);
         }
         if (v != null) { value = v; stichtag = st; nutzung = nu; zone = zo; raw = rw; usedLayer = ln; usedYear = yr; break outer; }
         if (rw && raw == null) raw = rw; // letzten Roh-Response fuer Diagnose behalten
       }
     }
-
-    if (value == null) {
-      const fb = fallback(lastErr ? 'request_failed:' + lastErr : 'kein_wert_am_punkt');
-      fb.tried_source = a.name;
-      fb.tried_layers = layers;
-      fb.tried_years = yearCandidates;
-      fb.properties_raw = raw; // damit das Mapping bei Bedarf justiert werden kann
-      return fb;
-    }
-
-    return {
-      available: true, source: a.name, license: a.license, verified: a.verified,
-      quellenvermerk: a.quellenvermerk || null,   /* v1071-WLIZ-2 */
-      value_sqm: value, stichtag, nutzung, zone, used_layer: usedLayer, used_year: usedYear, properties_raw: raw,
-    };
+    return { value, stichtag, nutzung, zone, raw, usedLayer, usedYear, lastErr, layers: layersInfo, years: yearCandidates };
   },
 
   // Ein-Klick-Verifikation: testet jedes hinterlegte Land mit Dienst an einem Beispielpunkt
@@ -440,11 +707,21 @@ export const BorisRegistry = {
       const lat = +(((a.bbox.minLat + a.bbox.maxLat) / 2).toFixed(5));
       const lon = +(((a.bbox.minLon + a.bbox.maxLon) / 2).toFixed(5));
       try {
-        const r = await this.landValue({ lat, lon });
+        /* v1077-WFBK-5 · Catch-alls direkt abfragen, sonst testet die
+         * BBox-Mitte immer nur den ERSTEN Catch-all der Kette. */
+        let r;
+        if (a.catchAll) {
+          const q = await this._queryAdapter(a, lat, lon);
+          r = { available: q.value != null, value_sqm: q.value, source: a.name,
+                used_layer: q.usedLayer, used_year: q.usedYear,
+                reason: q.value == null ? (q.lastErr ? 'request_failed:' + q.lastErr : 'kein_wert_am_punkt') : null };
+        } else {
+          r = await this.landValue({ lat, lon });
+        }
         out.push({ code: a.code, name: a.name, enabled: a.enabled, testpunkt: { lat, lon },
           liefert_wert: r.available && r.value_sqm != null, value_sqm: r.value_sqm ?? null,
           source: r.source, used_layer: r.used_layer || null, used_year: r.used_year || null,
-          reason: r.reason || null });
+          reason: r.reason || null, fallback_von: r.fallback_von || null });
       } catch (e) { out.push({ code: a.code, name: a.name, error: e.message }); }
     }
     return out;

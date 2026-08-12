@@ -17,8 +17,18 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     + 'für private Grünflächen 5 €/m² aus (Spanne 1 bis 12); in Gutachten sind '
     + 'auch 20 Prozent des Bodenrichtwerts üblich. Ohne Angabe wird nicht '
     + 'geschätzt — der Wert hängt von Zuschnitt, Zuwegung und Nutzbarkeit ab.',
-  garagenBgf: 'Länge × Breite aller Garagen zusammen, nicht die Zahl der '
-    + 'Stellplätze. Die NHK 2010 führen für Garagen eigene Kostenkennwerte '
+  /* v1142-GARMEA · Der Text sagte "aller Garagen zusammen" — bei einer
+   * Eigentumswohnung genau die falsche Lesart. Der Wert geht ungekuerzt in
+   * den Sachwert ein: lib/nhk2010.js kennt weder mea noch ist_wohnung.
+   * Beim Bodenwert wird der Miteigentumsanteil abgezogen, hier NICHT, und
+   * dieser Unterschied stand nirgends. Am Pruefobjekt Huellhorst standen
+   * 64,58 m2 fuer eine von drei Einheiten — bis zu 18.500 EUR zu viel. */
+  garagenBgf: 'Länge × Breite der Garagen, die zu <b>dieser</b> Bewertung '
+    + 'gehören — nicht die Zahl der Stellplätze. Bei einer Eigentumswohnung '
+    + 'also nur die eigene Garage oder der eigene Anteil; wird das ganze '
+    + 'Gebäude bewertet, kommen alle hinein. <b>Der Miteigentumsanteil wird '
+    + 'hier nicht automatisch abgezogen</b> — anders als beim Bodenwert. '
+    + 'Die NHK 2010 führen für Garagen eigene Kostenkennwerte '
     + '(Gebäudeart 14.1) und eine eigene Gesamtnutzungsdauer von 60 Jahren — eine '
     + 'Garage hält nicht so lange wie das Wohnhaus. Ohne Fläche wird sie nicht '
     + 'angesetzt.',

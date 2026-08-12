@@ -865,7 +865,22 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   /* Marktanpassung. Ohne Sachwertfaktor bleibt es beim vorlaeufigen Sachwert —
    * der ist ein definierter Zwischenwert, aber KEIN Marktwert. In schwachen
    * Maerkten liegt der Faktor deutlich unter 1, in starken darueber. */
-  const swf = param && Number(param.sachwertfaktor);
+  /* v1144-SWFELD · FALSCHER FELDNAME, seit jeher.
+   * Geliefert wird hier das Ergebnis von WertParameterService.sachwertfaktor()
+   * bzw. hole() — beide geben `{ wert, stufe, quelle, … }` zurück. Ein Feld
+   * `sachwertfaktor` gibt es in keinem der beiden Rückgabewege. Number(undefined)
+   * ist NaN, `!swf` damit immer wahr: **der Sachwertfaktor wurde nie angewandt**,
+   * weder als eigene Angabe (Stufe E) noch als amtlicher Wert.
+   *
+   * Am 2026-08-12 an Hermannstraße 9 gemessen: 1,15 stand im Objekt, kam als
+   * `sachwertfaktor: 1.15` im Payload an — und blieb wirkungslos. Bei der ETW
+   * fiel es nicht auf, weil für Wohnungen ohnehin kein Faktor angesetzt werden
+   * darf; bei jedem Haus rechnet es still den vorläufigen Sachwert aus.
+   *
+   * `param.stufe` und `param.quelle` unten stimmen — nur der Wert war falsch
+   * adressiert. Der alte Name bleibt als Rückfall stehen, falls ein Aufrufer
+   * ihn doch setzt. */
+  const swf = param && Number(param.wert != null ? param.wert : param.sachwertfaktor);
   if (!swf) {
     out.wert = vorlaeufig;
     out.marktangepasst = false;
