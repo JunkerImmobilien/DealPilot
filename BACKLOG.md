@@ -37,182 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
-   Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
-   `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
-   das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
-   Kenntnis davon, dass nur ein Anteil bewertet wird.
-
-   **Teilweise ist das unschädlich, und zwar genau geprüft:**
-   - Der **Gebäudeteil** ist über die BGF der Wohnung bemessen (195 m² bei
-     100 m² Wohnfläche), also implizit anteilig.
-   - Die **Außenanlagen** entstehen als Prozentsatz des Gebäudewerts
-     (`nhk2010.js:797`) und skalieren damit automatisch mit.
-   - Der **Bodenwert** kommt MEA-gekürzt aus dem Ertragswert-Kern.
-
-   **Offen bleibt die Garage:** `garagen_bgf_qm` ist ein **roher
-   Eingabewert**, der ungekürzt durchläuft. Am Prüfobjekt stehen dort
-   **64,58 m² × 485 €/m² × 2,02 = 37.118 €** — für eine einzelne Wohnung
-   in einem Haus mit drei Einheiten viel. Ist der Wert für das gesamte
-   Grundstück gepflegt, ist der Sachwert um bis zu ~18.500 € zu hoch.
-
-   **Das ist eine Eingabefrage, kein Rechenfehler** — der Kostenhinweis
-   sagt wörtlich „Der Bericht rechnet mit dem, was hier steht."
-
-   **BLOCKIERT:** Ob das Feld wohnungs- oder gebäudebezogen gemeint ist,
-   entscheidet Marcel fachlich — davon hängt ab, ob dort eine MEA-Kürzung
-   hingehört oder nur eine deutlichere Feldhilfe (die seit `v1142` steht
-   und den fehlenden Abzug bereits benennt).
-
-2. **Neun Info-Zeichen in der Wertermittlung tun nichts.** Beim Setzen des
-   Garagen-Hinweises (`v1142`) aufgefallen und dann durchgezählt:
-   `wertermittlung.js` vergibt **18** Hilfe-Schlüssel, `TEXTE` in
-   `feldhilfe.js` führt **11** (mit dem neuen). `textFuer()` kennt keinen
-   Rückfall — fehlt der Schlüssel, gibt sie `null` zurück und der Klick
-   verpufft **still**. Das ⓘ steht trotzdem am Feld und verspricht eine
-   Erklärung.
-
-   Ohne Text sind:
-   `aussenPct`, `ausstGewerk`, `bauteilHk`, `garagenStufe`, `grundriss`,
-   `hinterland`, `hinterlandRent`, `modGrad`, `standardstufe`.
-
-   Das sind ausgerechnet die **erklärungsbedürftigsten** Felder der
-   Wertermittlung — Standardstufe, Modernisierungsgrad und
-   Hinterland-Rentierlichkeit entscheiden erheblich mit, und
-   `hinterlandRent` steuert direkt die Bodenwertverzinsung nach § 41.
-
-   **BEHOBEN in `v1146` (`d868fbb`) und `v1146b` (`cbe57cf`).**
-
-   **Sechs der neun Texte gab es längst** — im `HILFE`-Block von
-   `wertermittlung.js`, wo sie nie jemand zu sehen bekam. Sie sind nach
-   `feldhilfe.js` überführt und in `kurz`/`lang` geteilt. Drei sind neu
-   geschrieben: **Standardstufe**, **Modernisierungsgrad**, **Grundriss** —
-   jeweils mit Rechtsgrundlage und der Angabe, was eine Stufe Unterschied
-   im Ergebnis ausmacht.
-
-   **`textFuer()` meldet einen fehlenden Schlüssel jetzt per
-   `console.warn`** statt still `null` zurückzugeben.
-
-   **`v1146b` — der Fix war eine Ebene zu hoch angesetzt.** Nach `v1146`
-   blieben drei Zeichen weiter wirkungslos, **ohne dass die neue Warnung
-   ansprang**: `hinterland`, `ausstGewerk` und `bauteilHk` sind
-   **Sammelschlüssel für Feldgruppen** — das ⓘ hängt dort 9× bzw. 5× an
-   verschiedenen Feldern (`ausstAussenwaende`, `btlGauben`, …). `box()`
-   suchte ein Element mit der **Id des Schlüssels** als Anker, fand keins
-   und baute still gar keinen Kasten. Der Text war da, die Warnung schwieg
-   zu Recht — und trotzdem passierte beim Klick nichts. Jetzt Rückfall auf
-   das angeklickte Zeichen selbst.
-
-   **Abgenommen auf Staging:** alle **13** bei Stufe 3 sichtbaren Zeichen
-   öffnen einen Kasten mit Text (400–424 Zeichen bei den drei
-   Gruppen-Schlüsseln), **keine Warnung**, kein leerer Kasten. Gegen die
-   Quelle gezählt: **18 Schlüssel, 19 Texte — keiner mehr ohne.**
-
-   **Eigener Messfehler, vermerkt:** Ein erster Prüflauf meldete vier
-   Felder ohne Kasten. Falsch — der Kasten ist ein **Umschalter**, und die
-   vier waren aus einem abgebrochenen Lauf noch offen; mein Klick hat sie
-   geschlossen. Zustand aus dem vorigen Prüflauf, genau die Falle aus
-   `FALLEN.md`. Vor der Messung `.fh-box` abräumen.
-
-3. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
-   Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
-   in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
-   `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
-   sauber, weil der Ton dort nachgezogen wird.
-
-   **Die Ursache ist bekannt und benannt:** `tonAufHell` aus v1097 rechnet
-   gegen **Weiß**, vier Vorlagen haben aber keinen weißen Grund — v1097
-   hat das für boarding selbst so vermerkt („kein Rückschritt"). Der
-   saubere Weg wäre, die Schwelle gegen den **tatsächlichen** Grund der
-   Vorlage zu rechnen statt gegen Weiß. Das betrifft `--gold-d` an 19
-   Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
-   kein Nachschlag.
-
-   **Vorbefund 2026-08-10 — die Annahme des Punktes stimmt so nicht.**
-   Angefangen zu messen, dann bewusst abgebrochen und übergeben, weil der
-   erste Wert der Beschreibung widerspricht. Gemessen ohne Vorlage,
-   Partner-Konto, über den Kaskaden-Walker:
-
-   - Gewinner für `#hdr-obj-num` ist
-     `header.hdr.has-v64-score #hdr-obj-num{color:var(--gold-2,#E8C964)!important}`
-     — also **`--gold-2`, nicht `--gold-d`.** Die 19 `--gold-d`-Stellen
-     mögen ihr eigenes Problem haben, aber **dieses** Element hängt nicht
-     daran. Vor dem Bauen also erst prüfen, welcher Ton in **kanzlei** und
-     **boarding** tatsächlich gewinnt.
-   - **`--gold-d` wird im Gold-Zweig gar nicht gesetzt** (`config.js`
-     ~Z. 1072–1074): dort stehen `--gold`, `-hi`, `-lo`, `-l`, `-2`, `-3`
-     und `-bg`, aber kein `-d`. Nur der Whitelabel-Zweig (Z. 1085) setzt
-     es über `tonAufHell()`. Das erklärt, warum der Befund gerade mit
-     **Standard-Gold** auftrat und mit Partner-Rot sauber war — nicht
-     „weil der Ton dort nachgezogen wird", sondern weil er dort überhaupt
-     erst gesetzt wird.
-   - **`tonFuerGrund(farbe, grund, min)` gibt es seit v1113 bereits** und
-     rechnet gegen einen beliebigen Grund. Der Baustein für die Lösung ist
-     also da; es fehlt die Zuordnung „welche Vorlage hat welchen Grund".
-
-   **Eigener Messfehler, gleich mit vermerkt:** Mein Grund-Leser lief die
-   Vorfahren hoch und nahm die erste `background-color` ≠ transparent. Die
-   Kopfleiste trägt aber einen **Verlauf** (`background-image`), keine
-   Farbe — der Leser übersprang sie und meldete Weiß. **Ein Grund-Leser,
-   der `background-image` nicht auswertet, taugt für diesen Punkt nicht.**
-
-   ---
-
-   ### Messlauf 2026-08-10, alle sechs Fassungen — **BLOCKIERT auf ein Konto ohne Whitelabel**
-
-   Über den echten Bedienweg gesetzt (Panel-Klicks, danach
-   `getAnimations().forEach(a=>a.finish())`), Objekt geladen, Partner-Konto:
-
-   | Fassung | Text | effektiver Grund | k |
-   |---|---|---|---|
-   | ohne Vorlage | `rgb(205,175,90)` | `rgb(56,50,31)` / `rgb(29,27,23)` | **6,01** |
-   | kontor | `rgb(152,123,34)` | `rgb(53,46,27)` / `rgb(25,24,18)` | **3,33** |
-   | panel | dito | dito | **3,33** |
-   | kanzlei | dito | dito | **3,33** |
-   | boarding | dito | dito | **3,33** |
-   | konsole | `rgb(205,175,90)` | dito | **6,34** |
-
-   **Auf diesem Konto ist der Punkt nicht reproduzierbar** — alle sechs
-   liegen über der Schwelle 3, die die v1113-Läufe benutzt haben.
-
-   **Der Grund ist bekannt und benannt:** seit `v1114` folgt die Kopfleiste
-   dem Obsidian des Partners. **Mit aktivem Whitelabel bleibt sie unter
-   *jeder* Vorlage dunkel** — der cremefarbene Grund, um den es im Punkt
-   geht, entsteht gar nicht erst. Der Befund braucht ein Konto **ohne**
-   Whitelabel. Genau diese Grenze hat der `v1114`-Eintrag selbst schon
-   vermerkt.
-
-   ### Zwei eigene Messfehler, beide zurückgenommen
-
-   Beide betrafen den Grund-Leser, nicht die App. Sie stehen hier, weil sie
-   den nächsten Lauf sonst genauso kosten:
-
-   1. **Ich habe den Elternteil gemessen, nicht das Element.**
-      `.hdr-obj-num` trägt einen **eigenen** `background-image`-Verlauf.
-      Ein Leser, der bei `el.parentElement` anfängt, sieht ihn nie und
-      meldet den Grund der Kopfleiste.
-   2. **Ich habe das Alpha verschluckt.** Der Verlauf lautet
-      `color(srgb 0.788 0.658 0.298 / 0.2)` — ein **20-prozentiger
-      Goldschleier**, keine goldene Fläche. Mein Parser las `color(srgb …)`,
-      filterte Alpha aber nur bei `rgba()`. Ergebnis: gemeldete **k=1,07**,
-      also „Gold auf Gold, unsichtbar" — physikalisch unmöglich, wie ein
-      Blick auf den Bildschirm sofort zeigt.
-
-   **Erst mit Überlagerung** (`a·vorn + (1−a)·hinten`, Schicht für Schicht
-   bis zum ersten deckenden Untergrund) kamen plausible Werte heraus.
-   **Ein Kontrastlauf, der Alpha ignoriert, taugt für dieses Element
-   nicht** — und die Zahlen 2,98 / 2,88 aus dem v1113-Lauf sind mit
-   demselben Vorbehalt zu lesen: ob sie den Schleier mitgerechnet haben,
-   ist offen.
-
-   ### Nächster Schritt
-
-   Ein **Konto ohne Whitelabel** anmelden, dieselben sechs Fassungen mit
-   dem Überlagerungs-Leser messen. Erst wenn dort ein Wert unter 3 steht,
-   ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
-   den *überlagerten* Grund, nicht gegen Weiß.
-
-4. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+1. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -247,7 +72,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-5. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+2. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -281,7 +106,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-6. **Marktbericht neu gestalten.**
+3. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -425,45 +250,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-7. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
-   Beim Ausrollen von `v1136` gemessen: `git status` auf
-   `root@116.203.214.11` meldet
-   `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
-   **319 Zeilen mehr, 42 weniger** als der Repo-Stand. Daneben liegen
-   `registry.js.pre-v1080` und `.pre-v1082a` — die Änderung stammt also
-   aus zwei Paketen, die nie zurückgeflossen sind.
-
-   **Warum das drängt:** `deploy-staging.ps1` bricht deshalb bei **jedem**
-   Ausrollen ab (der Pull lief nur nach Hand-Eingriff durch), und der
-   nächste, der die Datei im Repo anfasst, erzeugt einen Konflikt oder
-   überschreibt Arbeit, die es nur auf dem Server gibt. Eine Sicherung
-   liegt unter `/root/registry.js.bak-2026-08-11`.
-
-   **BEHOBEN am 2026-08-12 — `e35e34b`.** Aufgefallen, weil der Server
-   plötzlich auf Zweig **`main`** stand und ein Backlog-Commit nicht
-   ankam. Ursache war nicht die Drift allein: Marcel hatte die Datei
-   inzwischen **auf dem Server committet** (`1e04538`, 13:09 UTC), womit
-   `staging` dort um je einen Commit von `origin` abwich — jedes
-   `git pull --ff-only` bricht dann ab.
-
-   **Vorgehen:** Serverfassung 1:1 ins Repo geholt und unter Marcels
-   Autorschaft committet, `node --check` gegen eine ESM-Arbeitskopie
-   sauber. Dann auf dem Server gesichert
-   (`/root/registry.js.vor-abgleich`), `git reset --hard origin/staging`,
-   und **per MD5 nachgewiesen, dass die Datei bit-identisch geblieben
-   ist** (`3c7a41d8…` vorher wie nachher). Server steht wieder auf
-   `staging`, Divergenz weg, Deploys laufen.
-
-   **Zwei Dinge bleiben offen:**
-   - **Produktion prüfen:** liegt dieselbe Drift dort auch? SSH ist
-     read-only, ein Vergleich der Datei genügt.
-   - **Wie es dazu kam:** Ein Commit direkt auf dem Server ist der
-     naheliegende Reflex, wenn `deploy-staging.ps1` scheitert — er
-     erzeugt aber genau die Divergenz, die den nächsten Deploy blockiert.
-     Solange das Skript defekt ist (siehe `FALLEN.md`), wird das
-     wiederkommen.
-
-8. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
+4. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
 
    Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
 
@@ -501,7 +288,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-9. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+5. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
 
    Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
    Defekt, keine Geschmacksfrage.
@@ -521,7 +308,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
    dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
 
-10. **Regler „Tab-Texte" wirkt nicht**
+6. **Regler „Tab-Texte" wirkt nicht**
 
    Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
    Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
@@ -538,7 +325,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
    Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
 
-11. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+7. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
    Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
    schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
@@ -561,7 +348,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
    Aufgreifen zusammenlegen, nicht doppelt bauen.
 
-12. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+8. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
 
    **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
    führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
@@ -586,7 +373,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
    Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
 
-13. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+9. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
 
    Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
    Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
@@ -609,7 +396,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
    entschieden ist.
 
-14. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+10. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -646,7 +433,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-15. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+11. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -676,7 +463,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-16. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+12. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -732,7 +519,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-17. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+13. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
@@ -839,6 +626,131 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
+14. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+   Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
+   in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
+   `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
+   sauber, weil der Ton dort nachgezogen wird.
+
+   **Die Ursache ist bekannt und benannt:** `tonAufHell` aus v1097 rechnet
+   gegen **Weiß**, vier Vorlagen haben aber keinen weißen Grund — v1097
+   hat das für boarding selbst so vermerkt („kein Rückschritt"). Der
+   saubere Weg wäre, die Schwelle gegen den **tatsächlichen** Grund der
+   Vorlage zu rechnen statt gegen Weiß. Das betrifft `--gold-d` an 19
+   Stellen und ist deshalb ein eigenes Vorhaben mit eigener Prüfstrecke,
+   kein Nachschlag.
+
+   **Vorbefund 2026-08-10 — die Annahme des Punktes stimmt so nicht.**
+   Angefangen zu messen, dann bewusst abgebrochen und übergeben, weil der
+   erste Wert der Beschreibung widerspricht. Gemessen ohne Vorlage,
+   Partner-Konto, über den Kaskaden-Walker:
+
+   - Gewinner für `#hdr-obj-num` ist
+     `header.hdr.has-v64-score #hdr-obj-num{color:var(--gold-2,#E8C964)!important}`
+     — also **`--gold-2`, nicht `--gold-d`.** Die 19 `--gold-d`-Stellen
+     mögen ihr eigenes Problem haben, aber **dieses** Element hängt nicht
+     daran. Vor dem Bauen also erst prüfen, welcher Ton in **kanzlei** und
+     **boarding** tatsächlich gewinnt.
+   - **`--gold-d` wird im Gold-Zweig gar nicht gesetzt** (`config.js`
+     ~Z. 1072–1074): dort stehen `--gold`, `-hi`, `-lo`, `-l`, `-2`, `-3`
+     und `-bg`, aber kein `-d`. Nur der Whitelabel-Zweig (Z. 1085) setzt
+     es über `tonAufHell()`. Das erklärt, warum der Befund gerade mit
+     **Standard-Gold** auftrat und mit Partner-Rot sauber war — nicht
+     „weil der Ton dort nachgezogen wird", sondern weil er dort überhaupt
+     erst gesetzt wird.
+   - **`tonFuerGrund(farbe, grund, min)` gibt es seit v1113 bereits** und
+     rechnet gegen einen beliebigen Grund. Der Baustein für die Lösung ist
+     also da; es fehlt die Zuordnung „welche Vorlage hat welchen Grund".
+
+   **Eigener Messfehler, gleich mit vermerkt:** Mein Grund-Leser lief die
+   Vorfahren hoch und nahm die erste `background-color` ≠ transparent. Die
+   Kopfleiste trägt aber einen **Verlauf** (`background-image`), keine
+   Farbe — der Leser übersprang sie und meldete Weiß. **Ein Grund-Leser,
+   der `background-image` nicht auswertet, taugt für diesen Punkt nicht.**
+
+   ---
+
+   ### Messlauf 2026-08-10, alle sechs Fassungen — **BLOCKIERT auf ein Konto ohne Whitelabel**
+
+   Über den echten Bedienweg gesetzt (Panel-Klicks, danach
+   `getAnimations().forEach(a=>a.finish())`), Objekt geladen, Partner-Konto:
+
+   | Fassung | Text | effektiver Grund | k |
+   |---|---|---|---|
+   | ohne Vorlage | `rgb(205,175,90)` | `rgb(56,50,31)` / `rgb(29,27,23)` | **6,01** |
+   | kontor | `rgb(152,123,34)` | `rgb(53,46,27)` / `rgb(25,24,18)` | **3,33** |
+   | panel | dito | dito | **3,33** |
+   | kanzlei | dito | dito | **3,33** |
+   | boarding | dito | dito | **3,33** |
+   | konsole | `rgb(205,175,90)` | dito | **6,34** |
+
+   **Auf diesem Konto ist der Punkt nicht reproduzierbar** — alle sechs
+   liegen über der Schwelle 3, die die v1113-Läufe benutzt haben.
+
+   **Der Grund ist bekannt und benannt:** seit `v1114` folgt die Kopfleiste
+   dem Obsidian des Partners. **Mit aktivem Whitelabel bleibt sie unter
+   *jeder* Vorlage dunkel** — der cremefarbene Grund, um den es im Punkt
+   geht, entsteht gar nicht erst. Der Befund braucht ein Konto **ohne**
+   Whitelabel. Genau diese Grenze hat der `v1114`-Eintrag selbst schon
+   vermerkt.
+
+   ### Zwei eigene Messfehler, beide zurückgenommen
+
+   Beide betrafen den Grund-Leser, nicht die App. Sie stehen hier, weil sie
+   den nächsten Lauf sonst genauso kosten:
+
+   1. **Ich habe den Elternteil gemessen, nicht das Element.**
+      `.hdr-obj-num` trägt einen **eigenen** `background-image`-Verlauf.
+      Ein Leser, der bei `el.parentElement` anfängt, sieht ihn nie und
+      meldet den Grund der Kopfleiste.
+   2. **Ich habe das Alpha verschluckt.** Der Verlauf lautet
+      `color(srgb 0.788 0.658 0.298 / 0.2)` — ein **20-prozentiger
+      Goldschleier**, keine goldene Fläche. Mein Parser las `color(srgb …)`,
+      filterte Alpha aber nur bei `rgba()`. Ergebnis: gemeldete **k=1,07**,
+      also „Gold auf Gold, unsichtbar" — physikalisch unmöglich, wie ein
+      Blick auf den Bildschirm sofort zeigt.
+
+   **Erst mit Überlagerung** (`a·vorn + (1−a)·hinten`, Schicht für Schicht
+   bis zum ersten deckenden Untergrund) kamen plausible Werte heraus.
+   **Ein Kontrastlauf, der Alpha ignoriert, taugt für dieses Element
+   nicht** — und die Zahlen 2,98 / 2,88 aus dem v1113-Lauf sind mit
+   demselben Vorbehalt zu lesen: ob sie den Schleier mitgerechnet haben,
+   ist offen.
+
+   ### Nächster Schritt
+
+   Ein **Konto ohne Whitelabel** anmelden, dieselben sechs Fassungen mit
+   dem Überlagerungs-Leser messen. Erst wenn dort ein Wert unter 3 steht,
+   ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
+   den *überlagerten* Grund, nicht gegen Weiß.
+
+15. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+   Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
+   `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
+   das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
+   Kenntnis davon, dass nur ein Anteil bewertet wird.
+
+   **Teilweise ist das unschädlich, und zwar genau geprüft:**
+   - Der **Gebäudeteil** ist über die BGF der Wohnung bemessen (195 m² bei
+     100 m² Wohnfläche), also implizit anteilig.
+   - Die **Außenanlagen** entstehen als Prozentsatz des Gebäudewerts
+     (`nhk2010.js:797`) und skalieren damit automatisch mit.
+   - Der **Bodenwert** kommt MEA-gekürzt aus dem Ertragswert-Kern.
+
+   **Offen bleibt die Garage:** `garagen_bgf_qm` ist ein **roher
+   Eingabewert**, der ungekürzt durchläuft. Am Prüfobjekt stehen dort
+   **64,58 m² × 485 €/m² × 2,02 = 37.118 €** — für eine einzelne Wohnung
+   in einem Haus mit drei Einheiten viel. Ist der Wert für das gesamte
+   Grundstück gepflegt, ist der Sachwert um bis zu ~18.500 € zu hoch.
+
+   **Das ist eine Eingabefrage, kein Rechenfehler** — der Kostenhinweis
+   sagt wörtlich „Der Bericht rechnet mit dem, was hier steht."
+
+   **BLOCKIERT:** Ob das Feld wohnungs- oder gebäudebezogen gemeint ist,
+   entscheidet Marcel fachlich — davon hängt ab, ob dort eine MEA-Kürzung
+   hingehört oder nur eine deutlichere Feldhilfe (die seit `v1142` steht
+   und den fehlenden Abzug bereits benennt).
+
 ## Später
 
 - **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
@@ -873,6 +785,99 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Der Staging-Server trug 319 Zeilen, die im Repo nicht standen** — `e35e34b`.
+   Beim Ausrollen von `v1136` gemessen: `git status` auf
+   `root@116.203.214.11` meldet
+   `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
+   **319 Zeilen mehr, 42 weniger** als der Repo-Stand. Daneben liegen
+   `registry.js.pre-v1080` und `.pre-v1082a` — die Änderung stammt also
+   aus zwei Paketen, die nie zurückgeflossen sind.
+
+   **Warum das drängt:** `deploy-staging.ps1` bricht deshalb bei **jedem**
+   Ausrollen ab (der Pull lief nur nach Hand-Eingriff durch), und der
+   nächste, der die Datei im Repo anfasst, erzeugt einen Konflikt oder
+   überschreibt Arbeit, die es nur auf dem Server gibt. Eine Sicherung
+   liegt unter `/root/registry.js.bak-2026-08-11`.
+
+   **BEHOBEN am 2026-08-12 — `e35e34b`.** Aufgefallen, weil der Server
+   plötzlich auf Zweig **`main`** stand und ein Backlog-Commit nicht
+   ankam. Ursache war nicht die Drift allein: Marcel hatte die Datei
+   inzwischen **auf dem Server committet** (`1e04538`, 13:09 UTC), womit
+   `staging` dort um je einen Commit von `origin` abwich — jedes
+   `git pull --ff-only` bricht dann ab.
+
+   **Vorgehen:** Serverfassung 1:1 ins Repo geholt und unter Marcels
+   Autorschaft committet, `node --check` gegen eine ESM-Arbeitskopie
+   sauber. Dann auf dem Server gesichert
+   (`/root/registry.js.vor-abgleich`), `git reset --hard origin/staging`,
+   und **per MD5 nachgewiesen, dass die Datei bit-identisch geblieben
+   ist** (`3c7a41d8…` vorher wie nachher). Server steht wieder auf
+   `staging`, Divergenz weg, Deploys laufen.
+
+   **Zwei Dinge bleiben offen:**
+   - **Produktion prüfen:** liegt dieselbe Drift dort auch? SSH ist
+     read-only, ein Vergleich der Datei genügt.
+   - **Wie es dazu kam:** Ein Commit direkt auf dem Server ist der
+     naheliegende Reflex, wenn `deploy-staging.ps1` scheitert — er
+     erzeugt aber genau die Divergenz, die den nächsten Deploy blockiert.
+     Solange das Skript defekt ist (siehe `FALLEN.md`), wird das
+     wiederkommen.
+
+
+
+- [2026-08-12] **Neun Info-Zeichen in der Wertermittlung taten nichts** — `v1146` (`d868fbb`), `v1146b` (`cbe57cf`).
+
+   Beim Setzen des Garagen-Hinweises (`v1142`) aufgefallen und dann durchgezählt:
+   `wertermittlung.js` vergibt **18** Hilfe-Schlüssel, `TEXTE` in
+   `feldhilfe.js` führt **11** (mit dem neuen). `textFuer()` kennt keinen
+   Rückfall — fehlt der Schlüssel, gibt sie `null` zurück und der Klick
+   verpufft **still**. Das ⓘ steht trotzdem am Feld und verspricht eine
+   Erklärung.
+
+   Ohne Text sind:
+   `aussenPct`, `ausstGewerk`, `bauteilHk`, `garagenStufe`, `grundriss`,
+   `hinterland`, `hinterlandRent`, `modGrad`, `standardstufe`.
+
+   Das sind ausgerechnet die **erklärungsbedürftigsten** Felder der
+   Wertermittlung — Standardstufe, Modernisierungsgrad und
+   Hinterland-Rentierlichkeit entscheiden erheblich mit, und
+   `hinterlandRent` steuert direkt die Bodenwertverzinsung nach § 41.
+
+   **BEHOBEN in `v1146` (`d868fbb`) und `v1146b` (`cbe57cf`).**
+
+   **Sechs der neun Texte gab es längst** — im `HILFE`-Block von
+   `wertermittlung.js`, wo sie nie jemand zu sehen bekam. Sie sind nach
+   `feldhilfe.js` überführt und in `kurz`/`lang` geteilt. Drei sind neu
+   geschrieben: **Standardstufe**, **Modernisierungsgrad**, **Grundriss** —
+   jeweils mit Rechtsgrundlage und der Angabe, was eine Stufe Unterschied
+   im Ergebnis ausmacht.
+
+   **`textFuer()` meldet einen fehlenden Schlüssel jetzt per
+   `console.warn`** statt still `null` zurückzugeben.
+
+   **`v1146b` — der Fix war eine Ebene zu hoch angesetzt.** Nach `v1146`
+   blieben drei Zeichen weiter wirkungslos, **ohne dass die neue Warnung
+   ansprang**: `hinterland`, `ausstGewerk` und `bauteilHk` sind
+   **Sammelschlüssel für Feldgruppen** — das ⓘ hängt dort 9× bzw. 5× an
+   verschiedenen Feldern (`ausstAussenwaende`, `btlGauben`, …). `box()`
+   suchte ein Element mit der **Id des Schlüssels** als Anker, fand keins
+   und baute still gar keinen Kasten. Der Text war da, die Warnung schwieg
+   zu Recht — und trotzdem passierte beim Klick nichts. Jetzt Rückfall auf
+   das angeklickte Zeichen selbst.
+
+   **Abgenommen auf Staging:** alle **13** bei Stufe 3 sichtbaren Zeichen
+   öffnen einen Kasten mit Text (400–424 Zeichen bei den drei
+   Gruppen-Schlüsseln), **keine Warnung**, kein leerer Kasten. Gegen die
+   Quelle gezählt: **18 Schlüssel, 19 Texte — keiner mehr ohne.**
+
+   **Eigener Messfehler, vermerkt:** Ein erster Prüflauf meldete vier
+   Felder ohne Kasten. Falsch — der Kasten ist ein **Umschalter**, und die
+   vier waren aus einem abgebrochenen Lauf noch offen; mein Klick hat sie
+   geschlossen. Zustand aus dem vorigen Prüflauf, genau die Falle aus
+   `FALLEN.md`. Vor der Messung `.fh-box` abräumen.
+
+
 
 - [2026-08-12] **Die Sachwertfaktor-Kette ist bewiesen, beide Wege** — `v1144` (`d884836`), `v1143b` (`0bf64ec`).
 
