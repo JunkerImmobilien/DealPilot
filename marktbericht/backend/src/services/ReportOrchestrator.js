@@ -651,6 +651,29 @@ export const ReportOrchestrator = {
     // 6b) Sachwert/Ertragswert-Quercheck (reine Rechnung, keine API-Kosten)
     const crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
 
+    /* v1141b · Der Bodenwert-Rechenweg blieb im Backend liegen.
+     * `ErtragswertService.bodenwert()` protokolliert jeden Schritt in
+     * `schritte` — Fläche × Bodenrichtwert, Größenanpassung, Zuschnitt,
+     * Erschließungsbeitrag, Miteigentumsanteil. Ausgeliefert wurde davon
+     * nichts: `_wertParams` ist eine INTERNE Struktur, `crossCheck` gibt
+     * nur ausgewählte Felder heraus. Im ganzen Antwortbaum kam `schritte`
+     * kein einziges Mal vor (gemessen 2026-08-12).
+     *
+     * Genau an diesem Wert hing der v1140-Fehler. Sein Weg gehört deshalb
+     * sichtbar in die Ansicht — nicht nur ins PDF. Nur Lesefelder, keine
+     * Rechnung: der Bodenwert bleibt, was er ist. */
+    if (crossCheck && _wertParams && _wertParams.bodenwert) {
+      const _b = _wertParams.bodenwert;
+      crossCheck.bodenwert = {
+        wert: _b.wert,
+        wert_rentierlich: _b.wert_rentierlich,
+        bodenwert_gesamt: _b.bodenwert_gesamt,
+        vollstaendig: !!_b.vollstaendig,
+        schritte: Array.isArray(_b.schritte) ? _b.schritte : [],
+        hinweise: Array.isArray(_b.hinweise) ? _b.hinweise : [],
+      };
+    }
+
     /* WKIGEG-3 · Zweitmeinung einholen, wenn eingeschaltet. Faellt sie aus,
      * laeuft der Bericht unveraendert weiter — sie ist eine Probe, kein
      * Bestandteil der Rechnung. */
