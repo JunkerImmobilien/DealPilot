@@ -38,20 +38,35 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → Hier weitermachen (Übergabe 2026-08-12)
 
-**Stand:** alles auf `8051f88`, lokal wie Staging, Zweig `staging`,
-Arbeitsverzeichnis sauber. Backend dreimal neu gebaut.
+**Stand:** lokal wie Staging, Zweig `staging`, Arbeitsverzeichnis sauber.
 
-**Der nächste Punkt ist die Tablet-Fassung (Punkt 1), Entscheidung A ist
-gefallen: Sidebar dockt ab 1024 px an.** Baubar sind damit Andocken,
-zweispaltige Formulare und Aktionen als Popover. Nur **B** (Score flacher)
-bleibt offen und braucht ein Bild.
+**Die Tablet-Fassung (Punkt 1) ist nachgemessen, und das Ergebnis ist:
+A, C und D waren längst gebaut.** Ab 901 px dockt die Sidebar an (`v648`,
+`css/style.css:35783`), die Formulare sind zwei- und dreispaltig, und das
+Blatt von unten gibt es seit V46 nicht mehr — es ist global per
+`display:none!important` stillgelegt. **Es war nichts zu bauen**, es war
+nur nie nachgemessen worden. Die Messreihe steht im Punkt.
+
+**Daraus zwei Lehren für den nächsten Anlauf:**
+- **Der Entwurf `tablet-fassung.md` hat nur bei 820 px gemessen** — unter
+  der 901er-Schwelle, also im Drawer-Band. Wer eine Schwelle untersucht,
+  muss **beide Seiten** davon messen.
+- **Ein Element im DOM ist kein aktives Element.** Das Blatt steht mit
+  40 Erwähnungen im Markup und 11 Kacheln im Baum und sah deshalb aktiv
+  aus. Sichtbarkeit sagt nur die Messung.
+
+**Der nächste offene Punkt ist damit Punkt 2** (der 1025-px-Sprung, klein
+und klar) oder **Punkt 4** (Marktbericht neu gestalten, groß). **B** und die
+**Admin-Oberfläche** bleiben in Punkt 1 liegen: B braucht ein Bild, der
+Admin ein Konto.
 
 **Vor dem Bauen:**
-- Entwurf lesen: `design/Vorschläge/tablet-fassung.md` (gemessen bei
-  820 × 1180 im gleich-Origin-iframe).
 - Messkabine nach `FALLEN.md` aufsetzen — Träger `/impressum.html` auf der
   **App-Domain** (`app.staging.dealpilot.junker-immobilien.io`), nicht auf
-  der Landing-Domain.
+  der Landing-Domain. `getAnimations().finish()` nach jeder Änderung,
+  höchstens ~40 s pro `javascript_tool`-Aufruf (sonst CDP-Timeout), und
+  **Objektwechsel nur mit Neuladen** — ein Wechsel im laufenden Tab hat
+  `hdr-banner-only` und `hdr-no-score` gleichzeitig stehen lassen.
 - **Jeden CSS-Anker im Browser auslesen, bevor er in eine Regel geht.**
   In `v1147` stand `#app` in der Regel — das Element gibt es nicht.
 
@@ -71,48 +86,93 @@ bleibt offen und braucht ein Bild.
 ---
 ## Offen
 
-1. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
-   als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
-   prüfen. Der Score bleibt auf dem Tablet.
+1. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
+   Der Punkt bleibt offen, weil **B** und die **Admin-Oberfläche** offen sind.
+   Alles andere ist gebaut, es war nur nie nachgemessen worden.
 
-   **Entwurf steht: `design/Vorschläge/tablet-fassung.md`** (2026-08-10,
-   gemessen bei 820 × 1180 im gleich-Origin-iframe).
-   **Entscheidung A ist gefallen (Marcel, 2026-08-12): die Sidebar dockt
-   ab 1024 px an.** Damit ist der größere Teil des Entwurfs baubar —
-   Andocken, zweispaltige Formulare, Aktionen als Popover.
+   **Gemessen in der Messkabine** (Träger `/impressum.html` auf der
+   App-Domain, iframe, Partner-Konto, Objekt `PRUEF_ZFH` geladen,
+   `getAnimations().finish()` nach jeder Breitenänderung):
 
-   **Weiterhin blockiert ist nur B** (wie wird der Score flacher). Es
-   braucht ein **Bild**, weil es die auffälligste Fläche der App
-   betrifft. **Der Score bleibt auf dem Tablet** — nur seine Höhe steht
-   zur Debatte; nach dem eigenen Rechenfehler oben bringt erst die
-   flachere Pille die ~110 px, die Umstellung allein spart 18 px.
+   | Fenster | Sidebar | Leiste | Inhalt | Burger |
+   |---|---|---|---|---|
+   | 820 px | Drawer (`fixed`, −380) | 380 | 820 | sichtbar |
+   | 900 px | Drawer | 380 | 900 | sichtbar |
+   | **901 px** | **angedockt** (`sticky`) | 260 | 641 | aus |
+   | **1024 px** | **angedockt** | 260 | **764** | aus |
+   | 1025 px | angedockt (`relative`) | 380 | 645 | aus |
+   | 1180 px | angedockt | 380 | 800 | aus |
 
-   **Zwei Angaben dieses Punktes waren überholt und sind ersetzt:**
+   - **A (Sidebar andocken): erfüllt, und zwar seit `v648`.** Der Block
+     `css/style.css:35783` — `@media (min-width:901px) and (max-width:1024px)`
+     — dockt die Leiste als 260-px-Spalte im Fluss an und lässt bei 1024 px
+     **764 px** für den Inhalt. Marcels Entscheidung „ab 1024 px" ist damit
+     erfüllt, sogar schärfer: es beginnt bei 901 px.
+   - **C (zweispaltige Formulare): erfüllt.** Im Objekt-Tab stehen bei
+     641–764 px Inhaltsbreite zwei- **und** dreispaltige Raster
+     (2 × 318,5 px bzw. 3 × 210,3 px).
+   - **D (Popover statt Blatt): gegenstandslos.** Es gibt kein Blatt von
+     unten mehr. `css/style.css:11519` legt es **global** still:
+     `.bsheet-overlay{display:none!important}` mit dem Kommentar
+     „Bottom-Sheet aus V43 verstecken — wird in V46 nicht mehr genutzt". Der
+     Auslöser `.sb-actions-trigger` öffnet `sbActionsToggle()`, also das
+     **Akkordeon in der Sidebar** (11 `.sb-act-item`, 217 px breit).
+     Gegenprobe bei 820 px und 1024 px: `bsheet-panel` bleibt auf Höhe 0.
 
-   | stand hier | gemessen 2026-08-10 |
-   |---|---|
-   | Kopfleiste **589 px** | **348 px** — 41 % weniger |
-   | `#hdr-badges` **492 px** | **251 px** |
-   | „die fünf KPI-Pillen brechen zu je zwei um" (W43) | **falsch** — `.scores` ist `grid` mit `nowrap`, die fünf Pillen stehen **nebeneinander**, je 149 × 103 px |
+   > **Der Entwurf `design/Vorschläge/tablet-fassung.md` ist an drei Stellen
+   > widerlegt, und die Ursache ist dieselbe: er hat ausschließlich bei
+   > 820 px gemessen** — unterhalb der 901er-Schwelle, also im Drawer-Band.
+   > Deshalb las sich der Grundbefund als „das Tablet bekommt die
+   > Handy-Fassung, nur breiter". Für 901–1024 px trifft das nicht zu.
+   > Beim Blatt kam eine zweite Falle dazu: es steht mit 40 Erwähnungen im
+   > Markup und 11 Kacheln im DOM und **sieht deshalb aktiv aus**. Ob ein
+   > Element je sichtbar wird, sagt nur die Messung — nicht seine Anwesenheit.
 
-   **Der eigentliche Befund ist ein anderer:** das Tablet bekommt die
-   **Handy-Fassung, nur breiter**. Die Sidebar steht `position:fixed` bei
-   `left:-380px`, `.main-col` nimmt die vollen **820 px** für eine Spalte.
-   Für den Inhalt bleiben **776 von 1180 px** — die Kopfleiste frisst
-   29,5 % des Schirms.
+   **Was an dem Punkt wirklich offen ist:**
 
-   **Ein eigener Rechenfehler, im Entwurf gleich zurückgenommen:** Ich
-   hatte für „Pillen neben den Hauptblock" 121 px geschätzt. Falsch —
-   zwei Pillenreihen sind `2 × 103 + 7 = 213` px und damit **höher als der
-   121-px-Hauptblock**. Die Umstellung allein spart **18 px**, nicht 130.
-   **Die Höhe des Blocks bestimmt die Pille, nicht der Hauptblock**; der
-   Gewinn (~110 px) kommt erst mit der flacheren Pille dazu.
+   - **B — wie wird der Score flacher?** Weiterhin **blockiert auf ein Bild**,
+     weil es die auffälligste Fläche der App ist. **Neuer Befund dazu:** die
+     Score-Zeile erscheint überhaupt erst **ab 70 % Datenvollständigkeit**
+     (`js/calc.js:205` setzt sonst `body.hdr-banner-only` und zeigt einen
+     Hinweisbanner). Gemessen: `PRUEF_ZFH` liegt darunter → Kopfleiste
+     **157 px** statt der 348 px des Entwurfs, `.scores` und `.sc-main` sind
+     gar nicht im Layout. **Die 251 px des Entwurfs sind damit nicht
+     nachgemessen** — dafür braucht es ein Objekt über der 70-%-Schwelle.
+     Der Score bleibt auf dem Tablet (Marcels Vorgabe).
+   - **Admin-Oberfläche:** die verlangte Zahl ist erhoben —
+     `admin/css/admin.css` hat **3 Media-Queries** (bei 900 px, 900 px und
+     820 px), `admin/js/admin-network.js` eine vierte (1150 px), Viewport-Meta
+     ist gesetzt. **Anders als das Partner-Portal in `v1112b` ist der Admin
+     also nicht bei null.** Eine echte Messung braucht ein Admin-Konto, das
+     dieser Prüflauf nicht hatte — bleibt ehrlich offen.
+   - **820 px (iPad Hochformat) bleibt die Handy-Fassung:** Drawer, eine
+     Spalte über die volle Breite. Das ist **kein Defekt**, sondern die Folge
+     von Entscheidung A (Schwelle 901). Soll das Hochformat andocken, wären
+     bei 260-px-Leiste nur 560 px Inhalt übrig — das schließt zweispaltige
+     Formulare aus. **Eigene Entscheidung, nicht in diesem Punkt.**
 
-   **Die Admin-Oberfläche ist nicht gemessen** — sie hängt an einem
-   Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
-   dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
+2. **Der Inhalt wird bei 1025 px schmaler als bei 1024 px.** Gemessen am
+   12.08. in derselben Reihe: bei 1024 px trägt die Leiste 260 px und der
+   Inhalt 764 px; bei **1025 px** springt die Leiste auf 380 px und der
+   Inhalt fällt auf **645 px** — ein Pixel mehr Fenster, **119 px weniger
+   Inhalt**. Ursache: oberhalb von 1024 px greift der v648-Block nicht mehr,
+   und das Standard-Grid der App setzt 380 px.
 
-2. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+   Betroffen ist das Band **1025–1143 px**; ab 1144 px (380 + 764) ist der
+   Inhalt wieder mindestens so breit wie bei 1024. Bei 1180 px sind es
+   800 px, deshalb fällt es auf dem iPad Air quer nicht auf.
+
+   **Stetige Lösung:** die Leiste wächst im Band mit der Fensterbreite, dann
+   bleibt der Inhalt konstant 764 px —
+   `min(380px, calc(260px + 100vw - 1024px))` als erste Grid-Spalte. Bei
+   1024 px ergibt das 260, bei 1144 px 380, dazwischen linear.
+   `body #sidebar.sidebar` trägt im v648-Block `width:auto`, die Leiste folgt
+   also der Spalte von selbst. **Vor dem Bauen prüfen**, ob die übrigen
+   Regeln des v648-Blocks (sticky, Drawer-Bedienelemente aus) im Band
+   1025–1143 px mitgelten sollen — sonst greift die Anpassung nur halb.
+
+
+3. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -184,7 +244,7 @@ bleibt offen und braucht ein Bild.
      rechts frei ist** — überlappt das negative Margin die Nachbarn,
      stiehlt es Klicks in die andere Richtung.
 
-3. **Marktbericht neu gestalten.**
+4. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -328,7 +388,7 @@ bleibt offen und braucht ein Bild.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-4. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
+5. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
 
    Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
 
@@ -366,7 +426,7 @@ bleibt offen und braucht ein Bild.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-5. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+6. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
 
    Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
    Defekt, keine Geschmacksfrage.
@@ -386,7 +446,7 @@ bleibt offen und braucht ein Bild.
    hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
    dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
 
-6. **Regler „Tab-Texte" wirkt nicht**
+7. **Regler „Tab-Texte" wirkt nicht**
 
    Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
    Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
@@ -403,7 +463,7 @@ bleibt offen und braucht ein Bild.
    **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
    Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
 
-7. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+8. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
    Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
    schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
@@ -426,7 +486,7 @@ bleibt offen und braucht ein Bild.
    **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
    Aufgreifen zusammenlegen, nicht doppelt bauen.
 
-8. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+9. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
 
    **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
    führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
@@ -451,7 +511,7 @@ bleibt offen und braucht ein Bild.
    **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
    Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
 
-9. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+10. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
 
    Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
    Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
@@ -474,7 +534,7 @@ bleibt offen und braucht ein Bild.
    **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
    entschieden ist.
 
-10. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+11. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -511,7 +571,7 @@ bleibt offen und braucht ein Bild.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-11. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+12. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -541,7 +601,7 @@ bleibt offen und braucht ein Bild.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-12. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+13. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -597,7 +657,7 @@ bleibt offen und braucht ein Bild.
 
 ---
 
-13. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+14. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
@@ -704,7 +764,7 @@ bleibt offen und braucht ein Bild.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-14. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+15. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -802,7 +862,7 @@ bleibt offen und braucht ein Bild.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-15. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+16. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
    das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede

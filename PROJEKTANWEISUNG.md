@@ -2634,6 +2634,7 @@ kein Nachweis steht, ist der Punkt nicht abgenommen.
 
 | Datum | Was | Commit | Nachweis | Rest |
 |---|---|---|---|---|
+| 12.08. | **Tablet-Punkt nachgemessen — kein Code geändert.** A, C und D waren gebaut; der Entwurf hatte nur bei 820 px gemessen | (nur Backlog) | Messreihe 820/900/901/1024/1025/1180 px in der Kabine; `bsheet` per `display:none!important` seit V46 stillgelegt | B (Bild), Admin (Konto), 1025-px-Sprung als neuer Punkt 2 |
 | 12.08. | **Diese Konsolidierung** — Teil VI, zwei Korrekturen (`style.css`, Handy-Sperre), sechs Regeln | `1a76b38` | Server auf `1a76b38` per `git rev-parse` gegengeprüft; Skript brach wie dokumentiert in Z. 68 ab, Pull von Hand nachgezogen | drei Aufräum-Befunde im Backlog unter „Später" |
 | 12.08. | Übergabe: Einstiegspunkt im Backlog, vier neue Fallen | `6a11a32` | — (Dokumentation) | — |
 | 12.08. | Ankreuzfelder auf 33 px | `674c3b0` → `413d409` | Selektor korrigiert; `#app` existiert nicht | Abnahme mit geladenem Objekt offen |
