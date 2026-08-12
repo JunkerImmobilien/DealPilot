@@ -3466,8 +3466,18 @@ async function exportPdf(out) {
             var s = (f && typeof f === 'object') ? f.stufe : null;
             var q = (f && typeof f === 'object') ? f.quelle : null;
             if (z == null) return String(cc.assumptions.sachwertfaktor);
+            /* v1150b · Die Quelle nur, wenn sie kurz ist. Gemessen am
+             * Prüfobjekt liefert der amtliche Weg
+             * "Grundstücksmarktbericht 2026 für den Kreis Herford, 5.1.2
+             * Sachwertfaktoren" — 74 Zeichen, die die Fußnote um eine bis
+             * zwei Zeilen wachsen lassen und das Layout darunter schieben.
+             * Sie steht ohnehin im Bericht (sachwertfaktor_ausschuss).
+             * Die STUFE trägt die Herkunft und ist immer dabei; die Quelle
+             * lohnt nur, wo sie selbst die Aussage ist — "eigene Angabe"
+             * (13 Zeichen) bei Stufe E. */
+            var qk = (q && q.length <= 26) ? q : null;
             return String(z).replace('.', ',')
-              + (s ? ' (Stufe ' + s + (q ? ' · ' + q : '') + ')' : '');
+              + (s ? ' (Stufe ' + s + (qk ? ' · ' + qk : '') + ')' : '');
           })()) + '. Kein Gutachten n. § 194 BauGB.', blockW);
     doc.text(_fn, M, y + 3);
     y += 5 + _fn.length * 3;
