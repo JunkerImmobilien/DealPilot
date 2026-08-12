@@ -577,8 +577,14 @@ function _renderWertverfahren(d) {
     var st = document.createElement('style'); st.id = 'wv-css';
     st.textContent = '#wv-box .wv-h{margin:22px 0 10px;font-size:12px;letter-spacing:.05em;'
       + 'text-transform:uppercase;opacity:.65}'
-      + '#wv-box .wv-boden{display:flex;align-items:baseline;gap:14px}'
-      + '#wv-box .wv-boden b{font-size:22px}'
+      /* v1141d · Bei 390 px stand das Euro-Zeichen allein in der zweiten
+       * Zeile: der Kopfbetrag mass 66 px bei 33 px Zeilenhoehe. Ursache ist
+       * `nowrap` in der Flex-Zeile — das <b> wird gequetscht und bricht
+       * INNEN um, statt dass die Zeile umbricht. Derselbe Befundtyp wie die
+       * Cashflow-Kacheln in v1138c: eine Zahl, die man in zwei Zeilen liest,
+       * liest man falsch. */
+      + '#wv-box .wv-boden{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}'
+      + '#wv-box .wv-boden b{font-size:22px;white-space:nowrap}'
       + '#wv-box .wv-boden span{font-size:12px;opacity:.7}'
       + '#wv-box .wv-hk{margin-top:6px;font-size:12px;opacity:.75}'
       + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
