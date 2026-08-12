@@ -444,9 +444,24 @@ die alle auf Marcels Durchgang zurückgehen.
       Formularzeilen zusammen auf 760 px setzte. Jetzt eigene Grenze
       960 px → **eine Zeile ab 1024 px**.
 
-   2. **Der Erzeugen-Knopf lässt sich nicht klicken, obwohl die Angaben für
-      die einfache Einschätzung vollständig sind.** Marcel: „das muss ja
-      irgendwie möglich sein." **Das ist der Kern des ganzen
+   2. **ERLEDIGT — der Erzeugen-Knopf war bei Stufe 1 gesperrt** (`v1152`,
+      `d17edac`, siehe Fertig). Die zweite Ursache ist gefunden: `ab` und
+      `genauerAb` bedeuten Verschiedenes. Ertrags- und Sachwert stehen auf
+      `ab: 1`, weil sie immer mitrechnen („nur mit Pauschalen", v1018) — ihre
+      Pflichtfelder `plot`/`units` brauchen sie erst bei `genauerAb: 3`.
+      `knopfSperren()` prüfte gegen `ab`, also verlangte Stufe 1 die Angaben
+      von Stufe 3. Nachgewiesen in beide Richtungen: bei Stufe 1 jetzt
+      klickbar mit „· 2 L", bei Stufe 3 weiterhin gesperrt.
+      **Auch die Reihenfolge der Reiter ist geprüft und stimmt:** Stufe-1-
+      Felder liegen in Reiter 2, Stufe-2-Felder in Reiter 3, Stufe-3-Felder
+      in Reiter 5 — kein Pflichtfeld der Einschätzung steckt in einem
+      späteren Schritt.
+
+      *Der historische Befund, der zur ersten Ursache führte, bleibt hier
+      stehen, weil seine Lehren gelten:*
+
+      **Der frühere Wortlaut:** „das muss ja irgendwie möglich sein."
+      **Das ist der Kern des ganzen
       Meilenstein-Gedankens** — wer bei „Einschätzung" stehenbleiben will,
       muss dort auch erzeugen können. Steht der Knopf still, ist der Wizard
       wieder ein Pflichtdurchlauf und die Vereinigung der drei Stufen
@@ -1098,6 +1113,58 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Stufe 1 war gesperrt, weil sie die Angaben von Stufe 3 verlangte** — `v1152`, `d17edac`.
+   **Marcels Befund** aus der Entwurfs-Durchsicht: „Der Erzeugen-Knopf lässt
+   sich nicht klicken, obwohl die Angaben für die einfache Einschätzung
+   vollständig sind. Das muss ja irgendwie möglich sein." **Das war der Kern
+   des ganzen Meilenstein-Gedankens** — steht der Knopf still, ist der Wizard
+   wieder ein Pflichtdurchlauf.
+
+   **Reproduziert** (Stufe 1, ETW, alle vier Angaben aus `BEDARF` gefüllt):
+   der Knopf trug bereits **„Marktbericht erstellen · 2 L"**, war also über
+   die erreichte Stufe im Bilde — blieb aber `disabled`, und sein Titel nannte
+   als fehlend **„Grundstück (m²) · Wohneinheiten"**, die Pflichtfelder von
+   Ertrags- und Sachwert. Also die Angaben von **Stufe 3**.
+
+   **Ursache: `ab` und `genauerAb` bedeuten Verschiedenes.** Ertrags- und
+   Sachwert stehen bewusst auf `ab: 1`, weil sie **immer** mitrechnen — „nur
+   mit Pauschalen" (v1018). Ihre Pflichtfelder brauchen sie erst bei
+   `genauerAb: 3`, wenn derselbe Kern mit echten Parametern rechnet.
+   `knopfSperren()` prüfte aber gegen `ab`.
+
+   **Das war die zweite Doppelliste derselben Sache:** `BEDARF` in
+   `mb-stufen.js` führt für Stufe 1 vier Felder, `VERFAHREN[].pflicht` in
+   `wertermittlung.js` deren sieben. `v1126d` hat schon einmal eine solche
+   Zweitliste beseitigt („und lief prompt auseinander"). Sie sind jetzt wieder
+   deckungsgleich — **bleibt es bei zwei Listen, gehört das zusammengeführt.**
+
+   **Nicht angefasst: die Rechnung.** Fehlen `plot` und `units`, rechnet der
+   Quercheck wie vorgesehen mit Pauschalen. Die Sperre war der Fehler, nicht
+   das Ergebnis.
+
+   **Nachgewiesen am ausgerollten Stand** (`wertermittlung.js?v=1152` im
+   Browser bestätigt), beide Richtungen, ohne einen einzigen Abruf
+   (`confirm` abgefangen, **kein Kerosin verbraucht**):
+
+   | Stufe | `plot`/`units`/`mea` | Knopf | Kasten |
+   |---|---|---|---|
+   | **3** | leer | **gesperrt** | nennt genau diese drei |
+   | **1** | leer | **klickbar**, „· 2 L" | keiner |
+
+   **Zwei Beobachtungen am Rand, keine Behauptungen:**
+   - Beim Herunterstufen auf 1 fand mein Selektor **kein anklickbares
+     Bedienelement** für den Meilenstein „Einschätzung"; ich musste
+     `setStufe(1)` nutzen. Laut `v1126c` soll der Meilenstein anklickbar sein
+     — **mein Selektor kann zu eng gewesen sein**, das gehört gegengeprüft,
+     bevor daraus ein Befund wird.
+   - `baustatus` steht in `markt.pflicht`, in `BEDARF` aber erst auf Stufe 2.
+     Beim Leeren erschien er trotzdem nicht in der Fehlt-Liste. Ungeklärt,
+     ohne Auswirkung auf diesen Fix — notiert, damit es nicht verloren geht.
+
+   **Hinweis für den nächsten Prüflauf:** im Testbrowser sind `plot`, `units`
+   und `year` verändert und die Stufe steht auf 1 (localStorage-Formularstand,
+   keine gespeicherten Objektdaten). Vor der nächsten Messung mitlesen.
 
 - [2026-08-12] **Die sieben Reiter brachen um, obwohl Platz war** — `v1151`, `7c716ab`.
    **Marcels Befund** aus der Entwurfs-Durchsicht: „Die Punkte 1–7 sollten
