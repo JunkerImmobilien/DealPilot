@@ -69,8 +69,17 @@ export const ErtragswertService = {
     let wert;
     if (_auf && _auf.verfuegbar && _auf.gruen_qm > 0) {
       wert = _auf.wert_eur;
+      /* v1141c · Die Zeilentitel behaupteten mehr, als gerechnet wurde.
+       * "Bauland × angepasster Bodenwert" stand auch dann da, wenn gar kein
+       * Koeffizient griff — beim Prüfobjekt neben dem Detail "950 m² ×
+       * 90 €/m²", also dem unangepassten Richtwert. Und "überschüssige
+       * Fläche" passt nur zur automatischen Spaltung am 1,5-fachen; bei
+       * manuell gepflegtem Hinterland kommt die Fläche HINZU, sie ist nicht
+       * überschüssig (dieselbe Unterscheidung wie in v1140b). */
       out.schritte.push({
-        pos: 'Bauland × angepasster Bodenwert',
+        pos: _auf.koeffizient_angewandt
+          ? 'Bauland × angepasster Bodenwert'
+          : 'Grundstücksfläche × Bodenrichtwert',
         detail: `${_auf.bauland_qm} m² × ${_auf.bodenwert_eur_qm} €/m²`
           + (_auf.koeffizient_angewandt
             ? ` (${brw} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`
@@ -78,7 +87,9 @@ export const ErtragswertService = {
         wert: round0(_auf.wert_bauland_eur),
       });
       out.schritte.push({
-        pos: '+ überschüssige Fläche als private Grünfläche',
+        pos: _auf.quelle_art === 'eigene Angabe'
+          ? '+ Hinterlandfläche'
+          : '+ überschüssige Fläche als private Grünfläche',
         detail: `${_auf.gruen_qm} m² × ${_auf.gruen_eur_qm} €/m²`,
         wert: round0(_auf.wert_gruen_eur),
       });

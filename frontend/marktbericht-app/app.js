@@ -593,6 +593,11 @@ function _renderWertverfahren(d) {
        * `overflow-wrap` statt fester Breite: lieber ein Umbruch in der
        * Beschriftung als eine abgeschnittene Zahl. Die Zahlenspalte bleibt
        * deshalb `nowrap` und tabellarisch — nur links darf brechen. */
+      /* v1141c · Der Bodenwert-Weg steht NICHT in einer Kachel, sondern über
+       * die volle Breite (gemessen 856 px). Beschriftung links, Zahl ganz
+       * rechts — dazwischen ein halber Bildschirm. Eine Rechnung liest man
+       * nur, wenn Position und Betrag beieinanderstehen. */
+      + '#wv-box > .wv-erk .wv-rw{max-width:440px}'
       + '#wv-box .wv-rw{width:100%;border-collapse:collapse;font-size:11px}'
       + '#wv-box .wv-rw td{padding:3px 0;vertical-align:top;overflow-wrap:anywhere}'
       + '#wv-box .wv-rw td:last-child{text-align:right;white-space:nowrap;padding-left:10px;'
