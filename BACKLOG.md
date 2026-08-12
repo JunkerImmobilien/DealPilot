@@ -43,9 +43,15 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
    **Entwurf steht: `design/Vorschläge/tablet-fassung.md`** (2026-08-10,
    gemessen bei 820 × 1180 im gleich-Origin-iframe).
-   **BLOCKIERT auf zwei Entscheidungen** — A (ab welcher Breite dockt die
-   Sidebar an) und B (wie wird der Score flacher). B braucht ein **Bild**,
-   weil es die auffälligste Fläche der App betrifft.
+   **Entscheidung A ist gefallen (Marcel, 2026-08-12): die Sidebar dockt
+   ab 1024 px an.** Damit ist der größere Teil des Entwurfs baubar —
+   Andocken, zweispaltige Formulare, Aktionen als Popover.
+
+   **Weiterhin blockiert ist nur B** (wie wird der Score flacher). Es
+   braucht ein **Bild**, weil es die auffälligste Fläche der App
+   betrifft. **Der Score bleibt auf dem Tablet** — nur seine Höhe steht
+   zur Debatte; nach dem eigenen Rechenfehler oben bringt erst die
+   flachere Pille die ~110 px, die Umstellung allein spart 18 px.
 
    **Zwei Angaben dieses Punktes waren überholt und sind ersetzt:**
 
@@ -76,14 +82,34 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
-   - **23 Ankreuzfelder messen 13 × 13 px**, verteilt über fünf Reiter
-     (Investition, Miete, Finanzierung, Steuer, Pilot-Analyse). Jedes hat
-     ein Label, aber die Labels sind **16 bis 36 px** hoch — also selbst
-     unter 44. `v1112` hat diese Bauart im Einstellungs-Modal ausdrücklich
-     als tragbar abgenommen („Checkboxen mit eigenem Label als
-     Trefferfläche"); im Formularbereich trägt das Argument schwächer, weil
-     die Zeilen dichter stehen. Sie app-weit zu vergrößern ändert die
-     Zeilenhöhe überall — **das ist eine Gestaltungsentscheidung.**
+   - **ERLEDIGT — Ankreuzfelder auf 33 px** (`v1147` `674c3b0`,
+     `v1147b` `413d409`). **Marcels Entscheidung 2026-08-12: 33 px, nicht
+     44** — die volle Trefferfläche hätte jede Formularzeile höher gemacht.
+
+     **Ursache, am Markup nachgezählt:** alle **37** Checkboxen sind
+     nackte `<input type="checkbox">` **ohne Klasse**. Die Klasse
+     `.cb-label` sitzt am **Label**, nicht am Feld — ihre Regel
+     (`style.css:2191`, 16 px) griff deshalb nur für acht. Die übrigen
+     standen auf Browser-Standard, daher die gemessenen 13 px.
+
+     Schalter sind ausgenommen (`.ji-switch`, `.toggle-slim`,
+     `.fesh-tile`, `.dp-pf-tile`) — sie bauen aus demselben nackten
+     Element eine ganz andere Optik.
+
+     **Nachgemessen:** **26 Felder auf 33 × 33 px**, alle Schalter
+     unverändert (14 px, 32 × 18, auto).
+
+     **Eigener Fehler, korrigiert in `v1147b`:** Der Selektor stand zuerst
+     auf `#app` — **dieses Element gibt es in der App gar nicht**
+     (`getElementById` liefert `null`). Ich hatte den Anker aus
+     `CLAUDE.md` übernommen, statt ihn auszulesen; genau der Fehler, vor
+     dem Regel 1 warnt. Die Regel griff dadurch nirgends.
+
+     **OFFEN — optische Abnahme.** Gemessen wurde ohne geladenes Objekt,
+     alle Reiter zugeklappt: 0 von 26 Feldern waren sichtbar, die
+     Überlaufprüfung ist damit wertlos. **Beim nächsten Durchgang mit
+     geladenem Objekt gegenmessen**, ob 33 px die Formularzeilen sprengen
+     — besonders in den dichten Reitern Steuer und Pilot-Analyse.
    - **`.sbc-arrow` misst 20 × 20 px und ist ein echtes Bedienelement.**
 
      **Mein v1118-Befund war falsch und wird hiermit zurückgenommen.** Ich
