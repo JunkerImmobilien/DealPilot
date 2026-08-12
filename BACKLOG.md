@@ -124,7 +124,43 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-2. **Ein gepflegter Sachwertfaktor wird stillschweigend verworfen.**
+2. **Der Nachweis, dass ein Sachwertfaktor wirklich greift, steht noch aus
+   — es fehlt ein Haus auf Staging.** Alle **acht** Bestandsobjekte sind
+   ETW (gemessen 2026-08-12), und für Wohnungen darf kein Faktor angesetzt
+   werden. Keins hat eine bezahlte Stufe, jeder Abruf kostet **12 L**.
+
+   **Was dabei gefunden und behoben wurde — `v1144` (`d884836`):**
+   Der Sachwertfaktor wurde **nie** angewandt, an keinem Objekt, aus keiner
+   Quelle. `WertParameterService.sachwertfaktor()` und `hole()` liefern
+   beide `{ wert, stufe, quelle }`; gelesen wurde aber `param.sachwertfaktor`
+   — ein Feld, das keiner der beiden Rückgabewege setzt. `Number(undefined)`
+   ist `NaN`, also griff durchgehend der Zweig „kein Sachwertfaktor
+   verfügbar". Betroffen waren zwei Stellen: `lib/nhk2010.js:868` und
+   `CrossCheckService.js:171`. Bei den ETW fiel es nie auf, weil dort
+   ohnehin keiner angesetzt werden darf — **bei jedem Haus hätte es still
+   den vorläufigen Sachwert ausgewiesen.**
+
+   **Mitgefixt, weil der erste Fix es nötig machte:** Die Objektart-Sperre
+   lag nur im Tabellenweg (`sachwertfaktoren_nrw.js:134`). Mit korrektem
+   Feldnamen hätte ein gepflegter Wert bei einer Wohnung plötzlich
+   gegriffen — am Prüfobjekt wären aus 268.172 € **308.398 €** geworden,
+   ein Modellbruch nach § 10 ImmoWertV. Die Sperre sitzt jetzt zentral in
+   `WertParameterService.sachwertfaktor()` und gilt für beide Wege.
+
+   **Gegengemessen nach dem Ausrollen:** ETW unverändert bei 268.172 €,
+   `marktangepasst: false`, Grund weiterhin `objektart_nicht_abgeleitet` —
+   keine Regression.
+
+   **Offen bleibt der eigentliche Nachweis.** Dafür braucht es ein
+   EFH/ZFH-Objekt. Ein Funktionslauf im Container scheiterte an der
+   NHK-Typkennung: `sachwert()` verlangt einen Gebäudetyp aus
+   `NHK_2010.typen` (`1.01`, `1.11`, …), den erst der Orchestrator aus
+   `nhkHaus`/`nhkGeschosse`/`nhkDach` zusammensetzt. **Beim Aufgreifen
+   entweder den Typ direkt setzen oder ein echtes Haus anlegen** —
+   `Löhner Str. 278`, 32120 Hiddenhausen (ZFH, Verkehrswert 350.094,36 €)
+   aus `CLAUDE.md` wäre der Kandidat. **Kostet 12 L, Marcel fragen.**
+
+3. **Ein gepflegter Sachwertfaktor wird stillschweigend verworfen.**
    Gemessen am 2026-08-12 an Hermannstraße 9: Im Feld stand **1,15**, im
    Payload kam `sachwertfaktor: 1.15` sauber an — der Bericht rechnet ihn
    trotzdem nicht. Zu Recht, denn für eine ETW gibt es keinen
@@ -144,7 +180,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Verwandt mit Punkt 4 (neun Info-Zeichen ohne Text): auch hier
    verschwindet eine Erklärung, die es im System längst gibt.
 
-3. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+4. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
    das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
@@ -168,7 +204,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist, ob das Feld wohnungs- oder gebäudebezogen gemeint ist, und ob die
    Feldhilfe das sagt. **Marcel entscheidet das fachlich.**
 
-4. **Neun Info-Zeichen in der Wertermittlung tun nichts.** Beim Setzen des
+5. **Neun Info-Zeichen in der Wertermittlung tun nichts.** Beim Setzen des
    Garagen-Hinweises (`v1142`) aufgefallen und dann durchgezählt:
    `wertermittlung.js` vergibt **18** Hilfe-Schlüssel, `TEXTE` in
    `feldhilfe.js` führt **11** (mit dem neuen). `textFuer()` kennt keinen
@@ -189,7 +225,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Fehlen eines Schlüssels **laut** sein lassen (`console.warn`) statt
    still — ein stiller Rückfall sieht aus wie ein bestandener Lauf.
 
-5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+6. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -287,7 +323,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+7. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -322,7 +358,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+8. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -356,7 +392,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-8. **Marktbericht neu gestalten.**
+9. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -500,7 +536,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-9. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
+10. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
    Beim Ausrollen von `v1136` gemessen: `git status` auf
    `root@116.203.214.11` meldet
    `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
@@ -519,7 +555,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Produktion** liegt. Nicht nebenbei: es ist der BORIS-Anschluss, an
    dem die Bodenrichtwerte hängen.
 
-10. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
+11. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
 
    Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
 
@@ -557,7 +593,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-11. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+12. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
 
    Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
    Defekt, keine Geschmacksfrage.
@@ -577,7 +613,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
    dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
 
-12. **Regler „Tab-Texte" wirkt nicht**
+13. **Regler „Tab-Texte" wirkt nicht**
 
    Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
    Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
@@ -594,7 +630,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
    Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
 
-13. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+14. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
    Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
    schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
@@ -617,7 +653,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
    Aufgreifen zusammenlegen, nicht doppelt bauen.
 
-14. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+15. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
 
    **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
    führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
@@ -642,7 +678,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
    Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
 
-15. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+16. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
 
    Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
    Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
@@ -665,7 +701,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
    entschieden ist.
 
-16. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+17. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -702,7 +738,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-17. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+18. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -732,7 +768,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-18. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+19. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
