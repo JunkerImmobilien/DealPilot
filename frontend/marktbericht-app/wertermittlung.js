@@ -641,7 +641,33 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
 
     var fehlt = [];
     VERFAHREN.forEach(function (v) {
-      if (stufe() < v.ab) return;
+      /* v1152-SPERRE · Marcels Befund: „Der Erzeugen-Knopf lässt sich nicht
+       * klicken, obwohl die Angaben für die einfache Einschätzung
+       * vollständig sind. Das muss ja irgendwie möglich sein."
+       *
+       * Gemessen am 12.08. bei Stufe 1, ETW, alle Angaben aus BEDARF
+       * gefüllt: der Knopf trug bereits „Marktbericht erstellen · 2 L",
+       * blieb aber `disabled`, und sein Titel nannte als fehlend
+       * „Grundstück (m²) · Wohneinheiten" — die Pflichtfelder von
+       * Ertrags- und Sachwert, also von STUFE 3.
+       *
+       * Ursache: `ab` und `genauerAb` bedeuten Verschiedenes. Ertrags- und
+       * Sachwert stehen bewusst auf `ab: 1`, weil sie IMMER mitrechnen —
+       * „nur mit Pauschalen" (v1018). Ihre Pflichtfelder brauchen sie erst
+       * bei `genauerAb: 3`, wenn derselbe Kern mit echten Parametern
+       * rechnet. Geprüft wurde aber gegen `ab`, also verlangte Stufe 1 die
+       * Angaben von Stufe 3 — und der Meilenstein-Gedanke war damit
+       * ausgehebelt: wer bei „Einschätzung" stehenbleiben will, konnte dort
+       * nicht erzeugen.
+       *
+       * Das ist zugleich die zweite Doppelliste derselben Sache: `BEDARF`
+       * in mb-stufen.js führt für Stufe 1 vier Felder, `VERFAHREN[].pflicht`
+       * hier deren sieben. v1126d hat schon einmal eine solche Zweitliste
+       * beseitigt („und lief prompt auseinander"). Sie sind jetzt wieder
+       * deckungsgleich — bleibt es bei zwei Listen, gehört das
+       * zusammengeführt. */
+      var abPflicht = (v.genauerAb != null) ? v.genauerAb : v.ab;
+      if (stufe() < abPflicht) return;
       if (v.nichtWenn && v.nichtWenn()) return;
       v.pflicht.forEach(function (id) { if (!wert(id) && fehlt.indexOf(id) < 0) fehlt.push(id); });
     });
