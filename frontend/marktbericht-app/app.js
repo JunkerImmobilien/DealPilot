@@ -491,13 +491,51 @@ function _renderWertverfahren(d) {
   function eur(n) {
     return n == null ? '\u2013' : new Intl.NumberFormat('de-DE').format(Math.round(n)) + ' \u20ac';
   }
-  function karte(kennung, titel, wert, unten, art) {
+  /* \u2500\u2500 v1141-RW \u00b7 Der Rechenweg stand nur im PDF \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+   * Im dritten Pruefdurchgang (2026-08-12) fiel die Bodenwertverzinsung auf
+   * dem doppelten Wert auf \u2014 sichtbar NUR im PDF-Rechenweg, weil die
+   * Bildschirmansicht ausschliesslich Ergebniszahlen zeigte. Ein Fehler,
+   * den man erst nach dem Herunterladen sehen kann, ist praktisch
+   * unsichtbar.
+   *
+   * Dieselben Staffeln, die das PDF ab Z. 3416 zeichnet, liegen hier
+   * bereits vor: `_ew`/`_swx` dort sind exakt `e`/`sw` hier. Es wird also
+   * nichts neu berechnet und keine zweite Quelle aufgemacht \u2014 die Ansicht
+   * zeigt nur, was das PDF ohnehin zeigt.
+   *
+   * Formatregeln 1:1 vom PDF uebernommen (z.faktor vor z.wert, Faktor mit
+   * Komma, z.summe fett mit Trennlinie, z.detail als Unterzeile). Weichen
+   * die beiden ab, stehen zwei Darstellungen derselben Zahl nebeneinander
+   * \u2014 genau das soll der Rechenweg ja ausschliessen. */
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function rechenweg(staffel) {
+    if (!staffel || !staffel.length) return '';
+    return '<table class="wv-rw"><tbody>' + staffel.map(function (z) {
+      var rechts = '';
+      if (z.faktor != null) rechts = String(z.faktor).replace('.', ',');
+      else if (z.wert != null) rechts = eur(z.wert);
+      return '<tr' + (z.summe ? ' class="wv-rw-s"' : '') + '>'
+        + '<td>' + esc(z.pos)
+        + (z.detail ? '<div class="wv-rw-d">' + esc(z.detail) + '</div>' : '')
+        + '</td><td>' + rechts + '</td></tr>';
+    }).join('') + '</tbody></table>';
+  }
+  function aufklapper(kennung, beschriftung, inhalt) {
+    if (!inhalt) return '';
+    return '<div class="wv-mehr" data-wv="' + kennung + '" data-label="' + beschriftung + '">'
+      + '\u25b8 ' + beschriftung + '</div>'
+      + '<div class="wv-erk" id="wv-e-' + kennung + '">' + inhalt + '</div>';
+  }
+  function karte(kennung, titel, wert, unten, art, staffel) {
     return '<div class="wv-k">'
       + '<div class="wv-t">' + titel + '</div>'
       + '<div class="wv-v">' + wert + '</div>'
       + '<div class="wv-s">' + (unten || '') + '</div>'
-      + '<div class="wv-mehr" data-wv="' + kennung + '">\u25b8 was bedeutet das?</div>'
-      + '<div class="wv-erk" id="wv-e-' + kennung + '">' + _wvErklaerung(art) + '</div>'
+      + aufklapper(kennung, 'was bedeutet das?', _wvErklaerung(art))
+      + aufklapper('rw-' + kennung, 'Rechenweg', rechenweg(staffel))
       + '</div>';
   }
 
@@ -514,13 +552,25 @@ function _renderWertverfahren(d) {
     + (hk.kurz ? '<div class="wv-hk">Liegenschaftszinssatz: '
         + (hk.liegenschaftszins_pct != null ? String(hk.liegenschaftszins_pct).replace('.', ',') + ' % \u00b7 ' : '')
         + hk.kurz + (hk.indikativ ? ' (indikativ)' : '') + '</div>' : '')
+    /* v1141-RW \u00b7 Der Bodenwert geht in BEIDE anderen Verfahren ein, deshalb
+     * gehoert sein Weg direkt unter seine Zahl \u2014 nicht in eine der Karten.
+     * Seine Schritte heissen `schritte` (ErtragswertService.bodenwert), die
+     * der Verfahren `staffel`; er fuehrt kein `summe`-Flag, darum wird die
+     * Ergebniszeile hier angehaengt. */
+    + aufklapper('bod', 'Rechenweg', rechenweg(
+        (cc.bodenwert && cc.bodenwert.schritte && cc.bodenwert.schritte.length)
+          ? cc.bodenwert.schritte.concat([
+              { pos: '= Bodenwert', wert: cc.bodenwert.wert, summe: true },
+            ])
+          : null))
     + '<h3 class="wv-h">Wertverfahren im Vergleich</h3>'
     + '<div class="wv-g">'
     + karte('vgl', 'Vergleichswert', eur(v), 'f\u00fchrend bei Eigentumswohnungen', 'vergleich')
     + karte('ert', 'Ertragswert', e.available ? eur(e.value_eur) : '\u2013',
-        e.available ? ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.') : (e.grund || ''), 'ertrag')
+        e.available ? ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.') : (e.grund || ''),
+        'ertrag', e.staffel)
     + karte('sac', 'Sachwert', sw.available ? eur(sw.value_eur) : '\u2013',
-        sw.available ? '' : (sw.grund || 'nicht ausgewiesen'), 'sach')
+        sw.available ? '' : (sw.grund || 'nicht ausgewiesen'), 'sach', sw.staffel)
     + '</div>';
 
   if (!document.getElementById('wv-css')) {
@@ -538,7 +588,18 @@ function _renderWertverfahren(d) {
       + '#wv-box .wv-s{font-size:11.5px;opacity:.7;min-height:16px}'
       + '#wv-box .wv-mehr{margin-top:8px;font-size:11.5px;cursor:pointer;'
       + 'color:var(--wl-c9a84c,#C9A84C)}'
-      + '#wv-box .wv-erk{display:none;margin-top:7px;font-size:11.5px;line-height:1.55;opacity:.85}';
+      + '#wv-box .wv-erk{display:none;margin-top:7px;font-size:11.5px;line-height:1.55;opacity:.85}'
+      /* v1141-RW · Der Rechenweg steht in einer 3-Spalten-Kachel, also eng.
+       * `overflow-wrap` statt fester Breite: lieber ein Umbruch in der
+       * Beschriftung als eine abgeschnittene Zahl. Die Zahlenspalte bleibt
+       * deshalb `nowrap` und tabellarisch — nur links darf brechen. */
+      + '#wv-box .wv-rw{width:100%;border-collapse:collapse;font-size:11px}'
+      + '#wv-box .wv-rw td{padding:3px 0;vertical-align:top;overflow-wrap:anywhere}'
+      + '#wv-box .wv-rw td:last-child{text-align:right;white-space:nowrap;padding-left:10px;'
+      + 'font-variant-numeric:tabular-nums;width:1%}'
+      + '#wv-box .wv-rw-s td{font-weight:600;border-top:1px solid rgba(128,128,128,.28);padding-top:5px}'
+      + '#wv-box .wv-rw-s td:last-child{color:var(--wl-c9a84c,#C9A84C)}'
+      + '#wv-box .wv-rw-d{font-size:10px;line-height:1.4;opacity:.6;margin-top:2px;font-weight:400}';
     document.head.appendChild(st);
   }
   wrap.appendChild(box);
@@ -548,7 +609,10 @@ function _renderWertverfahren(d) {
       var z = document.getElementById('wv-e-' + m.getAttribute('data-wv'));
       var auf = z.style.display !== 'block';
       z.style.display = auf ? 'block' : 'none';
-      m.textContent = (auf ? '\u25be' : '\u25b8') + ' was bedeutet das?';
+      /* v1141-RW: die Beschriftung stand hier fest verdrahtet \u2014 mit einem
+       * zweiten Aufklapper haette der Rechenweg beim Zuklappen pl\u00f6tzlich
+       * "was bedeutet das?" geheissen. */
+      m.textContent = (auf ? '\u25be' : '\u25b8') + ' ' + m.getAttribute('data-label');
     });
   });
 }
