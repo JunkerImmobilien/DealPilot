@@ -182,6 +182,15 @@ muss mitfärben. Und **beide Bedienwege** prüfen —
   stillem Rückfall auf den Rohwert ließ eine Korrektur **nie** laufen, bei
   gemessenem Kontrast 1,00. **Fehlende Module laut melden**, nicht im `catch`
   verschwinden lassen.
+- **`window.confirm` blockiert jede Browser-Automation.** Der
+  Marktbericht-Abruf fragt vor dem kostenpflichtigen Lauf nach
+  (`marktbericht-app/app.js:224`, v647-cost). Ein modaler Dialog friert den
+  Renderer ein: CDP läuft in einen Timeout, Screenshots scheitern, der Tab
+  ist tot und muss geschlossen werden. Das sah wie ein Produktfehler aus und
+  war keiner — **der Dialog ist der Kostenschutz und gehört dahin.** Wer den
+  Weg automatisiert prüfen will, ersetzt ihn vorher:
+  `window.confirm = () => true` (und den Text mitschreiben, er nennt den
+  Preis). Gilt genauso für `alert` und `prompt`.
 - **Zustand aus dem vorigen Prüflauf verfälscht die nächste Messung.** Ein
   selbst gesetztes `body.hdr-collapsed` überlebte den Reload (localStorage)
   und ließ einen Spalt von 49 px melden, den es nicht gab. Vor jeder Messung
