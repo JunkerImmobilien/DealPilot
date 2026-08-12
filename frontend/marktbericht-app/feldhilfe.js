@@ -159,6 +159,25 @@
         out.kurz = 'Hier gehört die Fläche des GESAMTEN Grundstücks hinein, nicht ein Anteil davon. Den Anteil trägst du separat als Miteigentumsanteil ein.';
       }
     }
+    /* v1145-SWFART · Ein Eingabefeld, das den Wert wegwirft, ist schlimmer
+     * als keins. Für Eigentumswohnungen (und MFH/Gewerbe) leitet kein
+     * Gutachterausschuss Sachwertfaktoren ab; seit v1144 wird ein
+     * eingetragener Wert deshalb verworfen — bis dahin verschluckte ihn
+     * ohnehin ein Feldname-Fehler. Am Prüfobjekt stand 1,15 im Feld und
+     * blieb wirkungslos, ohne dass irgendwo etwas dazu stand. */
+    if (feld === 'sachwertfaktor') {
+      var pt2 = $('ptype') ? String($('ptype').value).toLowerCase() : '';
+      if (/etw|wohnung|whg|mfh|mehrfamilien|gewerbe|buero/.test(pt2)) {
+        out.titel = 'Für diese Objektart ohne Wirkung';
+        out.kurz = 'Sachwertfaktoren werden nur für Ein- und Zweifamilien-, Doppel- und '
+          + 'Reihenhäuser abgeleitet (Abschnitt 5.1.4). Ein hier eingetragener Wert '
+          + '<b>wird nicht angewandt</b> — der Bericht weist den vorläufigen Sachwert aus.';
+        out.lang = 'Das ist kein Mangel des Berichts: bei einer Eigentumswohnung führt das '
+          + 'Vergleichswertverfahren, der Sachwert steht nur zur Einordnung daneben. Einen '
+          + 'Faktor aus der Häuser-Ableitung auf eine Wohnung anzuwenden wäre ein '
+          + 'Modellbruch (§ 10 ImmoWertV). ' + out.lang;
+      }
+    }
     return out;
   }
 
@@ -175,6 +194,31 @@
       (el.parentNode || document.body).appendChild(d);
     }
     d.textContent = t.anker[el.value] || '';
+  }
+
+  /* ── v1145-SWFART · Sichtbar, ohne Klick ────────────────────────────────
+   * Die Feldhilfe erklärt es erst auf Klick — gemerkt hat es aber niemand:
+   * am Prüfobjekt stand 1,15 im Feld und blieb wirkungslos. `ankerZeigen()`
+   * taugt hier nicht, es hängt am eigenen Feldwert; hier entscheidet die
+   * Objektart nebenan. Deshalb eine eigene kleine Anzeige, die derselben
+   * Klasse folgt. */
+  function swfWirkung() {
+    var el = $('sachwertfaktor');
+    var id = 'fh-swf-aus';
+    var d = $(id);
+    if (!el) { if (d) d.remove(); return; }
+    var pt = $('ptype') ? String($('ptype').value).toLowerCase() : '';
+    if (!/etw|wohnung|whg|mfh|mehrfamilien|gewerbe|buero/.test(pt)) {
+      if (d) d.remove();
+      return;
+    }
+    if (!d) {
+      d = document.createElement('div');
+      d.id = id; d.className = 'fh-anker';
+      (el.parentNode || document.body).appendChild(d);
+    }
+    d.textContent = 'Für diese Objektart ohne Wirkung — Sachwertfaktoren werden nur '
+      + 'für Ein- und Zweifamilien-, Doppel- und Reihenhäuser abgeleitet.';
   }
 
   /* Baustatus schaltet den Modernisierungsblock. */
@@ -224,6 +268,13 @@
       ankerZeigen(f);
       e.addEventListener('change', function () { ankerZeigen(f); });
     });
+    /* v1145-SWFART · Das Feld `sachwertfaktor` liegt im Block wm-b3 und
+     * entsteht erst beim Hochstufen — ein einmaliger Aufruf beim Start
+     * verpufft deshalb. Am `document` lauschen ist hier billiger als ein
+     * Beobachter: die Prüfung ist zwei Feldzugriffe lang. */
+    document.addEventListener('change', swfWirkung, true);
+    document.addEventListener('input', swfWirkung, true);
+    swfWirkung();
     var bs = $('baustatus');
     if (bs) { bs.addEventListener('change', baustatusAnwenden); baustatusAnwenden(); }
   }
