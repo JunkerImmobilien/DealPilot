@@ -106,6 +106,24 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
+     **Nachgemessen 2026-08-12 im Quelltext — die 4 px sind kein
+     Quetschbefund.** `.sbc-arrow` trägt in `style.css:4828` bereits
+     `flex-shrink: 0`; die Regel darunter
+     (`aside.sidebar .sb-card .sbc-arrow`, Z. 24958) setzt nur Farbe,
+     Schriftgröße und `margin-left`. **Die 4 × 21 px sind schlicht die
+     natürliche Breite des Zeichens `›` bei 14 px ohne jedes Padding** —
+     der Pfeil hat nie eine Fläche gehabt, er ist nur ein Buchstabe.
+
+     **Damit ist die Lösung eine andere als gedacht:** kein Flex-Fix,
+     sondern dem Pfeil überhaupt erst eine Fläche geben. Der Weg ohne
+     Klickdiebstahl ist **Padding am Element selbst** plus negatives
+     `margin` zum Ausgleich — die vergrößerte Fläche gehört dann dem Pfeil
+     und seinem eigenen delegierten Handler
+     (`karten-kompakt.js:83`, `ziel.closest('.sbc-arrow')`), nicht der
+     Karte. **Zu messen ist vorher, wie viel Platz in `.sbc-top-line1`
+     rechts frei ist** — überlappt das negative Margin die Nachbarn,
+     stiehlt es Klicks in die andere Richtung.
+
 3. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
