@@ -75,6 +75,33 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Zugriff nur über `lib/gutachterausschuss.js`** (CLAUDE.md), nie ein
    Modul direkt.
 
+   ### → Hier weitermachen (Stand 2026-08-12, Sitzungsende)
+
+   **Der nächste Schritt ist ein Nachweis, kein Umbau, und er kostet
+   nichts:** Für `07d89138` (Hermannstraße 9, Hüllhorst) ist **Stufe 3
+   bereits bezahlt**, jeder weitere Abruf steht auf **0 L** (gemessen:
+   `stufenpreis` liefert `bezahlte_stufe: 3`, `faellig: {1:0, 2:0, 3:0}`).
+
+   1. Im Objekt-Reiter das Feld **`sachwertfaktor`** setzen — **Marcel gibt
+      den Wert vor**, er ist der Sachverständige. Rückgerechnet passt
+      **0,71** (191.500 / 268.172), aber die Zahl ist eine Ableitung aus
+      zwei anderen Verfahren, **kein Faktor eines Gutachterausschusses** —
+      sie taugt als Plausibilitätsprobe, nicht als Ansatz.
+   2. Bericht neu ziehen und drei Dinge messen:
+      - Schwenkt der Sachwert von **268.172 €** auf die Größenordnung von
+        Vergleichswert (192.000 €) und Ertragswert (191.339 €)?
+      - Trägt die Karte dann **„marktangepasst"** statt „INDIKATIV · ohne
+        Sachwertfaktor"? Das Feld `marktangepasst` liegt im Antwortobjekt
+        bereits vor.
+      - Steht die Herkunft als **Stufe E, „eigene Angabe"** dabei — so wie
+        der Liegenschaftszinssatz es tut?
+   3. Läuft das durch, ist die Abfragekette praktisch bewiesen und der
+      offene Punkt reduziert sich auf die **Ernte** (Weg 2 oben).
+
+   **Der Abruf blockiert unter Automation**, solange `window.confirm` nicht
+   ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
+   siehe `FALLEN.md`.
+
 2. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
