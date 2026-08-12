@@ -37,8 +37,37 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Der Sachwertfaktor wird nirgends geerntet — deshalb bleibt jeder
-   Sachwert ein vorläufiger.** Gemessen am 2026-08-12 in `mb.wert_parameter`:
+1. **Der Sachwertfaktor wird nirgends geerntet.**
+
+   > **Am 2026-08-12 nachgemessen und in einem Punkt korrigiert.** Die
+   > Überschrift hieß hier zuerst „…deshalb bleibt **jeder** Sachwert ein
+   > vorläufiger". Das war zu pauschal und hätte die Suche in die falsche
+   > Richtung geschickt. **Für Eigentumswohnungen gäbe es auch mit voller
+   > Ernte keinen Faktor** — der Gutachterausschuss leitet Sachwertfaktoren
+   > nur für Ein- und Zweifamilien-, Doppel- und Reihenhäuser ab
+   > (Abschnitt 5.1.4). Der Erntebefund unten bleibt richtig, er trifft
+   > aber **die Häuser**, nicht das Prüfobjekt.
+   >
+   > **Der Einstiegspunkt von gestern ist damit abgearbeitet:** Ein Faktor
+   > war sogar schon gepflegt — **1,15 stand im Feld** und kam als
+   > `sachwertfaktor: 1.15` sauber im Payload an. Der Bericht verwirft ihn
+   > trotzdem, mit Begründung im Antwortobjekt
+   > (`sachwertfaktor_grund: "objektart_nicht_abgeleitet"`). Der Sachwert
+   > blieb bei 268.172 €. **Das ist richtig so** — ein Sachwertfaktor auf
+   > eine ETW angewandt wäre ein Modellbruch.
+   >
+   > **Offen bleibt daraus ein eigener Punkt:** Der gepflegte Wert wird
+   > *stillschweigend* verworfen. Wer 1,15 einträgt, bekommt keinerlei
+   > Rückmeldung, dass die Angabe für diese Objektart wirkungslos ist —
+   > siehe Punkt 2.
+   >
+   > **Der Nachweis der Kette steht damit noch aus** und braucht ein
+   > **EFH oder ZFH**. Auf Staging bietet sich `Löhner Str. 278`
+   > (32120 Hiddenhausen, ZFH) an — das zweite Testobjekt aus `CLAUDE.md`.
+   > Dort greift die Objektart, und dort schlägt dann auch die leere Ernte
+   > durch.
+
+   Gemessen am 2026-08-12 in `mb.wert_parameter`:
 
    | Typ | Einträge |
    |---|---|
@@ -63,46 +92,59 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    korrekt („ohne Sachwertfaktor — Herstellungskosten, kein Marktwert"),
    aber wer nur die drei Zahlen sieht, hält eine für falsch.
 
-   **Zwei Wege, der zweite ist der eigentliche:**
-   - **Sofort:** Das Objektfeld `sachwertfaktor` füllen — es läuft über
-     `WM_MAP` ins Berichtsformular und als Stufe E in die Rechnung.
-     **Codeseitig geprüft, in der Praxis noch nicht durchgefahren.**
-   - **Dauerhaft:** Sachwertfaktoren in die Ernte aufnehmen. Sie stehen in
-     denselben Grundstücksmarktberichten wie der Liegenschaftszinssatz —
-     `WNHK-1` sagt dazu „die Ernte liefert beides oder keines", und
-     tatsächlich liefert sie nur eines.
+   **Zu tun:** Sachwertfaktoren in die Ernte aufnehmen. Sie stehen in
+   denselben Grundstücksmarktberichten wie der Liegenschaftszinssatz —
+   `WNHK-1` sagt dazu „die Ernte liefert beides oder keines", und
+   tatsächlich liefert sie nur eines. **Zugriff nur über
+   `lib/gutachterausschuss.js`** (CLAUDE.md), nie ein Modul direkt.
 
-   **Zugriff nur über `lib/gutachterausschuss.js`** (CLAUDE.md), nie ein
-   Modul direkt.
+   ### → Hier weitermachen
 
-   ### → Hier weitermachen (Stand 2026-08-12, Sitzungsende)
+   **Der Nachweis der Abfragekette braucht ein Haus, keine Wohnung.**
+   Vorschlag: **`Löhner Str. 278`, 32120 Hiddenhausen (ZFH)** — das zweite
+   Testobjekt aus `CLAUDE.md`, mit bekanntem Verkehrswert 350.094,36 €.
 
-   **Der nächste Schritt ist ein Nachweis, kein Umbau, und er kostet
-   nichts:** Für `07d89138` (Hermannstraße 9, Hüllhorst) ist **Stufe 3
-   bereits bezahlt**, jeder weitere Abruf steht auf **0 L** (gemessen:
-   `stufenpreis` liefert `bezahlte_stufe: 3`, `faellig: {1:0, 2:0, 3:0}`).
-
-   1. Im Objekt-Reiter das Feld **`sachwertfaktor`** setzen — **Marcel gibt
-      den Wert vor**, er ist der Sachverständige. Rückgerechnet passt
-      **0,71** (191.500 / 268.172), aber die Zahl ist eine Ableitung aus
-      zwei anderen Verfahren, **kein Faktor eines Gutachterausschusses** —
-      sie taugt als Plausibilitätsprobe, nicht als Ansatz.
-   2. Bericht neu ziehen und drei Dinge messen:
-      - Schwenkt der Sachwert von **268.172 €** auf die Größenordnung von
-        Vergleichswert (192.000 €) und Ertragswert (191.339 €)?
-      - Trägt die Karte dann **„marktangepasst"** statt „INDIKATIV · ohne
-        Sachwertfaktor"? Das Feld `marktangepasst` liegt im Antwortobjekt
-        bereits vor.
+   1. Objekt im Marktbericht wählen, Stufe 3, **Sachwertfaktor eintragen**
+      — **Marcel gibt den Wert vor**, er ist der Sachverständige.
+   2. Bericht ziehen und drei Dinge messen:
+      - Wandert der Sachwert vom vorläufigen auf den marktangepassten Wert?
+      - Trägt die Karte **„marktangepasst · Faktor x"** statt „vorläufig ·
+        ohne Sachwertfaktor" (die Unterzeile gibt es seit `v1143`)?
       - Steht die Herkunft als **Stufe E, „eigene Angabe"** dabei — so wie
         der Liegenschaftszinssatz es tut?
-   3. Läuft das durch, ist die Abfragekette praktisch bewiesen und der
-      offene Punkt reduziert sich auf die **Ernte** (Weg 2 oben).
+   3. Läuft das durch, ist die Kette bewiesen und der Punkt reduziert sich
+      auf die **Ernte**.
+
+   **Vorher prüfen, was der Abruf kostet.** Für `07d89138` (Hüllhorst) war
+   Stufe 3 bezahlt und jeder weitere Lauf stand auf 0 L; für ein anderes
+   Objekt gilt das **nicht** — `stufenpreis` fragen und Marcel den Preis
+   nennen, bevor Kerosin fließt.
 
    **Der Abruf blockiert unter Automation**, solange `window.confirm` nicht
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-2. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+2. **Ein gepflegter Sachwertfaktor wird stillschweigend verworfen.**
+   Gemessen am 2026-08-12 an Hermannstraße 9: Im Feld stand **1,15**, im
+   Payload kam `sachwertfaktor: 1.15` sauber an — der Bericht rechnet ihn
+   trotzdem nicht. Zu Recht, denn für eine ETW gibt es keinen
+   Sachwertfaktor (`sachwertfaktor_grund: "objektart_nicht_abgeleitet"`).
+
+   **Der Nutzer erfährt davon nichts.** Er trägt einen Wert ein, es
+   passiert nichts, und kein Feld sagt warum. Seit `v1143` steht der Grund
+   immerhin an der Sachwert-Karte („warum vorläufig?"), aber **nicht am
+   Eingabefeld**, wo die Angabe gemacht wird.
+
+   **Zu tun:** Das Feld `sachwertfaktor` blendet bei einer Wohnung einen
+   Hinweis ein — oder verschwindet ganz, so wie `wertermittlung.js` es bei
+   anderen objektartabhängigen Feldern schon tut (`istWohnung()` ist dort
+   vorhanden). **Ein Eingabefeld, das den eingetragenen Wert wegwirft, ist
+   schlimmer als keins.**
+
+   Verwandt mit Punkt 4 (neun Info-Zeichen ohne Text): auch hier
+   verschwindet eine Erklärung, die es im System längst gibt.
+
+3. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
    das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
@@ -126,7 +168,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist, ob das Feld wohnungs- oder gebäudebezogen gemeint ist, und ob die
    Feldhilfe das sagt. **Marcel entscheidet das fachlich.**
 
-3. **Neun Info-Zeichen in der Wertermittlung tun nichts.** Beim Setzen des
+4. **Neun Info-Zeichen in der Wertermittlung tun nichts.** Beim Setzen des
    Garagen-Hinweises (`v1142`) aufgefallen und dann durchgezählt:
    `wertermittlung.js` vergibt **18** Hilfe-Schlüssel, `TEXTE` in
    `feldhilfe.js` führt **11** (mit dem neuen). `textFuer()` kennt keinen
@@ -147,7 +189,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Fehlen eines Schlüssels **laut** sein lassen (`console.warn`) statt
    still — ein stiller Rückfall sieht aus wie ein bestandener Lauf.
 
-4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+5. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -245,7 +287,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+6. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -280,7 +322,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+7. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -314,7 +356,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-7. **Marktbericht neu gestalten.**
+8. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -458,7 +500,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-8. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
+9. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
    Beim Ausrollen von `v1136` gemessen: `git status` auf
    `root@116.203.214.11` meldet
    `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
@@ -477,7 +519,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Produktion** liegt. Nicht nebenbei: es ist der BORIS-Anschluss, an
    dem die Bodenrichtwerte hängen.
 
-9. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
+10. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
 
    Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
 
@@ -515,7 +557,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-10. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+11. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
 
    Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
    Defekt, keine Geschmacksfrage.
@@ -535,7 +577,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
    dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
 
-11. **Regler „Tab-Texte" wirkt nicht**
+12. **Regler „Tab-Texte" wirkt nicht**
 
    Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
    Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
@@ -552,7 +594,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
    Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
 
-12. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+13. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
    Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
    schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
@@ -575,7 +617,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
    Aufgreifen zusammenlegen, nicht doppelt bauen.
 
-13. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+14. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
 
    **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
    führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
@@ -600,7 +642,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
    Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
 
-14. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+15. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
 
    Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
    Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
@@ -623,7 +665,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
    entschieden ist.
 
-15. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+16. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -660,7 +702,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-16. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+17. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -690,7 +732,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-17. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+18. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
