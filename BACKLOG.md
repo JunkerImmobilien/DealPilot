@@ -37,7 +37,27 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Der Sachwertfaktor wird nirgends geerntet.**
+1. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+   Datenvorhaben, kein Defekt.**
+
+   > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
+   > eigene Module: **Minden-Lübbecke** (`05770`,
+   > `lib/sachwertfaktoren_nrw.js`) und **Herford** (`05758`,
+   > `lib/sachwertfaktoren_herford.js`), aufgelöst über
+   > `lib/gutachterausschuss.js`. Dass sie wirken, ist inzwischen belegt —
+   > siehe Punkt 2, dort kam 0,925 Stufe A aus dem Herforder Bericht.
+   >
+   > **Für jeden weiteren Kreis braucht es den Grundstücksmarktbericht
+   > selbst**, nicht Code: die Sachwertfaktor-Matrix wird je Ausschuss
+   > abgeleitet und ist ausdrücklich **nicht übertragbar** (§ 10
+   > ImmoWertV, der Modulcode sagt das auch so). Ein Objekt außerhalb der
+   > beiden Kreise bekommt korrekt `anderer_ausschuss` und bleibt beim
+   > vorläufigen Sachwert — das ist die Regel „kein Treffer heißt kein
+   > Wert", nicht ein Fehler.
+   >
+   > **Zu entscheiden ist deshalb zuerst, welche Kreise überhaupt
+   > gebraucht werden** — danach ist es Fleißarbeit je Kreis, keine
+   > Programmieraufgabe. Marcel gibt vor, welche.
 
    > **Am 2026-08-12 nachgemessen und in einem Punkt korrigiert.** Die
    > Überschrift hieß hier zuerst „…deshalb bleibt **jeder** Sachwert ein
@@ -195,14 +215,23 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    immerhin an der Sachwert-Karte („warum vorläufig?"), aber **nicht am
    Eingabefeld**, wo die Angabe gemacht wird.
 
-   **Zu tun:** Das Feld `sachwertfaktor` blendet bei einer Wohnung einen
-   Hinweis ein — oder verschwindet ganz, so wie `wertermittlung.js` es bei
-   anderen objektartabhängigen Feldern schon tut (`istWohnung()` ist dort
-   vorhanden). **Ein Eingabefeld, das den eingetragenen Wert wegwirft, ist
-   schlimmer als keins.**
+   **BEHOBEN in `v1145` (`1ea582d`).** Zweifach, weil ein Klick-Hinweis
+   allein nichts nützt — gemerkt hätte es weiter niemand:
 
-   Verwandt mit Punkt 4 (neun Info-Zeichen ohne Text): auch hier
-   verschwindet eine Erklärung, die es im System längst gibt.
+   - **Sichtbar ohne Klick:** unter dem Feld steht bei ETW/MFH/Gewerbe
+     „Für diese Objektart ohne Wirkung — Sachwertfaktoren werden nur für
+     Ein- und Zweifamilien-, Doppel- und Reihenhäuser abgeleitet."
+   - **Die Feldhilfe** erklärt den Grund samt § 10 ImmoWertV und dass bei
+     einer Wohnung ohnehin das Vergleichswertverfahren führt.
+
+   `ankerZeigen()` taugte dafür nicht — es hängt am **eigenen** Feldwert,
+   hier entscheidet die Objektart nebenan. Und das Feld entsteht erst im
+   Block `wm-b3`, ein einmaliger Aufruf beim Start verpufft; deshalb hört
+   die Prüfung am `document` mit.
+
+   **Gegengemessen an beiden Objektarten:** Hermannstraße 9 (ETW) zeigt
+   Hinweis und Feldhilfe, `PRUEF_ZFH` (EFH) zeigt **keinen** — und er
+   verschwindet beim Wechsel der Objektart von selbst.
 
 4. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
