@@ -36909,8 +36909,17 @@ body.dp-chrome-hell aside.sidebar .sb-act-section-title {
    Optik. Ihre Regeln stehen frueher in der Datei und haetten bei
    gleicher Spezifitaet verloren — deshalb hier ausgeschlossen statt
    dort verstaerkt.
+
+   v1147b · ERST GEMESSEN, DANN KORRIGIERT: der Selektor stand zuerst auf
+   `#app` — dieses Element gibt es in der App gar nicht (`getElementById`
+   liefert null, im Browser nachgesehen). Die Regel konnte nie greifen;
+   ich hatte den Anker aus CLAUDE.md uebernommen, statt ihn auszulesen.
+   Anker ist jetzt `body`, die vier :not()-Ketten tragen die Spezifitaet
+   und schlagen die frueheren Regeln sicher. Die Pre-Flight-Kacheln
+   (`.dp-pf-tile`) sind mit ausgenommen — sie bauen aus dem nackten Feld
+   ebenfalls eine eigene Optik.
    ======================================================================== */
-#app input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):not(.fesh-tile input) {
+body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):not(.fesh-tile input):not(.dp-pf-tile input) {
   width: 33px;
   height: 33px;
   accent-color: var(--gold);
