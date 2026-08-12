@@ -3319,6 +3319,28 @@ async function exportPdf(out) {
       (sw.restnutzungsdauer_jahre != null && sw.gesamtnutzungsdauer_jahre != null)
         ? 'RND ' + String(sw.restnutzungsdauer_jahre).replace('.', ',') + ' J. / GND '
           + sw.gesamtnutzungsdauer_jahre + ' J.'
+          /* v1083b-WPDF-1 · EIN STILLER RUECKFALL IST SCHLIMMER ALS EIN
+           * FEHLER. Ohne erfassten Modernisierungsgrad rechnet die
+           * Restnutzungsdauer als GND minus Alter statt nach Anlage 2 — an
+           * der Loehner Strasse 18 statt 24 Jahre, rund 57.500 EUR weniger
+           * Gebaeudesachwert. Die Zahl stand hier bisher ohne jeden Hinweis,
+           * als waere sie nach Anlage 2 ermittelt. Das Backend liefert die
+           * Herkunft seit v1083-WRND; sie wurde nur nie gedruckt. */
+          + ((sw.restnutzungsdauer_herkunft
+              && sw.restnutzungsdauer_herkunft.quelle === 'geschaetzt')
+              ? ' \u00b7 gesch\u00e4tzt' : '')
+        : null,
+      /* v1083b-WPDF-2 · Warum kein Sachwertfaktor angesetzt wurde. "Ohne
+       * Sachwertfaktor" ist eine Feststellung, keine Begruendung — bei einer
+       * Eigentumswohnung leitet der Gutachterausschuss naemlich gar keinen
+       * ab. Der Bildschirm zeigt den Grund seit v1143, das PDF nicht. */
+      (sw.available && !sw.marktangepasst && sw.sachwertfaktor_grund)
+        ? ({ objektart_nicht_abgeleitet: 'Ausschuss leitet f\u00fcr diese Objektart keinen Faktor ab',
+             kein_ausschuss_hinterlegt: 'kein Gutachterausschuss hinterlegt',
+             anderer_ausschuss: 'au\u00dferhalb des zust\u00e4ndigen Ausschusses',
+             ausserhalb_der_tabelle: 'Objekt liegt au\u00dferhalb der ver\u00f6ffentlichten Tabelle',
+             brw_fehlt: 'Bodenrichtwert fehlt' }[sw.sachwertfaktor_grund]
+           || String(sw.sachwertfaktor_grund).replace(/_/g, ' '))
         : null,
     ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar'],
       _fuehrt('sachwert'));   /* v1062-WFUE-3 */
@@ -3501,6 +3523,17 @@ async function exportPdf(out) {
       need(_agz.length * 3.4 + 4); doc.text(_agz, M, y); y += _agz.length * 3.4 + 3;
       doc.setFontSize(7.5);
     }
+    /* v1083b-WPDF-3 · Der volle Wortlaut, dort wo Platz ist. In der Karte
+     * steht nur "geschaetzt"; hier steht, was das bedeutet und was fehlt.
+     * Jede Zahl traegt ihre Herkunft — das gilt auch fuer eine, die aus
+     * einem Rueckfall stammt. */
+    var _rh = _swx.restnutzungsdauer_herkunft;
+    if (_rh && _rh.quelle === 'geschaetzt' && _rh.hinweis) {
+      doc.setFontSize(7); doc.setTextColor(150, 120, 60);
+      var _rz = doc.splitTextToSize(_rh.hinweis, blockW);
+      need(_rz.length * 3.4 + 4); doc.text(_rz, M, y); y += _rz.length * 3.4 + 3;
+      doc.setFontSize(7.5); doc.setTextColor(...MUT);
+    }
     _swx.staffel.forEach((z) => {
       need(9);
       const _sm = !!z.summe;
@@ -3637,6 +3670,17 @@ async function exportPdf(out) {
       if (_lo != null && _hi != null) {
         _sp = 'Spanne ' + String(_lo).replace('.', ',') + ' bis ' + String(_hi).replace('.', ',')
           + ' % · Angabe des Gutachterausschusses';
+      }
+      /* v1083b-WPDF-4 · Wenn die Streuung den Wert herabgestuft hat, gehoert
+       * der MASSSTAB daneben. "Zu unsicher" ohne Angabe, woran gemessen
+       * wurde, ist keine Begruendung. Wohnen wird absolut gemessen
+       * (Punkte), Gewerbe relativ (Prozent) — das ist eine Festlegung von
+       * DealPilot, nicht des Ausschusses, und muss darum dastehen. */
+      var _lg = d.cross_check && d.cross_check.ertragswert && d.cross_check.ertragswert.lzs;
+      if (_lg && _lg.grund === 'streuung' && _lg.streuung_pp != null) {
+        _sp += ' \u00b7 \u00b1' + String(_lg.streuung_pp).replace('.', ',') + ' Punkte, '
+          + (_lg.massstab === 'absolut' ? 'Ma\u00dfstab 1,5 Punkte' : 'Ma\u00dfstab 25 %')
+          + ' (DealPilot)';
       }
       doc.text(_sp, M + 5, y + 17.5);
     }

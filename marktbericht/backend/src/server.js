@@ -40,6 +40,26 @@ const server = app.listen(cfg.port, () => {
     /* WADM-3 · Taktgeber der Discovery. Laeuft neben dem Server, nie im
    * Anfragepfad — ein haengendes Landesportal darf keinen Bericht blockieren. */
   try { starteHarvestScheduler(); } catch (e) { console.log('[harvest] Start fehlgeschlagen:', e.message); }
+  /* v1083a-WBOOT · Ausschuss-Register aus mb.param_modell nachladen.
+   *
+   * Das Register laedt seine Saatdatei beim ersten Zugriff selbst
+   * (v1083a-WLAZ) — es kann also nie leer sein. Dieser Hook holt zusaetzlich
+   * den DB-Stand, damit eine spaetere Ernte OHNE Deploy wirkt.
+   *
+   * Laeuft NEBEN dem Server, nie im Anfragepfad — dieselbe Regel wie beim
+   * Taktgeber. Schlaegt er fehl oder ist die Tabelle leer, bleibt die
+   * versionierte Saatdatei stehen: das Register ist dann alt, aber nie leer. */
+  (async () => {
+    try {
+      const reg = await import('./lib/ausschuss_register.js');
+      reg.ladeSaat();
+      const { q } = await import('./lib/db.js');
+      const r = await reg.ladeAusDb(q);
+      const st = reg.registerStand();
+      console.log('[register] ' + st.saetze + ' Saetze, ' + st.gebiete
+        + ' Gebiete, Herkunft ' + st.herkunft + (r.grund ? ' (DB: ' + r.grund + ')' : ''));
+    } catch (e) { console.log('[register] Start fehlgeschlagen:', e.message); }
+  })();
   console.log(`[marktbericht] ai_mode=${cfg.ai.mode}  geo=${cfg.geoapify.key ? 'geoapify' : 'none'}  market=${cfg.market.source}`);
 });
 // Lange Berichte (GeoMap-Calls + bis zu 3 min OpenAI) nicht serverseitig abschneiden.

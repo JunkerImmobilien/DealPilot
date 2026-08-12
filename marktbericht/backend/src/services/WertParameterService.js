@@ -269,8 +269,13 @@ export const WertParameterService = {
          * wohnungen: 2,2 Prozent bei einer Standardabweichung von 1,1.
          * Das Modell der AGVGA.NRW weist selbst darauf hin, dass die
          * Mittelwerte betraechtliche Standardabweichungen aufweisen. */
+        /* v1083b-WSTU-4 · DIE KETTE. Die Regel unterscheidet Wohnen und
+         * Gewerbe — ohne diese eine durchgereichte Variable griffe sie nie,
+         * und der ganze Umbau waere wirkungslos geblieben. Genau die Sorte
+         * Zeile, die in v1075 fuer `ref.ags` gefehlt hat. */
         const _str = stufeNachStreuung({ wert: row.wert, wert_min: row.wert_min,
-                                         wert_max: row.wert_max, qualitaet: row.qualitaet });
+                                         wert_max: row.wert_max, qualitaet: row.qualitaet,
+                                         objektart: art });
         return {
           wert: Number(row.wert),
           min: row.wert_min != null ? Number(row.wert_min) : null,
@@ -278,6 +283,11 @@ export const WertParameterService = {
           stufe: _str.qualitaet,
           stufe_roh: row.qualitaet,
           streuung_pct: _str.streuung_pct,
+          /* v1083b-WSTU-5 · Absolute Streuung und Massstab mit nach aussen.
+           * Ohne sie kann der Bericht nicht sagen, WORAN gemessen wurde —
+           * und "zu unsicher" ohne Massstab ist keine Begruendung. */
+          streuung_pp: _str.streuung_pp != null ? _str.streuung_pp : null,
+          massstab: _str.massstab || null,
           herabgestuft: _str.herabgestuft,
           /* v1052-WSPN-1 · Gelesen wurden sie schon, zurueckgegeben nie.
            * Das PDF zeigte deshalb nur "Streuung ±50 % des Mittelwerts"

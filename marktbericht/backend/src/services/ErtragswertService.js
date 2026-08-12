@@ -398,12 +398,20 @@ export const ErtragswertService = {
     let lzs = pos(ein.lzs_pct);
     let lzsQuelle = ein.lzs_quelle || null;
     let lzsStufe = ein.lzs_stufe || null;
+    /* v1083b-WTXT-2 · Warum der Zinssatz auf B steht, nicht nur DASS.
+     * 'streuung' = amtlich und gebietsscharf, aber breit gestreut.
+     * null = die uebrigen Faelle (regionaler Wert, Auffangwert, Nutzerwert). */
+    const lzsGrund = ein.lzs_herabgestuft ? 'streuung' : (ein.lzs_grund || null);
     if (!lzs) {
       const fb = lzsNach256(ein.objektart, bodenwertErgebnis?.quelle?.brw_sqm, ein.anzahl_we);
       lzs = fb.pct; lzsQuelle = fb.quelle; lzsStufe = 'D';
       out.warnungen.push(fb.hinweis);
     }
-    out.lzs = { pct: lzs, quelle: lzsQuelle, stufe: lzsStufe };
+    /* v1083b-WTXT-3 · Grund und Massstab wandern mit nach aussen — das
+     * PDF und der Bildschirm sollen sagen koennen, WORAN gemessen wurde. */
+    out.lzs = { pct: lzs, quelle: lzsQuelle, stufe: lzsStufe, grund: lzsGrund,
+                streuung_pp: ein.lzs_streuung_pp ?? null,
+                massstab: ein.lzs_massstab ?? null };
 
     /* ── 4 · Bodenwertverzinsung ────────────────────────────────────────── */
     /* v1072-WREN-1 · NUR DER RENTIERLICHE BODENWERT WIRD VERZINST.
@@ -521,7 +529,7 @@ export const ErtragswertService = {
 
     /* ── 7 · Belastbarkeit ──────────────────────────────────────────────── */
     out.belastbarkeit = belastbarkeit({
-      lzsStufe, bwkGeprueft: BWK_TABELLE.geprueft,
+      lzsStufe, lzsGrund, bwkGeprueft: BWK_TABELLE.geprueft,
       bodenwertQuelle: bodenwertErgebnis?.quelle?.herkunft,
       hatWohnflaeche: !!pos(ein.wohnflaeche_qm),
       hatRnd: !!R,
@@ -548,11 +556,23 @@ function rundeSinnvoll(v) {
   return Math.round(v / step) * step;
 }
 
-function belastbarkeit({ lzsStufe, bwkGeprueft, bodenwertQuelle, hatWohnflaeche, hatRnd, warnungen }) {
+function belastbarkeit({ lzsStufe, lzsGrund = null, bwkGeprueft, bodenwertQuelle,
+                        hatWohnflaeche, hatRnd, warnungen }) {
   let p = 100;
   const abzuege = [];
   const stufe = String(lzsStufe || 'D').toUpperCase();
-  if (stufe === 'B') { p -= 12; abzuege.push('Liegenschaftszinssatz regional statt kreisscharf (−12)'); }
+  /* v1083b-WTXT-1 · Der Text war falsch beschriftet. Stufe B entsteht in den
+   * meisten Faellen NICHT, weil der Wert regional waere — er ist kreisscharf
+   * und amtlich —, sondern weil seine Streuung ueber dem Massstab liegt.
+   * "Regional statt kreisscharf" behauptete etwas ueber die Herkunft, was
+   * nicht stimmte, und verdeckte den wahren Grund. Jetzt sagt der Abzug,
+   * was er meint; `lzsGrund` kommt aus stufeNachStreuung. */
+  if (stufe === 'B') {
+    p -= 12;
+    abzuege.push(lzsGrund === 'streuung'
+      ? 'Liegenschaftszinssatz amtlich, aber mit großer Streuung (−12)'
+      : 'Liegenschaftszinssatz regional statt kreisscharf (−12)');
+  }
   /* v1022 · Die Marktableitung nutzt echte Preise, der gesetzliche
    * Auffangwert gar keine. Der Abstand im Abzug muss das abbilden. */
   if (stufe === 'C') { p -= 20; abzuege.push('Liegenschaftszinssatz marktabgeleitet, nicht amtlich (−20)'); }

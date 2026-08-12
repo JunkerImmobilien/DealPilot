@@ -590,6 +590,9 @@ export const ReportOrchestrator = {
           lzs_min: _lzs.wert_min != null ? _lzs.wert_min : null,
           lzs_max: _lzs.wert_max != null ? _lzs.wert_max : null,
           lzs_herabgestuft: !!_lzs.herabgestuft,
+          /* v1083b-WSTU-6 · Kette. */
+          lzs_streuung_pp: _lzs.streuung_pp != null ? _lzs.streuung_pp : null,
+          lzs_massstab: _lzs.massstab || null,
           bwk_quote_pct: _bwkPct ? _bwkPct.wert : null,
           bwk_quote_stufe: _bwkPct ? _bwkPct.stufe : null,
           bwk_quote_quelle: _bwkPct ? _bwkPct.quelle : null,

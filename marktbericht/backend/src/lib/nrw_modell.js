@@ -234,12 +234,47 @@ export function restnutzungsdauerNrw({ gnd, alter, punkte }) {
  * Merkmale Einfluss haben. */
 export const STREUUNG_SCHWELLE_PCT = Number(process.env.LZS_STREUUNG_SCHWELLE || 25);
 
+/* v1083b-WSTU-1 · DIE RELATIVE SCHWELLE PASST NUR AUF GEWERBE.
+ *
+ * Gemessen an den Grundstuecksmarktdaten NRW, 471 Saetze mit Streuungsangabe
+ * (12.08.2026): die Standardabweichung ist in ABSOLUTEN Prozentpunkten
+ * ziemlich konstant — Median 1,1 Pp. Wo der Zinssatz klein ist, explodiert
+ * die relative Quote, ohne dass die Datenlage schlechter waere:
+ *
+ *   handel   LZS-Median 5,6 %   relative Streuung  30 %
+ *   mfh      LZS-Median 3,2 %   relative Streuung  37 %
+ *   efh      LZS-Median 1,4 %   relative Streuung  55 %
+ *   we_s     LZS-Median 1,8 %   relative Streuung  62 %
+ *
+ * Mit der 25-Prozent-Regel blieben 15 % aller Saetze auf Stufe A — die Regel
+ * bestraft damit genau die Wohn-Teilmaerkte am haertesten, und zwar nicht
+ * wegen schlechterer Daten, sondern weil ihr Zinssatz kleiner ist.
+ *
+ * Entscheidung Marcel (DESAG-Sachverstaendiger), 12.08.2026:
+ * Wohnen absolut, Gewerbe relativ. Damit bleiben 81 % der Wohn-Saetze auf A.
+ *
+ * Der Anlassfall selbst: Minden-Luebbecke, Eigentumswohnungen 2,2 % +/- 1,1.
+ * 1,1 Pp liegt UNTER 1,5 Pp — der Wert bleibt jetzt Stufe A. Die Spanne
+ * 1,1 bis 3,3 % wird weiterhin ausgewiesen; sie verschwindet nicht, sie
+ * entwertet den Wert nur nicht mehr. */
+export const STREUUNG_SCHWELLE_PP = Number(process.env.LZS_STREUUNG_SCHWELLE_PP || 1.5);
+
+/** Teilmaerkte, fuer die die ABSOLUTE Schwelle gilt. Alles andere relativ. */
+const WOHNEN = new Set([
+  'efh', 'zfh', 'dhh', 'rh', 'rhdhh', 'dreifh', 'mfh', 'mfh_bis6', 'mfh_ueber6',
+  'etw', 'we_s', 'we_v', 'wohnung',
+]);
+
+export function istWohnteilmarkt(objektart) {
+  return WOHNEN.has(String(objektart || '').toLowerCase().trim());
+}
+
 /**
  * Stufe anhand der Streuung pruefen. A bleibt A, solange die relative
  * Standardabweichung unter der Schwelle liegt; darueber wird daraus B —
  * amtlich, aber als unsicher gekennzeichnet.
  */
-export function stufeNachStreuung({ wert, wert_min, wert_max, qualitaet }) {
+export function stufeNachStreuung({ wert, wert_min, wert_max, qualitaet, objektart = null }) {
   if (qualitaet !== 'A') return { qualitaet, streuung_pct: null, herabgestuft: false };
   const w = Number(wert);
   /* v1048 · `Number(null)` ist 0, und 0 besteht Number.isFinite. Eine
@@ -256,19 +291,39 @@ export function stufeNachStreuung({ wert, wert_min, wert_max, qualitaet }) {
   if (!(w > 0) || !Number.isFinite(lo) || !Number.isFinite(hi) || hi <= lo) {
     return { qualitaet, streuung_pct: null, herabgestuft: false };
   }
-  const stabw = (hi - lo) / 2;
+  /* v1083b-WSTU-2a · Auf eine Nachkommastelle runden. (3.3-1.1)/2 ergibt in
+   * Fliesskomma 1.0999999999999999 — das stand sonst so im Bericht. */
+  const stabw = Math.round((hi - lo) / 2 * 10) / 10;
   const rel = Math.round(stabw / w * 1000) / 10;
-  if (rel <= STREUUNG_SCHWELLE_PCT) {
-    return { qualitaet: 'A', streuung_pct: rel, herabgestuft: false };
+
+  /* v1083b-WSTU-2 · Massstab je Teilmarkt. Fehlt die Objektart, bleibt es
+   * beim bisherigen relativen Verhalten — eine unbekannte Objektart darf
+   * die Regel nicht stillschweigend lockern. */
+  const absolut = istWohnteilmarkt(objektart);
+  const drueber = absolut ? (stabw > STREUUNG_SCHWELLE_PP)
+                          : (rel > STREUUNG_SCHWELLE_PCT);
+  const massstab = absolut
+    ? `${String(STREUUNG_SCHWELLE_PP).replace('.', ',')} Punkten`
+    : `${STREUUNG_SCHWELLE_PCT} Prozent des Wertes`;
+
+  if (!drueber) {
+    return { qualitaet: 'A', streuung_pct: rel, streuung_pp: stabw,
+             massstab: absolut ? 'absolut' : 'relativ', herabgestuft: false };
   }
   return {
     qualitaet: 'B',
     streuung_pct: rel,
+    streuung_pp: stabw,
+    massstab: absolut ? 'absolut' : 'relativ',
     herabgestuft: true,
+    /* v1083b-WSTU-3 · Der Hinweis nennt jetzt den MASSSTAB, an dem gemessen
+     * wurde. "Der Wert ist zu unsicher" ist keine Begruendung, solange
+     * nicht dasteht, woran das gemessen wurde. */
     hinweis: `Der Gutachterausschuss gibt zu diesem Zinssatz eine Standardabweichung von `
       + `±${String(stabw.toFixed(1)).replace('.', ',')} Punkten an — bezogen auf den Mittelwert `
-      + `sind das ${String(rel).replace('.', ',')} Prozent. Der Wert ist amtlich ermittelt, aber als `
-      + `Mittelwert über den ganzen Kreis nicht objektscharf belastbar; er wird deshalb als `
-      + `regionaler Wert geführt und mit seiner Spanne ausgewiesen.`,
+      + `sind das ${String(rel).replace('.', ',')} Prozent. Das liegt über dem hier angesetzten `
+      + `Maßstab von ${massstab}. Der Wert ist amtlich und für das Gebiet des Ausschusses `
+      + `ermittelt, als Mittelwert aber nicht objektscharf belastbar; er wird deshalb `
+      + `herabgestuft und mit seiner Spanne ausgewiesen.`,
   };
 }
