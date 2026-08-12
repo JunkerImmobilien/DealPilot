@@ -276,12 +276,15 @@ die alle auf Marcels Durchgang zurückgehen.
    **Alles vier ist gemessen und steht in
    `design/Vorschläge/marktbericht-stufen-und-herkunft.md`.** Kurzfassung:
 
-   - **Die Abrechnung ist schon so gebaut** (v1125/v1126): der Preis kommt
-     vom Server (`GET /marktbericht/stufenpreis`), der Browser rechnet die
-     Ermäßigung **nicht** selbst, sie kommt aus dem Kerosin-Log. Vollpreise
-     2 / 5 / 12 L. **Nichts zu bauen — der Nachweis fehlt:** bucht Stufe 2
-     nach bezahlter Stufe 1 wirklich nur 3 L ab? Klicktest, **kostet echtes
-     Kerosin**, deshalb angekündigt und nicht nebenbei.
+   - **Die Abrechnung ist schon so gebaut** (v1125/v1126) **und jetzt
+     nachgewiesen** (siehe Fertig, ohne Kerosin): Auskunft und Abbuchung
+     rechnen dieselbe Formel, und im Log steht ein echter Vorgang mit
+     **7 L = 12 − 5** für eine Vertiefung von Stufe 2 auf 3. Vollpreise
+     2 / 5 / 12 L, der Browser rechnet die Ermäßigung nicht selbst.
+     **Offen bleibt nur eine Kleinigkeit:** die Formel steht an **zwei**
+     Stellen (`/stufenpreis` und `_kerosinKosten`) — heute deckungsgleich,
+     aber zwei Stellen laufen irgendwann auseinander. Zusammenführen ist ein
+     eigener, kleiner Punkt.
    - **Pflichtfelder je Stufe stehen als eine Quelle** in `BEDARF`
      (`mb-stufen.js`): Stufe 1 `address` `ptype` `area` `year` · Stufe 2
      `baustatus` `cond` `quality` · Stufe 3 `plot` `units` und
@@ -492,6 +495,26 @@ die alle auf Marcels Durchgang zurückgehen.
       Schrittleiste nebeneinander und ein Handy schließen sich aus — der
       Entwurf braucht **zwei** Darstellungen derselben Führung, nicht eine
       gequetschte.
+
+      **DEMO STEHT — blockiert auf Marcels Wahl:**
+      `design/Vorschläge/marktbericht-schrittleiste-handy.html` (2026-08-12,
+      anklickbar, echte 390-px-Rahmen). Drei Fassungen mit gemessenen Höhen:
+
+      | | Höhe | spart | Sprung zu jedem Schritt |
+      |---|---|---|---|
+      | heute | 188 px | — | ja |
+      | **A** Schritt 3 von 7 + Balken | ~62 px | 126 px | **nein** |
+      | **B** Blätterleiste mit Punkten | ~72 px | 116 px | nur über Punkte |
+      | **C** Klappleiste ★ | **50 px** zu | **138 px** | **ja** |
+
+      **Empfehlung C**, weil sie die einzige ist, die **nichts wegnimmt**: der
+      direkte Sprung bleibt, zugeklappt braucht sie weniger als A, und sie
+      zeigt **dieselbe** Führung wie der große Schirm — nur eingeklappt. Dazu
+      ist das Muster im Haus bekannt: die Kompakt-Karte der Sidebar ist
+      genau das („eine schmale Zeile zum Aufklappen", v1092/v1094).
+      **Vorschlag für die Schwelle: unter 900 px** — dieselbe, an der die App
+      auf den Drawer umschaltet. Dann gibt es zwei Fassungen und keine dritte
+      Zwischenform.
 
       **Jetzt vermessen (2026-08-12, nach `v1151`):** bei 390 px ist der
       Behälter 305 px breit, die Leiste bricht auf **vier Zeilen** um
@@ -1113,6 +1136,61 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Die Differenz-Abrechnung ist nachgewiesen — ohne einen Liter Kerosin** — kein Code geändert.
+   Der Punkt war als Klicktest geplant, der echtes Guthaben kostet
+   („Bucht Stufe 2 nach bezahlter Stufe 1 wirklich nur 3 L ab?"). **Er ist
+   nicht nötig** — der Nachweis liegt in vier Teilen vor, alle lesend erhoben.
+
+   **1 · Auskunft und Abbuchung rechnen dieselbe Formel.** Das war die
+   eigentliche Gefahr: zwei Codestellen, die auseinanderlaufen — dann wird
+   3 L angekündigt und 5 L gebucht (Marcels früherer GELD-Befund).
+
+   ```
+   /stufenpreis   faellig[s] = (bezahlt>=s) ? 0
+                    : max(0, STUFENPREIS[s] - (bezahlt>=1 ? STUFENPREIS[bezahlt] : 0))
+   _kerosinKosten  if (bezahlt >= st) return 0;
+                   if (bezahlt >= 1)  return max(0, voll - (STUFENPREIS[bezahlt]||0));
+   ```
+
+   Gleiche Fälle, gleiche Konstante `STUFENPREIS`, gleiche Quelle für
+   `bezahlt` (`aiCreditsService.bezahlteStufeMarktbericht`). **Deckungsgleich
+   — aber zwei Stellen.** Solange es zwei sind, können sie auseinanderlaufen;
+   als Punkt vermerkt.
+
+   **2 · In der Praxis belegt, an einem echten Vorgang.** Im Kerosin-Log
+   (`ai_credits_log`, Haupt-DB) steht für das ETW-Prüfobjekt:
+
+   | Objekt | cost | wert_stufe |
+   |---|---|---|
+   | `07d89138…` (Hermannstraße 9) | **7 L** | 3 |
+   | `3fbb754c…` (PRUEF_ZFH) | 12 L | 3 |
+
+   **Die 7 L sind die Differenz 12 − 5**: dort wurde von bezahlter Stufe 2 auf
+   Stufe 3 vertieft, und es kostete den Aufpreis, nicht den vollen Preis.
+   Genau Marcels Vorgabe — bereits gelebt.
+
+   **3 · Die Gutschrift ist kontobezogen, und das ist richtig.** Der Endpunkt
+   meldete für `PRUEF_ZFH` `bezahlte_stufe: 0` und die vollen Preise, obwohl
+   im Log 12 L stehen. **Kein Fehler:** die Zahlungen gehören
+   `info@junker-immobilien.io`, der Prüflauf lief unter einem anderen Konto.
+   `bezahlteStufeMarktbericht()` filtert auf `user_id` — jeder zahlt für seine
+   eigenen Abrufe.
+
+   **Achtung für künftige Prüfläufe:** die Backlog-Angabe „Stufe 3 bezahlt,
+   weitere Marktberichte kosten 0 L" gilt **nur für das Konto, das bezahlt
+   hat.** Unter einem anderen Konto kostet derselbe Bericht voll.
+
+   **4 · Sieben Buchungen à 12 L auf dasselbe Objekt sind Altdaten, kein
+   Doppelzahlungsfehler.** `def6e516…` trägt sieben volle Buchungen — alle vom
+   **02.08.2026**, also **zehn Tage vor `v1125`**, das die Stufenpreise und die
+   Gutschrift eingeführt hat. Damals gab es weder `wert_stufe` noch eine
+   Ermäßigung. Datiert, bevor daraus ein Befund wurde.
+
+   **Was ohne echten Doppelabruf offen bleibt:** der Durchlauf Stufe 1 → 2 im
+   **selben** Konto. Punkt 2 zeigt denselben Mechanismus von Stufe 2 → 3; ein
+   eigener Kauf würde nur die zweite Sprosse derselben Leiter prüfen.
+   **Deshalb kein Kerosin ausgegeben.**
 
 - [2026-08-12] **Stufe 1 war gesperrt, weil sie die Angaben von Stufe 3 verlangte** — `v1152`, `d17edac`.
    **Marcels Befund** aus der Entwurfs-Durchsicht: „Der Erzeugen-Knopf lässt
