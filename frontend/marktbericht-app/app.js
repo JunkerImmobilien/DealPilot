@@ -3444,7 +3444,31 @@ async function exportPdf(out) {
           : (cc.assumptions.liegenschaftszins * 100)).toLocaleString('de-DE'))
       + ' % · ' + ((cc.sachwert && cc.sachwert.vorlaeufig)
         ? 'ohne Sachwertfaktor'   /* v1061-WFUS-2 */
-        : 'Sachwertfaktor ' + cc.assumptions.sachwertfaktor) + '. Kein Gutachten n. § 194 BauGB.', blockW);
+        /* v1150-WFUS · Dieselbe Falle wie beim Zinssatz (v1052), eine Zeile
+         * weiter — und diesmal mit der Konstante: hier stand
+         * `cc.assumptions.sachwertfaktor`, und das ist SACHWERTFAKTOR = 1.0
+         * aus CrossCheckService.js:26, nicht der angewandte Faktor. Wer mit
+         * 0,889 rechnete, las im Dossier "Sachwertfaktor 1".
+         *
+         * Zweitens fehlte die STUFE. Auf dem Bildschirm steht sie längst
+         * (Karte "Sachwert", app.js:592 ff. — "Faktor 1,15 · Stufe E"), im
+         * PDF nicht. Genau dort muss die Zahl ihre Herkunft tragen: das
+         * Dossier verlässt das Haus, die Bildschirmansicht nicht.
+         *
+         * Beide Formen lesen: nhk2010.js:897 liefert ein OBJEKT
+         * { wert, stufe, quelle }, ältere Wege eine nackte Zahl — das ist
+         * die v1143b-Lehre, die auf dem Bildschirm schon gezogen wurde.
+         * Rückfall auf die Annahme bleibt, wie bei allen Nachbarn in
+         * dieser Fußnote. */
+        : 'Sachwertfaktor ' + (function () {
+            var f = cc.sachwert && cc.sachwert.sachwertfaktor;
+            var z = (f && typeof f === 'object') ? f.wert : f;
+            var s = (f && typeof f === 'object') ? f.stufe : null;
+            var q = (f && typeof f === 'object') ? f.quelle : null;
+            if (z == null) return String(cc.assumptions.sachwertfaktor);
+            return String(z).replace('.', ',')
+              + (s ? ' (Stufe ' + s + (q ? ' · ' + q : '') + ')' : '');
+          })()) + '. Kein Gutachten n. § 194 BauGB.', blockW);
     doc.text(_fn, M, y + 3);
     y += 5 + _fn.length * 3;
   }
