@@ -7,6 +7,21 @@ Junker Digital sind Marken darunter.
 
 Antworte auf **Deutsch**, im Du.
 
+## Die vier Dateien, die die Arbeit steuern
+
+| Datei | sagt |
+|---|---|
+| `CLAUDE.md` (diese) | **wie** gearbeitet wird — die Kurzfassung |
+| `BACKLOG.md` | **was** ansteht |
+| `FALLEN.md` | **wo** schon jemand hingefallen ist |
+| `PROJEKTANWEISUNG.md` | **der Gesamtstand** — Produkt, Architektur, Geld, Daten, Server, Chronik |
+
+`PROJEKTANWEISUNG.md` ist die Langfassung und die Quelle für die
+Projektanweisung in der Claude-App. **Sie wird nach jedem Rollout
+fortgeschrieben** — Eintrag im Rollout-Journal (Teil VI.10): Was · Commit ·
+Nachweis · Rest. Neue Erkenntnisse in den passenden Teil, **keine neue Datei
+mit neuem Datum** — nebeneinander erzeugen sie Widersprüche.
+
 ## Backlog und Vorlagen
 
 **Backlog:** `BACKLOG.md`. Der oberste offene Punkt wird bearbeitet. Nach
@@ -129,15 +144,23 @@ Reseller/Whitelabel · Landing nach Feature-Name · Admin `vNNN`
 ## Bekannte Fallen (teuer bezahlt)
 
 ### CSS
-- **`style.css` hat 35.000 Zeilen, 4.198 `!important`, 226 Media-Queries auf
-  25 Breakpoints.** Token-Überschreibungen reichen **nicht** — farbtragende
-  Flächen müssen **einzeln benannt** werden.
+- **Die aktive Datei ist `frontend/css/style.css`** (36.929 Zeilen, 4.198
+  `!important`, 226 Media-Queries auf 25 Breakpoints) — `index.html:38` lädt
+  sie. **`frontend/style.css` wird von keiner Seite geladen und ist eine
+  Leiche.** Token-Überschreibungen reichen **nicht** — farbtragende Flächen
+  müssen **einzeln benannt** werden.
 - Die dunkle Fassung hängt **nicht** an `--surface`/`--border`, sondern an
   später gesetzten, harten Regeln. `header.hdr`, `nav.tabs`, `aside.sidebar`.
 - Ein heller Skin existiert bereits: `body.dp-chrome-hell`, 103 Regeln,
   API `window._dpDispSkin('hell'|'obsidian')`, Merker `dp_chrome_hell`.
 - **Bei gleicher Spezifität gewinnt die spätere Regel.** Lieber Spezifität
-  erhöhen (`#app[...]`) als auf Ladereihenfolge bauen.
+  erhöhen als auf Ladereihenfolge bauen — aber **jeden Anker vorher im Browser
+  auslesen**. `#app` gibt es in dieser App **nicht**; eine Regel mit diesem
+  Anker greift nirgends und sieht dabei plausibel aus (kostete v1147 einen
+  ganzen Ausrollzyklus).
+- **Welche Regel gewinnt, sagt nur der Kaskaden-Walker**, nicht `matches()`.
+  Blinde Flecken: ID-Selektoren, Kurzschriften (`background:` wird nicht zu
+  `background-color` expandiert), Pseudoelemente. Details in `FALLEN.md`.
 - **`:not(#id)` erbt ID-Spezifität** — nie Sammelregeln auf Container-Kinder.
 - **Flex-Kinder in `overflow:auto`-Containern schrumpfen, statt zu scrollen.**
   Der Inhalt wird dann still abgeschnitten → `flex:0 0 auto` setzen.

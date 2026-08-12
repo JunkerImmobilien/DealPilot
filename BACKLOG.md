@@ -831,6 +831,25 @@ bleibt offen und braucht ein Bild.
 
 ## Später
 
+- **Drei Befunde aus der Konsolidierung der Projektanweisung (2026-08-12).**
+  Beim Zusammenführen von `PROJEKTANWEISUNG.md` gemessen, nicht gebaut:
+
+  1. **`frontend/style.css` ist eine Leiche** — 27.477 Zeilen, 842 KB, Stand
+     03.08., und **keine einzige** HTML-Datei lädt sie. Gegenprobe:
+     `grep -o 'href="[^"]*style\.css[^"]*"' frontend/*.html` liefert genau
+     einen Treffer, und der zeigt auf `css/style.css`. Die alte
+     Projektanweisung behauptete das Gegenteil — wer ihr folgte, patchte die
+     tote Datei. Löschen ist ein **eigenes Paket, nie am Rollout-Tag**.
+  2. **`_dpDispSkin` ist doppelt definiert** — `js/settings.js:3130` und
+     `:3364`. In JS gewinnt die letzte; nur die schaltet zusätzlich
+     `dp-hdr-compact`. Die tote erste Fassung entfernen, eigenes Paket.
+  3. **Der Vorwegsetzer kennt zwei Werte nicht.** `index.html:46`
+     (`v1082-uv-boot`) führt bei `data-ui-cards` nur `['kompakt','wallet']` —
+     **`stapel`** (v1095) fehlt, und `data-ui-form` (v1098) fehlt ganz. Folge:
+     für diese Nutzer blitzt beim Neuladen die DealPilot-Fassung auf, genau
+     das, was der Setzer verhindern soll. Zwei Zeilen — **geht im nächsten
+     Frontend-Paket mit**, kein eigenes Vorhaben.
+
 - **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
   Vorhaben mit eigener Prüfstrecke, nicht nebenbei. **Wird durch die Handy-Freigabe (v1118)
   größer, nicht kleiner** — mit der Freigabe fürs Handy trägt die normale
