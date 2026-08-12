@@ -37,71 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Bei jeder Eigentumswohnung wird die Bodenwertverzinsung auf dem
-   doppelten Bodenwert gerechnet.** Gefunden im dritten Prüfdurchgang
-   (2026-08-12) am PDF-Rechenweg von Hermannstraße 9, Hüllhorst.
-
-   **Was im PDF steht:**
-
-   ```
-   - Bodenwertverzinsung (80.676 € × 2,56 %)          -2.065 €
-     nur der rentierliche Bodenwert; -40.338 € nicht
-     rentierliche Fläche bleiben außen vor (§ 41 ImmoWertV)
-   + Bodenwert                                        40.338 €
-   ```
-
-   **80.676 € ist exakt das Doppelte von 40.338 €.** Verzinst wird der
-   Bodenwert **vor** Miteigentumsanteil, angesetzt wird der **nach** MEA.
-
-   **Ursache, im Kern lokalisiert** —
-   `marktbericht/backend/src/services/ErtragswertService.js`:
-
-   - **Z. 141** `out.wert_rentierlich = round0(wert)` — hier trägt `wert`
-     noch den vollen Grundstückswert.
-   - **Z. 162–165** `if (mea) { wert = wert * (mea / 100); … }` — die
-     MEA-Kürzung wirkt nur auf `wert`. **`wert_rentierlich` wird nicht
-     nachgezogen.**
-   - **Z. 393 f.** `const _bwRent = … bodenwertErgebnis.wert_rentierlich`
-     — die Ertragswertrechnung nimmt genau diesen Wert.
-
-   **Das ist der halb behobene V1026-Fehler.** Der Kommentar in Z. 145–150
-   beschreibt ihn wörtlich: „Bei einer Eigentumswohnung ist der VOLLE
-   Grundstückswert immer falsch … Die Bodenwertverzinsung fraß 4.809 von
-   6.578 EUR Reinertrag." Der Fix setzte `out.wert` — und ließ
-   `wert_rentierlich` stehen. Verzinst wird aber `wert_rentierlich`.
-
-   **Auswirkung, am Prüfobjekt gerechnet:**
-
-   | | ist | müsste |
-   |---|---|---|
-   | Bodenwertverzinsung | 2.065 € | 1.033 € |
-   | Gebäudereinertrag | 5.399 € | 6.431 € |
-   | × Barwertfaktor 23,02 | 124.285 € | 148.042 € |
-   | **Ertragswert** | **167.582 €** | **≈ 191.339 €** |
-
-   **Rund 24.000 € oder 14 % zu niedrig** — und zwar bei **jeder** ETW mit
-   gepflegtem Miteigentumsanteil. Je kleiner der MEA, desto größer der
-   Fehler.
-
-   **Zwei Nebenbefunde derselben Stelle:**
-
-   - **Die Fußnote deutet die Differenz falsch.** Sie nennt die 40.338 €
-     „nicht rentierliche Fläche … (§ 41 ImmoWertV)". Das Objekt führt
-     `hinterland_rentierlich: true` — es gibt gar keine nicht rentierliche
-     Fläche. Die Differenz ist der Miteigentumsanteil. Ein Modellvermerk,
-     der etwas anderes behauptet als er tut, ist schlimmer als keiner.
-   - **80.676 € ist auch für sich genommen ungeklärt.** 950 m² × 90 €/m²
-     wären 85.500 €; es fehlen 4.824 €. Der PDF-Text sagt ausdrücklich
-     „Der Bodenwert setzt die gesamte Fläche zum vollen Bodenrichtwert
-     an" — die Zahl widerspricht dem eigenen Satz. Die gepflegte
-     Anpassung −10 % („Lärmbelastung Hauptstraße") ergäbe 76.950 €, das
-     Hinterland 828 m² à 5 €/m² ergäbe 15.120 €. Keiner der Wege trifft.
-
-   **Beim Beheben:** eine Prüfstrecke mit bekanntem Sollwert anlegen. Die
-   beiden Testobjekte aus `CLAUDE.md` liegen auf Staging **nicht** in der
-   dort beschriebenen Fassung (siehe Fertig-Eintrag zum Prüflauf).
-
-2. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+1. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -199,7 +135,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-3. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+2. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -234,7 +170,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-4. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+3. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -268,7 +204,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-5. **Marktbericht neu gestalten.**
+4. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -412,7 +348,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-6. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
+5. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
    Beim Ausrollen von `v1136` gemessen: `git status` auf
    `root@116.203.214.11` meldet
    `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
@@ -431,7 +367,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Produktion** liegt. Nicht nebenbei: es ist der BORIS-Anschluss, an
    dem die Bodenrichtwerte hängen.
 
-7. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
+6. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
 
    Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
 
@@ -469,7 +405,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-8. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+7. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
 
    Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
    Defekt, keine Geschmacksfrage.
@@ -489,7 +425,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
    dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
 
-9. **Regler „Tab-Texte" wirkt nicht**
+8. **Regler „Tab-Texte" wirkt nicht**
 
    Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
    Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
@@ -506,7 +442,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
    Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
 
-10. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+9. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
    Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
    schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
@@ -529,7 +465,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
    Aufgreifen zusammenlegen, nicht doppelt bauen.
 
-11. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+10. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
 
    **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
    führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
@@ -554,7 +490,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
    Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
 
-12. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+11. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
 
    Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
    Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
@@ -577,7 +513,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
    entschieden ist.
 
-13. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+12. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -614,7 +550,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-14. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+13. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -644,7 +580,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-15. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+14. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -734,6 +670,61 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Bodenwertverzinsung bei Eigentumswohnungen lief auf dem doppelten Wert** — `v1140` (`6e1dbe8`), `v1140b` (`a1f9839`).
+
+   **Befund.** `ErtragswertService.bodenwert()` setzt `wert_rentierlich`
+   **vor** der MEA-Kürzung; die Kürzung traf nur `out.wert`. Verzinst wird
+   aber `wert_rentierlich` (Z. 393 f.). Bei MEA 50 % lief die
+   Bodenwertverzinsung damit auf dem **doppelten** Bodenwert. Das war der
+   **halb behobene V1026-Fehler** — der damalige Fix setzte `out.wert` und
+   ließ den anderen Wert stehen.
+
+   **Gefunden am PDF-Rechenweg**, nicht am Bildschirm: dort stand
+   „Bodenwertverzinsung (80.676 € × 2,56 %)" neben „+ Bodenwert 40.338 €",
+   und 80.676 ist exakt das Doppelte. Die Bildschirmansicht zeigt die
+   Rechenschritte nicht — ohne das PDF wäre es nicht auffindbar gewesen.
+
+   **Fassung.** `wert_rentierlich` macht dieselbe Kürzung mit. Die Fußnote
+   „nicht rentierliche Fläche bleiben außen vor (§ 41)" verschwindet damit
+   von selbst — sie entstand nur daraus, dass die beiden Werte
+   auseinanderliefen, und deutete die MEA-Differenz als etwas, das es beim
+   Objekt gar nicht gab.
+
+   **Gegengemessen auf Staging, Hermannstraße 9:**
+
+   | | vorher | nachher |
+   |---|---|---|
+   | Bodenwertverzinsung | −2.065 € | **−1.033 €** |
+   | Gebäudereinertrag | 5.399 € | **6.431 €** |
+   | Ertragswert | 167.582 € | **191.000 €** |
+   | Fußnote „nicht rentierlich" | stand da | **weg** (0 Treffer im PDF) |
+
+   Dazu ein Funktionslauf im Container über drei Fälle: ETW mit MEA
+   (`wert == wert_rentierlich`), **Haus mit Grünfläche** (§ 41 wirkt
+   weiter, 70.000 gegen 74.640 — der Fix durfte das nicht mitreißen), ETW
+   mit beidem (beide Kürzungen greifen).
+
+   **Zweiter Befund, mitgefixt:** Der Flächenhinweis sagte „Der Bodenwert
+   setzt die gesamte Fläche zum vollen Bodenrichtwert an … hier nicht
+   vorgenommen", während seit `v1070` sehr wohl aufgeteilt wird. Er nennt
+   jetzt die tatsächliche Rechnung. **`v1140b` war eine Nachbesserung an
+   meiner eigenen Fassung:** ich hatte beiden Aufteilungsarten denselben
+   Satz gegeben, sodass beim Prüfobjekt „die überschüssigen 828 m²" stand
+   — `manuelleAufteilung()` legt sie aber **zusätzlich** neben die volle
+   Fläche (`umrechnung_nrw.js` Z. 221–232). Ein falscher Modellvermerk
+   gegen einen anderen getauscht; jetzt haben die beiden Wege getrennte
+   Sätze.
+
+   **Zurückgenommen — kein Fehler war:** Ich hatte notiert, die 80.676 €
+   seien „auch für sich ungeklärt", weil 950 × 90 = 85.500 wären. Die
+   Rechnung geht vollständig auf, sobald man alle gepflegten Angaben
+   nimmt: 950 × 90 = 85.500, **+ 828 m² Hinterland à 5 € = 89.640**,
+   **× 0,9** (Anpassung −10 %, „Lärmbelastung Hauptstraße") = 80.676,
+   × 50 % MEA = 40.338. Mein Befund kam daher, dass ich die Anpassung und
+   das Hinterland nicht zusammen gerechnet hatte.
+
+
 
 - [2026-08-12] **Ein Testobjekt vollständig anlegen und alle Rechenwege gegenprüfen** — drei Durchgänge, `70326cf` bis `81d711b`.
 
