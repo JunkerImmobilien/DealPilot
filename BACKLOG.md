@@ -671,6 +671,52 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
 
+- [2026-08-12] **Die Rechenwege stehen jetzt auch im Ergebnis, zum Aufklappen** — `v1141` (`fb9fb3a`), `v1141b` (`b02654d`), `v1141c` (`211ee49`). Marcels Entscheidung, nachdem der `v1140`-Fehler nur im PDF sichtbar war.
+
+   Je ein Aufklapper **„Rechenweg"** unter dem Bodenwert und in der
+   Ertragswert- und Sachwertkachel. Der Vergleichswert bekommt keinen — er
+   kommt aus Angeboten, nicht aus einer Staffel.
+
+   **Keine zweite Quelle, keine zweite Rechnung.** Angezeigt werden exakt
+   die Staffeln, die das PDF ab `app.js:3416` zeichnet (`_ew`/`_swx` dort
+   sind dieselben Objekte wie `e`/`sw` in `_renderWertverfahren`). Auch die
+   Formatregeln sind 1:1 übernommen — `faktor` vor `wert`, Faktor mit
+   Komma, `summe` fett mit Trennlinie, `detail` als Unterzeile. Wichen sie
+   ab, stünden zwei Darstellungen derselben Zahl nebeneinander, und genau
+   das soll ein Rechenweg ja ausschließen.
+
+   **`v1141b` — der Bodenwert-Weg wurde überhaupt erst ausgeliefert.**
+   `ErtragswertService.bodenwert()` protokolliert jeden Schritt in
+   `schritte`, aber `_wertParams` ist eine interne Struktur und
+   `crossCheck` gibt nur ausgewählte Felder heraus: im gesamten
+   Antwortbaum kam `schritte` **kein einziges Mal** vor (gemessen). Der
+   erste Anlauf zeigte deshalb nur zwei der drei Wege.
+
+   **`v1141c` — zwei Nachbesserungen aus dem Abnahmelauf.** Der Zeilentitel
+   „Bauland × **angepasster** Bodenwert" stand auch dann da, wenn kein
+   Koeffizient griff — beim Prüfobjekt direkt neben dem Detail „950 m² ×
+   90 €/m²", also dem unangepassten Richtwert. Und „überschüssige Fläche"
+   passt nur zur automatischen Spaltung am 1,5-fachen; manuell gepflegtes
+   Hinterland **kommt hinzu** (dieselbe Unterscheidung wie `v1140b`).
+   Dazu stand der Bodenwert-Weg über die volle Breite von 856 px,
+   Beschriftung und Betrag einen halben Bildschirm auseinander — jetzt auf
+   440 px begrenzt.
+
+   **Abgenommen auf Staging**, Bodenwert-Weg vollständig lesbar:
+
+   ```
+   Grundstücksfläche × Bodenrichtwert   950 m² × 90 €/m²      85.500 €
+   + Hinterlandfläche                   828 m² × 5 €/m²        4.140 €
+   Anpassung Zuschnitt / Lage           −10 % — Lärmbelastung  80.676 €
+   Miteigentumsanteil                   50 %                   40.338 €
+   = Bodenwert                                                 40.338 €
+   ```
+
+   Die Ertragswert-Staffel deckt sich Zeile für Zeile mit dem PDF
+   (Verzinsung −1.033 €, Gebäudeertragswert 148.042 €, Ertragswert
+   191.339 €). Überlauftest gegen die klippende Kachel: **0 von 56 Zellen**
+   stehen über, Kartenbreite 277 px.
+
 - [2026-08-12] **Bodenwertverzinsung bei Eigentumswohnungen lief auf dem doppelten Wert** — `v1140` (`6e1dbe8`), `v1140b` (`a1f9839`).
 
    **Befund.** `ErtragswertService.bodenwert()` setzt `wert_rentierlich`
