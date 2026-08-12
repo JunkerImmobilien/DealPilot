@@ -124,10 +124,34 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-2. **Der Nachweis, dass ein Sachwertfaktor wirklich greift, steht noch aus
-   — es fehlt ein Haus auf Staging.** Alle **acht** Bestandsobjekte sind
-   ETW (gemessen 2026-08-12), und für Wohnungen darf kein Faktor angesetzt
-   werden. Keins hat eine bezahlte Stufe, jeder Abruf kostet **12 L**.
+2. **ERLEDIGT — die Sachwertfaktor-Kette ist bewiesen, beide Wege.**
+   Am 2026-08-12 durchgefahren; der Punkt bleibt hier stehen, bis der
+   Erntebefund (Punkt 1) mit erledigt ist.
+
+   **Prüfobjekt selbst angelegt:** `PRUEF_ZFH Löhner Str. 278`
+   (`3fbb754c`, Seq 2026-1006) — EFH, 233 m², Bj 1964, Grundstück 700 m²,
+   2 Wohneinheiten, Standardstufe 3, NHK-Typ freistehend / Keller-Erd-Ober
+   / DG ausgebaut. **Bleibt als Prüfstrecke auf Staging liegen**, Stufe 3
+   ist dafür bezahlt — weitere Läufe kosten 0 L.
+
+   | Lauf | Faktor | Herkunft | Sachwert |
+   |---|---|---|---|
+   | ohne eigenen Wert | **0,925** | **Stufe A**, Grundstücksmarktbericht 2026 Kreis Herford, 5.1.2 (1658 Kauffälle) | **243.577 €** |
+   | mit eigenem Wert | **0,80** | **Stufe E**, eigene Angabe | **210.661 €** |
+
+   Der eigene Wert hat Vorrang vor dem amtlichen — genau wie vorgesehen.
+   Die Rechnung stimmt exakt: vorläufiger Sachwert 263.326 × 0,8 =
+   210.661 €, im Rechenweg Zeile für Zeile nachlesbar. Kerosin: **98 → 86**
+   für den ersten Lauf (12 L), der zweite **0 L**.
+
+   **Drei Fallen beim Anlegen, alle aus der stillen Ablehnung unbekannter
+   Auswahlwerte:** `objart: 'ZFH'` gibt es nicht (die Liste kennt nur ETW,
+   EFH, MFH, DHH, RH — ein Zweifamilienhaus läuft unter **EFH**, so wie
+   die NHK-Gebäudeart „Ein-/Zweifamilienhaus" heißt). `nhk_haus:
+   'freistehend'` ebenso nicht — dort sind es die Zahlen **1/2/3**. Und
+   die Wohneinheiten kamen über keinen der versuchten Schlüssel (`we`,
+   `units`, `anzahl_we`, `wohneinheiten`) an; im Formular gesetzt lief es.
+   **Der richtige Objekt-Schlüssel für Wohneinheiten ist noch offen.**
 
    **Was dabei gefunden und behoben wurde — `v1144` (`d884836`):**
    Der Sachwertfaktor wurde **nie** angewandt, an keinem Objekt, aus keiner
