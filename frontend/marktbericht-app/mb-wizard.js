@@ -139,9 +139,28 @@
       'html.mb-breit .grid{grid-template-columns:1fr !important}',
       'html.mb-breit #resultPanel{display:none !important}',
       'html.mb-breit .panel{max-width:none}',
-      'html.mb-breit #wm-ziel,html.mb-breit .mbw-reiter,html.mb-breit .mbw-blatt,',
+      'html.mb-breit #wm-ziel,html.mb-breit .mbw-blatt,',
         'html.mb-breit .mbw-nav,html.mb-breit .mbw-fuss,html.mb-breit #wm-ampel{',
         'max-width:760px;margin-left:auto;margin-right:auto}',
+      /* v1151-LEISTE · Marcels Befund: „Die Punkte 1–7 sollten schon
+         nebeneinander passen." Gemessen bei 1024, 1280 und 1920 px: die
+         sieben Marken brauchen zusammen 902 px, ihr Behälter stand aber bei
+         JEDER Fensterbreite auf 760 px — auch bei 1920, wo `.panel` 1300 px
+         breit ist. Der Platz war da, die Leiste begrenzte sich selbst und
+         brach in zwei Zeilen um (Oberkanten 374 und 421).
+
+         Ursache war der Sammelselektor darüber: die 760 px sind für
+         Formularzeilen und Text richtig gedacht („eine Formularzeile über
+         1.278 px wäre unlesbar", v1128) — die Reiterleiste ist aber keine
+         Formularzeile, sondern Navigation. Ein Selektor, der beides gleich
+         behandelt, gibt einem von beiden das falsche Maß.
+
+         Deshalb eine eigene Grenze: 960 px, also 58 px Luft über dem
+         gemessenen Bedarf für längere Beschriftungen und andere
+         Schriftgrößen. Zentriert wie zuvor, damit sie über dem 760er-Inhalt
+         ausgerichtet bleibt. `flex-wrap:wrap` bleibt der Rückfall — bei
+         390 px MUSS sie umbrechen, dort ist Nebeneinander unmöglich. */
+      'html.mb-breit .mbw-reiter{max-width:960px;margin-left:auto;margin-right:auto}',
       'html.mb-breit .mbw-r{font-size:14px;padding:13px 20px}',
       'html.mb-breit .mbw-kurz{max-width:760px;margin-left:auto;margin-right:auto;font-size:12px}',
       'html.mb-breit input:not([type=checkbox]):not([type=radio]),html.mb-breit select{',
