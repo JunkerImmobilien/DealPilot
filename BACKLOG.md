@@ -128,11 +128,12 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
       (11.124, 11.458, …). Die Quick-Methode rechnete das erste Jahr
       voll.
 
-      **Kleiner Rest, bewusst offen gelassen:** Die Plausi-Zeile sagt
-      „Aktuelle NKM 10.800 €/J × 15 Jahre … mit 3,0 % p.a. wächst die
-      Miete auf 194.568 €" und **erwähnt das anteilige erste Jahr
-      nicht**. Wer nachrechnet, kommt auf 200.868 und hält die Zahl für
-      falsch. Das ist eine Beschriftungsfrage, kein Rechenfehler.
+      **Der kleine Rest ist nachgezogen — `v1137b` (`49df402`).** Die
+      Plausi-Zeile sagte „Aktuelle NKM 10.800 €/J × 15 Jahre … mit 3,0 %
+      p.a. wächst die Miete auf 194.568 €" und **erwähnte das anteilige
+      erste Jahr nicht**; wer nachrechnete, kam auf 200.868 und hielt die
+      Zahl für falsch. Jetzt steht der Satz „Das **erste Jahr zählt nur
+      anteilig** ab dem Kaufmonat" dahinter.
    3. **ZURÜCKGENOMMEN — das war mein Messfehler, kein Befund der App.**
       Ich hatte gemeldet, die Eingabe „Umlagefähige Kosten / Monat" werde
       still von 200 auf 175 überschrieben. Der Grund steht in
@@ -201,13 +202,24 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    `cond = 'gepflegt'` an, `ausst = 'Normal'` als `quality = 'normal'`,
    Energieklasse C direkt — die Tabelle aus `v1136c` greift.
 
-   **Kein Defekt, aber erklärungsbedürftig:** „fehlt: Miteigentumsanteil"
-   bleibt auch nach der Übernahme stehen. Das Feld `mea` entsteht erst,
-   wenn man die Zeile „Wertermittlung" anklickt; **dann** trägt der
-   Beobachter aus `v1136b` die 10 aus dem Objekt nach und die Stufe ist
-   erreicht (gemessen). Die Meldung nennt also etwas als fehlend, was
-   längst bekannt ist — eine Beschriftungsfrage wie beim anteiligen
-   ersten Jahr, kein Rechenfehler.
+   **BEHOBEN in `v1139` (`f80a1c9`) — „fehlt: Miteigentumsanteil" stand
+   da, obwohl der Wert im Objekt steht.** Ursache gemessen:
+   `mb-stufen.js:59` liest mit `wert(id)` das **Formularfeld**, und `mea`
+   liegt im Block `wm-b3`, den `wertermittlung.js` erst `if (s >= 3)`
+   baut. Ein Feld, das es noch nicht gibt, liefert `''` — **nicht zu
+   unterscheiden von einem leeren.** `mb-objektwahl.js` hält den Wert
+   derweil in seiner `offen`-Liste; die war nur von außen nicht lesbar.
+   Jetzt ist sie es (`window._mbVorrat`), und die Leiste zeigt eine
+   eigene Zeile „liegt im Objekt vor: … — hier klicken zum Übernehmen"
+   in Gold statt Rot.
+
+   **`erreicht()` blieb absichtlich unangetastet.** Würde der Vorrat als
+   erfüllt zählen, spränge die Stufe von allein auf 3 und der Knopf
+   forderte **12 L statt 5 L**, ohne dass jemand geklickt hat. Kerosin
+   nie ohne Zutun. Auf Staging an `PRUEF_1` nachgemessen: vorher rot
+   „fehlt", jetzt Gold `rgb(201,168,76)`, Stufe **2**, Knopf **5 L** —
+   und nach dem Klick auf die Zeile steht `mea` = 10 im Feld, der Vorrat
+   ist leer, Stufe **3**, Knopf 12 L. Kein Abruf ausgelöst.
 
    **Handy-Ansicht: vier Befunde, alle behoben.** Alle bei 390 px am
    selben Objekt gemessen, alle nach dem Ausrollen gegengemessen.
