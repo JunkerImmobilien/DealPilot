@@ -55,10 +55,14 @@ nur nie nachgemessen worden. Die Messreihe steht im Punkt.
   40 Erwähnungen im Markup und 11 Kacheln im Baum und sah deshalb aktiv
   aus. Sichtbarkeit sagt nur die Messung.
 
-**Der nächste offene Punkt ist damit Punkt 2** (der 1025-px-Sprung, klein
-und klar) oder **Punkt 4** (Marktbericht neu gestalten, groß). **B** und die
+**Der 1025-px-Sprung, der bei dieser Messung auffiel, ist als `v1148`
+behoben und abgenommen** (siehe Fertig). **B** und die
 **Admin-Oberfläche** bleiben in Punkt 1 liegen: B braucht ein Bild, der
 Admin ein Konto.
+
+**Der nächste offene Punkt ist damit Punkt 3** (Marktbericht neu gestalten,
+groß — Entwurf liegt) oder einer der kleinen Darstellungs-Punkte 4 bis 9,
+die alle auf Marcels Durchgang zurückgehen.
 
 **Vor dem Bauen:**
 - Messkabine nach `FALLEN.md` aufsetzen — Träger `/impressum.html` auf der
@@ -151,28 +155,7 @@ Admin ein Konto.
      bei 260-px-Leiste nur 560 px Inhalt übrig — das schließt zweispaltige
      Formulare aus. **Eigene Entscheidung, nicht in diesem Punkt.**
 
-2. **Der Inhalt wird bei 1025 px schmaler als bei 1024 px.** Gemessen am
-   12.08. in derselben Reihe: bei 1024 px trägt die Leiste 260 px und der
-   Inhalt 764 px; bei **1025 px** springt die Leiste auf 380 px und der
-   Inhalt fällt auf **645 px** — ein Pixel mehr Fenster, **119 px weniger
-   Inhalt**. Ursache: oberhalb von 1024 px greift der v648-Block nicht mehr,
-   und das Standard-Grid der App setzt 380 px.
-
-   Betroffen ist das Band **1025–1143 px**; ab 1144 px (380 + 764) ist der
-   Inhalt wieder mindestens so breit wie bei 1024. Bei 1180 px sind es
-   800 px, deshalb fällt es auf dem iPad Air quer nicht auf.
-
-   **Stetige Lösung:** die Leiste wächst im Band mit der Fensterbreite, dann
-   bleibt der Inhalt konstant 764 px —
-   `min(380px, calc(260px + 100vw - 1024px))` als erste Grid-Spalte. Bei
-   1024 px ergibt das 260, bei 1144 px 380, dazwischen linear.
-   `body #sidebar.sidebar` trägt im v648-Block `width:auto`, die Leiste folgt
-   also der Spalte von selbst. **Vor dem Bauen prüfen**, ob die übrigen
-   Regeln des v648-Blocks (sticky, Drawer-Bedienelemente aus) im Band
-   1025–1143 px mitgelten sollen — sonst greift die Anpassung nur halb.
-
-
-3. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+2. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -244,7 +227,7 @@ Admin ein Konto.
      rechts frei ist** — überlappt das negative Margin die Nachbarn,
      stiehlt es Klicks in die andere Richtung.
 
-4. **Marktbericht neu gestalten.**
+3. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -388,7 +371,7 @@ Admin ein Konto.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-5. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
+4. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
 
    Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
 
@@ -426,7 +409,7 @@ Admin ein Konto.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-6. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+5. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
 
    Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
    Defekt, keine Geschmacksfrage.
@@ -446,7 +429,7 @@ Admin ein Konto.
    hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
    dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
 
-7. **Regler „Tab-Texte" wirkt nicht**
+6. **Regler „Tab-Texte" wirkt nicht**
 
    Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
    Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
@@ -463,7 +446,7 @@ Admin ein Konto.
    **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
    Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
 
-8. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+7. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
    Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
    schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
@@ -486,7 +469,7 @@ Admin ein Konto.
    **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
    Aufgreifen zusammenlegen, nicht doppelt bauen.
 
-9. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+8. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
 
    **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
    führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
@@ -511,7 +494,7 @@ Admin ein Konto.
    **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
    Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
 
-10. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+9. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
 
    Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
    Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
@@ -534,7 +517,7 @@ Admin ein Konto.
    **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
    entschieden ist.
 
-11. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+10. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -571,7 +554,7 @@ Admin ein Konto.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-12. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+11. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -601,7 +584,7 @@ Admin ein Konto.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-13. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+12. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -657,7 +640,7 @@ Admin ein Konto.
 
 ---
 
-14. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+13. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
@@ -764,7 +747,7 @@ Admin ein Konto.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-15. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+14. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -862,7 +845,7 @@ Admin ein Konto.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-16. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+15. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
    das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
@@ -890,6 +873,18 @@ Admin ein Konto.
    und den fehlenden Abzug bereits benennt).
 
 ## Später
+
+- **Die eingeklappte Leiste hat kein Bedienelement.** Beim Regressionstest zu
+  `v1148` gemessen (1100 px): die CSS-Regeln für den 66-px-Rail existieren
+  (`css/style.css:32816` und `:33060`, `body.dp-sidebar-collapsed`) und
+  funktionieren einwandfrei, wenn man die Klasse setzt — **aber
+  `#dp-sb-toggle` gibt es im DOM nicht**, und es existiert keine globale
+  Toggle-Funktion (`toggleSidebar`, `dpSbToggle`, `sbToggle` — alle nicht
+  vorhanden). Die Treffer auf `[class*=collapse]` sind `v212-collapse-toggle`,
+  also Aufklapper **im Inhalt**. Entweder gehört der Weg dorthin gebaut oder
+  die Regeln gehören weg — **erst entscheiden, dann anfassen**, und vorher
+  prüfen, ob der Zustand über einen anderen Weg (Tastatur, Einstellungen,
+  gemerkter Merker) doch erreichbar ist.
 
 - **Drei Befunde aus der Konsolidierung der Projektanweisung (2026-08-12).**
   Beim Zusammenführen von `PROJEKTANWEISUNG.md` gemessen, nicht gebaut:
@@ -942,6 +937,52 @@ Admin ein Konto.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Der Inhalt wurde bei 1025 px schmaler als bei 1024 px** — `v1148`, `e4f3066`.
+   **Befund:** Bei 1024 px greift der v648-Block (`css/style.css:35783`) mit
+   260 px Leiste und lässt 764 px Inhalt. Ein Pixel darüber endet der Block,
+   das Standard-Grid aus Z. 267 setzt 380 px, und der Inhalt fiel auf
+   **645 px** — ein Pixel mehr Fenster kostete **119 px Inhalt**. Betroffen
+   war das Band **1025–1143 px**; ab 1144 px (380 + 764) war es von selbst
+   wieder gut, weshalb es auf dem iPad Air quer (1180) nicht auffiel.
+
+   **Vor dem Bauen geprüft:** die Sidebar trägt **keine eigene Breite** — sie
+   ist Grid-Kind und folgt der Spalte (`width:auto` gilt nur im v648-Block,
+   darüber gibt es gar keine Breitenregel). `.app-wrap` hat **kein `gap`**,
+   die Spaltenrechnung geht also glatt auf.
+
+   **Lösung ohne neue Zahl und ohne `100vw`:**
+   `body .app-wrap:not(.sb-collapsed){grid-template-columns:minmax(0,380px) minmax(764px,1fr)}`
+   ab `min-width:1025px`. Die zweite Spalte behält 764 px als Untergrenze,
+   die Leiste nimmt nur den Rest und wächst dabei stetig auf ihre 380 px.
+   **`100vw` wäre falsch gewesen** — es zählt die Scrollleiste mit und hätte
+   einen Versatz erzeugt. Kein `!important`, damit die eingeklappten
+   Zustände weiter gewinnen.
+
+   **Nachgemessen in der Kabine (Buster `W68` im iframe bestätigt):**
+
+   | Fenster | Spalten | Inhalt | Überlauf |
+   |---|---|---|---|
+   | 1024 px | 260 + 764 | 764 | nein |
+   | 1025 px | **261 + 764** | **764** (vorher 645) | nein |
+   | 1100 px | 336 + 764 | 764 | nein |
+   | 1143 px | 379 + 764 | 764 | nein |
+   | 1144 px | 380 + 764 | 764 | nein |
+   | 1400 px | 380 + 1020 | 1020 | nein |
+
+   **Regression eingeklappte Leiste:** mit `body.dp-sidebar-collapsed` bleibt
+   es bei `66px 1034px`, Leiste 66 px, kein Überlauf — die `!important`-Regel
+   aus Z. 32816 gewinnt wie vorgesehen.
+
+   **Grenze des Nachweises, ehrlich benannt:** der eingeklappte Zustand ist
+   **per Klasse** geprüft, nicht über den Bedienweg. Grund ist ein
+   Nebenbefund: **`#dp-sb-toggle` existiert im DOM nicht**, und es gibt keine
+   globale Toggle-Funktion (`toggleSidebar`/`dpSbToggle`/`sbToggle` alle
+   nicht vorhanden). Die Treffer auf `[class*=collapse]` sind
+   `v212-collapse-toggle`, also Aufklapper **im Inhalt**. Bei 1100 px hat der
+   Einklapp-Zustand damit **kein Bedienelement** — die CSS-Regeln dafür
+   (66-px-Rail in Z. 32816 und 33060) sind vorhanden, der Weg dorthin nicht.
+   Als eigener Punkt unter „Später" vermerkt.
 
 - [2026-08-12] **Der Staging-Server trug 319 Zeilen, die im Repo nicht standen** — `e35e34b`.
    Beim Ausrollen von `v1136` gemessen: `git status` auf
