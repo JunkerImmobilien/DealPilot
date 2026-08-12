@@ -50,20 +50,25 @@ durch bis in die Anzeige). `CLAUDE.md` sagt für diesen Fall: abschließen,
 übergeben, Schluss. **Die Lehre steht als Punkt 9 in `FALLEN.md`** und ist
 die wichtigste Übergabe dieses Tages.
 
-**Der nächste Schritt ist deshalb klein und klar umrissen** — die zwei echten
-Restlücken aus Punkt 3, beide belegt:
+**Die erste der beiden Restlücken ist erledigt** (`v1150`/`v1150b`) — und hat
+einen zweiten, größeren Fehler mitgebracht: die PDF-Fußnote nannte die
+**Konstante 1,0** statt des angewandten Faktors 0,925. Beides steht jetzt
+richtig im Dossier, mit Stufe.
 
-1. **Die Stufe des Sachwertfaktors ins PDF.** Auf dem Bildschirm steht
-   „· Faktor 1,15 · Stufe E", im PDF nicht. Reines Frontend (`app.js`).
-2. **Hinweistext beim manuellen Sachwertfaktor**, wie ihn der
-   Liegenschaftszins schon hat („bitte die Herkunft angeben —
-   Grundstücksmarktbericht, Jahr"). Eine Zeile in
-   `WertParameterService.js:473` → **mb-Backend, also Rebuild**, vorher
-   eigener `pg_dump` der mb-DB (sie steht in keinem Backup-Skript).
+**Was offen bleibt, und warum es nicht einfach gebaut wurde:** der Hinweistext
+beim manuellen Sachwertfaktor (`WertParameterService.js:473` gibt
+`hinweis: ''`, der Liegenschaftszins gibt einen Text). **Sein Anzeigeweg
+fehlt:** die Karte zeigt `sachwertfaktor_hinweis` nur bei
+`!marktangepasst` (`app.js:612`), und bei einem wirksamen eigenen Faktor ist
+`marktangepasst = true`. In `CrossCheckService.js:245` hängt das Feld
+zusätzlich nur am Tabellenweg. **Erst den Weg, dann den Text** — ein Hinweis,
+den niemand sieht, ist keine Verbesserung. Der eigentliche Vermerk steht seit
+`v1150` im PDF.
 
 **Vor dem Anfangen bitte `FALLEN.md` Punkt 9 lesen.** Er beschreibt genau den
 Fehler, den man in dieser Gegend macht: vom Erzeuger her suchen statt vom
-Verbraucher.
+Verbraucher. Bei `v1150` hat der Blick vom Verbraucher her sofort den
+größeren Fehler gezeigt.
 
 **Was Geld kostet und deshalb angekündigt gehört:** der Nachweis, dass Stufe 2
 nach bezahlter Stufe 1 wirklich nur die Differenz (3 L) abbucht. Ein
@@ -326,22 +331,27 @@ die alle auf Marcels Durchgang zurückgehen.
    Hergestellt hat das `v1144` — der Commit-Titel sagt es wörtlich: „Der
    Sachwertfaktor wurde nie angewandt — falscher Feldname an zwei Stellen."
 
-   **Marcels Vorgabe ist damit im Kern schon erfüllt.** Was übrig bleibt,
-   sind zwei kleine, echte Lücken:
+   **Marcels Vorgabe ist damit im Kern schon erfüllt gewesen.** Es blieben
+   zwei kleine Lücken:
 
-   1. **Im PDF fehlt die Stufe beim Sachwertfaktor.** Auf dem Bildschirm
-      steht „· Stufe E", im PDF nicht — gemessen: kein `doc.text` im
-      Export verbindet Faktor und Stufe. Die Zahl, die im Dossier landet,
-      trägt ihre Herkunft also **nicht** mit. Genau dort wird sie gebraucht.
-   2. **Der Hinweistext fehlt beim Sachwertfaktor.** Der LZS gibt bei
-      manueller Eingabe „bitte die Herkunft angeben (Grundstücksmarktbericht,
-      Jahr)", der Sachwertfaktor gibt `hinweis: ''`
-      (`WertParameterService.js:473`). Dieselbe Bitte gehört dorthin — das
-      ist der „Vermerk", den Marcel meint.
-
-   Beides ist klein. **Punkt 1 ist reines Frontend** (PDF-Export in `app.js`),
-   **Punkt 2 ist eine Zeile im mb-Backend** und damit ein Rebuild, vorher
-   eigener `pg_dump` der mb-DB.
+   1. **ERLEDIGT — die Stufe fehlte im PDF** (`v1150`/`v1150b`, `e33ea05`,
+      siehe Fertig). Dabei kam ein **zweiter, größerer Fehler** heraus: die
+      Fußnote druckte die **Konstante** `assumptions.sachwertfaktor` = 1,0,
+      nicht den angewandten Faktor. Am Prüfobjekt stand „Sachwertfaktor 1"
+      im Dossier, gerechnet wurde mit **0,925**.
+   2. **Offen, aber kleiner als gedacht — der Hinweistext beim
+      Sachwertfaktor.** Der LZS gibt bei manueller Eingabe „bitte die
+      Herkunft angeben (Grundstücksmarktbericht, Jahr)", der Sachwertfaktor
+      gibt `hinweis: ''` (`WertParameterService.js:473`).
+      **Vor dem Bauen beachten — der Anzeigeweg fehlt:** die Karte zeigt
+      `sachwertfaktor_hinweis` nur unter der Bedingung
+      `sw.available && !sw.marktangepasst` (`app.js:612`). Bei einem
+      **wirksamen** eigenen Faktor ist `marktangepasst = true`, der Hinweis
+      erschiene also **nirgends**. Und in `CrossCheckService.js:245` hängt
+      `sachwertfaktor_hinweis` ohnehin nur am Tabellenweg. Ein Hinweis, den
+      niemand sieht, ist keine Verbesserung — **erst den Weg bauen, dann den
+      Text.** Der eigentliche Vermerk („Stufe E · eigene Angabe") steht seit
+      `v1150` im Dossier, damit ist Marcels Anliegen abgedeckt.
 
    Der eigentliche **Abgleich** eigene ↔ amtliche Angabe bleibt ein eigenes
    Vorhaben und hängt daran, dass `mb.valuation_inputs` überhaupt beschrieben
@@ -1072,6 +1082,56 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Das PDF nannte den Sachwertfaktor 1, gerechnet wurde mit 0,925** — `v1150` + `v1150b`, `e33ea05`.
+   Gesucht war nur die fehlende **Stufe** im Dossier. Gefunden wurde daneben
+   ein **Rechenweg-Widerspruch**: die PDF-Fußnote druckte
+   `cc.assumptions.sachwertfaktor`, und das ist die **Konstante**
+   `SACHWERTFAKTOR = 1.0` aus `CrossCheckService.js:26` — nicht der
+   angewandte Faktor.
+
+   **Am echten Bericht gemessen** (Report 73, `PRUEF_ZFH Löhner Str.`, EFH):
+   tatsächlich gerechnet wurde mit **0,925, Stufe A**, Quelle
+   „Grundstücksmarktbericht 2026 für den Kreis Herford, 5.1.2
+   Sachwertfaktoren". Im Dossier stand **„Sachwertfaktor 1"**.
+
+   **Dieselbe Falle ist in dieser Fußnote schon dreimal aufgetreten** — v1050
+   (NHK), v1052 (Zinssatz: „nannte weiter 3 %, gerechnet wurden 2,2 %"),
+   v1061. Der Kommentar zwei Zeilen darüber sagt es wörtlich: „Eine Datei,
+   zwei Stellen — schon wieder." Alle Nachbarwerte in derselben Fußnote holen
+   ihre Zahl **aus dem Ergebnis mit Rückfall auf die Annahme**; der
+   Sachwertfaktor war der letzte, der es nicht tat.
+
+   **Zweitens fehlte die Stufe.** Auf dem Bildschirm steht sie seit `v1143b`
+   („Faktor 1,15 · Stufe E"), im PDF nicht — also genau dort nicht, wo die
+   Zahl ihre Herkunft tragen muss: **das Dossier verlässt das Haus, die
+   Bildschirmansicht nicht.**
+
+   **Beide Formen werden gelesen** — `nhk2010.js:897` liefert ein Objekt
+   `{wert, stufe, quelle}`, ältere Wege eine nackte Zahl. Das ist die
+   `v1143b`-Lehre, auf dem Bildschirm längst gezogen.
+
+   **`v1150b`: die Quelle nur, wenn sie kurz ist.** Die amtliche Quelle ist
+   74 Zeichen lang und hätte die Fußnote um ein bis zwei Zeilen wachsen
+   lassen. Die **Stufe** trägt die Herkunft und bleibt immer dabei; die
+   Quelle lohnt nur, wo sie selbst die Aussage ist — „eigene Angabe"
+   (13 Zeichen) bei Stufe E. Grenze bei 26 Zeichen. Ergebnis: **+14 Zeichen
+   statt +80**, Layout bleibt.
+
+   **Nachweis am ausgelieferten Stand** (`app.js?v=1150b` vom Server geladen):
+   Marker vorhanden, 26er-Grenze vorhanden, Objekt- **und** Zahlform gelesen,
+   Rückfall vorhanden. Dazu die Fußnote gegen echte Daten gerechnet:
+
+   | Fall | Ausgabe |
+   |---|---|
+   | Bericht 73 (amtlich) | `Sachwertfaktor 0,925 (Stufe A)` — vorher `Sachwertfaktor 1` |
+   | eigener Wert | `Sachwertfaktor 1,15 (Stufe E · eigene Angabe)` |
+   | lange Quelle | `Sachwertfaktor 0,889 (Stufe A)` — Quelle gekürzt |
+   | nackte Zahl (alte Form) | `Sachwertfaktor 0,9` |
+   | kein Faktor | `Sachwertfaktor 1` — Rückfall auf die Annahme |
+   | vorläufig | `ohne Sachwertfaktor` |
+
+   Buster-Kette alle vier Glieder auf `1150b`. `node --check` auf dem Server ok.
 
 - [2026-08-12] **Die Preisindikation stand im PDF auf jeder Seite** — `v1149`, `6777afe`.
    **Marcels Befund** (12.08.): „beim Marktbericht steht nicht 3–4 mal die
