@@ -496,7 +496,12 @@ die alle auf Marcels Durchgang zurückgehen.
       Entwurf braucht **zwei** Darstellungen derselben Führung, nicht eine
       gequetschte.
 
-      **DEMO STEHT — blockiert auf Marcels Wahl:**
+      **ERLEDIGT — Fassung C ist gebaut** (`v1153`/`v1153b`, `7fb691f`, siehe
+      Fertig). Marcels Wahl aus der Demo. Bei 390 px trägt die Führung jetzt
+      **55 px statt 188 px**; ab 1024 px stehen die sieben Marken unverändert
+      in einer Zeile. Alle drei Verhaltensregeln über den Bedienweg geprüft.
+
+      *Die Demo bleibt als Beleg der Entscheidung stehen:*
       `design/Vorschläge/marktbericht-schrittleiste-handy.html` (2026-08-12,
       anklickbar, echte 390-px-Rahmen). Drei Fassungen mit gemessenen Höhen:
 
@@ -1136,6 +1141,57 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Die Schrittleiste hat eine zweite Darstellung fürs Handy** — `v1153` + `v1153b`, `7fb691f`.
+   **Marcels Befund:** „Es muss auf dem Handy funktionieren. Eine
+   siebenteilige Schrittleiste nebeneinander und ein Handy schließen sich aus
+   — der Entwurf braucht **zwei** Darstellungen derselben Führung, nicht eine
+   gequetschte." **Marcels Wahl aus der Demo: Fassung C, die Klappleiste.**
+
+   **Gebaut um dieselben Knöpfe.** Unter 900 px wird `#mbw-reiter` zur
+   senkrechten Liste, darüber bleibt alles wie es ist. **Kein zweiter
+   Reiter-Satz** — sonst laufen zwei Listen auseinander (Lehre aus v1096b und
+   v1112b). Schwelle 900 px: dieselbe, an der die App auf den Drawer
+   umschaltet, also zwei Fassungen und keine dritte Zwischenform.
+
+   **Nachgemessen am ausgerollten Stand** (`mb-wizard.js?v=1153b` im iframe
+   bestätigt):
+
+   | Fenster | Führung | Kopfzeile | Liste |
+   |---|---|---|---|
+   | 390 px | **55 px** (vorher 188) | sichtbar, „1/7 Übersicht ▸", Balken 14 % | versteckt |
+   | 820 px | **55 px** | sichtbar | versteckt |
+   | 1024 px | 49 px | **unsichtbar** | 7 Marken in **einer** Zeile |
+
+   **Alle drei Verhaltensregeln geprüft, über den Bedienweg (echte Klicks):**
+   1. **Standard ist zu** — wer auf dem Handy ankommt, sieht Felder, kein Menü.
+   2. **Aufklappen** → 7 Marken, Zeilenhöhe **48 px** (über dem 44-px-Maß),
+      Liste 348 px, `aria-expanded=true`.
+   3. **Wahl aus der Liste** → Schritt gewechselt („3/7 Zustand") **und
+      zugeklappt**; **„Weiter"/„Zurück" lassen den Zustand unberührt** (offen
+      blieb offen, Kopfzeile zog mit auf „4/7 Ausstattung").
+   4. **Der Merker hält das Neuladen** (`dp_mb_leiste_zu`) — offen blieb offen.
+
+   ### `v1153b` — eigener Fehler, im ersten Prüflauf gefunden
+
+   `v1153` rief `klappBauen()` auf, **während die Reiterleiste noch nicht im
+   Dokument hing**. `reiter.parentNode` war `null`, das `insertBefore` lief
+   ins Leere, die Kopfzeile entstand nie — **`html.mbw-zu` wurde trotzdem
+   gesetzt.** Gemessen bei 390 und 820 px: null Marken, Höhe 0, keine
+   Kopfzeile. **Unter 900 px war damit überhaupt keine Führung sichtbar** —
+   schlimmer als der Zustand davor.
+
+   Zwei Änderungen: der Aufruf steht jetzt **nach** dem Einhängen, und
+   `klappBauen()` **weigert sich, `mbw-zu` zu setzen**, wenn die Kopfzeile
+   nicht gebaut werden konnte — der sichere Zustand ist *aufgeklappt*, die
+   Führung darf nie ganz verschwinden. Dazu eine Konsolen-Warnung statt eines
+   stummen Fehlschlags.
+
+   **Die Lehre, die über den Einzelfall hinausgeht:** ein Zustand, der etwas
+   **versteckt**, darf erst gesetzt werden, wenn der **Ersatz nachweislich
+   steht**. Sonst wird aus einem halb gescheiterten Aufbau eine leere Seite.
+   Verwandt mit `insertBefore` nur bei direktem Kind — hier hing der
+   Referenzknoten gar nicht im Dokument.
 
 - [2026-08-12] **Die Differenz-Abrechnung ist nachgewiesen — ohne einen Liter Kerosin** — kein Code geändert.
    Der Punkt war als Klicktest geplant, der echtes Guthaben kostet
