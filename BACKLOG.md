@@ -99,7 +99,28 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist, ob das Feld wohnungs- oder gebäudebezogen gemeint ist, und ob die
    Feldhilfe das sagt. **Marcel entscheidet das fachlich.**
 
-3. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+3. **Neun Info-Zeichen in der Wertermittlung tun nichts.** Beim Setzen des
+   Garagen-Hinweises (`v1142`) aufgefallen und dann durchgezählt:
+   `wertermittlung.js` vergibt **18** Hilfe-Schlüssel, `TEXTE` in
+   `feldhilfe.js` führt **11** (mit dem neuen). `textFuer()` kennt keinen
+   Rückfall — fehlt der Schlüssel, gibt sie `null` zurück und der Klick
+   verpufft **still**. Das ⓘ steht trotzdem am Feld und verspricht eine
+   Erklärung.
+
+   Ohne Text sind:
+   `aussenPct`, `ausstGewerk`, `bauteilHk`, `garagenStufe`, `grundriss`,
+   `hinterland`, `hinterlandRent`, `modGrad`, `standardstufe`.
+
+   Das sind ausgerechnet die **erklärungsbedürftigsten** Felder der
+   Wertermittlung — Standardstufe, Modernisierungsgrad und
+   Hinterland-Rentierlichkeit entscheiden erheblich mit, und
+   `hinterlandRent` steuert direkt die Bodenwertverzinsung nach § 41.
+
+   **Zwei Dinge zu tun:** die neun Texte schreiben, und `textFuer()` beim
+   Fehlen eines Schlüssels **laut** sein lassen (`console.warn`) statt
+   still — ein stiller Rückfall sieht aus wie ein bestandener Lauf.
+
+4. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -197,7 +218,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-4. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
+5. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
    als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
    prüfen. Der Score bleibt auf dem Tablet.
 
@@ -232,7 +253,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
    dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
 
-5. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+6. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -266,7 +287,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
      eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
 
-6. **Marktbericht neu gestalten.**
+7. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -410,7 +431,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-7. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
+8. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
    Beim Ausrollen von `v1136` gemessen: `git status` auf
    `root@116.203.214.11` meldet
    `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
@@ -429,7 +450,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Produktion** liegt. Nicht nebenbei: es ist der BORIS-Anschluss, an
    dem die Bodenrichtwerte hängen.
 
-8. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
+9. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
 
    Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
 
@@ -467,7 +488,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-9. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+10. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
 
    Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
    Defekt, keine Geschmacksfrage.
@@ -487,7 +508,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
    dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
 
-10. **Regler „Tab-Texte" wirkt nicht**
+11. **Regler „Tab-Texte" wirkt nicht**
 
    Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
    Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
@@ -504,7 +525,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
    Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
 
-11. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+12. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
    Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
    schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
@@ -527,7 +548,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
    Aufgreifen zusammenlegen, nicht doppelt bauen.
 
-12. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+13. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
 
    **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
    führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
@@ -552,7 +573,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
    Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
 
-13. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+14. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
 
    Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
    Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
@@ -575,7 +596,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
    entschieden ist.
 
-14. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+15. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -612,7 +633,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-15. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+16. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -642,7 +663,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-16. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+17. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
