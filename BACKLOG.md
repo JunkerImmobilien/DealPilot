@@ -264,10 +264,75 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    Punkt 4 und Punkt 11 führen denselben Pfeil mit den Desktop-Maßen;
    **beim Aufgreifen gilt der Handy-Wert als der schwerere.**
 
-   **Weiterhin offen und auf Marcels Freigabe wartend:** die
-   **PDF-Ausgabe** (löst einen Download aus) und der **eigentliche
-   Marktbericht-Abruf** (kostet Kerosin — Stufe 3 wären 12 L, das
-   Konto hat 12 L).
+   ---
+
+   ### Dritter Durchgang (2026-08-12) — der echte Marktbericht-Abruf
+
+   **Marcel hat den Abruf freigegeben und auf 112 L aufgeladen.** Gefahren
+   an **Hermannstraße 9, Hüllhorst** (`07d89138`), Stufe 3.
+
+   **Erst gemessen, dann ausgegeben — und die Messung hat den Plan
+   geändert.** Das Bestandsobjekt unter dieser Adresse ist **nicht** das
+   Testobjekt aus `CLAUDE.md`: dort steht ETW 165 m², Bj 1968, im Bestand
+   liegt **100 m², Bj 1962**, 950 m² Grundstück, 3 Einheiten, MEA 50.
+   Der Sollwert 305.937 / 348.687 € gilt für dieses Objekt also **nicht**.
+   Der Lauf ist damit ein **Ketten- und Plausibilitätsnachweis, kein
+   Genauigkeitsnachweis** — ein Objekt mit amtlichem Sollwert steht auf
+   Staging nicht bereit.
+
+   **Eigener Fehler, ausdrücklich zurückgenommen.** Mein erster Anlauf
+   ließ den Tab hängen, und ich hatte „der Klick friert die Seite ein"
+   notiert. Falsch: `app.js:224` ruft `window.confirm()` — den
+   Kostenhinweis vor dem kostenpflichtigen Abruf (v647-cost). Ein modaler
+   Dialog blockiert den Renderer, und Browser-Automation kann ihn nicht
+   wegklicken. **Der Dialog ist genau richtig so.** Zweiter Anlauf mit
+   `window.confirm = () => true` — die übrige Kette lief unverändert.
+
+   **Die Abrechnung stimmt auf den Liter.** Für das Objekt war Stufe 2
+   bereits bezahlt; der Knopf forderte **7 L** (Differenz zu 12).
+   Gemessen: **112 → 105 L**, `bezahlte_stufe` danach **3**, alle
+   Folgeabrufe **0 L**. Der Hinweistext nennt die 12 L und erklärt die
+   Differenz — Knopf und Dialog widersprechen sich also nicht.
+
+   **Alle drei Verfahren rechnen, keins halb.** Vergleichswert
+   **192.000 €** (als führend bei ETW gekennzeichnet), Ertragswert
+   **168.000 €** bei Reinertrag 7.464 €/a, Sachwert **268.172 €**,
+   Bodenwert **40.338 €**. Der Liegenschaftszinssatz **2,56 %** trägt
+   korrekt „eigene Angabe (indikativ)". Der Bodenrichtwert kommt echt aus
+   **BORIS-NRW** (Zone 167, Layer `brw_ein_zweigeschossig`, Stichtag
+   2026-01-01, `verified`, mit Quellenvermerk und dl-de/by-2-0). Der
+   Ertragswert ist in sich schlüssig: bei 40.338 € Bodenwert und 2,56 %
+   entspricht er einem Barwertfaktor von 19,85, also **rund 26 Jahren
+   Restnutzungsdauer** — für Bj 1962 mit Modernisierung plausibel.
+
+   **BEFUND, offen: der Bodenwert ist aus dem Bericht nicht
+   nachrechenbar.** Das Objekt führt Grundstück 950 m², BRW 90 €/m²,
+   MEA 50 %, **Hinterland 828 m² à 5 €/m² (rentierlich)** und
+   **Anpassung −10 % („Lärmbelastung Hauptstraße")**. Keine Kombination
+   ergibt die angezeigten 40.338 €:
+
+   | Weg | Ergebnis |
+   |---|---|
+   | 950 × 90 × 50 % | 42.750 € |
+   | … zusätzlich −10 % | 38.475 € |
+   | … mit Hinterlandaufteilung (122 × 90 + 828 × 5) | 6.804 € |
+   | **angezeigt** | **40.338 €** |
+
+   `ErtragswertService.bodenwert()` protokolliert jeden Schritt in
+   `out.schritte` (Z. 99–164: Fläche × BRW, GFZ-Umrechnung, Anpassung,
+   Erschließungsbeitrag, Miteigentumsanteil) — **die Bildschirmansicht
+   zeigt sie nicht**, und `data.land_value` im Replay trägt nur die
+   BORIS-Rohquelle, `valuation.land_component` ist `null`. **Ob das ein
+   Rechenfehler ist oder nur eine fehlende Anzeige, entscheidet der
+   Rechenweg im PDF** — genau das verspricht Stufe 3 („mit Rechenweg im
+   PDF"). Deshalb hier noch **nicht** als Rechenfehler geführt.
+
+   **Ebenfalls ohne Modellvermerk auf dem Bildschirm:** weder Stufe A–E
+   noch ein Modellvermerk taucht in der Ansicht auf (`grep` über den
+   gerenderten Text: null Treffer). Auch das ist am PDF zu messen.
+
+   **Weiterhin offen:** die **PDF-Ausgabe**. Sie löst einen Download aus
+   und ist der Maßstab für die beiden Befunde oben.
 
 2. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
