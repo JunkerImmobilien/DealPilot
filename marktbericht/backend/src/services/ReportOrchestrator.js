@@ -495,6 +495,38 @@ export const ReportOrchestrator = {
         anpassung_pct: ref.brw_anpassung_pct || null,
         anpassung_grund: ref.brw_anpassung_grund || null,
       });
+      /* v1140-UKTEXT · Der Flaechenhinweis behauptete das Gegenteil dessen,
+       * was gerechnet wurde. Er entsteht oben allein aus der Ueberschreitung
+       * (>= 30 %) und sagt seither unveraendert "Der Bodenwert setzt die
+       * gesamte Flaeche zum vollen Bodenrichtwert an … hier nicht
+       * vorgenommen." Seit v1070 stimmt das nicht mehr: liegt eine
+       * Groessenanpassung vor, wird sehr wohl umgerechnet.
+       *
+       * Am Pruefobjekt gemessen (950 m2, Bezugsgroesse 700 m2): der Bericht
+       * setzte 84,92 EUR/m2 an — Bodenrichtwert 90 EUR/m2 mal Koeffizient
+       * 0,9436 — und schrieb daneben, er habe nichts umgerechnet. Ein
+       * Modellvermerk, der etwas anderes behauptet als er tut, ist schlimmer
+       * als keiner (§ 10 ImmoWertV).
+       *
+       * Erst hier korrigierbar: `_uk` entsteht nach dem Hinweis. */
+      if (_flaeche && _flaeche.hinweis && _uk && _uk.verfuegbar) {
+        const _kopf = 'Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '
+          + _flaeche.ueberschreitung_pct + ' % größer als das Bodenrichtwertgrundstück '
+          + 'dieser Zone (' + _flaeche.richtwertgrundstueck_qm + ' m²). ';
+        if (_uk.gruen_qm > 0) {
+          _flaeche.hinweis = _kopf
+            + 'Die Fläche bis zum 1,5-fachen der Bezugsgröße ist mit '
+            + _uk.bodenwert_eur_qm + ' €/m² angesetzt, die überschüssigen '
+            + _uk.gruen_qm + ' m² wertmäßig als private Grünfläche ('
+            + _uk.gruen_eur_qm + ' €/m²) — getrennte Bewertung nach § 41 ImmoWertV.';
+        } else if (_uk.koeffizient_angewandt) {
+          _flaeche.hinweis = _kopf
+            + 'Der Bodenrichtwert ist deshalb über den Umrechnungskoeffizienten '
+            + 'der Zone auf ' + _uk.bodenwert_eur_qm + ' €/m² angepasst ('
+            + (landValue && landValue.value_sqm) + ' €/m² × ' + _uk.faktor + ').';
+        }
+      }
+
       /* WNHK-1 · Sachwertfaktor aus derselben Kaskade wie der Zinssatz.
        * Er steht in denselben Grundstuecksmarktberichten — die Ernte
        * liefert beides oder keines. */

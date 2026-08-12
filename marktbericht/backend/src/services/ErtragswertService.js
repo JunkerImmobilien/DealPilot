@@ -162,6 +162,25 @@ export const ErtragswertService = {
     if (mea) {
       wert = wert * (mea / 100);
       out.schritte.push({ pos: 'Miteigentumsanteil', detail: `${round2(mea)} %`, wert: round0(wert) });
+      /* v1140-MEARENT · DER V1026-FIX WAR NUR HALB FERTIG.
+       * `wert_rentierlich` wird oben gesetzt — also VOR dieser Kuerzung — und
+       * blieb deshalb auf dem vollen Grundstueckswert stehen. Verzinst wird
+       * aber genau er (Z. 393 f.), waehrend als Bodenwert der gekuerzte
+       * Betrag zaehlt. Bei MEA 50 % lief die Bodenwertverzinsung damit auf
+       * dem DOPPELTEN Wert.
+       *
+       * Am Pruefobjekt Hermannstrasse 9 gemessen (PDF-Rechenweg, 2026-08-12):
+       * "Bodenwertverzinsung (80.676 EUR x 2,56 %)" gegen "+ Bodenwert
+       * 40.338 EUR" — Ertragswert 167.582 statt 191.339 EUR, rund 14 %
+       * zu niedrig. Je kleiner der Miteigentumsanteil, desto groesser der
+       * Fehler.
+       *
+       * Der rentierliche Teil ist ein ANTEIL desselben Bodenwerts und muss
+       * dieselbe Kuerzung mitmachen — sonst vergleicht die Verzinsung zwei
+       * verschiedene Bezugsgroessen. */
+      if (Number.isFinite(Number(out.wert_rentierlich))) {
+        out.wert_rentierlich = round0(Number(out.wert_rentierlich) * (mea / 100));
+      }
     }
 
     out.wert = round0(wert);
