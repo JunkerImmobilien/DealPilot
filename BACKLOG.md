@@ -717,6 +717,31 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    191.339 €). Überlauftest gegen die klippende Kachel: **0 von 56 Zellen**
    stehen über, Kartenbreite 277 px.
 
+   **`v1141d` — bei 390 px in der Messkabine nachgemessen.** Der
+   Kopfbetrag des Bodenwerts maß **66 px bei 33 px Zeilenhöhe**: das
+   Euro-Zeichen stand allein in der zweiten Zeile. Ursache ist `nowrap` in
+   der Flex-Zeile `.wv-boden` — das `<b>` wird gequetscht und bricht
+   **innen** um, statt dass die Zeile umbricht. Derselbe Befundtyp wie die
+   Cashflow-Kacheln in `v1138c`; eine Zahl, die man in zwei Zeilen liest,
+   liest man falsch. Jetzt `flex-wrap:wrap` plus `white-space:nowrap` am
+   Betrag, nachgemessen **33 px, einzeilig**.
+
+   Der Rest der Handy-Messung ist sauber: Kachelraster einspaltig
+   (305 px), **0 überstehende Zellen** gegen den klippenden Vorfahren,
+   keine Zelle nur per Seitwärtswischen erreichbar, `scrollWidth` 375 bei
+   390 px Viewport.
+
+   **Eigener Messfehler, vermerkt:** Der erste Handy-Screenshot sah aus,
+   als wären die Beträge rechts abgeschnitten. Das war mein zu schmaler
+   Bildausschnitt — Tabelle 305 px im 305-px-Behälter, `scrollWidth`
+   identisch. Ein Screenshot ist keine Messung.
+
+   **Zweiter eigener Fehler, teurer:** Beim Hochziehen des Cache-Busters
+   `Set-Content` benutzt — **71 geänderte Zeilen statt einer**, Umlaute
+   doppelt kodiert. Genau die Falle, die am selben Tag in `FALLEN.md`
+   geschrieben wurde. Über `git checkout --` zurückgenommen und mit dem
+   Edit-Werkzeug wiederholt, Diff danach eine Zeile.
+
 - [2026-08-12] **Bodenwertverzinsung bei Eigentumswohnungen lief auf dem doppelten Wert** — `v1140` (`6e1dbe8`), `v1140b` (`a1f9839`).
 
    **Befund.** `ErtragswertService.bodenwert()` setzt `wert_rentierlich`
