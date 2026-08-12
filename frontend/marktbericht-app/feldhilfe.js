@@ -172,10 +172,21 @@
     document.head.appendChild(s);
   }
 
-  function box(feld, txt) {
+  function box(feld, txt, anker) {
     var alt = document.querySelector('.fh-box[data-fh-for="' + feld + '"]');
     if (alt) { alt.remove(); return null; }
-    var el = $(feld);
+    /* v1146b-FHANKER · Nicht jeder Hilfe-Schlüssel ist eine Feld-Id.
+     * `hinterland`, `ausstGewerk` und `bauteilHk` stehen für ganze
+     * Feldgruppen — das ⓘ hängt dort 9× bzw. 5× an verschiedenen Feldern
+     * (`ausstAussenwaende`, `btlGauben`, …). `$(feld)` findet dann nichts
+     * und der Kasten wurde **still** gar nicht erst gebaut: der Text war
+     * vorhanden, `textFuer()` warnte zu Recht nicht, und trotzdem passierte
+     * beim Klick nichts. Genau der Fehler, den v1146 beheben sollte — nur
+     * eine Ebene tiefer.
+     *
+     * Rückfall auf das angeklickte Zeichen selbst: es steht immer im Label
+     * des Feldes, zu dem die Erklärung gehört. */
+    var el = $(feld) || anker;
     if (!el) return null;
     var d = document.createElement('div');
     d.className = 'fh-box';
@@ -326,7 +337,7 @@
       i.addEventListener('click', function () {
         var f = i.getAttribute('data-fh');
         var t = textFuer(f);
-        if (t) box(f, t);
+        if (t) box(f, t, i.parentNode || i);   /* v1146b: Anker für Gruppen-Schlüssel */
       });
     });
     ['baustatus', 'cond'].forEach(function (f) {
