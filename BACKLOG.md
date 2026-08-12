@@ -603,10 +603,29 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    überschreibt Arbeit, die es nur auf dem Server gibt. Eine Sicherung
    liegt unter `/root/registry.js.bak-2026-08-11`.
 
-   **Zu tun:** Serverfassung gegen Repo-Fassung diffen, entscheiden was
-   gilt, ins Repo holen — und dann prüfen, ob dieselbe Drift auch auf der
-   **Produktion** liegt. Nicht nebenbei: es ist der BORIS-Anschluss, an
-   dem die Bodenrichtwerte hängen.
+   **BEHOBEN am 2026-08-12 — `e35e34b`.** Aufgefallen, weil der Server
+   plötzlich auf Zweig **`main`** stand und ein Backlog-Commit nicht
+   ankam. Ursache war nicht die Drift allein: Marcel hatte die Datei
+   inzwischen **auf dem Server committet** (`1e04538`, 13:09 UTC), womit
+   `staging` dort um je einen Commit von `origin` abwich — jedes
+   `git pull --ff-only` bricht dann ab.
+
+   **Vorgehen:** Serverfassung 1:1 ins Repo geholt und unter Marcels
+   Autorschaft committet, `node --check` gegen eine ESM-Arbeitskopie
+   sauber. Dann auf dem Server gesichert
+   (`/root/registry.js.vor-abgleich`), `git reset --hard origin/staging`,
+   und **per MD5 nachgewiesen, dass die Datei bit-identisch geblieben
+   ist** (`3c7a41d8…` vorher wie nachher). Server steht wieder auf
+   `staging`, Divergenz weg, Deploys laufen.
+
+   **Zwei Dinge bleiben offen:**
+   - **Produktion prüfen:** liegt dieselbe Drift dort auch? SSH ist
+     read-only, ein Vergleich der Datei genügt.
+   - **Wie es dazu kam:** Ein Commit direkt auf dem Server ist der
+     naheliegende Reflex, wenn `deploy-staging.ps1` scheitert — er
+     erzeugt aber genau die Divergenz, die den nächsten Deploy blockiert.
+     Solange das Skript defekt ist (siehe `FALLEN.md`), wird das
+     wiederkommen.
 
 11. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
 
