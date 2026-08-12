@@ -41,6 +41,7 @@ teuer sind, weil sie plausibel klingen.
 |---|---|---|
 | aktive Stildatei | `index.html` lädt `frontend/style.css` | **`css/style.css`** — `frontend/style.css` lädt **niemand** |
 | Handy-Sperre | „bewusst AKTIV (v970 + MA35)" | **mit `v1118` gefallen**, Dateien gelöscht |
+| Workstream (B) Mobile | „MA34 + MA35 + v970-Sperre" | **MA34**; MA35 und v970-Sperre mit `v1118` entfernt |
 | Deploy-Nachweis | Hash allein genügt | **Zweig mitlesen** — der Server stand am 12.08. auf `main` |
 
 **Und eine Regel für den Git-Umgang, aus einem Zwischenfall am 12.08. abends:**
@@ -294,7 +295,7 @@ Lieber fünf Minuten Diagnose als dreißig Minuten Raten.
 | | Namespace | Prod-Stand |
 |---|---|---|
 | **(A) Haupt-App** | `vNNN` | `beleg-import-20260721` + BMF v974–v994 + Voice v1000 |
-| **(B) Mobile** | `MA` | MA34 + MA35 + v970-Sperre |
+| **(B) Mobile** | `MA` | MA34; **MA35 und die v970-Sperre sind mit `v1118` entfernt** |
 | **(C) Landing** | Feature-Name | `landing-promo-20260723` |
 | **(D) Marktbericht** | `vNNN` | **`99c1097`**, Tags `rollout-20260812-abend` · `marktbericht-v1083b-20260812` · `marktbericht-v1154-20260812` |
 | **(E) Reseller / Whitelabel** | `P-NN` / `W-NN` | W43 |
