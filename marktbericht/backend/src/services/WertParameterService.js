@@ -438,8 +438,39 @@ export const WertParameterService = {
 
   /** Sachwertfaktor — Stufe 2, hier nur vorbereitet. */
   async sachwertfaktor({ ags, objektart, anzahlWe, stichtag, nutzerwert = null }) {
+    /* v1144-SWFART · Die Objektart-Sperre lag bisher NUR im Tabellenweg
+     * (lib/sachwertfaktoren_nrw.js:134). Solange der Feldname-Fehler den
+     * Faktor ohnehin verschluckte, fiel das nicht auf; mit dessen Behebung
+     * wuerde ein selbst gepflegter Wert bei einer Eigentumswohnung
+     * ploetzlich greifen — am Pruefobjekt waeren aus 268.172 EUR
+     * 308.398 EUR geworden.
+     *
+     * Sachwertfaktoren werden nur fuer Ein- und Zweifamilien-, Doppel- und
+     * Reihenhaeuser abgeleitet. Auf eine Wohnung angewandt ist das kein
+     * "eigener Ansatz", sondern ein Modellbruch (§ 10 ImmoWertV) — und das
+     * Sachwertverfahren ist bei der ETW ohnehin nicht das fuehrende.
+     * Deshalb gilt die Sperre jetzt fuer BEIDE Wege, an einer Stelle.
+     *
+     * Der Wert wird nicht still geschluckt: `grund` und `hinweis` gehen
+     * nach oben durch, damit die Anzeige sagen kann, warum nichts
+     * passiert. */
+    const art = String(objektart || '').toLowerCase();
+    const nichtAbgeleitet = /etw|eigentumswohnung|wohnung|whg|mfh|mehrfamilien|gewerbe|buero/.test(art);
+
     const eigen = Number(nutzerwert);
     if (Number.isFinite(eigen) && eigen > 0) {
+      if (nichtAbgeleitet) {
+        return {
+          wert: null, stufe: null, quelle: null, parameter_id: null,
+          grund: 'objektart_nicht_abgeleitet',
+          eigener_wert_verworfen: eigen,
+          hinweis: 'Für diese Objektart werden keine Sachwertfaktoren abgeleitet '
+            + '(nur Ein- und Zweifamilien-, Doppel- und Reihenhäuser, Abschnitt 5.1.4). '
+            + 'Der eingetragene Wert ' + String(eigen).replace('.', ',')
+            + ' bleibt deshalb unberücksichtigt; der Sachwert wird als vorläufiger '
+            + 'Sachwert ohne Marktanpassung ausgewiesen.',
+        };
+      }
       return { wert: eigen, stufe: 'E', quelle: 'eigene Angabe', parameter_id: null, hinweis: '' };
     }
     return this.hole({ typ: 'sachwertfaktor', ags, objektart, anzahlWe, stichtag });
