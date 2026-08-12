@@ -36927,3 +36927,32 @@ body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):not(.f
   flex: 0 0 auto;
 }
 /* ===== v1147-CB33 END ===== */
+
+/* ═══════════════════════════════════════════════════════════════
+   v1148-SPALT: Der Inhalt wurde bei 1025 px schmaler als bei 1024 px
+
+   Gemessen am 12.08. in der Messkabine:
+     1024 px -> Leiste 260, Inhalt 764   (v648-Block, Z. 35783)
+     1025 px -> Leiste 380, Inhalt 645   (Standard-Grid Z. 267)
+   Ein Pixel mehr Fenster kostete 119 px Inhalt. Ab 1144 px (380+764)
+   ist der Inhalt wieder mindestens so breit wie bei 1024.
+
+   Behoben ohne neue Zahl und ohne 100vw: die zweite Spalte behaelt ihre
+   764 px als Untergrenze, die Leiste nimmt nur, was uebrig ist, und
+   waechst dabei stetig von 261 auf ihre 380 px.
+     1025 px -> 261 + 764      1143 px -> 379 + 764      1200 px -> 380 + 820
+   Kein 100vw, weil das die Scrollleiste mitzaehlt und dann ein Versatz
+   entsteht. Die Leiste traegt keine eigene Breite (geprueft) — sie ist
+   Grid-Kind und folgt der Spalte von selbst.
+
+   Spezifitaet body .app-wrap (0,0,1,1) schlaegt .app-wrap (0,0,1,0) aus
+   Z. 267; die !important-Regeln des eingeklappten Zustands
+   (body.dp-sidebar-collapsed, Z. 32816) bleiben unberuehrt, weil hier
+   bewusst KEIN !important steht.
+═══════════════════════════════════════════════════════════════ */
+@media (min-width: 1025px) {
+  body .app-wrap:not(.sb-collapsed) {
+    grid-template-columns: minmax(0, 380px) minmax(764px, 1fr);
+  }
+}
+/* ===== v1148-SPALT END ===== */
