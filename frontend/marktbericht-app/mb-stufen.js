@@ -88,6 +88,35 @@
     var l = (n === 3) ? bedarf3() : BEDARF[n];
     return l.filter(function (f) { return !wert(f[0]); }).map(function (f) { return f[1]; });
   }
+
+  /* ── v1139-VORRAT · "fehlt" hiess auch, was laengst bekannt war ──────────
+     Im zweiten Pruefdurchgang gemessen: nach der Objektuebernahme stand hier
+     weiter "fehlt: Miteigentumsanteil", obwohl der Wert im Objekt gepflegt
+     ist. Ursache ist wert() selbst — es liest das Formularfeld, und `mea`
+     liegt im Block wm-b3, den wertermittlung.js erst `if (s >= 3)` baut. Ein
+     Feld, das es noch nicht gibt, liefert '' wie ein leeres.
+
+     mb-objektwahl.js haelt genau diese Werte schon vor (window._mbVorrat).
+     Die Leiste fragt sie jetzt — aber NUR fuer die Beschriftung.
+     erreicht() bleibt unveraendert am ausgefuellten Formular: sonst spraenge
+     die Stufe von allein auf 3 und der Knopf forderte 12 L statt 5 L, ohne
+     dass jemand geklickt hat. Kerosin nie ohne Zutun. */
+  function ausObjekt(id) {
+    if ($(id)) return '';          /* steht im DOM -> wert() ist die Wahrheit */
+    var v = null;
+    try { if (typeof window._mbVorrat === 'function') v = window._mbVorrat(id); } catch (e) {}
+    return (v == null) ? '' : String(v).trim();
+  }
+  /* Trennt das wirklich Fehlende von dem, was ein Klick einblendet. */
+  function offenGeteilt(n) {
+    var l = (n === 3) ? bedarf3() : BEDARF[n];
+    var echt = [], liegtVor = [];
+    l.forEach(function (f) {
+      if (wert(f[0])) return;
+      if (ausObjekt(f[0])) liegtVor.push(f[1]); else echt.push(f[1]);
+    });
+    return { echt: echt, vor: liegtVor };
+  }
   function erreicht() {
     if (fehlend(1).length) return 0;
     if (fehlend(2).length) return 1;
@@ -152,6 +181,8 @@
         'font-weight:600;color:var(--wl-c9a84c,#C9A84C);white-space:nowrap}',
       '.mbst-was{font-size:10.5px;line-height:1.45;opacity:.6;margin-top:2px}',
       '.mbst-fehlt{font-size:10.5px;line-height:1.45;margin-top:2px;color:var(--wl-b8625c,#B8625C)}',
+      /* v1139-VORRAT: kein Rot — das ist kein Mangel, sondern ein Klick. */
+      '.mbst-vor{font-size:10.5px;line-height:1.45;margin-top:2px;color:var(--wl-c9a84c,#C9A84C)}',
       '.mbst-info{margin-top:9px;padding:8px 10px;border-radius:6px;background:rgba(201,168,76,.10);',
         'font-size:11.5px;line-height:1.5}',
       '.mbst-info b{color:var(--wl-e8cc7a,#E8CC7A)}'
@@ -171,16 +202,22 @@
     var ms = [1, 2, 3].map(function (n) {
       var an = s >= n;
       var p = preisFuer(n);
-      var f = fehlend(n);
+      var g = offenGeteilt(n);
+      /* v1139-VORRAT: zwei getrennte Zeilen — Rot nur fuer echtes Fehlen. */
+      var unten = '';
+      if (an) unten = '<div class="mbst-was">' + WAS[n] + '</div>';
+      else {
+        if (g.echt.length) unten += '<div class="mbst-fehlt">fehlt: ' + g.echt.join(', ') + '</div>';
+        if (g.vor.length) unten += '<div class="mbst-vor">liegt im Objekt vor: ' + g.vor.join(', ') +
+          ' — hier klicken zum Übernehmen</div>';
+      }
       return '<div class="mbst-ms' + (an ? ' an' : '') + '" data-mbst-ziel="' + n + '" ' +
           'title="' + (an ? NAMEN[n] + ' erreicht' : 'Angaben für ' + NAMEN[n] + ' einblenden') + '">' +
         '<div class="mbst-pkt">' + (an ? '✓' : n) + '</div>' +
         '<div class="mbst-txt">' +
           '<div class="mbst-zeile"><span class="mbst-name">' + NAMEN[n] + '</span>' +
             '<span class="mbst-kero">' + (p === 0 ? 'bezahlt' : p + ' L') + '</span></div>' +
-          (an
-            ? '<div class="mbst-was">' + WAS[n] + '</div>'
-            : '<div class="mbst-fehlt">fehlt: ' + f.join(', ') + '</div>') +
+          unten +
         '</div></div>';
     }).join('');
 

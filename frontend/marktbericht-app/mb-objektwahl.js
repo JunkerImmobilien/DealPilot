@@ -251,13 +251,31 @@
       d.mea_pct = d.mea;
     }
     var offen = [];
+    _vorrat = {};
     WM_MAP.forEach(function (p) {
       var v = d[p[0]];
       if (v == null || v === '') return;
-      if ($(p[1])) setVal(p[1], v); else offen.push(p);
+      if ($(p[1])) setVal(p[1], v);
+      else { offen.push(p); _vorrat[p[1]] = v; }
     });
     return offen;
   }
+
+  /* ── v1139-VORRAT · Was bekannt ist, aber noch nicht im DOM steht ────────
+   * Im zweiten Pruefdurchgang gemessen: die Stufenleiste meldete "fehlt:
+   * Miteigentumsanteil", obwohl der Wert im Objekt gepflegt war. Sie liest
+   * das Formularfeld — und `mea` liegt im Block wm-b3, den es vor Stufe 3
+   * gar nicht gibt. Ein Feld, das noch nicht existiert, ist dort nicht von
+   * einem leeren zu unterscheiden.
+   *
+   * Deshalb ist die offene Liste jetzt ABFRAGBAR. Sie sagt nur "der Wert
+   * liegt vor"; ob eine Stufe erreicht ist, entscheidet weiter allein das
+   * ausgefuellte Formular — sonst spraenge der Bericht ungefragt auf eine
+   * teurere Stufe, und Kerosin wird nie ohne Zutun ausgegeben. */
+  var _vorrat = {};
+  window._mbVorrat = function (id) {
+    return Object.prototype.hasOwnProperty.call(_vorrat, id) ? _vorrat[id] : null;
+  };
 
   /* Die Wertermittlungsfelder liegen im Block wm-b3 und existieren erst,
    * wenn der Nutzer so weit ist. Ein einmaliges Befuellen verpufft also
@@ -272,6 +290,7 @@
       offen = offen.filter(function (p) {
         if (!$(p[1])) return true;
         setVal(p[1], d[p[0]]);
+        delete _vorrat[p[1]];   /* v1139-VORRAT: jetzt steht es im Feld */
         return false;
       });
       if (!offen.length) { try { _wmObs.disconnect(); } catch (e) {} _wmObs = null; }
