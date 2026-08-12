@@ -123,11 +123,9 @@ die alle auf Marcels Durchgang zurückgehen.
   In `v1147` stand `#app` in der Regel — das Element gibt es nicht.
 
 **Zwei Abnahmen, die noch offen sind:**
-1. **Ankreuzfelder 33 px** (`v1147b`) — gemessen ohne geladenes Objekt,
-   0 von 26 Feldern sichtbar. Mit geladenem Objekt gegenmessen, ob die
-   Formularzeilen tragen (besonders Steuer und Pilot-Analyse).
-2. **Produktion** — liegt dieselbe `registry.js`-Drift dort auch? SSH ist
-   read-only, ein Dateivergleich genügt.
+1. **Produktion** — liegt dieselbe `registry.js`-Drift dort auch? SSH ist
+   read-only, ein Dateivergleich genügt. *(Die Ankreuzfeld-Abnahme ist am
+   12.08. abends erledigt — 21 Felder, alle 33 px, auch bei 390 px.)*
 
 **Prüfstrecken auf Staging:**
 - `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt,
@@ -230,11 +228,13 @@ die alle auf Marcels Durchgang zurückgehen.
      `CLAUDE.md` übernommen, statt ihn auszulesen; genau der Fehler, vor
      dem Regel 1 warnt. Die Regel griff dadurch nirgends.
 
-     **OFFEN — optische Abnahme.** Gemessen wurde ohne geladenes Objekt,
-     alle Reiter zugeklappt: 0 von 26 Feldern waren sichtbar, die
-     Überlaufprüfung ist damit wertlos. **Beim nächsten Durchgang mit
-     geladenem Objekt gegenmessen**, ob 33 px die Formularzeilen sprengen
-     — besonders in den dichten Reitern Steuer und Pilot-Analyse.
+     **ABGENOMMEN (2026-08-12 abends, siehe Fertig).** Die Messung vom
+     Mittag war wertlos (0 von 26 Feldern sichtbar). Nachgeholt mit
+     geladenem Objekt, allen Reitern und aufgeklappten `<details>`:
+     **21 sichtbare Felder, alle 33 × 33 px, kein Überlauf** — bei 1440 px
+     und bei **390 px**. Die Zeilen tragen (33/35 px), kein Feld ragt heraus,
+     kein Label abgeschnitten. Die dichten Reiter Steuer (2) und
+     Pilot-Analyse (13) sind einzeln geprüft.
    - **`.sbc-arrow` misst 20 × 20 px und ist ein echtes Bedienelement.**
 
      **Mein v1118-Befund war falsch und wird hiermit zurückgenommen.** Ich
@@ -1154,6 +1154,40 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Ankreuzfelder 33 px — die optische Abnahme ist nachgeholt** — kein Code geändert, `v1147b` bestätigt.
+   Die Messung vom Mittag war **wertlos**: ohne geladenes Objekt und mit
+   zugeklappten Reitern waren **0 von 26** Feldern sichtbar. Jetzt mit
+   geladenem Objekt, allen Reitern durchgeklickt und `<details>` aufgeklappt:
+
+   | Reiter | Felder | Größe | Überlauf |
+   |---|---|---|---|
+   | Objekt · Bewirtschaftung · Bewertung · Deal-Aktion | 0 | — | — |
+   | Investition | 4 | 33 × 33 | keiner |
+   | Miete | 1 | 33 × 33 | keiner |
+   | Finanzierung | 1 | 33 × 33 | keiner |
+   | Steuer | 2 | 33 × 33 | keiner |
+   | **Pilot-Analyse** | **13** | 33 × 33 | keiner |
+
+   **Bei 390 px gegengemessen** (der Ursprung des Punkts war der
+   v1118-Handy-Durchgang): Steuer 2, Investition 4, Pilot-Analyse 13 Felder —
+   **alle 33 × 33, kein Überlauf.** Die Zeilen tragen: Höhen 33/35 px, **kein
+   Feld ragt aus seiner Zeile**, **kein Label-Text abgeschnitten**.
+   Schalter (`.ji-switch`, `.toggle-slim`, `.fesh-tile`, `.dp-pf-tile`) sind
+   wie vorgesehen ausgenommen und unverändert.
+
+   **Ein eigener Messfehler, gefunden und korrigiert, bevor er zum Befund
+   wurde:** Mein erster Überlauf-Prüfer meldete zwei Felder als „läuft aus
+   `.main-col`". Falsch positiv — er warf `overflow-x` und `overflow-y`
+   zusammen. Gemessen: `.main-col` hat **`overflow-x: hidden`** und
+   **`overflow-y: auto`**. Senkrecht „unterhalb" heißt dort **scrollbar**,
+   nicht abgeschnitten. Mit getrennt geprüften Achsen: kein Überlauf.
+
+   **Das ist die Falle aus `FALLEN.md` Punkt 4** („ein Überlauftest prüft
+   gegen den klippenden Vorfahren") in ihrer schärferen Form: **auch die Achse
+   muss stimmen.** Ein Container, der waagerecht klippt und senkrecht
+   scrollt, ist der Normalfall in dieser App — wer beides zusammenwirft,
+   erfindet Befunde.
 
 - [2026-08-12] **Die Differenz-Formel stand zweimal — jetzt eine Quelle** — `v1154`, `99a14db`.
    Sie stand in `_kerosinKosten()` (was **abgebucht** wird) und in
