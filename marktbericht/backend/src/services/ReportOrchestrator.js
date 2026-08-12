@@ -513,7 +513,24 @@ export const ReportOrchestrator = {
         const _kopf = 'Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '
           + _flaeche.ueberschreitung_pct + ' % größer als das Bodenrichtwertgrundstück '
           + 'dieser Zone (' + _flaeche.richtwertgrundstueck_qm + ' m²). ';
-        if (_uk.gruen_qm > 0) {
+        /* v1140b · Die beiden Aufteilungen sind NICHT dasselbe und dürfen
+         * nicht denselben Satz bekommen. `manuelleAufteilung()` setzt
+         * bauland_qm = volle Grundstücksfläche und legt die Hinterlandfläche
+         * ZUSÄTZLICH daneben (umrechnung_nrw.js Z. 221–232, „Zusätzliche
+         * Grundstücksfläche"). Die automatische Aufteilung dagegen SPALTET
+         * die vorhandene Fläche am 1,5-fachen der Bezugsgröße.
+         *
+         * Mein erster Anlauf gab beiden den Spaltungstext — beim Prüfobjekt
+         * stand dann „die überschüssigen 828 m²", obwohl die 828 m² gar
+         * nicht überschüssig sind, sondern hinzukommen. Ein falscher
+         * Modellvermerk gegen einen anderen getauscht. */
+        if (_uk.gruen_qm > 0 && _uk.quelle_art === 'eigene Angabe') {
+          _flaeche.hinweis = _kopf
+            + 'Das Grundstück selbst ist mit ' + _uk.bodenwert_eur_qm
+            + ' €/m² angesetzt; hinzu kommen ' + _uk.gruen_qm
+            + ' m² Hinterlandfläche zu ' + _uk.gruen_eur_qm
+            + ' €/m² (eigene Angabe) — getrennte Bewertung nach § 41 ImmoWertV.';
+        } else if (_uk.gruen_qm > 0) {
           _flaeche.hinweis = _kopf
             + 'Die Fläche bis zum 1,5-fachen der Bezugsgröße ist mit '
             + _uk.bodenwert_eur_qm + ' €/m² angesetzt, die überschüssigen '
