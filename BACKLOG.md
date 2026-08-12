@@ -281,10 +281,9 @@ die alle auf Marcels Durchgang zurückgehen.
      rechnen dieselbe Formel, und im Log steht ein echter Vorgang mit
      **7 L = 12 − 5** für eine Vertiefung von Stufe 2 auf 3. Vollpreise
      2 / 5 / 12 L, der Browser rechnet die Ermäßigung nicht selbst.
-     **Offen bleibt nur eine Kleinigkeit:** die Formel steht an **zwei**
-     Stellen (`/stufenpreis` und `_kerosinKosten`) — heute deckungsgleich,
-     aber zwei Stellen laufen irgendwann auseinander. Zusammenführen ist ein
-     eigener, kleiner Punkt.
+     **ERLEDIGT: die Formel stand an zwei Stellen** — `v1154` führt sie in
+     `_aufpreis(stufe, bezahlt)` zusammen, Verhalten bewiesen unverändert
+     über alle 12 Kombinationen (siehe Fertig).
    - **Pflichtfelder je Stufe stehen als eine Quelle** in `BEDARF`
      (`mb-stufen.js`): Stufe 1 `address` `ptype` `area` `year` · Stufe 2
      `baustatus` `cond` `quality` · Stufe 3 `plot` `units` und
@@ -1142,6 +1141,61 @@ die alle auf Marcels Durchgang zurückgehen.
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
 
+- [2026-08-12] **Die Differenz-Formel stand zweimal — jetzt eine Quelle** — `v1154`, `99a14db`.
+   Sie stand in `_kerosinKosten()` (was **abgebucht** wird) und in
+   `GET /stufenpreis` (was **angekündigt** wird). Beide rechneten dasselbe —
+   Zeile für Zeile nachgeprüft. **Genau das ist die Gefahr:** laufen sie
+   auseinander, wird 3 L angekündigt und 5 L gebucht. Das ist im Haus schon
+   passiert (Marcels GELD-Befund „Stufe 1 bewirbt 2 L, abgebucht werden 5 L",
+   behoben in `v1125`).
+
+   Jetzt eine Funktion `_aufpreis(stufe, bezahlt)` mit zwei Aufrufern.
+   **Verhalten unverändert, bewiesen** in node über alle 12 Kombinationen
+   (Stufe 1–3 × bezahlt 0–3): alte Abbuchung = alte Auskunft = neue Quelle.
+
+   | bezahlt | Stufe 1 | Stufe 2 | Stufe 3 |
+   |---|---|---|---|
+   | 0 | 2 L | 5 L | 12 L |
+   | 1 | 0 | **3 L** | 10 L |
+   | 2 | 0 | 0 | **7 L** |
+   | 3 | 0 | 0 | 0 |
+
+   Die 3 L und die 7 L sind genau Marcels Vorgabe — und die 7 L stehen als
+   echter Vorgang im Kerosin-Log.
+
+   **Rebuild gefahren** (Backend, keine Migration): Marker im laufenden
+   Container `docker exec … grep -c` = 2, Logs ohne Ausnahme, `/stufenpreis`
+   live geprüft und **identisch zum Stand vor dem Umbau**
+   (`bezahlte_stufe 0`, `faellig {1:2, 2:5, 3:12}`, kein Fallback-Pfad).
+
+- [2026-08-12] **`BEDARF` und `VERFAHREN[].pflicht` bleiben getrennt — eigene Empfehlung zurückgenommen** — kein Code geändert.
+   Ich hatte nach `v1152` notiert, die beiden Listen der Pflichtangaben
+   „gehören zusammengeführt". **Das war voreilig.** Vor dem Bauen gemessen:
+
+   - **`BEDARF`** (`mb-stufen.js`) beantwortet: *was braucht die **Stufe**,
+     damit der Nutzer sie erreichen und kaufen kann?* → Nutzerführung, Preis,
+     Meilensteinleiste.
+   - **`VERFAHREN[].pflicht`** (`wertermittlung.js`) beantwortet: *was braucht
+     ein **Verfahren**, um zu rechnen?* → Rechenqualität, Ampel.
+
+   **Das sind verschiedene Fragen.** Der Fehler in `v1152` war nicht, dass es
+   zwei Listen gibt, sondern dass die Knopfsperre die Verfahrensliste gegen
+   die falsche Stufe hielt (`ab` statt `genauerAb`). Eine Verschmelzung würde
+   zwei Zwecke in einen Topf werfen und wäre ein Rückschritt.
+
+   **Der scheinbare Widerspruch löst sich auf.** `markt.pflicht` enthält
+   `baustatus`, `BEDARF` führt ihn erst auf Stufe 2 — kollidieren kann das
+   nicht: das `<select id="baustatus">` hat **keine leere Option**, die erste
+   ist `bestand`. Es trägt also **immer** einen Wert und kann nie als
+   „fehlend" erscheinen. Das erklärt auch, warum es beim Leerversuch nicht in
+   der Fehlt-Liste auftauchte.
+
+   **Stehen gelassen, mit Absicht:** ein Pflichtfeld, das nie leer ist, tut
+   keinen Schaden. Es zu verschieben wäre erst dann eine echte Änderung, wenn
+   das Feld einmal eine leere Option bekommt — **dann** greift die Prüfung
+   plötzlich, und dann gehört sie geprüft. Als Merkposten hier festgehalten,
+   statt heute blind aufzuräumen.
+
 - [2026-08-12] **Die Schrittleiste hat eine zweite Darstellung fürs Handy** — `v1153` + `v1153b`, `7fb691f`.
    **Marcels Befund:** „Es muss auf dem Handy funktionieren. Eine
    siebenteilige Schrittleiste nebeneinander und ein Handy schließen sich aus
@@ -1267,11 +1321,12 @@ die alle auf Marcels Durchgang zurückgehen.
    `genauerAb: 3`, wenn derselbe Kern mit echten Parametern rechnet.
    `knopfSperren()` prüfte aber gegen `ab`.
 
-   **Das war die zweite Doppelliste derselben Sache:** `BEDARF` in
-   `mb-stufen.js` führt für Stufe 1 vier Felder, `VERFAHREN[].pflicht` in
-   `wertermittlung.js` deren sieben. `v1126d` hat schon einmal eine solche
-   Zweitliste beseitigt („und lief prompt auseinander"). Sie sind jetzt wieder
-   deckungsgleich — **bleibt es bei zwei Listen, gehört das zusammengeführt.**
+   **Zu den zwei Listen** (`BEDARF` in `mb-stufen.js` gegen
+   `VERFAHREN[].pflicht` in `wertermittlung.js`): ich hatte hier notiert, sie
+   „gehören zusammengeführt". **Das ist zurückgenommen** — sie beantworten
+   verschiedene Fragen (Stufe für die Führung, Verfahren für die Rechnung)
+   und bleiben getrennt. Begründung und die Auflösung des scheinbaren
+   `baustatus`-Widerspruchs stehen unter Fertig.
 
    **Nicht angefasst: die Rechnung.** Fehlen `plot` und `units`, rechnet der
    Quercheck wie vorgesehen mit Pauschalen. Die Sperre war der Fehler, nicht
