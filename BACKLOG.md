@@ -37,302 +37,69 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 ## Offen
 
-1. **Ein Testobjekt vollständig anlegen und alle Rechenwege
-   gegenprüfen.** Investition, Miete, Finanzierung, Bewirtschaftung,
-   Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
-   richtig, wird unter „Bewertung" alles passend angezeigt, sind die
-   Ergebnisse plausibel und korrekt dargestellt?**
+1. **Bei jeder Eigentumswohnung wird die Bodenwertverzinsung auf dem
+   doppelten Bodenwert gerechnet.** Gefunden im dritten Prüfdurchgang
+   (2026-08-12) am PDF-Rechenweg von Hermannstraße 9, Hüllhorst.
 
-   **Das ist ein Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste;
-   was daraus zu reparieren ist, wird danach als eigener Punkt gefasst.
-   Fünf Dinge, die dabei erfahrungsgemäß auffallen und deshalb gezielt
-   angesehen werden:
+   **Was im PDF steht:**
 
-   - **KPI und BWK werden beim Speichern eingefroren.** Ein Objekt, das vor
-     einer Modul-Änderung angelegt wurde, zeigt alte Werte, bis es erneut
-     gespeichert wird. Beim Prüfen also **nach jeder Änderung neu
-     speichern**, sonst wird ein Anzeigefehler gemeldet, der keiner ist.
-   - **DSCR kommt ausschließlich aus `window.Dscr.compute()`.** Weicht ein
-     Anzeigeort ab, ist dort eine zweite Formel entstanden — genau das
-     darf es nicht geben.
-   - ~~**Einheiten:** `kaufpreis` und `cf_ns` stehen in **Cent**~~ —
-     **am 2026-08-11 nachgemessen und widerlegt:** beide Spalten sind
-     `numeric` und führen **Euro** (`250000.00`, `-2075.13`). Ein Faktor
-     100 hat hier also **nicht** seine Ursache; die alte Warnung hätte
-     die nächste Fehlersuche in die falsche Richtung geschickt.
-   - **BWK-Zuordnung:** umlagefähig = `hg_ul + grundsteuer + ul_sonst`,
-     nicht umlagefähig = `hg_nul + eigen_r + mietausfall + nul_sonst`. Der
-     Bankexport teilt durch 12.
-   - **Jahreszahlen** dürfen nie durch `Intl.NumberFormat` laufen, sonst
-     steht „1.964" statt 1964 im Bild.
+   ```
+   - Bodenwertverzinsung (80.676 € × 2,56 %)          -2.065 €
+     nur der rentierliche Bodenwert; -40.338 € nicht
+     rentierliche Fläche bleiben außen vor (§ 41 ImmoWertV)
+   + Bodenwert                                        40.338 €
+   ```
 
-   **Sinnvoll mit dem Finanzamt-PDF zusammen zu fahren** — dasselbe Objekt,
-   dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
-   Steuerteil.
+   **80.676 € ist exakt das Doppelte von 40.338 €.** Verzinst wird der
+   Bodenwert **vor** Miteigentumsanteil, angesetzt wird der **nach** MEA.
 
-   ---
+   **Ursache, im Kern lokalisiert** —
+   `marktbericht/backend/src/services/ErtragswertService.js`:
 
-   ### Erster Durchgang gefahren (2026-08-11) — Rechenkern und Reiter „Bewertung"
+   - **Z. 141** `out.wert_rentierlich = round0(wert)` — hier trägt `wert`
+     noch den vollen Grundstückswert.
+   - **Z. 162–165** `if (mea) { wert = wert * (mea / 100); … }` — die
+     MEA-Kürzung wirkt nur auf `wert`. **`wert_rentierlich` wird nicht
+     nachgezogen.**
+   - **Z. 393 f.** `const _bwRent = … bodenwertErgebnis.wert_rentierlich`
+     — die Ertragswertrechnung nimmt genau diesen Wert.
 
-   **Testobjekt auf Staging: `PRUEF_1`, Prüfstraße 1, 32120 Hiddenhausen**
-   (`a08fbce3`). Bewusst runde Zahlen, damit jede Zeile im Kopf
-   nachrechenbar ist: KP 250.000, Wfl 80 m², NKM 850 + 50 €/Monat, EK
-   60.000, Darlehen 220.175 zu 3,5 % / 2 %, BWK ul 2.100 und nul 1.976,
-   zvE 70.000 bei 42 %, AfA 2 % auf 80 % Gebäudeanteil.
+   **Das ist der halb behobene V1026-Fehler.** Der Kommentar in Z. 145–150
+   beschreibt ihn wörtlich: „Bei einer Eigentumswohnung ist der VOLLE
+   Grundstückswert immer falsch … Die Bodenwertverzinsung fraß 4.809 von
+   6.578 EUR Reinertrag." Der Fix setzte `out.wert` — und ließ
+   `wert_rentierlich` stehen. Verzinst wird aber `wert_rentierlich`.
 
-   **Was stimmt — Zeile für Zeile gegen Handrechnung geprüft:**
+   **Auswirkung, am Prüfobjekt gerechnet:**
 
-   | Anzeige | App | Handrechnung |
+   | | ist | müsste |
    |---|---|---|
-   | Nebenkosten | 30.175 € (12,1 %) | 8.925+3.750+1.250+16.250 |
-   | Bodenwert / Anteil | 15.000 € / 100 m² | 1000 m² × 10 % × 150 € |
-   | Kaltmiete → NOI | 10.800 → 8.824 € | −1.976 nicht umlagefähig |
-   | Zins / Tilgung Jahr 1 | 7.706 / 4.404 € | 220.175 × 3,5 % / 2 % |
-   | CF vor Steuer | −3.286 € | −3.285,63 |
-   | Steuerwirkung | +1.210 € | Verlust 2.882,13 × 42 % = 1.210,49 |
-   | CF nach Steuer | −2.075 € / −173 €/Mon. | −2.075,13 |
-   | BMR / NMR / LTV / Faktor | 4,32 / 3,15 / 88,1 % / 23,1 | alle exakt |
-   | Wertzuwachs 15 J. | +62.558 € | 250.000 × 1,015¹⁵ − 250.000 |
+   | Bodenwertverzinsung | 2.065 € | 1.033 € |
+   | Gebäudereinertrag | 5.399 € | 6.431 € |
+   | × Barwertfaktor 23,02 | 124.285 € | 148.042 € |
+   | **Ertragswert** | **167.582 €** | **≈ 191.339 €** |
 
-   **DSCR: sauber, keine zweite Formel.** Der Kern liefert *brutto* und
-   *netto*; **0,89** steht an sechs Anzeigeorten (`kpi-dscr`,
-   `cr-dscr-val`, `r-dscr2`, Sidebar-Kachel, Badge, KPI-Bewertung),
-   **0,73** an zwei — und die sind ausdrücklich „netto" beschriftet.
-   Beide Werte decken sich exakt mit der Handrechnung. **Keine
-   Jahreszahl** lief durch `Intl.NumberFormat` (kein „1.995").
+   **Rund 24.000 € oder 14 % zu niedrig** — und zwar bei **jeder** ETW mit
+   gepflegtem Miteigentumsanteil. Je kleiner der MEA, desto größer der
+   Fehler.
 
-   **Vier Befunde — als eigene Punkte zu fassen, hier nicht repariert:**
+   **Zwei Nebenbefunde derselben Stelle:**
 
-   1. **BEHOBEN in `v1137` (`70326cf`) — ein negativer Cashflow zeigte
-      kein Minuszeichen.** `cf-vst-now` stand als **„274 €"** da, wo
-      −273,80 gemeint war; positive Werte tragen ein „+". Nur die
-      **Farbe** (rot `rgb(217,104,95)` gegen grün `rgb(63,165,108)`)
-      unterschied — für Rot-Grün-Blinde sind die beiden Fälle **nicht
-      unterscheidbar**. Ursache: `calc.js:3655` rief `fE(v, 0)` ohne das
-      Vorzeichen-Flag, und `fE` formatiert intern `Math.abs(n)`. Jetzt
-      `fE(v, 0, true)`; das manuelle „+" entfällt. Nachgemessen: „–274 €",
-      „–173 €", „+238 €" an allen sechs Phasen-Kacheln.
-   2. **BEHOBEN in `v1137` — zwei Zahlen für dieselbe Größe.** Die
-      kumulierten Mieteinnahmen standen im selben Reiter zweimal:
-      `vz-info-miete` = 200.868 €, `vz-plausi-mit` = 198.709 €.
-      Ursache: **genau der Bäckerstr.-7-Fehler aus `V119`, eine Zeile
-      weiter vergessen** — `vz-plausi-mit` bekam weiter den Wert der
-      ersten Schleife (Quick-Methode), während die Aufschlüsselung
-      darüber längst aus `cfRows` kam. Jetzt zieht die Plausi-Zeile
-      denselben `_mieteKumNew`-Wert.
+   - **Die Fußnote deutet die Differenz falsch.** Sie nennt die 40.338 €
+     „nicht rentierliche Fläche … (§ 41 ImmoWertV)". Das Objekt führt
+     `hinterland_rentierlich: true` — es gibt gar keine nicht rentierliche
+     Fläche. Die Differenz ist der Miteigentumsanteil. Ein Modellvermerk,
+     der etwas anderes behauptet als er tut, ist schlimmer als keiner.
+   - **80.676 € ist auch für sich genommen ungeklärt.** 950 m² × 90 €/m²
+     wären 85.500 €; es fehlen 4.824 €. Der PDF-Text sagt ausdrücklich
+     „Der Bodenwert setzt die gesamte Fläche zum vollen Bodenrichtwert
+     an" — die Zahl widerspricht dem eigenen Satz. Die gepflegte
+     Anpassung −10 % („Lärmbelastung Hauptstraße") ergäbe 76.950 €, das
+     Hinterland 828 m² à 5 €/m² ergäbe 15.120 €. Keiner der Wege trifft.
 
-      **Dabei kam heraus, dass BEIDE alten Zahlen zu hoch waren.** Die
-      echte Rechnung liefert **194.568 €**; an `State.cfRows` abgelesen:
-      **Jahr 1 = 4.500 €**, also 10.800 × 5/12 — das **anteilige
-      Erwerbsjahr** ab August. Ab Jahr 2 steigt es exakt mit 3 %
-      (11.124, 11.458, …). Die Quick-Methode rechnete das erste Jahr
-      voll.
-
-      **Der kleine Rest ist nachgezogen — `v1137b` (`49df402`).** Die
-      Plausi-Zeile sagte „Aktuelle NKM 10.800 €/J × 15 Jahre … mit 3,0 %
-      p.a. wächst die Miete auf 194.568 €" und **erwähnte das anteilige
-      erste Jahr nicht**; wer nachrechnete, kam auf 200.868 und hielt die
-      Zahl für falsch. Jetzt steht der Satz „Das **erste Jahr zählt nur
-      anteilig** ab dem Kaufmonat" dahinter.
-   3. **ZURÜCKGENOMMEN — das war mein Messfehler, kein Befund der App.**
-      Ich hatte gemeldet, die Eingabe „Umlagefähige Kosten / Monat" werde
-      still von 200 auf 175 überschrieben. Der Grund steht in
-      `main.js:338` und ist eine **gewollte Zwei-Wege-Kopplung** (V187):
-      `umlagef` → schreibt `hg_ul`, und jede Änderung an den
-      UL-Feldern schreibt die Summe/12 zurück. **Mein Testaufbau hat
-      beide Seiten gleichzeitig per Skript gesetzt** — ein Mensch tippt
-      nacheinander, und dann tut die Kopplung genau das Richtige. Auch
-      die Warmmiete 12.900 € ist damit korrekt: Kalt 10.800 +
-      umlagefähige Erstattung 2.100.
-   4. **Die Cent-Warnung oben in diesem Punkt stimmt nicht mehr.**
-      Gemessen an der Staging-Datenbank und am API-Objekt: `kaufpreis` =
-      `250000.00` und `cf_ns` = `-2075.13`, beide `numeric` in **Euro**.
-      Die Warnung „`kaufpreis` und `cf_ns` stehen in Cent" führt bei der
-      nächsten Fehlersuche in die Irre und ist deshalb oben gestrichen.
-
-   **Bankexport geprüft (2026-08-11) — sauber.** Der Haken „Alle Objekte
-   anzeigen" ist nötig, sonst zeigt der Export **nur gewonnene Deals**
-   und ein frisches Testobjekt fehlt wortlos. Zeile `PRUEF_1` gegen die
-   Handrechnung:
-
-   | Spalte | Export | Rechnung |
-   |---|---|---|
-   | **Nebenkosten (BWK)/Mon** | **339,67 €** | (2.100 + 1.976)/12 ✓ |
-   | Kapitaldienst | 1.009 € | 12.109,63/12 ✓ |
-   | €/qm | 10,63 € | 850/80 ✓ |
-   | Restschuld nach 10 J. | 168.516 € | 168.494 (jährlich gerechnet) |
-   | Volltilgung | 2056 | ~30,1 Jahre bei 3,5/2 ✓ |
-
-   Die 22 € Abweichung bei der Restschuld sind monatliche gegen
-   jährliche Verrechnung — kein Befund.
-
-   ---
-
-   ### Zweiter Durchgang (2026-08-11) — Marktbericht-Kette und Handy-Ansicht
-
-   **Die Messkabine funktioniert doch — mit einem leeren Träger.** Die
-   Warnung aus dem ersten Durchgang („eigenes Fenster in 390 px nehmen")
-   ist damit **überholt**: ein eigenes Fenster geht in dieser Umgebung
-   gar nicht, `resize_window` wirkt am maximierten Fenster nicht
-   (`innerWidth` blieb 1920, zwei Anläufe). Was **funktioniert**: die
-   Kabine in einem Tab, in dem die App **nicht schon läuft**. Träger ist
-   `/impressum.html` (7 KB, gleiches Origin), Inhalt gelöscht, iframe mit
-   390 × 844 eingesetzt. Genau das war die Ursache des Einfrierens — nicht
-   der iframe, sondern **zweimal dieselbe App im selben Renderer**. Ein
-   `?ref=<uuid>` als SPA-Pfad hilft übrigens nicht: jede unbekannte URL
-   liefert die volle App zurück, es gibt keine leere Seite auf dem Origin.
-
-   **Marktbericht-Kette: ein Bruch gefunden und behoben (`v1138`,
-   `e99d041`).** Beim Aufruf „Aktionen → Marktbericht" bei **geladenem**
-   Objekt standen im Bericht genau sechs Werte — Adresse, Objektart,
-   Wohnfläche, Zimmer, Baujahr, Kaufpreis. Leer blieben Etage, Kaltmiete,
-   Grundstücksfläche, Wohneinheiten, Zustand, Qualität, Energieklasse und
-   Miteigentumsanteil, **obwohl alle acht im Objekt gepflegt sind**. Der
-   Bericht meldete daraufhin „fehlt: Zustand, Qualität" und „fehlt:
-   Grundstücksfläche, Wohneinheiten, Miteigentumsanteil" — eine Stufe zu
-   wenig, ohne erkennbaren Grund. Ursache: **zwei Wege in dasselbe
-   Formular.** `marktbericht-view.js:62` hängt fünf Werte an die
-   iframe-URL, die vollständige Übernahme `fillFromData()` hing allein am
-   `change`-Handler des Dropdowns. Jetzt wählt das Dropdown bei
-   vorhandenem `?ref` selbst vor und läuft durch denselben Handler.
-   **Nachgemessen:** ohne einen einzigen Klick sind jetzt 13 Felder
-   gefüllt und **Stufe 2 (Marktpreisindikation) direkt erreicht.**
-
-   **Zustands-Zuordnung stimmt.** `ds2_zustand = 'gut'` kommt als
-   `cond = 'gepflegt'` an, `ausst = 'Normal'` als `quality = 'normal'`,
-   Energieklasse C direkt — die Tabelle aus `v1136c` greift.
-
-   **BEHOBEN in `v1139` (`f80a1c9`) — „fehlt: Miteigentumsanteil" stand
-   da, obwohl der Wert im Objekt steht.** Ursache gemessen:
-   `mb-stufen.js:59` liest mit `wert(id)` das **Formularfeld**, und `mea`
-   liegt im Block `wm-b3`, den `wertermittlung.js` erst `if (s >= 3)`
-   baut. Ein Feld, das es noch nicht gibt, liefert `''` — **nicht zu
-   unterscheiden von einem leeren.** `mb-objektwahl.js` hält den Wert
-   derweil in seiner `offen`-Liste; die war nur von außen nicht lesbar.
-   Jetzt ist sie es (`window._mbVorrat`), und die Leiste zeigt eine
-   eigene Zeile „liegt im Objekt vor: … — hier klicken zum Übernehmen"
-   in Gold statt Rot.
-
-   **`erreicht()` blieb absichtlich unangetastet.** Würde der Vorrat als
-   erfüllt zählen, spränge die Stufe von allein auf 3 und der Knopf
-   forderte **12 L statt 5 L**, ohne dass jemand geklickt hat. Kerosin
-   nie ohne Zutun. Auf Staging an `PRUEF_1` nachgemessen: vorher rot
-   „fehlt", jetzt Gold `rgb(201,168,76)`, Stufe **2**, Knopf **5 L** —
-   und nach dem Klick auf die Zeile steht `mea` = 10 im Feld, der Vorrat
-   ist leer, Stufe **3**, Knopf 12 L. Kein Abruf ausgelöst.
-
-   **Handy-Ansicht: vier Befunde, alle behoben.** Alle bei 390 px am
-   selben Objekt gemessen, alle nach dem Ausrollen gegengemessen.
-
-   | | Befund | Fassung |
-   |---|---|---|
-   | 1 | **Die Löschen-Schaltfläche lag auf der Score-Zahl.** `elementFromPoint` in deren Mitte lieferte `sbc-btn sbc-del` — wer den Score antippt, löst die Löschabfrage aus | `v1138b` `62cce64` |
-   | 2 | **Das Minuszeichen stand allein in einer Zeile.** Drei Cashflow-Kacheln à 97 px, Betrag in 30 px Schrift → „–" / „274" / „€" untereinander; wer die mittlere Zeile liest, sieht einen positiven Wert | `v1138c` `a266753` |
-   | 3 | **Die Sensitivitätsmatrix schnitt ihre rechte Spalte ab** — fünf von 25 Zellen hinter `overflow:hidden`, ohne Scrollbalken unerreichbar | `v1138d` `ccbca96` |
-   | 4 | **Zwei Stellen, an denen ein `flex:0 0 auto`-Nachbar alles zusammendrückt:** der Umschalter Prognose/Detail stand als „ognose" da, und die Zeile „Finanzamt-PDF" ließ ihrer Beschreibung 25 px | `v1138e` `0f2d698` |
-
-   **Zwei davon haben dieselbe Ursache — und sie ist bekannt:** eine
-   spätere `!important`-Regel gleicher Spezifität macht eine frühere
-   Korrektur wirkungslos. Bei 1 schlug die alte V80-Zeile (`top:12px`)
-   die V103-Korrektur (`top:38px`); bei 2 schlagen zwei Regeln mit
-   `repeat(3,1fr) !important` die Handy-Regel bei 700 px **und** die
-   Tablet-Regel bei 1024 px. Beide Korrekturen waren seit ihrem Einbau
-   wirkungslos. Deshalb jetzt über **Spezifität** (`.sec .cf-phase-grid`),
-   nicht über Position — im Browser bewiesen: die Regel gewann selbst
-   dann, als sie als **erstes** Stylesheet eingehängt war.
-
-   **Eigener Messfehler, ausdrücklich vermerkt:** Mein Überlauftest prüfte
-   gegen den **Viewport** und meldete „sauber", während fünf Matrixzellen
-   längst am `overflow:hidden` des Vorfahren abgeschnitten wurden.
-   **Ein Überlauftest muss gegen den klippenden Vorfahren prüfen**, und
-   `overflow-x:auto` darüber zählt nicht als Befund — dort ist der Inhalt
-   erwischbar. Mit dem korrigierten Maßstab sind alle **neun Reiter bei
-   390 px sauber**.
-
-   **Zweiter zurückgenommener Befund:** Ich hatte gemeldet, die
-   Bewertungs-Kommentare ragten 157 px über den Rand. Falsch — ihr
-   Container `kpi-eval-body` trägt `overflow-x:auto`, die Tabelle ist
-   seitwärts erreichbar. Kein Befund.
-
-   **Rechenwerte auf dem Handy identisch mit dem Desktop-Lauf:** DSCR
-   0,89, LTV 88,1 %, CF vor Steuern −274 €/Monat, Kartenkacheln −2.075 €
-   und 4,32 %. Der `v1137`-Vorzeichenfix wirkt auch hier.
-
-   **Neuer Befund, bewusst nicht gefixt — gehört zu Punkt 4:**
-   `.sbc-arrow` misst auf dem Handy **4 × 21 px** (auf dem Desktop
-   20 × 20). Ein Bedienelement von vier Pixeln Breite ist nicht treffbar.
-   Punkt 4 und Punkt 11 führen denselben Pfeil mit den Desktop-Maßen;
-   **beim Aufgreifen gilt der Handy-Wert als der schwerere.**
-
-   ---
-
-   ### Dritter Durchgang (2026-08-12) — der echte Marktbericht-Abruf
-
-   **Marcel hat den Abruf freigegeben und auf 112 L aufgeladen.** Gefahren
-   an **Hermannstraße 9, Hüllhorst** (`07d89138`), Stufe 3.
-
-   **Erst gemessen, dann ausgegeben — und die Messung hat den Plan
-   geändert.** Das Bestandsobjekt unter dieser Adresse ist **nicht** das
-   Testobjekt aus `CLAUDE.md`: dort steht ETW 165 m², Bj 1968, im Bestand
-   liegt **100 m², Bj 1962**, 950 m² Grundstück, 3 Einheiten, MEA 50.
-   Der Sollwert 305.937 / 348.687 € gilt für dieses Objekt also **nicht**.
-   Der Lauf ist damit ein **Ketten- und Plausibilitätsnachweis, kein
-   Genauigkeitsnachweis** — ein Objekt mit amtlichem Sollwert steht auf
-   Staging nicht bereit.
-
-   **Eigener Fehler, ausdrücklich zurückgenommen.** Mein erster Anlauf
-   ließ den Tab hängen, und ich hatte „der Klick friert die Seite ein"
-   notiert. Falsch: `app.js:224` ruft `window.confirm()` — den
-   Kostenhinweis vor dem kostenpflichtigen Abruf (v647-cost). Ein modaler
-   Dialog blockiert den Renderer, und Browser-Automation kann ihn nicht
-   wegklicken. **Der Dialog ist genau richtig so.** Zweiter Anlauf mit
-   `window.confirm = () => true` — die übrige Kette lief unverändert.
-
-   **Die Abrechnung stimmt auf den Liter.** Für das Objekt war Stufe 2
-   bereits bezahlt; der Knopf forderte **7 L** (Differenz zu 12).
-   Gemessen: **112 → 105 L**, `bezahlte_stufe` danach **3**, alle
-   Folgeabrufe **0 L**. Der Hinweistext nennt die 12 L und erklärt die
-   Differenz — Knopf und Dialog widersprechen sich also nicht.
-
-   **Alle drei Verfahren rechnen, keins halb.** Vergleichswert
-   **192.000 €** (als führend bei ETW gekennzeichnet), Ertragswert
-   **168.000 €** bei Reinertrag 7.464 €/a, Sachwert **268.172 €**,
-   Bodenwert **40.338 €**. Der Liegenschaftszinssatz **2,56 %** trägt
-   korrekt „eigene Angabe (indikativ)". Der Bodenrichtwert kommt echt aus
-   **BORIS-NRW** (Zone 167, Layer `brw_ein_zweigeschossig`, Stichtag
-   2026-01-01, `verified`, mit Quellenvermerk und dl-de/by-2-0). Der
-   Ertragswert ist in sich schlüssig: bei 40.338 € Bodenwert und 2,56 %
-   entspricht er einem Barwertfaktor von 19,85, also **rund 26 Jahren
-   Restnutzungsdauer** — für Bj 1962 mit Modernisierung plausibel.
-
-   **BEFUND, offen: der Bodenwert ist aus dem Bericht nicht
-   nachrechenbar.** Das Objekt führt Grundstück 950 m², BRW 90 €/m²,
-   MEA 50 %, **Hinterland 828 m² à 5 €/m² (rentierlich)** und
-   **Anpassung −10 % („Lärmbelastung Hauptstraße")**. Keine Kombination
-   ergibt die angezeigten 40.338 €:
-
-   | Weg | Ergebnis |
-   |---|---|
-   | 950 × 90 × 50 % | 42.750 € |
-   | … zusätzlich −10 % | 38.475 € |
-   | … mit Hinterlandaufteilung (122 × 90 + 828 × 5) | 6.804 € |
-   | **angezeigt** | **40.338 €** |
-
-   `ErtragswertService.bodenwert()` protokolliert jeden Schritt in
-   `out.schritte` (Z. 99–164: Fläche × BRW, GFZ-Umrechnung, Anpassung,
-   Erschließungsbeitrag, Miteigentumsanteil) — **die Bildschirmansicht
-   zeigt sie nicht**, und `data.land_value` im Replay trägt nur die
-   BORIS-Rohquelle, `valuation.land_component` ist `null`. **Ob das ein
-   Rechenfehler ist oder nur eine fehlende Anzeige, entscheidet der
-   Rechenweg im PDF** — genau das verspricht Stufe 3 („mit Rechenweg im
-   PDF"). Deshalb hier noch **nicht** als Rechenfehler geführt.
-
-   **Ebenfalls ohne Modellvermerk auf dem Bildschirm:** weder Stufe A–E
-   noch ein Modellvermerk taucht in der Ansicht auf (`grep` über den
-   gerenderten Text: null Treffer). Auch das ist am PDF zu messen.
-
-   **Weiterhin offen:** die **PDF-Ausgabe**. Sie löst einen Download aus
-   und ist der Maßstab für die beiden Befunde oben.
+   **Beim Beheben:** eine Prüfstrecke mit bekanntem Sollwert anlegen. Die
+   beiden Testobjekte aus `CLAUDE.md` liegen auf Staging **nicht** in der
+   dort beschriebenen Fassung (siehe Fertig-Eintrag zum Prüflauf).
 
 2. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
@@ -967,6 +734,315 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Ein Testobjekt vollständig anlegen und alle Rechenwege gegenprüfen** — drei Durchgänge, `70326cf` bis `81d711b`.
+
+   Ergebnis ist die Befundliste unten. Was daraus zu reparieren war, ist
+   entweder behoben (`v1137`, `v1137b`, `v1138`–`v1138e`, `v1139`) oder
+   als eigener Punkt gefasst (Bodenwertverzinsung bei ETW = Punkt 1).
+
+   **Ein Testobjekt mit amtlichem Sollwert fehlt auf Staging.** Die beiden
+   Objekte aus `CLAUDE.md` liegen dort nicht in der beschriebenen Fassung —
+   Hermannstraße 9 trägt 100 m² / Bj 1962 statt 165 m² / Bj 1968. Jeder
+   Bewertungslauf ist damit ein Kettennachweis, kein Genauigkeitsnachweis.
+
+   ---
+
+   **Der Auftrag war:** Investition, Miete, Finanzierung, Bewirtschaftung,
+   Steuer, Bewertung — jeden Reiter ausfüllen, dann prüfen: **rechnet alles
+   richtig, wird unter „Bewertung" alles passend angezeigt, sind die
+   Ergebnisse plausibel und korrekt dargestellt?**
+
+   Fünf Dinge, die dabei erfahrungsgemäß auffallen und deshalb gezielt
+   angesehen wurden:
+
+   - **KPI und BWK werden beim Speichern eingefroren.** Ein Objekt, das vor
+     einer Modul-Änderung angelegt wurde, zeigt alte Werte, bis es erneut
+     gespeichert wird. Beim Prüfen also **nach jeder Änderung neu
+     speichern**, sonst wird ein Anzeigefehler gemeldet, der keiner ist.
+   - **DSCR kommt ausschließlich aus `window.Dscr.compute()`.** Weicht ein
+     Anzeigeort ab, ist dort eine zweite Formel entstanden — genau das
+     darf es nicht geben.
+   - ~~**Einheiten:** `kaufpreis` und `cf_ns` stehen in **Cent**~~ —
+     **am 2026-08-11 nachgemessen und widerlegt:** beide Spalten sind
+     `numeric` und führen **Euro** (`250000.00`, `-2075.13`). Ein Faktor
+     100 hat hier also **nicht** seine Ursache; die alte Warnung hätte
+     die nächste Fehlersuche in die falsche Richtung geschickt.
+   - **BWK-Zuordnung:** umlagefähig = `hg_ul + grundsteuer + ul_sonst`,
+     nicht umlagefähig = `hg_nul + eigen_r + mietausfall + nul_sonst`. Der
+     Bankexport teilt durch 12.
+   - **Jahreszahlen** dürfen nie durch `Intl.NumberFormat` laufen, sonst
+     steht „1.964" statt 1964 im Bild.
+
+   **Sinnvoll mit dem Finanzamt-PDF zusammen zu fahren** — dasselbe Objekt,
+   dieselben Zahlen, und die Immokalk-Berechnung als Maßstab für den
+   Steuerteil.
+
+   ---
+
+   ### Erster Durchgang gefahren (2026-08-11) — Rechenkern und Reiter „Bewertung"
+
+   **Testobjekt auf Staging: `PRUEF_1`, Prüfstraße 1, 32120 Hiddenhausen**
+   (`a08fbce3`). Bewusst runde Zahlen, damit jede Zeile im Kopf
+   nachrechenbar ist: KP 250.000, Wfl 80 m², NKM 850 + 50 €/Monat, EK
+   60.000, Darlehen 220.175 zu 3,5 % / 2 %, BWK ul 2.100 und nul 1.976,
+   zvE 70.000 bei 42 %, AfA 2 % auf 80 % Gebäudeanteil.
+
+   **Was stimmt — Zeile für Zeile gegen Handrechnung geprüft:**
+
+   | Anzeige | App | Handrechnung |
+   |---|---|---|
+   | Nebenkosten | 30.175 € (12,1 %) | 8.925+3.750+1.250+16.250 |
+   | Bodenwert / Anteil | 15.000 € / 100 m² | 1000 m² × 10 % × 150 € |
+   | Kaltmiete → NOI | 10.800 → 8.824 € | −1.976 nicht umlagefähig |
+   | Zins / Tilgung Jahr 1 | 7.706 / 4.404 € | 220.175 × 3,5 % / 2 % |
+   | CF vor Steuer | −3.286 € | −3.285,63 |
+   | Steuerwirkung | +1.210 € | Verlust 2.882,13 × 42 % = 1.210,49 |
+   | CF nach Steuer | −2.075 € / −173 €/Mon. | −2.075,13 |
+   | BMR / NMR / LTV / Faktor | 4,32 / 3,15 / 88,1 % / 23,1 | alle exakt |
+   | Wertzuwachs 15 J. | +62.558 € | 250.000 × 1,015¹⁵ − 250.000 |
+
+   **DSCR: sauber, keine zweite Formel.** Der Kern liefert *brutto* und
+   *netto*; **0,89** steht an sechs Anzeigeorten (`kpi-dscr`,
+   `cr-dscr-val`, `r-dscr2`, Sidebar-Kachel, Badge, KPI-Bewertung),
+   **0,73** an zwei — und die sind ausdrücklich „netto" beschriftet.
+   Beide Werte decken sich exakt mit der Handrechnung. **Keine
+   Jahreszahl** lief durch `Intl.NumberFormat` (kein „1.995").
+
+   **Vier Befunde — als eigene Punkte zu fassen, hier nicht repariert:**
+
+   1. **BEHOBEN in `v1137` (`70326cf`) — ein negativer Cashflow zeigte
+      kein Minuszeichen.** `cf-vst-now` stand als **„274 €"** da, wo
+      −273,80 gemeint war; positive Werte tragen ein „+". Nur die
+      **Farbe** (rot `rgb(217,104,95)` gegen grün `rgb(63,165,108)`)
+      unterschied — für Rot-Grün-Blinde sind die beiden Fälle **nicht
+      unterscheidbar**. Ursache: `calc.js:3655` rief `fE(v, 0)` ohne das
+      Vorzeichen-Flag, und `fE` formatiert intern `Math.abs(n)`. Jetzt
+      `fE(v, 0, true)`; das manuelle „+" entfällt. Nachgemessen: „–274 €",
+      „–173 €", „+238 €" an allen sechs Phasen-Kacheln.
+   2. **BEHOBEN in `v1137` — zwei Zahlen für dieselbe Größe.** Die
+      kumulierten Mieteinnahmen standen im selben Reiter zweimal:
+      `vz-info-miete` = 200.868 €, `vz-plausi-mit` = 198.709 €.
+      Ursache: **genau der Bäckerstr.-7-Fehler aus `V119`, eine Zeile
+      weiter vergessen** — `vz-plausi-mit` bekam weiter den Wert der
+      ersten Schleife (Quick-Methode), während die Aufschlüsselung
+      darüber längst aus `cfRows` kam. Jetzt zieht die Plausi-Zeile
+      denselben `_mieteKumNew`-Wert.
+
+      **Dabei kam heraus, dass BEIDE alten Zahlen zu hoch waren.** Die
+      echte Rechnung liefert **194.568 €**; an `State.cfRows` abgelesen:
+      **Jahr 1 = 4.500 €**, also 10.800 × 5/12 — das **anteilige
+      Erwerbsjahr** ab August. Ab Jahr 2 steigt es exakt mit 3 %
+      (11.124, 11.458, …). Die Quick-Methode rechnete das erste Jahr
+      voll.
+
+      **Der kleine Rest ist nachgezogen — `v1137b` (`49df402`).** Die
+      Plausi-Zeile sagte „Aktuelle NKM 10.800 €/J × 15 Jahre … mit 3,0 %
+      p.a. wächst die Miete auf 194.568 €" und **erwähnte das anteilige
+      erste Jahr nicht**; wer nachrechnete, kam auf 200.868 und hielt die
+      Zahl für falsch. Jetzt steht der Satz „Das **erste Jahr zählt nur
+      anteilig** ab dem Kaufmonat" dahinter.
+   3. **ZURÜCKGENOMMEN — das war mein Messfehler, kein Befund der App.**
+      Ich hatte gemeldet, die Eingabe „Umlagefähige Kosten / Monat" werde
+      still von 200 auf 175 überschrieben. Der Grund steht in
+      `main.js:338` und ist eine **gewollte Zwei-Wege-Kopplung** (V187):
+      `umlagef` → schreibt `hg_ul`, und jede Änderung an den
+      UL-Feldern schreibt die Summe/12 zurück. **Mein Testaufbau hat
+      beide Seiten gleichzeitig per Skript gesetzt** — ein Mensch tippt
+      nacheinander, und dann tut die Kopplung genau das Richtige. Auch
+      die Warmmiete 12.900 € ist damit korrekt: Kalt 10.800 +
+      umlagefähige Erstattung 2.100.
+   4. **Die Cent-Warnung oben in diesem Punkt stimmt nicht mehr.**
+      Gemessen an der Staging-Datenbank und am API-Objekt: `kaufpreis` =
+      `250000.00` und `cf_ns` = `-2075.13`, beide `numeric` in **Euro**.
+      Die Warnung „`kaufpreis` und `cf_ns` stehen in Cent" führt bei der
+      nächsten Fehlersuche in die Irre und ist deshalb oben gestrichen.
+
+   **Bankexport geprüft (2026-08-11) — sauber.** Der Haken „Alle Objekte
+   anzeigen" ist nötig, sonst zeigt der Export **nur gewonnene Deals**
+   und ein frisches Testobjekt fehlt wortlos. Zeile `PRUEF_1` gegen die
+   Handrechnung:
+
+   | Spalte | Export | Rechnung |
+   |---|---|---|
+   | **Nebenkosten (BWK)/Mon** | **339,67 €** | (2.100 + 1.976)/12 ✓ |
+   | Kapitaldienst | 1.009 € | 12.109,63/12 ✓ |
+   | €/qm | 10,63 € | 850/80 ✓ |
+   | Restschuld nach 10 J. | 168.516 € | 168.494 (jährlich gerechnet) |
+   | Volltilgung | 2056 | ~30,1 Jahre bei 3,5/2 ✓ |
+
+   Die 22 € Abweichung bei der Restschuld sind monatliche gegen
+   jährliche Verrechnung — kein Befund.
+
+   ---
+
+   ### Zweiter Durchgang (2026-08-11) — Marktbericht-Kette und Handy-Ansicht
+
+   **Die Messkabine funktioniert doch — mit einem leeren Träger.** Die
+   Warnung aus dem ersten Durchgang („eigenes Fenster in 390 px nehmen")
+   ist damit **überholt**: ein eigenes Fenster geht in dieser Umgebung
+   gar nicht, `resize_window` wirkt am maximierten Fenster nicht
+   (`innerWidth` blieb 1920, zwei Anläufe). Was **funktioniert**: die
+   Kabine in einem Tab, in dem die App **nicht schon läuft**. Träger ist
+   `/impressum.html` (7 KB, gleiches Origin), Inhalt gelöscht, iframe mit
+   390 × 844 eingesetzt. Genau das war die Ursache des Einfrierens — nicht
+   der iframe, sondern **zweimal dieselbe App im selben Renderer**. Ein
+   `?ref=<uuid>` als SPA-Pfad hilft übrigens nicht: jede unbekannte URL
+   liefert die volle App zurück, es gibt keine leere Seite auf dem Origin.
+
+   **Marktbericht-Kette: ein Bruch gefunden und behoben (`v1138`,
+   `e99d041`).** Beim Aufruf „Aktionen → Marktbericht" bei **geladenem**
+   Objekt standen im Bericht genau sechs Werte — Adresse, Objektart,
+   Wohnfläche, Zimmer, Baujahr, Kaufpreis. Leer blieben Etage, Kaltmiete,
+   Grundstücksfläche, Wohneinheiten, Zustand, Qualität, Energieklasse und
+   Miteigentumsanteil, **obwohl alle acht im Objekt gepflegt sind**. Der
+   Bericht meldete daraufhin „fehlt: Zustand, Qualität" und „fehlt:
+   Grundstücksfläche, Wohneinheiten, Miteigentumsanteil" — eine Stufe zu
+   wenig, ohne erkennbaren Grund. Ursache: **zwei Wege in dasselbe
+   Formular.** `marktbericht-view.js:62` hängt fünf Werte an die
+   iframe-URL, die vollständige Übernahme `fillFromData()` hing allein am
+   `change`-Handler des Dropdowns. Jetzt wählt das Dropdown bei
+   vorhandenem `?ref` selbst vor und läuft durch denselben Handler.
+   **Nachgemessen:** ohne einen einzigen Klick sind jetzt 13 Felder
+   gefüllt und **Stufe 2 (Marktpreisindikation) direkt erreicht.**
+
+   **Zustands-Zuordnung stimmt.** `ds2_zustand = 'gut'` kommt als
+   `cond = 'gepflegt'` an, `ausst = 'Normal'` als `quality = 'normal'`,
+   Energieklasse C direkt — die Tabelle aus `v1136c` greift.
+
+   **BEHOBEN in `v1139` (`f80a1c9`) — „fehlt: Miteigentumsanteil" stand
+   da, obwohl der Wert im Objekt steht.** Ursache gemessen:
+   `mb-stufen.js:59` liest mit `wert(id)` das **Formularfeld**, und `mea`
+   liegt im Block `wm-b3`, den `wertermittlung.js` erst `if (s >= 3)`
+   baut. Ein Feld, das es noch nicht gibt, liefert `''` — **nicht zu
+   unterscheiden von einem leeren.** `mb-objektwahl.js` hält den Wert
+   derweil in seiner `offen`-Liste; die war nur von außen nicht lesbar.
+   Jetzt ist sie es (`window._mbVorrat`), und die Leiste zeigt eine
+   eigene Zeile „liegt im Objekt vor: … — hier klicken zum Übernehmen"
+   in Gold statt Rot.
+
+   **`erreicht()` blieb absichtlich unangetastet.** Würde der Vorrat als
+   erfüllt zählen, spränge die Stufe von allein auf 3 und der Knopf
+   forderte **12 L statt 5 L**, ohne dass jemand geklickt hat. Kerosin
+   nie ohne Zutun. Auf Staging an `PRUEF_1` nachgemessen: vorher rot
+   „fehlt", jetzt Gold `rgb(201,168,76)`, Stufe **2**, Knopf **5 L** —
+   und nach dem Klick auf die Zeile steht `mea` = 10 im Feld, der Vorrat
+   ist leer, Stufe **3**, Knopf 12 L. Kein Abruf ausgelöst.
+
+   **Handy-Ansicht: vier Befunde, alle behoben.** Alle bei 390 px am
+   selben Objekt gemessen, alle nach dem Ausrollen gegengemessen.
+
+   | | Befund | Fassung |
+   |---|---|---|
+   | 1 | **Die Löschen-Schaltfläche lag auf der Score-Zahl.** `elementFromPoint` in deren Mitte lieferte `sbc-btn sbc-del` — wer den Score antippt, löst die Löschabfrage aus | `v1138b` `62cce64` |
+   | 2 | **Das Minuszeichen stand allein in einer Zeile.** Drei Cashflow-Kacheln à 97 px, Betrag in 30 px Schrift → „–" / „274" / „€" untereinander; wer die mittlere Zeile liest, sieht einen positiven Wert | `v1138c` `a266753` |
+   | 3 | **Die Sensitivitätsmatrix schnitt ihre rechte Spalte ab** — fünf von 25 Zellen hinter `overflow:hidden`, ohne Scrollbalken unerreichbar | `v1138d` `ccbca96` |
+   | 4 | **Zwei Stellen, an denen ein `flex:0 0 auto`-Nachbar alles zusammendrückt:** der Umschalter Prognose/Detail stand als „ognose" da, und die Zeile „Finanzamt-PDF" ließ ihrer Beschreibung 25 px | `v1138e` `0f2d698` |
+
+   **Zwei davon haben dieselbe Ursache — und sie ist bekannt:** eine
+   spätere `!important`-Regel gleicher Spezifität macht eine frühere
+   Korrektur wirkungslos. Bei 1 schlug die alte V80-Zeile (`top:12px`)
+   die V103-Korrektur (`top:38px`); bei 2 schlagen zwei Regeln mit
+   `repeat(3,1fr) !important` die Handy-Regel bei 700 px **und** die
+   Tablet-Regel bei 1024 px. Beide Korrekturen waren seit ihrem Einbau
+   wirkungslos. Deshalb jetzt über **Spezifität** (`.sec .cf-phase-grid`),
+   nicht über Position — im Browser bewiesen: die Regel gewann selbst
+   dann, als sie als **erstes** Stylesheet eingehängt war.
+
+   **Eigener Messfehler, ausdrücklich vermerkt:** Mein Überlauftest prüfte
+   gegen den **Viewport** und meldete „sauber", während fünf Matrixzellen
+   längst am `overflow:hidden` des Vorfahren abgeschnitten wurden.
+   **Ein Überlauftest muss gegen den klippenden Vorfahren prüfen**, und
+   `overflow-x:auto` darüber zählt nicht als Befund — dort ist der Inhalt
+   erwischbar. Mit dem korrigierten Maßstab sind alle **neun Reiter bei
+   390 px sauber**.
+
+   **Zweiter zurückgenommener Befund:** Ich hatte gemeldet, die
+   Bewertungs-Kommentare ragten 157 px über den Rand. Falsch — ihr
+   Container `kpi-eval-body` trägt `overflow-x:auto`, die Tabelle ist
+   seitwärts erreichbar. Kein Befund.
+
+   **Rechenwerte auf dem Handy identisch mit dem Desktop-Lauf:** DSCR
+   0,89, LTV 88,1 %, CF vor Steuern −274 €/Monat, Kartenkacheln −2.075 €
+   und 4,32 %. Der `v1137`-Vorzeichenfix wirkt auch hier.
+
+   **Neuer Befund, bewusst nicht gefixt — gehört zu Punkt 4:**
+   `.sbc-arrow` misst auf dem Handy **4 × 21 px** (auf dem Desktop
+   20 × 20). Ein Bedienelement von vier Pixeln Breite ist nicht treffbar.
+   Punkt 4 und Punkt 11 führen denselben Pfeil mit den Desktop-Maßen;
+   **beim Aufgreifen gilt der Handy-Wert als der schwerere.**
+
+   ---
+
+   ### Dritter Durchgang (2026-08-12) — der echte Marktbericht-Abruf
+
+   **Marcel hat den Abruf freigegeben und auf 112 L aufgeladen.** Gefahren
+   an **Hermannstraße 9, Hüllhorst** (`07d89138`), Stufe 3.
+
+   **Erst gemessen, dann ausgegeben — und die Messung hat den Plan
+   geändert.** Das Bestandsobjekt unter dieser Adresse ist **nicht** das
+   Testobjekt aus `CLAUDE.md`: dort steht ETW 165 m², Bj 1968, im Bestand
+   liegt **100 m², Bj 1962**, 950 m² Grundstück, 3 Einheiten, MEA 50.
+   Der Sollwert 305.937 / 348.687 € gilt für dieses Objekt also **nicht**.
+   Der Lauf ist damit ein **Ketten- und Plausibilitätsnachweis, kein
+   Genauigkeitsnachweis** — ein Objekt mit amtlichem Sollwert steht auf
+   Staging nicht bereit.
+
+   **Eigener Fehler, ausdrücklich zurückgenommen.** Mein erster Anlauf
+   ließ den Tab hängen, und ich hatte „der Klick friert die Seite ein"
+   notiert. Falsch: `app.js:224` ruft `window.confirm()` — den
+   Kostenhinweis vor dem kostenpflichtigen Abruf (v647-cost). Ein modaler
+   Dialog blockiert den Renderer, und Browser-Automation kann ihn nicht
+   wegklicken. **Der Dialog ist genau richtig so.** Zweiter Anlauf mit
+   `window.confirm = () => true` — die übrige Kette lief unverändert.
+
+   **Die Abrechnung stimmt auf den Liter.** Für das Objekt war Stufe 2
+   bereits bezahlt; der Knopf forderte **7 L** (Differenz zu 12).
+   Gemessen: **112 → 105 L**, `bezahlte_stufe` danach **3**, alle
+   Folgeabrufe **0 L**. Der Hinweistext nennt die 12 L und erklärt die
+   Differenz — Knopf und Dialog widersprechen sich also nicht.
+
+   **Alle drei Verfahren rechnen, keins halb.** Vergleichswert
+   **192.000 €** (als führend bei ETW gekennzeichnet), Ertragswert
+   **168.000 €** bei Reinertrag 7.464 €/a, Sachwert **268.172 €**,
+   Bodenwert **40.338 €**. Der Liegenschaftszinssatz **2,56 %** trägt
+   korrekt „eigene Angabe (indikativ)". Der Bodenrichtwert kommt echt aus
+   **BORIS-NRW** (Zone 167, Layer `brw_ein_zweigeschossig`, Stichtag
+   2026-01-01, `verified`, mit Quellenvermerk und dl-de/by-2-0). Der
+   Ertragswert ist in sich schlüssig: bei 40.338 € Bodenwert und 2,56 %
+   entspricht er einem Barwertfaktor von 19,85, also **rund 26 Jahren
+   Restnutzungsdauer** — für Bj 1962 mit Modernisierung plausibel.
+
+   **BEFUND, offen: der Bodenwert ist aus dem Bericht nicht
+   nachrechenbar.** Das Objekt führt Grundstück 950 m², BRW 90 €/m²,
+   MEA 50 %, **Hinterland 828 m² à 5 €/m² (rentierlich)** und
+   **Anpassung −10 % („Lärmbelastung Hauptstraße")**. Keine Kombination
+   ergibt die angezeigten 40.338 €:
+
+   | Weg | Ergebnis |
+   |---|---|
+   | 950 × 90 × 50 % | 42.750 € |
+   | … zusätzlich −10 % | 38.475 € |
+   | … mit Hinterlandaufteilung (122 × 90 + 828 × 5) | 6.804 € |
+   | **angezeigt** | **40.338 €** |
+
+   `ErtragswertService.bodenwert()` protokolliert jeden Schritt in
+   `out.schritte` (Z. 99–164: Fläche × BRW, GFZ-Umrechnung, Anpassung,
+   Erschließungsbeitrag, Miteigentumsanteil) — **die Bildschirmansicht
+   zeigt sie nicht**, und `data.land_value` im Replay trägt nur die
+   BORIS-Rohquelle, `valuation.land_component` ist `null`. **Ob das ein
+   Rechenfehler ist oder nur eine fehlende Anzeige, entscheidet der
+   Rechenweg im PDF** — genau das verspricht Stufe 3 („mit Rechenweg im
+   PDF"). Deshalb hier noch **nicht** als Rechenfehler geführt.
+
+   **Ebenfalls ohne Modellvermerk auf dem Bildschirm:** weder Stufe A–E
+   noch ein Modellvermerk taucht in der Ansicht auf (`grep` über den
+   gerenderten Text: null Treffer). Auch das ist am PDF zu messen.
+
+   **Weiterhin offen:** die **PDF-Ausgabe**. Sie löst einen Download aus
+   und ist der Maßstab für die beiden Befunde oben.
+
+
 
 - [2026-08-11] **Partner-Logo caretechthiel auf der Landingpage** — `v1136i` (`0867d33`). Vorlage: `design/mockups/logo-dark.svg`, abgelegt als `frontend/landing/assets/caretechthiel-logo.svg`.
 
