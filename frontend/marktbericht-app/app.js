@@ -529,13 +529,16 @@ function _renderWertverfahren(d) {
       + '\u25b8 ' + beschriftung + '</div>'
       + '<div class="wv-erk" id="wv-e-' + kennung + '">' + inhalt + '</div>';
   }
-  function karte(kennung, titel, wert, unten, art, staffel) {
+  function karte(kennung, titel, wert, unten, art, staffel, vorbehalt) {
     return '<div class="wv-k">'
       + '<div class="wv-t">' + titel + '</div>'
       + '<div class="wv-v">' + wert + '</div>'
       + '<div class="wv-s">' + (unten || '') + '</div>'
       + aufklapper(kennung, 'was bedeutet das?', _wvErklaerung(art))
       + aufklapper('rw-' + kennung, 'Rechenweg', rechenweg(staffel))
+      /* v1143-VORL · Der Vorbehalt stand nur im PDF. */
+      + aufklapper('vb-' + kennung, 'warum vorläufig?',
+          vorbehalt ? '<div class="wv-vb">' + esc(vorbehalt) + '</div>' : '')
       + '</div>';
   }
 
@@ -569,8 +572,31 @@ function _renderWertverfahren(d) {
     + karte('ert', 'Ertragswert', e.available ? eur(e.value_eur) : '\u2013',
         e.available ? ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.') : (e.grund || ''),
         'ertrag', e.staffel)
+    /* v1143-VORL \u00b7 Die Karte zeigte bei vorhandenem Sachwert eine LEERE
+     * Unterzeile \u2014 die wichtigste Einschraenkung fehlte damit genau dort,
+     * wo die Zahl steht. Das PDF sagt "INDIKATIV \u00b7 ohne Sachwertfaktor \u2014
+     * Herstellungskosten, kein Marktwert", der Bildschirm sagte nichts.
+     *
+     * Am Pruefobjekt fuehrte das direkt zur Rueckfrage, ob 268.172 EUR
+     * gegen 191.339 EUR plausibel seien: ohne den Vorbehalt sieht es aus
+     * wie ein Widerspruch zwischen drei gleichrangigen Zahlen. Der
+     * vorlaeufige Sachwert nach \u00a7 35 ist aber gar kein Marktwert \u2014 es
+     * fehlt die Marktanpassung nach \u00a7 21 Abs. 3.
+     *
+     * Der Grund steht im Antwortobjekt (`sachwertfaktor_hinweis`) und war
+     * nirgends sichtbar: fuer Eigentumswohnungen leitet der
+     * Gutachterausschuss ueberhaupt keine Sachwertfaktoren ab. Auch ein
+     * gepflegter eigener Wert wird deshalb verworfen \u2014 am Pruefobjekt
+     * stand 1,15 im Feld und blieb wirkungslos. */
     + karte('sac', 'Sachwert', sw.available ? eur(sw.value_eur) : '\u2013',
-        sw.available ? '' : (sw.grund || 'nicht ausgewiesen'), 'sach', sw.staffel)
+        sw.available
+          ? (sw.marktangepasst
+              ? ('marktangepasst' + (sw.sachwertfaktor != null
+                  ? ' \u00b7 Faktor ' + String(sw.sachwertfaktor).replace('.', ',') : ''))
+              : 'vorl\u00e4ufig \u00b7 ohne Sachwertfaktor, kein Marktwert')
+          : (sw.grund || 'nicht ausgewiesen'),
+        'sach', sw.staffel,
+        (sw.available && !sw.marktangepasst) ? (sw.sachwertfaktor_hinweis || null) : null)
     + '</div>';
 
   if (!document.getElementById('wv-css')) {
@@ -610,7 +636,8 @@ function _renderWertverfahren(d) {
       + 'font-variant-numeric:tabular-nums;width:1%}'
       + '#wv-box .wv-rw-s td{font-weight:600;border-top:1px solid rgba(128,128,128,.28);padding-top:5px}'
       + '#wv-box .wv-rw-s td:last-child{color:var(--wl-c9a84c,#C9A84C)}'
-      + '#wv-box .wv-rw-d{font-size:10px;line-height:1.4;opacity:.6;margin-top:2px;font-weight:400}';
+      + '#wv-box .wv-rw-d{font-size:10px;line-height:1.4;opacity:.6;margin-top:2px;font-weight:400}'
+      + '#wv-box .wv-vb{font-size:11px;line-height:1.5}';
     document.head.appendChild(st);
   }
   wrap.appendChild(box);
