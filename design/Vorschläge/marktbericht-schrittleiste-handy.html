@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schrittleiste auf dem Handy — drei Fassungen</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Die Marktbericht-App ist IMMER HELL — die Demo auch. */
+  :root{
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --obsidian:#050505; --creme:#FDFCFA;
+    --bg:#ffffff; --panel:#faf8f2; --line:#e6e0d3; --txt:#161616; --mut:#4d4a45;
+    --gruen:#3FA56C; --rot:#B8625C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#efece5;color:var(--txt);font-family:'Inter',system-ui,sans-serif;line-height:1.5;padding:28px 20px 80px}
+  .wrap{max-width:1280px;margin:0 auto}
+  h1{font-family:'Space Grotesk';font-size:22px;letter-spacing:.3px;margin:0 0 6px}
+  .lead{color:var(--mut);font-size:14px;max-width:760px;margin:0 0 4px}
+  .mono{font-family:'JetBrains Mono';font-size:11.5px;color:var(--mut)}
+
+  .messkasten{background:#fff;border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:10px;padding:14px 16px;margin:20px 0 28px;max-width:900px}
+  .messkasten table{border-collapse:collapse;font-size:13px;margin-top:8px}
+  .messkasten td,.messkasten th{padding:3px 14px 3px 0;text-align:left}
+  .messkasten th{font-family:'JetBrains Mono';font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.6px;color:var(--mut);font-weight:500}
+  .schlecht{color:var(--rot);font-weight:600}
+  .gut{color:var(--gruen);font-weight:600}
+
+  .reihe{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+  .karte{background:#fff;border:1px solid var(--line);border-radius:14px;padding:0 0 16px;
+    width:428px;overflow:hidden;box-shadow:0 8px 26px -20px rgba(0,0,0,.45)}
+  .kopf{padding:14px 18px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .kopf h2{font-family:'Space Grotesk';font-size:15px;margin:0 0 3px;letter-spacing:.2px}
+  .kopf .hoehe{font-family:'JetBrains Mono';font-size:11px;color:var(--mut)}
+  .kopf .hoehe b{color:var(--gold-lo)}
+  .fuss{padding:12px 18px 0;font-size:12.5px;color:var(--mut)}
+  .fuss b{color:var(--txt)}
+
+  /* Der Handy-Rahmen: echte 390 px, damit die Höhen vergleichbar sind */
+  .handy{width:390px;margin:14px auto 0;border:1px solid #d8d2c6;border-radius:12px;
+    background:#fff;overflow:hidden}
+  .handy .inhalt{padding:12px 14px;font-size:13px;color:var(--mut);border-top:1px dashed #e6e0d3}
+  .handy .inhalt .feldreihe{height:38px;background:var(--panel);border:1px solid var(--line);
+    border-radius:7px;margin-bottom:8px}
+  .messlinie{position:relative;border-top:1px dashed var(--gold);margin:0}
+  .messlinie span{position:absolute;right:6px;top:-9px;background:#fff;padding:0 5px;
+    font-family:'JetBrains Mono';font-size:9.5px;color:var(--gold-lo)}
+
+  /* ══ HEUTE: sieben Marken, die umbrechen ══ */
+  .heute{display:flex;flex-wrap:wrap;gap:0 2px;padding:8px 10px}
+  .heute .r{font-family:'Space Grotesk';font-size:13px;padding:11px 13px;border-radius:8px 8px 0 0;
+    background:var(--panel);border:1px solid var(--line);border-bottom:none;color:var(--mut);white-space:nowrap}
+  .heute .r.an{background:#fff;color:var(--txt);border-color:var(--gold);
+    box-shadow:inset 0 -2px 0 var(--gold)}
+
+  /* ══ A: Schritt N von 7 ══ */
+  .fa{padding:11px 14px 12px}
+  .fa .zeile{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .fa .zaehler{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.7px;
+    text-transform:uppercase;color:var(--mut);flex:0 0 auto}
+  .fa .titel{font-family:'Space Grotesk';font-size:16px;font-weight:600;flex:1 1 auto}
+  .fa .stufe{font-family:'JetBrains Mono';font-size:10px;color:var(--gold-lo);
+    border:1px solid var(--gold);border-radius:999px;padding:2px 7px;flex:0 0 auto}
+  .fa .balken{height:4px;background:var(--line);border-radius:999px;margin-top:9px;overflow:hidden}
+  .fa .balken i{display:block;height:100%;width:43%;
+    background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo))}
+
+  /* ══ B: Blätterleiste ══ */
+  .fb{display:flex;align-items:center;gap:10px;padding:9px 10px}
+  .fb button{font-family:'Space Grotesk';font-size:17px;line-height:1;width:44px;height:44px;
+    flex:0 0 44px;border-radius:10px;border:1px solid var(--line);background:var(--panel);
+    color:var(--txt);cursor:pointer}
+  .fb button[disabled]{opacity:.35;cursor:default}
+  .fb .mitte{flex:1 1 auto;text-align:center;min-width:0}
+  .fb .mitte .n{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.7px;color:var(--mut)}
+  .fb .mitte .t{font-family:'Space Grotesk';font-size:15px;font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fb .punkte{display:flex;gap:4px;justify-content:center;margin-top:5px}
+  .fb .punkte i{width:5px;height:5px;border-radius:50%;background:var(--line)}
+  .fb .punkte i.an{background:var(--gold);transform:scale(1.35)}
+  .fb .punkte i.fertig{background:var(--gold-lo);opacity:.55}
+
+  /* ══ C: Klappleiste ══ */
+  .fc .kopfzeile{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer}
+  .fc .kopfzeile .n{font-family:'JetBrains Mono';font-size:10.5px;color:var(--mut);flex:0 0 auto}
+  .fc .kopfzeile .t{font-family:'Space Grotesk';font-size:15px;font-weight:600;flex:1 1 auto}
+  .fc .kopfzeile .pf{font-size:12px;color:var(--mut);transition:transform .18s}
+  .fc.offen .kopfzeile .pf{transform:rotate(90deg)}
+  .fc .liste{display:none;border-top:1px solid var(--line);background:var(--panel);padding:6px}
+  .fc.offen .liste{display:block}
+  .fc .liste a{display:flex;align-items:center;gap:9px;padding:11px 10px;border-radius:8px;
+    font-size:13.5px;color:var(--txt);text-decoration:none;min-height:44px}
+  .fc .liste a .k{font-family:'JetBrains Mono';font-size:10px;width:16px;color:var(--mut)}
+  .fc .liste a.an{background:#fff;box-shadow:inset 0 0 0 1px var(--gold)}
+  .fc .liste a .hk{margin-left:auto;color:var(--gruen);font-size:12px}
+  .fc .balken{height:3px;background:var(--line)}
+  .fc .balken i{display:block;height:100%;width:43%;
+    background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo))}
+
+  .empf{background:#fff;border:1px solid var(--line);border-left:3px solid var(--gruen);
+    border-radius:10px;padding:14px 16px;margin:30px 0 0;max-width:900px;font-size:13.5px}
+  .empf h3{font-family:'Space Grotesk';font-size:14px;margin:0 0 7px}
+  .empf ul{margin:7px 0 0;padding-left:18px}
+  .empf li{margin-bottom:5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Schrittleiste auf dem Handy — drei Fassungen zur Wahl</h1>
+  <p class="lead">
+    Marcels Befund: „Es muss auf dem Handy funktionieren. Eine siebenteilige
+    Schrittleiste nebeneinander und ein Handy schließen sich aus — der Entwurf
+    braucht <b>zwei</b> Darstellungen derselben Führung, nicht eine gequetschte."
+  </p>
+  <p class="mono">Stand 2026-08-12 · nach v1151 · alle Rahmen sind echte 390 px breit</p>
+
+  <div class="messkasten">
+    <b>Gemessen, nicht geschätzt</b> (Messkabine, iframe, Marktbericht-App):
+    <table>
+      <tr><th>Fenster</th><th>Behälter</th><th>Zeilen</th><th>Höhe der Leiste</th></tr>
+      <tr><td>1920 / 1280 px</td><td>960 px</td><td>1</td><td>47 px</td></tr>
+      <tr><td>1024 px</td><td>927 px</td><td>1</td><td>47 px</td></tr>
+      <tr><td>950 / 820 px</td><td>853 / 723 px</td><td>2</td><td>94 px</td></tr>
+      <tr><td><b>390 px</b></td><td>305 px</td><td class="schlecht">4</td><td class="schlecht">~188 px</td></tr>
+    </table>
+    <p style="margin:9px 0 0;font-size:13px">
+      Die sieben Marken brauchen zusammen <b>902 px</b>. Auf dem Handy stehen 305 px
+      zur Verfügung — vier Zeilen, <b>188 px bevor eine einzige Angabe zu sehen ist.</b>
+      Nichts ist beschnitten und alles ist erreichbar: <b>kein Defekt, eine
+      Platzfrage.</b>
+    </p>
+  </div>
+
+  <div class="reihe">
+
+    <!-- HEUTE -->
+    <div class="karte">
+      <div class="kopf">
+        <h2>Heute — vier Zeilen</h2>
+        <div class="hoehe">Leiste <b>188 px</b> · Rest für Inhalt: 68 %</div>
+      </div>
+      <div class="handy">
+        <div class="heute">
+          <span class="r">1 Übersicht</span><span class="r">2 Objekt</span>
+          <span class="r an">3 Zustand</span><span class="r">4 Ausstattung</span>
+          <span class="r">5 Gebäude &amp; Außen</span><span class="r">6 Wertermittlung</span>
+          <span class="r">7 Zusatzwerte</span>
+        </div>
+        <div class="messlinie"><span>188 px</span></div>
+        <div class="inhalt">
+          <div class="feldreihe"></div><div class="feldreihe"></div><div class="feldreihe"></div>
+        </div>
+      </div>
+      <div class="fuss">Alle sieben Marken sichtbar und tippbar — aber die Führung
+        nimmt mehr Platz als die ersten drei Eingabefelder.</div>
+    </div>
+
+    <!-- FASSUNG A -->
+    <div class="karte">
+      <div class="kopf">
+        <h2>A · Schritt 3 von 7</h2>
+        <div class="hoehe">Leiste <b>~62 px</b> · spart <b>126 px</b></div>
+      </div>
+      <div class="handy">
+        <div class="fa">
+          <div class="zeile">
+            <span class="zaehler">Schritt 3/7</span>
+            <span class="titel">Zustand</span>
+            <span class="stufe">2 · 5 L</span>
+          </div>
+          <div class="balken"><i></i></div>
+        </div>
+        <div class="messlinie"><span>62 px</span></div>
+        <div class="inhalt">
+          <div class="feldreihe"></div><div class="feldreihe"></div><div class="feldreihe"></div>
+        </div>
+      </div>
+      <div class="fuss"><b>Am sparsamsten.</b> Der Balken zeigt den Weg, die Pille
+        die erreichte Stufe samt Preis. Gewechselt wird über „Zurück / Weiter" im
+        Fuß, der schon da ist. <b>Kein Sprung zu Schritt 6</b> — das ist der Preis.</div>
+    </div>
+
+    <!-- FASSUNG B -->
+    <div class="karte">
+      <div class="kopf">
+        <h2>B · Blätterleiste mit Punkten</h2>
+        <div class="hoehe">Leiste <b>~72 px</b> · spart <b>116 px</b></div>
+      </div>
+      <div class="handy">
+        <div class="fb">
+          <button>‹</button>
+          <div class="mitte">
+            <div class="n">SCHRITT 3 VON 7</div>
+            <div class="t">Zustand</div>
+            <div class="punkte">
+              <i class="fertig"></i><i class="fertig"></i><i class="an"></i>
+              <i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+          <button>›</button>
+        </div>
+        <div class="messlinie"><span>72 px</span></div>
+        <div class="inhalt">
+          <div class="feldreihe"></div><div class="feldreihe"></div><div class="feldreihe"></div>
+        </div>
+      </div>
+      <div class="fuss">Die sieben Punkte zeigen <b>Länge und Position</b> auf einen
+        Blick, erledigte sind gefüllt. Pfeile mit 44 px Trefferfläche.
+        <b>Auch hier kein direkter Sprung</b>, aber ein Punkt ist antippbar, wenn
+        gewünscht.</div>
+    </div>
+
+    <!-- FASSUNG C -->
+    <div class="karte">
+      <div class="kopf">
+        <h2>C · Klappleiste <span style="font-family:'JetBrains Mono';font-size:10px;color:var(--gruen)">EMPFEHLUNG</span></h2>
+        <div class="hoehe">zu <b>~50 px</b> · offen 350 px · spart <b>138 px</b></div>
+      </div>
+      <div class="handy">
+        <div class="fc offen" id="klapp">
+          <div class="kopfzeile" onclick="document.getElementById('klapp').classList.toggle('offen')">
+            <span class="n">3/7</span>
+            <span class="t">Zustand</span>
+            <span class="pf">▸</span>
+          </div>
+          <div class="balken"><i></i></div>
+          <div class="liste">
+            <a><span class="k">1</span> Übersicht <span class="hk">✓</span></a>
+            <a><span class="k">2</span> Objekt <span class="hk">✓</span></a>
+            <a class="an"><span class="k">3</span> Zustand</a>
+            <a><span class="k">4</span> Ausstattung</a>
+            <a><span class="k">5</span> Gebäude &amp; Außen</a>
+            <a><span class="k">6</span> Wertermittlung</a>
+            <a><span class="k">7</span> Zusatzwerte</a>
+          </div>
+        </div>
+        <div class="inhalt">
+          <div class="feldreihe"></div><div class="feldreihe"></div><div class="feldreihe"></div>
+        </div>
+      </div>
+      <div class="fuss"><b>Zum Ausprobieren: auf die Kopfzeile tippen.</b>
+        Zugeklappt 50 px, aufgeklappt die volle Liste mit 44-px-Zeilen und Häkchen.
+        <b>Der direkte Sprung bleibt erhalten</b> — als einzige der drei Fassungen.</div>
+    </div>
+
+  </div>
+
+  <div class="empf">
+    <h3>Empfehlung: C, die Klappleiste</h3>
+    <p style="margin:0">
+      Sie ist die einzige Fassung, die <b>nichts wegnimmt</b>: der direkte Sprung zu
+      jedem Schritt bleibt, und zugeklappt braucht sie mit 50 px noch weniger als A.
+      Damit ist sie auch die einzige, die <b>dieselbe Führung</b> zeigt wie der große
+      Schirm — nur eingeklappt statt ausgebreitet.
+    </p>
+    <ul>
+      <li><b>Warum nicht A:</b> am sparsamsten, aber der Sprung fällt weg. Wer auf
+        Schritt 6 etwas nachtragen will, muss dreimal „Weiter" tippen.</li>
+      <li><b>Warum nicht B:</b> zeigt die Länge des Wegs am schönsten, kostet aber
+        22 px mehr als C und bietet den Sprung nur über kleine Punkte.</li>
+      <li><b>Ein bekanntes Muster im Haus:</b> die Kompakt-Karte in der Sidebar
+        macht genau das — „eine schmale Zeile zum Aufklappen" (v1092/v1094).
+        Dieselbe Bedienlogik zweimal ist besser als zwei neue.</li>
+      <li><b>Zustand merken:</b> zugeklappt bleibt zugeklappt, wie bei der
+        Kompakt-Karte. Beim Schrittwechsel klappt sie <b>nicht</b> von selbst auf —
+        sonst springt das Layout bei jedem „Weiter".</li>
+    </ul>
+    <p style="margin:9px 0 0">
+      <b>Ab welcher Breite?</b> Die große Leiste steht ab <b>1024 px</b> in einer Zeile
+      (v1151), darunter in zwei. Vorschlag: die Klappleiste <b>unter 900 px</b> —
+      dieselbe Schwelle, an der die App auf den Drawer umschaltet. Dann gibt es
+      genau zwei Fassungen und keine dritte Zwischenform.
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

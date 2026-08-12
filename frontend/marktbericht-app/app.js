@@ -2196,7 +2196,19 @@ async function exportPdf(out) {
     doc.setDrawColor(228, 226, 220); doc.setLineWidth(0.3); doc.line(M, H - 11, W - M, H - 11);
     doc.setFillColor(...GOLD); doc.circle(M + 1, H - 8.3, 0.9, 'F');
     doc.setFontSize(7.5); doc.setTextColor(...MUT); doc.setFont('helvetica', 'normal');
-    doc.text('DealPilot · Marktbericht — Marktpreisindikation, kein Gutachten n. § 194 BauGB', M + 4, H - 8);
+    /* v1149-FUSS · Der Hinweis stand auf JEDER Seite. Marcels Befund am
+     * PDF: "nicht 3-4 mal die Preisindikation, das ist etwas zu viel."
+     * Gemessen: footer() laeuft bei jedem newPage(), der Prod-Bericht hat
+     * sieben Seiten — der Begriff kam allein hier siebenmal.
+     * Der Satz ist rechtlich sinnvoll (Abgrenzung n. § 194 BauGB) und
+     * verschwindet deshalb NICHT, er steht nur noch EINMAL: auf Seite 1,
+     * wo ihn liest, wer den Bericht in die Hand nimmt. Ab Seite 2 traegt
+     * die Fusszeile nur noch Marke und Seitenzahl.
+     * Die Textstellen zur Belastbarkeit (Z. 900/902/3344) bleiben — sie
+     * sagen etwas anderes und sind keine Dopplung, nur ein gleiches Wort. */
+    doc.text(pageNo === 1
+      ? 'DealPilot · Marktbericht — Marktpreisindikation, kein Gutachten n. § 194 BauGB'
+      : 'DealPilot · Marktbericht', M + 4, H - 8);
     doc.setTextColor(...GOLD); doc.setFont('helvetica', 'bold');
     doc.text('Seite ' + pageNo, W - M, H - 8, { align: 'right' });
     doc.setFont('helvetica', 'normal');
@@ -3307,6 +3319,28 @@ async function exportPdf(out) {
       (sw.restnutzungsdauer_jahre != null && sw.gesamtnutzungsdauer_jahre != null)
         ? 'RND ' + String(sw.restnutzungsdauer_jahre).replace('.', ',') + ' J. / GND '
           + sw.gesamtnutzungsdauer_jahre + ' J.'
+          /* v1083b-WPDF-1 · EIN STILLER RUECKFALL IST SCHLIMMER ALS EIN
+           * FEHLER. Ohne erfassten Modernisierungsgrad rechnet die
+           * Restnutzungsdauer als GND minus Alter statt nach Anlage 2 — an
+           * der Loehner Strasse 18 statt 24 Jahre, rund 57.500 EUR weniger
+           * Gebaeudesachwert. Die Zahl stand hier bisher ohne jeden Hinweis,
+           * als waere sie nach Anlage 2 ermittelt. Das Backend liefert die
+           * Herkunft seit v1083-WRND; sie wurde nur nie gedruckt. */
+          + ((sw.restnutzungsdauer_herkunft
+              && sw.restnutzungsdauer_herkunft.quelle === 'geschaetzt')
+              ? ' \u00b7 gesch\u00e4tzt' : '')
+        : null,
+      /* v1083b-WPDF-2 · Warum kein Sachwertfaktor angesetzt wurde. "Ohne
+       * Sachwertfaktor" ist eine Feststellung, keine Begruendung — bei einer
+       * Eigentumswohnung leitet der Gutachterausschuss naemlich gar keinen
+       * ab. Der Bildschirm zeigt den Grund seit v1143, das PDF nicht. */
+      (sw.available && !sw.marktangepasst && sw.sachwertfaktor_grund)
+        ? ({ objektart_nicht_abgeleitet: 'Ausschuss leitet f\u00fcr diese Objektart keinen Faktor ab',
+             kein_ausschuss_hinterlegt: 'kein Gutachterausschuss hinterlegt',
+             anderer_ausschuss: 'au\u00dferhalb des zust\u00e4ndigen Ausschusses',
+             ausserhalb_der_tabelle: 'Objekt liegt au\u00dferhalb der ver\u00f6ffentlichten Tabelle',
+             brw_fehlt: 'Bodenrichtwert fehlt' }[sw.sachwertfaktor_grund]
+           || String(sw.sachwertfaktor_grund).replace(/_/g, ' '))
         : null,
     ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar'],
       _fuehrt('sachwert'));   /* v1062-WFUE-3 */
@@ -3432,7 +3466,41 @@ async function exportPdf(out) {
           : (cc.assumptions.liegenschaftszins * 100)).toLocaleString('de-DE'))
       + ' % · ' + ((cc.sachwert && cc.sachwert.vorlaeufig)
         ? 'ohne Sachwertfaktor'   /* v1061-WFUS-2 */
-        : 'Sachwertfaktor ' + cc.assumptions.sachwertfaktor) + '. Kein Gutachten n. § 194 BauGB.', blockW);
+        /* v1150-WFUS · Dieselbe Falle wie beim Zinssatz (v1052), eine Zeile
+         * weiter — und diesmal mit der Konstante: hier stand
+         * `cc.assumptions.sachwertfaktor`, und das ist SACHWERTFAKTOR = 1.0
+         * aus CrossCheckService.js:26, nicht der angewandte Faktor. Wer mit
+         * 0,889 rechnete, las im Dossier "Sachwertfaktor 1".
+         *
+         * Zweitens fehlte die STUFE. Auf dem Bildschirm steht sie längst
+         * (Karte "Sachwert", app.js:592 ff. — "Faktor 1,15 · Stufe E"), im
+         * PDF nicht. Genau dort muss die Zahl ihre Herkunft tragen: das
+         * Dossier verlässt das Haus, die Bildschirmansicht nicht.
+         *
+         * Beide Formen lesen: nhk2010.js:897 liefert ein OBJEKT
+         * { wert, stufe, quelle }, ältere Wege eine nackte Zahl — das ist
+         * die v1143b-Lehre, die auf dem Bildschirm schon gezogen wurde.
+         * Rückfall auf die Annahme bleibt, wie bei allen Nachbarn in
+         * dieser Fußnote. */
+        : 'Sachwertfaktor ' + (function () {
+            var f = cc.sachwert && cc.sachwert.sachwertfaktor;
+            var z = (f && typeof f === 'object') ? f.wert : f;
+            var s = (f && typeof f === 'object') ? f.stufe : null;
+            var q = (f && typeof f === 'object') ? f.quelle : null;
+            if (z == null) return String(cc.assumptions.sachwertfaktor);
+            /* v1150b · Die Quelle nur, wenn sie kurz ist. Gemessen am
+             * Prüfobjekt liefert der amtliche Weg
+             * "Grundstücksmarktbericht 2026 für den Kreis Herford, 5.1.2
+             * Sachwertfaktoren" — 74 Zeichen, die die Fußnote um eine bis
+             * zwei Zeilen wachsen lassen und das Layout darunter schieben.
+             * Sie steht ohnehin im Bericht (sachwertfaktor_ausschuss).
+             * Die STUFE trägt die Herkunft und ist immer dabei; die Quelle
+             * lohnt nur, wo sie selbst die Aussage ist — "eigene Angabe"
+             * (13 Zeichen) bei Stufe E. */
+            var qk = (q && q.length <= 26) ? q : null;
+            return String(z).replace('.', ',')
+              + (s ? ' (Stufe ' + s + (qk ? ' · ' + qk : '') + ')' : '');
+          })()) + '. Kein Gutachten n. § 194 BauGB.', blockW);
     doc.text(_fn, M, y + 3);
     y += 5 + _fn.length * 3;
   }
@@ -3454,6 +3522,17 @@ async function exportPdf(out) {
         + String(_swx.ausstattung_gewogen.gewogene_stufe).replace('.', ',') + '.', blockW);
       need(_agz.length * 3.4 + 4); doc.text(_agz, M, y); y += _agz.length * 3.4 + 3;
       doc.setFontSize(7.5);
+    }
+    /* v1083b-WPDF-3 · Der volle Wortlaut, dort wo Platz ist. In der Karte
+     * steht nur "geschaetzt"; hier steht, was das bedeutet und was fehlt.
+     * Jede Zahl traegt ihre Herkunft — das gilt auch fuer eine, die aus
+     * einem Rueckfall stammt. */
+    var _rh = _swx.restnutzungsdauer_herkunft;
+    if (_rh && _rh.quelle === 'geschaetzt' && _rh.hinweis) {
+      doc.setFontSize(7); doc.setTextColor(150, 120, 60);
+      var _rz = doc.splitTextToSize(_rh.hinweis, blockW);
+      need(_rz.length * 3.4 + 4); doc.text(_rz, M, y); y += _rz.length * 3.4 + 3;
+      doc.setFontSize(7.5); doc.setTextColor(...MUT);
     }
     _swx.staffel.forEach((z) => {
       need(9);
@@ -3591,6 +3670,17 @@ async function exportPdf(out) {
       if (_lo != null && _hi != null) {
         _sp = 'Spanne ' + String(_lo).replace('.', ',') + ' bis ' + String(_hi).replace('.', ',')
           + ' % · Angabe des Gutachterausschusses';
+      }
+      /* v1083b-WPDF-4 · Wenn die Streuung den Wert herabgestuft hat, gehoert
+       * der MASSSTAB daneben. "Zu unsicher" ohne Angabe, woran gemessen
+       * wurde, ist keine Begruendung. Wohnen wird absolut gemessen
+       * (Punkte), Gewerbe relativ (Prozent) — das ist eine Festlegung von
+       * DealPilot, nicht des Ausschusses, und muss darum dastehen. */
+      var _lg = d.cross_check && d.cross_check.ertragswert && d.cross_check.ertragswert.lzs;
+      if (_lg && _lg.grund === 'streuung' && _lg.streuung_pp != null) {
+        _sp += ' \u00b7 \u00b1' + String(_lg.streuung_pp).replace('.', ',') + ' Punkte, '
+          + (_lg.massstab === 'absolut' ? 'Ma\u00dfstab 1,5 Punkte' : 'Ma\u00dfstab 25 %')
+          + ' (DealPilot)';
       }
       doc.text(_sp, M + 5, y + 17.5);
     }

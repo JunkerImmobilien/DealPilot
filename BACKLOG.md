@@ -35,9 +35,816 @@ Zu den offenen Punkten liegt **kein** Bild vor. Das ist kein Mangel — es
 sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
+
+## → Hier weitermachen (Übergabe 2026-08-12, abends)
+
+> **ZUERST LESEN — der Server stand heute abend auf `main`.** Damit waren die
+> Frontend-Pakete `v1148` bis `v1153b` zeitweise **nicht ausgeliefert**,
+> obwohl jeder Deploy den richtigen Hash gemeldet hatte. Beim Zurückholen auf
+> `staging` lag dort ein **fremder Commit `0a55ee4`** — 920 Zeilen, das
+> v1083-Paket eines Parallel-Strangs (Ausschuss-Register NRW). **Beides ist
+> vereint und gesichert** (`ce821e3`, lokal = Server = GitHub, alle Marker
+> geprüft). **Der Prüfbefehl nach jedem Deploy liest ab jetzt den ZWEIG mit:**
+> ```
+> ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD'
+> ```
+> Erwartet wird `staging` **und** der eben gepushte Hash. Ein Hash ohne Zweig
+> ist bedeutungslos. Details in `FALLEN.md` Punkt 1.
+
+**Stand:** lokal wie Staging (`ce821e3`), Zweig `staging`, Arbeitsverzeichnis
+sauber.
+Ausgeliefert an diesem Tag: `v1148` (1025-px-Sprung), `v1149` (§ 194-Hinweis
+nur auf Seite 1), dazu `PROJEKTANWEISUNG.md` als konsolidierter Gesamtstand
+mit fortlaufendem Rollout-Journal.
+
+**Diese Sitzung ist bewusst beendet worden, nicht ausgelaufen.** Zweimal
+hintereinander habe ich eine Lücke behauptet, die es nicht gab — beim
+Tablet-Punkt (A, C und D waren gebaut) und beim Sachwertfaktor (Stufe E läuft
+durch bis in die Anzeige). `CLAUDE.md` sagt für diesen Fall: abschließen,
+übergeben, Schluss. **Die Lehre steht als Punkt 9 in `FALLEN.md`** und ist
+die wichtigste Übergabe dieses Tages.
+
+**Die erste der beiden Restlücken ist erledigt** (`v1150`/`v1150b`) — und hat
+einen zweiten, größeren Fehler mitgebracht: die PDF-Fußnote nannte die
+**Konstante 1,0** statt des angewandten Faktors 0,925. Beides steht jetzt
+richtig im Dossier, mit Stufe.
+
+**Was offen bleibt, und warum es nicht einfach gebaut wurde:** der Hinweistext
+beim manuellen Sachwertfaktor (`WertParameterService.js:473` gibt
+`hinweis: ''`, der Liegenschaftszins gibt einen Text). **Sein Anzeigeweg
+fehlt:** die Karte zeigt `sachwertfaktor_hinweis` nur bei
+`!marktangepasst` (`app.js:612`), und bei einem wirksamen eigenen Faktor ist
+`marktangepasst = true`. In `CrossCheckService.js:245` hängt das Feld
+zusätzlich nur am Tabellenweg. **Erst den Weg, dann den Text** — ein Hinweis,
+den niemand sieht, ist keine Verbesserung. Der eigentliche Vermerk steht seit
+`v1150` im PDF.
+
+**Vor dem Anfangen bitte `FALLEN.md` Punkt 9 lesen.** Er beschreibt genau den
+Fehler, den man in dieser Gegend macht: vom Erzeuger her suchen statt vom
+Verbraucher. Bei `v1150` hat der Blick vom Verbraucher her sofort den
+größeren Fehler gezeigt.
+
+**Was Geld kostet und deshalb angekündigt gehört:** der Nachweis, dass Stufe 2
+nach bezahlter Stufe 1 wirklich nur die Differenz (3 L) abbucht. Ein
+Klicktest am Testobjekt, echtes Kerosin. **Nicht nebenbei machen.**
+
+**Die Tablet-Fassung (Punkt 1) ist nachgemessen, und das Ergebnis ist:
+A, C und D waren längst gebaut.** Ab 901 px dockt die Sidebar an (`v648`,
+`css/style.css:35783`), die Formulare sind zwei- und dreispaltig, und das
+Blatt von unten gibt es seit V46 nicht mehr — es ist global per
+`display:none!important` stillgelegt. **Es war nichts zu bauen**, es war
+nur nie nachgemessen worden. Die Messreihe steht im Punkt.
+
+**Daraus zwei Lehren für den nächsten Anlauf:**
+- **Der Entwurf `tablet-fassung.md` hat nur bei 820 px gemessen** — unter
+  der 901er-Schwelle, also im Drawer-Band. Wer eine Schwelle untersucht,
+  muss **beide Seiten** davon messen.
+- **Ein Element im DOM ist kein aktives Element.** Das Blatt steht mit
+  40 Erwähnungen im Markup und 11 Kacheln im Baum und sah deshalb aktiv
+  aus. Sichtbarkeit sagt nur die Messung.
+
+**Der 1025-px-Sprung, der bei dieser Messung auffiel, ist als `v1148`
+behoben und abgenommen** (siehe Fertig). **B** und die
+**Admin-Oberfläche** bleiben in Punkt 1 liegen: B braucht ein Bild, der
+Admin ein Konto.
+
+**Der nächste offene Punkt ist damit Punkt 3** (Marktbericht neu gestalten,
+groß — Entwurf liegt) oder einer der kleinen Darstellungs-Punkte 4 bis 9,
+die alle auf Marcels Durchgang zurückgehen.
+
+**Vor dem Bauen:**
+- Messkabine nach `FALLEN.md` aufsetzen — Träger `/impressum.html` auf der
+  **App-Domain** (`app.staging.dealpilot.junker-immobilien.io`), nicht auf
+  der Landing-Domain. `getAnimations().finish()` nach jeder Änderung,
+  höchstens ~40 s pro `javascript_tool`-Aufruf (sonst CDP-Timeout), und
+  **Objektwechsel nur mit Neuladen** — ein Wechsel im laufenden Tab hat
+  `hdr-banner-only` und `hdr-no-score` gleichzeitig stehen lassen.
+- **Jeden CSS-Anker im Browser auslesen, bevor er in eine Regel geht.**
+  In `v1147` stand `#app` in der Regel — das Element gibt es nicht.
+
+**Zwei Abnahmen, die noch offen sind:**
+1. **Ankreuzfelder 33 px** (`v1147b`) — gemessen ohne geladenes Objekt,
+   0 von 26 Feldern sichtbar. Mit geladenem Objekt gegenmessen, ob die
+   Formularzeilen tragen (besonders Steuer und Pilot-Analyse).
+2. **Produktion** — liegt dieselbe `registry.js`-Drift dort auch? SSH ist
+   read-only, ein Dateivergleich genügt.
+
+**Prüfstrecken auf Staging:**
+- `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt,
+  weitere Marktberichte kosten **0 L**. Der einzige Haus-Testfall.
+- `Hermannstraße 9 Hüllhorst` (`07d89138`) — ETW, Stufe 3 bezahlt.
+- Kerosin zuletzt: **86 L**.
+
+---
 ## Offen
 
-1. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+1. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
+   Der Punkt bleibt offen, weil **B** und die **Admin-Oberfläche** offen sind.
+   Alles andere ist gebaut, es war nur nie nachgemessen worden.
+
+   **Gemessen in der Messkabine** (Träger `/impressum.html` auf der
+   App-Domain, iframe, Partner-Konto, Objekt `PRUEF_ZFH` geladen,
+   `getAnimations().finish()` nach jeder Breitenänderung):
+
+   | Fenster | Sidebar | Leiste | Inhalt | Burger |
+   |---|---|---|---|---|
+   | 820 px | Drawer (`fixed`, −380) | 380 | 820 | sichtbar |
+   | 900 px | Drawer | 380 | 900 | sichtbar |
+   | **901 px** | **angedockt** (`sticky`) | 260 | 641 | aus |
+   | **1024 px** | **angedockt** | 260 | **764** | aus |
+   | 1025 px | angedockt (`relative`) | 380 | 645 | aus |
+   | 1180 px | angedockt | 380 | 800 | aus |
+
+   - **A (Sidebar andocken): erfüllt, und zwar seit `v648`.** Der Block
+     `css/style.css:35783` — `@media (min-width:901px) and (max-width:1024px)`
+     — dockt die Leiste als 260-px-Spalte im Fluss an und lässt bei 1024 px
+     **764 px** für den Inhalt. Marcels Entscheidung „ab 1024 px" ist damit
+     erfüllt, sogar schärfer: es beginnt bei 901 px.
+   - **C (zweispaltige Formulare): erfüllt.** Im Objekt-Tab stehen bei
+     641–764 px Inhaltsbreite zwei- **und** dreispaltige Raster
+     (2 × 318,5 px bzw. 3 × 210,3 px).
+   - **D (Popover statt Blatt): gegenstandslos.** Es gibt kein Blatt von
+     unten mehr. `css/style.css:11519` legt es **global** still:
+     `.bsheet-overlay{display:none!important}` mit dem Kommentar
+     „Bottom-Sheet aus V43 verstecken — wird in V46 nicht mehr genutzt". Der
+     Auslöser `.sb-actions-trigger` öffnet `sbActionsToggle()`, also das
+     **Akkordeon in der Sidebar** (11 `.sb-act-item`, 217 px breit).
+     Gegenprobe bei 820 px und 1024 px: `bsheet-panel` bleibt auf Höhe 0.
+
+   > **Der Entwurf `design/Vorschläge/tablet-fassung.md` ist an drei Stellen
+   > widerlegt, und die Ursache ist dieselbe: er hat ausschließlich bei
+   > 820 px gemessen** — unterhalb der 901er-Schwelle, also im Drawer-Band.
+   > Deshalb las sich der Grundbefund als „das Tablet bekommt die
+   > Handy-Fassung, nur breiter". Für 901–1024 px trifft das nicht zu.
+   > Beim Blatt kam eine zweite Falle dazu: es steht mit 40 Erwähnungen im
+   > Markup und 11 Kacheln im DOM und **sieht deshalb aktiv aus**. Ob ein
+   > Element je sichtbar wird, sagt nur die Messung — nicht seine Anwesenheit.
+
+   **Was an dem Punkt wirklich offen ist:**
+
+   - **B — wie wird der Score flacher?** Weiterhin **blockiert auf ein Bild**,
+     weil es die auffälligste Fläche der App ist. **Neuer Befund dazu:** die
+     Score-Zeile erscheint überhaupt erst **ab 70 % Datenvollständigkeit**
+     (`js/calc.js:205` setzt sonst `body.hdr-banner-only` und zeigt einen
+     Hinweisbanner). Gemessen: `PRUEF_ZFH` liegt darunter → Kopfleiste
+     **157 px** statt der 348 px des Entwurfs, `.scores` und `.sc-main` sind
+     gar nicht im Layout. **Die 251 px des Entwurfs sind damit nicht
+     nachgemessen** — dafür braucht es ein Objekt über der 70-%-Schwelle.
+     Der Score bleibt auf dem Tablet (Marcels Vorgabe).
+   - **Admin-Oberfläche:** die verlangte Zahl ist erhoben —
+     `admin/css/admin.css` hat **3 Media-Queries** (bei 900 px, 900 px und
+     820 px), `admin/js/admin-network.js` eine vierte (1150 px), Viewport-Meta
+     ist gesetzt. **Anders als das Partner-Portal in `v1112b` ist der Admin
+     also nicht bei null.** Eine echte Messung braucht ein Admin-Konto, das
+     dieser Prüflauf nicht hatte — bleibt ehrlich offen.
+   - **820 px (iPad Hochformat) bleibt die Handy-Fassung:** Drawer, eine
+     Spalte über die volle Breite. Das ist **kein Defekt**, sondern die Folge
+     von Entscheidung A (Schwelle 901). Soll das Hochformat andocken, wären
+     bei 260-px-Leiste nur 560 px Inhalt übrig — das schließt zweispaltige
+     Formulare aus. **Eigene Entscheidung, nicht in diesem Punkt.**
+
+2. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+   Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
+   Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
+
+   - **ERLEDIGT — Ankreuzfelder auf 33 px** (`v1147` `674c3b0`,
+     `v1147b` `413d409`). **Marcels Entscheidung 2026-08-12: 33 px, nicht
+     44** — die volle Trefferfläche hätte jede Formularzeile höher gemacht.
+
+     **Ursache, am Markup nachgezählt:** alle **37** Checkboxen sind
+     nackte `<input type="checkbox">` **ohne Klasse**. Die Klasse
+     `.cb-label` sitzt am **Label**, nicht am Feld — ihre Regel
+     (`style.css:2191`, 16 px) griff deshalb nur für acht. Die übrigen
+     standen auf Browser-Standard, daher die gemessenen 13 px.
+
+     Schalter sind ausgenommen (`.ji-switch`, `.toggle-slim`,
+     `.fesh-tile`, `.dp-pf-tile`) — sie bauen aus demselben nackten
+     Element eine ganz andere Optik.
+
+     **Nachgemessen:** **26 Felder auf 33 × 33 px**, alle Schalter
+     unverändert (14 px, 32 × 18, auto).
+
+     **Eigener Fehler, korrigiert in `v1147b`:** Der Selektor stand zuerst
+     auf `#app` — **dieses Element gibt es in der App gar nicht**
+     (`getElementById` liefert `null`). Ich hatte den Anker aus
+     `CLAUDE.md` übernommen, statt ihn auszulesen; genau der Fehler, vor
+     dem Regel 1 warnt. Die Regel griff dadurch nirgends.
+
+     **OFFEN — optische Abnahme.** Gemessen wurde ohne geladenes Objekt,
+     alle Reiter zugeklappt: 0 von 26 Feldern waren sichtbar, die
+     Überlaufprüfung ist damit wertlos. **Beim nächsten Durchgang mit
+     geladenem Objekt gegenmessen**, ob 33 px die Formularzeilen sprengen
+     — besonders in den dichten Reitern Steuer und Pilot-Analyse.
+   - **`.sbc-arrow` misst 20 × 20 px und ist ein echtes Bedienelement.**
+
+     **Mein v1118-Befund war falsch und wird hiermit zurückgenommen.** Ich
+     hatte gemeldet, der Pfeil trage `role="button"` „ohne eigenen Klick"
+     und die Rolle sei irreführend. Nachgelesen in `karten-kompakt.js`
+     (v1092): Rolle, `tabindex="0"` und `aria-label` werden dort
+     **absichtlich** gesetzt — und zwar nur, wenn der Kartenmodus
+     `kompakt` oder `stapel` aktiv ist. Dort **klappt der Pfeil die Karte
+     auf und zu** (`umschalten()`), über einen **delegierten** Listener.
+     Mein Prüfausdruck hat nur `getAttribute('onclick')` abgefragt und
+     einen delegierten Handler deshalb nicht gesehen.
+
+     **Was bleibt, ist ein anderer, echter Befund:** ein Bedienelement mit
+     eigener Funktion misst **20 × 20 px** — deutlich unter der
+     44-px-Trefferfläche aus v650/v652.
+
+     **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:**
+     Pfeil und Karte tun **Verschiedenes** — der Pfeil klappt auf, der
+     Kartenkörper öffnet das Objekt. Eine 44-px-Pseudofläche würde der
+     Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
+     eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
+
+     **Nachgemessen 2026-08-12 im Quelltext — die 4 px sind kein
+     Quetschbefund.** `.sbc-arrow` trägt in `style.css:4828` bereits
+     `flex-shrink: 0`; die Regel darunter
+     (`aside.sidebar .sb-card .sbc-arrow`, Z. 24958) setzt nur Farbe,
+     Schriftgröße und `margin-left`. **Die 4 × 21 px sind schlicht die
+     natürliche Breite des Zeichens `›` bei 14 px ohne jedes Padding** —
+     der Pfeil hat nie eine Fläche gehabt, er ist nur ein Buchstabe.
+
+     **Damit ist die Lösung eine andere als gedacht:** kein Flex-Fix,
+     sondern dem Pfeil überhaupt erst eine Fläche geben. Der Weg ohne
+     Klickdiebstahl ist **Padding am Element selbst** plus negatives
+     `margin` zum Ausgleich — die vergrößerte Fläche gehört dann dem Pfeil
+     und seinem eigenen delegierten Handler
+     (`karten-kompakt.js:83`, `ziel.closest('.sbc-arrow')`), nicht der
+     Karte. **Zu messen ist vorher, wie viel Platz in `.sbc-top-line1`
+     rechts frei ist** — überlappt das negative Margin die Nachbarn,
+     stiehlt es Klicks in die andere Richtung.
+
+3. **Marktbericht neu gestalten.**
+   **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
+   (2026-08-11, anklickbar, im Browser durchgeprüft).
+
+   ### ENTBLOCKIERT — Marcels Vorgaben vom 2026-08-12
+
+   Die beiden Geldfragen, auf denen der Punkt blockiert war, sind
+   beantwortet: **abgerechnet wird beim Erzeugen, Vertiefen kostet nur die
+   Differenz.** Dazu drei neue Vorgaben: Felder klar pro Stufe abgrenzen
+   samt Zusatzfeldern · manuelle Parameter erst vermerken, bis ein Abgleich
+   möglich ist · die Preisindikation steht im PDF drei- bis viermal.
+
+   **Alles vier ist gemessen und steht in
+   `design/Vorschläge/marktbericht-stufen-und-herkunft.md`.** Kurzfassung:
+
+   - **Die Abrechnung ist schon so gebaut** (v1125/v1126) **und jetzt
+     nachgewiesen** (siehe Fertig, ohne Kerosin): Auskunft und Abbuchung
+     rechnen dieselbe Formel, und im Log steht ein echter Vorgang mit
+     **7 L = 12 − 5** für eine Vertiefung von Stufe 2 auf 3. Vollpreise
+     2 / 5 / 12 L, der Browser rechnet die Ermäßigung nicht selbst.
+     **ERLEDIGT: die Formel stand an zwei Stellen** — `v1154` führt sie in
+     `_aufpreis(stufe, bezahlt)` zusammen, Verhalten bewiesen unverändert
+     über alle 12 Kombinationen (siehe Fertig).
+   - **Pflichtfelder je Stufe stehen als eine Quelle** in `BEDARF`
+     (`mb-stufen.js`): Stufe 1 `address` `ptype` `area` `year` · Stufe 2
+     `baustatus` `cond` `quality` · Stufe 3 `plot` `units` und
+     objektartabhängig `mea` bzw. `standardstufe`+`nhkHaus`. **Keine zweite
+     Liste anlegen** — der frühere `FEHLT_TEXT` war genau das und lief
+     auseinander (v1126d).
+   - **22 Zusatzfelder hängen an der Objektart.** Sie sind im Entwurf nach
+     Gruppen aufgeschlüsselt. Drei Fallen: `ptype` gehört in die
+     Auslöserliste (v1119-WAUS), Felder mit `wenn:`-Bedingung erscheinen
+     **nur nach echter Nutzereingabe**, und `_angestrebt` in `mb-stufen.js`
+     ist eine **Untergrenze** — wer daran rührt, macht Stufe 3 wieder
+     unerreichbar (v1126c).
+   - **ERLEDIGT: die Preisindikation im PDF** — `v1149`, siehe Fertig.
+
+   ### Herkunft der manuellen Parameter — FEHLDIAGNOSE, ausdrücklich zurückgenommen
+
+   **Ich hatte gemeldet, ein manuell eingegebener Sachwertfaktor trage keine
+   Herkunft. Das ist falsch.** Die Rücknahme im Einzelnen, weil der Weg
+   wichtiger ist als der Irrtum:
+
+   Belegt war nur **eine** Stelle: in `CrossCheckService.js` hängen die sieben
+   `sachwertfaktor_*`-Felder (`_grund`, `_hinweis`, `_stuetzstellen`,
+   `_ausschuss`, `_tabellenwert`, `_korrekturen`) am Tabellenzweig, und der
+   wird bei eigenem Wert übersprungen. **Das stimmt — trägt aber die
+   Schlussfolgerung nicht.** Die Herkunft läuft über einen anderen Weg:
+
+   ```
+   WertParameterService.sachwertfaktor({nutzerwert})
+     -> { wert, stufe: 'E', quelle: 'eigene Angabe' }
+   nhk2010.js:897
+     -> out.sachwertfaktor = { wert, stufe, quelle }
+   app.js:592 ff. (Karte "Sachwert")
+     -> "marktangepasst · Faktor 1,15 · Stufe E"
+   ```
+
+   Dasselbe beim Liegenschaftszins: `ReportOrchestrator.js:404` reicht
+   `nutzerwert: ref.lzs_pct` durch, der Service antwortet mit `stufe: 'E'`,
+   `quelle: 'eigene Angabe'` **und** dem Hinweis „Liegenschaftszinssatz
+   manuell gesetzt. Für das Dossier bitte die Herkunft angeben
+   (Grundstücksmarktbericht, Jahr)." Die Ausgabe führt ihn über
+   `kern.lzs.stufe`. Meine Aussage „das Formular sendet keine Stufe, also ist
+   sie null" war falsch — **die Stufe entsteht im Backend, nicht im
+   Formular.**
+
+   Dazu gibt es `STUFEN_ETIKETT` (A–E) in `WertParameterService.js`, wo
+   **E = „eigene Angabe · vom Nutzer gesetzt · indikativ"** definiert ist.
+   Hergestellt hat das `v1144` — der Commit-Titel sagt es wörtlich: „Der
+   Sachwertfaktor wurde nie angewandt — falscher Feldname an zwei Stellen."
+
+   **Marcels Vorgabe ist damit im Kern schon erfüllt gewesen.** Es blieben
+   zwei kleine Lücken:
+
+   1. **ERLEDIGT — die Stufe fehlte im PDF** (`v1150`/`v1150b`, `e33ea05`,
+      siehe Fertig). Dabei kam ein **zweiter, größerer Fehler** heraus: die
+      Fußnote druckte die **Konstante** `assumptions.sachwertfaktor` = 1,0,
+      nicht den angewandten Faktor. Am Prüfobjekt stand „Sachwertfaktor 1"
+      im Dossier, gerechnet wurde mit **0,925**.
+   2. **Offen, aber kleiner als gedacht — der Hinweistext beim
+      Sachwertfaktor.** Der LZS gibt bei manueller Eingabe „bitte die
+      Herkunft angeben (Grundstücksmarktbericht, Jahr)", der Sachwertfaktor
+      gibt `hinweis: ''` (`WertParameterService.js:473`).
+      **Vor dem Bauen beachten — der Anzeigeweg fehlt:** die Karte zeigt
+      `sachwertfaktor_hinweis` nur unter der Bedingung
+      `sw.available && !sw.marktangepasst` (`app.js:612`). Bei einem
+      **wirksamen** eigenen Faktor ist `marktangepasst = true`, der Hinweis
+      erschiene also **nirgends**. Und in `CrossCheckService.js:245` hängt
+      `sachwertfaktor_hinweis` ohnehin nur am Tabellenweg. Ein Hinweis, den
+      niemand sieht, ist keine Verbesserung — **erst den Weg bauen, dann den
+      Text.** Der eigentliche Vermerk („Stufe E · eigene Angabe") steht seit
+      `v1150` im Dossier, damit ist Marcels Anliegen abgedeckt.
+
+   Der eigentliche **Abgleich** eigene ↔ amtliche Angabe bleibt ein eigenes
+   Vorhaben und hängt daran, dass `mb.valuation_inputs` überhaupt beschrieben
+   wird — heute passiert das nicht.
+
+   > **Die Lehre steht als Punkt 9 in `FALLEN.md`:** „Das fehlt" ist die
+   > teuerste Vermutung. Vom **Verbraucher** her suchen (wer zeigt den Wert
+   > an?), nach dem **Vokabular** greppen (`STUFEN_ETIKETT`, `'E'`) und die
+   > **Commit-Historie** nach dem Thema fragen (`git log -S`) — jedes davon
+   > hätte den Irrtum in einer Minute beendet.
+
+   ### Marcels Entscheidung vom 2026-08-11 — sie ersetzt die vom 2026-08-10
+
+   „Nummer 1 und dein Vorschlag" — also **Idee 1 (Wizard mit Reitern)**,
+   kombiniert mit **Idee 2 (lebende Vorschau)** und **Idee 6 (sichtbarer
+   Zweig)**, wie empfohlen. Wörtlich dazu:
+
+   - **Die drei Stufen sollen vereint werden**, nicht vorher abgefragt:
+     einfache Bewertung, erweiterte Marktpreisindikation und genaue
+     Wertermittlung in **einem** Weg.
+   - **Es soll übersichtlich sein.**
+   - **Am Schluss das Ergebnis wie jetzt.**
+   - **Die Übersicht bleibt vollständig:** Objekte einlesen, die Tabelle
+     der vorhandenen Marktberichte, und ein angelegtes Objekt direkt
+     auswählen. „Das ist ja quasi die Übersicht."
+
+   **Damit ist die Festlegung vom 2026-08-10 überholt** — dort hieß es noch
+   „nur die genaue Wertermittlung bekommt einen Wizard, Stufe 1 und 2
+   bleiben". Jetzt ist es **ein** Weg für alle drei.
+
+   ### Wie die Stufen vereint werden
+
+   Als **drei Meilensteine auf einem Weg** statt als Frage vorweg. Man kann
+   an jedem stehenbleiben und erzeugen:
+
+   | Meilenstein | erreicht nach | heute |
+   |---|---|---|
+   | Einschätzung | Schritt 1 | Stufe 1 · 2 L |
+   | Marktpreisindikation | Schritt 2 | Stufe 2 · 5 L |
+   | Wertermittlung | Schritt 4 | Stufe 3 · 12 L |
+
+   **Niemand muss vorher wissen, was er braucht** — und wer bei
+   „Einschätzung" anfängt, sieht am Balken, dass zwei Angaben mehr die
+   Spanne halbieren.
+
+   **Die Objektart steht in Schritt 1 und nirgends sonst**, weil
+   `istWohnung()` über **20 der 42 Felder** entscheidet. Ein Wizard, der
+   sie später fragt, müsste alles dahinter neu aufbauen.
+
+   ### Im Browser durchgeprüft
+
+   Übersicht → Wizard → Ergebnis → zurück. Zweig gemessen: **ETW ergibt
+   vier Reiter** (Feinjustierung entfällt), **Haus fünf**; `mea` ist beim
+   Haus weg. Folgefelder: `hinterlandFlaeche=828` bringt `hinterlandRent`
+   und `hinterlandWert`, **und der getippte Wert bleibt erhalten** — die
+   Fokusfalle beim Neuzeichnen ist im Entwurf schon gelöst. Kein Querlauf,
+   keine Konsolenfehler.
+
+   **BLOCKIERT auf zwei Fragen, beide betreffen Geld:**
+   1. **Wann wird abgerechnet**, wenn die Stufe sich erst am Ende ergibt?
+      Vorschlag: beim Erzeugen, nach erreichter Stufe, Preis am Knopf.
+   2. **Darf man später vertiefen** — erst „Einschätzung", dasselbe Objekt
+      später auf „Wertermittlung" hochziehen — **und was kostet das dann?**
+      Vorschlag: nur die Differenz.
+
+   **Was vor dem Entwurf gemessen sein muss:** welche Felder voneinander
+   abhängen. `garagenStufe` und `hinterlandRent` erscheinen nur nach echter
+   Nutzereingabe und werden bei programmatischem Setzen **nicht**
+   nachgezeichnet — ein Wizard, der das übersieht, verliert Eingaben.
+
+   **Zwei feste Randbedingungen:** die Marktbericht-App ist **immer hell**
+   und lädt `whitelabel-override.js` **nicht** (Farbe läuft über
+   `mb-whitelabel.js`). Und `payload()` in `wertermittlung.js` bleibt die
+   Sammelstelle — **eine neue Oberfläche darf die Feldnamen nicht ändern**,
+   sonst hängt der Rechenkern daran.
+
+   ---
+
+   ### Nachlese aus Marcels Durchsicht des Entwurfs, 2026-08-11
+
+   Drei Befunde am Entwurf `marktbericht-wizard.html`, dazu eine
+   Verständnisfrage, die den Ablauf betrifft — **die ist die wichtigste.**
+
+   1. **ERLEDIGT — die Schrittleiste ist zu schmal** (`v1151`, `7c716ab`,
+      siehe Fertig). Gemessen statt geschätzt: die sieben Marken brauchen
+      **902 px**, ihr Behälter stand bei **jeder** Fensterbreite auf
+      **760 px** — auch bei 1920, wo `.panel` 1300 px breit ist. Der Platz
+      war da; die Leiste begrenzte sich selbst und brach in zwei Zeilen um.
+      Ursache war ein Sammelselektor aus `v1128`, der die Leiste mit den
+      Formularzeilen zusammen auf 760 px setzte. Jetzt eigene Grenze
+      960 px → **eine Zeile ab 1024 px**.
+
+   2. **ERLEDIGT — der Erzeugen-Knopf war bei Stufe 1 gesperrt** (`v1152`,
+      `d17edac`, siehe Fertig). Die zweite Ursache ist gefunden: `ab` und
+      `genauerAb` bedeuten Verschiedenes. Ertrags- und Sachwert stehen auf
+      `ab: 1`, weil sie immer mitrechnen („nur mit Pauschalen", v1018) — ihre
+      Pflichtfelder `plot`/`units` brauchen sie erst bei `genauerAb: 3`.
+      `knopfSperren()` prüfte gegen `ab`, also verlangte Stufe 1 die Angaben
+      von Stufe 3. Nachgewiesen in beide Richtungen: bei Stufe 1 jetzt
+      klickbar mit „· 2 L", bei Stufe 3 weiterhin gesperrt.
+      **Auch die Reihenfolge der Reiter ist geprüft und stimmt:** Stufe-1-
+      Felder liegen in Reiter 2, Stufe-2-Felder in Reiter 3, Stufe-3-Felder
+      in Reiter 5 — kein Pflichtfeld der Einschätzung steckt in einem
+      späteren Schritt.
+
+      *Der historische Befund, der zur ersten Ursache führte, bleibt hier
+      stehen, weil seine Lehren gelten:*
+
+      **Der frühere Wortlaut:** „das muss ja irgendwie möglich sein."
+      **Das ist der Kern des ganzen
+      Meilenstein-Gedankens** — wer bei „Einschätzung" stehenbleiben will,
+      muss dort auch erzeugen können. Steht der Knopf still, ist der Wizard
+      wieder ein Pflichtdurchlauf und die Vereinigung der drei Stufen
+      wertlos.
+
+      **Eine Ursache ist gefunden und behoben (2026-08-11, `v1136c`) —
+      wahrscheinlich nicht die einzige.** Beim Durchmessen der Kette für
+      den Objekt-Reiter gemessen: `mapCond()` in `mb-objektwahl.js` ordnete
+      den Zustand **„gut"** keiner einzigen Option des Berichtsfeldes zu und
+      ergab `null`. Der Zustand ist Pflicht für die Marktpreisindikation,
+      und `erreicht()` in `mb-stufen.js` ist eine **Kaskade** — ohne Stufe 2
+      ist Stufe 3 unerreichbar. Der **häufigste Zustandswert überhaupt**
+      hat den Bericht also gesperrt, und die Ampel zeigte an Stufe 3
+      „fehlt: " **ohne Inhalt**, weil dort tatsächlich nichts fehlte.
+
+      Zwei Lehren für den Wizard:
+      - **Eine Stufe kann vollständig sein und trotzdem gesperrt** — weil
+        eine frühere es nicht ist. Die Beschriftung muss den **wirklichen**
+        Grund nennen, nicht die leere Liste der eigenen Stufe.
+      - **Beide Optionslisten gehören gegeneinander geprüft**, nicht per
+        Heuristik verknüpft. Die alte Fassung verglich fünf
+        Anfangsbuchstaben, und „sanie" steckt auch in
+        „sanierungsbedürftig" — **„stark sanierungsbedürftig" kam als
+        „saniert" an**, ein Fehler mit falschem Vorzeichen.
+
+   3. **Es muss auf dem Handy funktionieren.** Seit `v1118` landen echte
+      Nutzer bei 390 px in der normalen Ansicht. Eine siebenteilige
+      Schrittleiste nebeneinander und ein Handy schließen sich aus — der
+      Entwurf braucht **zwei** Darstellungen derselben Führung, nicht eine
+      gequetschte.
+
+      **ERLEDIGT — Fassung C ist gebaut** (`v1153`/`v1153b`, `7fb691f`, siehe
+      Fertig). Marcels Wahl aus der Demo. Bei 390 px trägt die Führung jetzt
+      **55 px statt 188 px**; ab 1024 px stehen die sieben Marken unverändert
+      in einer Zeile. Alle drei Verhaltensregeln über den Bedienweg geprüft.
+
+      *Die Demo bleibt als Beleg der Entscheidung stehen:*
+      `design/Vorschläge/marktbericht-schrittleiste-handy.html` (2026-08-12,
+      anklickbar, echte 390-px-Rahmen). Drei Fassungen mit gemessenen Höhen:
+
+      | | Höhe | spart | Sprung zu jedem Schritt |
+      |---|---|---|---|
+      | heute | 188 px | — | ja |
+      | **A** Schritt 3 von 7 + Balken | ~62 px | 126 px | **nein** |
+      | **B** Blätterleiste mit Punkten | ~72 px | 116 px | nur über Punkte |
+      | **C** Klappleiste ★ | **50 px** zu | **138 px** | **ja** |
+
+      **Empfehlung C**, weil sie die einzige ist, die **nichts wegnimmt**: der
+      direkte Sprung bleibt, zugeklappt braucht sie weniger als A, und sie
+      zeigt **dieselbe** Führung wie der große Schirm — nur eingeklappt. Dazu
+      ist das Muster im Haus bekannt: die Kompakt-Karte der Sidebar ist
+      genau das („eine schmale Zeile zum Aufklappen", v1092/v1094).
+      **Vorschlag für die Schwelle: unter 900 px** — dieselbe, an der die App
+      auf den Drawer umschaltet. Dann gibt es zwei Fassungen und keine dritte
+      Zwischenform.
+
+      **Jetzt vermessen (2026-08-12, nach `v1151`):** bei 390 px ist der
+      Behälter 305 px breit, die Leiste bricht auf **vier Zeilen** um
+      (Oberkanten 422/469/516/563) — also rund **188 px, bevor eine einzige
+      Angabe zu sehen ist**. **Kein Überlauf, nichts beschnitten, alle
+      sieben Marken erreichbar** — es ist kein Defekt, sondern eine
+      Platzfrage. Ab 1024 px steht die Leiste in einer Zeile, unter 1024 px
+      in zwei, auf dem Handy in vier.
+
+      **Damit ist die Aufgabe scharf umrissen:** gesucht ist eine zweite
+      Darstellung für schmale Schirme, die weniger als 188 px braucht — etwa
+      „Schritt 3 von 7" mit Titel und Fortschrittsbalken statt sieben
+      Marken. **Das ist Gestaltung, keine Reparatur → Demo-first**, Ablage
+      in `design/Vorschläge/`.
+
+   **Und die Aufgabe, die über allen dreien steht: den Ablauf einmal
+   vollständig durchspielen.** Marcel: „das muss ja Sinn machen, auch von
+   der Reihenfolge her." Zu klären ist damit nicht die Optik, sondern die
+   **Freischaltlogik**:
+
+   - **Welche Felder machen welchen Meilenstein voll?** Für jede der drei
+     Stufen die Pflichtangaben benennen — aus dem, was das Backend
+     tatsächlich braucht, nicht aus dem Bauchgefühl. Solange das nicht
+     gemessen ist, ist jeder Freischaltzustand geraten.
+   - **Der Knopf zeigt, was er gerade erzeugt.** Beschriftung und Preis
+     wandern mit dem erreichten Meilenstein mit. Er ist **nie** tot,
+     solange mindestens die Einschätzung vollständig ist.
+   - **Die Reihenfolge der sieben Schritte muss den Meilensteinen folgen.**
+     Wenn Schritt 1 die Einschätzung trägt und Schritt 2 die
+     Marktpreisindikation, darf kein Pflichtfeld der Einschätzung in
+     Schritt 5 stehen. Genau das ist zu prüfen — und es ist der
+     wahrscheinlichste Grund dafür, dass der Knopf still bleibt.
+   - **Die Objektart bleibt in Schritt 1.** `istWohnung()` entscheidet über
+     20 der 42 Felder; sie später zu fragen hieße, alles dahinter neu
+     aufzubauen.
+
+   **Das gehört in den überarbeiteten Entwurf, nicht in den Code** — erst
+   die Führung durchspielen und zeigen, dann bauen. Die beiden offenen
+   Geldfragen oben (wann wird abgerechnet, was kostet das Vertiefen)
+   hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
+   feststeht, wann ein Meilenstein als erreicht gilt.
+
+4. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
+
+   Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
+
+   **Der Defekt: der Darstellungs-Block nimmt die gewählte Farbe selbst an.**
+   Wählt Marcel Grün, wird das Gold am Kopf des Akzent-Bereichs mit grün.
+   **Das darf im Einstellblock nicht passieren** — wer eine Farbe *auswählt*,
+   braucht eine neutrale Umgebung, sonst beurteilt er die Farbe gegen sich
+   selbst. Die Bedienoberfläche ist kein Vorschaufeld.
+
+   Vor dem Patch messen, welche Regel greift: die `--wl-`Tokens werden
+   ausschließlich von `whitelabel-override.js` gesetzt (`setWlTokens` in
+   `apply()`), und der Block hängt vermutlich an denselben Tokens wie die App.
+   **Die Lösung ist ein eigener Satz fester Töne für das Panel**, nicht ein
+   Ausschalten der Vorschau — die Vorschauflächen *sollen* mitgehen, der
+   Rahmen darum nicht. Beide Bereiche also sauber trennen.
+
+   **Der Ausbau: sechs Farben reichen nicht.** Marcel will aus einer Palette
+   wählen können. Zu entscheiden ist, **welcher Art**:
+
+   | | |
+   |---|---|
+   | **freier Farbwähler** (`<input type=color>`) | jede Farbe, keine Kuratierung |
+   | **erweiterte Palette** | z. B. 24 abgestimmte Töne, alle geprüft |
+   | **beides** | Palette als Vorschlag, freier Wähler daneben |
+
+   **Das ist eine Produktentscheidung, keine technische.** Sie hat eine
+   gemessene Folge: `_recolor` rechnet HSL-relativ, und **vier der 66
+   WL_TINTS reißen schon heute bei einem extrem hellen Akzent** (`#F0D000`:
+   `#c08a2f`, `#a6842d`, `#a68a36`, `#a98e3a` landen bei k = 2,57–2,98). Ein
+   freier Wähler macht diesen Fall vom Sonderfall zum Regelfall. Er ist
+   trotzdem machbar — aber **dann muss der Tint-Weg vorher eine
+   Mindestkontrast-Regel bekommen**, sonst liefern wir eine Funktion aus, die
+   sich selbst unlesbar machen kann. Der Später-Punkt dazu wird damit zur
+   Voraussetzung.
+
+   **→ Demo nach `design/Vorschläge/`, nicht raten.**
+
+5. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+
+   Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
+   Defekt, keine Geschmacksfrage.
+
+   **Erst die Kette messen, dann patchen** — nicht am CSS anfangen. Vier
+   Stellen, in dieser Reihenfolge:
+
+   1. **Kommt der Klick an?** Feuert der Handler, wird ein Wert gesetzt?
+   2. **Wird gespeichert?** Steht der Wert nach dem Neuladen wieder da?
+   3. **Wird ein Token gesetzt?** `getComputedStyle(document.body)` auf den
+      erwarteten Namen, vorher/nachher.
+   4. **Liest das Token jemand?** Genau hier lag `v1101`: der Regler setzte
+      `--dp-logo-w`, gelesen wurde `--dp-logo-scale` — **zwei Namen für
+      dieselbe Sache**, und niemand merkte es, weil beide existierten.
+
+   Der wahrscheinlichste Fall ist wieder Punkt 4. Zweiter Kandidat: die Regel
+   hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
+   dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
+
+6. **Regler „Tab-Texte" wirkt nicht**
+
+   Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
+   Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
+   Bewertung**. Bei Marcel ändert sich nichts.
+
+   Gleiche Kette wie N2, gleiche Reihenfolge. **Ein zusätzlicher Verdacht,
+   der hier besonders naheliegt:** die Reiter tragen an mehreren Stellen
+   `!important`-Regeln (so gewinnt z. B. `header.hdr.has-v64-score
+   #hdr-obj-num` gegen alles andere). Ein Token, das korrekt gesetzt ist,
+   verliert dann trotzdem. **Deshalb den Kaskaden-Walker benutzen** — welche
+   Regel gewinnt tatsächlich für das Element —, nicht nur prüfen, ob die
+   Variable steht.
+
+   **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
+   Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
+
+7. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+
+   Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
+   schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
+   es der alte Befund in neuer Form ist.
+
+   **Am Raster messen, nicht am Farbtoken.** Ohne Vorlage ist der Bereich
+   sauber, erst mit umgestellter Vorlage rückt alles zusammen — die Ursache
+   liegt also im Abstandsraster, nicht in der Farbe. Und beim Nachmessen die
+   `v1105c`-Lehre mitnehmen: das Goldband ist ein `::before`, ein Leser, der
+   nur die Elternkette abläuft, sieht es nicht.
+
+   **Dazu Marcels zweite Vorgabe an derselben Karte:** *„achte darauf, dass
+   alle Werte immer angegeben werden, die wir brauchen."* Das ist ein eigener
+   Prüfschritt — **welche Angaben gehören auf die Karte, und fehlt eine
+   davon?** Die Liste gehört mit Marcel abgestimmt, nicht von mir geraten;
+   danach wird gezählt, ob jede tatsächlich erscheint (und was passiert, wenn
+   sie leer ist — `_euro(null)` liefert `"–"` und ist **truthy**, ein
+   `||`-Rückfall greift dort nie).
+
+   **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
+   Aufgreifen zusammenlegen, nicht doppelt bauen.
+
+8. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+
+   **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
+   führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
+   man auf dem × zum Löschen.
+
+   **Marcels Vorgabe: der Pfeil gehört nach unten.** Das löst zwei Dinge auf
+   einmal — die Kollision, und den bekannten Befund, dass `.sbc-arrow` mit
+   **20 × 20 px** deutlich unter der 44-px-Trefferfläche aus v650/v652 liegt.
+   Unten ist Platz, oben nicht.
+
+   **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:** Pfeil
+   und Karte tun Verschiedenes — der Pfeil klappt auf (`umschalten()` in
+   `karten-kompakt.js`, delegierter Listener), der Kartenkörper öffnet das
+   Objekt. Eine 44-px-Pseudofläche würde der Karte Klicks stehlen und die
+   falsche Aktion auslösen. Es ist eine Frage der Kartengestaltung.
+
+   **Vor dem Verschieben messen:** `getBoundingClientRect()` auf Pfeil und ×,
+   den Abstand beziffern, und mit `elementFromPoint` prüfen, **wer den Klick
+   in der Lücke bekommt**. Danach die neue Lage in allen drei Kartenmodi
+   gegenprüfen — der Pfeil erscheint nur bei `kompakt` und `stapel`.
+
+   **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
+   Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
+
+9. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+
+   Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
+   Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
+   **benannt statt beschrieben** — gut, denn dann muss sie nicht gestaltet,
+   sondern nur übernommen werden.
+
+   **Zuerst den Ist-Wert auslesen** (`.sb-act-item` bzw. der Kopf des
+   Aufklappers), dann als **gemeinsames Token** führen statt an zwei Stellen
+   zu pflegen. Zwei Stellen, die auseinanderlaufen, sind hier schon mehrfach
+   die Ursache gewesen.
+
+   **Ein bekannter Nebenbefund gehört mitgeprüft:**
+   `.sb-actions-accordion-inner` misst `rgb(255,255,255)` **auch** in den
+   dunklen Fassungen `dealpilot` und `konsole` — weiße Fläche in dunkler
+   Leiste, im geschlossenen Zustand unsichtbar (`display:none`, 0 × 0) und
+   deshalb bei allen Kontrastläufen durchgerutscht. **Mit geöffnetem Menü
+   messen.** Wer die Farbe von dort übernimmt, übernimmt sonst einen Wert aus
+   einem Zustand, den niemand geprüft hat.
+
+   **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
+   entschieden ist.
+
+10. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+
+   **Marcels Bild davon, wörtlich zusammengefasst:**
+
+   - **DealPilot wird im dunklen Modus ausgeliefert.** Das ist der Standard.
+   - **Daneben ein heller Modus**, umschaltbar mit einem Griff — hell/dunkel.
+   - **In der Darstellung sind das zwei Profile.**
+   - **Der helle Modus besteht aus:** App-Darstellung „Panel", Objektkarten
+     „Standard", und dem kleinen DealPilot-Logo oben in der Ecke.
+   - **Ort:** Einstellungen → Profil und Anzeige, oder direkt unter
+     Darstellung. Wer es individueller will, klickt dort weiter auf
+     „Darstellung öffnen" und stellt einzeln ein.
+
+   **Das ist der größte der neuen Punkte** — nicht wegen des Aufwands,
+   sondern weil er die Bedienlogik des ganzen Bereichs neu ordnet: **ein
+   Griff für 95 % der Leute, das volle Panel für den Rest.** Genau die
+   richtige Richtung; heute muss jeder durch alle acht Farbfelder, um zu
+   einem stimmigen Bild zu kommen.
+
+   **Drei Fragen, die vor dem Bauen zu klären sind:**
+
+   1. **Was passiert mit einer eigenen Einstellung, wenn jemand umschaltet?**
+      Überschreiben (einfach, aber Arbeit weg), daneben behalten (freundlich,
+      aber wo steht sie), oder je Profil eigene Werte (sauber, aber die
+      Speicherstruktur wächst). **Mein Vorschlag: je Profil eigene Werte** —
+      `brand_display` ist `jsonb`, kostet also keine Migration, und genau
+      deshalb wurde es damals so angelegt.
+   2. **Was ist „das kleine DealPilot-Logo oben in der Ecke"** — das
+      Wortmarken-Bild, das heute die Sidebar trägt? Ein Bild aus
+      `design/mockups/` würde das in einem Satz klären.
+   3. **Was sieht ein Partner-Mandant?** Der hat ein eigenes Branding. Der
+      Schalter darf ihn nicht aus der Marke seines Partners werfen. Das ist
+      dieselbe Grenze, die `v1114` und `v1122` schon einmal gezogen haben.
+
+   **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
+   dann bauen.**
+
+11. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+
+   **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
+
+   **Der Grund, warum das überfällig ist, steckt im Aufbau:** die Plangrenzen
+   stehen an **drei Stellen von Hand** — `config.js` (das Gate),
+   `pricing-modal.js` (zwei Matrizen) und `landing/index.html`. Drei
+   Wahrheiten, die nur so lange übereinstimmen, wie jemand sie pflegt.
+   **Der Abgleich gegen die Landingpage, den Marcel verlangt, ist genau der
+   richtige Maßstab** — sie ist das, was der Kunde gelesen hat, bevor er
+   bezahlt hat.
+
+   **Was gemessen wird:**
+
+   | | |
+   |---|---|
+   | **Gate gegen Versprechen** | jede Grenze aus `config.js` gegen die Landing-Tabelle, Zeile für Zeile |
+   | **DB gegen Datei** | `hasFeature` fragt **zuerst die Datenbank** (`Sub.hasCachedFeature`) und `config.js` nur bei `null` — beide Wege prüfen, sie können auseinanderlaufen |
+   | **Unbekannte Schlüssel** | ein Schlüssel, den niemand kennt, ist **für jeden false, auch für Pro**. Ein Tippfehler sperrt also still den teuersten Plan |
+   | **Partner** | ist ein **Pro-Klon** plus `reseller`, `reseller_whitelabel`, `custom_logo` |
+   | **Bekanntes Leck** | der Bankexport blockt nur `starter` — **Free rutscht mit Wasserzeichen durch.** Stand als offene Entscheidung, ist nie gefallen |
+
+   **Dazu Marcels Frage zum Starter: sieben Tage voller Pro-Status.** Er
+   meint, das sei so umgestellt worden. **Ich kann das nicht bestätigen** — in
+   meinen Unterlagen steht es nicht, und ich schreibe es nicht als Tatsache
+   auf. **Erst messen, ob es überhaupt eingebaut ist**, dann die zweite Frage
+   stellen: beibehalten oder anders lösen. Wenn es drinsteht, gehört
+   mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
+   wurden, dürfen nicht unerreichbar werden.
+
+12. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+
+   Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
+   Rechenweg.**
+
+   ### Was Marcel will
+
+   - **In der Pre-Flight-Karte** („Top-Objekt") sollen per Sprache **alle**
+     Felder befüllbar sein, die es in Objekt, Investition, Miete,
+     Finanzierung, Bewirtschaftung und Steuer gibt.
+   - **Genanntes einsortieren, nicht wegwerfen:** Risiken und Mängel gehören
+     unter **bekannte Risiken**, ein genanntes Vorhaben unter
+     **Investitionsthese**.
+   - **Der Rest wird ein ordentlicher Text** unter **zusätzliche Notizen** —
+     alles, was sich nicht auswerten ließ, statt es zu verlieren.
+   - **Im QuickBoarding gibt es weniger Felder** — aber **dieselbe
+     Rechenlogik im Hintergrund.**
+   - **Beim „Als Objekt speichern"** öffnet sich ohnehin ein kleines Modal.
+     Dort soll stehen: *es gibt weitere Werte, die mit übernommen werden* —
+     **mit Auflistung**, und mit den Texten der Zusammenfassung.
+
+   ### Was davon schon steht — und was das für den Punkt heißt
+
+   **Die Doppelstruktur existiert bereits**, das ist die gute Nachricht:
+   `buildCatalog` ist die kuratierte Liste für den Orbit, `buildFullCatalog`
+   nimmt **alle** `window.FIELDS` für die Auswertung. Im QuickCheck-Kontext
+   wird auf `QC_IDS` gefiltert. Der Weg „wenig Felder vorn, volle Auswertung
+   hinten" ist also **angelegt** — es geht nicht um einen Neubau, sondern um
+   Vollständigkeit und um das, was der Nutzer davon sieht.
+
+   **Deshalb ist der erste Schritt eine Zählung, kein Entwurf:** wie viele
+   Felder kennt `buildFullCatalog` heute, wie viele stehen in den sechs
+   Reitern, **und welche fehlen?** Erst diese Differenz macht den Punkt
+   bezifferbar.
+
+   **Drei Dinge, die dabei zu klären sind:**
+
+   1. **Freitext ist etwas anderes als ein Feld.** Risiken, These und Notizen
+      sind Prosa; die Zuordnung „das war ein Mangel" trifft das Modell, nicht
+      ein Muster. Das ist der Teil, der wirklich neu ist.
+   2. **Nichts stillschweigend verwerfen.** Marcels Kernsatz ist „eigentlich
+      soll alles vernünftig ausgewertet werden" — der Auffangtext unter
+      Notizen ist die Zusicherung, dass nichts verschwindet. **Er ist Teil
+      des Punktes, kein Beiwerk.**
+   3. **Kerosin.** Eine längere Auswertung über alle Felder kostet mehr als
+      die heutige. Ob das den Preis ändert, ist eine Geldfrage → Marcel.
+
+   **Das Übernahme-Modal im QuickBoarding ist der sichtbarste Teil** und
+   gleichzeitig der billigste: es zeigt, was ohnehin schon übertragen wird.
+   Wenn dort steht, was alles mitkommt, versteht der Nutzer zum ersten Mal,
+   was die Spracheingabe geleistet hat.
+
+   **→ Zählung zuerst, dann Demo des Modals, dann bauen.**
+
+---
+
+13. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
@@ -144,141 +951,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-2. **ERLEDIGT — die Sachwertfaktor-Kette ist bewiesen, beide Wege.**
-   Am 2026-08-12 durchgefahren; der Punkt bleibt hier stehen, bis der
-   Erntebefund (Punkt 1) mit erledigt ist.
-
-   **Prüfobjekt selbst angelegt:** `PRUEF_ZFH Löhner Str. 278`
-   (`3fbb754c`, Seq 2026-1006) — EFH, 233 m², Bj 1964, Grundstück 700 m²,
-   2 Wohneinheiten, Standardstufe 3, NHK-Typ freistehend / Keller-Erd-Ober
-   / DG ausgebaut. **Bleibt als Prüfstrecke auf Staging liegen**, Stufe 3
-   ist dafür bezahlt — weitere Läufe kosten 0 L.
-
-   | Lauf | Faktor | Herkunft | Sachwert |
-   |---|---|---|---|
-   | ohne eigenen Wert | **0,925** | **Stufe A**, Grundstücksmarktbericht 2026 Kreis Herford, 5.1.2 (1658 Kauffälle) | **243.577 €** |
-   | mit eigenem Wert | **0,80** | **Stufe E**, eigene Angabe | **210.661 €** |
-
-   Der eigene Wert hat Vorrang vor dem amtlichen — genau wie vorgesehen.
-   Die Rechnung stimmt exakt: vorläufiger Sachwert 263.326 × 0,8 =
-   210.661 €, im Rechenweg Zeile für Zeile nachlesbar. Kerosin: **98 → 86**
-   für den ersten Lauf (12 L), der zweite **0 L**.
-
-   **Drei Fallen beim Anlegen, alle aus der stillen Ablehnung unbekannter
-   Auswahlwerte:** `objart: 'ZFH'` gibt es nicht (die Liste kennt nur ETW,
-   EFH, MFH, DHH, RH — ein Zweifamilienhaus läuft unter **EFH**, so wie
-   die NHK-Gebäudeart „Ein-/Zweifamilienhaus" heißt). `nhk_haus:
-   'freistehend'` ebenso nicht — dort sind es die Zahlen **1/2/3**. Und
-   die Wohneinheiten kamen über keinen der versuchten Schlüssel (`we`,
-   `units`, `anzahl_we`, `wohneinheiten`) an; im Formular gesetzt lief es.
-   **Der richtige Objekt-Schlüssel für Wohneinheiten ist noch offen.**
-
-   **Was dabei gefunden und behoben wurde — `v1144` (`d884836`):**
-   Der Sachwertfaktor wurde **nie** angewandt, an keinem Objekt, aus keiner
-   Quelle. `WertParameterService.sachwertfaktor()` und `hole()` liefern
-   beide `{ wert, stufe, quelle }`; gelesen wurde aber `param.sachwertfaktor`
-   — ein Feld, das keiner der beiden Rückgabewege setzt. `Number(undefined)`
-   ist `NaN`, also griff durchgehend der Zweig „kein Sachwertfaktor
-   verfügbar". Betroffen waren zwei Stellen: `lib/nhk2010.js:868` und
-   `CrossCheckService.js:171`. Bei den ETW fiel es nie auf, weil dort
-   ohnehin keiner angesetzt werden darf — **bei jedem Haus hätte es still
-   den vorläufigen Sachwert ausgewiesen.**
-
-   **Mitgefixt, weil der erste Fix es nötig machte:** Die Objektart-Sperre
-   lag nur im Tabellenweg (`sachwertfaktoren_nrw.js:134`). Mit korrektem
-   Feldnamen hätte ein gepflegter Wert bei einer Wohnung plötzlich
-   gegriffen — am Prüfobjekt wären aus 268.172 € **308.398 €** geworden,
-   ein Modellbruch nach § 10 ImmoWertV. Die Sperre sitzt jetzt zentral in
-   `WertParameterService.sachwertfaktor()` und gilt für beide Wege.
-
-   **Gegengemessen nach dem Ausrollen:** ETW unverändert bei 268.172 €,
-   `marktangepasst: false`, Grund weiterhin `objektart_nicht_abgeleitet` —
-   keine Regression.
-
-   **Offen bleibt der eigentliche Nachweis.** Dafür braucht es ein
-   EFH/ZFH-Objekt. Ein Funktionslauf im Container scheiterte an der
-   NHK-Typkennung: `sachwert()` verlangt einen Gebäudetyp aus
-   `NHK_2010.typen` (`1.01`, `1.11`, …), den erst der Orchestrator aus
-   `nhkHaus`/`nhkGeschosse`/`nhkDach` zusammensetzt. **Beim Aufgreifen
-   entweder den Typ direkt setzen oder ein echtes Haus anlegen** —
-   `Löhner Str. 278`, 32120 Hiddenhausen (ZFH, Verkehrswert 350.094,36 €)
-   aus `CLAUDE.md` wäre der Kandidat. **Kostet 12 L, Marcel fragen.**
-
-3. **Ein gepflegter Sachwertfaktor wird stillschweigend verworfen.**
-   Gemessen am 2026-08-12 an Hermannstraße 9: Im Feld stand **1,15**, im
-   Payload kam `sachwertfaktor: 1.15` sauber an — der Bericht rechnet ihn
-   trotzdem nicht. Zu Recht, denn für eine ETW gibt es keinen
-   Sachwertfaktor (`sachwertfaktor_grund: "objektart_nicht_abgeleitet"`).
-
-   **Der Nutzer erfährt davon nichts.** Er trägt einen Wert ein, es
-   passiert nichts, und kein Feld sagt warum. Seit `v1143` steht der Grund
-   immerhin an der Sachwert-Karte („warum vorläufig?"), aber **nicht am
-   Eingabefeld**, wo die Angabe gemacht wird.
-
-   **BEHOBEN in `v1145` (`1ea582d`).** Zweifach, weil ein Klick-Hinweis
-   allein nichts nützt — gemerkt hätte es weiter niemand:
-
-   - **Sichtbar ohne Klick:** unter dem Feld steht bei ETW/MFH/Gewerbe
-     „Für diese Objektart ohne Wirkung — Sachwertfaktoren werden nur für
-     Ein- und Zweifamilien-, Doppel- und Reihenhäuser abgeleitet."
-   - **Die Feldhilfe** erklärt den Grund samt § 10 ImmoWertV und dass bei
-     einer Wohnung ohnehin das Vergleichswertverfahren führt.
-
-   `ankerZeigen()` taugte dafür nicht — es hängt am **eigenen** Feldwert,
-   hier entscheidet die Objektart nebenan. Und das Feld entsteht erst im
-   Block `wm-b3`, ein einmaliger Aufruf beim Start verpufft; deshalb hört
-   die Prüfung am `document` mit.
-
-   **Gegengemessen an beiden Objektarten:** Hermannstraße 9 (ETW) zeigt
-   Hinweis und Feldhilfe, `PRUEF_ZFH` (EFH) zeigt **keinen** — und er
-   verschwindet beim Wechsel der Objektart von selbst.
-
-4. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
-   Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
-   `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
-   das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
-   Kenntnis davon, dass nur ein Anteil bewertet wird.
-
-   **Teilweise ist das unschädlich, und zwar genau geprüft:**
-   - Der **Gebäudeteil** ist über die BGF der Wohnung bemessen (195 m² bei
-     100 m² Wohnfläche), also implizit anteilig.
-   - Die **Außenanlagen** entstehen als Prozentsatz des Gebäudewerts
-     (`nhk2010.js:797`) und skalieren damit automatisch mit.
-   - Der **Bodenwert** kommt MEA-gekürzt aus dem Ertragswert-Kern.
-
-   **Offen bleibt die Garage:** `garagen_bgf_qm` ist ein **roher
-   Eingabewert**, der ungekürzt durchläuft. Am Prüfobjekt stehen dort
-   **64,58 m² × 485 €/m² × 2,02 = 37.118 €** — für eine einzelne Wohnung
-   in einem Haus mit drei Einheiten viel. Ist der Wert für das gesamte
-   Grundstück gepflegt, ist der Sachwert um bis zu ~18.500 € zu hoch.
-
-   **Das ist eine Eingabefrage, kein Rechenfehler** — der Kostenhinweis
-   sagt wörtlich „Der Bericht rechnet mit dem, was hier steht." Zu klären
-   ist, ob das Feld wohnungs- oder gebäudebezogen gemeint ist, und ob die
-   Feldhilfe das sagt. **Marcel entscheidet das fachlich.**
-
-5. **Neun Info-Zeichen in der Wertermittlung tun nichts.** Beim Setzen des
-   Garagen-Hinweises (`v1142`) aufgefallen und dann durchgezählt:
-   `wertermittlung.js` vergibt **18** Hilfe-Schlüssel, `TEXTE` in
-   `feldhilfe.js` führt **11** (mit dem neuen). `textFuer()` kennt keinen
-   Rückfall — fehlt der Schlüssel, gibt sie `null` zurück und der Klick
-   verpufft **still**. Das ⓘ steht trotzdem am Feld und verspricht eine
-   Erklärung.
-
-   Ohne Text sind:
-   `aussenPct`, `ausstGewerk`, `bauteilHk`, `garagenStufe`, `grundriss`,
-   `hinterland`, `hinterlandRent`, `modGrad`, `standardstufe`.
-
-   Das sind ausgerechnet die **erklärungsbedürftigsten** Felder der
-   Wertermittlung — Standardstufe, Modernisierungsgrad und
-   Hinterland-Rentierlichkeit entscheiden erheblich mit, und
-   `hinterlandRent` steuert direkt die Bodenwertverzinsung nach § 41.
-
-   **Zwei Dinge zu tun:** die neun Texte schreiben, und `textFuer()` beim
-   Fehlen eines Schlüssels **laut** sein lassen (`console.warn`) statt
-   still — ein stiller Rückfall sieht aus wie ein bestandener Lauf.
-
-6. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+14. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -376,220 +1049,504 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-7. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen
-   als Popover statt Blatt von unten. Dazu die Admin-Oberfläche auf Tablet
-   prüfen. Der Score bleibt auf dem Tablet.
+15. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+   Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
+   `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
+   das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
+   Kenntnis davon, dass nur ein Anteil bewertet wird.
 
-   **Entwurf steht: `design/Vorschläge/tablet-fassung.md`** (2026-08-10,
-   gemessen bei 820 × 1180 im gleich-Origin-iframe).
-   **BLOCKIERT auf zwei Entscheidungen** — A (ab welcher Breite dockt die
-   Sidebar an) und B (wie wird der Score flacher). B braucht ein **Bild**,
-   weil es die auffälligste Fläche der App betrifft.
+   **Teilweise ist das unschädlich, und zwar genau geprüft:**
+   - Der **Gebäudeteil** ist über die BGF der Wohnung bemessen (195 m² bei
+     100 m² Wohnfläche), also implizit anteilig.
+   - Die **Außenanlagen** entstehen als Prozentsatz des Gebäudewerts
+     (`nhk2010.js:797`) und skalieren damit automatisch mit.
+   - Der **Bodenwert** kommt MEA-gekürzt aus dem Ertragswert-Kern.
 
-   **Zwei Angaben dieses Punktes waren überholt und sind ersetzt:**
+   **Offen bleibt die Garage:** `garagen_bgf_qm` ist ein **roher
+   Eingabewert**, der ungekürzt durchläuft. Am Prüfobjekt stehen dort
+   **64,58 m² × 485 €/m² × 2,02 = 37.118 €** — für eine einzelne Wohnung
+   in einem Haus mit drei Einheiten viel. Ist der Wert für das gesamte
+   Grundstück gepflegt, ist der Sachwert um bis zu ~18.500 € zu hoch.
 
-   | stand hier | gemessen 2026-08-10 |
-   |---|---|
-   | Kopfleiste **589 px** | **348 px** — 41 % weniger |
-   | `#hdr-badges` **492 px** | **251 px** |
-   | „die fünf KPI-Pillen brechen zu je zwei um" (W43) | **falsch** — `.scores` ist `grid` mit `nowrap`, die fünf Pillen stehen **nebeneinander**, je 149 × 103 px |
+   **Das ist eine Eingabefrage, kein Rechenfehler** — der Kostenhinweis
+   sagt wörtlich „Der Bericht rechnet mit dem, was hier steht."
 
-   **Der eigentliche Befund ist ein anderer:** das Tablet bekommt die
-   **Handy-Fassung, nur breiter**. Die Sidebar steht `position:fixed` bei
-   `left:-380px`, `.main-col` nimmt die vollen **820 px** für eine Spalte.
-   Für den Inhalt bleiben **776 von 1180 px** — die Kopfleiste frisst
-   29,5 % des Schirms.
+   **BLOCKIERT:** Ob das Feld wohnungs- oder gebäudebezogen gemeint ist,
+   entscheidet Marcel fachlich — davon hängt ab, ob dort eine MEA-Kürzung
+   hingehört oder nur eine deutlichere Feldhilfe (die seit `v1142` steht
+   und den fehlenden Abzug bereits benennt).
 
-   **Ein eigener Rechenfehler, im Entwurf gleich zurückgenommen:** Ich
-   hatte für „Pillen neben den Hauptblock" 121 px geschätzt. Falsch —
-   zwei Pillenreihen sind `2 × 103 + 7 = 213` px und damit **höher als der
-   121-px-Hauptblock**. Die Umstellung allein spart **18 px**, nicht 130.
-   **Die Höhe des Blocks bestimmt die Pille, nicht der Hauptblock**; der
-   Gewinn (~110 px) kommt erst mit der flacheren Pille dazu.
+## Später
 
-   **Die Admin-Oberfläche ist nicht gemessen** — sie hängt an einem
-   Admin-Konto, das dieser Prüflauf nicht hatte. Erste zu erhebende Zahl
-   dort: die Zahl der Media-Queries in der Datei, wie bei `v1112b`.
+- **`exportPdf()` erzeugte bei einem wiedergegebenen Bericht keine Ausgabe.**
+  Beim Nachweis zu `v1149` gemessen: Report 73 über `/reports/one` geholt
+  (voller Datensatz: `ref` `meta` `rent` `sale` `macro` `micro` `zensus`
+  `address` `dealpilot` `valuation` `assessment` `deal_score` `land_value`
+  `cross_check` plus `report_md`), dann `exportPdf(out)` aufgerufen. **Kein
+  Fehler, aber null `doc.text`-Aufrufe** — die Funktion steigt still aus.
+  **Nicht getrennt ist, ob das am Produkt liegt oder am Messaufbau** (der
+  Patch überschrieb neben `text`/`addPage`/`save` auch `output()`, und wenn
+  `exportPdf` seinen Blob über `output()` holt, könnte das der Grund sein).
+  **Erst trennen, dann urteilen:** denselben Lauf ohne `output`-Patch
+  wiederholen. Ist es das Produkt, wäre es ein echter Befund — ein
+  wiedergegebener Bericht ohne PDF.
 
-8. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
-   Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
-   Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
+- **Die eingeklappte Leiste hat kein Bedienelement.** Beim Regressionstest zu
+  `v1148` gemessen (1100 px): die CSS-Regeln für den 66-px-Rail existieren
+  (`css/style.css:32816` und `:33060`, `body.dp-sidebar-collapsed`) und
+  funktionieren einwandfrei, wenn man die Klasse setzt — **aber
+  `#dp-sb-toggle` gibt es im DOM nicht**, und es existiert keine globale
+  Toggle-Funktion (`toggleSidebar`, `dpSbToggle`, `sbToggle` — alle nicht
+  vorhanden). Die Treffer auf `[class*=collapse]` sind `v212-collapse-toggle`,
+  also Aufklapper **im Inhalt**. Entweder gehört der Weg dorthin gebaut oder
+  die Regeln gehören weg — **erst entscheiden, dann anfassen**, und vorher
+  prüfen, ob der Zustand über einen anderen Weg (Tastatur, Einstellungen,
+  gemerkter Merker) doch erreichbar ist.
 
-   - **23 Ankreuzfelder messen 13 × 13 px**, verteilt über fünf Reiter
-     (Investition, Miete, Finanzierung, Steuer, Pilot-Analyse). Jedes hat
-     ein Label, aber die Labels sind **16 bis 36 px** hoch — also selbst
-     unter 44. `v1112` hat diese Bauart im Einstellungs-Modal ausdrücklich
-     als tragbar abgenommen („Checkboxen mit eigenem Label als
-     Trefferfläche"); im Formularbereich trägt das Argument schwächer, weil
-     die Zeilen dichter stehen. Sie app-weit zu vergrößern ändert die
-     Zeilenhöhe überall — **das ist eine Gestaltungsentscheidung.**
-   - **`.sbc-arrow` misst 20 × 20 px und ist ein echtes Bedienelement.**
+- **Drei Befunde aus der Konsolidierung der Projektanweisung (2026-08-12).**
+  Beim Zusammenführen von `PROJEKTANWEISUNG.md` gemessen, nicht gebaut:
 
-     **Mein v1118-Befund war falsch und wird hiermit zurückgenommen.** Ich
-     hatte gemeldet, der Pfeil trage `role="button"` „ohne eigenen Klick"
-     und die Rolle sei irreführend. Nachgelesen in `karten-kompakt.js`
-     (v1092): Rolle, `tabindex="0"` und `aria-label` werden dort
-     **absichtlich** gesetzt — und zwar nur, wenn der Kartenmodus
-     `kompakt` oder `stapel` aktiv ist. Dort **klappt der Pfeil die Karte
-     auf und zu** (`umschalten()`), über einen **delegierten** Listener.
-     Mein Prüfausdruck hat nur `getAttribute('onclick')` abgefragt und
-     einen delegierten Handler deshalb nicht gesehen.
+  1. **`frontend/style.css` ist eine Leiche** — 27.477 Zeilen, 842 KB, Stand
+     03.08., und **keine einzige** HTML-Datei lädt sie. Gegenprobe:
+     `grep -o 'href="[^"]*style\.css[^"]*"' frontend/*.html` liefert genau
+     einen Treffer, und der zeigt auf `css/style.css`. Die alte
+     Projektanweisung behauptete das Gegenteil — wer ihr folgte, patchte die
+     tote Datei. Löschen ist ein **eigenes Paket, nie am Rollout-Tag**.
+  2. **`_dpDispSkin` ist doppelt definiert** — `js/settings.js:3130` und
+     `:3364`. In JS gewinnt die letzte; nur die schaltet zusätzlich
+     `dp-hdr-compact`. Die tote erste Fassung entfernen, eigenes Paket.
+  3. **Der Vorwegsetzer kennt zwei Werte nicht.** `index.html:46`
+     (`v1082-uv-boot`) führt bei `data-ui-cards` nur `['kompakt','wallet']` —
+     **`stapel`** (v1095) fehlt, und `data-ui-form` (v1098) fehlt ganz. Folge:
+     für diese Nutzer blitzt beim Neuladen die DealPilot-Fassung auf, genau
+     das, was der Setzer verhindern soll. Zwei Zeilen — **geht im nächsten
+     Frontend-Paket mit**, kein eigenes Vorhaben.
 
-     **Was bleibt, ist ein anderer, echter Befund:** ein Bedienelement mit
-     eigener Funktion misst **20 × 20 px** — deutlich unter der
-     44-px-Trefferfläche aus v650/v652.
+- **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
+  Vorhaben mit eigener Prüfstrecke, nicht nebenbei. **Wird durch die Handy-Freigabe (v1118)
+  größer, nicht kleiner** — mit der Freigabe fürs Handy trägt die normale
+  Ansicht allein, was vorher auf zwei Fassungen verteilt war.
 
-     **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:**
-     Pfeil und Karte tun **Verschiedenes** — der Pfeil klappt auf, der
-     Kartenkörper öffnet das Objekt. Eine 44-px-Pseudofläche würde der
-     Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
-     eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
+- **`gold-audit.py` auf RC=0 bringen** — 484 Fundstellen in 57 Dateien,
+  Altlast. Die neuen Dateien tragen davon **keine einzige**. Eigenes
+  Vorhaben, weil jede Fundstelle einzeln beurteilt werden muss.
 
-9. **Marktbericht neu gestalten.**
-   **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
-   (2026-08-11, anklickbar, im Browser durchgeprüft).
+- **`body.dp-chrome-hell` auflösen** — 105 gewachsene Regeln hängen daran.
+  Bei „Skin-Schalter und Darstellung" wurde bewusst **gekoppelt statt
+  gelöscht**; das Entfernen bleibt ein eigenes Vorhaben mit eigener
+  Prüfstrecke.
 
-   ### Marcels Entscheidung vom 2026-08-11 — sie ersetzt die vom 2026-08-10
+- **Zwei Nachweise, die aus Abnahmen offen geblieben sind** — jeweils
+  gemessen und beschrieben, nur nie am echten Gerät bzw. mit echten Daten
+  bestätigt:
+  - **Marktbericht auf dem Handy (v1077):** ein echter Klick auf den
+    PDF-Knopf (Datei lädt herunter), die **Zwei-Finger-Geste** auf der
+    Karte (hängt an `matchMedia('(hover:none)')`, greift im Prüfbrowser
+    nicht) und das **Erzeugen** eines neuen Berichts bei 390 px (kostet
+    5 L und hängt an einem `window.confirm`). Eigener Namensraum v1077,
+    nicht mit der Haupt-App mischen. **Wird mit der Handy-Freigabe (v1118) dringender:** nach
+    der Freigabe kommen echte Nutzer auf diesem Weg an.
+  - **Tabelle der geteilten Pässe** — die Scroll-Regel steht, das
+    Testkonto war leer, der Nachweis fehlt.
 
-   „Nummer 1 und dein Vorschlag" — also **Idee 1 (Wizard mit Reitern)**,
-   kombiniert mit **Idee 2 (lebende Vorschau)** und **Idee 6 (sichtbarer
-   Zweig)**, wie empfohlen. Wörtlich dazu:
+---
 
-   - **Die drei Stufen sollen vereint werden**, nicht vorher abgefragt:
-     einfache Bewertung, erweiterte Marktpreisindikation und genaue
-     Wertermittlung in **einem** Weg.
-   - **Es soll übersichtlich sein.**
-   - **Am Schluss das Ergebnis wie jetzt.**
-   - **Die Übersicht bleibt vollständig:** Objekte einlesen, die Tabelle
-     der vorhandenen Marktberichte, und ein angelegtes Objekt direkt
-     auswählen. „Das ist ja quasi die Übersicht."
+## Fertig
 
-   **Damit ist die Festlegung vom 2026-08-10 überholt** — dort hieß es noch
-   „nur die genaue Wertermittlung bekommt einen Wizard, Stufe 1 und 2
-   bleiben". Jetzt ist es **ein** Weg für alle drei.
+<!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
 
-   ### Wie die Stufen vereint werden
+- [2026-08-12] **Die Differenz-Formel stand zweimal — jetzt eine Quelle** — `v1154`, `99a14db`.
+   Sie stand in `_kerosinKosten()` (was **abgebucht** wird) und in
+   `GET /stufenpreis` (was **angekündigt** wird). Beide rechneten dasselbe —
+   Zeile für Zeile nachgeprüft. **Genau das ist die Gefahr:** laufen sie
+   auseinander, wird 3 L angekündigt und 5 L gebucht. Das ist im Haus schon
+   passiert (Marcels GELD-Befund „Stufe 1 bewirbt 2 L, abgebucht werden 5 L",
+   behoben in `v1125`).
 
-   Als **drei Meilensteine auf einem Weg** statt als Frage vorweg. Man kann
-   an jedem stehenbleiben und erzeugen:
+   Jetzt eine Funktion `_aufpreis(stufe, bezahlt)` mit zwei Aufrufern.
+   **Verhalten unverändert, bewiesen** in node über alle 12 Kombinationen
+   (Stufe 1–3 × bezahlt 0–3): alte Abbuchung = alte Auskunft = neue Quelle.
 
-   | Meilenstein | erreicht nach | heute |
+   | bezahlt | Stufe 1 | Stufe 2 | Stufe 3 |
+   |---|---|---|---|
+   | 0 | 2 L | 5 L | 12 L |
+   | 1 | 0 | **3 L** | 10 L |
+   | 2 | 0 | 0 | **7 L** |
+   | 3 | 0 | 0 | 0 |
+
+   Die 3 L und die 7 L sind genau Marcels Vorgabe — und die 7 L stehen als
+   echter Vorgang im Kerosin-Log.
+
+   **Rebuild gefahren** (Backend, keine Migration): Marker im laufenden
+   Container `docker exec … grep -c` = 2, Logs ohne Ausnahme, `/stufenpreis`
+   live geprüft und **identisch zum Stand vor dem Umbau**
+   (`bezahlte_stufe 0`, `faellig {1:2, 2:5, 3:12}`, kein Fallback-Pfad).
+
+- [2026-08-12] **`BEDARF` und `VERFAHREN[].pflicht` bleiben getrennt — eigene Empfehlung zurückgenommen** — kein Code geändert.
+   Ich hatte nach `v1152` notiert, die beiden Listen der Pflichtangaben
+   „gehören zusammengeführt". **Das war voreilig.** Vor dem Bauen gemessen:
+
+   - **`BEDARF`** (`mb-stufen.js`) beantwortet: *was braucht die **Stufe**,
+     damit der Nutzer sie erreichen und kaufen kann?* → Nutzerführung, Preis,
+     Meilensteinleiste.
+   - **`VERFAHREN[].pflicht`** (`wertermittlung.js`) beantwortet: *was braucht
+     ein **Verfahren**, um zu rechnen?* → Rechenqualität, Ampel.
+
+   **Das sind verschiedene Fragen.** Der Fehler in `v1152` war nicht, dass es
+   zwei Listen gibt, sondern dass die Knopfsperre die Verfahrensliste gegen
+   die falsche Stufe hielt (`ab` statt `genauerAb`). Eine Verschmelzung würde
+   zwei Zwecke in einen Topf werfen und wäre ein Rückschritt.
+
+   **Der scheinbare Widerspruch löst sich auf.** `markt.pflicht` enthält
+   `baustatus`, `BEDARF` führt ihn erst auf Stufe 2 — kollidieren kann das
+   nicht: das `<select id="baustatus">` hat **keine leere Option**, die erste
+   ist `bestand`. Es trägt also **immer** einen Wert und kann nie als
+   „fehlend" erscheinen. Das erklärt auch, warum es beim Leerversuch nicht in
+   der Fehlt-Liste auftauchte.
+
+   **Stehen gelassen, mit Absicht:** ein Pflichtfeld, das nie leer ist, tut
+   keinen Schaden. Es zu verschieben wäre erst dann eine echte Änderung, wenn
+   das Feld einmal eine leere Option bekommt — **dann** greift die Prüfung
+   plötzlich, und dann gehört sie geprüft. Als Merkposten hier festgehalten,
+   statt heute blind aufzuräumen.
+
+- [2026-08-12] **Die Schrittleiste hat eine zweite Darstellung fürs Handy** — `v1153` + `v1153b`, `7fb691f`.
+   **Marcels Befund:** „Es muss auf dem Handy funktionieren. Eine
+   siebenteilige Schrittleiste nebeneinander und ein Handy schließen sich aus
+   — der Entwurf braucht **zwei** Darstellungen derselben Führung, nicht eine
+   gequetschte." **Marcels Wahl aus der Demo: Fassung C, die Klappleiste.**
+
+   **Gebaut um dieselben Knöpfe.** Unter 900 px wird `#mbw-reiter` zur
+   senkrechten Liste, darüber bleibt alles wie es ist. **Kein zweiter
+   Reiter-Satz** — sonst laufen zwei Listen auseinander (Lehre aus v1096b und
+   v1112b). Schwelle 900 px: dieselbe, an der die App auf den Drawer
+   umschaltet, also zwei Fassungen und keine dritte Zwischenform.
+
+   **Nachgemessen am ausgerollten Stand** (`mb-wizard.js?v=1153b` im iframe
+   bestätigt):
+
+   | Fenster | Führung | Kopfzeile | Liste |
+   |---|---|---|---|
+   | 390 px | **55 px** (vorher 188) | sichtbar, „1/7 Übersicht ▸", Balken 14 % | versteckt |
+   | 820 px | **55 px** | sichtbar | versteckt |
+   | 1024 px | 49 px | **unsichtbar** | 7 Marken in **einer** Zeile |
+
+   **Alle drei Verhaltensregeln geprüft, über den Bedienweg (echte Klicks):**
+   1. **Standard ist zu** — wer auf dem Handy ankommt, sieht Felder, kein Menü.
+   2. **Aufklappen** → 7 Marken, Zeilenhöhe **48 px** (über dem 44-px-Maß),
+      Liste 348 px, `aria-expanded=true`.
+   3. **Wahl aus der Liste** → Schritt gewechselt („3/7 Zustand") **und
+      zugeklappt**; **„Weiter"/„Zurück" lassen den Zustand unberührt** (offen
+      blieb offen, Kopfzeile zog mit auf „4/7 Ausstattung").
+   4. **Der Merker hält das Neuladen** (`dp_mb_leiste_zu`) — offen blieb offen.
+
+   ### `v1153b` — eigener Fehler, im ersten Prüflauf gefunden
+
+   `v1153` rief `klappBauen()` auf, **während die Reiterleiste noch nicht im
+   Dokument hing**. `reiter.parentNode` war `null`, das `insertBefore` lief
+   ins Leere, die Kopfzeile entstand nie — **`html.mbw-zu` wurde trotzdem
+   gesetzt.** Gemessen bei 390 und 820 px: null Marken, Höhe 0, keine
+   Kopfzeile. **Unter 900 px war damit überhaupt keine Führung sichtbar** —
+   schlimmer als der Zustand davor.
+
+   Zwei Änderungen: der Aufruf steht jetzt **nach** dem Einhängen, und
+   `klappBauen()` **weigert sich, `mbw-zu` zu setzen**, wenn die Kopfzeile
+   nicht gebaut werden konnte — der sichere Zustand ist *aufgeklappt*, die
+   Führung darf nie ganz verschwinden. Dazu eine Konsolen-Warnung statt eines
+   stummen Fehlschlags.
+
+   **Die Lehre, die über den Einzelfall hinausgeht:** ein Zustand, der etwas
+   **versteckt**, darf erst gesetzt werden, wenn der **Ersatz nachweislich
+   steht**. Sonst wird aus einem halb gescheiterten Aufbau eine leere Seite.
+   Verwandt mit `insertBefore` nur bei direktem Kind — hier hing der
+   Referenzknoten gar nicht im Dokument.
+
+- [2026-08-12] **Die Differenz-Abrechnung ist nachgewiesen — ohne einen Liter Kerosin** — kein Code geändert.
+   Der Punkt war als Klicktest geplant, der echtes Guthaben kostet
+   („Bucht Stufe 2 nach bezahlter Stufe 1 wirklich nur 3 L ab?"). **Er ist
+   nicht nötig** — der Nachweis liegt in vier Teilen vor, alle lesend erhoben.
+
+   **1 · Auskunft und Abbuchung rechnen dieselbe Formel.** Das war die
+   eigentliche Gefahr: zwei Codestellen, die auseinanderlaufen — dann wird
+   3 L angekündigt und 5 L gebucht (Marcels früherer GELD-Befund).
+
+   ```
+   /stufenpreis   faellig[s] = (bezahlt>=s) ? 0
+                    : max(0, STUFENPREIS[s] - (bezahlt>=1 ? STUFENPREIS[bezahlt] : 0))
+   _kerosinKosten  if (bezahlt >= st) return 0;
+                   if (bezahlt >= 1)  return max(0, voll - (STUFENPREIS[bezahlt]||0));
+   ```
+
+   Gleiche Fälle, gleiche Konstante `STUFENPREIS`, gleiche Quelle für
+   `bezahlt` (`aiCreditsService.bezahlteStufeMarktbericht`). **Deckungsgleich
+   — aber zwei Stellen.** Solange es zwei sind, können sie auseinanderlaufen;
+   als Punkt vermerkt.
+
+   **2 · In der Praxis belegt, an einem echten Vorgang.** Im Kerosin-Log
+   (`ai_credits_log`, Haupt-DB) steht für das ETW-Prüfobjekt:
+
+   | Objekt | cost | wert_stufe |
    |---|---|---|
-   | Einschätzung | Schritt 1 | Stufe 1 · 2 L |
-   | Marktpreisindikation | Schritt 2 | Stufe 2 · 5 L |
-   | Wertermittlung | Schritt 4 | Stufe 3 · 12 L |
+   | `07d89138…` (Hermannstraße 9) | **7 L** | 3 |
+   | `3fbb754c…` (PRUEF_ZFH) | 12 L | 3 |
 
-   **Niemand muss vorher wissen, was er braucht** — und wer bei
-   „Einschätzung" anfängt, sieht am Balken, dass zwei Angaben mehr die
-   Spanne halbieren.
+   **Die 7 L sind die Differenz 12 − 5**: dort wurde von bezahlter Stufe 2 auf
+   Stufe 3 vertieft, und es kostete den Aufpreis, nicht den vollen Preis.
+   Genau Marcels Vorgabe — bereits gelebt.
 
-   **Die Objektart steht in Schritt 1 und nirgends sonst**, weil
-   `istWohnung()` über **20 der 42 Felder** entscheidet. Ein Wizard, der
-   sie später fragt, müsste alles dahinter neu aufbauen.
+   **3 · Die Gutschrift ist kontobezogen, und das ist richtig.** Der Endpunkt
+   meldete für `PRUEF_ZFH` `bezahlte_stufe: 0` und die vollen Preise, obwohl
+   im Log 12 L stehen. **Kein Fehler:** die Zahlungen gehören
+   `info@junker-immobilien.io`, der Prüflauf lief unter einem anderen Konto.
+   `bezahlteStufeMarktbericht()` filtert auf `user_id` — jeder zahlt für seine
+   eigenen Abrufe.
 
-   ### Im Browser durchgeprüft
+   **Achtung für künftige Prüfläufe:** die Backlog-Angabe „Stufe 3 bezahlt,
+   weitere Marktberichte kosten 0 L" gilt **nur für das Konto, das bezahlt
+   hat.** Unter einem anderen Konto kostet derselbe Bericht voll.
 
-   Übersicht → Wizard → Ergebnis → zurück. Zweig gemessen: **ETW ergibt
-   vier Reiter** (Feinjustierung entfällt), **Haus fünf**; `mea` ist beim
-   Haus weg. Folgefelder: `hinterlandFlaeche=828` bringt `hinterlandRent`
-   und `hinterlandWert`, **und der getippte Wert bleibt erhalten** — die
-   Fokusfalle beim Neuzeichnen ist im Entwurf schon gelöst. Kein Querlauf,
-   keine Konsolenfehler.
+   **4 · Sieben Buchungen à 12 L auf dasselbe Objekt sind Altdaten, kein
+   Doppelzahlungsfehler.** `def6e516…` trägt sieben volle Buchungen — alle vom
+   **02.08.2026**, also **zehn Tage vor `v1125`**, das die Stufenpreise und die
+   Gutschrift eingeführt hat. Damals gab es weder `wert_stufe` noch eine
+   Ermäßigung. Datiert, bevor daraus ein Befund wurde.
 
-   **BLOCKIERT auf zwei Fragen, beide betreffen Geld:**
-   1. **Wann wird abgerechnet**, wenn die Stufe sich erst am Ende ergibt?
-      Vorschlag: beim Erzeugen, nach erreichter Stufe, Preis am Knopf.
-   2. **Darf man später vertiefen** — erst „Einschätzung", dasselbe Objekt
-      später auf „Wertermittlung" hochziehen — **und was kostet das dann?**
-      Vorschlag: nur die Differenz.
+   **Was ohne echten Doppelabruf offen bleibt:** der Durchlauf Stufe 1 → 2 im
+   **selben** Konto. Punkt 2 zeigt denselben Mechanismus von Stufe 2 → 3; ein
+   eigener Kauf würde nur die zweite Sprosse derselben Leiter prüfen.
+   **Deshalb kein Kerosin ausgegeben.**
 
-   **Was vor dem Entwurf gemessen sein muss:** welche Felder voneinander
-   abhängen. `garagenStufe` und `hinterlandRent` erscheinen nur nach echter
-   Nutzereingabe und werden bei programmatischem Setzen **nicht**
-   nachgezeichnet — ein Wizard, der das übersieht, verliert Eingaben.
+- [2026-08-12] **Stufe 1 war gesperrt, weil sie die Angaben von Stufe 3 verlangte** — `v1152`, `d17edac`.
+   **Marcels Befund** aus der Entwurfs-Durchsicht: „Der Erzeugen-Knopf lässt
+   sich nicht klicken, obwohl die Angaben für die einfache Einschätzung
+   vollständig sind. Das muss ja irgendwie möglich sein." **Das war der Kern
+   des ganzen Meilenstein-Gedankens** — steht der Knopf still, ist der Wizard
+   wieder ein Pflichtdurchlauf.
 
-   **Zwei feste Randbedingungen:** die Marktbericht-App ist **immer hell**
-   und lädt `whitelabel-override.js` **nicht** (Farbe läuft über
-   `mb-whitelabel.js`). Und `payload()` in `wertermittlung.js` bleibt die
-   Sammelstelle — **eine neue Oberfläche darf die Feldnamen nicht ändern**,
-   sonst hängt der Rechenkern daran.
+   **Reproduziert** (Stufe 1, ETW, alle vier Angaben aus `BEDARF` gefüllt):
+   der Knopf trug bereits **„Marktbericht erstellen · 2 L"**, war also über
+   die erreichte Stufe im Bilde — blieb aber `disabled`, und sein Titel nannte
+   als fehlend **„Grundstück (m²) · Wohneinheiten"**, die Pflichtfelder von
+   Ertrags- und Sachwert. Also die Angaben von **Stufe 3**.
 
-   ---
+   **Ursache: `ab` und `genauerAb` bedeuten Verschiedenes.** Ertrags- und
+   Sachwert stehen bewusst auf `ab: 1`, weil sie **immer** mitrechnen — „nur
+   mit Pauschalen" (v1018). Ihre Pflichtfelder brauchen sie erst bei
+   `genauerAb: 3`, wenn derselbe Kern mit echten Parametern rechnet.
+   `knopfSperren()` prüfte aber gegen `ab`.
 
-   ### Nachlese aus Marcels Durchsicht des Entwurfs, 2026-08-11
+   **Zu den zwei Listen** (`BEDARF` in `mb-stufen.js` gegen
+   `VERFAHREN[].pflicht` in `wertermittlung.js`): ich hatte hier notiert, sie
+   „gehören zusammengeführt". **Das ist zurückgenommen** — sie beantworten
+   verschiedene Fragen (Stufe für die Führung, Verfahren für die Rechnung)
+   und bleiben getrennt. Begründung und die Auflösung des scheinbaren
+   `baustatus`-Widerspruchs stehen unter Fertig.
 
-   Drei Befunde am Entwurf `marktbericht-wizard.html`, dazu eine
-   Verständnisfrage, die den Ablauf betrifft — **die ist die wichtigste.**
+   **Nicht angefasst: die Rechnung.** Fehlen `plot` und `units`, rechnet der
+   Quercheck wie vorgesehen mit Pauschalen. Die Sperre war der Fehler, nicht
+   das Ergebnis.
 
-   1. **Die Schrittleiste ist zu schmal.** „Die Punkte 1–7 sollten schon
-      nebeneinander passen." Sie brechen also um oder werden gestaucht.
-      **Messen, nicht schätzen:** die tatsächliche Breite der sieben
-      Marken bei 1024, 1280 und 1920 px, dann entscheiden, ob die Leiste
-      breiter wird, die Marken schmaler oder die Beschriftung kürzer. Eine
-      Leiste, die den Weg zeigen soll, darf ihn nicht selbst zerlegen.
+   **Nachgewiesen am ausgerollten Stand** (`wertermittlung.js?v=1152` im
+   Browser bestätigt), beide Richtungen, ohne einen einzigen Abruf
+   (`confirm` abgefangen, **kein Kerosin verbraucht**):
 
-   2. **Der Erzeugen-Knopf lässt sich nicht klicken, obwohl die Angaben für
-      die einfache Einschätzung vollständig sind.** Marcel: „das muss ja
-      irgendwie möglich sein." **Das ist der Kern des ganzen
-      Meilenstein-Gedankens** — wer bei „Einschätzung" stehenbleiben will,
-      muss dort auch erzeugen können. Steht der Knopf still, ist der Wizard
-      wieder ein Pflichtdurchlauf und die Vereinigung der drei Stufen
-      wertlos.
+   | Stufe | `plot`/`units`/`mea` | Knopf | Kasten |
+   |---|---|---|---|
+   | **3** | leer | **gesperrt** | nennt genau diese drei |
+   | **1** | leer | **klickbar**, „· 2 L" | keiner |
 
-      **Eine Ursache ist gefunden und behoben (2026-08-11, `v1136c`) —
-      wahrscheinlich nicht die einzige.** Beim Durchmessen der Kette für
-      den Objekt-Reiter gemessen: `mapCond()` in `mb-objektwahl.js` ordnete
-      den Zustand **„gut"** keiner einzigen Option des Berichtsfeldes zu und
-      ergab `null`. Der Zustand ist Pflicht für die Marktpreisindikation,
-      und `erreicht()` in `mb-stufen.js` ist eine **Kaskade** — ohne Stufe 2
-      ist Stufe 3 unerreichbar. Der **häufigste Zustandswert überhaupt**
-      hat den Bericht also gesperrt, und die Ampel zeigte an Stufe 3
-      „fehlt: " **ohne Inhalt**, weil dort tatsächlich nichts fehlte.
+   **Zwei Beobachtungen am Rand, keine Behauptungen:**
+   - Beim Herunterstufen auf 1 fand mein Selektor **kein anklickbares
+     Bedienelement** für den Meilenstein „Einschätzung"; ich musste
+     `setStufe(1)` nutzen. Laut `v1126c` soll der Meilenstein anklickbar sein
+     — **mein Selektor kann zu eng gewesen sein**, das gehört gegengeprüft,
+     bevor daraus ein Befund wird.
+   - `baustatus` steht in `markt.pflicht`, in `BEDARF` aber erst auf Stufe 2.
+     Beim Leeren erschien er trotzdem nicht in der Fehlt-Liste. Ungeklärt,
+     ohne Auswirkung auf diesen Fix — notiert, damit es nicht verloren geht.
 
-      Zwei Lehren für den Wizard:
-      - **Eine Stufe kann vollständig sein und trotzdem gesperrt** — weil
-        eine frühere es nicht ist. Die Beschriftung muss den **wirklichen**
-        Grund nennen, nicht die leere Liste der eigenen Stufe.
-      - **Beide Optionslisten gehören gegeneinander geprüft**, nicht per
-        Heuristik verknüpft. Die alte Fassung verglich fünf
-        Anfangsbuchstaben, und „sanie" steckt auch in
-        „sanierungsbedürftig" — **„stark sanierungsbedürftig" kam als
-        „saniert" an**, ein Fehler mit falschem Vorzeichen.
+   **Hinweis für den nächsten Prüflauf:** im Testbrowser sind `plot`, `units`
+   und `year` verändert und die Stufe steht auf 1 (localStorage-Formularstand,
+   keine gespeicherten Objektdaten). Vor der nächsten Messung mitlesen.
 
-   3. **Es muss auf dem Handy funktionieren.** Seit `v1118` landen echte
-      Nutzer bei 390 px in der normalen Ansicht. Eine siebenteilige
-      Schrittleiste nebeneinander und ein Handy schließen sich aus — der
-      Entwurf braucht **zwei** Darstellungen derselben Führung, nicht eine
-      gequetschte.
+- [2026-08-12] **Die sieben Reiter brachen um, obwohl Platz war** — `v1151`, `7c716ab`.
+   **Marcels Befund** aus der Entwurfs-Durchsicht: „Die Punkte 1–7 sollten
+   schon nebeneinander passen."
 
-   **Und die Aufgabe, die über allen dreien steht: den Ablauf einmal
-   vollständig durchspielen.** Marcel: „das muss ja Sinn machen, auch von
-   der Reihenfolge her." Zu klären ist damit nicht die Optik, sondern die
-   **Freischaltlogik**:
+   **Gemessen statt geschätzt** (Messkabine, iframe auf `/impressum.html`,
+   Marktbericht-App direkt): die sieben Marken brauchen zusammen **902 px**
+   (117 · 94 · 105 · 131 · 171 · 149 · 133). Ihr Behälter `#mbw-reiter` stand
+   aber bei **jeder** Fensterbreite auf **760 px** — auch bei 1920 px, wo der
+   Eltern-Container `.panel` **1300 px** breit ist. Der Platz war da; die
+   Leiste begrenzte sich selbst und brach in zwei Zeilen um (Oberkanten 374
+   und 421). Kein Überlauf, nichts beschnitten — sie wickelte um.
 
-   - **Welche Felder machen welchen Meilenstein voll?** Für jede der drei
-     Stufen die Pflichtangaben benennen — aus dem, was das Backend
-     tatsächlich braucht, nicht aus dem Bauchgefühl. Solange das nicht
-     gemessen ist, ist jeder Freischaltzustand geraten.
-   - **Der Knopf zeigt, was er gerade erzeugt.** Beschriftung und Preis
-     wandern mit dem erreichten Meilenstein mit. Er ist **nie** tot,
-     solange mindestens die Einschätzung vollständig ist.
-   - **Die Reihenfolge der sieben Schritte muss den Meilensteinen folgen.**
-     Wenn Schritt 1 die Einschätzung trägt und Schritt 2 die
-     Marktpreisindikation, darf kein Pflichtfeld der Einschätzung in
-     Schritt 5 stehen. Genau das ist zu prüfen — und es ist der
-     wahrscheinlichste Grund dafür, dass der Knopf still bleibt.
-   - **Die Objektart bleibt in Schritt 1.** `istWohnung()` entscheidet über
-     20 der 42 Felder; sie später zu fragen hieße, alles dahinter neu
-     aufzubauen.
+   **Ursache: ein Sammelselektor aus `v1128`**, der `#wm-ziel`,
+   `.mbw-reiter`, `.mbw-blatt`, `.mbw-nav`, `.mbw-fuss` und `#wm-ampel`
+   gemeinsam auf 760 px setzt. Für Formularzeilen und Text ist das gut
+   begründet („eine Formularzeile über 1.278 px wäre unlesbar"). **Die
+   Reiterleiste ist aber keine Formularzeile, sondern Navigation** — ein
+   Selektor, der beides gleich behandelt, gibt einem von beiden das falsche
+   Maß. Dieselbe Familie wie die `:not(#id)`-Lehre: **Sammelregeln treffen
+   Elemente mit verschiedenen Bedürfnissen.**
 
-   **Das gehört in den überarbeiteten Entwurf, nicht in den Code** — erst
-   die Führung durchspielen und zeigen, dann bauen. Die beiden offenen
-   Geldfragen oben (wann wird abgerechnet, was kostet das Vertiefen)
-   hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
-   feststeht, wann ein Meilenstein als erreicht gilt.
+   **Gelöst:** eigene Grenze `max-width:960px` für `.mbw-reiter`, 58 px Luft
+   über dem gemessenen Bedarf für längere Beschriftungen. Zentriert wie
+   zuvor, damit sie über dem 760er-Inhalt ausgerichtet bleibt.
+   `flex-wrap:wrap` bleibt der Rückfall.
 
-10. **Der Staging-Server trägt 319 Zeilen, die im Repo nicht stehen.**
+   **Nachgemessen am ausgerollten Stand** (`mb-wizard.js?v=1151` im iframe
+   bestätigt):
+
+   | Fenster | Behälter | Zeilen | Überlauf |
+   |---|---|---|---|
+   | 1920 px | 960 | **1** | nein |
+   | 1280 px | 960 | **1** | nein |
+   | 1024 px | 927 | **1** (25 px Luft) | nein |
+   | 950 px | 853 | 2 | nein |
+   | 820 px | 723 | 2 | nein |
+   | 390 px | 305 | 4 | nein |
+
+   **Die Zeilenzahl unter 1024 px ist gewollt** — bei 902 px Bedarf und
+   723 px Platz ist Nebeneinander unmöglich. Der Handy-Fall (vier Zeilen,
+   ~188 px) ist damit vermessen und steht als Gestaltungsaufgabe im Punkt:
+   gesucht ist eine zweite Darstellung, nicht eine gequetschte erste.
+
+- [2026-08-12] **Das PDF nannte den Sachwertfaktor 1, gerechnet wurde mit 0,925** — `v1150` + `v1150b`, `e33ea05`.
+   Gesucht war nur die fehlende **Stufe** im Dossier. Gefunden wurde daneben
+   ein **Rechenweg-Widerspruch**: die PDF-Fußnote druckte
+   `cc.assumptions.sachwertfaktor`, und das ist die **Konstante**
+   `SACHWERTFAKTOR = 1.0` aus `CrossCheckService.js:26` — nicht der
+   angewandte Faktor.
+
+   **Am echten Bericht gemessen** (Report 73, `PRUEF_ZFH Löhner Str.`, EFH):
+   tatsächlich gerechnet wurde mit **0,925, Stufe A**, Quelle
+   „Grundstücksmarktbericht 2026 für den Kreis Herford, 5.1.2
+   Sachwertfaktoren". Im Dossier stand **„Sachwertfaktor 1"**.
+
+   **Dieselbe Falle ist in dieser Fußnote schon dreimal aufgetreten** — v1050
+   (NHK), v1052 (Zinssatz: „nannte weiter 3 %, gerechnet wurden 2,2 %"),
+   v1061. Der Kommentar zwei Zeilen darüber sagt es wörtlich: „Eine Datei,
+   zwei Stellen — schon wieder." Alle Nachbarwerte in derselben Fußnote holen
+   ihre Zahl **aus dem Ergebnis mit Rückfall auf die Annahme**; der
+   Sachwertfaktor war der letzte, der es nicht tat.
+
+   **Zweitens fehlte die Stufe.** Auf dem Bildschirm steht sie seit `v1143b`
+   („Faktor 1,15 · Stufe E"), im PDF nicht — also genau dort nicht, wo die
+   Zahl ihre Herkunft tragen muss: **das Dossier verlässt das Haus, die
+   Bildschirmansicht nicht.**
+
+   **Beide Formen werden gelesen** — `nhk2010.js:897` liefert ein Objekt
+   `{wert, stufe, quelle}`, ältere Wege eine nackte Zahl. Das ist die
+   `v1143b`-Lehre, auf dem Bildschirm längst gezogen.
+
+   **`v1150b`: die Quelle nur, wenn sie kurz ist.** Die amtliche Quelle ist
+   74 Zeichen lang und hätte die Fußnote um ein bis zwei Zeilen wachsen
+   lassen. Die **Stufe** trägt die Herkunft und bleibt immer dabei; die
+   Quelle lohnt nur, wo sie selbst die Aussage ist — „eigene Angabe"
+   (13 Zeichen) bei Stufe E. Grenze bei 26 Zeichen. Ergebnis: **+14 Zeichen
+   statt +80**, Layout bleibt.
+
+   **Nachweis am ausgelieferten Stand** (`app.js?v=1150b` vom Server geladen):
+   Marker vorhanden, 26er-Grenze vorhanden, Objekt- **und** Zahlform gelesen,
+   Rückfall vorhanden. Dazu die Fußnote gegen echte Daten gerechnet:
+
+   | Fall | Ausgabe |
+   |---|---|
+   | Bericht 73 (amtlich) | `Sachwertfaktor 0,925 (Stufe A)` — vorher `Sachwertfaktor 1` |
+   | eigener Wert | `Sachwertfaktor 1,15 (Stufe E · eigene Angabe)` |
+   | lange Quelle | `Sachwertfaktor 0,889 (Stufe A)` — Quelle gekürzt |
+   | nackte Zahl (alte Form) | `Sachwertfaktor 0,9` |
+   | kein Faktor | `Sachwertfaktor 1` — Rückfall auf die Annahme |
+   | vorläufig | `ohne Sachwertfaktor` |
+
+   Buster-Kette alle vier Glieder auf `1150b`. `node --check` auf dem Server ok.
+
+- [2026-08-12] **Die Preisindikation stand im PDF auf jeder Seite** — `v1149`, `6777afe`.
+   **Marcels Befund** (12.08.): „beim Marktbericht steht nicht 3–4 mal die
+   Preisindikation. Das ist mir beim PDF aufgefallen, das ist etwas zu viel."
+
+   **Gemessen in `frontend/marktbericht-app/app.js`:** `footer()` läuft bei
+   **jedem** `newPage()` und druckte „DealPilot · Marktbericht —
+   Marktpreisindikation, kein Gutachten n. § 194 BauGB". Der Prod-Bericht hat
+   laut Kommentar in derselben Datei **sieben Seiten** — der Begriff kam allein
+   hier siebenmal. Dazu drei Textstellen im Fluss (Z. 900, 902, 3344), die
+   aber etwas anderes sagen: **wie belastbar** die Zahl ist. Das ist keine
+   Dopplung, nur ein gleiches Wort — sie bleiben.
+
+   **Gelöst:** der Satz ist rechtlich sinnvoll (§ 194 BauGB) und verschwindet
+   nicht, er steht nur noch **einmal** — auf Seite 1, wo ihn liest, wer den
+   Bericht in die Hand nimmt. Ab Seite 2 trägt die Fußzeile Marke und
+   Seitenzahl. Gebunden an `pageNo`, das dieselbe Funktion schon für die
+   sichtbare Seitenzahl nutzt. **`footer()` bleibt zustandsneutral** — der
+   v957-fontleak-Befund zeigt, dass eine Größenänderung dort auf die
+   Folgeseite durchschlägt und Wortlücken erzeugt.
+
+   **Buster-Kette alle vier Glieder gezogen:** `marktbericht-view.js` 1129 →
+   1149, iframe `marktbericht-app/index.html` 1135b → 1149, `app.js` 1143b →
+   1149. Laut Projektanweisung wurde diese Kette **viermal** vergessen.
+
+   **Nachweis:** auf dem Server `node --check` (Node 18) ok, Marker
+   `v1149-FUSS` vorhanden, Buster `app.js?v=1149` angekommen.
+
+   **Offen als Staging-Abnahmepunkt, ehrlich benannt:** der **Sichtnachweis am
+   PDF fehlt.** Versucht wurde, einen vorhandenen Bericht (`/reports/one`,
+   Report 73 des Testobjekts, kostenlos) durch `exportPdf(out)` zu schicken
+   und die gedruckten Texte über einen Patch auf `jsPDF.prototype.text` zu
+   zählen — bei abgefangenem `save()`, damit kein Download entsteht. Ergebnis:
+   **kein Fehler, aber null Textaufrufe.** Die Export-Funktion steigt bei
+   einem wiedergegebenen Bericht offenbar still aus. **Ob das am Produkt oder
+   am Messaufbau liegt (der Patch überschrieb auch `output()`), ist nicht
+   getrennt** — deshalb keine Behauptung, sondern ein eigener Punkt unter
+   „Später". Marcel sieht das Ergebnis beim nächsten echten PDF auf Seite 2.
+
+- [2026-08-12] **Der Inhalt wurde bei 1025 px schmaler als bei 1024 px** — `v1148`, `e4f3066`.
+   **Befund:** Bei 1024 px greift der v648-Block (`css/style.css:35783`) mit
+   260 px Leiste und lässt 764 px Inhalt. Ein Pixel darüber endet der Block,
+   das Standard-Grid aus Z. 267 setzt 380 px, und der Inhalt fiel auf
+   **645 px** — ein Pixel mehr Fenster kostete **119 px Inhalt**. Betroffen
+   war das Band **1025–1143 px**; ab 1144 px (380 + 764) war es von selbst
+   wieder gut, weshalb es auf dem iPad Air quer (1180) nicht auffiel.
+
+   **Vor dem Bauen geprüft:** die Sidebar trägt **keine eigene Breite** — sie
+   ist Grid-Kind und folgt der Spalte (`width:auto` gilt nur im v648-Block,
+   darüber gibt es gar keine Breitenregel). `.app-wrap` hat **kein `gap`**,
+   die Spaltenrechnung geht also glatt auf.
+
+   **Lösung ohne neue Zahl und ohne `100vw`:**
+   `body .app-wrap:not(.sb-collapsed){grid-template-columns:minmax(0,380px) minmax(764px,1fr)}`
+   ab `min-width:1025px`. Die zweite Spalte behält 764 px als Untergrenze,
+   die Leiste nimmt nur den Rest und wächst dabei stetig auf ihre 380 px.
+   **`100vw` wäre falsch gewesen** — es zählt die Scrollleiste mit und hätte
+   einen Versatz erzeugt. Kein `!important`, damit die eingeklappten
+   Zustände weiter gewinnen.
+
+   **Nachgemessen in der Kabine (Buster `W68` im iframe bestätigt):**
+
+   | Fenster | Spalten | Inhalt | Überlauf |
+   |---|---|---|---|
+   | 1024 px | 260 + 764 | 764 | nein |
+   | 1025 px | **261 + 764** | **764** (vorher 645) | nein |
+   | 1100 px | 336 + 764 | 764 | nein |
+   | 1143 px | 379 + 764 | 764 | nein |
+   | 1144 px | 380 + 764 | 764 | nein |
+   | 1400 px | 380 + 1020 | 1020 | nein |
+
+   **Regression eingeklappte Leiste:** mit `body.dp-sidebar-collapsed` bleibt
+   es bei `66px 1034px`, Leiste 66 px, kein Überlauf — die `!important`-Regel
+   aus Z. 32816 gewinnt wie vorgesehen.
+
+   **Grenze des Nachweises, ehrlich benannt:** der eingeklappte Zustand ist
+   **per Klasse** geprüft, nicht über den Bedienweg. Grund ist ein
+   Nebenbefund: **`#dp-sb-toggle` existiert im DOM nicht**, und es gibt keine
+   globale Toggle-Funktion (`toggleSidebar`/`dpSbToggle`/`sbToggle` alle
+   nicht vorhanden). Die Treffer auf `[class*=collapse]` sind
+   `v212-collapse-toggle`, also Aufklapper **im Inhalt**. Bei 1100 px hat der
+   Einklapp-Zustand damit **kein Bedienelement** — die CSS-Regeln dafür
+   (66-px-Rail in Z. 32816 und 33060) sind vorhanden, der Weg dorthin nicht.
+   Als eigener Punkt unter „Später" vermerkt.
+
+- [2026-08-12] **Der Staging-Server trug 319 Zeilen, die im Repo nicht standen** — `e35e34b`.
    Beim Ausrollen von `v1136` gemessen: `git status` auf
    `root@116.203.214.11` meldet
    `marktbericht/backend/src/connectors/boris/registry.js` als geändert,
@@ -627,309 +1584,151 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
      Solange das Skript defekt ist (siehe `FALLEN.md`), wird das
      wiederkommen.
 
-11. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
-
-   Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
-
-   **Der Defekt: der Darstellungs-Block nimmt die gewählte Farbe selbst an.**
-   Wählt Marcel Grün, wird das Gold am Kopf des Akzent-Bereichs mit grün.
-   **Das darf im Einstellblock nicht passieren** — wer eine Farbe *auswählt*,
-   braucht eine neutrale Umgebung, sonst beurteilt er die Farbe gegen sich
-   selbst. Die Bedienoberfläche ist kein Vorschaufeld.
-
-   Vor dem Patch messen, welche Regel greift: die `--wl-`Tokens werden
-   ausschließlich von `whitelabel-override.js` gesetzt (`setWlTokens` in
-   `apply()`), und der Block hängt vermutlich an denselben Tokens wie die App.
-   **Die Lösung ist ein eigener Satz fester Töne für das Panel**, nicht ein
-   Ausschalten der Vorschau — die Vorschauflächen *sollen* mitgehen, der
-   Rahmen darum nicht. Beide Bereiche also sauber trennen.
-
-   **Der Ausbau: sechs Farben reichen nicht.** Marcel will aus einer Palette
-   wählen können. Zu entscheiden ist, **welcher Art**:
-
-   | | |
-   |---|---|
-   | **freier Farbwähler** (`<input type=color>`) | jede Farbe, keine Kuratierung |
-   | **erweiterte Palette** | z. B. 24 abgestimmte Töne, alle geprüft |
-   | **beides** | Palette als Vorschlag, freier Wähler daneben |
-
-   **Das ist eine Produktentscheidung, keine technische.** Sie hat eine
-   gemessene Folge: `_recolor` rechnet HSL-relativ, und **vier der 66
-   WL_TINTS reißen schon heute bei einem extrem hellen Akzent** (`#F0D000`:
-   `#c08a2f`, `#a6842d`, `#a68a36`, `#a98e3a` landen bei k = 2,57–2,98). Ein
-   freier Wähler macht diesen Fall vom Sonderfall zum Regelfall. Er ist
-   trotzdem machbar — aber **dann muss der Tint-Weg vorher eine
-   Mindestkontrast-Regel bekommen**, sonst liefern wir eine Funktion aus, die
-   sich selbst unlesbar machen kann. Der Später-Punkt dazu wird damit zur
-   Voraussetzung.
-
-   **→ Demo nach `design/Vorschläge/`, nicht raten.**
-
-12. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
-
-   Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
-   Defekt, keine Geschmacksfrage.
-
-   **Erst die Kette messen, dann patchen** — nicht am CSS anfangen. Vier
-   Stellen, in dieser Reihenfolge:
-
-   1. **Kommt der Klick an?** Feuert der Handler, wird ein Wert gesetzt?
-   2. **Wird gespeichert?** Steht der Wert nach dem Neuladen wieder da?
-   3. **Wird ein Token gesetzt?** `getComputedStyle(document.body)` auf den
-      erwarteten Namen, vorher/nachher.
-   4. **Liest das Token jemand?** Genau hier lag `v1101`: der Regler setzte
-      `--dp-logo-w`, gelesen wurde `--dp-logo-scale` — **zwei Namen für
-      dieselbe Sache**, und niemand merkte es, weil beide existierten.
-
-   Der wahrscheinlichste Fall ist wieder Punkt 4. Zweiter Kandidat: die Regel
-   hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
-   dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
-
-13. **Regler „Tab-Texte" wirkt nicht**
-
-   Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
-   Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
-   Bewertung**. Bei Marcel ändert sich nichts.
-
-   Gleiche Kette wie N2, gleiche Reihenfolge. **Ein zusätzlicher Verdacht,
-   der hier besonders naheliegt:** die Reiter tragen an mehreren Stellen
-   `!important`-Regeln (so gewinnt z. B. `header.hdr.has-v64-score
-   #hdr-obj-num` gegen alles andere). Ein Token, das korrekt gesetzt ist,
-   verliert dann trotzdem. **Deshalb den Kaskaden-Walker benutzen** — welche
-   Regel gewinnt tatsächlich für das Element —, nicht nur prüfen, ob die
-   Variable steht.
-
-   **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
-   Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
-
-14. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
-
-   Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
-   schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
-   es der alte Befund in neuer Form ist.
-
-   **Am Raster messen, nicht am Farbtoken.** Ohne Vorlage ist der Bereich
-   sauber, erst mit umgestellter Vorlage rückt alles zusammen — die Ursache
-   liegt also im Abstandsraster, nicht in der Farbe. Und beim Nachmessen die
-   `v1105c`-Lehre mitnehmen: das Goldband ist ein `::before`, ein Leser, der
-   nur die Elternkette abläuft, sieht es nicht.
-
-   **Dazu Marcels zweite Vorgabe an derselben Karte:** *„achte darauf, dass
-   alle Werte immer angegeben werden, die wir brauchen."* Das ist ein eigener
-   Prüfschritt — **welche Angaben gehören auf die Karte, und fehlt eine
-   davon?** Die Liste gehört mit Marcel abgestimmt, nicht von mir geraten;
-   danach wird gezählt, ob jede tatsächlich erscheint (und was passiert, wenn
-   sie leer ist — `_euro(null)` liefert `"–"` und ist **truthy**, ein
-   `||`-Rückfall greift dort nie).
-
-   **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
-   Aufgreifen zusammenlegen, nicht doppelt bauen.
-
-15. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
-
-   **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
-   führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
-   man auf dem × zum Löschen.
-
-   **Marcels Vorgabe: der Pfeil gehört nach unten.** Das löst zwei Dinge auf
-   einmal — die Kollision, und den bekannten Befund, dass `.sbc-arrow` mit
-   **20 × 20 px** deutlich unter der 44-px-Trefferfläche aus v650/v652 liegt.
-   Unten ist Platz, oben nicht.
-
-   **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:** Pfeil
-   und Karte tun Verschiedenes — der Pfeil klappt auf (`umschalten()` in
-   `karten-kompakt.js`, delegierter Listener), der Kartenkörper öffnet das
-   Objekt. Eine 44-px-Pseudofläche würde der Karte Klicks stehlen und die
-   falsche Aktion auslösen. Es ist eine Frage der Kartengestaltung.
-
-   **Vor dem Verschieben messen:** `getBoundingClientRect()` auf Pfeil und ×,
-   den Abstand beziffern, und mit `elementFromPoint` prüfen, **wer den Klick
-   in der Lücke bekommt**. Danach die neue Lage in allen drei Kartenmodi
-   gegenprüfen — der Pfeil erscheint nur bei `kompakt` und `stapel`.
-
-   **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
-   Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
-
-16. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
-
-   Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
-   Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
-   **benannt statt beschrieben** — gut, denn dann muss sie nicht gestaltet,
-   sondern nur übernommen werden.
-
-   **Zuerst den Ist-Wert auslesen** (`.sb-act-item` bzw. der Kopf des
-   Aufklappers), dann als **gemeinsames Token** führen statt an zwei Stellen
-   zu pflegen. Zwei Stellen, die auseinanderlaufen, sind hier schon mehrfach
-   die Ursache gewesen.
-
-   **Ein bekannter Nebenbefund gehört mitgeprüft:**
-   `.sb-actions-accordion-inner` misst `rgb(255,255,255)` **auch** in den
-   dunklen Fassungen `dealpilot` und `konsole` — weiße Fläche in dunkler
-   Leiste, im geschlossenen Zustand unsichtbar (`display:none`, 0 × 0) und
-   deshalb bei allen Kontrastläufen durchgerutscht. **Mit geöffnetem Menü
-   messen.** Wer die Farbe von dort übernimmt, übernimmt sonst einen Wert aus
-   einem Zustand, den niemand geprüft hat.
-
-   **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
-   entschieden ist.
-
-17. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
-
-   **Marcels Bild davon, wörtlich zusammengefasst:**
-
-   - **DealPilot wird im dunklen Modus ausgeliefert.** Das ist der Standard.
-   - **Daneben ein heller Modus**, umschaltbar mit einem Griff — hell/dunkel.
-   - **In der Darstellung sind das zwei Profile.**
-   - **Der helle Modus besteht aus:** App-Darstellung „Panel", Objektkarten
-     „Standard", und dem kleinen DealPilot-Logo oben in der Ecke.
-   - **Ort:** Einstellungen → Profil und Anzeige, oder direkt unter
-     Darstellung. Wer es individueller will, klickt dort weiter auf
-     „Darstellung öffnen" und stellt einzeln ein.
-
-   **Das ist der größte der neuen Punkte** — nicht wegen des Aufwands,
-   sondern weil er die Bedienlogik des ganzen Bereichs neu ordnet: **ein
-   Griff für 95 % der Leute, das volle Panel für den Rest.** Genau die
-   richtige Richtung; heute muss jeder durch alle acht Farbfelder, um zu
-   einem stimmigen Bild zu kommen.
-
-   **Drei Fragen, die vor dem Bauen zu klären sind:**
-
-   1. **Was passiert mit einer eigenen Einstellung, wenn jemand umschaltet?**
-      Überschreiben (einfach, aber Arbeit weg), daneben behalten (freundlich,
-      aber wo steht sie), oder je Profil eigene Werte (sauber, aber die
-      Speicherstruktur wächst). **Mein Vorschlag: je Profil eigene Werte** —
-      `brand_display` ist `jsonb`, kostet also keine Migration, und genau
-      deshalb wurde es damals so angelegt.
-   2. **Was ist „das kleine DealPilot-Logo oben in der Ecke"** — das
-      Wortmarken-Bild, das heute die Sidebar trägt? Ein Bild aus
-      `design/mockups/` würde das in einem Satz klären.
-   3. **Was sieht ein Partner-Mandant?** Der hat ein eigenes Branding. Der
-      Schalter darf ihn nicht aus der Marke seines Partners werfen. Das ist
-      dieselbe Grenze, die `v1114` und `v1122` schon einmal gezogen haben.
-
-   **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
-   dann bauen.**
-
-18. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
-
-   **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
-
-   **Der Grund, warum das überfällig ist, steckt im Aufbau:** die Plangrenzen
-   stehen an **drei Stellen von Hand** — `config.js` (das Gate),
-   `pricing-modal.js` (zwei Matrizen) und `landing/index.html`. Drei
-   Wahrheiten, die nur so lange übereinstimmen, wie jemand sie pflegt.
-   **Der Abgleich gegen die Landingpage, den Marcel verlangt, ist genau der
-   richtige Maßstab** — sie ist das, was der Kunde gelesen hat, bevor er
-   bezahlt hat.
-
-   **Was gemessen wird:**
-
-   | | |
-   |---|---|
-   | **Gate gegen Versprechen** | jede Grenze aus `config.js` gegen die Landing-Tabelle, Zeile für Zeile |
-   | **DB gegen Datei** | `hasFeature` fragt **zuerst die Datenbank** (`Sub.hasCachedFeature`) und `config.js` nur bei `null` — beide Wege prüfen, sie können auseinanderlaufen |
-   | **Unbekannte Schlüssel** | ein Schlüssel, den niemand kennt, ist **für jeden false, auch für Pro**. Ein Tippfehler sperrt also still den teuersten Plan |
-   | **Partner** | ist ein **Pro-Klon** plus `reseller`, `reseller_whitelabel`, `custom_logo` |
-   | **Bekanntes Leck** | der Bankexport blockt nur `starter` — **Free rutscht mit Wasserzeichen durch.** Stand als offene Entscheidung, ist nie gefallen |
-
-   **Dazu Marcels Frage zum Starter: sieben Tage voller Pro-Status.** Er
-   meint, das sei so umgestellt worden. **Ich kann das nicht bestätigen** — in
-   meinen Unterlagen steht es nicht, und ich schreibe es nicht als Tatsache
-   auf. **Erst messen, ob es überhaupt eingebaut ist**, dann die zweite Frage
-   stellen: beibehalten oder anders lösen. Wenn es drinsteht, gehört
-   mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
-   wurden, dürfen nicht unerreichbar werden.
-
-19. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
-
-   Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
-   Rechenweg.**
-
-   ### Was Marcel will
-
-   - **In der Pre-Flight-Karte** („Top-Objekt") sollen per Sprache **alle**
-     Felder befüllbar sein, die es in Objekt, Investition, Miete,
-     Finanzierung, Bewirtschaftung und Steuer gibt.
-   - **Genanntes einsortieren, nicht wegwerfen:** Risiken und Mängel gehören
-     unter **bekannte Risiken**, ein genanntes Vorhaben unter
-     **Investitionsthese**.
-   - **Der Rest wird ein ordentlicher Text** unter **zusätzliche Notizen** —
-     alles, was sich nicht auswerten ließ, statt es zu verlieren.
-   - **Im QuickBoarding gibt es weniger Felder** — aber **dieselbe
-     Rechenlogik im Hintergrund.**
-   - **Beim „Als Objekt speichern"** öffnet sich ohnehin ein kleines Modal.
-     Dort soll stehen: *es gibt weitere Werte, die mit übernommen werden* —
-     **mit Auflistung**, und mit den Texten der Zusammenfassung.
-
-   ### Was davon schon steht — und was das für den Punkt heißt
-
-   **Die Doppelstruktur existiert bereits**, das ist die gute Nachricht:
-   `buildCatalog` ist die kuratierte Liste für den Orbit, `buildFullCatalog`
-   nimmt **alle** `window.FIELDS` für die Auswertung. Im QuickCheck-Kontext
-   wird auf `QC_IDS` gefiltert. Der Weg „wenig Felder vorn, volle Auswertung
-   hinten" ist also **angelegt** — es geht nicht um einen Neubau, sondern um
-   Vollständigkeit und um das, was der Nutzer davon sieht.
-
-   **Deshalb ist der erste Schritt eine Zählung, kein Entwurf:** wie viele
-   Felder kennt `buildFullCatalog` heute, wie viele stehen in den sechs
-   Reitern, **und welche fehlen?** Erst diese Differenz macht den Punkt
-   bezifferbar.
-
-   **Drei Dinge, die dabei zu klären sind:**
-
-   1. **Freitext ist etwas anderes als ein Feld.** Risiken, These und Notizen
-      sind Prosa; die Zuordnung „das war ein Mangel" trifft das Modell, nicht
-      ein Muster. Das ist der Teil, der wirklich neu ist.
-   2. **Nichts stillschweigend verwerfen.** Marcels Kernsatz ist „eigentlich
-      soll alles vernünftig ausgewertet werden" — der Auffangtext unter
-      Notizen ist die Zusicherung, dass nichts verschwindet. **Er ist Teil
-      des Punktes, kein Beiwerk.**
-   3. **Kerosin.** Eine längere Auswertung über alle Felder kostet mehr als
-      die heutige. Ob das den Preis ändert, ist eine Geldfrage → Marcel.
-
-   **Das Übernahme-Modal im QuickBoarding ist der sichtbarste Teil** und
-   gleichzeitig der billigste: es zeigt, was ohnehin schon übertragen wird.
-   Wenn dort steht, was alles mitkommt, versteht der Nutzer zum ersten Mal,
-   was die Spracheingabe geleistet hat.
-
-   **→ Zählung zuerst, dann Demo des Modals, dann bauen.**
-
----
-
-## Später
-
-- **Media-Queries konsolidieren** — 226 Blöcke auf 25 Breakpoints. Eigenes
-  Vorhaben mit eigener Prüfstrecke, nicht nebenbei. **Wird durch die Handy-Freigabe (v1118)
-  größer, nicht kleiner** — mit der Freigabe fürs Handy trägt die normale
-  Ansicht allein, was vorher auf zwei Fassungen verteilt war.
-
-- **`gold-audit.py` auf RC=0 bringen** — 484 Fundstellen in 57 Dateien,
-  Altlast. Die neuen Dateien tragen davon **keine einzige**. Eigenes
-  Vorhaben, weil jede Fundstelle einzeln beurteilt werden muss.
-
-- **`body.dp-chrome-hell` auflösen** — 105 gewachsene Regeln hängen daran.
-  Bei „Skin-Schalter und Darstellung" wurde bewusst **gekoppelt statt
-  gelöscht**; das Entfernen bleibt ein eigenes Vorhaben mit eigener
-  Prüfstrecke.
-
-- **Zwei Nachweise, die aus Abnahmen offen geblieben sind** — jeweils
-  gemessen und beschrieben, nur nie am echten Gerät bzw. mit echten Daten
-  bestätigt:
-  - **Marktbericht auf dem Handy (v1077):** ein echter Klick auf den
-    PDF-Knopf (Datei lädt herunter), die **Zwei-Finger-Geste** auf der
-    Karte (hängt an `matchMedia('(hover:none)')`, greift im Prüfbrowser
-    nicht) und das **Erzeugen** eines neuen Berichts bei 390 px (kostet
-    5 L und hängt an einem `window.confirm`). Eigener Namensraum v1077,
-    nicht mit der Haupt-App mischen. **Wird mit der Handy-Freigabe (v1118) dringender:** nach
-    der Freigabe kommen echte Nutzer auf diesem Weg an.
-  - **Tabelle der geteilten Pässe** — die Scroll-Regel steht, das
-    Testkonto war leer, der Nachweis fehlt.
-
----
-
-## Fertig
-
-<!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+
+- [2026-08-12] **Neun Info-Zeichen in der Wertermittlung taten nichts** — `v1146` (`d868fbb`), `v1146b` (`cbe57cf`).
+
+   Beim Setzen des Garagen-Hinweises (`v1142`) aufgefallen und dann durchgezählt:
+   `wertermittlung.js` vergibt **18** Hilfe-Schlüssel, `TEXTE` in
+   `feldhilfe.js` führt **11** (mit dem neuen). `textFuer()` kennt keinen
+   Rückfall — fehlt der Schlüssel, gibt sie `null` zurück und der Klick
+   verpufft **still**. Das ⓘ steht trotzdem am Feld und verspricht eine
+   Erklärung.
+
+   Ohne Text sind:
+   `aussenPct`, `ausstGewerk`, `bauteilHk`, `garagenStufe`, `grundriss`,
+   `hinterland`, `hinterlandRent`, `modGrad`, `standardstufe`.
+
+   Das sind ausgerechnet die **erklärungsbedürftigsten** Felder der
+   Wertermittlung — Standardstufe, Modernisierungsgrad und
+   Hinterland-Rentierlichkeit entscheiden erheblich mit, und
+   `hinterlandRent` steuert direkt die Bodenwertverzinsung nach § 41.
+
+   **BEHOBEN in `v1146` (`d868fbb`) und `v1146b` (`cbe57cf`).**
+
+   **Sechs der neun Texte gab es längst** — im `HILFE`-Block von
+   `wertermittlung.js`, wo sie nie jemand zu sehen bekam. Sie sind nach
+   `feldhilfe.js` überführt und in `kurz`/`lang` geteilt. Drei sind neu
+   geschrieben: **Standardstufe**, **Modernisierungsgrad**, **Grundriss** —
+   jeweils mit Rechtsgrundlage und der Angabe, was eine Stufe Unterschied
+   im Ergebnis ausmacht.
+
+   **`textFuer()` meldet einen fehlenden Schlüssel jetzt per
+   `console.warn`** statt still `null` zurückzugeben.
+
+   **`v1146b` — der Fix war eine Ebene zu hoch angesetzt.** Nach `v1146`
+   blieben drei Zeichen weiter wirkungslos, **ohne dass die neue Warnung
+   ansprang**: `hinterland`, `ausstGewerk` und `bauteilHk` sind
+   **Sammelschlüssel für Feldgruppen** — das ⓘ hängt dort 9× bzw. 5× an
+   verschiedenen Feldern (`ausstAussenwaende`, `btlGauben`, …). `box()`
+   suchte ein Element mit der **Id des Schlüssels** als Anker, fand keins
+   und baute still gar keinen Kasten. Der Text war da, die Warnung schwieg
+   zu Recht — und trotzdem passierte beim Klick nichts. Jetzt Rückfall auf
+   das angeklickte Zeichen selbst.
+
+   **Abgenommen auf Staging:** alle **13** bei Stufe 3 sichtbaren Zeichen
+   öffnen einen Kasten mit Text (400–424 Zeichen bei den drei
+   Gruppen-Schlüsseln), **keine Warnung**, kein leerer Kasten. Gegen die
+   Quelle gezählt: **18 Schlüssel, 19 Texte — keiner mehr ohne.**
+
+   **Eigener Messfehler, vermerkt:** Ein erster Prüflauf meldete vier
+   Felder ohne Kasten. Falsch — der Kasten ist ein **Umschalter**, und die
+   vier waren aus einem abgebrochenen Lauf noch offen; mein Klick hat sie
+   geschlossen. Zustand aus dem vorigen Prüflauf, genau die Falle aus
+   `FALLEN.md`. Vor der Messung `.fh-box` abräumen.
+
+
+
+- [2026-08-12] **Die Sachwertfaktor-Kette ist bewiesen, beide Wege** — `v1144` (`d884836`), `v1143b` (`0bf64ec`).
+
+   **Prüfobjekt selbst angelegt:** `PRUEF_ZFH Löhner Str. 278`
+   (`3fbb754c`, Seq 2026-1006) — EFH, 233 m², Bj 1964, Grundstück 700 m²,
+   2 Wohneinheiten, Standardstufe 3, NHK-Typ freistehend / Keller-Erd-Ober
+   / DG ausgebaut. **Bleibt als Prüfstrecke auf Staging liegen**, Stufe 3
+   ist dafür bezahlt — weitere Läufe kosten 0 L.
+
+   | Lauf | Faktor | Herkunft | Sachwert |
+   |---|---|---|---|
+   | ohne eigenen Wert | **0,925** | **Stufe A**, Grundstücksmarktbericht 2026 Kreis Herford, 5.1.2 (1658 Kauffälle) | **243.577 €** |
+   | mit eigenem Wert | **0,80** | **Stufe E**, eigene Angabe | **210.661 €** |
+
+   Der eigene Wert hat Vorrang vor dem amtlichen — genau wie vorgesehen.
+   Die Rechnung stimmt exakt: vorläufiger Sachwert 263.326 × 0,8 =
+   210.661 €, im Rechenweg Zeile für Zeile nachlesbar. Kerosin: **98 → 86**
+   für den ersten Lauf (12 L), der zweite **0 L**.
+
+   **Drei Fallen beim Anlegen, alle aus der stillen Ablehnung unbekannter
+   Auswahlwerte:** `objart: 'ZFH'` gibt es nicht (die Liste kennt nur ETW,
+   EFH, MFH, DHH, RH — ein Zweifamilienhaus läuft unter **EFH**, so wie
+   die NHK-Gebäudeart „Ein-/Zweifamilienhaus" heißt). `nhk_haus:
+   'freistehend'` ebenso nicht — dort sind es die Zahlen **1/2/3**. Und
+   die Wohneinheiten kamen über keinen der versuchten Schlüssel (`we`,
+   `units`, `anzahl_we`, `wohneinheiten`) an; im Formular gesetzt lief es.
+   **Der richtige Objekt-Schlüssel für Wohneinheiten ist noch offen.**
+
+   **Was dabei gefunden und behoben wurde — `v1144` (`d884836`):**
+   Der Sachwertfaktor wurde **nie** angewandt, an keinem Objekt, aus keiner
+   Quelle. `WertParameterService.sachwertfaktor()` und `hole()` liefern
+   beide `{ wert, stufe, quelle }`; gelesen wurde aber `param.sachwertfaktor`
+   — ein Feld, das keiner der beiden Rückgabewege setzt. `Number(undefined)`
+   ist `NaN`, also griff durchgehend der Zweig „kein Sachwertfaktor
+   verfügbar". Betroffen waren zwei Stellen: `lib/nhk2010.js:868` und
+   `CrossCheckService.js:171`. Bei den ETW fiel es nie auf, weil dort
+   ohnehin keiner angesetzt werden darf — **bei jedem Haus hätte es still
+   den vorläufigen Sachwert ausgewiesen.**
+
+   **Mitgefixt, weil der erste Fix es nötig machte:** Die Objektart-Sperre
+   lag nur im Tabellenweg (`sachwertfaktoren_nrw.js:134`). Mit korrektem
+   Feldnamen hätte ein gepflegter Wert bei einer Wohnung plötzlich
+   gegriffen — am Prüfobjekt wären aus 268.172 € **308.398 €** geworden,
+   ein Modellbruch nach § 10 ImmoWertV. Die Sperre sitzt jetzt zentral in
+   `WertParameterService.sachwertfaktor()` und gilt für beide Wege.
+
+   **Gegengemessen nach dem Ausrollen:** ETW unverändert bei 268.172 €,
+   `marktangepasst: false`, Grund weiterhin `objektart_nicht_abgeleitet` —
+   keine Regression.
+
+   **Offen bleibt der eigentliche Nachweis.** Dafür braucht es ein
+   EFH/ZFH-Objekt. Ein Funktionslauf im Container scheiterte an der
+   NHK-Typkennung: `sachwert()` verlangt einen Gebäudetyp aus
+   `NHK_2010.typen` (`1.01`, `1.11`, …), den erst der Orchestrator aus
+   `nhkHaus`/`nhkGeschosse`/`nhkDach` zusammensetzt. **Beim Aufgreifen
+   entweder den Typ direkt setzen oder ein echtes Haus anlegen** —
+   `Löhner Str. 278`, 32120 Hiddenhausen (ZFH, Verkehrswert 350.094,36 €)
+   aus `CLAUDE.md` wäre der Kandidat. **Kostet 12 L, Marcel fragen.**
+
+
+- [2026-08-12] **Ein gepflegter Sachwertfaktor wurde stillschweigend verworfen** — `v1145` (`1ea582d`).
+
+   Gemessen an Hermannstraße 9: Im Feld stand **1,15**, im
+   Payload kam `sachwertfaktor: 1.15` sauber an — der Bericht rechnet ihn
+   trotzdem nicht. Zu Recht, denn für eine ETW gibt es keinen
+   Sachwertfaktor (`sachwertfaktor_grund: "objektart_nicht_abgeleitet"`).
+
+   **Der Nutzer erfährt davon nichts.** Er trägt einen Wert ein, es
+   passiert nichts, und kein Feld sagt warum. Seit `v1143` steht der Grund
+   immerhin an der Sachwert-Karte („warum vorläufig?"), aber **nicht am
+   Eingabefeld**, wo die Angabe gemacht wird.
+
+   **BEHOBEN in `v1145` (`1ea582d`).** Zweifach, weil ein Klick-Hinweis
+   allein nichts nützt — gemerkt hätte es weiter niemand:
+
+   - **Sichtbar ohne Klick:** unter dem Feld steht bei ETW/MFH/Gewerbe
+     „Für diese Objektart ohne Wirkung — Sachwertfaktoren werden nur für
+     Ein- und Zweifamilien-, Doppel- und Reihenhäuser abgeleitet."
+   - **Die Feldhilfe** erklärt den Grund samt § 10 ImmoWertV und dass bei
+     einer Wohnung ohnehin das Vergleichswertverfahren führt.
+
+   `ankerZeigen()` taugte dafür nicht — es hängt am **eigenen** Feldwert,
+   hier entscheidet die Objektart nebenan. Und das Feld entsteht erst im
+   Block `wm-b3`, ein einmaliger Aufruf beim Start verpufft; deshalb hört
+   die Prüfung am `document` mit.
+
+   **Gegengemessen an beiden Objektarten:** Hermannstraße 9 (ETW) zeigt
+   Hinweis und Feldhilfe, `PRUEF_ZFH` (EFH) zeigt **keinen** — und er
+   verschwindet beim Wechsel der Objektart von selbst.
+
+
 
 - [2026-08-12] **Die Rechenwege stehen jetzt auch im Ergebnis, zum Aufklappen** — `v1141` (`fb9fb3a`), `v1141b` (`b02654d`), `v1141c` (`211ee49`). Marcels Entscheidung, nachdem der `v1140`-Fehler nur im PDF sichtbar war.
 

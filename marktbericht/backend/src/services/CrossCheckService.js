@@ -120,16 +120,51 @@ export const CrossCheckService = {
      * ist schlimmer als keiner. */
     /* v1056-WRND-2 · Anlage 2, wenn Punkte vorliegen — sonst die
      * bisherige Schaetzung. Dieselbe Quelle wie beim Ertragswert. */
+    /* v1083-WRND-1 · EIN STILLER RUECKFALL IST SCHLIMMER ALS EIN FEHLER.
+     *
+     * Bleibt der Modernisierungsgrad leer, faellt die Restnutzungsdauer auf
+     * die Schaetzung GND minus Alter zurueck — und der Bericht zeigte diese
+     * Zahl bisher OHNE Hinweis, als waere sie nach Anlage 2 ermittelt.
+     *
+     * Wirkung an der Loehner Strasse: 18 statt 24 Jahre, Restwertfaktor
+     * 0,225 statt 0,30, rund 57.500 EUR weniger Gebaeudesachwert. Unbemerkt.
+     *
+     * Das verletzt zwei eigene Grundsaetze: kein Verfahren rechnet halb, und
+     * jede Zahl traegt ihre Herkunft. Gerechnet wird weiter genau wie vorher
+     * — der Rueckfall meldet sich jetzt nur. */
+    const _rndHerkunft = { quelle: null, grund: null, rnd_jahre: null,
+                           gnd_jahre: GND_JAHRE, hinweis: null };
+    const _rndMerke = (quelle, grund, wert, hinweis) => {
+      _rndHerkunft.quelle = quelle; _rndHerkunft.grund = grund;
+      _rndHerkunft.rnd_jahre = wert; _rndHerkunft.hinweis = hinweis;
+      return wert;
+    };
+    const _SCHAETZUNG = 'Restnutzungsdauer geschätzt (Gesamtnutzungsdauer '
+      + 'minus Alter) — Anlage 2 ImmoWertV wurde nicht angewandt.';
     const _rndEinheitlich = () => {
       const _mp = _num(ref.mod_punkte);
-      if (_mp == null) return rnd;
+      if (_mp == null) {
+        return _rndMerke('geschaetzt', 'kein_modernisierungsgrad', rnd,
+          _SCHAETZUNG + ' Es wurde kein Modernisierungsgrad erfasst. Mit '
+          + 'Modernisierungspunkten fällt die Restnutzungsdauer regelmäßig '
+          + 'höher aus, und mit ihr der Gebäudesachwert.');
+      }
       const _kern = /kernsaniert/i.test(String(ref.modernization || '')) && _mp >= 18;
       const _bj = _kern && _num(ref.modernization_year) > 1500
         ? _num(ref.modernization_year) : _num(ref.build_year);
-      if (!(_bj > 1500)) return rnd;
+      if (!(_bj > 1500)) {
+        return _rndMerke('geschaetzt', 'kein_baujahr', rnd,
+          _SCHAETZUNG + ' Es liegt kein verwertbares Baujahr vor.');
+      }
       const _a2 = anlage2Rnd({ gnd: GND_JAHRE, alter: Math.max(0, (new Date().getFullYear()) - _bj),
                                punkte: _mp, kernsaniert: _kern });
-      return _a2 && _a2.rnd != null ? _a2.rnd : rnd;
+      if (!(_a2 && _a2.rnd != null)) {
+        return _rndMerke('geschaetzt', 'anlage2_ohne_ergebnis', rnd,
+          _SCHAETZUNG + ' Die Berechnung nach Anlage 2 lieferte kein Ergebnis.');
+      }
+      return _rndMerke('anlage2', null, _a2.rnd,
+        'Restnutzungsdauer nach Anlage 2 ImmoWertV, aus ' + _mp
+        + ' Modernisierungspunkten' + (_kern ? ' (Kernsanierung)' : '') + '.');
     };
     const _bgfWhg = Number((p && p.bgf_direkt) || ref.bgf || 0);
     const _nhkTypWhg = (u) => (u > 20 ? '4.3' : (u > 6 ? '4.2' : '4.1'));
@@ -235,6 +270,10 @@ export const CrossCheckService = {
 
       if (_sw.wert != null) {
         out.sachwert = {
+          /* v1083-WRND-2 · Die Herkunft der Restnutzungsdauer wandert mit
+           * nach aussen. `quelle` ist 'anlage2' oder 'geschaetzt'; im zweiten
+           * Fall steht in `hinweis`, warum — und der gehoert in den Bericht. */
+          restnutzungsdauer_herkunft: _rndHerkunft,
           available: true, value_eur: _sw.wert, staffel: _sw.staffel,
           marktangepasst: _sw.marktangepasst, sachwertfaktor: _sw.sachwertfaktor || null,
           /* v1069-WSWF-3 · Bleibt der Sachwert vorlaeufig, soll dastehen
@@ -446,6 +485,14 @@ export const CrossCheckService = {
           && (_num(ref.mod_punkte) || 0) >= 18,
         sanierungsjahr: _num(ref.modernization_year) || _num(ref.reconstruction_year) || null,
         lzs_pct: lzsPct, lzs_quelle: p.lzs_quelle || 'pauschal', lzs_stufe: p.lzs_stufe || null,
+        /* v1083b-WSTU-7 · DAS FEHLENDE GLIED. Der Orchestrator setzt
+         * lzs_herabgestuft seit v1050 — der CrossCheckService reichte es nie
+         * durch. Der Ertragswert bekam also nur DASS der Wert auf B steht,
+         * nie WARUM, und der Abzugstext blieb zwangslaeufig der pauschale.
+         * Nach der Variable suchen, die angeblich gefuellt ist. */
+        lzs_herabgestuft: !!p.lzs_herabgestuft,
+        lzs_streuung_pp: p.lzs_streuung_pp != null ? p.lzs_streuung_pp : null,
+        lzs_massstab: p.lzs_massstab || null,
         bog_eur: _num(p.bog_eur), bog_grund: p.bog_grund || null,
       };
       /* v1048-WMOD-3 */
@@ -638,6 +685,10 @@ export const CrossCheckService = {
         out.notes.push(p.flaeche.hinweis);
       }
     }
+    /* v1083-WRND-3 · Auch auf oberster Ebene, damit PDF und Verlauf die
+     * Herkunft lesen koennen, ohne in den Sachwertblock zu greifen — der
+     * fehlt bei Objektarten ohne Sachwertverfahren ganz. */
+    out.restnutzungsdauer_herkunft = _rndHerkunft;
     out.available = true;
       const vals = [
         ['vergleichswert', vgl],

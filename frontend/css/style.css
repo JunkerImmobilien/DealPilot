@@ -36890,3 +36890,69 @@ body.dp-chrome-hell aside.sidebar .sb-act-section-title {
   border-top-color: color-mix(in srgb, var(--gold) 22%, transparent) !important;
 }
 /* ===== v1136e-aktionen-hell END ===== */
+
+/* ===== v1147-CB33 · Ankreuzfelder auf 33 px ==============================
+   Gemessen im v1118-Durchgang: 23 Ankreuzfelder in fuenf Reitern messen
+   13 x 13 px — die Labels daneben sind 16 bis 36 px hoch, liegen also
+   selbst unter der 44-px-Trefferflaeche aus v650/v652.
+
+   Ursache, am Markup nachgezaehlt: ALLE 37 Checkboxen sind nackte
+   <input type="checkbox"> ohne Klasse. Die Klasse `.cb-label` sitzt am
+   LABEL, nicht am Feld — ihre Regel (Z. 2191, 16 px) greift deshalb nur
+   fuer acht davon. Die uebrigen 29 standen auf Browser-Standard.
+
+   Marcels Entscheidung (2026-08-12): 33 px, nicht 44 — die volle
+   Trefferflaeche haette jede Formularzeile hoeher gemacht.
+
+   Schalter sind ausgenommen: `.ji-switch`, `.toggle-slim` und
+   `.fesh-tile` bauen aus demselben nackten Element eine ganz andere
+   Optik. Ihre Regeln stehen frueher in der Datei und haetten bei
+   gleicher Spezifitaet verloren — deshalb hier ausgeschlossen statt
+   dort verstaerkt.
+
+   v1147b · ERST GEMESSEN, DANN KORRIGIERT: der Selektor stand zuerst auf
+   `#app` — dieses Element gibt es in der App gar nicht (`getElementById`
+   liefert null, im Browser nachgesehen). Die Regel konnte nie greifen;
+   ich hatte den Anker aus CLAUDE.md uebernommen, statt ihn auszulesen.
+   Anker ist jetzt `body`, die vier :not()-Ketten tragen die Spezifitaet
+   und schlagen die frueheren Regeln sicher. Die Pre-Flight-Kacheln
+   (`.dp-pf-tile`) sind mit ausgenommen — sie bauen aus dem nackten Feld
+   ebenfalls eine eigene Optik.
+   ======================================================================== */
+body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):not(.fesh-tile input):not(.dp-pf-tile input) {
+  width: 33px;
+  height: 33px;
+  accent-color: var(--gold);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+/* ===== v1147-CB33 END ===== */
+
+/* ═══════════════════════════════════════════════════════════════
+   v1148-SPALT: Der Inhalt wurde bei 1025 px schmaler als bei 1024 px
+
+   Gemessen am 12.08. in der Messkabine:
+     1024 px -> Leiste 260, Inhalt 764   (v648-Block, Z. 35783)
+     1025 px -> Leiste 380, Inhalt 645   (Standard-Grid Z. 267)
+   Ein Pixel mehr Fenster kostete 119 px Inhalt. Ab 1144 px (380+764)
+   ist der Inhalt wieder mindestens so breit wie bei 1024.
+
+   Behoben ohne neue Zahl und ohne 100vw: die zweite Spalte behaelt ihre
+   764 px als Untergrenze, die Leiste nimmt nur, was uebrig ist, und
+   waechst dabei stetig von 261 auf ihre 380 px.
+     1025 px -> 261 + 764      1143 px -> 379 + 764      1200 px -> 380 + 820
+   Kein 100vw, weil das die Scrollleiste mitzaehlt und dann ein Versatz
+   entsteht. Die Leiste traegt keine eigene Breite (geprueft) — sie ist
+   Grid-Kind und folgt der Spalte von selbst.
+
+   Spezifitaet body .app-wrap (0,0,1,1) schlaegt .app-wrap (0,0,1,0) aus
+   Z. 267; die !important-Regeln des eingeklappten Zustands
+   (body.dp-sidebar-collapsed, Z. 32816) bleiben unberuehrt, weil hier
+   bewusst KEIN !important steht.
+═══════════════════════════════════════════════════════════════ */
+@media (min-width: 1025px) {
+  body .app-wrap:not(.sb-collapsed) {
+    grid-template-columns: minmax(0, 380px) minmax(764px, 1fr);
+  }
+}
+/* ===== v1148-SPALT END ===== */

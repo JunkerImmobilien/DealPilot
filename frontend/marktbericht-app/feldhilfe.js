@@ -70,6 +70,61 @@
       lang: '<b>Der Miteigentumsanteil wird hier nicht automatisch abgezogen</b> — anders als beim Bodenwert. Die Fläche geht so in den Sachwert ein, wie sie hier steht. Die NHK 2010 führen für Garagen eigene Kostenkennwerte (Gebäudeart 14.1) und eine eigene Gesamtnutzungsdauer von 60 Jahren; eine Garage hält nicht so lange wie das Wohnhaus. Ohne Fläche wird sie nicht angesetzt.',
       grund: '§ 36 ImmoWertV · NHK 2010, Gebäudeart 14.1'
     },
+    /* ── v1146-FHTEXT · Neun Felder trugen ein ⓘ, das nichts tat ──────────
+     * `wertermittlung.js` vergab 18 Hilfe-Schlüssel, `TEXTE` führte 10 —
+     * und `textFuer()` kennt keinen Rückfall: fehlt der Schlüssel, gibt es
+     * `null` zurück und der Klick verpufft still. Betroffen waren
+     * ausgerechnet die erklärungsbedürftigsten Felder.
+     *
+     * Sechs Texte gab es längst — im HILFE-Block von `wertermittlung.js`,
+     * wo sie nie jemand zu sehen bekam. Sie sind hierher überführt und in
+     * kurz/lang geteilt; drei (Standardstufe, Modernisierungsgrad,
+     * Grundriss) sind neu. */
+    standardstufe: {
+      kurz: 'Bauqualität des Gebäudes in fünf Stufen. Stufe 3 ist der Durchschnitt, Stufe 1 einfachst, Stufe 5 aufwendig. Sie steuert den Kostenkennwert und damit den ganzen Sachwert.',
+      lang: 'Die Stufen der Sachwertrichtlinie beschreiben Fenster, Dach, Heizung, Sanitär und Ausbau zusammengefasst. Eine Stufe Unterschied verschiebt die Herstellungskosten je nach Gebäudetyp um 15 bis 25 Prozent — es lohnt, hier genau zu sein. Wer es feiner will, füllt stattdessen die neun Gewerke einzeln aus; sind alle gesetzt, haben sie Vorrang vor dieser glatten Stufe.',
+      grund: 'SW-RL 2012, Anlage 1 · NHK 2010'
+    },
+    modGrad: {
+      kurz: 'Modernisierungspunkte nach SW-RL. Sie verlängern die Restnutzungsdauer eines älteren Gebäudes — ohne sie rechnet der Bericht mit dem reinen Baujahr.',
+      lang: 'Bewertet werden Dach, Fenster, Leitungen, Heizung, Bäder, Böden, Grundriss und Wärmedämmung mit je 0 bis 4 Punkten. Aus der Summe leitet sich das fiktive Baujahr ab. Bei einem Haus von 1964 macht eine durchgreifende Modernisierung schnell zwanzig Jahre Restnutzungsdauer aus — und die geht über den Barwertfaktor direkt in den Ertragswert.',
+      grund: 'SW-RL 2012, Anlage 4 · § 4 Abs. 3 ImmoWertV'
+    },
+    grundriss: {
+      kurz: 'Wohnungszuschnitt im Gebäude — Zweispänner, Dreispänner, Laubengang. Er korrigiert den Kostenkennwert nach oben oder unten.',
+      lang: 'Je mehr Wohnungen an einem Treppenhaus hängen, desto günstiger wird der Quadratmeter: die Erschließungsfläche verteilt sich auf mehr Einheiten. Die NHK 2010 führen dafür eigene Korrekturfaktoren. Ohne Angabe rechnet der Bericht ohne Korrektur — das ist die neutrale Annahme, kein Schätzwert.',
+      grund: 'NHK 2010, Korrektur Grundrissart'
+    },
+    hinterland: {
+      kurz: 'Nur die zusätzliche Fläche eintragen, die über das normale Baugrundstück hinausgeht — nicht die gesamte Grundstücksfläche, sie würde doppelt gezählt.',
+      lang: 'Beispiel: 1.000 m² Grundstück, davon 800 m² Bauland und 200 m² Hinterland — hier gehören die 200 hinein, nicht die 800 und nicht die 1.000. Die Fläche wird getrennt bewertet, weil sie nicht denselben Wert hat wie das Baugrundstück (§ 41 ImmoWertV).',
+      grund: '§ 41 ImmoWertV'
+    },
+    hinterlandRent: {
+      kurz: 'Rentierlich heißt: die Fläche wirft einen Ertrag ab, etwa weil sie verpachtet ist. Das ist die Ausnahme.',
+      lang: 'Eine <b>nicht</b> rentierliche Fläche geht in den Bodenwert ein, unterliegt aber nicht der Bodenwertverzinsung im Ertragswertverfahren — sonst mindert sie den Gebäudeertrag, obwohl sie gar keinen tragen soll. Der Haken ist damit eine der wenigen Stellen, an denen eine einzelne Angabe den Ertragswert spürbar verschiebt.',
+      grund: '§ 41 ImmoWertV'
+    },
+    garagenStufe: {
+      kurz: 'Stufe 3 sind Fertiggaragen, Stufe 4 Massivbauweise, Stufe 5 massiv mit besonderer Ausführung (Ziegel- oder Gründach, Fliesen, Wasser und Heizung).',
+      lang: 'Kostenkennwerte 245 / 485 / 780 €/m² BGF, Stand 2010 — sie werden mit dem Baupreisindex auf den Stichtag gebracht. Zwischen Stufe 3 und 5 liegt gut das Dreifache; bei einer Doppelgarage macht das im Sachwert mehrere zehntausend Euro aus.',
+      grund: 'NHK 2010, Gebäudeart 14.1'
+    },
+    aussenPct: {
+      kurz: 'Wege, Hofflächen, Einfriedungen, Ver- und Entsorgungsanlagen — als Prozentsatz des Gebäudesachwerts.',
+      lang: 'Übliche Ansätze liegen zwischen 5 und 7 Prozent; manche Gutachterausschüsse geben stattdessen feste Beträge vor (Minden-Lübbecke: Kanal 2.900 €, Einfahrt 2.500 €, Terrasse 2.000 €). Ist oben ein Eurobetrag eingetragen, hat der Vorrang. Weil der Wert am Gebäudesachwert hängt, skaliert er bei einer Eigentumswohnung automatisch mit — anders als die Garagenfläche.',
+      grund: '§ 36 Abs. 3 ImmoWertV'
+    },
+    ausstGewerk: {
+      kurz: 'Feinere Alternative zur glatten Standardstufe: je Gewerk eine Stufe 1–5, halbe Stufen erlaubt.',
+      lang: 'Gerechnet wird nur, wenn <b>alle neun</b> Gewerke gesetzt sind — sonst gilt die glatte Standardstufe oben. Das ist Absicht: eine halb gefüllte Gewerkeliste wäre genauer aussehend, aber ungenauer. Die Gewichte stehen in der Feldbezeichnung (Außenwände 23 % … sonstige Technik 6 %).',
+      grund: 'SW-RL 2012, Anlage 2'
+    },
+    bauteilHk: {
+      kurz: 'Herstellungskosten besonderer Bauteile zum heutigen Stichtag, ohne erneute Indexierung.',
+      lang: 'Sie unterliegen derselben Alterswertminderung wie das Gebäude. Größenordnung am Beispiel Löhner Straße: Gauben 51.000, Balkone 13.000, Vordach 10.000, Terrassen 18.000, Sonstiges 3.000 €. Gemeint sind Bauteile, die im Kostenkennwert nicht enthalten sind — nicht die normale Ausstattung.',
+      grund: '§ 36 Abs. 2 ImmoWertV'
+    },
     lzs: {
       kurz: 'Liegenschaftszinssatz in Prozent. Die größte Stellschraube im ganzen Verfahren — ein halber Punkt verschiebt den Ertragswert um rund acht Prozent.',
       lang: 'Er stammt aus dem Grundstücksmarktbericht des örtlichen Gutachterausschusses. Liegt keiner vor, greift der gesetzliche Auffangwert nach § 256 BewG — der ist nicht marktabgeleitet, liegt in der Regel darunter und erzeugt damit einen eher hohen Ertragswert. Die verwendete Stufe steht im Ergebnis und im PDF.',
@@ -117,10 +172,21 @@
     document.head.appendChild(s);
   }
 
-  function box(feld, txt) {
+  function box(feld, txt, anker) {
     var alt = document.querySelector('.fh-box[data-fh-for="' + feld + '"]');
     if (alt) { alt.remove(); return null; }
-    var el = $(feld);
+    /* v1146b-FHANKER · Nicht jeder Hilfe-Schlüssel ist eine Feld-Id.
+     * `hinterland`, `ausstGewerk` und `bauteilHk` stehen für ganze
+     * Feldgruppen — das ⓘ hängt dort 9× bzw. 5× an verschiedenen Feldern
+     * (`ausstAussenwaende`, `btlGauben`, …). `$(feld)` findet dann nichts
+     * und der Kasten wurde **still** gar nicht erst gebaut: der Text war
+     * vorhanden, `textFuer()` warnte zu Recht nicht, und trotzdem passierte
+     * beim Klick nichts. Genau der Fehler, den v1146 beheben sollte — nur
+     * eine Ebene tiefer.
+     *
+     * Rückfall auf das angeklickte Zeichen selbst: es steht immer im Label
+     * des Feldes, zu dem die Erklärung gehört. */
+    var el = $(feld) || anker;
     if (!el) return null;
     var d = document.createElement('div');
     d.className = 'fh-box';
@@ -143,7 +209,19 @@
   /* Kontextsensitiv: der Text richtet sich nach dem, was gewählt ist. */
   function textFuer(feld) {
     var t = TEXTE[feld];
-    if (!t) return null;
+    /* v1146-FHTEXT · Ein stiller Rückfall sieht aus wie ein bestandener
+     * Lauf. Genau so blieben neun Info-Zeichen unbemerkt wirkungslos: der
+     * Klick fand keinen Text, gab `null` zurück, und niemand erfuhr davon
+     * — weder Nutzer noch Entwickler. Fehlende Module laut melden, nicht
+     * im Rückfall verschwinden lassen (dieselbe Lehre wie beim
+     * DPC-Alias). */
+    if (!t) {
+      try {
+        console.warn('[feldhilfe] kein Text für Feld "' + feld
+          + '" — das Info-Zeichen bleibt wirkungslos. Eintrag in TEXTE fehlt.');
+      } catch (e) {}
+      return null;
+    }
     var out = { kurz: t.kurz, lang: t.lang, grund: t.grund, titel: null };
 
     if (feld === 'lzs') {
@@ -259,7 +337,7 @@
       i.addEventListener('click', function () {
         var f = i.getAttribute('data-fh');
         var t = textFuer(f);
-        if (t) box(f, t);
+        if (t) box(f, t, i.parentNode || i);   /* v1146b: Anker für Gruppen-Schlüssel */
       });
     });
     ['baustatus', 'cond'].forEach(function (f) {

@@ -84,6 +84,7 @@
               '#srcChips', '#costNote', '#loadSignal', '.mbw-aktionen'];
 
   var _aktiv = 1;
+  var _klappWahl = false;   /* v1153: wurde der Schritt AUS DER LISTE gewaehlt? */
   var _panel = null;
   var _plan = null;
 
@@ -139,9 +140,28 @@
       'html.mb-breit .grid{grid-template-columns:1fr !important}',
       'html.mb-breit #resultPanel{display:none !important}',
       'html.mb-breit .panel{max-width:none}',
-      'html.mb-breit #wm-ziel,html.mb-breit .mbw-reiter,html.mb-breit .mbw-blatt,',
+      'html.mb-breit #wm-ziel,html.mb-breit .mbw-blatt,',
         'html.mb-breit .mbw-nav,html.mb-breit .mbw-fuss,html.mb-breit #wm-ampel{',
         'max-width:760px;margin-left:auto;margin-right:auto}',
+      /* v1151-LEISTE · Marcels Befund: „Die Punkte 1–7 sollten schon
+         nebeneinander passen." Gemessen bei 1024, 1280 und 1920 px: die
+         sieben Marken brauchen zusammen 902 px, ihr Behälter stand aber bei
+         JEDER Fensterbreite auf 760 px — auch bei 1920, wo `.panel` 1300 px
+         breit ist. Der Platz war da, die Leiste begrenzte sich selbst und
+         brach in zwei Zeilen um (Oberkanten 374 und 421).
+
+         Ursache war der Sammelselektor darüber: die 760 px sind für
+         Formularzeilen und Text richtig gedacht („eine Formularzeile über
+         1.278 px wäre unlesbar", v1128) — die Reiterleiste ist aber keine
+         Formularzeile, sondern Navigation. Ein Selektor, der beides gleich
+         behandelt, gibt einem von beiden das falsche Maß.
+
+         Deshalb eine eigene Grenze: 960 px, also 58 px Luft über dem
+         gemessenen Bedarf für längere Beschriftungen und andere
+         Schriftgrößen. Zentriert wie zuvor, damit sie über dem 760er-Inhalt
+         ausgerichtet bleibt. `flex-wrap:wrap` bleibt der Rückfall — bei
+         390 px MUSS sie umbrechen, dort ist Nebeneinander unmöglich. */
+      'html.mb-breit .mbw-reiter{max-width:960px;margin-left:auto;margin-right:auto}',
       'html.mb-breit .mbw-r{font-size:14px;padding:13px 20px}',
       'html.mb-breit .mbw-kurz{max-width:760px;margin-left:auto;margin-right:auto;font-size:12px}',
       'html.mb-breit input:not([type=checkbox]):not([type=radio]),html.mb-breit select{',
@@ -166,9 +186,117 @@
       '.mbw-pbahn i{display:block;height:100%;border-radius:4px;transition:width .45s ease;',
         'background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f))}',
       '#genProgSteps{font-size:12px;line-height:1.7}',
-      'html.mb-breit #genProgress{font-size:13px}'
+      'html.mb-breit #genProgress{font-size:13px}',
+
+      /* ══ v1153-KLAPP · Zweite Darstellung fuer schmale Schirme ══════════
+         Marcels Befund: „Es muss auf dem Handy funktionieren. Eine
+         siebenteilige Schrittleiste nebeneinander und ein Handy schliessen
+         sich aus — der Entwurf braucht ZWEI Darstellungen derselben
+         Fuehrung, nicht eine gequetschte."
+
+         Gemessen bei 390 px: die sieben Marken brauchen 902 px, im Behaelter
+         stehen 305 px, also vier Zeilen und ~188 px, bevor eine einzige
+         Angabe zu sehen ist. Nichts beschnitten, alles erreichbar — kein
+         Defekt, eine Platzfrage.
+
+         Von drei gezeigten Fassungen hat Marcel C gewaehlt (Demo:
+         design/Vorschlaege/marktbericht-schrittleiste-handy.html): die
+         Klappleiste. Zugeklappt ~50 px, aufgeklappt die volle Liste. Sie ist
+         die einzige, die NICHTS wegnimmt — der direkte Sprung zu jedem
+         Schritt bleibt. Dasselbe Muster wie die Kompakt-Karte der Sidebar
+         (v1092/v1094): eine schmale Zeile zum Aufklappen.
+
+         DIESELBEN KNOEPFE, andere Huelle. Kein zweiter Reiter-Satz — sonst
+         gibt es zwei Listen, die auseinanderlaufen (die Lehre aus v1096b
+         und v1112b). Unter 900 px wird `#mbw-reiter` zur senkrechten Liste,
+         darueber bleibt alles wie es ist.
+
+         Schwelle 900 px: dieselbe, an der die App auf den Drawer umschaltet.
+         Damit gibt es zwei Fassungen und keine dritte Zwischenform. */
+      '.mbw-klapp{display:none}',
+      '@media (max-width:900px){',
+        '.mbw-klapp{display:block;max-width:960px;margin:0 auto 8px}',
+        '.mbw-klapp-kopf{display:flex;align-items:center;gap:10px;width:100%;',
+          'min-height:46px;padding:9px 13px;border:1px solid var(--line,#e6e0d3);',
+          'border-radius:10px;background:var(--panel,#faf8f2);color:inherit;',
+          'font:inherit;text-align:left;cursor:pointer}',
+        '.mbw-klapp-kopf .n{font-family:"JetBrains Mono",monospace;font-size:10.5px;',
+          'letter-spacing:.6px;color:var(--muted,#8a857c);flex:0 0 auto}',
+        '.mbw-klapp-kopf .t{font-family:"Space Grotesk",system-ui,sans-serif;font-size:15px;',
+          'font-weight:600;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+        '.mbw-klapp-kopf .pf{font-size:12px;color:var(--muted,#8a857c);flex:0 0 auto;',
+          'transition:transform .18s ease}',
+        'html:not(.mbw-zu) .mbw-klapp-kopf .pf{transform:rotate(90deg)}',
+        '.mbw-klapp-bahn{height:3px;border-radius:3px;background:rgba(128,128,128,.22);',
+          'overflow:hidden;margin:6px 2px 0}',
+        '.mbw-klapp-bahn i{display:block;height:100%;border-radius:3px;transition:width .35s ease;',
+          'background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f))}',
+        /* Die Leiste selbst wird zur Liste — 44 px je Zeile, linksbuendig. */
+        'html.mb-breit .mbw-reiter,.mbw-reiter{flex-direction:column;gap:4px;max-width:960px}',
+        '.mbw-reiter .mbw-r{width:100%;min-height:44px;border-radius:9px;text-align:left;',
+          'border-bottom:1px solid var(--line,#e6e0d3);box-shadow:none}',
+        '.mbw-reiter .mbw-r.an{box-shadow:inset 0 0 0 1px var(--wl-c9a84c,#C9A84C)}',
+        /* Zugeklappt: die Liste ist weg, die Kopfzeile traegt den Stand. */
+        'html.mbw-zu .mbw-reiter{display:none}',
+      '}'
     ].join('');
     document.head.appendChild(s);
+  }
+
+  /* ── v1153-KLAPP · Kopfzeile bauen, Zustand merken ─────────────────────
+     Der Merker haelt den Zustand ueber das Neuladen: zugeklappt bleibt
+     zugeklappt, wie bei der Kompakt-Karte. Standard ist ZU — wer auf dem
+     Handy ankommt, will Felder sehen, nicht ein Menue. */
+  var MERKER = 'dp_mb_leiste_zu';
+  function klappZu() { try { return localStorage.getItem(MERKER) !== '0'; } catch (e) { return true; } }
+  function klappSetzen(zu) {
+    document.documentElement.classList.toggle('mbw-zu', !!zu);
+    try { localStorage.setItem(MERKER, zu ? '1' : '0'); } catch (e) {}
+  }
+  function schmal() {
+    try { return window.matchMedia('(max-width:900px)').matches; } catch (e) { return false; }
+  }
+  function klappBauen(reiter) {
+    if (id('mbw-klapp')) return true;
+    /* v1153b · Ohne Referenzknoten im Dokument gibt es keine Kopfzeile —
+       und dann darf `mbw-zu` NICHT gesetzt werden, sonst versteckt der
+       Zustand die Liste, ohne einen Ersatz anzubieten. Laut melden statt
+       still scheitern: ein stummes catch hat schon einmal eine Korrektur
+       nie laufen lassen (config.js/DPC). */
+    if (!reiter || !reiter.parentNode) {
+      try { console.warn('[v1153b] Klappleiste nicht gebaut: Reiterleiste hängt nicht im Dokument. ' +
+        'Die Leiste bleibt aufgeklappt — das ist der sichere Zustand.'); } catch (e) {}
+      document.documentElement.classList.remove('mbw-zu');
+      return false;
+    }
+    var k = document.createElement('div');
+    k.className = 'mbw-klapp';
+    k.id = 'mbw-klapp';
+    k.innerHTML = '<button type="button" class="mbw-klapp-kopf" id="mbw-klapp-kopf" aria-expanded="false">'
+      + '<span class="n"></span><span class="t"></span><span class="pf">▸</span></button>'
+      + '<div class="mbw-klapp-bahn"><i style="width:0"></i></div>';
+    reiter.parentNode.insertBefore(k, reiter);
+    k.querySelector('#mbw-klapp-kopf').addEventListener('click', function () {
+      klappSetzen(!document.documentElement.classList.contains('mbw-zu'));
+      klappNachziehen();
+    });
+    klappSetzen(klappZu());
+    klappNachziehen();
+    return true;
+  }
+  /* Kopfzeile an den aktiven Schritt anpassen. Klappt NICHT von selbst auf —
+     sonst springt das Layout bei jedem „Weiter". */
+  function klappNachziehen() {
+    var kopf = id('mbw-klapp-kopf');
+    if (!kopf) return;
+    var s = null;
+    for (var i = 0; i < SCHRITTE.length; i++) if (SCHRITTE[i].id === _aktiv) s = SCHRITTE[i];
+    if (!s) return;
+    kopf.querySelector('.n').textContent = s.id + '/' + SCHRITTE.length;
+    kopf.querySelector('.t').textContent = s.t;
+    kopf.setAttribute('aria-expanded', document.documentElement.classList.contains('mbw-zu') ? 'false' : 'true');
+    var bahn = document.querySelector('.mbw-klapp-bahn i');
+    if (bahn) bahn.style.width = Math.round(s.id / SCHRITTE.length * 100) + '%';
   }
 
   /* Adresse und die Sichern-Knoepfe tragen keine Id — sie bekommen eine
@@ -254,10 +382,22 @@
        gilt fuer alle Reiter. */
     var nachher = id('wm-ziel');
     nachher.parentNode.insertBefore(reiter, nachher.nextSibling);
+    /* v1153b · HIER, nicht früher. Der erste Anlauf rief klappBauen() auf,
+       während `reiter` noch nicht im Dokument hing — `reiter.parentNode` war
+       null, das insertBefore lief ins Leere, die Kopfzeile entstand nie.
+       Gesetzt wurde `html.mbw-zu` trotzdem, und damit war unter 900 px
+       ÜBERHAUPT keine Führung mehr sichtbar: die Liste versteckt, die
+       Kopfzeile nicht vorhanden. Ein stiller Fehlschlag, der schlimmer war
+       als der Zustand davor. */
+    klappBauen(reiter);
     reiter.parentNode.insertBefore(blaetter, reiter.nextSibling);
 
     reiter.addEventListener('click', function (e) {
       var b = e.target.closest('[data-mbw]');
+      /* v1153-KLAPP · Eine Wahl AUS DER LISTE klappt sie danach zu; ein
+         Wechsel über „Weiter/Zurück" nicht. Deshalb der Merker hier und
+         nicht in zeige() selbst. */
+      if (b) _klappWahl = true;
       if (b) zeige(parseInt(b.getAttribute('data-mbw'), 10));
     });
     id('mbw-vor').addEventListener('click', function () { zeige(Math.min(SCHRITTE.length, _aktiv + 1)); });
@@ -341,6 +481,12 @@
     var z = id('mbw-zur'), v = id('mbw-vor');
     if (z) z.disabled = (n === 1);
     if (v) v.disabled = (n === SCHRITTE.length);
+    /* v1153-KLAPP · Kopfzeile mitziehen, und auf schmalen Schirmen nach der
+       Wahl zuklappen: die Liste hat ihren Zweck erfuellt und gaebe sonst
+       die Flaeche nicht frei. Ein Wechsel ueber „Weiter" laesst sie zu, wie
+       sie ist — er oeffnet sie nicht und schliesst sie nicht. */
+    if (schmal() && _klappWahl) { klappSetzen(true); _klappWahl = false; }
+    klappNachziehen();
     try { var w = id('mbw-reiter'); if (w) w.scrollIntoView({ block: 'nearest' }); } catch (e) {}
   }
 

@@ -39,6 +39,53 @@ ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --short HEAD'
 gegen den lokalen `HEAD`. Bricht das Skript nach dem Push ab, den Server-Pull
 von Hand nachziehen (`git pull --ff-only` in `/opt/dealpilot`).
 
+### Der Hash allein genügt nicht — den ZWEIG mitlesen
+
+Am 12.08. abends stand der Staging-Server plötzlich auf **`main`** statt
+`staging`, und damit auf `65ca0b0` — einem Stand von morgens. Alle
+Frontend-Pakete des Tages (`v1148` bis `v1153b`) waren nicht mehr
+ausgeliefert, obwohl jeder einzelne Deploy vorher den richtigen Hash gemeldet
+hatte. Aufgefallen ist es nur, weil der Prüfbefehl einen Hash zeigte, der
+nicht zum eben gepushten passte.
+
+**Ein `git pull --ff-only` auf dem falschen Zweig meldet Erfolg** — es holt
+brav `origin/main`, das sich nie bewegt. Der Prüfbefehl gehört deshalb
+erweitert:
+
+```
+ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD'
+```
+
+**Erwartet wird `staging` UND der eben gepushte Hash.** Stimmt der Zweig
+nicht, ist der Hash bedeutungslos.
+
+### Der Parallel-Chat committet auf dem Server
+
+Beim Zurückholen auf `staging` war der Zweig **divergiert**: auf dem Server
+lag ein fremder Commit `0a55ee4` — **920 Zeilen in 15 Dateien**, das
+v1083-Paket (Ausschuss-Register NRW, 493 LZS-Sätze, acht Auswerter für
+Sachwertfaktoren). Ein anderer Arbeitsstrang hatte direkt auf dem Server
+gearbeitet, committet und das mb-Backend neu gebaut.
+
+**Das ist die zweite Wiederholung.** `545d069` trägt denselben Fall („die 319
+Zeilen sind im Repo, Server wieder auf staging"), und die Projektanweisung
+warnt seit dem 12.08.: *„Nur EIN Chat fasst git an."*
+
+**Was in dieser Lage gilt:**
+- **Nichts wegwerfen.** `git reset --hard origin/staging` hätte 920 Zeilen
+  fremder Arbeit gelöscht. Erst `git log origin/staging..HEAD --stat` lesen.
+- **Prüfen, ob die Basis passt:** `git merge-base --is-ancestor <mein-commit>
+  <fremder-commit>`. Hier war es so — der fremde Strang hatte auf meinem
+  Stand aufgebaut, also war ein Merge gefahrlos.
+- **Konfliktrisiko an den Dateilisten ablesen**, nicht am Bauchgefühl. Hier
+  berührte der fremde Commit **keine** `.md`-Datei, mein letzter nur
+  Dokumentation → konfliktfreier Merge.
+- **Danach zurückpushen**, sonst liegt die fremde Arbeit weiter nur auf dem
+  Server und stirbt beim nächsten `--ff-only`-Abbruch.
+- **Und prüfen, ob ihr Container-Rebuild lief** — Code im Repo heißt nicht
+  Code im Container. Hier war er schon gebaut
+  (`docker exec dealpilot-mb-backend ls /app/src/lib/…`).
+
 ---
 
 ## 2 · Welche CSS-Regel gewinnt, sagt nur der Kaskaden-Walker
@@ -191,8 +238,81 @@ muss mitfärben. Und **beide Bedienwege** prüfen —
   Weg automatisiert prüfen will, ersetzt ihn vorher:
   `window.confirm = () => true` (und den Text mitschreiben, er nennt den
   Preis). Gilt genauso für `alert` und `prompt`.
+- **`#app` gibt es in der App nicht.** `CLAUDE.md` nennt `#app[...]` als
+  Beispiel für „lieber Spezifität erhöhen" — als Muster, nicht als
+  vorhandenes Element. `document.getElementById('app')` liefert `null`.
+  Eine CSS-Regel mit diesem Anker greift **nirgends** und sieht dabei
+  völlig plausibel aus. Kostete in `v1147` einen ganzen Ausrollzyklus.
+  **Jeden Anker vor dem Schreiben im Browser auslesen** — auch den aus der
+  eigenen Dokumentation.
+- **`WriteAllLines` rettet nicht vor der Umlaut-Falle, wenn das Skript
+  selbst falsch gelesen wird.** PowerShell 5.1 liest eine `.ps1` **ohne
+  BOM als ANSI**: jedes „—" und jeder Umlaut im Skript-Literal ist damit
+  schon beim Einlesen kaputt und wird sauber als Doppelkodierung
+  geschrieben. Betrifft nur die **eigenen Literale**, nicht die
+  eingelesenen Zeilen — deshalb sieht die Datei zu 99 % richtig aus.
+  Auch Suchmuster trifft es: `-Pattern '^## Später'` findet nichts.
+  **In Skripten ASCII-Muster benutzen** (`'^## Sp.ter'`) und Texte mit
+  Umlauten aus einer UTF-8-Datei einlesen, nie als Literal.
+- **CDP bricht nach 45 s ab.** Ein `await new Promise(r=>setTimeout(r,60000))`
+  im selben `javascript_tool`-Aufruf läuft in den Timeout und meldet
+  „renderer may be frozen" — die Seite ist völlig in Ordnung. Wartezeiten
+  auf mehrere Aufrufe verteilen, höchstens ~40 s pro Aufruf.
+- **Aufklapper sind Umschalter.** `feldhilfe.js` entfernt den Kasten, wenn
+  er schon da ist. Ein Prüflauf, der alle Zeichen durchklickt, **schließt**
+  die aus einem abgebrochenen Lauf noch offenen — und meldet sie als „ohne
+  Text". Vor der Messung `.fh-box` abräumen, sonst misst man den eigenen
+  Vorlauf.
 - **Zustand aus dem vorigen Prüflauf verfälscht die nächste Messung.** Ein
   selbst gesetztes `body.hdr-collapsed` überlebte den Reload (localStorage)
   und ließ einen Spalt von 49 px melden, den es nicht gab. Vor jeder Messung
   `document.body.className` und die einschlägigen Merker mitlesen — und im
   Befund nennen.
+
+---
+
+## 9 · „Das fehlt" ist die teuerste Vermutung — zweimal an einem Tag
+
+Am 12.08. zweimal derselbe Fehler: eine Lücke behauptet, die es nicht gab.
+
+- **Tablet-Punkt.** Der Backlog verlangte drei Dinge zu bauen (Sidebar
+  andocken, zweispaltige Formulare, Popover statt Blatt). **Alle drei waren
+  gebaut** — das Andocken seit `v648`, das Blatt seit `V46` per
+  `display:none!important` stillgelegt. Der zugrunde liegende Entwurf hatte
+  nur bei **820 px** gemessen, unterhalb der 901er-Schwelle.
+- **Sachwertfaktor.** Ich meldete, ein manuell eingegebener Faktor trage
+  **keine Herkunft**, weil in `CrossCheckService.js` alle sieben
+  `sachwertfaktor_*`-Felder am Tabellenweg hängen. Das stimmte — und war
+  trotzdem der falsche Schluss. Die Herkunft läuft über einen **anderen**
+  Weg: `WertParameterService.sachwertfaktor()` gibt beim eigenen Wert
+  `{wert, stufe:'E', quelle:'eigene Angabe'}`, `nhk2010.js:897` setzt daraus
+  `out.sachwertfaktor = {wert, stufe, quelle}`, und die Karte druckt
+  „· Faktor 1,15 · Stufe E". **Genau das hatte `v1144` hergestellt.**
+
+**Das Muster ist dasselbe:** ein Feld ist an der erwarteten Stelle leer, und
+daraus wird „die Funktion fehlt" — statt „ich habe den Weg noch nicht
+gefunden".
+
+**Woran es zu erkennen ist:** die Behauptung lautet „X wird nicht gesetzt",
+belegt durch **eine** Stelle. Ein Negativbefund über eine ganze Funktion
+lässt sich an einer Stelle aber nicht belegen.
+
+**Was hilft, in dieser Reihenfolge:**
+1. **Vom Verbraucher her suchen, nicht vom Erzeuger.** Wer stellt den Wert
+   dar? Die Anzeige (`app.js:592 ff.`) las die Stufe längst und beherrschte
+   sogar zwei Formen (Zahl **und** Objekt). Das allein hätte die Fehldiagnose
+   verhindert.
+2. **Nach dem Vokabular greppen, nicht nach dem Feldnamen.** `STUFEN_ETIKETT`
+   mit A–E steht in `WertParameterService.js` und beschreibt E als „eigene
+   Angabe, vom Nutzer gesetzt". Ein `grep -rn "'E'"` wäre schneller gewesen
+   als jede Weichenanalyse.
+3. **Die Commit-Historie nach dem Thema fragen.** `git log --oneline -S`
+   findet, wer den Weg gebaut hat. `v1144` trug es im Titel: „Der
+   Sachwertfaktor wurde nie angewandt — falscher Feldname an zwei Stellen."
+4. **Erst dann urteilen.** Und wenn geurteilt wurde: die Rücknahme
+   ausdrücklich, nicht stillschweigend.
+
+**Und die Konsequenz aus der Wiederholung:** `CLAUDE.md` sagt, zwei gleiche
+Fehler hintereinander heißen, die Sitzung ist zu lang — abschließen,
+übergeben, Schluss. **Das gilt auch dann, wenn der nächste Schritt klein und
+verlockend aussieht.** Genau dann irrt man weiter.
