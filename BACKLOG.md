@@ -35,6 +35,40 @@ Zu den offenen Punkten liegt **kein** Bild vor. Das ist kein Mangel — es
 sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
+
+## → Hier weitermachen (Übergabe 2026-08-12)
+
+**Stand:** alles auf `8051f88`, lokal wie Staging, Zweig `staging`,
+Arbeitsverzeichnis sauber. Backend dreimal neu gebaut.
+
+**Der nächste Punkt ist die Tablet-Fassung (Punkt 1), Entscheidung A ist
+gefallen: Sidebar dockt ab 1024 px an.** Baubar sind damit Andocken,
+zweispaltige Formulare und Aktionen als Popover. Nur **B** (Score flacher)
+bleibt offen und braucht ein Bild.
+
+**Vor dem Bauen:**
+- Entwurf lesen: `design/Vorschläge/tablet-fassung.md` (gemessen bei
+  820 × 1180 im gleich-Origin-iframe).
+- Messkabine nach `FALLEN.md` aufsetzen — Träger `/impressum.html` auf der
+  **App-Domain** (`app.staging.dealpilot.junker-immobilien.io`), nicht auf
+  der Landing-Domain.
+- **Jeden CSS-Anker im Browser auslesen, bevor er in eine Regel geht.**
+  In `v1147` stand `#app` in der Regel — das Element gibt es nicht.
+
+**Zwei Abnahmen, die noch offen sind:**
+1. **Ankreuzfelder 33 px** (`v1147b`) — gemessen ohne geladenes Objekt,
+   0 von 26 Feldern sichtbar. Mit geladenem Objekt gegenmessen, ob die
+   Formularzeilen tragen (besonders Steuer und Pilot-Analyse).
+2. **Produktion** — liegt dieselbe `registry.js`-Drift dort auch? SSH ist
+   read-only, ein Dateivergleich genügt.
+
+**Prüfstrecken auf Staging:**
+- `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt,
+  weitere Marktberichte kosten **0 L**. Der einzige Haus-Testfall.
+- `Hermannstraße 9 Hüllhorst` (`07d89138`) — ETW, Stufe 3 bezahlt.
+- Kerosin zuletzt: **86 L**.
+
+---
 ## Offen
 
 1. **Tablet-Fassung feinziehen** — Drawer, zweispaltige Formulare, Aktionen

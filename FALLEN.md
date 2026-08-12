@@ -191,6 +191,31 @@ muss mitfärben. Und **beide Bedienwege** prüfen —
   Weg automatisiert prüfen will, ersetzt ihn vorher:
   `window.confirm = () => true` (und den Text mitschreiben, er nennt den
   Preis). Gilt genauso für `alert` und `prompt`.
+- **`#app` gibt es in der App nicht.** `CLAUDE.md` nennt `#app[...]` als
+  Beispiel für „lieber Spezifität erhöhen" — als Muster, nicht als
+  vorhandenes Element. `document.getElementById('app')` liefert `null`.
+  Eine CSS-Regel mit diesem Anker greift **nirgends** und sieht dabei
+  völlig plausibel aus. Kostete in `v1147` einen ganzen Ausrollzyklus.
+  **Jeden Anker vor dem Schreiben im Browser auslesen** — auch den aus der
+  eigenen Dokumentation.
+- **`WriteAllLines` rettet nicht vor der Umlaut-Falle, wenn das Skript
+  selbst falsch gelesen wird.** PowerShell 5.1 liest eine `.ps1` **ohne
+  BOM als ANSI**: jedes „—" und jeder Umlaut im Skript-Literal ist damit
+  schon beim Einlesen kaputt und wird sauber als Doppelkodierung
+  geschrieben. Betrifft nur die **eigenen Literale**, nicht die
+  eingelesenen Zeilen — deshalb sieht die Datei zu 99 % richtig aus.
+  Auch Suchmuster trifft es: `-Pattern '^## Später'` findet nichts.
+  **In Skripten ASCII-Muster benutzen** (`'^## Sp.ter'`) und Texte mit
+  Umlauten aus einer UTF-8-Datei einlesen, nie als Literal.
+- **CDP bricht nach 45 s ab.** Ein `await new Promise(r=>setTimeout(r,60000))`
+  im selben `javascript_tool`-Aufruf läuft in den Timeout und meldet
+  „renderer may be frozen" — die Seite ist völlig in Ordnung. Wartezeiten
+  auf mehrere Aufrufe verteilen, höchstens ~40 s pro Aufruf.
+- **Aufklapper sind Umschalter.** `feldhilfe.js` entfernt den Kasten, wenn
+  er schon da ist. Ein Prüflauf, der alle Zeichen durchklickt, **schließt**
+  die aus einem abgebrochenen Lauf noch offenen — und meldet sie als „ohne
+  Text". Vor der Messung `.fh-box` abräumen, sonst misst man den eigenen
+  Vorlauf.
 - **Zustand aus dem vorigen Prüflauf verfälscht die nächste Messung.** Ein
   selbst gesetztes `body.hdr-collapsed` überlebte den Reload (localStorage)
   und ließ einen Spalt von 49 px melden, den es nicht gab. Vor jeder Messung
