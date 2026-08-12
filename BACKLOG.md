@@ -435,12 +435,14 @@ die alle auf Marcels Durchgang zurückgehen.
    Drei Befunde am Entwurf `marktbericht-wizard.html`, dazu eine
    Verständnisfrage, die den Ablauf betrifft — **die ist die wichtigste.**
 
-   1. **Die Schrittleiste ist zu schmal.** „Die Punkte 1–7 sollten schon
-      nebeneinander passen." Sie brechen also um oder werden gestaucht.
-      **Messen, nicht schätzen:** die tatsächliche Breite der sieben
-      Marken bei 1024, 1280 und 1920 px, dann entscheiden, ob die Leiste
-      breiter wird, die Marken schmaler oder die Beschriftung kürzer. Eine
-      Leiste, die den Weg zeigen soll, darf ihn nicht selbst zerlegen.
+   1. **ERLEDIGT — die Schrittleiste ist zu schmal** (`v1151`, `7c716ab`,
+      siehe Fertig). Gemessen statt geschätzt: die sieben Marken brauchen
+      **902 px**, ihr Behälter stand bei **jeder** Fensterbreite auf
+      **760 px** — auch bei 1920, wo `.panel` 1300 px breit ist. Der Platz
+      war da; die Leiste begrenzte sich selbst und brach in zwei Zeilen um.
+      Ursache war ein Sammelselektor aus `v1128`, der die Leiste mit den
+      Formularzeilen zusammen auf 760 px setzte. Jetzt eigene Grenze
+      960 px → **eine Zeile ab 1024 px**.
 
    2. **Der Erzeugen-Knopf lässt sich nicht klicken, obwohl die Angaben für
       die einfache Einschätzung vollständig sind.** Marcel: „das muss ja
@@ -475,6 +477,20 @@ die alle auf Marcels Durchgang zurückgehen.
       Schrittleiste nebeneinander und ein Handy schließen sich aus — der
       Entwurf braucht **zwei** Darstellungen derselben Führung, nicht eine
       gequetschte.
+
+      **Jetzt vermessen (2026-08-12, nach `v1151`):** bei 390 px ist der
+      Behälter 305 px breit, die Leiste bricht auf **vier Zeilen** um
+      (Oberkanten 422/469/516/563) — also rund **188 px, bevor eine einzige
+      Angabe zu sehen ist**. **Kein Überlauf, nichts beschnitten, alle
+      sieben Marken erreichbar** — es ist kein Defekt, sondern eine
+      Platzfrage. Ab 1024 px steht die Leiste in einer Zeile, unter 1024 px
+      in zwei, auf dem Handy in vier.
+
+      **Damit ist die Aufgabe scharf umrissen:** gesucht ist eine zweite
+      Darstellung für schmale Schirme, die weniger als 188 px braucht — etwa
+      „Schritt 3 von 7" mit Titel und Fortschrittsbalken statt sieben
+      Marken. **Das ist Gestaltung, keine Reparatur → Demo-first**, Ablage
+      in `design/Vorschläge/`.
 
    **Und die Aufgabe, die über allen dreien steht: den Ablauf einmal
    vollständig durchspielen.** Marcel: „das muss ja Sinn machen, auch von
@@ -1082,6 +1098,49 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-12] **Die sieben Reiter brachen um, obwohl Platz war** — `v1151`, `7c716ab`.
+   **Marcels Befund** aus der Entwurfs-Durchsicht: „Die Punkte 1–7 sollten
+   schon nebeneinander passen."
+
+   **Gemessen statt geschätzt** (Messkabine, iframe auf `/impressum.html`,
+   Marktbericht-App direkt): die sieben Marken brauchen zusammen **902 px**
+   (117 · 94 · 105 · 131 · 171 · 149 · 133). Ihr Behälter `#mbw-reiter` stand
+   aber bei **jeder** Fensterbreite auf **760 px** — auch bei 1920 px, wo der
+   Eltern-Container `.panel` **1300 px** breit ist. Der Platz war da; die
+   Leiste begrenzte sich selbst und brach in zwei Zeilen um (Oberkanten 374
+   und 421). Kein Überlauf, nichts beschnitten — sie wickelte um.
+
+   **Ursache: ein Sammelselektor aus `v1128`**, der `#wm-ziel`,
+   `.mbw-reiter`, `.mbw-blatt`, `.mbw-nav`, `.mbw-fuss` und `#wm-ampel`
+   gemeinsam auf 760 px setzt. Für Formularzeilen und Text ist das gut
+   begründet („eine Formularzeile über 1.278 px wäre unlesbar"). **Die
+   Reiterleiste ist aber keine Formularzeile, sondern Navigation** — ein
+   Selektor, der beides gleich behandelt, gibt einem von beiden das falsche
+   Maß. Dieselbe Familie wie die `:not(#id)`-Lehre: **Sammelregeln treffen
+   Elemente mit verschiedenen Bedürfnissen.**
+
+   **Gelöst:** eigene Grenze `max-width:960px` für `.mbw-reiter`, 58 px Luft
+   über dem gemessenen Bedarf für längere Beschriftungen. Zentriert wie
+   zuvor, damit sie über dem 760er-Inhalt ausgerichtet bleibt.
+   `flex-wrap:wrap` bleibt der Rückfall.
+
+   **Nachgemessen am ausgerollten Stand** (`mb-wizard.js?v=1151` im iframe
+   bestätigt):
+
+   | Fenster | Behälter | Zeilen | Überlauf |
+   |---|---|---|---|
+   | 1920 px | 960 | **1** | nein |
+   | 1280 px | 960 | **1** | nein |
+   | 1024 px | 927 | **1** (25 px Luft) | nein |
+   | 950 px | 853 | 2 | nein |
+   | 820 px | 723 | 2 | nein |
+   | 390 px | 305 | 4 | nein |
+
+   **Die Zeilenzahl unter 1024 px ist gewollt** — bei 902 px Bedarf und
+   723 px Platz ist Nebeneinander unmöglich. Der Handy-Fall (vier Zeilen,
+   ~188 px) ist damit vermessen und steht als Gestaltungsaufgabe im Punkt:
+   gesucht ist eine zweite Darstellung, nicht eine gequetschte erste.
 
 - [2026-08-12] **Das PDF nannte den Sachwertfaktor 1, gerechnet wurde mit 0,925** — `v1150` + `v1150b`, `e33ea05`.
    Gesucht war nur die fehlende **Stufe** im Dossier. Gefunden wurde daneben
