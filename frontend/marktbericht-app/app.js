@@ -2196,7 +2196,19 @@ async function exportPdf(out) {
     doc.setDrawColor(228, 226, 220); doc.setLineWidth(0.3); doc.line(M, H - 11, W - M, H - 11);
     doc.setFillColor(...GOLD); doc.circle(M + 1, H - 8.3, 0.9, 'F');
     doc.setFontSize(7.5); doc.setTextColor(...MUT); doc.setFont('helvetica', 'normal');
-    doc.text('DealPilot · Marktbericht — Marktpreisindikation, kein Gutachten n. § 194 BauGB', M + 4, H - 8);
+    /* v1149-FUSS · Der Hinweis stand auf JEDER Seite. Marcels Befund am
+     * PDF: "nicht 3-4 mal die Preisindikation, das ist etwas zu viel."
+     * Gemessen: footer() laeuft bei jedem newPage(), der Prod-Bericht hat
+     * sieben Seiten — der Begriff kam allein hier siebenmal.
+     * Der Satz ist rechtlich sinnvoll (Abgrenzung n. § 194 BauGB) und
+     * verschwindet deshalb NICHT, er steht nur noch EINMAL: auf Seite 1,
+     * wo ihn liest, wer den Bericht in die Hand nimmt. Ab Seite 2 traegt
+     * die Fusszeile nur noch Marke und Seitenzahl.
+     * Die Textstellen zur Belastbarkeit (Z. 900/902/3344) bleiben — sie
+     * sagen etwas anderes und sind keine Dopplung, nur ein gleiches Wort. */
+    doc.text(pageNo === 1
+      ? 'DealPilot · Marktbericht — Marktpreisindikation, kein Gutachten n. § 194 BauGB'
+      : 'DealPilot · Marktbericht', M + 4, H - 8);
     doc.setTextColor(...GOLD); doc.setFont('helvetica', 'bold');
     doc.text('Seite ' + pageNo, W - M, H - 8, { align: 'right' });
     doc.setFont('helvetica', 'normal');
