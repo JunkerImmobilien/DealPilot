@@ -53,17 +53,34 @@ function _stufeAus(body) {
   return st;
 }
 
+/* ── v1154-EINEQUELLE · Der Aufpreis, an EINER Stelle gerechnet ──────────
+   Die Differenz-Formel stand zweimal im Haus: hier in `_kerosinKosten()`
+   (was ABGEBUCHT wird) und in `GET /stufenpreis` (was ANGEKUENDIGT wird).
+   Beide rechneten dasselbe — nachgeprueft am 12.08. Zeile fuer Zeile.
+
+   Genau das ist die Gefahr: laufen sie auseinander, wird 3 L angekuendigt
+   und 5 L gebucht. Das ist im Haus schon passiert (Marcels GELD-Befund
+   „Stufe 1 bewirbt 2 L, abgebucht werden 5 L", behoben in v1125), und die
+   Doppelliste ist im Marktbericht dreimal aufgetreten: FEHLT_TEXT gegen
+   BEDARF (v1126d), BEDARF gegen VERFAHREN[].pflicht (v1152) und hier.
+
+   Deshalb: eine Funktion, zwei Aufrufer. Das Verhalten ist unveraendert —
+   `STUFENPREIS[st] || COST.full` ist der alte Rueckfall aus dieser Datei
+   fuer eine unbekannte Stufe; fuer 1..3 greift er nie. */
+function _aufpreis(stufe, bezahlt) {
+  var voll = STUFENPREIS[stufe] || COST.full;
+  if (bezahlt >= stufe) return 0;                    /* diese Tiefe ist bezahlt */
+  if (bezahlt >= 1) return Math.max(0, voll - (STUFENPREIS[bezahlt] || 0));
+  return voll;
+}
+
 /* Der Preis. Die schon bezahlte Stufe kommt aus dem eigenen Kerosin-Log,
    NIEMALS aus dem Body — sonst behauptet der Client einfach, er habe
    bezahlt. Rueckgabe 0 heisst: nichts nachzufordern. */
 async function _kerosinKosten(userId, body, externalRef) {
-  var st = _stufeAus(body);
-  var voll = STUFENPREIS[st] || COST.full;
   var bezahlt = 0;
   try { bezahlt = await aiCreditsService.bezahlteStufeMarktbericht(userId, externalRef); } catch (e) { bezahlt = 0; }
-  if (bezahlt >= st) return 0;                       /* diese Tiefe ist bezahlt */
-  if (bezahlt >= 1) return Math.max(0, voll - (STUFENPREIS[bezahlt] || 0));
-  return voll;
+  return _aufpreis(_stufeAus(body), bezahlt);
 }
 
 // Generischer Forward an den mb-backend. Nutzt globalen fetch (Node >=18).
@@ -215,12 +232,10 @@ router.get('/stufenpreis', authenticate, async function (req, res) {
   try {
     const ref = (req.query && (req.query.ref || req.query.external_ref)) || null;
     const bezahlt = await aiCreditsService.bezahlteStufeMarktbericht(req.user.id, ref);
+    /* v1154-EINEQUELLE · Dieselbe Funktion, die auch abbucht. Was hier
+       angekuendigt wird, KANN damit nicht mehr von der Abbuchung abweichen. */
     const faellig = {};
-    for (var s = 1; s <= 3; s++) {
-      faellig[s] = (bezahlt >= s)
-        ? 0
-        : Math.max(0, STUFENPREIS[s] - (bezahlt >= 1 ? (STUFENPREIS[bezahlt] || 0) : 0));
-    }
+    for (var s = 1; s <= 3; s++) faellig[s] = _aufpreis(s, bezahlt);
     res.json({ bezahlte_stufe: bezahlt, preise: STUFENPREIS, faellig: faellig });
   } catch (e) {
     /* Im Fehlerfall die vollen Preise melden — lieber zu viel angekuendigt
