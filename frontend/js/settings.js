@@ -3464,10 +3464,18 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
      LESEND an (er sammelt Gold-Literale und schreibt umgefaerbte Kopien in
      sein eigenes Overlay) — er kann sie nicht zuruecksetzen.
 
-     Angenehmer Nebeneffekt, der so gewollt ist: steht dort der Standardwert
-     #C9A84C, faerbt der Sweeper ihn wie jedes andere Gold-Literal mit —
-     der Tab-Text folgt dann dem Akzent. Ein bewusst gesetzter Sonderton
-     (z. B. #FF0000) ist kein Gold und bleibt unangetastet.
+     v1157b · EIGENE FEHLANNAHME, im Pruefstand widerlegt. Hier stand, der
+     Sweeper faerbe den Standardwert #C9A84C in diesem Sheet wie jedes andere
+     Gold-Literal mit, der Tab-Text folge dann dem Akzent. **Er tut es
+     nicht.** Gemessen: bei Akzent #0F6E6E und Reglerwert #C9A84C blieb der
+     Tab-Text rgb(201,168,76), also Gold. `_collect()` sammelt Farbwerte aus
+     Regeln, aber keine Custom-Property-DEFINITIONEN (`--x: #hex`).
+
+     Das Verhalten ist trotzdem richtig, nur anders begruendet: wer im Regler
+     Gold waehlt, bekommt Gold — auch unter einem anderen Akzent. Der Regler
+     ist eine Nutzerentscheidung, keine Ableitung. Wer den Akzent folgen
+     lassen will, laesst den Regler unberuehrt: dann greift die Klasse
+     `dp-tabtext-an` nicht und die alten Gold-Regeln gelten wie immer.
 
      Der alte Body-Inline-Wert wird beim Setzen ENTFERNT: er liegt naeher am
      Element als `:root` und wuerde sonst gewinnen. */

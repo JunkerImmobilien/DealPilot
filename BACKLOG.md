@@ -1088,7 +1088,30 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Später
 
 
-- **Der Tab-Text-Regler wirkt — bis der Akzent gewechselt wird.**
+- **Dieselbe Sweeper-Falle trifft alle Regler am Body-Inline-Stil.**
+  Struktureller Befund aus `v1157`, nicht mitgebaut — Scope.
+
+  `whitelabel-override.js` merkt sich in `_touchedAttr` den **Originalwert**
+  jedes `[style]`-Attributs, das es anfasst. Bei einem Akzentwechsel ruft
+  `apply()` (Z. 483) `reset()`, und das spielt die Originale per
+  `setAttribute` zurück. **Jede Nutzeränderung am Body-Inline-Stil, die nach
+  dem ersten Sweep kam, ist damit weg.**
+
+  Betroffen sind mindestens: **`--dp-obj-text`** (Regler „Objektkarten", steht
+  bewusst noch auf dem alten Weg) und **die sechs Bereichsfarben** aus
+  `BEREICHE` in `ui-varianten.js` (`_dpDispHeader`, `_dpDispSide`,
+  `_dpDispText`, `_dpDispHero`, `_dpDispKpi`, `_dpDispObj`) — falls sie
+  ebenfalls an `body.style` schreiben. **Das ist zu messen, nicht zu
+  vermuten:** je Regler einen Wert setzen, Akzent wechseln, nachsehen ob er
+  überlebt.
+
+  **Der Weg ist bekannt** und in `v1157` einmal gegangen: ein eigenes
+  `<style>`-Element statt `body.style`. Fremde Stylesheets kann der Sweeper
+  nur lesen, nicht zurücksetzen. **Erst messen, welche Regler betroffen sind,
+  dann alle in einem Paket umstellen** — nicht sechs Einzelfixes.
+
+
+- **ERLEDIGT (v1157) — der Tab-Text-Regler hielt keinen Akzentwechsel aus.**
   Halber Erfolg aus `v1155` (Backlog-Punkt 6), ehrlich benannt.
 
   **Was behoben ist:** Der Regler war doppelt tot. Gemessen mit dem
@@ -1214,6 +1237,55 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-13] **Der Sweeper verwarf den Tab-Text des Nutzers** — `v1157` + `v1157b`, `c2d7e9b`. **(Backlog-Punkt 6, jetzt vollständig)**
+   `v1155` machte den Regler wirksam, aber nur **bis zum nächsten
+   Akzentwechsel**. Die Kette ist jetzt zu Ende gemessen:
+
+   ```
+   whitelabel-override.js sweepInline()   läuft über ALLE [style]-Elemente
+     -> der <body> ist einer davon (dort standen unsere Custom Properties)
+     -> merkt jede Änderung in _touchedAttr MIT ORIGINALWERT
+   apply() Z. 483                          bei Akzentwechsel -> reset()
+   reset()                                 spielt die Originale per
+                                           setAttribute zurück
+   ```
+
+   **Alles, was NACH dem ersten Sweep in den Body-Inline-Stil geschrieben
+   wurde, ist damit weg.** Nicht nur der Tab-Text — jeder Regler, der so
+   arbeitet.
+
+   **Gelöst:** der Regler schreibt in ein eigenes `<style id="dp-textfein-css">`
+   statt an `body.style`. Fremde Stylesheets fasst der Sweeper nur **lesend**
+   an (er sammelt Gold-Literale und schreibt umgefärbte Kopien in sein eigenes
+   Overlay) — zurücksetzen kann er sie nicht. Der alte Body-Inline-Wert wird
+   beim Setzen entfernt, weil er näher am Element liegt als `:root`.
+
+   **Nachgemessen** (`settings.js?v=v1157`):
+
+   | Schritt | Tab-Text |
+   |---|---|
+   | Start | rgb(201,168,76) |
+   | Regler auf `#FF0000` | **rgb(255,0,0)** |
+   | **Akzentwechsel auf `#0F6E6E`** | **rgb(255,0,0)** — hält |
+
+   ### `v1157b` — eigene Fehlannahme, im Prüfstand widerlegt
+
+   Ich hatte in den Kommentar geschrieben, der Sweeper färbe den Standardwert
+   `#C9A84C` in diesem Sheet mit, der Tab-Text folge dann dem Akzent.
+   **Er tut es nicht:** bei Akzent `#0F6E6E` und Reglerwert `#C9A84C` blieb
+   der Tab-Text rgb(201,168,76). `_collect()` sammelt Farbwerte aus Regeln,
+   aber keine Custom-Property-**Definitionen**.
+
+   Das Verhalten ist trotzdem richtig, nur anders begründet — und so steht es
+   jetzt im Code: **wer im Regler Gold wählt, bekommt Gold**, auch unter einem
+   anderen Akzent. Der Regler ist eine Nutzerentscheidung, keine Ableitung.
+   Wer den Akzent folgen lassen will, lässt den Regler unberührt; dann greift
+   `dp-tabtext-an` nicht und die alten Gold-Regeln gelten wie immer.
+
+   **Zustand hinterlassen:** Merker gelöscht, Sheet leer, Klasse weg,
+   Einstellungen unverändert (Akzent `#C9A84C`, Grundfarbe `#050505`, keine
+   Vorlage).
 
 - [2026-08-13] **Die Grundfarbe wird unter einer Vorlage sichtbar gesperrt** — `v1156` + `v1156b` + `v1156c`, `8cc7af0`. **(Backlog-Punkt 5, Marcels Weg B)**
    **Gemessen war:** ohne Vorlage wirkt die Grundfarbe (Sidebar rgb(11,18,32),
