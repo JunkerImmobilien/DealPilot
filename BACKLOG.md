@@ -36,104 +36,67 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → Hier weitermachen (Übergabe 2026-08-12, abends)
+## → Hier weitermachen (Übergabe 2026-08-13)
 
-> **ZUERST LESEN — der Server stand heute abend auf `main`.** Damit waren die
-> Frontend-Pakete `v1148` bis `v1153b` zeitweise **nicht ausgeliefert**,
-> obwohl jeder Deploy den richtigen Hash gemeldet hatte. Beim Zurückholen auf
-> `staging` lag dort ein **fremder Commit `0a55ee4`** — 920 Zeilen, das
-> v1083-Paket eines Parallel-Strangs (Ausschuss-Register NRW). **Beides ist
-> vereint und gesichert** (`ce821e3`, lokal = Server = GitHub, alle Marker
-> geprüft). **Der Prüfbefehl nach jedem Deploy liest ab jetzt den ZWEIG mit:**
+**Stand:** lokal = GitHub = Staging auf demselben Commit, Zweig `staging`,
+Arbeitsverzeichnis sauber. Der Parallelstrang hat am 13.08. `v1084`/`v1084a`
+ausgerollt (Ausschuss-Register, Sachwertfaktoren) — beides ist im Repo.
+
+> **Der Prüfbefehl nach jedem Deploy liest den ZWEIG mit, nicht nur den Hash:**
 > ```
 > ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD'
 > ```
-> Erwartet wird `staging` **und** der eben gepushte Hash. Ein Hash ohne Zweig
-> ist bedeutungslos. Details in `FALLEN.md` Punkt 1.
+> Erwartet wird `staging` **und** der eben gepushte Hash. Am 12.08. stand der
+> Server auf `main`, und fünf Pakete waren dadurch stundenlang nicht live,
+> obwohl jeder Deploy „Erfolg" meldete. Details in `FALLEN.md` Punkt 1.
 
-**Stand:** lokal wie Staging (`ce821e3`), Zweig `staging`, Arbeitsverzeichnis
-sauber.
-Ausgeliefert an diesem Tag: `v1148` (1025-px-Sprung), `v1149` (§ 194-Hinweis
-nur auf Seite 1), dazu `PROJEKTANWEISUNG.md` als konsolidierter Gesamtstand
-mit fortlaufendem Rollout-Journal.
+### An diesem Tag ausgeliefert
 
-**Diese Sitzung ist bewusst beendet worden, nicht ausgelaufen.** Zweimal
-hintereinander habe ich eine Lücke behauptet, die es nicht gab — beim
-Tablet-Punkt (A, C und D waren gebaut) und beim Sachwertfaktor (Stufe E läuft
-durch bis in die Anzeige). `CLAUDE.md` sagt für diesen Fall: abschließen,
-übergeben, Schluss. **Die Lehre steht als Punkt 9 in `FALLEN.md`** und ist
-die wichtigste Übergabe dieses Tages.
+| | |
+|---|---|
+| `v1155` | Darstellungs-Panel färbte sich mit der gewählten Farbe mit |
+| `v1156`/`b`/`c` | Grundfarbe unter aktiver Vorlage sichtbar gesperrt (Marcels Weg B) |
+| `v1157`/`b` | Der Whitelabel-Sweeper verwarf jede Nutzeränderung am Body-Inline-Stil |
+| `v1158`/`b` | Reiter tragen im hellen Modus die Tinte des Aktionen-Menüs |
+| `v1159` | Im Stapelmodus löste die **Pfeilmitte Löschen aus** |
+| `v1160` | Gate zugezogen: `market_data_fields` + `live_market_rates` bei Free auf `false` |
+| `v1161` + DB | `business`/`enterprise` gelöscht — erst vier Code-Stellen, dann die Zeilen |
 
-**Die erste der beiden Restlücken ist erledigt** (`v1150`/`v1150b`) — und hat
-einen zweiten, größeren Fehler mitgebracht: die PDF-Fußnote nannte die
-**Konstante 1,0** statt des angewandten Faktors 0,925. Beides steht jetzt
-richtig im Dossier, mit Stufe.
+Dazu: Plan-Prüflauf mit Befundliste (Punkt 6), Backlog aufgeräumt und
+fortlaufend nummeriert, `PROJEKTANWEISUNG.md` mit Marcels Abendfassung
+zusammengeführt.
 
-**Was offen bleibt, und warum es nicht einfach gebaut wurde:** der Hinweistext
-beim manuellen Sachwertfaktor (`WertParameterService.js:473` gibt
-`hinweis: ''`, der Liegenschaftszins gibt einen Text). **Sein Anzeigeweg
-fehlt:** die Karte zeigt `sachwertfaktor_hinweis` nur bei
-`!marktangepasst` (`app.js:612`), und bei einem wirksamen eigenen Faktor ist
-`marktangepasst = true`. In `CrossCheckService.js:245` hängt das Feld
-zusätzlich nur am Tabellenweg. **Erst den Weg, dann den Text** — ein Hinweis,
-den niemand sieht, ist keine Verbesserung. Der eigentliche Vermerk steht seit
-`v1150` im PDF.
+### Der nächste Schritt ist vorbereitet, nicht angefangen
 
-**Vor dem Anfangen bitte `FALLEN.md` Punkt 9 lesen.** Er beschreibt genau den
-Fehler, den man in dieser Gegend macht: vom Erzeuger her suchen statt vom
-Verbraucher. Bei `v1150` hat der Blick vom Verbraucher her sofort den
-größeren Fehler gezeigt.
+**Punkt 5 (Hell und Dunkel als zwei Profile)** hat seinen Entwurf:
+`design/Vorschläge/hell-dunkel-zwei-profile.html` — anklickbar, mit dem
+Schalter wie er in den Einstellungen aussähe, beiden Fassungen nebeneinander
+und **allen drei offenen Fragen beantwortet** (je Profil eigene Werte über
+`brand_display`; das kleine Logo = die kompakte Wortmarke aus `v1086`; der
+Schalter ändert **niemals Farben**, die gehören dem Partner).
 
-**Was Geld kostet und deshalb angekündigt gehört:** der Nachweis, dass Stufe 2
-nach bezahlter Stufe 1 wirklich nur die Differenz (3 L) abbucht. Ein
-Klicktest am Testobjekt, echtes Kerosin. **Nicht nebenbei machen.**
+**Vor dem Bauen zwei Fallen, die im Entwurf stehen und teuer bezahlt sind:**
+1. Der Wechsel muss über den **Bedienweg** laufen — ein Klick löst
+   `skinNachziehen()` aus, ein `setAttribute` nicht.
+2. **`_dpDispSkin` setzt `ui_theme` auf leer**, wenn die aktive Vorlage der
+   neuen Helligkeit widerspricht. Das Profil muss die Vorlage deshalb
+   **nach** dem Skin setzen, nicht davor — sonst löscht der Skin sie sofort
+   wieder.
 
-**Die Tablet-Fassung (Punkt 1) ist nachgemessen, und das Ergebnis ist:
-A, C und D waren längst gebaut.** Ab 901 px dockt die Sidebar an (`v648`,
-`css/style.css:35783`), die Formulare sind zwei- und dreispaltig, und das
-Blatt von unten gibt es seit V46 nicht mehr — es ist global per
-`display:none!important` stillgelegt. **Es war nichts zu bauen**, es war
-nur nie nachgemessen worden. Die Messreihe steht im Punkt.
-
-**Daraus zwei Lehren für den nächsten Anlauf:**
-- **Der Entwurf `tablet-fassung.md` hat nur bei 820 px gemessen** — unter
-  der 901er-Schwelle, also im Drawer-Band. Wer eine Schwelle untersucht,
-  muss **beide Seiten** davon messen.
-- **Ein Element im DOM ist kein aktives Element.** Das Blatt steht mit
-  40 Erwähnungen im Markup und 11 Kacheln im Baum und sah deshalb aktiv
-  aus. Sichtbarkeit sagt nur die Messung.
-
-**Der 1025-px-Sprung, der bei dieser Messung auffiel, ist als `v1148`
-behoben und abgenommen** (siehe Fertig). **B** und die
-**Admin-Oberfläche** bleiben in Punkt 1 liegen: B braucht ein Bild, der
-Admin ein Konto.
-
-**Der nächste offene Punkt ist damit Punkt 3** (Marktbericht neu gestalten,
-groß — Entwurf liegt) oder einer der kleinen Darstellungs-Punkte 4 bis 9,
-die alle auf Marcels Durchgang zurückgehen.
-
-**Vor dem Bauen:**
-- Messkabine nach `FALLEN.md` aufsetzen — Träger `/impressum.html` auf der
-  **App-Domain** (`app.staging.dealpilot.junker-immobilien.io`), nicht auf
-  der Landing-Domain. `getAnimations().finish()` nach jeder Änderung,
-  höchstens ~40 s pro `javascript_tool`-Aufruf (sonst CDP-Timeout), und
-  **Objektwechsel nur mit Neuladen** — ein Wechsel im laufenden Tab hat
-  `hdr-banner-only` und `hdr-no-score` gleichzeitig stehen lassen.
-- **Jeden CSS-Anker im Browser auslesen, bevor er in eine Regel geht.**
-  In `v1147` stand `#app` in der Regel — das Element gibt es nicht.
-
-**Zwei Abnahmen, die noch offen sind:**
-1. **Produktion** — liegt dieselbe `registry.js`-Drift dort auch? SSH ist
-   read-only, ein Dateivergleich genügt. *(Die Ankreuzfeld-Abnahme ist am
-   12.08. abends erledigt — 21 Felder, alle 33 px, auch bei 390 px.)*
+**Was Marcel noch offen hat** (nicht von mir zu entscheiden):
+- **Punkt 1**, Teil B: wie wird der Score flacher — braucht ein Bild. Dazu der
+  Befund, dass die Score-Zeile erst **ab 70 % Datenvollständigkeit**
+  erscheint (`calc.js:205`).
+- **Punkt 4**: welcher Art soll die erweiterte Akzent-Palette sein.
+- **Punkt 11** (Wallet): welche Angaben gehören auf die Karte.
 
 **Prüfstrecken auf Staging:**
-- `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt,
-  weitere Marktberichte kosten **0 L**. Der einzige Haus-Testfall.
+- `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt.
+  **Achtung:** die bezahlte Stufe gilt nur für das Konto, das gezahlt hat
+  (`info@junker-immobilien.io`) — unter einem anderen Konto kostet derselbe
+  Bericht voll.
 - `Hermannstraße 9 Hüllhorst` (`07d89138`) — ETW, Stufe 3 bezahlt.
-- Kerosin zuletzt: **86 L**.
 
----
 ## Offen
 
 1. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
