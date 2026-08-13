@@ -1078,6 +1078,57 @@ die alle auf Marcels Durchgang zurückgehen.
 
 ## Später
 
+
+- **Der Tab-Text-Regler wirkt — bis der Akzent gewechselt wird.**
+  Halber Erfolg aus `v1155` (Backlog-Punkt 6), ehrlich benannt.
+
+  **Was behoben ist:** Der Regler war doppelt tot. Gemessen mit dem
+  Kaskaden-Walker über **alle** Stylesheets: seine Leser-Regel hing an
+  `body.dp-chrome-hell` (im Obsidian-Modus also niemand), und **elf** Regeln
+  setzen `color: var(--gold …)` auf `nav.tabs .tab`, **zehn mit
+  `!important`**. Ein Token allein verliert dagegen immer. (Mein `grep` fand
+  sie nicht — sie stehen in Kommalisten. Nur der Kaskaden-Blick im Browser
+  zeigte sie.) `v1155` setzt deshalb `body.dp-tabtext-an` und eine Regel mit
+  Spezifität **(0,6,4)** gegen die stärkste Gegenregel (0,5,2), am Dateiende.
+  **Nachgemessen: direkt nach dem Laden wirkt der Regler** — Tab-Text ging von
+  rgb(201,168,76) auf **rgb(255,0,0)**.
+
+  **Was offen ist:** Nach einem **Akzentwechsel** steht am Body-Inline-Stil
+  `--dp-tab-text: <Akzentwert>` statt des Nutzerwerts, und der Regler wirkt
+  nicht mehr. Meine Regel **gewinnt** weiterhin (per Walker bestätigt: 604,
+  `!important`, letzte Reihe) — sie liest nur einen überschriebenen Wert.
+
+  **Was schon ausgeschlossen ist:** Es sind **nicht** die drei bekannten
+  Setter. `grep` findet nur `_dpDispTabText`, den Boot-Block und die
+  Reset-Liste; ein Patch auf `CSSStyleDeclaration.setProperty` fing beim
+  Akzentwechsel **keinen** fremden Aufruf. Daraus folgt: der Setzer schreibt
+  **nicht** über `setProperty`, sondern über `style.cssText` oder
+  `setAttribute('style', …)` — dort greift der Patch nicht.
+
+  **Nächster Schritt, konkret:** `whitelabel-override.js` hat einen `sweep()`
+  mit `attributeFilter: ['style', …]`, der genau so arbeiten könnte. Also
+  `style.cssText` und `setAttribute` patchen (nicht `setProperty`) und den
+  Akzentwechsel wiederholen. **Erst wenn der Setzer benannt ist, wird
+  gebaut** — nach drei Anläufen an dieser Stelle war STOPP richtig.
+
+  **Kein Schaden im Auslieferungszustand:** ohne Nutzerwert wird weder Klasse
+  noch Token gesetzt, alles bleibt bitgenau wie vorher (nachgemessen).
+
+- **Punkt 5 (Grundfarbe) braucht eine Entscheidung, kein Patch.**
+  Gemessen: **ohne Vorlage wirkt die Grundfarbe** (Sidebar rgb(11,18,32),
+  Tabs rgb(21,27,41), Kopfverlauf mit). **Mit** Vorlage `kontor` sind Sidebar
+  und Tabs weiß und ein Wechsel der Grundfarbe ändert **nichts** — der Wert
+  wird aber gespeichert (`ui_obsidian`). Ursache: alle drei Regeln in
+  `css/ui-varianten.css` beginnen mit `html:not([data-ui-theme])`.
+
+  **Das ist ein stiller Rückfall** und in dieser Form falsch. Zwei Wege:
+  **(A)** die Grundfarbe wirkt auch unter Vorlagen — großer Eingriff, jede
+  Vorlage müsste sie respektieren, und eine dunkle Grundfläche unter der
+  hellen Vorlage „Kontor" widerspricht deren Zweck.
+  **(B)** der Regler wird unter aktiver Vorlage **sichtbar gesperrt** mit
+  einem Satz Begründung — klein, ehrlich, und das Muster gibt es schon
+  (`.dpuv-lockbar`, „sichtbar gesperrt ist ehrlicher als versteckt").
+  **Empfehlung: B.** Entscheidung liegt bei Marcel.
 - **`exportPdf()` erzeugte bei einem wiedergegebenen Bericht keine Ausgabe.**
   Beim Nachweis zu `v1149` gemessen: Report 73 über `/reports/one` geholt
   (voller Datensatz: `ref` `meta` `rent` `sale` `macro` `micro` `zensus`
@@ -1154,6 +1205,36 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-13] **Das Werkzeug färbte sich mit** — `v1155`, `2347684`. **(Backlog-Punkt 4, der Defekt-Teil)**
+   **Marcels Befund:** „Wählt Marcel Grün, wird das Gold am Kopf des
+   Akzent-Bereichs mit grün. Wer eine Farbe *auswählt*, braucht eine neutrale
+   Umgebung, sonst beurteilt er die Farbe gegen sich selbst."
+
+   **Reproduziert** (Panel geöffnet, Akzent `#0F6E6E` über den Bedienweg
+   geklickt): die Abschnitts-Überschrift wechselte von **rgb(154,127,51)** auf
+   **rgb(8,45,45)**. Ursache waren **neun `--wl-`Tokens in der
+   Bedienoberfläche** des Panels (`ui-varianten.js`): Überschriften,
+   Knopfränder, aktive Zustände, der Schranken-Kasten.
+
+   Der Dateikopf sagte das Richtige schon — „feste Werte, bewusst NICHT über
+   die `--uv`-Tokens" — bei den `--wl-`Tokens war es nur nicht durchgezogen.
+
+   **Gelöst mit Marcels eigener Trennlinie:** „die Vorschauflächen *sollen*
+   mitgehen, der Rahmen darum nicht." Bedienoberfläche → feste Literale, und
+   am Token bleibt **genau eine** Stelle: `.dpuv-pf.gold`, die Vorschaufläche.
+
+   **Nachgemessen** (`ui-varianten.js?v=v1155`): bei Akzent `#0F6E6E` bleibt
+   die Überschrift **rgb(154,127,51)** (Gold), die Vorschaufläche geht auf
+   **rgb(15,110,110)** (Türkis). Genau die gewünschte Trennung.
+
+   **Kein Whitelabel-Verstoß:** dieselbe Ausnahme gilt laut Projektanweisung
+   für `config.js`, `branding-darstellung.js`, `darstellung-reseller.js` —
+   „der Farb-Editor **muss** Literale tragen". Dies ist der Farb-Editor. Im
+   Dateikopf vermerkt, damit `gold-audit.py`-Fundstellen erklärbar bleiben.
+
+   *Der Ausbau-Teil von Punkt 4 (mehr Farben zur Wahl) bleibt offen — er
+   braucht Marcels Entscheidung, welcher Art die Palette sein soll.*
 
 - [2026-08-12] **Ankreuzfelder 33 px — die optische Abnahme ist nachgeholt** — kein Code geändert, `v1147b` bestätigt.
    Die Messung vom Mittag war **wertlos**: ohne geladenes Objekt und mit
