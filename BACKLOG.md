@@ -1405,6 +1405,51 @@ entfällt — nicht raten.
 
 ## Fertig
 
+- [2026-08-13] **Punkt 6 durchgeklickt — zwei Funktionen sind für JEDEN gesperrt, auch für Pro und Partner**
+   Der Prüfmodus aus `v1163` erlaubt endlich, was der Punkt verlangte. Alle
+   vier Stufen gegen 25 Feature-Schlüssel gemessen, dann **gegen die Datenbank
+   gegengehalten** — und genau das Gegenhalten war der Punkt.
+
+   ### Der Befund: `beleg_import` und `theme_palette` stehen in KEINEM DB-Plan
+
+   `config.js` gibt sie frei (`beleg_import` ab Investor, `theme_palette` ab
+   Pro). **Die Datenbank kennt beide Schlüssel überhaupt nicht** — geprüft
+   über `jsonb_object_keys` für alle fünf Pläne.
+
+   Und die DB ist die Quelle: `hasFeature` fragt zuerst `Sub.hasCachedFeature`
+   und nimmt `config.js` nur bei `null`. **Gemessen am echten Partner-Konto
+   sind beide `false`.** Für jeden zahlenden Nutzer sind diese zwei Funktionen
+   also **zu**, während die Datei behauptet, sie seien offen.
+
+   | Schlüssel | `config.js` | DB | echter Partner |
+   |---|---|---|---|
+   | `beleg_import` | ab investor | **fehlt** | **false** |
+   | `theme_palette` | ab pro | **fehlt** | **false** |
+
+   **Das ist Befund B3 in echt** — nur andersherum, als B3 ihn vermutet hatte.
+   B3 fürchtete einen Tippfehler im **Code**; der Kreuzabgleich hatte den zu
+   Recht entwarnt. Die Lücke sitzt zwischen **Code und Datenbank**: ein
+   Schlüssel, den `config.js` kennt und `plans.features` nicht, ist still zu.
+   **Der Kreuzabgleich muss beide Seiten prüfen, nicht nur die Frontend-Seite.**
+
+   **Zu klären, bevor jemand etwas ändert:** ob die zwei Funktionen überhaupt
+   ausgeliefert sind. Ein Schlüssel ohne DB-Eintrag kann auch schlicht heißen,
+   dass es die Funktion nicht mehr gibt — dann gehört er aus `config.js` raus
+   und nicht in die DB. **Erst messen, was hinter den Schlüsseln steckt.**
+
+   ### Zweiter Befund: `custom_finance_models` — die Datei ist großzügiger als die DB
+
+   `config.js` gibt es **Free** frei, die DB führt `free=false`. Ein echter
+   Free-Nutzer hat es also nicht — **es sieht nur im Startfenster so aus**,
+   bis die DB antwortet. Dasselbe Muster wie bei `v1160`, nur an einem anderen
+   Schlüssel. Die restlichen 22 Schlüssel waren unauffällig.
+
+   *(Messfalle, die ich fast selbst getreten hätte: die simulierten Stufen
+   lesen den `config.js`-Fallback, das echte Konto liest die DB. **Das ist kein
+   Äpfel-mit-Äpfeln-Vergleich** — ein Unterschied zwischen „partner" und den
+   anderen Zeilen der Matrix ist zuerst ein Hinweis auf die Quelle, nicht auf
+   den Plan. Erst der DB-Abgleich macht daraus einen Befund.)*
+
 - [2026-08-13] **Spracheingabe: schneller, und die Stichwörter als Fenster** — `v1169`, `a78ab83`.
    ### Schneller — eine Zeile, die niemandem nützte
 

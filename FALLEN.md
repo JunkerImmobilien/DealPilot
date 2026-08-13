@@ -369,3 +369,28 @@ mehr kann"**. Vor jedem „das fehlt": nach einem zweiten Katalog, einer
 **Zählstand dieser Sitzung: sechsmal „das gibt es nicht" gesagt, sechsmal gab
 es das.** Tablet-Fassung, Sachwertfaktor-Stufe E, BEDARF-Doppelliste, die
 sieben Pro-Tage, die Restlaufzeit-Anzeige, der volle Sprach-Katalog.
+
+## 12 · Der Kreuzabgleich muss BEIDE Seiten prüfen — Code UND Datenbank
+
+`hasFeature` fragt **zuerst** `Sub.hasCachedFeature` (die DB) und nimmt
+`config.js` nur bei `null`. Ein Schlüssel, den `config.js` kennt und
+`plans.features` **nicht**, ist damit für **jeden** zu — auch für Pro und
+Partner. Und zwar **still**: die Datei behauptet, die Funktion sei offen.
+
+Gefunden beim Punkt-6-Prüflauf: `beleg_import` und `theme_palette` stehen in
+`config.js`, aber in **keinem** DB-Plan. Am echten Partner-Konto sind beide
+`false`.
+
+**Der Abgleich Frontend-Schlüssel gegen Frontend-Pläne reicht nicht.** Er hatte
+kurz vorher „alles sauber" gemeldet — richtig, aber auf der falschen Achse.
+Die dritte Liste ist `plans.features` in der Datenbank:
+
+```sql
+SELECT id, jsonb_object_keys(features) FROM plans WHERE id IN (...);
+```
+
+**Und die Messfalle gleich dazu:** Im Prüfmodus (`v1163`) lesen die
+simulierten Stufen den **`config.js`-Fallback**, das echte Konto liest die
+**DB**. Weicht die „partner"-Zeile von den anderen ab, ist das zuerst ein
+Hinweis auf die **Quelle**, nicht auf den Plan. Erst der DB-Abgleich macht
+daraus einen Befund.
