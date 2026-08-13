@@ -1736,15 +1736,44 @@ html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-score-label {
   white-space: nowrap !important;
 }
 
-/* Chevron rechts aussen, senkrecht auf der Bandmitte. */
+/* Chevron rechts aussen — v1159: UNTEN, nicht auf der Bandmitte.
+   ────────────────────────────────────────────────────────────────
+   Marcels Befund: „Beim Hinueberfahren zum Pfeil landet man auf dem × zum
+   Loeschen." Der schwerste der Kartenbefunde, weil er eine FALSCHE Aktion
+   ausloest statt nur schlecht auszusehen.
+
+   Gemessen am 13.08. mit getBoundingClientRect und elementFromPoint:
+     .sbc-actions (Duplizieren + Loeschen)  absolute, top 6px, 48x22
+     .sbc-arrow                             absolute, top 16px, 20x20
+   Beide bei right:6px — Ueberlappung 12 px von 20 px Pfeilhoehe.
+   Und der Klick: **die MITTE des Pfeils (349,203) traf `sbc-btn
+   "Loeschen"`**, nicht den Pfeil. Erreichbar war er nur ueber sein unteres
+   Drittel. Wer auf die Pfeilmitte zielt, loescht das Objekt.
+
+   Die Pfeilspalte von oben nach unten (elementFromPoint alle 4 px):
+     8–28 px   Loeschen-×      (reicht weiter als seine 22 px Hoehe)
+     32–36 px  Pfeil           (nur ~8 px wirklich erreichbar)
+     40–60 px  frei
+   Marcels Satz „unten ist Platz, oben nicht" ist damit belegt.
+
+   Deshalb `bottom` statt `top`. Neue Lage: 212–234 statt 193–213, also
+   5 px Abstand zum ×, das bei 207 endet. Groesse 20 → 22 px, dieselbe wie
+   der Kompakt-Pfeil (Z. 1388) — eine Groesse fuer denselben Pfeil.
+
+   **44 px sind hier NICHT erreichbar, und das ist eine Absage mit Grund:**
+   die Karte ist 63 px hoch und traegt oben die Aktionen. Ein 44-px-Pfeil
+   reichte bis 194 und liege wieder unter dem ×. Der Punkt aus v650/v652
+   bleibt damit offen — aber die falsche Aktion ist weg, und das war das
+   Schwere daran. */
 html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-arrow {
   position: absolute !important;
   right: 6px !important;
-  top: 16px !important;
+  top: auto !important;
+  bottom: 4px !important;
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  width: 20px !important; height: 20px !important;
+  width: 22px !important; height: 22px !important;
   margin: 0 !important;
   cursor: pointer !important;
   color: #1a1407 !important;
