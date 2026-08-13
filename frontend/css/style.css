@@ -35230,7 +35230,7 @@ body[data-dp-skin="hell"] .sc-num,
 body[data-dp-skin="hell"] .sc-donut-num{ color:#1a1a1a !important; }
 
 /* --- Tabs: aktiver Tab dunkel + Gold-Unterstrich --- */
-body[data-dp-skin="hell"] .tab.active{ color:#211c12 !important; border-bottom-color:var(--gold) !important; }
+body[data-dp-skin="hell"] .tab.active{ color:var(--dp-tab-text, var(--dp-hell-ink,#141310)) !important; border-bottom-color:var(--gold) !important; }
 body[data-dp-skin="hell"] .tab{ color:#6f6857 !important; }
 /* /v916-goldplay */
 
@@ -35273,6 +35273,16 @@ body.dp-chrome-hell{
   --dp-ink-1:#1a1a1a; --dp-ink-92:rgba(26,26,26,.92); --dp-ink-80:rgba(26,26,26,.84);
   --dp-ink-70:rgba(26,26,26,.76); --dp-ink-60:rgba(26,26,26,.68); --dp-ink-50:rgba(26,26,26,.6);
   --dp-ink-40:rgba(26,26,26,.52); --dp-ink-30:rgba(26,26,26,.44);
+  /* v1158-TINTE · Marcels Vorgabe: „im hellen Modus sollen die Reiter
+     dieselbe Schriftfarbe tragen wie das Aktionen-Aufklappmenue."
+     Die Zielfarbe war benannt, nicht beschrieben — also nur zu uebernehmen.
+     Gemessen: Aktionen-Eintraege #141310 (rgb 20,19,16), Reiter dagegen
+     #6b6454 inaktiv und #211c12 aktiv. Drei hart kodierte Toene fuer eine
+     Sache. Der Punkt verlangt deshalb ein GEMEINSAMES Token statt zweier
+     Stellen, die auseinanderlaufen — im Haus schon mehrfach die Ursache.
+     Der Ton selbst ist nicht neu: er ist die „Tinte", die die helle
+     Sidebar fuer die Objektadresse fuehrt. */
+  --dp-hell-ink:#141310;
 }
 /* Chrome-Flaechen explizit hell */
 body.dp-chrome-hell header.hdr,
@@ -35316,7 +35326,7 @@ body.dp-chrome-hell .sbc-verdict.tier-red{
 }
 
 /* Tabs: aktiver Tab dunkel + Gold-Unterstrich */
-body.dp-chrome-hell .tab.active{ color:#211c12 !important; border-bottom-color:var(--gold) !important; }
+body.dp-chrome-hell .tab.active{ color:var(--dp-tab-text, var(--dp-hell-ink,#141310)) !important; border-bottom-color:var(--gold) !important; }
 /* /v919-chrome-hell */
 
 /*v920-tabbar*/
@@ -35328,11 +35338,16 @@ body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs.tabs{
   border-top:1px solid rgba(184,150,60,.22) !important;
   border-bottom:1px solid rgba(184,150,60,.18) !important;
 }
+/* v1158-TINTE · Beide Zustaende tragen jetzt die Tinte des Aktionen-Menues.
+   Der aktive Reiter bleibt am Goldstrich unter ihm erkennbar — genau wie im
+   Aktionen-Menue, das auch keine Farbunterscheidung fuehrt.
+   `--dp-tab-text` steht davor, damit der Nutzerregler (v1155/v1157) weiter
+   gewinnt; ohne Nutzerwert greift die Tinte. */
 body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs .tab{
-  color:#6b6454 !important;
+  color:var(--dp-tab-text, var(--dp-hell-ink,#141310)) !important;
 }
 body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs .tab.active{
-  color:#211c12 !important; border-bottom-color:var(--gold) !important;
+  color:var(--dp-tab-text, var(--dp-hell-ink,#141310)) !important; border-bottom-color:var(--gold) !important;
 }
 /* /v920-tabbar */
 
@@ -36868,7 +36883,7 @@ body.dp-chrome-hell aside.sidebar .sb-actions-accordion.sb-actions-open .sb-acti
 body.dp-chrome-hell aside.sidebar .sb-act-item,
 body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent,
 body.dp-chrome-hell aside.sidebar .sb-act-item:first-of-type {
-  color: #141310 !important;
+  color: var(--dp-hell-ink, #141310) !important;
 }
 /* Ueberfahren: die Goldspur bleibt, sie traegt auf Weiss nur bei
    hoeherem Anteil. Die Schrift bleibt Tinte. */
@@ -36876,7 +36891,7 @@ body.dp-chrome-hell aside.sidebar .sb-act-item:hover,
 body.dp-chrome-hell aside.sidebar .sb-act-item.sb-act-accent:hover,
 body.dp-chrome-hell aside.sidebar .sb-act-item:first-of-type:hover {
   background: color-mix(in srgb, var(--gold) 14%, transparent) !important;
-  color: #141310 !important;
+  color: var(--dp-hell-ink, #141310) !important;
 }
 /* Symbole: --gold traegt auf Weiss nicht (Kontrast 2,3). Der dunklere
    Goldton der Marke schon. */
