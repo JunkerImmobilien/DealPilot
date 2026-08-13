@@ -35484,9 +35484,13 @@ body.dp-chrome-hell .app-logo-simple-wrap{
   margin:0 -18px 12px -18px !important; padding:18px 18px 16px 18px !important;
 }
 /* Header-Bar-Text + Tabs hell/dunkel je nach Header-Farbe (KPI-Karten bleiben dunkel, sind separat) */
+/* v1158b · Die Reiterleiste ist HIER herausgenommen. Sie stand in einer
+   Liste mit `.hdr-v61-row1`, also mit der Kopfzeile — zwei verschiedene
+   Flaechen, eine Regel. Die Reiter fuehrt jetzt allein der v938-Block
+   weiter unten (Tinte statt Header-Text, Marcels Vorgabe). Die Kopfzeile
+   behaelt ihren Header-Text unveraendert. */
 body.dp-chrome-hell .hdr-v61-row1,
-body.dp-chrome-hell .hdr-v61-row1 *:not(input):not(.sc-pill):not(.sc-main),
-body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs .tab{ color:var(--dp-header-text,#1a1a1a) !important; }
+body.dp-chrome-hell .hdr-v61-row1 *:not(input):not(.sc-pill):not(.sc-main){ color:var(--dp-header-text,#1a1a1a) !important; }
 
 /* KOMPAKT: deutlich flacher (Donut kleiner, Zahlen/Labels kleiner, Padding minimal) */
 body.dp-hdr-compact .hdr-v61-row2{ padding:3px 22px !important; gap:5px !important; }
@@ -35600,10 +35604,18 @@ body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs.tabs{ margin-top:0 !impo
 /* /v937-flush-stable-css */
 
 /*v938-textcolors-css*/
-/* Tab-Text-Farbe (faellt zurueck auf Header-Text) */
+/* Tab-Text-Farbe. v1158b: der Rueckfall ist nicht mehr der Header-Text,
+   sondern die TINTE des Aktionen-Menues (--dp-hell-ink).
+   Warum: diese Regel ist die SPAETESTE mit diesem Selektor und gewinnt
+   deshalb bei gleicher Spezifitaet — sie hat die v1158-Aenderung weiter
+   oben (Z. 35346) fuer die inaktiven Reiter ueberstimmt. Gemessen: aktiver
+   Reiter trug die Tinte rgb(20,19,16), die inaktiven rgb(243,234,208), weil
+   --dp-header-text im Hell-Modus auf #f3ead0 steht (Kopf ist dunkel
+   gespeichert). Derselbe Selektor an drei Stellen — die dritte entscheidet.
+   Der Nutzerregler --dp-tab-text bleibt vorn. */
 body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs .tab,
-body.dp-chrome-hell nav.tabs .tab{ color: var(--dp-tab-text, var(--dp-header-text,#1a1a1a)) !important; }
-body.dp-chrome-hell nav.tabs .tab.active{ color: var(--dp-tab-text, var(--dp-header-text,#1a1a1a)) !important; }
+body.dp-chrome-hell nav.tabs .tab{ color: var(--dp-tab-text, var(--dp-hell-ink,#141310)) !important; }
+body.dp-chrome-hell nav.tabs .tab.active{ color: var(--dp-tab-text, var(--dp-hell-ink,#141310)) !important; }
 /* Objektkarten-Text-Farbe (kaskadiert; farbige KPIs behalten ihre Farbe) */
 body.dp-chrome-hell aside.sidebar .sb-card{ color: var(--dp-obj-text, inherit) !important; }
 body.dp-chrome-hell aside.sidebar .sb-card .sbc-addr,
