@@ -1,0 +1,5242 @@
+[
+ {
+  "land_code": "NW",
+  "ags": "05711000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    160000,
+    180000,
+    200000,
+    220000,
+    240000,
+    260000,
+    280000,
+    300000,
+    320000,
+    340000,
+    360000,
+    380000,
+    400000,
+    420000,
+    440000,
+    460000,
+    480000,
+    500000,
+    520000,
+    540000,
+    560000,
+    580000,
+    600000,
+    620000,
+    640000,
+    660000,
+    680000,
+    700000,
+    720000,
+    740000,
+    760000,
+    780000,
+    800000,
+    820000,
+    840000
+   ],
+   "achse_k_feld": "wohnlage",
+   "achse_k_bez": "Wohnlage",
+   "kategorien": [
+    "mittel",
+    "gut",
+    "sehr gut"
+   ],
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)",
+   "zellen": {
+    "160000": [
+     1.43,
+     null,
+     null
+    ],
+    "180000": [
+     1.36,
+     null,
+     null
+    ],
+    "200000": [
+     1.3,
+     1.4,
+     null
+    ],
+    "220000": [
+     1.24,
+     1.34,
+     null
+    ],
+    "240000": [
+     1.2,
+     1.29,
+     null
+    ],
+    "260000": [
+     1.16,
+     1.24,
+     null
+    ],
+    "280000": [
+     1.12,
+     1.2,
+     null
+    ],
+    "300000": [
+     1.09,
+     1.17,
+     null
+    ],
+    "320000": [
+     1.06,
+     1.14,
+     null
+    ],
+    "340000": [
+     1.03,
+     1.11,
+     null
+    ],
+    "360000": [
+     1.0,
+     1.08,
+     null
+    ],
+    "380000": [
+     0.98,
+     1.05,
+     null
+    ],
+    "400000": [
+     0.96,
+     1.03,
+     1.24
+    ],
+    "420000": [
+     0.94,
+     1.01,
+     1.21
+    ],
+    "440000": [
+     0.92,
+     0.99,
+     1.19
+    ],
+    "460000": [
+     0.9,
+     0.97,
+     1.16
+    ],
+    "480000": [
+     0.88,
+     0.95,
+     1.14
+    ],
+    "500000": [
+     0.87,
+     0.93,
+     1.12
+    ],
+    "520000": [
+     0.85,
+     0.92,
+     1.1
+    ],
+    "540000": [
+     0.84,
+     0.9,
+     1.08
+    ],
+    "560000": [
+     0.83,
+     0.89,
+     1.07
+    ],
+    "580000": [
+     0.81,
+     0.87,
+     1.05
+    ],
+    "600000": [
+     0.8,
+     0.86,
+     1.04
+    ],
+    "620000": [
+     null,
+     0.85,
+     1.02
+    ],
+    "640000": [
+     null,
+     0.83,
+     1.01
+    ],
+    "660000": [
+     null,
+     0.82,
+     0.99
+    ],
+    "680000": [
+     null,
+     0.81,
+     0.98
+    ],
+    "700000": [
+     null,
+     0.8,
+     0.97
+    ],
+    "720000": [
+     null,
+     0.79,
+     0.96
+    ],
+    "740000": [
+     null,
+     null,
+     0.94
+    ],
+    "760000": [
+     null,
+     null,
+     0.93
+    ],
+    "780000": [
+     null,
+     null,
+     0.92
+    ],
+    "800000": [
+     null,
+     null,
+     0.91
+    ],
+    "820000": [
+     null,
+     null,
+     0.9
+    ],
+    "840000": [
+     null,
+     null,
+     0.89
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Wörtlich: 'SF = Sachwertfaktor unter Anwendung des vorläufigen Sachwertes aus obiger Tabelle ablesbar bzw. sachverständig zu interpolieren.' Maßgeblich ist die Tabelle, nicht die Regressionsfunktion. Anwendungsformel SW = vorläufiger Sachwert × SF ± boG. Der Bericht führt KEINE Zu-/Abschläge für Restnutzungsdauer, BGF oder Grundstücksgröße.",
+   "ausgleichsfunktionen_dokumentation": {
+    "hinweis": "Nur Dokumentation der Regression, NICHT das Rechenwerkzeug. Form: a × (SW × 10^-6)^-0,44",
+    "mittel": {
+     "a": 0.64,
+     "b": -0.44,
+     "fallzahl": 180,
+     "bestimmtheitsmass": 0.66
+    },
+    "gut": {
+     "a": 0.68,
+     "b": -0.44,
+     "fallzahl": 80,
+     "bestimmtheitsmass": 0.63,
+     "pruefhinweis": "Mit a = 0,68 liegt die Funktion systematisch 0,009 bis 0,019 unter der Tabelle; mit 0,69 passt sie auf 0,004. Vermutlich Rundung im Bericht oder verlorene Ziffer in der Textebene."
+    },
+    "sehr gut": {
+     "a": 0.83,
+     "b": -0.44,
+     "fallzahl": 50,
+     "bestimmtheitsmass": 0.29
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4",
+    "eingabe": {
+     "sachwert": 320000,
+     "wohnlage": "gut",
+     "boG_reparaturstau_eur": 10000
+    },
+    "soll_tabellenwert": 1.14,
+    "soll_wert": 1.14,
+    "soll_sachwert_eur": 354800,
+    "soll_zeilen": 35,
+    "soll_spalten": 3,
+    "wortlaut": "EFH, vorläufiger Sachwert 320.000 €, Wohnlage gut, Sachwertfaktor 1,14, Reparaturstau 10.000 €. SW = 320.000 × 1,14 − 10.000 = 354.800 €."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gars.nrw/images/user/GA_Bielefeld/pdf/GMB_10200_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.4"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05911000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.21,
+   "ci": [
+    1.17,
+    1.26
+   ],
+   "hinweis": "Basiswertmodell ('basiswert_additiv'): vom Basiswert ausgehend werden die vier Korrekturen additiv verwendet. Wörtlich: 'Bei Anwendung des Sachwertverfahrens werden vom Basiswert ausgehend die aufgeführten Zu- und Abschläge additiv verwendet. Dabei ist ein sachverständiges Interpretieren der angegebenen Konfidenzintervalle möglich.'",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [
+   {
+    "bez": "Wohnlageklasse",
+    "feld": "wohnlageklasse",
+    "art": "stufen",
+    "stufen": {
+     "1": -0.06,
+     "2": 0.0,
+     "3": 0.06
+    },
+    "ci": {
+     "1": [
+      -0.09,
+      -0.03
+     ],
+     "2": null,
+     "3": [
+      0.03,
+      0.09
+     ]
+    },
+    "rundung_stellen": 2
+   },
+   {
+    "bez": "vorläufiger Sachwert",
+    "feld": "sachwert",
+    "art": "band",
+    "baender": [
+     {
+      "von": 50000,
+      "bis": 200000,
+      "zuschlag": 0.14,
+      "ci": [
+       0.07,
+       0.21
+      ],
+      "bez": "50.000–200.000 €"
+     },
+     {
+      "von": 200001,
+      "bis": 250000,
+      "zuschlag": 0.11,
+      "ci": [
+       0.05,
+       0.16
+      ],
+      "bez": "200.001–250.000 €"
+     },
+     {
+      "von": 250001,
+      "bis": 300000,
+      "zuschlag": 0.0,
+      "ci": null,
+      "bez": "250.001–300.000 €"
+     },
+     {
+      "von": 300001,
+      "bis": 350000,
+      "zuschlag": -0.08,
+      "ci": [
+       -0.12,
+       -0.03
+      ],
+      "bez": "300.001–350.000 €"
+     },
+     {
+      "von": 350001,
+      "bis": 400000,
+      "zuschlag": -0.15,
+      "ci": [
+       -0.2,
+       -0.1
+      ],
+      "bez": "350.001–400.000 €"
+     },
+     {
+      "von": 400001,
+      "bis": 450000,
+      "zuschlag": -0.19,
+      "ci": [
+       -0.24,
+       -0.14
+      ],
+      "bez": "400.001–450.000 €"
+     },
+     {
+      "von": 450001,
+      "bis": 500000,
+      "zuschlag": -0.23,
+      "ci": [
+       -0.29,
+       -0.17
+      ],
+      "bez": "450.001–500.000 €"
+     },
+     {
+      "von": 500001,
+      "bis": 550000,
+      "zuschlag": -0.33,
+      "ci": [
+       -0.41,
+       -0.26
+      ],
+      "bez": "500.001–550.000 €"
+     },
+     {
+      "von": 550001,
+      "bis": 600000,
+      "zuschlag": -0.37,
+      "ci": [
+       -0.45,
+       -0.29
+      ],
+      "bez": "550.001–600.000 €"
+     },
+     {
+      "von": 600001,
+      "bis": 730000,
+      "zuschlag": -0.39,
+      "ci": [
+       -0.46,
+       -0.32
+      ],
+      "bez": "600.001–730.000 €"
+     }
+    ],
+    "rundung_stellen": 2
+   },
+   {
+    "bez": "Restnutzungsdauer",
+    "feld": "rnd_jahre",
+    "art": "band",
+    "baender": [
+     {
+      "von": 20,
+      "bis": 25,
+      "zuschlag": -0.17,
+      "ci": [
+       -0.21,
+       -0.13
+      ],
+      "bez": "20–25 Jahre"
+     },
+     {
+      "von": 26,
+      "bis": 30,
+      "zuschlag": -0.09,
+      "ci": [
+       -0.13,
+       -0.06
+      ],
+      "bez": "26–30 Jahre"
+     },
+     {
+      "von": 31,
+      "bis": 40,
+      "zuschlag": 0.0,
+      "ci": null,
+      "bez": "31–40 Jahre"
+     },
+     {
+      "von": 41,
+      "bis": 50,
+      "zuschlag": 0.02,
+      "ci": [
+       -0.02,
+       0.06
+      ],
+      "bez": "41–50 Jahre"
+     },
+     {
+      "von": 51,
+      "bis": 60,
+      "zuschlag": 0.1,
+      "ci": [
+       0.04,
+       0.15
+      ],
+      "bez": "51–60 Jahre"
+     },
+     {
+      "von": 61,
+      "bis": 78,
+      "zuschlag": 0.12,
+      "ci": [
+       0.05,
+       0.19
+      ],
+      "bez": "61–78 Jahre"
+     }
+    ],
+    "rundung_stellen": 2
+   },
+   {
+    "bez": "Wohnfläche",
+    "feld": "wohnflaeche",
+    "art": "band",
+    "baender": [
+     {
+      "von": 50,
+      "bis": 100,
+      "zuschlag": -0.05,
+      "ci": [
+       -0.1,
+       -0.01
+      ],
+      "bez": "50–100 m²"
+     },
+     {
+      "von": 101,
+      "bis": 150,
+      "zuschlag": 0.0,
+      "ci": null,
+      "bez": "101–150 m²"
+     },
+     {
+      "von": 151,
+      "bis": 200,
+      "zuschlag": 0.05,
+      "ci": [
+       0.01,
+       0.09
+      ],
+      "bez": "151–200 m²"
+     },
+     {
+      "von": 201,
+      "bis": 300,
+      "zuschlag": 0.13,
+      "ci": [
+       0.07,
+       0.19
+      ],
+      "bez": "201–300 m²"
+     }
+    ],
+    "rundung_stellen": 2
+   }
+  ],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Wörtlich: 'Liegen Werte außerhalb einer Gruppe, so ist eine gesonderte Beurteilung hinsichtlich der Marktlage notwendig.' Keine Interpolation innerhalb der Bänder — die Bänder gelten als Ganzes. Lagegrenzen der Wohnlageklassen (aus der Vortagsernte, am Original noch zu bestätigen): gute Lage über 440 €/m², mittlere 360–440 €/m², einfache unter 360 €/m²."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "S. 50",
+    "eingabe": {
+     "wohnlageklasse": 3,
+     "sachwert": 375000,
+     "rnd_jahre": 43,
+     "wohnflaeche": 160
+    },
+    "soll_tabellenwert": 1.21,
+    "soll_wert": 1.19,
+    "wortlaut": "Einfamilienhaus, Wohnlageklasse 3, vorläufiger Sachwert 375.000 €, Restnutzungsdauer 43 Jahre, Wohnfläche 160 m². 1,21 + 0,06 − 0,15 + 0,02 + 0,05 = 1,19."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 747,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Der obere Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen (www.boris.nrw.de), dl-de/by-2-0",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Kap. 5.1.4, Tabelle 17, S. 49"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05913000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert bis … Euro",
+   "achse_x": [
+    75000,
+    100000,
+    125000,
+    150000,
+    175000,
+    200000,
+    225000,
+    250000,
+    275000,
+    300000,
+    325000,
+    350000,
+    375000,
+    400000,
+    450000
+   ],
+   "achse_k_feld": "gebiet",
+   "achse_k_bez": "Gebiet nach Stadtbezirken (Ziffer 8.1)",
+   "kategorien": [
+    "G3",
+    "G4",
+    "G5",
+    "G6b+7"
+   ],
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)",
+   "zellen": {
+    "75000": [
+     67,
+     73,
+     null,
+     null
+    ],
+    "100000": [
+     60,
+     45,
+     70,
+     null
+    ],
+    "125000": [
+     54,
+     31,
+     63,
+     66
+    ],
+    "150000": [
+     47,
+     24,
+     56,
+     54
+    ],
+    "175000": [
+     40,
+     19,
+     48,
+     45
+    ],
+    "200000": [
+     34,
+     16,
+     41,
+     38
+    ],
+    "225000": [
+     27,
+     13,
+     34,
+     31
+    ],
+    "250000": [
+     21,
+     11,
+     27,
+     26
+    ],
+    "275000": [
+     14,
+     10,
+     20,
+     21
+    ],
+    "300000": [
+     8,
+     8,
+     13,
+     16
+    ],
+    "325000": [
+     1,
+     7,
+     6,
+     13
+    ],
+    "350000": [
+     null,
+     6,
+     -1,
+     9
+    ],
+    "375000": [
+     null,
+     null,
+     null,
+     6
+    ],
+    "400000": [
+     null,
+     null,
+     null,
+     3
+    ],
+    "450000": [
+     null,
+     null,
+     null,
+     -2
+    ]
+   },
+   "vorbehalt": {
+    "hinweis": "Klammerwerte im Bericht = Wert MIT Vorbehalt (dünn belegt), kein fehlender Wert. Liste: Kategorie -> x-Stützstellen mit Vorbehalt.",
+    "G3": [
+     75000
+    ],
+    "G4": [
+     300000,
+     325000,
+     350000
+    ],
+    "G5": [
+     100000,
+     350000
+    ],
+    "G6b+7": [
+     375000,
+     400000,
+     450000
+    ]
+   },
+   "liefert": "zuschlag_prozent",
+   "umrechnung": "Sachwertfaktor = 1 + Zuschlag/100",
+   "rundung_stellen": 0
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "interpolation": "linear",
+   "hinweis": "Wörtlich: 'Liegen die Sachwerte zwischen den Tabellenwerten, so ist linear zu interpolieren. Eine Extrapolation ist nicht sachgerecht.' Die Werte sind Zu-/Abschläge in PROZENT auf den vorläufigen Sachwert, KEINE Faktoren. Fußnote: 'Gebiet 6 (b) beinhaltet das Gebiet 6 mit Ausnahme des statistischen Unterbezirks 674 (Kirchhörde-Ost).' Gebietsdefinition (welcher Stadtbezirk ist welches Gebiet) steht in Ziffer 8.1 und ist noch nicht erfasst.",
+   "objektabgrenzung": "Objekte ab Baujahr 1900 ohne Neubauten, Restnutzungsdauer mindestens 12 Jahre. Median der wirtschaftlichen Restnutzungsdauer 31 Jahre, Ausstattungskennzahl 1,0 bis 4,8."
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.4, S. 43",
+    "soll_zeilen": 15,
+    "soll_spalten": 4,
+    "wortlaut": "Das abgedruckte Anwendungsbeispiel (S. 45) betrifft Gebiet 1 und damit die Baujahrstabelle, nicht diese Tabelle. Ersatzprüfung: 15 Stützstellen, fallende Monotonie je Gebietsspalte, Vorbehaltswerte in Klammern erhalten."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.4, S. 43–45"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05913000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert bis … Euro",
+   "achse_x": [
+    125000,
+    150000,
+    175000,
+    200000,
+    225000,
+    250000,
+    275000,
+    300000,
+    325000,
+    350000,
+    375000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_k_feld": "gebiet",
+   "achse_k_bez": "Gebiet nach Stadtbezirken (Ziffer 8.1)",
+   "kategorien": [
+    "G3",
+    "G4",
+    "G5",
+    "G6b+7"
+   ],
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)",
+   "zellen": {
+    "125000": [
+     63,
+     30,
+     null,
+     null
+    ],
+    "150000": [
+     56,
+     26,
+     50,
+     null
+    ],
+    "175000": [
+     50,
+     22,
+     38,
+     null
+    ],
+    "200000": [
+     45,
+     18,
+     28,
+     null
+    ],
+    "225000": [
+     40,
+     14,
+     21,
+     27
+    ],
+    "250000": [
+     36,
+     9,
+     16,
+     20
+    ],
+    "275000": [
+     32,
+     5,
+     11,
+     14
+    ],
+    "300000": [
+     28,
+     1,
+     7,
+     10
+    ],
+    "325000": [
+     24,
+     -3,
+     4,
+     7
+    ],
+    "350000": [
+     21,
+     -7,
+     1,
+     4
+    ],
+    "375000": [
+     18,
+     -11,
+     -2,
+     2
+    ],
+    "400000": [
+     15,
+     -15,
+     -4,
+     0
+    ],
+    "450000": [
+     9,
+     -23,
+     -8,
+     -3
+    ],
+    "500000": [
+     4,
+     -31,
+     -12,
+     -5
+    ],
+    "550000": [
+     -1,
+     null,
+     -14,
+     -6
+    ],
+    "600000": [
+     -6,
+     null,
+     -17,
+     -8
+    ],
+    "650000": [
+     -10,
+     null,
+     -19,
+     -9
+    ],
+    "700000": [
+     null,
+     null,
+     -21,
+     -10
+    ]
+   },
+   "vorbehalt": {
+    "hinweis": "Klammerwerte im Bericht = Wert MIT Vorbehalt (dünn belegt), kein fehlender Wert.",
+    "G3": [
+     125000,
+     400000,
+     600000,
+     650000
+    ],
+    "G4": [
+     350000,
+     375000,
+     400000,
+     450000,
+     500000
+    ],
+    "G5": [
+     150000,
+     700000
+    ],
+    "G6b+7": []
+   },
+   "liefert": "zuschlag_prozent",
+   "umrechnung": "Sachwertfaktor = 1 + Zuschlag/100",
+   "rundung_stellen": 0
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "interpolation": "linear",
+   "hinweis": "Wörtlich: 'Liegen die Sachwerte zwischen den Tabellenwerten, so ist linear zu interpolieren. Eine Extrapolation ist nicht sachgerecht.' Werte sind Zu-/Abschläge in Prozent. Gebiet 6(b) = Gebiet 6 ohne den statistischen Unterbezirk 674 (Kirchhörde-Ost).",
+   "objektabgrenzung": "Objekte ab Baujahr 1900 ohne Neubauten, Restnutzungsdauer mindestens 12 Jahre."
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.4, S. 44",
+    "soll_zeilen": 18,
+    "soll_spalten": 4,
+    "wortlaut": "Kein Anwendungsbeispiel zu dieser Tabelle (das abgedruckte Beispiel betrifft Gebiet 1). Ersatzprüfung: 18 Stützstellen, fallende Monotonie je Gebietsspalte über die ganze Reihe."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.4, S. 43–45"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05913000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh_rh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "baujahr",
+   "achse_bez": "Baujahr",
+   "stufen": {
+    "1910": 53,
+    "1915": 51,
+    "1920": 49,
+    "1925": 47,
+    "1930": 45,
+    "1935": 43,
+    "1940": 41,
+    "1945": 39,
+    "1950": 37,
+    "1955": 36,
+    "1960": 34,
+    "1965": 32,
+    "1970": 31,
+    "1975": 29,
+    "1980": 28,
+    "1985": 26,
+    "1990": 25,
+    "1995": 24,
+    "2000": 22,
+    "2005": 21,
+    "2010": 20,
+    "2015": 19
+   },
+   "liefert": "zuschlag_prozent",
+   "umrechnung": "Sachwertfaktor = 1 + Zuschlag/100",
+   "rundung_stellen": 0
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "interpolation": "linear",
+   "gebiete": [
+    "1",
+    "6a"
+   ],
+   "hinweis": "In Gebiet 1 und Gebiet 6(a) wird der Zu-/Abschlag nach BAUJAHR bemessen, nicht nach vorläufigem Sachwert. Keine Klammerwerte in dieser Tabelle."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "S. 45",
+    "eingabe": {
+     "gebiet": "1",
+     "baujahr": 1960,
+     "vorlaeufiger_sachwert": 383711
+    },
+    "soll_tabellenwert": 34,
+    "soll_wert": 34,
+    "soll_sachwert_eur": 546000,
+    "wortlaut": "Doppelhaushälfte mit Garage im Gebiet 1, Baujahr 1960, Grundstück 405 m², Bodenrichtwert 470 €/m². Vorläufiger Sachwert 383.711 €. Sachwertfaktor Gebiet 1, Baujahr 1960 = 34 % → 1,34. Marktangepasster vorläufiger Sachwert 514.173 €. boG: Bodenwert Restfläche 405 m² × 470 × 0,91 = 173.219 € − 141.000 € = 32.219 €. Sachwert rd. 546.000 €.",
+    "modellbefund": "Das Beispiel rechnet mit Index 2010 = 100 → Bundesindex aktuell = 190,6, also Baupreisfaktor 1,906 zum Stichtag 01.01.2026. Außerdem: der Bodenwert wird nur für das Richtwertgrundstück (300 m²) angesetzt, die Restfläche kommt als besonderes objektspezifisches Merkmal mit Umrechnungskoeffizient 0,91 (Ziffer 4.7.3) dazu. Außenanlagen: Anschlüsse als Betrag plus Wegebefestigung/Terrasse/Einfriedigung rd. 2 % der alterswertgeminderten Herstellungskosten, max. 10.000 €.",
+    "soll_faktor": 1.34,
+    "einheit_hinweis": "Der Bericht druckt einen Zuschlag in Prozent ab. soll_wert ist die gedruckte Zahl, soll_faktor der daraus abgeleitete Sachwertfaktor (1 + Zuschlag/100)."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 164,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.4, S. 43–45"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05111000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_band",
+   "achse_y_feld": "baulandflaeche",
+   "achse_y_bez": "Baulandfläche in m²",
+   "baender_y": [
+    {
+     "von": 151,
+     "bis": 200,
+     "bez": "151 bis 200 m²"
+    },
+    {
+     "von": 201,
+     "bis": 350,
+     "bez": "201 bis 350 m²"
+    },
+    {
+     "von": 351,
+     "bis": 450,
+     "bez": "351 bis 450 m²"
+    },
+    {
+     "von": 451,
+     "bis": 550,
+     "bez": "451 bis 550 m²"
+    },
+    {
+     "von": 551,
+     "bis": 650,
+     "bez": "551 bis 650 m²"
+    },
+    {
+     "von": 651,
+     "bis": 750,
+     "bez": "651 bis 750 m²"
+    },
+    {
+     "von": 751,
+     "bis": 850,
+     "bez": "751 bis 850 m²"
+    },
+    {
+     "von": 851,
+     "bis": 1000,
+     "bez": "851 bis 1000 m²"
+    }
+   ],
+   "achse_x_feld": "baujahr",
+   "achse_x_bez": "Baujahresgruppe",
+   "baender_x": [
+    {
+     "von": null,
+     "bis": 1918,
+     "bez": "Baujahre bis 1918"
+    },
+    {
+     "von": 1919,
+     "bis": 1948,
+     "bez": "Baujahr 1919 bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1976,
+     "bez": "Baujahre 1949 bis 1976"
+    },
+    {
+     "von": 1977,
+     "bis": 1994,
+     "bez": "Baujahre 1977 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": null,
+     "bez": "Baujahre ab 1995 ohne Neubau"
+    },
+    {
+     "von": null,
+     "bis": null,
+     "bez": "Neubau 3 Jahre"
+    }
+   ],
+   "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+   "zellen": {
+    "151 bis 200 m²": [
+     1.2,
+     1.15,
+     1.25,
+     1.3,
+     1.35,
+     0.85
+    ],
+    "201 bis 350 m²": [
+     1.1,
+     1.05,
+     1.15,
+     1.3,
+     1.1,
+     1.0
+    ],
+    "351 bis 450 m²": [
+     1.1,
+     0.95,
+     1.0,
+     1.0,
+     0.9,
+     0.9
+    ],
+    "451 bis 550 m²": [
+     0.9,
+     0.85,
+     0.85,
+     0.95,
+     0.85,
+     0.8
+    ],
+    "551 bis 650 m²": [
+     0.85,
+     0.85,
+     0.85,
+     0.85,
+     0.85,
+     0.8
+    ],
+    "651 bis 750 m²": [
+     0.75,
+     0.8,
+     0.75,
+     0.8,
+     0.75,
+     0.75
+    ],
+    "751 bis 850 m²": [
+     0.75,
+     0.75,
+     0.8,
+     0.75,
+     0.8,
+     null
+    ],
+    "851 bis 1000 m²": [
+     0.7,
+     0.7,
+     0.75,
+     0.75,
+     0.8,
+     null
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.7: 'Die Auswertung der Sachwertfaktoren erfolgt nach den Grundsätzen des Sachwertverfahrens (ImmoWertV). … Bei der Anwendung der Sachwertfaktoren sind die angegebenen Modellparameter zwingend zu beachten (Modellkonformität).'",
+   "nhk": "NHK 2010, Baunebenkosten enthalten",
+   "baupreisindex": "Statistisches Bundesamt",
+   "regionalfaktor": 1.0,
+   "gnd": "gemäß Anlage 1 ImmoWertV",
+   "rnd": "sachverständig über Punktetabelle für Modernisierungselemente",
+   "aussenanlagen": "pauschal 8.000 EUR (fester Betrag, kein Prozentsatz)",
+   "gartenland_hinterland": "20 bis 30 % des vorderen Baulandwertes (Kap. 4.1.1, S. 26)",
+   "agvga": "Ein AGVGA-NRW-Modell wird NICHT als Grundlage genannt ('AGVGA' erscheint nur im Abkürzungsverzeichnis)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "keine",
+   "hinweis": "Beide Achsen sind Bänder — NICHT interpolieren. Wörtlich: 'Bei Abweichungen des Bewertungsobjektes von der Norm des Sachwertfaktor-Objektes sind sachverständige Zu- und Abschläge anzubringen. In bevorzugten Lagen kann im Einzelfall der angepasste Sachwertfaktor auch über 2,0 liegen.' Und: 'Bei Anpassungen im Randbereich der Normdefinitionen ist sachverständig abzuwägen.'",
+   "sachverstaendige_zuschlaege": [
+    {
+     "merkmal": "Wohnfläche",
+     "norm": "100 bis 220 m²",
+     "auspraegung": "unter 100 m²",
+     "spanne": "bis − 10 %"
+    },
+    {
+     "merkmal": "Wohnfläche",
+     "norm": "100 bis 220 m²",
+     "auspraegung": "über 220 m²",
+     "spanne": "bis + 10 %"
+    },
+    {
+     "merkmal": "Lage im Stadtgebiet",
+     "norm": "mittel (mittlere Randlage)",
+     "auspraegung": "gut bis sehr gut",
+     "spanne": "bis + 20 %"
+    },
+    {
+     "merkmal": "Modernisierung, nicht bei Neubauten",
+     "norm": "umfangreiche Modernisierung innerhalb der letzten 20 Jahre",
+     "auspraegung": "teilweise / nicht modernisiert",
+     "spanne": "bis − 15 %"
+    },
+    {
+     "merkmal": "Ausstattung",
+     "norm": "mittel",
+     "auspraegung": "stark gehoben",
+     "spanne": "bis + 5 %"
+    },
+    {
+     "merkmal": "Ausstattung",
+     "norm": "mittel",
+     "auspraegung": "gehoben",
+     "spanne": "+/− 0 %"
+    },
+    {
+     "merkmal": "Ausstattung",
+     "norm": "mittel",
+     "auspraegung": "einfach",
+     "spanne": "bis − 10 %"
+    },
+    {
+     "merkmal": "Immissionen",
+     "norm": "keine",
+     "auspraegung": "vorhanden",
+     "spanne": "bis − 5 %"
+    },
+    {
+     "merkmal": "Gebäudeart",
+     "norm": "freist. EFH/Doppelhaushälfte",
+     "auspraegung": "Villa",
+     "spanne": "bis + 25 %"
+    }
+   ],
+   "zuschlag_hinweis": "Die sA-Zu-/Abschläge sind OBERGRENZEN ('bis ± X %') und sachverständig abzuwägen — sie sind bewusst NICHT als rechenbare Korrekturen hinterlegt."
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.3, S. 41",
+    "soll_zeilen": 8,
+    "soll_spalten": 6,
+    "wortlaut": "Kein Anwendungs-/Rechenbeispiel zum Sachwertfaktor abgedruckt (zweifach gegengeprüft). Die abgedruckten Berechnungsbeispiele (Kap. 8.3 S. 57, Kap. 8.6 S. 59, 'Beispiele' S. 72) betreffen Umrechnungskoeffizienten, Lagekorrektur und Bodenwertableitung. Ersatzprüfung: 8 Flächenbänder × 6 Baujahresgruppen = 48 Zellen, davon 2 leer."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10700_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3 (S. 41), 5.2.3 (S. 44), 5.3.5 (S. 48); Modell Kap. 8.7 (S. 74/75)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05111000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rh",
+  "formel": {
+   "form": "matrix_band",
+   "achse_y_feld": "baulandflaeche",
+   "achse_y_bez": "Baulandfläche in m²",
+   "baender_y": [
+    {
+     "von": 151,
+     "bis": 200,
+     "bez": "151 bis 200 m²"
+    },
+    {
+     "von": 201,
+     "bis": 250,
+     "bez": "201 bis 250 m²"
+    },
+    {
+     "von": 251,
+     "bis": 350,
+     "bez": "251 bis 350 m²"
+    },
+    {
+     "von": 351,
+     "bis": 450,
+     "bez": "351 bis 450 m²"
+    }
+   ],
+   "achse_x_feld": "baujahr",
+   "achse_x_bez": "Baujahresgruppe",
+   "baender_x": [
+    {
+     "von": null,
+     "bis": 1918,
+     "bez": "Baujahre bis 1918"
+    },
+    {
+     "von": 1919,
+     "bis": 1948,
+     "bez": "Baujahr 1919 bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1976,
+     "bez": "Baujahre 1949 bis 1976"
+    },
+    {
+     "von": 1977,
+     "bis": 1994,
+     "bez": "Baujahre 1977 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": null,
+     "bez": "Baujahre ab 1995 ohne Neubau"
+    },
+    {
+     "von": null,
+     "bis": null,
+     "bez": "Neubau 3 Jahre"
+    }
+   ],
+   "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+   "zellen": {
+    "151 bis 200 m²": [
+     1.8,
+     1.45,
+     1.45,
+     1.65,
+     1.55,
+     1.2
+    ],
+    "201 bis 250 m²": [
+     1.7,
+     1.35,
+     1.4,
+     1.6,
+     1.4,
+     1.15
+    ],
+    "251 bis 350 m²": [
+     1.45,
+     1.3,
+     1.25,
+     1.45,
+     1.4,
+     1.1
+    ],
+    "351 bis 450 m²": [
+     1.4,
+     1.25,
+     1.05,
+     1.2,
+     1.3,
+     1.0
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.7: 'Die Auswertung der Sachwertfaktoren erfolgt nach den Grundsätzen des Sachwertverfahrens (ImmoWertV). … Bei der Anwendung der Sachwertfaktoren sind die angegebenen Modellparameter zwingend zu beachten (Modellkonformität).'",
+   "nhk": "NHK 2010, Baunebenkosten enthalten",
+   "baupreisindex": "Statistisches Bundesamt",
+   "regionalfaktor": 1.0,
+   "gnd": "gemäß Anlage 1 ImmoWertV",
+   "rnd": "sachverständig über Punktetabelle für Modernisierungselemente",
+   "aussenanlagen": "pauschal 8.000 EUR (fester Betrag, kein Prozentsatz)",
+   "gartenland_hinterland": "20 bis 30 % des vorderen Baulandwertes (Kap. 4.1.1, S. 26)",
+   "agvga": "Ein AGVGA-NRW-Modell wird NICHT als Grundlage genannt ('AGVGA' erscheint nur im Abkürzungsverzeichnis)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "keine",
+   "hinweis": "Beide Achsen sind Bänder — nicht interpolieren.",
+   "sachverstaendige_zuschlaege": [
+    {
+     "merkmal": "Gebäudeart",
+     "norm": "Reihenend/-mittelhaus",
+     "auspraegung": "Reihenstadthaus",
+     "spanne": "bis + 50 %"
+    },
+    {
+     "merkmal": "Wohnfläche",
+     "norm": "100 bis 170 m²",
+     "auspraegung": "unter 100 m²",
+     "spanne": "bis − 15 %"
+    },
+    {
+     "merkmal": "Wohnfläche",
+     "norm": "100 bis 170 m²",
+     "auspraegung": "über 170 m²",
+     "spanne": "bis + 15 %"
+    },
+    {
+     "merkmal": "Lage im Stadtgebiet",
+     "norm": "mittel (mittlere Randlage)",
+     "auspraegung": "gut bis sehr gut",
+     "spanne": "bis + 15 %"
+    },
+    {
+     "merkmal": "Modernisierung, nicht bei Neubauten",
+     "norm": "umfangreiche Modernisierung innerhalb der letzten 20 Jahre",
+     "auspraegung": "teilweise / nicht modernisiert",
+     "spanne": "bis − 10 %"
+    },
+    {
+     "merkmal": "Ausstattung",
+     "norm": "mittel",
+     "auspraegung": "stark gehoben",
+     "spanne": "bis + 5 %"
+    },
+    {
+     "merkmal": "Ausstattung",
+     "norm": "mittel",
+     "auspraegung": "gehoben",
+     "spanne": "+/− 0 %"
+    },
+    {
+     "merkmal": "Immissionen",
+     "norm": "keine",
+     "auspraegung": "vorhanden",
+     "spanne": "bis − 5 %"
+    }
+   ],
+   "zuschlag_hinweis": "Obergrenzen, sachverständig abzuwägen — bewusst nicht als rechenbare Korrekturen hinterlegt."
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.2.3, S. 44",
+    "soll_zeilen": 4,
+    "soll_spalten": 6,
+    "wortlaut": "Kein Anwendungsbeispiel zum Sachwertfaktor. Ersatzprüfung: 4 Flächenbänder × 6 Baujahresgruppen = 24 Zellen, vollständig belegt."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10700_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3 (S. 41), 5.2.3 (S. 44), 5.3.5 (S. 48); Modell Kap. 8.7 (S. 74/75)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05111000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "dreifh",
+  "formel": {
+   "form": "matrix_band",
+   "achse_y_feld": "gebaeudegruppe",
+   "achse_y_bez": "Gebäudegruppe",
+   "baender_y": [
+    {
+     "von": null,
+     "bis": null,
+     "bez": "Dreifamilienhäuser"
+    }
+   ],
+   "achse_x_feld": "baujahr",
+   "achse_x_bez": "Baujahresgruppe",
+   "baender_x": [
+    {
+     "von": null,
+     "bis": 1918,
+     "bez": "bis 1918"
+    },
+    {
+     "von": 1919,
+     "bis": 1948,
+     "bez": "1919 bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1976,
+     "bez": "1949 bis 1976"
+    },
+    {
+     "von": 1977,
+     "bis": 1994,
+     "bez": "1977 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": null,
+     "bez": "ab 1995 ohne Neubau"
+    },
+    {
+     "von": null,
+     "bis": null,
+     "bez": "Neubau 3 Jahre"
+    }
+   ],
+   "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+   "zellen": {
+    "Dreifamilienhäuser": [
+     0.9,
+     1.0,
+     0.9,
+     0.9,
+     0.95,
+     null
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.7: 'Die Auswertung der Sachwertfaktoren erfolgt nach den Grundsätzen des Sachwertverfahrens (ImmoWertV). … Bei der Anwendung der Sachwertfaktoren sind die angegebenen Modellparameter zwingend zu beachten (Modellkonformität).'",
+   "nhk": "NHK 2010, Baunebenkosten enthalten",
+   "baupreisindex": "Statistisches Bundesamt",
+   "regionalfaktor": 1.0,
+   "gnd": "gemäß Anlage 1 ImmoWertV",
+   "rnd": "sachverständig über Punktetabelle für Modernisierungselemente",
+   "aussenanlagen": "pauschal 8.000 EUR (fester Betrag, kein Prozentsatz)",
+   "gartenland_hinterland": "20 bis 30 % des vorderen Baulandwertes (Kap. 4.1.1, S. 26)",
+   "agvga": "Ein AGVGA-NRW-Modell wird NICHT als Grundlage genannt ('AGVGA' erscheint nur im Abkürzungsverzeichnis)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "keine",
+   "hinweis": "Aus Tabelle 5.3.5 (drei Gebäudegruppen in einer Tabelle) als eigenes Modell je Gebäudegruppe geführt. Wörtlich: 'Insbesondere bei citynahen Objekten ist darauf zu achten, dass der Bodenrichtwert sachverständig an die Mikrolage anzupassen ist.'",
+   "sachverstaendige_zuschlaege": [
+    {
+     "merkmal": "Maß der baulichen Nutzung (WGFZ)",
+     "norm": "1,0 bis 3,0",
+     "auspraegung": "unter 1,0",
+     "spanne": "bis − 5 %"
+    },
+    {
+     "merkmal": "Maß der baulichen Nutzung (WGFZ)",
+     "norm": "1,0 bis 3,0",
+     "auspraegung": "über 3,0",
+     "spanne": "bis + 25 %"
+    },
+    {
+     "merkmal": "Lage im Stadtgebiet",
+     "norm": "mittel (mittlere Randlage)",
+     "auspraegung": "gut bis sehr gut (zentrumsnah)",
+     "spanne": "bis + 10 %"
+    },
+    {
+     "merkmal": "Modernisierung, nicht bei Neubauten",
+     "norm": "umfangreiche Modernisierung innerhalb der letzten 20 Jahre",
+     "auspraegung": "teilweise / nicht modernisiert",
+     "spanne": "bis − 15 %"
+    },
+    {
+     "merkmal": "Ausstattung",
+     "norm": "mittel",
+     "auspraegung": "einfach",
+     "spanne": "bis − 10 %"
+    },
+    {
+     "merkmal": "Ausstattung",
+     "norm": "mittel",
+     "auspraegung": "gehoben",
+     "spanne": "+/− 0 %"
+    },
+    {
+     "merkmal": "Ausstattung",
+     "norm": "mittel",
+     "auspraegung": "stark gehoben",
+     "spanne": "bis + 10 %"
+    }
+   ]
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.3.5, S. 48",
+    "soll_zeilen": 1,
+    "soll_spalten": 6,
+    "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 6 Baujahresgruppen, Spalte 'Neubau 3 Jahre' im Bericht leer."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10700_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3 (S. 41), 5.2.3 (S. 44), 5.3.5 (S. 48); Modell Kap. 8.7 (S. 74/75)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05111000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "formel": {
+   "form": "matrix_band",
+   "achse_y_feld": "gebaeudegruppe",
+   "achse_y_bez": "Gebäudegruppe",
+   "baender_y": [
+    {
+     "von": null,
+     "bis": null,
+     "bez": "Mehrfamilienhäuser (< 20 % gewerbl. Anteil am Rohertrag)"
+    }
+   ],
+   "achse_x_feld": "baujahr",
+   "achse_x_bez": "Baujahresgruppe",
+   "baender_x": [
+    {
+     "von": null,
+     "bis": 1918,
+     "bez": "bis 1918"
+    },
+    {
+     "von": 1919,
+     "bis": 1948,
+     "bez": "1919 bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1976,
+     "bez": "1949 bis 1976"
+    },
+    {
+     "von": 1977,
+     "bis": 1994,
+     "bez": "1977 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": null,
+     "bez": "ab 1995 ohne Neubau"
+    },
+    {
+     "von": null,
+     "bis": null,
+     "bez": "Neubau 3 Jahre"
+    }
+   ],
+   "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+   "zellen": {
+    "Mehrfamilienhäuser (< 20 % gewerbl. Anteil am Rohertrag)": [
+     0.95,
+     1.05,
+     1.05,
+     1.1,
+     0.9,
+     null
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.7: 'Die Auswertung der Sachwertfaktoren erfolgt nach den Grundsätzen des Sachwertverfahrens (ImmoWertV). … Bei der Anwendung der Sachwertfaktoren sind die angegebenen Modellparameter zwingend zu beachten (Modellkonformität).'",
+   "nhk": "NHK 2010, Baunebenkosten enthalten",
+   "baupreisindex": "Statistisches Bundesamt",
+   "regionalfaktor": 1.0,
+   "gnd": "gemäß Anlage 1 ImmoWertV",
+   "rnd": "sachverständig über Punktetabelle für Modernisierungselemente",
+   "aussenanlagen": "pauschal 8.000 EUR (fester Betrag, kein Prozentsatz)",
+   "gartenland_hinterland": "20 bis 30 % des vorderen Baulandwertes (Kap. 4.1.1, S. 26)",
+   "agvga": "Ein AGVGA-NRW-Modell wird NICHT als Grundlage genannt ('AGVGA' erscheint nur im Abkürzungsverzeichnis)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "keine",
+   "hinweis": "Aus Tabelle 5.3.5. Dieselben sA-Merkmale wie bei den Dreifamilienhäusern (WGFZ, Lage, Modernisierung, Ausstattung) — Obergrenzen, sachverständig abzuwägen."
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.3.5, S. 48",
+    "soll_zeilen": 1,
+    "soll_spalten": 6,
+    "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 6 Baujahresgruppen, Spalte 'Neubau 3 Jahre' leer."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10700_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3 (S. 41), 5.2.3 (S. 44), 5.3.5 (S. 48); Modell Kap. 8.7 (S. 74/75)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05111000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ggg",
+  "formel": {
+   "form": "matrix_band",
+   "achse_y_feld": "gebaeudegruppe",
+   "achse_y_bez": "Gebäudegruppe",
+   "baender_y": [
+    {
+     "von": null,
+     "bis": null,
+     "bez": "gemischt genutzte Gebäude (35 – 45 % gewerbl. Anteil am Rohertrag)"
+    }
+   ],
+   "achse_x_feld": "baujahr",
+   "achse_x_bez": "Baujahresgruppe",
+   "baender_x": [
+    {
+     "von": null,
+     "bis": 1918,
+     "bez": "bis 1918"
+    },
+    {
+     "von": 1919,
+     "bis": 1948,
+     "bez": "1919 bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1976,
+     "bez": "1949 bis 1976"
+    },
+    {
+     "von": 1977,
+     "bis": 1994,
+     "bez": "1977 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": null,
+     "bez": "ab 1995 ohne Neubau"
+    },
+    {
+     "von": null,
+     "bis": null,
+     "bez": "Neubau 3 Jahre"
+    }
+   ],
+   "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+   "zellen": {
+    "gemischt genutzte Gebäude (35 – 45 % gewerbl. Anteil am Rohertrag)": [
+     0.9,
+     0.9,
+     1.0,
+     0.9,
+     null,
+     null
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.7: 'Die Auswertung der Sachwertfaktoren erfolgt nach den Grundsätzen des Sachwertverfahrens (ImmoWertV). … Bei der Anwendung der Sachwertfaktoren sind die angegebenen Modellparameter zwingend zu beachten (Modellkonformität).'",
+   "nhk": "NHK 2010, Baunebenkosten enthalten",
+   "baupreisindex": "Statistisches Bundesamt",
+   "regionalfaktor": 1.0,
+   "gnd": "gemäß Anlage 1 ImmoWertV",
+   "rnd": "sachverständig über Punktetabelle für Modernisierungselemente",
+   "aussenanlagen": "pauschal 8.000 EUR (fester Betrag, kein Prozentsatz)",
+   "gartenland_hinterland": "20 bis 30 % des vorderen Baulandwertes (Kap. 4.1.1, S. 26)",
+   "agvga": "Ein AGVGA-NRW-Modell wird NICHT als Grundlage genannt ('AGVGA' erscheint nur im Abkürzungsverzeichnis)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "keine",
+   "hinweis": "Aus Tabelle 5.3.5. Dieselben sA-Merkmale wie bei den Dreifamilienhäusern."
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.3.5, S. 48",
+    "soll_zeilen": 1,
+    "soll_spalten": 6,
+    "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 6 Baujahresgruppen, die beiden rechten Spalten im Bericht leer."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10700_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3 (S. 41), 5.2.3 (S. 44), 5.3.5 (S. 48); Modell Kap. 8.7 (S. 74/75)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05112000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.13,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Ein Faktor je Objektart, keine Matrix, keine Formel im Jahrgang 2026 erfasst. Stichprobe: RND 34 ± 14 Jahre · Kaufpreis 2.894 ± 1.031 €/m² Wfl · Wohnfläche 149 ± 35 m² · Ausstattungsstandard 2,7 ± 0,4 · vorläufiger Sachwert 380.607 ± 122.281 € · anrechenbare Baulandfläche 507 ± 137 m² · Bodenwertanteil 45 ± 15 % · lagetypischer Bodenwert 338 ± 101 €/m² · Wohnfläche ≥ 80 m², unvermietete Objekte.",
+   "vorjahr_dokumentation": {
+    "berichtsjahr": 2025,
+    "wert": 1.08
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.4",
+    "soll_zeilen": 1,
+    "soll_spalten": 1,
+    "wortlaut": "Kein Anwendungsbeispiel zum Sachwertfaktor im Bericht. Ersatzprüfung: der Faktor 1,13 liegt innerhalb der Stichprobenstreuung (± 0,22) und über dem Vorjahreswert 1,08, was zur berichteten Marktentwicklung passt."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 55,
+  "streuung": 0.22,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.4"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05112000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.33,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Ein Faktor je Objektart.",
+   "vorjahr_dokumentation": {
+    "berichtsjahr": 2025,
+    "wert": 1.2
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.4",
+    "soll_zeilen": 1,
+    "soll_spalten": 1,
+    "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 176 Kauffälle, Wert liegt zwischen freistehendem EFH (1,13) und RMH (1,46) — die im Bericht durchgängige Ordnung freistehend < DHH/REH < RMH ist eingehalten."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 176,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.4"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05112000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.46,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Ein Faktor je Objektart.",
+   "vorjahr_dokumentation": {
+    "berichtsjahr": 2025,
+    "wert": 1.35
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.4",
+    "soll_zeilen": 1,
+    "soll_spalten": 1,
+    "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 84 Kauffälle, höchster Faktor der vier Teilmärkte — Ordnung freistehend < DHH/REH < RMH eingehalten."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 84,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.4"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05112000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "zfh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.11,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Ein Faktor je Objektart.",
+   "vorjahr_dokumentation": {
+    "berichtsjahr": 2025,
+    "wert": 1.06
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.4",
+    "soll_zeilen": 1,
+    "soll_spalten": 1,
+    "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 33 Kauffälle, Wert 1,11 gegenüber Vorjahr 1,06."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 33,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.4"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05113000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.33,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Konstante je Objektart — keine Matrix, keine Formel, keine Zu-/Abschlagstabelle im Bericht. Modellansätze: Baunebenkosten in den NHK 2010 enthalten, Regionalfaktor 1,0, GND 80 (Gewerbe 60), RND-Verlängerung nach Anlage 2 ImmoWertV. Außenanlagen als Prozent der Herstellungskosten: freistehende EFH 5 % · DHH und REH 7 % · RMH 9 % (Kap. 9, Stand 01.01.2025). Umrechnungskoeffizient Wohnlage EZFH (5.1.5): einfach 0,70 · einfach–mittel 0,85 · mittel 1,00 · gut 1,25.",
+   "spanne": [
+    0.8,
+    1.9
+   ],
+   "median": 1.32
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.3",
+    "soll_zeilen": 1,
+    "soll_spalten": 1,
+    "soll_median": 1.32,
+    "soll_spanne": [
+     0.8,
+     1.9
+    ],
+    "wortlaut": "Kein Anwendungsbeispiel im gesamten Bericht (zweifach gegengeprüft). Ersatzprüfung aus dem Bericht selbst: Mittelwert 1,33 liegt dicht am abgedruckten Median 1,32 und innerhalb der Spanne 0,80 bis 1,90; Stichprobe RND 35 ± 15, Kaufpreis 3.357 €/m² Wfl, Wfl 136 m², vSW 354.982 €, Standard 2,6, Fläche 414 m², Bodenwert 158.967 €."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": 0.27,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gmb.gutachterausschuss-essen.de/gmb_10900_2026/",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.3"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05113000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "konstante",
+   "wert": 1.47,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Konstante je Objektart. Außenanlagen RMH 9 % der Herstellungskosten.",
+   "spanne": [
+    0.99,
+    2.0
+   ],
+   "median": 1.44
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.3",
+    "soll_zeilen": 1,
+    "soll_spalten": 1,
+    "soll_median": 1.44,
+    "soll_spanne": [
+     0.99,
+     2.0
+    ],
+    "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: Mittelwert 1,47 dicht am abgedruckten Median 1,44, innerhalb der Spanne 0,99 bis 2,00; Stichprobe RND 40 ± 14, Kaufpreis 2.920 ± 751 €/m² Wfl, Wfl 125 ± 23 m², vSW 254.503 ± 74.201 €, Gebäudestandard 2,7 ± 0,4, Grundstücksfläche 210 ± 67 m², Bodenwert 70.358 ± 30.334 €."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": 0.26,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gmb.gutachterausschuss-essen.de/gmb_10900_2026/",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.3"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05315000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Köln",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Köln",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    100000,
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000,
+    750000,
+    800000,
+    900000,
+    1000000,
+    1200000,
+    1400000,
+    1600000,
+    1800000,
+    2000000,
+    2200000
+   ],
+   "achse_k_feld": "anbauweise_rheinseite",
+   "achse_k_bez": "Anbauweise × Stadtbezirksgruppe (1–6 linksrheinisch mit Deutz, 7–9 rechtsrheinisch ohne Deutz)",
+   "kategorien": [
+    "1-6_ezfh_freistehend",
+    "1-6_dhh_reh",
+    "1-6_rmh",
+    "7-9_ezfh_freistehend",
+    "7-9_dhh_reh",
+    "7-9_rmh"
+   ],
+   "kategorien_bez": {
+    "1-6_ezfh_freistehend": "Stadtbezirke 1–6, freistehende Ein-/Zweifamilienhäuser",
+    "1-6_dhh_reh": "Stadtbezirke 1–6, Doppelhaushälften und Reihenendhäuser",
+    "1-6_rmh": "Stadtbezirke 1–6, Reihenmittelhäuser",
+    "7-9_ezfh_freistehend": "Stadtbezirke 7–9, freistehende Ein-/Zweifamilienhäuser",
+    "7-9_dhh_reh": "Stadtbezirke 7–9, Doppelhaushälften und Reihenendhäuser",
+    "7-9_rmh": "Stadtbezirke 7–9, Reihenmittelhäuser"
+   },
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)",
+   "zellen": {
+    "100000": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "150000": [
+     null,
+     null,
+     1.97,
+     null,
+     null,
+     1.76
+    ],
+    "200000": [
+     null,
+     1.37,
+     1.8,
+     null,
+     1.41,
+     1.63
+    ],
+    "250000": [
+     null,
+     1.32,
+     1.67,
+     null,
+     1.34,
+     1.53
+    ],
+    "300000": [
+     1.17,
+     1.27,
+     1.56,
+     null,
+     1.29,
+     1.44
+    ],
+    "350000": [
+     1.14,
+     1.24,
+     1.47,
+     null,
+     1.24,
+     1.37
+    ],
+    "400000": [
+     1.11,
+     1.2,
+     1.39,
+     1.11,
+     1.2,
+     1.31
+    ],
+    "450000": [
+     1.08,
+     1.18,
+     1.33,
+     1.08,
+     1.16,
+     1.25
+    ],
+    "500000": [
+     1.06,
+     1.15,
+     1.26,
+     1.06,
+     1.13,
+     1.21
+    ],
+    "550000": [
+     1.03,
+     1.13,
+     1.21,
+     1.04,
+     1.1,
+     1.16
+    ],
+    "600000": [
+     1.02,
+     1.11,
+     1.16,
+     1.03,
+     1.07,
+     1.12
+    ],
+    "650000": [
+     1.0,
+     1.09,
+     1.11,
+     1.01,
+     1.05,
+     null
+    ],
+    "700000": [
+     0.98,
+     1.07,
+     1.07,
+     1.0,
+     1.02,
+     null
+    ],
+    "750000": [
+     0.96,
+     1.06,
+     1.03,
+     0.98,
+     1.0,
+     null
+    ],
+    "800000": [
+     0.95,
+     1.04,
+     0.99,
+     0.97,
+     0.98,
+     null
+    ],
+    "900000": [
+     0.92,
+     1.01,
+     0.92,
+     0.95,
+     0.95,
+     null
+    ],
+    "1000000": [
+     0.9,
+     0.99,
+     0.86,
+     0.92,
+     0.91,
+     null
+    ],
+    "1200000": [
+     0.86,
+     0.94,
+     0.75,
+     0.89,
+     null,
+     null
+    ],
+    "1400000": [
+     0.82,
+     0.91,
+     null,
+     0.86,
+     null,
+     null
+    ],
+    "1600000": [
+     0.79,
+     0.88,
+     null,
+     null,
+     null,
+     null
+    ],
+    "1800000": [
+     0.77,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "2000000": [
+     0.74,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "2200000": [
+     0.72,
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   "normierung": "normiert auf ein mittleres Bodenwertniveau von 700 Euro/m²",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [
+   {
+    "bez": "Anpassung an das Bodenwertniveau",
+    "feld": "bodenwertniveau",
+    "art": "stufen",
+    "stufen": {
+     "300": -0.1,
+     "400": -0.08,
+     "500": -0.05,
+     "600": -0.03,
+     "700": 0.0,
+     "800": 0.03,
+     "1000": 0.08,
+     "1250": 0.14,
+     "1500": 0.21,
+     "1750": 0.27,
+     "2000": 0.34,
+     "2250": 0.41,
+     "2500": 0.47
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Additiv auf den Tabellenwert. Wörtlich: 'Für eine korrekte Anwendung der Sachwertfaktoren ist eine Anpassung an das Bodenwertniveau notwendig.' Das Bodenwertniveau wird aus dem anzuwendenden Bodenrichtwert abgeleitet: Bodenrichtwert auf eine Grundstücksgröße von 350 m² anpassen (Umrechnungskoeffizienten Kap. 4.6.6) und um Lageunterschiede zwischen Bodenrichtwert- und Wertermittlungsgrundstück korrigieren."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "'Orientiert wurde sich an der Handlungsempfehlung zur ImmoWertV 2021 und ImmoWertA bei der Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand: 12/2023) der AGVGA.NRW.'",
+   "nhk": "NHK 2010, keine Gebäudebaujahresklassen, Baunebenkosten enthalten",
+   "gnd": 80,
+   "bezugsmassstab": "Brutto-Grundfläche (BGF)",
+   "baupreisindex": "Statistisches Bundesamt",
+   "alterswertminderung": "linear, RND ggf. wegen Modernisierung modifiziert",
+   "regionalfaktor": 1.0,
+   "aussenanlagen": "in der Regel 5 % des Gebäudezeitwertes (ohne Hausanschlüsse); bei geringem oder ungewöhnlichem Ausmaß sachverständige Einschätzung",
+   "bodenwert": "aus den Bodenrichtwerten zum 01.01. des Auswertejahres, ohne konjunkturelle Weiterentwicklung; erschließungsbeitrags- und straßenbaukostenfreier Zustand; Garage auf dem Grundstück inbegriffen, Garagen auf separaten Grundstücken werden vom Kaufpreis abgezogen"
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Die Auswertung fokussiert auf den Schwerpunktbereich des Teilmarktes 'Ein- und Zweifamilienhäuser'; Sonderfälle wie Villen, Liebhaberobjekte, Atriumhäuser und Fertighäuser stellen nur einen geringen Anteil dar. Die Tabellenzeile 100.000 € ist im Bericht vorhanden, aber in allen sechs Spalten LEER. Zusätzlich führt der Bericht eine Zeilengruppe '2.400.000 – 3.000.000 €', ebenfalls durchgängig ohne Werte — sie ist hier nicht als Stützstelle aufgenommen.",
+   "zeitliche_anpassung_dokumentation": {
+    "hinweis": "Die Sachwertfaktoren wurden VOR der Auswertung zeitlich angepasst (negativer Wert = gesenkt). Dokumentation, kein Rechenschritt bei der Anwendung.",
+    "werte": {
+     "I. Halbjahr 2024": 0.16,
+     "II. Halbjahr 2024": 0.1,
+     "I. Halbjahr 2025": 0.06,
+     "II. Halbjahr 2025": 0.0
+    }
+   },
+   "weiterer_hinweis": "Untersuchung aus 2018: Ableitung mit den Bodenrichtwerten des Folgejahres senkt den Sachwertfaktor im gesamten Stadtgebiet um 0,05; in Hochpreislagen mit starker Bodenwertsteigerung kann er deutlich niedriger liegen."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "S. 94 (Bodenwertniveau S. 93)",
+    "eingabe": {
+     "sachwert": 500000,
+     "bodenwertniveau": 500,
+     "anbauweise_rheinseite": "1-6_ezfh_freistehend"
+    },
+    "soll_tabellenwert": 1.06,
+    "soll_korrektur": -0.05,
+    "soll_wert": 1.01,
+    "soll_zeilen": 23,
+    "soll_spalten": 6,
+    "wortlaut": "Der vorläufige Sachwert für ein freistehendes Einfamilienhaus im linksrheinischen Stadtgebiet beträgt 500.000 €. Das Bodenwertniveau wird mit rund 500 €/m² ermittelt. Der Korrekturwert beträgt − 0,05. Aus der Sachwertfaktoren-Tabelle ergibt sich ein Sachwertfaktor von 1,06. Der um das Bodenwertniveau angepasste Sachwertfaktor beträgt somit: 1,06 − 0,05 = 1,01.",
+    "beleg_bodenwertniveau": "Bodenrichtwert 600 €/m² (Richtwertgrundstück 400 m²), Lage 20 % schlechter → 480 €/m². Wertzahl 400 m² = 114, Wertzahl 350 m² = 118. 480 €/m² × 118 / 114 = rd. 500 €/m² → Korrekturwert − 0,05.",
+    "pruefhinweis": "Der Beleg nannte das Kategoriefeld \"kategorie\", das Modell heisst es \"anbauweise_rheinseite\". Angeglichen — der Auswerter liest ueber achse_k_feld, ein abweichender Schluessel im Beleg haette die Pruefung gruen und wertlos gemacht."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 514,
+  "streuung": 0.3,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_K%C3%B6ln/GMB2026_Digitalversion.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.5, S. 87–95 (Tabelle S. 92, Bodenwertniveau-Korrektur S. 93, Beispiele S. 93/94)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05962024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "200000": 1.0,
+    "300000": 0.97,
+    "400000": 0.95,
+    "500000": 0.92,
+    "600000": 0.9
+   },
+   "jahrgang": 2025,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "AGVGA.NRW-Modelle mit Handlungsempfehlung 11/2022 und 12/2023, Bezugszeitpunkt 01.01. des laufenden Jahres. Ableitung über lineare Regression, Datengrundlage Kaufvertragsjahre 2024 UND 2025."
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Zeitreihe über die Berichtsjahre 2020 bis 2025; anzuwenden ist der Jahrgang 2025, die älteren Spalten sind Dokumentation. 'Ab dem Berichtsjahr 2024 erfolgt die Ableitung der Sachwertfaktoren auf zusammengefasster Datengrundlage der jeweiligen Geschäftsjahre.' Kaufpreisschwerpunkt 200.000 bis 450.000 €. Stichtagswortlaut des Modells: 'Bezugszeitpunkt 01.01. des laufenden Jahres' — konkretes Datum im Erntedokument nicht abgedruckt, deshalb stichtag null.",
+   "zeitreihe_dokumentation": {
+    "stuetzstelle": 200000,
+    "werte": {
+     "2020": 1.11,
+     "2021": 1.12,
+     "2022": 1.26,
+     "2023": 1.13,
+     "2024": 1.02,
+     "2025": 1.0
+    }
+   },
+   "stichprobe": {
+    "bgf_m2": "344 ± 96",
+    "vorlaeufiger_sachwert_eur": "363.072 ± 101.815",
+    "bodenwertanteil_prozent": "30 ± 8",
+    "sachwertfaktor": "0,96 ± 0,10",
+    "restnutzungsdauer_jahre": "36 ± 11"
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.4, S. 42",
+    "soll_zeilen": 5,
+    "soll_spalten": 1,
+    "wortlaut": "Kein Anwendungsbeispiel im Bericht abgedruckt (Modellbeschreibung 8.1 lag hinter der Extraktionsgrenze). Ersatzprüfung: 5 Stützstellen mit Schrittweite 100.000 €, streng fallende Monotonie, alle Werte innerhalb der Stichprobenspanne 0,96 ± 0,10."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 86,
+  "streuung": 0.1,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gars.nrw/images/user/GA_Iserlohn/GMB_24300_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn, dl-de/by-2-0",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Kap. 5.1.4, S. 42"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05962024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "150000": 1.22,
+    "200000": 1.17,
+    "250000": 1.11,
+    "300000": 1.06
+   },
+   "jahrgang": 2025,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "AGVGA.NRW-Modelle mit Handlungsempfehlung 11/2022 und 12/2023, Bezugszeitpunkt 01.01. des laufenden Jahres. Ableitung über lineare Regression, Datengrundlage Kaufvertragsjahre 2024 UND 2025."
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Jahrgang 2025 der Zeitreihe. Kaufpreisschwerpunkt bei Reiheneigenheimen und Doppelhaushälften 200.000 bis 400.000 €.",
+   "stichprobe": {
+    "bgf_m2": "213 ± 54",
+    "vorlaeufiger_sachwert_eur": "219.569 ± 65.587",
+    "bodenwertanteil_prozent": "37 ± 9",
+    "sachwertfaktor": "1,16 ± 0,08",
+    "restnutzungsdauer_jahre": "42 ± 12"
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.4, S. 42",
+    "soll_zeilen": 4,
+    "soll_spalten": 1,
+    "wortlaut": "Kein Anwendungsbeispiel abgedruckt. Ersatzprüfung: 4 Stützstellen mit Schrittweite 50.000 €, streng fallende Monotonie, Stichprobenmittel 1,16 liegt zwischen den Tabellenrändern 1,06 und 1,22."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 59,
+  "streuung": 0.08,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gars.nrw/images/user/GA_Iserlohn/GMB_24300_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn, dl-de/by-2-0",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Kap. 5.1.4, S. 42"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05774032",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh",
+  "formel": {
+   "form": "linear_sachwert",
+   "a": 0.8544,
+   "b": 35534,
+   "liefert": "wert_eur",
+   "hinweis": "Liefert direkt den marktangepassten Sachwert in Euro, NICHT den Faktor: Wert = 0,8544 × vSW + 35.534 €. Eine zweite Bezugsgröße gibt es nicht — der Lagewert war laut Bericht nicht signifikant.",
+   "rundung_stellen": 0,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Modell zur Ableitung der Sachwertfaktoren der AGVGA NRW vom 21.06.2016 und 11.07.2017, auf Grundlage der SW-RL vom 09.09.2012.",
+   "abweichungen": [
+    "WGFZ-Bodenwertkorrektur ab Differenz 0,2 bei Gebäuden bis 30 Jahre",
+    "Abzinsung mit GND 70 statt 80",
+    "Bäderzahl je WE bestimmt den Standard bei Zwei-/Dreifamilienhäusern",
+    "GND einheitlich 80",
+    "Anlage 5 mit zwei Ausnahmen: Drempel 1.3 entfällt, Spitzboden 2.2 nach Herstellungskosten"
+   ],
+   "aussenanlagen": "nur verbal: Anschlusskosten plus gestaffelter Zuschlag nach Alter, Umfang und absolutem Bodenwert — keine Staffeltabelle abgedruckt"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Extrapolation über die Stichprobengrenzen ist laut Bericht unzulässig.",
+   "spannen": {
+    "grundstuecksflaeche_m2": [
+     264,
+     1650
+    ],
+    "bodenrichtwert_eur_m2": [
+     152,
+     752
+    ],
+    "restnutzungsdauer_jahre": [
+     13,
+     74
+    ],
+    "bgf_m2": [
+     167,
+     560
+    ],
+    "vorlaeufiger_sachwert_eur": [
+     221000,
+     899000
+    ]
+   },
+   "statistik": {
+    "bestimmtheitsmass": 0.78
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 9.2",
+    "eingabe": {
+     "sachwert": 450000
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": 420000,
+    "wortlaut": "450.000 → 0,8544 × 450.000 + 35.534 = rd. 420.000 €",
+    "soll_rundung": 1000,
+    "rundung_grund": "Der Bericht druckt den Betrag als \"rd.\" auf volle Tausend gerundet ab."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 37,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gars.nrw/images/user/GA_Paderborn/gmb/GMB_27000_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn, dl-de/by-2-0",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Kap. 9.2"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05774032",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "linear_sachwert",
+   "a": 0.4826,
+   "b": 192281,
+   "liefert": "wert_eur",
+   "hinweis": "Wert = 0,4826 × vSW + 192.281 €",
+   "rundung_stellen": 0,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Modell zur Ableitung der Sachwertfaktoren der AGVGA NRW vom 21.06.2016 und 11.07.2017, auf Grundlage der SW-RL vom 09.09.2012.",
+   "abweichungen": [
+    "WGFZ-Bodenwertkorrektur ab Differenz 0,2 bei Gebäuden bis 30 Jahre",
+    "Abzinsung mit GND 70 statt 80",
+    "Bäderzahl je WE bestimmt den Standard bei Zwei-/Dreifamilienhäusern",
+    "GND einheitlich 80",
+    "Anlage 5 mit zwei Ausnahmen: Drempel 1.3 entfällt, Spitzboden 2.2 nach Herstellungskosten"
+   ],
+   "aussenanlagen": "nur verbal: Anschlusskosten plus gestaffelter Zuschlag nach Alter, Umfang und absolutem Bodenwert — keine Staffeltabelle abgedruckt"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Extrapolation über die Stichprobengrenzen ist laut Bericht unzulässig.",
+   "spannen": {
+    "grundstuecksflaeche_m2": [
+     145,
+     786
+    ],
+    "bodenrichtwert_eur_m2": [
+     239,
+     610
+    ],
+    "restnutzungsdauer_jahre": [
+     12,
+     72
+    ],
+    "bgf_m2": [
+     147,
+     454
+    ],
+    "vorlaeufiger_sachwert_eur": [
+     175000,
+     599000
+    ]
+   },
+   "statistik": {
+    "bestimmtheitsmass": 0.33
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 9.2",
+    "eingabe": {
+     "sachwert": 380000
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": 376000,
+    "wortlaut": "380.000 → 0,4826 × 380.000 + 192.281 = rd. 376.000 €",
+    "soll_rundung": 1000,
+    "rundung_grund": "Der Bericht druckt den Betrag als \"rd.\" auf volle Tausend gerundet ab."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 43,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gars.nrw/images/user/GA_Paderborn/gmb/GMB_27000_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn, dl-de/by-2-0",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Kap. 9.2"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05774032",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "zfh",
+  "formel": {
+   "form": "linear_sachwert",
+   "a": 0.5894,
+   "b": 159773,
+   "liefert": "wert_eur",
+   "hinweis": "Wert = 0,5894 × vSW + 159.773 €. Der Bericht fasst Zwei- UND Dreifamilienhäuser in einer Funktion zusammen.",
+   "rundung_stellen": 0,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Modell zur Ableitung der Sachwertfaktoren der AGVGA NRW vom 21.06.2016 und 11.07.2017, auf Grundlage der SW-RL vom 09.09.2012.",
+   "abweichungen": [
+    "WGFZ-Bodenwertkorrektur ab Differenz 0,2 bei Gebäuden bis 30 Jahre",
+    "Abzinsung mit GND 70 statt 80",
+    "Bäderzahl je WE bestimmt den Standard bei Zwei-/Dreifamilienhäusern",
+    "GND einheitlich 80",
+    "Anlage 5 mit zwei Ausnahmen: Drempel 1.3 entfällt, Spitzboden 2.2 nach Herstellungskosten"
+   ],
+   "aussenanlagen": "nur verbal: Anschlusskosten plus gestaffelter Zuschlag nach Alter, Umfang und absolutem Bodenwert — keine Staffeltabelle abgedruckt"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Extrapolation über die Stichprobengrenzen ist laut Bericht unzulässig. Bäderzahl je Wohneinheit bestimmt bei Zwei-/Dreifamilienhäusern den Standard.",
+   "spannen": {
+    "grundstuecksflaeche_m2": [
+     334,
+     827
+    ],
+    "bodenrichtwert_eur_m2": [
+     281,
+     820
+    ],
+    "restnutzungsdauer_jahre": [
+     15,
+     50
+    ],
+    "bgf_m2": [
+     347,
+     582
+    ],
+    "vorlaeufiger_sachwert_eur": [
+     306000,
+     717000
+    ]
+   },
+   "statistik": {
+    "bestimmtheitsmass": 0.46
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 9.2",
+    "eingabe": {
+     "sachwert": 480000
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": 443000,
+    "wortlaut": "480.000 → 0,5894 × 480.000 + 159.773 = rd. 443.000 €",
+    "soll_rundung": 1000,
+    "rundung_grund": "Der Bericht druckt den Betrag als \"rd.\" auf volle Tausend gerundet ab."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 18,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://gars.nrw/images/user/GA_Paderborn/gmb/GMB_27000_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn, dl-de/by-2-0",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Kap. 9.2"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05362",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    200,
+    250,
+    300,
+    350,
+    400,
+    450,
+    500,
+    550,
+    600,
+    650,
+    700,
+    750
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m² (wie in www.boris.nrw.de veröffentlicht)",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.38,
+     1.35,
+     1.31,
+     1.27,
+     1.24,
+     1.22,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "200000": [
+     1.27,
+     1.25,
+     1.23,
+     1.21,
+     1.19,
+     1.18,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     1.2,
+     1.19,
+     1.18,
+     1.17,
+     1.16,
+     1.15,
+     1.15,
+     1.14,
+     1.14,
+     1.13,
+     1.13,
+     1.13
+    ],
+    "300000": [
+     1.14,
+     1.13,
+     1.13,
+     1.13,
+     1.13,
+     1.13,
+     1.13,
+     1.13,
+     1.13,
+     1.13,
+     1.13,
+     1.12
+    ],
+    "350000": [
+     1.09,
+     1.09,
+     1.1,
+     1.1,
+     1.11,
+     1.11,
+     1.11,
+     1.11,
+     1.12,
+     1.12,
+     1.12,
+     1.12
+    ],
+    "400000": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.09,
+     1.1,
+     1.1,
+     1.11,
+     1.11,
+     1.12,
+     1.12
+    ],
+    "450000": [
+     1.01,
+     1.03,
+     1.04,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.12
+    ],
+    "500000": [
+     0.98,
+     1.0,
+     1.02,
+     1.04,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.12
+    ],
+    "550000": [
+     0.96,
+     0.98,
+     1.0,
+     1.02,
+     1.04,
+     1.05,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12
+    ],
+    "600000": [
+     0.93,
+     0.96,
+     0.98,
+     1.01,
+     1.03,
+     1.04,
+     1.06,
+     1.07,
+     1.08,
+     1.1,
+     1.11,
+     1.12
+    ],
+    "650000": [
+     0.91,
+     0.94,
+     0.97,
+     0.99,
+     1.02,
+     1.04,
+     1.05,
+     1.07,
+     1.08,
+     1.1,
+     1.11,
+     1.13
+    ],
+    "700000": [
+     null,
+     0.92,
+     0.95,
+     0.98,
+     1.01,
+     1.03,
+     1.04,
+     1.06,
+     1.08,
+     1.09,
+     1.11,
+     1.13
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "AGVGA-NRW-Modell zur Ableitung von Sachwertfaktoren, 'das im Wesentlichen auch vom Gutachterausschuss des Rhein-Erft-Kreises angewendet wird'. Handlungsempfehlung AGVGA.NRW von Dezember 2023, angewendet ab 01.01.2026.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Bruttogrundfläche (BGF)",
+   "baupreisindex": "Statistisches Bundesamt",
+   "gnd": "Modellansatz nach Anlage 1 ImmoWertV (80 Jahre); Gewerbe seit 2023 einheitlich 60 Jahre",
+   "rnd": "Gesamtnutzungsdauer abzüglich Alter, unter Berücksichtigung von Modernisierungsmaßnahmen",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "4 – 8 % des vorläufigen Sachwerts der baulichen Anlagen",
+   "bodenwert": "auf Grundlage des Bodenrichtwertes zum Vertragsdatum",
+   "regionalfaktor": 1.0,
+   "gartenland_hinterland": "Arrondierungsflächen unter 500 m² ohne separate Zuwegung: 10 – 20 % des umgebenden Baulandrichtwertes (47 Fälle 2021–2025)"
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "linear zwischen den BRW-Stufen und den tabellierten vorläufigen Sachwerten",
+   "hinweis": "Wörtlich: 'Die hier tabellierten Sachwertfaktoren sind ohne Minderung für eine Sachwertermittlung mit den Bodenrichtwerten 2026 anzuhalten. Ein Anpassungsfaktor zur Berücksichtigung sich ändernder Bodenrichtwerte (+0,03) wurde in den Tabellen bereits rechnerisch berücksichtigt. … Dabei ist ggf. zwischen den einzelnen BRW-Stufen und den tabellierten vorläufigen Sachwerten zu interpolieren. Das so erhaltene Ergebnis ist sachverständig zu interpretieren.' Auswertung: Objekte im Wesentlichen mängelfrei, nach 1945 errichtet, keine Neubauten, vorläufiger Sachwert zwischen 160.000 und 800.000 €. 1.098 Verträge insgesamt über alle vier Gebäudetypen.",
+   "alternativformel_dokumentation": {
+    "hinweis": "Der Bericht veröffentlicht zusätzlich die Potenzfunktion SWF = a × vSW^b mit je Bodenrichtwertstufe eigenen Konstanten. Dokumentation — maßgeblich ist die Tabelle.",
+    "form": "SWF = a * vSW^b",
+    "konstanten": {
+     "50": {
+      "a": 2079.54998,
+      "b": -0.59703
+     },
+     "100": {
+      "a": 297.06025,
+      "b": -0.44313
+     },
+     "200": {
+      "a": 42.43456,
+      "b": -0.28924
+     },
+     "400": {
+      "a": 6.06171,
+      "b": -0.13534
+     },
+     "800": {
+      "a": 0.8659,
+      "b": 0.01855
+     }
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.3, S. 46",
+    "soll_zeilen": 12,
+    "soll_spalten": 12,
+    "wortlaut": "Kein Anwendungs-/Rechenbeispiel zum Sachwertfaktor abgedruckt — die Begriffe 'Anwendungsbeispiel', 'Rechenbeispiel' und 'Berechnungsbeispiel' kommen im Dokument nicht vor. Ersatzprüfung: 12 Zeilen (150.000 bis 700.000 € in 50.000er-Schritten) × 12 BRW-Spalten (200 bis 750 €/m² in 50er-Schritten); Monotonie fallend über den Sachwert bei niedrigen BRW, steigend über den BRW bei hohen Sachwerten.",
+    "monotonie_befund": "Die Spalte BRW 750 €/m² ist NICHT streng fallend: 250.000 → 1,13 · 300.000 bis 600.000 → 1,12 · 650.000 und 700.000 → 1,13. So steht es im Erntedokument; nicht geglättet. Beim Nachziehen am Original-PDF gezielt auf diese Spalte sehen."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Rhein-Erft-Kreis/GMB_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3, S. 45–47; Modellbeschreibung Kap. 8.4, S. 80–83"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05362",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    200,
+    250,
+    300,
+    350,
+    400,
+    450,
+    500,
+    550,
+    600,
+    650,
+    700,
+    750
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.52,
+     1.49,
+     1.45,
+     1.41,
+     1.38,
+     1.36,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "200000": [
+     1.38,
+     1.36,
+     1.34,
+     1.32,
+     1.3,
+     1.3,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     1.28,
+     1.28,
+     1.27,
+     1.26,
+     1.25,
+     1.25,
+     1.25,
+     1.24,
+     1.24,
+     1.23,
+     1.23,
+     1.23
+    ],
+    "300000": [
+     1.21,
+     1.21,
+     1.21,
+     1.21,
+     1.21,
+     1.21,
+     1.21,
+     1.21,
+     1.21,
+     1.21,
+     1.22,
+     1.22
+    ],
+    "350000": [
+     1.15,
+     1.15,
+     1.16,
+     1.17,
+     1.18,
+     1.18,
+     1.19,
+     1.19,
+     1.19,
+     1.2,
+     1.2,
+     1.21
+    ],
+    "400000": [
+     1.1,
+     1.11,
+     1.12,
+     1.14,
+     1.15,
+     1.16,
+     1.16,
+     1.17,
+     1.18,
+     1.19,
+     1.19,
+     1.2
+    ],
+    "450000": [
+     1.05,
+     1.07,
+     1.09,
+     1.11,
+     1.13,
+     1.13,
+     1.14,
+     1.15,
+     1.16,
+     1.17,
+     1.18,
+     1.19
+    ],
+    "500000": [
+     null,
+     1.04,
+     1.06,
+     1.08,
+     1.1,
+     1.12,
+     1.13,
+     1.14,
+     1.15,
+     1.16,
+     1.18,
+     1.19
+    ],
+    "550000": [
+     null,
+     1.01,
+     1.03,
+     1.06,
+     1.08,
+     1.1,
+     1.11,
+     1.13,
+     1.14,
+     1.15,
+     1.17,
+     1.18
+    ],
+    "600000": [
+     null,
+     0.98,
+     1.01,
+     1.04,
+     1.07,
+     1.08,
+     1.1,
+     1.11,
+     1.13,
+     1.15,
+     1.16,
+     1.18
+    ],
+    "650000": [
+     null,
+     null,
+     null,
+     null,
+     1.05,
+     1.07,
+     1.09,
+     1.1,
+     1.12,
+     1.14,
+     1.16,
+     1.17
+    ],
+    "700000": [
+     null,
+     null,
+     null,
+     null,
+     1.04,
+     1.06,
+     1.08,
+     1.09,
+     1.11,
+     1.13,
+     1.15,
+     1.17
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "AGVGA-NRW-Modell zur Ableitung von Sachwertfaktoren, 'das im Wesentlichen auch vom Gutachterausschuss des Rhein-Erft-Kreises angewendet wird'. Handlungsempfehlung AGVGA.NRW von Dezember 2023, angewendet ab 01.01.2026.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Bruttogrundfläche (BGF)",
+   "baupreisindex": "Statistisches Bundesamt",
+   "gnd": "Modellansatz nach Anlage 1 ImmoWertV (80 Jahre); Gewerbe seit 2023 einheitlich 60 Jahre",
+   "rnd": "Gesamtnutzungsdauer abzüglich Alter, unter Berücksichtigung von Modernisierungsmaßnahmen",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "4 – 8 % des vorläufigen Sachwerts der baulichen Anlagen",
+   "bodenwert": "auf Grundlage des Bodenrichtwertes zum Vertragsdatum",
+   "regionalfaktor": 1.0,
+   "gartenland_hinterland": "Arrondierungsflächen unter 500 m² ohne separate Zuwegung: 10 – 20 % des umgebenden Baulandrichtwertes (47 Fälle 2021–2025)"
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "linear zwischen den BRW-Stufen und den tabellierten vorläufigen Sachwerten",
+   "hinweis": "Anpassungsfaktor +0,03 für sich ändernde Bodenrichtwerte ist in den Tabellenwerten bereits enthalten.",
+   "alternativformel_dokumentation": {
+    "form": "SWF = a * vSW^b",
+    "konstanten": {
+     "50": {
+      "a": 4744.53403,
+      "b": -0.65899
+     },
+     "100": {
+      "a": 655.18805,
+      "b": -0.50166
+     },
+     "200": {
+      "a": 90.47704,
+      "b": -0.34433
+     },
+     "400": {
+      "a": 12.49427,
+      "b": -0.187
+     },
+     "800": {
+      "a": 1.72537,
+      "b": -0.02967
+     }
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.3, S. 46",
+    "soll_zeilen": 12,
+    "soll_spalten": 12,
+    "wortlaut": "Kein Anwendungsbeispiel im Bericht. Ersatzprüfung: 12 Zeilen × 12 Spalten, Monotonie fallend über den Sachwert, steigend über den Bodenrichtwert."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Rhein-Erft-Kreis/GMB_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3, S. 45–47; Modellbeschreibung Kap. 8.4, S. 80–83"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05362",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    200,
+    250,
+    300,
+    350,
+    400,
+    450,
+    500,
+    550,
+    600,
+    650,
+    700,
+    750
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.54,
+     1.54,
+     1.54,
+     1.54,
+     1.55,
+     1.55,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "200000": [
+     1.36,
+     1.37,
+     1.39,
+     1.4,
+     1.42,
+     1.42,
+     1.43,
+     1.44,
+     1.45,
+     1.46,
+     1.46,
+     1.47
+    ],
+    "250000": [
+     1.24,
+     1.26,
+     1.28,
+     1.3,
+     1.32,
+     1.34,
+     1.35,
+     1.36,
+     1.37,
+     1.38,
+     1.4,
+     1.41
+    ],
+    "300000": [
+     1.14,
+     1.17,
+     1.2,
+     1.23,
+     1.25,
+     1.27,
+     1.28,
+     1.3,
+     1.31,
+     1.33,
+     1.34,
+     1.36
+    ],
+    "350000": [
+     1.07,
+     1.1,
+     1.13,
+     1.16,
+     1.2,
+     1.21,
+     1.23,
+     1.25,
+     1.26,
+     1.28,
+     1.3,
+     1.32
+    ],
+    "400000": [
+     1.01,
+     1.05,
+     1.08,
+     1.11,
+     1.15,
+     1.17,
+     1.19,
+     1.21,
+     1.22,
+     1.24,
+     1.26,
+     1.28
+    ],
+    "450000": [
+     null,
+     null,
+     null,
+     1.07,
+     1.11,
+     1.13,
+     1.15,
+     1.17,
+     1.19,
+     1.21,
+     1.23,
+     1.25
+    ],
+    "500000": [
+     null,
+     null,
+     null,
+     1.03,
+     1.07,
+     1.09,
+     1.12,
+     1.14,
+     1.16,
+     1.18,
+     1.21,
+     1.23
+    ],
+    "550000": [
+     null,
+     null,
+     null,
+     1.0,
+     1.04,
+     1.07,
+     1.09,
+     1.11,
+     1.13,
+     1.16,
+     1.18,
+     1.2
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "AGVGA-NRW-Modell zur Ableitung von Sachwertfaktoren, 'das im Wesentlichen auch vom Gutachterausschuss des Rhein-Erft-Kreises angewendet wird'. Handlungsempfehlung AGVGA.NRW von Dezember 2023, angewendet ab 01.01.2026.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Bruttogrundfläche (BGF)",
+   "baupreisindex": "Statistisches Bundesamt",
+   "gnd": "Modellansatz nach Anlage 1 ImmoWertV (80 Jahre); Gewerbe seit 2023 einheitlich 60 Jahre",
+   "rnd": "Gesamtnutzungsdauer abzüglich Alter, unter Berücksichtigung von Modernisierungsmaßnahmen",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "4 – 8 % des vorläufigen Sachwerts der baulichen Anlagen",
+   "bodenwert": "auf Grundlage des Bodenrichtwertes zum Vertragsdatum",
+   "regionalfaktor": 1.0,
+   "gartenland_hinterland": "Arrondierungsflächen unter 500 m² ohne separate Zuwegung: 10 – 20 % des umgebenden Baulandrichtwertes (47 Fälle 2021–2025)"
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "linear zwischen den BRW-Stufen und den tabellierten vorläufigen Sachwerten",
+   "hinweis": "Anpassungsfaktor +0,03 ist in den Tabellenwerten bereits enthalten.",
+   "alternativformel_dokumentation": {
+    "form": "SWF = a * vSW^b",
+    "konstanten": {
+     "50": {
+      "a": 5169.24971,
+      "b": -0.68433
+     },
+     "100": {
+      "a": 1186.1427,
+      "b": -0.56019
+     },
+     "200": {
+      "a": 272.17383,
+      "b": -0.43605
+     },
+     "400": {
+      "a": 62.45336,
+      "b": -0.3119
+     },
+     "800": {
+      "a": 14.33063,
+      "b": -0.18776
+     }
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.3, S. 46",
+    "soll_zeilen": 9,
+    "soll_spalten": 12,
+    "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 9 Zeilen (150.000 bis 550.000 €) × 12 BRW-Spalten, Monotonie fallend über den Sachwert, steigend über den Bodenrichtwert."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Rhein-Erft-Kreis/GMB_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3, S. 45–47; Modellbeschreibung Kap. 8.4, S. 80–83"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05362",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "fertighaus",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    200,
+    250,
+    300,
+    350,
+    400,
+    450,
+    500,
+    550,
+    600,
+    650,
+    700,
+    750
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "150000": [
+     1.23,
+     1.28,
+     1.34,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "200000": [
+     1.18,
+     1.22,
+     1.27,
+     1.31,
+     1.35,
+     1.38,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     1.15,
+     1.18,
+     1.21,
+     1.24,
+     1.28,
+     1.29,
+     1.31,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "300000": [
+     1.12,
+     1.14,
+     1.17,
+     1.19,
+     1.22,
+     1.23,
+     1.25,
+     1.26,
+     1.27,
+     null,
+     null,
+     null
+    ],
+    "350000": [
+     1.09,
+     1.11,
+     1.13,
+     1.15,
+     1.17,
+     1.18,
+     1.19,
+     1.2,
+     1.21,
+     1.22,
+     1.23,
+     1.24
+    ],
+    "400000": [
+     1.07,
+     1.09,
+     1.1,
+     1.12,
+     1.13,
+     1.14,
+     1.15,
+     1.16,
+     1.16,
+     1.17,
+     1.18,
+     1.19
+    ],
+    "450000": [
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.1,
+     1.11,
+     1.11,
+     1.12,
+     1.13,
+     1.13,
+     1.14
+    ],
+    "500000": [
+     null,
+     1.05,
+     1.06,
+     1.06,
+     1.07,
+     1.07,
+     1.08,
+     1.08,
+     1.08,
+     1.09,
+     1.09,
+     1.09
+    ],
+    "550000": [
+     null,
+     1.03,
+     1.04,
+     1.04,
+     1.04,
+     1.05,
+     1.05,
+     1.05,
+     1.05,
+     1.05,
+     1.06,
+     1.06
+    ],
+    "600000": [
+     null,
+     null,
+     1.02,
+     1.02,
+     1.02,
+     1.02,
+     1.02,
+     1.02,
+     1.02,
+     1.02,
+     1.02,
+     1.03
+    ],
+    "650000": [
+     null,
+     null,
+     null,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "AGVGA-NRW-Modell zur Ableitung von Sachwertfaktoren, 'das im Wesentlichen auch vom Gutachterausschuss des Rhein-Erft-Kreises angewendet wird'. Handlungsempfehlung AGVGA.NRW von Dezember 2023, angewendet ab 01.01.2026.",
+   "nhk": "NHK 2010",
+   "bezugsmassstab": "Bruttogrundfläche (BGF)",
+   "baupreisindex": "Statistisches Bundesamt",
+   "gnd": "Modellansatz nach Anlage 1 ImmoWertV (80 Jahre); Gewerbe seit 2023 einheitlich 60 Jahre",
+   "rnd": "Gesamtnutzungsdauer abzüglich Alter, unter Berücksichtigung von Modernisierungsmaßnahmen",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "4 – 8 % des vorläufigen Sachwerts der baulichen Anlagen",
+   "bodenwert": "auf Grundlage des Bodenrichtwertes zum Vertragsdatum",
+   "regionalfaktor": 1.0,
+   "gartenland_hinterland": "Arrondierungsflächen unter 500 m² ohne separate Zuwegung: 10 – 20 % des umgebenden Baulandrichtwertes (47 Fälle 2021–2025)"
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "linear zwischen den BRW-Stufen und den tabellierten vorläufigen Sachwerten",
+   "hinweis": "Wörtlich: 'Bei der Ermittlung der Sachwertfaktoren für Fertighäuser wurden nur Objekte ausgewertet, die ab 1980 errichtet wurden und zum Kaufzeitpunkt mind. 2 Jahre alt waren.' Anpassungsfaktor +0,03 ist in den Tabellenwerten bereits enthalten.",
+   "alternativformel_dokumentation": {
+    "form": "SWF = a * vSW^b",
+    "konstanten": {
+     "50": {
+      "a": 0.25006,
+      "b": 0.10246
+     },
+     "100": {
+      "a": 1.26237,
+      "b": -0.01887
+     },
+     "200": {
+      "a": 6.37273,
+      "b": -0.14021
+     },
+     "400": {
+      "a": 32.1709,
+      "b": -0.26155
+     },
+     "800": {
+      "a": 162.40567,
+      "b": -0.38288
+     }
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.3, S. 47",
+    "soll_zeilen": 11,
+    "soll_spalten": 12,
+    "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 11 Zeilen (150.000 bis 650.000 €) × 12 BRW-Spalten, Monotonie fallend über den Sachwert, steigend über den Bodenrichtwert."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Rhein-Erft-Kreis/GMB_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3, S. 45–47; Modellbeschreibung Kap. 8.4, S. 80–83"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05762",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    20,
+    40,
+    60,
+    80,
+    100,
+    120,
+    140,
+    160
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    50000,
+    60000,
+    70000,
+    80000,
+    90000,
+    100000,
+    110000,
+    120000,
+    130000,
+    140000,
+    150000,
+    160000,
+    170000,
+    180000,
+    190000,
+    200000,
+    210000,
+    220000,
+    230000,
+    240000,
+    250000,
+    260000,
+    270000,
+    280000,
+    290000,
+    300000,
+    310000,
+    320000,
+    330000,
+    340000,
+    350000,
+    360000,
+    370000,
+    380000,
+    390000,
+    400000,
+    410000,
+    420000,
+    430000,
+    440000,
+    450000,
+    460000,
+    470000,
+    480000,
+    490000,
+    500000,
+    510000,
+    520000,
+    530000,
+    540000,
+    550000,
+    560000,
+    570000,
+    580000,
+    590000,
+    600000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "50000": [
+     0.71,
+     0.75,
+     0.79,
+     0.84,
+     0.88,
+     0.92,
+     0.96,
+     1.0
+    ],
+    "60000": [
+     0.7,
+     0.75,
+     0.79,
+     0.83,
+     0.87,
+     0.91,
+     0.96,
+     1.0
+    ],
+    "70000": [
+     0.7,
+     0.74,
+     0.78,
+     0.83,
+     0.87,
+     0.91,
+     0.95,
+     0.99
+    ],
+    "80000": [
+     0.69,
+     0.74,
+     0.78,
+     0.82,
+     0.86,
+     0.9,
+     0.95,
+     0.99
+    ],
+    "90000": [
+     0.69,
+     0.73,
+     0.77,
+     0.81,
+     0.86,
+     0.9,
+     0.94,
+     0.98
+    ],
+    "100000": [
+     0.68,
+     0.73,
+     0.77,
+     0.81,
+     0.85,
+     0.89,
+     0.94,
+     0.98
+    ],
+    "110000": [
+     0.68,
+     0.72,
+     0.76,
+     0.8,
+     0.85,
+     0.89,
+     0.93,
+     0.97
+    ],
+    "120000": [
+     0.67,
+     0.72,
+     0.76,
+     0.8,
+     0.84,
+     0.88,
+     0.92,
+     0.97
+    ],
+    "130000": [
+     0.67,
+     0.71,
+     0.75,
+     0.79,
+     0.84,
+     0.88,
+     0.92,
+     0.96
+    ],
+    "140000": [
+     0.66,
+     0.7,
+     0.75,
+     0.79,
+     0.83,
+     0.87,
+     0.91,
+     0.96
+    ],
+    "150000": [
+     0.66,
+     0.7,
+     0.74,
+     0.78,
+     0.83,
+     0.87,
+     0.91,
+     0.95
+    ],
+    "160000": [
+     0.65,
+     0.69,
+     0.74,
+     0.78,
+     0.82,
+     0.86,
+     0.9,
+     0.95
+    ],
+    "170000": [
+     0.65,
+     0.69,
+     0.73,
+     0.77,
+     0.81,
+     0.86,
+     0.9,
+     0.94
+    ],
+    "180000": [
+     0.64,
+     0.68,
+     0.73,
+     0.77,
+     0.81,
+     0.85,
+     0.89,
+     0.93
+    ],
+    "190000": [
+     0.64,
+     0.68,
+     0.72,
+     0.76,
+     0.8,
+     0.85,
+     0.89,
+     0.93
+    ],
+    "200000": [
+     0.63,
+     0.67,
+     0.71,
+     0.76,
+     0.8,
+     0.84,
+     0.88,
+     0.92
+    ],
+    "210000": [
+     0.63,
+     0.67,
+     0.71,
+     0.75,
+     0.79,
+     0.84,
+     0.88,
+     0.92
+    ],
+    "220000": [
+     0.62,
+     0.66,
+     0.7,
+     0.75,
+     0.79,
+     0.83,
+     0.87,
+     0.91
+    ],
+    "230000": [
+     0.62,
+     0.66,
+     0.7,
+     0.74,
+     0.78,
+     0.82,
+     0.87,
+     0.91
+    ],
+    "240000": [
+     0.61,
+     0.65,
+     0.69,
+     0.74,
+     0.78,
+     0.82,
+     0.86,
+     0.9
+    ],
+    "250000": [
+     0.6,
+     0.65,
+     0.69,
+     0.73,
+     0.77,
+     0.81,
+     0.86,
+     0.9
+    ],
+    "260000": [
+     0.6,
+     0.64,
+     0.68,
+     0.73,
+     0.77,
+     0.81,
+     0.85,
+     0.89
+    ],
+    "270000": [
+     0.59,
+     0.64,
+     0.68,
+     0.72,
+     0.76,
+     0.8,
+     0.85,
+     0.89
+    ],
+    "280000": [
+     0.59,
+     0.63,
+     0.67,
+     0.71,
+     0.76,
+     0.8,
+     0.84,
+     0.88
+    ],
+    "290000": [
+     0.58,
+     0.63,
+     0.67,
+     0.71,
+     0.75,
+     0.79,
+     0.84,
+     0.88
+    ],
+    "300000": [
+     0.58,
+     0.62,
+     0.66,
+     0.7,
+     0.75,
+     0.79,
+     0.83,
+     0.87
+    ],
+    "310000": [
+     0.57,
+     0.62,
+     0.66,
+     0.7,
+     0.74,
+     0.78,
+     0.82,
+     0.87
+    ],
+    "320000": [
+     0.57,
+     0.61,
+     0.65,
+     0.69,
+     0.74,
+     0.78,
+     0.82,
+     0.86
+    ],
+    "330000": [
+     0.56,
+     0.6,
+     0.65,
+     0.69,
+     0.73,
+     0.77,
+     0.81,
+     0.86
+    ],
+    "340000": [
+     0.56,
+     0.6,
+     0.64,
+     0.68,
+     0.72,
+     0.77,
+     0.81,
+     0.85
+    ],
+    "350000": [
+     0.55,
+     0.59,
+     0.64,
+     0.68,
+     0.72,
+     0.76,
+     0.8,
+     0.85
+    ],
+    "360000": [
+     0.55,
+     0.59,
+     0.63,
+     0.67,
+     0.71,
+     0.76,
+     0.8,
+     0.84
+    ],
+    "370000": [
+     0.54,
+     0.58,
+     0.63,
+     0.67,
+     0.71,
+     0.75,
+     0.79,
+     0.83
+    ],
+    "380000": [
+     0.54,
+     0.58,
+     0.62,
+     0.66,
+     0.7,
+     0.75,
+     0.79,
+     0.83
+    ],
+    "390000": [
+     0.53,
+     0.57,
+     0.61,
+     0.66,
+     0.7,
+     0.74,
+     0.78,
+     0.82
+    ],
+    "400000": [
+     0.53,
+     0.57,
+     0.61,
+     0.65,
+     0.69,
+     0.74,
+     0.78,
+     0.82
+    ],
+    "410000": [
+     0.52,
+     0.56,
+     0.6,
+     0.65,
+     0.69,
+     0.73,
+     0.77,
+     0.81
+    ],
+    "420000": [
+     0.52,
+     0.56,
+     0.6,
+     0.64,
+     0.68,
+     0.72,
+     0.77,
+     0.81
+    ],
+    "430000": [
+     0.51,
+     0.55,
+     0.59,
+     0.64,
+     0.68,
+     0.72,
+     0.76,
+     0.8
+    ],
+    "440000": [
+     0.5,
+     0.55,
+     0.59,
+     0.63,
+     0.67,
+     0.71,
+     0.76,
+     0.8
+    ],
+    "450000": [
+     0.5,
+     0.54,
+     0.58,
+     0.63,
+     0.67,
+     0.71,
+     0.75,
+     0.79
+    ],
+    "460000": [
+     0.49,
+     0.54,
+     0.58,
+     0.62,
+     0.66,
+     0.7,
+     0.75,
+     0.79
+    ],
+    "470000": [
+     0.49,
+     0.53,
+     0.57,
+     0.61,
+     0.66,
+     0.7,
+     0.74,
+     0.78
+    ],
+    "480000": [
+     0.48,
+     0.53,
+     0.57,
+     0.61,
+     0.65,
+     0.69,
+     0.74,
+     0.78
+    ],
+    "490000": [
+     0.48,
+     0.52,
+     0.56,
+     0.6,
+     0.65,
+     0.69,
+     0.73,
+     0.77
+    ],
+    "500000": [
+     0.47,
+     0.52,
+     0.56,
+     0.6,
+     0.64,
+     0.68,
+     0.72,
+     0.77
+    ],
+    "510000": [
+     0.47,
+     0.51,
+     0.55,
+     0.59,
+     0.64,
+     0.68,
+     0.72,
+     0.76
+    ],
+    "520000": [
+     0.46,
+     0.5,
+     0.55,
+     0.59,
+     0.63,
+     0.67,
+     0.71,
+     0.76
+    ],
+    "530000": [
+     0.46,
+     0.5,
+     0.54,
+     0.58,
+     0.62,
+     0.67,
+     0.71,
+     0.75
+    ],
+    "540000": [
+     0.45,
+     0.49,
+     0.54,
+     0.58,
+     0.62,
+     0.66,
+     0.7,
+     0.75
+    ],
+    "550000": [
+     0.45,
+     0.49,
+     0.53,
+     0.57,
+     0.61,
+     0.66,
+     0.7,
+     0.74
+    ],
+    "560000": [
+     0.44,
+     0.48,
+     0.53,
+     0.57,
+     0.61,
+     0.65,
+     0.69,
+     0.73
+    ],
+    "570000": [
+     0.44,
+     0.48,
+     0.52,
+     0.56,
+     0.6,
+     0.65,
+     0.69,
+     0.73
+    ],
+    "580000": [
+     0.43,
+     0.47,
+     0.51,
+     0.56,
+     0.6,
+     0.64,
+     0.68,
+     0.72
+    ],
+    "590000": [
+     0.43,
+     0.47,
+     0.51,
+     0.55,
+     0.59,
+     0.64,
+     0.68,
+     0.72
+    ],
+    "600000": [
+     0.42,
+     0.46,
+     0.5,
+     0.55,
+     0.59,
+     0.63,
+     0.67,
+     0.71
+    ]
+   },
+   "normobjekt": {
+    "bgf_m2": 350,
+    "rnd_jahre": 40
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichung der Restnutzungsdauer vom Normobjekt (40 Jahre)",
+    "feld": "rnd_jahre",
+    "art": "stufen",
+    "stufen": {
+     "10": -0.13,
+     "15": -0.11,
+     "20": -0.09,
+     "25": -0.06,
+     "30": -0.04,
+     "35": -0.02,
+     "40": 0.0,
+     "45": 0.02,
+     "50": 0.04,
+     "55": 0.06,
+     "60": 0.09,
+     "65": 0.11,
+     "70": 0.13,
+     "75": 0.15
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Additiv auf den Tabellenwert."
+   },
+   {
+    "bez": "Abweichung der Bruttogrundfläche vom Normobjekt (350 m²)",
+    "feld": "bgf",
+    "art": "stufen",
+    "stufen": {
+     "100": 0.05,
+     "150": 0.04,
+     "200": 0.03,
+     "250": 0.02,
+     "300": 0.01,
+     "350": 0.0,
+     "400": -0.01,
+     "450": -0.02,
+     "500": -0.03,
+     "550": -0.04,
+     "600": -0.05
+    },
+    "rundung_stellen": 2,
+    "hinweis": "Additiv auf den Tabellenwert."
+   }
+  ],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "interpolation": "Kreuzinterpolation zwischen beiden Achsen ausdrücklich vorgesehen",
+   "hinweis": "Wörtlich zur Modelltreue: 'Marktgerechte Werte können mit den hier veröffentlichten Sachwertfaktoren nur dann ermittelt werden, wenn bei der Verkehrswertableitung im gleichen Bewertungsmodell gearbeitet wird.'",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     50000,
+     600000
+    ],
+    "bodenrichtwert_eur_m2": [
+     20,
+     160
+    ],
+    "rnd_korrektur_jahre": [
+     10,
+     75
+    ],
+    "bgf_korrektur_m2": [
+     100,
+     600
+    ]
+   },
+   "stichprobe": {
+    "kaufpreis_eur": "183.966 (Median 170.000)",
+    "grundstueck_m2": "745 (Median 686)",
+    "bodenrichtwert_eur_m2": "65 (Median 50)",
+    "bgf_m2": 364,
+    "wohnflaeche_m2": 158,
+    "fiktives_baujahr": 1978,
+    "gnd_jahre": 80,
+    "rnd_jahre": "34 (Median 30)",
+    "vorlaeufiger_sachwert_eur": 272813,
+    "sachwertfaktor": "0,69 ± 0,24 (Median 0,68)"
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "S. 73",
+    "eingabe": {
+     "sachwert": 300000,
+     "brw": 80,
+     "rnd_jahre": 55,
+     "bgf": 300
+    },
+    "soll_tabellenwert": 0.7,
+    "soll_wert": 0.77,
+    "soll_zeilen": 56,
+    "soll_spalten": 8,
+    "soll_zellen": 448,
+    "soll_eckwerte": [
+     {
+      "sachwert": 50000,
+      "brw": 20,
+      "wert": 0.71
+     },
+     {
+      "sachwert": 50000,
+      "brw": 160,
+      "wert": 1.0
+     },
+     {
+      "sachwert": 600000,
+      "brw": 20,
+      "wert": 0.42
+     },
+     {
+      "sachwert": 600000,
+      "brw": 160,
+      "wert": 0.71
+     }
+    ],
+    "wortlaut": "Laut Tabelle beträgt der SF in einer BRW-Zone mit einem Bodenrichtwert von 80 Euro/m² und einem vorläufigen Sachwert in Höhe von 300.000 € = 0,70. Das Bewertungsobjekt hat jedoch keine RND von 40 Jahren, sondern von 55 Jahren. Die BGF beträgt nicht 350 m², sondern 300 m². Tabellenwert 0,70 + Zuschlag wegen längerer RND 0,06 + Zuschlag wegen geringerer BGF 0,01 = anzusetzender Sachwertfaktor 0,77.",
+    "pruefprotokoll": "Am 13.08.2026 gegen /root/ernte/out/swf_roh.json gemessen: 56 Zeilen × 8 Spalten = 448 Zellen, keine leere Zelle, Schrittweite y durchgehend 10.000 €, x durchgehend 20 €/m². Alle fünf Sollwerte getroffen (vier Eckwerte + Innenwert 300.000/80 → 0,70). Monotonie: alle 56 Zeilen steigend über den Bodenrichtwert, alle 8 Spalten fallend über den vorläufigen Sachwert, keine Ausreißerzeile. Wertebereich 0,42 bis 1,00.",
+    "negativtest": "Das fehlerhafte Suchmuster vom 11.08. fand 54 statt 56 Zeilen, weil die Zeilen 50.000 und 60.000 in der Spalte 160 auf 1,00 enden und das Muster 0,\\d\\d verlangte. Monotonie, Wertebereich und Anwendungsbeispiel gingen dabei ALLE durch — gefangen hat es allein die Zählprüfung gegen 56. Muster muss [01],\\d\\d lauten."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 1221,
+  "streuung": 0.24,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_H%C3%B6xter/pdf/hx_GMB_312_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3 „Sachwertfaktoren zum Stichtag 01.01.2026\", S. 70–73"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05766",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "doppel_log",
+   "c": 365.562,
+   "a": -9.8647,
+   "b": -16.6927,
+   "liefert": "prozent",
+   "hinweis": "Sachwertfaktor [%] = 365,562 − 9,8647 × LN(Baugrundstücksfläche) − 16,6927 × LN(vorläufiger Sachwert). Ergebnis in Prozent, für den Faktor durch 100 teilen. Keine Tabelle im Bericht.",
+   "rundung_stellen": 2,
+   "feld_1": "baugrundstuecksflaeche",
+   "bez_1": "Baugrundstücksfläche in m²",
+   "feld_2": "sachwert",
+   "bez_2": "vorläufiger Sachwert in Euro",
+   "gueltig_1": [
+    150,
+    1500
+   ],
+   "gueltig_2": [
+    86000,
+    646000
+   ]
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Anwendungsbereich = Datenspanne der Stichprobe, außerhalb NICHT rechnen.",
+   "spannen": {
+    "bodenrichtwert_eur_m2": [
+     32,
+     550
+    ],
+    "baugrundstuecksflaeche_m2": [
+     150,
+     1500
+    ],
+    "restnutzungsdauer_jahre": [
+     18,
+     78
+    ],
+    "bgf_m2": [
+     145,
+     620
+    ],
+    "standardstufe": [
+     1.8,
+     4.3
+    ],
+    "vorlaeufiger_sachwert_eur": [
+     86000,
+     646000
+    ],
+    "sachwertfaktor_prozent": [
+     54,
+     146
+    ]
+   },
+   "statistik": {
+    "bestimmtheitsmass": 0.31,
+    "bestimmtheitsmass_adjustiert": 0.3,
+    "standardfehler": 13.5,
+    "standardfehler_relativ_prozent": 15
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4",
+    "eingabe": {
+     "baugrundstuecksflaeche": 600,
+     "sachwert": 320000
+    },
+    "soll_tabellenwert": 90.86,
+    "soll_wert": 90.86,
+    "wortlaut": "Fläche 600 m² (LN 6,39692966), vorl. Sachwert 320.000 € (LN 12,6760763). 365,562 − 63,106 − 211,570 = 90,86 %.",
+    "pruefhinweis": "Nachgerechnet mit voller Genauigkeit: 365,562 − 63,10379 − 211,59794 = 90,8603 % → 90,86 % ✓. Der Sollwert des Dokuments ist getroffen. Die im Erntedokument abgedruckten gerundeten Zwischenwerte 63,106 und 211,570 sind selbst ungenau (211,570 statt 211,598) und ergeben scheinbar 90,886 — das ist ein Rundungsartefakt der Zwischenwerte, KEINE Abweichung der Formel."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 350,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.kreis-lippe.de/kreis-lippe-wAssets/docs/aktuelles/amtliche-bekanntmachungen/fachbereich-geoinfo-kataster-immobilien/immobilienbewertung-und-vermessung/grundstuecksmarktberichte/2026_Grundstuecksmarktbericht.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.4"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05962",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Märkischen Kreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Märkischen Kreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "150000": 0.97,
+    "175000": 0.96,
+    "200000": 0.95,
+    "225000": 0.94,
+    "250000": 0.93,
+    "275000": 0.92,
+    "300000": 0.91,
+    "325000": 0.9,
+    "350000": 0.89,
+    "375000": 0.89,
+    "400000": 0.88,
+    "425000": 0.87,
+    "450000": 0.86,
+    "475000": 0.85
+   },
+   "jahrgang": 2025,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Normierter Kaufpreis inklusive einer Garage, bereinigt um besondere objektspezifische Grundstücksmerkmale · Normalherstellungskosten 2010 · lineare Alterswertminderung OHNE Restwert · Restnutzungsdauer nach § 4 ImmoWertV in Anlehnung an Anlage 2 · Bodenwert mit marktüblicher objektbezogener Grundstücksgröße, selbständig nutzbare Teile werden als boG abgespalten · keine Kauffälle im bebauten Außenbereich."
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Zeitreihe über die Berichtsjahre 2020 bis 2025 aus linearer Regression; anzuwenden ist der Jahrgang 2025, die älteren Spalten sind Dokumentation. Zuständigkeit: Märkischer Kreis OHNE die Städte Iserlohn (eigener GAA 243, AGS 05962024) und Lüdenscheid (eigener GAA). Eigene Umrechnungskoeffizienten für die Grundstücksgröße gibt es NICHT (Kap. 4.7.4); der Bericht verweist hilfsweise auf die Anlagen 1 und 2 der Vergleichswertrichtlinie.",
+   "zeitreihe_dokumentation": {
+    "quelle": "Vollständige Zeitreihe 2020–2025 aus /root/ernte/out/swf_roh.json (Schlüssel 315_mk_freistehend, zweiter Extraktionsweg). Dokumentation, KEIN Rechenweg — es gilt der Jahrgang 2025 in formel.stufen.",
+    "abgleich": "Am 13.08.2026 gegen dieses Rezept gemessen: Jahrgang 2025 in beiden Quellen identisch (14 Stützstellen, kein abweichender Wert). Auch die Jahrgänge 2023 und 2024 stimmen im Überlappungsbereich vollständig überein; swf_roh.json führt dort zusätzlich die Stützstellen 450.000 und 475.000, die im Erntedokument nicht abgedruckt waren.",
+    "2020": {
+     "125000": 1.05,
+     "150000": 1.03,
+     "175000": 1.02,
+     "200000": 1.01,
+     "225000": 0.99,
+     "250000": 0.98,
+     "275000": 0.96,
+     "300000": 0.94,
+     "325000": 0.92,
+     "350000": 0.88
+    },
+    "2021": {
+     "150000": 1.07,
+     "175000": 1.05,
+     "200000": 1.04,
+     "225000": 1.03,
+     "250000": 1.02,
+     "275000": 1.01,
+     "300000": 1.0,
+     "325000": 0.98,
+     "350000": 0.97,
+     "375000": 0.97
+    },
+    "2022": {
+     "150000": 1.1,
+     "175000": 1.08,
+     "200000": 1.07,
+     "225000": 1.06,
+     "250000": 1.05,
+     "275000": 1.04,
+     "300000": 1.03,
+     "325000": 1.01,
+     "350000": 0.99,
+     "375000": 0.97,
+     "400000": 0.95,
+     "425000": 0.93,
+     "450000": 0.91
+    },
+    "2023": {
+     "150000": 1.01,
+     "175000": 1.0,
+     "200000": 0.98,
+     "225000": 0.97,
+     "250000": 0.95,
+     "275000": 0.94,
+     "300000": 0.92,
+     "325000": 0.91,
+     "350000": 0.9,
+     "375000": 0.88,
+     "400000": 0.87,
+     "425000": 0.85,
+     "450000": 0.84,
+     "475000": 0.82
+    },
+    "2024": {
+     "150000": 0.97,
+     "175000": 0.96,
+     "200000": 0.95,
+     "225000": 0.94,
+     "250000": 0.93,
+     "275000": 0.92,
+     "300000": 0.91,
+     "325000": 0.9,
+     "350000": 0.88,
+     "375000": 0.87,
+     "400000": 0.86,
+     "425000": 0.85,
+     "450000": 0.84,
+     "475000": 0.82
+    },
+    "2025": {
+     "150000": 0.97,
+     "175000": 0.96,
+     "200000": 0.95,
+     "225000": 0.94,
+     "250000": 0.93,
+     "275000": 0.92,
+     "300000": 0.91,
+     "325000": 0.9,
+     "350000": 0.89,
+     "375000": 0.89,
+     "400000": 0.88,
+     "425000": 0.87,
+     "450000": 0.86,
+     "475000": 0.85
+    }
+   },
+   "stichprobe": {
+    "baujahr": "1900 bis 2021, im Mittel 1969",
+    "wohnflaeche_m2": "90 bis 293, im Mittel 163",
+    "bgf_m2": "155 bis 660, im Mittel 346",
+    "vorlaeufiger_sachwert_eur": "110.000 bis 859.000, im Mittel 326.000",
+    "sachwertfaktor": "0,57 bis 1,30, im Mittel 0,90"
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.3, S. 71",
+    "soll_zeilen": 14,
+    "soll_spalten": 1,
+    "soll_schrittweite": 25000,
+    "soll_zeitreihe_jahrgaenge": 6,
+    "soll_spanne": [
+     0.57,
+     1.3
+    ],
+    "soll_stichprobenmittel": 0.9,
+    "wortlaut": "Der Bericht enthält kein einziges 'Beispiel' — über das ganze Dokument geprüft. Ersatzprüfung aus dem Dokument selbst: 14 Stützstellen, Schrittweite durchgehend 25.000 €, fallende Monotonie über die ganze Reihe, alle Tabellenwerte innerhalb der abgedruckten Stichprobenspanne 0,57–1,30, Stichprobenmittel 0,90 zwischen den Tabellenrändern 0,85 und 0,97, Zeitreihe führt genau 6 Berichtsjahre.",
+    "pruefhinweis": "Spaltenfalle: die Zeitreihe hat Lücken am Zeilenanfang (400.000 € trägt erst ab 2022 einen Wert). Wer die Zahlen der Reihe nach den Jahren zuordnet, verschiebt die ganze Zeile um zwei Spalten. Der Parser muss die Zeichenposition der Jahreszahl in der Kopfzeile messen."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 273,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Der obere Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen (www.boris.nrw.de), dl-de/by-2-0",
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.3, S. 71"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05962",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Märkischen Kreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Märkischen Kreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "125000": 1.07,
+    "150000": 1.06,
+    "175000": 1.05,
+    "200000": 1.03,
+    "225000": 1.02,
+    "250000": 1.01,
+    "275000": 0.99,
+    "300000": 0.98
+   },
+   "jahrgang": 2025,
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Normierter Kaufpreis inklusive einer Garage, bereinigt um besondere objektspezifische Grundstücksmerkmale · Normalherstellungskosten 2010 · lineare Alterswertminderung OHNE Restwert · Restnutzungsdauer nach § 4 ImmoWertV in Anlehnung an Anlage 2 · Bodenwert mit marktüblicher objektbezogener Grundstücksgröße, selbständig nutzbare Teile werden als boG abgespalten · keine Kauffälle im bebauten Außenbereich."
+  },
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Jahrgang 2025 der Zeitreihe 2020–2025.",
+   "zeitreihe_dokumentation": {
+    "quelle": "Vollständige Zeitreihe 2020–2025 aus /root/ernte/out/swf_roh.json (Schlüssel 315_mk_dhh_rh, zweiter Extraktionsweg). Dokumentation, kein Rechenweg.",
+    "abgleich": "Jahrgang 2025 in beiden Quellen identisch (8 Stützstellen, kein abweichender Wert).",
+    "2020": {
+     "100000": 1.13,
+     "125000": 1.1,
+     "150000": 1.09,
+     "175000": 1.07,
+     "200000": 1.05,
+     "225000": 1.03
+    },
+    "2021": {
+     "100000": 1.2,
+     "125000": 1.18,
+     "150000": 1.17,
+     "175000": 1.15,
+     "200000": 1.14,
+     "225000": 1.12,
+     "250000": 1.11
+    },
+    "2022": {
+     "125000": 1.16,
+     "150000": 1.15,
+     "175000": 1.13,
+     "200000": 1.12,
+     "225000": 1.1,
+     "250000": 1.09,
+     "275000": 1.06
+    },
+    "2023": {
+     "125000": 1.13,
+     "150000": 1.11,
+     "175000": 1.08,
+     "200000": 1.05,
+     "225000": 1.03,
+     "250000": 1.0,
+     "275000": 0.98,
+     "300000": 0.95
+    },
+    "2024": {
+     "125000": 1.05,
+     "150000": 1.04,
+     "175000": 1.02,
+     "200000": 1.0,
+     "225000": 0.99,
+     "250000": 0.97,
+     "275000": 0.95,
+     "300000": 0.94
+    },
+    "2025": {
+     "125000": 1.07,
+     "150000": 1.06,
+     "175000": 1.05,
+     "200000": 1.03,
+     "225000": 1.02,
+     "250000": 1.01,
+     "275000": 0.99,
+     "300000": 0.98
+    }
+   },
+   "stichprobe": {
+    "wohnflaeche_m2": "70 bis 240, im Mittel 132",
+    "bgf_m2": "112 bis 552, im Mittel 264",
+    "vorlaeufiger_sachwert_eur": "95.000 bis 395.000, im Mittel 228.000",
+    "sachwertfaktor": "0,74 bis 1,38, im Mittel 1,02"
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Kap. 5.1.3, S. 71",
+    "soll_zeilen": 8,
+    "soll_spalten": 1,
+    "soll_schrittweite": 25000,
+    "soll_spanne": [
+     0.74,
+     1.38
+    ],
+    "soll_stichprobenmittel": 1.02,
+    "wortlaut": "Kein Anwendungsbeispiel im Bericht. Ersatzprüfung: 8 Stützstellen, Schrittweite 25.000 €, fallende Monotonie, alle Werte innerhalb 0,74–1,38, Stichprobenmittel 1,02 zwischen den Tabellenrändern 0,98 und 1,07."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": null,
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Der obere Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen (www.boris.nrw.de), dl-de/by-2-0",
+  "lizenz": null,
+  "fundstelle": "Kap. 5.1.3, S. 71"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05774",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    100,
+    200,
+    300,
+    400
+   ],
+   "achse_x_feld": "lagewert",
+   "achse_x_bez": "Lagewert (Bodenrichtwert €/m², inkl. Erschließung und Kanalanschlussbeitrag)",
+   "achse_y": [
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert inkl. Bodenwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     0.95,
+     null,
+     null,
+     null
+    ],
+    "250000": [
+     0.92,
+     0.95,
+     null,
+     null
+    ],
+    "300000": [
+     0.89,
+     0.92,
+     0.95,
+     0.97
+    ],
+    "350000": [
+     0.86,
+     0.89,
+     0.92,
+     0.94
+    ],
+    "400000": [
+     0.84,
+     0.87,
+     0.89,
+     0.92
+    ],
+    "450000": [
+     0.81,
+     0.85,
+     0.87,
+     0.89
+    ],
+    "500000": [
+     0.79,
+     0.82,
+     0.85,
+     0.87
+    ],
+    "550000": [
+     0.77,
+     0.8,
+     0.83,
+     0.85
+    ],
+    "600000": [
+     null,
+     0.78,
+     0.81,
+     0.83
+    ],
+    "650000": [
+     null,
+     null,
+     null,
+     0.81
+    ]
+   },
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "extrapolation": "nicht_geregelt",
+   "hinweis": "Bandbreite laut Bericht: 'je nach Alter und Ausstattung ± 0,05'. Modellgrundlagen: NHK 2010, BGF, Regionalfaktor 1,0, GND 80. AGVGA NRW wird im Bericht NICHT genannt.",
+   "unsichere_zeilen": [
+    600000,
+    650000
+   ],
+   "unsicherheits_hinweis": "Die Spaltenzuordnung der Zeilen 600.000 und 650.000 ergibt sich nur aus der Spaltenmonotonie; im Rohtext stehen dort drei bzw. ein Wert ohne Spaltenmarkierung. VOR dem Verdrahten am Original-PDF sichtprüfen."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.3",
+    "eingabe": {
+     "sachwert": 400000,
+     "lagewert": 200,
+     "gnd_jahre": 80
+    },
+    "soll_tabellenwert": 0.87,
+    "soll_wert": 0.87,
+    "soll_sachwert_eur": 348000,
+    "soll_zeilen": 10,
+    "soll_spalten": 4,
+    "wortlaut": "Sachwert inkl. Bodenwert 400.000 €, Lagewert 200 €/m², GND 80 Jahre → Marktanpassungsfaktor 0,87, Abschlag 13 %, marktangepasster Sachwert 348.000 €."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quelle_url": "https://www.kreis-paderborn.de/gutachterausschuss/Produkte/Grundstucksmarktbericht/GMB_32100_2026.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3"
+ }
+]

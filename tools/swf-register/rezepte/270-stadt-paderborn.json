@@ -1,0 +1,211 @@
+{
+ "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+ "gaa_kennz": "27000",
+ "gaa_kennz_kurz": "270",
+ "ags": [
+  "05774032"
+ ],
+ "ebene": "gemeinde",
+ "berichtsjahr": 2026,
+ "stichtag": null,
+ "auswertezeitraum": "2025",
+ "beschlossen": null,
+ "veroeffentlicht": null,
+ "quelle_url": "https://gars.nrw/images/user/GA_Paderborn/gmb/GMB_27000_2026.pdf",
+ "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn, dl-de/by-2-0",
+ "lizenz": "dl-de/by-2-0",
+ "fundstelle": "Kap. 9.2",
+ "modelle": [
+  {
+   "zweig": "efh",
+   "zweig_bez": "freistehende Einfamilienhäuser, auch mit Einliegerwohnung",
+   "form": "linear_sachwert",
+   "formel": {
+    "form": "linear_sachwert",
+    "a": 0.8544,
+    "b": 35534,
+    "x_feld": "sachwert",
+    "x_bez": "vorläufiger Sachwert in Euro",
+    "liefert": "wert_eur",
+    "hinweis": "Liefert direkt den marktangepassten Sachwert in Euro, NICHT den Faktor: Wert = 0,8544 × vSW + 35.534 €. Eine zweite Bezugsgröße gibt es nicht — der Lagewert war laut Bericht nicht signifikant.",
+    "rundung_stellen": 0
+   },
+   "korrekturen": [],
+   "geltungsbereich": {
+    "extrapolation": "verboten",
+    "hinweis": "Extrapolation über die Stichprobengrenzen ist laut Bericht unzulässig.",
+    "spannen": {
+     "grundstuecksflaeche_m2": [
+      264,
+      1650
+     ],
+     "bodenrichtwert_eur_m2": [
+      152,
+      752
+     ],
+     "restnutzungsdauer_jahre": [
+      13,
+      74
+     ],
+     "bgf_m2": [
+      167,
+      560
+     ],
+     "vorlaeufiger_sachwert_eur": [
+      221000,
+      899000
+     ]
+    },
+    "statistik": {
+     "bestimmtheitsmass": 0.78
+    }
+   },
+   "stufe": "A",
+   "fallzahl": 37,
+   "streuung": null,
+   "beleg": {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 9.2",
+    "eingabe": {
+     "sachwert": 450000
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": 420000,
+    "wortlaut": "450.000 → 0,8544 × 450.000 + 35.534 = rd. 420.000 €",
+    "soll_rundung": 1000,
+    "rundung_grund": "Der Bericht druckt den Betrag als \"rd.\" auf volle Tausend gerundet ab."
+   }
+  },
+  {
+   "zweig": "rhdhh",
+   "zweig_bez": "Doppelhaushälften, Reihenend- und Reihenmittelhäuser",
+   "form": "linear_sachwert",
+   "formel": {
+    "form": "linear_sachwert",
+    "a": 0.4826,
+    "b": 192281,
+    "x_feld": "sachwert",
+    "x_bez": "vorläufiger Sachwert in Euro",
+    "liefert": "wert_eur",
+    "hinweis": "Wert = 0,4826 × vSW + 192.281 €",
+    "rundung_stellen": 0
+   },
+   "korrekturen": [],
+   "geltungsbereich": {
+    "extrapolation": "verboten",
+    "hinweis": "Extrapolation über die Stichprobengrenzen ist laut Bericht unzulässig.",
+    "spannen": {
+     "grundstuecksflaeche_m2": [
+      145,
+      786
+     ],
+     "bodenrichtwert_eur_m2": [
+      239,
+      610
+     ],
+     "restnutzungsdauer_jahre": [
+      12,
+      72
+     ],
+     "bgf_m2": [
+      147,
+      454
+     ],
+     "vorlaeufiger_sachwert_eur": [
+      175000,
+      599000
+     ]
+    },
+    "statistik": {
+     "bestimmtheitsmass": 0.33
+    }
+   },
+   "stufe": "A",
+   "fallzahl": 43,
+   "streuung": null,
+   "beleg": {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 9.2",
+    "eingabe": {
+     "sachwert": 380000
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": 376000,
+    "wortlaut": "380.000 → 0,4826 × 380.000 + 192.281 = rd. 376.000 €",
+    "soll_rundung": 1000,
+    "rundung_grund": "Der Bericht druckt den Betrag als \"rd.\" auf volle Tausend gerundet ab."
+   }
+  },
+  {
+   "zweig": "zfh",
+   "zweig_bez": "Zwei- und Dreifamilienhäuser",
+   "form": "linear_sachwert",
+   "formel": {
+    "form": "linear_sachwert",
+    "a": 0.5894,
+    "b": 159773,
+    "x_feld": "sachwert",
+    "x_bez": "vorläufiger Sachwert in Euro",
+    "liefert": "wert_eur",
+    "hinweis": "Wert = 0,5894 × vSW + 159.773 €. Der Bericht fasst Zwei- UND Dreifamilienhäuser in einer Funktion zusammen.",
+    "rundung_stellen": 0
+   },
+   "korrekturen": [],
+   "geltungsbereich": {
+    "extrapolation": "verboten",
+    "hinweis": "Extrapolation über die Stichprobengrenzen ist laut Bericht unzulässig. Bäderzahl je Wohneinheit bestimmt bei Zwei-/Dreifamilienhäusern den Standard.",
+    "spannen": {
+     "grundstuecksflaeche_m2": [
+      334,
+      827
+     ],
+     "bodenrichtwert_eur_m2": [
+      281,
+      820
+     ],
+     "restnutzungsdauer_jahre": [
+      15,
+      50
+     ],
+     "bgf_m2": [
+      347,
+      582
+     ],
+     "vorlaeufiger_sachwert_eur": [
+      306000,
+      717000
+     ]
+    },
+    "statistik": {
+     "bestimmtheitsmass": 0.46
+    }
+   },
+   "stufe": "A",
+   "fallzahl": 18,
+   "streuung": null,
+   "beleg": {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 9.2",
+    "eingabe": {
+     "sachwert": 480000
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": 443000,
+    "wortlaut": "480.000 → 0,5894 × 480.000 + 159.773 = rd. 443.000 €",
+    "soll_rundung": 1000,
+    "rundung_grund": "Der Bericht druckt den Betrag als \"rd.\" auf volle Tausend gerundet ab."
+   }
+  }
+ ],
+ "modellansaetze": {
+  "wortlaut": "Modell zur Ableitung der Sachwertfaktoren der AGVGA NRW vom 21.06.2016 und 11.07.2017, auf Grundlage der SW-RL vom 09.09.2012.",
+  "abweichungen": [
+   "WGFZ-Bodenwertkorrektur ab Differenz 0,2 bei Gebäuden bis 30 Jahre",
+   "Abzinsung mit GND 70 statt 80",
+   "Bäderzahl je WE bestimmt den Standard bei Zwei-/Dreifamilienhäusern",
+   "GND einheitlich 80",
+   "Anlage 5 mit zwei Ausnahmen: Drempel 1.3 entfällt, Spitzboden 2.2 nach Herstellungskosten"
+  ],
+  "aussenanlagen": "nur verbal: Anschlusskosten plus gestaffelter Zuschlag nach Alter, Umfang und absolutem Bodenwert — keine Staffeltabelle abgedruckt"
+ }
+}

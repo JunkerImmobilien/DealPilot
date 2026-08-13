@@ -1,0 +1,106 @@
+{
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn",
+  "gaa_kennz": "24300",
+  "gaa_kennz_kurz": "243",
+  "ags": ["05962024"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "auswertezeitraum": "2024-2025",
+  "beschlossen": null,
+  "veroeffentlicht": null,
+  "quelle_url": "https://gars.nrw/images/user/GA_Iserlohn/GMB_24300_2026.pdf",
+  "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn, dl-de/by-2-0",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Kap. 5.1.4, S. 42",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Einfamilienhäuser sowie Zweifamilienhäuser",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "200000": 1.00,
+          "300000": 0.97,
+          "400000": 0.95,
+          "500000": 0.92,
+          "600000": 0.90
+        },
+        "jahrgang": 2025,
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Zeitreihe über die Berichtsjahre 2020 bis 2025; anzuwenden ist der Jahrgang 2025, die älteren Spalten sind Dokumentation. 'Ab dem Berichtsjahr 2024 erfolgt die Ableitung der Sachwertfaktoren auf zusammengefasster Datengrundlage der jeweiligen Geschäftsjahre.' Kaufpreisschwerpunkt 200.000 bis 450.000 €. Stichtagswortlaut des Modells: 'Bezugszeitpunkt 01.01. des laufenden Jahres' — konkretes Datum im Erntedokument nicht abgedruckt, deshalb stichtag null.",
+        "zeitreihe_dokumentation": {
+          "stuetzstelle": 200000,
+          "werte": {"2020": 1.11, "2021": 1.12, "2022": 1.26, "2023": 1.13, "2024": 1.02, "2025": 1.00}
+        },
+        "stichprobe": {
+          "bgf_m2": "344 ± 96",
+          "vorlaeufiger_sachwert_eur": "363.072 ± 101.815",
+          "bodenwertanteil_prozent": "30 ± 8",
+          "sachwertfaktor": "0,96 ± 0,10",
+          "restnutzungsdauer_jahre": "36 ± 11"
+        }
+      },
+      "stufe": "A",
+      "fallzahl": 86,
+      "streuung": 0.10,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.4, S. 42",
+        "soll_zeilen": 5,
+        "soll_spalten": 1,
+        "wortlaut": "Kein Anwendungsbeispiel im Bericht abgedruckt (Modellbeschreibung 8.1 lag hinter der Extraktionsgrenze). Ersatzprüfung: 5 Stützstellen mit Schrittweite 100.000 €, streng fallende Monotonie, alle Werte innerhalb der Stichprobenspanne 0,96 ± 0,10."
+      }
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Reiheneigenheime und Doppelhaushälften (1 WE)",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "150000": 1.22,
+          "200000": 1.17,
+          "250000": 1.11,
+          "300000": 1.06
+        },
+        "jahrgang": 2025,
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Jahrgang 2025 der Zeitreihe. Kaufpreisschwerpunkt bei Reiheneigenheimen und Doppelhaushälften 200.000 bis 400.000 €.",
+        "stichprobe": {
+          "bgf_m2": "213 ± 54",
+          "vorlaeufiger_sachwert_eur": "219.569 ± 65.587",
+          "bodenwertanteil_prozent": "37 ± 9",
+          "sachwertfaktor": "1,16 ± 0,08",
+          "restnutzungsdauer_jahre": "42 ± 12"
+        }
+      },
+      "stufe": "A",
+      "fallzahl": 59,
+      "streuung": 0.08,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.4, S. 42",
+        "soll_zeilen": 4,
+        "soll_spalten": 1,
+        "wortlaut": "Kein Anwendungsbeispiel abgedruckt. Ersatzprüfung: 4 Stützstellen mit Schrittweite 50.000 €, streng fallende Monotonie, Stichprobenmittel 1,16 liegt zwischen den Tabellenrändern 1,06 und 1,22."
+      }
+    }
+  ],
+  "modellansaetze": {
+    "wortlaut": "AGVGA.NRW-Modelle mit Handlungsempfehlung 11/2022 und 12/2023, Bezugszeitpunkt 01.01. des laufenden Jahres. Ableitung über lineare Regression, Datengrundlage Kaufvertragsjahre 2024 UND 2025."
+  }
+}

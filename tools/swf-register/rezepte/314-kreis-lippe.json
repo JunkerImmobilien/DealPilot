@@ -1,0 +1,69 @@
+{
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold",
+  "gaa_kennz": "31400",
+  "gaa_kennz_kurz": "314",
+  "ags": ["05766"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "2025",
+  "beschlossen": null,
+  "veroeffentlicht": null,
+  "quelle_url": "https://www.kreis-lippe.de/kreis-lippe-wAssets/docs/aktuelles/amtliche-bekanntmachungen/fachbereich-geoinfo-kataster-immobilien/immobilienbewertung-und-vermessung/grundstuecksmarktberichte/2026_Grundstuecksmarktbericht.pdf",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.4",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Ein- und Zweifamilienhäuser (Regression ohne Trennung nach Anbauweise)",
+      "form": "doppel_log",
+      "formel": {
+        "form": "doppel_log",
+        "c": 365.562,
+        "a": -9.8647,
+        "b": -16.6927,
+        "f_feld": "baugrundstuecksflaeche",
+        "f_bez": "Baugrundstücksfläche in m²",
+        "x_feld": "sachwert",
+        "x_bez": "vorläufiger Sachwert in Euro",
+        "liefert": "prozent",
+        "hinweis": "Sachwertfaktor [%] = 365,562 − 9,8647 × LN(Baugrundstücksfläche) − 16,6927 × LN(vorläufiger Sachwert). Ergebnis in Prozent, für den Faktor durch 100 teilen. Keine Tabelle im Bericht.",
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "verboten",
+        "hinweis": "Anwendungsbereich = Datenspanne der Stichprobe, außerhalb NICHT rechnen.",
+        "spannen": {
+          "bodenrichtwert_eur_m2": [32, 550],
+          "baugrundstuecksflaeche_m2": [150, 1500],
+          "restnutzungsdauer_jahre": [18, 78],
+          "bgf_m2": [145, 620],
+          "standardstufe": [1.8, 4.3],
+          "vorlaeufiger_sachwert_eur": [86000, 646000],
+          "sachwertfaktor_prozent": [54, 146]
+        },
+        "statistik": {
+          "bestimmtheitsmass": 0.31,
+          "bestimmtheitsmass_adjustiert": 0.30,
+          "standardfehler": 13.5,
+          "standardfehler_relativ_prozent": 15
+        }
+      },
+      "stufe": "A",
+      "fallzahl": 350,
+      "fallzahl_hinweis": "350 von 353 Kauffällen, Vertragsjahr 2025",
+      "streuung": null,
+      "beleg": {
+        "art": "anwendungsbeispiel",
+        "fundstelle": "Kap. 5.1.4",
+        "eingabe": {"baugrundstuecksflaeche": 600, "sachwert": 320000},
+        "soll_tabellenwert": 90.86,
+        "soll_wert": 90.86,
+        "wortlaut": "Fläche 600 m² (LN 6,39692966), vorl. Sachwert 320.000 € (LN 12,6760763). 365,562 − 63,106 − 211,570 = 90,86 %.",
+        "pruefhinweis": "Nachgerechnet mit voller Genauigkeit: 365,562 − 63,10379 − 211,59794 = 90,8603 % → 90,86 % ✓. Der Sollwert des Dokuments ist getroffen. Die im Erntedokument abgedruckten gerundeten Zwischenwerte 63,106 und 211,570 sind selbst ungenau (211,570 statt 211,598) und ergeben scheinbar 90,886 — das ist ein Rundungsartefakt der Zwischenwerte, KEINE Abweichung der Formel."
+      }
+    }
+  ]
+}

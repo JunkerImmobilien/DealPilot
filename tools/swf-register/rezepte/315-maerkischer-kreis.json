@@ -1,0 +1,144 @@
+{
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Märkischen Kreis",
+  "gaa_kennz": "31500",
+  "gaa_kennz_kurz": "315",
+  "ags": ["05962"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "auswertezeitraum": "2025",
+  "beschlossen": null,
+  "veroeffentlicht": null,
+  "quelle_url": null,
+  "quelle_datei": "GMB_315_MaerkischerKreis_2026.pdf (110 Seiten, pdftotext -layout, 12.08.2026)",
+  "quellenvermerk": "Der obere Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen (www.boris.nrw.de), dl-de/by-2-0",
+  "lizenz": null,
+  "lizenz_hinweis": "Lizenzangabe im Dokument WIDERSPRÜCHLICH: Lizenztext dl-de/zero-2-0, Quellenvermerk dl-de/by-2-0. Vor der Übernahme am PDF verifizieren — deshalb lizenz null.",
+  "fundstelle": "Kap. 5.1.3, S. 71",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "freistehende Ein- und Zweifamilienhäuser",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "150000": 0.97,
+          "175000": 0.96,
+          "200000": 0.95,
+          "225000": 0.94,
+          "250000": 0.93,
+          "275000": 0.92,
+          "300000": 0.91,
+          "325000": 0.90,
+          "350000": 0.89,
+          "375000": 0.89,
+          "400000": 0.88,
+          "425000": 0.87,
+          "450000": 0.86,
+          "475000": 0.85
+        },
+        "jahrgang": 2025,
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Zeitreihe über die Berichtsjahre 2020 bis 2025 aus linearer Regression; anzuwenden ist der Jahrgang 2025, die älteren Spalten sind Dokumentation. Zuständigkeit: Märkischer Kreis OHNE die Städte Iserlohn (eigener GAA 243, AGS 05962024) und Lüdenscheid (eigener GAA). Eigene Umrechnungskoeffizienten für die Grundstücksgröße gibt es NICHT (Kap. 4.7.4); der Bericht verweist hilfsweise auf die Anlagen 1 und 2 der Vergleichswertrichtlinie.",
+        "zeitreihe_dokumentation": {
+          "quelle": "Vollständige Zeitreihe 2020–2025 aus /root/ernte/out/swf_roh.json (Schlüssel 315_mk_freistehend, zweiter Extraktionsweg). Dokumentation, KEIN Rechenweg — es gilt der Jahrgang 2025 in formel.stufen.",
+          "abgleich": "Am 13.08.2026 gegen dieses Rezept gemessen: Jahrgang 2025 in beiden Quellen identisch (14 Stützstellen, kein abweichender Wert). Auch die Jahrgänge 2023 und 2024 stimmen im Überlappungsbereich vollständig überein; swf_roh.json führt dort zusätzlich die Stützstellen 450.000 und 475.000, die im Erntedokument nicht abgedruckt waren.",
+          "2020": {"125000": 1.05, "150000": 1.03, "175000": 1.02, "200000": 1.01, "225000": 0.99, "250000": 0.98, "275000": 0.96, "300000": 0.94, "325000": 0.92, "350000": 0.88},
+          "2021": {"150000": 1.07, "175000": 1.05, "200000": 1.04, "225000": 1.03, "250000": 1.02, "275000": 1.01, "300000": 1.0, "325000": 0.98, "350000": 0.97, "375000": 0.97},
+          "2022": {"150000": 1.1, "175000": 1.08, "200000": 1.07, "225000": 1.06, "250000": 1.05, "275000": 1.04, "300000": 1.03, "325000": 1.01, "350000": 0.99, "375000": 0.97, "400000": 0.95, "425000": 0.93, "450000": 0.91},
+          "2023": {"150000": 1.01, "175000": 1.0, "200000": 0.98, "225000": 0.97, "250000": 0.95, "275000": 0.94, "300000": 0.92, "325000": 0.91, "350000": 0.9, "375000": 0.88, "400000": 0.87, "425000": 0.85, "450000": 0.84, "475000": 0.82},
+          "2024": {"150000": 0.97, "175000": 0.96, "200000": 0.95, "225000": 0.94, "250000": 0.93, "275000": 0.92, "300000": 0.91, "325000": 0.9, "350000": 0.88, "375000": 0.87, "400000": 0.86, "425000": 0.85, "450000": 0.84, "475000": 0.82},
+          "2025": {"150000": 0.97, "175000": 0.96, "200000": 0.95, "225000": 0.94, "250000": 0.93, "275000": 0.92, "300000": 0.91, "325000": 0.9, "350000": 0.89, "375000": 0.89, "400000": 0.88, "425000": 0.87, "450000": 0.86, "475000": 0.85}
+        },
+        "stichprobe": {
+          "baujahr": "1900 bis 2021, im Mittel 1969",
+          "wohnflaeche_m2": "90 bis 293, im Mittel 163",
+          "bgf_m2": "155 bis 660, im Mittel 346",
+          "vorlaeufiger_sachwert_eur": "110.000 bis 859.000, im Mittel 326.000",
+          "sachwertfaktor": "0,57 bis 1,30, im Mittel 0,90"
+        }
+      },
+      "stufe": "A",
+      "fallzahl": 273,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.3, S. 71",
+        "soll_zeilen": 14,
+        "soll_spalten": 1,
+        "soll_schrittweite": 25000,
+        "soll_zeitreihe_jahrgaenge": 6,
+        "soll_spanne": [0.57, 1.30],
+        "soll_stichprobenmittel": 0.90,
+        "wortlaut": "Der Bericht enthält kein einziges 'Beispiel' — über das ganze Dokument geprüft. Ersatzprüfung aus dem Dokument selbst: 14 Stützstellen, Schrittweite durchgehend 25.000 €, fallende Monotonie über die ganze Reihe, alle Tabellenwerte innerhalb der abgedruckten Stichprobenspanne 0,57–1,30, Stichprobenmittel 0,90 zwischen den Tabellenrändern 0,85 und 0,97, Zeitreihe führt genau 6 Berichtsjahre.",
+        "pruefhinweis": "Spaltenfalle: die Zeitreihe hat Lücken am Zeilenanfang (400.000 € trägt erst ab 2022 einen Wert). Wer die Zahlen der Reihe nach den Jahren zuordnet, verschiebt die ganze Zeile um zwei Spalten. Der Parser muss die Zeichenposition der Jahreszahl in der Kopfzeile messen."
+      }
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenhäuser",
+      "form": "stufen_1d",
+      "formel": {
+        "form": "stufen_1d",
+        "achse_feld": "sachwert",
+        "achse_bez": "vorläufiger Sachwert in Euro",
+        "stufen": {
+          "125000": 1.07,
+          "150000": 1.06,
+          "175000": 1.05,
+          "200000": 1.03,
+          "225000": 1.02,
+          "250000": 1.01,
+          "275000": 0.99,
+          "300000": 0.98
+        },
+        "jahrgang": 2025,
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Jahrgang 2025 der Zeitreihe 2020–2025.",
+        "zeitreihe_dokumentation": {
+          "quelle": "Vollständige Zeitreihe 2020–2025 aus /root/ernte/out/swf_roh.json (Schlüssel 315_mk_dhh_rh, zweiter Extraktionsweg). Dokumentation, kein Rechenweg.",
+          "abgleich": "Jahrgang 2025 in beiden Quellen identisch (8 Stützstellen, kein abweichender Wert).",
+          "2020": {"100000": 1.13, "125000": 1.1, "150000": 1.09, "175000": 1.07, "200000": 1.05, "225000": 1.03},
+          "2021": {"100000": 1.2, "125000": 1.18, "150000": 1.17, "175000": 1.15, "200000": 1.14, "225000": 1.12, "250000": 1.11},
+          "2022": {"125000": 1.16, "150000": 1.15, "175000": 1.13, "200000": 1.12, "225000": 1.1, "250000": 1.09, "275000": 1.06},
+          "2023": {"125000": 1.13, "150000": 1.11, "175000": 1.08, "200000": 1.05, "225000": 1.03, "250000": 1.0, "275000": 0.98, "300000": 0.95},
+          "2024": {"125000": 1.05, "150000": 1.04, "175000": 1.02, "200000": 1.0, "225000": 0.99, "250000": 0.97, "275000": 0.95, "300000": 0.94},
+          "2025": {"125000": 1.07, "150000": 1.06, "175000": 1.05, "200000": 1.03, "225000": 1.02, "250000": 1.01, "275000": 0.99, "300000": 0.98}
+        },
+        "stichprobe": {
+          "wohnflaeche_m2": "70 bis 240, im Mittel 132",
+          "bgf_m2": "112 bis 552, im Mittel 264",
+          "vorlaeufiger_sachwert_eur": "95.000 bis 395.000, im Mittel 228.000",
+          "sachwertfaktor": "0,74 bis 1,38, im Mittel 1,02"
+        }
+      },
+      "stufe": "A",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.3, S. 71",
+        "soll_zeilen": 8,
+        "soll_spalten": 1,
+        "soll_schrittweite": 25000,
+        "soll_spanne": [0.74, 1.38],
+        "soll_stichprobenmittel": 1.02,
+        "wortlaut": "Kein Anwendungsbeispiel im Bericht. Ersatzprüfung: 8 Stützstellen, Schrittweite 25.000 €, fallende Monotonie, alle Werte innerhalb 0,74–1,38, Stichprobenmittel 1,02 zwischen den Tabellenrändern 0,98 und 1,07."
+      }
+    }
+  ],
+  "modellansaetze": {
+    "wortlaut": "Normierter Kaufpreis inklusive einer Garage, bereinigt um besondere objektspezifische Grundstücksmerkmale · Normalherstellungskosten 2010 · lineare Alterswertminderung OHNE Restwert · Restnutzungsdauer nach § 4 ImmoWertV in Anlehnung an Anlage 2 · Bodenwert mit marktüblicher objektbezogener Grundstücksgröße, selbständig nutzbare Teile werden als boG abgespalten · keine Kauffälle im bebauten Außenbereich."
+  }
+}
