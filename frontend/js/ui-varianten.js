@@ -447,7 +447,12 @@
             '<div id="dpuv-resfrei">' + fremdBlock('_dpResFreiheitBlock') + '</div>' +
             '<div id="dpuv-ressave">' + fremdBlock('_dpResSave') + '</div>' +
           '</div></div>' +
-          '<div class="dpuv-lockbar"><div><b>Marke ab Partner</b>' +
+          /* v1156b · Eigene Id, weil es seit v1156 ZWEI Lockbars gibt und
+             gateSetzen() bis dahin die erste im Dokument nahm — das war
+             nach dem Einbau der Grundfarben-Schranke meine, und der
+             Partner-Text landete im falschen Kasten. Im ersten Prueflauf
+             gesehen. */
+          '<div class="dpuv-lockbar" id="dpuv-lockbar-marke"><div><b>Marke ab Partner</b>' +
             '<span>Farben und Logo gehören zum Partner-Paket und gelten dann ' +
             'auch für alle Mandanten.</span></div></div>' +
         '</div>' +
@@ -624,7 +629,12 @@
     var markeFrei = mandant && frei === 'alles';
 
     l.classList.toggle('locked', !partner && !markeFrei);
-    var bar = document.querySelector('.dpuv-lockbar');
+    /* v1156b · Gezielt die Marke-Bar, nicht "die erste .dpuv-lockbar" —
+       seit v1156 gibt es eine zweite (Grundfarbe), und sie steht im Markup
+       davor. Ein Klassen-Selektor auf ein Element, von dem es jetzt zwei
+       gibt, trifft das falsche. */
+    var bar = document.getElementById('dpuv-lockbar-marke')
+           || document.querySelector('.dpuv-lockbar');   /* Rueckfall fuer alte Staende */
     if (bar) {
       var txt;
       if (markeFrei) {
