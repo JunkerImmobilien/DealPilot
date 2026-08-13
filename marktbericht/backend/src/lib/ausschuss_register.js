@@ -49,6 +49,19 @@ let _index = new Map();
 let _herkunft = 'leer';
 let _stand = null;
 
+/* v1084a-WMRG · Die Saat wird als Liste behalten, nicht nur als Index.
+ * Ohne sie liesse sich nach einem DB-Lauf nicht mehr sagen, welche Saetze
+ * aus der Datei kamen — und genau das braucht die Zusammenfuehrung. */
+let _saat = [];
+
+/** Zaehlung je Kennzahl. Die einzige Zahl, an der man von aussen sieht, ob
+ *  beide Kennzahlen im Register stehen. Sie gehoert deshalb ins Startlog. */
+function jeKennzahl(saetze) {
+  const n = {};
+  for (const s of saetze) n[s.kennzahl] = (n[s.kennzahl] || 0) + 1;
+  return n;
+}
+
 function schluessel(kennzahl, ags) { return `${kennzahl}|${ags}`; }
 
 function indizieren(saetze) {
@@ -92,16 +105,18 @@ export function ladeSaat(dateien = SAATDATEIEN) {
       const saetze = JSON.parse(readFileSync(datei, 'utf8'));
       if (!Array.isArray(saetze)) throw new Error('kein Array');
       alle.push(...saetze);
-      gelesen.push({ datei, saetze: saetze.length });
+      gelesen.push({ datei, saetze: saetze.length });   /* v1084a-WMRG */
     } catch (e) {
       vermisst.push({ datei, fehler: e.message });
       console.error('[register] Saatdatei nicht lesbar:', datei, e.message);
     }
   }
   if (alle.length) {
+    _saat = alle;                                 /* v1084a-WMRG */
     _index = indizieren(alle);
     _herkunft = 'saatdatei';
-    _stand = { saetze: alle.length, gelesen, vermisst };
+    _stand = { saetze: alle.length, gelesen, vermisst,
+               je_kennzahl: jeKennzahl(alle) };
     return _stand;
   }
   try {
@@ -134,10 +149,30 @@ export async function ladeAusDb(q, kennzahlen = ['liegenschaftszinssatz', 'sachw
     if (!rows || !rows.length) {
       return { geladen: 0, grund: 'tabelle_leer', behalten: _herkunft };
     }
-    _index = indizieren(rows);
-    _herkunft = 'param_modell';
-    _stand = { saetze: rows.length };
-    return { geladen: rows.length, herkunft: 'param_modell' };
+
+    /* v1084a-WMRG · DIE TABELLE GEWINNT JE KENNZAHL, NICHT PAUSCHAL.
+     *
+     * Bis v1084 ersetzte diese Zeile den ganzen Index. Auf Produktion lagen
+     * in mb.param_modell 493 Liegenschaftszinssaetze und NULL
+     * Sachwertfaktoren — die 31 Sachwertfaktoren der Saatdatei waren damit
+     * zur Laufzeit weg, obwohl die Datei danebenlag und der Marker stand.
+     *
+     * Die alte Wache fing die LEERE Tabelle. Die halb gefuellte fing sie
+     * nicht. Ab hier gilt: was die Tabelle fuehrt, kommt aus der Tabelle;
+     * was sie nicht fuehrt, bleibt aus der Saat stehen. Ein Datensatz
+     * verschwindet nur, wenn ihn jemand ausdruecklich ersetzt. */
+    const ausDb = new Set(rows.map((r) => r.kennzahl));
+    const behalten = _saat.filter((s) => !ausDb.has(s.kennzahl));
+    const zusammen = [...behalten, ...rows];
+
+    _index = indizieren(zusammen);
+    _herkunft = behalten.length ? 'param_modell+saatdatei' : 'param_modell';
+    _stand = { saetze: zusammen.length,
+               aus_db: rows.length, aus_saat: behalten.length,
+               je_kennzahl: jeKennzahl(zusammen),
+               db_fuehrt: [...ausDb].sort() };
+    return { geladen: rows.length, aus_saat: behalten.length,
+             herkunft: _herkunft, je_kennzahl: _stand.je_kennzahl };
   } catch (e) {
     console.error('[register] param_modell nicht lesbar:', e.message);
     return { geladen: 0, grund: 'fehler', fehler: e.message, behalten: _herkunft };
