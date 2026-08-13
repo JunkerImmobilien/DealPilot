@@ -170,6 +170,29 @@
     if (!l) return;
     var vorlageAktiv = !!document.documentElement.getAttribute('data-ui-theme');
     l.classList.toggle('locked', vorlageAktiv);
+    sperreHart(l, vorlageAktiv);
+  }
+
+  /* ── v1156c · Eine ausgegraute Sperre ist nur eine optische ────────────
+     Im Pruefstand gemessen: `.dpuv-lock.locked>.dpuv-inner` setzt
+     `pointer-events:none`, aber die Knoepfe darin bleiben `tabIndex 0` und
+     nicht `disabled` — **per Tabulator erreichbar und mit Enter
+     ausloesbar.** Das betrifft nicht nur die neue Grundfarben-Schranke,
+     sondern genauso die Partner-Schranke, dort seit v1082.
+
+     `inert` nimmt den ganzen Teilbaum aus Fokus UND Zeiger, mit einer
+     Zuweisung statt einer Durchzaehlung. Kennt der Browser es nicht, bleibt
+     es beim heutigen Verhalten — also nie schlechter als vorher.
+
+     (Der eigene Messfehler dazu, damit er nicht wiederkehrt: ein
+     programmatisches `el.click()` umgeht `pointer-events` immer. Wer eine
+     Sperre pruefen will, muss Fokussierbarkeit und `disabled`/`inert`
+     messen, nicht klicken.) */
+  function sperreHart(wrapper, gesperrt) {
+    try {
+      var inner = wrapper.querySelector('.dpuv-inner');
+      if (inner && 'inert' in HTMLElement.prototype) inner.inert = !!gesperrt;
+    } catch (e) {}
   }
 
   /* ── Plan-Schranke ────────────────────────────────────────────────────
@@ -629,6 +652,7 @@
     var markeFrei = mandant && frei === 'alles';
 
     l.classList.toggle('locked', !partner && !markeFrei);
+    sperreHart(l, !partner && !markeFrei);   /* v1156c: auch gegen Tastatur */
     /* v1156b · Gezielt die Marke-Bar, nicht "die erste .dpuv-lockbar" —
        seit v1156 gibt es eine zweite (Grundfarbe), und sie steht im Markup
        davor. Ein Klassen-Selektor auf ein Element, von dem es jetzt zwei
