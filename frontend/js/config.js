@@ -706,7 +706,7 @@ window.DealPilotConfig = (function() {
         { id: 'expose',     label: 'Objekt-Exposé',                          required: true }
       ],
       // Welche Pläne dürfen den Bankexport automatisch mitsenden?
-      bankExportPlans: ['investor', 'pro', 'business'],
+      bankExportPlans: ['investor', 'pro'],   /* v1161-PLANS: 'business' war ein toter Eintrag */
       submitMode: 'auto'    // 'backend' | 'mailto' | 'auto'
     },
 

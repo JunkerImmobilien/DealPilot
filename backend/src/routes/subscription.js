@@ -217,7 +217,15 @@ router.post('/demo-change-plan', async (req, res, next) => {
     const { query } = require('../db/pool');
     const aiCreditsService = require('../services/aiCreditsService');
     const planId = String((req.body || {}).planId || '').toLowerCase();
-    const VALID_PLANS = ['free', 'starter', 'investor', 'pro', 'business'];
+    /* v1161-PLANS: 'business' raus. Marcel am 13.08.: „business und
+       enterprise gibt es gar nicht mehr." Die Zeilen sind seit demselben Tag
+       unsichtbar (is_public/is_active = false) und werden geloescht — ein
+       akzeptierter planId, der auf keine Zeile in `plans` zeigt, laeuft in
+       einen Fremdschluesselfehler (subscriptions.plan_id -> plans.id).
+       Der Legacy-Rueckfall auf 'free' bleibt an seinen drei Stellen
+       (config.js:462, subscription.js:693, settings.js:812) — er schuetzt
+       Altbestaende, die noch auf 'business' zeigen koennten. */
+    const VALID_PLANS = ['free', 'starter', 'investor', 'pro'];
     if (!VALID_PLANS.includes(planId)) {
       return res.status(400).json({ error: 'Ungültige planId. Erlaubt: ' + VALID_PLANS.join(', ') });
     }

@@ -262,7 +262,14 @@ async function ensureDemoUser() {
     `INSERT INTO subscriptions
        (user_id, plan_id, billing_interval, status,
         current_period_start, current_period_end)
-     VALUES ($1, 'business', 'monthly', 'active', NOW(), NOW() + INTERVAL '100 years')
+     /* v1161-PLANS: 'business' -> 'pro'. Der Plan 'business' wird geloescht
+        (Marcel 13.08.), und dieses Seed haette danach einen Fremdschluessel
+        auf eine nicht mehr vorhandene Zeile gesetzt. SEED_DEMO_DATA ist auf
+        Staging true, das Seed laeuft also wirklich.
+        'pro' statt 'starter', weil der Kommentar oben den Zweck nennt:
+        „damit er ohne Limits durchprobieren kann" — pro ist der groesste
+        regulaere Plan und trifft das. */
+     VALUES ($1, 'pro', 'monthly', 'active', NOW(), NOW() + INTERVAL '100 years')
      ON CONFLICT (user_id) DO UPDATE SET
        plan_id = EXCLUDED.plan_id,
        status = EXCLUDED.status,
