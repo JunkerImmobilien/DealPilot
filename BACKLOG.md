@@ -1144,10 +1144,27 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
    >   `ErtragswertService.bodenwert()` schon tut, und beide Texte drehen sich
    >   wieder um.
    >
-   > **Ohne Entscheidung noch baubar:** ein Hinweis im Formular, wenn ein MEA
-   > gepflegt ist **und** eine Garagenfläche steht — „der Anteil wird hier
-   > nicht abgezogen, ist das der eigene?". Reine Rückfrage, keine
-   > Rechenänderung, in beiden Wegen richtig.
+   > ~~**Ohne Entscheidung noch baubar:** ein Hinweis im Formular~~ —
+   > **gebaut, `v1166`, `c9779df`** (siehe „Fertig"). Erscheint, wenn ein MEA
+   > gepflegt ist **und** eine Garagenfläche steht.
+   >
+   > **Empfehlung für die Entscheidung: Weg A.** Drei Gründe, damit die
+   > Abwägung nicht neu geführt werden muss:
+   > 1. **Alles andere im Modell ist bereits wohnungsbezogen** — Gebäudeteil
+   >    über die BGF der Wohnung, Außenanlagen als Prozentsatz davon,
+   >    Bodenwert MEA-gekürzt. Bei B wäre die Garage das **einzige** Feld,
+   >    das gesamtgebäudebezogen eingegeben und intern gekürzt wird.
+   > 2. **Die Garage folgt fachlich nicht dem Wohnungs-MEA** — in der
+   >    Teilungserklärung meist eigener Anteil oder Sondernutzungsrecht.
+   >    Eine Kürzung mit dem Wohnungs-MEA wäre in beide Richtungen falsch.
+   > 3. **B ist ein Rechenkern-Eingriff** mit Prüfstrecke gegen das
+   >    Anwendungsbeispiel — für einen Effekt, den eine richtige Zahl im Feld
+   >    sauberer erreicht. A ist gebaut.
+   >
+   > **Wo A schwach ist, offen gesagt:** beim Mehrfamilienhaus mit
+   > gemeinschaftlichen Garagen ohne Zuordnung verführt das Feld dazu, die
+   > Gesamtfläche einzutragen. **Genau dagegen steht jetzt der Hinweis aus
+   > `v1166`.** Die Entscheidung bleibt trotzdem Marcels.
 
 11. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
@@ -1322,6 +1339,37 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 ---
 
 ## Fertig
+
+- [2026-08-13] **Der Hinweis am Garagenfeld — die Rückfrage, die in beiden Wegen stimmt** — `v1166`, `c9779df`. **(Backlog-Punkt 10)**
+   Punkt 10 wartet auf eine fachliche Entscheidung. **Dieser Hinweis nimmt sie
+   nicht vorweg** — er erscheint genau dann, wenn beide Auslegungen
+   auseinanderfallen können: ein **Miteigentumsanteil ist gepflegt** (also eine
+   ETW) **und eine Garagenfläche steht drin.** Dann fragt er:
+
+   > Der Miteigentumsanteil wird hier **nicht** abgezogen — anders als beim
+   > Bodenwert. Steht dort der eigene Anteil?
+
+   **Bewusst keine Schwelle und keine Rechnung.** Die Garage folgt in der
+   Teilungserklärung meist einem **eigenen** Anteil oder einem
+   Sondernutzungsrecht, nicht dem Wohnungs-MEA. Eine automatische Kürzung wäre
+   darum in **beide** Richtungen falsch — bei zwei Garagen für sechs Parteien zu
+   wenig, bei einer zugeordneten eigenen Garage ebenfalls zu wenig, bei gar
+   keiner zu viel. **Gefragt wird, nicht gerechnet.**
+
+   **Zwei Fallen beim Einbau, beide vorher bedacht:**
+   - Aufgerufen **nach** dem Neuzeichnen. `zeichnen()` baut die Blöcke neu auf;
+     ein vorher angehängter Hinweis wäre still wieder weg gewesen. `mea` und
+     `garagenBgf` standen bereits in der Auslöserliste — der Hinweis kommt bei
+     jeder Änderung an einem der beiden mit.
+   - **Eigene Darstellung statt einer fremden Klasse:** für `.wm-f small` gibt
+     es in dieser App **keine** Regel. Ein blankes `<small>` hätte geerbt, was
+     zufällig da war. Gedämpft und ohne Statusfarbe, Gold als
+     Whitelabel-Token — es ist eine Rückfrage, kein Fehler.
+
+   **Nachweis:** Syntax geprüft, zwei Marker auf dem Server, Cache-Kette in
+   allen drei Gliedern gezogen. **Im Browser nicht abgenommen** — dafür braucht
+   es einen Bericht mit gepflegtem MEA und Garagenfläche; das ist ein
+   Staging-Abnahmepunkt.
 
 - [2026-08-13] **Das Garagenfeld sagte im Platzhalter das Gegenteil der Feldhilfe** — `v1165`, `b9e7851`. **(Backlog-Punkt 10, der entblockbare Teil)**
    Punkt 10 stand als **blockiert**, weil eine fachliche Entscheidung fehlt.

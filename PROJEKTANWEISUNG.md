@@ -3375,3 +3375,25 @@ Einheiten, bis zu ~18.500 € zu viel.
 **Cache-Buster:** die Marktbericht-Kette hat **drei** Glieder, die zusammen
 gezogen werden müssen — `frontend/index.html` → `marktbericht-view.js` (die
 iframe-URL **im** Skript) → `marktbericht-app/index.html`.
+
+### `v1166` — Hinweis am Garagenfeld · `c9779df`
+
+Erscheint, wenn ein **Miteigentumsanteil gepflegt** ist **und** eine
+Garagenfläche steht: *„Der Miteigentumsanteil wird hier nicht abgezogen —
+anders als beim Bodenwert. Steht dort der eigene Anteil?"*
+
+**Keine Schwelle, keine Rechnung.** Die Garage folgt in der Teilungserklärung
+meist einem eigenen Anteil oder einem Sondernutzungsrecht, nicht dem
+Wohnungs-MEA — eine automatische Kürzung wäre in **beide** Richtungen falsch.
+Gefragt wird, nicht gerechnet.
+
+**Empfehlung zur offenen Frage aus Punkt 10: Weg A** (Feld bleibt
+wohnungsbezogen). Das Modell ist an allen anderen Stellen bereits
+wohnungsbezogen; die Garage wäre bei B der einzige Sonderweg. Die Entscheidung
+liegt weiterhin bei Marcel.
+
+> **Zwei Einbaufallen, die hier gelten und anderswo auch:**
+> `zeichnen()` baut die Blöcke neu auf — ein davor angehängtes Element ist
+> still wieder weg; also **nach** dem Neuzeichnen einhängen. Und für
+> `.wm-f small` gibt es in der Marktbericht-App **keine** Regel: ein blankes
+> `<small>` erbt, was zufällig da ist. Eigene Darstellung mitgeben.
