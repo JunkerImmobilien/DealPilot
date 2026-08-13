@@ -613,6 +613,50 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
+   ### DAS BILD IST DA (`design/mockups/hell.png`, 2026-08-13) — und es korrigiert zwei Annahmen
+
+   **Es zeigt nicht `panel`, sondern `kanzlei`.** Am CSS gegengeprüft:
+
+   | im Bild | `html[data-ui-theme="kanzlei"]` |
+   |---|---|
+   | helle, warme Kopfleiste | `--uv-chrome: #FBFAF7` |
+   | warme Arbeitsfläche | `--uv-pane: #F7F5F1` |
+   | weiße Karten | `--uv-surf: #FFFFFF` |
+   | warme Grautöne | `#1c1a16` / `#55504a` / `#928d84` |
+   | **Serifenschrift** bei „Objekt & Fotos" | `kanzlei` = „Serife" (THEMES) |
+
+   `panel` ist dagegen „Kühl" mit Blaustich (`rgb(21,26,32)`) — das ist im Bild
+   nirgends. **Die Textvorgabe im Punkt („App-Darstellung Panel") ist damit
+   überholt; das Bild ist die konkretere und neuere Angabe.**
+
+   **Und der Hell-Skin ist NICHT beteiligt.** Im Bild sind die Reiter
+   **golden**, nicht die Tinte aus `v1158` — und `v1158` hängt an
+   `body.dp-chrome-hell`. Das Bild zeigt also `kanzlei` **ohne**
+   `dp_chrome_hell`. Das ist kein Widerspruch, sondern die Auflösung: **der
+   „helle Modus" ist eine Vorlage, kein Chrome-Skin.**
+
+   **Damit ist Frage 2 auch beantwortet:** das Logo im Bild ist **groß und
+   prominent** (schwarzes „Deal", goldenes „Pilot"), nicht klein. Mein Entwurf
+   hatte „kleines Logo" aus der Textvorgabe übernommen — das Bild sagt etwas
+   anderes.
+
+   **Das Profil „Hell" setzt danach:**
+
+   | | Wert |
+   |---|---|
+   | `data-ui-theme` | **`kanzlei`** |
+   | `data-ui-cards` | `''` (Standard) |
+   | `dp_chrome_hell` | **`0`** — bleibt aus |
+   | Logo | **normal**, nicht klein |
+
+   Und „Obsidian" setzt alle vier auf den Istzustand zurück (kein Attribut,
+   `0`, normal). **Beide Profile sind damit reine Zustandsschalter über
+   vorhandene Wege** — kein neues CSS.
+
+   **Der Entwurf `hell-dunkel-zwei-profile.html` ist an drei Stellen
+   überholt** (Vorlage, Kopf-Farbe, Logogröße) und gehört vor dem Bauen
+   nachgezogen — oder man baut direkt gegen `hell.png`, das ist die Vorgabe.
+
 6. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
