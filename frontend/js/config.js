@@ -452,11 +452,61 @@ window.DealPilotConfig = (function() {
       .sort(function(a, b) { return (a.sort_order || 99) - (b.sort_order || 99); });
   }
 
+  /* ═══ v1163-pruefplan ═════════════════════════════════════════════
+     Der Plan-Override war im API-Modus WIRKUNGSLOS: getCurrentPlanKey()
+     fragte zuerst Sub.getCurrentSync(), und ein echtes Abo im Cache gewann
+     immer. Gemessen: dp_plan_override='free' gesetzt, currentKey() blieb
+     'partner'. Damit war „jeden Plan einmal durchklicken" nicht simulierbar
+     — der Prueflauf aus Backlog-Punkt 6 haette je ein echtes Konto gebraucht.
+
+     Warum nicht einfach Vorrang fuer den Override? Weil das JEDEN Nutzer
+     mit einer Konsolenzeile auf 'partner' hochstufen wuerde. Das Gate ist
+     zwar nur Anzeige und das Backend setzt eigenstaendig durch — aber ein
+     Werkzeug, das nebenbei die Schaufenstersperre oeffnet, baut man nicht.
+
+     Deshalb: DER OVERRIDE DARF NUR HERABSTUFEN. Wer ein Partner-Abo hat,
+     kann sich free/starter/investor/pro ansehen; nach oben geht nichts.
+     Das genuegt fuer den Prueflauf und verschenkt keine Rechte.
+
+     WICHTIG fuer den Pruefer: das simuliert das FRONTEND-Gate, nicht die
+     Durchsetzung im Backend. Ein herabgestufter Client sieht die Sperren,
+     die API antwortet weiterhin nach dem echten Abo. */
+  var PLAN_RANG = { free: 0, starter: 1, investor: 2, pro: 3, partner: 4 };
+
+  /* Liefert den WIRKSAMEN Herabstufungs-Override gegen einen echten Plan,
+     sonst null. Eine Quelle fuer beide Leser (Planschluessel UND Features) —
+     laufen die auseinander, zeigt die Oberflaeche 'free' und schaltet
+     trotzdem Partner-Funktionen frei. Das waere schlimmer als gar kein
+     Pruefmodus, weil es wie ein bestandener Test aussieht. */
+  function pruefOverride(echterPlan) {
+    try {
+      var ov = localStorage.getItem('dp_plan_override');
+      if (ov && PRICING[ov] && PLAN_RANG[ov] != null && PLAN_RANG[echterPlan] != null
+          && PLAN_RANG[ov] < PLAN_RANG[echterPlan]) return ov;
+    } catch (e) {}
+    return null;
+  }
+
   function getCurrentPlanKey() {
     // Reihenfolge: API-Subscription (wenn API-mode aktiv) > localStorage-override > 'free'
     if (typeof Sub !== 'undefined' && typeof Sub.getCurrentSync === 'function') {
       var apiPlan = Sub.getCurrentSync();
-      if (apiPlan && PRICING[apiPlan]) return apiPlan;
+      if (apiPlan && PRICING[apiPlan]) {
+        /* v1163: Herabstufung zum Pruefen zulassen — aber NIE hinauf. */
+        {
+          var ovDown = pruefOverride(apiPlan);
+          if (ovDown) {
+            if (!getCurrentPlanKey._ovWarned) {
+              getCurrentPlanKey._ovWarned = true;
+              console.warn('[Plan] Pruefmodus: ' + apiPlan + ' wird als ' + ovDown
+                + ' angezeigt. Nur das Frontend-Gate — das Backend antwortet nach dem echten Abo.'
+                + ' Aufheben: localStorage.removeItem("dp_plan_override")');
+            }
+            return ovDown;
+          }
+        }
+        return apiPlan;
+      }
     }
     var override = localStorage.getItem('dp_plan_override');
     // V63.7: Legacy 'business' / 'enterprise' als veraltet behandeln und auf free zurücksetzen
@@ -582,8 +632,16 @@ window.DealPilotConfig = (function() {
         // V186: Backend-Cache (DB) ist Quelle der Wahrheit.
         // Frontend config.js dient nur als Fallback wenn Sub noch nicht geladen.
         if (typeof Sub !== 'undefined' && typeof Sub.hasCachedFeature === 'function') {
-          var backendValue = Sub.hasCachedFeature(featureKey);
-          if (backendValue !== null) return backendValue;
+          /* v1163: Im Pruefmodus (wirksame Herabstufung) die DB UEBERSPRINGEN.
+             Sonst zeigt die Oberflaeche den simulierten Plan, die Funktionen
+             blieben aber die des echten Abos — ein halber Schalter, der einen
+             bestandenen Test vortaeuscht. Dann gilt der config.js-Zweig fuer
+             den simulierten Plan. */
+          var echt = (typeof Sub.getCurrentSync === 'function') ? Sub.getCurrentSync() : null;
+          if (!(echt && pruefOverride(echt))) {
+            var backendValue = Sub.hasCachedFeature(featureKey);
+            if (backendValue !== null) return backendValue;
+          }
         }
         // Fallback: alte config.js-Logik
         var p = getCurrentPlan();
