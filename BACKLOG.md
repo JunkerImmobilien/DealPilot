@@ -1116,27 +1116,6 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Später
 
 
-- **`business` und `enterprise` endgültig löschen — Code zuerst.**
-  Sie sind seit 13.08. unsichtbar (`is_public=false, is_active=false`, siehe
-  Fertig), aber die Zeilen stehen noch in `plans`. Vier Stellen müssen vorher
-  weg, sonst läuft ein Checkout in einen Fremdschlüsselfehler:
-
-  | Stelle | Änderung |
-  |---|---|
-  | `backend/src/routes/subscription.js:220` | `'business'` aus `VALID_PLANS` |
-  | `backend/src/db/seed-demo.js:265` | Demo-Abo auf `starter` statt `business` (`SEED_DEMO_DATA` ist auf Staging **true**) |
-  | `frontend/js/config.js:709` | `'business'` aus `bankExportPlans` |
-  | `frontend/js/rnd-ui.js:32` | `'business'` aus `requirePlan` |
-
-  **Bleiben muss** der Legacy-Rückfall auf `free` (`config.js:462`,
-  `subscription.js:693`, `settings.js:812`) — er schützt Altbestände.
-
-  Danach: `pg_dump`, prüfen dass kein Abo entstanden ist, dann
-  `DELETE FROM plans WHERE id IN ('business','enterprise')`.
-  **Backend-Änderung heißt Rebuild.** Keine Eile — unsichtbar ist der Schaden
-  weg.
-
-
 - **Dieselbe Sweeper-Falle trifft alle Regler am Body-Inline-Stil.**
   Struktureller Befund aus `v1157`, nicht mitgebaut — Scope.
 
@@ -1286,6 +1265,56 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-13] **`business` und `enterprise` sind gelöscht** — `v1161` + DB-Eingriff, `0a488f5`.
+   Marcels Freigabe: „ja kann weg." Erledigt in der Reihenfolge, die der
+   Vorbefund verlangte: **erst der Code, dann die Zeilen.**
+
+   ### Schritt 1 — die vier Stellen geräumt (`v1161`)
+
+   | Stelle | Änderung |
+   |---|---|
+   | `backend/routes/subscription.js:220` | `VALID_PLANS` ohne `'business'` — ein akzeptierter `planId` ohne Zeile in `plans` wäre in einen Fremdschlüsselfehler gelaufen |
+   | `backend/db/seed-demo.js:265` | Demo-Abo auf **`'pro'`** statt `'business'`. Pro, weil der Kommentar den Zweck nennt: „damit er ohne Limits durchprobieren kann". `SEED_DEMO_DATA` ist auf Staging **true** |
+   | `frontend/js/config.js:709` | `'business'` aus `bankExportPlans` (toter Eintrag) |
+   | `frontend/js/rnd-ui.js:32` | `'business'` aus `requirePlan` (toter Eintrag) |
+
+   **Bewusst stehen geblieben:** die **vier** Legacy-Rückfälle auf `free` —
+   `config.js:462`, `subscription.js:693`, `settings.js:812` und
+   `planService.js:118`. Sie fangen Altbestände, die noch auf `business`
+   zeigen könnten. Beim Räumen fiel der vierte erst auf; er war in der
+   Vorbefund-Liste nicht erfasst.
+
+   **Rebuild gefahren**, Marker im laufenden Container geprüft, und dort
+   steht jetzt wörtlich `const VALID_PLANS = ['free', 'starter', 'investor', 'pro']`.
+
+   ### Schritt 2 — die Zeilen gelöscht
+
+   Vorbedingung geprüft: **kein Abo zeigte darauf** (partner 3, free 1,
+   starter 1). `pg_dump` der Tabelle
+   (`/root/plans-vor-delete-20260813-0941.sql`, 9,3 K), dann **Probelauf per
+   `BEGIN; DELETE; SELECT; ROLLBACK;`** — er meldete `DELETE 2` und fünf
+   verbleibende Pläne. Danach echt ausgeführt.
+
+   **Nachweise nach dem Löschen:**
+
+   | Prüfung | Ergebnis |
+   |---|---|
+   | `plans` | 5 Zeilen: free, starter, investor, pro, partner |
+   | öffentliche API (`GET /api/v1/plans`) | **4** Pläne — free, starter, investor, pro |
+   | Fremdschlüssel-Waisen | **0** |
+   | Abos | unverändert (free 1, starter 1, partner 3) |
+   | Backend-Logs | ohne Ausnahme |
+
+   **Zweimal Cache-Neustart nötig:** `listPublicPlans()` filtert aus einem
+   In-Memory-Cache — eine DB-Änderung allein wirkt nicht, `docker restart
+   dealpilot-backend` leert ihn. Das gilt für jeden Plan-Eingriff.
+
+   **Nur Staging.** Auf Produktion sind die Zeilen unangetastet; der
+   SSH-Zugang dorthin ist read-only. **Vor einem Prod-Rollout gehört derselbe
+   Ablauf dort wiederholt** — Dump, Probelauf, DELETE, Cache-Neustart —, und
+   zwar erst nachdem `v1161` dort ausgerollt ist. Sonst akzeptiert das alte
+   Backend weiter `'business'` und schreibt einen Fremdschlüssel ins Leere.
 
 - [2026-08-13] **`business` und `enterprise` sind aus der öffentlichen Plan-Liste verschwunden** — DB-Eingriff auf Staging, kein Code geändert.
    **Marcels Wort:** „business und enterprise gibt es gar nicht mehr,
