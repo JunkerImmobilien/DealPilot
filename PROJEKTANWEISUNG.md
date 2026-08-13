@@ -3310,3 +3310,29 @@ Ein Tippfehler, der still den teuersten Plan sperrt, existiert nicht.
 > die es nicht gibt. Und eine Probe auf einen erfundenen Schlüssel liefert
 > immer `false`, weil unbekannt = false. **Aufrufstelle lesen, nicht Namen
 > vergleichen.**
+
+### Prüfergebnis: die sieben Pro-Tage (`TR7-trial`) — kein Umbau
+
+**Sie sind eingebaut.** Ich hatte im Prüflauf geschrieben, ich könne das nicht
+bestätigen — **das war falsch, weil ich in meinen Unterlagen gesucht habe statt
+im Code.**
+
+**Nicht am Starter, sondern ab Registrierung:** jeder neue Nutzer bekommt eine
+`plan_trials`-Zeile mit `granted_plan='pro'`, `expires_at = NOW() + 7 days`.
+Vergeben in `userService.js:42` (der Trichter) und `auth.js:69`,
+Mehrfachvergabe per `WHERE NOT EXISTS` ausgeschlossen, Auslaufen automatisch
+über `expires_at`. Ein Fehlschlag wird geloggt und bricht die Registrierung
+nicht ab.
+
+**Vier bewusste Abweichungen von rohem Pro:** bezahltes Abo schlägt die
+Testphase · `export_csv`/`json_backup`/`excel_import` bleiben aus · KI-Kontingent
+auf Free-Niveau · Wasserzeichen bleibt aktiv.
+
+**Nach Tag 7 wird nichts unerreichbar.** `requireUnderLimit('objects')` hängt an
+**genau einer Stelle**: `objects.js:73`, `router.post('/')`. Nur das **Anlegen**
+ist begrenzt — Lesen, Listen, Ändern nicht. Objektlimits: free 1 · starter 5 ·
+investor 25 · pro/partner `-1`.
+
+> **Lehre:** „Steht nicht in meinen Unterlagen" ist kein Befund. Das ist
+> `FALLEN.md` Punkt 9 zum vierten Mal — diesmal gegen ein Feature, das Marcel
+> selbst genannt hatte. **Wenn er sagt, etwas sei gebaut, im Code nachsehen.**

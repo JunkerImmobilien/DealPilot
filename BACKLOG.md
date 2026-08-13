@@ -827,10 +827,11 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
    Durchklicken selbst — Oberfläche für Oberfläche, je Stufe:
 
    - [ ] `free` — sieht der Nutzer die Sperren an den richtigen Stellen?
-   - [ ] `starter` — dazu Marcels Frage: **sieben Tage voller Pro-Status.**
-         Ob das überhaupt eingebaut ist, ist bis heute **nicht gemessen**.
-         Wenn ja, gehört mitgeprüft, was nach Tag 7 mit Objekten passiert,
-         die unter Pro angelegt wurden.
+   - [ ] `starter` — Marcels Frage nach den **sieben Pro-Tagen ist
+         beantwortet** (siehe „Fertig", `TR7-trial`): sie sind eingebaut, aber
+         **nicht am Starter — automatisch ab Registrierung** für jeden neuen
+         Nutzer. Nach Tag 7 wird **kein Objekt unerreichbar**; das Limit hängt
+         nur am Anlegen. **Ich hatte das bestritten, das war falsch.**
    - [ ] `investor`
    - [ ] `pro`
    - [ ] `partner` — der Prüfmodus kann ihn **nicht** simulieren (nur nach
@@ -1301,6 +1302,56 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 ---
 
 ## Fertig
+
+- [2026-08-13] **Die sieben Pro-Tage gibt es — Marcel hatte recht, ich hatte es bestritten** — Prüflauf, kein Umbau. **(Backlog-Punkt 6, Marcels Frage)**
+   **Zuerst die Rücknahme:** Im Prüflauf vom selben Tag stand von mir *„Ich
+   kann das nicht bestätigen — in meinen Unterlagen steht es nicht."* **Das
+   war falsch, und zwar weil ich in meinen Unterlagen gesucht habe statt im
+   Code.** Der Mechanismus ist gebaut, sauber dokumentiert und trägt überall
+   den Marker `TR7-trial`.
+
+   **Wie es wirklich läuft — nicht am Starter, sondern ab Registrierung:**
+
+   | | |
+   |---|---|
+   | **Wer** | **jeder neue Nutzer**, automatisch bei der Registrierung |
+   | **Was** | `plan_trials`-Zeile, `granted_plan='pro'`, `expires_at = NOW() + 7 days` |
+   | **Wo vergeben** | `userService.js:42` (der Trichter) und `auth.js:69` |
+   | **Mehrfachvergabe** | ausgeschlossen per `WHERE NOT EXISTS` |
+   | **Auslaufen** | automatisch über `expires_at`, kein Aufräumjob nötig |
+   | **Fehlschlag** | wird geloggt, bricht die Registrierung **nicht** ab |
+
+   **Vier bewusste Abweichungen von rohem Pro** (`subscriptionService.js:78 ff.`):
+   1. **Ein aktives bezahltes Abo schlägt die Testphase** — sonst sähe ein
+      Reseller-Mandant sieben Tage „Pro" und würde danach sichtbar
+      herabgestuft, obwohl der Reseller bezahlt hat.
+   2. `export_csv`, `json_backup`, `excel_import` bleiben **aus** — die
+      Exporte sind Verkaufsargumente und tragen kein Wasserzeichen.
+   3. **KI-Kontingent bleibt auf Free-Niveau** — Kerosin wird nicht verschenkt.
+   4. **Das Wasserzeichen bleibt aktiv.** Getestet wird der Funktionsumfang,
+      nicht der Export.
+
+   ### Und was nach Tag 7 mit den Objekten passiert — die eigentliche Frage
+
+   **Nichts wird unerreichbar.** Belegt, nicht vermutet: `requireUnderLimit('objects')`
+   hängt an **genau einer Stelle** — `router.post('/')` in `objects.js:73`.
+   **Nur das Anlegen** ist begrenzt; Lesen, Listen und Ändern tragen kein Limit.
+
+   | Plan | `max_objects` |
+   |---|---|
+   | free | 1 |
+   | starter | 5 |
+   | investor | 25 |
+   | pro / partner | `-1` (unbegrenzt) |
+
+   Nach Ablauf fällt der Nutzer auf Free (1). Seine unter Pro angelegten
+   Objekte bleiben **sichtbar, aufrufbar und bearbeitbar** — er kann nur kein
+   neues anlegen, solange er über dem Limit liegt. **Das ist das richtige
+   Verhalten**, und es ist keine Änderung nötig.
+
+   *(Ungeprüft geblieben: ob das Frontend die verbleibenden Testtage sichtbar
+   macht. `trial_days_left` liefert das Backend — ob es jemand anzeigt, ist
+   nicht gemessen.)*
 
 - [2026-08-13] **Der Plan-Override war wirkungslos — jetzt ein Prüfmodus, der nur nach unten geht** — `v1163`, `a4107d0`. **(Backlog-Punkt 6, der offene Rest)**
    **Der Punkt lag nicht am Prüfen, sondern am fehlenden Werkzeug.** „Je Plan
