@@ -154,9 +154,23 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       /* v1072-WGAR-6 · Ohne Bruttogrundflaeche der Garage wird nicht
        * geschaetzt — die Zahl der Stellplaetze sagt nichts ueber die
        * Flaeche. Im Gutachten sind es 64,58 m2 fuer zwei Garagen. */
+      /* v1165-GARMEA2 \u00b7 Der Platzhalter widersprach der Feldhilfe, und zwar
+       * an der teuersten Stelle. Die Hilfe (v1142) sagt \u201ebei einer
+       * Eigentumswohnung nur die eigene Garage oder der eigene Anteil" \u2014
+       * der Platzhalter sagte \u201ealle Garagen zusammen". Sichtbar ist der
+       * Platzhalter; die Hilfe muss man aufklappen. Der Nutzer trug also
+       * genau die Gesamtflaeche ein, die den Sachwert zu hoch macht:
+       * lib/nhk2010.js kennt weder mea noch ist_wohnung und kuerzt nichts.
+       * Am Pruefobjekt Huellhorst sind das 64,58 m2 fuer eine von drei
+       * Einheiten, bis zu ~18.500 EUR zu viel.
+       *
+       * Das ist KEINE Vorwegnahme der fachlichen Frage aus Backlog-Punkt 10
+       * (gehoert eine MEA-Kuerzung ins Feld oder nicht) \u2014 es raeumt nur den
+       * Widerspruch zwischen zwei Texten weg, von denen einer falsch sein
+       * MUSS. Die juengere, fachlich begruendete Fassung gewinnt. */
       { id: 'garagenBgf', label: 'Garage / Carport \u2013 Bruttogrundfl\u00e4che (m\u00b2)',
         typ: 'number', hilfe: 'garagenBgf',
-        platzhalter: 'L\u00e4nge \u00d7 Breite, alle Garagen zusammen' },
+        platzhalter: 'L\u00e4nge \u00d7 Breite \u2013 bei einer ETW nur der eigene Anteil' },
       { id: 'garagenStufe', label: 'Garage \u2013 Standardstufe', typ: 'select',
         opt: [['', '\u2013 keine Angabe \u2013'],
                    ['3', '3 \u00b7 Fertiggarage'],
