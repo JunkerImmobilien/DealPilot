@@ -48,7 +48,12 @@ function sanitizeCatalog(raw) {
     if (!e || typeof e.id !== 'string' || !/^[A-Za-z0-9_]{1,40}$/.test(e.id)) continue;
     const entry = {
       id: e.id,
-      kind: ['select', 'num', 'int', 'date', 'text'].includes(e.kind) ? e.kind : 'text',
+      /* v1168-VBOOL: 'bool' ergaenzt. Ohne diesen Eintrag faellt ein
+         Checkbox-Feld STILL auf 'text' zurueck — der Katalog kaeme durch, die
+         KI lieferte "ja", und das Frontend haette einen String, wo es ein
+         Haekchen setzen will. Die Whitelist ist der Grund, warum Checkboxen
+         nicht einfach im Frontend freigeschaltet werden konnten. */
+      kind: ['select', 'num', 'int', 'date', 'text', 'bool'].includes(e.kind) ? e.kind : 'text',
       label: String(e.label || e.id).slice(0, 90)
     };
     if (e.hint) entry.hint = String(e.hint).slice(0, 120);
@@ -105,6 +110,14 @@ function buildPrompt(transcript, catalog) {
     if (e.hint) l += ' (' + e.hint + ')';
     if (e.kind === 'select') {
       l += '\n  ERLAUBTE WERTE: ' + e.options.map(o => '"' + o.v + '"=' + o.t).join(', ');
+    }
+    /* v1168-VBOOL: Ohne diese Zeile steht im Prompt nur "bool" als Typ — das
+       Modell raet dann zwischen true, "ja" und 1. Und die zweite Haelfte ist
+       die wichtigere: NUR nennen, wenn es zutrifft. Sonst listet das Modell
+       gewissenhaft alle Haekchen mit false auf und die Import-Tabelle
+       quillt ueber mit Nicht-Befunden. */
+    if (e.kind === 'bool') {
+      l += '\n  NUR true, wenn es im Text ausdruecklich zutrifft. Trifft es nicht zu oder wird es nicht erwaehnt: Feld WEGLASSEN, nicht false.';
     }
     return l;
   }).join('\n');
@@ -215,6 +228,18 @@ async function extractFields(transcript, catalog, apiKey) {
       }
       if (!hit) return;
       fields[k] = hit.v;
+    } else if (entry.kind === 'bool') {
+      /* v1168-VBOOL · Ein Haekchen kennt zwei Zustaende, die KI liefert je
+         nach Formulierung true, "true", "ja" oder 1.
+         NUR JA-Antworten kommen durch. Ein "nein" wird VERWORFEN statt als
+         false uebernommen — sonst haekelt ein beilaeufiges "einen Stellplatz
+         gibt es nicht" ein Feld aktiv ab, das der Nutzer nie angefasst hat.
+         Die Import-Tabelle zeigt nur, was gesetzt wird; ein stilles
+         Abhaeken waere dort unsichtbar. */
+      const bv = (typeof v === 'boolean') ? v
+        : ['true', 'ja', 'yes', '1'].includes(String(v).toLowerCase().trim());
+      if (!bv) return;
+      fields[k] = true;
     } else {
       fields[k] = v;
     }
@@ -377,6 +402,18 @@ async function verifyFields(transcript, prev, catalog, apiKey) {
       }
       if (!hit) return;
       fields[k] = hit.v;
+    } else if (entry.kind === 'bool') {
+      /* v1168-VBOOL · Ein Haekchen kennt zwei Zustaende, die KI liefert je
+         nach Formulierung true, "true", "ja" oder 1.
+         NUR JA-Antworten kommen durch. Ein "nein" wird VERWORFEN statt als
+         false uebernommen — sonst haekelt ein beilaeufiges "einen Stellplatz
+         gibt es nicht" ein Feld aktiv ab, das der Nutzer nie angefasst hat.
+         Die Import-Tabelle zeigt nur, was gesetzt wird; ein stilles
+         Abhaeken waere dort unsichtbar. */
+      const bv = (typeof v === 'boolean') ? v
+        : ['true', 'ja', 'yes', '1'].includes(String(v).toLowerCase().trim());
+      if (!bv) return;
+      fields[k] = true;
     } else {
       fields[k] = v;
     }

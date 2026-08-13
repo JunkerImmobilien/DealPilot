@@ -279,10 +279,21 @@
       if (!el) return;
       var tag = el.tagName;
       if (tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'TEXTAREA') return;
-      if (el.type === 'checkbox' || el.type === 'hidden') return;
+      if (el.type === 'hidden') return;
       var wl = WL_MAP[id];
       var entry = { id: id, label: wl ? wl.label : labelFor(id, el) };
       if (HINTS[id]) entry.hint = HINTS[id];
+      /* v1168-VBOOL: Checkboxen waren hier ausgeschlossen — „alle Felder"
+         schloss sie aber ein. Sie brauchen den ganzen Weg: 'bool' in der
+         Katalog-Whitelist des Backends (sonst faellt es still auf 'text'),
+         eine eigene Prompt-Zeile, eine Normalisierung, und in
+         object-actions.js einen eigenen Zweig in applyMerged() — setInput()
+         schreibt in .value und laesst ein Haekchen unberuehrt.
+         Nur die AUSWERTUNG; die Chip-Wolke (buildCatalog) bleibt kuratiert. */
+      if (el.type === 'checkbox') {
+        cat.push({ id: id, kind: 'bool', label: entry.label, hint: entry.hint });
+        return;
+      }
       if (tag === 'SELECT') {
         entry.kind = 'select';
         entry.options = [];
@@ -1046,6 +1057,13 @@
         var opt = null;
         for (var i = 0; i < (entry.options || []).length; i++) { if (entry.options[i].v === String(v)) { opt = entry.options[i]; break; } }
         OA.addRow(id, entry.label, (opt ? opt.t : String(v)) + mark, v, S, 'select');
+        return;
+      }
+      /* v1168-VBOOL: Der Server laesst nur JA-Antworten durch, hier kommt
+         also nie ein false an. Angezeigt wird trotzdem Klartext — „true" in
+         einer Import-Tabelle liest niemand gern. */
+      if (entry.kind === 'bool') {
+        OA.addRow(id, entry.label, 'Ja' + mark, true, S, 'bool');
         return;
       }
       var raw = v, disp = String(v);
