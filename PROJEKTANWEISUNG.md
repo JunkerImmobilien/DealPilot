@@ -3397,3 +3397,19 @@ liegt weiterhin bei Marcel.
 > still wieder weg; also **nach** dem Neuzeichnen einhängen. Und für
 > `.wm-f small` gibt es in der Marktbericht-App **keine** Regel: ein blankes
 > `<small>` erbt, was zufällig da ist. Eigene Darstellung mitgeben.
+
+### `v1167` — die zwei Reste des Profil-Schalters · `c1d572b`
+
+**Punkt 5 ist damit vollständig.**
+
+**Je Profil eigene Werte.** `dp_profil_werte` merkt für `hell` und `obsidian`
+getrennt `ui_cards`, `ui_surface`, `ui_form`. **Nur diese drei** — `ui_accent`
+und `ui_obsidian` sind Markenfarben und gelten in beiden Profilen. Gesichert
+wird nur, wenn wirklich ein Profil aktiv war; bei einer dritten Vorlage gehört
+der Stand zu keinem der zwei.
+
+Gemessen: Obsidian + Wallet → Hell → zurück → **Wallet ist wieder da.**
+
+**Markierung beim Öffnen.** `markieren()` hing nur am Klick; wer das Pane
+öffnete, sah zwei ungedrückte Knöpfe, obwohl einer galt. `_dpProfilMarkieren`
+existierte längst und wurde nur nie beim Öffnen gerufen.

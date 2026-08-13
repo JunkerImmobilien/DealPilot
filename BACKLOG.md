@@ -578,12 +578,11 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 5. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
-   > **ERSTER WURF STEHT — `v1162`/`v1162b`, `381e678`, siehe „Fertig".**
-   > Der Schalter ist unter **Profil & Anzeige** gebaut und beide Richtungen
-   > sind im Browser nachgemessen. **Zwei Reste sind offen:**
-   > 1. „Je Profil eigene Werte" (Frage 1) ist **nicht** gebaut — der Schalter
-   >    überschreibt `ui_cards` hart auf `''`.
-   > 2. Beim programmatischen Öffnen des Panes wird nicht markiert.
+   > **ERLEDIGT — `v1162`/`v1162b` (`381e678`) und `v1167` (`c1d572b`),
+   > siehe „Fertig".** Der Schalter steht unter **Profil & Anzeige**, beide
+   > Richtungen sind im Browser nachgemessen, ~~zwei Reste~~ beide Reste sind
+   > zu: je Profil eigene Werte über `dp_profil_werte`, und die Markierung
+   > greift auch beim Öffnen ohne Klick.
    >
    > **Und eine Korrektur zu Marcels Beschreibung unten:** die helle Fassung
    > ist die Vorlage **`kanzlei`**, nicht `panel`. Marcels Bild
@@ -1339,6 +1338,40 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 ---
 
 ## Fertig
+
+- [2026-08-13] **Die zwei Reste des Profil-Schalters sind zu** — `v1167`, `c1d572b`. **(Backlog-Punkt 5 abgeschlossen)**
+   **Rest 1 · Je Profil eigene Werte.** Der Schalter setzte `ui_cards` hart auf
+   `''`. Wer „Wallet" oder „Stapel" eingestellt hatte, verlor das beim
+   Umschalten — und beim **Zurückschalten kam es nicht wieder.** Marcels
+   Vorgabe nennt für das helle Profil Standard-Karten, das war also nicht
+   falsch, aber gröber als nötig.
+
+   Jetzt merkt sich jedes Profil seine drei Darstellungsschalter unter
+   `dp_profil_werte`. **Nur die drei** — `ui_accent` und `ui_obsidian` sind
+   Markenfarben und gelten in beiden Profilen; wer sein Gold setzt, will es
+   nicht nur im Dunkeln.
+
+   **Gesichert wird nur, wenn wirklich ein Profil aktiv war.** Bei einer
+   dritten Vorlage gehört der Stand zu keinem der zwei und würde sonst einem
+   davon untergeschoben.
+
+   **Nachgemessen** (`settings.js?v=v1167`, echte Klicks):
+
+   | | Vorlage | Karten | Merker |
+   |---|---|---|---|
+   | Ausgang: Obsidian + Wallet | (keine) | `wallet` | – |
+   | nach „Hell" | `kanzlei` | (keine) | `obsidian:{wallet}` |
+   | zurück auf „Obsidian" | (keine) | **`wallet`** | beide Profile |
+
+   **Rest 2 · Markierung beim Öffnen.** `markieren()` hing nur am Klick auf ein
+   Profil — wer das Pane öffnete, sah **zwei ungedrückte Knöpfe**, obwohl einer
+   galt. `_dpProfilMarkieren` gab es bereits, es wurde nur nie beim Öffnen
+   gerufen. Gemessen: Pane geschlossen, neu geöffnet, ohne Klick steht
+   `obsidian=true hell=false`.
+
+   **Damit ist Backlog-Punkt 5 vollständig** — Schalter, beide Richtungen,
+   eigene Werte je Profil, Markierung. Marcels Einstellungen und der neue
+   Merker sind nach dem Test zurückgesetzt.
 
 - [2026-08-13] **Der Hinweis am Garagenfeld — die Rückfrage, die in beiden Wegen stimmt** — `v1166`, `c9779df`. **(Backlog-Punkt 10)**
    Punkt 10 wartet auf eine fachliche Entscheidung. **Dieser Hinweis nimmt sie
