@@ -3242,3 +3242,35 @@ kein Nachweis steht, ist der Punkt nicht abgenommen.
 
 
 
+
+### `v1162` / `v1162b` — Hell und Dunkel als zwei Profile · `381e678`
+
+**Was.** Ein Schalter „Obsidian / Hell" in Einstellungen → **Profil & Anzeige**.
+Obsidian bleibt der Auslieferungszustand.
+
+**Der helle Modus ist die Vorlage `kanzlei`, kein Skin.** Beweis ist
+`design/mockups/hell.png`: warme helle Kopfleiste (`--uv-chrome #FBFAF7`),
+Serifenschrift, **goldene Reiter**. Goldene Reiter heißt: `dp-chrome-hell` ist
+**aus** — dessen Tinte (`v1158`) wäre dunkel. `panel` ist „Kühl" mit Blaustich
+und im Bild nirgends.
+
+| Profil | `ui_theme` | `ui_cards` | `dp_chrome_hell` |
+|---|---|---|---|
+| Obsidian | `''` | `''` | `0` |
+| Hell | `kanzlei` | `''` | `0` |
+
+**Nachweis.** Echte Klicks, `settings.js?v=v1162b`: nach „Hell" Kopfleiste und
+Sidebar `rgb(251,250,247)`, Reiter golden, Vorlage `kanzlei`; nach „Obsidian"
+Sidebar `rgb(10,10,10)`, Vorlage leer. Bei einer dritten Vorlage ist **kein**
+Profil markiert — gemessen (`aktiv: null` bei `panel`).
+
+**Die Lehre, teuer bezahlt in `v1162`:**
+> **`_dpDispSkin` löscht die Vorlage.** Es ruft `vorlageNachziehen()`, und das
+> setzt `dp_user_settings.ui_theme` auf `''`, wenn die aktive Vorlage der neuen
+> Helligkeit widerspricht. Wer Vorlage **und** Skin in einem Griff setzt, muss
+> **erst den Skin schalten, dann die Vorlage** — sonst löscht der Skin, was
+> eine Zeile vorher gesetzt wurde. Ich hatte das im eigenen Kommentar richtig
+> stehen und im Code falsch gebaut.
+
+**Rest.** „Je Profil eigene Werte" über `brand_display` fehlt — `ui_cards` wird
+heute hart überschrieben. Markierung beim programmatischen Öffnen fehlt.

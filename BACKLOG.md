@@ -578,6 +578,19 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 5. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
+   > **ERSTER WURF STEHT — `v1162`/`v1162b`, `381e678`, siehe „Fertig".**
+   > Der Schalter ist unter **Profil & Anzeige** gebaut und beide Richtungen
+   > sind im Browser nachgemessen. **Zwei Reste sind offen:**
+   > 1. „Je Profil eigene Werte" (Frage 1) ist **nicht** gebaut — der Schalter
+   >    überschreibt `ui_cards` hart auf `''`.
+   > 2. Beim programmatischen Öffnen des Panes wird nicht markiert.
+   >
+   > **Und eine Korrektur zu Marcels Beschreibung unten:** die helle Fassung
+   > ist die Vorlage **`kanzlei`**, nicht `panel`. Marcels Bild
+   > `design/mockups/hell.png` zeigt die warme helle Kopfleiste und die
+   > Serifenschrift von `kanzlei`; `panel` ist „Kühl" mit Blaustich. Das Bild
+   > kam nach der Beschreibung und schlägt sie.
+
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
    - **DealPilot wird im dunklen Modus ausgeliefert.** Das ist der Standard.
@@ -1270,6 +1283,69 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 ---
 
 ## Fertig
+
+- [2026-08-13] **Hell und Dunkel als zwei Profile, unter „Profil & Anzeige"** — `v1162` + `v1162b`, `381e678`. **(Backlog-Punkt 5, erster Wurf)**
+   **Marcels Vorgabe:** „DealPilot wird im dunklen Modus ausgeliefert. Daneben
+   ein heller Modus, umschaltbar mit einem Griff." Ort: ausdrücklich
+   **Einstellungen → Profil & Anzeige**.
+
+   **Die helle Fassung kommt aus `design/mockups/hell.png`** und ist damit die
+   Vorlage **`kanzlei`**, nicht `panel` — am CSS gegengeprüft (warme helle
+   Kopfleiste `--uv-chrome #FBFAF7`, warme Fläche, weiße Karten,
+   Serifenschrift). `panel` ist „Kühl" mit Blaustich und im Bild nirgends.
+   **Und der Chrome-Skin bleibt in beiden Profilen aus:** im Bild sind die
+   Reiter golden, nicht die Tinte aus `v1158`, und die hängt an
+   `body.dp-chrome-hell`. Der helle Modus ist eine **Vorlage**, kein Skin.
+
+   | Profil | `ui_theme` | `ui_cards` | `dp_chrome_hell` |
+   |---|---|---|---|
+   | Obsidian | `''` | `''` | `0` |
+   | Hell | **`kanzlei`** | `''` | `0` |
+
+   **Kein zweites Zustandsmodell:** derselbe Schlüssel `dp_user_settings`,
+   dieselbe `anwenden()`-Kette wie im Darstellungs-Panel, angewandt über
+   **dessen API** statt per `setAttribute` — sonst fehlt `skinNachziehen()`.
+
+   **Ist eine dritte Vorlage aktiv, ist KEIN Profil markiert.** Das ist
+   ehrlicher als eines zu behaupten: wer im Panel „Konsole" gewählt hat, ist
+   in keinem der zwei. Gemessen und bestätigt (`aktiv: null` bei `panel`).
+
+   **Nachgemessen** (`settings.js?v=v1162b`, echte Klicks):
+
+   | | vorher | nach „Hell" | nach „Obsidian" |
+   |---|---|---|---|
+   | Vorlage | (keine) | **`kanzlei`** | (keine) |
+   | Kopfleiste | dunkler Verlauf | **rgb(251,250,247)** | dunkler Verlauf |
+   | Sidebar | rgb(10,10,10) | rgb(251,250,247) | rgb(10,10,10) |
+   | Reiter | — | **golden** | — |
+   | `dp_chrome_hell` | 0 | **0** | 0 |
+
+   ### `v1162b` — die Reihenfolge war der ganze Punkt
+
+   Der erste Anlauf setzte **erst die Vorlage, dann den Skin aus**. Gemessen:
+   nach dem Klick auf „Hell" stand `data-ui-theme` **leer** statt auf
+   `kanzlei`. Ursache ist `FALLEN.md` Punkt 6 — `_dpDispSkin` ruft
+   `vorlageNachziehen()`, und das setzt `ui_theme` auf `''`, wenn die Vorlage
+   der neuen Helligkeit widerspricht. **Es hat genau die Vorlage gelöscht, die
+   eine Zeile vorher gesetzt worden war.** Im Kommentar stand es richtig, im
+   Code falsch. Jetzt: erst Skin aus, dann Zustand, dann anwenden.
+
+   ### Zwei offene Punkte aus diesem ersten Wurf
+
+   1. **Frage 1 des Punkts ist noch nicht gebaut.** Meine Antwort war „je
+      Profil eigene Werte" über `brand_display` — der Schalter **überschreibt
+      `ui_cards` heute hart** auf `''`. Wer „Wallet" oder „Stapel" eingestellt
+      hatte, verliert das beim Umschalten. Marcels Vorgabe nennt Standard-Karten
+      für das helle Profil, also ist es nicht falsch — aber die Verfeinerung
+      fehlt.
+   2. **Beim programmatischen Öffnen** (`showSettings('profilanzeige')`) wird
+      nicht markiert; `markieren()` hängt am Tab-Klick. Nach einem Klick auf
+      ein Profil stimmt die Markierung. Kosmetisch, aber offen.
+
+   *(Nebenbeobachtung, nicht von diesem Paket: im Obsidian-Modus stand die
+   Reiterfarbe auf `rgb(0,0,0)` statt Gold, und `dp_user_settings` trug
+   `ui_form: 'rund'` und `ui_obsidian: '#241C16'` — fremde Werte aus einer
+   anderen Sitzung. Vor einem Befund daraus erst prüfen, wer sie gesetzt hat.)*
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
 
