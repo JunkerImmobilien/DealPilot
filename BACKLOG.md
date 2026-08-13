@@ -1116,6 +1116,27 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Später
 
 
+- **`business` und `enterprise` endgültig löschen — Code zuerst.**
+  Sie sind seit 13.08. unsichtbar (`is_public=false, is_active=false`, siehe
+  Fertig), aber die Zeilen stehen noch in `plans`. Vier Stellen müssen vorher
+  weg, sonst läuft ein Checkout in einen Fremdschlüsselfehler:
+
+  | Stelle | Änderung |
+  |---|---|
+  | `backend/src/routes/subscription.js:220` | `'business'` aus `VALID_PLANS` |
+  | `backend/src/db/seed-demo.js:265` | Demo-Abo auf `starter` statt `business` (`SEED_DEMO_DATA` ist auf Staging **true**) |
+  | `frontend/js/config.js:709` | `'business'` aus `bankExportPlans` |
+  | `frontend/js/rnd-ui.js:32` | `'business'` aus `requirePlan` |
+
+  **Bleiben muss** der Legacy-Rückfall auf `free` (`config.js:462`,
+  `subscription.js:693`, `settings.js:812`) — er schützt Altbestände.
+
+  Danach: `pg_dump`, prüfen dass kein Abo entstanden ist, dann
+  `DELETE FROM plans WHERE id IN ('business','enterprise')`.
+  **Backend-Änderung heißt Rebuild.** Keine Eile — unsichtbar ist der Schaden
+  weg.
+
+
 - **Dieselbe Sweeper-Falle trifft alle Regler am Body-Inline-Stil.**
   Struktureller Befund aus `v1157`, nicht mitgebaut — Scope.
 
@@ -1265,6 +1286,55 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-13] **`business` und `enterprise` sind aus der öffentlichen Plan-Liste verschwunden** — DB-Eingriff auf Staging, kein Code geändert.
+   **Marcels Wort:** „business und enterprise gibt es gar nicht mehr,
+   eigentlich können die raus, wenn die nicht für irgendwas sinnvoll sind."
+   Die Bedingung war der Prüfauftrag — und sie ist **teils erfüllt, teils
+   nicht.**
+
+   **Was gemessen wurde:**
+
+   | Frage | Antwort |
+   |---|---|
+   | Läuft ein Abo darauf? | **nein** — nur `partner` (3), `free` (1), `starter` (1) |
+   | Stripe-Produkt? | **keins** — nicht kaufbar |
+   | Waren sie sichtbar? | **ja** — `is_public = t`, also in der öffentlichen API |
+   | Preise | business **5.900 ct = 59 €**, identisch mit Investor; enterprise 299 € |
+   | Fremdschlüssel | `subscriptions.plan_id → plans.id` |
+
+   **Sofort erledigt, weil ohne Risiko:** `is_public = false, is_active = false`
+   für beide. Mit `pg_dump` der Tabelle davor
+   (`/root/plans-vor-v1161-20260813-0924.sql`) und **Probelauf per
+   `BEGIN; … ROLLBACK;`**, wie die Regel es für Eingriffe in bestehende Zeilen
+   verlangt. Der Probelauf hat dabei einen eigenen Quoting-Fehler gefangen
+   (`'business '` mit Leerzeichen traf null Zeilen) — genau dafür ist er da.
+
+   **Nachgewiesen:** die öffentliche API
+   (`GET /api/v1/plans` über Caddy, HTTP 200) liefert jetzt **vier** Pläne —
+   `free`, `starter`, `investor`, `pro`. `business`/`enterprise`: **0
+   Treffer.** Dafür war ein `docker restart dealpilot-backend` nötig:
+   `listPublicPlans()` filtert aus einem **In-Memory-Cache**, nicht direkt aus
+   der DB.
+
+   ### Warum NICHT gelöscht wurde — sieben Stellen hängen daran
+
+   | Stelle | was dort steht | muss vor dem DELETE |
+   |---|---|---|
+   | `backend/routes/subscription.js:220` | `VALID_PLANS` akzeptiert `'business'` | **raus** — sonst läuft ein Checkout in einen Fremdschlüsselfehler |
+   | `backend/db/seed-demo.js:265` | erzeugt ein **`business`-Abo** | **umstellen** — `SEED_DEMO_DATA` ist auf Staging `true`, das Seed läuft |
+   | `frontend/js/config.js:709` | `bankExportPlans: [… 'business']` | raus (toter Eintrag) |
+   | `frontend/js/rnd-ui.js:32` | `requirePlan: ['pro','business']` | raus (toter Eintrag) |
+   | `config.js:462`, `subscription.js:693`, `settings.js:812` | Legacy-Rückfall auf `free` | **bleibt** — schützt Altbestände |
+
+   **Reihenfolge für das echte Löschen:** erst die vier oberen Stellen räumen
+   (Backend → **Rebuild**), dann prüfen, dass kein Abo entstanden ist, dann
+   `DELETE FROM plans WHERE id IN ('business','enterprise')`. Vorher wieder
+   ein Dump. **So lange sind die Zeilen unsichtbar und harmlos** — der
+   sichtbare Schaden ist weg, der Rest ist Aufräumen ohne Eile.
+
+   **Nebenbefund:** `business` trug **denselben Preis wie Investor** (59 €).
+   Wer die Liste sah, bekam zwei Pläne zum gleichen Preis angeboten.
 
 - [2026-08-13] **Die Pfeilmitte löste Löschen aus** — `v1159`, `c1f71b5`. **(Backlog-Punkt 6)**
    **Marcels Befund:** „Beim Hinüberfahren zum Pfeil landet man auf dem × zum
