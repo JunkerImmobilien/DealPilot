@@ -3336,3 +3336,22 @@ investor 25 · pro/partner `-1`.
 > **Lehre:** „Steht nicht in meinen Unterlagen" ist kein Befund. Das ist
 > `FALLEN.md` Punkt 9 zum vierten Mal — diesmal gegen ein Feature, das Marcel
 > selbst genannt hatte. **Wenn er sagt, etwas sei gebaut, im Code nachsehen.**
+
+### `v1164` — Objektnummer im Kopf, Kontrast · `bb44d8d`
+
+**Backlog-Punkt 9, und es war der Rest eines halb erledigten Punkts.** Der Punkt
+nannte 2,98 / 2,88; gemessen wurden **3,88 (kanzlei) / 3,72 (boarding)** — die
+Regel hatte längst gewirkt, nur nicht weit genug. Kleiner Text (10,5 px / 700)
+braucht 4,5.
+
+**Gelöst über den Token:** `--uv-marke-dd` war nur ein Alias auf `--uv-marke-d`.
+Jetzt `color-mix(in srgb, var(--uv-marke-d) 82%, #000)` — **relativ zum
+Markenton**, damit ein Whitelabel-Rot Rot bleibt und nur dunkler wird. Ein festes
+Gold hätte die Mandantenmarke an sechs Stellen überschrieben.
+
+Ergebnis: kanzlei **5,38**, boarding **5,16**. Alle sechs Leser des Tokens stehen
+auf hellem Grund, keiner auf dunklem — deshalb gilt es für alle.
+
+**Drei Werkzeugfallen aus diesem Lauf stehen jetzt in `FALLEN.md` Punkt 10** —
+`color(srgb …)` statt `rgb()`, Verläufe im Grund-Leser, und der eigene
+halbtransparente Hintergrund des gemessenen Elements.

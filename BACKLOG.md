@@ -1303,6 +1303,50 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 ## Fertig
 
+- [2026-08-13] **Die Objektnummer im Kopf hat jetzt Kontrast** — `v1164`, `bb44d8d`. **(Backlog-Punkt 9)**
+   **Kein neuer Befund, sondern der Rest eines halb erledigten.** Der Punkt
+   nannte 2,98 (kanzlei) und 2,88 (boarding). Gemessen wurde jetzt **3,88 und
+   3,72** — die Regel aus Abschnitt (b) der `ui-varianten.css` hat also längst
+   gewirkt, sie war nur **nicht weit genug**. Kleiner Text (10,5 px / 700)
+   braucht 4,5.
+
+   **Gelöst über den Token, nicht über eine neue Regel.** `--uv-marke-dd` war
+   bisher nur ein Alias auf `--uv-marke-d` — die Sollbruchstelle war vorgesehen
+   und nie benutzt. Jetzt dunkelt sie **relativ zum Markenton** ab:
+   `color-mix(in srgb, var(--uv-marke-d) 82%, #000)`.
+
+   **Relativ und nicht als Literal — das ist der Punkt:** ein Whitelabel-Rot
+   bleibt Rot und wird nur dunkler. Ein festes Gold hätte die Mandantenmarke an
+   sechs Stellen überschrieben, und `gold-audit.py` hätte es zu Recht angemahnt.
+
+   | | vorher `#987B22` | jetzt `#7d651c` |
+   |---|---|---|
+   | kanzlei (`#FBFAF7`) | 3,88 | **5,38** |
+   | boarding (`#FAF5E8`) | 3,72 | **5,16** |
+
+   **Alle sechs Leser von `--uv-marke-dd` wurden vorher geprüft** — Objektnummer,
+   Kerosin-Pille, zwei Teile des Aktionen-Knopfs, Reiter-Status. Alle stehen auf
+   **hellem** Grund unter kontor/panel/kanzlei/boarding, keiner auf dunklem.
+   Deshalb ist das Abdunkeln für alle richtig und nicht nur für den gemeldeten Fall.
+
+   **Zwei Werkzeugfallen, beide neu und beide teuer:**
+   1. **Der Grund-Leser muss Verläufe auswerten** — stand schon im Punkt und hat
+      sich bestätigt. Ein Leser, der nur `background-color` kennt, überspringt die
+      Kopfleiste und meldet Weiß.
+   2. **Verschachteltes `color-mix` liefert `color(srgb 0.48 0.39 0.10)`, nicht
+      `rgb()`.** Mein Parser las die 0–1-Werte als 0–255 und meldete Kontrast
+      19,24 — *„behoben"*, wo nichts gemessen war. **Ein Farbparser, der nur
+      `rgb()` kennt, ist ab jetzt unbrauchbar**, sobald `color-mix` im Spiel ist.
+   3. Und der Nachfolgefehler davon: der reparierte Leser fand dann den
+      **halbtransparenten Eigenhintergrund** der Pille (20 % Gold) und maß
+      dagegen. **Gemessen wird gegen den Grund der Fläche darunter**, nicht gegen
+      den eigenen Schleier.
+
+   *(Nicht gemessen: `kontor` und `panel` lesen denselben Token, ihre Kopfgründe
+   sind aber nicht ausgelesen. Gegen den im Punkt genannten älteren Grund
+   `#E8DFC5` käme der neue Ton auf 4,22 — knapp unter 4,5. Wer dort nachmisst,
+   sollte mit 85 % statt 82 % rechnen.)*
+
 - [2026-08-13] **Die sieben Pro-Tage gibt es — Marcel hatte recht, ich hatte es bestritten** — Prüflauf, kein Umbau. **(Backlog-Punkt 6, Marcels Frage)**
    **Zuerst die Rücknahme:** Im Prüflauf vom selben Tag stand von mir *„Ich
    kann das nicht bestätigen — in meinen Unterlagen steht es nicht."* **Das

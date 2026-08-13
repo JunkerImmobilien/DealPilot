@@ -316,3 +316,34 @@ lässt sich an einer Stelle aber nicht belegen.
 Fehler hintereinander heißen, die Sitzung ist zu lang — abschließen,
 übergeben, Schluss. **Das gilt auch dann, wenn der nächste Schritt klein und
 verlockend aussieht.** Genau dann irrt man weiter.
+
+## 10 · Farbparser, die nur `rgb()` kennen, sind seit `color-mix` blind
+
+**Verschachteltes `color-mix` gibt `getComputedStyle().color` als
+`color(srgb 0.488784 0.395529 0.109333)` zurück — nicht als `rgb()`.**
+
+Ein Parser mit `(s.match(/[\d.]+/g)).slice(0,3)` zieht daraus `0.48, 0.39, 0.10`
+und liest sie als 0–255. Ergebnis: fast Schwarz, Kontrast **19,24** gegen einen
+hellen Grund. Das sieht aus wie ein glänzend behobener Befund und ist eine
+Messung, die nie stattgefunden hat.
+
+```js
+const rgb = s => { const n = (s.match(/[\d.]+/g)||[]).slice(0,3).map(Number);
+                   return /color\(/.test(s) ? n.map(v => v*255) : n; };
+```
+
+**Zwei Folgefallen aus demselben Lauf (`v1164`):**
+
+- **Der Grund-Leser muss `background-image` auswerten.** Die Kopfleiste trägt
+  einen Verlauf, keine Farbe — ein Leser, der die Vorfahren nach der ersten
+  `background-color` ≠ transparent absucht, überspringt sie und meldet Weiß.
+- **Und er darf nicht am eigenen Schleier hängenbleiben.** Nachdem der Regex um
+  `color(...)` erweitert war, fand er den **halbtransparenten Eigenhintergrund**
+  des gemessenen Elements (20 % Gold) und rechnete dagegen — Kontrast 2,46 statt
+  5,16. **Gemessen wird gegen die Fläche darunter**, nicht gegen den eigenen
+  Verlauf. Beim Aufsteigen also das Element selbst überspringen, wenn sein
+  Hintergrund halbtransparent ist.
+
+**Merksatz:** Ein Kontrastwert, der sich zwischen zwei Läufen um mehr als eine
+Stufe bewegt, ohne dass die Farbe sich geändert hat, ist ein Werkzeugbefund —
+nicht ein Ergebnis.
