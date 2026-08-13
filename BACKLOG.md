@@ -613,7 +613,16 @@ die alle auf Marcels Durchgang zurückgehen.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-5. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+5. **ERLEDIGT — Grundfarbe „Obsidian"** (`v1156`/`b`/`c`, `8cc7af0`, siehe
+   Fertig). Gemessen: **ohne** Vorlage wirkt sie, **mit** Vorlage nicht —
+   der Wert wurde aber gespeichert, ein stiller Rückfall. Marcels Weg **B**
+   ist gebaut: unter aktiver Vorlage sichtbar gesperrt, mit Grund und
+   Ausweg im Hinweis. Dabei zwei eigene Fehler gefunden und behoben (der
+   Partner-Text landete im neuen Kasten; die Sperre war nur optisch und per
+   Tabulator umgehbar — betraf auch die Partner-Schranke seit `v1082`).
+
+   *Der ursprüngliche Befund samt Diagnosewegen bleibt stehen, weil seine
+   Lehren gelten:*
 
    Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
    Defekt, keine Geschmacksfrage.
@@ -1205,6 +1214,67 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-13] **Die Grundfarbe wird unter einer Vorlage sichtbar gesperrt** — `v1156` + `v1156b` + `v1156c`, `8cc7af0`. **(Backlog-Punkt 5, Marcels Weg B)**
+   **Gemessen war:** ohne Vorlage wirkt die Grundfarbe (Sidebar rgb(11,18,32),
+   Tabs rgb(21,27,41), Kopfverlauf ziehen mit). **Mit** Vorlage `kontor` sind
+   Sidebar und Tabs weiß, ein Wechsel ändert **nichts** — der Wert wird aber
+   gespeichert. Ursache: alle drei Regeln in `css/ui-varianten.css` beginnen
+   mit `html:not([data-ui-theme])`. **Ein stiller Rückfall.**
+
+   **Marcels Entscheidung: Weg B** — sichtbar sperren statt wirken lassen.
+   Begründung, die dafür spricht: eine dunkle Grundfläche unter der hellen
+   Vorlage „Kontor" widerspricht deren Zweck; **die Vorlage IST die
+   Flächenentscheidung.**
+
+   Gebaut mit der vorhandenen Mechanik (`.dpuv-lock` / `.dpuv-lockbar`) —
+   keine zweite Sperr-Optik. Der Text nennt den Grund **und** den Weg heraus:
+   „Die Vorlage bestimmt die Flächen … die Grundfarbe gilt für die Fassung
+   DealPilot … der **Akzent** wirkt in jeder Vorlage."
+   Die Bedingung wird **nicht kopiert**, sondern am selben Attribut gelesen,
+   das auch die CSS-Regeln prüfen — zwei Wahrheiten über dieselbe Bedingung
+   liefen im Marktbericht dreimal auseinander.
+
+   **Nachgemessen** (`ui-varianten.js?v=v1156c`, Bedienweg):
+
+   | Zustand | gesperrt | Hinweis | Deckkraft |
+   |---|---|---|---|
+   | keine Vorlage | nein | aus | 1 |
+   | Vorlage `kontor` | **ja** | **sichtbar** | 0,42 |
+   | zurück auf DealPilot | nein | aus | 1 |
+
+   ### Zwei eigene Nachbesserungen, beide im Prüflauf gefunden
+
+   **`v1156b` — der Partner-Text landete in meinem Kasten.** `gateSetzen()`
+   nahm `document.querySelector('.dpuv-lockbar')`, also die **erste** im
+   Dokument. Bis `v1156` gab es nur eine; meine neue steht im Markup davor.
+   Beide haben jetzt eine eigene Id. **Die Lehre ist die der Sammelregeln im
+   CSS:** ein Selektor auf ein Element, von dem es plötzlich zwei gibt,
+   trifft das falsche. Wer ein zweites danebenstellt, prüft die vorhandenen
+   Selektoren darauf.
+
+   **`v1156c` — die ausgegraute Sperre war nur eine optische.**
+   `pointer-events:none` lässt die Knöpfe `tabIndex 0` und nicht `disabled`
+   — **per Tabulator erreichbar und mit Enter auslösbar.** Das betraf nicht
+   nur die neue Schranke, sondern **genauso die Partner-Schranke, dort seit
+   `v1082`**. Beide tragen jetzt `inert` auf dem Innenteil: nimmt den
+   Teilbaum aus Fokus und Zeiger, eine Zuweisung statt einer Durchzählung.
+   Kennt der Browser `inert` nicht, bleibt es beim heutigen Verhalten — nie
+   schlechter als vorher. Nachgemessen: `inert` gesetzt, **Fokus greift nicht
+   mehr**.
+
+   **Grenze des Nachweises, ehrlich benannt:** mein erster Sperrtest meldete
+   „Wert wurde geändert" — **das war ein Messfehler.** Ein programmatisches
+   `el.click()` ruft den Handler direkt auf und umgeht `pointer-events` und
+   `inert` immer; ein echter Nutzer kann weder klicken noch fokussieren.
+   **Wer eine Sperre prüft, messe Fokussierbarkeit und `disabled`/`inert` —
+   nicht Klicks.** Ein Test mit echten Mauskoordinaten steht damit als
+   letzter Schritt offen; die beiden Attribute sind gemessen.
+
+   **Zustand hinterlassen:** Marcels Einstellungen unverändert (Akzent
+   `#C9A84C`, Grundfarbe `#050505`, keine Vorlage, kein Tab-Text-Merker) —
+   nach Reload gegengeprüft. Die Abweichung im laufenden Tab davor war der
+   Inline-Rest aus `FALLEN.md` Punkt 6, kein Befund.
 
 - [2026-08-13] **Das Werkzeug färbte sich mit** — `v1155`, `2347684`. **(Backlog-Punkt 4, der Defekt-Teil)**
    **Marcels Befund:** „Wählt Marcel Grün, wird das Gold am Kopf des
