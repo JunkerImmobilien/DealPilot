@@ -56,6 +56,7 @@ import { sachwertfaktor as swfHerford, gartenlandAnsatz as gartenHerford,
 import { UK_STAND as ML_UK } from './umrechnung_nrw.js';
 import { finde, findeZweig, kaskadeSchluessel, registerStand }
   from './ausschuss_register.js';
+import { auswerten } from './swf_modelle.js';   /* v1084-WSWF */
 
 /** Die Ausschuesse mit handgeschriebenem Modul. `ags_schluessel` ist die
  *  Ebene, auf der sie zustaendig sind — beide kreisscharf, also fuenfstellig. */
@@ -125,23 +126,150 @@ function hinterlegteNamen() {
  * Gibt immer dieselbe Form zurueck — die Aufrufer muessen die Modelle nicht
  * kennen.
  */
+/* ── v1084-WFELD · Zwei Bruecken, gemessen am echten Aufrufer ───────────
+ *
+ * CrossCheckService.js ruft sachwertfaktor({ ags, sachwert_eur, rnd_jahre,
+ * bgf_qm, brw_eur_qm, objektart }). Die Rezepte des Registers sind in den
+ * Namen geschrieben, in denen die Berichte ihre Achsen benennen: sachwert,
+ * brw, rnd, bgf. Beides ist fuer sich richtig — aber ohne Uebersetzung
+ * haette der Register-Zweig fuer JEDES Objekt 'achse_y_fehlt' gemeldet.
+ * Das ist dieselbe Klasse wie ref.ags: gebaut, nie verdrahtet.
+ *
+ * Die Bruecke ist eine WEISSE LISTE. Ein Achsenfeld, das hier nicht steht,
+ * kommt nicht an — und faellt im Auswerter als 'fehlt' auf, statt still
+ * durch einen Standardwert ersetzt zu werden.
+ *
+ * Kategoriale Achsen (Wohnlage, Gebiet, Rheinseite) stehen bewusst NICHT
+ * darin: sie werden im Formular nicht erhoben. Der Auswerter meldet dann
+ * 'kategorie_fehlt', und der Bericht sagt es. Kein Verfahren rechnet halb. */
+const FELDBRUECKE = {
+  sachwert: ['sachwert_eur', 'vorlaeufiger_sachwert_eur', 'sachwert'],
+  brw: ['brw_eur_qm', 'brw_sqm', 'brw'],
+  rnd: ['rnd_jahre', 'restnutzungsdauer_jahre', 'rnd'],
+  bgf: ['bgf_qm', 'bgf_direkt', 'bgf'],
+  baujahr: ['baujahr', 'build_year'],
+  flaeche: ['grundstuecksflaeche_qm', 'flaeche_qm', 'gsfl', 'flaeche'],
+  baugrundstuecksflaeche: ['baugrundstuecksflaeche_qm',
+    'grundstuecksflaeche_qm', 'flaeche_qm', 'gsfl'],
+  baulandflaeche: ['baulandflaeche_qm', 'grundstuecksflaeche_qm', 'gsfl'],
+  lagewert: ['lagewert', 'brw_eur_qm', 'brw_sqm'],
+};
+
+function eingabeBruecke(o) {
+  const e = { ...(o || {}) };
+  for (const [ziel, quellen] of Object.entries(FELDBRUECKE)) {
+    if (e[ziel] != null && e[ziel] !== '') continue;
+    for (const q of quellen) {
+      if (o[q] != null && o[q] !== '') { e[ziel] = o[q]; break; }
+    }
+  }
+  return e;
+}
+
+/* v1084-WZWG · Objektart -> Zweig des Registers.
+ *
+ * Das Formular fuehrt deutschen Klartext ("Zweifamilienhaus"), das Register
+ * die Kuerzel der Berichte (zfh, ezfh, rhdhh). Uebersetzt wird ueber eine
+ * Vorzugsliste, und in der stehen NUR Zweige, die die Objektart wirklich
+ * einschliessen: ein Einfamilienhaus darf auf 'ezfh' fallen, weil der
+ * Bericht dort ausdruecklich "Ein- und Zweifamilienhaeuser" meint — aber
+ * niemals auf 'rhdhh', denn die Anbauweise ist eine andere Sache.
+ *
+ * KEIN TREFFER HEISST KEIN WERT. Insbesondere gibt es keinen Rueckfall
+ * "das Register fuehrt ohnehin nur einen Zweig, dann nimm den" — das waere
+ * ein stiller Rueckfall und wuerde einer Eigentumswohnung den Faktor fuer
+ * Einfamilienhaeuser geben. */
+const ZWEIG_VORZUG = [
+  [/eigentumswohnung|etw|whg|wohnung/i, ['etw', 'we', 'wohnung']],
+  [/mehrfamilien|mfh/i, ['mfh', 'mfh_bis6', 'mfh_ueber6']],
+  [/dreifamilien|dreifh/i, ['dreifh']],
+  [/reihenmittel|rmh/i, ['rmh', 'rh', 'rhdhh']],
+  [/reihenend|doppelhaus|dhh|reh/i, ['rhdhh', 'dhh', 'reh', 'rh']],
+  [/reihenhaus|rh/i, ['rh', 'rhdhh', 'rmh']],
+  [/zweifamilien|zfh/i, ['zfh', 'ezfh']],
+  [/einfamilien|efh|freistehend/i, ['efh', 'ezfh']],
+  [/fertighaus/i, ['fertighaus']],
+];
+
+function zweigWaehlen(reg, gefuehrt, objektart) {
+  const t = String(objektart || '').trim();
+  if (!t) return null;
+  const direkt = gefuehrt.indexOf(t.toLowerCase());
+  if (direkt >= 0) return reg[direkt];
+  for (const [muster, vorzug] of ZWEIG_VORZUG) {
+    if (!muster.test(t)) continue;
+    for (const z of vorzug) {
+      const i = gefuehrt.indexOf(z);
+      if (i >= 0) return reg[i];
+    }
+    return null;          /* erkannt, aber der Ausschuss fuehrt sie nicht */
+  }
+  return null;
+}
+
+/* v1084-WSWF · Der Register-Weg, ausgelagert, damit sachwertfaktor() lesbar
+ * bleibt. Gibt null zurueck, wenn das Register fuer dieses Gebiet nichts
+ * fuehrt — dann greift die Meldung "kein Ausschuss hinterlegt". */
+function ausRegisterRechnen(o, ags) {
+  /* v1084-WSWF · Kein Modul — dann rechnet das Register.
+   *
+   * Bis v1083 stand hier "Registereintrag vorhanden, aber kein Auswerter".
+   * Der Auswerter lag seit v1083 vor und rechnete 37 Pruefungen richtig — er
+   * wurde nur nie gefragt. Ab hier wird er gefragt.
+   *
+   * DIE RUECKGABEFORM BLEIBT DIESELBE wie beim handgeschriebenen Modul. */
+  const reg = finde('sachwertfaktor', ags);
+  if (!reg.length) return null;      /* faellt auf 'kein_ausschuss_hinterlegt' */
+
+  const gefuehrt = reg.map((x) => String(x.zweig || '').toLowerCase());
+  const satz = zweigWaehlen(reg, gefuehrt, o.zweig || o.objektart);
+
+  if (!satz) {
+    return { verfuegbar: false, grund: 'objektart_nicht_abgeleitet',
+      hinweis: 'Der Gutachterausschuss hat für diese Objektart keinen '
+        + 'Sachwertfaktor abgeleitet. Geführt werden: ' + gefuehrt.join(', ')
+        + '. Faktoren anderer Objektarten dürfen nicht übertragen werden '
+        + '(§ 10 ImmoWertV).',
+      ausschuss: reg[0].gaa_name || null,
+      gefuehrte_zweige: gefuehrt };
+  }
+
+  const r = auswerten({ ...(satz.formel || {}),
+                        korrekturen: satz.korrekturen || [] },
+                      eingabeBruecke(o));
+
+  /* Auch der Misserfolg traegt seine Herkunft — sonst steht im Bericht
+   * "kein Wert" ohne zu sagen, WER nichts abgeleitet hat. */
+  r.ausschuss = satz.gaa_name || null;
+  r.herkunft = 'register';
+  r.zweig = satz.zweig;
+  r.stufe = satz.stufe || null;
+  r.fallzahl = satz.fallzahl ?? null;
+  r.streuung = satz.streuung ?? null;
+  r.stichtag = satz.stichtag || null;
+  r.berichtsjahr = satz.berichtsjahr ?? null;
+  r.modellversion = satz.modellversion || null;
+  r.modellform = (satz.formel || {}).form || null;
+  r.fundstelle = satz.fundstelle || null;
+  r.quelle_url = satz.quelle_url || null;
+  r.quellenvermerk = satz.quellenvermerk || null;
+  r.lizenz = satz.lizenz || null;
+  r.geltungsbereich = satz.geltungsbereich || null;
+  r.beleg = (satz.belege || [])[0] || null;
+  return r;
+}
+
 export function sachwertfaktor(o) {
-  const ags = o && o.ags;
+  const ags = (o && o.ags) || null;
   const a = zustaendig(ags);
   if (a) {
     const r = a.sachwertfaktor(o);
     if (r && r.verfuegbar) { r.ausschuss = a.name; r.herkunft = 'modul'; }
     return r;
   }
-  /* Noch kein Modul — traegt das Register etwas? */
-  const reg = finde('sachwertfaktor', ags);
-  if (reg.length) {
-    return { verfuegbar: false, grund: 'register_ohne_auswerter',
-      hinweis: 'Für diesen Ausschuss liegt ein Registereintrag vor, aber noch '
-        + 'kein freigeschalteter Auswerter. Er wird im nächsten Schritt '
-        + 'verdrahtet; gerechnet wird bis dahin nicht.',
-      ausschuss: reg[0].gaa_name || null };
-  }
+  const ausRegister = ausRegisterRechnen(o || {}, ags);
+  if (ausRegister) return ausRegister;
+
   return {
     verfuegbar: false, grund: 'kein_ausschuss_hinterlegt',
     hinweis: 'Für diesen Ort sind noch keine Sachwertfaktoren hinterlegt. '

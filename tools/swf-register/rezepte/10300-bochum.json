@@ -1,0 +1,100 @@
+{
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum",
+  "gaa_kennz": "10300",
+  "ags": ["05911000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "auswertezeitraum": "die vergangenen zwei Berichtszeiträume (Jahresangaben im Bericht nicht beziffert)",
+  "beschlossen": null,
+  "veroeffentlicht": null,
+  "quelle_url": null,
+  "quelle_datei": "GMB 2026 Stadt Bochum, Original-PDF (11.08.2026); Tabelle 17 ist als Grafik eingebettet und wurde als Seitenbild gelesen",
+  "quellenvermerk": "Der obere Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen (www.boris.nrw.de), dl-de/by-2-0",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "Kap. 5.1.4, Tabelle 17, S. 49",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Ein- und Zweifamilienhäuser",
+      "form": "konstante",
+      "formel": {
+        "form": "konstante",
+        "wert": 1.21,
+        "ci": [1.17, 1.26],
+        "hinweis": "Basiswertmodell ('basiswert_additiv'): vom Basiswert ausgehend werden die vier Korrekturen additiv verwendet. Wörtlich: 'Bei Anwendung des Sachwertverfahrens werden vom Basiswert ausgehend die aufgeführten Zu- und Abschläge additiv verwendet. Dabei ist ein sachverständiges Interpretieren der angegebenen Konfidenzintervalle möglich.'",
+        "rundung_stellen": 2
+      },
+      "korrekturen": [
+        {
+          "bez": "Wohnlageklasse",
+          "feld": "wohnlageklasse",
+          "art": "stufen",
+          "stufen": {"1": -0.06, "2": 0.00, "3": 0.06},
+          "ci": {"1": [-0.09, -0.03], "2": null, "3": [0.03, 0.09]},
+          "rundung_stellen": 2
+        },
+        {
+          "bez": "vorläufiger Sachwert",
+          "feld": "sachwert",
+          "art": "band",
+          "baender": [
+            {"von": 50000, "bis": 200000, "zuschlag": 0.14, "ci": [0.07, 0.21], "bez": "50.000–200.000 €"},
+            {"von": 200001, "bis": 250000, "zuschlag": 0.11, "ci": [0.05, 0.16], "bez": "200.001–250.000 €"},
+            {"von": 250001, "bis": 300000, "zuschlag": 0.00, "ci": null, "bez": "250.001–300.000 €"},
+            {"von": 300001, "bis": 350000, "zuschlag": -0.08, "ci": [-0.12, -0.03], "bez": "300.001–350.000 €"},
+            {"von": 350001, "bis": 400000, "zuschlag": -0.15, "ci": [-0.20, -0.10], "bez": "350.001–400.000 €"},
+            {"von": 400001, "bis": 450000, "zuschlag": -0.19, "ci": [-0.24, -0.14], "bez": "400.001–450.000 €"},
+            {"von": 450001, "bis": 500000, "zuschlag": -0.23, "ci": [-0.29, -0.17], "bez": "450.001–500.000 €"},
+            {"von": 500001, "bis": 550000, "zuschlag": -0.33, "ci": [-0.41, -0.26], "bez": "500.001–550.000 €"},
+            {"von": 550001, "bis": 600000, "zuschlag": -0.37, "ci": [-0.45, -0.29], "bez": "550.001–600.000 €"},
+            {"von": 600001, "bis": 730000, "zuschlag": -0.39, "ci": [-0.46, -0.32], "bez": "600.001–730.000 €"}
+          ],
+          "rundung_stellen": 2
+        },
+        {
+          "bez": "Restnutzungsdauer",
+          "feld": "rnd_jahre",
+          "art": "band",
+          "baender": [
+            {"von": 20, "bis": 25, "zuschlag": -0.17, "ci": [-0.21, -0.13], "bez": "20–25 Jahre"},
+            {"von": 26, "bis": 30, "zuschlag": -0.09, "ci": [-0.13, -0.06], "bez": "26–30 Jahre"},
+            {"von": 31, "bis": 40, "zuschlag": 0.00, "ci": null, "bez": "31–40 Jahre"},
+            {"von": 41, "bis": 50, "zuschlag": 0.02, "ci": [-0.02, 0.06], "bez": "41–50 Jahre"},
+            {"von": 51, "bis": 60, "zuschlag": 0.10, "ci": [0.04, 0.15], "bez": "51–60 Jahre"},
+            {"von": 61, "bis": 78, "zuschlag": 0.12, "ci": [0.05, 0.19], "bez": "61–78 Jahre"}
+          ],
+          "rundung_stellen": 2
+        },
+        {
+          "bez": "Wohnfläche",
+          "feld": "wohnflaeche",
+          "art": "band",
+          "baender": [
+            {"von": 50, "bis": 100, "zuschlag": -0.05, "ci": [-0.10, -0.01], "bez": "50–100 m²"},
+            {"von": 101, "bis": 150, "zuschlag": 0.00, "ci": null, "bez": "101–150 m²"},
+            {"von": 151, "bis": 200, "zuschlag": 0.05, "ci": [0.01, 0.09], "bez": "151–200 m²"},
+            {"von": 201, "bis": 300, "zuschlag": 0.13, "ci": [0.07, 0.19], "bez": "201–300 m²"}
+          ],
+          "rundung_stellen": 2
+        }
+      ],
+      "geltungsbereich": {
+        "extrapolation": "verboten",
+        "hinweis": "Wörtlich: 'Liegen Werte außerhalb einer Gruppe, so ist eine gesonderte Beurteilung hinsichtlich der Marktlage notwendig.' Keine Interpolation innerhalb der Bänder — die Bänder gelten als Ganzes. Lagegrenzen der Wohnlageklassen (aus der Vortagsernte, am Original noch zu bestätigen): gute Lage über 440 €/m², mittlere 360–440 €/m², einfache unter 360 €/m²."
+      },
+      "stufe": "A",
+      "fallzahl": 747,
+      "streuung": null,
+      "beleg": {
+        "art": "anwendungsbeispiel",
+        "fundstelle": "S. 50",
+        "eingabe": {"wohnlageklasse": 3, "sachwert": 375000, "rnd_jahre": 43, "wohnflaeche": 160},
+        "soll_tabellenwert": 1.21,
+        "soll_wert": 1.19,
+        "wortlaut": "Einfamilienhaus, Wohnlageklasse 3, vorläufiger Sachwert 375.000 €, Restnutzungsdauer 43 Jahre, Wohnfläche 160 m². 1,21 + 0,06 − 0,15 + 0,02 + 0,05 = 1,19."
+      }
+    }
+  ],
+  "warnung": "Die am 10.08.2026 kursierende Bochum-Matrix ('matrix vorläufiger Sachwert × Lage', drei Objektarten, 847 Kauffälle) war FREI ERFUNDEN und ist verworfen. Bochum führt gar keine Matrix, und die Fallzahl lautet 747, nicht 847. Dieses Rezept ersetzt sie."
+}

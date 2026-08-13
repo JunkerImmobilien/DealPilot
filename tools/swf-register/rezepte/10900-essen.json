@@ -1,0 +1,72 @@
+{
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+  "gaa_kennz": "10900",
+  "ags": ["05113000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "auswertezeitraum": "2024-2025",
+  "modellstand": "2025-01-01",
+  "datenstand": "2026-02-25",
+  "beschlossen": null,
+  "veroeffentlicht": null,
+  "quelle_url": "https://gmb.gutachterausschuss-essen.de/gmb_10900_2026/",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "lizenz_hinweis": "Lizenzangabe weder in der Webfassung noch im Erntedokument des Original-PDF abgedruckt — deshalb null.",
+  "fundstelle": "Kap. 5.1.3",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Ein- und Zweifamilienhäuser ohne Reihenmittelhäuser",
+      "form": "konstante",
+      "formel": {"form": "konstante", "wert": 1.33, "rundung_stellen": 2},
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Konstante je Objektart — keine Matrix, keine Formel, keine Zu-/Abschlagstabelle im Bericht. Modellansätze: Baunebenkosten in den NHK 2010 enthalten, Regionalfaktor 1,0, GND 80 (Gewerbe 60), RND-Verlängerung nach Anlage 2 ImmoWertV. Außenanlagen als Prozent der Herstellungskosten: freistehende EFH 5 % · DHH und REH 7 % · RMH 9 % (Kap. 9, Stand 01.01.2025). Umrechnungskoeffizient Wohnlage EZFH (5.1.5): einfach 0,70 · einfach–mittel 0,85 · mittel 1,00 · gut 1,25.",
+        "spanne": [0.80, 1.90],
+        "median": 1.32
+      },
+      "stufe": "A",
+      "fallzahl": null,
+      "fallzahl_hinweis": "Kauffallzahlen fehlen im Bericht durchgängig.",
+      "streuung": 0.27,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.3",
+        "soll_zeilen": 1,
+        "soll_spalten": 1,
+        "soll_median": 1.32,
+        "soll_spanne": [0.80, 1.90],
+        "wortlaut": "Kein Anwendungsbeispiel im gesamten Bericht (zweifach gegengeprüft). Ersatzprüfung aus dem Bericht selbst: Mittelwert 1,33 liegt dicht am abgedruckten Median 1,32 und innerhalb der Spanne 0,80 bis 1,90; Stichprobe RND 35 ± 15, Kaufpreis 3.357 €/m² Wfl, Wfl 136 m², vSW 354.982 €, Standard 2,6, Fläche 414 m², Bodenwert 158.967 €."
+      }
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser",
+      "form": "konstante",
+      "formel": {"form": "konstante", "wert": 1.47, "rundung_stellen": 2},
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Konstante je Objektart. Außenanlagen RMH 9 % der Herstellungskosten.",
+        "spanne": [0.99, 2.00],
+        "median": 1.44
+      },
+      "stufe": "A",
+      "fallzahl": null,
+      "fallzahl_hinweis": "Kauffallzahlen fehlen im Bericht durchgängig.",
+      "streuung": 0.26,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.3",
+        "soll_zeilen": 1,
+        "soll_spalten": 1,
+        "soll_median": 1.44,
+        "soll_spanne": [0.99, 2.00],
+        "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: Mittelwert 1,47 dicht am abgedruckten Median 1,44, innerhalb der Spanne 0,99 bis 2,00; Stichprobe RND 40 ± 14, Kaufpreis 2.920 ± 751 €/m² Wfl, Wfl 125 ± 23 m², vSW 254.503 ± 74.201 €, Gebäudestandard 2,7 ± 0,4, Grundstücksfläche 210 ± 67 m², Bodenwert 70.358 ± 30.334 €."
+      }
+    }
+  ]
+}

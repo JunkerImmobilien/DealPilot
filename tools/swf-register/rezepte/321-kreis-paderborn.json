@@ -1,0 +1,67 @@
+{
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+  "gaa_kennz": "32100",
+  "gaa_kennz_kurz": "321",
+  "ags": ["05774"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "auswertezeitraum": "2025",
+  "beschlossen": null,
+  "veroeffentlicht": null,
+  "quelle_url": "https://www.kreis-paderborn.de/gutachterausschuss/Produkte/Grundstucksmarktbericht/GMB_32100_2026.pdf",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Gebrauchte Ein- und Zweifamilienhäuser, GND 80 Jahre",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [100, 200, 300, 400],
+        "achse_x_feld": "lagewert",
+        "achse_x_bez": "Lagewert (Bodenrichtwert €/m², inkl. Erschließung und Kanalanschlussbeitrag)",
+        "achse_y": [200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000, 600000, 650000],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert inkl. Bodenwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "200000": [0.95, null, null, null],
+          "250000": [0.92, 0.95, null, null],
+          "300000": [0.89, 0.92, 0.95, 0.97],
+          "350000": [0.86, 0.89, 0.92, 0.94],
+          "400000": [0.84, 0.87, 0.89, 0.92],
+          "450000": [0.81, 0.85, 0.87, 0.89],
+          "500000": [0.79, 0.82, 0.85, 0.87],
+          "550000": [0.77, 0.80, 0.83, 0.85],
+          "600000": [null, 0.78, 0.81, 0.83],
+          "650000": [null, null, null, 0.81]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Bandbreite laut Bericht: 'je nach Alter und Ausstattung ± 0,05'. Modellgrundlagen: NHK 2010, BGF, Regionalfaktor 1,0, GND 80. AGVGA NRW wird im Bericht NICHT genannt.",
+        "unsichere_zeilen": [600000, 650000],
+        "unsicherheits_hinweis": "Die Spaltenzuordnung der Zeilen 600.000 und 650.000 ergibt sich nur aus der Spaltenmonotonie; im Rohtext stehen dort drei bzw. ein Wert ohne Spaltenmarkierung. VOR dem Verdrahten am Original-PDF sichtprüfen."
+      },
+      "stufe": "A",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "anwendungsbeispiel",
+        "fundstelle": "Kap. 5.1.3",
+        "eingabe": {"sachwert": 400000, "lagewert": 200, "gnd_jahre": 80},
+        "soll_tabellenwert": 0.87,
+        "soll_wert": 0.87,
+        "soll_sachwert_eur": 348000,
+        "soll_zeilen": 10,
+        "soll_spalten": 4,
+        "wortlaut": "Sachwert inkl. Bodenwert 400.000 €, Lagewert 200 €/m², GND 80 Jahre → Marktanpassungsfaktor 0,87, Abschlag 13 %, marktangepasster Sachwert 348.000 €."
+      }
+    }
+  ]
+}

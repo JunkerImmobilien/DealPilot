@@ -1,0 +1,793 @@
+{
+ "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+ "gaa_kennz": "31200",
+ "gaa_kennz_kurz": "312",
+ "ags": [
+  "05762"
+ ],
+ "ags_form8": "05762000",
+ "ebene": "kreis",
+ "berichtsjahr": 2026,
+ "stichtag": "2026-01-01",
+ "auswertezeitraum": "2023-2025",
+ "beschlossen": null,
+ "veroeffentlicht": null,
+ "quelle_url": "https://www.gars.nrw/images/user/GA_H%C3%B6xter/pdf/hx_GMB_312_2026.pdf",
+ "quelle_datei": "GMB_312_Hoexter_2026.pdf (158 Seiten, pdftotext -layout); Zellwerte maschinell geparst, übernommen aus /root/ernte/out/swf_roh.json, Schlüssel 312_hoexter — unverändert, Zelle für Zelle.",
+ "quellenvermerk": null,
+ "lizenz": "dl-de/zero-2-0",
+ "fundstelle": "Kap. 5.1.3 „Sachwertfaktoren zum Stichtag 01.01.2026\", S. 70–73",
+ "modelle": [
+  {
+   "zweig": "ezfh",
+   "zweig_bez": "Ein- und Zweifamilienhäuser — die Objektartabgrenzung ist im Erntedokument nicht ausdrücklich beziffert; die Struktur ist identisch zum Kreis Herford. Am PDF gegenprüfen.",
+   "form": "matrix_interp",
+   "formel": {
+    "form": "matrix_interp",
+    "achse_x": [
+     20,
+     40,
+     60,
+     80,
+     100,
+     120,
+     140,
+     160
+    ],
+    "achse_x_feld": "brw",
+    "achse_x_bez": "Bodenrichtwert in Euro/m²",
+    "achse_y": [
+     50000,
+     60000,
+     70000,
+     80000,
+     90000,
+     100000,
+     110000,
+     120000,
+     130000,
+     140000,
+     150000,
+     160000,
+     170000,
+     180000,
+     190000,
+     200000,
+     210000,
+     220000,
+     230000,
+     240000,
+     250000,
+     260000,
+     270000,
+     280000,
+     290000,
+     300000,
+     310000,
+     320000,
+     330000,
+     340000,
+     350000,
+     360000,
+     370000,
+     380000,
+     390000,
+     400000,
+     410000,
+     420000,
+     430000,
+     440000,
+     450000,
+     460000,
+     470000,
+     480000,
+     490000,
+     500000,
+     510000,
+     520000,
+     530000,
+     540000,
+     550000,
+     560000,
+     570000,
+     580000,
+     590000,
+     600000
+    ],
+    "achse_y_feld": "sachwert",
+    "achse_y_bez": "vorläufiger Sachwert in Euro",
+    "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+    "zellen": {
+     "50000": [
+      0.71,
+      0.75,
+      0.79,
+      0.84,
+      0.88,
+      0.92,
+      0.96,
+      1.0
+     ],
+     "60000": [
+      0.7,
+      0.75,
+      0.79,
+      0.83,
+      0.87,
+      0.91,
+      0.96,
+      1.0
+     ],
+     "70000": [
+      0.7,
+      0.74,
+      0.78,
+      0.83,
+      0.87,
+      0.91,
+      0.95,
+      0.99
+     ],
+     "80000": [
+      0.69,
+      0.74,
+      0.78,
+      0.82,
+      0.86,
+      0.9,
+      0.95,
+      0.99
+     ],
+     "90000": [
+      0.69,
+      0.73,
+      0.77,
+      0.81,
+      0.86,
+      0.9,
+      0.94,
+      0.98
+     ],
+     "100000": [
+      0.68,
+      0.73,
+      0.77,
+      0.81,
+      0.85,
+      0.89,
+      0.94,
+      0.98
+     ],
+     "110000": [
+      0.68,
+      0.72,
+      0.76,
+      0.8,
+      0.85,
+      0.89,
+      0.93,
+      0.97
+     ],
+     "120000": [
+      0.67,
+      0.72,
+      0.76,
+      0.8,
+      0.84,
+      0.88,
+      0.92,
+      0.97
+     ],
+     "130000": [
+      0.67,
+      0.71,
+      0.75,
+      0.79,
+      0.84,
+      0.88,
+      0.92,
+      0.96
+     ],
+     "140000": [
+      0.66,
+      0.7,
+      0.75,
+      0.79,
+      0.83,
+      0.87,
+      0.91,
+      0.96
+     ],
+     "150000": [
+      0.66,
+      0.7,
+      0.74,
+      0.78,
+      0.83,
+      0.87,
+      0.91,
+      0.95
+     ],
+     "160000": [
+      0.65,
+      0.69,
+      0.74,
+      0.78,
+      0.82,
+      0.86,
+      0.9,
+      0.95
+     ],
+     "170000": [
+      0.65,
+      0.69,
+      0.73,
+      0.77,
+      0.81,
+      0.86,
+      0.9,
+      0.94
+     ],
+     "180000": [
+      0.64,
+      0.68,
+      0.73,
+      0.77,
+      0.81,
+      0.85,
+      0.89,
+      0.93
+     ],
+     "190000": [
+      0.64,
+      0.68,
+      0.72,
+      0.76,
+      0.8,
+      0.85,
+      0.89,
+      0.93
+     ],
+     "200000": [
+      0.63,
+      0.67,
+      0.71,
+      0.76,
+      0.8,
+      0.84,
+      0.88,
+      0.92
+     ],
+     "210000": [
+      0.63,
+      0.67,
+      0.71,
+      0.75,
+      0.79,
+      0.84,
+      0.88,
+      0.92
+     ],
+     "220000": [
+      0.62,
+      0.66,
+      0.7,
+      0.75,
+      0.79,
+      0.83,
+      0.87,
+      0.91
+     ],
+     "230000": [
+      0.62,
+      0.66,
+      0.7,
+      0.74,
+      0.78,
+      0.82,
+      0.87,
+      0.91
+     ],
+     "240000": [
+      0.61,
+      0.65,
+      0.69,
+      0.74,
+      0.78,
+      0.82,
+      0.86,
+      0.9
+     ],
+     "250000": [
+      0.6,
+      0.65,
+      0.69,
+      0.73,
+      0.77,
+      0.81,
+      0.86,
+      0.9
+     ],
+     "260000": [
+      0.6,
+      0.64,
+      0.68,
+      0.73,
+      0.77,
+      0.81,
+      0.85,
+      0.89
+     ],
+     "270000": [
+      0.59,
+      0.64,
+      0.68,
+      0.72,
+      0.76,
+      0.8,
+      0.85,
+      0.89
+     ],
+     "280000": [
+      0.59,
+      0.63,
+      0.67,
+      0.71,
+      0.76,
+      0.8,
+      0.84,
+      0.88
+     ],
+     "290000": [
+      0.58,
+      0.63,
+      0.67,
+      0.71,
+      0.75,
+      0.79,
+      0.84,
+      0.88
+     ],
+     "300000": [
+      0.58,
+      0.62,
+      0.66,
+      0.7,
+      0.75,
+      0.79,
+      0.83,
+      0.87
+     ],
+     "310000": [
+      0.57,
+      0.62,
+      0.66,
+      0.7,
+      0.74,
+      0.78,
+      0.82,
+      0.87
+     ],
+     "320000": [
+      0.57,
+      0.61,
+      0.65,
+      0.69,
+      0.74,
+      0.78,
+      0.82,
+      0.86
+     ],
+     "330000": [
+      0.56,
+      0.6,
+      0.65,
+      0.69,
+      0.73,
+      0.77,
+      0.81,
+      0.86
+     ],
+     "340000": [
+      0.56,
+      0.6,
+      0.64,
+      0.68,
+      0.72,
+      0.77,
+      0.81,
+      0.85
+     ],
+     "350000": [
+      0.55,
+      0.59,
+      0.64,
+      0.68,
+      0.72,
+      0.76,
+      0.8,
+      0.85
+     ],
+     "360000": [
+      0.55,
+      0.59,
+      0.63,
+      0.67,
+      0.71,
+      0.76,
+      0.8,
+      0.84
+     ],
+     "370000": [
+      0.54,
+      0.58,
+      0.63,
+      0.67,
+      0.71,
+      0.75,
+      0.79,
+      0.83
+     ],
+     "380000": [
+      0.54,
+      0.58,
+      0.62,
+      0.66,
+      0.7,
+      0.75,
+      0.79,
+      0.83
+     ],
+     "390000": [
+      0.53,
+      0.57,
+      0.61,
+      0.66,
+      0.7,
+      0.74,
+      0.78,
+      0.82
+     ],
+     "400000": [
+      0.53,
+      0.57,
+      0.61,
+      0.65,
+      0.69,
+      0.74,
+      0.78,
+      0.82
+     ],
+     "410000": [
+      0.52,
+      0.56,
+      0.6,
+      0.65,
+      0.69,
+      0.73,
+      0.77,
+      0.81
+     ],
+     "420000": [
+      0.52,
+      0.56,
+      0.6,
+      0.64,
+      0.68,
+      0.72,
+      0.77,
+      0.81
+     ],
+     "430000": [
+      0.51,
+      0.55,
+      0.59,
+      0.64,
+      0.68,
+      0.72,
+      0.76,
+      0.8
+     ],
+     "440000": [
+      0.5,
+      0.55,
+      0.59,
+      0.63,
+      0.67,
+      0.71,
+      0.76,
+      0.8
+     ],
+     "450000": [
+      0.5,
+      0.54,
+      0.58,
+      0.63,
+      0.67,
+      0.71,
+      0.75,
+      0.79
+     ],
+     "460000": [
+      0.49,
+      0.54,
+      0.58,
+      0.62,
+      0.66,
+      0.7,
+      0.75,
+      0.79
+     ],
+     "470000": [
+      0.49,
+      0.53,
+      0.57,
+      0.61,
+      0.66,
+      0.7,
+      0.74,
+      0.78
+     ],
+     "480000": [
+      0.48,
+      0.53,
+      0.57,
+      0.61,
+      0.65,
+      0.69,
+      0.74,
+      0.78
+     ],
+     "490000": [
+      0.48,
+      0.52,
+      0.56,
+      0.6,
+      0.65,
+      0.69,
+      0.73,
+      0.77
+     ],
+     "500000": [
+      0.47,
+      0.52,
+      0.56,
+      0.6,
+      0.64,
+      0.68,
+      0.72,
+      0.77
+     ],
+     "510000": [
+      0.47,
+      0.51,
+      0.55,
+      0.59,
+      0.64,
+      0.68,
+      0.72,
+      0.76
+     ],
+     "520000": [
+      0.46,
+      0.5,
+      0.55,
+      0.59,
+      0.63,
+      0.67,
+      0.71,
+      0.76
+     ],
+     "530000": [
+      0.46,
+      0.5,
+      0.54,
+      0.58,
+      0.62,
+      0.67,
+      0.71,
+      0.75
+     ],
+     "540000": [
+      0.45,
+      0.49,
+      0.54,
+      0.58,
+      0.62,
+      0.66,
+      0.7,
+      0.75
+     ],
+     "550000": [
+      0.45,
+      0.49,
+      0.53,
+      0.57,
+      0.61,
+      0.66,
+      0.7,
+      0.74
+     ],
+     "560000": [
+      0.44,
+      0.48,
+      0.53,
+      0.57,
+      0.61,
+      0.65,
+      0.69,
+      0.73
+     ],
+     "570000": [
+      0.44,
+      0.48,
+      0.52,
+      0.56,
+      0.6,
+      0.65,
+      0.69,
+      0.73
+     ],
+     "580000": [
+      0.43,
+      0.47,
+      0.51,
+      0.56,
+      0.6,
+      0.64,
+      0.68,
+      0.72
+     ],
+     "590000": [
+      0.43,
+      0.47,
+      0.51,
+      0.55,
+      0.59,
+      0.64,
+      0.68,
+      0.72
+     ],
+     "600000": [
+      0.42,
+      0.46,
+      0.5,
+      0.55,
+      0.59,
+      0.63,
+      0.67,
+      0.71
+     ]
+    },
+    "normobjekt": {
+     "bgf_m2": 350,
+     "rnd_jahre": 40
+    },
+    "rundung_stellen": 2
+   },
+   "korrekturen": [
+    {
+     "bez": "Abweichung der Restnutzungsdauer vom Normobjekt (40 Jahre)",
+     "feld": "rnd_jahre",
+     "art": "stufen",
+     "stufen": {
+      "10": -0.13,
+      "15": -0.11,
+      "20": -0.09,
+      "25": -0.06,
+      "30": -0.04,
+      "35": -0.02,
+      "40": 0.0,
+      "45": 0.02,
+      "50": 0.04,
+      "55": 0.06,
+      "60": 0.09,
+      "65": 0.11,
+      "70": 0.13,
+      "75": 0.15
+     },
+     "rundung_stellen": 2,
+     "hinweis": "Additiv auf den Tabellenwert."
+    },
+    {
+     "bez": "Abweichung der Bruttogrundfläche vom Normobjekt (350 m²)",
+     "feld": "bgf",
+     "art": "stufen",
+     "stufen": {
+      "100": 0.05,
+      "150": 0.04,
+      "200": 0.03,
+      "250": 0.02,
+      "300": 0.01,
+      "350": 0.0,
+      "400": -0.01,
+      "450": -0.02,
+      "500": -0.03,
+      "550": -0.04,
+      "600": -0.05
+     },
+     "rundung_stellen": 2,
+     "hinweis": "Additiv auf den Tabellenwert."
+    }
+   ],
+   "geltungsbereich": {
+    "extrapolation": "nicht_geregelt",
+    "interpolation": "Kreuzinterpolation zwischen beiden Achsen ausdrücklich vorgesehen",
+    "hinweis": "Wörtlich zur Modelltreue: 'Marktgerechte Werte können mit den hier veröffentlichten Sachwertfaktoren nur dann ermittelt werden, wenn bei der Verkehrswertableitung im gleichen Bewertungsmodell gearbeitet wird.'",
+    "spannen": {
+     "vorlaeufiger_sachwert_eur": [
+      50000,
+      600000
+     ],
+     "bodenrichtwert_eur_m2": [
+      20,
+      160
+     ],
+     "rnd_korrektur_jahre": [
+      10,
+      75
+     ],
+     "bgf_korrektur_m2": [
+      100,
+      600
+     ]
+    },
+    "stichprobe": {
+     "kaufpreis_eur": "183.966 (Median 170.000)",
+     "grundstueck_m2": "745 (Median 686)",
+     "bodenrichtwert_eur_m2": "65 (Median 50)",
+     "bgf_m2": 364,
+     "wohnflaeche_m2": 158,
+     "fiktives_baujahr": 1978,
+     "gnd_jahre": 80,
+     "rnd_jahre": "34 (Median 30)",
+     "vorlaeufiger_sachwert_eur": 272813,
+     "sachwertfaktor": "0,69 ± 0,24 (Median 0,68)"
+    }
+   },
+   "stufe": "A",
+   "fallzahl": 1221,
+   "streuung": 0.24,
+   "beleg": {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "S. 73",
+    "eingabe": {
+     "sachwert": 300000,
+     "brw": 80,
+     "rnd_jahre": 55,
+     "bgf": 300
+    },
+    "soll_tabellenwert": 0.7,
+    "soll_wert": 0.77,
+    "soll_zeilen": 56,
+    "soll_spalten": 8,
+    "soll_zellen": 448,
+    "soll_eckwerte": [
+     {
+      "sachwert": 50000,
+      "brw": 20,
+      "wert": 0.71
+     },
+     {
+      "sachwert": 50000,
+      "brw": 160,
+      "wert": 1.0
+     },
+     {
+      "sachwert": 600000,
+      "brw": 20,
+      "wert": 0.42
+     },
+     {
+      "sachwert": 600000,
+      "brw": 160,
+      "wert": 0.71
+     }
+    ],
+    "wortlaut": "Laut Tabelle beträgt der SF in einer BRW-Zone mit einem Bodenrichtwert von 80 Euro/m² und einem vorläufigen Sachwert in Höhe von 300.000 € = 0,70. Das Bewertungsobjekt hat jedoch keine RND von 40 Jahren, sondern von 55 Jahren. Die BGF beträgt nicht 350 m², sondern 300 m². Tabellenwert 0,70 + Zuschlag wegen längerer RND 0,06 + Zuschlag wegen geringerer BGF 0,01 = anzusetzender Sachwertfaktor 0,77.",
+    "pruefprotokoll": "Am 13.08.2026 gegen /root/ernte/out/swf_roh.json gemessen: 56 Zeilen × 8 Spalten = 448 Zellen, keine leere Zelle, Schrittweite y durchgehend 10.000 €, x durchgehend 20 €/m². Alle fünf Sollwerte getroffen (vier Eckwerte + Innenwert 300.000/80 → 0,70). Monotonie: alle 56 Zeilen steigend über den Bodenrichtwert, alle 8 Spalten fallend über den vorläufigen Sachwert, keine Ausreißerzeile. Wertebereich 0,42 bis 1,00.",
+    "negativtest": "Das fehlerhafte Suchmuster vom 11.08. fand 54 statt 56 Zeilen, weil die Zeilen 50.000 und 60.000 in der Spalte 160 auf 1,00 enden und das Muster 0,\\d\\d verlangte. Monotonie, Wertebereich und Anwendungsbeispiel gingen dabei ALLE durch — gefangen hat es allein die Zählprüfung gegen 56. Muster muss [01],\\d\\d lauten."
+   }
+  }
+ ]
+}

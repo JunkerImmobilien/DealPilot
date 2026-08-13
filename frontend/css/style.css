@@ -36956,3 +36956,42 @@ body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):not(.f
   }
 }
 /* ===== v1148-SPALT END ===== */
+
+/* ═══════════════════════════════════════════════════════════════
+   v1155-TABTEXT: Der Regler "Tab-Texte" wirkte nur im Hell-Skin
+
+   Marcels Befund: "Der Regler soll die Schriftfarbe der Reiterleiste
+   aendern. Bei Marcel aendert sich nichts."
+
+   Gemessen am 13.08. mit dem Kaskaden-Blick im Browser (nicht per grep —
+   die Regeln stehen in Kommalisten und waren so nicht zu finden):
+     - Der Regler setzt --dp-tab-text zuverlaessig.
+     - Gelesen wurde es nur von ZWEI Regeln, beide unter
+       `body.dp-chrome-hell` (Z. 35590/35591). Im Obsidian-Modus, dem
+       Auslieferungszustand, also von niemandem.
+     - Dazu setzen ELF Regeln `color: var(--gold …)` auf `nav.tabs .tab`,
+       ZEHN davon mit !important. Ein Token allein verliert dagegen immer.
+
+   Kein Spezifitaetskampf an elf Stellen: ein SCHALTER. settings.js setzt
+   body.dp-tabtext-an nur, wenn wirklich ein Nutzerwert vorliegt. Ohne
+   Nutzerwert greift hier nichts und alles bleibt bitgenau wie vorher.
+
+   Spezifitaet gerechnet gegen die staerkste Gegenregel
+   `header.hdr.has-v64-score + nav.tabs .tab.active` = (0,5,2):
+   der Selektor unten traegt html+body+.dp-tabtext-an davor und liegt bei
+   (0,6,4). Zusaetzlich steht er am Dateiende, gewinnt also auch bei
+   Gleichstand. !important, weil die Gegenseite es auch fuehrt.
+
+   Der Hell-Skin liest dasselbe Token und bekommt denselben Wert — kein
+   Widerspruch, nur eine Regel mehr, die faellt, wenn der Nutzer nichts
+   gewaehlt hat.
+═══════════════════════════════════════════════════════════════ */
+html body.dp-tabtext-an nav.tabs .tab,
+html body.dp-tabtext-an nav.tabs .tab.active,
+html body.dp-tabtext-an header.hdr + nav.tabs .tab,
+html body.dp-tabtext-an header.hdr + nav.tabs .tab.active,
+html body.dp-tabtext-an header.hdr.has-v64-score + nav.tabs .tab,
+html body.dp-tabtext-an header.hdr.has-v64-score + nav.tabs .tab.active {
+  color: var(--dp-tab-text, var(--gold, #C9A84C)) !important;
+}
+/* ===== v1155-TABTEXT END ===== */

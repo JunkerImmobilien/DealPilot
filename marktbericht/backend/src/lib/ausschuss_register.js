@@ -69,13 +69,43 @@ function indizieren(saetze) {
 /* ── Laden ─────────────────────────────────────────────────────────────── */
 
 /** Saatdatei aus dem Repo. Fehlt sie, bleibt das Register leer — aber laut. */
-export function ladeSaat(datei = join(HIER, 'register', 'lzs-nrw.json')) {
-  try {
-    const saetze = JSON.parse(readFileSync(datei, 'utf8'));
-    _index = indizieren(saetze);
+/* v1084-WSAAT · Eine Saatdatei je Kennzahl.
+ *
+ * Bis v1083 gab es genau eine Datei. Mit den Sachwertfaktoren kaeme eine
+ * zweite dazu — und die Versuchung waere, sie an dieselbe Stelle zu haengen.
+ * Das ginge einmal gut: beide Kennzahlen teilen sich den Index-Schluessel
+ * `kennzahl|ags`, und ein zweites JSON.parse() auf dieselbe Variable haette
+ * die erste Datei still ueberschrieben.
+ *
+ * Deshalb wird GESAMMELT und einmal indiziert. Fehlt eine Datei, laedt die
+ * andere trotzdem — aber die Luecke wird gemeldet, nicht verschwiegen. */
+export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json'];
+
+export function ladeSaat(dateien = SAATDATEIEN) {
+  const liste = (Array.isArray(dateien) ? dateien : [dateien])
+    .map((d) => (String(d).includes('/') ? String(d) : join(HIER, 'register', d)));
+  const alle = [];
+  const gelesen = [];
+  const vermisst = [];
+  for (const datei of liste) {
+    try {
+      const saetze = JSON.parse(readFileSync(datei, 'utf8'));
+      if (!Array.isArray(saetze)) throw new Error('kein Array');
+      alle.push(...saetze);
+      gelesen.push({ datei, saetze: saetze.length });
+    } catch (e) {
+      vermisst.push({ datei, fehler: e.message });
+      console.error('[register] Saatdatei nicht lesbar:', datei, e.message);
+    }
+  }
+  if (alle.length) {
+    _index = indizieren(alle);
     _herkunft = 'saatdatei';
-    _stand = { saetze: saetze.length, datei };
+    _stand = { saetze: alle.length, gelesen, vermisst };
     return _stand;
+  }
+  try {
+    throw new Error(vermisst.map((v) => v.fehler).join('; ') || 'keine Saatdatei');
   } catch (e) {
     console.error('[register] Saatdatei nicht lesbar:', e.message);
     /* 'fehlgeschlagen', NICHT 'leer' — sonst versucht der Lazy-Load es bei

@@ -1,0 +1,108 @@
+{
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+  "gaa_kennz": "10800",
+  "ags": ["05112000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "auswertezeitraum": null,
+  "beschlossen": null,
+  "veroeffentlicht": null,
+  "quelle_url": null,
+  "quelle_datei": "GMB 2026 Stadt Duisburg, Original-PDF (11.08.2026, pdftotext -layout). Im Erntedokument ist für den Jahrgang 2026 keine URL notiert; die im Vortagsdokument genannte Adresse (selektive.de) führt auf den GMB 2025 und damit auf die ALTEN Werte.",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "lizenz_hinweis": "Für den GMB 2026 ist im Erntedokument keine Lizenzangabe notiert. Der GMB 2025 führte dl-de/zero-2-0 — nicht ungeprüft übertragen.",
+  "fundstelle": "Kap. 5.1.4",
+  "modelle": [
+    {
+      "zweig": "efh",
+      "zweig_bez": "Einfamilienhäuser freistehend",
+      "form": "konstante",
+      "formel": {"form": "konstante", "wert": 1.13, "rundung_stellen": 2},
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Ein Faktor je Objektart, keine Matrix, keine Formel im Jahrgang 2026 erfasst. Stichprobe: RND 34 ± 14 Jahre · Kaufpreis 2.894 ± 1.031 €/m² Wfl · Wohnfläche 149 ± 35 m² · Ausstattungsstandard 2,7 ± 0,4 · vorläufiger Sachwert 380.607 ± 122.281 € · anrechenbare Baulandfläche 507 ± 137 m² · Bodenwertanteil 45 ± 15 % · lagetypischer Bodenwert 338 ± 101 €/m² · Wohnfläche ≥ 80 m², unvermietete Objekte.",
+        "vorjahr_dokumentation": {"berichtsjahr": 2025, "wert": 1.08}
+      },
+      "stufe": "A",
+      "fallzahl": 55,
+      "streuung": 0.22,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.4",
+        "soll_zeilen": 1,
+        "soll_spalten": 1,
+        "wortlaut": "Kein Anwendungsbeispiel zum Sachwertfaktor im Bericht. Ersatzprüfung: der Faktor 1,13 liegt innerhalb der Stichprobenstreuung (± 0,22) und über dem Vorjahreswert 1,08, was zur berichteten Marktentwicklung passt."
+      }
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Einfamilienhäuser Doppel-/Reihenendhäuser",
+      "form": "konstante",
+      "formel": {"form": "konstante", "wert": 1.33, "rundung_stellen": 2},
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Ein Faktor je Objektart.",
+        "vorjahr_dokumentation": {"berichtsjahr": 2025, "wert": 1.20}
+      },
+      "stufe": "A",
+      "fallzahl": 176,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.4",
+        "soll_zeilen": 1,
+        "soll_spalten": 1,
+        "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 176 Kauffälle, Wert liegt zwischen freistehendem EFH (1,13) und RMH (1,46) — die im Bericht durchgängige Ordnung freistehend < DHH/REH < RMH ist eingehalten."
+      }
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Einfamilienhäuser Reihenmittelhäuser",
+      "form": "konstante",
+      "formel": {"form": "konstante", "wert": 1.46, "rundung_stellen": 2},
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Ein Faktor je Objektart.",
+        "vorjahr_dokumentation": {"berichtsjahr": 2025, "wert": 1.35}
+      },
+      "stufe": "A",
+      "fallzahl": 84,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.4",
+        "soll_zeilen": 1,
+        "soll_spalten": 1,
+        "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 84 Kauffälle, höchster Faktor der vier Teilmärkte — Ordnung freistehend < DHH/REH < RMH eingehalten."
+      }
+    },
+    {
+      "zweig": "zfh",
+      "zweig_bez": "Zweifamilienhäuser",
+      "form": "konstante",
+      "formel": {"form": "konstante", "wert": 1.11, "rundung_stellen": 2},
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "hinweis": "Ein Faktor je Objektart.",
+        "vorjahr_dokumentation": {"berichtsjahr": 2025, "wert": 1.06}
+      },
+      "stufe": "A",
+      "fallzahl": 33,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.4",
+        "soll_zeilen": 1,
+        "soll_spalten": 1,
+        "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 33 Kauffälle, Wert 1,11 gegenüber Vorjahr 1,06."
+      }
+    }
+  ],
+  "unvollstaendig": "Der Bericht führt einen FÜNFTEN Teilmarkt (29 Kauffälle, im GMB 2025 die Dreifamilienhäuser mit 0,95). Sein Faktor für 2026 ist im Erntedokument als 'noch zu erfassen' markiert und deshalb hier NICHT hinterlegt."
+}

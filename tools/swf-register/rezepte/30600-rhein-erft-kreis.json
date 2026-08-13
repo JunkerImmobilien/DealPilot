@@ -1,0 +1,256 @@
+{
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "gaa_kennz": "30600",
+  "gaa_kennz_hinweis": "Kein Erntedokument nennt das Kennzeichen; am 13.08. aus /root/ernte/gmd2025/schluessel.csv nachgeschlagen: ags 05362000 · gaa_kennz 30600.",
+  "ags_form8": "05362000",
+  "ags": ["05362"],
+  "ebene": "kreis",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "2024-2025",
+  "beschlossen": null,
+  "veroeffentlicht": null,
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Rhein-Erft-Kreis/GMB_2026.pdf",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3, S. 45–47; Modellbeschreibung Kap. 8.4, S. 80–83",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Freistehende Ein- und Zweifamilienhäuser",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwert in Euro/m² (wie in www.boris.nrw.de veröffentlicht)",
+        "achse_y": [150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000, 600000, 650000, 700000],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "150000": [1.38, 1.35, 1.31, 1.27, 1.24, 1.22, null, null, null, null, null, null],
+          "200000": [1.27, 1.25, 1.23, 1.21, 1.19, 1.18, null, null, null, null, null, null],
+          "250000": [1.20, 1.19, 1.18, 1.17, 1.16, 1.15, 1.15, 1.14, 1.14, 1.13, 1.13, 1.13],
+          "300000": [1.14, 1.13, 1.13, 1.13, 1.13, 1.13, 1.13, 1.13, 1.13, 1.13, 1.13, 1.12],
+          "350000": [1.09, 1.09, 1.10, 1.10, 1.11, 1.11, 1.11, 1.11, 1.12, 1.12, 1.12, 1.12],
+          "400000": [1.05, 1.06, 1.07, 1.08, 1.09, 1.09, 1.10, 1.10, 1.11, 1.11, 1.12, 1.12],
+          "450000": [1.01, 1.03, 1.04, 1.06, 1.07, 1.08, 1.09, 1.09, 1.10, 1.11, 1.12, 1.12],
+          "500000": [0.98, 1.00, 1.02, 1.04, 1.06, 1.07, 1.08, 1.09, 1.10, 1.11, 1.12, 1.12],
+          "550000": [0.96, 0.98, 1.00, 1.02, 1.04, 1.05, 1.07, 1.08, 1.09, 1.10, 1.11, 1.12],
+          "600000": [0.93, 0.96, 0.98, 1.01, 1.03, 1.04, 1.06, 1.07, 1.08, 1.10, 1.11, 1.12],
+          "650000": [0.91, 0.94, 0.97, 0.99, 1.02, 1.04, 1.05, 1.07, 1.08, 1.10, 1.11, 1.13],
+          "700000": [null, 0.92, 0.95, 0.98, 1.01, 1.03, 1.04, 1.06, 1.08, 1.09, 1.11, 1.13]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "interpolation": "linear zwischen den BRW-Stufen und den tabellierten vorläufigen Sachwerten",
+        "hinweis": "Wörtlich: 'Die hier tabellierten Sachwertfaktoren sind ohne Minderung für eine Sachwertermittlung mit den Bodenrichtwerten 2026 anzuhalten. Ein Anpassungsfaktor zur Berücksichtigung sich ändernder Bodenrichtwerte (+0,03) wurde in den Tabellen bereits rechnerisch berücksichtigt. … Dabei ist ggf. zwischen den einzelnen BRW-Stufen und den tabellierten vorläufigen Sachwerten zu interpolieren. Das so erhaltene Ergebnis ist sachverständig zu interpretieren.' Auswertung: Objekte im Wesentlichen mängelfrei, nach 1945 errichtet, keine Neubauten, vorläufiger Sachwert zwischen 160.000 und 800.000 €. 1.098 Verträge insgesamt über alle vier Gebäudetypen.",
+        "alternativformel_dokumentation": {
+          "hinweis": "Der Bericht veröffentlicht zusätzlich die Potenzfunktion SWF = a × vSW^b mit je Bodenrichtwertstufe eigenen Konstanten. Dokumentation — maßgeblich ist die Tabelle.",
+          "form": "SWF = a * vSW^b",
+          "konstanten": {
+            "50":  {"a": 2079.54998, "b": -0.59703},
+            "100": {"a": 297.06025, "b": -0.44313},
+            "200": {"a": 42.43456, "b": -0.28924},
+            "400": {"a": 6.06171, "b": -0.13534},
+            "800": {"a": 0.86590, "b": 0.01855}
+          }
+        }
+      },
+      "stufe": "A",
+      "fallzahl": null,
+      "fallzahl_hinweis": "1.098 ausgewertete Verträge insgesamt über alle vier Gebäudetypen; eine Aufteilung je Gebäudetyp ist nicht abgedruckt.",
+      "streuung": null,
+      "streuung_hinweis": "Keine Standardabweichung und kein Bestimmtheitsmaß zu den Sachwertfaktoren ausgewiesen.",
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.3, S. 46",
+        "soll_zeilen": 12,
+        "soll_spalten": 12,
+        "wortlaut": "Kein Anwendungs-/Rechenbeispiel zum Sachwertfaktor abgedruckt — die Begriffe 'Anwendungsbeispiel', 'Rechenbeispiel' und 'Berechnungsbeispiel' kommen im Dokument nicht vor. Ersatzprüfung: 12 Zeilen (150.000 bis 700.000 € in 50.000er-Schritten) × 12 BRW-Spalten (200 bis 750 €/m² in 50er-Schritten); Monotonie fallend über den Sachwert bei niedrigen BRW, steigend über den BRW bei hohen Sachwerten.",
+        "monotonie_befund": "Die Spalte BRW 750 €/m² ist NICHT streng fallend: 250.000 → 1,13 · 300.000 bis 600.000 → 1,12 · 650.000 und 700.000 → 1,13. So steht es im Erntedokument; nicht geglättet. Beim Nachziehen am Original-PDF gezielt auf diese Spalte sehen."
+      }
+    },
+    {
+      "zweig": "rhdhh",
+      "zweig_bez": "Doppelhaushälften und Reihenendhäuser",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwert in Euro/m²",
+        "achse_y": [150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000, 600000, 650000, 700000],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "150000": [1.52, 1.49, 1.45, 1.41, 1.38, 1.36, null, null, null, null, null, null],
+          "200000": [1.38, 1.36, 1.34, 1.32, 1.30, 1.30, null, null, null, null, null, null],
+          "250000": [1.28, 1.28, 1.27, 1.26, 1.25, 1.25, 1.25, 1.24, 1.24, 1.23, 1.23, 1.23],
+          "300000": [1.21, 1.21, 1.21, 1.21, 1.21, 1.21, 1.21, 1.21, 1.21, 1.21, 1.22, 1.22],
+          "350000": [1.15, 1.15, 1.16, 1.17, 1.18, 1.18, 1.19, 1.19, 1.19, 1.20, 1.20, 1.21],
+          "400000": [1.10, 1.11, 1.12, 1.14, 1.15, 1.16, 1.16, 1.17, 1.18, 1.19, 1.19, 1.20],
+          "450000": [1.05, 1.07, 1.09, 1.11, 1.13, 1.13, 1.14, 1.15, 1.16, 1.17, 1.18, 1.19],
+          "500000": [null, 1.04, 1.06, 1.08, 1.10, 1.12, 1.13, 1.14, 1.15, 1.16, 1.18, 1.19],
+          "550000": [null, 1.01, 1.03, 1.06, 1.08, 1.10, 1.11, 1.13, 1.14, 1.15, 1.17, 1.18],
+          "600000": [null, 0.98, 1.01, 1.04, 1.07, 1.08, 1.10, 1.11, 1.13, 1.15, 1.16, 1.18],
+          "650000": [null, null, null, null, 1.05, 1.07, 1.09, 1.10, 1.12, 1.14, 1.16, 1.17],
+          "700000": [null, null, null, null, 1.04, 1.06, 1.08, 1.09, 1.11, 1.13, 1.15, 1.17]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "interpolation": "linear zwischen den BRW-Stufen und den tabellierten vorläufigen Sachwerten",
+        "hinweis": "Anpassungsfaktor +0,03 für sich ändernde Bodenrichtwerte ist in den Tabellenwerten bereits enthalten.",
+        "alternativformel_dokumentation": {
+          "form": "SWF = a * vSW^b",
+          "konstanten": {
+            "50":  {"a": 4744.53403, "b": -0.65899},
+            "100": {"a": 655.18805, "b": -0.50166},
+            "200": {"a": 90.47704, "b": -0.34433},
+            "400": {"a": 12.49427, "b": -0.18700},
+            "800": {"a": 1.72537, "b": -0.02967}
+          }
+        }
+      },
+      "stufe": "A",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.3, S. 46",
+        "soll_zeilen": 12,
+        "soll_spalten": 12,
+        "wortlaut": "Kein Anwendungsbeispiel im Bericht. Ersatzprüfung: 12 Zeilen × 12 Spalten, Monotonie fallend über den Sachwert, steigend über den Bodenrichtwert."
+      }
+    },
+    {
+      "zweig": "rmh",
+      "zweig_bez": "Reihenmittelhäuser",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwert in Euro/m²",
+        "achse_y": [150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "150000": [1.54, 1.54, 1.54, 1.54, 1.55, 1.55, null, null, null, null, null, null],
+          "200000": [1.36, 1.37, 1.39, 1.40, 1.42, 1.42, 1.43, 1.44, 1.45, 1.46, 1.46, 1.47],
+          "250000": [1.24, 1.26, 1.28, 1.30, 1.32, 1.34, 1.35, 1.36, 1.37, 1.38, 1.40, 1.41],
+          "300000": [1.14, 1.17, 1.20, 1.23, 1.25, 1.27, 1.28, 1.30, 1.31, 1.33, 1.34, 1.36],
+          "350000": [1.07, 1.10, 1.13, 1.16, 1.20, 1.21, 1.23, 1.25, 1.26, 1.28, 1.30, 1.32],
+          "400000": [1.01, 1.05, 1.08, 1.11, 1.15, 1.17, 1.19, 1.21, 1.22, 1.24, 1.26, 1.28],
+          "450000": [null, null, null, 1.07, 1.11, 1.13, 1.15, 1.17, 1.19, 1.21, 1.23, 1.25],
+          "500000": [null, null, null, 1.03, 1.07, 1.09, 1.12, 1.14, 1.16, 1.18, 1.21, 1.23],
+          "550000": [null, null, null, 1.00, 1.04, 1.07, 1.09, 1.11, 1.13, 1.16, 1.18, 1.20]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "interpolation": "linear zwischen den BRW-Stufen und den tabellierten vorläufigen Sachwerten",
+        "hinweis": "Anpassungsfaktor +0,03 ist in den Tabellenwerten bereits enthalten.",
+        "alternativformel_dokumentation": {
+          "form": "SWF = a * vSW^b",
+          "konstanten": {
+            "50":  {"a": 5169.24971, "b": -0.68433},
+            "100": {"a": 1186.14270, "b": -0.56019},
+            "200": {"a": 272.17383, "b": -0.43605},
+            "400": {"a": 62.45336, "b": -0.31190},
+            "800": {"a": 14.33063, "b": -0.18776}
+          }
+        }
+      },
+      "stufe": "A",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.3, S. 46",
+        "soll_zeilen": 9,
+        "soll_spalten": 12,
+        "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 9 Zeilen (150.000 bis 550.000 €) × 12 BRW-Spalten, Monotonie fallend über den Sachwert, steigend über den Bodenrichtwert."
+      }
+    },
+    {
+      "zweig": "fertighaus",
+      "zweig_bez": "Fertighäuser",
+      "form": "matrix_interp",
+      "formel": {
+        "form": "matrix_interp",
+        "achse_x": [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750],
+        "achse_x_feld": "brw",
+        "achse_x_bez": "Bodenrichtwert in Euro/m²",
+        "achse_y": [150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000, 600000, 650000],
+        "achse_y_feld": "sachwert",
+        "achse_y_bez": "vorläufiger Sachwert in Euro",
+        "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+        "zellen": {
+          "150000": [1.23, 1.28, 1.34, null, null, null, null, null, null, null, null, null],
+          "200000": [1.18, 1.22, 1.27, 1.31, 1.35, 1.38, null, null, null, null, null, null],
+          "250000": [1.15, 1.18, 1.21, 1.24, 1.28, 1.29, 1.31, null, null, null, null, null],
+          "300000": [1.12, 1.14, 1.17, 1.19, 1.22, 1.23, 1.25, 1.26, 1.27, null, null, null],
+          "350000": [1.09, 1.11, 1.13, 1.15, 1.17, 1.18, 1.19, 1.20, 1.21, 1.22, 1.23, 1.24],
+          "400000": [1.07, 1.09, 1.10, 1.12, 1.13, 1.14, 1.15, 1.16, 1.16, 1.17, 1.18, 1.19],
+          "450000": [1.06, 1.07, 1.08, 1.09, 1.10, 1.10, 1.11, 1.11, 1.12, 1.13, 1.13, 1.14],
+          "500000": [null, 1.05, 1.06, 1.06, 1.07, 1.07, 1.08, 1.08, 1.08, 1.09, 1.09, 1.09],
+          "550000": [null, 1.03, 1.04, 1.04, 1.04, 1.05, 1.05, 1.05, 1.05, 1.05, 1.06, 1.06],
+          "600000": [null, null, 1.02, 1.02, 1.02, 1.02, 1.02, 1.02, 1.02, 1.02, 1.02, 1.03],
+          "650000": [null, null, null, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "interpolation": "linear zwischen den BRW-Stufen und den tabellierten vorläufigen Sachwerten",
+        "hinweis": "Wörtlich: 'Bei der Ermittlung der Sachwertfaktoren für Fertighäuser wurden nur Objekte ausgewertet, die ab 1980 errichtet wurden und zum Kaufzeitpunkt mind. 2 Jahre alt waren.' Anpassungsfaktor +0,03 ist in den Tabellenwerten bereits enthalten.",
+        "alternativformel_dokumentation": {
+          "form": "SWF = a * vSW^b",
+          "konstanten": {
+            "50":  {"a": 0.25006, "b": 0.10246},
+            "100": {"a": 1.26237, "b": -0.01887},
+            "200": {"a": 6.37273, "b": -0.14021},
+            "400": {"a": 32.17090, "b": -0.26155},
+            "800": {"a": 162.40567, "b": -0.38288}
+          }
+        }
+      },
+      "stufe": "A",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.3, S. 47",
+        "soll_zeilen": 11,
+        "soll_spalten": 12,
+        "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 11 Zeilen (150.000 bis 650.000 €) × 12 BRW-Spalten, Monotonie fallend über den Sachwert, steigend über den Bodenrichtwert."
+      }
+    }
+  ],
+  "modellansaetze": {
+    "wortlaut": "AGVGA-NRW-Modell zur Ableitung von Sachwertfaktoren, 'das im Wesentlichen auch vom Gutachterausschuss des Rhein-Erft-Kreises angewendet wird'. Handlungsempfehlung AGVGA.NRW von Dezember 2023, angewendet ab 01.01.2026.",
+    "nhk": "NHK 2010",
+    "bezugsmassstab": "Bruttogrundfläche (BGF)",
+    "baupreisindex": "Statistisches Bundesamt",
+    "gnd": "Modellansatz nach Anlage 1 ImmoWertV (80 Jahre); Gewerbe seit 2023 einheitlich 60 Jahre",
+    "rnd": "Gesamtnutzungsdauer abzüglich Alter, unter Berücksichtigung von Modernisierungsmaßnahmen",
+    "alterswertminderung": "linear",
+    "aussenanlagen": "4 – 8 % des vorläufigen Sachwerts der baulichen Anlagen",
+    "bodenwert": "auf Grundlage des Bodenrichtwertes zum Vertragsdatum",
+    "regionalfaktor": 1.0,
+    "gartenland_hinterland": "Arrondierungsflächen unter 500 m² ohne separate Zuwegung: 10 – 20 % des umgebenden Baulandrichtwertes (47 Fälle 2021–2025)"
+  }
+}

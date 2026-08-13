@@ -1,0 +1,306 @@
+{
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+  "gaa_kennz": "10700",
+  "ags": ["05111000"],
+  "ebene": "gemeinde",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "auswertezeitraum": "2016-2021",
+  "auswertezeitraum_hinweis": "Wörtlich: 'Den Regressionsanalysen zur Ableitung von Umrechnungskoeffizienten für Sachwertfaktor-Richtwerte liegen in allen drei Teilmärkten die Jahrgänge 2016 bis 2021 zu Grunde.' Und: 'Die ausgewerteten Kauffälle des Jahres 2025 reichten nicht aus um den Sachwertfaktor in den verschiedenen Kategorien abzuleiten. Daher ist der Sachwertfaktor aus den Werten für 2023 unter Berücksichtigung der Entwicklung der Kaufpreise des entsprechenden Teilmarktes, sowie der Entwicklung der Bodenrichtwerte und der Baukosten, sachverständig fortgeschrieben worden.'",
+  "beschlossen": "2026-01-29",
+  "veroeffentlicht": "2026-02-14",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10700_2026.pdf",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kap. 5.1.3 (S. 41), 5.2.3 (S. 44), 5.3.5 (S. 48); Modell Kap. 8.7 (S. 74/75)",
+  "modelle": [
+    {
+      "zweig": "ezfh",
+      "zweig_bez": "Freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften",
+      "form": "matrix_band",
+      "formel": {
+        "form": "matrix_band",
+        "achse_y_feld": "baulandflaeche",
+        "achse_y_bez": "Baulandfläche in m²",
+        "baender_y": [
+          {"von": 151, "bis": 200, "bez": "151 bis 200 m²"},
+          {"von": 201, "bis": 350, "bez": "201 bis 350 m²"},
+          {"von": 351, "bis": 450, "bez": "351 bis 450 m²"},
+          {"von": 451, "bis": 550, "bez": "451 bis 550 m²"},
+          {"von": 551, "bis": 650, "bez": "551 bis 650 m²"},
+          {"von": 651, "bis": 750, "bez": "651 bis 750 m²"},
+          {"von": 751, "bis": 850, "bez": "751 bis 850 m²"},
+          {"von": 851, "bis": 1000, "bez": "851 bis 1000 m²"}
+        ],
+        "achse_x_feld": "baujahr",
+        "achse_x_bez": "Baujahresgruppe",
+        "baender_x": [
+          {"von": null, "bis": 1918, "bez": "Baujahre bis 1918"},
+          {"von": 1919, "bis": 1948, "bez": "Baujahr 1919 bis 1948"},
+          {"von": 1949, "bis": 1976, "bez": "Baujahre 1949 bis 1976"},
+          {"von": 1977, "bis": 1994, "bez": "Baujahre 1977 bis 1994"},
+          {"von": 1995, "bis": null, "bez": "Baujahre ab 1995 ohne Neubau"},
+          {"von": null, "bis": null, "bez": "Neubau 3 Jahre"}
+        ],
+        "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+        "zellen": {
+          "151 bis 200 m²":  [1.20, 1.15, 1.25, 1.30, 1.35, 0.85],
+          "201 bis 350 m²":  [1.10, 1.05, 1.15, 1.30, 1.10, 1.00],
+          "351 bis 450 m²":  [1.10, 0.95, 1.00, 1.00, 0.90, 0.90],
+          "451 bis 550 m²":  [0.90, 0.85, 0.85, 0.95, 0.85, 0.80],
+          "551 bis 650 m²":  [0.85, 0.85, 0.85, 0.85, 0.85, 0.80],
+          "651 bis 750 m²":  [0.75, 0.80, 0.75, 0.80, 0.75, 0.75],
+          "751 bis 850 m²":  [0.75, 0.75, 0.80, 0.75, 0.80, null],
+          "851 bis 1000 m²": [0.70, 0.70, 0.75, 0.75, 0.80, null]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "interpolation": "keine",
+        "hinweis": "Beide Achsen sind Bänder — NICHT interpolieren. Wörtlich: 'Bei Abweichungen des Bewertungsobjektes von der Norm des Sachwertfaktor-Objektes sind sachverständige Zu- und Abschläge anzubringen. In bevorzugten Lagen kann im Einzelfall der angepasste Sachwertfaktor auch über 2,0 liegen.' Und: 'Bei Anpassungen im Randbereich der Normdefinitionen ist sachverständig abzuwägen.'",
+        "sachverstaendige_zuschlaege": [
+          {"merkmal": "Wohnfläche", "norm": "100 bis 220 m²", "auspraegung": "unter 100 m²", "spanne": "bis − 10 %"},
+          {"merkmal": "Wohnfläche", "norm": "100 bis 220 m²", "auspraegung": "über 220 m²", "spanne": "bis + 10 %"},
+          {"merkmal": "Lage im Stadtgebiet", "norm": "mittel (mittlere Randlage)", "auspraegung": "gut bis sehr gut", "spanne": "bis + 20 %"},
+          {"merkmal": "Modernisierung, nicht bei Neubauten", "norm": "umfangreiche Modernisierung innerhalb der letzten 20 Jahre", "auspraegung": "teilweise / nicht modernisiert", "spanne": "bis − 15 %"},
+          {"merkmal": "Ausstattung", "norm": "mittel", "auspraegung": "stark gehoben", "spanne": "bis + 5 %"},
+          {"merkmal": "Ausstattung", "norm": "mittel", "auspraegung": "gehoben", "spanne": "+/− 0 %"},
+          {"merkmal": "Ausstattung", "norm": "mittel", "auspraegung": "einfach", "spanne": "bis − 10 %"},
+          {"merkmal": "Immissionen", "norm": "keine", "auspraegung": "vorhanden", "spanne": "bis − 5 %"},
+          {"merkmal": "Gebäudeart", "norm": "freist. EFH/Doppelhaushälfte", "auspraegung": "Villa", "spanne": "bis + 25 %"}
+        ],
+        "zuschlag_hinweis": "Die sA-Zu-/Abschläge sind OBERGRENZEN ('bis ± X %') und sachverständig abzuwägen — sie sind bewusst NICHT als rechenbare Korrekturen hinterlegt."
+      },
+      "stufe": "B",
+      "stufe_begruendung": "Amtlich und gemeindescharf, aber der Bericht weist die Werte selbst als sachverständig fortgeschrieben aus (Datenbasis 2025 unzureichend, Fortschreibung aus 2023) und nennt weder Kauffallzahlen noch Standardabweichungen zu den Sachwertfaktoren.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.1.3, S. 41",
+        "soll_zeilen": 8,
+        "soll_spalten": 6,
+        "wortlaut": "Kein Anwendungs-/Rechenbeispiel zum Sachwertfaktor abgedruckt (zweifach gegengeprüft). Die abgedruckten Berechnungsbeispiele (Kap. 8.3 S. 57, Kap. 8.6 S. 59, 'Beispiele' S. 72) betreffen Umrechnungskoeffizienten, Lagekorrektur und Bodenwertableitung. Ersatzprüfung: 8 Flächenbänder × 6 Baujahresgruppen = 48 Zellen, davon 2 leer."
+      }
+    },
+    {
+      "zweig": "rh",
+      "zweig_bez": "Reihenhäuser (Reihenend-/Reihenmittelhaus)",
+      "form": "matrix_band",
+      "formel": {
+        "form": "matrix_band",
+        "achse_y_feld": "baulandflaeche",
+        "achse_y_bez": "Baulandfläche in m²",
+        "baender_y": [
+          {"von": 151, "bis": 200, "bez": "151 bis 200 m²"},
+          {"von": 201, "bis": 250, "bez": "201 bis 250 m²"},
+          {"von": 251, "bis": 350, "bez": "251 bis 350 m²"},
+          {"von": 351, "bis": 450, "bez": "351 bis 450 m²"}
+        ],
+        "achse_x_feld": "baujahr",
+        "achse_x_bez": "Baujahresgruppe",
+        "baender_x": [
+          {"von": null, "bis": 1918, "bez": "Baujahre bis 1918"},
+          {"von": 1919, "bis": 1948, "bez": "Baujahr 1919 bis 1948"},
+          {"von": 1949, "bis": 1976, "bez": "Baujahre 1949 bis 1976"},
+          {"von": 1977, "bis": 1994, "bez": "Baujahre 1977 bis 1994"},
+          {"von": 1995, "bis": null, "bez": "Baujahre ab 1995 ohne Neubau"},
+          {"von": null, "bis": null, "bez": "Neubau 3 Jahre"}
+        ],
+        "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+        "zellen": {
+          "151 bis 200 m²": [1.80, 1.45, 1.45, 1.65, 1.55, 1.20],
+          "201 bis 250 m²": [1.70, 1.35, 1.40, 1.60, 1.40, 1.15],
+          "251 bis 350 m²": [1.45, 1.30, 1.25, 1.45, 1.40, 1.10],
+          "351 bis 450 m²": [1.40, 1.25, 1.05, 1.20, 1.30, 1.00]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "interpolation": "keine",
+        "hinweis": "Beide Achsen sind Bänder — nicht interpolieren.",
+        "sachverstaendige_zuschlaege": [
+          {"merkmal": "Gebäudeart", "norm": "Reihenend/-mittelhaus", "auspraegung": "Reihenstadthaus", "spanne": "bis + 50 %"},
+          {"merkmal": "Wohnfläche", "norm": "100 bis 170 m²", "auspraegung": "unter 100 m²", "spanne": "bis − 15 %"},
+          {"merkmal": "Wohnfläche", "norm": "100 bis 170 m²", "auspraegung": "über 170 m²", "spanne": "bis + 15 %"},
+          {"merkmal": "Lage im Stadtgebiet", "norm": "mittel (mittlere Randlage)", "auspraegung": "gut bis sehr gut", "spanne": "bis + 15 %"},
+          {"merkmal": "Modernisierung, nicht bei Neubauten", "norm": "umfangreiche Modernisierung innerhalb der letzten 20 Jahre", "auspraegung": "teilweise / nicht modernisiert", "spanne": "bis − 10 %"},
+          {"merkmal": "Ausstattung", "norm": "mittel", "auspraegung": "stark gehoben", "spanne": "bis + 5 %"},
+          {"merkmal": "Ausstattung", "norm": "mittel", "auspraegung": "gehoben", "spanne": "+/− 0 %"},
+          {"merkmal": "Immissionen", "norm": "keine", "auspraegung": "vorhanden", "spanne": "bis − 5 %"}
+        ],
+        "zuschlag_hinweis": "Obergrenzen, sachverständig abzuwägen — bewusst nicht als rechenbare Korrekturen hinterlegt."
+      },
+      "stufe": "B",
+      "stufe_begruendung": "wie ezfh: sachverständig fortgeschrieben, keine Fallzahlen/Streuungen ausgewiesen.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.2.3, S. 44",
+        "soll_zeilen": 4,
+        "soll_spalten": 6,
+        "wortlaut": "Kein Anwendungsbeispiel zum Sachwertfaktor. Ersatzprüfung: 4 Flächenbänder × 6 Baujahresgruppen = 24 Zellen, vollständig belegt."
+      }
+    },
+    {
+      "zweig": "dreifh",
+      "zweig_bez": "Dreifamilienhäuser",
+      "form": "matrix_band",
+      "formel": {
+        "form": "matrix_band",
+        "achse_y_feld": "gebaeudegruppe",
+        "achse_y_bez": "Gebäudegruppe",
+        "baender_y": [
+          {"von": null, "bis": null, "bez": "Dreifamilienhäuser"}
+        ],
+        "achse_x_feld": "baujahr",
+        "achse_x_bez": "Baujahresgruppe",
+        "baender_x": [
+          {"von": null, "bis": 1918, "bez": "bis 1918"},
+          {"von": 1919, "bis": 1948, "bez": "1919 bis 1948"},
+          {"von": 1949, "bis": 1976, "bez": "1949 bis 1976"},
+          {"von": 1977, "bis": 1994, "bez": "1977 bis 1994"},
+          {"von": 1995, "bis": null, "bez": "ab 1995 ohne Neubau"},
+          {"von": null, "bis": null, "bez": "Neubau 3 Jahre"}
+        ],
+        "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+        "zellen": {
+          "Dreifamilienhäuser": [0.90, 1.00, 0.90, 0.90, 0.95, null]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "interpolation": "keine",
+        "hinweis": "Aus Tabelle 5.3.5 (drei Gebäudegruppen in einer Tabelle) als eigenes Modell je Gebäudegruppe geführt. Wörtlich: 'Insbesondere bei citynahen Objekten ist darauf zu achten, dass der Bodenrichtwert sachverständig an die Mikrolage anzupassen ist.'",
+        "sachverstaendige_zuschlaege": [
+          {"merkmal": "Maß der baulichen Nutzung (WGFZ)", "norm": "1,0 bis 3,0", "auspraegung": "unter 1,0", "spanne": "bis − 5 %"},
+          {"merkmal": "Maß der baulichen Nutzung (WGFZ)", "norm": "1,0 bis 3,0", "auspraegung": "über 3,0", "spanne": "bis + 25 %"},
+          {"merkmal": "Lage im Stadtgebiet", "norm": "mittel (mittlere Randlage)", "auspraegung": "gut bis sehr gut (zentrumsnah)", "spanne": "bis + 10 %"},
+          {"merkmal": "Modernisierung, nicht bei Neubauten", "norm": "umfangreiche Modernisierung innerhalb der letzten 20 Jahre", "auspraegung": "teilweise / nicht modernisiert", "spanne": "bis − 15 %"},
+          {"merkmal": "Ausstattung", "norm": "mittel", "auspraegung": "einfach", "spanne": "bis − 10 %"},
+          {"merkmal": "Ausstattung", "norm": "mittel", "auspraegung": "gehoben", "spanne": "+/− 0 %"},
+          {"merkmal": "Ausstattung", "norm": "mittel", "auspraegung": "stark gehoben", "spanne": "bis + 10 %"}
+        ]
+      },
+      "stufe": "B",
+      "stufe_begruendung": "sachverständig fortgeschrieben, keine Fallzahlen/Streuungen.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.3.5, S. 48",
+        "soll_zeilen": 1,
+        "soll_spalten": 6,
+        "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 6 Baujahresgruppen, Spalte 'Neubau 3 Jahre' im Bericht leer."
+      }
+    },
+    {
+      "zweig": "mfh",
+      "zweig_bez": "Mehrfamilienhäuser (< 20 % gewerbl. Anteil am Rohertrag)",
+      "form": "matrix_band",
+      "formel": {
+        "form": "matrix_band",
+        "achse_y_feld": "gebaeudegruppe",
+        "achse_y_bez": "Gebäudegruppe",
+        "baender_y": [
+          {"von": null, "bis": null, "bez": "Mehrfamilienhäuser (< 20 % gewerbl. Anteil am Rohertrag)"}
+        ],
+        "achse_x_feld": "baujahr",
+        "achse_x_bez": "Baujahresgruppe",
+        "baender_x": [
+          {"von": null, "bis": 1918, "bez": "bis 1918"},
+          {"von": 1919, "bis": 1948, "bez": "1919 bis 1948"},
+          {"von": 1949, "bis": 1976, "bez": "1949 bis 1976"},
+          {"von": 1977, "bis": 1994, "bez": "1977 bis 1994"},
+          {"von": 1995, "bis": null, "bez": "ab 1995 ohne Neubau"},
+          {"von": null, "bis": null, "bez": "Neubau 3 Jahre"}
+        ],
+        "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+        "zellen": {
+          "Mehrfamilienhäuser (< 20 % gewerbl. Anteil am Rohertrag)": [0.95, 1.05, 1.05, 1.10, 0.90, null]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "interpolation": "keine",
+        "hinweis": "Aus Tabelle 5.3.5. Dieselben sA-Merkmale wie bei den Dreifamilienhäusern (WGFZ, Lage, Modernisierung, Ausstattung) — Obergrenzen, sachverständig abzuwägen."
+      },
+      "stufe": "B",
+      "stufe_begruendung": "sachverständig fortgeschrieben, keine Fallzahlen/Streuungen.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.3.5, S. 48",
+        "soll_zeilen": 1,
+        "soll_spalten": 6,
+        "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 6 Baujahresgruppen, Spalte 'Neubau 3 Jahre' leer."
+      }
+    },
+    {
+      "zweig": "ggg",
+      "zweig_bez": "gemischt genutzte Gebäude (35 – 45 % gewerbl. Anteil am Rohertrag)",
+      "form": "matrix_band",
+      "formel": {
+        "form": "matrix_band",
+        "achse_y_feld": "gebaeudegruppe",
+        "achse_y_bez": "Gebäudegruppe",
+        "baender_y": [
+          {"von": null, "bis": null, "bez": "gemischt genutzte Gebäude (35 – 45 % gewerbl. Anteil am Rohertrag)"}
+        ],
+        "achse_x_feld": "baujahr",
+        "achse_x_bez": "Baujahresgruppe",
+        "baender_x": [
+          {"von": null, "bis": 1918, "bez": "bis 1918"},
+          {"von": 1919, "bis": 1948, "bez": "1919 bis 1948"},
+          {"von": 1949, "bis": 1976, "bez": "1949 bis 1976"},
+          {"von": 1977, "bis": 1994, "bez": "1977 bis 1994"},
+          {"von": 1995, "bis": null, "bez": "ab 1995 ohne Neubau"},
+          {"von": null, "bis": null, "bez": "Neubau 3 Jahre"}
+        ],
+        "zellen_schluessel": "bez des y-Bandes -> Werte in Reihenfolge baender_x",
+        "zellen": {
+          "gemischt genutzte Gebäude (35 – 45 % gewerbl. Anteil am Rohertrag)": [0.90, 0.90, 1.00, 0.90, null, null]
+        },
+        "rundung_stellen": 2
+      },
+      "korrekturen": [],
+      "geltungsbereich": {
+        "extrapolation": "nicht_geregelt",
+        "interpolation": "keine",
+        "hinweis": "Aus Tabelle 5.3.5. Dieselben sA-Merkmale wie bei den Dreifamilienhäusern."
+      },
+      "stufe": "B",
+      "stufe_begruendung": "sachverständig fortgeschrieben, keine Fallzahlen/Streuungen.",
+      "fallzahl": null,
+      "streuung": null,
+      "beleg": {
+        "art": "zaehlpruefung",
+        "fundstelle": "Kap. 5.3.5, S. 48",
+        "soll_zeilen": 1,
+        "soll_spalten": 6,
+        "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 6 Baujahresgruppen, die beiden rechten Spalten im Bericht leer."
+      }
+    }
+  ],
+  "modellansaetze": {
+    "wortlaut": "Kap. 8.7: 'Die Auswertung der Sachwertfaktoren erfolgt nach den Grundsätzen des Sachwertverfahrens (ImmoWertV). … Bei der Anwendung der Sachwertfaktoren sind die angegebenen Modellparameter zwingend zu beachten (Modellkonformität).'",
+    "nhk": "NHK 2010, Baunebenkosten enthalten",
+    "baupreisindex": "Statistisches Bundesamt",
+    "regionalfaktor": 1.0,
+    "gnd": "gemäß Anlage 1 ImmoWertV",
+    "rnd": "sachverständig über Punktetabelle für Modernisierungselemente",
+    "aussenanlagen": "pauschal 8.000 EUR (fester Betrag, kein Prozentsatz)",
+    "gartenland_hinterland": "20 bis 30 % des vorderen Baulandwertes (Kap. 4.1.1, S. 26)",
+    "agvga": "Ein AGVGA-NRW-Modell wird NICHT als Grundlage genannt ('AGVGA' erscheint nur im Abkürzungsverzeichnis)."
+  }
+}

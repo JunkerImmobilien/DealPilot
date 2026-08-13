@@ -3430,7 +3430,66 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
   function LS(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} }
   function ci(fn,ls,def,label){ var v; try{ v=LS(ls)||def; }catch(e){ v=def; }
     return '<label class="dp-tb-row"><span>'+label+'</span><input type="color" value="'+v+'" oninput="'+fn+'(this.value)"></label>'; }
-  window._dpDispTabText=function(h){ document.body.style.setProperty('--dp-tab-text',h); LS('dp_tabtext_ui',h); };
+  /* v1155-TABTEXT · Marcels Befund: „Regler Tab-Texte wirkt nicht."
+     Gemessen: der Regler setzte --dp-tab-text zuverlaessig, aber gelesen
+     wurde es nur von zwei Regeln, die an `body.dp-chrome-hell` haengen —
+     im Obsidian-Modus also von niemandem. Dazu kam der Kaskaden-Befund:
+     ELF Regeln in style.css setzen `color: var(--gold …)` auf die Tabs,
+     ZEHN davon mit !important. Ein Token allein verliert dagegen immer.
+     (Mein grep fand sie zuerst nicht — sie stehen in Kommalisten. Nur der
+     Kaskaden-Blick im Browser zeigte sie.)
+
+     Deshalb ein SCHALTER statt eines Spezifitaetskampfs an elf Stellen:
+     body.dp-tabtext-an wird nur gesetzt, wenn wirklich ein Wert vorliegt.
+     Die zugehoerige Regel steht in css/style.css (v1155-TABTEXT) mit
+     hoeherer Spezifitaet als die stoerkste Gegenregel und !important.
+     Ohne Nutzerwert bleibt alles bitgenau wie vorher — kein Attribut,
+     keine Klasse, dieselbe Goldregel wie immer. */
+  function _tabTextAn(h){ try{ document.body.classList.toggle('dp-tabtext-an', !!h); }catch(e){} }
+
+  /* ── v1157-TABTEXT · Der Sweeper verwarf den Nutzerwert ────────────────
+     v1155 machte den Regler wirksam, aber nur bis zum naechsten
+     Akzentwechsel. Die Kette ist jetzt zu Ende gemessen:
+
+       whitelabel-override.js `sweepInline()` laeuft ueber ALLE `[style]`-
+       Elemente — der <body> ist einer davon, denn dort standen unsere
+       Custom Properties. Jede Aenderung merkt es sich in `_touchedAttr`
+       mit dem ORIGINALWERT. Bei einem Akzentwechsel ruft `apply()` (Z. 483)
+       `reset()`, und `reset()` spielt genau diese Originale per
+       `setAttribute` zurueck. Alles, was NACH dem ersten Sweep in den
+       Body-Inline-Stil geschrieben wurde, ist damit weg.
+
+     Deshalb schreibt der Regler nicht mehr an `body.style`, sondern in ein
+     eigenes <style>-Element. Der Sweeper fasst fremde Stylesheets nur
+     LESEND an (er sammelt Gold-Literale und schreibt umgefaerbte Kopien in
+     sein eigenes Overlay) — er kann sie nicht zuruecksetzen.
+
+     v1157b · EIGENE FEHLANNAHME, im Pruefstand widerlegt. Hier stand, der
+     Sweeper faerbe den Standardwert #C9A84C in diesem Sheet wie jedes andere
+     Gold-Literal mit, der Tab-Text folge dann dem Akzent. **Er tut es
+     nicht.** Gemessen: bei Akzent #0F6E6E und Reglerwert #C9A84C blieb der
+     Tab-Text rgb(201,168,76), also Gold. `_collect()` sammelt Farbwerte aus
+     Regeln, aber keine Custom-Property-DEFINITIONEN (`--x: #hex`).
+
+     Das Verhalten ist trotzdem richtig, nur anders begruendet: wer im Regler
+     Gold waehlt, bekommt Gold — auch unter einem anderen Akzent. Der Regler
+     ist eine Nutzerentscheidung, keine Ableitung. Wer den Akzent folgen
+     lassen will, laesst den Regler unberuehrt: dann greift die Klasse
+     `dp-tabtext-an` nicht und die alten Gold-Regeln gelten wie immer.
+
+     Der alte Body-Inline-Wert wird beim Setzen ENTFERNT: er liegt naeher am
+     Element als `:root` und wuerde sonst gewinnen. */
+  function _tabTextCss(h){
+    try{
+      var id='dp-textfein-css', st=document.getElementById(id);
+      if(!st){ st=document.createElement('style'); st.id=id; document.head.appendChild(st); }
+      st.textContent = h ? (':root{--dp-tab-text:'+h+'}') : '';
+    }catch(e){}
+  }
+  window._dpDispTabText=function(h){
+    try{ document.body.style.removeProperty('--dp-tab-text'); }catch(e){}
+    _tabTextCss(h); _tabTextAn(h); LS('dp_tabtext_ui',h);
+  };
   window._dpDispObjText=function(h){ document.body.style.setProperty('--dp-obj-text',h); LS('dp_objtext_ui',h); };
   /* Extra-Farbregler in die Toolbar einhaengen (vor dem Logo-Block) */
   var _oldLogo=window._dpLogoBlock;
@@ -3455,7 +3514,10 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     if(_oldOpen) _oldOpen();
   };
   /* Boot */
-  try{ var t=LS('dp_tabtext_ui'); if(t) document.body.style.setProperty('--dp-tab-text',t);
+  try{ var t=LS('dp_tabtext_ui'); if(t){ _tabTextCss(t); _tabTextAn(t); }   /* v1157: eigenes Sheet */
+       /* Der Objektkarten-Regler steht bewusst noch auf dem alten Weg: er ist
+          nicht als defekt gemeldet, und dieselbe Umstellung waere eine zweite
+          Baustelle. Er trifft aber dieselbe Falle — als Punkt vermerkt. */
        var o=LS('dp_objtext_ui'); if(o) document.body.style.setProperty('--dp-obj-text',o); }catch(e){}
 })();
 /* === /v938-textcolors === */

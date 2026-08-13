@@ -123,11 +123,9 @@ die alle auf Marcels Durchgang zurückgehen.
   In `v1147` stand `#app` in der Regel — das Element gibt es nicht.
 
 **Zwei Abnahmen, die noch offen sind:**
-1. **Ankreuzfelder 33 px** (`v1147b`) — gemessen ohne geladenes Objekt,
-   0 von 26 Feldern sichtbar. Mit geladenem Objekt gegenmessen, ob die
-   Formularzeilen tragen (besonders Steuer und Pilot-Analyse).
-2. **Produktion** — liegt dieselbe `registry.js`-Drift dort auch? SSH ist
-   read-only, ein Dateivergleich genügt.
+1. **Produktion** — liegt dieselbe `registry.js`-Drift dort auch? SSH ist
+   read-only, ein Dateivergleich genügt. *(Die Ankreuzfeld-Abnahme ist am
+   12.08. abends erledigt — 21 Felder, alle 33 px, auch bei 390 px.)*
 
 **Prüfstrecken auf Staging:**
 - `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt,
@@ -230,11 +228,13 @@ die alle auf Marcels Durchgang zurückgehen.
      `CLAUDE.md` übernommen, statt ihn auszulesen; genau der Fehler, vor
      dem Regel 1 warnt. Die Regel griff dadurch nirgends.
 
-     **OFFEN — optische Abnahme.** Gemessen wurde ohne geladenes Objekt,
-     alle Reiter zugeklappt: 0 von 26 Feldern waren sichtbar, die
-     Überlaufprüfung ist damit wertlos. **Beim nächsten Durchgang mit
-     geladenem Objekt gegenmessen**, ob 33 px die Formularzeilen sprengen
-     — besonders in den dichten Reitern Steuer und Pilot-Analyse.
+     **ABGENOMMEN (2026-08-12 abends, siehe Fertig).** Die Messung vom
+     Mittag war wertlos (0 von 26 Feldern sichtbar). Nachgeholt mit
+     geladenem Objekt, allen Reitern und aufgeklappten `<details>`:
+     **21 sichtbare Felder, alle 33 × 33 px, kein Überlauf** — bei 1440 px
+     und bei **390 px**. Die Zeilen tragen (33/35 px), kein Feld ragt heraus,
+     kein Label abgeschnitten. Die dichten Reiter Steuer (2) und
+     Pilot-Analyse (13) sind einzeln geprüft.
    - **`.sbc-arrow` misst 20 × 20 px und ist ein echtes Bedienelement.**
 
      **Mein v1118-Befund war falsch und wird hiermit zurückgenommen.** Ich
@@ -613,7 +613,16 @@ die alle auf Marcels Durchgang zurückgehen.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-5. **Grundfarbe „Obsidian": beim Auswählen passiert nichts**
+5. **ERLEDIGT — Grundfarbe „Obsidian"** (`v1156`/`b`/`c`, `8cc7af0`, siehe
+   Fertig). Gemessen: **ohne** Vorlage wirkt sie, **mit** Vorlage nicht —
+   der Wert wurde aber gespeichert, ein stiller Rückfall. Marcels Weg **B**
+   ist gebaut: unter aktiver Vorlage sichtbar gesperrt, mit Grund und
+   Ausweg im Hinweis. Dabei zwei eigene Fehler gefunden und behoben (der
+   Partner-Text landete im neuen Kasten; die Sperre war nur optisch und per
+   Tabulator umgehbar — betraf auch die Partner-Schranke seit `v1082`).
+
+   *Der ursprüngliche Befund samt Diagnosewegen bleibt stehen, weil seine
+   Lehren gelten:*
 
    Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
    Defekt, keine Geschmacksfrage.
@@ -1078,6 +1087,80 @@ die alle auf Marcels Durchgang zurückgehen.
 
 ## Später
 
+
+- **Dieselbe Sweeper-Falle trifft alle Regler am Body-Inline-Stil.**
+  Struktureller Befund aus `v1157`, nicht mitgebaut — Scope.
+
+  `whitelabel-override.js` merkt sich in `_touchedAttr` den **Originalwert**
+  jedes `[style]`-Attributs, das es anfasst. Bei einem Akzentwechsel ruft
+  `apply()` (Z. 483) `reset()`, und das spielt die Originale per
+  `setAttribute` zurück. **Jede Nutzeränderung am Body-Inline-Stil, die nach
+  dem ersten Sweep kam, ist damit weg.**
+
+  Betroffen sind mindestens: **`--dp-obj-text`** (Regler „Objektkarten", steht
+  bewusst noch auf dem alten Weg) und **die sechs Bereichsfarben** aus
+  `BEREICHE` in `ui-varianten.js` (`_dpDispHeader`, `_dpDispSide`,
+  `_dpDispText`, `_dpDispHero`, `_dpDispKpi`, `_dpDispObj`) — falls sie
+  ebenfalls an `body.style` schreiben. **Das ist zu messen, nicht zu
+  vermuten:** je Regler einen Wert setzen, Akzent wechseln, nachsehen ob er
+  überlebt.
+
+  **Der Weg ist bekannt** und in `v1157` einmal gegangen: ein eigenes
+  `<style>`-Element statt `body.style`. Fremde Stylesheets kann der Sweeper
+  nur lesen, nicht zurücksetzen. **Erst messen, welche Regler betroffen sind,
+  dann alle in einem Paket umstellen** — nicht sechs Einzelfixes.
+
+
+- **ERLEDIGT (v1157) — der Tab-Text-Regler hielt keinen Akzentwechsel aus.**
+  Halber Erfolg aus `v1155` (Backlog-Punkt 6), ehrlich benannt.
+
+  **Was behoben ist:** Der Regler war doppelt tot. Gemessen mit dem
+  Kaskaden-Walker über **alle** Stylesheets: seine Leser-Regel hing an
+  `body.dp-chrome-hell` (im Obsidian-Modus also niemand), und **elf** Regeln
+  setzen `color: var(--gold …)` auf `nav.tabs .tab`, **zehn mit
+  `!important`**. Ein Token allein verliert dagegen immer. (Mein `grep` fand
+  sie nicht — sie stehen in Kommalisten. Nur der Kaskaden-Blick im Browser
+  zeigte sie.) `v1155` setzt deshalb `body.dp-tabtext-an` und eine Regel mit
+  Spezifität **(0,6,4)** gegen die stärkste Gegenregel (0,5,2), am Dateiende.
+  **Nachgemessen: direkt nach dem Laden wirkt der Regler** — Tab-Text ging von
+  rgb(201,168,76) auf **rgb(255,0,0)**.
+
+  **Was offen ist:** Nach einem **Akzentwechsel** steht am Body-Inline-Stil
+  `--dp-tab-text: <Akzentwert>` statt des Nutzerwerts, und der Regler wirkt
+  nicht mehr. Meine Regel **gewinnt** weiterhin (per Walker bestätigt: 604,
+  `!important`, letzte Reihe) — sie liest nur einen überschriebenen Wert.
+
+  **Was schon ausgeschlossen ist:** Es sind **nicht** die drei bekannten
+  Setter. `grep` findet nur `_dpDispTabText`, den Boot-Block und die
+  Reset-Liste; ein Patch auf `CSSStyleDeclaration.setProperty` fing beim
+  Akzentwechsel **keinen** fremden Aufruf. Daraus folgt: der Setzer schreibt
+  **nicht** über `setProperty`, sondern über `style.cssText` oder
+  `setAttribute('style', …)` — dort greift der Patch nicht.
+
+  **Nächster Schritt, konkret:** `whitelabel-override.js` hat einen `sweep()`
+  mit `attributeFilter: ['style', …]`, der genau so arbeiten könnte. Also
+  `style.cssText` und `setAttribute` patchen (nicht `setProperty`) und den
+  Akzentwechsel wiederholen. **Erst wenn der Setzer benannt ist, wird
+  gebaut** — nach drei Anläufen an dieser Stelle war STOPP richtig.
+
+  **Kein Schaden im Auslieferungszustand:** ohne Nutzerwert wird weder Klasse
+  noch Token gesetzt, alles bleibt bitgenau wie vorher (nachgemessen).
+
+- **Punkt 5 (Grundfarbe) braucht eine Entscheidung, kein Patch.**
+  Gemessen: **ohne Vorlage wirkt die Grundfarbe** (Sidebar rgb(11,18,32),
+  Tabs rgb(21,27,41), Kopfverlauf mit). **Mit** Vorlage `kontor` sind Sidebar
+  und Tabs weiß und ein Wechsel der Grundfarbe ändert **nichts** — der Wert
+  wird aber gespeichert (`ui_obsidian`). Ursache: alle drei Regeln in
+  `css/ui-varianten.css` beginnen mit `html:not([data-ui-theme])`.
+
+  **Das ist ein stiller Rückfall** und in dieser Form falsch. Zwei Wege:
+  **(A)** die Grundfarbe wirkt auch unter Vorlagen — großer Eingriff, jede
+  Vorlage müsste sie respektieren, und eine dunkle Grundfläche unter der
+  hellen Vorlage „Kontor" widerspricht deren Zweck.
+  **(B)** der Regler wird unter aktiver Vorlage **sichtbar gesperrt** mit
+  einem Satz Begründung — klein, ehrlich, und das Muster gibt es schon
+  (`.dpuv-lockbar`, „sichtbar gesperrt ist ehrlicher als versteckt").
+  **Empfehlung: B.** Entscheidung liegt bei Marcel.
 - **`exportPdf()` erzeugte bei einem wiedergegebenen Bericht keine Ausgabe.**
   Beim Nachweis zu `v1149` gemessen: Report 73 über `/reports/one` geholt
   (voller Datensatz: `ref` `meta` `rent` `sale` `macro` `micro` `zensus`
@@ -1154,6 +1237,180 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-13] **Der Sweeper verwarf den Tab-Text des Nutzers** — `v1157` + `v1157b`, `c2d7e9b`. **(Backlog-Punkt 6, jetzt vollständig)**
+   `v1155` machte den Regler wirksam, aber nur **bis zum nächsten
+   Akzentwechsel**. Die Kette ist jetzt zu Ende gemessen:
+
+   ```
+   whitelabel-override.js sweepInline()   läuft über ALLE [style]-Elemente
+     -> der <body> ist einer davon (dort standen unsere Custom Properties)
+     -> merkt jede Änderung in _touchedAttr MIT ORIGINALWERT
+   apply() Z. 483                          bei Akzentwechsel -> reset()
+   reset()                                 spielt die Originale per
+                                           setAttribute zurück
+   ```
+
+   **Alles, was NACH dem ersten Sweep in den Body-Inline-Stil geschrieben
+   wurde, ist damit weg.** Nicht nur der Tab-Text — jeder Regler, der so
+   arbeitet.
+
+   **Gelöst:** der Regler schreibt in ein eigenes `<style id="dp-textfein-css">`
+   statt an `body.style`. Fremde Stylesheets fasst der Sweeper nur **lesend**
+   an (er sammelt Gold-Literale und schreibt umgefärbte Kopien in sein eigenes
+   Overlay) — zurücksetzen kann er sie nicht. Der alte Body-Inline-Wert wird
+   beim Setzen entfernt, weil er näher am Element liegt als `:root`.
+
+   **Nachgemessen** (`settings.js?v=v1157`):
+
+   | Schritt | Tab-Text |
+   |---|---|
+   | Start | rgb(201,168,76) |
+   | Regler auf `#FF0000` | **rgb(255,0,0)** |
+   | **Akzentwechsel auf `#0F6E6E`** | **rgb(255,0,0)** — hält |
+
+   ### `v1157b` — eigene Fehlannahme, im Prüfstand widerlegt
+
+   Ich hatte in den Kommentar geschrieben, der Sweeper färbe den Standardwert
+   `#C9A84C` in diesem Sheet mit, der Tab-Text folge dann dem Akzent.
+   **Er tut es nicht:** bei Akzent `#0F6E6E` und Reglerwert `#C9A84C` blieb
+   der Tab-Text rgb(201,168,76). `_collect()` sammelt Farbwerte aus Regeln,
+   aber keine Custom-Property-**Definitionen**.
+
+   Das Verhalten ist trotzdem richtig, nur anders begründet — und so steht es
+   jetzt im Code: **wer im Regler Gold wählt, bekommt Gold**, auch unter einem
+   anderen Akzent. Der Regler ist eine Nutzerentscheidung, keine Ableitung.
+   Wer den Akzent folgen lassen will, lässt den Regler unberührt; dann greift
+   `dp-tabtext-an` nicht und die alten Gold-Regeln gelten wie immer.
+
+   **Zustand hinterlassen:** Merker gelöscht, Sheet leer, Klasse weg,
+   Einstellungen unverändert (Akzent `#C9A84C`, Grundfarbe `#050505`, keine
+   Vorlage).
+
+- [2026-08-13] **Die Grundfarbe wird unter einer Vorlage sichtbar gesperrt** — `v1156` + `v1156b` + `v1156c`, `8cc7af0`. **(Backlog-Punkt 5, Marcels Weg B)**
+   **Gemessen war:** ohne Vorlage wirkt die Grundfarbe (Sidebar rgb(11,18,32),
+   Tabs rgb(21,27,41), Kopfverlauf ziehen mit). **Mit** Vorlage `kontor` sind
+   Sidebar und Tabs weiß, ein Wechsel ändert **nichts** — der Wert wird aber
+   gespeichert. Ursache: alle drei Regeln in `css/ui-varianten.css` beginnen
+   mit `html:not([data-ui-theme])`. **Ein stiller Rückfall.**
+
+   **Marcels Entscheidung: Weg B** — sichtbar sperren statt wirken lassen.
+   Begründung, die dafür spricht: eine dunkle Grundfläche unter der hellen
+   Vorlage „Kontor" widerspricht deren Zweck; **die Vorlage IST die
+   Flächenentscheidung.**
+
+   Gebaut mit der vorhandenen Mechanik (`.dpuv-lock` / `.dpuv-lockbar`) —
+   keine zweite Sperr-Optik. Der Text nennt den Grund **und** den Weg heraus:
+   „Die Vorlage bestimmt die Flächen … die Grundfarbe gilt für die Fassung
+   DealPilot … der **Akzent** wirkt in jeder Vorlage."
+   Die Bedingung wird **nicht kopiert**, sondern am selben Attribut gelesen,
+   das auch die CSS-Regeln prüfen — zwei Wahrheiten über dieselbe Bedingung
+   liefen im Marktbericht dreimal auseinander.
+
+   **Nachgemessen** (`ui-varianten.js?v=v1156c`, Bedienweg):
+
+   | Zustand | gesperrt | Hinweis | Deckkraft |
+   |---|---|---|---|
+   | keine Vorlage | nein | aus | 1 |
+   | Vorlage `kontor` | **ja** | **sichtbar** | 0,42 |
+   | zurück auf DealPilot | nein | aus | 1 |
+
+   ### Zwei eigene Nachbesserungen, beide im Prüflauf gefunden
+
+   **`v1156b` — der Partner-Text landete in meinem Kasten.** `gateSetzen()`
+   nahm `document.querySelector('.dpuv-lockbar')`, also die **erste** im
+   Dokument. Bis `v1156` gab es nur eine; meine neue steht im Markup davor.
+   Beide haben jetzt eine eigene Id. **Die Lehre ist die der Sammelregeln im
+   CSS:** ein Selektor auf ein Element, von dem es plötzlich zwei gibt,
+   trifft das falsche. Wer ein zweites danebenstellt, prüft die vorhandenen
+   Selektoren darauf.
+
+   **`v1156c` — die ausgegraute Sperre war nur eine optische.**
+   `pointer-events:none` lässt die Knöpfe `tabIndex 0` und nicht `disabled`
+   — **per Tabulator erreichbar und mit Enter auslösbar.** Das betraf nicht
+   nur die neue Schranke, sondern **genauso die Partner-Schranke, dort seit
+   `v1082`**. Beide tragen jetzt `inert` auf dem Innenteil: nimmt den
+   Teilbaum aus Fokus und Zeiger, eine Zuweisung statt einer Durchzählung.
+   Kennt der Browser `inert` nicht, bleibt es beim heutigen Verhalten — nie
+   schlechter als vorher. Nachgemessen: `inert` gesetzt, **Fokus greift nicht
+   mehr**.
+
+   **Grenze des Nachweises, ehrlich benannt:** mein erster Sperrtest meldete
+   „Wert wurde geändert" — **das war ein Messfehler.** Ein programmatisches
+   `el.click()` ruft den Handler direkt auf und umgeht `pointer-events` und
+   `inert` immer; ein echter Nutzer kann weder klicken noch fokussieren.
+   **Wer eine Sperre prüft, messe Fokussierbarkeit und `disabled`/`inert` —
+   nicht Klicks.** Ein Test mit echten Mauskoordinaten steht damit als
+   letzter Schritt offen; die beiden Attribute sind gemessen.
+
+   **Zustand hinterlassen:** Marcels Einstellungen unverändert (Akzent
+   `#C9A84C`, Grundfarbe `#050505`, keine Vorlage, kein Tab-Text-Merker) —
+   nach Reload gegengeprüft. Die Abweichung im laufenden Tab davor war der
+   Inline-Rest aus `FALLEN.md` Punkt 6, kein Befund.
+
+- [2026-08-13] **Das Werkzeug färbte sich mit** — `v1155`, `2347684`. **(Backlog-Punkt 4, der Defekt-Teil)**
+   **Marcels Befund:** „Wählt Marcel Grün, wird das Gold am Kopf des
+   Akzent-Bereichs mit grün. Wer eine Farbe *auswählt*, braucht eine neutrale
+   Umgebung, sonst beurteilt er die Farbe gegen sich selbst."
+
+   **Reproduziert** (Panel geöffnet, Akzent `#0F6E6E` über den Bedienweg
+   geklickt): die Abschnitts-Überschrift wechselte von **rgb(154,127,51)** auf
+   **rgb(8,45,45)**. Ursache waren **neun `--wl-`Tokens in der
+   Bedienoberfläche** des Panels (`ui-varianten.js`): Überschriften,
+   Knopfränder, aktive Zustände, der Schranken-Kasten.
+
+   Der Dateikopf sagte das Richtige schon — „feste Werte, bewusst NICHT über
+   die `--uv`-Tokens" — bei den `--wl-`Tokens war es nur nicht durchgezogen.
+
+   **Gelöst mit Marcels eigener Trennlinie:** „die Vorschauflächen *sollen*
+   mitgehen, der Rahmen darum nicht." Bedienoberfläche → feste Literale, und
+   am Token bleibt **genau eine** Stelle: `.dpuv-pf.gold`, die Vorschaufläche.
+
+   **Nachgemessen** (`ui-varianten.js?v=v1155`): bei Akzent `#0F6E6E` bleibt
+   die Überschrift **rgb(154,127,51)** (Gold), die Vorschaufläche geht auf
+   **rgb(15,110,110)** (Türkis). Genau die gewünschte Trennung.
+
+   **Kein Whitelabel-Verstoß:** dieselbe Ausnahme gilt laut Projektanweisung
+   für `config.js`, `branding-darstellung.js`, `darstellung-reseller.js` —
+   „der Farb-Editor **muss** Literale tragen". Dies ist der Farb-Editor. Im
+   Dateikopf vermerkt, damit `gold-audit.py`-Fundstellen erklärbar bleiben.
+
+   *Der Ausbau-Teil von Punkt 4 (mehr Farben zur Wahl) bleibt offen — er
+   braucht Marcels Entscheidung, welcher Art die Palette sein soll.*
+
+- [2026-08-12] **Ankreuzfelder 33 px — die optische Abnahme ist nachgeholt** — kein Code geändert, `v1147b` bestätigt.
+   Die Messung vom Mittag war **wertlos**: ohne geladenes Objekt und mit
+   zugeklappten Reitern waren **0 von 26** Feldern sichtbar. Jetzt mit
+   geladenem Objekt, allen Reitern durchgeklickt und `<details>` aufgeklappt:
+
+   | Reiter | Felder | Größe | Überlauf |
+   |---|---|---|---|
+   | Objekt · Bewirtschaftung · Bewertung · Deal-Aktion | 0 | — | — |
+   | Investition | 4 | 33 × 33 | keiner |
+   | Miete | 1 | 33 × 33 | keiner |
+   | Finanzierung | 1 | 33 × 33 | keiner |
+   | Steuer | 2 | 33 × 33 | keiner |
+   | **Pilot-Analyse** | **13** | 33 × 33 | keiner |
+
+   **Bei 390 px gegengemessen** (der Ursprung des Punkts war der
+   v1118-Handy-Durchgang): Steuer 2, Investition 4, Pilot-Analyse 13 Felder —
+   **alle 33 × 33, kein Überlauf.** Die Zeilen tragen: Höhen 33/35 px, **kein
+   Feld ragt aus seiner Zeile**, **kein Label-Text abgeschnitten**.
+   Schalter (`.ji-switch`, `.toggle-slim`, `.fesh-tile`, `.dp-pf-tile`) sind
+   wie vorgesehen ausgenommen und unverändert.
+
+   **Ein eigener Messfehler, gefunden und korrigiert, bevor er zum Befund
+   wurde:** Mein erster Überlauf-Prüfer meldete zwei Felder als „läuft aus
+   `.main-col`". Falsch positiv — er warf `overflow-x` und `overflow-y`
+   zusammen. Gemessen: `.main-col` hat **`overflow-x: hidden`** und
+   **`overflow-y: auto`**. Senkrecht „unterhalb" heißt dort **scrollbar**,
+   nicht abgeschnitten. Mit getrennt geprüften Achsen: kein Überlauf.
+
+   **Das ist die Falle aus `FALLEN.md` Punkt 4** („ein Überlauftest prüft
+   gegen den klippenden Vorfahren") in ihrer schärferen Form: **auch die Achse
+   muss stimmen.** Ein Container, der waagerecht klippt und senkrecht
+   scrollt, ist der Normalfall in dieser App — wer beides zusammenwirft,
+   erfindet Befunde.
 
 - [2026-08-12] **Die Differenz-Formel stand zweimal — jetzt eine Quelle** — `v1154`, `99a14db`.
    Sie stand in `_kerosinKosten()` (was **abgebucht** wird) und in

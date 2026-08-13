@@ -272,6 +272,36 @@ function korrekturAnwenden(k, e) {
   return { merkmal: k.bez, wert: Math.round(v * q) / q, ausprägung: String(x) };
 }
 
+/* ── Einheiten ─────────────────────────────────────────────────────────── */
+/* v1084-WEIN · Nicht jeder Bericht druckt einen Faktor.
+ *
+ * Kreis Lippe druckt den Sachwertfaktor in Prozent (90,86), Dortmund einen
+ * Zu-/Abschlag in Prozent (+34), Stadt Paderborn einen Euro-Betrag. Bis v1083
+ * hat der Wrapper das Ergebnis des Auswerters mit `tabellenwert + Korrekturen`
+ * ueberschrieben und damit die Umrechnung von doppelLog() zunichte gemacht —
+ * heraus kam ein "Sachwertfaktor" von 90,86. Aufgefallen ist es nie, weil der
+ * Register-Zweig bis v1084 gar nicht gerechnet hat.
+ *
+ * Jetzt gilt: gerechnet und GERUNDET wird in der Einheit des Dokuments,
+ * umgerechnet genau einmal danach. */
+const FORM_EINHEIT = {
+  doppel_log: 'prozent',        /* SF[%] = c + a*ln(F) + b*ln(X) */
+  linear_sachwert: 'wert_eur',  /* liefert einen Betrag, keinen Faktor */
+};
+
+const IN_FAKTOR = {
+  faktor: (v) => v,
+  prozent: (v) => v / 100,
+  zuschlag_prozent: (v) => 1 + v / 100,
+};
+
+/** Plausibilitaetsband fuer einen Sachwertfaktor. Keine Marktaussage, sondern
+ *  ein Einheitenwaechter: was hier herausfaellt, ist keine ungewoehnliche
+ *  Lage, sondern eine verwechselte Einheit. Lieber KEIN Wert als ein Faktor
+ *  von 90 — ein stiller Rueckfall ist schlimmer als ein Fehler. */
+const FAKTOR_MIN = 0.1;
+const FAKTOR_MAX = 5.0;
+
 /* ── Der Vertrag nach aussen ───────────────────────────────────────────── */
 
 /**
@@ -291,10 +321,14 @@ export function auswerten(modell, eingabe) {
   const r = fn(modell, eingabe || {});
   if (!r.verfuegbar) return r;
 
-  // linear_sachwert liefert einen Betrag - additive Faktorkorrekturen waeren
-  // dort sinnlos und werden nicht angewandt.
-  if (r.liefert === 'wert_eur') {
-    r.rechenweg = `${modell.formel || ''} = ${r.wert} EUR`.trim();
+  const einheit = modell.liefert || FORM_EINHEIT[modell.form] || 'faktor';
+
+  // Ein Betrag in Euro. Additive Faktorkorrekturen waeren dort sinnlos und
+  // werden nicht angewandt.
+  if (einheit === 'wert_eur' || r.liefert === 'wert_eur') {
+    r.liefert = 'wert_eur';
+    r.einheit = 'eur';
+    r.rechenweg = `${modell.formel || r.formel || ''} = ${r.wert} EUR`.trim();
     return r;
   }
 
@@ -303,22 +337,39 @@ export function auswerten(modell, eingabe) {
     const t = korrekturAnwenden(k, eingabe || {});
     if (t && t.wert) korr.push(t);
   }
-  const summe = korr.reduce((s, k) => s + k.wert, 0);
-  const roh = r.tabellenwert + summe;
 
-  // Untergrenze: ein Sachwertfaktor kleiner oder gleich 0 ist kein Faktor.
-  if (roh <= 0) {
+  /* Die Korrekturen stehen in der Einheit des Berichts — Herford in
+   * Faktorpunkten, Dortmund in Prozentpunkten. Deshalb wird HIER, in der
+   * Dokumenteinheit, summiert und gerundet. */
+  const summe = korr.reduce((s, k) => s + k.wert, 0);
+  const stellen = modell.rundung_stellen ?? (einheit === 'faktor' ? 2 : 1);
+  const p = Math.pow(10, stellen);
+  const dokument = Math.round((r.tabellenwert + summe) * p) / p;
+
+  const faktor = IN_FAKTOR[einheit](dokument);
+
+  if (!(faktor > 0)) {
     return nichts('korrektur_unplausibel',
       'Die Zu-/Abschlaege fuehren auf einen Faktor kleiner oder gleich null.');
   }
+  if (faktor < FAKTOR_MIN || faktor > FAKTOR_MAX) {
+    /* Kein Marktbefund, sondern ein Einheitenbefund. */
+    return nichts('einheit_unplausibel',
+      `Aus ${dokument} (${einheit}) wird der Faktor ${faktor} — das liegt `
+      + `ausserhalb von ${FAKTOR_MIN} bis ${FAKTOR_MAX}. Der Datensatz weist `
+      + `seine Einheit vermutlich falsch aus; gerechnet wird damit nicht.`);
+  }
 
-  const stellen = modell.rundung_stellen ?? 2;      // Dokumentverhalten
-  const p = Math.pow(10, stellen);
+  const zeigen = (v) => v.toFixed(stellen).replace('.', ',');
   r.korrekturen = korr;
-  r.wert = Math.round(roh * p) / p;
-  r.rechenweg = [`Tabellenwert ${r.tabellenwert.toFixed(stellen)}`]
-    .concat(korr.map((k) => `${k.wert > 0 ? '+' : '−'} ${Math.abs(k.wert).toFixed(stellen)} (${k.merkmal})`))
-    .join(' ') + ` = ${r.wert.toFixed(stellen)}`;
+  r.einheit = einheit;
+  r.dokumentwert = dokument;        /* die Zahl, wie der Bericht sie druckt */
+  r.wert = Math.round(faktor * 10000) / 10000;
+  r.rechenweg = [`Tabellenwert ${zeigen(r.tabellenwert)}`]
+    .concat(korr.map((k) => `${k.wert > 0 ? '+' : '−'} ${zeigen(Math.abs(k.wert))} (${k.merkmal})`))
+    .join(' ') + ` = ${zeigen(dokument)}`
+    + (einheit === 'faktor' ? '' : ` ${einheit === 'wert_eur' ? '€' : '%'} `
+       + `→ Faktor ${r.wert.toFixed(3).replace('.', ',')}`);
   return r;
 }
 

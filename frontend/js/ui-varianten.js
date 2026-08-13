@@ -24,6 +24,14 @@
        wird ausgegraut. Sichtbar gesperrt ist ehrlicher als versteckt.
      * Gold-Literale stehen als var(--wl-<hex>, #<hex>), damit
        tools/gold-audit.py keine neue Fundstelle bekommt.
+       ABER: v1155 nimmt die BEDIENOBERFLAECHE davon aus (Ueberschriften,
+       Knopfraender, aktive Zustaende, Schranken-Kasten). Sie traegt jetzt
+       feste Literale, weil sie sich sonst mit der gewaehlten Farbe
+       mitfaerbt — Marcels Befund: „wer eine Farbe auswaehlt, braucht eine
+       neutrale Umgebung". Dieselbe Ausnahme gilt laut Projektanweisung
+       schon fuer config.js, branding-darstellung.js und
+       darstellung-reseller.js: „der Farb-Editor MUSS Literale tragen."
+       Am Token bleibt nur, was VORSCHAU ist: .dpuv-pf.gold.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -148,6 +156,43 @@
     attr('data-ui-cards',   get('ui_cards',   CARDS));
     attr('data-ui-surface', get('ui_surface', SURFACE));
     attr('data-ui-form',    get('ui_form',    FORMEN));   /* v1098 */
+    grundSperre();                                        /* v1156 */
+  }
+
+  /* ── v1156-GRUND · Die Grundfarbe gilt nur ohne Vorlage ────────────────
+     Sie wird deshalb gesperrt, sobald eine Vorlage aktiv ist — sichtbar,
+     nicht versteckt, mit dem Grund daneben. Hier steht bewusst KEINE
+     Kopie der Bedingung aus dem CSS: gelesen wird dasselbe Attribut, das
+     die Regeln pruefen (`html[data-ui-theme]`). Zwei Wahrheiten ueber
+     dieselbe Bedingung liefen im Marktbericht dreimal auseinander. */
+  function grundSperre() {
+    var l = document.getElementById('dpuv-lock-grund');
+    if (!l) return;
+    var vorlageAktiv = !!document.documentElement.getAttribute('data-ui-theme');
+    l.classList.toggle('locked', vorlageAktiv);
+    sperreHart(l, vorlageAktiv);
+  }
+
+  /* ── v1156c · Eine ausgegraute Sperre ist nur eine optische ────────────
+     Im Pruefstand gemessen: `.dpuv-lock.locked>.dpuv-inner` setzt
+     `pointer-events:none`, aber die Knoepfe darin bleiben `tabIndex 0` und
+     nicht `disabled` — **per Tabulator erreichbar und mit Enter
+     ausloesbar.** Das betrifft nicht nur die neue Grundfarben-Schranke,
+     sondern genauso die Partner-Schranke, dort seit v1082.
+
+     `inert` nimmt den ganzen Teilbaum aus Fokus UND Zeiger, mit einer
+     Zuweisung statt einer Durchzaehlung. Kennt der Browser es nicht, bleibt
+     es beim heutigen Verhalten — also nie schlechter als vorher.
+
+     (Der eigene Messfehler dazu, damit er nicht wiederkehrt: ein
+     programmatisches `el.click()` umgeht `pointer-events` immer. Wer eine
+     Sperre pruefen will, muss Fokussierbarkeit und `disabled`/`inert`
+     messen, nicht klicken.) */
+  function sperreHart(wrapper, gesperrt) {
+    try {
+      var inner = wrapper.querySelector('.dpuv-inner');
+      if (inner && 'inert' in HTMLElement.prototype) inner.inert = !!gesperrt;
+    } catch (e) {}
   }
 
   /* ── Plan-Schranke ────────────────────────────────────────────────────
@@ -202,28 +247,41 @@
     '#dpuv-b{flex:1 1 auto;overflow-y:auto;padding:16px 18px 20px}',
     '.dpuv-g+.dpuv-g{margin-top:20px}',
     '.dpuv-g h3{font-family:"JetBrains Mono",monospace;font-size:9.5px;font-weight:700;letter-spacing:.17em;',
-      'text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin:0}',
+      /* v1155-WERKZEUG · Marcels Befund: „der Darstellungs-Block nimmt die
+         gewaehlte Farbe selbst an. Wer eine Farbe auswaehlt, braucht eine
+         neutrale Umgebung, sonst beurteilt er die Farbe gegen sich selbst."
+         Gemessen: bei Akzent #0F6E6E wechselte diese Ueberschrift von
+         rgb(154,127,51) auf rgb(8,45,45) — sie hing an --wl-9a7f33.
+         Der Kommentar oben sagt es bereits („feste Werte, bewusst NICHT
+         ueber die --uv-Tokens") — bei den --wl-Tokens war es nur nicht
+         durchgezogen. Feste Literale sind hier RICHTIG, nicht ein
+         Whitelabel-Verstoss: dieselbe Ausnahme gilt laut Projektanweisung
+         fuer config.js, branding-darstellung.js und darstellung-reseller.js
+         — „der Farb-Editor MUSS Literale tragen". Dies ist der Farb-Editor.
+         Die VORSCHAUflaeche .dpuv-pf.gold bleibt am Token: sie soll
+         mitgehen, der Rahmen darum nicht. */
+      'text-transform:uppercase;color:#9a7f33;margin:0}',
     '.dpuv-g .dpuv-hint{font-size:11px;color:#8b8577;font-style:italic;margin:3px 0 0;line-height:1.5}',
     '.dpuv-seg{display:grid;gap:7px;margin-top:9px;grid-template-columns:1fr 1fr 1fr}',
     '.dpuv-seg.c2{grid-template-columns:1fr 1fr}',
     '.dpuv-sgb{padding:9px 8px;border:1px solid #E0DACB;border-radius:7px;background:#fff;cursor:pointer;',
       'text-align:center;transition:.14s;min-height:44px}',
-    '.dpuv-sgb:hover{border-color:var(--wl-c9a84c, #C9A84C)}',
+    '.dpuv-sgb:hover{border-color:#C9A84C}',
     '.dpuv-sgb b{display:block;font-size:12px;font-weight:600;color:#1a1712}',
     '.dpuv-sgb small{display:block;font-size:9.5px;color:#8b8577;margin-top:2px}',
-    '.dpuv-sgb.on{background:var(--wl-fbf6e9, #FBF6E9);border-color:var(--wl-c9a84c, #C9A84C);',
-      'box-shadow:0 0 0 1px var(--wl-c9a84c, #C9A84C)}',
+    '.dpuv-sgb.on{background:#FBF6E9;border-color:#C9A84C;',
+      'box-shadow:0 0 0 1px #C9A84C}',
     '.dpuv-lock{position:relative;margin-top:9px}',
     '.dpuv-lock.locked>.dpuv-inner{filter:grayscale(.7);opacity:.42;pointer-events:none}',
-    '.dpuv-lockbar{display:none;margin-top:10px;padding:11px 12px;border:1px dashed var(--wl-e8d9a8, #E8D9A8);',
-      'border-radius:8px;background:var(--wl-faf5e8, #FAF5E8);gap:10px;align-items:flex-start}',
+    '.dpuv-lockbar{display:none;margin-top:10px;padding:11px 12px;border:1px dashed #E8D9A8;',
+      'border-radius:8px;background:#FAF5E8;gap:10px;align-items:flex-start}',
     '.dpuv-lock.locked+.dpuv-lockbar{display:flex}',
     '.dpuv-lockbar b{display:block;font-size:12px;font-weight:600;color:#5c4a18}',
     '.dpuv-lockbar span{display:block;font-size:11px;line-height:1.5;color:#8b8577;margin-top:2px}',
     '.dpuv-lbl{font-size:11px;font-weight:600;color:#5c574d;margin-bottom:6px}',
     '.dpuv-swrow{display:flex;gap:7px;flex-wrap:wrap}',
     '.dpuv-sw{width:44px;height:44px;border-radius:8px;border:2px solid #E0DACB;cursor:pointer;padding:0;transition:.14s}',
-    '.dpuv-sw.on{border-color:#1a1712;box-shadow:0 0 0 3px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)}',
+    '.dpuv-sw.on{border-color:#1a1712;box-shadow:0 0 0 3px color-mix(in srgb, #C9A84C 35%, transparent)}',
     '#dpuv-f{flex:0 0 auto;display:flex;gap:8px;padding:12px 18px;border-top:1px solid #E9E4D9;background:#F6F3EC}',
     '.dpuv-pf{flex:1;font-size:12.5px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px;',
       'border:1px solid #DCD5C4;background:#fff;color:#3d382f}',
@@ -261,8 +319,8 @@
     '#dpuv-b .dp-tt-mode-toggle{display:flex;gap:7px;flex-wrap:wrap}',
     '#dpuv-b .dp-tt-mode-btn{flex:1 1 auto;min-height:44px;padding:9px 8px;border:1px solid #E0DACB;',
       'border-radius:7px;background:#fff;color:#3d382f;font-size:12px;font-weight:600;cursor:pointer}',
-    '#dpuv-b .dp-tt-mode-btn.active{background:var(--wl-fbf6e9, #FBF6E9);',
-      'border-color:var(--wl-c9a84c, #C9A84C);box-shadow:0 0 0 1px var(--wl-c9a84c, #C9A84C)}',
+    '#dpuv-b .dp-tt-mode-btn.active{background:#FBF6E9;',
+      'border-color:#C9A84C;box-shadow:0 0 0 1px #C9A84C}',
     '#dpuv-b .btn{min-height:44px;border-radius:8px;border:1px solid #DCD5C4;background:#fff;',
       'color:#3d382f;font-size:12.5px;font-weight:600;cursor:pointer;padding:11px}',
     '#dpuv-b .dp-tb-sec img{max-width:100%;height:auto}'
@@ -375,8 +433,33 @@
             '<div id="dpuv-res">' + fremdBlock('_dpResBlock') + '</div>' +
             '<div class="dpuv-lbl" style="margin-top:12px">Akzent</div>' +
             swHtml('dpuv-acc', AKZENTE, s.ui_accent || GOLD_STD) +
+            /* v1156-GRUND · Marcels Befund: „Grundfarbe auswaehlen — es tut
+               sich gar nichts." Gemessen: OHNE Vorlage wirkt sie (Sidebar,
+               Tab-Leiste, Kopfverlauf ziehen mit), MIT Vorlage nicht — alle
+               drei Regeln in css/ui-varianten.css beginnen mit
+               `html:not([data-ui-theme])`. Der Wert wurde aber gespeichert:
+               ein stiller Rueckfall, und die sind schlimmer als ein Fehler.
+
+               Marcels Entscheidung: Weg B — sichtbar sperren statt wirken
+               lassen. Eine dunkle Grundflaeche unter der hellen Vorlage
+               „Kontor" wuerde deren Zweck widersprechen; die Vorlage IST
+               die Flaechenentscheidung.
+
+               Eigener kleiner Wrapper, dieselbe Mechanik wie die
+               Partner-Schranke (.dpuv-lock / .dpuv-lockbar) — keine zweite
+               Sperr-Optik. Die Akzentfarbe darueber bleibt frei: sie wirkt
+               auch unter Vorlagen (v1096b). */
             '<div class="dpuv-lbl" style="margin-top:14px">Grundfarbe (Obsidian)</div>' +
+            '<div class="dpuv-lock" id="dpuv-lock-grund"><div class="dpuv-inner">' +
             swHtml('dpuv-obs', GRUNDFARBEN, s.ui_obsidian || OBSIDIAN_STD) +
+            '</div></div>' +
+            '<div class="dpuv-lockbar" id="dpuv-lockbar-grund"><div>' +
+              '<b>Die Vorlage bestimmt die Flächen</b>' +
+              '<span>Solange eine Vorlage aktiv ist, kommen Kopfleiste, ' +
+              'Reiterleiste und Objektleiste aus ihr. Die Grundfarbe gilt für ' +
+              'die Fassung <b>DealPilot</b> — wähle sie oben, dann ist die ' +
+              'Grundfarbe wieder frei. Der <b>Akzent</b> wirkt in jeder ' +
+              'Vorlage.</span></div></div>' +
             '<div class="dp-tb-sec" id="dpuv-bereiche"><b>Einzelne Bereiche</b>' +
               '<p class="dpuv-hint" style="margin:0 0 6px">Übersteuert die Vorlage. ' +
               'Wirkt zusammen mit einer Vorlage — „DealPilot" behält seine eigenen Flächen.</p>' +
@@ -387,7 +470,12 @@
             '<div id="dpuv-resfrei">' + fremdBlock('_dpResFreiheitBlock') + '</div>' +
             '<div id="dpuv-ressave">' + fremdBlock('_dpResSave') + '</div>' +
           '</div></div>' +
-          '<div class="dpuv-lockbar"><div><b>Marke ab Partner</b>' +
+          /* v1156b · Eigene Id, weil es seit v1156 ZWEI Lockbars gibt und
+             gateSetzen() bis dahin die erste im Dokument nahm — das war
+             nach dem Einbau der Grundfarben-Schranke meine, und der
+             Partner-Text landete im falschen Kasten. Im ersten Prueflauf
+             gesehen. */
+          '<div class="dpuv-lockbar" id="dpuv-lockbar-marke"><div><b>Marke ab Partner</b>' +
             '<span>Farben und Logo gehören zum Partner-Paket und gelten dann ' +
             'auch für alle Mandanten.</span></div></div>' +
         '</div>' +
@@ -564,7 +652,13 @@
     var markeFrei = mandant && frei === 'alles';
 
     l.classList.toggle('locked', !partner && !markeFrei);
-    var bar = document.querySelector('.dpuv-lockbar');
+    sperreHart(l, !partner && !markeFrei);   /* v1156c: auch gegen Tastatur */
+    /* v1156b · Gezielt die Marke-Bar, nicht "die erste .dpuv-lockbar" —
+       seit v1156 gibt es eine zweite (Grundfarbe), und sie steht im Markup
+       davor. Ein Klassen-Selektor auf ein Element, von dem es jetzt zwei
+       gibt, trifft das falsche. */
+    var bar = document.getElementById('dpuv-lockbar-marke')
+           || document.querySelector('.dpuv-lockbar');   /* Rueckfall fuer alte Staende */
     if (bar) {
       var txt;
       if (markeFrei) {
@@ -803,6 +897,7 @@
   function oeffnen() {
     bauen();
     gateSetzen();
+    grundSperre();           /* v1156: beim Aufbau, nicht erst beim naechsten Klick */
     markeAuffrischen();      /* v1098: Reseller-Zustand und Logo sind aeusserer Zustand */
     targetUmhuellen();       /* v1098: erst hier, damit reseller-portal.js sicher geladen ist */
     resetUmhuellen();
