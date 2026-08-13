@@ -3466,3 +3466,25 @@ erkanntes bleibt 900 ms grün stehen, geht dann weg, von hinten rückt eins nach
 dafür braucht es einen Sprechlauf. Die weiteren Hebel wären der
 Verifikations-Pass (zweiter Aufruf) und `gpt-5.5` in der Feldauswertung; beides
 Qualitätsfragen, nicht einseitig zu entscheiden.
+
+### `v1170` — Verifikations-Pass aus · `ecd5be2`
+
+**Marcels Entscheidung**, um Tempo zu gewinnen. Der Pass (v522) ist ein
+**vollständiger zweiter KI-Aufruf**: Transkript **und** Erstergebnis gehen noch
+einmal weg und werden gegengeprüft. Er kostet damit etwa so viel Wartezeit wie
+die Auswertung selbst — **der größte einzelne Hebel**.
+
+**Nicht gelöscht, nur abgeschaltet.** Den Schalter `OPENAI_VOICE_VERIFY` gab es
+bereits, nur stand der Standard auf „an". Der Code bleibt vollständig und läuft
+wieder, sobald die Variable auf `1` gesetzt wird.
+
+**Nachweis, der zählt:** `printenv OPENAI_VOICE_VERIFY` **im Container** ist
+leer — der neue Default greift wirklich. Stünde dort eine `1`, wäre die
+Änderung wirkungslos gewesen und hätte trotzdem nach Erfolg ausgesehen.
+
+> **Wenn die Qualität sichtbar nachlässt** — falsch zugeordnete Zahlen,
+> verwechselte Felder —, ist das die **erste** Stellschraube: Variable auf `1`,
+> Rebuild. Dann war der Pass sein Geld wert.
+
+**Damit laufen noch zwei Modelle je Aufnahme** (Transkription + Auswertung)
+statt vier. Der verbleibende Hebel wäre `gpt-5.5` in der Feldauswertung.
