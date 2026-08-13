@@ -3274,3 +3274,39 @@ Profil markiert — gemessen (`aktiv: null` bei `panel`).
 
 **Rest.** „Je Profil eigene Werte" über `brand_display` fehlt — `ui_cards` wird
 heute hart überschrieben. Markierung beim programmatischen Öffnen fehlt.
+
+### `v1163` — Plan-Prüfmodus · `a4107d0`
+
+**Was.** Der Plan-Override wirkt jetzt — aber **nur nach unten**.
+`dp_plan_override` auf einen niedrigeren Plan setzen, neu laden, durchklicken;
+`localStorage.removeItem('dp_plan_override')` hebt ihn auf.
+
+**Warum er vorher nicht wirkte.** `getCurrentPlanKey()` (`config.js`) fragte
+**zuerst** `Sub.getCurrentSync()`; ein echtes Abo im Cache gewann immer. Der
+Override war nie tot, er stand hinten in der Reihenfolge.
+
+**Warum nicht einfach Vorrang.** Das hätte jeden Nutzer mit einer
+Konsolenzeile auf `partner` gehoben. Rangordnung
+`free < starter < investor < pro < partner`, strikt kleiner.
+
+**Die Stelle, die man übersieht:** `hasFeature` fragt zuerst
+`Sub.hasCachedFeature` — die DB-Features des **echten** Abos. Ohne
+Sonderbehandlung zeigt die Oberfläche den simulierten Plan und schaltet die
+Funktionen des echten frei. **Das sieht aus wie ein bestandener Test.** Im
+Prüfmodus wird der DB-Weg übersprungen; eine Quelle für beide Leser
+(`pruefOverride`).
+
+**Grenzen, die zum Werkzeug gehören:** simuliert wird das Frontend-Gate, nicht
+die Backend-Durchsetzung; und es gilt der `config.js`-Fallback des simulierten
+Plans, nicht dessen DB-Zeile.
+
+**Nebenertrag — B3 entwarnt.** Alle 26 im Frontend abgefragten
+Feature-Schlüssel gegen die 37 in Plänen definierten gehalten: **keiner fehlt.**
+Ein Tippfehler, der still den teuersten Plan sperrt, existiert nicht.
+
+> **Lehre, zwei Fehlbefunde teuer:** Feature-Schlüssel **nie** über Namenslisten
+> diffen. `_gate('[data-feature="a"], [data-feature="b"]', 'b')` trennt Selektor
+> und Schlüssel — ein grep über beide wirft sie zusammen und erfindet Dreher,
+> die es nicht gibt. Und eine Probe auf einen erfundenen Schlüssel liefert
+> immer `false`, weil unbekannt = false. **Aufrufstelle lesen, nicht Namen
+> vergleichen.**

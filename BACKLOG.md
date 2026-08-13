@@ -816,11 +816,29 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
    #### Was weiterhin offen ist
 
-   Der **Plan-Override greift nicht**: `dp_plan_override` auf `'free'` gesetzt
-   und neu geladen — `currentKey()` blieb `partner`. Ein Prüflauf „je Plan
-   durchklicken" ist damit **im Frontend nicht simulierbar**; es braucht je
-   ein echtes Konto. Ob der Override tot ist oder anders heißt, ist nicht
-   geklärt — **erst messen, bevor jemand ihn benutzt.**
+   ~~Der **Plan-Override greift nicht**~~ — **geklärt und behoben, `v1163`,
+   `a4107d0`** (siehe „Fertig"). Er war nicht tot, sondern stand hinten in der
+   Reihenfolge: `getCurrentPlanKey()` fragte zuerst `Sub.getCurrentSync()`.
+   **Jetzt ist er ein Prüfmodus, der nur herabstuft** — `dp_plan_override` auf
+   `free`/`starter`/`investor`/`pro` setzen, neu laden, durchklicken;
+   `localStorage.removeItem('dp_plan_override')` hebt ihn auf.
+
+   **Damit ist der Prüflauf jetzt fahrbar.** Was noch aussteht, ist das
+   Durchklicken selbst — Oberfläche für Oberfläche, je Stufe:
+
+   - [ ] `free` — sieht der Nutzer die Sperren an den richtigen Stellen?
+   - [ ] `starter` — dazu Marcels Frage: **sieben Tage voller Pro-Status.**
+         Ob das überhaupt eingebaut ist, ist bis heute **nicht gemessen**.
+         Wenn ja, gehört mitgeprüft, was nach Tag 7 mit Objekten passiert,
+         die unter Pro angelegt wurden.
+   - [ ] `investor`
+   - [ ] `pro`
+   - [ ] `partner` — der Prüfmodus kann ihn **nicht** simulieren (nur nach
+         unten). Er ist der echte Plan des Prüfkontos, also ohnehin sichtbar.
+
+   **Zwei Grenzen, die beim Durchklicken gelten:** der Prüfmodus zeigt das
+   **Frontend-Gate**, nicht die Backend-Durchsetzung — und er liest den
+   `config.js`-Fallback, nicht die DB-Zeile des simulierten Plans.
 
 7. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
@@ -1283,6 +1301,64 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 ---
 
 ## Fertig
+
+- [2026-08-13] **Der Plan-Override war wirkungslos — jetzt ein Prüfmodus, der nur nach unten geht** — `v1163`, `a4107d0`. **(Backlog-Punkt 6, der offene Rest)**
+   **Der Punkt lag nicht am Prüfen, sondern am fehlenden Werkzeug.** „Je Plan
+   durchklicken" war nicht simulierbar: `getCurrentPlanKey()` fragte **zuerst**
+   `Sub.getCurrentSync()`, und ein echtes Abo im Cache gewann immer. Gemessen:
+   `dp_plan_override='free'` gesetzt, `currentKey()` blieb `partner`. **Der
+   Override war also nie tot — er stand hinten in der Reihenfolge.**
+
+   **Kein genereller Vorrang.** Das würde jeden Nutzer mit einer Konsolenzeile
+   auf `partner` heben. Stattdessen Rangordnung
+   `free < starter < investor < pro < partner`, und **der Override darf nur
+   herabstufen.** Wer Partner hat, sieht sich alles darunter an; nach oben
+   geht nichts.
+
+   **Der zweite Teil, ohne den es ein halber Schalter wäre:** `hasFeature`
+   fragt zuerst `Sub.hasCachedFeature` — die DB-Features des **echten** Abos.
+   Die Anzeige hätte „free" gezeigt und trotzdem Partner-Funktionen
+   freigeschaltet. **Das sieht aus wie ein bestandener Test und ist keiner.**
+   Im Prüfmodus wird der DB-Weg jetzt übersprungen. Eine Quelle für beide
+   Leser: `pruefOverride(echterPlan)`.
+
+   **Nachgemessen** (`config.js?v=v1163`, echtes Partner-Konto):
+
+   | | echt | `currentKey()` | Features |
+   |---|---|---|---|
+   | ohne Override | partner | `partner` | `market_data_fields=true`, `rnd_full=true` |
+   | Override `free` | partner | **`free`** | **beide `false`** |
+   | Override entfernt | partner | `partner` | wieder `true` |
+
+   **Grenze, die dazugehört:** simuliert wird das **Frontend-Gate**, nicht die
+   Durchsetzung im Backend — die API antwortet weiter nach dem echten Abo. Und
+   der Prüfmodus zeigt den **`config.js`-Fallback** des simulierten Plans, nicht
+   dessen DB-Zeile; der Client kennt nur sein eigenes Abo. Für die geprüften
+   Schlüssel stimmen beide überein, sonst wäre das ein Fehlerkanal.
+
+   ### Kreuzabgleich der Feature-Schlüssel — B3 ist entwarnt
+
+   B3 fürchtete: „ein Tippfehler sperrt still den teuersten Plan". Alle im
+   Frontend abgefragten Schlüssel gegen alle in Plänen definierten gehalten
+   (37 in den Plänen, 26 abgefragt über `hasFeature`/`can`/`_gate`/
+   `data-feature`): **kein abgefragter Schlüssel fehlt in den Plänen.** Die
+   Sorge trifft an keiner Stelle zu.
+
+   *(Zwei eigene Fehlbefunde aus diesem Lauf, beide vor der Meldung gefangen —
+   und beide entstanden, weil ich Namen verglichen statt Aufrufstellen gelesen
+   habe:*
+   1. *`ai_analysis=false` bei Free „gemessen" — es heißt `ai_analysis_tab`,
+      und ein unbekannter Schlüssel ist für jeden false. Die Probe hat sich
+      selbst erzeugt, was sie fand.*
+   2. *Fünf Schlüssel schienen abgefragt, aber nirgends definiert, darunter ein
+      scheinbarer Dreher `custom_track_record_cover` ↔ `track_record_custom_cover`.
+      **Ein Namensdreher wäre ein echter Kundenschaden gewesen** — deshalb erst
+      die Aufrufstelle gelesen: `_gate()` führt beide Schreibweisen im
+      **Selektor**, um beide HTML-Varianten zu fangen, der **Schlüssel** ist
+      richtig. `ai_lage`, `bauspar`, `tilgungsaussetzung` sind gar keine
+      Feature-Schlüssel, sondern Datenfelder. **Lehre: bei Feature-Schlüsseln
+      nie Namenslisten diffen, ohne die Aufrufstelle zu lesen** — `_gate` trennt
+      Selektor und Schlüssel, ein grep über beide wirft sie zusammen.)*
 
 - [2026-08-13] **Hell und Dunkel als zwei Profile, unter „Profil & Anzeige"** — `v1162` + `v1162b`, `381e678`. **(Backlog-Punkt 5, erster Wurf)**
    **Marcels Vorgabe:** „DealPilot wird im dunklen Modus ausgeliefert. Daneben
