@@ -1405,6 +1405,43 @@ entfällt — nicht raten.
 
 ## Fertig
 
+- [2026-08-13] **Die zwei Befunde aus dem Prüflauf sind behoben — und einer war keiner** — `v1171` + DB-Eingriff, `6c1e101`.
+   ### `beleg_import` — echt, und behoben
+
+   Stand in `config.js` ab Investor, in **keinem** DB-Plan. Die DB ist die
+   Quelle, und `beleg-import.js:66` hängt **allein** an
+   `hasFeature('beleg_import')` — **kein** Plan-Key-Fallback. Die Funktion war
+   damit für **jeden** zu, auch für Pro und Partner.
+
+   Jetzt in der DB für `investor`/`pro`/`partner`, genau wie `config.js` es
+   vorsieht. **Sicherung 8.597 Bytes**, `BEGIN/ROLLBACK`-Probelauf vorher
+   (Verteilung geprüft), Backend danach neu gestartet — der Plan-Cache hätte
+   sonst die alten Werte weitergereicht.
+
+   ### `custom_finance_models` — Startfenster geschlossen
+
+   `config.js` gab es Free frei, die DB führt `false`. Ein echter Free-Nutzer
+   hatte es nie; der Fallback log nur **im Startfenster**, bis die DB
+   antwortet. Dasselbe Muster wie `v1160`, anderer Schlüssel.
+
+   ### `theme_palette` — ZURÜCKGENOMMEN, vor dem Eingriff
+
+   **Mein Befund war falsch geschlossen.** Gemessen stimmte er (`false` am
+   echten Konto), aber `_isPalette()` prüft **zuerst** `isProOrAbove()` — die
+   Palette hängt am **Plan-Schlüssel**, nicht am Feature. **Pro und Partner
+   haben sie.** Die `hasFeature('theme_palette')`-Zeile ist ein ausdrücklich
+   kommentierter Vorgriff („später, wenn Backend es kennt").
+
+   **Beinahe hätte ich einen bewusst gesetzten Platzhalter gelöscht.** Gerettet
+   hat nur die Frage „gibt es die Funktion überhaupt?" **vor** dem Eingriff —
+   dieselbe Frage, die den `beleg_import`-Fund erst brauchbar gemacht hat.
+
+   > **Die Lehre, die beide Fälle verbindet:** Ein Feature-Schlüssel auf
+   > `false` heißt **nicht**, dass die Funktion gesperrt ist. Sie kann an einem
+   > **zweiten Weg** hängen — hier am Plan-Schlüssel. **Vor jeder Behebung die
+   > Aufrufstelle lesen, nicht nur den Schlüssel.** Bei `beleg_import` gab es
+   > keinen zweiten Weg, bei `theme_palette` schon.
+
 - [2026-08-13] **Punkt 6 durchgeklickt — zwei Funktionen sind für JEDEN gesperrt, auch für Pro und Partner**
    Der Prüfmodus aus `v1163` erlaubt endlich, was der Punkt verlangte. Alle
    vier Stufen gegen 25 Feature-Schlüssel gemessen, dann **gegen die Datenbank
