@@ -657,6 +657,53 @@ function showSettings(initialTab) {
         '<hr class="dvd" style="margin:32px 0 22px">' +
         '<h2 class="set-section-h2">Anzeige-Optionen</h2>' +
         '<p class="hint">Steuere, welche UI-Elemente in der App angezeigt werden.</p>' +
+        /* ── v1162-PROFIL · Hell und Dunkel als zwei Profile ────────────────
+           Marcels Vorgabe (Backlog Punkt 5): „DealPilot wird im dunklen Modus
+           ausgeliefert. Daneben ein heller Modus, umschaltbar mit einem Griff."
+           Ort: hier, unter Profil & Anzeige — so ausdruecklich gewuenscht.
+
+           Die HELLE Fassung ist `design/mockups/hell.png` und damit die
+           Vorlage `kanzlei` — NICHT `panel`, wie die Textvorgabe zuerst sagte.
+           Am CSS gegengeprueft: warme helle Kopfleiste (--uv-chrome #FBFAF7),
+           warme Flaeche, weisse Karten, Serifenschrift. Panel ist kuehl mit
+           Blaustich und im Bild nirgends.
+
+           Der Chrome-Skin bleibt in BEIDEN Profilen aus: im Bild sind die
+           Reiter golden, nicht die Tinte aus v1158 — und die haengt an
+           body.dp-chrome-hell. Der helle Modus ist eine Vorlage, kein Skin.
+           Weil dp_chrome_hell also nie auf 1 geht, entfaellt die Falle, dass
+           _dpDispSkin die Vorlage loescht, wenn sie der Helligkeit
+           widerspricht.
+
+           Der Schalter erfindet nichts: er setzt dieselben Werte, die das
+           Darstellungs-Panel auch setzt, und laesst sie von dessen eigener
+           API anwenden. Wer es einzeln will, geht wie bisher ins Panel. */
+        '<hr class="dvd">' +
+        '<h3 class="set-section-h">Aussehen</h3>' +
+        '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
+          '<div id="dp-profil-wahl" style="display:flex;gap:11px">' +
+            '<button type="button" class="dp-profil" data-profil="obsidian" onclick="_dpProfil(\'obsidian\')" ' +
+              'style="flex:1 1 0;min-height:44px;text-align:left;padding:11px 12px;border-radius:9px;' +
+              'border:1px solid rgba(0,0,0,.12);background:#fff;cursor:pointer;font:inherit">' +
+              '<span style="display:block;height:34px;border-radius:6px;margin-bottom:8px;' +
+                'background:linear-gradient(#141414,#040404);box-shadow:inset 0 0 0 1px rgba(201,168,76,.35)"></span>' +
+              '<span style="display:block;font-weight:600">Obsidian</span>' +
+              '<span style="display:block;font-size:11.5px;color:var(--muted,#5F5E5A);margin-top:1px">Auslieferungszustand</span>' +
+            '</button>' +
+            '<button type="button" class="dp-profil" data-profil="hell" onclick="_dpProfil(\'hell\')" ' +
+              'style="flex:1 1 0;min-height:44px;text-align:left;padding:11px 12px;border-radius:9px;' +
+              'border:1px solid rgba(0,0,0,.12);background:#fff;cursor:pointer;font:inherit">' +
+              '<span style="display:block;height:34px;border-radius:6px;margin-bottom:8px;' +
+                'background:#FBFAF7;box-shadow:inset 0 0 0 1px #E8E4DC"></span>' +
+              '<span style="display:block;font-weight:600">Hell</span>' +
+              '<span style="display:block;font-size:11.5px;color:var(--muted,#5F5E5A);margin-top:1px">Warm, mit Serife</span>' +
+            '</button>' +
+          '</div>' +
+          '<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">' +
+            '<span style="font-size:11.5px;color:var(--muted,#5F5E5A)">Einzeln einstellen — Vorlage, Karten, Form, Schrift, Farben</span>' +
+            '<button type="button" class="btn btn-sm btn-ghost" onclick="try{DealPilotUiVarianten.open()}catch(e){}">Darstellung öffnen</button>' +
+          '</div>' +
+        '</div>' +
         /* === V213 collapse-toggle profilanzeige START === */
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Markt-Daten im Tab Finanzierung</h3>' +
@@ -3424,6 +3471,77 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
   window._dpFlushNow=sync;
 })();
 /* === /v937-flush-stable === */
+
+/* === v1162-profil: Hell und Dunkel als zwei Profile ===================
+   Ein Griff fuer die meisten, das Panel fuer den Rest. Siehe den Kommentar
+   am Schalter im Pane „Profil & Anzeige".
+
+   WAS DAS PROFIL SETZT
+     Obsidian  ui_theme=''         ui_cards=''  dp_chrome_hell=0
+     Hell      ui_theme='kanzlei'  ui_cards=''  dp_chrome_hell=0
+
+   Beides sind die Wege, die das Darstellungs-Panel auch nutzt — derselbe
+   Schluessel dp_user_settings, dieselbe anwenden()-Kette. Kein zweites
+   Zustandsmodell, keine eigene Speicherung: sonst laufen zwei Wahrheiten
+   ueber dasselbe auseinander (im Marktbericht dreimal passiert).
+
+   Die Reihenfolge ist Absicht: erst speichern, dann die vorhandene API
+   anwenden lassen. Ein setAttribute von aussen wuerde skinNachziehen()
+   ueberspringen — der Klick im Panel tut das nicht, und dieser hier auch
+   nicht. */
+(function () {
+  'use strict';
+  var LSK = 'dp_user_settings';
+  var HELL_VORLAGE = 'kanzlei';   /* aus design/mockups/hell.png, am CSS geprueft */
+
+  function laden() { try { return JSON.parse(localStorage.getItem(LSK) || '{}') || {}; } catch (e) { return {}; } }
+
+  window._dpProfilAktiv = function () {
+    var s = laden();
+    return (s.ui_theme === HELL_VORLAGE) ? 'hell' : (s.ui_theme ? null : 'obsidian');
+    /* null heisst: eine andere Vorlage ist aktiv — dann ist KEIN Profil
+       markiert. Das ist ehrlicher als eines zu behaupten: wer im Panel
+       „Konsole" gewaehlt hat, ist in keinem der zwei Profile. */
+  };
+
+  function markieren() {
+    var a = window._dpProfilAktiv();
+    var knoepfe = document.querySelectorAll('#dp-profil-wahl .dp-profil');
+    Array.prototype.forEach.call(knoepfe, function (b) {
+      var an = (b.getAttribute('data-profil') === a);
+      b.style.borderColor = an ? 'var(--wl-c9a84c, #C9A84C)' : 'rgba(0,0,0,.12)';
+      b.style.boxShadow = an ? '0 0 0 2px rgba(201,168,76,.30)' : 'none';
+      b.setAttribute('aria-pressed', an ? 'true' : 'false');
+    });
+  }
+  window._dpProfilMarkieren = markieren;
+
+  window._dpProfil = function (p) {
+    var hell = (p === 'hell');
+    try {
+      var s = laden();
+      s.ui_theme = hell ? HELL_VORLAGE : '';
+      s.ui_cards = '';                       /* Objektkarten „Standard" — Marcels Vorgabe */
+      localStorage.setItem(LSK, JSON.stringify(s));
+      localStorage.setItem('dp_chrome_hell', '0');   /* in BEIDEN Profilen aus */
+    } catch (e) {}
+    /* Anwenden ueber die vorhandene API, nicht per setAttribute. */
+    try { if (window.DealPilotUiVarianten && DealPilotUiVarianten.apply) DealPilotUiVarianten.apply(); } catch (e) {}
+    /* Der Chrome-Skin muss aus sein — falls er noch lief, ueber seinen
+       eigenen Weg abschalten, damit dessen Nachlauf (Logo, Refresh) greift. */
+    try { if (document.body.classList.contains('dp-chrome-hell') && typeof window._dpDispSkin === 'function') window._dpDispSkin('obsidian'); } catch (e) {}
+    markieren();
+  };
+
+  /* Beim Oeffnen des Panes markieren — der Tab rendert lazy. */
+  try {
+    document.addEventListener('click', function (e) {
+      var t = e.target && e.target.closest && e.target.closest('[data-tab="profilanzeige"]');
+      if (t) setTimeout(markieren, 60);
+    }, true);
+  } catch (e) {}
+})();
+/* === /v1162-profil === */
 
 /* === v938-textcolors === */
 (function(){
