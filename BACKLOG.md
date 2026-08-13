@@ -661,30 +661,7 @@ die alle auf Marcels Durchgang zurückgehen.
    **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
    Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
 
-7. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
-
-   Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
-   Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
-   **benannt statt beschrieben** — gut, denn dann muss sie nicht gestaltet,
-   sondern nur übernommen werden.
-
-   **Zuerst den Ist-Wert auslesen** (`.sb-act-item` bzw. der Kopf des
-   Aufklappers), dann als **gemeinsames Token** führen statt an zwei Stellen
-   zu pflegen. Zwei Stellen, die auseinanderlaufen, sind hier schon mehrfach
-   die Ursache gewesen.
-
-   **Ein bekannter Nebenbefund gehört mitgeprüft:**
-   `.sb-actions-accordion-inner` misst `rgb(255,255,255)` **auch** in den
-   dunklen Fassungen `dealpilot` und `konsole` — weiße Fläche in dunkler
-   Leiste, im geschlossenen Zustand unsichtbar (`display:none`, 0 × 0) und
-   deshalb bei allen Kontrastläufen durchgerutscht. **Mit geöffnetem Menü
-   messen.** Wer die Farbe von dort übernimmt, übernimmt sonst einen Wert aus
-   einem Zustand, den niemand geprüft hat.
-
-   **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
-   entschieden ist.
-
-8. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+7. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -721,7 +698,7 @@ die alle auf Marcels Durchgang zurückgehen.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-9. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+8. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -751,7 +728,7 @@ die alle auf Marcels Durchgang zurückgehen.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-10. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+9. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -807,7 +784,7 @@ die alle auf Marcels Durchgang zurückgehen.
 
 ---
 
-11. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+10. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
@@ -914,7 +891,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-12. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+11. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -1012,7 +989,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-13. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+12. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
    das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
@@ -1191,6 +1168,58 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-13] **Die Reiter tragen im hellen Modus die Tinte des Aktionen-Menüs** — `v1158` + `v1158b`, `399df3f`. **(Backlog-Punkt 7)**
+   **Marcels Vorgabe:** „im hellen Modus sollen die Reiter dieselbe
+   Schriftfarbe tragen wie das Aktionen-Aufklappmenü." Damit war die Zielfarbe
+   **benannt statt beschrieben** — nur zu übernehmen, nicht zu gestalten.
+
+   **Gemessen** (Merker `dp_chrome_hell` gesetzt und **neu geladen**, nicht im
+   laufenden Tab umgeschaltet — `FALLEN.md` Punkt 6):
+
+   | | vorher | Ziel |
+   |---|---|---|
+   | Aktionen-Einträge (11, alle gleich) | rgb(20,19,16) | — |
+   | Reiter inaktiv | #6b6454 | rgb(20,19,16) |
+   | Reiter aktiv | #211c12 | rgb(20,19,16) |
+
+   **Drei hart kodierte Töne für eine Sache.** Der Punkt verlangte deshalb ein
+   **gemeinsames Token** — jetzt führt der Hell-Skin `--dp-hell-ink:#141310`
+   bei seinen anderen Ink-Tokens, und **alle sechs Leser** holen ihn dort. Der
+   Ton ist nicht neu: es ist die „Tinte", die die helle Sidebar schon für die
+   Objektadresse führt.
+
+   `--dp-tab-text` steht in jedem Leser **davor**, damit der Nutzerregler aus
+   `v1155`/`v1157` weiter gewinnt.
+
+   ### `v1158b` — derselbe Selektor an drei Stellen, die dritte entschied
+
+   Nach `v1158` trug **nur der aktive** Reiter die Tinte; die inaktiven blieben
+   rgb(243,234,208). Ursache: der Selektor
+   `body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs .tab` steht
+   **dreimal** in der Datei — bei 35346 (meine Änderung), bei 35489 in einer
+   Liste **mit der Kopfzeile**, und bei 35605 im `v938`-Block. Bei gleicher
+   Spezifität gewinnt die **späteste**, also `v938` mit dem Rückfall auf
+   `--dp-header-text` — und der steht im Hell-Modus auf `#f3ead0`, weil der
+   Kopf dunkel gespeichert ist.
+
+   Zwei Korrekturen: der `v938`-Rückfall ist jetzt die Tinte, und **die
+   Reiterleiste ist aus der Kopfzeilen-Liste herausgenommen** — zwei
+   verschiedene Flächen gehören nicht in eine Regel.
+
+   **Nachgemessen** (`style.css?v=W71`):
+
+   | | Ergebnis |
+   |---|---|
+   | alle 9 Reiter | **rgb(20,19,16)** — eine Farbe |
+   | Aktionen-Menü | rgb(20,19,16) — gleich |
+   | Goldstrich am aktiven | rgb(201,168,76) — Unterscheidung bleibt |
+   | Kopfzeile | rgb(243,234,208) — **unverändert** |
+   | **Obsidian-Gegenprobe** | Reiter Gold, Sidebar rgb(10,10,10) — **unberührt** |
+
+   **Der Nebenbefund aus dem Punkt** (`.sb-actions-accordion-inner` ist auch
+   in dunklen Fassungen weiß) ist **nicht** mitgeprüft — er betrifft eine
+   Fläche, nicht die Schriftfarbe, und bleibt im Punkt stehen.
 
 - [2026-08-13] **Der Sweeper verwarf den Tab-Text des Nutzers** — `v1157` + `v1157b`, `c2d7e9b`. **(Backlog-Punkt 6, jetzt vollständig)**
    `v1155` machte den Regler wirksam, aber nur **bis zum nächsten
