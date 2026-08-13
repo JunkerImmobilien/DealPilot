@@ -329,7 +329,24 @@ async function quickMatch(transcript, catalog, apiKey) {
 }
 
 /* v522: Verifikations-Pass (2. KI-Call), prueft/korrigiert Felder gegen das Transkript. */
-const VERIFY_ON = String(process.env.OPENAI_VOICE_VERIFY || '1') !== '0';
+/* v1170-VNOVERIFY: Standard von AN auf AUS gedreht — Marcels Entscheidung
+   („mach den Pass weg wenn das schneller ist").
+
+   Der Verifikations-Pass ist ein VOLLSTAENDIGER zweiter KI-Aufruf: er schickt
+   Transkript UND das erste Ergebnis noch einmal weg und laesst gegenpruefen.
+   Damit kostet er ungefaehr so viel Wartezeit wie die Auswertung selbst — der
+   groesste einzelne Hebel beim Tempo.
+
+   NICHT geloescht, nur abgeschaltet. Der Code bleibt vollstaendig und laeuft
+   wieder, sobald OPENAI_VOICE_VERIFY=1 gesetzt wird. Kehrt die Qualitaet
+   sichtbar zurueck (falsch zugeordnete Zahlen, verwechselte Felder), ist das
+   die erste Stellschraube — dann war der Pass sein Geld wert und die
+   Entscheidung gehoert neu gestellt.
+
+   Der Aufruf in Zeile ~276 ist ohnehin fail-soft: faellt der Pass aus, gilt
+   das Erstergebnis. Abschalten aendert also nichts am Verhalten im Fehlerfall,
+   nur an der Regel. */
+const VERIFY_ON = String(process.env.OPENAI_VOICE_VERIFY || '0') !== '0';
 const VERIFY_MODEL = process.env.OPENAI_VOICE_VERIFY_MODEL || 'gpt-5.4-mini';
 
 function buildVerifyPrompt(transcript, fields, catalog) {
