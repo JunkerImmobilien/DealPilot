@@ -851,8 +851,13 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
    >
    > **Es bleiben drei Reste:**
    > 1. **Checkboxen** werden in beiden Katalogbauern übersprungen.
-   > 2. **Das Modal beim „Als Objekt speichern"** mit der Auflistung der
-   >    übernommenen Werte — nicht geprüft, ob es das gibt.
+   > 2. **Das Modal beim „Als Objekt speichern"** — **gemessen: es gibt
+   >    keines.** `qcSaveAsObject()` speichert direkt über einen fest
+   >    verdrahteten Snapshot von ~20 Feldern. Die Auflistung ist damit
+   >    **ohne Vorarbeit nicht baubar** — nichts weiß, welche Werte
+   >    „zusätzlich mitkommen". Und: **welches Modal Marcel meint, ist
+   >    ungeklärt** — erst den Bedienweg gemeinsam ansehen, sonst entsteht
+   >    ein zweites Modal neben einem vorhandenen.
    > 3. Ob die Einsortierung in der Praxis trifft — **Abnahmepunkt**, nur
    >    durch einen echten Sprechlauf zu klären.
    >
@@ -1355,6 +1360,33 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 ---
 
 ## Fertig
+
+- [2026-08-13] **Punkt 7, Rest 2 gemessen: das Speichern-Modal gibt es nicht — und der Snapshot ist eine feste Liste**
+   Marcel: *„Beim ‚Als Objekt speichern' öffnet sich ohnehin ein kleines Modal.
+   Dort soll stehen: es gibt weitere Werte, die mit übernommen werden — mit
+   Auflistung, und mit den Texten der Zusammenfassung."*
+
+   **Gemessen in `quick-check.js:1720`:** `qcSaveAsObject()` speichert **ohne
+   jedes Modal**. Es sammelt einen **fest verdrahteten Snapshot** von rund
+   20 `qc_`-Feldern (Kaufpreis, Miete, Adresse, Flächen, Zins, Tilgung …),
+   prüft zwei Pflichtfelder und schreibt durch.
+
+   **Zwei Folgerungen, die den Rest schärfen:**
+   1. **Die Auflistung, die Marcel will, ist ohne Vorarbeit gar nicht baubar** —
+      es gibt keine Stelle, die weiß, *welche* Werte „zusätzlich mitkommen".
+      Der Snapshot ist eine Handliste, keine Ableitung. Wer die Auflistung
+      will, braucht zuerst eine Quelle dafür.
+   2. **Der Snapshot trägt `thesis`, `risiken` und `notizen` NICHT.** Im
+      QuickBoarding werden sie heute auch nicht per Sprache gefüllt (dort
+      bleibt es bei den QC-Feldern), es geht also **nichts verloren**. Sobald
+      der Sprach-Umfang im QC erweitert würde, **ginge es verloren** — dann
+      muss der Snapshot mitwachsen. Das gehört zusammen entschieden.
+
+   **Nicht geklärt:** welches Modal Marcel meint. Möglich, dass er das
+   Namens-/Bestätigungsfenster eines anderen Weges vor Augen hat
+   (`pdf-import.js` kennt ein „Als Objekt speichern" mit Fotos). **Bevor hier
+   gebaut wird, den Bedienweg einmal gemeinsam anschauen** — sonst entsteht
+   ein zweites Modal neben einem vorhandenen.
 
 - [2026-08-13] **Punkt 7 ist zum größten Teil längst gebaut — Befund, kein Umbau**
    **Vor dem Bauen nachgesehen, und gut so.** Marcels Punkt liest sich wie ein
