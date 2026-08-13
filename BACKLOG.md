@@ -1361,6 +1361,51 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 ## Fertig
 
+- [2026-08-13] **Spracheingabe: schneller, und die Stichwörter als Fenster** — `v1169`, `a78ab83`.
+   ### Schneller — eine Zeile, die niemandem nützte
+
+   Pro Aufnahme laufen **vier** Modelle: Transkription, Live-Zwischenauswertung
+   (`gpt-4o-mini`), Feldauswertung (`gpt-5.5`), Verifikation (`gpt-5.4-mini`).
+
+   **Der Transkriptions-Default stand auf `gpt-4o-transcribe-diarize`.**
+   Diarisierung trennt **Sprecher voneinander** — beim Diktat ins eigene
+   Mikrofon spricht eine Person. Das war Rechenzeit ohne Gegenwert, und der
+   **Dateikopf nennt als Default ohnehin `gpt-4o-mini-transcribe`**: Code und
+   Doku standen auseinander, und der Code hatte das teurere gewonnen.
+
+   Jetzt `gpt-4o-mini-transcribe`. Weiterhin über `OPENAI_TRANSCRIBE_MODEL`
+   überschreibbar — wer eine Besichtigung zu zweit aufnimmt, setzt die
+   Sprechertrennung dort.
+
+   **Ehrlich dazu:** um wie viel es schneller wird, ist **nicht gemessen** —
+   dafür braucht es einen echten Sprechlauf. Dass Sprechertrennung bei einem
+   Sprecher nichts beiträgt, steht dagegen fest.
+
+   ### Fenster statt Wolke
+
+   Bisher standen **alle** Chips gleichzeitig da, je nach Modus über 30. Wer
+   spricht, sucht darin sein nächstes Stichwort — die Wolke wurde mit jedem
+   erkannten Feld nur **bunter, nicht kürzer**.
+
+   Jetzt höchstens **neun** sichtbar. Ein erkanntes bleibt **900 ms grün
+   stehen** — damit die Bestätigung gesehen wird —, geht dann mit einem kurzen
+   Abgang weg, und von hinten rückt eins nach.
+
+   **Bewusst nur die Sichtbarkeit.** Alle Chips bleiben im DOM:
+   `updateChipsFromText`, `markChipsFinal` und die Gruppen-Navigation suchen
+   per Selektor `.vi-chip[data-cid=…]` — **wer hier Elemente entfernt, bricht
+   drei Stellen still.** Und der Fortschrittszähler zählt weiter **alle**,
+   sonst stünde dort dauerhaft „9".
+
+   `display:none` statt `visibility` — ein unsichtbares Chip hielte seinen
+   Platz und die Wolke bliebe genauso groß.
+
+   **Nachweis:** Syntax beide Dateien, Backend neu gebaut, Marker im
+   Container. Das Ausblende-CSS im Browser geprüft: `.vi-aus` und `.vi-weg`
+   ergeben `display:none`, das erkannte Chip trägt die Animation `viAb`.
+   **Die Nachrück-Logik selbst ist nicht abgenommen** — die Chips entstehen
+   erst beim Aufnahmestart, und dafür braucht es ein Mikrofon. Staging-Abnahme.
+
 - [2026-08-13] **Checkboxen per Sprache — der ganze Weg, nicht nur die Freigabe** — `v1168`, `77be07f`. **(Backlog-Punkt 7, Rest 1)**
    Beide Katalogbauer stiegen bei `type === 'checkbox'` aus. „Alle Felder"
    schließt sie ein. **Die Freigabe allein hätte nichts bewirkt** — vier

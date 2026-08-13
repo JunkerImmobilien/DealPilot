@@ -3439,3 +3439,30 @@ Die Änderung ist vollständig, betrifft heute aber ein Feld — das Formular l�
 Ja/Nein sonst über Selects. **Erst zählen, dann schätzen.**
 
 **Backend geändert → Rebuild.** Vier Marker im laufenden Container geprüft.
+
+### `v1169` — Spracheingabe: Tempo und Stichwort-Fenster · `a78ab83`
+
+**Vier Modelle pro Aufnahme:** Transkription · Live-Zwischenauswertung
+(`gpt-4o-mini`) · Feldauswertung (`gpt-5.5`) · Verifikation (`gpt-5.4-mini`).
+Wer die Spracheingabe beschleunigen will, fängt hier an.
+
+**Der erste Fund:** Der Transkriptions-Default stand auf
+`gpt-4o-transcribe-diarize`. **Diarisierung trennt Sprecher voneinander** —
+beim Diktat ins eigene Mikrofon spricht eine Person. Der Dateikopf nannte als
+Default ohnehin `gpt-4o-mini-transcribe`; **Code und Doku waren auseinander,
+und der Code hatte das teurere gewonnen.** Jetzt korrigiert, weiter über
+`OPENAI_TRANSCRIBE_MODEL` überschreibbar.
+
+**Stichwort-Fenster statt Wolke.** Höchstens neun Chips sichtbar; ein
+erkanntes bleibt 900 ms grün stehen, geht dann weg, von hinten rückt eins nach.
+
+> **Warum nur die Sichtbarkeit geändert wurde:** `updateChipsFromText`,
+> `markChipsFinal` und die Gruppen-Navigation suchen per Selektor
+> `.vi-chip[data-cid=…]`. **Wer dort Elemente aus dem DOM entfernt, bricht drei
+> Stellen still.** Und der Fortschrittszähler muss weiter alle zählen, sonst
+> steht dort dauerhaft „9".
+
+**Offen:** Um wie viel die Transkription schneller wird, ist nicht gemessen —
+dafür braucht es einen Sprechlauf. Die weiteren Hebel wären der
+Verifikations-Pass (zweiter Aufruf) und `gpt-5.5` in der Feldauswertung; beides
+Qualitätsfragen, nicht einseitig zu entscheiden.
