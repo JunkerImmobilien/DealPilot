@@ -442,6 +442,45 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     return h + '</div>';
   }
 
+  /* ═══ v1166-GARMEA3 · Die Rueckfrage, die in beiden Wegen richtig ist ═════
+     Backlog-Punkt 10 wartet auf eine fachliche Entscheidung (Feld
+     wohnungsbezogen ODER Rechnung kuerzt selbst). Dieser Hinweis nimmt sie
+     NICHT vorweg — er fragt nur nach, und zwar genau dann, wenn beide
+     Auslegungen auseinanderfallen koennen: ein Miteigentumsanteil ist
+     gepflegt (also eine ETW) UND eine Garagenflaeche steht drin.
+
+     Der Anlass ist gemessen, nicht vermutet: lib/nhk2010.js kennt weder
+     `mea` noch `ist_wohnung` und kuerzt die Flaeche NICHT — anders als der
+     Bodenwert, der ueber ErtragswertService.bodenwert() anteilig kommt. Am
+     Pruefobjekt Huellhorst standen 64,58 m2 fuer eine von drei Einheiten;
+     ungekuerzt sind das bis zu ~18.500 EUR zu viel im Sachwert.
+
+     Bewusst KEINE Schwelle und KEINE Rechnung: die Garage folgt in der
+     Teilungserklaerung meist einem eigenen Anteil oder einem
+     Sondernutzungsrecht, nicht dem Wohnungs-MEA. Eine automatische Kuerzung
+     waere darum in beide Richtungen falsch. Gefragt wird, nicht gerechnet. */
+  function meaHinweis() {
+    var w = $('wm-w-garagenBgf');
+    if (!w) return;
+    var alt = w.querySelector('.wm-mea-hint');
+    var meaEl = $('mea'), garEl = $('garagenBgf');
+    var hatMea = !!(meaEl && parseFloat(String(meaEl.value).replace(',', '.')) > 0);
+    var hatGar = !!(garEl && parseFloat(String(garEl.value).replace(',', '.')) > 0);
+    if (!(hatMea && hatGar)) { if (alt) alt.remove(); return; }
+    if (alt) return;                                   /* schon da, nicht doppeln */
+    /* Eigene Darstellung statt einer fremden Klasse: fuer `.wm-f small` gibt
+       es in dieser App keine Regel, ein blankes <small> haette geerbt, was
+       gerade da war. Gedaempft und ohne Statusfarbe — es ist eine Rueckfrage,
+       kein Fehler. Der Gold-Akzent steht als Whitelabel-Token. */
+    var s = document.createElement('small');
+    s.className = 'wm-mea-hint';
+    s.style.cssText = 'display:block;margin-top:5px;font-size:11px;line-height:1.45;'
+      + 'opacity:.85;padding-left:7px;border-left:2px solid var(--wl-c9a84c,#C9A84C)';
+    s.innerHTML = 'Der Miteigentumsanteil wird hier <b>nicht</b> abgezogen — '
+      + 'anders als beim Bodenwert. Steht dort der eigene Anteil?';
+    w.appendChild(s);
+  }
+
   function block(id, titel, liste) {
     var alt = $(id);
     if (alt) alt.remove();
@@ -542,6 +581,11 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       var e = $(id);
       if (e && !e._wm) { e._wm = 1; e.addEventListener('change', function () { zeichnen(); ampel(); }); }
     });
+    /* v1166-GARMEA3 · NACH dem Neuzeichnen — zeichnen() baut die Bloecke neu
+       auf, ein vorher angehaengter Hinweis waere wieder weg. `mea` und
+       `garagenBgf` stehen in der Ausloeserliste darueber, der Hinweis kommt
+       also bei jeder Aenderung an einem der beiden mit. */
+    meaHinweis();
     if (window.Feldhilfe && window.Feldhilfe.neuLaden) window.Feldhilfe.neuLaden();
   }
 
