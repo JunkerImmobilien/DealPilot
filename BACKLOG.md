@@ -99,6 +99,27 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 ## Offen
 
+### OFFENE ABNAHME — Spracheingabe, ein Sprechlauf am Gerät
+
+**Marcel macht das später, der Punkt bleibt bis dahin stehen.** Drei
+Änderungen warten auf genau einen echten Sprechlauf, weil sie ohne Mikrofon
+nicht prüfbar sind:
+
+| Version | Was geprüft werden muss | Wenn es klemmt |
+|---|---|---|
+| `v1168` | Häkchen `san_tax_active` — taucht es in der Import-Tabelle auf, wenn eine Sanierungs-AfA genannt wird? | Nur JA kommt durch; ein „nein" wird bewusst verworfen |
+| `v1169` | **Das Stichwort-Fenster** — bleiben es neun, verschwindet ein erkanntes nach ~1 s, rückt eins nach? | `CHIP_FENSTER = 9` und `CHIP_NACHLEUCHTEN = 900` stehen direkt beieinander in `voice-import.js` |
+| `v1169`/`v1170` | **Das Tempo** — Diarisierung raus, Verifikations-Pass aus. Zwei Modelle statt vier | Qualität schlechter? `OPENAI_VOICE_VERIFY=1` + Rebuild holt den Pass zurück |
+
+**Worauf beim Sprechlauf zu achten ist:** Nicht nur, ob es schneller ist,
+sondern ob die **Zuordnung** noch stimmt — der Verifikations-Pass hat bisher
+falsch zugeordnete Zahlen und verwechselte Felder abgefangen. Genau dort
+zeigt sich, ob sein Wegfall zu teuer war.
+
+**Der letzte verbliebene Tempo-Hebel** wäre `gpt-5.5` in der Feldauswertung.
+Vorher messen, wie viel Zeit auf Transkription und wie viel auf Auswertung
+entfällt — nicht raten.
+
 1. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
    Der Punkt bleibt offen, weil **B** und die **Admin-Oberfläche** offen sind.
    Alles andere ist gebaut, es war nur nie nachgemessen worden.
