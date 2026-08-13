@@ -3446,7 +3446,42 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
      Ohne Nutzerwert bleibt alles bitgenau wie vorher — kein Attribut,
      keine Klasse, dieselbe Goldregel wie immer. */
   function _tabTextAn(h){ try{ document.body.classList.toggle('dp-tabtext-an', !!h); }catch(e){} }
-  window._dpDispTabText=function(h){ document.body.style.setProperty('--dp-tab-text',h); _tabTextAn(h); LS('dp_tabtext_ui',h); };
+
+  /* ── v1157-TABTEXT · Der Sweeper verwarf den Nutzerwert ────────────────
+     v1155 machte den Regler wirksam, aber nur bis zum naechsten
+     Akzentwechsel. Die Kette ist jetzt zu Ende gemessen:
+
+       whitelabel-override.js `sweepInline()` laeuft ueber ALLE `[style]`-
+       Elemente — der <body> ist einer davon, denn dort standen unsere
+       Custom Properties. Jede Aenderung merkt es sich in `_touchedAttr`
+       mit dem ORIGINALWERT. Bei einem Akzentwechsel ruft `apply()` (Z. 483)
+       `reset()`, und `reset()` spielt genau diese Originale per
+       `setAttribute` zurueck. Alles, was NACH dem ersten Sweep in den
+       Body-Inline-Stil geschrieben wurde, ist damit weg.
+
+     Deshalb schreibt der Regler nicht mehr an `body.style`, sondern in ein
+     eigenes <style>-Element. Der Sweeper fasst fremde Stylesheets nur
+     LESEND an (er sammelt Gold-Literale und schreibt umgefaerbte Kopien in
+     sein eigenes Overlay) — er kann sie nicht zuruecksetzen.
+
+     Angenehmer Nebeneffekt, der so gewollt ist: steht dort der Standardwert
+     #C9A84C, faerbt der Sweeper ihn wie jedes andere Gold-Literal mit —
+     der Tab-Text folgt dann dem Akzent. Ein bewusst gesetzter Sonderton
+     (z. B. #FF0000) ist kein Gold und bleibt unangetastet.
+
+     Der alte Body-Inline-Wert wird beim Setzen ENTFERNT: er liegt naeher am
+     Element als `:root` und wuerde sonst gewinnen. */
+  function _tabTextCss(h){
+    try{
+      var id='dp-textfein-css', st=document.getElementById(id);
+      if(!st){ st=document.createElement('style'); st.id=id; document.head.appendChild(st); }
+      st.textContent = h ? (':root{--dp-tab-text:'+h+'}') : '';
+    }catch(e){}
+  }
+  window._dpDispTabText=function(h){
+    try{ document.body.style.removeProperty('--dp-tab-text'); }catch(e){}
+    _tabTextCss(h); _tabTextAn(h); LS('dp_tabtext_ui',h);
+  };
   window._dpDispObjText=function(h){ document.body.style.setProperty('--dp-obj-text',h); LS('dp_objtext_ui',h); };
   /* Extra-Farbregler in die Toolbar einhaengen (vor dem Logo-Block) */
   var _oldLogo=window._dpLogoBlock;
@@ -3471,7 +3506,10 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     if(_oldOpen) _oldOpen();
   };
   /* Boot */
-  try{ var t=LS('dp_tabtext_ui'); if(t){ document.body.style.setProperty('--dp-tab-text',t); _tabTextAn(t); }
+  try{ var t=LS('dp_tabtext_ui'); if(t){ _tabTextCss(t); _tabTextAn(t); }   /* v1157: eigenes Sheet */
+       /* Der Objektkarten-Regler steht bewusst noch auf dem alten Weg: er ist
+          nicht als defekt gemeldet, und dieselbe Umstellung waere eine zweite
+          Baustelle. Er trifft aber dieselbe Falle — als Punkt vermerkt. */
        var o=LS('dp_objtext_ui'); if(o) document.body.style.setProperty('--dp-obj-text',o); }catch(e){}
 })();
 /* === /v938-textcolors === */
