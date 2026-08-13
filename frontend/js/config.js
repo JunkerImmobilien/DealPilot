@@ -214,7 +214,17 @@ window.DealPilotConfig = (function() {
         deal_score_v2:       'demo', // V63.82: nur Demo-Sichtbarkeit, kein voller Funktionsumfang
         deal_score_basic:    true,    // V112: Free zeigt BEIDE Scores (DS1 + DS2-Demo) — Marcels Wunsch
         ai_analysis_tab:     'full',  // V159: Free hat vollen Umfang als Demo
-        market_data_fields:  true,    // V159: Free darf Marktdaten sehen (Demo)
+        market_data_fields:  false,   // v1160-GATE: Entscheidung Marcel 13.08.2026 —
+                                      //   „Gate zuziehen, das Versprechen gilt."
+                                      //   Vorher true mit dem Kommentar „Free darf Marktdaten
+                                      //   sehen (Demo)" — der Wert war aber VOLL, nicht 'demo'.
+                                      //   Landing (Cockpit-Matrix Z. 12) und pricing-modal
+                                      //   (Z. 261 UND Z. 505) sagen bei Free „gesperrt*", und
+                                      //   die Fussnote wird noch deutlicher: „Marktdatenfelder
+                                      //   in Free & Starter als Vorschau gesperrt, ab Investor
+                                      //   freigeschaltet." Starter fuehrt dafuer false — Free
+                                      //   bekommt jetzt dasselbe. Derselbe Fall wie W42-free-bmf
+                                      //   unten, dieselbe Entscheidung.
         bmf_calc_export:     false,   // W42-free-bmf: Entscheidung 16.07.2026 —
                                       //   Free bekommt keinen BMF-Rechner. Vorher stand hier
                                       //   true ("V159: BMF-Demo verfuegbar"), waehrend Landing
@@ -231,7 +241,11 @@ window.DealPilotConfig = (function() {
         export_csv:          false,   // v494-matrix: Rohdatenexport nur Pro
         custom_finance_models: true,  // V159: ✅ zum Ausprobieren (Bauspar/Tilgungsaussetzung)
         custom_logo:         false,
-        live_market_rates:   true,    // V159: Demo
+        live_market_rates:   false,   // v1160-GATE: Entscheidung Marcel 13.08.2026.
+                                      //   Vorher true mit dem Kommentar „Demo" — der Wert war
+                                      //   aber VOLL. Landing und pricing-modal fuehren bei Free
+                                      //   UND Starter ein „–", also gar nicht. Starter hat
+                                      //   dafuer bereits false (Z. 291); Free bekommt dasselbe.
         bank_pdf_a3:         false,
         bank_pdf_normal:     true,    // V159: Demo
         werbungskosten_pdf:  false,   // v494-matrix: erst ab Investor
