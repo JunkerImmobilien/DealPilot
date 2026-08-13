@@ -3355,3 +3355,23 @@ auf hellem Grund, keiner auf dunklem — deshalb gilt es für alle.
 **Drei Werkzeugfallen aus diesem Lauf stehen jetzt in `FALLEN.md` Punkt 10** —
 `color(srgb …)` statt `rgb()`, Verläufe im Grund-Leser, und der eigene
 halbtransparente Hintergrund des gemessenen Elements.
+
+### `v1165` — Garagenfeld im Marktbericht · `b9e7851`
+
+**Backlog-Punkt 10 war als „blockiert" markiert — der Widerspruch darunter war
+es nicht.** Die Feldhilfe (v1142) sagte „bei einer Eigentumswohnung nur der
+eigene Anteil", der Platzhalter sagte „alle Garagen zusammen". **Sichtbar ist
+der Platzhalter**; die Hilfe muss man aufklappen. Der Nutzer trug also die
+Gesamtfläche ein — und `lib/nhk2010.js` kennt weder `mea` noch `ist_wohnung`,
+kürzt also nichts. Am Prüfobjekt Hüllhorst 64,58 m² für eine von drei
+Einheiten, bis zu ~18.500 € zu viel.
+
+> **Lehre, allgemein:** Ein Punkt, der auf eine Entscheidung wartet, kann
+> trotzdem Anteile haben, die **keine** brauchen. Bevor „blockiert" stehen
+> bleibt: nachsehen, ob darunter etwas liegt, das in **jedem** Ausgang der
+> Entscheidung richtig ist. Zwei Texte, die sich widersprechen, sind so ein
+> Fall — einer ist falsch, egal wie entschieden wird.
+
+**Cache-Buster:** die Marktbericht-Kette hat **drei** Glieder, die zusammen
+gezogen werden müssen — `frontend/index.html` → `marktbericht-view.js` (die
+iframe-URL **im** Skript) → `marktbericht-app/index.html`.

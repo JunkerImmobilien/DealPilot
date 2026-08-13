@@ -1129,6 +1129,26 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
    hingehört oder nur eine deutlichere Feldhilfe (die seit `v1142` steht
    und den fehlenden Abzug bereits benennt).
 
+   > **TEILWEISE GERÄUMT — `v1165`, `b9e7851`** (siehe „Fertig"). Der
+   > **Platzhalter sagte das Gegenteil der Feldhilfe** („alle Garagen
+   > zusammen" gegen „nur der eigene Anteil"), und sichtbar ist der
+   > Platzhalter. Das war kein Entscheidungsfall, sondern ein Widerspruch, in
+   > dem einer der beiden Texte falsch sein musste. Er ist weg.
+   >
+   > **Die fachliche Frage bleibt offen** — und sie ist jetzt die einzige, die
+   > noch blockiert. Zwei Wege stehen zur Wahl:
+   > - **A · Feld bleibt wohnungsbezogen** (was die Texte jetzt sagen). Nichts
+   >   weiter zu tun; der Nutzer trägt seinen Anteil ein.
+   > - **B · Feld wird gebäudebezogen** und die Rechnung kürzt selbst mit dem
+   >   MEA — dann muss `lib/nhk2010.js` `mea`/`ist_wohnung` bekommen, wie es
+   >   `ErtragswertService.bodenwert()` schon tut, und beide Texte drehen sich
+   >   wieder um.
+   >
+   > **Ohne Entscheidung noch baubar:** ein Hinweis im Formular, wenn ein MEA
+   > gepflegt ist **und** eine Garagenfläche steht — „der Anteil wird hier
+   > nicht abgezogen, ist das der eigene?". Reine Rückfrage, keine
+   > Rechenänderung, in beiden Wegen richtig.
+
 11. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
    Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
@@ -1302,6 +1322,34 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 ---
 
 ## Fertig
+
+- [2026-08-13] **Das Garagenfeld sagte im Platzhalter das Gegenteil der Feldhilfe** — `v1165`, `b9e7851`. **(Backlog-Punkt 10, der entblockbare Teil)**
+   Punkt 10 stand als **blockiert**, weil eine fachliche Entscheidung fehlt.
+   Beim Nachsehen lag darunter aber ein Widerspruch, der **keine** Entscheidung
+   braucht — einer der beiden Texte muss schlicht falsch sein:
+
+   | | Text |
+   |---|---|
+   | Feldhilfe (v1142) | „bei einer Eigentumswohnung also nur die eigene Garage oder **der eigene Anteil**" |
+   | Platzhalter im Feld | „Länge × Breite, **alle Garagen zusammen**" |
+
+   **Sichtbar ist der Platzhalter.** Die Hilfe muss man aufklappen. Der Nutzer
+   trug also genau die Gesamtfläche ein, die den Sachwert zu hoch macht —
+   `lib/nhk2010.js` kennt weder `mea` noch `ist_wohnung` und kürzt nichts. Am
+   Prüfobjekt Hüllhorst sind das 64,58 m² für **eine von drei** Einheiten, bis
+   zu rund 18.500 € zu viel.
+
+   Der Platzhalter heißt jetzt „Länge × Breite – bei einer ETW nur der eigene
+   Anteil". Cache-Buster in **allen drei Gliedern** der Marktbericht-Kette
+   hochgezogen.
+
+   **Was das ausdrücklich NICHT tut:** es nimmt die fachliche Frage nicht
+   vorweg. Ob ins Feld eine MEA-Kürzung gehört, entscheidet Marcel weiterhin —
+   hier wurde nur der Widerspruch zwischen zwei Texten geräumt.
+
+   **Nachweis:** Syntax geprüft, Marker auf dem Server, Kette gezogen. Der
+   sichtbare Platzhalter ist **nicht im Browser abgenommen** — ein Textstring
+   ohne Logik, aber gesehen habe ich ihn dort nicht.
 
 - [2026-08-13] **Die Objektnummer im Kopf hat jetzt Kontrast** — `v1164`, `bb44d8d`. **(Backlog-Punkt 9)**
    **Kein neuer Befund, sondern der Rest eines halb erledigten.** Der Punkt
