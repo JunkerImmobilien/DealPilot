@@ -842,6 +842,23 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 7. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
+   > **GRÖSSTENTEILS SCHON GEBAUT — Befund vom 2026-08-13, siehe „Fertig".**
+   > `buildFullCatalog()` (v519) gibt **alle** `window.FIELDS` an die
+   > Auswertung; `risiken`, `thesis` und `notizen` sind füllbar, und
+   > Prompt-Regel 8 sortiert den Rest nach `notizen`. **Die Chip-Wolke ist
+   > kuratiert, der Auswertekatalog ist es nicht** — wer auf die Chips sieht,
+   > hält die Anzeige für den Umfang.
+   >
+   > **Es bleiben drei Reste:**
+   > 1. **Checkboxen** werden in beiden Katalogbauern übersprungen.
+   > 2. **Das Modal beim „Als Objekt speichern"** mit der Auflistung der
+   >    übernommenen Werte — nicht geprüft, ob es das gibt.
+   > 3. Ob die Einsortierung in der Praxis trifft — **Abnahmepunkt**, nur
+   >    durch einen echten Sprechlauf zu klären.
+   >
+   > **Der Punkt gehört auf diese drei zusammengestrichen**, nicht als Neubau
+   > angefasst.
+
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
 
@@ -1338,6 +1355,39 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 ---
 
 ## Fertig
+
+- [2026-08-13] **Punkt 7 ist zum größten Teil längst gebaut — Befund, kein Umbau**
+   **Vor dem Bauen nachgesehen, und gut so.** Marcels Punkt liest sich wie ein
+   Neubau („Spracheingabe soll **alle** Felder füllen"). Gemessen im Code:
+
+   | Marcels Wunsch | Stand |
+   |---|---|
+   | **alle** Felder per Sprache füllbar | **`buildFullCatalog()`, v519** — gibt *alle* `window.FIELDS` an die Auswertung, nicht nur die Chip-Whitelist. Der Kommentar nennt als Beispiele genau `bank_inst`, `d1_type`, Bauspar-Felder, Investment-These, Risiken |
+   | Risiken und Mängel → **bekannte Risiken** | `risiken` steht in `HINTS` und ist füllbar |
+   | Vorhaben → **Investitionsthese** | `thesis` ebenso |
+   | Rest → **zusätzliche Notizen**, statt ihn zu verlieren | **Prompt-Regel 8** in `voiceExtractService.js:138`: *„Allgemeine Anmerkungen ohne eigenes Feld → notizen."* |
+   | QuickBoarding: weniger Felder, gleiche Logik | so gebaut — im Quick Check bleibt es bei den QC-Feldern, derselbe Dienst |
+
+   **Der Unterschied, der den Punkt erklärt:** die **Chip-Wolke** ist kuratiert
+   (`buildCatalog`, v510 — eine Whitelist mit Klartext-Labels), der
+   **Auswertekatalog** ist vollständig (`buildFullCatalog`, v519). Wer auf die
+   Chips sieht, hält die Liste für den Umfang. **Sie ist nur die Anzeige.**
+
+   ### Was wirklich offen ist — deutlich kleiner als der Punkt
+
+   1. **Checkboxen werden übersprungen.** Beide Katalogbauer steigen bei
+      `el.type === 'checkbox'` aus. „Alle Felder" schließt sie ein; ob das
+      Absicht war, steht nirgends.
+   2. **Das Modal beim „Als Objekt speichern"** — Marcel will dort die
+      Auflistung der mit übernommenen Werte und die Texte der Zusammenfassung.
+      **Nicht geprüft**, ob es das gibt.
+   3. Ob die Einsortierung in `risiken`/`thesis`/`notizen` in der Praxis
+      trifft, sagt nur ein echter Sprechlauf — das ist ein Abnahmepunkt, kein
+      Codebefund.
+
+   **Deshalb hier nichts gebaut.** Ein Paket auf „das fehlt" wäre das siebte
+   Mal derselbe Fehler gewesen. Der Punkt gehört auf die drei Reste
+   zusammengestrichen, nicht als Neubau angefasst.
 
 - [2026-08-13] **Die zwei Reste des Profil-Schalters sind zu** — `v1167`, `c1d572b`. **(Backlog-Punkt 5 abgeschlossen)**
    **Rest 1 · Je Profil eigene Werte.** Der Schalter setzte `ui_cards` hart auf
