@@ -613,30 +613,7 @@ die alle auf Marcels Durchgang zurückgehen.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-5. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
-
-   Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
-   schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
-   es der alte Befund in neuer Form ist.
-
-   **Am Raster messen, nicht am Farbtoken.** Ohne Vorlage ist der Bereich
-   sauber, erst mit umgestellter Vorlage rückt alles zusammen — die Ursache
-   liegt also im Abstandsraster, nicht in der Farbe. Und beim Nachmessen die
-   `v1105c`-Lehre mitnehmen: das Goldband ist ein `::before`, ein Leser, der
-   nur die Elternkette abläuft, sieht es nicht.
-
-   **Dazu Marcels zweite Vorgabe an derselben Karte:** *„achte darauf, dass
-   alle Werte immer angegeben werden, die wir brauchen."* Das ist ein eigener
-   Prüfschritt — **welche Angaben gehören auf die Karte, und fehlt eine
-   davon?** Die Liste gehört mit Marcel abgestimmt, nicht von mir geraten;
-   danach wird gezählt, ob jede tatsächlich erscheint (und was passiert, wenn
-   sie leer ist — `_euro(null)` liefert `"–"` und ist **truthy**, ein
-   `||`-Rückfall greift dort nie).
-
-   **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
-   Aufgreifen zusammenlegen, nicht doppelt bauen.
-
-6. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+5. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -673,7 +650,7 @@ die alle auf Marcels Durchgang zurückgehen.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-7. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+6. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -703,7 +680,84 @@ die alle auf Marcels Durchgang zurückgehen.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-8. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+   ### PRÜFLAUF DURCHGEFÜHRT (2026-08-13) — die Befundliste
+
+   Alle drei Wahrheiten ausgelesen und gegeneinander gehalten: `config.js`
+   (Gate, 4 Plan-Blöcke, 33 Schlüssel), `pricing-modal.js` (Matrix) und
+   `landing/index.html` (Cockpit-Matrix, 31 Zeilen).
+
+   **Zuerst die gute Nachricht:** die drei Matrizen sind bei den geprüften
+   Zeilen **deckungsgleich** — 31 Zeilen, gleiche Reihenfolge, gleiche Werte.
+   Die befürchtete Drift zwischen Landing und Modal gibt es an dieser Stelle
+   **nicht**.
+
+   #### B1 · Free bekommt zwei Funktionen, die die Landing ihm nicht verspricht
+
+   | Schlüssel | `config.js` free | Landing + Modal (Free) |
+   |---|---|---|
+   | `live_market_rates` | **true** | **„–"** (also nein) |
+   | `market_data_fields` | **true** | **„gesperrt\*"** |
+
+   Die Fußnote der Landing ist dabei eindeutig: *„Marktdatenfelder in Free &
+   Starter als Vorschau gesperrt, ab Investor freigeschaltet."*
+   **Kein Kundenschaden, aber das Gate ist offener als das Versprechen.**
+   Zu entscheiden ist, welche Seite recht hat — das ist Marcels Sache, nicht
+   meine: entweder das Gate zuziehen oder die Matrix ehrlich machen.
+
+   #### B2 · `bank_pdf_premium` ist ein toter Schlüssel
+
+   Er steht **nur** im Starter-Block, dort auf `false`, und fehlt bei free,
+   investor **und pro**. Ein fehlender Schlüssel ist `undefined` und damit
+   false — **das Feature ist für niemanden verfügbar, auch nicht für Pro.**
+   In keiner der drei Matrizen kommt er vor, es gibt also kein
+   Verkaufsversprechen dazu. Vermutlich ein Überrest; **vor dem Löschen
+   prüfen, ob ihn jemand abfragt** (`grep -rn "bank_pdf_premium"`).
+
+   #### B3 · Dreizehn Schlüssel verlassen sich auf „undefined = false"
+
+   `ai_analysis`, `ai_market_analysis`, `api_access`, `bank_pdf_premium`,
+   `bankexport`, `custom_imports`, `deal_score_v2`, `investment_thesis_ai`,
+   `migration_service`, `premium_pdf_layouts`, `priority_support`,
+   `theme_palette`, `track_record_custom_cover` stehen **nicht in jedem
+   Plan**. Heute ist das folgenlos, weil `undefined` wie `false` wirkt —
+   **aber genau daran hing W41** (`bmf_advanced` stand in keinem Plan und war
+   dadurch für Pro gesperrt). **Ein Tippfehler in einem Schlüsselnamen ist in
+   dieser Bauweise unsichtbar.** Empfehlung: jeden Schlüssel in jedem Plan
+   explizit führen, dann fällt ein Tippfehler beim Lesen auf.
+
+   #### B4 · Zwei „Free kann mehr als Starter"-Fälle sind KEIN Fehler
+
+   `track_record_pdf` (free true, starter false) und
+   `custom_finance_models` (free true, starter false) sahen nach einem
+   Preisfehler aus. Die Matrix erklärt beide: **Free = „Wasserzeichen" bzw.
+   „alle Modelle als Demo"** — Free sieht alles als Vorschau, Starter zahlt
+   und bekommt dafür echte, aber begrenzte Funktionen. **Absicht, nicht
+   Defekt.** Zurückgenommen, bevor daraus ein Befund wurde.
+
+   #### B5 · `pricing-modal.js` führt die Matrix zweimal
+
+   Einmal ab Z. 261 mit `\uXXXX`-Escapes, einmal ab Z. 505 mit echten
+   Zeichen — **dieselben 31 Zeilen, zwei Fassungen.** Heute inhaltsgleich
+   (geprüft an den kritischen Zeilen), aber es ist dieselbe Doppelung, die im
+   Marktbericht dreimal auseinandergelaufen ist. **Eigener kleiner Punkt.**
+
+   #### Nicht geprüft, ehrlich benannt
+
+   - **`hasFeature` fragt zuerst die Datenbank** (`Sub.hasCachedFeature`),
+     `config.js` nur bei `null`. **Der DB-Weg ist nicht gemessen** — dafür
+     braucht es je Plan ein echtes Konto. Das ist der zweite Teil des Punkts
+     und bleibt offen.
+   - **Partner** steht in `config.js` gar nicht; er ist ein Pro-Klon
+     (`reseller-portal.js:552`) plus `reseller`, `reseller_whitelabel`,
+     `custom_logo`. Auch das ist am Konto zu prüfen, nicht im Code.
+
+   *(Zwei eigene Fehlbefunde aus diesem Lauf, damit sie nicht wiederkehren:
+   die Landing schien „Pro = 8 Objekte" und einen Spaltenkopf „?Investor" zu
+   führen. Beides waren **Kodierungsartefakte meiner Konsolenausgabe** —
+   roh stehen dort `∞` und `★`. Bei Matrizen mit Sonderzeichen die Rohzelle
+   lesen, nicht die aufbereitete Ausgabe.)*
+
+7. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -759,7 +813,7 @@ die alle auf Marcels Durchgang zurückgehen.
 
 ---
 
-9. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+8. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
@@ -866,7 +920,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-10. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+9. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -964,7 +1018,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-11. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+10. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
    das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
@@ -990,6 +1044,29 @@ die alle auf Marcels Durchgang zurückgehen.
    entscheidet Marcel fachlich — davon hängt ab, ob dort eine MEA-Kürzung
    hingehört oder nur eine deutlichere Feldhilfe (die seit `v1142` steht
    und den fehlenden Abzug bereits benennt).
+
+11. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+
+   Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
+   schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
+   es der alte Befund in neuer Form ist.
+
+   **Am Raster messen, nicht am Farbtoken.** Ohne Vorlage ist der Bereich
+   sauber, erst mit umgestellter Vorlage rückt alles zusammen — die Ursache
+   liegt also im Abstandsraster, nicht in der Farbe. Und beim Nachmessen die
+   `v1105c`-Lehre mitnehmen: das Goldband ist ein `::before`, ein Leser, der
+   nur die Elternkette abläuft, sieht es nicht.
+
+   **Dazu Marcels zweite Vorgabe an derselben Karte:** *„achte darauf, dass
+   alle Werte immer angegeben werden, die wir brauchen."* Das ist ein eigener
+   Prüfschritt — **welche Angaben gehören auf die Karte, und fehlt eine
+   davon?** Die Liste gehört mit Marcel abgestimmt, nicht von mir geraten;
+   danach wird gezählt, ob jede tatsächlich erscheint (und was passiert, wenn
+   sie leer ist — `_euro(null)` liefert `"–"` und ist **truthy**, ein
+   `||`-Rückfall greift dort nie).
+
+   **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
+   Aufgreifen zusammenlegen, nicht doppelt bauen.
 
 ## Später
 
