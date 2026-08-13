@@ -17,7 +17,14 @@
  * ════════════════════════════════════════════════════════════════════ */
 'use strict';
 
-const TRANSCRIBE_MODEL = process.env.OPENAI_TRANSCRIBE_MODEL || 'gpt-4o-transcribe-diarize';
+/* v1169-VFAST: Der Default stand auf `gpt-4o-transcribe-diarize`. Diarisierung
+   trennt SPRECHER voneinander — beim Diktat ins eigene Mikrofon spricht eine
+   Person. Das war Rechenzeit ohne Gegenwert und der erste Grund, warum die
+   Erkennung sich zaeh anfuehlte. Der Dateikopf nennt als Default ohnehin
+   `gpt-4o-mini-transcribe`; Code und Doku waren auseinander.
+   Weiterhin per OPENAI_TRANSCRIBE_MODEL ueberschreibbar — wer Sprechertrennung
+   braucht (Aufnahme einer Besichtigung zu zweit), setzt sie dort. */
+const TRANSCRIBE_MODEL = process.env.OPENAI_TRANSCRIBE_MODEL || 'gpt-4o-mini-transcribe';
 const EXTRACT_MODEL = process.env.OPENAI_VOICE_EXTRACT_MODEL || process.env.OPENAI_MODEL || 'gpt-5.5';
 const QUICKMATCH_MODEL = process.env.OPENAI_QUICKMATCH_MODEL || 'gpt-4o-mini';  /* v513: Live-Zwischenauswertung, klein/guenstig */
 
