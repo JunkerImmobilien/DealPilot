@@ -156,6 +156,20 @@
     attr('data-ui-cards',   get('ui_cards',   CARDS));
     attr('data-ui-surface', get('ui_surface', SURFACE));
     attr('data-ui-form',    get('ui_form',    FORMEN));   /* v1098 */
+    grundSperre();                                        /* v1156 */
+  }
+
+  /* ── v1156-GRUND · Die Grundfarbe gilt nur ohne Vorlage ────────────────
+     Sie wird deshalb gesperrt, sobald eine Vorlage aktiv ist — sichtbar,
+     nicht versteckt, mit dem Grund daneben. Hier steht bewusst KEINE
+     Kopie der Bedingung aus dem CSS: gelesen wird dasselbe Attribut, das
+     die Regeln pruefen (`html[data-ui-theme]`). Zwei Wahrheiten ueber
+     dieselbe Bedingung liefen im Marktbericht dreimal auseinander. */
+  function grundSperre() {
+    var l = document.getElementById('dpuv-lock-grund');
+    if (!l) return;
+    var vorlageAktiv = !!document.documentElement.getAttribute('data-ui-theme');
+    l.classList.toggle('locked', vorlageAktiv);
   }
 
   /* ── Plan-Schranke ────────────────────────────────────────────────────
@@ -396,8 +410,33 @@
             '<div id="dpuv-res">' + fremdBlock('_dpResBlock') + '</div>' +
             '<div class="dpuv-lbl" style="margin-top:12px">Akzent</div>' +
             swHtml('dpuv-acc', AKZENTE, s.ui_accent || GOLD_STD) +
+            /* v1156-GRUND · Marcels Befund: „Grundfarbe auswaehlen — es tut
+               sich gar nichts." Gemessen: OHNE Vorlage wirkt sie (Sidebar,
+               Tab-Leiste, Kopfverlauf ziehen mit), MIT Vorlage nicht — alle
+               drei Regeln in css/ui-varianten.css beginnen mit
+               `html:not([data-ui-theme])`. Der Wert wurde aber gespeichert:
+               ein stiller Rueckfall, und die sind schlimmer als ein Fehler.
+
+               Marcels Entscheidung: Weg B — sichtbar sperren statt wirken
+               lassen. Eine dunkle Grundflaeche unter der hellen Vorlage
+               „Kontor" wuerde deren Zweck widersprechen; die Vorlage IST
+               die Flaechenentscheidung.
+
+               Eigener kleiner Wrapper, dieselbe Mechanik wie die
+               Partner-Schranke (.dpuv-lock / .dpuv-lockbar) — keine zweite
+               Sperr-Optik. Die Akzentfarbe darueber bleibt frei: sie wirkt
+               auch unter Vorlagen (v1096b). */
             '<div class="dpuv-lbl" style="margin-top:14px">Grundfarbe (Obsidian)</div>' +
+            '<div class="dpuv-lock" id="dpuv-lock-grund"><div class="dpuv-inner">' +
             swHtml('dpuv-obs', GRUNDFARBEN, s.ui_obsidian || OBSIDIAN_STD) +
+            '</div></div>' +
+            '<div class="dpuv-lockbar" id="dpuv-lockbar-grund"><div>' +
+              '<b>Die Vorlage bestimmt die Flächen</b>' +
+              '<span>Solange eine Vorlage aktiv ist, kommen Kopfleiste, ' +
+              'Reiterleiste und Objektleiste aus ihr. Die Grundfarbe gilt für ' +
+              'die Fassung <b>DealPilot</b> — wähle sie oben, dann ist die ' +
+              'Grundfarbe wieder frei. Der <b>Akzent</b> wirkt in jeder ' +
+              'Vorlage.</span></div></div>' +
             '<div class="dp-tb-sec" id="dpuv-bereiche"><b>Einzelne Bereiche</b>' +
               '<p class="dpuv-hint" style="margin:0 0 6px">Übersteuert die Vorlage. ' +
               'Wirkt zusammen mit einer Vorlage — „DealPilot" behält seine eigenen Flächen.</p>' +
@@ -824,6 +863,7 @@
   function oeffnen() {
     bauen();
     gateSetzen();
+    grundSperre();           /* v1156: beim Aufbau, nicht erst beim naechsten Klick */
     markeAuffrischen();      /* v1098: Reseller-Zustand und Logo sind aeusserer Zustand */
     targetUmhuellen();       /* v1098: erst hier, damit reseller-portal.js sicher geladen ist */
     resetUmhuellen();
