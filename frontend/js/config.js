@@ -239,7 +239,12 @@ window.DealPilotConfig = (function() {
            Damit konnte niemand den BMF-Rechner oeffnen. */
         export_pdf:          true,    // mit Wasserzeichen
         export_csv:          false,   // v494-matrix: Rohdatenexport nur Pro
-        custom_finance_models: true,  // V159: ✅ zum Ausprobieren (Bauspar/Tilgungsaussetzung)
+        /* v1171: war true. Die DB führt für free `custom_finance_models=false`,
+           und die DB ist die Quelle — ein echter Free-Nutzer hatte es nie.
+           Der Fallback log aber im STARTFENSTER, bis die DB antwortet, und
+           zeigte kurz eine Funktion, die gleich wieder verschwindet.
+           Dasselbe Muster wie v1160, anderer Schlüssel. */
+        custom_finance_models: false,  // V159/v1171: ab Investor (Bauspar/Tilgungsaussetzung)
         custom_logo:         false,
         live_market_rates:   false,   // v1160-GATE: Entscheidung Marcel 13.08.2026.
                                       //   Vorher true mit dem Kommentar „Demo" — der Wert war
