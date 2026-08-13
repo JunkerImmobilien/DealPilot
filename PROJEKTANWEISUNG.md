@@ -3413,3 +3413,29 @@ Gemessen: Obsidian + Wallet → Hell → zurück → **Wallet ist wieder da.**
 **Markierung beim Öffnen.** `markieren()` hing nur am Klick; wer das Pane
 öffnete, sah zwei ungedrückte Knöpfe, obwohl einer galt. `_dpProfilMarkieren`
 existierte längst und wurde nur nie beim Öffnen gerufen.
+
+### `v1168` — Checkboxen per Sprache · `77be07f`
+
+**Backlog-Punkt 7, Rest 1.** Beide Katalogbauer schlossen `type="checkbox"`
+aus. Die Freigabe allein hätte nichts bewirkt — **vier Stellen** mussten mit,
+jede hätte still versagt:
+
+1. **Backend-Whitelist** `voiceExtractService:51` — `kind` wird gegen eine
+   feste Liste geprüft; `bool` wäre **still auf `text`** gefallen.
+2. **Prompt-Zeile** — sonst rät das Modell zwischen `true`, `"ja"`, `1`.
+3. **Normalisierung in beiden Auswertepfaden.**
+4. **`applyMerged()`** in `object-actions.js` — `setInput()` schreibt in
+   `.value` und lässt ein Häkchen unberührt; es wäre als übernommen
+   **gezählt** worden, ohne gesetzt zu sein.
+
+> **Die Regel, die dabei am meisten wert ist:** Es kommt **nur JA** durch. Ein
+> „nein" wird verworfen statt als `false` übernommen — sonst hakt ein
+> beiläufiges „einen Stellplatz gibt es nicht" ein Feld **aktiv ab**, das der
+> Nutzer nie angefasst hat. Die Import-Tabelle zeigt nur, was gesetzt wird;
+> ein stilles Abhaken wäre dort unsichtbar.
+
+**Und der Maßstab:** 203 Felder, **genau eine Checkbox** (`san_tax_active`).
+Die Änderung ist vollständig, betrifft heute aber ein Feld — das Formular löst
+Ja/Nein sonst über Selects. **Erst zählen, dann schätzen.**
+
+**Backend geändert → Rebuild.** Vier Marker im laufenden Container geprüft.

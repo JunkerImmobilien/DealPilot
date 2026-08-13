@@ -1361,6 +1361,40 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 ## Fertig
 
+- [2026-08-13] **Checkboxen per Sprache — der ganze Weg, nicht nur die Freigabe** — `v1168`, `77be07f`. **(Backlog-Punkt 7, Rest 1)**
+   Beide Katalogbauer stiegen bei `type === 'checkbox'` aus. „Alle Felder"
+   schließt sie ein. **Die Freigabe allein hätte nichts bewirkt** — vier
+   Stellen mussten mit, und jede einzelne hätte still versagt:
+
+   | # | Stelle | Was ohne sie passiert wäre |
+   |---|---|---|
+   | 1 | **Backend-Whitelist** (`voiceExtractService:51`) | `kind` wird gegen `['select','num','int','date','text']` geprüft — `bool` wäre **still auf `text`** gefallen. Katalog käme durch, KI lieferte `"ja"`, das Frontend hätte einen String, wo es ein Häkchen setzen will |
+   | 2 | **Prompt-Zeile** | Das Modell rät zwischen `true`, `"ja"` und `1`. Wichtiger noch: **nur nennen, wenn zutreffend** — sonst listet es gewissenhaft alle Häkchen mit `false` und die Import-Tabelle quillt über mit Nicht-Befunden |
+   | 3 | **Normalisierung**, in **beiden** Auswertepfaden | Ohne sie käme `"ja"` als String an |
+   | 4 | **`applyMerged()`** in `object-actions.js` | `setInput()` schreibt in `.value` und **lässt eine Checkbox unberührt** — sie wäre als übernommen **gezählt** worden, ohne gesetzt zu sein |
+
+   **Die wichtigste Entscheidung ist keine technische:** Es kommt **nur JA
+   durch.** Ein „nein" wird verworfen statt als `false` übernommen — sonst
+   hakt ein beiläufiges *„einen Stellplatz gibt es nicht"* ein Feld **aktiv
+   ab**, das der Nutzer nie angefasst hat. Die Import-Tabelle zeigt nur, was
+   gesetzt wird; ein stilles Abhaken wäre dort unsichtbar gewesen.
+
+   `change` wird von Hand gefeuert — ein per Skript gesetztes `.checked` löst
+   keins aus, und die Rechenkette hängt an Ereignissen.
+
+   ### Der Rest war viel kleiner als der Punkt klingt
+
+   **Gemessen: 203 Felder, davon genau EINE Checkbox** — `san_tax_active`.
+   Die Änderung ist vollständig und richtig, **betrifft heute aber ein Feld.**
+   Das Formular löst Ja/Nein sonst über Selects, und die sind längst füllbar.
+   *(Wer den Punkt für groß hielt — ich auch — hat von „Checkboxen" auf eine
+   Menge geschlossen, die es nicht gibt. Erst zählen, dann schätzen.)*
+
+   **Nachweis:** Syntax für alle drei Dateien, Backend **neu gebaut**, vier
+   Marker im laufenden Container, Server hört wieder. **Nicht abgenommen ist
+   der Sprechlauf** — dafür braucht es ein Mikrofon am Gerät. Das bleibt
+   Rest 3 des Punktes.
+
 - [2026-08-13] **Punkt 7, Rest 2 gemessen: das Speichern-Modal gibt es nicht — und der Snapshot ist eine feste Liste**
    Marcel: *„Beim ‚Als Objekt speichern' öffnet sich ohnehin ein kleines Modal.
    Dort soll stehen: es gibt weitere Werte, die mit übernommen werden — mit
