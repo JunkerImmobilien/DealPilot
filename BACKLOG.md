@@ -636,32 +636,7 @@ die alle auf Marcels Durchgang zurückgehen.
    **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
    Aufgreifen zusammenlegen, nicht doppelt bauen.
 
-6. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
-
-   **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
-   führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
-   man auf dem × zum Löschen.
-
-   **Marcels Vorgabe: der Pfeil gehört nach unten.** Das löst zwei Dinge auf
-   einmal — die Kollision, und den bekannten Befund, dass `.sbc-arrow` mit
-   **20 × 20 px** deutlich unter der 44-px-Trefferfläche aus v650/v652 liegt.
-   Unten ist Platz, oben nicht.
-
-   **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:** Pfeil
-   und Karte tun Verschiedenes — der Pfeil klappt auf (`umschalten()` in
-   `karten-kompakt.js`, delegierter Listener), der Kartenkörper öffnet das
-   Objekt. Eine 44-px-Pseudofläche würde der Karte Klicks stehlen und die
-   falsche Aktion auslösen. Es ist eine Frage der Kartengestaltung.
-
-   **Vor dem Verschieben messen:** `getBoundingClientRect()` auf Pfeil und ×,
-   den Abstand beziffern, und mit `elementFromPoint` prüfen, **wer den Klick
-   in der Lücke bekommt**. Danach die neue Lage in allen drei Kartenmodi
-   gegenprüfen — der Pfeil erscheint nur bei `kompakt` und `stapel`.
-
-   **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
-   Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
-
-7. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+6. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -698,7 +673,7 @@ die alle auf Marcels Durchgang zurückgehen.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-8. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+7. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -728,7 +703,7 @@ die alle auf Marcels Durchgang zurückgehen.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-9. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+8. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -784,7 +759,7 @@ die alle auf Marcels Durchgang zurückgehen.
 
 ---
 
-10. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+9. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
@@ -891,7 +866,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-11. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+10. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -989,7 +964,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-12. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+11. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
    das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
@@ -1168,6 +1143,62 @@ die alle auf Marcels Durchgang zurückgehen.
 ## Fertig
 
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-13] **Die Pfeilmitte löste Löschen aus** — `v1159`, `c1f71b5`. **(Backlog-Punkt 6)**
+   **Marcels Befund:** „Beim Hinüberfahren zum Pfeil landet man auf dem × zum
+   Löschen." Er nannte ihn den schwersten der Kartenbefunde, **und das war
+   untertrieben** — es war kein Optikfehler, sondern eine falsche Aktion mit
+   Datenverlust.
+
+   **Gemessen** (`getBoundingClientRect` + `elementFromPoint`, Stapelmodus):
+
+   | Element | Rechteck | Größe |
+   |---|---|---|
+   | `.sbc-actions` (Duplizieren + Löschen) | `top:6px`, 48 × 22 | — |
+   | `.sbc-arrow` | `top:16px` | 20 × 20 |
+
+   Beide `absolute` bei `right:6px` → **12 px Überlappung von 20 px
+   Pfeilhöhe.** Und der entscheidende Nachweis: **die MITTE des Pfeils
+   (349,203) traf `sbc-btn "Löschen"`** — nicht den Pfeil. Erreichbar war er
+   nur über sein unteres Drittel. **Wer auf die Pfeilmitte zielt, löscht das
+   Objekt.**
+
+   **Die Pfeilspalte alle 4 px abgetastet** — damit ist Marcels Satz „unten
+   ist Platz, oben nicht" belegt, nicht geglaubt:
+
+   | von oben | wer |
+   |---|---|
+   | 8–28 px | Löschen-× (reicht weiter als seine 22 px) |
+   | 32–36 px | Pfeil (~8 px wirklich erreichbar) |
+   | 40–60 px | **frei** |
+
+   **Gelöst:** `bottom:4px` statt `top:16px`, Größe 20 → 22 px (dieselbe wie
+   der Kompakt-Pfeil — eine Größe für denselben Pfeil).
+
+   **Nachgemessen** (`ui-varianten.css?v=v1159`):
+
+   | | vorher | jetzt |
+   |---|---|---|
+   | Pfeil | 193–213, 20 × 20 | **210–232, 22 × 22** |
+   | Abstand zum × | **−12 px (Überlappung)** | **+5 px** |
+   | Klick auf Pfeilmitte | `sbc-btn "Löschen"` | **`sbc-arrow`** |
+   | Pfeil oben / unten | teils Löschen | **beide `sbc-arrow`** |
+   | Löschen-Mitte | Löschen | Löschen (unverändert) |
+
+   **Funktion geprüft:** Klick klappt die Karte auf (`uv-open` false → true),
+   die Drehung wechselt auf `rotate(-90deg)`.
+   **Kompaktmodus gegengeprüft** (dort erscheint derselbe Pfeil): 327,207
+   22 × 22, **keine Überlappung**, Mitte trifft den Pfeil. Betroffen war nur
+   der Stapelmodus — im Kompaktmodus sitzt der Pfeil ohnehin anders.
+
+   **Eine Absage mit Grund: 44 px sind hier nicht erreichbar.** Die Karte ist
+   63 px hoch und trägt oben die Aktionen; ein 44-px-Pfeil läge wieder unter
+   dem ×. Der Trefferflächen-Punkt aus v650/v652 bleibt damit offen — **die
+   falsche Aktion ist weg, und das war das Schwere daran.**
+
+   *(Messhinweis für den nächsten: die erste Kompakt-Messung war verfälscht,
+   weil das Darstellungs-Panel noch offen über der Karte lag und
+   `elementFromPoint` es traf. Panel schließen, dann messen.)*
 
 - [2026-08-13] **Die Reiter tragen im hellen Modus die Tinte des Aktionen-Menüs** — `v1158` + `v1158b`, `399df3f`. **(Backlog-Punkt 7)**
    **Marcels Vorgabe:** „im hellen Modus sollen die Reiter dieselbe
