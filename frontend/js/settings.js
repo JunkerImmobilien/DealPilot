@@ -3430,7 +3430,23 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
   function LS(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} }
   function ci(fn,ls,def,label){ var v; try{ v=LS(ls)||def; }catch(e){ v=def; }
     return '<label class="dp-tb-row"><span>'+label+'</span><input type="color" value="'+v+'" oninput="'+fn+'(this.value)"></label>'; }
-  window._dpDispTabText=function(h){ document.body.style.setProperty('--dp-tab-text',h); LS('dp_tabtext_ui',h); };
+  /* v1155-TABTEXT · Marcels Befund: „Regler Tab-Texte wirkt nicht."
+     Gemessen: der Regler setzte --dp-tab-text zuverlaessig, aber gelesen
+     wurde es nur von zwei Regeln, die an `body.dp-chrome-hell` haengen —
+     im Obsidian-Modus also von niemandem. Dazu kam der Kaskaden-Befund:
+     ELF Regeln in style.css setzen `color: var(--gold …)` auf die Tabs,
+     ZEHN davon mit !important. Ein Token allein verliert dagegen immer.
+     (Mein grep fand sie zuerst nicht — sie stehen in Kommalisten. Nur der
+     Kaskaden-Blick im Browser zeigte sie.)
+
+     Deshalb ein SCHALTER statt eines Spezifitaetskampfs an elf Stellen:
+     body.dp-tabtext-an wird nur gesetzt, wenn wirklich ein Wert vorliegt.
+     Die zugehoerige Regel steht in css/style.css (v1155-TABTEXT) mit
+     hoeherer Spezifitaet als die stoerkste Gegenregel und !important.
+     Ohne Nutzerwert bleibt alles bitgenau wie vorher — kein Attribut,
+     keine Klasse, dieselbe Goldregel wie immer. */
+  function _tabTextAn(h){ try{ document.body.classList.toggle('dp-tabtext-an', !!h); }catch(e){} }
+  window._dpDispTabText=function(h){ document.body.style.setProperty('--dp-tab-text',h); _tabTextAn(h); LS('dp_tabtext_ui',h); };
   window._dpDispObjText=function(h){ document.body.style.setProperty('--dp-obj-text',h); LS('dp_objtext_ui',h); };
   /* Extra-Farbregler in die Toolbar einhaengen (vor dem Logo-Block) */
   var _oldLogo=window._dpLogoBlock;
@@ -3455,7 +3471,7 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     if(_oldOpen) _oldOpen();
   };
   /* Boot */
-  try{ var t=LS('dp_tabtext_ui'); if(t) document.body.style.setProperty('--dp-tab-text',t);
+  try{ var t=LS('dp_tabtext_ui'); if(t){ document.body.style.setProperty('--dp-tab-text',t); _tabTextAn(t); }
        var o=LS('dp_objtext_ui'); if(o) document.body.style.setProperty('--dp-obj-text',o); }catch(e){}
 })();
 /* === /v938-textcolors === */
