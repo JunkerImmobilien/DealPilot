@@ -613,53 +613,7 @@ die alle auf Marcels Durchgang zurückgehen.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-5. **ERLEDIGT — Grundfarbe „Obsidian"** (`v1156`/`b`/`c`, `8cc7af0`, siehe
-   Fertig). Gemessen: **ohne** Vorlage wirkt sie, **mit** Vorlage nicht —
-   der Wert wurde aber gespeichert, ein stiller Rückfall. Marcels Weg **B**
-   ist gebaut: unter aktiver Vorlage sichtbar gesperrt, mit Grund und
-   Ausweg im Hinweis. Dabei zwei eigene Fehler gefunden und behoben (der
-   Partner-Text landete im neuen Kasten; die Sperre war nur optisch und per
-   Tabulator umgehbar — betraf auch die Partner-Schranke seit `v1082`).
-
-   *Der ursprüngliche Befund samt Diagnosewegen bleibt stehen, weil seine
-   Lehren gelten:*
-
-   Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
-   Defekt, keine Geschmacksfrage.
-
-   **Erst die Kette messen, dann patchen** — nicht am CSS anfangen. Vier
-   Stellen, in dieser Reihenfolge:
-
-   1. **Kommt der Klick an?** Feuert der Handler, wird ein Wert gesetzt?
-   2. **Wird gespeichert?** Steht der Wert nach dem Neuladen wieder da?
-   3. **Wird ein Token gesetzt?** `getComputedStyle(document.body)` auf den
-      erwarteten Namen, vorher/nachher.
-   4. **Liest das Token jemand?** Genau hier lag `v1101`: der Regler setzte
-      `--dp-logo-w`, gelesen wurde `--dp-logo-scale` — **zwei Namen für
-      dieselbe Sache**, und niemand merkte es, weil beide existierten.
-
-   Der wahrscheinlichste Fall ist wieder Punkt 4. Zweiter Kandidat: die Regel
-   hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
-   dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
-
-6. **Regler „Tab-Texte" wirkt nicht**
-
-   Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
-   Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
-   Bewertung**. Bei Marcel ändert sich nichts.
-
-   Gleiche Kette wie N2, gleiche Reihenfolge. **Ein zusätzlicher Verdacht,
-   der hier besonders naheliegt:** die Reiter tragen an mehreren Stellen
-   `!important`-Regeln (so gewinnt z. B. `header.hdr.has-v64-score
-   #hdr-obj-num` gegen alles andere). Ein Token, das korrekt gesetzt ist,
-   verliert dann trotzdem. **Deshalb den Kaskaden-Walker benutzen** — welche
-   Regel gewinnt tatsächlich für das Element —, nicht nur prüfen, ob die
-   Variable steht.
-
-   **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
-   Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
-
-7. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+5. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
 
    Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
    schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
@@ -682,7 +636,7 @@ die alle auf Marcels Durchgang zurückgehen.
    **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
    Aufgreifen zusammenlegen, nicht doppelt bauen.
 
-8. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
+6. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
 
    **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
    führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
@@ -707,7 +661,7 @@ die alle auf Marcels Durchgang zurückgehen.
    **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
    Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
 
-9. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
+7. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
 
    Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
    Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
@@ -730,7 +684,7 @@ die alle auf Marcels Durchgang zurückgehen.
    **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
    entschieden ist.
 
-10. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+8. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -767,7 +721,7 @@ die alle auf Marcels Durchgang zurückgehen.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-11. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+9. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -797,7 +751,7 @@ die alle auf Marcels Durchgang zurückgehen.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-12. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+10. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -853,7 +807,7 @@ die alle auf Marcels Durchgang zurückgehen.
 
 ---
 
-13. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+11. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
@@ -960,7 +914,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-14. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+12. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -1058,7 +1012,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-15. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+13. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
    das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
