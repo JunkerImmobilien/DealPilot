@@ -56,8 +56,17 @@ const server = app.listen(cfg.port, () => {
       const { q } = await import('./lib/db.js');
       const r = await reg.ladeAusDb(q);
       const st = reg.registerStand();
+      /* v1084a-WLOG · je Kennzahl ausweisen. Eine Gesamtzahl allein haette
+       * am 13.08. nicht verraten, dass die Sachwertfaktoren fehlen — 493
+       * sieht aus wie eine plausible Zahl. */
+      const jeK = st.je_kennzahl
+        ? Object.entries(st.je_kennzahl).map(([k, n]) => k + '=' + n).join(' ')
+        : '(nicht ausgewiesen)';
       console.log('[register] ' + st.saetze + ' Saetze, ' + st.gebiete
         + ' Gebiete, Herkunft ' + st.herkunft + (r.grund ? ' (DB: ' + r.grund + ')' : ''));
+      console.log('[register] ' + jeK
+        + (st.aus_saat ? '  (' + st.aus_db + ' aus param_modell, '
+                       + st.aus_saat + ' aus der Saatdatei)' : ''));
     } catch (e) { console.log('[register] Start fehlgeschlagen:', e.message); }
   })();
   console.log(`[marktbericht] ai_mode=${cfg.ai.mode}  geo=${cfg.geoapify.key ? 'geoapify' : 'none'}  market=${cfg.market.source}`);
