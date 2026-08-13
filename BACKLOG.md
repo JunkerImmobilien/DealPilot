@@ -757,6 +757,51 @@ die alle auf Marcels Durchgang zurückgehen.
    roh stehen dort `∞` und `★`. Bei Matrizen mit Sonderzeichen die Rohzelle
    lesen, nicht die aufbereitete Ausgabe.)*
 
+   ### NACHTRAG (2026-08-13): der DB-Weg ist gemessen — und B1 war zu weit gegriffen
+
+   Der Punkt verlangte, **beide** Wege zu prüfen. Der DB-Weg ist jetzt
+   gelesen (`plans.features`, jsonb, Staging):
+
+   | Plan | `market_data_fields` | `live_market_rates` | Schlüssel |
+   |---|---|---|---|
+   | free | **false** | **false** | 34 |
+   | starter | false | false | 34 |
+   | investor | true | true | 34 |
+   | pro | true | true | 35 |
+   | partner | true | true | 37 |
+   | **business** | *(fehlt)* | *(fehlt)* | **10** |
+   | **enterprise** | *(fehlt)* | *(fehlt)* | **13** |
+
+   **B1 ist damit zu korrigieren, und zwar zu meinen Lasten:** Ich hatte
+   geschrieben, „Free bekommt zwei Funktionen, die die Landing ihm nicht
+   verspricht". Richtig ist: **die Datenbank führte für Free längst `false`**,
+   und die DB ist laut `config.js:568` die Quelle der Wahrheit — `config.js`
+   ist nur der **Fallback**, solange `Sub.hasCachedFeature` noch `null`
+   liefert. Für einen echten Free-Nutzer war das Gate also zu.
+
+   **Was `v1160` dann wirklich behebt:** das **Startfenster**. Zwischen
+   Seitenaufbau und DB-Antwort greift der Fallback, und dort stand `true`.
+   In diesem Moment sah ein Free-Nutzer Felder, die ihm nicht zustehen.
+   Das Fenster ist jetzt zu. **Kleiner als der Befund klang, aber echt** —
+   und die drei Wahrheiten sagen jetzt dasselbe, was für sich zählt.
+
+   #### B6 · `business` und `enterprise` sind unvollständige Plan-Datensätze
+
+   Sie führen **10 bzw. 13 Schlüssel** statt 34. Alles, was fehlt, ist für
+   sie `false` — dieselbe W41-Mechanik. Beide sind in der Landing und im
+   pricing-modal **nicht** aufgeführt, also vermutlich nicht verkauft.
+   **Vor dem Aufräumen prüfen, ob ein Konto darauf läuft:**
+   `select id, plan_id from subscriptions where plan_id in ('business','enterprise');`
+   Ist niemand darauf, gehören die Zeilen weg oder auf 34 Schlüssel gebracht.
+
+   #### Was weiterhin offen ist
+
+   Der **Plan-Override greift nicht**: `dp_plan_override` auf `'free'` gesetzt
+   und neu geladen — `currentKey()` blieb `partner`. Ein Prüflauf „je Plan
+   durchklicken" ist damit **im Frontend nicht simulierbar**; es braucht je
+   ein echtes Konto. Ob der Override tot ist oder anders heißt, ist nicht
+   geklärt — **erst messen, bevor jemand ihn benutzt.**
+
 7. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
