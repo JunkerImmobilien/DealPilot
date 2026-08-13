@@ -1116,6 +1116,11 @@ function _swSet(btn) {
         sel.value = current;
       } catch (e) {}
     }
+    /* v1167: Profil-Schalter markieren. Bisher hing markieren() nur am
+       Klick auf ein Profil — wer das Pane oeffnete, sah zwei ungedrueckte
+       Knoepfe, obwohl einer galt. Die Funktion steht weiter unten in
+       derselben Datei und ist beim Oeffnen laengst definiert. */
+    try { if (typeof window._dpProfilMarkieren === 'function') window._dpProfilMarkieren(); } catch (e) {}
     /* v452: Theme-Switch aktiv markieren */
     try {
       var _dpTh = localStorage.getItem('dp_theme') || 'light';
@@ -3492,6 +3497,7 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
 (function () {
   'use strict';
   var LSK = 'dp_user_settings';
+  var PROFILWERTE = 'dp_profil_werte';   /* v1167: je Profil eigene Schalter */
   var HELL_VORLAGE = 'kanzlei';   /* aus design/mockups/hell.png, am CSS geprueft */
 
   function laden() { try { return JSON.parse(localStorage.getItem(LSK) || '{}') || {}; } catch (e) { return {}; } }
@@ -3542,11 +3548,41 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
       localStorage.setItem('dp_chrome_hell', '0');   /* in BEIDEN Profilen aus */
     } catch (e) {}
 
-    /* 2 · Erst jetzt der Zustand des Profils. */
+    /* 2 · Erst jetzt der Zustand des Profils.
+
+       v1167: Bisher wurde `ui_cards` hart auf '' gesetzt. Wer „Wallet" oder
+       „Stapel" eingestellt hatte, verlor das beim Umschalten — und beim
+       Zurueckschalten kam es nicht wieder. Marcels Vorgabe nennt fuer das
+       helle Profil Standard-Karten, das war also nicht falsch, aber groeber
+       als noetig.
+
+       Jetzt merkt sich jedes Profil seine eigenen Darstellungsschalter.
+       NUR die drei Schalter — `ui_accent` und `ui_obsidian` sind Markenfarben
+       und gelten in beiden Profilen; wer sein Gold setzt, will es nicht nur
+       im Dunkeln. */
     try {
       var s = laden();
-      s.ui_theme = hell ? HELL_VORLAGE : '';
-      s.ui_cards = '';                       /* Objektkarten „Standard" — Marcels Vorgabe */
+      var eigen = {};
+      try { eigen = JSON.parse(localStorage.getItem(PROFILWERTE) || '{}') || {}; } catch (e2) {}
+
+      /* (a) Stand des VERLASSENEN Profils sichern — aber nur, wenn wirklich
+             eines aktiv war. Bei einer dritten Vorlage gehoert der Stand zu
+             keinem der zwei und wuerde sonst einem davon untergeschoben. */
+      var vorher = window._dpProfilAktiv();
+      if (vorher) {
+        eigen[vorher] = { ui_cards: s.ui_cards || '', ui_surface: s.ui_surface || '', ui_form: s.ui_form || '' };
+      }
+
+      /* (b) Das neue Profil setzen und seinen gemerkten Stand zurueckholen.
+             Beim ersten Mal gibt es keinen — dann gilt Marcels Vorgabe:
+             Objektkarten „Standard". */
+      var neu = eigen[p] || { ui_cards: '', ui_surface: '', ui_form: s.ui_form || '' };
+      s.ui_theme   = hell ? HELL_VORLAGE : '';
+      s.ui_cards   = neu.ui_cards || '';
+      s.ui_surface = neu.ui_surface || '';
+      if (neu.ui_form) s.ui_form = neu.ui_form;
+
+      localStorage.setItem(PROFILWERTE, JSON.stringify(eigen));
       localStorage.setItem(LSK, JSON.stringify(s));
     } catch (e) {}
 
