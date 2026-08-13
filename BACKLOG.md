@@ -61,10 +61,33 @@ ausgerollt (Ausschuss-Register, Sachwertfaktoren) — beides ist im Repo.
 | `v1159` | Im Stapelmodus löste die **Pfeilmitte Löschen aus** |
 | `v1160` | Gate zugezogen: `market_data_fields` + `live_market_rates` bei Free auf `false` |
 | `v1161` + DB | `business`/`enterprise` gelöscht — erst vier Code-Stellen, dann die Zeilen |
+| `v1162`/`b` | **Hell/Dunkel als zwei Profile** unter „Profil & Anzeige" — hell ist `kanzlei`, kein Skin |
+| `v1163` | **Plan-Prüfmodus** — der Override wirkte nie, jetzt herabstufend. Punkt 6 wird fahrbar |
+| `v1164` | Objektnummer im Kopf: Kontrast 3,7/3,9 → **5,2/5,4** über `--uv-marke-dd` |
+| `v1165` | Garagenfeld: der **Platzhalter widersprach der Feldhilfe** |
+| `v1166` | Hinweis am Garagenfeld, wenn MEA **und** Garagenfläche gesetzt sind |
+| `v1167` | Profil-Schalter: **je Profil eigene Werte** + Markierung beim Öffnen |
+| `v1168` + Rebuild | **Checkboxen per Sprache** — vier Stellen, jede hätte still versagt |
+| `v1169` + Rebuild | Spracheingabe: **Diarisierung raus**, **Stichwort-Fenster** (9 statt 30+) |
+| `v1170` + Rebuild | **Verifikations-Pass aus** — Marcels Entscheidung, zwei Modelle statt vier |
+
+**Erledigte Backlog-Punkte:** 5 (vollständig), 6 (Werkzeug + Befunde), 9,
+10 (soweit ohne fachliche Entscheidung möglich), 7 (Rest 1).
+
+**Vier Prüfergebnisse ohne Umbau — weil es schon gebaut war:**
+die **sieben Pro-Tage** (`TR7-trial`, ab Registrierung, Objekte bleiben nach
+Tag 7 erreichbar) · die **Restlaufzeit-Anzeige** in der Plan-Pille · der
+**volle Sprach-Katalog** (`buildFullCatalog`, v519) · **B3 entwarnt** — kein
+abgefragter Feature-Schlüssel fehlt in den Plänen.
+
+> **Die Lehre dieser Runde, sechsmal bezahlt:** sechsmal „das gibt es nicht"
+> gesagt, sechsmal gab es das. Zählstand und Gegenmittel in `FALLEN.md`
+> Punkt 11. **Vor jedem „das fehlt": nach einem zweiten Weg suchen** — einer
+> `*Full*`-Variante, einem Fallback-Zweig, einer zweiten Liste.
 
 Dazu: Plan-Prüflauf mit Befundliste (Punkt 6), Backlog aufgeräumt und
 fortlaufend nummeriert, `PROJEKTANWEISUNG.md` mit Marcels Abendfassung
-zusammengeführt.
+zusammengeführt und nach **jedem** Rollout fortgeschrieben.
 
 ### Der nächste Schritt ist vorbereitet, nicht angefangen
 
