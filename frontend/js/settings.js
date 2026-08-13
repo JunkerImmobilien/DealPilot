@@ -3518,18 +3518,40 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
 
   window._dpProfil = function (p) {
     var hell = (p === 'hell');
+
+    /* ── v1162b · DIE REIHENFOLGE IST DER GANZE PUNKT ─────────────────────
+       Erster Anlauf hatte sie falsch: erst Vorlage setzen, dann den
+       Chrome-Skin abschalten. Gemessen: nach dem Klick auf „Hell" stand
+       `data-ui-theme` LEER statt auf `kanzlei`.
+
+       Ursache ist die Falle aus FALLEN.md Punkt 6, vor der ich im eigenen
+       Entwurf gewarnt hatte: `_dpDispSkin` ruft `vorlageNachziehen()`, und
+       steht die aktive Vorlage der neuen Helligkeit entgegen, setzt es
+       `dp_user_settings.ui_theme` auf ''. Es hat also genau die Vorlage
+       gelöscht, die eine Zeile vorher gesetzt worden war.
+
+       Deshalb: ZUERST den Skin abschalten (er darf löschen, was er will —
+       danach kommt unser Wert), DANN die Vorlage speichern und anwenden. */
+
+    /* 1 · Chrome-Skin aus, über seinen eigenen Weg (wegen des Nachlaufs
+           für Logo und Refresh). Nur wenn er wirklich läuft. */
+    try {
+      if (document.body.classList.contains('dp-chrome-hell') && typeof window._dpDispSkin === 'function') {
+        window._dpDispSkin('obsidian');
+      }
+      localStorage.setItem('dp_chrome_hell', '0');   /* in BEIDEN Profilen aus */
+    } catch (e) {}
+
+    /* 2 · Erst jetzt der Zustand des Profils. */
     try {
       var s = laden();
       s.ui_theme = hell ? HELL_VORLAGE : '';
       s.ui_cards = '';                       /* Objektkarten „Standard" — Marcels Vorgabe */
       localStorage.setItem(LSK, JSON.stringify(s));
-      localStorage.setItem('dp_chrome_hell', '0');   /* in BEIDEN Profilen aus */
     } catch (e) {}
-    /* Anwenden ueber die vorhandene API, nicht per setAttribute. */
+
+    /* 3 · Anwenden über die vorhandene API, nicht per setAttribute. */
     try { if (window.DealPilotUiVarianten && DealPilotUiVarianten.apply) DealPilotUiVarianten.apply(); } catch (e) {}
-    /* Der Chrome-Skin muss aus sein — falls er noch lief, ueber seinen
-       eigenen Weg abschalten, damit dessen Nachlauf (Logo, Refresh) greift. */
-    try { if (document.body.classList.contains('dp-chrome-hell') && typeof window._dpDispSkin === 'function') window._dpDispSkin('obsidian'); } catch (e) {}
     markieren();
   };
 
