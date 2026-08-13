@@ -311,7 +311,29 @@ html[data-ui-theme] body {
    stehen als Restpunkt im BACKLOG. */
 html[data-ui-theme] {
   --uv-marke-d:  var(--gold-d, color-mix(in srgb, var(--gold, #C9A84C) 76%, #000));
-  --uv-marke-dd: var(--uv-marke-d);
+  /* v1164: --uv-marke-dd war bisher nur ein Alias auf --uv-marke-d — die
+     Sollbruchstelle war vorgesehen, aber nie benutzt. Gemessen auf Staging
+     mit einem Grund-Leser, der VERLAEUFE auswertet (ein Leser, der nur
+     background-color kennt, meldet hier faelschlich Weiss):
+
+       #hdr-obj-num, 10,5 px / 700  ->  kanzlei  3,88  auf #FBFAF7
+                                        boarding 3,72  auf #FAF5E8
+
+     Kleiner Text braucht 4,5. Der Punkt im Backlog nannte 2,98 / 2,88 —
+     die Regel darunter (Abschnitt (b)) hat also schon gewirkt, sie war nur
+     nicht weit genug. Jetzt der letzte Schritt.
+
+     RELATIV zum Markenton abgedunkelt, nicht auf ein Literal gesetzt:
+     ein Whitelabel-Rot bleibt Rot und wird nur dunkler. Ein festes Gold
+     haette die Mandantenmarke an sechs Stellen ueberschrieben — und
+     gold-audit.py haette es zu Recht angemahnt.
+
+     Alle sechs Leser von --uv-marke-dd stehen auf HELLEM Grund unter
+     kontor/panel/kanzlei/boarding (Objektnummer, Kerosin-Pille, zwei
+     Teile des Aktionen-Knopfs, Reiter-Status). Keiner auf dunklem Grund
+     — deshalb ist das Abdunkeln fuer alle richtig und nicht nur fuer den
+     gemeldeten Fall. */
+  --uv-marke-dd: color-mix(in srgb, var(--uv-marke-d) 82%, #000);
 }
 
 
