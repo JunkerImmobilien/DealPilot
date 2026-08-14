@@ -122,6 +122,57 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 ## Offen
 
+### MARCELS ANTWORTEN VOM 2026-08-14 — hier steht, was jetzt gebaut werden darf
+
+**Vier Entscheidungen sind gefallen und eine Auskunft ist da.** Damit sind
+vier Punkte entblockiert. Der nächste Durchgang fängt hier an.
+
+**1 · Garagenfeld (Punkt 10) → WOHNUNGSBEZOGEN. Weg A.**
+Damit ist **nichts mehr zu bauen** — `v1165` (Platzhalter) und `v1166`
+(Hinweis) setzen genau das um. `lib/nhk2010.js` bleibt unangetastet, es
+kommt **keine** MEA-Kürzung ins Feld. **Punkt 10 ist erledigt.**
+
+**2 · Akzentfarbe (Punkt 4) → beides, und die Standardtöne wärmer.**
+Wörtlich: *„freie farbwöhler und paar standard direkt als auswahl so wie
+jetzt nur etwas wärmere töne"*.
+- Der **freie Farbwähler bleibt**.
+- Die **Schnellauswahl bleibt in ihrer heutigen Form** — nur die Töne
+  werden **wärmer**.
+- **Nicht** die Anzahl ist das Thema, sondern der **Ton**. Vor dem Bauen die
+  heutigen Standardwerte auslesen und die wärmeren daneben zeigen — das ist
+  eine Optikfrage, also **Demo bauen, nicht raten**.
+- **Achtung Whitelabel:** die Vorschläge sind Nutzerwerte, keine Marke. Sie
+  dürfen **nicht** als `--wl-`Token gesetzt werden, sonst färbt der Sweeper
+  sie mit (`v1157`-Falle).
+
+**3 · Wallet (Punkt 11) → alles, was auch auf der Standardkarte steht.**
+Wörtlich: *„es muss alles drauf auch im standard drauf ist"*.
+Damit ist die Frage nach den Kartenangaben beantwortet: **kein eigener
+Umfang**, die Wallet-Fassung trägt denselben Satz wie `.sb-card`. Zu bauen
+ist also nur der **Abstand** zwischen Objektbild, Kaufpreis und „privat" —
+der ursprüngliche Befund — **ohne** dabei etwas wegzulassen.
+Die gemessene Struktur der Standardkarte steht in `CLAUDE.md`.
+
+**4 · Score flacher (Punkt 1B) → Rückfrage von Marcel: „welches Score Bild?"**
+**Meine Formulierung war schuld.** Gemeint ist **kein Bild einer Datei**,
+sondern eine **Vorgabe, wie die Score-Zeile in der Kopfleiste flacher
+aussehen soll** — sie ist die auffälligste Fläche der App, deshalb wurde
+dort nie geraten.
+**Bevor Marcel danach gefragt wird, gehört gemessen:** die Score-Zeile
+erscheint erst **ab 70 % Datenvollständigkeit** (`js/calc.js:205`), darunter
+steht nur ein Hinweisbanner. Das Prüfobjekt lag darunter — **die 251 px des
+Entwurfs sind nie nachgemessen worden.** Erst ein Objekt über der Schwelle
+laden, echte Höhe messen, **dann** fragen. Womöglich erübrigt sich die Frage.
+
+**5 · Das Speichern-Modal (Punkt 7, Rest 2) → es GIBT eines.**
+Wörtlich: *„Button ‚als Objekt speichern' im Quickboarding da geht ein Modal
+auf"*. **Mein Befund „es gibt keins" war falsch** — ich hatte nur
+`qcSaveAsObject()` in `quick-check.js` gelesen und dort keins gefunden. Der
+Weg läuft über `qc-bridge.js:172 _handleSave()` → `window.qcSaveAsObject()`;
+**das Modal muss davor oder darin liegen.** Erst den echten Klickweg im
+Browser verfolgen, dann die Auflistung dort ergänzen — **nicht** ein zweites
+Modal danebenbauen.
+
 ### OFFENE ABNAHME — Spracheingabe, ein Sprechlauf am Gerät
 
 **Marcel macht das später, der Punkt bleibt bis dahin stehen.** Drei
