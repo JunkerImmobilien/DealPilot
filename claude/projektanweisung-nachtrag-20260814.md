@@ -21,7 +21,7 @@ Das ist kein Versehen, sondern folgt den Namensräumen aus Teil II:
 
 | Datei | Strang | Nummern | Inhalt |
 |---|---|---|---|
-| *(bei Marcel)* Gesamtfassung 12.08. | Marktbericht | v1077–v1083b | Register, Wertermittlung, Ernte, amtliche Daten |
+| `claude/projektanweisung-marktbericht-20260812-abend.md` (2.605 Z.) | Marktbericht | v1077–v1083b | Register, Wertermittlung, Ernte, amtliche Daten |
 | **diese Datei** | Marktbericht | v1084–v1096a | Fortschreibung dazu |
 | `PROJEKTANWEISUNG.md` (im Repo) | **Haupt-App** | **v1148–v1172** | Darstellung, Profile, Plan-Gate, Spracheingabe, Marktbericht-**Oberfläche** |
 
@@ -335,10 +335,12 @@ eine Ernte **ohne Deploy** wirksam zu machen.
 
 Am Anfang der nächsten Sitzung, mit dem Originaltext im Zugriff:
 
-1. `claude/projektanweisung-gesamt-20260812-abend.md` lesen.
-   **Diese Datei liegt noch nicht im Repo** — Marcel hat den Volltext im Chat
-   geliefert, aber 2.700 Zeilen wurden aus dem verbleibenden Kontext nicht
-   herausgeschrieben. **Erster Schritt: von Marcel als Datei anfordern.**
+1. `claude/projektanweisung-marktbericht-20260812-abend.md` lesen — **sie liegt
+   im Repo** (2.605 Zeilen). Marcels Rezept nennt sie
+   `projektanweisung-gesamt-20260812-abend.md`; der tatsaechliche Name ist der
+   obige. Sie hiess zuvor `claude/PROJEKTANWEISUNG.md` und war damit vom
+   Haupt-App-Stand `PROJEKTANWEISUNG.md` im Wurzelverzeichnis nur am Ordner zu
+   unterscheiden — deshalb umbenannt.
 2. Diese Datei Abschnitt für Abschnitt einarbeiten — jeder Punkt nennt seinen
    Zielabschnitt.
 3. **NEU: `PROJEKTANWEISUNG.md` (Haupt-App-Strang, v1148–v1172) einarbeiten.**
