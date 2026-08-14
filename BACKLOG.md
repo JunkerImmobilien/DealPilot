@@ -1476,6 +1476,37 @@ entfällt — nicht raten.
 
 ## Fertig
 
+- [2026-08-14] **Eine Breite für die ganze Marktbericht-Seite** — `v1172`/`v1172b`, `167c935`. **Von Marcel abgenommen.**
+   **Sein Befund am Bild `design/mockups/markztbericht.png`:** die Schrittleiste
+   breit, alles darüber und darunter schmal — *„das muss optisch zusammenpassen."*
+
+   **Die Ursache war mein eigener Eingriff aus `v1151`.** Dort hatte die
+   Reiterleiste eine **eigene** Grenze von 960 px bekommen, weil die sieben
+   Marken 902 px brauchen und bei 760 px in zwei Zeilen umbrachen. Die
+   Begründung stimmt technisch — die Leiste ist Navigation, keine
+   Formularzeile. **Nur entsteht dadurch eine zweite Kante auf derselben
+   Seite, und genau die sieht man.**
+
+   Jetzt **960 px für alles**: Inhalt, Leiste, Kurztext, Fortschritt. Keine
+   760er-Regel mehr in der Datei. Das Argument aus `v1128` (eine Formularzeile
+   über 1.278 px ist unlesbar) bleibt gewahrt — 960 liegt deutlich darunter.
+
+   > **Die Lehre:** Eine Sonderbreite für ein einzelnes Element ist fast immer
+   > die falsche Antwort auf „zu schmal". Sie löst das gemeldete Problem und
+   > erzeugt ein sichtbareres. **Wenn ein Element mehr Platz braucht als seine
+   > Nachbarn, ist die Frage, ob nicht alle mehr brauchen.**
+
+   ### `v1172b` — die Cache-Kette war nur zu einem Drittel gezogen
+
+   Mein `sed` suchte `v=1165`; dort stand längst `v=1166` aus dem vorigen
+   Paket. `mb-wizard.js` stand also auf `1172`, **iframe-URL und Lader weiter
+   auf `1166`**. Der Browser hätte das iframe-Dokument aus dem Cache geladen —
+   mit dem **alten** Skriptverweis — und die Änderung wäre nie angekommen,
+   obwohl auf dem Server alles richtig lag.
+
+   **Aufgefallen nur, weil die Kontrollausgabe alle drei Glieder nebeneinander
+   zeigt.** Ein `sed`, das nichts findet, meldet keinen Fehler.
+
 - [2026-08-13] **Die zwei Befunde aus dem Prüflauf sind behoben — und einer war keiner** — `v1171` + DB-Eingriff, `6c1e101`.
    ### `beleg_import` — echt, und behoben
 

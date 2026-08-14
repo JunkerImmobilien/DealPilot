@@ -417,3 +417,32 @@ Versehen.
 **Gegenprobe, die beide Fälle trennt:** *Gibt es die Funktion überhaupt, und
 hängt sie ausschließlich an diesem Schlüssel?* Ein `grep` auf den Schlüssel
 ohne `config.js` beantwortet beides in einem Schritt.
+
+## 14 · Eine Sonderbreite ist fast immer die falsche Antwort auf „zu schmal"
+
+`v1151` gab der Reiterleiste des Marktberichts eine eigene `max-width` von
+960 px, weil sie bei 760 px umbrach. Die Begründung war richtig — Navigation
+ist keine Formularzeile. **Das Ergebnis war eine zweite Kante auf derselben
+Seite, und die fiel sofort auf** (`v1172`).
+
+**Wenn ein Element mehr Platz braucht als seine Nachbarn, ist die Frage, ob
+nicht alle mehr brauchen.** Erst dann eine Ausnahme, und nur wenn sie nicht
+in derselben Blickachse liegt.
+
+### Und die Cache-Kette dazu: ein `sed`, das nichts findet, meldet nichts
+
+Die Marktbericht-Kette hat **drei** Glieder:
+
+```
+frontend/index.html            marktbericht-view.js?v=N
+frontend/js/marktbericht-view.js   /marktbericht-app/index.html?v=N   <- IM Skript
+frontend/marktbericht-app/index.html   mb-wizard.js?v=N  (bzw. app.js, wertermittlung.js)
+```
+
+Beim Ausrollen von `v1172` traf das Muster nur eins davon: es suchte `v=1165`,
+dort stand längst `v=1166`. **Der Browser hätte das iframe-Dokument aus dem
+Cache geladen — mit dem alten Skriptverweis — und die Änderung wäre nie
+angekommen, obwohl auf dem Server alles richtig lag.**
+
+**Nach jedem Ziehen alle drei Glieder nebeneinander ausgeben lassen.** Nicht
+das Ersetzen prüfen, sondern das Ergebnis.
