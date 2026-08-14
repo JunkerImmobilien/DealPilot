@@ -86,7 +86,7 @@ abgefragter Feature-Schlüssel fehlt in den Plänen.
 > `*Full*`-Variante, einem Fallback-Zweig, einer zweiten Liste.
 
 Dazu: Plan-Prüflauf mit Befundliste (Punkt 6), Backlog aufgeräumt und
-fortlaufend nummeriert, `PROJEKTANWEISUNG.md` mit Marcels Abendfassung
+fortlaufend nummeriert, `claude/projektanweisung-hauptapp.md` mit Marcels Abendfassung
 zusammengeführt und nach **jedem** Rollout fortgeschrieben.
 
 ### Der nächste Schritt ist vorbereitet, nicht angefangen
@@ -1427,7 +1427,7 @@ entfällt — nicht raten.
   gemerkter Merker) doch erreichbar ist.
 
 - **Drei Befunde aus der Konsolidierung der Projektanweisung (2026-08-12).**
-  Beim Zusammenführen von `PROJEKTANWEISUNG.md` gemessen, nicht gebaut:
+  Beim Zusammenführen der Projektanweisung gemessen, nicht gebaut:
 
   1. **`frontend/style.css` ist eine Leiche** — 27.477 Zeilen, 842 KB, Stand
      03.08., und **keine einzige** HTML-Datei lädt sie. Gegenprobe:

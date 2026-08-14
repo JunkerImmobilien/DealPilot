@@ -14,13 +14,32 @@ Antworte auf **Deutsch**, im Du.
 | `CLAUDE.md` (diese) | **wie** gearbeitet wird — die Kurzfassung |
 | `BACKLOG.md` | **was** ansteht |
 | `FALLEN.md` | **wo** schon jemand hingefallen ist |
-| `PROJEKTANWEISUNG.md` | **der Gesamtstand** — Produkt, Architektur, Geld, Daten, Server, Chronik |
+| `claude/projektanweisung-*.md` | **der Gesamtstand** — Produkt, Architektur, Geld, Daten, Server, Chronik |
 
-`PROJEKTANWEISUNG.md` ist die Langfassung und die Quelle für die
-Projektanweisung in der Claude-App. **Sie wird nach jedem Rollout
-fortgeschrieben** — Eintrag im Rollout-Journal (Teil VI.10): Was · Commit ·
-Nachweis · Rest. Neue Erkenntnisse in den passenden Teil, **keine neue Datei
-mit neuem Datum** — nebeneinander erzeugen sie Widersprüche.
+Die Langfassung und Quelle für die Projektanweisung in der Claude-App liegt
+in **`claude/`**. **Sie wird nach jedem Rollout fortgeschrieben** — Eintrag im
+Rollout-Journal: Was · Commit · Nachweis · Rest. Neue Erkenntnisse in den
+passenden Teil, **keine neue Datei mit neuem Datum** — nebeneinander erzeugen
+sie Widersprüche.
+
+**Es sind derzeit DREI Stände, weil zwei Chats parallel arbeiten:**
+
+| Datei | Strang | Nummern |
+|---|---|---|
+| `claude/projektanweisung-hauptapp.md` | Haupt-App | v1148–v1172 |
+| `claude/projektanweisung-marktbericht-20260812-abend.md` | Marktbericht | v1077–v1083b |
+| `claude/projektanweisung-nachtrag-20260814.md` | Marktbericht | v1084–v1096a |
+
+**Ein „Widerspruch" zwischen ihnen ist meist nur der andere Strang** — sechs
+bekannte Scheinwidersprüche stehen am Ende des Nachtrags tabelliert. Das Rezept
+zum Zusammenführen steht dort in Abschnitt 6.
+
+> **Warum keine im Wurzelverzeichnis liegt:** Dort lagen am 14.08. zwei Dateien
+> namens `PROJEKTANWEISUNG.md` — eine im Wurzel, eine in `claude/`. Eine Kopie
+> ins Wurzelverzeichnis hat den Haupt-App-Stand überschrieben, und `cat >>`
+> hängte stundenlang klaglos an die falsche Datei an. Wiederherstellbar war es
+> nur, weil jeder Rollout committet wurde. **Alle Stände liegen jetzt in
+> `claude/` mit sprechendem Namen.**
 
 ## Backlog und Vorlagen
 
