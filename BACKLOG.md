@@ -433,12 +433,19 @@ entfällt — nicht raten.
    Fokusfalle beim Neuzeichnen ist im Entwurf schon gelöst. Kein Querlauf,
    keine Konsolenfehler.
 
-   **BLOCKIERT auf zwei Fragen, beide betreffen Geld:**
-   1. **Wann wird abgerechnet**, wenn die Stufe sich erst am Ende ergibt?
-      Vorschlag: beim Erzeugen, nach erreichter Stufe, Preis am Knopf.
-   2. **Darf man später vertiefen** — erst „Einschätzung", dasselbe Objekt
-      später auf „Wertermittlung" hochziehen — **und was kostet das dann?**
-      Vorschlag: nur die Differenz.
+   ~~**BLOCKIERT auf zwei Fragen, beide betreffen Geld:**~~
+   **BEIDE VON MARCEL BEANTWORTET (2026-08-13) UND GEBAUT — `v1154`.**
+   1. ~~**Wann wird abgerechnet**, wenn die Stufe sich erst am Ende ergibt?~~
+      → **Beim Erzeugen**, nach erreichter Stufe. Umgesetzt.
+   2. ~~**Darf man später vertiefen**, und was kostet das?~~
+      → **Ja, und es kostet nur die Differenz.** Umgesetzt in
+      `_aufpreis(stufe, bezahlt)`, `backend/src/routes/marktbericht.js`,
+      zwei Aufrufer.
+
+   *(Der Blockade-Vermerk stand noch, obwohl die Antworten am selben Tag kamen
+   und gebaut wurden. **Eine veraltete Blockade ist teurer als gar keine** —
+   sie führt dazu, dass eine beantwortete Frage ein zweites Mal gestellt wird.
+   Beim Abhaken einer Entscheidung immer auch den Blockade-Vermerk suchen.)*
 
    **Was vor dem Entwurf gemessen sein muss:** welche Felder voneinander
    abhängen. `garagenStufe` und `hinterlandRent` erscheinen nur nach echter
