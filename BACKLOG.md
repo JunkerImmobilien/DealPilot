@@ -965,6 +965,19 @@ entfällt — nicht raten.
 8. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
+   > ## 🔒 AUSGELAGERT — Marcel bearbeitet diesen Punkt an anderer Stelle
+   > **Stand 2026-08-14.** Hier wird daran **nicht** gearbeitet.
+   >
+   > **Der Text bleibt trotzdem stehen** — die Vorarbeit ist gemessen und
+   > präzisiert, und ein gelöschter Punkt wird irgendwann von vorn
+   > angefangen. Wer hier weitermachen will, fragt vorher bei Marcel nach
+   > dem dortigen Stand.
+   >
+   > **Warum das hier so ausdrücklich steht:** In dieser Runde ist schon
+   > einmal ein Commit aus einem parallelen Chat auf dem Server gelandet und
+   > hätte fast Arbeit verworfen. Zwei Stellen am selben Punkt sind genau
+   > diese Falle — siehe `FALLEN.md` Punkt 1.
+
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
    > eigene Module: **Minden-Lübbecke** (`05770`,
    > `lib/sachwertfaktoren_nrw.js`) und **Herford** (`05758`,
