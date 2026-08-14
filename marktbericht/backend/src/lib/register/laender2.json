@@ -1,0 +1,2559 @@
+[
+ {
+  "land_code": "NI",
+  "ags": "03402",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.2,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Dieser Ausschuss beziffert die Gesamtnutzungsdauer — anders als Osnabrück-Meppen und Oldenburg-Cloppenburg, die auf Anlage 3 verweisen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Wörtlich als Gesamtnutzungsdauer 70 Jahre abgedruckt. ACHTUNG: die Konstante GND_JAHRE = 80 im CrossCheckService passt NICHT zu diesem Modell. Wer diesen Zinssatz mit 80 Jahren kapitalisiert, rechnet gegen ein anderes Modell als das, aus dem er stammt — dieselbe Klasse wie der Bonn-Befund vom 12.08.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietspiegeln der Städte",
+   "marktmiete_hinweis": "MODELLUNTERSCHIED INNERHALB DESSELBEN BERICHTS: für Ein- und Zweifamilienhäuser stammt der Rohertrag „aus Mietspiegeln der Städte\", für Reihenhäuser und Doppelhaushälften „aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)\". Zwei verschiedene Mietquellen im selben Heft — der Unterschied gehört in den Modellvermerk und darf nicht eingeebnet werden.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.2,
+     2.4
+    ],
+    "kaufpreis_eur": [
+     120000,
+     460000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Am 13.08.2026 geprüft. Zwei unabhängige Leseläufe: n = 157, Median 1,2 %, Mittel 1,2 %, Zeitraum 01.01.2023–31.12.2024, Gesamtnutzungsdauer 70, Restnutzungsdauerspanne 15–70 — in beiden Läufen zeichengleich. LAGEPRÜFUNG: Median 1,2 liegt in [0,2 ; 2,4] — erfüllt. Median und Mittel deckungsgleich, konsistent mit n = 157. WERTEBEREICH: das Minimum der Stichprobe ist mit 0,2 % positiv; dies ist die einzige der hier geernteten niedersächsischen Auswertungen ohne negative Einzelwerte. MONOTONIE ÜBER DIE OBJEKTARTEN: 1,2 (EZFH) < 1,7 (Reihenhaus/Doppelhaushälfte) < 1,9 (Eigentumswohnung) — streng steigend nach Risiko, richtungsgleich mit dem NRW-Bild. VERGLEICH NRW: 1,2 % gegen NRW-Median efh 1,4 % — dasselbe niedrige Band.",
+    "negativtest": "Die Prüfung, die hier angeschlagen hat, ist der Abgleich der beiden Leseläufe: Lauf 2 hat an der Stelle der Zinssatzspanne die KAUFPREISspanne geliefert. Wäre nur Lauf 2 gemacht worden, stünden jetzt 120.000 und 460.000 als Zinssatzgrenzen im Rezept — eine offensichtlich unsinnige, aber formal befüllte Spanne. Der Widerspruch zwischen den Läufen ist aufgelöst worden, indem BEIDE Größen getrennt geführt werden und die Zinssatzspanne als einfach gelesen gekennzeichnet ist. Genau dafür sind zwei Leseläufe da."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 157,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03405",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.2,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Dieser Ausschuss beziffert die Gesamtnutzungsdauer — anders als Osnabrück-Meppen und Oldenburg-Cloppenburg, die auf Anlage 3 verweisen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Wörtlich als Gesamtnutzungsdauer 70 Jahre abgedruckt. ACHTUNG: die Konstante GND_JAHRE = 80 im CrossCheckService passt NICHT zu diesem Modell. Wer diesen Zinssatz mit 80 Jahren kapitalisiert, rechnet gegen ein anderes Modell als das, aus dem er stammt — dieselbe Klasse wie der Bonn-Befund vom 12.08.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietspiegeln der Städte",
+   "marktmiete_hinweis": "MODELLUNTERSCHIED INNERHALB DESSELBEN BERICHTS: für Ein- und Zweifamilienhäuser stammt der Rohertrag „aus Mietspiegeln der Städte\", für Reihenhäuser und Doppelhaushälften „aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)\". Zwei verschiedene Mietquellen im selben Heft — der Unterschied gehört in den Modellvermerk und darf nicht eingeebnet werden.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.2,
+     2.4
+    ],
+    "kaufpreis_eur": [
+     120000,
+     460000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Am 13.08.2026 geprüft. Zwei unabhängige Leseläufe: n = 157, Median 1,2 %, Mittel 1,2 %, Zeitraum 01.01.2023–31.12.2024, Gesamtnutzungsdauer 70, Restnutzungsdauerspanne 15–70 — in beiden Läufen zeichengleich. LAGEPRÜFUNG: Median 1,2 liegt in [0,2 ; 2,4] — erfüllt. Median und Mittel deckungsgleich, konsistent mit n = 157. WERTEBEREICH: das Minimum der Stichprobe ist mit 0,2 % positiv; dies ist die einzige der hier geernteten niedersächsischen Auswertungen ohne negative Einzelwerte. MONOTONIE ÜBER DIE OBJEKTARTEN: 1,2 (EZFH) < 1,7 (Reihenhaus/Doppelhaushälfte) < 1,9 (Eigentumswohnung) — streng steigend nach Risiko, richtungsgleich mit dem NRW-Bild. VERGLEICH NRW: 1,2 % gegen NRW-Median efh 1,4 % — dasselbe niedrige Band.",
+    "negativtest": "Die Prüfung, die hier angeschlagen hat, ist der Abgleich der beiden Leseläufe: Lauf 2 hat an der Stelle der Zinssatzspanne die KAUFPREISspanne geliefert. Wäre nur Lauf 2 gemacht worden, stünden jetzt 120.000 und 460.000 als Zinssatzgrenzen im Rezept — eine offensichtlich unsinnige, aber formal befüllte Spanne. Der Widerspruch zwischen den Läufen ist aufgelöst worden, indem BEIDE Größen getrennt geführt werden und die Zinssatzspanne als einfach gelesen gekennzeichnet ist. Genau dafür sind zwei Leseläufe da."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 157,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03452",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.2,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Dieser Ausschuss beziffert die Gesamtnutzungsdauer — anders als Osnabrück-Meppen und Oldenburg-Cloppenburg, die auf Anlage 3 verweisen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Wörtlich als Gesamtnutzungsdauer 70 Jahre abgedruckt. ACHTUNG: die Konstante GND_JAHRE = 80 im CrossCheckService passt NICHT zu diesem Modell. Wer diesen Zinssatz mit 80 Jahren kapitalisiert, rechnet gegen ein anderes Modell als das, aus dem er stammt — dieselbe Klasse wie der Bonn-Befund vom 12.08.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietspiegeln der Städte",
+   "marktmiete_hinweis": "MODELLUNTERSCHIED INNERHALB DESSELBEN BERICHTS: für Ein- und Zweifamilienhäuser stammt der Rohertrag „aus Mietspiegeln der Städte\", für Reihenhäuser und Doppelhaushälften „aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)\". Zwei verschiedene Mietquellen im selben Heft — der Unterschied gehört in den Modellvermerk und darf nicht eingeebnet werden.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.2,
+     2.4
+    ],
+    "kaufpreis_eur": [
+     120000,
+     460000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Am 13.08.2026 geprüft. Zwei unabhängige Leseläufe: n = 157, Median 1,2 %, Mittel 1,2 %, Zeitraum 01.01.2023–31.12.2024, Gesamtnutzungsdauer 70, Restnutzungsdauerspanne 15–70 — in beiden Läufen zeichengleich. LAGEPRÜFUNG: Median 1,2 liegt in [0,2 ; 2,4] — erfüllt. Median und Mittel deckungsgleich, konsistent mit n = 157. WERTEBEREICH: das Minimum der Stichprobe ist mit 0,2 % positiv; dies ist die einzige der hier geernteten niedersächsischen Auswertungen ohne negative Einzelwerte. MONOTONIE ÜBER DIE OBJEKTARTEN: 1,2 (EZFH) < 1,7 (Reihenhaus/Doppelhaushälfte) < 1,9 (Eigentumswohnung) — streng steigend nach Risiko, richtungsgleich mit dem NRW-Bild. VERGLEICH NRW: 1,2 % gegen NRW-Median efh 1,4 % — dasselbe niedrige Band.",
+    "negativtest": "Die Prüfung, die hier angeschlagen hat, ist der Abgleich der beiden Leseläufe: Lauf 2 hat an der Stelle der Zinssatzspanne die KAUFPREISspanne geliefert. Wäre nur Lauf 2 gemacht worden, stünden jetzt 120.000 und 460.000 als Zinssatzgrenzen im Rezept — eine offensichtlich unsinnige, aber formal befüllte Spanne. Der Widerspruch zwischen den Läufen ist aufgelöst worden, indem BEIDE Größen getrennt geführt werden und die Zinssatzspanne als einfach gelesen gekennzeichnet ist. Genau dafür sind zwei Leseläufe da."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 157,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03455",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.2,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Dieser Ausschuss beziffert die Gesamtnutzungsdauer — anders als Osnabrück-Meppen und Oldenburg-Cloppenburg, die auf Anlage 3 verweisen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Wörtlich als Gesamtnutzungsdauer 70 Jahre abgedruckt. ACHTUNG: die Konstante GND_JAHRE = 80 im CrossCheckService passt NICHT zu diesem Modell. Wer diesen Zinssatz mit 80 Jahren kapitalisiert, rechnet gegen ein anderes Modell als das, aus dem er stammt — dieselbe Klasse wie der Bonn-Befund vom 12.08.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietspiegeln der Städte",
+   "marktmiete_hinweis": "MODELLUNTERSCHIED INNERHALB DESSELBEN BERICHTS: für Ein- und Zweifamilienhäuser stammt der Rohertrag „aus Mietspiegeln der Städte\", für Reihenhäuser und Doppelhaushälften „aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)\". Zwei verschiedene Mietquellen im selben Heft — der Unterschied gehört in den Modellvermerk und darf nicht eingeebnet werden.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.2,
+     2.4
+    ],
+    "kaufpreis_eur": [
+     120000,
+     460000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Am 13.08.2026 geprüft. Zwei unabhängige Leseläufe: n = 157, Median 1,2 %, Mittel 1,2 %, Zeitraum 01.01.2023–31.12.2024, Gesamtnutzungsdauer 70, Restnutzungsdauerspanne 15–70 — in beiden Läufen zeichengleich. LAGEPRÜFUNG: Median 1,2 liegt in [0,2 ; 2,4] — erfüllt. Median und Mittel deckungsgleich, konsistent mit n = 157. WERTEBEREICH: das Minimum der Stichprobe ist mit 0,2 % positiv; dies ist die einzige der hier geernteten niedersächsischen Auswertungen ohne negative Einzelwerte. MONOTONIE ÜBER DIE OBJEKTARTEN: 1,2 (EZFH) < 1,7 (Reihenhaus/Doppelhaushälfte) < 1,9 (Eigentumswohnung) — streng steigend nach Risiko, richtungsgleich mit dem NRW-Bild. VERGLEICH NRW: 1,2 % gegen NRW-Median efh 1,4 % — dasselbe niedrige Band.",
+    "negativtest": "Die Prüfung, die hier angeschlagen hat, ist der Abgleich der beiden Leseläufe: Lauf 2 hat an der Stelle der Zinssatzspanne die KAUFPREISspanne geliefert. Wäre nur Lauf 2 gemacht worden, stünden jetzt 120.000 und 460.000 als Zinssatzgrenzen im Rezept — eine offensichtlich unsinnige, aber formal befüllte Spanne. Der Widerspruch zwischen den Läufen ist aufgelöst worden, indem BEIDE Größen getrennt geführt werden und die Zinssatzspanne als einfach gelesen gekennzeichnet ist. Genau dafür sind zwei Leseläufe da."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 157,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03457",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.2,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Dieser Ausschuss beziffert die Gesamtnutzungsdauer — anders als Osnabrück-Meppen und Oldenburg-Cloppenburg, die auf Anlage 3 verweisen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Wörtlich als Gesamtnutzungsdauer 70 Jahre abgedruckt. ACHTUNG: die Konstante GND_JAHRE = 80 im CrossCheckService passt NICHT zu diesem Modell. Wer diesen Zinssatz mit 80 Jahren kapitalisiert, rechnet gegen ein anderes Modell als das, aus dem er stammt — dieselbe Klasse wie der Bonn-Befund vom 12.08.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietspiegeln der Städte",
+   "marktmiete_hinweis": "MODELLUNTERSCHIED INNERHALB DESSELBEN BERICHTS: für Ein- und Zweifamilienhäuser stammt der Rohertrag „aus Mietspiegeln der Städte\", für Reihenhäuser und Doppelhaushälften „aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)\". Zwei verschiedene Mietquellen im selben Heft — der Unterschied gehört in den Modellvermerk und darf nicht eingeebnet werden.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.2,
+     2.4
+    ],
+    "kaufpreis_eur": [
+     120000,
+     460000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Am 13.08.2026 geprüft. Zwei unabhängige Leseläufe: n = 157, Median 1,2 %, Mittel 1,2 %, Zeitraum 01.01.2023–31.12.2024, Gesamtnutzungsdauer 70, Restnutzungsdauerspanne 15–70 — in beiden Läufen zeichengleich. LAGEPRÜFUNG: Median 1,2 liegt in [0,2 ; 2,4] — erfüllt. Median und Mittel deckungsgleich, konsistent mit n = 157. WERTEBEREICH: das Minimum der Stichprobe ist mit 0,2 % positiv; dies ist die einzige der hier geernteten niedersächsischen Auswertungen ohne negative Einzelwerte. MONOTONIE ÜBER DIE OBJEKTARTEN: 1,2 (EZFH) < 1,7 (Reihenhaus/Doppelhaushälfte) < 1,9 (Eigentumswohnung) — streng steigend nach Risiko, richtungsgleich mit dem NRW-Bild. VERGLEICH NRW: 1,2 % gegen NRW-Median efh 1,4 % — dasselbe niedrige Band.",
+    "negativtest": "Die Prüfung, die hier angeschlagen hat, ist der Abgleich der beiden Leseläufe: Lauf 2 hat an der Stelle der Zinssatzspanne die KAUFPREISspanne geliefert. Wäre nur Lauf 2 gemacht worden, stünden jetzt 120.000 und 460.000 als Zinssatzgrenzen im Rezept — eine offensichtlich unsinnige, aber formal befüllte Spanne. Der Widerspruch zwischen den Läufen ist aufgelöst worden, indem BEIDE Größen getrennt geführt werden und die Zinssatzspanne als einfach gelesen gekennzeichnet ist. Genau dafür sind zwei Leseläufe da."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 157,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03462",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.2,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Dieser Ausschuss beziffert die Gesamtnutzungsdauer — anders als Osnabrück-Meppen und Oldenburg-Cloppenburg, die auf Anlage 3 verweisen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Wörtlich als Gesamtnutzungsdauer 70 Jahre abgedruckt. ACHTUNG: die Konstante GND_JAHRE = 80 im CrossCheckService passt NICHT zu diesem Modell. Wer diesen Zinssatz mit 80 Jahren kapitalisiert, rechnet gegen ein anderes Modell als das, aus dem er stammt — dieselbe Klasse wie der Bonn-Befund vom 12.08.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietspiegeln der Städte",
+   "marktmiete_hinweis": "MODELLUNTERSCHIED INNERHALB DESSELBEN BERICHTS: für Ein- und Zweifamilienhäuser stammt der Rohertrag „aus Mietspiegeln der Städte\", für Reihenhäuser und Doppelhaushälften „aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)\". Zwei verschiedene Mietquellen im selben Heft — der Unterschied gehört in den Modellvermerk und darf nicht eingeebnet werden.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.2,
+     2.4
+    ],
+    "kaufpreis_eur": [
+     120000,
+     460000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Am 13.08.2026 geprüft. Zwei unabhängige Leseläufe: n = 157, Median 1,2 %, Mittel 1,2 %, Zeitraum 01.01.2023–31.12.2024, Gesamtnutzungsdauer 70, Restnutzungsdauerspanne 15–70 — in beiden Läufen zeichengleich. LAGEPRÜFUNG: Median 1,2 liegt in [0,2 ; 2,4] — erfüllt. Median und Mittel deckungsgleich, konsistent mit n = 157. WERTEBEREICH: das Minimum der Stichprobe ist mit 0,2 % positiv; dies ist die einzige der hier geernteten niedersächsischen Auswertungen ohne negative Einzelwerte. MONOTONIE ÜBER DIE OBJEKTARTEN: 1,2 (EZFH) < 1,7 (Reihenhaus/Doppelhaushälfte) < 1,9 (Eigentumswohnung) — streng steigend nach Risiko, richtungsgleich mit dem NRW-Bild. VERGLEICH NRW: 1,2 % gegen NRW-Median efh 1,4 % — dasselbe niedrige Band.",
+    "negativtest": "Die Prüfung, die hier angeschlagen hat, ist der Abgleich der beiden Leseläufe: Lauf 2 hat an der Stelle der Zinssatzspanne die KAUFPREISspanne geliefert. Wäre nur Lauf 2 gemacht worden, stünden jetzt 120.000 und 460.000 als Zinssatzgrenzen im Rezept — eine offensichtlich unsinnige, aber formal befüllte Spanne. Der Widerspruch zwischen den Läufen ist aufgelöst worden, indem BEIDE Größen getrennt geführt werden und die Zinssatzspanne als einfach gelesen gekennzeichnet ist. Genau dafür sind zwei Leseläufe da."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 157,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03402",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.7,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)",
+   "marktmiete_hinweis": "Der Rohertrag ist hier ein SECHS-JAHRES-MITTEL DER ANGEBOTSMIETE 2018–2023 — nicht die tatsächliche Miete und nicht ein Mietspiegelwert. Wer diesen Zinssatz mit einer heutigen Ist-Miete kombiniert, verlässt das Modell.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.7
+    ],
+    "kaufpreis_eur": [
+     90000,
+     365000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt. Gilt außerdem nicht für die kreisfreie Stadt Wilhelmshaven.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln und Wilhelmshaven",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge",
+     "Wilhelmshaven (kreisfreie Stadt, 03405)"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe: n = 96, Median 1,7 %, Mittel 1,8 %, Zeitraum 01.01.2023–31.12.2023 — zeichengleich. LAGEPRÜFUNG: Median 1,7 und Mittel 1,8 liegen in [0,4 ; 3,7] — erfüllt. Reihung gegen die Nachbarobjektarten erfüllt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 96,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03452",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.7,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)",
+   "marktmiete_hinweis": "Der Rohertrag ist hier ein SECHS-JAHRES-MITTEL DER ANGEBOTSMIETE 2018–2023 — nicht die tatsächliche Miete und nicht ein Mietspiegelwert. Wer diesen Zinssatz mit einer heutigen Ist-Miete kombiniert, verlässt das Modell.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.7
+    ],
+    "kaufpreis_eur": [
+     90000,
+     365000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt. Gilt außerdem nicht für die kreisfreie Stadt Wilhelmshaven.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln und Wilhelmshaven",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge",
+     "Wilhelmshaven (kreisfreie Stadt, 03405)"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe: n = 96, Median 1,7 %, Mittel 1,8 %, Zeitraum 01.01.2023–31.12.2023 — zeichengleich. LAGEPRÜFUNG: Median 1,7 und Mittel 1,8 liegen in [0,4 ; 3,7] — erfüllt. Reihung gegen die Nachbarobjektarten erfüllt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 96,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03455",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.7,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)",
+   "marktmiete_hinweis": "Der Rohertrag ist hier ein SECHS-JAHRES-MITTEL DER ANGEBOTSMIETE 2018–2023 — nicht die tatsächliche Miete und nicht ein Mietspiegelwert. Wer diesen Zinssatz mit einer heutigen Ist-Miete kombiniert, verlässt das Modell.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.7
+    ],
+    "kaufpreis_eur": [
+     90000,
+     365000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt. Gilt außerdem nicht für die kreisfreie Stadt Wilhelmshaven.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln und Wilhelmshaven",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge",
+     "Wilhelmshaven (kreisfreie Stadt, 03405)"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe: n = 96, Median 1,7 %, Mittel 1,8 %, Zeitraum 01.01.2023–31.12.2023 — zeichengleich. LAGEPRÜFUNG: Median 1,7 und Mittel 1,8 liegen in [0,4 ; 3,7] — erfüllt. Reihung gegen die Nachbarobjektarten erfüllt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 96,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03457",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.7,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)",
+   "marktmiete_hinweis": "Der Rohertrag ist hier ein SECHS-JAHRES-MITTEL DER ANGEBOTSMIETE 2018–2023 — nicht die tatsächliche Miete und nicht ein Mietspiegelwert. Wer diesen Zinssatz mit einer heutigen Ist-Miete kombiniert, verlässt das Modell.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.7
+    ],
+    "kaufpreis_eur": [
+     90000,
+     365000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt. Gilt außerdem nicht für die kreisfreie Stadt Wilhelmshaven.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln und Wilhelmshaven",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge",
+     "Wilhelmshaven (kreisfreie Stadt, 03405)"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe: n = 96, Median 1,7 %, Mittel 1,8 %, Zeitraum 01.01.2023–31.12.2023 — zeichengleich. LAGEPRÜFUNG: Median 1,7 und Mittel 1,8 liegen in [0,4 ; 3,7] — erfüllt. Reihung gegen die Nachbarobjektarten erfüllt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 96,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03462",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.7,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "aus Mietübersicht GAG 2024 (6-Jahresmittel Angebotsmiete 2018-2023)",
+   "marktmiete_hinweis": "Der Rohertrag ist hier ein SECHS-JAHRES-MITTEL DER ANGEBOTSMIETE 2018–2023 — nicht die tatsächliche Miete und nicht ein Mietspiegelwert. Wer diesen Zinssatz mit einer heutigen Ist-Miete kombiniert, verlässt das Modell.",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.7
+    ],
+    "kaufpreis_eur": [
+     90000,
+     365000
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt. Gilt außerdem nicht für die kreisfreie Stadt Wilhelmshaven.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln und Wilhelmshaven",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge",
+     "Wilhelmshaven (kreisfreie Stadt, 03405)"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 38–40",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe: n = 96, Median 1,7 %, Mittel 1,8 %, Zeitraum 01.01.2023–31.12.2023 — zeichengleich. LAGEPRÜFUNG: Median 1,7 und Mittel 1,8 liegen in [0,4 ; 3,7] — erfüllt. Reihung gegen die Nachbarobjektarten erfüllt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 96,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03402",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für diese Objektart NICHT erreicht. Die 70 Jahre der beiden Hausobjektarten werden ausdrücklich NICHT übertragen.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": null,
+   "marktmiete_hinweis": "Nicht erreicht — der Leselauf bricht vor der Angabe ab. Bleibt null.",
+   "bodenwert": "Bodenrichtwert (ggf. angepasst mit Umrechnungskoeffizienten) — der abgedruckte Satz bricht im Leselauf ab und ist deshalb nur sinngemäß, nicht wörtlich gesichert.",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.3
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik_teilweise",
+    "fundstelle": "S. 40 (Abbruch)",
+    "soll_kennzahlen": 4,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe. ÜBEREINSTIMMEND: Median 1,9 %, Mittel 1,9 %. NUR LAUF 1: Spanne 0,4–3,3 %. IN KEINEM LAUF: Fallzahl, Auswertezeitraum, Mietquelle, Gesamtnutzungsdauer. LAGEPRÜFUNG: Median und Mittel liegen in [0,4 ; 3,3] — erfüllt. REIHUNG: 1,2 < 1,7 < 1,9 über die drei Objektarten, streng steigend nach Risiko — erfüllt. Die Reihung ist hier die einzige verfügbare Quergegenprobe und sie spricht dafür, dass die Zeile richtig zugeordnet ist.",
+    "negativtest": "Die naheliegende Versuchung wäre gewesen, Gesamtnutzungsdauer, Mietquelle und Auswertezeitraum vom Nachbarabschnitt zu übernehmen — der steht drei Absätze darüber und wirkt zuständig. Genau das wurde nicht getan, und der Bericht selbst liefert den Grund: seine beiden gelesenen Objektarten haben BEREITS verschiedene Zeiträume und verschiedene Mietquellen. Eine Übernahme wäre kein Schluss, sondern eine Vermutung mit amtlichem Anstrich gewesen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "we_v",
+  "objektart_bez": "Wohnungseigentum",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03405",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für diese Objektart NICHT erreicht. Die 70 Jahre der beiden Hausobjektarten werden ausdrücklich NICHT übertragen.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": null,
+   "marktmiete_hinweis": "Nicht erreicht — der Leselauf bricht vor der Angabe ab. Bleibt null.",
+   "bodenwert": "Bodenrichtwert (ggf. angepasst mit Umrechnungskoeffizienten) — der abgedruckte Satz bricht im Leselauf ab und ist deshalb nur sinngemäß, nicht wörtlich gesichert.",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.3
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik_teilweise",
+    "fundstelle": "S. 40 (Abbruch)",
+    "soll_kennzahlen": 4,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe. ÜBEREINSTIMMEND: Median 1,9 %, Mittel 1,9 %. NUR LAUF 1: Spanne 0,4–3,3 %. IN KEINEM LAUF: Fallzahl, Auswertezeitraum, Mietquelle, Gesamtnutzungsdauer. LAGEPRÜFUNG: Median und Mittel liegen in [0,4 ; 3,3] — erfüllt. REIHUNG: 1,2 < 1,7 < 1,9 über die drei Objektarten, streng steigend nach Risiko — erfüllt. Die Reihung ist hier die einzige verfügbare Quergegenprobe und sie spricht dafür, dass die Zeile richtig zugeordnet ist.",
+    "negativtest": "Die naheliegende Versuchung wäre gewesen, Gesamtnutzungsdauer, Mietquelle und Auswertezeitraum vom Nachbarabschnitt zu übernehmen — der steht drei Absätze darüber und wirkt zuständig. Genau das wurde nicht getan, und der Bericht selbst liefert den Grund: seine beiden gelesenen Objektarten haben BEREITS verschiedene Zeiträume und verschiedene Mietquellen. Eine Übernahme wäre kein Schluss, sondern eine Vermutung mit amtlichem Anstrich gewesen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "we_v",
+  "objektart_bez": "Wohnungseigentum",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03452",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für diese Objektart NICHT erreicht. Die 70 Jahre der beiden Hausobjektarten werden ausdrücklich NICHT übertragen.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": null,
+   "marktmiete_hinweis": "Nicht erreicht — der Leselauf bricht vor der Angabe ab. Bleibt null.",
+   "bodenwert": "Bodenrichtwert (ggf. angepasst mit Umrechnungskoeffizienten) — der abgedruckte Satz bricht im Leselauf ab und ist deshalb nur sinngemäß, nicht wörtlich gesichert.",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.3
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik_teilweise",
+    "fundstelle": "S. 40 (Abbruch)",
+    "soll_kennzahlen": 4,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe. ÜBEREINSTIMMEND: Median 1,9 %, Mittel 1,9 %. NUR LAUF 1: Spanne 0,4–3,3 %. IN KEINEM LAUF: Fallzahl, Auswertezeitraum, Mietquelle, Gesamtnutzungsdauer. LAGEPRÜFUNG: Median und Mittel liegen in [0,4 ; 3,3] — erfüllt. REIHUNG: 1,2 < 1,7 < 1,9 über die drei Objektarten, streng steigend nach Risiko — erfüllt. Die Reihung ist hier die einzige verfügbare Quergegenprobe und sie spricht dafür, dass die Zeile richtig zugeordnet ist.",
+    "negativtest": "Die naheliegende Versuchung wäre gewesen, Gesamtnutzungsdauer, Mietquelle und Auswertezeitraum vom Nachbarabschnitt zu übernehmen — der steht drei Absätze darüber und wirkt zuständig. Genau das wurde nicht getan, und der Bericht selbst liefert den Grund: seine beiden gelesenen Objektarten haben BEREITS verschiedene Zeiträume und verschiedene Mietquellen. Eine Übernahme wäre kein Schluss, sondern eine Vermutung mit amtlichem Anstrich gewesen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "we_v",
+  "objektart_bez": "Wohnungseigentum",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03455",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für diese Objektart NICHT erreicht. Die 70 Jahre der beiden Hausobjektarten werden ausdrücklich NICHT übertragen.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": null,
+   "marktmiete_hinweis": "Nicht erreicht — der Leselauf bricht vor der Angabe ab. Bleibt null.",
+   "bodenwert": "Bodenrichtwert (ggf. angepasst mit Umrechnungskoeffizienten) — der abgedruckte Satz bricht im Leselauf ab und ist deshalb nur sinngemäß, nicht wörtlich gesichert.",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.3
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik_teilweise",
+    "fundstelle": "S. 40 (Abbruch)",
+    "soll_kennzahlen": 4,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe. ÜBEREINSTIMMEND: Median 1,9 %, Mittel 1,9 %. NUR LAUF 1: Spanne 0,4–3,3 %. IN KEINEM LAUF: Fallzahl, Auswertezeitraum, Mietquelle, Gesamtnutzungsdauer. LAGEPRÜFUNG: Median und Mittel liegen in [0,4 ; 3,3] — erfüllt. REIHUNG: 1,2 < 1,7 < 1,9 über die drei Objektarten, streng steigend nach Risiko — erfüllt. Die Reihung ist hier die einzige verfügbare Quergegenprobe und sie spricht dafür, dass die Zeile richtig zugeordnet ist.",
+    "negativtest": "Die naheliegende Versuchung wäre gewesen, Gesamtnutzungsdauer, Mietquelle und Auswertezeitraum vom Nachbarabschnitt zu übernehmen — der steht drei Absätze darüber und wirkt zuständig. Genau das wurde nicht getan, und der Bericht selbst liefert den Grund: seine beiden gelesenen Objektarten haben BEREITS verschiedene Zeiträume und verschiedene Mietquellen. Eine Übernahme wäre kein Schluss, sondern eine Vermutung mit amtlichem Anstrich gewesen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "we_v",
+  "objektart_bez": "Wohnungseigentum",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03457",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für diese Objektart NICHT erreicht. Die 70 Jahre der beiden Hausobjektarten werden ausdrücklich NICHT übertragen.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": null,
+   "marktmiete_hinweis": "Nicht erreicht — der Leselauf bricht vor der Angabe ab. Bleibt null.",
+   "bodenwert": "Bodenrichtwert (ggf. angepasst mit Umrechnungskoeffizienten) — der abgedruckte Satz bricht im Leselauf ab und ist deshalb nur sinngemäß, nicht wörtlich gesichert.",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.3
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik_teilweise",
+    "fundstelle": "S. 40 (Abbruch)",
+    "soll_kennzahlen": 4,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe. ÜBEREINSTIMMEND: Median 1,9 %, Mittel 1,9 %. NUR LAUF 1: Spanne 0,4–3,3 %. IN KEINEM LAUF: Fallzahl, Auswertezeitraum, Mietquelle, Gesamtnutzungsdauer. LAGEPRÜFUNG: Median und Mittel liegen in [0,4 ; 3,3] — erfüllt. REIHUNG: 1,2 < 1,7 < 1,9 über die drei Objektarten, streng steigend nach Risiko — erfüllt. Die Reihung ist hier die einzige verfügbare Quergegenprobe und sie spricht dafür, dass die Zeile richtig zugeordnet ist.",
+    "negativtest": "Die naheliegende Versuchung wäre gewesen, Gesamtnutzungsdauer, Mietquelle und Auswertezeitraum vom Nachbarabschnitt zu übernehmen — der steht drei Absätze darüber und wirkt zuständig. Genau das wurde nicht getan, und der Bericht selbst liefert den Grund: seine beiden gelesenen Objektarten haben BEREITS verschiedene Zeiträume und verschiedene Mietquellen. Eine Übernahme wäre kein Schluss, sondern eine Vermutung mit amtlichem Anstrich gewesen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "we_v",
+  "objektart_bez": "Wohnungseigentum",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03462",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1,
+   "liefert_hinweis": "Im Rezept stand \"liegenschaftszinssatz_prozent\" — das nennt die Kennzahl, nicht die Einheit. Der Vertrag kennt nur faktor, prozent, zuschlag_prozent und wert_eur."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für diese Objektart NICHT erreicht. Die 70 Jahre der beiden Hausobjektarten werden ausdrücklich NICHT übertragen.",
+   "restnutzungsdauer": "15-70 Jahre (Spanne der Stichprobe)",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": null,
+   "marktmiete_hinweis": "Nicht erreicht — der Leselauf bricht vor der Angabe ab. Bleibt null.",
+   "bodenwert": "Bodenrichtwert (ggf. angepasst mit Umrechnungskoeffizienten) — der abgedruckte Satz bricht im Leselauf ab und ist deshalb nur sinngemäß, nicht wörtlich gesichert.",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.4,
+     3.3
+    ]
+   },
+   "hinweis": "Gilt nicht für die ostfriesischen Inselgemeinden — der Vorbehalt ist am Dokument gemessen und unter 'inselvorbehalt' im Kopf des Rezepts belegt.",
+   "ausgeschlossene_gebiete": {
+    "art": "Inselgemeinden",
+    "wortlaut": "ohne Inseln",
+    "gemeinden": [
+     "Borkum",
+     "Juist",
+     "Norderney",
+     "Baltrum",
+     "Langeoog",
+     "Spiekeroog",
+     "Wangerooge"
+    ],
+    "wirkung": "Für diese Gebiete darf aus diesem Satz NICHT gerechnet werden. Kein Nachbarwert, kein Kreiswert."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik_teilweise",
+    "fundstelle": "S. 40 (Abbruch)",
+    "soll_kennzahlen": 4,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe. ÜBEREINSTIMMEND: Median 1,9 %, Mittel 1,9 %. NUR LAUF 1: Spanne 0,4–3,3 %. IN KEINEM LAUF: Fallzahl, Auswertezeitraum, Mietquelle, Gesamtnutzungsdauer. LAGEPRÜFUNG: Median und Mittel liegen in [0,4 ; 3,3] — erfüllt. REIHUNG: 1,2 < 1,7 < 1,9 über die drei Objektarten, streng steigend nach Risiko — erfüllt. Die Reihung ist hier die einzige verfügbare Quergegenprobe und sie spricht dafür, dass die Zeile richtig zugeordnet ist.",
+    "negativtest": "Die naheliegende Versuchung wäre gewesen, Gesamtnutzungsdauer, Mietquelle und Auswertezeitraum vom Nachbarabschnitt zu übernehmen — der steht drei Absätze darüber und wirkt zuständig. Genau das wurde nicht getan, und der Bericht selbst liefert den Grund: seine beiden gelesenen Objektarten haben BEREITS verschiedene Zeiträume und verschiedene Mietquellen. Eine Übernahme wäre kein Schluss, sondern eine Vermutung mit amtlichem Anstrich gewesen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "DIESER DATENSATZ IST EIN TEILSTAND UND WEISS DAS. Vier Lücken. ERSTENS: der Leselauf bricht auf Seite 40 ab; das Kapitel reicht bis Seite 52. Wie viele Objektarten dahinter stehen, ist unbekannt — die Auswertung ist also nicht nur unvollständig, sondern von unbekanntem Restumfang. ZWEITENS: für die Eigentumswohnungen fehlen Fallzahl und Auswertezeitraum. DRITTENS: keine Standardabweichung bei irgendeiner Objektart. VIERTENS: die Sachwertfaktoren auf Seite 55 sind gar nicht erreicht worden. Dazu der ungeklärte Inselvorbehalt (siehe ags_vorbehalt). STAND NACH v1094-WNI: Lücke VIER ist NICHT geschlossen — das Kapitel Sachwertfaktoren (S. 55) liegt auch nach vier Leseläufen hinter der Textgrenze (höchste gesehene Seite: 48). Der Inselvorbehalt ist von „ungeklärt“ auf „gemessen und aufgelöst“ gehoben. Offen bleiben: der Abbruch im Kapitel (Text reichte im dritten Leselauf bis S. 50 statt bis S. 40 — das Kapitel endet auf S. 52, es fehlt also weniger als gedacht, aber es fehlt), Fallzahl und Auswertezeitraum der Eigentumswohnungen, die fehlende Standardabweichung und die achtstelligen Schlüssel der Inselgemeinden.",
+  "objektart": "we_v",
+  "objektart_bez": "Wohnungseigentum",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210956",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze, S. 38–52 (gelesen bis S. 40)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05120",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh",
+  "formel": {
+   "form": "stufen_1d",
+   "liefert": "faktor",
+   "variable_einheit": "EUR",
+   "interpolation": "linear",
+   "interpolation_hinweis": "Der Bericht sagt zur Interpolation nichts. Lineare Interpolation zwischen den Stützstellen ist die übliche Lesart einer solchen Tabelle und die einzige, die bei ungleicher Schrittweite überhaupt sinnvoll ist. Sie wird hier als Annahme gekennzeichnet, nicht als Dokumentaussage.",
+   "rundung_stellen": 2,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorlaeufiger_sachwert",
+   "stufen": {
+    "100000": 1.52,
+    "125000": 1.42,
+    "150000": 1.34,
+    "175000": 1.28,
+    "200000": 1.22,
+    "225000": 1.18,
+    "250000": 1.14,
+    "275000": 1.11,
+    "300000": 1.08,
+    "350000": 1.03,
+    "400000": 0.99,
+    "450000": 0.95,
+    "500000": 0.92,
+    "600000": 0.87,
+    "700000": 0.83,
+    "800000": 0.79
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "_herkunft": "DURCH BEZUGNAHME auf das Landesmodell. Der Bericht beruft sich ausdrücklich auf das „Modell der AGVGA-NRW\" (S. 45) und auf § 21 Abs. 3 ImmoWertV in Verbindung mit § 40 Abs. 1 GrundWertVO NRW; für das vollständige Modell verweist er auf die Handlungsempfehlungen der AGVGA NRW. Die Ansätze stammen daher aus dem Baustein _modellansaetze-nrw.json, nicht aus dem Grundstücksmarktbericht selbst. Gemessen wurde das Landesmodell am Dokument „Modell zur Ableitung von Sachwertfaktoren\" der AGVGA.NRW, Stand 21.06.2016, 31 Seiten, VOLLSTÄNDIG gelesen.",
+   "modell": "AGVGA-NRW, Modell zur Ableitung von Sachwertfaktoren",
+   "rechtsgrundlage": "§ 21 Abs. 3 ImmoWertV in Verbindung mit § 40 Abs. 1 GrundWertVO NRW; Sachwertfaktoren als sonstige erforderliche Daten nach § 193 Abs. 5 BauGB",
+   "nhk_ausgabe": "NHK 2010",
+   "nhk_beleg": "DOPPELT belegt: im Bericht selbst wörtlich „Basis NHK 2010\" (S. 45) UND im Landesmodell (Anlage 1). Dieser Ansatz hängt also nicht allein an der Bezugnahme.",
+   "nhk_bezugsmassstab": "Brutto-Grundfläche (BGF) nach DIN 277-1:2005-02",
+   "standardstufen": "fünf Standardstufen mit Wägungsanteilen nach Merkmalgruppen (Anlage 2 des Landesmodells)",
+   "regionalfaktor": 1.0,
+   "regionalfaktor_beleg": "Landesmodell wörtlich: „Korrekturfaktoren für Land und Ortsgröße sind nicht anzuwenden.\" Rechnerisch 1,0. DREIFACH unabhängig bestätigt — AGVGA-Modell 2016, Sachwertmodell Bielefeld 2014 („nicht angewendet\") und der Grundstücksmarktbericht Krefeld 2026 (druckt „Regionalfaktor 1,00\" ab).",
+   "gesamtnutzungsdauer": 80,
+   "gnd_beleg": "Landesmodell: pauschal 80 Jahre, ausdrücklich abweichend von der SW-RL; nach Gebäudestandard sind 70, 80 oder 90 Jahre möglich (Anlage 3).",
+   "alterswertminderung": "linear, nach dem Verhältnis Restnutzungsdauer zu Gesamtnutzungsdauer",
+   "restnutzungsdauer": "sachverständig unter Berücksichtigung des Modernisierungsgrades; Punktetabelle mit den Stufen ≤ 1, 4, 8, 13 und ≥ 18 Punkten (Anlage 4 des Landesmodells)",
+   "baupreisindex": "Preisindizes des Statistischen Bundesamtes für den Neubau von Wohngebäuden, einschließlich Umsatzsteuer",
+   "baupreisindex_beleg": "Im Bericht selbst benannt (Fortschreibung der vorläufigen Sachwerte auf den 01.01.2025) UND im Landesmodell.",
+   "indexbasis": null,
+   "indexbasis_hinweis": "WEITERHIN OFFEN. Weder der Bericht noch das AGVGA-Sachwertmodell nennen die Basis des Baupreisindex. Sie wird NICHT aus dem Liegenschaftszinssatzmodell übernommen — die dortigen 87,5 sind der VERBRAUCHERpreisindex Oktober 2001 auf Basis 2010 = 100 und dienen der Fortschreibung der Bewirtschaftungskosten, nicht der Indexierung von Herstellungskosten. Zwei Indizes, zwei Zwecke. Die Angabe stünde in Baupreisindex.pdf auf dem GESPERRTEN BORIS-Pfad /borisfachdaten/agvga/ und wurde deshalb nicht abgerufen.",
+   "baunebenkosten": "in den NHK 2010 enthalten, mit 17 % (Anlage 1, Fußnote 1 des Landesmodells)",
+   "aussenanlagen": null,
+   "aussenanlagen_hinweis": "NICHT ergänzbar. Das Landesmodell legt keinen Prozentsatz fest, sondern sagt nur „pauschaliert nach Erfahrungssätzen\"; der Bericht schweigt. Ein Wert aus einem Nachbarausschuss (Bielefeld 3–7 %, Kreis Olpe 5 % höchstens 20.000 €) wäre eine erfundene Zahl und wird nicht eingetragen. Das ist die einzige inhaltliche Lücke, die die Bezugnahme nicht schließt.",
+   "garagen_stellplaetze": "nicht gesondert bewertet; typische Nebengebäude sind im normierten Kaufpreis enthalten (Landesmodell). ACHTUNG: Die Aussage des Berichts, ein Immobilienrichtwert beinhalte in der Regel eine Einzelgarage (S. 36), betrifft eine ANDERE Kennzahl und wird nicht übertragen.",
+   "bodenwert": "UNGEDÄMPFT anzusetzen, aus dem Bodenrichtwert oder aus Vergleichspreisen",
+   "bodenwert_hinweis": "Harte Modellaussage. Wer denselben Faktor auf einen gedämpft angesetzten Bodenwert anwendet, rechnet modellfremd.",
+   "besondere_objektspezifische_grundstuecksmerkmale": "bei der Kaufpreisbereinigung zu berücksichtigen; anzusetzen ist der Werteinfluss, nicht die Kosten",
+   "sachwertfaktor_definition": "Kaufpreis − Bodenwert selbstständig verwertbarer Grundstücksteile + Erschließungsbeiträge und Abgaben +/− besondere objektspezifische Grundstücksmerkmale = bereinigter und normierter Kaufpreis, geteilt durch den vorläufigen Sachwert",
+   "fassungsvorbehalt": "Die gelesene Fassung des Landesmodells trägt den Stand 21.06.2016 und stützt sich auf die SW-RL 2012 und die ImmoWertV alter Fassung. Der Bericht ist von 2025 und zitiert § 21 Abs. 3 ImmoWertV 2021 — es muss also eine neuere Fassung des AGVGA-Modells geben, die nicht erreichbar war. Die hier eingetragenen Ansätze sind bewusst auf solche beschränkt, die die ImmoWertV 2021 unverändert übernommen hat (NHK 2010, BGF nach DIN 277, lineare Alterswertminderung, GND 80, Baunebenkosten in den NHK, ungedämpfter Bodenwert, Definition des Sachwertfaktors) oder die unabhängig mehrfach bestätigt sind (Regionalfaktor). Nicht übernommen wurden die §-Verweise der alten Fassung. Vollständige Begründung im Baustein unter fassungsvorbehalt.",
+   "_ersetzt": "Dieser Block ersetzt den früheren, weitgehend leeren Modellvermerk. Zuvor standen hier Regionalfaktor, Gesamtnutzungsdauer, Alterswertminderung, Indexbasis, Außenanlagen, Baunebenkosten und Bodenwertansatz auf null.",
+   "garagen_hinweis_aus_bericht": "Nicht im Sachwertfaktor geregelt. Der Bericht sagt zu den IMMOBILIENRICHTWERTEN (S. 36), dass diese in der Regel eine Einzelgarage beinhalten — das ist eine andere Kennzahl und darf NICHT auf den Sachwertfaktor übertragen werden.",
+   "normierung": "Kaufpreise mit Indexreihe auf den 01.01.2025 angepasst; vorläufige Sachwerte mit dem Baupreisindex des Statistischen Bundesamtes auf den 01.01.2025 fortgeschrieben."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "extrapolation_beleg": "Ein ausdrückliches Verbot ist NICHT abgedruckt. Die Grenze wird trotzdem hart gezogen: unterhalb 100.000 € und oberhalb 800.000 € druckt der Bericht keinen Wert ab.",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     100000,
+     800000
+    ]
+   },
+   "warnung_der_quelle": "Wörtlich: „Bei stark steigenden Bodenwerten macht sich der Einfluss der im Vergleich zum Ableitungsjahr deutlich höheren Bodenpreise durch überhöhte Ergebnisse im Sachwert bemerkbar. Dieser Effekt ist bei der Anwendung sachverständig zu würdigen.\" Das ist eine Alterungswarnung der Quelle an ihren eigenen Wert und gehört in jeden Bericht, der ihn verwendet — besonders, weil dieser Datensatz aus dem Jahrgang 2025 stammt."
+  },
+  "belege": [
+   {
+    "art": "doppelt_gemessene_abgedruckte_tabelle",
+    "fundstelle": "S. 45–46",
+    "soll_zeilen": 16,
+    "pruefprotokoll": "Geprüft am 13.08.2026, zwei unabhängige Leseläufe mit unterschiedlicher Fragestellung. (1) ZEICHENGLEICHHEIT: Beide Läufe liefern dieselben 16 Wertepaare, Ziffer für Ziffer. Da der Bericht KEINE Regressionsformel abdruckt, ist diese Doppelmessung der einzige verfügbare Beleg — es gibt keine zweite unabhängige Darstellung derselben Zahlen im Dokument, wie sie Olpe und Hamm bieten. (2) ZÄHLPRÜFUNG: 16 Stützstellen in beiden Läufen. Die Schrittweite ist ungleich (25.000 € bis 300.000 €, dann 50.000 €, ab 500.000 € 100.000 €); nachgezählt ergibt das 9 + 4 + 3 = 16 Zeilen. Die Zählung geht auf. (3) MONOTONIE über die ganze Tabelle: 1,52 → 0,79, streng fallend, ohne Plateau und ohne Sprung. (4) KRÜMMUNG: Die Abstände zwischen aufeinanderfolgenden Werten werden mit steigendem Sachwert kleiner (−0,10, −0,08, −0,06, −0,06, −0,04, −0,04, −0,03, −0,03 auf gleicher Schrittweite). Das ist der degressive Verlauf, den eine Marktanpassungskurve haben muss; ein vertauschter Wert hätte diese Folge gebrochen. (5) LAGEPRÜFUNG GEGEN DIE STICHPROBE: Der mittlere vorläufige Sachwert der Stichprobe beträgt 356.252 €, der mittlere Sachwertfaktor 1,12. Die Tabelle liefert bei 356.252 € rund 1,03. Die beiden Zahlen müssen NICHT gleich sein — der Mittelwert einer konvexen fallenden Funktion liegt über dem Funktionswert am Mittelwert — und die Richtung der Abweichung ist genau die zu erwartende. Läge der Tabellenwert ÜBER dem Stichprobenmittel, wäre das ein Befund gewesen.",
+    "negativtest": "Zwei Prüfungen haben angeschlagen. ERSTENS die Bezugsgrößenprüfung: die abgedruckte Standardabweichung von 141.463 € gehört zum Kaufpreis, nicht zum Faktor. Sie wurde nicht in streuung übernommen; ein unbesehen eingetragener Wert hätte in stufeNachStreuung() eine Streuung von 141.463 auf einen Faktor um 1,0 bedeutet und den Satz sinnlos herabgestuft. ZWEITENS die Jahrgangsprüfung: der Bericht ist Jahrgang 2025 mit Datenjahr 2024, während dieselbe Erntestrecke für Olpe, Unna, Krefeld und Hamm den Jahrgang 2026 mit Datenjahr 2025 geliefert hat. Der Datensatz ist damit ein Jahr alt, und der Bericht warnt selbst vor der Alterung bei stark steigenden Bodenwerten. Statt ihn als gleichwertig einzustellen, ist er nicht freigegeben und der fehlende Jahrgang 2026 in _fehlend.md vermerkt. DRITTENS wurde dem Verweis auf das vollständige AGVGA-NRW-Modell NICHT gefolgt, weil er auf boris.nrw.de zeigt — die Lücke im Modellvermerk bleibt dadurch offen, aber die robots-Sperre wird nicht umgangen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "efh",
+  "objektart_bez": "freistehendes Ein- und Zweifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 39,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Remscheid/pdf/GMB_121_2025_pflichtig.pdf",
+  "quelle_parser": "v1093-WNRW",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kapitel 5.1.4 „Sachwertfaktoren\", S. 45–47"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05120",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "liefert": "faktor",
+   "variable_einheit": "EUR",
+   "interpolation": "linear",
+   "rundung_stellen": 2,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorlaeufiger_sachwert",
+   "stufen": {
+    "100000": 1.79,
+    "125000": 1.63,
+    "150000": 1.52,
+    "175000": 1.43,
+    "200000": 1.36,
+    "225000": 1.29,
+    "250000": 1.24,
+    "275000": 1.19,
+    "300000": 1.15,
+    "325000": 1.12,
+    "350000": 1.09,
+    "375000": 1.06,
+    "400000": 1.03,
+    "450000": 0.98,
+    "500000": 0.94
+   }
+  },
+  "korrekturen": [
+   {
+    "name": "Korrektur Reihenmittelhaus",
+    "art_beleg": "Wörtlich abgedruckt: „Korrektur für Reihenmittelhaus: +0,04\". Das Vorzeichen und die Größenordnung weisen die Korrektur eindeutig als additiven Zuschlag auf den Faktor aus, nicht als Multiplikator — ein multiplikatives 0,04 wäre sinnlos.",
+    "typ": "kategorial",
+    "merkmal": "anbauweise",
+    "rundung_stellen": 2,
+    "werte": {
+     "Doppelhaushälfte": 0.0,
+     "Reihenendhaus": 0.0,
+     "Reihenmittelhaus": 0.04
+    },
+    "hinweis": "Die Nullwerte für Doppelhaushälfte und Reihenendhaus sind NICHT abgedruckt, sondern folgen daraus, dass die Grundtabelle ausdrücklich für „Doppelhaushälften und Reihenhäuser\" gilt und nur für das Reihenmittelhaus eine Korrektur genannt ist. Das ist eine Auslegung, keine Ablesung — deshalb steht sie hier ausdrücklich als solche.",
+    "wirkung": "additiv"
+   }
+  ],
+  "modellansaetze": {
+   "_herkunft": "DURCH BEZUGNAHME auf das Landesmodell. Der Bericht beruft sich ausdrücklich auf das „Modell der AGVGA-NRW\" (S. 45) und auf § 21 Abs. 3 ImmoWertV in Verbindung mit § 40 Abs. 1 GrundWertVO NRW; für das vollständige Modell verweist er auf die Handlungsempfehlungen der AGVGA NRW. Die Ansätze stammen daher aus dem Baustein _modellansaetze-nrw.json, nicht aus dem Grundstücksmarktbericht selbst. Gemessen wurde das Landesmodell am Dokument „Modell zur Ableitung von Sachwertfaktoren\" der AGVGA.NRW, Stand 21.06.2016, 31 Seiten, VOLLSTÄNDIG gelesen.",
+   "modell": "AGVGA-NRW, Modell zur Ableitung von Sachwertfaktoren",
+   "rechtsgrundlage": "§ 21 Abs. 3 ImmoWertV in Verbindung mit § 40 Abs. 1 GrundWertVO NRW; Sachwertfaktoren als sonstige erforderliche Daten nach § 193 Abs. 5 BauGB",
+   "nhk_ausgabe": "NHK 2010",
+   "nhk_beleg": "DOPPELT belegt: im Bericht selbst wörtlich „Basis NHK 2010\" (S. 45) UND im Landesmodell (Anlage 1). Dieser Ansatz hängt also nicht allein an der Bezugnahme.",
+   "nhk_bezugsmassstab": "Brutto-Grundfläche (BGF) nach DIN 277-1:2005-02",
+   "standardstufen": "fünf Standardstufen mit Wägungsanteilen nach Merkmalgruppen (Anlage 2 des Landesmodells)",
+   "regionalfaktor": 1.0,
+   "regionalfaktor_beleg": "Landesmodell wörtlich: „Korrekturfaktoren für Land und Ortsgröße sind nicht anzuwenden.\" Rechnerisch 1,0. DREIFACH unabhängig bestätigt — AGVGA-Modell 2016, Sachwertmodell Bielefeld 2014 („nicht angewendet\") und der Grundstücksmarktbericht Krefeld 2026 (druckt „Regionalfaktor 1,00\" ab).",
+   "gesamtnutzungsdauer": 80,
+   "gnd_beleg": "Landesmodell: pauschal 80 Jahre, ausdrücklich abweichend von der SW-RL; nach Gebäudestandard sind 70, 80 oder 90 Jahre möglich (Anlage 3).",
+   "alterswertminderung": "linear, nach dem Verhältnis Restnutzungsdauer zu Gesamtnutzungsdauer",
+   "restnutzungsdauer": "sachverständig unter Berücksichtigung des Modernisierungsgrades; Punktetabelle mit den Stufen ≤ 1, 4, 8, 13 und ≥ 18 Punkten (Anlage 4 des Landesmodells)",
+   "baupreisindex": "Preisindizes des Statistischen Bundesamtes für den Neubau von Wohngebäuden, einschließlich Umsatzsteuer",
+   "baupreisindex_beleg": "Im Bericht selbst benannt (Fortschreibung der vorläufigen Sachwerte auf den 01.01.2025) UND im Landesmodell.",
+   "indexbasis": null,
+   "indexbasis_hinweis": "WEITERHIN OFFEN. Weder der Bericht noch das AGVGA-Sachwertmodell nennen die Basis des Baupreisindex. Sie wird NICHT aus dem Liegenschaftszinssatzmodell übernommen — die dortigen 87,5 sind der VERBRAUCHERpreisindex Oktober 2001 auf Basis 2010 = 100 und dienen der Fortschreibung der Bewirtschaftungskosten, nicht der Indexierung von Herstellungskosten. Zwei Indizes, zwei Zwecke. Die Angabe stünde in Baupreisindex.pdf auf dem GESPERRTEN BORIS-Pfad /borisfachdaten/agvga/ und wurde deshalb nicht abgerufen.",
+   "baunebenkosten": "in den NHK 2010 enthalten, mit 17 % (Anlage 1, Fußnote 1 des Landesmodells)",
+   "aussenanlagen": null,
+   "aussenanlagen_hinweis": "NICHT ergänzbar. Das Landesmodell legt keinen Prozentsatz fest, sondern sagt nur „pauschaliert nach Erfahrungssätzen\"; der Bericht schweigt. Ein Wert aus einem Nachbarausschuss (Bielefeld 3–7 %, Kreis Olpe 5 % höchstens 20.000 €) wäre eine erfundene Zahl und wird nicht eingetragen. Das ist die einzige inhaltliche Lücke, die die Bezugnahme nicht schließt.",
+   "garagen_stellplaetze": "nicht gesondert bewertet; typische Nebengebäude sind im normierten Kaufpreis enthalten (Landesmodell). ACHTUNG: Die Aussage des Berichts, ein Immobilienrichtwert beinhalte in der Regel eine Einzelgarage (S. 36), betrifft eine ANDERE Kennzahl und wird nicht übertragen.",
+   "bodenwert": "UNGEDÄMPFT anzusetzen, aus dem Bodenrichtwert oder aus Vergleichspreisen",
+   "bodenwert_hinweis": "Harte Modellaussage. Wer denselben Faktor auf einen gedämpft angesetzten Bodenwert anwendet, rechnet modellfremd.",
+   "besondere_objektspezifische_grundstuecksmerkmale": "bei der Kaufpreisbereinigung zu berücksichtigen; anzusetzen ist der Werteinfluss, nicht die Kosten",
+   "sachwertfaktor_definition": "Kaufpreis − Bodenwert selbstständig verwertbarer Grundstücksteile + Erschließungsbeiträge und Abgaben +/− besondere objektspezifische Grundstücksmerkmale = bereinigter und normierter Kaufpreis, geteilt durch den vorläufigen Sachwert",
+   "fassungsvorbehalt": "Die gelesene Fassung des Landesmodells trägt den Stand 21.06.2016 und stützt sich auf die SW-RL 2012 und die ImmoWertV alter Fassung. Der Bericht ist von 2025 und zitiert § 21 Abs. 3 ImmoWertV 2021 — es muss also eine neuere Fassung des AGVGA-Modells geben, die nicht erreichbar war. Die hier eingetragenen Ansätze sind bewusst auf solche beschränkt, die die ImmoWertV 2021 unverändert übernommen hat (NHK 2010, BGF nach DIN 277, lineare Alterswertminderung, GND 80, Baunebenkosten in den NHK, ungedämpfter Bodenwert, Definition des Sachwertfaktors) oder die unabhängig mehrfach bestätigt sind (Regionalfaktor). Nicht übernommen wurden die §-Verweise der alten Fassung. Vollständige Begründung im Baustein unter fassungsvorbehalt.",
+   "_ersetzt": "Dieser Block ersetzt den früheren, weitgehend leeren Modellvermerk. Zuvor standen hier Regionalfaktor, Gesamtnutzungsdauer, Alterswertminderung, Indexbasis, Außenanlagen, Baunebenkosten und Bodenwertansatz auf null.",
+   "normierung": "Kaufpreise und vorläufige Sachwerte auf den 01.01.2025 fortgeschrieben"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     100000,
+     500000
+    ]
+   },
+   "hinweis": "Diese Tabelle endet bei 500.000 €, die Tabelle für freistehende Häuser erst bei 800.000 €. Die Obergrenze der Nachbartabelle darf NICHT übernommen werden."
+  },
+  "belege": [
+   {
+    "art": "doppelt_gemessene_abgedruckte_tabelle",
+    "fundstelle": "S. 47",
+    "soll_zeilen": 15,
+    "pruefprotokoll": "(1) ZEICHENGLEICHHEIT: beide Leseläufe liefern dieselben 15 Wertepaare und denselben Reihenmittelhaus-Zuschlag von +0,04. (2) ZÄHLPRÜFUNG: Schrittweite 25.000 € von 100.000 € bis 400.000 €, danach 50.000 €; nachgezählt 13 + 2 = 15 Zeilen. Geht auf. (3) MONOTONIE: 1,79 → 0,94, streng fallend, degressiv (−0,16, −0,11, −0,09, −0,07, −0,07, −0,05, −0,05, −0,04, −0,03, −0,03, −0,03, −0,03 auf gleicher Schrittweite). (4) QUERPRÜFUNG GEGEN DIE NACHBARTABELLE: In jeder gemeinsam belegten Zeile liegt der Faktor für Doppel-/Reihenhäuser ÜBER dem für freistehende Häuser (100.000: 1,79 gegen 1,52; 300.000: 1,15 gegen 1,08; 500.000: 0,94 gegen 0,92). Die Differenz schrumpft mit steigendem Sachwert von 0,27 auf 0,02 und wechselt nirgends das Vorzeichen. Dieselbe Richtung zeigen Kreis Unna (+0,05 für Doppel-/Reihenendhaus, +0,14 für Reihenmittelhaus) und Mülheim an der Ruhr — drei unabhängige Ausschüsse, dieselbe Ordnung. (5) LAGEPRÜFUNG: mittlerer vorläufiger Sachwert 256.529 €, mittlerer Faktor 1,23; die Tabelle liefert dort rund 1,23. Hier fallen beide Zahlen praktisch zusammen, was zur engeren Streuung dieser Stichprobe passt (Standardabweichung des Kaufpreises 77.789 € gegen 141.463 € bei den freistehenden Häusern).",
+    "negativtest": "Die Prüfung, die hier angeschlagen hat, betrifft die Nullwerte der Korrekturtabelle. Der Bericht druckt NUR den Reihenmittelhaus-Zuschlag ab. Dass Doppelhaushälfte und Reihenendhaus mit 0,00 laufen, ist eine Auslegung des Tabellentitels und keine gelesene Zelle — sie ist im Feld hinweis ausdrücklich als Auslegung gekennzeichnet, statt sie stillschweigend wie einen abgedruckten Wert zu führen. Kreis Unna druckt die Nullzeile ausdrücklich ab; Remscheid tut es nicht, und dieser Unterschied darf nicht verwischt werden."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppelhaushälfte, Reihenendhaus, Reihenmittelhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 58,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Remscheid/pdf/GMB_121_2025_pflichtig.pdf",
+  "quelle_parser": "v1093-WNRW",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kapitel 5.1.4 „Sachwertfaktoren\", S. 45–47"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05966",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Olpe",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Olpe",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh",
+  "formel": {
+   "form": "regression_additiv",
+   "liefert": "faktor",
+   "variable_einheit": "EUR",
+   "intercept": 0.829405,
+   "terme": [
+    {
+     "koeffizient": 27602.80555,
+     "exponent": -1,
+     "feld": "sachwert"
+    }
+   ],
+   "rundung_stellen": 2,
+   "herleitung": "Der Bericht druckt die Ausgleichsgerade zwischen bereinigtem Kaufpreis und vorläufigem Sachwert ab: bereinigter Kaufpreis = P1 × vorläufiger Sachwert + P2 mit P1 = 0,829405 und P2 = 27.602,80555. Der Sachwertfaktor ist definitionsgemäß der Quotient aus bereinigtem Kaufpreis und vorläufigem Sachwert; Division der abgedruckten Geradengleichung durch den vorläufigen Sachwert ergibt unmittelbar Faktor = P1 + P2 / vorläufiger Sachwert. Das ist keine eigene Modellbildung, sondern eine Umformung der abgedruckten Gleichung — und sie ist an der ebenfalls abgedruckten Tabelle nachgerechnet (siehe pruefprotokoll).",
+   "hinweis_einheit": "Der Bericht druckt die Tabelle als PROZENTUALEN Zu-/Abschlag ab (z. B. „−8\" bei 300.000 €), nicht als Faktor. Der Zusammenhang ist Zuschlag[%] = (Faktor − 1) × 100. Im Rezept wird der FAKTOR geführt, weil die abgedruckte Gleichung ihn direkt liefert und jede Zwischenumrechnung eine Rundungsstufe einzieht. Die abgedruckten Prozentwerte stehen zur Kontrolle in tabelle_abgedruckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Der Faktor darf nur auf einen vorläufigen Sachwert angewandt werden, der nach genau diesen Ansätzen ermittelt wurde.",
+   "nhk_ausgabe": "NHK 2010",
+   "nhk_beleg": "Steht im Spaltenkopf der Tabelle selbst: „Sachwertfaktor in % 2025 (NHK 2010)\".",
+   "alterswertminderung": "nach Sachwertrichtlinie 2012, entsprechend §§ 35–38 ImmoWertV",
+   "gesamtnutzungsdauer": 80,
+   "gnd_hinweis": "80 Jahre als Standardwert der Stichprobe. ACHTUNG für den CrossCheckService: dessen Konstante GND_JAHRE steht ebenfalls auf 80 — hier stimmen sie zufällig überein. Das entbindet nicht davon, die GND aus dem Modellvermerk zu lesen; für Bonn steht dort 60.",
+   "restnutzungsdauer_stichprobe": 31,
+   "rnd_hinweis": "31 Jahre ist das Mittel der Stichprobe, KEIN Rechenansatz für das Einzelobjekt. Nicht als Vorgabe verwenden.",
+   "aussenanlagen": "5 % des Gebäudesachwerts, höchstens 20.000 €",
+   "garagen": "ein Garagen- bzw. Carportstellplatz ist im Normobjekt enthalten und NICHT zusätzlich anzusetzen",
+   "indexbasis": "2010",
+   "baupreisindex": null,
+   "regionalfaktor": null,
+   "baunebenkosten": null,
+   "bodenwert": "Bodenrichtwerte des Ausschusses"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "extrapolation_beleg": "Der Bericht sagt wörtlich: „Die Berechnungsformel gilt für Sachwerte zwischen 75.000 € und 700.000 €.\" Das ist eine Gültigkeitsaussage der Quelle; außerhalb wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     75000,
+     700000
+    ]
+   },
+   "verfeinerungen": [
+    {
+     "bez": "Freistehende Ein- und Zweifamilienhäuser in Bodenrichtwertbereichen BIS 89 €/m². Tabellenüberschrift: „Sachwertfaktoren (in %) für freistehende Ein- und Zweifamilienhäuser in Bodenrichtwertbereichen\", Spalte „bis 89 €/m²\".",
+     "formel": {
+      "form": "regression_additiv",
+      "liefert": "faktor",
+      "variable": "vorlaeufiger_sachwert",
+      "variable_einheit": "EUR",
+      "intercept": 0.644094,
+      "terme": [
+       {
+        "variable": "vorlaeufiger_sachwert",
+        "koeffizient": 59134.815858,
+        "exponent": -1
+       }
+      ],
+      "rundung_stellen": 2
+     },
+     "fallzahl": 64,
+     "beleg": "S. 45"
+    },
+    {
+     "bez": "Freistehende Ein- und Zweifamilienhäuser in Bodenrichtwertbereichen AB 90 €/m². Spalte „ab 90 €/m²\" derselben Tabelle.",
+     "formel": {
+      "form": "regression_additiv",
+      "liefert": "faktor",
+      "variable": "vorlaeufiger_sachwert",
+      "variable_einheit": "EUR",
+      "intercept": 0.81053,
+      "terme": [
+       {
+        "variable": "vorlaeufiger_sachwert",
+        "koeffizient": 49334.634426,
+        "exponent": -1
+       }
+      ],
+      "rundung_stellen": 2
+     },
+     "fallzahl": null,
+     "beleg": "S. 45"
+    }
+   ],
+   "verfeinerungen_hinweis": "AUSGEWIESEN, NICHT GERECHNET. Der Bericht fuehrt neben der Kreisregression zwei feinere Regressionen fuer benannte Bodenrichtwertbereiche. Sie stehen unter demselben Zweig und demselben Kreisschluessel und wuerden im eindeutigen Schluessel von mb.param_modell mit der Kreisregression kollidieren — zwei der drei Saetze waeren still ueberschrieben worden. Die Auswahl nach Bodenrichtwertbereich kann der Auswerter heute nicht: es gibt keine Form, die eine REGRESSION nach einem Band auswaehlt (stufen_kategorial traegt Werte, keine Gleichungen). Bis es sie gibt, rechnet die Kreisregression und die beiden Verfeinerungen werden mitgefuehrt, damit der Bericht sie nennen kann. Ihre Zahlen sind vollstaendig und geprueft — es fehlt der Auswerter, nicht der Beleg."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_formel_gegen_abgedruckte_tabelle",
+    "fundstelle": "S. 41 (Formel und Gültigkeitsbereich), S. 43 (Tabelle Kreisdurchschnitt)",
+    "soll_zeilen": 26,
+    "wortlaut_sollwert": "Der Bericht nennt einen eigenen Sollwert: „Bei einem Sachwert von ca. 160.000 € ergibt sich kein Marktauf- oder Abschlag.\" Das ist eine Aussage des Dokuments über sein eigenes Modell und damit ein echter Prüfmaßstab — keine selbst gerechnete Zahl.",
+    "pruefprotokoll": "Geprüft am 13.08.2026, drei unabhängige Leseläufe. (1) ZÄHLPRÜFUNG: Die Tabelle läuft von 75.000 € bis 700.000 € in Schritten von 25.000 €. Erwartete Zeilenzahl (700.000 − 75.000) / 25.000 + 1 = 26. Gelesen: 26 Zeilen. Keine Lücke, keine geschätzte Zelle. (2) NACHRECHNUNG DER FORMEL GEGEN DIE TABELLE, alle 26 Zeilen: Faktor = 0,829405 + 27.602,80555 / S. 75.000 → 1,1975 → +20 % (Tabelle +20). 100.000 → 1,1054 → +11 (Tabelle +11). 125.000 → 1,0502 → +5 (+5). 150.000 → 1,0134 → +1 (+1). 175.000 → 0,9871 → −1 (−1). 200.000 → 0,9674 → −3 (−3). 225.000 → 0,9521 → −5 (−5). 250.000 → 0,9398 → −6 (−6). 275.000 → 0,9298 → −7 (−7). 300.000 → 0,9214 → −8 (−8). 325.000 → 0,9143 → −9 (−9). 350.000 → 0,9083 → −9 (−9). 375.000 → 0,9030 → −10 (−10). 400.000 → 0,8984 → −10 (−10). 425.000 → 0,8944 → −11 (−11). 450.000 → 0,8907 → −11 (−11). 475.000 → 0,8875 → −11 (−11). 500.000 → 0,8846 → −12 (−12). 525.000 → 0,8820 → −12 (−12). 550.000 → 0,8796 → −12 (−12). 575.000 → 0,8774 → −12 (−12). 600.000 → 0,8754 → −12 (−12). 625.000 → 0,8736 → −13 (−13). 650.000 → 0,8719 → −13 (−13). 675.000 → 0,8703 → −13 (−13). 700.000 → 0,8688 → −13 (−13). ALLE 26 ZEILEN STIMMEN. Das ist der eigentliche Beleg: die abgedruckte Formel und die abgedruckte Tabelle sind zwei voneinander unabhängige Abdrucke desselben Modells, und sie decken sich vollständig. Ein Lesefehler in der Tabelle hätte sich hier gezeigt. (3) SOLLWERT DES DOKUMENTS: bei 160.000 € liefert die Formel 0,829405 + 0,172518 = 1,00192, also +0,19 % und damit gerundet null Marktauf-/abschlag — genau die Aussage des Berichts. (4) MONOTONIE über die ganze Tabelle: der Faktor fällt streng monoton von 1,1975 auf 0,8688; die gerundeten Prozentwerte fallen monoton nicht-steigend mit den erwarteten Plateaus (−9/−9, −10/−10, −11/−11/−11, −12 fünfmal, −13 viermal). Die Plateaus sind kein Widerspruch, sondern die notwendige Folge der Rundung einer flach auslaufenden Hyperbel. (5) WERTEBEREICH: alle Faktoren liegen zwischen 0,87 und 1,20 und damit in einem für NRW plausiblen Band; kein Wert ≤ 0, der Faktor ist überall definiert.",
+    "negativtest": "Zwei Prüfungen haben angeschlagen und den Datensatz verändert. ERSTENS: Der erste Leselauf meldete die Kreisdurchschnittstabelle, der zweite Leselauf meldete an derselben Stelle eine ZWEISPALTIGE Tabelle nach Bodenrichtwertbereichen mit völlig anderen Werten (75.000 → 43 statt 20). Das sah zunächst nach einem Lesefehler aus. Der dritte, gezielt auf den Spaltenaufbau gerichtete Leselauf klärte es: es sind ZWEI verschiedene Tabellen auf zwei verschiedenen Seiten (S. 43 Kreisdurchschnitt, S. 45 nach Bodenrichtwertbereichen), jede mit eigenen Regressionsparametern. Hätte ich nach dem zweiten Lauf aufgehört, wäre entweder ein Wert verworfen oder — schlimmer — die Kreisdurchschnittstabelle mit den Parametern des Bodenrichtwertmodells verheiratet worden. ZWEITENS: Die Standardabweichung 113 €/m², die der zweite Lauf lieferte, wurde NICHT als Streuung des Sachwertfaktors übernommen. Sie bezieht sich auf den Sachwert je Quadratmeter nach NHK, nicht auf den Faktor. Ein unbesehen übernommener Wert hätte in stufeNachStreuung() eine Streuung vorgetäuscht, die es nicht gibt. streuung steht deshalb auf null."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "efh",
+  "objektart_bez": "freistehendes Ein- und Zweifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 133,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Olpe/pdf/GMB_32000_2026.pdf",
+  "quelle_parser": "v1093-WNRW",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Kapitel 5.1.4 „Sachwertfaktoren\", S. 40–45; Kreisdurchschnittstabelle S. 43, nach Bodenrichtwertbereichen differenzierte Tabelle S. 45"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06414000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "baender_1d",
+   "liefert": "prozent",
+   "interpolation": "verboten",
+   "interpolation_hinweis": "Der Ausschuss druckt zwei getrennte Auswertungen ab, keine stetige Kurve. Zwischen 2,5 und 3,0 wird NICHT interpoliert — eine RND von 29 Jahren liefert 2,5, eine von 30 Jahren liefert 3,0. Wer hier interpoliert, erfindet eine Zwischenstufe, die der Ausschuss nicht abgeleitet hat.",
+   "rundung_stellen": 1,
+   "baender": [
+    {
+     "von": 20,
+     "bis": 30,
+     "von_inklusive": true,
+     "bis_inklusive": false,
+     "bezeichnung_wortlaut": "RND ≥20 u. <30 Jahre",
+     "wert": 2.5,
+     "wert_art": "arithmetisches_mittel"
+    },
+    {
+     "von": 30,
+     "bis": 45,
+     "von_inklusive": true,
+     "bis_inklusive": true,
+     "bezeichnung_wortlaut": "RND ≥30 u. ≤45 Jahre",
+     "wert": 3.0,
+     "wert_art": "arithmetisches_mittel"
+    }
+   ],
+   "achse_feld": "rnd",
+   "achse_bez": "restnutzungsdauer_jahre"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": null,
+   "gnd_warnung": "Die Gesamtnutzungsdauer ist im Kapitel Liegenschaftszinssätze NICHT abgedruckt; beide Leseläufe waren ausdrücklich darauf gerichtet. Für die Umkehrrechnung ist die Restnutzungsdauer bindend, und die ist je Band angegeben (24 bzw. 32 Jahre im Mittel, Bandgrenzen 20–45). ACHTUNG: die Konstante GND_JAHRE = 80 im CrossCheckService darf hier NICHT stillschweigend eingesetzt werden. Der hessische Landesleitfaden II der ZGGH nennt für das SACHWERTmodell 80 Jahre, das Sachwertkapitel desselben Wiesbadener Berichts nennt 70 Jahre — drei verschiedene Zahlen für drei verschiedene Zwecke. Ein Übertrag wäre genau die Modellvermischung, die § 10 verbietet.",
+   "restnutzungsdauer": "Bandgrenzen 20–45 Jahre; Mittel 24 (Band 1) bzw. 32 (Band 2)",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV; tatsächlich angesetzt 18,5 % (Band 1) bzw. 18,4 % (Band 2) des Rohertrags",
+   "marktmiete": "Jahresnettokaltmieten aus den ausgewerteten Kaufverträgen; Ø 10,10 €/m² (Band 1) bzw. 9,91 €/m² (Band 2)",
+   "bodenwert": "Bodenrichtwerte, Stichtag 1. Januar 2024",
+   "ableitungsverfahren_wortlaut": "„Durch Umkehrung des dem Ertragswertverfahren zugrunde liegenden Rechengangs werden die Liegenschaftszinssätze ermittelt (auf der Basis ausgewerteter Kaufverträge mit Liegenschaftszinssätzen im Spannenbereich einer 2-fachen Standardabweichung).\"",
+   "ausreisserbehandlung": "Kauffälle außerhalb der zweifachen Standardabweichung sind ausgeschlossen. Das ist ein eigenständiger Modellansatz: die abgedruckte Standardabweichung ist damit die eines bereits getrimmten Datensatzes und unterschätzt die Streuung des Rohmarktes."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt nur für Restnutzungsdauern von 20 bis 45 Jahren. Unterhalb 20 und oberhalb 45 hat der Ausschuss nichts abgeleitet — dort wird ausgewiesen, nicht gerechnet.",
+   "restnutzungsdauer_bereich": [
+    20,
+    45
+   ],
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     2.5,
+     3.0
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 29–31, Tabellen „Mehrfamilienhäuser\" (zwei Restnutzungsdauerklassen)",
+    "soll_kennzahlen": 14,
+    "wortlaut": "Das Kapitel druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt die abgedruckte Stichprobenstatistik mit 14 Kennzahlen je Objektart.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI unabhängige, getrennt beauftragte Leseläufe über dasselbe PDF (Lauf 1 Gesamtstruktur mit Kapiteldetails, Lauf 2 ausschließlich das Kapitel Liegenschaftszinssätze mit anderer Fragestellung und anderer Sortiervorgabe). Beide liefern für beide Bänder zeichengleich: 2,5 / 1,0 / 2,8 / 19,2 / n 22 und 3,0 / 0,8 / 3,0 / 19,7 / n 22. LAGEPRÜFUNG: Band 1 Median 2,8 liegt über dem Mittel 2,5 — linksschief, bei n = 22 hinnehmbar; Band 2 Median 3,0 gleich dem Mittel 3,0 — symmetrisch. WERTEBEREICH: beide Zinssätze positiv, der Barwertfaktor damit definiert; die Verwerfungsregel für Zinssätze ≤ 0 greift nicht. MONOTONIE ÜBER DIE RND-ACHSE: 2,5 (jüngere Gebäude, RND 20–30) < 3,0 (ältere Gebäude, RND 30–45). Die Richtung ist fachlich zu erwarten und wurde nicht angenommen, sondern an den gelesenen Zahlen nachgeprüft.",
+    "negativtest": "Angeschlagen hat die Prüfung auf die Gesamtnutzungsdauer: beide Leseläufe wurden ausdrücklich danach gefragt, beide fanden keine. Statt die Konstante GND_JAHRE = 80 oder die 70 aus dem Sachwertkapitel desselben Berichts einzusetzen, steht gnd_jahre auf null und trägt eine ausdrückliche Warnung. Der bequeme Fehler wäre gewesen, die 80 aus dem Landesleitfaden zu übernehmen — sie gilt dort für das Sachwertmodell, nicht für dieses Ertragswertmodell."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 44,
+  "streuung": 1.0,
+  "stichtag": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.wiesbaden.de/pressemitteilungen/pressereferat/2025/maerz/250328_007.php.media/352350/Immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1093-WHE",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden, Immobilienmarktbericht 2025 (Berichtsjahr 2024). Daten unverändert übernommen.",
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Immobilienmarktbericht 2025\", Kapitel Liegenschaftszinssätze, S. 29–31"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06414000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ggg",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3.5,
+   "wert_art": "arithmetisches_mittel",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_warnung": "Nicht abgedruckt. Siehe die ausführliche Warnung beim Zweig mfh — die GND darf nicht aus einer Konstante oder aus dem Sachwertkapitel übernommen werden.",
+   "restnutzungsdauer": "Bandgrenzen 25–35 Jahre; Mittel 30",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV; tatsächlich angesetzt 17,3 % des Rohertrags",
+   "marktmiete": "Jahresnettokaltmieten aus den ausgewerteten Kaufverträgen; Ø 11,19 €/m²",
+   "bodenwert": "Bodenrichtwerte, Stichtag 1. Januar 2024",
+   "ausreisserbehandlung": "Spannenbereich einer zweifachen Standardabweichung"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "restnutzungsdauer_bereich": [
+    25,
+    35
+   ],
+   "restnutzungsdauer_wortlaut": "RND ≥25 u. ≤35 Jahre",
+   "wohnanteil_prozent": [
+    20,
+    80
+   ],
+   "hinweis": "Gilt nur bei einem Wohnnutzungsanteil zwischen 20 und 80 Prozent und einer Restnutzungsdauer von 25 bis 35 Jahren. Außerhalb dieser Bedingungen hat der Ausschuss nichts abgeleitet."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 29–31",
+    "soll_kennzahlen": 14,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: 3,5 / 1,0 / 3,7 / 17,4 / n 16. LAGEPRÜFUNG: Median 3,7 über dem Mittel 3,5, linksschief, bei n = 16 hinnehmbar. EINORDNUNG IN DIE REIHE: 3,5 liegt zwischen den Mehrfamilienhäusern (3,0) und dem produzierenden Gewerbe (4,6) — genau dort, wo ein gemischt genutztes Objekt nach Risiko stehen muss. Die Bandbreite der Mieten (6,13 bis 16,70 €/m²) ist die weiteste aller Wohn-nahen Objektarten und erklärt die Streuung sachlich.",
+    "negativtest": "Angeschlagen hat die Streuungsprüfung: mit der Wohn-Regel (absolut, 1,5 pp) wäre dieser Satz auf Stufe A geblieben, weil 1,0 pp unter 1,5 pp liegt. Erst die richtige Teilmarktzuordnung — ggg ist Gewerbe, dort gilt relativ 25 % — führt zur Herabstufung. Die Teilmarktzuordnung ist also nicht kosmetisch, sie entscheidet die Stufe."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "ggg",
+  "objektart_bez": "Gemischt genutztes Grundstück",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": 16,
+  "streuung": 1.0,
+  "stichtag": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.wiesbaden.de/pressemitteilungen/pressereferat/2025/maerz/250328_007.php.media/352350/Immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1093-WHE",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden, Immobilienmarktbericht 2025 (Berichtsjahr 2024). Daten unverändert übernommen.",
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Immobilienmarktbericht 2025\", Kapitel Liegenschaftszinssätze, S. 29–31"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06414000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "gegi",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 4.6,
+   "wert_art": "arithmetisches_mittel",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_warnung": "Nicht abgedruckt. Für Gewerbeobjekte ist die Konstante GND_JAHRE = 80 des CrossCheckService ohnehin fachlich falsch; hier gilt die abgedruckte RND-Bandbreite 15–30 Jahre.",
+   "restnutzungsdauer": "Bandgrenzen 15–30 Jahre; Mittel 21",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV; tatsächlich angesetzt 16,2 % des Rohertrags",
+   "marktmiete": "Ø 8,24 €/m², Spanne 6,15–10,55 €/m²",
+   "bodenwert": "Bodenrichtwerte, Stichtag 1. Januar 2024; Ø 215 €/m²",
+   "ausreisserbehandlung": "Spannenbereich einer zweifachen Standardabweichung"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "restnutzungsdauer_bereich": [
+    15,
+    30
+   ],
+   "restnutzungsdauer_wortlaut": "RND ≥15 u. ≤30 Jahre",
+   "hinweis": "Sehr dünne Belegung. Der Wert ist als Anhalt zu führen, nicht als tragende Größe."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 30–31",
+    "soll_kennzahlen": 12,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: 4,6 / 3,9 / 6,4 / 14,3 / n 5. LAGEPRÜFUNG: Median über Mittel, stark linksschief. WERTEBEREICH: positiv, Barwertfaktor definiert. GEGENPROBE ROHERTRAGSFAKTOR: 14,3 ist der niedrigste Rohertragsfaktor des Berichts und passt zum zweithöchsten Zinssatz.",
+    "negativtest": "Angeschlagen hat die Fallzahlprüfung UND die Streuungsprüfung. Der Satz wird trotzdem geführt, aber auf Stufe B, mit ausdrücklichem Vorbehalt und mit dem Hinweis, dass Mittel und Median 1,8 Prozentpunkte auseinanderliegen. Ihn stillschweigend auf A zu führen, weil er amtlich und gemeindescharf ist, wäre der Fehler gewesen: amtlich heißt nicht belastbar."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "gegi",
+  "objektart_bez": "Gewerbe- und Industriegrundstück",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": 5,
+  "streuung": 3.9,
+  "stichtag": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.wiesbaden.de/pressemitteilungen/pressereferat/2025/maerz/250328_007.php.media/352350/Immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1093-WHE",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden, Immobilienmarktbericht 2025 (Berichtsjahr 2024). Daten unverändert übernommen.",
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Immobilienmarktbericht 2025\", Kapitel Liegenschaftszinssätze, S. 29–31"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06414000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "buero",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 5.2,
+   "wert_art": "arithmetisches_mittel",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_warnung": "Nicht abgedruckt. Gewerbe-GND ist im Projekt ohnehin als ungeprüft markiert (GND_TABELLE.geprueft = false).",
+   "restnutzungsdauer": "Bandgrenzen 20–50 Jahre; Mittel 39",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV; tatsächlich angesetzt 15,9 % des Rohertrags",
+   "marktmiete": "Ø 11,15 €/m², Spanne 8,00–18,33 €/m²",
+   "bodenwert": "Bodenrichtwerte, Stichtag 1. Januar 2024; Ø 540 €/m², Spanne 210–1.600 €/m²",
+   "ausreisserbehandlung": "Spannenbereich einer zweifachen Standardabweichung"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "restnutzungsdauer_bereich": [
+    20,
+    50
+   ],
+   "restnutzungsdauer_wortlaut": "RND ≥20 u. ≤50 Jahre"
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 30–31",
+    "soll_kennzahlen": 12,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: 5,2 / 3,5 / 4,0 / 16,5 / n 9. WERTEBEREICH: positiv. EINORDNUNG: 5,2 ist der höchste Zinssatz des Berichts und steht damit am risikoreichen Ende der Reihe — richtungsgleich mit dem NRW-Bild, wo buero mit 4,7 % ebenfalls am oberen Ende liegt.",
+    "negativtest": "Der Rohertragsfaktor bricht hier die sonst durchgehende Gegenläufigkeit: 16,5 bei einem Zinssatz von 5,2 liegt ÜBER dem Rohertragsfaktor des produzierenden Gewerbes (14,3) bei nur 4,6. Erklärbar über die deutlich längere Restnutzungsdauer (39 statt 21 Jahre) und die niedrigeren Bewirtschaftungskosten, aber die Abweichung ist vermerkt statt weggerundet."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "buero",
+  "objektart_bez": "Bürogebäude",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": null,
+  "fallzahl": 9,
+  "streuung": 3.5,
+  "stichtag": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.wiesbaden.de/pressemitteilungen/pressereferat/2025/maerz/250328_007.php.media/352350/Immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1093-WHE",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden, Immobilienmarktbericht 2025 (Berichtsjahr 2024). Daten unverändert übernommen.",
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Immobilienmarktbericht 2025\", Kapitel Liegenschaftszinssätze, S. 29–31"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06414000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "dreifh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.7,
+   "wert_art": "arithmetisches_mittel",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_warnung": "Nicht abgedruckt. Besonders zu beachten: die Bundesstadt Bonn rechnet Dreifamilienhäuser ausweislich der NRW-Ernte mit GND 60, nicht 80. Ein Übertrag der 80 wäre auch hier eine Modellvermischung.",
+   "restnutzungsdauer": "Bandgrenzen 20–50 Jahre; Mittel 30",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV; tatsächlich angesetzt 18,1 % des Rohertrags",
+   "marktmiete": "Ø 9,53 €/m², Spanne 8,60–10,51 €/m²",
+   "bodenwert": "Bodenrichtwerte, Stichtag 1. Januar 2024",
+   "ausreisserbehandlung": "Spannenbereich einer zweifachen Standardabweichung"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "restnutzungsdauer_bereich": [
+    20,
+    50
+   ],
+   "restnutzungsdauer_wortlaut": "RND ≥20 u. ≤50 Jahre"
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 30–31",
+    "soll_kennzahlen": 13,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: 2,7 / 0,8 / 2,5 / 25,7 / n 12. LAGEPRÜFUNG erfüllt. EINORDNUNG: 2,7 liegt zwischen Wohnungseigentum (2,0) und den Mehrfamilienhäusern (3,0) und damit dort, wo ein Dreifamilienhaus nach Risiko steht. Die Mietspanne ist mit 8,60 bis 10,51 €/m² die engste aller Objektarten, was zur kleinen Streuung passt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "dreifh",
+  "objektart_bez": "Dreifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 12,
+  "streuung": 0.8,
+  "stichtag": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.wiesbaden.de/pressemitteilungen/pressereferat/2025/maerz/250328_007.php.media/352350/Immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1093-WHE",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden, Immobilienmarktbericht 2025 (Berichtsjahr 2024). Daten unverändert übernommen.",
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Immobilienmarktbericht 2025\", Kapitel Liegenschaftszinssätze, S. 29–31"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06414000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "efh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.7,
+   "wert_art": "arithmetisches_mittel",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_warnung": "Nicht abgedruckt. Der hessische Landesleitfaden II der ZGGH nennt für Ein- und Zweifamilienhäuser im SACHWERTmodell 80 Jahre — das ist ein anderes Modell und darf hier nicht eingesetzt werden.",
+   "restnutzungsdauer": "über 20 Jahre; Mittel 33",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV; tatsächlich angesetzt 14,8 % des Rohertrags",
+   "marktmiete": "ACHTUNG, EIGENSTÄNDIGER MODELLANSATZ. Fußnote wörtlich: „Überwiegend eigengenutzt. Berechnung ausschließlich auf der Grundlage von Mietspiegelmieten gemäß Mietspiegel für nicht preisgebundene Wohnungen im Gebiet der Stadt Wiesbaden, Stand 01.01.2021.\" Der Rohertrag stammt also NICHT aus vereinbarten Mieten, sondern aus einem Mietspiegel, dessen Stand zum Berichtsjahr 2024 bereits drei Jahre zurückliegt.",
+   "marktmiete_warnung": "Dieser Zinssatz darf nur mit Mieten aus demselben Wiesbadener Mietspiegel kombiniert werden. Wer ihn mit einer aktuellen Marktmiete kapitalisiert, rechnet gegen ein anderes Modell als das, aus dem er stammt — der Zähler wäre neuer als der Nenner, und das Ergebnis sähe amtlich aus, ohne es zu sein.",
+   "bodenwert": "Bodenrichtwerte, Stichtag 1. Januar 2024",
+   "ausreisserbehandlung": "Spannenbereich einer zweifachen Standardabweichung"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "restnutzungsdauer_bereich": [
+    20,
+    null
+   ],
+   "restnutzungsdauer_wortlaut": "RND >20",
+   "hinweis": "Nach oben ist keine Grenze abgedruckt; die mittlere Restnutzungsdauer der Stichprobe liegt bei 33 Jahren. Eine Anwendung auf sehr junge Objekte mit Restnutzungsdauern weit über der Stichprobe ist nicht gedeckt."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 30–31",
+    "soll_kennzahlen": 13,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: 1,7 / 0,7 / 1,7 / 30,5 / n 181. LAGEPRÜFUNG: Mittel und Median identisch bei 1,7 — symmetrische Verteilung, wie sie bei 181 Fällen zu erwarten ist. VERGLEICH: der NRW-Median für efh liegt bei 1,4 %, Wiesbaden bei 1,7 % — dieselbe Größenordnung, plausibel für eine teure Landeshauptstadt. Der Vergleich ist ausdrücklich KEIN Beleg, nur eine Plausibilitätsprobe; Beleg ist allein die abgedruckte Statistik. Der Bericht nennt außerdem eine Entwicklungsreihe 2019–2023, in der der Wert für Ein-/Zweifamilienhäuser stabil bei 1,7 % liegt — eine weitere Quergegenprobe, die zum Berichtsjahr passt.",
+    "negativtest": "Angeschlagen hat die Modellprüfung, nicht die Zahlenprüfung: die Fußnote zur Mietspiegelgrundlage wäre beim schnellen Lesen untergegangen. Sie ist der Grund, warum dieser sonst bestbelegte Satz eine ausdrückliche Anwendungsbeschränkung trägt. Ein Satz mit n = 181 und symmetrischer Verteilung sieht wie der verlässlichste des Berichts aus — und ist zugleich derjenige, dessen Rohertrag am weitesten vom tatsächlichen Marktgeschehen entfernt modelliert wurde."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "efh",
+  "objektart_bez": "Ein- und Zweifamilienhaus",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 181,
+  "streuung": 0.7,
+  "stichtag": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.wiesbaden.de/pressemitteilungen/pressereferat/2025/maerz/250328_007.php.media/352350/Immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1093-WHE",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden, Immobilienmarktbericht 2025 (Berichtsjahr 2024). Daten unverändert übernommen.",
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Immobilienmarktbericht 2025\", Kapitel Liegenschaftszinssätze, S. 29–31"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06414000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.0,
+   "wert_art": "arithmetisches_mittel",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_warnung": "Nicht abgedruckt.",
+   "restnutzungsdauer": "Bandgrenzen 20–50 Jahre; Mittel 29",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV; tatsächlich angesetzt 18,3 % des Rohertrags",
+   "marktmiete": "Ø 10,69 €/m², Spanne 8,33–15,29 €/m²",
+   "bodenwert": "Bodenrichtwerte, Stichtag 1. Januar 2024",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert. Der Registerdatensatz ändert daran nichts.",
+   "ausreisserbehandlung": "Spannenbereich einer zweifachen Standardabweichung"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "restnutzungsdauer_bereich": [
+    20,
+    50
+   ],
+   "restnutzungsdauer_wortlaut": "RND ≥20 u. ≤50 Jahre"
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 30–31",
+    "soll_kennzahlen": 12,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: 2,0 / 0,6 / 2,0 / n 35. Mittel und Median identisch. Der Rohertragsfaktor ist in beiden Läufen als „k.A.\" gelesen worden und steht deshalb auf null.",
+    "negativtest": "Angeschlagen hat die Vollständigkeitsprüfung beim Rohertragsfaktor: er ist als einzige der neun Objektarten nicht abgedruckt. Der Reflex, ihn aus Zinssatz und Restnutzungsdauer zurückzurechnen, wurde unterlassen — ein selbst gerechneter Wert ist kein abgedruckter Wert, und Number(null) ist 0 und besteht Number.isFinite. Der Leser muss auf Abwesenheit prüfen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "we_v",
+  "objektart_bez": "Wohnungseigentum",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 35,
+  "streuung": 0.6,
+  "stichtag": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.wiesbaden.de/pressemitteilungen/pressereferat/2025/maerz/250328_007.php.media/352350/Immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1093-WHE",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden, Immobilienmarktbericht 2025 (Berichtsjahr 2024). Daten unverändert übernommen.",
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Immobilienmarktbericht 2025\", Kapitel Liegenschaftszinssätze, S. 29–31"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06414000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "altbauvilla",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.5,
+   "wert_art": "arithmetisches_mittel",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_warnung": "Nicht abgedruckt.",
+   "restnutzungsdauer": "Bandgrenzen 30–45 Jahre; Mittel 35",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV; tatsächlich angesetzt 14,4 % des Rohertrags",
+   "marktmiete": "Ø 11,33 €/m², Spanne 9,27–12,69 €/m²",
+   "bodenwert": "Bodenrichtwerte, Stichtag 1. Januar 2024; Ø 1.455 €/m² — der höchste mittlere Bodenrichtwert aller Objektarten des Berichts",
+   "ausreisserbehandlung": "Spannenbereich einer zweifachen Standardabweichung"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "restnutzungsdauer_bereich": [
+    30,
+    45
+   ],
+   "restnutzungsdauer_wortlaut": "RND ≥30 u. ≤45 Jahre"
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 30–31",
+    "soll_kennzahlen": 14,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: 1,5 / 0,6 / 1,5 / 34,0 / n 11. Mittel und Median identisch. GEGENPROBE: der Rohertragsfaktor 34,0 ist der höchste des Berichts und korrespondiert mit dem niedrigsten Zinssatz — die beiden Reihen laufen an diesem Ende sauber gegenläufig.",
+    "negativtest": "Angeschlagen hat die Zweigzuordnung: die naheliegende Einordnung als efh hätte zwei fachlich verschiedene Teilmärkte unter einem Schlüssel zusammengeführt und wegen des Eindeutigkeitsschlüssels zudem einen der beiden Sätze verdrängt. Der Zweig ist deshalb als neu markiert und die Entscheidung ausdrücklich offen gelassen, statt sie stillschweigend zu treffen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "altbauvilla",
+  "objektart_bez": "Altbauvilla",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 11,
+  "streuung": 0.6,
+  "stichtag": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.wiesbaden.de/pressemitteilungen/pressereferat/2025/maerz/250328_007.php.media/352350/Immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1093-WHE",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Wiesbaden, Immobilienmarktbericht 2025 (Berichtsjahr 2024). Daten unverändert übernommen.",
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Immobilienmarktbericht 2025\", Kapitel Liegenschaftszinssätze, S. 29–31"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12054",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Potsdam",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Potsdam",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": 1.06,
+   "wert_art": "arithmetisches_mittel",
+   "wert_art_hinweis": "Der Bericht druckt einen durchschnittlichen Sachwertfaktor ab (Abb. 63). Ein Median ist NICHT abgedruckt und wird nicht ersatzweise gesetzt.",
+   "rundung_stellen": 2,
+   "rundung_hinweis": "Der Bericht druckt zweistellig ab. Alle Nachrechnungen sind auf zwei Stellen zu runden; ein dreistelliger Zwischenwert wie 1,0617 existiert im Dokument nicht."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "quelle": "Verwaltungsvorschrift zur Ermittlung von Ertragswerten und Liegenschaftszinssätzen sowie von Sachwerten und Sachwertfaktoren im Land Brandenburg (VV EW-SW) vom 03.05.2023, Anlage 2 „Modellbeschreibung für Sachwertfaktoren\"",
+   "quelle_url": "https://bravors.brandenburg.de/verwaltungsvorschriften/vv_ew_sw",
+   "quelle_url_pdf": "https://mik.brandenburg.de/sixcms/media.php/9/2023-05-03_VV_EW-SW.pdf",
+   "gelesen": true,
+   "gelesen_wo": "NICHT im Grundstücksmarktbericht selbst (dessen Anhang A ab S. 105 liegt weiterhin hinter dem WebFetch-Abbruch), sondern in der landesweit BINDENDEN Verwaltungsvorschrift, die dem Bericht zugrunde liegt. Die VV EW-SW ist seit dem 03.05.2023 in Kraft und gilt für ALLE Gutachterausschüsse des Landes Brandenburg. Der Berichtsjahrgang 2024 (veröffentlicht 2025) und der Jahrgang 2025 (veröffentlicht 2026) sind vollständig unter ihrer Geltung entstanden.",
+   "nhk_ausgabe": "NHK 2010 gemäß Anlage 4 ImmoWertV",
+   "nhk_bezugsmassstab": "Brutto-Grundfläche (BGF)",
+   "standardstufen": "fünf Standardstufen 1 sehr einfach (Bauausführungen bis ca. 1980) · 2 einfach (bis ca. 1995) · 3 durchschnittlich/zeitgemäß (ab ca. 1995) · 4 gehoben (ab ca. 2005) · 5 stark gehoben/hochwertig",
+   "regionalfaktor": 1.0,
+   "regionalfaktor_beleg": "VV EW-SW, Anlage 2: „Regionalfaktor 1\" — für das Land Brandenburg wird KEIN Regionalfaktor angesetzt. Das ist die Angabe, die den Potsdamer Faktor überhaupt erst anwendbar macht: ein von DealPilot gerechneter vorläufiger Sachwert ohne Regionalfaktor liegt auf derselben Bezugsgröße.",
+   "alterswertminderung": "linear",
+   "gnd_jahre": 80,
+   "gnd_beleg": "VV EW-SW, Anlage 2: Gesamtnutzungsdauer 80 Jahre für Einfamilienhäuser, Doppelhäuser und Reihenhäuser. ACHTUNG für den CrossCheckService: dessen Konstante GND_JAHRE steht ebenfalls auf 80 — hier stimmen Konstante und Modellvermerk zufällig überein. Das entbindet NICHT davon, die GND aus dem Modellvermerk zu lesen (Bonn-Befund: dort 60).",
+   "restnutzungsdauer": "nach § 4 Absatz 3 bzw. Anlage 2 ImmoWertV; bei Modernisierung § 12 Absatz 5 Satz 1 ImmoWertV",
+   "baupreisindex": "Preisindex für den Neubau von Wohngebäuden aus den Indexreihen für die Bauwirtschaft des Statistischen Bundesamts",
+   "baupreisindex_basis": "Basisjahr 2010 (die Reihe des Statistischen Bundesamts mit Basis 2020 wird auf 2010 umbasiert)",
+   "baupreisindex_hinweis": "WICHTIG für den CrossCheckService: dessen Konstante BAUPREISINDEX = 2,02 ist auf 2010 = 100 bezogen und passt damit zur Indexbasis dieses Modells. Sie ist aber nach wie vor nicht stichtagsfähig und liegt gegenüber dem amtlichen Bundesindex (GMB Dortmund 2026: 190,6) rund 6 % zu hoch. Dieser Befund gilt unabhängig von Brandenburg und wird hier nur verknüpft.",
+   "baunebenkosten": "keine gesonderten Baunebenkosten — sie sind in den NHK 2010 enthalten",
+   "aussenanlagen": "pauschaler Ansatz von 4 % des vorläufigen Hauptgebäudesachwerts (ohne Nebengebäude, Garagen und Carports)",
+   "garagen_pauschal_eur": {
+    "fertiggarage_stufe_3": 6000,
+    "massivbau_stufe_4": 12000,
+    "individuell_stufe_5": 18000,
+    "hinweis": "gilt für Garagen mit 18–24 m² BGF; Carports werden mit dem Zeitwert angesetzt"
+   },
+   "nicht_gesondert_bewertete_bauteile": [
+    "Dachgauben bis ca. 5 m Länge",
+    "Balkone und Dachterrassen bis 5 m²",
+    "Vordächer im üblichen Umfang",
+    "übliche Außentreppen"
+   ],
+   "zu_abschlaege_dachgeschoss_prozent": {
+    "ausgebaut_ohne_drempel": -5,
+    "spitzboden_ausgebaut": 10,
+    "nicht_ausgebaut_eingeschraenkt_nutzbar": -10,
+    "mit_drempel": 5
+   },
+   "bodenwert": "beitrags- und abgabenfrei, aus dem objektspezifisch angepassten Bodenrichtwert",
+   "boG": "besondere objektspezifische Grundstücksmerkmale werden durch Zu-/Abschläge berücksichtigt oder der Kaufpreis wird bereinigt",
+   "kauffallkriterien": "Objekte ohne ungewöhnliche oder persönliche Verhältnisse; Ortsbesichtigung durchgeführt",
+   "auswertemethodik": "Regressionsanalyse oder arithmetischer Mittelwert; Ausreißer eliminiert (z. B. jenseits des 2,5fachen der Standardabweichung)",
+   "bewirtschaftungskosten_hinweis": "Für den SACHWERT ohne Belang. Die Bewirtschaftungskostenansätze des Landes stehen in Bewko_2026.pdf und in Anlage 1 zur VV EW-SW und gehören zum Ertragswert-/Liegenschaftszinsmodell.",
+   "querpruefung": "Die Ansätze der VV EW-SW 2023 sind identisch mit denen, die der Aufsatz „Die Ermittlung von Sachwertfaktoren im Land Brandenburg\" (Vermessung Brandenburg 1/2016, ISSN 1430-7650) und die Brandenburgische Sachwertrichtlinie RL SW-BB vom 01.04.2014 nennen: 4 % Außenanlagen, Garagenpauschalen 6.000/12.000/18.000 EUR, NHK 2010, lineare Alterswertminderung, Baupreisindex Neubau Wohngebäude. DREI unabhängige Dokumente aus neun Jahren, gleiche Zahlen — das ist eine Zählprüfung, die man geschenkt bekommt."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt AUSSCHLIESSLICH für die Landeshauptstadt Potsdam. Der Ausschuss ist nur für dieses Stadtgebiet zuständig; eine Übertragung auf Potsdam-Mittelmark ist ausgeschlossen — das ist ein eigener Ausschuss mit eigenem Bericht (GMB_PM.pdf).",
+   "stichprobe": {
+    "fundstelle": "Abb. 62 „Ein- und Zweifamilienhäuser – Stichprobe für Sachwertfaktoren\"",
+    "kauffaelle": 48,
+    "bodenwertniveau_eur_qm_min": 150,
+    "bodenwertniveau_eur_qm_max": 900,
+    "bodenwertniveau_eur_qm_mittel": 595,
+    "standardstufe_min": 3,
+    "standardstufe_max": 4,
+    "restnutzungsdauer_jahre_min": 34,
+    "restnutzungsdauer_jahre_max": 74,
+    "restnutzungsdauer_jahre_mittel": 54,
+    "bgf_qm_min": 125,
+    "bgf_qm_max": 520,
+    "bgf_qm_mittel": 275,
+    "wohnflaeche_qm_min": 90,
+    "wohnflaeche_qm_max": 230,
+    "bauzustand": "mittel bis sehr gut"
+   },
+   "spannen": {
+    "hinweis": "Die Stichprobengrenzen sind der Geltungsbereich. Ein Objekt mit Bodenwert 1.200 €/m², Standardstufe 5 oder Restnutzungsdauer 15 Jahren liegt AUSSERHALB der ausgewerteten Stichprobe. Dort wird ausgewiesen, nicht gerechnet."
+   },
+   "raeumliche_differenzierung_dokumentation": {
+    "fundstelle": "Abb. 66 „Ein- und Zweifamilienhäuser – Sachwertfaktoren je Untersuchungsraum (Datenbasis siehe Abb. 62)\"",
+    "hinweis": "DOKUMENTATION, KEINE KORREKTUR. Der geführte Registerwert 1,06 ist bereits das Mittel über beide Untersuchungsräume. Wer diese Werte zusätzlich als Zu-/Abschlag anwendet, zählt doppelt. Sie stehen hier, damit ein Sachverständiger die Streubreite kennt und damit ein späterer Ausbau auf ein kategoriales Modell die Zahlen nicht erneut ernten muss.",
+    "raeume": [
+     {
+      "raum": "Inneres Stadtgebiet",
+      "kauffaelle": 28,
+      "mittel": 1.07,
+      "minimum": 0.69,
+      "maximum": 1.45,
+      "vertrauensbereich_95_unten": 1.0,
+      "vertrauensbereich_95_oben": 1.14
+     },
+     {
+      "raum": "Äußeres Stadtgebiet",
+      "kauffaelle": 20,
+      "mittel": 1.05,
+      "minimum": 0.72,
+      "maximum": 1.47,
+      "vertrauensbereich_95_unten": 0.95,
+      "vertrauensbereich_95_oben": 1.14
+     }
+    ],
+    "abgrenzung_gelesen": false,
+    "abgrenzung_hinweis": "Welche Stadtteile zum inneren und welche zum äußeren Stadtgebiet zählen, ist im gelesenen Abschnitt NICHT definiert. Ohne diese Abgrenzung ist ein kategoriales Modell nicht baubar — das ist der zweite Grund, warum hier eine Konstante geführt wird."
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "art_hinweis": "Ein durchgerechnetes Anwendungsbeispiel ist im Kapitel NICHT abgedruckt — im zweiten Leselauf ausdrücklich danach gefragt. Der Prüfmaßstab ist deshalb die abgedruckte Stichprobenstatistik, wie bei fehlendem Anwendungsbeispiel vorgesehen.",
+    "fundstelle": "S. 47–50, Abb. 62, 63 und 66",
+    "wortlaut": "Bei den empirischen Untersuchungen konnte keine statistische Abhängigkeit des vorläufigen Sachwertes zum Sachwertfaktor ermittelt werden.",
+    "wortlaut_bedeutung": "Das ist die ausdrückliche Absage des Ausschusses an ein Achsenmodell. Sie ist der Beleg dafür, dass 'konstante' die richtige Modellform ist und nicht eine Verlegenheitslösung.",
+    "soll_kennzahlen": 4,
+    "pruefprotokoll": "ZWEI unabhängige Leseläufe über dieselbe Adresse mit verschieden gestellten Fragen (Lauf 1: Kapitelinhalt; Lauf 2: Abbildungsverzeichnis, Regressionsfrage, Modellansätze, Nachbarkapitel). Beide zeichengleich in allen sieben Zahlen: 48 · 1,06 · 0,69 · 1,47 · 1,01 · 1,12 sowie 28/1,07 und 20/1,05. EINSCHRÄNKUNG, ehrlich benannt: beide Läufe lesen dieselbe zwischengespeicherte Textextraktion; sie sind zwei unabhängige LESUNGEN, keine zwei unabhängigen ABRUFE.",
+    "zaehlpruefung": "BESTANDEN: 28 Kauffälle inneres Stadtgebiet + 20 Kauffälle äußeres Stadtgebiet = 48 = abgedruckte Gesamtfallzahl aus Abb. 62. Die Bezugszahl 48 ist BELEGT, nicht angenommen.",
+    "mittelwertpruefung": "BESTANDEN, aus den Zellen nachgerechnet: (28 × 1,07 + 20 × 1,05) / 48 = 50,96 / 48 = 1,0617 → gerundet 1,06 = abgedruckter Gesamtwert. Genau diese Nachrechnung hat bei Dithmarschen eine falsch gelesene Spalte entlarvt; hier hält sie.",
+    "lagepruefung": "BESTANDEN: der Gesamtwert 1,06 liegt zwischen den beiden Untersuchungsräumen 1,05 und 1,07. Der 95-%-Vertrauensbereich 1,01–1,12 liegt innerhalb der Spanne 0,69–1,47 und umschließt das Mittel 1,06. Die Gesamtspanne 0,69–1,47 ist die Vereinigung der beiden Teilspannen (min 0,69 aus dem inneren, max 1,47 aus dem äußeren Stadtgebiet) — auch das ist konsistent.",
+    "kennzahlpruefung": "BESTANDEN: geprüft wurde, dass es sich um SACHWERTFAKTOREN handelt und nicht um Vergleichsfaktoren oder Erbbaurechtskoeffizienten. Beleg: die Kennzahl ist dimensionslos (0,69 bis 1,47, kein €/m²), das Kapitel 8.2.3 „Vergleichsfaktoren\" steht DANEBEN und führt getrennt Wohnflächenpreise, und die Stichprobenbeschreibung nennt vorläufigen Sachwert, Standardstufe, BGF und Restnutzungsdauer — die Merkmale des Sachwertverfahrens."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Zwei Angaben fehlen. (1) Die STANDARDABWEICHUNG ist nicht abgedruckt; der Ausschuss weist stattdessen die Spanne und den 95-%-Vertrauensbereich aus. Nach der Regel dieses Laufs ist der Datensatz damit nicht unvollständig im Sinne eines Datenfehlers, er bekommt aber Stufe B statt A — siehe stufe_hinweis. streuung bleibt NULL, NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. (2) Die MODELLANSÄTZE stehen im Anhang ab S. 105 und liegen hinter dem Abbruch — siehe modelltreue_vorbehalt.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 48,
+  "streuung": null,
+  "stichtag": "2025-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_P.pdf",
+  "quelle_parser": "v1094-WBB",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktbericht 2025\", Kapitel 8.2.2 „Sachwertfaktoren\", S. 47–50, Abb. 62, 63, 64/65, 66"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12054",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Potsdam",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Potsdam",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": 1.08,
+   "wert_art": "arithmetisches_mittel",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "quelle": "Verwaltungsvorschrift zur Ermittlung von Ertragswerten und Liegenschaftszinssätzen sowie von Sachwerten und Sachwertfaktoren im Land Brandenburg (VV EW-SW) vom 03.05.2023, Anlage 2 „Modellbeschreibung für Sachwertfaktoren\"",
+   "quelle_url": "https://bravors.brandenburg.de/verwaltungsvorschriften/vv_ew_sw",
+   "quelle_url_pdf": "https://mik.brandenburg.de/sixcms/media.php/9/2023-05-03_VV_EW-SW.pdf",
+   "gelesen": true,
+   "gelesen_wo": "NICHT im Grundstücksmarktbericht selbst (dessen Anhang A ab S. 105 liegt weiterhin hinter dem WebFetch-Abbruch), sondern in der landesweit BINDENDEN Verwaltungsvorschrift, die dem Bericht zugrunde liegt. Die VV EW-SW ist seit dem 03.05.2023 in Kraft und gilt für ALLE Gutachterausschüsse des Landes Brandenburg. Der Berichtsjahrgang 2024 (veröffentlicht 2025) und der Jahrgang 2025 (veröffentlicht 2026) sind vollständig unter ihrer Geltung entstanden. Für den Jahrgang 2024 gilt dasselbe: der Bericht ist 2025 erschienen, also nach Inkrafttreten.",
+   "nhk_ausgabe": "NHK 2010 gemäß Anlage 4 ImmoWertV",
+   "nhk_bezugsmassstab": "Brutto-Grundfläche (BGF)",
+   "standardstufen": "fünf Standardstufen 1 sehr einfach (Bauausführungen bis ca. 1980) · 2 einfach (bis ca. 1995) · 3 durchschnittlich/zeitgemäß (ab ca. 1995) · 4 gehoben (ab ca. 2005) · 5 stark gehoben/hochwertig",
+   "regionalfaktor": 1.0,
+   "regionalfaktor_beleg": "VV EW-SW, Anlage 2: „Regionalfaktor 1\" — für das Land Brandenburg wird KEIN Regionalfaktor angesetzt. Das ist die Angabe, die den Potsdamer Faktor überhaupt erst anwendbar macht: ein von DealPilot gerechneter vorläufiger Sachwert ohne Regionalfaktor liegt auf derselben Bezugsgröße.",
+   "alterswertminderung": "linear",
+   "gnd_jahre": 80,
+   "gnd_beleg": "VV EW-SW, Anlage 2: Gesamtnutzungsdauer 80 Jahre für Einfamilienhäuser, Doppelhäuser und Reihenhäuser. ACHTUNG für den CrossCheckService: dessen Konstante GND_JAHRE steht ebenfalls auf 80 — hier stimmen Konstante und Modellvermerk zufällig überein. Das entbindet NICHT davon, die GND aus dem Modellvermerk zu lesen (Bonn-Befund: dort 60).",
+   "restnutzungsdauer": "nach § 4 Absatz 3 bzw. Anlage 2 ImmoWertV; bei Modernisierung § 12 Absatz 5 Satz 1 ImmoWertV",
+   "baupreisindex": "Preisindex für den Neubau von Wohngebäuden aus den Indexreihen für die Bauwirtschaft des Statistischen Bundesamts",
+   "baupreisindex_basis": "Basisjahr 2010 (die Reihe des Statistischen Bundesamts mit Basis 2020 wird auf 2010 umbasiert)",
+   "baupreisindex_hinweis": "WICHTIG für den CrossCheckService: dessen Konstante BAUPREISINDEX = 2,02 ist auf 2010 = 100 bezogen und passt damit zur Indexbasis dieses Modells. Sie ist aber nach wie vor nicht stichtagsfähig und liegt gegenüber dem amtlichen Bundesindex (GMB Dortmund 2026: 190,6) rund 6 % zu hoch. Dieser Befund gilt unabhängig von Brandenburg und wird hier nur verknüpft.",
+   "baunebenkosten": "keine gesonderten Baunebenkosten — sie sind in den NHK 2010 enthalten",
+   "aussenanlagen": "pauschaler Ansatz von 4 % des vorläufigen Hauptgebäudesachwerts (ohne Nebengebäude, Garagen und Carports)",
+   "garagen_pauschal_eur": {
+    "fertiggarage_stufe_3": 6000,
+    "massivbau_stufe_4": 12000,
+    "individuell_stufe_5": 18000,
+    "hinweis": "gilt für Garagen mit 18–24 m² BGF; Carports werden mit dem Zeitwert angesetzt"
+   },
+   "nicht_gesondert_bewertete_bauteile": [
+    "Dachgauben bis ca. 5 m Länge",
+    "Balkone und Dachterrassen bis 5 m²",
+    "Vordächer im üblichen Umfang",
+    "übliche Außentreppen"
+   ],
+   "zu_abschlaege_dachgeschoss_prozent": {
+    "ausgebaut_ohne_drempel": -5,
+    "spitzboden_ausgebaut": 10,
+    "nicht_ausgebaut_eingeschraenkt_nutzbar": -10,
+    "mit_drempel": 5
+   },
+   "bodenwert": "beitrags- und abgabenfrei, aus dem objektspezifisch angepassten Bodenrichtwert",
+   "boG": "besondere objektspezifische Grundstücksmerkmale werden durch Zu-/Abschläge berücksichtigt oder der Kaufpreis wird bereinigt",
+   "kauffallkriterien": "Objekte ohne ungewöhnliche oder persönliche Verhältnisse; Ortsbesichtigung durchgeführt",
+   "auswertemethodik": "Regressionsanalyse oder arithmetischer Mittelwert; Ausreißer eliminiert (z. B. jenseits des 2,5fachen der Standardabweichung)",
+   "bewirtschaftungskosten_hinweis": "Für den SACHWERT ohne Belang. Die Bewirtschaftungskostenansätze des Landes stehen in Bewko_2026.pdf und in Anlage 1 zur VV EW-SW und gehören zum Ertragswert-/Liegenschaftszinsmodell.",
+   "querpruefung": "Die Ansätze der VV EW-SW 2023 sind identisch mit denen, die der Aufsatz „Die Ermittlung von Sachwertfaktoren im Land Brandenburg\" (Vermessung Brandenburg 1/2016, ISSN 1430-7650) und die Brandenburgische Sachwertrichtlinie RL SW-BB vom 01.04.2014 nennen: 4 % Außenanlagen, Garagenpauschalen 6.000/12.000/18.000 EUR, NHK 2010, lineare Alterswertminderung, Baupreisindex Neubau Wohngebäude. DREI unabhängige Dokumente aus neun Jahren, gleiche Zahlen — das ist eine Zählprüfung, die man geschenkt bekommt."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt ausschließlich für die Landeshauptstadt Potsdam.",
+   "stichprobe": {
+    "fundstelle": "Abb. 66 „Ein- und Zweifamilienhäuser – Stichprobe für Sachwertfaktoren\" (Jahrgang 2024)",
+    "kauffaelle": 41,
+    "bodenwertniveau_eur_qm_min": 150,
+    "bodenwertniveau_eur_qm_max": 1000,
+    "bodenwertniveau_eur_qm_mittel": 560
+   },
+   "raeumliche_differenzierung_dokumentation": {
+    "fundstelle": "Abb. 70 (Jahrgang 2024)",
+    "hinweis": "DOKUMENTATION, KEINE KORREKTUR.",
+    "raeume": [
+     {
+      "raum": "Inneres Stadtgebiet",
+      "kauffaelle": null,
+      "mittel": 1.09,
+      "minimum": 0.85,
+      "maximum": 1.42,
+      "vertrauensbereich_95_unten": 1.03,
+      "vertrauensbereich_95_oben": 1.15
+     },
+     {
+      "raum": "Äußeres Stadtgebiet",
+      "kauffaelle": null,
+      "mittel": 1.07,
+      "minimum": 0.79,
+      "maximum": 1.42,
+      "vertrauensbereich_95_unten": 0.96,
+      "vertrauensbereich_95_oben": 1.18
+     }
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "„Grundstücksmarktbericht 2024\", S. 49 ff., Abb. 66, 67, 70",
+    "soll_kennzahlen": 3,
+    "pruefprotokoll": "EIN Leselauf. Der Jahrgang 2024 dient als Quergegenprobe zum Jahrgang 2025 und ist ausdrücklich schwächer belegt als dieser.",
+    "zaehlpruefung": "NICHT MÖGLICH: die Fallzahlen je Untersuchungsraum sind im Jahrgang 2024 nicht abgedruckt bzw. nicht gelesen worden. Deshalb steht dort kauffaelle: null und NICHT eine aus 41 zurückgerechnete Zahl.",
+    "lagepruefung": "BESTANDEN: Gesamtwert 1,08 liegt zwischen 1,07 und 1,09; Vertrauensbereich 1,03–1,14 liegt innerhalb der Spanne 0,79–1,42; die Gesamtspanne ist die Vereinigung der Teilspannen (0,79 aus dem äußeren, 1,42 aus beiden).",
+    "quergegenprobe_2025": "Der Faktor fällt von 1,08 (2024) auf 1,06 (2025), die Fallzahl steigt von 41 auf 48. Beide Jahrgänge liegen über 1,00 und in derselben Größenordnung — kein Sprung, der auf einen Lesefehler hindeutet."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Zwei Angaben fehlen. (1) Die STANDARDABWEICHUNG ist nicht abgedruckt; der Ausschuss weist stattdessen die Spanne und den 95-%-Vertrauensbereich aus. Nach der Regel dieses Laufs ist der Datensatz damit nicht unvollständig im Sinne eines Datenfehlers, er bekommt aber Stufe B statt A — siehe stufe_hinweis. streuung bleibt NULL, NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. (2) Die MODELLANSÄTZE stehen im Anhang ab S. 105 und liegen hinter dem Abbruch — siehe modelltreue_vorbehalt.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 41,
+  "streuung": null,
+  "stichtag": "2025-07-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_P.pdf",
+  "quelle_parser": "v1094-WBB",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktbericht 2025\", Kapitel 8.2.2 „Sachwertfaktoren\", S. 47–50, Abb. 62, 63, 64/65, 66"
+ }
+]

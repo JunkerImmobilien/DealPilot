@@ -108,8 +108,14 @@ function matrixInterp(m, e) {
 /** matrix_kategorial — x stetig, y kategorial (Wohnlage, Rheinseite …). */
 function matrixKategorial(m, e) {
   const x = zahl(e[m.achse_x_feld]);
-  const k = String(e[m.achse_k_feld] ?? '').toLowerCase().trim();
+  const kk = kategorieAus(m, e);              /* v1085-WZUO */
+  const k = kk.wert;
   if (x === null) return nichts('achse_x_fehlt', `${m.achse_x_bez} nicht erfasst.`);
+  if (!k && kk.bekannt_aber_ohne_wert) {
+    return nichts('gebiet_ohne_wert',
+      `Fuer dieses Gebiet fuehrt der Bericht keinen Wert. `
+      + `Ein Wert eines anderen Gebiets wird nicht uebertragen.`);
+  }
   if (!k) return nichts('kategorie_fehlt', `${m.achse_k_bez} nicht erfasst.`);
   const idx = m.kategorien.findIndex((c) => String(c).toLowerCase() === k);
   if (idx < 0) {
@@ -224,6 +230,227 @@ function doppelLog(m, e) {
            formel: `${m.c} + ${m.a}*ln(${m.bez_1}) + ${m.b}*ln(${m.bez_2})` };
 }
 
+/** v1088-WKAT · stufen_kategorial — eine reine Nachschlagetabelle.
+ *
+ * Sachsen-Anhalt fuehrt seinen Liegenschaftszinssatz je Stadt bzw.
+ * Regionstyp. Es gibt KEINE stetige Achse und deshalb auch nichts zu
+ * interpolieren — der Bericht rundet ausdruecklich auf halbe Prozentpunkte
+ * und ermittelt sachverstaendig. Ein Zwischenwert waere eine Erfindung.
+ *
+ * Der Unterschied zu matrix_kategorial: dort gibt es zusaetzlich eine
+ * stetige x-Achse. Hier ist die Kategorie alles. */
+function stufenKategorial(m, e) {
+  const kk = kategorieAus(m, e);
+  const k = kk.wert;
+  if (!k && kk.bekannt_aber_ohne_wert) {
+    return nichts('gebiet_ohne_wert',
+      'Fuer dieses Gebiet fuehrt der Bericht keinen Wert. Ein Wert eines '
+      + 'anderen Gebiets wird nicht uebertragen.');
+  }
+  if (!k) return nichts('kategorie_fehlt', `${m.achse_k_bez} nicht erfasst.`);
+
+  /* Der Schluesselvergleich laeuft ueber die Kleinschreibung, damit
+   * "Halle" und "halle" dasselbe treffen — die Schreibweise im Bericht
+   * ist keine Aussage ueber das Gebiet. */
+  const tab = m.stufen || {};
+  let treffer = tab[k];
+  if (treffer === undefined) {
+    const gefunden = Object.keys(tab)
+      .find((x) => String(x).toLowerCase().trim() === k);
+    if (gefunden !== undefined) treffer = tab[gefunden];
+  }
+  if (!istZahl(treffer)) {
+    return nichts('kategorie_unbekannt',
+      `Der Bericht fuehrt ${Object.keys(tab).length} Eintraege; `
+      + `"${k}" ist keiner davon.`);
+  }
+  return { verfuegbar: true, wert: treffer, tabellenwert: treffer,
+           korrekturen: [], kategorie: k };
+}
+
+/** v1088-WREG · regression_additiv — mehrgliedrige Regression.
+ *
+ *   wert = intercept + SUMME( koeffizient * feld ^ exponent )
+ *                    + SUMME( diskrete Zuschlaege )
+ *
+ * Halle veroeffentlicht seinen Sachwertfaktor so, und mit ihm der groesste
+ * Teil Ost- und Sueddeutschlands. Wo NRW Matrizen druckt, drucken sie
+ * Gleichungen.
+ *
+ * DREI REGELN, DIE AUCH HIER GELTEN:
+ *  1. Fehlt ein Feld eines Terms, gibt es KEINEN Wert. Einen Term
+ *     wegzulassen hiesse, gegen ein anderes Modell zu rechnen — die
+ *     Gleichung ist als Ganzes abgeleitet worden.
+ *  2. Der Geltungsbereich ist Pflicht, wo die Quelle einen nennt.
+ *     Extrapolation ueber die Stichprobe hinaus ist keine Rechnung.
+ *  3. Jeder Term erscheint einzeln im Rechenweg. */
+function regressionAdditiv(m, e) {
+  const teile = [];
+  let summe = zahl(m.intercept) ?? 0;
+  teile.push(`${summe}`);
+
+  for (const t of (m.terme || [])) {
+    const x = zahl(e[t.feld]);
+    if (x === null) {
+      return nichts('feld_fehlt',
+        `${t.bez || t.feld} ist nicht erfasst. Die Gleichung ist als Ganzes `
+        + `abgeleitet; ein weggelassener Term waere ein anderes Modell.`);
+    }
+    if (Array.isArray(t.gueltig) && (x < t.gueltig[0] || x > t.gueltig[1])) {
+      return nichts('ausserhalb_der_stichprobe',
+        `${t.bez || t.feld} liegt ausserhalb der Datenspanne `
+        + `${t.gueltig[0]} bis ${t.gueltig[1]}.`);
+    }
+    const exp = zahl(t.exponent);
+    const basis = (exp === null || exp === 1) ? x : Math.pow(x, exp);
+    if (!Number.isFinite(basis)) {
+      return nichts('term_unbestimmt',
+        `${t.bez || t.feld} = ${x} ergibt in diesem Term keinen endlichen `
+        + `Wert (Exponent ${exp}).`);
+    }
+    const bei = zahl(t.koeffizient);
+    if (bei === null) return nichts('kein_koeffizient', `${t.feld} ohne Koeffizient.`);
+    const anteil = bei * basis;
+    summe += anteil;
+    teile.push(`${anteil >= 0 ? '+' : '−'} ${Math.abs(anteil).toFixed(4)} `
+      + `(${t.bez || t.feld}${exp && exp !== 1 ? ` ^${exp}` : ''})`);
+  }
+
+  /* Diskrete Zuschlaege: eine Auspraegung, ein Betrag. Fehlt die
+   * Auspraegung, gilt KEIN Zuschlag — das ist der ausdrueckliche
+   * Standardfall der Gleichung, nicht ein uebersehener Term. */
+  for (const dz of (m.diskret || [])) {
+    const v = String(e[dz.feld] ?? '').toLowerCase().trim();
+    if (!v) continue;
+    const w = zahl((dz.werte || {})[v]);
+    if (w === null) continue;
+    summe += w;
+    teile.push(`${w >= 0 ? '+' : '−'} ${Math.abs(w).toFixed(4)} (${dz.bez || dz.feld})`);
+  }
+
+  const st = m.rundung_stellen ?? 2;
+  const p = Math.pow(10, st);
+  const wert = Math.round(summe * p) / p;
+  return { verfuegbar: true, wert, tabellenwert: wert, korrekturen: [],
+           rechenweg_terme: teile };
+}
+
+/** v1089-WBND1 · baender_1d — eine stetige Achse in KLASSEN, ohne Interpolation.
+ *
+ * Muenchen fuehrt seine Sachwertfaktoren je Klasse des vorlaeufigen
+ * Sachwerts und begruendet die fehlende Interpolation selbst:
+ *
+ *   "Jeder Wert ist das arithmetische Mittel einer Teilstichprobe, kein
+ *    Funktionswert an einer Stuetzstelle."
+ *
+ * Zwischen zwei Klassenmitten zu interpolieren hiesse, eine Kurve zu
+ * unterstellen, die der Ausschuss nicht abgeleitet hat.
+ *
+ * Abgrenzung: `stufen_1d` interpoliert zwischen Stuetzstellen EINER
+ * Funktion. `matrix_band` hat zwei Bandachsen. Hier ist es eine.
+ *
+ * Ein offenes Band (von=null oder bis=null) ist Absicht — die unterste und
+ * oberste Klasse sind nach aussen offen. Das ist KEINE Extrapolation,
+ * sondern die Klasseneinteilung des Berichts. */
+function baender1d(m, e) {
+  const x = zahl(e[m.achse_feld]);
+  if (x === null) return nichts('achse_fehlt', `${m.achse_bez} nicht erfasst.`);
+
+  const b = (m.baender || []).find((r) =>
+    (r.von == null || x > r.von) && (r.bis == null || x <= r.bis));
+  if (!b) {
+    return nichts('ausserhalb_der_klassen',
+      `${m.achse_bez} = ${x} faellt in keine der `
+      + `${(m.baender || []).length} Klassen des Berichts.`);
+  }
+  if (!istZahl(b.wert)) {
+    return nichts('klasse_ohne_wert',
+      `Fuer die Klasse "${b.schluessel || b.bez}" fuehrt der Bericht keinen Wert.`);
+  }
+  return { verfuegbar: true, wert: b.wert, tabellenwert: b.wert,
+           korrekturen: [], klasse: b.schluessel || b.bez || null,
+           klasse_fallzahl: b.fallzahl ?? null,
+           klasse_streuung: b.streuung ?? null };
+}
+
+/** v1093-WLOG · log_1d — eine Achse, ein Logarithmus: Y = a * ln(x) + b.
+ *
+ * Worms fuehrt seine Liegenschaftszinssaetze so, ueber der relativen
+ * Restnutzungsdauer. Abgrenzung: `doppel_log` hat ZWEI Logarithmen ueber
+ * zwei Achsen, `potenz` ist Y = a * X^b.
+ *
+ * DIE EINHEIT IST HIER DER GANZE FALL. Worms setzt die relative
+ * Restnutzungsdauer als PROZENTZAHL ein (30 fuer 30 %), nicht als
+ * Dezimalbruch 0,30. Mit dem Dezimalbruch kaeme 8,35 % statt 3,99 % heraus
+ * — plausibel und falsch. `eingang_bez` haelt fest, was einzusetzen ist;
+ * `skala` rechnet um, wenn der Aufrufer die andere Einheit liefert.
+ *
+ * Der Logarithmus ist fuer jedes x > 0 definiert — die Regression traegt
+ * dort aber nicht. Deshalb gilt der abgedruckte Gueltigkeitsbereich, und
+ * zwar in derselben Einheit wie der Eingang. Wo die Quelle endet, endet
+ * die Rechnung. */
+function log1d(m, e) {
+  const feld = m.achse_feld || m.eingang;
+  const roh = zahl(e[feld]);
+  if (roh === null) {
+    return nichts('achse_fehlt',
+      `${m.eingang_bez || m.achse_bez || feld} nicht erfasst.`);
+  }
+  const skala = zahl(m.skala) ?? 1;
+  const x = roh * skala;
+
+  if (!(x > 0)) {
+    return nichts('achse_nicht_positiv',
+      `Der Logarithmus ist fuer ${feld} = ${x} nicht definiert. `
+      + 'Gerechnet wird damit nicht.');
+  }
+  const g = m.gueltig || m.geltungsbereich || null;
+  if (Array.isArray(g) && g.length === 2 && (x < g[0] || x > g[1])) {
+    return nichts('ausserhalb_des_gueltigkeitsbereichs',
+      `${m.eingang_bez || feld} = ${x} liegt ausserhalb von ${g[0]} bis `
+      + `${g[1]}. Der Bericht untersagt die Extrapolation; ausgewiesen `
+      + 'wird, gerechnet nicht.');
+  }
+  const a = zahl(m.a), b = zahl(m.b);
+  if (a === null || b === null) {
+    return nichts('koeffizient_fehlt',
+      'Der Datensatz fuehrt a oder b nicht.');
+  }
+  const wert = a * Math.log(x) + b;
+  const st = m.rundung_stellen ?? 2;
+  const q = Math.pow(10, st);
+  const ger = Math.round(wert * q) / q;
+  return { verfuegbar: true, wert: ger, tabellenwert: ger, korrekturen: [],
+           formel: `${a} * ln(${x}) + ${b}`,
+           eingang_einheit: m.eingang_bez || null };
+}
+
+/** v1093-WSPN · spanne_kategorial — die Form, die ABSICHTLICH nicht rechnet.
+ *
+ * Saarbruecken druckt je Grundstuecksart nur eine Spanne ab ("2,0 – 4,5"),
+ * kein Punktmass — weder Median noch Mittel. Ein Wert daraus waere erfunden.
+ *
+ * Diese Form liefert deshalb keinen Wert, sondern die Spanne. Der
+ * Unterschied zu `form_unbekannt` ist der ganze Zweck: `form_unbekannt` ist
+ * eine Aussage ueber den Auswerter, `nur_spanne` eine ueber die Quelle. Der
+ * Bericht kann die Spanne dann ausweisen, statt zu schweigen. */
+function spanneKategorial(m, e) {
+  const k = m.kategorie_feld ? String(e[m.kategorie_feld] || '').toLowerCase().trim() : null;
+  const eintrag = (k && (m.kategorien || {})[k]) || m;
+  const sp = eintrag.spanne;
+  if (!Array.isArray(sp) || sp.length !== 2) {
+    return nichts('spanne_fehlt', 'Der Datensatz fuehrt keine Spanne.');
+  }
+  return { verfuegbar: false, wert: null, grund: 'nur_spanne',
+    hinweis: 'Die Quelle nennt fuer diese Art nur eine Spanne von '
+      + `${eintrag.spanne_wortlaut || sp.join(' bis ')}, kein Punktmass. `
+      + 'Ein Mittelwert daraus stuende nirgends im Dokument und wird '
+      + 'deshalb nicht gebildet. Die Spanne ist auszuweisen, nicht zu '
+      + 'verrechnen.',
+    spanne: sp, spanne_wortlaut: eintrag.spanne_wortlaut || null,
+    korrekturen: [] };
+}
+
 /** konstante — ein Faktor. Basis fuer Bochum und Dortmund. */
 function konstante(m) {
   if (!istZahl(m.wert)) return nichts('kein_wert', 'Kein Faktor hinterlegt.');
@@ -239,6 +466,11 @@ const AUSWERTER = {
   linear_sachwert: linearSachwert,
   doppel_log: doppelLog,
   konstante,
+  stufen_kategorial: stufenKategorial,   /* v1088-WKAT */
+  regression_additiv: regressionAdditiv, /* v1088-WREG */
+  baender_1d: baender1d,                 /* v1089-WBND1 */
+  log_1d: log1d,                         /* v1093-WLOG */
+  spanne_kategorial: spanneKategorial,   /* v1093-WSPN */
 };
 
 /* ── Additive Korrekturen ──────────────────────────────────────────────── */
@@ -251,9 +483,18 @@ const AUSWERTER = {
 function korrekturAnwenden(k, e) {
   const x = zahl(e[k.feld]);
   if (x === null) return null;                  // nicht erfasst = keine Korrektur
+
+  /* v1093-WMUL · `wirkung` sagt, WIE die Korrektur wirkt; `art` sagt, welche
+   * FORM ihre Tabelle hat. Zwei verschiedene Dinge — die Rezepte hatten
+   * beides unter `art` geschrieben, der Wandler trennt es. Fehlt `wirkung`,
+   * gilt additiv: so drucken es Herford, Hoexter und Dortmund ab, und so
+   * hat der Auswerter seit v1083 gerechnet. */
+  const wirkung = k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv';
+
   if (k.art === 'band') {
     const b = (k.baender || []).find((r) => x >= r.von && x <= r.bis);
-    return b ? { merkmal: k.bez, wert: b.zuschlag, ausprägung: b.bez ?? `${b.von}-${b.bis}` } : null;
+    return b ? { merkmal: k.bez, wert: b.zuschlag, wirkung,
+                 ausprägung: b.bez ?? `${b.von}-${b.bis}` } : null;
   }
   const stufen = Object.keys(k.stufen || {}).map(Number).sort((p, q) => p - q);
   if (!stufen.length) return null;
@@ -269,7 +510,8 @@ function korrekturAnwenden(k, e) {
   // Wer erst summiert und dann rundet, kommt auf 0,89 - eine andere Zahl.
   const st = k.rundung_stellen ?? 3;
   const q = Math.pow(10, st);
-  return { merkmal: k.bez, wert: Math.round(v * q) / q, ausprägung: String(x) };
+  return { merkmal: k.bez, wert: Math.round(v * q) / q, wirkung,
+           ausprägung: String(x) };
 }
 
 /* ── Einheiten ─────────────────────────────────────────────────────────── */
@@ -295,12 +537,77 @@ const IN_FAKTOR = {
   zuschlag_prozent: (v) => 1 + v / 100,
 };
 
-/** Plausibilitaetsband fuer einen Sachwertfaktor. Keine Marktaussage, sondern
- *  ein Einheitenwaechter: was hier herausfaellt, ist keine ungewoehnliche
- *  Lage, sondern eine verwechselte Einheit. Lieber KEIN Wert als ein Faktor
- *  von 90 — ein stiller Rueckfall ist schlimmer als ein Fehler. */
-const FAKTOR_MIN = 0.1;
-const FAKTOR_MAX = 5.0;
+/** v1085-WBND · Plausibilitaetsband JE KENNZAHL.
+ *
+ * Keine Marktaussage, sondern ein Einheitenwaechter: was hier herausfaellt,
+ * ist keine ungewoehnliche Lage, sondern eine verwechselte Einheit. Lieber
+ * KEIN Wert als ein Faktor von 90.
+ *
+ * Bis v1084 war das Band fest auf Sachwertfaktoren geeicht. Berlin fuehrt
+ * seinen Liegenschaftszinssatz als Funktion der Objektkaltmiete — 2,3 % bis
+ * 4,6 %, also 0,023 bis 0,046 als Dezimalwert. Der feste Waechter hat das
+ * als "Einheit vermutlich falsch ausgewiesen" verworfen, obwohl der
+ * Datensatz stimmte. Ein Waechter, der Unfug meldet, wird ueberlesen. */
+const BAND = {
+  sachwertfaktor: [0.1, 5.0],
+  liegenschaftszinssatz: [0.001, 0.15],   /* 0,1 % bis 15 % */
+};
+const BAND_STANDARD = BAND.sachwertfaktor;
+
+/* v1085-WZUO · Ein feineres Merkmal auf die Kategorie abbilden.
+ *
+ * Berlins Sachwertfaktoren stehen je Gebietsgruppe (1/2/3), zugeordnet ueber
+ * den ALTBEZIRK — Stand vor 2001, nicht der heutige Bezirk und nicht der
+ * Ortsteil. Die Zuordnung liegt im Datensatz; ohne diese Funktion muesste
+ * der Aufrufer sie kennen, und dann stuende sie an zwei Stellen.
+ *
+ * Ist das Merkmal bekannt, aber keiner Kategorie zugeordnet, gibt es KEINEN
+ * Wert: sieben der 23 Berliner Altbezirke fuehren keinen Sachwertfaktor.
+ * Das ist kein Fehler, das ist die Aussage des Berichts. */
+function kategorieAus(m, e) {
+  const direkt = String(e[m.achse_k_feld] ?? '').toLowerCase().trim();
+  if (direkt) return { wert: direkt, ueber: 'direkt' };
+
+  /* v1094-WKAB · Die Kategorie aus einem ZAHLENBAND ableiten.
+   *
+   * Berlins Zuordnung ist eine Namensliste (Altbezirk -> Gebietsgruppe).
+   * Wiesbaden ordnet dagegen ueber eine ZAHL zu: der Bodenrichtwert faellt
+   * in eine Klasse 600-699, 700-799 und so fort. Ohne diesen Zweig muesste
+   * der Aufrufer die Klassengrenzen kennen — und dann stuenden sie an zwei
+   * Stellen, die frueher oder spaeter auseinanderlaufen.
+   *
+   * Zwischen den Klassen wird NICHT interpoliert: der Bericht druckt sie
+   * als Klassen ab, nicht als Stuetzstellen. Faellt die Zahl in keine
+   * Klasse, gibt es keinen Wert — das ist die Extrapolationssperre, nicht
+   * ein fehlendes Merkmal. */
+  const zb = m.kategorie_baender;
+  if (Array.isArray(zb) && zb.length) {
+    const feldZ = m.zuordnung_feld;
+    const zv = zahl(e[feldZ]);
+    if (zv === null) return { wert: '', ueber: null };
+    const treffer = zb.find((b) => (b.von == null || zv >= b.von)
+                                && (b.bis == null || zv <= b.bis));
+    if (!treffer) {
+      return { wert: '', ueber: feldZ, bekannt_aber_ohne_wert: true };
+    }
+    return { wert: String(treffer.kategorie).toLowerCase(), ueber: feldZ };
+  }
+
+  const zu = m.kategorie_zuordnung;
+  if (!zu) return { wert: '', ueber: null };
+  const feld = m.zuordnung_feld || 'altbezirk';
+  const v = String(e[feld] ?? '').toLowerCase().trim();
+  if (!v) return { wert: '', ueber: null };
+
+  for (const kat of (m.kategorien || [])) {
+    const liste = zu[String(kat)];
+    if (Array.isArray(liste)
+        && liste.some((x) => String(x).toLowerCase().trim() === v)) {
+      return { wert: String(kat).toLowerCase(), ueber: feld };
+    }
+  }
+  return { wert: '', ueber: feld, bekannt_aber_ohne_wert: true };
+}
 
 /* ── Der Vertrag nach aussen ───────────────────────────────────────────── */
 
@@ -323,50 +630,153 @@ export function auswerten(modell, eingabe) {
 
   const einheit = modell.liefert || FORM_EINHEIT[modell.form] || 'faktor';
 
-  // Ein Betrag in Euro. Additive Faktorkorrekturen waeren dort sinnlos und
-  // werden nicht angewandt.
+  /* v1094-WEUR · EIN EURO-BETRAG BEKOMMT SEINE KORREKTUREN.
+   *
+   * Bis v1093 kehrte diese Stelle sofort zurueck — mit der Begruendung,
+   * additive Faktorkorrekturen seien bei einem Euro-Betrag sinnlos. Das
+   * stimmte fuer Stadt Paderborn, deren `linear_sachwert` einen
+   * Gesamtbetrag liefert und gar keine Korrekturen fuehrt.
+   *
+   * Wiesbaden fuehrt seine Vergleichsfaktoren (§ 20 ImmoWertV) als Wert JE
+   * QUADRATMETER Wohnflaeche, mit einer Korrekturtabelle in DERSELBEN
+   * Einheit. Sein Anwendungsbeispiel rechnet 5.171 + (-855) = 4.316, mal
+   * 140 m2 = 604.240 EUR. Ohne die Korrektur kaeme 723.940 heraus —
+   * 120.000 Euro daneben, und die falsche Zahl sieht plausibel aus.
+   *
+   * Was NICHT passiert und auch nicht passieren darf: die Umrechnung in
+   * einen Faktor und die Pruefung gegen das Faktorband. Ein Euro-Betrag ist
+   * kein Faktor; der Einheitenwaechter wuerde ihn zu Recht verwerfen. Er
+   * wird in seiner eigenen Einheit gerechnet und in ihr ausgegeben. */
   if (einheit === 'wert_eur' || r.liefert === 'wert_eur') {
+    const kE = [];
+    const offenE = [];
+    for (const k of (modell.korrekturen || [])) {
+      const t = korrekturAnwenden(k, eingabe || {});
+      if (t && (t.wert || t.wirkung === 'multiplikativ')) kE.push(t);
+      else if (t == null) offenE.push(k.bez || k.feld);
+    }
+    const addE = kE.filter((k) => k.wirkung !== 'multiplikativ');
+    const mulE = kE.filter((k) => k.wirkung === 'multiplikativ');
+    const stE = modell.rundung_stellen ?? 0;
+    const pE = Math.pow(10, stE);
+    let betrag = r.tabellenwert + addE.reduce((s, k) => s + k.wert, 0);
+    for (const k of mulE) {
+      if (!(k.wert > 0)) {
+        return nichts('korrektur_unplausibel',
+          `Der multiplikative Faktor "${k.merkmal}" ist ${k.wert} — `
+          + 'gerechnet wird damit nicht.');
+      }
+      betrag *= k.wert;
+    }
+    betrag = Math.round(betrag * pE) / pE;
+    if (!(betrag > 0)) {
+      return nichts('korrektur_unplausibel',
+        'Die Zu-/Abschlaege fuehren auf einen Betrag kleiner oder gleich null.');
+    }
     r.liefert = 'wert_eur';
     r.einheit = 'eur';
-    r.rechenweg = `${modell.formel || r.formel || ''} = ${r.wert} EUR`.trim();
+    r.wert = betrag;
+    r.dokumentwert = betrag;
+    r.korrekturen = kE;
+    r.korrekturen_offen = offenE;
+    r.korrekturen_gefuehrt = (modell.korrekturen || []).length;
+    r.korrekturen_multiplikativ = mulE.length;
+    r.rechenweg = [`Tabellenwert ${r.tabellenwert} EUR`]
+      .concat(addE.map((k) => `${k.wert > 0 ? '+' : '−'} ${Math.abs(k.wert)} (${k.merkmal})`))
+      .concat(mulE.map((k) => `× ${k.wert} (${k.merkmal})`))
+      .join(' ') + ` = ${betrag} EUR`;
     return r;
   }
 
   const korr = [];
+  const offen = [];
   for (const k of (modell.korrekturen || [])) {
     const t = korrekturAnwenden(k, eingabe || {});
-    if (t && t.wert) korr.push(t);
+    /* v1093-WMUL · Ein additiver Zuschlag von 0,00 ist ein Nichts — so
+     * druckt Herford ihn ab (kBgf 0,00), und so wird er seit v1083
+     * uebersprungen. Ein MULTIPLIKATIVER Faktor 0 ist kein Nichts: er
+     * setzt das Ergebnis auf null. Er waere hier still verschwunden, weil
+     * 0 falsy ist, und der Waechter unten haette ihn nie gesehen. */
+    if (t && (t.wert || t.wirkung === 'multiplikativ')) korr.push(t);
+    else if (t == null) offen.push(k.bez || k.feld);   /* v1085-WOFF */
   }
 
   /* Die Korrekturen stehen in der Einheit des Berichts — Herford in
    * Faktorpunkten, Dortmund in Prozentpunkten. Deshalb wird HIER, in der
    * Dokumenteinheit, summiert und gerundet. */
-  const summe = korr.reduce((s, k) => s + k.wert, 0);
+  /* v1093-WMUL · ZWEI ARTEN, ZWEI RECHENSCHRITTE.
+   *
+   * Kiel druckt seine Zu-/Abschlaege als FAKTOREN ab (x 0,89, x 1,16,
+   * x 0,82, x 0,78). Additiv verrechnet wuerde aus einem Abschlag auf
+   * 78 Prozent ein Zuschlag von 0,78 Faktorpunkten — ein Wert, der im
+   * Plausibilitaetsband bleibt und keiner Monotonie- oder Zaehlpruefung
+   * auffaellt.
+   *
+   * Reihenfolge: erst die additive Summe, in Dokumenteinheit gerundet (das
+   * ist belegtes Herford-Verhalten), dann die Faktoren, dann EINMAL runden.
+   * Eine Zwischenrundung je Faktor wird bewusst NICHT angewandt — kein
+   * bisher gelesener Bericht druckt dafuer ein Anwendungsbeispiel ab.
+   * Sobald einer es tut, ist es zu messen und hier nachzuziehen, nicht zu
+   * vermuten. */
+  const addK = korr.filter((k) => k.wirkung !== 'multiplikativ');
+  const mulK = korr.filter((k) => k.wirkung === 'multiplikativ');
+  const summe = addK.reduce((s, k) => s + k.wert, 0);
   const stellen = modell.rundung_stellen ?? (einheit === 'faktor' ? 2 : 1);
   const p = Math.pow(10, stellen);
-  const dokument = Math.round((r.tabellenwert + summe) * p) / p;
+  let dokument = Math.round((r.tabellenwert + summe) * p) / p;
+
+  if (mulK.length) {
+    /* Ein Zuschlag in Prozentpunkten ist die Abweichung von 1 — ihn zu
+     * multiplizieren waere eine Doppelzaehlung. Lieber kein Wert als ein
+     * doppelt gezaehlter. */
+    if (einheit === 'zuschlag_prozent') {
+      return nichts('multiplikativ_auf_zuschlag',
+        'Der Datensatz fuehrt multiplikative Korrekturen auf einer Groesse, '
+        + 'die selbst schon ein Zuschlag ist. Das waere eine Doppelzaehlung; '
+        + 'gerechnet wird damit nicht.');
+    }
+    for (const k of mulK) {
+      if (!(k.wert > 0)) {
+        return nichts('korrektur_unplausibel',
+          `Der multiplikative Faktor "${k.merkmal}" ist ${k.wert} — `
+          + 'gerechnet wird damit nicht.');
+      }
+      dokument *= k.wert;
+    }
+    dokument = Math.round(dokument * p) / p;
+  }
 
   const faktor = IN_FAKTOR[einheit](dokument);
+  const [bMin, bMax] = BAND[modell.kennzahl] || BAND_STANDARD;   /* v1085-WBND */
 
   if (!(faktor > 0)) {
     return nichts('korrektur_unplausibel',
-      'Die Zu-/Abschlaege fuehren auf einen Faktor kleiner oder gleich null.');
+      'Die Zu-/Abschlaege fuehren auf einen Wert kleiner oder gleich null.');
   }
-  if (faktor < FAKTOR_MIN || faktor > FAKTOR_MAX) {
+  if (faktor < bMin || faktor > bMax) {
     /* Kein Marktbefund, sondern ein Einheitenbefund. */
     return nichts('einheit_unplausibel',
-      `Aus ${dokument} (${einheit}) wird der Faktor ${faktor} — das liegt `
-      + `ausserhalb von ${FAKTOR_MIN} bis ${FAKTOR_MAX}. Der Datensatz weist `
-      + `seine Einheit vermutlich falsch aus; gerechnet wird damit nicht.`);
+      `Aus ${dokument} (${einheit}) wird ${faktor} — das liegt ausserhalb `
+      + `von ${bMin} bis ${bMax} fuer `
+      + `${modell.kennzahl || 'sachwertfaktor'}. Der Datensatz weist seine `
+      + `Einheit vermutlich falsch aus; gerechnet wird damit nicht.`);
   }
 
   const zeigen = (v) => v.toFixed(stellen).replace('.', ',');
+  /* v1085-WOFF · Welche Korrekturen NICHT angewandt wurden, weil ihr Merkmal
+   * nicht erfasst war. Berlin fuehrt sechs Zu-/Abschlaege; ein Faktor, der
+   * ohne vier davon zustande kam, sieht genauso aus wie einer mit allen.
+   * Jede Zahl traegt ihre Herkunft — auch die Luecken darin. */
   r.korrekturen = korr;
+  r.korrekturen_offen = offen;
+  r.korrekturen_gefuehrt = (modell.korrekturen || []).length;
   r.einheit = einheit;
   r.dokumentwert = dokument;        /* die Zahl, wie der Bericht sie druckt */
   r.wert = Math.round(faktor * 10000) / 10000;
+  r.korrekturen_multiplikativ = mulK.length;   /* v1093-WMUL */
   r.rechenweg = [`Tabellenwert ${zeigen(r.tabellenwert)}`]
-    .concat(korr.map((k) => `${k.wert > 0 ? '+' : '−'} ${zeigen(Math.abs(k.wert))} (${k.merkmal})`))
+    .concat(addK.map((k) => `${k.wert > 0 ? '+' : '−'} ${zeigen(Math.abs(k.wert))} (${k.merkmal})`))
+    .concat(mulK.map((k) => `× ${k.wert} (${k.merkmal})`))
     .join(' ') + ` = ${zeigen(dokument)}`
     + (einheit === 'faktor' ? '' : ` ${einheit === 'wert_eur' ? '€' : '%'} `
        + `→ Faktor ${r.wert.toFixed(3).replace('.', ',')}`);

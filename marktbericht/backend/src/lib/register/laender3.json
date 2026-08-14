@@ -1,0 +1,1333 @@
+[
+ {
+  "land_code": "NI",
+  "ags": "03241",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.2,
+   "wert_art": "normobjektwert",
+   "wert_art_hinweis": "Das Dokument führt KEINEN Median und kein arithmetisches Mittel der Stichprobe als Ergebniswert, sondern den auf ein NORMOBJEKT bezogenen Liegenschaftszinssatz zum Stichtag 01.07.2022. Die daneben abgedruckte Spanne −0,6 bis 3,2 % ist die Streubreite der Einzelfälle, nicht eine Spanne um einen Mittelwert. Wer den Wert verwendet, verwendet ihn für das Normobjekt (Bodenrichtwert 300 €/m², Nettokaltmiete 8,50 €/m²) und muss abweichende Merkmale nach den Richtungsangaben des Berichts sachverständig anpassen — Zahlenwerte für diese Anpassung sind NICHT abgedruckt.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden. ACHTUNG für den CrossCheckService: dessen Konstante GND_JAHRE steht auf 80 — hier gilt 70. Die GND ist aus dem Modellvermerk zu lesen, nicht aus der Konstante.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Im Kapitel Liegenschaftszinssätze als Gesamtnutzungsdauer 70 Jahre geführt (Wohnnutzung).",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer „unter Berücksichtigung der vorgenommenen Modernisierungen nach Anlage 2 ImmoWertV“",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten (Verwaltung, Instandhaltung, Mietausfallwagnis) nach II. BV gemäß Anlage 3 ImmoWertV",
+   "marktmiete": "nachhaltig gezahlter oder erzielbarer Jahresrohertrag (Nettokaltmiete)",
+   "bodenwert": "Bodenrichtwert, erschließungsbeitragsfrei"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt für die Region Hannover und die abgedruckte Objektart. Außerhalb wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     -0.6,
+     3.2
+    ],
+    "bodenrichtwert_eur_qm": [
+     80,
+     750
+    ],
+    "restnutzungsdauer_jahre": [
+     19,
+     65
+    ],
+    "nettokaltmiete_eur_qm_monat": [
+     5.4,
+     13.65
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 12–13",
+    "wortlaut": "Das Dokument druckt kein durchgerechnetes Anwendungsbeispiel für diese Auswertung ab. An seine Stelle tritt die abgedruckte Stichprobenbeschreibung: Fallzahl, Bodenrichtwert von/bis/Mittel, Restnutzungsdauer von/bis/Mittel, Nettokaltmiete von/bis/Mittel, Zinssatz mit Spanne, Normobjekt, Stichtag.",
+    "pruefprotokoll": "Zwei unabhängige Leseläufe über dasselbe Dokument am 13.08.2026: Lauf 1 (Kurzabfrage) und Lauf 2 (Sachdatenextraktion). Beide liefern zeichengleich n = 69, Zinssatz 1,2 %, Bodenrichtwert 80–750 €/m², Nettokaltmiete 5,40–13,65 €/m², Kaufzeitraum 2020–2022. LAGEPRÜFUNG: 1,2 liegt in [−0,6 ; 3,2] — erfüllt. WERTEBEREICH: der geführte Wert ist positiv, der Barwertfaktor damit definiert; die Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen“ greift für den geführten Wert nicht (das Minimum der Stichprobe ist negativ, der geführte Wert nicht)."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Drei Lücken, alle benannt: (1) Für KEINE Auswertung ist eine STANDARDABWEICHUNG abgedruckt — streuung bleibt überall null, NICHT 0. (2) Beim Wohnungseigentum liegen vier von sechs Korrekturgrößen nur als Diagramm vor; das dort abgedruckte Anwendungsbeispiel konnte deshalb nicht nachgerechnet werden. (3) Für Mehrfamilienhäuser druckt der Ausschuss NUR Rohertragsfaktoren, keinen Liegenschaftszinssatz — dafür entsteht bewusst KEIN Modell. Die Rohertragsfaktoren stehen unter 'rohertragsfaktoren_ohne_zinssatz' als Dokumentation, nicht als Datensatz.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein-/Zweifamilienhaus, Reihenhaus, Doppelhaushälfte (vermietet)",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 69,
+  "streuung": null,
+  "stichtag": "2022-07-01",
+  "berichtsjahr": 2022,
+  "modellversion": "GMB 2022",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/189398",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Hameln-Hannover 2023, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 12–20"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03252",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.4,
+   "wert_art": "normobjektwert",
+   "wert_art_hinweis": "Normobjektbezogener Zinssatz zum Stichtag 01.07.2022; Normobjekt Bodenrichtwert 90 €/m², Nettokaltmiete 6,00 €/m².",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden. ACHTUNG für den CrossCheckService: dessen Konstante GND_JAHRE steht auf 80 — hier gilt 70. Die GND ist aus dem Modellvermerk zu lesen, nicht aus der Konstante.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Im Kapitel Liegenschaftszinssätze als Gesamtnutzungsdauer 70 Jahre geführt (Wohnnutzung).",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer „unter Berücksichtigung der vorgenommenen Modernisierungen nach Anlage 2 ImmoWertV“",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten (Verwaltung, Instandhaltung, Mietausfallwagnis) nach II. BV gemäß Anlage 3 ImmoWertV",
+   "marktmiete": "nachhaltig gezahlter oder erzielbarer Jahresrohertrag (Nettokaltmiete)",
+   "bodenwert": "Bodenrichtwert, erschließungsbeitragsfrei"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.0,
+     4.9
+    ],
+    "bodenrichtwert_eur_qm": [
+     30,
+     195
+    ],
+    "wohnflaeche_qm": [
+     70,
+     245
+    ],
+    "restnutzungsdauer_jahre": [
+     11,
+     70
+    ],
+    "nettokaltmiete_eur_qm_monat": [
+     4.0,
+     9.85
+    ]
+   },
+   "hinweis": "Gilt NICHT für die Region Hannover — dort gilt das eigene Modell mit 1,2 %."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 13",
+    "pruefprotokoll": "Zwei Leseläufe, zeichengleich: n = 49, Zinssatz 1,4 % (0,0–4,9 %), Kaufzeitraum 2017–2022. LAGEPRÜFUNG erfüllt. Der Wert liegt über dem der Region Hannover (1,2 %) — richtungsgleich mit der Erwartung, dass ländlichere Teilmärkte höher rentieren."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Drei Lücken, alle benannt: (1) Für KEINE Auswertung ist eine STANDARDABWEICHUNG abgedruckt — streuung bleibt überall null, NICHT 0. (2) Beim Wohnungseigentum liegen vier von sechs Korrekturgrößen nur als Diagramm vor; das dort abgedruckte Anwendungsbeispiel konnte deshalb nicht nachgerechnet werden. (3) Für Mehrfamilienhäuser druckt der Ausschuss NUR Rohertragsfaktoren, keinen Liegenschaftszinssatz — dafür entsteht bewusst KEIN Modell. Die Rohertragsfaktoren stehen unter 'rohertragsfaktoren_ohne_zinssatz' als Dokumentation, nicht als Datensatz.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein-/Zweifamilienhaus, Reihenhaus, Doppelhaushälfte (vermietet)",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 49,
+  "streuung": null,
+  "stichtag": "2022-07-01",
+  "berichtsjahr": 2022,
+  "modellversion": "GMB 2022",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/189398",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Hameln-Hannover 2023, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 12–20"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03254",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.4,
+   "wert_art": "normobjektwert",
+   "wert_art_hinweis": "Normobjektbezogener Zinssatz zum Stichtag 01.07.2022; Normobjekt Bodenrichtwert 90 €/m², Nettokaltmiete 6,00 €/m².",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden. ACHTUNG für den CrossCheckService: dessen Konstante GND_JAHRE steht auf 80 — hier gilt 70. Die GND ist aus dem Modellvermerk zu lesen, nicht aus der Konstante.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Im Kapitel Liegenschaftszinssätze als Gesamtnutzungsdauer 70 Jahre geführt (Wohnnutzung).",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer „unter Berücksichtigung der vorgenommenen Modernisierungen nach Anlage 2 ImmoWertV“",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten (Verwaltung, Instandhaltung, Mietausfallwagnis) nach II. BV gemäß Anlage 3 ImmoWertV",
+   "marktmiete": "nachhaltig gezahlter oder erzielbarer Jahresrohertrag (Nettokaltmiete)",
+   "bodenwert": "Bodenrichtwert, erschließungsbeitragsfrei"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.0,
+     4.9
+    ],
+    "bodenrichtwert_eur_qm": [
+     30,
+     195
+    ],
+    "wohnflaeche_qm": [
+     70,
+     245
+    ],
+    "restnutzungsdauer_jahre": [
+     11,
+     70
+    ],
+    "nettokaltmiete_eur_qm_monat": [
+     4.0,
+     9.85
+    ]
+   },
+   "hinweis": "Gilt NICHT für die Region Hannover — dort gilt das eigene Modell mit 1,2 %."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 13",
+    "pruefprotokoll": "Zwei Leseläufe, zeichengleich: n = 49, Zinssatz 1,4 % (0,0–4,9 %), Kaufzeitraum 2017–2022. LAGEPRÜFUNG erfüllt. Der Wert liegt über dem der Region Hannover (1,2 %) — richtungsgleich mit der Erwartung, dass ländlichere Teilmärkte höher rentieren."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Drei Lücken, alle benannt: (1) Für KEINE Auswertung ist eine STANDARDABWEICHUNG abgedruckt — streuung bleibt überall null, NICHT 0. (2) Beim Wohnungseigentum liegen vier von sechs Korrekturgrößen nur als Diagramm vor; das dort abgedruckte Anwendungsbeispiel konnte deshalb nicht nachgerechnet werden. (3) Für Mehrfamilienhäuser druckt der Ausschuss NUR Rohertragsfaktoren, keinen Liegenschaftszinssatz — dafür entsteht bewusst KEIN Modell. Die Rohertragsfaktoren stehen unter 'rohertragsfaktoren_ohne_zinssatz' als Dokumentation, nicht als Datensatz.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein-/Zweifamilienhaus, Reihenhaus, Doppelhaushälfte (vermietet)",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 49,
+  "streuung": null,
+  "stichtag": "2022-07-01",
+  "berichtsjahr": 2022,
+  "modellversion": "GMB 2022",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/189398",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Hameln-Hannover 2023, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 12–20"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03257",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.4,
+   "wert_art": "normobjektwert",
+   "wert_art_hinweis": "Normobjektbezogener Zinssatz zum Stichtag 01.07.2022; Normobjekt Bodenrichtwert 90 €/m², Nettokaltmiete 6,00 €/m².",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden. ACHTUNG für den CrossCheckService: dessen Konstante GND_JAHRE steht auf 80 — hier gilt 70. Die GND ist aus dem Modellvermerk zu lesen, nicht aus der Konstante.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Im Kapitel Liegenschaftszinssätze als Gesamtnutzungsdauer 70 Jahre geführt (Wohnnutzung).",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer „unter Berücksichtigung der vorgenommenen Modernisierungen nach Anlage 2 ImmoWertV“",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten (Verwaltung, Instandhaltung, Mietausfallwagnis) nach II. BV gemäß Anlage 3 ImmoWertV",
+   "marktmiete": "nachhaltig gezahlter oder erzielbarer Jahresrohertrag (Nettokaltmiete)",
+   "bodenwert": "Bodenrichtwert, erschließungsbeitragsfrei"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.0,
+     4.9
+    ],
+    "bodenrichtwert_eur_qm": [
+     30,
+     195
+    ],
+    "wohnflaeche_qm": [
+     70,
+     245
+    ],
+    "restnutzungsdauer_jahre": [
+     11,
+     70
+    ],
+    "nettokaltmiete_eur_qm_monat": [
+     4.0,
+     9.85
+    ]
+   },
+   "hinweis": "Gilt NICHT für die Region Hannover — dort gilt das eigene Modell mit 1,2 %."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 13",
+    "pruefprotokoll": "Zwei Leseläufe, zeichengleich: n = 49, Zinssatz 1,4 % (0,0–4,9 %), Kaufzeitraum 2017–2022. LAGEPRÜFUNG erfüllt. Der Wert liegt über dem der Region Hannover (1,2 %) — richtungsgleich mit der Erwartung, dass ländlichere Teilmärkte höher rentieren."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Drei Lücken, alle benannt: (1) Für KEINE Auswertung ist eine STANDARDABWEICHUNG abgedruckt — streuung bleibt überall null, NICHT 0. (2) Beim Wohnungseigentum liegen vier von sechs Korrekturgrößen nur als Diagramm vor; das dort abgedruckte Anwendungsbeispiel konnte deshalb nicht nachgerechnet werden. (3) Für Mehrfamilienhäuser druckt der Ausschuss NUR Rohertragsfaktoren, keinen Liegenschaftszinssatz — dafür entsteht bewusst KEIN Modell. Die Rohertragsfaktoren stehen unter 'rohertragsfaktoren_ohne_zinssatz' als Dokumentation, nicht als Datensatz.",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein-/Zweifamilienhaus, Reihenhaus, Doppelhaushälfte (vermietet)",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 49,
+  "streuung": null,
+  "stichtag": "2022-07-01",
+  "berichtsjahr": 2022,
+  "modellversion": "GMB 2022",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/189398",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Hameln-Hannover 2023, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 12–20"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03241",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 0.9,
+   "wert_art": "normobjektwert",
+   "wert_art_hinweis": "Der Bericht führt einen BASISWERT von 0,9 % für ein Normobjekt (Lagewert/Bodenrichtwert 350 €/m², Wohnanlage mit 30 Wohnungen, Nettokaltmiete 7,50 €/m², Wohnfläche 70 m²) und dazu Korrekturwerte. Nur die beiden LAGE-Korrekturen sind als Zahl abgedruckt; die Anpassung an Bodenrichtwert, Wohnfläche, Nettokaltmiete und Anzahl der Wohnungen liegt ausschließlich als DIAGRAMM vor und ist über WebFetch nicht ablesbar.",
+   "rundung_stellen": 1,
+   "form_korrektur": "v1094: im Rezept stand regression_additiv, aber das Modell hat keine Terme — nur einen Basiswert und additive Korrekturen. Das ist eine konstante mit Korrekturen, die Bauform von Bochum. Als regression_additiv haette der Auswerter den Intercept gesucht, keinen gefunden und mit 0 gerechnet: ein Liegenschaftszinssatz von 0 statt 0,9 %. Dieselbe Korrektur war schon in v1093 noetig; der Neubau des Rezepts hat sie zurueckgesetzt."
+  },
+  "korrekturen": [
+   {
+    "merkmal": "Lage innerhalb der Region Hannover",
+    "feld": "gemeinde",
+    "wirkung": "additiv",
+    "einheit": "prozentpunkte",
+    "werte": [
+     {
+      "auspraegung": "Landeshauptstadt Hannover",
+      "wert": -0.2
+     },
+     {
+      "auspraegung": "übrige Region Hannover",
+      "wert": 0.1
+     }
+    ],
+    "beleg": "beide Werte tabellarisch abgedruckt",
+    "hinweis": "Additiv auf den Basiswert 0,9 %. Ergebnis: 0,7 % in der Landeshauptstadt, 1,0 % in der übrigen Region. Die beiden Ausprägungen sind gemeindescharf und damit aus dem achtstelligen Schlüssel bestimmbar — deshalb feld='gemeinde' und nicht eine sachverständige Feststellung. KEIN Feld 'art': das ist keine Bandtabelle. KEINE multiplikative Wirkung."
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden. ACHTUNG für den CrossCheckService: dessen Konstante GND_JAHRE steht auf 80 — hier gilt 70. Die GND ist aus dem Modellvermerk zu lesen, nicht aus der Konstante.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Im Kapitel Liegenschaftszinssätze als Gesamtnutzungsdauer 70 Jahre geführt (Wohnnutzung).",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer „unter Berücksichtigung der vorgenommenen Modernisierungen nach Anlage 2 ImmoWertV“",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten (Verwaltung, Instandhaltung, Mietausfallwagnis) nach II. BV gemäß Anlage 3 ImmoWertV",
+   "marktmiete": "nachhaltig gezahlter oder erzielbarer Jahresrohertrag (Nettokaltmiete)",
+   "bodenwert": "Bodenrichtwert, erschließungsbeitragsfrei"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Basiswert gilt für das Normobjekt. Weicht ein Objekt in Bodenrichtwert, Wohnfläche, Nettokaltmiete oder Anlagengröße erheblich ab, ist der Wert OHNE die fehlenden Korrekturkurven nicht modellkonform anzuwenden — dann ausweisen, nicht rechnen. ETW-Regel des Projekts bleibt: ohne Miteigentumsanteil KEIN Bodenwert.",
+   "spannen": {
+    "bodenrichtwert_eur_qm": [
+     70,
+     850
+    ],
+    "wohnflaeche_qm": [
+     30,
+     130
+    ],
+    "nettokaltmiete_eur_qm_monat": [
+     4.25,
+     13.75
+    ],
+    "restnutzungsdauer_jahre": [
+     19,
+     67
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 14–16",
+    "pruefprotokoll": "Zwei Leseläufe, zeichengleich: n = 884, Basiswert 0,9 %, Normobjekt 350 €/m² / 30 Wohnungen / 7,50 €/m² / 70 m², Lagekorrekturen −0,2 (LHH) und +0,1 (übrige Region), Kaufzeitraum 2018–2022. Ein Anwendungsbeispiel mit Korrekturwertberechnung ist im Dokument abgedruckt, war über WebFetch aber nicht in Zahlen lesbar — es ist deshalb NICHT nachgerechnet worden und steht als offener Prüfpunkt in _fehlend.md.",
+    "negativtest": "ANGESCHLAGEN — und zwar die Reihung über die Objektarten. Erwartet wird, dass Wohnungseigentum ÜBER dem Ein-/Zweifamilienhaus liegt (NRW-Median: efh 1,4 · we_v 2,2). Hier ist es umgekehrt: we_v 0,9 % liegt UNTER ezfh 1,2 %. Die Prüfung wurde nicht weggeräumt und der Wert nicht angepasst. Erklärung am Dokument: die beiden Zahlen sind nicht vergleichbar konstruiert — der EZFH-Wert bezieht sich auf ein Normobjekt mit Bodenrichtwert 300 €/m², der WE-Wert auf ein Normobjekt mit Lagewert 350 €/m² und 30 Wohnungen, und die Lagekorrektur der Landeshauptstadt zieht ihn zusätzlich auf 0,7 %. Die Monotonieprüfung über Objektarten setzt gleich konstruierte Werte voraus; diese Voraussetzung ist hier NICHT erfüllt, die Prüfung ist damit nicht anwendbar, nicht bestanden."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Drei Lücken, alle benannt: (1) Für KEINE Auswertung ist eine STANDARDABWEICHUNG abgedruckt — streuung bleibt überall null, NICHT 0. (2) Beim Wohnungseigentum liegen vier von sechs Korrekturgrößen nur als Diagramm vor; das dort abgedruckte Anwendungsbeispiel konnte deshalb nicht nachgerechnet werden. (3) Für Mehrfamilienhäuser druckt der Ausschuss NUR Rohertragsfaktoren, keinen Liegenschaftszinssatz — dafür entsteht bewusst KEIN Modell. Die Rohertragsfaktoren stehen unter 'rohertragsfaktoren_ohne_zinssatz' als Dokumentation, nicht als Datensatz.",
+  "objektart": "we_v",
+  "objektart_bez": "Wohnungseigentum (vermietet)",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 884,
+  "streuung": null,
+  "stichtag": "2022-07-01",
+  "berichtsjahr": 2022,
+  "modellversion": "GMB 2022",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/189398",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Hameln-Hannover 2023, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 12–20"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03241",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "handel",
+  "formel": {
+   "form": "stufen_kategorial",
+   "liefert": "prozent",
+   "stufen": [
+    {
+     "kategorie": "Innenstadt Ia-Lage",
+     "wert": 0.6,
+     "minimum": 0.01,
+     "maximum": 3.7
+    },
+    {
+     "kategorie": "Ib- und II-Lage",
+     "wert": 2.5,
+     "minimum": 0.4,
+     "maximum": 6.7
+    }
+   ],
+   "kein_treffer": "kein Wert — keine Zwischenstufe, keine Interpolation zwischen den Kategorien",
+   "rundung_stellen": 1,
+   "wert_art": "mittelwert",
+   "wert_art_hinweis": "Ob Median oder arithmetisches Mittel, ist nicht abgedruckt. Der Vorbehalt steht hier und darf nicht stillschweigend als Median ausgegeben werden."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. ACHTUNG: die Gesamtnutzungsdauer hängt hier an der GEBÄUDEART, nicht an der Lage — und beide Gebäudearten stecken in derselben Auswertung. Es gibt deshalb KEINE eine GND für dieses Modell.",
+   "gnd_jahre": null,
+   "gnd_je_gebaeudeart": {
+    "kauf_warenhaus": 50,
+    "geschaefts_buerogebaeude": 60
+   },
+   "gnd_beleg": "Das Dokument führt: 50 Jahre Kauf-/Warenhäuser, 60 Jahre Geschäftshäuser und Bürogebäude, 70 Jahre Wohn-/Geschäftshäuser. Die Konstante GND_JAHRE = 80 des CrossCheckService ist hier in jedem Fall falsch.",
+   "gnd_regel": "Ohne festgestellte Gebäudeart darf mit diesem Satz NICHT kapitalisiert werden — dann ausweisen, nicht rechnen.",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach Anlage 2 ImmoWertV",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten nach II. BV gemäß Anlage 3 ImmoWertV",
+   "marktmiete": "nachhaltig gezahlter oder erzielbarer Jahresrohertrag (Nettokaltmiete)",
+   "bodenwert": "Bodenrichtwert, erschließungsbeitragsfrei"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.01,
+     6.7
+    ]
+   },
+   "hinweis": "LAGEGEBUNDEN. Gilt nur in der Landeshauptstadt Hannover und nur für die beiden abgedruckten Geschäftslagen. Für die übrige Region Hannover leitet der Ausschuss für diese Objektart keinen Zinssatz ab."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 17–20",
+    "pruefprotokoll": "MONOTONIE ÜBER DIE STUFEN: 0,6 (Ia-Lage) < 2,5 (Ib-/II-Lage) — steigend mit abnehmender Lagequalität, wie es sein muss. LAGEPRÜFUNG: jeder Stufenwert liegt in seiner eigenen Spanne (0,6 in [0,01 ; 3,7]; 2,5 in [0,4 ; 6,7]). WERTEBEREICH: beide positiv, Barwertfaktor definiert. Die Spanne der Ia-Lage beginnt bei 0,01 % — ein Einzelfall nahe null, aber der geführte Wert ist es nicht."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Drei Lücken, alle benannt: (1) Für KEINE Auswertung ist eine STANDARDABWEICHUNG abgedruckt — streuung bleibt überall null, NICHT 0. (2) Beim Wohnungseigentum liegen vier von sechs Korrekturgrößen nur als Diagramm vor; das dort abgedruckte Anwendungsbeispiel konnte deshalb nicht nachgerechnet werden. (3) Für Mehrfamilienhäuser druckt der Ausschuss NUR Rohertragsfaktoren, keinen Liegenschaftszinssatz — dafür entsteht bewusst KEIN Modell. Die Rohertragsfaktoren stehen unter 'rohertragsfaktoren_ohne_zinssatz' als Dokumentation, nicht als Datensatz.",
+  "objektart": "handel",
+  "objektart_bez": "Kauf-/Warenhaus, Geschäfts-/Bürogebäude",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2022-07-01",
+  "berichtsjahr": 2022,
+  "modellversion": "GMB 2022",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/189398",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Hameln-Hannover 2023, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 12–20"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03241",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "buero",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3.6,
+   "wert_art": "mittelwert",
+   "wert_art_hinweis": "Das Dokument führt je Lage einen Wert mit Spanne. Ob es sich um Median oder arithmetisches Mittel handelt, ist NICHT ausdrücklich abgedruckt; der Wert wird deshalb als „mittelwert“ ohne Festlegung der Statistikart geführt und der Vorbehalt steht hier. Er darf nicht stillschweigend als Median ausgegeben werden.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV.",
+   "gnd_jahre": 60,
+   "gnd_beleg": "Das Dokument führt die Gesamtnutzungsdauer nach Gebäudeart getrennt: 50 Jahre Kauf-/Warenhäuser, 60 Jahre Geschäftshäuser und Bürogebäude, 70 Jahre Wohn-/Geschäftshäuser. Für diesen Satz gilt 60. Die Konstante GND_JAHRE = 80 des CrossCheckService ist hier in JEDEM Fall falsch.",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach Anlage 2 ImmoWertV",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten nach II. BV gemäß Anlage 3 ImmoWertV",
+   "marktmiete": "nachhaltig gezahlter oder erzielbarer Jahresrohertrag (Nettokaltmiete)",
+   "bodenwert": "Bodenrichtwert, erschließungsbeitragsfrei"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.3,
+     7.2
+    ]
+   },
+   "hinweis": "LAGEGEBUNDEN. Der Wert gilt nur für die genannte Lage („Landeshauptstadt Hannover, Peripherie und Bürozentren“). Die Lagezuordnung ist eine sachverständige Feststellung am Objekt und kann NICHT aus dem Gemeindeschlüssel abgeleitet werden — der Auflöser darf hier keinen Wert automatisch ziehen, ohne dass die Lage feststeht."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 17–20",
+    "pruefprotokoll": "Gelesen im zweiten Lesedurchgang (Sachdatenextraktion). LAGEPRÜFUNG: der geführte Wert liegt in seiner Spanne. MONOTONIE ÜBER DIE LAGEN: 0,6 (Ia) < 2,5 (Ib/II) < 3,0 (WGH Stadtgebiet) < 3,6 (Büro Peripherie) < 4,4 (WGH übrige Region) — steigend mit abnehmender Lagequalität bzw. zunehmendem Risiko, wie es sein muss. GEGENPROBE ZUM WOHNEN: alle Gewerbewerte liegen über den Wohnwerten (1,2 / 1,4 / 0,9) — ebenfalls richtungsrichtig."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Drei Lücken, alle benannt: (1) Für KEINE Auswertung ist eine STANDARDABWEICHUNG abgedruckt — streuung bleibt überall null, NICHT 0. (2) Beim Wohnungseigentum liegen vier von sechs Korrekturgrößen nur als Diagramm vor; das dort abgedruckte Anwendungsbeispiel konnte deshalb nicht nachgerechnet werden. (3) Für Mehrfamilienhäuser druckt der Ausschuss NUR Rohertragsfaktoren, keinen Liegenschaftszinssatz — dafür entsteht bewusst KEIN Modell. Die Rohertragsfaktoren stehen unter 'rohertragsfaktoren_ohne_zinssatz' als Dokumentation, nicht als Datensatz.",
+  "objektart": "buero",
+  "objektart_bez": "Büro-/Verwaltungsgebäude, Peripherie/Bürozentren",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2022-07-01",
+  "berichtsjahr": 2022,
+  "modellversion": "GMB 2022",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/189398",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Hameln-Hannover 2023, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 12–20"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03241",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ggg",
+  "formel": {
+   "form": "stufen_kategorial",
+   "liefert": "prozent",
+   "stufen": [
+    {
+     "kategorie": "Landeshauptstadt Hannover, gesamtes Stadtgebiet",
+     "wert": 3.0,
+     "minimum": 0.3,
+     "maximum": 7.4
+    },
+    {
+     "kategorie": "übrige Region Hannover, innerstädtische Geschäftslagen",
+     "wert": 4.4,
+     "minimum": 0.6,
+     "maximum": 7.5
+    }
+   ],
+   "kein_treffer": "kein Wert",
+   "rundung_stellen": 1,
+   "wert_art": "mittelwert",
+   "wert_art_hinweis": "Statistikart nicht abgedruckt; Vorbehalt geführt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Für Wohn-/Geschäftshäuser führt das Dokument 70 Jahre Gesamtnutzungsdauer — dieselbe wie beim Wohnen, anders als bei Geschäftshäusern (60) und Kauf-/Warenhäusern (50).",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Im Kapitel Liegenschaftszinssätze als Gesamtnutzungsdauer 70 Jahre geführt (Wohnnutzung).",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach Anlage 2 ImmoWertV",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten (Verwaltung, Instandhaltung, Mietausfallwagnis) nach II. BV gemäß Anlage 3 ImmoWertV",
+   "marktmiete": "nachhaltig gezahlter oder erzielbarer Jahresrohertrag (Nettokaltmiete)",
+   "bodenwert": "Bodenrichtwert, erschließungsbeitragsfrei"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "liegenschaftszinssatz_prozent": [
+     0.3,
+     7.5
+    ]
+   },
+   "hinweis": "Die zweite Stufe gilt ausdrücklich nur für innerstädtische Geschäftslagen der übrigen Region — nicht flächendeckend für die drei Landkreise (die haben ohnehin ihren eigenen ags-Satz und dort leitet der Ausschuss für diese Objektart keinen Zinssatz ab)."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 17–20",
+    "pruefprotokoll": "MONOTONIE ÜBER DIE STUFEN: 3,0 (Landeshauptstadt) < 4,4 (übrige Region) — steigend mit abnehmender Zentralität, richtungsgleich mit dem Bild bei den Ein-/Zweifamilienhäusern (Region Hannover 1,2 % unter den Landkreisen 1,4 %). LAGEPRÜFUNG: beide Stufenwerte liegen in ihrer Spanne. GEGENPROBE GEGEN DEN HANDEL-SATZ: Wohn-/Geschäftshäuser 3,0 liegen zwischen der Ib-/II-Lage (2,5) und dem Bürosatz der Peripherie (3,6) — eine plausible Einordnung, die vorher über zwei getrennte Modelle nicht sichtbar war."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Drei Lücken, alle benannt: (1) Für KEINE Auswertung ist eine STANDARDABWEICHUNG abgedruckt — streuung bleibt überall null, NICHT 0. (2) Beim Wohnungseigentum liegen vier von sechs Korrekturgrößen nur als Diagramm vor; das dort abgedruckte Anwendungsbeispiel konnte deshalb nicht nachgerechnet werden. (3) Für Mehrfamilienhäuser druckt der Ausschuss NUR Rohertragsfaktoren, keinen Liegenschaftszinssatz — dafür entsteht bewusst KEIN Modell. Die Rohertragsfaktoren stehen unter 'rohertragsfaktoren_ohne_zinssatz' als Dokumentation, nicht als Datensatz.",
+  "objektart": "ggg",
+  "objektart_bez": "Wohn- und Geschäftshaus (gemischt genutzt)",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2022-07-01",
+  "berichtsjahr": 2022,
+  "modellversion": "GMB 2022",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/189398",
+  "quelle_parser": "v1094-WNI",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Hameln-Hannover 2023, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2023“, Kapitel Liegenschaftszinssätze, S. 12–20"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06611000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Immobilienwerte für den Bereich der documenta Stadt Kassel",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der documenta Stadt Kassel",
+  "kennzahl": "bodenpreisindex",
+  "zweig": "baugrundstueck",
+  "formel": {
+   "form": "matrix_kategorial",
+   "liefert": "prozent",
+   "liefert_einheit": "Indexpunkte, Basisjahr 2010 = 100",
+   "liefert_hinweis": "Der Wert ist ein INDEXSTAND, kein Faktor. 193 bedeutet 193 Prozent des Bodenpreisniveaus von 2010. Wer ihn als Faktor 193 statt 1,93 einsetzt, verrechnet sich um den Faktor 100. Die Umrechnung in einen Anpassungsfaktor zwischen zwei Jahren lautet: faktor = index(zieljahr) / index(ausgangsjahr) — NICHT index/100, außer das Ausgangsjahr ist das Basisjahr 2010.",
+   "rundung_stellen": 0,
+   "interpolation": "verboten",
+   "interpolation_hinweis": "Abgedruckt sind ausschließlich die geraden Jahre 2010 bis 2024. Die ungeraden Jahre hat der Ausschuss nicht ausgewiesen; zwischen den Stützstellen wird deshalb NICHT interpoliert. Auch über 2024 hinaus wird nicht fortgeschrieben — der Stand ist der 1. Januar 2024.",
+   "achse_x": [
+    2010,
+    2012,
+    2014,
+    2016,
+    2018,
+    2020,
+    2022,
+    2024
+   ],
+   "tabelle_hinweis": "Die Reihenfolge der acht Werte entspricht der Reihenfolge von achse_x.werte: 2010, 2012, 2014, 2016, 2018, 2020, 2022, 2024.",
+   "tabelle_luecken": {
+    "preiskategorie_4": "VOLLSTÄNDIG AUF NULL GESETZT, obwohl die Zeile im Bericht existiert und Werte trägt. Grund: drei Leseläufe haben drei verschiedene Spaltenzuordnungen geliefert (siehe beleg.negativtest). Die Zeile bleibt im Modell sichtbar, damit ihr Fehlen auffällt, statt dass sie stillschweigend verschwindet. Ein Auswerter, der diese Kategorie anfragt, muss 'kein Wert hinterlegt' liefern — nicht den Wert einer Nachbarkategorie."
+   },
+   "achse_x_feld": "jahr",
+   "achse_x_bez": "jahr",
+   "kategorien": [
+    "preiskategorie_4",
+    "preiskategorie_3",
+    "preiskategorie_2",
+    "preiskategorie_1",
+    "gewerbliche_bauflaechen",
+    "gemischte_bauflaechen",
+    "kerngebietsflaechen"
+   ],
+   "achse_k_bez": "klassifizierung_baunutzung",
+   "achse_k_feld": "klassifizierung_baunutzung",
+   "zellen": {
+    "2010": [
+     null,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "2012": [
+     null,
+     101,
+     101,
+     101,
+     101,
+     101,
+     99
+    ],
+    "2014": [
+     null,
+     116,
+     108,
+     113,
+     101,
+     109,
+     103
+    ],
+    "2016": [
+     null,
+     137,
+     121,
+     136,
+     106,
+     121,
+     105
+    ],
+    "2018": [
+     null,
+     157,
+     135,
+     155,
+     113,
+     138,
+     108
+    ],
+    "2020": [
+     null,
+     168,
+     148,
+     171,
+     119,
+     149,
+     113
+    ],
+    "2022": [
+     null,
+     180,
+     156,
+     177,
+     130,
+     156,
+     119
+    ],
+    "2024": [
+     null,
+     193,
+     165,
+     183,
+     142,
+     162,
+     125
+    ]
+   },
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV, geführt aus dem Kapitel selbst.",
+   "basisjahr": 2010,
+   "basiswert": 100,
+   "basiswert_hinweis": "Basisjahr 2010 = 100. ACHTUNG BEI DER VERMISCHUNG VON INDEXBASEN: Das Projekt führt bereits zwei Baupreisindexbasen (ImmoWertV gegen Oktober 2001 = 77,1, NRW-Modell = 87,5) und den hessischen Baupreisindex mit Basisjahr 2021 aus dem ZGGH-Leitfaden II. Dieser Bodenpreisindex hat mit allen dreien nichts zu tun: er indiziert BODEN, nicht BAUKOSTEN, und seine Basis ist 2010. Vier verschiedene Indexbasen für drei verschiedene Zwecke — sie dürfen unter keinen Umständen gegeneinander gerechnet werden.",
+   "stichtag": "2024-01-01",
+   "ableitung": "aus der Veränderung der Bodenrichtwerte je Klassifizierung seit dem Bezugsjahr 2010",
+   "ableitung_wortlaut": "„Zur Verdeutlichung dieser Einflüsse sind in der nachstehenden Grafik die Veränderungen der Bodenrichtwerte seit dem Bezugsjahr 2010 bis 2024 für die sechs, ab 2022 für sieben Klassifizierungen abgebildet.\"",
+   "rechtsgrundlage": "BauGB, Immobilienwertermittlungsverordnung (ImmoWertV) und Ausführungsverordnung zum Baugesetzbuch (BauGB-AV)",
+   "nicht_einschlaegig": "NHK-Ausgabe, Gesamtnutzungsdauer, Alterswertminderung, Bewirtschaftungskosten, Marktmiete und Regionalfaktor sind für eine Bodenpreisindexreihe nicht einschlägig. Ihr Fehlen ist keine Lücke."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "jahr_bereich": [
+    2010,
+    2024
+   ],
+   "hinweis": "Gilt für das Stadtgebiet Kassel und für die Jahre 2010 bis 2024 an den abgedruckten Stützstellen. Eine Fortschreibung über 2024 hinaus oder eine Interpolation auf ungerade Jahre ist vom Ausschuss nicht gedeckt.",
+   "kategorien_ohne_wert": [
+    "preiskategorie_4"
+   ]
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_tabelle",
+    "fundstelle": "S. 24, Tabelle 7 nebst Abbildung 11",
+    "soll_zellen": 56,
+    "wortlaut": "Das Kapitel druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle treten die Basiswertprobe, die Monotonieprüfung über die Zeitachse und die Zählprüfung.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. DREI Leseläufe über dieselbe Seite. Läufe 1 und 3 sind für alle sechs übernommenen Zeilen ZEICHENGLEICH über alle acht Jahresspalten — 48 Werte, kein einziger Unterschied. Lauf 2 war gezielt auf die strittige siebte Zeile gerichtet. ZÄHLPRÜFUNG: 7 Zeilen × 8 Jahresspalten = 56 Zellen erwartet; 48 gelesen und übernommen, 8 verworfen. BASISWERTPROBE — die vom Dokument geschenkte Prüfung: die Überschrift sagt „Basisjahr 2010 = 100\", also MUSS jede Zeile in der Spalte 2010 den Wert 100 tragen. Nachgeprüft: alle sechs übernommenen Zeilen tragen dort exakt 100. Diese Probe verknüpft Tabellenkopf und Tabelleninhalt unabhängig voneinander und geht auf. MONOTONIE ÜBER DIE ZEIT: fünf der sechs Zeilen steigen durchgehend monoton (Preiskategorie 3: 100→101→116→137→157→168→180→193; Preiskategorie 2: 100→101→108→121→135→148→156→165; Preiskategorie 1: 100→101→113→136→155→171→177→183; Gewerbliche: 100→101→101→106→113→119→130→142, mit einer Seitwärtsbewegung 101/101 zwischen 2012 und 2014; Gemischte: 100→101→109→121→138→149→156→162). PLAUSIBILITÄTSPROBE ÜBER DIE KATEGORIEN: die gute Wohnlage (Preiskategorie 3) steigt mit 193 am stärksten, die Kerngebietsflächen mit 125 am schwächsten — Wohnen ist im Zeitraum 2010–2024 stärker gestiegen als Gewerbe und Kerngebiet, was dem bundesweiten Bild entspricht und der Reihung nicht widerspricht.",
+    "negativtest": "ZWEI Prüfungen haben angeschlagen. (a) DIE SPALTENZUORDNUNG DER ZEILE 'PREISKATEGORIE 4'. Drei Leseläufe lieferten drei verschiedene Zuordnungen desselben Zahlentripels: Lauf 1 setzte 100/179/191 auf 2010/2012/2014, Lauf 2 meldete 2022=100 und 2024=179 und kannte die 191 gar nicht, Lauf 3 setzte 2010=100, 2020=179, 2024=191. Kein Lauf stimmt mit einem anderen überein. Der Fließtext („für die sechs, ab 2022 für sieben Klassifizierungen\") stützt Lauf 2, widerspricht aber Lauf 1 und 3, die einen Wert im Jahr 2010 sehen. Genau dieselbe Fehlerklasse wie bei den Sachwertfaktoren Wiesbadens und bei den Zeitreihen des Märkischen Kreises: eine Zeile mit LÜCKEN am Zeilenanfang wird nach Reihenfolge statt nach Zeichenposition zugeordnet. Die Zeile ist deshalb vollständig auf null gesetzt. Bemerkenswert: die Monotonieprüfung allein hätte Lauf 3 (100 → 179 → 191) klaglos durchgewinkt — erst der Vergleich der drei Läufe und die Gegenprobe am Fließtext haben den Widerspruch sichtbar gemacht. Die dumme Prüfung fängt hier mehr als die kluge. (b) EINE SEITWÄRTSBEWEGUNG bei den gewerblichen Bauflächen (2012 und 2014 beide 101) und EIN RÜCKGANG bei den Kerngebietsflächen (2010 = 100 auf 2012 = 99). Beide sind KEINE Lesefehler, sondern echtes Marktverhalten: gewerbliche Bodenpreise stagnierten in Kassel Anfang der 2010er Jahre, und ein Rückgang um einen Indexpunkt im Kerngebiet ist ein realer, kleiner Rücksetzer. Sie sind bewusst NICHT geglättet worden. Eine Indexreihe muss nicht streng monoton sein — die Erwartung 'Immobilienpreise steigen immer' ist eine Annahme, kein Prüfmaßstab."
+   }
+  ],
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Von den SIEBEN Zeilen der Tabelle sind nur SECHS übernommen. Die Zeile „Preiskategorie 4\" ist in drei Leseläufen mit drei verschiedenen Spaltenzuordnungen zurückgekommen und wurde deshalb NICHT übernommen — Einzelheiten in beleg.negativtest und in _fehlend.md. Sie steht als eigener Eintrag mit werte auf null im Modell, damit sichtbar bleibt, dass sie existiert und fehlt, statt stillschweigend zu verschwinden.",
+  "objektart": "baugrundstueck",
+  "objektart_bez": "unbebautes Baugrundstück",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2024-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/Immobilienmarktbericht-Stadt-Kassel-2025.pdf",
+  "quelle_parser": "v1094-WHE",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der documenta Stadt Kassel, Immobilienmarktbericht 2025 (Berichtsjahr 2024). Daten unverändert übernommen; eine Zeile der Tabelle wurde nicht übernommen.",
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Immobilienmarktbericht 2025\", S. 24, Tabelle 7 „Bodenpreisindex – Basisjahr 2010 = 100 Stand: 1. Januar 2024\" nebst Abbildung 11"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12073",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "liefert": "faktor",
+   "rundung_stellen": 2,
+   "rundung_hinweis": "Der Bericht druckt zweistellig ab. Zwischenwerte der Regressionsformel sind auf zwei Stellen zu runden; dreistellige Werte existieren im Dokument nicht.",
+   "regression_dokumentation": {
+    "hinweis": "Der Bericht druckt je Klasse die Regressionsformel MIT ab. Sie ist hier als Prüfmaßstab und als Rechenweg für Zwischenwerte hinterlegt, nicht als zweites Modell. x = vorläufiger Sachwert in EUR, y = Sachwertfaktor.",
+    "bis 30 EUR/qm": {
+     "wortlaut": "y = 6,9441x^-0,171",
+     "a": 6.9441,
+     "b": -0.171,
+     "bestimmtheitsmass_r2": 0.2244
+    },
+    "groesser 30 EUR/qm": {
+     "wortlaut": "y = 6,7386x^-0,159",
+     "a": 6.7386,
+     "b": -0.159,
+     "bestimmtheitsmass_r2": 0.229
+    },
+    "bestimmtheitsmass_bewertung": "R² von 0,22 bzw. 0,23 ist NIEDRIG. Der Bericht druckt es selbst ab; der Vorbehalt gehört in den Bericht, nicht in den Papierkorb. Er ist der eigentliche Grund, die Streubreite auszuweisen — eine Standardabweichung gibt es ja nicht."
+   },
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorlaeufiger_sachwert",
+   "kategorien": [
+    "bis 30 EUR/qm",
+    "groesser 30 EUR/qm"
+   ],
+   "achse_k_bez": "bodenrichtwertklasse",
+   "achse_k_feld": "bodenrichtwertklasse",
+   "zellen": {
+    "50000": [
+     1.09,
+     null
+    ],
+    "75000": [
+     1.02,
+     null
+    ],
+    "100000": [
+     0.97,
+     1.08
+    ],
+    "125000": [
+     0.93,
+     1.04
+    ],
+    "150000": [
+     0.9,
+     1.01
+    ],
+    "175000": [
+     0.88,
+     0.99
+    ],
+    "200000": [
+     0.86,
+     0.97
+    ],
+    "225000": [
+     0.84,
+     0.95
+    ],
+    "250000": [
+     0.83,
+     0.93
+    ],
+    "275000": [
+     0.82,
+     0.92
+    ],
+    "300000": [
+     0.8,
+     0.91
+    ],
+    "325000": [
+     null,
+     0.9
+    ],
+    "350000": [
+     null,
+     0.89
+    ]
+   },
+   "achse_x": [
+    50000.0,
+    75000.0,
+    100000.0,
+    125000.0,
+    150000.0,
+    175000.0,
+    200000.0,
+    225000.0,
+    250000.0,
+    275000.0,
+    300000.0,
+    325000.0,
+    350000.0
+   ],
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (aus Paarlisten je Kategorie gebaut)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gelesen": true,
+   "gelesen_wo": "AM BERICHT SELBST GELESEN, S. 48/49 (Jahrgang 2019) bzw. S. 49 (Jahrgang 2018). Der Bericht beruft sich AUSDRÜCKLICH auf eine Vorschrift und druckt seine Modellansätze ab. Es wird NICHTS aus dem Landesmodell unterstellt.",
+   "berufung_wortlaut": "Die nachfolgend veröffentlichten Sachwertfaktoren wurden nach den Bestimmungen der Sachwertrichtlinie – SW-RL vom 05.09.2012 in Verbindung mit der Brandenburgischen Sachwertrichtlinie - RL SW-BB vom 31.03.2014 ermittelt.",
+   "berufung_fundstelle": "GMB_UM_2019.pdf S. 48 und GMB_UM_2018.pdf S. 49 — in BEIDEN Jahrgängen wortgleich, jeweils gezielt erfragt und wörtlich zitiert.",
+   "nhk_ausgabe": "Normalherstellungskosten 2010 (NHK 2010) - Anl. 1 der SW-RL",
+   "gesamtnutzungsdauer": "nach Anlage 3 der SW-RL",
+   "baupreisindex": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamtes 2010 - Preisindex für den Neubau von Wohngebäuden",
+   "baupreisindex_basis": "2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschaler Ansatz in Höhe von 4 % des Gebäudesachwertes",
+   "baunebenkosten": "keine, in den NHK 2010 enthalten",
+   "garagen": "pauschalierter Ansatz von 6.000 EUR bis 18.000 EUR",
+   "besondere_bauteile": "im Bericht als Aufzählung abgedruckt (Dachgauben, Balkone u. a.)",
+   "regionalfaktor": null,
+   "regionalfaktor_hinweis": "KEINE ANGABE im Bericht — und das ist kein Versehen. Die RL SW-BB von 2014 kennt keinen Regionalfaktor; erst die VV EW-SW von 2023 schreibt ausdrücklich „Regionalfaktor 1\". Der Aufsatz Vermessung Brandenburg 1/2016 erklärt den Grund: die Sachwertrichtlinie des Bundes von 2012 hat die regionalen Korrekturfaktoren aufgelöst, Brandenburg bildet regionale Unterschiede über lageabhängige Sachwertfaktoren ab — hier über die zwei Bodenrichtwertklassen. Der Faktor 1 der Nachfolgevorschrift bestätigt das im Nachhinein. Es wird trotzdem KEIN Wert eingetragen, wo der Bericht keinen nennt.",
+   "querpruefung": "BESTANDEN: die sieben abgedruckten Ansätze stimmen Position für Position mit der RL SW-BB vom 01.04.2014 überein, die vollständig als HTML auf bravors.brandenburg.de gelesen wurde (NHK 2010, BGF, GND nach Anlage 3 SW-RL, lineare Alterswertminderung, Baupreisindex Neubau Wohngebäude Basis 2010, Außenanlagen 4 %) — und ebenso mit der VV EW-SW von 2023 und dem Aufsatz von 2016, einschließlich der Garagenpauschalen 6.000/12.000/18.000 EUR. VIER Dokumente aus neun Jahren, gleiche Zahlen."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "extrapolation_hinweis": "Wo die Tabelle endet, endet die Rechnung. Unter 50.000 EUR (Klasse bis 30) bzw. 100.000 EUR (Klasse größer 30) und über 300.000 bzw. 350.000 EUR wird AUSGEWIESEN, nicht gerechnet — auch nicht über die Regressionsformel, die dort rechnerisch weiterliefe.",
+   "hinweis": "Gilt ausschließlich für den Landkreis Uckermark. Eine Übertragung auf Barnim oder Oberhavel ist ausgeschlossen — eigene Ausschüsse, eigene Berichte.",
+   "spannen": {
+    "bis 30 EUR/qm": {
+     "vorlaeufiger_sachwert_eur": [
+      50000,
+      300000
+     ]
+    },
+    "groesser 30 EUR/qm": {
+     "vorlaeufiger_sachwert_eur": [
+      100000,
+      350000
+     ]
+    }
+   },
+   "stichprobe": {
+    "bis 30 EUR/qm": {
+     "kauffaelle": 56,
+     "auswertezeitraum": "2017, 2018 und 2019",
+     "kaufpreis_eur_min": 43000,
+     "kaufpreis_eur_max": 257000,
+     "kaufpreis_eur_mittel": 129000,
+     "bodenwert_eur_qm_min": 3,
+     "bodenwert_eur_qm_max": 30,
+     "bodenwert_eur_qm_mittel": 13,
+     "grundstuecksflaeche_qm_min": 90,
+     "grundstuecksflaeche_qm_max": 2700,
+     "grundstuecksflaeche_qm_mittel": 1300,
+     "baujahr_min": 1735,
+     "baujahr_max": 2012,
+     "baujahr_mittel": 1962,
+     "restnutzungsdauer_jahre_min": 9,
+     "restnutzungsdauer_jahre_max": 67,
+     "restnutzungsdauer_jahre_mittel": 32
+    },
+    "groesser 30 EUR/qm": {
+     "kauffaelle": 21,
+     "auswertezeitraum": "2017, 2018 und 2019",
+     "kaufpreis_eur_min": 90000,
+     "kaufpreis_eur_max": 375000,
+     "kaufpreis_eur_mittel": 197000,
+     "bodenwert_eur_qm_min": 35,
+     "bodenwert_eur_qm_max": 55,
+     "bodenwert_eur_qm_mittel": 47,
+     "grundstuecksflaeche_qm_min": 400,
+     "grundstuecksflaeche_qm_max": 2800,
+     "grundstuecksflaeche_qm_mittel": 900,
+     "baujahr_min": 1936,
+     "baujahr_max": 2013,
+     "baujahr_mittel": 1986,
+     "restnutzungsdauer_jahre_min": 15,
+     "restnutzungsdauer_jahre_max": 75,
+     "restnutzungsdauer_jahre_mittel": 42
+    }
+   },
+   "luecke_bodenwert_30_bis_35": "AUFFÄLLIGKEIT, ehrlich benannt: die Stichprobe der Klasse „bis 30\" endet bei 30 EUR/qm, die der Klasse „größer 30\" beginnt bei 35 EUR/qm. Zwischen 30 und 35 EUR/qm liegt in dieser Auswertung KEIN Kauffall. Die Klassengrenze der Überschrift (30) bleibt maßgebend; ein Objekt mit 32 EUR/qm fällt nach der Überschrift in die obere Klasse, liegt aber außerhalb der dortigen Stichprobe. Das ist auszuweisen, nicht wegzurechnen."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_regressionsformel_und_wertetabelle",
+    "art_hinweis": "Ein durchgerechnetes Anwendungsbeispiel im Sinne eines vollständigen Sachwerts ist NICHT abgedruckt. An seine Stelle tritt etwas Besseres: der Bericht druckt Formel UND Wertetabelle ab. Die Formel ist damit der Sollwert der Tabelle, und die Nachrechnung ist eine echte Dokumentprüfung, kein selbst gerechneter Sollwert.",
+    "fundstelle": "GMB_UM_2019.pdf, S. 50–52",
+    "soll_kennzahlen": 22,
+    "pruefprotokoll": "ZWEI Leseläufe über dieselbe Adresse mit verschieden gestellten Fragen (Lauf 1: Vier-Block-Struktur mit Lizenz und Reichweite; Lauf 2: ausschließlich S. 48–52, Zelle für Zelle). Beide liefern dieselben Stützstellen. EINSCHRÄNKUNG, ehrlich benannt: beide Läufe lesen dieselbe zwischengespeicherte Textextraktion; das sind zwei unabhängige LESUNGEN, keine zwei unabhängigen ABRUFE.",
+    "zaehlpruefung": "BESTANDEN: 11 Stützstellen in der Klasse bis 30 EUR/qm (50.000 bis 300.000 in Schritten von 25.000 — Sollzahl (300000-50000)/25000+1 = 11) und 11 in der Klasse größer 30 EUR/qm (100.000 bis 350.000, (350000-100000)/25000+1 = 11). Keine Lücke, keine geschätzte Zelle. Die erwartete Zeilenzahl folgt aus der Schrittweite, sie wurde NICHT aus der Anzahl gelesener Zeilen abgeleitet.",
+    "formelprobe": "BESTANDEN, 22 von 22, maschinell nachgerechnet. Klasse bis 30 EUR/qm mit y = 6,9441·x^(-0,171): 50.000 -> 1,0917 -> 1,09 ✔ · 150.000 -> 0,9047 -> 0,90 ✔ · 300.000 -> 0,8036 -> 0,80 ✔ (alle elf getroffen). Klasse größer 30 EUR/qm mit y = 6,7386·x^(-0,159): 100.000 -> 1,0804 -> 1,08 ✔ · 200.000 -> 0,9676 -> 0,97 ✔ · 350.000 -> 0,8852 -> 0,89 ✔ (alle elf getroffen). Jede abgedruckte Tabellenzelle ist auf zwei Stellen gerundet exakt der Formelwert. Das ist der stärkste Beleg, den dieser Lauf hat: wären Formel oder Tabelle falsch gelesen, träfen sie sich nicht in 22 von 22 Punkten.",
+    "monotonie": "BESTANDEN über die GANZE Tabelle, beide Klassen streng fallend (1,09 -> 0,80 und 1,08 -> 0,89). Fachlich zwingend: der negative Exponent der abgedruckten Regression verlangt es. Geprüft wurde nicht stichprobenartig, sondern über alle 22 Stützstellen.",
+    "wertebereich": "BESTANDEN: alle Werte liegen zwischen 0,80 und 1,09, also in der Größenordnung 1,0 — ein Sachwertfaktor ist dimensionslos. Damit ist zugleich die Verwechslungsprobe bestanden: Vergleichsfaktoren stünden in EUR/m², Erbbaurechtskoeffizienten in Prozent.",
+    "klassenprobe": "BESTANDEN: bei gleichem vorläufigem Sachwert liegt die Klasse mit dem HÖHEREN Bodenrichtwert durchweg über der mit dem niedrigeren (bei 150.000 EUR: 1,01 gegen 0,90; bei 300.000 EUR: 0,91 gegen 0,80). Die Richtung ist fachlich zwingend und wurde nicht angenommen, sondern an allen sieben gemeinsamen Stützstellen nachgeprüft."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Zwei Angaben fehlen. (1) Die STANDARDABWEICHUNG ist in keinem der fünf Modelle abgedruckt; der Ausschuss weist stattdessen Stichprobenspannen und im Jahrgang 2019 das Bestimmtheitsmaß R² aus. streuung bleibt NULL, NICHT 0 — bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. (2) Der MODELLVERMERK des Berichts ist nicht gelesen — siehe freigabe_hinweis.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 77,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2019,
+  "modellversion": "GMB 2019",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM_2019.pdf",
+  "quelle_parser": "v1094-WBB",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2019, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktbericht 2019\", Kapitel 8.2 Sachwertfaktoren, S. 50–52; „Grundstücksmarktbericht 2018\", S. 51–53 und 56–57"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12073",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "liefert": "faktor",
+   "rundung_stellen": 2,
+   "regression_dokumentation": {
+    "hinweis": "Für den Jahrgang 2018 ist im gelesenen Abschnitt KEINE Regressionsformel und KEIN Bestimmtheitsmaß abgedruckt worden. Es wurde deshalb auch keine gefittet — eine selbst gerechnete Formel wäre kein Dokumentinhalt. Gerechnet wird über die Tabelle.",
+    "vorhanden": false
+   },
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorlaeufiger_sachwert",
+   "kategorien": [
+    "bis 30 EUR/qm",
+    "groesser 30 EUR/qm"
+   ],
+   "achse_k_bez": "bodenrichtwertklasse",
+   "achse_k_feld": "bodenrichtwertklasse",
+   "zellen": {
+    "50000": [
+     1.03,
+     null
+    ],
+    "75000": [
+     0.96,
+     null
+    ],
+    "100000": [
+     0.92,
+     0.99
+    ],
+    "125000": [
+     0.88,
+     0.95
+    ],
+    "150000": [
+     0.86,
+     0.93
+    ],
+    "175000": [
+     0.84,
+     0.91
+    ],
+    "200000": [
+     0.82,
+     0.89
+    ],
+    "225000": [
+     0.81,
+     0.87
+    ],
+    "250000": [
+     0.79,
+     0.86
+    ],
+    "275000": [
+     0.78,
+     0.85
+    ],
+    "300000": [
+     0.77,
+     0.83
+    ],
+    "325000": [
+     null,
+     0.82
+    ],
+    "350000": [
+     null,
+     0.82
+    ]
+   },
+   "achse_x": [
+    50000.0,
+    75000.0,
+    100000.0,
+    125000.0,
+    150000.0,
+    175000.0,
+    200000.0,
+    225000.0,
+    250000.0,
+    275000.0,
+    300000.0,
+    325000.0,
+    350000.0
+   ],
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (aus Paarlisten je Kategorie gebaut)"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gelesen": true,
+   "gelesen_wo": "AM BERICHT SELBST GELESEN, S. 48/49 (Jahrgang 2019) bzw. S. 49 (Jahrgang 2018). Der Bericht beruft sich AUSDRÜCKLICH auf eine Vorschrift und druckt seine Modellansätze ab. Es wird NICHTS aus dem Landesmodell unterstellt.",
+   "berufung_wortlaut": "Die nachfolgend veröffentlichten Sachwertfaktoren wurden nach den Bestimmungen der Sachwertrichtlinie – SW-RL vom 05.09.2012 in Verbindung mit der Brandenburgischen Sachwertrichtlinie - RL SW-BB vom 31.03.2014 ermittelt.",
+   "berufung_fundstelle": "GMB_UM_2019.pdf S. 48 und GMB_UM_2018.pdf S. 49 — in BEIDEN Jahrgängen wortgleich, jeweils gezielt erfragt und wörtlich zitiert.",
+   "nhk_ausgabe": "Normalherstellungskosten 2010 (NHK 2010) - Anl. 1 der SW-RL",
+   "gesamtnutzungsdauer": "nach Anlage 3 der SW-RL",
+   "baupreisindex": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamtes 2010 - Preisindex für den Neubau von Wohngebäuden",
+   "baupreisindex_basis": "2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschaler Ansatz in Höhe von 4 % des Gebäudesachwertes",
+   "baunebenkosten": "keine, in den NHK 2010 enthalten",
+   "garagen": "pauschalierter Ansatz von 6.000 EUR bis 18.000 EUR",
+   "besondere_bauteile": "im Bericht als Aufzählung abgedruckt (Dachgauben, Balkone u. a.)",
+   "regionalfaktor": null,
+   "regionalfaktor_hinweis": "KEINE ANGABE im Bericht — und das ist kein Versehen. Die RL SW-BB von 2014 kennt keinen Regionalfaktor; erst die VV EW-SW von 2023 schreibt ausdrücklich „Regionalfaktor 1\". Der Aufsatz Vermessung Brandenburg 1/2016 erklärt den Grund: die Sachwertrichtlinie des Bundes von 2012 hat die regionalen Korrekturfaktoren aufgelöst, Brandenburg bildet regionale Unterschiede über lageabhängige Sachwertfaktoren ab — hier über die zwei Bodenrichtwertklassen. Der Faktor 1 der Nachfolgevorschrift bestätigt das im Nachhinein. Es wird trotzdem KEIN Wert eingetragen, wo der Bericht keinen nennt.",
+   "querpruefung": "BESTANDEN: die sieben abgedruckten Ansätze stimmen Position für Position mit der RL SW-BB vom 01.04.2014 überein, die vollständig als HTML auf bravors.brandenburg.de gelesen wurde (NHK 2010, BGF, GND nach Anlage 3 SW-RL, lineare Alterswertminderung, Baupreisindex Neubau Wohngebäude Basis 2010, Außenanlagen 4 %) — und ebenso mit der VV EW-SW von 2023 und dem Aufsatz von 2016, einschließlich der Garagenpauschalen 6.000/12.000/18.000 EUR. VIER Dokumente aus neun Jahren, gleiche Zahlen."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "bis 30 EUR/qm": {
+     "vorlaeufiger_sachwert_eur": [
+      50000,
+      300000
+     ]
+    },
+    "groesser 30 EUR/qm": {
+     "vorlaeufiger_sachwert_eur": [
+      100000,
+      350000
+     ]
+    }
+   },
+   "stichprobe": {
+    "bis 30 EUR/qm": {
+     "kauffaelle": 58,
+     "auswertezeitraum": "2016, 2017 und 2018",
+     "kaufpreis_eur_min": 38000,
+     "kaufpreis_eur_max": 257000,
+     "kaufpreis_eur_mittel": 111000,
+     "bodenwert_eur_qm_min": 3,
+     "bodenwert_eur_qm_max": 26,
+     "bodenwert_eur_qm_mittel": 11,
+     "grundstuecksflaeche_qm_min": 90,
+     "grundstuecksflaeche_qm_max": 4100,
+     "grundstuecksflaeche_qm_mittel": 1400,
+     "baujahr_min": 1890,
+     "baujahr_max": 2012,
+     "baujahr_mittel": 1964,
+     "restnutzungsdauer_jahre_min": 8,
+     "restnutzungsdauer_jahre_max": 67,
+     "restnutzungsdauer_jahre_mittel": 29
+    },
+    "groesser 30 EUR/qm": {
+     "kauffaelle": 21,
+     "auswertezeitraum": "2016, 2017 und 2018",
+     "kaufpreis_eur_min": 90000,
+     "kaufpreis_eur_max": 328000,
+     "kaufpreis_eur_mittel": 182000,
+     "bodenwert_eur_qm_min": 31,
+     "bodenwert_eur_qm_max": 55,
+     "bodenwert_eur_qm_mittel": 46,
+     "grundstuecksflaeche_qm_min": 400,
+     "grundstuecksflaeche_qm_max": 2000,
+     "grundstuecksflaeche_qm_mittel": 900,
+     "baujahr_min": 1925,
+     "baujahr_max": 2009,
+     "baujahr_mittel": 1985,
+     "restnutzungsdauer_jahre_min": 18,
+     "restnutzungsdauer_jahre_max": 83,
+     "restnutzungsdauer_jahre_mittel": 46
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_wertetabelle_mit_stichprobenstatistik",
+    "fundstelle": "GMB_UM_2018.pdf, S. 51–53",
+    "soll_kennzahlen": 22,
+    "pruefprotokoll": "ZWEI Leseläufe (Lauf 1: Vier-Block-Struktur; Lauf 2: ausschließlich S. 50–59, Zelle für Zelle). Beide zeichengleich in allen 22 Stützstellen und in den Stichprobenangaben.",
+    "zaehlpruefung": "BESTANDEN: 11 und 11 Stützstellen, Schrittweite 25.000 EUR, keine Lücke.",
+    "monotonie": "BESTANDEN, nicht steigend über beide Klassen. HINWEIS: in der Klasse größer 30 EUR/qm steht bei 325.000 und 350.000 EUR zweimal 0,82 — die Reihe ist dort also nicht STRENG fallend. Das ist kein Lesefehler, sondern die Folge der Rundung auf zwei Stellen am flachen Ende einer fallenden Kurve. Es wurde NICHT zu 0,81 „korrigiert\".",
+    "jahresvergleich_2019": "BESTANDEN, maschinell nachgerechnet — siehe gesamtpruefung.jahresvergleich."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Zwei Angaben fehlen. (1) Die STANDARDABWEICHUNG ist in keinem der fünf Modelle abgedruckt; der Ausschuss weist stattdessen Stichprobenspannen und im Jahrgang 2019 das Bestimmtheitsmaß R² aus. streuung bleibt NULL, NICHT 0 — bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. (2) Der MODELLVERMERK des Berichts ist nicht gelesen — siehe freigabe_hinweis.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 79,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2018,
+  "modellversion": "GMB 2019",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM_2019.pdf",
+  "quelle_parser": "v1094-WBB",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2019, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktbericht 2019\", Kapitel 8.2 Sachwertfaktoren, S. 50–52; „Grundstücksmarktbericht 2018\", S. 51–53 und 56–57"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12073",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "liefert": "faktor",
+   "rundung_stellen": 2,
+   "hinweis": "EINE Achse — für Doppelhaushälften und Reihenhäuser teilt der Ausschuss NICHT nach Bodenrichtwertklassen. Deshalb 'stufen_1d' und nicht 'matrix_kategorial'. Es wurde nicht ersatzweise die Klasseneinteilung der Ein- und Zweifamilienhäuser übernommen.",
+   "stufen": {
+    "50000": 0.99,
+    "75000": 0.96,
+    "100000": 0.94,
+    "125000": 0.92,
+    "150000": 0.91,
+    "175000": 0.9,
+    "200000": 0.89,
+    "210000": 0.89
+   },
+   "achse_feld": "sachwert",
+   "achse_bez": "vorlaeufiger_sachwert"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gelesen": true,
+   "gelesen_wo": "AM BERICHT SELBST GELESEN, S. 48/49 (Jahrgang 2019) bzw. S. 49 (Jahrgang 2018). Der Bericht beruft sich AUSDRÜCKLICH auf eine Vorschrift und druckt seine Modellansätze ab. Es wird NICHTS aus dem Landesmodell unterstellt.",
+   "berufung_wortlaut": "Die nachfolgend veröffentlichten Sachwertfaktoren wurden nach den Bestimmungen der Sachwertrichtlinie – SW-RL vom 05.09.2012 in Verbindung mit der Brandenburgischen Sachwertrichtlinie - RL SW-BB vom 31.03.2014 ermittelt.",
+   "berufung_fundstelle": "GMB_UM_2019.pdf S. 48 und GMB_UM_2018.pdf S. 49 — in BEIDEN Jahrgängen wortgleich, jeweils gezielt erfragt und wörtlich zitiert.",
+   "nhk_ausgabe": "Normalherstellungskosten 2010 (NHK 2010) - Anl. 1 der SW-RL",
+   "gesamtnutzungsdauer": "nach Anlage 3 der SW-RL",
+   "baupreisindex": "Indexreihen für die Bauwirtschaft des Statistischen Bundesamtes 2010 - Preisindex für den Neubau von Wohngebäuden",
+   "baupreisindex_basis": "2010",
+   "alterswertminderung": "linear",
+   "aussenanlagen": "pauschaler Ansatz in Höhe von 4 % des Gebäudesachwertes",
+   "baunebenkosten": "keine, in den NHK 2010 enthalten",
+   "garagen": "pauschalierter Ansatz von 6.000 EUR bis 18.000 EUR",
+   "besondere_bauteile": "im Bericht als Aufzählung abgedruckt (Dachgauben, Balkone u. a.)",
+   "regionalfaktor": null,
+   "regionalfaktor_hinweis": "KEINE ANGABE im Bericht — und das ist kein Versehen. Die RL SW-BB von 2014 kennt keinen Regionalfaktor; erst die VV EW-SW von 2023 schreibt ausdrücklich „Regionalfaktor 1\". Der Aufsatz Vermessung Brandenburg 1/2016 erklärt den Grund: die Sachwertrichtlinie des Bundes von 2012 hat die regionalen Korrekturfaktoren aufgelöst, Brandenburg bildet regionale Unterschiede über lageabhängige Sachwertfaktoren ab — hier über die zwei Bodenrichtwertklassen. Der Faktor 1 der Nachfolgevorschrift bestätigt das im Nachhinein. Es wird trotzdem KEIN Wert eingetragen, wo der Bericht keinen nennt.",
+   "querpruefung": "BESTANDEN: die sieben abgedruckten Ansätze stimmen Position für Position mit der RL SW-BB vom 01.04.2014 überein, die vollständig als HTML auf bravors.brandenburg.de gelesen wurde (NHK 2010, BGF, GND nach Anlage 3 SW-RL, lineare Alterswertminderung, Baupreisindex Neubau Wohngebäude Basis 2010, Außenanlagen 4 %) — und ebenso mit der VV EW-SW von 2023 und dem Aufsatz von 2016, einschließlich der Garagenpauschalen 6.000/12.000/18.000 EUR. VIER Dokumente aus neun Jahren, gleiche Zahlen."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     50000,
+     210000
+    ]
+   },
+   "spannen_hinweis": "Die Tabelle endet bei 210.000 EUR, NICHT bei 200.000 — die letzte Stützstelle bricht die Schrittweite von 25.000 EUR. Das ist so abgedruckt und wurde nicht geglättet.",
+   "stichprobe": {
+    "kauffaelle": 34,
+    "auswertezeitraum": "2016, 2017 und 2018",
+    "kaufpreis_eur_min": 41000,
+    "kaufpreis_eur_max": 191000,
+    "kaufpreis_eur_mittel": 97000,
+    "bodenwert_eur_qm_min": 3,
+    "bodenwert_eur_qm_max": 65,
+    "bodenwert_eur_qm_mittel": 27,
+    "grundstuecksflaeche_qm_min": 300,
+    "grundstuecksflaeche_qm_max": 3000,
+    "grundstuecksflaeche_qm_mittel": 1100,
+    "baujahr_min": 1888,
+    "baujahr_max": 1997,
+    "baujahr_mittel": 1939,
+    "restnutzungsdauer_jahre_min": 10,
+    "restnutzungsdauer_jahre_max": 51,
+    "restnutzungsdauer_jahre_mittel": 25
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_wertetabelle_mit_stichprobenstatistik",
+    "fundstelle": "GMB_UM_2018.pdf, S. 56–57",
+    "soll_kennzahlen": 8,
+    "pruefprotokoll": "Zwei Leseläufe, zeichengleich in allen acht Stützstellen.",
+    "zaehlpruefung": "BESTANDEN: acht Stützstellen. Sieben davon folgen der Schrittweite 25.000 EUR (50.000 bis 200.000 -> (200000-50000)/25000+1 = 7), die achte ist die abweichende Endstelle 210.000. 7 + 1 = 8. Die Abweichung ist damit ABGEZÄHLT und nicht überlesen worden.",
+    "monotonie": "BESTANDEN, nicht steigend (0,99 -> 0,89). Die letzten beiden Stützstellen stehen beide auf 0,89 — Rundungsfolge am flachen Kurvenende, nicht korrigiert.",
+    "objektartenprobe": "BESTANDEN: Doppelhaushälften und Reihenhäuser liegen bei gleichem vorläufigem Sachwert unter den freistehenden Ein-/Zweifamilienhäusern der oberen Bodenrichtwertklasse und über denen der unteren (bei 100.000 EUR: 0,94 gegen 0,99 bzw. 0,92). Das ist plausibel und ausdrücklich KEIN Beleg — belegt wird nur am Dokument."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Zwei Angaben fehlen. (1) Die STANDARDABWEICHUNG ist in keinem der fünf Modelle abgedruckt; der Ausschuss weist stattdessen Stichprobenspannen und im Jahrgang 2019 das Bestimmtheitsmaß R² aus. streuung bleibt NULL, NICHT 0 — bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. (2) Der MODELLVERMERK des Berichts ist nicht gelesen — siehe freigabe_hinweis.",
+  "objektart": "rhdhh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 34,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2018,
+  "modellversion": "GMB 2019",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM_2019.pdf",
+  "quelle_parser": "v1094-WBB",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2019, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktbericht 2019\", Kapitel 8.2 Sachwertfaktoren, S. 50–52; „Grundstücksmarktbericht 2018\", S. 51–53 und 56–57"
+ }
+]

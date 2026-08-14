@@ -1,0 +1,1638 @@
+[
+ {
+  "land_code": "NI",
+  "ags": "03101",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "wert_art_hinweis": "Als Registerwert wird der MEDIAN geführt. Der Ausschuss beschreibt sein Verfahren selbst als Medianuntersuchung mit Ausreißerbehandlung über den 1,5-fachen Interquartilsabstand — der Median ist damit die Größe, die die Quelle voranstellt. Das arithmetische Mittel (2,2) liegt darüber, die Verteilung ist rechtsschief; es wird mitgeführt, nicht verworfen.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Der Bericht verweist für die Nutzungsdauer auf die Verordnung, nennt aber keinen Zahlenwert für die Gesamtnutzungsdauer. Für den CrossCheckService heißt das: die Konstante GND_JAHRE = 80 ist hier NICHT belegt, und der Wert 70, den die niedersächsischen Nachbarausschüsse führen, wird NICHT ersatzweise übernommen — das wäre eine Vermutung mit amtlichem Anstrich.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "restnutzungsdauer_hinweis": "Das ist die Spanne der in der Stichprobe vorkommenden Restnutzungsdauern, kein Rechenansatz. Für ein Objekt außerhalb dieser Spanne liegt der Zinssatz außerhalb des Ableitungsbereichs.",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "rohertrag": "marktüblich erzielbare Erträge; Reinertrag nach Abzug der Bewirtschaftungskosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Wert gilt für den GESAMTBEREICH des Ausschusses (alle acht Gebietskörperschaften) und für die abgedruckte Objektart. Der Bericht trifft KEINE Unterscheidung zwischen den acht Gebieten — anders als der Nachbarausschuss Lüneburg, der je Landkreis auswertet. Außerhalb des Ausschussgebiets wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.4,
+     4.3
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29, Kapitel Liegenschaftszinssätze und Rohertragsfaktoren",
+    "soll_kennzahlen": 5,
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt die abgedruckte Stichprobenstatistik: Fallzahl, Median, arithmetisches Mittel, 10. und 90. Perzentil, dazu der Rohertragsfaktor mit denselben vier Maßzahlen.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI unabhängige Leseläufe über zwei Adressformen. Beide liefern für diese Objektart zeichengleich Median 1,9 %, Mittel 2,2 %, 10. Perzentil 0,4 %, 90. Perzentil 4,3 %. LAGEPRÜFUNG: Median 1,9 liegt im Band [0,4 ; 4,3] — erfüllt. Mittel 2,2 ebenfalls. WERTEBEREICH: der Zinssatz ist positiv, der Barwertfaktor damit definiert; die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Median nicht. SEITENUMFANG: Inhaltsverzeichnis nennt 46 Seiten, gelieferter Text reicht bis 46 — kein Abbruch, das Kapitel ist ganz gelesen und nicht nur angelesen.",
+    "negativtest": "Zwei Prüfungen haben ANGESCHLAGEN. Erstens die Vollständigkeitsprüfung: beide Leseläufe wurden ausdrücklich auf die Standardabweichung gerichtet, beide fanden keine — statt einen Ersatzwert aus dem Perzentilband zu bilden, steht streuung auf null. Zweitens die Plausibilitätsprüfung des Rohertragsfaktors: das 10. Perzentil von 0,3 ist wirtschaftlich unmöglich und wurde als zweifelhaft markiert statt übernommen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 54,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03102",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "wert_art_hinweis": "Als Registerwert wird der MEDIAN geführt. Der Ausschuss beschreibt sein Verfahren selbst als Medianuntersuchung mit Ausreißerbehandlung über den 1,5-fachen Interquartilsabstand — der Median ist damit die Größe, die die Quelle voranstellt. Das arithmetische Mittel (2,2) liegt darüber, die Verteilung ist rechtsschief; es wird mitgeführt, nicht verworfen.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Der Bericht verweist für die Nutzungsdauer auf die Verordnung, nennt aber keinen Zahlenwert für die Gesamtnutzungsdauer. Für den CrossCheckService heißt das: die Konstante GND_JAHRE = 80 ist hier NICHT belegt, und der Wert 70, den die niedersächsischen Nachbarausschüsse führen, wird NICHT ersatzweise übernommen — das wäre eine Vermutung mit amtlichem Anstrich.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "restnutzungsdauer_hinweis": "Das ist die Spanne der in der Stichprobe vorkommenden Restnutzungsdauern, kein Rechenansatz. Für ein Objekt außerhalb dieser Spanne liegt der Zinssatz außerhalb des Ableitungsbereichs.",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "rohertrag": "marktüblich erzielbare Erträge; Reinertrag nach Abzug der Bewirtschaftungskosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Wert gilt für den GESAMTBEREICH des Ausschusses (alle acht Gebietskörperschaften) und für die abgedruckte Objektart. Der Bericht trifft KEINE Unterscheidung zwischen den acht Gebieten — anders als der Nachbarausschuss Lüneburg, der je Landkreis auswertet. Außerhalb des Ausschussgebiets wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.4,
+     4.3
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29, Kapitel Liegenschaftszinssätze und Rohertragsfaktoren",
+    "soll_kennzahlen": 5,
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt die abgedruckte Stichprobenstatistik: Fallzahl, Median, arithmetisches Mittel, 10. und 90. Perzentil, dazu der Rohertragsfaktor mit denselben vier Maßzahlen.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI unabhängige Leseläufe über zwei Adressformen. Beide liefern für diese Objektart zeichengleich Median 1,9 %, Mittel 2,2 %, 10. Perzentil 0,4 %, 90. Perzentil 4,3 %. LAGEPRÜFUNG: Median 1,9 liegt im Band [0,4 ; 4,3] — erfüllt. Mittel 2,2 ebenfalls. WERTEBEREICH: der Zinssatz ist positiv, der Barwertfaktor damit definiert; die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Median nicht. SEITENUMFANG: Inhaltsverzeichnis nennt 46 Seiten, gelieferter Text reicht bis 46 — kein Abbruch, das Kapitel ist ganz gelesen und nicht nur angelesen.",
+    "negativtest": "Zwei Prüfungen haben ANGESCHLAGEN. Erstens die Vollständigkeitsprüfung: beide Leseläufe wurden ausdrücklich auf die Standardabweichung gerichtet, beide fanden keine — statt einen Ersatzwert aus dem Perzentilband zu bilden, steht streuung auf null. Zweitens die Plausibilitätsprüfung des Rohertragsfaktors: das 10. Perzentil von 0,3 ist wirtschaftlich unmöglich und wurde als zweifelhaft markiert statt übernommen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 54,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03103",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "wert_art_hinweis": "Als Registerwert wird der MEDIAN geführt. Der Ausschuss beschreibt sein Verfahren selbst als Medianuntersuchung mit Ausreißerbehandlung über den 1,5-fachen Interquartilsabstand — der Median ist damit die Größe, die die Quelle voranstellt. Das arithmetische Mittel (2,2) liegt darüber, die Verteilung ist rechtsschief; es wird mitgeführt, nicht verworfen.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Der Bericht verweist für die Nutzungsdauer auf die Verordnung, nennt aber keinen Zahlenwert für die Gesamtnutzungsdauer. Für den CrossCheckService heißt das: die Konstante GND_JAHRE = 80 ist hier NICHT belegt, und der Wert 70, den die niedersächsischen Nachbarausschüsse führen, wird NICHT ersatzweise übernommen — das wäre eine Vermutung mit amtlichem Anstrich.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "restnutzungsdauer_hinweis": "Das ist die Spanne der in der Stichprobe vorkommenden Restnutzungsdauern, kein Rechenansatz. Für ein Objekt außerhalb dieser Spanne liegt der Zinssatz außerhalb des Ableitungsbereichs.",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "rohertrag": "marktüblich erzielbare Erträge; Reinertrag nach Abzug der Bewirtschaftungskosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Wert gilt für den GESAMTBEREICH des Ausschusses (alle acht Gebietskörperschaften) und für die abgedruckte Objektart. Der Bericht trifft KEINE Unterscheidung zwischen den acht Gebieten — anders als der Nachbarausschuss Lüneburg, der je Landkreis auswertet. Außerhalb des Ausschussgebiets wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.4,
+     4.3
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29, Kapitel Liegenschaftszinssätze und Rohertragsfaktoren",
+    "soll_kennzahlen": 5,
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt die abgedruckte Stichprobenstatistik: Fallzahl, Median, arithmetisches Mittel, 10. und 90. Perzentil, dazu der Rohertragsfaktor mit denselben vier Maßzahlen.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI unabhängige Leseläufe über zwei Adressformen. Beide liefern für diese Objektart zeichengleich Median 1,9 %, Mittel 2,2 %, 10. Perzentil 0,4 %, 90. Perzentil 4,3 %. LAGEPRÜFUNG: Median 1,9 liegt im Band [0,4 ; 4,3] — erfüllt. Mittel 2,2 ebenfalls. WERTEBEREICH: der Zinssatz ist positiv, der Barwertfaktor damit definiert; die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Median nicht. SEITENUMFANG: Inhaltsverzeichnis nennt 46 Seiten, gelieferter Text reicht bis 46 — kein Abbruch, das Kapitel ist ganz gelesen und nicht nur angelesen.",
+    "negativtest": "Zwei Prüfungen haben ANGESCHLAGEN. Erstens die Vollständigkeitsprüfung: beide Leseläufe wurden ausdrücklich auf die Standardabweichung gerichtet, beide fanden keine — statt einen Ersatzwert aus dem Perzentilband zu bilden, steht streuung auf null. Zweitens die Plausibilitätsprüfung des Rohertragsfaktors: das 10. Perzentil von 0,3 ist wirtschaftlich unmöglich und wurde als zweifelhaft markiert statt übernommen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 54,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03151",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "wert_art_hinweis": "Als Registerwert wird der MEDIAN geführt. Der Ausschuss beschreibt sein Verfahren selbst als Medianuntersuchung mit Ausreißerbehandlung über den 1,5-fachen Interquartilsabstand — der Median ist damit die Größe, die die Quelle voranstellt. Das arithmetische Mittel (2,2) liegt darüber, die Verteilung ist rechtsschief; es wird mitgeführt, nicht verworfen.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Der Bericht verweist für die Nutzungsdauer auf die Verordnung, nennt aber keinen Zahlenwert für die Gesamtnutzungsdauer. Für den CrossCheckService heißt das: die Konstante GND_JAHRE = 80 ist hier NICHT belegt, und der Wert 70, den die niedersächsischen Nachbarausschüsse führen, wird NICHT ersatzweise übernommen — das wäre eine Vermutung mit amtlichem Anstrich.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "restnutzungsdauer_hinweis": "Das ist die Spanne der in der Stichprobe vorkommenden Restnutzungsdauern, kein Rechenansatz. Für ein Objekt außerhalb dieser Spanne liegt der Zinssatz außerhalb des Ableitungsbereichs.",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "rohertrag": "marktüblich erzielbare Erträge; Reinertrag nach Abzug der Bewirtschaftungskosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Wert gilt für den GESAMTBEREICH des Ausschusses (alle acht Gebietskörperschaften) und für die abgedruckte Objektart. Der Bericht trifft KEINE Unterscheidung zwischen den acht Gebieten — anders als der Nachbarausschuss Lüneburg, der je Landkreis auswertet. Außerhalb des Ausschussgebiets wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.4,
+     4.3
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29, Kapitel Liegenschaftszinssätze und Rohertragsfaktoren",
+    "soll_kennzahlen": 5,
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt die abgedruckte Stichprobenstatistik: Fallzahl, Median, arithmetisches Mittel, 10. und 90. Perzentil, dazu der Rohertragsfaktor mit denselben vier Maßzahlen.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI unabhängige Leseläufe über zwei Adressformen. Beide liefern für diese Objektart zeichengleich Median 1,9 %, Mittel 2,2 %, 10. Perzentil 0,4 %, 90. Perzentil 4,3 %. LAGEPRÜFUNG: Median 1,9 liegt im Band [0,4 ; 4,3] — erfüllt. Mittel 2,2 ebenfalls. WERTEBEREICH: der Zinssatz ist positiv, der Barwertfaktor damit definiert; die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Median nicht. SEITENUMFANG: Inhaltsverzeichnis nennt 46 Seiten, gelieferter Text reicht bis 46 — kein Abbruch, das Kapitel ist ganz gelesen und nicht nur angelesen.",
+    "negativtest": "Zwei Prüfungen haben ANGESCHLAGEN. Erstens die Vollständigkeitsprüfung: beide Leseläufe wurden ausdrücklich auf die Standardabweichung gerichtet, beide fanden keine — statt einen Ersatzwert aus dem Perzentilband zu bilden, steht streuung auf null. Zweitens die Plausibilitätsprüfung des Rohertragsfaktors: das 10. Perzentil von 0,3 ist wirtschaftlich unmöglich und wurde als zweifelhaft markiert statt übernommen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 54,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03154",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "wert_art_hinweis": "Als Registerwert wird der MEDIAN geführt. Der Ausschuss beschreibt sein Verfahren selbst als Medianuntersuchung mit Ausreißerbehandlung über den 1,5-fachen Interquartilsabstand — der Median ist damit die Größe, die die Quelle voranstellt. Das arithmetische Mittel (2,2) liegt darüber, die Verteilung ist rechtsschief; es wird mitgeführt, nicht verworfen.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Der Bericht verweist für die Nutzungsdauer auf die Verordnung, nennt aber keinen Zahlenwert für die Gesamtnutzungsdauer. Für den CrossCheckService heißt das: die Konstante GND_JAHRE = 80 ist hier NICHT belegt, und der Wert 70, den die niedersächsischen Nachbarausschüsse führen, wird NICHT ersatzweise übernommen — das wäre eine Vermutung mit amtlichem Anstrich.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "restnutzungsdauer_hinweis": "Das ist die Spanne der in der Stichprobe vorkommenden Restnutzungsdauern, kein Rechenansatz. Für ein Objekt außerhalb dieser Spanne liegt der Zinssatz außerhalb des Ableitungsbereichs.",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "rohertrag": "marktüblich erzielbare Erträge; Reinertrag nach Abzug der Bewirtschaftungskosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Wert gilt für den GESAMTBEREICH des Ausschusses (alle acht Gebietskörperschaften) und für die abgedruckte Objektart. Der Bericht trifft KEINE Unterscheidung zwischen den acht Gebieten — anders als der Nachbarausschuss Lüneburg, der je Landkreis auswertet. Außerhalb des Ausschussgebiets wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.4,
+     4.3
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29, Kapitel Liegenschaftszinssätze und Rohertragsfaktoren",
+    "soll_kennzahlen": 5,
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt die abgedruckte Stichprobenstatistik: Fallzahl, Median, arithmetisches Mittel, 10. und 90. Perzentil, dazu der Rohertragsfaktor mit denselben vier Maßzahlen.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI unabhängige Leseläufe über zwei Adressformen. Beide liefern für diese Objektart zeichengleich Median 1,9 %, Mittel 2,2 %, 10. Perzentil 0,4 %, 90. Perzentil 4,3 %. LAGEPRÜFUNG: Median 1,9 liegt im Band [0,4 ; 4,3] — erfüllt. Mittel 2,2 ebenfalls. WERTEBEREICH: der Zinssatz ist positiv, der Barwertfaktor damit definiert; die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Median nicht. SEITENUMFANG: Inhaltsverzeichnis nennt 46 Seiten, gelieferter Text reicht bis 46 — kein Abbruch, das Kapitel ist ganz gelesen und nicht nur angelesen.",
+    "negativtest": "Zwei Prüfungen haben ANGESCHLAGEN. Erstens die Vollständigkeitsprüfung: beide Leseläufe wurden ausdrücklich auf die Standardabweichung gerichtet, beide fanden keine — statt einen Ersatzwert aus dem Perzentilband zu bilden, steht streuung auf null. Zweitens die Plausibilitätsprüfung des Rohertragsfaktors: das 10. Perzentil von 0,3 ist wirtschaftlich unmöglich und wurde als zweifelhaft markiert statt übernommen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 54,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03157",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "wert_art_hinweis": "Als Registerwert wird der MEDIAN geführt. Der Ausschuss beschreibt sein Verfahren selbst als Medianuntersuchung mit Ausreißerbehandlung über den 1,5-fachen Interquartilsabstand — der Median ist damit die Größe, die die Quelle voranstellt. Das arithmetische Mittel (2,2) liegt darüber, die Verteilung ist rechtsschief; es wird mitgeführt, nicht verworfen.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Der Bericht verweist für die Nutzungsdauer auf die Verordnung, nennt aber keinen Zahlenwert für die Gesamtnutzungsdauer. Für den CrossCheckService heißt das: die Konstante GND_JAHRE = 80 ist hier NICHT belegt, und der Wert 70, den die niedersächsischen Nachbarausschüsse führen, wird NICHT ersatzweise übernommen — das wäre eine Vermutung mit amtlichem Anstrich.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "restnutzungsdauer_hinweis": "Das ist die Spanne der in der Stichprobe vorkommenden Restnutzungsdauern, kein Rechenansatz. Für ein Objekt außerhalb dieser Spanne liegt der Zinssatz außerhalb des Ableitungsbereichs.",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "rohertrag": "marktüblich erzielbare Erträge; Reinertrag nach Abzug der Bewirtschaftungskosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Wert gilt für den GESAMTBEREICH des Ausschusses (alle acht Gebietskörperschaften) und für die abgedruckte Objektart. Der Bericht trifft KEINE Unterscheidung zwischen den acht Gebieten — anders als der Nachbarausschuss Lüneburg, der je Landkreis auswertet. Außerhalb des Ausschussgebiets wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.4,
+     4.3
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29, Kapitel Liegenschaftszinssätze und Rohertragsfaktoren",
+    "soll_kennzahlen": 5,
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt die abgedruckte Stichprobenstatistik: Fallzahl, Median, arithmetisches Mittel, 10. und 90. Perzentil, dazu der Rohertragsfaktor mit denselben vier Maßzahlen.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI unabhängige Leseläufe über zwei Adressformen. Beide liefern für diese Objektart zeichengleich Median 1,9 %, Mittel 2,2 %, 10. Perzentil 0,4 %, 90. Perzentil 4,3 %. LAGEPRÜFUNG: Median 1,9 liegt im Band [0,4 ; 4,3] — erfüllt. Mittel 2,2 ebenfalls. WERTEBEREICH: der Zinssatz ist positiv, der Barwertfaktor damit definiert; die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Median nicht. SEITENUMFANG: Inhaltsverzeichnis nennt 46 Seiten, gelieferter Text reicht bis 46 — kein Abbruch, das Kapitel ist ganz gelesen und nicht nur angelesen.",
+    "negativtest": "Zwei Prüfungen haben ANGESCHLAGEN. Erstens die Vollständigkeitsprüfung: beide Leseläufe wurden ausdrücklich auf die Standardabweichung gerichtet, beide fanden keine — statt einen Ersatzwert aus dem Perzentilband zu bilden, steht streuung auf null. Zweitens die Plausibilitätsprüfung des Rohertragsfaktors: das 10. Perzentil von 0,3 ist wirtschaftlich unmöglich und wurde als zweifelhaft markiert statt übernommen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 54,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03158",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "wert_art_hinweis": "Als Registerwert wird der MEDIAN geführt. Der Ausschuss beschreibt sein Verfahren selbst als Medianuntersuchung mit Ausreißerbehandlung über den 1,5-fachen Interquartilsabstand — der Median ist damit die Größe, die die Quelle voranstellt. Das arithmetische Mittel (2,2) liegt darüber, die Verteilung ist rechtsschief; es wird mitgeführt, nicht verworfen.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Der Bericht verweist für die Nutzungsdauer auf die Verordnung, nennt aber keinen Zahlenwert für die Gesamtnutzungsdauer. Für den CrossCheckService heißt das: die Konstante GND_JAHRE = 80 ist hier NICHT belegt, und der Wert 70, den die niedersächsischen Nachbarausschüsse führen, wird NICHT ersatzweise übernommen — das wäre eine Vermutung mit amtlichem Anstrich.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "restnutzungsdauer_hinweis": "Das ist die Spanne der in der Stichprobe vorkommenden Restnutzungsdauern, kein Rechenansatz. Für ein Objekt außerhalb dieser Spanne liegt der Zinssatz außerhalb des Ableitungsbereichs.",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "rohertrag": "marktüblich erzielbare Erträge; Reinertrag nach Abzug der Bewirtschaftungskosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Wert gilt für den GESAMTBEREICH des Ausschusses (alle acht Gebietskörperschaften) und für die abgedruckte Objektart. Der Bericht trifft KEINE Unterscheidung zwischen den acht Gebieten — anders als der Nachbarausschuss Lüneburg, der je Landkreis auswertet. Außerhalb des Ausschussgebiets wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.4,
+     4.3
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29, Kapitel Liegenschaftszinssätze und Rohertragsfaktoren",
+    "soll_kennzahlen": 5,
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt die abgedruckte Stichprobenstatistik: Fallzahl, Median, arithmetisches Mittel, 10. und 90. Perzentil, dazu der Rohertragsfaktor mit denselben vier Maßzahlen.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI unabhängige Leseläufe über zwei Adressformen. Beide liefern für diese Objektart zeichengleich Median 1,9 %, Mittel 2,2 %, 10. Perzentil 0,4 %, 90. Perzentil 4,3 %. LAGEPRÜFUNG: Median 1,9 liegt im Band [0,4 ; 4,3] — erfüllt. Mittel 2,2 ebenfalls. WERTEBEREICH: der Zinssatz ist positiv, der Barwertfaktor damit definiert; die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Median nicht. SEITENUMFANG: Inhaltsverzeichnis nennt 46 Seiten, gelieferter Text reicht bis 46 — kein Abbruch, das Kapitel ist ganz gelesen und nicht nur angelesen.",
+    "negativtest": "Zwei Prüfungen haben ANGESCHLAGEN. Erstens die Vollständigkeitsprüfung: beide Leseläufe wurden ausdrücklich auf die Standardabweichung gerichtet, beide fanden keine — statt einen Ersatzwert aus dem Perzentilband zu bilden, steht streuung auf null. Zweitens die Plausibilitätsprüfung des Rohertragsfaktors: das 10. Perzentil von 0,3 ist wirtschaftlich unmöglich und wurde als zweifelhaft markiert statt übernommen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 54,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03351",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "wert_art_hinweis": "Als Registerwert wird der MEDIAN geführt. Der Ausschuss beschreibt sein Verfahren selbst als Medianuntersuchung mit Ausreißerbehandlung über den 1,5-fachen Interquartilsabstand — der Median ist damit die Größe, die die Quelle voranstellt. Das arithmetische Mittel (2,2) liegt darüber, die Verteilung ist rechtsschief; es wird mitgeführt, nicht verworfen.",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Der Bericht verweist für die Nutzungsdauer auf die Verordnung, nennt aber keinen Zahlenwert für die Gesamtnutzungsdauer. Für den CrossCheckService heißt das: die Konstante GND_JAHRE = 80 ist hier NICHT belegt, und der Wert 70, den die niedersächsischen Nachbarausschüsse führen, wird NICHT ersatzweise übernommen — das wäre eine Vermutung mit amtlichem Anstrich.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "restnutzungsdauer_hinweis": "Das ist die Spanne der in der Stichprobe vorkommenden Restnutzungsdauern, kein Rechenansatz. Für ein Objekt außerhalb dieser Spanne liegt der Zinssatz außerhalb des Ableitungsbereichs.",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "rohertrag": "marktüblich erzielbare Erträge; Reinertrag nach Abzug der Bewirtschaftungskosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Wert gilt für den GESAMTBEREICH des Ausschusses (alle acht Gebietskörperschaften) und für die abgedruckte Objektart. Der Bericht trifft KEINE Unterscheidung zwischen den acht Gebieten — anders als der Nachbarausschuss Lüneburg, der je Landkreis auswertet. Außerhalb des Ausschussgebiets wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.4,
+     4.3
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29, Kapitel Liegenschaftszinssätze und Rohertragsfaktoren",
+    "soll_kennzahlen": 5,
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt die abgedruckte Stichprobenstatistik: Fallzahl, Median, arithmetisches Mittel, 10. und 90. Perzentil, dazu der Rohertragsfaktor mit denselben vier Maßzahlen.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI unabhängige Leseläufe über zwei Adressformen. Beide liefern für diese Objektart zeichengleich Median 1,9 %, Mittel 2,2 %, 10. Perzentil 0,4 %, 90. Perzentil 4,3 %. LAGEPRÜFUNG: Median 1,9 liegt im Band [0,4 ; 4,3] — erfüllt. Mittel 2,2 ebenfalls. WERTEBEREICH: der Zinssatz ist positiv, der Barwertfaktor damit definiert; die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Median nicht. SEITENUMFANG: Inhaltsverzeichnis nennt 46 Seiten, gelieferter Text reicht bis 46 — kein Abbruch, das Kapitel ist ganz gelesen und nicht nur angelesen.",
+    "negativtest": "Zwei Prüfungen haben ANGESCHLAGEN. Erstens die Vollständigkeitsprüfung: beide Leseläufe wurden ausdrücklich auf die Standardabweichung gerichtet, beide fanden keine — statt einen Ersatzwert aus dem Perzentilband zu bilden, steht streuung auf null. Zweitens die Plausibilitätsprüfung des Rohertragsfaktors: das 10. Perzentil von 0,3 ist wirtschaftlich unmöglich und wurde als zweifelhaft markiert statt übernommen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 54,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03101",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Siehe ezfh-Zweig.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert. Der Registerdatensatz ändert daran nichts."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt für den Gesamtbereich des Ausschusses, keine Unterscheidung zwischen den acht Gebieten.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -0.4,
+     4.5
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil ist NEGATIV (−0,4 %). Das ist eine Aussage über die Stichprobe, nicht über den geführten Wert: der Median 1,9 % ist positiv und rechenbar. Die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Registerwert nicht. Sie greift, wenn jemand versucht, mit dem unteren Rand des Bandes zu rechnen — das ist verboten."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: Median 1,9 %, Mittel 1,9 %, 10. Perzentil −0,4 %, 90. Perzentil 4,5 %. LAGEPRÜFUNG: Median und Mittel liegen beide im Band [−0,4 ; 4,5] — erfüllt. GEGENPROBE ROHERTRAGSFAKTOR: 18,1 gegen 20,3 beim ezfh-Zweig — der Rohertragsfaktor der Eigentumswohnungen liegt niedriger, was bei GLEICHEM Zinssatz nur über eine kürzere Restnutzungsdauer oder höhere Bewirtschaftungskosten zustande kommt. Beides ist möglich und im Bericht nicht aufgeschlüsselt; die Beobachtung wird notiert, nicht erklärt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 200,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03102",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Siehe ezfh-Zweig.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert. Der Registerdatensatz ändert daran nichts."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt für den Gesamtbereich des Ausschusses, keine Unterscheidung zwischen den acht Gebieten.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -0.4,
+     4.5
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil ist NEGATIV (−0,4 %). Das ist eine Aussage über die Stichprobe, nicht über den geführten Wert: der Median 1,9 % ist positiv und rechenbar. Die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Registerwert nicht. Sie greift, wenn jemand versucht, mit dem unteren Rand des Bandes zu rechnen — das ist verboten."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: Median 1,9 %, Mittel 1,9 %, 10. Perzentil −0,4 %, 90. Perzentil 4,5 %. LAGEPRÜFUNG: Median und Mittel liegen beide im Band [−0,4 ; 4,5] — erfüllt. GEGENPROBE ROHERTRAGSFAKTOR: 18,1 gegen 20,3 beim ezfh-Zweig — der Rohertragsfaktor der Eigentumswohnungen liegt niedriger, was bei GLEICHEM Zinssatz nur über eine kürzere Restnutzungsdauer oder höhere Bewirtschaftungskosten zustande kommt. Beides ist möglich und im Bericht nicht aufgeschlüsselt; die Beobachtung wird notiert, nicht erklärt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 200,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03103",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Siehe ezfh-Zweig.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert. Der Registerdatensatz ändert daran nichts."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt für den Gesamtbereich des Ausschusses, keine Unterscheidung zwischen den acht Gebieten.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -0.4,
+     4.5
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil ist NEGATIV (−0,4 %). Das ist eine Aussage über die Stichprobe, nicht über den geführten Wert: der Median 1,9 % ist positiv und rechenbar. Die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Registerwert nicht. Sie greift, wenn jemand versucht, mit dem unteren Rand des Bandes zu rechnen — das ist verboten."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: Median 1,9 %, Mittel 1,9 %, 10. Perzentil −0,4 %, 90. Perzentil 4,5 %. LAGEPRÜFUNG: Median und Mittel liegen beide im Band [−0,4 ; 4,5] — erfüllt. GEGENPROBE ROHERTRAGSFAKTOR: 18,1 gegen 20,3 beim ezfh-Zweig — der Rohertragsfaktor der Eigentumswohnungen liegt niedriger, was bei GLEICHEM Zinssatz nur über eine kürzere Restnutzungsdauer oder höhere Bewirtschaftungskosten zustande kommt. Beides ist möglich und im Bericht nicht aufgeschlüsselt; die Beobachtung wird notiert, nicht erklärt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 200,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03151",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Siehe ezfh-Zweig.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert. Der Registerdatensatz ändert daran nichts."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt für den Gesamtbereich des Ausschusses, keine Unterscheidung zwischen den acht Gebieten.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -0.4,
+     4.5
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil ist NEGATIV (−0,4 %). Das ist eine Aussage über die Stichprobe, nicht über den geführten Wert: der Median 1,9 % ist positiv und rechenbar. Die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Registerwert nicht. Sie greift, wenn jemand versucht, mit dem unteren Rand des Bandes zu rechnen — das ist verboten."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: Median 1,9 %, Mittel 1,9 %, 10. Perzentil −0,4 %, 90. Perzentil 4,5 %. LAGEPRÜFUNG: Median und Mittel liegen beide im Band [−0,4 ; 4,5] — erfüllt. GEGENPROBE ROHERTRAGSFAKTOR: 18,1 gegen 20,3 beim ezfh-Zweig — der Rohertragsfaktor der Eigentumswohnungen liegt niedriger, was bei GLEICHEM Zinssatz nur über eine kürzere Restnutzungsdauer oder höhere Bewirtschaftungskosten zustande kommt. Beides ist möglich und im Bericht nicht aufgeschlüsselt; die Beobachtung wird notiert, nicht erklärt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 200,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03154",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Siehe ezfh-Zweig.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert. Der Registerdatensatz ändert daran nichts."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt für den Gesamtbereich des Ausschusses, keine Unterscheidung zwischen den acht Gebieten.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -0.4,
+     4.5
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil ist NEGATIV (−0,4 %). Das ist eine Aussage über die Stichprobe, nicht über den geführten Wert: der Median 1,9 % ist positiv und rechenbar. Die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Registerwert nicht. Sie greift, wenn jemand versucht, mit dem unteren Rand des Bandes zu rechnen — das ist verboten."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: Median 1,9 %, Mittel 1,9 %, 10. Perzentil −0,4 %, 90. Perzentil 4,5 %. LAGEPRÜFUNG: Median und Mittel liegen beide im Band [−0,4 ; 4,5] — erfüllt. GEGENPROBE ROHERTRAGSFAKTOR: 18,1 gegen 20,3 beim ezfh-Zweig — der Rohertragsfaktor der Eigentumswohnungen liegt niedriger, was bei GLEICHEM Zinssatz nur über eine kürzere Restnutzungsdauer oder höhere Bewirtschaftungskosten zustande kommt. Beides ist möglich und im Bericht nicht aufgeschlüsselt; die Beobachtung wird notiert, nicht erklärt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 200,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03157",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Siehe ezfh-Zweig.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert. Der Registerdatensatz ändert daran nichts."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt für den Gesamtbereich des Ausschusses, keine Unterscheidung zwischen den acht Gebieten.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -0.4,
+     4.5
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil ist NEGATIV (−0,4 %). Das ist eine Aussage über die Stichprobe, nicht über den geführten Wert: der Median 1,9 % ist positiv und rechenbar. Die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Registerwert nicht. Sie greift, wenn jemand versucht, mit dem unteren Rand des Bandes zu rechnen — das ist verboten."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: Median 1,9 %, Mittel 1,9 %, 10. Perzentil −0,4 %, 90. Perzentil 4,5 %. LAGEPRÜFUNG: Median und Mittel liegen beide im Band [−0,4 ; 4,5] — erfüllt. GEGENPROBE ROHERTRAGSFAKTOR: 18,1 gegen 20,3 beim ezfh-Zweig — der Rohertragsfaktor der Eigentumswohnungen liegt niedriger, was bei GLEICHEM Zinssatz nur über eine kürzere Restnutzungsdauer oder höhere Bewirtschaftungskosten zustande kommt. Beides ist möglich und im Bericht nicht aufgeschlüsselt; die Beobachtung wird notiert, nicht erklärt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 200,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03158",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Siehe ezfh-Zweig.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert. Der Registerdatensatz ändert daran nichts."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt für den Gesamtbereich des Ausschusses, keine Unterscheidung zwischen den acht Gebieten.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -0.4,
+     4.5
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil ist NEGATIV (−0,4 %). Das ist eine Aussage über die Stichprobe, nicht über den geführten Wert: der Median 1,9 % ist positiv und rechenbar. Die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Registerwert nicht. Sie greift, wenn jemand versucht, mit dem unteren Rand des Bandes zu rechnen — das ist verboten."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: Median 1,9 %, Mittel 1,9 %, 10. Perzentil −0,4 %, 90. Perzentil 4,5 %. LAGEPRÜFUNG: Median und Mittel liegen beide im Band [−0,4 ; 4,5] — erfüllt. GEGENPROBE ROHERTRAGSFAKTOR: 18,1 gegen 20,3 beim ezfh-Zweig — der Rohertragsfaktor der Eigentumswohnungen liegt niedriger, was bei GLEICHEM Zinssatz nur über eine kürzere Restnutzungsdauer oder höhere Bewirtschaftungskosten zustande kommt. Beides ist möglich und im Bericht nicht aufgeschlüsselt; die Beobachtung wird notiert, nicht erklärt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 200,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03351",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 1
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "gnd_hinweis": "NICHT ALS ZAHL ABGEDRUCKT. Siehe ezfh-Zweig.",
+   "restnutzungsdauer": "15 bis 70 Jahre, ermittelt gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "statistisches_verfahren": "Medianuntersuchung",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert. Der Registerdatensatz ändert daran nichts."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt für den Gesamtbereich des Ausschusses, keine Unterscheidung zwischen den acht Gebieten.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -0.4,
+     4.5
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil ist NEGATIV (−0,4 %). Das ist eine Aussage über die Stichprobe, nicht über den geführten Wert: der Median 1,9 % ist positiv und rechenbar. Die v1083b-Regel „ein Liegenschaftszinssatz ≤ 0 wird verworfen\" greift für den Registerwert nicht. Sie greift, wenn jemand versucht, mit dem unteren Rand des Bandes zu rechnen — das ist verboten."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 26–29",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: Median 1,9 %, Mittel 1,9 %, 10. Perzentil −0,4 %, 90. Perzentil 4,5 %. LAGEPRÜFUNG: Median und Mittel liegen beide im Band [−0,4 ; 4,5] — erfüllt. GEGENPROBE ROHERTRAGSFAKTOR: 18,1 gegen 20,3 beim ezfh-Zweig — der Rohertragsfaktor der Eigentumswohnungen liegt niedriger, was bei GLEICHEM Zinssatz nur über eine kürzere Restnutzungsdauer oder höhere Bewirtschaftungskosten zustande kommt. Beides ist möglich und im Bericht nicht aufgeschlüsselt; die Beobachtung wird notiert, nicht erklärt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der beiden Objektarten abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und das 90. Perzentil. Damit fehlt die Bezugsgröße der Streuungsregel aus nrw_modell.js. streuung bleibt NULL — NICHT 0. Bekannte Falle: Number(null) ist 0 und besteht Number.isFinite; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum (nur Perzentile), die GESAMTNUTZUNGSDAUER als Zahl, Beschluss- und Veröffentlichungsdatum.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 200,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210957",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 26–29"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03353",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "wert_art": "median",
+   "wert_art_hinweis": "Als Registerwert wird der MEDIAN geführt; der Ausschuss stellt ihn voran. Das arithmetische Mittel wird mitgeführt, nicht verworfen.",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "MODELLVERMERK NACH § 10 ImmoWertV. Ohne diese Ansätze darf der Zinssatz nicht verwendet werden.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Im Bericht mit „70 Jahren\" genannt. ACHTUNG für den CrossCheckService: dessen Konstante GND_JAHRE steht auf 80. Für diesen Satz gilt 70 — die GND ist aus dem Modellvermerk zu lesen, nicht aus der Konstante (dieselbe Klasse wie der Bonn-Befund mit GND 60).",
+   "restnutzungsdauer": "15 bis 70 Jahre je Objektart, ermittelt gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge abzüglich der nicht umlagefähigen Kosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "zeiteinfluss": "kein Einfluss der Zeit abgeleitet — die fünf Jahrgänge sind unbereinigt zusammengefasst"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt AUSSCHLIESSLICH für den Landkreis Harburg. Der Ausschuss wertet je Landkreis aus; eine Übertragung auf die drei anderen Kreise seines Gebiets ist ausdrücklich nicht gedeckt — für sie stehen eigene Werte im Bericht.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -1.0,
+     4.2
+    ],
+    "rohertragsfaktor": [
+     12.3,
+     39.4
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil ist negativ. Das ist eine Aussage über die Stichprobe, nicht über den geführten Wert: der Median 2,30 % ist positiv und rechenbar. Mit dem unteren Rand des Bandes darf nicht gerechnet werden."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 40–57, Tabelle Ein- und Zweifamilienhäuser",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: n = 37, Median 2,30 %, Mittel 2,20 %, 10. Perzentil −1,00 %, 90. Perzentil 4,20 %. LAGEPRÜFUNG maschinell: Median und Mittel liegen beide im Band [−1,00 ; 4,20] — erfüllt. Rohertragsfaktor-Median 25,8 liegt in [12,3 ; 39,4] — erfüllt. Median positiv."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der acht Auswertungen abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und 90. Perzentil. streuung bleibt NULL — NICHT 0; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum des Zinssatzes (nur Perzentile) sowie Beschluss- und Veröffentlichungsdatum. Die GESAMTNUTZUNGSDAUER ist mit 70 Jahren genannt und damit vorhanden.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 37,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210959",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Lüneburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 40–57"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03355",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.4,
+   "wert_art": "median",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "gnd_beleg": "Im Bericht mit „70 Jahren\" genannt. Nicht die Konstante GND_JAHRE = 80 verwenden.",
+   "restnutzungsdauer": "15 bis 70 Jahre je Objektart, gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge abzüglich der nicht umlagefähigen Kosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "zeiteinfluss": "kein Einfluss der Zeit abgeleitet"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt ausschließlich für den Landkreis Lüneburg.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -3.7,
+     4.5
+    ],
+    "rohertragsfaktor": [
+     13.3,
+     35.9
+    ]
+   },
+   "hinweis_negativ": "Das 10. Perzentil von −3,70 % ist der tiefste negative Rand aller acht Auswertungen. Bei n = 16 heißt das: mindestens zwei Kauffälle liegen deutlich im Negativen. Der geführte Median bleibt positiv und rechenbar; die Breite des Bandes gehört als Vorbehalt in den Bericht."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 40–57",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: n = 16, Median 1,40 %, Mittel 1,20 %, Perzentile −3,70 / 4,50. LAGEPRÜFUNG maschinell erfüllt für Median und Mittel; Rohertragsfaktor-Median 25,0 in [13,3 ; 35,9] erfüllt. Das Mittel liegt UNTER dem Median — linksschief; bei 16 Fällen kein belastbares Verteilungsurteil, sondern ein Hinweis auf geringe Belegung."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der acht Auswertungen abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und 90. Perzentil. streuung bleibt NULL — NICHT 0; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum des Zinssatzes (nur Perzentile) sowie Beschluss- und Veröffentlichungsdatum. Die GESAMTNUTZUNGSDAUER ist mit 70 Jahren genannt und damit vorhanden.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 16,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210959",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Lüneburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 40–57"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03360",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 0.8,
+   "wert_art": "median",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15 bis 70 Jahre je Objektart, gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge abzüglich der nicht umlagefähigen Kosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "zeiteinfluss": "kein Einfluss der Zeit abgeleitet"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt ausschließlich für den Landkreis Uelzen.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -1.6,
+     4.7
+    ],
+    "rohertragsfaktor": [
+     11.9,
+     38.4
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 40–57",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: n = 11, Median 0,80 %, Mittel 1,30 %, Perzentile −1,60 / 4,70. LAGEPRÜFUNG maschinell erfüllt. Rohertragsfaktor-Median 19,6 in [11,9 ; 38,4] erfüllt. GEGENPROBE: Uelzen hat von den drei Kreisen den NIEDRIGSTEN Zinssatz (0,80) und zugleich den NIEDRIGSTEN Rohertragsfaktor (19,6). Das ist die FALSCHE Richtung — bei sonst gleichen Ansätzen gehört zu einem niedrigeren Zinssatz ein HÖHERER Rohertragsfaktor. Die Beobachtung wird notiert, nicht wegerklärt: sie kann an unterschiedlichen Restnutzungsdauern der Stichproben liegen, die der Bericht je Kreis nicht ausweist. Sie ist KEIN bestandener Gegentest."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der acht Auswertungen abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und 90. Perzentil. streuung bleibt NULL — NICHT 0; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum des Zinssatzes (nur Perzentile) sowie Beschluss- und Veröffentlichungsdatum. Die GESAMTNUTZUNGSDAUER ist mit 70 Jahren genannt und damit vorhanden.",
+  "objektart": "ezfh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 11,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210959",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Lüneburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 40–57"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03353",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.8,
+   "wert_art": "median",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15 bis 70 Jahre je Objektart, gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge abzüglich der nicht umlagefähigen Kosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "zeiteinfluss": "kein Einfluss der Zeit abgeleitet"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt ausschließlich für den Landkreis Harburg. KEIN TREFFER HEISST KEIN WERT: für ein Reihen- oder Doppelhaus in Lüneburg, Uelzen oder Lüchow-Dannenberg darf dieser Wert NICHT verwendet werden, und es darf auch nicht ersatzweise auf den ezfh-Zweig desselben Kreises ausgewichen werden.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -1.3,
+     3.4
+    ],
+    "rohertragsfaktor": [
+     18.1,
+     61.7
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 40–57, Tabelle Doppel- und Reihenhäuser",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: n = 22, Median 1,80 %, Mittel 1,50 %, Perzentile −1,30 / 3,40. LAGEPRÜFUNG maschinell erfüllt. Rohertragsfaktor-Median 28,2 in [18,1 ; 61,7] erfüllt. Die Obergrenze 61,7 ist auffällig hoch; sie ist ein Stichprobenrand, kein geführter Wert."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der acht Auswertungen abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und 90. Perzentil. streuung bleibt NULL — NICHT 0; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum des Zinssatzes (nur Perzentile) sowie Beschluss- und Veröffentlichungsdatum. Die GESAMTNUTZUNGSDAUER ist mit 70 Jahren genannt und damit vorhanden.",
+  "objektart": "rhdhh",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 22,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210959",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Lüneburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 40–57"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03353",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.6,
+   "wert_art": "median",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15 bis 70 Jahre je Objektart, gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge abzüglich der nicht umlagefähigen Kosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "zeiteinfluss": "kein Einfluss der Zeit abgeleitet",
+   "hinweis_mea": "Für Wohnungseigentum gilt die Projektregel: OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt ausschließlich für den Landkreis Harburg.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.7,
+     3.7
+    ],
+    "rohertragsfaktor": [
+     8.9,
+     40.9
+    ]
+   },
+   "hinweis_band": "Das einzige der acht Bänder mit vollständig POSITIVEM Perzentilband. Zusammen mit n = 68 ist das die belastbarste Auswertung dieses Ausschusses."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 40–57, Tabelle Wohnungseigentum",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: n = 68, Median 2,60 %, Mittel 2,40 %, Perzentile 0,70 / 3,70. LAGEPRÜFUNG maschinell erfüllt. Rohertragsfaktor-Median 25,0 in [8,9 ; 40,9] erfüllt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der acht Auswertungen abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und 90. Perzentil. streuung bleibt NULL — NICHT 0; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum des Zinssatzes (nur Perzentile) sowie Beschluss- und Veröffentlichungsdatum. Die GESAMTNUTZUNGSDAUER ist mit 70 Jahren genannt und damit vorhanden.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 68,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210959",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Lüneburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 40–57"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03355",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15 bis 70 Jahre je Objektart, gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge abzüglich der nicht umlagefähigen Kosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "zeiteinfluss": "kein Einfluss der Zeit abgeleitet",
+   "hinweis_mea": "OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt ausschließlich für den Landkreis Lüneburg.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.0,
+     3.2
+    ],
+    "rohertragsfaktor": [
+     15.6,
+     52.9
+    ]
+   },
+   "hinweis_band": "Das 10. Perzentil steht auf EXAKT 0,00 %. Achtung auf die bekannte Falle: Number(null) ist 0 — hier ist die 0 aber ein GELESENER Wert, keine Abwesenheit. Beides darf nicht verwechselt werden. Der geführte Median 1,90 % ist davon unberührt."
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 40–57",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: n = 46, Median 1,90 %, Mittel 1,90 %, Perzentile 0,00 / 3,20. LAGEPRÜFUNG maschinell erfüllt. Median und Mittel deckungsgleich — passt zu einer eng belegten, symmetrischen Stichprobe."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der acht Auswertungen abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und 90. Perzentil. streuung bleibt NULL — NICHT 0; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum des Zinssatzes (nur Perzentile) sowie Beschluss- und Veröffentlichungsdatum. Die GESAMTNUTZUNGSDAUER ist mit 70 Jahren genannt und damit vorhanden.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 46,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210959",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Lüneburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 40–57"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03360",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.5,
+   "wert_art": "median",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15 bis 70 Jahre je Objektart, gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge abzüglich der nicht umlagefähigen Kosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "zeiteinfluss": "kein Einfluss der Zeit abgeleitet",
+   "hinweis_mea": "OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt ausschließlich für den Landkreis Uelzen.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     -0.3,
+     4.4
+    ],
+    "rohertragsfaktor": [
+     14.8,
+     40.1
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 40–57",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: n = 15, Median 1,50 %, Mittel 1,70 %, Perzentile −0,30 / 4,40. LAGEPRÜFUNG maschinell erfüllt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der acht Auswertungen abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und 90. Perzentil. streuung bleibt NULL — NICHT 0; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum des Zinssatzes (nur Perzentile) sowie Beschluss- und Veröffentlichungsdatum. Die GESAMTNUTZUNGSDAUER ist mit 70 Jahren genannt und damit vorhanden.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 15,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210959",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Lüneburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 40–57"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03354",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Lüneburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "wert_art": "median",
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "restnutzungsdauer": "15 bis 70 Jahre je Objektart, gemäß § 4 (3) ImmoWertV",
+   "bewirtschaftungskosten": "gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV",
+   "marktmiete": "marktüblich erzielbare Erträge abzüglich der nicht umlagefähigen Kosten",
+   "bodenwert": "Bodenrichtwert, angepasst mit Umrechnungskoeffizienten",
+   "ausreisserbehandlung": "1,5-facher Interquartilsabstand",
+   "zeiteinfluss": "kein Einfluss der Zeit abgeleitet",
+   "hinweis_mea": "OHNE Miteigentumsanteil KEIN Bodenwert."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt ausschließlich für den Landkreis Lüchow-Dannenberg und ausschließlich für Wohnungseigentum. Für Ein-/Zweifamilienhäuser und für Doppel-/Reihenhäuser leitet der Ausschuss in diesem Kreis KEINEN Zinssatz ab — dort gilt „kein Wert\", und es darf weder auf einen Nachbarkreis noch auf einen anderen Zweig ausgewichen werden.",
+   "spannen": {
+    "liegenschaftszinssatz_prozent_perzentilband_10_90": [
+     0.8,
+     7.3
+    ],
+    "rohertragsfaktor": [
+     9.4,
+     19.2
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "abgedruckte_stichprobenstatistik",
+    "fundstelle": "S. 40–57",
+    "soll_kennzahlen": 5,
+    "pruefprotokoll": "Zwei unabhängige Leseläufe, zeichengleich: n = 5, Median 1,90 %, Mittel 3,30 %, Perzentile 0,80 / 7,30. LAGEPRÜFUNG maschinell erfüllt (Median und Mittel beide im Band). GEGENPROBE ROHERTRAGSFAKTOR: Median 18,6 liegt in [9,4 ; 19,2] — erfüllt, aber die Spanne ist mit 9,8 Punkten so eng am Median, dass sie eher die Kleinheit der Stichprobe belegt als die Güte des Wertes."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": "Die STANDARDABWEICHUNG ist für keine der acht Auswertungen abgedruckt (beide Leseläufe ausdrücklich darauf gerichtet). Der Ausschuss führt stattdessen das 10. und 90. Perzentil. streuung bleibt NULL — NICHT 0; stufeNachStreuung() muss auf Abwesenheit prüfen. Ebenfalls nicht abgedruckt: Minimum und Maximum des Zinssatzes (nur Perzentile) sowie Beschluss- und Veröffentlichungsdatum. Die GESAMTNUTZUNGSDAUER ist mit 70 Jahren genannt und damit vorhanden.",
+  "objektart": "we_v",
+  "objektart_bez": null,
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "B",
+  "stufe_grund": "Streuung nicht ausgewiesen — die Belastbarkeit lässt sich nicht auf Stufe A prüfen. Der Wert selbst ist amtlich veröffentlicht.",
+  "fallzahl": 5,
+  "streuung": null,
+  "stichtag": "2025-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/210959",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Lüneburg 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "fundstelle": "„Grundstücksmarktdaten 2025\", Kapitel Liegenschaftszinssätze und Rohertragsfaktoren, S. 40–57"
+ }
+]

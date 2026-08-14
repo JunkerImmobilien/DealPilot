@@ -1,0 +1,509 @@
+[
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "objektkaltmiete_eur_m2_monat",
+   "achse_bez": "durchschnittliche monatliche Objektkaltmiete in EUR/m² Wohn-/Nutzfläche",
+   "liefert": "prozent",
+   "stufen": {
+    "3": 2.3,
+    "5": 2.6,
+    "7": 2.8,
+    "9": 3.0,
+    "11": 3.3,
+    "13": 3.5,
+    "15": 3.7,
+    "17": 4.0,
+    "19": 4.2,
+    "22": 4.6
+   },
+   "rundung_stellen": 1,
+   "interpolation": "linear zwischen den Stützstellen",
+   "hinweis": "Ergebnis in PROZENT (2,3 bedeutet 2,3 %), nicht als Dezimalbruch. Anders als vom Auftrag vermutet ist der Berliner Liegenschaftszinssatz KEINE Konstante je Objektart, sondern eine Funktion der Objektkaltmiete. Das Dokument entscheidet, nicht die Erwartung."
+  },
+  "korrekturen": [
+   {
+    "bez": "Altbezirk",
+    "feld": "altbezirk",
+    "art": "stufen_kategorial",
+    "stufen": {
+     "Mitte": 0.0,
+     "Tiergarten": 0.0,
+     "Wedding": -0.3,
+     "Prenzlauer Berg": 0.0,
+     "Friedrichshain": 0.2,
+     "Kreuzberg": 0.0,
+     "Charlottenburg": 0.0,
+     "Spandau": 0.0,
+     "Wilmersdorf": 0.0,
+     "Zehlendorf": 0.0,
+     "Schöneberg": 0.2,
+     "Steglitz": 0.3,
+     "Tempelhof": 0.0,
+     "Neukölln": 0.0,
+     "Treptow": 0.0,
+     "Köpenick": 0.0,
+     "Lichtenberg": 0.0,
+     "Weißensee": 0.5,
+     "Pankow": 0.0,
+     "Reinickendorf": 0.2,
+     "Marzahn": 0.0,
+     "Hohenschönhausen": 0.0,
+     "Hellersdorf": 0.0
+    },
+    "rundung_stellen": 1,
+    "einheit": "prozentpunkte",
+    "vorbehalt": true,
+    "hinweis": "Additiv in Prozentpunkten auf den abgelesenen Zinssatz. 23 Altbezirke (Stand vor der Gebietsreform 2001) — hier sind ALLE 23 abgedeckt, anders als beim Sachwertfaktor. VORBEHALT: die 23 Einzelwerte stammen aus nur EINEM Lesedurchgang. Gegenprüfung: ein unabhängiger Durchgang nannte die Spanne „−0,3 bis +0,5\", und Minimum (Wedding −0,3) wie Maximum (Weißensee +0,5) treffen diese Spanne exakt. Das stützt die Randwerte, nicht jede Einzelzuordnung. Vor produktivem Einsatz am PDF bestätigen."
+   },
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahr",
+    "art": "stufen_kategorial",
+    "stufen": {
+     "Altbauten (vor 1919)": 0.0,
+     "Zwischenkriegsbauten (1919–1948)": 0.0,
+     "1949–1972": 0.0,
+     "1973–1990 West": 0.2,
+     "1973–1990 Ost": 0.0,
+     "1991–2002": 0.0,
+     "ab 2003": 0.0
+    },
+    "rundung_stellen": 1,
+    "einheit": "prozentpunkte",
+    "vorbehalt": true,
+    "hinweis": "Additiv in Prozentpunkten. Nur die Gruppe „1973–1990 West\" trägt einen Wert; die Unterscheidung West/Ost innerhalb derselben Baujahresspanne setzt die Kenntnis der Lage im ehemaligen West- bzw. Ostteil Berlins voraus. Nur EIN Lesedurchgang — Vorbehalt."
+   },
+   {
+    "bez": "Gewerblicher Mietanteil",
+    "feld": "gewerbeanteil_prozent",
+    "art": "stufen",
+    "stufen": {
+     "0": 0.0,
+     "10": 0.03,
+     "20": 0.06,
+     "30": 0.09,
+     "40": 0.12,
+     "50": 0.15,
+     "60": 0.18,
+     "70": 0.21,
+     "80": 0.24
+    },
+    "rundung_stellen": 2,
+    "einheit": "prozentpunkte",
+    "hinweis": "Additiv in Prozentpunkten, 9 Stufen in 10-%-Schritten. Exakt linear: 0,003 Prozentpunkte je Prozent Gewerbeanteil. Zwei Lesedurchgänge stimmen in der Spanne (+0,00 bis +0,24) überein. Über 80 % Gewerbeanteil liegt das Objekt außerhalb der Definition und bekommt keinen Wert."
+   },
+   {
+    "bez": "Stadträumliche Wohnlage",
+    "feld": "wohnlage",
+    "art": "stufen_kategorial",
+    "stufen": {
+     "einfach": 0.2,
+     "mittel": 0.0,
+     "gut": 0.0,
+     "sehr gut": -0.07
+    },
+    "rundung_stellen": 2,
+    "einheit": "prozentpunkte",
+    "vorbehalt": true,
+    "hinweis": "Additiv in Prozentpunkten. Bezugsfall mittel; „gut\" liegt gleichauf mit „mittel\". Nur EIN Lesedurchgang — Vorbehalt."
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV — ein Liegenschaftszinssatz darf nur mit den Ansätzen gerechnet werden, aus denen er abgeleitet wurde.",
+   "rohertrag": "Jahresnettokaltmieten aus den Kaufverträgen",
+   "instandhaltungskosten": {
+    "wohnen_eur_m2_wfl_jahr": 13.3,
+    "garage_eur_platz_jahr": 100,
+    "offener_stellplatz_eur_platz_jahr": 50
+   },
+   "verwaltungskosten": {
+    "wohnen_eur_wohnung_jahr": 339.0,
+    "gewerbe": "3 % vom Mietertrag"
+   },
+   "mietausfallwagnis": {
+    "wohnen": "2 % der Netto-Kaltmiete",
+    "gewerbe_sonstiges": "4 % der Netto-Kaltmiete"
+   },
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Berlin nennt KEINE pauschale Quote, sondern Einzelansätze (siehe oben). Wer mit einer Prozentquote rechnet, verlässt das Modell.",
+   "restnutzungsdauer": {
+    "altbauten_zwischenkriegsbauten_jahre": [
+     25,
+     55
+    ],
+    "ab_1949_jahre": [
+     25,
+     80
+    ],
+    "hinweis": "Restnutzungsdauer je nach Baualter, Bauzustand und Ausstattung aus den Tabellen 1–4 des Dokuments; kein einheitlicher Wert. Die Tabellen 1–4 selbst sind hier NICHT erfasst — siehe _fehlend.md."
+   },
+   "gesamtnutzungsdauer_jahre": null,
+   "gesamtnutzungsdauer_hinweis": "Das Dokument arbeitet mit Restnutzungsdauer-Tabellen und beziffert KEINE einheitliche Gesamtnutzungsdauer. Zweifach geprüft. Das ist eine echte Lücke für den Modellvermerk — die RND darf nicht ersatzweise aus einer angenommenen GND minus Alter gebildet werden.",
+   "verfahren": "multiple lineare Regression auf dem Berliner Kaufpreismaterial"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Wörtlicher Anwendungshinweis zur Tabelle: „Die Liegenschaftszinssätze gelten zum Stichtag unter Anwendung untenstehender Korrekturfaktoren.\" Die Korrekturen sind damit PFLICHT, nicht Kür. Außerhalb der Mietspanne 3,00 bis 22,00 EUR/m² und außerhalb der Objektartdefinition (mind. vier Mieteinheiten, Gewerbeanteil bis 80 %) wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "objektkaltmiete_eur_m2_monat": [
+     3.0,
+     22.0
+    ],
+    "gewerbeanteil_prozent": [
+     0,
+     80
+    ],
+    "mieteinheiten_min": 4,
+    "leerstand_max_prozent": 20
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Tabelle 5, S. 8",
+    "soll_zeilen": 1,
+    "soll_spalten": 10,
+    "soll_stuetzstellen": 10,
+    "soll_eckwerte": [
+     {
+      "objektkaltmiete_eur_m2_monat": 3.0,
+      "wert": 2.3
+     },
+     {
+      "objektkaltmiete_eur_m2_monat": 22.0,
+      "wert": 4.6
+     }
+    ],
+    "wortlaut": "Kein durchgerechnetes Rechenbeispiel im Dokument (zweifach geprüft), und anders als beim Sachwertfaktor auch keine abgedruckte Regressionsgleichung — das Dokument spricht nur allgemein von „Regressionsgleichungen\" und „multipler linearer Regression\". An die Stelle des Anwendungsbeispiels treten deshalb Zählprüfung, Monotonie und eine Linearitätsprobe.",
+    "pruefprotokoll": "Am 13.08.2026 gerechnet. ZÄHLPRÜFUNG: 10 Stützstellen, in zwei unabhängigen Leseläufen identisch (3,00 · 5,00 · 7,00 · 9,00 · 11,00 · 13,00 · 15,00 · 17,00 · 19,00 · 22,00 EUR/m²), keine Lücke. Schrittweite durchgehend 2,00 EUR/m² bis auf den letzten Schritt (19,00 auf 22,00 = 3,00) — die Unregelmäßigkeit steht so im Dokument und ist kein Lesefehler, sie wurde eigens gegengeprüft. MONOTONIE: streng steigend über alle zehn Stützstellen, Wertebereich 2,3 bis 4,6 %. LINEARITÄTSPROBE als Ersatz für das fehlende Anwendungsbeispiel: eine Ausgleichsgerade durch alle zehn Paare lautet LZS = 1,96423 + 0,11866 × Miete; sie trifft ALLE ZEHN abgedruckten Werte nach Rundung auf eine Nachkommastelle exakt, maximale absolute Abweichung 0,044 Prozentpunkte. Ein Zahlendreher oder eine vertauschte Zelle hätte diese Gerade gebrochen. GEGENPRÜFUNG der Korrekturen: Altbezirk-Spanne −0,3 bis +0,5 aus einem unabhängigen Durchgang wird von den Einzelwerten (Wedding −0,3, Weißensee +0,5) exakt getroffen; Gewerbeanteil-Spanne +0,00 bis +0,24 ebenso, und die neun Stufen sind exakt linear mit 0,003 je Prozentpunkt.",
+    "negativtest": "Ein Lesedurchgang behauptete, das Modell differenziere nach „Gebietsgruppen (City, Nord, Ost, Südost, Südwest, West)\". Die gezielte Nachfrage nach dem Anwendungshinweis widerlegte das: die Gebietsgruppen dienen im Dokument der Flächenanalyse, die Zinssatzkorrektur läuft über den ALTBEZIRK. Wäre die erste Lesart übernommen worden, wäre eine Gebietsachse ins Rezept geraten, die das Modell gar nicht kennt — und die passende Zuordnungstabelle hätte für immer gefehlt. Lehre: die Achse eines Modells wird am Anwendungshinweis festgemacht, nicht an der auffälligsten Tabelle im Heft."
+   }
+  ],
+  "vollstaendig": false,
+  "unvollstaendig_grund": null,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 724,
+  "streuung": null,
+  "stichtag": "2023-12-31",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-02-010-2400.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "Tabelle 5 „Liegenschaftszinssätze\", S. 8, nebst den nachstehenden Korrekturtabellen"
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_kategorial",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert des Grundstücks in Euro",
+   "achse_x": [
+    300000,
+    500000,
+    700000,
+    900000,
+    1100000
+   ],
+   "achse_k_feld": "altbezirksgruppe",
+   "achse_k_bez": "Altbezirksgruppe (Berliner Altbezirke vor der Gebietsreform 2001)",
+   "kategorien": [
+    "1",
+    "2",
+    "3"
+   ],
+   "zellen_schluessel": "x-Stuetzstelle -> Werte in Reihenfolge kategorien (beim Einlesen gedreht)",
+   "zellen": {
+    "300000": [
+     1.01,
+     0.95,
+     0.91
+    ],
+    "500000": [
+     0.96,
+     0.89,
+     0.85
+    ],
+    "700000": [
+     0.9,
+     0.84,
+     0.79
+    ],
+    "900000": [
+     0.84,
+     0.78,
+     0.74
+    ],
+    "1100000": [
+     0.79,
+     0.73,
+     0.68
+    ]
+   },
+   "rundung_stellen": 2,
+   "interpolation": "linear über achse_x. Das zugrunde liegende Modell ist in x exakt linear (siehe regression_dokumentation), lineare Interpolation gibt es deshalb ohne Modellbruch wieder.",
+   "kategorie_zuordnung": {
+    "hinweis": "Die Kategorie ergibt sich aus dem ALTBEZIRK (Stand vor 2001), nicht aus dem heutigen Bezirk und nicht aus dem Ortsteil. Das Dokument nennt die Altbezirke in den Tabellenüberschriften; die Liste unten ist genau diese Aufzählung, zweifach unabhängig gelesen und identisch bestätigt.",
+    "1": [
+     "Treptow",
+     "Lichtenberg",
+     "Charlottenburg",
+     "Spandau",
+     "Wilmersdorf",
+     "Zehlendorf",
+     "Steglitz",
+     "Pankow"
+    ],
+    "2": [
+     "Tempelhof",
+     "Neukölln",
+     "Hohenschönhausen"
+    ],
+    "3": [
+     "Köpenick",
+     "Weißensee",
+     "Reinickendorf",
+     "Marzahn",
+     "Hellersdorf"
+    ],
+    "abgedeckte_altbezirke": 16,
+    "nicht_abgedeckt": "Berlin hat 23 Altbezirke; das Dokument führt 16. Die sieben nicht genannten sind nach Abgleich mit der bekannten Altbezirksliste Mitte, Tiergarten, Wedding, Prenzlauer Berg, Friedrichshain, Kreuzberg und Schöneberg — diese Ableitung stammt NICHT aus dem Dokument, sondern aus dem Abgleich; sie ist am PDF zu bestätigen. Das Dokument enthält KEINEN Hinweis, wie mit Grundstücken in nicht genannten Altbezirken zu verfahren ist.",
+    "regel": "KEIN TREFFER HEISST KEIN WERT. Liegt das Objekt in einem der sieben nicht genannten Altbezirke, wird kein Sachwertfaktor geliefert — keine Nachbargruppe, kein Mittelwert."
+   }
+  },
+  "korrekturen": [
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahr",
+    "art": "band",
+    "baender": [
+     {
+      "bis": 1919,
+      "wert": 0.0
+     },
+     {
+      "von": 1920,
+      "bis": 1948,
+      "wert": -0.061
+     },
+     {
+      "von": 1949,
+      "bis": 1970,
+      "wert": -0.123
+     },
+     {
+      "von": 1971,
+      "bis": 1990,
+      "wert": 0.0
+     },
+     {
+      "von": 1991,
+      "bis": 2009,
+      "wert": 0.106
+     },
+     {
+      "von": 2010,
+      "bis": 2019,
+      "wert": 0.0
+     },
+     {
+      "von": 2020,
+      "wert": 0.0
+     }
+    ],
+    "rundung_stellen": 3,
+    "hinweis": "Additiv auf den Tabellenwert. ACHTUNG: vier der sieben Baujahresgruppen tragen ±0. Das ist für ein Dummy-Schema ungewöhnlich (normalerweise genau eine Referenzkategorie) und erklärt sich daraus, dass das Modell aus Baum- UND Regressionsanalyse stammt und nicht signifikante Gruppen auf 0 fallen. Zwei unabhängige Leseläufe geben exakt dieselben sieben Werte. Vor produktivem Einsatz am PDF gegenprüfen.",
+    "vorbehalt": true
+   },
+   {
+    "bez": "Gebäudeart / Anbauweise",
+    "feld": "gebaeudeart",
+    "art": "stufen_kategorial",
+    "stufen": {
+     "freistehendes Ein-/Zweifamilienhaus": 0.0,
+     "Doppelhaushälfte": 0.084,
+     "Reihenendhaus": 0.201,
+     "Reihenmittelhaus": 0.341
+    },
+    "rundung_stellen": 3,
+    "hinweis": "Additiv auf den Tabellenwert. Bezugsfall: freistehendes Ein-/Zweifamilienhaus."
+   },
+   {
+    "bez": "Bauzustand",
+    "feld": "bauzustand",
+    "art": "stufen_kategorial",
+    "stufen": {
+     "gut": 0.179,
+     "normal": 0.0,
+     "schlecht": -0.141
+    },
+    "rundung_stellen": 3,
+    "hinweis": "Additiv auf den Tabellenwert. Bezugsfall: normal."
+   },
+   {
+    "bez": "Gebäudekonstruktion",
+    "feld": "gebaeudekonstruktion",
+    "art": "stufen_kategorial",
+    "stufen": {
+     "Massivhaus": 0.0,
+     "Fertighaus-Massiv": 0.0,
+     "Fertighaus-Holz": -0.072
+    },
+    "rundung_stellen": 3,
+    "hinweis": "Additiv auf den Tabellenwert. Bezugsfall: Massivhaus; Fertighaus-Massiv ist dem Massivhaus gleichgestellt."
+   },
+   {
+    "bez": "Stadträumliche Wohnlage",
+    "feld": "wohnlage",
+    "art": "stufen_kategorial",
+    "stufen": {
+     "einfach": -0.043,
+     "mittel": 0.0,
+     "gut": 0.075
+    },
+    "rundung_stellen": 3,
+    "hinweis": "Additiv auf den Tabellenwert. Bezugsfall: mittel. Gemeint ist die stadträumliche Wohnlage Berlins, nicht eine frei geschätzte Lagenote."
+   },
+   {
+    "bez": "Bauerrichtungsvertrag",
+    "feld": "bauerrichtungsvertrag",
+    "art": "stufen_kategorial",
+    "stufen": {
+     "mit Kaufvertrag beurkundet": -0.081,
+     "nicht beurkundet": 0.0
+    },
+    "rundung_stellen": 3,
+    "hinweis": "Additiv auf den Tabellenwert. Bezugsfall: nicht beurkundet."
+   }
+  ],
+  "modellansaetze": {
+   "nhk": "NHK 2010 (Tabellenzeile NHK10 in der Perzentiltabelle, Mittelwert 970 €/m²)",
+   "verfahren": "Baumanalyse und Regressionsanalyse auf dem Berliner Kaufpreismaterial",
+   "gnd_jahre": null,
+   "hinweis": "Gesamtnutzungsdauer, Alterswertminderungsmodell, Außenanlagenansatz und Regionalfaktor sind in den gelesenen Abschnitten NICHT beziffert. Für die Modelltreue nach § 10 ImmoWertV ist das eine offene Stelle — siehe _fehlend.md."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "extrapolation_wortlaut": "(Nur innerhalb der 5% und 95% Perzentilen statistisch verlässlich anwendbar.)",
+   "hinweis": "Der Anwendungsbereich ist ausdrücklich auf das 5–95-%-Perzentilband der Stichprobe begrenzt. Die x-Achse der Tabelle (300.000 bis 1.100.000 €) liegt genau in diesem Band (Sachwert 5 % = 289.845 €, 95 % = 1.114.060 €). Außerhalb wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     289845,
+     1114060
+    ],
+    "grundstuecksflaeche_m2": [
+     212,
+     993
+    ],
+    "bruttogrundflaeche_m2": [
+     146,
+     430
+    ],
+    "bodenrichtwert_eur_m2": [
+     410,
+     1200
+    ],
+    "nhk2010_eur_m2": [
+     825,
+     1215
+    ],
+    "gfz": [
+     0.1,
+     0.54
+    ],
+    "kaufpreis_sachwert_verhaeltnis": [
+     0.635,
+     1.627
+    ]
+   },
+   "stichprobe_mittelwerte": {
+    "kaufpreis_sachwert_verhaeltnis": 1.06,
+    "grundstuecksflaeche_m2": 559,
+    "bruttogrundflaeche_m2": 257,
+    "bodenrichtwert_eur_m2": 684,
+    "nhk2010_eur_m2": 970,
+    "sachwert_eur": 620440,
+    "gfz": 0.27
+   },
+   "regression_dokumentation": {
+    "hinweis": "NUR DOKUMENTATION, NICHT das Rechenwerkzeug. Gerechnet wird über die abgedruckte Tabelle im generischen Auswerter. Die geschlossene Form ist hier festgehalten, weil sie die Tabelle Zelle für Zelle exakt reproduziert und damit den Beleg trägt (siehe beleg.pruefprotokoll).",
+    "formel_wortlaut_gruppe1": "SWF zum Stichtag 31.12.2024 = 1,398 -0,000000280 x Sachwert des Grundstücks - 0,0002759 x Anzahl der Tage vom 31.12.2021 bis zum 31.12.2024",
+    "intercept": 1.398,
+    "koeff_sachwert": -2.8e-07,
+    "koeff_tage": -0.0002759,
+    "tage_basis": "31.12.2021",
+    "tage_zum_stichtag": 1096,
+    "gruppenkorrektur": {
+     "1": 0.0,
+     "2": -0.062,
+     "3": -0.105
+    },
+    "zeitbezug": "Der Tage-Term macht das Berliner Modell stichtagsfähig: er misst die Zeit ab dem 31.12.2021. Für den Tabellenstichtag 31.12.2024 sind es 1.096 Tage. Eine Anwendung auf einen anderen Wertermittlungsstichtag verlässt den belegten Bereich und ist nicht durch das Dokument gedeckt — die Tabelle gilt zum 31.12.2024."
+   }
+  },
+  "belege": [
+   {
+    "art": "formel_gegen_tabelle",
+    "fundstelle": "Sachwertfaktor-Tabellen der drei Altbezirksgruppen nebst zugehöriger Regressionsformel",
+    "soll_zeilen": 3,
+    "soll_spalten": 5,
+    "soll_zellen": 15,
+    "soll_eckwerte": [
+     {
+      "altbezirksgruppe": "1",
+      "sachwert": 300000,
+      "wert": 1.01
+     },
+     {
+      "altbezirksgruppe": "1",
+      "sachwert": 1100000,
+      "wert": 0.79
+     },
+     {
+      "altbezirksgruppe": "3",
+      "sachwert": 300000,
+      "wert": 0.91
+     },
+     {
+      "altbezirksgruppe": "3",
+      "sachwert": 1100000,
+      "wert": 0.68
+     }
+    ],
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt ein stärkerer Beleg: das Dokument nennt neben der Tabelle die vollständige Regressionsformel, aus der die Tabelle erzeugt wurde. Formel und Tabelle wurden in getrennten Leseläufen erhoben und gegeneinander gerechnet.",
+    "pruefprotokoll": "Am 13.08.2026 gerechnet. Tage vom 31.12.2021 bis 31.12.2024 = 1.096 (2022: 365, 2023: 365, 2024: 366 — Schaltjahr). Basisterm 1,398 − 0,000000280 × SW − 0,0002759 × 1.096, zuzüglich Gruppenkorrektur 0 / −0,062 / −0,105. ZÄHLPRÜFUNG: 3 Gruppen × 5 Stützstellen = 15 Zellen, keine leere Zelle, Schrittweite x durchgehend 200.000 €. ZELLPRÜFUNG: alle 15 Zellen auf zwei Stellen getroffen, keine Abweichung (Gruppe 1: 1,01162→1,01 · 0,95561→0,96 · 0,89961→0,90 · 0,84361→0,84 · 0,78761→0,79; Gruppe 2 und 3 entsprechend). MONOTONIE: alle drei Zeilen fallen streng über den vorläufigen Sachwert; alle fünf Spalten fallen streng über die Gruppennummer 1→2→3. WERTEBEREICH 0,68 bis 1,01, plausibel für Berliner Eigenheime. QUERPRÜFUNG: der aus der Tabelle abgeleitete Steigungswert (−0,055 je 200.000 €) trifft den Formelkoeffizienten −0,000000280 auf die dritte Stelle. Die Perzentilgrenzen des Sachwerts (289.845 / 1.114.060 €) umschließen die Achsenenden 300.000 / 1.100.000 € — die Tabelle bildet also genau das erlaubte Anwendungsband ab.",
+    "negativtest": "Ein Lesedurchgang lieferte die Formel zunächst abgeschnitten („= 1,398 -0,000000280 x Sachwert des Grundstücks [...]\"). Mit dieser verkürzten Fassung ergibt sich für Gruppe 1 bei 300.000 € ein Wert von 1,314 statt 1,01 — eine Abweichung von 0,30. Erst der vollständige Formeltext mit dem Tage-Term löst den Widerspruch auf. Lehre: eine Formel, die die abgedruckte Tabelle nicht reproduziert, ist unvollständig gelesen und nicht etwa die Tabelle falsch. Der Term wäre ohne die Gegenrechnung stillschweigend verlorengegangen und hätte jeden Berliner Sachwert um rund 30 Prozentpunkte zu hoch angesetzt."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 2952,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-03-010-2500.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "fundstelle": "„Sachwertfaktoren 2025\", Tabellen für die drei Altbezirksgruppen nebst Zu-/Abschlagstabellen"
+ }
+]

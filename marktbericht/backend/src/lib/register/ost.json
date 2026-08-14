@@ -1,0 +1,1808 @@
+[
+ {
+  "land_code": "ST",
+  "ags": "15",
+  "ebene": "land",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "stufen_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "ort",
+   "achse_k_bez": "Name der Stadt bzw. des Regionstyps; die Zuordnung erfolgt über den Ortsnamen, nicht über den Gemeindeschlüssel",
+   "rundung_stellen": 1,
+   "interpolation": "keine — kategoriale Nachschlagetabelle",
+   "stufen_hinweis": "Ergebnis in PROZENT (3,0 bedeutet 3,0 %), nicht als Dezimalbruch. Das Dokument rundet die Zinssätze ausdrücklich auf halbe Prozentpunkte und ermittelt sie sachverständig — Wortlaut: „Auf halbe Prozentpunkte gerundet, sachverständig ermittelt“. Zwischenwerte gibt es damit nicht; eine Interpolation wäre Dokumentbruch.",
+   "stufen": {
+    "Stendal": 3.0,
+    "Wernigerode": 3.0,
+    "Merseburg": 3.5,
+    "Quedlinburg": 3.5,
+    "Naumburg": 3.5,
+    "Wittenberg": 3.5,
+    "Schönbeck": 3.5,
+    "Dessau": 4.0,
+    "Weißenfels": 4.0,
+    "Salzwedel": 4.0,
+    "Haldensleben": 4.0,
+    "Eisleben": 4.0,
+    "Bernburg": 4.5,
+    "Halberstadt": 4.5,
+    "Burg": 4.5,
+    "Aschersleben": 4.5,
+    "Zeitz": 5.0,
+    "Oschersleben": 5.0,
+    "Bitterfeld-Wolfen": 5.5,
+    "Köthen": 5.5,
+    "Zerbst": 6.0,
+    "Staßfurt": 6.5
+   },
+   "stufen_fallzahl": {
+    "Stendal": 22,
+    "Wernigerode": 5,
+    "Merseburg": 7,
+    "Quedlinburg": 6,
+    "Naumburg": 6,
+    "Wittenberg": 5,
+    "Schönbeck": 4,
+    "Dessau": 9,
+    "Weißenfels": 9,
+    "Salzwedel": 6,
+    "Haldensleben": 2,
+    "Eisleben": 2,
+    "Bernburg": 13,
+    "Halberstadt": 7,
+    "Burg": 6,
+    "Aschersleben": 5,
+    "Zeitz": 7,
+    "Oschersleben": 2,
+    "Bitterfeld-Wolfen": 5,
+    "Köthen": 7,
+    "Zerbst": 2,
+    "Staßfurt": 3
+   },
+   "stufen_schreibweise_vorbehalt": {
+    "Schönbeck": "Beide Leseläufe geben „Schönbeck“. Gemeint ist mit hoher Wahrscheinlichkeit Schönebeck (Elbe); der Name wurde ABSICHTLICH NICHT stillschweigend korrigiert. Vor der Ortsnamen->AGS-Abbildung am Dokument zu prüfen."
+   },
+   "strittig": {
+    "Sangerhausen": {
+     "wert": 4.0,
+     "fallzahl": 0,
+     "grund": "Lesedurchgang 1 führt Sangerhausen als eigene Zeile im 4,0-%-Block, mit „–“ in allen Datenspalten und der Fußnote „Sangerhausen wurde sachverständig zugeordnet“. Lesedurchgang 2 zählt 22 Ortszeilen und führt Sangerhausen NICHT. Die beiden Läufe widersprechen sich. Sangerhausen ist deshalb NICHT in stufen aufgenommen — kein Treffer heißt kein Wert.",
+     "aufloesung": "Am Dokument nachzusehen. Träfe Lesedurchgang 1 zu, wäre der Wert ohnehin sachverständig zugeordnet und nicht aus Kauffällen abgeleitet — also von schwächerer Qualität als die übrigen 22."
+    }
+   }
+  },
+  "korrekturen": [
+   {
+    "bez": "Regionstyp — Rückfall, wenn der Ort nicht in der Städteliste steht",
+    "feld": "regionstyp",
+    "art": "stufen_kategorial",
+    "einheit": "prozent",
+    "ersetzt_statt_addiert": true,
+    "stufen": {
+     "Mittelzentrum / Oberzentrum Dessau": 4.1,
+     "Grundzentrum": 4.9,
+     "Dorf": 5.7
+    },
+    "rundung_stellen": 1,
+    "hinweis": "Dies sind KEINE additiven Korrekturen, sondern die arithmetischen Mittel der drei Gesamtstichproben. Sie ERSETZEN den Ortswert, wenn kein Ortstreffer vorliegt. Achtung: die Mittel sind auf eine Nachkommastelle angegeben, die Ortswerte dagegen auf halbe Prozentpunkte gerundet — zwei verschiedene Rundungsregeln in einem Dokument.",
+    "vorbehalt": true,
+    "vorbehalt_grund": "Ob der Ausschuss diesen Rückfall selbst vorsieht, sagt das Dokument NICHT. Die Ersetzung ist unsere Auslegung, nicht seine Anweisung. Wer sie nutzt, muss sie im Bericht als solche kennzeichnen."
+   },
+   {
+    "bez": "Altmärkische Grundzentren — Abschlag für die besseren Lagen",
+    "feld": "ort",
+    "art": "stufen_kategorial",
+    "einheit": "prozentpunkte",
+    "stufen": {
+     "Gardelegen": -0.75,
+     "Tangermünde": -0.75
+    },
+    "rundung_stellen": 2,
+    "vorbehalt": true,
+    "hinweis": "Das Dokument nennt für die altmärkischen Grundzentren einen durchschnittlichen Liegenschaftszinssatz von 4,5 % (Spanne 3,1–7,4 %) und für Gardelegen und Tangermünde einen Abschlag von „0,5–1,0 %“ wegen der besseren Lage. Ein EINZELNER Wert ist damit nicht genannt — die hier eingetragenen -0,75 sind die Bandmitte und damit UNSERE Setzung, nicht die des Ausschusses. Deshalb vorbehalt: true. Wer genau rechnen will, muss die Spanne ausweisen, nicht die Mitte."
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle ist das getrennte Erläuterungsdokument, nicht das Zahlenblatt.",
+   "rohertrag": "Jahresnettokaltmiete. Wörtlich: tatsächliche Mieten, sofern marktüblich; Leerstände wurden mit Marktmieten aufgefüllt. Datenquelle ist der Erwerberfragebogen mit Plausibilitäts- und Marktüblichkeitsprüfung.",
+   "reinertrag": "Rohertrag abzüglich Bewirtschaftungskosten. Wörtlich: „Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis, sowie für nicht umlegbare Betriebskosten“.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Das Modell nennt KEINE pauschale Quote. Die Werte 31,0 % / 32,3 % / 35,1 % in geltungsbereich.stichprobe_mittelwerte sind BEOBACHTETE Stichprobenmittel, keine Modellvorgabe. Wer sie als Ansatz verwendet, muss das ausweisen.",
+   "gesamtnutzungsdauer_jahre": null,
+   "gesamtnutzungsdauer_hinweis": "In BEIDEN Dokumenten nicht beziffert (je zweifach geprüft). Das Modell arbeitet ausschließlich mit der Restnutzungsdauer. Eine Ersatzrechnung „RND = angenommene GND minus Alter“ verlässt das Modell.",
+   "restnutzungsdauer": "Wörtlich: die Literatur fordert mindestens 20 Jahre für eine sachgerechte Ableitung; sanierungsbedürftige Gebäude mit kürzerer Lebensdauer sind auszuschließen. Beobachtete Spannen je Regionstyp siehe geltungsbereich.spannen.",
+   "bodenwert": "Wörtlich: bei langer Restnutzungsdauer vernachlässigbar; bei kurzer Restnutzungsdauer sind die Reinertragsanteile von Boden und Gebäude getrennt zu berücksichtigen.",
+   "verfahren": "Ertragswertverfahren, iterative Ableitung. Näherung p = RE / KP; exakt p = (RE/KP) - ((q-1)/(q^n - 1)) * (KP - BW)/KP mit q = 1 + p, n = Restnutzungsdauer. Iteration bis der Zinssatz konstant bleibt.",
+   "modellkonformitaet_wortlaut": "„Die Anwendung der hiernach abgeleiteten Liegenschaftszinssätze im Ertragswertverfahren ist nur dann sachgerecht, wenn das Modell der Wertermittlung dem Modell der Ableitung des Liegenschaftszinssatzes entspricht.\\“",
+   "rechtsgrundlage_wortlaut": "„Gemäß § 193 Absatz 5 BauGB hat der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt Liegenschaftszinssätze und Ertragsfaktoren für Mehrfamilienhäuser und für Wohn- und Geschäftshäuser ermittelt.\\“"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Für Orte, die weder in der Städteliste noch in einem der drei Regionstypen geführt sind, liefert dieser Datensatz nichts — kein Nachbarort, kein Landesmittel. Das Dokument deckt ausdrücklich nur Mehrfamilienhäuser des genannten Baualters ab; Plattenbauten sind ausgeschlossen.",
+   "spannen": {
+    "mittelzentren": {
+     "liegenschaftszinssatz_prozent": [
+      0.5,
+      9.0
+     ],
+     "baujahr": [
+      1750,
+      1938
+     ],
+     "restnutzungsdauer_jahre": [
+      20,
+      54
+     ],
+     "wohn_nutzflaeche_m2": [
+      135,
+      1340
+     ],
+     "wohneinheiten": [
+      3,
+      18
+     ],
+     "bodenrichtwert_eur_m2": [
+      25,
+      200
+     ],
+     "nettokaltmiete_eur_m2_monat": [
+      3.5,
+      8.52
+     ],
+     "bewirtschaftungskosten_prozent": [
+      21.4,
+      43.8
+     ]
+    },
+    "grundzentren": {
+     "liegenschaftszinssatz_prozent": [
+      1.8,
+      8.8
+     ],
+     "baujahr": [
+      1800,
+      1939
+     ],
+     "restnutzungsdauer_jahre": [
+      21,
+      44
+     ],
+     "wohn_nutzflaeche_m2": [
+      160,
+      1044
+     ],
+     "wohneinheiten": [
+      3,
+      12
+     ],
+     "bodenrichtwert_eur_m2": [
+      14,
+      100
+     ],
+     "nettokaltmiete_eur_m2_monat": [
+      3.3,
+      6.92
+     ],
+     "bewirtschaftungskosten_prozent": [
+      8.0,
+      59.4
+     ]
+    },
+    "doerfer": {
+     "liegenschaftszinssatz_prozent": [
+      0.65,
+      11.84
+     ],
+     "baujahr": [
+      1800,
+      1963
+     ],
+     "restnutzungsdauer_jahre": [
+      20,
+      38
+     ],
+     "wohn_nutzflaeche_m2": [
+      180,
+      1190
+     ],
+     "wohneinheiten": [
+      3,
+      18
+     ],
+     "bodenrichtwert_eur_m2": [
+      7,
+      45
+     ],
+     "nettokaltmiete_eur_m2_monat": [
+      3.44,
+      6.5
+     ],
+     "bewirtschaftungskosten_prozent": [
+      24.5,
+      45.4
+     ]
+    }
+   },
+   "stichprobe_mittelwerte": {
+    "mittelzentren": {
+     "n": 138,
+     "baujahr": 1908,
+     "rnd_jahre": 32,
+     "wohn_nutzflaeche_m2": 361,
+     "wohneinheiten": 6,
+     "bodenrichtwert_eur_m2": 60,
+     "nettokaltmiete_eur_m2_monat": 5.53,
+     "bewirtschaftungskosten_prozent": 31.0,
+     "denkmalschutz_anteil_prozent": 14,
+     "lzs_prozent": 4.1,
+     "lzs_standardabweichung_pp": 1.6,
+     "lzs_median": 3.9,
+     "lzs_q1": 3.0,
+     "lzs_q3": 4.9,
+     "rohertragsfaktor": 12.8,
+     "rohertragsfaktor_standardabweichung": 3.1,
+     "rohertragsfaktor_median": 12.7
+    },
+    "grundzentren": {
+     "n": 47,
+     "baujahr": 1905,
+     "rnd_jahre": 30,
+     "wohn_nutzflaeche_m2": 327,
+     "wohneinheiten": 5,
+     "bodenrichtwert_eur_m2": 38,
+     "nettokaltmiete_eur_m2_monat": 5.23,
+     "bewirtschaftungskosten_prozent": 32.3,
+     "denkmalschutz_anteil_prozent": 15,
+     "lzs_prozent": 4.9,
+     "lzs_standardabweichung_pp": 1.6,
+     "lzs_median": 4.9,
+     "lzs_q1": 3.6,
+     "lzs_q3": 6.0,
+     "rohertragsfaktor": 11.1,
+     "rohertragsfaktor_standardabweichung": 2.7,
+     "rohertragsfaktor_median": 10.9
+    },
+    "doerfer": {
+     "n": 35,
+     "baujahr": 1915,
+     "rnd_jahre": 29,
+     "wohn_nutzflaeche_m2": 362,
+     "wohneinheiten": 6,
+     "bodenrichtwert_eur_m2": 24,
+     "nettokaltmiete_eur_m2_monat": 4.86,
+     "bewirtschaftungskosten_prozent": 35.1,
+     "denkmalschutz_anteil_prozent": 0,
+     "lzs_prozent": 5.7,
+     "lzs_standardabweichung_pp": 2.7,
+     "lzs_median": 5.5,
+     "lzs_q1": 3.9,
+     "lzs_q3": 6.9,
+     "rohertragsfaktor": 10.1,
+     "rohertragsfaktor_standardabweichung": 3.5,
+     "rohertragsfaktor_median": 9.7
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung_zwei_leselaeufe",
+    "fundstelle": "Abschnitt I „Mittelzentren und Oberzentrum Dessau“, Ortstabelle",
+    "soll_zeilen": 22,
+    "soll_spalten": 8,
+    "spaltenueberschriften_wortlaut": [
+     "Liegenschaftszinssatz in %",
+     "Ort",
+     "Anzahl Kauffälle",
+     "Spannen",
+     "Anzahl Denkmalschutz",
+     "Spanne Liegenschaftszinssatz (%)",
+     "BRW in €/m²",
+     "RND in Jahren",
+     "Anzahl der Wohn-, Nutzeinheiten"
+    ],
+    "soll_eckwerte": [
+     {
+      "ort": "Stendal",
+      "wert": 3.0,
+      "fallzahl": 22
+     },
+     {
+      "ort": "Staßfurt",
+      "wert": 6.5,
+      "fallzahl": 3
+     },
+     {
+      "ort": "Dessau",
+      "wert": 4.0,
+      "fallzahl": 9
+     }
+    ],
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab und nennt auch keine Regressionsgleichung — es ist eine reine Nachschlagetabelle mit sachverständig gerundeten Werten. An die Stelle des Anwendungsbeispiels treten deshalb zwei unabhängige Leseläufe, eine Zählprüfung und die abgedruckte Stichprobenstatistik.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZWEI LESELÄUFE: der erste erhob die Ortstabelle zusammen mit allen Nebenspalten, der zweite ausschließlich Ortsname, Zinssatz und Fallzahl. Beide liefern für alle 22 Orte IDENTISCHE Zinssätze und IDENTISCHE Fallzahlen, in identischer Reihenfolge. ZÄHLPRÜFUNG: Lauf 2 zählt ausdrücklich 22 Ortszeilen; Lauf 1 enthält dieselben 22 plus die strittige Zeile Sangerhausen (siehe formel.strittig). MONOTONIE: die Tabelle ist nach dem Zinssatz aufsteigend sortiert, 3,0 -> 6,5; innerhalb jedes Zinsblocks ist sie nach Fallzahl absteigend sortiert — beide Ordnungen sind über die ganze Tabelle durchgehalten, was ein vertauschtes Zeilenpaar sichtbar gemacht hätte. WERTEBEREICH: alle 22 Ortswerte liegen zwischen 3,0 und 6,5 % und damit innerhalb der abgedruckten Gesamtspanne 0,5–9,0 %. STICHPROBENSTATISTIK ALS GEGENPROBE: das arithmetische Mittel der Gesamtstichprobe beträgt 4,1 %, der Median 3,9 %, das 1. und 3. Quartil 3,0 und 4,9 % — das ungewichtete Mittel der 22 Ortswerte beträgt 4,32 %, der Median 4,00 % (beide am 13.08.2026 nachgerechnet, nicht geschätzt) — beide liegen zwischen dem 1. Quartil 3,0 und dem 3. Quartil 4,9 und damit im vom Bericht selbst genannten Sollband. RASTERPRÜFUNG: alle 22 Werte sind Vielfache von 0,5 Prozentpunkten, wie es die Methodenanmerkung „auf halbe Prozentpunkte gerundet“ verlangt — ein Zahlendreher hätte diese Regel mit hoher Wahrscheinlichkeit verletzt. FALLZAHL-GEGENPROBE: die Summe der 22 Ortsfallzahlen ergibt 140 gegenüber 138 der abgedruckten Gesamtstichprobe — Differenz +2, ungeklärt (siehe fallzahl_hinweis).",
+    "negativtest": "Die Zählprüfung hat gearbeitet: Lauf 1 und Lauf 2 unterscheiden sich um genau eine Zeile (Sangerhausen). Ohne das Nachzählen wäre die Differenz unbemerkt geblieben und Sangerhausen mit 4,0 % ins Register gewandert, obwohl der Ort in Lauf 1 in ALLEN Datenspalten „–“ trägt, also gar keine Kauffälle hat und nur sachverständig zugeordnet wurde. Genau die Fehlerklasse, die der Höxter-Negativtest beschreibt: Monotonie, Wertebereich und Stichprobenstatistik gingen ALLE durch, gefangen hat es allein das Nachzählen."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "mfh",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 220,
+  "streuung": 1.6,
+  "stichtag": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/482187,501/liegenschaftszinzs_tze_rohertragsfaktoren_landkreise.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "Datenblatt „Liegenschaftszinssätze und Rohertragsfaktoren“, Abschnitte I Mittelzentren und Oberzentrum Dessau, II Grundzentren, III Dörfer"
+ },
+ {
+  "land_code": "ST",
+  "ags": "15002000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh",
+  "formel": {
+   "form": "regression_additiv",
+   "liefert": "faktor",
+   "wortlaut": "Sachwertfaktor = + 0,79821318 + 10.800,16031602 x vorläufiger Sachwert ^ -0,81 € + 0,00096848 x Bodenrichtwert €/m² - 1,63874939 x Gebäudestandard ^ -1,88 - 0,06348555 x Gemarkung diskret",
+   "wortlaut_hinweis": "Dieser Formeltext wurde in ZWEI voneinander unabhängigen Leseläufen zeichengleich erhoben — identische Vorzeichen, identische Nachkommastellen, identische Exponenten. Das ist genau die Prüfung, die beim Berliner Sachwertfaktor einen abgeschnittenen Term gefangen hat.",
+   "intercept": 0.79821318,
+   "terme": [
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert des Grundstücks in Euro",
+     "art": "potenz",
+     "koeffizient": 10800.16031602,
+     "exponent": -0.81
+    },
+    {
+     "feld": "brw",
+     "bez": "Bodenrichtwert in Euro/m²",
+     "art": "linear",
+     "koeffizient": 0.00096848
+    },
+    {
+     "feld": "gebaeudestandard",
+     "bez": "gewogener Gebäudestandard (Standardstufe, Zwischenwerte zulässig)",
+     "art": "potenz",
+     "koeffizient": -1.63874939,
+     "exponent": -1.88
+    },
+    {
+     "feld": "gemarkung",
+     "bez": "Gemarkungsgruppe als diskrete Kennziffer",
+     "art": "linear_diskret",
+     "koeffizient": -0.06348555,
+     "auspraegungen": {
+      "HAL West": 1.0,
+      "HAL Ost": 2.0
+     },
+     "auspraegungen_hinweis": "Die Gemarkungsgruppe geht als ZAHL in die Formel ein (1 oder 2), nicht als Dummy. Welche Gemarkungen Halles zu „HAL West“ und welche zu „HAL Ost“ gehören, sagt das Dokument in den gelesenen Abschnitten NICHT — siehe _fehlend.md. Ohne diese Zuordnung ist das Modell nicht anwendbar."
+    }
+   ],
+   "rundung_stellen": 2
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Das Dokument benennt Kaufpreisbereinigungen, aber KEINE NHK-Fassung, KEINE Gesamtnutzungsdauer, KEIN Alterswertminderungsmodell, KEINEN Außenanlagenansatz und KEINEN Regionalfaktor (drei Leseläufe). Für die Modelltreue nach § 10 ImmoWertV ist das eine offene Stelle — siehe _fehlend.md.",
+   "nhk": null,
+   "gnd_jahre": null,
+   "alterswertminderung": null,
+   "aussenanlagen": null,
+   "regionalfaktor": null,
+   "kaufpreisbereinigungen": "Kamin 2.000 € · Wintergarten 1.000 €/m² · Photovoltaikanlage 150 €/m² · ab der 3. Garage pauschal 2.000 € · Einbauküchen. Diese Beträge wurden aus den Kaufpreisen herausgerechnet — wer mit diesem Sachwertfaktor rechnet, muss dieselben Bestandteile im vorläufigen Sachwert gleich behandeln.",
+   "verfahren": "multiple nichtlineare Regression auf dem Kaufpreismaterial der Stadt Halle (Saale)"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Der Anwendungsbereich ist durch die Spannen der Stichprobe begrenzt. Außerhalb wird ausgewiesen, nicht gerechnet. Der Datensatz gilt ausschließlich für freistehende Ein- und Zweifamilienhäuser der Stadt Halle (Saale) mit Baujahr ab 1991.",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     292000,
+     660000
+    ],
+    "bodenrichtwert_eur_m2": [
+     105,
+     320
+    ],
+    "gebaeudestandard": [
+     2.6,
+     4.0
+    ]
+   },
+   "spannen_hinweis": "Die Koeffiziententabelle des Bodenrichtwerts beginnt bei 110 €/m², die Anwendungsspanne bei 105 €/m² — die Differenz ist abgedruckt und wurde nicht geglättet.",
+   "umrechnungskoeffizienten_dokumentation": {
+    "hinweis": "Der Bericht druckt neben der Schaetzfunktion eine Tabelle der Umrechnungskoeffizienten ab. Sie BESCHREIBT die Wirkung der Terme derselben Gleichung — sie ist kein zusaetzlicher Zuschlag. Additiv angewandt haette sie den Faktor verdoppelt (1,10 wurde zu 2,02). Sie dient der Gegenrechnung, nicht der Rechnung.",
+    "tabellen": [
+     {
+      "bez": "Umrechnungskoeffizient Bodenrichtwert",
+      "feld": "brw",
+      "art": "stufen",
+      "einheit": "faktor_multiplikativ",
+      "stufen": {
+       "110": 0.92,
+       "120": 0.92,
+       "130": 0.93,
+       "140": 0.94,
+       "150": 0.95,
+       "160": 0.96,
+       "170": 0.97,
+       "180": 0.98,
+       "190": 0.99,
+       "200": 1.0,
+       "210": 1.0,
+       "220": 1.01,
+       "230": 1.02,
+       "240": 1.03,
+       "250": 1.04,
+       "260": 1.05,
+       "270": 1.06,
+       "280": 1.07,
+       "290": 1.08,
+       "300": 1.08,
+       "310": 1.09,
+       "320": 1.1
+      },
+      "rundung_stellen": 2,
+      "hinweis": "NUR DOKUMENTATION UND BELEG, NICHT das Rechenwerkzeug. Gerechnet wird über die Formel. Diese Tabelle ist der Gegenbeweis: sie wird von der Formel Zelle für Zelle reproduziert (22 von 22). Bezug ist das Normobjekt (Bodenrichtwert 205 €/m² = Koeffizient 1,00 — im Raster der Tabelle liegen 200 und 210 beide auf 1,00)."
+     },
+     {
+      "bez": "Umrechnungskoeffizient Gebäudestandard",
+      "feld": "gebaeudestandard",
+      "art": "stufen",
+      "einheit": "faktor_multiplikativ",
+      "stufen": {
+       "2.6": 0.91,
+       "2.7": 0.93,
+       "2.8": 0.94,
+       "2.9": 0.96,
+       "3.0": 0.97,
+       "3.1": 0.98,
+       "3.2": 0.99,
+       "3.3": 1.0,
+       "3.4": 1.01,
+       "3.5": 1.02,
+       "3.6": 1.02,
+       "3.7": 1.03,
+       "3.8": 1.04,
+       "3.9": 1.04,
+       "4.0": 1.05
+      },
+      "rundung_stellen": 2,
+      "hinweis": "NUR DOKUMENTATION UND BELEG. 15 von 15 Zellen von der Formel reproduziert. Bezug Gebäudestandard 3,3 = 1,00."
+     },
+     {
+      "bez": "Umrechnungskoeffizient Gemarkung",
+      "feld": "gemarkung",
+      "art": "stufen_kategorial",
+      "einheit": "faktor_multiplikativ",
+      "stufen": {
+       "HAL West": 1.0,
+       "HAL Ost": 0.94
+      },
+      "rundung_stellen": 2,
+      "hinweis": "NUR DOKUMENTATION UND BELEG. 2 von 2 Zellen von der Formel reproduziert."
+     }
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "formel_gegen_tabelle",
+    "fundstelle": "Schätzfunktion nebst Tabelle „Umrechnungskoeffizienten zur Berücksichtigung der vom Normobjekt abweichenden Grundstücksmerkmale“",
+    "soll_zellen": 39,
+    "soll_eckwerte": [
+     {
+      "merkmal": "brw",
+      "wert": 110,
+      "koeffizient": 0.92
+     },
+     {
+      "merkmal": "brw",
+      "wert": 320,
+      "koeffizient": 1.1
+     },
+     {
+      "merkmal": "gebaeudestandard",
+      "wert": 2.6,
+      "koeffizient": 0.91
+     },
+     {
+      "merkmal": "gebaeudestandard",
+      "wert": 4.0,
+      "koeffizient": 1.05
+     },
+     {
+      "merkmal": "gemarkung",
+      "wert": "HAL Ost",
+      "koeffizient": 0.94
+     }
+    ],
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab (dritter Leselauf ausdrücklich darauf gerichtet). An seine Stelle tritt derselbe, stärkere Beleg wie in Berlin: das Dokument nennt neben den Koeffiziententabellen die vollständige Regressionsformel. Formel und Tabellen wurden in GETRENNTEN Leseläufen erhoben und gegeneinander gerechnet.",
+    "pruefprotokoll": "Am 13.08.2026 gerechnet. Basiswert am Normobjekt (Sachwert 380.000 €, BRW 205 €/m², Standard 3,3, Gemarkung HAL West = 1) aus der Formel: 1,08605. Jeder Tabellenkoeffizient wurde als Quotient Formelwert(Merkmal) / Basiswert gerechnet und auf zwei Stellen gerundet. ZÄHLPRÖBE: 22 + 15 + 2 = 39 Zellen, keine leere Zelle, Schrittweite BRW durchgehend 10 €/m², Gebäudestandard durchgehend 0,1. ZELLPRÜFUNG: 39 von 39 Zellen getroffen, NULL Abweichungen — Bodenrichtwert 22/22, Gebäudestandard 15/15, Gemarkung 2/2. MONOTONIE: der Bodenrichtwert-Koeffizient steigt über die ganze Tabelle monoton von 0,92 auf 1,10, der Standard-Koeffizient monoton von 0,91 auf 1,05; die beiden Plateaus (120/110 und 210/200 bzw. 3,5/3,6 und 3,8/3,9) sind Rundungsplateaus und werden von der Formel exakt so erzeugt. WERTEBEREICH: Sachwertfaktor an den Enden der Sachwertspanne 1,1637 (292.000 €) bis 0,9683 (660.000 €), fallend — richtungsgleich mit allen übrigen uns bekannten Sachwertfaktormodellen.",
+    "negativtest": "Der Maßstab war die Berliner Lehre: eine Formel, die die abgedruckte Tabelle nicht reproduziert, ist unvollständig gelesen. Hier reproduziert sie alle 39 Zellen exakt — hätte ein Term gefehlt oder wäre ein Exponent falsch gelesen worden, wäre die Quotientenprobe sofort auseinandergelaufen, weil die vier Terme unterschiedlich stark auf den Basiswert wirken. Zugleich zeigt derselbe Test, was die Tabelle NICHT belegt: der vorläufige Sachwert hat KEINE Koeffiziententabelle, seine Wirkung ist also nur über die Formel und nicht über ein abgedrucktes Raster geprüft."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "efh",
+  "baujahr_von": 1991,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 31,
+  "streuung": null,
+  "stichtag": "2024-01-01",
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/455443,501/sachwertfaktor_ezh_hal_ab_1991.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": null,
+  "lizenz": null,
+  "fundstelle": "„Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“, Schätzfunktion nebst Normobjekt und den drei Umrechnungskoeffiziententabellen"
+ },
+ {
+  "land_code": "TH",
+  "ags": "16051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 0.9,
+   "rundung_stellen": 1,
+   "hinweis": "Ergebnis in PROZENT (0,9 bedeutet 0,9 %), nicht als Dezimalbruch. Keine Achse, keine Interpolation, keine Korrekturen — ein Wert für den ganzen Teilmarkt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Alle Angaben aus dem Dokument selbst.",
+   "gesamtnutzungsdauer_jahre": [
+    60,
+    80
+   ],
+   "gesamtnutzungsdauer_hinweis": "60 bis 80 Jahre, gestaffelt nach Standardstufe 1 bis 5. WICHTIG für unseren Rechenkern: die Konstante GND_JAHRE = 80 im CrossCheckService trifft dieses Modell nur an der Standardstufe 5. Wer diesen Zinssatz mit pauschal 80 Jahren kapitalisiert, rechnet für die Stufen 1 bis 4 gegen ein anderes Modell als das, aus dem er stammt — dieselbe Fehlerklasse wie bei der Bundesstadt Bonn mit GND 60.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer minus Alter. AUSDRÜCKLICH KEIN Anlage-2-Verfahren, keine Modernisierungspunkte. Wer diesen Zinssatz mit einer nach ImmoWertV Anlage 2 verlängerten Restnutzungsdauer kombiniert, verlässt das Modell.",
+   "bewirtschaftungskosten": "nach Anlage 1 des Dokuments, differenziert nach Verwaltung, Instandhaltung und Mietausfallwagnis. Die Anlage 1 selbst wurde NICHT ausgelesen — siehe _fehlend.md.",
+   "bewirtschaftungskostenquote": null,
+   "marktmiete": "Ansatz der tatsächlichen oder, wo nicht vorhanden, geschätzten Nettokaltmieten.",
+   "nhk": "NHK-Bezugsjahr 2010",
+   "verfahren": "Ertragswertverfahren auf dem Erfurter Kaufpreismaterial"
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Gilt ausschließlich für Mehrfamilienhausgrundstücke im Gebiet der kreisfreien Stadt Erfurt zum Stichtag 01.07.2021. KEIN TREFFER HEISST KEIN WERT — kein Nachbarkreis, kein Landesmittel."
+  },
+  "belege": [
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Ergebnistabelle des Dokuments",
+    "soll_zeilen": 1,
+    "soll_spalten": 4,
+    "soll_eckwerte": [
+     {
+      "kennzahl": "liegenschaftszinssatz_prozent",
+      "wert": 0.9
+     },
+     {
+      "kennzahl": "standardabweichung_pp",
+      "wert": 1.41
+     },
+     {
+      "kennzahl": "rohertragsfaktor",
+      "wert": 23.0
+     },
+     {
+      "kennzahl": "rohertragsfaktor_standardabweichung",
+      "wert": 3.74
+     }
+    ],
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. Es ist ein Ergebnisblatt mit vier Zahlen; es gibt keine Tabelle, über die Monotonie geprüft werden könnte.",
+    "pruefprotokoll": "Am 13.08.2026 geprüft. ZÄHLPRÜFUNG: vier Kennzahlen, alle vier besetzt, keine Leerstelle. PLAUSIBILITÄTSPROBE GEGEN DIE ZWEITE KENNZAHL DESSELBEN BLATTS: Liegenschaftszinssatz und Rohertragsfaktor stammen aus derselben Stichprobe und müssen zueinander passen. Ein Rohertragsfaktor von 23,0 entspricht einer Bruttoanfangsrendite von 1/23,0 = 4,35 %; nach Abzug von Bewirtschaftungskosten in der für Mehrfamilienhäuser üblichen Größenordnung von 25 bis 30 % verbleibt eine Nettoanfangsrendite von rund 3,0 bis 3,3 %, aus der sich bei kurzer Restnutzungsdauer und hohem Bodenwertanteil ein deutlich niedrigerer Liegenschaftszinssatz ergibt — die 0,9 % sind damit in der Größenordnung nachvollziehbar und kein offensichtlicher Zahlendreher. DIESE PROBE IST EINE PLAUSIBILITÄTSPROBE, KEIN BELEG: sie schließt einen groben Lesefehler aus, ersetzt aber kein Anwendungsbeispiel. EINSCHRÄNKUNG, ausdrücklich: dieses Rezept beruht auf EINEM Lesedurchgang des Zahlenwerks. Ein zweiter Durchgang ist beim Nachladen nachzuholen.",
+    "negativtest": "Der Wert 0,9 % ist ungewöhnlich niedrig und wäre ein klassischer Kandidat für einen Zahlendreher aus 9,0 %. Dagegen sprechen zwei unabhängige Angaben desselben Blatts: der Rohertragsfaktor 23,0 (ein Zinssatz von 9,0 % wäre mit einem Faktor um 23 unvereinbar — das wären grob 11 statt 23) und die Standardabweichung 1,41, die zu einem Mittelwert von 0,9 passt und zu 9,0 nicht. Der niedrige Wert ist damit belegt und nicht wegzudiskutieren."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "mfh",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": 44,
+  "streuung": 1.41,
+  "stichtag": "2021-07-01",
+  "berichtsjahr": 2021,
+  "modellversion": "GMB 2021",
+  "quelle_url": "https://d-nb.info/1258976129/34",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Liegenschaftszinssatz und Rohertragsfaktor für Mehrfamilienhausgrundstücke 2022 © Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "lizenz": null,
+  "fundstelle": "„Liegenschaftszinssatz und Rohertragsfaktor für Mehrfamilienhausgrundstücke 2022“, Ergebnistabelle"
+ },
+ {
+  "land_code": "TH",
+  "ags": "16051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_bis1990",
+  "formel": {
+   "form": "stufen_1d",
+   "liefert": "faktor",
+   "achse_x": [
+    50000,
+    60000,
+    70000,
+    80000,
+    90000,
+    100000,
+    110000,
+    120000,
+    130000,
+    140000,
+    150000,
+    160000,
+    170000,
+    180000,
+    190000,
+    200000,
+    210000,
+    220000,
+    230000,
+    240000,
+    250000,
+    260000,
+    270000,
+    280000,
+    290000,
+    300000,
+    310000,
+    320000,
+    330000,
+    340000,
+    350000,
+    360000,
+    370000,
+    380000,
+    390000,
+    400000,
+    410000,
+    420000,
+    430000,
+    440000,
+    450000,
+    460000,
+    470000,
+    480000,
+    490000,
+    500000,
+    510000,
+    520000
+   ],
+   "rundung_stellen": 2,
+   "stufen": {
+    "50000": 2.55,
+    "60000": 2.38,
+    "70000": 2.24,
+    "80000": 2.13,
+    "90000": 2.04,
+    "100000": 1.96,
+    "110000": 1.89,
+    "120000": 1.83,
+    "130000": 1.77,
+    "140000": 1.72,
+    "150000": 1.68,
+    "160000": 1.64,
+    "170000": 1.6,
+    "180000": 1.56,
+    "190000": 1.53,
+    "200000": 1.5,
+    "210000": 1.47,
+    "220000": 1.45,
+    "230000": 1.42,
+    "240000": 1.4,
+    "250000": 1.38,
+    "260000": 1.36,
+    "270000": 1.34,
+    "280000": 1.32,
+    "290000": 1.3,
+    "300000": 1.29,
+    "310000": 1.27,
+    "320000": 1.26,
+    "330000": 1.24,
+    "340000": 1.23,
+    "350000": 1.21,
+    "360000": 1.2,
+    "370000": 1.19,
+    "380000": 1.18,
+    "390000": 1.16,
+    "400000": 1.15,
+    "410000": 1.14,
+    "420000": 1.13,
+    "430000": 1.12,
+    "440000": 1.11,
+    "450000": 1.1,
+    "460000": 1.09,
+    "470000": 1.08,
+    "480000": 1.08,
+    "490000": 1.07,
+    "500000": 1.06,
+    "510000": 1.05,
+    "520000": 1.04
+   },
+   "interpolation": "linear zwischen den Stützstellen des vorläufigen Sachwerts. Das zugrunde liegende Modell ist eine Potenzfunktion; bei einer Schrittweite von 10.000 Euro ist der Interpolationsfehler kleiner als die abgedruckte Rundung auf zwei Stellen.",
+   "funktion_dokumentation": {
+    "wortlaut": "k = a1 x vSW^b (ohne Lagekomponente)",
+    "exponent_b_dokument": -0.3812,
+    "exponent_b_nachgerechnet": -0.3823,
+    "koeffizient_a1_hinweis": "Das Dokument druckt einen Wert a1 ab, der die abgedruckte Tabelle in Euro-Einheiten NICHT reproduziert (er ist um rund zwei Zehnerpotenzen zu klein). Der EXPONENT b dagegen wird von der Tabelle exakt bestätigt. Der a1-Wert wurde deshalb NICHT übernommen — gerechnet wird über die Tabelle, nicht über die Funktion. Siehe beleg.negativtest."
+   },
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert des Grundstücks in Euro"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Alle Angaben aus dem Dokument selbst.",
+   "nhk": "NHK 2010",
+   "bezugsmass": "Brutto-Grundfläche",
+   "alterswertminderung": "linear",
+   "bodenwert": "Bodenrichtwerte zum Kaufzeitpunkt",
+   "aussenanlagen": "bauliche Außenanlagen im Umfang von 5 bis 10 % erfasst",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Im Sachwertfaktor-Dokument NICHT beziffert. Das LIEGENSCHAFTSZINS-Dokument desselben Ausschusses nennt 60 bis 80 Jahre nach Standardstufe; ob dieselbe Staffel dem Sachwertmodell zugrunde liegt, sagt das Sachwertdokument NICHT und wurde NICHT unterstellt.",
+   "regionalfaktor": null,
+   "baupreisindex": null,
+   "verfahren": "Regression. Schätzfunktion wörtlich: k = a1 x vSW^b x BRW^c, logarithmisch ln(k) = ln(a1) + b x ln(vSW) + c x ln(BRW). Für die Objekte bis 1990 ohne Lagekomponente: k = a1 x vSW^b."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Wo die Tabelle endet, endet die Rechnung. Außerhalb der abgedruckten Spannen wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     50000,
+     520000
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "funktion_gegen_tabelle",
+    "fundstelle": "Sachwertfaktortabelle nebst zugehöriger Schätzfunktion",
+    "soll_zeilen": 48,
+    "soll_spalten": 1,
+    "soll_zellen": 48,
+    "soll_eckwerte": [
+     {
+      "sachwert": 50000,
+      "brw": null,
+      "wert": 2.55
+     },
+     {
+      "sachwert": 520000,
+      "brw": null,
+      "wert": 1.04
+     }
+    ],
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt der Abgleich der Tabelle gegen die abgedruckten Funktionsexponenten, der in einem getrennten Lesedurchgang erhobenen Zahlen.",
+    "pruefprotokoll": "Am 13.08.2026 gerechnet. ZÄHLPRÜFUNG: 48 Stützstellen des vorläufigen Sachwerts x 1 Bodenwertniveau(s) = 48 Zellen, keine leere Zelle, Schrittweite durchgehend 10.000 Euro (geprüft). FUNKTION GEGEN TABELLE: an jede Spalte wurde eine Potenzfunktion angepasst; die nachgerechneten Exponenten lauten -0.3823 gegenüber dem abgedruckten b = -0.3812 — Übereinstimmung bis auf die dritte Stelle, wie sie die Rundung der Tabelle auf zwei Nachkommastellen zulässt (bestanden). MONOTONIE: alle Spalten fallen streng monoton über den vorläufigen Sachwert (bestanden). WERTEBEREICH: 1.04 bis 2.55.",
+    "negativtest": "Die abgedruckten Vorfaktoren a1 wurden bewusst NICHT übernommen. Grund: mit a1 = 0,8136 und b = -0,3812 ergibt die Funktion für einen vorläufigen Sachwert von 50.000 Euro einen Wert von 0,0132 statt der abgedruckten 2,55 — ein Faktor von rund 190. Der EXPONENT dagegen stimmt auf die vierte Stelle. Daraus folgt: nicht die Tabelle ist falsch gelesen, sondern der Vorfaktor trägt eine im gelesenen Text nicht sichtbare Skalierung (Zehnerpotenz oder normierte Bezugsgröße). Die Tabelle ist die belastbare Größe, die Funktion nur ihr Beleg. Wer den Vorfaktor blind übernähme, würde jeden Erfurter Sachwert auf ein Prozent seines Werts drücken."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "efh",
+  "baujahr_von": null,
+  "baujahr_bis": 1990,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2021-01-01",
+  "berichtsjahr": 2021,
+  "modellversion": "GMB 2021",
+  "quelle_url": "https://d-nb.info/1258976129/34",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser © Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "lizenz": null,
+  "fundstelle": "„Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser“, fünf Sachwertfaktortabellen nebst Schätzfunktionen"
+ },
+ {
+  "land_code": "TH",
+  "ags": "16051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_ab1991",
+  "formel": {
+   "form": "matrix_interp",
+   "liefert": "faktor",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert des Grundstücks in Euro",
+   "achse_x": [
+    180000,
+    190000,
+    200000,
+    210000,
+    220000,
+    230000,
+    240000,
+    250000,
+    260000,
+    270000,
+    280000,
+    290000,
+    300000,
+    310000,
+    320000,
+    330000,
+    340000,
+    350000,
+    360000,
+    370000,
+    380000,
+    390000,
+    400000,
+    410000,
+    420000,
+    430000,
+    440000,
+    450000,
+    460000,
+    470000,
+    480000,
+    490000,
+    500000,
+    510000,
+    520000,
+    530000,
+    540000,
+    550000,
+    560000,
+    570000,
+    580000,
+    590000,
+    600000,
+    610000,
+    620000,
+    630000
+   ],
+   "rundung_stellen": 2,
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenwertniveau (Bodenrichtwert) in Euro/m²",
+   "achse_y": [
+    90,
+    180,
+    360
+   ],
+   "zellen_schluessel": "Bodenwertniveau -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "90": [
+     1.6,
+     1.57,
+     1.54,
+     1.51,
+     1.48,
+     1.46,
+     1.44,
+     1.42,
+     1.4,
+     1.38,
+     1.36,
+     1.34,
+     1.32,
+     1.31,
+     1.29,
+     1.28,
+     1.26,
+     1.25,
+     1.24,
+     1.22,
+     1.21,
+     1.2,
+     1.19,
+     1.18,
+     1.17,
+     1.16,
+     1.15,
+     1.14,
+     1.13,
+     1.12,
+     1.11,
+     1.1,
+     1.1,
+     1.09,
+     1.08,
+     1.07,
+     1.06,
+     1.06,
+     1.05,
+     1.04,
+     1.04,
+     1.03,
+     1.02,
+     1.02,
+     1.01,
+     1.01
+    ],
+    "180": [
+     1.68,
+     1.65,
+     1.62,
+     1.59,
+     1.56,
+     1.54,
+     1.51,
+     1.49,
+     1.47,
+     1.45,
+     1.43,
+     1.41,
+     1.39,
+     1.37,
+     1.36,
+     1.34,
+     1.33,
+     1.31,
+     1.3,
+     1.29,
+     1.27,
+     1.26,
+     1.25,
+     1.24,
+     1.23,
+     1.22,
+     1.21,
+     1.2,
+     1.19,
+     1.18,
+     1.17,
+     1.16,
+     1.15,
+     1.14,
+     1.13,
+     1.13,
+     1.12,
+     1.11,
+     1.1,
+     1.1,
+     1.09,
+     1.08,
+     1.08,
+     1.07,
+     1.06,
+     1.06
+    ],
+    "360": [
+     1.77,
+     1.73,
+     1.7,
+     1.67,
+     1.64,
+     1.61,
+     1.59,
+     1.57,
+     1.54,
+     1.52,
+     1.5,
+     1.48,
+     1.46,
+     1.45,
+     1.43,
+     1.41,
+     1.4,
+     1.38,
+     1.37,
+     1.35,
+     1.34,
+     1.33,
+     1.32,
+     1.3,
+     1.29,
+     1.28,
+     1.27,
+     1.26,
+     1.25,
+     1.24,
+     1.23,
+     1.22,
+     1.21,
+     1.2,
+     1.19,
+     1.19,
+     1.18,
+     1.17,
+     1.16,
+     1.15,
+     1.15,
+     1.14,
+     1.13,
+     1.13,
+     1.12,
+     1.11
+    ]
+   },
+   "interpolation": "Kreuzinterpolation. Über den vorläufigen Sachwert linear (Schrittweite 10.000 Euro, Fehler unter der Rundung). Über den Bodenrichtwert NICHT linear — siehe geltungsbereich.interpolation_warnung.",
+   "funktion_dokumentation": {
+    "wortlaut": "k = a1 x vSW^b x BRW^c",
+    "exponent_b_dokument": -0.3703,
+    "exponent_b_nachgerechnet": [
+     -0.371,
+     -0.3712,
+     -0.3695
+    ],
+    "exponent_c_dokument": 0.0726,
+    "koeffizient_a1_hinweis": "Die je Bodenwertniveau abgedruckten a1-Werte verhalten sich zueinander exakt wie (BRW2/BRW1)^c und bestätigen damit den Exponenten c. Ihr ABSOLUTNIVEAU reproduziert die Tabelle in Euro-Einheiten dagegen nicht. Gerechnet wird über die Tabelle, nicht über die Funktion."
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Alle Angaben aus dem Dokument selbst.",
+   "nhk": "NHK 2010",
+   "bezugsmass": "Brutto-Grundfläche",
+   "alterswertminderung": "linear",
+   "bodenwert": "Bodenrichtwerte zum Kaufzeitpunkt",
+   "aussenanlagen": "bauliche Außenanlagen im Umfang von 5 bis 10 % erfasst",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Im Sachwertfaktor-Dokument NICHT beziffert. Das LIEGENSCHAFTSZINS-Dokument desselben Ausschusses nennt 60 bis 80 Jahre nach Standardstufe; ob dieselbe Staffel dem Sachwertmodell zugrunde liegt, sagt das Sachwertdokument NICHT und wurde NICHT unterstellt.",
+   "regionalfaktor": null,
+   "baupreisindex": null,
+   "verfahren": "Regression. Schätzfunktion wörtlich: k = a1 x vSW^b x BRW^c, logarithmisch ln(k) = ln(a1) + b x ln(vSW) + c x ln(BRW). Für die Objekte bis 1990 ohne Lagekomponente: k = a1 x vSW^b."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Wo die Tabelle endet, endet die Rechnung. Außerhalb der abgedruckten Spannen wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     180000,
+     630000
+    ],
+    "bodenrichtwert_eur_m2": [
+     90,
+     360
+    ]
+   },
+   "interpolation_warnung": "Die Bodenwertniveaus sind GEOMETRISCH gestuft (90 / 180 / 360 €/m²), das Modell ist in BRW eine Potenzfunktion mit Exponent 0.0726. Lineare Interpolation zwischen zwei Stützstellen unterschätzt den Faktor in der Bandmitte um bis zu rund 0,4 % — bei einem Faktor um 1,5 sind das rund 0,006, also gerade an der Grenze der abgedruckten zweiten Nachkommastelle. Korrekt ist die Interpolation über ln(BRW), also k = k1 x (BRW/BRW1)^c. Wer den generischen matrix_interp-Auswerter mit linearer Interpolation nutzt, muss diesen Effekt kennen; er ist klein, aber er ist systematisch und immer in dieselbe Richtung."
+  },
+  "belege": [
+   {
+    "art": "funktion_gegen_tabelle",
+    "fundstelle": "Sachwertfaktortabelle nebst zugehöriger Schätzfunktion",
+    "soll_zeilen": 46,
+    "soll_spalten": 3,
+    "soll_zellen": 138,
+    "soll_eckwerte": [
+     {
+      "sachwert": 180000,
+      "brw": 90,
+      "wert": 1.6
+     },
+     {
+      "sachwert": 630000,
+      "brw": 360,
+      "wert": 1.11
+     }
+    ],
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt der Abgleich der Tabelle gegen die abgedruckten Funktionsexponenten, der in einem getrennten Lesedurchgang erhobenen Zahlen.",
+    "pruefprotokoll": "Am 13.08.2026 gerechnet. ZÄHLPRÜFUNG: 46 Stützstellen des vorläufigen Sachwerts x 3 Bodenwertniveau(s) = 138 Zellen, keine leere Zelle, Schrittweite durchgehend 10.000 Euro (geprüft). FUNKTION GEGEN TABELLE: an jede Spalte wurde eine Potenzfunktion angepasst; die nachgerechneten Exponenten lauten -0.3710 / -0.3712 / -0.3695 gegenüber dem abgedruckten b = -0.3703 — Übereinstimmung bis auf die dritte Stelle, wie sie die Rundung der Tabelle auf zwei Nachkommastellen zulässt (bestanden). MONOTONIE: alle Spalten fallen streng monoton über den vorläufigen Sachwert (bestanden), und alle 46 Zeilen steigen monoton über das Bodenwertniveau (bestanden). WERTEBEREICH: 1.01 bis 1.77. SPALTENVERHÄLTNIS GEGEN DEN ABGEDRUCKTEN EXPONENTEN c = 0.0726: das mittlere Verhältnis benachbarter Spalten muss (BRW2/BRW1)^c betragen — 90->180: gemessen 1.0512, erwartet 1.0516; 180->360: gemessen 1.0515, erwartet 1.0516. Das ist der schärfste Test dieses Rezepts: er prüft die Spalten GEGENEINANDER und hätte eine vertauschte oder verschobene Spalte sofort sichtbar gemacht.",
+    "negativtest": "Die abgedruckten Vorfaktoren a1 wurden bewusst NICHT übernommen. Grund: mit a1 = 0,8136 und b = -0,3812 ergibt die Funktion für einen vorläufigen Sachwert von 50.000 Euro einen Wert von 0,0132 statt der abgedruckten 2,55 — ein Faktor von rund 190. Der EXPONENT dagegen stimmt auf die vierte Stelle. Daraus folgt: nicht die Tabelle ist falsch gelesen, sondern der Vorfaktor trägt eine im gelesenen Text nicht sichtbare Skalierung (Zehnerpotenz oder normierte Bezugsgröße). Die Tabelle ist die belastbare Größe, die Funktion nur ihr Beleg. Wer den Vorfaktor blind übernähme, würde jeden Erfurter Sachwert auf ein Prozent seines Werts drücken."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "efh",
+  "baujahr_von": 1991,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2021-01-01",
+  "berichtsjahr": 2021,
+  "modellversion": "GMB 2021",
+  "quelle_url": "https://d-nb.info/1258976129/34",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser © Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "lizenz": null,
+  "fundstelle": "„Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser“, fünf Sachwertfaktortabellen nebst Schätzfunktionen"
+ },
+ {
+  "land_code": "TH",
+  "ags": "16051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "liefert": "faktor",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert des Grundstücks in Euro",
+   "achse_x": [
+    70000,
+    80000,
+    90000,
+    100000,
+    110000,
+    120000,
+    130000,
+    140000,
+    150000,
+    160000,
+    170000,
+    180000,
+    190000,
+    200000,
+    210000,
+    220000,
+    230000,
+    240000,
+    250000,
+    260000,
+    270000,
+    280000,
+    290000,
+    300000,
+    310000,
+    320000,
+    330000,
+    340000,
+    350000,
+    360000,
+    370000,
+    380000,
+    390000,
+    400000,
+    410000,
+    420000,
+    430000,
+    440000,
+    450000,
+    460000,
+    470000,
+    480000,
+    490000,
+    500000
+   ],
+   "rundung_stellen": 2,
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenwertniveau (Bodenrichtwert) in Euro/m²",
+   "achse_y": [
+    90,
+    180,
+    360,
+    720
+   ],
+   "zellen_schluessel": "Bodenwertniveau -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "90": [
+     1.94,
+     1.86,
+     1.8,
+     1.74,
+     1.69,
+     1.65,
+     1.61,
+     1.57,
+     1.54,
+     1.51,
+     1.48,
+     1.46,
+     1.43,
+     1.41,
+     1.39,
+     1.37,
+     1.35,
+     1.33,
+     1.32,
+     1.3,
+     1.29,
+     1.27,
+     1.26,
+     1.25,
+     1.23,
+     1.22,
+     1.21,
+     1.2,
+     1.19,
+     1.18,
+     1.17,
+     1.16,
+     1.15,
+     1.14,
+     1.13,
+     1.13,
+     1.12,
+     1.11,
+     1.1,
+     1.09,
+     1.09,
+     1.08,
+     1.07,
+     1.07
+    ],
+    "180": [
+     2.09,
+     2.01,
+     1.94,
+     1.88,
+     1.83,
+     1.78,
+     1.74,
+     1.7,
+     1.66,
+     1.63,
+     1.6,
+     1.57,
+     1.55,
+     1.52,
+     1.5,
+     1.48,
+     1.46,
+     1.44,
+     1.42,
+     1.41,
+     1.39,
+     1.37,
+     1.36,
+     1.35,
+     1.33,
+     1.32,
+     1.31,
+     1.3,
+     1.28,
+     1.27,
+     1.26,
+     1.25,
+     1.24,
+     1.23,
+     1.22,
+     1.21,
+     1.21,
+     1.2,
+     1.19,
+     1.18,
+     1.17,
+     1.17,
+     1.16,
+     1.15
+    ],
+    "360": [
+     2.26,
+     2.17,
+     2.09,
+     2.03,
+     1.97,
+     1.92,
+     1.87,
+     1.83,
+     1.79,
+     1.76,
+     1.73,
+     1.7,
+     1.67,
+     1.64,
+     1.62,
+     1.6,
+     1.57,
+     1.55,
+     1.54,
+     1.52,
+     1.5,
+     1.48,
+     1.47,
+     1.45,
+     1.44,
+     1.42,
+     1.41,
+     1.4,
+     1.39,
+     1.37,
+     1.36,
+     1.35,
+     1.34,
+     1.33,
+     1.32,
+     1.31,
+     1.3,
+     1.29,
+     1.28,
+     1.28,
+     1.27,
+     1.26,
+     1.25,
+     1.24
+    ],
+    "720": [
+     2.44,
+     2.34,
+     2.26,
+     2.19,
+     2.13,
+     2.07,
+     2.02,
+     1.98,
+     1.94,
+     1.9,
+     1.86,
+     1.83,
+     1.8,
+     1.77,
+     1.75,
+     1.72,
+     1.7,
+     1.68,
+     1.66,
+     1.64,
+     1.62,
+     1.6,
+     1.58,
+     1.57,
+     1.55,
+     1.54,
+     1.52,
+     1.51,
+     1.5,
+     1.48,
+     1.47,
+     1.46,
+     1.45,
+     1.44,
+     1.43,
+     1.42,
+     1.41,
+     1.4,
+     1.39,
+     1.38,
+     1.37,
+     1.36,
+     1.35,
+     1.34
+    ]
+   },
+   "interpolation": "Kreuzinterpolation. Über den vorläufigen Sachwert linear (Schrittweite 10.000 Euro, Fehler unter der Rundung). Über den Bodenrichtwert NICHT linear — siehe geltungsbereich.interpolation_warnung.",
+   "funktion_dokumentation": {
+    "wortlaut": "k = a1 x vSW^b x BRW^c",
+    "exponent_b_dokument": -0.3039,
+    "exponent_b_nachgerechnet": [
+     -0.3043,
+     -0.3047,
+     -0.3043,
+     -0.3031
+    ],
+    "exponent_c_dokument": 0.1105,
+    "koeffizient_a1_hinweis": "Die je Bodenwertniveau abgedruckten a1-Werte verhalten sich zueinander exakt wie (BRW2/BRW1)^c und bestätigen damit den Exponenten c. Ihr ABSOLUTNIVEAU reproduziert die Tabelle in Euro-Einheiten dagegen nicht. Gerechnet wird über die Tabelle, nicht über die Funktion."
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Alle Angaben aus dem Dokument selbst.",
+   "nhk": "NHK 2010",
+   "bezugsmass": "Brutto-Grundfläche",
+   "alterswertminderung": "linear",
+   "bodenwert": "Bodenrichtwerte zum Kaufzeitpunkt",
+   "aussenanlagen": "bauliche Außenanlagen im Umfang von 5 bis 10 % erfasst",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Im Sachwertfaktor-Dokument NICHT beziffert. Das LIEGENSCHAFTSZINS-Dokument desselben Ausschusses nennt 60 bis 80 Jahre nach Standardstufe; ob dieselbe Staffel dem Sachwertmodell zugrunde liegt, sagt das Sachwertdokument NICHT und wurde NICHT unterstellt.",
+   "regionalfaktor": null,
+   "baupreisindex": null,
+   "verfahren": "Regression. Schätzfunktion wörtlich: k = a1 x vSW^b x BRW^c, logarithmisch ln(k) = ln(a1) + b x ln(vSW) + c x ln(BRW). Für die Objekte bis 1990 ohne Lagekomponente: k = a1 x vSW^b."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Wo die Tabelle endet, endet die Rechnung. Außerhalb der abgedruckten Spannen wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     70000,
+     500000
+    ],
+    "bodenrichtwert_eur_m2": [
+     90,
+     720
+    ]
+   },
+   "interpolation_warnung": "Die Bodenwertniveaus sind GEOMETRISCH gestuft (90 / 180 / 360 / 720 €/m²), das Modell ist in BRW eine Potenzfunktion mit Exponent 0.1105. Lineare Interpolation zwischen zwei Stützstellen unterschätzt den Faktor in der Bandmitte um bis zu rund 0,4 % — bei einem Faktor um 1,5 sind das rund 0,006, also gerade an der Grenze der abgedruckten zweiten Nachkommastelle. Korrekt ist die Interpolation über ln(BRW), also k = k1 x (BRW/BRW1)^c. Wer den generischen matrix_interp-Auswerter mit linearer Interpolation nutzt, muss diesen Effekt kennen; er ist klein, aber er ist systematisch und immer in dieselbe Richtung."
+  },
+  "belege": [
+   {
+    "art": "funktion_gegen_tabelle",
+    "fundstelle": "Sachwertfaktortabelle nebst zugehöriger Schätzfunktion",
+    "soll_zeilen": 44,
+    "soll_spalten": 4,
+    "soll_zellen": 176,
+    "soll_eckwerte": [
+     {
+      "sachwert": 70000,
+      "brw": 90,
+      "wert": 1.94
+     },
+     {
+      "sachwert": 500000,
+      "brw": 720,
+      "wert": 1.34
+     }
+    ],
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt der Abgleich der Tabelle gegen die abgedruckten Funktionsexponenten, der in einem getrennten Lesedurchgang erhobenen Zahlen.",
+    "pruefprotokoll": "Am 13.08.2026 gerechnet. ZÄHLPRÜFUNG: 44 Stützstellen des vorläufigen Sachwerts x 4 Bodenwertniveau(s) = 176 Zellen, keine leere Zelle, Schrittweite durchgehend 10.000 Euro (geprüft). FUNKTION GEGEN TABELLE: an jede Spalte wurde eine Potenzfunktion angepasst; die nachgerechneten Exponenten lauten -0.3043 / -0.3047 / -0.3043 / -0.3031 gegenüber dem abgedruckten b = -0.3039 — Übereinstimmung bis auf die dritte Stelle, wie sie die Rundung der Tabelle auf zwei Nachkommastellen zulässt (bestanden). MONOTONIE: alle Spalten fallen streng monoton über den vorläufigen Sachwert (bestanden), und alle 44 Zeilen steigen monoton über das Bodenwertniveau (bestanden). WERTEBEREICH: 1.07 bis 2.44. SPALTENVERHÄLTNIS GEGEN DEN ABGEDRUCKTEN EXPONENTEN c = 0.1105: das mittlere Verhältnis benachbarter Spalten muss (BRW2/BRW1)^c betragen — 90->180: gemessen 1.0796, erwartet 1.0796; 180->360: gemessen 1.0792, erwartet 1.0796; 360->720: gemessen 1.0803, erwartet 1.0796. Das ist der schärfste Test dieses Rezepts: er prüft die Spalten GEGENEINANDER und hätte eine vertauschte oder verschobene Spalte sofort sichtbar gemacht.",
+    "negativtest": "Die abgedruckten Vorfaktoren a1 wurden bewusst NICHT übernommen. Grund: mit a1 = 0,8136 und b = -0,3812 ergibt die Funktion für einen vorläufigen Sachwert von 50.000 Euro einen Wert von 0,0132 statt der abgedruckten 2,55 — ein Faktor von rund 190. Der EXPONENT dagegen stimmt auf die vierte Stelle. Daraus folgt: nicht die Tabelle ist falsch gelesen, sondern der Vorfaktor trägt eine im gelesenen Text nicht sichtbare Skalierung (Zehnerpotenz oder normierte Bezugsgröße). Die Tabelle ist die belastbare Größe, die Funktion nur ihr Beleg. Wer den Vorfaktor blind übernähme, würde jeden Erfurter Sachwert auf ein Prozent seines Werts drücken."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "rhdhh",
+  "baujahr_von": null,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2021-01-01",
+  "berichtsjahr": 2021,
+  "modellversion": "GMB 2021",
+  "quelle_url": "https://d-nb.info/1258976129/34",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser © Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "lizenz": null,
+  "fundstelle": "„Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser“, fünf Sachwertfaktortabellen nebst Schätzfunktionen"
+ },
+ {
+  "land_code": "TH",
+  "ags": "16051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh_bis1990",
+  "formel": {
+   "form": "stufen_1d",
+   "liefert": "faktor",
+   "achse_x": [
+    50000,
+    60000,
+    70000,
+    80000,
+    90000,
+    100000,
+    110000,
+    120000,
+    130000,
+    140000,
+    150000,
+    160000,
+    170000,
+    180000,
+    190000,
+    200000,
+    210000,
+    220000,
+    230000,
+    240000,
+    250000,
+    260000,
+    270000,
+    280000,
+    290000,
+    300000,
+    310000
+   ],
+   "rundung_stellen": 2,
+   "stufen": {
+    "50000": 3.03,
+    "60000": 2.86,
+    "70000": 2.72,
+    "80000": 2.6,
+    "90000": 2.51,
+    "100000": 2.42,
+    "110000": 2.35,
+    "120000": 2.28,
+    "130000": 2.23,
+    "140000": 2.17,
+    "150000": 2.13,
+    "160000": 2.08,
+    "170000": 2.04,
+    "180000": 2.0,
+    "190000": 1.97,
+    "200000": 1.94,
+    "210000": 1.91,
+    "220000": 1.88,
+    "230000": 1.85,
+    "240000": 1.83,
+    "250000": 1.8,
+    "260000": 1.78,
+    "270000": 1.76,
+    "280000": 1.74,
+    "290000": 1.72,
+    "300000": 1.7,
+    "310000": 1.68
+   },
+   "interpolation": "linear zwischen den Stützstellen des vorläufigen Sachwerts. Das zugrunde liegende Modell ist eine Potenzfunktion; bei einer Schrittweite von 10.000 Euro ist der Interpolationsfehler kleiner als die abgedruckte Rundung auf zwei Stellen.",
+   "funktion_dokumentation": {
+    "wortlaut": "k = a1 x vSW^b (ohne Lagekomponente)",
+    "exponent_b_dokument": -0.3222,
+    "exponent_b_nachgerechnet": -0.3225,
+    "koeffizient_a1_hinweis": "Das Dokument druckt einen Wert a1 ab, der die abgedruckte Tabelle in Euro-Einheiten NICHT reproduziert (er ist um rund zwei Zehnerpotenzen zu klein). Der EXPONENT b dagegen wird von der Tabelle exakt bestätigt. Der a1-Wert wurde deshalb NICHT übernommen — gerechnet wird über die Tabelle, nicht über die Funktion. Siehe beleg.negativtest."
+   },
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert des Grundstücks in Euro"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Alle Angaben aus dem Dokument selbst.",
+   "nhk": "NHK 2010",
+   "bezugsmass": "Brutto-Grundfläche",
+   "alterswertminderung": "linear",
+   "bodenwert": "Bodenrichtwerte zum Kaufzeitpunkt",
+   "aussenanlagen": "bauliche Außenanlagen im Umfang von 5 bis 10 % erfasst",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Im Sachwertfaktor-Dokument NICHT beziffert. Das LIEGENSCHAFTSZINS-Dokument desselben Ausschusses nennt 60 bis 80 Jahre nach Standardstufe; ob dieselbe Staffel dem Sachwertmodell zugrunde liegt, sagt das Sachwertdokument NICHT und wurde NICHT unterstellt.",
+   "regionalfaktor": null,
+   "baupreisindex": null,
+   "verfahren": "Regression. Schätzfunktion wörtlich: k = a1 x vSW^b x BRW^c, logarithmisch ln(k) = ln(a1) + b x ln(vSW) + c x ln(BRW). Für die Objekte bis 1990 ohne Lagekomponente: k = a1 x vSW^b."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Wo die Tabelle endet, endet die Rechnung. Außerhalb der abgedruckten Spannen wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     50000,
+     310000
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "funktion_gegen_tabelle",
+    "fundstelle": "Sachwertfaktortabelle nebst zugehöriger Schätzfunktion",
+    "soll_zeilen": 27,
+    "soll_spalten": 1,
+    "soll_zellen": 27,
+    "soll_eckwerte": [
+     {
+      "sachwert": 50000,
+      "brw": null,
+      "wert": 3.03
+     },
+     {
+      "sachwert": 310000,
+      "brw": null,
+      "wert": 1.68
+     }
+    ],
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt der Abgleich der Tabelle gegen die abgedruckten Funktionsexponenten, der in einem getrennten Lesedurchgang erhobenen Zahlen.",
+    "pruefprotokoll": "Am 13.08.2026 gerechnet. ZÄHLPRÜFUNG: 27 Stützstellen des vorläufigen Sachwerts x 1 Bodenwertniveau(s) = 27 Zellen, keine leere Zelle, Schrittweite durchgehend 10.000 Euro (geprüft). FUNKTION GEGEN TABELLE: an jede Spalte wurde eine Potenzfunktion angepasst; die nachgerechneten Exponenten lauten -0.3225 gegenüber dem abgedruckten b = -0.3222 — Übereinstimmung bis auf die dritte Stelle, wie sie die Rundung der Tabelle auf zwei Nachkommastellen zulässt (bestanden). MONOTONIE: alle Spalten fallen streng monoton über den vorläufigen Sachwert (bestanden). WERTEBEREICH: 1.68 bis 3.03.",
+    "negativtest": "Die abgedruckten Vorfaktoren a1 wurden bewusst NICHT übernommen. Grund: mit a1 = 0,8136 und b = -0,3812 ergibt die Funktion für einen vorläufigen Sachwert von 50.000 Euro einen Wert von 0,0132 statt der abgedruckten 2,55 — ein Faktor von rund 190. Der EXPONENT dagegen stimmt auf die vierte Stelle. Daraus folgt: nicht die Tabelle ist falsch gelesen, sondern der Vorfaktor trägt eine im gelesenen Text nicht sichtbare Skalierung (Zehnerpotenz oder normierte Bezugsgröße). Die Tabelle ist die belastbare Größe, die Funktion nur ihr Beleg. Wer den Vorfaktor blind übernähme, würde jeden Erfurter Sachwert auf ein Prozent seines Werts drücken."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "rmh",
+  "baujahr_von": null,
+  "baujahr_bis": 1990,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2021-01-01",
+  "berichtsjahr": 2021,
+  "modellversion": "GMB 2021",
+  "quelle_url": "https://d-nb.info/1258976129/34",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser © Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "lizenz": null,
+  "fundstelle": "„Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser“, fünf Sachwertfaktortabellen nebst Schätzfunktionen"
+ },
+ {
+  "land_code": "TH",
+  "ags": "16051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rmh_ab1991",
+  "formel": {
+   "form": "matrix_interp",
+   "liefert": "faktor",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert des Grundstücks in Euro",
+   "achse_x": [
+    100000,
+    110000,
+    120000,
+    130000,
+    140000,
+    150000,
+    160000,
+    170000,
+    180000,
+    190000,
+    200000,
+    210000,
+    220000,
+    230000,
+    240000,
+    250000,
+    260000,
+    270000,
+    280000,
+    290000,
+    300000,
+    310000,
+    320000,
+    330000,
+    340000,
+    350000
+   ],
+   "rundung_stellen": 2,
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenwertniveau (Bodenrichtwert) in Euro/m²",
+   "achse_y": [
+    90,
+    180
+   ],
+   "zellen_schluessel": "Bodenwertniveau -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "90": [
+     1.99,
+     1.91,
+     1.84,
+     1.77,
+     1.72,
+     1.67,
+     1.62,
+     1.58,
+     1.54,
+     1.5,
+     1.47,
+     1.44,
+     1.41,
+     1.38,
+     1.35,
+     1.33,
+     1.31,
+     1.29,
+     1.27,
+     1.25,
+     1.23,
+     1.21,
+     1.19,
+     1.18,
+     1.16,
+     1.15
+    ],
+    "180": [
+     2.14,
+     2.06,
+     1.98,
+     1.91,
+     1.85,
+     1.79,
+     1.74,
+     1.7,
+     1.66,
+     1.62,
+     1.58,
+     1.55,
+     1.52,
+     1.49,
+     1.46,
+     1.43,
+     1.41,
+     1.39,
+     1.36,
+     1.34,
+     1.32,
+     1.3,
+     1.29,
+     1.27,
+     1.25,
+     1.24
+    ]
+   },
+   "interpolation": "Kreuzinterpolation. Über den vorläufigen Sachwert linear (Schrittweite 10.000 Euro, Fehler unter der Rundung). Über den Bodenrichtwert NICHT linear — siehe geltungsbereich.interpolation_warnung.",
+   "funktion_dokumentation": {
+    "wortlaut": "k = a1 x vSW^b x BRW^c",
+    "exponent_b_dokument": -0.4396,
+    "exponent_b_nachgerechnet": [
+     -0.4397,
+     -0.4394
+    ],
+    "exponent_c_dokument": 0.1071,
+    "koeffizient_a1_hinweis": "Die je Bodenwertniveau abgedruckten a1-Werte verhalten sich zueinander exakt wie (BRW2/BRW1)^c und bestätigen damit den Exponenten c. Ihr ABSOLUTNIVEAU reproduziert die Tabelle in Euro-Einheiten dagegen nicht. Gerechnet wird über die Tabelle, nicht über die Funktion."
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Alle Angaben aus dem Dokument selbst.",
+   "nhk": "NHK 2010",
+   "bezugsmass": "Brutto-Grundfläche",
+   "alterswertminderung": "linear",
+   "bodenwert": "Bodenrichtwerte zum Kaufzeitpunkt",
+   "aussenanlagen": "bauliche Außenanlagen im Umfang von 5 bis 10 % erfasst",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Im Sachwertfaktor-Dokument NICHT beziffert. Das LIEGENSCHAFTSZINS-Dokument desselben Ausschusses nennt 60 bis 80 Jahre nach Standardstufe; ob dieselbe Staffel dem Sachwertmodell zugrunde liegt, sagt das Sachwertdokument NICHT und wurde NICHT unterstellt.",
+   "regionalfaktor": null,
+   "baupreisindex": null,
+   "verfahren": "Regression. Schätzfunktion wörtlich: k = a1 x vSW^b x BRW^c, logarithmisch ln(k) = ln(a1) + b x ln(vSW) + c x ln(BRW). Für die Objekte bis 1990 ohne Lagekomponente: k = a1 x vSW^b."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten",
+   "hinweis": "Wo die Tabelle endet, endet die Rechnung. Außerhalb der abgedruckten Spannen wird ausgewiesen, nicht gerechnet.",
+   "spannen": {
+    "vorlaeufiger_sachwert_eur": [
+     100000,
+     350000
+    ],
+    "bodenrichtwert_eur_m2": [
+     90,
+     180
+    ]
+   },
+   "interpolation_warnung": "Die Bodenwertniveaus sind GEOMETRISCH gestuft (90 / 180 €/m²), das Modell ist in BRW eine Potenzfunktion mit Exponent 0.1071. Lineare Interpolation zwischen zwei Stützstellen unterschätzt den Faktor in der Bandmitte um bis zu rund 0,4 % — bei einem Faktor um 1,5 sind das rund 0,006, also gerade an der Grenze der abgedruckten zweiten Nachkommastelle. Korrekt ist die Interpolation über ln(BRW), also k = k1 x (BRW/BRW1)^c. Wer den generischen matrix_interp-Auswerter mit linearer Interpolation nutzt, muss diesen Effekt kennen; er ist klein, aber er ist systematisch und immer in dieselbe Richtung."
+  },
+  "belege": [
+   {
+    "art": "funktion_gegen_tabelle",
+    "fundstelle": "Sachwertfaktortabelle nebst zugehöriger Schätzfunktion",
+    "soll_zeilen": 26,
+    "soll_spalten": 2,
+    "soll_zellen": 52,
+    "soll_eckwerte": [
+     {
+      "sachwert": 100000,
+      "brw": 90,
+      "wert": 1.99
+     },
+     {
+      "sachwert": 350000,
+      "brw": 180,
+      "wert": 1.24
+     }
+    ],
+    "wortlaut": "Das Dokument druckt KEIN durchgerechnetes Anwendungsbeispiel ab. An seine Stelle tritt der Abgleich der Tabelle gegen die abgedruckten Funktionsexponenten, der in einem getrennten Lesedurchgang erhobenen Zahlen.",
+    "pruefprotokoll": "Am 13.08.2026 gerechnet. ZÄHLPRÜFUNG: 26 Stützstellen des vorläufigen Sachwerts x 2 Bodenwertniveau(s) = 52 Zellen, keine leere Zelle, Schrittweite durchgehend 10.000 Euro (geprüft). FUNKTION GEGEN TABELLE: an jede Spalte wurde eine Potenzfunktion angepasst; die nachgerechneten Exponenten lauten -0.4397 / -0.4394 gegenüber dem abgedruckten b = -0.4396 — Übereinstimmung bis auf die dritte Stelle, wie sie die Rundung der Tabelle auf zwei Nachkommastellen zulässt (bestanden). MONOTONIE: alle Spalten fallen streng monoton über den vorläufigen Sachwert (bestanden), und alle 26 Zeilen steigen monoton über das Bodenwertniveau (bestanden). WERTEBEREICH: 1.15 bis 2.14. SPALTENVERHÄLTNIS GEGEN DEN ABGEDRUCKTEN EXPONENTEN c = 0.1071: das mittlere Verhältnis benachbarter Spalten muss (BRW2/BRW1)^c betragen — 90->180: gemessen 1.0766, erwartet 1.0771. Das ist der schärfste Test dieses Rezepts: er prüft die Spalten GEGENEINANDER und hätte eine vertauschte oder verschobene Spalte sofort sichtbar gemacht.",
+    "negativtest": "Die abgedruckten Vorfaktoren a1 wurden bewusst NICHT übernommen. Grund: mit a1 = 0,8136 und b = -0,3812 ergibt die Funktion für einen vorläufigen Sachwert von 50.000 Euro einen Wert von 0,0132 statt der abgedruckten 2,55 — ein Faktor von rund 190. Der EXPONENT dagegen stimmt auf die vierte Stelle. Daraus folgt: nicht die Tabelle ist falsch gelesen, sondern der Vorfaktor trägt eine im gelesenen Text nicht sichtbare Skalierung (Zehnerpotenz oder normierte Bezugsgröße). Die Tabelle ist die belastbare Größe, die Funktion nur ihr Beleg. Wer den Vorfaktor blind übernähme, würde jeden Erfurter Sachwert auf ein Prozent seines Werts drücken."
+   }
+  ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
+  "objektart": "rmh",
+  "baujahr_von": 1991,
+  "baujahr_bis": null,
+  "auswerter_vorhanden": true,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2021-01-01",
+  "berichtsjahr": 2021,
+  "modellversion": "GMB 2021",
+  "quelle_url": "https://d-nb.info/1258976129/34",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser © Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "lizenz": null,
+  "fundstelle": "„Sachwertfaktoren 2022 für Ein- und Zweifamilienhäuser“, fünf Sachwertfaktortabellen nebst Schätzfunktionen"
+ }
+]

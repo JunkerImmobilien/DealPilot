@@ -67,6 +67,25 @@ const server = app.listen(cfg.port, () => {
       console.log('[register] ' + jeK
         + (st.aus_saat ? '  (' + st.aus_db + ' aus param_modell, '
                        + st.aus_saat + ' aus der Saatdatei)' : ''));
+      /* v1095-WMRG2 · Die Zahl, die beim v1094-Rollout gefehlt hat.
+       *
+       * Das Log meldete "1565 Saetze, 493 aus param_modell, 1072 aus der
+       * Saatdatei" — jede Zahl fuer sich richtig, und trotzdem war nicht zu
+       * sehen, dass 585 Saetze verdraengt worden waren. Ein stiller Verlust
+       * sieht genauso aus wie eine saubere Zusammenfuehrung.
+       *
+       * Jetzt steht daneben, wieviele Saetze der Saat die Tabelle ERSETZT
+       * hat, und wieviele die Saatdatei ueberhaupt mitbringt. Weichen beide
+       * Zahlen stark voneinander ab, ist die Tabelle veraltet — und das
+       * sagt das Log dann selbst. */
+      if (st.ersetzt != null) {
+        console.log('[register] Saatdatei fuehrt ' + (st.aus_saat + st.ersetzt)
+          + ' Saetze, davon ' + st.ersetzt + ' durch param_modell ersetzt'
+          + (st.ersetzt > st.aus_db
+             ? '  ACHTUNG: die Tabelle ersetzt mehr, als sie selbst fuehrt '
+               + '— sie ist vermutlich veraltet'
+             : ''));
+      }
     } catch (e) { console.log('[register] Start fehlgeschlagen:', e.message); }
   })();
   console.log(`[marktbericht] ai_mode=${cfg.ai.mode}  geo=${cfg.geoapify.key ? 'geoapify' : 'none'}  market=${cfg.market.source}`);

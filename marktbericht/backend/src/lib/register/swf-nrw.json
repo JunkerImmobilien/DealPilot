@@ -280,6 +280,8 @@
     "wortlaut": "EFH, vorläufiger Sachwert 320.000 €, Wohnlage gut, Sachwertfaktor 1,14, Reparaturstau 10.000 €. SW = 320.000 × 1,14 − 10.000 = 354.800 €."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -570,6 +572,8 @@
     "wortlaut": "Einfamilienhaus, Wohnlageklasse 3, vorläufiger Sachwert 375.000 €, Restnutzungsdauer 43 Jahre, Wohnfläche 160 m². 1,21 + 0,06 − 0,15 + 0,02 + 0,05 = 1,19."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 747,
@@ -754,6 +758,8 @@
     "wortlaut": "Das abgedruckte Anwendungsbeispiel (S. 45) betrifft Gebiet 1 und damit die Baujahrstabelle, nicht diese Tabelle. Ersatzprüfung: 15 Stützstellen, fallende Monotonie je Gebietsspalte, Vorbehaltswerte in Klammern erhalten."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -960,6 +966,8 @@
     "wortlaut": "Kein Anwendungsbeispiel zu dieser Tabelle (das abgedruckte Beispiel betrifft Gebiet 1). Ersatzprüfung: 18 Stützstellen, fallende Monotonie je Gebietsspalte über die ganze Reihe."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -1042,6 +1050,8 @@
     "einheit_hinweis": "Der Bericht druckt einen Zuschlag in Prozent ab. soll_wert ist die gedruckte Zahl, soll_faktor der daraus abgeleitete Sachwertfaktor (1 + Zuschlag/100)."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 164,
@@ -1295,6 +1305,8 @@
     "wortlaut": "Kein Anwendungs-/Rechenbeispiel zum Sachwertfaktor abgedruckt (zweifach gegengeprüft). Die abgedruckten Berechnungsbeispiele (Kap. 8.3 S. 57, Kap. 8.6 S. 59, 'Beispiele' S. 72) betreffen Umrechnungskoeffizienten, Lagekorrektur und Bodenwertableitung. Ersatzprüfung: 8 Flächenbänder × 6 Baujahresgruppen = 48 Zellen, davon 2 leer."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "B",
   "stufe_grund": null,
   "fallzahl": null,
@@ -1490,6 +1502,8 @@
     "wortlaut": "Kein Anwendungsbeispiel zum Sachwertfaktor. Ersatzprüfung: 4 Flächenbänder × 6 Baujahresgruppen = 24 Zellen, vollständig belegt."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "B",
   "stufe_grund": null,
   "fallzahl": null,
@@ -1639,6 +1653,8 @@
     "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 6 Baujahresgruppen, Spalte 'Neubau 3 Jahre' im Bericht leer."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "B",
   "stufe_grund": null,
   "fallzahl": null,
@@ -1744,6 +1760,8 @@
     "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 6 Baujahresgruppen, Spalte 'Neubau 3 Jahre' leer."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "B",
   "stufe_grund": null,
   "fallzahl": null,
@@ -1849,6 +1867,8 @@
     "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 6 Baujahresgruppen, die beiden rechten Spalten im Bericht leer."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "B",
   "stufe_grund": null,
   "fallzahl": null,
@@ -1894,6 +1914,8 @@
     "wortlaut": "Kein Anwendungsbeispiel zum Sachwertfaktor im Bericht. Ersatzprüfung: der Faktor 1,13 liegt innerhalb der Stichprobenstreuung (± 0,22) und über dem Vorjahreswert 1,08, was zur berichteten Marktentwicklung passt."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 55,
@@ -1939,6 +1961,8 @@
     "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 176 Kauffälle, Wert liegt zwischen freistehendem EFH (1,13) und RMH (1,46) — die im Bericht durchgängige Ordnung freistehend < DHH/REH < RMH ist eingehalten."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 176,
@@ -1984,6 +2008,8 @@
     "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 84 Kauffälle, höchster Faktor der vier Teilmärkte — Ordnung freistehend < DHH/REH < RMH eingehalten."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 84,
@@ -2029,6 +2055,8 @@
     "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 33 Kauffälle, Wert 1,11 gegenüber Vorjahr 1,06."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 33,
@@ -2080,6 +2108,8 @@
     "wortlaut": "Kein Anwendungsbeispiel im gesamten Bericht (zweifach gegengeprüft). Ersatzprüfung aus dem Bericht selbst: Mittelwert 1,33 liegt dicht am abgedruckten Median 1,32 und innerhalb der Spanne 0,80 bis 1,90; Stichprobe RND 35 ± 15, Kaufpreis 3.357 €/m² Wfl, Wfl 136 m², vSW 354.982 €, Standard 2,6, Fläche 414 m², Bodenwert 158.967 €."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -2131,6 +2161,8 @@
     "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: Mittelwert 1,47 dicht am abgedruckten Median 1,44, innerhalb der Spanne 0,99 bis 2,00; Stichprobe RND 40 ± 14, Kaufpreis 2.920 ± 751 €/m² Wfl, Wfl 125 ± 23 m², vSW 254.503 ± 74.201 €, Gebäudestandard 2,7 ± 0,4, Grundstücksfläche 210 ± 67 m², Bodenwert 70.358 ± 30.334 €."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -2457,6 +2489,8 @@
     "pruefhinweis": "Der Beleg nannte das Kategoriefeld \"kategorie\", das Modell heisst es \"anbauweise_rheinseite\". Angeglichen — der Auswerter liest ueber achse_k_feld, ein abweichender Schluessel im Beleg haette die Pruefung gruen und wertlos gemacht."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 514,
@@ -2527,6 +2561,8 @@
     "wortlaut": "Kein Anwendungsbeispiel im Bericht abgedruckt (Modellbeschreibung 8.1 lag hinter der Extraktionsgrenze). Ersatzprüfung: 5 Stützstellen mit Schrittweite 100.000 €, streng fallende Monotonie, alle Werte innerhalb der Stichprobenspanne 0,96 ± 0,10."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 86,
@@ -2585,6 +2621,8 @@
     "wortlaut": "Kein Anwendungsbeispiel abgedruckt. Ersatzprüfung: 4 Stützstellen mit Schrittweite 50.000 €, streng fallende Monotonie, Stichprobenmittel 1,16 liegt zwischen den Tabellenrändern 1,06 und 1,22."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 59,
@@ -2671,6 +2709,8 @@
     "rundung_grund": "Der Bericht druckt den Betrag als \"rd.\" auf volle Tausend gerundet ab."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 37,
@@ -2757,6 +2797,8 @@
     "rundung_grund": "Der Bericht druckt den Betrag als \"rd.\" auf volle Tausend gerundet ab."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 43,
@@ -2843,6 +2885,8 @@
     "rundung_grund": "Der Bericht druckt den Betrag als \"rd.\" auf volle Tausend gerundet ab."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 18,
@@ -3126,6 +3170,8 @@
     "monotonie_befund": "Die Spalte BRW 750 €/m² ist NICHT streng fallend: 250.000 → 1,13 · 300.000 bis 600.000 → 1,12 · 650.000 und 700.000 → 1,13. So steht es im Erntedokument; nicht geglättet. Beim Nachziehen am Original-PDF gezielt auf diese Spalte sehen."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -3407,6 +3453,8 @@
     "wortlaut": "Kein Anwendungsbeispiel im Bericht. Ersatzprüfung: 12 Zeilen × 12 Spalten, Monotonie fallend über den Sachwert, steigend über den Bodenrichtwert."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -3643,6 +3691,8 @@
     "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 9 Zeilen (150.000 bis 550.000 €) × 12 BRW-Spalten, Monotonie fallend über den Sachwert, steigend über den Bodenrichtwert."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -3909,6 +3959,8 @@
     "wortlaut": "Kein Anwendungsbeispiel. Ersatzprüfung: 11 Zeilen (150.000 bis 650.000 €) × 12 BRW-Spalten, Monotonie fallend über den Sachwert, steigend über den Bodenrichtwert."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -4696,6 +4748,8 @@
     "negativtest": "Das fehlerhafte Suchmuster vom 11.08. fand 54 statt 56 Zeilen, weil die Zeilen 50.000 und 60.000 in der Spalte 160 auf 1,00 enden und das Muster 0,\\d\\d verlangte. Monotonie, Wertebereich und Anwendungsbeispiel gingen dabei ALLE durch — gefangen hat es allein die Zählprüfung gegen 56. Muster muss [01],\\d\\d lauten."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 1221,
@@ -4794,6 +4848,8 @@
     "pruefhinweis": "Nachgerechnet mit voller Genauigkeit: 365,562 − 63,10379 − 211,59794 = 90,8603 % → 90,86 % ✓. Der Sollwert des Dokuments ist getroffen. Die im Erntedokument abgedruckten gerundeten Zwischenwerte 63,106 und 211,570 sind selbst ungenau (211,570 statt 211,598) und ergeben scheinbar 90,886 — das ist ein Rundungsartefakt der Zwischenwerte, KEINE Abweichung der Formel."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 350,
@@ -4961,6 +5017,8 @@
     "pruefhinweis": "Spaltenfalle: die Zeitreihe hat Lücken am Zeilenanfang (400.000 € trägt erst ab 2022 einen Wert). Wer die Zahlen der Reihe nach den Jahren zuordnet, verschiebt die ganze Zeile um zwei Spalten. Der Parser muss die Zeichenposition der Jahreszahl in der Kopfzeile messen."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": 273,
@@ -5088,6 +5146,8 @@
     "wortlaut": "Kein Anwendungsbeispiel im Bericht. Ersatzprüfung: 8 Stützstellen, Schrittweite 25.000 €, fallende Monotonie, alle Werte innerhalb 0,74–1,38, Stichprobenmittel 1,02 zwischen den Tabellenrändern 0,98 und 1,07."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
@@ -5226,6 +5286,8 @@
     "wortlaut": "Sachwert inkl. Bodenwert 400.000 €, Lagewert 200 €/m², GND 80 Jahre → Marktanpassungsfaktor 0,87, Abschlag 13 %, marktangepasster Sachwert 348.000 €."
    }
   ],
+  "vollstaendig": true,
+  "unvollstaendig_grund": null,
   "stufe": "A",
   "stufe_grund": null,
   "fallzahl": null,
