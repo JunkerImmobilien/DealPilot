@@ -1,65 +1,22 @@
 # DEALPILOT — PROJEKTANWEISUNG (GESAMTSTAND)
-
 **Stand 12.08.2026, Abend · nach v1083b/v1154 · KONSOLIDIERT ÜBER DEN GESAMTVERLAUF**
-
 Diese Fassung ersetzt **alle** vorherigen, auch die vom 12.08. mittags. Bitte
 alle alten Fassungen aus dem Projekt löschen — nebeneinander erzeugen sie
 Widersprüche.
-
 **Was neu ist:** Das Ausschuss-Register ist **auf Produktion**. Damit wandert
 ein großer Block aus „offene Punkte" nach „so funktioniert es". Dazu vier neue
 Diagnose-Lehren, eine davon aus einem Git-Zwischenfall, und Marcels Festlegung
 zur Stufenregel.
-
 **Wie zu lesen:** Teil I ist Haltung und Arbeitsweise — gilt immer. Teil II ist
 die Landkarte mit sechs Workstreams. Teil III ist die Wertermittlung, der
 aktuelle Schwerpunkt. Teil IV sind Marke, Architektur, Geld, Daten, Server.
-Teil V sind Diagnose-Lehren, Rollout und offene Punkte. **Teil VI ist die
-Arbeit im Repo mit Claude Code** — Werkzeuge, Messkabine, Darstellungs-Ebene,
-Chronik und das fortlaufende Rollout-Journal.
-
----
-
-## WIE DIESE DATEI GEPFLEGT WIRD
-
-**Sie liegt im Repo als `PROJEKTANWEISUNG.md` und ist der eine Ort.** Für die
-Claude-App gilt: hier herauskopieren, nicht danebenschreiben. Nach jedem
-Rollout kommt ein Eintrag ins **Rollout-Journal (Teil VI.10)** — dieselbe
-Datei, neuer Eintrag, **nie** eine neue Datei mit neuem Datum.
-
-**Warum das streng gilt:** An DealPilot arbeiten zwei Stränge parallel — einer
-über den Chat mit ZIP-Paketen, einer direkt im Repo. **Beide schreiben diese
-Datei.** Am 12.08. ist dabei zweimal dasselbe passiert: der eine Strang
-korrigierte eine Angabe, der andere konsolidierte auf älterer Grundlage und
-schrieb den Fehler zurück.
-
-**Deshalb gilt für jeden, der diese Datei konsolidiert:** die folgende Liste
-zuerst prüfen. Es sind Angaben, die **schon zurückgeschrieben wurden** und
-teuer sind, weil sie plausibel klingen.
-
-| Angabe | Falsch (kam zweimal zurück) | Richtig, gemessen |
-|---|---|---|
-| aktive Stildatei | `index.html` lädt `frontend/style.css` | **`css/style.css`** — `frontend/style.css` lädt **niemand** |
-| Handy-Sperre | „bewusst AKTIV (v970 + MA35)" | **mit `v1118` gefallen**, Dateien gelöscht |
-| Workstream (B) Mobile | „MA34 + MA35 + v970-Sperre" | **MA34**; MA35 und v970-Sperre mit `v1118` entfernt |
-| Deploy-Nachweis | Hash allein genügt | **Zweig mitlesen** — der Server stand am 12.08. auf `main` |
-
-**Und eine Regel für den Git-Umgang, aus einem Zwischenfall am 12.08. abends:**
-Steht auf dem Server ein Commit, der nicht im Repo ist, wird **nichts
-verworfen** — erst `git log origin/staging..HEAD --stat` lesen, dann mergen,
-dann zurückpushen. Ein `reset --hard` hätte dort 920 Zeilen fremder Arbeit
-gelöscht. Ausführlich in `FALLEN.md` Punkt 1.
-
+Teil V sind Diagnose-Lehren, Rollout und offene Punkte.
 ---
 ---
-
 # TEIL I — HALTUNG UND ARBEITSWEISE
-
-## DIE SIEBEN REGELN, DIE IMMER GELTEN
-
+## DIE FÜNF REGELN, DIE IMMER GELTEN
 **1 · Erst messen, dann bauen.**
 Der erste Befehl jeder Sitzung im Marktbericht-Strang ist die Marker-Übersicht.
-
 ```
 cd /opt/dealpilot
 for f in marktbericht/backend/src/services/*.js \
@@ -73,9 +30,7 @@ for f in marktbericht/backend/src/services/*.js \
 done
 grep -o "v=1[01][0-9][0-9]" frontend/marktbericht-app/index.html
 ```
-
 **Erwartung nach dem Rollout vom 12.08. abends:**
-
 ```
 swf_modelle.js          v1083-WMOD
 ausschuss_register.js   v1083-WREG v1083a-WLAZ
@@ -86,7 +41,6 @@ ErtragswertService.js   … v1083b-WTXT
 ReportOrchestrator.js   … v1075-WAGS v1083b-WSTU
 app.js                  … v1083b-WPDF
 ```
-
 **Drei Korrekturen an diesem Befehl, alle teuer bezahlt:** Die Zeile
 `connectors/boris/*.js` fehlte — dort liegen v1077 bis v1082b, und die Übersicht
 meldete deshalb einen Stand von v1076, obwohl alles installiert war. Das Muster
@@ -94,22 +48,18 @@ braucht `[A-Z0-9]`, nicht `[A-Z]`, sonst fehlen `WA2`, `WSW`, `WVF` und alle mit
 Ziffer im Namen. Und **nicht jedes Paket setzt einen Marker**: v1082b und die
 v114x-Pakete des Parallel-Strangs tun es nicht — ein fehlender Marker beweist
 also nicht, dass ein Paket fehlt.
-
 In den anderen Workstreams gilt dasselbe Prinzip mit anderen Mitteln: **die
 Landkarte selbst aufnehmen**, Marker greppen, im Zweifel einen Screenshot
 verlangen. Keiner Übergabe glauben, was die App lädt.
-
 **2 · Der Prüfmaßstab ist das Anwendungsbeispiel des Dokuments.**
 Nie eine selbst ausgerechnete Zahl. Jeder Grundstücksmarktbericht, die SW-RL,
 die ImmoWertV-Anlagen, die amtliche BMF-Vorlage — alle drucken durchgerechnete
 Beispiele ab. Trifft die Prüfung sie, ist die Tabelle richtig gelesen.
-
 **Auch die Rundung ist Dokumentverhalten** (SW-RL: volle Euro; 879,97 ≠ 880).
 Herford druckt seine Zu-/Abschläge **zweistellig** ab und summiert erst danach:
 0,899 + (−0,01) + 0,00 = 0,889. Wer erst summiert und dann rundet, kommt auf
 0,89 — eine andere Zahl. Deshalb trägt `swf_modelle.js` ein
 `rundung_stellen` je Modell **und** je Korrekturtabelle.
-
 **Und wo kein Beispiel abgedruckt ist**, sind Monotonie über die ganze Tabelle,
 eine Zählprüfung gegen die erwartete Zeilenzahl und die **abgedruckte
 Stichprobenstatistik** der Ersatz — nie das Bauchgefühl. Der Märkische Kreis
@@ -118,7 +68,6 @@ in diese Spanne fallen und das Mittel zwischen die Tabellenränder. **Der Berich
 sagt seine eigenen Sollwerte — man muss sie nur als solche lesen.**
 **Fünf falsche Sollwerte an einem Tag** (v1065–v1070) haben gezeigt, warum das
 nicht verhandelbar ist.
-
 **3 · Große Pakete. Immer.**
 Ein Feature = EIN ZIP mit `apply.sh`, `rollback.sh`, `patch.py`, `README` und
 `TEST-LOG`. Zusammenhängendes bündeln, Superset bevorzugen. Nie in P1/P2/P3
@@ -129,118 +78,74 @@ entstanden am 12.08. v1083a (zwei Befunde aus dem Staging-Lauf) und v1083b
 (ein Befund aus dem Klicktest).
 **Neuer Inhalt heißt neue Versionsnummer**, ohne dass Marcel danach fragen muss.
 (Marcels Dauervorgabe seit 18.07.)
-
 **4 · Installationsbefehle immer mitgeben. Ungefragt.**
-
 ```
 scp vNNNN.zip root@116.203.214.11:/tmp/
-
 cd /opt/dealpilot
 docker exec dealpilot-mb-db pg_dump -U mb -d marktbericht | gzip > /root/backup-mb-vor-vNNNN.sql.gz
 unzip -o /tmp/vNNNN.zip -d /tmp
 bash /tmp/vNNNN/apply.sh
 docker compose -f docker-compose.prod.yml up -d --build mb-backend backend
 ```
-
 Dazu was danach zu tun ist (**Strg+F5** — nicht nur Strg+Shift+R, der iframe
 hält sich sonst —, Migration prüfen, Klicktest) und worauf zu achten ist. Der
 eigene `pg_dump` der mb-DB gehört immer dazu; sie steht in keinem Backup-Skript.
 **Kein Paket ohne Install-Schritte.**
-
 **5 · In jeden Befehlsblock gehören `cd /opt/dealpilot`, `hostname` UND der Zweig.**
 Neu seit dem Git-Zwischenfall vom 12.08. abends. Nach dem Neuverbinden landet man
 in `~`, nach einem Neu-Login steht der Zweig wieder auf `staging`, und bei zwei
 offenen SSH-Sitzungen landet ein Block auf der falschen Maschine. Alle drei sind
 an einem Abend passiert.
-
 ```
 cd /opt/dealpilot
 hostname                          == DealPilot-Staging | DealPilot-Prod-neu
 git rev-parse --abbrev-ref HEAD   == der erwartete Zweig
 ```
-
 Was daraus folgte, steht in Teil V unter „Git und Parallelbetrieb".
-
-**6 · Ursache statt Symptom — nach zwei bis drei Fehlversuchen STOPP.**
-Dann wird nicht weitergepatcht, sondern diagnostiziert: `getComputedStyle`,
-`getBoundingClientRect`, `elementFromPoint`, Direktaufruf der Funktion,
-Console auf `Uncaught`. Lieber fünf Minuten Diagnose als dreißig Minuten Raten.
-
-**Und der teuerste Sonderfall davon: „das fehlt" ist die teuerste Vermutung.**
-Am 12.08. dreimal dasselbe — eine Lücke behauptet, die es nicht gab: beim
-Tablet-Punkt (A, C und D waren seit `v648` gebaut), beim Sachwertfaktor (die
-Stufe E lief längst durch bis in die Anzeige) und beim Aufräumen zweier Listen
-(sie haben verschiedene Zwecke). Was hilft, in dieser Reihenfolge:
-**vom Verbraucher her suchen** (wer *zeigt* den Wert an?), **nach dem
-Vokabular greppen** statt nach dem Feldnamen, und **die Commit-Historie nach
-dem Thema fragen** (`git log -S`). Jedes davon hätte den Irrtum in einer
-Minute beendet. Ausführlich in `FALLEN.md` Punkt 9.
-
-**7 · Fehler offen zugeben, besonders die eigenen.**
-Eine falsche Diagnose wird **ausdrücklich zurückgenommen**, nicht
-stillschweigend ersetzt — im Commit-Titel, nicht im Nebensatz
-(`v1092d: v1092c zurückgenommen`, `v1113f: eigener Rückschritt zurückgenommen`,
-`v1153b: die Kopfzeile entstand nie`). **Wenn zwei gleiche Fehler
-hintereinander passieren, ist die Sitzung zu lang** — abschließen, übergeben,
-Schluss. **Das gilt auch dann, wenn der nächste Schritt klein und verlockend
-aussieht;** genau dann irrt man weiter.
-
 ---
-
 ## ROLLE UND KOMMUNIKATION
-
 Senior Full-Stack-Entwickler für DealPilot. Marcel ist **nicht-technisch**,
 schreibt casual Deutsch (du), oft per Spracheingabe mit Tippfehlern —
 **Intent parsen, nicht Wortlaut.** „ja weiter" / „hau rein" / „ok los" /
 „mach weiter" = ohne Rückfrage fortfahren. Immer kopierbare Bash-Befehle.
-
 **Er ist DESAG-zertifizierter Sachverständiger.** Bei Bewertungsfragen weiß er
 es besser, bei Code nicht. Sagt er „das ist für mich Quatsch", genau hinsehen —
 beim Ertragswert hatte er recht, und sein eigenes Gutachten war der Beleg.
 **Aber auch die Kaskade gilt für ihn:** seine gegriffene 0,91 für die Löhner
 Straße war Stufe E; die amtliche Herford-Matrix liefert 0,889 Stufe A.
-
 **Bewertungsfragen gehören ihm, Code-Fragen mir.** Die Stufenregel vom 12.08.
 (Wohnen absolut, Gewerbe relativ) ist so entschieden worden: ich habe gemessen
 und drei Optionen mit Empfehlung vorgelegt, er hat gewählt. Die Frage, ob das
 Register im Speicher liegt oder per DB-Abfrage kommt, habe ich dagegen selbst
 entschieden und nur begründet — das ist keine Bewertungsfrage.
-
 **Seine Zwischenfragen sind oft die besten Befunde.** „Haben wir dafür nicht
 Tabellen im Backend?" führte zu `mb.param_modell` und ersparte eine Migration.
 „Sollten wir das Datum nicht mitnehmen?" deckte auf, dass die Zeitangaben je
 Kennzahl geführt werden müssen, nicht je Bericht. „Was ist mit den Daten, die
 wir hier schon ausgelesen haben?" führte zur Inventur der Erntedokumente.
 Solche Fragen ernst nehmen.
-
 **Staging-first IMMER. URSACHE statt Symptom. Fehler offen zugeben** — auch die
 eigenen, besonders die eigenen. Eine falsche Diagnose wird **ausdrücklich
 zurückgenommen**, nicht stillschweigend ersetzt. Am 12.08. waren es vier eigene
 Korrekturen; jede steht mit Namen in Teil V.
-
 Optik, Produkt, Geld, Preise → **Demo-first bzw. Rückfrage, NIE raten.** Keine
 Rückfragen der Sorte „was sollen wir ausrollen" — das steht hier drin.
 Demo-first funktioniert: die Klappblöcke (v1075/76) wurden erst als HTML-Demo
 gezeigt, dann gebaut — und die erste gebaute Fassung brauchte trotzdem eine
 Politur nach Screenshot. Beides eingeplant lassen. Das Flugklassen-Naming und
 die Hero-Videos wurden genauso entschieden.
-
 Bei größeren Entscheidungen 1/2/3-Optionen mit Empfehlung. Jede Session endet
 mit knappem Summary, kopierbarem Deploy-Block und Rollback-Hinweis.
-
 **Nach jeder Code-Änderung ausgeben:** welche Dateien · Frontend oder Backend ·
 Backend-Rebuild nötig? · Cache-Bump nötig? · vollständige Deploy-Kette ·
 Test-Checkliste · Rollback.
-
 **Wenn zwei gleiche Fehler hintereinander passieren, ist die Sitzung zu lang.**
 Paket abschließen, Übergabe schreiben, Schluss. Am 11.08. sind fünf Korrekturen
 an einem Tag passiert, am 12.08. vier — **drei davon derselbe Typ: „gebaut, nie
 verdrahtet".** Gehalten haben beide Tage nur, weil nach jeder Behauptung
 gemessen wurde.
-
 **Whack-a-Mole-Stopp:** nach 2–3 Fehlversuchen STOPP, neu diagnostizieren.
 Lieber fünf Minuten Diagnose als dreißig Minuten Raten.
-
 ### Datei- und Ausgabeaustausch
 - Terminal-Ausgaben **unter ~40 Zeilen** — filtern, kürzen, zählen.
   `| wc -l` statt Liste · `| sort | uniq -c` · `| cut -c1-200` · `--stat` statt
@@ -284,96 +189,57 @@ Lieber fünf Minuten Diagnose als dreißig Minuten Raten.
   Befehl, eine Frage.
 - **Projektwissen zuerst durchsuchen**, dann Dateien anfordern. Paket-Notizen
   und Ernte-Dokumente liegen als `claude/*.md` im Projekt.
-
 ---
 ---
-
 # TEIL II — DIE LANDKARTE UND DIE SECHS WORKSTREAMS
-
 ## WORKSTREAMS / NAMESPACES — NIE MISCHEN
-
 | | Namespace | Prod-Stand |
 |---|---|---|
 | **(A) Haupt-App** | `vNNN` | `beleg-import-20260721` + BMF v974–v994 + Voice v1000 |
-| **(B) Mobile** | `MA` | MA34; **MA35 und die v970-Sperre sind mit `v1118` entfernt** |
+| **(B) Mobile** | `MA` | MA34 + MA35 + v970-Sperre |
 | **(C) Landing** | Feature-Name | `landing-promo-20260723` |
 | **(D) Marktbericht** | `vNNN` | **`99c1097`**, Tags `rollout-20260812-abend` · `marktbericht-v1083b-20260812` · `marktbericht-v1154-20260812` |
 | **(E) Reseller / Whitelabel** | `P-NN` / `W-NN` | W43 |
 | **(F) Admin** | `vNNN` | v973/a/b + Marktzinsen-Reiter |
-
 `vNNN` ist über A/D/F **geteilt** — im Paket-Kopf ausweisen, welcher Workstream.
-
 **Zwei Nummernkreise im Marktbericht-Strang (Stand 12.08. abends):** dieser Chat
 vergibt v1077–v1083b (BORIS, Sachwertfaktoren, Register), der Parallel-Chat
 v1138–v1154 (Wertermittlung, Rechenwege, Handy, Reiter, Klappleiste). Beide
 laufen in dieselben Dateien — vor allem in `frontend/marktbericht-app/app.js`.
 **Vor jedem Paket den aktuellen Stand ziehen, und nur EIN Chat fasst git an.**
-
 ### DIE LANDKARTE — was die App ausliefert
 `frontend/index.html` · `quickcheck-app.html` · `mobile-demo.html` ·
 `pass.html` · `reseller.html` · `marktbericht-app/index.html` ·
 `landing/index.html` · `admin/index.html` ·
 `leistungsumfang` / `impressum` / `agb` / `datenschutz.html`
-
 - `landing/index.html` lädt `env.js` **NICHT** (nutzt inline `relink()`); nur
   `leistungsumfang.html` lädt `assets/env.js`
 - **Landing: `</body>` kommt 3× vor → `rfind`**, `</head>` 1×
 - `marktbericht-app` lädt `whitelabel-override.js` NICHT (braucht
   `mb-whitelabel.js`)
 - `admin/` = eigene App (X-Admin-Token, eigener Chart-Helfer, feste helle Töne)
-- **ZWEI `style.css` — und die Zuordnung war hier zweimal verdreht.**
-  Gemessen am 12.08.: `frontend/index.html` Zeile 38 lädt **`css/style.css`**
-  (36.929 Zeilen, aktiv gepflegt). **`frontend/style.css`** (27.477 Zeilen,
-  Stand 03.08.) wird von **keiner einzigen** HTML-Datei geladen — sie ist eine
-  Leiche. Gegenprobe, ein Befehl:
-  `grep -o 'href="[^"]*style\.css[^"]*"' frontend/*.html` → genau ein Treffer.
-  **Wer der alten Angabe folgt, patcht die tote Datei**, misst keine Wirkung
-  und sucht den Fehler in der Kaskade. *(Die alte, falsche Fassung lautete
-  „`index.html` lädt `frontend/style.css`; `css/style.css` gehört dem
-  Parallel-Strang" — sie stand in der Fassung vom 12.08. mittags und wieder
-  in der vom Abend. **Nicht zurückschreiben.**)*
+- **ZWEI `style.css`:** `index.html` lädt `frontend/style.css`;
+  `css/style.css` gehört dem Parallel-Strang
 - **Pfad-basiert routen, NICHT basename** — es gibt zwei `index.html`
-  **und zwei `style.css`.**
-
 ### ZWILLINGSDATEIEN — immer zusammen patchen
 `dealpilot-mb.js` ↔ `dealpilot-mb-qc.js` ·
 `js/marktbewertung-card.js` ↔ `marktbericht-app/marktbewertung-card.js` ·
 `css/marktbewertung-card.css` ↔ `marktbericht-app/marktbewertung-card.css` ·
 `landing/promo-erstflug.js` ↔ `js/promo-erstflug.js` (`apply.sh` prüft mit `cmp`)
-
-**HANDY-SPERRE IST GEFALLEN (v1118, 11.08.).** Die Angabe „bewusst AKTIV"
-stand in der Fassung vom 12.08. mittags und wieder in der vom Abend —
-**beide Male überholt, nicht zurückschreiben.** `js/mobile-redirect.js`
-(v970, „MB1-hardblock") und MA35 sind **gelöscht**; in `index.html` steht an
-der Stelle nur noch der Kommentar `v1118-ma-ausbau: … entfernt`. Die normale
-Ansicht trägt das Handy seit v1118 allein, geprüft im Durchgang bei 390 px
-(v1118b/c: sieben Bedienelemente auf 44 px gezogen). `?nomobileblock` gibt es
-nicht mehr. Die Landing war nie betroffen.
-
-**Zwei Dinge dürfen dabei nicht mitfallen:**
-- **`frontend/dp-mobile-sw.js` und `frontend/mobile-demo.html` bleiben** — sie
-  sind die *Selbstabmeldung* des alten Mobile-Service-Workers. Ein
-  registrierter SW liegt auf dem **Gerät** und wird nur abgeräumt, wenn das
-  Gerät die Seite noch einmal erreicht. **Beide fallen zusammen oder gar
-  nicht**, und erst, wenn jedes Gerät sie einmal gesehen hat.
-- **`dp_wl_cache` in `js/ui-varianten.js`** ist die Whitelabel-Sperre der
-  Mandanten (v1111) — anderer Zweck, gleiche Gegend. Nicht mit aufräumen.
-
+**HANDY-SPERRE bewusst AKTIV** (v970 Haupt-App + MA35 mobile-demo-Direktaufruf)
+— nicht aufweichen, bis die Mobile-Version fertig ist. Die Landing ist nicht
+betroffen.
 ---
-
 ## (A) HAUPT-APP
-
 ### Grundgerüst
 - Tabs sind `.sec` mit IDs `s0`–`s8`; `s-quick` ist Standalone-View.
 - Cache-Versionen in `index.html` als `?v=NNN` pflegen — bei **jeder**
   Frontend-JS-Änderung bumpen. Neue JS-Datei? **Include prüfen.**
 - HTML-IDs müssen eindeutig sein. **Keine zweite Datei fürs selbe DOM-Element
   bauen** (ID-Kollisions-Lehre v844/v845).
-
 **LocalStorage-Schlüssel:** `dp_user_settings` · `dp_dealscore_weights` ·
 `dp_demo_active` · `ji_token` · `ji_session` · `dp_plan_override` ·
 `dp_tour_completed_v1` · `dp_show_tooltips` · `dp_last_plan` · `dp_promo_v2`
-
 **Wichtige App-APIs (bevorzugen statt CSS-Hacks):**
 `DealPilotConfig.branding.get()` · `DealPilotConfig.pricing.currentKey()` ·
 `DealPilotConfig.pricing.plans` · `window.Dscr.compute()` ·
@@ -383,11 +249,9 @@ nicht mehr. Die Landing war nie betroffen.
 `window.showSettings(initialTab)` · `window.DpTip.setMode('off'|'pro'|'beginner')` ·
 `Sub.getCurrent()` / `Sub.startCheckout()` / `Sub.openPortal()` ·
 `window._currentObjKey` = einzige verlässliche Objektreferenz
-
 **Tour-System:** `tour-engine.js` + `tour-content.js` + `tour.css`; nutzt die
 echten App-APIs (`sbActionsToggle`, `enterQuickCheckMode`, `DpTip.setMode`) —
 keine Parallel-Mechanik danebenbauen.
-
 **Sidebar-Objektkarten (v815 / v844–v850):** `_renderRichCard` in `storage.js`,
 `.sb-card` in `#sb-list`. Karte zeigt **Kaufdatum** (`.sbc-date` = `kaufdat`),
 `updated_at` nur als `data-updated`. Halter-Zeile `.sbc-halter`:
@@ -397,19 +261,15 @@ CSS-Regel zurückbauen. Backend `listForUser` liefert `data->>'halter'` +
 `sidebar-search.js` (die alte/echte), keine zweite `sb-search.js`.
 Portfolio-Cockpit nur über das Aktionen-Akkordeon; `sb-portfolio`-Block bleibt
 entfernt (v848).
-
 **Portfolio-Cockpit:** `dashboard.js`/`.css` v750k, Mount `dashboard-main`,
 Creme `#FDFCFA`, CSS-Idempotenz-Marker exakt.
-
 **Schließen-X im schwarzen Band (v843):** `dp-band-close` im
 `dp-modal-topband` (Settings + Hilfe), CSS-Marker `v843-band-close`.
-
 ### PDF und Branding
 Drei Desktop-Exporte (client-seitiges jsPDF, lesen den globalen State aus
 `calc.js` + `window.jspdf`):
 `exportPDF()` (Investment) · `exportWerbungskostenPDF('all')` (Finanzamt) ·
 `exportTrackRecordPDF()` (Track Record). `loadSaved(k)` lädt ein Objekt.
-
 **Branding-Kern = `pdf.js`:** `_getBranding()` = `DealPilotConfig.branding.get()`
 (product_name/company/name/role/address/plz/city/phone/email/website/logo_b64) ·
 `_getBrandingLogo()` (Custom-Logo hat Vorrang) · `_formatBrandingFooter()` ·
@@ -418,14 +278,12 @@ Drei Desktop-Exporte (client-seitiges jsPDF, lesen den globalen State aus
 `_getBranding()`, **nie hart „JUNKER IMMOBILIEN"**.
 **Track-Record-PDF** (`track-record.js`): Plan-Gate Investor+, Free mit
 Wasserzeichen, Starter gesperrt.
-
 ### Modale-Redesign + Theme-Config (v898)
 Track-Record- und Bankexport-Modal im **Welcome-Mail-/Boarding-Stil**, beide in
 `frontend/js/storage.js`. Design-Referenz ist `mailLayout.js`:
 Bar `#070707` · Hero `linear-gradient(110deg,#E8CC7A,#C9A84C 60%,#b8932f)` ·
 Kicker `#5a4a14` · Titel `#1a1407` · Sub `#3a2e08` · Body `#fff` ·
 Footer `#FAF6EC`/`#E6DFCE`/`#8a8473` · Seite `#EDE7DA`.
-
 `_dpModalCss()` injiziert `<style id="dp-modal-theme">` mit `:root`-Variablen
 (`--dp-obsidian/accent/hi/lo/surface/line/ink*/hero*`) plus Boarding-Shell
 (`.dpm-bar` / `.dpm-hero` / `.dpm-body`, Helfer `DP_BAR`, `DP_HERO`, `DP_ICO`
@@ -433,11 +291,9 @@ Footer `#FAF6EC`/`#E6DFCE`/`#8a8473` · Seite `#EDE7DA`.
 `DealPilotConfig.branding.get().theme` = {accent, accentHi, accentLo, obsidian}
 → **ein Reseller ändert nur die Palette zentral, alle Modale ziehen mit.**
 Marker `/*v898-modal-theme*/`, `v898-p3/p4/p5`. Pro-SVG-Icons statt Emoji.
-
 **Zwei Portfolio-Modale in `storage.js`:** `showBankexportView` (Bankexport) und
 `showTrackRecordView` (Track Record). `deal-action.js` `openBank()` ist die
 Bank-**Anfrage** (Dokumentenversand) — **nicht** der Bankexport.
-
 ### Bankexport-Audit (v899 + v899b)
 1. **Datum-Spalte raus** (zeigte immer „heute", redundant zum
    Finanzierungsdatum) — Modal, CSV, XLSX, A3-PDF (`columnStyles`-Indizes −1).
@@ -451,10 +307,8 @@ Bank-**Anfrage** (Dokumentenversand) — **nicht** der Bankexport.
 4. **Doppel-Definitions-Bug:** `exportGlobalBankPDF` war 2× definiert
    (Z. 2358 A4-Portfolio, Z. 2923 A3-AuswertungBank). **In JS gewinnt die
    letzte** — Fixes gingen an die tote erste.
-
 Label „Objekte mit Darlehen: X / Y". Toggle-Text (beide Modale): „Alle Objekte
 anzeigen — sonst nur gewonnene Deals (mit Zuschlag)".
-
 ### BMF-MODAL — Architektur (hart erarbeitet 19.07.)
 **Drei Schichten, ein Modal:**
 `js/bmf-modal-html.html` (Basis-Markup, per fetch von `_ensureModalLoaded` —
@@ -463,10 +317,8 @@ Logik: `calcAk`, `updateAfaPreview`, Varianten, `applyToTax`, `exportBmfPdf`,
 `closeBMFModal`) + **`js/bmf-modal-v292.js` (UI-Schicht:** Prognose-AK-Baum,
 Inventar-Detail-Box, Varianten-Tabelle, `_renderPane1..4`, `_v292RenderAll`,
 `window._v292Pipeline` = debounced `POST /api/v1/bmf/pipeline`).
-
 **v974 hatte v292.js fälschlich als „Leiche" gelöscht** → tagelang das nackte
 Basis-Modal bearbeitet. **NIE wieder löschen.**
-
 - **Sichtbarkeit klassenbasiert:** `closeBMFModal` entfernt nur `.open` auf
   `#bmfOverlay`. CSS muss daran hängen: `#bmfOverlay.open{…}` +
   `#bmfOverlay:not(.open){display:none!important}`. Eine nackte
@@ -495,7 +347,6 @@ Basis-Modal bearbeitet. **NIE wieder löschen.**
 - **Buster-Disziplin:** Includes in `index.html` (`bmf-modal.js`,
   `bmf-modal-v292.js`, `pdf-anlage-bmf.js`, `bmf-modal-v292.css`) **und** der
   fetch-Buster für `bmf-modal-html.html` in `bmf-modal.js`.
-
 ### KI-Beleg-Import (live seit 21.07.)
 `frontend/js/beleg-import.js` (neu) + `backend/src/routes/ai.js` +
 `backend/src/services/openaiService.js` + `bmf-modal.js`/`-html.html` +
@@ -507,7 +358,6 @@ der Übernahme** (Steuer!); Auto-Kategorisierung AK/HK
 (Herstellungskosten/Makler/Notar/Grundbuch/Fahrt/Verpflegung/Sonstiges);
 15-%-Ampel. Kerosin-metered, Plan-Gate Investor+/Pro, DSGVO, von Anfang an
 `--wl-*`.
-
 ### Voice-Import (Endstand v1000)
 Original-Feldumfang, **5 Kategorien** (Stammdaten · Kauf & Nebenkosten · Miete ·
 Finanzierung · Lage & Bewertung), `runQuickMatch`-Debounce **600 ms**.
@@ -517,7 +367,6 @@ Tabs, das ist gewollt. QC-Kontext filtert auf `QC_IDS`.
 Guide-/KI-Stimme-/Schnell-Detail-Modi sind **komplett zurückgebaut**;
 `backend/routes/ai.js` hat **keine TTS-Route**. Thema Guide/TTS zu den Akten,
 bis Marcel es anders will.
-
 ### QuickCheck und AVM-Vorwahl
 - QC-Iframe: `qc-bridge.js` `IFRAME_SRC='quickcheck-app.html?v=NNN'` bei **jeder**
   QC-Änderung bumpen **und** `qc-bridge.js` selbst bustern.
@@ -536,30 +385,23 @@ bis Marcel es anders will.
   `qc-bridge.js` `qcpm`-Overlay (Ergebnis-Picker).
 - `object-actions.js` trägt die Feldnamen des Hauptformulars — dort nachsehen,
   nicht raten (`objart`, `eigen_r`, `leerstand`, `gsfl`).
-
 ### Weitere Module
 `DpQr` clientseitig · Shared Pass (Mig 035) · ImmoMetrica (Mig 034,
 AES-256-GCM, `IMMOMETRICA_MODE=stub`, 428 = kein Zugang) ·
 API-Keys (Mig 047): `dpk_live_`, SHA-256, max. 5, nur Pro, Verwaltung nur per
 JWT (nie per Key) · Steuer-Snapshot nur in `tax.js` (v732), `tax_snapshots`
 (Mig 026), Debounce-POST über `window._scheduleTaxSnapshotPost`.
-
 ### Vertagt — nicht ohne neue Diagnose anfassen
 **Logo-Saga:** V202–V207 alle erfolglos. Das PNG hat einen eingebrannten Rand →
 CSS-only-Lösungen greifen nicht. Eine transparente Fassung existiert
 (`dp-logo-clean-cropped.png`, 477×123), wurde aber nie zufriedenstellend
 ausgerollt. **Vor jedem weiteren Logo-Patch: DevTools-Inspect der Live-Sidebar.**
-
 ---
-
 ## (B) MOBILE — `frontend/mobile-demo.html`
-
 Same-origin zur Haupt-App, git-getrackt. **Superset-Prinzip: ein ZIP = volle
 Datei.** Testen: echtes Mobil-Login im Gate (MA21) oder vorher im Cockpit
 einloggen (same-origin `ji_token`). Am Handy Strg+Shift+R.
-
 **MA-Historie (Kurzform):**
-
 | | |
 |---|---|
 | MA01–13 | PWA-Infra · Prototyp · Data-Layer · KPIs/Login/Flotte/Detail/Kerosin · Quick-Boarding · AVM · Hub-Ehrlichkeit |
@@ -580,7 +422,6 @@ einloggen (same-origin `ji_token`). Am Handy Strg+Shift+R.
 | MA33 | **PWA-Installierbarkeit:** `dp-mobile.webmanifest` + `dp-mobile-sw.js` + Icons; SW **eng gescoped** auf `/mobile-demo.html` (network-first Shell) |
 | MA34 | Gerätefixes: QC-LEDs über `data-goqc`/`_qcTileKey` statt `data-go` · **generisches** `_catBarsHtml(raw)` statt geratener Keys · „Tarif & Rechnungen" per `window.open(origin+'/')`, weil `location.href='/'` den PWA-Scope verlässt |
 | MA35 | Direktaufruf-Sperre für `mobile-demo.html` |
-
 **API-Verträge (Mobile):** `Auth.apiCall(path,{method,body})` — body als
 **Objekt** (wird selbst stringifiziert), Bearer `ji_token` ·
 `GET /objects?limit=100` (Listen-KPIs `cf_ns` = CENT/Jahr, `kaufpreis` = CENT) ·
@@ -590,21 +431,15 @@ einloggen (same-origin `ji_token`). Am Handy Strg+Shift+R.
 `/ai/extract-voice` (1 L) · `/ai/credits`.
 **SSoT gilt auch mobil:** `DealKpis` / `DealScore` / `Dscr`.
 Cashflow = `_kpis_cf_ns/12`.
-
 **Mobile Boarding-IDs → Objektfelder:** `hg_ul`↔`mb_hg` · `hg_nul`↔`mb_hgsplit` ·
 `d1z`↔`mb_zins` · `d1t`↔`mb_tilg` · `ji_p`↔`mb_knk` · `baujahr`↔`mb_bj`.
-
 ---
-
 ## (C) LANDING — `frontend/landing/index.html`
-
 Getrackt, **self-contained** (~1 MB, keine eigenen externen JS/CSS außer Google
 Fonts). Deploy = eine Datei committen → main → Prod-Pull.
-
 ### Aufbau (seit v851-landing)
 **Views** über `data-view` (kein Routing): `view-landing` · `view-api` ·
 `view-lu` (Leistungsumfang). Nav-Links `data-scroll` (Anker) bzw. `data-view`.
-
 - **Cockpit-Intro `#dp-intro`** (23.07.): 4,0 s, Klick **irgendwo** überspringt,
   Esc, 1×/Session, kein Ton-Button. Das alte Licht-Intro (`intro-kerosin`,
   `#dpi-css`) ist per CSS **stillgelegt, nicht gelöscht** —
@@ -640,21 +475,17 @@ Fonts). Deploy = eine Datei committen → main → Prod-Pull.
   On-Demand-Berechnungen, kein KI/AVM per Key, kein PDF-Trigger, keine Webhooks).
 - **Partnerlogo CareTech Thiel** (v1136i/j) — Zuschnitt war das Problem, nicht
   die Größenregel.
-
 **Zeiten-Regel für Texte (konsistent halten):** händische Eingabe ca. 1 Minute ·
 Import/Schnittstelle 30 Sekunden · Vollanalyse 10 Minuten · Boarding 30 Sekunden.
-
 ### Promo-Layer (23.07.) — eine Logik, zwei Ansichten
 Landing und App rendern dasselbe Markup
 `<div class="tk-price" data-m="29" data-y="290">`, deshalb genügt ein Layer.
-
 | | Landing | App |
 |---|---|---|
 | Datei | `landing/promo-erstflug.js` | `js/promo-erstflug.js` |
 | Grid | `.tkg` | `.ppg` in `#pricing-plugin-host` |
 | Umschalter | `#ptoggle` | `.dp-toggle-btn` |
 | Aufbau | statisch | dynamisch → MutationObserver + rAF-Warteschleife |
-
 **Drei Zustände:** `promo` (Landing immer, App nur ohne bezahlten Plan) ·
 `founding` („Du fliegst als Founding Member — 16 % dauerhaft") · `off`.
 **Die Wahrheit kommt aus Stripe, nicht aus der DB** — kein Feld, keine
@@ -664,19 +495,16 @@ Migration; der Founding-Status wird an der Subscription gelesen
 angezeigt. Vorschaumodi `?promo=demo` · `?promo=founding` · `?promo=fresh`.
 Endpunkte: `GET /plans/promo` (öffentlich) · `GET /subscription/promo`
 (eingeloggt).
-
 **Parallel laufende Renderer:** beide Seiten setzen `<b>` selbst
 (`setP()` bzw. `_updatePpgPrices()` in `pricing-modal.js`). Der Promo-Layer
 schreibt **nach** ihnen (`setTimeout 0`) und räumt vor jedem Zeichnen seine
 eigenen Elemente ab.
-
 ### Landing-Analytics (v973)
 Tabelle **`landing_events`** (Migration 063, Haupt-DB): `session_id`,
 `event_type` (pageview | scroll | section | cta | exit | heartbeat), `path`,
 `section`, `value`, `referrer`, `device`, `utm_*`, `created_at`.
 **Keine IP, keine PII, kein Cookie** — `session_id` ist Zufall aus
 `sessionStorage` und verfällt beim Tab-Schließen. Anonym by design.
-
 `POST /api/v1/track`: **öffentlich** (die Landing hat keinen Login),
 rate-limited beim Mount (60 s / 120), Event-Whitelist, Größen-Cap,
 **immer 204** (fire-and-forget).
@@ -684,64 +512,51 @@ rate-limited beim Mount (60 s / 120), Event-Whitelist, Größen-Cap,
 Verweildauer, Bounce, Zeitverlauf, Funnel, Absprung, CTA, Geräte, Referrer.
 Client: `navigator.sendBeacon`, sonst `fetch keepalive`; Scroll 25/50/75/100,
 IntersectionObserver auf `section[id]`, Exit über `pagehide`/`visibilitychange`.
-
 **Die Caddy-405-Falle:** Die Landing-Domain liefert per `file_server` aus, und
 `file_server` erlaubt nur GET/HEAD → jeder POST auf `/api/v1/track` kam als
 **405** zurück (nicht 404). Fix: ein eigener `handle`-Block für `/api/v1/track*`
 → `reverse_proxy backend:3001`, **vor** den `file_server`-Handles. Die
 Caddyfile ist repo-gepflegt. **Nie die ganze `/api` auf die Landing-Domain
 hängen** — Auth-Routen haben dort nichts verloren.
-
 ---
-
 ## (E) RESELLER / WHITELABEL — die `--wl-`Ebene
-
 Jedes Gold-Literal in der App steht als `var(--wl-<hex>, #<hex>)`, z. B.
 `var(--wl-c9a84c, #C9A84C)`. Die Tokens sind in **keinem** `:root` definiert;
 nur `whitelabel-override.js` setzt sie (`setWlTokens()` in `apply()`).
-
 - **Standard-DealPilot:** der Fallback greift immer = exakt das Literal.
 - **Whitelabel:** alle 66 Töne folgen dem Akzent (`recolor` überträgt
   Farbwinkel-, Sättigungs- und Helligkeitsversatz relativ zum Basisgold);
   `recolor('#C9A84C', acc) === acc`.
 - **`WL_TINTS` ist DIE Liste.** Neuer Ton nötig? Dort eintragen, sonst bleibt
   die Stelle stumm gold.
-
 **NICHT in WL_TINTS, mit Absicht:** Rottöne (`#B8625C` `#B86250` `#8C4843`
 `#D98579` `#B94F3A` `#D9685F` `#F0D4CC`) · Statusfarben (`#E89B2F` `#E0A030`
 `#A16207` `#E8B84F` `#d9a441` `#d9655b` + Ampelmitten im Marktbericht-PDF) ·
 warme Grautöne (`#F2ECDC` `#CDBF9A` `#A89F8C` `#ECE4D2` `#E8E2D4` …) ·
 `--dp-card #FBF6E9`. `rgba(201,168,76,0)` bleibt (Alpha 0).
-
 **Wo `var()` NICHT funktioniert — die fünf Fallen:**
 1. SVG-Präsentationsattribute (`stroke`/`fill`/`stop-color`) → `window._wlc('#hex')`
 2. Canvas `fillStyle`/`strokeStyle` → `window._wlrgbaH('#hex', a)`
 3. Leaflet `L.circleMarker` (setzt intern SVG-Attribute)
 4. jsPDF `setFillColor(RGB-Tripel)` → `_pdfGold()` / `_wlRgb` / `GOLD_D/M/L`
 5. Data-URIs `url("data:…%23C9A84C")` — geht **nie** (4 Icons in `style.css`)
-
 **Die richtige Frage lautet: „landet ein `var()`-String, wo `var()` nicht
 gilt?"** — nicht „ist noch rohes Gold da?". W36 hat so die Charts zerschossen,
 W40 hat repariert.
-
 **Wächter:** `python3 /opt/dealpilot/tools/gold-audit.py [--alle]` — read-only,
 RC=0 sauber. **Vor jedem Rollout.** ~489 bekannte Fundstellen = Backlog, kein
 Blocker. Blinde Flecken: RGB-Tripel (jsPDF) und `var()`-Strings in
 Trägervariablen. **Nicht anfassen:** `config.js` · `branding-darstellung.js` ·
 `darstellung-reseller.js` (der Farb-Editor **muss** Literale tragen) ·
 4 Data-URI-Icons. **Kein blinder Sweep** (~118 Statusfarben-Resttöne).
-
 **Reseller-Regeln:** Kontext immer über `getResellerForUser` ·
 `subscriptions`-INSERT **mit** `billing_interval` · Objektzugriff nur bei
 aktiver `object_shares` · Seat → Mandant wird INVESTOR ·
 **Kerosin-Kaufbestätigung bleibt DealPilot** · Track Record nicht für den
 Partner · **ungepflegte Reseller-Felder werden GELEERT, nie auf Junker
 zurückgesetzt** · SN/PH-Logos nicht vom Sweeper überschreiben (W23).
-
 ---
-
 ## (F) ADMIN — `frontend/admin/`, eigene App
-
 - `admin-api.js`: `const API` (IIFE), `call()`, `X-Admin-Token`.
   `admin-app.js`: `switchView`-Kette, `requireAdmin`/`requireRole`, Views
   dashboard / users / audit / credits / support / satisfaction / invoices /
@@ -769,14 +584,10 @@ zurückgesetzt** · SN/PH-Logos nicht vom Sweeper überschreiben (W23).
 - **Admin-Login geht gegen `admin_users` (bcrypt).**
   `ADMIN_EMAIL`/`ADMIN_PASSWORD` in der `.env` sind **nur Erst-Seed** — eine
   `.env`-Änderung ändert einen bestehenden Admin **nicht**.
-
 ---
 ---
-
 # TEIL III — (D) MARKTBERICHT UND WERTERMITTLUNG
-
 ## MARKTBERICHT — ARCHITEKTUR
-
 - **App** `/opt/dealpilot/frontend/marktbericht-app/` (`app.js` ~4400 Zeilen,
   `wertermittlung.js`, dazu `mb-wizard.js`, `mb-stufen.js`, `mb-objektwahl.js`,
   `feldhilfe.js` aus dem Parallel-Strang), läuft als **iframe** über
@@ -877,16 +688,11 @@ zurückgesetzt** · SN/PH-Logos nicht vom Sweeper überschreiben (W23).
   Ob eine Tabelle wirklich da ist, sagt `select to_regclass('mb.<name>');`
 - **Leiche:** `marktbericht/frontend/app.js` liegt unerreichbar im mb-Image.
   Aufräumen = eigenes Paket, nie am Rollout-Tag.
-
 ---
-
 ## AMTLICHE DATEN — WOHER SIE KOMMEN
-
 **Alle NRW-Grundstücksmarktberichte liegen kostenfrei bei `gars.nrw` und
 `boris.nrw`, Datenlizenz Deutschland Zero 2.0.** 73 Ausschüsse.
-
 ### Die Beschaffung, gemessen am 11./12.08.
-
 **`boris.nrw.de/robots.txt` sperrt `/borisfachdaten/` vollständig** (einzige
 Ausnahme `/borisfachdaten/standardmodelleAGVGA/`). Dort liegen ALLE NRW-GMB-PDF.
 Das ist keine Schutzgebühr, sondern eine robots-Sperre — derselbe Fall wie
@@ -894,15 +700,12 @@ seinerzeit `gis.nrw.de`. **Ein Anfragetext an den Oberen Gutachterausschuss
 liegt vor** (`claude/`), noch nicht abgeschickt. Bis zur Klärung lädt Marcel
 diese PDF selbst im Browser; das ist der vorgesehene Fall. **Automatisiert wird
 dort nicht zugegriffen — auch nicht über einen ferngesteuerten Browser.**
-
 **`gars.nrw` und die Kreisseiten sind frei** und dürfen automatisiert geladen
 werden.
-
 **`opengeodata.nrw.de` ist der offene Verteilserver und NICHT gesperrt.** Dort
 liegen die `GMDNRW_*_CSV.zip` — das ist der Weg zu den Liegenschaftszinssätzen
 für ganz NRW, ohne die robots-Sperre zu berühren. Der CKAN-Eintrag dazu:
 `open.nrw/dataset/ad760913-eb7b-4843-b3b7-dc9100b788ca`.
-
 **Chrome-Downloads über die Fernsteuerung:** Chrome blockt mehrere automatische
 Downloads je Seitenaufruf **stumm**. Zwei je Aufruf gehen durch, danach ist
 Schluss; die Seite muss neu geladen werden. Steht die Domain einmal in der
@@ -911,9 +714,7 @@ das Entfernen des Eintrags. Der `download`-Attribut-Trick wirkt nur
 **same-origin** — für `gars.nrw` also von `gars.nrw` aus auslösen.
 **Zwei Dateien in einem Aufruf gehen zuverlässig** (am 12.08. belegt: beide
 GMD-Archive in einem Zug).
-
 ### Die Verarbeitung — die Leiter hat drei Stufen
-
 1. **`pdftotext -layout`** löst den Löwenanteil. **458 Seiten am Stück ohne
    Abbruch; am 12.08. zusätzlich belegt mit 158 (Höxter) und 110 Seiten
    (Märkischer Kreis).** Die Grenze der Web-Extraktion (Abbruch nach 45–57
@@ -926,41 +727,32 @@ GMD-Archive in einem Zug).
 3. **Immer gegen das Anwendungsbeispiel rechnen.** Ohne diesen Schritt wäre am
    10.08. eine **frei erfundene** Sachwertfaktor-Matrix ins Modul gewandert;
    dieselbe Extraktion hatte auch die Fallzahl verdreht (847 statt 747).
-
 ### Zwei Lizenzen aus demselben Haus, nicht verwechseln
-
 | | |
 |---|---|
 | Grundstücksmarktberichte | `dl-de/zero-2-0` — keine Bedingungen |
 | Grundstücksmarktdaten NRW (CSV) | `dl-de/zero-2-0` |
 | **Bodenrichtwerte BORIS-NRW** | **`dl-de/by-2-0`** — Namensnennung, Quellenvermerk pflichtig |
-
 Einzelne Berichte sind in sich widersprüchlich (Märkischer Kreis führt
 Lizenztext Zero 2.0 **und** Quellenvermerk by-2-0). Vor der Übernahme am
 Dokument prüfen. Quellenvermerk wörtlich: *„Der obere Gutachterausschuss für
-Grundstückswerte im Land Nordrhein-Westfalen (www.boris.nrw.de), dl-de/by-2-0"*
-
+Grundstückswerte im Land Nordrhein-Westfalen ([www.boris.nrw.de](https://www.boris.nrw.de)), dl-de/by-2-0"*
 **Grenzen, die nicht verschoben werden:** kostenpflichtige Berichte NIE abrufen
 (Meißen 20 €, Sachsen-Anhalt ~30 €, RLP 150 €) · Captcha = Ansage, nicht Hürde
 (Thüringen) · robots-Sperre = Ansage · ein Abruf je Sekunde, eigene Kennung mit
 Kontakt. **Ausnahme BORIS-D:** `gis.nrw.de` weist Anfragen ohne Browser-Kennung
 mit 403 ab; Marcel hat das mit der Stelle geklärt (Aktennotiz), Kennung über
 `BORISD_USER_AGENT`.
-
 **Nicht crawlen, wo eine Datei existiert.** Behördenportale sind Weboberflächen
 für Menschen (`boris.nrw.de` = 9.440 Bytes JavaScript, null Links). CKAN
 abfragen und die Datei ziehen.
-
 **Konnektoren:** `BorisConnector` (Bodenrichtwerte, ArcGIS, 16 Länder) ·
 `IrwConnector` (Immobilienrichtwerte § 20 über WMS, Jahrgänge ab 2011) ·
 `OpenDataConnector` (NRW CKAN) · `opendata/` (AK-OGA bundesweit, Parser P1).
-
 ### Grundstücksmarktdaten NRW — die maschinenlesbare Quelle
-
 `GMDNRW_CSV.zip` von `opengeodata.nrw.de/produkte/infrastruktur_bauen_wohnen/boris/GMD/`,
 8,5 MB, dl-de/zero-2-0, Herausgeber Oberer Gutachterausschuss c/o
 Bezirksregierung Köln. Sechs Dateien:
-
 | Datei | Inhalt |
 |---|---|
 | `lzs.csv` | **73 Zeilen × 181 Spalten** = 5 Kopffelder + 11 Objektarten × 16 Kennzahlen |
@@ -969,43 +761,34 @@ Bezirksregierung Köln. Sechs Dateien:
 | `efh.csv` / `we.csv` | Durchschnittspreise je Altersklasse |
 | `umsatz.csv` | Kauffälle, Flächen-/Geldumsatz, Preisentwicklung, Erbbauzinssätze |
 | `allgemein_erlaeuterung.xlsx` | **die amtliche Feldbeschreibung** |
-
 **Wichtig für die Zeitangabe:** die Ausgabe **2025** trägt das Berichtsjahr
 **2024** (Berichtszeitraum 01.01.–31.12.2024). Die von Hand geernteten GMB sind
 Jahrgang **2026** (Berichtsjahr 2025) — das CSV ist also **einen Jahrgang
 älter**. Bei Konflikt gewinnt der jüngere Jahrgang, nicht die Quelle.
-
 **Die Marker-Semantik steht in der xlsx, nicht im Kopf:**
 `-` keine Angabe · `*` Anzahl kleiner 3 bzw. 5 · `.` kein Markt →
 alle drei ergeben `None`, **nie 0**.
 Dazu die dokumentierte Ausgaberegel: *„lzs: Ausgabe je Gutachterausschuss,
 Ausgabe nur wenn Anzahl gleich oder größer 5"* — das ist eine Prüfung, die man
 geschenkt bekommt.
-
 **Die elf Zweige:** `efh` freistehend · `zfh` · `rhdhh` Reihen-/Doppelhäuser ·
 `dreifh` · `mfh` (gew. Anteil ≤ 20 %) · `ggg` gemischt genutzt · `handel` ·
 `buero` · `gegi` Gewerbe/Industrie · `we_s` Wohnungseigentum selbstgenutzt ·
 `we_v` Wohnungseigentum vermietet.
-
 **Je Zweig 16 Kennzahlen:** Unsicherheitsvermerk · Zinssatz · Standardabweichung ·
 Fallzahl · **Anzahl ausgewerteter Geschäftsjahre** · Objektgröße (± s) ·
 Kaufpreis €/m² (± s) · Marktmiete €/m² (± s) · **Bewirtschaftungskostenquote**
 (± s) · Restnutzungsdauer (± s) · **Gesamtnutzungsdauer**.
-
 **Encoding cp1252, Trenner `;`, Dezimalkomma.**
-
 ### `gaa_kennz` ist NICHT der Ausschussschlüssel — eine scharfe Falle
-
 Gemessen: `schluessel.csv` hat 428 Zeilen mit **428 verschiedenen** `gaa_kennz`.
 Es ist ein Schlüssel **je Gemeinde**, nicht je Ausschuss.
-
 ```
 05758000  Herford, Kreis   gaa 31000   <- dieser traegt die LZS-Zeile
 05758016  Hiddenhausen     gaa 31003   <- keine LZS-Zeile
 05770024  Minden           gaa 26100   <- eigener Ausschuss MITTEN im Kreis
         (leer)             gaa 22200   <- Verbund Dorsten/Gladbeck/Marl, KEIN eigener AGS
 ```
-
 **14 NRW-Kreise tragen mehr als einen Gutachterausschuss:** Wesel vier (Kreis,
 Dinslaken, Moers, Wesel), Mettmann und Märkischer Kreis je drei, dazu Düren,
 Rheinisch-Bergischer Kreis, Borken, Recklinghausen, Steinfurt, Minden-Lübbecke,
@@ -1013,17 +796,12 @@ Paderborn, Hochsauerland, Siegen-Wittgenstein, Soest, Unna.
 **20 Städte haben einen eigenen Ausschuss innerhalb ihres Kreises** — darunter
 Iserlohn, Lüdenscheid, Minden und Stadt Paderborn, also genau die, für die
 eigene GMB existieren.
-
 Die richtige Auflösung ist die Kaskade, und die Daten tragen sie nativ:
 **Gemeinde (8 Stellen) zuerst, dann Kreis (5 Stellen).** Damit werden 420 von
 428 Gemeinden abgedeckt.
-
 ---
-
 ### Bundesweit: es gibt KEINE Sachwertfaktor-Quelle
-
 Recherchiert und belegt am 10.08.:
-
 - Der **Immobilienmarktbericht Deutschland** des AK OGA schließt die
   erforderlichen Daten ausdrücklich aus: *„Die hier veröffentlichten Daten
   eignen sich grundsätzlich nicht zur Ermittlung von Verkehrswerten … sind den
@@ -1034,7 +812,6 @@ Recherchiert und belegt am 10.08.:
 - **Kommerziell** führt sie einzig Sprengnetter bundesweit — nach eigenem
   Hilfe-Center im **Fünf-Jahres-Rhythmus** fortgeschrieben und vor Gebrauch
   lokal zu kalibrieren. Also abgeleitet, nicht amtlich.
-
 **Maschinenlesbar gibt es nur:** Liegenschaftszinssätze für NRW aus
 `Grundstücksmarktdaten NRW` (CSV, Zero 2.0) und Immobilienrichtwerte NRW als
 Shapefile (§ 20, nicht § 21 Abs. 3).
@@ -1043,14 +820,11 @@ Sachsen-Anhalt (kostenfrei, ein einziger Ausschuss fürs ganze Land seit 2014),
 Berlin (kostenfrei; Sachwertfaktor-PDF Jahrgang 2025, Stand 04.02.2026, frei bei
 berlin.de). Bayern und Schleswig-Holstein sagen in ihren Landesberichten
 ausdrücklich, dass sie diese Daten **nicht** enthalten.
-
 **Das ist der Burggraben.** Wer amtliche kreisscharfe Sachwertfaktoren will,
 muss dieselbe Handarbeit leisten — es gibt keine Datei, die man einmal zieht.
 **Für Liegenschaftszinssätze gilt das in NRW nicht mehr:** die stehen seit dem
 12.08. flächendeckend im Register.
-
 ### Zum Wettbewerb (beide vermessen am 10./11.08.)
-
 **immobilien-wertermittlung.de (ImmoInvent GmbH)** — Tooltip wörtlich:
 *„Der angegebene Sachwertfaktor wird über einen internen Algorithmus ermittelt.
 Dieser deckt sich aber nicht zwangsläufig mit den Sachwertfaktoren der
@@ -1059,7 +833,6 @@ wo die amtliche Herford-Matrix rund 0,87 liefert. Das Formular hat genau ein
 Textfeld `sachwertfaktor` — kein Feld für Ausschuss, Stichtag, Quelle oder
 Stufe. Liegenschaftszinssätze für Wohnen und Gewerbe werden dagegen geführt.
 **Ihr Baupreisindex ist stichtagsfähig** (jedes Quartal seit 2000 wählbar).
-
 **ImmoAnalyse.Pro** — Deal-Pipeline mit angehängter Bewertung. Im Code stehen
 `sachwertfaktor_efh: null` und `sachwertfaktor_mfh: null`;
 `liegenschaftszinssatz_whg` und `_gew` sind dagegen gefüllt. Die Schnellanalyse
@@ -1069,17 +842,12 @@ Umrechnungskoeffizient, ohne Gartenlandansatz.
 **Was sie besser können:** Suchagenten, Pipeline, Due Diligence, Fix & Flip,
 **Ankauf-Widget zum Einbetten**. Das ist die Sourcing-Seite, die bei uns als
 Deal Tracker auf der Liste steht.
-
 Beim Wohnrecht sieht deren Rechnung nach **Doppel-Abzinsung** aus (Faktor 2 zu
 niedrig). Falls wir je ein BOG/Wohnrecht-Modul bauen: klassische
 Leibrentenmethode, gegen Handrechnung belegt, **NICHT abschauen**.
-
 ---
-
 ## DAS AUSSCHUSS-REGISTER — SEIT 12.08. AUF PRODUKTION
-
 ### Die drei Bausteine
-
 | Datei | Marker | Rolle |
 |---|---|---|
 | `lib/swf_modelle.js` | `v1083-WMOD` | **acht Auswerter, ein Vertrag** — rechnet |
@@ -1087,12 +855,9 @@ Leibrentenmethode, gegen Handrechnung belegt, **NICHT abschauen**.
 | `lib/register/lzs-nrw.json` | — | **493 Datensätze**, versionierte Saatdatei (663 KB) |
 | `lib/gutachterausschuss.js` | `v1083-WKAS` `v1083-WLZS` `v1083-WHFL` | **der Auflöser** — einzige Stelle nach außen |
 | `tools/register-saat.mjs` | `v1083-WSAAT` | schreibt die Saat nach `mb.param_modell` |
-
 ### Neun Modellformen, acht Auswerter
-
 **Jeder Ausschuss veröffentlicht in eigener Struktur.** Gemessen an 21 Berichten
 des Jahrgangs 2026 gibt es nicht drei Formen, sondern **neun**:
-
 | Form | Ausschüsse |
 |---|---|
 | `matrix_interp` Matrix, zwei stetige Achsen, Kreuzinterpolation | Minden-Lübbecke (SW × RND), Herford (SW × BRW), Höxter (SW × BRW), Kreis Paderborn (SW × Lagewert) |
@@ -1105,42 +870,33 @@ des Jahrgangs 2026 gibt es nicht drei Formen, sondern **neun**:
 | `konstante` ein Faktor je Objektart | Essen, Duisburg |
 | `basiswert_additiv` Basiswert + Bandkorrekturen | Bochum |
 | `zuschlag_prozent` Zu-/Abschläge in % nach Gebiet | Dortmund |
-
 **Bochum und `zuschlag_prozent` brauchen keinen eigenen Auswerter** — Bochum ist
 eine `konstante` plus vier `band`-Korrekturen.
-
 **Neue Eigenschaft, kein neuer Auswerter:** Iserlohn und Märkischer Kreis führen
 **Zeitreihen** über sechs Berichtsjahre. Der jüngste Jahrgang gilt, die älteren
 sind Dokumentation.
-
 **Drei Regeln, die `swf_modelle.js` hart durchsetzt:**
 1. **Wo die Quelle endet, endet die Rechnung** — keine Extrapolation über die
    Tabelle hinaus.
 2. **Eine leere Zelle ist kein Wert** — kein Nachbar, kein Mittelwert.
 3. **Jede Zahl trägt ihre Herkunft** — Tabellenwert, jede Korrektur einzeln,
    und die Rechenkette als Text (`rechenweg`).
-
 **Prüfstrecke 36 von 36**, jeder Sollwert aus einem Anwendungsbeispiel oder einer
 abgedruckten Tabelle. **Kernbeleg:** die Regression Löhner Straße läuft durch den
 **generischen** Auswerter und liefert Tabellenwert **0,899**, Faktor **0,889**
 und marktangepasst **290.391 €** — exakt die Zahlen des v1076-Klicktests aus dem
 handgeschriebenen Herford-Modul.
-
 ### Die Kaskade — 8 → 5 → 3 → 2
-
 `zustaendig()` verglich bis v1083 **nur den fünfstelligen Kreisschlüssel**. Das
 konnte die 14 Mehrfach-Kreise nicht auseinanderhalten: ein Registereintrag für
 Lüdenscheid hätte still den Märkischen Kreis getroffen — die v1060-Fehlerklasse,
 eine Ebene tiefer.
-
 Seit `v1083-WKAS` läuft die Auflösung über `kaskadeSchluessel(ags)`:
 **8 → 5 → 3 → 2**, feinste Ebene zuerst. Jeder Ausschuss liegt auf der Ebene, auf
 der er zuständig ist — gemeindescharf achtstellig, kreisscharf fünfstellig — und
 die feinere gewinnt von selbst. Dieselbe Reihenfolge wie in
 `connectors/opendata/param-repository.js`, **bewusst identisch**.
-
 Belegt gegen:
-
 | Adresse | trifft | Ausschuss |
 |---|---|---|
 | 05758016 Hiddenhausen | `05758` | Kreis Herford |
@@ -1150,14 +906,11 @@ Belegt gegen:
 | 05962004 Altena | `05962` | Märkischer Kreis |
 | 05562012/14/24 Dorsten/Gladbeck/Marl | 8-stellig | Verbund-Ausschuss |
 | 05111000 Düsseldorf | `05111` | Landeshauptstadt |
-
 ### Warum das Register im Speicher liegt
-
 `CrossCheckService.compute()` ist **synchron**, `holeModelle()` aus dem
 param-repository ist async. Ein DB-Lesevorgang im Auflöser hätte `compute()`
 async gemacht und damit die ganze Aufrufkette. 493 Sätze sind nichts — einmal
 laden, danach synchron fragen.
-
 **Zwei Ladewege, in dieser Reihenfolge:**
 1. `ladeSaat()` — die versionierte Datei im Repo. **Lädt sich beim ersten
    Zugriff selbst** (`v1083a-WLAZ`), kann also nie vergessen werden.
@@ -1165,134 +918,103 @@ laden, danach synchron fragen.
    in `server.js` neben dem Taktgeber, nie im Anfragepfad). Überschreibt die
    Saat **nur bei Erfolg und nur, wenn die Tabelle etwas liefert** — eine leere
    Tabelle darf ein gefülltes Register nicht löschen.
-
 Damit wirkt eine spätere Ernte **ohne Deploy**, und ein vergessener Saatlauf
 führt nicht zu einem stillen „kein Ausschuss hinterlegt".
-
 **Nach jedem Saatlauf muss das mb-Backend neu starten** — der Node-Prozess hält
 das Register im Speicher. Ohne `docker restart dealpilot-mb-backend` wirkt die
 frische Ernte erst beim nächsten Neustart. Dieselbe Klasse wie der Stripe-Cache.
-
 ### Kein zweites Repository
-
 `connectors/opendata/param-repository.js` (OD-02, aus v1066) hat
 `schreibeModelle()` und `holeModelle()` samt dem richtigen ON-CONFLICT-Schlüssel
 und einer Belegprüfung vor dem Insert **schon lange**. v1083 nutzt es.
 *Bevor ein zweites Werkzeug gebaut wird, nachsehen, ob es das erste schon gibt.*
-
 **`m.ags` ist dort ein SKALAR, keine Liste.** Eine Gemeindeliste je Ausschuss
 hätte `schreibeModelle()` klaglos geschrieben und `holeModelle()` hätte nie
 etwas gefunden, weil dort `ags = $2` exakt vergleicht.
-
 **`param_modell_ebene_check` erlaubt `gemeinde` und `kreis`** — `gemeinde_verbund`
 fiel durch und kostete 24 Sätze. Der vollständige erlaubte Wertebereich ist
 **noch nicht gemessen**:
 ```
 docker exec dealpilot-mb-db psql -U mb -d marktbericht -c "select pg_get_constraintdef(oid) from pg_constraint where conname = 'param_modell_ebene_check';"
 ```
-
 ### Zuständigkeit bleibt an einer Stelle
-
 **`lib/gutachterausschuss.js` bleibt die einzige Stelle**, die nach dem
 Gemeindeschlüssel entscheidet, und gibt immer dieselbe Form zurück.
 **Sachwertfaktor nur über den Auflöser, nie ein Modul direkt.**
 Die zwei handgeschriebenen Module (Minden-Lübbecke, Herford) bleiben stehen —
 sie tragen Umrechnungskoeffizienten und Gartenland, die im Register noch nicht
 abgebildet sind. Gefragt wird **erst das Modul, dann das Register**.
-
 Neu seit v1083: `liegenschaftszinssatz({ ags, zweig })` — kommt aus dem Register,
 deckt alle 73 NRW-Ausschüsse ab und **liefert den Modellvermerk mit** (GND, RND,
 BWK-Quote, Marktmiete). Ohne den darf der Zinssatz nicht verwendet werden
 (§ 10 ImmoWertV).
-
 **KEIN TREFFER HEISST KEIN WERT.** Nie ein Nachbarkreis, nie ein Landesmittel.
 Genau so ist in v1060 ein Vergleichsfaktor aus Minden-Lübbecke in einen Bericht
 für Hiddenhausen geraten: die Kreisprüfung lag in den Modulen, in einem fehlte sie.
-
 **Neuen Ausschuss aufnehmen:** Bericht holen → Rezept nach dem Muster von
 `312-hoexter.json` → Prüfstand → Registerdatensatz → über den Saatlauf in
 `param_modell`.
-
 ---
-
 ## DAS ERNTEWERKZEUG
-
 **Je Ausschuss ein Rezept, für alle derselbe Prüfstand.** Ein generischer Parser
 ist unmöglich, aus demselben Grund, aus dem es kein generisches Sachwertmodell
 gibt. Die Prüfungen dagegen sind für alle gleich.
-
 ```
 tools/gmb-ernte.py          der Pruefstand fuer PDF-Berichte
 tools/rezepte/<gaa>.json    je Ausschuss ein Rezept
 tools/lzs-ernte/            Parser + Pruefstand + Saat fuer die NRW-CSV
 tools/swf-ernte/            Parser + Pruefstand Hoexter / Maerkischer Kreis
 ```
-
 **Das Rezept** sagt: wo die Tabelle steht (Anker/Anker-Ende), welches Muster die
 Zeilen haben, wie die Achsen heißen, wie viele Zeilen zu erwarten sind, welchen
 Sollwert das Anwendungsbeispiel liefert, welche Korrekturen es gibt, und die
 vollständigen Zeitangaben.
-
 **Der Prüfstand** prüft für jeden dasselbe: Zeitangaben vollständig ·
 Zeilenzahl gegen die Erwartung · Monotonie je Achse · Wertebereich ·
 Tabellenwert des Anwendungsbeispiels. Fällt eine durch, entsteht **kein
 Registerdatensatz** (Rückgabewert 1).
-
 **Grenze bewusst gezogen:** Das Werkzeug **rechnet keinen Sachwertfaktor**, es
 schlägt nur nach. Gerechnet wird ausschließlich in `swf_modelle.js` — ein
 zweiter Auswerter wäre eine Dublette, und Dubletten laufen auseinander.
-
 **Klammerwerte** wie `(67)` markieren viele Ausschüsse als dünn belegt. Das ist
 ein **Wert mit Vorbehalt**, kein fehlender Wert — der Vorbehalt gehört in den
 Bericht, nicht in den Papierkorb. `-` und leer ergeben `None`.
-
 **Der Negativtest ist Teil des Werkzeugs.** Mit dem fehlerhaften Suchmuster vom
 11.08. findet der Parser 54 statt 56 Zeilen (die Zeilen 50.000 und 60.000 enden
 auf `1,00`, das Muster verlangte `0,\d\d`) — Monotonie, Wertebereich und
 Anwendungsbeispiel gehen **alle durch**, nur das Nachzählen fängt es. Die
 Zählprüfung ist deshalb nicht verhandelbar.
-
 **Bildtabellen** (Bochum) bekommen kein Rezept mit Suchmuster, sondern die Werte
 im Rezept (`werte_inline`) — und laufen durch denselben Prüfstand.
-
 **Spaltenzuordnung nach Zeichenposition, nicht nach Reihenfolge.** Zeitreihen
 haben Lücken am Zeilenanfang (Märkischer Kreis: 400.000 € trägt erst ab 2022
 einen Wert). Wer die Zahlen der Reihe nach den Jahren zuordnet, verschiebt die
 Zeile. Der Parser misst die Position der Jahreszahl in der Kopfzeile. Dieselbe
 Fehlerklasse wie die vertauschte Spaltenzuordnung bei Bielefeld am 11.08.
-
 ### Zeitangaben sind Pflicht, und zwar je Kennzahl
-
 Die Ausschüsse meinen mit „Datum" Verschiedenes: Höxter normiert „zum Stichtag
 01.01.2026" aus Kauffällen 2023–2025, Dortmund „auf das Berichtsjahr 2025" aus
 mehreren Jahren, Bochum auf „die vergangenen zwei Berichtszeiträume".
 **Bielefeld führt im selben Heft Sachwertfaktoren auf Datengrundlage 2025 und
 Liegenschaftszinssätze auf Kauffällen 2024.**
-
 Deshalb je Kennzahl, nicht je Bericht: `stichtag` · `berichtsjahr` ·
 `auswertezeitraum` · `beschlossen` · `veroeffentlicht`. Bielefeld schreibt selbst
 dazu, dass eine Anpassung bei aktuellen Stichtagen sachverständig zu
 berücksichtigen ist — mit dem Stichtag im Datensatz kann der Bericht warnen,
 wenn er altert.
-
 ---
-
 ## WERTERMITTLUNG — DER RECHENKERN
-
 **Modellkonformität ist das Leitprinzip** (§ 10 ImmoWertV). Jeder Parameter
 trägt einen Modellvermerk (`modellversion`), und der entscheidet, mit welchen
 Ansätzen er gerechnet werden darf. Wer einen amtlichen Zinssatz mit fremden
 Bewirtschaftungskosten oder fremden Mieten kombiniert, bekommt ein Ergebnis, das
 amtlich aussieht und es nicht ist.
-
 **Das ist keine Theorie:** aus der NRW-Ernte gemessen rechnet die **Bundesstadt
 Bonn** (GAA 10400, AGS 05314000) Dreifamilien- und Mehrfamilienhäuser mit
 **GND 60**, nicht 80. Wer diesen Zinssatz mit `GND_JAHRE = 80` kapitalisiert,
 rechnet gegen ein anderes Modell als das, aus dem er stammt. Deshalb steht die
 GND im Registerdatensatz unter `modellansaetze` und muss dort gelesen werden.
-
 **Module (`marktbericht/backend/src/lib/`):**
-
 | Datei | Inhalt | Belegt gegen |
 |---|---|---|
 | `immowertv.js` | Bodenwert, Ertragswert, GND-Tabelle, Anlage 3 | Verordnungstext |
@@ -1308,64 +1030,49 @@ GND im Registerdatensatz unter `modellansaetze` und muss dort gelesen werden.
 | `gutachterausschuss.js` | **Auflöser** (importiert `umrechnung_nrw` + `ausschuss_register`) | Zuständigkeit |
 | `swf_modelle.js` | **Acht Auswerter für die neun Modellformen** | 36 Prüfungen |
 | `ausschuss_register.js` | Register im Speicher, Kaskade | 30 Kettenprüfungen |
-
 ### Das AGVGA-NRW-Modell — andere Ansätze als Anlage 3
-
 | | ImmoWertV Anlage 3 | AGVGA.NRW |
 |---|---|---|
 | Verwaltung ETW | 275 / 357 € | 275 / 335 € |
 | Instandhaltung | 9,00 / 11,70 €/m² | 9,00 / 11,00 €/m² |
 | Garage | 68 / 88 € | 65 € |
 | Stellplatz | nicht getrennt | 25 € |
-
 **Zwei Indexbasen, die nicht vermischt werden dürfen:** ImmoWertV rechnet gegen
 Oktober 2001 = **77,1**, das NRW-Modell gegen **87,5**. Dasselbe Datum, zwei
 Reihen — wer sie mischt, verrechnet sich um zwölf Prozent.
 Index Oktober 2025 = 123 (ImmoWertV-Basis) bzw. 139,6 (NRW-Basis).
-
 ### Der Rechenkern ist geprüft — Stand 11./12.08.
-
 Anlass war eine Differenz von rund 72.000 € im Gebäudesachwert gegenüber dem
 Werkzeug, mit dem das Gutachten zur Löhner Straße erstellt wurde.
 **Ergebnis nach sechs Messungen am Server: kein Befund im Code.**
-
 | geprüft | Ergebnis |
 |---|---|
 | `anlage2.js` bei GND 80, Alter 62, 3 Punkte | **24 Jahre**, Formel Anlage 2 (a = 0,9033 · b = 1,9263 · c = 1,2505) |
 | Staffel 0/1/2/3/5 Punkte | 19,3 · 19,3 · 21,7 · 24 · 28,7 — Bänder wie in der Verordnung |
 | `nhkSachwert()`-Aufrufe (Z. 137, 189) | beide mit `rnd_jahre: _rndEinheitlich()`, seit v1056-WRND-1 |
 | Kette `modGrad` → `mod_punkte` | heil: `wertermittlung.js:740` · `app.js:1380` · `ReportOrchestrator:136` |
-
 **Die alte Notiz „RND 18 statt 24" ist erledigt.** Die 18 kam daher, dass im
 Klicktest kein Modernisierungsgrad ausgewählt war; dann greift der beabsichtigte
 Rückfall auf GND − Alter.
-
 ### Der stille Rückfall meldet sich — v1083-WRND / v1083b-WPDF
-
 **Gerechnet wird weiter genau wie vorher.** Neu ist nur, dass der Rückfall seine
 Herkunft mitträgt:
-
 ```js
 out.sachwert.restnutzungsdauer_herkunft = { quelle, grund, rnd_jahre, gnd_jahre, hinweis }
 out.restnutzungsdauer_herkunft          = dasselbe, auf oberster Ebene
 ```
-
 `quelle` ist `'anlage2'` oder `'geschaetzt'`. Drei Rückfallgründe werden
 unterschieden: `kein_modernisierungsgrad` · `kein_baujahr` ·
 `anlage2_ohne_ergebnis`.
-
 Im PDF steht seit `v1083b-WPDF` in der Sachwert-Karte „RND 18 J. / GND 80 J.
 **· geschätzt**" und am Rechenweg der volle Wortlaut. **Der Warnfall ist im
 Echtbetrieb noch nie sichtbar gewesen** — am Testobjekt Hüllhorst greift
 Anlage 2 (RND 49,6). Ein Gegentest mit einem Bericht ohne Modernisierungsgrad
 steht aus.
-
 Ebenfalls neu im PDF: der **Grund** für „ohne Sachwertfaktor". Bei einer
 Eigentumswohnung leitet der Ausschuss gar keinen ab; das stand bisher nur auf
 dem Bildschirm.
-
 ### Drei Konstanten im CrossCheckService
-
 - **`BAUPREISINDEX = 2.02`** (Z. 22), kommentiert als „2010 → 2026 (Destatis,
   gerundet)". Das **Berechnungsbeispiel des GMB Dortmund 2026** rechnet dagegen
   mit *Index 2010 = 100 · Bundesindex = 190,6*, also Faktor **1,906** zum
@@ -1376,16 +1083,12 @@ dem Bildschirm.
   Für Wohngebäude richtig, für Gewerbe falsch — und für Bonn auch bei Wohnen.
 - **`RND_MIN = 10`** (Z. 25), eine selbstgesetzte Untergrenze vor der
   Anlage-2-Kurve.
-
 ### Der gewogene Ausstattungsgrad (v1074, SW-RL Anlage 2)
-
 Neun Gewerke mit amtlichen Wägungsanteilen — **Summe exakt 100**:
-
 ```
 Außenwände 23 · Dach 15 · Fenster/Außentüren 11 · Innenwände 11 ·
 Decken/Treppen 11 · Fußböden 5 · Sanitär 9 · Heizung 9 · sonst. Technik 6
 ```
-
 Je Gewerk eine Stufe 1–5, halbe Stufen linear interpoliert; Kennwert =
 gewichtete Summe, **auf volle Euro gerundet** (Dokumentverhalten).
 - **Alle neun oder gar nicht:** fehlt ein Gewerk, rechnet die glatte
@@ -1393,17 +1096,13 @@ gewichtete Summe, **auf volle Euro gerundet** (Dokumentverhalten).
 - **Nur Gebäudearten 1.–3.** — die Verordnung gibt die Anteile nur für
   Ein-/Zweifamilienhäuser. MFH bleibt gesperrt (Datenlücke).
 - Invariante der Prüfstrecke: alle neun auf Stufe 3 == glatte Stufe 3.
-
 ### Sonstige Bauteile (v1074)
-
 Gauben, Balkone, Vordächer, Terrassen, Weitere — **Herstellungskosten zum
 heutigen Stichtag, OHNE erneute Indexierung, VOR der Alterswertminderung**
 (sie altern mit dem Gebäude). Das bestehende Feld `besBauteile` bleibt der
 **Zeitwert-Weg NACH der AWM** (Aufzug u. ä.) — zwei verschiedene Dinge, nicht
 zusammenlegen. Referenz Löhner Straße: 95.000 € (51+13+10+18+3).
-
 ### Die Parameter-Kaskade
-
 ```
 A  amtlich, gemeinde- oder gutachterausschussscharf   nicht indikativ
 B  amtlich, aber breit gestreut oder nur regional     nicht indikativ
@@ -1411,19 +1110,14 @@ C  marktabgeleitet, objektspezifisch                  indikativ
 D  § 256 BewG                                         indikativ
 E  eigene Angabe                                      schlägt alles
 ```
-
 Kette: **gemeinde (8) → kreis (5) → bezirk (3) → land (2) → bund**
 **Eigene Angabe (E) schlägt A, wird aber als eigene Angabe gekennzeichnet.**
-
 **Die Herabstufung A → B misst seit v1083b nach Teilmarkt** — siehe nächster
 Abschnitt.
-
 ### Die Stufenregel — Marcels Festlegung vom 12.08.2026
-
 Gemessen an 471 NRW-Sätzen mit Streuungsangabe: die Standardabweichung ist
 **absolut** ziemlich konstant (Median 1,1 Prozentpunkte). Wo der Zinssatz klein
 ist, explodiert die relative Quote, ohne dass die Datenlage schlechter wäre:
-
 | Zweig | LZS-Median | rel. Streuung (Median) |
 |---|---|---|
 | handel | 5,6 % | 30 % |
@@ -1432,64 +1126,51 @@ ist, explodiert die relative Quote, ohne dass die Datenlage schlechter wäre:
 | dreifh | 2,6 % | 47 % |
 | **efh** | **1,4 %** | **55 %** |
 | **we_s** | **1,8 %** | **62 %** |
-
 Mit der alten 25-Prozent-Regel wären **85 % aller Sätze** herabgestuft worden —
 und zwar die Wohn-Teilmärkte am härtesten, nicht wegen schlechterer Daten,
 sondern weil ihr Zinssatz kleiner ist.
-
 **Die Regel lautet jetzt:**
-
 ```
 Wohnen  (efh zfh rhdhh dreifh mfh we_s we_v etw dhh rh)  absolut, ab 1,5 Punkten
 Gewerbe (ggg handel buero gegi)                          relativ, ab 25 % des Wertes
 in beiden Faellen stuft der amtliche Unsicherheitsvermerk der Quelle herab
 ```
-
 Umgesetzt in `nrw_modell.js` (`v1083b-WSTU`), Konstanten `STREUUNG_SCHWELLE_PP`
 (1,5) und `STREUUNG_SCHWELLE_PCT` (25), Umgebungsvariablen
 `LZS_STREUUNG_SCHWELLE_PP` und `LZS_STREUUNG_SCHWELLE`.
-
 **Fehlt die Objektart, bleibt das alte relative Verhalten** — eine unbekannte
 Art darf die Regel nicht stillschweigend lockern.
-
 Wirkung im Jahrgang 2024: Wohnen **81 % Stufe A** (vorher 15 %), Gewerbe 24 %.
 Am Testobjekt Hüllhorst: Belastbarkeit **80 → 92 %**, Herkunft „amtlich,
 kreisscharf" statt „amtlich, regional" — **ohne dass sich eine einzige
 gerechnete Zahl ändert**.
-
 **Der Abzugstext war falsch beschriftet.** „Liegenschaftszinssatz regional statt
 kreisscharf (−12)" behauptete etwas über die Herkunft, was nicht stimmte: der
 Wert war kreisscharf und nur breit gestreut. Seit `v1083b-WTXT` sagt der Abzug,
 was er meint, und `stufeNachStreuung` reicht `grund`, `streuung_pp` und
 `massstab` durch bis ins PDF.
-
 **Median-Liegenschaftszins NRW, Berichtsjahr 2024** (aus der Quelle
 reproduzierbar): efh 1,4 % · rhdhh 1,4 % · zfh 1,8 % · we_s 1,8 % ·
 we_v 2,2 % · dreifh 2,6 % · mfh 3,2 % · ggg 4,1 % · gegi 4,6 % · buero 4,7 % ·
 handel 5,5 %. Monoton nach Risiko.
 Der § 256-Auffangwert (3,0 / 2,5) liegt für Wohnen **um mehr als das Doppelte**
 zu hoch.
-
 **Ein Liegenschaftszinssatz ≤ 0 wird verworfen.** Der Hochsauerlandkreis führt
 zum Berichtsjahr 2023 für EFH **−0,2 %** aus 121 Fällen, ohne
 Unsicherheitsvermerk. Fachlich ehrlich, rechnerisch unbrauchbar — der
 Barwertfaktor ist nicht definiert. Kein Wert ist besser als ein Wert, mit dem
 nicht gerechnet werden darf.
-
 **Offene Entscheidung (Marcel):** Für Gebiete ohne hinterlegten Ausschuss steht
 heute „kein Ausschuss hinterlegt". Denkbare Ersatzebenen: **ImmoWertA Nr. 9(3)**
 erlaubt Daten anderer Ausschüsse bei nachgewiesener Modellgleichheit und mit
 besonderer Begründung. Und **Anlage 25 BewG** wäre eine bundesweite gesetzliche
 Wertzahl — allerdings steuerlich, nicht für den Verkehrswert. Noch nicht
 entschieden.
-
 ### Die Verfahrenswahl (§ 6 Abs. 1)
-
 - Wohnungseigentum mit höchstens zwei WE, Ein- und Zweifamilienhäuser →
   **Sachwert führt**
 - Mehrfamilienhäuser ab drei Einheiten, Gewerbe → **Ertragswert führt**
 - typisches Wohnungseigentum → **Vergleichswert führt**
-
 Begründet aus dem Grundstücksmarktbericht: *„Ein- und Zweifamilienhäuser werden
 normalerweise nicht unter Renditegesichtspunkten gehandelt … folglich wird der
 Verkehrswert im Allgemeinen auf Grundlage des Sachwertverfahrens ermittelt."*
@@ -1497,13 +1178,10 @@ Der Ertragswert bleibt Kontrollrechnung. **Aber:** bei Ein- und
 Zweifamilienhäusern **ohne erfasste Miete erscheint keine Zahl** (v1072). Das
 Verkehrswertgutachten zur Löhner Straße sagt es wörtlich: „Ein stützendes
 Wertermittlungsverfahren wurde nicht angewandt."
-
 ### Die Zinsanpassung (§ 33)
-
 Fünf Merkmale, Gewichte summieren auf 1,00 → die Anpassung kann eine
 Standardabweichung konstruktionsbedingt nicht überschreiten. Ergebnis ist
 **Stufe C**, nie A. Jedes Merkmal wird einzeln ausgewiesen.
-
 | Merkmal | Gewicht |
 |---|---|
 | Gebäudealter | 0,30 |
@@ -1511,13 +1189,10 @@ Standardabweichung konstruktionsbedingt nicht überschreiten. Ergebnis ist
 | Nutzung | 0,20 |
 | Wohneinheiten | 0,15 |
 | Objektgröße gegen Normobjekt | 0,10 |
-
 **Die Gewichte sind eine Festlegung von DealPilot, nicht des Ausschusses.**
 Er nennt die Richtungen, nicht ihre Stärke. Das gehört so in den Bericht —
 genauso wie der Maßstab der Streuungsschwelle.
-
 ### Nicht aufweichen
-
 - **Kein Verfahren rechnet halb.** Fehlt eine Pflichtangabe, erscheint das
   Verfahren nicht — statt mit einem stillen Standardwert zu rechnen.
 - **Wo die Quelle endet, endet die Rechnung.** Tabelle bis 1.600 m²? Darüber
@@ -1541,15 +1216,12 @@ genauso wie der Maßstab der Streuungsschwelle.
 - **`Number(null)` ist 0 und besteht `Number.isFinite`.** Erst auf Abwesenheit
   prüfen, dann rechnen — sonst wird aus „keine Streuung" ein „Streuung 0 Prozent"
   und aus fehlendem Baujahr ein Neubau.
-
 ### Kerosin
-
 ```
 schnell / fast          2 L
 Stufe 1 und 2           5 L
 Stufe 3 Wertermittlung 12 L
 ```
-
 Preis 0,156–0,20 €/L (10 L = 2 € bis 160 L = 25 €).
 Monatstank: Free 2 · Starter 10 · Investor 40 · Pro 100.
 Marktbericht im Proxy: fast = 2 L · full = 5 L · Verlauf-Text = 1 L ·
@@ -1561,65 +1233,47 @@ Die Kerosin-Anzeige oben aktualisiert erst nach Reload — Buchung im Zweifel im
 `created_at` — erst `\d marktbericht_cost_log`).
 `aiCreditsService`: `consume(userId, amount, 'grund')` **direkt in try/catch**
 versuchen, statt Feldnamen von `getStatus` zu raten (402 = Feldnamen).
-
 ---
 ---
-
 # TEIL IV — MARKE, ARCHITEKTUR, GELD, DATEN, SERVER
-
 ## PRODUKT
-
 DealPilot = deutsche PropTech-SaaS für Immobilien-Investitionsanalyse (DACH).
 Zielgruppen: Privatinvestoren, aktive Kapitalanleger, Sachverständige,
 Asset-Manager.
-
 Marcel Junker, **Junker Solution (Einzelunternehmen, Kleinunternehmer § 19
 UStG)** — **KEINE UG.** Junker Immobilien / DealPilot / Junker Digital sind
 Marken darunter. (Die älteren Fassungen nannten „Junker Group UG" — das war
 falsch.) Rechtsformentwicklung Richtung UG/GmbH ist Ziel, nicht Ist-Stand.
-
 Claim: „Immobilienentscheidungen sind zu groß für ein Bauchgefühl."
 WZ-Klassifikation: **IT 62.01 / 63.11**, nicht 68 (Immobilien).
 immocation Festival 01.11.2026, Leipzig, **Stand 23**.
 Instagram `@dealpilot.app` / `@getdealpilot`.
-
 **Domains (alle vier parallel live):**
 `dealpilot.immo` · `app.dealpilot.immo` (Staging: `staging.` / `app.staging.`)
 `dealpilot.junker-immobilien.io` · `app.dealpilot.junker-immobilien.io`
 Regel: **App-Host = `app.` + Landing-Host**
-
 **Mail-Adressen folgen der Marke** (`@dealpilot.immo`); Website-URLs und
 PDF-Fußzeilen (`junker-immobilien.io` als Link) bleiben bis zur bewussten
 Umstellung.
-
 ---
-
 ## MARKE & DESIGN-DNA
-
 **Farben:** Obsidian `#050505` / `#070707` · Gold `#C9A84C` mit `#E8CC7A` (hell)
 und `#b8932f` (dunkel) · Grün `#3FA56C` · Rot `#B8625C` / `#D8564C` ·
 Creme `#FDFCFA` · Karte `#FBF6E9`.
 Runway/Hero: `linear-gradient(110deg, #E8CC7A, #C9A84C 55–60%, #b8932f)`.
 Landing: Ticket-/Pass-Mitten **pur weiß** `#fff` (kein Creme).
 **`--ch=#2A2727` NIE auf Obsidian.**
-
 **Schriften:** Space Grotesk (Display) · JetBrains Mono (Mono/Labels) ·
 Inter (Body) · Cormorant Garamond (Serif).
-
 **Bildsprache — Luftfahrt durchgehend:** Kerosin (KI-Guthaben) · Cockpit
 (Dashboard) · Boarding / QuickBoarding · Co-Pilot (KI-Agent) · Runway ·
 Boarding-Pass-Karten · Score-Dial · Pre-Flight.
-
 **Score-Tier:** STARK / SOLIDE / SCHWACH → grün / gold / rot bei
 ≥ 70 / ≥ 50 / < 50.
-
 **Mail:** Design-Referenz ist `mailLayout.wrap` — alle Systemmails laufen
 darüber. **Keine Vorlage danebenbauen.**
-
 ---
-
 ## ARCHITEKTUR-INTEGRITÄT (nicht aufweichen)
-
 ### Rechenkerne — nie duplizieren
 - **DSCR** SSoT `window.Dscr.compute()` = (nkm+ze)·12 / (Zins+Tilgung) brutto,
   **BSV-Sparrate als Tilgungsersatz in ALLEN Callern**
@@ -1641,7 +1295,6 @@ darüber. **Keine Vorlage danebenbauen.**
 - **Zuständigkeit** nur über `kaskadeSchluessel()`, nie ein eigener
   AGS-Vergleich
 - **Stufenvergabe** nur über `stufeNachStreuung()`, nie eine zweite Schwelle
-
 ### Allgemein
 - `_euro(null)` == „–" (**truthy!**) → nie `||`-Fallback
 - Baujahr/Jahre nie durch `Intl.NumberFormat`
@@ -1660,21 +1313,16 @@ darüber. **Keine Vorlage danebenbauen.**
 - Ungepflegte Reseller-Felder GELEERT, nie auf Junker zurück
 - **Marktbericht-App hat eigene Statuslogik** — die Cashflow-Regeln der
   Haupt-App gelten dort nicht.
-
 ---
-
 ## PLAN-SYSTEM + `dp:plan-ready`
-
 **Drei Wahrheiten, von Hand gepflegt:** `config.js` (Gate) · `pricing-modal.js`
 (2 Matrizen, Z. 264 + 508) · `landing/index.html` (Z. 2850).
-
 `hasFeature`: **DB zuerst** (`Sub.hasCachedFeature`), `config.js` nur bei `null`.
 **Ein Schlüssel, den keiner kennt, ist für JEDEN false — auch Pro** (W41
 `bmf_advanced`). Stand: free/starter `calc=false adv=false` · investor
 `calc=true adv=false` · pro + partner beides.
 **Partner = Pro-Klon** (`reseller-portal.js:552`) + `reseller` /
 `reseller_whitelabel` / `custom_logo`. Neue Pro-Features immer in `config.js`.
-
 `dp:plan-ready` (`subscription.js:154`) feuert, sobald der Plan bekannt ist:
 ```js
 window.addEventListener('dp:plan-ready', e => e.detail.plan);
@@ -1683,34 +1331,25 @@ window.addEventListener('dp:plan-ready', e => e.detail.plan);
 **Neue Module hören darauf — kein `setTimeout`, kein Polling.**
 `getCurrentPlanKey()` darf NIE wortlos auf `'free'` fallen; `dp_last_plan` ist
 der Merker.
-
 **Pläne:** Free · Starter 29 € · Investor 59 € ★ · Pro 99 €.
 **Kerosin-Pakete:** 10 L / 2 € · 28 L / 5 € · 90 L / 15 € (beliebt) ·
 160 L / 25 €.
-
 ---
-
 ## STRIPE
-
 ### Zwei Konten, nie verwechseln
-
 | Umgebung | Konto | Key |
 |---|---|---|
 | **LIVE / Prod** | `acct_1TWXFdGefFev8arz` | `sk_live_` |
 | **TEST / Staging** | `acct_1TWXFqKEjyPDo0wo` | `sk_test_` |
-
 **Der Claude-Connector hängt am LIVE-Konto** und folgt dessen Modus-Schalter.
 Was dort angelegt wird, landet **nicht** automatisch im Staging-Konto. Für
 Staging-Objekte den Befehl **im Container** ausführen — der hat den Testkey.
 LIVE-Preis-IDs tragen `GefFev8arz`, TEST-IDs `KEjyPDo0wo`.
-
 ### ERSTFLUG — Founding Member
-
 | | LIVE | TEST |
 |---|---|---|
 | Coupon | `ndnM8B6F` | `ykjOGjxy` |
 | Wirkung | **16 %**, `duration:forever`, max. 100 | identisch |
-
 Prozentual gewählt, weil ein Code so monatlich **und** jährlich abdeckt.
 16 % statt 15 %, damit Investor unter 50 € fällt.
 **Preise mit Rabatt:** Starter 24,36 · Investor **49,56** · Pro 83,16 ·
@@ -1718,7 +1357,6 @@ Investor-Jahr **495,60**.
 Gelöscht: `4nrzLjZ2` (15 %), `V6pwFwEP` (EINSTIEG10), `diBpk6um` (EINSTIEG30).
 **`percent_off` ist an einem Coupon unveränderlich** → Prozentwechsel = neuer
 Coupon + neuer Code (den alten Coupon löschen gibt den Code-String wieder frei).
-
 **Partner** `prod_Ut8G0Zt5bgSMQj`: 149 €/Monat
 (`price_1TtM0CGefFev8arzACdni0a9`) bzw. 1.490 €/Jahr (`…ixIUNCYo`).
 **Seat** `prod_Ut8Gi6OPw3FdtF`, Volume-Staffel 35 / 29 / 24 € monatlich
@@ -1727,22 +1365,16 @@ notierten 249 € sind **falsch**.
 **Tiered-Checkout nie mit echter Staffel getestet** — der erste Pool-Kauf ist der
 Test; `adjustable_quantity` ist bei Tiered **nicht erlaubt**. Die Landing bewirbt
 Partner, der Direktkauf ist ausgegraut (mailto).
-
 `allow_promotion_codes: true` steht in `stripeService.js` — der Kerosin-Checkout
 (`credits.js`) und der Seat-Checkout (`resellerPortal.js`) haben ihn bewusst
 **nicht**.
-
 **⚠ Die Staging-`plans`-Tabelle trägt beim Partner eine LIVE-Preis-ID** →
 Partner-Checkout ist auf Staging nicht testbar („No such price"). Kein
 Geldrisiko (Testkey), aber vor dem ersten echten Partner-Verkauf geradeziehen.
-
 Backend-Endpunkte: `POST /api/v1/subscription/checkout` · `…/portal` ·
 `POST /api/v1/webhooks/stripe`.
-
 ---
-
 ## DATEN / SCHEMA
-
 **OBJEKT (`objects`, Haupt-DB):** `id`, `user_id`, `name`, `kuerzel`, `ort`,
 `kaufpreis` (**CENT**), `bmy`, `cf_ns` (**CENT/Jahr**), `dscr`, `seq_no`,
 `data` (jsonb), `ai_analysis`, `photos`, `version`, timestamps.
@@ -1753,11 +1385,9 @@ kuerzel` + `_kpis_*` (**EURO**). **`kp`/`nkm` = rohe EURO.**
 Weitere Formularfelder: `mea, brw, brw_stichtag, gsfl, einheiten, bgf,
 standardstufe, baustatus, leerstand, zimmer, etage, ds2_energie, ds2_zustand,
 eq_*, ji_p`.
-
 **BWK:** Umlagefähig = `hg_ul + grundsteuer + ul_sonst` ·
 Nicht-umlagefähig = `hg_nul + eigen_r + mietausfall + nul_sonst`.
 **WEG-Rücklage (`weg_r`) ist nur Info, NICHT in der BWK.**
-
 **Wertermittlungsfelder im Marktbericht-Formular:** `mea`, `bgf`, `spMiete`,
 `sonstEinnahmen`, `standardstufe`, `grundriss`, `modGrad`, `nhkHaus`,
 `nhkGeschosse`, `nhkDach`, `hinterlandFlaeche`, `hinterlandWert`,
@@ -1769,19 +1399,16 @@ Feinjustierungsfelder** `ausstAussenwaende`, `ausstDach`, `ausstFenster`,
 (als `ausstattung`-Objekt mit 9 Schlüsseln, `bauteile_hk`-Summe und
 `bauteile_detail`) **und** über `_mbBuildObjData()` in `app.js`
 (als `ausst_*`/`btl_*`).
-
 **RESELLER (Migrationen 055–062):** `resellers` (brand_*, inkl.
 `brand_mail_accent` 059, `brand_pdf_light` 060, `brand_display` 062) ·
 `reseller_members` · `reseller_clients` · `licenses`
 (`uq_license_active_per_client`) · `object_shares`
 (UNIQUE `object_id, reseller_id`) · `share_audit` · `reseller_invites`.
-
 **mb-DB (Schema `mb.`, PostGIS):** `properties` · `addresses` (geteilter Cache) ·
 `market_reports` · `valuation_results` · `deal_scores` · `micro_locations` ·
 `object_snapshots` (`object_key='dp:<id>'`, alle Trend-Felder) ·
 `param_modell` · `param_werte` · `param_lauf` · `param_probe` ·
 `gaa_sources` · `gaa_documents` · `valuation_inputs`.
-
 **Sonstiges:** `landing_events` (063, anonym) · `tax_snapshots` (026) ·
 `ai_credits_log` · `api_keys` (047) · `pro_test_override` (048) ·
 `network_cards`/`network_leads` (049) · `JWT_EXPIRES_IN=30d` ·
@@ -1789,7 +1416,6 @@ Token `ji_token` · `subscriptions` UNIQUE(user_id) → UPSERT ·
 Admin: eigene `admin_users` / `admin_audit_log` / `admin_login_attempts`,
 Token `dp_admin_token` (`X-Admin-Token`), `requireAdmin`.
 `marktbericht_cost_log` liegt in der **HAUPT-DB** (Abrechnung, nie löschen).
-
 **Migrationshistorie Haupt-DB (Auszug):** 026 tax_snapshots · 034 ImmoMetrica ·
 035 Shared Pass · 036 AVM-Historie · 037 email_change_requests · 038 invoices ·
 039 support_tickets · 040 broadcasts · 041 lifecycle ·
@@ -1797,12 +1423,9 @@ Token `dp_admin_token` (`X-Admin-Token`), `requireAdmin`.
 045 retention · 046 retention_templates · 047 api_keys · 048 pro_test_override ·
 049 network_cards/network_leads · 055–062 Reseller · 063 landing_events.
 **Stand 63, nächste 064.** `schema_migrations.version` ist INTEGER.
-
 ### `mb.param_modell` — das Register, seit 12.08. befüllt
-
 Die Tabelle aus Migration 014 passte **ohne Änderung**. Sie ist besser
 zugeschnitten, als ein Neuentwurf geworden wäre:
-
 | Spalte | nimmt auf |
 |---|---|
 | `land_code · ags · ebene · gebiet_name · gaa_name` | Zuständigkeit |
@@ -1814,26 +1437,20 @@ zugeschnitten, als ein Neuentwurf geworden wäre:
 | `belege` jsonb | Anwendungsbeispiel mit Fundstelle |
 | `stufe · fallzahl · stichtag · berichtsjahr · modellversion` | eigene Spalten |
 | `quelle_url · quelle_parser · quellenvermerk · lizenz` | Herkunft |
-
 Zwei Entwurfsentscheidungen, die zur Doktrin passen:
-
 ```
 CHECK (jsonb_array_length(belege) > 0)
 CHECK (ebene IN (…))                    <- 'gemeinde' und 'kreis' belegt
 UNIQUE (land_code, ags, kennzahl, zweig, COALESCE(berichtsjahr,-1), quelle_url)
 ```
-
 **Kein Datensatz ohne Beleg** — als Constraint. Und das `berichtsjahr` im
 Schlüssel ist die **Zeitreihe**: Iserlohn und Märkischer Kreis passen mit sechs
 Jahrgängen nativ hinein, und zwei Jahrgänge desselben Ausschusses stehen
 konfliktfrei nebeneinander.
-
 **Stand auf Prod (12.08. abends):** 493 Datensätze, Kennzahl
 `liegenschaftszinssatz`, 74 Zuständigkeitsschlüssel (356 kreisscharf,
 137 gemeindescharf), Berichtsjahr 2024, `quelle_parser = v1083-WLZS`.
-
 ### Die Erntestrecke
-
 | Tabelle | Stand 12.08. abends |
 |---|---|
 | `param_modell` | **493 Zeilen auf Prod und Staging** |
@@ -1841,26 +1458,20 @@ konfliktfrei nebeneinander.
 | `gaa_sources` → `gaa_documents` | 67 Dokumente, alle `status = neu` — nie extrahiert |
 | `param_probe` | **Quellenwächter** (http_status, content_type, urteil) — NICHT das Prüfprotokoll |
 | `param_werte` | Open-Data-Sätze (28.827 auf Staging, **0 auf Prod**) |
-
 Der `sha256` in `gaa_documents` trägt mehr, als er aussieht: ändert ein
 Ausschuss seinen Bericht, ändert sich der Hash, und das Dokument fällt
 automatisch zurück in die Warteschlange. **Die Jahrgangspflege läuft von selbst**
 — sobald der Schritt `gaa_documents → param_modell` gebaut ist.
-
 ---
-
 ## SERVER / STACK
-
 Vanilla-JS-Frontend (**kein Build**, volume-mounted → `git pull` = live),
 Node/Express **:3001**, mb-backend **:4000** (beide nur im Docker-Netz),
 PostgreSQL 16 + PostGIS, Docker Compose, Caddy, Hetzner.
-
 **STAGING** `root@116.203.214.11` (`DealPilot-Staging`) ·
 **PROD** `root@157.90.117.167` (`DealPilot-Prod-neu`) · beide `/opt/dealpilot` ·
 GitHub `JunkerImmobilien/DealPilot` (privat).
 Container: `dealpilot-backend` · `-postgres` · `-caddy` · `-mb-backend` ·
 `-mb-db`. Compose-Projektname `dealpilot-v124`.
-
 - **Prod-SSH-Key read-only** → Push unmöglich. **Getaggt wird NUR auf Staging.**
 - `skip-worktree` nur `docker-compose.prod.yml` (**die Caddyfile ist
   repo-gepflegt**, seit 19.07.)
@@ -1878,7 +1489,6 @@ Container: `dealpilot-backend` · `-postgres` · `-caddy` · `-mb-backend` ·
   Server `poppler-utils` nachrüsten. **In der Arbeitsumgebung des Chats ist es
   vorhanden** — dort läuft die Extraktion ohnehin schneller und ohne Serverlast.
 - Bash-Aliase auf beiden Servern: `dp`, `dplogs`, `dpps`.
-
 ### Die `.env` — die Fallen, die Geld gekostet haben
 - **Compose `environment:` schlägt `env_file:`** bei gleichem Key →
   `${VAR:-fallback}` nutzen. `docker-compose.prod.yml` Z. 52/53 sind so
@@ -1896,9 +1506,7 @@ Container: `dealpilot-backend` · `-postgres` · `-caddy` · `-mb-backend` ·
   Konfiguration nicht geändert hat (`Running` statt `Started`). Neue
   Umgebungsvariablen brauchen `--force-recreate`.
   **`printenv` IM Container ist die Wahrheit.**
-
 ### Umgebungsvariablen (Wertermittlung)
-
 ```
 MARKET_CACHE_TTL_MIN        720 (12 h) — zum Testen auf 5
 KI_GEGENRECHNUNG            0 = aus, 1 = Zweitmeinung
@@ -1912,42 +1520,31 @@ BORISD_USER_AGENT           Browser-Kennung für gis.nrw.de
 OPENDATA_USER_AGENT         eigene Kennung mit Kontakt
 MB_BODY_LIMIT               80mb
 ```
-
 **`mb-backend` hat einen `environment:`-Block ohne `env_file:`** — zehn
 Variablen aus der `.env` kommen dort nicht an. `compose-env.sh` aus v1064 trägt
 sie ein, danach `--force-recreate`. **`LZS_STREUUNG_SCHWELLE_PP` ist noch nicht
 eingetragen** — die Vorgabe 1,5 gilt im Code, eine Änderung per `.env` wirkt erst
 nach `compose-env.sh`.
-
 ### AVM & Betriebsschalter
-
 **DealPilot ruft IMMER den Marktbericht-Microservice** (2 L). Sprengnetter
 (20 L) und PriceHubble (40 L) hängen an `AVM_MODE`
 (`AVM_LIVE_PROVIDERS=sprengnetter,pricehubble`). `MB_DEMO=1` bzw. `market=seed`
 → Seed-Zahlen. ImmoMetrica `IMMOMETRICA_MODE=stub`, 428 = kein Zugang.
-
 **⚠ Prod läuft weiterhin mit `market=seed`** (720 erzeugte Angebote im Log) —
 Kunden sehen Seed-Vergleichsdaten. Bekannt, nicht erledigt. Blockiert auch die
 Spread-Prüfung (Ertragswert vs. Vergleichswert 48,1 %).
-
 **In der App-internen Pre-Flight-Leiste sind SN/PH-Logos sichtbar** (ausgegraut,
 „Coming soon") — eingeloggte Ansicht, kein Verstoß gegen die
 Anbieter-Neutralität nach außen.
 **NICHT anfassen:** `avm-section.js` · `qc-bridge.js` `qcpm`-Overlay.
-
 ---
 ---
-
 # TEIL V — DIAGNOSE-LEHREN, ROLLOUT, OFFENE PUNKTE
-
 ## DIAGNOSE-LEHREN (kumuliert über den Gesamtverlauf)
-
 **DIE FALSCHE FRAGE STELLEN = GRÜN UND WERTLOS.** Marker statt Prosa prüfen;
 codegebundene Marker, nicht Kommentare. Widersprüche im Harness ernst nehmen
 (Zähler gegen Label → der Harness ist kaputt, nicht der Code).
-
 ### Die teuersten Lehren
-
 **Eine Prüfung darf ihre Vorbedingung nicht selbst herstellen.**
 Die Kettenprüfung von v1083 rief `ladeSaat()` selbst auf — und deckte damit zu,
 dass es im Serverbetrieb **niemand** tat. Das Register blieb leer, jede Adresse
@@ -1956,21 +1553,18 @@ bekam „kein Ausschuss hinterlegt", und die Prüfung war grün.
 LESER**, nicht am Rückgabewert: für jedes Feld wird geprüft, dass es gesetzt
 **und** gelesen wird. Sie schlug beim ersten Lauf prompt an und fand die
 Umkehrung: gelesen, nie gesetzt.
-
 **Drei von vier Fehlern eines Tages waren derselbe Typ: „gebaut, nie
 verdrahtet".** `ladeSaat()` rief niemand auf · `liegenschaftszinssatz()` rief
 niemand auf · `lzs_herabgestuft` reichte der CrossCheckService nicht durch.
 Alle drei liefen an grünen Funktionsprüfungen vorbei, weil die Funktion stimmte
 und nur die Kette fehlte. **Eine neue Funktion ohne einen Test, der ihren
 Aufrufer misst, ist nicht fertig.**
-
 **Ein nie betretener Zweig ist ungetestet — ein Fix, der ihn freischaltet,
 zündet dort Altfehler.** `const _sw` + `_sw = _sw2` lag seit v1069 im
 Übernahmezweig des amtlichen Sachwertfaktors; der Zweig lief nie, weil `ref.ags`
 nie gesetzt war. Die ags-Rückschreibung (v1075) schaltete ihn scharf →
 „Assignment to constant variable" in Produktion. **Wer eine Kette heilt, führt
 den frisch freigeschalteten Zweig im `apply.sh` echt aus.**
-
 **`node --check` prüft Syntax, die Prüfstrecke prüft Verträge, und
 Laufzeit-TypeErrors findet nur der echte Lauf.** Alle drei braucht es. Von zehn
 Fehlern eines Tages hat `node --check` keinen gefunden: `bericht` und `p` vor
@@ -1978,7 +1572,6 @@ ihrer Deklaration, leeres `ref.ags`, `optionen` statt `opt`, ein fehlender
 Import, eine nicht durchgereichte Modellkennung, ein nie betretener Zweig, drei
 Felder im falschen Objekt, ein doppeltes Pluszeichen, eine Quote auf der
 falschen Bezugsgröße.
-
 **Die Kette prüfen, nicht die Funktion.** Mehrfach war ein Modul richtig und der
 Aufrufer reichte den Parameter nicht durch. Höhepunkt: `ref.ags` wurde
 **nirgends** gesetzt — fünf `ags: ref.ags`-Stellen liefen seit ihrer Einführung
@@ -1987,67 +1580,53 @@ suchen, die angeblich gefüllt ist.**
 Zweiter Fall am 12.08.: der Orchestrator setzte `lzs_herabgestuft` seit v1050,
 der CrossCheckService reichte es nie durch — der Ertragswert bekam also nur
 DASS der Wert auf B stand, nie WARUM.
-
 **Aber: die Kette kann auch heil sein.** Am 11.08. wurden drei Diagnosen zur
 Restnutzungsdauer gestellt und alle drei widerlegt. Am 12.08. lautete meine
 erste Diagnose zum Liegenschaftszins „das Register wird nicht gelesen" — auch
 falsch: der Wert kam längst kreisscharf und wurde nur wegen seiner Streuung
 herabgestuft. **Bevor ein Befund behauptet wird, muss er gemessen sein, nicht
 plausibel.** Und: die Messung macht den Fix oft kleiner und besser.
-
 **Der Sollwert kommt aus dem Dokument, nicht aus dem Kopf** — einschließlich der
 Rundung. Fünf falsche Sollwerte an einem Tag (v1065–v1070). Am 12.08. noch
 einer: ich prüfte eine Interpolation gegen 0,905, obwohl der Bericht
 zweistellig abdruckt — 0,905 gibt es dort nicht. **Ein selbst gerechneter
 Sollwert ist kein Sollwert, auch wenn die Rechnung stimmt.**
-
 **Ein Extraktionsmodell erfindet Tabellen.** Bei Bochum kam eine perfekt
 gestaffelte Sachwertfaktor-Matrix zurück, die es im Dokument nicht gibt, dazu
 eine verdrehte Fallzahl. **Jede Tabelle aus einem PDF braucht die Nachrechnung
 gegen das Anwendungsbeispiel oder mindestens eine Zählprüfung.**
-
 **Die kluge Prüfung fängt weniger als die dumme.** Beim fehlerhaften Suchmuster
 gingen Monotonie, Wertebereich und Anwendungsbeispiel alle durch — nur das
 Nachzählen der Zeilen fand die Lücke. Am 12.08. dasselbe Muster: die
 Zählprüfung „428 Zeilen, 428 verschiedene `gaa_kennz`" entlarvte eine
 Verknüpfung, die inhaltlich plausibel aussah.
-
 **Ein Schlüssel ist kein Name.** GAA 10400 sah nach der Ruhrgebietsreihe aus und
 ist die **Bundesstadt Bonn**. Ich hatte den Namen aus der Nummer geschlossen
 statt ihn nachzuschlagen, und der Fehler stand fett in einem Projektdokument,
 bevor die Kettenprüfung ihn fand. **Amtliche Kennziffern werden nachgeschlagen.**
-
 **Proben über die ganze Tabelle statt Stichproben.** Monotonie in beide
 Richtungen fängt vertauschte Blöcke und Zahlendreher.
-
 **Wo eine Rückfall-Regel steht, prüfen, wofür sie gilt.**
 `HAUS_TABELLE['_kreis']` galt für jeden Ort in Deutschland.
-
 **Ein stiller Rückfall ist schlimmer als ein Fehler.** Er liefert eine Zahl, die
 aussieht wie die richtige. Jeder Rückfall muss sich im Bericht melden — seit
 v1083b tut es der RND-Rückfall.
-
 **Ein falsch beschrifteter Hinweis ist auch ein stiller Fehler.**
 „Liegenschaftszinssatz regional statt kreisscharf (−12)" behauptete etwas über
 die Herkunft, was nicht stimmte, und verdeckte den wahren Grund. Wer einen
 Abzug oder eine Warnung schreibt, muss den Grund führen, nicht raten.
-
 **Die erste Erklärung ist nicht die ganze.** Beim leeren `ref.ags` lagen DREI
 unabhängige Ursachen übereinander — die vierte zündete erst nach dem Fix der
 ersten drei. Beim Promo waren es ebenfalls drei. **Bei mehrschichtigen Ketten
 einmal komplett durchmessen.**
-
 **Es gibt nur EIN Modal und Schichten.** „Falsches Modal"-Eindrücke erst per
 `grep -rln` über `js/` klären. Gelöschte „Leichen" können aktive UI-Schichten
 sein (`bmf-modal-v292.js`).
-
 **Bevor ein zweites Werkzeug gebaut wird, nachsehen, ob es das erste schon
 gibt.** `gaa_documents`, `param_lauf` und `param-repository.js` standen längst
 da — letzteres mit fertigem `schreibeModelle()`/`holeModelle()` samt
 Belegprüfung. v1083 wurde dadurch erheblich kleiner.
-
 ### Git und Parallelbetrieb
-
 - **Nur EIN Chat fasst git an.** Am 12.08. haben beide Chats am selben Abend auf
   `staging` committet. Es ist gutgegangen — aber nur, weil der Parallel-Chat den
   Zwischenfall bemerkt und selbst zusammengeführt hat. **Vor jedem Rollout
@@ -2082,9 +1661,7 @@ Belegprüfung. v1083 wurde dadurch erheblich kleiner.
   gehört in jeden Befehlsblock.**
 - **Rückroll statt Verheddern:** Features, die auf Infrastruktur warten, nicht im
   selben Commit mitschleppen.
-
 ### Patch-Disziplin
-
 1. **Ein Marker sagt „hier war ich", nicht „hier ist alles gut."** Viermal hat
    ein gesetzter Marker seine eigene Reparatur blockiert (`if marker in s: skip`).
    Wo ein Fehler ausgeliefert wurde, braucht es einen Block, der den **Schaden**
@@ -2140,9 +1717,7 @@ Belegprüfung. v1083 wurde dadurch erheblich kleiner.
 20. **JSON-Schlüssel sind Strings.** `json.dump` mit float-Keys erzeugt
     `"50000.0"`, der Leser sucht `"50000"` → KeyError. Beim Schreiben
     normalisieren, nicht beim Lesen raten.
-
 ### Bash und Node
-
 - **`grep -q X && { exit 1; }` bricht unter `set -e` ab, wenn grep NICHTS
   findet** — also im guten Fall. Die if-Form tut das nicht.
 - **`grep -c` / `grep -rl` mit null Treffern gibt Rückgabewert 1** → `|| true`.
@@ -2168,9 +1743,7 @@ Belegprüfung. v1083 wurde dadurch erheblich kleiner.
   geändert, ist die Zwischenspeicherung richtig. **Ein Build, der komplett
   CACHED durchläuft, ist aber ein Hinweis: dann hat der Pull nichts gebracht.**
 - **BOM in Mockdateien prüfen.**
-
 ### CSS / Frontend
-
 - **`:not(#id)` erbt ID-Spezifität.** `.hero > *:not(#dpm-flug)` hat 110, nicht
   10 — beide Orbs rutschten in den Fluss und schoben den Hero um **exakt
   760 px**. **Nie Sammelregeln auf Container-Kinder.**
@@ -2199,9 +1772,7 @@ Belegprüfung. v1083 wurde dadurch erheblich kleiner.
 - **Bild-Retusche:** Farb-Schlüssel-Maske + MaxFilter-Dilation + **harte
   Schutzzonen-Rechtecke** statt Feder-Maske. Den Farbdetektor an echten Pixeln
   **kalibrieren**, Ergebnis per Zoom-Crops abnehmen.
-
 ### Backend / Ops
-
 - **Status lesen, nicht raten.** 405 auf einen POST an eine statische Domain =
   `file_server` (nur GET/HEAD). 402 = consume / Feldnamen. `printenv` für
   Container-Env. **Aufrufer immer lesen — alle.**
@@ -2231,9 +1802,7 @@ Belegprüfung. v1083 wurde dadurch erheblich kleiner.
   Schreiben `pg_get_constraintdef` lesen.**
 - **Verify-Mail fehlt = SPAM (SPF/DKIM/DMARC), kein Bug.**
 - **Direkt-Patch auf Prod** → Cleanup `git checkout -- <files>` + `git pull`.
-
 ### Stripe
-
 - **`promotion_code.coupon` gibt es so nicht mehr.** Die API liefert
   `"promotion": {"coupon": "id", "type": "coupon"}` — je nach API-Version auch
   als eingebettetes Objekt oder unter `pc.coupon`. **Alle drei Formen abdecken.**
@@ -2244,9 +1813,7 @@ Belegprüfung. v1083 wurde dadurch erheblich kleiner.
 - **In-Memory-Cache nach Stripe-Änderung:** 5 Minuten im Node-Prozess →
   `docker restart dealpilot-backend` leert ihn sofort.
 - `percent_off` ist unveränderlich → Prozentwechsel = neuer Coupon + Code.
-
 ### Browser-Klicktests (Cowork/Chrome)
-
 - **`generate()` ruft `window.confirm()`** (Kostenhinweis). Ein nativer Dialog
   friert JEDE CDP-Automatisierung ein — der Tab wirkt tot, nichts ist kaputt.
   Vor automatisierten Läufen `w.confirm = () => true` im iframe setzen.
@@ -2260,21 +1827,16 @@ Belegprüfung. v1083 wurde dadurch erheblich kleiner.
 - **Der beste Klicktest ist ein PDF.** Marcel lädt den fertigen Bericht hoch,
   `pdftotext -layout` macht ihn messbar, und dann wird gegen die
   Regressionswerte geprüft — nicht gegen den Eindruck.
-
 ### Wächter
-
 **Ein Wächter, der Unfug meldet, wird überlesen.** Der Taktgeber meldete 38
 frisch geprüfte Quellen als „seit 18 Monaten stumm", und das TDZ-Werkzeug hätte
 einen Rollout blockiert, ohne dass ein Fehler vorlag.
 `tools/tdz-pruefung.py` **meldet, bricht aber nicht ab** — es kennt keine
 Gültigkeitsbereiche.
-
 **Ein Prüfstand, der nur bestätigt, ist keiner.** Der LZS-Prüfstand fing am
 12.08. **mich**: mein GND-Band „nur 40/60/80" war erfunden, der Bestand führt
 40 bis 82. Ein Prüfstand, der nie anschlägt, prüft die falschen Dinge.
-
 ### Grundsätzlich
-
 - **Die Landkarte selbst aufnehmen** — keiner Übergabe glauben, was die App lädt.
   Bei UI-Fragen schlägt ein Screenshot von Marcel jede Grep-Runde.
 - **Feldnamen amtlicher APIs messen, nicht annehmen**
@@ -2293,11 +1855,8 @@ Gültigkeitsbereiche.
   Grenze des Weges, nicht des PDF.
 - **Auslöser entschärfen statt Konsumenten patchen** (Performance, v729–v734).
   Trace first.
-
 ---
-
 ## AUSLIEFERUNG
-
 - **`apply.sh` = alles oder nichts:** Kopien in `/tmp` patchen, ALLE Prüfungen,
   dann tauschen. Anker- oder Syntaxfehler → nichts geschrieben. **Am 12.08.
   belegt:** ein Paketlauf brach an einem falschen Pfad in der Prüfstrecke ab,
@@ -2333,13 +1892,9 @@ Gültigkeitsbereiche.
   Paket-Ordner und `/tmp/*-check`-Verzeichnisse ebenfalls wegräumen.
   `auto-save.js` bleibt untracked; `patchesold/` gehört dem Parallel-Chat.
 - **scp im LOKALEN Terminal**, Ziel `/tmp`.
-
 ---
-
 ## ROLLOUT
-
 ### Mehrere Pakete auf Staging
-
 1. Alle ZIPs hochladen, **beide** Datenbanken sichern
 2. Alle auspacken, dann **der Reihe nach** `apply.sh` unter `set -e` — jedes
    prüft die Marker seines Vorgängers und bricht ab
@@ -2348,9 +1903,7 @@ Gültigkeitsbereiche.
 4. Migration prüfen, Buster-Kette prüfen, **Strg+F5**
 5. Bei Datenpaketen: **Saatlauf, dann `docker restart`**
 6. Erst nach dem Klicktest aufräumen
-
 **Vor dem Commit die Marker MESSEN**, nicht annehmen:
-
 ```
 cd /opt/dealpilot
 hostname
@@ -2359,25 +1912,19 @@ for m in v1083-WMOD v1083-WKAS v1083-WRND v1083a-WLAZ v1083a-WBOOT v1083b-WSTU v
   printf '%-14s %s Datei(en)\n' "$m" "$n"
 done
 ```
-
 Eine `0` heißt: das Paket lief nicht → **nicht committen.** Zusätzlich im
 Container prüfen — „habs eingespielt" ist nicht dasselbe wie installiert:
-
 ```
 docker exec dealpilot-mb-backend grep -c "<marker>" /app/src/<pfad>
 ```
-
 ### Standard-Deploy nach Prod (bewährt am 12.08., zweimal)
-
 **Jeder Block beginnt mit `cd`, `hostname` und dem Zweig.**
-
 ```
 cd /opt/dealpilot
 hostname                             == DealPilot-Staging
 git rev-parse --abbrev-ref HEAD
 git status -s
 ```
-
 ```
 cd /opt/dealpilot
 git add -u
@@ -2385,12 +1932,10 @@ git add NEUE DATEIEN EINZELN          (NIE -A oder .)
 git diff --cached --name-only         == GENAU meine Dateien
 git diff --cached --name-only | grep -E 'auto-save|patchesold|\.pre-|docker-compose|Caddyfile' || echo sauber
 ```
-
 ```
 cd /opt/dealpilot
 git commit -m "<Inhalt benennen, nicht nur die Nummer>"
 ```
-
 ```
 cd /opt/dealpilot
 git checkout main
@@ -2398,14 +1943,12 @@ git rev-parse --abbrev-ref HEAD       == main, SONST NICHT WEITER
 git pull --ff-only                    ← ZUERST, sonst sperrt der Merge fremde Arbeit aus
 git rev-parse --short HEAD            ← PROD-ANKER NOTIEREN
 ```
-
 ```
 cd /opt/dealpilot
 git log --oneline main..staging | wc -l
 git log --oneline main..staging | head -20
 git diff main...staging --name-only | grep -iE 'migration|docker-compose|Caddyfile' || echo "keine Migration"
 ```
-
 ```
 cd /opt/dealpilot
 git rev-parse --abbrev-ref HEAD       == main
@@ -2414,18 +1957,14 @@ git rev-parse --short HEAD
 git tag <name je Arbeitsstrang>       ← alle auf denselben Commit
 git push origin main --tags
 ```
-
 ```
 cd /opt/dealpilot
 git checkout staging && git merge --ff-only main && git push
 ```
-
 **Prod:**
-
 ```
 ssh root@157.90.117.167
 ```
-
 ```
 cd /opt/dealpilot
 hostname                          == DealPilot-Prod-neu
@@ -2433,7 +1972,6 @@ git rev-parse --abbrev-ref HEAD   == main
 git status -s                     == sauber
 git log --oneline -1              ← PROD-ANKER
 ```
-
 ```
 cd /opt/dealpilot
 hostname
@@ -2441,7 +1979,6 @@ docker exec dealpilot-postgres pg_dump -U dealpilot -d dealpilot_db | gzip > /ro
 docker exec dealpilot-mb-db pg_dump -U mb -d marktbericht | gzip > /root/backup-mb-vor-<hash>.sql.gz
 ls -lh /root/backup-*vor-<hash>.sql.gz     ← ~7,3 MB / ~614 KB, sonst STOPP
 ```
-
 ```
 cd /opt/dealpilot
 hostname
@@ -2449,7 +1986,6 @@ git fetch
 git log HEAD..origin/main --oneline | wc -l      ← muss zur Zahl von Staging passen
 git diff HEAD...origin/main --name-only | grep -iE 'migration|docker-compose|Caddyfile' || echo "keine"
 ```
-
 ```
 cd /opt/dealpilot
 hostname
@@ -2457,15 +1993,12 @@ git pull --ff-only
 grep -c "<marker>" <datei>        ← Inhaltspruefung VOR dem Rebuild, je Strang einer
 ls -l marktbericht/backend/src/lib/register/lzs-nrw.json
 ```
-
 ```
 cd /opt/dealpilot
 hostname
 docker compose -f docker-compose.prod.yml up -d --build mb-backend backend
 ```
-
 Bei Datenpaketen zusätzlich:
-
 ```
 cd /opt/dealpilot
 hostname
@@ -2474,13 +2007,11 @@ docker restart dealpilot-mb-backend
 sleep 8
 docker logs --tail 20 dealpilot-mb-backend | grep -i register
 ```
-
 **Abnahme:** Marker im laufenden Container · beide Migrationstabellen
 unverändert · `docker logs --tail 12` beider Container ohne Ausnahme ·
 **Strg+F5** · Klicktest gegen die Regressionswerte · eine Adresse **außerhalb
 NRW** (dort muss „kein Ausschuss hinterlegt" stehen).
 Caddyfile-Änderung: danach `docker exec dealpilot-caddy caddy validate` + reload.
-
 **Rückweg:** `git reset --hard <Prod-Anker>` + Rebuild + Strg+F5. Migrationen
 sind additiv → ein Code-Rollback braucht **kein** DB-Restore; `mb.param_modell`
 bliebe befüllt und würde nur nicht mehr gelesen. Bei echter Datenänderung
@@ -2488,13 +2019,9 @@ zusätzlich
 `zcat /root/backup-mb-vor-<hash>.sql.gz | docker exec -i dealpilot-mb-db psql -U mb -d marktbericht`.
 **Ein Code-Rollback vor v966 macht das Löschen wieder unmöglich, stellt aber
 bereits gelöschte mb-Berichte NICHT wieder her.**
-
 ---
-
 ## CHRONIK — DIE ROLLBACK-KETTE
-
 **Marktbericht-Strang (neueste zuerst):**
-
 ```
 99c1097  rollout-20260812-abend + marktbericht-v1083b-20260812
          + marktbericht-v1154-20260812              (Anker 65ca0b0)
@@ -2505,9 +2032,7 @@ ca9e101  marktbericht-v1076-20260803
 21dc057  marktbericht-v1073-20260803
 72b3189  verfahrenswahl-20260802 (v1061)
 ```
-
 **Haupt-App / Landing / Mobile:**
-
 ```
 0a543d7  landing-promo-20260723   (Anker 2b7a131)  Cockpit-Intro, Hero-Video, ERSTFLUG 16 %
 2b7a131  immo-cutover-20260721    (Anker 8cf82c5)  .immo-Domains, Mail-Sweep, Caddyfile
@@ -2520,27 +2045,21 @@ ea33a6c  v899 (Bankexport) · 03d0d23 MA34 · 16963c7 v898 · 1c69fd2 MA33
 b92686d  v851-landing (Anker 6729968) · 36f5fe0 v816 · d2fd84b v800 · 2fe05d7 v748 · 2a3b569 v734
 Prod-Rollback NIE unter e43ce2d — darunter hängt der Microservice.
 ```
-
 **DB-Backups auf Prod:** `/root/backup-haupt-vor-v1083b.sql.gz` (7,3 MB) +
 `backup-mb-vor-v1083b.sql.gz` (614 KB) · `-vor-65ca0b0` (12.08. mittags) ·
 `-pre-landing-promo` · `-pre-immo-cutover-20260721-1420` (6,7 MB) ·
 `-pre-beleg-import` · `-pre-rollout-20260719` (6,5 MB) ·
 `-pre-rollout-20260718` + `backup-mb-pre-rollout-20260718` ·
 `-pre-whitelabel-2026-07-16` · `-pre-v968` · `Caddyfile.pre-rollout-20260719`.
-
 **Erledigte Meilensteine, die nicht zurückgedreht werden:**
 Web-Cutover auf `.immo` (alle vier Hosts HTTP 200, ACME-Certs) · Mail mit
 DKIM `cloudpit` (dkim/spf/dmarc pass) · **Demo-Seed geschlossen**
 (`SEED_DEMO_DATA=0` + `users.is_active=false` für `demo@dealpilot.local`) ·
 Stripe LIVE seit 15.07. · Caddyfile repo-gepflegt ·
 **Ausschuss-Register für alle 73 NRW-Ausschüsse auf Prod (12.08.).**
-
 ---
-
 ## OFFENE PUNKTE
-
 ### Sofort — Abnahme des letzten Rollouts
-
 - **Browser-Klicktest auf Prod:** Hüllhorst (305.937 / 348.687 / 2,56
   unverändert, Belastbarkeit **92 %**, Herkunft **kreisscharf**) und eine
   Adresse **außerhalb NRW** („kein Ausschuss hinterlegt").
@@ -2549,13 +2068,10 @@ Stripe LIVE seit 15.07. · Caddyfile repo-gepflegt ·
   am Rechenweg. Die Zeile war im Echtbetrieb noch nie sichtbar.
 - **Aufräumen auf Staging:** `.pre-v1083*`-Dateien, `/tmp/v1083*`,
   `/tmp/v1083b-check`.
-
 ### Der nächste Bau — Sachwertfaktoren ins Register
-
 `swf_modelle.js` liegt auf Prod und rechnet 36 Prüfungen richtig, aber
 `gutachterausschuss.js` nutzt für Sachwertfaktoren weiterhin die zwei
 handgeschriebenen Module. Der Weg ist derselbe wie beim Liegenschaftszins:
-
 1. **`param_modell_ebene_check` messen** — der erlaubte Wertebereich ist nach
    wie vor unbekannt. `gemeinde` und `kreis` gehen, `gemeinde_verbund` nicht.
 2. **Registerdatensätze schreiben** mit `formel` + `korrekturen` je Modellform.
@@ -2569,17 +2085,13 @@ handgeschriebenen Module. Der Weg ist derselbe wie beim Liegenschaftszins:
    `docker restart dealpilot-mb-backend` nötig.
 6. **Prüfstrecke:** gleiche RND in allen Verfahren · Regression Hüllhorst und
    Löhner Straße · **Kettenprüfung am Ausgabeobjekt**, nicht am Rückgabewert.
-
 ### Billig und flächendeckend
-
 Die vier **anderen CSV** der Grundstücksmarktdaten NRW sind ungenutzt:
 `baulandpreise.csv` (Bodenrichtwertniveaus je Lage), `efh.csv` und `we.csv`
 (Durchschnittspreise je Altersklasse), `umsatz.csv` (Preisentwicklung,
 Erbbauzinssätze). Alles Zero 2.0, alles für 73 Ausschüsse, alles bereits
 heruntergeladen.
-
 ### Zu messen
-
 - **Kostenkennwert gegen 904,26 €/m²** (Mix 49 % Stufe 2 / 51 % Stufe 3,
   Basisjahr 2010) — es fehlt die NHK-Zeile für ein Haus **ohne** Keller.
   Signatur `nhkKennwert(typ, kellerDg, stufe)`.
@@ -2596,20 +2108,16 @@ heruntergeladen.
 - **Ein NRW-Ausschuss ohne jeden LZS** (73 minus 72) und 8 Gemeinden ohne
   Abdeckung — auflisten und als „kein Ausschuss hinterlegt" führen.
 - **Stadt Dortmund führt 8 LZS ohne Angabe der Geschäftsjahre** (Jahrgang 2023).
-
 ### Ernte — Stand und Fläche
-
 **Liegenschaftszinssätze NRW: vollständig.** 493 Datensätze, alle 73 Ausschüsse,
 Berichtsjahr 2024, auf Prod. Zweiter Jahrgang (2023, 479 Sätze) liegt geprüft im
 Ernte-Paket bereit.
-
 **Sachwertfaktoren: 21 Ausschüsse erfasst**, davon **15 am Original-PDF belegt**:
 Bochum · Dortmund · Düsseldorf · Duisburg · Essen · **Höxter** · Iserlohn ·
 **Märkischer Kreis** · Kreis Lippe · Kreis Paderborn · Bielefeld · Lüdenscheid ·
 Rhein-Erft · Herford · Minden-Lübbecke. Nur aus der Netz-Ernte: Stadt Paderborn.
 **Nicht belegbar:** Gütersloh und Köln (keine feste Adresse, nur über den
 BORIS-Downloadbereich).
-
 Vollständige Daten: `claude/v1083-ernte-lzs-nrw-alle-73.md` ·
 `claude/v1083-ernte-hoexter-mk-belegt.md` · `claude/v1083-ernte-owl-ruhr.md` ·
 `claude/v1083-ernte-rheinschiene.md` · `claude/v1083-ernte-fuenf-staedte.md` ·
@@ -2617,15 +2125,12 @@ Vollständige Daten: `claude/v1083-ernte-lzs-nrw-alle-73.md` ·
 `claude/wettbewerb-sachwertfaktor-20260810.md` ·
 `claude/v1083-korrektur-bonn-20260812.md` ·
 `claude/v1083-messung-tarball-20260812.md`
-
 **Nächster Ausbauschritt nach Aufwand pro Einwohner:** Berlin, Hamburg, Bremen
 und Sachsen-Anhalt — zusammen fünf Ausschüsse für vier Bundesländer, alle
 kostenfrei. Berlins Sachwertfaktor-PDF (Jahrgang 2025, Stand 04.02.2026) liegt
 frei bei berlin.de. Danach NRW fertig. Rheinland-Pfalz wäre ein Bundesland
 für 150 €.
-
 ### Wertermittlung, nach Wirkung
-
 1. **Sachwertfaktoren ins Register** (siehe oben), beginnend mit Lüdenscheid.
 2. **`mb.valuation_inputs` wird nicht beschrieben** → Berichte nicht
    reproduzierbar.
@@ -2638,9 +2143,7 @@ für 150 €.
    Datei neben dem CrossCheckService). Der Sachwert-ETW-Text „nicht anwendbar"
    ist eine **Implementierungsgrenze**, keine ImmoWertV-Aussage.
 6. **BOG/Wohnrecht-Modul** (Leibrentenmethode, Sterbetafel) — Feature-Lücke.
-
 ### Open Data
-
 - **Auf Produktion liegen KEINE Open-Data-Sätze** in `param_werte`
   (`quelle_parser='p1-imbde'` = 0). Die 28.827 Sätze existieren nur auf Staging
   (davon 6.060 benannt, 22.767 offen). **`param_modell` ist davon unberührt** —
@@ -2650,16 +2153,12 @@ für 150 €.
   `docker exec dealpilot-mb-backend find /app -name "opendata-ernte.mjs"`.
 - **Berlin ernten** (v1066): braucht `poppler-utils`, Erwartung 6 Modelle,
   0 verworfen.
-
 ### Datenlücken
-
 - **Ortsteil → Gebietsgruppe Berlin** (Tabelle 1 im Amtsblatt, 96 Zeilen) —
   `pdftotext` verklebt die Spalten.
 - **Wägungsanteile für Mehrfamilienhäuser** — die Verordnung gibt sie nur für
   Ein-/Zweifamilienhäuser.
-
 ### Offene Entscheidungen (Marcel)
-
 - **Ersatzebenen der Kaskade** (übernommener Faktor nach ImmoWertA Nr. 9(3)
   und/oder Anlage 25 BewG — oder weiterhin nichts)
 - **Ausbaureihenfolge** und ob der RLP-Landesbericht gekauft wird
@@ -2672,9 +2171,7 @@ für 150 €.
 - **Plan-Naming-Konsistenz:** die Landing verkauft Flugklassen, App/Stripe/
   Settings/Mails sagen Free/Starter/Investor/Pro — App-weite Umbenennung als
   eigenes Paket oder bewusst Landing-only?
-
 ### Aufräumen (eigene Pakete, nach Abnahme)
-
 - Altes Intro-Markup (`intro-kerosin`, `#dpi-css`) — aktuell nur per CSS aus
 - **Totes Pricing-Plugin:** `#pricing-host` existiert im Markup **nicht**;
   `pricing-plugin.js/.css` + Inline-Fassung (~23 KB) rendern nie
@@ -2685,26 +2182,20 @@ für 150 €.
 - `.env`: tote `@junker-immo.de`-Empfänger, `ADMIN_EMAIL`-Platzhalter —
   **NICHT** `PRICEHUBBLE_USERNAME` / `SPRENGNETTER_AVM_USERNAME` (AVM-Logins!)
 - `voiceStream.js` löschen
-
 ### Gold-Nachzug (ein Sammel-ZIP)
-
 Voice-Orbit (Mikro-Gradient, Chip-Rand, `#vi-fill`) · Verlauf-Panel/Chart (v972) ·
 Kerosin-Knopf-Gradient → WL_TINTS.
 Backlog nach Sichtbarkeit: pricing-modal 53 · reseller-portal 42 · qc-bridge 39 ·
 mobile-demo 37 · rnd-wizard 27 · settings 23 · tax-periods 20 ·
 quick-boarding 18 · pass 17 · voice-import 16 · help 13.
-
 ### Steuer-Follow-up
-
 Taggenaue 3-Jahres-Frist § 6 Ib Nr. 1a (ab Besitz/Nutzen/Lasten) +
 fiktive-AfA-Kürzung (Eigennutzung → Vermietung). § 255 HGB AK gegen HK;
 anschaffungsnahe HK > 15 % der **NETTO**-Gebäude-AK → HK/AfA statt Sofortabzug;
 HK § 255 II 100 % Gebäude ohne Split.
 **`sonst`-Auto-Sync Tab-Investition → `ak_sonst` hängt** (Fallback `ji_e` aktiv)
 — Ursache fixen.
-
 ### Technik / Quer
-
 Willkommens-Mail · Whitelabel-Domain vor dem Login · Abrechnung-Tab ·
 Reseller-Self-Serve-Onboarding · Benachrichtigungen · erster Pool-Kauf als
 Staffel-Test · SPF/DKIM/DMARC für `junker-immobilien.io` · DATEV EXTF (braucht
@@ -2720,27 +2211,19 @@ Bundesbank-406 bei Live-Marktzinsen · Kommunale Wärmeplanung ·
 Stripe-Webhook prüfen/reaktivieren · DB-Passwort-Rotation · Server-Upgrade ·
 „PDF beim Export frisch rechnen" (offscreen-iframe wie MA27) ·
 Altobjekte ohne `kaufdat` einmal öffnen + speichern
-
 ---
-
 ## DIE TESTOBJEKTE
-
 | | |
 |---|---|
 | **Hüllhorst** — Hermannstraße 9, 32609, ETW 165 m², Bj 1968, 2 WE | Kreis Minden-Lübbecke (AGS 05770016). **Regression:** Gebäudesachwert **305.937 €**, vorläufiger Sachwert **348.687 €**, Zinsanpassung **2,56 %**, amtliche Miete **4,83 €/m²**, Vergleichsfaktor **239.250 €**, RND **49,6 J.** Seit v1083b zusätzlich: LZS 2,2 % **Stufe A**, Herkunft **kreisscharf**, Belastbarkeit **92 %**, Sachwert-Karte nennt den Grund „Ausschuss leitet für diese Objektart keinen Faktor ab" |
 | **Löhner Straße 278**, 32120 Hiddenhausen, ZFH 233 m², Bj 1964 | Kreis Herford (AGS 05758016). **Maßstab:** Verkehrswertgutachten 350.094,36 €, BGF 346,62 m², Bodenwert 144.840 €. **Regression durch den generischen Auswerter:** vorläufiger Sachwert 326.649 € × **SWF 0,889 Stufe A** (Tabelle 0,899, kRnd −0,01, kBgf 0) = **290.391 €** marktangepasst. Marcels 0,91 war eigene Angabe (Stufe E). |
-
 **Achtung bei den Löhner-Sollwerten:** Sie sind unter der Restnutzungsdauer 18
 entstanden — also ohne erfassten Modernisierungsgrad. Sobald der Klicktest mit
 Modernisierungspunkten läuft, ändern sich beide Regressionswerte und müssen neu
 festgelegt und gegen das Gutachten abgenommen werden.
-
 **Beide gehören in jede Prüfstrecke, die den Rechenkern anfasst.**
-
 ---
-
 ## KEY-LEARNINGS — DIE KURZFASSUNG
-
 - **Erst messen, dann bauen.** Marker-Übersicht als erster Befehl; die Landkarte
   selbst aufnehmen; keiner Übergabe glauben — auch keiner eigenen.
 - **Der Sollwert kommt aus dem Dokument** — inklusive Rundung. Wo keiner steht:
@@ -2768,723 +2251,355 @@ festgelegt und gegen das Gutachten abgenommen werden.
 - **Fehler offen zugeben, falsche Diagnosen ausdrücklich zurücknehmen.** Zwei
   gleiche Fehler hintereinander heißt: Sitzung beenden, Übergabe schreiben.
 
+# PROJEKTANWEISUNG — ERGÄNZUNG VOM 14.08.2026
+
+**Diese Datei ersetzt die Gesamtfassung vom 12.08. NICHT.** Sie ist ein
+Nachtrag und benennt für jeden Punkt, **welchen Abschnitt der Gesamtfassung er
+ändert**. Beide zusammen sind der gültige Stand.
+
+**Warum kein neuer Gesamtstand:** die Fassung vom 12.08. ist rund 2.700 Zeilen.
+Sie hier neu zu schreiben hieße, sie aus dem Gedächtnis zu rekonstruieren — und
+genau davor warnt sie selbst („rekonstruierte Arbeitskopien gegen die Marker
+prüfen"). Die Konsolidierung gehört an den **Anfang der nächsten Sitzung**, mit
+dem Originaltext im Zugriff. Rezept dafür steht am Ende dieser Datei.
+
 ---
----
 
-# TEIL VI — DIE ARBEIT IM REPO (CLAUDE CODE)
+# 1 · WAS SICH AM STAND GEÄNDERT HAT
 
-Teil I–V beschreiben den Weg über den Chat: Tarball anfordern, ZIP mit
-`apply.sh` bauen, `scp`, auf dem Server auspacken. **Dieser Weg gilt
-weiterhin** — für alles, was das mb-Backend, Migrationen oder Server-Eingriffe
-betrifft.
+## ersetzt TEIL II, Tabelle „WORKSTREAMS / NAMESPACES"
 
-Seit dem 04.08. läuft die Frontend-Arbeit über einen zweiten Weg: **Claude Code
-direkt im Arbeitsverzeichnis `E:\DealPilot\repo`.** Zwischen dem 04. und 12.08.
-sind darüber **254 Commits (v1079 bis v1147b)** entstanden. Dieser Teil hält
-fest, was dieser Weg anders macht und was er gekostet hat.
-
-## VI.1 · WELCHER WEG WANN
-
-| | Chat + ZIP (Teil I–V) | Repo + Claude Code (Teil VI) |
+| | Namespace | Prod-Stand **14.08.2026** |
 |---|---|---|
-| **Wofür** | mb-Backend, Migrationen, Server, Ernte | Frontend, CSS, JS, Landing, Admin |
-| **Werkzeug** | `apply.sh` + `patch.py`, Anker mit `count==1` | direkte Dateiänderung, `git` |
-| **Ausrollen** | `scp` + `unzip` + `apply.sh` + Rebuild | `.\tools\deploy-staging.ps1` |
-| **Prüfen** | Marker im Container greppen | im Browser nachmessen |
-| **Rollback** | `rollback.sh` / `.pre-<paket>` | `git checkout -- <datei>` |
+| **(D) Marktbericht** | `vNNN` | **`74ae2e3`**, Tags `rollout-20260814` · `marktbericht-v1096a-20260814` · **Prod-Anker `2165738`** |
 
-**Gemeinsam bleibt:** neue Versionsnummer bei neuem Inhalt · große Pakete ·
-Staging-first · Marker in Kommentaren · Cache-Buster hochziehen · nur eigene
-Dateien einzeln stagen.
+Alle übrigen Zeilen unverändert.
 
-### Die Dateien, die die Arbeit steuern
-| Datei | sagt |
-|---|---|
-| `CLAUDE.md` | **wie** gearbeitet wird (Kurzfassung dieser Anweisung, im Repo) |
-| `BACKLOG.md` | **was** ansteht — Reihenfolge = Priorität, oberster offener Punkt wird bearbeitet |
-| `FALLEN.md` | **wo** schon jemand hingefallen ist (Werkzeug- und Messfallen) |
-| `PROJEKTANWEISUNG.md` | **diese** Datei — der Gesamtstand, fortlaufend |
-| `design/mockups/` | der Zielzustand. Bei Layoutfragen dort nachsehen statt raten |
-| `design/Vorschläge/` | Demo-first-Ablage: **zuerst** Entwurf, **dann** bauen |
+**Die zwei Nummernkreise laufen weiter:** dieser Chat vergibt v1084–v1096a
+(Register, Auswerter, Abnahme), der Parallel-Chat v1158–v1171 (Hell/Dunkel,
+Spracheingabe, Plan-Gate, Beleg-Import). **Beide sind mit `74ae2e3` auf Prod.**
 
-**Marcel legt seine Screenshots jedes Mal in `design/mockups/` ab.** Vor jedem
-Punkt, der Optik betrifft, dort nachsehen — und **den Dateinamen in den
-Backlog-Punkt schreiben**. Ein Optik-Befund ohne Bildbezug ist eine Vermutung;
-beim Stapel-Modus kam die falsche Annahme aus `handy2.jpg`, einer Datei, die
-gar nicht mehr im Repo lag.
+## ersetzt TEIL I, Regel 1 — die Marker-Übersicht
 
-### Arbeitsmodus — durchziehen statt nachfragen
-**Standard ist: machen.** Nicht fragen, ob gebaut werden soll — bauen,
-ausrollen, prüfen, nachbessern, bis es steht. Der Kreislauf pro Aufgabe:
+Die Erwartungsliste vom 12.08. ist überholt. Neuer Sollstand:
 
-1. Messen (DOM, Konsole, `getBoundingClientRect`) und **den Befund nennen**
-2. Ändern
-3. `.\tools\deploy-staging.ps1`
-4. Im Browser nachmessen, ob es **wirklich** wirkt
-5. Bei Abweichung zurück zu 1 — **nicht** fragen, ob weitergemacht werden soll
-
-Erst melden, wenn es **funktioniert** oder wenn du **nicht weiterkommst**.
-
-**Nachfragen nur bei:** Produktion · Datenbank-Eingriffen · Geld, Preisen,
-Kündigungen · Optik ohne klare Vorgabe (dann Demo bauen und zeigen) · wenn
-etwas aus „Nicht anfassen" angefasst werden müsste · nach drei erfolglosen
-Anläufen (STOPP, Diagnose, melden).
-**Nicht nachfragen bei:** Datei-Änderungen im Repo, Commits, Ausrollen auf
-Staging, Messen im Browser, Zwischenversionen. Das ist der Auftrag.
-
-### Commit- und Deploy-Disziplin im Repo
-- **NIE `git add -A` oder `git add .`** — Dateien einzeln stagen.
-- **Nie committen:** `auto-save.js` · `docker-compose.prod.yml` · `Caddyfile` ·
-  `*.pre-*` · `patchesold/`
-- Vor dem Commit `git diff --cached --name-only` gegenlesen.
-- **Nach jeder JS/CSS-Änderung den Cache-Buster hochziehen**, sonst kommt die
-  Änderung im Browser nicht an.
-- Frontend ist **volume-mounted** → `git pull` auf dem Server = sofort live,
-  kein Rebuild. Backend-Änderung oder neue Migration → Rebuild.
-- Commit-Nachrichten benennen den **Befund**, nicht die Nummer
-  (`v1144: Der Sachwertfaktor wurde nie angewandt — falscher Feldname an zwei
-  Stellen`). Nach Abschluss wandert der Punkt in `BACKLOG.md` nach **Fertig**,
-  mit Datum, Commit-Hash und Befund.
-
----
-
-## VI.2 · DAS DEPLOY-SKRIPT LÜGT IN BEIDE RICHTUNGEN
-
-`tools/deploy-staging.ps1` hat drei Defekte, alle offen. Die Datei liegt per
-`.gitignore` **nur lokal** — sie taucht in keinem Repo-Stand auf.
-
-- **BOM vor `set -e`.** Der Server meldet
-  `bash: line 1: ﻿set: command not found`, das `set -e` wird verschluckt. Ohne
-  Fehlerabbruch gibt ein gescheiterter Deploy trotzdem `AUSGEROLLT: <sha>` aus.
-  **Fehlschlag sieht aus wie Erfolg.**
-- **Abbruch an gits stderr.** `$ErrorActionPreference = "Stop"` plus PowerShell
-  5.1: `git push` schreibt seinen Fortschritt nach stderr, daraus wird ein
-  `NativeCommandError`, das Skript bricht in Zeile 68 ab — **obwohl der Push
-  lief**. Schritt 6, der `git pull` auf dem Server, läuft dann nie. GitHub hat
-  den Stand, der Server nicht. **Erfolg sieht aus wie Fehlschlag.**
-- **Abbruch an fremden Serveränderungen.** Das Skript bricht ab, sobald auf dem
-  Server eine verfolgte Datei geändert ist — auch wenn der eigene Commit sie
-  nicht anfasst. Auf Staging war das der Dauerzustand: 319 Zeilen aus zwei
-  alten Paketen in `marktbericht/backend/src/connectors/boris/registry.js`, die
-  nie zurückflossen (mit `e35e34b` eingesammelt).
-
-**Deshalb nach jedem Lauf den echten Stand prüfen, nie der Ausgabe glauben:**
 ```
-ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --short HEAD'
+swf_modelle.js          v1083-WMOD v1084-WEIN v1085-WBND v1085-WZUO v1085-WOFF
+                        v1088-WKAT v1088-WREG v1089-WBND1
+                        v1093-WLOG v1093-WSPN v1093-WMUL
+                        v1094-WEUR v1094-WKAB
+gutachterausschuss.js   v1083-WKAS v1084-WSWF v1084-WFELD v1084-WZWG
+                        v1085-WKAS v1085-WVOL v1085-WLFN v1086-WBPN v1087-WMKT
+                        v1088-WBJ v1089-WART v1089-WART2
+                        v1093-WSPN2 v1093-WJG v1094-WKZ v1096a-WVOK
+ausschuss_register.js   v1083-WREG v1083a-WLAZ v1084-WSAAT v1084a-WMRG
+                        v1093-WSTD v1095-WMRG2   + 11 Saatdateien
+nrw_modell.js           v1083b-WSTU v1090-WSCH
+routes/api.js           v1096-WPRB
+server.js               v1084a-WBOOT v1095-WMRG2
 ```
-gegen den lokalen `HEAD`. Bricht das Skript nach dem Push ab, den Server-Pull
-von Hand nachziehen (`git pull --ff-only` in `/opt/dealpilot`).
 
----
+**Neu und wichtiger als die Marker-Liste: die Abnahme läuft per Befehl.**
+Siehe Abschnitt 3 dieser Datei.
 
-## VI.3 · MESSEN IM BROWSER — DIE KABINE
+## ersetzt TEIL III, „DAS AUSSCHUSS-REGISTER"
 
-`resize_window` ändert `innerWidth` **nicht** — es blieb bei 1920, egal was
-angefordert wurde. Responsive messen geht nur über ein **gleich-Origin-iframe**
-mit gesetzter `style.width/height`; Media-Queries richten sich danach.
+**Aus „493 Datensätze, eine Kennzahl, ein Land" sind 2.150 Datensätze,
+sieben Kennzahlen und acht Bundesländer geworden.**
 
-- **Die Kabine braucht einen Träger, auf dem die App nicht schon läuft.** Ein
-  Renderer-Einfrieren (CDP-Timeout nach 45 s) kam nicht vom iframe, sondern
-  davon, dass dieselbe App zweimal im selben Renderer startete. Träger ist
-  `/impressum.html` (7 KB), Inhalt gelöscht, iframe 390 × 844 bzw. 820 × 1180.
-  **Auf der App-Domain**, nicht auf der Landing-Domain.
-- **Eine unbekannte URL taugt nicht als leerer Träger** — der SPA-Fallback
-  liefert die volle App zurück (159 Skripte).
-- **Eingefrorene Transitions.** Der gedrosselte Tab lässt CSS-Transitions bei
-  Offset 0 stehen; der Drawer sah geschlossen aus, obwohl `.sb-mobile-open`
-  gesetzt war. `*{transition:none!important}` hilft **nicht**. Was hilft:
-  `document.getAnimations().forEach(a => a.finish())` nach jeder Änderung.
-  Transitions stehen in der Kaskade **über** allem, auch über Inline-`!important`.
-- **Im verborgenen Tab feuert `requestAnimationFrame` nie** — ein rAF-Nachlauf
-  läuft dort nicht an (v1082c, v1092b). Nachläufe ohne rAF bauen.
-- **CDP bricht nach 45 s ab.** Ein `setTimeout(…, 60000)` im selben
-  `javascript_tool`-Aufruf meldet „renderer may be frozen", obwohl die Seite in
-  Ordnung ist. Wartezeiten auf mehrere Aufrufe verteilen, ≤ ~40 s pro Aufruf.
-- **`window.confirm` blockiert jede Browser-Automation.** Der
-  Marktbericht-Abruf fragt vor dem kostenpflichtigen Lauf nach
-  (`marktbericht-app/app.js:224`, v647-cost). Der modale Dialog friert den
-  Renderer ein, der Tab ist tot und muss geschlossen werden. **Das ist kein
-  Produktfehler — der Dialog ist der Kostenschutz und gehört dahin.** Vor
-  automatisierten Läufen `window.confirm = () => true` setzen (und den Text
-  mitschreiben, er nennt den Preis). Gilt genauso für `alert` und `prompt`.
-- **Ein Überlauftest prüft gegen den klippenden Vorfahren, nicht gegen den
-  Viewport.** Fünf abgeschnittene Tabellenzellen blieben unentdeckt, weil sie
-  innerhalb des Fensters lagen. Vorfahren mit `overflow-x:auto` zählen **nicht**
-  als Befund — dort ist der Inhalt erwischbar.
-- **Zustand aus dem vorigen Prüflauf verfälscht die nächste Messung.** Ein
-  selbst gesetztes `body.hdr-collapsed` überlebte den Reload (localStorage) und
-  ließ einen Spalt von 49 px melden, den es nicht gab. Vor jeder Messung
-  `document.body.className` und die einschlägigen Merker mitlesen — und im
-  Befund nennen.
-- **Aufklapper sind Umschalter.** `feldhilfe.js` entfernt den Kasten, wenn er
-  schon da ist. Ein Prüflauf, der alle Info-Zeichen durchklickt, **schließt**
-  die aus einem abgebrochenen Lauf noch offenen und meldet sie als „ohne Text".
-  Vor der Messung `.fh-box` abräumen.
-- **Faustregel:** Sieht eine Messung physikalisch unmöglich aus, liegt es am
-  Messwerkzeug, nicht an der App.
+```
+[register] 2150 Saetze, 525 Gebiete, Herkunft param_modell+saatdatei
+liegenschaftszinssatz 1078 · bodenpreisniveau 403 · durchschnittspreis 386
+preisentwicklung 215 · sachwertfaktor 52 · erbbauzinssatz 15 · bodenpreisindex 1
+NW 1109 · NI 41 · BE 2 · ST 2 · TH 2 · HE 2 · BB 2 · BY 1   (Schlüssel)
+```
 
----
+Der vollständige Abdeckungsbericht — jedes Land, jeder Ausschuss, was fehlt und
+warum — steht in **`claude/abdeckung-laender-kreise-20260814.md`**.
 
-## VI.4 · WELCHE CSS-REGEL GEWINNT, SAGT NUR DER KASKADEN-WALKER
+## ersetzt TEIL III, „Neun Modellformen, acht Auswerter"
 
-**`element.matches(selektor)` findet Regeln, sagt aber nichts darüber, welche
-gewinnt.** Zwei Sitzungen sind daran hängengeblieben: eine Regel als gewinnend
-erklärt, die tatsächlich verlor, und dann am Symptom weitergepatcht.
+Es sind **zwölf Modellformen**. Neu seit dem 12.08.:
 
-In `css/style.css` (36.929 Zeilen, 4.198 `!important`, 226 Media-Queries auf
-25 Breakpoints) steht zu fast jedem Element mehr als eine Farbregel. Häufigster
-blinder Fleck: das Element trägt **Klasse und ID**
-(`<div class="hdr-obj-name" id="hdr-obj">`), die Gegenregel selektiert über die
-ID. `!important` auf beiden Seiten hebt sich auf, es entscheidet die Spezifität.
-
-Der Walker läuft alle `document.styleSheets` rekursiv (auch `@media`), matcht je
-**Teilselektor** einer Kommaliste und sortiert nach `!important` → Spezifität →
-Reihenfolge. Zwei eigene blinde Flecken:
-
-- **Kurzschriften.** CSSOM expandiert `background:` nicht zu `background-color`.
-  Wer nur das Longhand abfragt, findet null Treffer und hält die Stelle für
-  ungeregelt. Immer **beide** abfragen. Gleiches beim Schreiben: wer
-  `background:` überbieten will, muss selbst `background:` setzen.
-- **Pseudoelemente.** Das Goldband der Stapel-Karte ist `.sbc-top::before`. Ein
-  Grund-Leser, der nur die Elternkette abklappert, rechnet Text gegen die dunkle
-  Karte darunter und meldet k=1,08, wo real k=8,01 steht.
-
-### Inline-`!important` schlägt alles
-Mehrere JS-Dateien setzen Stile **inline mit `!important`**, ausdrücklich um jede
-CSS-Regel zu schlagen — `js/dp-band-fix.js` (v863, Schließen-Knopf) und
-`js/deal-action-boarding.js` (v857, `min-height:0` auf `.dab-chip`). Der
-Kaskaden-Walker findet den Setzer **nicht**: er läuft `document.styleSheets`, und
-die Inline-Regel steht dort nicht drin.
-
-**Wirkt eine Regel nicht, obwohl die Spezifität passt:** zuerst
-`el.getAttribute('style')` lesen. Steht der Wert dort, wird **in der JS-Datei**
-geändert, nicht im CSS. Ein zweiter CSS-Versuch mit höherer Spezifität ist
-verlorene Zeit.
-
-### Weitere CSS-Fallen dieser Ära
-- **Token-Überschreibungen reichen nicht** — farbtragende Flächen müssen
-  **einzeln benannt** werden. Die dunkle Fassung hängt **nicht** an
-  `--surface`/`--border`, sondern an später gesetzten, harten Regeln:
-  `header.hdr`, `nav.tabs`, `aside.sidebar`.
-- **Bei gleicher Spezifität gewinnt die spätere Regel.** Lieber Spezifität
-  erhöhen als auf Ladereihenfolge bauen.
-- **`:not(#id)` erbt ID-Spezifität** — `.hero > *:not(#dpm-flug)` hat 110, nicht
-  10. Nie Sammelregeln auf Container-Kinder.
-- **Flex-Kinder in `overflow:auto`-Containern schrumpfen, statt zu scrollen.**
-  Der Inhalt wird still abgeschnitten → `flex:0 0 auto` setzen.
-- **`align-items:center` lässt leere `::before`-Pseudoelemente auf null Höhe
-  schrumpfen** → `align-self:stretch`, sonst ist der Verlauf unsichtbar.
-- **`var()` funktioniert nicht in** SVG-Präsentationsattributen, Canvas, Leaflet,
-  jsPDF, Data-URIs → `_wlc()` / `_wlrgbaH()` / `_pdfGold()`.
-- **`#app` gibt es in der App NICHT.** `document.getElementById('app')` liefert
-  `null`. Eine CSS-Regel mit diesem Anker greift **nirgends** und sieht dabei
-  völlig plausibel aus — kostete in `v1147` einen ganzen Ausrollzyklus (behoben
-  mit `v1147b`). **Jeden Anker vor dem Schreiben im Browser auslesen, auch den
-  aus der eigenen Dokumentation.**
-
----
-
-## VI.5 · DIE DARSTELLUNGS-EBENE (v1082–v1136h)
-
-Der Nutzer kann das Aussehen der App über vier Attribute am `<html>` steuern.
-Modul ist **`js/ui-varianten.js`** mit **`css/ui-varianten.css`**; das Panel
-sitzt in `js/settings.js`. Gemessen am 12.08.:
-
-| Attribut | Werte | Istzustand (**kein** Attribut) |
+| Form | Ausschuss | Besonderheit |
 |---|---|---|
-| `data-ui-theme` | `kontor` · `panel` · `kanzlei` · `boarding` · `konsole` | DealPilot |
-| `data-ui-cards` | `kompakt` · `wallet` · `stapel` | Standard |
-| `data-ui-surface` | `light` | Passend |
-| `data-ui-form` (v1098) | `kantig` · `rund` | Passend |
+| `stufen_kategorial` | Erfurt, Hameln-Hannover | Kategorienachse statt stetiger Achse |
+| `regression_additiv` | Kreis Olpe, Halle | Intercept + Terme mit Koeffizient und Exponent |
+| `baender_1d` | München, Wiesbaden, Krefeld | eine Achse in Klassen, **ohne** Interpolation |
+| `log_1d` | Worms | `Y = a·ln(x) + b`, eine Achse, ein Logarithmus |
+| `spanne_kategorial` | Saarbrücken | liefert **absichtlich keinen Wert**, nur die Spanne |
 
-- **Istzustände tragen bewusst kein Attribut.** Ein `data-ui-theme=""` würde in
-  CSS auf `[data-ui-theme]` matchen und den Istzustand kippen — leerer Wert
-  heißt **Attribut entfernen** (`ui-varianten.js:140`).
-- **Der Vorwegsetzer im Kopf** (`index.html:45`, Marker `v1082-uv-boot`) setzt
-  die Attribute **vor dem ersten Paint**, sonst blitzt beim Neuladen kurz die
-  DealPilot-Fassung auf. **Achtung, gemessene Lücke:** seine Whitelist kennt bei
-  `data-ui-cards` nur `['kompakt','wallet']` — **`stapel` fehlt** (v1095 nicht
-  nachgezogen), und `data-ui-form` fehlt ganz (v1098 nicht nachgezogen). Wer
-  eine neue Vorlage oder einen neuen Modus baut, **trägt ihn dort mit ein.**
+**`spanne_kategorial` ist kein Widerspruch, sondern die Umsetzung der
+Projektregel.** Ohne sie meldete der Auswerter `form_unbekannt` — eine Aussage
+über sich selbst. Mit ihr meldet er `nur_spanne` — eine Aussage über die Quelle.
 
-### Skin und Vorlage sind zwei verschiedene Dinge
-Neben der Vorlage gibt es den **Chrome-Skin**: `body.dp-chrome-hell` (103
-Regeln), API `window._dpDispSkin('hell'|'obsidian')`, Merker `dp_chrome_hell`.
+**Korrekturen können jetzt multiplikativ wirken.** Kiel druckt `× 0,89 × 1,16`
+statt `+`. Das Feld heißt **`wirkung`**, nicht `art` — `art` ist seit v1083 mit
+der FORM der Korrekturtabelle belegt (`band` gegen Stufentabelle). Zwei
+verschiedene Dinge, ein Name; der Wandler trennt sie.
 
-- **`_dpDispSkin` ist ZWEIMAL definiert** — `settings.js:3130` und
-  `settings.js:3364`. **In JS gewinnt die letzte**, und nur die schaltet
-  zusätzlich `dp-hdr-compact`. Wer die erste patcht, editiert toten Code.
-- **Hell und Obsidian nie im laufenden Tab umschalten.** `_dpDispSkin`
-  hinterlässt Inline-CSS-Variablen am `<body>`, die nach dem Zurückschalten
-  stehen bleiben — die zweite Messung misst eine Mischfassung, die es im Betrieb
-  nicht gibt. `styleElement.disabled = true` setzt den berechneten Stil nicht
-  zurück. **Teuer dazu:** `_dpDispSkin` ruft `vorlageNachziehen()`; steht die
-  aktive Vorlage der neuen Helligkeit entgegen, wird
-  `dp_user_settings.ui_theme` auf `''` gesetzt — **die Vorlage ist weg.**
-  Zum Messen: Merker `dp_chrome_hell` setzen, `reload()`, messen. Fassung A und
-  B je einzeln. **Nie A→B→A in einem Tab.**
-- **Zustände über den Bedienweg herstellen, nie per Attribut.** Wer
-  `data-ui-theme` per `setAttribute` setzt, misst **nicht** denselben Zustand wie
-  ein Klick im Panel: der Klick löst zusätzlich `skinNachziehen()`
-  (`ui-varianten.js:853`, v1085) aus. Ein Paket sah über `setAttribute` sauber
-  aus und färbte über den echten Weg Kopf und Tab-Leiste in **allen vier hellen
-  Vorlagen schwarz**.
-- Ursache war ein **Tokenname mit zwei Bedeutungen**: `--dp-header-bg` ist der
-  Nutzerwert des Reglers *und* eine Interna des Hell-Skins. Bevor ein fremdes
-  Token als „Nutzerwert" gelesen wird: prüfen, wer es sonst noch setzt. **Dem
-  eigenen Zweck gehört ein eigener Namensraum** (v1104: `--uv-*` für die
-  Bereichsfarben).
-
-### Markenverlust wird über den Farbton gemessen
-Um zu prüfen, wo eine Vorlage die Markenfarbe totsetzt: Akzent setzen,
-Momentaufnahme **ohne** Vorlage, dann je Vorlage erneut, je Element vergleichen.
-Zählen oder Regex über die CSS-Datei taugt nicht. Vier Fallen:
-
-1. **„Neutral" ist nicht „grau".** Mit dem Kriterium max − min ≤ 8 meldete die
-   Vorlage `panel` null Treffer — ihr Neutralton ist `rgb(21,26,32)` (Blaustich),
-   `boarding` ist cremefarben. Richtig ist der **Farbton**.
-2. **Nie mit rotem Testakzent messen.** Rot ist von Status-Rot nicht zu trennen,
-   Grün genauso wenig. **Violett** (`#7C5CBF`) hält beide eindeutig.
-3. **Rahmenfarbe nur zählen bei `border-width > 0`** und Stil ≠ `none`.
-4. **`color` nur zählen bei eigenem Textknoten** — sonst zählt jede
-   Vererbungsstufe mit, und aus 13 Elementen werden scheinbar 33.
-
-**Die Trennlinie:** Gold bei 10–55 % Deckung ist ein **Neutralton**, den die
-Vorlage bestimmen darf. Vollton auf Text oder Bedienelement ist **Marke** und
-muss mitfärben. Und **beide Bedienwege** prüfen —
-`DealPilotWhitelabel.apply()` setzt `--gold-d` und die `--wl-*`, der Regler
-`_dpDispAccent()` nicht (v1096b).
-
-**Markentöne tragen einen Mindestkontrast** (v1097), keine feste
-Prozent-Ableitung — ein Ton für helle Flächen statt zwei (v1097b). Die
-Gold-auf-Gold-Reihe (v1113 bis v1113f) hat vier Markenableitungen einzeln
-nachgezogen; drei davon fielen erst in der **Rot-Gegenprobe** auf.
+**Euro-Beträge bekommen ihre Korrekturen** (`v1094-WEUR`). Bis v1093 sprang
+`auswerten()` bei `liefert: 'wert_eur'` sofort zurück.
 
 ---
 
-## VI.6 · DIE OBJEKTKARTE — GEMESSENE STRUKTUR
+# 2 · NEUE REGELN — ergänzt TEIL I
 
-Gebaut in `js/storage.js` von `_renderRichCard()` ab Z. 866, Karten in `#sb-list`.
+## Regel 6 · Eine Auskunft, die einen anderen Weg nimmt als der Rechenweg, misst sich selbst
+
+Zweimal an einem Tag gestolpert:
 
 ```
-.sb-card
-  .sbc-score-overlay          <- DIREKTES Kind der Karte
-    .sbc-mini-score (Ring-SVG + .sbc-mini-score-num)
-    .sbc-score-label
-  .sbc-top
-    .sbc-thumb (.sbc-thumb-empty > .sbc-thumb-icon | .sbc-thumb-photo)
-    .sbc-top-body
-      .sbc-top-line1 (.sbc-seq .sbc-ai-badge .sbc-ds2-hint .sbc-arrow)
-      .sbc-address
-      .sbc-halter
-      .sbc-kp-row > .sbc-kp   <- der PREIS
-  .sbc-mini-grid              <- BEHÄLTER der drei Kacheln
-    .sbcm[data-mode] x3       <- die Kacheln
-  .sbc-actions                position:absolute
+swf-abfrage --stand      meldete 2150      der Server führte 1565
+registerStand() im       meldete 2150      derselbe Fehler, anderer Weg
+docker exec node -e
 ```
 
-- Karte zeigt **Kaufdatum** (`.sbc-date` = `kaufdat`), `updated_at` nur als
-  `data-updated`. Backend `listForUser` liefert `data->>'halter'` +
-  `data->>'kaufdat'` (Änderung = Backend-Rebuild).
-- **`.sbc-halter` trägt Farbe und Größe inline im Markup** (v850,
-  CSS-kommt-nicht-an-Lehre) — nicht auf eine CSS-Regel zurückbauen.
-- Sidebar-Suche ist `sidebar-search.js`, keine zweite `sb-search.js`.
-  `sb-portfolio`-Block bleibt entfernt (v848); Portfolio-Cockpit nur über das
-  Aktionen-Akkordeon.
-- **Vier Modi, vier Baustellen:** Standard · **Wallet** (v1082e–v1082j: Score-
-  Ringe standen leer, Foto dehnte sich, Stufen-Pille rutschte unter den Ring —
-  vier Anläufe) · **Kompakt** (v1092–v1094: schmale Zeile zum Aufklappen;
-  v1082k sparte nur 10 px, weil das falsche Element getroffen war) ·
-  **Stapel** (v1095, Handy-Optik; Feinschliff v1105–v1105c).
-  **Gegen die gemessene Struktur bauen, nicht gegen das Mockup** — `v1082g`
-  war ein Neubau genau aus diesem Grund.
+Beide starten einen **eigenen** Node-Prozess, lesen nur die Saatdatei und rufen
+`ladeAusDb()` nie auf. **Die ehrliche Zahl steht im Startlog oder kommt aus dem
+Endpunkt** (Abschnitt 3).
+
+Dieselbe Klasse wie die Kettenprüfung aus v1083, die ihre Vorbedingung selbst
+herstellte. **Wer eine Auskunft baut, prüft zuerst, ob sie denselben Weg nimmt
+wie die Rechnung.**
+
+## Regel 7 · Ein Prüfwerkzeug mit einer Abhängigkeit, die der geprüften Maschine fehlt, prüft die Maschine nicht
+
+`abnahme.sh` wertete die Antworten mit `node -e` auf dem **Host** aus. Staging
+hat Node 18, **Prod hat kein node auf dem Host**. Ergebnis: dreizehn Zeilen
+„FEHL … ist (leer)", während das Serverlog daneben sauber 2150 meldete.
+
+Auf Staging gebaut, auf Staging abgenommen, auf Prod Fehlalarm. **Der
+Unterschied zwischen den beiden Servern steht in der Projektanweisung** — er
+wurde beim Bauen nicht mitgedacht.
+
+Konsequenz: Prüfwerkzeuge laufen **im Container**, nicht auf dem Host.
+
+## Regel 8 · Vor dem Merge nach main klären, wessen Rollout es ist
+
+Am 14.08. standen 41 Commits in `main..staging` — **alle aus dem
+Parallel-Strang**, keiner von diesem Chat. Der Merge war damit sein Release,
+nicht meins.
+
+Zwei Folgen, die man vorher wissen muss:
+
+- **`backend` braucht einen Rebuild**, sobald `backend/src/*` mit im Merge ist.
+  Nicht nur `mb-backend`.
+- **Die Buster-Kette gehört dem, der zuletzt bumpt.** Der Parallel-Strang hat
+  alle vier Glieder angefasst; Stand nach dem Rollout **1166**.
+
+Und: der Push nach `origin/staging` wurde abgelehnt, weil der Parallel-Chat
+während des Rollouts vier Commits geschoben hatte. Kein Schaden — main und Prod
+standen —, aber `git pull --rebase` gehört **abgesprochen**, es ist sein
+Zweig-Stand.
 
 ---
 
-## VI.7 · WERKZEUGFALLEN UNTER WINDOWS / POWERSHELL 5.1
+# 3 · DIE ABNAHME PER BEFEHL — neuer Abschnitt zu TEIL V, „ROLLOUT"
 
-- **`Set-Content` zerstört Dateien mit Umlauten.** Ein
-  `(Get-Content x -Raw) -replace … | Set-Content x -Encoding UTF8` hat
-  `index.html` komplett neu geschrieben: jedes Nicht-ASCII-Zeichen doppelt
-  kodiert, BOM vorangestellt — **711 geänderte Zeilen statt einer** (behoben mit
-  `v1123c`). Immer `[System.IO.File]::ReadAllText` / `WriteAllText`. Nach jeder
-  Buster-Änderung `git diff --stat` gegenlesen.
-- **`WriteAllLines` rettet nicht, wenn das Skript selbst falsch gelesen wird.**
-  PowerShell 5.1 liest eine `.ps1` **ohne BOM als ANSI**: jedes „—" und jeder
-  Umlaut im Skript-**Literal** ist schon beim Einlesen kaputt. Betrifft nur die
-  eigenen Literale, nicht die eingelesenen Zeilen — deshalb sieht die Datei zu
-  99 % richtig aus. Auch Suchmuster trifft es: `-Pattern '^## Später'` findet
-  nichts. **In Skripten ASCII-Muster benutzen** (`'^## Sp.ter'`) und Texte mit
-  Umlauten aus einer UTF-8-Datei einlesen, nie als Literal.
-- **PowerShell 5.1 behandelt typografische Anführungszeichen wie echte Quotes.**
-  Eine Commit-Nachricht mit „…" sprengt das Here-String, git liest die
-  Bruchstücke als Dateinamen. Nachricht in eine Datei schreiben und
-  `git commit -F` nutzen.
-- **`&&`, `||`, `?:`, `??`, `?.` gibt es in 5.1 nicht** — `; if ($?) { … }`.
-  Kein `2>&1` auf native Exes (NativeCommandError trotz Exit 0).
-- **`DPC` gibt es im Seiten-Scope nicht.** In `config.js:852` steht
-  `var DPC = window.DealPilotConfig;` — ein modul-interner Alias. Nach außen
-  heißt alles `window.DealPilotConfig.branding.*`. Ein `try/catch` mit stillem
-  Rückfall auf den Rohwert ließ eine Korrektur **nie** laufen, bei gemessenem
-  Kontrast 1,00. **Fehlende Module laut melden**, nicht im `catch` verschwinden.
-- **`grep -q` in einer Pipe kappt die Pipe** — der Sender stirbt an
-  `BrokenPipeError`. Ausgabe erst in eine Datei, dann zählen.
-- **Ein falscher Modulname lässt die Korrektur stillschweigend nie laufen**
-  (`v1123e`). Modulnamen gegen die Datei prüfen, nicht gegen die Erinnerung.
+Seit v1096 hat das mb-Backend zwei **Leseendpunkte**. Sie schreiben nichts,
+nehmen keine Objektdaten, hängen **nicht** im Proxy des Haupt-Backends und sind
+von außen nicht erreichbar. Angefragt werden sie im Container.
 
----
+```
+docker exec dealpilot-mb-backend node -e "fetch('http://localhost:4000/api/v1/marktbericht/register/stand').then(r=>r.json()).then(d=>console.log(d.saetze,d.herkunft,JSON.stringify(d.laender)))"
+```
 
-## VI.8 · CHRONIK v1079–v1147b (254 Commits, 04.–12.08.)
+```
+docker exec dealpilot-mb-backend node -e "fetch('http://localhost:4000/api/v1/marktbericht/register/probe?ags=05758016&kennzahl=sachwertfaktor&objektart=Zweifamilienhaus&sachwert=326649&brw=145&rnd=18&bgf=347').then(r=>r.json()).then(d=>console.log(JSON.stringify(d.ergebnis,null,1)))"
+```
 
-Thematisch geordnet; die Commit-Nachricht nennt jeweils den Befund.
+`kennzahl` kennt `liegenschaftszinssatz` · `sachwertfaktor` · `bodenpreisniveau`
+· `vergleichsfaktor` · `bodenpreisindex`. Weitere Parameter je Modellform:
+`zweig`, `objektart`, `sachwert`, `brw`, `rnd`, `bgf`, `flaeche`, `wfl`,
+`baujahr`. **Ohne Treffer kommt der Grund zurück, nicht ein leeres Objekt.**
 
-| Strecke | Versionen | worum es ging |
-|---|---|---|
-| **Logo / Kopf** | v1079 · v1080 · v1086 · v1086b · v1101 · v1101b | rahmenlose Wortmarke, Goldrahmen aus CSS, kompakter Logo-Kopf, Regler wirken auch unter einer Vorlage. `v1086b`: Logo saß mittig statt links — **Flex-Richtung fehlte, zweites Mal** |
-| **Plan-Gates** | v1081 | Partner-Plan war von fünf Pro-Gates ausgesperrt |
-| **Darstellungs-Vorlagen** | v1082 · v1082b–v1082k | die zwei 404-Dateien mit Leben gefüllt; heller Text auf hellem Grund; Karte trägt Farbe als Verlauf; Wallet neu gebaut |
-| **Aktionen-Menü** | v1084 · v1084b · v1136e–v1136h | gegliedert, Schranken sichtbar, Kerosin am Eintrag, Trefferflächen 769–900 px, folgt der hellen Darstellung |
-| **Skin ↔ Vorlage** | v1085 · v1103 · v1136f · v1136g | Skin-Schalter gekoppelt; Hell-Skin überstimmte die Vorlage an drei Flächen; Träger der Hell-Regeln ist nur der Chrome-Skin |
-| **Tablet-Kopfleiste** | v1087 · v1087b | von 589 px auf fünf Spalten (statt Scroller) |
-| **Heller Text auf hellem Grund** | v1088 · v1089 · v1090 · v1107 · v1107b | Leiste, Kopfzeile, Tabs, die letzten zwei Goldflächen, Kachel-Texte in **jeder** Vorlage |
-| **Kartenmodi** | v1091 · v1091b · v1092–v1092d · v1094 · v1095–v1095c · v1105–v1105c · v1106 · v1108 · v1108b | Kompakt als aufklappbare Zeile, Stapel als vierter Modus, Score-Ring lag über der Adresse. `v1092d` nimmt `v1092c` zurück |
-| **Marke unter den Vorlagen** | v1093 · v1096 · v1096b · v1097 · v1097b · v1109 · v1113–v1113f | die Vorlage darf die Marke nicht totsetzen; Mindestkontrast statt Prozent-Ableitung; WL-Tints mit Einstufung je Ton |
-| **Darstellungs-Panel** | v1098–v1098d · v1099–v1099d · v1100 · v1102–v1102c · v1104 · v1110 | Abschnitt Marke, Form und Schrift; Arbeitsbereich folgt der Vorlage; **altes Panel abgeklemmt** (v1100); eigener Namensraum für Bereichsfarben (v1104); Einstellungen galten nach jedem Tab-Wechsel als geändert (v1110) |
-| **Partner / Whitelabel** | v1111 · v1114 · v1122 | Partner-Flow Weg C und A, dann B (drei Freiheitsstufen je Partner, ohne Migration); Partner-Branding griff nicht — **drei getrennte Ursachen** |
-| **Handy** | v1112 · v1112b · v1118 · v1118b · v1118c · v1138b–v1138e · v1141d | Einstellungen auf dem Handy (**vier Kaskadenfehler**), Partner-Portal nie für kleine Schirme gebaut, **Handy-Sperre gefallen**, Trefferflächen auf 44 px, Löschen-Schaltfläche lag auf der Score-Zahl |
-| **Schließen-Knopf** | v1115 · v1116 · v1117 | Ist-Zustand gemessen, drei Fassungen gezeigt, Fassung B an sieben Stellen vereinheitlicht — und `v1117`, weil sie erst dann wirklich ankam |
-| **Textfarben-Regler** | v1123–v1123e | Score- und KPI-Karten; `v1123c` reparierte die eigene Kodierungspanne; `v1123e`: falscher Modulname, die Korrektur lief nie |
-| **Kopf/Reiter-Spalt** | v1124 · v1124b | `hdr-h` blieb stehen, auch beim zugeklappten Kopf |
-| **Marktbericht-Preise** | v1125–v1125c · v1126–v1126d | drei echte Stufenpreise (**GELD-Befund:** Stufe 1 bewarb 2 L, abgebucht wurden 5 L), Meilensteinleiste, Bestätigungsdialog nennt den echten Preis. `v1126c`: Stufe 3 war unerreichbar (Henne-Ei) |
-| **Marktbericht-Wizard** | v1127–v1130 | Reiter, ganze Fläche, sechs Reiter statt drei, Übersicht als erster Reiter. `v1129c`: der Ladebalken hat nie existiert |
-| **Werbungskosten-PDF** | v1131 · v1132 · v1133 | Aufstellung ging nicht auf (1.500 € ohne Zeile), Nullzeilen verschwinden, Steuerwirkung pro Jahr und Monat |
-| **Marktbericht-Rückweg** | v1119–v1121 · v1134 · v1135 · v1135b · v1136–v1136d | bedingte Felder erschienen nie; **fünf Felder gingen im Objekt verloren**; das Hauptprogramm löschte die Wertermittlungsfelder wieder weg; Zahlenfelder nehmen die deutsche Schreibweise an |
-| **Landing** | v1083 · v1136i · v1136j | Netzwerk-Fehlermeldung nennt die Ursache; Partnerlogo CareTech Thiel (Zuschnitt war das Problem, nicht die Größenregel) |
-| **Rechenkern / Sachwert** | v1137 · v1137b · v1139–v1146b | negativer Cashflow zeigt sein Vorzeichen; **Bodenwertverzinsung bei ETW lief auf dem doppelten Wert** (v1140); Rechenwege im Ergebnis; **der Sachwertfaktor wurde nie angewandt — falscher Feldname an zwei Stellen** (v1144); neun tote Info-Zeichen bekamen Texte |
-| **Ankreuzfelder** | v1147 · v1147b | auf 33 px (Marcels Entscheidung). `v1147` stand auf `#app` — **ein Element, das es nicht gibt** |
+Die vollständige Abnahme (14 Prüfungen) liegt als `abnahme.mjs` vor:
 
-**Drei Rücknahmen in dieser Ära, alle ausdrücklich:** `v1092d` (nimmt `v1092c`
-zurück), `v1113f` (nimmt den eigenen Rückschritt aus `v1113e` zurück),
-`v1136h` (Band und Kopf zurückgenommen, Zusatz bleibt auf der Sidebar).
+```
+docker cp /tmp/abnahme.mjs dealpilot-mb-backend:/tmp/abnahme.mjs
+docker exec dealpilot-mb-backend node /tmp/abnahme.mjs
+```
+
+**Die zwei wichtigsten Prüfungen sind die negativen:** Rostock (MV) und München
+dürfen **keinen** Wert liefern. München ist der feinere Fall — dort liegt ein
+Sachwertfaktor, aber kein Zinssatz. Ein Ausschuss, der die eine Kennzahl führt,
+darf die andere nicht miterfinden.
+
+**Offener Punkt:** die committete `tools/abnahme.sh` ist die kaputte
+Host-Fassung. Sie gehört durch `abnahme.mjs` ersetzt.
 
 ---
 
-## VI.9 · STAND UND EINSTIEGSPUNKT (12.08.2026)
+# 4 · NEUE DIAGNOSE-LEHREN — ergänzt TEIL V
 
-**Alles auf `6a11a32`**, lokal wie Staging, Zweig `staging`, Arbeitsverzeichnis
-sauber. Der Einstiegspunkt steht **im Backlog oben** unter
-„→ Hier weitermachen"; diese Datei wiederholt ihn nicht, sonst laufen zwei
-Wahrheiten nebeneinander.
+**Die Zusammenführung von Tabelle und Saat läuft je DATENSATZ, nicht je
+Kennzahl** (`v1095-WMRG2`). v1084a führte sie je Kennzahl zusammen — und weil
+in `mb.param_modell` 493 Liegenschaftszinssätze aus dem Saatlauf vom 12.08.
+lagen (nur NRW, nur Berichtsjahr 2024), gewann die Tabelle für die **ganze**
+Kennzahl. 585 neuere Sätze fielen still heraus: `2150 − 1078 + 493 = 1565`, die
+Rechnung ging exakt auf.
 
-**Prüfstrecken auf Staging:**
-- `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt, weitere
-  Marktberichte kosten **0 L**. Der einzige Haus-Testfall.
-- `Hermannstraße 9 Hüllhorst` (`07d89138`) — ETW, Stufe 3 bezahlt.
-- Kerosin zuletzt: **86 L**.
+Dieselbe Fehlerklasse wie v1084a, eine Ebene tiefer: damals fing die Wache die
+**leere** Tabelle, aber nicht die halb gefüllte; danach fing sie die halb
+gefüllte, aber nicht die **veraltete**. Beide Male lag dieselbe Annahme
+darunter — dass die Tabelle mindestens so aktuell ist wie die Datei. **Sie
+stimmt nicht: die Datei ist versioniert und fährt mit dem Code mit, die Tabelle
+wird von Hand nachgezogen.**
 
-**Zwei offene Abnahmen:**
-1. **Ankreuzfelder 33 px** (`v1147b`) — gemessen ohne geladenes Objekt, 0 von
-   26 Feldern sichtbar. Mit geladenem Objekt gegenmessen, ob die Formularzeilen
-   tragen (besonders Steuer und Pilot-Analyse).
-2. **Produktion** — liegt dieselbe `registry.js`-Drift dort auch? SSH ist
-   read-only, ein Dateivergleich genügt.
+**Ein multiplikativer Faktor 0 wäre still verschwunden**, weil `0` falsy ist und
+`if (t && t.wert)` ihn übersprungen hätte — der Wächter zwei Zeilen tiefer wäre
+nie erreicht worden. Für einen **additiven** Zuschlag ist 0 ein Nichts (Herford
+druckt so eine Zeile ab), für einen **Faktor** ist es eine Katastrophe.
+Aufgefallen nur, weil die Prüfstrecke den Wächter selbst geprüft hat.
 
-**Aus dieser Konsolidierung neu aufgenommen (noch nicht gebaut):**
-- Der Vorwegsetzer `v1082-uv-boot` in `index.html:46` kennt `stapel` und
-  `data-ui-form` nicht → beim Neuladen blitzt für diese Nutzer die
-  DealPilot-Fassung auf. Zwei Zeilen, siehe VI.5.
-- `frontend/style.css` (27.477 Zeilen, 842 KB) wird von keiner Seite geladen →
-  Aufräumen als eigenes Paket, **nie am Rollout-Tag**.
-- `_dpDispSkin` ist in `settings.js` doppelt definiert (Z. 3130 / Z. 3364) → die
-  tote erste Fassung entfernen, ebenfalls als eigenes Paket.
+**Zwei Jahrgänge desselben Zweigs machten die Objektart unerreichbar**
+(`v1093-WJG`). `waehleAusGruppe()` hielt sie für zwei Baujahrsgruppen und gab
+`null` — Potsdam meldete „objektart_nicht_abgeleitet", obwohl es sie führt. Die
+Zeitreihe, die eine Stärke sein sollte, war ein Fehler. **Zuerst der Jahrgang
+(der jüngste gewinnt), dann die Baujahrsgruppe.**
+
+**`registerStand()` löste die Saat nicht aus** und meldete „0 Sätze, Herkunft
+leer" bei intaktem Register. Genau der umgekehrte Fehler wie bei
+`swf-abfrage --stand`: dort grün und wertlos, hier rot und falsch.
+
+**Ein Vokabular, nicht zwei** (`v1096a-WVOK`). `sachwertfaktor()` hat zwei Wege:
+das Register versteht über `eingabeBruecke()` sowohl `sachwert` als auch
+`sachwert_eur`; die zwei handgeschriebenen Module bekamen das Objekt **roh** und
+lasen nur die langen Namen. Betroffen waren ausgerechnet Herford und
+Minden-Lübbecke — die Ausschüsse, an denen die Regressionswerte hängen. Die
+Asymmetrie lag still da und wartete auf den ersten neuen Leser.
+
+**`land_code` war fest verdrahtet.** Der Umsetzer trug `'NW'` ein, seit das
+Register nur NRW führte — 86 Sätze aus vier Ländern trugen es. Funktional
+unkritisch (die Auflösung geht über den AGS), aber die Spalte lügt, sie steht im
+eindeutigen Schlüssel, und eine Auswertung nach Bundesland bekäme für Bayern
+null Zeilen. **Wo ein Fehler ausgeliefert wurde, braucht es einen Schritt, der
+den SCHADEN sucht** — nicht nur einen, der die Quelle schließt.
+
+**17 Dublettensätze über zwei Pakete hinweg**: v1090 hatte Rezepte aus v1089
+mitgebaut. Der **jüngere** Satz gewinnt — beim überarbeiteten Aurich-Rezept ist
+das wesentlich, denn dort war ein zu weiter Kreisschlüssel entfernt worden.
+
+**Zwei Modelle mit demselben `zweig` unter demselben AGS und demselben
+Berichtsjahr kollidieren** im eindeutigen Schlüssel; eines würde still
+überschrieben. Trennen sie sich nach **Gebiet** → verschiedene AGS, die Kaskade
+löst es. Trennen sie sich nach einem **Merkmal** innerhalb desselben Gebiets →
+EIN Modell mit Kategorienachse. Gefunden bei Hameln-Hannover (2×) und Kreis
+Olpe (2×).
+
+## Bash und Node — Nachträge
+
+- **`grep … | cat || echo` kann nie anschlagen.** Der Rückgabewert einer
+  Pipeline ist der des letzten Glieds. Richtig: erst in eine Datei, dann
+  `grep -c … || true`.
+- **`python3 patch.py | grep -q SKIP` tötet den Doppellauf.** `grep -q` beendet
+  sich beim ersten Treffer, schließt die Pipe, Python stirbt an SIGPIPE — die
+  Prüfung meldet „kein SKIP", obwohl eines kam. Erst in eine Datei, dann greppen.
+- **Auf Prod gibt es kein node auf dem Host.** Nur im Container.
+- **Ein großer Paste-Block braucht eine Zählprüfung.** `wc -l` gegen die
+  erwartete Zeilenzahl, direkt nach dem Heredoc.
+
+## Ernte — Nachträge
+
+- **Die WebFetch-Grenze ist eine Textmenge, keine Seitenzahl.** Gemessen über
+  zehn Läufe: Abbruch zwischen Seite **21 und 55**, unabhängig davon, ob das
+  Dokument 56 oder 157 Seiten hat.
+- **„Ältere Jahrgänge sind kürzer" ist widerlegt** (NRW-Landesbericht 2016
+  bricht früher ab als 2025). **Aber Abbruchseite und Kapitelseite bewegen sich
+  unabhängig** — in Niedersachsen und Brandenburg hat der Jahrgangswechsel je
+  zwei Rezepte gerettet, in NRW keinen einzigen (dort ist die Kapitelfolge fest).
+- **Die Lizenz ist jahrgangsgebunden.** Derselbe NRW-Landesbericht trägt 2016
+  `by-2-0` und 2025 `zero-2-0`. Brandenburg trägt `by-2-0` erst ab Berichtsjahr
+  2018.
+- **Lizenz und Inhaltsverzeichnis im ERSTEN Abruf zusammen lesen.** Spart einen
+  Abruf und verhindert vergebliche Ernte.
+- **Viele Ausschüsse veröffentlichen dieselben Daten zweimal** — das separate
+  Blatt ist oft erreichbar, wo das Kapitel es nicht ist (Kiel). In NRW sind diese
+  Blätter allerdings häufig Bild-PDF ohne Textlayer.
+- **Der größte Hebel ist nicht der Landesbericht, sondern die
+  Verwaltungsvorschrift.** Brandenburgs **VV EW-SW** ist landesweit bindend für
+  alle 18 Gebietskörperschaften und liegt als **HTML** vor — HTML kennt keine
+  Abbruchseite. NRW hat dieselbe Struktur, aber schwächer: die AGVGA-Modelle
+  haben „den Charakter einer Richtlinie". **Deshalb je Bericht messen, ob er
+  sich beruft** — von vier NRW-Ausschüssen tat es einer.
 
 ---
 
-## VI.10 · ROLLOUT-JOURNAL (FORTLAUFEND)
+# 5 · WAS AN TEIL III ZU KORRIGIEREN IST
 
-**Regel:** Nach **jedem** Rollout kommt hier ein Eintrag dazu — neueste zuerst,
-in dieser Datei, nicht in einer neuen. Ein Eintrag hat vier Zeilen: **Was ·
-Commit · Nachweis · Rest.** „Nachweis" ist die Messung, nicht die Absicht. Wo
-kein Nachweis steht, ist der Punkt nicht abgenommen.
+**„Sachwertfaktoren: 21 Ausschüsse erfasst"** — im Register sind es **16
+Zuständigkeitsgebiete plus 2 handgeschriebene Module**. Die Differenz sind
+Rezepte, die zurückgehalten wurden.
 
-| Datum | Was | Commit | Nachweis | Rest |
-|---|---|---|---|---|
-| 13.08. | **`v1161` + DB** — `business`/`enterprise` gelöscht (Marcels Freigabe): erst vier Code-Stellen geräumt, dann die Zeilen | `0a488f5` | Rebuild + Marker im Container (`VALID_PLANS` ohne business); Dump + `BEGIN/ROLLBACK`-Probelauf; danach `plans` 5 Zeilen, API 4 Pläne, **0 Fremdschlüssel-Waisen**, Abos unverändert | **Nur Staging.** Auf Prod erst nach dem `v1161`-Rollout wiederholen — sonst akzeptiert das alte Backend weiter `'business'` |
-| 13.08. | **`v1160`** — Gate zugezogen (Marcels Entscheidung „das Versprechen gilt"): `market_data_fields` und `live_market_rates` bei Free auf `false` | `d0aedab` | Matrix nach der Änderung: free/starter `false`, investor/pro `true` — deckungsgleich mit der Cockpit-Matrix; Syntax auf dem Server ok | **DB führte für Free längst `false`** → `v1160` schließt das **Startfenster** vor der DB-Antwort, nicht mehr |
-| 13.08. | **Plan-Prüflauf (Punkt 6)** — alle drei Wahrheiten gegeneinander gehalten, dazu der DB-Weg | (nur Backlog) | Matrizen **deckungsgleich** (31 Zeilen); `bank_pdf_premium` **toter Schlüssel**; 13 Schlüssel auf `undefined=false`; `business`/`enterprise` mit nur 10/13 Schlüsseln | **Plan-Override greift nicht** (`dp_plan_override='free'` → bleibt `partner`) — Prüflauf je Plan braucht echte Konten |
-| 13.08. | **`v1159`** — im Stapelmodus löste die **Pfeilmitte Löschen aus** (12 px Überlappung); Pfeil nach unten, 20 → 22 px | `c1f71b5` | `elementFromPoint` auf der Pfeilmitte trifft jetzt `sbc-arrow` statt „Löschen"; 5 px Abstand; Aufklappen funktioniert; Kompaktmodus unberührt | 44-px-Trefferfläche bleibt offen — passt nicht in eine 63-px-Karte mit Aktionen oben |
-| 13.08. | **`v1158`/`b`** — Reiter tragen im hellen Modus die Tinte des Aktionen-Menüs (Marcels Vorgabe), als gemeinsames Token `--dp-hell-ink` | `399df3f` | Alle 9 Reiter rgb(20,19,16) = Aktionen-Menü; Goldstrich bleibt; Kopfzeile unverändert; **Obsidian unberührt** | Der Selektor stand **dreimal** in der Datei — die späteste Regel entschied |
-| 13.08. | **`v1157`/`b`** — der Whitelabel-Sweeper verwarf jede Nutzeränderung am **Body-Inline-Stil**: `reset()` spielt bei Akzentwechsel die Originale zurück. Regler schreibt jetzt in ein eigenes Stylesheet | `c2d7e9b` | Rot überlebt den Akzentwechsel (rgb 255,0,0 vor **und** nach); eigene Fehlannahme zum Sweeper-Nebeneffekt im Code zurückgenommen | **Struktureller Befund:** dieselbe Falle trifft jeden Regler am Body-Inline-Stil (u. a. `--dp-obj-text`, die sechs Bereichsfarben) |
-| 13.08. | **`v1156`/`b`/`c`** — Grundfarbe unter aktiver Vorlage sichtbar gesperrt (Marcels Weg B); dabei zwei eigene Fehler behoben | `8cc7af0` | Bedienweg: gesperrt/frei/gesperrt, Hinweistexte korrekt getrennt, `inert` gesetzt, Fokus greift nicht | Sperrtest mit **echten** Mauskoordinaten offen — `el.click()` ist als Prüfmittel untauglich |
-| 13.08. | **`v1155`** — das Darstellungs-Panel färbte sich mit der gewählten Farbe mit (Punkt 4); Tab-Text-Regler war doppelt tot (Punkt 6) | `2347684` | Panel-Überschrift bleibt Gold, Vorschaufläche geht auf Türkis; Tab-Text ging auf rgb(255,0,0) — Regler wirkt | **Halb:** nach einem Akzentwechsel überschreibt etwas den Body-Inline-Stil; Setzer nicht per `setProperty` → `cssText`/`setAttribute` patchen. Punkt 5 braucht eine Entscheidung |
-| 12.08. | **Ankreuzfeld-Abnahme nachgeholt** — die Messung vom Mittag war wertlos (0 von 26 Feldern sichtbar) | (nur Backlog) | 21 Felder über alle Reiter, **alle 33 × 33**, kein Überlauf, bei 1440 **und** 390 px; Zeilen tragen (33/35 px) | eigener Messfehler gefunden und korrigiert: Achsen **getrennt** prüfen — `.main-col` klippt waagerecht, scrollt senkrecht |
-| 12.08. | **Zwischenfall: Server stand auf `main`, fremder Commit auf `staging`** — beide Seiten vereint und gesichert | `ce821e3` | Zweig geprüft (`--abbrev-ref`), Divergenz gelesen (`0a55ee4`, 920 Zeilen v1083 des Parallel-Chats), konfliktfrei gemergt, zurückgepusht; alle 7 eigenen Marker + 3 fremde Dateien vorhanden, mb-Container hatte den Rebuild schon | **Prüfbefehl erweitert** (Zweig + Hash) — steht in `FALLEN.md` Punkt 1 |
-| 12.08. | **`v1154`** — Differenz-Formel stand zweimal (Abbuchung ↔ Auskunft), jetzt eine Funktion. Dazu: „`BEDARF` zusammenführen" **zurückgenommen** — zwei Zwecke, zwei Listen | `99a14db` | node-Beweis über alle 12 Kombinationen; **Rebuild** gefahren, Marker im Container, `/stufenpreis` live identisch | `baustatus` ist ein Pflichtfeld ohne leere Option → kann nie fehlen; Merkposten falls sich das ändert |
-| 12.08. | **`v1153`/`v1153b`** — Klappleiste fürs Handy (Marcels Wahl „C"): 55 px statt 188 px unter 900 px, ab 1024 px unverändert eine Zeile | `7fb691f` | Bedienweg geprüft: auf/zu, 48-px-Zeilen, Wahl klappt zu, „Weiter" lässt offen, Merker hält den Reload | — |
-| 12.08. | **Abrechnung nachgewiesen, ohne Kerosin** — Auskunft und Abbuchung rechnen dieselbe Differenz-Formel; im Log ein echter Vorgang mit 7 L = 12 − 5. Dazu die Handy-Demo der Schrittleiste (drei Fassungen) | `(Doku + Demo)` | `/stufenpreis` und `_kerosinKosten` gegenübergestellt; `ai_credits_log` lesend geprüft; sieben 12-L-Buchungen als **Altdaten vom 02.08.** datiert (vor v1125) | Formel steht an **zwei** Stellen → zusammenführen; Demo blockiert auf Marcels Wahl |
-| 12.08. | **`v1152`** — Stufe 1 war gesperrt, weil `knopfSperren()` gegen `ab` statt `genauerAb` prüfte und so die Stufe-3-Felder `plot`/`units` verlangte | `d17edac` | Beide Richtungen am ausgerollten Stand: Stufe 1 klickbar mit „· 2 L", Stufe 3 weiterhin gesperrt; kein Abruf, kein Kerosin. Reiter-Reihenfolge geprüft und stimmig | zwei Listen derselben Pflichtangaben (`BEDARF` ↔ `VERFAHREN[].pflicht`) gehören zusammengeführt |
-| 12.08. | **`v1151`** — die sieben Wizard-Reiter (902 px) brachen um, weil ihr Behälter bei **jeder** Breite auf 760 px stand; eigene Grenze 960 px | `7c716ab` | Kabine mit `mb-wizard.js?v=1151`: eine Zeile bei 1024/1280/1920, kein Überlauf; 390 px bricht auf vier Zeilen (~188 px) | Handy braucht eine **zweite Darstellung** (Demo-first), nicht die gequetschte erste |
-| 12.08. | **`v1150`/`v1150b`** — die PDF-Fußnote nannte die **Konstante** 1,0 statt des angewandten Faktors (0,925) und trug keine Stufe; jetzt „Sachwertfaktor 0,925 (Stufe A)" bzw. „1,15 (Stufe E · eigene Angabe)" | `e33ea05` | Am ausgelieferten `app.js?v=1150b` geprüft; Fußnote gegen Bericht 73 gerechnet, sechs Fälle inkl. Rückfall und alter Zahlform; `node --check` ok | Hinweistext beim SWF bleibt offen — **sein Anzeigeweg fehlt** (`app.js:612` zeigt ihn nur bei `!marktangepasst`) |
-| 12.08. | **Fehldiagnose zurückgenommen** — „manueller Sachwertfaktor trägt keine Herkunft" war falsch: Stufe E läuft über `WertParameterService` → `nhk2010.js:897` → Karte. Lehre als `FALLEN.md` Punkt 9 | (Doku) | Kette vom Verbraucher her nachgelesen; `v1144` hatte den Weg hergestellt | zwei echte Restlücken: Stufe im **PDF**, Hinweistext beim SWF |
-| 12.08. | **`v1149`** — der § 194-Hinweis stand im PDF auf jeder Seite (7×), steht jetzt nur auf Seite 1 | `6777afe` | Server: `node --check` ok, Marker `v1149-FUSS`, Buster-Kette alle **vier** Glieder auf 1149 | **Sichtnachweis am PDF fehlt** — `exportPdf()` gab bei einem Replay-Bericht keine Textausgabe, Ursache nicht getrennt (Punkt unter „Später") |
-| 12.08. | **Entwurf zu Punkt 3** — Stufen abgegrenzt, Abrechnung geklärt, Herkunftsbefund | `6777afe` | `BEDARF` als eine Quelle gelesen; 22 objektartabhängige Zusatzfelder aufgeschlüsselt; Herkunftsweiche in `CrossCheckService.js` gemessen | **Stufe E an der Zahl** ist der nächste Bauschritt (Backend → Rebuild) |
-| 12.08. | **`v1148`** — der Inhalt wurde bei 1025 px schmaler als bei 1024 px (764 → 645), behoben mit `minmax(0,380px) minmax(764px,1fr)` ab 1025 px | `e4f3066` | Kabine mit Buster `W68`: 1024/1025/1100/1143/1144/1400 px → Inhalt konstant 764, kein Überlauf; eingeklappt weiter `66px 1034px` | Einklapp-Zustand nur per Klasse geprüft — es gibt **kein** Bedienelement (`#dp-sb-toggle` fehlt im DOM), als Punkt unter „Später" |
-| 12.08. | **Tablet-Punkt nachgemessen — kein Code geändert.** A, C und D waren gebaut; der Entwurf hatte nur bei 820 px gemessen | (nur Backlog) | Messreihe 820/900/901/1024/1025/1180 px in der Kabine; `bsheet` per `display:none!important` seit V46 stillgelegt | B (Bild), Admin (Konto), 1025-px-Sprung → wurde `v1148` |
-| 12.08. | **Diese Konsolidierung** — Teil VI, zwei Korrekturen (`style.css`, Handy-Sperre), sechs Regeln | `1a76b38` | Server auf `1a76b38` per `git rev-parse` gegengeprüft; Skript brach wie dokumentiert in Z. 68 ab, Pull von Hand nachgezogen | drei Aufräum-Befunde im Backlog unter „Später" |
-| 12.08. | Übergabe: Einstiegspunkt im Backlog, vier neue Fallen | `6a11a32` | — (Dokumentation) | — |
-| 12.08. | Ankreuzfelder auf 33 px | `674c3b0` → `413d409` | Selektor korrigiert; `#app` existiert nicht | Abnahme mit geladenem Objekt offen |
-| 12.08. | `boris`: alle 16 Länder über verifizierte Landesdienste (v1077–v1082b) | `e35e34b` · Merge `65ca0b0` | 319 Server-Zeilen ins Repo eingesammelt | — |
-| 11.08. | Prod-Rollout Wertermittlung + Objekt-Reiter | `e682367` → `51958c6` | Prod-Abnahme vermerkt (`4ceb915`) | — |
+**„Liegenschaftszinssätze NRW: vollständig"** gilt weiter und jetzt für **zwei
+Jahrgänge** (2024 und 2023).
 
-*(Ältere Rollouts: siehe „CHRONIK — DIE ROLLBACK-KETTE" in Teil V.)*
+**Die Kennzahlen sind nicht mehr zwei.** `ladeAusDb()` liest sieben:
+`liegenschaftszinssatz` · `sachwertfaktor` · `bodenpreisniveau` ·
+`durchschnittspreis` · `preisentwicklung` · `erbbauzinssatz` · `bodenpreisindex`
+· dazu `vergleichsfaktor` (im Auflöser vorhanden, noch ohne freigegebenen Satz).
 
+**Die Streuungsschwelle steht auf 1,55**, nicht 1,5 (`v1090-WSCH`). Grund: der
+Ausschuss Osnabrück-Meppen weist eine Standardabweichung von exakt 1,5
+Prozentpunkten aus und traf die alte Schwelle punktgenau — an dieser Stelle
+widersprachen sich Prosa („ab 1,5") und Code (`stabw > 1.5`). **Eine Schwelle,
+die genau auf einem abgedruckten Wert sitzt, ist keine Schwelle.**
 
+**`ebene = 'gaa'` und `'land'`** kommen im Bestand vor (49 Sätze) und sind gegen
+`param_modell_ebene_check` **nicht gemessen**. Im Speicher unkritisch, vor einem
+Saatlauf in die Datenbank zu klären.
 
+**Ein Saatlauf ist nicht mehr nötig**, um eine neue Ernte wirken zu lassen —
+seit v1095 ergänzen sich Tabelle und Saat je Datensatz. Er wäre nur nötig, um
+eine Ernte **ohne Deploy** wirksam zu machen.
 
+---
 
+# 6 · REZEPT FÜR DIE KONSOLIDIERUNG
 
-### `v1162` / `v1162b` — Hell und Dunkel als zwei Profile · `381e678`
+Am Anfang der nächsten Sitzung, mit dem Originaltext im Zugriff:
 
-**Was.** Ein Schalter „Obsidian / Hell" in Einstellungen → **Profil & Anzeige**.
-Obsidian bleibt der Auslieferungszustand.
+1. `claude/projektanweisung-gesamt-20260812-abend.md` lesen.
+2. Diese Datei Abschnitt für Abschnitt einarbeiten — jeder Punkt nennt seinen
+   Zielabschnitt.
+3. Den Abdeckungsbericht `claude/abdeckung-laender-kreise-20260814.md` als
+   eigenen Abschnitt in Teil III einhängen, **nicht** hineinkopieren; er ändert
+   sich mit jeder Ernte.
+4. Die neue Gesamtfassung schreiben, **danach beide Vorgänger löschen** —
+   nebeneinander erzeugen sie Widersprüche.
+5. Marker-Übersicht aus Abschnitt 1 dieser Datei als Erwartungsliste übernehmen.
 
-**Der helle Modus ist die Vorlage `kanzlei`, kein Skin.** Beweis ist
-`design/mockups/hell.png`: warme helle Kopfleiste (`--uv-chrome #FBFAF7`),
-Serifenschrift, **goldene Reiter**. Goldene Reiter heißt: `dp-chrome-hell` ist
-**aus** — dessen Tinte (`v1158`) wäre dunkel. `panel` ist „Kühl" mit Blaustich
-und im Bild nirgends.
+**Nicht vergessen:** die Fassung vom 12.08. enthält Aussagen, die inzwischen
+falsch sind (493 Sätze, neun Modellformen, zwei Kennzahlen, Schwelle 1,5,
+Prod-Stand `99c1097`). Sie stehen oben mit ihrer Berichtigung. Wer nur die alte
+Fassung liest, arbeitet mit überholten Zahlen.
+---
 
-| Profil | `ui_theme` | `ui_cards` | `dp_chrome_hell` |
+# ES GIBT DREI STÄNDE — NICHT EINEN
+
+**Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
+jeder führt seine eigene Projektanweisung. **Diese Datei ist der Haupt-App-Strang.**
+
+| Stand | Strang | Nummern | Inhalt |
 |---|---|---|---|
-| Obsidian | `''` | `''` | `0` |
-| Hell | `kanzlei` | `''` | `0` |
+| Gesamtfassung 12.08. (~2.700 Z.) | Marktbericht | v1077–v1083b | Register, Wertermittlung, amtliche Daten, Ernte |
+| `claude/projektanweisung-nachtrag-20260814.md` | Marktbericht | v1084–v1096a | Fortschreibung dazu |
+| **diese Datei** | **Haupt-App** | **v1148–v1172** | Darstellung, Profile, Plan-Gate, Spracheingabe |
 
-**Nachweis.** Echte Klicks, `settings.js?v=v1162b`: nach „Hell" Kopfleiste und
-Sidebar `rgb(251,250,247)`, Reiter golden, Vorlage `kanzlei`; nach „Obsidian"
-Sidebar `rgb(10,10,10)`, Vorlage leer. Bei einer dritten Vorlage ist **kein**
-Profil markiert — gemessen (`aktiv: null` bei `panel`).
+**Marcels Nachtrag nennt diesen Strang beim Namen:** *„der Parallel-Chat
+v1158–v1171 (Hell/Dunkel, Spracheingabe, Plan-Gate, Beleg-Import)."* Beide
+Stände waren mit `74ae2e3` auf Prod.
 
-**Die Lehre, teuer bezahlt in `v1162`:**
-> **`_dpDispSkin` löscht die Vorlage.** Es ruft `vorlageNachziehen()`, und das
-> setzt `dp_user_settings.ui_theme` auf `''`, wenn die aktive Vorlage der neuen
-> Helligkeit widerspricht. Wer Vorlage **und** Skin in einem Griff setzt, muss
-> **erst den Skin schalten, dann die Vorlage** — sonst löscht der Skin, was
-> eine Zeile vorher gesetzt wurde. Ich hatte das im eigenen Kommentar richtig
-> stehen und im Code falsch gebaut.
+> **Ein „Widerspruch" zwischen den Dateien ist meist nur der andere Strang.**
+> Vier bekannte Scheinwidersprüche stehen am Ende des Nachtrags tabelliert —
+> darunter „zwei `style.css`" (für die Haupt-App falsch: `index.html:38` lädt
+> `css/style.css`, `frontend/style.css` ist eine Leiche) und „Handy-Sperre
+> aktiv" (mit `v1118` aufgehoben). **Vor dem Melden prüfen, welcher Strang die
+> Aussage besitzt.**
 
-**Rest.** „Je Profil eigene Werte" über `brand_display` fehlt — `ui_cards` wird
-heute hart überschrieben. Markierung beim programmatischen Öffnen fehlt.
-
-### `v1163` — Plan-Prüfmodus · `a4107d0`
-
-**Was.** Der Plan-Override wirkt jetzt — aber **nur nach unten**.
-`dp_plan_override` auf einen niedrigeren Plan setzen, neu laden, durchklicken;
-`localStorage.removeItem('dp_plan_override')` hebt ihn auf.
-
-**Warum er vorher nicht wirkte.** `getCurrentPlanKey()` (`config.js`) fragte
-**zuerst** `Sub.getCurrentSync()`; ein echtes Abo im Cache gewann immer. Der
-Override war nie tot, er stand hinten in der Reihenfolge.
-
-**Warum nicht einfach Vorrang.** Das hätte jeden Nutzer mit einer
-Konsolenzeile auf `partner` gehoben. Rangordnung
-`free < starter < investor < pro < partner`, strikt kleiner.
-
-**Die Stelle, die man übersieht:** `hasFeature` fragt zuerst
-`Sub.hasCachedFeature` — die DB-Features des **echten** Abos. Ohne
-Sonderbehandlung zeigt die Oberfläche den simulierten Plan und schaltet die
-Funktionen des echten frei. **Das sieht aus wie ein bestandener Test.** Im
-Prüfmodus wird der DB-Weg übersprungen; eine Quelle für beide Leser
-(`pruefOverride`).
-
-**Grenzen, die zum Werkzeug gehören:** simuliert wird das Frontend-Gate, nicht
-die Backend-Durchsetzung; und es gilt der `config.js`-Fallback des simulierten
-Plans, nicht dessen DB-Zeile.
-
-**Nebenertrag — B3 entwarnt.** Alle 26 im Frontend abgefragten
-Feature-Schlüssel gegen die 37 in Plänen definierten gehalten: **keiner fehlt.**
-Ein Tippfehler, der still den teuersten Plan sperrt, existiert nicht.
-
-> **Lehre, zwei Fehlbefunde teuer:** Feature-Schlüssel **nie** über Namenslisten
-> diffen. `_gate('[data-feature="a"], [data-feature="b"]', 'b')` trennt Selektor
-> und Schlüssel — ein grep über beide wirft sie zusammen und erfindet Dreher,
-> die es nicht gibt. Und eine Probe auf einen erfundenen Schlüssel liefert
-> immer `false`, weil unbekannt = false. **Aufrufstelle lesen, nicht Namen
-> vergleichen.**
-
-### Prüfergebnis: die sieben Pro-Tage (`TR7-trial`) — kein Umbau
-
-**Sie sind eingebaut.** Ich hatte im Prüflauf geschrieben, ich könne das nicht
-bestätigen — **das war falsch, weil ich in meinen Unterlagen gesucht habe statt
-im Code.**
-
-**Nicht am Starter, sondern ab Registrierung:** jeder neue Nutzer bekommt eine
-`plan_trials`-Zeile mit `granted_plan='pro'`, `expires_at = NOW() + 7 days`.
-Vergeben in `userService.js:42` (der Trichter) und `auth.js:69`,
-Mehrfachvergabe per `WHERE NOT EXISTS` ausgeschlossen, Auslaufen automatisch
-über `expires_at`. Ein Fehlschlag wird geloggt und bricht die Registrierung
-nicht ab.
-
-**Vier bewusste Abweichungen von rohem Pro:** bezahltes Abo schlägt die
-Testphase · `export_csv`/`json_backup`/`excel_import` bleiben aus · KI-Kontingent
-auf Free-Niveau · Wasserzeichen bleibt aktiv.
-
-**Nach Tag 7 wird nichts unerreichbar.** `requireUnderLimit('objects')` hängt an
-**genau einer Stelle**: `objects.js:73`, `router.post('/')`. Nur das **Anlegen**
-ist begrenzt — Lesen, Listen, Ändern nicht. Objektlimits: free 1 · starter 5 ·
-investor 25 · pro/partner `-1`.
-
-> **Lehre:** „Steht nicht in meinen Unterlagen" ist kein Befund. Das ist
-> `FALLEN.md` Punkt 9 zum vierten Mal — diesmal gegen ein Feature, das Marcel
-> selbst genannt hatte. **Wenn er sagt, etwas sei gebaut, im Code nachsehen.**
-
-### `v1164` — Objektnummer im Kopf, Kontrast · `bb44d8d`
-
-**Backlog-Punkt 9, und es war der Rest eines halb erledigten Punkts.** Der Punkt
-nannte 2,98 / 2,88; gemessen wurden **3,88 (kanzlei) / 3,72 (boarding)** — die
-Regel hatte längst gewirkt, nur nicht weit genug. Kleiner Text (10,5 px / 700)
-braucht 4,5.
-
-**Gelöst über den Token:** `--uv-marke-dd` war nur ein Alias auf `--uv-marke-d`.
-Jetzt `color-mix(in srgb, var(--uv-marke-d) 82%, #000)` — **relativ zum
-Markenton**, damit ein Whitelabel-Rot Rot bleibt und nur dunkler wird. Ein festes
-Gold hätte die Mandantenmarke an sechs Stellen überschrieben.
-
-Ergebnis: kanzlei **5,38**, boarding **5,16**. Alle sechs Leser des Tokens stehen
-auf hellem Grund, keiner auf dunklem — deshalb gilt es für alle.
-
-**Drei Werkzeugfallen aus diesem Lauf stehen jetzt in `FALLEN.md` Punkt 10** —
-`color(srgb …)` statt `rgb()`, Verläufe im Grund-Leser, und der eigene
-halbtransparente Hintergrund des gemessenen Elements.
-
-### `v1165` — Garagenfeld im Marktbericht · `b9e7851`
-
-**Backlog-Punkt 10 war als „blockiert" markiert — der Widerspruch darunter war
-es nicht.** Die Feldhilfe (v1142) sagte „bei einer Eigentumswohnung nur der
-eigene Anteil", der Platzhalter sagte „alle Garagen zusammen". **Sichtbar ist
-der Platzhalter**; die Hilfe muss man aufklappen. Der Nutzer trug also die
-Gesamtfläche ein — und `lib/nhk2010.js` kennt weder `mea` noch `ist_wohnung`,
-kürzt also nichts. Am Prüfobjekt Hüllhorst 64,58 m² für eine von drei
-Einheiten, bis zu ~18.500 € zu viel.
-
-> **Lehre, allgemein:** Ein Punkt, der auf eine Entscheidung wartet, kann
-> trotzdem Anteile haben, die **keine** brauchen. Bevor „blockiert" stehen
-> bleibt: nachsehen, ob darunter etwas liegt, das in **jedem** Ausgang der
-> Entscheidung richtig ist. Zwei Texte, die sich widersprechen, sind so ein
-> Fall — einer ist falsch, egal wie entschieden wird.
-
-**Cache-Buster:** die Marktbericht-Kette hat **drei** Glieder, die zusammen
-gezogen werden müssen — `frontend/index.html` → `marktbericht-view.js` (die
-iframe-URL **im** Skript) → `marktbericht-app/index.html`.
-
-### `v1166` — Hinweis am Garagenfeld · `c9779df`
-
-Erscheint, wenn ein **Miteigentumsanteil gepflegt** ist **und** eine
-Garagenfläche steht: *„Der Miteigentumsanteil wird hier nicht abgezogen —
-anders als beim Bodenwert. Steht dort der eigene Anteil?"*
-
-**Keine Schwelle, keine Rechnung.** Die Garage folgt in der Teilungserklärung
-meist einem eigenen Anteil oder einem Sondernutzungsrecht, nicht dem
-Wohnungs-MEA — eine automatische Kürzung wäre in **beide** Richtungen falsch.
-Gefragt wird, nicht gerechnet.
-
-**Empfehlung zur offenen Frage aus Punkt 10: Weg A** (Feld bleibt
-wohnungsbezogen). Das Modell ist an allen anderen Stellen bereits
-wohnungsbezogen; die Garage wäre bei B der einzige Sonderweg. Die Entscheidung
-liegt weiterhin bei Marcel.
-
-> **Zwei Einbaufallen, die hier gelten und anderswo auch:**
-> `zeichnen()` baut die Blöcke neu auf — ein davor angehängtes Element ist
-> still wieder weg; also **nach** dem Neuzeichnen einhängen. Und für
-> `.wm-f small` gibt es in der Marktbericht-App **keine** Regel: ein blankes
-> `<small>` erbt, was zufällig da ist. Eigene Darstellung mitgeben.
-
-### `v1167` — die zwei Reste des Profil-Schalters · `c1d572b`
-
-**Punkt 5 ist damit vollständig.**
-
-**Je Profil eigene Werte.** `dp_profil_werte` merkt für `hell` und `obsidian`
-getrennt `ui_cards`, `ui_surface`, `ui_form`. **Nur diese drei** — `ui_accent`
-und `ui_obsidian` sind Markenfarben und gelten in beiden Profilen. Gesichert
-wird nur, wenn wirklich ein Profil aktiv war; bei einer dritten Vorlage gehört
-der Stand zu keinem der zwei.
-
-Gemessen: Obsidian + Wallet → Hell → zurück → **Wallet ist wieder da.**
-
-**Markierung beim Öffnen.** `markieren()` hing nur am Klick; wer das Pane
-öffnete, sah zwei ungedrückte Knöpfe, obwohl einer galt. `_dpProfilMarkieren`
-existierte längst und wurde nur nie beim Öffnen gerufen.
-
-### `v1168` — Checkboxen per Sprache · `77be07f`
-
-**Backlog-Punkt 7, Rest 1.** Beide Katalogbauer schlossen `type="checkbox"`
-aus. Die Freigabe allein hätte nichts bewirkt — **vier Stellen** mussten mit,
-jede hätte still versagt:
-
-1. **Backend-Whitelist** `voiceExtractService:51` — `kind` wird gegen eine
-   feste Liste geprüft; `bool` wäre **still auf `text`** gefallen.
-2. **Prompt-Zeile** — sonst rät das Modell zwischen `true`, `"ja"`, `1`.
-3. **Normalisierung in beiden Auswertepfaden.**
-4. **`applyMerged()`** in `object-actions.js` — `setInput()` schreibt in
-   `.value` und lässt ein Häkchen unberührt; es wäre als übernommen
-   **gezählt** worden, ohne gesetzt zu sein.
-
-> **Die Regel, die dabei am meisten wert ist:** Es kommt **nur JA** durch. Ein
-> „nein" wird verworfen statt als `false` übernommen — sonst hakt ein
-> beiläufiges „einen Stellplatz gibt es nicht" ein Feld **aktiv ab**, das der
-> Nutzer nie angefasst hat. Die Import-Tabelle zeigt nur, was gesetzt wird;
-> ein stilles Abhaken wäre dort unsichtbar.
-
-**Und der Maßstab:** 203 Felder, **genau eine Checkbox** (`san_tax_active`).
-Die Änderung ist vollständig, betrifft heute aber ein Feld — das Formular löst
-Ja/Nein sonst über Selects. **Erst zählen, dann schätzen.**
-
-**Backend geändert → Rebuild.** Vier Marker im laufenden Container geprüft.
-
-### `v1169` — Spracheingabe: Tempo und Stichwort-Fenster · `a78ab83`
-
-**Vier Modelle pro Aufnahme:** Transkription · Live-Zwischenauswertung
-(`gpt-4o-mini`) · Feldauswertung (`gpt-5.5`) · Verifikation (`gpt-5.4-mini`).
-Wer die Spracheingabe beschleunigen will, fängt hier an.
-
-**Der erste Fund:** Der Transkriptions-Default stand auf
-`gpt-4o-transcribe-diarize`. **Diarisierung trennt Sprecher voneinander** —
-beim Diktat ins eigene Mikrofon spricht eine Person. Der Dateikopf nannte als
-Default ohnehin `gpt-4o-mini-transcribe`; **Code und Doku waren auseinander,
-und der Code hatte das teurere gewonnen.** Jetzt korrigiert, weiter über
-`OPENAI_TRANSCRIBE_MODEL` überschreibbar.
-
-**Stichwort-Fenster statt Wolke.** Höchstens neun Chips sichtbar; ein
-erkanntes bleibt 900 ms grün stehen, geht dann weg, von hinten rückt eins nach.
-
-> **Warum nur die Sichtbarkeit geändert wurde:** `updateChipsFromText`,
-> `markChipsFinal` und die Gruppen-Navigation suchen per Selektor
-> `.vi-chip[data-cid=…]`. **Wer dort Elemente aus dem DOM entfernt, bricht drei
-> Stellen still.** Und der Fortschrittszähler muss weiter alle zählen, sonst
-> steht dort dauerhaft „9".
-
-**Offen:** Um wie viel die Transkription schneller wird, ist nicht gemessen —
-dafür braucht es einen Sprechlauf. Die weiteren Hebel wären der
-Verifikations-Pass (zweiter Aufruf) und `gpt-5.5` in der Feldauswertung; beides
-Qualitätsfragen, nicht einseitig zu entscheiden.
-
-### `v1170` — Verifikations-Pass aus · `ecd5be2`
-
-**Marcels Entscheidung**, um Tempo zu gewinnen. Der Pass (v522) ist ein
-**vollständiger zweiter KI-Aufruf**: Transkript **und** Erstergebnis gehen noch
-einmal weg und werden gegengeprüft. Er kostet damit etwa so viel Wartezeit wie
-die Auswertung selbst — **der größte einzelne Hebel**.
-
-**Nicht gelöscht, nur abgeschaltet.** Den Schalter `OPENAI_VOICE_VERIFY` gab es
-bereits, nur stand der Standard auf „an". Der Code bleibt vollständig und läuft
-wieder, sobald die Variable auf `1` gesetzt wird.
-
-**Nachweis, der zählt:** `printenv OPENAI_VOICE_VERIFY` **im Container** ist
-leer — der neue Default greift wirklich. Stünde dort eine `1`, wäre die
-Änderung wirkungslos gewesen und hätte trotzdem nach Erfolg ausgesehen.
-
-> **Wenn die Qualität sichtbar nachlässt** — falsch zugeordnete Zahlen,
-> verwechselte Felder —, ist das die **erste** Stellschraube: Variable auf `1`,
-> Rebuild. Dann war der Pass sein Geld wert.
-
-**Damit laufen noch zwei Modelle je Aufnahme** (Transkription + Auswertung)
-statt vier. Der verbleibende Hebel wäre `gpt-5.5` in der Feldauswertung.
+**Die Gesamtfassung vom 12.08. liegt NICHT im Repo.** Marcel hat den Volltext im
+Chat geliefert; 2.700 Zeilen wurden aus dem verbleibenden Kontext nicht
+herausgeschrieben. **Erster Schritt der Konsolidierung: die Datei von ihm
+anfordern.** Das Rezept steht in Abschnitt 6 des Nachtrags — dort um diesen
+dritten Strang ergänzt, denn Marcels Fassung kennt nur zwei.
