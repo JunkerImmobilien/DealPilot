@@ -257,7 +257,23 @@ export const STREUUNG_SCHWELLE_PCT = Number(process.env.LZS_STREUUNG_SCHWELLE ||
  * 1,1 Pp liegt UNTER 1,5 Pp — der Wert bleibt jetzt Stufe A. Die Spanne
  * 1,1 bis 3,3 % wird weiterhin ausgewiesen; sie verschwindet nicht, sie
  * entwertet den Wert nur nicht mehr. */
-export const STREUUNG_SCHWELLE_PP = Number(process.env.LZS_STREUUNG_SCHWELLE_PP || 1.5);
+/* v1090-WSCH · 1,55 statt 1,5 — Marcels Festlegung vom 13.08.2026.
+ *
+ * Der Gutachterausschuss Osnabrueck-Meppen weist eine Standardabweichung von
+ * EXAKT 1,5 Prozentpunkten aus und traf damit die alte Schwelle punktgenau.
+ * An dieser Stelle widersprachen sich Prosa und Code:
+ *
+ *   Projektanweisung:  "Wohnen absolut, ab 1,5 Punkten"   (einschliessend)
+ *   diese Datei:       stabw > STREUUNG_SCHWELLE_PP        (ausschliessend)
+ *
+ * Mit 1,55 ist die Frage gegenstandslos: 1,5 liegt eindeutig darunter und
+ * bleibt Stufe A. Inhaltlich verschiebt sich nichts — betroffen waren nur
+ * die Grenzfaelle, deren Stufe vorher vom Vergleichsoperator abhing statt
+ * von einer Festlegung.
+ *
+ * EINE SCHWELLE, DIE GENAU AUF EINEM ABGEDRUCKTEN WERT SITZT, IST KEINE
+ * SCHWELLE. Sie ist ein Muenzwurf mit dem Vergleichsoperator. */
+export const STREUUNG_SCHWELLE_PP = Number(process.env.LZS_STREUUNG_SCHWELLE_PP || 1.55);
 
 /** Teilmaerkte, fuer die die ABSOLUTE Schwelle gilt. Alles andere relativ. */
 const WOHNEN = new Set([

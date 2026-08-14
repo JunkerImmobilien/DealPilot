@@ -3209,6 +3209,11 @@ kein Nachweis steht, ist der Punkt nicht abgenommen.
 
 | Datum | Was | Commit | Nachweis | Rest |
 |---|---|---|---|---|
+| 13.08. | **`v1161` + DB** — `business`/`enterprise` gelöscht (Marcels Freigabe): erst vier Code-Stellen geräumt, dann die Zeilen | `0a488f5` | Rebuild + Marker im Container (`VALID_PLANS` ohne business); Dump + `BEGIN/ROLLBACK`-Probelauf; danach `plans` 5 Zeilen, API 4 Pläne, **0 Fremdschlüssel-Waisen**, Abos unverändert | **Nur Staging.** Auf Prod erst nach dem `v1161`-Rollout wiederholen — sonst akzeptiert das alte Backend weiter `'business'` |
+| 13.08. | **`v1160`** — Gate zugezogen (Marcels Entscheidung „das Versprechen gilt"): `market_data_fields` und `live_market_rates` bei Free auf `false` | `d0aedab` | Matrix nach der Änderung: free/starter `false`, investor/pro `true` — deckungsgleich mit der Cockpit-Matrix; Syntax auf dem Server ok | **DB führte für Free längst `false`** → `v1160` schließt das **Startfenster** vor der DB-Antwort, nicht mehr |
+| 13.08. | **Plan-Prüflauf (Punkt 6)** — alle drei Wahrheiten gegeneinander gehalten, dazu der DB-Weg | (nur Backlog) | Matrizen **deckungsgleich** (31 Zeilen); `bank_pdf_premium` **toter Schlüssel**; 13 Schlüssel auf `undefined=false`; `business`/`enterprise` mit nur 10/13 Schlüsseln | **Plan-Override greift nicht** (`dp_plan_override='free'` → bleibt `partner`) — Prüflauf je Plan braucht echte Konten |
+| 13.08. | **`v1159`** — im Stapelmodus löste die **Pfeilmitte Löschen aus** (12 px Überlappung); Pfeil nach unten, 20 → 22 px | `c1f71b5` | `elementFromPoint` auf der Pfeilmitte trifft jetzt `sbc-arrow` statt „Löschen"; 5 px Abstand; Aufklappen funktioniert; Kompaktmodus unberührt | 44-px-Trefferfläche bleibt offen — passt nicht in eine 63-px-Karte mit Aktionen oben |
+| 13.08. | **`v1158`/`b`** — Reiter tragen im hellen Modus die Tinte des Aktionen-Menüs (Marcels Vorgabe), als gemeinsames Token `--dp-hell-ink` | `399df3f` | Alle 9 Reiter rgb(20,19,16) = Aktionen-Menü; Goldstrich bleibt; Kopfzeile unverändert; **Obsidian unberührt** | Der Selektor stand **dreimal** in der Datei — die späteste Regel entschied |
 | 13.08. | **`v1157`/`b`** — der Whitelabel-Sweeper verwarf jede Nutzeränderung am **Body-Inline-Stil**: `reset()` spielt bei Akzentwechsel die Originale zurück. Regler schreibt jetzt in ein eigenes Stylesheet | `c2d7e9b` | Rot überlebt den Akzentwechsel (rgb 255,0,0 vor **und** nach); eigene Fehlannahme zum Sweeper-Nebeneffekt im Code zurückgenommen | **Struktureller Befund:** dieselbe Falle trifft jeden Regler am Body-Inline-Stil (u. a. `--dp-obj-text`, die sechs Bereichsfarben) |
 | 13.08. | **`v1156`/`b`/`c`** — Grundfarbe unter aktiver Vorlage sichtbar gesperrt (Marcels Weg B); dabei zwei eigene Fehler behoben | `8cc7af0` | Bedienweg: gesperrt/frei/gesperrt, Hinweistexte korrekt getrennt, `inert` gesetzt, Fokus greift nicht | Sperrtest mit **echten** Mauskoordinaten offen — `el.click()` ist als Prüfmittel untauglich |
 | 13.08. | **`v1155`** — das Darstellungs-Panel färbte sich mit der gewählten Farbe mit (Punkt 4); Tab-Text-Regler war doppelt tot (Punkt 6) | `2347684` | Panel-Überschrift bleibt Gold, Vorschaufläche geht auf Türkis; Tab-Text ging auf rgb(255,0,0) — Regler wirkt | **Halb:** nach einem Akzentwechsel überschreibt etwas den Body-Inline-Stil; Setzer nicht per `setProperty` → `cssText`/`setAttribute` patchen. Punkt 5 braucht eine Entscheidung |
@@ -3237,3 +3242,249 @@ kein Nachweis steht, ist der Punkt nicht abgenommen.
 
 
 
+
+### `v1162` / `v1162b` — Hell und Dunkel als zwei Profile · `381e678`
+
+**Was.** Ein Schalter „Obsidian / Hell" in Einstellungen → **Profil & Anzeige**.
+Obsidian bleibt der Auslieferungszustand.
+
+**Der helle Modus ist die Vorlage `kanzlei`, kein Skin.** Beweis ist
+`design/mockups/hell.png`: warme helle Kopfleiste (`--uv-chrome #FBFAF7`),
+Serifenschrift, **goldene Reiter**. Goldene Reiter heißt: `dp-chrome-hell` ist
+**aus** — dessen Tinte (`v1158`) wäre dunkel. `panel` ist „Kühl" mit Blaustich
+und im Bild nirgends.
+
+| Profil | `ui_theme` | `ui_cards` | `dp_chrome_hell` |
+|---|---|---|---|
+| Obsidian | `''` | `''` | `0` |
+| Hell | `kanzlei` | `''` | `0` |
+
+**Nachweis.** Echte Klicks, `settings.js?v=v1162b`: nach „Hell" Kopfleiste und
+Sidebar `rgb(251,250,247)`, Reiter golden, Vorlage `kanzlei`; nach „Obsidian"
+Sidebar `rgb(10,10,10)`, Vorlage leer. Bei einer dritten Vorlage ist **kein**
+Profil markiert — gemessen (`aktiv: null` bei `panel`).
+
+**Die Lehre, teuer bezahlt in `v1162`:**
+> **`_dpDispSkin` löscht die Vorlage.** Es ruft `vorlageNachziehen()`, und das
+> setzt `dp_user_settings.ui_theme` auf `''`, wenn die aktive Vorlage der neuen
+> Helligkeit widerspricht. Wer Vorlage **und** Skin in einem Griff setzt, muss
+> **erst den Skin schalten, dann die Vorlage** — sonst löscht der Skin, was
+> eine Zeile vorher gesetzt wurde. Ich hatte das im eigenen Kommentar richtig
+> stehen und im Code falsch gebaut.
+
+**Rest.** „Je Profil eigene Werte" über `brand_display` fehlt — `ui_cards` wird
+heute hart überschrieben. Markierung beim programmatischen Öffnen fehlt.
+
+### `v1163` — Plan-Prüfmodus · `a4107d0`
+
+**Was.** Der Plan-Override wirkt jetzt — aber **nur nach unten**.
+`dp_plan_override` auf einen niedrigeren Plan setzen, neu laden, durchklicken;
+`localStorage.removeItem('dp_plan_override')` hebt ihn auf.
+
+**Warum er vorher nicht wirkte.** `getCurrentPlanKey()` (`config.js`) fragte
+**zuerst** `Sub.getCurrentSync()`; ein echtes Abo im Cache gewann immer. Der
+Override war nie tot, er stand hinten in der Reihenfolge.
+
+**Warum nicht einfach Vorrang.** Das hätte jeden Nutzer mit einer
+Konsolenzeile auf `partner` gehoben. Rangordnung
+`free < starter < investor < pro < partner`, strikt kleiner.
+
+**Die Stelle, die man übersieht:** `hasFeature` fragt zuerst
+`Sub.hasCachedFeature` — die DB-Features des **echten** Abos. Ohne
+Sonderbehandlung zeigt die Oberfläche den simulierten Plan und schaltet die
+Funktionen des echten frei. **Das sieht aus wie ein bestandener Test.** Im
+Prüfmodus wird der DB-Weg übersprungen; eine Quelle für beide Leser
+(`pruefOverride`).
+
+**Grenzen, die zum Werkzeug gehören:** simuliert wird das Frontend-Gate, nicht
+die Backend-Durchsetzung; und es gilt der `config.js`-Fallback des simulierten
+Plans, nicht dessen DB-Zeile.
+
+**Nebenertrag — B3 entwarnt.** Alle 26 im Frontend abgefragten
+Feature-Schlüssel gegen die 37 in Plänen definierten gehalten: **keiner fehlt.**
+Ein Tippfehler, der still den teuersten Plan sperrt, existiert nicht.
+
+> **Lehre, zwei Fehlbefunde teuer:** Feature-Schlüssel **nie** über Namenslisten
+> diffen. `_gate('[data-feature="a"], [data-feature="b"]', 'b')` trennt Selektor
+> und Schlüssel — ein grep über beide wirft sie zusammen und erfindet Dreher,
+> die es nicht gibt. Und eine Probe auf einen erfundenen Schlüssel liefert
+> immer `false`, weil unbekannt = false. **Aufrufstelle lesen, nicht Namen
+> vergleichen.**
+
+### Prüfergebnis: die sieben Pro-Tage (`TR7-trial`) — kein Umbau
+
+**Sie sind eingebaut.** Ich hatte im Prüflauf geschrieben, ich könne das nicht
+bestätigen — **das war falsch, weil ich in meinen Unterlagen gesucht habe statt
+im Code.**
+
+**Nicht am Starter, sondern ab Registrierung:** jeder neue Nutzer bekommt eine
+`plan_trials`-Zeile mit `granted_plan='pro'`, `expires_at = NOW() + 7 days`.
+Vergeben in `userService.js:42` (der Trichter) und `auth.js:69`,
+Mehrfachvergabe per `WHERE NOT EXISTS` ausgeschlossen, Auslaufen automatisch
+über `expires_at`. Ein Fehlschlag wird geloggt und bricht die Registrierung
+nicht ab.
+
+**Vier bewusste Abweichungen von rohem Pro:** bezahltes Abo schlägt die
+Testphase · `export_csv`/`json_backup`/`excel_import` bleiben aus · KI-Kontingent
+auf Free-Niveau · Wasserzeichen bleibt aktiv.
+
+**Nach Tag 7 wird nichts unerreichbar.** `requireUnderLimit('objects')` hängt an
+**genau einer Stelle**: `objects.js:73`, `router.post('/')`. Nur das **Anlegen**
+ist begrenzt — Lesen, Listen, Ändern nicht. Objektlimits: free 1 · starter 5 ·
+investor 25 · pro/partner `-1`.
+
+> **Lehre:** „Steht nicht in meinen Unterlagen" ist kein Befund. Das ist
+> `FALLEN.md` Punkt 9 zum vierten Mal — diesmal gegen ein Feature, das Marcel
+> selbst genannt hatte. **Wenn er sagt, etwas sei gebaut, im Code nachsehen.**
+
+### `v1164` — Objektnummer im Kopf, Kontrast · `bb44d8d`
+
+**Backlog-Punkt 9, und es war der Rest eines halb erledigten Punkts.** Der Punkt
+nannte 2,98 / 2,88; gemessen wurden **3,88 (kanzlei) / 3,72 (boarding)** — die
+Regel hatte längst gewirkt, nur nicht weit genug. Kleiner Text (10,5 px / 700)
+braucht 4,5.
+
+**Gelöst über den Token:** `--uv-marke-dd` war nur ein Alias auf `--uv-marke-d`.
+Jetzt `color-mix(in srgb, var(--uv-marke-d) 82%, #000)` — **relativ zum
+Markenton**, damit ein Whitelabel-Rot Rot bleibt und nur dunkler wird. Ein festes
+Gold hätte die Mandantenmarke an sechs Stellen überschrieben.
+
+Ergebnis: kanzlei **5,38**, boarding **5,16**. Alle sechs Leser des Tokens stehen
+auf hellem Grund, keiner auf dunklem — deshalb gilt es für alle.
+
+**Drei Werkzeugfallen aus diesem Lauf stehen jetzt in `FALLEN.md` Punkt 10** —
+`color(srgb …)` statt `rgb()`, Verläufe im Grund-Leser, und der eigene
+halbtransparente Hintergrund des gemessenen Elements.
+
+### `v1165` — Garagenfeld im Marktbericht · `b9e7851`
+
+**Backlog-Punkt 10 war als „blockiert" markiert — der Widerspruch darunter war
+es nicht.** Die Feldhilfe (v1142) sagte „bei einer Eigentumswohnung nur der
+eigene Anteil", der Platzhalter sagte „alle Garagen zusammen". **Sichtbar ist
+der Platzhalter**; die Hilfe muss man aufklappen. Der Nutzer trug also die
+Gesamtfläche ein — und `lib/nhk2010.js` kennt weder `mea` noch `ist_wohnung`,
+kürzt also nichts. Am Prüfobjekt Hüllhorst 64,58 m² für eine von drei
+Einheiten, bis zu ~18.500 € zu viel.
+
+> **Lehre, allgemein:** Ein Punkt, der auf eine Entscheidung wartet, kann
+> trotzdem Anteile haben, die **keine** brauchen. Bevor „blockiert" stehen
+> bleibt: nachsehen, ob darunter etwas liegt, das in **jedem** Ausgang der
+> Entscheidung richtig ist. Zwei Texte, die sich widersprechen, sind so ein
+> Fall — einer ist falsch, egal wie entschieden wird.
+
+**Cache-Buster:** die Marktbericht-Kette hat **drei** Glieder, die zusammen
+gezogen werden müssen — `frontend/index.html` → `marktbericht-view.js` (die
+iframe-URL **im** Skript) → `marktbericht-app/index.html`.
+
+### `v1166` — Hinweis am Garagenfeld · `c9779df`
+
+Erscheint, wenn ein **Miteigentumsanteil gepflegt** ist **und** eine
+Garagenfläche steht: *„Der Miteigentumsanteil wird hier nicht abgezogen —
+anders als beim Bodenwert. Steht dort der eigene Anteil?"*
+
+**Keine Schwelle, keine Rechnung.** Die Garage folgt in der Teilungserklärung
+meist einem eigenen Anteil oder einem Sondernutzungsrecht, nicht dem
+Wohnungs-MEA — eine automatische Kürzung wäre in **beide** Richtungen falsch.
+Gefragt wird, nicht gerechnet.
+
+**Empfehlung zur offenen Frage aus Punkt 10: Weg A** (Feld bleibt
+wohnungsbezogen). Das Modell ist an allen anderen Stellen bereits
+wohnungsbezogen; die Garage wäre bei B der einzige Sonderweg. Die Entscheidung
+liegt weiterhin bei Marcel.
+
+> **Zwei Einbaufallen, die hier gelten und anderswo auch:**
+> `zeichnen()` baut die Blöcke neu auf — ein davor angehängtes Element ist
+> still wieder weg; also **nach** dem Neuzeichnen einhängen. Und für
+> `.wm-f small` gibt es in der Marktbericht-App **keine** Regel: ein blankes
+> `<small>` erbt, was zufällig da ist. Eigene Darstellung mitgeben.
+
+### `v1167` — die zwei Reste des Profil-Schalters · `c1d572b`
+
+**Punkt 5 ist damit vollständig.**
+
+**Je Profil eigene Werte.** `dp_profil_werte` merkt für `hell` und `obsidian`
+getrennt `ui_cards`, `ui_surface`, `ui_form`. **Nur diese drei** — `ui_accent`
+und `ui_obsidian` sind Markenfarben und gelten in beiden Profilen. Gesichert
+wird nur, wenn wirklich ein Profil aktiv war; bei einer dritten Vorlage gehört
+der Stand zu keinem der zwei.
+
+Gemessen: Obsidian + Wallet → Hell → zurück → **Wallet ist wieder da.**
+
+**Markierung beim Öffnen.** `markieren()` hing nur am Klick; wer das Pane
+öffnete, sah zwei ungedrückte Knöpfe, obwohl einer galt. `_dpProfilMarkieren`
+existierte längst und wurde nur nie beim Öffnen gerufen.
+
+### `v1168` — Checkboxen per Sprache · `77be07f`
+
+**Backlog-Punkt 7, Rest 1.** Beide Katalogbauer schlossen `type="checkbox"`
+aus. Die Freigabe allein hätte nichts bewirkt — **vier Stellen** mussten mit,
+jede hätte still versagt:
+
+1. **Backend-Whitelist** `voiceExtractService:51` — `kind` wird gegen eine
+   feste Liste geprüft; `bool` wäre **still auf `text`** gefallen.
+2. **Prompt-Zeile** — sonst rät das Modell zwischen `true`, `"ja"`, `1`.
+3. **Normalisierung in beiden Auswertepfaden.**
+4. **`applyMerged()`** in `object-actions.js` — `setInput()` schreibt in
+   `.value` und lässt ein Häkchen unberührt; es wäre als übernommen
+   **gezählt** worden, ohne gesetzt zu sein.
+
+> **Die Regel, die dabei am meisten wert ist:** Es kommt **nur JA** durch. Ein
+> „nein" wird verworfen statt als `false` übernommen — sonst hakt ein
+> beiläufiges „einen Stellplatz gibt es nicht" ein Feld **aktiv ab**, das der
+> Nutzer nie angefasst hat. Die Import-Tabelle zeigt nur, was gesetzt wird;
+> ein stilles Abhaken wäre dort unsichtbar.
+
+**Und der Maßstab:** 203 Felder, **genau eine Checkbox** (`san_tax_active`).
+Die Änderung ist vollständig, betrifft heute aber ein Feld — das Formular löst
+Ja/Nein sonst über Selects. **Erst zählen, dann schätzen.**
+
+**Backend geändert → Rebuild.** Vier Marker im laufenden Container geprüft.
+
+### `v1169` — Spracheingabe: Tempo und Stichwort-Fenster · `a78ab83`
+
+**Vier Modelle pro Aufnahme:** Transkription · Live-Zwischenauswertung
+(`gpt-4o-mini`) · Feldauswertung (`gpt-5.5`) · Verifikation (`gpt-5.4-mini`).
+Wer die Spracheingabe beschleunigen will, fängt hier an.
+
+**Der erste Fund:** Der Transkriptions-Default stand auf
+`gpt-4o-transcribe-diarize`. **Diarisierung trennt Sprecher voneinander** —
+beim Diktat ins eigene Mikrofon spricht eine Person. Der Dateikopf nannte als
+Default ohnehin `gpt-4o-mini-transcribe`; **Code und Doku waren auseinander,
+und der Code hatte das teurere gewonnen.** Jetzt korrigiert, weiter über
+`OPENAI_TRANSCRIBE_MODEL` überschreibbar.
+
+**Stichwort-Fenster statt Wolke.** Höchstens neun Chips sichtbar; ein
+erkanntes bleibt 900 ms grün stehen, geht dann weg, von hinten rückt eins nach.
+
+> **Warum nur die Sichtbarkeit geändert wurde:** `updateChipsFromText`,
+> `markChipsFinal` und die Gruppen-Navigation suchen per Selektor
+> `.vi-chip[data-cid=…]`. **Wer dort Elemente aus dem DOM entfernt, bricht drei
+> Stellen still.** Und der Fortschrittszähler muss weiter alle zählen, sonst
+> steht dort dauerhaft „9".
+
+**Offen:** Um wie viel die Transkription schneller wird, ist nicht gemessen —
+dafür braucht es einen Sprechlauf. Die weiteren Hebel wären der
+Verifikations-Pass (zweiter Aufruf) und `gpt-5.5` in der Feldauswertung; beides
+Qualitätsfragen, nicht einseitig zu entscheiden.
+
+### `v1170` — Verifikations-Pass aus · `ecd5be2`
+
+**Marcels Entscheidung**, um Tempo zu gewinnen. Der Pass (v522) ist ein
+**vollständiger zweiter KI-Aufruf**: Transkript **und** Erstergebnis gehen noch
+einmal weg und werden gegengeprüft. Er kostet damit etwa so viel Wartezeit wie
+die Auswertung selbst — **der größte einzelne Hebel**.
+
+**Nicht gelöscht, nur abgeschaltet.** Den Schalter `OPENAI_VOICE_VERIFY` gab es
+bereits, nur stand der Standard auf „an". Der Code bleibt vollständig und läuft
+wieder, sobald die Variable auf `1` gesetzt wird.
+
+**Nachweis, der zählt:** `printenv OPENAI_VOICE_VERIFY` **im Container** ist
+leer — der neue Default greift wirklich. Stünde dort eine `1`, wäre die
+Änderung wirkungslos gewesen und hätte trotzdem nach Erfolg ausgesehen.
+
+> **Wenn die Qualität sichtbar nachlässt** — falsch zugeordnete Zahlen,
+> verwechselte Felder —, ist das die **erste** Stellschraube: Variable auf `1`,
+> Rebuild. Dann war der Pass sein Geld wert.
+
+**Damit laufen noch zwei Modelle je Aufnahme** (Transkription + Auswertung)
+statt vier. Der verbleibende Hebel wäre `gpt-5.5` in der Feldauswertung.

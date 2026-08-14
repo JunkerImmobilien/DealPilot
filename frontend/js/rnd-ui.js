@@ -29,7 +29,7 @@
 
   const DEFAULT_OPTIONS = {
     showPlanGate: true,
-    requirePlan: ['pro', 'business'],
+    requirePlan: ['pro'],   /* v1161-PLANS: 'business' war ein toter Eintrag */
     initialData: null,
     onRecalc: null,
     grenzsteuerSource: 'manual',

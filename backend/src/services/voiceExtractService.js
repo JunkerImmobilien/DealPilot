@@ -17,7 +17,14 @@
  * ════════════════════════════════════════════════════════════════════ */
 'use strict';
 
-const TRANSCRIBE_MODEL = process.env.OPENAI_TRANSCRIBE_MODEL || 'gpt-4o-transcribe-diarize';
+/* v1169-VFAST: Der Default stand auf `gpt-4o-transcribe-diarize`. Diarisierung
+   trennt SPRECHER voneinander — beim Diktat ins eigene Mikrofon spricht eine
+   Person. Das war Rechenzeit ohne Gegenwert und der erste Grund, warum die
+   Erkennung sich zaeh anfuehlte. Der Dateikopf nennt als Default ohnehin
+   `gpt-4o-mini-transcribe`; Code und Doku waren auseinander.
+   Weiterhin per OPENAI_TRANSCRIBE_MODEL ueberschreibbar — wer Sprechertrennung
+   braucht (Aufnahme einer Besichtigung zu zweit), setzt sie dort. */
+const TRANSCRIBE_MODEL = process.env.OPENAI_TRANSCRIBE_MODEL || 'gpt-4o-mini-transcribe';
 const EXTRACT_MODEL = process.env.OPENAI_VOICE_EXTRACT_MODEL || process.env.OPENAI_MODEL || 'gpt-5.5';
 const QUICKMATCH_MODEL = process.env.OPENAI_QUICKMATCH_MODEL || 'gpt-4o-mini';  /* v513: Live-Zwischenauswertung, klein/guenstig */
 
@@ -48,7 +55,12 @@ function sanitizeCatalog(raw) {
     if (!e || typeof e.id !== 'string' || !/^[A-Za-z0-9_]{1,40}$/.test(e.id)) continue;
     const entry = {
       id: e.id,
-      kind: ['select', 'num', 'int', 'date', 'text'].includes(e.kind) ? e.kind : 'text',
+      /* v1168-VBOOL: 'bool' ergaenzt. Ohne diesen Eintrag faellt ein
+         Checkbox-Feld STILL auf 'text' zurueck — der Katalog kaeme durch, die
+         KI lieferte "ja", und das Frontend haette einen String, wo es ein
+         Haekchen setzen will. Die Whitelist ist der Grund, warum Checkboxen
+         nicht einfach im Frontend freigeschaltet werden konnten. */
+      kind: ['select', 'num', 'int', 'date', 'text', 'bool'].includes(e.kind) ? e.kind : 'text',
       label: String(e.label || e.id).slice(0, 90)
     };
     if (e.hint) entry.hint = String(e.hint).slice(0, 120);
@@ -105,6 +117,14 @@ function buildPrompt(transcript, catalog) {
     if (e.hint) l += ' (' + e.hint + ')';
     if (e.kind === 'select') {
       l += '\n  ERLAUBTE WERTE: ' + e.options.map(o => '"' + o.v + '"=' + o.t).join(', ');
+    }
+    /* v1168-VBOOL: Ohne diese Zeile steht im Prompt nur "bool" als Typ — das
+       Modell raet dann zwischen true, "ja" und 1. Und die zweite Haelfte ist
+       die wichtigere: NUR nennen, wenn es zutrifft. Sonst listet das Modell
+       gewissenhaft alle Haekchen mit false auf und die Import-Tabelle
+       quillt ueber mit Nicht-Befunden. */
+    if (e.kind === 'bool') {
+      l += '\n  NUR true, wenn es im Text ausdruecklich zutrifft. Trifft es nicht zu oder wird es nicht erwaehnt: Feld WEGLASSEN, nicht false.';
     }
     return l;
   }).join('\n');
@@ -215,6 +235,18 @@ async function extractFields(transcript, catalog, apiKey) {
       }
       if (!hit) return;
       fields[k] = hit.v;
+    } else if (entry.kind === 'bool') {
+      /* v1168-VBOOL · Ein Haekchen kennt zwei Zustaende, die KI liefert je
+         nach Formulierung true, "true", "ja" oder 1.
+         NUR JA-Antworten kommen durch. Ein "nein" wird VERWORFEN statt als
+         false uebernommen — sonst haekelt ein beilaeufiges "einen Stellplatz
+         gibt es nicht" ein Feld aktiv ab, das der Nutzer nie angefasst hat.
+         Die Import-Tabelle zeigt nur, was gesetzt wird; ein stilles
+         Abhaeken waere dort unsichtbar. */
+      const bv = (typeof v === 'boolean') ? v
+        : ['true', 'ja', 'yes', '1'].includes(String(v).toLowerCase().trim());
+      if (!bv) return;
+      fields[k] = true;
     } else {
       fields[k] = v;
     }
@@ -297,7 +329,24 @@ async function quickMatch(transcript, catalog, apiKey) {
 }
 
 /* v522: Verifikations-Pass (2. KI-Call), prueft/korrigiert Felder gegen das Transkript. */
-const VERIFY_ON = String(process.env.OPENAI_VOICE_VERIFY || '1') !== '0';
+/* v1170-VNOVERIFY: Standard von AN auf AUS gedreht — Marcels Entscheidung
+   („mach den Pass weg wenn das schneller ist").
+
+   Der Verifikations-Pass ist ein VOLLSTAENDIGER zweiter KI-Aufruf: er schickt
+   Transkript UND das erste Ergebnis noch einmal weg und laesst gegenpruefen.
+   Damit kostet er ungefaehr so viel Wartezeit wie die Auswertung selbst — der
+   groesste einzelne Hebel beim Tempo.
+
+   NICHT geloescht, nur abgeschaltet. Der Code bleibt vollstaendig und laeuft
+   wieder, sobald OPENAI_VOICE_VERIFY=1 gesetzt wird. Kehrt die Qualitaet
+   sichtbar zurueck (falsch zugeordnete Zahlen, verwechselte Felder), ist das
+   die erste Stellschraube — dann war der Pass sein Geld wert und die
+   Entscheidung gehoert neu gestellt.
+
+   Der Aufruf in Zeile ~276 ist ohnehin fail-soft: faellt der Pass aus, gilt
+   das Erstergebnis. Abschalten aendert also nichts am Verhalten im Fehlerfall,
+   nur an der Regel. */
+const VERIFY_ON = String(process.env.OPENAI_VOICE_VERIFY || '0') !== '0';
 const VERIFY_MODEL = process.env.OPENAI_VOICE_VERIFY_MODEL || 'gpt-5.4-mini';
 
 function buildVerifyPrompt(transcript, fields, catalog) {
@@ -377,6 +426,18 @@ async function verifyFields(transcript, prev, catalog, apiKey) {
       }
       if (!hit) return;
       fields[k] = hit.v;
+    } else if (entry.kind === 'bool') {
+      /* v1168-VBOOL · Ein Haekchen kennt zwei Zustaende, die KI liefert je
+         nach Formulierung true, "true", "ja" oder 1.
+         NUR JA-Antworten kommen durch. Ein "nein" wird VERWORFEN statt als
+         false uebernommen — sonst haekelt ein beilaeufiges "einen Stellplatz
+         gibt es nicht" ein Feld aktiv ab, das der Nutzer nie angefasst hat.
+         Die Import-Tabelle zeigt nur, was gesetzt wird; ein stilles
+         Abhaeken waere dort unsichtbar. */
+      const bv = (typeof v === 'boolean') ? v
+        : ['true', 'ja', 'yes', '1'].includes(String(v).toLowerCase().trim());
+      if (!bv) return;
+      fields[k] = true;
     } else {
       fields[k] = v;
     }

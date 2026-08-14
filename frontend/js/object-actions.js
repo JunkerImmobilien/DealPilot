@@ -1381,6 +1381,20 @@
       var id = cb.getAttribute('data-id'), it = _merged[id]; if (!it) return;
       if (it.kind === 'star') { if (it.raw > 0 && window.StarRating && typeof StarRating.setRating === 'function') { StarRating.setRating(id, it.raw); n++; _applied.push(id); } return; }
       if (it.kind === 'select') { if (setSelectSmart(id, it.raw, it.emptyOnly)) { n++; _applied.push(id); } return; }
+      /* v1168-VBOOL: Haekchen brauchen einen eigenen Zweig — setInput()
+         schreibt in .value und laesst eine Checkbox unberuehrt. Sie waere
+         als uebernommen gezaehlt worden, ohne gesetzt zu sein.
+         `change` von Hand feuern: die Rechenkette haengt an Ereignissen,
+         und ein per Skript gesetztes .checked feuert keins. */
+      if (it.kind === 'bool') {
+        var _cbEl = document.getElementById(id);
+        if (_cbEl && _cbEl.type === 'checkbox' && !_cbEl.checked) {
+          _cbEl.checked = true;
+          try { _cbEl.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+          n++; _applied.push(id);
+        }
+        return;
+      }
       setInput(id, it.raw); if (id === 'svwert' && it.source === 'Marktbericht') markSvwertAvm(); n++; _applied.push(id);
     });
     try {

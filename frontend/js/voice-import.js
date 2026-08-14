@@ -144,6 +144,14 @@
       '.vi-mic svg{width:40px;height:40px}',
       /* Chips im Orbit (absolut positioniert per JS) */
       '.oabi-ov.vi-mode .vi-chips{position:absolute;inset:0;margin:0;max-height:none;overflow:visible;display:block}',
+      /* v1169-VFENSTER: ausgeblendet wird ueber display:none, nicht ueber
+         Sichtbarkeit — ein `visibility:hidden`-Chip haelt seinen Platz und
+         die Wolke bliebe genauso gross. */
+      '.vi-chip.vi-aus,.vi-chip.vi-weg{display:none}',
+      /* Das erkannte Wort bekommt einen kurzen Abgang, damit das Verschwinden
+         als Bestaetigung gelesen wird und nicht als Fehler. */
+      '.vi-chip.on{animation:viAb .9s ease forwards}',
+      '@keyframes viAb{0%,55%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-6px) scale(.94)}}',
       /* v975-voice-nachzug: coolere, immer lesbare Chips */
       '.oabi-ov.vi-mode .vi-chip{position:absolute;width:auto;max-width:134px;transform:translate(-50%,-50%);background:linear-gradient(180deg,#413b32,#332e27);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent);border-radius:12px;padding:6px 9px;text-align:left;white-space:nowrap;font:600 10.5px/1.2 "JetBrains Mono",monospace;color:#fff;opacity:.94;box-shadow:0 4px 13px rgba(0,0,0,.2);transition:all .3s ease;z-index:2}',
       '.oabi-ov.vi-darkbg .vi-chip{background:linear-gradient(180deg,#1b1a17,#121110);border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);box-shadow:0 4px 13px rgba(0,0,0,.5)}',
@@ -279,10 +287,21 @@
       if (!el) return;
       var tag = el.tagName;
       if (tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'TEXTAREA') return;
-      if (el.type === 'checkbox' || el.type === 'hidden') return;
+      if (el.type === 'hidden') return;
       var wl = WL_MAP[id];
       var entry = { id: id, label: wl ? wl.label : labelFor(id, el) };
       if (HINTS[id]) entry.hint = HINTS[id];
+      /* v1168-VBOOL: Checkboxen waren hier ausgeschlossen — „alle Felder"
+         schloss sie aber ein. Sie brauchen den ganzen Weg: 'bool' in der
+         Katalog-Whitelist des Backends (sonst faellt es still auf 'text'),
+         eine eigene Prompt-Zeile, eine Normalisierung, und in
+         object-actions.js einen eigenen Zweig in applyMerged() — setInput()
+         schreibt in .value und laesst ein Haekchen unberuehrt.
+         Nur die AUSWERTUNG; die Chip-Wolke (buildCatalog) bleibt kuratiert. */
+      if (el.type === 'checkbox') {
+        cat.push({ id: id, kind: 'bool', label: entry.label, hint: entry.hint });
+        return;
+      }
       if (tag === 'SELECT') {
         entry.kind = 'select';
         entry.options = [];
@@ -672,7 +691,45 @@
     var nk = $('vi-nkhint');
     if (nk) nk.textContent = _qcTarget ? '' : 'Kaufnebenkosten (Makler/Notar/Grundbuch/Grunderwerbsteuer) werden automatisch gef\u00fcllt, wenn du sie nennst.';
     updateChipsCount();
+    chipsNachruecken();   /* v1169-VFENSTER */
   }
+  /* ═══ v1169-VFENSTER · Immer nur ein Fenster von Stichwoertern ══════════
+     Bisher standen ALLE Chips gleichzeitig da (je nach Modus 30+). Wer
+     spricht, sucht darin sein naechstes Stichwort — die Wolke wurde mit
+     jedem erkannten Feld nur bunter, nicht kuerzer.
+
+     Jetzt: hoechstens FENSTER Stichwoerter sichtbar. Ein erkanntes bleibt
+     noch kurz gruen stehen (damit man die Bestaetigung SIEHT), verschwindet
+     dann, und von hinten rueckt eins nach.
+
+     Bewusst nur die SICHTBARKEIT: alle Chips bleiben im DOM. updateChipsFromText,
+     markChipsFinal und die Gruppen-Navigation suchen per Selektor
+     `.vi-chip[data-cid=...]` — wer hier Elemente entfernt, bricht drei
+     Stellen still. Und der Fortschrittszaehler zaehlt weiter ALLE, nicht die
+     sichtbaren; sonst staende dort dauernd „9". */
+  var CHIP_FENSTER = 9;
+  var CHIP_NACHLEUCHTEN = 900;   /* ms, in denen das erkannte Wort gruen stehen bleibt */
+
+  function chipsNachruecken() {
+    var host = $('vi-chips'); if (!host) return;
+    var chips = host.querySelectorAll('.vi-chip');
+    var offen = 0;
+    Array.prototype.forEach.call(chips, function (c) {
+      if (c.classList.contains('on')) {
+        /* Erkannt: kurz stehen lassen, dann raus. _weg verhindert, dass bei
+           jedem Neuaufruf ein zweiter Timer auf dasselbe Chip laeuft. */
+        if (!c._weg) {
+          c._weg = 1;
+          setTimeout(function () { c.classList.add('vi-weg'); chipsNachruecken(); }, CHIP_NACHLEUCHTEN);
+        }
+        return;
+      }
+      if (c.classList.contains('vi-weg')) return;
+      if (offen < CHIP_FENSTER) { c.classList.remove('vi-aus'); offen++; }
+      else { c.classList.add('vi-aus'); }
+    });
+  }
+
   function updateChipsFromText(txt) {
     if (!txt) return;
     var t = _de(txt);
@@ -693,6 +750,7 @@
       for (var i = 0; i < kws.length; i++) { if (kws[i] && t.indexOf(_de(kws[i])) >= 0) { chip.classList.add('on'); break; } }
     });
     updateChipsCount();
+    chipsNachruecken();   /* v1169-VFENSTER */
   }
   function markChipsFinal(fields) {
     var host = $('vi-chips'); if (!host) return;
@@ -701,6 +759,7 @@
       if (chip) chip.classList.add('on');
     });
     updateChipsCount();
+    chipsNachruecken();   /* v1169-VFENSTER */
   }
   var _activeGrp = -1;  /* v517 */
   /* v517: markiert komplette Gruppen + scrollt zur ersten offenen Gruppe (gefuehrte Hilfe) */
@@ -903,6 +962,7 @@
       if (chip) chip.classList.add('on');
     });
     updateChipsCount();
+    chipsNachruecken();   /* v1169-VFENSTER */
   }
 
 
@@ -1046,6 +1106,13 @@
         var opt = null;
         for (var i = 0; i < (entry.options || []).length; i++) { if (entry.options[i].v === String(v)) { opt = entry.options[i]; break; } }
         OA.addRow(id, entry.label, (opt ? opt.t : String(v)) + mark, v, S, 'select');
+        return;
+      }
+      /* v1168-VBOOL: Der Server laesst nur JA-Antworten durch, hier kommt
+         also nie ein false an. Angezeigt wird trotzdem Klartext — „true" in
+         einer Import-Tabelle liest niemand gern. */
+      if (entry.kind === 'bool') {
+        OA.addRow(id, entry.label, 'Ja' + mark, true, S, 'bool');
         return;
       }
       var raw = v, disp = String(v);

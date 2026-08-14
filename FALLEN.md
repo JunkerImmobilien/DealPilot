@@ -316,3 +316,81 @@ lässt sich an einer Stelle aber nicht belegen.
 Fehler hintereinander heißen, die Sitzung ist zu lang — abschließen,
 übergeben, Schluss. **Das gilt auch dann, wenn der nächste Schritt klein und
 verlockend aussieht.** Genau dann irrt man weiter.
+
+## 10 · Farbparser, die nur `rgb()` kennen, sind seit `color-mix` blind
+
+**Verschachteltes `color-mix` gibt `getComputedStyle().color` als
+`color(srgb 0.488784 0.395529 0.109333)` zurück — nicht als `rgb()`.**
+
+Ein Parser mit `(s.match(/[\d.]+/g)).slice(0,3)` zieht daraus `0.48, 0.39, 0.10`
+und liest sie als 0–255. Ergebnis: fast Schwarz, Kontrast **19,24** gegen einen
+hellen Grund. Das sieht aus wie ein glänzend behobener Befund und ist eine
+Messung, die nie stattgefunden hat.
+
+```js
+const rgb = s => { const n = (s.match(/[\d.]+/g)||[]).slice(0,3).map(Number);
+                   return /color\(/.test(s) ? n.map(v => v*255) : n; };
+```
+
+**Zwei Folgefallen aus demselben Lauf (`v1164`):**
+
+- **Der Grund-Leser muss `background-image` auswerten.** Die Kopfleiste trägt
+  einen Verlauf, keine Farbe — ein Leser, der die Vorfahren nach der ersten
+  `background-color` ≠ transparent absucht, überspringt sie und meldet Weiß.
+- **Und er darf nicht am eigenen Schleier hängenbleiben.** Nachdem der Regex um
+  `color(...)` erweitert war, fand er den **halbtransparenten Eigenhintergrund**
+  des gemessenen Elements (20 % Gold) und rechnete dagegen — Kontrast 2,46 statt
+  5,16. **Gemessen wird gegen die Fläche darunter**, nicht gegen den eigenen
+  Verlauf. Beim Aufsteigen also das Element selbst überspringen, wenn sein
+  Hintergrund halbtransparent ist.
+
+**Merksatz:** Ein Kontrastwert, der sich zwischen zwei Läufen um mehr als eine
+Stufe bewegt, ohne dass die Farbe sich geändert hat, ist ein Werkzeugbefund —
+nicht ein Ergebnis.
+
+## 11 · Die kuratierte Anzeige ist nicht der Umfang
+
+**`voice-import.js` hat ZWEI Feldkataloge**, und nur einer ist sichtbar:
+
+| | |
+|---|---|
+| `buildCatalog()` (v510) | **kuratierte Whitelist** — baut die Chip-Wolke. Interne und kryptische Felder fehlen bewusst |
+| `buildFullCatalog()` (v519) | **alle `window.FIELDS`** — geht an die Auswertung. Auch Investment-These, Risiken, Bauspar-, Bank-Felder |
+
+Wer die Chips zählt, hält die **Anzeige** für den **Funktionsumfang** und
+schreibt einen Backlog-Punkt über etwas, das seit v519 gebaut ist. Genau das
+ist mit Punkt 7 passiert.
+
+**Allgemein:** Wenn eine Oberfläche eine kuratierte Auswahl zeigt, ist die
+Frage nie „was steht in der Liste", sondern **„gibt es einen zweiten Weg, der
+mehr kann"**. Vor jedem „das fehlt": nach einem zweiten Katalog, einer
+`*Full*`-Variante oder einem Fallback-Zweig suchen.
+
+**Zählstand dieser Sitzung: sechsmal „das gibt es nicht" gesagt, sechsmal gab
+es das.** Tablet-Fassung, Sachwertfaktor-Stufe E, BEDARF-Doppelliste, die
+sieben Pro-Tage, die Restlaufzeit-Anzeige, der volle Sprach-Katalog.
+
+## 12 · Der Kreuzabgleich muss BEIDE Seiten prüfen — Code UND Datenbank
+
+`hasFeature` fragt **zuerst** `Sub.hasCachedFeature` (die DB) und nimmt
+`config.js` nur bei `null`. Ein Schlüssel, den `config.js` kennt und
+`plans.features` **nicht**, ist damit für **jeden** zu — auch für Pro und
+Partner. Und zwar **still**: die Datei behauptet, die Funktion sei offen.
+
+Gefunden beim Punkt-6-Prüflauf: `beleg_import` und `theme_palette` stehen in
+`config.js`, aber in **keinem** DB-Plan. Am echten Partner-Konto sind beide
+`false`.
+
+**Der Abgleich Frontend-Schlüssel gegen Frontend-Pläne reicht nicht.** Er hatte
+kurz vorher „alles sauber" gemeldet — richtig, aber auf der falschen Achse.
+Die dritte Liste ist `plans.features` in der Datenbank:
+
+```sql
+SELECT id, jsonb_object_keys(features) FROM plans WHERE id IN (...);
+```
+
+**Und die Messfalle gleich dazu:** Im Prüfmodus (`v1163`) lesen die
+simulierten Stufen den **`config.js`-Fallback**, das echte Konto liest die
+**DB**. Weicht die „partner"-Zeile von den anderen ab, ist das zuerst ein
+Hinweis auf die **Quelle**, nicht auf den Plan. Erst der DB-Abgleich macht
+daraus einen Befund.

@@ -25,7 +25,82 @@ import { ZensusConnector } from '../connectors/ZensusConnector.js';
 import { GeoapifyConnector } from '../connectors/GeoapifyConnector.js';
 import { LocationFinderService } from '../services/LocationFinderService.js';
 
+/* v1096-WPRB · Der Aufloeser und der Registerstand fuer die Abnahme. */
+import * as GAA from '../lib/gutachterausschuss.js';
+import { registerStand } from '../lib/ausschuss_register.js';
+
 export const router = express.Router();
+
+/* ── v1096-WPRB · ABNAHME PER BEFEHL, AM LAUFENDEN SERVER ───────────────
+ *
+ * Diese Auskunft kommt aus DEM Prozess, der das Register haelt — nicht aus
+ * einem frisch gestarteten Node, der nur die Saatdatei liest. Der
+ * Unterschied ist nicht theoretisch: am 14.08. meldete der Server 1565
+ * Saetze und ein Einzelprozess 2150, weil dieser `ladeAusDb()` nie aufruft.
+ *
+ * Eine Auskunft, die einen anderen Weg nimmt als der Rechenweg, misst sich
+ * selbst.
+ *
+ * Reine Leseauskunft: kein Schreibzugriff, keine Objektdaten, kein
+ * Nutzerbezug. Nicht im Proxy des Haupt-Backends eingetragen und deshalb
+ * von aussen nicht erreichbar — angefragt wird sie im Container.
+ */
+router.get('/register/stand', (req, res) => {
+  const st = registerStand();
+  res.json({
+    saetze: st.saetze, herkunft: st.herkunft, gebiete: st.gebiete,
+    je_kennzahl: st.je_kennzahl || null,
+    aus_db: st.aus_db ?? null, aus_saat: st.aus_saat ?? null,
+    ersetzt: st.ersetzt ?? null, laender: st.laender || null,
+    gelesen: (st.gelesen || []).map((g) => ({
+      datei: String(g.datei).split('/').pop(), saetze: g.saetze })),
+    vermisst: (st.vermisst || []).map((v) => String(v.datei).split('/').pop()),
+  });
+});
+
+/**
+ * Eine Adresse gegen das Register fragen — genau so, wie der Bericht es tut.
+ *
+ *   /register/probe?ags=06414000&kennzahl=liegenschaftszinssatz&zweig=efh
+ *   /register/probe?ags=12054&kennzahl=sachwertfaktor&objektart=Einfamilienhaus&sachwert=300000
+ *
+ * Ohne Treffer kommt der GRUND zurueck, nicht ein leeres Objekt. „kein
+ * Ausschuss hinterlegt" ist eine Aussage und muss als solche lesbar sein —
+ * sie ist der wichtigste Abnahmefall ueberhaupt.
+ */
+router.get('/register/probe', (req, res) => {
+  const { ags, kennzahl = 'liegenschaftszinssatz', zweig, objektart } = req.query;
+  if (!ags || !/^\d{5}(\d{3})?$/.test(String(ags))) {
+    return res.status(400).json({ fehler:
+      'ags fehlt oder ist kein 5- oder 8-stelliger Gemeindeschluessel' });
+  }
+  const zahl = (v) => (v == null || v === '' ? undefined : Number(v));
+  const arg = { ags: String(ags), zweig, objektart,
+    sachwert: zahl(req.query.sachwert), brw: zahl(req.query.brw),
+    rnd: zahl(req.query.rnd), bgf: zahl(req.query.bgf),
+    flaeche: zahl(req.query.flaeche), wfl: zahl(req.query.wfl),
+    baujahr: zahl(req.query.baujahr) };
+
+  const zugang = {
+    liegenschaftszinssatz: GAA.liegenschaftszinssatz,
+    sachwertfaktor: GAA.sachwertfaktor,
+    bodenpreisniveau: GAA.bodenpreisniveau,
+    vergleichsfaktor: GAA.vergleichsfaktor,
+    bodenpreisindex: GAA.bodenpreisindex,
+  }[String(kennzahl)];
+  if (!zugang) {
+    return res.status(400).json({ fehler: `kennzahl '${kennzahl}' unbekannt`,
+      bekannt: ['liegenschaftszinssatz', 'sachwertfaktor', 'bodenpreisniveau',
+                'vergleichsfaktor', 'bodenpreisindex'] });
+  }
+  let r;
+  try { r = zugang(arg); } catch (e) {
+    return res.status(500).json({ fehler: e.message });
+  }
+  res.json({ ags: String(ags), kennzahl: String(kennzahl),
+             zustaendig: GAA.zustaendig ? (GAA.zustaendig(String(ags)) || null) : null,
+             ergebnis: r });
+});
 
 router.get('/health', async (req, res) => {
   let db = false;

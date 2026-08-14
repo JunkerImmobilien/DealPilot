@@ -36,105 +36,112 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → Hier weitermachen (Übergabe 2026-08-12, abends)
+## → Hier weitermachen (Übergabe 2026-08-13)
 
-> **ZUERST LESEN — der Server stand heute abend auf `main`.** Damit waren die
-> Frontend-Pakete `v1148` bis `v1153b` zeitweise **nicht ausgeliefert**,
-> obwohl jeder Deploy den richtigen Hash gemeldet hatte. Beim Zurückholen auf
-> `staging` lag dort ein **fremder Commit `0a55ee4`** — 920 Zeilen, das
-> v1083-Paket eines Parallel-Strangs (Ausschuss-Register NRW). **Beides ist
-> vereint und gesichert** (`ce821e3`, lokal = Server = GitHub, alle Marker
-> geprüft). **Der Prüfbefehl nach jedem Deploy liest ab jetzt den ZWEIG mit:**
+**Stand:** lokal = GitHub = Staging auf demselben Commit, Zweig `staging`,
+Arbeitsverzeichnis sauber. Der Parallelstrang hat am 13.08. `v1084`/`v1084a`
+ausgerollt (Ausschuss-Register, Sachwertfaktoren) — beides ist im Repo.
+
+> **Der Prüfbefehl nach jedem Deploy liest den ZWEIG mit, nicht nur den Hash:**
 > ```
 > ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD'
 > ```
-> Erwartet wird `staging` **und** der eben gepushte Hash. Ein Hash ohne Zweig
-> ist bedeutungslos. Details in `FALLEN.md` Punkt 1.
+> Erwartet wird `staging` **und** der eben gepushte Hash. Am 12.08. stand der
+> Server auf `main`, und fünf Pakete waren dadurch stundenlang nicht live,
+> obwohl jeder Deploy „Erfolg" meldete. Details in `FALLEN.md` Punkt 1.
 
-**Stand:** lokal wie Staging (`ce821e3`), Zweig `staging`, Arbeitsverzeichnis
-sauber.
-Ausgeliefert an diesem Tag: `v1148` (1025-px-Sprung), `v1149` (§ 194-Hinweis
-nur auf Seite 1), dazu `PROJEKTANWEISUNG.md` als konsolidierter Gesamtstand
-mit fortlaufendem Rollout-Journal.
+### An diesem Tag ausgeliefert
 
-**Diese Sitzung ist bewusst beendet worden, nicht ausgelaufen.** Zweimal
-hintereinander habe ich eine Lücke behauptet, die es nicht gab — beim
-Tablet-Punkt (A, C und D waren gebaut) und beim Sachwertfaktor (Stufe E läuft
-durch bis in die Anzeige). `CLAUDE.md` sagt für diesen Fall: abschließen,
-übergeben, Schluss. **Die Lehre steht als Punkt 9 in `FALLEN.md`** und ist
-die wichtigste Übergabe dieses Tages.
+| | |
+|---|---|
+| `v1155` | Darstellungs-Panel färbte sich mit der gewählten Farbe mit |
+| `v1156`/`b`/`c` | Grundfarbe unter aktiver Vorlage sichtbar gesperrt (Marcels Weg B) |
+| `v1157`/`b` | Der Whitelabel-Sweeper verwarf jede Nutzeränderung am Body-Inline-Stil |
+| `v1158`/`b` | Reiter tragen im hellen Modus die Tinte des Aktionen-Menüs |
+| `v1159` | Im Stapelmodus löste die **Pfeilmitte Löschen aus** |
+| `v1160` | Gate zugezogen: `market_data_fields` + `live_market_rates` bei Free auf `false` |
+| `v1161` + DB | `business`/`enterprise` gelöscht — erst vier Code-Stellen, dann die Zeilen |
+| `v1162`/`b` | **Hell/Dunkel als zwei Profile** unter „Profil & Anzeige" — hell ist `kanzlei`, kein Skin |
+| `v1163` | **Plan-Prüfmodus** — der Override wirkte nie, jetzt herabstufend. Punkt 6 wird fahrbar |
+| `v1164` | Objektnummer im Kopf: Kontrast 3,7/3,9 → **5,2/5,4** über `--uv-marke-dd` |
+| `v1165` | Garagenfeld: der **Platzhalter widersprach der Feldhilfe** |
+| `v1166` | Hinweis am Garagenfeld, wenn MEA **und** Garagenfläche gesetzt sind |
+| `v1167` | Profil-Schalter: **je Profil eigene Werte** + Markierung beim Öffnen |
+| `v1168` + Rebuild | **Checkboxen per Sprache** — vier Stellen, jede hätte still versagt |
+| `v1169` + Rebuild | Spracheingabe: **Diarisierung raus**, **Stichwort-Fenster** (9 statt 30+) |
+| `v1170` + Rebuild | **Verifikations-Pass aus** — Marcels Entscheidung, zwei Modelle statt vier |
 
-**Die erste der beiden Restlücken ist erledigt** (`v1150`/`v1150b`) — und hat
-einen zweiten, größeren Fehler mitgebracht: die PDF-Fußnote nannte die
-**Konstante 1,0** statt des angewandten Faktors 0,925. Beides steht jetzt
-richtig im Dossier, mit Stufe.
+**Erledigte Backlog-Punkte:** 5 (vollständig), 6 (Werkzeug + Befunde), 9,
+10 (soweit ohne fachliche Entscheidung möglich), 7 (Rest 1).
 
-**Was offen bleibt, und warum es nicht einfach gebaut wurde:** der Hinweistext
-beim manuellen Sachwertfaktor (`WertParameterService.js:473` gibt
-`hinweis: ''`, der Liegenschaftszins gibt einen Text). **Sein Anzeigeweg
-fehlt:** die Karte zeigt `sachwertfaktor_hinweis` nur bei
-`!marktangepasst` (`app.js:612`), und bei einem wirksamen eigenen Faktor ist
-`marktangepasst = true`. In `CrossCheckService.js:245` hängt das Feld
-zusätzlich nur am Tabellenweg. **Erst den Weg, dann den Text** — ein Hinweis,
-den niemand sieht, ist keine Verbesserung. Der eigentliche Vermerk steht seit
-`v1150` im PDF.
+**Vier Prüfergebnisse ohne Umbau — weil es schon gebaut war:**
+die **sieben Pro-Tage** (`TR7-trial`, ab Registrierung, Objekte bleiben nach
+Tag 7 erreichbar) · die **Restlaufzeit-Anzeige** in der Plan-Pille · der
+**volle Sprach-Katalog** (`buildFullCatalog`, v519) · **B3 entwarnt** — kein
+abgefragter Feature-Schlüssel fehlt in den Plänen.
 
-**Vor dem Anfangen bitte `FALLEN.md` Punkt 9 lesen.** Er beschreibt genau den
-Fehler, den man in dieser Gegend macht: vom Erzeuger her suchen statt vom
-Verbraucher. Bei `v1150` hat der Blick vom Verbraucher her sofort den
-größeren Fehler gezeigt.
+> **Die Lehre dieser Runde, sechsmal bezahlt:** sechsmal „das gibt es nicht"
+> gesagt, sechsmal gab es das. Zählstand und Gegenmittel in `FALLEN.md`
+> Punkt 11. **Vor jedem „das fehlt": nach einem zweiten Weg suchen** — einer
+> `*Full*`-Variante, einem Fallback-Zweig, einer zweiten Liste.
 
-**Was Geld kostet und deshalb angekündigt gehört:** der Nachweis, dass Stufe 2
-nach bezahlter Stufe 1 wirklich nur die Differenz (3 L) abbucht. Ein
-Klicktest am Testobjekt, echtes Kerosin. **Nicht nebenbei machen.**
+Dazu: Plan-Prüflauf mit Befundliste (Punkt 6), Backlog aufgeräumt und
+fortlaufend nummeriert, `PROJEKTANWEISUNG.md` mit Marcels Abendfassung
+zusammengeführt und nach **jedem** Rollout fortgeschrieben.
 
-**Die Tablet-Fassung (Punkt 1) ist nachgemessen, und das Ergebnis ist:
-A, C und D waren längst gebaut.** Ab 901 px dockt die Sidebar an (`v648`,
-`css/style.css:35783`), die Formulare sind zwei- und dreispaltig, und das
-Blatt von unten gibt es seit V46 nicht mehr — es ist global per
-`display:none!important` stillgelegt. **Es war nichts zu bauen**, es war
-nur nie nachgemessen worden. Die Messreihe steht im Punkt.
+### Der nächste Schritt ist vorbereitet, nicht angefangen
 
-**Daraus zwei Lehren für den nächsten Anlauf:**
-- **Der Entwurf `tablet-fassung.md` hat nur bei 820 px gemessen** — unter
-  der 901er-Schwelle, also im Drawer-Band. Wer eine Schwelle untersucht,
-  muss **beide Seiten** davon messen.
-- **Ein Element im DOM ist kein aktives Element.** Das Blatt steht mit
-  40 Erwähnungen im Markup und 11 Kacheln im Baum und sah deshalb aktiv
-  aus. Sichtbarkeit sagt nur die Messung.
+**Punkt 5 (Hell und Dunkel als zwei Profile)** hat seinen Entwurf:
+`design/Vorschläge/hell-dunkel-zwei-profile.html` — anklickbar, mit dem
+Schalter wie er in den Einstellungen aussähe, beiden Fassungen nebeneinander
+und **allen drei offenen Fragen beantwortet** (je Profil eigene Werte über
+`brand_display`; das kleine Logo = die kompakte Wortmarke aus `v1086`; der
+Schalter ändert **niemals Farben**, die gehören dem Partner).
 
-**Der 1025-px-Sprung, der bei dieser Messung auffiel, ist als `v1148`
-behoben und abgenommen** (siehe Fertig). **B** und die
-**Admin-Oberfläche** bleiben in Punkt 1 liegen: B braucht ein Bild, der
-Admin ein Konto.
+**Vor dem Bauen zwei Fallen, die im Entwurf stehen und teuer bezahlt sind:**
+1. Der Wechsel muss über den **Bedienweg** laufen — ein Klick löst
+   `skinNachziehen()` aus, ein `setAttribute` nicht.
+2. **`_dpDispSkin` setzt `ui_theme` auf leer**, wenn die aktive Vorlage der
+   neuen Helligkeit widerspricht. Das Profil muss die Vorlage deshalb
+   **nach** dem Skin setzen, nicht davor — sonst löscht der Skin sie sofort
+   wieder.
 
-**Der nächste offene Punkt ist damit Punkt 3** (Marktbericht neu gestalten,
-groß — Entwurf liegt) oder einer der kleinen Darstellungs-Punkte 4 bis 9,
-die alle auf Marcels Durchgang zurückgehen.
-
-**Vor dem Bauen:**
-- Messkabine nach `FALLEN.md` aufsetzen — Träger `/impressum.html` auf der
-  **App-Domain** (`app.staging.dealpilot.junker-immobilien.io`), nicht auf
-  der Landing-Domain. `getAnimations().finish()` nach jeder Änderung,
-  höchstens ~40 s pro `javascript_tool`-Aufruf (sonst CDP-Timeout), und
-  **Objektwechsel nur mit Neuladen** — ein Wechsel im laufenden Tab hat
-  `hdr-banner-only` und `hdr-no-score` gleichzeitig stehen lassen.
-- **Jeden CSS-Anker im Browser auslesen, bevor er in eine Regel geht.**
-  In `v1147` stand `#app` in der Regel — das Element gibt es nicht.
-
-**Zwei Abnahmen, die noch offen sind:**
-1. **Produktion** — liegt dieselbe `registry.js`-Drift dort auch? SSH ist
-   read-only, ein Dateivergleich genügt. *(Die Ankreuzfeld-Abnahme ist am
-   12.08. abends erledigt — 21 Felder, alle 33 px, auch bei 390 px.)*
+**Was Marcel noch offen hat** (nicht von mir zu entscheiden):
+- **Punkt 1**, Teil B: wie wird der Score flacher — braucht ein Bild. Dazu der
+  Befund, dass die Score-Zeile erst **ab 70 % Datenvollständigkeit**
+  erscheint (`calc.js:205`).
+- **Punkt 4**: welcher Art soll die erweiterte Akzent-Palette sein.
+- **Punkt 11** (Wallet): welche Angaben gehören auf die Karte.
 
 **Prüfstrecken auf Staging:**
-- `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt,
-  weitere Marktberichte kosten **0 L**. Der einzige Haus-Testfall.
+- `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt.
+  **Achtung:** die bezahlte Stufe gilt nur für das Konto, das gezahlt hat
+  (`info@junker-immobilien.io`) — unter einem anderen Konto kostet derselbe
+  Bericht voll.
 - `Hermannstraße 9 Hüllhorst` (`07d89138`) — ETW, Stufe 3 bezahlt.
-- Kerosin zuletzt: **86 L**.
 
----
 ## Offen
+
+### OFFENE ABNAHME — Spracheingabe, ein Sprechlauf am Gerät
+
+**Marcel macht das später, der Punkt bleibt bis dahin stehen.** Drei
+Änderungen warten auf genau einen echten Sprechlauf, weil sie ohne Mikrofon
+nicht prüfbar sind:
+
+| Version | Was geprüft werden muss | Wenn es klemmt |
+|---|---|---|
+| `v1168` | Häkchen `san_tax_active` — taucht es in der Import-Tabelle auf, wenn eine Sanierungs-AfA genannt wird? | Nur JA kommt durch; ein „nein" wird bewusst verworfen |
+| `v1169` | **Das Stichwort-Fenster** — bleiben es neun, verschwindet ein erkanntes nach ~1 s, rückt eins nach? | `CHIP_FENSTER = 9` und `CHIP_NACHLEUCHTEN = 900` stehen direkt beieinander in `voice-import.js` |
+| `v1169`/`v1170` | **Das Tempo** — Diarisierung raus, Verifikations-Pass aus. Zwei Modelle statt vier | Qualität schlechter? `OPENAI_VOICE_VERIFY=1` + Rebuild holt den Pass zurück |
+
+**Worauf beim Sprechlauf zu achten ist:** Nicht nur, ob es schneller ist,
+sondern ob die **Zuordnung** noch stimmt — der Verifikations-Pass hat bisher
+falsch zugeordnete Zahlen und verwechselte Felder abgefangen. Genau dort
+zeigt sich, ob sein Wegfall zu teuer war.
+
+**Der letzte verbliebene Tempo-Hebel** wäre `gpt-5.5` in der Feldauswertung.
+Vorher messen, wie viel Zeit auf Transkription und wie viel auf Auswertung
+entfällt — nicht raten.
 
 1. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
    Der Punkt bleibt offen, weil **B** und die **Admin-Oberfläche** offen sind.
@@ -613,124 +620,19 @@ die alle auf Marcels Durchgang zurückgehen.
 
    **→ Demo nach `design/Vorschläge/`, nicht raten.**
 
-5. **ERLEDIGT — Grundfarbe „Obsidian"** (`v1156`/`b`/`c`, `8cc7af0`, siehe
-   Fertig). Gemessen: **ohne** Vorlage wirkt sie, **mit** Vorlage nicht —
-   der Wert wurde aber gespeichert, ein stiller Rückfall. Marcels Weg **B**
-   ist gebaut: unter aktiver Vorlage sichtbar gesperrt, mit Grund und
-   Ausweg im Hinweis. Dabei zwei eigene Fehler gefunden und behoben (der
-   Partner-Text landete im neuen Kasten; die Sperre war nur optisch und per
-   Tabulator umgehbar — betraf auch die Partner-Schranke seit `v1082`).
+5. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
-   *Der ursprüngliche Befund samt Diagnosewegen bleibt stehen, weil seine
-   Lehren gelten:*
-
-   Marcel wählt die Grundfarbe aus, **und es tut sich gar nichts.** Klarer
-   Defekt, keine Geschmacksfrage.
-
-   **Erst die Kette messen, dann patchen** — nicht am CSS anfangen. Vier
-   Stellen, in dieser Reihenfolge:
-
-   1. **Kommt der Klick an?** Feuert der Handler, wird ein Wert gesetzt?
-   2. **Wird gespeichert?** Steht der Wert nach dem Neuladen wieder da?
-   3. **Wird ein Token gesetzt?** `getComputedStyle(document.body)` auf den
-      erwarteten Namen, vorher/nachher.
-   4. **Liest das Token jemand?** Genau hier lag `v1101`: der Regler setzte
-      `--dp-logo-w`, gelesen wurde `--dp-logo-scale` — **zwei Namen für
-      dieselbe Sache**, und niemand merkte es, weil beide existierten.
-
-   Der wahrscheinlichste Fall ist wieder Punkt 4. Zweiter Kandidat: die Regel
-   hängt an `body.dp-chrome-hell`, das bei diesem Weg nicht gesetzt wird —
-   dasselbe Muster, das die Logo-Regler unter jeder Vorlage tot gestellt hat.
-
-6. **Regler „Tab-Texte" wirkt nicht**
-
-   Der Regler soll die Schriftfarbe der Reiterleiste ändern — **Objekt,
-   Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, Pilot-Analyse,
-   Bewertung**. Bei Marcel ändert sich nichts.
-
-   Gleiche Kette wie N2, gleiche Reihenfolge. **Ein zusätzlicher Verdacht,
-   der hier besonders naheliegt:** die Reiter tragen an mehreren Stellen
-   `!important`-Regeln (so gewinnt z. B. `header.hdr.has-v64-score
-   #hdr-obj-num` gegen alles andere). Ein Token, das korrekt gesetzt ist,
-   verliert dann trotzdem. **Deshalb den Kaskaden-Walker benutzen** — welche
-   Regel gewinnt tatsächlich für das Element —, nicht nur prüfen, ob die
-   Variable steht.
-
-   **N2 und N3 sind wahrscheinlich derselbe Fehler an zwei Reglern.** Beim
-   Messen also erst beide nebeneinanderlegen, bevor zwei Fixes gebaut werden.
-
-7. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
-
-   Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
-   schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
-   es der alte Befund in neuer Form ist.
-
-   **Am Raster messen, nicht am Farbtoken.** Ohne Vorlage ist der Bereich
-   sauber, erst mit umgestellter Vorlage rückt alles zusammen — die Ursache
-   liegt also im Abstandsraster, nicht in der Farbe. Und beim Nachmessen die
-   `v1105c`-Lehre mitnehmen: das Goldband ist ein `::before`, ein Leser, der
-   nur die Elternkette abläuft, sieht es nicht.
-
-   **Dazu Marcels zweite Vorgabe an derselben Karte:** *„achte darauf, dass
-   alle Werte immer angegeben werden, die wir brauchen."* Das ist ein eigener
-   Prüfschritt — **welche Angaben gehören auf die Karte, und fehlt eine
-   davon?** Die Liste gehört mit Marcel abgestimmt, nicht von mir geraten;
-   danach wird gezählt, ob jede tatsächlich erscheint (und was passiert, wenn
-   sie leer ist — `_euro(null)` liefert `"–"` und ist **truthy**, ein
-   `||`-Rückfall greift dort nie).
-
-   **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
-   Aufgreifen zusammenlegen, nicht doppelt bauen.
-
-8. **Stapelmodus: der Aufklapp-Pfeil kollidiert mit dem Löschen-×**
-
-   **Der schwerste der neuen Befunde**, weil er zu einer *falschen* Aktion
-   führt statt nur schlecht auszusehen. Beim Hinüberfahren zum Pfeil landet
-   man auf dem × zum Löschen.
-
-   **Marcels Vorgabe: der Pfeil gehört nach unten.** Das löst zwei Dinge auf
-   einmal — die Kollision, und den bekannten Befund, dass `.sbc-arrow` mit
-   **20 × 20 px** deutlich unter der 44-px-Trefferfläche aus v650/v652 liegt.
-   Unten ist Platz, oben nicht.
-
-   **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:** Pfeil
-   und Karte tun Verschiedenes — der Pfeil klappt auf (`umschalten()` in
-   `karten-kompakt.js`, delegierter Listener), der Kartenkörper öffnet das
-   Objekt. Eine 44-px-Pseudofläche würde der Karte Klicks stehlen und die
-   falsche Aktion auslösen. Es ist eine Frage der Kartengestaltung.
-
-   **Vor dem Verschieben messen:** `getBoundingClientRect()` auf Pfeil und ×,
-   den Abstand beziffern, und mit `elementFromPoint` prüfen, **wer den Klick
-   in der Lücke bekommt**. Danach die neue Lage in allen drei Kartenmodi
-   gegenprüfen — der Pfeil erscheint nur bei `kompakt` und `stapel`.
-
-   **Gehört zu Punkt 4** — dort steht `.sbc-arrow` bereits mit 20 × 20 px.
-   Das hier ist derselbe Pfeil mit einem zweiten, schwereren Befund.
-
-9. **Heller Modus: die Reiter sollen die Schriftfarbe des Aktionen-Menüs annehmen**
-
-   Im hellen Modus sollen die Reiter (Objekt … Pilot-Analyse) dieselbe
-   Schriftfarbe tragen wie das Aktionen-Aufklappmenü. Damit ist die Zielfarbe
-   **benannt statt beschrieben** — gut, denn dann muss sie nicht gestaltet,
-   sondern nur übernommen werden.
-
-   **Zuerst den Ist-Wert auslesen** (`.sb-act-item` bzw. der Kopf des
-   Aufklappers), dann als **gemeinsames Token** führen statt an zwei Stellen
-   zu pflegen. Zwei Stellen, die auseinanderlaufen, sind hier schon mehrfach
-   die Ursache gewesen.
-
-   **Ein bekannter Nebenbefund gehört mitgeprüft:**
-   `.sb-actions-accordion-inner` misst `rgb(255,255,255)` **auch** in den
-   dunklen Fassungen `dealpilot` und `konsole` — weiße Fläche in dunkler
-   Leiste, im geschlossenen Zustand unsichtbar (`display:none`, 0 × 0) und
-   deshalb bei allen Kontrastläufen durchgerutscht. **Mit geöffnetem Menü
-   messen.** Wer die Farbe von dort übernimmt, übernimmt sonst einen Wert aus
-   einem Zustand, den niemand geprüft hat.
-
-   **Hängt an Punkt 13** — „heller Modus" ist erst definiert, wenn der
-   entschieden ist.
-
-10. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
+   > **ERLEDIGT — `v1162`/`v1162b` (`381e678`) und `v1167` (`c1d572b`),
+   > siehe „Fertig".** Der Schalter steht unter **Profil & Anzeige**, beide
+   > Richtungen sind im Browser nachgemessen, ~~zwei Reste~~ beide Reste sind
+   > zu: je Profil eigene Werte über `dp_profil_werte`, und die Markierung
+   > greift auch beim Öffnen ohne Klick.
+   >
+   > **Und eine Korrektur zu Marcels Beschreibung unten:** die helle Fassung
+   > ist die Vorlage **`kanzlei`**, nicht `panel`. Marcels Bild
+   > `design/mockups/hell.png` zeigt die warme helle Kopfleiste und die
+   > Serifenschrift von `kanzlei`; `panel` ist „Kühl" mit Blaustich. Das Bild
+   > kam nach der Beschreibung und schlägt sie.
 
    **Marcels Bild davon, wörtlich zusammengefasst:**
 
@@ -767,7 +669,51 @@ die alle auf Marcels Durchgang zurückgehen.
    **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
    dann bauen.**
 
-11. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+   ### DAS BILD IST DA (`design/mockups/hell.png`, 2026-08-13) — und es korrigiert zwei Annahmen
+
+   **Es zeigt nicht `panel`, sondern `kanzlei`.** Am CSS gegengeprüft:
+
+   | im Bild | `html[data-ui-theme="kanzlei"]` |
+   |---|---|
+   | helle, warme Kopfleiste | `--uv-chrome: #FBFAF7` |
+   | warme Arbeitsfläche | `--uv-pane: #F7F5F1` |
+   | weiße Karten | `--uv-surf: #FFFFFF` |
+   | warme Grautöne | `#1c1a16` / `#55504a` / `#928d84` |
+   | **Serifenschrift** bei „Objekt & Fotos" | `kanzlei` = „Serife" (THEMES) |
+
+   `panel` ist dagegen „Kühl" mit Blaustich (`rgb(21,26,32)`) — das ist im Bild
+   nirgends. **Die Textvorgabe im Punkt („App-Darstellung Panel") ist damit
+   überholt; das Bild ist die konkretere und neuere Angabe.**
+
+   **Und der Hell-Skin ist NICHT beteiligt.** Im Bild sind die Reiter
+   **golden**, nicht die Tinte aus `v1158` — und `v1158` hängt an
+   `body.dp-chrome-hell`. Das Bild zeigt also `kanzlei` **ohne**
+   `dp_chrome_hell`. Das ist kein Widerspruch, sondern die Auflösung: **der
+   „helle Modus" ist eine Vorlage, kein Chrome-Skin.**
+
+   **Damit ist Frage 2 auch beantwortet:** das Logo im Bild ist **groß und
+   prominent** (schwarzes „Deal", goldenes „Pilot"), nicht klein. Mein Entwurf
+   hatte „kleines Logo" aus der Textvorgabe übernommen — das Bild sagt etwas
+   anderes.
+
+   **Das Profil „Hell" setzt danach:**
+
+   | | Wert |
+   |---|---|
+   | `data-ui-theme` | **`kanzlei`** |
+   | `data-ui-cards` | `''` (Standard) |
+   | `dp_chrome_hell` | **`0`** — bleibt aus |
+   | Logo | **normal**, nicht klein |
+
+   Und „Obsidian" setzt alle vier auf den Istzustand zurück (kein Attribut,
+   `0`, normal). **Beide Profile sind damit reine Zustandsschalter über
+   vorhandene Wege** — kein neues CSS.
+
+   **Der Entwurf `hell-dunkel-zwei-profile.html` ist an drei Stellen
+   überholt** (Vorlage, Kopf-Farbe, Logogröße) und gehört vor dem Bauen
+   nachgezogen — oder man baut direkt gegen `hell.png`, das ist die Vorgabe.
+
+6. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -797,7 +743,170 @@ die alle auf Marcels Durchgang zurückgehen.
    mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
    wurden, dürfen nicht unerreichbar werden.
 
-12. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+   ### PRÜFLAUF DURCHGEFÜHRT (2026-08-13) — die Befundliste
+
+   Alle drei Wahrheiten ausgelesen und gegeneinander gehalten: `config.js`
+   (Gate, 4 Plan-Blöcke, 33 Schlüssel), `pricing-modal.js` (Matrix) und
+   `landing/index.html` (Cockpit-Matrix, 31 Zeilen).
+
+   **Zuerst die gute Nachricht:** die drei Matrizen sind bei den geprüften
+   Zeilen **deckungsgleich** — 31 Zeilen, gleiche Reihenfolge, gleiche Werte.
+   Die befürchtete Drift zwischen Landing und Modal gibt es an dieser Stelle
+   **nicht**.
+
+   #### B1 · Free bekommt zwei Funktionen, die die Landing ihm nicht verspricht
+
+   | Schlüssel | `config.js` free | Landing + Modal (Free) |
+   |---|---|---|
+   | `live_market_rates` | **true** | **„–"** (also nein) |
+   | `market_data_fields` | **true** | **„gesperrt\*"** |
+
+   Die Fußnote der Landing ist dabei eindeutig: *„Marktdatenfelder in Free &
+   Starter als Vorschau gesperrt, ab Investor freigeschaltet."*
+   **Kein Kundenschaden, aber das Gate ist offener als das Versprechen.**
+   Zu entscheiden ist, welche Seite recht hat — das ist Marcels Sache, nicht
+   meine: entweder das Gate zuziehen oder die Matrix ehrlich machen.
+
+   #### B2 · `bank_pdf_premium` ist ein toter Schlüssel
+
+   Er steht **nur** im Starter-Block, dort auf `false`, und fehlt bei free,
+   investor **und pro**. Ein fehlender Schlüssel ist `undefined` und damit
+   false — **das Feature ist für niemanden verfügbar, auch nicht für Pro.**
+   In keiner der drei Matrizen kommt er vor, es gibt also kein
+   Verkaufsversprechen dazu. Vermutlich ein Überrest; **vor dem Löschen
+   prüfen, ob ihn jemand abfragt** (`grep -rn "bank_pdf_premium"`).
+
+   #### B3 · Dreizehn Schlüssel verlassen sich auf „undefined = false"
+
+   `ai_analysis`, `ai_market_analysis`, `api_access`, `bank_pdf_premium`,
+   `bankexport`, `custom_imports`, `deal_score_v2`, `investment_thesis_ai`,
+   `migration_service`, `premium_pdf_layouts`, `priority_support`,
+   `theme_palette`, `track_record_custom_cover` stehen **nicht in jedem
+   Plan**. Heute ist das folgenlos, weil `undefined` wie `false` wirkt —
+   **aber genau daran hing W41** (`bmf_advanced` stand in keinem Plan und war
+   dadurch für Pro gesperrt). **Ein Tippfehler in einem Schlüsselnamen ist in
+   dieser Bauweise unsichtbar.** Empfehlung: jeden Schlüssel in jedem Plan
+   explizit führen, dann fällt ein Tippfehler beim Lesen auf.
+
+   #### B4 · Zwei „Free kann mehr als Starter"-Fälle sind KEIN Fehler
+
+   `track_record_pdf` (free true, starter false) und
+   `custom_finance_models` (free true, starter false) sahen nach einem
+   Preisfehler aus. Die Matrix erklärt beide: **Free = „Wasserzeichen" bzw.
+   „alle Modelle als Demo"** — Free sieht alles als Vorschau, Starter zahlt
+   und bekommt dafür echte, aber begrenzte Funktionen. **Absicht, nicht
+   Defekt.** Zurückgenommen, bevor daraus ein Befund wurde.
+
+   #### B5 · `pricing-modal.js` führt die Matrix zweimal
+
+   Einmal ab Z. 261 mit `\uXXXX`-Escapes, einmal ab Z. 505 mit echten
+   Zeichen — **dieselben 31 Zeilen, zwei Fassungen.** Heute inhaltsgleich
+   (geprüft an den kritischen Zeilen), aber es ist dieselbe Doppelung, die im
+   Marktbericht dreimal auseinandergelaufen ist. **Eigener kleiner Punkt.**
+
+   #### Nicht geprüft, ehrlich benannt
+
+   - **`hasFeature` fragt zuerst die Datenbank** (`Sub.hasCachedFeature`),
+     `config.js` nur bei `null`. **Der DB-Weg ist nicht gemessen** — dafür
+     braucht es je Plan ein echtes Konto. Das ist der zweite Teil des Punkts
+     und bleibt offen.
+   - **Partner** steht in `config.js` gar nicht; er ist ein Pro-Klon
+     (`reseller-portal.js:552`) plus `reseller`, `reseller_whitelabel`,
+     `custom_logo`. Auch das ist am Konto zu prüfen, nicht im Code.
+
+   *(Zwei eigene Fehlbefunde aus diesem Lauf, damit sie nicht wiederkehren:
+   die Landing schien „Pro = 8 Objekte" und einen Spaltenkopf „?Investor" zu
+   führen. Beides waren **Kodierungsartefakte meiner Konsolenausgabe** —
+   roh stehen dort `∞` und `★`. Bei Matrizen mit Sonderzeichen die Rohzelle
+   lesen, nicht die aufbereitete Ausgabe.)*
+
+   ### NACHTRAG (2026-08-13): der DB-Weg ist gemessen — und B1 war zu weit gegriffen
+
+   Der Punkt verlangte, **beide** Wege zu prüfen. Der DB-Weg ist jetzt
+   gelesen (`plans.features`, jsonb, Staging):
+
+   | Plan | `market_data_fields` | `live_market_rates` | Schlüssel |
+   |---|---|---|---|
+   | free | **false** | **false** | 34 |
+   | starter | false | false | 34 |
+   | investor | true | true | 34 |
+   | pro | true | true | 35 |
+   | partner | true | true | 37 |
+   | **business** | *(fehlt)* | *(fehlt)* | **10** |
+   | **enterprise** | *(fehlt)* | *(fehlt)* | **13** |
+
+   **B1 ist damit zu korrigieren, und zwar zu meinen Lasten:** Ich hatte
+   geschrieben, „Free bekommt zwei Funktionen, die die Landing ihm nicht
+   verspricht". Richtig ist: **die Datenbank führte für Free längst `false`**,
+   und die DB ist laut `config.js:568` die Quelle der Wahrheit — `config.js`
+   ist nur der **Fallback**, solange `Sub.hasCachedFeature` noch `null`
+   liefert. Für einen echten Free-Nutzer war das Gate also zu.
+
+   **Was `v1160` dann wirklich behebt:** das **Startfenster**. Zwischen
+   Seitenaufbau und DB-Antwort greift der Fallback, und dort stand `true`.
+   In diesem Moment sah ein Free-Nutzer Felder, die ihm nicht zustehen.
+   Das Fenster ist jetzt zu. **Kleiner als der Befund klang, aber echt** —
+   und die drei Wahrheiten sagen jetzt dasselbe, was für sich zählt.
+
+   #### B6 · `business` und `enterprise` sind unvollständige Plan-Datensätze
+
+   Sie führen **10 bzw. 13 Schlüssel** statt 34. Alles, was fehlt, ist für
+   sie `false` — dieselbe W41-Mechanik. Beide sind in der Landing und im
+   pricing-modal **nicht** aufgeführt, also vermutlich nicht verkauft.
+   **Vor dem Aufräumen prüfen, ob ein Konto darauf läuft:**
+   `select id, plan_id from subscriptions where plan_id in ('business','enterprise');`
+   Ist niemand darauf, gehören die Zeilen weg oder auf 34 Schlüssel gebracht.
+
+   #### Was weiterhin offen ist
+
+   ~~Der **Plan-Override greift nicht**~~ — **geklärt und behoben, `v1163`,
+   `a4107d0`** (siehe „Fertig"). Er war nicht tot, sondern stand hinten in der
+   Reihenfolge: `getCurrentPlanKey()` fragte zuerst `Sub.getCurrentSync()`.
+   **Jetzt ist er ein Prüfmodus, der nur herabstuft** — `dp_plan_override` auf
+   `free`/`starter`/`investor`/`pro` setzen, neu laden, durchklicken;
+   `localStorage.removeItem('dp_plan_override')` hebt ihn auf.
+
+   **Damit ist der Prüflauf jetzt fahrbar.** Was noch aussteht, ist das
+   Durchklicken selbst — Oberfläche für Oberfläche, je Stufe:
+
+   - [ ] `free` — sieht der Nutzer die Sperren an den richtigen Stellen?
+   - [ ] `starter` — Marcels Frage nach den **sieben Pro-Tagen ist
+         beantwortet** (siehe „Fertig", `TR7-trial`): sie sind eingebaut, aber
+         **nicht am Starter — automatisch ab Registrierung** für jeden neuen
+         Nutzer. Nach Tag 7 wird **kein Objekt unerreichbar**; das Limit hängt
+         nur am Anlegen. **Ich hatte das bestritten, das war falsch.**
+   - [ ] `investor`
+   - [ ] `pro`
+   - [ ] `partner` — der Prüfmodus kann ihn **nicht** simulieren (nur nach
+         unten). Er ist der echte Plan des Prüfkontos, also ohnehin sichtbar.
+
+   **Zwei Grenzen, die beim Durchklicken gelten:** der Prüfmodus zeigt das
+   **Frontend-Gate**, nicht die Backend-Durchsetzung — und er liest den
+   `config.js`-Fallback, nicht die DB-Zeile des simulierten Plans.
+
+7. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+
+   > **GRÖSSTENTEILS SCHON GEBAUT — Befund vom 2026-08-13, siehe „Fertig".**
+   > `buildFullCatalog()` (v519) gibt **alle** `window.FIELDS` an die
+   > Auswertung; `risiken`, `thesis` und `notizen` sind füllbar, und
+   > Prompt-Regel 8 sortiert den Rest nach `notizen`. **Die Chip-Wolke ist
+   > kuratiert, der Auswertekatalog ist es nicht** — wer auf die Chips sieht,
+   > hält die Anzeige für den Umfang.
+   >
+   > **Es bleiben drei Reste:**
+   > 1. **Checkboxen** werden in beiden Katalogbauern übersprungen.
+   > 2. **Das Modal beim „Als Objekt speichern"** — **gemessen: es gibt
+   >    keines.** `qcSaveAsObject()` speichert direkt über einen fest
+   >    verdrahteten Snapshot von ~20 Feldern. Die Auflistung ist damit
+   >    **ohne Vorarbeit nicht baubar** — nichts weiß, welche Werte
+   >    „zusätzlich mitkommen". Und: **welches Modal Marcel meint, ist
+   >    ungeklärt** — erst den Bedienweg gemeinsam ansehen, sonst entsteht
+   >    ein zweites Modal neben einem vorhandenen.
+   > 3. Ob die Einsortierung in der Praxis trifft — **Abnahmepunkt**, nur
+   >    durch einen echten Sprechlauf zu klären.
+   >
+   > **Der Punkt gehört auf diese drei zusammengestrichen**, nicht als Neubau
+   > angefasst.
 
    Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
    Rechenweg.**
@@ -853,7 +962,7 @@ die alle auf Marcels Durchgang zurückgehen.
 
 ---
 
-13. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+8. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
@@ -960,7 +1069,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-14. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+9. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -1058,7 +1167,7 @@ die alle auf Marcels Durchgang zurückgehen.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-15. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
+10. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
    Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
    `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
    das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
@@ -1084,6 +1193,66 @@ die alle auf Marcels Durchgang zurückgehen.
    entscheidet Marcel fachlich — davon hängt ab, ob dort eine MEA-Kürzung
    hingehört oder nur eine deutlichere Feldhilfe (die seit `v1142` steht
    und den fehlenden Abzug bereits benennt).
+
+   > **TEILWEISE GERÄUMT — `v1165`, `b9e7851`** (siehe „Fertig"). Der
+   > **Platzhalter sagte das Gegenteil der Feldhilfe** („alle Garagen
+   > zusammen" gegen „nur der eigene Anteil"), und sichtbar ist der
+   > Platzhalter. Das war kein Entscheidungsfall, sondern ein Widerspruch, in
+   > dem einer der beiden Texte falsch sein musste. Er ist weg.
+   >
+   > **Die fachliche Frage bleibt offen** — und sie ist jetzt die einzige, die
+   > noch blockiert. Zwei Wege stehen zur Wahl:
+   > - **A · Feld bleibt wohnungsbezogen** (was die Texte jetzt sagen). Nichts
+   >   weiter zu tun; der Nutzer trägt seinen Anteil ein.
+   > - **B · Feld wird gebäudebezogen** und die Rechnung kürzt selbst mit dem
+   >   MEA — dann muss `lib/nhk2010.js` `mea`/`ist_wohnung` bekommen, wie es
+   >   `ErtragswertService.bodenwert()` schon tut, und beide Texte drehen sich
+   >   wieder um.
+   >
+   > ~~**Ohne Entscheidung noch baubar:** ein Hinweis im Formular~~ —
+   > **gebaut, `v1166`, `c9779df`** (siehe „Fertig"). Erscheint, wenn ein MEA
+   > gepflegt ist **und** eine Garagenfläche steht.
+   >
+   > **Empfehlung für die Entscheidung: Weg A.** Drei Gründe, damit die
+   > Abwägung nicht neu geführt werden muss:
+   > 1. **Alles andere im Modell ist bereits wohnungsbezogen** — Gebäudeteil
+   >    über die BGF der Wohnung, Außenanlagen als Prozentsatz davon,
+   >    Bodenwert MEA-gekürzt. Bei B wäre die Garage das **einzige** Feld,
+   >    das gesamtgebäudebezogen eingegeben und intern gekürzt wird.
+   > 2. **Die Garage folgt fachlich nicht dem Wohnungs-MEA** — in der
+   >    Teilungserklärung meist eigener Anteil oder Sondernutzungsrecht.
+   >    Eine Kürzung mit dem Wohnungs-MEA wäre in beide Richtungen falsch.
+   > 3. **B ist ein Rechenkern-Eingriff** mit Prüfstrecke gegen das
+   >    Anwendungsbeispiel — für einen Effekt, den eine richtige Zahl im Feld
+   >    sauberer erreicht. A ist gebaut.
+   >
+   > **Wo A schwach ist, offen gesagt:** beim Mehrfamilienhaus mit
+   > gemeinschaftlichen Garagen ohne Zuordnung verführt das Feld dazu, die
+   > Gesamtfläche einzutragen. **Genau dagegen steht jetzt der Hinweis aus
+   > `v1166`.** Die Entscheidung bleibt trotzdem Marcels.
+
+11. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
+
+   Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
+   schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
+   es der alte Befund in neuer Form ist.
+
+   **Am Raster messen, nicht am Farbtoken.** Ohne Vorlage ist der Bereich
+   sauber, erst mit umgestellter Vorlage rückt alles zusammen — die Ursache
+   liegt also im Abstandsraster, nicht in der Farbe. Und beim Nachmessen die
+   `v1105c`-Lehre mitnehmen: das Goldband ist ein `::before`, ein Leser, der
+   nur die Elternkette abläuft, sieht es nicht.
+
+   **Dazu Marcels zweite Vorgabe an derselben Karte:** *„achte darauf, dass
+   alle Werte immer angegeben werden, die wir brauchen."* Das ist ein eigener
+   Prüfschritt — **welche Angaben gehören auf die Karte, und fehlt eine
+   davon?** Die Liste gehört mit Marcel abgestimmt, nicht von mir geraten;
+   danach wird gezählt, ob jede tatsächlich erscheint (und was passiert, wenn
+   sie leer ist — `_euro(null)` liefert `"–"` und ist **truthy**, ein
+   `||`-Rückfall greift dort nie).
+
+   **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
+   Aufgreifen zusammenlegen, nicht doppelt bauen.
 
 ## Später
 
@@ -1236,7 +1405,706 @@ die alle auf Marcels Durchgang zurückgehen.
 
 ## Fertig
 
+- [2026-08-13] **Punkt 6 durchgeklickt — zwei Funktionen sind für JEDEN gesperrt, auch für Pro und Partner**
+   Der Prüfmodus aus `v1163` erlaubt endlich, was der Punkt verlangte. Alle
+   vier Stufen gegen 25 Feature-Schlüssel gemessen, dann **gegen die Datenbank
+   gegengehalten** — und genau das Gegenhalten war der Punkt.
+
+   ### Der Befund: `beleg_import` und `theme_palette` stehen in KEINEM DB-Plan
+
+   `config.js` gibt sie frei (`beleg_import` ab Investor, `theme_palette` ab
+   Pro). **Die Datenbank kennt beide Schlüssel überhaupt nicht** — geprüft
+   über `jsonb_object_keys` für alle fünf Pläne.
+
+   Und die DB ist die Quelle: `hasFeature` fragt zuerst `Sub.hasCachedFeature`
+   und nimmt `config.js` nur bei `null`. **Gemessen am echten Partner-Konto
+   sind beide `false`.** Für jeden zahlenden Nutzer sind diese zwei Funktionen
+   also **zu**, während die Datei behauptet, sie seien offen.
+
+   | Schlüssel | `config.js` | DB | echter Partner |
+   |---|---|---|---|
+   | `beleg_import` | ab investor | **fehlt** | **false** |
+   | `theme_palette` | ab pro | **fehlt** | **false** |
+
+   **Das ist Befund B3 in echt** — nur andersherum, als B3 ihn vermutet hatte.
+   B3 fürchtete einen Tippfehler im **Code**; der Kreuzabgleich hatte den zu
+   Recht entwarnt. Die Lücke sitzt zwischen **Code und Datenbank**: ein
+   Schlüssel, den `config.js` kennt und `plans.features` nicht, ist still zu.
+   **Der Kreuzabgleich muss beide Seiten prüfen, nicht nur die Frontend-Seite.**
+
+   **Zu klären, bevor jemand etwas ändert:** ob die zwei Funktionen überhaupt
+   ausgeliefert sind. Ein Schlüssel ohne DB-Eintrag kann auch schlicht heißen,
+   dass es die Funktion nicht mehr gibt — dann gehört er aus `config.js` raus
+   und nicht in die DB. **Erst messen, was hinter den Schlüsseln steckt.**
+
+   ### Zweiter Befund: `custom_finance_models` — die Datei ist großzügiger als die DB
+
+   `config.js` gibt es **Free** frei, die DB führt `free=false`. Ein echter
+   Free-Nutzer hat es also nicht — **es sieht nur im Startfenster so aus**,
+   bis die DB antwortet. Dasselbe Muster wie bei `v1160`, nur an einem anderen
+   Schlüssel. Die restlichen 22 Schlüssel waren unauffällig.
+
+   *(Messfalle, die ich fast selbst getreten hätte: die simulierten Stufen
+   lesen den `config.js`-Fallback, das echte Konto liest die DB. **Das ist kein
+   Äpfel-mit-Äpfeln-Vergleich** — ein Unterschied zwischen „partner" und den
+   anderen Zeilen der Matrix ist zuerst ein Hinweis auf die Quelle, nicht auf
+   den Plan. Erst der DB-Abgleich macht daraus einen Befund.)*
+
+- [2026-08-13] **Spracheingabe: schneller, und die Stichwörter als Fenster** — `v1169`, `a78ab83`.
+   ### Schneller — eine Zeile, die niemandem nützte
+
+   Pro Aufnahme laufen **vier** Modelle: Transkription, Live-Zwischenauswertung
+   (`gpt-4o-mini`), Feldauswertung (`gpt-5.5`), Verifikation (`gpt-5.4-mini`).
+
+   **Der Transkriptions-Default stand auf `gpt-4o-transcribe-diarize`.**
+   Diarisierung trennt **Sprecher voneinander** — beim Diktat ins eigene
+   Mikrofon spricht eine Person. Das war Rechenzeit ohne Gegenwert, und der
+   **Dateikopf nennt als Default ohnehin `gpt-4o-mini-transcribe`**: Code und
+   Doku standen auseinander, und der Code hatte das teurere gewonnen.
+
+   Jetzt `gpt-4o-mini-transcribe`. Weiterhin über `OPENAI_TRANSCRIBE_MODEL`
+   überschreibbar — wer eine Besichtigung zu zweit aufnimmt, setzt die
+   Sprechertrennung dort.
+
+   **Ehrlich dazu:** um wie viel es schneller wird, ist **nicht gemessen** —
+   dafür braucht es einen echten Sprechlauf. Dass Sprechertrennung bei einem
+   Sprecher nichts beiträgt, steht dagegen fest.
+
+   ### Fenster statt Wolke
+
+   Bisher standen **alle** Chips gleichzeitig da, je nach Modus über 30. Wer
+   spricht, sucht darin sein nächstes Stichwort — die Wolke wurde mit jedem
+   erkannten Feld nur **bunter, nicht kürzer**.
+
+   Jetzt höchstens **neun** sichtbar. Ein erkanntes bleibt **900 ms grün
+   stehen** — damit die Bestätigung gesehen wird —, geht dann mit einem kurzen
+   Abgang weg, und von hinten rückt eins nach.
+
+   **Bewusst nur die Sichtbarkeit.** Alle Chips bleiben im DOM:
+   `updateChipsFromText`, `markChipsFinal` und die Gruppen-Navigation suchen
+   per Selektor `.vi-chip[data-cid=…]` — **wer hier Elemente entfernt, bricht
+   drei Stellen still.** Und der Fortschrittszähler zählt weiter **alle**,
+   sonst stünde dort dauerhaft „9".
+
+   `display:none` statt `visibility` — ein unsichtbares Chip hielte seinen
+   Platz und die Wolke bliebe genauso groß.
+
+   **Nachweis:** Syntax beide Dateien, Backend neu gebaut, Marker im
+   Container. Das Ausblende-CSS im Browser geprüft: `.vi-aus` und `.vi-weg`
+   ergeben `display:none`, das erkannte Chip trägt die Animation `viAb`.
+   **Die Nachrück-Logik selbst ist nicht abgenommen** — die Chips entstehen
+   erst beim Aufnahmestart, und dafür braucht es ein Mikrofon. Staging-Abnahme.
+
+- [2026-08-13] **Checkboxen per Sprache — der ganze Weg, nicht nur die Freigabe** — `v1168`, `77be07f`. **(Backlog-Punkt 7, Rest 1)**
+   Beide Katalogbauer stiegen bei `type === 'checkbox'` aus. „Alle Felder"
+   schließt sie ein. **Die Freigabe allein hätte nichts bewirkt** — vier
+   Stellen mussten mit, und jede einzelne hätte still versagt:
+
+   | # | Stelle | Was ohne sie passiert wäre |
+   |---|---|---|
+   | 1 | **Backend-Whitelist** (`voiceExtractService:51`) | `kind` wird gegen `['select','num','int','date','text']` geprüft — `bool` wäre **still auf `text`** gefallen. Katalog käme durch, KI lieferte `"ja"`, das Frontend hätte einen String, wo es ein Häkchen setzen will |
+   | 2 | **Prompt-Zeile** | Das Modell rät zwischen `true`, `"ja"` und `1`. Wichtiger noch: **nur nennen, wenn zutreffend** — sonst listet es gewissenhaft alle Häkchen mit `false` und die Import-Tabelle quillt über mit Nicht-Befunden |
+   | 3 | **Normalisierung**, in **beiden** Auswertepfaden | Ohne sie käme `"ja"` als String an |
+   | 4 | **`applyMerged()`** in `object-actions.js` | `setInput()` schreibt in `.value` und **lässt eine Checkbox unberührt** — sie wäre als übernommen **gezählt** worden, ohne gesetzt zu sein |
+
+   **Die wichtigste Entscheidung ist keine technische:** Es kommt **nur JA
+   durch.** Ein „nein" wird verworfen statt als `false` übernommen — sonst
+   hakt ein beiläufiges *„einen Stellplatz gibt es nicht"* ein Feld **aktiv
+   ab**, das der Nutzer nie angefasst hat. Die Import-Tabelle zeigt nur, was
+   gesetzt wird; ein stilles Abhaken wäre dort unsichtbar gewesen.
+
+   `change` wird von Hand gefeuert — ein per Skript gesetztes `.checked` löst
+   keins aus, und die Rechenkette hängt an Ereignissen.
+
+   ### Der Rest war viel kleiner als der Punkt klingt
+
+   **Gemessen: 203 Felder, davon genau EINE Checkbox** — `san_tax_active`.
+   Die Änderung ist vollständig und richtig, **betrifft heute aber ein Feld.**
+   Das Formular löst Ja/Nein sonst über Selects, und die sind längst füllbar.
+   *(Wer den Punkt für groß hielt — ich auch — hat von „Checkboxen" auf eine
+   Menge geschlossen, die es nicht gibt. Erst zählen, dann schätzen.)*
+
+   **Nachweis:** Syntax für alle drei Dateien, Backend **neu gebaut**, vier
+   Marker im laufenden Container, Server hört wieder. **Nicht abgenommen ist
+   der Sprechlauf** — dafür braucht es ein Mikrofon am Gerät. Das bleibt
+   Rest 3 des Punktes.
+
+- [2026-08-13] **Punkt 7, Rest 2 gemessen: das Speichern-Modal gibt es nicht — und der Snapshot ist eine feste Liste**
+   Marcel: *„Beim ‚Als Objekt speichern' öffnet sich ohnehin ein kleines Modal.
+   Dort soll stehen: es gibt weitere Werte, die mit übernommen werden — mit
+   Auflistung, und mit den Texten der Zusammenfassung."*
+
+   **Gemessen in `quick-check.js:1720`:** `qcSaveAsObject()` speichert **ohne
+   jedes Modal**. Es sammelt einen **fest verdrahteten Snapshot** von rund
+   20 `qc_`-Feldern (Kaufpreis, Miete, Adresse, Flächen, Zins, Tilgung …),
+   prüft zwei Pflichtfelder und schreibt durch.
+
+   **Zwei Folgerungen, die den Rest schärfen:**
+   1. **Die Auflistung, die Marcel will, ist ohne Vorarbeit gar nicht baubar** —
+      es gibt keine Stelle, die weiß, *welche* Werte „zusätzlich mitkommen".
+      Der Snapshot ist eine Handliste, keine Ableitung. Wer die Auflistung
+      will, braucht zuerst eine Quelle dafür.
+   2. **Der Snapshot trägt `thesis`, `risiken` und `notizen` NICHT.** Im
+      QuickBoarding werden sie heute auch nicht per Sprache gefüllt (dort
+      bleibt es bei den QC-Feldern), es geht also **nichts verloren**. Sobald
+      der Sprach-Umfang im QC erweitert würde, **ginge es verloren** — dann
+      muss der Snapshot mitwachsen. Das gehört zusammen entschieden.
+
+   **Nicht geklärt:** welches Modal Marcel meint. Möglich, dass er das
+   Namens-/Bestätigungsfenster eines anderen Weges vor Augen hat
+   (`pdf-import.js` kennt ein „Als Objekt speichern" mit Fotos). **Bevor hier
+   gebaut wird, den Bedienweg einmal gemeinsam anschauen** — sonst entsteht
+   ein zweites Modal neben einem vorhandenen.
+
+- [2026-08-13] **Punkt 7 ist zum größten Teil längst gebaut — Befund, kein Umbau**
+   **Vor dem Bauen nachgesehen, und gut so.** Marcels Punkt liest sich wie ein
+   Neubau („Spracheingabe soll **alle** Felder füllen"). Gemessen im Code:
+
+   | Marcels Wunsch | Stand |
+   |---|---|
+   | **alle** Felder per Sprache füllbar | **`buildFullCatalog()`, v519** — gibt *alle* `window.FIELDS` an die Auswertung, nicht nur die Chip-Whitelist. Der Kommentar nennt als Beispiele genau `bank_inst`, `d1_type`, Bauspar-Felder, Investment-These, Risiken |
+   | Risiken und Mängel → **bekannte Risiken** | `risiken` steht in `HINTS` und ist füllbar |
+   | Vorhaben → **Investitionsthese** | `thesis` ebenso |
+   | Rest → **zusätzliche Notizen**, statt ihn zu verlieren | **Prompt-Regel 8** in `voiceExtractService.js:138`: *„Allgemeine Anmerkungen ohne eigenes Feld → notizen."* |
+   | QuickBoarding: weniger Felder, gleiche Logik | so gebaut — im Quick Check bleibt es bei den QC-Feldern, derselbe Dienst |
+
+   **Der Unterschied, der den Punkt erklärt:** die **Chip-Wolke** ist kuratiert
+   (`buildCatalog`, v510 — eine Whitelist mit Klartext-Labels), der
+   **Auswertekatalog** ist vollständig (`buildFullCatalog`, v519). Wer auf die
+   Chips sieht, hält die Liste für den Umfang. **Sie ist nur die Anzeige.**
+
+   ### Was wirklich offen ist — deutlich kleiner als der Punkt
+
+   1. **Checkboxen werden übersprungen.** Beide Katalogbauer steigen bei
+      `el.type === 'checkbox'` aus. „Alle Felder" schließt sie ein; ob das
+      Absicht war, steht nirgends.
+   2. **Das Modal beim „Als Objekt speichern"** — Marcel will dort die
+      Auflistung der mit übernommenen Werte und die Texte der Zusammenfassung.
+      **Nicht geprüft**, ob es das gibt.
+   3. Ob die Einsortierung in `risiken`/`thesis`/`notizen` in der Praxis
+      trifft, sagt nur ein echter Sprechlauf — das ist ein Abnahmepunkt, kein
+      Codebefund.
+
+   **Deshalb hier nichts gebaut.** Ein Paket auf „das fehlt" wäre das siebte
+   Mal derselbe Fehler gewesen. Der Punkt gehört auf die drei Reste
+   zusammengestrichen, nicht als Neubau angefasst.
+
+- [2026-08-13] **Die zwei Reste des Profil-Schalters sind zu** — `v1167`, `c1d572b`. **(Backlog-Punkt 5 abgeschlossen)**
+   **Rest 1 · Je Profil eigene Werte.** Der Schalter setzte `ui_cards` hart auf
+   `''`. Wer „Wallet" oder „Stapel" eingestellt hatte, verlor das beim
+   Umschalten — und beim **Zurückschalten kam es nicht wieder.** Marcels
+   Vorgabe nennt für das helle Profil Standard-Karten, das war also nicht
+   falsch, aber gröber als nötig.
+
+   Jetzt merkt sich jedes Profil seine drei Darstellungsschalter unter
+   `dp_profil_werte`. **Nur die drei** — `ui_accent` und `ui_obsidian` sind
+   Markenfarben und gelten in beiden Profilen; wer sein Gold setzt, will es
+   nicht nur im Dunkeln.
+
+   **Gesichert wird nur, wenn wirklich ein Profil aktiv war.** Bei einer
+   dritten Vorlage gehört der Stand zu keinem der zwei und würde sonst einem
+   davon untergeschoben.
+
+   **Nachgemessen** (`settings.js?v=v1167`, echte Klicks):
+
+   | | Vorlage | Karten | Merker |
+   |---|---|---|---|
+   | Ausgang: Obsidian + Wallet | (keine) | `wallet` | – |
+   | nach „Hell" | `kanzlei` | (keine) | `obsidian:{wallet}` |
+   | zurück auf „Obsidian" | (keine) | **`wallet`** | beide Profile |
+
+   **Rest 2 · Markierung beim Öffnen.** `markieren()` hing nur am Klick auf ein
+   Profil — wer das Pane öffnete, sah **zwei ungedrückte Knöpfe**, obwohl einer
+   galt. `_dpProfilMarkieren` gab es bereits, es wurde nur nie beim Öffnen
+   gerufen. Gemessen: Pane geschlossen, neu geöffnet, ohne Klick steht
+   `obsidian=true hell=false`.
+
+   **Damit ist Backlog-Punkt 5 vollständig** — Schalter, beide Richtungen,
+   eigene Werte je Profil, Markierung. Marcels Einstellungen und der neue
+   Merker sind nach dem Test zurückgesetzt.
+
+- [2026-08-13] **Der Hinweis am Garagenfeld — die Rückfrage, die in beiden Wegen stimmt** — `v1166`, `c9779df`. **(Backlog-Punkt 10)**
+   Punkt 10 wartet auf eine fachliche Entscheidung. **Dieser Hinweis nimmt sie
+   nicht vorweg** — er erscheint genau dann, wenn beide Auslegungen
+   auseinanderfallen können: ein **Miteigentumsanteil ist gepflegt** (also eine
+   ETW) **und eine Garagenfläche steht drin.** Dann fragt er:
+
+   > Der Miteigentumsanteil wird hier **nicht** abgezogen — anders als beim
+   > Bodenwert. Steht dort der eigene Anteil?
+
+   **Bewusst keine Schwelle und keine Rechnung.** Die Garage folgt in der
+   Teilungserklärung meist einem **eigenen** Anteil oder einem
+   Sondernutzungsrecht, nicht dem Wohnungs-MEA. Eine automatische Kürzung wäre
+   darum in **beide** Richtungen falsch — bei zwei Garagen für sechs Parteien zu
+   wenig, bei einer zugeordneten eigenen Garage ebenfalls zu wenig, bei gar
+   keiner zu viel. **Gefragt wird, nicht gerechnet.**
+
+   **Zwei Fallen beim Einbau, beide vorher bedacht:**
+   - Aufgerufen **nach** dem Neuzeichnen. `zeichnen()` baut die Blöcke neu auf;
+     ein vorher angehängter Hinweis wäre still wieder weg gewesen. `mea` und
+     `garagenBgf` standen bereits in der Auslöserliste — der Hinweis kommt bei
+     jeder Änderung an einem der beiden mit.
+   - **Eigene Darstellung statt einer fremden Klasse:** für `.wm-f small` gibt
+     es in dieser App **keine** Regel. Ein blankes `<small>` hätte geerbt, was
+     zufällig da war. Gedämpft und ohne Statusfarbe, Gold als
+     Whitelabel-Token — es ist eine Rückfrage, kein Fehler.
+
+   **Nachweis:** Syntax geprüft, zwei Marker auf dem Server, Cache-Kette in
+   allen drei Gliedern gezogen. **Im Browser nicht abgenommen** — dafür braucht
+   es einen Bericht mit gepflegtem MEA und Garagenfläche; das ist ein
+   Staging-Abnahmepunkt.
+
+- [2026-08-13] **Das Garagenfeld sagte im Platzhalter das Gegenteil der Feldhilfe** — `v1165`, `b9e7851`. **(Backlog-Punkt 10, der entblockbare Teil)**
+   Punkt 10 stand als **blockiert**, weil eine fachliche Entscheidung fehlt.
+   Beim Nachsehen lag darunter aber ein Widerspruch, der **keine** Entscheidung
+   braucht — einer der beiden Texte muss schlicht falsch sein:
+
+   | | Text |
+   |---|---|
+   | Feldhilfe (v1142) | „bei einer Eigentumswohnung also nur die eigene Garage oder **der eigene Anteil**" |
+   | Platzhalter im Feld | „Länge × Breite, **alle Garagen zusammen**" |
+
+   **Sichtbar ist der Platzhalter.** Die Hilfe muss man aufklappen. Der Nutzer
+   trug also genau die Gesamtfläche ein, die den Sachwert zu hoch macht —
+   `lib/nhk2010.js` kennt weder `mea` noch `ist_wohnung` und kürzt nichts. Am
+   Prüfobjekt Hüllhorst sind das 64,58 m² für **eine von drei** Einheiten, bis
+   zu rund 18.500 € zu viel.
+
+   Der Platzhalter heißt jetzt „Länge × Breite – bei einer ETW nur der eigene
+   Anteil". Cache-Buster in **allen drei Gliedern** der Marktbericht-Kette
+   hochgezogen.
+
+   **Was das ausdrücklich NICHT tut:** es nimmt die fachliche Frage nicht
+   vorweg. Ob ins Feld eine MEA-Kürzung gehört, entscheidet Marcel weiterhin —
+   hier wurde nur der Widerspruch zwischen zwei Texten geräumt.
+
+   **Nachweis:** Syntax geprüft, Marker auf dem Server, Kette gezogen. Der
+   sichtbare Platzhalter ist **nicht im Browser abgenommen** — ein Textstring
+   ohne Logik, aber gesehen habe ich ihn dort nicht.
+
+- [2026-08-13] **Die Objektnummer im Kopf hat jetzt Kontrast** — `v1164`, `bb44d8d`. **(Backlog-Punkt 9)**
+   **Kein neuer Befund, sondern der Rest eines halb erledigten.** Der Punkt
+   nannte 2,98 (kanzlei) und 2,88 (boarding). Gemessen wurde jetzt **3,88 und
+   3,72** — die Regel aus Abschnitt (b) der `ui-varianten.css` hat also längst
+   gewirkt, sie war nur **nicht weit genug**. Kleiner Text (10,5 px / 700)
+   braucht 4,5.
+
+   **Gelöst über den Token, nicht über eine neue Regel.** `--uv-marke-dd` war
+   bisher nur ein Alias auf `--uv-marke-d` — die Sollbruchstelle war vorgesehen
+   und nie benutzt. Jetzt dunkelt sie **relativ zum Markenton** ab:
+   `color-mix(in srgb, var(--uv-marke-d) 82%, #000)`.
+
+   **Relativ und nicht als Literal — das ist der Punkt:** ein Whitelabel-Rot
+   bleibt Rot und wird nur dunkler. Ein festes Gold hätte die Mandantenmarke an
+   sechs Stellen überschrieben, und `gold-audit.py` hätte es zu Recht angemahnt.
+
+   | | vorher `#987B22` | jetzt `#7d651c` |
+   |---|---|---|
+   | kanzlei (`#FBFAF7`) | 3,88 | **5,38** |
+   | boarding (`#FAF5E8`) | 3,72 | **5,16** |
+
+   **Alle sechs Leser von `--uv-marke-dd` wurden vorher geprüft** — Objektnummer,
+   Kerosin-Pille, zwei Teile des Aktionen-Knopfs, Reiter-Status. Alle stehen auf
+   **hellem** Grund unter kontor/panel/kanzlei/boarding, keiner auf dunklem.
+   Deshalb ist das Abdunkeln für alle richtig und nicht nur für den gemeldeten Fall.
+
+   **Zwei Werkzeugfallen, beide neu und beide teuer:**
+   1. **Der Grund-Leser muss Verläufe auswerten** — stand schon im Punkt und hat
+      sich bestätigt. Ein Leser, der nur `background-color` kennt, überspringt die
+      Kopfleiste und meldet Weiß.
+   2. **Verschachteltes `color-mix` liefert `color(srgb 0.48 0.39 0.10)`, nicht
+      `rgb()`.** Mein Parser las die 0–1-Werte als 0–255 und meldete Kontrast
+      19,24 — *„behoben"*, wo nichts gemessen war. **Ein Farbparser, der nur
+      `rgb()` kennt, ist ab jetzt unbrauchbar**, sobald `color-mix` im Spiel ist.
+   3. Und der Nachfolgefehler davon: der reparierte Leser fand dann den
+      **halbtransparenten Eigenhintergrund** der Pille (20 % Gold) und maß
+      dagegen. **Gemessen wird gegen den Grund der Fläche darunter**, nicht gegen
+      den eigenen Schleier.
+
+   *(Nicht gemessen: `kontor` und `panel` lesen denselben Token, ihre Kopfgründe
+   sind aber nicht ausgelesen. Gegen den im Punkt genannten älteren Grund
+   `#E8DFC5` käme der neue Ton auf 4,22 — knapp unter 4,5. Wer dort nachmisst,
+   sollte mit 85 % statt 82 % rechnen.)*
+
+- [2026-08-13] **Die sieben Pro-Tage gibt es — Marcel hatte recht, ich hatte es bestritten** — Prüflauf, kein Umbau. **(Backlog-Punkt 6, Marcels Frage)**
+   **Zuerst die Rücknahme:** Im Prüflauf vom selben Tag stand von mir *„Ich
+   kann das nicht bestätigen — in meinen Unterlagen steht es nicht."* **Das
+   war falsch, und zwar weil ich in meinen Unterlagen gesucht habe statt im
+   Code.** Der Mechanismus ist gebaut, sauber dokumentiert und trägt überall
+   den Marker `TR7-trial`.
+
+   **Wie es wirklich läuft — nicht am Starter, sondern ab Registrierung:**
+
+   | | |
+   |---|---|
+   | **Wer** | **jeder neue Nutzer**, automatisch bei der Registrierung |
+   | **Was** | `plan_trials`-Zeile, `granted_plan='pro'`, `expires_at = NOW() + 7 days` |
+   | **Wo vergeben** | `userService.js:42` (der Trichter) und `auth.js:69` |
+   | **Mehrfachvergabe** | ausgeschlossen per `WHERE NOT EXISTS` |
+   | **Auslaufen** | automatisch über `expires_at`, kein Aufräumjob nötig |
+   | **Fehlschlag** | wird geloggt, bricht die Registrierung **nicht** ab |
+
+   **Vier bewusste Abweichungen von rohem Pro** (`subscriptionService.js:78 ff.`):
+   1. **Ein aktives bezahltes Abo schlägt die Testphase** — sonst sähe ein
+      Reseller-Mandant sieben Tage „Pro" und würde danach sichtbar
+      herabgestuft, obwohl der Reseller bezahlt hat.
+   2. `export_csv`, `json_backup`, `excel_import` bleiben **aus** — die
+      Exporte sind Verkaufsargumente und tragen kein Wasserzeichen.
+   3. **KI-Kontingent bleibt auf Free-Niveau** — Kerosin wird nicht verschenkt.
+   4. **Das Wasserzeichen bleibt aktiv.** Getestet wird der Funktionsumfang,
+      nicht der Export.
+
+   ### Und was nach Tag 7 mit den Objekten passiert — die eigentliche Frage
+
+   **Nichts wird unerreichbar.** Belegt, nicht vermutet: `requireUnderLimit('objects')`
+   hängt an **genau einer Stelle** — `router.post('/')` in `objects.js:73`.
+   **Nur das Anlegen** ist begrenzt; Lesen, Listen und Ändern tragen kein Limit.
+
+   | Plan | `max_objects` |
+   |---|---|
+   | free | 1 |
+   | starter | 5 |
+   | investor | 25 |
+   | pro / partner | `-1` (unbegrenzt) |
+
+   Nach Ablauf fällt der Nutzer auf Free (1). Seine unter Pro angelegten
+   Objekte bleiben **sichtbar, aufrufbar und bearbeitbar** — er kann nur kein
+   neues anlegen, solange er über dem Limit liegt. **Das ist das richtige
+   Verhalten**, und es ist keine Änderung nötig.
+
+   *(Ungeprüft geblieben: ob das Frontend die verbleibenden Testtage sichtbar
+   macht. `trial_days_left` liefert das Backend — ob es jemand anzeigt, ist
+   nicht gemessen.)*
+
+- [2026-08-13] **Der Plan-Override war wirkungslos — jetzt ein Prüfmodus, der nur nach unten geht** — `v1163`, `a4107d0`. **(Backlog-Punkt 6, der offene Rest)**
+   **Der Punkt lag nicht am Prüfen, sondern am fehlenden Werkzeug.** „Je Plan
+   durchklicken" war nicht simulierbar: `getCurrentPlanKey()` fragte **zuerst**
+   `Sub.getCurrentSync()`, und ein echtes Abo im Cache gewann immer. Gemessen:
+   `dp_plan_override='free'` gesetzt, `currentKey()` blieb `partner`. **Der
+   Override war also nie tot — er stand hinten in der Reihenfolge.**
+
+   **Kein genereller Vorrang.** Das würde jeden Nutzer mit einer Konsolenzeile
+   auf `partner` heben. Stattdessen Rangordnung
+   `free < starter < investor < pro < partner`, und **der Override darf nur
+   herabstufen.** Wer Partner hat, sieht sich alles darunter an; nach oben
+   geht nichts.
+
+   **Der zweite Teil, ohne den es ein halber Schalter wäre:** `hasFeature`
+   fragt zuerst `Sub.hasCachedFeature` — die DB-Features des **echten** Abos.
+   Die Anzeige hätte „free" gezeigt und trotzdem Partner-Funktionen
+   freigeschaltet. **Das sieht aus wie ein bestandener Test und ist keiner.**
+   Im Prüfmodus wird der DB-Weg jetzt übersprungen. Eine Quelle für beide
+   Leser: `pruefOverride(echterPlan)`.
+
+   **Nachgemessen** (`config.js?v=v1163`, echtes Partner-Konto):
+
+   | | echt | `currentKey()` | Features |
+   |---|---|---|---|
+   | ohne Override | partner | `partner` | `market_data_fields=true`, `rnd_full=true` |
+   | Override `free` | partner | **`free`** | **beide `false`** |
+   | Override entfernt | partner | `partner` | wieder `true` |
+
+   **Grenze, die dazugehört:** simuliert wird das **Frontend-Gate**, nicht die
+   Durchsetzung im Backend — die API antwortet weiter nach dem echten Abo. Und
+   der Prüfmodus zeigt den **`config.js`-Fallback** des simulierten Plans, nicht
+   dessen DB-Zeile; der Client kennt nur sein eigenes Abo. Für die geprüften
+   Schlüssel stimmen beide überein, sonst wäre das ein Fehlerkanal.
+
+   ### Kreuzabgleich der Feature-Schlüssel — B3 ist entwarnt
+
+   B3 fürchtete: „ein Tippfehler sperrt still den teuersten Plan". Alle im
+   Frontend abgefragten Schlüssel gegen alle in Plänen definierten gehalten
+   (37 in den Plänen, 26 abgefragt über `hasFeature`/`can`/`_gate`/
+   `data-feature`): **kein abgefragter Schlüssel fehlt in den Plänen.** Die
+   Sorge trifft an keiner Stelle zu.
+
+   *(Zwei eigene Fehlbefunde aus diesem Lauf, beide vor der Meldung gefangen —
+   und beide entstanden, weil ich Namen verglichen statt Aufrufstellen gelesen
+   habe:*
+   1. *`ai_analysis=false` bei Free „gemessen" — es heißt `ai_analysis_tab`,
+      und ein unbekannter Schlüssel ist für jeden false. Die Probe hat sich
+      selbst erzeugt, was sie fand.*
+   2. *Fünf Schlüssel schienen abgefragt, aber nirgends definiert, darunter ein
+      scheinbarer Dreher `custom_track_record_cover` ↔ `track_record_custom_cover`.
+      **Ein Namensdreher wäre ein echter Kundenschaden gewesen** — deshalb erst
+      die Aufrufstelle gelesen: `_gate()` führt beide Schreibweisen im
+      **Selektor**, um beide HTML-Varianten zu fangen, der **Schlüssel** ist
+      richtig. `ai_lage`, `bauspar`, `tilgungsaussetzung` sind gar keine
+      Feature-Schlüssel, sondern Datenfelder. **Lehre: bei Feature-Schlüsseln
+      nie Namenslisten diffen, ohne die Aufrufstelle zu lesen** — `_gate` trennt
+      Selektor und Schlüssel, ein grep über beide wirft sie zusammen.)*
+
+- [2026-08-13] **Hell und Dunkel als zwei Profile, unter „Profil & Anzeige"** — `v1162` + `v1162b`, `381e678`. **(Backlog-Punkt 5, erster Wurf)**
+   **Marcels Vorgabe:** „DealPilot wird im dunklen Modus ausgeliefert. Daneben
+   ein heller Modus, umschaltbar mit einem Griff." Ort: ausdrücklich
+   **Einstellungen → Profil & Anzeige**.
+
+   **Die helle Fassung kommt aus `design/mockups/hell.png`** und ist damit die
+   Vorlage **`kanzlei`**, nicht `panel` — am CSS gegengeprüft (warme helle
+   Kopfleiste `--uv-chrome #FBFAF7`, warme Fläche, weiße Karten,
+   Serifenschrift). `panel` ist „Kühl" mit Blaustich und im Bild nirgends.
+   **Und der Chrome-Skin bleibt in beiden Profilen aus:** im Bild sind die
+   Reiter golden, nicht die Tinte aus `v1158`, und die hängt an
+   `body.dp-chrome-hell`. Der helle Modus ist eine **Vorlage**, kein Skin.
+
+   | Profil | `ui_theme` | `ui_cards` | `dp_chrome_hell` |
+   |---|---|---|---|
+   | Obsidian | `''` | `''` | `0` |
+   | Hell | **`kanzlei`** | `''` | `0` |
+
+   **Kein zweites Zustandsmodell:** derselbe Schlüssel `dp_user_settings`,
+   dieselbe `anwenden()`-Kette wie im Darstellungs-Panel, angewandt über
+   **dessen API** statt per `setAttribute` — sonst fehlt `skinNachziehen()`.
+
+   **Ist eine dritte Vorlage aktiv, ist KEIN Profil markiert.** Das ist
+   ehrlicher als eines zu behaupten: wer im Panel „Konsole" gewählt hat, ist
+   in keinem der zwei. Gemessen und bestätigt (`aktiv: null` bei `panel`).
+
+   **Nachgemessen** (`settings.js?v=v1162b`, echte Klicks):
+
+   | | vorher | nach „Hell" | nach „Obsidian" |
+   |---|---|---|---|
+   | Vorlage | (keine) | **`kanzlei`** | (keine) |
+   | Kopfleiste | dunkler Verlauf | **rgb(251,250,247)** | dunkler Verlauf |
+   | Sidebar | rgb(10,10,10) | rgb(251,250,247) | rgb(10,10,10) |
+   | Reiter | — | **golden** | — |
+   | `dp_chrome_hell` | 0 | **0** | 0 |
+
+   ### `v1162b` — die Reihenfolge war der ganze Punkt
+
+   Der erste Anlauf setzte **erst die Vorlage, dann den Skin aus**. Gemessen:
+   nach dem Klick auf „Hell" stand `data-ui-theme` **leer** statt auf
+   `kanzlei`. Ursache ist `FALLEN.md` Punkt 6 — `_dpDispSkin` ruft
+   `vorlageNachziehen()`, und das setzt `ui_theme` auf `''`, wenn die Vorlage
+   der neuen Helligkeit widerspricht. **Es hat genau die Vorlage gelöscht, die
+   eine Zeile vorher gesetzt worden war.** Im Kommentar stand es richtig, im
+   Code falsch. Jetzt: erst Skin aus, dann Zustand, dann anwenden.
+
+   ### Zwei offene Punkte aus diesem ersten Wurf
+
+   1. **Frage 1 des Punkts ist noch nicht gebaut.** Meine Antwort war „je
+      Profil eigene Werte" über `brand_display` — der Schalter **überschreibt
+      `ui_cards` heute hart** auf `''`. Wer „Wallet" oder „Stapel" eingestellt
+      hatte, verliert das beim Umschalten. Marcels Vorgabe nennt Standard-Karten
+      für das helle Profil, also ist es nicht falsch — aber die Verfeinerung
+      fehlt.
+   2. **Beim programmatischen Öffnen** (`showSettings('profilanzeige')`) wird
+      nicht markiert; `markieren()` hängt am Tab-Klick. Nach einem Klick auf
+      ein Profil stimmt die Markierung. Kosmetisch, aber offen.
+
+   *(Nebenbeobachtung, nicht von diesem Paket: im Obsidian-Modus stand die
+   Reiterfarbe auf `rgb(0,0,0)` statt Gold, und `dp_user_settings` trug
+   `ui_form: 'rund'` und `ui_obsidian: '#241C16'` — fremde Werte aus einer
+   anderen Sitzung. Vor einem Befund daraus erst prüfen, wer sie gesetzt hat.)*
+
 <!-- Format:  - [YYYY-MM-DD] Punkt — Commit-Hash -->
+
+- [2026-08-13] **`business` und `enterprise` sind gelöscht** — `v1161` + DB-Eingriff, `0a488f5`.
+   Marcels Freigabe: „ja kann weg." Erledigt in der Reihenfolge, die der
+   Vorbefund verlangte: **erst der Code, dann die Zeilen.**
+
+   ### Schritt 1 — die vier Stellen geräumt (`v1161`)
+
+   | Stelle | Änderung |
+   |---|---|
+   | `backend/routes/subscription.js:220` | `VALID_PLANS` ohne `'business'` — ein akzeptierter `planId` ohne Zeile in `plans` wäre in einen Fremdschlüsselfehler gelaufen |
+   | `backend/db/seed-demo.js:265` | Demo-Abo auf **`'pro'`** statt `'business'`. Pro, weil der Kommentar den Zweck nennt: „damit er ohne Limits durchprobieren kann". `SEED_DEMO_DATA` ist auf Staging **true** |
+   | `frontend/js/config.js:709` | `'business'` aus `bankExportPlans` (toter Eintrag) |
+   | `frontend/js/rnd-ui.js:32` | `'business'` aus `requirePlan` (toter Eintrag) |
+
+   **Bewusst stehen geblieben:** die **vier** Legacy-Rückfälle auf `free` —
+   `config.js:462`, `subscription.js:693`, `settings.js:812` und
+   `planService.js:118`. Sie fangen Altbestände, die noch auf `business`
+   zeigen könnten. Beim Räumen fiel der vierte erst auf; er war in der
+   Vorbefund-Liste nicht erfasst.
+
+   **Rebuild gefahren**, Marker im laufenden Container geprüft, und dort
+   steht jetzt wörtlich `const VALID_PLANS = ['free', 'starter', 'investor', 'pro']`.
+
+   ### Schritt 2 — die Zeilen gelöscht
+
+   Vorbedingung geprüft: **kein Abo zeigte darauf** (partner 3, free 1,
+   starter 1). `pg_dump` der Tabelle
+   (`/root/plans-vor-delete-20260813-0941.sql`, 9,3 K), dann **Probelauf per
+   `BEGIN; DELETE; SELECT; ROLLBACK;`** — er meldete `DELETE 2` und fünf
+   verbleibende Pläne. Danach echt ausgeführt.
+
+   **Nachweise nach dem Löschen:**
+
+   | Prüfung | Ergebnis |
+   |---|---|
+   | `plans` | 5 Zeilen: free, starter, investor, pro, partner |
+   | öffentliche API (`GET /api/v1/plans`) | **4** Pläne — free, starter, investor, pro |
+   | Fremdschlüssel-Waisen | **0** |
+   | Abos | unverändert (free 1, starter 1, partner 3) |
+   | Backend-Logs | ohne Ausnahme |
+
+   **Zweimal Cache-Neustart nötig:** `listPublicPlans()` filtert aus einem
+   In-Memory-Cache — eine DB-Änderung allein wirkt nicht, `docker restart
+   dealpilot-backend` leert ihn. Das gilt für jeden Plan-Eingriff.
+
+   **Nur Staging.** Auf Produktion sind die Zeilen unangetastet; der
+   SSH-Zugang dorthin ist read-only. **Vor einem Prod-Rollout gehört derselbe
+   Ablauf dort wiederholt** — Dump, Probelauf, DELETE, Cache-Neustart —, und
+   zwar erst nachdem `v1161` dort ausgerollt ist. Sonst akzeptiert das alte
+   Backend weiter `'business'` und schreibt einen Fremdschlüssel ins Leere.
+
+- [2026-08-13] **`business` und `enterprise` sind aus der öffentlichen Plan-Liste verschwunden** — DB-Eingriff auf Staging, kein Code geändert.
+   **Marcels Wort:** „business und enterprise gibt es gar nicht mehr,
+   eigentlich können die raus, wenn die nicht für irgendwas sinnvoll sind."
+   Die Bedingung war der Prüfauftrag — und sie ist **teils erfüllt, teils
+   nicht.**
+
+   **Was gemessen wurde:**
+
+   | Frage | Antwort |
+   |---|---|
+   | Läuft ein Abo darauf? | **nein** — nur `partner` (3), `free` (1), `starter` (1) |
+   | Stripe-Produkt? | **keins** — nicht kaufbar |
+   | Waren sie sichtbar? | **ja** — `is_public = t`, also in der öffentlichen API |
+   | Preise | business **5.900 ct = 59 €**, identisch mit Investor; enterprise 299 € |
+   | Fremdschlüssel | `subscriptions.plan_id → plans.id` |
+
+   **Sofort erledigt, weil ohne Risiko:** `is_public = false, is_active = false`
+   für beide. Mit `pg_dump` der Tabelle davor
+   (`/root/plans-vor-v1161-20260813-0924.sql`) und **Probelauf per
+   `BEGIN; … ROLLBACK;`**, wie die Regel es für Eingriffe in bestehende Zeilen
+   verlangt. Der Probelauf hat dabei einen eigenen Quoting-Fehler gefangen
+   (`'business '` mit Leerzeichen traf null Zeilen) — genau dafür ist er da.
+
+   **Nachgewiesen:** die öffentliche API
+   (`GET /api/v1/plans` über Caddy, HTTP 200) liefert jetzt **vier** Pläne —
+   `free`, `starter`, `investor`, `pro`. `business`/`enterprise`: **0
+   Treffer.** Dafür war ein `docker restart dealpilot-backend` nötig:
+   `listPublicPlans()` filtert aus einem **In-Memory-Cache**, nicht direkt aus
+   der DB.
+
+   ### Warum NICHT gelöscht wurde — sieben Stellen hängen daran
+
+   | Stelle | was dort steht | muss vor dem DELETE |
+   |---|---|---|
+   | `backend/routes/subscription.js:220` | `VALID_PLANS` akzeptiert `'business'` | **raus** — sonst läuft ein Checkout in einen Fremdschlüsselfehler |
+   | `backend/db/seed-demo.js:265` | erzeugt ein **`business`-Abo** | **umstellen** — `SEED_DEMO_DATA` ist auf Staging `true`, das Seed läuft |
+   | `frontend/js/config.js:709` | `bankExportPlans: [… 'business']` | raus (toter Eintrag) |
+   | `frontend/js/rnd-ui.js:32` | `requirePlan: ['pro','business']` | raus (toter Eintrag) |
+   | `config.js:462`, `subscription.js:693`, `settings.js:812` | Legacy-Rückfall auf `free` | **bleibt** — schützt Altbestände |
+
+   **Reihenfolge für das echte Löschen:** erst die vier oberen Stellen räumen
+   (Backend → **Rebuild**), dann prüfen, dass kein Abo entstanden ist, dann
+   `DELETE FROM plans WHERE id IN ('business','enterprise')`. Vorher wieder
+   ein Dump. **So lange sind die Zeilen unsichtbar und harmlos** — der
+   sichtbare Schaden ist weg, der Rest ist Aufräumen ohne Eile.
+
+   **Nebenbefund:** `business` trug **denselben Preis wie Investor** (59 €).
+   Wer die Liste sah, bekam zwei Pläne zum gleichen Preis angeboten.
+
+- [2026-08-13] **Die Pfeilmitte löste Löschen aus** — `v1159`, `c1f71b5`. **(Backlog-Punkt 6)**
+   **Marcels Befund:** „Beim Hinüberfahren zum Pfeil landet man auf dem × zum
+   Löschen." Er nannte ihn den schwersten der Kartenbefunde, **und das war
+   untertrieben** — es war kein Optikfehler, sondern eine falsche Aktion mit
+   Datenverlust.
+
+   **Gemessen** (`getBoundingClientRect` + `elementFromPoint`, Stapelmodus):
+
+   | Element | Rechteck | Größe |
+   |---|---|---|
+   | `.sbc-actions` (Duplizieren + Löschen) | `top:6px`, 48 × 22 | — |
+   | `.sbc-arrow` | `top:16px` | 20 × 20 |
+
+   Beide `absolute` bei `right:6px` → **12 px Überlappung von 20 px
+   Pfeilhöhe.** Und der entscheidende Nachweis: **die MITTE des Pfeils
+   (349,203) traf `sbc-btn "Löschen"`** — nicht den Pfeil. Erreichbar war er
+   nur über sein unteres Drittel. **Wer auf die Pfeilmitte zielt, löscht das
+   Objekt.**
+
+   **Die Pfeilspalte alle 4 px abgetastet** — damit ist Marcels Satz „unten
+   ist Platz, oben nicht" belegt, nicht geglaubt:
+
+   | von oben | wer |
+   |---|---|
+   | 8–28 px | Löschen-× (reicht weiter als seine 22 px) |
+   | 32–36 px | Pfeil (~8 px wirklich erreichbar) |
+   | 40–60 px | **frei** |
+
+   **Gelöst:** `bottom:4px` statt `top:16px`, Größe 20 → 22 px (dieselbe wie
+   der Kompakt-Pfeil — eine Größe für denselben Pfeil).
+
+   **Nachgemessen** (`ui-varianten.css?v=v1159`):
+
+   | | vorher | jetzt |
+   |---|---|---|
+   | Pfeil | 193–213, 20 × 20 | **210–232, 22 × 22** |
+   | Abstand zum × | **−12 px (Überlappung)** | **+5 px** |
+   | Klick auf Pfeilmitte | `sbc-btn "Löschen"` | **`sbc-arrow`** |
+   | Pfeil oben / unten | teils Löschen | **beide `sbc-arrow`** |
+   | Löschen-Mitte | Löschen | Löschen (unverändert) |
+
+   **Funktion geprüft:** Klick klappt die Karte auf (`uv-open` false → true),
+   die Drehung wechselt auf `rotate(-90deg)`.
+   **Kompaktmodus gegengeprüft** (dort erscheint derselbe Pfeil): 327,207
+   22 × 22, **keine Überlappung**, Mitte trifft den Pfeil. Betroffen war nur
+   der Stapelmodus — im Kompaktmodus sitzt der Pfeil ohnehin anders.
+
+   **Eine Absage mit Grund: 44 px sind hier nicht erreichbar.** Die Karte ist
+   63 px hoch und trägt oben die Aktionen; ein 44-px-Pfeil läge wieder unter
+   dem ×. Der Trefferflächen-Punkt aus v650/v652 bleibt damit offen — **die
+   falsche Aktion ist weg, und das war das Schwere daran.**
+
+   *(Messhinweis für den nächsten: die erste Kompakt-Messung war verfälscht,
+   weil das Darstellungs-Panel noch offen über der Karte lag und
+   `elementFromPoint` es traf. Panel schließen, dann messen.)*
+
+- [2026-08-13] **Die Reiter tragen im hellen Modus die Tinte des Aktionen-Menüs** — `v1158` + `v1158b`, `399df3f`. **(Backlog-Punkt 7)**
+   **Marcels Vorgabe:** „im hellen Modus sollen die Reiter dieselbe
+   Schriftfarbe tragen wie das Aktionen-Aufklappmenü." Damit war die Zielfarbe
+   **benannt statt beschrieben** — nur zu übernehmen, nicht zu gestalten.
+
+   **Gemessen** (Merker `dp_chrome_hell` gesetzt und **neu geladen**, nicht im
+   laufenden Tab umgeschaltet — `FALLEN.md` Punkt 6):
+
+   | | vorher | Ziel |
+   |---|---|---|
+   | Aktionen-Einträge (11, alle gleich) | rgb(20,19,16) | — |
+   | Reiter inaktiv | #6b6454 | rgb(20,19,16) |
+   | Reiter aktiv | #211c12 | rgb(20,19,16) |
+
+   **Drei hart kodierte Töne für eine Sache.** Der Punkt verlangte deshalb ein
+   **gemeinsames Token** — jetzt führt der Hell-Skin `--dp-hell-ink:#141310`
+   bei seinen anderen Ink-Tokens, und **alle sechs Leser** holen ihn dort. Der
+   Ton ist nicht neu: es ist die „Tinte", die die helle Sidebar schon für die
+   Objektadresse führt.
+
+   `--dp-tab-text` steht in jedem Leser **davor**, damit der Nutzerregler aus
+   `v1155`/`v1157` weiter gewinnt.
+
+   ### `v1158b` — derselbe Selektor an drei Stellen, die dritte entschied
+
+   Nach `v1158` trug **nur der aktive** Reiter die Tinte; die inaktiven blieben
+   rgb(243,234,208). Ursache: der Selektor
+   `body.dp-chrome-hell header.hdr.has-v64-score + nav.tabs .tab` steht
+   **dreimal** in der Datei — bei 35346 (meine Änderung), bei 35489 in einer
+   Liste **mit der Kopfzeile**, und bei 35605 im `v938`-Block. Bei gleicher
+   Spezifität gewinnt die **späteste**, also `v938` mit dem Rückfall auf
+   `--dp-header-text` — und der steht im Hell-Modus auf `#f3ead0`, weil der
+   Kopf dunkel gespeichert ist.
+
+   Zwei Korrekturen: der `v938`-Rückfall ist jetzt die Tinte, und **die
+   Reiterleiste ist aus der Kopfzeilen-Liste herausgenommen** — zwei
+   verschiedene Flächen gehören nicht in eine Regel.
+
+   **Nachgemessen** (`style.css?v=W71`):
+
+   | | Ergebnis |
+   |---|---|
+   | alle 9 Reiter | **rgb(20,19,16)** — eine Farbe |
+   | Aktionen-Menü | rgb(20,19,16) — gleich |
+   | Goldstrich am aktiven | rgb(201,168,76) — Unterscheidung bleibt |
+   | Kopfzeile | rgb(243,234,208) — **unverändert** |
+   | **Obsidian-Gegenprobe** | Reiter Gold, Sidebar rgb(10,10,10) — **unberührt** |
+
+   **Der Nebenbefund aus dem Punkt** (`.sb-actions-accordion-inner` ist auch
+   in dunklen Fassungen weiß) ist **nicht** mitgeprüft — er betrifft eine
+   Fläche, nicht die Schriftfarbe, und bleibt im Punkt stehen.
 
 - [2026-08-13] **Der Sweeper verwarf den Tab-Text des Nutzers** — `v1157` + `v1157b`, `c2d7e9b`. **(Backlog-Punkt 6, jetzt vollständig)**
    `v1155` machte den Regler wirksam, aber nur **bis zum nächsten
