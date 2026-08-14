@@ -140,9 +140,28 @@
       'html.mb-breit .grid{grid-template-columns:1fr !important}',
       'html.mb-breit #resultPanel{display:none !important}',
       'html.mb-breit .panel{max-width:none}',
+      /* v1172-BREITE · Marcels Befund am Bild `markztbericht.png`: die
+         Schrittleiste ist breit, alles darüber und darunter schmal — „das
+         muss optisch zusammenpassen."
+
+         Die Ursache ist mein eigener Eingriff aus v1151. Dort habe ich der
+         Reiterleiste eine eigene Grenze von 960 px gegeben, weil die sieben
+         Marken 902 px brauchen und bei 760 px in zwei Zeilen umbrachen. Die
+         Begründung stimmt technisch — die Leiste ist Navigation, keine
+         Formularzeile. Nur entsteht dadurch eine ZWEITE Kante auf derselben
+         Seite, und genau die sieht man.
+
+         Jetzt eine gemeinsame Breite: 960 px für beides. Die 760 px kamen aus
+         v1128 mit dem Argument, eine Formularzeile über 1.278 px sei unlesbar
+         — 960 liegt deutlich darunter, das Argument bleibt gewahrt. Was es
+         nicht mehr gibt, ist der sichtbare Versatz.
+
+         `.mbw-reiter` behält seine eigene Regel weiter unten; sie steht jetzt
+         auf demselben Maß und dient als Ankerpunkt, falls die Leiste später
+         doch wieder mehr Platz braucht als der Inhalt. */
       'html.mb-breit #wm-ziel,html.mb-breit .mbw-blatt,',
         'html.mb-breit .mbw-nav,html.mb-breit .mbw-fuss,html.mb-breit #wm-ampel{',
-        'max-width:760px;margin-left:auto;margin-right:auto}',
+        'max-width:960px;margin-left:auto;margin-right:auto}',
       /* v1151-LEISTE · Marcels Befund: „Die Punkte 1–7 sollten schon
          nebeneinander passen." Gemessen bei 1024, 1280 und 1920 px: die
          sieben Marken brauchen zusammen 902 px, ihr Behälter stand aber bei
@@ -163,7 +182,7 @@
          390 px MUSS sie umbrechen, dort ist Nebeneinander unmöglich. */
       'html.mb-breit .mbw-reiter{max-width:960px;margin-left:auto;margin-right:auto}',
       'html.mb-breit .mbw-r{font-size:14px;padding:13px 20px}',
-      'html.mb-breit .mbw-kurz{max-width:760px;margin-left:auto;margin-right:auto;font-size:12px}',
+      'html.mb-breit .mbw-kurz{max-width:960px;margin-left:auto;margin-right:auto;font-size:12px}',
       'html.mb-breit input:not([type=checkbox]):not([type=radio]),html.mb-breit select{',
         'font-size:15px;padding:11px 12px}',
       'html.mb-breit label{font-size:13px}',
@@ -175,7 +194,7 @@
         'color:#2c2410;border-color:transparent}',
       'html.mb-breit #goBtn{width:100%;padding:15px 20px;font-size:15px}',
       /* Der Ladebalken bekommt die Buehne, statt unten zu kleben. */
-      'html.mb-breit #genProgress{max-width:760px;margin:18px auto 0;padding:18px 20px}',
+      'html.mb-breit #genProgress{max-width:960px;margin:18px auto 0;padding:18px 20px}',
       'html.mb-erzeugt .mbw-reiter,html.mb-erzeugt .mbw-blatt,html.mb-erzeugt .mbw-nav{',
         'opacity:.35;pointer-events:none;transition:opacity .3s}',
       /* v1129c · Balken, Prozent und Schritte. */
