@@ -122,6 +122,57 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 ## Offen
 
+### MARCELS ANTWORTEN VOM 2026-08-14 — hier steht, was jetzt gebaut werden darf
+
+**Vier Entscheidungen sind gefallen und eine Auskunft ist da.** Damit sind
+vier Punkte entblockiert. Der nächste Durchgang fängt hier an.
+
+**1 · Garagenfeld (Punkt 10) → WOHNUNGSBEZOGEN. Weg A.**
+Damit ist **nichts mehr zu bauen** — `v1165` (Platzhalter) und `v1166`
+(Hinweis) setzen genau das um. `lib/nhk2010.js` bleibt unangetastet, es
+kommt **keine** MEA-Kürzung ins Feld. **Punkt 10 ist erledigt.**
+
+**2 · Akzentfarbe (Punkt 4) → beides, und die Standardtöne wärmer.**
+Wörtlich: *„freie farbwöhler und paar standard direkt als auswahl so wie
+jetzt nur etwas wärmere töne"*.
+- Der **freie Farbwähler bleibt**.
+- Die **Schnellauswahl bleibt in ihrer heutigen Form** — nur die Töne
+  werden **wärmer**.
+- **Nicht** die Anzahl ist das Thema, sondern der **Ton**. Vor dem Bauen die
+  heutigen Standardwerte auslesen und die wärmeren daneben zeigen — das ist
+  eine Optikfrage, also **Demo bauen, nicht raten**.
+- **Achtung Whitelabel:** die Vorschläge sind Nutzerwerte, keine Marke. Sie
+  dürfen **nicht** als `--wl-`Token gesetzt werden, sonst färbt der Sweeper
+  sie mit (`v1157`-Falle).
+
+**3 · Wallet (Punkt 11) → alles, was auch auf der Standardkarte steht.**
+Wörtlich: *„es muss alles drauf auch im standard drauf ist"*.
+Damit ist die Frage nach den Kartenangaben beantwortet: **kein eigener
+Umfang**, die Wallet-Fassung trägt denselben Satz wie `.sb-card`. Zu bauen
+ist also nur der **Abstand** zwischen Objektbild, Kaufpreis und „privat" —
+der ursprüngliche Befund — **ohne** dabei etwas wegzulassen.
+Die gemessene Struktur der Standardkarte steht in `CLAUDE.md`.
+
+**4 · Score flacher (Punkt 1B) → Rückfrage von Marcel: „welches Score Bild?"**
+**Meine Formulierung war schuld.** Gemeint ist **kein Bild einer Datei**,
+sondern eine **Vorgabe, wie die Score-Zeile in der Kopfleiste flacher
+aussehen soll** — sie ist die auffälligste Fläche der App, deshalb wurde
+dort nie geraten.
+**Bevor Marcel danach gefragt wird, gehört gemessen:** die Score-Zeile
+erscheint erst **ab 70 % Datenvollständigkeit** (`js/calc.js:205`), darunter
+steht nur ein Hinweisbanner. Das Prüfobjekt lag darunter — **die 251 px des
+Entwurfs sind nie nachgemessen worden.** Erst ein Objekt über der Schwelle
+laden, echte Höhe messen, **dann** fragen. Womöglich erübrigt sich die Frage.
+
+**5 · Das Speichern-Modal (Punkt 7, Rest 2) → es GIBT eines.**
+Wörtlich: *„Button ‚als Objekt speichern' im Quickboarding da geht ein Modal
+auf"*. **Mein Befund „es gibt keins" war falsch** — ich hatte nur
+`qcSaveAsObject()` in `quick-check.js` gelesen und dort keins gefunden. Der
+Weg läuft über `qc-bridge.js:172 _handleSave()` → `window.qcSaveAsObject()`;
+**das Modal muss davor oder darin liegen.** Erst den echten Klickweg im
+Browser verfolgen, dann die Auflistung dort ergänzen — **nicht** ein zweites
+Modal danebenbauen.
+
 ### OFFENE ABNAHME — Spracheingabe, ein Sprechlauf am Gerät
 
 **Marcel macht das später, der Punkt bleibt bis dahin stehen.** Drei
@@ -433,12 +484,19 @@ entfällt — nicht raten.
    Fokusfalle beim Neuzeichnen ist im Entwurf schon gelöst. Kein Querlauf,
    keine Konsolenfehler.
 
-   **BLOCKIERT auf zwei Fragen, beide betreffen Geld:**
-   1. **Wann wird abgerechnet**, wenn die Stufe sich erst am Ende ergibt?
-      Vorschlag: beim Erzeugen, nach erreichter Stufe, Preis am Knopf.
-   2. **Darf man später vertiefen** — erst „Einschätzung", dasselbe Objekt
-      später auf „Wertermittlung" hochziehen — **und was kostet das dann?**
-      Vorschlag: nur die Differenz.
+   ~~**BLOCKIERT auf zwei Fragen, beide betreffen Geld:**~~
+   **BEIDE VON MARCEL BEANTWORTET (2026-08-13) UND GEBAUT — `v1154`.**
+   1. ~~**Wann wird abgerechnet**, wenn die Stufe sich erst am Ende ergibt?~~
+      → **Beim Erzeugen**, nach erreichter Stufe. Umgesetzt.
+   2. ~~**Darf man später vertiefen**, und was kostet das?~~
+      → **Ja, und es kostet nur die Differenz.** Umgesetzt in
+      `_aufpreis(stufe, bezahlt)`, `backend/src/routes/marktbericht.js`,
+      zwei Aufrufer.
+
+   *(Der Blockade-Vermerk stand noch, obwohl die Antworten am selben Tag kamen
+   und gebaut wurden. **Eine veraltete Blockade ist teurer als gar keine** —
+   sie führt dazu, dass eine beantwortete Frage ein zweites Mal gestellt wird.
+   Beim Abhaken einer Entscheidung immer auch den Blockade-Vermerk suchen.)*
 
    **Was vor dem Entwurf gemessen sein muss:** welche Felder voneinander
    abhängen. `garagenStufe` und `hinterlandRent` erscheinen nur nach echter
@@ -965,6 +1023,19 @@ entfällt — nicht raten.
 8. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
+   > ## 🔒 AUSGELAGERT — Marcel bearbeitet diesen Punkt an anderer Stelle
+   > **Stand 2026-08-14.** Hier wird daran **nicht** gearbeitet.
+   >
+   > **Der Text bleibt trotzdem stehen** — die Vorarbeit ist gemessen und
+   > präzisiert, und ein gelöschter Punkt wird irgendwann von vorn
+   > angefangen. Wer hier weitermachen will, fragt vorher bei Marcel nach
+   > dem dortigen Stand.
+   >
+   > **Warum das hier so ausdrücklich steht:** In dieser Runde ist schon
+   > einmal ein Commit aus einem parallelen Chat auf dem Server gelandet und
+   > hätte fast Arbeit verworfen. Zwei Stellen am selben Punkt sind genau
+   > diese Falle — siehe `FALLEN.md` Punkt 1.
+
    > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
    > eigene Module: **Minden-Lübbecke** (`05770`,
    > `lib/sachwertfaktoren_nrw.js`) und **Herford** (`05758`,
@@ -1404,6 +1475,43 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+- [2026-08-13] **Die zwei Befunde aus dem Prüflauf sind behoben — und einer war keiner** — `v1171` + DB-Eingriff, `6c1e101`.
+   ### `beleg_import` — echt, und behoben
+
+   Stand in `config.js` ab Investor, in **keinem** DB-Plan. Die DB ist die
+   Quelle, und `beleg-import.js:66` hängt **allein** an
+   `hasFeature('beleg_import')` — **kein** Plan-Key-Fallback. Die Funktion war
+   damit für **jeden** zu, auch für Pro und Partner.
+
+   Jetzt in der DB für `investor`/`pro`/`partner`, genau wie `config.js` es
+   vorsieht. **Sicherung 8.597 Bytes**, `BEGIN/ROLLBACK`-Probelauf vorher
+   (Verteilung geprüft), Backend danach neu gestartet — der Plan-Cache hätte
+   sonst die alten Werte weitergereicht.
+
+   ### `custom_finance_models` — Startfenster geschlossen
+
+   `config.js` gab es Free frei, die DB führt `false`. Ein echter Free-Nutzer
+   hatte es nie; der Fallback log nur **im Startfenster**, bis die DB
+   antwortet. Dasselbe Muster wie `v1160`, anderer Schlüssel.
+
+   ### `theme_palette` — ZURÜCKGENOMMEN, vor dem Eingriff
+
+   **Mein Befund war falsch geschlossen.** Gemessen stimmte er (`false` am
+   echten Konto), aber `_isPalette()` prüft **zuerst** `isProOrAbove()` — die
+   Palette hängt am **Plan-Schlüssel**, nicht am Feature. **Pro und Partner
+   haben sie.** Die `hasFeature('theme_palette')`-Zeile ist ein ausdrücklich
+   kommentierter Vorgriff („später, wenn Backend es kennt").
+
+   **Beinahe hätte ich einen bewusst gesetzten Platzhalter gelöscht.** Gerettet
+   hat nur die Frage „gibt es die Funktion überhaupt?" **vor** dem Eingriff —
+   dieselbe Frage, die den `beleg_import`-Fund erst brauchbar gemacht hat.
+
+   > **Die Lehre, die beide Fälle verbindet:** Ein Feature-Schlüssel auf
+   > `false` heißt **nicht**, dass die Funktion gesperrt ist. Sie kann an einem
+   > **zweiten Weg** hängen — hier am Plan-Schlüssel. **Vor jeder Behebung die
+   > Aufrufstelle lesen, nicht nur den Schlüssel.** Bei `beleg_import` gab es
+   > keinen zweiten Weg, bei `theme_palette` schon.
 
 - [2026-08-13] **Punkt 6 durchgeklickt — zwei Funktionen sind für JEDEN gesperrt, auch für Pro und Partner**
    Der Prüfmodus aus `v1163` erlaubt endlich, was der Punkt verlangte. Alle

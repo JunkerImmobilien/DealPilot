@@ -394,3 +394,26 @@ simulierten Stufen den **`config.js`-Fallback**, das echte Konto liest die
 **DB**. Weicht die „partner"-Zeile von den anderen ab, ist das zuerst ein
 Hinweis auf die **Quelle**, nicht auf den Plan. Erst der DB-Abgleich macht
 daraus einen Befund.
+
+## 13 · Ein Feature-Schlüssel auf `false` heißt nicht, dass die Funktion gesperrt ist
+
+Sie kann an einem **zweiten Weg** hängen. Beim Punkt-6-Prüflauf standen zwei
+Schlüssel gleich aussehend auf `false` — der eine war ein echter Ausfall, der
+andere völlig in Ordnung:
+
+| Schlüssel | Aufrufstelle | Urteil |
+|---|---|---|
+| `beleg_import` | `beleg-import.js:66` — **allein** an `hasFeature` | echter Ausfall, Funktion war für jeden zu |
+| `theme_palette` | `_isPalette()` prüft **zuerst** `isProOrAbove()` | kein Fehler; hängt am **Plan-Schlüssel** |
+
+Beide waren am echten Konto `false`. **Die Messung war in beiden Fällen
+richtig; der Schluss nur in einem.**
+
+**Vor jeder Behebung die Aufrufstelle lesen, nicht nur den Schlüssel.** Sonst
+wird ein bewusst gesetzter Platzhalter gelöscht — die `theme_palette`-Zeile
+trägt den Kommentar „später, wenn Backend es kennt" und ist ein Vorgriff, kein
+Versehen.
+
+**Gegenprobe, die beide Fälle trennt:** *Gibt es die Funktion überhaupt, und
+hängt sie ausschließlich an diesem Schlüssel?* Ein `grep` auf den Schlüssel
+ohne `config.js` beantwortet beides in einem Schritt.
