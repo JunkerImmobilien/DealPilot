@@ -668,17 +668,48 @@ entfällt — nicht raten.
    | **erweiterte Palette** | z. B. 24 abgestimmte Töne, alle geprüft |
    | **beides** | Palette als Vorschlag, freier Wähler daneben |
 
-   **Das ist eine Produktentscheidung, keine technische.** Sie hat eine
-   gemessene Folge: `_recolor` rechnet HSL-relativ, und **vier der 66
-   WL_TINTS reißen schon heute bei einem extrem hellen Akzent** (`#F0D000`:
-   `#c08a2f`, `#a6842d`, `#a68a36`, `#a98e3a` landen bei k = 2,57–2,98). Ein
-   freier Wähler macht diesen Fall vom Sonderfall zum Regelfall. Er ist
-   trotzdem machbar — aber **dann muss der Tint-Weg vorher eine
-   Mindestkontrast-Regel bekommen**, sonst liefern wir eine Funktion aus, die
-   sich selbst unlesbar machen kann. Der Später-Punkt dazu wird damit zur
-   Voraussetzung.
+   ~~**Das ist eine Produktentscheidung, keine technische.** Sie hat eine
+   gemessene Folge: `_recolor` rechnet HSL-relativ, und vier der 66 WL_TINTS
+   reißen schon heute bei einem extrem hellen Akzent (`#F0D000`: k =
+   2,57–2,98). Dann muss der Tint-Weg vorher eine Mindestkontrast-Regel
+   bekommen.~~
 
-   **→ Demo nach `design/Vorschläge/`, nicht raten.**
+   ### Stand 2026-08-30 — der freie Wähler ist gebaut, die Töne warten auf Marcel
+
+   **Marcels Entscheidung vom 14.08. war „beides".** Der freie Wähler ist
+   damit keine offene Frage mehr, sondern Auftrag — und **ausgeliefert mit
+   `v1174`** (`8e95bf5`, siehe „Fertig"). Offen ist nur noch **welche
+   Töne**, und dafür steht jetzt eine Demo:
+   **`design/Vorschläge/akzent-waermer.html`** — drei Fassungen zu je sechs
+   Tönen, anklickbar, mit zwei Bühnen (Obsidian und Creme). Alle Zahlen darin
+   sind Messwerte aus der laufenden App.
+
+   **Drei Befunde aus dem Messlauf, zwei davon nehmen etwas zurück:**
+
+   1. **Einen freien Akzentwähler gab es hier nie.** Der Punkt oben nimmt an,
+      es gäbe einen. Im Panel standen sechs feste Kacheln; die sechs
+      `<input type=color>` dort gehören den **Bereichsfarben**. Der einzige
+      freie Wähler saß im **Reseller-Portal**
+      (`branding-darstellung.js:114`) und setzt die **Partner-Marke** für
+      deren Mandanten — andere Bühne, anderer Zweck.
+   2. **Die Mindestkontrast-Regel ist seit `v1109` gebaut**
+      (`whitelabel-override.js:128`). Nachgemessen mit genau dem Extremfall
+      `#F0D000`: schwächster Textton **3,84**, keiner unter 3. **Die Zahlen
+      2,57–2,98 oben stammen von vor v1109.** Die Voraussetzung ist erfüllt,
+      nicht offen — der Später-Punkt dazu ist keine Sperre mehr.
+   3. **Rücknahme einer eigenen Zwischenannahme:** der rohe Akzent erreicht
+      auf Obsidian bei Blau 2,35, Weinrot 2,21, Schiefer 2,01 — danach sah es
+      aus, als seien drei der sechs auf der dunklen App unlesbar. **Auf der
+      dunklen Fläche landet aber nicht der rohe Akzent**, sondern ein
+      aufgehellter Ton. An `.sb-section-title` gemessen: **5,48 bis 9,58 über
+      alle sechs.** Es ist kein Kontrastmangel. **Wärmer wird gewählt, weil es
+      besser aussieht — nicht, weil etwas kaputt ist.**
+
+   **Was Marcel entscheiden muss:** eine der drei Fassungen (Empfehlung: C,
+   warm und in der Helligkeit des Haus-Golds) — und die eine Frage, die in
+   der Demo unten steht: **Fassung C hat keine kühle Kachel mehr.** Bleibt
+   die Schnellauswahl die kuratierte warme Liste, und alles Kühle kommt über
+   den freien Wähler? Oder soll eine kühle Kachel bleiben?
 
 5. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
@@ -1429,6 +1460,41 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+- [2026-08-30] **Freier Akzentwähler im Darstellungs-Panel** — `v1174`, `8e95bf5`.
+   Der zweite Teil von **Punkt 4**; die Tonwahl bleibt dort offen.
+
+   **Er musste gebaut werden, weil es hier keinen gab** — der Backlog nahm
+   an, es gäbe einen. Im Panel standen sechs feste Kacheln
+   (`ui-varianten.js:80`); die sechs `<input type=color>` dort gehören den
+   **Bereichsfarben**. Der einzige freie Wähler saß im **Reseller-Portal**
+   (`branding-darstellung.js:114`, `#dpbe-acc`) und setzt die
+   **Partner-Marke** für deren Mandanten.
+
+   **Er geht denselben Weg wie die Kacheln:** `save(ui_accent)` +
+   `farbenAnwenden` → `DealPilotWhitelabel.apply`. **Kein zweiter
+   Speicherort und keine eigenen `--wl-`Tokens** — genau daran ist `v1157`
+   gescheitert. 44 px, damit die Trefferfläche aus v650/v652 auch hier gilt.
+   Er liegt **innerhalb** `#dpuv-lock`, die Partner-Sperre (`sperreHart`)
+   fasst ihn also mit.
+
+   **Über den Bedienweg geprüft, alle vier Richtungen:**
+
+   | Schritt | Kachel | Wähler | `--gold` | gespeichert |
+   |---|---|---|---|---|
+   | Start | Gold an | `#c9a84c` | `#c9a84c` | `#C9A84C` |
+   | Kachel Petrol geklickt | Petrol an | folgt: `#0f6e6e` | `#0F6E6E` | `#0F6E6E` |
+   | Wähler auf `#B5633F` | **keine an** | markiert | `#b5633f` | `#b5633f` |
+   | Wähler auf eine Kachelfarbe | Blau an | `#1f4e79` | `#1f4e79` | `#1f4e79` |
+   | Zurücksetzen | Gold an | `#c9a84c` | `#C9A84C` | — |
+
+   > **Wie der Zurücksetzen-Test ohne Schaden lief:** „Zurücksetzen" räumt
+   > auch `ui_form`, `ui_obsidian` und die alten Einzelschlüssel weg, und im
+   > Prüfkonto standen dort echte Werte (`rund`, `#241C16`). Vor dem Test
+   > **den gesamten `localStorage` gesichert**, danach Schlüssel für
+   > Schlüssel zurückgeschrieben und mit einem Neuladen gegengeprüft.
+   > `_dpDispReset` schreibt nichts auf den Server, deshalb war das
+   > vollständig.
 
 - [2026-08-30] **Garagenfeld und Miteigentumsanteil — Marcels Entscheidung: Weg A** — `v1165` `b9e7851`, `v1166` `c9779df`.
    War **Punkt 10**. Die fachliche Frage war die einzige, die den Punkt noch
