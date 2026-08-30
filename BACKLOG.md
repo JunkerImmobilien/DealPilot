@@ -36,54 +36,86 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 2026-08-30, abends)
+## → HIER WEITERMACHEN (Übergabe 2026-08-30, nachts)
 
-**Stand:** lokal = GitHub = Staging auf `1b138c6`, Zweig `staging`,
-Arbeitsverzeichnis sauber. **Nichts hängt halbfertig.**
+**Stand:** lokal = GitHub = Staging auf `8b87e23`, Zweig `staging`.
+Migrationen **65**. **Nichts hängt halbfertig.**
 
-### Das Erste nach dem Neustart: prüfen, ob Stripe jetzt geht
+### Erledigt in dieser Runde — Stripe steht, Migrationen laufen
 
-Marcel hat den Konnektor im Stripe-Konto für **Test und Live** freigegeben
-und die Sitzung neu gestartet, weil das Token in der alten Sitzung nicht
-ankam. **Zuerst also nachsehen, ob die echten Stripe-Werkzeuge da sind**
-(nicht nur `authenticate` und `complete_authentication`).
+**Der Konnektor funktioniert.** Lesen und Schreiben, Test und Live. Drei
+Kontexte meldet er: `acct_1TWXFdGefFev8arz` (Haupt, live + test) und
+`acct_1TWXFqKEjyPDo0wo` (Sandbox, nur test).
 
-**Wenn ja, in einem Durchgang anlegen** — Marcel: *„nur Test-User, keine
-zahlenden Kunden, du kannst einfach ändern und löschen nach Belieben"*:
+> **Gemessen, und es ist der Punkt, an dem man sich sonst vertut:**
+> **Staging rechnet gegen die Sandbox `acct_1TWXFqKEjyPDo0wo`**, nicht
+> gegen das Hauptkonto. Nachweis: `sk_test`, und die Seat-Preis-IDs in der
+> `.env` tragen das Kürzel `KEjyPDo0wo`. Wer im Hauptkonto Test-Preise
+> anlegt, legt sie im falschen Konto an — dort liegen bereits welche aus
+> einer früheren Sitzung, die **nichts** erreichen.
 
-| Abo | monatlich | jährlich |
+**19 Objekte in der Sandbox angelegt** (Produkte wiederverwendet, Preise
+neu — Stripe-Preise werden nie geändert; die alten bleiben aktiv, damit
+laufende Test-Abos nicht ins Leere zeigen):
+
+| Was | monatlich | jährlich |
 |---|---|---|
-| Starter | 19,99 € | 199 € |
-| Investor | 39,99 € | 399 € |
-| Pro | 79,99 € | 799 € |
-| Partner-Grundgebühr | 99 € | 990 € |
-| Mandanten-Seat | 24 / 19 / 15 € gestaffelt | — |
+| Starter | `price_1UADtaKEjyPDo0woWc7P2BpP` 19,99 | `price_1UADteKEjyPDo0woJ4PSCR07` 199 |
+| Investor | `price_1UADtSKEjyPDo0wofNZrGqv7` 39,99 | `price_1UADtTKEjyPDo0wopW2KaUWB` 399 |
+| Pro | `price_1UADtUKEjyPDo0woUb9HGnH9` 79,99 | `price_1UADtUKEjyPDo0wo9lIM0Jss` 799 |
+| Partner | `price_1UADtjKEjyPDo0wojizmUVQe` 99 | `price_1UADtnKEjyPDo0wos33wfja3` 990 |
+| Seat (Volume 24/19/15) | `price_1UADttKEjyPDo0woyrz1dd2t` | `price_1UADtyKEjyPDo0woHp82HVWE` |
 
-Einmalig dazu: vier Bewertungspakete (7,90 · 19,90 · 39,90 · 69,90 €) und
-fünf Einzelposten (0,90 · 1,90 · 3,90 · 5,90 · 9,90 €).
+Die neun Einmalkäufe tragen **`lookup_key`** und gehören deshalb **nicht**
+hartverdrahtet in Code oder Migration — zur Laufzeit über den Schlüssel
+auflösen, dann stimmt jede Umgebung von selbst:
+`dp_paket_kurz` 7,90 · `dp_paket_mittel` 19,90 · `dp_paket_gross` 39,90 ·
+`dp_paket_max` 69,90 · `dp_einzeln_mpi` 0,90 · `dp_einzeln_mpi_plus` 1,90 ·
+`dp_einzeln_wev` 3,90 · `dp_einzeln_avm_a` 5,90 · `dp_einzeln_avm_b` 9,90.
 
-**Danach die Preis-IDs** in die Tabelle `plans` (`stripe_price_*_id`) und in
-`STRIPE_PRICE_MANDANT_SEAT_*` in der `.env`.
+**Migration 064 und 065 sind ausgeführt.** `plans` führt jetzt 1999/3999/
+7999/9900, die sechs Kontingent-Spalten stehen, und **drei Bestandsnutzer**
+haben ihr Bonus-Guthaben nach `mpi_bank` übertragen bekommen.
 
-### Das Zweite: Migration 064 ausführen
+**Kettenprüfung bestanden** — vier echte Checkout-Sitzungen aus dem
+Container, mit dem Schlüssel der App: Starter 1999 · Pro-Jahr 79900 ·
+`paket_gross` 3990 · **Partner + 12 Seats = 32700**. Die letzte Zahl ist
+der Beweis, dass die Volume-Staffel greift: 9900 + 12 × 1900, weil 12 in
+Stufe 2 fällt. Der Plans-Endpunkt liefert die neuen Beträge vorn an.
 
-`backend/migrations/064_preise_v1176_kontingente.sql` liegt im Repo,
-**geschrieben und ausgerollt, aber nicht ausgeführt.**
+### Der Defekt, der dabei herausfiel — und die Falle dahinter
 
-> **Gemessen beim Vorbereiten, spart die nächste Suche:**
-> die Datenbank heißt **`dealpilot_db`**, nicht `dealpilot`; der Rolle
-> `postgres` gibt es nicht, der Nutzer ist `dealpilot`. Der Leseweg ist
-> ```
-> docker exec dealpilot-postgres psql -U dealpilot -d dealpilot_db -tAc "…"
-> ```
-> Stand der Migrationen: **63**, also ist 064 die nächste offene.
-> **Und `plans` führt weiter die ALTEN Preise** (starter 2900, investor 5900,
-> pro 9900, **partner 14900** — die Partner-Zeile gibt es also doch, meine
-> Migration fängt sie mit).
+`plans.partner` trug auf **Staging** die **Live**-IDs
+`price_1TtM0CGefFev8arz…`, während Staging mit `sk_test` läuft. Ein
+Partner-Checkout konnte dort nie funktionieren; Stripe kennt eine
+Live-Preis-ID unter einem Test-Schlüssel nicht.
 
-**Migrationen sind ins Image gebacken → Rebuild**, nicht nur `up -d`.
+**Ursache: Migration `061_partner_stripe_live.sql` schreibt die Live-IDs
+bedingungslos in JEDE Datenbank.** Migrationen laufen auf Staging *und*
+Prod — eine hartverdrahtete ID ist deshalb immer in einer der beiden
+Umgebungen falsch.
 
-### Das Dritte: der Kontingent-Zähler
+`065` macht es anders, und das ist das Muster für jede weitere:
+**sie hängt an der Umgebung, nicht am Zeilenzustand** — sie greift nur,
+wenn die `starter`-Zeile eine Sandbox-ID (`…KEjyPDo0wo…`) trägt. Auf
+Produktion passiert nichts.
+
+### Was BEWUSST offen ist: die Live-Preise
+
+**In `acct_1TWXFdGefFev8arz` livemode wurde nichts angelegt.** Das ist eine
+Geldentscheidung und gehört Marcel. Dort stehen noch die alten Beträge
+(Starter 29, Investor 59, Pro 99, Partner 149, Seats 35/29/24).
+
+Wenn Marcel „ja" sagt, sind es dieselben 19 Objekte im Live-Konto, danach
+eine Migration `066` nach demselben Muster wie 065 — nur mit der
+umgekehrten Bedingung (greift, wenn `starter` eine **Live**-ID trägt).
+
+> **Achtung, bevor das passiert:** `plans.price_*_cents` zeigt nach 064
+> auch auf **Prod** die neuen Beträge an, der Checkout dort aber noch die
+> alten. Solange keine Live-Preise existieren, darf 064 **nicht** auf Prod
+> laufen — sonst wirbt die Seite mit 19,99 € und bucht 29 € ab.
+
+### Das Nächste: der Kontingent-Zähler
 
 Das ist der eigentliche Umbau und der größte Rest. **Die Anzeige ist
 umgestellt, die Buchhaltung nicht** — `aiCreditsService.js` führt weiter

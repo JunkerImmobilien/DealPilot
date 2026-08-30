@@ -3517,6 +3517,42 @@ Cache geladen und die Änderung wäre nie angekommen. **Ein `sed`, das nichts
 findet, meldet keinen Fehler** — nach jedem Ziehen alle Glieder nebeneinander
 ausgeben lassen.
 
+
+**`v1180` — Stripe: die neuen Preise angelegt, 064 und 065 ausgeführt.**
+Commit `8b87e23`. Nachweis: vier Checkout-Sitzungen aus dem Container mit
+dem Schlüssel der App — Starter 1999, Pro-Jahr 79900, `paket_gross` 3990,
+**Partner + 12 Seats 32700**. Die letzte Zahl beweist die Volume-Staffel:
+9900 + 12 × 1900, weil 12 in Stufe 2 fällt.
+
+**Der Befund, der Zeit spart: es sind zwei Stripe-Konten, und Staging
+benutzt das unauffälligere.** `acct_1TWXFdGefFev8arz` ist das Hauptkonto
+(live *und* test), `acct_1TWXFqKEjyPDo0wo` die Sandbox (nur test) — und
+**Staging rechnet gegen die Sandbox.** Im Container nachgemessen:
+`sk_test`, und die Seat-IDs der `.env` tragen `KEjyPDo0wo`. Im Hauptkonto
+liegen aus einer früheren Sitzung bereits Partner- und Seat-Testpreise,
+die **nichts** erreichen. Wer nur „Test-Modus" prüft und nicht das Konto,
+legt sauber an — nur am falschen Ort.
+
+**Daraus fiel ein echter Defekt:** `plans.partner` trug auf Staging die
+**Live**-IDs `price_1TtM0CGefFev8arz…`, während Staging mit `sk_test`
+läuft. Partner-Checkout war dort nie möglich. Ursache ist
+`061_partner_stripe_live.sql`: sie schreibt Live-IDs **bedingungslos in
+jede Datenbank**, und Migrationen laufen auf Staging wie auf Prod.
+
+> **Lehre, die über Stripe hinausgeht: eine hartverdrahtete ID in einer
+> Migration ist immer in einer der beiden Umgebungen falsch.** `065` hängt
+> deshalb an der **Umgebung** statt am Zeilenzustand — sie greift nur, wenn
+> die `starter`-Zeile eine Sandbox-ID trägt, und tut auf Prod nichts. Die
+> neun Einmalkäufe lösen es noch besser: sie tragen `lookup_key`, werden
+> zur Laufzeit aufgelöst und brauchen überhaupt keine ID im Code.
+
+**Live wurde bewusst nicht angefasst.** Preise sind Geld, Geld ist Marcels
+Entscheidung. Solange es keine Live-Preise gibt, darf `064` **nicht** auf
+Prod laufen — sonst wirbt die Seite mit 19,99 € und bucht 29 € ab.
+
+**Nebenbei bestätigt: das Deploy-Skript lügt weiter** (VI.2). Es brach an
+gits `Everything up-to-date` auf stderr ab, bevor der Server zog — der
+`git pull` musste von Hand nach.
 ---
 
 # ES GIBT DREI STÄNDE — NICHT EINEN
