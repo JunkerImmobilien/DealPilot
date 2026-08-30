@@ -24,7 +24,7 @@
         '3 Speicherungen',
         'DealPilot Score (5 Faktoren)',
         'Investor Deal Score (24 KPIs) — Demo',
-        '2 L Kerosin / Monat' /* v493-liter */,
+        '1 Marktpreisindikation / Monat' /* v1176-kontingent */,
         'Alle PDFs mit Wasserzeichen'
       ],
       not_included: null,
@@ -36,7 +36,7 @@
     {
       key: 'starter', letter: 'S', label: 'Starter', tag: 'Privat-Investor', title: 'Starter',
       lead: 'Fühlt sich vollständig an. Volle PDFs ohne Wasserzeichen, Werbungskosten-Modul, Mietspiegel-Vergleich — für die ersten echten Deals.',
-      price_monthly: 29, price_yearly: 290,
+      price_monthly: 19.99, price_yearly: 199,   /* v1176 */
       features: [
         '5 Objekte',
         'DealPilot Score (5 Faktoren)',
@@ -44,7 +44,7 @@
         'Werbungskosten-Modul vollständig',
         'Mietspiegel-Vergleich (manuell)',
         'Manuelle Marktzinsen',
-        '10 L Kerosin / Monat inklusive'
+        '5 Marktpreisindikationen / Monat' /* v1176-kontingent */
       ],
       not_included: [
         'Investor Deal Score (24 KPIs)',
@@ -61,7 +61,7 @@
     {
       key: 'investor', letter: 'I', label: 'Investor', tag: 'Bestseller', title: 'Investor',
       lead: 'Der Plan für aktive Investoren. Investor Deal Score mit 24 KPIs, Track-Record-PDF, Bankexport, Live-Marktzinsen und BMF-Rechner — alles, was Sie für ernstgemeinte Investments brauchen.',
-      price_monthly: 59, price_yearly: 590,
+      price_monthly: 39.99, price_yearly: 399,  /* v1176 */
       best: true,
       features: [
         '25 Objekte',
@@ -72,7 +72,7 @@
         'Live-Marktzinsen',
         'Mietspiegel — Auto-Vergleich',
         'BMF-Rechner & Export',
-        '40 L Kerosin / Monat inklusive'
+        '5 Marktpreisindikationen + 5 erweiterte / Monat' /* v1176-kontingent */
       ],
       not_included: null,
       result: 'Sie investieren wie ein institutioneller Investor — mit allen KPIs, die Banken und Steuerberater erwarten.',
@@ -82,7 +82,7 @@
     {
       key: 'pro', letter: 'P', label: 'Pro', tag: 'Profis · Sachverständige', title: 'Pro',
       lead: 'Für Investoren, Sachverständige und Vermögensverwalter. Unbegrenzte Objekte, Premium-PDF-Layouts, Custom Track-Record Cover und Migration & Setup-Service inklusive.',
-      price_monthly: 99, price_yearly: 990,
+      price_monthly: 79.99, price_yearly: 799,  /* v1176 */
       features: [
         'Unbegrenzte Objekte',
         'Alle Investor-Features',
@@ -90,7 +90,7 @@
         'Custom Track-Record Cover',
         'BMF-Rechner & Export',
         'Priorisierter Support',
-        '100 L Kerosin / Monat inklusive',
+        '5 Marktpreisindikationen, 5 erweiterte, 5 Wertermittlungen / Monat', /* v1176-kontingent */
         'Migration & Einrichtungsservice (bis 3 h) inkl.'
       ],
       not_included: null,
@@ -128,12 +128,25 @@
   // ═══════════════════════════════════════════════════════════════
   /* v884-flugklassen: Plan-Karten im Landing-Look (geteilte Optik) */
   function _esc(v){return String(v==null?'':v).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  /* v1176 · Deutsche Schreibweise fuer Preise mit Nachkommastellen. Ganze
+     Zahlen bleiben ohne Nachkomma — „0 €", nicht „0,00 €". */
+  function _pnum(v){var r=Math.round(v*100)/100;
+    return (Math.abs(r-Math.round(r))<0.005)?String(Math.round(r)):r.toFixed(2).replace('.',',');}
   function _planCardsHtml(){
-    var KER={free:2,starter:10,investor:40,pro:100};
+    /* v1176 · Aus dem Litertank wird die Zahl der enthaltenen Bewertungen.
+       Sie ist die Summe der drei Kontingente — dieselbe Zahl, die auch in
+       der Kopfpille steht, damit Preisseite und Werkzeug nicht auseinander
+       laufen. */
+    var KONT={free:{m:1,e:0,w:0},starter:{m:5,e:0,w:0},
+              investor:{m:5,e:5,w:0},pro:{m:5,e:5,w:5}};
+    function _kontSumme(k){var q=KONT[k];return q?(q.m+q.e+q.w):0;}
     var _cur=(window.DealPilotConfig&&DealPilotConfig.pricing&&DealPilotConfig.pricing.currentKey)?DealPilotConfig.pricing.currentKey():'';
     return '<div class="ppg">'+PLANS.map(function(p,i){
       var stars=''; for(var z=0;z<=i;z++)stars+='\u2605';
-      var feats=(p.features||[]).filter(function(f){return !/Kerosin/.test(f);}).slice(0,8);
+      /* v1176: die Kontingentzeile steht schon als eigene Zeile ueber der
+         Liste (tk-ker) — in der Liste waere sie doppelt. Frueher filterte
+         derselbe Ausdruck das Wort „Kerosin". */
+      var feats=(p.features||[]).filter(function(f){return !/Kerosin|\/ Monat/.test(f);}).slice(0,8);
       var note=(p.price_yearly>0)?('oder '+p.price_yearly+' \u20ac/Jahr'):(p.footnote||'');
       return '<div class="tk'+(p.best?' best':'')+'" data-plan="'+p.key+'">'+
         '<div class="tk-stub"><div class="tk-stars">'+stars+'</div>'+
@@ -141,9 +154,11 @@
           '<div class="tk-tag">'+_esc(p.tag||'')+'</div><div class="tk-name">'+_esc(p.title||p.label)+'</div></div>'+
         '<div class="tkperf"></div>'+
         '<div class="tk-body">'+
-          '<div class="tk-price" data-m="'+(p.price_monthly||0)+'" data-y="'+(p.price_yearly||0)+'"><b>'+(p.price_monthly||0)+'</b><span class="cur">\u20ac</span>'+(p.price_monthly>0?'<span class="per">/ Monat</span>':'')+'</div>'+
+          /* v1176: Preise haben Nachkommastellen (19,99) \u2014 ohne _pnum st\u00fcnde
+             \u201e19.99" mit Punkt da. data-m/data-y bleiben maschinenlesbar. */
+          '<div class="tk-price" data-m="'+(p.price_monthly||0)+'" data-y="'+(p.price_yearly||0)+'"><b>'+_pnum(p.price_monthly||0)+'</b><span class="cur">\u20ac</span>'+(p.price_monthly>0?'<span class="per">/ Monat</span>':'')+'</div>'+
           '<div class="tk-note">'+_esc(note)+'</div>'+
-          '<div class="tk-ker"><span>\u2708</span>'+(KER[p.key]||0)+' L Kerosin&nbsp;/&nbsp;Monat</div>'+
+          '<div class="tk-ker"><span>\u25f7</span>'+_kontSumme(p.key)+'&nbsp;Bewertungen&nbsp;/&nbsp;Monat</div>'+
           '<ul class="tk-feat">'+feats.map(function(f){return '<li>'+_esc(f)+'</li>';}).join('')+'</ul>'+
           (p.key===_cur?'<a class="tk-cta tk-cta-cur" href="#" data-plan="'+p.key+'">\u2713 Dein aktueller Plan</a>':'<a class="tk-cta" href="#" data-plan="'+p.key+'">'+_esc(p.ctaText||((p.title||p.label)+' w\u00e4hlen'))+'</a>')+
           '<div class="tk-rip"><span class="bar"></span><span class="bp-txt">\u2708 Boarding Pass \u00b7 DP-0'+(i+1)+'</span></div>'+
@@ -193,31 +208,39 @@
   // v885-plan-landing: Kerosin-Streifen (bw) + Cockpit-Matrix (mx) + CSS
   // ═══════════════════════════════════════════════════════════════
   var KPACKS = [
-    { l:10,  p:2,  ppl:'0,20',  id:'kerosin_10',  cls:'\u2708 Kurzstrecke',        use:'Mal schnell pr\u00fcfen',     reach:'\u2248 2 Reports oder 5 Markteinsch\u00e4tzungen' },
-    { l:28,  p:5,  ppl:'0,18',  id:'kerosin_28',  cls:'\u2708\u2708 Mittelstrecke', use:'Mehrere Deals',           reach:'\u2248 7 Reports oder 14 Markteinsch\u00e4tzungen' },
-    { l:90,  p:15, ppl:'0,167', id:'kerosin_90',  cls:'\u2708\u2708\u2708 Langstrecke', use:'Aktiver Investor',    reach:'\u2248 22 Reports oder 45 Markteinsch\u00e4tzungen', best:true },
-    { l:160, p:25, ppl:'0,156', id:'kerosin_160', cls:'\ud83c\udf0d Interkontinental', use:'Maximale Reichweite', reach:'\u2248 40 Reports oder 80 Markteinsch\u00e4tzungen' }
+    /* v1176 · Aus Litern werden Bewertungen. `l` ist jetzt die Aufteilung
+       „MPI · erweitert · Wertermittlung", `ppl` der Stückpreis der
+       einfachsten Bewertung im Paket. Die Reichweitentexte bleiben, sie
+       waren immer schon die eigentliche Auskunft. */
+    { l:'5 · 2 · 0',   p:'7,90',  ppl:'0,90', id:'paket_kurz',   cls:'✈ Kurzstrecke',
+      use:'Mal schnell prüfen',    reach:'5 Marktpreisindikationen · 2 erweiterte' },
+    { l:'10 · 5 · 1',  p:'19,90', ppl:'0,85', id:'paket_mittel', cls:'✈✈ Mittelstrecke',
+      use:'Mehrere Deals',              reach:'10 · 5 · 1 Wertermittlung' },
+    { l:'15 · 10 · 3', p:'39,90', ppl:'0,80', id:'paket_gross',  cls:'✈✈✈ Langstrecke',
+      use:'Aktiver Investor',           reach:'15 · 10 · 3 Wertermittlungen', best:true },
+    { l:'25 · 20 · 6', p:'69,90', ppl:'0,75', id:'paket_max',    cls:'🌍 Interkontinental',
+      use:'Maximale Reichweite',        reach:'25 · 20 · 6 Wertermittlungen' }
   ];
   function _bwSegsHtml(idx){
     return '<div class="bw-segs">' + KPACKS.map(function(k,i){
       return '<div class="bw-seg'+(i===idx?' on':'')+'" data-i="'+i+'">' +
-        '<span class="bw-seg-l">'+k.l+' L</span><span class="bw-seg-p">'+k.p+' \u20ac</span></div>';
+        '<span class="bw-seg-l">'+k.l+'</span><span class="bw-seg-p">'+k.p+' \u20ac</span></div>';
     }).join('') + '</div>';
   }
   function _bwPassHtml(idx){
     var k = KPACKS[idx];
     return '<div class="bw'+(k.best?' best':'')+'" id="pm-bw">' +
       (k.best?'<span class="bw-pop">Beliebt</span>':'') +
-      '<div class="bw-stub"><div class="bw-class">'+k.cls+'</div><div class="bw-l">'+k.l+'</div><div class="bw-ll">Liter Kerosin</div></div>' +
+      '<div class="bw-stub"><div class="bw-class">'+k.cls+'</div><div class="bw-l">'+k.p+' €</div><div class="bw-ll">Bewertungen</div></div>' +
       '<div class="bw-perf"></div>' +
       '<div class="bw-body">' +
         '<div class="bw-col"><span class="bw-k">Reichweite</span><span class="bw-v">'+k.reach+'</span></div>' +
-        '<div class="bw-col"><span class="bw-k">Preis / Liter</span><span class="bw-v"><span class="dp">'+k.ppl+' \u20ac</span> / L</span></div>' +
+        '<div class="bw-col"><span class="bw-k">ab</span><span class="bw-v"><span class="dp">'+k.ppl+' \u20ac</span> je Bewertung</span></div>' +
         '<div class="bw-col"><span class="bw-k">Einsatz</span><span class="bw-v">'+k.use+'</span></div>' +
         '<div class="bw-col"><span class="bw-k">Verfall</span><span class="bw-v"><span class="dp">nie</span> \u00b7 kein Abo</span></div>' +
       '</div>' +
-      '<div class="bw-gate"><div class="bw-price">'+k.p+' \u20ac<small>einmalig \u00b7 '+k.l+' L</small></div>' +
-        '<a class="bw-cta" href="#" data-pack-id="'+k.id+'" onclick="window._buyCreditPackDirect(this); return false;">Kerosin kaufen</a></div>' +
+      '<div class="bw-gate"><div class="bw-price">'+k.p+' \u20ac<small>einmalig \u00b7 '+k.l+'</small></div>' +
+        '<a class="bw-cta" href="#" data-pack-id="'+k.id+'" onclick="window._buyCreditPackDirect(this); return false;">Bewertungen kaufen</a></div>' +
     '</div>';
   }
   function _kerosinStripHtml(){
@@ -248,11 +271,16 @@
   function _cockpitMatrixHtml(){
     var R = [
       ['Objekte','1','5','25','\u221e'],
-      ['Kerosin / Monat','2 L','10 L','40 L','100 L'],
-      ['Kerosin nachtanken (Liter-Pakete)','\u2013','\u2713','\u2713','\u2713'],
+      /* v1176 \u00b7 Aus einer Kerosin-Zeile werden vier Kontingent-Zeilen. */
+      ['Marktpreisindikation / Monat','1','5','5','5'],
+      ['Erweiterte Marktpreisindikation / Monat','\u2013','\u2013','5','5'],
+      ['Wertermittlung nach ImmoWertV / Monat','\u2013','\u2013','\u2013','5'],
+      ['Nicht genutzte Abrufe bleiben erhalten','\u2013','\u2713','\u2713','\u2713'],
+      ['Bewertungen nachkaufen','\u2013','\u2713','\u2713','\u2713'],
       ['DealPilot Score (5 Faktoren)','\u2713','\u2713','\u2713','\u2713'],
       ['Investor Deal Score (24 KPIs)','Demo','\u2013','\u2713','\u2713'],
       ['Boarding (Schnellpr\u00fcfung)','\u2713','\u2713','\u2713','\u2713'],
+      ['Co-Pilot (KI-Chat)','5 Fragen','5 Fragen','✓','✓'],
       ['Pilot-Analyse (KI)','vereinfacht','vereinfacht','Vollversion','Vollversion'],
       ['Pilot-Lagebewertung (KI)','\u2013','\u2713','\u2713','\u2713'],
       ['DealPilot Marktreport','\u2013','\u2713','\u2713','\u2713'],
@@ -268,6 +296,7 @@
       ['Werbungskosten-Modul','Demo','\u2713','\u2713','\u2713'],
       ['Investment-PDF','Wasserzeichen','\u2713','\u2713','\u2713'],
       ['Werbungskosten-PDF','\u2013','\u2013','\u2713','\u2713'],
+      ['Steuer-Mappe \u00fcber alle Objekte','\u2013','\u2013','\u2013','\u2713'],
       ['Track-Record-PDF','Wasserzeichen','\u2013','\u2713','\u2713'],
       ['Eigenes Logo &amp; Footer im PDF','\u2013','\u2013','\u2713','\u2713'],
       ['Bankexport (PDF / Excel)','\u2013','\u2013','\u2713','\u2713'],
@@ -488,13 +517,19 @@
     var rows = [ /* v493-matrix — Feature-Matrix Stand 05.06.2026 */
       { cat: 'Nutzung & Kerosin', items: [
         ['Objekte',                              '1', '5', '25', '∞'],
-        ['Kerosin / Monat',                      '2 L', '10 L', '40 L', '100 L'],
-        ['Kerosin nachtanken (Liter-Pakete)',    '–', '✓', '✓', '✓']
+        /* v1176 · dieselben vier Zeilen wie in der Kurzmatrix oben. Es sind
+           zwei Listen fuer dieselbe Sache — sie muessen zusammen wandern. */
+        ['Marktpreisindikation / Monat',         '1', '5', '5', '5'],
+        ['Erweiterte Marktpreisindikation / Monat', '–', '–', '5', '5'],
+        ['Wertermittlung nach ImmoWertV / Monat', '–', '–', '–', '5'],
+        ['Nicht genutzte Abrufe bleiben erhalten', '–', '✓', '✓', '✓'],
+        ['Bewertungen nachkaufen',               '–', '✓', '✓', '✓']
       ]},
       { cat: 'Analyse & Bewertung', items: [
         ['DealPilot Score (5 Faktoren)',         '✓', '✓', '✓', '✓'],
         ['Investor Deal Score (24 KPIs)',        'Demo', '–', '✓', '✓'],
         ['Quick-Check (Schnellbewertung)',       '✓', '✓', '✓', '✓'],
+        ['Co-Pilot (KI-Chat)',                   '5 Fragen', '5 Fragen', '✓', '✓'],
         ['Pilot-Analyse (KI)',                   'vereinfacht', 'vereinfacht', 'Vollversion', 'Vollversion'],
         ['Pilot-Lagebewertung (KI)',             '–', '✓', '✓', '✓'],
         ['DealPilot Marktreport',                '–', '✓', '✓', '✓'],
@@ -516,6 +551,7 @@
       { cat: 'Reports & Exporte', items: [
         ['Investment-PDF',                       'Wasserzeichen', '✓', '✓', '✓'],
         ['Werbungskosten-PDF',                   '–', '–', '✓', '✓'],
+        ['Steuer-Mappe über alle Objekte',       '–', '–', '–', '✓'],
         ['Track-Record-PDF',                     'Wasserzeichen', '–', '✓', '✓'],
         ['Eigenes Logo & Footer im PDF',         '–', '–', '✓', '✓'],
         ['Bankexport (PDF / Excel)',             '–', '–', '✓', '✓'],
@@ -611,7 +647,7 @@
       '<div class="dp-credits-perunit">' + perLiterStr + ' / Liter</div>' +
       '<div class="dp-credits-target">' + target + '</div>' +
       '<div class="kp-reach">' + reach + '</div>' +
-      '<a class="dp-credits-cta" href="#" data-pack-id="' + packId + '" onclick="window._buyCreditPackDirect(this); return false;">Kerosin kaufen</a>' +
+      '<a class="dp-credits-cta" href="#" data-pack-id="' + packId + '" onclick="window._buyCreditPackDirect(this); return false;">Bewertungen kaufen</a>' +
     '</div>';
   }
 

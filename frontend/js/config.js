@@ -204,10 +204,21 @@ window.DealPilotConfig = (function() {
       limits: {
         objects:       1,
         max_saves:     3,        // V63: Max-Speicherungen
-        ai_credits:    1,        // 1 Credit = 2 Anfragen (Demo)
+        ai_credits:    2,        // v1176: war 1 — das Backend gibt 2 (aiCreditsService PLAN_LIMITS)
         photos_per_obj: 3,
         watermark:     true
       },
+      /* ── v1176 · Kontingente statt Kerosin ───────────────────────────────
+         Drei benannte Zaehler statt eines Litertanks. Die Namen sind die der
+         Marktbericht-Stufen (mb-stufen.js), damit Preisseite und Werkzeug
+         dasselbe Wort benutzen.
+           mpi        Stufe 1 · Marktpreisindikation           (frueher 2 L)
+           mpi_plus   Stufe 2 · Erweiterte Marktpreisindikation (frueher 5 L)
+           wev        Stufe 3 · Wertermittlung nach ImmoWertV   (frueher 12 L)
+         `sparfaktor` ist die Obergrenze des Angesparten als Vielfaches des
+         Monatskontingents: nicht genutzte Abrufe verfallen NICHT, wachsen
+         aber auch nicht unbegrenzt. */
+      kontingent: { mpi: 1, mpi_plus: 0, wev: 0, sparfaktor: 0 },
       features: {
         marktreport: false, rnd_full: false, json_backup: false, excel_import: false, // v494-matrix
         full_calc:           true,    // Vollständige Kalkulation & Charts
@@ -264,16 +275,18 @@ window.DealPilotConfig = (function() {
       key: 'starter',
       label: 'Starter',
       tagline: 'Privat-Investor',
-      price_monthly_eur: 29,
-      price_yearly_eur: 290,             // 2 Monate gratis (= 290 statt 348)
+      price_monthly_eur: 19.99,          // v1176: war 29
+      price_yearly_eur: 199,             // v1176: war 290 — 2 Monate gratis
       sort_order: 2,
       limits: {
         objects:       5,
         max_saves:     -1,                // unbegrenzt
-        ai_credits:    5,                 // 5 Credits = 10 Anfragen / Monat
+        ai_credits:    10,                // v1176: war 5 — das Backend gibt 10
         photos_per_obj: 6,
         watermark:     false              // PDFs ohne Wasserzeichen
       },
+      /* v1176 · Kontingente — siehe Kommentar beim Free-Plan. */
+      kontingent: { mpi: 5, mpi_plus: 0, wev: 0, sparfaktor: 3 },
       features: {
         marktreport: true, rnd_full: false, json_backup: false, excel_import: true, // v494-matrix
         full_calc:           true,
@@ -313,8 +326,8 @@ window.DealPilotConfig = (function() {
       key: 'investor',
       label: 'Investor',
       tagline: 'Bestseller',
-      price_monthly_eur: 59,
-      price_yearly_eur: 590,             // 2 Monate gratis
+      price_monthly_eur: 39.99,          // v1176: war 59
+      price_yearly_eur: 399,             // v1176: war 590 — 2 Monate gratis
       sort_order: 3,
       highlight: true,                    // Bestseller-Badge
       limits: {
@@ -324,6 +337,8 @@ window.DealPilotConfig = (function() {
         photos_per_obj: 10,
         watermark:     false
       },
+      /* v1176 · Kontingente — siehe Kommentar beim Free-Plan. */
+      kontingent: { mpi: 5, mpi_plus: 5, wev: 0, sparfaktor: 3 },
       features: {
         marktreport: true, rnd_full: true, json_backup: false, excel_import: true, // v494-matrix
         full_calc:           true,
@@ -358,8 +373,8 @@ window.DealPilotConfig = (function() {
       key: 'pro',
       label: 'Pro',
       tagline: 'Profis · Sachverständige · White-Label',
-      price_monthly_eur: 99,
-      price_yearly_eur: 990,             // 2 Monate gratis
+      price_monthly_eur: 79.99,          // v1176: war 99
+      price_yearly_eur: 799,             // v1176: war 990 — 2 Monate gratis
       sort_order: 4,
       limits: {
         objects:       -1,                // Unbegrenzt
@@ -368,6 +383,8 @@ window.DealPilotConfig = (function() {
         photos_per_obj: 30,
         watermark:     false
       },
+      /* v1176 · Kontingente — siehe Kommentar beim Free-Plan. */
+      kontingent: { mpi: 5, mpi_plus: 5, wev: 5, sparfaktor: 3 },
       features: {
         theme_palette:       true,    /*v901-theme*/
         marktreport: true, rnd_full: true, json_backup: true, excel_import: true, // v494-matrix
@@ -411,6 +428,43 @@ window.DealPilotConfig = (function() {
   // 1 Liter = 1 Pilot-Anfrage (klein). Kerosin ab Starter zubuchbar. Verfällt nicht.
   // Kompat: credits/anfragen/per_anfrage spiegeln liter/per_liter, damit
   // bestehende Konsumenten (plan-audit.js etc.) nicht brechen.
+  /* ── v1176 · Bewertungen nachkaufen, in Euro statt in Litern ────────────
+     Marcels Vorgabe: „Es kann ja optisch weiterhin so abgebildet werden, nur
+     ohne Kerosin und zweite Waehrung." Also dieselben vier Kacheln, dieselben
+     Reichweitentexte, nur die Einheit wechselt.
+
+     `einzeln` ist der Hauptweg: der Knopf, an dem gerade eine Bewertung
+     fehlt, verkauft genau diese eine. Ein Paket ist wieder ein Vorrat, den
+     man nicht ueberblickt — davor warnt der Testbericht ausdruecklich.
+     Die Einzelpreise liegen bewusst ueber dem Paketanteil; sonst lohnte
+     kein Plan. */
+  var EINZELKAUF = [
+    { key: 'mpi',      label: 'Marktpreisindikation',             price_eur: 0.90 },
+    { key: 'mpi_plus', label: 'Erweiterte Marktpreisindikation',  price_eur: 1.90 },
+    { key: 'wev',      label: 'Wertermittlung nach ImmoWertV',    price_eur: 3.90 },
+    { key: 'avm_a',    label: 'Marktwert-Abruf · Bewertungspartner',        price_eur: 5.90 },
+    { key: 'avm_b',    label: 'Marktwert-Abruf · zweiter Bewertungspartner', price_eur: 9.90 }
+  ];
+
+  var BEWERTUNGS_PAKETE = [
+    { key: 'paket_kurz',  mpi: 5,  mpi_plus: 2,  wev: 0, price_eur: 7.90,
+      label: '5 · 2 · 0',   tag: 'Mal schnell prüfen',    flight: '✈ Kurzstrecke',
+      spart_pct: 4,  gauge_off: 164.8, gauge_deg: -57.6 },
+    { key: 'paket_mittel', mpi: 10, mpi_plus: 5,  wev: 1, price_eur: 19.90,
+      label: '10 · 5 · 1',  tag: 'Mehrere Deals',         flight: '✈✈ Mittelstrecke',
+      spart_pct: 13, gauge_off: 116.6, gauge_deg: -14.4 },
+    { key: 'paket_gross', mpi: 15, mpi_plus: 10, wev: 3, price_eur: 39.90,
+      label: '15 · 10 · 3', tag: 'Aktiver Investor',      flight: '✈✈✈ Langstrecke',
+      spart_pct: 18, gauge_off: 56.3,  gauge_deg: 39.6, highlight: true },
+    { key: 'paket_max',   mpi: 25, mpi_plus: 20, wev: 6, price_eur: 69.90,
+      label: '25 · 20 · 6', tag: 'Maximale Reichweite',   flight: '🌍 Interkontinental',
+      spart_pct: 24, gauge_off: 14.1,  gauge_deg: 77.4 }
+  ];
+
+  /* Die alten Liter-Pakete bleiben stehen, bis der Zaehler umgestellt ist
+     (v1179). Sie sind die Abrechnungsgrundlage des heutigen Tanks — sie zu
+     loeschen, bevor der neue Zaehler steht, nimmt dem laufenden System die
+     Preisliste. */
   var AI_CREDIT_PACKAGES = [
     { key: 'kerosin_10',  liter: 10,  per_liter: 0.20,  credits: 10,  anfragen: 10,  price_eur: 2,  per_anfrage: 0.20,  label: '10 Liter',  tag: 'Mal schnell prüfen',  flight: '✈ Kurzstrecke',       gauge_off: 164.8, gauge_deg: -57.6 },
     { key: 'kerosin_28',  liter: 28,  per_liter: 0.18,  credits: 28,  anfragen: 28,  price_eur: 5,  per_anfrage: 0.18,  label: '28 Liter',  tag: 'Mehrere Deals',        flight: '✈✈ Mittelstrecke',   gauge_off: 116.6, gauge_deg: -14.4 },
@@ -626,6 +680,9 @@ window.DealPilotConfig = (function() {
       payment: getPaymentConfig,
       // V63: Erweiterte API
       aiCreditPackages: AI_CREDIT_PACKAGES,
+      /* v1176 */
+      einzelkauf: EINZELKAUF,
+      bewertungsPakete: BEWERTUNGS_PAKETE,
       yearlyBonus: YEARLY_BONUS,
       // V63.82: Service-Level
       serviceLevels: SERVICE_LEVELS,
