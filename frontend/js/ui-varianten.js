@@ -282,6 +282,13 @@
     '.dpuv-swrow{display:flex;gap:7px;flex-wrap:wrap}',
     '.dpuv-sw{width:44px;height:44px;border-radius:8px;border:2px solid #E0DACB;cursor:pointer;padding:0;transition:.14s}',
     '.dpuv-sw.on{border-color:#1a1712;box-shadow:0 0 0 3px color-mix(in srgb, #C9A84C 35%, transparent)}',
+    /* v1174 · Der freie Akzentwaehler. 44px, damit die Trefferflaeche aus
+       v650/v652 auch hier gilt — er steht neben Kacheln derselben Groesse. */
+    '.dpuv-frei{display:inline-flex;align-items:center;gap:9px;margin-top:8px;cursor:pointer;',
+      'font-size:11.5px;color:#5c574d}',
+    '.dpuv-frei input{width:44px;height:44px;min-height:44px;padding:2px;border:2px solid #E0DACB;',
+      'border-radius:8px;background:none;cursor:pointer}',
+    '.dpuv-frei.on input{border-color:#1a1712;box-shadow:0 0 0 3px color-mix(in srgb, #C9A84C 35%, transparent)}',
     '#dpuv-f{flex:0 0 auto;display:flex;gap:8px;padding:12px 18px;border-top:1px solid #E9E4D9;background:#F6F3EC}',
     '.dpuv-pf{flex:1;font-size:12.5px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px;',
       'border:1px solid #DCD5C4;background:#fff;color:#3d382f}',
@@ -433,6 +440,21 @@
             '<div id="dpuv-res">' + fremdBlock('_dpResBlock') + '</div>' +
             '<div class="dpuv-lbl" style="margin-top:12px">Akzent</div>' +
             swHtml('dpuv-acc', AKZENTE, s.ui_accent || GOLD_STD) +
+            /* v1174 · Marcels Vorgabe vom 14.08.: „freie farbwöhler und paar
+               standard direkt als auswahl". Die Schnellauswahl bleibt, der
+               freie Waehler kommt daneben.
+               GEMESSEN, warum das ueberhaupt noetig war: einen freien
+               Akzentwaehler gab es hier NICHT — die sechs <input type=color>
+               im Panel gehoeren den Bereichsfarben. Der einzige freie Waehler
+               sass im Reseller-Portal (branding-darstellung.js:114) und setzt
+               die PARTNER-Marke fuer dessen Mandanten, also eine andere Buehne.
+               Er laeuft ueber denselben Weg wie die Kacheln (save +
+               farbenAnwenden -> DealPilotWhitelabel.apply) und schreibt
+               deshalb KEINE eigenen --wl-Tokens: genau daran ist v1157
+               gescheitert. */
+            '<label class="dpuv-frei" id="dpuv-acc-frei-l" title="Eigene Akzentfarbe">' +
+              '<input type="color" id="dpuv-acc-frei" value="' + esc(s.ui_accent || GOLD_STD) + '">' +
+              '<span>Eigene Farbe</span></label>' +
             /* v1156-GRUND · Marcels Befund: „Grundfarbe auswaehlen — es tut
                sich gar nichts." Gemessen: OHNE Vorlage wirkt sie (Sidebar,
                Tab-Leiste, Kopfverlauf ziehen mit), MIT Vorlage nicht — alle
@@ -543,7 +565,7 @@
     knopfReihe('dpuv-size', 'dp_zoom_ui', '_dpDispSize', '1');
 
     /* Farbfelder */
-    function swBinden(id, feld) {
+    function swBinden(id, feld, nachher) {
       var host = document.getElementById(id);
       host.addEventListener('click', function (ev) {
         var b = ev.target.closest ? ev.target.closest('.dpuv-sw') : null;
@@ -554,10 +576,51 @@
         var patch = {}; patch[feld] = v; save(patch);
         var st = load();
         farbenAnwenden(st.ui_accent || GOLD_STD, st.ui_obsidian || OBSIDIAN_STD);
+        if (nachher) nachher(v);
       });
     }
-    swBinden('dpuv-acc', 'ui_accent');
+
+    /* ── v1174 · Der freie Akzentwaehler ──────────────────────────────────
+       Er ist die siebte Kachel, nur dass sie jede Farbe kann. Beide Wege
+       schreiben denselben Schluessel (ui_accent) und gehen durch dieselbe
+       Anwendung — es gibt also keinen zweiten Speicherort und keine zweite
+       Wahrheit. Die Markierung folgt dem Wert: liegt er auf einer der sechs
+       Kacheln, leuchtet die Kachel; sonst der freie Waehler. */
+    var freiL = document.getElementById('dpuv-acc-frei-l');
+    var frei  = document.getElementById('dpuv-acc-frei');
+    function istKachel(v) {
+      v = String(v || '').toLowerCase();
+      for (var i = 0; i < AKZENTE.length; i++) { if (AKZENTE[i].toLowerCase() === v) return true; }
+      return false;
+    }
+    function freiMarkieren(v) {
+      if (!freiL) return;
+      if (istKachel(v)) freiL.classList.remove('on'); else freiL.classList.add('on');
+    }
+
+    swBinden('dpuv-acc', 'ui_accent', function (v) {
+      if (frei) frei.value = v;      /* der Waehler zeigt, was gilt */
+      freiMarkieren(v);
+    });
     swBinden('dpuv-obs', 'ui_obsidian');
+
+    if (frei) {
+      /* input, nicht change: der Sinn des freien Waehlers ist das Sehen
+         waehrend des Ziehens. save() ist nur localStorage, das traegt das. */
+      frei.addEventListener('input', function () {
+        var v = frei.value;
+        var host = document.getElementById('dpuv-acc');
+        if (host) host.querySelectorAll('.dpuv-sw').forEach(function (x) {
+          if (x.getAttribute('data-v').toLowerCase() === v.toLowerCase()) x.classList.add('on');
+          else x.classList.remove('on');
+        });
+        save({ ui_accent: v });
+        var st = load();
+        farbenAnwenden(v, st.ui_obsidian || OBSIDIAN_STD);
+        freiMarkieren(v);
+      });
+      freiMarkieren(load().ui_accent || GOLD_STD);
+    }
 
     document.getElementById('dpuv-x').addEventListener('click', schliessen);
     document.getElementById('dpuv-done').addEventListener('click', schliessen);
@@ -607,6 +670,10 @@
           x.classList.toggle('on', (x.getAttribute('data-v') || '').toLowerCase() === pair[1]);
         });
       });
+      /* v1174: der freie Waehler gehoert zum Akzent — er muss beim
+         Zuruecksetzen mitgehen, sonst steht dort noch die alte Farbe und
+         der naechste Klick darauf holt sie zurueck. */
+      if (frei) { frei.value = GOLD_STD; freiMarkieren(GOLD_STD); }
       try { if (typeof toast === 'function') toast('Darstellung zurückgesetzt'); } catch (e) {}
     });
 

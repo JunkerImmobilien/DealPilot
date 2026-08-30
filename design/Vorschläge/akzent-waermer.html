@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akzentfarben — wärmere Töne zur Auswahl</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#C9A84C; --obsidian:#050505; --karte:#FBF6E9;
+    --gruen:#3FA56C; --rot:#B8625C;
+    --papier:#efece5; --linie:#e6e0d3; --tinte:#141310; --mut:#6f6a61;
+    /* wird per Klick gesetzt */
+    --a:#C9A84C; --a-hi:#d5bb73; --a-lo:#a98d40; --a-d:#987b22; --a-tx:#cdaf5a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--tinte);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.55;padding:26px 20px 90px}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font-family:'Space Grotesk';font-size:23px;margin:0 0 5px}
+  h2{font-family:'Space Grotesk';font-size:16px;margin:34px 0 3px}
+  .lead{color:var(--mut);font-size:14px;max-width:820px;margin:0 0 3px}
+  .mono{font-family:'JetBrains Mono';font-size:11px;color:var(--mut)}
+
+  .kasten{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--gold);
+    border-radius:10px;padding:13px 16px;margin:16px 0;max-width:900px;font-size:13.5px}
+  .kasten b{color:var(--tinte)}
+  .kasten.gruen{border-left-color:var(--gruen)}
+  .kasten.rot{border-left-color:var(--rot)}
+  .kasten p{margin:0 0 7px}
+  .kasten p:last-child{margin-bottom:0}
+
+  /* ── Die vier Fassungen ── */
+  .fassung{background:#fff;border:1px solid var(--linie);border-radius:13px;
+    padding:14px 16px 16px;margin:0 0 14px;max-width:900px}
+  .fassung .kopf{display:flex;align-items:baseline;gap:10px;margin-bottom:3px}
+  .fassung .kopf .n{font-family:'Space Grotesk';font-size:14.5px;font-weight:600}
+  .fassung .kopf .tag{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.06em;
+    text-transform:uppercase;padding:2px 7px;border-radius:4px;background:#f2eee4;color:var(--mut)}
+  .fassung .kopf .tag.empf{background:#e7f3ec;color:#2b6b48}
+  .fassung .was{font-size:12.5px;color:var(--mut);margin:0 0 11px}
+  .reihe{display:flex;gap:9px;flex-wrap:wrap}
+  .sw{width:106px;border:1px solid var(--linie);border-radius:9px;padding:0;overflow:hidden;
+    background:#fff;cursor:pointer;font:inherit;text-align:left;transition:box-shadow .15s,border-color .15s}
+  .sw:hover{border-color:var(--gold)}
+  .sw.an{border-color:var(--tinte);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 45%,transparent)}
+  .sw .flaeche{height:38px}
+  .sw .txt{padding:6px 8px 7px}
+  .sw .nm{font-size:11.5px;font-weight:600;line-height:1.2}
+  .sw .hx{font-family:'JetBrains Mono';font-size:9.5px;color:var(--mut);margin-top:1px}
+
+  /* ── Vorschau ── */
+  .vorschau{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;
+    max-width:900px;margin:8px 0 0}
+  @media (max-width:760px){.vorschau{grid-template-columns:1fr}}
+  .buehne{border:1px solid var(--linie);border-radius:12px;overflow:hidden;background:#fff}
+  .buehne .titel{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--mut);padding:8px 12px;border-bottom:1px solid var(--linie);background:#faf8f2}
+
+  /* dunkle Bühne — so steht der Akzent in der App */
+  .dunkel{background:var(--obsidian);padding:14px 15px 16px}
+  .dunkel .rubrik{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--a-tx)}
+  .dunkel .wert{font-family:'Space Grotesk';font-size:26px;font-weight:600;color:var(--a);margin-top:5px}
+  .dunkel .runway{height:6px;border-radius:3px;margin-top:11px;
+    background:linear-gradient(110deg,var(--a-hi),var(--a) 55%,var(--a-lo))}
+  .dunkel .knopf{display:inline-block;margin-top:13px;background:var(--a);color:#141310;
+    font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:7px}
+  .dunkel .linie{height:1px;background:var(--a);opacity:.35;margin-top:13px}
+
+  /* helle Bühne — Karte und Text auf Creme */
+  .hell{background:var(--karte);padding:14px 15px 16px}
+  .hell .rubrik{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--a-d)}
+  .hell .wert{font-family:'Space Grotesk';font-size:26px;font-weight:600;color:var(--a-d);margin-top:5px}
+  .hell .band{height:6px;border-radius:3px;margin-top:11px;
+    background:linear-gradient(110deg,var(--a-hi),var(--a) 55%,var(--a-lo))}
+  .hell .knopf{display:inline-block;margin-top:13px;background:var(--a);color:#141310;
+    font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:7px}
+  .hell .fliess{font-size:12.5px;color:#3a352c;margin-top:12px}
+  .hell .fliess a{color:var(--a-d);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+
+  .zahlen{max-width:900px;margin:10px 0 0;border:1px solid var(--linie);border-radius:10px;
+    background:#fff;padding:11px 14px;font-size:12.5px}
+  .zahlen b{font-family:'JetBrains Mono';font-size:12px}
+
+  table{border-collapse:collapse;width:100%;max-width:900px;font-size:12.5px;margin:10px 0 0;background:#fff}
+  th,td{border:1px solid var(--linie);padding:6px 9px;text-align:left}
+  th{background:#faf8f2;font-weight:600;font-size:11.5px}
+  td.z{font-family:'JetBrains Mono';font-size:11.5px;text-align:right}
+  .pu{display:inline-block;width:13px;height:13px;border-radius:3px;vertical-align:-2px;margin-right:6px;
+    border:1px solid rgba(0,0,0,.15)}
+  .frage{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--rot);
+    border-radius:10px;padding:13px 16px;margin:16px 0 0;max-width:900px;font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Akzentfarben — wärmere Töne zur Auswahl</h1>
+<p class="lead">Backlog Punkt 4. Marcels Vorgabe vom 14.08.: <i>„freie farbwöhler und paar
+standard direkt als auswahl so wie jetzt nur etwas wärmere töne"</i> — also der freie Wähler
+<b>und</b> die Schnellauswahl, gleiche Anzahl, gleiche Form, nur andere Töne.</p>
+<p class="mono">Gemessen am 30.08.2026 in der laufenden App auf Staging. Alle Zahlen unten sind
+Messwerte aus <code>DealPilotWhitelabel.apply()</code>, keine gerechneten Schätzungen.</p>
+
+<h2>Drei Befunde, bevor gewählt wird</h2>
+
+<div class="kasten rot">
+<p><b>1 · Einen freien Farbwähler für den Akzent gibt es heute nicht.</b> Im Darstellungs-Panel
+stehen sechs feste Kacheln (<code>ui-varianten.js:80</code>) und sonst nichts — die sechs
+<code>&lt;input type="color"&gt;</code> im Panel gehören den <b>Bereichsfarben</b>, nicht dem Akzent.</p>
+<p>Der freie Wähler, den es gibt, sitzt im <b>Reseller-Portal</b>
+(<code>branding-darstellung.js:114</code>, <code>#dpbe-acc</code>) und setzt die <b>Partner-Marke</b>
+für dessen Mandanten — eine andere Bühne, ein anderer Zweck. <b>Für die eigene Anzeige muss er
+gebaut werden.</b> Das ist keine Geschmacksfrage, sondern Marcels Entscheidung — er wird gebaut.</p>
+</div>
+
+<div class="kasten gruen">
+<p><b>2 · Die Mindestkontrast-Regel, die der Backlog als Voraussetzung nennt, ist längst gebaut.</b>
+Sie kam mit <code>v1109</code> und steht in <code>whitelabel-override.js:128</code>: war ein Ton im
+Original auf Weiß lesbar (k ≥ 3), muss er es nach dem Umfärben bleiben — sonst senkt
+<code>tonAufHell()</code> ihn ab.</p>
+<p><b>Nachgemessen mit genau dem Extremfall aus dem Backlog</b>, <code>#F0D000</code>: schwächster
+Textton <b>3,84</b>, <b>kein einziger unter 3</b>. Die Zahlen 2,57–2,98 im Backlog stammen von
+<b>vor</b> v1109. Der freie Wähler hat damit keine offene Voraussetzung mehr.</p>
+</div>
+
+<div class="kasten">
+<p><b>3 · Die heutigen sechs haben keinen Kontrastmangel — die Wahl ist reine Geschmackssache.</b>
+Das ist eine <b>Rücknahme meiner eigenen Zwischenannahme</b>: der rohe Akzent erreicht auf Obsidian
+bei Blau 2,35, bei Weinrot 2,21 und bei Schiefer 2,01, und danach sah es aus, als seien drei der
+sechs auf der dunklen App unlesbar.</p>
+<p><b>Auf der dunklen Fläche landet aber nicht der rohe Akzent.</b> An einer echten Textstelle
+gemessen (<code>.sb-section-title</code> auf <code>rgb(5,5,5)</code>) läuft er über einen
+aufgehellten Ton: <b>5,48 bis 9,58 über alle sechs</b>. Es bricht nichts, und es rettet auch nichts —
+<b>wärmer wird gewählt, weil es besser aussieht, nicht weil etwas kaputt ist.</b></p>
+</div>
+
+<h2>Die Fassungen — anklicken, die Bühnen unten färben sich mit</h2>
+<p class="lead" style="margin-bottom:12px">Kachel 1 ist in jeder Fassung das Haus-Gold. Es ist die
+Marke und der Rücksetzwert, es steht nicht zur Wahl.</p>
+
+<div class="fassung">
+  <div class="kopf"><span class="n">Heute</span><span class="tag">Ist-Zustand</span></div>
+  <p class="was">Sechs Töne, drei davon kühl (Blau, Petrol, Schiefer).</p>
+  <div class="reihe" id="r0"></div>
+</div>
+
+<div class="fassung">
+  <div class="kopf"><span class="n">Fassung A — dieselben Familien, nur wärmer gedreht</span><span class="tag">vorsichtig</span></div>
+  <p class="was">Jede Farbe behält ihre Familie, der Ton wandert Richtung Rot-Gelb. Blau wird
+  Tinte, Petrol bekommt Grün statt Cyan, Schiefer wird Taupe. <b>Die kühle Anmutung bleibt
+  erkennbar</b> — wer die heutige Auswahl mag, findet sich sofort zurecht.</p>
+  <div class="reihe" id="r1"></div>
+</div>
+
+<div class="fassung">
+  <div class="kopf"><span class="n">Fassung B — Erdtöne, mitteldunkel</span><span class="tag">deutlich</span></div>
+  <p class="was">Bronze, Moos, Terrakotta, Taupe, Aubergine. <b>Gleiche Tiefe wie heute</b>, aber
+  durchgehend erdig. Das ist der größte Schritt, ohne dass die Auswahl hell wird.</p>
+  <div class="reihe" id="r2"></div>
+</div>
+
+<div class="fassung">
+  <div class="kopf"><span class="n">Fassung C — warm und hell genug für die dunkle App</span><span class="tag empf">Empfehlung</span></div>
+  <p class="was">Karamell, Kupfer, Ziegel, Moos, Sand. <b>Alle liegen in der Helligkeit des
+  Haus-Golds</b> — dadurch wirken sie neben ihm wie eine Familie und nicht wie sechs Fremde.
+  Der Preis: <b>keine kühle Kachel mehr</b>. Wer Blau will, nimmt den freien Wähler.</p>
+  <div class="reihe" id="r3"></div>
+</div>
+
+<h2>Die Bühnen</h2>
+<div class="vorschau">
+  <div class="buehne">
+    <div class="titel">Obsidian — Kopfleiste, Sidebar, Kacheln</div>
+    <div class="dunkel">
+      <div class="rubrik">Investor Deal Score</div>
+      <div class="wert">180.000 €</div>
+      <div class="runway"></div>
+      <div class="linie"></div>
+      <div class="knopf">Speichern</div>
+    </div>
+  </div>
+  <div class="buehne">
+    <div class="titel">Creme — Karte, Formular, PDF</div>
+    <div class="hell">
+      <div class="rubrik">Kaufpreis</div>
+      <div class="wert">180.000 €</div>
+      <div class="band"></div>
+      <div class="fliess">Ein Fließtext mit einem <a href="#0">Verweis in Akzentfarbe</a>,
+      damit sichtbar wird, wie der abgedunkelte Ton auf der Karte liest.</div>
+      <div class="knopf">Speichern</div>
+    </div>
+  </div>
+</div>
+
+<div class="zahlen" id="zahlen"></div>
+
+<h2>Alle 21 Töne, gemessen</h2>
+<p class="lead" style="margin-bottom:0">Zwei Spalten entscheiden: <b>Text auf Obsidian</b> ist der
+aufgehellte Ton auf der dunklen Fläche, <b>Text auf Karte</b> ist <code>--gold-d</code> auf
+<code>#FBF6E9</code>. Beide müssen über 3 liegen. <b>Das tun alle 21.</b></p>
+<table id="tab"></table>
+
+<div class="frage">
+<b>Die eine Frage, die offen bleibt:</b> Fassung C hat <b>keine kühle Kachel</b> mehr. Heute sind
+drei von sechs kühl. Ist die Schnellauswahl die <i>kuratierte warme Liste</i> — und alles Kühle
+kommt über den freien Wähler? Oder soll eine kühle Kachel bleiben (dann Fassung C mit „Tinte"
+<code>#2E4372</code> statt „Sand")?
+</div>
+
+<script>
+/* Alle Werte sind MESSWERTE aus der laufenden App vom 30.08.2026:
+   [Name, Akzent, --gold-hi, --gold-lo, --gold-d, Textton auf Obsidian,
+    k(Text/Obsidian), k(--gold-d / Karte #FBF6E9)] */
+var FASSUNGEN = [
+  ['Heute', [
+    ['Gold',    '#C9A84C','#d5bb73','#a98d40','#987b22','#cdaf5a',9.58,3.75],
+    ['Blau',    '#1F4E79','#507596','#1a4266','#1c476e','#5f8bb6',5.68,8.94],
+    ['Petrol',  '#0F6E6E','#448e8e','#0d5c5c','#0e6464','#3f9292',5.57,6.43],
+    ['Weinrot', '#7B2D3B','#985b66','#672632','#702936','#c0727e',5.77,9.45],
+    ['Schiefer','#3A4250','#656c77','#313743','#353c49','#7d8593',5.48,10.28],
+    ['Oliv',    '#5B7C3A','#7f9965','#4c6831','#537135','#749256',5.81,5.15]
+  ]],
+  ['A', [
+    ['Gold',            '#C9A84C','#d5bb73','#a98d40','#987b22','#cdaf5a',9.58,3.75],
+    ['Tinte',           '#2E4372','#5c6c91','#273860','#2a3d68','#7186b5',5.61,9.90],
+    ['Petrol warm',     '#1F6B57','#508c7c','#1a5a49','#1c614f','#509581',5.78,6.78],
+    ['Terrakotta-Wein', '#8A3A32','#a4655f','#74312a','#7e352e','#c17369',5.75,7.99],
+    ['Taupe',           '#4A443C','#726d67','#3e3932','#433e37','#8c877f',5.71,9.81],
+    ['Moos',            '#6B7A32','#8c975f','#5a662a','#616f2e','#7d8b48',5.49,5.09]
+  ]],
+  ['B', [
+    ['Gold',       '#C9A84C','#d5bb73','#a98d40','#987b22','#cdaf5a',9.58,3.75],
+    ['Bronze',     '#A0632C','#b5855a','#865325','#925a28','#b57b49',5.72,5.24],
+    ['Moosgrün',   '#4E6B3C','#758c67','#425a32','#476137','#738f63',5.67,6.42],
+    ['Terrakotta', '#9C4A33','#b27260','#833e2b','#8e432e','#be705a',5.49,6.50],
+    ['Taupe warm', '#6B5F4E','#8c8275','#5a5042','#615647','#8f8373',5.50,6.64],
+    ['Aubergine',  '#6B3A4A','#8c6572','#5a313e','#613543','#a87886',5.53,9.27]
+  ]],
+  ['C', [
+    ['Gold',      '#C9A84C','#d5bb73','#a98d40','#987b22','#cdaf5a',9.58,3.75],
+    ['Karamell',  '#C3924F','#d0aa76','#a47b42','#a4793c','#c89b5d',8.06,3.62],
+    ['Kupfer',    '#C0814A','#ce9d72','#a16c3e','#af7543','#c58b58',7.00,3.57],
+    ['Ziegel',    '#B5633F','#c58569','#985335','#a55a39','#c27554',5.79,4.72],
+    ['Moos hell', '#8E9A4E','#a7b075','#778142','#7b8641','#97a25c',7.41,3.65],
+    ['Sand',      '#B8A085','#c8b5a0','#9b8670','#8e7a62','#bea88f',8.92,3.81]
+  ]]
+];
+
+function setzen(t, knopf){
+  var r = document.documentElement.style;
+  r.setProperty('--a',    t[1]);
+  r.setProperty('--a-hi', t[2]);
+  r.setProperty('--a-lo', t[3]);
+  r.setProperty('--a-d',  t[4]);
+  r.setProperty('--a-tx', t[5]);
+  document.querySelectorAll('.sw').forEach(function(x){ x.classList.remove('an'); });
+  if (knopf) knopf.classList.add('an');
+  document.getElementById('zahlen').innerHTML =
+    '<span class="pu" style="background:' + t[1] + '"></span><b>' + t[0] + ' ' + t[1] + '</b> · ' +
+    'Text auf Obsidian <b>' + t[6].toFixed(2) + '</b> (' + t[5] + ') · ' +
+    'Text auf Karte <b>' + t[7].toFixed(2) + '</b> (' + t[4] + ') · ' +
+    'Verlauf ' + t[2] + ' → ' + t[1] + ' → ' + t[3];
+}
+
+FASSUNGEN.forEach(function(f, i){
+  var host = document.getElementById('r' + i);
+  f[1].forEach(function(t){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'sw';
+    b.innerHTML = '<div class="flaeche" style="background:' + t[1] + '"></div>' +
+                  '<div class="txt"><div class="nm">' + t[0] + '</div>' +
+                  '<div class="hx">' + t[1] + '</div></div>';
+    b.addEventListener('click', function(){ setzen(t, b); });
+    host.appendChild(b);
+  });
+});
+
+/* Tabelle: jeder Ton einmal, in der Reihenfolge der Fassungen */
+(function(){
+  var zeilen = ['<tr><th>Fassung</th><th>Ton</th><th>Akzent</th>' +
+    '<th>Text auf Obsidian</th><th>Text auf Karte</th></tr>'];
+  var gesehen = {};
+  FASSUNGEN.forEach(function(f){
+    f[1].forEach(function(t){
+      var schl = f[0] + t[1];
+      if (gesehen[schl]) return;
+      gesehen[schl] = 1;
+      if (f[0] !== 'Heute' && t[0] === 'Gold') return;
+      zeilen.push('<tr><td>' + f[0] + '</td>' +
+        '<td><span class="pu" style="background:' + t[1] + '"></span>' + t[0] + '</td>' +
+        '<td class="z">' + t[1] + '</td>' +
+        '<td class="z">' + t[6].toFixed(2) + '</td>' +
+        '<td class="z">' + t[7].toFixed(2) + '</td></tr>');
+    });
+  });
+  document.getElementById('tab').innerHTML = zeilen.join('');
+})();
+
+/* Startzustand: Haus-Gold */
+setzen(FASSUNGEN[0][1][0], document.querySelector('#r0 .sw'));
+</script>
+
+</div>
+</body>
+</html>
