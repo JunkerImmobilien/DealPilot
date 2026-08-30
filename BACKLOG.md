@@ -111,7 +111,9 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
   Befund, dass die Score-Zeile erst **ab 70 % Datenvollständigkeit**
   erscheint (`calc.js:205`).
 - **Punkt 4**: welcher Art soll die erweiterte Akzent-Palette sein.
-- **Punkt 11** (Wallet): welche Angaben gehören auf die Karte.
+- ~~**Punkt 11** (Wallet): welche Angaben gehören auf die Karte.~~ **Beantwortet
+  am 14.08.** („alles, was auch im Standard drauf ist") und mit `v1173`
+  ausgeliefert — nachgezählt, es fehlt nichts. Siehe „Fertig".
 
 **Prüfstrecken auf Staging:**
 - `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt.
@@ -1238,73 +1240,44 @@ entfällt — nicht raten.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-10. **Der Sachwert kennt den Miteigentumsanteil nicht.** Beim Prüfen der
-   Eingabekette am 2026-08-12 gefunden: `lib/nhk2010.js` führt **weder
-   `mea` noch `ist_wohnung`** — anders als `ErtragswertService.bodenwert()`,
-   das beides auswertet. Der Sachwert einer ETW entsteht also ohne jede
-   Kenntnis davon, dass nur ein Anteil bewertet wird.
+10. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
+   **Neu gefunden beim `v1173`-Messlauf, 2026-08-30** — nicht dadurch
+   verursacht, `.sbc-actions` und `.sbc-score-overlay` sind absolut
+   positioniert und vom Raster unabhängig.
 
-   **Teilweise ist das unschädlich, und zwar genau geprüft:**
-   - Der **Gebäudeteil** ist über die BGF der Wohnung bemessen (195 m² bei
-     100 m² Wohnfläche), also implizit anteilig.
-   - Die **Außenanlagen** entstehen als Prozentsatz des Gebäudewerts
-     (`nhk2010.js:797`) und skalieren damit automatisch mit.
-   - Der **Bodenwert** kommt MEA-gekürzt aus dem Ertragswert-Kern.
+   **Gemessen in der Messkabine, Wallet-Modus, ein Objekt geladen:**
 
-   **Offen bleibt die Garage:** `garagen_bgf_qm` ist ein **roher
-   Eingabewert**, der ungekürzt durchläuft. Am Prüfobjekt stehen dort
-   **64,58 m² × 485 €/m² × 2,02 = 37.118 €** — für eine einzelne Wohnung
-   in einem Haus mit drei Einheiten viel. Ist der Wert für das gesamte
-   Grundstück gepflegt, ist der Sachwert um bis zu ~18.500 € zu hoch.
+   | Breite | Ring | Aktionen | `elementFromPoint` auf der Ringmitte |
+   |---|---|---|---|
+   | 1200 px | y189–239 | y183–**205** | `sbc-mini-score-num` — sauber |
+   | 900 px | y185–225 | y179–**205** | `sbc-mini-score-num` — sauber |
+   | **390 px** | y200–240 | y194–**238** | **`sbc-btn sbc-del`** — Löschen |
 
-   **Das ist eine Eingabefrage, kein Rechenfehler** — der Kostenhinweis
-   sagt wörtlich „Der Bericht rechnet mit dem, was hier steht."
+   **Die Ursache ist die 44-px-Trefferfläche aus v650/v652:** auf dem Handy
+   wachsen die beiden Knöpfe von 22 px auf 44 px Höhe und decken den Ring
+   damit vollständig zu. **Im Standard-Kartenmodus passiert das nicht** —
+   dort trifft die Ringmitte bei 390 px `sbc-mini-score-num`. Es ist also
+   eine Wallet-Sache, keine allgemeine.
 
-   **BLOCKIERT:** Ob das Feld wohnungs- oder gebäudebezogen gemeint ist,
-   entscheidet Marcel fachlich — davon hängt ab, ob dort eine MEA-Kürzung
-   hingehört oder nur eine deutlichere Feldhilfe (die seit `v1142` steht
-   und den fehlenden Abzug bereits benennt).
+   **Kein Datenverlust:** `delSaved()` fragt vorher (`storage.js:1526`,
+   „Objekt wirklich löschen?"). Wer auf seinen Score tippt, bekommt trotzdem
+   die Löschabfrage — **derselbe Fehlertyp wie `v1159`**, wo im Stapelmodus
+   die Pfeilmitte Löschen auslöste.
 
-   > **TEILWEISE GERÄUMT — `v1165`, `b9e7851`** (siehe „Fertig"). Der
-   > **Platzhalter sagte das Gegenteil der Feldhilfe** („alle Garagen
-   > zusammen" gegen „nur der eigene Anteil"), und sichtbar ist der
-   > Platzhalter. Das war kein Entscheidungsfall, sondern ein Widerspruch, in
-   > dem einer der beiden Texte falsch sein musste. Er ist weg.
-   >
-   > **Die fachliche Frage bleibt offen** — und sie ist jetzt die einzige, die
-   > noch blockiert. Zwei Wege stehen zur Wahl:
-   > - **A · Feld bleibt wohnungsbezogen** (was die Texte jetzt sagen). Nichts
-   >   weiter zu tun; der Nutzer trägt seinen Anteil ein.
-   > - **B · Feld wird gebäudebezogen** und die Rechnung kürzt selbst mit dem
-   >   MEA — dann muss `lib/nhk2010.js` `mea`/`ist_wohnung` bekommen, wie es
-   >   `ErtragswertService.bodenwert()` schon tut, und beide Texte drehen sich
-   >   wieder um.
-   >
-   > ~~**Ohne Entscheidung noch baubar:** ein Hinweis im Formular~~ —
-   > **gebaut, `v1166`, `c9779df`** (siehe „Fertig"). Erscheint, wenn ein MEA
-   > gepflegt ist **und** eine Garagenfläche steht.
-   >
-   > **Empfehlung für die Entscheidung: Weg A.** Drei Gründe, damit die
-   > Abwägung nicht neu geführt werden muss:
-   > 1. **Alles andere im Modell ist bereits wohnungsbezogen** — Gebäudeteil
-   >    über die BGF der Wohnung, Außenanlagen als Prozentsatz davon,
-   >    Bodenwert MEA-gekürzt. Bei B wäre die Garage das **einzige** Feld,
-   >    das gesamtgebäudebezogen eingegeben und intern gekürzt wird.
-   > 2. **Die Garage folgt fachlich nicht dem Wohnungs-MEA** — in der
-   >    Teilungserklärung meist eigener Anteil oder Sondernutzungsrecht.
-   >    Eine Kürzung mit dem Wohnungs-MEA wäre in beide Richtungen falsch.
-   > 3. **B ist ein Rechenkern-Eingriff** mit Prüfstrecke gegen das
-   >    Anwendungsbeispiel — für einen Effekt, den eine richtige Zahl im Feld
-   >    sauberer erreicht. A ist gebaut.
-   >
-   > **Wo A schwach ist, offen gesagt:** beim Mehrfamilienhaus mit
-   > gemeinschaftlichen Garagen ohne Zuordnung verführt das Feld dazu, die
-   > Gesamtfläche einzutragen. **Genau dagegen steht jetzt der Hinweis aus
-   > `v1166`.** Die Entscheidung bleibt trotzdem Marcels.
+   **Zu entscheiden ist, was weicht** — das ist Optik, also nicht zu raten:
+   die Aktionen nach unten, der Ring nach links, oder auf dem Handy beide
+   auf verschiedene Kartenhälften. Vorschlag zuerst nach
+   `design/Vorschläge/`.
 
-> **Punkt 11 (Wallet-Abstände) ist erledigt** — `v1173`, siehe „Fertig".
-> Der Kartenbereich bleibt trotzdem mit **Punkt 4** verklammert: dort steht
-> dieselbe Karte. Wer Punkt 4 aufgreift, misst die Abstände einmal nach.
+> **Punkt 11 (Wallet-Abstände) ist erledigt** — `v1173`/`v1173b`, siehe
+> „Fertig". Der Kartenbereich bleibt trotzdem mit **Punkt 4** verklammert:
+> dort steht dieselbe Karte. Wer Punkt 4 aufgreift, misst die Abstände
+> einmal nach.
+>
+> **Der alte Punkt 10 (Sachwert und Miteigentumsanteil) ist ebenfalls
+> erledigt** — Marcel hat am 14.08. **Weg A** entschieden (Garagenfeld
+> bleibt wohnungsbezogen), `v1165` und `v1166` setzen genau das um. Der
+> volle Befund steht unter „Fertig".
 
 ## Später
 
@@ -1457,6 +1430,32 @@ entfällt — nicht raten.
 
 ## Fertig
 
+- [2026-08-30] **Garagenfeld und Miteigentumsanteil — Marcels Entscheidung: Weg A** — `v1165` `b9e7851`, `v1166` `c9779df`.
+   War **Punkt 10**. Die fachliche Frage war die einzige, die den Punkt noch
+   blockierte; Marcel hat sie am 14.08. beantwortet: *„wohnungsbezogen"*.
+
+   **Damit war nichts mehr zu bauen.** Das Feld bleibt wohnungsbezogen, der
+   Nutzer trägt seinen Anteil ein, `lib/nhk2010.js` bekommt **kein** `mea`
+   und **kein** `ist_wohnung`. Die beiden Pakete, die vor der Entscheidung
+   ohnehin baubar waren, setzen genau das um: `v1165` hat den Platzhalter
+   geräumt, der das Gegenteil der Feldhilfe sagte („alle Garagen zusammen"
+   gegen „nur der eigene Anteil"), und `v1166` zeigt einen Hinweis, wenn ein
+   MEA gepflegt ist **und** eine Garagenfläche steht.
+
+   **Warum A fachlich trägt** (damit die Abwägung nicht neu geführt wird):
+   alles andere im Modell ist bereits wohnungsbezogen — Gebäudeteil über die
+   BGF der Wohnung, Außenanlagen als Prozentsatz davon, Bodenwert
+   MEA-gekürzt; die Garage folgt fachlich **nicht** dem Wohnungs-MEA (in der
+   Teilungserklärung meist eigener Anteil oder Sondernutzungsrecht), eine
+   Kürzung damit wäre in beide Richtungen falsch; und B wäre ein
+   Rechenkern-Eingriff mit eigener Prüfstrecke für einen Effekt, den eine
+   richtige Zahl im Feld sauberer erreicht.
+
+   **Wo A schwach bleibt, offen gesagt:** beim Mehrfamilienhaus mit
+   gemeinschaftlichen Garagen ohne Zuordnung verführt das Feld dazu, die
+   Gesamtfläche einzutragen — bis zu ~18.500 € zu viel im Sachwert. Genau
+   dagegen steht der Hinweis aus `v1166`.
+
 - [2026-08-30] **Wallet: Bild, Kaufpreis und „privat" haben wieder Abstand** — `v1173`, `0131306`.
    War **Punkt 11**. Gemessen in der laufenden App auf Staging (Partner-Konto,
    Objekt `Dealstreet 999`, Kartenmodus über den **Bedienweg** im
@@ -1496,6 +1495,30 @@ entfällt — nicht raten.
    Wallet-Fassung blendet gegenüber der Standardkarte **nichts** aus;
    `.sbc-top-body` hat als einziges keine eigene Fläche, weil es
    `display:contents` trägt — das ist der Zweck der Regel, kein Verlust.
+
+   ### `v1173b` — der Griff nach der Spaltenbreite hatte einen Preis, sichtbar erst bei 390 px
+
+   `1e4bde8`. **In der Messkabine gefunden** (iframe 390 px auf
+   `/impressum.html`, gleiche Herkunft, Schublade aufgezogen,
+   `getAnimations().finish()`):
+
+   | | Adresse `scrollWidth` / `clientWidth` |
+   |---|---|
+   | vor `v1173` (Spalte 64 px) | 244 / 244 — passt |
+   | nach `v1173` (Spalte 74 px) | **234 / 232 — zwei Pixel Ellipse** |
+   | nach `v1173b` | 322 / 322 — passt |
+
+   **Nummer, Datum und Adresse standen in Spalte 2** — ihre Breite hing
+   damit an der Bildspalte, und die ist um 10 px gewachsen. Auf dem großen
+   Schirm fällt das nicht auf, in der Schublade schon. Die beiden Bandzeilen
+   spannen jetzt über **beide** Spalten und halten ihren Einzug mit
+   `padding-left: 74px` (10 Polsterung + 64 Bild) selbst. Sie stehen damit
+   **pixelgleich wie vor `v1173`** und sind von der Bildspalte unabhängig.
+
+   > **Die Lehre:** Wer eine Rasterspalte breiter macht, nimmt die Breite
+   > **allen** Zeilen weg, die in der Nachbarspalte liegen — auch denen, die
+   > mit dem Grund der Änderung nichts zu tun haben. **Nachmessen gehört
+   > deshalb an die schmalste Stelle**, nicht an die, an der gebaut wurde.
 
    > **Was beim Messen fast schiefgegangen wäre:** die Zoom-Ausschnitte des
    > Browsers liegen in **Bildschirmkoordinaten**, `getBoundingClientRect`
