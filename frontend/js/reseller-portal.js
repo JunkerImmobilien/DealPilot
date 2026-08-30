@@ -611,8 +611,15 @@ if (!window._pdfGold) {
         _pl.photos_per_obj = 30; _pl.watermark = false;
         DealPilotConfig.pricing.plans.partner = {
           key: 'partner', label: 'Partner', tagline: 'Makler · Steuerberater · Finanzierer',
-          price_monthly_eur: 149, price_yearly_eur: 1490, sort_order: 5,
+          /* v1176: Grundgebuehr 149 -> 99. Der Seat faellt mit (24/19/15),
+             sonst spart der Mandant gegenueber dem neuen Investor-Preis von
+             39,99 nur noch 40 % statt der heutigen 59 %. */
+          price_monthly_eur: 99, price_yearly_eur: 990, sort_order: 5,
           limits: _pl,
+          /* v1176: der Partner ist ein Pro-Klon — er erbt dessen Kontingent. */
+          kontingent: (_pro && _pro.kontingent)
+            ? JSON.parse(JSON.stringify(_pro.kontingent))
+            : { mpi: 5, mpi_plus: 5, wev: 5, sparfaktor: 3 },
           features: _pf,
           stripe_price_id_monthly: null, stripe_price_id_yearly: null
         };
