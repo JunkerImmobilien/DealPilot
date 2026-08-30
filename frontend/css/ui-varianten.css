@@ -777,21 +777,28 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-top::before {
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-top > .sbc-top-body {
   display: contents !important;
 }
-/* Zeile 1+2 = Band: Nummer/Datum oben, Adresse darunter. Beide beginnen in
-   Spalte 2, damit links der Ring Platz hat. */
+/* Zeile 1+2 = Band: Nummer/Datum oben, Adresse darunter. Sie standen frueher
+   in Spalte 2 — damals sass der Score-Ring links auf dem Band (v1082j).
+   v1173b: Sie spannen jetzt ueber BEIDE Spalten und halten ihren Einzug per
+   padding-left selbst. Grund ist gemessen: mit Spalte 2 haengt ihre Breite an
+   der Bildspalte, und der v1173-Zuwachs von 10px hat ihnen genau diese 10px
+   weggenommen. Bei 390px (Messkabine, Schublade) riss die Adresse dadurch:
+   scrollWidth 234 gegen clientWidth 232, also zwei Pixel Ellipse, wo vorher
+   nichts fehlte. Mit 74px Einzug (10 Polsterung + 64 Bild) steht das Band
+   pixelgleich wie vor v1173 und ist von der Bildspalte unabhaengig. */
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-top-line1 {
-  grid-row: 1 !important; grid-column: 2 !important;
-  z-index: 2 !important; margin: 0 !important; padding: 8px 86px 0 0 !important;
+  grid-row: 1 !important; grid-column: 1 / -1 !important;
+  z-index: 2 !important; margin: 0 !important; padding: 8px 86px 0 74px !important;
 }
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-address {
-  grid-row: 2 !important; grid-column: 2 !important;
+  grid-row: 2 !important; grid-column: 1 / -1 !important;
   /* v1106: rechts 86px statt 9px — GEMESSEN lief die Adresse bis x=356
      und damit 67px weit unter den Score-Ring (x 277-344). Die Zeile
      DARUEBER (.sbc-top-line1) hielt mit padding-right:86px bereits genau
      diesen Abstand; nur die Adresse war ausgenommen. Es war also keine
      neue Entscheidung noetig, sondern eine Inkonsistenz in derselben
      Spalte. */
-  z-index: 2 !important; margin: 0 !important; padding: 0 86px 8px 0 !important;
+  z-index: 2 !important; margin: 0 !important; padding: 0 86px 8px 74px !important;
   color: #1a1407 !important;
 }
 /* Zeile 3+4 = Rumpf auf der Kartenflaeche: Foto links, Halter und Preis rechts. */

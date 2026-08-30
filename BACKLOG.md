@@ -1302,28 +1302,9 @@ entfällt — nicht raten.
    > Gesamtfläche einzutragen. **Genau dagegen steht jetzt der Hinweis aus
    > `v1166`.** Die Entscheidung bleibt trotzdem Marcels.
 
-11. **Wallet: kein Abstand zwischen Objektbild, Kaufpreis und „privat"**
-
-   Die drei Elemente kleben aneinander. **Das ist derselbe Bereich, in dem
-   schon einmal „privat" auf dem Preis lag** — beim Zusammenführen prüfen, ob
-   es der alte Befund in neuer Form ist.
-
-   **Am Raster messen, nicht am Farbtoken.** Ohne Vorlage ist der Bereich
-   sauber, erst mit umgestellter Vorlage rückt alles zusammen — die Ursache
-   liegt also im Abstandsraster, nicht in der Farbe. Und beim Nachmessen die
-   `v1105c`-Lehre mitnehmen: das Goldband ist ein `::before`, ein Leser, der
-   nur die Elternkette abläuft, sieht es nicht.
-
-   **Dazu Marcels zweite Vorgabe an derselben Karte:** *„achte darauf, dass
-   alle Werte immer angegeben werden, die wir brauchen."* Das ist ein eigener
-   Prüfschritt — **welche Angaben gehören auf die Karte, und fehlt eine
-   davon?** Die Liste gehört mit Marcel abgestimmt, nicht von mir geraten;
-   danach wird gezählt, ob jede tatsächlich erscheint (und was passiert, wenn
-   sie leer ist — `_euro(null)` liefert `"–"` und ist **truthy**, ein
-   `||`-Rückfall greift dort nie).
-
-   **Gehört zu Punkt 4** — dort steht derselbe Kartenbereich. Beim
-   Aufgreifen zusammenlegen, nicht doppelt bauen.
+> **Punkt 11 (Wallet-Abstände) ist erledigt** — `v1173`, siehe „Fertig".
+> Der Kartenbereich bleibt trotzdem mit **Punkt 4** verklammert: dort steht
+> dieselbe Karte. Wer Punkt 4 aufgreift, misst die Abstände einmal nach.
 
 ## Später
 
@@ -1475,6 +1456,54 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+- [2026-08-30] **Wallet: Bild, Kaufpreis und „privat" haben wieder Abstand** — `v1173`, `0131306`.
+   War **Punkt 11**. Gemessen in der laufenden App auf Staging (Partner-Konto,
+   Objekt `Dealstreet 999`, Kartenmodus über den **Bedienweg** im
+   Darstellungs-Panel gesetzt, nicht per `setAttribute`).
+
+   | | Wallet vorher | Standardkarte | Wallet jetzt |
+   |---|---|---|---|
+   | Bild → Text, waagerecht | **0 px** (Bildkante x88, Textkante x88) | 12 px | **12 px** |
+   | „privat" → Kaufpreis | **1 px** | 4 px | **5 px** |
+
+   **Der Befund im Backlog stimmte: es lag am Raster, nicht an der Farbe.**
+   Zwei Ursachen, beide in `css/ui-varianten.css`:
+
+   1. **Spalte 1 war 64 px breit — genau so breit wie das Bild.** Das Bild
+      bekommt in Abschnitt (C) zusätzlich `margin-left:10px`, damit es die
+      Polsterung wiederhat, die `.sbc-top` mit `margin:-10px` weggenommen
+      hat. Es ragte damit **exakt 10 px in den 10-px-Spaltenabstand** und
+      fraß ihn auf. Die Spalte trägt die Polsterung jetzt selbst
+      (10 + 64 = 74 px), der Abstand steht auf 12 px wie im Standard.
+   2. **Der Zeilenabstand des Rasters ist 0.** Der Halter sitzt mit
+      `align-self:end` am Ende von Zeile 3, der Preis mit `align-self:start`
+      am Anfang von Zeile 4 — sie treffen sich an der Zeilengrenze. Der
+      `margin-top:1px` des Preises war der ganze Abstand.
+
+   **Nach dem Eingriff nachgemessen, ohne Testregel, gegen die Datei vom
+   Server:** Bild bis x88, Text ab x100 · Halter bis y264, Preis ab y269 ·
+   das Paar bleibt mittig zum Bild (Mitte 271 = Bildmitte 271) · die
+   Bandzeilen rücken um 10 px mit und halten weiter 24 px Luft zum
+   Score-Ring, die Adresse läuft nicht über (`scrollWidth == clientWidth`).
+
+   **Marcels zweite Vorgabe an derselben Karte** (*„achte darauf, dass alle
+   Werte immer angegeben werden, die wir brauchen"*) ist damit auch
+   beantwortet — **es fehlt nichts.** Am geladenen Objekt ausgezählt, welche
+   `.sbc-*`-Elemente im Layout stehen: Objektnummer, KI-Abzeichen, Datum,
+   Pfeil, Adresse, Halter, Kaufpreis, alle drei Kacheln, Score-Ring mit
+   Stufenpille, Investor- und Won-Ribbon, Duplizieren und Löschen. Die
+   Wallet-Fassung blendet gegenüber der Standardkarte **nichts** aus;
+   `.sbc-top-body` hat als einziges keine eigene Fläche, weil es
+   `display:contents` trägt — das ist der Zweck der Regel, kein Verlust.
+
+   > **Was beim Messen fast schiefgegangen wäre:** die Zoom-Ausschnitte des
+   > Browsers liegen in **Bildschirmkoordinaten**, `getBoundingClientRect`
+   > liefert **CSS-Pixel**. Zwischen beiden liegt hier ein Faktor von rund
+   > 0,83. Ein Ausschnitt, der nach den gemessenen Zahlen gesetzt wird,
+   > zeigt etwas anderes als erwartet — die Bandzeile mit Nummer und Datum
+   > sah dadurch erst aus, als fehle sie. **Zum Beweisen zählt die Zahl aus
+   > dem DOM, nicht der Ausschnitt.**
 
 - [2026-08-14] **Eine Breite für die ganze Marktbericht-Seite** — `v1172`/`v1172b`, `167c935`. **Von Marcel abgenommen.**
    **Sein Befund am Bild `design/mockups/markztbericht.png`:** die Schrittleiste
