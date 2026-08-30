@@ -746,9 +746,17 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card {
 }
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-top {
   display: grid !important;
-  grid-template-columns: 64px minmax(0, 1fr) !important;
+  /* v1173 — GEMESSEN: Spalte 1 war 64px breit, das Bild ist 64px breit und
+     bekommt in Abschnitt (C) weiter unten zusaetzlich margin-left:10px —
+     die Polsterung, die .sbc-top mit margin:-10px weggenommen hat. Das Bild
+     ragte damit genau 10px in den Spaltenabstand hinein: gemessen Bildkante
+     x88, Textkante x88, also NULL Abstand. Die Standardkarte haelt dort
+     12px (Bild bis x98, Rumpf ab x110).
+     Spalte 1 traegt die Polsterung jetzt selbst (10 + 64 = 74), dadurch
+     wird der Spaltenabstand wieder sichtbar. */
+  grid-template-columns: 74px minmax(0, 1fr) !important;
   grid-template-rows: auto auto auto auto !important;
-  gap: 0 10px !important;
+  gap: 0 12px !important;
   padding: 0 !important;
   position: relative !important;
 }
@@ -804,7 +812,11 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-halter {
 }
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-kp-row {
   grid-row: 4 !important; grid-column: 2 !important;
-  z-index: 2 !important; margin: 1px 9px 9px 0 !important; align-self: start !important;
+  /* v1173 — zwischen "privat" und dem Kaufpreis stand 1px: der Halter sitzt
+     mit align-self:end am Ende von Zeile 3, der Preis mit align-self:start
+     am Anfang von Zeile 4, und der Zeilenabstand des Rasters ist 0. Die
+     Standardkarte haelt an derselben Stelle 4px. */
+  z-index: 2 !important; margin: 5px 9px 9px 0 !important; align-self: start !important;
 }
 /* Der Ring wandert auf das Band nach links. Er ist ein direktes Kind der
    KARTE und absolut positioniert — deshalb hier ueber left/right, nicht
