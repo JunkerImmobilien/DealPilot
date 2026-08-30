@@ -77,8 +77,70 @@
   var GOLD_STD = '#C9A84C';
   var OBSIDIAN_STD = '#050505';
 
-  var AKZENTE  = [GOLD_STD, '#1F4E79', '#0F6E6E', '#7B2D3B', '#3A4250', '#5B7C3A'];
+  /* v1175 · Marcels Wahl: Fassung C aus design/Vorschlaege/akzent-waermer.html.
+     Die kuehlen Toene (Blau, Petrol, Schiefer) fallen weg — die Schnellauswahl
+     ist ab jetzt die kuratierte WARME Liste, alles andere kommt ueber den
+     freien Waehler und den Farbton-Regler daneben.
+
+     Alle fuenf sind einzeln durch DealPilotWhitelabel.apply gefahren und
+     gemessen (Text auf Obsidian / --gold-d auf der Karte #FBF6E9):
+       Karamell   8,06 / 3,62      Ziegel     5,79 / 4,72
+       Kupfer     7,00 / 3,57      Moos hell  7,41 / 3,65
+       Sand       8,92 / 3,81      (Gold      9,58 / 3,75)
+     Kein Wert unter 3 — es reisst nichts. Ausgewaehlt wurden sie nach der
+     Helligkeit des Haus-Golds, damit die Reihe neben ihm wie eine Familie
+     wirkt und nicht wie sechs Fremde. */
+  var AKZENTE  = [GOLD_STD, '#C3924F', '#C0814A', '#B5633F', '#8E9A4E', '#B8A085'];
   var GRUNDFARBEN = [OBSIDIAN_STD, '#0B1220', '#16110B', '#0D1512', '#1C2027', '#241C16'];
+
+  /* ── v1175 · Farbe zerlegen und zusammensetzen, fuer den Farbton-Regler ──
+     Eigene kleine Rechnung statt Import: whitelabel-override.js hat dieselbe
+     (_toHsl/_fromHsl), aber modul-intern — nach aussen gibt es sie nicht.
+     Sie hier zu wiederholen ist KEIN zweiter Rechenkern: der Regler baut nur
+     seinen Vorschlagswert, gefaerbt wird danach ueber denselben einen Weg
+     (farbenAnwenden -> DealPilotWhitelabel.apply). */
+  function hexZuHsl(h) {
+    h = String(h || '').replace('#', '');
+    if (h.length !== 6) return [44, 0.54, 0.54];
+    var r = parseInt(h.slice(0, 2), 16) / 255,
+        g = parseInt(h.slice(2, 4), 16) / 255,
+        b = parseInt(h.slice(4, 6), 16) / 255;
+    var mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    var L = (mx + mn) / 2, S = 0, H = 0;
+    if (d) {
+      S = L > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+      H = (mx === r ? ((g - b) / d + (g < b ? 6 : 0)) : mx === g ? ((b - r) / d + 2) : ((r - g) / d + 4)) * 60;
+    }
+    return [H, S, L];
+  }
+  function hslZuHex(H, S, L) {
+    H = ((H % 360) + 360) % 360 / 360;
+    S = Math.max(0, Math.min(1, S)); L = Math.max(0, Math.min(1, L));
+    function f(p, q, t) {
+      if (t < 0) t += 1; if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    }
+    var q = L < 0.5 ? L * (1 + S) : L + S - L * S, p = 2 * L - q;
+    var a = S === 0 ? [L, L, L] : [f(p, q, H + 1 / 3), f(p, q, H), f(p, q, H - 1 / 3)];
+    return '#' + a.map(function (x) {
+      return ('0' + Math.round(x * 255).toString(16)).slice(-2);
+    }).join('');
+  }
+  /* Der Regler dreht NUR den Farbton. Saettigung und Helligkeit kommen aus
+     dem Ton, der gerade gilt — sonst waere ein Zug am Regler ein Sprung in
+     eine fremde Farbe. Zwei Grenzen, damit jede Stellung auch etwas ergibt:
+     ein fast graues Gold wuerde sich sonst beim Drehen nicht veraendern, und
+     ein sehr helles oder sehr dunkles wuerde als Akzent verschwinden.
+     Die Mitte (0,50 / 0,48) ist die Lage des Haus-Golds. */
+  function tonAusRegler(grad, basis) {
+    var hsl = hexZuHsl(basis);
+    var S = hsl[1] < 0.25 ? 0.50 : Math.min(hsl[1], 0.85);
+    var L = Math.max(0.30, Math.min(0.62, hsl[2] || 0.48));
+    return hslZuHex(grad, S, L);
+  }
 
   /* ── v1098 · Die Bereiche aus dem alten Panel ─────────────────────────
      Backlog Punkt 1: die beiden Darstellungs-Panels zusammenlegen.
@@ -289,6 +351,27 @@
     '.dpuv-frei input{width:44px;height:44px;min-height:44px;padding:2px;border:2px solid #E0DACB;',
       'border-radius:8px;background:none;cursor:pointer}',
     '.dpuv-frei.on input{border-color:#1a1712;box-shadow:0 0 0 3px color-mix(in srgb, #C9A84C 35%, transparent)}',
+    /* v1175 · Der Farbton-Regler. Eigene Bahn statt Browser-Voreinstellung,
+       damit man SIEHT, wohin man zieht — der Regenbogen ist die Skala. */
+    '.dpuv-reg{display:block;margin-top:11px}',
+    '.dpuv-reg .z{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}',
+    '.dpuv-reg .z b{font-size:11px;font-weight:600;color:#5c574d}',
+    '.dpuv-reg .z i{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:#8b8577;font-style:normal}',
+    '.dpuv-reg input{-webkit-appearance:none;appearance:none;width:100%;height:44px;background:none;',
+      'cursor:pointer;margin:0;padding:0}',
+    '.dpuv-reg input::-webkit-slider-runnable-track{height:14px;border-radius:7px;',
+      'border:1px solid #E0DACB;background:linear-gradient(90deg,',
+      'hsl(0,55%,46%),hsl(40,55%,46%),hsl(80,55%,46%),hsl(120,55%,46%),hsl(160,55%,46%),',
+      'hsl(200,55%,46%),hsl(240,55%,46%),hsl(280,55%,46%),hsl(320,55%,46%),hsl(360,55%,46%))}',
+    '.dpuv-reg input::-moz-range-track{height:14px;border-radius:7px;',
+      'border:1px solid #E0DACB;background:linear-gradient(90deg,',
+      'hsl(0,55%,46%),hsl(40,55%,46%),hsl(80,55%,46%),hsl(120,55%,46%),hsl(160,55%,46%),',
+      'hsl(200,55%,46%),hsl(240,55%,46%),hsl(280,55%,46%),hsl(320,55%,46%),hsl(360,55%,46%))}',
+    '.dpuv-reg input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;',
+      'border-radius:50%;background:#fff;border:2px solid #1a1712;margin-top:-5px;',
+      'box-shadow:0 1px 4px -1px rgba(0,0,0,.5)}',
+    '.dpuv-reg input::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;',
+      'border:2px solid #1a1712;box-shadow:0 1px 4px -1px rgba(0,0,0,.5)}',
     '#dpuv-f{flex:0 0 auto;display:flex;gap:8px;padding:12px 18px;border-top:1px solid #E9E4D9;background:#F6F3EC}',
     '.dpuv-pf{flex:1;font-size:12.5px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px;',
       'border:1px solid #DCD5C4;background:#fff;color:#3d382f}',
@@ -455,6 +538,16 @@
             '<label class="dpuv-frei" id="dpuv-acc-frei-l" title="Eigene Akzentfarbe">' +
               '<input type="color" id="dpuv-acc-frei" value="' + esc(s.ui_accent || GOLD_STD) + '">' +
               '<span>Eigene Farbe</span></label>' +
+            /* v1175 · Marcels Nachtrag: „können wir einen freien Farbregler
+               auch dazu setzen?" Der Farbkasten des Systems ist ein Fenster,
+               das sich oeffnet — der Regler steht offen da und man sieht
+               beim Ziehen sofort, was passiert. Beide bleiben: der Regler
+               fuer das Suchen, der Farbkasten fuer den genauen Wert. */
+            '<label class="dpuv-reg" id="dpuv-acc-reg-l">' +
+              '<span class="z"><b>Farbton frei drehen</b><i id="dpuv-acc-reg-w">—</i></span>' +
+              '<input type="range" id="dpuv-acc-reg" min="0" max="359" step="1" ' +
+                'value="' + Math.round(hexZuHsl(s.ui_accent || GOLD_STD)[0]) + '" ' +
+                'aria-label="Farbton des Akzents"></label>' +
             /* v1156-GRUND · Marcels Befund: „Grundfarbe auswaehlen — es tut
                sich gar nichts." Gemessen: OHNE Vorlage wirkt sie (Sidebar,
                Tab-Leiste, Kopfverlauf ziehen mit), MIT Vorlage nicht — alle
@@ -598,29 +691,49 @@
       if (istKachel(v)) freiL.classList.remove('on'); else freiL.classList.add('on');
     }
 
-    swBinden('dpuv-acc', 'ui_accent', function (v) {
-      if (frei) frei.value = v;      /* der Waehler zeigt, was gilt */
+    /* ── v1175 · Drei Bedienelemente, EIN Weg ─────────────────────────────
+       Kacheln, Farbkasten und Regler stellen dieselbe Sache ein. Sie haetten
+       damit auch drei Kopien derselben Nachzieh-Logik bekommen koennen — und
+       genau daraus entstehen die Faelle, in denen ein Weg den anderen nicht
+       mitbekommt. Deshalb geht jeder von ihnen durch akzentSetzen(), und nur
+       das eine Element, an dem der Nutzer gerade zieht, wird ausgelassen:
+       ihm den Wert zurueckzuschreiben, waehrend er ihn bewegt, laesst
+       Regler springen. */
+    var reg  = document.getElementById('dpuv-acc-reg');
+    var regW = document.getElementById('dpuv-acc-reg-w');
+
+    function akzentSetzen(v, quelle) {
+      save({ ui_accent: v });
+      var st = load();
+      farbenAnwenden(v, st.ui_obsidian || OBSIDIAN_STD);
+
+      var host = document.getElementById('dpuv-acc');
+      if (host) host.querySelectorAll('.dpuv-sw').forEach(function (x) {
+        x.classList.toggle('on', (x.getAttribute('data-v') || '').toLowerCase() === v.toLowerCase());
+      });
+      if (frei && quelle !== 'frei') frei.value = v;
+      if (reg  && quelle !== 'reg')  reg.value  = Math.round(hexZuHsl(v)[0]);
+      if (regW) regW.textContent = v.toUpperCase();
       freiMarkieren(v);
-    });
+    }
+
+    swBinden('dpuv-acc', 'ui_accent', function (v) { akzentSetzen(v, 'kachel'); });
     swBinden('dpuv-obs', 'ui_obsidian');
 
-    if (frei) {
-      /* input, nicht change: der Sinn des freien Waehlers ist das Sehen
-         waehrend des Ziehens. save() ist nur localStorage, das traegt das. */
-      frei.addEventListener('input', function () {
-        var v = frei.value;
-        var host = document.getElementById('dpuv-acc');
-        if (host) host.querySelectorAll('.dpuv-sw').forEach(function (x) {
-          if (x.getAttribute('data-v').toLowerCase() === v.toLowerCase()) x.classList.add('on');
-          else x.classList.remove('on');
-        });
-        save({ ui_accent: v });
-        var st = load();
-        farbenAnwenden(v, st.ui_obsidian || OBSIDIAN_STD);
-        freiMarkieren(v);
-      });
-      freiMarkieren(load().ui_accent || GOLD_STD);
-    }
+    /* input, nicht change: der Sinn beider Bedienelemente ist das Sehen
+       waehrend des Ziehens. save() ist nur localStorage, das traegt das. */
+    if (frei) frei.addEventListener('input', function () { akzentSetzen(frei.value, 'frei'); });
+    if (reg)  reg.addEventListener('input', function () {
+      akzentSetzen(tonAusRegler(parseInt(reg.value, 10) || 0, load().ui_accent || GOLD_STD), 'reg');
+    });
+
+    /* Startzustand — ohne zu faerben, es gilt ja schon. */
+    (function () {
+      var v = load().ui_accent || GOLD_STD;
+      if (reg)  reg.value = Math.round(hexZuHsl(v)[0]);
+      if (regW) regW.textContent = v.toUpperCase();
+      freiMarkieren(v);
+    })();
 
     document.getElementById('dpuv-x').addEventListener('click', schliessen);
     document.getElementById('dpuv-done').addEventListener('click', schliessen);
@@ -670,10 +783,13 @@
           x.classList.toggle('on', (x.getAttribute('data-v') || '').toLowerCase() === pair[1]);
         });
       });
-      /* v1174: der freie Waehler gehoert zum Akzent — er muss beim
-         Zuruecksetzen mitgehen, sonst steht dort noch die alte Farbe und
-         der naechste Klick darauf holt sie zurueck. */
-      if (frei) { frei.value = GOLD_STD; freiMarkieren(GOLD_STD); }
+      /* v1174/v1175: Farbkasten und Regler gehoeren zum Akzent — sie muessen
+         beim Zuruecksetzen mitgehen, sonst steht dort noch die alte Farbe und
+         der naechste Griff daran holt sie zurueck. */
+      if (frei) frei.value = GOLD_STD;
+      if (reg)  reg.value  = Math.round(hexZuHsl(GOLD_STD)[0]);
+      if (regW) regW.textContent = GOLD_STD.toUpperCase();
+      freiMarkieren(GOLD_STD);
       try { if (typeof toast === 'function') toast('Darstellung zurückgesetzt'); } catch (e) {}
     });
 
