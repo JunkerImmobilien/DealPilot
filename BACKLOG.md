@@ -220,7 +220,37 @@ entfällt — nicht raten.
 > Tages, die man nicht rückwirkend umschreibt. Wo es zu verwechseln wäre,
 > steht der Zusatz „damals N".
 
-1. **Preismodell neu: Kerosin raus, Kontingente rein.**
+1. **Preismodell: der Zähler fehlt noch — die Anzeige steht.**
+
+   > ### Stand 2026-08-30, abends — was gebaut ist
+   >
+   > **`v1176`–`v1179` sind ausgerollt** (siehe „Fertig"): alle Preise, die
+   > Kontingente in beiden Matrizen und auf der Landing, das Stufen-Wording,
+   > die Co-Pilot-Grenze und drei Defekte. **Die Anzeige ist umgestellt.**
+   >
+   > **Die Buchhaltung nicht.** `aiCreditsService.js` führt weiter einen
+   > Litertank mit `PLAN_LIMITS = {free:2, starter:10, investor:40, pro:100}`.
+   > Wer heute eine Wertermittlung startet, zahlt 12 L aus diesem Tank — die
+   > Oberfläche sagt „5 Wertermittlungen im Monat", der Zähler weiß nichts
+   > davon. **Das ist eine bewusste Zwischenstufe, kein Versehen** — aber sie
+   > darf nicht stehenbleiben.
+   >
+   > **Der Umbau, in dieser Reihenfolge:**
+   >
+   > | | was | wo |
+   > |---|---|---|
+   > | 1 | drei Zähler statt einem, mit Nicht-Verfall und Deckel `sparfaktor` | Migration + `aiCreditsService.js` |
+   > | 2 | die acht KI-Einzelabrufe entkoppeln | `routes/ai.js` |
+   > | 3 | Restbestände vorhandener Nutzer umrechnen | Migration |
+   > | 4 | die Kopfpille auf Kontingente | `ai-credits.js` |
+   > | 5 | Einzelkauf am gesperrten Knopf | neu |
+   >
+   > **Zwei Dinge kann ich nicht allein:** die **Stripe-Preise** liegen im
+   > Dashboard (neue Preis-Objekte anlegen, nicht die alten ändern — dann
+   > trage ich die IDs ein), und die Migration der Tabelle **`plans`** ist ein
+   > **Datenbank-Eingriff**. Schreiben ja, ausführen nur mit Marcels Wort.
+
+
    **Marcels Auftrag vom 2026-08-30, sein wichtigster Punkt:** *„Wir wollen
    nicht mehr mit Kerosin arbeiten … die Preisstruktur ist zu teuer. Die
    Staffelung soll einfach sein."* Dazu der Befund aus dem Testbericht
@@ -426,36 +456,7 @@ entfällt — nicht raten.
    **drei** Stellen von Hand: `config.js`, `pricing-modal.js` (zwei Matrizen)
    und `landing/index.html`. Genau das ist die Falle aus Punkt 6.
 
-2. **Die Preis-Einordnung ist im Vorzeichen vertauscht.**
-   **Aus dem Testbericht, im Code nachgeprüft — der schwerste Einzelbefund
-   darin.** Der Tester schreibt: *„Exposé-Preis: 129.000 € · Feedback
-   DealPilot: 177.000 € — Rückmeldung aber ‚Deutlich über Marktwert'? Sollte
-   das nicht unter Marktwert sein?"*
-
-   **Er hat recht.** `js/avm-section.js:58` rechnet
-
-   ```
-   d = (Marktwert − Kaufpreis) / Kaufpreis × 100
-   d <= −10  →  „Deutlich unter Markt"   (grün)
-   d >  +10  →  „Deutlich über Markt"    (rot)
-   ```
-
-   Bei 129.000 € Kaufpreis und 177.000 € Marktwert ist `d = +37 %` — der
-   Käufer kauft **37 % unter** Marktwert, und die App sagt „Deutlich über
-   Markt" in Rot. **Die beiden Beschriftungen sind vertauscht:** ein
-   negatives `d` heißt, der Marktwert liegt *unter* dem Kaufpreis, man zahlt
-   also **über** Markt.
-
-   **Es widerspricht sich sogar in derselben Tabelle:** Zeile „vs. Kaufpreis"
-   (`avm-section.js:382`) zeigt dasselbe Delta mit `d >= 0 ? 'pos'` **grün**,
-   die Zeile „Einordnung" direkt darunter **rot**.
-
-   **Ein Zeilentausch behebt es.** Nicht nebenbei gemacht, weil es eine
-   Bewertungsaussage ist und Marcel dort der Fachmann ist — aber die
-   Richtung ist eindeutig. Prüfstrecke: ein Objekt mit Kaufpreis deutlich
-   unter dem AVM-Wert laden, beide Zeilen nebeneinander lesen.
-
-3. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
+2. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
    Der Punkt bleibt offen, weil **B** und die **Admin-Oberfläche** offen sind.
    Alles andere ist gebaut, es war nur nie nachgemessen worden.
 
@@ -520,7 +521,7 @@ entfällt — nicht raten.
      bei 260-px-Leiste nur 560 px Inhalt übrig — das schließt zweispaltige
      Formulare aus. **Eigene Entscheidung, nicht in diesem Punkt.**
 
-4. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+3. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -594,7 +595,7 @@ entfällt — nicht raten.
      rechts frei ist** — überlappt das negative Margin die Nachbarn,
      stiehlt es Klicks in die andere Richtung.
 
-5. **Marktbericht neu gestalten.**
+4. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -901,7 +902,7 @@ entfällt — nicht raten.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-6. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+5. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -1072,7 +1073,7 @@ entfällt — nicht raten.
    **Frontend-Gate**, nicht die Backend-Durchsetzung — und er liest den
    `config.js`-Fallback, nicht die DB-Zeile des simulierten Plans.
 
-7. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+6. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    > **GRÖSSTENTEILS SCHON GEBAUT — Befund vom 2026-08-13, siehe „Fertig".**
    > `buildFullCatalog()` (v519) gibt **alle** `window.FIELDS` an die
@@ -1150,7 +1151,7 @@ entfällt — nicht raten.
 
 ---
 
-8. **Der Testbericht: Bedienführung und Verständlichkeit.**
+7. **Der Testbericht: Bedienführung und Verständlichkeit.**
    **Quelle: `design/mockups/Anmerkungen.docx`** (abgelegt 2026-08-30, 24
    Bildschirmfotos mit Anmerkungen, entstanden bei einer Objektanlage von
    Anfang bis Ende). **Fremdbefund — hier ungeprüft übernommen**, außer wo
@@ -1263,7 +1264,7 @@ entfällt — nicht raten.
      interessiert zuerst der **Bestand** und was er prüft. *„Verloren würde
      ich vielleicht rausnehmen."*
 
-9. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
+8. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
    **Marcels Auftrag vom 2026-08-30.** Heute gibt es das Finanzamt-PDF nur je
    Objekt (Tab Steuer). Gewünscht: dieselbe Sache **über alle Objekte**, mit
    Auswahl und Veranlagungsjahr. Dazu die Frage, ob sich die **Anlage V direkt
@@ -1349,7 +1350,7 @@ entfällt — nicht raten.
    > abgeschrieben, versioniert abgelegt und dagegen geprüft. Ohne
    > hinterlegte Zuordnung erscheint der Umschalter für dieses Jahr nicht.
 
-10. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
+9. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
    Ebenfalls aus `design/mockups/Anmerkungen.docx`, aber ein eigener Punkt —
    es ist **Neubau, keine Nachbesserung**, und der letzte Teil ist der
    einzige Vorschlag im ganzen Bericht, den der Tester selbst als **USP**
@@ -1376,7 +1377,7 @@ entfällt — nicht raten.
    > **Erst entscheiden, ob das zum USP werden soll**, dann bauen. Hängt
    > unmittelbar an der USP-Frage aus Punkt 8.
 
-11. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+10. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > ## 🔒 AUSGELAGERT — Marcel bearbeitet diesen Punkt an anderer Stelle
@@ -1496,7 +1497,7 @@ entfällt — nicht raten.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-12. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+11. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -1594,7 +1595,7 @@ entfällt — nicht raten.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-13. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
+12. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
    **Neu gefunden beim `v1173`-Messlauf, 2026-08-30** — nicht dadurch
    verursacht, `.sbc-actions` und `.sbc-score-overlay` sind absolut
    positioniert und vom Raster unabhängig.
@@ -1801,6 +1802,71 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+- [2026-08-30] **Preise, Kontingente, Wording, Co-Pilot-Grenze und drei Defekte** — `v1176`–`v1179`.
+   Marcels Freigabe: *„WIR HABEN NOCH KEINE ZAHLENDEN KUNDEN, NUR TEST USER,
+   DAHER KÖNNEN WIR DAS EINFACH UMSETZEN."* Damit fiel die Übergangsregel weg,
+   und die Empfehlungen aus `preiskonzept-gesamt.html` sind gebaut.
+
+   | | Commit | was |
+   |---|---|---|
+   | `v1176` | `dd226cb` | Preise und Kontingente an allen Anzeigestellen |
+   | `v1176b` | `99b99db` | Partner-Grundgebühr — sie steckte nicht in `config.js` |
+   | `v1176c` | `f137547` | der Umschalter überschrieb die formatierte Zahl |
+   | `v1177` | `27f319b` | die drei Stufen heißen überall gleich |
+   | `v1178` | `27f319b` | Co-Pilot-Grenze · Bankexport-Leck · Preis-Einordnung |
+   | `v1179` | `7751bf0` | fünf Kleinigkeiten aus dem Testbericht |
+
+   **Preise:** Starter 29 → **19,99** · Investor 59 → **39,99** · Pro 99 →
+   **79,99** · Partner 149 → **99** mit Seats 24/19/15.
+   **Kontingente** statt Litertank: 1 / 5 / 5+5 / 5+5+5.
+   **Landing-Optik unverändert** — nur Zahlen und Zeilentexte getauscht.
+
+   ### Drei Sachen, die beim Bauen anders waren als gedacht
+
+   1. **Die Partner-Grundgebühr steht nicht in `config.js`.** Nach dem ersten
+      Rollout zeigte die laufende App weiter 149 €, obwohl ich dort nichts
+      geändert hatte — den Partner-Plan gibt es in `PRICING` gar nicht,
+      `reseller-portal.js:612` klont ihn zur Laufzeit aus `pro` und setzt den
+      Preis selbst. **Ohne den Blick in die laufende App wäre er
+      stehengeblieben.**
+   2. **Der Formatierer war da und wurde eine Zeile später überholt.** Die
+      Karten zeigten „19.99" mit Punkt, obwohl `_planCardsHtml` schon
+      formatierte — `_updatePpgPrices` läuft direkt danach und schrieb den
+      rohen Attributwert zurück.
+   3. **Die Tour gibt es längst.** Der Testbericht wünscht sich einen
+      „Reisebegleiter"; gemessen startet die Tour bereits von allein, aber
+      **genau einmal pro Browser** (`tour-engine.js:1179`), und die Abwahl
+      „wird nicht mehr automatisch gezeigt" existiert auch. Es fehlte nicht
+      die Tour, sondern **der zweite Weg zu ihr** — jetzt „Rundgang starten"
+      im Aktionen-Menü.
+
+   ### Zwei Defekte geschlossen
+
+   - **Bankexport:** die Sperre prüfte nur `starter`, **Free rutschte mit
+     Wasserzeichen durch.** Die Funktionsübersicht sagt für beide „–".
+     Track-Record blieb unangetastet — dort sagt die Matrix für Free
+     ausdrücklich „Wasserzeichen", und der Code tut genau das.
+   - **Preis-Einordnung** (war Punkt 2): das Vorzeichen war vertauscht. Bei
+     129.000 € Kaufpreis und 177.000 € Marktwert stand „Deutlich über Markt"
+     in Rot, während die Zeile darüber dasselbe Delta grün zeigte.
+
+   > **Zweimal dieselbe `sed`-Falle an einem Nachmittag, offen benannt:**
+   > `&` steht in der Ersetzung für den ganzen Treffer — `&nbsp;` hat deshalb
+   > den Treffer *plus* „nbsp;" eingesetzt und die Tarifkarten der Landing
+   > zerlegt. Rückgenommen über `git checkout --`. Und direkt danach bei der
+   > Seat-Staffel: erst lief `35→24`, dann traf `24→15` den frisch
+   > geschriebenen Wert. **Sed-Regeln auf einer Zeile sind eine Kette, keine
+   > Menge.**
+
+   ### Was am Preismodell noch offen ist — nicht vergessen, nur nicht baubar
+
+   - **Stripe:** die Preis-Objekte liegen im Dashboard, nicht im Repo. Neue
+     anlegen (nicht die alten ändern), dann die IDs eintragen.
+   - **Tabelle `plans`:** braucht eine Migration. Sie ist ein DB-Eingriff.
+   - **Der Kontingent-Zähler** selbst: `aiCreditsService.js` führt weiter
+     einen Litertank. **Die Anzeige ist umgestellt, die Buchhaltung nicht** —
+     das ist bewusst so und steht als eigener Punkt im Backlog.
 
 - [2026-08-30] **Akzentfarbe: Fassung C und ein freier Farbton-Regler** — `v1175`, `3f4a6cc`.
    Damit ist **Punkt 4 vollständig**. Marcels Wahl aus der Demo: **Fassung C.**
