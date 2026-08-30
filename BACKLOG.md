@@ -91,7 +91,10 @@ zusammengeführt und nach **jedem** Rollout fortgeschrieben.
 
 ### Der nächste Schritt ist vorbereitet, nicht angefangen
 
-**Punkt 5 (Hell und Dunkel als zwei Profile)** hat seinen Entwurf:
+**Erledigt seit dem 13.08. — der Absatz bleibt als Beleg der Entscheidung
+stehen.** Der Punkt hieß damals 5 und ist mit `v1162`/`v1167` ausgeliefert.
+
+**Punkt 5 (Hell und Dunkel als zwei Profile)** hatte seinen Entwurf:
 `design/Vorschläge/hell-dunkel-zwei-profile.html` — anklickbar, mit dem
 Schalter wie er in den Einstellungen aussähe, beiden Fassungen nebeneinander
 und **allen drei offenen Fragen beantwortet** (je Profil eigene Werte über
@@ -107,10 +110,11 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
    wieder.
 
 **Was Marcel noch offen hat** (nicht von mir zu entscheiden):
-- **Punkt 1**, Teil B: wie wird der Score flacher — braucht ein Bild. Dazu der
-  Befund, dass die Score-Zeile erst **ab 70 % Datenvollständigkeit**
-  erscheint (`calc.js:205`).
-- **Punkt 4**: welcher Art soll die erweiterte Akzent-Palette sein.
+- **Punkt 3** (damals 1), Teil B: wie wird der Score flacher — braucht ein
+  Bild. Dazu der Befund, dass die Score-Zeile erst **ab 70 %
+  Datenvollständigkeit** erscheint (`calc.js:205`).
+- ~~**Punkt 4**: welcher Art soll die erweiterte Akzent-Palette sein.~~
+  **Beantwortet am 30.08.** — Fassung C, `v1175`. Siehe „Fertig".
 - ~~**Punkt 11** (Wallet): welche Angaben gehören auf die Karte.~~ **Beantwortet
   am 14.08.** („alles, was auch im Standard drauf ist") und mit `v1173`
   ausgeliefert — nachgezählt, es fehlt nichts. Siehe „Fertig".
@@ -196,7 +200,125 @@ zeigt sich, ob sein Wegfall zu teuer war.
 Vorher messen, wie viel Zeit auf Transkription und wie viel auf Auswertung
 entfällt — nicht raten.
 
-1. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
+> ### Die Nummern sind am 30.08. neu durchgezählt
+>
+> Vier Punkte sind fertig geworden (die alten 4, 5, 10 und 11), vier neue
+> sind dazugekommen. Aus 1–11 mit Lücken wurde **1–12 ohne Lücke**.
+>
+> | alt | neu | | alt | neu |
+> |---|---|---|---|---|
+> | 1 Tablet | **3** | | 7 Spracheingabe | **7** |
+> | 2 Handy-Befunde | **4** | | 8 Sachwertfaktor | **10** |
+> | 3 Marktbericht | **5** | | 9 Objektnummer-Kontrast | **11** |
+> | 6 Pläne durchtesten | **6** | | 10 Wallet am Handy | **12** |
+>
+> **In den Blöcken oben („Hier weitermachen", „Marcels Antworten") und unter
+> „Fertig" stehen weiter die ALTEN Nummern** — das sind Protokolle eines
+> Tages, die man nicht rückwirkend umschreibt. Wo es zu verwechseln wäre,
+> steht der Zusatz „damals N".
+
+1. **Preismodell neu: Kerosin raus, Kontingente rein.**
+   **Marcels Auftrag vom 2026-08-30, sein wichtigster Punkt:** *„Wir wollen
+   nicht mehr mit Kerosin arbeiten … die Preisstruktur ist zu teuer. Die
+   Staffelung soll einfach sein."* Dazu der Befund aus dem Testbericht
+   (`design/mockups/Anmerkungen.docx`): *„Zweite Währung sollte meiner
+   Meinung nach unbedingt raus. Wirkt undurchsichtig."*
+
+   **Vorschlag steht: `design/Vorschläge/preismodell-2026.html`** — was heute
+   gilt, fünf Befunde, drei Staffelungen zur Wahl, der Umbau in vier
+   Schritten und sechs Fragen, die Marcel beantworten muss.
+
+   ### Der Fund, der die Sache trägt
+
+   **Marcels Beispiel ist fast auf den Liter das, was die Pläne heute schon
+   enthalten.** Seine Worte bilden sich eins zu eins auf die drei Stufen ab,
+   die es im Marktbericht bereits gibt (`mb-stufen.js:31`):
+
+   | Marcels Wort | heißt im Haus | kostet |
+   |---|---|---|
+   | „einfache Marktpreisindikation" | Stufe 1 · Einschätzung | 2 L |
+   | „Bewertung" / „erweiterte Bewertung" | Stufe 2 · Marktpreisindikation | 5 L |
+   | „Ertragswert bzw. Verkehrswert" | Stufe 3 · Wertermittlung | 12 L |
+
+   | Plan | 5 × St. 1 | 5 × St. 2 | 5 × St. 3 | Summe | heute | |
+   |---|---|---|---|---|---|---|
+   | Starter | 10 L | — | — | **10 L** | 10 L | **exakt** |
+   | Investor | 10 L | 25 L | — | **35 L** | 40 L | 5 L Luft |
+   | Pro | 10 L | 25 L | 60 L | **95 L** | 100 L | 5 L Luft |
+
+   **Der Umbau kostet also kaum Marge — er kostet die zweite Währung.** Aus
+   „40 L" wird „5 Einschätzungen + 5 Marktpreisindikationen". Die
+   Marge-Entscheidung ist eine andere, nämlich der Preis.
+
+   ### Drei Befunde, die beim Neuschnitt mit entschieden gehören
+
+   1. **Der Co-Pilot hat heute gar kein Plan-Gate.** `js/copilot.js` fragt
+      `hasFeature` an **keiner** Stelle ab, im Dateikopf steht „KEIN Kerosin
+      (server-seitig rate-limited)". Er ist für Free so offen wie für Pro.
+      Soll er das Investor-Merkmal werden, ist das ein **Neubau**.
+   2. **Free und Starter tragen im Frontend die falsche Litermenge.**
+      `config.js` führt `ai_credits: 1` und `5`, das Backend
+      (`aiCreditsService.js:20`, die verbindliche Stelle) gibt **2** und
+      **10** — so steht es auch auf der Landing. Rest aus der Zeit
+      „1 Credit = 2 Anfragen". **Kein Kundenschaden**, die DB gewinnt; aber
+      im Fenster vor dem Laden zeigt die App die halbe Menge.
+   3. **Das Bankexport-Leck ist weiter offen** — der Export blockt nur
+      `starter`, **Free rutscht mit Wasserzeichen durch.** Steht seit dem
+      Plan-Prüflauf als unentschieden im Backlog (jetzt Punkt 6).
+
+   ### Was Marcel entscheiden muss, bevor gebaut wird
+
+   Alle sechs Fragen stehen ausformuliert im Vorschlag. Die beiden, ohne die
+   **gar nichts** gebaut werden kann:
+
+   - **Was passiert, wenn das Kontingent leer ist?** Einzelverkauf oder
+     Sperre mit Verweis auf das größere Paket. Der Testbericht nennt beide
+     Wege — das ist eine Geldentscheidung.
+   - **Was wird aus den acht KI-Einzelabrufen?** Pilot-Analyse,
+     Lagebewertung, Spracheingabe, Beleg-Import, Bodenrichtwert, BMF-GAA,
+     DS2-Vorschlag, Marktfelder — je 1 L (`routes/ai.js`, acht Stellen). Sie
+     passen in **keines** der drei Kontingente.
+
+   > **Und ein Hinweis, der keine Frage ist:** Kerosin ist kein Zufallsname —
+   > er gehört zu Cockpit, Boarding, Runway, Pre-Flight und Co-Pilot. Wenn der
+   > Tank verschwindet, fehlt der Marke ein Stück Erzählung. **Ein Mittelweg
+   > wäre, den Namen zu behalten und nur die Einheit zu ändern:** nicht
+   > „40 Liter", sondern „5 Bewertungen im Tank".
+
+   **Achtung beim Bauen — die drei Wahrheiten.** Preise und Matrix stehen an
+   **drei** Stellen von Hand: `config.js`, `pricing-modal.js` (zwei Matrizen)
+   und `landing/index.html`. Genau das ist die Falle aus Punkt 6.
+
+2. **Die Preis-Einordnung ist im Vorzeichen vertauscht.**
+   **Aus dem Testbericht, im Code nachgeprüft — der schwerste Einzelbefund
+   darin.** Der Tester schreibt: *„Exposé-Preis: 129.000 € · Feedback
+   DealPilot: 177.000 € — Rückmeldung aber ‚Deutlich über Marktwert'? Sollte
+   das nicht unter Marktwert sein?"*
+
+   **Er hat recht.** `js/avm-section.js:58` rechnet
+
+   ```
+   d = (Marktwert − Kaufpreis) / Kaufpreis × 100
+   d <= −10  →  „Deutlich unter Markt"   (grün)
+   d >  +10  →  „Deutlich über Markt"    (rot)
+   ```
+
+   Bei 129.000 € Kaufpreis und 177.000 € Marktwert ist `d = +37 %` — der
+   Käufer kauft **37 % unter** Marktwert, und die App sagt „Deutlich über
+   Markt" in Rot. **Die beiden Beschriftungen sind vertauscht:** ein
+   negatives `d` heißt, der Marktwert liegt *unter* dem Kaufpreis, man zahlt
+   also **über** Markt.
+
+   **Es widerspricht sich sogar in derselben Tabelle:** Zeile „vs. Kaufpreis"
+   (`avm-section.js:382`) zeigt dasselbe Delta mit `d >= 0 ? 'pos'` **grün**,
+   die Zeile „Einordnung" direkt darunter **rot**.
+
+   **Ein Zeilentausch behebt es.** Nicht nebenbei gemacht, weil es eine
+   Bewertungsaussage ist und Marcel dort der Fachmann ist — aber die
+   Richtung ist eindeutig. Prüfstrecke: ein Objekt mit Kaufpreis deutlich
+   unter dem AVM-Wert laden, beide Zeilen nebeneinander lesen.
+
+3. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
    Der Punkt bleibt offen, weil **B** und die **Admin-Oberfläche** offen sind.
    Alles andere ist gebaut, es war nur nie nachgemessen worden.
 
@@ -261,7 +383,7 @@ entfällt — nicht raten.
      bei 260-px-Leiste nur 560 px Inhalt übrig — das schließt zweispaltige
      Formulare aus. **Eigene Entscheidung, nicht in diesem Punkt.**
 
-2. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+4. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -335,7 +457,7 @@ entfällt — nicht raten.
      rechts frei ist** — überlappt das negative Margin die Nachbarn,
      stiehlt es Klicks in die andere Richtung.
 
-3. **Marktbericht neu gestalten.**
+5. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -642,99 +764,6 @@ entfällt — nicht raten.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-5. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
-
-   > **ERLEDIGT — `v1162`/`v1162b` (`381e678`) und `v1167` (`c1d572b`),
-   > siehe „Fertig".** Der Schalter steht unter **Profil & Anzeige**, beide
-   > Richtungen sind im Browser nachgemessen, ~~zwei Reste~~ beide Reste sind
-   > zu: je Profil eigene Werte über `dp_profil_werte`, und die Markierung
-   > greift auch beim Öffnen ohne Klick.
-   >
-   > **Und eine Korrektur zu Marcels Beschreibung unten:** die helle Fassung
-   > ist die Vorlage **`kanzlei`**, nicht `panel`. Marcels Bild
-   > `design/mockups/hell.png` zeigt die warme helle Kopfleiste und die
-   > Serifenschrift von `kanzlei`; `panel` ist „Kühl" mit Blaustich. Das Bild
-   > kam nach der Beschreibung und schlägt sie.
-
-   **Marcels Bild davon, wörtlich zusammengefasst:**
-
-   - **DealPilot wird im dunklen Modus ausgeliefert.** Das ist der Standard.
-   - **Daneben ein heller Modus**, umschaltbar mit einem Griff — hell/dunkel.
-   - **In der Darstellung sind das zwei Profile.**
-   - **Der helle Modus besteht aus:** App-Darstellung „Panel", Objektkarten
-     „Standard", und dem kleinen DealPilot-Logo oben in der Ecke.
-   - **Ort:** Einstellungen → Profil und Anzeige, oder direkt unter
-     Darstellung. Wer es individueller will, klickt dort weiter auf
-     „Darstellung öffnen" und stellt einzeln ein.
-
-   **Das ist der größte der neuen Punkte** — nicht wegen des Aufwands,
-   sondern weil er die Bedienlogik des ganzen Bereichs neu ordnet: **ein
-   Griff für 95 % der Leute, das volle Panel für den Rest.** Genau die
-   richtige Richtung; heute muss jeder durch alle acht Farbfelder, um zu
-   einem stimmigen Bild zu kommen.
-
-   **Drei Fragen, die vor dem Bauen zu klären sind:**
-
-   1. **Was passiert mit einer eigenen Einstellung, wenn jemand umschaltet?**
-      Überschreiben (einfach, aber Arbeit weg), daneben behalten (freundlich,
-      aber wo steht sie), oder je Profil eigene Werte (sauber, aber die
-      Speicherstruktur wächst). **Mein Vorschlag: je Profil eigene Werte** —
-      `brand_display` ist `jsonb`, kostet also keine Migration, und genau
-      deshalb wurde es damals so angelegt.
-   2. **Was ist „das kleine DealPilot-Logo oben in der Ecke"** — das
-      Wortmarken-Bild, das heute die Sidebar trägt? Ein Bild aus
-      `design/mockups/` würde das in einem Satz klären.
-   3. **Was sieht ein Partner-Mandant?** Der hat ein eigenes Branding. Der
-      Schalter darf ihn nicht aus der Marke seines Partners werfen. Das ist
-      dieselbe Grenze, die `v1114` und `v1122` schon einmal gezogen haben.
-
-   **→ Demo nach `design/Vorschläge/` mit beiden Profilen zum Durchklicken,
-   dann bauen.**
-
-   ### DAS BILD IST DA (`design/mockups/hell.png`, 2026-08-13) — und es korrigiert zwei Annahmen
-
-   **Es zeigt nicht `panel`, sondern `kanzlei`.** Am CSS gegengeprüft:
-
-   | im Bild | `html[data-ui-theme="kanzlei"]` |
-   |---|---|
-   | helle, warme Kopfleiste | `--uv-chrome: #FBFAF7` |
-   | warme Arbeitsfläche | `--uv-pane: #F7F5F1` |
-   | weiße Karten | `--uv-surf: #FFFFFF` |
-   | warme Grautöne | `#1c1a16` / `#55504a` / `#928d84` |
-   | **Serifenschrift** bei „Objekt & Fotos" | `kanzlei` = „Serife" (THEMES) |
-
-   `panel` ist dagegen „Kühl" mit Blaustich (`rgb(21,26,32)`) — das ist im Bild
-   nirgends. **Die Textvorgabe im Punkt („App-Darstellung Panel") ist damit
-   überholt; das Bild ist die konkretere und neuere Angabe.**
-
-   **Und der Hell-Skin ist NICHT beteiligt.** Im Bild sind die Reiter
-   **golden**, nicht die Tinte aus `v1158` — und `v1158` hängt an
-   `body.dp-chrome-hell`. Das Bild zeigt also `kanzlei` **ohne**
-   `dp_chrome_hell`. Das ist kein Widerspruch, sondern die Auflösung: **der
-   „helle Modus" ist eine Vorlage, kein Chrome-Skin.**
-
-   **Damit ist Frage 2 auch beantwortet:** das Logo im Bild ist **groß und
-   prominent** (schwarzes „Deal", goldenes „Pilot"), nicht klein. Mein Entwurf
-   hatte „kleines Logo" aus der Textvorgabe übernommen — das Bild sagt etwas
-   anderes.
-
-   **Das Profil „Hell" setzt danach:**
-
-   | | Wert |
-   |---|---|
-   | `data-ui-theme` | **`kanzlei`** |
-   | `data-ui-cards` | `''` (Standard) |
-   | `dp_chrome_hell` | **`0`** — bleibt aus |
-   | Logo | **normal**, nicht klein |
-
-   Und „Obsidian" setzt alle vier auf den Istzustand zurück (kein Attribut,
-   `0`, normal). **Beide Profile sind damit reine Zustandsschalter über
-   vorhandene Wege** — kein neues CSS.
-
-   **Der Entwurf `hell-dunkel-zwei-profile.html` ist an drei Stellen
-   überholt** (Vorlage, Kopf-Farbe, Logogröße) und gehört vor dem Bauen
-   nachgezogen — oder man baut direkt gegen `hell.png`, das ist die Vorgabe.
-
 6. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
@@ -984,7 +1013,147 @@ entfällt — nicht raten.
 
 ---
 
-8. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+8. **Der Testbericht: Bedienführung und Verständlichkeit.**
+   **Quelle: `design/mockups/Anmerkungen.docx`** (abgelegt 2026-08-30, 24
+   Bildschirmfotos mit Anmerkungen, entstanden bei einer Objektanlage von
+   Anfang bis Ende). **Fremdbefund — hier ungeprüft übernommen**, außer wo
+   ausdrücklich „geprüft" steht. Die Bilder liegen im Dokument in
+   derselben Reihenfolge wie die Punkte unten.
+
+   > **Vor dem Abarbeiten: der Satz, der über allem steht.** Der Tester
+   > schreibt zum Schluss: *„Tool hat super viele Funktionen. Ich weiß aber
+   > nicht, ob ich das wirklich regelmäßig nutzen würde, sehr viele
+   > Eingabefelder und teilweise noch etwas verwirrend. … USP muss definiert
+   > werden und meiner Meinung nach dann darauf starken Fokus setzen."*
+   > **Das ist keine Liste von Kleinigkeiten, das ist ein Befund über das
+   > Ganze.** Wer die Punkte unten einzeln abräumt, ohne diese Frage zu
+   > beantworten, macht die App gründlicher — nicht einfacher.
+
+   **A · Einstieg**
+   - Nach dem Einloggen zu viele verschiedene Knöpfe. Vorschlag des Testers:
+     ein „Reisebegleiter"-Fenster beim ersten Mal, das die wichtigsten
+     Funktionen erklärt, mit Haken „nicht mehr anzeigen". **Die Tour gibt es,
+     sie ist nur im Hilfe-Bereich versteckt** (`dp_tour_seen_v1`) — es geht
+     also ums Anbieten, nicht ums Bauen.
+   - Von dort auch auf die Hilfe-Videos verweisen.
+
+   **B · Boarding-Pass und Exposé-Übernahme**
+   - **Zustand und Qualität werden doppelt abgefragt** — verwirrend, muss das
+     sein?
+   - Ein wichtiger Bereich war **eingeklappt**, obwohl er zentral ist.
+   - **Die Investitionsthese wird abgefragt** — *„mache ich das Boarding nicht
+     gerade, um die Investition zu bewerten?"*
+   - Aus dem Exposé ließe sich mehr übernehmen: *„der Boden muss ersetzt
+     werden, die Wohnung ist teilweise renovierungsbedürftig"* steht dort im
+     Text.
+   - **Der Wertpuffer steht zu weit unten** — er gehört nach oben. (Ist damit
+     das Delta der Bewertung gemeint? Der Tester ist sich nicht sicher.)
+   - **`DS2` als Abzeichen sagt nichts.** Wenn es wichtig ist, gehört eine
+     Erklärung daneben.
+   - **Makrolage „Durchschnittlich" ohne Herkunft**: kam das automatisch aus
+     dem Exposé? Bevölkerungsentwicklung und anderes stehen leer. **Es fehlt
+     der Hinweis, dass aus dem Exposé nichts zu holen war.**
+   - Die KI-Abfrage gehört **oben** in den Bereich, wenn nicht automatisch
+     gefüllt wird.
+   - **Grundsatzfrage:** kommen die Werte erst aus dem Exposé und werden dann
+     per KI geschärft? *„Wie ist der Prozess gedacht?"* — die Antwort darauf
+     entscheidet mehrere Punkte oben.
+   - Notizfeld neben Risiken und These: **was soll da rein?**
+
+   **C · Die Wertermittlungs-Felder**
+   - *„Braucht es so viele Felder für die Bewertung einer ETW?"*
+   - **NHK-2010-Standardstufe und Sachwertfaktor sind unerklärt** — woher soll
+     ein Anwender das wissen?
+   - **Stellplatzmiete wird abgefragt, die Kaltmiete nicht.**
+   - **Hausform „Mehrfamilienhaus" nicht anklickbar** — ist der Bereich für
+     ETW gedacht?
+   - *„Was genau sind die Stufen?"* — braucht eine einfache Erklärung.
+   - Vorschlag: vorher fragen, **wie ausführlich** der Anwender eingeben will,
+     oder die Bereiche auf- und zuklappbar machen.
+
+   **D · Investition**
+   - **Grundbuchamt mit 0,5 % vorbelegen** — der Anwender kennt den Wert nicht.
+   - **„Sonstiges 1,5 %" benennen**: gemeint sind wohl Bausachverständiger,
+     Anfahrt und Ähnliches. Als unbenannter Standard steht es schlecht da.
+   - **Hinweis, was danach passiert** — dass die Werte in die
+     Steuerprogression gehen und am Ende den Cashflow über alle Investitionen
+     bestimmen.
+   - **Oben stehen schon Haken, obwohl der Bereich nie besucht wurde.**
+
+   **E · Miete**
+   - Marktmiete ohne KI zu niedrig; **mit KI 10,99 €/m²** — realistischer, für
+     den Zustand aber eher zu hoch. Er sieht als Quelle nur den Mietspiegel.
+   - **Den KI-Knopf nach oben** oder gleich automatisch recherchieren.
+   - **Mietsteigerung doppelt abgefragt:** wer dreimal erhöhen will, um auf
+     10 € zu kommen, hat das Ziel schon genannt — die „angestrebte
+     Entwicklung" fragt dasselbe noch einmal.
+
+   **F · Finanzierung**
+   - **Reihenfolge umdrehen:** erst den Kredit eintragen, den man bekommt,
+     dann das Eigenkapital daraus rechnen (wie im Immocation-Tool).
+   - *„Warum muss ich zur Bewertung schon die Bank eintragen? Ich dachte, ich
+     wäre im schnellen Onboarding."*
+
+   **G · Bewirtschaftung**
+   - **Prozent der Nettokaltmiete ist ortsabhängig** — in München ein anderer
+     Wert als in Bielefeld. Macht man das so?
+   - Vorschläge vorbelegen.
+   - **Als Profileinstellung hinterlegbar**: *„für Profil ‚Investition C-Lage'
+     nimm Mietausfall immer 3 %, für A-Lage 1 %."* → gehört mit dem Punkt aus
+     H zusammen, es ist dieselbe Idee.
+   - Eine Angabe ist unklar: *„worauf bezieht sich das? Pro Jahr/Monat?"*
+
+   **H · Steuer**
+   - **zvE ausschreiben** oder erklären.
+   - *„Ist das wirklich der Standard? Hängt stark von der Lage ab."*
+   - **Sonder-AfA erst nach dem Anklicken erklärt** — die Info gehört davor.
+
+   **I · QuickBoarding**
+   - Es war **schwer zu finden** (steckt unter „Aktionen").
+   - **Dasselbe Exposé ergab dort einen anderen Wert** als im Boarding. → Das
+     ist kein Gestaltungspunkt, sondern **möglicherweise ein Rechenbefund.
+     Zuerst nachstellen.**
+   - Die Spanne (unten / Durchschnitt / oben) **kompakter** darstellen.
+   - **„Übernehmen" ist unklar** — was übernimmt es wohin?
+   - **Den Knopf „Tabelle" weglassen** — es gibt zu viele Knöpfe.
+
+   **J · Zwei Punkte aus dem Vorgespräch**
+   - **Lage-Strategie als Profil in den Einstellungen**: eine C-Lage-Strategie
+     bewertet anders als eine A-Lage-Strategie und passt nicht in die
+     vorgefertigten Profile. **Zusammen mit G bauen** — es ist derselbe
+     Mechanismus.
+   - **Braucht es „In Prüfung" / „Gewonnen" / „Verloren"?** Den Tester
+     interessiert zuerst der **Bestand** und was er prüft. *„Verloren würde
+     ich vielleicht rausnehmen."*
+
+9. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
+   Ebenfalls aus `design/mockups/Anmerkungen.docx`, aber ein eigener Punkt —
+   es ist **Neubau, keine Nachbesserung**, und der letzte Teil ist der
+   einzige Vorschlag im ganzen Bericht, den der Tester selbst als **USP**
+   bezeichnet.
+
+   - **EK-Rendite vor und nach Steuer** — wie viel Geld habe ich eingesetzt
+     gegen wie viel Überschuss bleibt, samt Delta über den
+     Beleihungsauslauf.
+   - **Mietpotenzial p. a., IST gegen SOLL** — zeigt, wie viel Miete
+     erreichbar wäre. **Dazu fehlt eine Angabe, die es heute nicht gibt:**
+     welcher Investitionsbetrag nötig ist, um das SOLL zu erreichen.
+   - **Gesamtvermögensbilanz und ihre Entwicklung.** Wörtlich: *„Ich ziehe
+     mir jeden Monat Kontostände, Aktienwerte, Immobilienwerte zum Anfang des
+     Monats. Dann sehe ich, wie der Wert steigt, und kann eine Trendlinie
+     abbilden. Würde ich hier auch sehen, dass ggf. Kontostände abgefragt
+     werden können und andere Werte (z. B. Bargeld) eingetragen werden
+     können. **Das wäre ein USP von dem System.**"*
+
+   > **Der dritte Teil ist etwas anderes als die ersten beiden.** EK-Rendite
+   > und Mietpotenzial rechnet DealPilot aus Daten, die es schon hat. Eine
+   > Vermögensbilanz mit Kontoständen ist ein **neuer Datentopf** mit eigener
+   > Eingabe, eigener Historie und — sobald „Kontostände abgefragt" wörtlich
+   > gemeint ist — einer Bankschnittstelle samt allem, was daran hängt.
+   > **Erst entscheiden, ob das zum USP werden soll**, dann bauen. Hängt
+   > unmittelbar an der USP-Frage aus Punkt 8.
+
+10. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > ## 🔒 AUSGELAGERT — Marcel bearbeitet diesen Punkt an anderer Stelle
@@ -1104,7 +1273,7 @@ entfällt — nicht raten.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-9. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+11. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -1202,7 +1371,7 @@ entfällt — nicht raten.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-10. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
+12. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
    **Neu gefunden beim `v1173`-Messlauf, 2026-08-30** — nicht dadurch
    verursacht, `.sbc-actions` und `.sbc-score-overlay` sind absolut
    positioniert und vom Raster unabhängig.
@@ -1231,7 +1400,14 @@ entfällt — nicht raten.
    auf verschiedene Kartenhälften. Vorschlag zuerst nach
    `design/Vorschläge/`.
 
-> ### Drei Punkte sind seit dem 30.08. zu — hier stehen nur noch die Zeiger
+> ### Vier Punkte sind seit dem 30.08. zu — hier stehen nur noch die Zeiger
+>
+> **Alle Nummern in diesem Block sind die ALTEN**, aus der Zählung vor dem
+> 30.08. — sie sind fertig, also wandern sie nicht mit.
+>
+> **Punkt 5 (Hell und Dunkel als zwei Profile) ist erledigt** — `v1162`/
+> `v1162b` und `v1167`, beide Reste zu. Der Text stand nur noch als Hinweis
+> in „Offen" und ist dort entfernt; der volle Befund steht unter „Fertig".
 >
 > **Punkt 4 (Akzentfarbe) ist erledigt** — `v1174` (freier Farbwähler) und
 > `v1175` (Fassung C + Farbton-Regler). Marcel hat aus

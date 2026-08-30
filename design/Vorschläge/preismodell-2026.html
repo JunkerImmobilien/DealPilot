@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preismodell 2026 — Kerosin raus, Kontingente rein</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --obsidian:#050505; --karte:#FBF6E9;
+    --gruen:#3FA56C; --rot:#B8625C;
+    --papier:#efece5; --linie:#e6e0d3; --tinte:#141310; --mut:#6f6a61;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--tinte);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.55;padding:26px 20px 90px}
+  .wrap{max-width:1120px;margin:0 auto}
+  h1{font-family:'Space Grotesk';font-size:24px;margin:0 0 5px}
+  h2{font-family:'Space Grotesk';font-size:17px;margin:38px 0 4px;padding-top:14px;
+    border-top:1px solid var(--linie)}
+  h3{font-family:'Space Grotesk';font-size:14px;margin:22px 0 4px}
+  .lead{color:var(--mut);font-size:14px;max-width:840px;margin:0 0 3px}
+  .mono{font-family:'JetBrains Mono';font-size:11px;color:var(--mut)}
+  p{max-width:860px}
+
+  .kasten{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--gold);
+    border-radius:10px;padding:13px 16px;margin:14px 0;max-width:880px;font-size:13.5px}
+  .kasten.gruen{border-left-color:var(--gruen)}
+  .kasten.rot{border-left-color:var(--rot)}
+  .kasten p{margin:0 0 7px}
+  .kasten p:last-child{margin-bottom:0}
+
+  table{border-collapse:collapse;width:100%;max-width:880px;font-size:12.5px;margin:12px 0;background:#fff}
+  th,td{border:1px solid var(--linie);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:#faf8f2;font-weight:600;font-size:11.5px}
+  td.z,th.z{font-family:'JetBrains Mono';font-size:11.5px;text-align:right}
+  tr.sum td{background:#faf8f2;font-weight:600}
+  .ja{color:#2b6b48;font-weight:600}
+  .nein{color:#9a5450}
+
+  .tarife{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;
+    max-width:880px;margin:14px 0}
+  .tf{background:#fff;border:1px solid var(--linie);border-radius:12px;padding:14px;position:relative}
+  .tf.best{border-color:var(--gold);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 25%,transparent)}
+  .tf .n{font-family:'Space Grotesk';font-size:15px;font-weight:600}
+  .tf .p{font-family:'Space Grotesk';font-size:26px;font-weight:600;margin:4px 0 0}
+  .tf .p s{font-size:13px;color:var(--mut);font-weight:400;margin-left:7px}
+  .tf .alt{font-size:11px;color:var(--mut);font-family:'JetBrains Mono'}
+  .tf ul{margin:10px 0 0;padding-left:17px;font-size:12.5px}
+  .tf li{margin-bottom:3px}
+  .tf .bs{position:absolute;top:-9px;right:12px;background:var(--gold);color:#1a1407;
+    font-size:10px;font-weight:600;padding:2px 8px;border-radius:9px}
+
+  .frage{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--rot);
+    border-radius:10px;padding:13px 16px;margin:12px 0;max-width:880px;font-size:13.5px}
+  .frage b.nr{font-family:'JetBrains Mono';font-size:12px;color:var(--rot)}
+  code{font-family:'JetBrains Mono';font-size:11.5px;background:#f4f1e9;padding:1px 4px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Preismodell 2026 — Kerosin raus, Kontingente rein</h1>
+<p class="lead">Marcels Auftrag vom 30.08.: <i>„Wir wollen nicht mehr mit Kerosin arbeiten … die
+Preisstruktur ist zu teuer. Die Staffelung soll einfach sein."</i> Dazu der Befund aus
+<code>design/mockups/Anmerkungen.docx</code>: <i>„Zweite Währung sollte unbedingt raus. Wirkt
+undurchsichtig."</i></p>
+<p class="mono">Alle Zahlen unten sind aus dem Code gelesen, nicht geschätzt. Quellen je Zeile genannt.</p>
+
+<div class="kasten gruen">
+<p><b>Das wichtigste Ergebnis vorweg:</b> Marcels Beispiel („5 einfache Marktpreisindikationen",
+„5 Bewertungen", „5 Ertragswerte") ist <b>keine neue Rechnung</b> — es ist fast auf den Liter
+genau das, was die Pläne heute schon spendieren. <b>Der Umbau kostet also kaum Marge; er kostet
+die zweite Währung.</b> Die Rechnung steht in Teil&nbsp;3.</p>
+</div>
+
+<h2>Teil 1 · Was heute gilt</h2>
+
+<h3>Die vier Pläne</h3>
+<table>
+<tr><th>Plan</th><th class="z">Preis / Monat</th><th class="z">Jahr</th><th class="z">Objekte</th><th class="z">Kerosin / Monat</th></tr>
+<tr><td>Free</td><td class="z">0 €</td><td class="z">—</td><td class="z">1</td><td class="z">2 L</td></tr>
+<tr><td>Starter</td><td class="z">29 €</td><td class="z">290 €</td><td class="z">5</td><td class="z">10 L</td></tr>
+<tr><td><b>Investor</b> ★</td><td class="z">59 €</td><td class="z">590 €</td><td class="z">25</td><td class="z">40 L</td></tr>
+<tr><td>Pro</td><td class="z">99 €</td><td class="z">990 €</td><td class="z">∞</td><td class="z">100 L</td></tr>
+<tr><td>Partner-Seat</td><td class="z">ab 24 €</td><td class="z">—</td><td class="z">—</td><td class="z">Pro-Klon</td></tr>
+</table>
+<p class="mono">Quelle: <code>backend/src/services/aiCreditsService.js:20</code> (die Liter — das ist
+die verbindliche Stelle), <code>frontend/js/config.js:196 ff.</code>, Landing Z. 1073.</p>
+
+<h3>Was eine Leistung heute kostet</h3>
+<table>
+<tr><th>Leistung</th><th class="z">Liter</th><th class="z">in € (bei 0,167 €/L)</th><th>Quelle</th></tr>
+<tr><td><b>Stufe 1 · Einschätzung</b> — Lage und Marktpreisindikation</td><td class="z">2</td><td class="z">0,33</td><td><code>routes/marktbericht.js:34</code></td></tr>
+<tr><td><b>Stufe 2 · Marktpreisindikation</b> — zusätzlich Baustatus, Zustand, Qualität</td><td class="z">5</td><td class="z">0,84</td><td>ebd.</td></tr>
+<tr><td><b>Stufe 3 · Wertermittlung</b> — zusätzlich Boden-, Ertrags-, Sachwert nach ImmoWertV</td><td class="z">12</td><td class="z">2,00</td><td>ebd.</td></tr>
+<tr><td>Marktwert-Abruf, Anbieter A</td><td class="z">20</td><td class="z">3,34</td><td><code>routes/avm.js:76</code></td></tr>
+<tr><td>Marktwert-Abruf, Anbieter B</td><td class="z">40</td><td class="z">6,68</td><td>ebd.</td></tr>
+<tr><td>Jeder einzelne KI-Abruf (Analyse, Lage, Sprache, Beleg, BRW, BMF-GAA …)</td><td class="z">1</td><td class="z">0,17</td><td><code>routes/ai.js</code>, 8 Stellen</td></tr>
+<tr><td>Vorschau / Prüfung im Marktbericht</td><td class="z">1</td><td class="z">0,17</td><td><code>routes/marktbericht.js:191</code></td></tr>
+</table>
+<p class="mono">Kerosin-Pakete: 10 L / 2 € · 28 L / 5 € · 90 L / 15 € · 160 L / 25 € → 0,156–0,20 €/L.</p>
+
+<h2>Teil 2 · Fünf Befunde, bevor umgebaut wird</h2>
+
+<div class="kasten rot">
+<p><b>1 · Die zweite Währung ist genau da undurchsichtig, wo es weh tut.</b> Ein Nutzer sieht
+„40 L" und weiß nicht, ob das für zwei Bewertungen reicht oder für zwanzig. Die Landingpage
+übersetzt es in „≈ 22 Marktberichte · 45 DealPilot-Marktbewertungen" — <b>diese Übersetzung
+müsste er selbst können</b>, sonst ist der Tank eine Blackbox. Der Tester schreibt dazu: <i>„Die
+KI-Anbieter verweisen auch nur auf das größere Paket."</i></p>
+</div>
+
+<div class="kasten rot">
+<p><b>2 · Free und Starter tragen im Frontend die falsche Litermenge.</b>
+<code>config.js</code> führt <code>ai_credits: 1</code> für Free und <code>5</code> für Starter —
+das Backend gibt <b>2</b> und <b>10</b>, die Landingpage nennt ebenfalls 2 und 10. Es ist ein
+Rest aus der Zeit „1 Credit = 2 Anfragen".</p>
+<p><b>Kein Kundenschaden</b>, weil die DB die Wahrheit ist und <code>config.js</code> nur der
+Rückfall — aber in dem Fenster, bevor der Plan geladen ist, zeigt die App die halbe Menge an.
+Beim Umbau fällt diese Zahl ohnehin weg; sie steht hier, damit sie nicht mitwandert.</p>
+</div>
+
+<div class="kasten rot">
+<p><b>3 · Der Co-Pilot hat heute gar kein Plan-Gate.</b> <code>js/copilot.js</code> fragt
+<code>hasFeature</code> an keiner Stelle ab; im Dateikopf steht ausdrücklich <i>„KEIN Kerosin
+(server-seitig rate-limited)"</i>. Er ist damit <b>für Free genauso offen wie für Pro</b>. Wenn er
+laut Marcel das Investor-Merkmal werden soll, ist das ein echter Neubau — ein Schlüssel, eine
+Sperre, ein Hinweis.</p>
+</div>
+
+<div class="kasten rot">
+<p><b>4 · Das bekannte Bankexport-Leck ist noch offen.</b> Der Export blockt nur
+<code>starter</code>; <b>Free rutscht mit Wasserzeichen durch.</b> Steht seit dem Plan-Prüflauf im
+Backlog als offene Entscheidung. Beim Neuschnitt der Pakete gehört es mit entschieden, nicht
+danach.</p>
+</div>
+
+<div class="kasten rot">
+<p><b>5 · Aus dem Anmerkungen-Dokument, gehört nicht zum Preismodell, ist aber der schwerste
+Einzelbefund darin:</b> die <b>Preis-Einordnung ist im Vorzeichen vertauscht</b>.
+<code>js/avm-section.js:58</code> rechnet <code>d = (Marktwert − Kaufpreis) / Kaufpreis</code> und
+beschriftet <code>d ≥ +10 %</code> mit <b>„Deutlich über Markt"</b> in Rot. Beim Testobjekt:
+Kaufpreis 129.000 €, Marktwert 177.000 € → <b>+37 %</b>, also ein Kauf <b>unter</b> Markt — die App
+sagt das Gegenteil. In derselben Tabelle steht eine Zeile darüber dasselbe Delta <b>grün</b>. Ein
+Zeilentausch behebt es; er steht als eigener Punkt im Backlog.</p>
+</div>
+
+<h2>Teil 3 · Marcels Zielbild, in Litern nachgerechnet</h2>
+<p>Seine Worte lassen sich <b>eins zu eins</b> auf die drei Stufen abbilden, die es im Marktbericht
+schon gibt (<code>mb-stufen.js:31</code>) — das ist der Grund, warum das Modell trägt:</p>
+
+<table>
+<tr><th>Marcels Wort</th><th>heißt im Haus</th><th class="z">kostet</th></tr>
+<tr><td>„einfache Marktpreisindikation"</td><td>Stufe 1 · Einschätzung</td><td class="z">2 L</td></tr>
+<tr><td>„Bewertung" / „erweiterte Bewertung"</td><td>Stufe 2 · Marktpreisindikation</td><td class="z">5 L</td></tr>
+<tr><td>„Ertragswert bzw. Verkehrswertberechnung"</td><td>Stufe 3 · Wertermittlung</td><td class="z">12 L</td></tr>
+</table>
+
+<p>Damit ergibt sein Beispiel — jeweils <b>5 Stück</b>, und die höheren Pakete bekommen die
+niedrigeren mit:</p>
+
+<table>
+<tr><th>Plan</th><th class="z">5 × Stufe 1</th><th class="z">5 × Stufe 2</th><th class="z">5 × Stufe 3</th><th class="z">Summe</th><th class="z">heute im Plan</th><th>passt?</th></tr>
+<tr><td>Starter</td><td class="z">10 L</td><td class="z">—</td><td class="z">—</td><td class="z">10 L</td><td class="z">10 L</td><td class="ja">exakt</td></tr>
+<tr><td>Investor</td><td class="z">10 L</td><td class="z">25 L</td><td class="z">—</td><td class="z">35 L</td><td class="z">40 L</td><td class="ja">5 L Luft</td></tr>
+<tr><td>Pro</td><td class="z">10 L</td><td class="z">25 L</td><td class="z">60 L</td><td class="z">95 L</td><td class="z">100 L</td><td class="ja">5 L Luft</td></tr>
+</table>
+
+<div class="kasten gruen">
+<p><b>Das ist der eigentliche Fund.</b> Die Kontingente, die Marcel aus dem Bauch nennt, sind
+<b>dieselbe Menge Leistung, die die Pläne heute schon enthalten</b> — nur benannt statt gemessen.
+Der Umbau ist damit <b>keine Marge-Entscheidung</b>, sondern eine Sprach-Entscheidung: aus „40 L"
+wird „5 Einschätzungen + 5 Marktpreisindikationen".</p>
+<p><b>Die Marge-Entscheidung ist eine andere</b> — nämlich der Preis. Dazu Teil 4.</p>
+</div>
+
+<h2>Teil 4 · Drei Staffelungen zur Wahl</h2>
+<p>Marcel nennt 19,99 € für Starter und sagt, die Struktur sei insgesamt zu teuer. Drei Wege,
+alle mit derselben Leistung, nur anders bepreist. <b>Free bleibt in allen dreien</b> — es ist der
+Einstieg, und die sieben Pro-Tage ab Registrierung laufen ohnehin darüber.</p>
+
+<h3>Variante A — die Verdopplung (am leichtesten zu merken)</h3>
+<div class="tarife">
+  <div class="tf"><div class="n">Free</div><div class="p">0 €</div><div class="alt">1 Objekt</div>
+    <ul><li>1 Einschätzung</li><li>PDF mit Wasserzeichen</li></ul></div>
+  <div class="tf"><div class="n">Starter</div><div class="p">19,99 €<s>statt 29</s></div><div class="alt">199 € / Jahr</div>
+    <ul><li>Objekte bis Grenze</li><li><b>5 Einschätzungen</b></li><li>PDF ohne Wasserzeichen</li></ul></div>
+  <div class="tf best"><span class="bs">★ Bestseller</span><div class="n">Investor</div><div class="p">39,99 €<s>statt 59</s></div><div class="alt">399 € / Jahr</div>
+    <ul><li>alles aus Starter</li><li><b>5 Marktpreisindikationen</b></li><li><b>Co-Pilot</b></li><li>Investor Deal Score</li></ul></div>
+  <div class="tf"><div class="n">Pro</div><div class="p">79,99 €<s>statt 99</s></div><div class="alt">799 € / Jahr</div>
+    <ul><li>alles aus Investor</li><li><b>5 Wertermittlungen</b></li><li><b>Kaufpreisaufteilung</b></li><li>unbegrenzte Objekte</li></ul></div>
+</div>
+<p class="mono">Sprung 2× je Stufe. Umsatz je Kunde sinkt gegenüber heute um rund ein Drittel —
+das ist der Preis für „nicht zu teuer".</p>
+
+<h3>Variante B — die sanfte (hält mehr Marge)</h3>
+<div class="tarife">
+  <div class="tf"><div class="n">Free</div><div class="p">0 €</div><div class="alt">1 Objekt</div><ul><li>1 Einschätzung</li></ul></div>
+  <div class="tf"><div class="n">Starter</div><div class="p">19,99 €</div><div class="alt">199 € / Jahr</div><ul><li>5 Einschätzungen</li></ul></div>
+  <div class="tf best"><span class="bs">★</span><div class="n">Investor</div><div class="p">44,99 €</div><div class="alt">449 € / Jahr</div><ul><li>+ 5 Marktpreisindikationen</li><li>+ Co-Pilot</li></ul></div>
+  <div class="tf"><div class="n">Pro</div><div class="p">89,99 €</div><div class="alt">899 € / Jahr</div><ul><li>+ 5 Wertermittlungen</li><li>+ Kaufpreisaufteilung</li></ul></div>
+</div>
+<p class="mono">Nur Starter fällt deutlich, oben bleibt es fast wie heute. Wer heute Pro zahlt,
+merkt kaum etwas — der Einstieg wird aber spürbar billiger.</p>
+
+<h3>Variante C — drei statt vier (die radikale)</h3>
+<div class="tarife">
+  <div class="tf"><div class="n">Free</div><div class="p">0 €</div><div class="alt">Testflug, 14 Tage voll</div><ul><li>danach 1 Objekt, lesen</li></ul></div>
+  <div class="tf"><div class="n">Investor</div><div class="p">29,99 €</div><div class="alt">299 € / Jahr</div><ul><li>5 Einschätzungen</li><li>5 Marktpreisindikationen</li><li>Co-Pilot</li></ul></div>
+  <div class="tf best"><span class="bs">★</span><div class="n">Pro</div><div class="p">69,99 €</div><div class="alt">699 € / Jahr</div><ul><li>+ 5 Wertermittlungen</li><li>+ Kaufpreisaufteilung</li><li>unbegrenzte Objekte</li></ul></div>
+</div>
+<p class="mono"><b>Starter fällt weg.</b> Vier Stufen sind viel für ein Werkzeug, das der Kunde in
+zwei Minuten verstehen soll — der Tester schreibt genau das über die ganze App. Drei Stufen
+entscheidet man an einem Nachmittag.</p>
+
+<div class="kasten">
+<p><b>Empfehlung: Variante A.</b> Sie trifft Marcels 19,99 € genau, sie ist die einzige, deren
+Sprünge man sich ohne Tabelle merkt, und sie lässt oben Luft für einen späteren
+Sachverständigen-Tarif. <b>Variante C ist die bessere Produktentscheidung, wenn der USP-Punkt aus
+dem Anmerkungen-Dokument ernst genommen wird</b> — aber sie kostet einen bestehenden Plan, und
+bestehende Starter-Kunden müssten umziehen.</p>
+</div>
+
+<h2>Teil 5 · Was „Kerosin raus" technisch heißt</h2>
+<p>Der Zähler selbst bleibt — er ist die Buchhaltung. Was verschwindet, ist die <b>Anzeige</b> in
+Litern und der <b>Kauf</b> von Litern. Vier Schritte, in dieser Reihenfolge:</p>
+
+<table>
+<tr><th class="z">#</th><th>Schritt</th><th>betrifft</th><th>Risiko</th></tr>
+<tr><td class="z">1</td><td><b>Kontingente je Leistungsart</b> statt eines Topfs: drei Zähler
+(Einschätzung / Marktpreisindikation / Wertermittlung) statt eines Litertanks.</td>
+<td><code>aiCreditsService.js</code>, <code>ai_credits_user</code>, <code>PLAN_LIMITS</code></td>
+<td>DB-Migration. Bestandsnutzer mit Restlitern brauchen eine Umrechnung.</td></tr>
+<tr><td class="z">2</td><td><b>Die KI-Einzelabrufe entkoppeln</b> — acht Stellen à 1 L. Sie
+passen in keines der drei Kontingente.</td><td><code>routes/ai.js</code></td>
+<td><b>Das ist die offene Frage Nr. 2 unten.</b> Ohne Entscheidung kein sauberer Umbau.</td></tr>
+<tr><td class="z">3</td><td><b>Oberfläche</b>: Tankanzeige, Nachtank-Knopf, Kerosin-Pakete,
+Stufenpreis-Anzeige, Aktionen-Menü.</td><td>Landing, Pricing-Modal, <code>mb-stufen.js</code>,
+Boarding-Pass</td><td>Viele Stellen, aber alle sichtbar — was übersehen wird, fällt beim
+Durchklicken auf.</td></tr>
+<tr><td class="z">4</td><td><b>Preise und Matrix</b> an <b>drei</b> Stellen gleichzeitig.</td>
+<td><code>config.js</code> · <code>pricing-modal.js</code> (zwei Matrizen) · Landing</td>
+<td><b>Die bekannte Falle:</b> drei Wahrheiten, die nur so lange stimmen, wie jemand sie pflegt.</td></tr>
+</table>
+
+<div class="kasten rot">
+<p><b>Die Bildsprache verliert dabei etwas.</b> Kerosin ist kein Zufallsname — er gehört zu
+Cockpit, Boarding, Runway, Pre-Flight und Co-Pilot. Wenn der Tank verschwindet, fehlt der Marke
+ein Stück Erzählung. <b>Ein Mittelweg wäre, den Namen zu behalten und nur die Einheit zu
+ändern:</b> nicht „40 Liter", sondern „5 Bewertungen im Tank". Dann bleibt das Bild und die
+Blackbox geht.</p>
+</div>
+
+<h2>Teil 6 · Was ich nicht entscheiden kann</h2>
+
+<div class="frage"><b class="nr">1</b> · <b>Was passiert, wenn das Kontingent leer ist?</b> Der
+Tester nennt beide Wege: <i>„danach kostet die Bewertung extra"</i> <b>oder</b> <i>„Pakete, danach
+ist es eine Flatrate ODER kein Kontingent dazubuchen möglich"</i>. Einzelverkauf hält den
+kleinen Tarif am Leben, Nachbuchen-Sperre schiebt zum größeren. <b>Das ist eine Geldentscheidung
+und deine.</b></div>
+
+<div class="frage"><b class="nr">2</b> · <b>Was wird aus den acht KI-Einzelabrufen?</b>
+Pilot-Analyse, Lagebewertung, Spracheingabe, Beleg-Import, Bodenrichtwert, BMF-GAA,
+DS2-Vorschlag, Marktfelder — je 1 L. Drei Möglichkeiten: <b>(a)</b> im Plan enthalten mit fairer
+Nutzung, <b>(b)</b> ein vierter Zähler „KI-Abrufe", <b>(c)</b> sie zählen auf das
+Bewertungs-Kontingent. <b>(a)</b> ist das einfachste Versprechen und passt zu „Staffelung soll
+einfach sein" — aber es ist die einzige Variante, bei der ein Vielnutzer echtes Geld kosten kann.</div>
+
+<div class="frage"><b class="nr">3</b> · <b>Bleiben die Marktwert-Abrufe der Partner
+(20 L / 40 L) außen vor?</b> Sie sind zehn- bis zwanzigmal so teuer wie eine Einschätzung und
+stehen auf der Landing schon als „zubuchbar". <b>Mein Vorschlag: sie bleiben Einzelkauf in Euro</b> —
+sonst sprengt eine einzige Abfrage das ganze Monatspaket.</div>
+
+<div class="frage"><b class="nr">4</b> · <b>Wie hoch ist die Objektgrenze im Starter?</b> Heute 5.
+Marcel schreibt „bis zu Objektgrenze die wir festgelegt haben" — die Zahl steht nicht fest.</div>
+
+<div class="frage"><b class="nr">5</b> · <b>Was passiert mit Bestandskunden?</b> Wer heute 29 €
+zahlt und 10 L bekommt, zahlt künftig 19,99 € und bekommt 5 Einschätzungen. <b>Preislich ein
+Gewinn für ihn</b> — aber wer sein Kerosin für Marktwert-Abrufe genutzt hat, verliert eine
+Möglichkeit. Braucht eine Übergangsregel.</div>
+
+<div class="frage"><b class="nr">6</b> · <b>Bleibt Free?</b> In Variante C wird daraus ein
+14-Tage-Testflug. Das ist sauberer als ein Dauer-Gratistarif, der Kosten verursacht — aber es
+nimmt die Möglichkeit, DealPilot einfach liegen zu lassen und später wiederzukommen.</div>
+
+</div>
+</body>
+</html>
