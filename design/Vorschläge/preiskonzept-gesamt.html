@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preiskonzept gesamt — Pläne, Partner, Zubuchbares, Matrix</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#C9A84C;--gruen:#3FA56C;--rot:#B8625C;
+    --papier:#efece5;--linie:#e6e0d3;--tinte:#141310;--mut:#6f6a61}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--tinte);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.55;padding:26px 20px 90px}
+  .wrap{max-width:1160px;margin:0 auto}
+  h1{font-family:'Space Grotesk';font-size:25px;margin:0 0 5px}
+  h2{font-family:'Space Grotesk';font-size:18px;margin:40px 0 4px;padding-top:15px;border-top:2px solid var(--linie)}
+  h3{font-family:'Space Grotesk';font-size:14.5px;margin:24px 0 4px}
+  .lead{color:var(--mut);font-size:14px;max-width:860px;margin:0 0 3px}
+  .mono{font-family:'JetBrains Mono';font-size:11px;color:var(--mut)}
+  p{max-width:880px}
+  .kasten{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--gold);
+    border-radius:10px;padding:13px 16px;margin:14px 0;max-width:900px;font-size:13.5px}
+  .kasten.gruen{border-left-color:var(--gruen)}
+  .kasten.rot{border-left-color:var(--rot)}
+  .kasten p{margin:0 0 7px}.kasten p:last-child{margin-bottom:0}
+  table{border-collapse:collapse;width:100%;max-width:900px;font-size:12.5px;margin:12px 0;background:#fff}
+  table.breit{max-width:1160px}
+  th,td{border:1px solid var(--linie);padding:6px 9px;text-align:left;vertical-align:top}
+  th{background:#faf8f2;font-weight:600;font-size:11.5px}
+  td.z,th.z{font-family:'JetBrains Mono';font-size:11.5px;text-align:right}
+  td.c,th.c{text-align:center}
+  tr.sum td{background:#faf8f2;font-weight:600}
+  .best{background:#fdfaf0}
+  .ja{color:#2b6b48;font-weight:600}.nein{color:#9a5450}.evtl{color:#8a6d1f;font-weight:600}
+  .alt{color:var(--mut);text-decoration:line-through;font-size:11px}
+  code{font-family:'JetBrains Mono';font-size:11.5px;background:#f4f1e9;padding:1px 4px;border-radius:3px}
+  .frage{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--rot);
+    border-radius:10px;padding:13px 16px;margin:12px 0;max-width:900px;font-size:13.5px}
+
+  /* Tank-Pille */
+  .pille{display:inline-flex;align-items:center;gap:8px;background:#0d0d0d;color:#e8e2d4;
+    border:1px solid #2a2724;border-radius:20px;padding:7px 13px;font-size:12.5px;
+    font-family:'JetBrains Mono'}
+  .pille b{color:var(--gold);font-weight:600}
+  .tip{background:#0d0d0d;color:#e8e2d4;border:1px solid #2a2724;border-radius:10px;
+    padding:11px 13px;max-width:290px;font-size:12px;margin-top:8px;font-family:'Inter'}
+  .tip .z{display:flex;justify-content:space-between;gap:14px;padding:3px 0}
+  .tip .z b{color:var(--gold)}
+  .tip hr{border:0;border-top:1px solid #2a2724;margin:7px 0}
+  .tip .kl{font-size:10.5px;color:#8b8577}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Preiskonzept gesamt</h1>
+<p class="lead">Alle Pläne, das Partner-Modell, die zubuchbaren Optionen und die
+Funktionsübersicht — auf Marcels Entscheidungen vom 30.08. gezogen. <b>Die Optik der
+Landingpage bleibt unverändert</b>; es wird nur umgelegt, was in den Karten und in der Matrix
+steht.</p>
+<p class="mono">Alle „heute"-Werte sind aus Code und Datenbank gelesen. Alle „neu"-Werte sind
+Vorschläge — nichts davon ist gebaut.</p>
+
+<h2>1 · Alle Preise auf einen Blick</h2>
+
+<table>
+<tr><th>Angebot</th><th class="z">heute</th><th class="z">neu</th><th>Änderung</th></tr>
+<tr><td><b>Free</b></td><td class="z">0 €</td><td class="z">0 €</td><td>bleibt</td></tr>
+<tr><td><b>Starter</b></td><td class="z">29 €</td><td class="z"><b>19,99 €</b></td><td>−31 %</td></tr>
+<tr class="best"><td><b>Investor ★</b></td><td class="z">59 €</td><td class="z"><b>39,99 €</b></td><td>−32 %</td></tr>
+<tr><td><b>Pro</b></td><td class="z">99 €</td><td class="z"><b>79,99 €</b></td><td>−19 %</td></tr>
+<tr><td colspan="4" style="background:#faf8f2"></td></tr>
+<tr><td><b>Partner</b> · Grundgebühr</td><td class="z">149 €</td><td class="z"><b>99 €</b></td><td>−34 %</td></tr>
+<tr><td>Partner · Seat, 1–9 Mandanten</td><td class="z">35 €</td><td class="z"><b>24 €</b></td><td>−31 %</td></tr>
+<tr><td>Partner · Seat, 10–24</td><td class="z">29 €</td><td class="z"><b>19 €</b></td><td>−34 %</td></tr>
+<tr><td>Partner · Seat, 25+</td><td class="z">24 €</td><td class="z"><b>15 €</b></td><td>−38 %</td></tr>
+</table>
+<p class="mono">Jahreszahlung überall wie bisher: zwei Monate frei
+(199 € · 399 € · 799 € · Partner 990 €).</p>
+
+<h3>Warum die Partner-Preise mitmüssen</h3>
+<p>Der Seat muss <b>spürbar unter</b> dem Einzelplan liegen, sonst hat der Partner kein Argument
+gegenüber seinem Mandanten. Heute steht 24 € gegen 59 € — der Mandant spart 59 %. Bliebe der
+Seat bei 24 € und Investor fiele auf 39,99 €, wären es nur noch 40 %. <b>Die Staffel muss also
+mitfallen, sonst zerfällt das Partner-Argument von selbst.</b></p>
+
+<table>
+<tr><th>Partner mit …</th><th class="z">Grundgebühr</th><th class="z">Seats</th><th class="z">Summe / Monat</th><th class="z">je Mandant</th><th>Mandant spart gegenüber Investor</th></tr>
+<tr><td>5 Mandanten</td><td class="z">99 €</td><td class="z">5 × 24 = 120 €</td><td class="z">219 €</td><td class="z">43,80 €</td><td class="nein">nichts — teurer als Investor</td></tr>
+<tr><td>10 Mandanten</td><td class="z">99 €</td><td class="z">10 × 19 = 190 €</td><td class="z">289 €</td><td class="z">28,90 €</td><td class="ja">28 %</td></tr>
+<tr><td>25 Mandanten</td><td class="z">99 €</td><td class="z">25 × 15 = 375 €</td><td class="z">474 €</td><td class="z">18,96 €</td><td class="ja">53 %</td></tr>
+<tr><td>50 Mandanten</td><td class="z">99 €</td><td class="z">50 × 15 = 750 €</td><td class="z">849 €</td><td class="z">16,98 €</td><td class="ja">58 %</td></tr>
+</table>
+
+<div class="kasten rot">
+<p><b>Die erste Zeile ist das Problem, und sie besteht schon heute:</b> ein Partner mit fünf
+Mandanten zahlt pro Kopf mehr, als der Mandant allein zahlen würde. <b>Die Grundgebühr trägt
+sich erst ab etwa acht Mandanten.</b> Wer mit drei anfängt, rechnet sich das aus und winkt ab.</p>
+<p><b>Zwei Auswege, beide besser als der Status quo:</b></p>
+<p><b>a) Einstiegsstaffel ohne Grundgebühr</b> — bis 5 Mandanten keine Grundgebühr, dafür
+29 €/Seat. Fünf Mandanten kosten dann 145 € statt 219 €, und der Partner kann klein anfangen.
+Ab dem sechsten Mandanten greift das normale Modell.</p>
+<p><b>b) Grundgebühr enthält die ersten drei Seats</b> — 99 € inklusive 3 Mandanten, jeder
+weitere nach Staffel. Das ist die einfachere Ansage und verkauft sich besser.</p>
+<p><b>Ich empfehle b.</b> Eine Grundgebühr, die nichts enthält, wirkt wie eine Eintrittsgebühr.
+Eine, die drei Plätze enthält, wirkt wie ein Paket.</p>
+</div>
+
+<h2>2 · Die Kontingente — und dass nichts verfällt</h2>
+
+<table>
+<tr><th>Plan</th><th class="c">Marktpreis&shy;indikation</th><th class="c">Erweiterte&nbsp;Bewertung</th><th class="c">Wertermittlung</th><th class="z">Objekte</th></tr>
+<tr><td><b>Free</b></td><td class="c">1</td><td class="c">–</td><td class="c">–</td><td class="z">1</td></tr>
+<tr><td><b>Starter</b></td><td class="c">5</td><td class="c">–</td><td class="c">–</td><td class="z">5</td></tr>
+<tr class="best"><td><b>Investor ★</b></td><td class="c">5</td><td class="c">5</td><td class="c">–</td><td class="z">25</td></tr>
+<tr><td><b>Pro</b></td><td class="c">5</td><td class="c">5</td><td class="c">5</td><td class="z">∞</td></tr>
+</table>
+
+<div class="kasten gruen">
+<p><b>Marcels Entscheidung: nicht genutzte Abrufe verfallen nicht.</b> Das ist technisch schon
+vorgezeichnet — der <b>Bonus-Tank verfällt heute ebenfalls nicht</b>
+(<code>ai-credits.js:93</code>: „Bonus-Tank: X L (verfällt nicht)"). Das Monatskontingent wird
+also behandelt wie der Bonus-Tank heute.</p>
+</div>
+
+<div class="kasten rot">
+<p><b>Was daran zu entscheiden ist, bevor es gebaut wird:</b> ein Kontingent, das nie verfällt,
+ist ein <b>wachsender Bestand</b>. Ein Starter, der ein Jahr nicht rechnet, hat 60
+Marktpreisindikationen liegen. Kündigt er danach und bucht für einen Monat wieder — nimmt er
+alles auf einmal mit.</p>
+<p><b>Vorschlag: eine Obergrenze statt eines Verfalls.</b> „Nicht genutzte Abrufe bleiben
+erhalten, bis zum Dreifachen deines Monatskontingents." Das fühlt sich großzügig an, ist in
+einem Satz erklärt und deckelt den Fall. <b>Alternativ ohne Deckel</b> — dann aber mit der
+Regel, dass sie bei Kündigung verfallen und nicht erstattet werden.</p>
+</div>
+
+<h3>Die Anzeige: aus dem Tank wird das Kontingent</h3>
+<p>Marcels Bild: <i>„Die Kerosin-Anzeige tauschen, und wenn man drüberfährt, sieht man sein
+Kontingent und die Aufteilung."</i> Die Pille sitzt schon oben rechts im Kopf und hat schon
+einen Tooltip — beides wird umgehängt, nicht neu gebaut.</p>
+
+<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start;margin:14px 0">
+  <div>
+    <div class="mono" style="margin-bottom:6px">heute</div>
+    <span class="pille">⛽ <b>86 L</b></span>
+    <div class="tip">
+      <div><b>Pilot-Tank · Kerosin</b></div>
+      <div class="z"><span>Verbleibend</span><b>46 L</b></div>
+      <div class="z"><span>Bonus-Tank</span><b>40 L</b></div>
+      <div class="kl">verfällt nicht</div>
+    </div>
+  </div>
+  <div>
+    <div class="mono" style="margin-bottom:6px">neu</div>
+    <span class="pille">◷ <b>11</b> Bewertungen</span>
+    <div class="tip">
+      <div><b>Dein Kontingent</b></div>
+      <hr>
+      <div class="z"><span>Marktpreisindikation</span><b>4 von 5</b></div>
+      <div class="z"><span>Erweiterte Bewertung</span><b>5 von 5</b></div>
+      <div class="z"><span>Wertermittlung</span><b>2 von 5</b></div>
+      <hr>
+      <div class="z"><span>Angespart</span><b>+ 3</b></div>
+      <div class="kl">Nicht genutzte Abrufe bleiben erhalten.<br>Nächste Gutschrift am 1. Oktober.</div>
+    </div>
+  </div>
+</div>
+
+<p><b>Drei Regeln für diese Anzeige</b>, aus dem Testbericht abgeleitet („wirkt undurchsichtig"):
+die Zahl in der Pille ist die <b>Summe der noch möglichen Bewertungen</b>, nicht eine Einheit,
+die niemand kennt · der Tooltip zeigt <b>immer alle drei Zeilen</b>, auch die mit „–", damit man
+sieht, was der nächste Plan brächte · und darunter steht, <b>wann nachgelegt wird</b>.</p>
+
+<h2>3 · Das Wording der drei Stufen</h2>
+
+<p>Marcels Korrektur: die erste Stufe ist schon eine Marktpreisindikation, die zweite eine
+erweiterte, die dritte die Wertermittlung nach ImmoWertV. <b>Das trifft die Sache besser als die
+heutigen Namen</b> — „Einschätzung" sagt nichts, und „Marktpreisindikation" erst auf Stufe 2 zu
+verwenden, verschenkt den Begriff.</p>
+
+<table>
+<tr><th>Stufe</th><th>heute heißt es</th><th>Vorschlag</th><th>Kurztext für die Preisseite</th></tr>
+<tr><td class="z">1</td><td>Einschätzung</td><td><b>Marktpreisindikation</b></td>
+    <td>Lage und Preisspanne aus den Daten des zuständigen Gutachterausschusses.</td></tr>
+<tr><td class="z">2</td><td>Marktpreisindikation</td><td><b>Erweiterte Marktpreisindikation</b><br><span class="mono">mit Objekt-Dossier</span></td>
+    <td>Zusätzlich Baustatus, Zustand und Qualität — deutlich engere Spanne, mit Dossier zum Objekt.</td></tr>
+<tr><td class="z">3</td><td>Wertermittlung</td><td><b>Wertermittlung nach ImmoWertV</b></td>
+    <td>Boden-, Ertrags- und Sachwert nach ImmoWertV, führendes Verfahren nach § 6, mit Rechenweg.</td></tr>
+</table>
+
+<div class="kasten rot">
+<p><b>Ein Einwand zur zweiten Stufe, und du entscheidest ihn.</b> Du hast „erweiterte
+Wertermittlung" gesagt. <b>Ich würde das Wort „Wertermittlung" auf Stufe 3 beschränken.</b>
+Grund: Stufe 2 führt <b>kein</b> Verfahren nach ImmoWertV aus — sie liefert eine engere
+Preisspanne, keinen Ertrags- oder Sachwert. Wer „Wertermittlung" liest und einen Verkehrswert
+erwartet, bekommt ihn auf Stufe 2 nicht.</p>
+<p>„Erweiterte Marktpreisindikation" ist sperriger, aber es hält, was es sagt. <b>Du bist hier
+der Sachverständige</b> — wenn du das anders siehst, gilt deine Fassung.</p>
+</div>
+
+<div class="kasten">
+<p><b>Der Satz, der überall dabeistehen muss</b> — bei Stufe 3, im PDF und in der Matrix:</p>
+<p style="font-size:14.5px;padding:9px 0"><b>„Eine Wertermittlung nach ImmoWertV ersetzt kein
+Gutachten eines Sachverständigen."</b></p>
+<p>Kurz, ohne Weichspüler, und er steht besser freiwillig da, als dass ihn jemand vermisst.</p>
+</div>
+
+<h2>4 · Wenn für die Adresse keine Daten vorliegen</h2>
+
+<div class="kasten gruen">
+<p><b>Beides, was du dir wünschst, gibt es schon</b> — es wird nur nicht zum richtigen Zeitpunkt
+angeboten.</p>
+<p><b>Die eigenen Werte:</b> im Block „Experte" von <code>wertermittlung.js:300</code> stehen
+<b>Bodenrichtwert, Liegenschaftszinssatz und Sachwertfaktor</b> als Eingabefelder, mit den
+Platzhaltern „leer = amtlicher Abruf" und „leer = aus der Parametertabelle". Sie sind nur
+eingeklappt und heißen „Experte".</p>
+<p><b>Die Standardwerte:</b> es gibt sie, und sie sind <b>gestuft und gekennzeichnet</b> —
+das A-bis-E-System aus <code>WertParameterService.js:505</code>.</p>
+</div>
+
+<table>
+<tr><th class="c">Stufe</th><th>woher der Wert kommt</th><th>Etikett im Bericht</th></tr>
+<tr><td class="c"><b>A</b></td><td>amtlicher Wert des zuständigen Gutachterausschusses</td><td>amtlich</td></tr>
+<tr><td class="c"><b>B</b></td><td>amtlicher Wert auf Landesebene, wenn für den Kreis keiner vorliegt</td><td>amtlich, regional</td></tr>
+<tr><td class="c"><b>C</b></td><td>aus dem regionalen Marktgeschehen zurückgerechnet</td><td>indikativ, marktabgeleitet</td></tr>
+<tr><td class="c"><b>D</b></td><td><b>gesetzlicher Auffangwert nach § 256 BewG</b> — nicht marktabgeleitet</td><td>indikativ, gesetzlicher Auffangwert</td></tr>
+<tr><td class="c"><b>E</b></td><td><b>eigene Angabe des Nutzers</b></td><td>eigene Angabe</td></tr>
+</table>
+
+<p><b>Das ist die Antwort auf deine Frage nach „Algorithmus oder Formel":</b> keine erfundene
+Formel, sondern eine Leiter mit vier Rückfallebenen — und jede Zahl trägt sichtbar, auf welcher
+Sprosse sie steht. Der gesetzliche Auffangwert nach § 256 BewG trägt sogar den Hinweis, dass er
+<i>„in der Regel unter dem örtlichen Niveau liegt und damit zu einem eher hohen Ertragswert
+führt"</i>.</p>
+
+<h3>Was gebaut wird</h3>
+<ol>
+  <li><b>Adressprüfung vor dem Kauf.</b> Adresse eingeben → welche Stufen sind für dieses Objekt
+      möglich, und mit welcher Datenstufe (A–E) wird gerechnet.</li>
+  <li><b>Steht nur D, wird gefragt statt gerechnet:</b> „Für Ihren Kreis liegt kein amtlicher
+      Liegenschaftszinssatz vor. Sie können ihn eintragen — beim Gutachterausschuss
+      [Name, Link]. Ohne Eingabe rechnen wir mit dem gesetzlichen Auffangwert; der Bericht weist
+      das aus."</li>
+  <li><b>Der Experten-Block wandert an diese Stelle</b> — dorthin, wo er gebraucht wird, und
+      ohne den Namen „Experte", der abschreckt.</li>
+</ol>
+<p class="mono">Der Name des zuständigen Ausschusses steht bereits im Register
+(<code>gaa_name</code>) — der Link dorthin ist die einzige neue Angabe.</p>
+
+<h2>5 · Der Co-Pilot — meine Einschätzung</h2>
+<p>Er ist heute <b>für alle offen</b>, kostet kein Kerosin und ist server-seitig
+mengenbegrenzt. Deine Frage: rausnehmen oder je Plan ein- und ausblenden?</p>
+
+<table>
+<tr><th>Weg</th><th>was der Free-Nutzer erlebt</th><th>Risiko</th></tr>
+<tr><td><b>a) so lassen</b></td><td>alles wie bisher</td><td>ein Kaufargument verschenkt</td></tr>
+<tr><td><b>b) ausblenden</b></td><td>er ist weg — ohne Erklärung</td><td><b>Wegnahme.</b> Wer ihn benutzt hat, merkt es und ärgert sich</td></tr>
+<tr><td><b>c) sichtbar sperren</b></td><td>er ist da, mit Schloss und „ab Investor"</td><td>Sperren, die man ständig sieht, nerven</td></tr>
+<tr><td class="best"><b>d) sichtbar, aber begrenzt</b></td><td>fünf Fragen im Monat, danach der Hinweis</td><td>etwas mehr Arbeit</td></tr>
+</table>
+
+<div class="kasten gruen">
+<p><b>Meine Empfehlung ist d.</b> Drei Gründe:</p>
+<p><b>1 · Wegnehmen ist die teuerste Variante.</b> Der Co-Pilot läuft heute für alle. Ihn
+kommentarlos zu entfernen ist genau der Vorgang, den Kunden als Verschlechterung erinnern —
+auch wenn sie ihn selten benutzt haben.</p>
+<p><b>2 · Ein gesperrtes Feld verkauft nichts, ein benutztes schon.</b> Wer den Co-Pilot fünfmal
+erlebt hat, weiß, was ihm ab Investor fehlt. Wer nur ein Schloss sieht, weiß es nicht.</p>
+<p><b>3 · Es kostet fast nichts.</b> Er verbraucht kein Kerosin und ist ohnehin begrenzt — aus
+der Mengenbegrenzung wird eine plangebundene.</p>
+<p><b>In jedem Fall gilt:</b> die Umstellung braucht eine Ankündigung an die Bestandsnutzer.
+Eine Zeile in der App reicht, aber sie muss vorher da sein, nicht danach.</p>
+</div>
+
+<h2>6 · Zubuchbare Optionen</h2>
+
+<h3>a) Einzelne Bewertung — der Hauptweg</h3>
+<p>Direkt am gesperrten Knopf, in dem Moment, in dem sie fehlt. <b>Kein Vorrat, keine
+Umrechnung.</b></p>
+<table>
+<tr><th>Leistung</th><th class="z">heute in L</th><th class="z">Vorschlag</th></tr>
+<tr><td>Marktpreisindikation</td><td class="z">2 L</td><td class="z">0,90 €</td></tr>
+<tr><td>Erweiterte Marktpreisindikation</td><td class="z">5 L</td><td class="z">1,90 €</td></tr>
+<tr><td>Wertermittlung nach ImmoWertV</td><td class="z">12 L</td><td class="z">3,90 €</td></tr>
+<tr><td>Marktwert-Abruf, unabhängiger Bewertungspartner</td><td class="z">20 L</td><td class="z">5,90 €</td></tr>
+<tr><td>Marktwert-Abruf, zweiter Partner</td><td class="z">40 L</td><td class="z">9,90 €</td></tr>
+</table>
+<p class="mono">Die Preise liegen bewusst über dem reinen Liter-Gegenwert (0,33 / 0,84 / 2,00 €) —
+Einzelkauf darf teurer sein als das Paket, sonst lohnt kein Plan.</p>
+
+<h3>b) Pakete — für die, die vorsorgen</h3>
+<p>Dieselben vier Kacheln wie heute, dieselben Reichweitentexte, nur ohne Liter.</p>
+<table>
+<tr><th>Paket</th><th class="c">MPI</th><th class="c">erweitert</th><th class="c">Wertermittlung</th><th class="z">Preis</th><th class="z">Ersparnis</th></tr>
+<tr><td><b>Kurzstrecke</b></td><td class="c">5</td><td class="c">2</td><td class="c">–</td><td class="z">7,90 €</td><td class="z">4 %</td></tr>
+<tr><td><b>Mittelstrecke</b></td><td class="c">10</td><td class="c">5</td><td class="c">1</td><td class="z">19,90 €</td><td class="z">13 %</td></tr>
+<tr class="best"><td><b>Langstrecke</b> ★</td><td class="c">15</td><td class="c">10</td><td class="c">3</td><td class="z">39,90 €</td><td class="z">18 %</td></tr>
+<tr><td><b>Interkontinental</b></td><td class="c">25</td><td class="c">20</td><td class="c">6</td><td class="z">69,90 €</td><td class="z">24 %</td></tr>
+</table>
+
+<h3>c) Was zubuchbar bleibt wie bisher</h3>
+<p>Marktwert-Abrufe der Bewertungspartner · Migration und Einrichtung (Pro) · Schnittstellen und
+Anpassungen für Partner nach Aufwand.</p>
+
+<h2>7 · Die Funktionsübersicht — Cockpit-Matrix, neu</h2>
+<p class="lead">31 Zeilen wie heute, <b>gleiche Reihenfolge, gleiche Optik</b>. Fett markiert ist,
+was sich ändert.</p>
+
+<table class="breit">
+<tr><th>Funktion</th><th class="c">Free</th><th class="c">Starter</th><th class="c best">★ Investor</th><th class="c">Pro</th></tr>
+<tr><td>Objekte</td><td class="c">1</td><td class="c">5</td><td class="c best">25</td><td class="c">∞</td></tr>
+<tr><td><b>Marktpreisindikation / Monat</b></td><td class="c"><b>1</b></td><td class="c"><b>5</b></td><td class="c best"><b>5</b></td><td class="c"><b>5</b></td></tr>
+<tr><td><b>Erweiterte Marktpreisindikation / Monat</b></td><td class="c">–</td><td class="c">–</td><td class="c best"><b>5</b></td><td class="c"><b>5</b></td></tr>
+<tr><td><b>Wertermittlung nach ImmoWertV / Monat</b></td><td class="c">–</td><td class="c">–</td><td class="c best">–</td><td class="c"><b>5</b></td></tr>
+<tr><td><b>Nicht genutzte Abrufe bleiben erhalten</b></td><td class="c">–</td><td class="c"><b>✓</b></td><td class="c best"><b>✓</b></td><td class="c"><b>✓</b></td></tr>
+<tr><td><b>Bewertungen nachkaufen</b></td><td class="c">–</td><td class="c">✓</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>DealPilot Score (5 Faktoren)</td><td class="c">✓</td><td class="c">✓</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Investor Deal Score (24 KPIs)</td><td class="c">Demo</td><td class="c">–</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Boarding (Schnellprüfung)</td><td class="c">✓</td><td class="c">✓</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td><b>Co-Pilot (KI-Chat)</b></td><td class="c"><b>5 Fragen</b></td><td class="c"><b>5 Fragen</b></td><td class="c best"><b>✓</b></td><td class="c"><b>✓</b></td></tr>
+<tr><td>Pilot-Analyse (KI)</td><td class="c">vereinfacht</td><td class="c">vereinfacht</td><td class="c best">Vollversion</td><td class="c">Vollversion</td></tr>
+<tr><td>Pilot-Lagebewertung (KI)</td><td class="c">–</td><td class="c">✓</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Deal-Aktion (Anfragen / Gutachten)</td><td class="c">✓</td><td class="c">✓</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>RND-Einschätzung &amp; Gutachten-Anfrage</td><td class="c">nur Anfrage</td><td class="c">nur Anfrage</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Marktdatenfelder</td><td class="c">gesperrt</td><td class="c">gesperrt</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Live-Marktzinsen</td><td class="c">–</td><td class="c">–</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Mietspiegel-Vergleich</td><td class="c">–</td><td class="c">manuell</td><td class="c best">automatisch</td><td class="c">automatisch</td></tr>
+<tr><td>Marktwert-Abrufe (Bewertungspartner)</td><td class="c">Demo</td><td class="c">zubuchbar</td><td class="c best">zubuchbar</td><td class="c">zubuchbar</td></tr>
+<tr><td><b>BMF-Kaufpreisaufteilung</b></td><td class="c">–</td><td class="c">–</td><td class="c best">Rechner</td><td class="c"><b>✓ mit PDF-Anlage</b></td></tr>
+<tr><td>Finanzierung</td><td class="c">Demo</td><td class="c">Hauptdarlehen</td><td class="c best">alle Modelle</td><td class="c">alle Modelle</td></tr>
+<tr><td>AfA-Methoden</td><td class="c">Demo</td><td class="c">linear + § 7b</td><td class="c best">+ degressiv</td><td class="c">+ degressiv</td></tr>
+<tr><td>Werbungskosten-Modul</td><td class="c">Demo</td><td class="c">✓</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Investment-PDF</td><td class="c">Wasserzeichen</td><td class="c">✓</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Werbungskosten-PDF (Finanzamt)</td><td class="c">–</td><td class="c">–</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td><b>Steuer-Mappe über alle Objekte</b></td><td class="c">–</td><td class="c">–</td><td class="c best">–</td><td class="c"><b>✓</b></td></tr>
+<tr><td>Track-Record-PDF</td><td class="c">Wasserzeichen</td><td class="c">–</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Eigenes Logo &amp; Footer im PDF</td><td class="c">–</td><td class="c">–</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td><b>Bankexport (PDF / Excel)</b></td><td class="c"><b>–</b></td><td class="c">–</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>Rohdatenexport (CSV / XLSX)</td><td class="c">–</td><td class="c">–</td><td class="c best">–</td><td class="c">✓</td></tr>
+<tr><td>JSON-Objektsicherung</td><td class="c">–</td><td class="c">–</td><td class="c best">–</td><td class="c">✓</td></tr>
+<tr><td>Exposé-, Marktbericht-, Excel-Import</td><td class="c">teilweise</td><td class="c">✓</td><td class="c best">✓</td><td class="c">✓</td></tr>
+<tr><td>API-Zugang</td><td class="c">–</td><td class="c">–</td><td class="c best">–</td><td class="c">✓</td></tr>
+<tr><td>Migration &amp; Setup (3 h)</td><td class="c">–</td><td class="c">–</td><td class="c best">–</td><td class="c">✓</td></tr>
+</table>
+
+<div class="kasten rot">
+<p><b>Eine Zeile darin ist eine Korrektur, kein Umbau:</b> „Bankexport" steht bei Free auf „–",
+<b>tatsächlich blockt der Export heute nur <code>starter</code></b> — Free rutscht mit
+Wasserzeichen durch. Die Matrix sagt seit jeher das Richtige, der Code nicht. <b>Beim
+Umstellen mitziehen.</b></p>
+</div>
+
+<h2>8 · Was wo geändert werden muss</h2>
+
+<table>
+<tr><th class="z">#</th><th>Stelle</th><th>was dort steht</th><th>Risiko</th></tr>
+<tr><td class="z">1</td><td><b>Stripe</b> — Produkte und Preise</td>
+    <td>vier Pläne × monatlich/jährlich, dazu Partner-Grundgebühr und der Seat-Preis
+    (<code>STRIPE_PRICE_MANDANT_SEAT_*</code>)</td>
+    <td><b>Preise werden in Stripe nie geändert, sondern neu angelegt.</b> Bestandsabos hängen an
+    der alten Preis-ID und laufen weiter — das ist gewollt, muss aber bewusst entschieden werden.
+    <b>Zwei Konten nicht verwechseln</b> (Test ≠ Live).</td></tr>
+<tr><td class="z">2</td><td><b>Datenbank</b> — Tabelle <code>plans</code></td>
+    <td><code>price_monthly_cents</code>, <code>price_yearly_cents</code>,
+    <code>stripe_price_*_id</code>, <code>max_objects</code>, <code>features</code></td>
+    <td>Migration. <b>Die DB ist die Wahrheit</b> — <code>hasFeature</code> fragt zuerst sie.</td></tr>
+<tr><td class="z">3</td><td><b><code>frontend/js/config.js</code></b></td>
+    <td><code>PRICING</code> mit Preisen, Limits und Feature-Flags; <code>AI_CREDIT_PACKAGES</code></td>
+    <td>Nur der Rückfall — aber er greift im Startfenster, bevor der Plan geladen ist.</td></tr>
+<tr><td class="z">4</td><td><b><code>frontend/js/pricing-modal.js</code></b></td>
+    <td><code>PLANS</code> (Z. 17), <code>KER</code> (Z. 132), <code>KPACKS</code> (Z. 195),
+    Matrix <code>R</code> (Z. 249, 31 Zeilen)</td>
+    <td><b>Vier Listen in einer Datei</b>, die alle dasselbe beschreiben.</td></tr>
+<tr><td class="z">5</td><td><b><code>frontend/landing/index.html</code></b></td>
+    <td>vier Tarifkarten (Z. 1073), Partner-Block (Z. 1080 ff.), Kerosin-Kacheln
+    (<code>DATA</code>, Z. 1206), Matrix (Z. 1187)</td>
+    <td><b>Optik bleibt unverändert</b> — nur Zahlen und Zeilentexte werden getauscht.</td></tr>
+<tr><td class="z">6</td><td><b>Kontingent-Zähler</b></td>
+    <td><code>aiCreditsService.js</code> — aus einem Topf werden drei; <code>PLAN_LIMITS</code></td>
+    <td>DB-Migration und eine <b>Umrechnung der Restbestände</b> vorhandener Nutzer.</td></tr>
+<tr><td class="z">7</td><td><b>Anzeige</b></td>
+    <td><code>ai-credits.js</code> — Pille und Tooltip</td><td>klein</td></tr>
+</table>
+
+<div class="kasten rot">
+<p><b>Die Falle, die dieses Vorhaben mitbringt, steht schon im Backlog:</b> Preise und Matrix
+stehen an <b>drei Stellen von Hand</b> — <code>config.js</code>, <code>pricing-modal.js</code>
+und die Landing. Dazu kommt jetzt die DB als vierte. <b>Vier Wahrheiten, die nur so lange
+stimmen, wie jemand sie pflegt.</b></p>
+<p><b>Vorschlag: eine Prüfstrecke, die sie gegeneinander hält</b> — ein kleines Skript, das die
+vier Quellen liest und meldet, wo sie auseinanderlaufen. Es dauert eine Stunde und verhindert
+genau den Fehler, der beim letzten Plan-Prüflauf gefunden wurde.</p>
+</div>
+
+<h2>9 · Was noch entschieden werden muss</h2>
+
+<div class="frage"><b>1 · Objektgrenze im Starter</b> — heute 5. Bei 19,99 € statt 29 € ist das
+die Stellschraube, mit der sich der Preisverlust auffangen lässt.</div>
+
+<div class="frage"><b>2 · Deckel auf den angesparten Abrufen?</b> Mein Vorschlag: bis zum
+Dreifachen des Monatskontingents. Ohne Deckel wächst der Bestand unbegrenzt.</div>
+
+<div class="frage"><b>3 · Partner: Grundgebühr mit oder ohne enthaltene Seats?</b> Ich empfehle
+99 € inklusive drei Mandanten — sonst rechnet sich der Einstieg erst ab acht.</div>
+
+<div class="frage"><b>4 · Heißt Stufe 2 „erweiterte Marktpreisindikation" oder „erweiterte
+Wertermittlung"?</b> Meine Bedenken stehen oben; du entscheidest fachlich.</div>
+
+<div class="frage"><b>5 · Bestandskunden.</b> Wer heute 29 € zahlt, zahlt künftig weniger — das
+ist unproblematisch. <b>Wer aber Kerosin für Marktwert-Abrufe genutzt hat, verliert diese
+Möglichkeit</b>, weil die Abrufe künftig einzeln in Euro gekauft werden. Braucht eine
+Übergangsregel und eine Ankündigung.</div>
+
+<div class="frage"><b>6 · Was wird aus den acht KI-Einzelabrufen?</b> Weiter offen. Mein
+Vorschlag bleibt: im Plan enthalten, mit fairer Nutzung — sie sind billig, und ein vierter
+Zähler wäre wieder eine Währung.</div>
+
+</div>
+</body>
+</html>

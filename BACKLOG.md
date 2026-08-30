@@ -288,11 +288,82 @@ entfällt — nicht raten.
    — 2,40 €" direkt am gesperrten Knopf). Ein Paket ist wieder ein Vorrat, den
    man nicht überblickt — genau davor warnt der Testbericht.
 
-   ### Noch offen (fünf Fragen im Dokument)
+   ### Marcels Entscheidungen vom 30.08., zweite Runde
 
-   Objektgrenze im Starter · verfallen Abrufe monatlich · leeres Kontingent:
-   Einzelkauf oder Sperre · die acht KI-Einzelabrufe · **die Co-Pilot-Sperre
-   ist eine Wegnahme** und braucht eine Ankündigung.
+   **Das runde Konzept liegt in
+   `design/Vorschläge/preiskonzept-gesamt.html`** — alle Preise inklusive
+   Partner, die Kontingente, das Wording, die zubuchbaren Optionen, die
+   vollständige Cockpit-Matrix und die sieben Stellen, die geändert werden
+   müssen.
+
+   1. **Abrufe verfallen NICHT.** Technisch vorgezeichnet: der Bonus-Tank
+      verfällt heute schon nicht (`ai-credits.js:93`). **Offen bleibt ein
+      Deckel** — ohne ihn wächst der Bestand unbegrenzt; Vorschlag: bis zum
+      Dreifachen des Monatskontingents.
+   2. **Die Kerosin-Pille wird zur Kontingent-Pille.** Zahl = Summe der noch
+      möglichen Bewertungen, Tooltip zeigt die Aufteilung auf die drei
+      Stufen. **Die Pille und ihr Tooltip existieren bereits**
+      (`ai-credits.js:51` und `:90`) — sie werden umgehängt, nicht gebaut.
+   3. **Wording:** Stufe 1 heißt künftig **Marktpreisindikation**, Stufe 3
+      **Wertermittlung nach ImmoWertV**. Für Stufe 2 schlage ich
+      **„Erweiterte Marktpreisindikation"** statt „erweiterte Wertermittlung"
+      vor — sie führt **kein** ImmoWertV-Verfahren aus, und wer
+      „Wertermittlung" liest, erwartet einen Verkehrswert. **Marcel
+      entscheidet das fachlich.** Überall dabei: *„ersetzt kein Gutachten
+      eines Sachverständigen."*
+   4. **Adressprüfung kommt** — und wenn keine Daten vorliegen, kann der
+      Kunde die Werte selbst eintragen. **Beides gibt es schon:** die Felder
+      für Bodenrichtwert, Liegenschaftszins und Sachwertfaktor stehen im
+      Block „Experte" (`wertermittlung.js:300`), und die Rückfallleiter ist
+      das **A-bis-E-System** (`WertParameterService.js:505`) — A amtlich ·
+      B amtlich regional · C marktabgeleitet · **D gesetzlicher Auffangwert
+      § 256 BewG** · E eigene Angabe. **Es gibt also keinen erfundenen
+      Standardwert, sondern eine Leiter mit Etikett.** Zu bauen ist nur: den
+      Block an die richtige Stelle holen, den Ausschuss-Link zeigen
+      (`gaa_name` steht im Register) und den Namen „Experte" ablegen.
+   5. **Co-Pilot: mein Rat ist „sichtbar, aber begrenzt"** — fünf Fragen im
+      Monat für Free und Starter, voll ab Investor. Ihn ganz auszublenden
+      wäre eine Wegnahme bei Leuten, die ihn heute nutzen; ein bloßes
+      Schloss verkauft nichts, ein benutztes Werkzeug schon. **In jedem Fall
+      eine Ankündigung vorher, nicht danach.**
+   6. **Partner-Preise fallen mit:** Grundgebühr 149 → **99 €**, Seats
+      35/29/24 → **24/19/15 €**. Sonst zerfällt das Partner-Argument von
+      selbst — heute spart der Mandant 59 %, bei unverändertem Seat und
+      Investor zu 39,99 € nur noch 40 %.
+      **Ein Befund dazu, der schon heute gilt:** ein Partner mit fünf
+      Mandanten zahlt pro Kopf **mehr**, als der Mandant allein zahlen würde
+      — die Grundgebühr trägt sich erst ab etwa acht. **Vorschlag: 99 €
+      inklusive drei Seats.**
+   7. **Die Landing-Optik bleibt unverändert** — es werden nur Zahlen und
+      Zeilentexte getauscht.
+
+   ### Sieben Stellen, und eine vierte Wahrheit
+
+   Stripe · Tabelle `plans` · `config.js` · `pricing-modal.js` (**vier
+   Listen in einer Datei**: `PLANS`, `KER`, `KPACKS`, Matrix `R`) ·
+   `landing/index.html` · `aiCreditsService.js` (aus einem Topf werden drei,
+   mit Umrechnung der Restbestände) · `ai-credits.js`.
+
+   > **Preise werden in Stripe nie geändert, sondern neu angelegt.**
+   > Bestandsabos hängen an der alten Preis-ID und laufen weiter. Und: zwei
+   > Konten, Test und Live, nie verwechseln.
+   >
+   > **Vorschlag gegen die vier Wahrheiten:** eine kleine Prüfstrecke, die
+   > alle vier Quellen liest und meldet, wo sie auseinanderlaufen. Eine
+   > Stunde Arbeit, und sie verhindert genau den Fehler, den der
+   > Plan-Prüflauf gefunden hat.
+
+   **Nebenbefund für die Matrix:** die Zeile „Bankexport" steht bei Free auf
+   „–", **der Code blockt aber nur `starter`** — Free rutscht mit
+   Wasserzeichen durch. Die Matrix sagt seit jeher das Richtige, der Code
+   nicht. Beim Umstellen mitziehen.
+
+   ### Noch offen
+
+   Objektgrenze im Starter · Deckel auf den angesparten Abrufen · Name der
+   Stufe 2 · Partner-Grundgebühr mit oder ohne enthaltene Seats ·
+   Übergangsregel für Bestandskunden, die Kerosin für Marktwert-Abrufe
+   genutzt haben · die acht KI-Einzelabrufe.
 
    ### Der Fund, der die Sache trägt
 
@@ -1249,9 +1320,34 @@ entfällt — nicht raten.
    > Live-Balken gibt. **DealPilot kennt Ist-Miete und Marktmiete bereits** —
    > es könnte von selbst warnen. Kleine Rechnung, große Wirkung.
 
-   **Offene Frage an Marcel:** Sammel-PDF **je Halter** getrennt (privat /
-   GmbH) oder alles in eine Mappe? Steuerlich sind es zwei Erklärungen — ich
-   würde trennen, aber das ist eine fachliche Frage.
+   ### Marcels Entscheidungen vom 30.08.
+
+   1. **Getrennt je Halter** — bestätigt. Die Auswahl gehört ins
+      **Portfolio-Cockpit**, zusammen mit Jahr und Objektauswahl.
+   2. **Die Anlage V soll kommen**, und zwar so: *„auch die jetzige schon die
+      Nummern angeben, oder zwischen den Ansichten umschalten — Anlage V und
+      die, die wir jetzt haben, mit den Nummern der Anlage V drauf. Sollte
+      nur vollständig sein."*
+
+   **Damit ist der Zuschnitt klar: ein Umschalter, zwei Ansichten, eine
+   Datenbasis.**
+
+   | Ansicht | was sie zeigt | für wen |
+   |---|---|---|
+   | **Aufstellung** (heute) | sechs Abschnitte nach Kostenart, mit Bemerkungen | den Eigentümer, der verstehen will, wo das Geld hingeht |
+   | **Anlage V** (neu) | dieselben Zahlen, sortiert nach den Zeilen des amtlichen Formulars | den, der es abtippt oder zum Steuerberater gibt |
+
+   **„Sollte nur vollständig sein" ist die eigentliche Anforderung** — und
+   die schärfste. Eine Anlage-V-Ansicht, in der eine Position fehlt, ist
+   schlimmer als keine: sie sieht aus wie eine fertige Erklärung.
+   **Konsequenz:** jede Zeile des Formulars, die wir nicht befüllen können,
+   erscheint **sichtbar leer mit Grund** („keine Angabe erfasst"), nicht
+   stillschweigend gar nicht. Dasselbe Prinzip wie im Marktbericht.
+
+   > **Die Zeilennummern werden weiterhin NICHT geraten** — sie ändern sich
+   > je Veranlagungsjahr und werden aus dem amtlichen Formular
+   > abgeschrieben, versioniert abgelegt und dagegen geprüft. Ohne
+   > hinterlegte Zuordnung erscheint der Umschalter für dieses Jahr nicht.
 
 10. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
    Ebenfalls aus `design/mockups/Anmerkungen.docx`, aber ein eigener Punkt —
