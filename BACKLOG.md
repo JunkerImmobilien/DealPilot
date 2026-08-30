@@ -36,6 +36,73 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → HIER WEITERMACHEN (Übergabe 2026-08-30, abends)
+
+**Stand:** lokal = GitHub = Staging auf `1b138c6`, Zweig `staging`,
+Arbeitsverzeichnis sauber. **Nichts hängt halbfertig.**
+
+### Das Erste nach dem Neustart: prüfen, ob Stripe jetzt geht
+
+Marcel hat den Konnektor im Stripe-Konto für **Test und Live** freigegeben
+und die Sitzung neu gestartet, weil das Token in der alten Sitzung nicht
+ankam. **Zuerst also nachsehen, ob die echten Stripe-Werkzeuge da sind**
+(nicht nur `authenticate` und `complete_authentication`).
+
+**Wenn ja, in einem Durchgang anlegen** — Marcel: *„nur Test-User, keine
+zahlenden Kunden, du kannst einfach ändern und löschen nach Belieben"*:
+
+| Abo | monatlich | jährlich |
+|---|---|---|
+| Starter | 19,99 € | 199 € |
+| Investor | 39,99 € | 399 € |
+| Pro | 79,99 € | 799 € |
+| Partner-Grundgebühr | 99 € | 990 € |
+| Mandanten-Seat | 24 / 19 / 15 € gestaffelt | — |
+
+Einmalig dazu: vier Bewertungspakete (7,90 · 19,90 · 39,90 · 69,90 €) und
+fünf Einzelposten (0,90 · 1,90 · 3,90 · 5,90 · 9,90 €).
+
+**Danach die Preis-IDs** in die Tabelle `plans` (`stripe_price_*_id`) und in
+`STRIPE_PRICE_MANDANT_SEAT_*` in der `.env`.
+
+### Das Zweite: Migration 064 ausführen
+
+`backend/migrations/064_preise_v1176_kontingente.sql` liegt im Repo,
+**geschrieben und ausgerollt, aber nicht ausgeführt.**
+
+> **Gemessen beim Vorbereiten, spart die nächste Suche:**
+> die Datenbank heißt **`dealpilot_db`**, nicht `dealpilot`; der Rolle
+> `postgres` gibt es nicht, der Nutzer ist `dealpilot`. Der Leseweg ist
+> ```
+> docker exec dealpilot-postgres psql -U dealpilot -d dealpilot_db -tAc "…"
+> ```
+> Stand der Migrationen: **63**, also ist 064 die nächste offene.
+> **Und `plans` führt weiter die ALTEN Preise** (starter 2900, investor 5900,
+> pro 9900, **partner 14900** — die Partner-Zeile gibt es also doch, meine
+> Migration fängt sie mit).
+
+**Migrationen sind ins Image gebacken → Rebuild**, nicht nur `up -d`.
+
+### Das Dritte: der Kontingent-Zähler
+
+Das ist der eigentliche Umbau und der größte Rest. **Die Anzeige ist
+umgestellt, die Buchhaltung nicht** — `aiCreditsService.js` führt weiter
+`PLAN_LIMITS = {free:2, starter:10, investor:40, pro:100}` in Litern. Wer
+heute eine Wertermittlung startet, zahlt 12 L aus dem alten Tank, während
+die Oberfläche „5 Wertermittlungen im Monat" sagt.
+
+Reihenfolge steht in **Punkt 1** unter „Offen".
+
+### Was in dieser Runde fertig wurde
+
+`v1173`–`v1179`, sechs Rollouts: Wallet-Abstände · freier Farbwähler ·
+Fassung C mit Farbton-Regler · alle Preise und Kontingente · Stufen-Wording ·
+Co-Pilot-Grenze · Bankexport-Leck · vertauschte Preis-Einordnung · fünf
+Kleinigkeiten aus dem Testbericht. Dazu vier Vorschlagsdokumente in
+`design/Vorschläge/` und der Testbericht als Punkt 7 im Backlog.
+
+---
+
 ## → Hier weitermachen (Übergabe 2026-08-13)
 
 **Stand:** lokal = GitHub = Staging auf demselben Commit, Zweig `staging`,
