@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sammel-PDF fürs Finanzamt und Anlage V</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#C9A84C;--gruen:#3FA56C;--rot:#B8625C;
+    --papier:#efece5;--linie:#e6e0d3;--tinte:#141310;--mut:#6f6a61}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--tinte);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.55;padding:26px 20px 90px}
+  .wrap{max-width:1120px;margin:0 auto}
+  h1{font-family:'Space Grotesk';font-size:24px;margin:0 0 5px}
+  h2{font-family:'Space Grotesk';font-size:17px;margin:38px 0 4px;padding-top:14px;border-top:1px solid var(--linie)}
+  h3{font-family:'Space Grotesk';font-size:14px;margin:22px 0 4px}
+  .lead{color:var(--mut);font-size:14px;max-width:840px;margin:0 0 3px}
+  .mono{font-family:'JetBrains Mono';font-size:11px;color:var(--mut)}
+  p{max-width:860px}
+  .kasten{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--gold);
+    border-radius:10px;padding:13px 16px;margin:14px 0;max-width:880px;font-size:13.5px}
+  .kasten.gruen{border-left-color:var(--gruen)}
+  .kasten.rot{border-left-color:var(--rot)}
+  .kasten p{margin:0 0 7px}.kasten p:last-child{margin-bottom:0}
+  table{border-collapse:collapse;width:100%;max-width:880px;font-size:12.5px;margin:12px 0;background:#fff}
+  th,td{border:1px solid var(--linie);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:#faf8f2;font-weight:600;font-size:11.5px}
+  td.z,th.z{font-family:'JetBrains Mono';font-size:11.5px;text-align:right}
+  .ja{color:#2b6b48;font-weight:600}.nein{color:#9a5450}.evtl{color:#8a6d1f;font-weight:600}
+  code{font-family:'JetBrains Mono';font-size:11.5px;background:#f4f1e9;padding:1px 4px;border-radius:3px}
+  .frage{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--rot);
+    border-radius:10px;padding:13px 16px;margin:12px 0;max-width:880px;font-size:13.5px}
+  .maske{background:#fff;border:1px solid var(--linie);border-radius:12px;padding:0;overflow:hidden;
+    max-width:620px;margin:14px 0;box-shadow:0 8px 26px -22px rgba(0,0,0,.5)}
+  .maske h4{font-family:'Space Grotesk';font-size:13.5px;margin:0;padding:12px 16px;
+    border-bottom:1px solid var(--linie);background:#faf8f2}
+  .maske .body{padding:14px 16px}
+  .maske .zeile{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px dashed var(--linie);font-size:13px}
+  .maske .zeile:last-child{border-bottom:0}
+  .maske .zeile input[type=checkbox]{width:17px;height:17px;accent-color:var(--gold)}
+  .maske .zeile .adr{flex:1}
+  .maske .zeile .sum{font-family:'JetBrains Mono';font-size:12px;color:var(--mut)}
+  .maske .kopf{display:flex;gap:10px;align-items:center;margin-bottom:11px;font-size:12.5px}
+  .maske select,.maske button{font:inherit;font-size:12.5px;padding:7px 11px;border-radius:7px;
+    border:1px solid var(--linie);background:#fff}
+  .maske button.go{background:var(--gold);border-color:var(--gold);color:#1a1407;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Sammel-PDF fürs Finanzamt und Anlage V</h1>
+<p class="lead">Marcels Auftrag vom 30.08.: ein Finanzamt-PDF <b>über alle Objekte</b> mit Auswahl
+und Veranlagungsjahr — so wie es das heute je Objekt im Tab Steuer gibt. Dazu die Frage, ob sich
+die <b>Anlage V direkt befüllen</b> lässt.</p>
+<p class="mono">Geprüft am 30.08.2026 im Browser an der laufenden App (Partner-Konto) und im Code.</p>
+
+<h2>1 · Was es heute gibt — gemessen, nicht vermutet</h2>
+
+<table>
+<tr><th>Stelle</th><th>Befund</th></tr>
+<tr><td><b>Tab Steuer</b></td><td>Knopf <b>„Finanzamt-PDF"</b>, dazu ein <b>Steuerjahr</b>-Wähler,
+ELSTER-Link, BMF-Rechner. Das PDF ist <code>exportWerbungskostenPDF()</code> — pro Objekt, ein
+Jahr <b>oder</b> alle Jahre.</td></tr>
+<tr><td><b>Das PDF selbst</b></td><td>Kopf „Vermietung &amp; Verpachtung · Anlage V · § 21 EStG",
+sechs Abschnitte (Finanzierung, Betriebskosten, Verwaltung, Sonstiges, AfA, Anschaffungsnah),
+Einnahmen aufgeschlüsselt in Kaltmiete und Umlagen, Ergebnis, Steuerwirkung. Fußzeile:
+<i>„dient der Vorbereitung der Anlage V"</i>. <b>Es ist inhaltlich schon eine Anlage-V-Zuarbeit —
+nur ohne Zeilennummern.</b></td></tr>
+<tr><td><b>Portfolio-Cockpit</b></td><td>Abschnitte: Portfolio Score · Kennzahlen · Objekte ·
+Geteilte Objekte · Projektion &amp; Verlauf · Gesamt-Projektion.
+<b class="nein">Kein einziger Export-Knopf</b> — kein PDF, kein CSV.</td></tr>
+<tr><td><b>Einstellungen → Mandanten</b></td><td>Halter mit Rechtsform; „Privat" ist fix und wird
+über das <b>zvE</b> besteuert, mit <b>Steuerzeiträumen</b> (gültig von/bis, zvE/Jahr, Grund,
+Notiz). Für Pro angekündigt: GmbH/UG mit eigener Körperschaftsteuer, Cockpit-Filter je Halter und
+<i>„(in Vorbereitung) GuV/Bilanz-Export"</i>.</td></tr>
+<tr><td><b>Einstellungen → Account</b></td><td>Name, E-Mail, Rolle, Firma, <b>Steuernummer</b>,
+USt-IdNr. Unter „Kontakt &amp; Logo" Anschrift, Telefon, Website, Logo.</td></tr>
+</table>
+
+<div class="kasten gruen">
+<p><b>Der Fund, der die Sache klein macht:</b> Es gibt bereits einen Endpunkt, der <b>alle
+Steuerdaten eines Nutzers über alle Objekte</b> liefert, gefiltert nach Jahr:</p>
+<p><code>GET /tax-records?from=2024&amp;to=2024</code> → <code>taxService.listForUser()</code>
+(<code>backend/src/routes/taxRecords.js:72</code>).</p>
+<p>Ein Satz trägt <b>jedes einzelne Feld</b>, das das heutige PDF druckt — von
+<code>schuldzinsen</code> über <code>hausverwaltung</code> bis <code>einnahmen_km</code> und
+<code>einnahmen_nk</code>. Gespeichert wird er beim Objektspeichern über
+<code>PUT /tax-records/object/:id/timeline</code>.</p>
+<p><b>Das Sammel-PDF braucht also keine neue Datenhaltung und kein Nachladen der Objekte.</b> Es
+ist eine Schleife über vorhandene Sätze und eine vorhandene Seitenfunktion
+(<code>_renderWerbungskostenPage</code>).</p>
+</div>
+
+<h2>2 · Vorschlag: „Steuer-Mappe" im Portfolio-Cockpit</h2>
+
+<div class="maske">
+  <h4>Steuer-Mappe erzeugen</h4>
+  <div class="body">
+    <div class="kopf">
+      <span>Veranlagungsjahr</span>
+      <select><option>2024</option><option>2025</option><option>2026</option></select>
+      <span>Halter</span>
+      <select><option>Privat</option><option>alle</option></select>
+      <button class="go">PDF erzeugen</button>
+    </div>
+    <div class="zeile"><input type="checkbox" checked><span class="adr">Dealstreet 999, Dealhausen</span><span class="sum">−4.812 €</span></div>
+    <div class="zeile"><input type="checkbox" checked><span class="adr">Hermannstraße 9, Hüllhorst</span><span class="sum">+1.240 €</span></div>
+    <div class="zeile"><input type="checkbox" checked><span class="adr">Löhner Str. 278, Hiddenhausen</span><span class="sum">−2.077 €</span></div>
+    <div class="zeile" style="opacity:.5"><input type="checkbox"><span class="adr">Am Markt 9 — <i>kein Steuersatz für 2024</i></span><span class="sum">—</span></div>
+  </div>
+</div>
+
+<p><b>Der Ort ist das Portfolio-Cockpit</b>, weil dort schon alle Objekte nebeneinander stehen —
+und weil dort der Halter-Filter hingehört, den die Mandanten-Funktion ohnehin ankündigt.</p>
+
+<h3>Was das PDF enthält</h3>
+<ol>
+  <li><b>Deckblatt:</b> Steuerpflichtiger (Name, Anschrift, Steuernummer aus den Einstellungen),
+      Veranlagungsjahr, Halter, Anzahl der Objekte, <b>Gesamtsumme der Einkünfte aus V+V</b>.</li>
+  <li><b>Eine Seite je Objekt</b> — exakt die heutige Seite, unverändert.</li>
+  <li><b>Summenblatt:</b> alle Objekte in einer Tabelle, je Zeile Einnahmen, Werbungskosten,
+      Ergebnis; darunter die Summe, die in die Steuererklärung geht.</li>
+  <li><b>Anlage-V-Zuordnung</b> je Objekt — siehe unten.</li>
+</ol>
+
+<div class="kasten">
+<p><b>Ein Objekt ohne Steuerdaten für das gewählte Jahr darf nicht still fehlen.</b> Es steht in
+der Auswahl, ausgegraut, mit dem Grund daneben. Ein Sammel-PDF, das kommentarlos zwei von fünf
+Objekten weglässt, ist gefährlicher als gar keins — und es ist genau die Falle, vor der die
+Hausregeln warnen: was fehlt, wird benannt.</p>
+</div>
+
+<h2>3 · Anlage V befüllen — drei Wege, einer davon geht</h2>
+
+<table>
+<tr><th>Weg</th><th>was es wäre</th><th>Aufwand</th><th>geht das?</th></tr>
+<tr>
+  <td><b>A · Zuordnungsblatt</b></td>
+  <td>Unsere Zahlen mit der amtlichen <b>Zeilennummer</b> daneben. Der Kunde tippt sie in ELSTER
+      ab — bei einem Objekt fünf Minuten.</td>
+  <td>klein</td>
+  <td class="ja">ja, sofort</td>
+</tr>
+<tr>
+  <td><b>B · Amtliches PDF ausfüllen</b></td>
+  <td>Das Formular der Finanzverwaltung als ausfüllbares PDF laden und die Felder setzen.</td>
+  <td>mittel</td>
+  <td class="evtl">technisch machbar, aber die Feldnamen ändern sich je Jahr — <b>vor jeder Zusage
+      am amtlichen Formular prüfen</b></td>
+</tr>
+<tr>
+  <td><b>C · An ELSTER übermitteln</b></td>
+  <td>Die Erklärung direkt einreichen.</td>
+  <td>groß</td>
+  <td class="nein">nach meinem Kenntnisstand nur über das zertifizierte ERiC-Modul, mit
+      Zertifikatsverwaltung und Zulassung. <b>Nichts, was man nebenbei baut</b> — und nichts, was
+      ich ohne eigene Prüfung zusagen würde</td>
+</tr>
+</table>
+
+<div class="kasten gruen">
+<p><b>Empfehlung: Weg A, und zwar als Teil der Steuer-Mappe.</b> Er liefert 90 % des Nutzens für
+5 % des Aufwands, er kann nicht falsch übermitteln, und er macht genau das sichtbar, was
+DealPilot ohnehin schon rechnet. <b>Weg B lohnt erst, wenn A benutzt wird.</b></p>
+</div>
+
+<h3>So sähe das Zuordnungsblatt aus</h3>
+<table>
+<tr><th>Anlage V</th><th>Position</th><th>unser Feld</th><th class="z">Betrag</th></tr>
+<tr><td class="z">Zeile ▢</td><td>Mieteinnahmen ohne Umlagen</td><td><code>einnahmen_km</code></td><td class="z">10.800 €</td></tr>
+<tr><td class="z">Zeile ▢</td><td>vereinnahmte Umlagen</td><td><code>einnahmen_nk</code></td><td class="z">1.500 €</td></tr>
+<tr><td class="z">Zeile ▢</td><td>AfA Gebäude</td><td><code>afa</code></td><td class="z">3.150 €</td></tr>
+<tr><td class="z">Zeile ▢</td><td>Schuldzinsen</td><td><code>schuldzinsen</code></td><td class="z">6.420 €</td></tr>
+<tr><td class="z">Zeile ▢</td><td>Erhaltungsaufwand</td><td><code>erhaltungsaufwand</code></td><td class="z">1.900 €</td></tr>
+<tr><td class="z">Zeile ▢</td><td>Verwaltungskosten</td><td><code>hausverwaltung</code> + <code>steuerber</code> + …</td><td class="z">840 €</td></tr>
+</table>
+
+<div class="kasten rot">
+<p><b>Die Zeilennummern stehen hier bewusst als ▢.</b> Sie ändern sich von Veranlagungsjahr zu
+Veranlagungsjahr, und ich habe kein amtliches Formular vorliegen. <b>Eine geratene Zeilennummer
+ist schlimmer als keine</b> — sie wandert ungeprüft in eine Steuererklärung.</p>
+<p><b>Der Weg ist derselbe wie bei der Wertermittlung:</b> die Zuordnung wird <b>je Jahr</b> aus
+dem amtlichen Formular abgeschrieben, versioniert abgelegt und gegen das Formular geprüft. Ohne
+hinterlegte Zuordnung für ein Jahr erscheint das Blatt nicht — statt mit den Zahlen des Vorjahres
+zu raten.</p>
+</div>
+
+<h2>4 · Was in den Daten fehlt</h2>
+<p>Für ein vollständiges Zuordnungsblatt fehlen ein paar Angaben, die es heute nirgends gibt.
+Alle sind kleine Formularfelder, keine Rechnung:</p>
+
+<table>
+<tr><th>fehlt</th><th>wo es hingehört</th><th>warum</th></tr>
+<tr><td><b>Finanzamt</b></td><td>Einstellungen → Mandant</td><td>steht im Kopf der Anlage V</td></tr>
+<tr><td><b>Steuer-Identifikationsnummer</b></td><td>Einstellungen → Mandant</td><td>ist etwas anderes als die Steuernummer, die es schon gibt</td></tr>
+<tr><td><b>Einheitswert-Aktenzeichen</b></td><td>am Objekt</td><td>fragt die Anlage V je Objekt ab</td></tr>
+<tr><td><b>Eigentumsanteil der Person</b></td><td>am Objekt</td><td>bei Ehegatten oder Gemeinschaften wird nur der eigene Anteil erklärt. <code>mea</code> ist der Miteigentumsanteil am Gemeinschaftseigentum — <b>etwas anderes</b>, das darf nicht verwechselt werden</td></tr>
+<tr><td><b>verbilligte Überlassung</b></td><td>am Objekt</td><td>unter 66 % der ortsüblichen Miete wird der Werbungskostenabzug gekürzt (§ 21 Abs. 2 EStG). <b>DealPilot kennt beide Zahlen bereits</b> — Ist-Miete und Marktmiete — und könnte sogar von selbst warnen</td></tr>
+<tr><td><b>Ferienwohnung / kurzfristige Vermietung</b></td><td>am Objekt</td><td>eigener Abschnitt in der Anlage V</td></tr>
+</table>
+
+<div class="kasten">
+<p><b>Der vorletzte Punkt ist mehr als ein Formularfeld.</b> Die 66-%-Grenze ist dieselbe Art
+Falle wie die 15-%-Grenze bei den anschaffungsnahen Herstellungskosten, für die DealPilot schon
+einen Live-Balken hat. <b>Wer Ist-Miete und Marktmiete nebeneinander stehen hat, kann sie
+warnen</b> — das ist eine kleine Rechnung mit großer Wirkung, und sie passt zum Charakter des
+Werkzeugs.</p>
+</div>
+
+<h2>5 · Reihenfolge und Zuschnitt</h2>
+<table>
+<tr><th class="z">#</th><th>Schritt</th><th>Aufwand</th><th>Nutzen ohne die späteren Schritte</th></tr>
+<tr><td class="z">1</td><td><b>Steuer-Mappe</b>: Auswahl, Jahr, Halter, Deckblatt, Objektseiten, Summenblatt</td><td>überschaubar — vorhandene Daten, vorhandene Seitenfunktion</td><td class="ja">voll: das ist Marcels eigentlicher Wunsch</td></tr>
+<tr><td class="z">2</td><td><b>Fehlende Stammdaten</b> (Finanzamt, Steuer-ID, Aktenzeichen, Anteil, Nutzungsart)</td><td>klein, aber viele Stellen</td><td>ohne sie bleibt das Deckblatt unvollständig</td></tr>
+<tr><td class="z">3</td><td><b>Anlage-V-Zuordnung</b> je Jahr, aus dem amtlichen Formular abgeschrieben</td><td>klein je Jahr, dafür jedes Jahr wieder</td><td class="ja">macht aus der Zuarbeit eine Abschreibvorlage</td></tr>
+<tr><td class="z">4</td><td><b>66-%-Warnung</b></td><td>klein</td><td class="ja">eigenständig nützlich</td></tr>
+<tr><td class="z">5</td><td>Amtliches PDF befüllen (Weg B)</td><td>mittel, jährlich zu pflegen</td><td>erst sinnvoll, wenn 3 benutzt wird</td></tr>
+</table>
+
+<div class="kasten">
+<p><b>Und die Frage, die zum Preismodell zurückführt:</b> Die Steuer-Mappe ist ein Pro-Merkmal —
+sie richtet sich an jemanden mit mehreren Objekten, und das Werbungskosten-PDF ist heute schon
+Investor+. <b>Vorschlag: Mappe und Zuordnungsblatt gehören in Pro</b>, die Einzelobjekt-Fassung
+bleibt, wo sie ist.</p>
+</div>
+
+<div class="frage"><b>Eine Frage an Marcel, die ich nicht entscheiden kann:</b> Soll das
+Sammel-PDF <b>je Halter</b> getrennt werden (privat / GmbH), oder alles in eine Mappe? Steuerlich
+sind es zwei verschiedene Erklärungen — <b>ich würde trennen</b> und im Wähler nur einen Halter
+zulassen. Das ist aber eine fachliche Frage, und dort bist du der Sachverständige.</div>
+
+</div>
+</body>
+</html>

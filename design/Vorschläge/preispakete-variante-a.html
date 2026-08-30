@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preispakete — Variante A, ausformuliert</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#C9A84C; --obsidian:#050505; --karte:#FBF6E9;
+    --gruen:#3FA56C; --rot:#B8625C;
+    --papier:#efece5; --linie:#e6e0d3; --tinte:#141310; --mut:#6f6a61;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--tinte);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.55;padding:26px 20px 90px}
+  .wrap{max-width:1120px;margin:0 auto}
+  h1{font-family:'Space Grotesk';font-size:24px;margin:0 0 5px}
+  h2{font-family:'Space Grotesk';font-size:17px;margin:38px 0 4px;padding-top:14px;border-top:1px solid var(--linie)}
+  h3{font-family:'Space Grotesk';font-size:14px;margin:22px 0 4px}
+  .lead{color:var(--mut);font-size:14px;max-width:840px;margin:0 0 3px}
+  .mono{font-family:'JetBrains Mono';font-size:11px;color:var(--mut)}
+  p{max-width:860px}
+  .kasten{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--gold);
+    border-radius:10px;padding:13px 16px;margin:14px 0;max-width:880px;font-size:13.5px}
+  .kasten.gruen{border-left-color:var(--gruen)}
+  .kasten.rot{border-left-color:var(--rot)}
+  .kasten p{margin:0 0 7px}.kasten p:last-child{margin-bottom:0}
+  table{border-collapse:collapse;width:100%;max-width:880px;font-size:12.5px;margin:12px 0;background:#fff}
+  th,td{border:1px solid var(--linie);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:#faf8f2;font-weight:600;font-size:11.5px}
+  td.z,th.z{font-family:'JetBrains Mono';font-size:11.5px;text-align:right}
+  .ja{color:#2b6b48;font-weight:600}.nein{color:#9a5450}
+
+  /* Tarifkarten wie auf der Landing */
+  .tarife{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;max-width:920px;margin:16px 0}
+  .tf{background:#fff;border:1px solid var(--linie);border-radius:12px;padding:15px;position:relative}
+  .tf.best{border-color:var(--gold);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 25%,transparent)}
+  .tf .n{font-family:'Space Grotesk';font-size:15px;font-weight:600}
+  .tf .tag{font-family:'JetBrains Mono';font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
+  .tf .p{font-family:'Space Grotesk';font-size:27px;font-weight:600;margin:5px 0 0}
+  .tf .p s{font-size:12.5px;color:var(--mut);font-weight:400;margin-left:7px}
+  .tf .alt{font-size:11px;color:var(--mut);font-family:'JetBrains Mono';margin-bottom:9px}
+  .tf .kont{background:#faf8f2;border:1px solid var(--linie);border-radius:8px;padding:8px 10px;margin:9px 0}
+  .tf .kont b{display:block;font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;
+    letter-spacing:.05em;font-family:'JetBrains Mono';margin-bottom:4px}
+  .tf .kont div{font-size:12.5px;margin-bottom:2px}
+  .tf ul{margin:8px 0 0;padding-left:17px;font-size:12.5px}
+  .tf li{margin-bottom:3px}
+  .tf .bs{position:absolute;top:-9px;right:12px;background:var(--gold);color:#1a1407;
+    font-size:10px;font-weight:600;padding:2px 8px;border-radius:9px}
+
+  .txt{background:#fff;border:1px solid var(--linie);border-radius:10px;padding:14px 16px;
+    margin:10px 0;max-width:880px}
+  .txt .wo{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--mut);margin-bottom:6px}
+  .txt .zeile{font-size:13.5px;margin-bottom:4px}
+  .txt .fein{font-size:12px;color:var(--mut);font-style:italic}
+  code{font-family:'JetBrains Mono';font-size:11.5px;background:#f4f1e9;padding:1px 4px;border-radius:3px}
+  .frage{background:#fff;border:1px solid var(--linie);border-left:3px solid var(--rot);
+    border-radius:10px;padding:13px 16px;margin:12px 0;max-width:880px;font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Preispakete — Variante A, ausformuliert</h1>
+<p class="lead">Marcels Entscheidung vom 30.08.: <b>Variante A</b>. Dazu seine Präzisierung des
+Zuschnitts und der Auftrag: <i>„da ist es aber wichtig zu sagen, dass es verschiedene Stufen gibt,
+und wir müssen da ehrlich sein."</i> Dieses Blatt liefert die <b>fertigen Texte</b> — und davor die
+Messung, die sie deckt.</p>
+
+<h2>1 · Die drei Stufen, ehrlich beschrieben</h2>
+
+<div class="kasten rot">
+<p><b>Der wichtigste Satz vorweg, und er ist gemessen:</b> <code>wert_stufe</code> wird im
+Marktbericht-Dienst genau einmal entgegengenommen (<code>ReportOrchestrator.js:125</code>) und
+danach <b>nie wieder gelesen</b>. Die Stufe schaltet also <b>keine Inhalte frei</b>.</p>
+<p><b>Was die Tiefe bestimmt, sind die Angaben.</b> Die Leiste rechnet die erreichte Stufe aus den
+ausgefüllten Feldern (<code>mb-stufen.js:120</code>, <code>erreicht()</code>), und der Preis folgt
+dieser Stufe. <b>Man kauft also keine Wertermittlung — man liefert die Daten, die eine möglich
+machen, und dann kostet sie mehr.</b> Genau so muss es auch dastehen, sonst verspricht die
+Preisseite etwas, das der Kunde nicht durch Bezahlen bekommt.</p>
+</div>
+
+<table>
+<tr><th>Stufe</th><th>Pflichtangaben</th><th>Was herauskommt</th><th class="z">heute</th></tr>
+<tr>
+  <td><b>1 · Einschätzung</b></td>
+  <td>Adresse, Objektart, Wohnfläche, Baujahr</td>
+  <td>Lage und Marktpreisindikation — eine Spanne aus den Marktdaten des zuständigen
+      Gutachterausschusses</td>
+  <td class="z">2 L</td>
+</tr>
+<tr>
+  <td><b>2 · Marktpreisindikation</b></td>
+  <td>zusätzlich Baustatus, Zustand, Qualität</td>
+  <td>dieselbe Rechnung, aber <b>deutlich engere Spanne</b>, weil der Zustand eingeht</td>
+  <td class="z">5 L</td>
+</tr>
+<tr>
+  <td><b>3 · Wertermittlung</b></td>
+  <td>zusätzlich Grundstücksfläche und Wohneinheiten; bei einer <b>ETW</b> der
+      Miteigentumsanteil, bei einem <b>Haus</b> Standardstufe und Hausform</td>
+  <td>Boden-, Ertrags- und Sachwert nach ImmoWertV, führendes Verfahren nach § 6 Abs. 1,
+      <b>mit Rechenweg im PDF</b></td>
+  <td class="z">12 L</td>
+</tr>
+</table>
+<p class="mono">Quelle: <code>mb-stufen.js:30–36</code> (Namen, Preise, Beschreibung),
+<code>BEDARF</code> ebd. Z. 74 (Pflichtangaben), <code>verfahrenswahl.js</code> (führendes
+Verfahren).</p>
+
+<h2>2 · Wo es wirklich trägt — die Reichweite, gezählt</h2>
+<p>Das ist der zweite Teil der Ehrlichkeit. Ein Verkehrswert braucht Daten des zuständigen
+Gutachterausschusses. Die liegen nicht überall vor, und <b>die Hausregel lautet: kein Treffer heißt
+kein Wert — nie ein Nachbarkreis, nie ein Landesmittel.</b></p>
+
+<table>
+<tr><th>Kennzahl</th><th>wofür sie gebraucht wird</th><th class="z">Einträge im Register</th><th>Länder</th></tr>
+<tr><td>Liegenschaftszinssatz</td><td><b>Ertragswert</b></td><td class="z">1.078</td>
+    <td>NRW 972 · Niedersachsen 95 · Hessen 8 · TH/ST/BE je 1</td></tr>
+<tr><td>Sachwertfaktor</td><td><b>marktangepasster Sachwert</b></td><td class="z">52</td>
+    <td>NRW 34 · Thüringen 5 · Brandenburg 5 · Niedersachsen 4 · Bayern 2 · ST 1 · Berlin 1</td></tr>
+<tr><td>Bodenpreisniveau</td><td>Bodenwert</td><td class="z">403</td><td>nur NRW</td></tr>
+<tr><td>Durchschnittspreise, Preisentwicklung</td><td><b>Stufe 1 und 2</b></td><td class="z">601</td>
+    <td>nur NRW</td></tr>
+</table>
+<p class="mono">Gezählt in <code>marktbericht/backend/src/lib/register/*.json</code> am 30.08.2026.</p>
+
+<div class="kasten rot">
+<p><b>Daraus folgt eine Aussage, die auf die Preisseite gehört:</b> DealPilot rechnet dort, wo der
+Gutachterausschuss ausgewertet ist. <b>Vollständig ist das heute in Nordrhein-Westfalen</b>; für
+den Ertragswert reicht es auch in Niedersachsen und Hessen weit. <b>Ohne diese Angabe verkauft
+Pro ein Versprechen, das außerhalb NRWs nicht eingelöst werden kann.</b></p>
+<p>Der ehrliche Weg ist gleichzeitig der bequeme: <b>eine Adressprüfung vor dem Kauf.</b> Der
+Kunde gibt die Adresse ein und sieht, welche Stufen für dieses Objekt möglich sind — bevor er
+etwas bezahlt.</p>
+</div>
+
+<h2>3 · Die Pakete</h2>
+
+<div class="tarife">
+  <div class="tf">
+    <div class="tag">Einstieg · Testflug</div><div class="n">Free</div>
+    <div class="p">0 €</div><div class="alt">keine Kreditkarte nötig</div>
+    <div class="kont"><b>Enthalten pro Monat</b><div>1 × Einschätzung</div></div>
+    <ul><li>1 Objekt</li><li>DealPilot Score</li><li>PDFs mit Wasserzeichen</li></ul>
+  </div>
+  <div class="tf">
+    <div class="tag">Privat-Investor</div><div class="n">Starter</div>
+    <div class="p">19,99 €<s>statt 29</s></div><div class="alt">199 € / Jahr · 2 Monate frei</div>
+    <div class="kont"><b>Enthalten pro Monat</b><div><b>5 ×</b> Einschätzung</div></div>
+    <ul><li>Objekte bis zur Grenze</li><li>PDFs ohne Wasserzeichen</li><li>Werbungskosten-Modul</li><li>Exposé- und Excel-Import</li></ul>
+  </div>
+  <div class="tf best">
+    <span class="bs">★ Bestseller</span>
+    <div class="tag">Aktiver Investor</div><div class="n">Investor</div>
+    <div class="p">39,99 €<s>statt 59</s></div><div class="alt">399 € / Jahr · 2 Monate frei</div>
+    <div class="kont"><b>Enthalten pro Monat</b><div><b>5 ×</b> Einschätzung</div>
+      <div><b>5 ×</b> Marktpreisindikation <span class="fein">mit Dossier</span></div></div>
+    <ul><li>alles aus Starter</li><li><b>Co-Pilot</b></li><li>Investor Deal Score (24 KPIs)</li><li>Bankexport · Track-Record-PDF</li><li>Live-Marktzinsen</li></ul>
+  </div>
+  <div class="tf">
+    <div class="tag">Profi · Sachverständige</div><div class="n">Pro</div>
+    <div class="p">79,99 €<s>statt 99</s></div><div class="alt">799 € / Jahr · 2 Monate frei</div>
+    <div class="kont"><b>Enthalten pro Monat</b><div><b>5 ×</b> Einschätzung</div>
+      <div><b>5 ×</b> Marktpreisindikation</div>
+      <div><b>5 ×</b> Wertermittlung <span class="fein">ImmoWertV</span></div></div>
+    <ul><li>alles aus Investor</li><li><b>Kaufpreisaufteilung (BMF)</b></li><li>unbegrenzte Objekte</li><li>Whitelabel · eigenes Logo</li><li>Rohdaten- und JSON-Export</li></ul>
+  </div>
+</div>
+
+<div class="kasten gruen">
+<p><b>Das kostet fast nichts extra.</b> In Litern gerechnet: Starter 10 L (heute 10), Investor
+35 L (heute 40), Pro 95 L (heute 100). <b>Die Kontingente sind dieselbe Menge Leistung wie
+heute</b> — nur benannt statt gemessen.</p>
+</div>
+
+<h2>4 · Die Texte, die auf die Seiten gehören</h2>
+
+<div class="txt">
+  <div class="wo">Unter jedem Kontingent, klein</div>
+  <div class="zeile">Nicht verbrauchte Abrufe verfallen am Monatsende.</div>
+  <div class="fein">Kurz, klar, keine Überraschung. Wenn sie stattdessen verfallen sollen: siehe
+  Frage 2 unten.</div>
+</div>
+
+<div class="txt">
+  <div class="wo">Bei „Wertermittlung", als Fußnote</div>
+  <div class="zeile">Eine Wertermittlung entsteht nur mit vollständigen Angaben zum Objekt —
+  Grundstücksfläche, Wohneinheiten und je nach Objektart Miteigentumsanteil oder Standardstufe.
+  Fehlt eine davon, erscheint das Verfahren nicht.</div>
+  <div class="fein">Das ist wörtlich die Hausregel „kein Verfahren rechnet halb" — und sie schützt
+  vor der Erwartung, ein bezahltes Paket liefere den Verkehrswert auf Knopfdruck.</div>
+</div>
+
+<div class="txt">
+  <div class="wo">Bei „Wertermittlung", zweite Fußnote</div>
+  <div class="zeile">Boden-, Ertrags- und Sachwert werden nach ImmoWertV mit den Daten des
+  zuständigen Gutachterausschusses gerechnet. Wo für einen Kreis keine Daten ausgewertet sind,
+  wird kein Wert ausgewiesen — DealPilot rechnet nicht mit Nachbarkreisen oder Landesmitteln.
+  Vollständig verfügbar ist die Wertermittlung derzeit in Nordrhein-Westfalen.</div>
+  <div class="fein">Der letzte Satz ist der unbequeme. Er ist auch der, der einen Rückbucher
+  verhindert.</div>
+</div>
+
+<div class="txt">
+  <div class="wo">Über der Tarifreihe</div>
+  <div class="zeile">Jeder Plan enthält ein festes Kontingent an Bewertungen. Kein Guthaben, keine
+  Umrechnung — Sie sehen, was Sie bekommen.</div>
+  <div class="fein">Das ist die Antwort auf „wirkt undurchsichtig", in einem Satz.</div>
+</div>
+
+<div class="txt">
+  <div class="wo">Beim Nachkauf</div>
+  <div class="zeile">Bewertungen nachkaufen — einzeln oder im Paket. Keine Laufzeit, kein Abo.</div>
+</div>
+
+<h2>5 · Der Nachkauf: dieselben Pakete, nur in Euro</h2>
+<p>Marcels Vorgabe: <i>„Es kann ja optisch weiterhin so abgebildet werden, nur ohne Kerosin und
+zweite Währung."</i> Genau das — die vier Kacheln bleiben, die Reichweitentexte bleiben, nur die
+Einheit wechselt. <b>Statt „90 Liter" steht dort, wie viele Bewertungen drin sind.</b></p>
+
+<p class="mono">Grundlage: heutige Liter-Preise 0,156–0,20 €/L. Die Euro-Preise unten sind
+<b>rechnerisch abgeleitet</b>, nicht gesetzt — sie sollen zeigen, dass die Staffelung aufgeht.</p>
+
+<table>
+<tr><th>Paket</th><th>Einschätzungen</th><th>Marktpreis&shy;indikationen</th><th>Wertermittlungen</th><th class="z">heute in L</th><th class="z">Vorschlag</th><th>Reichweitentext</th></tr>
+<tr><td><b>Klein</b></td><td>5</td><td>2</td><td>—</td><td class="z">20 L</td><td class="z">4 €</td><td>Mal schnell prüfen</td></tr>
+<tr><td><b>Mittel</b></td><td>10</td><td>5</td><td>1</td><td class="z">57 L</td><td class="z">9 €</td><td>Mehrere Deals</td></tr>
+<tr><td><b>Groß</b> ★</td><td>15</td><td>10</td><td>3</td><td class="z">116 L</td><td class="z">18 €</td><td>Aktiver Investor</td></tr>
+<tr><td><b>Maximal</b></td><td>25</td><td>20</td><td>6</td><td class="z">222 L</td><td class="z">33 €</td><td>Maximale Reichweite</td></tr>
+</table>
+
+<div class="kasten">
+<p><b>Der bessere Weg wäre allerdings der Einzelkauf</b>, und zwar aus einem Grund, der nichts mit
+dem Preis zu tun hat: <b>ein Paket ist wieder ein Vorrat, den man nicht überblickt.</b> Genau
+davor warnt der Testbericht. Ein Kunde, dem eine Wertermittlung fehlt, will eine Wertermittlung
+kaufen — nicht ein Paket, aus dem er hinterher wieder Reste behält.</p>
+<p><b>Vorschlag: beides anbieten, den Einzelkauf zuerst.</b> „Diese Wertermittlung freischalten —
+2,40 €" direkt am gesperrten Knopf, und darunter klein „oder Paket kaufen". Die Paketkacheln
+bleiben für die, die vorsorgen wollen.</p>
+</div>
+
+<h2>6 · Was Marcel noch entscheiden muss</h2>
+
+<div class="frage"><b>1 · Wie viele Objekte hat Starter?</b> Heute 5. Bei 19,99 € statt 29 € ist
+das die Stellschraube, mit der sich der Preisverlust auffangen lässt — oder eben nicht.</div>
+
+<div class="frage"><b>2 · Verfallen nicht genutzte Abrufe?</b> Monatlich verfallen ist einfach zu
+erklären und rechnet sich für uns. Ansparen bindet den Kunden. <b>Nicht beides gleichzeitig,
+sonst ist es wieder ein Tank.</b></div>
+
+<div class="frage"><b>3 · Was passiert bei leerem Kontingent?</b> Einzelkauf (mein Vorschlag) oder
+Sperre mit Verweis auf das größere Paket.</div>
+
+<div class="frage"><b>4 · Was wird aus den acht KI-Einzelabrufen?</b> Pilot-Analyse, Lagebewertung,
+Spracheingabe, Beleg-Import, Bodenrichtwert, BMF-GAA, DS2-Vorschlag, Marktfelder — je 1 L
+(<code>routes/ai.js</code>, acht Stellen). Sie passen in keines der drei Kontingente.
+<b>Mein Vorschlag: im Plan enthalten, mit fairer Nutzung</b> — sie sind billig, und ein vierter
+Zähler wäre wieder eine Währung.</div>
+
+<div class="frage"><b>5 · Der Co-Pilot bekommt eine Sperre.</b> Er hat heute keine
+(<code>copilot.js</code> fragt <code>hasFeature</code> nirgends ab). Wenn er das
+Investor-Merkmal wird, sehen Free- und Starter-Kunden ihn künftig gesperrt, <b>die ihn heute
+benutzen</b>. Das ist eine Wegnahme — sie braucht eine Ankündigung.</div>
+
+</div>
+</body>
+</html>

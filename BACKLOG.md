@@ -202,15 +202,18 @@ entfällt — nicht raten.
 
 > ### Die Nummern sind am 30.08. neu durchgezählt
 >
-> Vier Punkte sind fertig geworden (die alten 4, 5, 10 und 11), vier neue
-> sind dazugekommen. Aus 1–11 mit Lücken wurde **1–12 ohne Lücke**.
+> Vier Punkte sind fertig geworden (die alten 4, 5, 10 und 11), **fünf** neue
+> sind dazugekommen. Aus 1–11 mit Lücken wurde **1–13 ohne Lücke**.
 >
 > | alt | neu | | alt | neu |
 > |---|---|---|---|---|
 > | 1 Tablet | **3** | | 7 Spracheingabe | **7** |
-> | 2 Handy-Befunde | **4** | | 8 Sachwertfaktor | **10** |
-> | 3 Marktbericht | **5** | | 9 Objektnummer-Kontrast | **11** |
-> | 6 Pläne durchtesten | **6** | | 10 Wallet am Handy | **12** |
+> | 2 Handy-Befunde | **4** | | 8 Sachwertfaktor | **11** |
+> | 3 Marktbericht | **5** | | 9 Objektnummer-Kontrast | **12** |
+> | 6 Pläne durchtesten | **6** | | 10 Wallet am Handy | **13** |
+>
+> Neu sind **1** (Preismodell), **2** (Preis-Einordnung), **8**
+> (Testbericht), **9** (Steuer-Mappe) und **10** (Cockpit-Kennzahlen).
 >
 > **In den Blöcken oben („Hier weitermachen", „Marcels Antworten") und unter
 > „Fertig" stehen weiter die ALTEN Nummern** — das sind Protokolle eines
@@ -227,6 +230,69 @@ entfällt — nicht raten.
    **Vorschlag steht: `design/Vorschläge/preismodell-2026.html`** — was heute
    gilt, fünf Befunde, drei Staffelungen zur Wahl, der Umbau in vier
    Schritten und sechs Fragen, die Marcel beantworten muss.
+
+   ### ENTSCHIEDEN am 2026-08-30: Variante A
+
+   **`design/Vorschläge/preispakete-variante-a.html`** — die Pakete
+   ausformuliert, mit den fertigen Texten für Landing und Pricing-Modal.
+
+   | | Free | Starter | Investor ★ | Pro |
+   |---|---|---|---|---|
+   | Preis | 0 € | **19,99 €** | **39,99 €** | **79,99 €** |
+   | heute | 0 € | 29 € | 59 € | 99 € |
+   | Einschätzung | 1 | 5 | 5 | 5 |
+   | Marktpreisindikation | — | — | 5 | 5 |
+   | Wertermittlung | — | — | — | 5 |
+   | dazu | | | Co-Pilot | Kaufpreisaufteilung |
+
+   **Marcels Zuschnitt, wörtlich:** Starter die *einfache
+   Marktpreisindikation*, ab Investor die *erweiterte Marktpreisbewertung mit
+   Marktbericht bzw. Dossier*, bei Pro *Verkehrswertermittlung, Ertragswert,
+   Sachwert nach ImmoWertV*. Dazu: *„da ist es aber wichtig zu sagen, dass es
+   verschiedene Stufen gibt, und wir müssen da ehrlich sein."*
+
+   ### Der Satz, an dem die Ehrlichkeit hängt — gemessen
+
+   **`wert_stufe` wird im Marktbericht-Dienst genau einmal entgegengenommen
+   (`ReportOrchestrator.js:125`) und danach nie wieder gelesen.** Die Stufe
+   schaltet also **keine Inhalte frei**. Was die Tiefe bestimmt, sind die
+   **Angaben**: `erreicht()` in `mb-stufen.js:120` rechnet die Stufe aus den
+   ausgefüllten Feldern, der Preis folgt ihr.
+
+   > **Man kauft keine Wertermittlung — man liefert die Daten, die eine
+   > möglich machen, und dann kostet sie mehr.** Genau so muss es auf der
+   > Preisseite stehen, sonst verspricht sie etwas, das durch Bezahlen nicht
+   > zu bekommen ist.
+
+   ### Die Reichweite, gezählt (`register/*.json`, 30.08.)
+
+   | Kennzahl | wofür | Einträge | wo |
+   |---|---|---|---|
+   | Liegenschaftszinssatz | **Ertragswert** | 1.078 | NRW 972 · NI 95 · HE 8 · TH/ST/BE je 1 |
+   | Sachwertfaktor | **marktangepasster Sachwert** | 52 | NRW 34 · TH 5 · BB 5 · NI 4 · BY 2 · ST 1 · BE 1 |
+   | Bodenpreisniveau | Bodenwert | 403 | nur NRW |
+   | Durchschnittspreise | **Stufe 1 und 2** | 601 | nur NRW |
+
+   **Vollständig ist das heute in Nordrhein-Westfalen.** Ohne diesen Satz
+   verkauft Pro ein Versprechen, das außerhalb NRWs nicht einzulösen ist.
+   Der ehrliche Weg ist zugleich der bequeme: **eine Adressprüfung vor dem
+   Kauf** — der Kunde sieht, welche Stufen für sein Objekt möglich sind,
+   bevor er zahlt.
+
+   ### Nachkauf: dieselben Kacheln, nur in Euro
+
+   Marcels Vorgabe: *„Es kann ja optisch weiterhin so abgebildet werden, nur
+   ohne Kerosin und zweite Währung."* Vier Pakete wie heute, Reichweitentexte
+   wie heute, Einheit „Bewertungen" statt „Liter". **Mein Gegenvorschlag im
+   Dokument: den Einzelkauf voranstellen** („Diese Wertermittlung freischalten
+   — 2,40 €" direkt am gesperrten Knopf). Ein Paket ist wieder ein Vorrat, den
+   man nicht überblickt — genau davor warnt der Testbericht.
+
+   ### Noch offen (fünf Fragen im Dokument)
+
+   Objektgrenze im Starter · verfallen Abrufe monatlich · leeres Kontingent:
+   Einzelkauf oder Sperre · die acht KI-Einzelabrufe · **die Co-Pilot-Sperre
+   ist eine Wegnahme** und braucht eine Ankündigung.
 
    ### Der Fund, der die Sache trägt
 
@@ -1126,7 +1192,68 @@ entfällt — nicht raten.
      interessiert zuerst der **Bestand** und was er prüft. *„Verloren würde
      ich vielleicht rausnehmen."*
 
-9. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
+9. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
+   **Marcels Auftrag vom 2026-08-30.** Heute gibt es das Finanzamt-PDF nur je
+   Objekt (Tab Steuer). Gewünscht: dieselbe Sache **über alle Objekte**, mit
+   Auswahl und Veranlagungsjahr. Dazu die Frage, ob sich die **Anlage V direkt
+   befüllen** lässt.
+
+   **Vorschlag steht: `design/Vorschläge/steuer-sammelpdf-anlage-v.html`.**
+
+   ### Gemessen im Browser und im Code
+
+   - **Das Portfolio-Cockpit hat keinen einzigen Export-Knopf.** Abschnitte:
+     Portfolio Score · Kennzahlen · Objekte · Geteilte Objekte · Projektion &
+     Verlauf · Gesamt-Projektion. Kein PDF, kein CSV.
+   - **Das heutige PDF ist inhaltlich schon eine Anlage-V-Zuarbeit** — Kopf
+     „Anlage V · § 21 EStG", sechs Abschnitte, Einnahmen in Kaltmiete und
+     Umlagen getrennt, Ergebnis, Steuerwirkung. **Es fehlen nur die
+     Zeilennummern.**
+   - **Der entscheidende Fund:** `GET /tax-records?from=&to=`
+     (`routes/taxRecords.js:72`) liefert **alle Steuersätze eines Nutzers über
+     alle Objekte**, nach Jahr gefiltert. Ein Satz trägt **jedes Feld**, das
+     das PDF druckt. **Das Sammel-PDF braucht also keine neue Datenhaltung und
+     kein Nachladen der Objekte** — es ist eine Schleife über vorhandene Sätze
+     und die vorhandene Seitenfunktion `_renderWerbungskostenPage`.
+   - **Einstellungen → Mandanten** ist der richtige Ort für den Halter-Filter:
+     dort hängt das Steuerregime (Privat über zvE, mit Steuerzeiträumen), und
+     „GuV/Bilanz-Export" ist dort schon als *in Vorbereitung* angekündigt.
+
+   ### Anlage V — drei Wege, einer geht
+
+   | | | |
+   |---|---|---|
+   | **A · Zuordnungsblatt** | unsere Zahlen mit der amtlichen Zeilennummer daneben | **geht sofort** |
+   | **B · amtliches PDF befüllen** | Formularfelder setzen | machbar, Feldnamen ändern sich jährlich |
+   | **C · an ELSTER übermitteln** | Einreichung | nach meinem Kenntnisstand nur über das zertifizierte ERiC-Modul — **nichts, was ich ohne eigene Prüfung zusagen würde** |
+
+   **Empfehlung: Weg A**, als Teil der Mappe. 90 % des Nutzens für 5 % des
+   Aufwands, und er kann nichts falsch übermitteln.
+
+   > **Die Zeilennummern werden NICHT geraten.** Sie ändern sich je
+   > Veranlagungsjahr. Die Zuordnung wird je Jahr aus dem **amtlichen
+   > Formular** abgeschrieben, versioniert abgelegt und dagegen geprüft — und
+   > ohne hinterlegte Zuordnung erscheint das Blatt **nicht**, statt mit den
+   > Zahlen des Vorjahres zu raten. Dasselbe Prinzip wie bei der
+   > Wertermittlung.
+
+   ### Was in den Daten fehlt
+
+   Finanzamt · Steuer-Identifikationsnummer (etwas anderes als die vorhandene
+   Steuernummer) · Einheitswert-Aktenzeichen · **Eigentumsanteil der Person**
+   (nicht zu verwechseln mit `mea`, dem Miteigentumsanteil am
+   Gemeinschaftseigentum) · verbilligte Überlassung · Ferienwohnung.
+
+   > **Ein Nebenfund mit eigenem Wert:** die **66-%-Grenze** des § 21 Abs. 2
+   > EStG ist dieselbe Art Falle wie die 15-%-Grenze, für die es schon einen
+   > Live-Balken gibt. **DealPilot kennt Ist-Miete und Marktmiete bereits** —
+   > es könnte von selbst warnen. Kleine Rechnung, große Wirkung.
+
+   **Offene Frage an Marcel:** Sammel-PDF **je Halter** getrennt (privat /
+   GmbH) oder alles in eine Mappe? Steuerlich sind es zwei Erklärungen — ich
+   würde trennen, aber das ist eine fachliche Frage.
+
+10. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
    Ebenfalls aus `design/mockups/Anmerkungen.docx`, aber ein eigener Punkt —
    es ist **Neubau, keine Nachbesserung**, und der letzte Teil ist der
    einzige Vorschlag im ganzen Bericht, den der Tester selbst als **USP**
@@ -1153,7 +1280,7 @@ entfällt — nicht raten.
    > **Erst entscheiden, ob das zum USP werden soll**, dann bauen. Hängt
    > unmittelbar an der USP-Frage aus Punkt 8.
 
-10. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+11. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > ## 🔒 AUSGELAGERT — Marcel bearbeitet diesen Punkt an anderer Stelle
@@ -1273,7 +1400,7 @@ entfällt — nicht raten.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-11. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+12. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -1371,7 +1498,7 @@ entfällt — nicht raten.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-12. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
+13. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
    **Neu gefunden beim `v1173`-Messlauf, 2026-08-30** — nicht dadurch
    verursacht, `.sbc-actions` und `.sbc-score-overlay` sind absolut
    positioniert und vom Raster unabhängig.
