@@ -28,11 +28,24 @@
   if (window.DealPilotMbStufen) return;
 
   var VOLLPREIS = { 1: 2, 2: 5, 3: 12 };
-  var NAMEN = { 1: 'Einschätzung', 2: 'Marktpreisindikation', 3: 'Wertermittlung' };
+  /* ── v1177 · Die Namen, die auch auf der Preisseite stehen ──────────────
+     Marcels Korrektur vom 30.08.: die erste Stufe IST schon eine
+     Marktpreisindikation — „Einschätzung" sagte nichts und verschenkte den
+     Begriff an Stufe 2.
+
+     Stufe 2 heisst bewusst NICHT „erweiterte Wertermittlung": sie fuehrt
+     kein Verfahren nach ImmoWertV aus, sondern verengt die Spanne. Wer
+     „Wertermittlung" liest, erwartet einen Verkehrswert — den gibt es erst
+     auf Stufe 3. */
+  var NAMEN = {
+    1: 'Marktpreisindikation',
+    2: 'Erweiterte Marktpreisindikation',
+    3: 'Wertermittlung nach ImmoWertV'
+  };
   var WAS = {
-    1: 'Lage und Marktpreisindikation.',
-    2: 'Zusätzlich Baustatus, Zustand und Qualität — deutlich engere Spanne.',
-    3: 'Zusätzlich Boden-, Ertrags- und Sachwert nach ImmoWertV, mit Rechenweg im PDF.'
+    1: 'Lage und Preisspanne aus den Daten des zuständigen Gutachterausschusses.',
+    2: 'Zusätzlich Baustatus, Zustand und Qualität — deutlich engere Spanne, mit Dossier zum Objekt.',
+    3: 'Zusätzlich Boden-, Ertrags- und Sachwert nach ImmoWertV, mit Rechenweg im PDF. Ersetzt kein Gutachten eines Sachverständigen.'
   };
   /* v1126d: Der fruehere FEHLT_TEXT ist raus. Er war eine zweite, von Hand
      gepflegte Liste derselben Pflichtangaben — und lief prompt auseinander.

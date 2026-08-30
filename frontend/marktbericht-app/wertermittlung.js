@@ -407,9 +407,12 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     d.className = 'wm-ziel'; d.id = 'wm-ziel';
     d.innerHTML =
       '<h4>Was soll der Bericht leisten?</h4>' +
-      opt(1, 'Schnelle Einschätzung', 'Lage und Marktpreisindikation. Wenige Angaben.') +
-      opt(2, 'Genaue Preisindikation', 'Zusätzlich Baustatus, Zustand und Qualität. Deutlich engere Spanne.') +
-      opt(3, 'Wertermittlung', 'Zusätzlich Bodenwert und Ertragswert nach ImmoWertV, mit Rechenweg im PDF.') +
+      /* v1177: dieselben drei Namen wie in mb-stufen.js und auf der
+         Preisseite. Drei Stellen, ein Wort — sonst heisst dasselbe Ding im
+         Werkzeug anders als im Tarif. */
+      opt(1, 'Marktpreisindikation', 'Lage und Preisspanne. Wenige Angaben.') +
+      opt(2, 'Erweiterte Marktpreisindikation', 'Zusätzlich Baustatus, Zustand und Qualität. Deutlich engere Spanne.') +
+      opt(3, 'Wertermittlung nach ImmoWertV', 'Zusätzlich Bodenwert und Ertragswert nach ImmoWertV, mit Rechenweg im PDF. Ersetzt kein Gutachten.') +
       '<div style="margin-top:8px;font-size:11px;color:#7a7a84">Du kannst jederzeit hochschalten — Eingetragenes bleibt erhalten.</div>';
     wo.insertBefore(d, wo.firstChild);
     d.querySelectorAll('.wm-opt').forEach(function (o) {

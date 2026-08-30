@@ -29,7 +29,10 @@
       '<div class="dp-cp-head">' +
         '<span class="dp-cp-ic">' + PLANE + '</span>' +
         '<div class="dp-cp-tt"><span class="dp-cp-t">Co-Pilot</span><span class="dp-cp-s">KI-Assistent zu diesem Deal</span></div>' +
-        '<span class="dp-cp-badge">kostet kein Kerosin</span>' +
+        /* v1178: die Pille sagt jetzt, was noch geht — Kerosin gibt es
+           nicht mehr, und ein Kontingent, das man nicht sieht, ist genau
+           die Blackbox, die der Testbericht bemaengelt. */
+        '<span class="dp-cp-badge" id="dp-cp-rest">' + cpBadgeText() + '</span>' +
         '<label class="dp-cp-web" title="Erlaubt dem Co-Pilot, fuer aktuelle Marktdaten im Web zu recherchieren"><input type="checkbox" id="dp-cp-web"><span>Web-Recherche</span></label>' +
       '</div>' +
       '<div class="dp-cp-log" id="dp-cp-log">' +
@@ -81,11 +84,66 @@
     return extra;
   }
 
+  /* ── v1178 · Der Co-Pilot bekommt eine Grenze, kein Schloss ─────────────
+     BEFUND: bis hierher fragte diese Datei `hasFeature` an KEINER Stelle ab
+     — der Co-Pilot war fuer Free genauso offen wie fuer Pro. Marcels Frage
+     war „rausnehmen oder je Plan ausblenden".
+
+     Weg d aus dem Konzept: sichtbar lassen, aber begrenzen. Ihn zu
+     entfernen waere eine Wegnahme bei Leuten, die ihn heute benutzen; ein
+     blosses Schloss verkauft nichts, ein fuenfmal benutztes Werkzeug schon.
+
+     Der Zaehler steht bewusst im Frontend und ist damit umgehbar. Das ist
+     hier vertretbar und wird nicht verschwiegen: der Endpunkt ist
+     server-seitig ohnehin mengenbegrenzt, es fliesst kein Kerosin, und die
+     harte Durchsetzung gehoert an denselben Ort wie die der anderen Gates.
+     Ein Frontend-Zaehler, der ehrlich benannt ist, ist besser als gar
+     keiner — aber er ist keine Abrechnungsgrenze. */
+  var CP_FREI = 5;                       /* Fragen je Monat fuer free/starter */
+  var CP_KEY  = 'dp_cp_verbrauch';
+
+  function cpMonat() { var d = new Date(); return d.getUTCFullYear() + '-' + (d.getUTCMonth() + 1); }
+  function cpStand() {
+    try {
+      var r = JSON.parse(localStorage.getItem(CP_KEY) || '{}');
+      return (r && r.m === cpMonat()) ? (r.n || 0) : 0;
+    } catch (e) { return 0; }
+  }
+  function cpZaehlen() {
+    try { localStorage.setItem(CP_KEY, JSON.stringify({ m: cpMonat(), n: cpStand() + 1 })); } catch (e) {}
+  }
+  /* Voll ab Investor. Unbekannter Plan = begrenzt, nicht offen — ein
+     stiller Rueckfall auf „alles frei" waere die falsche Richtung. */
+  function cpVoll() {
+    try {
+      var k = DealPilotConfig.pricing.currentKey();
+      return k === 'investor' || k === 'pro' || k === 'partner';
+    } catch (e) { return false; }
+  }
+  function cpRest() { return cpVoll() ? Infinity : Math.max(0, CP_FREI - cpStand()); }
+  function cpBadgeText() {
+    if (cpVoll()) return 'unbegrenzt';
+    var r = cpRest();
+    return r + ' von ' + CP_FREI + ' Fragen frei';
+  }
+  function cpBadgeZiehen() {
+    var b = el('dp-cp-rest');
+    if (b) b.textContent = cpBadgeText();
+  }
+
   function send() {
     if (busy) return;
     var inp = el('dp-cp-in');
     var msg = (inp && inp.value || '').trim();
     if (!msg) return;
+    if (cpRest() <= 0) {
+      addMsg('assistant', 'Deine ' + CP_FREI + ' Co-Pilot-Fragen für diesen Monat sind aufgebraucht. '
+        + 'Ab dem Investor-Plan fragst du so oft du willst — am 1. des nächsten Monats sind '
+        + 'wieder ' + CP_FREI + ' frei.');
+      try { if (typeof openPricingModal === 'function') setTimeout(openPricingModal, 900); } catch (e) {}
+      return;
+    }
+    if (!cpVoll()) { cpZaehlen(); cpBadgeZiehen(); }
     if (inp) inp.value = '';
     addMsg('user', msg);
     history.push({ role: 'user', content: msg });

@@ -2339,10 +2339,15 @@ function _dpModalCss(){
 }
 
 async function showBankexportView() {
-  // V63.82: Plan-Gate — Bankexport ist Investor+ (Starter hat ihn nicht; Free nur mit Wasserzeichen)
+  /* ── v1178 · Das Leck, das seit dem Plan-Prüflauf im Backlog stand ──────
+     Die Sperre prüfte nur auf 'starter'. **Free rutschte durch** — mit
+     Wasserzeichen, aber durch. Die Funktionsübersicht sagt für Free und
+     Starter beide „–"; die Matrix hatte also immer recht, der Code nicht.
+     Track-Record bleibt unverändert: dort sagt die Matrix für Free
+     ausdrücklich „Wasserzeichen", und der Code tut genau das. */
   if (typeof Plan !== 'undefined') {
     var k = Plan.key();
-    if (k === 'starter') {
+    if (k === 'starter' || k === 'free') {
       if (typeof toast === 'function') toast('🔒 Bankexport ist im Investor-Plan enthalten');
       if (typeof openPricingModal === 'function') setTimeout(openPricingModal, 600);
       return;

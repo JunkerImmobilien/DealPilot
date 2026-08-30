@@ -58,11 +58,24 @@ if (!window._wlc) {
   function priceClass(mw) {
     var kp = KP();
     if (!kp || !mw) return ['\u2013', '#7A7370'];
+    /* \u2500\u2500 v1178 \u00b7 Das Vorzeichen war vertauscht \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+       BEFUND aus dem Testbericht vom 30.08., im Code nachgepr\u00fcft:
+       Expos\u00e9-Preis 129.000 \u20ac, Marktwert 177.000 \u20ac \u2192 d = +37 %, und die App
+       schrieb \u201eDeutlich \u00fcber Markt" in Rot.
+
+       `d` misst, wie weit der MARKTWERT \u00fcber dem KAUFPREIS liegt. Ein
+       positives d heisst also: der K\u00e4ufer zahlt UNTER Markt \u2014 ein Vorteil.
+       Beschriftet wird aber der PREIS. Die beiden Enden geh\u00f6rten damit
+       genau andersherum.
+
+       Es widersprach sich sogar in derselben Tabelle: die Zeile
+       \u201evs. Kaufpreis" (unten, Z. 382) faerbt dasselbe Delta bei d >= 0
+       gruen, waehrend \u201eEinordnung" rot sagte. */
     var d = (mw - kp) / kp * 100;
-    if (d <= -10) return ['Deutlich unter Markt', '#2f8f57'];
-    if (d <= -3) return ['Unter Markt', '#2f8f57'];
-    if (d < 3) return ['Marktgerecht', 'var(--wl-9a7f33, #9a7f33)'];
-    if (d <= 10) return ['Leicht \u00fcber Markt', 'var(--wl-c08a2f, #c08a2f)'];
+    if (d >= 10) return ['Deutlich unter Markt', '#2f8f57'];
+    if (d >= 3) return ['Unter Markt', '#2f8f57'];
+    if (d > -3) return ['Marktgerecht', 'var(--wl-9a7f33, #9a7f33)'];
+    if (d >= -10) return ['Leicht \u00fcber Markt', 'var(--wl-c08a2f, #c08a2f)'];
     return ['Deutlich \u00fcber Markt', '#c0564f'];
   }
   function diffPct(mw) { var kp = KP(); return (kp && mw) ? ((mw - kp) / kp * 100) : null; }
