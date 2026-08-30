@@ -733,6 +733,16 @@ label.dp-required.qc-required::after {
         <span class="sb-act-ico" data-icon="settings"></span><span class="sb-act-l">Einstellungen</span>
       </button>
       <!-- v857: Hilfe aus Aktionen-Menue entfernt (weiterhin ueber Header + Settings erreichbar) -->
+      <!-- v1179 · Aus dem Testbericht: „Pop-Up mit Reisebegleiter, der dir die
+           wichtigsten Funktionen sofort erklaert … aktuell ist die Tour im
+           Hilfe-Bereich versteckt."
+           GEMESSEN: die Tour startet bereits von allein, aber GENAU EINMAL pro
+           Browser (tour-engine.js:1179, SEEN_KEY wird nie zurueckgesetzt) — und
+           danach war sie nur noch ueber die Hilfe zu finden. Es fehlte also
+           nicht die Tour, sondern der zweite Weg zu ihr. -->
+      <button class="sb-act-item" type="button" onclick="if(window.startTourFromSidebar)startTourFromSidebar();else if(window.startTour)startTour();">
+        <span class="sb-act-ico" data-icon="help"></span><span class="sb-act-l">Rundgang starten</span>
+      </button>
       <button class="sb-act-item sb-act-feedback" type="button" onclick="sbActionsAction('feedback')">
         <span class="sb-act-ico" data-icon="feedback"></span><span class="sb-act-l">Feedback &amp; Support</span>
       </button>
@@ -1374,11 +1384,11 @@ label.dp-required.qc-required::after {
           <div class="f"><label>Makler (€)</label><div class="iw"><span class="pfx">€</span><input id="makler_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('makler')"></div></div>
           <div class="f"><label>Notar (%) <button type="button" class="dp-tip" data-tip-id="tab2.notar" tabindex="-1" aria-label="Hilfe zu Notarkosten"></button></label><div class="iw"><input id="notar_p" type="text" inputmode="decimal" value="2.20" step="0.01" class="tr" oninput="syncCostPct('notar')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Notar (€)</label><div class="iw"><span class="pfx">€</span><input id="notar_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('notar')"></div></div>
-          <div class="f"><label>Grundbuchamt (%) <button type="button" class="dp-tip" data-tip-id="tab2.grundbuchamt" tabindex="-1" aria-label="Hilfe zu Grundbuchamt"></button></label><div class="iw"><input id="gba_p" type="text" inputmode="decimal" placeholder="0" step="0.01" class="tr" oninput="syncCostPct('gba')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Grundbuchamt (%) <button type="button" class="dp-tip" data-tip-id="tab2.grundbuchamt" tabindex="-1" aria-label="Hilfe zu Grundbuchamt"></button></label><div class="iw"><input id="gba_p" type="text" inputmode="decimal" placeholder="0,5" step="0.01" class="tr" oninput="syncCostPct('gba')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Grundbuchamt (€)</label><div class="iw"><span class="pfx">€</span><input id="gba_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gba')"></div></div>
           <div class="f"><label>Grunderwerbsteuer (%) <button type="button" class="dp-tip" data-tip-id="tab2.grunderwerbsteuer" tabindex="-1" aria-label="Hilfe zu Grunderwerbsteuer"></button></label><div class="iw"><input id="gest_p" type="text" inputmode="decimal" value="6.50" step="0.01" class="tr" oninput="syncCostPct('gest')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Grunderwerbsteuer (€)</label><div class="iw"><span class="pfx">€</span><input id="gest_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('gest')"></div></div>
-          <div class="f"><label>Sonstige (%)</label><div class="iw"><input id="ji_p" type="text" inputmode="decimal" value="0" step="0.01" class="tr" oninput="syncCostPct('ji')"><span class="sfx">%</span></div></div>
+          <div class="f"><label>Sonstige (%) <button type="button" class="dp-tip" data-tip-id="tab2.sonstige" tabindex="-1" aria-label="Hilfe zu Sonstige Kaufnebenkosten"></button></label><div class="iw"><input id="ji_p" title="Bausachverständiger, Anfahrt, Gutachten, Behördengebühren" type="text" inputmode="decimal" value="0" step="0.01" class="tr" oninput="syncCostPct('ji')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Sonstige (€)</label><div class="iw"><span class="pfx">€</span><input id="ji_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('ji')"></div></div>
         </div>
         <hr class="dvd">
@@ -1740,7 +1750,7 @@ label.dp-required.qc-required::after {
     <a href="#" class="v842-tax-link" onclick="window._v842OpenTaxPeriods();return false" style="color:var(--gold,#C9A84C);font-weight:600;text-decoration:underline;margin-left:4px">📅 Steuerzeiträume verwalten →</a> <!-- v842-tax-redirect --> <!-- V259-06 --> <!-- v1118b: Klasse nur als Angriffspunkt fuer die 44-px-Regel -->
   </div>
 </div>
-<div class="f"><label>zvE vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="if(window.DealPilotZvE)DealPilotZvE.onObjectInput(this.value);calc()"></div></div>
+<div class="f"><label>Zu versteuerndes Einkommen (zvE) vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="if(window.DealPilotZvE)DealPilotZvE.onObjectInput(this.value);calc()"></div></div>
       <div class="f"><label>Persönl. Grenzsteuersatz (%) <button type="button" class="dp-tip" data-tip-id="tab4.grenzsteuersatz" tabindex="-1" aria-label="Hilfe zu tab4.grenzsteuersatz"></button></label><div class="iw"><input id="grenz" type="text" inputmode="decimal" placeholder="42.00" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
     </div>
     <div class="f checkbox-row">
@@ -3121,7 +3131,7 @@ label.dp-required.qc-required::after {
 <script src="js/dealscore.js?v=463"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
 <script src="js/datenraum.js?v=889"></script>
-<script src="js/tooltip-content.js?v=738"></script>
+<script src="js/tooltip-content.js?v=v1179"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=839"></script>
   <script src="js/immometrica-qc.js?v=672"></script>
@@ -3146,7 +3156,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=974"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1178"></script>
+<script src="js/storage.js?v=v1179"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>

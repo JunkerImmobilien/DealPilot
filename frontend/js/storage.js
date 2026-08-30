@@ -959,7 +959,7 @@ async function renderSaved(opts) {
     // V63.25: Hinweis "DS2 ergänzen" wenn der Plan das Feature hat aber dieses
     // Objekt es noch nicht berechnet hat (= Upgrade-Pfad sichtbar).
     var ds2HintBadge = opts.canDs2 && !opts.showInvestor ?
-      '<div class="sbc-ds2-hint" title="Dein Plan kann den Investor Deal Score — fülle die DS2-Felder aus, um diesen Deal zu vervollständigen.">⚡ DS2</div>' : '';
+      '<div class="sbc-ds2-hint" title="DS2 = Investor Deal Score 2.0 — die Bewertung aus 24 Kennzahlen. Dein Plan kann ihn: fülle die fehlenden Felder aus, dann wird er für dieses Objekt gerechnet.">⚡ DS2</div>' : '';
 
     // V30: Mit Foto → reines Bild (kein Icon-Overlay).
     //      Ohne Foto → Haus-Icon als Platzhalter.

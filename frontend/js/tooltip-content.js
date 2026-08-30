@@ -144,6 +144,19 @@
       paragraph: 'GNotKG',
       severity: 'beginner'
     },
+    /* v1179 · Aus dem Testbericht: „Was ist ‚Sonstiges' mit 1,5 %? Du meinst
+       wahrscheinlich einen Bausachverständigen, Anfahrt etc. — das würde ich
+       hier dann auch vermerken und nicht als Standard 1,5 % drin haben."
+       Der Wert bleibt als Vorschlag stehen, aber er sagt jetzt, wofür. */
+    'tab2.sonstige': {
+      title: 'Sonstige Kaufnebenkosten',
+      body: 'Alles, was neben Notar, Grunderwerbsteuer, Grundbuchamt und Makler anfällt: '
+        + 'Bausachverständiger für die Kaufprüfung, Anfahrten zu Besichtigungen, '
+        + 'Behördengebühren, Kopien aus der Teilungserklärung. '
+        + 'Der Vorschlag von 1,5 % ist eine Faustzahl — wer seine echten Positionen kennt, '
+        + 'trägt sie ein.',
+      severity: 'beginner'
+    },
     'tab2.grundbuchamt': {
       title: 'Grundbuchamt',
       body: 'Eintragungsgebühren beim Grundbuchamt — typisch 0,5-1,0% des Kaufpreises. Inkludiert: Auflassungsvormerkung, Eigentumsumschreibung, Eintragung der Grundschuld (falls Finanzierung).',
