@@ -158,7 +158,7 @@
              \u201e19.99" mit Punkt da. data-m/data-y bleiben maschinenlesbar. */
           '<div class="tk-price" data-m="'+(p.price_monthly||0)+'" data-y="'+(p.price_yearly||0)+'"><b>'+_pnum(p.price_monthly||0)+'</b><span class="cur">\u20ac</span>'+(p.price_monthly>0?'<span class="per">/ Monat</span>':'')+'</div>'+
           '<div class="tk-note">'+_esc(note)+'</div>'+
-          '<div class="tk-ker"><span>\u25f7</span>'+_kontSumme(p.key)+'&nbsp;Bewertungen&nbsp;/&nbsp;Monat</div>'+
+          '<div class="tk-ker"><span>\u25f7</span>'+_kontSumme(p.key)+'&nbsp;'+(_kontSumme(p.key)===1?'Bewertung':'Bewertungen')+'&nbsp;/&nbsp;Monat</div>'+
           '<ul class="tk-feat">'+feats.map(function(f){return '<li>'+_esc(f)+'</li>';}).join('')+'</ul>'+
           (p.key===_cur?'<a class="tk-cta tk-cta-cur" href="#" data-plan="'+p.key+'">\u2713 Dein aktueller Plan</a>':'<a class="tk-cta" href="#" data-plan="'+p.key+'">'+_esc(p.ctaText||((p.title||p.label)+' w\u00e4hlen'))+'</a>')+
           '<div class="tk-rip"><span class="bar"></span><span class="bp-txt">\u2708 Boarding Pass \u00b7 DP-0'+(i+1)+'</span></div>'+
@@ -377,8 +377,11 @@
     Array.prototype.forEach.call(host.querySelectorAll('.ppg .tk-price'),function(pr){
       var m=pr.getAttribute('data-m'),y=pr.getAttribute('data-y');
       var b=pr.querySelector('b'),per=pr.querySelector('.per');
-      if(period==='yearly'&&y&&(+y)>0){ if(b)b.textContent=y; if(per)per.textContent='/ Jahr'; }
-      else { if(b)b.textContent=m; if(per)per.textContent=((+m)>0?'/ Monat':''); }
+      /* v1176b: derselbe Formatierer wie beim Aufbau. Diese Funktion laeuft
+         direkt nach _mountPlanCards und ueberschrieb die formatierte Zahl
+         mit dem rohen Attributwert — „19.99" statt „19,99". */
+      if(period==='yearly'&&y&&(+y)>0){ if(b)b.textContent=_pnum(+y); if(per)per.textContent='/ Jahr'; }
+      else { if(b)b.textContent=_pnum(+m); if(per)per.textContent=((+m)>0?'/ Monat':''); }
     });
   }
   function _mountPlanCards(){
