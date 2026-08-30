@@ -642,75 +642,6 @@ entfällt — nicht raten.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-4. **Akzentfarbe: zu wenig Auswahl, und der Block färbt sich selbst mit**
-
-   Zwei Befunde an einer Stelle, aber **nur einer davon ist ein Defekt**.
-
-   **Der Defekt: der Darstellungs-Block nimmt die gewählte Farbe selbst an.**
-   Wählt Marcel Grün, wird das Gold am Kopf des Akzent-Bereichs mit grün.
-   **Das darf im Einstellblock nicht passieren** — wer eine Farbe *auswählt*,
-   braucht eine neutrale Umgebung, sonst beurteilt er die Farbe gegen sich
-   selbst. Die Bedienoberfläche ist kein Vorschaufeld.
-
-   Vor dem Patch messen, welche Regel greift: die `--wl-`Tokens werden
-   ausschließlich von `whitelabel-override.js` gesetzt (`setWlTokens` in
-   `apply()`), und der Block hängt vermutlich an denselben Tokens wie die App.
-   **Die Lösung ist ein eigener Satz fester Töne für das Panel**, nicht ein
-   Ausschalten der Vorschau — die Vorschauflächen *sollen* mitgehen, der
-   Rahmen darum nicht. Beide Bereiche also sauber trennen.
-
-   **Der Ausbau: sechs Farben reichen nicht.** Marcel will aus einer Palette
-   wählen können. Zu entscheiden ist, **welcher Art**:
-
-   | | |
-   |---|---|
-   | **freier Farbwähler** (`<input type=color>`) | jede Farbe, keine Kuratierung |
-   | **erweiterte Palette** | z. B. 24 abgestimmte Töne, alle geprüft |
-   | **beides** | Palette als Vorschlag, freier Wähler daneben |
-
-   ~~**Das ist eine Produktentscheidung, keine technische.** Sie hat eine
-   gemessene Folge: `_recolor` rechnet HSL-relativ, und vier der 66 WL_TINTS
-   reißen schon heute bei einem extrem hellen Akzent (`#F0D000`: k =
-   2,57–2,98). Dann muss der Tint-Weg vorher eine Mindestkontrast-Regel
-   bekommen.~~
-
-   ### Stand 2026-08-30 — der freie Wähler ist gebaut, die Töne warten auf Marcel
-
-   **Marcels Entscheidung vom 14.08. war „beides".** Der freie Wähler ist
-   damit keine offene Frage mehr, sondern Auftrag — und **ausgeliefert mit
-   `v1174`** (`8e95bf5`, siehe „Fertig"). Offen ist nur noch **welche
-   Töne**, und dafür steht jetzt eine Demo:
-   **`design/Vorschläge/akzent-waermer.html`** — drei Fassungen zu je sechs
-   Tönen, anklickbar, mit zwei Bühnen (Obsidian und Creme). Alle Zahlen darin
-   sind Messwerte aus der laufenden App.
-
-   **Drei Befunde aus dem Messlauf, zwei davon nehmen etwas zurück:**
-
-   1. **Einen freien Akzentwähler gab es hier nie.** Der Punkt oben nimmt an,
-      es gäbe einen. Im Panel standen sechs feste Kacheln; die sechs
-      `<input type=color>` dort gehören den **Bereichsfarben**. Der einzige
-      freie Wähler saß im **Reseller-Portal**
-      (`branding-darstellung.js:114`) und setzt die **Partner-Marke** für
-      deren Mandanten — andere Bühne, anderer Zweck.
-   2. **Die Mindestkontrast-Regel ist seit `v1109` gebaut**
-      (`whitelabel-override.js:128`). Nachgemessen mit genau dem Extremfall
-      `#F0D000`: schwächster Textton **3,84**, keiner unter 3. **Die Zahlen
-      2,57–2,98 oben stammen von vor v1109.** Die Voraussetzung ist erfüllt,
-      nicht offen — der Später-Punkt dazu ist keine Sperre mehr.
-   3. **Rücknahme einer eigenen Zwischenannahme:** der rohe Akzent erreicht
-      auf Obsidian bei Blau 2,35, Weinrot 2,21, Schiefer 2,01 — danach sah es
-      aus, als seien drei der sechs auf der dunklen App unlesbar. **Auf der
-      dunklen Fläche landet aber nicht der rohe Akzent**, sondern ein
-      aufgehellter Ton. An `.sb-section-title` gemessen: **5,48 bis 9,58 über
-      alle sechs.** Es ist kein Kontrastmangel. **Wärmer wird gewählt, weil es
-      besser aussieht — nicht, weil etwas kaputt ist.**
-
-   **Was Marcel entscheiden muss:** eine der drei Fassungen (Empfehlung: C,
-   warm und in der Helligkeit des Haus-Golds) — und die eine Frage, die in
-   der Demo unten steht: **Fassung C hat keine kühle Kachel mehr.** Bleibt
-   die Schnellauswahl die kuratierte warme Liste, und alles Kühle kommt über
-   den freien Wähler? Oder soll eine kühle Kachel bleiben?
-
 5. **Hell und Dunkel als zwei Profile, Dunkel als Auslieferungszustand**
 
    > **ERLEDIGT — `v1162`/`v1162b` (`381e678`) und `v1167` (`c1d572b`),
@@ -1300,15 +1231,26 @@ entfällt — nicht raten.
    auf verschiedene Kartenhälften. Vorschlag zuerst nach
    `design/Vorschläge/`.
 
-> **Punkt 11 (Wallet-Abstände) ist erledigt** — `v1173`/`v1173b`, siehe
-> „Fertig". Der Kartenbereich bleibt trotzdem mit **Punkt 4** verklammert:
-> dort steht dieselbe Karte. Wer Punkt 4 aufgreift, misst die Abstände
-> einmal nach.
+> ### Drei Punkte sind seit dem 30.08. zu — hier stehen nur noch die Zeiger
 >
-> **Der alte Punkt 10 (Sachwert und Miteigentumsanteil) ist ebenfalls
-> erledigt** — Marcel hat am 14.08. **Weg A** entschieden (Garagenfeld
-> bleibt wohnungsbezogen), `v1165` und `v1166` setzen genau das um. Der
-> volle Befund steht unter „Fertig".
+> **Punkt 4 (Akzentfarbe) ist erledigt** — `v1174` (freier Farbwähler) und
+> `v1175` (Fassung C + Farbton-Regler). Marcel hat aus
+> `design/Vorschläge/akzent-waermer.html` **Fassung C** gewählt; die
+> Schnellauswahl ist damit die kuratierte warme Liste, alles Kühle kommt
+> über Regler oder Farbkasten. Der Später-Punkt „Mindestkontrast-Regel"
+> ist **keine Voraussetzung mehr** — sie steht seit `v1109`.
+>
+> **Punkt 11 (Wallet-Abstände) ist erledigt** — `v1173`/`v1173b`. Der
+> Kartenbereich war mit Punkt 4 verklammert; beide sind jetzt zu.
+>
+> **Der alte Punkt 10 (Sachwert und Miteigentumsanteil) ist erledigt** —
+> Marcel hat am 14.08. **Weg A** entschieden (Garagenfeld bleibt
+> wohnungsbezogen), `v1165` und `v1166` setzen genau das um.
+>
+> **Die Nummern sind dadurch lückig** (1, 2, 3, 5, 6, 7, 8, 9, 10). Sie
+> werden **beim nächsten Aufräumen** durchgezählt, nicht nebenbei: die
+> Punkte verweisen quer aufeinander, und ein halb gezogenes Umnummerieren
+> ist schlimmer als eine Lücke.
 
 ## Später
 
@@ -1461,8 +1403,49 @@ entfällt — nicht raten.
 
 ## Fertig
 
+- [2026-08-30] **Akzentfarbe: Fassung C und ein freier Farbton-Regler** — `v1175`, `3f4a6cc`.
+   Damit ist **Punkt 4 vollständig**. Marcels Wahl aus der Demo: **Fassung C.**
+   Dazu sein Nachtrag: *„können wir einen freien Farbregler auch dazu setzen?"*
+
+   **Die Schnellauswahl ist ab jetzt die kuratierte warme Liste** — Gold,
+   Karamell, Kupfer, Ziegel, Moos hell, Sand. Blau, Petrol und Schiefer
+   fallen weg; **alles Kühle kommt über den Regler oder den Farbkasten.**
+   Nachgewiesen, dass das trägt: der Regler auf 200° ergibt `#3F8EB5`, ein
+   sauberes Blau.
+
+   **Der Regler dreht nur den Farbton.** Sättigung und Helligkeit kommen aus
+   dem Ton, der gerade gilt — sonst wäre ein Zug am Regler ein Sprung in eine
+   fremde Farbe. Zwei Grenzen, damit jede Stellung auch etwas ergibt, beide
+   nachgemessen:
+
+   | Ausgangston | Regler | Ergebnis | warum |
+   |---|---|---|---|
+   | `#4A443C` fast grau | 120° | `#267326` | ohne Boden bei S 0,50 hätte sich **nichts** bewegt |
+   | `#FDFCFA` fast weiß | 300° | `#C875C8` | Deckel L 0,62 — darüber verschwindet ein Akzent |
+   | `#080706` fast schwarz | 300° | `#732673` | Boden L 0,30 |
+
+   **Alle drei Bedienelemente gehen durch eine Funktion** (`akzentSetzen`).
+   Drei Wege mit je eigener Nachzieh-Logik wären genau die Konstellation, in
+   der einer den anderen nicht mitbekommt. Ausgelassen wird nur das Element,
+   an dem gerade gezogen wird — ihm den Wert zurückzuschreiben lässt den
+   Regler springen. Über den Bedienweg in allen Richtungen geprüft:
+
+   | Schritt | Kachel | Regler | Farbkasten |
+   |---|---|---|---|
+   | Kachel Ziegel | Ziegel an | springt auf 18° | `#b5633f` |
+   | Regler auf 200° | keine | 200 | `#3f8eb5`, markiert |
+   | Farbkasten auf Moos hell | **Moos hell an** | 69° | `#8e9a4e` |
+   | Zurücksetzen | Gold an | 44° | `#c9a84c` |
+
+   > **Was den freien Wähler ungefährlich macht, gemessen:** selbst mit
+   > `#FFFFFF` als Akzent landet der dunkle Textton bei **3,81** auf der
+   > Karte und **20,38** auf Obsidian; mit `#F0D000` bei 3,62 / 13,75. Die
+   > `v1109`-Regel greift also auch im Unsinnsfall. **Der Regler braucht
+   > seine Grenzen trotzdem** — nicht wegen des Kontrasts, sondern damit er
+   > sich beim Ziehen überhaupt sichtbar verhält.
+
 - [2026-08-30] **Freier Akzentwähler im Darstellungs-Panel** — `v1174`, `8e95bf5`.
-   Der zweite Teil von **Punkt 4**; die Tonwahl bleibt dort offen.
+   Der zweite Teil von **Punkt 4**; die Tonwahl war da noch offen.
 
    **Er musste gebaut werden, weil es hier keinen gab** — der Backlog nahm
    an, es gäbe einen. Im Panel standen sechs feste Kacheln
