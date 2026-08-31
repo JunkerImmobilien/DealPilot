@@ -1049,7 +1049,7 @@
         });
     }).catch(function (err) {
       if (err && err.needs_credits) {
-        toast('Spracheingabe gerade nicht verfuegbar');
+        toast('Spracheingabe gerade nicht verf00fcgbar');
         try { if (typeof window.showSettings === 'function') window.showSettings('plan'); } catch (e) {}
       } else {
         toast('Sprachauswertung fehlgeschlagen: ' + ((err && err.message) || err));

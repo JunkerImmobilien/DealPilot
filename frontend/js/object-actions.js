@@ -434,7 +434,7 @@
     ov.innerHTML =
       '<div class="v754-modal" role="dialog" aria-modal="true">' +
         '<div class="v754-hero"><span class="bp">BOARDING PASS \u00b7 DEALPILOT</span><h3>Abruf best\u00e4tigen</h3></div>' +
-        '<div class="v754-body">Fuer diesen Abruf wird dein Kontingent belastet:' +
+        '<div class="v754-body">F00fcr diesen Abruf wird dein Kontingent belastet:' +
           '<div class="v754-cost">' + parts + (costing.length > 1 ? ' &nbsp;=&nbsp; <b>' + total + '\u00a0L</b> gesamt' : '') + '</div>' +
           'M\u00f6chtest du fortfahren?' +
           '<label style="display:flex;align-items:center;gap:7px;margin-top:12px;font-size:12.5px;color:#6b6660;cursor:pointer">' +

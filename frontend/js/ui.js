@@ -2057,7 +2057,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       labels: mets.reduce(function (a, m) { a[m.key] = m.label; return a; }, {}) };
     Auth.apiCall('/marktbericht/verlauf-text', { method: 'POST', body: payload })
       .then(function (data) {
-        if (data && data.needs_credits) { out.innerHTML = '<span class="dpv-err">Gerade nicht verfuegbar.</span>'; return; }
+        if (data && data.needs_credits) { out.innerHTML = '<span class="dpv-err">Gerade nicht verf00fcgbar.</span>'; return; }
         var t = (data && (data.text || data.report_md)) || '';
         out.innerHTML = t ? _dpVEscP(t) : '<span class="dpv-err">Kein Text erhalten.</span>';
         if (t) { btn.style.display = 'none'; }

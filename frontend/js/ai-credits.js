@@ -55,6 +55,17 @@
     return ARTEN.reduce(function (n, a) { return n + _rest(s, a.key); }, 0);
   }
 
+  /* Das Backend liefert das Datum als ISO (2026-10-01). So gehoert es in
+     eine API, aber nicht auf den Schirm — hier steht 01.10.2026.
+     Kein Intl.DateTimeFormat: die Jahreszahl darf nicht durch einen
+     Zahlenformatierer laufen (FALLEN.md), und ein fester Aufbau ist hier
+     ohnehin eindeutiger als eine Gebietsschema-Abhaengigkeit. */
+  function _datum(iso) {
+    if (!iso) return '1. des Monats';
+    var m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? (m[3] + '.' + m[2] + '.' + m[1]) : String(iso);
+  }
+
   async function refresh(force) {
     if (!force && _cache && (Date.now() - _lastFetch) < CACHE_TTL) {
       return _cache;
@@ -146,7 +157,7 @@
                 '</div>';
     }
 
-    var fuss = 'Zuruecksetzung am ' + (s.period_reset_at || '1. des Monats') + '. ' +
+    var fuss = 'Zurücksetzung am ' + _datum(s.period_reset_at) + '. ' +
                'Nicht genutzte Bewertungen verfallen nicht.';
 
     return '<div class="dp-kg-panel" role="tooltip">' +
@@ -192,7 +203,7 @@
        wo :hover nicht greift. */
     pill.title = 'Dein Kontingent\n' + ARTEN.map(function (a) {
       return '  ' + a.name + ': ' + _rest(s, a.key);
-    }).join('\n') + '\nZuruecksetzung am ' + (s.period_reset_at || '1. des Monats');
+    }).join('\n') + '\nZurücksetzung am ' + _datum(s.period_reset_at);
   }
 
   // Render der Kontingent-Box im Einstellungen-Reiter „Plan"
@@ -209,7 +220,7 @@
           refresh(false).then(function(fresh) {
             host._v840Loading = false;
             if (fresh) { try { renderSettingsBox(host); } catch(e){} }
-            else { host.innerHTML = '<div class="hint">Kontingent nicht verfuegbar.</div>'; }
+            else { host.innerHTML = '<div class="hint">Kontingent nicht verfügbar.</div>'; }
           }).catch(function(){ host._v840Loading = false; });
         }
       } catch(e) {}
@@ -242,10 +253,10 @@
     host.innerHTML = '' +
       '<div class="ai-credits-box">' +
         '<div class="ai-credits-row">' + zellen + '</div>' +
-        '<div class="hint">Was du in einem Monat nicht nutzt, verfaellt nicht — es wandert ins Guthaben, ' +
+        '<div class="hint">Was du in einem Monat nicht nutzt, verfällt nicht — es wandert ins Guthaben, ' +
           'bis zum Dreifachen deines Monatskontingents. Zugekaufte Bewertungen verfallen nie.</div>' +
         '<div class="ai-credits-meta">' +
-          '<span>Zuruecksetzung am ' + resetDate + ' (1. des Monats, 00:00 UTC)</span>' +
+          '<span>Zurücksetzung am ' + _datum(resetDate) + ' (1. des Monats)</span>' +
           '<button class="btn btn-outline btn-sm" type="button" onclick="if(typeof showSettings===\'function\')showSettings(\'plan\');">Bewertungen nachkaufen</button>' +
         '</div>' +
       '</div>';

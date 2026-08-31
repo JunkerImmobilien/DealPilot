@@ -1929,8 +1929,8 @@ function _renderPlanPane() {
          was man dafuer BEKOMMT, stand nirgends — der Nutzer musste selbst
          wissen, dass eine Wertermittlung 12 L kostet. Jetzt steht auf der
          Kachel, was drin ist: 15 · 10 · 3, darunter ausgeschrieben. */
-      '<p class="plan-credits-desc">Jedes Paket enthaelt eine feste Zahl je Bewertungsart. ' +
-        'Zugekauftes verfaellt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
+      '<p class="plan-credits-desc">Jedes Paket enthält eine feste Zahl je Bewertungsart. ' +
+        'Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
       '<div class="plan-credits-grid">';
     creditPacks.forEach(function(pack) {
       /* Beide Formen lesen: die neuen Pakete tragen mpi/mpi_plus/wev, die
