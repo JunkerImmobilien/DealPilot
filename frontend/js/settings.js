@@ -1656,19 +1656,48 @@ function _v234_1RenderPlanStatusHeader() {
       planKey = DealPilotConfig.pricing.currentKey() || 'free';
       var plan = DealPilotConfig.pricing.plans && DealPilotConfig.pricing.plans[planKey];
       if (plan) {
-        planName = plan.name || planKey.charAt(0).toUpperCase() + planKey.slice(1);
+        /* v1182: DIESER BLOCK HAT NIE ETWAS GEFUNDEN.
+           Er las plan.name / plan.priceMonthly / plan.maxObjects — die Plaene
+           in config.js fuehren aber label / price_monthly_eur / limits.objects.
+           Kein einziger Plan hatte je einen dieser drei Schluessel, auch nicht
+           der in reseller-portal.js:612 geklonte 'partner'. Folge: JEDER
+           zahlende Kunde sah die Vorbelegung darueber, also
+           "0 € / Monat · 10 KI-Credits einmalig · 1 Objekt".
+           Der Planname sah nur richtig aus, weil er auf den grossgeschriebenen
+           Schluessel zurueckfaellt — das hat den Rest gedeckt.
+           Gemessen 31.08. auf Staging: Partner zeigte "0 € / Monat", waehrend
+           Stripe 99,00 € abrechnete.
+           Beide Schreibweisen werden gelesen, damit ein spaeterer Umbau der
+           Konfiguration das hier nicht wieder still abschaltet. */
+        planName = plan.label || plan.name ||
+                   planKey.charAt(0).toUpperCase() + planKey.slice(1);
         isPaid = (planKey !== 'free');
-        // Preis
-        if (plan.priceMonthly && plan.priceMonthly > 0) {
-          planPrice = plan.priceMonthly + ' € / Monat';
+
+        var lim = plan.limits || {};
+        var preis   = (plan.price_monthly_eur != null) ? plan.price_monthly_eur
+                                                       : plan.priceMonthly;
+        var objekte = (lim.objects != null) ? lim.objects : plan.maxObjects;
+
+        /* Erst auf Abwesenheit pruefen, dann rechnen — 0 ist ein gueltiger
+           Preis und besteht Number.isFinite. */
+        if (preis != null && preis > 0) {
+          planPrice = String(preis).replace('.', ',') + ' € / Monat';
         }
-        // Meta-Info: Credits + Objekt-Limit
+
         var metaParts = [];
-        if (plan.aiCreditsPerMonth) metaParts.push(plan.aiCreditsPerMonth + ' L Kerosin / Monat');
-        if (plan.maxObjects === Infinity || plan.maxObjects === -1) {
+        /* v1176: gezaehlt werden Bewertungen, nicht mehr Liter. Die Karte
+           daneben im selben Reiter sagt bereits "5 Bewertungen / Monat" —
+           zwei Waehrungen auf einem Schirm waren der Ausgangsbefund. */
+        var kg = plan.kontingent;
+        if (kg && (kg.mpi || kg.mpi_plus || kg.wev)) {
+          metaParts.push((kg.mpi || 0) + ' Bewertungen / Monat');
+        } else if (lim.ai_credits) {
+          metaParts.push(lim.ai_credits + ' L Kerosin / Monat');
+        }
+        if (objekte === Infinity || objekte === -1) {
           metaParts.push('Unbegrenzte Objekte');
-        } else if (plan.maxObjects) {
-          metaParts.push(plan.maxObjects + ' Objekte');
+        } else if (objekte) {
+          metaParts.push(objekte + ' Objekte');
         }
         if (metaParts.length) planMeta = metaParts.join(' · ');
       }
