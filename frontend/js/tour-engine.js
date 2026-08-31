@@ -476,7 +476,7 @@
 
     var html = '';
     html += '<div class="dp-tour-close-wrap">';
-    html += '  <button class="dp-tour-close" type="button" aria-label="Tour schliessen">';
+    html += '  <button class="dp-tour-close" type="button" aria-label="Tour schließen">';
     html += '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     html += '  </button>';
     html += '</div>';

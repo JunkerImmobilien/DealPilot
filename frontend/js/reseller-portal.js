@@ -695,7 +695,7 @@ if (!window._pdfGold) {
         '<div class="rp-panel">' +
           '<div style="display:flex;gap:12px">' +
             '<div style="flex:2"><div class="rp-fl">Firma (rechtlich, falls abweichend)</div><input id="rp-b-company" value="' + esc(b.brand_company || '') + '" placeholder="' + esc(b.brand_name || 'Kanzlei Muster GmbH') + '" style="' + inp + '"></div>' +
-            '<div style="flex:2"><div class="rp-fl">Claim / Untertitel</div><input id="rp-b-tagline" value="' + esc(b.brand_tagline || '') + '" placeholder="Ihre Kanzlei fuer Immobilien" style="' + inp + '"></div>' +
+            '<div style="flex:2"><div class="rp-fl">Claim / Untertitel</div><input id="rp-b-tagline" value="' + esc(b.brand_tagline || '') + '" placeholder="Ihre Kanzlei für Immobilien" style="' + inp + '"></div>' +
           '</div>' +
           '<div style="display:flex;gap:12px;margin-top:12px">' +
             '<div style="flex:3"><div class="rp-fl">Straße &amp; Hausnummer</div><input id="rp-b-address" value="' + esc(b.brand_address || '') + '" style="' + inp + '"></div>' +
@@ -717,7 +717,7 @@ if (!window._pdfGold) {
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-prev" style="width:18px;height:18px;accent-color:var(--gold,#C9A84C)">' +
             '<span><b>Ansicht meiner Mandanten</b> — die App in meinem Branding anzeigen</span></label>' +
-          '<div style="font-size:11.5px;color:#8a8473;margin-top:7px;padding-left:28px">Nur fuer dich, nur in diesem Browser. Zum Zuruecksetzen Haken entfernen.</div>' +
+          '<div style="font-size:11.5px;color:#8a8473;margin-top:7px;padding-left:28px">Nur für dich, nur in diesem Browser. Zum Zurücksetzen Haken entfernen.</div>' +
         '</div>' +
         '<div style="margin-top:18px"><button class="rp-checkout" id="rp-b-save">Branding speichern</button></div>';
       var upd = function () { _brandPreview(); _logoPrev(); try { if (_previewOn()) _applyPreview(); } catch (e) {} };  /*W7-livepreview W22-logoprev*/

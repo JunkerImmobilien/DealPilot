@@ -170,7 +170,7 @@
     }).catch(function (err) {
       if (thinking && thinking.parentNode) thinking.parentNode.removeChild(thinking);
       var m = (err && err.data && (err.data.message || err.data.error)) || (err && err.message) || 'Fehler';
-      if (err && err.status === 429) m = 'Co-Pilot-Tageslimit erreicht. Morgen wieder verfuegbar.';
+      if (err && err.status === 429) m = 'Co-Pilot-Tageslimit erreicht. Morgen wieder verfügbar.';
       if (err && err.status === 503) m = 'KI ist gerade nicht verfuegbar (kein Server-Key).';
       addMsg('assistant', '\u26a0 ' + m);
     }).then(function () {

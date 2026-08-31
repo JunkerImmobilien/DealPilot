@@ -93,7 +93,7 @@
     bwk_ul_pct: 'Bewirtschaftungskosten umlagefaehig in Prozent', bwk_nul_pct: 'Bewirtschaftungskosten nicht umlagefaehig in Prozent',
     bwk_kp_pct: 'Bewirtschaftungskosten in Prozent vom Kaufpreis',
     mietspiegel: 'Mietspiegel in Euro pro m2', me_soll: 'Soll-Miete in Euro pro m2',
-    me_anz: 'Anzahl Mieterhoehungen', me_int: 'Intervall Mieterhoehung in Jahren', me_pct: 'Mieterhoehung in Prozent',
+    me_anz: 'Anzahl Mieterhöhungen', me_int: 'Intervall Mieterhöhung in Jahren', me_pct: 'Mieterhöhung in Prozent',
     ds2_zustand: 'Zustand des Objekts/der Wohnung', ds2_energie: 'Energieeffizienz/Energieklasse',
     ds2_mietausfall: 'Mietausfall-Risiko', ds2_marktmiete: 'Marktmiete in Euro pro m2',
     ds2_bevoelkerung: 'Bevoelkerungsentwicklung am Standort', ds2_nachfrage: 'Nachfrage-Indikator am Standort',

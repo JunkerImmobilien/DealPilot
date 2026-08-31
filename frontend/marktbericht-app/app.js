@@ -237,8 +237,8 @@ async function _zeigeKaufAngebot(d) {
       '⚠ Keine ' + name + ' mehr frei.' +
     '</div>' +
     '<div style="font-size:13px;line-height:1.5;margin-bottom:10px;">' +
-      'Dein Monatskontingent fuer diese Bewertungsart ist aufgebraucht. ' +
-      'Du kannst genau diese eine nachkaufen — sie verfaellt nicht.' +
+      'Dein Monatskontingent für diese Bewertungsart ist aufgebraucht. ' +
+      'Du kannst genau diese eine nachkaufen — sie verfällt nicht.' +
     '</div>' +
     '<button type="button" id="mbKaufBtn" data-art="' + art + '" ' +
       'style="cursor:pointer;border:0;border-radius:9px;padding:10px 16px;font-weight:700;' +
@@ -246,7 +246,7 @@ async function _zeigeKaufAngebot(d) {
       'Eine ' + name + ' kaufen' + (preis ? ' · ' + preis : '') +
     '</button>' +
     '<div style="font-size:11.5px;opacity:.75;margin-top:8px;">' +
-      'Guenstiger im Paket: im Cockpit unter „Plan“.' +
+      'Günstiger im Paket: im Cockpit unter „Plan“.' +
     '</div>';
   box.classList.remove('hide');
 
@@ -275,7 +275,7 @@ async function _kaufeEinzeln(art, btn) {
     }
     if (btn) { btn.disabled = false; btn.textContent = alt; }
     var msg = (d && (d.message || d.error)) || 'Kauf konnte nicht gestartet werden';
-    if (r.status === 403) msg = 'Bewertungen koennen ab dem Starter-Plan dazugekauft werden.';
+    if (r.status === 403) msg = 'Bewertungen können ab dem Starter-Plan dazugekauft werden.';
     alert(msg);
   } catch (e) {
     if (btn) { btn.disabled = false; btn.textContent = alt; }
@@ -318,7 +318,7 @@ async function generate() {
   var _msg = 'Marktbericht jetzt erstellen?\n\nKosten: ' + _STUFENNAME[_st]
            + ' – nur wenn ein Marktwert ermittelt wird. Liegen keine '
            + 'Marktdaten vor, wird nichts abgebucht.'
-           + '\n\nWurde fuer dieses Objekt schon dieselbe oder eine hoehere '
+           + '\n\nWurde für dieses Objekt schon dieselbe oder eine höhere '
            + 'Stufe erstellt, kostet der Bericht nichts.';
   if (_w.length) {
     _msg = '\u26a0 ' + _w.length + (_w.length === 1 ? ' Angabe sieht' : ' Angaben sehen') + ' ungew\u00f6hnlich aus:\n\n'
@@ -526,7 +526,7 @@ function _scoreWord(s) {
  * einen davon fuer falsch. */
 function _wvErklaerung(art) {
   var t = {
-    vergleich: 'Das Vergleichswertverfahren fragt: was zahlen Kaeufer gerade fuer aehnliche '
+    vergleich: 'Das Vergleichswertverfahren fragt: was zahlen Käufer gerade für ähnliche '
       + 'Objekte? Grundlage sind tatsächliche Angebote im Umkreis, zugeschnitten auf '
       + 'Wohnfläche, Baujahr, Zustand und Erstbezug. Bei Eigentumswohnungen ist es das '
       + 'führende Verfahren, weil es dafür viele Vergleichsfälle gibt. Es bildet den '

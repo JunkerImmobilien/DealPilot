@@ -529,7 +529,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
 
         var labelHtml = '<div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) '
                       + '<span style="color:var(--muted);font-size:11.5px;margin-left:2px">(' + count + ')</span> '
-                      + '<span class="tax-info" title="Summe der Ueberschuesse/Verluste aller anderen Bestandsobjekte (Kaufdatum vor diesem Objekt). Berechnung fuer Jahr ' + displayYear + '. Klick fuer Detailliste.">ⓘ</span></div>';
+                      + '<span class="tax-info" title="Summe der Überschüsse/Verluste aller anderen Bestandsobjekte (Kaufdatum vor diesem Objekt). Berechnung für Jahr ' + displayYear + '. Klick für Detailliste.">ⓘ</span></div>';
 
         /* Fall 2a: ≤5 Objekte → Inline-Liste */
         if (count <= 5) {
@@ -725,7 +725,7 @@ function renderTaxTimeline() {
       var aStyle = isA ? ';outline:2px solid var(--gold,#C9A84C);outline-offset:1px;box-shadow:0 2px 8px rgba(201,168,76,0.3)' : '';
       chtml += '<div class="tax-tl-bar tax-tl-clickable" style="background:' + bg + ';border-left-color:' + color + ';cursor:pointer;transition:all 0.15s' + aStyle + '" '
         + 'onclick="if(typeof renderTaxModule===&quot;function&quot;){renderTaxModule(' + t.year + ');var b=document.getElementById(&quot;tax-result-box&quot;);if(b)b.scrollIntoView({behavior:&quot;smooth&quot;,block:&quot;center&quot;});}" '
-        + 'title="Klick: Berechnung fuer ' + t.year + ' anzeigen">'
+        + 'title="Klick: Berechnung für ' + t.year + ' anzeigen">'
         + '<div class="tax-tl-year">' + t.year + '</div>'
         + '<div class="tax-tl-amount" style="color:' + color + '">' + (hasKst ? '&minus;' + Math.round(kst).toLocaleString('de-DE') + ' &euro;' : '0 &euro;') + '</div>'
         + '<div class="tax-tl-label">' + (hasKst ? 'K&ouml;rperschaftsteuer' : 'kein KSt') + '</div>'

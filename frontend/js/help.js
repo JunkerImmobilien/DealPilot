@@ -765,7 +765,7 @@
             resolve(ans);
           })
           .catch(function(e) {
-            if (e && e.status === 429) { reject(new Error('Tageslimit fuer KI-Fragen erreicht \u2014 morgen wieder verfuegbar.')); return; }
+            if (e && e.status === 429) { reject(new Error('Tageslimit für KI-Fragen erreicht \u2014 morgen wieder verfügbar.')); return; }
             if (e && e.status === 503) { reject(new Error('KI momentan nicht konfiguriert. Bitte sp\u00e4ter erneut versuchen.')); return; }
             if (e && (e.status === 404 || e.status === 405)) { resolve(_localFallback(question)); return; }
             reject(e);

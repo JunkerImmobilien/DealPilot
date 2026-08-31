@@ -398,7 +398,7 @@
         _setStatus('\u2713 BORIS: ' + bd.value_sqm + ' \u20ac/m\u00b2' + (extra.length ? ' (' + extra.join(' \u00b7 ') + ')' : ''), 'ok');
         if (typeof toast === 'function') toast('\u2713 Bodenrichtwert (BORIS): ' + bd.value_sqm + ' \u20ac/m\u00b2');
       } else {
-        _setStatus('\u26a0 Kein BORIS-Wert fuer diese Lage \u2014 bitte Portal pruefen', 'err');
+        _setStatus('\u26a0 Kein BORIS-Wert für diese Lage \u2014 bitte Portal prüfen', 'err');
         if (typeof toast === 'function') toast('\u26a0 Kein BORIS-Wert gefunden \u2014 BORIS-Portal pruefen');
       }
     } catch (err) {

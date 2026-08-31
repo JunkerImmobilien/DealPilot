@@ -484,7 +484,7 @@
   function renderOverview(){
     var host=$('dp-overview-strip'); if(!host) return;
     if(!_detailsLoaded){ host.innerHTML='<div class="dp-chart-loading" style="grid-column:1/-1;height:54px"><span class="dp-spin"></span>Kennzahlen werden geladen\u2026</div>'; return; }
-    var arr=detailArr(); if(!arr.length){ host.innerHTML='<div class="health-sub" style="grid-column:1/-1">Keine Detaildaten verfuegbar.</div>'; return; }
+    var arr=detailArr(); if(!arr.length){ host.innerHTML='<div class="health-sub" style="grid-column:1/-1">Keine Detaildaten verfügbar.</div>'; return; }
     var s=aggStats();
     /* v475: Objekt-Dropdown befuellen (volle Liste, nicht gefiltert) */
     (function(){
@@ -524,7 +524,7 @@
       host.innerHTML='<div class="dp-chart-loading" style="grid-column:1/-1;height:60px"><span class="dp-spin"></span>Portfolio-Kennzahlen werden geladen…</div>';
       return;
     }
-    if(!arr.length){ host.innerHTML='<div class="health-sub" style="grid-column:1/-1">Keine Detaildaten verfuegbar.</div>'; return; }
+    if(!arr.length){ host.innerHTML='<div class="health-sub" style="grid-column:1/-1">Keine Detaildaten verfügbar.</div>'; return; }
     var P=plan();
     if(!P.full){
       /* W10-lockfix: das SVG hatte KEIN width/height -> im Grid-Container blaehte es
