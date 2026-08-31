@@ -14503,6 +14503,29 @@ header.hdr {
   text-transform: uppercase;
   margin-bottom: 8px;
 }
+/* v1183 · Einzelkauf unter den Paketen.
+   Marcels Vorgabe in config.js: „der Knopf, an dem gerade eine Bewertung
+   fehlt, verkauft genau diese eine" — ein Paket ist wieder ein Vorrat, den
+   man nicht ueberblickt. Deshalb steht die Einzelliste gleichberechtigt
+   unter den Kacheln und nicht in einem Aufklapper.
+   Eine Liste statt Kacheln, weil fuenf Posten mit sehr kurzen Preisen als
+   Kachelfeld nur Platz fressen und der Blick die Zeile schneller scannt. */
+.plan-einzel-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.plan-einzel-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 12px; border-radius: 8px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+}
+.plan-einzel-l { flex: 1 1 auto; min-width: 0; font-size: 13px; }
+.plan-einzel-p {
+  flex: 0 0 auto; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px; font-weight: 600; color: var(--wl-C9A84C, #C9A84C);
+}
+@media (max-width: 520px) {
+  .plan-einzel-row { flex-wrap: wrap; }
+  .plan-einzel-l { flex: 1 1 100%; }
+}
 .plan-credit-price {
   font-size: 18px;
   font-weight: 700;

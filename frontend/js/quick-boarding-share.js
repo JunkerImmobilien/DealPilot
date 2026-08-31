@@ -98,7 +98,7 @@
       '<div class="qbs-prev"><div class="nm">' + esc(m.name) + '</div>' + (m.addr ? '<div class="ad">' + esc(m.addr) + '</div>' : '') + '</div>' +
       '<div class="qbs-lbl">G\u00fcltig f\u00fcr</div><div class="qbs-seg" id="qbs-seg">' + seg + '</div>' +
       '<button class="qbs-primary" id="qbs-create">' + plane() + ' Pass erstellen</button>' +
-      '<div class="qbs-note">Friert die aktuellen Daten + Bilder ein. Der Empf\u00e4nger sieht eine Read-only-Karte und kann das Objekt \u00fcbernehmen. Frische Analysen auf seinem Klon kosten wie immer Kerosin.</div>';
+      '<div class="qbs-note">Friert die aktuellen Daten + Bilder ein. Der Empf\u00e4nger sieht eine Read-only-Karte und kann das Objekt \u00fcbernehmen. Frische Bewertungen auf seinem Klon gehen von seinem eigenen Kontingent ab.</div>';
     setBody('Quick Boarding Pass teilen', html);
     var segEl = document.getElementById('qbs-seg');
     segEl.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; _days = +b.getAttribute('data-d'); [].forEach.call(segEl.querySelectorAll('button'), function (x) { x.classList.remove('on'); }); b.classList.add('on'); });

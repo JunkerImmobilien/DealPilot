@@ -229,7 +229,7 @@ function showSettings(initialTab) {
         '<button class="help-sidebar-item st-tab ms-tab" data-tab="plan" onclick="_swSet(this)">' +
           '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-star"/></svg></span>' +
             '<span class="help-sidebar-item-title">Plan</span></div>' +
-          '<span class="help-sidebar-item-desc">Abo, Kerosin, Abrechnung</span>' +
+          '<span class="help-sidebar-item-desc">Abo, Kontingent, Abrechnung</span>' +
         '</button>' +
         /* v839-info-removed: Info-Tab-Button entfernt */
         '<button class="help-sidebar-item st-tab ms-tab" data-tab="rechtliches" onclick="_swSet(this)">' +
@@ -907,7 +907,7 @@ function _getCurrentPlanMeta() {
     var parts = [];
     if (objLimit > 0)        parts.push(objLimit + ' Objekt' + (objLimit === 1 ? '' : 'e'));
     else if (objLimit < 0)   parts.push('unbegrenzte Objekte');
-    if (aiLimit > 0)         parts.push(aiLimit + ' L Kerosin / Monat');
+    if (aiLimit > 0)         parts.push(aiLimit + ' Bewertungen / Monat');
     else if (aiLimit === 1)  parts.push('1 Pilot-Analyse');
     return _esc(parts.join(' · '));
   } catch(e) { return ''; }
@@ -1029,7 +1029,7 @@ function _swSet(btn) {
       datenraum:['Datenraum','Geteilte Objekte und Portfolio-P\u00e4sse.'],
       anbieter:['Externe Anbieter','ImmoMetrica und weitere Datenquellen verbinden.'],
       mandanten:['Mandanten','Gesellschaften, Halter und Steuerregime verwalten.'],
-      plan:['Plan','Dein aktueller Tarif und Kerosin-Guthaben.'],
+      plan:['Plan','Dein aktueller Tarif und dein Bewertungs-Kontingent.'],
       info:['Info','Version, Changelog und Systemstatus.'],
       rechtliches:['Rechtliches','Impressum, Datenschutz und AGB.'],
       help:['Hilfe','Interaktive Tour, FAQ und Support.']
@@ -1086,7 +1086,7 @@ function _swSet(btn) {
            genau die Sackgasse, die v1182b beseitigt hat. */
         console.warn('[v1182c] Kerosin-Kasten: refresh fehlgeschlagen', e);
         var host = document.getElementById('set-ai-credits-host');
-        if (host) host.innerHTML = '<div class="hint">Kerosin-Stand gerade nicht abrufbar.</div>';
+        if (host) host.innerHTML = '<div class="hint">Kontingent gerade nicht abrufbar.</div>';
       });
     }, 40);
   }
@@ -1716,7 +1716,7 @@ function _v234_1RenderPlanStatusHeader() {
         if (kg && (kg.mpi || kg.mpi_plus || kg.wev)) {
           metaParts.push((kg.mpi || 0) + ' Bewertungen / Monat');
         } else if (lim.ai_credits) {
-          metaParts.push(lim.ai_credits + ' L Kerosin / Monat');
+          metaParts.push(lim.ai_credits + ' Bewertungen / Monat');
         }
         if (objekte === Infinity || objekte === -1) {
           metaParts.push('Unbegrenzte Objekte');
@@ -1787,7 +1787,7 @@ function _renderPlanPane() {
 
   // Bei bezahltem Plan: nur Status-Header zurückgeben (keine Plan-Cards)
   if (_v234_1CurrentPlan !== 'free') {
-    return '<h3 class="set-section-h">Kerosin</h3><div id="set-ai-credits-host"><div class="hint">Lädt…</div></div><hr class="dvd">' + _v234_1Header; /* v611-kerosin-paid */
+    return '<h3 class="set-section-h">Dein Kontingent</h3><div id="set-ai-credits-host"><div class="hint">Lädt…</div></div><hr class="dvd">' + _v234_1Header; /* v611-kerosin-paid */
   }
 
   // Free-User: Status-Header + bisherige Plan-Card-Logik (siehe unten)
@@ -1801,10 +1801,15 @@ function _renderPlanPane() {
   var allowSwitch = DealPilotConfig.dev.flags.SHOW_PLAN_SWITCHER || DealPilotConfig.dev.isDev();
 
   var billingCycle = window._planBillingCycle || 'monthly';   // 'monthly' | 'yearly'
-  var creditPacks = DealPilotConfig.pricing.aiCreditPackages || [];
+  /* v1183: die Pakete kommen aus `bewertungsPakete`, nicht mehr aus den
+     Liter-Paketen. `aiCreditPackages` bleibt als Rueckfall stehen, damit
+     eine alte config.js die Kacheln nicht ganz verschwinden laesst. */
+  var creditPacks = DealPilotConfig.pricing.bewertungsPakete ||
+                    DealPilotConfig.pricing.aiCreditPackages || [];
+  var einzelkauf  = DealPilotConfig.pricing.einzelkauf || [];
   var yearlyBonus = DealPilotConfig.pricing.yearlyBonus || {};
 
-  var html = '<h3 class="set-section-h">Kerosin</h3><div id="set-ai-credits-host"><div class="hint">Lädt…</div></div><hr class="dvd">'; /* v611-kerosin */
+  var html = '<h3 class="set-section-h">Dein Kontingent</h3><div id="set-ai-credits-host"><div class="hint">Lädt…</div></div><hr class="dvd">'; /* v611-kerosin */
   if (plans[current]) {
     html += '<p class="hint">Aktueller Plan: <strong>' + plans[current].label + '</strong>';
     if (DealPilotConfig.dev.isDev()) html += ' <span class="dev-badge">DEV</span>';
@@ -1825,7 +1830,7 @@ function _renderPlanPane() {
     html += '<div class="plan-yearly-bonus-banner">' +
       '<strong>Jahres-Vorteile:</strong> ' +
       (yearlyBonus.free_months || 2) + ' Monate gratis · ' +
-      (yearlyBonus.bonus_ai_credits || 50) + ' Liter Bonus-Kerosin einmalig · ' +
+      (yearlyBonus.bonus_ai_credits || 50) + ' Bewertungen einmalig obendrauf · ' +
       'Preisgarantie ' + (yearlyBonus.price_lock_months || 24) + ' Monate' +
     '</div>';
   }
@@ -1918,21 +1923,57 @@ function _renderPlanPane() {
   // V63.1: KI-Credit-Pakete
   if (creditPacks.length > 0) {
     html += '<div class="plan-credits-section">' +
-      '<h3 class="plan-credits-title">Kerosin-Pakete</h3>' + /* v489-kerosin-settings */
-      '<p class="plan-credits-desc">Brauchst du mehr Pilot-Anfragen? Kerosin ist einmalig zubuchbar und verfällt nie. 1 Liter = 1 Pilot-Anfrage. Dein Plan füllt den Tank am 1. jeden Monats automatisch — gekauftes Kerosin kommt obendrauf und wird erst nach dem Monatskontingent verbraucht.</p>' /* v491-hybrid */ +
+      '<h3 class="plan-credits-title">Bewertungen nachkaufen</h3>' +
+      /* v1183: Marcels Befund zum alten Stand war „total unuebersichtlich".
+         Ursache: die Kachel zeigte eine Zahl (Liter) und einen Preis, und
+         was man dafuer BEKOMMT, stand nirgends — der Nutzer musste selbst
+         wissen, dass eine Wertermittlung 12 L kostet. Jetzt steht auf der
+         Kachel, was drin ist: 15 · 10 · 3, darunter ausgeschrieben. */
+      '<p class="plan-credits-desc">Jedes Paket enthaelt eine feste Zahl je Bewertungsart. ' +
+        'Zugekauftes verfaellt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.</p>' +
       '<div class="plan-credits-grid">';
     creditPacks.forEach(function(pack) {
+      /* Beide Formen lesen: die neuen Pakete tragen mpi/mpi_plus/wev, die
+         alten Liter-Pakete nur `liter`. So bleibt die Kachel auch mit einer
+         alten config.js sinnvoll, statt „undefined" zu zeigen. */
+      var istNeu = (pack.mpi != null);
+      var num = istNeu
+        ? (pack.mpi + ' · ' + pack.mpi_plus + ' · ' + pack.wev)
+        : (pack.liter != null ? pack.liter : pack.credits);
+      var stueck = istNeu ? null
+        : (pack.per_liter != null ? pack.per_liter : pack.per_anfrage);
       html += '<div class="plan-credit-card' + (pack.highlight ? ' plan-credit-highlight' : '') + '">' +
         (pack.highlight ? '<span class="plan-credit-best">Beliebt</span>' : '') +
         '<div class="plan-credit-flight">' + (pack.flight || '') + '</div>' +
-        '<div class="plan-credit-num">' + (pack.liter != null ? pack.liter : pack.credits) + '</div>' +
-        '<div class="plan-credit-label">Liter</div>' +
+        '<div class="plan-credit-num">' + num + '</div>' +
+        '<div class="plan-credit-label">' +
+          (istNeu ? 'MPI · erweitert · Wertermittlung' : 'Abrufe') + '</div>' +
         '<div class="plan-credit-price">' + pack.price_eur + ' €</div>' +
-        '<div class="plan-credit-sub">≈ ' + (pack.per_liter != null ? pack.per_liter : pack.per_anfrage).toFixed(2).replace('.', ',') + ' € / Liter</div>' +
-        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + pack.key + '\')">Tanken</button>' +
+        '<div class="plan-credit-sub">' +
+          (istNeu ? (pack.tag || '') : ('≈ ' + stueck.toFixed(2).replace('.', ',') + ' € je Abruf')) +
+        '</div>' +
+        '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + pack.key + '\')">Dazubuchen</button>' +
       '</div>';
     });
-    html += '</div></div>';
+    html += '</div>';
+
+    /* v1183: der Einzelkauf. Marcels Vorgabe in config.js: „der Knopf, an
+       dem gerade eine Bewertung fehlt, verkauft genau diese eine" — ein
+       Paket ist wieder ein Vorrat, den man nicht ueberblickt. Deshalb steht
+       die Einzelliste gleichberechtigt darunter und nicht versteckt. */
+    if (einzelkauf.length > 0) {
+      html += '<h4 class="plan-credits-title" style="font-size:14px;margin-top:22px">Oder einzeln</h4>' +
+        '<div class="plan-einzel-grid">';
+      einzelkauf.forEach(function (e) {
+        html += '<div class="plan-einzel-row">' +
+          '<span class="plan-einzel-l">' + e.label + '</span>' +
+          '<span class="plan-einzel-p">' + e.price_eur.toFixed(2).replace('.', ',') + ' €</span>' +
+          '<button class="btn btn-outline btn-sm" onclick="_buyCreditPack(\'' + e.key + '\')">Kaufen</button>' +
+        '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
   }
 
   // V180: Stripe-Hinweis entfernt — Stripe ist jetzt der einzige Flow.

@@ -489,12 +489,12 @@
       // v885-plan-landing: Kerosin-Nachtank-Streifen (bw-Boarding-Pass, Landing-Look)
       '<div class="dp-container dp-section">' +
         '<div class="dp-section-head">' +
-          '<span class="dp-pill dp-pill-alt">Kerosin nachtanken</span>' +
-          '<h2 class="dp-h2">Volltanken. Durchstarten.</h2>' +
-          '<p class="dp-sub"><strong>1 Liter = 1 Pilot-Anfrage.</strong> Ein Pass, umschaltbar \u2014 gekauftes Kerosin kommt obendrauf, wird zuletzt verbraucht und verf\u00e4llt nie.</p>' +
+          '<span class="dp-pill dp-pill-alt">Bewertungen nachkaufen</span>' +
+          '<h2 class="dp-h2">Mehr Reichweite. Ohne Abo.</h2>' +
+          '<p class="dp-sub"><strong>Gez\u00e4hlt werden Bewertungen, getrennt nach Art.</strong> Ein Pass, umschaltbar \u2014 Zugekauftes kommt obendrauf, wird zuletzt verbraucht und verf\u00e4llt nie.</p>' +
         '</div>' +
         _kerosinStripHtml() +
-        '<p class="dp-note" style="text-align:center;margin-top:14px">Kerosin ist ab dem Starter-Plan zubuchbar \u00b7 verf\u00e4llt nicht \u00b7 kein Abo.</p>' +
+        '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar \u00b7 verfallen nicht \u00b7 kein Abo.</p>' +
       '</div>' +
 
       // V63.82: Feature-Übersicht — vollständige Vergleichstabelle
@@ -510,7 +510,7 @@
 
       // Footer-Hinweise
       '<div class="dp-container dp-footer-note">' +
-        '<p>Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. Kerosin verfällt nicht.</p>' +
+        '<p>Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. Zugekaufte Bewertungen verfallen nicht.</p>' +
       '</div>';
   }
 
@@ -518,7 +518,7 @@
   // V63.82: Feature-Übersicht-Tabelle — alle Features alle Pläne
   function _renderFeatureTable() {
     var rows = [ /* v493-matrix — Feature-Matrix Stand 05.06.2026 */
-      { cat: 'Nutzung & Kerosin', items: [
+      { cat: 'Nutzung & Kontingent', items: [
         ['Objekte',                              '1', '5', '25', '∞'],
         /* v1176 · dieselben vier Zeilen wie in der Kurzmatrix oben. Es sind
            zwei Listen fuer dieselbe Sache — sie muessen zusammen wandern. */

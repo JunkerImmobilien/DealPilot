@@ -324,12 +324,12 @@ if (!window._wlc) {
       });
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) {
-        if (data && data.needs_credits) toast('⚠ Nicht genug Kerosin (' + (data.required || '?') + ' L nötig)');
+        if (data && data.needs_credits) toast('⚠ ' + (data.error || 'Kontingent aufgebraucht'));
         else toast('⚠ DealPilot-Marktbewertung fehlgeschlagen' + (data && (data.error || data.message) ? ': ' + (data.error || data.message) : ''));
         return;
       }
       if (data && data.no_data) {
-        toast('⚠ Für diese Adresse liegen aktuell keine Marktdaten vor (kein Kerosin berechnet)');
+        toast('⚠ Für diese Adresse liegen aktuell keine Marktdaten vor (nichts berechnet)');
         return;
       }
       var payload = data.data || data;

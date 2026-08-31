@@ -306,7 +306,7 @@
         '<div class="dp-pf-sep"></div>' +
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">' +
           pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
-          (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen \u2014 1 L Kerosin') : '') +
+          (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen 2014 im Plan enthalten') : '') +
           '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
         '</div></div>' +
         '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run"><span class="dp-pf-ic">' + _plane + '</span> Abrufen</button>' + '</span>' +
@@ -390,7 +390,7 @@
       var nm = s === 'voice' ? 'Sprachauswertung' : (s === 'pricehubble' ? 'PriceHubble' : (s === 'dealpilot' ? 'DealPilot' : 'Sprengnetter'));
       return '<b>' + L + '\u00a0L</b> ' + nm;
     }).join(' + ');
-    var txt = 'Beim <b>Abrufen</b> ' + (billed.length > 1 ? 'werden ' : 'wird ') + parts + ' Kerosin verbraucht' + (billed.length > 1 ? ' (' + _total + '\u00a0L gesamt)' : '') + '.';
+    var txt = 'Beim <b>Abrufen</b> ' + (billed.length > 1 ? 'werden ' : 'wird ') + parts + ' Kontingent verbraucht' + (billed.length > 1 ? ' (' + billed.length + ' Bewertungen)' : '') + '.';
     if (demo && billed.some(function (s) { return s !== 'voice'; })) txt += ' <span style="opacity:.75">Marktradar im Demo-Modus aktuell kostenlos.</span>';
     el.innerHTML = '<span class="oab-credit-dot"></span>' + txt;
     el.style.display = '';
@@ -434,7 +434,7 @@
     ov.innerHTML =
       '<div class="v754-modal" role="dialog" aria-modal="true">' +
         '<div class="v754-hero"><span class="bp">BOARDING PASS \u00b7 DEALPILOT</span><h3>Abruf best\u00e4tigen</h3></div>' +
-        '<div class="v754-body">F\u00fcr diesen Abruf wird Kerosin verbraucht:' +
+        '<div class="v754-body">Fuer diesen Abruf wird dein Kontingent belastet:' +
           '<div class="v754-cost">' + parts + (costing.length > 1 ? ' &nbsp;=&nbsp; <b>' + total + '\u00a0L</b> gesamt' : '') + '</div>' +
           'M\u00f6chtest du fortfahren?' +
           '<label style="display:flex;align-items:center;gap:7px;margin-top:12px;font-size:12.5px;color:#6b6660;cursor:pointer">' +

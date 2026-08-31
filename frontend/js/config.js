@@ -333,7 +333,7 @@ window.DealPilotConfig = (function() {
       limits: {
         objects:       25,
         max_saves:     -1,
-        ai_credits:    40,                // v494-matrix: 40 L Kerosin / Monat
+        ai_credits:    40,                // STILLGELEGT v1183 — siehe kontingent
         photos_per_obj: 10,
         watermark:     false
       },
@@ -379,7 +379,7 @@ window.DealPilotConfig = (function() {
       limits: {
         objects:       -1,                // Unbegrenzt
         max_saves:     -1,
-        ai_credits:    100,               // v494-matrix: 100 L Kerosin / Monat
+        ai_credits:    100,               // STILLGELEGT v1183 — siehe kontingent
         photos_per_obj: 30,
         watermark:     false
       },
@@ -424,8 +424,8 @@ window.DealPilotConfig = (function() {
     }
   };
 
-  // v489-kerosin: Kerosin-Pakete (Landing-Page Wahrheit) — vorher KI-Credit-Pakete
-  // 1 Liter = 1 Pilot-Anfrage (klein). Kerosin ab Starter zubuchbar. Verfällt nicht.
+  // STILLGELEGT v1183 — alte Kerosin-Pakete
+  // Die gueltige Preisliste ist BEWERTUNGS_PAKETE + EINZELKAUF.
   // Kompat: credits/anfragen/per_anfrage spiegeln liter/per_liter, damit
   // bestehende Konsumenten (plan-audit.js etc.) nicht brechen.
   /* ── v1176 · Bewertungen nachkaufen, in Euro statt in Litern ────────────
@@ -461,10 +461,17 @@ window.DealPilotConfig = (function() {
       spart_pct: 24, gauge_off: 14.1,  gauge_deg: 77.4 }
   ];
 
-  /* Die alten Liter-Pakete bleiben stehen, bis der Zaehler umgestellt ist
-     (v1179). Sie sind die Abrechnungsgrundlage des heutigen Tanks — sie zu
-     loeschen, bevor der neue Zaehler steht, nimmt dem laufenden System die
-     Preisliste. */
+  /* STILLGELEGT v1183 — die alten Liter-Pakete.
+     Sie standen hier, bis der Zaehler umgestellt war; das ist er jetzt
+     (aiCreditsService.js rechnet je Bewertungsart, Migration 066).
+     `bewertungsPakete` ist die Preisliste, `aiCreditPackages` nur noch der
+     Rueckfall in settings.js fuer den Fall, dass eine alte config.js
+     ausgeliefert wird.
+
+     WARUM SIE NICHT GELOESCHT SIND: die Betraege 2/5/15/25 € stehen so in
+     der Rechnungshistorie jedes Bestandskunden. Wer sie entfernt, kann eine
+     alte Rechnung nicht mehr nachvollziehen — dieselbe Begruendung, aus der
+     Migration 066 die Spalte `bonus_credits` stehen laesst. */
   var AI_CREDIT_PACKAGES = [
     { key: 'kerosin_10',  liter: 10,  per_liter: 0.20,  credits: 10,  anfragen: 10,  price_eur: 2,  per_anfrage: 0.20,  label: '10 Liter',  tag: 'Mal schnell prüfen',  flight: '✈ Kurzstrecke',       gauge_off: 164.8, gauge_deg: -57.6 },
     { key: 'kerosin_28',  liter: 28,  per_liter: 0.18,  credits: 28,  anfragen: 28,  price_eur: 5,  per_anfrage: 0.18,  label: '28 Liter',  tag: 'Mehrere Deals',        flight: '✈✈ Mittelstrecke',   gauge_off: 116.6, gauge_deg: -14.4 },

@@ -1991,7 +1991,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       '</div>' +
       '<div class="dp-pa-card dpv-card">' +
         '<div class="dpv-h">KI-Einordnung des Verlaufs</div>' +
-        '<div class="dpv-sub">Kurze Zusammenfassung der Entwicklung \u00b7 kostet 1 L Kerosin</div>' +
+        '<div class="dpv-sub">Kurze Zusammenfassung der Entwicklung \u00b7 im Plan enthalten</div>' +
         '<div id="dpv-txt" class="dpv-txt"></div>' +
         '<button type="button" id="dpv-ki-btn" class="dpv-kibtn">Trend-Text erzeugen <span class="dpv-l">1 L</span></button>' +
       '</div>' +
@@ -2057,7 +2057,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       labels: mets.reduce(function (a, m) { a[m.key] = m.label; return a; }, {}) };
     Auth.apiCall('/marktbericht/verlauf-text', { method: 'POST', body: payload })
       .then(function (data) {
-        if (data && data.needs_credits) { out.innerHTML = '<span class="dpv-err">Nicht genug Kerosin (1 L n\u00f6tig).</span>'; return; }
+        if (data && data.needs_credits) { out.innerHTML = '<span class="dpv-err">Gerade nicht verfuegbar.</span>'; return; }
         var t = (data && (data.text || data.report_md)) || '';
         out.innerHTML = t ? _dpVEscP(t) : '<span class="dpv-err">Kein Text erhalten.</span>';
         if (t) { btn.style.display = 'none'; }

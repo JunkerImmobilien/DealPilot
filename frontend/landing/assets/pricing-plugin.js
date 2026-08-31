@@ -22,7 +22,7 @@
         '3 Speicherungen',
         'DealPilot Score (5 Faktoren)',
         'Investor Deal Score (24 KPIs) — Demo',
-        '2 L Kerosin / Monat' /* v493-liter */,
+        '1 Marktpreisindikation / Monat' /* v1183 */,
         'Alle PDFs mit Wasserzeichen'
       ],
       not_included: null,
@@ -42,7 +42,7 @@
         'Werbungskosten-Modul vollständig',
         'Mietspiegel-Vergleich (manuell)',
         'Manuelle Marktzinsen',
-        '10 L Kerosin / Monat inklusive'
+        '5 Marktpreisindikationen / Monat'
       ],
       not_included: [
         'Investor Deal Score (24 KPIs)',
@@ -70,7 +70,7 @@
         'Live-Marktzinsen',
         'Mietspiegel — Auto-Vergleich',
         'BMF-Rechner & Export',
-        '40 L Kerosin / Monat inklusive'
+        '5 Marktpreisindikationen + 5 erweiterte / Monat'
       ],
       not_included: null,
       result: 'Sie investieren wie ein institutioneller Investor — mit allen KPIs, die Banken und Steuerberater erwarten.',
@@ -88,7 +88,7 @@
         'Custom Track-Record Cover',
         'BMF-Rechner & Export',
         'Priorisierter Support',
-        '100 L Kerosin / Monat inklusive',
+        '5 Marktpreisindikationen + 5 erweiterte + 5 Wertermittlungen / Monat',
         'Migration & Einrichtungsservice (bis 3 h) inkl.'
       ],
       not_included: null,
@@ -187,19 +187,19 @@
         // v489-kerosin-landing: Kerosin-Tacho-Karten (ersetzt KI-Credits + Marktdaten-Credits)
         '<div class="dp-container dp-section">' +
           '<div class="dp-section-head">' +
-            '<span class="dp-pill dp-pill-alt">Kerosin</span>' +
+            '<span class="dp-pill dp-pill-alt">Bewertungen nachkaufen</span>' +
             '<h2 class="dp-h2">Volltanken. Durchstarten.</h2>' +
             '<p class="dp-sub">' +
-              '<strong>1 Liter = 1 Pilot-Anfrage.</strong> Dein Plan füllt den Tank monatlich (Starter 10 L · Investor 40 L · Pro 100 L) — gekauftes Kerosin kommt obendrauf, wird zuletzt verbraucht und verfällt nie.' /* v491-hybrid */ +
+              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du nicht nutzt, wandert ins Guthaben; Zugekauftes verfällt nie und wird zuletzt verbraucht.' /* v1183 */ +
             '</p>' +
           '</div>' +
           '<div class="dp-credits-grid">' +
-            _kerosinCard(10,  2,  0.20,  'Mal schnell prüfen',  '✈ Kurzstrecke',       164.8, -57.6, '≈ 2 Reports oder 5 Markteinschätzungen',   false) +
-            _kerosinCard(28,  5,  0.18,  'Mehrere Deals',        '✈✈ Mittelstrecke',   116.6, -14.4, '≈ 7 Reports oder 14 Markteinschätzungen',  false) +
-            _kerosinCard(90,  15, 0.167, 'Aktiver Investor',     '✈✈✈ Langstrecke',  56.3,  39.6,  '≈ 22 Reports oder 45 Markteinschätzungen', true)  +
-            _kerosinCard(160, 25, 0.156, 'Maximale Reichweite',  '🌍 Interkontinental', 14.1,  77.4,  '≈ 40 Reports oder 80 Markteinschätzungen', false) +
+            _kerosinCard('5 · 2 · 0',   '7,90',  0.90, 'Mal schnell prüfen',  '✈ Kurzstrecke',       164.8, -57.6, '5 Marktpreisindikationen · 2 erweiterte', false) +
+            _kerosinCard('10 · 5 · 1',  '19,90', 0.85, 'Mehrere Deals',       '✈✈ Mittelstrecke',   116.6, -14.4, '10 · 5 · 1 Wertermittlung', false) +
+            _kerosinCard('15 · 10 · 3', '39,90', 0.80, 'Aktiver Investor',    '✈✈✈ Langstrecke',  56.3,  39.6,  '15 · 10 · 3 Wertermittlungen', true)  +
+            _kerosinCard('25 · 20 · 6', '69,90', 0.75, 'Maximale Reichweite', '🌍 Interkontinental', 14.1,  77.4,  '25 · 20 · 6 Wertermittlungen', false) +
           '</div>' +
-          '<p class="dp-note" style="text-align:center;margin-top:14px">Kerosin ist ab dem Starter-Plan zubuchbar · verfällt nicht · kein Abo.</p>' +
+          '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar · verfallen nicht · kein Abo.</p>' +
         '</div>' +
 
         // Feature-Übersicht
@@ -213,7 +213,7 @@
 
         // Footer-Hinweise
         '<div class="dp-container dp-footer-note">' +
-          '<p>Alle Preise sind Endpreise — gemäß § 19 UStG (Kleinunternehmerregelung) wird keine Umsatzsteuer ausgewiesen. Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. Kerosin verfällt nicht.</p>' +
+          '<p>Alle Preise sind Endpreise — gemäß § 19 UStG (Kleinunternehmerregelung) wird keine Umsatzsteuer ausgewiesen. Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. Zugekaufte Bewertungen verfallen nicht.</p>' +
         '</div>' +
       '</div>';
   }
@@ -221,10 +221,10 @@
   // Feature-Tabelle
   function _renderFeatureTable() {
     var rows = [ /* v493-matrix — Feature-Matrix Stand 05.06.2026 */
-      { cat: 'Nutzung & Kerosin', items: [
+      { cat: 'Nutzung & Kontingent', items: [
         ['Objekte',                              '1', '5', '25', '∞'],
-        ['Kerosin / Monat',                      '2 L', '10 L', '40 L', '100 L'],
-        ['Kerosin nachtanken (Liter-Pakete)',    '–', '✓', '✓', '✓']
+        ['Marktpreisindikation / Monat','1','5','5','5'],['Erweiterte Marktpreisindikation','–','–','5','5'],['Wertermittlung nach ImmoWertV','–','–','–','5'],
+        ['Bewertungen nachkaufen','–','✓','✓','✓']
       ]},
       { cat: 'Analyse & Bewertung', items: [
         ['DealPilot Score (5 Faktoren)',         '✓', '✓', '✓', '✓'],
@@ -315,19 +315,19 @@
   }
 
   function _kerosinCard(liter, price, perLiter, target, flight, off, deg, reach, best) {
-    var perLiterStr = perLiter.toFixed(perLiter < 0.17 ? 3 : 2).replace('.', ',') + ' €';
+    var perStr = (typeof perLiter === 'number') ? perLiter.toFixed(2).replace('.', ',') + ' €' : String(perLiter);
     return '<div class="dp-credits-card kp-card' + (best ? ' dp-credits-card-best' : '') + '">' +
       (best ? '<span class="dp-credits-best">Beliebt</span>' : '') +
       '<div class="kp-flight">' + flight + '</div>' +
       _kerosinGauge(off, deg) +
       '<div class="dp-credits-amount">' + liter + '</div>' +
-      '<div class="dp-credits-amount-label">Liter = ' + liter + ' Pilot-Anfragen</div>' +
+      '<div class="dp-credits-amount-label">MPI · erweitert · Wertermittlung</div>' +
       '<div class="dp-credits-divider"></div>' +
       '<div class="dp-credits-price">' + price + ' €</div>' +
-      '<div class="dp-credits-perunit">' + perLiterStr + ' / Liter</div>' +
+      '<div class="dp-credits-perunit">ab ' + perStr + ' je Bewertung</div>' +
       '<div class="dp-credits-target">' + target + '</div>' +
       '<div class="kp-reach">' + reach + '</div>' +
-      '<a class="dp-credits-cta" href="https://app.dealpilot.junker-immobilien.io/?register=1&kerosin=' + liter + '">Kerosin kaufen</a>' +
+      '<a class="dp-credits-cta" href="https://app.dealpilot.junker-immobilien.io/?register=1&paket=' + encodeURIComponent(liter) + '">Dazubuchen</a>' +
     '</div>';
   }
 

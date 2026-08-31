@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=W71"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1183"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1173b">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -852,13 +852,21 @@ label.dp-required.qc-required::after {
       </button>
       <!-- V108: Verlauf + Teilen Buttons entfernt (Marcels Wunsch) -->
       <!-- v857: Duplizieren-Button aus dem Header entfernt -->
-      <!-- v489-fuel-pill: Pilot-Tank — Kerosin-Stand, klickt zu Settings → Pilot -->
-      <button class="hdr-credits-pill fuel-pill" id="hdr-credits-pill" type="button"
-              title="Pilot-Tank — klicken für Details"
-              onclick="if(typeof showSettings==='function')showSettings('api')"
+      <!-- v1183: aus der Tankanzeige wird die Kontingent-Anzeige.
+           Die Zapfsaeule ist raus — sie war das Bild fuer eine Einheit, die
+           es nicht mehr gibt. Jetzt drei gestapelte Ebenen fuer die drei
+           Bewertungsarten; die Zahlen daneben stehen in derselben
+           Schreibweise wie die Pakete (5 · 5 · 5). Beim Ueberfahren klappt
+           auf, welche Zahl zu welcher Bewertung gehoert (ai-credits.js).
+           Der Klick geht auf den Plan-Reiter, weil dort das Kontingent und
+           der Nachkauf stehen — vorher auf 'api', wo seit v611 nichts mehr
+           davon liegt. -->
+      <button class="hdr-credits-pill" id="hdr-credits-pill" type="button"
+              title="Dein Kontingent — klicken für Details"
+              onclick="if(typeof showSettings==='function')showSettings('plan')"
               style="display:none">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 22h12V4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v18Z"/><path d="M15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V9l-3-3"/><path d="M6 6h6"/></svg>
-        <span id="hdr-credits-pill-label">Pilot</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <span id="hdr-credits-pill-label">Kontingent</span>
       </button>
     </div>
   </div>
@@ -3120,7 +3128,7 @@ label.dp-required.qc-required::after {
 <script src="js/mietentwicklung.js?v=166"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=1133"></script>
-<script src="js/config.js?v=v1176"></script>
+<script src="js/config.js?v=v1183"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -3140,8 +3148,8 @@ label.dp-required.qc-required::after {
   <script src="js/mandanten.js?v=953"></script>
   <script src="js/ueberfuehrung-wizard.js?v=816i"></script>
   <script src="js/apikeys.js?v=811"></script>
-  <script src="js/settings.js?v=v1182c"></script>
-<script src="js/pricing-modal.js?v=v1176c"></script>
+  <script src="js/settings.js?v=v1183"></script>
+<script src="js/pricing-modal.js?v=v1183"></script>
   <script src="js/promo-erstflug.js?v=1"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=878"></script>
@@ -3154,7 +3162,7 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=974"></script>
+<script src="js/ui.js?v=v1183"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=v1179"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
@@ -3175,7 +3183,7 @@ label.dp-required.qc-required::after {
 <script src="js/ki-miete.js?v=124"></script>
 <script src="js/star-rating.js?v=364"></script>
 <script src="js/pdf-import.js?v=477"></script>
-<script src="js/beleg-import.js?v=v1116"></script>
+<script src="js/beleg-import.js?v=v1183"></script>
 <script src="js/financing.js?v=124"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=124"></script>
@@ -3184,7 +3192,7 @@ label.dp-required.qc-required::after {
 <script src="js/qc-bridge.js?v=969c"></script>
 <script src="js/bodenrichtwert.js?v=191"></script>
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
-<script src="js/ai-credits.js?v=840"></script>
+<script src="js/ai-credits.js?v=v1183"></script>
 <script src="js/workflow.js?v=124"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=W35"></script>
@@ -3231,10 +3239,10 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=951"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v1168"></script>
+  <script src="js/object-actions.js?v=v1183"></script>
   <script src="js/dpsh-score-hero.js?v=v1116"></script><!-- dpsh-score-hero -->
-  <script src="js/quick-boarding-share.js?v=v1116"></script>
-  <script src="js/voice-import.js?v=v1169"></script>
+  <script src="js/quick-boarding-share.js?v=v1183"></script>
+  <script src="js/voice-import.js?v=v1183"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->

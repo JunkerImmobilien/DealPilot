@@ -212,7 +212,7 @@
 
   /* Checkbox-Label im qc7-src-Format (von object-actions render() eingebunden) */
   function srcLabel() {
-    return '<label class="qc7-src" data-src="voice" title="Objekt frei einsprechen \u2014 1 L Kerosin pro Auswertung">' +
+    return '<label class="qc7-src" data-src="voice" title="Objekt frei einsprechen 2014 im Plan enthalten">' +
       '<input type="checkbox" value="voice">' +
       '<span class="qc7-box">' + checkSvg() + '</span>' +
       '<span class="qc7-ic">' + micSvg(14) + '</span> Sprachaufzeichnung</label>';
@@ -1037,7 +1037,7 @@
     collectBlob().then(function (blob) {
       stopAll();
       if (!blob || blob.size < 2000) {
-        toast('Aufnahme zu kurz \u2014 keine Auswertung (kein Kerosin verbraucht)');
+        toast('Aufnahme zu kurz \u2014 keine Auswertung');
         if (nx) { nx.disabled = false; nx.textContent = 'Weiter \u2014 auswerten (1\u00a0L)'; }
         return;
       }
@@ -1049,7 +1049,7 @@
         });
     }).catch(function (err) {
       if (err && err.needs_credits) {
-        toast('Nicht genug Kerosin im Tank (1\u00a0L ben\u00f6tigt) \u2014 bitte tanken');
+        toast('Spracheingabe gerade nicht verfuegbar');
         try { if (typeof window.showSettings === 'function') window.showSettings('plan'); } catch (e) {}
       } else {
         toast('Sprachauswertung fehlgeschlagen: ' + ((err && err.message) || err));

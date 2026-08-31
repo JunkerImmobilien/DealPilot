@@ -1150,28 +1150,34 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
   </section>
   <hr class="rw">
 
-  <!-- KEROSIN NACHTANKEN (volle Breite) — v11 -->
+  <!-- BEWERTUNGEN NACHKAUFEN (volle Breite) — v11, v1183 ohne Kerosin -->
   <section class="sec sec-dark" id="kerosin-tanken">
     <div class="wrap">
       <div class="head ctr">
-        <span class="eye">// Kerosin nachtanken</span>
-        <h2>Volltanken. <span class="ac">Durchstarten.</span></h2>
-        <p>Ein Pass, umschaltbar &mdash; gekauftes Kerosin verf&auml;llt nie, kein Abo.</p>
+        <span class="eye">// Bewertungen nachkaufen</span>
+        <h2>Mehr Reichweite. <span class="ac">Ohne Abo.</span></h2>
+        <p>Ein Pass, umschaltbar &mdash; gekaufte Bewertungen verfallen nie.</p>
       </div>
-      <div class="bw-segs"><button class="bw-seg" data-i="0"><span class="bw-seg-l">10 L</span><span class="bw-seg-p">2 €</span></button><button class="bw-seg" data-i="1"><span class="bw-seg-l">28 L</span><span class="bw-seg-p">5 €</span></button><button class="bw-seg on" data-i="2"><span class="bw-seg-l">90 L</span><span class="bw-seg-p">15 €</span></button><button class="bw-seg" data-i="3"><span class="bw-seg-l">160 L</span><span class="bw-seg-p">25 €</span></button></div>
+      <!-- v1183: Die Kacheln standen hier als vier feste Knoepfe im HTML und
+           trugen noch „10 L / 2 €", waehrend die Karte darunter laengst aus
+           DATA kam und „15 · 10 · 3 / 39,90 €" zeigte. Zwei Listen fuer
+           dieselbe Sache, und genau das war Marcels Befund „total
+           unuebersichtlich". Jetzt werden sie aus DATA gebaut — eine Quelle,
+           sie koennen nicht mehr auseinanderlaufen. -->
+      <div class="bw-segs" id="bw-segs"></div>
       <div class="bw" id="bw-pass">
         <span class="bw-pop">Beliebt &middot; bestes Verh&auml;ltnis</span>
-        <div class="bw-stub"><div class="bw-class" id="bw-flight"></div><div class="bw-l" id="bw-l"></div><div class="bw-ll">Liter Kerosin</div></div>
+        <div class="bw-stub"><div class="bw-class" id="bw-flight"></div><div class="bw-l" id="bw-l"></div><div class="bw-ll">Bewertungen</div></div>
         <div class="bw-perf"></div>
         <div class="bw-body">
-          <div class="bw-col"><span class="bw-k">Anfragen</span><span class="bw-v"><span id="bw-anf"></span> Pilot-Anfragen</span></div>
+          <div class="bw-col"><span class="bw-k">Enthalten</span><span class="bw-v"><span id="bw-anf"></span> &middot; MPI &middot; erweitert &middot; Wertermittlung</span></div>
           <div class="bw-col"><span class="bw-k">Reichweite</span><span class="bw-v" id="bw-reach"></span></div>
-          <div class="bw-col"><span class="bw-k">Preis / Liter</span><span class="bw-v"><span id="bw-per"></span><span class="sv" id="bw-save"></span></span></div>
+          <div class="bw-col"><span class="bw-k">Preis</span><span class="bw-v"><span id="bw-per"></span><span class="sv" id="bw-save"></span></span></div>
           <div class="bw-col"><span class="bw-k">Profil</span><span class="bw-v" id="bw-target"></span></div>
         </div>
-        <div class="bw-gate"><div class="bw-price"><span id="bw-price"></span><small>einmalig &middot; kein Abo</small></div><a class="bw-cta" id="bw-cta" href="#">Tanken &#9992;</a></div>
+        <div class="bw-gate"><div class="bw-price"><span id="bw-price"></span><small>einmalig &middot; kein Abo</small></div><a class="bw-cta" id="bw-cta" href="#">Dazubuchen &#9992;</a></div>
       </div>
-      <div class="footline">Nicht genutzte Abrufe bleiben erhalten &middot; ab Starter-Plan zubuchbar</div>
+      <div class="footline">Nicht genutzte Bewertungen bleiben erhalten &middot; ab Starter-Plan zubuchbar</div>
     </div>
   </section>
   <hr class="rw">
@@ -1207,6 +1213,14 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
       setP('monthly');
     }
     var DATA=[{"l": "5 · 2 · 0", "price": "7,90", "per": "0,90 €", "flight": "✈ Kurzstrecke", "target": "Mal schnell prüfen", "reach": "5 Marktpreisindikationen · 2 erweiterte", "best": false, "save": 4}, {"l": "10 · 5 · 1", "price": "19,90", "per": "0,85 €", "flight": "✈✈ Mittelstrecke", "target": "Mehrere Deals", "reach": "10 · 5 · 1 Wertermittlung", "best": false, "save": 13}, {"l": "15 · 10 · 3", "price": "39,90", "per": "0,80 €", "flight": "✈✈✈ Langstrecke", "target": "Aktiver Investor", "reach": "15 · 10 · 3 Wertermittlungen", "best": true, "save": 18}, {"l": "25 · 20 · 6", "price": "69,90", "per": "0,75 €", "flight": "🌍 Interkontinental", "target": "Maximale Reichweite", "reach": "25 · 20 · 6 Wertermittlungen", "best": false, "save": 24}];var buy='https://app.dealpilot.junker-immobilien.io/?register=1&amp;kerosin='.replace('&amp;','&');
+    /* v1183: Die Kacheln kommen aus DATA statt aus festem HTML. Sie trugen
+       sonst die alten Liter-Zahlen, waehrend die Karte darunter schon die
+       Pakete zeigte. */
+    var segHost=document.getElementById('bw-segs');
+    if(segHost){segHost.innerHTML=DATA.map(function(d,j){
+      return '<button class="bw-seg'+(d.best?' on':'')+'" data-i="'+j+'">'+
+             '<span class="bw-seg-l">'+d.l+'</span>'+
+             '<span class="bw-seg-p">'+d.price+' €</span></button>';}).join('');}
     var seg=document.querySelectorAll('.bw-seg');var pass=document.getElementById('bw-pass');
     function paint(i){var d=DATA[i];
       document.getElementById('bw-flight').textContent=d.flight;
@@ -2673,7 +2687,7 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
         '3 Speicherungen',
         'DealPilot Score (5 Faktoren)',
         'Investor Deal Score (24 KPIs) — Demo',
-        '2 L Kerosin / Monat' /* v493-liter */,
+        '1 Marktpreisindikation / Monat' /* v1183 */,
         'Alle PDFs mit Wasserzeichen'
       ],
       not_included: null,
@@ -2692,7 +2706,7 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
         'Werbungskosten-Modul vollständig',
         'Mietspiegel-Vergleich (manuell)',
         'Manuelle Marktzinsen',
-        '10 L Kerosin / Monat inklusive'
+        '5 Marktpreisindikationen / Monat'
       ],
       not_included: [
         'Investor Deal Score (24 KPIs)',
@@ -2720,7 +2734,7 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
         'Live-Marktzinsen',
         'Mietspiegel — Auto-Vergleich',
         'BMF-Rechner & Export',
-        '40 L Kerosin / Monat inklusive'
+        '5 Marktpreisindikationen + 5 erweiterte / Monat'
       ],
       not_included: null,
       result: 'Sie investieren wie ein institutioneller Investor — mit allen KPIs, die Banken und Steuerberater erwarten.',
@@ -2738,7 +2752,7 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
         'Custom Track-Record Cover',
         'BMF-Rechner & Export',
         'Priorisierter Support',
-        '100 L Kerosin / Monat inklusive',
+        '5 Marktpreisindikationen + 5 erweiterte + 5 Wertermittlungen / Monat',
         'Migration & Einrichtungsservice (bis 3 h) inkl.'
       ],
       not_included: null,
@@ -2837,19 +2851,19 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
         // v489-kerosin-landing: Kerosin-Tacho-Karten (ersetzt KI-Credits + Marktdaten-Credits)
         '<div class="dp-container dp-section">' +
           '<div class="dp-section-head">' +
-            '<span class="dp-pill dp-pill-alt">Kerosin</span>' +
-            '<h2 class="dp-h2">Volltanken. Durchstarten.</h2>' +
+            '<span class="dp-pill dp-pill-alt">Bewertungen nachkaufen</span>' +
+            '<h2 class="dp-h2">Mehr Reichweite. Ohne Abo.</h2>' +
             '<p class="dp-sub">' +
-              '<strong>1 Liter = 1 Pilot-Anfrage.</strong> Dein Plan füllt den Tank monatlich (Starter 10 L · Investor 40 L · Pro 100 L) — gekauftes Kerosin kommt obendrauf, wird zuletzt verbraucht und verfällt nie.' /* v491-hybrid */ +
+              '<strong>Gezählt werden Bewertungen, getrennt nach Art.</strong> Dein Plan setzt sie monatlich neu (Starter 5 · Investor 5 · 5 · Pro 5 · 5 · 5) — was du nicht nutzt, wandert ins Guthaben; Zugekauftes verfällt nie und wird zuletzt verbraucht.' /* v1183 */ +
             '</p>' +
           '</div>' +
           '<div class="dp-credits-grid">' +
-            _kerosinCard(10,  2,  0.20,  'Mal schnell prüfen',  '✈ Kurzstrecke',       164.8, -57.6, '≈ 2 Reports oder 5 Markteinschätzungen',   false) +
-            _kerosinCard(28,  5,  0.18,  'Mehrere Deals',        '✈✈ Mittelstrecke',   116.6, -14.4, '≈ 7 Reports oder 14 Markteinschätzungen',  false) +
-            _kerosinCard(90,  15, 0.167, 'Aktiver Investor',     '✈✈✈ Langstrecke',  56.3,  39.6,  '≈ 22 Reports oder 45 Markteinschätzungen', true)  +
-            _kerosinCard(160, 25, 0.156, 'Maximale Reichweite',  '🌍 Interkontinental', 14.1,  77.4,  '≈ 40 Reports oder 80 Markteinschätzungen', false) +
+            _kerosinCard('5 · 2 · 0',   '7,90',  0.90, 'Mal schnell prüfen',  '✈ Kurzstrecke',       164.8, -57.6, '5 Marktpreisindikationen · 2 erweiterte', false) +
+            _kerosinCard('10 · 5 · 1',  '19,90', 0.85, 'Mehrere Deals',       '✈✈ Mittelstrecke',   116.6, -14.4, '10 · 5 · 1 Wertermittlung', false) +
+            _kerosinCard('15 · 10 · 3', '39,90', 0.80, 'Aktiver Investor',    '✈✈✈ Langstrecke',  56.3,  39.6,  '15 · 10 · 3 Wertermittlungen', true)  +
+            _kerosinCard('25 · 20 · 6', '69,90', 0.75, 'Maximale Reichweite', '🌍 Interkontinental', 14.1,  77.4,  '25 · 20 · 6 Wertermittlungen', false) +
           '</div>' +
-          '<p class="dp-note" style="text-align:center;margin-top:14px">Kerosin ist ab dem Starter-Plan zubuchbar · verfällt nicht · kein Abo.</p>' +
+          '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar · verfallen nicht · kein Abo.</p>' +
         '</div>' +
 
         // Feature-Übersicht
@@ -2863,7 +2877,7 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
 
         // Footer-Hinweise
         '<div class="dp-container dp-footer-note">' +
-          '<p>Alle Preise sind Endpreise — gemäß § 19 UStG (Kleinunternehmerregelung) wird keine Umsatzsteuer ausgewiesen. Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. Kerosin verfällt nicht.</p>' +
+          '<p>Alle Preise sind Endpreise — gemäß § 19 UStG (Kleinunternehmerregelung) wird keine Umsatzsteuer ausgewiesen. Pläne jederzeit kündbar. Plan-Änderungen werden zum Beginn der nächsten Abrechnungsperiode wirksam. Zugekaufte Bewertungen verfallen nicht.</p>' +
         '</div>' +
       '</div>';
   }
@@ -2871,10 +2885,14 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
   // Feature-Tabelle
   function _renderFeatureTable() {
     var rows = [ /* v493-matrix — Feature-Matrix Stand 05.06.2026 */
-      { cat: 'Nutzung & Kerosin', items: [
+      { cat: 'Nutzung & Kontingent', items: [
         ['Objekte',                              '1', '5', '25', '∞'],
-        ['Kerosin / Monat',                      '2 L', '10 L', '40 L', '100 L'],
-        ['Kerosin nachtanken (Liter-Pakete)',    '–', '✓', '✓', '✓']
+        /* v1183: eine Zeile je Bewertungsart statt einer Liter-Zeile. Genau
+           die Aufschluesselung, die der Kunde vorher selbst rechnen musste. */
+        ['Marktpreisindikation / Monat',          '1', '5', '5', '5'],
+        ['Erweiterte Marktpreisindikation',       '–', '–', '5', '5'],
+        ['Wertermittlung nach ImmoWertV',         '–', '–', '–', '5'],
+        ['Bewertungen nachkaufen',                '–', '✓', '✓', '✓']
       ]},
       { cat: 'Analyse & Bewertung', items: [
         ['DealPilot Score (5 Faktoren)',         '✓', '✓', '✓', '✓'],
@@ -2964,20 +2982,26 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
     '</svg>';
   }
 
+  /* v1183: `liter` ist jetzt die Paket-Aufteilung „5 · 2 · 0", `perLiter`
+     der Stueckpreis der einfachsten Bewertung im Paket. Die Parameternamen
+     bleiben, damit die Aufrufer nicht mitwandern muessen — der angezeigte
+     Text nennt keine Liter mehr. */
   function _kerosinCard(liter, price, perLiter, target, flight, off, deg, reach, best) {
-    var perLiterStr = perLiter.toFixed(perLiter < 0.17 ? 3 : 2).replace('.', ',') + ' €';
+    var perStr = (typeof perLiter === 'number')
+      ? perLiter.toFixed(2).replace('.', ',') + ' €'
+      : String(perLiter);
     return '<div class="dp-credits-card kp-card' + (best ? ' dp-credits-card-best' : '') + '">' +
       (best ? '<span class="dp-credits-best">Beliebt</span>' : '') +
       '<div class="kp-flight">' + flight + '</div>' +
       _kerosinGauge(off, deg) +
       '<div class="dp-credits-amount">' + liter + '</div>' +
-      '<div class="dp-credits-amount-label">Liter = ' + liter + ' Pilot-Anfragen</div>' +
+      '<div class="dp-credits-amount-label">MPI · erweitert · Wertermittlung</div>' +
       '<div class="dp-credits-divider"></div>' +
       '<div class="dp-credits-price">' + price + ' €</div>' +
-      '<div class="dp-credits-perunit">' + perLiterStr + ' / Liter</div>' +
+      '<div class="dp-credits-perunit">ab ' + perStr + ' je Bewertung</div>' +
       '<div class="dp-credits-target">' + target + '</div>' +
       '<div class="kp-reach">' + reach + '</div>' +
-      '<a class="dp-credits-cta" href="https://app.dealpilot.junker-immobilien.io/?register=1&kerosin=' + liter + '">Kerosin kaufen</a>' +
+      '<a class="dp-credits-cta" href="https://app.dealpilot.junker-immobilien.io/?register=1&paket=' + encodeURIComponent(liter) + '">Dazubuchen</a>' +
     '</div>';
   }
 
@@ -3667,12 +3691,15 @@ html{scroll-behavior:smooth}
         <li><strong>Bankargumente</strong> — 5–7 ausführliche, fundierte Argumente für die Finanzierungsanfrage, mit konkreten Zahlen und Bezug auf den Deal</li>
       </ul>
 
-      <h3>Wie das Kerosin-System funktioniert</h3>
+      <h3>Wie das Kontingent funktioniert</h3>
       <p>
-        DealPilot rechnet in <strong>Kerosin</strong>: 1 Liter = 1 Pilot-Anfrage. Eine vollständige Pilot-Analyse verbraucht also genau einen Liter aus deinem Tank. Wir nutzen dieses System statt einer Flatrate, weil KI-Aufrufe für uns echte Kosten bedeuten — und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
+        DealPilot rechnet in <strong>Bewertungen</strong> — und zwar getrennt nach Art, weil sie unterschiedlich aufwendig sind: die <strong>Marktpreisindikation</strong> als schneller Marktabgleich, die <strong>erweiterte Marktpreisindikation</strong> mit Vergleichswerten und Korridor, und die <strong>Wertermittlung nach ImmoWertV</strong> als vollständiges Verfahren mit Modellvermerken. Jede Art hat ihr eigenes Kontingent. Wir rechnen so statt mit einer Flatrate, weil die Verfahren für uns echte Kosten bedeuten — und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
       </p>
       <p>
-        Dein Plan füllt den Tank jeden Monat neu (Free: 2 L, Starter: 10 L, Investor: 40 L, Pro: 100 L). Brauchst du mehr, tankst du nach: 10 L für 2 €, 28 L für 5 €, 90 L für 15 € oder 160 L für 25 €. <strong>Gekauftes Kerosin verfällt nie</strong> — es wird erst angezapft, wenn dein Monatskontingent leer ist.
+        Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du nicht nutzt, verfällt nicht</strong> — es wandert ins Guthaben, bis zum Dreifachen deines Monatskontingents. Brauchst du mehr, kaufst du nach: ab 7,90 € für ein Paket oder 0,90 € für eine einzelne Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht.
+      </p>
+      <p>
+        Die kleinen KI-Hilfen — Spracheingabe, Beleg-Import, Bodenrichtwert-Abruf, Feldvorschläge — sind <strong>in jedem Plan enthalten</strong> und zählen gegen kein Kontingent.
       </p>
     </div>
   </section>
@@ -3803,7 +3830,7 @@ html{scroll-behavior:smooth}
         Eine Kalkulation ist nur so gut wie ihre Annahmen. DealPilot holt deshalb echte Marktdaten in die Analyse: <strong>Live-Marktzinsen</strong> für realistische Finanzierungskonditionen, den automatischen <strong>Mietspiegel-Vergleich</strong> für deine Mietansätze und den <strong>Bodenrichtwert-Abruf</strong> für die Einordnung des Grundstücksanteils.
       </p>
       <p>
-        Für die Preisfrage selbst gibt es die <strong>Marktwert-Indikation</strong> über professionelle Bewertungsdienste — PriceHubble und Sprengnetter, dieselben Anbieter, mit denen Banken und Sachverständige arbeiten. Die Abrufe bezahlst du flexibel mit Kerosin aus deinem Tank, ohne Abo-Bindung an einen Datenanbieter. So siehst du schwarz auf weiß, ob der Angebotspreis im Marktkorridor liegt, bevor du verhandelst.
+        Für die Preisfrage selbst gibt es die <strong>Marktwert-Indikation</strong> über <strong>unabhängige Bewertungspartner</strong> — dieselben Datengrundlagen, mit denen Banken und Sachverständige arbeiten. Die Abrufe kaufst du einzeln, ohne Abo-Bindung an einen Datenanbieter. So siehst du schwarz auf weiß, ob der Angebotspreis im Marktkorridor liegt, bevor du verhandelst.
       </p>
     </div>
   </section>
@@ -3831,35 +3858,37 @@ html{scroll-behavior:smooth}
   <section class="sec sec-cream">
     <div class="wrap">
       <div class="head">
-        <span class="eye">// Kerosin &middot; dein KI-Guthaben</span>
-        <h2>Voll tanken, <span class="ac">wenn du fliegst.</span></h2>
-        <p>Kerosin ist das Guthaben f&uuml;r alle KI-Funktionen &mdash; gemessen in Litern. <strong>1&nbsp;Liter = 1&nbsp;Pilot-Anfrage.</strong> Dein Plan f&uuml;llt den Tank jeden Monat automatisch, gekauftes Kerosin kommt obendrauf, wird zuletzt verbraucht und <strong>verf&auml;llt nie.</strong></p>
+        <span class="eye">// Dein Kontingent</span>
+        <h2>Drei Tiefen, <span class="ac">du entscheidest.</span></h2>
+        <p>Gez&auml;hlt werden <strong>Bewertungen</strong>, getrennt nach Art &mdash; weil sie unterschiedlich aufwendig sind. Dein Plan setzt die Kontingente jeden Monat neu. <strong>Was du nicht nutzt, verf&auml;llt nicht</strong>, es wandert ins Guthaben.</p>
       </div>
 
-      <div class="lu-sub">Monatlicher Tank je Plan</div>
+      <div class="lu-sub">Monatliches Kontingent je Plan</div>
       <div class="lu-tanks">
-        <div class="lu-tank"><div class="g" style="--p:8%"></div><b>2&nbsp;L</b><span>Free</span></div>
-        <div class="lu-tank"><div class="g" style="--p:22%"></div><b>10&nbsp;L</b><span>Starter</span></div>
-        <div class="lu-tank best"><div class="g" style="--p:60%"></div><b>40&nbsp;L</b><span>Investor</span></div>
-        <div class="lu-tank"><div class="g" style="--p:100%"></div><b>100&nbsp;L</b><span>Pro</span></div>
+        <div class="lu-tank"><div class="g" style="--p:10%"></div><b>1</b><span>Free</span></div>
+        <div class="lu-tank"><div class="g" style="--p:34%"></div><b>5</b><span>Starter</span></div>
+        <div class="lu-tank best"><div class="g" style="--p:67%"></div><b>5 &middot; 5</b><span>Investor</span></div>
+        <div class="lu-tank"><div class="g" style="--p:100%"></div><b>5 &middot; 5 &middot; 5</b><span>Pro</span></div>
       </div>
 
-      <div class="lu-sub">Kerosin nachtanken &mdash; jederzeit, ohne Abo</div>
-      <div class="lu-packs">
-        <div class="lu-pack"><div class="lp-l">10&nbsp;L</div><div class="lp-p">2&nbsp;&euro;</div><div class="lp-u">0,20&nbsp;&euro;/L</div></div>
-        <div class="lu-pack pop"><span class="lp-tag">beliebt</span><div class="lp-l">28&nbsp;L</div><div class="lp-p">5&nbsp;&euro;</div><div class="lp-u">0,18&nbsp;&euro;/L</div></div>
-        <div class="lu-pack"><div class="lp-l">90&nbsp;L</div><div class="lp-p">15&nbsp;&euro;</div><div class="lp-u">0,17&nbsp;&euro;/L</div></div>
-        <div class="lu-pack"><div class="lp-l">160&nbsp;L</div><div class="lp-p">25&nbsp;&euro;</div><div class="lp-u">0,16&nbsp;&euro;/L</div></div>
-      </div>
-
-      <div class="lu-sub">Was Kerosin kostet</div>
+      <div class="lu-sub">Die drei Bewertungsarten</div>
       <div class="lu-costs">
-        <div class="lu-cost"><span class="c-n">Co-Pilot (KI) &middot; Analyse pro Objekt</span><span class="c-v">1&nbsp;L</span></div>
-        <div class="lu-cost"><span class="c-n">KI-Feldvorschlag &middot; Marktmiete / Lage</span><span class="c-v">1&nbsp;L</span></div>
-        <div class="lu-cost"><span class="c-n">Marktbericht &middot; Schnell / Voll</span><span class="c-v">2&ndash;5&nbsp;L</span></div>
-        <div class="lu-cost"><span class="c-n">Marktwert Sprengnetter</span><span class="c-v">20&nbsp;L</span></div>
-        <div class="lu-cost"><span class="c-n">Marktwert PriceHubble</span><span class="c-v">40&nbsp;L</span></div>
+        <div class="lu-cost"><span class="c-n">Marktpreisindikation &middot; schneller Marktabgleich</span><span class="c-v">0,90&nbsp;&euro;</span></div>
+        <div class="lu-cost"><span class="c-n">Erweiterte Marktpreisindikation &middot; mit Korridor</span><span class="c-v">1,90&nbsp;&euro;</span></div>
+        <div class="lu-cost"><span class="c-n">Wertermittlung nach ImmoWertV &middot; volles Verfahren</span><span class="c-v">3,90&nbsp;&euro;</span></div>
+        <div class="lu-cost"><span class="c-n">Marktwert-Abruf &middot; unabh&auml;ngiger Bewertungspartner</span><span class="c-v">5,90&nbsp;&euro;</span></div>
+        <div class="lu-cost"><span class="c-n">Marktwert-Abruf &middot; zweiter Bewertungspartner</span><span class="c-v">9,90&nbsp;&euro;</span></div>
       </div>
+
+      <div class="lu-sub">Nachkaufen &mdash; jederzeit, ohne Abo</div>
+      <div class="lu-packs">
+        <div class="lu-pack"><div class="lp-l">5&nbsp;&middot;&nbsp;2&nbsp;&middot;&nbsp;0</div><div class="lp-p">7,90&nbsp;&euro;</div><div class="lp-u">Kurzstrecke</div></div>
+        <div class="lu-pack"><div class="lp-l">10&nbsp;&middot;&nbsp;5&nbsp;&middot;&nbsp;1</div><div class="lp-p">19,90&nbsp;&euro;</div><div class="lp-u">Mittelstrecke</div></div>
+        <div class="lu-pack pop"><span class="lp-tag">beliebt</span><div class="lp-l">15&nbsp;&middot;&nbsp;10&nbsp;&middot;&nbsp;3</div><div class="lp-p">39,90&nbsp;&euro;</div><div class="lp-u">Langstrecke</div></div>
+        <div class="lu-pack"><div class="lp-l">25&nbsp;&middot;&nbsp;20&nbsp;&middot;&nbsp;6</div><div class="lp-p">69,90&nbsp;&euro;</div><div class="lp-u">Interkontinental</div></div>
+      </div>
+
+      <p class="dp-note" style="text-align:center;margin-top:16px">Spracheingabe, Beleg-Import, Bodenrichtwert und Feldvorschl&auml;ge sind in jedem Plan enthalten und z&auml;hlen gegen kein Kontingent.</p>
     </div>
   </section>
   <hr class="rw">
