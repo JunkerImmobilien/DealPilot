@@ -36,11 +36,46 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 2026-08-30, nachts)
+## → HIER WEITERMACHEN (Übergabe 2026-08-31, abends)
 
-**Stand:** lokal = GitHub auf `8267b52`, Staging auf `8b87e23` (Doku-Commits
-müssen nicht ausgerollt werden). Zweig `staging`, Migrationen **65**.
-**Nichts hängt halbfertig.**
+**Stand:** lokal = GitHub = Staging auf `478ac15`, Zweig `staging`,
+Migrationen **66**. **Nichts hängt halbfertig.** Produktion steht
+unverändert auf `74ae2e3` vom 14.08. und wurde nicht angefasst.
+
+**Marcel schaut sich v1183 in Ruhe an.** Vor dem nächsten Bauen also
+zuerst seinen Befund abwarten — die drei Punkte unten hängen nicht davon
+ab und können vorher laufen.
+
+### Die drei nächsten Schritte, in dieser Reihenfolge
+
+**1 · Der Stripe-Webhook füllt das Kontingent noch nicht.**
+`aiCreditsService.addKontingent()` steht und ist im Container geprüft,
+aber der Webhook kennt noch die Liter-Welt und ruft es nicht auf. **Bis
+das hängt, schreibt ein Kauf nichts gut** — das ist der wichtigste Rest,
+weil er Geld betrifft. Die Paket-Inhalte stehen als `lookup_key`-Metadaten
+an den Stripe-Preisen (`mpi`, `mpi_plus`, `wev` an `dp_paket_*`), der
+Webhook kann sie also direkt auslesen, statt eine eigene Tabelle zu
+führen.
+
+**2 · Der Monatsübertrag ist ungetestet.**
+`_carryOver()` ist idempotent über `kontingent_carry_at` gebaut. Zum
+Prüfen den Merker eines Testnutzers auf den Vormonat setzen und
+`getStatus()` rufen — dann muss der Rest in die Bank wandern, gedeckelt
+auf das Dreifache, und `mpi_used` auf 0 stehen.
+
+**3 · Die Live-Portal-Konfiguration führt noch 29 / 59 / 99 €.**
+Auf Staging ist sie gesetzt, live nicht. Sie darf **erst mit dem
+Prod-Rollout** umgestellt werden, sonst zeigt die alte Prod-App 29 € und
+das Portal 19,99 €.
+
+> **Und die Warnung, die über allem steht, solange Prod alt ist:**
+> Die angezeigten Preise kommen aus `frontend/js/config.js`, die
+> Abbuchung aus `plans.stripe_price_*_id`, und was der Kunde beim
+> Wechseln sieht, aus der **Billing-Portal-Konfiguration**. **Drei
+> Stellen.** Läuft eine davon vor, wirbt die Seite mit einem Preis, den
+> die Buchung nicht kennt. Deshalb gehört ein Prod-Rollout in **einen**
+> Arbeitsgang: Frontend, Migration 064/066 und Portal-Konfiguration.
+
 
 ### Erledigt in dieser Runde — Stripe steht, Migrationen laufen
 
