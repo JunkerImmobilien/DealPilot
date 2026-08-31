@@ -22,13 +22,16 @@
         '3 Speicherungen',
         'DealPilot Score (5 Faktoren)',
         'Investor Deal Score (24 KPIs) — Demo',
-        '1 Marktpreisindikation / Monat' /* v1183 */,
+        /* v1185: die Testphase zuerst — sie ist das, was ein neues Konto
+           tatsaechlich vorfindet. Die Zeile darunter gilt ab Woche fuenf. */
+        '4 Wochen Pro — mit 5 · 3 · 1 Bewertungen',
+        'danach 1 Marktpreisindikation / Monat' /* v1183 */,
         'Alle PDFs mit Wasserzeichen'
       ],
       not_included: null,
       result: 'Sie sehen die volle Tiefe von DealPilot — und entscheiden danach, ob Sie upgraden.',
       ctaText: 'Kostenlos starten',
-      footnote: 'Keine Kreditkarte nötig'
+      footnote: '4 Wochen Pro inklusive · danach automatisch Free · keine Kreditkarte'
     },
     {
       key: 'starter', letter: 'S', label: 'Starter', tag: 'Privat-Investor', title: 'Starter',

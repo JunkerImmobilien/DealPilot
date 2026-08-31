@@ -24,14 +24,19 @@
         '3 Speicherungen',
         'DealPilot Score (5 Faktoren)',
         'Investor Deal Score (24 KPIs) — Demo',
-        '1 Marktpreisindikation / Monat' /* v1176-kontingent */,
+        /* v1185: die Testphase steht zuerst, weil sie das ist, was ein
+           neues Konto tatsaechlich vorfindet. Die Zeile darunter gilt ab
+           Woche fuenf. */
+        '4 Wochen Pro — mit 5 · 3 · 1 Bewertungen',
+        'danach 1 Marktpreisindikation / Monat' /* v1176-kontingent */,
         'Alle PDFs mit Wasserzeichen'
       ],
       not_included: null,
       result: 'Sie sehen die volle Tiefe von DealPilot — und entscheiden danach, ob Sie upgraden.',
       ctaText: 'Kostenlos starten',
-      /* TR7-trial */
-      footnote: '7 Tage Pro inklusive · danach automatisch Free · keine Kreditkarte'
+      /* TR7-trial, v1185: aus sieben Tagen werden vier Wochen, und die
+         Testphase traegt jetzt ein eigenes Bewertungspaket. */
+      footnote: '4 Wochen Pro inklusive · mit 5 · 3 · 1 Bewertungen · danach automatisch Free · keine Kreditkarte'
     },
     {
       key: 'starter', letter: 'S', label: 'Starter', tag: 'Privat-Investor', title: 'Starter',
@@ -270,6 +275,10 @@
   }
   function _cockpitMatrixHtml(){
     var R = [
+      /* v1185 · Steht ganz oben, weil es der Zustand ist, in dem jedes
+         neue Konto startet. Ohne diese Zeile las sich die Free-Spalte so,
+         als bekaeme man vom ersten Tag an eine Indikation im Monat. */
+      ['Die ersten 4 Wochen','✓ Pro · 5 · 3 · 1 Bewertungen','–','–','–'],
       ['Objekte','1','5','25','\u221e'],
       /* v1176 \u00b7 Aus einer Kerosin-Zeile werden vier Kontingent-Zeilen. */
       ['Marktpreisindikation / Monat','1','5','5','5'],
@@ -502,7 +511,9 @@
         '<h3 class="dp-feature-table-h">Cockpit-Matrix</h3>' +
         '<p class="dp-feature-table-sub">Klare Gegen\u00fcberstellung aller Features pro Plan.</p>' +
         _cockpitMatrixHtml() +
-        '<div class="mx-foot">* Marktdatenfelder in Free &amp; Starter als Vorschau gesperrt, ab Investor freigeschaltet.</div>' +
+        '<div class="mx-foot">* Marktdatenfelder in Free &amp; Starter als Vorschau gesperrt, ab Investor freigeschaltet.<br>' +
+        'Jedes neue Konto läuft die ersten vier Wochen als Pro — mit 5 Marktpreisindikationen, 3 erweiterten und 1 Wertermittlung. ' +
+        'Danach automatisch Free, ohne Kündigung. Nicht genutzte Bewertungen aus der Testphase verfallen.</div>' +
       '</div>' +
 
       // V192: Service & Support-Block entfernt (auf User-Wunsch)
@@ -519,6 +530,9 @@
   function _renderFeatureTable() {
     var rows = [ /* v493-matrix — Feature-Matrix Stand 05.06.2026 */
       { cat: 'Nutzung & Kontingent', items: [
+        /* v1185 · Dieselbe Zeile wie in der Kurzmatrix oben — sie muessen
+           zusammen wandern, sonst stehen zwei Wahrheiten im selben Modal. */
+        ['Die ersten 4 Wochen',                  '✓ Pro · 5 · 3 · 1', '–', '–', '–'],
         ['Objekte',                              '1', '5', '25', '∞'],
         /* v1176 · dieselben vier Zeilen wie in der Kurzmatrix oben. Es sind
            zwei Listen fuer dieselbe Sache — sie muessen zusammen wandern. */

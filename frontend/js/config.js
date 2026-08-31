@@ -502,10 +502,34 @@ window.DealPilotConfig = (function() {
     currency: 'EUR',
     yearly_discount_label: '~17% gespart',  // Anzeigetext beim Toggle
     show_yearly_toggle: true,
-    trial_days: 7               // TR7-trial: 7 Tage Pro ab Registrierung.
-                                // Reine ANZEIGE-Wahrheit fuer die UI — die
-                                // verbindliche Laufzeit steht in plan_trials
-                                // (Backend). Hier nichts berechnen.
+    trial_days: 28              // v1185: vier Wochen Pro ab Registrierung
+                                // (vorher 7). Reine ANZEIGE-Wahrheit fuer
+                                // die UI — die verbindliche Laufzeit steht
+                                // in plan_trials (Backend), die Zahl dort
+                                // in aiCreditsService.TESTPHASE_TAGE.
+                                // Hier nichts berechnen.
+  };
+
+  /* ── v1185 · Was die Testphase an Bewertungen mitbringt ────────────────
+     Marcels Entscheidung vom 31.08.2026: ein EINMALIGES Paket fuer die
+     vier Wochen, das mit der Testphase verfaellt — nicht das
+     Monatskontingent eines Pro.
+
+     Warum kein Pro-Kontingent: es haenge am Zufall des Anmeldedatums (wer
+     sich am 20. anmeldet, bekaeme am 1. das naechste) und wandere beim
+     Monatswechsel in die Bank, die nie verfaellt. Ein Testnutzer haette
+     danach als Free-Nutzer dauerhaft Wertermittlungen auf Vorrat.
+
+     DIESE ZAHLEN SIND EIN PREIS und stehen auch in
+     backend/src/services/aiCreditsService.js als TESTPAKET. Laufen sie
+     auseinander, wirbt die Seite mit etwas, das der Server nicht gibt —
+     dieselbe Falle wie bei den Monatskontingenten. */
+  var TESTPHASE = {
+    tage:     28,
+    mpi:      5,
+    mpi_plus: 3,
+    wev:      1,
+    label:    '5 · 3 · 1'
   };
 
   function getPlan(key) {
@@ -690,6 +714,7 @@ window.DealPilotConfig = (function() {
       /* v1176 */
       einzelkauf: EINZELKAUF,
       bewertungsPakete: BEWERTUNGS_PAKETE,
+      testphase: TESTPHASE,                 /* v1185 */
       yearlyBonus: YEARLY_BONUS,
       // V63.82: Service-Level
       serviceLevels: SERVICE_LEVELS,

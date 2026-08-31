@@ -37,19 +37,52 @@ async function createUser({ email, plainPassword, name, newsletter }) {
      WHERE NOT EXISTS -> keine Mehrfachvergabe.
      Fehler werden geloggt, nicht geworfen: ein fehlender Trial ist ein
      Schoenheitsfehler, ein geplatztes Konto waere ein echter Schaden. */
-  try {
-    await query(
-      "INSERT INTO plan_trials (user_id, granted_plan, expires_at) " +
-      "SELECT $1::uuid, 'pro', NOW() + INTERVAL '7 days' " +
-      "WHERE NOT EXISTS (SELECT 1 FROM plan_trials WHERE user_id = $1::uuid)",
-      [r.rows[0].id]
-    );
-    console.log('[TR7-trial] Testphase 7 Tage Pro gewaehrt fuer', r.rows[0].email);
-  } catch (trialErr) {
-    console.warn('[TR7-trial] Auto-Grant fehlgeschlagen:', trialErr.message);
-  }
+  await gewaehreTestphase(r.rows[0].id, r.rows[0].email);
 
   return r.rows[0];
+}
+
+/* ─── v1185 · Die Testphase vergeben ────────────────────────────────────
+   Vier Wochen Pro plus ein einmaliges Bewertungspaket. Bis v1184 gab die
+   Testphase NUR den Funktionsumfang frei: der Testnutzer sah Pro, hatte
+   aber das Free-Kontingent (eine Marktpreisindikation im Monat, keine
+   Wertermittlung) und konnte gerade das nicht testen, wofuer er zahlen
+   soll. Marcels Entscheidung vom 31.08.2026.
+
+   EINE Funktion, weil es bis hierher ZWEI Kopien gab: eine in
+   `createUser` und eine in `routes/auth.js`. Solange beide nur Tage
+   zaehlten, war das nur haesslich — mit dem Paket dahinter waeren es zwei
+   Wahrheiten geworden, und die zweite haette still sieben Tage vergeben.
+   Das ist das fuenfte Mal „zwei Listen fuer dieselbe Sache" in diesem
+   Projekt.
+
+   `expires_at` wird als `testphase_bis` uebernommen, damit Funktionen und
+   Bewertungen zusammen ablaufen. WHERE NOT EXISTS verhindert die zweite
+   Vergabe; Fehler werden geloggt, nicht geworfen — ein fehlender Trial
+   ist ein Schoenheitsfehler, ein geplatztes Konto waere ein Schaden. */
+async function gewaehreTestphase(userId, email) {
+  const ai = require('./aiCreditsService');
+  try {
+    const tr = await query(
+      "INSERT INTO plan_trials (user_id, granted_plan, expires_at) " +
+      "SELECT $1::uuid, 'pro', NOW() + ($2 || ' days')::interval " +
+      "WHERE NOT EXISTS (SELECT 1 FROM plan_trials WHERE user_id = $1::uuid) " +
+      "RETURNING expires_at",
+      [userId, String(ai.TESTPHASE_TAGE)]
+    );
+    if (!tr.rowCount) return { ok: false, reason: 'schon_vergeben' };
+    console.log('[v1185-testphase] ' + ai.TESTPHASE_TAGE + ' Tage Pro gewaehrt fuer', email || userId);
+
+    try {
+      await ai.gewaehreTestpaket(userId, tr.rows[0].expires_at);
+    } catch (pErr) {
+      console.warn('[v1185-testphase] Paket nicht gewaehrt:', pErr.message);
+    }
+    return { ok: true, expires_at: tr.rows[0].expires_at };
+  } catch (err) {
+    console.warn('[v1185-testphase] Auto-Grant fehlgeschlagen:', err.message);
+    return { ok: false, reason: err.message };
+  }
 }
 
 /**
@@ -227,6 +260,7 @@ async function updatePasswordById(userId, newPassword) {
 
 module.exports = {
   createUser,
+  gewaehreTestphase,      /* v1185 — vier Wochen Pro + Testpaket, eine Quelle */
   authenticate,
   getById,
   listAll,

@@ -50,6 +50,75 @@ function defaultInactiveTemplate() {
 }
 
 // ── Settings ──────────────────────────────────────────────────
+/* ─── v1185 · Die zwei Erinnerungen der Testphase ───────────────────────
+   Marcels Vorgabe: nach der Haelfte und kurz vor Ablauf, falls noch kein
+   Plan gebucht ist.
+
+   Die Texte stehen hier und nicht in der Datenbank — wer sie dorthin
+   holt, muss die Admin-Oberflaeche mitziehen, sonst liegt Text an einer
+   Stelle, die niemand sieht. Platzhalter wie ueberall: {{name}},
+   {{days}}, {{date}}. */
+function defaultTestphaseTemplates() {
+  return {
+    halbzeit: {
+      subject: 'Noch {{days}} Tage Pro — nutzt du sie?',
+      body:
+        'Hallo {{name}},\n\n' +
+        'die Haelfte deiner DealPilot-Testphase ist um. Bis zum {{date}} laeuft ' +
+        'dein Konto noch als Pro — mit allen Funktionen und deinem ' +
+        'Bewertungspaket.\n\n' +
+        'Was sich zu testen lohnt, solange es laeuft:\n' +
+        '• eine Wertermittlung nach ImmoWertV auf ein echtes Objekt\n' +
+        '• die Steuer-Mappe ueber alle Objekte\n' +
+        '• der Bankexport als PDF\n\n' +
+        'Danach faellt dein Konto automatisch auf Free zurueck. Deine Objekte ' +
+        'und Analysen bleiben erhalten — gesperrt werden nur die ' +
+        'Pro-Funktionen.\n\n' +
+        'Kein Abo noetig, keine Kuendigung: wenn du nichts tust, passiert nichts.'
+    },
+    ende: {
+      subject: 'Deine Testphase endet in {{days}} Tagen',
+      body:
+        'Hallo {{name}},\n\n' +
+        'am {{date}} endet deine DealPilot-Testphase. Danach laeuft dein Konto ' +
+        'als Free weiter.\n\n' +
+        'Was bleibt: deine Objekte, deine Analysen, deine Marktberichte.\n' +
+        'Was geht: die Pro-Funktionen und die restlichen Bewertungen aus dem ' +
+        'Testpaket — sie verfallen mit der Testphase.\n\n' +
+        'Wenn du weitermachen willst, waehlst du im Cockpit unter ' +
+        '„Plan“ einen Tarif. Wenn nicht, musst du nichts tun und ' +
+        'nichts kuendigen.'
+    }
+  };
+}
+
+/* Testnutzer mit laufender Testphase, deren Restlaufzeit in einem der
+   beiden Fenster liegt. Wer ein bezahltes aktives Abo hat, faellt raus —
+   dieselbe Regel wie in getEffectivePlan(): bezahlt schlaegt Testphase. */
+async function listTestphase(tageRest) {
+  const d = _int(tageRest, 3, 1, 365);
+  const r = await query(
+    `SELECT u.id, u.email, u.name, t.expires_at,
+            CEIL(EXTRACT(EPOCH FROM (t.expires_at - NOW())) / 86400)::int AS days_left
+       FROM plan_trials t
+       JOIN users u ON u.id = t.user_id
+      WHERE t.revoked_at IS NULL
+        AND t.expires_at > NOW()
+        AND t.expires_at <= NOW() + ($1 || ' days')::interval
+        AND u.deleted_at IS NULL
+        AND u.is_active = TRUE
+        AND NOT EXISTS (
+              SELECT 1 FROM subscriptions s
+               WHERE s.user_id = u.id
+                 AND s.status IN ('active', 'trialing')
+                 AND s.plan_id IS NOT NULL
+                 AND s.plan_id <> 'free'
+            )`,
+    [d]
+  );
+  return r.rows;
+}
+
 async function getSettings() {
   await query('INSERT INTO retention_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING');
   const r = await query('SELECT * FROM retention_settings WHERE id = 1');
@@ -66,6 +135,11 @@ async function getSettings() {
     inactive_days: s.inactive_days != null ? s.inactive_days : 30,
     inactive_subject: s.inactive_subject || inT.subject,
     inactive_body: s.inactive_body || inT.body,
+    /* v1185: Standard AN. Anders als Auslauf und Inaktivitaet ist das
+       keine Werbung an Bestandskunden, sondern die Auskunft, dass eine
+       laufende Testphase endet — wer sie abschaltet, laesst Nutzer ohne
+       Vorwarnung herausfallen. */
+    testphase_enabled: s.testphase_enabled !== false,
     updated_at: s.updated_at || null
   };
 }
@@ -204,12 +278,16 @@ async function _logSent(userId, kind, refKey, meta) {
   } catch (e) { /* ignore */ }
 }
 
-async function _sendOne(row, kind, settings, vars, refKey) {
+async function _sendOne(row, kind, settings, vars, refKey, tpl) {
   if (!row.email) return { skipped: 'no_email' };
   if (await _alreadySent(row.id, kind, refKey)) return { skipped: 'already_sent' };
 
-  const subject = (kind === 'expiry') ? settings.expiry_subject : settings.inactive_subject;
-  const bodyTpl = (kind === 'expiry') ? settings.expiry_body : settings.inactive_body;
+  /* v1185: `tpl` gewinnt, wenn der Aufrufer eine mitgibt (Testphase). Ohne
+     sie bleibt es beim alten Weg ueber die Einstellungen. */
+  const subject = tpl ? tpl.subject
+    : (kind === 'expiry') ? settings.expiry_subject : settings.inactive_subject;
+  const bodyTpl = tpl ? tpl.body
+    : (kind === 'expiry') ? settings.expiry_body : settings.inactive_body;
   const body = _fill(bodyTpl, vars);
   const subj = _fill(subject, vars);
 
@@ -232,7 +310,12 @@ async function runOnce(opts) {
   const dryRun = !!opts.dryRun;
   const force = !!opts.force; // ignoriert enabled-Schalter (fuer manuellen "jetzt senden")
   const s = await getSettings();
-  const result = { expiry: { candidates: 0, sent: 0, skipped: 0 }, inactive: { candidates: 0, sent: 0, skipped: 0 }, dryRun: dryRun };
+  const result = {
+    expiry: { candidates: 0, sent: 0, skipped: 0 },
+    inactive: { candidates: 0, sent: 0, skipped: 0 },
+    testphase: { candidates: 0, sent: 0, skipped: 0 },   /* v1185 */
+    dryRun: dryRun
+  };
 
   // ── Auslauf ──
   if (force || s.expiry_enabled) {
@@ -273,12 +356,53 @@ async function runOnce(opts) {
     }
   }
 
+  /* ── v1185 · Testphase: Halbzeit und kurz vor Ablauf ──────────────────
+     ZWEI Fenster aus EINER Abfrage: `listTestphase(14)` liefert alle mit
+     hoechstens 14 Tagen Rest, und daraus wird zugeordnet. Zwei getrennte
+     Abfragen waeren zwei Wahrheiten ueber dieselbe Menge.
+
+     Die Zuordnung ist bewusst grosszuegig (Fenster statt Stichtag): der
+     Lauf ist taeglich, aber ein Serverneustart oder ein ausgefallener Tag
+     darf keine Mail verschlucken. Doppelt verschickt wird trotzdem nichts
+     — der `refKey` traegt das Ablaufdatum, und `retention_log` haelt
+     dagegen.
+
+     `days_left` faellt monoton; wer im Halbzeit-Fenster nichts bekommen
+     hat, faellt spaeter ins Ende-Fenster und bekommt dort seine Mail. */
+  if (force || s.testphase_enabled) {
+    const tpls = defaultTestphaseTemplates();
+    const rows = await listTestphase(14);
+    result.testphase.candidates = rows.length;
+    for (const row of rows) {
+      const tage = row.days_left;
+      const stufe = (tage <= 4) ? 'ende' : 'halbzeit';
+      const dateStr = row.expires_at ? new Date(row.expires_at).toLocaleDateString('de-DE') : '';
+      const refKey = 'testphase:' + stufe + ':' +
+        (row.expires_at ? new Date(row.expires_at).toISOString().slice(0, 10) : 'na');
+      const vars = { name: row.name || '', days: tage, date: dateStr };
+      if (dryRun) {
+        if (await _alreadySent(row.id, 'testphase', refKey)) result.testphase.skipped++;
+        else result.testphase.sent++;
+        continue;
+      }
+      try {
+        const r = await _sendOne(row, 'testphase', s, vars, refKey, tpls[stufe]);
+        if (r.sent) result.testphase.sent++; else result.testphase.skipped++;
+      } catch (e) {
+        result.testphase.skipped++;
+        console.error('[retention] testphase send error:', e.message);
+      }
+    }
+  }
+
   return result;
 }
 
 module.exports = {
   getSettings, saveSettings,
   listExpiring, listInactive,
+  listTestphase,                                        /* v1185 */
   defaultExpiryTemplate, defaultInactiveTemplate,
+  defaultTestphaseTemplates,                            /* v1185 */
   runOnce
 };

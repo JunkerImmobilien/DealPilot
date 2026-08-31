@@ -141,6 +141,10 @@
       var gespart = k.bank || 0;
       var sub = (k.limit ? (k.limit + '/Monat') : 'nicht im Plan');
       if (gespart > 0) sub = '+' + gespart + ' gespart';
+      /* v1185: Die Testphase gewinnt die Beschriftung. Ohne sie stand bei
+         einem Testnutzer „nicht im Plan" neben einer Zahl groesser null —
+         die Wertermittlung liegt im Testpaket, nicht im Free-Plan. */
+      if ((k.testphase || 0) > 0) sub = k.testphase + ' aus Testphase';
       return '<div class="dp-kg-r">' +
                '<span class="dp-kg-n">' + a.name + '</span>' +
                '<span class="dp-kg-s">' + sub + '</span>' +
@@ -159,6 +163,15 @@
 
     var fuss = 'Zurücksetzung am ' + _datum(s.period_reset_at) + '. ' +
                'Nicht genutzte Bewertungen verfallen nicht.';
+    /* v1185: Waehrend der Testphase stimmt der zweite Satz nicht — was aus
+       dem Testpaket kommt, verfaellt sehr wohl. Ein Satz, der in einem
+       Zustand falsch ist, gehoert ersetzt, nicht ergaenzt. */
+    if (s.testphase && s.testphase.laeuft) {
+      fuss = 'Testphase: noch ' + s.testphase.tage_rest +
+             (s.testphase.tage_rest === 1 ? ' Tag' : ' Tage') +
+             ' Pro, bis ' + _datum(s.testphase.bis) + '. ' +
+             'Die Bewertungen aus dem Testpaket verfallen dann — zugekaufte bleiben.';
+    }
 
     return '<div class="dp-kg-panel" role="tooltip">' +
              '<p class="dp-kg-h">Dein Kontingent</p>' +
@@ -234,6 +247,8 @@
       if (!k.limit) sub = (k.bank ? 'nur zugekauft' : 'nicht in deinem Plan');
       else if (k.bank) sub = k.limit + ' im Monat · ' + k.bank + ' gespart';
       else sub = k.limit + ' im Monat';
+      /* v1185: siehe _panelHtml — die Testphase gewinnt die Beschriftung. */
+      if ((k.testphase || 0) > 0) sub = k.testphase + ' aus der Testphase';
       return '<div class="ai-credits-cell">' +
                '<div class="ai-credits-label">' + a.kurz + '</div>' +
                '<div class="ai-credits-value' + (rest === 0 ? ' rd' : ' gn') + '">' + rest + '</div>' +

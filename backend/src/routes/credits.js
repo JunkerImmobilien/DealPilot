@@ -255,19 +255,33 @@ async function _checkoutBewertung(req, res, db, sku) {
   }
 
   try {
-    /* 1) Plan-Check — unveraendert wie beim Kerosin-Kauf: Free kauft nicht
-       zu, Free wechselt den Plan. */
+    /* 1) Wer darf zukaufen?
+       v1185: die laufende Testphase darf es AUCH. Sie hat keine
+       subscriptions-Zeile — die rohe Abfrage unten sieht sie als `free`
+       und haette jeden Testnutzer abgewiesen, genau in dem Moment, in dem
+       ihm eine Bewertung fehlt. Deshalb entscheidet der EFFEKTIVE Plan
+       (getEffectivePlan liest plan_trials mit), nicht die Tabelle allein.
+       Marcels Vorgabe vom 31.08.2026: „Nachkaeufe waeren moeglich."
+
+       Die Kundennummer kommt weiter aus der Tabelle — ein Testnutzer hat
+       meistens keine, dann traegt Stripe die Mailadresse. */
     const planCheck = await db.query(`
-      SELECT COALESCE(p.id, 'free') AS plan_id, sc.stripe_customer_id
+      SELECT sc.stripe_customer_id
       FROM users u
-      LEFT JOIN subscriptions s ON s.user_id = u.id AND s.status = 'active'
-      LEFT JOIN plans p ON p.id = s.plan_id
       LEFT JOIN stripe_customers sc ON sc.user_id = u.id
       WHERE u.id = $1
     `, [req.user.id]);
-    const userPlan = planCheck.rows[0];
+    const userPlan = planCheck.rows[0] || {};
 
-    if (!userPlan || userPlan.plan_id === 'free') {
+    let effektiv = 'free';
+    try {
+      const eff = await require('../services/subscriptionService').getEffectivePlan(req.user.id);
+      effektiv = (eff && (eff.plan_id || eff.id)) || 'free';
+    } catch (e) {
+      console.warn('[credits/checkout] effektiver Plan nicht ermittelbar:', e.message);
+    }
+
+    if (effektiv === 'free') {
       return res.status(403).json({
         error: 'upgrade_required',
         message: 'Bewertungen koennen ab dem Starter-Plan dazugekauft werden. Bitte waehle zuerst einen Plan.',

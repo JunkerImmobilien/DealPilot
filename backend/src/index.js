@@ -189,7 +189,8 @@ async function start() {
         const r = await retentionService.runOnce({ dryRun: false });
         console.log('[retention] Lauf fertig:',
           'Auslauf', r.expiry.sent + '/' + r.expiry.candidates,
-          '| Inaktiv', r.inactive.sent + '/' + r.inactive.candidates);
+          '| Inaktiv', r.inactive.sent + '/' + r.inactive.candidates,
+          '| Testphase', (r.testphase ? r.testphase.sent + '/' + r.testphase.candidates : '-'));
       } catch (e) {
         console.error('[retention] Lauf-Fehler:', e.message);
       }

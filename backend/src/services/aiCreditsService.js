@@ -43,6 +43,25 @@ const KONTINGENT = {
 
 const ARTEN = ['mpi', 'mpi_plus', 'wev'];
 
+/* ═══ v1185 · Das Testpaket ═════════════════════════════════════════════
+   Vier Wochen Pro ab Registrierung (plan_trials, TR7 seit v811b) geben den
+   FUNKTIONSUMFANG frei. Die Bewertungen kamen bis hierher nicht mit: der
+   Testnutzer sah Pro, hatte aber das Free-Kontingent — eine
+   Marktpreisindikation im Monat, keine Wertermittlung. Er konnte also
+   gerade das nicht testen, wofuer er zahlen soll.
+
+   Marcels Entscheidung vom 31.08.2026: ein EINMALIGES Paket fuer das ganze
+   Fenster, das mit der Testphase verfaellt. Nicht das Monatskontingent
+   eines Pro — das haenge am Zufall des Anmeldedatums (wer sich am 20.
+   anmeldet, bekaeme am 1. das naechste) und wandere beim Monatswechsel in
+   die Bank, die nie verfaellt.
+
+   DIESE ZAHLEN SIND EIN PREIS. Sie stehen auch in frontend/js/config.js
+   als `testphase` und in der Cockpit-Matrix. Beim Aendern alle drei
+   anfassen — es ist dieselbe Falle wie bei KONTINGENT oben. */
+const TESTPAKET = { mpi: 5, mpi_plus: 3, wev: 1 };
+const TESTPHASE_TAGE = 28;
+
 /* Die Stufen des Marktberichts heissen im Code seit je 1/2/3. Diese
    Zuordnung ist die einzige Stelle, an der aus einer Stufe eine Art wird. */
 const STUFE_ART = { 1: 'mpi', 2: 'mpi_plus', 3: 'wev' };
@@ -72,6 +91,50 @@ async function _ensureCurrentPeriod(userId) {
     WHERE user_id = $1
       AND current_period_start < date_trunc('month', NOW())::date
   `, [userId]);
+}
+
+/* ─── v1185 · Testpaket gewaehren ───────────────────────────────────────
+   Wird beim Vergeben der Testphase gerufen (userService.createUser und der
+   Admin-Weg). `bis` ist plan_trials.expires_at.
+
+   NUR EINMAL JE NUTZER: die Bedingung ist `testphase_bis IS NULL`. Wer
+   schon eine Testphase hatte, bekommt keine zweite — sonst waere ein
+   zweites Konto oder ein zweiter Admin-Klick ein zweites Paket. */
+async function gewaehreTestpaket(userId, bis) {
+  if (!userId || !bis) return { ok: false, reason: 'fehlende_angabe' };
+  await _ensureCurrentPeriod(userId);
+  const r = await query(
+    'UPDATE ai_credits_user' +
+    '   SET testphase_mpi = $2, testphase_mpi_plus = $3, testphase_wev = $4,' +
+    '       testphase_bis = $5, updated_at = NOW()' +
+    ' WHERE user_id = $1 AND testphase_bis IS NULL' +
+    ' RETURNING user_id',
+    [userId, TESTPAKET.mpi, TESTPAKET.mpi_plus, TESTPAKET.wev, bis]
+  );
+  if (!r.rowCount) return { ok: false, reason: 'schon_gewaehrt' };
+  await query(
+    "INSERT INTO ai_credits_log (user_id, endpoint, cost, source, meta) VALUES ($1,'testphase',0,'trial',$2)",
+    [userId, JSON.stringify({ paket: TESTPAKET, bis: bis })]
+  );
+  return { ok: true, paket: TESTPAKET, bis: bis };
+}
+
+/* ─── v1185 · Der Verfall ───────────────────────────────────────────────
+   Laeuft vor jeder Auskunft und vor jeder Abbuchung. Was von der
+   Testphase uebrig ist, wird verworfen — es wandert NICHT in die Bank.
+   Genau das ist der Unterschied zum Monatskontingent.
+
+   `testphase_bis` bleibt stehen: sie ist der Nachweis, dass dieser Nutzer
+   seine Testphase hatte, und der Riegel gegen ein zweites Paket. */
+async function _verfallTestphase(userId) {
+  await query(
+    'UPDATE ai_credits_user' +
+    '   SET testphase_mpi = 0, testphase_mpi_plus = 0, testphase_wev = 0,' +
+    '       updated_at = NOW()' +
+    ' WHERE user_id = $1 AND testphase_bis IS NOT NULL AND testphase_bis <= NOW()' +
+    '   AND (testphase_mpi > 0 OR testphase_mpi_plus > 0 OR testphase_wev > 0)',
+    [userId]
+  );
 }
 
 async function _planKey(userId) {
@@ -176,12 +239,14 @@ async function getStatus(userId) {
   await _ensureCurrentPeriod(userId);
   const plan = await _planKey(userId);
   await _carryOver(userId, plan);
+  await _verfallTestphase(userId);      /* v1185 — vor jeder Auskunft */
 
   const r = await query(`
     SELECT current_period_start,
            mpi_used, mpi_plus_used, wev_used,
            mpi_bank, mpi_plus_bank, wev_bank,
-           avm_a_bank, avm_b_bank
+           avm_a_bank, avm_b_bank,
+           testphase_mpi, testphase_mpi_plus, testphase_wev, testphase_bis
       FROM ai_credits_user WHERE user_id = $1
   `, [userId]);
   const row = r.rows[0] || {};
@@ -192,13 +257,15 @@ async function getStatus(userId) {
     const limit = k[art] || 0;
     const used  = parseInt(row[art + '_used'], 10) || 0;
     const bank  = parseInt(row[art + '_bank'], 10) || 0;
+    const test  = parseInt(row['testphase_' + art], 10) || 0;
     const ausMonat = Math.max(0, limit - used);
     arten[art] = {
       limit:     limit,
       used:      used,
       monatlich: ausMonat,          /* was dieser Monat noch hergibt */
+      testphase: test,              /* v1185 — verfaellt mit der Testphase */
       bank:      bank,              /* angespart und gekauft, verfaellt nie */
-      rest:      ausMonat + bank    /* was der Nutzer wirklich noch machen kann */
+      rest:      ausMonat + test + bank  /* was der Nutzer wirklich noch machen kann */
     };
   });
 
@@ -208,10 +275,24 @@ async function getStatus(userId) {
   next.setUTCDate(1);
   next.setUTCHours(0, 0, 0, 0);
 
+  /* v1185: `testphase` ist null, wenn nie eine lief — das Frontend soll
+     „keine Testphase" von „Testphase abgelaufen" unterscheiden koennen. */
+  let testphase = null;
+  if (row.testphase_bis) {
+    const bis = new Date(row.testphase_bis);
+    const laeuft = bis.getTime() > Date.now();
+    testphase = {
+      bis:    row.testphase_bis,
+      laeuft: laeuft,
+      tage_rest: laeuft ? Math.max(0, Math.ceil((bis.getTime() - Date.now()) / 86400000)) : 0
+    };
+  }
+
   return {
     plan:            plan,
     arten:           arten,
     sparfaktor:      k.sparfaktor || 0,
+    testphase:       testphase,      /* v1185 */
     avm:             {
       a: parseInt(row.avm_a_bank, 10) || 0,
       b: parseInt(row.avm_b_bank, 10) || 0
@@ -222,10 +303,17 @@ async function getStatus(userId) {
 }
 
 /* ─── v1183 · Eine Bewertung abbuchen ───────────────────────────────────
-   `art` ist 'mpi' | 'mpi_plus' | 'wev'. Reihenfolge: ZUERST das
-   Monatskontingent, dann das Sparguthaben. Das ist die fuer den Nutzer
-   guenstigere Richtung — das Monatskontingent waere am Monatsende ohnehin
-   nur bis zum Deckel uebertragen worden, das Gesparte verfaellt nie.
+   `art` ist 'mpi' | 'mpi_plus' | 'wev'.
+
+   REIHENFOLGE: was zuerst verfaellt, wird zuerst verbraucht.
+     1. Monatskontingent — laeuft zum Monatsende ab (bei bezahlten Plaenen
+        wandert der Rest bis zum Deckel in die Bank, bei free verfaellt er)
+     2. Testphase (v1185) — laeuft mit dem Testfenster ab und wandert NIE
+        in die Bank
+     3. Bank — angespart und gekauft, verfaellt nie
+
+   Das ist durchgehend die fuer den Nutzer guenstigere Richtung: sein
+   Bestaendigstes bleibt am laengsten liegen.
 
    Gibt { ok:false, reason:'kein_kontingent', art, status } zurueck, wenn
    nichts mehr da ist. Der Aufrufer muss das behandeln: ein verschlucktes
@@ -235,38 +323,49 @@ async function consumeArt(userId, art, endpoint, meta) {
     return { ok: false, reason: 'unbekannte_art', art: art };
   }
   await _ensureCurrentPeriod(userId);
-  const status = await getStatus(userId);
+  const status = await getStatus(userId);   /* raeumt auch die Testphase ab */
   const k = status.arten[art];
 
   if (!k || k.rest < 1) {
     return { ok: false, reason: 'kein_kontingent', art: art, status: status };
   }
 
-  const ausMonat = k.monatlich > 0 ? 1 : 0;
-  const ausBank  = 1 - ausMonat;
-
-  if (ausMonat) {
+  /* Genau EIN Topf wird belastet. `quelle` steht im Log, damit spaeter
+     nachvollziehbar ist, was eine Bewertung gekostet hat — eine aus der
+     Testphase hat niemand bezahlt. */
+  let quelle;
+  if (k.monatlich > 0) {
+    quelle = 'monat';
     await query(
       'UPDATE ai_credits_user SET ' + art + '_used = ' + art + '_used + 1, updated_at = NOW() WHERE user_id = $1',
       [userId]
     );
+  } else if (k.testphase > 0) {
+    quelle = 'testphase';
+    await query(
+      'UPDATE ai_credits_user SET testphase_' + art + ' = GREATEST(0, testphase_' + art + ' - 1),' +
+      ' updated_at = NOW() WHERE user_id = $1',
+      [userId]
+    );
   } else {
+    quelle = 'bank';
     await query(
       'UPDATE ai_credits_user SET ' + art + '_bank = GREATEST(0, ' + art + '_bank - 1), updated_at = NOW() WHERE user_id = $1',
       [userId]
     );
   }
-
   /* Das Log bleibt in derselben Tabelle und behaelt seine Bedeutung:
-     v1125 rechnet daraus die bezahlte Marktbericht-Stufe zurueck. `cost`
-     ist ab jetzt immer 1 — die Art steht im meta und in `source`. */
+     v1125 rechnet daraus die bezahlte Marktbericht-Stufe zurueck — und
+     eine Bewertung aus der Testphase zaehlt dafuer mit, der Nutzer hat
+     den Bericht ja bekommen. `cost` ist immer 1, die Art steht im meta. */
+  const QUELLE_SOURCE = { monat: 'monthly', testphase: 'trial', bank: 'bonus' };
   await query(
     `INSERT INTO ai_credits_log (user_id, endpoint, cost, source, meta) VALUES ($1,$2,1,$3,$4)`,
-    [userId, endpoint || 'unknown', ausMonat ? 'monthly' : 'bonus',
-     JSON.stringify(Object.assign({ art: art }, meta || {}))]
+    [userId, endpoint || 'unknown', QUELLE_SOURCE[quelle] || 'bonus',
+     JSON.stringify(Object.assign({ art: art, quelle: quelle }, meta || {}))]
   );
 
-  return { ok: true, art: art, source: ausMonat ? 'monthly' : 'bank' };
+  return { ok: true, art: art, source: quelle };
 }
 
 /* Marktbericht-Stufe 1/2/3 -> Art. Die einzige Uebersetzung im System. */
@@ -453,6 +552,9 @@ module.exports = {
   consumeStufe,                /* v1183 — Marktbericht-Stufe 1/2/3 */
   consumeAvm,                  /* v1183 — Marktwert-Abruf */
   addKontingent,               /* v1183 — Kauf gutschreiben */
+  gewaehreTestpaket,           /* v1185 — Testphase, einmalig, verfaellt */
+  TESTPAKET,                   /* v1185 — muss zu config.js passen */
+  TESTPHASE_TAGE,              /* v1185 */
   KONTINGENT,                  /* v1183 — muss zu config.js passen */
   ARTEN,
   STUFE_ART,
