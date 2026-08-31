@@ -59,35 +59,58 @@ function defaultInactiveTemplate() {
    Stelle, die niemand sieht. Platzhalter wie ueberall: {{name}},
    {{days}}, {{date}}. */
 function defaultTestphaseTemplates() {
+  /* UMLAUTE ALS u-ESCAPE, wie in den beiden Vorlagen darueber und wie in
+     JEDEM anderen Service dieses Backends — gemessen: kein einziger
+     Service unter src/services traegt einen echten Umlaut im Quelltext.
+
+     In KOMMENTAREN schreibt dieses Projekt ae/oe/ue, in NUTZTEXT NIEMALS.
+     v1183b hiess woertlich „Datumsformat und Umlaute im Nutztext", und die
+     erste Fassung dieser Mails hat den Fehler prompt wiederholt: sie
+     schrieb „die Haelfte deiner Testphase". Marcel hat es im Postfach
+     gesehen, nicht der Entwickler im Editor.
+
+     WIE DIESER BLOCK ENTSTANDEN IST, und das ist die eigentliche Lehre:
+     die Escapes wurden GENERIERT, nicht getippt. Zwei Anlaeufe, sie von
+     Hand einzusetzen, sind still gescheitert — die Werkzeugkette halbiert
+     Backslashes in Heredocs, auch bei gequotetem Delimiter, und ein
+     Ersetzungslauf hat dabei einmal doppelt kodiert („HÃ¤lfte"). Der
+     deutsche Text steht deshalb als reine Textdatei daneben und wird
+     durch ein Skript in diese Form gebracht. Wer die Texte aendert,
+     nimmt denselben Weg — von Hand tippen geht hier schief. */
   return {
     halbzeit: {
-      subject: 'Noch {{days}} Tage Pro — nutzt du sie?',
+      subject: 'Noch {{days}} Tage Pro \u2014 nutzt du sie?',
       body:
-        'Hallo {{name}},\n\n' +
-        'die Haelfte deiner DealPilot-Testphase ist um. Bis zum {{date}} laeuft ' +
-        'dein Konto noch als Pro — mit allen Funktionen und deinem ' +
-        'Bewertungspaket.\n\n' +
-        'Was sich zu testen lohnt, solange es laeuft:\n' +
-        '• eine Wertermittlung nach ImmoWertV auf ein echtes Objekt\n' +
-        '• die Steuer-Mappe ueber alle Objekte\n' +
-        '• der Bankexport als PDF\n\n' +
-        'Danach faellt dein Konto automatisch auf Free zurueck. Deine Objekte ' +
-        'und Analysen bleiben erhalten — gesperrt werden nur die ' +
-        'Pro-Funktionen.\n\n' +
-        'Kein Abo noetig, keine Kuendigung: wenn du nichts tust, passiert nichts.'
+        'Hallo {{name}},\n' +
+        '\n' +
+        'die H\u00e4lfte deiner DealPilot-Testphase ist um. Bis zum {{date}} l\u00e4uft dein Konto noch als Pro \u2014 mit allen Funktionen und deinem Bewertungspaket.\n' +
+        '\n' +
+        'Was sich zu testen lohnt, solange es l\u00e4uft:\n' +
+        '\u2022 eine Wertermittlung nach ImmoWertV auf ein echtes Objekt\n' +
+        '\u2022 die Steuer-Mappe \u00fcber alle Objekte\n' +
+        '\u2022 der Bankexport als PDF\n' +
+        '\n' +
+        'Danach f\u00e4llt dein Konto automatisch auf Free zur\u00fcck. Deine Objekte und Analysen bleiben erhalten \u2014 gesperrt werden nur die Pro-Funktionen.\n' +
+        '\n' +
+        'Kein Abo n\u00f6tig, keine K\u00fcndigung: wenn du nichts tust, passiert nichts.\n' +
+        '\n' +
+        'Viele Gr\u00fc\u00dfe\n' +
+        'Dein DealPilot-Team'
     },
     ende: {
       subject: 'Deine Testphase endet in {{days}} Tagen',
       body:
-        'Hallo {{name}},\n\n' +
-        'am {{date}} endet deine DealPilot-Testphase. Danach laeuft dein Konto ' +
-        'als Free weiter.\n\n' +
+        'Hallo {{name}},\n' +
+        '\n' +
+        'am {{date}} endet deine DealPilot-Testphase. Danach l\u00e4uft dein Konto als Free weiter.\n' +
+        '\n' +
         'Was bleibt: deine Objekte, deine Analysen, deine Marktberichte.\n' +
-        'Was geht: die Pro-Funktionen und die restlichen Bewertungen aus dem ' +
-        'Testpaket — sie verfallen mit der Testphase.\n\n' +
-        'Wenn du weitermachen willst, waehlst du im Cockpit unter ' +
-        '„Plan“ einen Tarif. Wenn nicht, musst du nichts tun und ' +
-        'nichts kuendigen.'
+        'Was geht: die Pro-Funktionen und die restlichen Bewertungen aus dem Testpaket \u2014 sie verfallen mit der Testphase.\n' +
+        '\n' +
+        'Wenn du weitermachen willst, w\u00e4hlst du im Cockpit unter \u201ePlan\u201c einen Tarif. Wenn nicht, musst du nichts tun und nichts k\u00fcndigen.\n' +
+        '\n' +
+        'Viele Gr\u00fc\u00dfe\n' +
+        'Dein DealPilot-Team'
     }
   };
 }

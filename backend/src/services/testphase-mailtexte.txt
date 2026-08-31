@@ -1,0 +1,32 @@
+=halbzeit.subject
+Noch {{days}} Tage Pro — nutzt du sie?
+=halbzeit.body
+Hallo {{name}},
+|
+die Hälfte deiner DealPilot-Testphase ist um. Bis zum {{date}} läuft dein Konto noch als Pro — mit allen Funktionen und deinem Bewertungspaket.
+|
+Was sich zu testen lohnt, solange es läuft:
+• eine Wertermittlung nach ImmoWertV auf ein echtes Objekt
+• die Steuer-Mappe über alle Objekte
+• der Bankexport als PDF
+|
+Danach fällt dein Konto automatisch auf Free zurück. Deine Objekte und Analysen bleiben erhalten — gesperrt werden nur die Pro-Funktionen.
+|
+Kein Abo nötig, keine Kündigung: wenn du nichts tust, passiert nichts.
+|
+Viele Grüße
+Dein DealPilot-Team
+=ende.subject
+Deine Testphase endet in {{days}} Tagen
+=ende.body
+Hallo {{name}},
+|
+am {{date}} endet deine DealPilot-Testphase. Danach läuft dein Konto als Free weiter.
+|
+Was bleibt: deine Objekte, deine Analysen, deine Marktberichte.
+Was geht: die Pro-Funktionen und die restlichen Bewertungen aus dem Testpaket — sie verfallen mit der Testphase.
+|
+Wenn du weitermachen willst, wählst du im Cockpit unter „Plan“ einen Tarif. Wenn nicht, musst du nichts tun und nichts kündigen.
+|
+Viele Grüße
+Dein DealPilot-Team
