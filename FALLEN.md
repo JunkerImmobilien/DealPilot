@@ -213,6 +213,27 @@ muss mitfärben. Und **beide Bedienwege** prüfen —
 
 ## 8 · Werkzeugfallen
 
+- **Heredocs halbieren Backslashes — auch mit gequotetem Delimiter.**
+  Beim Einsetzen der `u`-Escapes in die Testphasen-Mails (v1185f) kamen
+  zwei Anläufe still verstümmelt an: aus einem `\` wurde ein `\`, aus
+  einer Escape-Sequenz ein gewöhnliches `u`. Ein Ersetzungslauf, der das
+  reparieren sollte, hat dabei **doppelt kodiert** — aus `ä` wurde `Ã¤`,
+  die alte Falle in neuem Gewand. Zurückgenommen über
+  `git checkout --`, nicht über ein Backup.
+  **Konsequenz: Escape-Sequenzen nie tippen, immer generieren.** Der
+  deutsche Text liegt als reine Textdatei
+  (`backend/src/services/testphase-mailtexte.txt`),
+  `tools/baue-mailtexte.js` erzeugt daraus den JS-Block —
+  **das Skript selbst enthält keinen einzigen Backslash**, es setzt sie
+  über `String.fromCharCode(92)` zusammen. Wer einen Anker mit `\n` oder
+  `\u` braucht, holt ihn mit `sed` aus der Datei, statt ihn zu schreiben.
+- **Umlaute: `ae/oe/ue` gehört in Kommentare, NIE in Nutztext.** Der
+  Fehler steht zweimal in der Chronik — v1183b („Datumsformat und
+  Umlaute im Nutztext") und v1185, wo die Testphasen-Mails „die Haelfte
+  deiner Testphase" an einen echten Empfänger schickten. **Gemessen:
+  kein einziger Service unter `backend/src/services` trägt einen echten
+  Umlaut im Quelltext** — dort gilt durchgehend die `u`-Escape-Form.
+  Wer eine neue Vorlage schreibt, sieht sich die Nachbarvorlage an.
 - **`Set-Content` zerstört Dateien mit Umlauten.** Ein
   `(Get-Content x -Raw) -replace … | Set-Content x -Encoding UTF8` hat
   `index.html` komplett neu geschrieben: jedes Nicht-ASCII-Zeichen doppelt
