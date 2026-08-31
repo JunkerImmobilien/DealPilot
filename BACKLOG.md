@@ -100,20 +100,77 @@ Umgebungen falsch.
 wenn die `starter`-Zeile eine Sandbox-ID (`…KEjyPDo0wo…`) trägt. Auf
 Produktion passiert nichts.
 
-### Was BEWUSST offen ist: die Live-Preise
+### Die Live-Preise sind angelegt (31.08.2026, auf Marcels „ja")
 
-**In `acct_1TWXFdGefFev8arz` livemode wurde nichts angelegt.** Das ist eine
-Geldentscheidung und gehört Marcel. Dort stehen noch die alten Beträge
-(Starter 29, Investor 59, Pro 99, Partner 149, Seats 35/29/24).
+Dieselben 19 Objekte in `acct_1TWXFdGefFev8arz` **livemode**. Produkte
+wiederverwendet, Preise neu; die alten bleiben aktiv, damit laufende Abos
+nicht ins Leere zeigen. **Es wurde niemandem etwas berechnet** — ein neuer
+Preis ändert an bestehenden Abonnements nichts.
 
-Wenn Marcel „ja" sagt, sind es dieselben 19 Objekte im Live-Konto, danach
-eine Migration `066` nach demselben Muster wie 065 — nur mit der
-umgekehrten Bedingung (greift, wenn `starter` eine **Live**-ID trägt).
+| Was | monatlich | jährlich |
+|---|---|---|
+| Starter | `price_1UAMoxGefFev8arzxhNJKezR` | `price_1UAMp2GefFev8arzUOV1rcLo` |
+| Investor | `price_1UAMp7GefFev8arzPddgtbMM` | `price_1UAMpBGefFev8arzs3KC4CqW` |
+| Pro | `price_1UAMpGGefFev8arzroVRW3vZ` | `price_1UAMpKGefFev8arzcbN6CqZh` |
+| Partner | `price_1UAMpPGefFev8arzbrdeoAyp` | `price_1UAMpUGefFev8arz4r7m3Zdn` |
+| Seat (24/19/15) | `price_1UAMpaGefFev8arz1LjirhgR` | `price_1UAMpfGefFev8arzabgaK2pD` |
 
-> **Achtung, bevor das passiert:** `plans.price_*_cents` zeigt nach 064
-> auch auf **Prod** die neuen Beträge an, der Checkout dort aber noch die
-> alten. Solange keine Live-Preise existieren, darf 064 **nicht** auf Prod
-> laufen — sonst wirbt die Seite mit 19,99 € und bucht 29 € ab.
+Neue Live-Produkte: `prod_VAiGIq7PExYzY5` (Bewertungs-Paket),
+`prod_VAiG7Wp5IH4LAM` (Bewertung · einzeln).
+
+### Die Falle aus 061 ist strukturell geschlossen: `lookup_key`
+
+**Beim Vorbereiten von 066 fiel auf, dass eine ID-Migration gar nicht
+sicher zu schreiben ist.** Die Seeds (003/008/014) schreiben **nie** eine
+Stripe-ID — bei einer frischen Datenbank stehen die Spalten auf `NULL`.
+Es gibt also keinen verlässlichen Zustand in der Zeile, an dem eine
+Migration die Umgebung erkennen könnte. Jede Bedingung wäre geraten
+gewesen — genau der Fehler, den 061 gemacht hat.
+
+**Deshalb tragen jetzt alle 19 Preise in BEIDEN Konten denselben
+`lookup_key`:**
+
+```
+dp_plan_starter_monthly   dp_plan_starter_yearly
+dp_plan_investor_monthly  dp_plan_investor_yearly
+dp_plan_pro_monthly       dp_plan_pro_yearly
+dp_plan_partner_monthly   dp_plan_partner_yearly
+dp_seat_monthly           dp_seat_yearly
+dp_paket_kurz · dp_paket_mittel · dp_paket_gross · dp_paket_max
+dp_einzeln_mpi · dp_einzeln_mpi_plus · dp_einzeln_wev
+dp_einzeln_avm_a · dp_einzeln_avm_b
+```
+
+**Der Schlüssel ist umgebungsblind.** Wer mit dem Sandbox-Schlüssel danach
+fragt, bekommt die Sandbox-Preise; wer mit dem Live-Schlüssel fragt, die
+Live-Preise. Keine Migration muss mehr wissen, wo sie läuft.
+
+**Nachgewiesen** aus dem Container mit dem Schlüssel der App:
+**19 von 19 aufgelöst**, alle Beträge korrekt (`stripe.prices.list
+{lookup_keys}` — Achtung, **höchstens 10 Schlüssel je Abfrage**, sonst 400).
+
+### Der Rest, und er ist Code, nicht Stripe
+
+`subscription.js:138` liest den Preis noch aus `plan.stripe_price_monthly_id`.
+**Solange das so ist, braucht Prod seine Spalten von Hand** — Stripe allein
+reicht nicht. Zwei Wege, und der zweite ist der richtige:
+
+1. **Sofort-Weg** (eine Zeile SQL auf Prod, wenn Marcel umstellen will):
+   ```sql
+   UPDATE plans SET stripe_price_monthly_id='price_1UAMoxGefFev8arzxhNJKezR',
+                    stripe_price_yearly_id ='price_1UAMp2GefFev8arzUOV1rcLo',
+                    stripe_price_id_monthly='price_1UAMoxGefFev8arzxhNJKezR',
+                    stripe_price_id_yearly ='price_1UAMp2GefFev8arzUOV1rcLo'
+    WHERE id='starter';   -- analog investor/pro/partner, IDs siehe Tabelle
+   ```
+2. **Richtiger Weg:** `subscription.js` löst über den `lookup_key` auf, die
+   DB-Spalte wird nur noch Rückfall. Dann ist das Thema für immer erledigt
+   und `061`/`065` können irgendwann weg.
+
+> **Die Warnung steht weiter:** `064` setzt die neuen **Beträge**. Läuft sie
+> auf Prod, bevor die Preis-IDs dort umgestellt sind, wirbt die Seite mit
+> 19,99 € und bucht 29 € ab. **064 und die ID-Umstellung gehören auf Prod in
+> denselben Arbeitsgang.**
 
 ### Das Nächste: der Kontingent-Zähler
 

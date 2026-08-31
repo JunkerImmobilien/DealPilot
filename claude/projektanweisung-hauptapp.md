@@ -3553,6 +3553,48 @@ Prod laufen — sonst wirbt die Seite mit 19,99 € und bucht 29 € ab.
 **Nebenbei bestätigt: das Deploy-Skript lügt weiter** (VI.2). Es brach an
 gits `Everything up-to-date` auf stderr ab, bevor der Server zog — der
 `git pull` musste von Hand nach.
+
+**`v1181` — die Live-Preise angelegt, und die ID-Falle strukturell
+geschlossen.** Auf Marcels „ja leg das auch an": dieselben 19 Objekte in
+`acct_1TWXFdGefFev8arz` livemode. Produkte wiederverwendet, Preise neu.
+**Niemandem wurde etwas berechnet** — ein neuer Preis ändert an
+bestehenden Abonnements nichts.
+
+**Der eigentliche Ertrag der Runde kam beim Vorbereiten von Migration 066
+und hat sie überflüssig gemacht.** Ich wollte 066 an der Umgebung
+aufhängen, so wie 065 es tut. Dabei gemessen: **die Seeds 003/008/014
+schreiben nie eine Stripe-ID** — eine frische Datenbank hat dort `NULL`.
+Es gibt also gar keinen verlässlichen Zeilenzustand, an dem eine Migration
+erkennen könnte, wo sie läuft. Jede Bedingung wäre geraten gewesen — genau
+der Fehler, den 061 gemacht hat, nur eine Ebene subtiler.
+
+> **Lehre: wenn die Umgebungserkennung selbst geraten ist, ist die
+> Migration die falsche Stelle.** Die Antwort war, die ID ganz
+> abzuschaffen: alle 19 Preise tragen jetzt in **beiden** Konten denselben
+> `lookup_key` (`dp_plan_<plan>_<intervall>`, `dp_seat_*`, `dp_paket_*`,
+> `dp_einzeln_*`). Der Schlüssel ist umgebungsblind — wer mit dem
+> Sandbox-Schlüssel fragt, bekommt Sandbox-Preise, wer mit dem
+> Live-Schlüssel fragt, Live-Preise. Keine Migration muss mehr wissen, wo
+> sie steht.
+
+**Nachweis:** aus dem Container, mit dem Schlüssel der App, **19 von 19
+aufgelöst** mit korrekten Beträgen. Kleine Falle dabei:
+`prices.list({lookup_keys})` nimmt **höchstens 10 Schlüssel je Abfrage**
+und antwortet sonst mit 400 — in Zehnerblöcken fragen.
+
+**Was offen bleibt und Code ist, nicht Stripe:** `subscription.js:138`
+liest den Preis weiter aus `plan.stripe_price_monthly_id`. Solange das so
+ist, braucht Prod seine Spalten von Hand. Der richtige Schritt ist, dort
+auf den `lookup_key` umzustellen und die Spalte zum Rückfall zu machen —
+dann können `061` und `065` irgendwann ganz verschwinden.
+
+**Produktion wurde nicht angefasst.** Der Zugriff auf `157.90.117.167` ist
+in dieser Sitzung gesperrt; der Ist-Zustand dort ist ungemessen. Deshalb
+steht im Backlog fertiges SQL statt einer Migration, die auf geratene IDs
+baut. **064 und die ID-Umstellung gehören auf Prod in denselben
+Arbeitsgang** — sonst wirbt die Seite mit 19,99 € und bucht 29 € ab.
+
+
 ---
 
 # ES GIBT DREI STÄNDE — NICHT EINEN
