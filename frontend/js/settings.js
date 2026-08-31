@@ -1067,12 +1067,28 @@ function _swSet(btn) {
      einmal geaendert, und ein Fueller, der nur einen Ort kennt, faellt beim
      naechsten Umzug wieder still aus. */
   if ((pane === 'api' || pane === 'plan') && window.AiCredits) {
-    var creditsHost = document.getElementById('set-ai-credits-host');
-    if (creditsHost) {
-      window.AiCredits.refresh(true).then(function(){
-        window.AiCredits.renderSettingsBox(creditsHost);
+    /* Erst der Reiter, dann wir. Beim Plan-Reiter wird das Markup mit
+       #set-ai-credits-host NACH diesem Punkt eingesetzt — ohne die Verzoegerung
+       greift der Lookup ins Leere und das frische "Lädt…" bleibt stehen.
+       Der DealScore-Reiter zwei Zweige weiter oben macht es aus demselben
+       Grund genauso. Gemessen: refresh() liefert sauber, renderSettingsBox()
+       fuellt sofort — es fehlte nur der richtige Moment. */
+    setTimeout(function () {
+      var creditsHost = document.getElementById('set-ai-credits-host');
+      if (!creditsHost) return;
+      window.AiCredits.refresh(true).then(function () {
+        /* Host neu holen: der Reiter kann zwischenzeitlich neu gezeichnet
+           haben, dann zeigt die alte Referenz auf ein abgehaengtes Element. */
+        var host = document.getElementById('set-ai-credits-host') || creditsHost;
+        window.AiCredits.renderSettingsBox(host);
+      })['catch'](function (e) {
+        /* Ohne catch endet jeder Fehlschlag wieder unsichtbar in "Lädt…" —
+           genau die Sackgasse, die v1182b beseitigt hat. */
+        console.warn('[v1182c] Kerosin-Kasten: refresh fehlgeschlagen', e);
+        var host = document.getElementById('set-ai-credits-host');
+        if (host) host.innerHTML = '<div class="hint">Kerosin-Stand gerade nicht abrufbar.</div>';
       });
-    }
+    }, 40);
   }
   // V63.76: Bei Wechsel auf Investmentprofil-Tab das Pane lazy rendern
   // V63.78: vereinter Tab "Profil & Anzeige" — beide Panes initialisieren
