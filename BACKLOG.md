@@ -64,6 +64,57 @@ Retention-Lauf. Sie sind mit abgefangenem Versand geprüft — **eine
 echte Mail ist noch nie rausgegangen.** Das ist der eine Punkt, den
 nur ein Blick ins Postfach abschließt.
 
+### v1187 / v1188 (01.09., `5b688e3` + `063b202`) — auf Staging, **noch nicht auf Prod**
+
+**Nach dem Rollout gesucht, was der Kunde jetzt wirklich liest.** Vier
+Stellen sprachen weiter von Kerosin — der Währung, die v1183 abgeschafft
+hat und die seit dem Rollout auch live weg ist. v1183 hatte „kein
+Kerosin mehr im sichtbaren Text" gemeldet und im Browser gegengelesen:
+**offenbar nur in der Haupt-App, nicht in der Marktbericht-App und nicht
+in den Fehlerpfaden.**
+
+**Der teuerste Text stand im Bestätigungsdialog des Marktberichts**, den
+der Kunde vor jedem kostenpflichtigen Abruf abnicken muss:
+
+> *„Kosten: 5 L Kerosin … Wurde für dieses Objekt schon eine niedrigere
+> Stufe bezahlt, wird nur die Differenz abgebucht."*
+
+**Beides falsch.** Gemessen in `routes/marktbericht.js:100` gibt
+`_faelligeStufe()` entweder **0** zurück (schon bezahlt, kostet nichts)
+oder die **volle** Stufe. Eine Differenz gibt es seit v1183 nicht mehr —
+wer von Stufe 1 auf 3 vertieft, zahlt eine ganze Wertermittlung. **Ein
+Preisversprechen, das der Server nicht einlöst.**
+
+**Zwei weitere Texte warnten vor Kosten, die es nicht gibt:** der
+Beleg-Import ist seit v1183 im Plan enthalten (`ai.js:1058`, nur noch
+`logExtract`), der Hinweis nannte „1 L Kerosin". Ein Kostenhinweis vor
+einer kostenlosen Funktion hält Nutzer davon ab, sie zu benutzen.
+
+**Dazu der letzte offene Schritt des Preismodells** (Punkt 1, Schritt 5):
+der **Einzelkauf am gesperrten Knopf**. Ein leeres Kontingent endete in
+„Keine Wertermittlung mehr frei." — Punkt, keine Fortsetzung, vor einem
+fertig ausgefüllten Formular. Jetzt bietet die 402 genau die fehlende
+Bewertung an, mit Preis aus `/credits/bewertungen` (also aus Stripe,
+statt als fünfte Kopie derselben Zahlen im Quelltext). Die Weiterleitung
+geht auf `window.top` — die Seite läuft im iframe, und Stripe verweigert
+die Anzeige im Rahmen.
+
+**v1188 — Umlaute, 17 Stellen.** Marcels Hinweis galt der Mail, gilt
+aber überall. Vier der 17 hatte ich in v1187 selbst frisch eingebaut.
+
+> **Was dabei NICHT angefasst wurde, und das ist der Punkt:** zwischen
+> dem Nutztext stehen **Datenschlüssel derselben Schreibweise** —
+> `erhoeht:` in `ki-miete.js`, `me_anz`/`me_int`/`me_pct` in
+> `voice-import.js`, `weitere_maengel` als `data-state`,
+> `prognose_naechstes_jahr_pct`. **Wer die mitkorrigiert, zerstört
+> gespeicherte Objekte.** Bei `voice-import.js` wurden nur die Labels
+> geändert, die Schlüssel stehen unverändert daneben — im Diff
+> gegengelesen.
+
+**`kerosin-confirm-lage.js` bleibt unangetastet** — die Datei wird
+nirgends geladen und nirgends gerufen. In diesem Projekt wurde einmal
+eine vermeintliche Leiche zu Unrecht gelöscht.
+
 ### Der Rollout — was passiert ist, und zwei Korrekturen
 
 **Ausgeführt:** Backups → `staging` per Fast-Forward nach `main` →
