@@ -1994,8 +1994,21 @@ window._setBillingCycle = _setBillingCycle;
 // V224: Echter Stripe-Checkout (vorher V197-Toast-Stub).
 // Identische Logik wie _buyCreditPackDirect in pricing-modal.js.
 async function _buyCreditPack(packKey) {
-  var packs = (DealPilotConfig.pricing && DealPilotConfig.pricing.aiCreditPackages) || [];
-  var pack = packs.find(function(p){ return p.key === packKey; });
+  /* v1184: Der Tuersteher suchte nur in `aiCreditPackages` — der Liter-
+     Liste, die v1183 stillgelegt hat. Die Knoepfe darueber schicken seit
+     v1176 aber `paket_kurz` und `mpi`, also fiel JEDER Kaufversuch hier
+     heraus, ohne dass je ein Netzwerkaufruf entstand. Gemessen, nicht
+     vermutet: die Kacheln lesen `bewertungsPakete`, der Streifen darunter
+     `einzelkauf` — genau diese beiden Listen fehlten.
+
+     `pack` wird danach nicht mehr gebraucht; der Server loest den SKU ueber
+     den Stripe-lookup_key selbst auf. Die Suche ist nur dazu da, einen
+     Tippfehler im Aufruf zu fangen, bevor er zu einer 400 wird. */
+  var p = (DealPilotConfig.pricing || {});
+  var packs = (p.bewertungsPakete || [])
+    .concat(p.einzelkauf || [])
+    .concat(p.aiCreditPackages || []);
+  var pack = packs.find(function(x){ return x.key === packKey; });
   if (!pack) {
     if (typeof toast === 'function') toast('❌ Credit-Pack nicht gefunden');
     return;

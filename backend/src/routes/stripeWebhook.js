@@ -78,6 +78,21 @@ async function handleEvent(event) {
     case 'checkout.session.completed': {
       // Customer completed checkout - subscription should now exist
       const session = event.data.object;
+      /* v1184: Bewertungs-Kauf (Preismodell v1176). Steht VOR dem alten
+         Credit-Pack-Zweig, weil beide mode=payment sind und sich nur im
+         metadata.type unterscheiden.
+
+         Der Fehler wird hier NICHT verschluckt: bei einer gescheiterten
+         Gutschrift muss Stripe erneut zustellen, sonst hat der Kunde
+         bezahlt und nichts bekommen. Genau darin unterscheidet sich der
+         Zweig vom Credit-Pack darunter. */
+      if (session.mode === 'payment' && session.metadata?.type === 'bewertung') {
+        const { handleBewertungPaid } = require('../services/bewertungWebhook');
+        const { pool } = require('../db/pool');
+        const r = await handleBewertungPaid(pool, session);
+        console.log('[stripe-webhook] bewertung:', JSON.stringify(r));
+        return;
+      }
       // V197: Credit-Pack-Handler — wenn payment-Mode mit type=credit_pack
       if (session.mode === 'payment' && session.metadata?.type === 'credit_pack') {
         try {

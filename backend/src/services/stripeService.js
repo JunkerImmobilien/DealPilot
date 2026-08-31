@@ -162,6 +162,7 @@ async function resolvePlanFromPriceId(stripePriceId) {
 }
 
 module.exports = {
+  getStripe,          /* v1184: der Bewertungs-Katalog braucht denselben Client */
   isConfigured,
   getOrCreateCustomer,
   createCheckoutSession,

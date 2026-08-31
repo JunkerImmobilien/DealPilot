@@ -17,6 +17,7 @@ const express = require('express');
 const Stripe = require('stripe');
 const { CREDIT_PACKS, getPack, listPacks } = require('../services/creditPacks');
 const avmPacks = require('../services/avmPacks');
+const bewertungsKatalog = require('../services/bewertungsKatalog');   /* v1184 */
 
 const router = express.Router();
 
@@ -127,6 +128,15 @@ router.post('/checkout', userAuth, async (req, res) => {
     return res.status(500).json({ error: 'stripe_not_configured' });
   }
 
+  /* v1184: Bewertungen (Preismodell v1176) gehen einen eigenen Weg — ihre
+     Inhalte stehen an den Stripe-Preisen, nicht in einer Tabelle im Code.
+     Der Zweig steht VOR den Kerosin-Packs, weil die SKUs sich nicht
+     ueberschneiden und der alte Weg sonst mit `invalid_pack` abbraeche —
+     genau das tat er bis v1183 bei jedem einzelnen Kaufversuch. */
+  if (bewertungsKatalog.istBewertungsSku(pack_id)) {
+    return _checkoutBewertung(req, res, db, pack_id);
+  }
+
   let pack = getPack(pack_id);
   let packKind = 'ki';
   if (!pack) { pack = avmPacks.getPack(pack_id); if (pack) packKind = 'avm'; }
@@ -220,6 +230,116 @@ router.post('/checkout', userAuth, async (req, res) => {
   } catch (err) {
     console.error('[credits/checkout] error:', err);
     res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+/* ═══ v1184 · Bewertungen kaufen ════════════════════════════════════════
+   Vier Pakete, fuenf Einzelposten. Preis und Inhalt kommen aus Stripe
+   (bewertungsKatalog.js), damit Sandbox und Hauptkonto dieselbe Datei
+   fahren koennen — eine Price-ID im Code waere in einer der beiden
+   Umgebungen immer falsch.
+
+   Der Kauf-Eintrag entsteht hier als `pending`; auf `completed` setzt ihn
+   erst der Webhook, und zwar in demselben Zug, in dem er gutschreibt.
+   Wer ihn hier schon fertig meldete, haette eine Kaufhistorie ohne Ware. */
+async function _checkoutBewertung(req, res, db, sku) {
+  let eintrag;
+  try {
+    eintrag = await bewertungsKatalog.getBySku(sku);
+  } catch (e) {
+    console.error('[credits/checkout] Katalog nicht ladbar:', e.message);
+    return res.status(503).json({ error: 'katalog_nicht_erreichbar', message: e.message });
+  }
+  if (!eintrag) {
+    return res.status(400).json({ error: 'invalid_pack', sku: sku });
+  }
+
+  try {
+    /* 1) Plan-Check — unveraendert wie beim Kerosin-Kauf: Free kauft nicht
+       zu, Free wechselt den Plan. */
+    const planCheck = await db.query(`
+      SELECT COALESCE(p.id, 'free') AS plan_id, sc.stripe_customer_id
+      FROM users u
+      LEFT JOIN subscriptions s ON s.user_id = u.id AND s.status = 'active'
+      LEFT JOIN plans p ON p.id = s.plan_id
+      LEFT JOIN stripe_customers sc ON sc.user_id = u.id
+      WHERE u.id = $1
+    `, [req.user.id]);
+    const userPlan = planCheck.rows[0];
+
+    if (!userPlan || userPlan.plan_id === 'free') {
+      return res.status(403).json({
+        error: 'upgrade_required',
+        message: 'Bewertungen koennen ab dem Starter-Plan dazugekauft werden. Bitte waehle zuerst einen Plan.',
+        upgrade_to: 'starter'
+      });
+    }
+
+    const userResult = await db.query(
+      'SELECT id, email, name FROM users WHERE id = $1 AND deleted_at IS NULL',
+      [req.user.id]
+    );
+    if (!userResult.rowCount) return res.status(404).json({ error: 'user_not_found' });
+    const user = userResult.rows[0];
+
+    /* 2) Die Sitzung. `paket` faehrt als Metadatum mit, aber nur als
+       Rueckfall — der Webhook liest die Menge aus den Positionen. */
+    const successBase = process.env.APP_URL || process.env.FRONTEND_URL || `https://${req.headers.host}`;
+    const meta = {
+      user_id: user.id,
+      sku: eintrag.sku,
+      lookup_key: eintrag.lookup_key,
+      paket: JSON.stringify(eintrag.paket),
+      type: 'bewertung'
+    };
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [{ price: eintrag.price_id, quantity: 1 }],
+      customer_email: !userPlan.stripe_customer_id ? user.email : undefined,
+      customer: userPlan.stripe_customer_id || undefined,
+      client_reference_id: user.id,
+      metadata: meta,
+      payment_intent_data: { metadata: meta },
+      success_url: `${successBase}/?credit_purchase=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${successBase}/?credit_purchase=canceled`,
+      locale: 'de'
+    });
+
+    await db.query(`
+      INSERT INTO credit_purchases
+        (user_id, pack_id, credits_granted, amount_cents, currency, stripe_session_id, status, kind)
+      VALUES ($1, $2, $3, $4, $5, $6, 'pending', 'bewertung')
+    `, [
+      user.id, eintrag.sku, bewertungsKatalog.summe(eintrag.paket),
+      eintrag.amount_cents, eintrag.currency, session.id
+    ]);
+
+    return res.json({
+      url: session.url,
+      session_id: session.id,
+      pack: {
+        id: eintrag.sku,
+        label: eintrag.label,
+        paket: eintrag.paket,
+        amount_cents: eintrag.amount_cents
+      }
+    });
+  } catch (err) {
+    console.error('[credits/checkout] bewertung error:', err);
+    return res.status(500).json({ error: 'server_error', message: err.message });
+  }
+}
+
+/* v1184: was der Nutzer kaufen kann, direkt aus Stripe. Das Frontend hat
+   die Preise zwar in config.js stehen (Anzeige), aber wer pruefen will, ob
+   Anzeige und Abbuchung noch zusammenpassen, braucht diese Auskunft. */
+router.get('/bewertungen', async (req, res) => {
+  try {
+    const k = await bewertungsKatalog.ladeKatalog(false);
+    res.json({ katalog: k });
+  } catch (e) {
+    res.status(503).json({ error: 'katalog_nicht_erreichbar', message: e.message });
   }
 });
 
