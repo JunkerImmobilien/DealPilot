@@ -3693,6 +3693,67 @@ Nein; addKontingent schreibt gut) und im Browser gegengelesen — kein
 noch nicht auf — ein Kauf fuellt das Kontingent also noch nicht. Und der
 Monatsuebertrag ist ungetestet, weil dafuer ein Monatswechsel noetig ist.
 
+**`v1184` — der Kauf kommt an.** Commits `78280ec`, `65370f3`. Migration
+067. Der offene Rest aus v1183 ist geschlossen: ein Kauf fuellt das
+Kontingent.
+
+> **Der Webhook war die dritte von drei Unterbrechungen, nicht die
+> einzige.** Der Uebergabezettel nannte nur ihn. Gemessen wurde die ganze
+> Kette, bevor gebaut wurde, und sie riss schon im Browser:
+> `settings.js:_buyCreditPack` suchte den SKU in `aiCreditPackages` —
+> der Liter-Liste, die v1183 stillgelegt hatte. Die Knoepfe schicken seit
+> v1176 `paket_kurz` und `mpi`. **Jeder Kaufversuch endete lokal mit
+> „Credit-Pack nicht gefunden", ohne je einen Netzwerkaufruf zu machen.**
+> Danach erst haette `/credits/checkout` mit `400 invalid_pack`
+> geantwortet, und danach erst der Webhook in den stillgelegten
+> Litertank geschrieben. **Wer nur den gemeldeten Punkt repariert, baut
+> zwei Drittel einer Kette.**
+
+**Die Preise stehen nirgends im Code.** `services/bewertungsKatalog.js`
+loest die neun Posten zur Laufzeit ueber ihren `lookup_key` auf. Der
+Grund ist bekannt und teuer: eine Price-ID gilt je Konto, Staging rechnet
+gegen die Sandbox `acct_1TWXFqKEjyPDo0wo` — eine ID im Code oder in einer
+Migration ist deshalb **immer in genau einer Umgebung falsch, und zwar
+lautlos**. Ein `lookup_key` ist ein Name und heisst in beiden Konten
+gleich. Die Paketinhalte (`mpi`/`mpi_plus`/`wev`) stehen als Metadaten am
+Stripe-Preis, nicht in einer eigenen Tabelle.
+
+**Die Menge kommt aus den Line Items, nicht aus unseren Metadaten.** Der
+Preis ist auch die Quelle des Betrags; steht die Menge woanders, koennen
+Betrag und Ware auseinanderlaufen. Die Sitzungs-Metadaten sind nur der
+Rueckfall, wenn das Nachladen scheitert.
+
+**Scheitert die Gutschrift, wird der Fehler geworfen.** Der alte
+Credit-Pack-Zweig faengt ihn und loggt nur — hier waere das ein bezahlter
+Kauf ohne Ware. Der Anspruch auf `credit_purchases` geht zurueck auf
+`pending`, der Router antwortet 500, Stripe stellt erneut zu.
+
+**Beim Pruefen kam ein zweiter Fehler heraus, der nicht gesucht war:**
+ein frisch angelegter Pro-Nutzer stand vor jedem Kauf auf
+`mpi=5 mpi_plus=5 wev=5` **in der Bank** — sein volles Monatskontingent,
+zusaetzlich zum Monatskontingent. Der erste Monat waere doppelt gewesen.
+`_carryOver()` ueberspringt nur, wenn `kontingent_carry_at` im laufenden
+Monat liegt; bei `NULL` laeuft er durch. Migration 066 hatte die damals
+bestehenden Zeilen gesetzt, der Spalte aber **keinen DEFAULT** gegeben —
+und `_ensureCurrentPeriod()` legt neue Zeilen mit `INSERT (user_id)` an.
+**Eine Datenmigration heilt den Bestand, nicht die Zukunft.** Migration
+067 setzt den DEFAULT, der Riegel im Code bleibt zusaetzlich (Prod hat
+067 noch nicht).
+
+**Nachweis, alles im Container gegen die Sandbox gelaufen:** Katalog mit
+neun Posten aus Stripe · `/credits/checkout` liefert echte Sitzungen
+(`paket_gross` 3990 ct → 15/10/3, `mpi` 90 ct → 1) statt `400` · Webhook
+bucht (Bank 5/5/5 → 20/15/8), Doppellauf bucht nicht noch einmal ·
+Uebertrag: 2 von 5 verbraucht → 3 wandern, `used` auf 0, Deckel bei 15
+haelt, 40 Gekaufte bleiben ungekuerzt · im Browser: `settings.js?v=v1184`
+geladen, Tuersteher findet alle SKUs, Knopf endet auf `checkout.stripe.com`
+mit 7,90 € und 5 · 2 · 0.
+
+**Zwei Pruefnutzer stehen auf Staging** (`v1184-pruef@dealpilot.test`,
+`v1184-carry@dealpilot.test`, beide mit Pro-Abo). Ihre Kaufhistorie ist
+echt; die zwei unbezahlten Test-Sitzungen auf Marcels Konto wurden
+entfernt, damit `/credits/purchases` nichts Falsches zeigt.
+
 **Zum dritten Mal in zwei Tagen der verborgene Tab:** die Landing blieb
 im Screenshot leer, obwohl `getBoundingClientRect()` Hoehe 626 und
 Deckkraft 1 meldete. `document.visibilityState === 'hidden'` gehoert vor

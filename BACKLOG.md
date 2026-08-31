@@ -36,34 +36,21 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 2026-08-31, abends)
+## → HIER WEITERMACHEN (Übergabe 2026-08-31, nachts)
 
-**Stand:** lokal = GitHub = Staging auf `478ac15`, Zweig `staging`,
-Migrationen **66**. **Nichts hängt halbfertig.** Produktion steht
+**Stand:** lokal = GitHub = Staging auf `65370f3`, Zweig `staging`,
+Migrationen **67**. **Nichts hängt halbfertig.** Produktion steht
 unverändert auf `74ae2e3` vom 14.08. und wurde nicht angefasst.
 
 **Marcel schaut sich v1183 in Ruhe an.** Vor dem nächsten Bauen also
-zuerst seinen Befund abwarten — die drei Punkte unten hängen nicht davon
-ab und können vorher laufen.
+zuerst seinen Befund abwarten.
 
-### Die drei nächsten Schritte, in dieser Reihenfolge
+**Punkt 1 und 2 der letzten Übergabe sind erledigt** (v1184, siehe unten).
+Offen ist nur noch der Prod-Schritt.
 
-**1 · Der Stripe-Webhook füllt das Kontingent noch nicht.**
-`aiCreditsService.addKontingent()` steht und ist im Container geprüft,
-aber der Webhook kennt noch die Liter-Welt und ruft es nicht auf. **Bis
-das hängt, schreibt ein Kauf nichts gut** — das ist der wichtigste Rest,
-weil er Geld betrifft. Die Paket-Inhalte stehen als `lookup_key`-Metadaten
-an den Stripe-Preisen (`mpi`, `mpi_plus`, `wev` an `dp_paket_*`), der
-Webhook kann sie also direkt auslesen, statt eine eigene Tabelle zu
-führen.
+### Der nächste Schritt
 
-**2 · Der Monatsübertrag ist ungetestet.**
-`_carryOver()` ist idempotent über `kontingent_carry_at` gebaut. Zum
-Prüfen den Merker eines Testnutzers auf den Vormonat setzen und
-`getStatus()` rufen — dann muss der Rest in die Bank wandern, gedeckelt
-auf das Dreifache, und `mpi_used` auf 0 stehen.
-
-**3 · Die Live-Portal-Konfiguration führt noch 29 / 59 / 99 €.**
+**1 · Die Live-Portal-Konfiguration führt noch 29 / 59 / 99 €.**
 Auf Staging ist sie gesetzt, live nicht. Sie darf **erst mit dem
 Prod-Rollout** umgestellt werden, sonst zeigt die alte Prod-App 29 € und
 das Portal 19,99 €.
@@ -74,10 +61,74 @@ das Portal 19,99 €.
 > Wechseln sieht, aus der **Billing-Portal-Konfiguration**. **Drei
 > Stellen.** Läuft eine davon vor, wirbt die Seite mit einem Preis, den
 > die Buchung nicht kennt. Deshalb gehört ein Prod-Rollout in **einen**
-> Arbeitsgang: Frontend, Migration 064/066 und Portal-Konfiguration.
+> Arbeitsgang: Frontend, Migrationen 064-067 und Portal-Konfiguration.
 
 
-### Erledigt in dieser Runde — Stripe steht, Migrationen laufen
+### v1184 (31.08., `78280ec` + `65370f3`) — der Kauf kommt an
+
+**Punkt 1 war nicht ein Defekt, sondern drei.** Der Zettel nannte nur den
+Webhook. Gemessen wurde die ganze Kette, und sie riss schon im Browser:
+
+| Stelle | was passierte |
+|---|---|
+| `settings.js:_buyCreditPack` | suchte `paket_kurz` in `aiCreditPackages` — der Liter-Liste, die v1183 stillgelegt hat. **Kein Netzwerkaufruf, nur „Credit-Pack nicht gefunden".** |
+| `POST /credits/checkout` | kannte nur `kerosin_*` und die Alt-Packs → **400 `invalid_pack`** |
+| `stripeWebhook.js` | kannte nur `type=credit_pack` → hätte in `bonus_credits` geschrieben, den Topf, den 066 stillgelegt hat |
+
+**Befund:** wer nur den gemeldeten Punkt repariert, baut zwei Drittel
+einer Kette. Der Knopf hätte danach immer noch nichts getan.
+
+**Gebaut:** `services/bewertungsKatalog.js` (löst die neun Posten zur
+Laufzeit über ihren `lookup_key` auf — keine Price-ID im Code, sie wäre
+je Umgebung immer in einer falsch), `services/bewertungWebhook.js`
+(bucht über `addKontingent()`, Menge aus den **Line Items**, nicht aus
+unseren eigenen Metadaten), Weiche in `credits.js` und
+`stripeWebhook.js`, `GET /credits/bewertungen`.
+
+**Scheitert die Gutschrift, wird geworfen, nicht geloggt.** Der Anspruch
+geht zurück auf `pending`, Stripe stellt erneut zu. Der alte
+Credit-Pack-Zweig verschluckt den Fehler — hier wäre das ein bezahlter
+Kauf ohne Ware.
+
+### v1184b — der Monatsübertrag beschenkte jeden neuen Nutzer
+
+**Punkt 2 hat beim Prüfen einen Fehler ausgeworfen, der nicht gesucht
+war.** Ein frisch angelegter Pro-Nutzer stand **vor jedem Kauf** auf
+`mpi=5 mpi_plus=5 wev=5` in der Bank — sein volles Monatskontingent,
+zusätzlich zum Monatskontingent. Der erste Monat wäre doppelt gewesen.
+
+**Ursache:** `_carryOver()` überspringt nur, wenn `kontingent_carry_at`
+im laufenden Monat liegt. Bei `NULL` läuft er durch. Migration 066 hat
+die damals bestehenden Zeilen gesetzt, der Spalte aber **keinen DEFAULT**
+gegeben — und `_ensureCurrentPeriod()` legt neue Zeilen mit
+`INSERT (user_id)` an.
+
+> **Eine Datenmigration heilt den Bestand, nicht die Zukunft.** Wer
+> Zeilen per `UPDATE` nachzieht, muss fragen, wer die nächste Zeile
+> anlegt. Migration 067 setzt den DEFAULT, der Riegel in `_carryOver()`
+> bleibt zusätzlich — Prod hat 067 noch nicht.
+
+**Nachweis (Container, gegen die Sandbox):** Katalog neun Posten ·
+`/credits/checkout` liefert echte Sitzungen statt 400 (`paket_gross`
+3990 ct → 15/10/3; `mpi` 90 ct → 1) · Webhook bucht 5/5/5 → 20/15/8,
+Doppellauf bucht nicht noch einmal · Übertrag: 2 von 5 verbraucht → 3
+wandern, `used` auf 0, Deckel bei 15 hält, 40 Gekaufte bleiben
+ungekürzt · Browser: `settings.js?v=v1184`, Türsteher findet alle SKUs,
+Knopf endet auf `checkout.stripe.com` mit 7,90 € / 5 · 2 · 0.
+
+**Auf Staging stehen zwei Prüfnutzer** (`v1184-pruef@dealpilot.test`,
+`v1184-carry@dealpilot.test`, beide Pro). Die zwei unbezahlten
+Test-Sitzungen auf Marcels Konto sind wieder entfernt.
+
+**Eine Produktfrage bleibt offen — sie ist Geld, deshalb nicht geraten:**
+**Darf ein Free-Nutzer einzelne Bewertungen kaufen?** Heute nicht: der
+Bewertungs-Weg übernimmt die Sperre des Kerosin-Kaufs unverändert
+(`upgrade_required` ab Free). Das passt zur alten Begründung „Kerosin nur
+ab Starter", aber nicht unbedingt zu v1176 („der Knopf, an dem gerade
+eine Bewertung fehlt, verkauft genau diese eine"). Ein Free-Nutzer hat
+eine Marktpreisindikation im Monat und sieht danach eine Wand.
+
+### Erledigt in der Runde davor — Stripe steht, Migrationen laufen
 
 **Der Konnektor funktioniert.** Lesen und Schreiben, Test und Live. Drei
 Kontexte meldet er: `acct_1TWXFdGefFev8arz` (Haupt, live + test) und
