@@ -3693,6 +3693,56 @@ Nein; addKontingent schreibt gut) und im Browser gegengelesen — kein
 noch nicht auf — ein Kauf fuellt das Kontingent also noch nicht. Und der
 Monatsuebertrag ist ungetestet, weil dafuer ein Monatswechsel noetig ist.
 
+**`v1185` — vier Wochen Pro, mit einem Testpaket, das verfaellt.**
+Commits `dac26aa` … `37b03f5`. Migrationen 068 und 069. Marcels
+Vorschlag: neue Nutzer bekommen vier Wochen Pro, zwei Erinnerungsmails,
+und die Cockpit-Matrix zeigt es.
+
+> **Zwei Drittel standen schon, und das dritte war absichtlich
+> ausgelassen.** Die Testphase gibt es seit TR7 (`plan_trials`, sieben
+> Tage Pro ab Registrierung), den taeglichen Mail-Lauf seit v799. Was
+> fehlte, stand als Kommentar im Code: *„KI-Kontingent bleibt auf
+> Free-Niveau (Kerosin wird nicht verschenkt)."* Der Testnutzer sah Pro,
+> hatte eine Marktpreisindikation im Monat und **null** Wertermittlungen
+> — er konnte gerade das nicht testen, wofuer er zahlen soll. **Wer eine
+> Idee fuer neu haelt, ohne nachzusehen, baut sie ein zweites Mal daneben.**
+
+**Die Geldentscheidung hat Marcel getroffen, nicht ich:** ein einmaliges
+Paket (5 · 3 · 1) fuer das ganze Fenster, das mit der Testphase
+verfaellt. Das Pro-Monatskontingent waere die teure Variante gewesen,
+und das ist gemessen, nicht vermutet: ungenutztes Monatskontingent
+wandert beim Monatswechsel in die Bank, **und die Bank verfaellt nie**.
+In vier Wochen liegt fast immer ein Monatswechsel — ein Testnutzer, der
+nichts tut, haette danach als Free-Nutzer dauerhaft bis zu 15
+Wertermittlungen auf Vorrat gehabt.
+
+**Was mehrfach im Haus lag, zum fuenften und sechsten Mal:** die
+Trial-Vergabe stand zweimal im Code mit eigener Tagezahl (jetzt
+`userService.gewaehreTestphase()`), und der Satz „verfaellt nicht" stand
+in zwei Fusstexten, von denen ich zuerst nur einen nachzog.
+
+> **Der teuerste Fund beim Nachmessen im Browser:** die
+> Boarding-Pass-Karte filtert seit v1176 **alles mit „/ Monat" aus der
+> Feature-Liste**, weil die Kontingentzeile als eigenes Feld darueber
+> steht. Meine neue Zeile fiel genau in diesen Filter und war auf der
+> Karte unsichtbar — waehrend sie in der Matrix daneben korrekt stand.
+> **Ein Filter, der nach Textmustern aussortiert, trifft auch Saetze,
+> die es noch nicht gab, als er geschrieben wurde.**
+
+**Nachweis:** Container-Lauf (28 Tage, Paket 5/3/1, Reihenfolge
+Monat → Testphase → Bank, zweite Wertermittlung abgelehnt, nach Ablauf
+Toepfe leer und Gekauftes unberuehrt, zweite Vergabe abgelehnt) und
+Mail-Lauf mit abgefangenem Versand (2 von 3 Kandidaten, der Zahler
+faellt raus, keine offenen Platzhalter, zweiter Lauf schickt nichts
+nach). Im Browser gegengelesen: Matrix, Free-Karte, Landing,
+Kontingent-Box.
+
+**Offen und ehrlich benannt:** eine echte Mail ist nie rausgegangen.
+Und `routes/admin.js` registriert zweimal denselben Pfad
+`/users/:id/start-pro-trial` — Express nimmt die erste Registrierung,
+also den alten `subscriptions`-Weg; der Admin-Trial vergibt deshalb kein
+Testpaket. Nicht angefasst, weil ausserhalb des Auftrags.
+
 **`v1184` — der Kauf kommt an.** Commits `78280ec`, `65370f3`. Migration
 067. Der offene Rest aus v1183 ist geschlossen: ein Kauf fuellt das
 Kontingent.

@@ -38,15 +38,20 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 2026-08-31, nachts)
 
-**Stand:** lokal = GitHub = Staging auf `65370f3`, Zweig `staging`,
-Migrationen **67**. **Nichts hängt halbfertig.** Produktion steht
+**Stand:** lokal = GitHub = Staging auf `37b03f5`, Zweig `staging`,
+Migrationen **69**. **Nichts hängt halbfertig.** Produktion steht
 unverändert auf `74ae2e3` vom 14.08. und wurde nicht angefasst.
 
-**Marcel schaut sich v1183 in Ruhe an.** Vor dem nächsten Bauen also
-zuerst seinen Befund abwarten.
+**Punkt 1 und 2 der letzten Übergabe sind erledigt** (v1184), und die
+Testphase ist auf Marcels Entscheidung hin umgebaut (v1185).
 
-**Punkt 1 und 2 der letzten Übergabe sind erledigt** (v1184, siehe unten).
-Offen ist nur noch der Prod-Schritt.
+**Zur Abnahme auf Staging:** ein neues Konto läuft jetzt vier Wochen als
+Pro und trägt ein einmaliges Paket aus 5 Marktpreisindikationen, 3
+erweiterten und 1 Wertermittlung, das mit der Testphase verfällt. Zwei
+Erinnerungsmails (Halbzeit, kurz vor Ablauf) hängen am täglichen
+Retention-Lauf. Sie sind mit abgefangenem Versand geprüft — **eine
+echte Mail ist noch nie rausgegangen.** Das ist der eine Punkt, den
+nur ein Blick ins Postfach abschließt.
 
 ### Der nächste Schritt
 
@@ -63,6 +68,71 @@ das Portal 19,99 €.
 > die Buchung nicht kennt. Deshalb gehört ein Prod-Rollout in **einen**
 > Arbeitsgang: Frontend, Migrationen 064-067 und Portal-Konfiguration.
 
+
+### v1185 (31.08., `dac26aa` … `37b03f5`) — vier Wochen Pro, mit Testpaket
+
+**Marcels Vorschlag:** neue Nutzer bekommen vier Wochen alle Funktionen
+aus Pro, dazu zwei Erinnerungsmails, und die Cockpit-Matrix soll es
+zeigen. **Zwei Drittel standen schon** — beim Messen kam heraus:
+
+| gefunden | Zustand vorher |
+|---|---|
+| `plan_trials` + Auto-Grant (TR7) | **7 Tage Pro ab Registrierung, gab es längst** |
+| `retentionService` | täglicher Lauf, Vorlagen, Idempotenz — **aber `listExpiring()` sucht über `subscriptions`, und ein Testnutzer hat dort keine Zeile** |
+| Kontingent im Trial | **bewusst Free-Niveau** („Kerosin wird nicht verschenkt") — der Testnutzer sah Pro, hatte 1 Indikation im Monat und **null Wertermittlungen** |
+| Trial-Vergabe | stand **zweimal** im Code, mit eigener Tagezahl je Kopie |
+| Nachkauf im Trial | gesperrt — `credits.js` las den Plan roh und sah jeden Testnutzer als `free` |
+
+**Die Entscheidung, die Geld betraf, hat Marcel getroffen:** ein
+**einmaliges** Paket (5 · 3 · 1) für das ganze Fenster, das mit der
+Testphase verfällt — nicht das Monatskontingent eines Pro.
+
+> **Warum das die teure Variante gewesen wäre, und es ist gemessen:**
+> Ungenutztes Monatskontingent wandert beim Monatswechsel in die Bank,
+> und **die Bank verfällt nie**. In vier Wochen liegt fast immer ein
+> Monatswechsel. Ein Testnutzer, der nichts tut, hätte danach als
+> Free-Nutzer **dauerhaft bis zu 15 Wertermittlungen auf Vorrat** gehabt
+> — und je nach Anmeldedatum zwei Monatskontingente statt einem.
+
+**Entwarnung bei den Fremdkosten:** die teuren Partner-Abrufe (5,90 /
+9,90 €) hängen an `avm_a`/`avm_b` und sind vom Monatskontingent
+getrennt. Auch ein Testnutzer muss sie kaufen. Was die Testphase
+verschenkt, ist eigene Rechenzeit.
+
+**Gebaut:** Migration 068 (eigener Topf `testphase_*` + `testphase_bis`,
+verfällt, wandert nie in die Bank) · `consumeArt()` zieht in der
+Reihenfolge ab, in der etwas verfällt (Monat → Testphase → Bank) ·
+Migration 069 + dritte Retention-Stufe mit zwei Vorlagen · eine einzige
+Vergabefunktion `userService.gewaehreTestphase()` · Nachkauf über den
+**effektiven** Plan · Matrix, Feature-Tabelle, Free-Karte und Landing.
+
+**Drei Nachbesserungen kamen erst beim Nachmessen im Browser** — alle
+drei derselbe Fehlertyp, *zwei Texte für dieselbe Aussage*:
+
+- `v1185b` Datum: `toLocaleDateString('de-DE')` liefert „12.9.2026" ohne
+  führende Null. Die Auslauf-Mail hatte das seit v799.
+- `v1185c` Die Boarding-Pass-Karte filtert seit v1176 **alles mit
+  „/ Monat" aus der Feature-Liste**, weil die Kontingentzeile separat
+  darübersteht. Die neue Testphasen-Zeile fiel genau in diesen Filter
+  und war auf der Karte unsichtbar.
+- `v1185d`/`e` Der Fußtext behauptete weiter „verfällt nicht", während
+  die Zellen darüber schon „5 aus der Testphase" zeigten.
+
+**Nachweis (Container + Browser):** 28 Tage vergeben · Paket 5/3/1 ·
+Wertermittlung für einen Testnutzer erstmals nutzbar (vorher 0) ·
+Reihenfolge Monat → Testphase belegt · zweite Wertermittlung abgelehnt ·
+nach Ablauf Töpfe leer, **gekaufte 2 WEV unberührt**, nichts in die Bank
+gewandert · zweite Vergabe abgelehnt · Erinnerungen: 2 von 3 Kandidaten
+(der Zahler fällt raus), richtige Stufe je Restlaufzeit, keine offenen
+Platzhalter, zweiter Lauf schickt nichts nach · Browser: Matrix, Karte,
+Landing und Kontingent-Box.
+
+**Offen:** eine echte Mail ist nie rausgegangen (Versand im Prüflauf
+abgefangen). Und: `routes/admin.js` registriert **zweimal** denselben
+Pfad `/users/:id/start-pro-trial` (Zeile 1475 und 1495) — Express nimmt
+die erste, also den alten `subscriptions`-Weg, nicht den
+`plan_trials`-Weg. Der Admin-Trial vergibt damit **kein** Testpaket.
+Nicht angefasst, weil außerhalb des Auftrags.
 
 ### v1184 (31.08., `78280ec` + `65370f3`) — der Kauf kommt an
 
