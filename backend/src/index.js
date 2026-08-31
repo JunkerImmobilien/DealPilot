@@ -202,6 +202,28 @@ async function start() {
     console.error('✗ Retention-Scheduler konnte nicht starten:', e.message);
   }
 
+  /* v1186: Die Stripe-Preis-IDs in `plans` gegen die lookup_keys abgleichen.
+     Laeuft bei jedem Start, nicht als Migration — eine Migration kann nur
+     feste IDs schreiben, und die sind je Umgebung verschieden. Migration
+     065 hat auf diese Weise die Sandbox-IDs festgeschrieben; auf
+     Produktion waere daran jeder Checkout gescheitert.
+
+     Verzoegert, damit der Server zuerst antwortet: der Abgleich ist
+     wichtig, aber nicht dringlicher als ein laufender Dienst. Faellt er
+     aus, bleiben die alten Werte stehen und es steht im Log. */
+  try {
+    const plansSync = require('./db/plans-preise-sync');
+    setTimeout(function () {
+      plansSync.sync({}).then(function (r) {
+        if (!r.ok) console.warn('[plans-sync] uebersprungen:', r.reason);
+      }).catch(function (e) {
+        console.error('[plans-sync] fehlgeschlagen:', e && e.message);
+      });
+    }, 15000);
+  } catch (e) {
+    console.error('✗ plans-sync konnte nicht starten:', e.message);
+  }
+
   // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)
   /* v538-ws-removed: Realtime-WS-Live-Pfad entfernt. Web-Audio liefert auf manchen
      Geraeten Stille -> Realtime unbrauchbar. Live-Mitschrift laeuft seit v536 ueber
