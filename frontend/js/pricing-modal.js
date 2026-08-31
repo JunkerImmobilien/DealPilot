@@ -163,7 +163,16 @@
              \u201e19.99" mit Punkt da. data-m/data-y bleiben maschinenlesbar. */
           '<div class="tk-price" data-m="'+(p.price_monthly||0)+'" data-y="'+(p.price_yearly||0)+'"><b>'+_pnum(p.price_monthly||0)+'</b><span class="cur">\u20ac</span>'+(p.price_monthly>0?'<span class="per">/ Monat</span>':'')+'</div>'+
           '<div class="tk-note">'+_esc(note)+'</div>'+
-          '<div class="tk-ker"><span>\u25f7</span>'+_kontSumme(p.key)+'&nbsp;'+(_kontSumme(p.key)===1?'Bewertung':'Bewertungen')+'&nbsp;/&nbsp;Monat</div>'+
+          /* v1185: Fuer Free steht hier die Testphase statt der einen
+             Indikation. Sie ist der Zustand, in dem ein neues Konto
+             wirklich startet — die Monatszahl gilt erst ab Woche fuenf.
+             GEMESSEN im Browser: die Feature-Liste darunter filtert alles
+             mit „/ Monat" heraus (Zeile darueber), die Testphase waere
+             sonst nirgends auf der Karte sichtbar. */
+          '<div class="tk-ker"><span>◷</span>'+(p.key==='free'
+            ? '4 Wochen Pro&nbsp;·&nbsp;dann 1&nbsp;/&nbsp;Monat'
+            : _kontSumme(p.key)+'&nbsp;'+(_kontSumme(p.key)===1?'Bewertung':'Bewertungen')+'&nbsp;/&nbsp;Monat')+'</div>'+
+
           '<ul class="tk-feat">'+feats.map(function(f){return '<li>'+_esc(f)+'</li>';}).join('')+'</ul>'+
           (p.key===_cur?'<a class="tk-cta tk-cta-cur" href="#" data-plan="'+p.key+'">\u2713 Dein aktueller Plan</a>':'<a class="tk-cta" href="#" data-plan="'+p.key+'">'+_esc(p.ctaText||((p.title||p.label)+' w\u00e4hlen'))+'</a>')+
           '<div class="tk-rip"><span class="bar"></span><span class="bp-txt">\u2708 Boarding Pass \u00b7 DP-0'+(i+1)+'</span></div>'+
