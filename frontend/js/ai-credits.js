@@ -247,8 +247,14 @@
       if (!k.limit) sub = (k.bank ? 'nur zugekauft' : 'nicht in deinem Plan');
       else if (k.bank) sub = k.limit + ' im Monat · ' + k.bank + ' gespart';
       else sub = k.limit + ' im Monat';
-      /* v1185: siehe _panelHtml — die Testphase gewinnt die Beschriftung. */
-      if ((k.testphase || 0) > 0) sub = k.testphase + ' aus der Testphase';
+      /* v1185: Die Testphase gewinnt die Beschriftung — aber sie darf den
+         Rest nicht verschweigen. Bei 1 aus der Testphase und 2 gekauften
+         stand ueber der 3 nur „1 aus der Testphase"; die anderen zwei
+         blieben unerklaert. */
+      if ((k.testphase || 0) > 0) {
+        sub = k.testphase + ' aus der Testphase';
+        if (k.bank) sub += ' · ' + k.bank + ' gekauft';
+      }
       return '<div class="ai-credits-cell">' +
                '<div class="ai-credits-label">' + a.kurz + '</div>' +
                '<div class="ai-credits-value' + (rest === 0 ? ' rd' : ' gn') + '">' + rest + '</div>' +
