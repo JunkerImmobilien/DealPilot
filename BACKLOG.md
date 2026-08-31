@@ -38,8 +38,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 2026-08-30, nachts)
 
-**Stand:** lokal = GitHub = Staging auf `8b87e23`, Zweig `staging`.
-Migrationen **65**. **Nichts hängt halbfertig.**
+**Stand:** lokal = GitHub auf `8267b52`, Staging auf `8b87e23` (Doku-Commits
+müssen nicht ausgerollt werden). Zweig `staging`, Migrationen **65**.
+**Nichts hängt halbfertig.**
 
 ### Erledigt in dieser Runde — Stripe steht, Migrationen laufen
 
