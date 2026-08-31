@@ -244,15 +244,80 @@ reicht nicht. Zwei Wege, und der zweite ist der richtige:
 > 19,99 € und bucht 29 € ab. **064 und die ID-Umstellung gehören auf Prod in
 > denselben Arbeitsgang.**
 
-### Das Nächste: der Kontingent-Zähler
+### Der Kontingent-Zähler ist gebaut (v1183, 31.08.) — Kerosin ist weg
 
-Das ist der eigentliche Umbau und der größte Rest. **Die Anzeige ist
-umgestellt, die Buchhaltung nicht** — `aiCreditsService.js` führt weiter
-`PLAN_LIMITS = {free:2, starter:10, investor:40, pro:100}` in Litern. Wer
-heute eine Wertermittlung startet, zahlt 12 L aus dem alten Tank, während
-die Oberfläche „5 Wertermittlungen im Monat" sagt.
+**Der größte offene Punkt ist erledigt.** Gezählt wird je Leistungsart,
+nicht mehr in einem gemeinsamen Litertank. Migration **066** ist
+ausgeführt, Stand der Migrationen ist **66**.
 
-Reihenfolge steht in **Punkt 1** unter „Offen".
+| Stufe | heißt jetzt | kostete |
+|---|---|---|
+| 1 | **MPI** · Marktpreisindikation | 2 L |
+| 2 | **MPI+** · Erweiterte Marktpreisindikation | 5 L |
+| 3 | **WEV** · Wertermittlung nach ImmoWertV | 12 L |
+
+**Marcels Entscheidung dazu:** die acht kleinen KI-Hilfen (Sprache,
+Beleg, Bodenrichtwert, BMF, DS2-Vorschlag, Lage, Anreicherung, Analyse)
+plus der Verlaufstext sind **im Plan enthalten** und kosten nichts mehr.
+Eine Währung, drei Bewertungen.
+
+**Marktwert-Abrufe haben jetzt einen eigenen Bestand.** Sie kosteten 40
+bzw. 20 L — bei fünf Bewertungen im Monat wäre ein einziger Abruf das
+Achtfache des Kontingents gewesen. Die Zahlen stammten aus der Zeit, als
+100 L im Pro-Plan lagen. Im Preismodell v1176 sind sie Einzelposten
+(5,90 / 9,90 €), also gehören sie nicht in den Monatstopf.
+
+> **Die Falle, die diese Umstellung überall gelegt hat, und sie ist
+> allgemein:** `getStatus()` liefert `total_remaining` nicht mehr — und
+> **`undefined < 1` ist `false`**. Jede der sieben 402-Sperren hätte
+> danach lautlos nie mehr gegriffen, die Leistung wäre erbracht und nie
+> bezahlt worden. Dieselbe Form im Demo-Deckel (`NaN > 200` ist auch
+> `false`) und beim Co-Pilot-Tageslimit, das über das Literlimit
+> abgeleitet wurde und jeden still auf `free` gesetzt hätte.
+> **Wer ein Feld aus einer Antwort entfernt, muss jeden Vergleich
+> darauf suchen — ein toter Vergleich schlägt nicht fehl, er wird wahr
+> oder falsch.** Deshalb sind die Sperren ausdrücklich entfernt und
+> `consume()`/`addBonus()` antworten mit einem harten Nein statt mit
+> einer stillen Null.
+
+**Was in der Oberfläche anders ist**
+- Die **Tankanzeige oben rechts ist weg.** Die Pille zeigt `48 · 5 · 5`
+  in derselben Schreibweise wie die Pakete; beim Überfahren klappt ein
+  Panel auf mit Name, Monatsanteil, Gespartem und Rest je Art.
+- **Der Nachkauf war wirklich widersprüchlich, nicht nur unübersichtlich:**
+  die Kachelleiste stand als vier feste Knöpfe im HTML und trug noch
+  „10 L / 2 €", während die Karte darunter längst aus `DATA` kam und
+  „15 · 10 · 3 / 39,90 €" zeigte. Zwei Listen für dieselbe Sache. Die
+  Kacheln werden jetzt aus `DATA` gebaut.
+- Landing, `leistungsumfang.html` und `assets/pricing-plugin.js` sind
+  **alle drei** nachgezogen — derselbe Text lag dreifach im Haus.
+
+**Nachgewiesen:** Funktionslauf im Container — `consumeStufe(3)` zieht
+nur `wev` ab, `mpi` bleibt unberührt; unbekannte Art wird abgelehnt;
+stillgelegtes `consume()` antwortet mit Nein und schreibt eine Warnung;
+`addKontingent({wev:3})` schreibt gut. Im Browser: Pille, Panel,
+Kontingent-Box, Nachkauf-Streifen und Landing gegengelesen — **kein
+„Kerosin", „Liter" oder „Pilot-Anfrage" mehr im sichtbaren Text.**
+
+**Nebenbefund, unabhängig vom Auftrag:** die Landing nannte
+**PriceHubble und Sprengnetter namentlich**. CLAUDE.md verbietet das
+ausdrücklich — jetzt „unabhängige Bewertungspartner". Im **Pre-Flight-
+Streifen der App** stehen die beiden Logos weiterhin; das ist die
+Anbieter-Auswahl und war nicht Teil dieses Auftrags.
+
+### Was an diesem Umbau noch offen ist
+
+1. **Der Kauf schreibt noch nichts gut.** `addKontingent()` steht und ist
+   geprüft, aber der Stripe-Webhook ruft es noch nicht auf — er kannte
+   bisher nur Liter. Bis das hängt, füllt ein Kauf das Kontingent nicht.
+2. **Der Monatsübertrag ist ungetestet**, weil dafür ein Monatswechsel
+   nötig ist. Die Funktion ist idempotent gebaut (`kontingent_carry_at`)
+   und lässt sich vorziehen, indem man den Merker auf den Vormonat setzt.
+3. Die alten Liter-Felder (`bonus_credits`, `PLAN_LIMITS`,
+   `AI_CREDIT_PACKAGES`) stehen **bewusst** noch da — sie sind der
+   Nachweis für Bestandskunden und für v1125 die Grundlage, aus alten
+   Log-Zeilen die bezahlte Stufe zurückzurechnen.
+
 
 ### Was in dieser Runde fertig wurde
 

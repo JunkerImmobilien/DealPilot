@@ -3642,6 +3642,63 @@ Chronik:**
   zurueckgenommen. `document.visibilityState` gehoert vor jede Messung, die
   an einer Animation haengt.
 
+
+**`v1183` — der Kontingent-Zaehler. Kerosin ist weg.** Commits `31f9829`
+ff. Migration 066. Der groesste offene Punkt aus dem Backlog ist gebaut:
+gezaehlt wird je Leistungsart (mpi / mpi_plus / wev), nicht mehr in einem
+gemeinsamen Litertank. Marcels Entscheidung dazu: die acht kleinen
+KI-Hilfen sind im Plan enthalten und kosten nichts — eine Waehrung, drei
+Bewertungen.
+
+> **Die Lehre dieser Runde, und sie gilt weit ueber Stripe hinaus:
+> `getStatus()` liefert `total_remaining` nicht mehr — und
+> `undefined < 1` ist `false`.** Alle sieben 402-Sperren in `ai.js` haetten
+> danach lautlos NIE mehr gegriffen: die Leistung waere erbracht und nie
+> bezahlt worden. Dieselbe Form im Demo-Deckel (`NaN > 200` ist auch
+> falsch) und beim Co-Pilot-Tageslimit, das ueber das Literlimit
+> abgeleitet wurde und jeden still auf `free` gesetzt haette.
+> **Ein toter Vergleich schlaegt nicht fehl — er wird wahr oder falsch.**
+> Wer ein Feld aus einer Antwort entfernt, muss jeden Vergleich darauf
+> suchen. Deshalb sind die Sperren ausdruecklich entfernt statt
+> wirkungslos gelassen, und `consume()`/`addBonus()` antworten mit einem
+> harten Nein plus Log-Warnung statt mit einer stillen Null.
+
+**Marcels Befund „total unuebersichtlich" war woertlich richtig.** Die
+Kachelleiste im Nachkauf stand als vier feste Knoepfe im HTML und trug
+noch „10 L / 2 €", waehrend die Karte darunter laengst aus `DATA` kam und
+„15 · 10 · 3 / 39,90 €" zeigte. **Zwei Listen fuer dieselbe Sache** — das
+vierte Mal in diesem Projekt (FEHLT_TEXT/BEDARF v1126d,
+BEDARF/VERFAHREN v1152, Abbuchung/Ankuendigung v1154, und jetzt hier).
+Die Kacheln werden aus `DATA` gebaut; sie koennen nicht mehr driften.
+
+**Marktwert-Abrufe haben einen eigenen Bestand bekommen.** Sie kosteten
+40 bzw. 20 L — bei fuenf Bewertungen im Monat waere ein einziger Abruf
+das Achtfache des Kontingents gewesen. Die Zahlen stammten aus der Zeit,
+als 100 L im Pro-Plan lagen. **Wenn sich die Einheit aendert, muss jeder
+Preis, der in der alten Einheit steht, neu begruendet werden** — sonst
+wandert eine Zahl mit, deren Grundlage weg ist.
+
+**Derselbe Text lag dreifach im Haus:** `landing/index.html`,
+`landing/leistungsumfang.html` und `landing/assets/pricing-plugin.js`.
+Alle drei nachgezogen. **Nebenbefund:** die Landing nannte PriceHubble
+und Sprengnetter namentlich, was CLAUDE.md ausdruecklich verbietet —
+jetzt „unabhaengige Bewertungspartner".
+
+**Nachweis:** Funktionslauf im Container (nur die gebuchte Art sinkt, die
+anderen nicht; unbekannte Art abgelehnt; stillgelegtes consume() sagt
+Nein; addKontingent schreibt gut) und im Browser gegengelesen — kein
+„Kerosin", „Liter" oder „Pilot-Anfrage" mehr im sichtbaren Text.
+
+**Offen und ehrlich benannt:** der Stripe-Webhook ruft `addKontingent()`
+noch nicht auf — ein Kauf fuellt das Kontingent also noch nicht. Und der
+Monatsuebertrag ist ungetestet, weil dafuer ein Monatswechsel noetig ist.
+
+**Zum dritten Mal in zwei Tagen der verborgene Tab:** die Landing blieb
+im Screenshot leer, obwohl `getBoundingClientRect()` Hoehe 626 und
+Deckkraft 1 meldete. `document.visibilityState === 'hidden'` gehoert vor
+jede Messung, die an einer Animation haengt — und **die Messung schlaegt
+das Bild.**
+
 ---
 
 # ES GIBT DREI STÄNDE — NICHT EINEN
