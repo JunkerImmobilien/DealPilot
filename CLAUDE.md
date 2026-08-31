@@ -112,7 +112,15 @@ Terminal-Ausgaben unter ~40 Zeilen halten: filtern, zählen, kürzen.
 | | |
 |---|---|
 | Staging | `root@116.203.214.11` · `/opt/dealpilot` · Zweig `staging` |
-| Produktion | `root@157.90.117.167` (`DealPilot-Prod-neu`) · Zweig `main` · SSH **read-only** |
+| Produktion | `root@157.90.117.167` (`DealPilot-Prod-neu`) · Zweig `main` · SSH mit **Schreibrecht** |
+
+> **Hier stand bis zum 31.08.2026 „SSH read-only". Das stimmt nicht** —
+> gemessen beim Prod-Rollout v1186: `git pull`, `docker compose build` und
+> `pg_dump` laufen dort alle. Die Zeile hat eine falsche Sicherheit
+> vermittelt: wer sie liest, hält einen Fehlgriff auf Prod für technisch
+> unmöglich. **Er ist es nicht.** Der Schutz ist die Regel, nicht der
+> Zugang: Produktion wird nur nach ausdrücklicher Freigabe angefasst, und
+> vorher wird gesichert (`/root/backups/`, beide Datenbanken).
 
 Getaggt wird **nur auf Staging**.
 Host-Node ist 18, Container-Node 22.

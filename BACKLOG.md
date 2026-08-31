@@ -36,11 +36,22 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 2026-08-31, nachts)
+## → HIER WEITERMACHEN (Übergabe 2026-08-31, nach dem Prod-Rollout)
 
-**Stand:** lokal = GitHub = Staging auf `37b03f5`, Zweig `staging`,
-Migrationen **69**. **Nichts hängt halbfertig.** Produktion steht
-unverändert auf `74ae2e3` vom 14.08. und wurde nicht angefasst.
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `fc5e7b3`.
+Migrationen **69** auf beiden Servern. **Nichts hängt halbfertig.**
+
+**Produktion ist am 31.08.2026 gegen 21:40 ausgerollt worden** — der
+erste Rollout seit dem 14.08., 58 Commits. Preise live: Starter 19,99 ·
+Investor 39,99 · Pro 79,99 · Partner 99. Backups beider Datenbanken
+liegen unter `/root/backups/*-vor-v1186-20260831-2135.sql` (12 MB
+Haupt-DB, 14 MB Marktbericht-DB, beide auf Inhalt geprüft).
+
+> **Die sieben zahlenden Bestandskunden zahlen unverändert weiter.**
+> Ihre Stripe-Abos hängen an der alten Price-ID; eine Preisänderung in
+> `plans` betrifft nur Neuabschlüsse. Sie **sehen** aber ab sofort die
+> neuen, niedrigeren Preise. Marcels Entscheidung: Rollout jetzt,
+> Ansprache bei Nachfrage.
 
 **Punkt 1 und 2 der letzten Übergabe sind erledigt** (v1184), und die
 Testphase ist auf Marcels Entscheidung hin umgebaut (v1185).
@@ -53,20 +64,53 @@ Retention-Lauf. Sie sind mit abgefangenem Versand geprüft — **eine
 echte Mail ist noch nie rausgegangen.** Das ist der eine Punkt, den
 nur ein Blick ins Postfach abschließt.
 
-### Der nächste Schritt
+### Der Rollout — was passiert ist, und zwei Korrekturen
 
-**1 · Die Live-Portal-Konfiguration führt noch 29 / 59 / 99 €.**
-Auf Staging ist sie gesetzt, live nicht. Sie darf **erst mit dem
-Prod-Rollout** umgestellt werden, sonst zeigt die alte Prod-App 29 € und
-das Portal 19,99 €.
+**Ausgeführt:** Backups → `staging` per Fast-Forward nach `main` →
+`git pull` auf Prod → Backend neu gebaut (Migrationen 064–069 liefen
+beim Start) → Preisabgleich → Abnahme im Browser.
 
-> **Und die Warnung, die über allem steht, solange Prod alt ist:**
-> Die angezeigten Preise kommen aus `frontend/js/config.js`, die
-> Abbuchung aus `plans.stripe_price_*_id`, und was der Kunde beim
-> Wechseln sieht, aus der **Billing-Portal-Konfiguration**. **Drei
-> Stellen.** Läuft eine davon vor, wirbt die Seite mit einem Preis, den
-> die Buchung nicht kennt. Deshalb gehört ein Prod-Rollout in **einen**
-> Arbeitsgang: Frontend, Migrationen 064-067 und Portal-Konfiguration.
+**Nachgewiesen:** `plans` trägt die neuen Live-IDs · der Webhook löst
+alle vier auf (`price_1UAMox…` → starter/monthly usw.) · der
+Bewertungs-Katalog findet alle neun Posten im Live-Konto · Landing und
+App zeigen 19,99 / 39,99 / 79,99 und die Testphase · keine
+Konsolenfehler.
+
+#### Korrektur 1 — meine Fehldiagnose zu Migration 065
+
+Ich hatte gemeldet, 065 schreibe Sandbox-Preis-IDs auf Prod und breche
+damit die Zahlung. **Das war falsch.** 065 hat einen Riegel, den ich
+übersehen hatte, weil mein `grep` genau diese Zeile nicht traf:
+
+```sql
+SELECT COALESCE(stripe_price_monthly_id,'') LIKE '%KEjyPDo0wo%' INTO ist_sandbox …
+IF NOT COALESCE(ist_sandbox, FALSE) THEN RAISE NOTICE '065: kein Sandbox-Konto…'; RETURN;
+```
+
+Auf einem Live-Konto tut sie **nichts**. Die Lehre gilt trotzdem, nur
+andersherum: **weil 065 auf Prod nichts tut, gab es überhaupt keinen
+Mechanismus, der die neuen Live-Preise einträgt.** Ohne den Abgleich
+(v1186) stünde Prod jetzt mit Anzeige 19,99 € und Abbuchung 29 € da —
+dieselbe Drei-Stellen-Falle, nur aus der anderen Richtung. **Ein
+Sicherheitsriegel, der eine Migration in einer Umgebung stilllegt,
+hinterlässt dort eine Lücke, die jemand anders füllen muss.**
+
+#### Korrektur 2 — die Portal-Konfiguration führt gar keine Preise
+
+Der alte Zettel warnte: *„Die Live-Portal-Konfiguration führt noch
+29/59/99 €."* **Gemessen stimmt das nicht.** Die Default-Konfiguration
+`bpc_1TqTylGefFev8arzlMDFfCOz` hat **kein `products`-Feld** — weder
+live noch in der Sandbox. Es gibt dort keine Preisliste, die veralten
+könnte; der Kunde sieht im Portal Rechnungen, Zahlungsmittel und
+Kündigung, aber keine Plan-Auswahl. `createPortalSession()` übergibt
+keine `configuration`, nimmt also genau diese. **Nicht angefasst** —
+ein Eingriff in eine Geld-Konfiguration ohne Not wäre falsch.
+
+> **Von den „drei Stellen" waren es also zwei:** `config.js` (Anzeige)
+> und `plans` (Abbuchung). Beide stimmen jetzt überein. Wenn Kunden im
+> Portal ihren Plan selbst wechseln können sollen, muss dort erst eine
+> Produktliste angelegt werden — das ist eine offene Produktfrage, keine
+> Rollout-Aufgabe.
 
 
 ### v1185 (31.08., `dac26aa` … `37b03f5`) — vier Wochen Pro, mit Testpaket

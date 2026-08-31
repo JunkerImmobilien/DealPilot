@@ -3693,6 +3693,37 @@ Nein; addKontingent schreibt gut) und im Browser gegengelesen — kein
 noch nicht auf — ein Kauf fuellt das Kontingent also noch nicht. Und der
 Monatsuebertrag ist ungetestet, weil dafuer ein Monatswechsel noetig ist.
 
+**`v1186` — Prod-Rollout, 31.08.2026, 21:40.** Commit `fc5e7b3`,
+Migrationen 064–069. Der erste Rollout seit dem 14.08., 58 Commits.
+Preise live: 19,99 / 39,99 / 79,99 / 99. Beide Datenbanken vorher
+gesichert und auf Inhalt geprueft.
+
+> **Die Preis-IDs stehen jetzt in keiner Migration mehr.**
+> `db/plans-preise-sync.js` fragt Stripe beim Start mit dem Schluessel
+> DIESER Umgebung nach den `lookup_key`s und traegt ein, was es findet —
+> kein einziges `price_` im Quelltext. Das ist die strukturelle Antwort
+> auf eine Falle, die dieses Projekt zum dritten Mal beschaeftigt hat.
+
+> **ZWEI DIAGNOSEN VON MIR WAREN FALSCH, beide ausdruecklich
+> zurueckgenommen:**
+> 1. Ich meldete, Migration 065 schreibe Sandbox-IDs auf Prod und breche
+>    die Zahlung. Sie hat einen Riegel (`LIKE '%KEjyPDo0wo%'`), den mein
+>    `grep`-Filter nicht traf — auf Live tut sie nichts. **Der gebaute
+>    Abgleich war trotzdem noetig, nur aus dem umgekehrten Grund:** weil
+>    065 auf Prod nichts tut, haette niemand die neuen Preise
+>    eingetragen. Ein Riegel, der eine Migration stilllegt, hinterlaesst
+>    eine Luecke.
+> 2. Der Uebergabezettel und ich sagten, die Live-Portal-Konfiguration
+>    fuehre 29/59/99 €. Gemessen: sie fuehrt **gar keine Produktliste**,
+>    weder live noch in der Sandbox. Von den „drei Preisstellen" sind es
+>    zwei. Nicht angefasst.
+
+**Und eine Korrektur an CLAUDE.md:** dort stand „Produktion · SSH
+read-only". Gemessen laufen dort `git pull`, `docker compose build` und
+`pg_dump`. Die Zeile vermittelte eine falsche Sicherheit — wer sie
+liest, haelt einen Fehlgriff auf Prod fuer technisch unmoeglich.
+**Der Schutz ist die Regel, nicht der Zugang.**
+
 **`v1185` — vier Wochen Pro, mit einem Testpaket, das verfaellt.**
 Commits `dac26aa` … `37b03f5`. Migrationen 068 und 069. Marcels
 Vorschlag: neue Nutzer bekommen vier Wochen Pro, zwei Erinnerungsmails,
