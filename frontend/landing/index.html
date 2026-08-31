@@ -1170,7 +1170,11 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
         <div class="bw-stub"><div class="bw-class" id="bw-flight"></div><div class="bw-l" id="bw-l"></div><div class="bw-ll">Bewertungen</div></div>
         <div class="bw-perf"></div>
         <div class="bw-body">
-          <div class="bw-col"><span class="bw-k">Enthalten</span><span class="bw-v"><span id="bw-anf"></span> &middot; MPI &middot; erweitert &middot; Wertermittlung</span></div>
+          <!-- v1183b: stand hier zuerst als „15 · 10 · 3 · MPI · erweitert ·
+               Wertermittlung" und wiederholte damit die Zahlen aus der
+               Reichweite-Spalte daneben. Jetzt: hier die Kurzform, dort
+               ausgeschrieben. -->
+          <div class="bw-col"><span class="bw-k">Enthalten</span><span class="bw-v"><span id="bw-anf"></span></span></div>
           <div class="bw-col"><span class="bw-k">Reichweite</span><span class="bw-v" id="bw-reach"></span></div>
           <div class="bw-col"><span class="bw-k">Preis</span><span class="bw-v"><span id="bw-per"></span><span class="sv" id="bw-save"></span></span></div>
           <div class="bw-col"><span class="bw-k">Profil</span><span class="bw-v" id="bw-target"></span></div>
@@ -1212,7 +1216,7 @@ th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
       tgl.addEventListener('click',function(e){var b=e.target.closest('button');if(b)setP(b.getAttribute('data-p'));});
       setP('monthly');
     }
-    var DATA=[{"l": "5 · 2 · 0", "price": "7,90", "per": "0,90 €", "flight": "✈ Kurzstrecke", "target": "Mal schnell prüfen", "reach": "5 Marktpreisindikationen · 2 erweiterte", "best": false, "save": 4}, {"l": "10 · 5 · 1", "price": "19,90", "per": "0,85 €", "flight": "✈✈ Mittelstrecke", "target": "Mehrere Deals", "reach": "10 · 5 · 1 Wertermittlung", "best": false, "save": 13}, {"l": "15 · 10 · 3", "price": "39,90", "per": "0,80 €", "flight": "✈✈✈ Langstrecke", "target": "Aktiver Investor", "reach": "15 · 10 · 3 Wertermittlungen", "best": true, "save": 18}, {"l": "25 · 20 · 6", "price": "69,90", "per": "0,75 €", "flight": "🌍 Interkontinental", "target": "Maximale Reichweite", "reach": "25 · 20 · 6 Wertermittlungen", "best": false, "save": 24}];var buy='https://app.dealpilot.junker-immobilien.io/?register=1&amp;kerosin='.replace('&amp;','&');
+    var DATA=[{"l": "5 · 2 · 0", "price": "7,90", "per": "0,90 €", "flight": "✈ Kurzstrecke", "target": "Mal schnell prüfen", "reach": "5 Marktpreisindikationen · 2 erweiterte", "best": false, "save": 4}, {"l": "10 · 5 · 1", "price": "19,90", "per": "0,85 €", "flight": "✈✈ Mittelstrecke", "target": "Mehrere Deals", "reach": "10 Indikationen · 5 erweiterte · 1 Wertermittlung", "best": false, "save": 13}, {"l": "15 · 10 · 3", "price": "39,90", "per": "0,80 €", "flight": "✈✈✈ Langstrecke", "target": "Aktiver Investor", "reach": "15 Indikationen · 10 erweiterte · 3 Wertermittlungen", "best": true, "save": 18}, {"l": "25 · 20 · 6", "price": "69,90", "per": "0,75 €", "flight": "🌍 Interkontinental", "target": "Maximale Reichweite", "reach": "25 Indikationen · 20 erweiterte · 6 Wertermittlungen", "best": false, "save": 24}];var buy='https://app.dealpilot.junker-immobilien.io/?register=1&amp;kerosin='.replace('&amp;','&');
     /* v1183: Die Kacheln kommen aus DATA statt aus festem HTML. Sie trugen
        sonst die alten Liter-Zahlen, waehrend die Karte darunter schon die
        Pakete zeigte. */

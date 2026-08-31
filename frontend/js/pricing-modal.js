@@ -215,11 +215,11 @@
     { l:'5 · 2 · 0',   p:'7,90',  ppl:'0,90', id:'paket_kurz',   cls:'✈ Kurzstrecke',
       use:'Mal schnell prüfen',    reach:'5 Marktpreisindikationen · 2 erweiterte' },
     { l:'10 · 5 · 1',  p:'19,90', ppl:'0,85', id:'paket_mittel', cls:'✈✈ Mittelstrecke',
-      use:'Mehrere Deals',              reach:'10 · 5 · 1 Wertermittlung' },
+      use:'Mehrere Deals',              reach:'10 Indikationen · 5 erweiterte · 1 Wertermittlung' },
     { l:'15 · 10 · 3', p:'39,90', ppl:'0,80', id:'paket_gross',  cls:'✈✈✈ Langstrecke',
-      use:'Aktiver Investor',           reach:'15 · 10 · 3 Wertermittlungen', best:true },
+      use:'Aktiver Investor',           reach:'15 Indikationen · 10 erweiterte · 3 Wertermittlungen', best:true },
     { l:'25 · 20 · 6', p:'69,90', ppl:'0,75', id:'paket_max',    cls:'🌍 Interkontinental',
-      use:'Maximale Reichweite',        reach:'25 · 20 · 6 Wertermittlungen' }
+      use:'Maximale Reichweite',        reach:'25 Indikationen · 20 erweiterte · 6 Wertermittlungen' }
   ];
   function _bwSegsHtml(idx){
     return '<div class="bw-segs">' + KPACKS.map(function(k,i){
