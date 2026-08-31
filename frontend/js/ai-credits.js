@@ -257,7 +257,15 @@
           'bis zum Dreifachen deines Monatskontingents. Zugekaufte Bewertungen verfallen nie.</div>' +
         '<div class="ai-credits-meta">' +
           '<span>Zurücksetzung am ' + _datum(resetDate) + ' (1. des Monats)</span>' +
-          '<button class="btn btn-outline btn-sm" type="button" onclick="if(typeof showSettings===\'function\')showSettings(\'plan\');">Bewertungen nachkaufen</button>' +
+          /* v1183b: fuehrte auf showSettings('plan') — also auf die Ansicht,
+             in der man schon steht. Fuer einen zahlenden Kunden war der Knopf
+             damit eine Sackgasse: der Nachkauf-Streifen liegt im
+             Preis-Modal, weil _renderPlanPane fuer bezahlte Plaene frueh
+             zurueckkehrt und die Paketkacheln gar nicht baut. */
+          '<button class="btn btn-outline btn-sm" type="button" ' +
+            'onclick="if(typeof window.openPricingModal===\'function\'){window.openPricingModal();}' +
+            'else if(typeof showSettings===\'function\'){showSettings(\'plan\');}">' +
+            'Bewertungen nachkaufen</button>' +
         '</div>' +
       '</div>';
   }
