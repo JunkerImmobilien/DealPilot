@@ -1057,8 +1057,16 @@ function _swSet(btn) {
   if (pane === 'dealscore' && typeof _ds2FillSettingsForm === 'function') {
     setTimeout(_ds2FillSettingsForm, 30);
   }
-  // V63.86: KI-Tab — Credits-Box rendern
-  if (pane === 'api' && window.AiCredits) {
+  /* V63.86: Credits-Box rendern.
+     v1182: 'plan' kam dazu. #set-ai-credits-host wird seit v611-kerosin im
+     PLAN-Reiter gebaut (settings.js:1766/1783) — der Fueller hier hing aber
+     weiter allein am alten KI-Reiter. Der Kasten entstand also, und niemand
+     befuellte ihn: im Plan-Reiter stand dauerhaft "Lädt…".
+     Gemessen 31.08. auf Staging, mit einem Partner-Konto.
+     Beide Reiter bleiben zulaessig — welcher den Kasten baut, hat sich schon
+     einmal geaendert, und ein Fueller, der nur einen Ort kennt, faellt beim
+     naechsten Umzug wieder still aus. */
+  if ((pane === 'api' || pane === 'plan') && window.AiCredits) {
     var creditsHost = document.getElementById('set-ai-credits-host');
     if (creditsHost) {
       window.AiCredits.refresh(true).then(function(){
