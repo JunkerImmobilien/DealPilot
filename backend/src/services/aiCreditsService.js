@@ -121,6 +121,27 @@ async function _carryOver(userId, plan) {
   const carryAt = row.kontingent_carry_at ? new Date(row.kontingent_carry_at) : null;
   if (carryAt && carryAt >= monatsAnfang) return;   /* schon gelaufen */
 
+  /* v1184: KEIN Merker heisst NEUE Zeile, nicht "seit je nichts uebertragen".
+     GEMESSEN am 31.08.2026: ein frisch angelegter Pro-Nutzer stand ohne
+     einen einzigen Kauf auf mpi=5 mpi_plus=5 wev=5 in der Bank — sein
+     volles Monatskontingent, zusaetzlich zum Monatskontingent selbst.
+     Ursache war die fehlende Vorbelegung: `_ensureCurrentPeriod()` legt die
+     Zeile mit `INSERT (user_id)` an, und Migration 066 hatte nur die damals
+     bestehenden Zeilen gesetzt.
+
+     Migration 067 gibt der Spalte einen DEFAULT. Dieser Riegel bleibt
+     trotzdem: Produktion hat 067 noch nicht, und eine Zeile aus einer
+     Wiederherstellung kann den Merker jederzeit wieder leer mitbringen.
+     Also nur den Merker setzen und nichts uebertragen — wer diesen Monat
+     erst angelegt wurde, hatte im Vormonat nichts uebrig. */
+  if (!carryAt) {
+    await query(
+      "UPDATE ai_credits_user SET kontingent_carry_at = date_trunc('month', NOW())::date," +
+      ' updated_at = NOW() WHERE user_id = $1', [userId]
+    );
+    return;
+  }
+
   const setzt = [];
   const werte = [];
   ARTEN.forEach(function (art) {
