@@ -216,6 +216,19 @@ async function listInactive(days) {
 }
 
 // ── Template-Rendering ────────────────────────────────────────
+/* v1185: toLocaleDateString('de-DE') liefert in Node "12.9.2026" — ohne
+   fuehrende Null. In einer Kundenmail sieht das nach Schlamperei aus;
+   dasselbe Thema stand schon in v1183b („Datumsformat und Umlaute im
+   Nutztext"). Eine Stelle fuer alle Stufen. */
+function _datumDe(d) {
+  if (!d) return '';
+  try {
+    return new Date(d).toLocaleDateString('de-DE', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
+    });
+  } catch (e) { return ''; }
+}
+
 function _fill(tpl, vars) {
   return String(tpl || '').replace(/\{\{(\w+)\}\}/g, function (_, k) {
     return (vars && vars[k] != null) ? String(vars[k]) : '';
@@ -322,7 +335,7 @@ async function runOnce(opts) {
     const rows = await listExpiring(s.expiry_days_before);
     result.expiry.candidates = rows.length;
     for (const row of rows) {
-      const dateStr = row.current_period_end ? new Date(row.current_period_end).toLocaleDateString('de-DE') : '';
+      const dateStr = _datumDe(row.current_period_end);
       const refKey = 'expiry:' + (row.current_period_end ? new Date(row.current_period_end).toISOString().slice(0, 10) : 'na');
       const vars = { name: row.name || '', days: row.days_left, date: dateStr };
       if (dryRun) {
@@ -376,7 +389,7 @@ async function runOnce(opts) {
     for (const row of rows) {
       const tage = row.days_left;
       const stufe = (tage <= 4) ? 'ende' : 'halbzeit';
-      const dateStr = row.expires_at ? new Date(row.expires_at).toLocaleDateString('de-DE') : '';
+      const dateStr = _datumDe(row.expires_at);
       const refKey = 'testphase:' + stufe + ':' +
         (row.expires_at ? new Date(row.expires_at).toISOString().slice(0, 10) : 'na');
       const vars = { name: row.name || '', days: tage, date: dateStr };
