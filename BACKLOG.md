@@ -150,6 +150,77 @@ Live-Preise. Keine Migration muss mehr wissen, wo sie läuft.
 **19 von 19 aufgelöst**, alle Beträge korrekt (`stripe.prices.list
 {lookup_keys}` — Achtung, **höchstens 10 Schlüssel je Abfrage**, sonst 400).
 
+### Der Durchstich im Browser (31.08.) — vier Befunde, drei behoben
+
+Gemessen auf `app.staging.dealpilot.immo`, angemeldet als Marcel, Plan
+**Partner**. Die App liegt **nicht** auf `staging.dealpilot.io` — die
+Domains stehen in der `.env` als `APP_DOMAIN`/`LANDING_DOMAIN`.
+
+**1 · Das Stripe-Kundenportal führte eine eigene, alte Preisliste. BEHOBEN.**
+Der Knopf „Plan wechseln" führt nicht in einen Checkout, sondern ins
+Stripe-Kundenportal — und das bot **29 / 59 / 99 €** an, während die App
+19,99 / 39,99 / 79,99 zeigte. Wer gewechselt hätte, hätte den alten Preis
+gebucht.
+
+> **Die Portal-Preisliste hängt an der Billing-Portal-Konfiguration
+> (`bpc_…`), nicht an den Produkten.** Sie war überhaupt nicht gesetzt
+> (`features.subscription_update.products` war leer) und kam aus einer
+> unsichtbaren Dashboard-Voreinstellung. Jetzt explizit gesetzt — damit ist
+> sie auslesbar und steuerbar. Nachgemessen im Portal: monatlich 19,99 /
+> 39,99, jährlich **199 / 399 / 799**. Pro steht weiter auf 99, weil Stripe
+> für die *laufende* Position immer den gebuchten Preis zeigt.
+
+**Für Produktion gilt dasselbe und ist noch offen** — die Live-Portal-
+Konfiguration führt weiter 29/59/99. Sie darf erst mit dem Prod-Rollout
+umgestellt werden, sonst zeigt die alte Prod-App 29 € und das Portal 19,99.
+
+**2 · Jeder zahlende Kunde sah „0 € / Monat". BEHOBEN (`v1182`).**
+Die Karte „DEIN AKTUELLER PLAN" sagte *„Partner · 0 € / Monat · 10
+KI-Credits einmalig · 1 Objekt"* — während Stripe 99,00 € abrechnete.
+Keine Preisfrage, sondern zwei Namensformen: `settings.js` las
+`plan.name` / `plan.priceMonthly` / `plan.maxObjects`, die Pläne führen
+aber `label` / `price_monthly_eur` / `limits.objects`. **Kein einziger Plan
+hatte je einen der drei gelesenen Schlüssel** — der Block ist seit v234.1
+nie eingesprungen, und es betraf Starter, Investor und Pro genauso.
+Gedeckt wurde es davon, dass der Planname auf den großgeschriebenen
+Schlüssel zurückfällt und deshalb richtig aussah.
+Jetzt: *„Partner · 99 € / Monat · 5 Bewertungen / Monat · Unbegrenzte
+Objekte"*.
+
+**3 · Der Kerosin-Kasten stand dauerhaft auf „Lädt…". BEHOBEN (`v1182c`).**
+Ein halber Umzug: das Markup mit `#set-ai-credits-host` wird seit
+v611-kerosin im **Plan**-Reiter gebaut, der Füller hing weiter an
+`pane === 'api'`. `v1182b` nahm `'plan'` auf und änderte **nichts** —
+weil das Markup **nach** dieser Stelle eingesetzt wird. Erst
+`setTimeout(40)` griff, wie es der DealScore-Zweig seit V63.21 tut.
+Dazu ein `catch`: ohne das endete jeder Fehlschlag wieder unsichtbar in
+„Lädt…".
+
+**4 · Der Plan-Wechsler kennt Partner nicht.** OFFEN.
+Er bietet Free / Starter / Investor / Pro. Ein Partner findet dort weder
+seinen eigenen Plan noch einen Weg heraus. Ursache ist beabsichtigt
+(`plans.partner` steht auf `is_public=false`, `is_listed=false`), die
+Folge ist es nicht.
+
+**Dazu zwei kleinere Beobachtungen:**
+- `/api-keys/ensure` antwortet einem **Partner** mit *„API-Keys erfordern
+  einen aktiven Pro-Plan"*. Genau die `PRO_FAMILIE`-Falle, vor der
+  `config.js:594-606` warnt — hier ist sie noch nicht angewandt.
+- **Chrome füllt `#set_user_name` bei jedem Öffnen der Einstellungen mit
+  der E-Mail**, und die Maske hat Auto-Save. Ich habe es jedes Mal geleert;
+  das Feld braucht ein `autocomplete="off"`.
+
+> **Messfalle, zweimal getreten, damit sie nicht ein drittes Mal kostet:**
+> Die Reiter sind `.st-tab[data-tab="plan"]` mit `onclick="_swSet(this)"`.
+> `[data-pane="plan"]` ist die **Inhaltsfläche** — ein Klick darauf schaltet
+> nichts um und lässt eine Prüfung fälschlich scheitern.
+> **Und im verborgenen Tab feuert `requestAnimationFrame` nie:** der
+> ERSTFLUG-Rabatt rollt den Monatspreis per rAF herunter, also blieb bei mir
+> 19,99 statt 16,79 stehen. **Kein Defekt — nicht messbar.** In einem
+> sichtbaren Fenster müssen dort **16,79 / 33,59 / 67,19** stehen; das ist
+> mit eigenen Augen zu prüfen. Der Jahrespreis rechnet nachweislich richtig
+> (199 → 167,16).
+
 ### Der Rest, und er ist Code, nicht Stripe
 
 `subscription.js:138` liest den Preis noch aus `plan.stripe_price_monthly_id`.

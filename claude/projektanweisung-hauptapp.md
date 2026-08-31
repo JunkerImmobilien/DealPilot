@@ -3595,6 +3595,53 @@ baut. **064 und die ID-Umstellung gehören auf Prod in denselben
 Arbeitsgang** — sonst wirbt die Seite mit 19,99 € und bucht 29 € ab.
 
 
+
+**`v1182` / `v1182b` / `v1182c` — der Durchstich im Browser, drei Fixes.**
+Commits `8e57aec` ff. Gemessen auf `app.staging.dealpilot.immo` (die App
+liegt **nicht** auf `staging.dealpilot.io`), angemeldet als Partner.
+
+**Der teuerste Befund war nicht im Code, sondern in Stripe:** „Plan
+wechseln" führt ins **Kundenportal**, und dessen Preisliste hängt an der
+Billing-Portal-Konfiguration `bpc_…` — nicht an den Produkten und nicht an
+den Preisen. Sie war gar nicht gesetzt und kam aus einer unsichtbaren
+Dashboard-Voreinstellung: das Portal bot **29 / 59 / 99 €**, während die
+App 19,99 / 39,99 / 79,99 zeigte. **Neue Preise anzulegen reicht also
+nicht — die Portal-Konfiguration ist eine dritte Stelle**, neben
+`config.js` (Anzeige) und `plans` (Abbuchung). Jetzt explizit gesetzt und
+im Portal nachgemessen: 19,99 / 39,99 monatlich, 199 / 399 / 799 jährlich.
+
+**`v1182`: jeder zahlende Kunde sah „0 € / Monat".** Die Plan-Karte las
+`plan.name` / `plan.priceMonthly` / `plan.maxObjects`, die Pläne führen
+aber `label` / `price_monthly_eur` / `limits.objects`. Kein Plan hatte je
+einen der drei Schlüssel — der Block sprang seit v234.1 nie ein.
+
+> **Lehre: ein Fallback kann einen toten Block jahrelang decken.** Der
+> Planname fiel auf den grossgeschriebenen Schluessel zurueck und sah
+> deshalb richtig aus. Oben stand „Partner", also hat niemand geprueft, ob
+> darunter noch die Vorbelegung steht. **Wo eine Zeile teils aus Daten und
+> teils aus Vorbelegung kommt, muss die Vorbelegung erkennbar sein** —
+> „0 € / Monat" sieht aus wie ein Wert, nicht wie ein Ausfall.
+
+**`v1182b` änderte nichts, `v1182c` war der Fix.** Der Kerosin-Kasten stand
+auf „Lädt…", weil sein Markup seit v611 im Plan-Reiter gebaut wird, der
+Füller aber am KI-Reiter hing. `'plan'` in die Bedingung aufzunehmen half
+nicht: das Markup wird **nach** dieser Stelle eingesetzt, der Lookup griff
+ins Leere. Erst `setTimeout(40)` — wie es der DealScore-Zweig seit V63.21
+macht — traf den richtigen Moment.
+
+**Zwei Messfallen, beide selbst getreten und beide teuer genug fuer die
+Chronik:**
+- Die Reiter sind `.st-tab[data-tab]` mit `onclick="_swSet(this)"`.
+  `[data-pane]` ist die **Inhaltsflaeche**. Ich habe zweimal die Flaeche
+  geklickt, nichts geschah, und habe daraufhin einen funktionierenden Fix
+  fuer kaputt gehalten. **Ein fehlgeschlagener Test ist erst ein Befund,
+  wenn der Bedienweg stimmt.**
+- **Im verborgenen Tab feuert `requestAnimationFrame` nie** — der
+  ERSTFLUG-Rabatt rollt den Monatspreis per rAF herunter, also blieb 19,99
+  statt 16,79 stehen. Ich hatte das schon als Defekt gemeldet und
+  zurueckgenommen. `document.visibilityState` gehoert vor jede Messung, die
+  an einer Animation haengt.
+
 ---
 
 # ES GIBT DREI STÄNDE — NICHT EINEN
