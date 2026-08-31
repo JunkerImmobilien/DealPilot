@@ -193,6 +193,96 @@ function _mbRef() {
   try { return new URLSearchParams(location.search).get('ref') || null; } catch (e) { return null; }
 }
 
+/* ═══ v1187 · Kaufangebot statt Sackgasse ══════════════════════════════
+   Wird gerufen, wenn der Server mit 402 antwortet: die faellige
+   Bewertungsart ist aufgebraucht. Der Nutzer soll genau die eine
+   nachkaufen koennen, die ihm fehlt — Marcels Vorgabe aus v1176: „der
+   Knopf, an dem gerade eine Bewertung fehlt, verkauft genau diese eine."
+
+   DIE PREISE KOMMEN AUS `/credits/bewertungen`, also aus Stripe. Diese
+   Seite laedt `config.js` nicht, und ein zweiter Satz Preise im Quelltext
+   waere die fuenfte Kopie derselben Zahlen. Ist der Katalog nicht
+   erreichbar, wird ohne Betrag angeboten — ein Kauf ohne Preisangabe ist
+   besser als eine Sackgasse, und der Betrag steht im Stripe-Fenster
+   ohnehin noch einmal. */
+var _ART_NAME = {
+  mpi:      'Marktpreisindikation',
+  mpi_plus: 'erweiterte Marktpreisindikation',
+  wev:      'Wertermittlung nach ImmoWertV'
+};
+
+function _euroText(cent) {
+  if (typeof cent !== 'number' || !isFinite(cent)) return '';
+  return (cent / 100).toFixed(2).replace('.', ',') + ' €';
+}
+
+async function _zeigeKaufAngebot(d) {
+  var art  = (d && d.art) || '';
+  var name = _ART_NAME[art] || 'Bewertung';
+  var box  = $('errBox');
+  if (!box) return;
+
+  var preis = '';
+  try {
+    var kr = await fetch('/api/v1/credits/bewertungen', { headers: _mbAuth() });
+    if (kr.ok) {
+      var kat = await kr.json();
+      var e = kat && kat.katalog && kat.katalog[art];
+      if (e) preis = _euroText(e.amount_cents);
+    }
+  } catch (e) { /* ohne Betrag anbieten, siehe oben */ }
+
+  box.innerHTML =
+    '<div style="font-weight:600;margin-bottom:6px;">' +
+      '⚠ Keine ' + name + ' mehr frei.' +
+    '</div>' +
+    '<div style="font-size:13px;line-height:1.5;margin-bottom:10px;">' +
+      'Dein Monatskontingent fuer diese Bewertungsart ist aufgebraucht. ' +
+      'Du kannst genau diese eine nachkaufen — sie verfaellt nicht.' +
+    '</div>' +
+    '<button type="button" id="mbKaufBtn" data-art="' + art + '" ' +
+      'style="cursor:pointer;border:0;border-radius:9px;padding:10px 16px;font-weight:700;' +
+      'background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;">' +
+      'Eine ' + name + ' kaufen' + (preis ? ' · ' + preis : '') +
+    '</button>' +
+    '<div style="font-size:11.5px;opacity:.75;margin-top:8px;">' +
+      'Guenstiger im Paket: im Cockpit unter „Plan“.' +
+    '</div>';
+  box.classList.remove('hide');
+
+  var btn = document.getElementById('mbKaufBtn');
+  if (btn) btn.addEventListener('click', function () { _kaufeEinzeln(art, btn); });
+}
+
+async function _kaufeEinzeln(art, btn) {
+  var alt = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Wird gestartet…'; }
+  try {
+    var r = await fetch('/api/v1/credits/checkout', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, _mbAuth()),
+      body: JSON.stringify({ pack_id: art })
+    });
+    var d = null;
+    try { d = await r.json(); } catch (e) {}
+    if (r.ok && d && d.url) {
+      /* Diese Seite laeuft in der Haupt-App im iframe. Eine Weiterleitung
+         auf `window.location` wuerde Stripe IN den Rahmen laden — dort
+         verweigert Stripe die Anzeige. Also immer das oberste Fenster. */
+      try { (window.top || window).location.href = d.url; }
+      catch (e) { window.location.href = d.url; }
+      return;
+    }
+    if (btn) { btn.disabled = false; btn.textContent = alt; }
+    var msg = (d && (d.message || d.error)) || 'Kauf konnte nicht gestartet werden';
+    if (r.status === 403) msg = 'Bewertungen koennen ab dem Starter-Plan dazugekauft werden.';
+    alert(msg);
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = alt; }
+    alert('Netzwerkfehler: ' + e.message);
+  }
+}
+
 async function generate() {
   /* v951-checkup: Der Kostenhinweis war schon da — die Pruefung kommt hinein,
    * nicht daneben. Zwei Dialoge hintereinander klickt niemand, er klickt sie weg.
@@ -205,15 +295,31 @@ async function generate() {
      Die Ermaessigung beim Vertiefen kennt nur der Server (die bezahlte
      Stufe kommt aus dem Kerosin-Log, nie aus dem Browser) — deshalb wird
      sie als Moeglichkeit genannt, nicht als Zahl behauptet. */
-  var _STUFENPREIS = { 1: 2, 2: 5, 3: 12 };
+  /* v1187: Der Dialog nannte „5 L Kerosin". Die Waehrung gibt es seit
+     v1183 nicht mehr, und seit dem Prod-Rollout vom 31.08. stand hier das
+     Einzige, was dem Kunden noch Liter versprach — ausgerechnet im
+     Kostenhinweis, den er bestaetigen muss.
+
+     ZWEITER FEHLER IM SELBEN TEXT, und der war teurer: „wird nur die
+     Differenz abgebucht" stimmt nicht mehr. GEMESSEN in
+     routes/marktbericht.js:100 — `_faelligeStufe()` gibt entweder 0
+     zurueck (schon bezahlt, kostet nichts) oder die VOLLE Stufe. Eine
+     Differenz gibt es nicht mehr; wer von Stufe 1 auf 3 vertieft, zahlt
+     eine ganze Wertermittlung. Ein Preisversprechen, das der Server nicht
+     einloest, gehoert sofort weg. */
+  var _STUFENNAME = {
+    1: '1 Marktpreisindikation',
+    2: '1 erweiterte Marktpreisindikation',
+    3: '1 Wertermittlung nach ImmoWertV'
+  };
   var _st = 2;
   try { _st = parseInt(window.Wertermittlung.payload().wert_stufe, 10) || 2; } catch (e) {}
   if (!(_st >= 1 && _st <= 3)) _st = 2;
-  var _preis = _STUFENPREIS[_st];
-  var _msg = 'Marktbericht jetzt erstellen?\n\nKosten: ' + _preis + ' L Kerosin – nur wenn ein Marktwert '
-           + 'ermittelt wird. Liegen keine Marktdaten vor, wird nichts abgebucht.'
-           + '\n\nWurde fuer dieses Objekt schon eine niedrigere Stufe bezahlt, '
-           + 'wird nur die Differenz abgebucht.';
+  var _msg = 'Marktbericht jetzt erstellen?\n\nKosten: ' + _STUFENNAME[_st]
+           + ' – nur wenn ein Marktwert ermittelt wird. Liegen keine '
+           + 'Marktdaten vor, wird nichts abgebucht.'
+           + '\n\nWurde fuer dieses Objekt schon dieselbe oder eine hoehere '
+           + 'Stufe erstellt, kostet der Bericht nichts.';
   if (_w.length) {
     _msg = '\u26a0 ' + _w.length + (_w.length === 1 ? ' Angabe sieht' : ' Angaben sehen') + ' ungew\u00f6hnlich aus:\n\n'
          + _w.map(function (x, i) { return (i + 1) + '. ' + x; }).join('\n')
@@ -315,6 +421,24 @@ async function generate() {
     });
 
     // Fallback auf den klassischen (nicht-streamenden) Endpoint, falls Stream nicht verfuegbar.
+    /* v1187 · Der Einzelkauf am gesperrten Knopf — letzter Schritt des
+       Preismodells v1176 (Backlog Punkt 1, Schritt 5).
+
+       Bis hierher endete ein leeres Kontingent in der Fehlerzeile:
+       „✗ Keine Wertermittlung nach ImmoWertV mehr frei." Punkt. Der
+       Nutzer stand vor einem fertig ausgefuellten Formular und hatte
+       keinen Weg weiter — genau die Sackgasse, die v1183c schon einmal
+       beim Nachkauf-Knopf hatte.
+
+       Die 402 wird DIREKT behandelt, nicht ueber den Rueckfall darunter:
+       der wuerde denselben Abruf ein zweites Mal schicken, nur um
+       denselben Fehler zu bekommen. */
+    if (res.status === 402) {
+      var _d402 = {};
+      try { _d402 = await res.json(); } catch (e) {}
+      await _zeigeKaufAngebot(_d402);
+      return;
+    }
     if (!res.ok || !res.body || !res.body.getReader) {
       const r2 = await fetch(API + '/reports/generate', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),

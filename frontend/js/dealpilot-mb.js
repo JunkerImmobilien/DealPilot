@@ -379,12 +379,19 @@ if (!window._wlc) {
       });
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) {
-        if (data && data.needs_credits) toast('⚠ Nicht genug Kerosin (' + (data.required || '?') + ' L nötig)');
+        /* v1187: nannte Liter. Der Server schickt seit v1183 die ART mit
+           (mpi | mpi_plus | wev) — sie wird jetzt benannt, damit der Nutzer
+           weiss, WELCHE Bewertung fehlt. Nachkaufen kann er sie im
+           Marktbericht selbst, dort steht der Knopf am Fehler. */
+        if (data && data.needs_credits) {
+          var _artName = { mpi: 'Marktpreisindikation', mpi_plus: 'erweiterte Marktpreisindikation', wev: 'Wertermittlung' };
+          toast('⚠ Keine ' + (_artName[data.art] || 'Bewertung') + ' mehr frei — im Marktbericht nachkaufbar');
+        }
         else toast('⚠ DealPilot-Marktbewertung fehlgeschlagen' + (data && (data.error || data.message) ? ': ' + (data.error || data.message) : ''));
         return;
       }
       if (data && data.no_data) {
-        toast('⚠ Für diese Adresse liegen aktuell keine Marktdaten vor (kein Kerosin berechnet)');
+        toast('⚠ Für diese Adresse liegen aktuell keine Marktdaten vor — es wurde nichts abgebucht');
         return;
       }
       var payload = data.data || data;

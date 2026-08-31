@@ -220,7 +220,12 @@
         '<div class="bi-body">' +
           '<div class="bi-drop" id="bi-drop">' +
             '<div class="bi-big">Ordner mit Belegen wählen</div>' +
-            '<div style="margin-bottom:14px">PDFs, Fotos (JPG/PNG), CSV oder Excel. 1 Import-Lauf = 1 L Kerosin — CSV/Excel kosten nichts.</div>' +
+            /* v1187: stand hier als "1 Import-Lauf = 1 L Kerosin". Die Waehrung
+               gibt es seit v1183 nicht, und der Import kostet seit v1183 gar
+               nichts mehr — GEMESSEN in routes/ai.js:1058, dort steht nur noch
+               logExtract(). Ein Kostenhinweis vor einer kostenlosen Funktion
+               haelt Nutzer davon ab, sie zu benutzen. */
+            '<div style="margin-bottom:14px">PDFs, Fotos (JPG/PNG), CSV oder Excel. In deinem Plan enthalten.</div>' +
             '<button class="bi-btn" type="button" onclick="document.getElementById(\'bi-folder\').click()">Ordner auswählen</button> ' +
             '<button class="bi-ghost" type="button" onclick="document.getElementById(\'bi-files\').click()">Einzelne Dateien</button>' +
             '<input type="file" id="bi-folder" webkitdirectory directory multiple style="display:none">' +
@@ -311,7 +316,10 @@
         setT('KI liest ' + belege.length + ' Beleg(e) …');
         try {
           var resp = await fetch('/api/v1/ai/extract-beleg', { method: 'POST', headers: _hdrs(), body: JSON.stringify({ belege: belege }) });
-          if (resp.status === 402) { belege.forEach(function (b) { leer.push(b.name + ' (nicht genug Kerosin)'); }); }
+          /* v1187: seit v1183 gibt es hier keine 402 mehr — der Beleg-Import
+             ist im Plan enthalten. Der Zweig bleibt als Riegel stehen, falls
+             das je zurueckgedreht wird, aber ohne die alte Waehrung. */
+          if (resp.status === 402) { belege.forEach(function (b) { leer.push(b.name + ' (Kontingent aufgebraucht)'); }); }
           else if (resp.status === 403) { belege.forEach(function (b) { leer.push(b.name + ' (ab Investor)'); }); }
           else if (!resp.ok) { belege.forEach(function (b) { leer.push(b.name + ' (Fehler ' + resp.status + ')'); }); }
           else {
