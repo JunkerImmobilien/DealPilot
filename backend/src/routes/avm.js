@@ -71,9 +71,23 @@ async function modeForUser(userId) {
 // Credit-Kosten je Provider. Sprengnetter: seit v480 immer 2 echte API-Calls
 // (Marktwert + Marktmiete); das Fair-Price-Label (3. Call) ist deaktiviert.
 // PriceHubble: 1 Call. (Credit-Preis je Abruf hier = 1, unabhaengig vom Kaufpreis.)
-// v491-kerosin-avm: Verbrauch in LITERN aus dem einen Kerosin-Tank.
+// STILLGELEGT v1183 — alter Verbrauch in Litern aus dem einen Tank.
 // PriceHubble 40 L (Kosten 6 EUR), Sprengnetter 20 L (Kosten 3 EUR, 2 API-Calls).
 const COST = { pricehubble: 40, sprengnetter_full: 20, sprengnetter_nokp: 20 };
+
+/* ─── v1183 · Eigener Bestand statt Litertank ───────────────────────────
+   Ein Marktwert-Abruf kostete 40 bzw. 20 L. Bei einem Monatskontingent von
+   fuenf Bewertungen waere ein einziger Abruf das Achtfache gewesen — die
+   Zahlen stammen aus der Zeit, als 100 L im Pro-Plan lagen.
+
+   Im Preismodell v1176 sind die beiden Abrufe Einzelposten (5,90 € und
+   9,90 €). Sie bekommen deshalb einen eigenen Bestand ohne Monats-
+   zuteilung: wer keinen hat, kauft einen, und er verfaellt nicht.
+
+   Die Zuordnung folgt den alten Kosten — der teurere Anbieter (40 L) ist
+   der teurere Posten. Nach aussen werden beide NIE namentlich genannt
+   (CLAUDE.md, Anbieter-Neutralitaet), deshalb heissen sie hier nur a und b. */
+const AVM_SEITE = { pricehubble: 'b', sprengnetter: 'a' };
 
 function num(v) { return stub.num(v); }
 function hasKp(inputs) { return !!num((inputs || {}).kp); }
@@ -134,7 +148,10 @@ router.post('/quote', authenticate, async function (req, res, next) {
       missing_fields: miss,
       ready: miss.length === 0,
       credits: status,
-      enough_credits: mode === 'stub' ? true : (status.total_remaining >= cost)
+      /* v1183: gezaehlt wird der eigene Bestand der jeweiligen Seite. */
+      enough_credits: mode === 'stub'
+        ? true
+        : ((status.avm && status.avm[AVM_SEITE[provider] || 'a']) || 0) >= 1
     });
   } catch (e) { next(e); }
 });
@@ -207,14 +224,16 @@ async function runProvider(provider, req, res, next) {
       }
     }
 
-    // Credit-Pre-Check NUR im Live-Modus (Stub ist kostenlos).
+    // v1183: Pre-Check auf den eigenen Bestand, NUR im Live-Modus.
     if (mode === 'live') {
       const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < cost) {
+      const seite = AVM_SEITE[provider] || 'a';
+      if (!status.avm || (status.avm[seite] || 0) < 1) {
         return res.status(402).json({
-          error: 'Nicht genug Kerosin im Tank.',
+          error: 'Kein Marktwert-Abruf mehr frei.',
           needs_credits: true,
-          required: cost,
+          avm: seite,
+          required: 1,
           credits: status
         });
       }
@@ -233,7 +252,7 @@ async function runProvider(provider, req, res, next) {
     // Credits abziehen NUR im Live-Modus nach Erfolg.
     if (mode === 'live') {
       try {
-        await aiCreditsService.consume(req.user.id, cost, 'avm:' + provider, { cost: cost, mode: mode });
+        await aiCreditsService.consumeAvm(req.user.id, AVM_SEITE[provider] || 'a', 'avm:' + provider, { mode: mode });
       } catch (e) {
         console.warn('[avm/' + provider + '] credits consume failed:', e.message);
       }

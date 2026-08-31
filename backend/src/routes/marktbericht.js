@@ -28,7 +28,16 @@ const router = express.Router();
 // Interner mb-backend (Service-Name im dealpilot-net). Per ENV ueberschreibbar.
 const MB_BASE = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
 
-// Kerosin-Tarife in Litern.
+/* v1183: die Meldung nennt die Leistung beim Namen. „Nicht genug Kerosin im
+   Tank" sagte weder, WAS fehlt, noch WIE VIEL — und wer drei getrennte
+   Kontingente hat, braucht genau diese Auskunft. */
+const _KEIN_KONTINGENT = {
+  mpi:      'Keine Marktpreisindikation mehr frei.',
+  mpi_plus: 'Keine erweiterte Marktpreisindikation mehr frei.',
+  wev:      'Keine Wertermittlung nach ImmoWertV mehr frei.'
+};
+
+// STILLGELEGT v1183 — alte Kerosin-Tarife in Litern.
 /* WKERO-1 · Kerosin nach Stufe. Die Stufe kommt aus der Zielfrage im
  * Formular (wert_stufe 1..3) und steht im Berichts-Payload. */
 const COST = { fast: 2, full: 5, wertermittlung: 12 }; // v554: Vollbericht 4->5 L
@@ -74,6 +83,26 @@ function _aufpreis(stufe, bezahlt) {
   return voll;
 }
 
+/* ─── v1183 · Dieselbe Regel, nur ohne Liter ────────────────────────────
+   Gezaehlt wird jetzt je Leistungsart, nicht in einem gemeinsamen Tank.
+   Marcels Regel bleibt Wort fuer Wort dieselbe — „man darf spaeter
+   vertiefen und es kostet nur die Differenz" —, sie wird nur einfacher:
+
+     schon bezahlt >= Zielstufe  ->  nichts faellig
+     sonst                       ->  EINE Bewertung der Zielstufe
+
+   Wer Stufe 2 bezahlt hat und auf 3 vertieft, zahlt genau eine
+   Wertermittlung — und nicht noch einmal die Marktpreisindikation, die er
+   schon hat. Ein Differenzbetrag entsteht gar nicht erst, weil es keine
+   gemeinsame Einheit mehr gibt, in der man ihn ausdruecken muesste.
+
+   Rueckgabe: 0 = nichts faellig, sonst die zu buchende Stufe (1..3). */
+function _faelligeStufe(stufe, bezahlt) {
+  var st = parseInt(stufe, 10);
+  if (!(st >= 1 && st <= 3)) return 0;
+  return (bezahlt >= st) ? 0 : st;
+}
+
 /* Der Preis. Die schon bezahlte Stufe kommt aus dem eigenen Kerosin-Log,
    NIEMALS aus dem Body — sonst behauptet der Client einfach, er habe
    bezahlt. Rueckgabe 0 heisst: nichts nachzufordern. */
@@ -81,6 +110,15 @@ async function _kerosinKosten(userId, body, externalRef) {
   var bezahlt = 0;
   try { bezahlt = await aiCreditsService.bezahlteStufeMarktbericht(userId, externalRef); } catch (e) { bezahlt = 0; }
   return _aufpreis(_stufeAus(body), bezahlt);
+}
+
+/* v1183: dieselbe Quelle, dieselbe Regel — die schon bezahlte Stufe kommt
+   aus dem eigenen Log, NIEMALS aus dem Body. Eine vom Browser
+   mitgeschickte „ich habe schon bezahlt" waere ein Freifahrtschein. */
+async function _faelligeStufeFuer(userId, body, externalRef) {
+  var bezahlt = 0;
+  try { bezahlt = await aiCreditsService.bezahlteStufeMarktbericht(userId, externalRef); } catch (e) { bezahlt = 0; }
+  return _faelligeStufe(_stufeAus(body), bezahlt);
 }
 
 // Generischer Forward an den mb-backend. Nutzt globalen fetch (Node >=18).
@@ -186,19 +224,17 @@ router.get('/reports/fixtures', authenticate, readGet('/reports/fixtures'));
 router.get('/objects', authenticate, readGetLabelled('/objects', function (d) { return d.objects; }));           /* v942 */
 router.get('/objects/history', authenticate, readGetLabelled('/objects/history', function (d) { return d.history; })); /* v942 */
 
-/* v972b: KI-Trend-Text - 1 L Kerosin, user_id via qstrUser (Token). */
+/* v972b: KI-Trend-Text. v1183: im Plan enthalten — er ist ein Begleittext
+   zu einem Verlauf, keine Bewertung, und passt in keines der drei
+   Kontingente. Der Aufruf wird weiter protokolliert, damit die Nutzung
+   sichtbar bleibt, aber nichts mehr abgezogen. */
 router.post('/verlauf-text', authenticate, async function (req, res) {
-  const VCOST = 1;
   try {
-    const status = await aiCreditsService.getStatus(req.user.id);
-    if (status.total_remaining < VCOST) {
-      return res.status(402).json({ error: 'Nicht genug Kerosin im Tank.', needs_credits: true, required: VCOST, credits: status });
-    }
     const out = await forward('POST', '/verlauf-text', { query: qstrUser(req), body: req.body || {} });
     if (out.status >= 400) return res.status(out.status).json(out.data);
     const gotText = !!(out.data && out.data.text);
-    if (gotText) { try { await aiCreditsService.consume(req.user.id, VCOST, 'marktbericht:verlauf-text', { cost: VCOST }); } catch (e) {} }
-    res.status(200).json(Object.assign({}, out.data, { _kerosin: { charged: gotText ? VCOST : 0 } }));
+    if (gotText) { try { await aiCreditsService.logExtract(req.user.id, 'marktbericht:verlauf-text'); } catch (e) {} }
+    res.status(200).json(Object.assign({}, out.data, { _kontingent: { charged: 0 } }));
   } catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
 });
 router.get('/reports/one', authenticate, readGet('/reports/one')); /* v895g-reportbyid */
@@ -236,11 +272,21 @@ router.get('/stufenpreis', authenticate, async function (req, res) {
        angekuendigt wird, KANN damit nicht mehr von der Abbuchung abweichen. */
     const faellig = {};
     for (var s = 1; s <= 3; s++) faellig[s] = _aufpreis(s, bezahlt);
-    res.json({ bezahlte_stufe: bezahlt, preise: STUFENPREIS, faellig: faellig });
+    /* v1183: was WIRKLICH faellig ist, steht jetzt in `kosten` — je Stufe
+       entweder nichts oder genau eine Bewertung der zugehoerigen Art.
+       `preise`/`faellig` bleiben als Liter-Felder stehen, bis der letzte
+       alte Aufrufer weg ist; sie duerfen nichts mehr steuern. */
+    const kosten = {};
+    for (var t = 1; t <= 3; t++) {
+      const st = _faelligeStufe(t, bezahlt);
+      kosten[t] = st ? { anzahl: 1, art: aiCreditsService.STUFE_ART[st] } : { anzahl: 0, art: null };
+    }
+    res.json({ bezahlte_stufe: bezahlt, kosten: kosten, preise: STUFENPREIS, faellig: faellig });
   } catch (e) {
-    /* Im Fehlerfall die vollen Preise melden — lieber zu viel angekuendigt
+    /* Im Fehlerfall den vollen Preis melden — lieber zu viel angekuendigt
        als eine Ermaessigung versprochen, die es nicht gibt. */
-    res.json({ bezahlte_stufe: 0, preise: STUFENPREIS, faellig: Object.assign({}, STUFENPREIS), _hinweis: 'fallback' });
+    const kosten = { 1: { anzahl: 1, art: 'mpi' }, 2: { anzahl: 1, art: 'mpi_plus' }, 3: { anzahl: 1, art: 'wev' } };
+    res.json({ bezahlte_stufe: 0, kosten: kosten, preise: STUFENPREIS, faellig: Object.assign({}, STUFENPREIS), _hinweis: 'fallback' });
   }
 });
 
@@ -260,17 +306,26 @@ async function runReport(req, res) {
 
     /* v1125-stufenpreis: externalRef muss VOR dem Preis stehen — die schon
        bezahlte Stufe haengt daran. Deshalb ist der Block hierher gewandert. */
-    const cost = await _kerosinKosten(req.user.id, body, externalRef);   /* WKERO-2 */
+    /* v1183: faellig ist eine STUFE, kein Literbetrag. 0 = schon bezahlt. */
+    const stufe = await _faelligeStufeFuer(req.user.id, body, externalRef);   /* WKERO-2 */
 
-    // Kerosin-Vorabpruefung (Muster avm.js)
+    /* Vorabpruefung: hat der Nutzer diese Bewertungsart ueberhaupt noch?
+       Geprueft wird genau die Art, die faellig ist — wer keine
+       Wertermittlung mehr hat, darf trotzdem eine Marktpreisindikation
+       ziehen. Ein gemeinsamer Tank konnte das nicht unterscheiden. */
     const status = await aiCreditsService.getStatus(req.user.id);
-    if (cost > 0 && status.total_remaining < cost) {
-      return res.status(402).json({
-        error: 'Nicht genug Kerosin im Tank.',
-        needs_credits: true,
-        required: cost,
-        credits: status
-      });
+    if (stufe > 0) {
+      const art = aiCreditsService.STUFE_ART[stufe];
+      const k = status.arten && status.arten[art];
+      if (!k || k.rest < 1) {
+        return res.status(402).json({
+          error: _KEIN_KONTINGENT[art] || 'Kontingent aufgebraucht.',
+          needs_credits: true,
+          art: art,
+          required: 1,
+          credits: status
+        });
+      }
     }
     /* v942-userbind: Besitzer + Kuerzel wandern mit in den Snapshot. */
     const _lm = await labelMap(req, [externalRef]);
@@ -327,15 +382,15 @@ async function runReport(req, res) {
        aus "schon bezahlt" ein "kostet doch was" machen.
        wert_stufe wandert in die meta, damit die naechste Vertiefung die
        bezahlte Tiefe kennt, ohne sie aus dem Preis zu erraten. */
-    if (cost > 0) {
+    if (stufe > 0) {
       try {
-        await aiCreditsService.consume(
-          req.user.id, cost,
+        await aiCreditsService.consumeStufe(
+          req.user.id, stufe,
           'marktbericht:' + (fast ? 'fast' : 'full'),
-          { cost: cost, fast: fast, external_ref: externalRef, wert_stufe: _stufeAus(body) }
+          { fast: fast, external_ref: externalRef }
         );
       } catch (e) {
-        console.warn('[marktbericht] credits consume failed:', e.message);
+        console.warn('[marktbericht] Kontingent-Buchung fehlgeschlagen:', e.message);
       }
     }
 
@@ -345,7 +400,7 @@ async function runReport(req, res) {
       if (db) {
         await db.query(
           'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok) VALUES ($1,$2,$3,$4,$5,$6,true)',
-          [req.user.id, (fast ? 'qc' : 'voll'), cost,
+          [req.user.id, (fast ? 'qc' : 'voll'), stufe,
            (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal,
            ((obj && ((obj.plz || '') + ' ' + (obj.ort || ''))) || body.address || '').trim() || null]
         );
@@ -355,7 +410,7 @@ async function runReport(req, res) {
     } catch (e) { console.warn('[marktbericht] cost-log failed:', e.message); }
 
     // v559: mb-Antwort UNVERAENDERT durchreichen, Kerosin als Zusatzfeld.
-    var _resp = Object.assign({}, out.data, { _kerosin: { charged: cost, mode: (fast ? 'fast' : 'full') } });
+    var _resp = Object.assign({}, out.data, { _kontingent: { charged: stufe ? 1 : 0, art: stufe ? aiCreditsService.STUFE_ART[stufe] : null, mode: (fast ? 'fast' : 'full') } });
     res.status(200).json(_resp);
   } catch (e) {
     res.status(502).json({ error: 'mb_unreachable', message: e.message });
@@ -388,13 +443,20 @@ router.post('/reports/generate-stream', authenticate, async function (req, res) 
   const obj = body.object || body.dealpilot || body;
   const externalRef = body.external_ref || body.objId || (obj && (obj.id || obj.objId)) || null;
 
-  const cost = await _kerosinKosten(req.user.id, body, externalRef);   /* WKERO-3 */
-  // Vorab-Check Kerosin
+  const stufe = await _faelligeStufeFuer(req.user.id, body, externalRef);   /* WKERO-3 */
+  // v1183: Vorab-Check auf die faellige Bewertungsart
   let status;
   try {
     status = await aiCreditsService.getStatus(req.user.id);
-    if (cost > 0 && status.total_remaining < cost) {
-      return res.status(402).json({ error: 'Nicht genug Kerosin im Tank.', needs_credits: true, required: cost, credits: status });
+    if (stufe > 0) {
+      const art = aiCreditsService.STUFE_ART[stufe];
+      const k = status.arten && status.arten[art];
+      if (!k || k.rest < 1) {
+        return res.status(402).json({
+          error: _KEIN_KONTINGENT[art] || 'Kontingent aufgebraucht.',
+          needs_credits: true, art: art, required: 1, credits: status
+        });
+      }
     }
   } catch (e) { /* fail-open auf Status, aber weiter */ }
   const _lm2 = await labelMap(req, [externalRef]);                      /* v942 */
@@ -470,13 +532,13 @@ router.post('/reports/generate-stream', authenticate, async function (req, res) 
       /* v1125-stufenpreis: bei 0 nicht buchen — consume() macht daraus sonst
          1 L. wert_stufe wandert mit, damit die naechste Vertiefung die
          bezahlte Tiefe kennt. */
-      if (cost > 0) {
-        try { await aiCreditsService.consume(req.user.id, cost, 'marktbericht:' + (fast ? 'fast' : 'full'), { cost: cost, fast: fast, external_ref: externalRef, stream: true, wert_stufe: _stufeAus(body) }); } catch (e) {}
+      if (stufe > 0) {
+        try { await aiCreditsService.consumeStufe(req.user.id, stufe, 'marktbericht:' + (fast ? 'fast' : 'full'), { fast: fast, external_ref: externalRef, stream: true }); } catch (e) {}
       }
       if (db) {
         await db.query(
           'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok) VALUES ($1,$2,$3,$4,$5,$6,true)',
-          [req.user.id, (fast ? 'qc' : 'voll'), cost, (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal, _addr]
+          [req.user.id, (fast ? 'qc' : 'voll'), stufe, (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal, _addr]
         );
         if (_bal != null) { try { await creditAlert.checkAndAlert(db, _bal); } catch (e) {} }
       }

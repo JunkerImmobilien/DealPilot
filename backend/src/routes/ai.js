@@ -115,14 +115,20 @@ router.post('/credits/demo-purchase', authenticate, async (req, res, next) => {
         error: 'Ungültige Paketgröße. Erlaubt: ' + DEMO_PACK_SIZES.join(', ')
       });
     }
+    /* v1183: gutgeschrieben werden Marktpreisindikationen, nicht Liter.
+       Der Demo-Deckel zaehlt jetzt das Sparguthaben dieser einen Art —
+       bonus_credits ist stillgelegt und stuende hier auf undefined,
+       `undefined + amount > 200` waere NaN > 200 und damit immer false:
+       der Deckel haette lautlos nicht mehr gegriffen. */
     const status = await aiCreditsService.getStatus(req.user.id);
-    if (status.bonus_credits + amount > DEMO_MAX_BONUS_TOTAL) {
+    const bestand = (status.arten && status.arten.mpi && status.arten.mpi.bank) || 0;
+    if (bestand + amount > DEMO_MAX_BONUS_TOTAL) {
       return res.status(403).json({
-        error: 'Demo-Limit erreicht: max. ' + DEMO_MAX_BONUS_TOTAL + ' Bonus-Credits gleichzeitig. ' +
-               'Aktuell: ' + status.bonus_credits + ' Credits.'
+        error: 'Demo-Limit erreicht: max. ' + DEMO_MAX_BONUS_TOTAL + ' Bewertungen gleichzeitig. ' +
+               'Aktuell: ' + bestand + '.'
       });
     }
-    await aiCreditsService.addBonus(req.user.id, amount, 'demo:' + amount);
+    await aiCreditsService.addKontingent(req.user.id, { mpi: amount }, 'demo:' + amount);
     const updated = await aiCreditsService.getStatus(req.user.id);
     res.json({ ok: true, demo: true, amount: amount, status: updated });
   } catch (e) { next(e); }
@@ -175,16 +181,8 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
 
     // v493-limits: 1 Liter = 1 KI-Analyse (Feature-Matrix 05.06.)
     if (!userApiKey) {
-      const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < 1) {
-        return res.status(402).json({
-          error: 'Nicht genug Kerosin im Tank.',
-          message: 'Dein Tank ist leer. Monatskontingent-Reset am ' + status.period_reset_at + ' — oder jetzt Kerosin tanken.',
-          credits: status,
-          required: 1,
-          needs_credits: true
-        });
-      }
+      /* v1183: keine Kontingent-Sperre mehr — diese KI-Hilfe ist im Plan
+         enthalten. Frueher stand hier ein 402 gegen den Litertank. */
     }
 
     /* v947-mbsource: Marktbericht anhaengen, BEVOR der Prompt gebaut wird.
@@ -200,7 +198,7 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
     // V63.86: Nach erfolgreicher Analyse Credits abziehen (nur wenn Server-Key benutzt wurde)
     if (!userApiKey) {
       try {
-        await aiCreditsService.consume(req.user.id, 1, 'analyze', { model: config.openai.defaultModel });
+        await aiCreditsService.logExtract(req.user.id, 'analyze'); /* v1183: im Plan enthalten */
       } catch (e) {
         console.warn('[ai/analyze] Credits consume failed:', e.message);
       }
@@ -266,21 +264,15 @@ router.post('/lage', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzi
 
     // V63.86: Credits-Pre-Check
     if (!userApiKey) {
-      const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < 1) {
-        return res.status(402).json({
-          error: 'Nicht genug Kerosin im Tank.',
-          credits: status,
-          needs_credits: true
-        });
-      }
+      /* v1183: keine Kontingent-Sperre mehr — diese KI-Hilfe ist im Plan
+         enthalten. Frueher stand hier ein 402 gegen den Litertank. */
     }
 
     const result = await openaiService.analyzeLage(payload, { userApiKey, aiOptions });
 
     // V63.86: Credits abziehen
     if (!userApiKey) {
-      try { await aiCreditsService.consume(req.user.id, 1, 'lage'); } catch (e) {}
+      try { await aiCreditsService.logExtract(req.user.id, 'lage'); } catch (e) {} /* v1183: im Plan enthalten */
     }
 
     try {
@@ -347,16 +339,14 @@ router.post('/ds2-suggest', authenticate, /* V186: kein requireUnderLimit, AI-Cr
 
     // V63.86: Credits-Check (DS2-Suggest = halber Credit, mindestens 1)
     if (!userApiKey) {
-      const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < 1) {
-        return res.status(402).json({ error: 'Nicht genug Kerosin im Tank.', credits: status, needs_credits: true });
-      }
+      /* v1183: keine Kontingent-Sperre mehr — diese KI-Hilfe ist im Plan
+         enthalten. Frueher stand hier ein 402 gegen den Litertank. */
     }
 
     const result = await openaiService.suggestDs2Fields(payload, { userApiKey, aiOptions });
 
     if (!userApiKey) {
-      try { await aiCreditsService.consume(req.user.id, 1, 'ds2-suggest'); } catch (e) {}
+      try { await aiCreditsService.logExtract(req.user.id, 'ds2-suggest'); } catch (e) {} /* v1183: im Plan enthalten */
     }
     try {
       await usageService.incrementUsage(req.user.id, 'ai_analysis');
@@ -509,15 +499,8 @@ router.post('/extract-voice', authenticate, extractLimiter, async (req, res, nex
 
     // Kerosin-Pre-Check (nur Server-Key) — Muster /analyze
     if (!userApiKey) {
-      const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < 1) {
-        return res.status(402).json({
-          error: 'Nicht genug Kerosin im Tank.',
-          credits: status,
-          required: 1,
-          needs_credits: true
-        });
-      }
+      /* v1183: keine Kontingent-Sperre mehr — diese KI-Hilfe ist im Plan
+         enthalten. Frueher stand hier ein 402 gegen den Litertank. */
     }
 
     const result = await voiceExtractService.extractFromAudio(audio, mime, catalog, {
@@ -528,7 +511,7 @@ router.post('/extract-voice', authenticate, extractLimiter, async (req, res, nex
     // Kerosin abziehen (nur Server-Key), erst NACH erfolgreicher Auswertung
     if (!userApiKey) {
       try {
-        await aiCreditsService.consume(req.user.id, 1, 'extract-voice');
+        await aiCreditsService.logExtract(req.user.id, 'extract-voice'); /* v1183: im Plan enthalten */
       } catch (e) {
         console.warn('[ai/extract-voice] Credits consume failed:', e.message);
       }
@@ -631,14 +614,8 @@ router.post('/bodenrichtwert', authenticate, plzValidator.middleware, /* V229: P
 
     // Credit-Pre-Check (nur wenn Server-Key)
     if (!userApiKey) {
-      const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < 1) {
-        return res.status(402).json({
-          error: 'Nicht genug Kerosin im Tank.',
-          credits: status,
-          needs_credits: true
-        });
-      }
+      /* v1183: keine Kontingent-Sperre mehr — diese KI-Hilfe ist im Plan
+         enthalten. Frueher stand hier ein 402 gegen den Litertank. */
     }
 
     // Adresse zusammenbauen
@@ -757,7 +734,7 @@ router.post('/bodenrichtwert', authenticate, plzValidator.middleware, /* V229: P
     // Credits verbrauchen (nur wenn Server-Key)
     if (!userApiKey) {
       try {
-        await aiCreditsService.consume(req.user.id, 1, 'bodenrichtwert');
+        await aiCreditsService.logExtract(req.user.id, 'bodenrichtwert'); /* v1183: im Plan enthalten */
       } catch (e) {
         console.warn('[ai/bodenrichtwert] Credits consume failed:', e.message);
       }
@@ -819,14 +796,8 @@ router.post('/bmf-gaa', authenticate, plzValidator.middleware, async (req, res, 
 
     // Credit-Pre-Check (nur wenn Server-Key)
     if (!userApiKey) {
-      const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < 1) {
-        return res.status(402).json({
-          error: 'Nicht genug Kerosin im Tank.',
-          credits: status,
-          needs_credits: true
-        });
-      }
+      /* v1183: keine Kontingent-Sperre mehr — diese KI-Hilfe ist im Plan
+         enthalten. Frueher stand hier ein 402 gegen den Litertank. */
     }
 
     // Adresse + Kontext zusammenbauen
@@ -939,7 +910,7 @@ router.post('/bmf-gaa', authenticate, plzValidator.middleware, async (req, res, 
     // Credits verbrauchen (nur wenn Server-Key + erfolgreich)
     if (!userApiKey) {
       try {
-        await aiCreditsService.consume(req.user.id, 1, 'bmf-gaa');
+        await aiCreditsService.logExtract(req.user.id, 'bmf-gaa'); /* v1183: im Plan enthalten */
       } catch (e) {
         console.warn('[ai/bmf-gaa] credit-deduct failed:', e.message);
       }
@@ -986,16 +957,14 @@ router.post('/enrich-market-fields', authenticate, extractLimiter, async (req, r
 
     // Credit-Check (1 Credit pro Aufruf) — nur bei Server-Key
     if (!userApiKey) {
-      const status = await aiCreditsService.getStatus(req.user.id);
-      if (status.total_remaining < 1) {
-        return res.status(402).json({ error: 'Nicht genug Kerosin im Tank.', credits: status, needs_credits: true });
-      }
+      /* v1183: keine Kontingent-Sperre mehr — diese KI-Hilfe ist im Plan
+         enthalten. Frueher stand hier ein 402 gegen den Litertank. */
     }
 
     const result = await openaiService.enrichMarketFields(text, fields, context || {}, { userApiKey });
 
     if (!userApiKey) {
-      try { await aiCreditsService.consume(req.user.id, 1, 'enrich-market-fields'); } catch (e) {}
+      try { await aiCreditsService.logExtract(req.user.id, 'enrich-market-fields'); } catch (e) {} /* v1183: im Plan enthalten */
     }
     try { await usageService.incrementUsage(req.user.id, 'ai_analysis'); } catch (e) {}
     res.json(result);
@@ -1015,14 +984,20 @@ router.post('/enrich-market-fields', authenticate, extractLimiter, async (req, r
  *   monthly_limit 2->free(10) 10->starter(50) 40->investor(150) 100->pro(300)
  * Body: { message, history:[{role,content}], context:{...}, allowWeb:bool, userApiKey? }
  */
-const COPILOT_PLAN_LIMITS = { free: 10, starter: 50, investor: 150, pro: 300 };
+const COPILOT_PLAN_LIMITS = { free: 10, starter: 50, investor: 150, pro: 300, partner: 300 };
+/* STILLGELEGT v1183 — die Ableitung ueber das Monatslimit in Litern. */
 const _COPILOT_BY_MONTHLY = { 2: 10, 10: 50, 40: 150, 100: 300 };
 const _cpDaily = new Map(); // key: userId:YYYY-MM-DD -> count
 function _cpKey(uid) { return uid + ':' + new Date().toISOString().slice(0, 10); }
+/* v1183: das Tageslimit haengt jetzt direkt am PLAN. Vorher wurde es aus
+   `monthly_limit` (Liter) zurueckgerechnet — ein Umweg, der mit dem Tank
+   gestorben ist und stillschweigend jeden auf `free` gesetzt haette.
+   `partner` ist ein erweiterter Pro und stand in der alten Tabelle gar
+   nicht drin; er faellt hier nicht mehr durch. */
 async function _copilotLimit(uid) {
   try {
     const st = await aiCreditsService.getStatus(uid);
-    return _COPILOT_BY_MONTHLY[st && st.monthly_limit] || COPILOT_PLAN_LIMITS.free;
+    return COPILOT_PLAN_LIMITS[st && st.plan] || COPILOT_PLAN_LIMITS.free;
   } catch (e) { return COPILOT_PLAN_LIMITS.free; }
 }
 router.post('/copilot', authenticate, async (req, res, next) => {
@@ -1080,13 +1055,9 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
     if (!belege.length) return res.status(400).json({ error: 'Keine Belege uebergeben.' });
     if (belege.length > 40) return res.status(400).json({ error: 'Zu viele Belege pro Lauf (max. 40).' });
 
-    // Kerosin-Verfuegbarkeit vorab pruefen (1 L pro Lauf), noch nicht abbuchen.
-    try {
-      const st = await aiCreditsService.getStatus(req.user.id);
-      if (!st || st.total_remaining < 1) {
-        return res.status(402).json({ error: 'Nicht genug Kerosin fuer diesen Import-Lauf.', status: st });
-      }
-    } catch (e) { /* getStatus-Fehler nicht blockierend */ }
+    /* v1183: keine Vorabpruefung mehr — der Beleg-Import ist im Plan
+       enthalten. Die Begrenzung auf 40 Belege je Lauf steht darueber und
+       bleibt die eigentliche Schranke. */
 
     const userApiKey = (req.body && req.body.userApiKey) || undefined;
     const results = [];
@@ -1110,7 +1081,7 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
     let charged = false;
     if (okCount > 0) {
       try {
-        const c = await aiCreditsService.consume(req.user.id, 1, 'extract-beleg', { belege: belege.length, ok: okCount });
+        await aiCreditsService.logExtract(req.user.id, 'extract-beleg'); const c = { ok: true }; /* v1183: im Plan enthalten */
         charged = !!(c && c.ok);
       } catch (e) { /* Abbuchung fehlgeschlagen -> nicht blockierend */ }
     }
