@@ -265,11 +265,25 @@
               '</div>';
 
     var resetDate = s.period_reset_at || '—';
+
+    /* v1185: ZWEITER Fusstext, dieselbe Stelle wie im Tooltip-Panel. Der
+       Satz „verfaellt nicht" ist waehrend der Testphase falsch — was aus
+       dem Testpaket kommt, verfaellt sehr wohl. Beim Nachmessen im
+       Browser aufgefallen: die Zellen waren schon richtig, der Text
+       darunter widersprach ihnen. */
+    var hinweis = 'Was du in einem Monat nicht nutzt, verfällt nicht — es wandert ins Guthaben, ' +
+      'bis zum Dreifachen deines Monatskontingents. Zugekaufte Bewertungen verfallen nie.';
+    if (s.testphase && s.testphase.laeuft) {
+      hinweis = 'Testphase: noch ' + s.testphase.tage_rest +
+        (s.testphase.tage_rest === 1 ? ' Tag' : ' Tage') + ' Pro, bis ' +
+        _datum(s.testphase.bis) + '. Was du bis dahin nicht nutzt, verfällt — ' +
+        'zugekaufte Bewertungen bleiben dir dagegen erhalten.';
+    }
+
     host.innerHTML = '' +
       '<div class="ai-credits-box">' +
         '<div class="ai-credits-row">' + zellen + '</div>' +
-        '<div class="hint">Was du in einem Monat nicht nutzt, verfällt nicht — es wandert ins Guthaben, ' +
-          'bis zum Dreifachen deines Monatskontingents. Zugekaufte Bewertungen verfallen nie.</div>' +
+        '<div class="hint">' + hinweis + '</div>' +
         '<div class="ai-credits-meta">' +
           '<span>Zurücksetzung am ' + _datum(resetDate) + ' (1. des Monats)</span>' +
           /* v1183b: fuehrte auf showSettings('plan') — also auf die Ansicht,
