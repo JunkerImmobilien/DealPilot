@@ -115,6 +115,14 @@
       '.mbw-blatt.an{display:block;animation:mbwRein .22s ease}',
       '@keyframes mbwRein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}',
       '.mbw-kurz{font-size:11px;opacity:.6;margin:-6px 0 12px}',
+      /* v1196 · Hinweis in einem Reiter, dessen Angaben noch nicht dran sind. */
+      '.mbw-leer{margin:10px 0;padding:13px 15px;border-radius:8px;font-size:12.5px;line-height:1.55;',
+        'border:1px solid rgba(128,128,128,.28);background:rgba(201,168,76,.07)}',
+      '.mbw-leer b{color:var(--wl-b8932f,#b8932f)}',
+      '.mbw-leer-btn{display:inline-block;margin-top:10px;appearance:none;border:0;border-radius:999px;',
+        'padding:8px 15px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;',
+        'background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));',
+        'color:#221a06}',
       '.mbw-nav{display:flex;gap:8px;align-items:center;margin:14px 0 10px;flex-wrap:wrap}',
       '.mbw-nav button{appearance:none;border:1px solid rgba(128,128,128,.35);background:transparent;',
         'color:inherit;border-radius:999px;padding:8px 15px;font:inherit;font-size:12.5px;cursor:pointer}',
@@ -482,6 +490,68 @@
     ['precHead', 'precBox'].forEach(function (x) {
       var e = id(x); if (e) { e.style.display = 'none'; verschieben(e, fuss || _panel); }
     });
+    /* v1196 · Nach jedem Einraeumen neu bewerten: ein Reiter kann durch eine
+       Nutzereingabe gerade Felder bekommen haben — dann muss der Hinweis weg
+       — oder immer noch keine haben, dann gehoert er hin. */
+    SCHRITTE.forEach(function (s) { leerHinweis(s, id('mbw-b' + s.id)); });
+  }
+
+  /* ── v1196 · Ein leerer Reiter sah aus wie ein Defekt ────────────────────
+     Gemessen am 01.09.2026 auf Staging, Objekt „Hölderlinstr. 1", erreichte
+     Stufe 1: die Reiter 6 (Wertermittlung) und 7 (Zusatzwerte) waren
+     **18 px hoch und trugen null Felder**. Sichtbar war nur ihre eigene
+     Unterzeile — „Bodenwert, NHK, Feinjustierung". Kein Satz, warum da
+     nichts steht, und kein Weg weiter.
+
+     Kaputt war nichts: die Felder gehoeren zu Stufe 3 und werden
+     eingeblendet, sobald man diese Tiefe ansteuert (die Ampel sagt
+     „Eine Zeile tiefer klicken blendet die naechsten Angaben ein").
+     Gemessen: nach einem Klick auf die Ampel-Zeile 3 fuellt sich Reiter 6
+     mit 15 und Reiter 7 mit 6 Feldern.
+
+     Aber wer den Reiter direkt anklickt, sieht das nicht — er sieht eine
+     leere Seite. **Eine richtige Mechanik, die aussieht wie ein Fehler,
+     ist ein Fehler.**
+
+     DER TEXT KOMMT AUS DER AMPEL, NICHT AUS EINER ZWEITEN LISTE.
+     Name der Stufe und das, was fehlt, werden aus der gerenderten
+     Ampel-Zeile gelesen (`.mbst-ms[data-mbst-ziel]`), und der Knopf
+     klickt genau diese Zeile. Damit gibt es hier keine Kopie, die
+     auseinanderlaufen kann — die Falle, die im Marktbericht schon
+     sechsmal zugeschlagen hat (v1126d, v1152, v1154, v1183, v1185,
+     v1195). Ist die Ampel noch nicht da, erscheint gar kein Hinweis:
+     lieber nichts sagen als etwas Erfundenes. */
+  function leerHinweis(s, blatt) {
+    if (!blatt || !s || !s.stufe) return;
+    var alt = blatt.querySelector('.mbw-leer');
+    /* Sobald echte Felder drin sind, hat der Hinweis seinen Zweck erfuellt. */
+    if (blatt.querySelector('input,select,textarea')) {
+      if (alt && alt.parentNode) alt.parentNode.removeChild(alt);
+      return;
+    }
+    var zeile = document.querySelector('.mbst-ms[data-mbst-ziel="' + s.stufe + '"]');
+    if (!zeile) return;
+    var name = (zeile.querySelector('.mbst-name') || {}).textContent || '';
+    var fehlt = (zeile.querySelector('.mbst-fehlt') || {}).textContent || '';
+    if (!name) return;
+    if (alt && alt.getAttribute('data-fuer') === name + '|' + fehlt) return;  /* unveraendert */
+    if (alt && alt.parentNode) alt.parentNode.removeChild(alt);
+
+    var box = document.createElement('div');
+    box.className = 'mbw-leer';
+    box.setAttribute('data-fuer', name + '|' + fehlt);
+    var p = document.createElement('div');
+    p.innerHTML = '<b>Diese Angaben gehören zu: ' + name + '.</b><br>' +
+      'Sie erscheinen hier, sobald du diese Tiefe ansteuerst.' +
+      (fehlt ? ' Dafür ' + fehlt.replace(/^fehlt:/, 'fehlt noch:') + '.' : '');
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mbw-leer-btn';
+    btn.textContent = 'Angaben einblenden';
+    btn.addEventListener('click', function () { zeile.click(); });
+    box.appendChild(p);
+    box.appendChild(btn);
+    blatt.appendChild(box);
   }
 
   function zeige(n) {
@@ -489,6 +559,7 @@
     SCHRITTE.forEach(function (s) {
       var b = id('mbw-b' + s.id);
       if (b) b.classList.toggle('an', s.id === n);
+      leerHinweis(s, b);                                   /* v1196 */
       var r = document.querySelector('.mbw-r[data-mbw="' + s.id + '"]');
       if (r) {
         r.classList.toggle('an', s.id === n);
