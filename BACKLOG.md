@@ -64,6 +64,42 @@ Retention-Lauf. Sie sind mit abgefangenem Versand geprüft — **eine
 echte Mail ist noch nie rausgegangen.** Das ist der eine Punkt, den
 nur ein Blick ins Postfach abschließt.
 
+### v1189 (01.09., `c411ba4`) — zwei Routen auf einem Pfad, die gefährliche gewann
+
+`routes/admin.js` registrierte `/users/:id/start-pro-trial` **zweimal**.
+Express nimmt die erste — also lief seit v811b die alte, und die neue,
+ausdrücklich als deren Ersatz gebaute, war unerreichbar. Von außen nicht
+zu sehen: derselbe Pfad, dieselbe Antwortform.
+
+**Was die alte tat:**
+
+```sql
+UPDATE subscriptions SET status='canceled' … WHERE status IN ('active','trialing')
+```
+
+Sie kündigte **jedes aktive Abo**, bevor sie ihren Pseudo-Trial als
+`subscriptions`-Zeile anlegte. Bei einem zahlenden Kunden: die App sieht
+ihn als Testnutzer, **Stripe bucht unverändert weiter**, und nach Ablauf
+des Tests fällt er auf Free — während er zahlt. Ein Admin, der jemandem
+etwas Gutes tun wollte, hätte ihm sein Abo genommen.
+
+**Gemessen, bevor etwas geändert wurde:** `admin_audit_log` führt auf
+beiden Servern **null** Einträge mit `user.pro_trial`, keine
+Pseudo-Trials, keine fälschlich gekündigten Abos. **Die Falle war
+scharf, aber nie ausgelöst** — nichts zu reparieren.
+
+**Geprüft (Container, echter HTTP-Weg mit `X-Admin-Token`):** Abo bleibt
+`starter/active` · `plan_trials` 21 Tage · Testpaket 5/3/1 kommt an ·
+effektiver Plan bleibt `starter`, weil bezahlt die Testphase schlägt ·
+Audit-Eintrag mit Paket.
+
+> **Ein Umweg im Prüflauf, der eine Lehre trägt:** Der erste Anlauf
+> meldete „Audit: KEIN EINTRAG", und das sah nach einem Produktfehler
+> aus. Es war meiner: `admin_audit_log.admin_user_id` zeigt auf
+> **`admin_users`**, nicht auf `users` — ich hatte das Token mit einer
+> `users`-ID signiert, und der Fremdschlüssel schlug zu. **Ein Prüfaufbau,
+> der einen Nebenweg nachbaut statt ihn zu benutzen, misst sich selbst.**
+
 ### v1187 / v1188 (01.09., `5b688e3` + `063b202`) — **auf Prod nachgezogen**
 
 **Abgenommen auf `app.dealpilot.immo`:** der Kostenhinweis lautet
