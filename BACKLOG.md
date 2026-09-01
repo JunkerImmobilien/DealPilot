@@ -852,7 +852,58 @@ entfällt — nicht raten.
 
    **Was an dem Punkt wirklich offen ist:**
 
-   - **B — wie wird der Score flacher?** Weiterhin **blockiert auf ein Bild**,
+   ### B ist nachgemessen (01.09.2026) — die Zahl lag nie vor
+
+   **Der Entwurf hatte recht, ich hatte unrecht.** Im Prüflauf vom 12.08.
+   stand „Kopfleiste 157 px statt der 348 px des Entwurfs" — gemessen an
+   `PRUEF_ZFH`, einem Objekt **unter** der 70-%-Schwelle, bei dem die
+   Score-Zeile gar nicht erst gebaut wird. Mit einem Objekt **über** der
+   Schwelle (`Am Markt 9, Kabelsketal`, 24/24 Felder, Score 83) in der
+   Messkabine:
+
+   | Fenster | Kopfleiste | davon Score-Block | Sidebar |
+   |---|---|---|---|
+   | **820 px** | **347 px** — 39 % eines 900-px-Schirms | 230 px | Drawer |
+   | 1024 px | 342 px | 230 px | angedockt |
+   | 1180 px | 317 px | 206 px | angedockt |
+
+   **Woraus die 347 px bestehen:** `hdr-v61-row1` 88 px (Nummer, Adresse,
+   Auto-Speichern) · `hdr-v61-row2` 250 px, darin `.scores` als Raster mit
+   `.sc-main` 121 px über **einer** Reihe aus fünf `.sc-pill` à 103 px ·
+   Chevron-Knopf 22 px.
+
+   ### Und der Hebel existiert schon
+
+   **Die Kopfleiste lässt sich einklappen — der Knopf ist da, gemessen:**
+
+   | Zustand | Höhe | Anteil an 900 px |
+   |---|---|---|
+   | ausgeklappt | 347 px | 39 % |
+   | **eingeklappt** | **97 px** | **11 %** |
+
+   Der Zustand wird in `localStorage.dp_hdr_collapsed` gemerkt, die Klasse
+   heißt `body.hdr-collapsed`. **250 px Ersparnis ohne eine Zeile neuen
+   Code** — es wäre nur ein anderer Startzustand für Tablet-Breiten.
+
+   > **Der Preis, und deshalb ist es eine Entscheidung für Marcel:**
+   > eingeklappt bleiben Objektnummer, Adresse, „Auto-saved", die
+   > Vollständigkeit (24/24 · 100 %) und die Kontingent-Pille sichtbar —
+   > **der Score-Wert selbst nicht.** Marcels Vorgabe war „der Score bleibt
+   > auf dem Tablet". Ein eingeklappter Start nimmt ihn nicht weg, aber er
+   > zeigt ihn beim Öffnen nicht.
+
+   **Drei Wege, alle ohne Umbau der Score-Logik:**
+
+   1. **Eingeklappt starten ab ≤ 1024 px**, Score einen Klick entfernt.
+      Billigster Weg, 250 px gewonnen, Score beim Start unsichtbar.
+   2. **Eingeklappt starten + Kurzfassung** — „83 · Gut" wandert neben die
+      Adresse in `row1`. Kostet etwas Bauarbeit, hält aber beide Ziele:
+      flach **und** Score sichtbar. **Empfehlung.**
+   3. **Ausgeklappt lassen, Pillen verkleinern** (103 → ~70 px) und
+      `.sc-main` neben die Pillen. Spart nur ~100 px und fasst die
+      auffälligste Fläche der App an.
+
+   - **B — die Entscheidung steht noch aus**, aber nicht mehr blockiert:
      weil es die auffälligste Fläche der App ist. **Neuer Befund dazu:** die
      Score-Zeile erscheint überhaupt erst **ab 70 % Datenvollständigkeit**
      (`js/calc.js:205` setzt sonst `body.hdr-banner-only` und zeigt einen
