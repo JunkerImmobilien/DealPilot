@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 2026-08-31, nach dem Prod-Rollout)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `fc5e7b3`.
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `9b52442`.
 Migrationen **69** auf beiden Servern. **Nichts hängt halbfertig.**
 
 **Produktion ist am 31.08.2026 gegen 21:40 ausgerollt worden** — der
@@ -64,7 +64,15 @@ Retention-Lauf. Sie sind mit abgefangenem Versand geprüft — **eine
 echte Mail ist noch nie rausgegangen.** Das ist der eine Punkt, den
 nur ein Blick ins Postfach abschließt.
 
-### v1187 / v1188 (01.09., `5b688e3` + `063b202`) — auf Staging, **noch nicht auf Prod**
+### v1187 / v1188 (01.09., `5b688e3` + `063b202`) — **auf Prod nachgezogen**
+
+**Abgenommen auf `app.dealpilot.immo`:** der Kostenhinweis lautet
+„Kosten: 1 Marktpreisindikation" (kein Kerosin, kein Differenz-
+Versprechen), das Kaufangebot bei leerem Kontingent zeigt „Eine
+Wertermittlung nach ImmoWertV kaufen · 3,90 €" — der Betrag kommt aus
+dem **Live**-Stripe-Konto, was nebenbei beweist, dass
+`/credits/bewertungen` dort trägt. Alle zehn v1188-Dateien geladen,
+keine Konsolenfehler. Reines Frontend, kein Rebuild nötig.
 
 **Nach dem Rollout gesucht, was der Kunde jetzt wirklich liest.** Vier
 Stellen sprachen weiter von Kerosin — der Währung, die v1183 abgeschafft
