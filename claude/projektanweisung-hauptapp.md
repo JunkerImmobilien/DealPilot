@@ -3843,6 +3843,84 @@ das Bild.**
 
 ---
 
+### v1191 (01.09.2026, `8902e87`) — der Löschknopf fraß den Aufklapp-Pfeil
+
+**Was:** In der Objektkarte war der Chevron zum Auf- und Zuklappen nicht
+erreichbar. `elementFromPoint` in seiner **Mitte** lieferte in beiden
+aufklappbaren Kartenmodi `sbc-btn sbc-del`. Wer aufklappen wollte, öffnete
+die **Löschabfrage**.
+
+**Gemessen** (Kabine auf `/impressum.html`, iframe 390 px, Partner-Konto,
+Objekt „Am Markt 9, Kabelsketal", Pfeilspalte pixelweise abgetastet):
+
+| | vorher | nachher |
+|---|---|---|
+| `.sbc-del` | 26 × **44** px + unsichtbares `::after` 44 × 44 → greift 8..52 px unter der Kartenoberkante | 26 × 26 px, kein `::after` |
+| `.sbc-arrow` erreichbar (kompakt) | **1 Rasterpunkt** von 22 px | **22 von 22 px** |
+| `.sbc-arrow` erreichbar (stapel) | 4 px von 22 | **22 von 22 px** |
+| Pfeilmitte trifft | `sbc-btn sbc-del` | `sbc-arrow` |
+
+**Zwei Ursachen, beide aus der 44-px-Trefferflächen-Kampagne (v650/v650c):**
+
+1. `style.css:22663`, `@media (max-width:640px)`:
+   `button, .btn, .tab, input… { min-height: 44px !important }`.
+   Das **nackte `button`** trifft auch die Kartenknöpfe. Und
+   **`min-height` schlägt `height`** — die 26 px aus V101 (`style.css:27189`)
+   waren wirkungslos. `!important` hilft dagegen nicht: es sind zwei
+   verschiedene Eigenschaften, nicht zwei Regeln um dieselbe.
+2. `style.css:36060`: `.sbc-btn::after { width/height: max(100%, 44px) }`,
+   **zentriert**. Bei 26 px Knopfhöhe ragt die unsichtbare Fläche je 9 px
+   nach oben und unten heraus. Deshalb meldete `elementFromPoint`
+   `sbc-btn` acht Pixel weiter, als der Knopf hoch ist.
+
+> **Das war die dritte Auflage desselben Fehlers.** `v1138b` (die
+> Score-Zahl lag unter dem Löschknopf) und `v1159` (der Chevron in
+> „stapel") haben beide das **Opfer verschoben** — Score nach unten,
+> Chevron nach unten — und den **Täter nie angefasst**. Solange der
+> Löschknopf 44 px in eine 64-px-Karte drückt, wandert der Konflikt nur
+> weiter. Deshalb hier die Ursache: die zwei Kartenknöpfe werden von der
+> Pauschale ausgenommen.
+
+**Warum die 44 px für genau diese zwei Knöpfe zurückgenommen werden:** Die
+zugeklappte Karte ist 64–82 px hoch und trägt auf ihren obersten 60 px
+**vier** Bedienziele — Duplizieren, Löschen, Aufklappen und die Karte
+selbst. 44 px sind dort nicht unterzubringen. Die Pauschale hat dort keine
+Bedienbarkeit erzeugt, sondern die **gefährlichste** der vier Aktionen über
+die anderen gelegt.
+
+> **Eine Variante war gebaut und wurde nach der Messung verworfen:** die
+> Fläche nach **oben** wachsen zu lassen (0..34 statt 8..34) statt sie zu
+> schrumpfen. Gemessen: sie legt den Löschknopf auf die obersten 8 px der
+> Karte, wo bisher „Objekt öffnen" lag. **Mehr Fläche für die
+> gefährlichste Aktion ist der falsche Handel** — auch wenn die Zahl
+> dabei besser aussieht.
+
+**Dazu:** `ui-varianten.css` — Chevron in „kompakt" `top: 22px → 26px`.
+Die Aktionen enden bei 34, der Pfeil begann bei 32; die obersten 2 px
+gingen weiterhin an den Knopf.
+
+**Nachweis auf Staging** (`8902e87`, frisch geladen, `style.css?v=v1191`):
+fünf sichtbare Karten × zwei Modi, zu und aufgeklappt — Pfeil überall
+22 von 22 px erreichbar, Löschmitte → `sbc-del`, Duplizierenmitte →
+`sbc-btn`. **Und der echte Klickweg:** ein Mausklick auf die Pfeilmitte
+klappt die Karte auf, `delSaved` wird nicht gerufen, keine Löschabfrage,
+alle sieben Karten bleiben stehen.
+
+**Rest — zwei Entscheidungen für Marcel, bewusst nicht geraten:**
+
+1. **Der Score-Ring liegt in „kompakt" unter dem Duplizieren-Knopf.**
+   Gemessen: Ring 239..277 px, Aktionen 249..305 — die Ringmitte trifft
+   `sbc-btn`. Optisch sichtbar: das Kopiersymbol klebt auf dem Ring.
+   Freistellen geht (`right: 34px → 68px`), kostet aber **30 px
+   Adressbreite** (`padding-right` 84 → 114), sonst läuft der Text unter
+   den Ring.
+2. **44 px Trefferfläche für den Pfeil** sind in „kompakt" machbar
+   (46 px frei unter den Aktionen), in „stapel" nicht (30 px). Sie kosten
+   in kompakt 22 px Kartenfläche, auf der heute „Objekt öffnen" liegt —
+   und die Fläche wäre in den zwei Modi unterschiedlich groß.
+
+---
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und

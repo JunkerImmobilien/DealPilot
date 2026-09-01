@@ -900,6 +900,64 @@ entfällt — nicht raten.
      rechts frei ist** — überlappt das negative Margin die Nachbarn,
      stiehlt es Klicks in die andere Richtung.
 
+     ### Gemessen und behoben am 01.09.2026 — `v1191` (`8902e87`)
+
+     **Der Befund oben ist überholt, und zwar in beide Richtungen: die
+     4 × 21 px waren die falsche Zahl, und das Problem war ein anderes.**
+     Die 4 px stammen aus dem Modus **Standard**, in dem der Pfeil gar
+     kein Bedienelement ist (`karten-kompakt.js` hängt seinen Handler nur
+     bei `kompakt` oder `stapel` ein). In den beiden Modi, in denen er
+     wirklich schaltet, ist er **22 × 22 px** — eine Fläche hat er also
+     längst.
+
+     **Was er nicht hatte, war Erreichbarkeit.** Gemessen in der Kabine
+     bei 390 px (Objekt „Am Markt 9, Kabelsketal", Pfeilspalte pixelweise
+     mit `elementFromPoint`):
+
+     | | vorher | jetzt |
+     |---|---|---|
+     | Pfeilmitte trifft | **`sbc-btn sbc-del`** | `sbc-arrow` |
+     | erreichbar in kompakt | **1 px** von 22 | **22 von 22** |
+     | erreichbar in stapel | 4 px von 22 | **22 von 22** |
+
+     **Wer aufklappen wollte, öffnete die Löschabfrage.** Ursache waren
+     zwei Regeln aus der 44-px-Trefferflächen-Kampagne, die den
+     Löschknopf auf 26 × 44 px plus eine unsichtbare `::after`-Fläche von
+     44 × 44 aufgeblasen haben — er griff damit von 8 bis 52 px unter der
+     Kartenoberkante, der Pfeil sitzt bei 32..54. Details und die genauen
+     Zeilennummern stehen im Rollout-Journal der Projektanweisung und im
+     Kommentar am Ende von `style.css`.
+
+     > **Das war die dritte Auflage desselben Fehlers.** `v1138b`
+     > (Score-Zahl unter dem Löschknopf) und `v1159` (Chevron in
+     > „stapel") haben beide das **Opfer** verschoben und den **Täter**
+     > nie angefasst. Ein 44-px-Knopf in einer 64-px-Karte schiebt den
+     > Konflikt nur weiter.
+
+     **Der ursprüngliche Lösungsvorschlag (Padding plus negatives Margin)
+     wird damit hinfällig** — er hätte an einer Fläche gearbeitet, die es
+     schon gab, und die eigentliche Ursache nicht berührt.
+
+     **ZWEI ENTSCHEIDUNGEN FÜR MARCEL — hier wird bewusst nicht geraten:**
+
+     **a) Der Score-Ring liegt im Modus „kompakt" unter dem
+     Duplizieren-Knopf.** Gemessen: Ring 239..277 px, Aktionsband
+     249..305 — die Ringmitte trifft `sbc-btn`. Auf dem Bild klebt das
+     Kopiersymbol sichtbar auf dem Ring. Ein Fehlgriff **dupliziert** das
+     Objekt (nicht destruktiv, aber falsch).
+     Freistellen geht: Ring `right: 34px → 68px`. **Kostet 30 px
+     Adressbreite** (`padding-right` 84 → 114), sonst läuft der Adresstext
+     unter den Ring. Also: schmalere Adresse gegen freien Ring.
+
+     **b) 44 px Trefferfläche für den Pfeil** sind in „kompakt" machbar
+     (46 px sind unter den Aktionen frei), in „stapel" **nicht** (30 px).
+     Sie kosten in kompakt 22 px Kartenfläche, auf der heute „Objekt
+     öffnen" liegt — und die Fläche wäre in den zwei Modi verschieden
+     groß. Der Punkt aus v650/v652 bleibt für diesen Pfeil damit offen;
+     die **falsche Aktion** ist aber weg, und das war das Schwere daran.
+
+     **Der Punkt bleibt bis zu Marcels Antwort auf a) und b) offen.**
+
 2. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
@@ -1928,6 +1986,32 @@ entfällt — nicht raten.
    die Aktionen nach unten, der Ring nach links, oder auf dem Handy beide
    auf verschiedene Kartenhälften. Vorschlag zuerst nach
    `design/Vorschläge/`.
+
+   ### Nachgemessen am 01.09.2026 nach `v1191` — die Hälfte ist weg
+
+   **`v1191` hat denselben Täter geschrumpft** (Punkt 1): der Löschknopf
+   stand auf 26 × 44 px plus einer unsichtbaren 44-×-44-`::after`-Fläche
+   und steht jetzt auf 26 × 26 px. Neu gemessen bei 390 px, Wallet, fünf
+   Karten:
+
+   | | 30.08. | jetzt |
+   |---|---|---|
+   | Ringmitte trifft | **`sbc-btn sbc-del`** | **`sbc-mini-score-num`** |
+   | Aktionen | y194–**238** | y8–**34** |
+   | Ring | y200–240 | y14–54 |
+
+   **Wer auf seinen Score tippt, bekommt keine Löschabfrage mehr.** Der
+   Ring ist ab seiner Mitte frei.
+
+   **Was bleibt:** die **obere Ringhälfte** (y14–34, senkrecht abgetastet)
+   liegt weiter unter dem Löschknopf — 20 von 40 px Ringhöhe. Die
+   Entscheidung „was weicht" steht also noch, aber sie ist kleiner
+   geworden: nötig sind jetzt **20 px** Versatz statt 38.
+
+   **Es ist dieselbe Entscheidung wie in Punkt 1a** (Ring unter dem
+   Duplizieren-Knopf im Modus „kompakt"). Beide zusammen entscheiden,
+   nicht einzeln — sonst stehen Ring und Aktionen in zwei Kartenmodi
+   verschieden.
 
 > ### Vier Punkte sind seit dem 30.08. zu — hier stehen nur noch die Zeiger
 >
