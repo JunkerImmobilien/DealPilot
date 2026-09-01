@@ -83,4 +83,10 @@ backup_*.sql
 /README-v*.md
 *.bak
 
-tools/deploy-staging.ps1
+# tools/deploy-staging.ps1 stand hier bis 01.09.2026 — ohne Begruendung und
+# als EINZIGES Werkzeug unter tools/ (gold-audit.py, baue-mailtexte.js und
+# die swf-register-Kette sind alle versioniert). Genau deshalb konnte eine
+# kaputte Fassung monatelang ueberleben: kein Diff, keine Historie, keine
+# Gegenlesung. Nichts Schuetzenswertes steht drin — die Anmeldung laeuft
+# ueber den SSH-Schluessel, und beide Server-IPs stehen ohnehin im
+# versionierten CLAUDE.md.
