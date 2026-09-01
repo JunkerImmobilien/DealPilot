@@ -100,14 +100,21 @@ async function _ensureCurrentPeriod(userId) {
    NUR EINMAL JE NUTZER: die Bedingung ist `testphase_bis IS NULL`. Wer
    schon eine Testphase hatte, bekommt keine zweite — sonst waere ein
    zweites Konto oder ein zweiter Admin-Klick ein zweites Paket. */
-async function gewaehreTestpaket(userId, bis) {
+async function gewaehreTestpaket(userId, bis, opts) {
   if (!userId || !bis) return { ok: false, reason: 'fehlende_angabe' };
+  opts = opts || {};
   await _ensureCurrentPeriod(userId);
+
+  /* v1189: `erneuern` hebt den Einmal-Riegel auf. Die Registrierung darf
+     das NIE — sonst waere ein zweites Konto ein zweites Paket. Der Admin
+     darf es, weil dahinter eine Person steht, die es entscheidet, und die
+     Vergabe im Audit-Log landet. */
+  const bedingung = opts.erneuern ? '' : ' AND testphase_bis IS NULL';
   const r = await query(
     'UPDATE ai_credits_user' +
     '   SET testphase_mpi = $2, testphase_mpi_plus = $3, testphase_wev = $4,' +
     '       testphase_bis = $5, updated_at = NOW()' +
-    ' WHERE user_id = $1 AND testphase_bis IS NULL' +
+    ' WHERE user_id = $1' + bedingung +
     ' RETURNING user_id',
     [userId, TESTPAKET.mpi, TESTPAKET.mpi_plus, TESTPAKET.wev, bis]
   );

@@ -1471,39 +1471,57 @@ router.delete('/api-keys/:keyId', requireAdmin, requireRole('owner', 'support'),
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-/* mand v811-pro-trial: zeitlich begrenzter Pro-Test (laeuft via isActive/trial_end automatisch aus) */
-router.post('/users/:id/start-pro-trial', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
-  const db = req.app.get('db');
-  let days = parseInt((req.body && req.body.days), 10);
-  if (!days || days < 1 || days > 90) days = 14;
-  try {
-    await db.query("UPDATE subscriptions SET status='canceled', ended_at=NOW() WHERE user_id=$1 AND status IN ('active','trialing')", [req.params.id]);
-    await db.query(
-      "INSERT INTO subscriptions (user_id, plan_id, billing_interval, status, current_period_start, current_period_end, trial_end) " +
-      "VALUES ($1, 'pro', 'monthly', 'trialing', NOW(), NOW() + ($2 || ' days')::interval, NOW() + ($2 || ' days')::interval)",
-      [req.params.id, String(days)]
-    );
-    await audit(db, req.adminUser.id, req.adminUser.email, 'user.pro_trial', 'user', req.params.id, { days }, req.ip, req.headers['user-agent']);
-    res.json({ success: true, plan_id: 'pro', trial_days: days });
-  } catch (err) {
-    console.error('[admin/users/start-pro-trial] error:', err);
-    res.status(500).json({ error: 'server_error', message: err.message });
-  }
-});
+/* ═══ v1189 · Pro-Test durch den Admin ══════════════════════════════════
+   HIER STANDEN ZWEI ROUTEN AUF DEMSELBEN PFAD. Express nimmt bei doppelter
+   Registrierung die ERSTE — also lief seit v811b die alte, und die neue,
+   ausdruecklich als Ersatz gebaute, war unerreichbar. Von aussen sieht man
+   das nicht: derselbe Pfad, dieselbe Antwortform.
 
-/* mand v811b-pro-trial: Pro-Test als Override (plan_trials) - echte Subscription bleibt unangetastet */
+   WAS DIE ALTE TAT, und warum sie weg muss:
+
+     UPDATE subscriptions SET status='canceled' … WHERE status IN ('active','trialing')
+
+   Sie kuendigte JEDES aktive Abo, bevor sie ihren Pseudo-Trial als
+   subscriptions-Zeile anlegte. Bei einem ZAHLENDEN Kunden heisst das: die
+   App sieht ihn als Testnutzer, Stripe bucht unveraendert weiter, und nach
+   Ablauf des Tests faellt er auf free — waehrend er zahlt. Ein Admin, der
+   jemandem etwas Gutes tun will, haette ihm sein Abo genommen.
+
+   GEMESSEN am 01.09.2026 auf beiden Servern, bevor etwas geaendert wurde:
+   `admin_audit_log` fuehrt **null** Eintraege mit `user.pro_trial`, es gibt
+   keine Pseudo-Trials und keine faelschlich gekuendigten Abos. **Die Falle
+   war scharf, aber nie ausgeloest** — es ist nichts zu reparieren.
+
+   Was bleibt, ist der Override ueber `plan_trials`: die echte Subscription
+   wird nicht angefasst, `getEffectivePlan()` liest den Test mit, und nach
+   Ablauf gilt automatisch wieder der reale Plan. */
 router.post('/users/:id/start-pro-trial', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
   const db = req.app.get('db');
   let days = parseInt((req.body && req.body.days), 10);
   if (!days || days < 1 || days > 90) days = 14;
   try {
     await db.query('UPDATE plan_trials SET revoked_at=NOW() WHERE user_id=$1 AND revoked_at IS NULL', [req.params.id]);
-    await db.query(
-      "INSERT INTO plan_trials (user_id, granted_plan, expires_at) VALUES ($1, 'pro', NOW() + ($2 || ' days')::interval)",
+    const tr = await db.query(
+      "INSERT INTO plan_trials (user_id, granted_plan, expires_at) VALUES ($1, 'pro', NOW() + ($2 || ' days')::interval) RETURNING expires_at",
       [req.params.id, String(days)]
     );
-    await audit(db, req.adminUser.id, req.adminUser.email, 'user.pro_trial', 'user', req.params.id, { days, plan: 'pro' }, req.ip, req.headers['user-agent']);
-    res.json({ success: true, plan: 'pro', trial_days: days });
+
+    /* v1189: Das Testpaket gehoert dazu, sonst gibt der Admin einen Pro-Test
+       ohne Bewertungen — genau die Luecke, die v1185 fuer den
+       Registrierungsweg geschlossen hat. `erneuern` setzt es auch dann neu,
+       wenn dieser Nutzer schon einmal eine Testphase hatte: der Admin
+       entscheidet bewusst, das ist der Unterschied zur Registrierung. */
+    let paket = null;
+    try {
+      const r = await require('../services/aiCreditsService')
+        .gewaehreTestpaket(req.params.id, tr.rows[0].expires_at, { erneuern: true });
+      paket = r && r.ok ? r.paket : null;
+    } catch (e) {
+      console.warn('[admin/start-pro-trial] Testpaket nicht gewaehrt:', e.message);
+    }
+
+    await audit(db, req.adminUser.id, req.adminUser.email, 'user.pro_trial', 'user', req.params.id, { days, plan: 'pro', paket: paket }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, plan: 'pro', trial_days: days, paket: paket });
   } catch (err) {
     console.error('[admin/users/start-pro-trial] error:', err);
     res.status(500).json({ error: 'server_error', message: err.message });
