@@ -932,12 +932,48 @@ entfällt — nicht raten.
    >    benutzt, muss `git show <alt>:datei | grep -c` gegenrechnen —
    >    genau das hat den echten Befund geliefert.
 
-   - **Admin-Oberfläche:** die verlangte Zahl ist erhoben —
-     `admin/css/admin.css` hat **3 Media-Queries** (bei 900 px, 900 px und
-     820 px), `admin/js/admin-network.js` eine vierte (1150 px), Viewport-Meta
-     ist gesetzt. **Anders als das Partner-Portal in `v1112b` ist der Admin
-     also nicht bei null.** Eine echte Messung braucht ein Admin-Konto, das
-     dieser Prüflauf nicht hatte — bleibt ehrlich offen.
+   ### Admin-Oberfläche — gemessen am 01.09.2026, sie trägt
+
+   **Ergebnis: kein Umbau nötig.** Gemessen in der Kabine, jede Ansicht
+   **einzeln** eingeblendet:
+
+   | Fenster | Navigation | Inhalt | Überlauf |
+   |---|---|---|---|
+   | **768 px** (iPad hoch) | legt sich **waagerecht** um (MQ 820 greift) | volle Breite | **keiner** in 10 Ansichten |
+   | **1024 px** (iPad quer) | bleibt Spalte, 214 px | 793 px | **keiner** |
+
+   Die drei Media-Queries tun genau das, was sie sollen: `two-col` und
+   `user-detail-grid` fallen bei ≤ 900 px auf eine Spalte, die Navigation
+   wird bei ≤ 820 px zur Zeile. Bei 1024 px ist der Desktop-Zustand
+   richtig — 214 px Leiste neben 793 px Inhalt ist auf einem quer
+   gehaltenen iPad kein Engpass.
+
+   > **Ein Zwischenbefund war falsch, und die Ursache ist lehrreich:** Der
+   > erste Durchgang meldete **51 px Überlauf** bei 820 px, verursacht von
+   > einem `button.btn`. Das war ein **Artefakt des Messaufbaus** — ich
+   > hatte alle 14 Ansichten **gleichzeitig** eingeblendet, um überhaupt
+   > etwas zu sehen. Im Betrieb ist immer nur eine sichtbar. Einzeln
+   > gemessen: null Überlauf. **Wer versteckte Ansichten zum Messen
+   > aufdeckt, misst einen Zustand, den es nicht gibt.**
+
+   > **Und eine Feinheit, die man kennen muss:** bei einer iframe-Breite
+   > von exakt 820 px greift `@media (max-width: 820px)` **nicht** —
+   > `innerWidth` meldet 820, `documentElement.clientWidth` aber 804, weil
+   > der senkrechte Rollbalken 16 px nimmt. Wer auf der Grenze misst, misst
+   > die falsche Seite davon. Deshalb steht oben 768 px (iPad hoch) und
+   > nicht 820.
+
+   **Was diese Messung NICHT abdeckt, ehrlich benannt:**
+   - **Ohne Anmeldung sind die Tabellen leer.** Gemessen wurden die
+     statischen Kopfzeilen (6–7 Spalten); echte Zeilen mit langen
+     Mailadressen und UUIDs können breiter werden. In ein Passwortfeld
+     tippe ich nicht — für die Messung mit Daten müsste Marcel im Admin
+     angemeldet sein, dann misst der nächste Durchgang in seinem Tab.
+   - **Vier Ansichten waren ganz leer** (`landing`, `marktzinsen`,
+     `stats`, `network`) — sie bauen ihren Inhalt erst aus Daten. Für sie
+     gilt „nicht messbar", nicht „kein Befund".
+   - Die vierte Media-Query (1150 px, Karten-Designer in
+     `admin-network.js`) konnte deshalb nicht geprüft werden.
    - **820 px (iPad Hochformat) bleibt die Handy-Fassung:** Drawer, eine
      Spalte über die volle Breite. Das ist **kein Defekt**, sondern die Folge
      von Entscheidung A (Schwelle 901). Soll das Hochformat andocken, wären
