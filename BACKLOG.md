@@ -36,13 +36,16 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 01.09.2026, nach v1196b)
+## → HIER WEITERMACHEN (Übergabe 01.09.2026, nach v1197)
 
-**Stand:** lokal = GitHub = Staging auf `005a084`.
-**Produktion steht auf `30a10b1`** (`v1191`–`v1195`, ausgerollt 01.09.
-gegen 17:30 und 18:00 auf Marcels Freigabe).
-**`v1195b` und `v1196`/`v1196b` sind NICHT auf Prod** — reines Frontend,
-`git pull` ohne Rebuild.
+**Stand:** lokal = GitHub = Staging auf `c9efc07`.
+**Produktion steht auf `195e7e9`** (`v1191`–`v1196b` plus das reparierte
+Deploy-Skript, ausgerollt am 01.09. in drei Schritten auf Marcels
+Freigabe).
+**`v1197` ist NICHT auf Prod** — und es ist als einziges der Sitzung
+**keine reine Frontend-Änderung**: die Score-Rechnung liegt im
+`mb-backend`, also braucht Prod dort einen **Rebuild**, nicht nur
+`git pull`.
 
 > ### Der Gelddefekt ist behoben und live
 >
@@ -110,25 +113,54 @@ Umgebung blockiert.**
 
 ### Der oberste offene Punkt: 1 · Marktbericht neu gestalten
 
-**Der Wizard-Durchgang ist gemacht.** Alle sieben Reiter durchgeklickt und
-vermessen — Reiter 1–5 tragen 2–9 Felder auf 384–511 px, **Reiter 6 und 7
-waren 18 px hoch und trugen null Felder.** Kaputt war nichts: die Felder
-gehören zu Stufe 3 und erscheinen, sobald man diese Tiefe ansteuert. **Aber
-wer den Reiter direkt anklickt, sieht eine leere Seite — eine richtige
-Mechanik, die aussieht wie ein Fehler, ist ein Fehler.** `v1196` setzt dort
-einen Hinweis, der seinen Text **aus der Ampel liest** statt aus einer
-zweiten Liste.
+**Der Wizard ist jetzt strukturell UND inhaltlich durchgegangen, und der
+Ergebnis-Teil ist erstmals angesehen.** Was dabei herauskam, steht unter
+Fertig (`v1196`, `v1196b`, `v1197`). Kurzfassung:
 
-**Wo weitergemacht wird:** die Reiter sind jetzt strukturell durch, aber
-**inhaltlich** nicht — welche Felder in welchem Reiter stehen, ob die
-Gruppierung stimmt, ob Pflichtfelder erkennbar sind. Und der **Ergebnis**-
-Teil (`#resultPanel`) ist überhaupt noch nicht angesehen worden; beim
-Abruf-Test war nur zu sehen, dass er erscheint und plausible Zahlen trägt
-(Marktwert 176.000 €, Spanne 143.000–262.000 €).
+- Reiter 6 und 7 waren leer und sahen aus wie ein Defekt → Hinweis mit Text
+  aus der Ampel (`v1196`).
+- Die bedingte Pflicht-Logik in Reiter 6/7 **stimmt** (gemessen: jedes
+  gesternte Feld hat einen gefüllten Auslöser).
+- Der Ergebnis-Teil rechnete „unbekannt" als „schlecht" → `v1197`.
+- Die Abrechnungskette ist end-to-end belegt, inklusive „ohne Aufpreis".
+
+**Wo weitergemacht wird — drei benannte Baustellen:**
+
+**a) Pflichtangaben sind in den Reitern 2–5 nicht erkennbar.**
+`address`/`ptype`/`area`/`year` (Stufe 1), `cond`/`quality` (Stufe 2),
+`plot`/`units` (Stufe 3) tragen keinen Marker. Die einzige Stelle, die sie
+nennt, ist die Ampel **oben, außerhalb des Reiters**. Dazu passt: die CSS-
+Regel `.wm-f.fehlt input{outline:2px solid …}` existiert
+(`wertermittlung.js:393`), **aber die Klasse `fehlt` wird nirgends
+gesetzt** — gebaut und nie verdrahtet.
+**Vorschlag, noch nicht gebaut:** die fehlenden Felder der jeweils nächsten
+Stufe am Feld markieren, Text wieder aus der Ampel. **Wie es aussehen
+soll, ist eine Optikfrage — Demo vor Bau.**
+
+**b) Die Konvention für fehlende Score-Teilwerte gehört entschieden.**
+`v1197` setzt „unbekannt" auf den **neutralen** Wert und nennt ihn im UI
+„geschätzt". Die Alternative wäre, den Teilwert **wegzulassen und die
+übrigen Gewichte hochzunormieren** — fachlich ebenso vertretbar und fällt
+anders aus. Im Code steht bewusst die Konvention, die die Datei ohnehin
+dokumentiert. **Das ist eine Bewertungsfrage, also Marcels.**
+
+**c) Der Ergebnis-Teil ist nur überflogen.** Neun Abschnitte, 3682 px.
+Angesehen wurden Kennzahlenzeile, Score-Komponenten und die Kopfzeilen der
+Verfahren. **Nicht** geprüft: Vergleichspreise, Bodenwert, „Wertverfahren
+im Vergleich" im Detail, die Rechenwege hinter „▸ Rechenweg", und der
+PDF-Export.
+
+**Positiv aufgefallen und nicht angetastet:** die Verfahren kennzeichnen
+sich selbst — „SACHWERT 268.172 € · **vorläufig · ohne Sachwertfaktor,
+kein Marktwert**" mit einem „warum vorläufig?"-Aufklapper. Und die
+Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
+„wertparameter: LZS 2,2 % (**Stufe A**)". Das ist genau die Disziplin, die
+`CLAUDE.md` verlangt.
 
 ### Was sonst offen liegt und nicht vergessen werden darf
 
-- **`v1195b`, `v1196`, `v1196b` sind nicht auf Prod.**
+- **`v1197` ist nicht auf Prod** — und braucht dort einen `mb-backend`-Rebuild,
+  nicht nur `git pull`. Alles davor (`v1191`–`v1196b`) ist live.
 - **Der `402`-Pfad ist nicht end-to-end bewiesen** (siehe oben, DB-Eingriff
   blockiert).
 - **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.**
@@ -2220,6 +2252,72 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Der Ergebnis-Teil, erstmals angesehen — `v1197`, 01.09.2026 (`c9efc07`)
+
+**Der Ergebnis-Teil war laut Backlog „überhaupt noch nicht angesehen
+worden".** Beim ersten Blick fielen zwei Dinge auf, beide über Ehrlichkeit
+von Zahlen.
+
+**1 · Ein fehlender Kaufpreis machte das Objekt schlecht statt unbewertet.**
+Die Kennzahlenzeile sagt korrekt „– %" für die Bruttorendite. Die
+Score-Komponente daneben stand auf **0 / 100** und riss über ihr Gewicht
+von 20 % den ganzen Deal-Score mit — ohne jede Erklärung daneben.
+
+Ursache an zwei Stellen: `grossYieldPct ?? 0`. Die Formel ist
+`clamp01((gy-2)/6)`, **ihr neutraler Punkt liegt bei 5 %, nicht bei 0.**
+Die `?? 0` war von den Nachbarn abgeschrieben, wo 0 zufällig neutral ist
+(Preisabschlag) oder wo gleich `?? 50` steht (Makro, Mikro).
+
+> **Die Falle steht wörtlich in `CLAUDE.md`:** *„`Number(null)` ist 0 und
+> besteht `Number.isFinite` — erst auf Abwesenheit prüfen, dann rechnen."*
+> Und der Kopf der betroffenen Datei sagt seit jeher *„sonst neutral 50 +
+> Note geschätzt"* — `macroScore()` hält sich daran, `dealScore()` nicht.
+
+**2 · Ein Untertitel, der log.** `mietentwicklung: 'mangels Miet-Zeitreihe
+konservativ angesetzt'` war fest verdrahtet und erschien immer — im
+geöffneten Bericht neben **100/100**, was nur **mit** echter Zeitreihe
+zustande kommt.
+
+**Am echten Bericht gegengeprüft, dasselbe Objekt, dieselben Daten:**
+
+| | alt (id 72) | neu (id 78) |
+|---|---|---|
+| Bruttorendite-Teilwert | **0** / 100 | **50** / 100 |
+| Deal-Score | **45** | **56** |
+| `geschaetzt` | Feld fehlt | `["preisabschlag","bruttorendite"]` |
+
+Auf dem Schirm steht jetzt an jedem geratenen Balken **„keine Daten —
+neutral angesetzt"**. Und im Funktionslauf belegt: **eine echte Null (0 %
+Rendite) bleibt schlecht** — nur „unbekannt" nicht mehr.
+
+**Nebenbeweis:** der zweite Bericht auf dasselbe, bereits bezahlte Objekt
+kostete **nichts** — Kontingent vor und nach dem Lauf 48 / 9 / 10.
+
+**Bewusst nicht entschieden:** statt neutral zu ersetzen könnte man den
+fehlenden Teilwert weglassen und die übrigen Gewichte hochnormieren.
+Fachlich ebenso vertretbar, fällt anders aus — **das ist Marcels
+Entscheidung**, siehe offene Punkte.
+
+**Alte Berichte behalten ihre gespeicherten Zahlen.**
+
+### Der Wizard inhaltlich durchgegangen — 01.09.2026
+
+Neben den leeren Reitern (`v1196`) wurde der Inhalt geprüft:
+
+- **Die bedingte Pflicht-Logik stimmt.** In Reiter 6/7 trägt jedes
+  gesternte Feld einen gefüllten Auslöser: Hinterland 828 m² → Wertansatz
+  Pflicht, Garage 64,58 m² → Standardstufe Pflicht, Anpassung −10 % →
+  Begründung Pflicht. `pflichtWenn()` arbeitet wie vorgesehen.
+- **BEFUND, offen:** die Pflichtangaben der Stufen 1–3 sind in den Reitern
+  2–5 **nicht** als solche erkennbar. `address`/`ptype`/`area`/`year`
+  (Stufe 1), `cond`/`quality` (Stufe 2), `plot`/`units` (Stufe 3) tragen
+  keinen Marker — nur `baustatus` hat einen, weil es zufällig über
+  `wertermittlung.js` gerendert wird. Die einzige Stelle, die sie nennt,
+  ist die Ampel **oben, außerhalb des Reiters**.
+- **Dazu passt ein toter Mechanismus:** `wertermittlung.js:393` definiert
+  `.wm-f.fehlt input{outline:2px solid …}` — **die Klasse `fehlt` wird
+  nirgends gesetzt.** Gebaut und nie verdrahtet.
 
 ### Das Deploy-Skript ist repariert — `v3` / `v3b`, 01.09.2026 (`d0ab1f4`)
 

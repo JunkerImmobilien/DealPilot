@@ -4411,6 +4411,109 @@ lange überleben — kein Diff, keine Historie, keine Gegenlesung.
 > Beide eigenen Fehler in `v3` fielen erst auf, als die **Abbruch**-Pfade
 > durchgespielt wurden. Der Erfolgslauf sah vorher schon tadellos aus.
 
+### v1197 (01.09.2026, `c9efc07`) — ein fehlender Kaufpreis machte das Objekt schlecht statt unbewertet
+
+**Beim ersten Blick auf den Ergebnis-Teil gefunden** — der war laut Backlog
+„überhaupt noch nicht angesehen worden".
+
+Die Kennzahlenzeile sagt bei fehlendem Kaufpreis ehrlich **„– %"** für die
+Bruttorendite. Die Score-Komponente daneben zeigte **„Bruttorendite
+0 / 100"** und riss über ihr Gewicht von 20 % den ganzen Deal-Score mit.
+Daneben stand **keine Erklärung**, weil der Untertitel bei fehlendem Wert
+korrekt leer bleibt. **Der Nutzer sah eine harte Null ohne Grund.**
+
+#### Die Ursache stand an zwei Stellen
+
+```
+ScoringService.js:39    const gy = grossYieldPct ?? 0;
+ReportOrchestrator.js   grossYieldPct: valuation.yield?.gross_yield_pct ?? 0
+```
+
+Zwei Gürtel um dieselbe falsche Hose. Die Formel ist `clamp01((gy-2)/6)`,
+**ihr neutraler Punkt liegt bei 5 %, nicht bei 0.** Aus „unbekannt" wurde
+damit der schlechtestmögliche Wert.
+
+**Die Nachbarn in derselben Funktion machen es richtig:**
+
+| Komponente | fehlt → | |
+|---|---|---|
+| Preisabschlag | `?? 0` → `0,5 + 0/30` = 0,5 | neutral ✓ (die 0 ist hier **zufällig** der neutrale Punkt) |
+| **Bruttorendite** | `?? 0` → `(0−2)/6` → clamp 0 | **schlechtestmöglich ✗** |
+| Makrolage | `?? 50` | neutral ✓ |
+| Mikrolage | `?? 50` | neutral ✓ |
+| Risiko | `?? 0.6` | dokumentierter Vorgabewert ✓ |
+
+**Die `?? 0` war von den Nachbarn abgeschrieben, wo sie harmlos ist.** Das
+ist die Falle aus `CLAUDE.md`: *„`Number(null)` ist 0 und besteht
+`Number.isFinite` — erst auf Abwesenheit prüfen, dann rechnen."* Und der
+Kopf der Datei sagt die Absicht seit jeher: *„sonst neutral 50 + Note
+geschätzt"*. `macroScore()` macht das. `dealScore()` machte es nicht.
+
+#### Was jetzt passiert
+
+Jeder Teilwert geht durch `teil(name, wert, formel, ersatz)`. Fehlt die
+Zahl, wird der neutrale Ersatz genommen **und der Name in `geschaetzt`
+vermerkt**. Die Oberfläche schreibt dann **„keine Daten — neutral
+angesetzt"** an den Balken. **Eine Zahl ohne Herkunft gibt es hier nicht
+mehr.**
+
+#### Zweiter Fund am selben Ort: ein Untertitel, der log
+
+`mietentwicklung: 'mangels Miet-Zeitreihe konservativ angesetzt'` war
+**fest verdrahtet** — der Satz erschien immer. Im geöffneten Bericht stand
+er neben **100/100**, was nur **mit** echter Zeitreihe zustande kommt.
+Alle Nachbarn in derselben Liste sind bedingt; dieser war es nicht. Jetzt
+nennt er die echte Zeitreihe oder schweigt.
+
+#### Echter Funktionslauf, nicht nur `node --check`
+
+```
+ohne Kaufpreis (null)          50/100  Durchschnittlich       rendite= 50
+Rendite 2 % (unteres Ende)     40/100  Unterdurchschnittlich  rendite=  0
+Rendite 5 % (neutraler Punkt)  50/100  Durchschnittlich       rendite= 50
+Rendite 8 % (oberes Ende)      60/100  Attraktiv              rendite=100
+
+unbekannt == neutraler Punkt ....... true
+unbekannt != schlechtester Wert .... true
+alles unbekannt -> 6 von 6 geschaetzt
+alles bekannt   -> geschaetzt leer
+Rendite 0 %     -> Teilwert 0
+```
+
+> **Der letzte Punkt ist der wichtigste: „null Rendite" und „Rendite
+> unbekannt" sind jetzt zwei verschiedene Dinge.** Eine echte Null wird
+> weiterhin schlecht bewertet.
+
+#### Am echten Bericht gegengeprüft — dasselbe Objekt, dieselben Daten
+
+| | alt (id 72) | neu (id 78) |
+|---|---|---|
+| Bruttorendite-Teilwert | **0** / 100 | **50** / 100 |
+| Deal-Score | **45** | **56** |
+| `geschaetzt` | Feld fehlt | `["preisabschlag","bruttorendite"]` |
+
+Und auf dem Schirm: *„Bruttorendite 50 / 100 · keine Daten — neutral
+angesetzt"*, *„Preisabschlag 50 / 100 · keine Daten — neutral angesetzt"*,
+Mietentwicklung ohne den erfundenen Satz.
+
+**Nebenbeweis:** der zweite Bericht auf dasselbe, bereits bezahlte Objekt
+hat **nichts** gekostet — Kontingent vor und nach dem Lauf 48 / 9 / 10.
+Damit ist die „ohne Aufpreis"-Zusage ein zweites Mal belegt.
+
+#### Offen und bewusst nicht entschieden
+
+Statt neutral zu ersetzen könnte man den fehlenden Teilwert **weglassen und
+die übrigen Gewichte hochnormieren**. Fachlich ebenso vertretbar, fällt
+anders aus. **Diese Wahl gehört Marcel** — im Code steht die Konvention,
+die die Datei ohnehin schon dokumentiert.
+
+**Alte Berichte behalten ihre gespeicherten Zahlen.** Die Rechnung wirkt
+nur auf neu erzeugte; die Oberflächen-Korrektur (kein erfundener Satz)
+wirkt auch rückwirkend, weil sie beim Anzeigen greift.
+
+**Backend-Änderung** — `mb-backend` gerebuildet, Container läuft die neue
+Fassung, keine Fehler im Log.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
