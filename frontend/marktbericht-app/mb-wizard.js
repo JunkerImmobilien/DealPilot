@@ -548,7 +548,28 @@
     btn.type = 'button';
     btn.className = 'mbw-leer-btn';
     btn.textContent = 'Angaben einblenden';
-    btn.addEventListener('click', function () { zeile.click(); });
+    /* ── v1196b · Die Ampel-Zeile NICHT festhalten, sondern frisch suchen ──
+       Der erste Anlauf schrieb `zeile.click()` mit der Referenz, die beim
+       Bauen des Hinweises gegriffen wurde. Gemessen auf Staging: das
+       funktioniert genau einmal nicht.
+
+       `mb-stufen.zeichnen()` setzt bei JEDEM `melden()` das innerHTML von
+       `#wm-ziel` neu — die Zeile ist danach ein anderes Element, die alte
+       Referenz haengt losgeloest im Speicher. Und ein losgeloester Knoten
+       hat keinen Weg mehr zum `document`, an dem der Meilenstein-Handler
+       als delegierter Listener haengt (`mb-stufen.js:358`). Der Klick geht
+       also ins Leere, ohne Fehler, ohne Wirkung.
+
+       Beweis: derselbe Klick auf die FRISCH gesuchte Zeile blendet 12
+       Felder ein und raeumt den Hinweis ab; die Gegenprobe
+       `querySelector(...) === alteReferenz` ergab „neues Element".
+
+       Deshalb wird hier nur die STUFENZAHL festgehalten und das Element
+       erst im Moment des Klicks gesucht. */
+    btn.addEventListener('click', function () {
+      var frisch = document.querySelector('.mbst-ms[data-mbst-ziel="' + s.stufe + '"]');
+      if (frisch) frisch.click();
+    });
     box.appendChild(p);
     box.appendChild(btn);
     blatt.appendChild(box);
