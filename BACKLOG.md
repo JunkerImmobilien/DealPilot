@@ -1396,6 +1396,33 @@ entfällt — nicht raten.
    ausdrücklich „geprüft" steht. Die Bilder liegen im Dokument in
    derselben Reihenfolge wie die Punkte unten.
 
+   ### Vollständigkeit geprüft am 01.09.2026 — auf Marcels Frage
+
+   **Der Text der `.docx` wurde ausgepackt und Zeile für Zeile gegen das
+   Backlog gehalten.** Sie enthält **49 Anmerkungen** (dazu zwei
+   Kontextzeilen mit den Beträgen und drei Überschriften). **Alle 49 sind
+   erfasst**, verteilt auf:
+
+   | Anmerkungen | wo |
+   |---|---|
+   | 25 zu Boarding, Feldern, Miete, Finanzierung, Steuer, QuickBoarding | dieser Punkt, Blöcke **A–I** |
+   | Lage-Strategie als Profil · „Verloren" rausnehmen | dieser Punkt, Block **J** |
+   | *„Tool hat super viele Funktionen … USP muss definiert werden"* | dieser Punkt, der **Kasten oben** |
+   | 5 fehlende Cockpit-Kennzahlen | **Punkt 6** (Portfolio-Cockpit) |
+   | *„Bezahlmodell: zweite Währung sollte unbedingt raus. Wirkt undurchsichtig."* | **erledigt** — Kerosin abgeschafft, `v1176`/`v1183`, siehe Fertig |
+   | Exposé 129.000 € gegen DealPilot 177.000 € → *„Deutlich über Marktwert? sollte das nicht unter Marktwert sein?"* | **erledigt** — `v1178`, das Vorzeichen war vertauscht |
+
+   > **Zwei Punkte des Berichts sind also schon gebaut, und zwar die zwei
+   > schwersten** — das Preismodell und ein echter Rechenbefund. Bei beiden
+   > stand bisher nicht, dass sie aus diesem Bericht stammen; wer nur nach
+   > „Anmerkungen.docx" suchte, hätte sie für offen gehalten.
+
+   **Wie der Text ausgepackt wurde** (es gibt lokal kein Python und kein
+   Node): PowerShell, `System.IO.Compression.ZipFile` auf `word/document.xml`,
+   `</w:p>` zu Zeilenumbruch, dann alle Tags weg. Word-Kommentare gibt es
+   keine — `word/comments.xml` fehlt im Archiv, die Anmerkungen stehen als
+   normaler Text zwischen den 25 Bildern.
+
    > **Vor dem Abarbeiten: der Satz, der über allem steht.** Der Tester
    > schreibt zum Schluss: *„Tool hat super viele Funktionen. Ich weiß aber
    > nicht, ob ich das wirklich regelmäßig nutzen würde, sehr viele
@@ -2463,6 +2490,13 @@ gehaltenen iPad kein Engpass.
 ist zu teuer. Die Staffelung soll einfach sein."* Alle fünf Umbauschritte
 sind gebaut, ausgerollt und auf Produktion abgenommen:
 
+> **Woher der Auftrag kam:** aus `design/mockups/Anmerkungen.docx`. Der
+> Tester schreibt dort als zweiten Punkt überhaupt: *„Bezahlmodell: Zweite
+> Währung sollte meiner Meinung nach unbedingt raus. Wirkt undurchsichtig.
+> Idee: Basis-Tarif bestimmtes Kontingent frei, danach kostet die Bewertung
+> extra."* **Das ist genau das, was gebaut wurde** — drei Zähler statt
+> Kerosin, Einzelkauf am gesperrten Knopf.
+
 | | was | erledigt in |
 |---|---|---|
 | 1 | drei Zähler statt einem, Nicht-Verfall und Deckel | `v1183` (Migration 064/066) |
@@ -2549,6 +2583,10 @@ nächste Durchgang zuerst hinsieht.
    - **Preis-Einordnung** (war Punkt 2): das Vorzeichen war vertauscht. Bei
      129.000 € Kaufpreis und 177.000 € Marktwert stand „Deutlich über Markt"
      in Rot, während die Zeile darüber dasselbe Delta grün zeigte.
+     **Herkunft: `design/mockups/Anmerkungen.docx`** — der Tester schreibt
+     dort wörtlich *„Rückmeldung aber ‚Deutlich über Marktwert'? sollte das
+     nicht unter Marktwert sein?"* Es ist der einzige **Rechen**befund des
+     ganzen Berichts; alles andere darin ist Bedienführung.
 
    > **Zweimal dieselbe `sed`-Falle an einem Nachmittag, offen benannt:**
    > `&` steht in der Ersetzung für den ganzen Treffer — `&nbsp;` hat deshalb
