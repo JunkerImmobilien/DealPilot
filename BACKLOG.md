@@ -36,7 +36,71 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 2026-08-31, nach dem Prod-Rollout)
+## → HIER WEITERMACHEN (Übergabe 01.09.2026, abends)
+
+**Stand:** lokal = GitHub = Staging auf `229d9b7`.
+**Produktion steht auf `28f8ab1`** — alles aus dieser Sitzung
+(`v1191`–`v1193`) ist **nur auf Staging**, nichts davon ist ausgerollt.
+Keine neue Migration, kein Backend-Rebuild nötig: alle drei Pakete sind
+reines Frontend (CSS und eine JS-Datei).
+
+### Was in dieser Sitzung passiert ist
+
+| | was | Nachweis |
+|---|---|---|
+| `v1191` `8902e87` | Der Löschknopf fraß den Aufklapp-Pfeil der Objektkarte | Pfeil 22/22 px erreichbar, echter Klick klappt auf statt zu löschen |
+| `v1192` `8aa9857` | Der Score-Ring lag unter den Aktionsknöpfen (kompakt + wallet) | Ringmitte trifft in **allen vier** Kartenmodi die Score-Zahl |
+| `v1193` `cd68aa0` | Die Marktbericht-Ampel rechnete noch in Kerosin | kein `\d+ L` mehr im Seitentext, Knopf zeigt „· 1 Marktpreisindikation" |
+
+**Zwei Backlog-Punkte sind dabei zugegangen** (Tablet-Fassung war schon
+vorher zu): aus 1–11 wurde erst 1–10, dann **1–8**.
+
+**Marcels Entscheidungen in dieser Sitzung:**
+- „**a ja, b nein**" — Score-Ring freistellen, 44-px-Fläche für den Pfeil
+  bleibt, wie sie ist. Beides umgesetzt bzw. bewusst nicht gebaut.
+
+### Der oberste offene Punkt: 1 · Marktbericht neu gestalten
+
+**Er ist viel weiter, als sein Kopf jahrelang behauptet hat.** Der Wizard
+ist gebaut und aktiv (`mb-wizard.js`, v1127 → v1172), sieben Reiter, die
+Meilenstein-Ampel trägt, der Knopf wandert mit der erreichten Stufe mit.
+Am Testobjekt Hüllhorst durchgespielt. Der Ist-Zustand steht als Kasten
+oben im Punkt.
+
+**Wo genau weitergemacht wird:** den Wizard-Ablauf **komplett** durchgehen
+— Übersicht → alle sieben Reiter → Ergebnis — und dabei nach weiteren
+Stellen suchen, die beim Preisumbau (`v1176`/`v1183`) stehengeblieben
+sind. `v1193` war so eine, gefunden nach zwei Minuten Hinsehen.
+
+> **Und das ist die Methode für den nächsten Durchgang:** `v1187` hat
+> Kerosin-Reste per `grep` nach dem **Wort** gesucht und diese Stelle
+> nicht gefunden, weil dort nur `p + ' L'` stand. **Eine Währung
+> versteckt sich in ihrer Einheit, nicht in ihrem Namen.** Die Oberfläche
+> aufmachen schlägt jedes grep.
+
+**Nicht vergessen — noch nie geprüft:** ein Marktbericht wurde in dieser
+Sitzung **nicht erzeugt**. Die Ampel und der Knopf sind gemessen, der
+**Abruf selbst** nicht: ob die Abbuchung die richtige Art zieht (`mpi` /
+`mpi_plus` / `wev`) und was bei leerem Kontingent passiert, steht offen.
+Das kostet Kontingent — auf Staging in der Sandbox unbedenklich, aber es
+gehört bewusst gemacht und protokolliert.
+
+### Was sonst offen liegt und nicht vergessen werden darf
+
+- **Die Spracheingabe wartet auf einen echten Sprechlauf am Gerät**
+  (`v1168`/`v1169`/`v1170`) — Marcel macht das, wenn es passt. Der Punkt
+  steht unverändert unter „OFFENE ABNAHME".
+- **Eine echte Erinnerungsmail ist noch nie rausgegangen.** Die zwei
+  Retention-Mails sind nur mit abgefangenem Versand geprüft. Das schließt
+  nur ein Blick ins Postfach ab.
+- **Das Deploy-Skript meldet weiterhin `bash: line 1: set: command not
+  found`** (BOM vor `set -e`). Der Pull läuft trotzdem — der Serverstand
+  wurde in dieser Sitzung jedes Mal per `ssh … git rev-parse` selbst
+  nachgeprüft. Das Skript ist nicht repariert worden.
+
+---
+
+## → ARCHIV: Übergabe 2026-08-31, nach dem Prod-Rollout
 
 **Stand:** lokal = GitHub = Staging = **Produktion** auf `28f8ab1`.
 Migrationen **69** auf beiden Servern. **Nichts hängt halbfertig.**
