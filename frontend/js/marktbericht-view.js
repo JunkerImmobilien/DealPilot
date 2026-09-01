@@ -126,7 +126,29 @@
         '<div class="mbv-bandmain">' +
           '<div class="ttl">Marktbericht<span class="sub">Voller Marktbericht \u2013 Daten aus dem gew\u00e4hlten Objekt vorbef\u00fcllt, im Bericht anpassbar.</span></div>' +
           '<div class="mbv-band-actions">' +
-            '<span class="mbv-cost" title="Wird nur bei vorhandenem Marktwert abgebucht">\u25f7 5 L bei Marktwert \u00b7 keine Daten = kostenlos</span>' + /* v654-cost-text */
+            /* ── v1195 · Der letzte Liter-Rest, und er stand ganz oben ────
+               Hier stand statisch „◷ 5 L bei Marktwert · keine Daten =
+               kostenlos" (`v654-cost-text`). Drei Dinge waren daran falsch:
+
+                 · die Währung ist seit `v1183` abgeschafft,
+                 · die Zahl stimmte nicht — abgerechnet wird **1 Bewertung**
+                   der zur erreichten Stufe gehörenden Art, nie 5 von
+                   irgendetwas, und
+                 · es war die **dritte** Preisangabe auf demselben Schirm.
+                   Ampel („1 × MPI+") und Knopf („1 Erweiterte
+                   Marktpreisindikation") holen ihre Zahl live vom Server;
+                   dieses Schild war fest verdrahtet und konnte gar nicht
+                   mitwandern.
+
+               `v1194` hat diese Stelle NICHT gefunden. Zwei Gründe, beide
+               lehrreich: im Quelltext steht ` 5 L bei ` — ein Treffer für
+               weder `'Kerosin'` noch `' L'` noch `\d+ L` am Stringanfang.
+               Und gemessen wurde der **iframe**, nicht das Band darum. Wer
+               eine Fläche prüft, muss den Rahmen mitprüfen.
+
+               Jetzt steht hier keine Zahl mehr — nur noch WANN abgerechnet
+               wird. Das WIEVIEL steht an genau einer Stelle: an der Stufe. */
+            '<span class="mbv-cost" title="Abgebucht wird nur, wenn ein Marktwert ermittelt wird">◷ Kosten erst beim Erstellen · was es kostet, steht unten an der Stufe</span>' +
           '</div>' +
         '</div>' +
         '<div class="mbv-rz"><span class="mbv-qr">' + MBV_QR + '</span>' +
