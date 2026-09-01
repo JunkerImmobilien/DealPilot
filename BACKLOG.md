@@ -36,107 +36,114 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 01.09.2026, nach v1194)
+## → HIER WEITERMACHEN (Übergabe 01.09.2026, nach v1195)
 
-**Stand:** lokal = GitHub = Staging auf `954a669`.
-**Produktion steht auf `28f8ab1`** — alles aus dieser Sitzung
-(`v1191`–`v1194b`) ist **nur auf Staging**, nichts davon ist ausgerollt.
-Keine neue Migration, kein Backend-Rebuild nötig: alle Pakete sind reines
-Frontend.
+**Stand:** lokal = GitHub = Staging auf `69dee08`.
+**Produktion steht auf `a4ae78d`** — ausgerollt am 01.09. gegen 17:30 auf
+Marcels Freigabe, mit `v1191`–`v1194b`. **`v1195` ist noch NICHT auf Prod.**
+Es ist reines Frontend, also `git pull` ohne Rebuild.
 
-> ### ⚠ PRODUKTION TRÄGT EINEN GELDDEFEKT — das ist der wichtigste Satz hier
+> ### Der Gelddefekt ist behoben und live — hier steht, was er war
 >
-> `v1194` hat gefunden, dass **`credits-modal.js` den Kaufweg kapert**:
-> die Datei setzt am Ende `window._buyCreditPack` und wird in
-> `index.html` **nach** `js/settings.js` geladen (3252 vs. 3151). Bei
-> gleichem Namen gewinnt der spätere Setzer. Damit führte jedes
-> **„Dazubuchen"/„Kaufen"** in Einstellungen → Plan in den alten
-> **Kerosin-Laden** (10/28/90/160 Liter zu 2/5/15/25 €) statt zu Stripe.
+> `v1194` hat gefunden, dass **`credits-modal.js` den Kaufweg kaperte**:
+> die Datei setzt am Ende `window._buyCreditPack` und wird in `index.html`
+> **nach** `js/settings.js` geladen (3252 vs. 3151). Bei gleichem Namen
+> gewinnt der spätere Setzer. Damit führte jedes **„Dazubuchen"/„Kaufen"**
+> in Einstellungen → Plan in den alten **Kerosin-Laden** (10/28/90/160
+> Liter zu 2/5/15/25 €) statt zu Stripe. Das Backend kennt die
+> `kerosin_*`-SKUs weiterhin, und `creditPackWebhook.js` bucht sie auf
+> `bonus_credits` — die Spalte, die `aiCreditsService` seit `v1183` nicht
+> mehr liest. **Geld rein, nichts raus.**
 >
-> **Das Backend kennt die `kerosin_*`-SKUs weiterhin**, und
-> `creditPackWebhook.js` bucht sie auf `bonus_credits` — die Spalte, die
-> `aiCreditsService` seit `v1183` nicht mehr liest. **Geld rein, nichts
-> raus.**
->
-> **Auf Staging behoben und nachgemessen. Auf Produktion nicht.**
-> `credits-modal.js` ist dort unverändert. Der Rollout braucht Marcels
-> Freigabe — er ist reines Frontend, also `git pull` und fertig, kein
-> Rebuild.
->
-> **Wen es trifft:** die Paketkacheln baut `_renderPlanPane` nur für
-> Pläne, die keinen frühen Rückweg nehmen — bei einem bezahlten Konto
-> (Partner) stand nur „Bewertungen nachkaufen", das über
-> `openPricingModal` läuft und **nicht** betroffen war. Vor dem
-> Prod-Rollout einmal mit einem Free-/Starter-Konto gegenprüfen, wie oft
-> der gekaperte Knopf überhaupt erschien.
+> **Auf Prod abgenommen** (`app.dealpilot.immo`, 01.09.): alle Dateien auf
+> `v1194`, `window._buyCreditPack` ist die Stripe-Fassung aus
+> `settings.js`, `CreditsModal.open` führt aufs Preis-Modal, null
+> Konsolenfehler. Sicherungen vorher:
+> `/root/backups/dealpilot_db-vor-v1194-20260901-1728.sql` (12 MB) und
+> `marktbericht-vor-v1194-20260901-1728.sql` (14 MB — die Marktbericht-DB
+> steht in keinem Skript und wurde einzeln gezogen).
 
 ### Was in dieser Sitzung passiert ist
 
 | | was | Nachweis |
 |---|---|---|
-| `v1191` `8902e87` | Der Löschknopf fraß den Aufklapp-Pfeil der Objektkarte | Pfeil 22/22 px erreichbar, echter Klick klappt auf statt zu löschen |
-| `v1192` `8aa9857` | Der Score-Ring lag unter den Aktionsknöpfen (kompakt + wallet) | Ringmitte trifft in **allen vier** Kartenmodi die Score-Zahl |
-| `v1193` `cd68aa0` | Die Marktbericht-Ampel rechnete noch in Kerosin | kein `\d+ L` mehr im Seitentext, Knopf zeigt „· 1 Marktpreisindikation" |
-| `v1194` `b026689` | **Die abgeschaffte Währung stand noch auf dem Geldweg** — 6 Dateien | siehe Kasten oben und den Journal-Eintrag |
-| `v1194b` `954a669` | Der iframe-Cache-Buster hätte den Marktbericht-Teil verschluckt | `wertermittlung.js?v=1194` kommt im Browser an |
+| `v1191` `8902e87` | Der Löschknopf fraß den Aufklapp-Pfeil der Objektkarte | Pfeil 22/22 px erreichbar |
+| `v1192` `8aa9857` | Der Score-Ring lag unter den Aktionsknöpfen | Ringmitte trifft in allen vier Kartenmodi |
+| `v1193` `cd68aa0` | Die Marktbericht-Ampel rechnete noch in Kerosin | kein `\d+ L` im Seitentext |
+| `v1194` `b026689` | **Die abgeschaffte Währung stand auf dem Geldweg** — 6 Dateien | siehe Kasten und Journal |
+| `v1194b` `954a669` | Der iframe-Cache-Buster hätte den Marktbericht-Teil verschluckt | `wertermittlung.js?v=1194` kommt an |
+| **Prod-Rollout** `a4ae78d` | `v1191`–`v1194b` auf Produktion | beide DBs gesichert, abgenommen |
+| `v1195` `69dee08` | **Der letzte Liter-Rest stand ganz oben im Band** — „5 L bei Marktwert" | Rahmen **und** iframe messen null Treffer |
+| — | **Der Marktbericht-Abruf ist gefahren** | siehe unten |
 
 **Marcels Entscheidungen in dieser Sitzung:**
-- „**a ja, b nein**" — Score-Ring freistellen, 44-px-Fläche für den Pfeil
-  bleibt, wie sie ist. Beides umgesetzt bzw. bewusst nicht gebaut.
+- „**a ja, b nein**" — Score-Ring freistellen, 44-px-Fläche bleibt.
+- **Prod-Rollout freigegeben** und **echter Abruf-Test freigegeben.**
+
+### Der Abruf-Test ist durch — die Abbuchung stimmt
+
+**Die offene Frage seit der letzten Übergabe ist beantwortet.** Testobjekt
+`2026-004 · Bäckerstr. 7 Musterhausen`, erreichte Stufe 2:
+
+| | |
+|---|---|
+| Angekündigt | Ampel `1 × MPI+`, Knopf „1 Erweiterte Marktpreisindikation" |
+| Kontingent | MPI+ **10 → 9**, MPI und WEV unberührt |
+| Log | `marktbericht:full` · `cost 1` · `source 'monthly'` · `{"art":"mpi_plus","wert_stufe":2}` |
+| Spalten | `mpi_plus_used` 0 → 1, **Bank unverändert** — erst der Monat, dann die Bank |
+| Zweiter Lauf | Stufe 1+2 `{anzahl: 0}`, Knopf „ohne Aufpreis"; Stufe 3 `{anzahl: 1, art:'wev'}` — **volle** WEV, keine Differenz |
+
+**Was dabei zu lernen war:** der Bestätigungsdialog ist ein **natives
+`window.confirm()`** (`marktbericht-app/app.js:330`). Es blockiert den
+gesamten Renderer, auch die Browser-Erweiterung — Screenshot, JS und
+Tastendrücke liefen alle in den Timeout. **Dieser Knopf darf beim Prüfen
+nicht blind gedrückt werden.**
+
+**Noch offen: der Fall „leeres Kontingent".** Alle drei Arten haben Vorrat
+(48 / 9 / 10), der `402`-Pfad (`routes/marktbericht.js:457`) ist nicht
+ausgelöst worden. Prüfbar mit einem gezielten `UPDATE ai_credits_user` auf
+Staging — **Datenbank-Eingriff, braucht eine eigene Freigabe.**
 
 ### Der oberste offene Punkt: 1 · Marktbericht neu gestalten
 
 **Er ist viel weiter, als sein Kopf jahrelang behauptet hat.** Der Wizard
 ist gebaut und aktiv (`mb-wizard.js`, v1127 → v1172), sieben Reiter, die
 Meilenstein-Ampel trägt, der Knopf wandert mit der erreichten Stufe mit.
-Am Testobjekt Hüllhorst durchgespielt. Der Ist-Zustand steht als Kasten
-oben im Punkt.
 
-**Was `v1194` daran erledigt hat:** die Preisumbau-Reste sind gesucht und
-gefunden — aber **nicht im Wizard-Ablauf**, sondern quer durch die App.
-Der eine Marktbericht-Fund (`wertermittlung.js`, `KEROSIN = {1:2,2:5,3:12}`)
-war nicht einmal sichtbar, weil `mb-stufen.zeichnen()` ihn überschreibt.
+**Was diese Sitzung daran erledigt hat:** die Preisumbau-Reste sind
+gesucht und gefunden (`v1193`–`v1195`), und **die Abrechnungskette ist
+end-to-end bewiesen** — Ankündigung, Abbuchung, Reihenfolge, Zweitlauf.
 
 **Wo genau weitergemacht wird:** der Wizard-Ablauf ist **inhaltlich** noch
 nicht durchgegangen — Übersicht → alle sieben Reiter → Ergebnis. Bisher
-sind nur Ampel, Knopf und Stufenwahl gemessen.
-
-**Nicht vergessen — noch nie geprüft:** ein Marktbericht wurde **nicht
-erzeugt**. Die Ampel und der Knopf sind gemessen, der **Abruf selbst**
-nicht: ob die Abbuchung die richtige Art zieht (`mpi` / `mpi_plus` /
-`wev`) und was bei leerem Kontingent passiert, steht offen. Das kostet
-Kontingent — auf Staging in der Sandbox unbedenklich, aber es gehört
-bewusst gemacht und protokolliert. **Das Konto steht auf MPI 48 · MPI+ 10
-· WEV 10 · Marktwert 0** (Plan „Partner", am 01.09. abgelesen), es ist
-also Kontingent da.
+sind Ampel, Knopf, Stufenwahl und Abrechnung gemessen, die Reiter selbst
+nicht.
 
 ### Was sonst offen liegt und nicht vergessen werden darf
 
-- **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.**
-  `v1194` hat ausgelesen, dass `window._buyCreditPack` jetzt die
-  Stripe-Fassung aus `settings.js` ist, und dass ein unbekannter Schlüssel
-  am Türsteher hängenbleibt — **ohne Netzaufruf**. Eine echte
-  Stripe-Sitzung wurde nicht gestartet.
+- **`v1195` ist nicht auf Prod.** Reines Frontend.
+- **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.** Der
+  Weg ist ausgelesen und der Türsteher greift (unbekannter Schlüssel →
+  „Credit-Pack nicht gefunden", **ohne Netzaufruf**), aber es wurde keine
+  Stripe-Sitzung gestartet.
 - **Die Spracheingabe wartet auf einen echten Sprechlauf am Gerät**
-  (`v1168`/`v1169`/`v1170`) — Marcel macht das, wenn es passt. Der Punkt
-  steht unverändert unter „OFFENE ABNAHME".
-- **Eine echte Erinnerungsmail ist noch nie rausgegangen.** Die zwei
-  Retention-Mails sind nur mit abgefangenem Versand geprüft. Das schließt
-  nur ein Blick ins Postfach ab.
+  (`v1168`/`v1169`/`v1170`) — steht unverändert unter „OFFENE ABNAHME".
+- **Eine echte Erinnerungsmail ist noch nie rausgegangen.**
 - **`gold-audit.py` liefert auf Staging RC=1** — 463 harte Gold-Literale in
-  55 Dateien. **Das ist Bestand, nicht von `v1194`:** der Commit hat
-  **null** Farbliterale hinzugefügt und sechs entfernt. `CLAUDE.md` sagt
-  „RC=0 ist sauber" — das stimmt seit Längerem nicht mehr, und wer sich
-  darauf verlässt, hält jeden Rollout für blockiert oder ignoriert den
-  Prüfschritt ganz. **Entweder die 463 abarbeiten oder die Regel
-  präzisieren.**
-- **Das Deploy-Skript meldet weiterhin `bash: line 1: set: command not
-  found`** (BOM vor `set -e`) und **bricht zusätzlich an gits stderr ab** —
-  bei `v1194` ist der Push durchgelaufen, das Skript hat mit Exit 1
-  abgebrochen und **der Server-Pull fiel aus**. Von Hand nachgezogen und
-  per `ssh … git rev-parse` gegengeprüft. Das Skript ist nicht repariert
-  worden.
-
+  55 Dateien. **Bestand, nicht von `v1194`:** der Commit hat null
+  Farbliterale hinzugefügt und sechs entfernt. `CLAUDE.md` sagt „RC=0 ist
+  sauber", das stimmt seit Längerem nicht. **Entweder die 463 abarbeiten
+  oder die Regel präzisieren** — sonst wird der Prüfschritt entweder
+  ignoriert oder hält jeden Rollout fälschlich für blockiert.
+- **Das Deploy-Skript** meldet weiterhin `bash: line 1: set: command not
+  found` (BOM vor `set -e`) und **bricht an gits stderr ab** — bei `v1194`
+  lief der Push durch, das Skript ging mit Exit 1 raus und **der
+  Server-Pull fiel aus**. Alle Rollouts dieser Sitzung wurden von Hand
+  gezogen und per `ssh … git rev-parse` gegengeprüft.
+- **Anbieter-Neutralität:** `CLAUDE.md` sagt, Sprengnetter und PriceHubble
+  nie namentlich nach außen. **Im Boarding-Pass stehen beide mit Logo**,
+  und der Kosten-Hinweis nennt sie ebenfalls. Das ist Bestand und war nicht
+  Teil von `v1194` — **es ist aber eine Produktentscheidung, die ansteht.**
 ---
 
 ## → ARCHIV: Übergabe 2026-08-31, nach dem Prod-Rollout
@@ -2281,8 +2288,25 @@ Preis-Modal ohne `L`/Kerosin/Credits · Marktbericht mit
 `wertermittlung.js?v=1194`, Ampel `1 × MPI`, sieben Reiter · `node --check`
 auf allen sieben JS-Dateien.
 
-**Offen:** ein echter Kauf ist auf dem reparierten Weg nicht durchgelaufen,
-und **Produktion trägt den Defekt unverändert.**
+**Auf Produktion ausgerollt** am 01.09. gegen 17:30 auf Marcels Freigabe (`a4ae78d`, beide DBs vorher gesichert) und dort abgenommen: alle Dateien auf `v1194`, `_buyCreditPack` ist die Stripe-Fassung, null Konsolenfehler. **Offen bleibt:** ein echter Kauf ist auf dem reparierten Weg nicht durchgelaufen
+— der Weg ist ausgelesen, der Türsteher greift ohne Netzaufruf, aber es wurde keine Stripe-Sitzung gestartet.
+
+**Nachtrag `v1195` (`69dee08`):** beim Abruf-Test fiel ein **weiterer**
+Liter-Rest auf, den `v1194` verfehlt hatte — „**◷ 5 L bei Marktwert**"
+statisch im Kopf des Marktberichts (`js/marktbericht-view.js:129`, ein
+`v654`-Rest). Zwei Gründe für den Fehlschlag, beide lehrreich: im
+Quelltext steht ` 5 L bei ` **mitten in einem Satz** (kein `grep` nach
+„Kerosin", `' L'` oder `\d+ L` trifft das), **und ich hatte den iframe
+gemessen, nicht das Band darum.** Das Band gehört der Haupt-App und liegt
+außerhalb. Beide Male stand „kein Treffer" im Befund — und beide Male
+stimmte er für die Fläche, die ich angesehen hatte.
+
+> **Wer eine Fläche prüft, muss den Rahmen mitprüfen.** Bei jeder
+> iframe-Ansicht gehören beide `body.innerText` in dieselbe Messung.
+
+Das Schild war zugleich die **dritte** Preisangabe auf demselben Schirm —
+Band (statisch), Ampel (live) und Knopf (live). Jetzt steht dort nur noch,
+**wann** abgerechnet wird; das **wieviel** an genau einer Stelle.
 
 ### Die Objektkarte auf dem Handy — `v1191` / `v1192`, 01.09.2026
 

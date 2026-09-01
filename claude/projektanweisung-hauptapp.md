@@ -4166,6 +4166,85 @@ ankommt. Der Weg ist ausgelesen, der Türsteher greift, aber es ist keine
 Stripe-Sitzung gestartet worden. **Und Produktion trägt denselben Defekt**
 — `credits-modal.js` ist dort unverändert.
 
+### v1195 (01.09.2026, `69dee08`) — der letzte Liter-Rest stand ganz oben
+
+**Beim Abruf-Test aufgefallen, nicht beim Suchen.** Im Kopf des
+Marktberichts stand statisch **„◷ 5 L bei Marktwert · keine Daten =
+kostenlos"** (`js/marktbericht-view.js:129`, ein `v654`-Rest). Drei Fehler
+auf einmal: die Währung ist seit `v1183` weg · die Zahl stimmte nicht
+(abgerechnet wird **1 Bewertung** der zur Stufe gehörenden Art) · und es
+war die **dritte** Preisangabe auf demselben Schirm.
+
+| Stelle | Quelle | wandert mit? |
+|---|---|---|
+| Band oben | fest verdrahtet | **nein** |
+| Ampel („1 × MPI+") | Server, `kosten` | ja |
+| Knopf („1 Erweiterte Marktpreisindikation") | Server, `kosten` | ja |
+
+**Das statische Schild ist weg.** Dort steht jetzt nur noch, **wann**
+abgerechnet wird; das **wieviel** steht an genau einer Stelle.
+
+> ### Warum `v1194` diese Stelle verfehlt hat — zwei Gründe
+>
+> **1 · Der Text war zerlegt.** Im Quelltext steht ` 5 L bei ` mitten in
+> einem Satz. Weder `grep` nach „Kerosin" (`v1187`) noch nach `' L'`
+> (mein Kehraus) noch nach `\d+ L` im Seitentext (`v1193`) trifft das.
+> **Die Einheit versteckt sich nicht nur im Namen, sondern auch im Satz.**
+>
+> **2 · Ich habe das Bild gemessen und den Rahmen übersehen.** Geprüft
+> wurde `marktbericht-app/index.html` — der **iframe**. Das Band gehört
+> aber der **Haupt-App** und liegt außerhalb. Beide Male stand
+> „kein Treffer" im Befund, und beide Male stimmte er für die Fläche, die
+> ich angesehen hatte. **Wer eine Fläche prüft, muss den Rahmen
+> mitprüfen** — bei jeder iframe-Ansicht gehören beide `body.innerText`
+> in dieselbe Messung.
+
+---
+
+### Der Marktbericht-Abruf ist gefahren — 01.09.2026, auf Marcels Freigabe
+
+**Die offene Frage seit der Übergabe war: zieht die Abbuchung die richtige
+Art?** Sie ist beantwortet. Testobjekt `2026-004 · Bäckerstr. 7
+Musterhausen` (Dummy), erreichte Stufe 2.
+
+| | |
+|---|---|
+| Ankündigung Ampel | `1 × MPI+` |
+| Ankündigung Knopf | „Marktbericht erstellen · **1 Erweiterte Marktpreisindikation**" |
+| Kontingent vorher | MPI 48 · MPI+ **10** · WEV 10 |
+| Kontingent nachher | MPI 48 · MPI+ **9** · WEV 10 |
+| Log | `marktbericht:full` · `cost 1` · `source 'monthly'` · `{"art":"mpi_plus","wert_stufe":2,"quelle":"monat","external_ref":"d65ed5cb…"}` |
+| Spalten | `mpi_plus_used` 0 → **1**, Bank **unverändert** bei 5 |
+| Ergebnis | Marktwert 176.000 €, Spanne 143.000–262.000 €, Score 46/100 |
+
+**Vier Dinge sind damit bewiesen, nicht mehr vermutet:**
+
+1. **Die angekündigte Art ist die gebuchte Art.** `mpi_plus`, passend zur
+   erreichten Stufe 2 — nicht `mpi`, nicht `wev`.
+2. **Genau eine**, und die anderen beiden Arten bleiben unberührt.
+3. **Zuerst der Monat, dann die Bank.** `source: 'monthly'`,
+   `mpi_plus_used` 0 → 1, die Bank blieb bei 5. Das ist die richtige
+   Reihenfolge: was ohnehin verfällt, geht zuerst.
+4. **Ein zweiter Lauf auf dasselbe Objekt kostet nichts.** Danach gemessen:
+   Stufe 1 und 2 melden `{anzahl: 0}`, der Knopf sagt „ohne Aufpreis".
+   Stufe 3 meldet `{anzahl: 1, art: 'wev'}` — **die volle Wertermittlung,
+   keine Differenz.** Genau das, was `v1187`/`v1193` angekündigt haben.
+
+> **Der Bestätigungsdialog ist ein natives `window.confirm()`**
+> (`marktbericht-app/app.js:330`). Das blockiert den gesamten Renderer —
+> auch die Browser-Erweiterung: Screenshot, JS-Auswertung und sogar
+> Tastendrücke liefen alle in den Timeout. **Beim Prüfen im Browser darf
+> dieser Knopf nicht blind gedrückt werden.** Der Dialog trug übrigens
+> zusätzlich eine Plausibilitätswarnung („Grundstücksfläche bei einer
+> Wohnung — die fließt nur bei Häusern in die Bewertung ein"), die
+> Warnstrecke arbeitet also.
+
+**Weiterhin offen: was bei LEEREM Kontingent passiert.** Alle drei Arten
+haben Vorrat (48 / 9 / 10), der `402`-Pfad
+(`routes/marktbericht.js:457`) ist nicht ausgelöst worden. Er ließe sich
+auf Staging mit einem gezielten `UPDATE ai_credits_user` prüfen — das ist
+ein Datenbank-Eingriff und braucht eine eigene Freigabe.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
