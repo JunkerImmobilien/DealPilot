@@ -4360,6 +4360,57 @@ Quelltext.**
 **Was fehlt:** dass der Server den `402` unter echten Bedingungen auch
 wirklich schickt. Dafür müsste eine Art auf 0 gesetzt werden.
 
+### Werkzeug: `deploy-staging.ps1` v3/v3b (01.09.2026, `d0ab1f4`) — drei Defekte, einer davon nie bemerkt
+
+**Kein Rollout-Paket, sondern das Werkzeug selbst.** Es steht hier, weil
+seine Fehlfunktion jeden Rollout dieser Sitzung Handarbeit gekostet hat.
+
+**Der Fund, der in keinem Backlog stand: PowerShell-Variablen sind nicht
+groß-/kleinschreibungsempfindlich.** `$BRANCH` und `$branch` sind
+dieselbe Variable. Gemessen auf `main`:
+`branch='main'  BRANCH='main'  -ne ergibt: False`.
+
+> **Die Zweig-Sperre hat nie funktioniert** — wer versehentlich auf `main`
+> stand, hätte `main` nach `origin/staging` gepusht, und das Skript hätte
+> dazu `[ok] lokaler Zweig: main` gemeldet.
+
+Dieselbe Falle zweimal mehr: `$REMOTE`/`$remote` (das ganze Bash-Skript
+landete als Pfad in einem `cd`) und `$FERN`/`$fern`. **Aus `v2` geerbt und
+in `v3` wiederholt** — gefunden erst beim Prüfen der Abbruch-Pfade.
+Gegenprobe jetzt: alle 24 Variablennamen nach `ToLower()` gruppiert, keine
+Gruppe mit mehr als einer Schreibweise.
+
+**Die beiden bekannten Defekte, beide belegt:**
+
+| | Ursache | Wirkung | Lösung |
+|---|---|---|---|
+| BOM vor `set -e` | die PowerShell-Pipe an `ssh "bash -s"` setzt `EF BB BF` davor (mit `od -c` gemessen) | der Fehlerabbruch auf dem Server war **nie aktiv** | keine Pipe mehr: `WriteAllText` mit `UTF8Encoding($false)` + `scp` |
+| Tod an gits stderr | `$ErrorActionPreference = "Stop"` + `NativeCommandError` in WinPS 5.1 | Push durch, Skript Exit 1, **Server-Pull fiel aus** | `"Continue"` + `$LASTEXITCODE` nach jedem nativen Aufruf |
+
+Weder `$OutputEncoding` noch `[Console]::OutputEncoding` auf
+`UTF8Encoding($false)` half gegen das BOM — beides gemessen. Deshalb der
+Umweg über Datei und `scp`.
+
+**Schritt 7 ist neu und der eigentliche Gewinn:** das Skript liest den
+HEAD des Servers und vergleicht ihn mit dem lokalen. Weicht er ab, ist es
+ein Abbruch. **`Fertig.` ist damit ein Beweis, kein Versprechen** — bis
+hierher musste der Stand jedes Mal von Hand gegengelesen werden.
+
+**Die Datei liegt jetzt im Repo.** Sie stand in `.gitignore` als einziges
+Werkzeug unter `tools/`; genau deshalb konnte eine kaputte Fassung so
+lange überleben — kein Diff, keine Historie, keine Gegenlesung.
+
+> **Zwei Lehren, die über dieses Skript hinausgehen:**
+>
+> **1 · „Kann ich nicht reproduzieren" ist kein „gibt es nicht".** Den
+> stderr-Abbruch löst der Werkzeug-Host nicht aus, Marcels interaktive
+> Konsole schon. Die Reparatur baut deshalb nicht mehr auf das
+> Fehlerverhalten, sondern auf den Rückgabewert — sie hält in beiden.
+>
+> **2 · Ein Skript, das nur im Erfolgsfall stimmt, ist nicht geprüft.**
+> Beide eigenen Fehler in `v3` fielen erst auf, als die **Abbruch**-Pfade
+> durchgespielt wurden. Der Erfolgslauf sah vorher schon tadellos aus.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und

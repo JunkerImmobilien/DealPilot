@@ -139,9 +139,10 @@ Abruf-Test war nur zu sehen, dass er erscheint und plausible Zahlen trägt
   **Bestand**, nicht von dieser Sitzung. `CLAUDE.md` sagt „RC=0 ist
   sauber"; das stimmt seit Längerem nicht. **Entweder die 463 abarbeiten
   oder die Regel präzisieren.**
-- **Das Deploy-Skript** bricht nach dem Push an gits stderr ab, der
-  Server-Pull fällt aus. **Alle Rollouts dieser Sitzung wurden von Hand
-  gezogen** und per `ssh … git rev-parse` gegengeprüft.
+- **Das Deploy-Skript ist repariert** (`v3`/`v3b`, `d0ab1f4`) — siehe
+  Fertig. Es prüft am Ende **selbst**, ob der Serverstand dem lokalen
+  entspricht; `Fertig.` ist damit ein Beweis statt eines Versprechens.
+  Die ersten fünf Rollouts dieser Sitzung liefen noch von Hand.
 - **Anbieter-Neutralität:** `CLAUDE.md` verlangt, Sprengnetter und
   PriceHubble nie namentlich nach außen zu nennen. **Im Boarding-Pass
   stehen beide mit Logo**, und der Kosten-Hinweis nennt sie ebenfalls.
@@ -2219,6 +2220,104 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Das Deploy-Skript ist repariert — `v3` / `v3b`, 01.09.2026 (`d0ab1f4`)
+
+**Marcels Frage: „warum geht das deploy script nicht?"** Antwort: aus drei
+Gründen gleichzeitig, und der schwerwiegendste stand nirgends im Backlog.
+
+#### Der Fund, den niemand auf dem Zettel hatte
+
+**PowerShell-Variablen sind nicht groß-/kleinschreibungsempfindlich.**
+`$BRANCH` und `$branch` sind **dieselbe** Variable.
+
+```
+$BRANCH = "staging"
+$branch = git rev-parse --abbrev-ref HEAD    # ueberschreibt $BRANCH
+if ($branch -ne $BRANCH) { ... }             # vergleicht main mit main
+```
+
+Gemessen auf `main`: `branch='main'  BRANCH='main'  -ne ergibt: False`.
+
+> **Die Sperre, die einen versehentlichen Push von `main` nach
+> `origin/staging` verhindern soll, war nie aktiv** — und meldete dabei
+> freundlich `[ok] lokaler Zweig: main`.
+
+Dieselbe Falle steckte **zweimal mehr** in derselben Datei: `$REMOTE`
+gegen `$remote` (deshalb schickte Schritt 7 das ganze Bash-Skript als Pfad
+an ein `cd` — sichtbar an
+`bash: cd: $'/opt/dealpilot\r': No such file or directory`) und `$FERN`
+gegen `$fern`. **Ich habe diesen Fehler aus `v2` geerbt und im ersten
+Anlauf von `v3` wiederholt.** Gefunden erst beim Prüfen der
+Abbruch-Pfade — ein Skript, das nur im Erfolgsfall stimmt, ist nichts wert.
+
+#### Die beiden bekannten Defekte
+
+**1 · Ein BOM vor `set -e`.** Die PowerShell-Pipe an `ssh "bash -s"`
+setzte `EF BB BF` davor; auf dem Server gemessen:
+
+```
+0000000  357 273 277   s   e   t       -   e  \n
+```
+
+bash meldete „set: command not found" — **und damit war der
+Abbruch-bei-Fehler auf dem Server nie aktiv.** Weder `$OutputEncoding`
+noch `[Console]::OutputEncoding` auf `UTF8Encoding($false)` half, beides
+gemessen. **Also gar keine Pipe mehr:** `[IO.File]::WriteAllText` mit
+`UTF8Encoding($false)`, `scp`, dann dort ausführen. Gegenprobe auf dem
+Server: die Datei beginnt mit `#`, trägt **null** CR-Bytes, `set -e` steht
+intakt auf Zeile 2.
+
+**2 · `$ErrorActionPreference = "Stop"` starb an gits stderr.** WinPS 5.1
+verpackt stderr nativer Programme in einen `NativeCommandError`; mit
+„Stop" bricht das ab. `git push` schreibt `To https://github.com/…`
+**immer** auf stderr, auch im Erfolgsfall. Jetzt „Continue" und nach jedem
+nativen Aufruf `$LASTEXITCODE`.
+
+> **Ehrlich dazu:** diesen Abbruch konnte ich im Werkzeug-Host nicht
+> reproduzieren — dort wird stderr nicht verpackt. Der Beleg ist der echte
+> Lauf in Marcels Konsole beim `v1194`-Rollout. Die Reparatur hält in
+> beiden Fällen, weil sie nicht mehr auf das Fehlerverhalten baut, sondern
+> auf den Rückgabewert. **„Kann ich nicht reproduzieren" ist kein
+> „gibt es nicht".**
+
+#### Und der Grund, warum „Fertig." jetzt etwas bedeutet
+
+Weil die Defekte sich gegenseitig verdeckten, musste der Serverstand
+bisher **jedes Mal von Hand** nachgeprüft werden — allein in dieser
+Sitzung fünfmal. **Schritt 7 liest jetzt den HEAD des Servers und
+vergleicht ihn mit dem lokalen**; bei Abweichung ist es ein Abbruch, egal
+wie freundlich alles davor aussah.
+
+Dabei fiel ein weiterer eigener Fehler auf: ein nackter `ssh …` schreibt
+in den Erfolgs-Stream, und Schritt 7 las die Ausgabe von Schritt 6 mit —
+verglichen wurde
+`"Server-Zweig: staging Already up to date. AUSGEROLLT: 38d819d 38d819d"`
+gegen `"38d819d"`. **Ein Fehlalarm bei einem Rollout, der sauber
+durchlief.** Jetzt geht alles Anzeigende an `Out-Host`, und der Vergleich
+nimmt per `Select-Object -Last 1` nur die letzte Zeile — robust auch gegen
+Login-Banner und motd.
+
+#### Warum die Datei jetzt im Repo liegt
+
+Sie stand in `.gitignore`, **ohne Begründung, als einziges Werkzeug unter
+`tools/`** — `gold-audit.py`, `baue-mailtexte.js` und die
+`swf-register`-Kette sind alle versioniert. **Genau deshalb konnte eine
+kaputte Fassung so lange überleben: kein Diff, keine Historie, keine
+Gegenlesung.** Nichts Schützenswertes steht drin (Anmeldung über den
+SSH-Schlüssel; beide Server-IPs stehen ohnehin im versionierten
+`CLAUDE.md`). Die Ignore-Zeile ist durch einen Kommentar ersetzt, der das
+festhält.
+
+#### Nachgewiesen, alle drei Pfade
+
+| Fall | Ergebnis |
+|---|---|
+| Sauberer Lauf mit echtem Push | **Exit 0**, Server-Pull lief, `[ok] Serverstand geprueft: d0ab1f4 == lokal d0ab1f4` |
+| Falscher Zweig (`main`) | **Exit 1** — `ABBRUCH: Lokaler Zweig ist 'main', erwartet 'staging'` (vorher: lief durch) |
+| Schmutziges Arbeitsverzeichnis | **Exit 1** — Dateiliste, dann Abbruch |
+| Übertragene Datei auf dem Server | beginnt mit `#`, **0 CR-Bytes**, `set -e` auf Zeile 2 |
+| Namenskollisionen | alle 24 Variablennamen nach `ToLower()` gruppiert — **keine Gruppe mit mehr als einer Schreibweise** |
 
 ### Der Wizard-Durchgang und die leeren Reiter — `v1196` / `v1196b`, 01.09.2026
 
