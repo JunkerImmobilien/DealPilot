@@ -37098,7 +37098,13 @@ body.hdr-collapsed .hdr-score-mini span {
 body.hdr-collapsed .hdr-score-mini-green b { color: #5ed992; }
 body.hdr-collapsed .hdr-score-mini-green    { border-color: rgba(63, 165, 108, .40); }
 body.hdr-collapsed .hdr-score-mini-gold  b { color: var(--wl-E8C964, #E8C964); }
-body.hdr-collapsed .hdr-score-mini-gold     { border-color: rgba(201, 168, 76, .40); }
+/* Gold NICHT als rgba: 201,168,76 ist das Marken-Gold, und als Zahlenwert
+   faerbt es sich beim Mandanten nicht um — der Gold-Audit hat genau diese
+   eine Zeile gefunden (RC=1), sie war der erste solche Treffer in
+   style.css. `--gold` setzt whitelabel-override.js, und so loesen es die
+   uebrigen Rahmen dieser Datei auch. */
+body.hdr-collapsed .hdr-score-mini-gold     { border-color: var(--gold); }
+
 body.hdr-collapsed .hdr-score-mini-red   b { color: #e8a09a; }
 body.hdr-collapsed .hdr-score-mini-red      { border-color: rgba(184, 98, 92, .40); }
 
