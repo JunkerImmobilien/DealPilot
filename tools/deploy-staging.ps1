@@ -9,10 +9,36 @@
 #  BOM als ANSI, nicht als UTF-8 - ein Umlaut kaeme dann verstuemmelt an.
 #
 # ---------------------------------------------------------------------
-#  WAS AN v2 KAPUTT WAR (gemessen am 01.09.2026, nicht vermutet)
+#  DIE WICHTIGSTE REGEL FUER DIESE DATEI
 # ---------------------------------------------------------------------
 #
-#  1) DAS REMOTE-SKRIPT BEKAM EIN BOM VORGESETZT -> "set -e" LIEF NIE.
+#  POWERSHELL-VARIABLEN SIND NICHT GROSS-/KLEINSCHREIBUNGSEMPFINDLICH.
+#  $BRANCH und $branch sind DIESELBE Variable.
+#
+#  Genau daran ist v2 gescheitert, und v3 hat den Fehler im ersten Anlauf
+#  wiederholt. Gemessen am 01.09.2026:
+#
+#      $BRANCH = "staging"
+#      $branch = git rev-parse --abbrev-ref HEAD     # ueberschreibt $BRANCH
+#      if ($branch -ne $BRANCH) { ... }              # vergleicht main mit main
+#
+#      -> Ausgabe: branch='main'  BRANCH='main'  -ne ergibt: False
+#
+#  DIE ZWEIG-SPERRE HAT ALSO NIE FUNKTIONIERT. Wer versehentlich auf main
+#  stand, hat main nach origin/staging gepusht - die Sperre, die genau das
+#  verhindern sollte, winkte durch und meldete dabei "[ok] lokaler Zweig".
+#
+#  Dieselbe Falle zweimal mehr: $REMOTE gegen $remote (das Remote-Skript
+#  landete als Pfad in einem cd) und $FERN gegen $fern.
+#
+#  DESHALB: Konfigurationswerte GROSS, alles andere in Kamelschrift, und
+#  nie ein Paar, das sich nur in der Schreibweise unterscheidet.
+#
+# ---------------------------------------------------------------------
+#  WAS AN v2 SONST NOCH KAPUTT WAR (alles gemessen, nicht vermutet)
+# ---------------------------------------------------------------------
+#
+#  1) DAS REMOTE-SKRIPT BEKAM EIN BOM -> "set -e" LIEF NIE.
 #
 #     v2 schickte den Here-String per Pipe an  ssh "bash -s".  Gemessen,
 #     was auf dem Server ankam:
@@ -20,7 +46,7 @@
 #         0000000  357 273 277   s   e   t       -   e  \n
 #                  ^^^^^^^^^^^ = EF BB BF = UTF-8-BOM
 #
-#     bash las also <BOM>set -e und meldete
+#     bash las <BOM>set -e und meldete
 #     "bash: line 1: set: command not found". Das war KEIN Schoenheits-
 #     fehler: damit war der Abbruch-bei-Fehler auf dem Server nie aktiv.
 #     Waere  cd /opt/dealpilot  fehlgeschlagen, haette das Skript
@@ -31,11 +57,15 @@
 #     BOM blieb. Deshalb geht das Skript jetzt NICHT mehr durch die
 #     PowerShell-Pipe: es wird mit .NET byteweise geschrieben (kein BOM,
 #     nur LF), per scp uebertragen und dort ausgefuehrt. Gegenprobe auf
-#     dem Server:  od -c  zeigt   s   e   t       -   e  \n
+#     dem Server:  od -c  zeigt   #  (Kommentar), dann  set   - e  \n
 #
 #     Zusaetzlich ist die erste Zeile des Remote-Skripts ein Kommentar.
 #     Sollte je wieder ein BOM davorrutschen, verdirbt es nur den
 #     Kommentar und nicht die Zeile "set -e".
+#
+#     Das -replace auf CR ist kein Zierrat: seit die Datei im Repo liegt,
+#     checkt git sie mit CRLF aus. Der Here-String traegt dann \r\n, und
+#     bash stolpert ueber ein "then\r".
 #
 #  2) DAS SKRIPT STARB NACH DEM PUSH - UND DER SERVER-PULL FIEL AUS.
 #
@@ -58,7 +88,7 @@
 #
 #  3) "FERTIG" WAR EINE BEHAUPTUNG, KEIN BEWEIS.
 #
-#     Weil (1) und (2) sich gegenseitig verdeckten, musste der Serverstand
+#     Weil 1 und 2 sich gegenseitig verdeckten, musste der Serverstand
 #     bisher jedes Mal von Hand nachgeprueft werden. Schritt 7 tut das
 #     jetzt selbst: er liest den HEAD des Servers und vergleicht ihn mit
 #     dem lokalen. Stimmen sie nicht ueberein, ist es ein ABBRUCH - egal
@@ -69,10 +99,12 @@
 # melden Fehler ueber ihren Rueckgabewert, nicht ueber stderr.
 $ErrorActionPreference = "Continue"
 
-$SERVER = "root@116.203.214.11"
-$REMOTE = "/opt/dealpilot"
-$BRANCH = "staging"
-$FERN   = "/tmp/dp-deploy-staging.sh"
+# --- Konfiguration. GROSS geschrieben, und keine Variable weiter unten
+#     darf denselben Namen in anderer Schreibweise tragen. ---
+$SERVER    = "root@116.203.214.11"
+$REPOPFAD  = "/opt/dealpilot"
+$ZWEIG     = "staging"
+$FERNPFAD  = "/tmp/dp-deploy-staging.sh"
 
 function Fail($msg) {
     Write-Host ""
@@ -94,20 +126,22 @@ git rev-parse --is-inside-work-tree | Out-Null
 if ($LASTEXITCODE -ne 0) { Fail "Kein git-Repo. Bitte im Repo-Ordner ausfuehren." }
 
 # --- 2) Richtiger Zweig? ---------------------------------------------
-$branch = git rev-parse --abbrev-ref HEAD
+#     $aktZweig, NICHT $zweig - sonst waere es dieselbe Variable wie
+#     $ZWEIG und der Vergleich immer wahr. Siehe Kopf.
+$aktZweig = git rev-parse --abbrev-ref HEAD
 PruefeExit "git rev-parse HEAD"
-$branch = "$branch".Trim()
-if ($branch -ne $BRANCH) {
-    Fail "Lokaler Zweig ist '$branch', erwartet '$BRANCH'. Wechseln mit:  git checkout $BRANCH"
+$aktZweig = "$aktZweig".Trim()
+if ($aktZweig -ne $ZWEIG) {
+    Fail "Lokaler Zweig ist '$aktZweig', erwartet '$ZWEIG'. Wechseln mit:  git checkout $ZWEIG"
 }
-Write-Host "   [ok] lokaler Zweig: $branch"
+Write-Host "   [ok] lokaler Zweig: $aktZweig"
 
 # --- 3) Nichts Uncommittetes (verfolgte Dateien) ---------------------
 #     Unbekannte Dateien werden bewusst ignoriert: auto-save.js und
 #     patchesold/ liegen dauerhaft herum und duerfen nicht blockieren.
-$dirty = git status --porcelain --untracked-files=no
+$offen = git status --porcelain --untracked-files=no
 PruefeExit "git status"
-if ($dirty) {
+if ($offen) {
     Write-Host ""
     Write-Host "ABBRUCH: es liegen ungespeicherte Aenderungen vor:" -ForegroundColor Red
     git status -s
@@ -118,34 +152,35 @@ if ($dirty) {
 Write-Host "   [ok] Arbeitsverzeichnis sauber"
 
 # --- 4) Was geht raus? ------------------------------------------------
-git fetch origin $BRANCH --quiet
+git fetch origin $ZWEIG --quiet
 PruefeExit "git fetch"
-$ahead = git rev-list --count "origin/$BRANCH..HEAD"
+$voraus = git rev-list --count "origin/$ZWEIG..HEAD"
 PruefeExit "git rev-list"
-$ahead = "$ahead".Trim()
-if ($ahead -eq "0") {
+$voraus = "$voraus".Trim()
+if ($voraus -eq "0") {
     Write-Host "   [i]  Nichts Neues zu pushen - rolle nur den Server nach." -ForegroundColor Yellow
 } else {
-    Write-Host "   [i]  $ahead Commit(s) gehen raus:"
-    git --no-pager log --oneline "origin/$BRANCH..HEAD"
+    Write-Host "   [i]  $voraus Commit(s) gehen raus:"
+    git --no-pager log --oneline "origin/$ZWEIG..HEAD"
 }
 
-$lokal = git rev-parse --short HEAD
+$standLokal = git rev-parse --short HEAD
 PruefeExit "git rev-parse --short HEAD"
-$lokal = "$lokal".Trim()
+$standLokal = "$standLokal".Trim()
 
 # --- 5) Push ----------------------------------------------------------
 Write-Host ""
 Write-Host "-> push nach GitHub" -ForegroundColor Cyan
-git push origin $BRANCH
+git push origin $ZWEIG
 PruefeExit "git push"
 
 # --- 6) Pull auf dem Server ------------------------------------------
 Write-Host ""
 Write-Host "-> pull auf Staging" -ForegroundColor Cyan
 
-# Erste Zeile ABSICHTLICH ein Kommentar - Begruendung: Punkt 1 im Kopf.
-$remote = @'
+# $fernSkript, NICHT $remote/$REMOTE - siehe Kopf. Erste Zeile
+# ABSICHTLICH ein Kommentar, Begruendung: Punkt 1 im Kopf.
+$fernSkript = @'
 # dp-deploy-staging - erzeugt von tools/deploy-staging.ps1, nicht von Hand aendern
 set -e
 cd /opt/dealpilot
@@ -172,22 +207,19 @@ echo "   AUSGEROLLT: $(git rev-parse --short HEAD)"
 
 # NICHT durch die PowerShell-Pipe - siehe Punkt 1 im Kopf.
 # WriteAllText mit UTF8Encoding($false) schreibt die Bytes ohne BOM.
-# Das -replace raeumt CR weg, falls die Datei je auf CRLF umgestellt wird:
-# bash stolpert sonst ueber ein "then\r".
-$tmp  = Join-Path $env:TEMP "dp-deploy-staging.sh"
-$utf8 = New-Object System.Text.UTF8Encoding($false)
-[System.IO.File]::WriteAllText($tmp, ($remote -replace "`r", ""), $utf8)
+# Das -replace raeumt CR weg: seit die Datei im Repo liegt, checkt git sie
+# mit CRLF aus, und bash stolpert ueber ein "then\r".
+$tmpPfad = Join-Path $env:TEMP "dp-deploy-staging.sh"
+$utf8    = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($tmpPfad, ($fernSkript -replace "`r", ""), $utf8)
 
-scp -q $tmp "${SERVER}:$FERN"
+scp -q $tmpPfad "${SERVER}:$FERNPFAD"
 PruefeExit "scp des Remote-Skripts"
 
 # Out-Host, NICHT bloss "ssh ...": ein nackter Aufruf schreibt in den
-# Erfolgs-Stream. Beim ersten Lauf von v3 hat Schritt 7 dadurch die
-# Ausgabe DIESES Aufrufs mitgelesen und verglich
-#   "Server-Zweig: staging Already up to date. AUSGEROLLT: 38d819d 38d819d"
-# mit "38d819d" - ein Fehlalarm bei einem Rollout, der sauber durchlief.
-# Alles, was nur angezeigt werden soll, geht deshalb direkt an den Host.
-ssh $SERVER "bash $FERN" | Out-Host
+# Erfolgs-Stream, und Schritt 7 las diese Ausgabe mit. Alles, was nur
+# angezeigt werden soll, geht deshalb direkt an den Host.
+ssh $SERVER "bash $FERNPFAD" | Out-Host
 PruefeExit "Ausrollen auf dem Server"
 
 # --- 7) BEWEIS statt Behauptung --------------------------------------
@@ -197,13 +229,13 @@ PruefeExit "Ausrollen auf dem Server"
 #     Select-Object -Last 1: der Rueckgabewert ist die LETZTE Zeile. Ein
 #     Login-Banner, eine motd oder eine Warnung des ssh-Clients wuerden
 #     sonst mit im Vergleich landen.
-$fern = ssh $SERVER "cd $REMOTE && git rev-parse --short HEAD" | Select-Object -Last 1
+$standFern = ssh $SERVER "cd $REPOPFAD && git rev-parse --short HEAD" | Select-Object -Last 1
 PruefeExit "Serverstand lesen"
-$fern = "$fern".Trim()
-if ($fern -ne $lokal) {
-    Fail "Serverstand ist '$fern', lokal steht '$lokal'. Der Server hat NICHT uebernommen."
+$standFern = "$standFern".Trim()
+if ($standFern -ne $standLokal) {
+    Fail "Serverstand ist '$standFern', lokal steht '$standLokal'. Der Server hat NICHT uebernommen."
 }
-Write-Host "   [ok] Serverstand geprueft: $fern == lokal $lokal" -ForegroundColor Green
+Write-Host "   [ok] Serverstand geprueft: $standFern == lokal $standLokal" -ForegroundColor Green
 
 Write-Host ""
 Write-Host "Fertig. Im Browser Strg+Shift+R." -ForegroundColor Green
