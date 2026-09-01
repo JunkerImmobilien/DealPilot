@@ -688,10 +688,15 @@ label.dp-required.qc-required::after {
       </button>
 
       <div class="sb-act-section-title">Analyse</div>
-      <!-- Kerosin steht am Eintrag, weil hier welches anfaellt. Die Staffel
-           kommt aus backend/src/routes/marktbericht.js:34
-           (COST = { fast: 2, full: 5, wertermittlung: 12 }) — deshalb "ab 2 L"
-           und keine feste Zahl. -->
+      <!-- v1195b · HIER STAND EIN KOMMENTAR, DER DEM CODE WIDERSPRACH.
+           Woertlich: „Kerosin steht am Eintrag, weil hier welches
+           anfaellt … deshalb 'ab 2 L'." Im Praesens — und direkt darunter
+           erklaert v1136e, dass genau dieser Hinweis ENTFERNT wurde. Zwei
+           Kommentare, zwei Wahrheiten, drei Zeilen auseinander.
+           Der zitierte Tarif (COST = {fast:2, full:5, wertermittlung:12})
+           ist ausserdem seit v1183 abgeschafft. Ein Kommentar, der einen
+           abgeschafften Preis im Praesens nennt, ist eine Einladung, ihn
+           wieder einzubauen. -->
       <button class="sb-act-item" type="button" onclick="sbActionsAction('marktbericht')">
         <span class="sb-act-ico" data-icon="market"></span><span class="sb-act-l">Marktbericht</span><!-- v1136e-aktionen · Der Kerosin-Hinweis "ab 2 L" ist hier weg. Er
      gehoert an den Erzeugen-Knopf, wo auch entschieden wird, WELCHE
