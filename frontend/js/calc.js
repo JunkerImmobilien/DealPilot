@@ -104,6 +104,12 @@ function updHeaderBadges() {
   function _setHdrEmpty(empty) {
     if (empty) document.body.classList.add('hdr-no-score');
     else document.body.classList.remove('hdr-no-score');
+    /* v1190: EINE Stelle statt fuenf. `box.innerHTML = ''` steht an fuenf
+       Stellen (leeres Objekt, Banner-Modus, Rechenfehler …), und jede
+       haette die Kurzfassung einzeln loeschen muessen. Sie alle laufen
+       hier durch — bleibt die Zahl stehen, zeigt der Kopf den Score des
+       VORIGEN Objekts. */
+    if (empty && typeof _clearHdrScoreMini === 'function') _clearHdrScoreMini();
     // V64.0: Pure-Obsidian Score-Header — Klasse aufs Header-Element setzen.
     // V64.9: Marcel will dass der Header IMMER im Pure-Obsidian-Look ist, auch
     // bei "Neues Objekt" (= empty). Daher: Klasse einmal setzen, nicht mehr entfernen.
@@ -356,6 +362,17 @@ function updHeaderBadges() {
 
   box.innerHTML = html;
   _setHdrEmpty(false);
+  /* v1190: Kurzfassung fuer die eingeklappte Kopfleiste. Sie steht in
+     row1, die auch eingeklappt sichtbar bleibt — GEMESSEN am 01.09.2026:
+     ausgeklappt 347 px, eingeklappt 97 px, und im eingeklappten Zustand
+     fehlte bis hierher als Einziges der Score. Marcels Vorgabe war „der
+     Score bleibt auf dem Tablet"; er bleibt, nur klein.
+
+     Zahl und Wort kommen aus DENSELBEN Variablen wie die grosse Karte
+     darueber — nicht neu berechnet und nicht aus dem DOM zurueckgelesen.
+     Zwei Wege zu derselben Zahl waeren die siebte Ausgabe von „zwei
+     Listen fuer dieselbe Sache". */
+  if (typeof _setHdrScoreMini === 'function') _setHdrScoreMini(score, verdict, tier);
   // V63.4: Header-Höhe nachmessen damit Tabs richtig anschließen
   _updateHdrHeight();
   // V63.4: Toggle-Button-Sichtbarkeit aktualisieren
@@ -3828,6 +3845,51 @@ function dpUpdateAll() {
 window._dpComputeDS2Cached = _dpComputeDS2Cached;
 window.dpUpdateAll = dpUpdateAll;
 
+/* ═══ v1190 · Die Kurzfassung des Scores ════════════════════════════════
+   Sitzt in `hdr-v61-row1` und ist nur sichtbar, wenn die Leiste
+   eingeklappt ist (CSS: `body.hdr-collapsed #hdr-score-mini`). Damit
+   zeigt der Kopf in beiden Zustaenden denselben Befund — einmal gross
+   mit Donut, KI-Rat und fuenf Kacheln, einmal als „83 · Gut".
+
+   Das Element wird beim ersten Bedarf angelegt und danach nur noch
+   gefuellt. Es traegt die Tier-Klasse der grossen Karte, damit Gruen,
+   Gold und Rot ohne zweite Farbtabelle stimmen. */
+function _setHdrScoreMini(score, verdict, tier) {
+  var row = document.querySelector('.hdr-v61-row1');
+  if (!row) return;
+  var el = document.getElementById('hdr-score-mini');
+  if (!el) {
+    el = document.createElement('span');
+    el.id = 'hdr-score-mini';
+    el.className = 'hdr-score-mini';
+    /* Vor den Spacer, damit die Kurzfassung links bei der Adresse steht
+       und nicht rechts zwischen den Werkzeugknoepfen landet. */
+    var spacer = row.querySelector('.hdr-spacer');
+    if (spacer) row.insertBefore(el, spacer); else row.appendChild(el);
+    /* Ein Klick klappt wieder auf — wer die Zahl sieht, will meist die
+       Begruendung dazu. */
+    el.addEventListener('click', function () {
+      if (typeof toggleHdrScore === 'function') toggleHdrScore();
+    });
+  }
+  var s = parseInt(score, 10);
+  if (!Number.isFinite(s)) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  el.className = 'hdr-score-mini hdr-score-mini-' + (tier || 'gold');
+  el.title = 'Investor Deal Score ' + s + ' — klicken zum Aufklappen';
+  el.innerHTML = '<b>' + s + '</b><span>' + (verdict || '') + '</span>';
+}
+window._setHdrScoreMini = _setHdrScoreMini;
+
+/* v1190: Wenn kein Score da ist (Banner-Modus, leeres Objekt), darf auch
+   die Kurzfassung nicht stehenbleiben — sonst zeigt sie die Zahl des
+   vorigen Objekts. */
+function _clearHdrScoreMini() {
+  var el = document.getElementById('hdr-score-mini');
+  if (el) el.style.display = 'none';
+}
+window._clearHdrScoreMini = _clearHdrScoreMini;
+
 // ═══════════════════════════════════════════════════════════════
 // V63.4: Toggle für Investor Deal Score im Header (minimierbar)
 // ═══════════════════════════════════════════════════════════════
@@ -3848,6 +3910,32 @@ document.addEventListener('DOMContentLoaded', function() {
       var saved = localStorage.getItem('dp_hdr_collapsed');
       // V63.22: Default-State = EXPANDED (User-Wunsch). Nur collapse wenn explizit '1' im Storage.
       var shouldCollapse = (saved === '1');
+
+      /* ── v1190 · Auf dem Tablet eingeklappt starten ────────────────────
+         GEMESSEN am 01.09.2026 in der Messkabine, mit einem Objekt ueber
+         der 70-%-Schwelle (bis dahin war immer eines darunter gemessen
+         worden, deshalb stand im Backlog eine zu kleine Zahl):
+
+           820 px  ausgeklappt 347 px  = 39 % eines 900-px-Schirms
+           820 px  eingeklappt  97 px  = 11 %
+
+         Vier von zehn Zeilen Bildschirm fuer den Kopf, bevor der Nutzer
+         die erste Zahl seines Objekts sieht. Eingeklappt bleibt alles
+         Wichtige stehen — Nummer, Adresse, Vollstaendigkeit, Kontingent —
+         und seit v1190 auch der Score als Kurzfassung.
+
+         NUR WENN DER NUTZER NOCH NIE GEWAEHLT HAT. `saved === null` heisst
+         „unberuehrt"; wer die Leiste je auf- oder zugeklappt hat, behaelt
+         seine Wahl auf jedem Geraet. Eine Voreinstellung, die eine
+         getroffene Entscheidung ueberschreibt, ist keine Voreinstellung
+         mehr, sondern eine Bevormundung.
+
+         1024 px ist dieselbe Grenze, an der die Sidebar andockt
+         (`style.css:35783`) — keine zweite Schwelle erfinden. */
+      if (saved === null && window.innerWidth <= 1024) {
+        shouldCollapse = true;
+      }
+
       if (shouldCollapse) {
         document.body.classList.add('hdr-collapsed');
       } else {

@@ -37045,3 +37045,67 @@ html body.dp-tabtext-an header.hdr.has-v64-score + nav.tabs .tab.active {
   color: var(--dp-tab-text, var(--gold, #C9A84C)) !important;
 }
 /* ===== v1155-TABTEXT END ===== */
+
+/* ===== v1190-SCORE-MINI START =====================================
+   Die Kurzfassung des Investor Deal Score in der eingeklappten
+   Kopfleiste. Gebaut wird sie in calc.js (_setHdrScoreMini), sichtbar
+   ist sie ausschliesslich hier.
+
+   WARUM AM DATEIENDE: `body.hdr-collapsed` trifft in dieser Datei
+   30 Regeln, die aeltere davon ab Zeile 15337. Bei gleicher Spezifitaet
+   gewinnt die spaetere — und diese Regeln sollen gewinnen, ohne dass
+   irgendwo `!important` noetig wird.
+
+   Ausgeklappt bleibt sie aus: dann steht der Score gross darunter, mit
+   Donut und KI-Rat. Zweimal dieselbe Zahl uebereinander waere genau die
+   Doppelanzeige, die v1183 an den Nachkauf-Kacheln gekostet hat. */
+.hdr-score-mini {
+  display: none;
+}
+body.hdr-collapsed .hdr-score-mini {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-left: 10px;
+  padding: 3px 10px 4px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .10);
+  transition: background .15s, border-color .15s;
+}
+body.hdr-collapsed .hdr-score-mini:hover {
+  background: rgba(255, 255, 255, .09);
+}
+body.hdr-collapsed .hdr-score-mini b {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+body.hdr-collapsed .hdr-score-mini span {
+  font-size: 10.5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .82;
+}
+
+/* Die drei Stufen tragen dieselben Farben wie die grosse Karte. Gruen und
+   Rot sind Statusfarben und bleiben in jeder Marke gleich (CLAUDE.md);
+   Gold laeuft ueber das Whitelabel-Token, damit ein Mandant nicht
+   ploetzlich fremdes Gold im Kopf hat. */
+body.hdr-collapsed .hdr-score-mini-green b { color: #5ed992; }
+body.hdr-collapsed .hdr-score-mini-green    { border-color: rgba(63, 165, 108, .40); }
+body.hdr-collapsed .hdr-score-mini-gold  b { color: var(--wl-E8C964, #E8C964); }
+body.hdr-collapsed .hdr-score-mini-gold     { border-color: rgba(201, 168, 76, .40); }
+body.hdr-collapsed .hdr-score-mini-red   b { color: #e8a09a; }
+body.hdr-collapsed .hdr-score-mini-red      { border-color: rgba(184, 98, 92, .40); }
+
+/* Am Handy ist row1 ohnehin eng — dort traegt die Zeile schon Nummer,
+   Adresse und Kontingent. Die Kurzfassung faellt weg, statt die Adresse
+   zu verdraengen. */
+@media (max-width: 560px) {
+  body.hdr-collapsed .hdr-score-mini { display: none; }
+}
+/* ===== v1190-SCORE-MINI END ===== */
