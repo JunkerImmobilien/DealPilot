@@ -27,7 +27,31 @@
   'use strict';
   if (window.DealPilotMbStufen) return;
 
-  var VOLLPREIS = { 1: 2, 2: 5, 3: 12 };
+  /* ── v1193 · Die Waehrung ist weg, die Stufen sind geblieben ────────────
+     v1183 hat Kerosin abgeschafft: gezaehlt wird je Leistungsart, eine
+     Bewertung je Stufe.
+
+     `var VOLLPREIS = { 1: 2, 2: 5, 3: 12 }` STAND HIER und ist entfernt.
+     Es waren die Kerosin-Literpreise, und nach dem Umbau las sie niemand
+     mehr — gegengeprueft mit `grep -rn VOLLPREIS frontend/ backend/`:
+     genau ein Treffer, diese Zeile. Eine tote Preistabelle ist keine
+     harmlose Leiche: der naechste Leser haelt sie fuer die Wahrheit.
+
+     ART_KURZ und ART_NAME sind KEINE zweite Liste, sondern die Uebersetzung der
+     Artschluessel, die der Server schickt. Dieselben Woerter stehen in
+     `frontend/js/ai-credits.js:32` — dort fuellt `kurz` die Kontingent-Box
+     des Nutzers. Deshalb steht in der Ampel das Kuerzel und nicht der
+     ausgeschriebene Name: der Name steht in derselben Zeile schon links,
+     und das Kuerzel zeigt auf genau den Zaehler, den der Nutzer in seiner
+     Box wiederfindet. Am Knopf, wo links kein Name steht, wird
+     ausgeschrieben — Wort fuer Wort wie im Bestaetigungsdialog (v1187). */
+  var ART_JE_STUFE = { 1: 'mpi', 2: 'mpi_plus', 3: 'wev' };
+  var ART_KURZ = { mpi: 'MPI', mpi_plus: 'MPI+', wev: 'WEV' };
+  var ART_NAME = {
+    mpi:      'Marktpreisindikation',
+    mpi_plus: 'Erweiterte Marktpreisindikation',
+    wev:      'Wertermittlung nach ImmoWertV'
+  };
   /* ── v1177 · Die Namen, die auch auf der Preisseite stehen ──────────────
      Marcels Korrektur vom 30.08.: die erste Stufe IST schon eine
      Marktpreisindikation — „Einschätzung" sagte nichts und verschenkte den
@@ -51,7 +75,8 @@
      gepflegte Liste derselben Pflichtangaben — und lief prompt auseinander.
      Was fehlt, sagt jetzt fehlend() aus BEDARF, also aus einer Quelle. */
 
-  var _faellig = null;      /* vom Server, je Stufe */
+  var _faellig = null;      /* vom Server, je Stufe — ALTES Liter-Feld, v1193 nur noch Beifang */
+  var _kosten = null;       /* v1193 · vom Server: { 1..3: {anzahl, art} } */
   var _bezahlt = 0;
   var _letzte = 0;
   /* ── v1126c · Das Henne-Ei-Problem, im Durchgang gefunden ───────────────
@@ -152,15 +177,42 @@
     return fetch(url, { headers: tok ? { Authorization: 'Bearer ' + tok } : {} })
       .then(function (x) { return x.json(); })
       .then(function (d) {
-        if (d && d.faellig) { _faellig = d.faellig; _bezahlt = parseInt(d.bezahlte_stufe, 10) || 0; }
+        if (d && d.kosten) { _kosten = d.kosten; }              /* v1193 */
+        if (d && d.faellig) { _faellig = d.faellig; }
+        if (d) { _bezahlt = parseInt(d.bezahlte_stufe, 10) || 0; }
         zeichnen();
       })
-      .catch(function () { _faellig = null; zeichnen(); });
+      .catch(function () { _kosten = null; _faellig = null; zeichnen(); });
   }
 
-  function preisFuer(s) {
-    if (_faellig && _faellig[s] != null) return parseInt(_faellig[s], 10);
-    return VOLLPREIS[s];
+  /* ── v1193 · Was die Stufe WIRKLICH kostet ──────────────────────────────
+     Der Server liefert seit v1183 das Feld `kosten` — je Stufe entweder
+     nichts oder genau EINE Bewertung der zugehoerigen Art. Ueber `faellig`
+     kamen bis hierher noch Kerosin-Liter; die Datei war, wie der Server es
+     in `routes/marktbericht.js:277` nennt, „der letzte alte Aufrufer".
+
+     Faellt `kosten` aus (alter Server, Netzfehler), wird der VOLLE Preis
+     angekuendigt — dieselbe Regel wie bisher: lieber zu viel ankuendigen
+     als eine Ermaessigung versprechen, die es nicht gibt. */
+  function kostenFuer(s) {
+    if (_kosten && _kosten[s]) {
+      var k = _kosten[s];
+      return { anzahl: parseInt(k.anzahl, 10) || 0, art: k.art || ART_JE_STUFE[s] };
+    }
+    return { anzahl: 1, art: ART_JE_STUFE[s] };
+  }
+
+  /* Kurzform fuer die Ampel (der Name steht links daneben) und Langform
+     fuer den Knopf, wo links nichts steht. Dieselben Woerter wie im
+     Bestaetigungsdialog aus v1187 — der Nutzer soll an beiden Stellen
+     dasselbe lesen. */
+  function preisText(k) {
+    if (!k || k.anzahl === 0) return 'bezahlt';
+    return k.anzahl + ' × ' + (ART_KURZ[k.art] || k.art);
+  }
+  function preisTextLang(k) {
+    if (!k || k.anzahl === 0) return 'ohne Aufpreis';
+    return k.anzahl + ' ' + (ART_NAME[k.art] || k.art);
   }
 
   /* ── Die Leiste ────────────────────────────────────────────────────────── */
@@ -214,7 +266,7 @@
 
     var ms = [1, 2, 3].map(function (n) {
       var an = s >= n;
-      var p = preisFuer(n);
+      var k = kostenFuer(n);
       var g = offenGeteilt(n);
       /* v1139-VORRAT: zwei getrennte Zeilen — Rot nur fuer echtes Fehlen. */
       var unten = '';
@@ -229,7 +281,7 @@
         '<div class="mbst-pkt">' + (an ? '✓' : n) + '</div>' +
         '<div class="mbst-txt">' +
           '<div class="mbst-zeile"><span class="mbst-name">' + NAMEN[n] + '</span>' +
-            '<span class="mbst-kero">' + (p === 0 ? 'bezahlt' : p + ' L') + '</span></div>' +
+            '<span class="mbst-kero">' + preisText(k) + '</span></div>' +
           unten +
         '</div></div>';
     }).join('');
@@ -238,9 +290,16 @@
     if (s === 0) info = '<b>Noch nichts erreicht.</b> Die Angaben oben füllen — die Stufe ergibt sich daraus.';
     else if (s < 3) info = '<b>' + NAMEN[s] + '</b> ist erreicht. Eine Zeile tiefer klicken blendet die nächsten Angaben ein.';
     else info = '<b>Wertermittlung erreicht</b> — alle drei Verfahren rechnen mit echten Parametern.';
+    /* v1193 · Das Differenz-Versprechen ist RAUS, und zwar aus demselben
+       Grund wie in v1187 aus dem Bestaetigungsdialog: der Server loest es
+       nicht mehr ein. `_faelligeStufe()` (routes/marktbericht.js:100)
+       gibt seit v1183 entweder 0 zurueck — diese Tiefe ist bezahlt — oder
+       die VOLLE Stufe. Wer von 1 auf 3 vertieft, zahlt eine ganze
+       Wertermittlung, keine Differenz. Ein Preisversprechen, das der
+       Server nicht haelt, ist teurer als gar keins. */
     if (_bezahlt > 0) {
       info += '<br>Für dieses Objekt ist <b>' + NAMEN[_bezahlt] + '</b> bereits bezahlt — ' +
-              'eine höhere Stufe kostet nur die Differenz.';
+              'diese Tiefe kostet dich nichts mehr. Eine höhere Stufe wird voll berechnet.';
     }
 
     wo.innerHTML =
@@ -261,9 +320,8 @@
        waere der Preis nie zu sehen. Ueberschrieben werden darf nur der
        LAUFENDE Abruf: app.js setzt dort ein <span class="spin"> hinein. */
     if (b.querySelector('.spin')) return;
-    var p = s >= 1 ? preisFuer(s) : null;
     b.textContent = s >= 1
-      ? ('Marktbericht erstellen · ' + (p === 0 ? 'ohne Aufpreis' : p + ' L'))
+      ? ('Marktbericht erstellen · ' + preisTextLang(kostenFuer(s)))
       : 'Marktbericht erstellen';
   }
 
@@ -318,6 +376,6 @@
 
   window.DealPilotMbStufen = {
     erreicht: erreicht, zeichnen: zeichnen, preisHolen: preisHolen,
-    _stand: function () { return { erreicht: erreicht(), bezahlt: _bezahlt, faellig: _faellig }; }
+    _stand: function () { return { erreicht: erreicht(), bezahlt: _bezahlt, kosten: _kosten, faellig: _faellig }; }
   };
 })();
