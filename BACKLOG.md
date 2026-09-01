@@ -36,13 +36,39 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 01.09.2026, abends)
+## → HIER WEITERMACHEN (Übergabe 01.09.2026, nach v1194)
 
-**Stand:** lokal = GitHub = Staging auf `229d9b7`.
+**Stand:** lokal = GitHub = Staging auf `954a669`.
 **Produktion steht auf `28f8ab1`** — alles aus dieser Sitzung
-(`v1191`–`v1193`) ist **nur auf Staging**, nichts davon ist ausgerollt.
-Keine neue Migration, kein Backend-Rebuild nötig: alle drei Pakete sind
-reines Frontend (CSS und eine JS-Datei).
+(`v1191`–`v1194b`) ist **nur auf Staging**, nichts davon ist ausgerollt.
+Keine neue Migration, kein Backend-Rebuild nötig: alle Pakete sind reines
+Frontend.
+
+> ### ⚠ PRODUKTION TRÄGT EINEN GELDDEFEKT — das ist der wichtigste Satz hier
+>
+> `v1194` hat gefunden, dass **`credits-modal.js` den Kaufweg kapert**:
+> die Datei setzt am Ende `window._buyCreditPack` und wird in
+> `index.html` **nach** `js/settings.js` geladen (3252 vs. 3151). Bei
+> gleichem Namen gewinnt der spätere Setzer. Damit führte jedes
+> **„Dazubuchen"/„Kaufen"** in Einstellungen → Plan in den alten
+> **Kerosin-Laden** (10/28/90/160 Liter zu 2/5/15/25 €) statt zu Stripe.
+>
+> **Das Backend kennt die `kerosin_*`-SKUs weiterhin**, und
+> `creditPackWebhook.js` bucht sie auf `bonus_credits` — die Spalte, die
+> `aiCreditsService` seit `v1183` nicht mehr liest. **Geld rein, nichts
+> raus.**
+>
+> **Auf Staging behoben und nachgemessen. Auf Produktion nicht.**
+> `credits-modal.js` ist dort unverändert. Der Rollout braucht Marcels
+> Freigabe — er ist reines Frontend, also `git pull` und fertig, kein
+> Rebuild.
+>
+> **Wen es trifft:** die Paketkacheln baut `_renderPlanPane` nur für
+> Pläne, die keinen frühen Rückweg nehmen — bei einem bezahlten Konto
+> (Partner) stand nur „Bewertungen nachkaufen", das über
+> `openPricingModal` läuft und **nicht** betroffen war. Vor dem
+> Prod-Rollout einmal mit einem Free-/Starter-Konto gegenprüfen, wie oft
+> der gekaperte Knopf überhaupt erschien.
 
 ### Was in dieser Sitzung passiert ist
 
@@ -51,9 +77,8 @@ reines Frontend (CSS und eine JS-Datei).
 | `v1191` `8902e87` | Der Löschknopf fraß den Aufklapp-Pfeil der Objektkarte | Pfeil 22/22 px erreichbar, echter Klick klappt auf statt zu löschen |
 | `v1192` `8aa9857` | Der Score-Ring lag unter den Aktionsknöpfen (kompakt + wallet) | Ringmitte trifft in **allen vier** Kartenmodi die Score-Zahl |
 | `v1193` `cd68aa0` | Die Marktbericht-Ampel rechnete noch in Kerosin | kein `\d+ L` mehr im Seitentext, Knopf zeigt „· 1 Marktpreisindikation" |
-
-**Zwei Backlog-Punkte sind dabei zugegangen** (Tablet-Fassung war schon
-vorher zu): aus 1–11 wurde erst 1–10, dann **1–8**.
+| `v1194` `b026689` | **Die abgeschaffte Währung stand noch auf dem Geldweg** — 6 Dateien | siehe Kasten oben und den Journal-Eintrag |
+| `v1194b` `954a669` | Der iframe-Cache-Buster hätte den Marktbericht-Teil verschluckt | `wertermittlung.js?v=1194` kommt im Browser an |
 
 **Marcels Entscheidungen in dieser Sitzung:**
 - „**a ja, b nein**" — Score-Ring freistellen, 44-px-Fläche für den Pfeil
@@ -67,36 +92,50 @@ Meilenstein-Ampel trägt, der Knopf wandert mit der erreichten Stufe mit.
 Am Testobjekt Hüllhorst durchgespielt. Der Ist-Zustand steht als Kasten
 oben im Punkt.
 
-**Wo genau weitergemacht wird:** den Wizard-Ablauf **komplett** durchgehen
-— Übersicht → alle sieben Reiter → Ergebnis — und dabei nach weiteren
-Stellen suchen, die beim Preisumbau (`v1176`/`v1183`) stehengeblieben
-sind. `v1193` war so eine, gefunden nach zwei Minuten Hinsehen.
+**Was `v1194` daran erledigt hat:** die Preisumbau-Reste sind gesucht und
+gefunden — aber **nicht im Wizard-Ablauf**, sondern quer durch die App.
+Der eine Marktbericht-Fund (`wertermittlung.js`, `KEROSIN = {1:2,2:5,3:12}`)
+war nicht einmal sichtbar, weil `mb-stufen.zeichnen()` ihn überschreibt.
 
-> **Und das ist die Methode für den nächsten Durchgang:** `v1187` hat
-> Kerosin-Reste per `grep` nach dem **Wort** gesucht und diese Stelle
-> nicht gefunden, weil dort nur `p + ' L'` stand. **Eine Währung
-> versteckt sich in ihrer Einheit, nicht in ihrem Namen.** Die Oberfläche
-> aufmachen schlägt jedes grep.
+**Wo genau weitergemacht wird:** der Wizard-Ablauf ist **inhaltlich** noch
+nicht durchgegangen — Übersicht → alle sieben Reiter → Ergebnis. Bisher
+sind nur Ampel, Knopf und Stufenwahl gemessen.
 
-**Nicht vergessen — noch nie geprüft:** ein Marktbericht wurde in dieser
-Sitzung **nicht erzeugt**. Die Ampel und der Knopf sind gemessen, der
-**Abruf selbst** nicht: ob die Abbuchung die richtige Art zieht (`mpi` /
-`mpi_plus` / `wev`) und was bei leerem Kontingent passiert, steht offen.
-Das kostet Kontingent — auf Staging in der Sandbox unbedenklich, aber es
-gehört bewusst gemacht und protokolliert.
+**Nicht vergessen — noch nie geprüft:** ein Marktbericht wurde **nicht
+erzeugt**. Die Ampel und der Knopf sind gemessen, der **Abruf selbst**
+nicht: ob die Abbuchung die richtige Art zieht (`mpi` / `mpi_plus` /
+`wev`) und was bei leerem Kontingent passiert, steht offen. Das kostet
+Kontingent — auf Staging in der Sandbox unbedenklich, aber es gehört
+bewusst gemacht und protokolliert. **Das Konto steht auf MPI 48 · MPI+ 10
+· WEV 10 · Marktwert 0** (Plan „Partner", am 01.09. abgelesen), es ist
+also Kontingent da.
 
 ### Was sonst offen liegt und nicht vergessen werden darf
 
+- **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.**
+  `v1194` hat ausgelesen, dass `window._buyCreditPack` jetzt die
+  Stripe-Fassung aus `settings.js` ist, und dass ein unbekannter Schlüssel
+  am Türsteher hängenbleibt — **ohne Netzaufruf**. Eine echte
+  Stripe-Sitzung wurde nicht gestartet.
 - **Die Spracheingabe wartet auf einen echten Sprechlauf am Gerät**
   (`v1168`/`v1169`/`v1170`) — Marcel macht das, wenn es passt. Der Punkt
   steht unverändert unter „OFFENE ABNAHME".
 - **Eine echte Erinnerungsmail ist noch nie rausgegangen.** Die zwei
   Retention-Mails sind nur mit abgefangenem Versand geprüft. Das schließt
   nur ein Blick ins Postfach ab.
+- **`gold-audit.py` liefert auf Staging RC=1** — 463 harte Gold-Literale in
+  55 Dateien. **Das ist Bestand, nicht von `v1194`:** der Commit hat
+  **null** Farbliterale hinzugefügt und sechs entfernt. `CLAUDE.md` sagt
+  „RC=0 ist sauber" — das stimmt seit Längerem nicht mehr, und wer sich
+  darauf verlässt, hält jeden Rollout für blockiert oder ignoriert den
+  Prüfschritt ganz. **Entweder die 463 abarbeiten oder die Regel
+  präzisieren.**
 - **Das Deploy-Skript meldet weiterhin `bash: line 1: set: command not
-  found`** (BOM vor `set -e`). Der Pull läuft trotzdem — der Serverstand
-  wurde in dieser Sitzung jedes Mal per `ssh … git rev-parse` selbst
-  nachgeprüft. Das Skript ist nicht repariert worden.
+  found`** (BOM vor `set -e`) und **bricht zusätzlich an gits stderr ab** —
+  bei `v1194` ist der Push durchgelaufen, das Skript hat mit Exit 1
+  abgebrochen und **der Server-Pull fiel aus**. Von Hand nachgezogen und
+  per `ssh … git rev-parse` gegengeprüft. Das Skript ist nicht repariert
+  worden.
 
 ---
 
@@ -2170,6 +2209,80 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Die abgeschaffte Währung ist vom Geldweg — `v1194` / `v1194b`, 01.09.2026
+
+**Gesucht war etwas anderes.** Der Auftrag aus der Übergabe lautete, den
+Wizard-Ablauf des Marktberichts nach Resten des Preisumbaus
+(`v1176`/`v1183`) abzusuchen. Gefunden wurde ein Defekt, der **Geld
+kostet** und nichts mit dem Wizard zu tun hat.
+
+**`credits-modal.js` kaperte den Kaufweg.** Die Datei ist der
+Kerosin-Laden aus `v489`. Sie setzt am Ende `window._buyCreditPack` —
+dieselbe globale Funktion, die `js/settings.js:2109` setzt. In
+`index.html` steht `settings.js` auf 3151, `credits-modal.js` auf 3252,
+beide ohne `defer`. **Der spätere Setzer gewinnt.** Im laufenden Staging
+ausgelesen, nicht vermutet:
+
+```
+window._buyCreditPack  →  credits-modal.js (KEROSIN)
+```
+
+Damit landete jedes „Dazubuchen"/„Kaufen" aus Einstellungen → Plan im
+alten Laden mit den alten Preisen. **Die `v1184`-Reparatur lief auf diesem
+Weg nie** — sie war fertig, getestet und richtig, und kam trotzdem nie
+dran. Und das Backend kennt `kerosin_10…160` weiterhin;
+`creditPackWebhook.js` bucht sie auf `bonus_credits`, die Spalte, die
+`aiCreditsService` seit `v1183` nicht mehr liest. **Geld rein, nichts
+raus.**
+
+**Die Datei wurde ausgeräumt, nicht gelöscht** — `checkPurchaseSuccess()`
+ist der einzige Leser von `?credit_purchase=`, dem `success_url`-Parameter
+aus `routes/credits.js:213`. Ihr Text lautete bis hierher „✓ Kerosin
+erfolgreich getankt!".
+
+**Fünf weitere Stellen, alle mit falschem PREIS, nicht nur falschem Namen:**
+
+| Datei | stand da | Wahrheit |
+|---|---|---|
+| `js/object-actions.js` | „**20 L** Sprengnetter" (live gemessen) | `consumeAvm()` zieht **1 Marktwert-Abruf** |
+| `js/ui.js` | Knopf „Trend-Text erzeugen **1 L**" | kostet **nichts** (`logExtract`, `cost 0`) |
+| `js/bmf-modal.js` | „KI-Vorschlag **(1 Credit)**" nach jedem Lauf | kostet nichts, `ai.js` hat keinen 402 mehr |
+| `js/tooltip-content.js` | „kostet **2 Credits** / je **1 Credit**" | alle drei Analysen kostenlos |
+| `marktbericht-app/wertermittlung.js` | `KEROSIN = {1:2,2:5,3:12}` | zweite Preisquelle neben dem Server |
+
+Dazu ein kaputtes Escape in `js/ui.js`: **„Gerade nicht verf00fcgbar"** —
+dem `ü` fehlte der Backslash.
+
+**Der Befund zur Methode.** `v1187` suchte nach dem **Wort** „Kerosin",
+`v1193` nach `\d+ L` im **Seitentext**. Beide hätten den
+Marktradar-Hinweis verfehlt: dort steht `' L'` mit einem geschützten
+Leerzeichen — mein erstes `grep` nach `' L'` fand ihn auch nicht.
+**Und keine Textsuche der Welt hätte gefunden, dass zwei Dateien dieselbe
+globale Funktion belegen.** Das sieht man erst im laufenden System.
+
+> **Die allgemeine Regel, die dabei herausfiel:** wo zwei Dateien denselben
+> globalen Namen setzen, entscheidet die Ladereihenfolge in `index.html` —
+> und der Verlierer ist **lautlos** weg. Eine Reparatur kann vollständig,
+> getestet und richtig sein und trotzdem nie laufen. Wer eine Funktion
+> repariert, die `window.x = …` heißt, prüft **im Browser**, ob seine
+> Fassung die ist, die dort ankommt.
+
+**`v1194b`** zog den iframe-Cache-Buster nach (`js/marktbericht-view.js:91`
+stand auf 1193). Ohne ihn wäre der Marktbericht-Teil des Pakets im Repo
+richtig und im Browser nicht angekommen. **`v1193` hatte genau diese Kette
+schon dokumentiert** — ich bin trotzdem hineingelaufen und habe es erst
+beim Nachmessen bemerkt.
+
+**Nachgemessen auf Staging (`954a669`):** `window._buyCreditPack` ist die
+Stripe-Fassung · `CreditsModal.open` führt aufs Preis-Modal · Marktradar
+sagt „1 Marktwert-Abruf (Sprengnetter)", bei zwei Quellen beide ·
+Preis-Modal ohne `L`/Kerosin/Credits · Marktbericht mit
+`wertermittlung.js?v=1194`, Ampel `1 × MPI`, sieben Reiter · `node --check`
+auf allen sieben JS-Dateien.
+
+**Offen:** ein echter Kauf ist auf dem reparierten Weg nicht durchgelaufen,
+und **Produktion trägt den Defekt unverändert.**
 
 ### Die Objektkarte auf dem Handy — `v1191` / `v1192`, 01.09.2026
 

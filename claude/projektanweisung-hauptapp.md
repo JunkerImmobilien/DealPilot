@@ -4039,6 +4039,133 @@ Baujahr springt die Ampel auf Stufe 1 und der Knopf auf
 
 ---
 
+### v1194 / v1194b (01.09.2026, `b026689` + `954a669`) — die abgeschaffte Währung stand noch auf dem Geldweg
+
+**Der Auftrag war, den Wizard-Ablauf nach Preisumbau-Resten abzusuchen —
+gefunden wurde etwas anderes und Schwereres.** `v1187` hatte nach dem
+**Wort** „Kerosin" gesucht, `v1193` nach `\d+ L` im Seitentext. Diese
+Runde hat nach der **Einheit** gesucht und die Oberfläche aufgemacht.
+
+#### Der schwerwiegende Befund: `credits-modal.js` stand auf dem Kaufweg
+
+Die Datei ist der Kerosin-Laden aus `v489` — vier Pakete, 10/28/90/160
+Liter zu 2/5/15/25 €. `v1176` und `v1183` haben die Währung abgeschafft,
+**die Datei blieb geladen.** Und am Ende stand:
+
+```js
+window._buyCreditPack = function(packId) { CreditsModal.open(); … }
+```
+
+`js/settings.js:2109` setzt **dieselbe** globale Funktion. In `index.html`
+steht `settings.js` auf Zeile **3151**, `credits-modal.js` auf **3252** —
+beide ohne `defer`, also in Dokumentreihenfolge. **Bei gleichem Namen
+gewinnt der spätere Setzer.** Im laufenden Staging ausgelesen:
+
+```
+window._buyCreditPack  →  credits-modal.js (KEROSIN)
+```
+
+Damit führte jedes **„Dazubuchen"** und **„Kaufen"** in Einstellungen →
+Plan (`settings.js:1955` / `:1971`) nicht zu Stripe, sondern in den
+Kerosin-Laden. **Die Reparatur aus `v1184` („der Kauf kommt an") lief auf
+diesem Weg nie** — sie war da, sie kam nur nie dran. Der Nachkauf über das
+Preis-Modal war nicht betroffen: `_buyCreditPackDirect` trägt einen
+anderen Namen und wird von niemandem überschrieben.
+
+**Und der Laden hätte Geld genommen.** `creditPacks.js` kennt
+`kerosin_10…160` weiterhin, `creditPackWebhook.js` bucht sie auf
+`bonus_credits` — die Spalte, von der `aiCreditsService` seit `v1183`
+sagt: stillgelegt. `getStatus` und `consumeArt` lesen sie nicht mehr,
+`ai.js:120` nennt sie wörtlich „stillgelegt". **Geld rein, nichts raus.**
+
+**Die Datei ist ausgeräumt, nicht gelöscht.** `checkPurchaseSuccess()` ist
+der **einzige** Leser von `?credit_purchase=` — dem `success_url`-Parameter
+aus `routes/credits.js:213`. Wer die Datei löscht, nimmt jedem echten Kauf
+die Rückmeldung. Deren Text lautete bis hierher **„✓ Kerosin erfolgreich
+getankt!"** — der letzte Satz, den ein zahlender Kunde zu sehen bekam.
+
+#### Fünf weitere Stellen — alle mit falschem **Preis**, nicht nur falschem Namen
+
+| Datei | stand da | Wahrheit im Backend |
+|---|---|---|
+| `js/object-actions.js` | „**20 L** Sprengnetter" (live gemessen) | `consumeAvm()` zieht **1 Marktwert-Abruf**, `avm.js:236` sagt `required: 1`. Die 40/20 sind der alte Liter-Tarif aus `COST` |
+| `js/ui.js` | Knopf „Trend-Text erzeugen **1 L**" | `logExtract`, `cost 0, source 'free'` — kostet **nichts**. Die Zeile darüber sagte schon „im Plan enthalten" |
+| `js/bmf-modal.js` | Knopf nach jedem Lauf auf „KI-Vorschlag **(1 Credit)**" zurückgesetzt | `ai.js` hat seit `v1183` **keinen 402 mehr** — 7× der Kommentar „Frueher stand hier ein 402 gegen den Litertank". Die Vorlage in `bmf-modal-html.html:269` sagt nur „KI-Vorschlag" |
+| `js/tooltip-content.js` | „kostet **2 Credits** / je **1 Credit**" | alle drei genannten Analysen sind kostenlos. Der Schlüssel `tab7.ki_credits` wird von keinem Feld aufgerufen — die Angabe stand trotzdem im Haus |
+| `marktbericht-app/wertermittlung.js` | `var KEROSIN = {1:2, 2:5, 3:12}` | eine **zweite Preisquelle** neben dem Server |
+
+**Zu `voice`:** die Sprachauswertung ist aus dem Kosten-Hinweis ganz
+verschwunden. `ai.js:514` bucht sie über `logExtract` — „im Plan
+enthalten", `cost 0`. **Für etwas Kostenloses ein Preisschild zu zeigen
+ist derselbe Fehler wie eine abgeschaffte Währung, nur andersherum.**
+
+**Zu `wertermittlung.js`:** die Liste war nicht sichtbar —
+`mb-stufen.zeichnen()` ersetzt den Inhalt von `#wm-ziel` durch die
+Meilenstein-Ampel („Die alte Optionsliste weicht"). **Genau deshalb hat
+`v1193` dort kein `L` gefunden: die Stelle war nicht sichtbar, nur
+geladen.** Fällt `mb-stufen.js` aber aus, bleibt stehen, was dort steht.
+**Ein falscher Preis als Rückfallebene ist schlechter als gar keiner.**
+Der Preis steht jetzt nur noch an einer Stelle: in der Ampel.
+
+**Nebenbefund im selben Block:** `js/ui.js` zeigte
+**„Gerade nicht verf00fcgbar"** — dem `ü` fehlte der Backslash, der
+Nutzer las die Ziffern.
+
+#### `v1194b` — der Cache-Buster, der die Hälfte verschluckt hätte
+
+Beim Nachmessen gefunden, **bevor** der Marktbericht geöffnet wurde:
+`js/marktbericht-view.js:91` verdrahtet die iframe-URL der Marktbericht-App
+mit einer eigenen Versionsnummer, und die stand noch auf `1193`. `v1194`
+hat `marktbericht-app/index.html` geändert (`wertermittlung.js` 1177 →
+1194) — mit unverändertem `?v=1193` hätte der Browser das alte
+iframe-HTML aus dem Cache genommen und darin weiter
+`wertermittlung.js?v=1177` geladen. **Die Änderung wäre im Repo richtig
+gewesen und im Browser nicht angekommen.**
+
+> **Zwei Buster in einer Kette:** der äußere (`index.html` → `view.js`)
+> und der innere (`view.js` → iframe). **Beide müssen mit.**
+>
+> **Und das stand schon hier.** Der `v1193`-Eintrag eine Bildschirmseite
+> weiter oben sagt wörtlich: *„Vier Cache-Buster mussten mit, weil die App
+> im iframe läuft … die iframe-URL in `js/marktbericht-view.js:91` und
+> deren eigener Buster in `index.html:3223`."* **Ich bin trotzdem
+> hineingelaufen** und habe es erst beim Nachmessen bemerkt, nicht beim
+> Bauen. Ein Eintrag im Journal wirkt nur, wenn er vor dem Ausliefern
+> gelesen wird — bei einer Änderung an `marktbericht-app/` gehört diese
+> Kette auf die Prüfstrecke, nicht in die Erinnerung.
+
+#### Nachgemessen auf Staging (`954a669`, frisch geladen)
+
+| | Befund |
+|---|---|
+| `window._buyCreditPack` | `settings.js` (Stripe) ✔ — Aufruf mit unbekanntem Schlüssel erreicht den Türsteher „Credit-Pack nicht gefunden", **ohne Netzaufruf** |
+| `CreditsModal.open` | führt aufs Preis-Modal, baut keinen Laden mehr ✔ |
+| Marktradar, eine Quelle | „Beim **Abrufen** wird **1 Marktwert-Abruf** (Sprengnetter) aus deinem Kontingent verbraucht." |
+| Marktradar, zwei Quellen | „… **werden** 1 Marktwert-Abruf (Sprengnetter) **+** 1 Marktwert-Abruf (PriceHubble) …" |
+| Preis-Modal | kein `L`, kein „Kerosin", kein „Credits" — Knöpfe „Bewertungen kaufen" |
+| Marktbericht | `wertermittlung.js?v=1194`, Ampel `1 × MPI` / `1 × MPI+`, sieben Reiter, kein `L` |
+| Plan-Ansicht | MPI 48 · MPI+ 10 · WEV 10 · Marktwert 0 — sauber |
+| `node --check` | alle sieben geänderten JS-Dateien |
+
+#### Die Methode, die das gefunden hat
+
+`v1187` suchte nach „Kerosin", `v1193` nach `\d+ L` im Seitentext.
+**Beide hätten den Marktradar-Hinweis verfehlt:** dort steht
+`' L'`, ein geschütztes Leerzeichen — mein erstes `grep` nach `' L'`
+fand ihn auch nicht. Und **keine** Textsuche hätte gefunden, dass zwei
+Dateien dieselbe globale Funktion belegen. Das sieht man erst, wenn man
+`window._buyCreditPack` **im laufenden System ausliest.**
+
+> **Die Regel dahinter, allgemeiner als Kerosin:** wo zwei Dateien
+> denselben globalen Namen setzen, entscheidet die Ladereihenfolge in
+> `index.html`, und der Verlierer ist **lautlos** weg. Eine Reparatur kann
+> vollständig, getestet und richtig sein — und trotzdem nie laufen.
+
+**Was NICHT geprüft ist:** ob ein echter Kauf über den reparierten Weg
+ankommt. Der Weg ist ausgelesen, der Türsteher greift, aber es ist keine
+Stripe-Sitzung gestartet worden. **Und Produktion trägt denselben Defekt**
+— `credits-modal.js` ist dort unverändert.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
