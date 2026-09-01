@@ -903,15 +903,35 @@ entfällt — nicht raten.
       `.sc-main` neben die Pillen. Spart nur ~100 px und fasst die
       auffälligste Fläche der App an.
 
-   - **B — die Entscheidung steht noch aus**, aber nicht mehr blockiert:
-     weil es die auffälligste Fläche der App ist. **Neuer Befund dazu:** die
-     Score-Zeile erscheint überhaupt erst **ab 70 % Datenvollständigkeit**
-     (`js/calc.js:205` setzt sonst `body.hdr-banner-only` und zeigt einen
-     Hinweisbanner). Gemessen: `PRUEF_ZFH` liegt darunter → Kopfleiste
-     **157 px** statt der 348 px des Entwurfs, `.scores` und `.sc-main` sind
-     gar nicht im Layout. **Die 251 px des Entwurfs sind damit nicht
-     nachgemessen** — dafür braucht es ein Objekt über der 70-%-Schwelle.
-     Der Score bleibt auf dem Tablet (Marcels Vorgabe).
+   ### B ist gebaut — `v1190` / `v1190b`, Weg 2 (Marcels Entscheidung 01.09.)
+
+   | Fenster | vorher | jetzt beim Start |
+   |---|---|---|
+   | **820 px** | 347 px (39 %) | **97 px (11 %)** |
+   | 1024 px | 342 px | eingeklappt |
+   | 1400 px | 317 px | unverändert ausgeklappt |
+
+   **Gemessen in der Kabine, alle fünf Regeln:** startet eingeklappt bei
+   ≤ 1024 px · Kurzfassung „83 · Gut" in der Tier-Farbe (grün, `#5ed992`)
+   · Klick darauf klappt auf → 347 px, und die Kurzfassung verschwindet
+   (keine Doppelanzeige) · die getroffene Wahl überlebt das Neuladen ·
+   bei 1400 px bleibt es ausgeklappt.
+
+   > **Zwei eigene Fehler in diesem Paket, beide zurückgenommen:**
+   > 1. Der erste Wurf schrieb `border-color: rgba(201,168,76,.40)` — das
+   >    Marken-Gold als Zahlenwert, das sich beim Mandanten **nicht**
+   >    umfärbt. `style.css` hatte davon vorher **null** Treffer, ich habe
+   >    den ersten hineingebracht. Behoben mit `var(--gold)` (`v1190b`);
+   >    Grün und Rot bleiben als Statusfarben fest.
+   > 2. Ich meldete, der Gold-Audit sei „von RC=0 auf RC=1 gesprungen".
+   >    **Falsch gemessen:** `python3 … | tail -5; echo $?` liefert den
+   >    Rückgabewert von `tail`. **RC=1 ist der Normalzustand dieses
+   >    Repos** — der Audit zählt alle bekannten, nicht tokenisierten
+   >    Goldtöne, und davon stehen Hunderte in JS-Dateien. Er ist ein
+   >    Frühwarnsystem für neue Verstöße, kein Tor. Wer ihn als Tor
+   >    benutzt, muss `git show <alt>:datei | grep -c` gegenrechnen —
+   >    genau das hat den echten Befund geliefert.
+
    - **Admin-Oberfläche:** die verlangte Zahl ist erhoben —
      `admin/css/admin.css` hat **3 Media-Queries** (bei 900 px, 900 px und
      820 px), `admin/js/admin-network.js` eine vierte (1150 px), Viewport-Meta
