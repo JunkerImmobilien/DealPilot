@@ -1347,10 +1347,25 @@ html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-kp-row {
    v1082j hatte ihn bewusst nach links auf das Band geschoben. Marcel will
    ihn dort, wo er vorher war. Damit wird v1082j zurueckgenommen: dieselbe
    Lage wie im Standard, der Ring liegt dann rechts auf dem Band. */
+/* v1192: top 12 -> 34. Der Ring lag bei y14..54, die Aktionsknoepfe bei
+   y8..34 — die obere Ringhaelfte (20 von 40 px) gehoerte dem Loeschknopf.
+   Das ist der Befund aus Punkt 10 des Backlogs; `v1191` hat ihn halbiert
+   (die Knoepfe stehen nicht mehr auf 44 px), die obere Haelfte blieb.
+   Mit top:34 beginnt der Ring bei y36, direkt unter dem Band der
+   Aktionen: 40 von 40 px frei, Ringmitte -> `sbc-mini-score-num`.
+   Die Stufen-Pille wandert von y63..85 auf y85..107 und bleibt in der
+   255-px-Karte.
+
+   WARUM HIER NACH UNTEN UND IN "kompakt" NACH LINKS: nach links geht es
+   hier nicht. Der Ring muesste auf right:68 und laege dann bei l203..243
+   — das Datum in der Kopfzeile endet bei 214. Die Zeile hat
+   flex-wrap:wrap, das Datum wuerde also umbrechen und die Karte hoeher
+   machen. Nach unten ist in der 255-px-Karte Platz; in der 80-px-Karte
+   von "kompakt" ist er nicht. */
 html[data-ui-cards="wallet"] body aside.sidebar .sb-card > .sbc-score-overlay {
   left: auto !important;
   right: 12px !important;
-  top: 12px !important;
+  top: 34px !important;
   display: block !important;
   width: auto !important;
   text-align: center !important;
@@ -1455,7 +1470,13 @@ html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-address {
   font-size: 13.5px !important;
   font-weight: 700 !important;
   line-height: 1.25 !important;
-  padding-right: 84px !important;
+  /* v1192: 84 -> 94. Der Ring steht ab jetzt bei right:68px, also ab
+     Pixel 204 der Karte. Mit 84 endete der Adresstext bei 206 und lief
+     unter den Ring; 94 laesst 8 px Luft. Gemessen mit einer bewusst zu
+     langen Adresse (Friedrich-Wilhelm-Strasse 128a, 33602 Bielefeld-
+     Mitte): der Randpunkt trifft danach .sbc-address, nicht mehr das
+     Ring-SVG. Mehr als 94 kostet nur Text und bringt nichts. */
+  padding-right: 94px !important;
 }
 html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-top-line1 {
   gap: 6px !important;
@@ -1633,9 +1654,28 @@ html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-top-line1 {
 html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-kp-row { order: 3 !important; }
 html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-halter  { order: 4 !important; }
 
-/* Ring nach links ruecken, damit der Chevron rechts daneben Platz hat. */
+/* Ring nach links ruecken, damit der Chevron rechts daneben Platz hat.
+
+   v1192: 34 -> 68. Der Chevron war nicht das einzige, was dort Platz
+   braucht — die AKTIONSKNOEPFE stehen bei right:6px und sind 56 px breit,
+   sie belegen also die rechten 62 px. Mit right:34 lag der Ring bei
+   204..242 gemessen von rechts: 36..74 — mitten im Aktionsband. Gemessen
+   am 01.09. bei 390 px: die Ringmitte lieferte `sbc-btn`, wer den Score
+   antippte, DUPLIZIERTE das Objekt. Auf dem Bild klebte das Kopiersymbol
+   sichtbar auf dem Ring.
+   Mit right:68 steht der Ring bei l204..242, das Band beginnt bei 248 —
+   6 px Luft. Ringmitte -> `sbc-mini-score-num`, 38 von 38 px frei.
+   Die Stufen-Pille haengt am selben Overlay und wandert mit (l208..237,
+   y57..75) — sie bleibt in der 80-px-Karte.
+
+   NICHT nach unten geschoben, obwohl das die Adresse nicht gekostet
+   haette: gemessen mit top:34 steht der Ring zwar frei, aber die
+   Stufen-Pille rutscht dann auf y79..101 und TRITT AUS DER KARTE HERAUS
+   (Karte 80 px). Im Wallet-Modus ist die Karte 255 px hoch, dort ist
+   genau dieser Weg richtig — deshalb loesen die beiden Modi es
+   verschieden. */
 html[data-ui-cards="kompakt"] body aside.sidebar .sb-card > .sbc-score-overlay {
-  right: 34px !important;
+  right: 68px !important;
 }
 /* Der Chevron verlaesst die Textzeile und steht rechts aussen, senkrecht
    mittig — die Karte ist position:relative (das Score-Overlay haengt
