@@ -700,9 +700,15 @@ export const ReportOrchestrator = {
     }
 
     // 7) Deal-Score
+    /* v1197 · Die `?? 0` sind hier RAUS. Sie haben `null` in eine Zahl
+       verwandelt, bevor dealScore() ueberhaupt die Chance hatte, den
+       fehlenden Wert als fehlend zu behandeln — zwei Guertel um dieselbe
+       falsche Hose. Beim Preisabschlag war die 0 harmlos (dort ist sie der
+       neutrale Punkt der Formel), bei der Bruttorendite nicht: ein Objekt
+       ohne Kaufpreis bekam 0 von 100 statt „unbekannt". */
     const deal = ScoringService.dealScore({
-      discountPct: valuation.market_value?.discount_to_market_pct ?? 0,
-      grossYieldPct: valuation.yield?.gross_yield_pct ?? 0,
+      discountPct: valuation.market_value?.discount_to_market_pct ?? null,
+      grossYieldPct: valuation.yield?.gross_yield_pct ?? null,
       macroScore: macro.score,
       microScore: micro.score,
       rentTrendPct: insights && insights.series ? insights.series.rent_cagr_pct : null,

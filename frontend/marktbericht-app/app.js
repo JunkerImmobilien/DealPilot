@@ -927,6 +927,18 @@ function render(out) {
     mikrolage:'Mikrolage', mietentwicklung:'Mietentwicklung', risiko:'Risiko' };
   const mvv = (d.valuation && d.valuation.market_value) || {};
   const yld = (d.valuation && d.valuation.yield) || {};
+  /* v1197 · Der Untertitel der Mietentwicklung war fest verdrahtet.
+     Er lautete IMMER „mangels Miet-Zeitreihe konservativ angesetzt" — auch
+     dann, wenn eine Zeitreihe vorlag. Gemessen an einem echten Bericht:
+     der Balken stand auf 100/100, was nur mit einer echten Zeitreihe
+     zustande kommt, und daneben stand trotzdem „mangels Zeitreihe".
+     Alle anderen Eintraege dieser Liste sind bedingt; dieser war es nicht.
+
+     Jetzt kommt der Satz aus dem, was der Server ueber die Herkunft sagt:
+     `ds.geschaetzt` (seit v1197) listet die Teilwerte, fuer die keine Zahl
+     vorlag und ein neutraler Ersatz genommen wurde. Fehlt das Feld — alte
+     Berichte aus der Datenbank kennen es nicht — wird nichts behauptet. */
+  const geraten = Array.isArray(ds.geschaetzt) ? ds.geschaetzt : [];
   const subFor = {
     preisabschlag: mvv.discount_to_market_pct != null
       ? `Kaufpreis ${mvv.discount_to_market_pct >= 0 ? mvv.discount_to_market_pct + ' % unter' : Math.abs(mvv.discount_to_market_pct) + ' % über'} Marktwert`
@@ -934,9 +946,14 @@ function render(out) {
     bruttorendite: yld.gross_yield_pct != null ? `${yld.gross_yield_pct} % Rendite · Faktor ${yld.rent_multiplier ?? '–'}` : null,
     makrolage: (d.macro && d.macro.score != null) ? `Makro-Score ${d.macro.score}/100` : null,
     mikrolage: (d.micro && d.micro.score != null) ? `Mikro-Score ${d.micro.score}/100` : null,
-    mietentwicklung: 'mangels Miet-Zeitreihe konservativ angesetzt',
+    mietentwicklung: (d.insights && d.insights.series && d.insights.series.rent_cagr_pct != null)
+      ? `Miet-Zeitreihe: ${d.insights.series.rent_cagr_pct} % p. a.`
+      : null,
     risiko: mvv.confidence_pct != null ? `Datenkonfidenz ${mvv.confidence_pct} %` : 'Markt-/Mietausfallrisiko',
   };
+  /* Ein geratener Teilwert sagt das selbst — und ueberschreibt dabei jede
+     andere Erklaerung, denn „keine Daten" ist die wichtigere Auskunft. */
+  geraten.forEach(function (k) { subFor[k] = 'keine Daten — neutral angesetzt'; });
   $('scoreBars').innerHTML = Object.entries(ds.breakdown || {}).map(([k, v]) => {
     const col = _scoreCol(v);
     return `<div style="margin-bottom:13px;">
