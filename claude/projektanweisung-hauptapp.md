@@ -4245,6 +4245,121 @@ haben Vorrat (48 / 9 / 10), der `402`-Pfad
 auf Staging mit einem gezielten `UPDATE ai_credits_user` prüfen — das ist
 ein Datenbank-Eingriff und braucht eine eigene Freigabe.
 
+### v1196 / v1196b (01.09.2026, `59a87d2` + `005a084`) — zwei Wizard-Reiter waren leer und sahen aus wie ein Defekt
+
+**Der Wizard-Durchgang, den die Übergabe verlangt hat.** Alle sieben Reiter
+am Objekt „Hölderlinstr. 1" (erreichte Stufe 1) durchgeklickt und
+vermessen:
+
+| Reiter | Höhe | Felder |
+|---|---|---|
+| 1 Übersicht | 384 px | 2 |
+| 2 Objekt | 511 px | 9 |
+| 3 Zustand | 465 px | 7 |
+| 4 Ausstattung | 435 px | 8 |
+| 5 Gebäude & Außen | 466 px | 9 |
+| **6 Wertermittlung** | **18 px** | **0** |
+| **7 Zusatzwerte** | **18 px** | **0** |
+
+Sichtbar war in 6 und 7 nur die eigene Unterzeile des Reiters — bei 6
+wörtlich nur „Bodenwert, NHK, Feinjustierung". Kein Satz, warum dort
+nichts steht, kein Weg weiter.
+
+**Kaputt war nichts.** Die Felder gehören zu Stufe 3 und erscheinen,
+sobald man diese Tiefe ansteuert — die Ampel sagt es sogar: *„Eine Zeile
+tiefer klicken blendet die nächsten Angaben ein."* Nachgemessen: ein Klick
+auf die Ampel-Zeile 3 füllt Reiter 6 mit 15 und Reiter 7 mit 6 Feldern.
+
+> **Aber wer den Reiter direkt anklickt, sieht davon nichts.** Er sieht
+> eine leere Seite. **Eine richtige Mechanik, die aussieht wie ein Fehler,
+> ist ein Fehler.**
+
+**Jetzt steht in einem leeren Reiter**, zu welcher Stufe seine Angaben
+gehören, was dafür noch fehlt, und ein Knopf blendet sie ein:
+
+> **Diese Angaben gehören zu: Wertermittlung nach ImmoWertV.**
+> Sie erscheinen hier, sobald du diese Tiefe ansteuerst. Dafür fehlt noch:
+> Grundstücksfläche, Wohneinheiten, Miteigentumsanteil.
+> `[ Angaben einblenden ]`
+
+**Der Text kommt aus der Ampel, nicht aus einer zweiten Liste.**
+Stufenname und Fehlendes werden aus der gerenderten Ampel-Zeile gelesen
+(`.mbst-ms[data-mbst-ziel]`), der Knopf steuert genau diese Zeile an. Hier
+kann also nichts auseinanderlaufen — die Falle, die im Marktbericht schon
+sechsmal zugeschlagen hat. Ist die Ampel noch nicht da, erscheint **gar
+kein** Hinweis: lieber nichts sagen als etwas Erfundenes.
+
+#### `v1196b` — mein eigener Knopf klickte ein Element, das es nicht mehr gab
+
+**Beim Nachmessen von `v1196` gefunden, bevor es als fertig gemeldet
+wurde.** Der Knopf hielt die Ampel-Zeile fest, die beim **Bauen** des
+Hinweises gegriffen wurde, und rief später `zeile.click()`. Wirkung: null.
+Fehler: keiner. Meldung: keine.
+
+**Ursache:** `mb-stufen.zeichnen()` setzt bei **jedem** `melden()` das
+`innerHTML` von `#wm-ziel` neu. Die Zeile ist danach ein anderes Element,
+die alte Referenz hängt losgelöst im Speicher — und **ein losgelöster
+Knoten hat keinen Weg mehr zum `document`**, an dem der
+Meilenstein-Handler als delegierter Listener hängt (`mb-stufen.js:358`).
+Der Klick verpufft.
+
+**Beweis statt Vermutung, beides in einem Lauf gemessen:**
+
+| Messung | Ergebnis |
+|---|---|
+| Klick auf die **frisch gesuchte** Zeile | 0 → **12 Felder**, Hinweis räumt sich selbst ab |
+| `querySelector('.mbst-ms[data-mbst-ziel="3"]') === alteReferenz` | **„NEUES Element"** |
+
+Jetzt wird nur die **Stufenzahl** festgehalten und das Element im Moment
+des Klicks gesucht. Abgenommen über den echten Bedienweg: 0 → 12 Felder in
+Reiter 6, 6 Felder in Reiter 7, beide Hinweise weg, Höhe 18 → 1095 px.
+
+> **Dieselbe Fehlerklasse wie der Gelddefekt aus `v1194`, nur
+> andersherum:** dort gewann der spätere Setzer einer globalen Funktion,
+> hier verliert eine festgehaltene Referenz gegen ein neu gezeichnetes
+> DOM. **Beide Male sieht der Quelltext richtig aus, und beide Male
+> passiert im Browser nichts.** Gegen beides hilft nur dasselbe: den
+> fertigen Zustand im laufenden System auslesen, nicht den Quelltext
+> lesen.
+
+**Cache-Buster: diesmal alle drei der Kette gleich mit** — `mb-wizard.js`
+im iframe-HTML, die iframe-URL in `marktbericht-view.js:91` und deren
+eigener Buster in `index.html:3228`. Die Lektion aus `v1194b`, angewandt
+statt wiederholt.
+
+---
+
+### Der 402-Pfad bei leerem Kontingent — halb bewiesen, ehrlich getrennt
+
+**Der Datenbank-Eingriff, der den Fall vollständig beweisen würde, wurde
+von der Umgebung blockiert.** Deshalb steht hier getrennt, was gemessen
+ist und was nur gelesen:
+
+**Gelesen (Server):** `routes/marktbericht.js` prüft an **zwei** Stellen
+(Z. 320 und Z. 454) `k.rest < 1` und antwortet mit `402` und
+`{ error: _KEIN_KONTINGENT[art], needs_credits: true, art, required: 1 }`.
+Die Meldungen sind ausgeschrieben — *„Keine erweiterte
+Marktpreisindikation mehr frei."* — statt wie früher *„Nicht genug Kerosin
+im Tank"*.
+
+**Gemessen (Frontend):** `_zeigeKaufAngebot()` aus `v1187` wurde mit genau
+der Nutzlast aufgerufen, die der Server bei 402 schickt. Ergebnis auf dem
+Schirm:
+
+> ⚠ Keine erweiterte Marktpreisindikation mehr frei. · Dein
+> Monatskontingent für diese Bewertungsart ist aufgebraucht. Du kannst
+> genau diese eine nachkaufen — sie verfällt nicht. ·
+> **[ Eine erweiterte Marktpreisindikation kaufen · 1,90 € ]** ·
+> Günstiger im Paket: im Cockpit unter „Plan".
+
+**Der Preis kommt live aus `/credits/bewertungen`**, also aus Stripe —
+1,90 € = 190 Cent, und der Katalog führt neun SKUs (`mpi`, `mpi_plus`,
+`wev`, `avm_a`, `avm_b`, vier Pakete). **Keine zweite Preisliste im
+Quelltext.**
+
+**Was fehlt:** dass der Server den `402` unter echten Bedingungen auch
+wirklich schickt. Dafür müsste eine Art auf 0 gesetzt werden.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
