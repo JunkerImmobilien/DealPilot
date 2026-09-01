@@ -1640,10 +1640,16 @@ html[data-ui-cards="kompakt"] body aside.sidebar .sb-card > .sbc-score-overlay {
 /* Der Chevron verlaesst die Textzeile und steht rechts aussen, senkrecht
    mittig — die Karte ist position:relative (das Score-Overlay haengt
    bereits daran). */
+/* v1191: top 22 -> 26. Gemessen am 01.09. bei 390 px, Objekt "Am Markt 9":
+   die Aktionsknoepfe stehen 8..34 px unter der Kartenoberkante, der Pfeil
+   lag bei 32..54 — die obersten 2 px gingen an den Loeschknopf. Mit 26 px
+   beginnt er bei 36 und ist auf voller Hoehe erreichbar (22 von 22 px,
+   elementFromPoint jeden Pixel). Die Karte ist zugeklappt 82 px hoch, der
+   Pfeil endet bei 58 — er bleibt drin. */
 html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-arrow {
   position: absolute !important;
   right: 6px !important;
-  top: 22px !important;
+  top: 26px !important;
   margin-left: 0 !important;
   z-index: 4 !important;
 }

@@ -37115,3 +37115,67 @@ body.hdr-collapsed .hdr-score-mini-red      { border-color: rgba(184, 98, 92, .4
   body.hdr-collapsed .hdr-score-mini { display: none; }
 }
 /* ===== v1190-SCORE-MINI END ===== */
+
+/* ═══════════════════════════════════════════════════════════════════════
+   v1191 — Die 44-px-Trefferflaeche des Loeschknopfs frass den Chevron
+
+   BEFUND (01.09.2026, Messkabine auf /impressum.html, iframe 390 px,
+   Partner-Konto, Objekt "Am Markt 9, Kabelsketal", Kartenmodus kompakt
+   und stapel, elementFromPoint jeden 2. Pixel der Pfeilspalte):
+
+     .sbc-btn.sbc-del   gemessen 26 x 44 px, dazu ein unsichtbares
+                        ::after von 44 x 44 -> greift 8..52 px unter
+                        der Kartenoberkante
+     .sbc-arrow         22 x 22 px bei 32..54 (kompakt) bzw. 35..57 (stapel)
+     .sbc-actions       z-index 7, .sbc-arrow z-index 4
+
+   Ergebnis: die MITTE des Pfeils lieferte `sbc-btn sbc-del`. In kompakt
+   war genau EIN Rasterpunkt des Pfeils erreichbar, in stapel vier.
+   Wer den Aufklapp-Pfeil antippt, oeffnet die Loeschabfrage.
+
+   ZWEI URSACHEN, beide aus der 44-px-Kampagne (v650/v650c):
+     1. Z. 22663, @media (max-width:640px):
+        `button, .btn, .tab, input… { min-height: 44px !important }`
+        Das nackte `button` trifft auch die Kartenknoepfe. Und
+        min-height schlaegt height — die 26 px aus V101 (Z. 27189)
+        waren wirkungslos, `!important` hilft dagegen nicht, weil es
+        zwei verschiedene Eigenschaften sind.
+     2. Z. 36060: `.sbc-btn::after { width/height: max(100%, 44px) }`,
+        zentriert. Bei einem 26-px-Knopf ragt die unsichtbare Flaeche
+        je 9 px oben und unten heraus.
+
+   DAS IST DIE DRITTE AUFLAGE DESSELBEN FEHLERS. v1138b (Score-Zahl unter
+   dem Loeschknopf) und v1159 (Chevron in stapel) haben beide das OPFER
+   verschoben, nicht den Taeter geschrumpft. Deshalb hier die Ursache.
+
+   WARUM DIE 44 PX FUER DIESE ZWEI KNOEPFE ZURUECKGENOMMEN WERDEN:
+   Die zugeklappte Karte ist 64–82 px hoch und traegt auf ihren obersten
+   60 px vier Bedienziele — Duplizieren, Loeschen, Aufklappen und die
+   Karte selbst. 44 px sind dort nicht unterzubringen; die Pauschale hat
+   dort keine Bedienbarkeit erzeugt, sondern die GEFAEHRLICHSTE der vier
+   Aktionen ueber die anderen gelegt. 26 x 26 px ist der Wert, den V101
+   fuer Touch ausdruecklich gesetzt hatte.
+
+   Eine Vergroesserung nach OBEN (Flaeche 0..34 statt 8..34) war gebaut
+   und wurde nach der Messung wieder verworfen: sie legt den Loeschknopf
+   auf die obersten 8 px der Karte, wo bisher "Objekt oeffnen" lag. Eine
+   groessere Flaeche fuer die gefaehrlichste Aktion ist der falsche
+   Handel.
+
+   NACHGEMESSEN nach dem Eingriff, 390 px, beide Modi, zu und aufgeklappt,
+   fuenf sichtbare Karten: Pfeilmitte -> `sbc-arrow`, Loeschmitte ->
+   `sbc-btn sbc-del`, Duplizierenmitte -> `sbc-btn`. Erreichbare
+   Pfeilhoehe 22 von 22 px (mit ui-varianten.css v1191: top 26px).
+
+   OFFEN UND BEWUSST NICHT HIER GELOEST: im Modus "kompakt" liegt der
+   Score-Ring unter dem Duplizieren-Knopf (Ring 239..277 px, Aktionen
+   249..305). Ihn freizustellen kostet 30 px Adressbreite — das ist eine
+   Optikentscheidung, sie steht im BACKLOG.
+   ═══════════════════════════════════════════════════════════════════ */
+aside.sidebar .sb-card .sbc-btn {
+  min-height: 0 !important;
+}
+aside.sidebar .sb-card .sbc-btn::after {
+  content: none;
+}
+/* ===== v1191-KARTENKNOPF END ===== */
