@@ -837,6 +837,74 @@ entfällt — nicht raten.
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
+   > ### Ist-Zustand aufgenommen am 01.09.2026 — der Wizard IST gebaut
+   >
+   > **Der Satz „Entwurf steht" darüber ist überholt und stand hier viel zu
+   > lange.** Gemessen auf Staging: `frontend/marktbericht-app/mb-wizard.js`
+   > (615 Zeilen, `v1127` → `v1172`) ist geladen und aktiv, die App zeigt
+   > **sieben Reiter** (Übersicht · Objekt · Zustand · Ausstattung ·
+   > Gebäude & Außen · Wertermittlung · Zusatzwerte) und darüber die
+   > Meilenstein-Ampel mit „fehlt: …" je Stufe. Der Weg Übersicht → Wizard →
+   > Ergebnis existiert.
+   >
+   > **Wer nur den Kopf dieses Punktes liest, hält ein fertiges Feature für
+   > einen Entwurf** — und baut es womöglich ein zweites Mal. Die
+   > ERLEDIGT-Vermerke weiter unten (`v1149`–`v1154`) sagen es, aber sie
+   > stehen 100 Zeilen tiefer.
+   >
+   > **Und die Meilenstein-Mechanik trägt** — im selben Durchgang am
+   > Testobjekt Hüllhorst (ETW, 165 m², Bj 1968) nachgemessen: mit
+   > Adresse · Art · Fläche · Baujahr springt die Ampel auf Stufe 1 und der
+   > Knopf auf „Marktbericht erstellen · 1 Marktpreisindikation"; mit
+   > Zustand und Qualität auf Stufe 2 und „· 1 Erweiterte
+   > Marktpreisindikation". Genau das, was Marcel wollte: **kein Vorab-Klick,
+   > die Stufe ergibt sich aus den Angaben, und der Knopf ist nie tot.**
+
+   ### `v1193` (01.09., `cd68aa0`) — die Ampel rechnete noch in Kerosin
+
+   **Beim Aufnehmen des Ist-Zustands gefunden.** Die Ampel zeigte
+   **„2 L / 5 L / 12 L"** und der Knopf „Marktbericht erstellen · 12 L" —
+   Kerosin, das `v1183` abgeschafft hat und das seit dem Prod-Rollout auch
+   live weg ist. Das ist wörtlich der Befund des Testers aus
+   `Anmerkungen.docx`: *„Zweite Währung sollte unbedingt raus. Wirkt
+   undurchsichtig."*
+
+   **Der Server war längst umgestellt.** `GET /marktbericht/stufenpreis`
+   liefert seit `v1183` das Feld `kosten` mit `{anzahl, art}` je Stufe und
+   sagt im Kommentar (`routes/marktbericht.js:277`) wörtlich: *„`preise`/
+   `faellig` bleiben als Liter-Felder stehen, bis der letzte alte Aufrufer
+   weg ist; sie dürfen nichts mehr steuern."* **`mb-stufen.js` WAR dieser
+   letzte Aufrufer** — er las `faellig` und zeigte Liter.
+
+   | | vorher | jetzt |
+   |---|---|---|
+   | Ampel | `2 L` · `5 L` · `12 L` | **`1 × MPI` · `1 × MPI+` · `1 × WEV`** |
+   | Knopf bei Stufe 2 | `· 5 L` | **`· 1 Erweiterte Marktpreisindikation`** |
+
+   Die Kürzel MPI / MPI+ / WEV sind **kein neues Vokabular** — sie füllen
+   schon die Kontingent-Box des Nutzers (`ai-credits.js:32`). In der Ampel
+   steht das Kürzel, weil der ausgeschriebene Name in derselben Zeile links
+   steht; am Knopf, wo links nichts steht, wird ausgeschrieben — Wort für
+   Wort wie im Bestätigungsdialog aus `v1187`.
+
+   **Dazu ist ein Preisversprechen verschwunden, das der Server nicht
+   einlöst:** *„eine höhere Stufe kostet nur die Differenz."* Genau diesen
+   Satz hat `v1187` aus dem Bestätigungsdialog entfernt, weil
+   `_faelligeStufe()` seit `v1183` entweder **0** liefert oder die **volle**
+   Stufe. In der Ampel stand er noch. Jetzt: *„diese Tiefe kostet dich nichts
+   mehr. Eine höhere Stufe wird voll berechnet."*
+
+   > **`v1187` hat vier Kerosin-Stellen gesucht und behoben — diese war
+   > nicht dabei.** Der Grund ist lehrreich: gesucht wurde nach dem **Wort**
+   > „Kerosin". Hier stand nur `p + ' L'`, zusammengesetzt aus einer
+   > Variablen und einem Buchstaben. **Eine Währung versteckt sich in ihrer
+   > Einheit, nicht in ihrem Namen.** Wer Reste sucht, muss nach der
+   > Einheit greppen und die Oberfläche ansehen — nicht nur nach dem Begriff.
+
+   **Nachgemessen auf Staging** (frisch geladen, `mb-stufen.js?v=1193`):
+   kein einziges `\d+ L` mehr im gesamten Seitentext, kein
+   Differenz-Versprechen, Ampel und Knopf wie in der Tabelle.
+
    ### ENTBLOCKIERT — Marcels Vorgaben vom 2026-08-12
 
    Die beiden Geldfragen, auf denen der Punkt blockiert war, sind

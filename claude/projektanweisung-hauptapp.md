@@ -3972,6 +3972,73 @@ zu** — es war derselbe Täter, und aus 1–10 wurde 1–8.
 
 ---
 
+### v1193 (01.09.2026, `cd68aa0`) — die Marktbericht-Ampel rechnete noch in Kerosin
+
+**Gefunden beim Aufnehmen des Ist-Zustands** für den Backlog-Punkt
+„Marktbericht neu gestalten". Die Meilenstein-Ampel zeigte
+**„2 L / 5 L / 12 L"**, der Knopf „Marktbericht erstellen · 12 L".
+
+**Der Server war seit `v1183` umgestellt, das Frontend nicht.**
+`GET /marktbericht/stufenpreis` liefert das Feld `kosten` mit
+`{anzahl, art}` je Stufe (`mpi` · `mpi_plus` · `wev`) und sagt im
+Kommentar (`routes/marktbericht.js:277`) wörtlich: *„`preise`/`faellig`
+bleiben als Liter-Felder stehen, bis der letzte alte Aufrufer weg ist;
+sie dürfen nichts mehr steuern."* **`mb-stufen.js` war dieser letzte
+Aufrufer.**
+
+| | vorher | jetzt |
+|---|---|---|
+| Ampel | `2 L` · `5 L` · `12 L` | `1 × MPI` · `1 × MPI+` · `1 × WEV` |
+| Knopf bei Stufe 2 | `· 5 L` | `· 1 Erweiterte Marktpreisindikation` |
+
+**Warum in der Ampel das Kürzel und am Knopf der volle Name steht:** in
+der Ampel steht der ausgeschriebene Name schon **links in derselben
+Zeile** — „Marktpreisindikation … 1 Marktpreisindikation" wäre eine
+Dopplung. Das Kürzel zeigt dafür auf genau den Zähler, den der Nutzer in
+seiner Kontingent-Box wiederfindet (`ai-credits.js:32` füllt sie mit
+`kurz`). Am Knopf steht links nichts, dort wird ausgeschrieben — Wort für
+Wort wie im Bestätigungsdialog aus `v1187`.
+
+> **Der Platz war vorher gemessen, nicht geschätzt:** die Ampelzeile ist
+> 878 px breit, rechts vom Namen bleiben 754 px. Selbst
+> „1 Wertermittlung nach ImmoWertV" (257 px) hätte gepasst — die
+> Kurzform ist also **keine Platzentscheidung, sondern eine
+> inhaltliche.**
+
+**Dazu ist ein Preisversprechen verschwunden, das der Server nicht
+einlöst:** *„eine höhere Stufe kostet nur die Differenz."* Genau diesen
+Satz hat `v1187` aus dem Bestätigungsdialog entfernt, weil
+`_faelligeStufe()` seit `v1183` entweder **0** zurückgibt oder die
+**volle** Stufe. In der Ampel stand er weiter.
+
+**Und eine tote Preistabelle ist raus:** `VOLLPREIS = {1:2, 2:5, 3:12}`,
+die Kerosin-Literpreise. Nach dem Umbau las sie niemand mehr —
+gegengeprüft mit `grep -rn VOLLPREIS frontend/ backend/`, ein einziger
+Treffer, ihre eigene Zeile. Eine tote Preistabelle ist keine harmlose
+Leiche: **der nächste Leser hält sie für die Wahrheit.**
+
+> **Warum `v1187` diese Stelle nicht gefunden hat, und das ist die
+> eigentliche Lehre:** `v1187` hat vier Kerosin-Stellen gesucht und
+> behoben — gesucht wurde nach dem **Wort** „Kerosin". Hier stand nur
+> `p + ' L'`, zusammengesetzt aus einer Variablen und einem Buchstaben,
+> und die Klasse hieß `mbst-kero`. **Eine Währung versteckt sich in ihrer
+> Einheit, nicht in ihrem Namen.** Wer Reste sucht, greppt nach der
+> Einheit **und sieht sich die Oberfläche an** — der Fund kam hier nicht
+> aus einem grep, sondern daraus, dass die Seite einmal geöffnet wurde.
+
+**Nachweis auf Staging** (frisch geladen, `mb-stufen.js?v=1193`): kein
+einziges `\d+ L` mehr im gesamten Seitentext, kein Differenz-Versprechen.
+Am Testobjekt Hüllhorst durchgespielt — mit Adresse, Art, Fläche und
+Baujahr springt die Ampel auf Stufe 1 und der Knopf auf
+„· 1 Marktpreisindikation", mit Zustand und Qualität auf Stufe 2 und
+„· 1 Erweiterte Marktpreisindikation".
+
+**Vier Cache-Buster mussten mit**, weil die App im iframe läuft:
+`mb-stufen.js` in `marktbericht-app/index.html`, die iframe-URL in
+`js/marktbericht-view.js:91` und deren eigener Buster in `index.html:3223`.
+
+---
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
