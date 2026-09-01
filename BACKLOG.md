@@ -808,243 +808,7 @@ entfällt — nicht raten.
 > Tages, die man nicht rückwirkend umschreibt. Wo es zu verwechseln wäre,
 > steht der Zusatz „damals N".
 
-1. **Preismodell: der Zähler fehlt noch — die Anzeige steht.**
-
-   > ### Stand 2026-08-30, abends — was gebaut ist
-   >
-   > **`v1176`–`v1179` sind ausgerollt** (siehe „Fertig"): alle Preise, die
-   > Kontingente in beiden Matrizen und auf der Landing, das Stufen-Wording,
-   > die Co-Pilot-Grenze und drei Defekte. **Die Anzeige ist umgestellt.**
-   >
-   > **Die Buchhaltung nicht.** `aiCreditsService.js` führt weiter einen
-   > Litertank mit `PLAN_LIMITS = {free:2, starter:10, investor:40, pro:100}`.
-   > Wer heute eine Wertermittlung startet, zahlt 12 L aus diesem Tank — die
-   > Oberfläche sagt „5 Wertermittlungen im Monat", der Zähler weiß nichts
-   > davon. **Das ist eine bewusste Zwischenstufe, kein Versehen** — aber sie
-   > darf nicht stehenbleiben.
-   >
-   > **Der Umbau, in dieser Reihenfolge:**
-   >
-   > | | was | wo |
-   > |---|---|---|
-   > | 1 | drei Zähler statt einem, mit Nicht-Verfall und Deckel `sparfaktor` | Migration + `aiCreditsService.js` |
-   > | 2 | die acht KI-Einzelabrufe entkoppeln | `routes/ai.js` |
-   > | 3 | Restbestände vorhandener Nutzer umrechnen | Migration |
-   > | 4 | die Kopfpille auf Kontingente | `ai-credits.js` |
-   > | 5 | Einzelkauf am gesperrten Knopf | neu |
-   >
-   > **Zwei Dinge kann ich nicht allein:** die **Stripe-Preise** liegen im
-   > Dashboard (neue Preis-Objekte anlegen, nicht die alten ändern — dann
-   > trage ich die IDs ein), und die Migration der Tabelle **`plans`** ist ein
-   > **Datenbank-Eingriff**. Schreiben ja, ausführen nur mit Marcels Wort.
-
-
-   **Marcels Auftrag vom 2026-08-30, sein wichtigster Punkt:** *„Wir wollen
-   nicht mehr mit Kerosin arbeiten … die Preisstruktur ist zu teuer. Die
-   Staffelung soll einfach sein."* Dazu der Befund aus dem Testbericht
-   (`design/mockups/Anmerkungen.docx`): *„Zweite Währung sollte meiner
-   Meinung nach unbedingt raus. Wirkt undurchsichtig."*
-
-   **Vorschlag steht: `design/Vorschläge/preismodell-2026.html`** — was heute
-   gilt, fünf Befunde, drei Staffelungen zur Wahl, der Umbau in vier
-   Schritten und sechs Fragen, die Marcel beantworten muss.
-
-   ### ENTSCHIEDEN am 2026-08-30: Variante A
-
-   **`design/Vorschläge/preispakete-variante-a.html`** — die Pakete
-   ausformuliert, mit den fertigen Texten für Landing und Pricing-Modal.
-
-   | | Free | Starter | Investor ★ | Pro |
-   |---|---|---|---|---|
-   | Preis | 0 € | **19,99 €** | **39,99 €** | **79,99 €** |
-   | heute | 0 € | 29 € | 59 € | 99 € |
-   | Einschätzung | 1 | 5 | 5 | 5 |
-   | Marktpreisindikation | — | — | 5 | 5 |
-   | Wertermittlung | — | — | — | 5 |
-   | dazu | | | Co-Pilot | Kaufpreisaufteilung |
-
-   **Marcels Zuschnitt, wörtlich:** Starter die *einfache
-   Marktpreisindikation*, ab Investor die *erweiterte Marktpreisbewertung mit
-   Marktbericht bzw. Dossier*, bei Pro *Verkehrswertermittlung, Ertragswert,
-   Sachwert nach ImmoWertV*. Dazu: *„da ist es aber wichtig zu sagen, dass es
-   verschiedene Stufen gibt, und wir müssen da ehrlich sein."*
-
-   ### Der Satz, an dem die Ehrlichkeit hängt — gemessen
-
-   **`wert_stufe` wird im Marktbericht-Dienst genau einmal entgegengenommen
-   (`ReportOrchestrator.js:125`) und danach nie wieder gelesen.** Die Stufe
-   schaltet also **keine Inhalte frei**. Was die Tiefe bestimmt, sind die
-   **Angaben**: `erreicht()` in `mb-stufen.js:120` rechnet die Stufe aus den
-   ausgefüllten Feldern, der Preis folgt ihr.
-
-   > **Man kauft keine Wertermittlung — man liefert die Daten, die eine
-   > möglich machen, und dann kostet sie mehr.** Genau so muss es auf der
-   > Preisseite stehen, sonst verspricht sie etwas, das durch Bezahlen nicht
-   > zu bekommen ist.
-
-   ### Die Reichweite, gezählt (`register/*.json`, 30.08.)
-
-   | Kennzahl | wofür | Einträge | wo |
-   |---|---|---|---|
-   | Liegenschaftszinssatz | **Ertragswert** | 1.078 | NRW 972 · NI 95 · HE 8 · TH/ST/BE je 1 |
-   | Sachwertfaktor | **marktangepasster Sachwert** | 52 | NRW 34 · TH 5 · BB 5 · NI 4 · BY 2 · ST 1 · BE 1 |
-   | Bodenpreisniveau | Bodenwert | 403 | nur NRW |
-   | Durchschnittspreise | **Stufe 1 und 2** | 601 | nur NRW |
-
-   **Vollständig ist das heute in Nordrhein-Westfalen.** Ohne diesen Satz
-   verkauft Pro ein Versprechen, das außerhalb NRWs nicht einzulösen ist.
-   Der ehrliche Weg ist zugleich der bequeme: **eine Adressprüfung vor dem
-   Kauf** — der Kunde sieht, welche Stufen für sein Objekt möglich sind,
-   bevor er zahlt.
-
-   ### Nachkauf: dieselben Kacheln, nur in Euro
-
-   Marcels Vorgabe: *„Es kann ja optisch weiterhin so abgebildet werden, nur
-   ohne Kerosin und zweite Währung."* Vier Pakete wie heute, Reichweitentexte
-   wie heute, Einheit „Bewertungen" statt „Liter". **Mein Gegenvorschlag im
-   Dokument: den Einzelkauf voranstellen** („Diese Wertermittlung freischalten
-   — 2,40 €" direkt am gesperrten Knopf). Ein Paket ist wieder ein Vorrat, den
-   man nicht überblickt — genau davor warnt der Testbericht.
-
-   ### Marcels Entscheidungen vom 30.08., zweite Runde
-
-   **Das runde Konzept liegt in
-   `design/Vorschläge/preiskonzept-gesamt.html`** — alle Preise inklusive
-   Partner, die Kontingente, das Wording, die zubuchbaren Optionen, die
-   vollständige Cockpit-Matrix und die sieben Stellen, die geändert werden
-   müssen.
-
-   1. **Abrufe verfallen NICHT.** Technisch vorgezeichnet: der Bonus-Tank
-      verfällt heute schon nicht (`ai-credits.js:93`). **Offen bleibt ein
-      Deckel** — ohne ihn wächst der Bestand unbegrenzt; Vorschlag: bis zum
-      Dreifachen des Monatskontingents.
-   2. **Die Kerosin-Pille wird zur Kontingent-Pille.** Zahl = Summe der noch
-      möglichen Bewertungen, Tooltip zeigt die Aufteilung auf die drei
-      Stufen. **Die Pille und ihr Tooltip existieren bereits**
-      (`ai-credits.js:51` und `:90`) — sie werden umgehängt, nicht gebaut.
-   3. **Wording:** Stufe 1 heißt künftig **Marktpreisindikation**, Stufe 3
-      **Wertermittlung nach ImmoWertV**. Für Stufe 2 schlage ich
-      **„Erweiterte Marktpreisindikation"** statt „erweiterte Wertermittlung"
-      vor — sie führt **kein** ImmoWertV-Verfahren aus, und wer
-      „Wertermittlung" liest, erwartet einen Verkehrswert. **Marcel
-      entscheidet das fachlich.** Überall dabei: *„ersetzt kein Gutachten
-      eines Sachverständigen."*
-   4. **Adressprüfung kommt** — und wenn keine Daten vorliegen, kann der
-      Kunde die Werte selbst eintragen. **Beides gibt es schon:** die Felder
-      für Bodenrichtwert, Liegenschaftszins und Sachwertfaktor stehen im
-      Block „Experte" (`wertermittlung.js:300`), und die Rückfallleiter ist
-      das **A-bis-E-System** (`WertParameterService.js:505`) — A amtlich ·
-      B amtlich regional · C marktabgeleitet · **D gesetzlicher Auffangwert
-      § 256 BewG** · E eigene Angabe. **Es gibt also keinen erfundenen
-      Standardwert, sondern eine Leiter mit Etikett.** Zu bauen ist nur: den
-      Block an die richtige Stelle holen, den Ausschuss-Link zeigen
-      (`gaa_name` steht im Register) und den Namen „Experte" ablegen.
-   5. **Co-Pilot: mein Rat ist „sichtbar, aber begrenzt"** — fünf Fragen im
-      Monat für Free und Starter, voll ab Investor. Ihn ganz auszublenden
-      wäre eine Wegnahme bei Leuten, die ihn heute nutzen; ein bloßes
-      Schloss verkauft nichts, ein benutztes Werkzeug schon. **In jedem Fall
-      eine Ankündigung vorher, nicht danach.**
-   6. **Partner-Preise fallen mit:** Grundgebühr 149 → **99 €**, Seats
-      35/29/24 → **24/19/15 €**. Sonst zerfällt das Partner-Argument von
-      selbst — heute spart der Mandant 59 %, bei unverändertem Seat und
-      Investor zu 39,99 € nur noch 40 %.
-      **Ein Befund dazu, der schon heute gilt:** ein Partner mit fünf
-      Mandanten zahlt pro Kopf **mehr**, als der Mandant allein zahlen würde
-      — die Grundgebühr trägt sich erst ab etwa acht. **Vorschlag: 99 €
-      inklusive drei Seats.**
-   7. **Die Landing-Optik bleibt unverändert** — es werden nur Zahlen und
-      Zeilentexte getauscht.
-
-   ### Sieben Stellen, und eine vierte Wahrheit
-
-   Stripe · Tabelle `plans` · `config.js` · `pricing-modal.js` (**vier
-   Listen in einer Datei**: `PLANS`, `KER`, `KPACKS`, Matrix `R`) ·
-   `landing/index.html` · `aiCreditsService.js` (aus einem Topf werden drei,
-   mit Umrechnung der Restbestände) · `ai-credits.js`.
-
-   > **Preise werden in Stripe nie geändert, sondern neu angelegt.**
-   > Bestandsabos hängen an der alten Preis-ID und laufen weiter. Und: zwei
-   > Konten, Test und Live, nie verwechseln.
-   >
-   > **Vorschlag gegen die vier Wahrheiten:** eine kleine Prüfstrecke, die
-   > alle vier Quellen liest und meldet, wo sie auseinanderlaufen. Eine
-   > Stunde Arbeit, und sie verhindert genau den Fehler, den der
-   > Plan-Prüflauf gefunden hat.
-
-   **Nebenbefund für die Matrix:** die Zeile „Bankexport" steht bei Free auf
-   „–", **der Code blockt aber nur `starter`** — Free rutscht mit
-   Wasserzeichen durch. Die Matrix sagt seit jeher das Richtige, der Code
-   nicht. Beim Umstellen mitziehen.
-
-   ### Noch offen
-
-   Objektgrenze im Starter · Deckel auf den angesparten Abrufen · Name der
-   Stufe 2 · Partner-Grundgebühr mit oder ohne enthaltene Seats ·
-   Übergangsregel für Bestandskunden, die Kerosin für Marktwert-Abrufe
-   genutzt haben · die acht KI-Einzelabrufe.
-
-   ### Der Fund, der die Sache trägt
-
-   **Marcels Beispiel ist fast auf den Liter das, was die Pläne heute schon
-   enthalten.** Seine Worte bilden sich eins zu eins auf die drei Stufen ab,
-   die es im Marktbericht bereits gibt (`mb-stufen.js:31`):
-
-   | Marcels Wort | heißt im Haus | kostet |
-   |---|---|---|
-   | „einfache Marktpreisindikation" | Stufe 1 · Einschätzung | 2 L |
-   | „Bewertung" / „erweiterte Bewertung" | Stufe 2 · Marktpreisindikation | 5 L |
-   | „Ertragswert bzw. Verkehrswert" | Stufe 3 · Wertermittlung | 12 L |
-
-   | Plan | 5 × St. 1 | 5 × St. 2 | 5 × St. 3 | Summe | heute | |
-   |---|---|---|---|---|---|---|
-   | Starter | 10 L | — | — | **10 L** | 10 L | **exakt** |
-   | Investor | 10 L | 25 L | — | **35 L** | 40 L | 5 L Luft |
-   | Pro | 10 L | 25 L | 60 L | **95 L** | 100 L | 5 L Luft |
-
-   **Der Umbau kostet also kaum Marge — er kostet die zweite Währung.** Aus
-   „40 L" wird „5 Einschätzungen + 5 Marktpreisindikationen". Die
-   Marge-Entscheidung ist eine andere, nämlich der Preis.
-
-   ### Drei Befunde, die beim Neuschnitt mit entschieden gehören
-
-   1. **Der Co-Pilot hat heute gar kein Plan-Gate.** `js/copilot.js` fragt
-      `hasFeature` an **keiner** Stelle ab, im Dateikopf steht „KEIN Kerosin
-      (server-seitig rate-limited)". Er ist für Free so offen wie für Pro.
-      Soll er das Investor-Merkmal werden, ist das ein **Neubau**.
-   2. **Free und Starter tragen im Frontend die falsche Litermenge.**
-      `config.js` führt `ai_credits: 1` und `5`, das Backend
-      (`aiCreditsService.js:20`, die verbindliche Stelle) gibt **2** und
-      **10** — so steht es auch auf der Landing. Rest aus der Zeit
-      „1 Credit = 2 Anfragen". **Kein Kundenschaden**, die DB gewinnt; aber
-      im Fenster vor dem Laden zeigt die App die halbe Menge.
-   3. **Das Bankexport-Leck ist weiter offen** — der Export blockt nur
-      `starter`, **Free rutscht mit Wasserzeichen durch.** Steht seit dem
-      Plan-Prüflauf als unentschieden im Backlog (jetzt Punkt 6).
-
-   ### Was Marcel entscheiden muss, bevor gebaut wird
-
-   Alle sechs Fragen stehen ausformuliert im Vorschlag. Die beiden, ohne die
-   **gar nichts** gebaut werden kann:
-
-   - **Was passiert, wenn das Kontingent leer ist?** Einzelverkauf oder
-     Sperre mit Verweis auf das größere Paket. Der Testbericht nennt beide
-     Wege — das ist eine Geldentscheidung.
-   - **Was wird aus den acht KI-Einzelabrufen?** Pilot-Analyse,
-     Lagebewertung, Spracheingabe, Beleg-Import, Bodenrichtwert, BMF-GAA,
-     DS2-Vorschlag, Marktfelder — je 1 L (`routes/ai.js`, acht Stellen). Sie
-     passen in **keines** der drei Kontingente.
-
-   > **Und ein Hinweis, der keine Frage ist:** Kerosin ist kein Zufallsname —
-   > er gehört zu Cockpit, Boarding, Runway, Pre-Flight und Co-Pilot. Wenn der
-   > Tank verschwindet, fehlt der Marke ein Stück Erzählung. **Ein Mittelweg
-   > wäre, den Namen zu behalten und nur die Einheit zu ändern:** nicht
-   > „40 Liter", sondern „5 Bewertungen im Tank".
-
-   **Achtung beim Bauen — die drei Wahrheiten.** Preise und Matrix stehen an
-   **drei** Stellen von Hand: `config.js`, `pricing-modal.js` (zwei Matrizen)
-   und `landing/index.html`. Genau das ist die Falle aus Punkt 6.
-
-2. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
+1. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
    Der Punkt bleibt offen, weil **B** und die **Admin-Oberfläche** offen sind.
    Alles andere ist gebaut, es war nur nie nachgemessen worden.
 
@@ -1109,7 +873,7 @@ entfällt — nicht raten.
      bei 260-px-Leiste nur 560 px Inhalt übrig — das schließt zweispaltige
      Formulare aus. **Eigene Entscheidung, nicht in diesem Punkt.**
 
-3. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+2. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -1183,7 +947,7 @@ entfällt — nicht raten.
      rechts frei ist** — überlappt das negative Margin die Nachbarn,
      stiehlt es Klicks in die andere Richtung.
 
-4. **Marktbericht neu gestalten.**
+3. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -1490,7 +1254,7 @@ entfällt — nicht raten.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-5. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+4. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -1661,7 +1425,7 @@ entfällt — nicht raten.
    **Frontend-Gate**, nicht die Backend-Durchsetzung — und er liest den
    `config.js`-Fallback, nicht die DB-Zeile des simulierten Plans.
 
-6. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+5. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    > **GRÖSSTENTEILS SCHON GEBAUT — Befund vom 2026-08-13, siehe „Fertig".**
    > `buildFullCatalog()` (v519) gibt **alle** `window.FIELDS` an die
@@ -1739,7 +1503,7 @@ entfällt — nicht raten.
 
 ---
 
-7. **Der Testbericht: Bedienführung und Verständlichkeit.**
+6. **Der Testbericht: Bedienführung und Verständlichkeit.**
    **Quelle: `design/mockups/Anmerkungen.docx`** (abgelegt 2026-08-30, 24
    Bildschirmfotos mit Anmerkungen, entstanden bei einer Objektanlage von
    Anfang bis Ende). **Fremdbefund — hier ungeprüft übernommen**, außer wo
@@ -1852,7 +1616,7 @@ entfällt — nicht raten.
      interessiert zuerst der **Bestand** und was er prüft. *„Verloren würde
      ich vielleicht rausnehmen."*
 
-8. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
+7. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
    **Marcels Auftrag vom 2026-08-30.** Heute gibt es das Finanzamt-PDF nur je
    Objekt (Tab Steuer). Gewünscht: dieselbe Sache **über alle Objekte**, mit
    Auswahl und Veranlagungsjahr. Dazu die Frage, ob sich die **Anlage V direkt
@@ -1938,7 +1702,7 @@ entfällt — nicht raten.
    > abgeschrieben, versioniert abgelegt und dagegen geprüft. Ohne
    > hinterlegte Zuordnung erscheint der Umschalter für dieses Jahr nicht.
 
-9. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
+8. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
    Ebenfalls aus `design/mockups/Anmerkungen.docx`, aber ein eigener Punkt —
    es ist **Neubau, keine Nachbesserung**, und der letzte Teil ist der
    einzige Vorschlag im ganzen Bericht, den der Tester selbst als **USP**
@@ -1965,7 +1729,7 @@ entfällt — nicht raten.
    > **Erst entscheiden, ob das zum USP werden soll**, dann bauen. Hängt
    > unmittelbar an der USP-Frage aus Punkt 8.
 
-10. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+9. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > ## 🔒 AUSGELAGERT — Marcel bearbeitet diesen Punkt an anderer Stelle
@@ -2085,7 +1849,7 @@ entfällt — nicht raten.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-11. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+10. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -2183,7 +1947,7 @@ entfällt — nicht raten.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-12. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
+11. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
    **Neu gefunden beim `v1173`-Messlauf, 2026-08-30** — nicht dadurch
    verursacht, `.sbc-actions` und `.sbc-score-overlay` sind absolut
    positioniert und vom Raster unabhängig.
@@ -2390,6 +2154,52 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Preismodell v1176 — vollständig, live seit 31.08./01.09.2026
+
+**War Punkt 1 und der größte Brocken im Backlog.** Marcels Auftrag vom
+30.08.: *„Wir wollen nicht mehr mit Kerosin arbeiten … die Preisstruktur
+ist zu teuer. Die Staffelung soll einfach sein."* Alle fünf Umbauschritte
+sind gebaut, ausgerollt und auf Produktion abgenommen:
+
+| | was | erledigt in |
+|---|---|---|
+| 1 | drei Zähler statt einem, Nicht-Verfall und Deckel | `v1183` (Migration 064/066) |
+| 2 | die acht KI-Einzelabrufe entkoppelt — sie kosten nichts mehr | `v1183` |
+| 3 | Restbestände vorhandener Nutzer umgerechnet | Migration 064 |
+| 4 | Kopfpille und Kontingent-Box auf Bewertungen | `v1183`, `v1185d/e` |
+| 5 | **Einzelkauf am gesperrten Knopf** | `v1187` |
+
+**Dazu, was beim Bauen dazukam:** der Kauf, der nichts gutschrieb
+(`v1184`) · der Monatsübertrag, der jeden neuen Nutzer beschenkte
+(`v1184b`, Migration 067) · vier Wochen Pro mit Testpaket statt sieben
+Tagen ohne (`v1185`, Migrationen 068/069) · die Preis-IDs, die keine
+Migration mehr schreibt (`v1186`) · Kerosin-Reste im Nutztext und ein
+Preisversprechen, das der Server nicht einlöste (`v1187`) · Umlaute
+(`v1188`) · der Admin-Doppelpfad (`v1189`).
+
+**Live-Preise:** Starter 19,99 · Investor 39,99 · Pro 79,99 · Partner 99.
+Vier Pakete (7,90 / 19,90 / 39,90 / 69,90) und fünf Einzelposten (0,90
+bis 9,90), alle über `lookup_key` aufgelöst.
+
+**Beim Abschließen wurden die offenen Restfragen des Punktes einzeln
+nachgeprüft**, damit nichts still mit ihm verschwindet:
+
+- **Co-Pilot ohne Plan-Gate** → mit `v1178` gebaut (Grenze statt Schloss).
+- **Free/Starter mit falscher Litermenge in `config.js`** → mit `v1176`
+  korrigiert, der Rest mit `v1183` stillgelegt.
+- **Bankexport-Leck** („Free rutscht durch") → `bankExportPlans:
+  ['investor','pro']`, Free und Starter sind draußen.
+- **Übergangsregel für Bestandskunden mit gekauften Marktwert-Abrufen**
+  → **gemessen auf beiden Servern: null Nutzer mit `avm_bonus_credits`.**
+  Die Umstellung auf die getrennten Töpfe `avm_a_bank`/`avm_b_bank` hat
+  also niemandem etwas genommen. Wäre hier jemand gewesen, hätte eine
+  Migration gefehlt — Migration 066 legt die neuen Spalten mit 0 an und
+  überträgt den alten Stand **nicht**.
+
+**Die ausführlichen Befunde stehen oben** unter „HIER WEITERMACHEN" —
+sie sind die eigentliche Lehre dieser Runde und gehören dorthin, wo der
+nächste Durchgang zuerst hinsieht.
 
 - [2026-08-30] **Preise, Kontingente, Wording, Co-Pilot-Grenze und drei Defekte** — `v1176`–`v1179`.
    Marcels Freigabe: *„WIR HABEN NOCH KEINE ZAHLENDEN KUNDEN, NUR TEST USER,
