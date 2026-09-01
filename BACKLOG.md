@@ -825,140 +825,15 @@ entfällt — nicht raten.
 > Spracheingabe 5 → **4**, Testbericht 6 → **5**, Steuer-Mappe 7 → **6**,
 > Cockpit 8 → **7**, Sachwertfaktor 9 → **8**, Objektnummer 10 → **9**,
 > Wallet 11 → **10**.
+>
+> **Und am selben Tag ein drittes Mal:** die Handy-Befunde (1) und der
+> Wallet-Ring (10) sind beide zu — es war **derselbe Täter**, siehe
+> `v1191`/`v1192` unter Fertig. Aus 1–10 wurde **1–8**: Marktbericht
+> 2 → **1**, Pläne 3 → **2**, Spracheingabe 4 → **3**, Testbericht
+> 5 → **4**, Steuer-Mappe 6 → **5**, Cockpit 7 → **6**, Sachwertfaktor
+> 8 → **7**, Objektnummer 9 → **8**.
 
-1. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
-   Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
-   Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
-
-   - **ERLEDIGT — Ankreuzfelder auf 33 px** (`v1147` `674c3b0`,
-     `v1147b` `413d409`). **Marcels Entscheidung 2026-08-12: 33 px, nicht
-     44** — die volle Trefferfläche hätte jede Formularzeile höher gemacht.
-
-     **Ursache, am Markup nachgezählt:** alle **37** Checkboxen sind
-     nackte `<input type="checkbox">` **ohne Klasse**. Die Klasse
-     `.cb-label` sitzt am **Label**, nicht am Feld — ihre Regel
-     (`style.css:2191`, 16 px) griff deshalb nur für acht. Die übrigen
-     standen auf Browser-Standard, daher die gemessenen 13 px.
-
-     Schalter sind ausgenommen (`.ji-switch`, `.toggle-slim`,
-     `.fesh-tile`, `.dp-pf-tile`) — sie bauen aus demselben nackten
-     Element eine ganz andere Optik.
-
-     **Nachgemessen:** **26 Felder auf 33 × 33 px**, alle Schalter
-     unverändert (14 px, 32 × 18, auto).
-
-     **Eigener Fehler, korrigiert in `v1147b`:** Der Selektor stand zuerst
-     auf `#app` — **dieses Element gibt es in der App gar nicht**
-     (`getElementById` liefert `null`). Ich hatte den Anker aus
-     `CLAUDE.md` übernommen, statt ihn auszulesen; genau der Fehler, vor
-     dem Regel 1 warnt. Die Regel griff dadurch nirgends.
-
-     **ABGENOMMEN (2026-08-12 abends, siehe Fertig).** Die Messung vom
-     Mittag war wertlos (0 von 26 Feldern sichtbar). Nachgeholt mit
-     geladenem Objekt, allen Reitern und aufgeklappten `<details>`:
-     **21 sichtbare Felder, alle 33 × 33 px, kein Überlauf** — bei 1440 px
-     und bei **390 px**. Die Zeilen tragen (33/35 px), kein Feld ragt heraus,
-     kein Label abgeschnitten. Die dichten Reiter Steuer (2) und
-     Pilot-Analyse (13) sind einzeln geprüft.
-   - **`.sbc-arrow` misst 20 × 20 px und ist ein echtes Bedienelement.**
-
-     **Mein v1118-Befund war falsch und wird hiermit zurückgenommen.** Ich
-     hatte gemeldet, der Pfeil trage `role="button"` „ohne eigenen Klick"
-     und die Rolle sei irreführend. Nachgelesen in `karten-kompakt.js`
-     (v1092): Rolle, `tabindex="0"` und `aria-label` werden dort
-     **absichtlich** gesetzt — und zwar nur, wenn der Kartenmodus
-     `kompakt` oder `stapel` aktiv ist. Dort **klappt der Pfeil die Karte
-     auf und zu** (`umschalten()`), über einen **delegierten** Listener.
-     Mein Prüfausdruck hat nur `getAttribute('onclick')` abgefragt und
-     einen delegierten Handler deshalb nicht gesehen.
-
-     **Was bleibt, ist ein anderer, echter Befund:** ein Bedienelement mit
-     eigener Funktion misst **20 × 20 px** — deutlich unter der
-     44-px-Trefferfläche aus v650/v652.
-
-     **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:**
-     Pfeil und Karte tun **Verschiedenes** — der Pfeil klappt auf, der
-     Kartenkörper öffnet das Objekt. Eine 44-px-Pseudofläche würde der
-     Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
-     eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
-
-     **Nachgemessen 2026-08-12 im Quelltext — die 4 px sind kein
-     Quetschbefund.** `.sbc-arrow` trägt in `style.css:4828` bereits
-     `flex-shrink: 0`; die Regel darunter
-     (`aside.sidebar .sb-card .sbc-arrow`, Z. 24958) setzt nur Farbe,
-     Schriftgröße und `margin-left`. **Die 4 × 21 px sind schlicht die
-     natürliche Breite des Zeichens `›` bei 14 px ohne jedes Padding** —
-     der Pfeil hat nie eine Fläche gehabt, er ist nur ein Buchstabe.
-
-     **Damit ist die Lösung eine andere als gedacht:** kein Flex-Fix,
-     sondern dem Pfeil überhaupt erst eine Fläche geben. Der Weg ohne
-     Klickdiebstahl ist **Padding am Element selbst** plus negatives
-     `margin` zum Ausgleich — die vergrößerte Fläche gehört dann dem Pfeil
-     und seinem eigenen delegierten Handler
-     (`karten-kompakt.js:83`, `ziel.closest('.sbc-arrow')`), nicht der
-     Karte. **Zu messen ist vorher, wie viel Platz in `.sbc-top-line1`
-     rechts frei ist** — überlappt das negative Margin die Nachbarn,
-     stiehlt es Klicks in die andere Richtung.
-
-     ### Gemessen und behoben am 01.09.2026 — `v1191` (`8902e87`)
-
-     **Der Befund oben ist überholt, und zwar in beide Richtungen: die
-     4 × 21 px waren die falsche Zahl, und das Problem war ein anderes.**
-     Die 4 px stammen aus dem Modus **Standard**, in dem der Pfeil gar
-     kein Bedienelement ist (`karten-kompakt.js` hängt seinen Handler nur
-     bei `kompakt` oder `stapel` ein). In den beiden Modi, in denen er
-     wirklich schaltet, ist er **22 × 22 px** — eine Fläche hat er also
-     längst.
-
-     **Was er nicht hatte, war Erreichbarkeit.** Gemessen in der Kabine
-     bei 390 px (Objekt „Am Markt 9, Kabelsketal", Pfeilspalte pixelweise
-     mit `elementFromPoint`):
-
-     | | vorher | jetzt |
-     |---|---|---|
-     | Pfeilmitte trifft | **`sbc-btn sbc-del`** | `sbc-arrow` |
-     | erreichbar in kompakt | **1 px** von 22 | **22 von 22** |
-     | erreichbar in stapel | 4 px von 22 | **22 von 22** |
-
-     **Wer aufklappen wollte, öffnete die Löschabfrage.** Ursache waren
-     zwei Regeln aus der 44-px-Trefferflächen-Kampagne, die den
-     Löschknopf auf 26 × 44 px plus eine unsichtbare `::after`-Fläche von
-     44 × 44 aufgeblasen haben — er griff damit von 8 bis 52 px unter der
-     Kartenoberkante, der Pfeil sitzt bei 32..54. Details und die genauen
-     Zeilennummern stehen im Rollout-Journal der Projektanweisung und im
-     Kommentar am Ende von `style.css`.
-
-     > **Das war die dritte Auflage desselben Fehlers.** `v1138b`
-     > (Score-Zahl unter dem Löschknopf) und `v1159` (Chevron in
-     > „stapel") haben beide das **Opfer** verschoben und den **Täter**
-     > nie angefasst. Ein 44-px-Knopf in einer 64-px-Karte schiebt den
-     > Konflikt nur weiter.
-
-     **Der ursprüngliche Lösungsvorschlag (Padding plus negatives Margin)
-     wird damit hinfällig** — er hätte an einer Fläche gearbeitet, die es
-     schon gab, und die eigentliche Ursache nicht berührt.
-
-     **ZWEI ENTSCHEIDUNGEN FÜR MARCEL — hier wird bewusst nicht geraten:**
-
-     **a) Der Score-Ring liegt im Modus „kompakt" unter dem
-     Duplizieren-Knopf.** Gemessen: Ring 239..277 px, Aktionsband
-     249..305 — die Ringmitte trifft `sbc-btn`. Auf dem Bild klebt das
-     Kopiersymbol sichtbar auf dem Ring. Ein Fehlgriff **dupliziert** das
-     Objekt (nicht destruktiv, aber falsch).
-     Freistellen geht: Ring `right: 34px → 68px`. **Kostet 30 px
-     Adressbreite** (`padding-right` 84 → 114), sonst läuft der Adresstext
-     unter den Ring. Also: schmalere Adresse gegen freien Ring.
-
-     **b) 44 px Trefferfläche für den Pfeil** sind in „kompakt" machbar
-     (46 px sind unter den Aktionen frei), in „stapel" **nicht** (30 px).
-     Sie kosten in kompakt 22 px Kartenfläche, auf der heute „Objekt
-     öffnen" liegt — und die Fläche wäre in den zwei Modi verschieden
-     groß. Der Punkt aus v650/v652 bleibt für diesen Pfeil damit offen;
-     die **falsche Aktion** ist aber weg, und das war das Schwere daran.
-
-     **Der Punkt bleibt bis zu Marcels Antwort auf a) und b) offen.**
-
-2. **Marktbericht neu gestalten.**
+1. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -1265,7 +1140,7 @@ entfällt — nicht raten.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-3. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+2. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -1436,7 +1311,7 @@ entfällt — nicht raten.
    **Frontend-Gate**, nicht die Backend-Durchsetzung — und er liest den
    `config.js`-Fallback, nicht die DB-Zeile des simulierten Plans.
 
-4. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+3. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    > **GRÖSSTENTEILS SCHON GEBAUT — Befund vom 2026-08-13, siehe „Fertig".**
    > `buildFullCatalog()` (v519) gibt **alle** `window.FIELDS` an die
@@ -1514,7 +1389,7 @@ entfällt — nicht raten.
 
 ---
 
-5. **Der Testbericht: Bedienführung und Verständlichkeit.**
+4. **Der Testbericht: Bedienführung und Verständlichkeit.**
    **Quelle: `design/mockups/Anmerkungen.docx`** (abgelegt 2026-08-30, 24
    Bildschirmfotos mit Anmerkungen, entstanden bei einer Objektanlage von
    Anfang bis Ende). **Fremdbefund — hier ungeprüft übernommen**, außer wo
@@ -1627,7 +1502,7 @@ entfällt — nicht raten.
      interessiert zuerst der **Bestand** und was er prüft. *„Verloren würde
      ich vielleicht rausnehmen."*
 
-6. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
+5. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
    **Marcels Auftrag vom 2026-08-30.** Heute gibt es das Finanzamt-PDF nur je
    Objekt (Tab Steuer). Gewünscht: dieselbe Sache **über alle Objekte**, mit
    Auswahl und Veranlagungsjahr. Dazu die Frage, ob sich die **Anlage V direkt
@@ -1713,7 +1588,7 @@ entfällt — nicht raten.
    > abgeschrieben, versioniert abgelegt und dagegen geprüft. Ohne
    > hinterlegte Zuordnung erscheint der Umschalter für dieses Jahr nicht.
 
-7. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
+6. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
    Ebenfalls aus `design/mockups/Anmerkungen.docx`, aber ein eigener Punkt —
    es ist **Neubau, keine Nachbesserung**, und der letzte Teil ist der
    einzige Vorschlag im ganzen Bericht, den der Tester selbst als **USP**
@@ -1740,7 +1615,7 @@ entfällt — nicht raten.
    > **Erst entscheiden, ob das zum USP werden soll**, dann bauen. Hängt
    > unmittelbar an der USP-Frage aus Punkt 8.
 
-8. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+7. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > ## 🔒 AUSGELAGERT — Marcel bearbeitet diesen Punkt an anderer Stelle
@@ -1860,7 +1735,7 @@ entfällt — nicht raten.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-9. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+8. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -1957,61 +1832,6 @@ entfällt — nicht raten.
    dem Überlagerungs-Leser messen. Erst wenn dort ein Wert unter 3 steht,
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
-
-10. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
-   **Neu gefunden beim `v1173`-Messlauf, 2026-08-30** — nicht dadurch
-   verursacht, `.sbc-actions` und `.sbc-score-overlay` sind absolut
-   positioniert und vom Raster unabhängig.
-
-   **Gemessen in der Messkabine, Wallet-Modus, ein Objekt geladen:**
-
-   | Breite | Ring | Aktionen | `elementFromPoint` auf der Ringmitte |
-   |---|---|---|---|
-   | 1200 px | y189–239 | y183–**205** | `sbc-mini-score-num` — sauber |
-   | 900 px | y185–225 | y179–**205** | `sbc-mini-score-num` — sauber |
-   | **390 px** | y200–240 | y194–**238** | **`sbc-btn sbc-del`** — Löschen |
-
-   **Die Ursache ist die 44-px-Trefferfläche aus v650/v652:** auf dem Handy
-   wachsen die beiden Knöpfe von 22 px auf 44 px Höhe und decken den Ring
-   damit vollständig zu. **Im Standard-Kartenmodus passiert das nicht** —
-   dort trifft die Ringmitte bei 390 px `sbc-mini-score-num`. Es ist also
-   eine Wallet-Sache, keine allgemeine.
-
-   **Kein Datenverlust:** `delSaved()` fragt vorher (`storage.js:1526`,
-   „Objekt wirklich löschen?"). Wer auf seinen Score tippt, bekommt trotzdem
-   die Löschabfrage — **derselbe Fehlertyp wie `v1159`**, wo im Stapelmodus
-   die Pfeilmitte Löschen auslöste.
-
-   **Zu entscheiden ist, was weicht** — das ist Optik, also nicht zu raten:
-   die Aktionen nach unten, der Ring nach links, oder auf dem Handy beide
-   auf verschiedene Kartenhälften. Vorschlag zuerst nach
-   `design/Vorschläge/`.
-
-   ### Nachgemessen am 01.09.2026 nach `v1191` — die Hälfte ist weg
-
-   **`v1191` hat denselben Täter geschrumpft** (Punkt 1): der Löschknopf
-   stand auf 26 × 44 px plus einer unsichtbaren 44-×-44-`::after`-Fläche
-   und steht jetzt auf 26 × 26 px. Neu gemessen bei 390 px, Wallet, fünf
-   Karten:
-
-   | | 30.08. | jetzt |
-   |---|---|---|
-   | Ringmitte trifft | **`sbc-btn sbc-del`** | **`sbc-mini-score-num`** |
-   | Aktionen | y194–**238** | y8–**34** |
-   | Ring | y200–240 | y14–54 |
-
-   **Wer auf seinen Score tippt, bekommt keine Löschabfrage mehr.** Der
-   Ring ist ab seiner Mitte frei.
-
-   **Was bleibt:** die **obere Ringhälfte** (y14–34, senkrecht abgetastet)
-   liegt weiter unter dem Löschknopf — 20 von 40 px Ringhöhe. Die
-   Entscheidung „was weicht" steht also noch, aber sie ist kleiner
-   geworden: nötig sind jetzt **20 px** Versatz statt 38.
-
-   **Es ist dieselbe Entscheidung wie in Punkt 1a** (Ring unter dem
-   Duplizieren-Knopf im Modus „kompakt"). Beide zusammen entscheiden,
-   nicht einzeln — sonst stehen Ring und Aktionen in zwei Kartenmodi
-   verschieden.
 
 > ### Vier Punkte sind seit dem 30.08. zu — hier stehen nur noch die Zeiger
 >
@@ -2191,6 +2011,270 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Die Objektkarte auf dem Handy — `v1191` / `v1192`, 01.09.2026
+
+**Waren Punkt 1 (Handy-Befunde) und Punkt 10 (Wallet-Ring), und es war
+derselbe Täter.** Beide Punkte beschrieben dasselbe: ein Bedienelement der
+Objektkarte lag unter dem Löschknopf. Beim Pfeil war es die Aufklapp-Geste,
+beim Ring der Score — und beide Male löste ein Fehlgriff die Löschabfrage
+aus.
+
+**Die Ursache waren zwei Regeln aus der 44-px-Trefferflächen-Kampagne
+(v650/v650c)**, die den 26-px-Kartenknopf auf 26 × 44 px plus eine
+unsichtbare `::after`-Fläche von 44 × 44 aufgebläht haben. Er griff damit
+von 8 bis 52 px unter der Kartenoberkante — quer über alles, was dort sonst
+noch steht. Details, Zeilennummern und die verworfene Gegenvariante stehen
+im Kommentar am Ende von `style.css` und im Rollout-Journal.
+
+> **Es war die dritte Auflage.** `v1138b` (Score-Zahl) und `v1159` (Chevron
+> in „stapel") haben beide das **Opfer** verschoben und den **Täter** nie
+> angefasst. Ein 44-px-Knopf in einer 64-px-Karte schiebt den Konflikt nur
+> weiter.
+
+**`v1191` (`8902e87`) — der Täter:** die zwei Kartenknöpfe sind aus der
+Pauschale heraus und stehen wieder auf ihren 26 × 26 px (der Wert, den V101
+für Touch ausdrücklich gesetzt hatte). Dazu Chevron in „kompakt"
+`top: 22px → 26px`.
+
+**`v1192` (`8aa9857`) — Marcels Entscheidung „a ja, b nein":** der Ring wird
+freigestellt, die 44-px-Fläche für den Pfeil bleibt wie sie ist.
+
+| Modus | was geändert | Ring vorher | Ring jetzt |
+|---|---|---|---|
+| **kompakt** | Ring `right: 34px → 68px`, Adresse `padding-right: 84 → 94` | Mitte trifft `sbc-btn` (Duplizieren), 14 von 38 px frei | **38 von 38 px frei** |
+| **wallet** | Overlay `top: 12px → 34px` | Mitte traf `sbc-del`, ab v1191 noch obere Hälfte verdeckt | **40 von 40 px frei** |
+
+**Warum die zwei Modi es verschieden lösen — beide Wege sind gemessen, nicht
+gewählt:** In „kompakt" ist die Karte 80 px hoch. Schiebt man den Ring nach
+unten, tritt die **Stufen-Pille** (sie hängt am selben Overlay) bei y79–101
+aus der Karte heraus. In „wallet" ist die Karte 255 px hoch, dort ist unten
+Platz — dafür geht dort **links** nichts: der Ring läge bei l203–243, das
+Datum endet bei 214, und die Zeile hat `flex-wrap: wrap` — sie würde
+umbrechen und die Karte höher machen.
+
+> **Eine eigene Zahl war zu grob und wird zurückgenommen.** Ich hatte
+> Marcel gesagt, den Ring freizustellen koste **30 px** Adressbreite. Das
+> war der Wert meines ersten Versuchs (`padding-right: 114`), nicht die
+> nötige Untergrenze. Nachgerechnet: der Text muss vor Pixel 204 enden,
+> das schafft **94** — also **10 px**, nicht 30. „Am Markt 9, Kabelsketal"
+> steht danach immer noch vollständig da.
+
+**Nachgemessen auf Staging** (frisch geladen, `ui-varianten.css?v=v1192`),
+fünf sichtbare Karten je Modus:
+
+- **Pfeil** in kompakt und stapel: **22 von 22 px** erreichbar; der echte
+  Mausklick auf die Pfeilmitte klappt auf, `delSaved` wird nicht gerufen,
+  keine Löschabfrage, alle sieben Objekte bleiben stehen.
+- **Ring** in allen vier Modi (Standard, kompakt, wallet, stapel):
+  Ringmitte → `sbc-mini-score-num`, volle Höhe frei.
+- **Stufen-Pille** in jedem Modus innerhalb der Karte.
+- **Löschen** und **Duplizieren** treffen weiterhin ihre eigenen Knöpfe.
+
+**Was aus Punkt 1 bewusst NICHT gebaut wurde (Marcels „b nein"):** eine
+44-px-Trefferfläche für den Pfeil. Sie wäre in „kompakt" machbar (46 px
+frei), in „stapel" nicht (30 px) — sie wäre also in zwei Modi verschieden
+groß und nähme in kompakt 22 px Fläche weg, auf der heute „Objekt öffnen"
+liegt. Der Punkt aus v650/v652 bleibt für diesen einen Pfeil damit offen;
+die **falsche Aktion** ist weg, und das war das Schwere daran.
+
+**Der andere Teilbefund von Punkt 1** (Ankreuzfelder auf 33 px, `v1147`/
+`v1147b`) war bereits am 12.08. abgenommen.
+
+---
+#### Der Wortlaut aus "Offen" — die Handy-Befunde
+
+**Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
+Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
+
+- **ERLEDIGT — Ankreuzfelder auf 33 px** (`v1147` `674c3b0`,
+  `v1147b` `413d409`). **Marcels Entscheidung 2026-08-12: 33 px, nicht
+  44** — die volle Trefferfläche hätte jede Formularzeile höher gemacht.
+
+  **Ursache, am Markup nachgezählt:** alle **37** Checkboxen sind
+  nackte `<input type="checkbox">` **ohne Klasse**. Die Klasse
+  `.cb-label` sitzt am **Label**, nicht am Feld — ihre Regel
+  (`style.css:2191`, 16 px) griff deshalb nur für acht. Die übrigen
+  standen auf Browser-Standard, daher die gemessenen 13 px.
+
+  Schalter sind ausgenommen (`.ji-switch`, `.toggle-slim`,
+  `.fesh-tile`, `.dp-pf-tile`) — sie bauen aus demselben nackten
+  Element eine ganz andere Optik.
+
+  **Nachgemessen:** **26 Felder auf 33 × 33 px**, alle Schalter
+  unverändert (14 px, 32 × 18, auto).
+
+  **Eigener Fehler, korrigiert in `v1147b`:** Der Selektor stand zuerst
+  auf `#app` — **dieses Element gibt es in der App gar nicht**
+  (`getElementById` liefert `null`). Ich hatte den Anker aus
+  `CLAUDE.md` übernommen, statt ihn auszulesen; genau der Fehler, vor
+  dem Regel 1 warnt. Die Regel griff dadurch nirgends.
+
+  **ABGENOMMEN (2026-08-12 abends, siehe Fertig).** Die Messung vom
+  Mittag war wertlos (0 von 26 Feldern sichtbar). Nachgeholt mit
+  geladenem Objekt, allen Reitern und aufgeklappten `<details>`:
+  **21 sichtbare Felder, alle 33 × 33 px, kein Überlauf** — bei 1440 px
+  und bei **390 px**. Die Zeilen tragen (33/35 px), kein Feld ragt heraus,
+  kein Label abgeschnitten. Die dichten Reiter Steuer (2) und
+  Pilot-Analyse (13) sind einzeln geprüft.
+- **`.sbc-arrow` misst 20 × 20 px und ist ein echtes Bedienelement.**
+
+  **Mein v1118-Befund war falsch und wird hiermit zurückgenommen.** Ich
+  hatte gemeldet, der Pfeil trage `role="button"` „ohne eigenen Klick"
+  und die Rolle sei irreführend. Nachgelesen in `karten-kompakt.js`
+  (v1092): Rolle, `tabindex="0"` und `aria-label` werden dort
+  **absichtlich** gesetzt — und zwar nur, wenn der Kartenmodus
+  `kompakt` oder `stapel` aktiv ist. Dort **klappt der Pfeil die Karte
+  auf und zu** (`umschalten()`), über einen **delegierten** Listener.
+  Mein Prüfausdruck hat nur `getAttribute('onclick')` abgefragt und
+  einen delegierten Handler deshalb nicht gesehen.
+
+  **Was bleibt, ist ein anderer, echter Befund:** ein Bedienelement mit
+  eigener Funktion misst **20 × 20 px** — deutlich unter der
+  44-px-Trefferfläche aus v650/v652.
+
+  **Warum das nicht wie in `v1118b` mit einem `::after` zu lösen ist:**
+  Pfeil und Karte tun **Verschiedenes** — der Pfeil klappt auf, der
+  Kartenkörper öffnet das Objekt. Eine 44-px-Pseudofläche würde der
+  Karte Klicks stehlen und die falsche Aktion auslösen. Es ist also
+  eine Frage der Kartengestaltung im Kompakt-Modus, kein Nachschlag.
+
+  **Nachgemessen 2026-08-12 im Quelltext — die 4 px sind kein
+  Quetschbefund.** `.sbc-arrow` trägt in `style.css:4828` bereits
+  `flex-shrink: 0`; die Regel darunter
+  (`aside.sidebar .sb-card .sbc-arrow`, Z. 24958) setzt nur Farbe,
+  Schriftgröße und `margin-left`. **Die 4 × 21 px sind schlicht die
+  natürliche Breite des Zeichens `›` bei 14 px ohne jedes Padding** —
+  der Pfeil hat nie eine Fläche gehabt, er ist nur ein Buchstabe.
+
+  **Damit ist die Lösung eine andere als gedacht:** kein Flex-Fix,
+  sondern dem Pfeil überhaupt erst eine Fläche geben. Der Weg ohne
+  Klickdiebstahl ist **Padding am Element selbst** plus negatives
+  `margin` zum Ausgleich — die vergrößerte Fläche gehört dann dem Pfeil
+  und seinem eigenen delegierten Handler
+  (`karten-kompakt.js:83`, `ziel.closest('.sbc-arrow')`), nicht der
+  Karte. **Zu messen ist vorher, wie viel Platz in `.sbc-top-line1`
+  rechts frei ist** — überlappt das negative Margin die Nachbarn,
+  stiehlt es Klicks in die andere Richtung.
+
+  ### Gemessen und behoben am 01.09.2026 — `v1191` (`8902e87`)
+
+  **Der Befund oben ist überholt, und zwar in beide Richtungen: die
+  4 × 21 px waren die falsche Zahl, und das Problem war ein anderes.**
+  Die 4 px stammen aus dem Modus **Standard**, in dem der Pfeil gar
+  kein Bedienelement ist (`karten-kompakt.js` hängt seinen Handler nur
+  bei `kompakt` oder `stapel` ein). In den beiden Modi, in denen er
+  wirklich schaltet, ist er **22 × 22 px** — eine Fläche hat er also
+  längst.
+
+  **Was er nicht hatte, war Erreichbarkeit.** Gemessen in der Kabine
+  bei 390 px (Objekt „Am Markt 9, Kabelsketal", Pfeilspalte pixelweise
+  mit `elementFromPoint`):
+
+  | | vorher | jetzt |
+  |---|---|---|
+  | Pfeilmitte trifft | **`sbc-btn sbc-del`** | `sbc-arrow` |
+  | erreichbar in kompakt | **1 px** von 22 | **22 von 22** |
+  | erreichbar in stapel | 4 px von 22 | **22 von 22** |
+
+  **Wer aufklappen wollte, öffnete die Löschabfrage.** Ursache waren
+  zwei Regeln aus der 44-px-Trefferflächen-Kampagne, die den
+  Löschknopf auf 26 × 44 px plus eine unsichtbare `::after`-Fläche von
+  44 × 44 aufgeblasen haben — er griff damit von 8 bis 52 px unter der
+  Kartenoberkante, der Pfeil sitzt bei 32..54. Details und die genauen
+  Zeilennummern stehen im Rollout-Journal der Projektanweisung und im
+  Kommentar am Ende von `style.css`.
+
+  > **Das war die dritte Auflage desselben Fehlers.** `v1138b`
+  > (Score-Zahl unter dem Löschknopf) und `v1159` (Chevron in
+  > „stapel") haben beide das **Opfer** verschoben und den **Täter**
+  > nie angefasst. Ein 44-px-Knopf in einer 64-px-Karte schiebt den
+  > Konflikt nur weiter.
+
+  **Der ursprüngliche Lösungsvorschlag (Padding plus negatives Margin)
+  wird damit hinfällig** — er hätte an einer Fläche gearbeitet, die es
+  schon gab, und die eigentliche Ursache nicht berührt.
+
+  **ZWEI ENTSCHEIDUNGEN FÜR MARCEL — hier wird bewusst nicht geraten:**
+
+  **a) Der Score-Ring liegt im Modus „kompakt" unter dem
+  Duplizieren-Knopf.** Gemessen: Ring 239..277 px, Aktionsband
+  249..305 — die Ringmitte trifft `sbc-btn`. Auf dem Bild klebt das
+  Kopiersymbol sichtbar auf dem Ring. Ein Fehlgriff **dupliziert** das
+  Objekt (nicht destruktiv, aber falsch).
+  Freistellen geht: Ring `right: 34px → 68px`. **Kostet 30 px
+  Adressbreite** (`padding-right` 84 → 114), sonst läuft der Adresstext
+  unter den Ring. Also: schmalere Adresse gegen freien Ring.
+
+  **b) 44 px Trefferfläche für den Pfeil** sind in „kompakt" machbar
+  (46 px sind unter den Aktionen frei), in „stapel" **nicht** (30 px).
+  Sie kosten in kompakt 22 px Kartenfläche, auf der heute „Objekt
+  öffnen" liegt — und die Fläche wäre in den zwei Modi verschieden
+  groß. Der Punkt aus v650/v652 bleibt für diesen Pfeil damit offen;
+  die **falsche Aktion** ist aber weg, und das war das Schwere daran.
+
+  **MARCELS ENTSCHEIDUNG (01.09.2026): „a ja, b nein."**
+  Der Ring wird freigestellt (`v1192`), die 44-px-Fläche für den Pfeil
+  bleibt, wie sie ist.
+
+#### Der Wortlaut aus "Offen" — der Wallet-Ring
+
+**Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
+**Neu gefunden beim `v1173`-Messlauf, 2026-08-30** — nicht dadurch
+verursacht, `.sbc-actions` und `.sbc-score-overlay` sind absolut
+positioniert und vom Raster unabhängig.
+
+**Gemessen in der Messkabine, Wallet-Modus, ein Objekt geladen:**
+
+| Breite | Ring | Aktionen | `elementFromPoint` auf der Ringmitte |
+|---|---|---|---|
+| 1200 px | y189–239 | y183–**205** | `sbc-mini-score-num` — sauber |
+| 900 px | y185–225 | y179–**205** | `sbc-mini-score-num` — sauber |
+| **390 px** | y200–240 | y194–**238** | **`sbc-btn sbc-del`** — Löschen |
+
+**Die Ursache ist die 44-px-Trefferfläche aus v650/v652:** auf dem Handy
+wachsen die beiden Knöpfe von 22 px auf 44 px Höhe und decken den Ring
+damit vollständig zu. **Im Standard-Kartenmodus passiert das nicht** —
+dort trifft die Ringmitte bei 390 px `sbc-mini-score-num`. Es ist also
+eine Wallet-Sache, keine allgemeine.
+
+**Kein Datenverlust:** `delSaved()` fragt vorher (`storage.js:1526`,
+„Objekt wirklich löschen?"). Wer auf seinen Score tippt, bekommt trotzdem
+die Löschabfrage — **derselbe Fehlertyp wie `v1159`**, wo im Stapelmodus
+die Pfeilmitte Löschen auslöste.
+
+**Zu entscheiden ist, was weicht** — das ist Optik, also nicht zu raten:
+die Aktionen nach unten, der Ring nach links, oder auf dem Handy beide
+auf verschiedene Kartenhälften. Vorschlag zuerst nach
+`design/Vorschläge/`.
+
+### Nachgemessen am 01.09.2026 nach `v1191` — die Hälfte ist weg
+
+**`v1191` hat denselben Täter geschrumpft** (Punkt 1): der Löschknopf
+stand auf 26 × 44 px plus einer unsichtbaren 44-×-44-`::after`-Fläche
+und steht jetzt auf 26 × 26 px. Neu gemessen bei 390 px, Wallet, fünf
+Karten:
+
+| | 30.08. | jetzt |
+|---|---|---|
+| Ringmitte trifft | **`sbc-btn sbc-del`** | **`sbc-mini-score-num`** |
+| Aktionen | y194–**238** | y8–**34** |
+| Ring | y200–240 | y14–54 |
+
+**Wer auf seinen Score tippt, bekommt keine Löschabfrage mehr.** Der
+Ring ist ab seiner Mitte frei.
+
+**Was bleibt:** die **obere Ringhälfte** (y14–34, senkrecht abgetastet)
+liegt weiter unter dem Löschknopf — 20 von 40 px Ringhöhe. Die
+Entscheidung „was weicht" steht also noch, aber sie ist kleiner
+geworden: nötig sind jetzt **20 px** Versatz statt 38.
+
+**Es ist dieselbe Entscheidung wie in Punkt 1a** (Ring unter dem
+Duplizieren-Knopf im Modus „kompakt"). Beide zusammen entscheiden,
+nicht einzeln — sonst stehen Ring und Aktionen in zwei Kartenmodi
+verschieden.
+
 
 ### Tablet-Fassung — vollständig, 01.09.2026 (`d92fa5f`, `2dde1ab`)
 

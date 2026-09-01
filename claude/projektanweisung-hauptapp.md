@@ -3921,6 +3921,57 @@ alle sieben Karten bleiben stehen.
 
 ---
 
+### v1192 (01.09.2026, `8aa9857`) — der Score-Ring lag unter den Aktionsknöpfen
+
+**Marcels Entscheidung auf die zwei Fragen aus `v1191`: „a ja, b nein."**
+Der Ring wird freigestellt, die 44-px-Fläche für den Pfeil bleibt wie sie
+ist.
+
+| Modus | geändert | Ring vorher | Ring jetzt |
+|---|---|---|---|
+| **kompakt** | Ring `right: 34px → 68px`, Adresse `padding-right: 84 → 94` | Mitte trifft `sbc-btn` (Duplizieren), 14 von 38 px frei | **38 von 38 px frei** |
+| **wallet** | Overlay `top: 12px → 34px` | Mitte traf `sbc-del`, ab `v1191` noch die obere Hälfte verdeckt | **40 von 40 px frei** |
+
+**Warum in „kompakt" 34 px nicht reichten:** der Kommentar an der Regel
+sagte „Ring nach links rücken, damit der Chevron rechts daneben Platz
+hat" — gerechnet war also nur gegen den **Chevron**. Die
+**Aktionsknöpfe** stehen aber bei `right: 6px` und sind 56 px breit, sie
+belegen die rechten 62 px. Mit `right: 34` lag der Ring mittendrin.
+Sichtbar war es die ganze Zeit: das Kopiersymbol klebte auf dem Ring.
+
+**Warum die zwei Modi es verschieden lösen — beide Wege sind gemessen:**
+
+- In **kompakt** ist die Karte **80 px** hoch. Schiebt man den Ring nach
+  unten (`top: 34`), steht er zwar frei, aber die **Stufen-Pille** hängt
+  am selben Overlay und rutscht auf y79–101 — sie **tritt aus der Karte
+  heraus**. Also nach links.
+- In **wallet** ist die Karte **255 px** hoch, unten ist Platz. Nach
+  links geht es dort **nicht**: der Ring läge bei l203–243, das Datum in
+  der Kopfzeile endet bei 214, und `.sbc-top-line1` hat
+  `flex-wrap: wrap` — das Datum bräche um und machte die Karte höher.
+
+> **Eine eigene Zahl war zu grob und wird zurückgenommen.** Ich hatte
+> Marcel gesagt, den Ring freizustellen koste **30 px** Adressbreite. Das
+> war der Wert meines ersten Versuchs (`padding-right: 114`), nicht die
+> nötige Untergrenze. Nachgerechnet: der Adresstext muss vor Pixel 204
+> enden, das schafft **94** — also **10 px**, nicht 30. Der Unterschied
+> ist sichtbar: „Am Markt 9, Kabelsketal" steht mit 94 noch vollständig
+> da, mit 114 nicht mehr. **Wer eine Kostenangabe aus dem ersten
+> Versuchswert nimmt statt aus der Untergrenze, verhandelt gegen sich
+> selbst.**
+
+**Nachweis auf Staging** (`8aa9857`, frisch geladen,
+`ui-varianten.css?v=v1192`), fünf sichtbare Karten je Modus:
+Ringmitte → `sbc-mini-score-num` in **allen vier** Kartenmodi (Standard,
+kompakt, wallet, stapel), volle Ringhöhe frei · Stufen-Pille überall
+innerhalb der Karte · Pfeil weiter 22 von 22 px · Löschen und Duplizieren
+treffen ihre eigenen Knöpfe.
+
+**Damit sind Backlog-Punkt 1 (Handy-Befunde) und Punkt 10 (Wallet-Ring)
+zu** — es war derselbe Täter, und aus 1–10 wurde 1–8.
+
+---
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
