@@ -38,8 +38,19 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 2026-08-31, nach dem Prod-Rollout)
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `9b52442`.
+**Stand:** lokal = GitHub = Staging = **Produktion** auf `28f8ab1`.
 Migrationen **69** auf beiden Servern. **Nichts hängt halbfertig.**
+
+**Zweiter Prod-Rollout am 01.09. gegen 02:35** — `v1189` (Admin-Route),
+`v1190`/`v1190b` (flache Kopfleiste). Keine neue Migration, zwei
+Backend-Dateien, Rebuild gelaufen. Backup vorher:
+`/root/backups/dealpilot_db-vor-v1190-20260901-0233.sql` (12 MB,
+60 Tabellen). **Abgenommen auf `app.dealpilot.immo`:** nur noch eine
+`start-pro-trial`-Route · `gewaehreTestpaket` kennt `erneuern` · Preise
+unverändert (1999 / 7999) · null Fehler im Log · bei 820 px startet die
+Leiste eingeklappt, die Kurzfassung „83 · Gut" steht in Grün
+(`rgb(94,217,146)`) und verschwindet beim Aufklappen · bei 1400 px
+bleibt alles ausgeklappt.
 
 **Produktion ist am 31.08.2026 gegen 21:40 ausgerollt worden** — der
 erste Rollout seit dem 14.08., 58 Commits. Preise live: Starter 19,99 ·
