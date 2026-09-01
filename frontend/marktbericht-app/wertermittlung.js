@@ -420,12 +420,31 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     });
   }
 
-  /* v1027 · Der Preis steht an der Wahl, nicht irgendwo im Kopf. */
-  var KEROSIN = { 1: 2, 2: 5, 3: 12 };
+  /* ── v1194 · Hier lag der Preis ein zweites Mal, und zwar in Kerosin ──
+     Bis hierher stand `var KEROSIN = { 1: 2, 2: 5, 3: 12 }` und die
+     Optionen trugen ein Schild „2 L / 5 L / 12 L".
+
+     Zwei Gruende, warum es weg ist und nicht nur uebersetzt wurde:
+
+       · Es war eine ZWEITE Preisquelle. Was eine Stufe kostet, weiss der
+         Server (`GET /marktbericht/stufenpreis`, Feld `kosten`), und
+         `mb-stufen.js` holt es dort ab. Eine fest verdrahtete Zahl
+         daneben laeuft frueher oder spaeter auseinander — genau so ist
+         der Liter-Tarif hier stehengeblieben, als v1183 die Waehrung
+         abgeschafft hat.
+       · Diese Liste lebt nur Millisekunden: `mb-stufen.zeichnen()`
+         ersetzt den Inhalt von `#wm-ziel` durch die Meilenstein-Ampel
+         („Die alte Optionsliste weicht"). Deshalb hat v1193 im
+         Seitentext auch kein `L` mehr gefunden — die Stelle war nicht
+         sichtbar, nur geladen. Faellt mb-stufen.js aber aus, bleibt
+         stehen, was hier steht. Ein falscher Preis als Rueckfallebene
+         ist schlechter als gar keiner.
+
+     Der Preis steht jetzt an EINER Stelle: in der Ampel darueber. */
 
   function opt(n, titel, text) {
     return '<div class="wm-opt' + (stufe() === n ? ' an' : '') + '" data-s="' + n + '">' +
-      '<b>' + titel + '</b><span class="wm-kero">' + KEROSIN[n] + ' L</span>' +
+      '<b>' + titel + '</b>' +
       '<small>' + text + '</small></div>';
   }
 

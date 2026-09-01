@@ -382,8 +382,13 @@
 
     // ──────── TAB 7: KI-ANALYSE ───────────────────────────────────────────
     'tab7.ki_credits': {
-      title: 'KI-Credits',
-      body: 'Eine vollständige KI-Analyse kostet 2 Credits. KI-Lage-Bewertung und KI-Mietpreis-Analyse: je 1 Credit. Du kannst Credit-Pakete kaufen oder über das Abo erhalten.',
+      /* v1194 · Stand hier als „KI-Credits: 2 Credits / je 1 Credit". Alle
+         drei genannten Analysen buchen seit v1183 ueber `logExtract`
+         (ai.js, Kommentar dort: „im Plan enthalten") und kosten NICHTS.
+         Der Schluessel wird derzeit von keinem Feld aufgerufen — die
+         Angabe war trotzdem falsch und stand als Vorlage im Haus. */
+      title: 'Kontingent',
+      body: 'Die KI-Analysen in diesem Tab sind in deinem Plan enthalten und verbrauchen kein Kontingent. Verbraucht wird nur bei Marktberichten (Marktpreisindikation, Erweiterte Marktpreisindikation, Wertermittlung nach ImmoWertV) und bei Marktwert-Abrufen. Deinen Stand siehst du in den Einstellungen unter „Plan".',
       severity: 'beginner'
     },
     'tab7.analyse_parameter': {

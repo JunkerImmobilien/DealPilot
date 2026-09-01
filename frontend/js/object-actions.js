@@ -377,21 +377,42 @@
   function updateCreditHint() {
     var el = $('oab-credit-hint'); if (!el) return;
     var sel = selectedSources();
-    /* v503-kerosin-hint: Liter statt "Credits" — Saetze gemaess Backend
-       (avm.js COST: PriceHubble 40 L, Sprengnetter 20 L; ai.js extract-voice 1 L).
-       Frontend zeigt nur an, abgerechnet wird serverseitig. */
-    var KEROSIN_L = { voice: 1, pricehubble: 40, sprengnetter: 20, dealpilot: 2 }; /* v654-dp-hint */
-    var billed = sel.filter(function (s) { return KEROSIN_L[s] != null; });
+    /* ── v1194 · Der Hinweis rechnete noch in Kerosin ────────────────────
+       Hier stand `{ voice: 1, pricehubble: 40, sprengnetter: 20, dealpilot: 2 }`
+       und daraus wurde auf dem Schirm „20 L Sprengnetter". Das war ZWEIMAL
+       falsch:
+
+         · die Waehrung gibt es seit v1183 nicht mehr, und
+         · die ZAHL stimmte auch nicht. `avm.js` zieht ueber `consumeAvm()`
+           genau EINEN Marktwert-Abruf je Anbieter — `routes/avm.js:236`
+           sagt `required: 1`, nicht 40 oder 20. Die 40/20 sind der alte
+           Liter-Tarif aus `COST`, den der Server nur noch als `cost` im
+           Antwortkoerper mitschleppt.
+
+       `voice` steht gar nicht mehr in der Liste: `ai.js:514` bucht die
+       Sprachauswertung ueber `logExtract` — der Kommentar dort sagt
+       woertlich „v1183: im Plan enthalten", also cost 0. Fuer etwas
+       Kostenloses ein Preisschild zu zeigen ist derselbe Fehler wie eine
+       abgeschaffte Waehrung, nur andersherum.
+
+       `dealpilot` kostet EINE Bewertung, aber welche Art (MPI / MPI+ / WEV)
+       haengt an der erreichten Stufe und weiss nur der Server
+       (`_faelligeStufeFuer`, routes/marktbericht.js:445). Deshalb steht hier
+       „1 Bewertung" ohne Art — lieber unbestimmt als falsch bestimmt. */
+    var KOSTET = {
+      pricehubble:  '1 Marktwert-Abruf',
+      sprengnetter: '1 Marktwert-Abruf',
+      dealpilot:    '1 Bewertung'
+    };
+    var billed = sel.filter(function (s) { return KOSTET[s] != null; });
     if (!billed.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var demo = !!(_avmHealth && _avmHealth.mode === 'stub');
-    var _total = 0;
     var parts = billed.map(function (s) {
-      var L = KEROSIN_L[s]; _total += L;
-      var nm = s === 'voice' ? 'Sprachauswertung' : (s === 'pricehubble' ? 'PriceHubble' : (s === 'dealpilot' ? 'DealPilot' : 'Sprengnetter'));
-      return '<b>' + L + '\u00a0L</b> ' + nm;
+      var nm = s === 'pricehubble' ? 'PriceHubble' : (s === 'dealpilot' ? 'DealPilot' : 'Sprengnetter');
+      return '<b>' + KOSTET[s] + '</b> (' + nm + ')';
     }).join(' + ');
-    var txt = 'Beim <b>Abrufen</b> ' + (billed.length > 1 ? 'werden ' : 'wird ') + parts + ' Kontingent verbraucht' + (billed.length > 1 ? ' (' + billed.length + ' Bewertungen)' : '') + '.';
-    if (demo && billed.some(function (s) { return s !== 'voice'; })) txt += ' <span style="opacity:.75">Marktradar im Demo-Modus aktuell kostenlos.</span>';
+    var txt = 'Beim <b>Abrufen</b> ' + (billed.length > 1 ? 'werden ' : 'wird ') + parts + ' aus deinem Kontingent verbraucht.';
+    if (demo) txt += ' <span style="opacity:.75">Marktradar im Demo-Modus aktuell kostenlos.</span>';
     el.innerHTML = '<span class="oab-credit-dot"></span>' + txt;
     el.style.display = '';
   }
@@ -549,13 +570,18 @@
       var res = await fetch('/api/v1/avm/' + provider, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() }, body: JSON.stringify({ inputs: mainInputs(), objectId: window._currentObjKey || null }) }); /* v742-avm-history-ui */
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) {
-        if (data && data.needs_credits) toast('⚠ Nicht genug Credits (' + (data.required || '?') + ' nötig)');
+        /* v1194 · „Nicht genug Credits" war die abgeschaffte Waehrung, und
+           `required` ist ohnehin immer 1. Der Server schickt in `error`
+           bereits den fertigen deutschen Satz („Kein Marktwert-Abruf mehr
+           frei.", routes/avm.js:233) — den zeigen, statt daneben einen
+           zweiten zu bauen, der auseinanderlaufen kann. */
+        if (data && data.needs_credits) toast('⚠ ' + (data.error || 'Kein Marktwert-Abruf mehr frei.'));
         else if (data && data.missing_fields) { promptMissing(provider); }
         else if (data && data.disabled) toast('Marktradar ist derzeit deaktiviert.');
         else toast('⚠ Marktradar-Abruf fehlgeschlagen' + (data && data.message ? ': ' + data.message : ''));
         return;
       }
-      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); /* v742-avm-persist: nur echte Live-Ergebnisse persistieren (kein Stub/live-unmapped) */ if (data.result.mode === 'live') { persistAvmState(); } toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−' + (data.cost || 0) + ' Credits)')); if (data.mode !== 'stub') { try { setTimeout(function(){ if (window.AiCredits && typeof window.AiCredits.refreshAvm === 'function') window.AiCredits.refreshAvm(); }, 400); } catch (e) {} } }
+      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); /* v742-avm-persist: nur echte Live-Ergebnisse persistieren (kein Stub/live-unmapped) */ if (data.result.mode === 'live') { persistAvmState(); } toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−1 Marktwert-Abruf)')); if (data.mode !== 'stub') { try { setTimeout(function(){ if (window.AiCredits && typeof window.AiCredits.refreshAvm === 'function') window.AiCredits.refreshAvm(); }, 400); } catch (e) {} } }
     } catch (e) { toast('⚠ Netzwerkfehler beim Marktradar-Abruf'); }
   }
   function pickMW(r) { return _span === 'low' ? r.low : _span === 'high' ? r.high : r.marktwert; }

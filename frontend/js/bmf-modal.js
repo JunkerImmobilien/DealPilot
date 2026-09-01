@@ -1536,7 +1536,7 @@ function suggestGaaBmf(){
   // Vorab-Validierung: ohne PLZ + Ort macht's keinen Sinn
   if(!payload.plz || !payload.ort){
     toast('KI-Vorschlag braucht PLZ und Ort — bitte erst im Tab Objekt eintragen');
-    if(btn){ btn.disabled = false; btn.textContent = 'KI-Vorschlag (1 Credit)'; }
+    if(btn){ btn.disabled = false; btn.textContent = 'KI-Vorschlag'; }
     return;
   }
 
@@ -1615,11 +1615,11 @@ function suggestGaaBmf(){
     _persistBmfState();
   })
   .catch(function(err){
-    if(err.message === 'credits'){ toast('Keine KI-Credits verfügbar'); }
+    if(err.message === 'credits'){ toast('Vorschlag gerade nicht verfügbar.'); } /* v1194: ai.js hat seit v1183 keinen 402 mehr — der Zweig bleibt als Netz, aber ohne Waehrungsnamen */
     else { toast('KI-Fehler: ' + err.message); }
   })
   .finally(function(){
-    if(btn){ btn.disabled = false; btn.textContent = 'KI-Vorschlag (1 Credit)'; }
+    if(btn){ btn.disabled = false; btn.textContent = 'KI-Vorschlag'; }
   });
 }
 

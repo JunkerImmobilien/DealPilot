@@ -1993,7 +1993,13 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
         '<div class="dpv-h">KI-Einordnung des Verlaufs</div>' +
         '<div class="dpv-sub">Kurze Zusammenfassung der Entwicklung \u00b7 im Plan enthalten</div>' +
         '<div id="dpv-txt" class="dpv-txt"></div>' +
-        '<button type="button" id="dpv-ki-btn" class="dpv-kibtn">Trend-Text erzeugen <span class="dpv-l">1 L</span></button>' +
+        /* v1194 · Hier hing ein Preisschild „1 L" am Knopf — die Waehrung,
+           die v1183 abgeschafft hat. Und der Preis stimmte auch nicht:
+           `routes/marktbericht.js:236` bucht den Trend-Text ueber
+           `logExtract`, also mit `cost 0, source 'free'`. Er kostet nichts.
+           Die Zeile darueber sagt „im Plan enthalten" — das Schild hat ihr
+           direkt widersprochen. */
+        '<button type="button" id="dpv-ki-btn" class="dpv-kibtn">Trend-Text erzeugen</button>' +
       '</div>' +
       '<div class="dp-pa-card dpv-card">' +
         '<div class="dpv-h">Absolutwerte &amp; \u0394</div>' +
@@ -2057,7 +2063,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       labels: mets.reduce(function (a, m) { a[m.key] = m.label; return a; }, {}) };
     Auth.apiCall('/marktbericht/verlauf-text', { method: 'POST', body: payload })
       .then(function (data) {
-        if (data && data.needs_credits) { out.innerHTML = '<span class="dpv-err">Gerade nicht verf00fcgbar.</span>'; return; }
+        if (data && data.needs_credits) { out.innerHTML = '<span class="dpv-err">Gerade nicht verfügbar.</span>'; return; }
         var t = (data && (data.text || data.report_md)) || '';
         out.innerHTML = t ? _dpVEscP(t) : '<span class="dpv-err">Kein Text erhalten.</span>';
         if (t) { btn.style.display = 'none'; }
