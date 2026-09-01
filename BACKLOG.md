@@ -818,180 +818,15 @@ entfällt — nicht raten.
 > „Fertig" stehen weiter die ALTEN Nummern** — das sind Protokolle eines
 > Tages, die man nicht rückwirkend umschreibt. Wo es zu verwechseln wäre,
 > steht der Zusatz „damals N".
+>
+> **Am 01.09. noch einmal:** die Tablet-Fassung (Punkt 1) ist nach Fertig
+> gewandert, aus 1–11 wurde **1–10**. Jede Nummer rückt um eins vor:
+> Handy-Befunde 2 → **1**, Marktbericht 3 → **2**, Pläne 4 → **3**,
+> Spracheingabe 5 → **4**, Testbericht 6 → **5**, Steuer-Mappe 7 → **6**,
+> Cockpit 8 → **7**, Sachwertfaktor 9 → **8**, Objektnummer 10 → **9**,
+> Wallet 11 → **10**.
 
-1. **Tablet-Fassung: A, C und D sind erfüllt — gemessen 2026-08-12.**
-   Der Punkt bleibt offen, weil **B** und die **Admin-Oberfläche** offen sind.
-   Alles andere ist gebaut, es war nur nie nachgemessen worden.
-
-   **Gemessen in der Messkabine** (Träger `/impressum.html` auf der
-   App-Domain, iframe, Partner-Konto, Objekt `PRUEF_ZFH` geladen,
-   `getAnimations().finish()` nach jeder Breitenänderung):
-
-   | Fenster | Sidebar | Leiste | Inhalt | Burger |
-   |---|---|---|---|---|
-   | 820 px | Drawer (`fixed`, −380) | 380 | 820 | sichtbar |
-   | 900 px | Drawer | 380 | 900 | sichtbar |
-   | **901 px** | **angedockt** (`sticky`) | 260 | 641 | aus |
-   | **1024 px** | **angedockt** | 260 | **764** | aus |
-   | 1025 px | angedockt (`relative`) | 380 | 645 | aus |
-   | 1180 px | angedockt | 380 | 800 | aus |
-
-   - **A (Sidebar andocken): erfüllt, und zwar seit `v648`.** Der Block
-     `css/style.css:35783` — `@media (min-width:901px) and (max-width:1024px)`
-     — dockt die Leiste als 260-px-Spalte im Fluss an und lässt bei 1024 px
-     **764 px** für den Inhalt. Marcels Entscheidung „ab 1024 px" ist damit
-     erfüllt, sogar schärfer: es beginnt bei 901 px.
-   - **C (zweispaltige Formulare): erfüllt.** Im Objekt-Tab stehen bei
-     641–764 px Inhaltsbreite zwei- **und** dreispaltige Raster
-     (2 × 318,5 px bzw. 3 × 210,3 px).
-   - **D (Popover statt Blatt): gegenstandslos.** Es gibt kein Blatt von
-     unten mehr. `css/style.css:11519` legt es **global** still:
-     `.bsheet-overlay{display:none!important}` mit dem Kommentar
-     „Bottom-Sheet aus V43 verstecken — wird in V46 nicht mehr genutzt". Der
-     Auslöser `.sb-actions-trigger` öffnet `sbActionsToggle()`, also das
-     **Akkordeon in der Sidebar** (11 `.sb-act-item`, 217 px breit).
-     Gegenprobe bei 820 px und 1024 px: `bsheet-panel` bleibt auf Höhe 0.
-
-   > **Der Entwurf `design/Vorschläge/tablet-fassung.md` ist an drei Stellen
-   > widerlegt, und die Ursache ist dieselbe: er hat ausschließlich bei
-   > 820 px gemessen** — unterhalb der 901er-Schwelle, also im Drawer-Band.
-   > Deshalb las sich der Grundbefund als „das Tablet bekommt die
-   > Handy-Fassung, nur breiter". Für 901–1024 px trifft das nicht zu.
-   > Beim Blatt kam eine zweite Falle dazu: es steht mit 40 Erwähnungen im
-   > Markup und 11 Kacheln im DOM und **sieht deshalb aktiv aus**. Ob ein
-   > Element je sichtbar wird, sagt nur die Messung — nicht seine Anwesenheit.
-
-   **Was an dem Punkt wirklich offen ist:**
-
-   ### B ist nachgemessen (01.09.2026) — die Zahl lag nie vor
-
-   **Der Entwurf hatte recht, ich hatte unrecht.** Im Prüflauf vom 12.08.
-   stand „Kopfleiste 157 px statt der 348 px des Entwurfs" — gemessen an
-   `PRUEF_ZFH`, einem Objekt **unter** der 70-%-Schwelle, bei dem die
-   Score-Zeile gar nicht erst gebaut wird. Mit einem Objekt **über** der
-   Schwelle (`Am Markt 9, Kabelsketal`, 24/24 Felder, Score 83) in der
-   Messkabine:
-
-   | Fenster | Kopfleiste | davon Score-Block | Sidebar |
-   |---|---|---|---|
-   | **820 px** | **347 px** — 39 % eines 900-px-Schirms | 230 px | Drawer |
-   | 1024 px | 342 px | 230 px | angedockt |
-   | 1180 px | 317 px | 206 px | angedockt |
-
-   **Woraus die 347 px bestehen:** `hdr-v61-row1` 88 px (Nummer, Adresse,
-   Auto-Speichern) · `hdr-v61-row2` 250 px, darin `.scores` als Raster mit
-   `.sc-main` 121 px über **einer** Reihe aus fünf `.sc-pill` à 103 px ·
-   Chevron-Knopf 22 px.
-
-   ### Und der Hebel existiert schon
-
-   **Die Kopfleiste lässt sich einklappen — der Knopf ist da, gemessen:**
-
-   | Zustand | Höhe | Anteil an 900 px |
-   |---|---|---|
-   | ausgeklappt | 347 px | 39 % |
-   | **eingeklappt** | **97 px** | **11 %** |
-
-   Der Zustand wird in `localStorage.dp_hdr_collapsed` gemerkt, die Klasse
-   heißt `body.hdr-collapsed`. **250 px Ersparnis ohne eine Zeile neuen
-   Code** — es wäre nur ein anderer Startzustand für Tablet-Breiten.
-
-   > **Der Preis, und deshalb ist es eine Entscheidung für Marcel:**
-   > eingeklappt bleiben Objektnummer, Adresse, „Auto-saved", die
-   > Vollständigkeit (24/24 · 100 %) und die Kontingent-Pille sichtbar —
-   > **der Score-Wert selbst nicht.** Marcels Vorgabe war „der Score bleibt
-   > auf dem Tablet". Ein eingeklappter Start nimmt ihn nicht weg, aber er
-   > zeigt ihn beim Öffnen nicht.
-
-   **Drei Wege, alle ohne Umbau der Score-Logik:**
-
-   1. **Eingeklappt starten ab ≤ 1024 px**, Score einen Klick entfernt.
-      Billigster Weg, 250 px gewonnen, Score beim Start unsichtbar.
-   2. **Eingeklappt starten + Kurzfassung** — „83 · Gut" wandert neben die
-      Adresse in `row1`. Kostet etwas Bauarbeit, hält aber beide Ziele:
-      flach **und** Score sichtbar. **Empfehlung.**
-   3. **Ausgeklappt lassen, Pillen verkleinern** (103 → ~70 px) und
-      `.sc-main` neben die Pillen. Spart nur ~100 px und fasst die
-      auffälligste Fläche der App an.
-
-   ### B ist gebaut — `v1190` / `v1190b`, Weg 2 (Marcels Entscheidung 01.09.)
-
-   | Fenster | vorher | jetzt beim Start |
-   |---|---|---|
-   | **820 px** | 347 px (39 %) | **97 px (11 %)** |
-   | 1024 px | 342 px | eingeklappt |
-   | 1400 px | 317 px | unverändert ausgeklappt |
-
-   **Gemessen in der Kabine, alle fünf Regeln:** startet eingeklappt bei
-   ≤ 1024 px · Kurzfassung „83 · Gut" in der Tier-Farbe (grün, `#5ed992`)
-   · Klick darauf klappt auf → 347 px, und die Kurzfassung verschwindet
-   (keine Doppelanzeige) · die getroffene Wahl überlebt das Neuladen ·
-   bei 1400 px bleibt es ausgeklappt.
-
-   > **Zwei eigene Fehler in diesem Paket, beide zurückgenommen:**
-   > 1. Der erste Wurf schrieb `border-color: rgba(201,168,76,.40)` — das
-   >    Marken-Gold als Zahlenwert, das sich beim Mandanten **nicht**
-   >    umfärbt. `style.css` hatte davon vorher **null** Treffer, ich habe
-   >    den ersten hineingebracht. Behoben mit `var(--gold)` (`v1190b`);
-   >    Grün und Rot bleiben als Statusfarben fest.
-   > 2. Ich meldete, der Gold-Audit sei „von RC=0 auf RC=1 gesprungen".
-   >    **Falsch gemessen:** `python3 … | tail -5; echo $?` liefert den
-   >    Rückgabewert von `tail`. **RC=1 ist der Normalzustand dieses
-   >    Repos** — der Audit zählt alle bekannten, nicht tokenisierten
-   >    Goldtöne, und davon stehen Hunderte in JS-Dateien. Er ist ein
-   >    Frühwarnsystem für neue Verstöße, kein Tor. Wer ihn als Tor
-   >    benutzt, muss `git show <alt>:datei | grep -c` gegenrechnen —
-   >    genau das hat den echten Befund geliefert.
-
-   ### Admin-Oberfläche — gemessen am 01.09.2026, sie trägt
-
-   **Ergebnis: kein Umbau nötig.** Gemessen in der Kabine, jede Ansicht
-   **einzeln** eingeblendet:
-
-   | Fenster | Navigation | Inhalt | Überlauf |
-   |---|---|---|---|
-   | **768 px** (iPad hoch) | legt sich **waagerecht** um (MQ 820 greift) | volle Breite | **keiner** in 10 Ansichten |
-   | **1024 px** (iPad quer) | bleibt Spalte, 214 px | 793 px | **keiner** |
-
-   Die drei Media-Queries tun genau das, was sie sollen: `two-col` und
-   `user-detail-grid` fallen bei ≤ 900 px auf eine Spalte, die Navigation
-   wird bei ≤ 820 px zur Zeile. Bei 1024 px ist der Desktop-Zustand
-   richtig — 214 px Leiste neben 793 px Inhalt ist auf einem quer
-   gehaltenen iPad kein Engpass.
-
-   > **Ein Zwischenbefund war falsch, und die Ursache ist lehrreich:** Der
-   > erste Durchgang meldete **51 px Überlauf** bei 820 px, verursacht von
-   > einem `button.btn`. Das war ein **Artefakt des Messaufbaus** — ich
-   > hatte alle 14 Ansichten **gleichzeitig** eingeblendet, um überhaupt
-   > etwas zu sehen. Im Betrieb ist immer nur eine sichtbar. Einzeln
-   > gemessen: null Überlauf. **Wer versteckte Ansichten zum Messen
-   > aufdeckt, misst einen Zustand, den es nicht gibt.**
-
-   > **Und eine Feinheit, die man kennen muss:** bei einer iframe-Breite
-   > von exakt 820 px greift `@media (max-width: 820px)` **nicht** —
-   > `innerWidth` meldet 820, `documentElement.clientWidth` aber 804, weil
-   > der senkrechte Rollbalken 16 px nimmt. Wer auf der Grenze misst, misst
-   > die falsche Seite davon. Deshalb steht oben 768 px (iPad hoch) und
-   > nicht 820.
-
-   **Was diese Messung NICHT abdeckt, ehrlich benannt:**
-   - **Ohne Anmeldung sind die Tabellen leer.** Gemessen wurden die
-     statischen Kopfzeilen (6–7 Spalten); echte Zeilen mit langen
-     Mailadressen und UUIDs können breiter werden. In ein Passwortfeld
-     tippe ich nicht — für die Messung mit Daten müsste Marcel im Admin
-     angemeldet sein, dann misst der nächste Durchgang in seinem Tab.
-   - **Vier Ansichten waren ganz leer** (`landing`, `marktzinsen`,
-     `stats`, `network`) — sie bauen ihren Inhalt erst aus Daten. Für sie
-     gilt „nicht messbar", nicht „kein Befund".
-   - Die vierte Media-Query (1150 px, Karten-Designer in
-     `admin-network.js`) konnte deshalb nicht geprüft werden.
-   - **820 px (iPad Hochformat) bleibt die Handy-Fassung:** Drawer, eine
-     Spalte über die volle Breite. Das ist **kein Defekt**, sondern die Folge
-     von Entscheidung A (Schwelle 901). Soll das Hochformat andocken, wären
-     bei 260-px-Leiste nur 560 px Inhalt übrig — das schließt zweispaltige
-     Formulare aus. **Eigene Entscheidung, nicht in diesem Punkt.**
-
-2. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
+1. **Zwei Handy-Befunde aus dem v1118-Durchgang, bewusst nicht gefixt.**
    Beide sind gemessen und beschrieben; beide sind **Gestaltung bzw.
    Barrierefreiheit**, kein Defekt — deshalb nicht nebenbei erledigt.
 
@@ -1065,7 +900,7 @@ entfällt — nicht raten.
      rechts frei ist** — überlappt das negative Margin die Nachbarn,
      stiehlt es Klicks in die andere Richtung.
 
-3. **Marktbericht neu gestalten.**
+2. **Marktbericht neu gestalten.**
    **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
    (2026-08-11, anklickbar, im Browser durchgeprüft).
 
@@ -1372,7 +1207,7 @@ entfällt — nicht raten.
    hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
    feststeht, wann ein Meilenstein als erreicht gilt.
 
-4. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
+3. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
 
    **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
 
@@ -1543,7 +1378,7 @@ entfällt — nicht raten.
    **Frontend-Gate**, nicht die Backend-Durchsetzung — und er liest den
    `config.js`-Fallback, nicht die DB-Zeile des simulierten Plans.
 
-5. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
+4. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
 
    > **GRÖSSTENTEILS SCHON GEBAUT — Befund vom 2026-08-13, siehe „Fertig".**
    > `buildFullCatalog()` (v519) gibt **alle** `window.FIELDS` an die
@@ -1621,7 +1456,7 @@ entfällt — nicht raten.
 
 ---
 
-6. **Der Testbericht: Bedienführung und Verständlichkeit.**
+5. **Der Testbericht: Bedienführung und Verständlichkeit.**
    **Quelle: `design/mockups/Anmerkungen.docx`** (abgelegt 2026-08-30, 24
    Bildschirmfotos mit Anmerkungen, entstanden bei einer Objektanlage von
    Anfang bis Ende). **Fremdbefund — hier ungeprüft übernommen**, außer wo
@@ -1734,7 +1569,7 @@ entfällt — nicht raten.
      interessiert zuerst der **Bestand** und was er prüft. *„Verloren würde
      ich vielleicht rausnehmen."*
 
-7. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
+6. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
    **Marcels Auftrag vom 2026-08-30.** Heute gibt es das Finanzamt-PDF nur je
    Objekt (Tab Steuer). Gewünscht: dieselbe Sache **über alle Objekte**, mit
    Auswahl und Veranlagungsjahr. Dazu die Frage, ob sich die **Anlage V direkt
@@ -1820,7 +1655,7 @@ entfällt — nicht raten.
    > abgeschrieben, versioniert abgelegt und dagegen geprüft. Ohne
    > hinterlegte Zuordnung erscheint der Umschalter für dieses Jahr nicht.
 
-8. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
+7. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
    Ebenfalls aus `design/mockups/Anmerkungen.docx`, aber ein eigener Punkt —
    es ist **Neubau, keine Nachbesserung**, und der letzte Teil ist der
    einzige Vorschlag im ganzen Bericht, den der Tester selbst als **USP**
@@ -1847,7 +1682,7 @@ entfällt — nicht raten.
    > **Erst entscheiden, ob das zum USP werden soll**, dann bauen. Hängt
    > unmittelbar an der USP-Frage aus Punkt 8.
 
-9. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
+8. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
    Datenvorhaben, kein Defekt.**
 
    > ## 🔒 AUSGELAGERT — Marcel bearbeitet diesen Punkt an anderer Stelle
@@ -1967,7 +1802,7 @@ entfällt — nicht raten.
    ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
    siehe `FALLEN.md`.
 
-10. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
+9. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
    in **kanzlei bei 2,98** und in **boarding bei 2,88** (`#9a7f33` auf
    `rgb(233,227,209)` bzw. `rgb(232,223,197)`). Mit Partner-Rot ist es
@@ -2065,7 +1900,7 @@ entfällt — nicht raten.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-11. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
+10. **Wallet auf dem Handy: die Aktionen liegen auf dem Score-Ring.**
    **Neu gefunden beim `v1173`-Messlauf, 2026-08-30** — nicht dadurch
    verursacht, `.sbc-actions` und `.sbc-score-overlay` sind absolut
    positioniert und vom Raster unabhängig.
@@ -2272,6 +2107,186 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Tablet-Fassung — vollständig, 01.09.2026 (`d92fa5f`, `2dde1ab`)
+
+**War Punkt 1.** Vier Teilstücke (A Sidebar andocken · B flache Kopfleiste ·
+C zweispaltige Formulare · D Popover statt Blatt) plus die Admin-Oberfläche.
+**Drei waren längst gebaut und nur nie nachgemessen**, B ist am 01.09. als
+`v1190`/`v1190b` dazugekommen, die Admin-Oberfläche trägt ohne Umbau.
+
+**A, C und D waren schon gebaut — gemessen 2026-08-12.**
+Offen blieben nur **B** (die hohe Kopfleiste) und die **Admin-Oberfläche** —
+beide sind am 01.09.2026 erledigt.
+
+**Gemessen in der Messkabine** (Träger `/impressum.html` auf der
+App-Domain, iframe, Partner-Konto, Objekt `PRUEF_ZFH` geladen,
+`getAnimations().finish()` nach jeder Breitenänderung):
+
+| Fenster | Sidebar | Leiste | Inhalt | Burger |
+|---|---|---|---|---|
+| 820 px | Drawer (`fixed`, −380) | 380 | 820 | sichtbar |
+| 900 px | Drawer | 380 | 900 | sichtbar |
+| **901 px** | **angedockt** (`sticky`) | 260 | 641 | aus |
+| **1024 px** | **angedockt** | 260 | **764** | aus |
+| 1025 px | angedockt (`relative`) | 380 | 645 | aus |
+| 1180 px | angedockt | 380 | 800 | aus |
+
+- **A (Sidebar andocken): erfüllt, und zwar seit `v648`.** Der Block
+  `css/style.css:35783` — `@media (min-width:901px) and (max-width:1024px)`
+  — dockt die Leiste als 260-px-Spalte im Fluss an und lässt bei 1024 px
+  **764 px** für den Inhalt. Marcels Entscheidung „ab 1024 px" ist damit
+  erfüllt, sogar schärfer: es beginnt bei 901 px.
+- **C (zweispaltige Formulare): erfüllt.** Im Objekt-Tab stehen bei
+  641–764 px Inhaltsbreite zwei- **und** dreispaltige Raster
+  (2 × 318,5 px bzw. 3 × 210,3 px).
+- **D (Popover statt Blatt): gegenstandslos.** Es gibt kein Blatt von
+  unten mehr. `css/style.css:11519` legt es **global** still:
+  `.bsheet-overlay{display:none!important}` mit dem Kommentar
+  „Bottom-Sheet aus V43 verstecken — wird in V46 nicht mehr genutzt". Der
+  Auslöser `.sb-actions-trigger` öffnet `sbActionsToggle()`, also das
+  **Akkordeon in der Sidebar** (11 `.sb-act-item`, 217 px breit).
+  Gegenprobe bei 820 px und 1024 px: `bsheet-panel` bleibt auf Höhe 0.
+
+> **Der Entwurf `design/Vorschläge/tablet-fassung.md` ist an drei Stellen
+> widerlegt, und die Ursache ist dieselbe: er hat ausschließlich bei
+> 820 px gemessen** — unterhalb der 901er-Schwelle, also im Drawer-Band.
+> Deshalb las sich der Grundbefund als „das Tablet bekommt die
+> Handy-Fassung, nur breiter". Für 901–1024 px trifft das nicht zu.
+> Beim Blatt kam eine zweite Falle dazu: es steht mit 40 Erwähnungen im
+> Markup und 11 Kacheln im DOM und **sieht deshalb aktiv aus**. Ob ein
+> Element je sichtbar wird, sagt nur die Messung — nicht seine Anwesenheit.
+
+**Was an dem Punkt wirklich offen ist:**
+
+### B ist nachgemessen (01.09.2026) — die Zahl lag nie vor
+
+**Der Entwurf hatte recht, ich hatte unrecht.** Im Prüflauf vom 12.08.
+stand „Kopfleiste 157 px statt der 348 px des Entwurfs" — gemessen an
+`PRUEF_ZFH`, einem Objekt **unter** der 70-%-Schwelle, bei dem die
+Score-Zeile gar nicht erst gebaut wird. Mit einem Objekt **über** der
+Schwelle (`Am Markt 9, Kabelsketal`, 24/24 Felder, Score 83) in der
+Messkabine:
+
+| Fenster | Kopfleiste | davon Score-Block | Sidebar |
+|---|---|---|---|
+| **820 px** | **347 px** — 39 % eines 900-px-Schirms | 230 px | Drawer |
+| 1024 px | 342 px | 230 px | angedockt |
+| 1180 px | 317 px | 206 px | angedockt |
+
+**Woraus die 347 px bestehen:** `hdr-v61-row1` 88 px (Nummer, Adresse,
+Auto-Speichern) · `hdr-v61-row2` 250 px, darin `.scores` als Raster mit
+`.sc-main` 121 px über **einer** Reihe aus fünf `.sc-pill` à 103 px ·
+Chevron-Knopf 22 px.
+
+### Und der Hebel existiert schon
+
+**Die Kopfleiste lässt sich einklappen — der Knopf ist da, gemessen:**
+
+| Zustand | Höhe | Anteil an 900 px |
+|---|---|---|
+| ausgeklappt | 347 px | 39 % |
+| **eingeklappt** | **97 px** | **11 %** |
+
+Der Zustand wird in `localStorage.dp_hdr_collapsed` gemerkt, die Klasse
+heißt `body.hdr-collapsed`. **250 px Ersparnis ohne eine Zeile neuen
+Code** — es wäre nur ein anderer Startzustand für Tablet-Breiten.
+
+> **Der Preis, und deshalb ist es eine Entscheidung für Marcel:**
+> eingeklappt bleiben Objektnummer, Adresse, „Auto-saved", die
+> Vollständigkeit (24/24 · 100 %) und die Kontingent-Pille sichtbar —
+> **der Score-Wert selbst nicht.** Marcels Vorgabe war „der Score bleibt
+> auf dem Tablet". Ein eingeklappter Start nimmt ihn nicht weg, aber er
+> zeigt ihn beim Öffnen nicht.
+
+**Drei Wege, alle ohne Umbau der Score-Logik:**
+
+1. **Eingeklappt starten ab ≤ 1024 px**, Score einen Klick entfernt.
+   Billigster Weg, 250 px gewonnen, Score beim Start unsichtbar.
+2. **Eingeklappt starten + Kurzfassung** — „83 · Gut" wandert neben die
+   Adresse in `row1`. Kostet etwas Bauarbeit, hält aber beide Ziele:
+   flach **und** Score sichtbar. **Empfehlung.**
+3. **Ausgeklappt lassen, Pillen verkleinern** (103 → ~70 px) und
+   `.sc-main` neben die Pillen. Spart nur ~100 px und fasst die
+   auffälligste Fläche der App an.
+
+### B ist gebaut — `v1190` / `v1190b`, Weg 2 (Marcels Entscheidung 01.09.)
+
+| Fenster | vorher | jetzt beim Start |
+|---|---|---|
+| **820 px** | 347 px (39 %) | **97 px (11 %)** |
+| 1024 px | 342 px | eingeklappt |
+| 1400 px | 317 px | unverändert ausgeklappt |
+
+**Gemessen in der Kabine, alle fünf Regeln:** startet eingeklappt bei
+≤ 1024 px · Kurzfassung „83 · Gut" in der Tier-Farbe (grün, `#5ed992`)
+· Klick darauf klappt auf → 347 px, und die Kurzfassung verschwindet
+(keine Doppelanzeige) · die getroffene Wahl überlebt das Neuladen ·
+bei 1400 px bleibt es ausgeklappt.
+
+> **Zwei eigene Fehler in diesem Paket, beide zurückgenommen:**
+> 1. Der erste Wurf schrieb `border-color: rgba(201,168,76,.40)` — das
+>    Marken-Gold als Zahlenwert, das sich beim Mandanten **nicht**
+>    umfärbt. `style.css` hatte davon vorher **null** Treffer, ich habe
+>    den ersten hineingebracht. Behoben mit `var(--gold)` (`v1190b`);
+>    Grün und Rot bleiben als Statusfarben fest.
+> 2. Ich meldete, der Gold-Audit sei „von RC=0 auf RC=1 gesprungen".
+>    **Falsch gemessen:** `python3 … | tail -5; echo $?` liefert den
+>    Rückgabewert von `tail`. **RC=1 ist der Normalzustand dieses
+>    Repos** — der Audit zählt alle bekannten, nicht tokenisierten
+>    Goldtöne, und davon stehen Hunderte in JS-Dateien. Er ist ein
+>    Frühwarnsystem für neue Verstöße, kein Tor. Wer ihn als Tor
+>    benutzt, muss `git show <alt>:datei | grep -c` gegenrechnen —
+>    genau das hat den echten Befund geliefert.
+
+### Admin-Oberfläche — gemessen am 01.09.2026, sie trägt
+
+**Ergebnis: kein Umbau nötig.** Gemessen in der Kabine, jede Ansicht
+**einzeln** eingeblendet:
+
+| Fenster | Navigation | Inhalt | Überlauf |
+|---|---|---|---|
+| **768 px** (iPad hoch) | legt sich **waagerecht** um (MQ 820 greift) | volle Breite | **keiner** in 10 Ansichten |
+| **1024 px** (iPad quer) | bleibt Spalte, 214 px | 793 px | **keiner** |
+
+Die drei Media-Queries tun genau das, was sie sollen: `two-col` und
+`user-detail-grid` fallen bei ≤ 900 px auf eine Spalte, die Navigation
+wird bei ≤ 820 px zur Zeile. Bei 1024 px ist der Desktop-Zustand
+richtig — 214 px Leiste neben 793 px Inhalt ist auf einem quer
+gehaltenen iPad kein Engpass.
+
+> **Ein Zwischenbefund war falsch, und die Ursache ist lehrreich:** Der
+> erste Durchgang meldete **51 px Überlauf** bei 820 px, verursacht von
+> einem `button.btn`. Das war ein **Artefakt des Messaufbaus** — ich
+> hatte alle 14 Ansichten **gleichzeitig** eingeblendet, um überhaupt
+> etwas zu sehen. Im Betrieb ist immer nur eine sichtbar. Einzeln
+> gemessen: null Überlauf. **Wer versteckte Ansichten zum Messen
+> aufdeckt, misst einen Zustand, den es nicht gibt.**
+
+> **Und eine Feinheit, die man kennen muss:** bei einer iframe-Breite
+> von exakt 820 px greift `@media (max-width: 820px)` **nicht** —
+> `innerWidth` meldet 820, `documentElement.clientWidth` aber 804, weil
+> der senkrechte Rollbalken 16 px nimmt. Wer auf der Grenze misst, misst
+> die falsche Seite davon. Deshalb steht oben 768 px (iPad hoch) und
+> nicht 820.
+
+**Was diese Messung NICHT abdeckt, ehrlich benannt:**
+- **Ohne Anmeldung sind die Tabellen leer.** Gemessen wurden die
+  statischen Kopfzeilen (6–7 Spalten); echte Zeilen mit langen
+  Mailadressen und UUIDs können breiter werden. In ein Passwortfeld
+  tippe ich nicht — für die Messung mit Daten müsste Marcel im Admin
+  angemeldet sein, dann misst der nächste Durchgang in seinem Tab.
+- **Vier Ansichten waren ganz leer** (`landing`, `marktzinsen`,
+  `stats`, `network`) — sie bauen ihren Inhalt erst aus Daten. Für sie
+  gilt „nicht messbar", nicht „kein Befund".
+- Die vierte Media-Query (1150 px, Karten-Designer in
+  `admin-network.js`) konnte deshalb nicht geprüft werden.
+- **820 px (iPad Hochformat) bleibt die Handy-Fassung:** Drawer, eine
+  Spalte über die volle Breite. Das ist **kein Defekt**, sondern die Folge
+  von Entscheidung A (Schwelle 901). Soll das Hochformat andocken, wären
+  bei 260-px-Leiste nur 560 px Inhalt übrig — das schließt zweispaltige
+  Formulare aus. **Eigene Entscheidung, nicht in diesem Punkt.**
+
 
 ### Preismodell v1176 — vollständig, live seit 31.08./01.09.2026
 
