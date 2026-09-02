@@ -43,28 +43,27 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 reparierte Deploy-Skript, ausgerollt am 01.09. in vier Schritten auf
 Marcels Freigabe, `mb-backend` dort gerebuildet.
 
-> ### `v1198`–`v1200b` sind NICHT auf Prod — und das ist eine Entscheidung
+> ### `v1198`–`v1202` sind NICHT auf Prod — und warten auf Marcels eigenen Durchgang
 >
-> **`v1200` ist der wichtigere der beiden.** Es schickt Werte mit, die das
-> Objekt längst hat, deren Eingabefeld aber gerade nicht gezeichnet ist —
-> Miteigentumsanteil, Bruttogrundfläche, Stellplatzmiete, sonstige
-> Erträge. Am Testobjekt gemessen: Bodenwert **40.338 €** statt keinem,
-> Ertragswert **192.328 €** statt 50.365 €, Sachwert **242.274 €** statt
-> keinem, und der Spread der drei Verfahren fällt von **286 % auf 1,6 %**.
-> Die 40.338 € sind der im `v1140`-Kommentar hinterlegte Sollwert dieses
-> Objekts — **die Reparatur trifft die bekannten richtigen Zahlen.**
+> **Fachlich ist alles entschieden.** `v1198` ist auf Marcels Wort
+> Variante B, `v1201`/`v1202` sind seine Vorgaben (Pflichtfeld,
+> Stufenauswahl). Es fehlt keine Antwort mehr.
 >
-> **`v1198` greift nur noch, wenn wirklich kein Miteigentumsanteil im
-> Objekt steht.** Es ändert dann den Ertragswert (im alten Testfall
-> 110.716 € → 50.365 €). Die Regel ist nicht neu — sie steht in
-> `CLAUDE.md` („ETW ohne Miteigentumsanteil: kein Bodenwert") und
-> ausführlich begründet in `v1026`; neu ist nur, dass der Ertragswert sie
-> **befolgt**.
+> **Was fehlt, ist SEIN Blick auf Staging.** An einem Tag sind fünf
+> Pakete entstanden, die den Kern des Marktberichts anfassen — die
+> Bodenwert-Ermittlung, den Payload, das Pflichtfeld und die ganze
+> Stufenmechanik. Geprüft wurde das an ein, zwei Testobjekten, und
+> **zweimal hat `node --check` an diesem Tag „OK" gemeldet, während im
+> Browser gar nichts lief** (`v1196b`, `v1200b`).
 >
-> **Marcel ist DESAG-zertifizierter Sachverständiger. Diese Zahlen gehören
-> ihm, nicht dem Code.** Deshalb liegen die Pakete auf Staging. Sie
-> brauchen auf Prod einen `mb-backend`-Rebuild (`v1198`) bzw. nur
-> `git pull` (`v1199`, `v1200` — reines Frontend).
+> **Eine Maschinenprüfung ersetzt die fachliche nicht.** Marcel ist der
+> Einzige, der sieht, ob die Zahlen stimmen. Vorgeschlagener Weg: ein
+> echtes Objekt auf `app.staging.dealpilot.immo`, Stufe wählen, Felder
+> füllen, Bericht erzeugen, Zahlen ansehen — rund zehn Minuten.
+>
+> **Danach:** Sicherung beider Datenbanken, `git pull`, und für `v1198`
+> zusätzlich ein `mb-backend`-Rebuild. `v1199`–`v1202` sind reines
+> Frontend.
 
 > ### Der Gelddefekt ist behoben und live
 >
@@ -182,9 +181,13 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
   gewählt, der Preis folgt der Wahl, Vorgabewert ist die günstigste Stufe.
   Siehe Fertig.
 
-- **`v1198`/`b`/`c` liegen auf Staging und warten auf Marcels Gegenlesen** —
-  sie ändern den Ertragswert jeder ETW ohne Miteigentumsanteil. Siehe Kasten
-  oben. Alles bis `v1197` ist live.
+- **`v1198` ist entschieden** — Marcel hat am 02.09.2026 **Variante B**
+  gewählt: ohne Miteigentumsanteil kein Bodenwert, vereinfachtes
+  Ertragswertverfahren mit Begründung im Bericht. Die Vorlage mit allen
+  drei Varianten steht unter
+  `design/Vorschläge/ertragswert-ohne-mea.html`.
+  **Offen ist nur noch der Prod-Rollout** — und der wartet bewusst auf
+  Marcels eigenen Durchgang auf Staging (siehe unten).
 - **Die Score-Konvention für fehlende Teilwerte gehört entschieden**
   (`v1197`): neutral ersetzen — so gebaut — oder den Teilwert weglassen und
   die übrigen Gewichte hochnormieren. Beides fachlich vertretbar, fällt
