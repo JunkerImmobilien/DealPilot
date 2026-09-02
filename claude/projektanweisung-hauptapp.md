@@ -4861,6 +4861,82 @@ er nur zufällig gedeckelt — weil das Pflichtfeld unsichtbar war und
 > `_angestrebt` bereits. Das wäre aber eine Änderung **für alle
 > Objektarten**, nicht nur für ETW, und gehört ausdrücklich entschieden.
 
+
+### v1202 (02.09.2026, `4d649ff`) — die Stufe wird wieder gewählt, und der Preis folgt der Wahl
+
+**Marcels Entscheidung:** *„dann lass uns doch wieder die drei Stufen zum
+Auswählen machen und dann für die jeweilige Stufe die Pflichtfelder
+anzeigen."*
+
+**Das kehrt `v1193` um** („kein Vorab-Klick, die Stufe ergibt sich aus den
+Angaben") — und zwar aus einem gemessenen Grund: seit `v1201` der
+Miteigentumsanteil sichtbar wurde, war bei einer vollständig gepflegten
+Eigentumswohnung Stufe 3 sofort erreicht, und der Knopf forderte
+**ungefragt** eine Wertermittlung (3,90 €) statt einer erweiterten
+Marktpreisindikation (1,90 €).
+
+#### Was sich umdreht
+
+```
+vorher   Preis und Tiefe = erreicht()    -> die Daten bestimmen die Kosten
+jetzt    Preis und Tiefe = gewaehlt()    -> der Nutzer bestimmt die Kosten
+```
+
+**`erreicht()` bleibt unverändert** und behält seine Aufgabe: es sagt, ob
+die gewählte Tiefe **vollständig** ist. Es entscheidet nur nicht mehr, was
+sie kostet.
+
+#### Im Einzelnen
+
+- **`gewaehlt()`** liest die Wahl aus `dp_mb_stufe` (über
+  `Wertermittlung.stufe`) und steht ohne Zutun auf **1** — der günstigsten.
+  **Teurer wird es nur durch einen Klick.**
+- **Die Ampel ist wieder eine Auswahl.** Die gewählte Zeile trägt Rand und
+  gefüllten Punkt. Bewusst **nicht grün**: Grün heißt hier „erreicht", und
+  gewählt ist etwas anderes als fertig.
+- **`melden()`** nimmt nur noch die Wahl. Das `Math.max(1, erreicht(),
+  _angestrebt)` war der Selbstsprung.
+- **`feldMarken()`** markiert für die gewählte Tiefe, und zwar über **alle**
+  Stufen bis dahin — Stufe 3 braucht auch die Angaben von 1 und 2. Bis
+  `v1201` markierte es nur die „nächste" Stufe und hätte bei gewählter
+  Stufe 3 die Lücken in Stufe 1 stumm gelassen.
+- **Die Sperre in `generate()` ist verallgemeinert.** Sie kannte nur den
+  Miteigentumsanteil (`v1201`) und gilt jetzt für jede Pflichtangabe der
+  gewählten Tiefe. **Welche das sind, weiß `mb-stufen.js` allein** und gibt
+  sie über `offenFuer()` heraus — in `app.js` steht bewusst keine eigene
+  Liste.
+
+#### Nachgemessen am unbezahlten Objekt 2026-999
+
+| geklickt | Knopf |
+|---|---|
+| 1 | „· **1 Marktpreisindikation**" |
+| 2 | „· **1 Erweiterte Marktpreisindikation**" |
+| 3 | „· **1 Wertermittlung nach ImmoWertV**" |
+| zurück auf 1 | „· **1 Marktpreisindikation**" |
+
+**Der Preis folgt der Wahl in beide Richtungen.** Vorgabewert nach frischem
+Laden: Stufe 1.
+
+**Und die Sperre:** bei gewählter Stufe 3 mit geleerten Feldern steht in
+der Ampel *„Erweiterte Marktpreisindikation ist gewählt. Dafür fehlt noch:
+Qualität."*, die Felder tragen ihre goldene Marke mit dem Stufennamen, und
+`generate()` bricht ab mit
+
+> ⚠ Angaben fehlen für Wertermittlung nach ImmoWertV · Es fehlt noch:
+> Qualität, Wohneinheiten. · Die fehlenden Felder sind im Formular gold
+> markiert. **Du kannst auch eine geringere Tiefe wählen** — dann werden
+> weniger Angaben gebraucht.
+
+**Kein Kostendialog davor**, kein natives Fenster.
+
+> **Nebenbefund:** der Knopf ist bei fehlenden Angaben ohnehin schon
+> `disabled` — die App prüft das selbst. Die neue Sperre ist damit das
+> **Netz für den Fall, den die App nicht sehen kann**: ein Feld, das gar
+> nicht im DOM ist. Genau der Miteigentumsanteil-Fall aus `v1200`/`v1201`.
+> Beide Wege wurden getrennt geprüft: Klick auf den gesperrten Knopf tut
+> nichts, `generate()` direkt gerufen zeigt die Meldung.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und

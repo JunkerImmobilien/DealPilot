@@ -36,9 +36,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1201)
+## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1202)
 
-**Stand:** lokal = GitHub = Staging auf `a47f3d2`.
+**Stand:** lokal = GitHub = Staging auf `4d649ff`.
 **Produktion steht auf `bca7c06`** — das ist `v1191`–`v1197` plus das
 reparierte Deploy-Skript, ausgerollt am 01.09. in vier Schritten auf
 Marcels Freigabe, `mb-backend` dort gerebuildet.
@@ -178,15 +178,9 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 ### Was sonst offen liegt und nicht vergessen werden darf
 
-- **⚠ ENTSCHEIDUNG OFFEN: springt die Stufe von allein auf 3?** Seit
-  `v1201` fordert der Knopf bei einer vollständig gepflegten ETW
-  „1 Wertermittlung nach ImmoWertV" statt „1 Erweiterte
-  Marktpreisindikation" — Einzelkauf 3,90 € statt 1,90 €. **Das ist keine
-  Panne, sondern die Regel „die Stufe ergibt sich aus den Angaben"
-  (`v1193`), die bei Häusern längst so wirkt** und bei ETW nur zufällig
-  gedeckelt war. Wer es anders will, muss die Tiefe an einen
-  ausdrücklichen Klick binden (`_angestrebt` gibt es dafür) —
-  **für alle Objektarten.**
+- **Der Selbstsprung der Stufe ist zu** (`v1202`) — die Tiefe wird wieder
+  gewählt, der Preis folgt der Wahl, Vorgabewert ist die günstigste Stufe.
+  Siehe Fertig.
 
 - **`v1198`/`b`/`c` liegen auf Staging und warten auf Marcels Gegenlesen** —
   sie ändern den Ertragswert jeder ETW ohne Miteigentumsanteil. Siehe Kasten
@@ -2289,6 +2283,42 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Die Stufe wird wieder gewählt — `v1202`, 02.09.2026 (`4d649ff`)
+
+**Marcels Entscheidung**, nachdem er die Nebenwirkung aus `v1201` gesehen
+hatte: *„dann lass uns doch wieder die drei Stufen zum Auswählen machen und
+dann für die jeweilige Stufe die Pflichtfelder anzeigen."*
+
+**Das kehrt `v1193` um** — und schließt damit den offenen Punkt „springt
+die Stufe von allein auf 3?".
+
+```
+vorher   Preis und Tiefe = erreicht()    -> die Daten bestimmen die Kosten
+jetzt    Preis und Tiefe = gewaehlt()    -> der Nutzer bestimmt die Kosten
+```
+
+`erreicht()` bleibt unverändert und sagt weiterhin, ob die gewählte Tiefe
+**vollständig** ist — es entscheidet nur nicht mehr, was sie kostet. Die
+Wahl steht ohne Zutun auf **1**, der günstigsten; **teurer wird es nur
+durch einen Klick.**
+
+**Nachgemessen am unbezahlten Objekt 2026-999:** Klick auf 1 / 2 / 3 / 1
+ergibt „1 Marktpreisindikation" / „1 Erweiterte Marktpreisindikation" /
+„1 Wertermittlung nach ImmoWertV" / wieder „1 Marktpreisindikation".
+**Der Preis folgt der Wahl in beide Richtungen.**
+
+Die Pflichtfelder werden für die **gewählte** Tiefe markiert, über alle
+Stufen bis dahin — Stufe 3 braucht auch die Angaben von 1 und 2. Und die
+Sperre in `generate()` gilt jetzt allgemein statt nur für den
+Miteigentumsanteil; **welche Angaben fehlen, weiß `mb-stufen.js` allein**
+und gibt sie über `offenFuer()` heraus, damit in `app.js` keine zweite
+Liste entsteht.
+
+> **Nebenbefund:** der Knopf ist bei fehlenden Angaben ohnehin schon
+> `disabled`. Die neue Sperre ist das **Netz für den Fall, den die App
+> nicht sehen kann** — ein Feld, das gar nicht im DOM ist. Beide Wege
+> getrennt geprüft.
 
 ### Der Miteigentumsanteil ist Pflicht — `v1201`, 02.09.2026 (`a47f3d2`)
 
