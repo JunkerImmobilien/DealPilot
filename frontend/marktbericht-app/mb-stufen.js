@@ -250,9 +250,97 @@
       '.mbst-vor{font-size:10.5px;line-height:1.45;margin-top:2px;color:var(--wl-c9a84c,#C9A84C)}',
       '.mbst-info{margin-top:9px;padding:8px 10px;border-radius:6px;background:rgba(201,168,76,.10);',
         'font-size:11.5px;line-height:1.5}',
-      '.mbst-info b{color:var(--wl-e8cc7a,#E8CC7A)}'
+      '.mbst-info b{color:var(--wl-e8cc7a,#E8CC7A)}',
+      /* ── v1199 · Variante B aus design/Vorschlaege/marktbericht-fehlende-felder.html
+         Marcels Wahl: goldener Merkstreifen statt rotem Rahmen. Ein leeres
+         Feld ist KEIN Fehler — und Rot ist in dieser Leiste schon fuer
+         „fehlt" vergeben (.mbst-fehlt). Zweimal dieselbe Farbe fuer zwei
+         Dringlichkeiten macht beide stumpf.
+
+         Der Streifen sitzt am BEHAELTER, nicht am Feld: sonst kaempft er
+         mit dem Rahmen des Eingabefelds. `input,select` setzt ihn mit
+         Spezifitaet (0,0,1) — `.mbst-fehltfeld input` ist (0,1,1) und
+         gewinnt ohne !important. Im Browser nachgemessen, nicht geraten. */
+      '.mbst-fehltfeld{border-left:3px solid var(--wl-c9a84c,#C9A84C);padding-left:10px}',
+      '.mbst-fehltfeld input,.mbst-fehltfeld select{border-color:var(--wl-c9a84c,#C9A84C)}',
+      '.mbst-fehltfeld-solo{border-color:var(--wl-c9a84c,#C9A84C)}',
+      '.mbst-fuer{display:block;font-family:"JetBrains Mono",monospace;font-size:10.5px;',
+        'line-height:1.4;font-weight:500;letter-spacing:.02em;margin-top:4px;',
+        'color:var(--wl-b8932f,#b8932f)}'
     ].join('');
     document.head.appendChild(s);
+  }
+
+  /* ── v1199 · Die fehlenden Angaben stehen jetzt AM FELD ─────────────────
+     Bis hierher nannte nur die Ampel sie — ganz oben, ausserhalb des
+     Reiters. Wer in Reiter 2 „Objekt" arbeitete, sah neun gleich
+     aussehende Felder und konnte nicht erkennen, welche vier die Stufe
+     ueberhaupt erst freischalten. Gemessen am 01.09.2026: von den
+     Pflichtangaben der Stufen 1-3 trug in den Reitern 2-5 KEINE einen
+     Marker; nur `baustatus` hatte einen, weil es zufaellig ueber
+     wertermittlung.js gerendert wird.
+
+     Marcels Wahl aus design/Vorschlaege/marktbericht-fehlende-felder.html
+     ist Variante B: goldener Merkstreifen plus eine Zeile, die sagt WOFUER
+     das Feld fehlt.
+
+     ZWEI ENTSCHEIDUNGEN, DIE HIER FESTGEHALTEN GEHOEREN:
+
+     1 · NUR DIE NAECHSTE STUFE. Wer auf Stufe 1 steht, bekommt die Felder
+         fuer Stufe 2 markiert — nicht zusaetzlich die fuer Stufe 3. Sonst
+         steht die Maske voll und die Markierung sagt wieder nichts.
+
+     2 · KEINE ZWEITE LISTE. Feld-IDs und Klarnamen kommen aus `BEDARF` /
+         `bedarf3()`, der Stufenname aus `NAMEN` — dieselben Quellen, aus
+         denen die Ampel und der Knopf ihre Woerter nehmen. Im Marktbericht
+         sind schon sechs Fehler daraus entstanden, dass dieselbe Sache
+         zweimal im Haus stand.
+
+     Felder, die noch gar nicht im DOM sind (der Stufe-3-Block wird erst
+     aufgeklappt gebaut), werden uebersprungen — dort greift der Hinweis
+     aus v1196, der den leeren Reiter erklaert. */
+  function feldMarkeAbraeumen() {
+    var alt = document.querySelectorAll('.mbst-fehltfeld,.mbst-fehltfeld-solo');
+    Array.prototype.forEach.call(alt, function (e) {
+      e.classList.remove('mbst-fehltfeld');
+      e.classList.remove('mbst-fehltfeld-solo');
+    });
+    var txt = document.querySelectorAll('.mbst-fuer');
+    Array.prototype.forEach.call(txt, function (e) { if (e.parentNode) e.parentNode.removeChild(e); });
+  }
+
+  function feldMarken(s) {
+    feldMarkeAbraeumen();
+    if (s >= 3) return;                       /* nichts mehr offen */
+    var n = s + 1;
+    var liste = (n === 3) ? bedarf3() : BEDARF[n];
+    if (!liste) return;
+    var name = NAMEN[n];
+    liste.forEach(function (f) {
+      if (wert(f[0])) return;                 /* ausgefuellt */
+      var el = $(f[0]);
+      if (!el) return;                        /* Feld noch nicht gebaut */
+
+      /* Der Behaelter ist je nach Reiter ein anderer: die Wertermittlung
+         baut `.wm-f`, die uebrigen Reiter ein nacktes <div> mit Label und
+         Feld. `#address` haengt sogar direkt im Reiter, ohne Huelle —
+         dafuer der Solo-Fall. Alles im Browser ausgelesen. */
+      var box = el.closest ? el.closest('.wm-f') : null;
+      if (!box) {
+        var p = el.parentElement;
+        if (p && p.querySelector('label') && !/mbw-blatt/.test(String(p.className || ''))) box = p;
+      }
+      var zeile = document.createElement('span');
+      zeile.className = 'mbst-fuer';
+      zeile.textContent = 'fehlt für ' + name;
+      if (box) {
+        box.classList.add('mbst-fehltfeld');
+        box.appendChild(zeile);
+      } else {
+        el.classList.add('mbst-fehltfeld-solo');
+        if (el.parentNode) el.parentNode.insertBefore(zeile, el.nextSibling);
+      }
+    });
   }
 
   function zeichnen() {
@@ -309,6 +397,7 @@
       '<div class="mbst-info">' + info + '</div>';
 
     knopf(s);
+    feldMarken(s);                              /* v1199 */
   }
 
   /* Der Preis wandert an den Erzeugen-Knopf — dort wird er ausgegeben. */
