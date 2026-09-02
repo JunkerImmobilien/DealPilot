@@ -280,6 +280,18 @@
       '.mbst-info{margin-top:9px;padding:8px 10px;border-radius:6px;background:rgba(201,168,76,.10);',
         'font-size:11.5px;line-height:1.5}',
       '.mbst-info b{color:var(--wl-e8cc7a,#E8CC7A)}',
+      /* ── v1202 · Die GEWÄHLTE Zeile muss man sehen, ohne sie zu suchen ────
+         `.an` (erreicht) traegt bereits rgba(201,168,76,.13) — die Wahl
+         braucht also etwas anderes als noch mehr Gold-Flaeche, sonst sind
+         „fertig" und „gewaehlt" nicht zu unterscheiden. Deshalb ein
+         durchgezogener Rand plus gefuellter Punkt.
+         Bewusst nicht Gruen: Gruen heisst hier „erreicht", und gewaehlt ist
+         etwas anderes als fertig. */
+      '.mbst-ms{border:1px solid transparent}',
+      '.mbst-ms.gewaehlt{border-color:var(--wl-c9a84c,#C9A84C);background:rgba(201,168,76,.16)}',
+      '.mbst-ms.gewaehlt .mbst-name{font-weight:700}',
+      '.mbst-ms.gewaehlt .mbst-pkt{background:var(--wl-c9a84c,#C9A84C);',
+        'border-color:var(--wl-c9a84c,#C9A84C);color:#221a06;font-weight:700}',
       /* ── v1199 · Variante B aus design/Vorschlaege/marktbericht-fehlende-felder.html
          Marcels Wahl: goldener Merkstreifen statt rotem Rahmen. Ein leeres
          Feld ist KEIN Fehler — und Rot ist in dieser Leiste schon fuer
@@ -338,10 +350,18 @@
     Array.prototype.forEach.call(txt, function (e) { if (e.parentNode) e.parentNode.removeChild(e); });
   }
 
-  function feldMarken(s) {
+  /* v1202 · Markiert wird jetzt fuer die GEWAEHLTE Tiefe — und zwar alles,
+     was ihr noch fehlt, ueber ALLE Stufen bis dahin. Stufe 3 braucht auch
+     die Angaben von 1 und 2; sie nur fuer die „naechste" Stufe zu markieren
+     (so bis v1201) haette bei gewaehlter Stufe 3 die Luecken in Stufe 1
+     stumm gelassen. Jede Marke nennt die Stufe, zu der ihr Feld gehoert. */
+  function feldMarken(ziel) {
     feldMarkeAbraeumen();
-    if (s >= 3) return;                       /* nichts mehr offen */
-    var n = s + 1;
+    ziel = ziel || 1;
+    for (var n = 1; n <= ziel; n++) markiereStufe(n);
+  }
+
+  function markiereStufe(n) {
     var liste = bedarfFuer(n);
     if (!liste) return;
     var name = NAMEN[n];
@@ -372,30 +392,75 @@
     });
   }
 
+  /* ── v1202 · Die Stufe wird wieder GEWÄHLT, nicht erraten ────────────────
+     Marcels Entscheidung vom 02.09.2026: „dann lass uns doch wieder die drei
+     Stufen zum Auswählen machen und dann für die jeweilige Stufe die
+     Pflichtfelder anzeigen."
+
+     Das kehrt v1193 um („kein Vorab-Klick, die Stufe ergibt sich aus den
+     Angaben"), und zwar aus einem gemessenen Grund: seit v1201 der
+     Miteigentumsanteil sichtbar wurde, war bei einer vollstaendig gepflegten
+     Eigentumswohnung Stufe 3 sofort erreicht — und der Knopf forderte
+     ungefragt eine Wertermittlung (3,90 €) statt einer erweiterten
+     Marktpreisindikation (1,90 €). Bei Haeusern war das laengst so, es fiel
+     nur nie auf.
+
+     WAS SICH DAMIT UMDREHT:
+       vorher  Preis und Tiefe = erreicht()   -> die Daten bestimmen die Kosten
+       jetzt   Preis und Tiefe = gewaehlt()   -> der Nutzer bestimmt die Kosten
+
+     `erreicht()` bleibt unveraendert und behaelt seine Aufgabe: es sagt, ob
+     die gewaehlte Tiefe VOLLSTAENDIG ist. Es entscheidet nur nicht mehr,
+     was sie kostet.
+
+     Die Wahl liegt in localStorage (`dp_mb_stufe`, ueber
+     Wertermittlung.setStufe) und steht ohne Zutun auf 1 — der guenstigsten.
+     Teurer wird es nur durch einen Klick. */
+  function gewaehlt() {
+    var g = 1;
+    try {
+      if (window.Wertermittlung && window.Wertermittlung.stufe) g = window.Wertermittlung.stufe();
+    } catch (e) {}
+    g = parseInt(g, 10) || 1;
+    return (g >= 1 && g <= 3) ? g : 1;
+  }
+
+  /* Was fuer die GEWAEHLTE Tiefe noch fehlt — alle Stufen bis dahin, denn
+     Stufe 3 braucht auch die Angaben von 1 und 2. Nach aussen gegeben,
+     damit app.js den Knopf sperren kann, ohne die Listen zu kennen. */
+  function offenFuer(ziel) {
+    ziel = ziel || gewaehlt();
+    var raus = [];
+    for (var n = 1; n <= ziel; n++) {
+      bedarfFuer(n).forEach(function (f) { if (!wert(f[0])) raus.push(f[1]); });
+    }
+    return raus;
+  }
+
   function zeichnen() {
     var wo = $('wm-ziel');
     if (!wo) return;
     stil();
-    /* Die alte Optionsliste weicht — der Behaelter bleibt, damit
-       stufenAnwenden() weiter seinen Hinweis anhaengen kann. */
     wo.className = 'mbst';
     var s = erreicht();
+    var g = gewaehlt();
 
     var ms = [1, 2, 3].map(function (n) {
-      var an = s >= n;
+      var fertig = s >= n;
+      var dieseWahl = (n === g);
       var k = kostenFuer(n);
-      var g = offenGeteilt(n);
-      /* v1139-VORRAT: zwei getrennte Zeilen — Rot nur fuer echtes Fehlen. */
+      var o = offenGeteilt(n);
       var unten = '';
-      if (an) unten = '<div class="mbst-was">' + WAS[n] + '</div>';
+      if (fertig) unten = '<div class="mbst-was">' + WAS[n] + '</div>';
       else {
-        if (g.echt.length) unten += '<div class="mbst-fehlt">fehlt: ' + g.echt.join(', ') + '</div>';
-        if (g.vor.length) unten += '<div class="mbst-vor">liegt im Objekt vor: ' + g.vor.join(', ') +
+        if (o.echt.length) unten += '<div class="mbst-fehlt">fehlt: ' + o.echt.join(', ') + '</div>';
+        if (o.vor.length) unten += '<div class="mbst-vor">liegt im Objekt vor: ' + o.vor.join(', ') +
           ' — hier klicken zum Übernehmen</div>';
       }
-      return '<div class="mbst-ms' + (an ? ' an' : '') + '" data-mbst-ziel="' + n + '" ' +
-          'title="' + (an ? NAMEN[n] + ' erreicht' : 'Angaben für ' + NAMEN[n] + ' einblenden') + '">' +
-        '<div class="mbst-pkt">' + (an ? '✓' : n) + '</div>' +
+      return '<div class="mbst-ms' + (fertig ? ' an' : '') + (dieseWahl ? ' gewaehlt' : '') +
+          '" data-mbst-ziel="' + n + '" ' +
+          'title="' + (dieseWahl ? NAMEN[n] + ' ist gewählt' : NAMEN[n] + ' wählen') + '">' +
+        '<div class="mbst-pkt">' + (dieseWahl ? '●' : (fertig ? '✓' : n)) + '</div>' +
         '<div class="mbst-txt">' +
           '<div class="mbst-zeile"><span class="mbst-name">' + NAMEN[n] + '</span>' +
             '<span class="mbst-kero">' + preisText(k) + '</span></div>' +
@@ -403,32 +468,28 @@
         '</div></div>';
     }).join('');
 
+    var offen = offenFuer(g);
     var info;
-    if (s === 0) info = '<b>Noch nichts erreicht.</b> Die Angaben oben füllen — die Stufe ergibt sich daraus.';
-    else if (s < 3) info = '<b>' + NAMEN[s] + '</b> ist erreicht. Eine Zeile tiefer klicken blendet die nächsten Angaben ein.';
-    else info = '<b>Wertermittlung erreicht</b> — alle drei Verfahren rechnen mit echten Parametern.';
-    /* v1193 · Das Differenz-Versprechen ist RAUS, und zwar aus demselben
-       Grund wie in v1187 aus dem Bestaetigungsdialog: der Server loest es
-       nicht mehr ein. `_faelligeStufe()` (routes/marktbericht.js:100)
-       gibt seit v1183 entweder 0 zurueck — diese Tiefe ist bezahlt — oder
-       die VOLLE Stufe. Wer von 1 auf 3 vertieft, zahlt eine ganze
-       Wertermittlung, keine Differenz. Ein Preisversprechen, das der
-       Server nicht haelt, ist teurer als gar keins. */
+    if (offen.length) {
+      info = '<b>' + NAMEN[g] + '</b> ist gewählt. Dafür fehlt noch: <b>' + offen.join(', ') + '</b>.';
+    } else {
+      info = '<b>' + NAMEN[g] + '</b> ist gewählt und vollständig.';
+    }
+    /* v1193 · Kein Differenz-Versprechen — der Server loest es nicht ein. */
     if (_bezahlt > 0) {
       info += '<br>Für dieses Objekt ist <b>' + NAMEN[_bezahlt] + '</b> bereits bezahlt — ' +
               'diese Tiefe kostet dich nichts mehr. Eine höhere Stufe wird voll berechnet.';
     }
 
     wo.innerHTML =
-      '<h4>Was der Bericht leisten soll</h4>' +
-      '<div class="mbst-sub">Kein Vorab-Klick nötig — die Stufe ergibt sich aus deinen Angaben.</div>' +
+      '<h4>Was soll der Bericht leisten?</h4>' +
+      '<div class="mbst-sub">Tiefe wählen — der Preis richtet sich danach, nicht nach den Angaben.</div>' +
       ms +
       '<div class="mbst-info">' + info + '</div>';
 
-    knopf(s);
-    feldMarken(s);                              /* v1199 */
+    knopf(g);                                   /* v1202: der Preis folgt der WAHL */
+    feldMarken(g);                              /* v1199, seit v1202 fuer die Wahl */
   }
-
   /* Der Preis wandert an den Erzeugen-Knopf — dort wird er ausgegeben. */
   function knopf(s) {
     var b = $('goBtn');
@@ -446,17 +507,23 @@
   /* ── Die Stufe an wertermittlung.js melden ─────────────────────────────
      NUR bei echter Aenderung: setStufe() zeichnet die Bloecke neu, das bei
      jedem Tastendruck zu tun waere teuer und wuerde den Fokus kosten. */
+  /* ── v1202 · Nur noch die Wahl bestimmt die Tiefe ────────────────────────
+     Hier stand `Math.max(1, erreicht(), _angestrebt)`. Damit hob JEDE
+     vollstaendige Angabe die gezeigte Tiefe an — und mit ihr den Preis am
+     Knopf. Das war der Selbstsprung, den Marcel abgestellt haben wollte.
+
+     `_angestrebt` ist damit ueberfluessig geworden: die Wahl liegt jetzt
+     dauerhaft in `dp_mb_stufe` und wird beim Klick auf eine Zeile gesetzt.
+     Die Variable bleibt als Feld im _stand() erhalten, damit ein alter
+     Aufrufer nicht ins Leere greift. */
   function melden() {
-    var s = erreicht();
-    /* _angestrebt ist die Untergrenze: der Nutzer hat den Meilenstein
-       angeklickt und will die Felder sehen. Was davon ausgefuellt ist,
-       entscheidet weiter allein erreicht(). */
-    var ziel = Math.max(1, s, _angestrebt);
-    if (ziel === _letzte) { zeichnen(); return; }
-    _letzte = ziel;
-    try {
-      if (window.Wertermittlung && window.Wertermittlung.setStufe) window.Wertermittlung.setStufe(ziel);
-    } catch (e) {}
+    var ziel = gewaehlt();
+    if (ziel !== _letzte) {
+      _letzte = ziel;
+      try {
+        if (window.Wertermittlung && window.Wertermittlung.setStufe) window.Wertermittlung.setStufe(ziel);
+      } catch (e) {}
+    }
     zeichnen();
   }
 
@@ -472,13 +539,18 @@
     if (!$('wm-ziel')) { setTimeout(start, 400); return; }
     document.addEventListener('input', angestossen, true);
     document.addEventListener('change', angestossen, true);
-    /* Klick auf einen Meilenstein blendet dessen Angaben ein. */
+    /* v1202 · Ein Klick auf eine Zeile WAEHLT diese Tiefe. Vorher setzte er
+       nur eine Untergrenze, die erreicht() jederzeit ueberholen konnte. */
     document.addEventListener('click', function (ev) {
       var m = ev.target && ev.target.closest ? ev.target.closest('[data-mbst-ziel]') : null;
       if (!m) return;
       var n = parseInt(m.getAttribute('data-mbst-ziel'), 10);
       if (!(n >= 1 && n <= 3)) return;
-      _angestrebt = n;
+      _angestrebt = n;                          /* nur noch fuer _stand() */
+      try {
+        if (window.Wertermittlung && window.Wertermittlung.setStufe) window.Wertermittlung.setStufe(n);
+      } catch (e) {}
+      _letzte = -1;                             /* Neuzeichnen erzwingen */
       melden();
     }, true);
     _letzte = 0;
@@ -494,6 +566,7 @@
 
   window.DealPilotMbStufen = {
     erreicht: erreicht, zeichnen: zeichnen, preisHolen: preisHolen,
-    _stand: function () { return { erreicht: erreicht(), bezahlt: _bezahlt, kosten: _kosten, faellig: _faellig }; }
+    gewaehlt: gewaehlt, offenFuer: offenFuer,          /* v1202 */
+    _stand: function () { return { erreicht: erreicht(), gewaehlt: gewaehlt(), offen: offenFuer(), bezahlt: _bezahlt, kosten: _kosten, faellig: _faellig }; }
   };
 })();

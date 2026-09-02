@@ -284,53 +284,48 @@ async function _kaufeEinzeln(art, btn) {
 }
 
 async function generate() {
-  /* ── v1201 · Ohne Miteigentumsanteil laeuft bei einer ETW gar nichts ─────
-     Marcels Entscheidung vom 02.09.2026, woertlich: „der Miteigentumsanteil
-     muss ausgefuellt werden als Pflichtwert, sonst kann man es nicht
-     ausfuehren."
+  /* ── v1202 · Die gewaehlte Tiefe muss vollstaendig sein ──────────────────
+     Loest die ETW-Sonderregel aus v1201 ab, die nur den Miteigentumsanteil
+     kannte. Seit die Stufe wieder GEWAEHLT wird (v1202), gilt allgemein:
+     wer Stufe N bestellt, muss die Angaben der Stufen 1..N beisammen haben.
+     Der Miteigentumsanteil ist darin nur einer von mehreren — bei einer ETW
+     steht er seit v1201 in bedarf1().
 
-     Es ist die einzige STELLE, an der sich das durchsetzen laesst: der Knopf
-     hatte bis hierher gar keine Vollstaendigkeitspruefung — `generate()` lief
-     einfach los, und was fehlte, entschied der Server hinterher.
+     Marcels Vorgabe dahinter, woertlich: „der Miteigentumsanteil muss
+     ausgefuellt werden als Pflichtwert, sonst kann man es nicht ausfuehren."
+     Das gilt jetzt fuer jede Pflichtangabe der gewaehlten Tiefe.
 
-     Warum eine harte Sperre und nicht nur eine Warnung: der Bodenwert einer
-     Eigentumswohnung IST der Miteigentumsanteil. Ohne ihn ist jeder
-     Ertragswert und jeder Sachwert entweder falsch (voller Grundstueckswert,
-     siehe v1198) oder gar nicht vorhanden. Ein Bericht, der beides nicht
-     leisten kann, soll nicht erst Kontingent kosten.
+     WELCHE das sind, weiss mb-stufen.js und niemand sonst — `offenFuer()`
+     gibt sie heraus. Hier steht bewusst KEINE eigene Liste; das waere die
+     Doppelliste, an der der Marktbericht schon sechsmal gescheitert ist.
 
-     Der Wert kommt seit v1200 auch aus dem Objekt, wenn das Feld gerade
-     nicht gezeichnet ist — geprueft wird deshalb gegen payload(), nicht
-     gegen das DOM. Sonst haette die Sperre gegriffen, obwohl der Wert da
-     ist. */
+     KEIN alert(). Ein natives Fenster blockiert den ganzen Renderer — die
+     Meldung geht in `errBox`, dieselbe Flaeche wie das v1187-Kaufangebot. */
   try {
-    var _p = (window.Wertermittlung && window.Wertermittlung.payload)
-      ? window.Wertermittlung.payload() : null;
-    var _istWhg = /wohnung|etw/i.test(String((document.getElementById('ptype') || {}).value || ''));
-    if (_istWhg && _p && !(_p.mea_pct > 0)) {
-      var _feld = document.getElementById('mea');
-      if (_feld) {
-        try { _feld.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
-        try { _feld.focus(); } catch (e) {}
-      }
-      /* KEIN alert(). Ein natives Fenster blockiert den ganzen Renderer —
-         dieselbe Falle wie beim Bestaetigungsdialog (app.js:330). Die Seite
-         hat mit `errBox` bereits eine Flaeche fuer genau solche Meldungen;
-         das v1187-Kaufangebot benutzt sie ebenfalls. */
+    var _st = window.DealPilotMbStufen;
+    var _offen = (_st && typeof _st.offenFuer === 'function') ? _st.offenFuer() : null;
+    if (_offen && _offen.length) {
+      var _tiefe = (_st && typeof _st.gewaehlt === 'function') ? _st.gewaehlt() : null;
+      var _name = { 1: 'Marktpreisindikation', 2: 'Erweiterte Marktpreisindikation',
+                    3: 'Wertermittlung nach ImmoWertV' }[_tiefe] || 'die gewählte Tiefe';
       var _box = document.getElementById('errBox');
       if (_box) {
         _box.innerHTML =
-          '<div style="font-weight:600;margin-bottom:6px;">⚠ Miteigentumsanteil fehlt</div>'
+          '<div style="font-weight:600;margin-bottom:6px;">⚠ Angaben fehlen für '
+            + _name + '</div>'
           + '<div style="font-size:13px;line-height:1.55;">'
-          + 'Bei einer Eigentumswohnung wird der Bodenwert über den Miteigentumsanteil '
-          + 'ermittelt. Ohne ihn lassen sich Ertrags- und Sachwert nicht sauber rechnen — '
-          + 'deshalb wird der Bericht nicht erstellt.<br><br>'
-          + 'Der Wert steht in der <b>Teilungserklärung</b>, meist als Bruch wie 125/1000 — '
-          + 'das entspricht 12,5 %.'
+          + 'Es fehlt noch: <b>' + _offen.join(', ') + '</b>.<br><br>'
+          + 'Die fehlenden Felder sind im Formular gold markiert. Du kannst auch eine '
+          + 'geringere Tiefe wählen — dann werden weniger Angaben gebraucht.'
           + '</div>';
         _box.classList.remove('hide');
         try { _box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
       }
+      /* Ins erste fehlende Feld springen, damit der Weg kurz ist. */
+      try {
+        var _erstes = document.querySelector('.mbst-fehltfeld input, .mbst-fehltfeld select, .mbst-fehltfeld-solo');
+        if (_erstes) { _erstes.scrollIntoView({ behavior: 'smooth', block: 'center' }); _erstes.focus(); }
+      } catch (e) {}
       return;
     }
   } catch (e) { /* im Zweifel nicht blockieren */ }
