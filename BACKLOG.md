@@ -193,15 +193,33 @@ Verfahren. **Nicht** geprüft: Vergleichspreise, Bodenwert, „Wertverfahren
 im Vergleich" im Detail, die Rechenwege hinter „▸ Rechenweg", und der
 PDF-Export.
 
+**d) Der PDF-Bericht ist durchgesehen und zweimal umgebaut.** Marcel hat den
+eigenen Export gelesen. Gebaut sind: 03 und 04 zu einer Sektion mit der
+Bandanzeige (`v1206`), Sektion 01 entschlackt, zwei Waisen-Umbrüche behoben
+und der Kasten „Welche Miete der Ertragswert rechnet" (`v1207`, beide unter
+Fertig). „195.000" steht jetzt 4× im Dokument statt 10×.
 
-**d) Der PDF-Bericht ist angesehen und einmal umgebaut.** Marcel hat den
-eigenen Export gelesen und drei Dinge benannt. Eines davon ist gebaut:
-`03 Marktwert & Marktmiete` und `04 Preisstrategie` sind **eine** Sektion
-mit der Bandanzeige aus 04 (`v1206`, siehe Fertig). Zwei sind offen und
-liegen bei Marcel: **welche Miete den Ertragswert trägt** (die amtliche
-4,89 €/m² liegt unterhalb der ganzen Vergleichsspanne 6,66–8,30) und ob der
-Marktwert im **Fließtext** des KI-Berichts seltener stehen soll — der
-wiederholt ihn in fast jedem Absatz.
+**Offen und bei Marcel:**
+
+1. **Die Gliederung.** Demo liegt:
+   `design/Vorschläge/marktbericht-struktur.html`, drei Stufen. Gemessener
+   Befund: `08 Lage- & Potenzialbewertung`, `09 Makrolage & Sozioökonomie`
+   und `10 Lage & Infrastruktur` beginnen **alle drei auf Seite 7** — dieselbe
+   Zersplitterung wie vorher bei 03/04. Empfohlen ist Stufe 1: nur die Lage
+   bündeln, 12 → 10 Abschnitte. **Spart keine Seite**, macht die Seite ruhig.
+2. **Der Fließtext des KI-Berichts** wiederholt den Marktwert in fast jedem
+   Absatz. Das wäre eine Änderung an der Textvorgabe, kein Layout — und es
+   ist die letzte verbliebene Quelle der Wiederholung.
+3. **„Aussagekraft: Mittel · 59 %"** steht weiterhin in 01 unter dem
+   Score-Ring **und** vollständig in 03. Die kurze Zeile in 01 bezieht sich
+   auf den Score, der Block in 03 auf den Marktwert — es sind zwei Aussagen
+   mit demselben Wortlaut und derselben Zahl. Ob das eine Dopplung ist oder
+   zwei richtige Angaben, ist eine Produktfrage.
+
+> **Die Mietfrage ist erledigt und war eine falsche Prämisse — meine.**
+> Der Ertragswert rechnet längst mit 7,67 €/m², nicht mit 4,89. Die
+> A/B/C-Frage, die ich gestellt hatte, ist zurückgenommen; siehe Fertig
+> und das Journal zu `v1207`.
 
 **Positiv aufgefallen und nicht angetastet:** die Verfahren kennzeichnen
 sich selbst — „SACHWERT 268.172 € · **vorläufig · ohne Sachwertfaktor,
@@ -220,14 +238,14 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 **Entscheidungen, die bei Marcel liegen**
 
-- **Welche Miete führt den Ertragswert?** Gemessen am Bericht vom
-  02.09.2026: die amtliche Mietpreisübersicht sagt **4,89 €/m²**, die
-  Vergleichsangebote **7,67 €/m² (Spanne 6,66–8,30)**. **Die amtliche liegt
-  komplett unter der beobachteten Spanne**, und der Bericht sagt dazu kein
-  Wort. Drei Wege: **A** amtlich führt weiter, aber der Widerspruch wird
-  ausgewiesen · **B** die Vergleichsmiete führt · **C** die Ist-Miete führt,
-  wenn erfasst. **Empfehlung: A, unabhängig vom Rest** — das Verschweigen
-  ist das eigentliche Problem.
+- **Die Gliederung des Marktberichts.** Demo:
+  `design/Vorschläge/marktbericht-struktur.html`. Gemessen: `08`, `09` und
+  `10` beginnen alle drei auf Seite 7 — dieselbe Zersplitterung wie vorher
+  bei 03/04. **Empfohlen ist Stufe 1** (nur die Lage bündeln, 12 → 10
+  Abschnitte). Spart keine Seite, macht die Seite ruhig.
+- **Soll der Marktwert auch im Fließtext des KI-Berichts seltener stehen?**
+  Der wiederholt ihn in fast jedem Absatz — die letzte verbliebene Quelle
+  der Wiederholung. Wäre eine Änderung an der Textvorgabe, kein Layout.
 - **Die Score-Konvention für fehlende Teilwerte** (`v1197`): neutral
   ersetzen — so gebaut — oder den Teilwert weglassen und die übrigen
   Gewichte hochnormieren.
@@ -2327,6 +2345,42 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Der PDF-Bericht durchgesehen — `v1207`, 02.09.2026 (`8469143`…`9a210f0`)
+
+Marcel hat den Export nach `v1206` gelesen und vier Dinge gesagt. Drei sind
+gebaut, eines liegt als Demo bei ihm.
+
+**Sektion 01 ist entschlackt.** Marktwert-Kachel, Marktmiete-Kachel und der
+Balken `MARKTWERT-SPANNE` sind raus. Der Block `AUSSAGEKRAFT DER INDIKATION`
+ist nicht gelöscht, sondern nach 03 verschoben — dorthin, wo der Marktwert
+steht, den er qualifiziert. „195.000" steht jetzt **4×** im Dokument, vor
+`v1206` waren es 10×.
+
+**Zwei Waisen-Umbrüche behoben**, die Marcel nicht genannt hat und die beim
+Auslesen des PDF auffielen: der Energiebalken von 02 und der Haftungsrahmen
+von 07 standen je allein oben auf einer Seite. Ursache beide Male der Block
+**davor**, nicht das Anhängsel.
+
+**Die 4,89 €/m² — die Prämisse war falsch.** Der Ertragswert rechnet längst
+mit 7,67 €/m² (gemessen: `miete_quelle = "Angebotsmieten"`, Rohertrag
+9.204 € ÷ 12 ÷ 100 m²). Die A/B/C-Frage, die ich gestellt und Marcel mit „a"
+beantwortet hat, ging von einer falschen Annahme aus und ist zurückgenommen.
+Gebaut ist der Geist von A: der Kasten **„Welche Miete der Ertragswert
+rechnet"** in 05 nennt beide Zahlen, die Abweichung (−36,2 %), die Lage zur
+Vergleichsspanne und den Grund.
+
+**Drei eigene Fehler in derselben Sitzung**, alle im Journal:
+`v1207b` (Fix auf einem Pfad, den das Dokument nie betritt), `v1207c`
+(globales `sed` setzte `_HR` außerhalb seines Gültigkeitsbereichs — im
+Browser sofort `ReferenceError`), `v1207d` (Zahlenformat). **Dreimal hat
+`node --check` bestanden, während nichts funktionierte.**
+
+**Bei Marcel liegt:** `design/Vorschläge/marktbericht-struktur.html` —
+drei Stufen für die Gliederung. Gemessener Befund: `08`, `09` und `10`
+beginnen alle drei auf Seite 7, dieselbe Zersplitterung wie 03/04.
+Empfohlen ist Stufe 1 (nur die Lage bündeln, 12 → 10 Abschnitte); sie spart
+**keine** Seite, und das steht diesmal vorher da.
 
 ### 03 und 04 sind eine Sektion — `v1206`, 02.09.2026 (`99f6dff`)
 

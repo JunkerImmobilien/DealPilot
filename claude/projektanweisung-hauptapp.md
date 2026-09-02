@@ -5247,6 +5247,100 @@ amtlichen Mietpreisübersicht rechnet — **unterhalb der ganzen Spanne**.
 Derselbe Bericht zeigt zwei Mieten, die nicht zusammenpassen. A/B/C liegen
 bei Marcel. **Prod hat v1206 noch nicht.**
 
+### v1207 / v1207b–d (02.09.2026, `8469143` · `42b12f9` · `f9f7b78` · `9a210f0`) — 01 ist der Score, und die 4,89 sagen endlich, was sie sind
+
+**Was.** Marcel hat den Export nach `v1206` gelesen und drei Dinge gesagt:
+*„a"* (zur Mietfrage), *„kannst du bitte unter 01 auch den Marktwert und die
+Marktmiete und Spanen rausnehmen"*, *„auch alles passend formatieren und
+passend seitenumbrüche"*, und *„wenn es sinnvoll ist könenn wir komplett neu
+strukturieren"*.
+
+**1 · Sektion 01 entschlackt.** Gezählt im Export: der Marktwert stand auf dem
+Deckblatt, in 01 als Kachel **und** als Balken `MARKTWERT-SPANNE`, in 03 als
+Band, in 05 im Verfahrensvergleich. Die Aussagekraft stand auf dem Deckblatt,
+in 01 **zweimal** und in 03. Raus aus 01: beide Kacheln und der Spannenbalken.
+Der Block `AUSSAGEKRAFT DER INDIKATION` ist **nicht gelöscht**, sondern als
+`aussagekraft()` ans Ende von Sektion 03 verschoben — dorthin, wo der
+Marktwert steht, den er qualifiziert. Die einzeilige Fußzeile aus `v1206`
+fällt dafür weg.
+
+**2 · Zwei Waisen-Umbrüche, die Marcel nicht genannt hat.** Beim Auslesen des
+PDF gefunden: der Energiebalken von 02 stand allein oben auf Seite 3, seine
+Überschrift auf Seite 2. Der Haftungsrahmen von 07 stand allein oben auf
+Seite 6. Beide Male ist die Ursache **nicht das Anhängsel** — es reserviert
+korrekt seinen Platz. Ursache ist der Block **davor**, der die Seite bis knapp
+unter die Schwelle füllt.
+
+**3 · Die 4,89 €/m² — die Prämisse war falsch, meine und seine.**
+
+> Marcel fragte, warum der Ertragswert mit 4,89 €/m² rechne. Ich habe daraus
+> eine A/B/C-Frage gemacht, er hat „a" gewählt. **Gemessen im gespeicherten
+> Bericht:** `cross_check.ertragswert.miete_quelle = "Angebotsmieten"`,
+> `modellversion = "immowertv2021"` (nicht `agvga_nrw_2016`), Rohertrag
+> 9.204 € ÷ 12 ÷ 100 m² = **7,67 €/m²**. **Es wird nicht mit 4,89 gerechnet.**
+> Der Ertragswert nimmt längst die Marktmiete — genau das, was Marcel wollte.
+> Die 4,89 sind ein amtlicher Vergleichswert, der nur deshalb wie ein
+> Rechenschritt aussieht, weil die Mietpreisübersicht ihre eigene Ableitung
+> mit Gleichheitszeichen zeigt („= marktüblich erzielbare Miete 4,89").
+> **Die A/B/C-Frage ist hinfällig und zurückgenommen.**
+
+Gebaut wurde der **Geist** von A: der Widerspruch wird benannt statt
+versteckt. `CrossCheckService` liefert neu `miete_qm` und `miete_vergleich`;
+das Dokument zeichnet daraus in 05 den Kasten
+**„WELCHE MIETE DER ERTRAGSWERT RECHNET"**. Er entsteht nur, wenn es wirklich
+zwei verschiedene Zahlen gibt.
+
+**Commits.** `8469143` (app.js, CrossCheckService, Cache-Buster-Kette 1207)
+· `42b12f9` (1207b) · `f9f7b78` (1207c) · `9a210f0` (1207d).
+
+**Nachweis.**
+
+| gemessen am selben Bericht | vor v1206 | nach v1207d |
+|---|---|---|
+| „195.000" im Dokument | 10× | **4×** |
+| „AUSSAGEKRAFT DER INDIKATION" | 01 **und** 03 | **nur 03** |
+| Balken „MARKTWERT-SPANNE" | in 01 | **weg** |
+| Kachel „Marktmiete €/m²" | in 01 | **weg** |
+| ENERGIEKLASSE / Objekt-Stammdaten | S3 / S2 | **beide S3** |
+| Haftungsrahmen / Sektion 07 | S6 allein / S5 | **beide S7** |
+| Seiten gesamt | 9 | 9 |
+
+Der Rechenkern wurde **echt gelaufen**, nicht nur geprüft: `CrossCheckService`
+im Container mit den gespeicherten Daten aufgerufen →
+`{ miete_qm: 7.67, miete_quelle: "Angebotsmieten", miete_vergleich:
+{ abweichung_pct: -36.2, ausserhalb_spanne: "unterhalb", … } }`. Der Kasten
+im PDF liest sich richtig; Konsole ohne Fehler.
+
+**Drei Korrekturen an mir selbst, in derselben Sitzung:**
+
+- **`v1207b`** — der Haftungsrahmen-Fix aus `v1207` hing an `Belastbarkeit`
+  und `Sensitivität`. **Beide zeichnen in diesem Bericht gar nicht.** Der Fix
+  lag auf einem Pfad, den das Dokument nie betritt: er sah plausibel aus und
+  tat nichts. Welcher Block der letzte ist, steht nicht fest — fünf sind
+  bedingt. Jetzt reserviert **jeder** von ihnen den Rahmen mit (`+ _HR`).
+  In den Fußbereich ausweichen geht nicht, gemessen: Fußzeile bei `H-8`,
+  Inhalt endet bei `H-16`, fünf Millimeter Luft, der Rahmen braucht neun.
+- **`v1207c`** — mein `sed` war **global**. `need(24);` kommt zweimal vor,
+  einmal in 07 (wo `_HR` deklariert ist) und einmal in 03 (wo nicht).
+  Sofort im Browser: `ReferenceError: _HR is not defined`. **Ein Muster, das
+  im ganzen File eindeutig aussieht, ist es meist nicht** — der Bereich
+  gehört in die Ersetzung, nicht in die Absicht.
+- **`v1207d`** — die Spanne stand als „6,66–8,3 €/m²". Zwei Stellen links,
+  eine rechts, und der Leser sucht den Grund. Mieten jetzt immer zweistellig,
+  Prozente mit eigenem Formatierer und höchstens einer Stelle.
+
+> **Zum dritten Mal in dieser Sitzung hat `node --check` bestanden, während
+> nichts funktionierte.** Gefunden hat es jedes Mal der erste echte Lauf.
+
+**Rest.** Marcels vierte Frage — komplett neu strukturieren — beantwortet
+`design/Vorschläge/marktbericht-struktur.html`: **nein, komplett nicht.**
+Gemessen ist **ein** Befund: `08 Lage- & Potenzialbewertung`,
+`09 Makrolage & Sozioökonomie` und `10 Lage & Infrastruktur` beginnen **alle
+drei auf Seite 7** — dieselbe Zersplitterung wie 03/04. Drei Stufen stehen
+zur Wahl, Stufe 1 (nur die Lage bündeln, 12 → 10 Abschnitte) ist empfohlen.
+**Und diesmal steht vorher da, dass es keine Seite spart.** **Prod hat
+v1206 und v1207 noch nicht.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

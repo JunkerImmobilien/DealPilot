@@ -1,0 +1,218 @@
+<title>Wie der Marktbericht gegliedert ist</title>
+<style>
+/* Gliederungsvergleich. Alle Abschnitte und Seitenzahlen sind aus dem Export
+   vom 02.09.2026 ausgelesen, nicht geschaetzt. */
+:root{
+  --grund:#F7F5F1; --papier:#fff; --ink:#17171a; --text:#26262b; --leise:#7b7b83;
+  --linie:#E4DED1; --gold:#C9A84C; --gold-d:#a8842c; --gruen:#3FA56C; --rot:#B8625C;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--grund);color:var(--text);
+     font:15px/1.62 Inter,-apple-system,system-ui,sans-serif}
+.h{max-width:1180px;margin:0 auto;padding:34px 20px 90px}
+h1{font:600 26px/1.2 'Space Grotesk',Inter,sans-serif;margin:0 0 10px;text-wrap:balance}
+.lead{color:var(--leise);font-size:14.5px;max-width:74ch;margin:0 0 6px}
+h2{font:600 18px/1.3 'Space Grotesk',Inter,sans-serif;margin:38px 0 4px}
+.h2sub{color:var(--leise);font-size:13px;margin:0 0 16px;max-width:78ch}
+code{font:500 12px ui-monospace,'JetBrains Mono',monospace;background:rgba(0,0,0,.055);
+  padding:1px 5px;border-radius:4px}
+
+/* ── Gliederungsspalten ───────────────────────────────────────── */
+.spalten{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px;align-items:start}
+.sp{background:var(--papier);border:1px solid var(--linie);border-radius:8px;overflow:hidden}
+.sp.gewaehlt{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.18)}
+.sp h3{margin:0;padding:13px 16px 11px;border-bottom:1px solid var(--linie);
+  font:600 14px 'Space Grotesk',Inter,sans-serif;display:flex;align-items:baseline;
+  justify-content:space-between;gap:8px}
+.sp h3 .n{font:600 9px ui-monospace,monospace;letter-spacing:.15em;color:var(--leise);
+  text-transform:uppercase;white-space:nowrap}
+.sp .wie{padding:9px 16px;font-size:12.5px;color:var(--leise);border-bottom:1px solid var(--linie);
+  background:rgba(0,0,0,.015)}
+ol.gl{margin:0;padding:8px 0;list-style:none;counter-reset:s}
+ol.gl li{display:flex;gap:9px;padding:4.5px 16px;font-size:13.2px;align-items:baseline}
+ol.gl li .nr{font:600 10px ui-monospace,monospace;color:var(--gold-d);min-width:16px;
+  font-variant-numeric:tabular-nums}
+ol.gl li .t{flex:1}
+ol.gl li .s{font:500 10px ui-monospace,monospace;color:var(--leise);font-variant-numeric:tabular-nums}
+ol.gl li.neu{background:rgba(63,165,108,.075)}
+ol.gl li.neu .nr{color:var(--gruen)}
+ol.gl li.weg{opacity:.42;text-decoration:line-through}
+ol.gl li.teil{background:var(--ink);color:#fff;margin:6px 0 2px;padding-top:6px;padding-bottom:6px;
+  font:600 9.5px ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase}
+ol.gl li.teil .nr{color:var(--gold)}
+.sp .fuss{padding:11px 16px 14px;border-top:1px solid var(--linie);font-size:12.4px;line-height:1.55}
+.sp .fuss b{color:var(--text)}
+.pro{color:var(--gruen)} .con{color:var(--rot)}
+
+/* ── Befundkasten ─────────────────────────────────────────────── */
+.bef{background:var(--papier);border:1px solid var(--linie);border-left:4px solid var(--gold);
+  border-radius:10px;padding:18px 22px;margin:22px 0}
+.bef h3{margin:0 0 9px;font:600 15px 'Space Grotesk',Inter,sans-serif}
+.bef p{margin:0 0 9px}.bef p:last-child{margin:0}
+table.m{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0 4px}
+table.m th{text-align:left;padding:6px 0;border-bottom:1px solid var(--linie);
+  font:600 9px ui-monospace,monospace;letter-spacing:.14em;color:var(--leise);text-transform:uppercase}
+table.m td{padding:6px 0;border-bottom:1px solid var(--linie);vertical-align:top}
+table.m td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{display:inline-block;font:600 10px ui-monospace,monospace;border-radius:999px;padding:2px 9px}
+.tag.g{background:rgba(63,165,108,.14);color:var(--gruen)}
+.tag.r{background:rgba(184,98,92,.13);color:var(--rot)}
+</style>
+
+<div class="h">
+
+<h1>Wie der Marktbericht gegliedert ist</h1>
+<p class="lead">
+  Marcel am 02.09.2026: <b>„wenn es sinnvoll ist können wir komplett neu strukturieren."</b>
+  Bevor ich das vorschlage, habe ich die Gliederung ausgelesen — jeder Abschnitt und jede
+  Seitenzahl unten stammt aus seinem Export, nichts ist geschätzt.
+</p>
+<p class="lead">
+  <b>Meine Antwort vorweg: nein, komplett nicht.</b> Die Reihenfolge trägt. Aber ein Muster
+  wiederholt sich, und es ist genau das von 03/04.
+</p>
+
+<div class="bef">
+  <h3>Der Befund: drei Abschnitte für ein Thema, alle auf derselben Seite</h3>
+  <p>
+    <b>08 Lage- &amp; Potenzialbewertung</b>, <b>09 Makrolage &amp; Sozioökonomie</b> und
+    <b>10 Lage &amp; Infrastruktur</b> beginnen im Export <b>alle drei auf Seite 7</b>. Drei
+    goldene Nummernschilder, drei Doppellinien, drei Überschriften — für eine einzige Frage:
+    <i>wie ist die Lage?</i> Genau die Zersplitterung, die bei Marktwert und Preisstrategie
+    schon aufgefallen ist.
+  </p>
+  <p>
+    Zweiter Befund, kleiner: <b>04 Bodenrichtwert</b> steht zwischen dem Marktwert und dem
+    Verfahrensvergleich. Der Bodenrichtwert ist aber kein Ergebnis, sondern ein
+    <b>Eingangswert</b> — Sachwert und Ertragswert rechnen mit ihm. In 05 stünde er dort,
+    wo er gebraucht wird.
+  </p>
+  <table class="m">
+    <tr><th>gemessen im Export vom 02.09.2026</th><th></th></tr>
+    <tr><td>Abschnitte insgesamt</td><td>12</td></tr>
+    <tr><td>Abschnitte, die auf Seite 7 beginnen</td><td>08, 09, 10</td></tr>
+    <tr><td>Abschnitte, die eine ganze Seite tragen</td><td>05, 06, 12</td></tr>
+    <tr><td>Seiten gesamt</td><td>9</td></tr>
+  </table>
+</div>
+
+<h2>Drei Stufen — such dir eine aus</h2>
+<p class="h2sub">Von links nach rechts wächst der Eingriff. Grün = neu oder verschoben.</p>
+
+<div class="spalten">
+
+  <!-- ════ 1 ════ -->
+  <div class="sp gewaehlt">
+    <h3>Nur die Lage bündeln <span class="n">Stufe 1 · empfohlen</span></h3>
+    <div class="wie">Ein Eingriff. 12&nbsp;→&nbsp;10 Abschnitte.</div>
+    <ol class="gl">
+      <li><span class="nr">01</span><span class="t">Kennzahlen-Überblick</span><span class="s">S3</span></li>
+      <li><span class="nr">02</span><span class="t">Objekt-Stammdaten</span><span class="s">S3</span></li>
+      <li><span class="nr">03</span><span class="t">Marktwert &amp; Marktmiete</span><span class="s">S4</span></li>
+      <li><span class="nr">04</span><span class="t">Bodenrichtwert (amtlich)</span><span class="s">S4</span></li>
+      <li><span class="nr">05</span><span class="t">Wertverfahren im Vergleich</span><span class="s">S5</span></li>
+      <li><span class="nr">06</span><span class="t">Sachwertverfahren — Rechenweg</span><span class="s">S6</span></li>
+      <li><span class="nr">07</span><span class="t">Ertragswertverfahren — Rechenweg</span><span class="s">S6</span></li>
+      <li class="neu"><span class="nr">08</span><span class="t"><b>Lage</b> — Bewertung, Makrolage, Infrastruktur</span><span class="s">S7</span></li>
+      <li><span class="nr">09</span><span class="t">Vergleichsobjekte (10)</span><span class="s">S8</span></li>
+      <li><span class="nr">10</span><span class="t">Ausführlicher Marktbericht</span><span class="s">S8</span></li>
+    </ol>
+    <div class="fuss">
+      <div class="pro">+ Behebt genau den gemessenen Befund und nichts sonst.</div>
+      <div class="pro">+ Drei Überschriften werden zu drei Zwischenzeilen — die Seite wird ruhiger.</div>
+      <div class="pro">+ Kein Leser muss sich umgewöhnen; die Reihenfolge bleibt.</div>
+      <div class="con">− Der Bodenrichtwert steht weiter an der falschen Stelle.</div>
+    </div>
+  </div>
+
+  <!-- ════ 2 ════ -->
+  <div class="sp">
+    <h3>Lage bündeln, Bodenwert einordnen <span class="n">Stufe 2</span></h3>
+    <div class="wie">Zwei Eingriffe. 12&nbsp;→&nbsp;9 Abschnitte.</div>
+    <ol class="gl">
+      <li><span class="nr">01</span><span class="t">Kennzahlen-Überblick</span><span class="s">S3</span></li>
+      <li><span class="nr">02</span><span class="t">Objekt-Stammdaten</span><span class="s">S3</span></li>
+      <li><span class="nr">03</span><span class="t">Marktwert &amp; Marktmiete</span><span class="s">S4</span></li>
+      <li class="neu"><span class="nr">04</span><span class="t">Wertverfahren im Vergleich<br><span style="font-size:11.5px;color:var(--leise)">mit Bodenrichtwert als Eingangswert</span></span><span class="s">S4</span></li>
+      <li><span class="nr">05</span><span class="t">Sachwertverfahren — Rechenweg</span><span class="s">S5</span></li>
+      <li><span class="nr">06</span><span class="t">Ertragswertverfahren — Rechenweg</span><span class="s">S6</span></li>
+      <li class="neu"><span class="nr">07</span><span class="t"><b>Lage</b> — Bewertung, Makrolage, Infrastruktur</span><span class="s">S7</span></li>
+      <li><span class="nr">08</span><span class="t">Vergleichsobjekte (10)</span><span class="s">S7</span></li>
+      <li><span class="nr">09</span><span class="t">Ausführlicher Marktbericht</span><span class="s">S8</span></li>
+    </ol>
+    <div class="fuss">
+      <div class="pro">+ Der Bodenrichtwert steht, wo mit ihm gerechnet wird.</div>
+      <div class="pro">+ Neun Abschnitte statt zwölf — das Inhaltsverzeichnis wird lesbar.</div>
+      <div class="con">− Der Bodenrichtwert verliert sein eigenes Kapitel. Als amtlicher Wert
+        mit Quelle und Stichtag hat er einen Anspruch darauf.</div>
+    </div>
+  </div>
+
+  <!-- ════ 3 ════ -->
+  <div class="sp">
+    <h3>In drei Teile gliedern <span class="n">Stufe 3</span></h3>
+    <div class="wie">Neue Reihenfolge. 12&nbsp;→&nbsp;8 Abschnitte in 3 Teilen.</div>
+    <ol class="gl">
+      <li class="teil"><span class="nr">I</span><span class="t">Das Objekt</span></li>
+      <li><span class="nr">01</span><span class="t">Objekt-Stammdaten</span></li>
+      <li class="neu"><span class="nr">02</span><span class="t"><b>Lage</b> — Bewertung, Makrolage, Infrastruktur</span></li>
+      <li class="teil"><span class="nr">II</span><span class="t">Der Wert</span></li>
+      <li><span class="nr">03</span><span class="t">Marktwert &amp; Marktmiete</span></li>
+      <li class="neu"><span class="nr">04</span><span class="t">Wertverfahren im Vergleich<br><span style="font-size:11.5px;color:var(--leise)">mit Bodenrichtwert</span></span></li>
+      <li class="neu"><span class="nr">05</span><span class="t"><b>Rechenwege</b> — Sachwert und Ertragswert</span></li>
+      <li><span class="nr">06</span><span class="t">Vergleichsobjekte (10)</span></li>
+      <li class="teil"><span class="nr">III</span><span class="t">Die Einschätzung</span></li>
+      <li class="neu"><span class="nr">07</span><span class="t">Deal-Score<br><span style="font-size:11.5px;color:var(--leise)">heute 01, wandert ans Ende</span></span></li>
+      <li><span class="nr">08</span><span class="t">Ausführlicher Marktbericht</span></li>
+    </ol>
+    <div class="fuss">
+      <div class="pro">+ Erst das Objekt, dann der Wert, dann die Einschätzung — die Reihenfolge,
+        in der ein Sachverständiger denkt.</div>
+      <div class="con">− <b>Der Score wandert nach hinten.</b> Heute steht er auf Seite 3 und
+        ist das Erste, was jemand sieht. Das ist kein Versehen, sondern eine Zusammenfassung
+        vorweg — dieselbe Entscheidung, die jeder Analystenbericht trifft.</div>
+      <div class="con">− Teil-Zwischenseiten kosten Seiten, statt welche zu sparen.</div>
+      <div class="con">− Größter Eingriff, kleinster gemessener Anlass.</div>
+    </div>
+  </div>
+
+</div>
+
+<h2>Warum ich Stufe 1 empfehle</h2>
+<p class="h2sub" style="max-width:78ch">
+  Der gemessene Befund ist <b>eine</b> Zersplitterung: drei Lage-Abschnitte auf einer Seite.
+  Stufe 1 behebt genau die. Stufe 2 nimmt eine Frage mit dazu, die niemand gestellt hat, und
+  Stufe 3 dreht die Reihenfolge um — dafür bräuchte es einen Anlass, den die Messung nicht
+  hergibt.
+</p>
+<p class="h2sub" style="max-width:78ch">
+  <b>Anders als bei 03/04 spart auch das hier keine Seite</b>, und ich sage es diesmal vorher:
+  die drei Lage-Abschnitte stehen ohnehin schon auf einer Seite. Was wegfällt, sind zwei
+  Nummernschilder, zwei Doppellinien und zwei Zeilen im Inhaltsverzeichnis. Der Gewinn ist
+  Ruhe, nicht Papier.
+</p>
+
+<div class="bef" style="border-left-color:var(--gruen)">
+  <h3>Was bereits gebaut ist — <code>v1206</code> und <code>v1207</code></h3>
+  <table class="m">
+    <tr><th>gemessen am selben Bericht</th><th>vorher</th><th>nachher</th></tr>
+    <tr><td>„195.000" im Dokument</td><td>10×</td><td><span class="tag g">4×</span></td></tr>
+    <tr><td>„MARKTWERT (INDIKATION)" als Kopfzeile</td><td>2×</td><td><span class="tag g">1×</span></td></tr>
+    <tr><td>„AUSSAGEKRAFT DER INDIKATION"</td><td>01 und 03</td><td><span class="tag g">nur 03</span></td></tr>
+    <tr><td>Balken „MARKTWERT-SPANNE" in 01</td><td>ja</td><td><span class="tag g">weg</span></td></tr>
+    <tr><td>Energiebalken von 02 abgerissen</td><td>ja</td><td><span class="tag g">behoben</span></td></tr>
+    <tr><td>Haftungsrahmen allein auf einer Seite</td><td>ja</td><td><span class="tag g">behoben</span></td></tr>
+    <tr><td>Abschnitte im Inhaltsverzeichnis</td><td>13</td><td>12</td></tr>
+    <tr><td>Seiten gesamt</td><td>9</td><td>9</td></tr>
+  </table>
+  <p style="margin-top:12px">
+    Dazu der Kasten <b>„Welche Miete der Ertragswert rechnet"</b> in Abschnitt 05. Er war
+    nötig, weil die Prämisse falsch war: der Ertragswert nimmt <b>7,67 €/m²</b>, nicht die
+    4,89 €/m² aus der amtlichen Übersicht. Die 4,89 stehen als Vergleichswert daneben — und
+    weil die Mietpreisübersicht ihre eigene Ableitung mit Gleichheitszeichen zeigt
+    („= marktüblich erzielbare Miete 4,89"), sah der Vergleichswert aus wie ein Rechenschritt.
+    Jetzt steht dort, welche Zahl gerechnet wird, um wie viel die andere abweicht und warum.
+  </p>
+</div>
+
+</div>
