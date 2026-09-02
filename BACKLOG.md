@@ -36,34 +36,36 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1202)
+## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach dem Prod-Rollout)
 
-**Stand:** lokal = GitHub = Staging auf `4d649ff`.
-**Produktion steht auf `bca7c06`** — das ist `v1191`–`v1197` plus das
-reparierte Deploy-Skript, ausgerollt am 01.09. in vier Schritten auf
-Marcels Freigabe, `mb-backend` dort gerebuildet.
+**Stand: lokal = GitHub = Staging = Produktion auf `8f2832c`.**
+**Nichts hängt halbfertig.** Keine Migration offen, kein Rebuild offen.
 
-> ### `v1198`–`v1202` sind NICHT auf Prod — und warten auf Marcels eigenen Durchgang
+> ### Prod-Rollout 02.09.2026 — `v1198`–`v1202` sind live
 >
-> **Fachlich ist alles entschieden.** `v1198` ist auf Marcels Wort
-> Variante B, `v1201`/`v1202` sind seine Vorgaben (Pflichtfeld,
-> Stufenauswahl). Es fehlt keine Antwort mehr.
+> **Ausgerollt auf Marcels „passt"** nach seinem eigenen Durchgang auf
+> Staging. Produktion steht auf `8f2832c`.
 >
-> **Was fehlt, ist SEIN Blick auf Staging.** An einem Tag sind fünf
-> Pakete entstanden, die den Kern des Marktberichts anfassen — die
-> Bodenwert-Ermittlung, den Payload, das Pflichtfeld und die ganze
-> Stufenmechanik. Geprüft wurde das an ein, zwei Testobjekten, und
-> **zweimal hat `node --check` an diesem Tag „OK" gemeldet, während im
-> Browser gar nichts lief** (`v1196b`, `v1200b`).
+> **Sicherungen vorher:**
+> `/root/backups/dealpilot_db-vor-v1202-20260902-1321.sql` (12 MB) und
+> `marktbericht-vor-v1202-20260902-1321.sql` (14 MB — die Marktbericht-DB
+> steht in keinem Skript und wurde einzeln gezogen).
 >
-> **Eine Maschinenprüfung ersetzt die fachliche nicht.** Marcel ist der
-> Einzige, der sieht, ob die Zahlen stimmen. Vorgeschlagener Weg: ein
-> echtes Objekt auf `app.staging.dealpilot.immo`, Stufe wählen, Felder
-> füllen, Bericht erzeugen, Zahlen ansehen — rund zehn Minuten.
+> **`mb-backend` gerebuildet** (`v1198` ist Backend). Im Container
+> nachgemessen: `CrossCheckService.js:486` trägt die neue Form
+> `const bwErgebnis = p.bodenwert` — der stille Rückfall ist weg; die
+> alte Form steht nur noch im Kommentar darüber (Z. 450).
+> `ErtragswertService.js` trägt den Hinweis mit echten Umlauten.
+> Keine Fehler im Log.
 >
-> **Danach:** Sicherung beider Datenbanken, `git pull`, und für `v1198`
-> zusätzlich ein `mb-backend`-Rebuild. `v1199`–`v1202` sind reines
-> Frontend.
+> **Auf `app.dealpilot.immo` abgenommen:** `app.js?v=1202` ·
+> `mb-stufen.js?v=1202` · `wertermittlung.js?v=1201` · die Stufenauswahl
+> steht („Was soll der Bericht leisten?" / „Tiefe wählen — der Preis
+> richtet sich danach, nicht nach den Angaben"), Stufe 1 ist vorgewählt,
+> das `mea`-Feld steht im ersten Block, sieben Reiter, **null
+> Konsolenfehler.**
+>
+> **Keine Migration.** Lokal = GitHub = Staging = Produktion auf `8f2832c`.
 
 > ### Der Gelddefekt ist behoben und live
 >
@@ -181,13 +183,12 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
   gewählt, der Preis folgt der Wahl, Vorgabewert ist die günstigste Stufe.
   Siehe Fertig.
 
-- **`v1198` ist entschieden** — Marcel hat am 02.09.2026 **Variante B**
-  gewählt: ohne Miteigentumsanteil kein Bodenwert, vereinfachtes
-  Ertragswertverfahren mit Begründung im Bericht. Die Vorlage mit allen
-  drei Varianten steht unter
+- **`v1198` ist entschieden und live** — Marcel hat am 02.09.2026
+  **Variante B** gewählt (ohne Miteigentumsanteil kein Bodenwert,
+  vereinfachtes Ertragswertverfahren mit Begründung im Bericht) und den
+  Rollout nach eigenem Durchgang auf Staging freigegeben. Die Vorlage mit
+  allen drei Varianten bleibt unter
   `design/Vorschläge/ertragswert-ohne-mea.html`.
-  **Offen ist nur noch der Prod-Rollout** — und der wartet bewusst auf
-  Marcels eigenen Durchgang auf Staging (siehe unten).
 - **Die Score-Konvention für fehlende Teilwerte gehört entschieden**
   (`v1197`): neutral ersetzen — so gebaut — oder den Teilwert weglassen und
   die übrigen Gewichte hochnormieren. Beides fachlich vertretbar, fällt

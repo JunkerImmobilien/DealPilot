@@ -4937,6 +4937,49 @@ Qualität."*, die Felder tragen ihre goldene Marke mit dem Stufennamen, und
 > Beide Wege wurden getrennt geprüft: Klick auf den gesperrten Knopf tut
 > nichts, `generate()` direkt gerufen zeigt die Meldung.
 
+
+### Prod-Rollout 02.09.2026 (`8f2832c`) — `v1198`–`v1202` sind live
+
+**Ausgerollt auf Marcels „passt"**, nach seinem eigenen Durchgang auf
+Staging. Das war die Bedingung, und sie war nicht Zierde: an einem Tag
+sind fünf Pakete entstanden, die den Kern des Marktberichts anfassen —
+Bodenwert-Ermittlung, Payload, Pflichtfeld, Stufenmechanik. **Und zweimal
+hat `node --check` an diesem Tag „OK" gemeldet, während im Browser gar
+nichts lief** (`v1196b`, `v1200b`). Eine Maschinenprüfung ersetzt die
+fachliche nicht.
+
+**Was rausging:** vier Frontend-Dateien, zwei Backend-Dateien
+(`CrossCheckService.js`, `ErtragswertService.js`), zwei
+Entscheidungsvorlagen unter `design/Vorschläge/`. **Keine Migration.**
+
+**Sicherungen vorher:**
+`/root/backups/dealpilot_db-vor-v1202-20260902-1321.sql` (12 MB) ·
+`marktbericht-vor-v1202-20260902-1321.sql` (14 MB — die Marktbericht-DB
+steht in keinem Backup-Skript und wurde einzeln gezogen).
+
+**`mb-backend` gerebuildet.** Im Container nachgemessen statt behauptet:
+
+| Prüfung | Befund |
+|---|---|
+| `CrossCheckService.js:486` | `const bwErgebnis = p.bodenwert` — die neue Form |
+| `CrossCheckService.js:450` | die alte Form steht **nur noch im Kommentar** |
+| `ErtragswertService.js` | der Hinweis trägt echte Umlaute (`v1198c`) |
+| Log | keine Fehler |
+
+**Auf `app.dealpilot.immo` abgenommen:** `app.js?v=1202` ·
+`mb-stufen.js?v=1202` · `wertermittlung.js?v=1201` · die Stufenauswahl
+steht („Was soll der Bericht leisten?" · „Tiefe wählen — der Preis richtet
+sich danach, nicht nach den Angaben"), **Stufe 1 ist vorgewählt**, das
+`mea`-Feld steht im ersten Block, sieben Reiter, **null Konsolenfehler**
+(nach frischem Laden mit aktiver Konsolenaufzeichnung geprüft).
+
+**Lokal = GitHub = Staging = Produktion auf `8f2832c`.**
+
+> **Was der Tag fachlich verändert hat, in einem Satz:** ein Bericht
+> rechnet nicht mehr mit dem vollen Grundstück einer Eigentumswohnung,
+> verliert keine Angaben mehr, die das Objekt längst hat, verlangt den
+> Miteigentumsanteil, bevor er losläuft — und kostet nur noch das, was der
+> Nutzer ausdrücklich gewählt hat.
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
