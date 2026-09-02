@@ -1199,7 +1199,27 @@ function renderScore(d) { /*v895-doublering*/
   const box = document.querySelector('.scorebox');
   if (!box) return;
   const s = ds.score || 0, col = _scoreCol(s);
-  const ratingText = ds.rating || _scoreTier(s);
+  /* ── v1203 · EINE Sprache fuer EINE Zahl ────────────────────────────────
+     Hier stand `ds.rating || _scoreTier(s)`. Der Ring daneben zeichnet aber
+     IMMER _scoreTier — also stand am selben Score zweimal ein anderes Wort:
+     „56 / 100 · Solide" direkt neben „DEAL-SCORE · Durchschnittlich".
+
+     Gemessen sind drei Vokabulare im Haus:
+       Haupt-App (dashboard.js:390) TOP / GUT / SOLIDE / SCHWACH / KRITISCH
+       hier (_scoreTier)            Top / Gut / Solide / Schwach
+       mb-Backend (ScoringService)  Sehr attraktiv / Attraktiv /
+                                    Durchschnittlich / Unterdurchschnittlich
+
+     Der Backend-Rating ist der Ausreisser — sein Wortschatz kommt sonst
+     nirgends im Produkt vor, waehrend _scoreTier sich mit der Haupt-App
+     deckt. Deshalb entscheidet ab jetzt _scoreTier, auf dem Schirm UND im
+     PDF.
+
+     Das Feld bleibt im Datensatz: der Server rechnet es weiter, alte
+     Berichte behalten es, es wird nur nicht mehr ANGEZEIGT. Wer es doch
+     zeigen will, muss dann auch den Ring umstellen — sonst ist der
+     Widerspruch sofort zurueck. */
+  const ratingText = _scoreTier(s);
   const mv = (d.valuation && d.valuation.market_value) || {};
   const confPct = (mv.confidence_pct != null) ? mv.confidence_pct : null;
   let confLbl = mv.confidence_label || null;
@@ -2517,7 +2537,11 @@ async function exportPdf(out) {
   function scoreDonut(cx, cy, r, score, conf) {
     const s = Math.max(0, Math.min(100, score || 0));
     const col = s >= 70 ? [63, 165, 108] : s >= 50 ? GOLD : [184, 98, 80];
-    const tier = s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : 'Schwach'; // = _scoreTier(), Z.615
+    /* v1203 · war eine wortgleiche Kopie von _scoreTier() — mitsamt einem
+       Kommentar, der auf eine "Z.615" verwies, die es nicht mehr gibt. Zwei
+       Schwellenketten fuer dieselbe Einstufung sind die Doppelliste, an der
+       der Marktbericht schon sechsmal gescheitert ist. */
+    const tier = _scoreTier(s);
     const swO = Math.max(1.6, r * 0.185), rI = r * 0.75, swI = Math.max(1.2, r * 0.143);
     doc.setLineCap('round');
     doc.setLineWidth(swO);
@@ -2959,7 +2983,7 @@ async function exportPdf(out) {
   doc.setTextColor(..._scol); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6);
   doc.text('DEAL-SCORE', sbx + 14.5, y + 12.2, { align: 'center', charSpace: 0.4 });
   doc.setTextColor(..._scol); doc.setFont('helvetica', 'bold'); doc.setFontSize(22);
-  doc.text(ds.rating ?? '–', sbx, y + 23);
+  doc.text(_scoreTier(ds.score), sbx, y + 23);      /* v1203: dieselbe Sprache wie auf dem Schirm */
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(178, 178, 188);
   doc.text('Markt- & Chance-Risiko-Bewertung dieses Objekts', sbx, y + 29);
   /* Aussagekraft jetzt IM Panel, nicht erst 20 mm weiter unten als Textzeile.
@@ -3351,7 +3375,7 @@ async function exportPdf(out) {
   const kpis = [
     yld.gross_yield_pct != null ? ['Bruttorendite', yld.gross_yield_pct + ' %'] : null,
     yld.rent_multiplier != null ? ['Kaufpreisfaktor', yld.rent_multiplier] : null,
-    ds.score != null ? ['Deal-Score', ds.score + ' (' + (ds.rating ?? '–') + ')'] : null,
+    ds.score != null ? ['Deal-Score', ds.score + ' (' + _scoreTier(ds.score) + ')'] : null,   /* v1203 */
   ].filter(Boolean);
   if (kpis.length) { kpis.forEach((k, i) => kv(k[0], k[1], M + i * col, col, k[2])); y += 16; } /* v952-kvaccent */
 
