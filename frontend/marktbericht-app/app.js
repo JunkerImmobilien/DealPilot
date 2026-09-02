@@ -3101,12 +3101,13 @@ async function exportPdf(out) {
   // KPI-Kacheln 3×2
   const tw = (W - 2 * M - 2 * 4) / 3, th = 18;
   const tiles = [
-    ['Marktwert', mv.estimated != null ? euro(mv.estimated) : null, GOLD],
+    /* v1207-01schlank · Hier standen ['Marktwert', …] und ['Marktmiete €/m²', …].
+     * Beide sind raus — der Marktwert steht in 03 im Band, die Marktmiete
+     * ebenfalls. 01 zeigt nur noch, was NICHT anderswo steht. */
     ['Bruttorendite', yld.gross_yield_pct != null ? yld.gross_yield_pct + ' %' : null, [67, 183, 124]],
     ['Kaufpreisfaktor', yld.rent_multiplier != null ? yld.rent_multiplier : null, [150, 142, 120]],
     ['Abw. z. Marktwert', mv.discount_to_market_pct != null ? mv.discount_to_market_pct + ' %' : null, GOLD],
     ['Kaufpreis €/m²', inp.price_per_sqm ? Math.round(inp.price_per_sqm).toLocaleString('de-DE') + ' €' : null, [138, 138, 147]],
-    ['Marktmiete €/m²', inp.market_rent_sqm ? inp.market_rent_sqm.toLocaleString('de-DE') + ' €' : null, [138, 138, 147]],
   ].filter((t) => t[1] != null); // leere Kacheln (z.B. Kauf-Szenario ohne Preis) NICHT zeigen
   const tileRows = Math.ceil(tiles.length / 3);
   need(tileRows * (th + 4));
@@ -3115,32 +3116,28 @@ async function exportPdf(out) {
     tile(cx, cy, tw, th, t[0], t[1], t[2]);
   });
   y += tileRows * (th + 4) + 2;
-  // Marktwert-Spanne-Balken
-  if (mv.low != null && mv.high != null && mv.estimated != null) {
-    need(20); doc.setFontSize(8); doc.setTextColor(...MUT); doc.text('MARKTWERT-SPANNE', M, y); y += 4;
-    if (rangeBar(M, y, W - 2 * M, mv.low, mv.estimated, mv.high)) {
-      y += 8; doc.setFontSize(8.5); doc.setTextColor(...TXT);
-      doc.text(euro(mv.low), M, y);
-      doc.setFont('helvetica', 'bold'); doc.text(euro(mv.estimated), M + (W - 2 * M) / 2, y, { align: 'center' });
-      doc.setFont('helvetica', 'normal'); doc.text(euro(mv.high), W - M, y, { align: 'right' });
-      y += 8;
-    }
-  }
-  // Aussagekraft: kombinierte Konfidenz (Marktdaten-Stichprobe + Vollständigkeit der Objektangaben)
-  /* v959-confsource
-   * Hier stand: mv.confidence — die ROHE Stichproben-Konfidenz (~0,9).
-   * confInfo() liefert damit den >=0.85-Zweig, also den Satz "Grosse, eng
-   * beieinander liegende Vergleichsstichprobe – belastbare Marktwert-
-   * indikation." Die Zahl daneben kommt aber aus mv.confidence_pct (47).
-   * Ergebnis auf Seite 2 des Prod-Berichts: rote LED "Niedrig · 47 %" und
-   * direkt darunter "belastbar". Genau der Widerspruch, den der Kommentar
-   * bei confInfo() (Z.558-564) als behoben beschreibt — v955/v956 haben das
-   * Dashboard geheilt und diese Zeile vergessen.
-   * Jetzt Zeichen fuer Zeichen dieselbe Kette wie das Dashboard (Z.731).
+  /* v1207-01schlank
+   * ──────────────────────────────────────────────────────────────────────
+   * Hier standen bis zum 02.09.2026 der Balken MARKTWERT-SPANNE und der
+   * Block AUSSAGEKRAFT DER INDIKATION. Marcel am eigenen Bericht:
+   * "kannst du bitte unter 01 auch den Marktwert und die Marktmiete und
+   * Spannen rausnehmen."
+   *
+   * Gezaehlt im Export vom 02.09.: der Marktwert stand auf dem Deckblatt,
+   * in 01 als Kachel UND als Spannenbalken, in 03 als Band und in 05 im
+   * Verfahrensvergleich. Die Aussagekraft stand auf dem Deckblatt, in 01
+   * ZWEIMAL (unter dem Score-Ring und als eigener Block) und in 03.
+   *
+   * 01 ist jetzt der SCORE, sonst nichts. Der Aussagekraft-Block ist NICHT
+   * geloescht, sondern nach unten verschoben: `aussagekraft()` wird am Ende
+   * von Sektion 03 gerufen, wo der Marktwert steht, den sie qualifiziert.
+   * Dort ersetzt sie die einzeilige Fusszeile aus v1206 — eine Aussage,
+   * einmal, vollstaendig, an der richtigen Stelle.
    */
   const cval = (mv.confidence_pct != null) ? (mv.confidence_pct / 100)
              : (mv.confidence != null ? mv.confidence : (d.sale && d.sale.confidence));
   const ci = confInfo(cval, (out.data && out.data.valuation && out.data.valuation.market_value && out.data.valuation.market_value.confidence_parts) || null); /* v956-onesource */
+  const aussagekraft = () => {
   if (mv.confidence_pct != null || ci) {
     need(24); doc.setFontSize(8); doc.setTextColor(...MUT); doc.text('AUSSAGEKRAFT DER INDIKATION', M, y); y += 5;
     const pct = mv.confidence_pct;
@@ -3171,6 +3168,7 @@ async function exportPdf(out) {
       : (ci ? ci.text : 'Alle wertrelevanten Objektangaben berücksichtigt.');
     const cw = doc.splitTextToSize(msg, W - 2 * M); doc.text(cw, M, y); y += cw.length * 4.4;
   }
+  };
   y += 2;
 
   // ---------- Stammdaten ----------
@@ -3190,8 +3188,20 @@ async function exportPdf(out) {
   if (stell) rows.push(['Stellplätze', stell]);
   if (ref.elevator) rows.push(['Aufzug', 'ja']);
   rows.push(['Kaufpreis', euro(ref.purchase_price)], ['Kaltmiete/Monat', euro(ref.monthly_net_rent)]);
+  /* v1207-umbruch · Der Energiebalken hing als Waise oben auf der naechsten
+   * Seite. Gemessen im Export vom 02.09.2026: Sektion 02 stand auf Seite 2,
+   * ihr Energiebalken allein auf Seite 3 — abgerissen von seiner Ueberschrift.
+   * Ursache ist NICHT der Balken: er reserviert korrekt seine 18 mm. Ursache
+   * ist die Zeile davor, die die Seite bis auf 14 mm fuellt und ihn damit
+   * hinausdraengt. Wer zuletzt zeichnet, muss den Platz fuer das Anhaengsel
+   * MITreservieren — sonst bricht die falsche Stelle um.
+   * Rechnet der Balken nicht (keine Klasse oder unbekannte), ist der Zuschlag 0. */
+  const _enH = (ref.energy_class
+    && ['A+','A','B','C','D','E','F','G','H'].indexOf(String(ref.energy_class).toUpperCase().trim()) >= 0)
+    ? 20 : 0;
   for (let i = 0; i < rows.length; i += 3) {
-    need(14);
+    const _letzte = (i + 3 >= rows.length);
+    need(14 + (_letzte ? _enH : 0));
     for (let j = 0; j < 3 && i + j < rows.length; j++) kv(rows[i + j][0], rows[i + j][1], M + j * col, col, rows[i + j][2]); /* v952-kvaccent: [2] war schon da */
     y += 14;
   }
@@ -3313,7 +3323,6 @@ async function exportPdf(out) {
   };
 
   if (mv.estimated != null) {
-    const cl = mv.confidence_label || '', cp = mv.confidence_pct;
     wertBand({
       lo: mv.low, hi: mv.high, val: mv.estimated,
       loLab: 'MINDESTPREIS', loTxt: euro(mv.low), loSub: sqPreis(mv.low),
@@ -3321,8 +3330,12 @@ async function exportPdf(out) {
       hiLab: 'MAXIMALPREIS', hiTxt: euro(mv.high), hiSub: sqPreis(mv.high),
       marker: ref.purchase_price,
       markerTxt: ref.purchase_price != null ? 'Kaufpreis ' + euro(ref.purchase_price) : '',
-      fuss: (cl && cp != null) ? 'Aussagekraft: ' + cl + ' · ' + cp + ' %' : null,
-      fussCol: (cp != null && cp >= 75) ? [67, 183, 124] : (cp != null && cp >= 50) ? [217, 180, 90] : [217, 104, 95],
+      /* v1207 · Hier stand die einzeilige Fusszeile "Aussagekraft: Mittel · 59 %".
+       * Sie ist raus, weil der VOLLSTAENDIGE Aussagekraft-Block jetzt am Ende
+       * dieser Sektion steht — mit Balken, Stichprobengroesse und dem Satz,
+       * was die Bewertung genauer machen wuerde. Zweimal dieselbe Aussage in
+       * einer Sektion war genau das, was Marcel angemerkt hat. */
+      fuss: null, fussCol: [120, 113, 100],
     });
   }
   if (rmed) {
@@ -3347,6 +3360,9 @@ async function exportPdf(out) {
     doc.text(recl, M, y + 3);
     y += recl.length * 3.6 + 5.5;
   }
+  /* v1207 · Die Aussagekraft qualifiziert den Marktwert — sie steht deshalb
+   * hier und nicht mehr in 01. Der Block ist derselbe, nur verschoben. */
+  aussagekraft();
 
   // -- €/m²-Spannen (Kauf + Miete) nebeneinander --
   need(24);
@@ -3641,6 +3657,59 @@ async function exportPdf(out) {
         }
       });
       y += 2;
+    }
+
+    /* v1207-WMIE-2 · WELCHE MIETE DER ERTRAGSWERT RECHNET.
+     *
+     * Marcel las "4,89 €/m²" im Block darueber und fragte, warum damit
+     * gerechnet werde, wo die Mietspanne bis zehn Euro reiche. Gemessen im
+     * gespeicherten Bericht: es wird NICHT damit gerechnet — miete_quelle ist
+     * "Angebotsmieten", der Rohertrag von 9.204 EUR entspricht 7,67 EUR/m².
+     * Die 4,89 sind ein amtlicher VERGLEICHSWERT. Nur zeigt die
+     * Mietpreisuebersicht ihre eigene Ableitung mit Gleichheitszeichen
+     * ("= marktueblich erzielbare Miete  4,89"), und damit sieht der
+     * Vergleichswert aus wie ein Rechenschritt.
+     *
+     * Der Kasten stellt beide Zahlen nebeneinander, beziffert die Abweichung
+     * und sagt, warum die eine fuehrt. Er erscheint nur, wenn es wirklich
+     * zwei verschiedene Zahlen gibt (miete_vergleich ist sonst null). */
+    const _mvgl = cc.ertragswert && cc.ertragswert.miete_vergleich;
+    if (_mvgl) {
+      const _z2 = (v) => String(Math.round(v * 100) / 100).replace('.', ',');
+      const _qm = (v) => _z2(v) + ' €/m²';
+      const _ri = (p) => (p < 0 ? 'darunter' : 'darüber');
+      const _sp = (_mvgl.spanne_q25 != null && _mvgl.spanne_q75 != null)
+        ? _z2(_mvgl.spanne_q25) + '–' + _z2(_mvgl.spanne_q75) + ' €/m²' : null;
+      const _lage = (_mvgl.ausserhalb_spanne && _sp)
+        ? ' und damit ' + _mvgl.ausserhalb_spanne + ' der Vergleichsspanne ' + _sp : '';
+      const _txt = _mvgl.amtlich_fuehrt
+        ? 'Angesetzt sind ' + _qm(_mvgl.angesetzt_qm) + ' aus der Mietpreisübersicht des '
+          + 'Gutachterausschusses — modellkonform zum Liegenschaftszinssatz aus derselben '
+          + 'Quelle (§ 10 ImmoWertV). Die Vergleichsangebote liegen bei '
+          + _qm(_mvgl.amtlich_qm) + ', also ' + _z2(Math.abs(_mvgl.abweichung_pct))
+          + ' % ' + _ri(-_mvgl.abweichung_pct) + '. Beide Zahlen stehen hier bewusst '
+          + 'nebeneinander.'
+        : 'Angesetzt sind ' + _qm(_mvgl.angesetzt_qm) + ' (' + _mvgl.angesetzt_quelle
+          + '). Die amtliche Mietpreisübersicht nennt ' + _qm(_mvgl.amtlich_qm) + ' — '
+          + _z2(Math.abs(_mvgl.abweichung_pct)) + ' % ' + _ri(_mvgl.abweichung_pct)
+          + _lage + '. Der amtliche Wert führt hier nicht: modellkonform nach '
+          + '§ 10 ImmoWertV wäre er nur, wenn auch der Liegenschaftszinssatz aus '
+          + 'derselben Quelle stammt. Die Zahl oben ist ein Vergleichswert, kein '
+          + 'Rechenschritt.';
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setCharSpace(0);
+      const _mt = doc.splitTextToSize(_txt, blockW - 10);
+      const _mh = 9.5 + _mt.length * 3;
+      need(_mh + 4);
+      doc.setFillColor(250, 248, 242); doc.roundedRect(M, y, blockW, _mh, 2, 2, 'F');
+      doc.setFillColor(...GOLD); doc.roundedRect(M, y, 1.6, _mh, 0.8, 0.8, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.9); doc.setTextColor(...TXT);
+      doc.setCharSpace(0.3);
+      doc.text('WELCHE MIETE DER ERTRAGSWERT RECHNET', M + 5, y + 5.5);
+      doc.setCharSpace(0);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(...MUT);
+      doc.text(_mt, M + 5, y + 10);
+      y += _mh + 4;
+      doc.setFontSize(6.5); doc.setTextColor(...MUT);
     }
 
     doc.setFontSize(6.5); doc.setTextColor(...MUT);
@@ -3981,7 +4050,12 @@ async function exportPdf(out) {
 
     /* Belastbarkeit und Sensitivitaet */
     if (_ew.belastbarkeit) {
-      need(12);
+      /* v1207-umbruch · +14 fuer den Haftungsrahmen, der zwingend folgt.
+       * Gemessen im Export vom 02.09.2026: der Haftungsrahmen stand allein
+       * oben auf Seite 6, seine Sektion 07 endete auf Seite 5. Derselbe
+       * Waisen-Fall wie beim Energiebalken — und dieselbe Ursache: nicht das
+       * Anhaengsel reserviert zu wenig, sondern der Block davor. */
+      need(12 + 14);
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
       doc.text('Belastbarkeit ' + _ew.belastbarkeit.pct + ' % ('
         + _ew.belastbarkeit.label + ')', M, y);
@@ -3995,7 +4069,7 @@ async function exportPdf(out) {
       }
     }
     if (_ew.sensitivitaet && _ew.sensitivitaet.lzs_plus_05) {
-      need(10);
+      need(10 + 14);   /* v1207-umbruch · +14 fuer den Haftungsrahmen, siehe oben */
       const _s = _ew.sensitivitaet.lzs_plus_05;
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2); doc.setTextColor(...TXT);
       doc.text('Ein halber Zinspunkt mehr (' + String(_s.lzs_pct).replace('.', ',')

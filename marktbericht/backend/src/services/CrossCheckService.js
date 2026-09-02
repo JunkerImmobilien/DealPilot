@@ -409,6 +409,43 @@ export const CrossCheckService = {
     const mieteQm = _amtFuehrt ? p.amtliche_miete.miete_qm : rentSqm;
     const mieteQuelle = _amtFuehrt
       ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten';
+    /* v1207-WMIE-2 · DER WIDERSPRUCH GEHOERT BENANNT, NICHT VERSTECKT.
+     *
+     * Marcel las im eigenen Bericht "4,89 EUR/m2" neben dem Ertragswert und
+     * fragte, warum damit gerechnet werde, wo die Spanne bis zehn Euro reiche.
+     * Gemessen im gespeicherten Bericht: es wird NICHT damit gerechnet.
+     *   cross_check.ertragswert.miete_quelle = "Angebotsmieten"
+     *   modellversion = "immowertv2021"  (nicht agvga_nrw_2016)
+     *   Rohertrag 9.204 EUR / 12 / 100 m2 = 7,67 EUR/m2
+     * Die 4,89 stehen als amtlicher VERGLEICHSWERT daneben — und weil die
+     * Mietpreisuebersicht ihre eigene Ableitungskette mit Gleichheitszeichen
+     * zeigt ("= marktueblich erzielbare Miete  4,89"), sieht der Vergleichswert
+     * aus wie ein Rechenschritt. Ein Leser kann das nicht auseinanderhalten.
+     *
+     * Also: die beiden Zahlen nebeneinanderstellen, die Abweichung beziffern
+     * und sagen, WARUM die eine fuehrt. Modellkonform (Paragraf 10 ImmoWertV)
+     * waere die amtliche Miete nur, wenn auch der Liegenschaftszins aus
+     * derselben Quelle stammt — genau das prueft `_amtFuehrt` oben.
+     *
+     * Der Vergleich entsteht NUR, wenn es wirklich zwei Zahlen gibt. Kein
+     * amtlicher Wert, keine angesetzte Miete, oder beide gleich: null, und
+     * das Dokument sagt nichts dazu. Wo die Quelle endet, endet die Rechnung. */
+    const _amtQm = (p.amtliche_miete && p.amtliche_miete.verfuegbar)
+      ? _num(p.amtliche_miete.miete_qm) : null;
+    const _q25 = rent ? _num(rent.q25_per_sqm) : null;
+    const _q75 = rent ? _num(rent.q75_per_sqm) : null;
+    const mieteVergleich = (mieteQm != null && _amtQm != null
+        && Math.abs(_amtQm - mieteQm) >= 0.01) ? {
+      angesetzt_qm: mieteQm,
+      angesetzt_quelle: mieteQuelle,
+      amtlich_qm: _amtQm,
+      /* Bezugsgroesse ist die ANGESETZTE Miete: "die amtliche liegt X % darunter". */
+      abweichung_pct: Math.round((_amtQm - mieteQm) / mieteQm * 1000) / 10,
+      spanne_q25: _q25, spanne_q75: _q75,
+      ausserhalb_spanne: (_q25 != null && _q75 != null)
+        ? (_amtQm < _q25 ? 'unterhalb' : (_amtQm > _q75 ? 'oberhalb' : null)) : null,
+      amtlich_fuehrt: _amtFuehrt,
+    } : null;
     /* v1047 · `p` steht jetzt am Anfang der Funktion. */
     /* v1072-WERT-1 · KEINE ERTRAGSWERT-ZAHL OHNE ERFASSTE MIETE.
      *
@@ -620,6 +657,12 @@ export const CrossCheckService = {
           miete_quelle: mieteQuelle,
           miete_erfasst: !!(p && p.ist_miete_erfasst),
           miete_modellkonform: mieteQuelle === 'Mietpreisübersicht des Gutachterausschusses',
+          /* v1207-WMIE-2 · die angesetzte Miete war nirgends als Zahl sichtbar,
+           * nur als Quellenname. Ohne sie kann das Dokument den Vergleich mit
+           * dem amtlichen Wert nicht ausschreiben, ohne ihn neu herzuleiten —
+           * und Zahlen, die an zwei Stellen entstehen, laufen auseinander. */
+          miete_qm: mieteQm,
+          miete_vergleich: mieteVergleich,
           /* v1063-WOD-8 · dritte Station der Kette */
           liegenschaftszins_einordnung: p.lzs_einordnung || null,
           restnutzungsdauer_jahre: kern.nutzungsdauer ? kern.nutzungsdauer.rnd : rnd,
