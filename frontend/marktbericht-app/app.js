@@ -707,8 +707,21 @@ function _renderWertverfahren(d) {
     + '<h3 class="wv-h">Wertverfahren im Vergleich</h3>'
     + '<div class="wv-g">'
     + karte('vgl', 'Vergleichswert', eur(v), 'f\u00fchrend bei Eigentumswohnungen', 'vergleich')
-    + karte('ert', 'Ertragswert', e.available ? eur(e.value_eur) : '\u2013',
-        e.available ? ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.') : (e.grund || ''),
+    /* ── v1200 · Die Karte verschwieg, WIE gerechnet wurde ─────────────────
+       Sie zeigte nur „Reinertrag 3.767 € p. a.". Dass ohne Bodenwert
+       gerechnet wurde — bei einer Eigentumswohnung ohne Miteigentumsanteil
+       der Normalfall — stand zwar im Datensatz (`verfahren`:
+       „vereinfachtes Ertragswertverfahren (ohne Bodenwerttrennung)"), aber
+       nirgends auf dem Schirm. Der Nutzer las eine Zahl und hatte keinen
+       Anlass, sie fuer weniger belastbar zu halten als die daneben.
+
+       Die Sachwert-Karte macht es seit jeher richtig und begruendet ihr
+       eigenes Fehlen. Hier zieht der Ertragswert nach. */
+    + karte('ert', 'Ertragswert', e.available ? eur(e.value_eur) : '–',
+        e.available
+          ? ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.'
+             + (e.bodenwert_fehlt ? ' · <b>ohne Bodenwert gerechnet</b>' : ''))
+          : (e.grund || ''),
         'ertrag', e.staffel)
     /* v1143-VORL \u00b7 Die Karte zeigte bei vorhandenem Sachwert eine LEERE
      * Unterzeile \u2014 die wichtigste Einschraenkung fehlte damit genau dort,

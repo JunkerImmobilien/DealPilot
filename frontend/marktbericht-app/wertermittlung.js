@@ -354,6 +354,47 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     if (e) return String(e.value || '').trim();
     if (_imNeuzeichnen) return String(_letzte[id] || '').trim();
     return '';
+
+  /* ── v1200 · Was das Objekt weiss, gehoert in den Bericht ────────────────
+     `wert()` liest das FORMULARFELD. Existiert es nicht, liefert es ''. Das
+     ist fuer die Stufenlogik richtig und muss so bleiben (v1139: sonst
+     spraenge die Stufe von allein hoch, ohne dass jemand geklickt hat).
+
+     Fuer den PAYLOAD ist es falsch. Gemessen am 02.09.2026, Objekt
+     Huellhorst, erreichte Stufe 2:
+
+         Feld `mea` im DOM ......... nein (der Wertermittlungs-Block wird
+                                     erst aufgeklappt gebaut)
+         window._mbVorrat('mea') ... "50"
+         payload().mea_pct ......... null
+
+     Die App KANNTE den Miteigentumsanteil, schrieb sogar in die Ampel
+     „liegt im Objekt vor: Miteigentumsanteil" — und schickte ihn nicht mit.
+     Der Bericht rechnete daraufhin ohne ihn. Ein Wert, der da ist, darf
+     nicht verlorengehen, nur weil sein Eingabefeld gerade nicht gezeichnet
+     ist.
+
+     DIE UNTERSCHEIDUNG, auf die es ankommt:
+       Feld da, aber leer  -> der Nutzer hat es so gewollt. Leer bleibt leer.
+       Feld gar nicht da   -> niemand hat etwas gewollt. Der Vorrat gilt.
+
+     Dieselbe Trennung macht `ausObjekt()` in mb-stufen.js seit v1139.
+
+     KEIN PREIS-EINFLUSS, geprueft: die faellige Stufe kommt aus
+     `wert_stufe` (stufe()), nicht aus dem Miteigentumsanteil. Der Server
+     leitet aus `mea_pct` nur den Bodenwert ab. */
+  function pWert(id) {
+    if ($(id)) return wert(id);        /* Feld da -> es entscheidet, auch leer */
+    var v = wert(id);                  /* Ruecklage aus dem Neuzeichnen zuerst */
+    if (v) return v;
+    try {
+      if (typeof window._mbVorrat === 'function') {
+        var o = window._mbVorrat(id);
+        if (o != null && String(o).trim() !== '') return String(o).trim();
+      }
+    } catch (e) {}
+    return '';
+  }
   }
   function istWohnung() { return /wohnung|etw/i.test(wert('ptype')); }
   function stufe() {
@@ -806,22 +847,22 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
 
   /* ── Payload ───────────────────────────────────────────────────────────── */
   function payload() {
-    var z = parseFloat(wert('mea'));
+    var z = parseFloat(pWert('mea'));
     return {
       wert_stufe: stufe(),
-      baustatus: wert('baustatus') || 'bestand',
-      first_time_use: /neubau_erstbezug|neubau_im_bau/.test(wert('baustatus')) || wert('cond') === 'erstbezug',
-      refurbished: /saniert/.test(wert('baustatus')) || /saniert/.test(wert('cond')),
-      reconstruction_year: parseInt(wert('sanierungsjahr'), 10) || null,
+      baustatus: pWert('baustatus') || 'bestand',
+      first_time_use: /neubau_erstbezug|neubau_im_bau/.test(pWert('baustatus')) || pWert('cond') === 'erstbezug',
+      refurbished: /saniert/.test(pWert('baustatus')) || /saniert/.test(pWert('cond')),
+      reconstruction_year: parseInt(pWert('sanierungsjahr'), 10) || null,
       mea_pct: isFinite(z) && z > 0 ? z : null,
-      lzs_pct: parseFloat(wert('lzs')) || null,
-      land_value_manual: parseFloat(wert('brwManuell')) || null,
-      land_value_stichtag: wert('brwStichtag') || null,
-      brw_anpassung_pct: parseFloat(wert('brwAnp')) || null,
-      brw_anpassung_grund: wert('brwAnpGrund') || null,
-      bgf: parseFloat(wert('bgf')) || null,
-      sachwertfaktor: parseFloat(wert('sachwertfaktor')) || null,
-      stellplatz_miete_monat: parseFloat(wert('spMiete')) || null,
+      lzs_pct: parseFloat(pWert('lzs')) || null,
+      land_value_manual: parseFloat(pWert('brwManuell')) || null,
+      land_value_stichtag: pWert('brwStichtag') || null,
+      brw_anpassung_pct: parseFloat(pWert('brwAnp')) || null,
+      brw_anpassung_grund: pWert('brwAnpGrund') || null,
+      bgf: parseFloat(pWert('bgf')) || null,
+      sachwertfaktor: parseFloat(pWert('sachwertfaktor')) || null,
+      stellplatz_miete_monat: parseFloat(pWert('spMiete')) || null,
       /* v1055-WFELD-1 · Seit v1047 stehen diese drei im Formular und wurden
        * nie mitgeschickt. app.js sammelt den Block nicht selbst ein, sondern
        * uebernimmt payload() als Ganzes — wer hier fehlt, existiert fuer den
@@ -830,7 +871,7 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
        * Kaltmiete, weil die Vergleichsmiete aus reinen Wohnungsangeboten
        * stammt — und getrennt kapitalisiert, weil sie nicht am Gebaeude
        * haengt. */
-      sonstige_jahr: parseFloat(wert('sonstEinnahmen')) || null,
+      sonstige_jahr: parseFloat(pWert('sonstEinnahmen')) || null,
       /* v1067-WSW-6 · app.js uebernimmt payload() als Ganzes. Wer hier
        * fehlt, existiert fuer den Bericht nicht — dieselbe Lehre wie
        * v1055 und v1062. */
@@ -841,24 +882,24 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
        * sich das nicht — bei einer Wohnung ist "Garten" ein Teil des
        * Grundstuecks, bei einem Haus koennen 928 m2 Hinterland daneben
        * liegen. Deshalb gefragt, nicht geraten. */
-      hinterland_qm: parseFloat(wert('hinterlandFlaeche')) || null,
-      hinterland_eur_qm: parseFloat(wert('hinterlandWert')) || null,
-      hinterland_rentierlich: wert('hinterlandRent') === 'ja',   /* v1072-WREN-7 */
-      garagen_bgf_qm: parseFloat(wert('garagenBgf')) || null,
-      garagen_stufe: parseFloat(wert('garagenStufe')) || null,
-      aussenanlagen_pct: parseFloat(wert('aussenPct')) || null,
+      hinterland_qm: parseFloat(pWert('hinterlandFlaeche')) || null,
+      hinterland_eur_qm: parseFloat(pWert('hinterlandWert')) || null,
+      hinterland_rentierlich: pWert('hinterlandRent') === 'ja',   /* v1072-WREN-7 */
+      garagen_bgf_qm: parseFloat(pWert('garagenBgf')) || null,
+      garagen_stufe: parseFloat(pWert('garagenStufe')) || null,
+      aussenanlagen_pct: parseFloat(pWert('aussenPct')) || null,
       nhk_typ: (function () {
-        var h = wert('nhkHaus'), g = wert('nhkGeschosse'), d = wert('nhkDach');
+        var h = pWert('nhkHaus'), g = pWert('nhkGeschosse'), d = pWert('nhkDach');
         return (h && g && d) ? (h + '.' + g + d) : null;
       })(),
-      standardstufe: parseFloat(wert('standardstufe')) || null,
-      grundriss: wert('grundriss') || null,
-      mod_punkte: wert('modGrad') !== '' ? parseFloat(wert('modGrad')) : null,
+      standardstufe: parseFloat(pWert('standardstufe')) || null,
+      grundriss: pWert('grundriss') || null,
+      mod_punkte: pWert('modGrad') !== '' ? parseFloat(pWert('modGrad')) : null,
       /* v1062-WAUS-2 · app.js sammelt den Block nicht selbst ein, es
        * uebernimmt payload() als Ganzes. Wer hier fehlt, existiert fuer den
        * Bericht nicht — genau wie v1055 es fuer drei andere Felder gelernt hat. */
-      aussenanlagen: parseFloat(wert('aussenanlagen')) || null,
-      bes_bauteile: parseFloat(wert('besBauteile')) || null,
+      aussenanlagen: parseFloat(pWert('aussenanlagen')) || null,
+      bes_bauteile: parseFloat(pWert('besBauteile')) || null,
       /* v1074-WAUS9-7 · payload() ist die einzige Tuer zum Bericht —
        * dieselbe Lehre wie v1055, v1062, v1067. */
       ausstattung: (function () {
@@ -869,7 +910,7 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
                   sonstige_technik: 'ausstTechnik' };
         var o = {}, n = 0;
         Object.keys(m).forEach(function (k) {
-          var v = parseFloat(wert(m[k]));
+          var v = parseFloat(pWert(m[k]));
           if (isFinite(v) && v >= 1 && v <= 5) { o[k] = v; n++; }
         });
         return n > 0 ? o : null;
@@ -877,15 +918,15 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       bauteile_hk: (function () {
         var s = 0;
         ['btlGauben', 'btlBalkone', 'btlVordach', 'btlTerrassen', 'btlSonstige']
-          .forEach(function (id) { s += parseFloat(wert(id)) || 0; });
+          .forEach(function (id) { s += parseFloat(pWert(id)) || 0; });
         return s > 0 ? Math.round(s) : null;
       })(),
       bauteile_detail: (function () {
-        var d = { gauben: parseFloat(wert('btlGauben')) || null,
-                  balkone: parseFloat(wert('btlBalkone')) || null,
-                  vordaecher: parseFloat(wert('btlVordach')) || null,
-                  terrassen: parseFloat(wert('btlTerrassen')) || null,
-                  sonstige: parseFloat(wert('btlSonstige')) || null };
+        var d = { gauben: parseFloat(pWert('btlGauben')) || null,
+                  balkone: parseFloat(pWert('btlBalkone')) || null,
+                  vordaecher: parseFloat(pWert('btlVordach')) || null,
+                  terrassen: parseFloat(pWert('btlTerrassen')) || null,
+                  sonstige: parseFloat(pWert('btlSonstige')) || null };
         var hat = Object.keys(d).some(function (k) { return d[k]; });
         return hat ? d : null;
       })(),
