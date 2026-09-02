@@ -3224,148 +3224,128 @@ async function exportPdf(out) {
     }
   }
 
-  // ---------- Marktwert & Marktmiete (Gauge + Spannenbalken) ----------
-  sectionTitle('Marktwert & Marktmiete', 104);
+  // ---------- Marktwert & Marktmiete (v1206: eine Sektion, Bandanzeige) ----------
+  /* v1206-einband
+   * ─────────────────────────────────────────────────────────────────────
+   * Bis hierher standen ZWEI Abschnitte: 03 zeichnete Marktwert und Marktmiete
+   * als zwei Tacho-Karten, 04 "Preisstrategie" zeichnete denselben Marktwert
+   * noch einmal als Band — mit sectionTitle(..., 999), also erzwungen auf einer
+   * eigenen Seite. Die Zahl stand damit zweimal gross im Abstand einer Seite;
+   * im Beispielbericht (Huellhorst) kam 195.000 EUR rund zehnmal im Dokument vor.
+   *
+   * Marcels Entscheidung am 02.09.2026: zusammenlegen, die Anzeige aus 04
+   * uebernehmen. Der Preis bekommt das Band, die Miete bekommt dasselbe Band
+   * eine Nummer kleiner — gleiche Lesart fuer zwei Groessen, eine Seite weniger.
+   * Der Titel bleibt "Marktwert & Marktmiete", NICHT "Preisstrategie": dort
+   * steht eine Wertaussage mit Spanne, keine Strategie. Das Wort verspraeche
+   * eine Empfehlung, die der Abschnitt nicht einloest.
+   *
+   * Was aus den Karten mitwandern MUSSTE, weil es im Band nicht steckt:
+   * die Aussagekraft (confidence_label/-pct mit Farbpunkt) und der Brutto-Faktor.
+   * Was NICHT dasselbe ist und deshalb unten stehen bleibt: mv.low/high ist die
+   * Spanne des BEWERTUNGSMODELLS, sale.q25/q75 die Quartilspanne der ANGEBOTE.
+   */
+  sectionTitle('Marktwert & Marktmiete', 92);
   const area = ref.living_area;
   const blockW = W - 2 * M;
-
-  // -- Marktwert & Marktmiete: zwei Karten nebeneinander (Web-Karten-Look) --
   const rmed = d.rent && d.rent.median_per_sqm;
   const rMonth = (rmed && area) ? Math.round(rmed * area) : null;
   const rLo = (d.rent && d.rent.q25_per_sqm && area) ? Math.round(d.rent.q25_per_sqm * area) : null;
   const rHi = (d.rent && d.rent.q75_per_sqm && area) ? Math.round(d.rent.q75_per_sqm * area) : null;
-  if (mv.estimated != null || rmed) {
-    const hw = (blockW - 6) / 2, ch = 92;
-    need(ch + 6);
-    const sale = d.sale || {};
-    const fmtSqm = (v, dec) => (v != null ? (dec ? v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Math.round(v).toLocaleString('de-DE')) : null);
-    /* v961-goldzonen
-     * ────────────────────────────────────────────────────────────
-     * Bis hierher stand hier die Ampel: gruen→gold→rot, bei der Miete invertiert.
-     * Die Invertierung war der Beweis, dass die Skala nicht passt — sie musste
-     * eine WERTUNG ausdruecken ("teuer = rot", "hohe Miete = gruen"), die die
-     * Anzeige gar nicht treffen kann: ein Marktwert am oberen Ende der Spanne
-     * ist nicht "schlecht", er liegt nur oben.
-     * Die Web-Karte (svgGauge Z.653) macht es richtig: eine Gold-Familie von
-     * dunkel nach hell, die nur die LAGE IN DER SPANNE zeigt. Grenzen 0.4/0.72
-     * sind die des Webs, nicht die alten 0.33/0.66.
-     * _wlc() macht die Toene whitelabel-faehig — genau wie im Web. jsPDF kennt
-     * kein var(), deshalb hier der Umweg ueber den Laufzeit-Hex. */
-    /* v962-balkenampel: zurueck auf den Stand vor v961.
-     * segMW/segMiete fuettern NICHT den Tacho, sondern den waagerechten Balken
-     * unter dem Wert (`segs: segMW`). Der SOLL Ampel bleiben — die Web-Karte
-     * macht es genauso (rangeStrip Z.673: #2f4030 / #3d3a24 / #3f2a24).
-     * v961 hat ihn vergoldet und den Tacho nicht angefasst: falsches Ziel. */
-    /* v963-goldbalken: der Spannbalken in der Karte bekommt dieselbe Gold-
-     * Familie wie der Tacho. Grenzen 0.4/0.72 wie dort, LUECKENLOS (vorher
-     * 0.33->0.34: die Luecke war der Grund, warum es wie drei Pillen aussah).
-     * Keine Invertierung mehr: die Skala zeigt die Lage, sie wertet nicht. */
-    const segMW = [[0, 0.4, GOLD_D()], [0.4, 0.72, GOLD_M()], [0.72, 1, GOLD_L()]];
-    const segMiete = segMW;
-    const drawValueCard = (x, o) => {
-      obsidianCard(x, y, hw, ch);
-      const ix = x + 8, iw = hw - 16;
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(165, 165, 175);
-      doc.text(o.title, ix, y + 10, { charSpace: 1.1 });
-      // Tacho zentral, Wert im Tacho (wie Web-Karte)
-      gauge(x + hw / 2, y + 38, 16.5, o.lo, o.hi, o.val, {
-        dark: true, caption: o.caption,
-        loLabel: o.loLbl, hiLabel: o.hiLbl, marker: o.marker, markerColor: [232, 226, 212],
-        zones: o.zones, valueText: o.valTxt, valueColor: [255, 255, 255],
-      });
-      // grosser Wert + Median-Zeile + €/m²-Spanne — Wert auto-skaliert, damit er nie ueberlaeuft
+  const fmtSqm = (v, dec) => (v != null ? (dec ? v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : Math.round(v).toLocaleString('de-DE')) : null);
+  const sqPreis = (v) => (area && v != null ? Math.round(v / area).toLocaleString('de-DE') + ' €/m²' : null);
+
+  /* Ein Band, zweimal gebaut: drei Kopfwerte, Track, Gold-Marker, Fusszeile.
+   * `klein` traegt die Miete — dieselbe Form, eine Nummer kleiner.
+   * Fehlt die Spanne, steht nur der Mittelwert mittig: kein halbes Band. */
+  const wertBand = (o) => {
+    const bw = blockW, kl = !!o.klein;
+    const hatSpanne = (o.lo != null && o.hi != null && o.hi > o.lo && o.val != null);
+    need(hatSpanne ? (kl ? 30 : 42) : 16);
+    const kopf = (lab, val, sub, cx, big, goldVal) => {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(kl ? 7 : 7.5); doc.setTextColor(...MUT);
+      doc.text(lab, cx, y + 3, { align: 'center', charSpace: 0.6 });
       doc.setFont('helvetica', 'bold');
-      let vfs = 20; doc.setFontSize(vfs);
-      while (doc.getTextWidth(o.valTxt) > iw && vfs > 12) { vfs -= 1; doc.setFontSize(vfs); }
-      doc.setTextColor(...o.valCol);
-      doc.text(o.valTxt, ix, y + 58);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(200, 200, 208);
-      if (o.medLine) doc.text(o.medLine, ix, y + 64);
-      doc.setFontSize(7); doc.setTextColor(150, 150, 160);
-      if (o.spanLine) doc.text(o.spanLine, ix, y + 68.5);
-      // Spannen-Balken mit Gold-Punkt (Wert) + weissem Dreieck (Kaufpreis)
-      if (o.lo != null && o.hi != null && o.hi > o.lo) {
-        const by = y + 72.5, bh = 2.6;
-        /* v963-spannschieber: ein durchgehender Track mit gerundeten Enden statt
-         * drei einzeln gerundeter Pillen. Basis in der dunkelsten Stufe, die
-         * beiden helleren als gerade Rechtecke darueber, rechte Kappe hell. */
-        const _r = bh / 2;
-        doc.setFillColor(...o.segs[0][2]);
-        doc.roundedRect(ix, by, iw, bh, _r, _r, 'F');
-        o.segs.slice(1).forEach(([f, t, c]) => {
-          const w2 = iw * (t - f) - (t >= 1 ? _r : 0);
-          if (w2 > 0) { doc.setFillColor(...c); doc.rect(ix + iw * f, by, w2, bh, 'F'); }
-        });
-        doc.setFillColor(...o.segs[o.segs.length - 1][2]);
-        doc.roundedRect(ix + iw - bh, by, bh, bh, _r, _r, 'F');
-        const frac = Math.max(0, Math.min(1, (o.val - o.lo) / (o.hi - o.lo)));
-        const mxp = ix + iw * frac;
-        /* Gold auf Gold ist unsichtbar. Die Web-Karte loest das mit einem dunklen
-         * Ring um den Knopf (rangeStrip Z.674: box-shadow 0 0 0 3px #141417) —
-         * genau der ersetzt hier den alten Gold-Glow, der jetzt nichts mehr traegt. */
-        doc.setFillColor(20, 20, 23); doc.circle(mxp, by + bh / 2, 2.5, 'F');
-        doc.setFillColor(...GOLD); doc.circle(mxp, by + bh / 2, 1.7, 'F');
-        doc.setFillColor(255, 255, 255); doc.circle(mxp, by + bh / 2, 0.6, 'F');
-        if (o.marker != null && o.marker >= o.lo && o.marker <= o.hi) {
-          const kf = (o.marker - o.lo) / (o.hi - o.lo), kx = ix + iw * kf;
-          doc.setFillColor(232, 226, 212);
-          doc.triangle(kx - 1.5, by - 1.6, kx + 1.5, by - 1.6, kx, by + 0.4, 'F');
-        }
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.2); doc.setTextColor(150, 150, 160);
-        doc.text(o.loFull, ix, by + bh + 4);
-        doc.text(o.hiFull, ix + iw, by + bh + 4, { align: 'right' });
-      }
-      // Fusszeile der Karte: Aussagekraft (MW) bzw. Kaufpreis-Hinweis
-      if (o.foot) {
-        doc.setFillColor(...o.footCol); doc.circle(ix + 1.2, y + ch - 6.6, 1.2, 'F');
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...o.footCol);
-        doc.text(o.foot, ix + 4, y + ch - 5.6);
-      }
+      doc.setFontSize(big ? (kl ? 12.5 : 15) : (kl ? 10 : 11.5));
+      doc.setTextColor(...(goldVal ? GOLD : TXT));
+      doc.text(val, cx, y + (big ? 10 : 9), { align: 'center' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(...MUT);
+      if (sub) doc.text(sub, cx, y + 13.5, { align: 'center' });
     };
-    if (mv.estimated != null) {
-      const cl = mv.confidence_label || '', cp = mv.confidence_pct;
-      const footCol = (cp != null && cp >= 75) ? [67, 183, 124] : (cp != null && cp >= 50) ? [217, 180, 90] : [217, 104, 95];
-      drawValueCard(M, {
-        title: 'MARKTWERT (INDIKATION)',
-        lo: mv.low, hi: mv.high, val: mv.estimated,
-        valTxt: euro(mv.estimated), valCol: GOLD, caption: 'Lage in der Spanne',
-        loLbl: mv.low != null ? Math.round(mv.low / 1000) + 'k' : null,
-        hiLbl: mv.high != null ? Math.round(mv.high / 1000) + 'k' : null,
-        marker: ref.purchase_price, zones: undefined, segs: segMW,
-        medLine: mv.basis_median_sqm ? fmtSqm(mv.basis_median_sqm) + ' €/m²  ·  Median' : null,
-        spanLine: (sale.q25_per_sqm != null && sale.q75_per_sqm != null)
-          ? 'Spanne ' + fmtSqm(sale.q25_per_sqm) + ' – ' + fmtSqm(sale.q75_per_sqm) + ' €/m²' : null,
-        loFull: mv.low != null ? euro(mv.low) : '', hiFull: mv.high != null ? euro(mv.high) : '',
-        foot: (cl && cp != null) ? 'Aussagekraft: ' + cl + ' · ' + cp + ' %' : null, footCol,
-      });
+    if (hatSpanne) {
+      const colsW = bw / 3;
+      kopf(o.loLab, o.loTxt, o.loSub, M + colsW * 0.5, false, false);
+      kopf(o.midLab, o.midTxt, o.midSub, M + colsW * 1.5, true, true);
+      kopf(o.hiLab, o.hiTxt, o.hiSub, M + colsW * 2.5, false, false);
+      const py0 = y + 16, ph2 = kl ? 4 : 5.5, gap = 1.6;
+      doc.setFillColor(214, 212, 206);
+      doc.roundedRect(M, py0, bw * 0.115 - gap, ph2, 1.6, 1.6, 'F');
+      doc.setFillColor(...INK);
+      doc.roundedRect(M + bw * 0.115, py0, bw * 0.77, ph2, 1.6, 1.6, 'F');
+      doc.setFillColor(214, 212, 206);
+      doc.roundedRect(M + bw * 0.885 + gap, py0, bw * 0.115 - gap, ph2, 1.6, 1.6, 'F');
+      const px = (v) => M + (Math.max(o.lo, Math.min(o.hi, v)) - o.lo) / (o.hi - o.lo) * bw;
+      const mx = px(o.val);
+      doc.setFillColor(...GOLD);
+      doc.triangle(mx - 2.8, py0 - 2.0, mx + 2.8, py0 - 2.0, mx, py0 + 2.4, 'F');
+      doc.setDrawColor(...GOLD); doc.setLineWidth(0.7); doc.line(mx, py0, mx, py0 + ph2);
+      y = py0 + ph2;
+      if (o.marker != null && o.marker >= o.lo && o.marker <= o.hi) {
+        const kx = px(o.marker);
+        doc.setFillColor(150, 142, 120);
+        doc.triangle(kx - 2, y + 2.4, kx + 2, y + 2.4, kx, y - 0.2, 'F');
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(120, 113, 100);
+        doc.text(o.markerTxt, kx, y + 6.5, { align: 'center' });
+        y += 10;
+      } else { y += 6; }
+    } else {
+      kopf(o.midLab, o.midTxt, o.midSub, M + bw / 2, true, true);
+      y += 17;
     }
-    if (rmed) {
-      drawValueCard(mv.estimated != null ? M + hw + 6 : M, {
-        title: 'MARKTMIETE KALT (MONAT)',
-        lo: rLo, hi: rHi, val: rMonth != null ? rMonth : rmed,
-        valTxt: rMonth != null ? euro(rMonth) : rmed.toLocaleString('de-DE') + ' €/m²',
-        valCol: [255, 255, 255], caption: 'Mietspanne',
-        loLbl: rLo != null ? rLo + '€' : null, hiLbl: rHi != null ? rHi + '€' : null,
-        /* v963-mietetacho
-         * ──────────────────────────────────────────────────────────
-         * Hier standen die Zonen INLINE: rot -> gold -> gruen (invertierte Ampel).
-         * Damit war opts.zones gesetzt und der Gold-Default aus v962 griff nie —
-         * der Marktwert-Tacho wurde gold, der Miet-Tacho blieb Ampel.
-         * Es gibt ZWEI drawValueCard-Aufrufe. Ich hatte nur den ersten gelesen.
-         * zones: undefined -> beide holen sich denselben Default aus gauge().
-         */
-        marker: null, zones: undefined,
-        segs: segMiete,
-        medLine: fmtSqm(rmed, true) + ' €/m²  ·  Median',
-        spanLine: (d.rent.q25_per_sqm != null && d.rent.q75_per_sqm != null)
-          ? 'Spanne ' + fmtSqm(d.rent.q25_per_sqm, true) + ' – ' + fmtSqm(d.rent.q75_per_sqm, true) + ' €/m²' : null,
-        loFull: rLo != null ? euro(rLo) : '', hiFull: rHi != null ? euro(rHi) : '',
-        foot: ref.purchase_price != null && rMonth != null
-          ? 'Brutto-Faktor: ' + (ref.purchase_price / (rMonth * 12)).toFixed(1) : null,
-        footCol: [165, 165, 175],
-      });
+    if (o.fuss) {
+      doc.setFillColor(...o.fussCol); doc.circle(M + 1.2, y - 1.0, 1.2, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...o.fussCol);
+      doc.text(o.fuss, M + 4, y);
+      doc.setFont('helvetica', 'normal');
+      y += 5;
     }
-    y += ch + 6;
+  };
+
+  if (mv.estimated != null) {
+    const cl = mv.confidence_label || '', cp = mv.confidence_pct;
+    wertBand({
+      lo: mv.low, hi: mv.high, val: mv.estimated,
+      loLab: 'MINDESTPREIS', loTxt: euro(mv.low), loSub: sqPreis(mv.low),
+      midLab: 'MARKTWERT (INDIKATION)', midTxt: euro(mv.estimated), midSub: sqPreis(mv.estimated),
+      hiLab: 'MAXIMALPREIS', hiTxt: euro(mv.high), hiSub: sqPreis(mv.high),
+      marker: ref.purchase_price,
+      markerTxt: ref.purchase_price != null ? 'Kaufpreis ' + euro(ref.purchase_price) : '',
+      fuss: (cl && cp != null) ? 'Aussagekraft: ' + cl + ' · ' + cp + ' %' : null,
+      fussCol: (cp != null && cp >= 75) ? [67, 183, 124] : (cp != null && cp >= 50) ? [217, 180, 90] : [217, 104, 95],
+    });
+  }
+  if (rmed) {
+    y += 4;
+    wertBand({
+      klein: true, lo: rLo, hi: rHi, val: rMonth,
+      loLab: 'UNTERE MIETE', loTxt: euro(rLo), loSub: fmtSqm(d.rent.q25_per_sqm, true) + ' €/m²',
+      midLab: 'MARKTMIETE KALT (MONAT)',
+      midTxt: rMonth != null ? euro(rMonth) : fmtSqm(rmed, true) + ' €/m²',
+      midSub: fmtSqm(rmed, true) + ' €/m²  ·  Median',
+      hiLab: 'OBERE MIETE', hiTxt: euro(rHi), hiSub: fmtSqm(d.rent.q75_per_sqm, true) + ' €/m²',
+      marker: null, markerTxt: '',
+      fuss: (ref.purchase_price != null && rMonth) ? 'Brutto-Faktor: ' + (ref.purchase_price / (rMonth * 12)).toFixed(1) : null,
+      fussCol: [120, 113, 100],
+    });
+  }
+  /* Der Empfehlungssatz stand in 04 und gehoert zum Preisband — er wandert mit. */
+  if (mv.estimated != null && mv.low != null && mv.high != null && mv.high > mv.low) {
+    need(14);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(...MUT);
+    const recl = doc.splitTextToSize('Empfehlung: Angebote unterhalb des Marktwerts bieten Verhandlungspuffer; oberhalb des Maximalpreises ist besondere Begründung (Lage, Zustand, Ausstattung) erforderlich.', blockW);
+    doc.text(recl, M, y + 3);
+    y += recl.length * 3.6 + 5.5;
   }
 
   // -- €/m²-Spannen (Kauf + Miete) nebeneinander --
@@ -3406,52 +3386,6 @@ async function exportPdf(out) {
     ds.score != null ? ['Deal-Score', ds.score + ' (' + _scoreTier(ds.score) + ')'] : null,   /* v1203 */
   ].filter(Boolean);
   if (kpis.length) { kpis.forEach((k, i) => kv(k[0], k[1], M + i * col, col, k[2])); y += 16; } /* v952-kvaccent */
-
-  // ---------- Preisstrategie (Min — Marktwert — Max) ----------
-  if (mv.estimated != null && mv.low != null && mv.high != null && mv.high > mv.low) {
-    sectionTitle('Preisstrategie', 999);   /* v1040: immer neue Seite */
-    need(40);
-    const pw = blockW, ph = 7, py0 = y + 16;
-    const span = mv.high - mv.low;
-    const px = (v) => M + (Math.max(mv.low, Math.min(mv.high, v)) - mv.low) / span * pw;
-    // Kopfwerte: Mindest | Marktwert | Maximal
-    const colsW = pw / 3;
-    const head3 = (lab, val, sub, cx, big, goldVal) => {
-      doc.setFontSize(7.5); doc.setTextColor(...MUT); doc.text(lab, cx, y + 3, { align: 'center', charSpace: 0.6 });
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(big ? 15 : 11.5);
-      doc.setTextColor(...(goldVal ? GOLD : TXT)); doc.text(val, cx, y + (big ? 10 : 9), { align: 'center' });
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUT);
-      if (sub) doc.text(sub, cx, y + 13.5, { align: 'center' });
-    };
-    const sq = (v) => area ? Math.round(v / area).toLocaleString('de-DE') + ' €/m²' : null;
-    head3('MINDESTPREIS', euro(mv.low), sq(mv.low), M + colsW * 0.5, false, false);
-    head3('MARKTWERT (INDIKATION)', euro(mv.estimated), sq(mv.estimated), M + colsW * 1.5, true, true);
-    head3('MAXIMALPREIS', euro(mv.high), sq(mv.high), M + colsW * 2.5, false, false);
-    // Band im Vorlagen-Look: helle Aussen-Segmente + dunkler Kern, mit feinen Luecken
-    const ph2 = 5.5, gap = 1.6;
-    doc.setFillColor(214, 212, 206); doc.roundedRect(M, py0, pw * 0.115 - gap, ph2, 1.6, 1.6, 'F');
-    doc.setFillColor(...INK); doc.roundedRect(M + pw * 0.115, py0, pw * 0.77, ph2, 1.6, 1.6, 'F');
-    doc.setFillColor(214, 212, 206); doc.roundedRect(M + pw * 0.885 + gap, py0, pw * 0.115 - gap, ph2, 1.6, 1.6, 'F');
-    // Marktwert-Marker (gold)
-    const mx = px(mv.estimated);
-    doc.setFillColor(...GOLD); doc.triangle(mx - 2.8, py0 - 2.0, mx + 2.8, py0 - 2.0, mx, py0 + 2.4, 'F');
-    doc.setDrawColor(...GOLD); doc.setLineWidth(0.7); doc.line(mx, py0, mx, py0 + 5.5);
-    // Kaufpreis-Marker (falls vorhanden)
-    if (ref.purchase_price != null) {
-      const kx = px(ref.purchase_price);
-      doc.setFillColor(150, 142, 120);
-      doc.triangle(kx - 2, py0 + 5.5 + 2.4, kx + 2, py0 + 5.5 + 2.4, kx, py0 + 5.5 - 0.2, 'F');
-      doc.setFontSize(7); doc.setTextColor(120, 113, 100);
-      doc.text('Kaufpreis ' + euro(ref.purchase_price), kx, py0 + 5.5 + 6.5, { align: 'center' });
-    }
-    y = py0 + 5.5 + (ref.purchase_price != null ? 10 : 6);
-    doc.setFontSize(7); doc.setTextColor(...MUT);
-    {
-      const recl = doc.splitTextToSize('Empfehlung: Angebote unterhalb des Marktwerts bieten Verhandlungspuffer; oberhalb des Maximalpreises ist besondere Begründung (Lage, Zustand, Ausstattung) erforderlich.', W - 2 * M);
-      doc.text(recl, M, y);
-      y += recl.length * 3.6 + 2.5;
-    }
-  }
 
   // ---------- Bodenrichtwert (BORIS) ----------
   const lv = d.land_value;
