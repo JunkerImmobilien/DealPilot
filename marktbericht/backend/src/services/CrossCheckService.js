@@ -444,7 +444,46 @@ export const CrossCheckService = {
       /* v1059-WMIET-6 */
       const rohertrag = Math.round(mieteQm * wfl * 12);
       const lzsPct = _num(p.lzs_pct) != null ? Number(p.lzs_pct) : LIEGENSCHAFTSZINS * 100;
-      const bwErgebnis = (p.bodenwert && p.bodenwert.vollstaendig)
+      /* ── v1198 · „unvollstaendig" ist eine ENTSCHEIDUNG, kein Fehlen ──────
+         Hier stand:
+
+             const bwErgebnis = (p.bodenwert && p.bodenwert.vollstaendig)
+               ? p.bodenwert
+               : { vollstaendig: bodenwert != null, wert: bodenwert, ... };
+
+         `p.bodenwert` kommt aus `ErtragswertService.bodenwert()`. Dort setzt
+         der v1026-Schutz bei einer Eigentumswohnung OHNE Miteigentumsanteil
+         ausdruecklich `wert = null` und `vollstaendig = false` und legt einen
+         Hinweis dazu — mit der Begruendung „Lieber gar kein Bodenwert als ein
+         zehnfach zu hoher."
+
+         Der Rueckfall oben las dieses `vollstaendig: false` aber als „liegt
+         nicht vor" und setzte an seine Stelle `bodenwert` aus Zeile 75 —
+         `plot * brw`, also GENAU den vollen Grundstueckswert, den der Schutz
+         gerade verworfen hatte. Und er meldete ihn als `vollstaendig: true`.
+
+         GEMESSEN am 02.09.2026, Bericht 78, ETW 100 m2, MEA fehlte,
+         Grundstueck 950 m2 zu 90 EUR/m2:
+
+             = Reinertrag                                3.767 EUR
+             - Bodenwertverzinsung (85.500 EUR x 2,2 %) -1.881 EUR   <- halber Reinertrag
+             = Gebaeudereinertrag                        1.886 EUR
+             = Gebaeudeertragswert                      25.216 EUR
+             + Bodenwert                                85.500 EUR   <- volles Grundstueck
+             = vorlaeufiger Ertragswert                110.716 EUR
+
+         Derselbe Bericht fuehrte daneben `cross_check.bodenwert.wert = null`
+         mit dem Hinweis, der Bodenwert bleibe „hier aussen vor". Zwei
+         Rechnungen derselben Groesse in einem Bericht, und der Ertragswert
+         nahm die ungeschuetzte.
+
+         JETZT: liegt `p.bodenwert` ueberhaupt vor, gilt es — auch und gerade
+         dann, wenn es „nichts" sagt. Der Rueckfall greift nur noch, wenn gar
+         kein geprueftes Ergebnis existiert (kein `_wertParams`).
+         `ErtragswertService` faengt das sauber ab: `hatBw` wird false, und es
+         rechnet das vereinfachte Ertragswertverfahren ohne Bodenwerttrennung
+         samt Warnung — der Weg, den FIX-OHNEBW dort ausdruecklich vorsieht. */
+      const bwErgebnis = p.bodenwert
         ? p.bodenwert
         : { vollstaendig: bodenwert != null, wert: bodenwert,
             quelle: { brw_sqm: brw, herkunft: brw ? 'boris' : 'manuell' } };
