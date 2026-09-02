@@ -5030,6 +5030,64 @@ das deckt sich mit **keiner** der drei Ketten. Die Haupt-App hat fünf
 Stufen und sagt TOP/GUT statt STARK. **Welche Fassung gilt, gehört
 entschieden** — und dann in `CLAUDE.md` nachgezogen, sonst führt die
 Projektdatei den nächsten Leser in die Irre.
+
+### v1204 (02.09.2026, `2c3a62c`) — die Skala der Haupt-App gilt, und `CLAUDE.md` sagt es endlich richtig
+
+**Marcels Entscheidung:** *„so wie in der Haupt-App. bitte claude md
+anpassen."*
+
+#### `CLAUDE.md` war falsch — und wurde als Wahrheit gelesen
+
+Dort stand: *„Score-Stufen: STARK / SOLIDE / SCHWACH bei ≥ 70 / ≥ 50 /
+< 50."* **Gemessen ist das weder die Objektkarte noch sonst eine Stelle im
+Code** — „STARK" kommt als Score-Stufe nirgends vor, und die vierte und
+fünfte Stufe fehlten ganz.
+
+Jetzt steht dort die Kette der Objektkarte (`js/dashboard.js:390`):
+
+| Score | Stufe |
+|---|---|
+| ≥ 85 | TOP |
+| ≥ 70 | GUT |
+| ≥ 50 | SOLIDE |
+| ≥ 35 | SCHWACH |
+| < 35 | KRITISCH |
+
+mit dem Hinweis, dass die Karte Versalien setzt und Fließtext
+Kamelschrift, und dass dieselben Schwellen auch die Farbketten brechen
+(`top`/`green`/`gold`/`red` bei 85/70/50).
+
+> **Der alte Wortlaut steht als Zitat dabei, mit Datum und Grund.** Eine
+> Projektdatei, die still korrigiert wird, lässt den nächsten Leser im
+> Unklaren, ob er einer alten Notiz aufsitzt oder einer neuen Regel.
+
+#### Der Marktbericht folgt derselben Kette
+
+`_scoreTier()` kannte nur vier Stufen — **alles unter 50 hieß pauschal
+„Schwach".** Die Objektkarte trennt bei 35 noch einmal und sagt darunter
+KRITISCH. **Ein Objekt mit Score 12 stand im Marktbericht damit in
+derselben Stufe wie eines mit 49.**
+
+**Gegengeprüft im Browser gegen die Kette der Haupt-App**, an zwölf
+Proben einschließlich aller Grenzwerte:
+
+```
+95 Top/TOP ✓   85 Top/TOP ✓   84 Gut/GUT ✓   70 Gut/GUT ✓
+69 Solide ✓    56 Solide ✓    50 Solide ✓    49 Schwach ✓
+35 Schwach ✓   34 Kritisch ✓  12 Kritisch ✓   0 Kritisch ✓
+```
+
+#### Zwei Abweichungen bleiben — benannt, nicht im Vorbeigehen geändert
+
+- **`js/dashboard.js:1283`** sagt `Sehr gut / Gut / Solide / Schwach` —
+  vier Stufen, „Sehr gut" statt „TOP". **Liegt in der Haupt-App.**
+- **Der Marktbericht-Backend** (`ScoringService`) führt sein eigenes
+  Vokabular weiter; es wird seit `v1203` nur nicht mehr angezeigt.
+
+Beide stehen jetzt auch in `CLAUDE.md`, damit sie nicht wieder in
+Vergessenheit geraten. **Angefasst wurden sie nicht** — die eine liegt in
+einem anderen Strang, die andere im Backend, und gefragt war weder das eine
+noch das andere.
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und

@@ -38,8 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach dem Prod-Rollout)
 
-**Stand:** lokal = GitHub = Staging auf `ac137df`. **Produktion auf `2ecb979`** —
-dort fehlt nur `v1203` (reines Frontend, `git pull` genügt).
+**Stand:** lokal = GitHub = Staging auf `2c3a62c`. **Produktion auf `2ecb979`** —
+dort fehlen `v1203` und `v1204` (reines Frontend, `git pull` genügt).
 **Nichts hängt halbfertig.** Keine Migration offen, kein Rebuild offen.
 
 > ### Prod-Rollout 02.09.2026 — `v1198`–`v1202` sind live
@@ -194,18 +194,19 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
   (`v1197`): neutral ersetzen — so gebaut — oder den Teilwert weglassen und
   die übrigen Gewichte hochnormieren. Beides fachlich vertretbar, fällt
   anders aus.
-- **Der Widerspruch bei der Bewertung ist zu** (`v1203`) — aber **zwei
-  Entscheidungen bleiben:** „Solide" steht jetzt **zweimal** nebeneinander
-  (klein im Ring, groß als Überschrift); eines von beiden zu streichen ist
-  ein Einzeiler, aber eine Optikfrage. Und **`CLAUDE.md` stimmt mit keiner
-  der drei Skalen überein** — dort steht „STARK / SOLIDE / SCHWACH bei
-  ≥ 70 / ≥ 50 / < 50", die Haupt-App hat aber fünf Stufen und sagt
-  TOP/GUT. **Welche Fassung gilt, gehört entschieden und dann in
-  `CLAUDE.md` nachgezogen** — sonst führt die Projektdatei den nächsten
-  Leser in die Irre.
+- **Die Bewertungsskala ist vereinheitlicht** (`v1203`/`v1204`) — der
+  Marktbericht spricht jetzt dieselbe Sprache wie die Objektkarte, und
+  `CLAUDE.md` ist korrigiert. **Zwei Reste sind benannt und offen:**
+  `js/dashboard.js:1283` sagt „Sehr gut / Gut / Solide / Schwach" (vier
+  Stufen statt fünf), und der Marktbericht-Backend führt sein eigenes
+  Vokabular weiter, das seit `v1203` nur nicht mehr angezeigt wird.
+  **Dazu: „Solide" steht jetzt zweimal nebeneinander** — klein im Ring,
+  groß als Überschrift. Eines zu streichen ist ein Einzeiler, aber eine
+  Optikfrage.
 - **Die Markierung fehlender Angaben am Feld ist gebaut** (`v1199`,
   Variante B auf Marcels „b ist super") — siehe Fertig. Die Demo mit allen
-  drei Varianten bleibt unter `design/Vorschläge/marktbericht-fehlende-felder.html`.
+  drei Varianten bleibt unter
+  `design/Vorschläge/marktbericht-fehlende-felder.html`.
 - **Der `402`-Pfad ist nicht end-to-end bewiesen** (siehe oben, DB-Eingriff
   blockiert).
 - **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.**
@@ -2297,6 +2298,33 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Die Skala der Haupt-App gilt — `v1204`, 02.09.2026 (`2c3a62c`)
+
+**Marcels Entscheidung:** *„so wie in der Haupt-App. bitte claude md
+anpassen."*
+
+**`CLAUDE.md` war falsch.** Dort stand *„STARK / SOLIDE / SCHWACH bei
+≥ 70 / ≥ 50 / < 50"* — das war weder die Objektkarte noch sonst eine
+Stelle im Code. „STARK" kommt als Score-Stufe nirgends vor, und zwei
+Stufen fehlten ganz. Jetzt steht dort die Kette der Karte
+(`js/dashboard.js:390`): **≥ 85 TOP · ≥ 70 GUT · ≥ 50 SOLIDE · ≥ 35
+SCHWACH · < 35 KRITISCH**, mitsamt dem alten Wortlaut als Zitat, Datum und
+Grund — eine still korrigierte Projektdatei lässt den nächsten Leser im
+Unklaren.
+
+**Der Marktbericht folgt jetzt derselben Kette.** `_scoreTier()` kannte
+nur vier Stufen; alles unter 50 hieß pauschal „Schwach". **Ein Objekt mit
+Score 12 stand damit in derselben Stufe wie eines mit 49.**
+
+Gegengeprüft im Browser an zwölf Proben einschließlich aller Grenzwerte
+(85/84, 70/69, 50/49, 35/34) — **alle identisch mit der Haupt-App.**
+
+> **Zwei Abweichungen bleiben, benannt und nicht im Vorbeigehen geändert:**
+> `js/dashboard.js:1283` sagt „Sehr gut / Gut / Solide / Schwach" (vier
+> Stufen), und der Marktbericht-Backend führt sein eigenes Vokabular
+> weiter — es wird seit `v1203` nur nicht mehr angezeigt. Beide stehen
+> jetzt in `CLAUDE.md`, damit sie nicht wieder vergessen werden.
 
 ### Eine Sprache für eine Zahl — `v1203`, 02.09.2026 (`ac137df`)
 
