@@ -38,10 +38,32 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach dem Prod-Rollout)
 
-**Stand:** lokal = GitHub = Staging auf `2c3a62c`. **Produktion auf `2ecb979`** —
-dort fehlen `v1203` und `v1204` (reines Frontend, `git pull` genügt).
+**Stand: lokal = GitHub = Staging = Produktion auf `6047036`.**
+
 **Nichts hängt halbfertig.** Keine Migration offen, kein Rebuild offen.
 
+> ### Prod-Rollout 02.09.2026, zweiter — `v1203`/`v1204` sind live
+>
+> **Ausgerollt auf Marcels „ja nachziehen".** Produktion steht auf
+> `6047036`, gleichauf mit Staging. Reines Frontend, **kein Rebuild, keine
+> Migration.**
+>
+> Sicherungen vorher: `dealpilot_db-vor-v1204-20260902-1348.sql` (12 MB)
+> und `marktbericht-vor-v1204-20260902-1348.sql` (14 MB).
+>
+> **Auf `app.dealpilot.immo` abgenommen:** `app.js?v=1204` ·
+> `marktbericht-view.js?v=1204` · die Stufenauswahl steht, Stufe 1
+> vorgewählt, sieben Reiter, **null Konsolenfehler.** Und die Score-Kette
+> gegen die Haupt-App geprüft — zehn Proben einschließlich aller
+> Grenzwerte, **alle identisch**:
+>
+> ```
+> 95 Top · 85 Top · 84 Gut · 70 Gut · 69 Solide
+> 50 Solide · 49 Schwach · 35 Schwach · 34 Kritisch · 0 Kritisch
+> ```
+>
+> `CLAUDE.md` trägt auf Prod die korrigierte Kette.
+>
 > ### Prod-Rollout 02.09.2026 — `v1198`–`v1202` sind live
 >
 > **Ausgerollt auf Marcels „passt"** nach seinem eigenen Durchgang auf
