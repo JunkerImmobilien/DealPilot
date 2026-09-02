@@ -3675,7 +3675,11 @@ async function exportPdf(out) {
      * zwei verschiedene Zahlen gibt (miete_vergleich ist sonst null). */
     const _mvgl = cc.ertragswert && cc.ertragswert.miete_vergleich;
     if (_mvgl) {
-      const _z2 = (v) => String(Math.round(v * 100) / 100).replace('.', ',');
+      /* Mieten IMMER mit zwei Nachkommastellen: 8,3 neben 6,66 in derselben
+       * Spanne liest sich wie ein anderer Genauigkeitsgrad. Prozente dagegen
+       * bekommen eine Stelle — 36,20 % taeuscht Genauigkeit vor, die nicht da ist. */
+      const _z2 = (v) => Number(v).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const _pz = (v) => Number(v).toLocaleString("de-DE", { maximumFractionDigits: 1 });
       const _qm = (v) => _z2(v) + ' €/m²';
       const _ri = (p) => (p < 0 ? 'darunter' : 'darüber');
       const _sp = (_mvgl.spanne_q25 != null && _mvgl.spanne_q75 != null)
@@ -3686,12 +3690,12 @@ async function exportPdf(out) {
         ? 'Angesetzt sind ' + _qm(_mvgl.angesetzt_qm) + ' aus der Mietpreisübersicht des '
           + 'Gutachterausschusses — modellkonform zum Liegenschaftszinssatz aus derselben '
           + 'Quelle (§ 10 ImmoWertV). Die Vergleichsangebote liegen bei '
-          + _qm(_mvgl.amtlich_qm) + ', also ' + _z2(Math.abs(_mvgl.abweichung_pct))
+          + _qm(_mvgl.amtlich_qm) + ', also ' + _pz(Math.abs(_mvgl.abweichung_pct))
           + ' % ' + _ri(-_mvgl.abweichung_pct) + '. Beide Zahlen stehen hier bewusst '
           + 'nebeneinander.'
         : 'Angesetzt sind ' + _qm(_mvgl.angesetzt_qm) + ' (' + _mvgl.angesetzt_quelle
           + '). Die amtliche Mietpreisübersicht nennt ' + _qm(_mvgl.amtlich_qm) + ' — '
-          + _z2(Math.abs(_mvgl.abweichung_pct)) + ' % ' + _ri(_mvgl.abweichung_pct)
+          + _pz(Math.abs(_mvgl.abweichung_pct)) + ' % ' + _ri(_mvgl.abweichung_pct)
           + _lage + '. Der amtliche Wert führt hier nicht: modellkonform nach '
           + '§ 10 ImmoWertV wäre er nur, wenn auch der Liegenschaftszinssatz aus '
           + 'derselben Quelle stammt. Die Zahl oben ist ein Vergleichswert, kein '
