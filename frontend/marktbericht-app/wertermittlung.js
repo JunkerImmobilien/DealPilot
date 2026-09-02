@@ -354,6 +354,7 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
     if (e) return String(e.value || '').trim();
     if (_imNeuzeichnen) return String(_letzte[id] || '').trim();
     return '';
+  }
 
   /* ── v1200 · Was das Objekt weiss, gehoert in den Bericht ────────────────
      `wert()` liest das FORMULARFELD. Existiert es nicht, liefert es ''. Das
@@ -394,7 +395,6 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       }
     } catch (e) {}
     return '';
-  }
   }
   function istWohnung() { return /wohnung|etw/i.test(wert('ptype')); }
   function stufe() {
