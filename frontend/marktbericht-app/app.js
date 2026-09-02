@@ -1145,6 +1145,15 @@ function _scoreCol(s) { s = s || 0; return s >= 70 ? DP_GREEN : s >= 50 ? window
    Steht seit v1204 auch so in CLAUDE.md — dort stand bis dahin
    „STARK / SOLIDE / SCHWACH bei >= 70 / >= 50 / < 50", was weder die Karte
    noch sonst eine Stelle im Code war. */
+
+/* v1205 · Eine Stelle fuer deutsche Dezimalzahlen im PDF und in der Ansicht.
+   Rohe JS-Zahlen schreiben „2.56", der Rest des Dokuments „2,56" — und im
+   Marktbericht standen beide Formen im selben Absatz. toLocaleString setzt
+   zugleich den Tausenderpunkt richtig. */
+function _deZahl(v) {
+  const n = Number(v);
+  return (v == null || !isFinite(n)) ? '–' : n.toLocaleString('de-DE');
+}
 function _scoreTier(s) {
   s = s || 0;
   return s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : s >= 35 ? 'Schwach' : 'Kritisch';
@@ -3606,7 +3615,11 @@ async function exportPdf(out) {
     card3(M + 2 * (cardW + 6), 'ERTRAGSWERT · INDIKATIV', ew.available ? ew.value_eur : null, ew.available ? [
       'Rohertrag ' + euro(ew.rohertrag_pa_eur) + ' p.a.',
       'Reinertrag ' + euro(ew.reinertrag_pa_eur) + ' p.a.',
-      'LZ ' + ew.liegenschaftszins_pct + ' % · V ' + ew.vervielfaeltiger,
+      /* v1205 · Liegenschaftszins und Vervielfaeltiger sind Dezimalzahlen und
+         standen als rohe JS-Werte da: „LZ 2.56 % · V 23.02". Zwei Zeilen
+         darueber laufen Rohertrag und Reinertrag schon durch euro(), also
+         durch de-DE. Im selben Kaertchen zwei Zahlensysteme. */
+      'LZ ' + _deZahl(ew.liegenschaftszins_pct) + ' % · V ' + _deZahl(ew.vervielfaeltiger),
     ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar'],
       _fuehrt('ertragswert'));   /* v1062-WFUE-4 */
     y += cardH + 5;

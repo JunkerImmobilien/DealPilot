@@ -26,6 +26,27 @@ const num = (v) => {
 };
 const pos = (v) => { const n = num(v); return n != null && n > 0 ? n : null; };
 
+/* ── v1205 · Deutsche Zahlen im Rechenweg ────────────────────────────────
+   Im PDF vom 02.09.2026 stand DERSELBE Wert in beiden Schreibweisen:
+
+       „− Bodenwertverzinsung (40.338 € × 2.56 %)"     <- Punkt
+       „Liegenschaftszinssatz: 2,56 %"                  <- Komma
+       „× Barwertfaktor (2.56 % / 35.2 Jahre)"          <- Punkt
+       „RND 35,2 J. / GND 80 J."                        <- Komma
+
+   Ursache: die Staffel interpolierte rohe JS-Zahlen, waehrend
+   der Euro-Betrag daneben schon durch `toLocaleString('de-DE')` lief. Wer
+   den Rechenweg nachrechnet — und genau dafuer ist er da — liest im selben
+   Absatz zwei Zahlensysteme.
+
+   `deZahl` ist die eine Stelle dafuer. toLocaleString setzt zugleich den
+   Tausenderpunkt richtig (1234 -> „1.234"), was bei €/m²-Werten ueber 1000
+   vorher fehlte. */
+function deZahl(v) {
+  const n = num(v);
+  return n == null ? '–' : n.toLocaleString('de-DE');
+}
+
 export const ErtragswertService = {
 
   /* ══════════════════════════════════════════════════════════════════════════
@@ -80,9 +101,9 @@ export const ErtragswertService = {
         pos: _auf.koeffizient_angewandt
           ? 'Bauland × angepasster Bodenwert'
           : 'Grundstücksfläche × Bodenrichtwert',
-        detail: `${_auf.bauland_qm} m² × ${_auf.bodenwert_eur_qm} €/m²`
+        detail: `${_auf.bauland_qm} m² × ${deZahl(_auf.bodenwert_eur_qm)} €/m²`
           + (_auf.koeffizient_angewandt
-            ? ` (${brw} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`
+            ? ` (${deZahl(brw)} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`
             : ''),
         wert: round0(_auf.wert_bauland_eur),
       });
@@ -90,7 +111,7 @@ export const ErtragswertService = {
         pos: _auf.quelle_art === 'eigene Angabe'
           ? '+ Hinterlandfläche'
           : '+ überschüssige Fläche als private Grünfläche',
-        detail: `${_auf.gruen_qm} m² × ${_auf.gruen_eur_qm} €/m²`,
+        detail: `${_auf.gruen_qm} m² × ${deZahl(_auf.gruen_eur_qm)} €/m²`,
         wert: round0(_auf.wert_gruen_eur),
       });
       out.hinweise.push(_auf.hinweis);
@@ -99,15 +120,15 @@ export const ErtragswertService = {
       wert = _auf.wert_eur;
       out.schritte.push({
         pos: 'Grundstücksfläche × angepasster Bodenwert',
-        detail: `${flaeche} m² × ${_auf.bodenwert_eur_qm} €/m²`
-          + ` (${brw} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`,
+        detail: `${flaeche} m² × ${deZahl(_auf.bodenwert_eur_qm)} €/m²`
+          + ` (${deZahl(brw)} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`,
         wert: round0(wert),
       });
       out.hinweise.push(_auf.hinweis);
       out.flaechenaufteilung = _auf;
     } else {
       wert = flaeche * brw;
-      out.schritte.push({ pos: 'Grundstücksfläche × Bodenrichtwert', detail: `${flaeche} m² × ${brw} €/m²`, wert: round0(wert) });
+      out.schritte.push({ pos: 'Grundstücksfläche × Bodenrichtwert', detail: `${flaeche} m² × ${deZahl(brw)} €/m²`, wert: round0(wert) });
     }
 
     // GFZ-Umrechnung nur mit ausdruecklich angegebenem Koeffizienten. Wir erfinden
@@ -126,7 +147,7 @@ export const ErtragswertService = {
       wert *= (1 + anp / 100);
       out.schritte.push({
         pos: 'Anpassung Zuschnitt / Lage',
-        detail: `${anp > 0 ? '+' : ''}${anp} %${grund.anpassung_grund ? ' — ' + grund.anpassung_grund : ''}`,
+        detail: `${anp > 0 ? '+' : ''}${deZahl(anp)} %${grund.anpassung_grund ? ' — ' + grund.anpassung_grund : ''}`,
         wert: round0(wert),
       });
       if (!grund.anpassung_grund) out.hinweise.push('Die Bodenwert-Anpassung ist ohne Begründung eingetragen. Im Dossier gehört eine Begründung dazu.');
@@ -374,7 +395,7 @@ export const ErtragswertService = {
       bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${iJeQm} €)`,
         detail: iHerkunft === 'Anlage 3' ? null : 'aus deiner Rücklage',
         wert: instand });
-      bwkDetail.push({ pos: `Mietausfallwagnis (${maPct} % vom Rohertrag)`,
+      bwkDetail.push({ pos: `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag)`,
         detail: maHerkunft === 'Anlage 3' ? null : 'aus deiner Leerstandsannahme',
         wert: mietausfall });
       if (betriebNul) bwkDetail.push({ pos: 'Nicht umlagefähige Betriebskosten', wert: betriebNul });
@@ -437,7 +458,7 @@ export const ErtragswertService = {
     const bwVerzinsung = hatBw ? round0(_bwRent * lzs / 100) : 0;
     if (hatBw) {
       out.staffel.push({
-        pos: `− Bodenwertverzinsung (${_bwRent.toLocaleString('de-DE')} € × ${lzs} %)`,
+        pos: `− Bodenwertverzinsung (${_bwRent.toLocaleString('de-DE')} € × ${deZahl(lzs)} %)`,
         detail: _bwRent !== bw
           ? 'nur der rentierliche Bodenwert; ' + (bw - _bwRent).toLocaleString('de-DE')
             + ' € nicht rentierliche Fläche bleiben außen vor (§ 41 ImmoWertV)'
@@ -483,7 +504,7 @@ export const ErtragswertService = {
 
     const V = barwertfaktor(lzs, R);
     out.barwertfaktor = V;
-    out.staffel.push({ pos: `× Barwertfaktor (${lzs} % / ${R} Jahre)`, wert: null, faktor: V });
+    out.staffel.push({ pos: `× Barwertfaktor (${deZahl(lzs)} % / ${deZahl(R)} Jahre)`, wert: null, faktor: V });
 
     const gebErtragswert = round0(gebReinertrag * V);
     out.staffel.push({ pos: '= Gebäudeertragswert', wert: gebErtragswert, summe: true });
