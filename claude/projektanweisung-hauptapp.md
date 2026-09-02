@@ -5088,6 +5088,56 @@ Beide stehen jetzt auch in `CLAUDE.md`, damit sie nicht wieder in
 Vergessenheit geraten. **Angefasst wurden sie nicht** — die eine liegt in
 einem anderen Strang, die andere im Backend, und gefragt war weder das eine
 noch das andere.
+
+### v1205 (02.09.2026, `3d334e9`) — im Rechenweg standen zwei Zahlensysteme nebeneinander
+
+**Marcel hat den erzeugten Marktbericht als PDF in `design/mockups/`
+abgelegt** — 10 Seiten, 7,4 MB. Der Text wurde ausgelesen (23.472
+Bausteine) und geprüft. **Das PDF liegt als Beleg im Repo.**
+
+#### Der Befund steht schwarz auf weiß im selben Dokument
+
+```
+„− Bodenwertverzinsung (40.338 € × 2.56 %)"     <- Punkt
+„Liegenschaftszinssatz: 2,56 %"                  <- Komma
+„× Barwertfaktor (2.56 % / 35.2 Jahre)"          <- Punkt
+„RND 35,2 J. / GND 80 J."                        <- Komma
+„LZ 2.56 % · V 23.02"                            <- Punkt
+```
+
+Gezählt: **`2.56 %` sechsmal mit Punkt, `2,56 %` zweimal mit Komma.**
+`35.2 Jahre` gegen `35,2 J.` **Derselbe Wert, dasselbe Dokument.**
+
+**Ursache:** die Staffel interpolierte rohe JS-Zahlen, während der
+Euro-Betrag **in derselben Zeile** schon durch `toLocaleString('de-DE')`
+lief. **Der Rechenweg ist genau dafür da, dass jemand nachrechnet** — und
+der liest dann im selben Absatz zwei Zahlensysteme.
+
+Gefixt mit **einer Stelle je Seite** statt einem Dutzend Einzelfixes:
+`deZahl()` im `ErtragswertService` (11 Verwendungen — Liegenschaftszins,
+Restnutzungsdauer, Bodenwert-Anpassung, Marktanpassung, alle €/m²-Werte)
+und `_deZahl()` in `app.js` für das LZ/V-Kärtchen. **`toLocaleString`
+setzt zugleich den Tausenderpunkt richtig** — bei €/m²-Werten über 1000
+fehlte er vorher.
+
+**Nachgemessen am frisch erzeugten Bericht 82:** null Punkt-Zahlen, drei
+Komma-Zahlen. Der ganze Rechenweg in einem System.
+
+#### Was das PDF sonst ergab — und das ist die gute Nachricht
+
+| Prüfung | Befund |
+|---|---|
+| Währungsreste | **keine** — kein Kerosin, kein Liter, keine Credits |
+| Bewertungsvokabular | nur „Solide", **kein „Durchschnittlich"** — `v1203`/`v1204` greifen |
+| NaN / undefined / null | **keine.** Die sechs „nan"-Treffer stecken in „Fi**nan**zierungsdaten", „mitei**nan**der", „Auße**nan**lagen" |
+| Bodenwert | **40.338 €**, ausdrücklich als „Bodenwertanteil dieses Objekts" beschriftet — der MEA-Anteil, nicht das volle Grundstück |
+| Sachwert / Ertragswert | 242.274 € / 192.328 € — **identisch mit dem Schirm** |
+| Platzhalter, Null-Euro-Felder | **keine** |
+| Herkunft | „amtlich" 3×, „indikativ" 1×, Gutachterausschuss benannt |
+
+> **Der PDF-Export war der letzte weiße Fleck des Marktberichts** — nie
+> jemand hatte ihn angesehen, und er ist das, was der Kunde einer Bank
+> hinlegt. Bis auf die Zahlenschreibweise hat er die Prüfung bestanden.
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und

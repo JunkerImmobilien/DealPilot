@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach dem Prod-Rollout)
 
-**Stand: lokal = GitHub = Staging = Produktion auf `6047036`.**
+**Stand:** lokal = GitHub = Staging auf `3d334e9`. **Produktion auf `39aa598`** — es fehlt `v1205` (Backend, braucht `mb-backend`-Rebuild).
 
 **Nichts hängt halbfertig.** Keine Migration offen, kein Rebuild offen.
 
@@ -2320,6 +2320,30 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Der PDF-Export geprüft — `v1205`, 02.09.2026 (`3d334e9`)
+
+**Marcel hat den erzeugten Marktbericht als PDF abgelegt** (10 Seiten,
+`design/mockups/Marktbericht_32609_Ahlsen_Reineberg.pdf`, liegt als Beleg
+im Repo). Text ausgelesen, 23.472 Bausteine, geprüft.
+
+**Ein Befund:** im selben Dokument standen zwei Zahlensysteme —
+`2.56 %` sechsmal mit Punkt gegen `2,56 %` zweimal mit Komma, `35.2 Jahre`
+gegen `35,2 J.` Die Staffel interpolierte rohe JS-Zahlen, während der
+Euro-Betrag **in derselben Zeile** schon durch `de-DE` lief. **Der
+Rechenweg ist dafür da, dass jemand nachrechnet.** Gefixt mit einer Stelle
+je Seite (`deZahl()` im Backend, `_deZahl()` im Frontend); nachgemessen am
+frisch erzeugten Bericht: null Punkt-Zahlen.
+
+**Alles andere hat bestanden:** keine Währungsreste · kein
+„Durchschnittlich" mehr · keine NaN/undefined (die „nan"-Treffer stecken
+in „Finanzierungsdaten" und „Außenanlagen") · Bodenwert **40.338 €** als
+„Bodenwertanteil dieses Objekts" · Sachwert und Ertragswert identisch mit
+dem Schirm · keine Platzhalter, keine Null-Euro-Felder.
+
+> **Damit ist der letzte weiße Fleck des Marktberichts geprüft.** Der
+> PDF-Export hatte nie jemand angesehen — und er ist das, was der Kunde
+> einer Bank hinlegt.
 
 ### Die Skala der Haupt-App gilt — `v1204`, 02.09.2026 (`2c3a62c`)
 
