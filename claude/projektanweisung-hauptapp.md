@@ -4980,6 +4980,56 @@ sich danach, nicht nach den Angaben"), **Stufe 1 ist vorgewählt**, das
 > verliert keine Angaben mehr, die das Objekt längst hat, verlangt den
 > Miteigentumsanteil, bevor er losläuft — und kostet nur noch das, was der
 > Nutzer ausdrücklich gewählt hat.
+
+### v1203 (02.09.2026, `ac137df`) — eine Sprache für eine Zahl
+
+Im Ergebnis-Kopf stand am selben Score **zweimal ein anderes Wort**:
+
+```
+56 / 100 · Solide                 (im Ring)
+DEAL-SCORE · Durchschnittlich     (die Überschrift daneben)
+```
+
+Ursache: `const ratingText = ds.rating || _scoreTier(s)`. Der Ring
+zeichnet **immer** `_scoreTier`, die Überschrift bevorzugte den
+Backend-Rating.
+
+#### Drei Vokabulare, gemessen
+
+| Quelle | Stufen |
+|---|---|
+| Haupt-App (`dashboard.js:390`) | TOP / GUT / SOLIDE / SCHWACH / KRITISCH |
+| mb-Frontend (`_scoreTier`) | Top / Gut / Solide / Schwach |
+| mb-Backend (`ScoringService`) | Sehr attraktiv / Attraktiv / Durchschnittlich / Unterdurchschnittlich |
+
+**Der Backend-Rating ist der Ausreißer** — sein Wortschatz kommt sonst
+nirgends im Produkt vor, während `_scoreTier` sich mit der Haupt-App
+deckt. Deshalb entscheidet jetzt `_scoreTier`, **auf dem Schirm und im
+PDF** (beide PDF-Stellen mitgezogen, sonst hätte das Dokument anders
+geurteilt als die Ansicht).
+
+**`ds.rating` bleibt im Datensatz:** der Server rechnet es weiter, alte
+Berichte behalten es, es wird nur nicht mehr **angezeigt**.
+
+**Dabei aufgefallen:** eine wortgleiche Kopie von `_scoreTier()`
+(`app.js:2520`) — mitsamt einem Kommentar, der auf eine „Z.615" verwies,
+die es nicht mehr gibt. Zwei Schwellenketten für dieselbe Einstufung sind
+die Doppelliste, an der der Marktbericht schon sechsmal gescheitert ist.
+
+#### Was offen bleibt, und bewusst nicht entschieden wurde
+
+**1 · Die Dopplung.** Jetzt steht „Solide" zweimal nebeneinander — klein
+im Ring (12,5 px) und groß als Überschrift (24 px, gold). **Der
+Widerspruch ist weg, die Wiederholung ist geblieben.** Eines von beiden
+zu streichen ist eine Optikfrage; das entscheidet Marcel, nicht der Code.
+Ein Einzeiler in beide Richtungen.
+
+**2 · `CLAUDE.md` und der Code sind auseinander.** Die Projektdatei nennt
+als Score-Stufen *„STARK / SOLIDE / SCHWACH bei ≥ 70 / ≥ 50 / < 50"* —
+das deckt sich mit **keiner** der drei Ketten. Die Haupt-App hat fünf
+Stufen und sagt TOP/GUT statt STARK. **Welche Fassung gilt, gehört
+entschieden** — und dann in `CLAUDE.md` nachgezogen, sonst führt die
+Projektdatei den nächsten Leser in die Irre.
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und

@@ -38,7 +38,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach dem Prod-Rollout)
 
-**Stand: lokal = GitHub = Staging = Produktion auf `8f2832c`.**
+**Stand:** lokal = GitHub = Staging auf `ac137df`. **Produktion auf `2ecb979`** —
+dort fehlt nur `v1203` (reines Frontend, `git pull` genügt).
 **Nichts hängt halbfertig.** Keine Migration offen, kein Rebuild offen.
 
 > ### Prod-Rollout 02.09.2026 — `v1198`–`v1202` sind live
@@ -193,6 +194,15 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
   (`v1197`): neutral ersetzen — so gebaut — oder den Teilwert weglassen und
   die übrigen Gewichte hochnormieren. Beides fachlich vertretbar, fällt
   anders aus.
+- **Der Widerspruch bei der Bewertung ist zu** (`v1203`) — aber **zwei
+  Entscheidungen bleiben:** „Solide" steht jetzt **zweimal** nebeneinander
+  (klein im Ring, groß als Überschrift); eines von beiden zu streichen ist
+  ein Einzeiler, aber eine Optikfrage. Und **`CLAUDE.md` stimmt mit keiner
+  der drei Skalen überein** — dort steht „STARK / SOLIDE / SCHWACH bei
+  ≥ 70 / ≥ 50 / < 50", die Haupt-App hat aber fünf Stufen und sagt
+  TOP/GUT. **Welche Fassung gilt, gehört entschieden und dann in
+  `CLAUDE.md` nachgezogen** — sonst führt die Projektdatei den nächsten
+  Leser in die Irre.
 - **Die Markierung fehlender Angaben am Feld ist gebaut** (`v1199`,
   Variante B auf Marcels „b ist super") — siehe Fertig. Die Demo mit allen
   drei Varianten bleibt unter `design/Vorschläge/marktbericht-fehlende-felder.html`.
@@ -2287,6 +2297,32 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Eine Sprache für eine Zahl — `v1203`, 02.09.2026 (`ac137df`)
+
+Im Ergebnis-Kopf stand am selben Score zweimal ein anderes Wort:
+**„56 / 100 · Solide"** im Ring, **„DEAL-SCORE · Durchschnittlich"**
+daneben. Ursache: `ds.rating || _scoreTier(s)` — der Ring zeichnet immer
+`_scoreTier`, die Überschrift bevorzugte den Backend-Rating.
+
+**Drei Vokabulare im Haus, gemessen:** die Haupt-App sagt
+TOP/GUT/SOLIDE/SCHWACH/KRITISCH, das Marktbericht-Frontend
+Top/Gut/Solide/Schwach, das Marktbericht-Backend Sehr attraktiv/Attraktiv/
+Durchschnittlich/Unterdurchschnittlich. **Der Backend-Rating ist der
+Ausreißer** — sein Wortschatz kommt sonst nirgends vor, `_scoreTier` deckt
+sich mit der Haupt-App. Deshalb entscheidet jetzt `_scoreTier`, auf dem
+Schirm **und im PDF**. Das Feld bleibt im Datensatz, es wird nur nicht mehr
+angezeigt.
+
+Dabei fiel eine wortgleiche Kopie von `_scoreTier()` auf, mitsamt einem
+Kommentar mit toter Zeilenangabe.
+
+> **Zwei Dinge bleiben ausdrücklich offen**, weil sie Entscheidungen sind:
+> die **Dopplung** („Solide" steht jetzt zweimal nebeneinander, klein im
+> Ring und groß als Überschrift — Einzeiler in beide Richtungen), und dass
+> **`CLAUDE.md` mit keiner der drei Ketten übereinstimmt** („STARK /
+> SOLIDE / SCHWACH bei ≥ 70 / ≥ 50 / < 50", während die App fünf Stufen
+> hat und TOP/GUT sagt).
 
 ### Die Stufe wird wieder gewählt — `v1202`, 02.09.2026 (`4d649ff`)
 
