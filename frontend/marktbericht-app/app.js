@@ -284,6 +284,57 @@ async function _kaufeEinzeln(art, btn) {
 }
 
 async function generate() {
+  /* ── v1201 · Ohne Miteigentumsanteil laeuft bei einer ETW gar nichts ─────
+     Marcels Entscheidung vom 02.09.2026, woertlich: „der Miteigentumsanteil
+     muss ausgefuellt werden als Pflichtwert, sonst kann man es nicht
+     ausfuehren."
+
+     Es ist die einzige STELLE, an der sich das durchsetzen laesst: der Knopf
+     hatte bis hierher gar keine Vollstaendigkeitspruefung — `generate()` lief
+     einfach los, und was fehlte, entschied der Server hinterher.
+
+     Warum eine harte Sperre und nicht nur eine Warnung: der Bodenwert einer
+     Eigentumswohnung IST der Miteigentumsanteil. Ohne ihn ist jeder
+     Ertragswert und jeder Sachwert entweder falsch (voller Grundstueckswert,
+     siehe v1198) oder gar nicht vorhanden. Ein Bericht, der beides nicht
+     leisten kann, soll nicht erst Kontingent kosten.
+
+     Der Wert kommt seit v1200 auch aus dem Objekt, wenn das Feld gerade
+     nicht gezeichnet ist — geprueft wird deshalb gegen payload(), nicht
+     gegen das DOM. Sonst haette die Sperre gegriffen, obwohl der Wert da
+     ist. */
+  try {
+    var _p = (window.Wertermittlung && window.Wertermittlung.payload)
+      ? window.Wertermittlung.payload() : null;
+    var _istWhg = /wohnung|etw/i.test(String((document.getElementById('ptype') || {}).value || ''));
+    if (_istWhg && _p && !(_p.mea_pct > 0)) {
+      var _feld = document.getElementById('mea');
+      if (_feld) {
+        try { _feld.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+        try { _feld.focus(); } catch (e) {}
+      }
+      /* KEIN alert(). Ein natives Fenster blockiert den ganzen Renderer —
+         dieselbe Falle wie beim Bestaetigungsdialog (app.js:330). Die Seite
+         hat mit `errBox` bereits eine Flaeche fuer genau solche Meldungen;
+         das v1187-Kaufangebot benutzt sie ebenfalls. */
+      var _box = document.getElementById('errBox');
+      if (_box) {
+        _box.innerHTML =
+          '<div style="font-weight:600;margin-bottom:6px;">⚠ Miteigentumsanteil fehlt</div>'
+          + '<div style="font-size:13px;line-height:1.55;">'
+          + 'Bei einer Eigentumswohnung wird der Bodenwert über den Miteigentumsanteil '
+          + 'ermittelt. Ohne ihn lassen sich Ertrags- und Sachwert nicht sauber rechnen — '
+          + 'deshalb wird der Bericht nicht erstellt.<br><br>'
+          + 'Der Wert steht in der <b>Teilungserklärung</b>, meist als Bruch wie 125/1000 — '
+          + 'das entspricht 12,5 %.'
+          + '</div>';
+        _box.classList.remove('hide');
+        try { _box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+      }
+      return;
+    }
+  } catch (e) { /* im Zweifel nicht blockieren */ }
+
   /* v951-checkup: Der Kostenhinweis war schon da — die Pruefung kommt hinein,
    * nicht daneben. Zwei Dialoge hintereinander klickt niemand, er klickt sie weg.
    * Sind die Zahlen sauber, bleibt der Dialog exakt wie vorher. */

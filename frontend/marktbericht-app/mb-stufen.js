@@ -115,15 +115,44 @@
     2: [['baustatus', 'Baustatus'], ['cond', 'Zustand'], ['quality', 'Qualität']],
     3: [['plot', 'Grundstücksfläche'], ['units', 'Wohneinheiten']]
   };
-  /* Die objektartabhaengigen Pflichtangaben der Wertermittlung. */
-  function bedarf3() {
-    var l = BEDARF[3].slice();
+  /* ── v1201 · Der Miteigentumsanteil ist bei einer ETW ab Stufe 1 Pflicht ──
+     Marcels Entscheidung vom 02.09.2026. Vorher stand er nur in bedarf3(),
+     also erst bei der Wertermittlung — und der Ertragswert, der ihn braucht,
+     wird schon ab Stufe 1 ausgewiesen.
+
+     Er steht bewusst NICHT fest in BEDARF[1]: bei einem Haus gibt es keinen
+     Miteigentumsanteil, und eine Ampel, die etwas Unmoegliches fordert, ist
+     schlimmer als keine (v1126d). Deshalb dieselbe Bauweise wie bedarf3().
+
+     Das Feld wird seit v1201 auch schon im ersten Block gezeichnet
+     (wertermittlung.js, FELDER.stufe1) — sonst waere die Pflicht eine
+     Sackgasse. */
+  function bedarf1() {
+    var l = BEDARF[1].slice();
     if (istWohnung()) l.push(['mea', 'Miteigentumsanteil']);
-    else { l.push(['standardstufe', 'Standardstufe']); l.push(['nhkHaus', 'Hausform (NHK)']); }
     return l;
   }
+  /* Die objektartabhaengigen Pflichtangaben der Wertermittlung.
+     v1201: `mea` ist hier RAUS — er wird jetzt schon in bedarf1() verlangt,
+     und zweimal dieselbe Forderung in zwei Stufen zu fuehren waere genau die
+     Doppelliste, an der der Marktbericht schon sechsmal gescheitert ist. */
+  function bedarf3() {
+    var l = BEDARF[3].slice();
+    if (!istWohnung()) { l.push(['standardstufe', 'Standardstufe']); l.push(['nhkHaus', 'Hausform (NHK)']); }
+    return l;
+  }
+  /* v1201 · EINE Stelle, die sagt was eine Stufe braucht. Vorher stand der
+     Ausdruck `(n === 3) ? bedarf3() : BEDARF[n]` dreimal wortgleich im Haus —
+     in fehlend(), in offenGeteilt() und in feldMarken(). Mit bedarf1() waeren
+     daraus drei Stellen geworden, die man einzeln haette nachziehen muessen.
+     Genau so entstehen Doppellisten. */
+  function bedarfFuer(n) {
+    if (n === 1) return bedarf1();
+    if (n === 3) return bedarf3();
+    return BEDARF[n];
+  }
   function fehlend(n) {
-    var l = (n === 3) ? bedarf3() : BEDARF[n];
+    var l = bedarfFuer(n);
     return l.filter(function (f) { return !wert(f[0]); }).map(function (f) { return f[1]; });
   }
 
@@ -147,7 +176,7 @@
   }
   /* Trennt das wirklich Fehlende von dem, was ein Klick einblendet. */
   function offenGeteilt(n) {
-    var l = (n === 3) ? bedarf3() : BEDARF[n];
+    var l = bedarfFuer(n);
     var echt = [], liegtVor = [];
     l.forEach(function (f) {
       if (wert(f[0])) return;
@@ -313,7 +342,7 @@
     feldMarkeAbraeumen();
     if (s >= 3) return;                       /* nichts mehr offen */
     var n = s + 1;
-    var liste = (n === 3) ? bedarf3() : BEDARF[n];
+    var liste = bedarfFuer(n);
     if (!liste) return;
     var name = NAMEN[n];
     liste.forEach(function (f) {
