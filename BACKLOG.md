@@ -193,6 +193,16 @@ Verfahren. **Nicht** geprüft: Vergleichspreise, Bodenwert, „Wertverfahren
 im Vergleich" im Detail, die Rechenwege hinter „▸ Rechenweg", und der
 PDF-Export.
 
+
+**d) Der PDF-Bericht ist angesehen und einmal umgebaut.** Marcel hat den
+eigenen Export gelesen und drei Dinge benannt. Eines davon ist gebaut:
+`03 Marktwert & Marktmiete` und `04 Preisstrategie` sind **eine** Sektion
+mit der Bandanzeige aus 04 (`v1206`, siehe Fertig). Zwei sind offen und
+liegen bei Marcel: **welche Miete den Ertragswert trägt** (die amtliche
+4,89 €/m² liegt unterhalb der ganzen Vergleichsspanne 6,66–8,30) und ob der
+Marktwert im **Fließtext** des KI-Berichts seltener stehen soll — der
+wiederholt ihn in fast jedem Absatz.
+
 **Positiv aufgefallen und nicht angetastet:** die Verfahren kennzeichnen
 sich selbst — „SACHWERT 268.172 € · **vorläufig · ohne Sachwertfaktor,
 kein Marktwert**" mit einem „warum vorläufig?"-Aufklapper. Und die
@@ -2317,6 +2327,64 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### 03 und 04 sind eine Sektion — `v1206`, 02.09.2026 (`99f6dff`)
+
+Marcels Beobachtung am eigenen Bericht: **„Außerdem wird mir zu oft der
+Marktwert in dem Bericht angegeben. Eigentlich könnte man Punkt 03 und 04
+zusammenfügen und die Anzeige aus 04 übernehmen."** Erst Demo
+(`design/Vorschläge/marktbericht-03-04-zusammenlegen.html`), dann gebaut.
+
+**Vorher.** `03 Marktwert & Marktmiete` zeichnete zwei Tacho-Karten
+nebeneinander. `04 Preisstrategie` zeichnete **denselben** Marktwert noch
+einmal als Band — und `sectionTitle('Preisstrategie', 999)` zwang den
+Abschnitt auf eine eigene Seite. Die Zahl stand zweimal groß, im Abstand
+einer Seite.
+
+**Nachher.** Eine Sektion 03. Der Preis bekommt das Band aus 04, die Miete
+bekommt dasselbe Band eine Nummer kleiner. Der Empfehlungssatz wandert mit,
+04 fällt weg, alle folgenden Kapitelnummern rücken auf — auch im
+Inhaltsverzeichnis.
+
+**Der Titel bleibt „Marktwert & Marktmiete", nicht „Preisstrategie".** Was
+dort steht, ist eine Wertaussage mit Spanne. Das Wort „Preisstrategie"
+verspräche eine Verhandlungsempfehlung, die der Abschnitt nicht einlöst.
+
+**Mitgenommen, weil es im Band nicht steckt:** die Aussagekraft
+(`confidence_label` + `-pct`) als Punkt in Ampelfarbe, und der Brutto-Faktor
+unter dem Mietband. Beides wäre sonst stillschweigend verschwunden.
+
+**Nicht angefasst, weil es NICHT dasselbe ist:** `mv.low/high` ist die
+Spanne des **Bewertungsmodells**, `sale.q25/q75` die Quartilspanne der
+**Angebote**. Die €/m²-Balken darunter sind keine dritte Wiederholung.
+
+**Nachgemessen** am selben Bericht (Replay, ohne neue Kosten), alte Fassung
+gegen neue:
+
+| gemessen | vorher | nachher |
+|---|---|---|
+| „195.000" im Dokument | 10× | **7×** |
+| „MARKTWERT (INDIKATION)" als Kopfzeile | 2× | **1×** |
+| Abschnitte im Inhaltsverzeichnis | 13 | **12** |
+| „Bodenrichtwert (amtlich)" beginnt auf | Seite 4 | **Seite 3** |
+| Seiten gesamt | 9 | 9 |
+
+> **Die Seitenersparnis tritt NICHT ein, und das steht hier, weil ich sie in
+> der Demo behauptet hatte.** Der Platz, den der erzwungene Umbruch frei
+> gibt, wird vom nachrückenden Marktbericht-Text sofort wieder aufgebraucht.
+> Was eintritt, ist das Eigentliche: der Marktwert steht nur noch einmal als
+> große Kopfzeile, und drei Nennungen weniger im ganzen Dokument.
+
+Cache-Buster-Kette komplett auf 1206 (alle drei Glieder). Browser-Abnahme
+auf Staging ohne Konsolenfehler.
+
+**Offen und davon unberührt:** die Zahl steht danach noch siebenmal im
+Dokument, vor allem im Fließtext des KI-Berichts — das wäre eine Änderung
+an der Textvorgabe, kein Layout. Und die Miete im Band kommt aus
+Vergleichsangeboten (6,66–8,30 €/m²), während der Ertragswert daneben mit
+4,89 €/m² aus der amtlichen Übersicht rechnet — **unterhalb der ganzen
+Spanne**. Das ist die größere Baustelle und wartet auf Marcels Entscheidung
+(A/B/C, siehe „Entscheidungen, die bei Marcel liegen").
 
 ### Der PDF-Export geprüft — `v1205`, 02.09.2026 (`3d334e9`)
 

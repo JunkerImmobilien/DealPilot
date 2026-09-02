@@ -5160,6 +5160,93 @@ Stände waren mit `74ae2e3` auf Prod.
 > aktiv" (mit `v1118` aufgehoben). **Vor dem Melden prüfen, welcher Strang die
 > Aussage besitzt.**
 
+### v1206 (02.09.2026, `99f6dff`) — der Marktwert stand zweimal groß, im Abstand einer Seite
+
+**Was.** Marcel hat den eigenen PDF-Export gelesen und gesagt: *„Außerdem
+wird mir zu oft der Marktwert in dem Bericht angegeben. Eigentlich könnte
+man Punkt 03 und 04 zusammenfügen und die Anzeige aus 04 übernehmen."*
+Erst Demo (`design/Vorschläge/marktbericht-03-04-zusammenlegen.html`,
+Commit `b1c38ce`), auf sein „ja mach das so fertig" dann gebaut.
+
+Vorher standen zwei Abschnitte. `03 Marktwert & Marktmiete` zeichnete zwei
+Tacho-Karten nebeneinander (`drawValueCard`, 92 mm hoch).
+`04 Preisstrategie` zeichnete **denselben** Marktwert noch einmal als Band,
+und `sectionTitle('Preisstrategie', 999)` zwang den Abschnitt auf eine
+eigene Seite.
+
+Nachher ist es eine Sektion. Der Preis bekommt das Band aus 04 — drei
+Kopfwerte (Mindestpreis / Marktwert / Maximalpreis) mit €/m² darunter,
+heller Track mit dunklem Kern, Gold-Marker auf dem Marktwert,
+Kaufpreis-Dreieck darunter. Die Miete bekommt dasselbe Band eine Nummer
+kleiner. Eine Funktion `wertBand()` zeichnet beide; `klein: true` trägt die
+Miete. Der Empfehlungssatz aus 04 wandert mit, 04 fällt weg, alle folgenden
+Kapitelnummern rücken auf — auch im Inhaltsverzeichnis.
+
+**Der Titel bleibt „Marktwert & Marktmiete", nicht „Preisstrategie".** Was
+dort steht, ist eine Wertaussage mit Spanne. Das Wort verspräche eine
+Verhandlungsempfehlung, die der Abschnitt nicht einlöst.
+
+**Commit.** `99f6dff` — `app.js` (112 Zeilen neu, 178 weg),
+`marktbericht-app/index.html`, `index.html`, `js/marktbericht-view.js`
+(Cache-Buster-Kette komplett auf 1206, alle drei Glieder).
+
+**Nachweis.** Replay des gespeicherten Berichts im Browser
+(`/reports/replay`, kostet nichts), `jsPDF` abgefangen statt heruntergeladen,
+Textströme des erzeugten Dokuments gezählt — alte Fassung (Marcels
+committetes PDF) gegen neue:
+
+| gemessen | vorher | nachher |
+|---|---|---|
+| „195.000" im Dokument | 10× | **7×** |
+| „MARKTWERT (INDIKATION)" als Kopfzeile | 2× | **1×** |
+| „Preisstrategie" | 2× | **0×** |
+| Abschnitte im Inhaltsverzeichnis | 13 | **12** |
+| „Bodenrichtwert (amtlich)" beginnt auf | Seite 4 | **Seite 3** |
+| Seiten gesamt | 9 | 9 |
+
+Beide Bänder stehen auf **derselben** Seite: `MINDESTPREIS`,
+`MARKTWERT (INDIKATION)`, `MAXIMALPREIS`, `UNTERE MIETE`,
+`MARKTMIETE KALT (MONAT)`, `OBERE MIETE` je genau einmal auf Seite 4.
+Konsole ohne Fehler.
+
+> **Die Seitenersparnis, die ich in der Demo behauptet hatte, tritt nicht
+> ein.** Vorher 9 Seiten, nachher 9. Der Platz, den der erzwungene Umbruch
+> frei gibt, wird vom nachrückenden Marktbericht-Text sofort wieder
+> aufgebraucht. Die Behauptung ist in der Demo korrigiert stehen geblieben,
+> nicht gelöscht. Was eintritt, ist das Eigentliche: drei Nennungen weniger
+> und nur noch eine große Kopfzeile.
+
+**Zwei Dinge mussten aus den Karten mitwandern**, weil sie im Band nicht
+stecken: die Aussagekraft (`confidence_label` + `-pct`) als Punkt in
+Ampelfarbe, und der Brutto-Faktor unter dem Mietband. Beides wäre sonst
+stillschweigend verschwunden — der Bericht hätte weniger gesagt, ohne dass
+es jemand gemerkt hätte.
+
+**Ein Ding durfte NICHT wandern und bleibt darunter stehen:** `mv.low/high`
+ist die Spanne des **Bewertungsmodells**, `sale.q25/q75` die Quartilspanne
+der **Angebote**. Zwei verschiedene Aussagen, die nur ähnlich aussehen. Die
+€/m²-Balken sind keine dritte Wiederholung.
+
+`wertBand()` fängt die fehlende Spanne ab: ohne `lo`/`hi` steht nur der
+Mittelwert mittig statt eines halben Bandes — „kein Treffer heißt kein Wert".
+
+**Werkzeug-Befund, der wiederkommt.** `jsPDF` kopiert seine API-Methoden auf
+die **Instanz**, nicht nur auf `prototype`. Ein Patch auf
+`jsPDF.prototype.save` greift deshalb nie; abgefangen wird über den
+**Konstruktor** (`window.jspdf.jsPDF` umhüllen, `inst.save` überschreiben).
+Der erste Versuch sah aus wie „PDF-Erzeugung schlägt fehl" und war nur das.
+Und: der Heredoc hat mir wieder die Backslashes halbiert — die Regex zum
+Lesen der PDF-Textströme kommt ohne aus (`[(]([^()]*)[)][ ]*Tj`).
+
+**Rest.** Der Marktwert steht danach noch siebenmal im Dokument, vor allem
+im **Fließtext** des KI-Berichts, der ihn in fast jedem Absatz wiederholt —
+das wäre eine Änderung an der Textvorgabe, kein Layout. Und die größere
+Baustelle bleibt offen: die Miete im Band kommt aus Vergleichsangeboten
+(6,66–8,30 €/m²), während der Ertragswert daneben mit 4,89 €/m² aus der
+amtlichen Mietpreisübersicht rechnet — **unterhalb der ganzen Spanne**.
+Derselbe Bericht zeigt zwei Mieten, die nicht zusammenpassen. A/B/C liegen
+bei Marcel. **Prod hat v1206 noch nicht.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

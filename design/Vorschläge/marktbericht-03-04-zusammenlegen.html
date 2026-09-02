@@ -195,14 +195,15 @@ code{font:500 12px 'JetBrains Mono',monospace;background:rgba(0,0,0,.05);
   </div>
   <div class="bandfuss"><span>6,66 €/m²</span><span>Median 7,67 €/m²</span><span>8,30 €/m²</span></div>
 
-  <div class="seitenzahl">Seite 3 — Seite 4 entfällt</div>
+  <div class="seitenzahl">Seite 3 — Sektion 04 entfällt; 04 heißt jetzt Bodenrichtwert</div>
 </div>
 
 <div class="bewert">
-  <div class="p">Der Marktwert steht <b>einmal</b> groß statt zweimal<span class="zaehler gut">195.000 € · 8×</span></div>
+  <div class="p">Der Marktwert steht <b>einmal</b> groß statt zweimal<span class="zaehler gut">195.000 € · 7×</span></div>
   <div class="p">Preis und Miete lesen sich in derselben Form — wer die eine Zeile verstanden hat, versteht die andere.</div>
   <div class="p">Die Spanne steht in €/m² <i>unter</i> dem Band, wo sie hingehört: dieselbe Einheit wie die Kopfwerte darüber.</div>
-  <div class="p"><b>Eine Seite weniger</b> im PDF; <code>sectionTitle(…, 999)</code> fällt weg.</div>
+  <div class="p">Der erzwungene Seitenumbruch (<code>sectionTitle(…, 999)</code>) fällt weg — der Bodenrichtwert rückt eine Seite vor.</div>
+  <div class="c"><b>Eine Seite spart es nicht.</b> Gemessen am selben Bericht: vorher 9 Seiten, nachher 9. Der frei gewordene Platz wird vom nachrückenden Text wieder aufgebraucht.</div>
   <div class="c">Der Kartengauge aus 03 verschwindet — er war der eigenständigere Blickfang.</div>
 </div>
 
@@ -225,6 +226,42 @@ code{font:500 12px 'JetBrains Mono',monospace;background:rgba(0,0,0,.05);
     ganzen Spanne.</b> Solange das so steht, zeigt derselbe Bericht zwei Mieten, die nicht
     zusammenpassen. <b>Das ist die wichtigere Baustelle als das Layout</b> und wartet auf deine
     Entscheidung (A / B / C im Backlog).
+  </p>
+</div>
+
+<div class="empf" style="border-left-color:var(--gruen)">
+  <h3>Gebaut, ausgerollt, nachgemessen — v1206</h3>
+  <p style="margin:0 0 10px">
+    Am selben Bericht (Replay, ohne neue Kosten) gegen den Stand von vorher gehalten:
+  </p>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin:0 0 12px">
+    <tr style="border-bottom:1px solid var(--linie)">
+      <th style="text-align:left;padding:5px 0;font:600 9px 'JetBrains Mono',monospace;letter-spacing:.14em;color:var(--leise)">GEMESSEN</th>
+      <th style="text-align:right;padding:5px 0;font:600 9px 'JetBrains Mono',monospace;letter-spacing:.14em;color:var(--leise)">VORHER</th>
+      <th style="text-align:right;padding:5px 0;font:600 9px 'JetBrains Mono',monospace;letter-spacing:.14em;color:var(--leise)">NACHHER</th>
+    </tr>
+    <tr style="border-bottom:1px solid var(--linie)"><td style="padding:6px 0">„195.000" im Dokument</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums">10×</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;color:var(--gruen);font-weight:700">7×</td></tr>
+    <tr style="border-bottom:1px solid var(--linie)"><td style="padding:6px 0">„MARKTWERT (INDIKATION)" als Kopfzeile</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums">2×</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;color:var(--gruen);font-weight:700">1×</td></tr>
+    <tr style="border-bottom:1px solid var(--linie)"><td style="padding:6px 0">Abschnitte im Inhaltsverzeichnis</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums">13</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;color:var(--gruen);font-weight:700">12</td></tr>
+    <tr style="border-bottom:1px solid var(--linie)"><td style="padding:6px 0">„Bodenrichtwert (amtlich)" beginnt auf</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums">Seite 4</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;color:var(--gruen);font-weight:700">Seite 3</td></tr>
+    <tr><td style="padding:6px 0">Seiten gesamt</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums">9</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums">9</td></tr>
+  </table>
+  <p style="margin:0">
+    <b>Die Seitenersparnis aus dem Vorschlag oben tritt nicht ein</b>, und das steht hier,
+    weil sie oben behauptet war: der Platz, den der erzwungene Umbruch frei gibt, wird vom
+    nachrückenden Marktbericht-Text sofort wieder aufgebraucht. Was eintritt, ist das
+    Eigentliche — der Marktwert steht nur noch <b>einmal</b> als große Kopfzeile statt zweimal
+    im Abstand einer Seite, und drei Nennungen weniger im ganzen Dokument.
   </p>
 </div>
 
