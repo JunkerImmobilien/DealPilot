@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fehlende Angaben markieren</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Alle Werte hier sind am 01.09.2026 aus der laufenden Staging-App
+   ausgelesen, nicht geschaetzt:
+     Flaeche      #FFFFFF        Text        rgb(22,22,22)
+     Feldrahmen   #E6E0D3        Radius      11px    Polster 11/12px
+     Schrift      Inter 15px     Reiter      Space Grotesk 12.5px
+     „fehlt"-Rot  #B8625C        Gold        #C9A84C / #E8CC7A / #b8932f  */
+:root{
+  --grund:#fff; --text:#161616; --leise:#7a7a84;
+  --rahmen:#E6E0D3; --gold:#C9A84C; --gold-hell:#E8CC7A; --gold-dunkel:#b8932f;
+  --rot:#B8625C; --gruen:#3FA56C;
+}
+*{box-sizing:border-box}
+/* Seitengrund ist die dokumentierte DealPilot-Creme, nicht irgendein Beige —
+   die Karten darauf zeigen die App in ihrem echten Weiss. */
+body{margin:0;background:#FDFCFA;color:var(--text);font:15px/1.55 Inter,system-ui,sans-serif}
+.huelle{max-width:1180px;margin:0 auto;padding:34px 22px 80px}
+h1{font:600 25px/1.25 'Space Grotesk',sans-serif;margin:0 0 6px}
+.unter{color:var(--leise);font-size:14px;margin:0 0 26px;max-width:70ch}
+h2{font:600 17px/1.3 'Space Grotesk',sans-serif;margin:38px 0 4px}
+.h2sub{color:var(--leise);font-size:13px;margin:0 0 14px;max-width:76ch}
+
+.karte{background:var(--grund);border:1px solid var(--rahmen);border-radius:14px;padding:20px 22px;
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.reiterleiste{display:flex;gap:2px;border-bottom:1px solid var(--rahmen);margin:-4px -4px 16px;overflow-x:auto}
+.reiter{font:600 12.5px/1 'Space Grotesk',sans-serif;padding:9px 11px;white-space:nowrap;
+  color:var(--leise);border-bottom:2px solid transparent}
+.reiter.an{color:var(--text);border-bottom-color:var(--gold)}
+.kurz{font-size:11px;opacity:.6;margin:-6px 0 14px}
+
+.feld{margin-bottom:13px}
+.feld label{display:block;font-size:11.5px;margin-bottom:3px;opacity:.85}
+.feld input,.feld select{width:100%;background:#fff;color:var(--text);font:15px Inter,sans-serif;
+  padding:11px 12px;border:1.11px solid var(--rahmen);border-radius:11px}
+.zwei{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+
+/* ── A · roter Rahmen ──────────────────────────────────────────────── */
+.a .feld.fehlt input{outline:2px solid var(--rot);outline-offset:1px}
+.a .feld.fehlt label::after{content:' *';color:var(--rot);font-weight:700}
+
+/* ── B · goldener Merkstreifen ─────────────────────────────────────── */
+.b .feld.fehlt{border-left:3px solid var(--gold);padding-left:11px;margin-left:-14px}
+.b .feld.fehlt input{border-color:var(--gold)}
+.b .fuer{display:block;font:500 10.5px/1.4 'JetBrains Mono',monospace;color:var(--gold-dunkel);
+  letter-spacing:.02em;margin-top:4px}
+
+/* ── C · Streifen oben, Felder nur dezent ──────────────────────────── */
+.c .streifen{background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.32);
+  border-radius:9px;padding:11px 13px;margin-bottom:16px;font-size:12.5px;line-height:1.55}
+.c .streifen b{color:var(--gold-dunkel)}
+.c .sprung{display:inline-block;font:500 11.5px 'JetBrains Mono',monospace;
+  background:#fff;border:1px solid rgba(201,168,76,.5);border-radius:999px;
+  padding:3px 10px;margin:5px 5px 0 0;cursor:pointer;color:var(--gold-dunkel)}
+.c .sprung:hover{background:rgba(201,168,76,.14)}
+.c .feld.fehlt label::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--gold);margin-right:6px;vertical-align:middle}
+.c .feld.fehlt input{border-color:rgba(201,168,76,.55)}
+
+/* ── Ampel (unveraendert aus der App, nur zur Einordnung) ──────────── */
+.ampel{background:var(--grund);border:1px solid var(--rahmen);border-radius:10px;padding:12px 14px;font-size:12.5px}
+.ms{display:flex;gap:9px;padding:6px 0;align-items:flex-start}
+.pkt{width:19px;height:19px;flex:0 0 19px;border-radius:50%;display:grid;place-items:center;
+  font:600 11px 'JetBrains Mono',monospace;border:1px solid var(--rahmen);color:var(--leise)}
+.ms.an .pkt{background:var(--gruen);border-color:var(--gruen);color:#fff}
+.zeile{display:flex;justify-content:space-between;gap:12px}
+.name{font-weight:600}
+.preis{font:500 11px 'JetBrains Mono',monospace;color:var(--gold-dunkel)}
+.fehlt-txt{color:var(--rot);font-size:11px;margin-top:1px}
+
+.bewert{margin-top:12px;font-size:12.5px;line-height:1.6}
+.bewert .pro::before{content:'+ ';color:var(--gruen);font-weight:700}
+.bewert .con::before{content:'− ';color:var(--rot);font-weight:700}
+.empf{margin-top:26px;background:#fff;border:1px solid var(--rahmen);border-left:4px solid var(--gold);
+  border-radius:12px;padding:18px 20px}
+.empf h3{font:600 15px 'Space Grotesk',sans-serif;margin:0 0 8px}
+code{font:500 12px 'JetBrains Mono',monospace;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:4px}
+.hinweis{font-size:12.5px;color:var(--leise);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="huelle">
+
+<h1>Fehlende Angaben am Feld markieren</h1>
+<p class="unter">
+  <b>Das Problem, gemessen am 01.09.2026:</b> die Pflichtangaben der Stufen 1–3
+  stehen nur in der Ampel <i>oben</i>. Wer in Reiter 2 „Objekt“ arbeitet, sieht
+  neun gleich aussehende Felder und kann nicht erkennen, welche vier die Stufe
+  überhaupt erst freischalten. Dazu passt ein toter Mechanismus:
+  <code>.wm-f.fehlt input{outline:2px solid …}</code> existiert in
+  <code>wertermittlung.js:393</code> — <b>die Klasse wird nirgends gesetzt.</b>
+  Gebaut und nie verdrahtet.
+</p>
+
+<div class="ampel" style="max-width:640px">
+  <div class="ms an"><div class="pkt">✓</div><div style="flex:1">
+    <div class="zeile"><span class="name">Marktpreisindikation</span><span class="preis">bezahlt</span></div>
+  </div></div>
+  <div class="ms"><div class="pkt">2</div><div style="flex:1">
+    <div class="zeile"><span class="name">Erweiterte Marktpreisindikation</span><span class="preis">1 × MPI+</span></div>
+    <div class="fehlt-txt">fehlt: Zustand, Qualität</div>
+  </div></div>
+</div>
+<p class="hinweis">So sieht die Ampel heute aus. Sie <b>weiß</b>, was fehlt — sie sagt es nur nicht am Feld.</p>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2>A · Roter Rahmen — was die tote CSS-Regel vorhatte</h2>
+<p class="h2sub">Genau das, was <code>.wm-f.fehlt</code> gebaut hätte: 2 px Kontur in <code>#B8625C</code> plus Stern am Label.</p>
+<div class="karte a">
+  <div class="reiterleiste">
+    <div class="reiter">1 Übersicht</div><div class="reiter an">3 Zustand</div>
+    <div class="reiter">4 Ausstattung</div><div class="reiter">5 Gebäude &amp; Außen</div>
+  </div>
+  <div class="kurz">Baustatus, Zustand, Qualität, Modernisierung</div>
+  <div class="zwei">
+    <div class="feld fehlt"><label>Zustand</label><select><option>– keine Angabe –</option></select></div>
+    <div class="feld fehlt"><label>Ausstattungsqualität</label><select><option>– keine Angabe –</option></select></div>
+    <div class="feld"><label>Energieklasse</label><input value="C"></div>
+    <div class="feld"><label>Modernisierungsjahr</label><input placeholder="z. B. 2018"></div>
+  </div>
+  <div class="bewert">
+    <div class="pro">Nutzt die Regel, die ohnehin schon im Code steht — kein neues Vokabular.</div>
+    <div class="con"><b>Rot ist die Sprache des Fehlers.</b> Diese Felder sind aber nicht falsch, sie sind nur noch nicht ausgefüllt.</div>
+    <div class="con">Beim Öffnen eines frischen Objekts stünde die halbe Maske sofort in Alarmrot.</div>
+    <div class="con">Sagt nicht, <i>wofür</i> das Feld fehlt — Stufe 2 oder Stufe 3 sieht gleich aus.</div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2>B · Goldener Merkstreifen und ein Wort dazu</h2>
+<p class="h2sub">Gold statt Rot, dazu eine Zeile in Monospace, die den Zweck nennt. Der Text kommt aus der Ampel, nicht aus einer zweiten Liste.</p>
+<div class="karte b">
+  <div class="reiterleiste">
+    <div class="reiter">1 Übersicht</div><div class="reiter an">3 Zustand</div>
+    <div class="reiter">4 Ausstattung</div><div class="reiter">5 Gebäude &amp; Außen</div>
+  </div>
+  <div class="kurz">Baustatus, Zustand, Qualität, Modernisierung</div>
+  <div class="zwei">
+    <div class="feld fehlt"><label>Zustand</label><select><option>– keine Angabe –</option></select>
+      <span class="fuer">fehlt für Erweiterte Marktpreisindikation</span></div>
+    <div class="feld fehlt"><label>Ausstattungsqualität</label><select><option>– keine Angabe –</option></select>
+      <span class="fuer">fehlt für Erweiterte Marktpreisindikation</span></div>
+    <div class="feld"><label>Energieklasse</label><input value="C"></div>
+    <div class="feld"><label>Modernisierungsjahr</label><input placeholder="z. B. 2018"></div>
+  </div>
+  <div class="bewert">
+    <div class="pro"><b>Kein Alarm.</b> Gold heißt im DealPilot „hier geht noch was“, nicht „hier ist ein Fehler“.</div>
+    <div class="pro">Sagt, <b>wofür</b> das Feld fehlt — und benennt die Stufe mit demselben Wort wie Ampel, Knopf und Tarif.</div>
+    <div class="pro">Passt zur Produktidee: <i>kein Vorab-Klick, die Stufe ergibt sich aus den Angaben.</i></div>
+    <div class="con">Braucht Platz unter jedem markierten Feld.</div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2>C · Ein Streifen oben, Felder nur mit Punkt</h2>
+<p class="h2sub">Die Auskunft steht einmal oben statt an jedem Feld; die Namen sind anklickbar und springen ins Feld.</p>
+<div class="karte c">
+  <div class="reiterleiste">
+    <div class="reiter">1 Übersicht</div><div class="reiter an">3 Zustand</div>
+    <div class="reiter">4 Ausstattung</div><div class="reiter">5 Gebäude &amp; Außen</div>
+  </div>
+  <div class="kurz">Baustatus, Zustand, Qualität, Modernisierung</div>
+  <div class="streifen">
+    Für <b>Erweiterte Marktpreisindikation</b> fehlt in diesem Reiter noch:
+    <span class="sprung">Zustand</span><span class="sprung">Qualität</span>
+  </div>
+  <div class="zwei">
+    <div class="feld fehlt"><label>Zustand</label><select><option>– keine Angabe –</option></select></div>
+    <div class="feld fehlt"><label>Ausstattungsqualität</label><select><option>– keine Angabe –</option></select></div>
+    <div class="feld"><label>Energieklasse</label><input value="C"></div>
+    <div class="feld"><label>Modernisierungsjahr</label><input placeholder="z. B. 2018"></div>
+  </div>
+  <div class="bewert">
+    <div class="pro">Sagt es <b>einmal</b> statt viermal — ruhiger, wenn viele Felder fehlen.</div>
+    <div class="pro">Die Sprungmarken sind derselbe Bedienweg wie die Ampel, nur näher dran.</div>
+    <div class="con">Wer direkt ins Feld scrollt, sieht den Streifen nicht mehr — der Punkt allein erklärt nichts.</div>
+    <div class="con">Ein weiterer Kasten in einer Maske, die schon Ampel, Reiter und Fußzeile trägt.</div>
+  </div>
+</div>
+
+<div class="empf">
+  <h3>Empfehlung: B, und zwar nur für die NÄCHSTE Stufe</h3>
+  <p style="margin:0 0 10px">
+    <b>Rot scheidet aus</b> — nicht aus Geschmack, sondern weil es etwas Falsches behauptet.
+    Ein leeres Feld ist kein Fehler, und die Ampel benutzt Rot bereits für „fehlt“; zweimal
+    dieselbe Farbe für zwei verschiedene Dringlichkeiten macht beide stumpf.
+  </p>
+  <p style="margin:0 0 10px">
+    <b>B sagt als einziges, wofür.</b> Das ist der eigentliche Mangel heute: nicht dass die
+    Felder unmarkiert sind, sondern dass niemand weiß, welche Stufe an ihnen hängt.
+  </p>
+  <p style="margin:0 0 10px">
+    <b>Nur die nächste Stufe markieren.</b> Wer auf Stufe 1 steht, bekommt die Felder für
+    Stufe 2 markiert — nicht zusätzlich die für Stufe 3. Sonst steht die Maske voll und
+    die Markierung sagt wieder nichts.
+  </p>
+  <p style="margin:0">
+    <b>Beides zusammen wäre auch möglich:</b> B am Feld <i>und</i> die „fehlt:“-Namen in der
+    Ampel anklickbar machen, sodass sie in den richtigen Reiter springen. Das löst die zweite
+    Hälfte des Problems — von der Ampel aus findet man das Feld heute gar nicht.
+  </p>
+  <p class="hinweis">
+    Umsetzung in allen Fällen ohne zweite Liste: <code>BEDARF</code> in
+    <code>mb-stufen.js</code> kennt die Feld-IDs je Stufe, die Ampel kennt die Klarnamen.
+    Beides ist schon da — es wird nur nicht am Feld gezeigt.
+  </p>
+</div>
+
+</div>
+</body>
+</html>
