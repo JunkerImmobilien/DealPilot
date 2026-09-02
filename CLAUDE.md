@@ -257,7 +257,34 @@ Inter (Body) · Cormorant Garamond (Serif).
 **Bildsprache Luftfahrt durchgehend:** Kerosin (KI-Guthaben) · Cockpit ·
 Boarding / QuickBoarding · Co-Pilot · Runway · Pre-Flight · Score-Dial.
 
-**Score-Stufen:** STARK / SOLIDE / SCHWACH bei ≥ 70 / ≥ 50 / < 50.
+**Score-Stufen — die Kette der Objektkarte gilt** (`js/dashboard.js:390`):
+
+| Score | Stufe |
+|---|---|
+| ≥ 85 | **TOP** |
+| ≥ 70 | **GUT** |
+| ≥ 50 | **SOLIDE** |
+| ≥ 35 | **SCHWACH** |
+| < 35 | **KRITISCH** |
+
+Auf der Karte als Versalien-Pille, in Fließtext und Überschriften in
+Kamelschrift (`Top`, `Gut`, …). **Die Schwellen sind überall dieselben** —
+auch die Farbketten (`top` / `green` / `gold` / `red`) brechen bei
+85 / 70 / 50.
+
+> **Hier stand bis zum 02.09.2026 „STARK / SOLIDE / SCHWACH bei ≥ 70 /
+> ≥ 50 / < 50".** Das war weder die Karte noch sonst eine Stelle im Code:
+> „STARK" kommt als Score-Stufe nirgends vor, und die vierte und fünfte
+> Stufe fehlten ganz. Gefunden, als der Marktbericht am selben Score
+> zweimal ein anderes Wort zeigte (`v1203`). **Marcels Entscheidung: es
+> gilt, was die Haupt-App tut.**
+>
+> **Zwei Abweichungen sind gemessen und noch offen:**
+> `js/dashboard.js:1283` sagt `Sehr gut / Gut / Solide / Schwach` (vier
+> Stufen, „Sehr gut" statt „TOP"), und der Marktbericht-Backend
+> (`ScoringService`) führt ein eigenes Vokabular `Sehr attraktiv /
+> Attraktiv / Durchschnittlich / Unterdurchschnittlich`, das seit `v1203`
+> **nicht mehr angezeigt** wird. Beide gehören noch angeglichen.
 
 ### Whitelabel-Pflicht
 Jedes Gold-Literal steht als `var(--wl-<hex>, #<hex>)`. Tokens stehen in

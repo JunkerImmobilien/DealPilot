@@ -1129,7 +1129,26 @@ const DP_GREEN = '#3FA56C', DP_RED = '#B86250';
 /* W40-pdf-svg: DP_GOLD war top-level und wurde beim LADEN ausgewertet — also
    vor dem Branding. Die Aufloesung sitzt jetzt in _scoreCol() (pro Render). */
 function _scoreCol(s) { s = s || 0; return s >= 70 ? DP_GREEN : s >= 50 ? window._wlc('#C9A84C') : DP_RED; }
-function _scoreTier(s) { s = s || 0; return s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : 'Schwach'; }
+/* ── v1204 · Dieselbe Kette wie die Objektkarte der Haupt-App ─────────────
+   Marcels Entscheidung vom 02.09.2026: „so wie in der Haupt-App."
+
+   Vorher fehlten hier die beiden unteren Stufen: alles unter 50 hiess
+   pauschal „Schwach", waehrend die Objektkarte (js/dashboard.js:390) bei
+   35 noch einmal trennt und darunter KRITISCH sagt. Ein Objekt mit Score 12
+   stand im Marktbericht damit in derselben Stufe wie eines mit 49.
+
+   Woerter und Schwellen sind jetzt identisch mit der Karte; nur die
+   Schreibweise unterscheidet sich, weil das hier eine 24-px-Ueberschrift
+   ist und dort eine Versalien-Pille. Die Schwellen 85/70/50 decken sich
+   ausserdem mit den Farbketten der Haupt-App (top/green/gold/red).
+
+   Steht seit v1204 auch so in CLAUDE.md — dort stand bis dahin
+   „STARK / SOLIDE / SCHWACH bei >= 70 / >= 50 / < 50", was weder die Karte
+   noch sonst eine Stelle im Code war. */
+function _scoreTier(s) {
+  s = s || 0;
+  return s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : s >= 35 ? 'Schwach' : 'Kritisch';
+}
 function _kiRaet(s) { s = s || 0; return s >= 85 ? 'Aktiv ausbauen' : s >= 70 ? 'Kauf erwägen' : s >= 50 ? 'Genau prüfen' : 'Zurückhaltung'; }
 // Donut-Ring im DealPilot-Stil: dicker Ring, tier-farbig, Score gross, Tier-Pille unten.
 function svgDonut(score, conf) { /*v895-doublering*/
