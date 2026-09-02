@@ -676,6 +676,20 @@ function _renderWertverfahren(d) {
     '<h3 class="wv-h">Bodenwert</h3>'
     + '<div class="wv-boden"><b>' + (e.bodenwert_eur != null ? eur(e.bodenwert_eur) : '\u2013')
     + '</b><span>' + bodenZeile + '</span></div>'
+    /* ── v1198b · Ein Strich ohne Grund sieht aus wie ein Fehler ───────────
+       Seit v1198 steht hier korrekt „–", wenn der Bodenwert nicht angesetzt
+       werden darf — bei einer Eigentumswohnung ohne Miteigentumsanteil.
+       Warum, stand nirgends: der Rechenweg darunter zeigte weiter
+       „950 m² × 90 €/m² = 85.500 €", und die Zahl daneben war ein Strich.
+       Das liest sich wie ein Anzeigefehler, nicht wie eine Entscheidung.
+
+       `ErtragswertService.bodenwert()` legt den fertigen Satz in
+       `hinweise` ab — er wurde nur nie gezeigt. Dieselbe Regel wie in
+       v1197: keine Zahl (und kein Strich) ohne Herkunft. */
+    + ((cc.bodenwert && cc.bodenwert.vollstaendig === false
+        && Array.isArray(cc.bodenwert.hinweise) && cc.bodenwert.hinweise.length)
+        ? '<div class="wv-bwgrund">' + cc.bodenwert.hinweise.map(esc).join('<br>') + '</div>'
+        : '')
     + (hk.kurz ? '<div class="wv-hk">Liegenschaftszinssatz: '
         + (hk.liegenschaftszins_pct != null ? String(hk.liegenschaftszins_pct).replace('.', ',') + ' % \u00b7 ' : '')
         + hk.kurz + (hk.indikativ ? ' (indikativ)' : '') + '</div>' : '')
@@ -750,6 +764,8 @@ function _renderWertverfahren(d) {
       + '#wv-box .wv-boden b{font-size:22px;white-space:nowrap}'
       + '#wv-box .wv-boden span{font-size:12px;opacity:.7}'
       + '#wv-box .wv-hk{margin-top:6px;font-size:12px;opacity:.75}'
+      /* v1198b · Der Grund, warum kein Bodenwert dasteht. */
+      + '#wv-box .wv-bwgrund{margin-top:9px;padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.55;border:1px solid rgba(201,168,76,.32);background:rgba(201,168,76,.09)}'
       + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
       + '#wv-box .wv-k{padding:13px 15px;border:1px solid rgba(128,128,128,.22);border-radius:8px}'
       + '#wv-box .wv-t{font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}'
