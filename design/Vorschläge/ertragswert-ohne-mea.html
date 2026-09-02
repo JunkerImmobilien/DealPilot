@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ertragswert ohne Miteigentumsanteil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --grund:#FDFCFA; --flaeche:#fff; --text:#161616; --leise:#7a7a84;
+  --rahmen:#E6E0D3; --gold:#C9A84C; --gold-d:#b8932f; --gold-h:#E8CC7A;
+  --rot:#B8625C; --gruen:#3FA56C;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--grund);color:var(--text);
+     font:15px/1.6 Inter,system-ui,sans-serif}
+.h{max-width:1120px;margin:0 auto;padding:30px 20px 90px}
+
+.frage{background:var(--flaeche);border:1px solid var(--rahmen);border-left:5px solid var(--gold);
+  border-radius:13px;padding:22px 24px;margin-bottom:26px}
+.frage .k{font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold-d);margin-bottom:9px}
+h1{font:600 25px/1.3 'Space Grotesk',sans-serif;margin:0 0 10px;text-wrap:balance}
+.frage p{margin:0;max-width:66ch}
+
+h2{font:600 17px/1.3 'Space Grotesk',sans-serif;margin:34px 0 4px}
+.sub{color:var(--leise);font-size:13.5px;margin:0 0 14px;max-width:72ch}
+
+.fakten{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px;margin-bottom:8px}
+.f{background:var(--flaeche);border:1px solid var(--rahmen);border-radius:10px;padding:11px 13px}
+.f b{display:block;font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--leise);margin-bottom:5px}
+.f span{font-size:15px;font-weight:600}
+
+.paar{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:820px){.paar{grid-template-columns:1fr}}
+.w{background:var(--flaeche);border:1px solid var(--rahmen);border-radius:13px;overflow:hidden}
+.w.alt{border-top:4px solid var(--rot)}
+.w.neu{border-top:4px solid var(--gruen)}
+.w h3{margin:0;padding:14px 18px 4px;font:600 15px 'Space Grotesk',sans-serif}
+.w .wo{padding:0 18px 12px;font-size:12px;color:var(--leise)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td{padding:7px 18px;border-top:1px solid rgba(0,0,0,.05);vertical-align:baseline}
+td.z{text-align:right;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.hin td{background:rgba(184,98,92,.10)}
+tr.hin td:first-child{font-weight:600}
+tr.erg td{font-weight:700;border-top:2px solid var(--rahmen);background:rgba(0,0,0,.02)}
+.detail{display:block;font-size:11px;color:var(--leise);font-family:'JetBrains Mono',monospace}
+
+.merk{margin:22px 0;padding:15px 18px;border-radius:11px;font-size:13.5px;line-height:1.65;
+  background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.34)}
+.merk b{color:var(--gold-d)}
+
+.opt{background:var(--flaeche);border:1px solid var(--rahmen);border-radius:13px;
+  padding:17px 20px;margin-bottom:13px}
+.opt.empf{border-left:5px solid var(--gruen)}
+.opt h4{margin:0 0 3px;font:600 15.5px 'Space Grotesk',sans-serif}
+.opt .was{font-size:13.5px;color:var(--leise);margin:0 0 9px}
+.opt ul{margin:0;padding-left:19px;font-size:13.5px;line-height:1.65}
+.opt li.p::marker{content:'+ ';color:var(--gruen)}
+.opt li.c::marker{content:'− ';color:var(--rot)}
+.tag{display:inline-block;font:600 10px 'JetBrains Mono',monospace;letter-spacing:.1em;
+  text-transform:uppercase;padding:3px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.tag.jetzt{background:rgba(184,98,92,.14);color:var(--rot)}
+.tag.staging{background:rgba(63,165,108,.14);color:var(--gruen)}
+.tag.neu{background:rgba(201,168,76,.16);color:var(--gold-d)}
+
+.tun{margin-top:30px;background:var(--flaeche);border:1px solid var(--rahmen);
+  border-left:5px solid var(--gold);border-radius:13px;padding:20px 22px}
+.tun h3{margin:0 0 10px;font:600 16px 'Space Grotesk',sans-serif}
+.tun ol{margin:0;padding-left:20px;font-size:14px;line-height:1.75}
+code{font:500 12.5px 'JetBrains Mono',monospace;background:rgba(0,0,0,.05);
+  padding:1px 5px;border-radius:4px}
+.fuss{margin-top:26px;font-size:12.5px;color:var(--leise);line-height:1.65;max-width:76ch}
+</style>
+</head>
+<body>
+<div class="h">
+
+<div class="frage">
+  <div class="k">Deine Entscheidung</div>
+  <h1>Was soll der Ertragswert tun, wenn bei einer Eigentumswohnung der Miteigentumsanteil fehlt?</h1>
+  <p>Das ist keine Programmierfrage. Der Code kann alle drei Antworten — welche richtig ist,
+     entscheidest du.</p>
+</div>
+
+<h2>Der Fall</h2>
+<p class="sub">Testobjekt Hermannstraße 9, Hüllhorst. Alle Zahlen aus einem echten Bericht,
+   nicht nachgestellt.</p>
+<div class="fakten">
+  <div class="f"><b>Objektart</b><span>Eigentumswohnung</span></div>
+  <div class="f"><b>Wohnfläche</b><span>100 m²</span></div>
+  <div class="f"><b>Baujahr</b><span>1962</span></div>
+  <div class="f"><b>Grundstück gesamt</b><span>950 m²</span></div>
+  <div class="f"><b>Bodenrichtwert</b><span>90 €/m² <span style="font-size:11px;color:var(--leise)">amtlich</span></span></div>
+  <div class="f"><b>Liegenschaftszins</b><span>2,2 % <span style="font-size:11px;color:var(--leise)">amtlich</span></span></div>
+  <div class="f"><b>Miteigentumsanteil</b><span style="color:var(--rot)">nicht erfasst</span></div>
+  <div class="f"><b>Vergleichswert</b><span>195.000 €</span></div>
+</div>
+
+<h2>Die beiden Rechenwege</h2>
+<p class="sub">Links, was heute auf deiner Produktion passiert. Rechts, was auf Staging liegt
+   und auf dein Wort wartet.</p>
+
+<div class="paar">
+  <div class="w alt">
+    <h3>Bisher <span class="tag jetzt">live auf Prod</span></h3>
+    <div class="wo">allgemeines Ertragswertverfahren</div>
+    <table>
+      <tr><td>Rohertrag</td><td class="z">5.160 €</td></tr>
+      <tr><td>− Bewirtschaftungskosten<span class="detail">27 % · Angabe des Gutachterausschusses</span></td><td class="z">−1.393 €</td></tr>
+      <tr><td>= Reinertrag</td><td class="z">3.767 €</td></tr>
+      <tr class="hin"><td>− Bodenwertverzinsung<span class="detail">85.500 € × 2,2 % — das VOLLE Grundstück</span></td><td class="z">−1.881 €</td></tr>
+      <tr><td>= Gebäudereinertrag</td><td class="z">1.886 €</td></tr>
+      <tr><td>× Barwertfaktor<span class="detail">2,2 % / 16 Jahre</span></td><td class="z"></td></tr>
+      <tr><td>= Gebäudeertragswert</td><td class="z">25.216 €</td></tr>
+      <tr class="hin"><td>+ Bodenwert<span class="detail">wieder das VOLLE Grundstück</span></td><td class="z">85.500 €</td></tr>
+      <tr class="erg"><td>= Ertragswert</td><td class="z">110.716 €</td></tr>
+    </table>
+  </div>
+
+  <div class="w neu">
+    <h3>Neu <span class="tag staging">auf Staging</span></h3>
+    <div class="wo">vereinfachtes Ertragswertverfahren, ohne Bodenwerttrennung</div>
+    <table>
+      <tr><td>Rohertrag</td><td class="z">5.160 €</td></tr>
+      <tr><td>− Bewirtschaftungskosten<span class="detail">27 % · Angabe des Gutachterausschusses</span></td><td class="z">−1.393 €</td></tr>
+      <tr><td>= Reinertrag</td><td class="z">3.767 €</td></tr>
+      <tr><td style="color:var(--leise)">keine Bodenwertverzinsung<span class="detail">Bodenwert wird nicht angesetzt</span></td><td class="z" style="color:var(--leise)">—</td></tr>
+      <tr><td>× Barwertfaktor<span class="detail">2,2 % / 16 Jahre</span></td><td class="z"></td></tr>
+      <tr><td>= Gebäudeertragswert</td><td class="z">50.365 €</td></tr>
+      <tr><td style="color:var(--leise)">kein Bodenwert<span class="detail">mit Begründung im Bericht</span></td><td class="z" style="color:var(--leise)">—</td></tr>
+      <tr class="erg"><td>= Ertragswert</td><td class="z">50.365 €</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="merk">
+  <b>Wichtig, damit dich die Zahlen nicht in die Irre führen:</b> die Kaltmiete dieses Testobjekts
+  steht auf 1,00 €/m² — ein Unsinnswert, den die Plausibilitätsprüfung auch anmahnt. <b>Beide
+  Ertragswerte sind deshalb absolut wertlos.</b> Zu beurteilen ist allein das <b>Verfahren</b>,
+  nicht die Höhe.
+</div>
+
+<div class="merk" style="background:rgba(63,165,108,.09);border-color:rgba(63,165,108,.34)">
+  <b>Und so sähe es aus, wenn der Miteigentumsanteil erfasst wäre</b> — im Objekt stehen 50 %,
+  sie kamen nur nicht in den Bericht. Bodenwert 950 m² × 90 € × 50 % = <b>42.750 €</b>,
+  Verzinsung 941 €, Gebäudereinertrag 2.826 €, mal demselben Barwertfaktor ≈ 37.800 €,
+  plus 42.750 € ⇒ <b>rund 80.500 €</b>. <span style="color:var(--leise)">(Diese Zeile habe ich
+  selbst gerechnet, mit dem Faktor aus dem Bericht — sie ist keine Ausgabe des Systems.)</span>
+  <b>Das ist der eigentlich richtige Weg</b>, und er braucht nur eine Eingabe.
+</div>
+
+<h2>Deine drei Möglichkeiten</h2>
+
+<div class="opt">
+  <h4>A · So lassen wie bisher <span class="tag jetzt">Status quo</span></h4>
+  <p class="was">Der volle Grundstückswert wird verzinst und addiert, obwohl der Wohnung nur ein
+     Bruchteil davon gehört.</p>
+  <ul>
+    <li class="p">Nichts zu tun, keine Zahl ändert sich.</li>
+    <li class="c">Widerspricht der Regel, die in <code>CLAUDE.md</code> steht und die im Code seit
+        <code>v1026</code> ausführlich begründet ist.</li>
+    <li class="c">Der Bericht widerspricht sich selbst: an einer Stelle steht „Bodenwert bleibt
+        außen vor“, an der anderen wird er verzinst.</li>
+    <li class="c">Je kleiner der Miteigentumsanteil, desto größer der Fehler — bei 1/10 frisst die
+        Verzinsung fast den ganzen Reinertrag.</li>
+  </ul>
+</div>
+
+<div class="opt empf">
+  <h4>B · Kein Bodenwert, vereinfachtes Verfahren <span class="tag staging">liegt gebaut auf Staging</span></h4>
+  <p class="was">Ohne Miteigentumsanteil wird kein Bodenwert angesetzt. Der Bericht rechnet das
+     vereinfachte Ertragswertverfahren und sagt im Klartext, warum.</p>
+  <ul>
+    <li class="p">Setzt genau die Regel um, die du längst festgelegt hast.</li>
+    <li class="p">Der Bericht ist in sich stimmig und nennt den Grund samt Handlungsanweisung
+        („Miteigentumsanteil ergänzen, steht in der Teilungserklärung“).</li>
+    <li class="p">Erfindet nichts. Wo die Angabe fehlt, endet die Rechnung.</li>
+    <li class="c">Der Ertragswert fällt deutlich niedriger aus und weicht stärker vom
+        Vergleichswert ab — das ist ehrlich, sieht aber erklärungsbedürftig aus.</li>
+  </ul>
+</div>
+
+<div class="opt">
+  <h4>C · Ertragswert ganz weglassen <span class="tag neu">nicht gebaut</span></h4>
+  <p class="was">Bei einer Eigentumswohnung ohne Miteigentumsanteil erscheint das
+     Ertragswertverfahren gar nicht — wie es der Sachwert heute schon handhabt.</p>
+  <ul>
+    <li class="p">Folgt am strengsten deinem Grundsatz „kein Verfahren rechnet halb“.</li>
+    <li class="p">Genau das Muster, das die Sachwert-Karte bereits benutzt.</li>
+    <li class="c">Beim Wohnungseigentum wäre dann oft nur noch der Vergleichswert übrig.</li>
+    <li class="c">Muss ich noch bauen — etwa eine halbe Stunde.</li>
+  </ul>
+</div>
+
+<div class="tun">
+  <h3>Was du konkret tun musst</h3>
+  <ol>
+    <li>Diese Seite lesen — mehr braucht es nicht, du musst nichts in der App anklicken.</li>
+    <li>Mir <b>A</b>, <b>B</b> oder <b>C</b> schreiben. Ein Buchstabe genügt.</li>
+    <li>Bei <b>B</b> rolle ich es auf Produktion aus (Sicherung, <code>mb-backend</code>-Rebuild,
+        Abnahme) und melde mich mit dem Nachweis.</li>
+    <li>Bei <b>C</b> baue ich es erst und zeige es dir auf Staging.</li>
+    <li>Bei <b>A</b> nehme ich die Änderung zurück und vermerke im Backlog, dass es deine
+        bewusste Entscheidung war.</li>
+  </ol>
+</div>
+
+<p class="fuss">
+  <b>Unabhängig davon, was du wählst:</b> der saubere Weg für jede echte Bewertung bleibt, den
+  Miteigentumsanteil einzutragen. Seit <code>v1196</code> und <code>v1199</code> weist die
+  Oberfläche im Wizard aktiv darauf hin — das Feld ist markiert und der leere Reiter erklärt sich.
+  <br><br>
+  <b>Es gibt noch eine zweite, kleinere Frage</b> (Deal-Score: fehlende Teilwerte neutral ansetzen
+  oder ganz weglassen und die Gewichte hochnormieren). Die eilt nicht und steht im Backlog —
+  antworte darauf, wann es dir passt.
+</p>
+
+</div>
+</body>
+</html>
