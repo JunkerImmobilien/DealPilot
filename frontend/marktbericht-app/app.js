@@ -2508,6 +2508,33 @@ async function exportPdf(out) {
     doc.setDrawColor(225, 223, 217); doc.setLineWidth(0.3); doc.line(M + 9, y + 10.4, W - M, y + 10.4);
     y += 15; doc.setFont('helvetica', 'normal');
   }
+  /* v1208-lage · ZWISCHENUEBERSCHRIFT INNERHALB EINER SEKTION.
+   *
+   * Es gab bisher nur sectionTitle: Nummernschild, Doppellinie, eigener
+   * Eintrag im Inhaltsverzeichnis. Wer damit drei zusammengehoerende Bloecke
+   * ueberschreibt, erzeugt drei Kapitel — gemessen im Export vom 02.09.2026:
+   * "08 Lage- & Potenzialbewertung", "09 Makrolage & Sozioekonomie" und
+   * "10 Lage & Infrastruktur" begannen ALLE DREI auf Seite 7.
+   *
+   * blockTitle ist bewusst leiser: keine Nummer, kein TOC-Eintrag, nur
+   * Versalien in Gold und eine feine Linie. Drei davon untereinander liest
+   * man als Teile EINER Sache — genau das ist der Zweck.
+   *
+   * `reserve` ist die Mindesthoehe dessen, was FOLGT. Eine Zwischen-
+   * ueberschrift allein am Seitenfuss ist dieselbe Waise wie der
+   * Energiebalken (v1207) — nur dass hier der Titel das Anhaengsel ist und
+   * sein eigener Inhalt das Zugpferd. */
+  function blockTitle(t, reserve) {
+    need((reserve || 0) + 12);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+    doc.setTextColor(...GOLD); doc.setCharSpace(0.9);
+    doc.text(String(t).toUpperCase(), M, y + 3.5);
+    doc.setCharSpace(0);
+    doc.setDrawColor(230, 226, 216); doc.setLineWidth(0.3);
+    doc.line(M, y + 6, W - M, y + 6);
+    y += 11;
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(...TXT);
+  }
   function kv(label, val, x, w, accent) {
     /* v952-kvaccent
      * ──────────────────────────────────────────────────────────────────────
@@ -4109,11 +4136,34 @@ async function exportPdf(out) {
     y += 5 + _hr.length * 3;
   }
 
+  /* v1208-lage · VIER BLOECKE, EINE SEKTION.
+   * ──────────────────────────────────────────────────────────────────────
+   * Bis hierher trugen Potenzialbewertung, Makrolage, Marktentwicklung und
+   * Infrastruktur je einen eigenen sectionTitle. Gemessen im Export vom
+   * 02.09.2026: "08", "09" und "10" begannen ALLE DREI auf Seite 7 — drei
+   * Nummernschilder, drei Doppellinien, drei Ueberschriften fuer eine
+   * einzige Frage. Marcel hat dazu Stufe 1 aus
+   * design/Vorschlaege/marktbericht-struktur.html gewaehlt.
+   *
+   * Die vier Bloecke sind EINZELN bedingt: jeder kann fehlen. Der
+   * Sektionstitel gehoert deshalb an den ERSTEN, der wirklich zeichnet —
+   * nicht fest an den obersten. Sonst stuende bei fehlender
+   * Potenzialbewertung eine Zwischenueberschrift ohne Sektion darueber, und
+   * das Inhaltsverzeichnis wuesste von einem Kapitel, das nie beginnt.
+   *
+   * Der Titel heisst "Lage & Marktumfeld", nicht nur "Lage": die
+   * Marktentwicklung gehoert dazu und ist keine Lage. */
+  let _lageOffen = true;
+  const lageSektion = () => {
+    if (_lageOffen) { _lageOffen = false; sectionTitle('Lage & Marktumfeld', 60); }
+  };
+
   // ---------- Lage-/Potenzialbewertung ----------
   const _z = d.zensus;
   const _arProbe = d.assessment ? Object.values(d.assessment).filter((v) => v != null && v !== '').length : 0;
   if ((_arProbe >= 2) || (_z && _z.available)) {
-    sectionTitle('Lage- & Potenzialbewertung');
+    lageSektion();
+    blockTitle("Bewertung & Potenzial", 30);
     const A = d.assessment || {}; const ar = [
       ['Mikrolage', A.mikrolage], ['Makrolage', A.makrolage], ['Bevölkerungsentwicklung', A.bevoelkerung],
       ['Nachfrage', A.nachfrage], ['Entwicklungsmöglichkeiten', A.entwicklung], ['Wertsteigerungspotenzial', A.wertsteigerung],
@@ -4157,7 +4207,8 @@ async function exportPdf(out) {
   const mac = d.macro || {};
   const mbd = mac.breakdown || {};
   if (Object.keys(mbd).length) {
-    sectionTitle('Makrolage & Sozioökonomie', 72);
+    lageSektion();
+    blockTitle("Makrolage & Sozioökonomie", 60);
     const labelMap = { bevoelkerung: 'Bevölkerung', kaufkraft: 'Kaufkraft', arbeitslosigkeit: 'Arbeitsmarkt',
       wanderung: 'Wanderung', miet_trend: 'Miettrend', kaufpreis_trend: 'Kaufpreistrend' };
     const order = ['bevoelkerung', 'kaufkraft', 'arbeitslosigkeit', 'wanderung', 'miet_trend', 'kaufpreis_trend'];
@@ -4198,7 +4249,8 @@ async function exportPdf(out) {
     if (typeof histChart !== 'undefined' && histChart) {
       const cimg = histChart.toBase64Image('image/png', 1);
       if (cimg && cimg.length > 200) {
-        sectionTitle('Marktentwicklung');
+        lageSektion();
+        blockTitle("Marktentwicklung", 70);
         need(70);
         obsidianCard(M, y, W - 2 * M, 64);
         doc.addImage(cimg, 'PNG', M + 6, y + 4, W - 2 * M - 10, 56);
@@ -4218,7 +4270,8 @@ async function exportPdf(out) {
   // ---------- Lage & Infrastruktur ----------
   const mg = d.micro && d.micro.groups;
   if (mg && Object.keys(mg).length) {
-    sectionTitle('Lage & Infrastruktur', 44);
+    lageSektion();
+    blockTitle("Infrastruktur & Nahversorgung", 40);
     const ord = ['einkaufen', 'verkehr', 'gesundheit', 'freizeit', 'bildung', 'gastronomie'];
     const list = ord.filter((k) => mg[k]).map((k) => mg[k]);
     // Ring-Leiste: ein Ring je Kategorie (DealPilot-Look) mit echtem Score + Anzahl/Distanz
