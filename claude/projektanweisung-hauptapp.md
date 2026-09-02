@@ -4792,6 +4792,75 @@ Gegengeprüft nach der Verschiebung: Klammerbilanz der Datei **0**,
 Klammerbilanz des verschobenen Blocks **0**, `wert()` wieder vier Zeilen
 lang wie zuvor.
 
+### v1201 (02.09.2026, `a47f3d2`) — der Miteigentumsanteil ist Pflicht
+
+**Marcels Entscheidung, wörtlich:** *„der Miteigentumsanteil muss
+ausgefüllt werden als Pflichtwert, sonst kann man es nicht ausführen."*
+
+**Ich hatte davon abgeraten und die Gründe genannt; er hat es bestätigt.**
+Damit ist es entschieden und gebaut. Drei Teile, die zusammengehören:
+
+**1 · Das Feld steht jetzt ganz vorn.** `mea` wandert von `FELDER.stufe3`
+nach `FELDER.stufe1`. Es wurde bis hierher erst gebaut, wenn jemand die
+Wertermittlung ansteuerte (`if (s >= 3)`) — **bei Stufe 1 und 2 war es
+nicht einmal sichtbar.** Eine Pflicht, die man nicht erfüllen kann, ist
+keine Pflicht, sondern eine Sackgasse. `wenn: istWohnung()` bleibt: bei
+Häusern gibt es das Feld weiterhin nicht.
+
+**2 · Die Ampel verlangt ihn ab Stufe 1.** Neu ist `bedarf1()`, gebaut wie
+`bedarf3()`. Fest in `BEDARF[1]` wäre falsch — bei einem Haus gibt es
+keinen, und eine Ampel, die Unmögliches fordert, ist schlimmer als keine
+(`v1126d`). `mea` ist dafür aus `bedarf3()` **raus**.
+
+> Dabei fiel auf, dass `(n === 3) ? bedarf3() : BEDARF[n]` **dreimal
+> wortgleich** im Haus stand — in `fehlend()`, `offenGeteilt()` und
+> `feldMarken()`. Mit `bedarf1()` wären daraus drei Stellen geworden, die
+> man einzeln hätte nachziehen müssen. Jetzt gibt es `bedarfFuer(n)`.
+
+**3 · Die harte Sperre.** `generate()` hatte **gar keine**
+Vollständigkeitsprüfung — der Knopf lief einfach los. Jetzt bricht er bei
+einer ETW ohne Miteigentumsanteil ab, springt ins Feld und erklärt warum.
+**Kein `alert()`** — ein natives Fenster blockiert den ganzen Renderer;
+die Meldung geht in `errBox`, dieselbe Fläche wie das `v1187`-Kaufangebot.
+Geprüft wird gegen `payload()`, **nicht** gegen das DOM: seit `v1200`
+kommt der Wert auch aus dem Objekt, wenn das Feld nicht gezeichnet ist.
+
+#### Nachgemessen
+
+| Prüfung | Ergebnis |
+|---|---|
+| `mea` geleert → Stufe | **0** |
+| Knopf | „Marktbericht erstellen" **ohne Preis** |
+| Feld markiert (`v1199`) | ja |
+| Klick auf den Knopf | **kein Bestätigungsdialog** — die Sperre greift davor |
+| Meldung | „⚠ Miteigentumsanteil fehlt …" in `errBox` |
+| Natives Fenster | keins, die Seite bleibt bedienbar |
+
+#### ⚠ Die Nebenwirkung, die Geld kostet — und die Marcel wissen muss
+
+**Bei einer vollständig gepflegten ETW springt die Stufe jetzt von allein
+auf 3**, und der Knopf fordert die teuerste Tiefe:
+
+| Objekt | vorher | jetzt |
+|---|---|---|
+| 2026-1004 · 2026-1005 · 2026-004 | 1 Erweiterte Marktpreisindikation | **1 Wertermittlung nach ImmoWertV** |
+
+Im Einzelkauf sind das **1,90 € gegen 3,90 €**; aus dem Kontingent ein
+WEV statt eines MPI+.
+
+**Es ist kein neu eingebauter Fehler, sondern eine Folge der
+Entscheidung.** Gegengeprüft am ZFH „Löhner Str. 278": dort steht
+`erreicht: 3` **ebenfalls**, und dort gab es nie ein `mea`-Feld. **Bei
+Häusern war der Selbstsprung also längst so.** Bei Eigentumswohnungen war
+er nur zufällig gedeckelt — weil das Pflichtfeld unsichtbar war und
+`fehlend(3)` deshalb nie leer wurde.
+
+> **Die Regel „die Stufe ergibt sich aus den Angaben" (Marcels eigene aus
+> `v1193`) tut also genau, was sie soll.** Wer das nicht will, muss die
+> Tiefe wieder an einen ausdrücklichen Klick binden — dafür gibt es
+> `_angestrebt` bereits. Das wäre aber eine Änderung **für alle
+> Objektarten**, nicht nur für ETW, und gehört ausdrücklich entschieden.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und

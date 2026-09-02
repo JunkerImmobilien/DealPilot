@@ -36,9 +36,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1200b)
+## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1201)
 
-**Stand:** lokal = GitHub = Staging auf `1fb1dae`.
+**Stand:** lokal = GitHub = Staging auf `a47f3d2`.
 **Produktion steht auf `bca7c06`** — das ist `v1191`–`v1197` plus das
 reparierte Deploy-Skript, ausgerollt am 01.09. in vier Schritten auf
 Marcels Freigabe, `mb-backend` dort gerebuildet.
@@ -177,6 +177,16 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 `CLAUDE.md` verlangt.
 
 ### Was sonst offen liegt und nicht vergessen werden darf
+
+- **⚠ ENTSCHEIDUNG OFFEN: springt die Stufe von allein auf 3?** Seit
+  `v1201` fordert der Knopf bei einer vollständig gepflegten ETW
+  „1 Wertermittlung nach ImmoWertV" statt „1 Erweiterte
+  Marktpreisindikation" — Einzelkauf 3,90 € statt 1,90 €. **Das ist keine
+  Panne, sondern die Regel „die Stufe ergibt sich aus den Angaben"
+  (`v1193`), die bei Häusern längst so wirkt** und bei ETW nur zufällig
+  gedeckelt war. Wer es anders will, muss die Tiefe an einen
+  ausdrücklichen Klick binden (`_angestrebt` gibt es dafür) —
+  **für alle Objektarten.**
 
 - **`v1198`/`b`/`c` liegen auf Staging und warten auf Marcels Gegenlesen** —
   sie ändern den Ertragswert jeder ETW ohne Miteigentumsanteil. Siehe Kasten
@@ -2279,6 +2289,40 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Der Miteigentumsanteil ist Pflicht — `v1201`, 02.09.2026 (`a47f3d2`)
+
+**Marcels Entscheidung:** *„der Miteigentumsanteil muss ausgefüllt werden
+als Pflichtwert, sonst kann man es nicht ausführen."* Ich hatte davon
+abgeraten, er hat es bestätigt — gebaut.
+
+Drei Teile: **das Feld steht jetzt im ersten Block** (es lag in
+`FELDER.stufe3` und war bei Stufe 1/2 nicht einmal sichtbar — eine Pflicht,
+die man nicht erfüllen kann, ist eine Sackgasse) · **die Ampel verlangt ihn
+ab Stufe 1** über das neue `bedarf1()`, nur bei ETW · **und `generate()`
+bricht ab**, springt ins Feld und erklärt warum. Kein `alert()`, sondern
+`errBox` — ein natives Fenster blockiert den Renderer.
+
+Dabei fiel auf, dass `(n === 3) ? bedarf3() : BEDARF[n]` **dreimal
+wortgleich** im Haus stand. Jetzt gibt es `bedarfFuer(n)`, eine Stelle.
+
+**Nachgemessen:** `mea` geleert → Stufe 0, Knopf ohne Preis, Feld
+markiert, Klick zeigt **keinen** Bestätigungsdialog, die Meldung steht in
+der Fehlerfläche, kein natives Fenster.
+
+> **⚠ NEBENWIRKUNG, DIE GELD KOSTET.** Bei einer vollständig gepflegten
+> ETW springt die Stufe jetzt von allein auf 3 — der Knopf fordert
+> „1 Wertermittlung nach ImmoWertV" statt „1 Erweiterte
+> Marktpreisindikation" (Einzelkauf 3,90 € statt 1,90 €).
+>
+> **Kein neuer Fehler, sondern eine Folge der Entscheidung:** am ZFH
+> „Löhner Str. 278" steht `erreicht: 3` ebenfalls, und dort gab es nie ein
+> `mea`-Feld. **Bei Häusern war der Selbstsprung längst so**; bei ETW war
+> er nur zufällig gedeckelt, weil das Pflichtfeld unsichtbar war.
+>
+> Wer das nicht will, muss die Tiefe wieder an einen ausdrücklichen Klick
+> binden (`_angestrebt` gibt es dafür) — **für alle Objektarten**, nicht
+> nur für ETW. Steht als offener Punkt.
 
 ### Der Miteigentumsanteil war da und wurde nicht mitgeschickt — `v1200`/`b`, 02.09.2026
 
