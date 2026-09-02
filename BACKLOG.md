@@ -36,16 +36,25 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 01.09.2026, nach v1197)
+## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1198c)
 
-**Stand:** lokal = GitHub = Staging auf `c9efc07`.
-**Produktion steht auf `195e7e9`** (`v1191`–`v1196b` plus das reparierte
-Deploy-Skript, ausgerollt am 01.09. in drei Schritten auf Marcels
-Freigabe).
-**`v1197` ist NICHT auf Prod** — und es ist als einziges der Sitzung
-**keine reine Frontend-Änderung**: die Score-Rechnung liegt im
-`mb-backend`, also braucht Prod dort einen **Rebuild**, nicht nur
-`git pull`.
+**Stand:** lokal = GitHub = Staging auf `9894d90`.
+**Produktion steht auf `bca7c06`** — das ist `v1191`–`v1197` plus das
+reparierte Deploy-Skript, ausgerollt am 01.09. in vier Schritten auf
+Marcels Freigabe, `mb-backend` dort gerebuildet.
+
+> ### `v1198` / `v1198b` / `v1198c` sind NICHT auf Prod — und das ist eine Entscheidung, keine Nachlässigkeit
+>
+> `v1198` **ändert den Ertragswert jeder Eigentumswohnung ohne erfassten
+> Miteigentumsanteil** (im Testfall 110.716 € → 50.365 €). Die Regel
+> dahinter ist nicht neu — sie steht in `CLAUDE.md` („ETW ohne
+> Miteigentumsanteil: kein Bodenwert") und ausführlich begründet in
+> `v1026`. Neu ist nur, dass der Ertragswert sie jetzt **befolgt**.
+>
+> **Marcel ist DESAG-zertifizierter Sachverständiger. Diese Zahl gehört
+> ihm, nicht dem Code.** Deshalb liegt das Paket auf Staging und wartet
+> auf sein Gegenlesen. Es braucht auf Prod einen `mb-backend`-Rebuild,
+> nicht nur `git pull`.
 
 > ### Der Gelddefekt ist behoben und live
 >
@@ -159,8 +168,17 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 ### Was sonst offen liegt und nicht vergessen werden darf
 
-- **`v1197` ist nicht auf Prod** — und braucht dort einen `mb-backend`-Rebuild,
-  nicht nur `git pull`. Alles davor (`v1191`–`v1196b`) ist live.
+- **`v1198`/`b`/`c` liegen auf Staging und warten auf Marcels Gegenlesen** —
+  sie ändern den Ertragswert jeder ETW ohne Miteigentumsanteil. Siehe Kasten
+  oben. Alles bis `v1197` ist live.
+- **Die Score-Konvention für fehlende Teilwerte gehört entschieden**
+  (`v1197`): neutral ersetzen — so gebaut — oder den Teilwert weglassen und
+  die übrigen Gewichte hochnormieren. Beides fachlich vertretbar, fällt
+  anders aus.
+- **Die Markierung fehlender Angaben am Feld ist als Demo fertig**, nicht
+  gebaut: `design/Vorschläge/marktbericht-fehlende-felder.html`, drei
+  Varianten mit Empfehlung (B: goldener Merkstreifen plus „fehlt für
+  <Stufenname>", nur für die nächste Stufe).
 - **Der `402`-Pfad ist nicht end-to-end bewiesen** (siehe oben, DB-Eingriff
   blockiert).
 - **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.**
@@ -2252,6 +2270,53 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Der Ertragswert verzinste das volle Grundstück einer ETW — `v1198`/`b`/`c`, 02.09.2026
+
+**Der schwerste Befund dieser Sitzung, und er stand im Ergebnis-Teil, den
+noch nie jemand angesehen hatte.** Bei einer Eigentumswohnung ohne
+erfassten Miteigentumsanteil rechnete der Ertragswert mit dem **vollen**
+Grundstück — verzinste es und addierte es:
+
+```
+= Reinertrag                                3.767 €
+− Bodenwertverzinsung (85.500 € × 2,2 %)   −1.881 €   ← halber Reinertrag
++ Bodenwert                                85.500 €   ← volles Grundstück
+= vorläufiger Ertragswert                 110.716 €
+```
+
+**Derselbe Bericht führte daneben `bodenwert.wert = null`** mit dem
+Hinweis, der Bodenwert bleibe „hier außen vor". Zwei Rechnungen derselben
+Größe, und der Ertragswert nahm die ungeschützte.
+
+**Ursache, eine Zeile** (`CrossCheckService.js:447`): der Rückfall las
+`vollstaendig: false` als „liegt nicht vor" statt als „die Regel hat
+entschieden" — und setzte `plot × brw` ein, genau den Wert, den der
+`v1026`-Schutz verworfen hatte. Und meldete ihn als vollständig.
+
+> **Ein stiller Rückfall sieht aus wie ein bestandener Lauf.** Der Schutz
+> war da, lief, entschied richtig — und eine Ebene weiter wurde seine
+> Entscheidung als Datenlücke missverstanden.
+
+**Gegengeprüft, dasselbe Objekt, eine Zeile Unterschied:** Ertragswert
+110.716 € → **50.365 €**, Verfahren „allgemeines" → „vereinfachtes (ohne
+Bodenwerttrennung)", Bodenwertverzinsung und „+ Bodenwert" entfallen.
+
+**`v1198b`:** danach stand „–" ohne Grund, während der Rechenweg weiter
+„950 m² × 90 €/m² = 85.500 €" zeigte. Der fertige Erklärsatz lag im
+Backend und wurde nie angezeigt. Jetzt steht er da — dieselbe Regel wie
+`v1197`: **keine Zahl und kein Strich ohne Herkunft.**
+
+**`v1198c`:** dabei fiel auf, dass genau dieser Satz in `ae/oe/ue` stand
+(„ueber", „waere", „Grundstueckswert", „aussen", „ergaenzen"). **Es fiel
+nie auf, weil ihn niemand zu sehen bekam.** Gegengeprüft über alle
+`hinweise`/`warnungen`/`notes` im Marktbericht-Backend: keine weitere
+Stelle.
+
+**MARCEL MUSS DAS ALS SACHVERSTÄNDIGER GEGENLESEN** — es ändert den
+Ertragswert jeder ETW ohne erfassten Miteigentumsanteil. Die Regel ist
+nicht neu (`CLAUDE.md`, `v1026`); neu ist, dass der Ertragswert sie
+befolgt. Der saubere Ausweg bleibt: **den Miteigentumsanteil eintragen.**
 
 ### Der Ergebnis-Teil, erstmals angesehen — `v1197`, 01.09.2026 (`c9efc07`)
 

@@ -4514,6 +4514,128 @@ wirkt auch rückwirkend, weil sie beim Anzeigen greift.
 **Backend-Änderung** — `mb-backend` gerebuildet, Container läuft die neue
 Fassung, keine Fehler im Log.
 
+### v1198 / v1198b / v1198c (02.09.2026, `78039c1` · `78a48d3` · `9894d90`) — der Ertragswert verzinste das volle Grundstück einer Eigentumswohnung
+
+**Beim Durchgehen des Ergebnis-Teils gefunden.** Es ist der Fehler, den
+`v1026` abgestellt hat — auf einem zweiten Weg wieder hereingekommen.
+
+#### Was gemessen wurde
+
+Bericht 78, ETW 100 m², Miteigentumsanteil fehlte, Grundstück 950 m² zu
+90 €/m²:
+
+```
+= Reinertrag                                3.767 €
+− Bodenwertverzinsung (85.500 € × 2,2 %)   −1.881 €   ← halber Reinertrag
+= Gebäudereinertrag                         1.886 €
+= Gebäudeertragswert                       25.216 €
++ Bodenwert                                85.500 €   ← volles Grundstück
+= vorläufiger Ertragswert                 110.716 €
+```
+
+**Derselbe Bericht führte daneben** `cross_check.bodenwert.wert = null`,
+`vollstaendig = false`, mit dem Hinweis, der Bodenwert bleibe „hier außen
+vor". **Zwei Rechnungen derselben Größe in einem Bericht — und der
+Ertragswert nahm die ungeschützte.**
+
+#### Die Ursache ist eine Zeile
+
+`CrossCheckService.js:447`:
+
+```js
+const bwErgebnis = (p.bodenwert && p.bodenwert.vollstaendig)
+  ? p.bodenwert
+  : { vollstaendig: bodenwert != null, wert: bodenwert, … };
+```
+
+**`vollstaendig: false` ist bei einer ETW ohne MEA eine ENTSCHEIDUNG des
+`v1026`-Schutzes, kein Fehlen.** Der Rückfall las sie als „liegt nicht
+vor" und setzte `plot * brw` ein — genau den Wert, den der Schutz
+verworfen hatte — **und meldete ihn als `vollstaendig: true`.**
+
+> **Ein stiller Rückfall sieht aus wie ein bestandener Lauf.** Der Schutz
+> war da, er wurde ausgeführt, er hat richtig entschieden — und eine Ebene
+> weiter wurde seine Entscheidung als Datenlücke missverstanden und
+> überschrieben.
+
+Dazu ein zweiter Weg derselben Zahl: `CrossCheckService.js:75` rechnet
+`plot * brw` **ohne jeden Schutz**, obwohl `istWohnung` sechs Zeilen
+darüber schon bereitsteht und nicht benutzt wird.
+
+#### Was jetzt gilt
+
+Liegt `p.bodenwert` vor, gilt es — **auch und gerade dann, wenn es
+„nichts" sagt.** Der Rückfall greift nur noch, wenn gar kein geprüftes
+Ergebnis existiert. `ErtragswertService` fängt das sauber ab (`hatBw`
+wird false) und rechnet das **vereinfachte Ertragswertverfahren ohne
+Bodenwerttrennung** samt Warnung — der Weg, den `FIX-OHNEBW` dort
+ausdrücklich vorsieht.
+
+**Abgrenzung, geprüft:** `vollstaendig: false` entsteht nur bei fehlender
+Fläche/BRW — dort ist auch der Rückfall `null`, also keine Änderung — oder
+beim ETW-Schutz. **Die Änderung trifft genau diesen einen Fall.**
+
+#### Gegengeprüft am echten Bericht — dasselbe Objekt, eine Zeile Unterschied
+
+| | vorher (id 78) | nachher (id 79) |
+|---|---|---|
+| Verfahren | allgemeines Ertragswertverfahren | **vereinfachtes (ohne Bodenwerttrennung)** |
+| `bodenwert_eur` | 85.500 € | **null** |
+| `bodenwert_fehlt` | false | **true** |
+| Bodenwertverzinsung | −1.881 € auf 85.500 € | **entfällt** |
+| „+ Bodenwert" | +85.500 € | **entfällt** |
+| Ertragswert | 110.716 € | **50.365 €** |
+
+Im Server-Log: `wertparameter: LZS 2,2 % (Stufe A), kein Bodenwert` ·
+`quercheck: Vergleich 195000 / Sachwert – / Ertrag 50500`.
+
+> **Die absoluten Zahlen dieses Testobjekts sind nicht aussagekräftig** —
+> seine Kaltmiete steht auf 1 €/m², was die Plausibilitätsprüfung auch
+> anmahnt. Was zählt, ist der Mechanismus.
+
+#### `v1198b` — ein Strich ohne Grund sieht aus wie ein Anzeigefehler
+
+Nach `v1198` stand korrekt „–", aber darunter lief der Rechenweg weiter:
+*„Grundstücksfläche × Bodenrichtwert · 950 m² × 90 €/m² · 85.500 € ·
+= Bodenwert –"*. Die verbotene Zahl stand als Zwischenschritt trotzdem da,
+und kein Wort erklärte den Strich. **`ErtragswertService` legt den fertigen
+Satz längst in `hinweise` ab — er wurde nur nie gezeigt.** Jetzt steht er
+unter der Zahl, wenn `vollstaendig === false`. Dieselbe Regel wie `v1197`:
+**keine Zahl — und kein Strich — ohne Herkunft.**
+
+#### `v1198c` — und dabei fiel auf, dass der Satz in ae/oe/ue stand
+
+*„wird der Bodenwert **ueber** den Miteigentumsanteil ermittelt. Ohne ihn
+**waere** der volle **Grundstueckswert** anzusetzen … bleibt er hier
+**aussen** vor … **ergaenzen** … **Teilungserklaerung**"*
+
+`CLAUDE.md`: *„ae/oe/ue gehört in Kommentare, NIE in Nutztext."*
+
+> **Es fiel nie auf, weil ihn niemand zu sehen bekam** — die Oberfläche
+> zeigte ihn erst ab `v1198b` an. **Ein Text, den man erst sieht, wenn man
+> ihn anzeigt, wird auch erst dann gelesen.** Der Rest der Datei benutzt
+> durchgehend echte Umlaute (55 Zeilen); gegengeprüft über alle
+> `hinweise`/`warnungen`/`notes` im Marktbericht-Backend: **keine weitere
+> Stelle.**
+
+#### Positiv aufgefallen und nicht angetastet
+
+Die Sachwert-Karte macht es längst vorbildlich: *„**–** · Sachwert nicht
+ausgewiesen: für eine Eigentumswohnung wird die Bruttogrundfläche der
+Wohnung benötigt. Die Näherung aus der Wohnfläche ist im Mehrfamilienhaus
+zu ungenau (Treppenhaus, Keller, Gemeinschaftsflächen). Beim
+Wohnungseigentum führt ohnehin das Vergleichswertverfahren."* **Genau das
+Muster, das `v1198b` für den Bodenwert nachzieht.**
+
+#### Was Marcel als Sachverständiger gegenlesen muss
+
+`v1198` **ändert den Ertragswert jeder Eigentumswohnung ohne erfassten
+Miteigentumsanteil.** Die Regel selbst ist nicht neu — sie steht in
+`CLAUDE.md` und ausführlich begründet in `v1026`. **Neu ist nur, dass der
+Ertragswert sie jetzt auch befolgt.** Der saubere Ausweg für eine echte
+Bewertung bleibt: **den Miteigentumsanteil eintragen** — wozu die
+Oberfläche seit `v1196` aktiv einlädt.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
