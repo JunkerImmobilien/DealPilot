@@ -4636,6 +4636,57 @@ Ertragswert sie jetzt auch befolgt.** Der saubere Ausweg für eine echte
 Bewertung bleibt: **den Miteigentumsanteil eintragen** — wozu die
 Oberfläche seit `v1196` aktiv einlädt.
 
+### v1199 (02.09.2026, `4964e64`) — die fehlenden Angaben stehen jetzt am Feld
+
+**Marcels Wahl aus der Demo:** „b ist super" —
+`design/Vorschläge/marktbericht-fehlende-felder.html`, Variante B.
+
+**Das Problem, gemessen am 01.09.:** die Pflichtangaben der Stufen 1–3
+standen nur in der Ampel, **ganz oben, außerhalb des Reiters.** Wer in
+Reiter 2 „Objekt" arbeitete, sah neun gleich aussehende Felder und konnte
+nicht erkennen, welche vier die Stufe überhaupt erst freischalten. Von
+`address`/`ptype`/`area`/`year` (Stufe 1), `cond`/`quality` (Stufe 2) und
+`plot`/`units` (Stufe 3) trug **keines** einen Marker — nur `baustatus`,
+weil es zufällig über `wertermittlung.js` gerendert wird.
+
+**Warum Gold und nicht Rot:** ein leeres Feld ist kein Fehler, und Rot ist
+in dieser Leiste schon für „fehlt" vergeben (`.mbst-fehlt`). **Zweimal
+dieselbe Farbe für zwei Dringlichkeiten macht beide stumpf.** Die tote
+CSS-Regel `.wm-f.fehlt` (rote Kontur, Klasse wird nirgends gesetzt) bleibt
+deshalb bewusst liegen — sie war der Entwurf, der nicht gewonnen hat.
+
+#### Zwei Entscheidungen, im Code festgehalten
+
+**1 · Nur die nächste Stufe.** Wer auf Stufe 1 steht, bekommt die Felder
+für Stufe 2 markiert — nicht zusätzlich die für Stufe 3. Sonst steht die
+Maske voll und die Markierung sagt wieder nichts.
+
+**2 · Keine zweite Liste.** Feld-IDs und Klarnamen kommen aus `BEDARF` /
+`bedarf3()`, der Stufenname aus `NAMEN` — dieselben Quellen, aus denen
+Ampel und Knopf ihre Wörter nehmen. **Im Marktbericht sind schon sechs
+Fehler daraus entstanden, dass dieselbe Sache zweimal im Haus stand.**
+
+#### Gemessen statt geraten
+
+| | Befund |
+|---|---|
+| Behälter je Reiter | Wertermittlung baut `.wm-f`; Reiter 2–5 ein nacktes `<div>` mit Label und Feld; **`#address` hängt direkt im Reiter, ohne Hülle** → eigener Solo-Fall |
+| Feldrahmen | kommt aus `input,select`, Spezifität **(0,0,1)** → `.mbst-fehltfeld input` ist **(0,1,1)** und gewinnt **ohne `!important`** |
+| Nachgemessen im Browser | Streifen `rgb(201,168,76)`, Feldrahmen `rgb(201,168,76)`, Zeile `rgb(184,147,47)` in JetBrains Mono |
+
+#### Der ganze Ablauf, am Objekt „Hölderlinstr. 1" durchgespielt
+
+| Schritt | Ergebnis |
+|---|---|
+| Objekt geladen, erreichte Stufe **1** | markiert: `cond`, `quality` in Reiter 3 — *„fehlt für Erweiterte Marktpreisindikation"* |
+| `cond` ausgefüllt | dessen Marke räumt sich ab, `quality` bleibt |
+| `quality` ausgefüllt → Stufe **2** | Marken **wandern** auf `plot`, `units` in Reiter 5 — *„fehlt für Wertermittlung nach ImmoWertV"* |
+| `mea` (Stufe 3, noch nicht im DOM) | **nicht** markiert — dort greift der Hinweis aus `v1196` |
+
+> **`v1196` und `v1199` greifen ineinander:** Felder, die es gibt, werden
+> am Feld markiert; Felder, die es noch nicht gibt, erklärt ihr leerer
+> Reiter. Zusammen bleibt keine Lücke, in der der Nutzer raten muss.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und

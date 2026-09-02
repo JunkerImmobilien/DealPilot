@@ -36,14 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1198c)
+## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1199)
 
-**Stand:** lokal = GitHub = Staging auf `9894d90`.
+**Stand:** lokal = GitHub = Staging auf `4964e64`.
 **Produktion steht auf `bca7c06`** — das ist `v1191`–`v1197` plus das
 reparierte Deploy-Skript, ausgerollt am 01.09. in vier Schritten auf
 Marcels Freigabe, `mb-backend` dort gerebuildet.
 
-> ### `v1198` / `v1198b` / `v1198c` sind NICHT auf Prod — und das ist eine Entscheidung, keine Nachlässigkeit
+> ### `v1198`–`v1199` sind NICHT auf Prod — und bei `v1198` ist das eine Entscheidung, keine Nachlässigkeit
 >
 > `v1198` **ändert den Ertragswert jeder Eigentumswohnung ohne erfassten
 > Miteigentumsanteil** (im Testfall 110.716 € → 50.365 €). Die Regel
@@ -175,10 +175,9 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
   (`v1197`): neutral ersetzen — so gebaut — oder den Teilwert weglassen und
   die übrigen Gewichte hochnormieren. Beides fachlich vertretbar, fällt
   anders aus.
-- **Die Markierung fehlender Angaben am Feld ist als Demo fertig**, nicht
-  gebaut: `design/Vorschläge/marktbericht-fehlende-felder.html`, drei
-  Varianten mit Empfehlung (B: goldener Merkstreifen plus „fehlt für
-  <Stufenname>", nur für die nächste Stufe).
+- **Die Markierung fehlender Angaben am Feld ist gebaut** (`v1199`,
+  Variante B auf Marcels „b ist super") — siehe Fertig. Die Demo mit allen
+  drei Varianten bleibt unter `design/Vorschläge/marktbericht-fehlende-felder.html`.
 - **Der `402`-Pfad ist nicht end-to-end bewiesen** (siehe oben, DB-Eingriff
   blockiert).
 - **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.**
@@ -2270,6 +2269,38 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Fehlende Angaben stehen jetzt am Feld — `v1199`, 02.09.2026 (`4964e64`)
+
+**Marcels Wahl aus der Demo: „b ist super".** Goldener Merkstreifen plus
+eine Zeile „fehlt für <Stufenname>", **nur für die nächste Stufe**.
+
+Vorher standen die Pflichtangaben der Stufen 1–3 nur in der Ampel — ganz
+oben, außerhalb des Reiters. Von `address`/`ptype`/`area`/`year`,
+`cond`/`quality` und `plot`/`units` trug **keines** einen Marker.
+
+**Warum Gold und nicht Rot:** ein leeres Feld ist kein Fehler, und Rot ist
+in der Ampel schon für „fehlt" vergeben. Zweimal dieselbe Farbe für zwei
+Dringlichkeiten macht beide stumpf. Die tote CSS-Regel `.wm-f.fehlt`
+(rote Kontur, nie verdrahtet) bleibt bewusst liegen — sie war der Entwurf,
+der nicht gewonnen hat.
+
+**Keine zweite Liste:** Feld-IDs und Klarnamen aus `BEDARF`/`bedarf3()`,
+der Stufenname aus `NAMEN` — dieselben Quellen wie Ampel und Knopf.
+
+**Am Objekt „Hölderlinstr. 1" durchgespielt:** Stufe 1 → `cond`+`quality`
+markiert · `cond` ausgefüllt → dessen Marke weg · `quality` ausgefüllt →
+Stufe 2, Marken **wandern** auf `plot`+`units` · `mea` (noch nicht im DOM)
+bleibt unmarkiert, dort greift der `v1196`-Hinweis.
+
+> **`v1196` und `v1199` greifen ineinander:** Felder, die es gibt, werden
+> am Feld markiert; Felder, die es noch nicht gibt, erklärt ihr leerer
+> Reiter. Zusammen bleibt keine Lücke, in der der Nutzer raten muss.
+
+**Gemessen, nicht geraten:** der Feldrahmen kommt aus `input,select` mit
+Spezifität (0,0,1) — die Klassenregel (0,1,1) gewinnt ohne `!important`.
+Und der Behälter ist je Reiter ein anderer; `#address` hängt sogar ganz
+ohne Hülle im Reiter, dafür gibt es einen eigenen Zweig.
 
 ### Der Ertragswert verzinste das volle Grundstück einer ETW — `v1198`/`b`/`c`, 02.09.2026
 
