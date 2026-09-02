@@ -3365,7 +3365,7 @@ async function exportPdf(out) {
   aussagekraft();
 
   // -- €/m²-Spannen (Kauf + Miete) nebeneinander --
-  need(24 + _HR);
+  need(24);
   const halfW = (blockW - 6) / 2;
   doc.setFontSize(8); doc.setTextColor(...MUT);
   doc.text('KAUFPREIS €/m²', M, y + 4);
