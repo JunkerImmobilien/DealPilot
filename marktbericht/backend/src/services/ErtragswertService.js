@@ -164,10 +164,14 @@ export const ErtragswertService = {
       out.wert = null;
       out.vollstaendig = false;
       out.bodenwert_gesamt = round0(wert);
-      out.hinweise.push('Bei einer Eigentumswohnung wird der Bodenwert ueber den Miteigentumsanteil '
-        + 'ermittelt. Ohne ihn waere der volle Grundstueckswert anzusetzen, was den Ertragswert '
-        + 'stark verzerrt — deshalb bleibt er hier aussen vor. Miteigentumsanteil ergaenzen '
-        + '(steht in der Teilungserklaerung, meist als Bruch wie 125/1000).');
+      /* v1198c · ae/oe/ue gehoert in Kommentare, NIE in Nutztext. Dieser Satz
+         war seit v1026 in der Ersatzschreibweise und fiel nicht auf, weil ihn
+         niemand zu sehen bekam — die Oberflaeche zeigte ihn erst ab v1198b an.
+         Der Rest dieser Datei benutzt durchgehend echte Umlaute. */
+      out.hinweise.push('Bei einer Eigentumswohnung wird der Bodenwert über den Miteigentumsanteil '
+        + 'ermittelt. Ohne ihn wäre der volle Grundstückswert anzusetzen, was den Ertragswert '
+        + 'stark verzerrt — deshalb bleibt er hier außen vor. Miteigentumsanteil ergänzen '
+        + '(steht in der Teilungserklärung, meist als Bruch wie 125/1000).');
       return out;
     }
     if (mea) {
