@@ -238,11 +238,6 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 **Entscheidungen, die bei Marcel liegen**
 
-- **Die Gliederung des Marktberichts.** Demo:
-  `design/Vorschläge/marktbericht-struktur.html`. Gemessen: `08`, `09` und
-  `10` beginnen alle drei auf Seite 7 — dieselbe Zersplitterung wie vorher
-  bei 03/04. **Empfohlen ist Stufe 1** (nur die Lage bündeln, 12 → 10
-  Abschnitte). Spart keine Seite, macht die Seite ruhig.
 - **Soll der Marktwert auch im Fließtext des KI-Berichts seltener stehen?**
   Der wiederholt ihn in fast jedem Absatz — die letzte verbliebene Quelle
   der Wiederholung. Wäre eine Änderung an der Textvorgabe, kein Layout.
@@ -2345,6 +2340,35 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Die Lage ist ein Kapitel — `v1208`, 02.09.2026 (`f61a409`)
+
+Marcel hat nach der Demo **Stufe 1** gewählt. `08 Lage- & Potenzialbewertung`,
+`09 Makrolage & Sozioökonomie` und `10 Lage & Infrastruktur` begannen alle
+drei auf Seite 7; sie sind jetzt **ein** Abschnitt `08 Lage & Marktumfeld`
+mit drei Zwischenüberschriften. **13 → 10 Abschnitte** im
+Inhaltsverzeichnis, gemessen. Seiten unverändert 9 — wie angekündigt.
+
+Neu ist `blockTitle()`: eine Überschrift **innerhalb** einer Sektion, ohne
+Nummernschild und ohne TOC-Eintrag. Es gab bisher nur `sectionTitle`, und wer
+damit zusammengehörende Blöcke überschreibt, erzeugt zwangsläufig Kapitel.
+
+Die Sektion heißt **„Lage & Marktumfeld"**, nicht nur „Lage": die
+Marktentwicklung wandert mit hinein, weil sie sonst die Sektion zerschnitten
+hätte — und eine Marktentwicklung ist keine Lage.
+
+> **Dabei ist eine eigene Fehldiagnose aufgeflogen.** Ich hatte in `v1207`
+> zwei Waisen-Umbrüche gemeldet. Einer war echt (der Energiebalken), **der
+> andere war eingebildet**: der Haftungsrahmen stand nie allein. Nachgemessen
+> mit dem echten `v1207`-Stand über eine Probe-Kopie auf Staging. Damit waren
+> `v1207b` und `v1207c` unnötig — und `v1207c` war die Reparatur eines
+> Fehlers, den `v1207b` erst erzeugt hat. Der Mechanismus `+ _HR` bleibt
+> trotzdem, aber aus dem richtigen Grund. Details im Journal.
+>
+> **Beide Male hat mein eigenes Werkzeug die Ausnahme versteckt** — einmal
+> eine Regex ohne Backslashes, die alles in Klammern verschluckt, einmal ein
+> Filter, der alles mit `&` wegwarf. Vor jeder Aussage „X kommt nicht vor"
+> gehört die Gegenprobe, ob das Werkzeug X überhaupt zeigen **könnte**.
 
 ### Der PDF-Bericht durchgesehen — `v1207`, 02.09.2026 (`8469143`…`9a210f0`)
 

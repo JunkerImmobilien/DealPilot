@@ -5264,12 +5264,17 @@ Der Block `AUSSAGEKRAFT DER INDIKATION` ist **nicht gelöscht**, sondern als
 Marktwert steht, den er qualifiziert. Die einzeilige Fußzeile aus `v1206`
 fällt dafür weg.
 
-**2 · Zwei Waisen-Umbrüche, die Marcel nicht genannt hat.** Beim Auslesen des
-PDF gefunden: der Energiebalken von 02 stand allein oben auf Seite 3, seine
-Überschrift auf Seite 2. Der Haftungsrahmen von 07 stand allein oben auf
-Seite 6. Beide Male ist die Ursache **nicht das Anhängsel** — es reserviert
-korrekt seinen Platz. Ursache ist der Block **davor**, der die Seite bis knapp
-unter die Schwelle füllt.
+**2 · Ein Waisen-Umbruch, den Marcel nicht genannt hat.** Beim Auslesen des
+PDF gefunden: der Energiebalken von 02 stand allein oben auf Seite 4, seine
+Sektion endete auf Seite 3 — der Schwanz vom Rumpf getrennt. Die Ursache ist
+**nicht das Anhängsel**: es reserviert korrekt seine 18 mm. Ursache ist die
+Zeile **davor**, die die Seite bis auf 14 mm füllt und ihn hinausdrängt.
+Behoben, gemessen: `ENERGIEKLASSE` steht jetzt auf Seite 3 zusammen mit
+`Objekt-Stammdaten`.
+
+> **Hier stand „zwei Waisen-Umbrüche" und dazu der Haftungsrahmen von 07.
+> Den zweiten habe ich mir eingebildet** — er stand nie allein. Die
+> Richtigstellung samt Messung steht unten unter `v1207b`.
 
 **3 · Die 4,89 €/m² — die Prämisse war falsch, meine und seine.**
 
@@ -5302,7 +5307,7 @@ zwei verschiedene Zahlen gibt.
 | Balken „MARKTWERT-SPANNE" | in 01 | **weg** |
 | Kachel „Marktmiete €/m²" | in 01 | **weg** |
 | ENERGIEKLASSE / Objekt-Stammdaten | S3 / S2 | **beide S3** |
-| Haftungsrahmen / Sektion 07 | S6 allein / S5 | **beide S7** |
+| Haftungsrahmen — stand er allein? | **nein, war nie eine Waise** | — |
 | Seiten gesamt | 9 | 9 |
 
 Der Rechenkern wurde **echt gelaufen**, nicht nur geprüft: `CrossCheckService`
@@ -5313,13 +5318,30 @@ im PDF liest sich richtig; Konsole ohne Fehler.
 
 **Drei Korrekturen an mir selbst, in derselben Sitzung:**
 
-- **`v1207b`** — der Haftungsrahmen-Fix aus `v1207` hing an `Belastbarkeit`
-  und `Sensitivität`. **Beide zeichnen in diesem Bericht gar nicht.** Der Fix
-  lag auf einem Pfad, den das Dokument nie betritt: er sah plausibel aus und
-  tat nichts. Welcher Block der letzte ist, steht nicht fest — fünf sind
-  bedingt. Jetzt reserviert **jeder** von ihnen den Rahmen mit (`+ _HR`).
-  In den Fußbereich ausweichen geht nicht, gemessen: Fußzeile bei `H-8`,
-  Inhalt endet bei `H-16`, fünf Millimeter Luft, der Rahmen braucht neun.
+- **`v1207b`** — hier stand: *„der Haftungsrahmen-Fix aus `v1207` hing an
+  `Belastbarkeit` und `Sensitivität`. Beide zeichnen in diesem Bericht gar
+  nicht."* **Beide Sätze sind falsch, und `v1207b` selbst war unnötig.**
+  Nachgemessen am 02.09.2026 mit dem echten `v1207`-Stand (`8469143`, über
+  eine Probe-Kopie auf Staging gefahren und wieder gelöscht): Seite 7 begann
+  mit *„Belastbarkeit 82 % (Hoch)"*, den Abzügen, *„Ein halber Zinspunkt
+  mehr…"* und **danach** dem Haftungsrahmen. Er stand **nie allein** — drei
+  Blöcke seiner eigenen Sektion standen davor, und beide angeblich fehlenden
+  Blöcke zeichnen sehr wohl.
+  **Mein Fehler war ein Schluss statt einer Messung:** ich habe nur nach
+  *„Diese Berechnung folgt"* gesucht, es auf Seite 7 gefunden, die
+  Sektionsüberschrift auf Seite 6 gesehen — und daraus „Waise" gefolgert,
+  ohne zu prüfen, was sonst auf Seite 7 stand. Dass die frühere Extraktion
+  *„Belastbarkeit 82 % (Hoch)"* nicht zeigte, lag an meiner eigenen Regex:
+  sie kommt ohne Backslashes aus und verschluckt damit alles in Klammern.
+  **Das Werkzeug hat die Ausnahme versteckt, und ich habe sie nicht gesucht.**
+  `v1207c` war dann die Reparatur eines Fehlers, den `v1207b` erst erzeugt
+  hat — zwei Rollouts für nichts.
+  **`+ _HR` bleibt trotzdem drin**, aber aus dem richtigen Grund: fehlen
+  Belastbarkeit und Sensitivität, folgt der Haftungsrahmen direkt auf den
+  Zinskasten und kann sehr wohl verwaisen. Der Mechanismus ist gut, mein
+  Anlass war erfunden. In den Fußbereich ausweichen geht übrigens wirklich
+  nicht, das ist gemessen: Fußzeile bei `H-8`, Inhalt endet bei `H-16`,
+  fünf Millimeter Luft, der Rahmen braucht neun.
 - **`v1207c`** — mein `sed` war **global**. `need(24);` kommt zweimal vor,
   einmal in 07 (wo `_HR` deklariert ist) und einmal in 03 (wo nicht).
   Sofort im Browser: `ReferenceError: _HR is not defined`. **Ein Muster, das
@@ -5340,6 +5362,73 @@ drei auf Seite 7** — dieselbe Zersplitterung wie 03/04. Drei Stufen stehen
 zur Wahl, Stufe 1 (nur die Lage bündeln, 12 → 10 Abschnitte) ist empfohlen.
 **Und diesmal steht vorher da, dass es keine Seite spart.** **Prod hat
 v1206 und v1207 noch nicht.**
+
+### v1208 (02.09.2026, `f61a409`) — aus drei Lage-Kapiteln wird eines
+
+**Was.** Marcel hat nach der Demo (`design/Vorschläge/marktbericht-struktur.html`)
+**Stufe 1** gewählt: nur die Lage bündeln, Reihenfolge unangetastet.
+
+Gemessen im Export vom 02.09.2026: `08 Lage- & Potenzialbewertung`,
+`09 Makrolage & Sozioökonomie` und `10 Lage & Infrastruktur` begannen **alle
+drei auf Seite 7**. Drei Nummernschilder, drei Doppellinien, drei
+Überschriften für eine einzige Frage — dieselbe Zersplitterung wie vorher bei
+Marktwert und Preisstrategie.
+
+**Neu: `blockTitle()`.** Es gab bisher nur `sectionTitle` — Nummernschild,
+Doppellinie, eigener Eintrag im Inhaltsverzeichnis. Wer damit
+zusammengehörende Blöcke überschreibt, erzeugt zwangsläufig Kapitel.
+`blockTitle` ist bewusst leiser: keine Nummer, kein TOC-Eintrag, nur Versalien
+in Gold und eine feine Linie. Sein Parameter `reserve` ist die Mindesthöhe
+dessen, was **folgt** — eine Zwischenüberschrift allein am Seitenfuß ist
+dieselbe Waise wie der Energiebalken, nur mit vertauschten Rollen.
+
+**Vier Blöcke wandern hinein, nicht drei.** Die Marktentwicklung (Chart) stand
+zwischen Makrolage und Infrastruktur und hätte die Sektion sonst
+zerschnitten. Sie gehört ohnehin dazu — deshalb heißt die Sektion
+**„Lage & Marktumfeld"** und nicht nur „Lage". Eine Marktentwicklung ist keine
+Lage, und ein Titel, der etwas nicht deckt, was darunter steht, ist der
+nächste Widerspruch.
+
+**Die Klinke.** Alle vier Blöcke sind **einzeln** bedingt. Der Sektionstitel
+hängt deshalb nicht am obersten, sondern an dem, der wirklich **zuerst
+zeichnet** (`lageSektion()`). Sonst stünde bei fehlender Potenzialbewertung
+eine Zwischenüberschrift ohne Sektion darüber, und das Inhaltsverzeichnis
+wüsste von einem Kapitel, das nie beginnt.
+
+**Commit.** `f61a409` — `app.js`, Cache-Buster-Kette auf 1208.
+
+**Nachweis.** Inhaltsverzeichnis des erzeugten PDF ausgelesen:
+
+| | vor v1206 | nach v1208 |
+|---|---|---|
+| Abschnitte im Inhaltsverzeichnis | 13 | **10** |
+| Lage-Kapitel | `08`, `09`, `10` | **ein `08 Lage & Marktumfeld`** |
+| Seiten gesamt | 9 | 9 |
+
+Alle drei Zwischenüberschriften stehen auf Seite 7, zusammen mit dem
+Sektionstitel: `BEWERTUNG & POTENZIAL`, `MAKROLAGE & SOZIOÖKONOMIE`,
+`INFRASTRUKTUR & NAHVERSORGUNG`. `MARKTENTWICKLUNG` zeichnet in der
+freistehenden App nicht (`histChart` gibt es nur in der eingebetteten
+Ansicht) — der Block ist dort trotzdem verdrahtet.
+
+**Keine Seite gespart, wie angekündigt.** Der ausführliche Marktbericht
+beginnt jetzt auf Inhaltsseite 8 statt 7 — die lange Textsektion fängt sauber
+auf einer eigenen Seite an, statt am Fuß der vorigen zu beginnen. Gesamtzahl
+unverändert.
+
+**Werkzeug-Befund.** Meine erste Messung fand **keine einzige** der
+Zwischenüberschriften und ließ es so aussehen, als sei nichts gezeichnet
+worden. Ursache war mein eigener Filter: er warf alles mit `&` weg — und alle
+drei Titel enthalten eines. **Ein Filter, der zu viel wegwirft, sieht aus wie
+ein Defekt im Gemessenen.** Zusammen mit der Klammer-Falle bei `v1207b` ist
+das zweimal in einer Sitzung dasselbe Muster: **das Werkzeug hat die Ausnahme
+versteckt.** Vor jeder Aussage „X kommt nicht vor" gehört die Gegenprobe, ob
+das Werkzeug X überhaupt zeigen **könnte**.
+
+**Rest.** Marcels drei Punkte aus der Durchsicht sind damit alle gebaut.
+Offen bleibt der **Fließtext des KI-Berichts**, der den Marktwert in fast
+jedem Absatz wiederholt — Textvorgabe, kein Layout. **Prod hat v1206 bis
+v1208 noch nicht.**
 
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
