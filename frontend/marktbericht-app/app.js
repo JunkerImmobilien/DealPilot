@@ -3365,7 +3365,7 @@ async function exportPdf(out) {
   aussagekraft();
 
   // -- €/m²-Spannen (Kauf + Miete) nebeneinander --
-  need(24);
+  need(24 + _HR);
   const halfW = (blockW - 6) / 2;
   doc.setFontSize(8); doc.setTextColor(...MUT);
   doc.text('KAUFPREIS €/m²', M, y + 4);
@@ -3849,6 +3849,28 @@ async function exportPdf(out) {
      * nebeneinander sieht und 45 % Abstand liest, braucht die Einordnung —
      * sonst haelt er einen davon fuer falsch. */
     sectionTitle('Ertragswertverfahren — Rechenweg', 150);
+    /* v1207-umbruch · DER HAFTUNGSRAHMEN DARF NIE ALLEIN AUF EINER SEITE STEHEN.
+     *
+     * Gemessen im Export vom 02.09.2026: er stand allein oben auf Seite 6,
+     * seine Sektion 07 endete auf Seite 5. Dieselbe Waise wie beim
+     * Energiebalken in Sektion 02 — und dieselbe Ursache: nicht das
+     * Anhaengsel reserviert zu wenig, sondern der Block DAVOR.
+     *
+     * Der erste Versuch hat nur die Belastbarkeit und die Sensitivitaet
+     * bedacht. Beide zeichnen in DIESEM Bericht gar nicht — gemessen: Seite 5
+     * endet mit "LIEGENSCHAFTSZINSSATZ 2,56 % · Herkunft: eigene Angabe".
+     * Der Fix griff an einer Stelle, die das Dokument nie erreicht.
+     *
+     * Welcher Block der letzte ist, steht nicht fest: Zinskasten,
+     * Zinsanpassung, bundesweite Einordnung, Belastbarkeit und
+     * Sensitivitaet sind ALLE bedingt. Deshalb reserviert jeder von ihnen
+     * den Rahmen mit. Der Preis dafuer sind hoechstens 14 mm frueherer
+     * Umbruch — und genau dann WILL man ihn, sonst verwaist der Rahmen.
+     *
+     * In den Fussbereich ausweichen geht nicht: die Fusszeile steht bei
+     * H-8, der Inhalt endet bei H-16. Fuenf Millimeter Luft, der Rahmen
+     * braucht neun. */
+    const _HR = 14;
     need(26);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2); doc.setTextColor(...MUT);
     const _erk = doc.splitTextToSize(
@@ -3909,7 +3931,7 @@ async function exportPdf(out) {
       }
     });
 
-    y += 3; need(30);
+    y += 3; need(30 + _HR);
 
     /* Herkunft des Zinssatzes — die Zahl, an der alles haengt */
     /* v1050-WSPN-1 · Der Kasten wird hoeher, wenn eine Streuung vorliegt —
@@ -3970,7 +3992,7 @@ async function exportPdf(out) {
     if (_za && _za.verfuegbar && _za.merkmale && _za.merkmale.length) {
       const _mName = { alter: 'Gebäudealter', wohnlage: 'Wohnlage', nutzung: 'Nutzung',
         wohneinheiten: 'Wohneinheiten', groesse: 'Objektgröße' };
-      need(24);
+      need(24 + _HR);
       doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(120, 113, 100);
       doc.setCharSpace(0.3);
       doc.text('OBJEKTSPEZIFISCH ANGEPASSTER ZINSSATZ (§ 33 IMMOWERTV) · STUFE '
@@ -3986,7 +4008,7 @@ async function exportPdf(out) {
       y += 6;
       doc.setFontSize(6.6);
       _za.merkmale.forEach((_mk) => {
-        need(5);
+        need(5 + _HR);
         doc.setFont('helvetica', 'normal'); doc.setTextColor(...MUT);
         doc.text((_mName[_mk.id] || _mk.id) + ' — ' + String(_mk.text || ''), M + 3, y + 2);
         /* Statusfarben bleiben hart (rot rauf, gruen runter) — sie sind
@@ -4007,14 +4029,14 @@ async function exportPdf(out) {
         const _fl = doc.splitTextToSize('Nicht bewertbar mangels Angabe: ' + _fehlt.join(', ')
           + '. Diese Merkmale bleiben unberücksichtigt — ein Ersatzwert wäre eine Aussage '
           + 'über etwas, das nicht erhoben wurde.', blockW - 3);
-        need(_fl.length * 3 + 4);
+        need(_fl.length * 3 + 4 + _HR);
         doc.text(_fl, M + 3, y + 2); y += _fl.length * 3 + 2;
         doc.setFont('helvetica', 'normal');
       }
       if (_za.hinweis) {
         doc.setFontSize(6.2); doc.setTextColor(150, 143, 130);
         const _zh = doc.splitTextToSize(String(_za.hinweis), blockW);
-        need(_zh.length * 2.9 + 4);
+        need(_zh.length * 2.9 + 4 + _HR);
         doc.text(_zh, M, y + 2); y += _zh.length * 2.9 + 3;
       }
       y += 2;
@@ -4031,7 +4053,7 @@ async function exportPdf(out) {
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setCharSpace(0);
       const _oeT = doc.splitTextToSize(String(_oe.hinweis || ''), blockW - 10);
       const _oeH = 9 + _oeT.length * 3;
-      need(_oeH + 4);
+      need(_oeH + 4 + _HR);
       doc.setFillColor(248, 247, 244); doc.roundedRect(M, y, blockW, _oeH, 2, 2, 'F');
       doc.setFillColor(190, 186, 176); doc.roundedRect(M, y, 1.6, _oeH, 0.8, 0.8, 'F');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(6.9); doc.setTextColor(...TXT);
@@ -4050,12 +4072,7 @@ async function exportPdf(out) {
 
     /* Belastbarkeit und Sensitivitaet */
     if (_ew.belastbarkeit) {
-      /* v1207-umbruch · +14 fuer den Haftungsrahmen, der zwingend folgt.
-       * Gemessen im Export vom 02.09.2026: der Haftungsrahmen stand allein
-       * oben auf Seite 6, seine Sektion 07 endete auf Seite 5. Derselbe
-       * Waisen-Fall wie beim Energiebalken — und dieselbe Ursache: nicht das
-       * Anhaengsel reserviert zu wenig, sondern der Block davor. */
-      need(12 + 14);
+      need(12 + _HR);
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
       doc.text('Belastbarkeit ' + _ew.belastbarkeit.pct + ' % ('
         + _ew.belastbarkeit.label + ')', M, y);
@@ -4069,7 +4086,7 @@ async function exportPdf(out) {
       }
     }
     if (_ew.sensitivitaet && _ew.sensitivitaet.lzs_plus_05) {
-      need(10 + 14);   /* v1207-umbruch · +14 fuer den Haftungsrahmen, siehe oben */
+      need(10 + _HR);   /* v1207-umbruch · siehe _HR oben */
       const _s = _ew.sensitivitaet.lzs_plus_05;
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2); doc.setTextColor(...TXT);
       doc.text('Ein halber Zinspunkt mehr (' + String(_s.lzs_pct).replace('.', ',')
