@@ -36,25 +36,35 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1199)
+## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach v1200b)
 
-**Stand:** lokal = GitHub = Staging auf `4964e64`.
+**Stand:** lokal = GitHub = Staging auf `1fb1dae`.
 **Produktion steht auf `bca7c06`** — das ist `v1191`–`v1197` plus das
 reparierte Deploy-Skript, ausgerollt am 01.09. in vier Schritten auf
 Marcels Freigabe, `mb-backend` dort gerebuildet.
 
-> ### `v1198`–`v1199` sind NICHT auf Prod — und bei `v1198` ist das eine Entscheidung, keine Nachlässigkeit
+> ### `v1198`–`v1200b` sind NICHT auf Prod — und das ist eine Entscheidung
 >
-> `v1198` **ändert den Ertragswert jeder Eigentumswohnung ohne erfassten
-> Miteigentumsanteil** (im Testfall 110.716 € → 50.365 €). Die Regel
-> dahinter ist nicht neu — sie steht in `CLAUDE.md` („ETW ohne
-> Miteigentumsanteil: kein Bodenwert") und ausführlich begründet in
-> `v1026`. Neu ist nur, dass der Ertragswert sie jetzt **befolgt**.
+> **`v1200` ist der wichtigere der beiden.** Es schickt Werte mit, die das
+> Objekt längst hat, deren Eingabefeld aber gerade nicht gezeichnet ist —
+> Miteigentumsanteil, Bruttogrundfläche, Stellplatzmiete, sonstige
+> Erträge. Am Testobjekt gemessen: Bodenwert **40.338 €** statt keinem,
+> Ertragswert **192.328 €** statt 50.365 €, Sachwert **242.274 €** statt
+> keinem, und der Spread der drei Verfahren fällt von **286 % auf 1,6 %**.
+> Die 40.338 € sind der im `v1140`-Kommentar hinterlegte Sollwert dieses
+> Objekts — **die Reparatur trifft die bekannten richtigen Zahlen.**
 >
-> **Marcel ist DESAG-zertifizierter Sachverständiger. Diese Zahl gehört
-> ihm, nicht dem Code.** Deshalb liegt das Paket auf Staging und wartet
-> auf sein Gegenlesen. Es braucht auf Prod einen `mb-backend`-Rebuild,
-> nicht nur `git pull`.
+> **`v1198` greift nur noch, wenn wirklich kein Miteigentumsanteil im
+> Objekt steht.** Es ändert dann den Ertragswert (im alten Testfall
+> 110.716 € → 50.365 €). Die Regel ist nicht neu — sie steht in
+> `CLAUDE.md` („ETW ohne Miteigentumsanteil: kein Bodenwert") und
+> ausführlich begründet in `v1026`; neu ist nur, dass der Ertragswert sie
+> **befolgt**.
+>
+> **Marcel ist DESAG-zertifizierter Sachverständiger. Diese Zahlen gehören
+> ihm, nicht dem Code.** Deshalb liegen die Pakete auf Staging. Sie
+> brauchen auf Prod einen `mb-backend`-Rebuild (`v1198`) bzw. nur
+> `git pull` (`v1199`, `v1200` — reines Frontend).
 
 > ### Der Gelddefekt ist behoben und live
 >
@@ -2269,6 +2279,50 @@ entfällt — nicht raten.
 ---
 
 ## Fertig
+
+### Der Miteigentumsanteil war da und wurde nicht mitgeschickt — `v1200`/`b`, 02.09.2026
+
+**Aus Marcels Frage entstanden** („sollten wir das nicht als Pflichtfeld
+setzen?"). Die Messung sagt: **ein Pflichtfeld hätte den Fall gar nicht
+verhindert.** Bei Stufe 2 existiert das Feld `mea` nicht im Formular —
+aber `_mbVorrat('mea')` lieferte **„50"**, und `payload().mea_pct` war
+**null**. Die App kannte den Wert, schrieb in die Ampel „liegt im Objekt
+vor" — und schickte ihn nicht mit.
+
+**Die Unterscheidung, auf die es ankommt:** Feld da, aber leer → der
+Nutzer wollte es so. Feld gar nicht da → niemand wollte etwas, der Vorrat
+gilt. Neu ist `pWert()`, benutzt **nur** in `payload()`; `wert()` bleibt
+unangetastet, damit die Stufe weiter am ausgefüllten Formular hängt
+(`v1139`: „nie ohne Zutun"). **Kein Preis-Einfluss, nachgemessen:**
+`wert_stufe` blieb 2, Knopf „ohne Aufpreis", Kontingent 48/9/10.
+
+**Das Ergebnis, derselbe Bericht:**
+
+| | vorher | jetzt |
+|---|---|---|
+| Bodenwert | — | **40.338 €** (der Anteil, nicht das Grundstück) |
+| Verfahren | vereinfachtes | **allgemeines Ertragswertverfahren** |
+| Ertragswert | 50.365 € | **192.328 €** |
+| Sachwert | – | **242.274 €** |
+| Spread der drei Verfahren | **286 %** | **1,6 %** |
+
+> **Die 40.338 € sind kein Zufallstreffer** — genau diese Zahl steht im
+> `v1140`-Kommentar als geprüfter Sollwert dieses Objekts, und die 2,56 %
+> Zinsanpassung in `CLAUDE.md` als Kennzahl von Hüllhorst. Die Reparatur
+> reproduziert die bekannten richtigen Werte.
+
+**Es war nie ein Miteigentumsanteil-Problem, sondern ein Payload-Problem:**
+auch `spMiete` und `sonstEinnahmen` gingen verloren — der Rohertrag stieg
+von 5.160 € auf 10.284 €.
+
+**Dazu:** die Ertragswert-Karte sagt jetzt „· ohne Bodenwert gerechnet",
+wenn es so ist — und schweigt, wenn nicht.
+
+**`v1200b`** war ein eigener Fehler: `pWert` stand nach dem `return` von
+`wert()`, aber vor dessen Klammer — also im falschen Gültigkeitsbereich.
+**Syntaktisch einwandfrei, `node --check` meldete „OK"**, und der erste
+echte Aufruf warf `ReferenceError`. Zum zweiten Mal in dieser Sitzung
+dieselbe Lehre (nach `v1196b`): **Verträge prüft nur ein echter Lauf.**
 
 ### Fehlende Angaben stehen jetzt am Feld — `v1199`, 02.09.2026 (`4964e64`)
 

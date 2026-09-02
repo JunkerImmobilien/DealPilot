@@ -4687,6 +4687,111 @@ Fehler daraus entstanden, dass dieselbe Sache zweimal im Haus stand.**
 > am Feld markiert; Felder, die es noch nicht gibt, erklärt ihr leerer
 > Reiter. Zusammen bleibt keine Lücke, in der der Nutzer raten muss.
 
+### v1200 / v1200b (02.09.2026, `3d727e4` · `1fb1dae`) — der Miteigentumsanteil war da und wurde nicht mitgeschickt
+
+**Aus Marcels Frage entstanden:** *„sollten wir das nicht als Pflichtfeld
+setzen oder vorher drauf hinweisen?"* — Die Messung sagt: **ein Pflichtfeld
+hätte diesen Fall gar nicht verhindert.**
+
+#### Was gemessen wurde
+
+Objekt Hüllhorst, erreichte Stufe 2:
+
+| | |
+|---|---|
+| Feld `mea` im DOM | **nein** — der Wertermittlungs-Block wird erst aufgeklappt gebaut |
+| `window._mbVorrat('mea')` | **„50"** |
+| `payload().mea_pct` | **null** |
+| Was die Ampel dazu schrieb | *„liegt im Objekt vor: Miteigentumsanteil — hier klicken zum Übernehmen"* |
+
+**Die App kannte den Wert, sagte auf dem Schirm, dass sie ihn kennt — und
+schickte ihn nicht mit.** Ein Pflichtfeld hätte etwas erzwungen, das
+längst da war; und ausfüllen ließe es sich bei Stufe 2 ohnehin nicht, weil
+das Feld dort nicht existiert.
+
+#### Die Unterscheidung, auf die es ankommt
+
+```
+Feld da, aber leer  ->  der Nutzer wollte es so. Leer bleibt leer.
+Feld gar nicht da   ->  niemand wollte etwas. Der Vorrat gilt.
+```
+
+Neu ist `pWert(id)` in `wertermittlung.js`, benutzt **ausschließlich** in
+`payload()`. **`wert()` selbst bleibt unverändert** — `erreicht()` muss
+weiter am ausgefüllten Formular hängen, sonst spränge die Stufe von allein
+hoch (`v1139`: „nie ohne Zutun"). Dieselbe Trennung macht `ausObjekt()`
+in `mb-stufen.js` seit ebendiesem `v1139`.
+
+**Kein Preis-Einfluss, geprüft und nachgemessen:** `wert_stufe` blieb 2,
+der Knopf sagte weiter *„ohne Aufpreis"*, das Kontingent blieb 48/9/10.
+
+#### Das Ergebnis ist deutlicher als erwartet
+
+Derselbe Bericht, dasselbe Objekt, nur die Werte kommen jetzt an:
+
+| | vorher (id 79) | jetzt (id 81) |
+|---|---|---|
+| `mea_pct` / `bgf` | null / null | **50** / **195** |
+| Bodenwert | — nicht angesetzt | **40.338 €**, vollständig |
+| Bodenwertverzinsung | entfiel | **40.338 € × 2,56 %** — der Anteil, nicht das Grundstück |
+| Verfahren | vereinfachtes | **allgemeines Ertragswertverfahren** |
+| Ertragswert | 50.365 € | **192.328 €** |
+| Sachwert | – | **242.274 €** |
+| Spread der drei Verfahren | **286 %** | **1,6 %** |
+
+> **Die 40.338 € sind kein Zufallstreffer.** Genau diese Zahl steht im
+> `v1140-MEARENT`-Kommentar als der geprüfte Sollwert dieses Testobjekts
+> (*„+ Bodenwert 40.338 EUR"*), und die 2,56 % Zinsanpassung stehen in
+> `CLAUDE.md` als Kennzahl von Hüllhorst. **Die Reparatur reproduziert die
+> bekannten richtigen Werte.**
+
+**Nebenbefund:** nicht nur `mea` und `bgf` gingen verloren, sondern auch
+`spMiete` und `sonstEinnahmen` — der Rohertrag stieg von 5.160 € auf
+10.284 €, weil die Stellplatzmiete (2 × 45 €) und die sonstigen Erträge
+(240 €) endlich mitkommen. **Es war nie ein Miteigentumsanteil-Problem,
+sondern ein Payload-Problem.**
+
+#### Zweite Maßnahme: die Ertragswert-Karte sagt jetzt, wie gerechnet wurde
+
+Sie zeigte nur „Reinertrag … p. a.". Dass **ohne Bodenwert** gerechnet
+wurde, stand im Datensatz (`verfahren`), aber nirgends auf dem Schirm.
+Jetzt steht *„· ohne Bodenwert gerechnet"* daneben, wenn
+`bodenwert_fehlt` gesetzt ist — und **schweigt**, wenn es nichts zu
+erklären gibt. Im positiven Lauf nachgemessen: kein Hinweis, kein
+Grund-Kasten, wie es sein soll.
+
+#### Kein Pflichtfeld — und warum nicht
+
+Es widerspräche dem eigenen Stufenkonzept. Der Bericht sagt selbst
+*„Ertragswert indikativ mit Pauschalwerten — genau ab Stufe 3"*, und für
+Stufe 3 **ist** der Miteigentumsanteil bereits Pflicht (`bedarf3()`). Ein
+Pflichtfeld bei Stufe 1/2 würde die Marktpreisindikation für **jede**
+Eigentumswohnung blockieren, obwohl sie keinen Bodenwert braucht.
+
+#### `v1200b` — und dann stand `pWert` im falschen Gültigkeitsbereich
+
+```
+ReferenceError: pWert is not defined
+  at Object.payload (wertermittlung.js:850)
+```
+
+Die neue Funktion war nach dem `return '';` von `wert()` eingefügt worden,
+aber **vor dessen schließender Klammer**. Damit lag sie im
+Gültigkeitsbereich von `wert()` und war für `payload()` unsichtbar.
+
+> **Das ist syntaktisch einwandfrei** — eine Funktionsdeklaration nach
+> einem `return` ist erlaubt, nur unerreichbar. **`node --check` meldete
+> „OK".** Genau davor warnt `CLAUDE.md`: *„node --check prüft nur Syntax.
+> Verträge prüft nur ein echter Lauf."* Gefunden hat es der erste Aufruf
+> von `payload()` im Browser.
+>
+> **Zum zweiten Mal in dieser Sitzung dieselbe Lehre** — nach `v1196b`,
+> wo eine festgehaltene DOM-Referenz ebenso lautlos ins Leere lief.
+
+Gegengeprüft nach der Verschiebung: Klammerbilanz der Datei **0**,
+Klammerbilanz des verschobenen Blocks **0**, `wert()` wieder vier Zeilen
+lang wie zuvor.
+
 # ES GIBT DREI STÄNDE — NICHT EINEN
 
 **Stand 14.08.2026.** DealPilot wird in **zwei parallelen Chats** entwickelt, und
