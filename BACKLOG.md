@@ -202,53 +202,50 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 ### Was sonst offen liegt und nicht vergessen werden darf
 
-- **Der Selbstsprung der Stufe ist zu** (`v1202`) — die Tiefe wird wieder
-  gewählt, der Preis folgt der Wahl, Vorgabewert ist die günstigste Stufe.
-  Siehe Fertig.
+> **Nur noch echte Offenposten.** Bis zum 02.09.2026 standen hier auch fünf
+> längst erledigte Zeilen (Selbstsprung, `v1198`, Bewertungsskala,
+> Feldmarkierung, Deploy-Skript). **Eine Liste offener Punkte, in der die
+> Hälfte fertig ist, wird nicht mehr gelesen.** Alles Erledigte steht unter
+> Fertig.
 
-- **`v1198` ist entschieden und live** — Marcel hat am 02.09.2026
-  **Variante B** gewählt (ohne Miteigentumsanteil kein Bodenwert,
-  vereinfachtes Ertragswertverfahren mit Begründung im Bericht) und den
-  Rollout nach eigenem Durchgang auf Staging freigegeben. Die Vorlage mit
-  allen drei Varianten bleibt unter
-  `design/Vorschläge/ertragswert-ohne-mea.html`.
-- **Die Score-Konvention für fehlende Teilwerte gehört entschieden**
-  (`v1197`): neutral ersetzen — so gebaut — oder den Teilwert weglassen und
-  die übrigen Gewichte hochnormieren. Beides fachlich vertretbar, fällt
-  anders aus.
-- **Die Bewertungsskala ist vereinheitlicht** (`v1203`/`v1204`) — der
-  Marktbericht spricht jetzt dieselbe Sprache wie die Objektkarte, und
-  `CLAUDE.md` ist korrigiert. **Zwei Reste sind benannt und offen:**
-  `js/dashboard.js:1283` sagt „Sehr gut / Gut / Solide / Schwach" (vier
-  Stufen statt fünf), und der Marktbericht-Backend führt sein eigenes
-  Vokabular weiter, das seit `v1203` nur nicht mehr angezeigt wird.
-  **Dazu: „Solide" steht jetzt zweimal nebeneinander** — klein im Ring,
-  groß als Überschrift. Eines zu streichen ist ein Einzeiler, aber eine
-  Optikfrage.
-- **Die Markierung fehlender Angaben am Feld ist gebaut** (`v1199`,
-  Variante B auf Marcels „b ist super") — siehe Fertig. Die Demo mit allen
-  drei Varianten bleibt unter
-  `design/Vorschläge/marktbericht-fehlende-felder.html`.
-- **Der `402`-Pfad ist nicht end-to-end bewiesen** (siehe oben, DB-Eingriff
-  blockiert).
-- **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.**
+**Entscheidungen, die bei Marcel liegen**
+
+- **Welche Miete führt den Ertragswert?** Gemessen am Bericht vom
+  02.09.2026: die amtliche Mietpreisübersicht sagt **4,89 €/m²**, die
+  Vergleichsangebote **7,67 €/m² (Spanne 6,66–8,30)**. **Die amtliche liegt
+  komplett unter der beobachteten Spanne**, und der Bericht sagt dazu kein
+  Wort. Drei Wege: **A** amtlich führt weiter, aber der Widerspruch wird
+  ausgewiesen · **B** die Vergleichsmiete führt · **C** die Ist-Miete führt,
+  wenn erfasst. **Empfehlung: A, unabhängig vom Rest** — das Verschweigen
+  ist das eigentliche Problem.
+- **Die Score-Konvention für fehlende Teilwerte** (`v1197`): neutral
+  ersetzen — so gebaut — oder den Teilwert weglassen und die übrigen
+  Gewichte hochnormieren.
+- **Anbieter-Neutralität:** `CLAUDE.md` verlangt, Sprengnetter und
+  PriceHubble nie namentlich nach außen zu nennen. **Im Boarding-Pass stehen
+  beide mit Logo.**
+- **„Solide" steht zweimal nebeneinander** — klein im Ring, groß als
+  Überschrift. Ein Einzeiler in beide Richtungen.
+
+**Beweise, die noch fehlen**
+
+- **Der `402`-Pfad ist nicht end-to-end bewiesen.** Serverseitig gelesen,
+  frontendseitig gemessen; der Beweis unter echten Bedingungen braucht einen
+  `UPDATE ai_credits_user` auf Staging — **der DB-Eingriff wurde von der
+  Umgebung blockiert.**
+- **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.** Der Weg
+  ist ausgelesen, der Türsteher greift ohne Netzaufruf — eine Stripe-Sitzung
+  wurde nie gestartet.
 - **Die Spracheingabe wartet auf einen echten Sprechlauf am Gerät**
   (`v1168`/`v1169`/`v1170`).
 - **Eine echte Erinnerungsmail ist noch nie rausgegangen.**
-- **`gold-audit.py` liefert RC=1** — 463 harte Gold-Literale in 55 Dateien.
-  **Bestand**, nicht von dieser Sitzung. `CLAUDE.md` sagt „RC=0 ist
-  sauber"; das stimmt seit Längerem nicht. **Entweder die 463 abarbeiten
-  oder die Regel präzisieren.**
-- **Das Deploy-Skript ist repariert** (`v3`/`v3b`, `d0ab1f4`) — siehe
-  Fertig. Es prüft am Ende **selbst**, ob der Serverstand dem lokalen
-  entspricht; `Fertig.` ist damit ein Beweis statt eines Versprechens.
-  Die ersten fünf Rollouts dieser Sitzung liefen noch von Hand.
-- **Anbieter-Neutralität:** `CLAUDE.md` verlangt, Sprengnetter und
-  PriceHubble nie namentlich nach außen zu nennen. **Im Boarding-Pass
-  stehen beide mit Logo**, und der Kosten-Hinweis nennt sie ebenfalls.
-  Bestand — aber eine **Produktentscheidung, die ansteht.**
 
----
+**Bestand, der ansteht**
+
+- **`gold-audit.py` liefert RC=1** — 463 harte Gold-Literale in 55 Dateien.
+  Bestand, nicht aus dieser Sitzung. **Entweder die 463 abarbeiten oder die
+  Regel in `CLAUDE.md` präzisieren** („RC=0 ist sauber" stimmt seit Längerem
+  nicht).
 
 ## → ARCHIV: Übergabe 2026-08-31, nach dem Prod-Rollout
 

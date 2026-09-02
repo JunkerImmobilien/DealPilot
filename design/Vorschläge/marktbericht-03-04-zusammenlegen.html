@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marktwert und Miete auf einer Seite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Alle Zahlen stammen aus Marcels Bericht vom 02.09.2026
+   (Hermannstraße 9, 32609 Hüllhorst, ETW, 100 m², Bj 1962) — nichts erfunden.
+   Farben: DealPilot-Marke. Papierton wie die Inhaltsseiten des PDF. */
+:root{
+  --papier:#fff; --grund:#FDFCFA; --ink:#141417; --text:#222226; --leise:#78787f;
+  --linie:#E6E0D3; --gold:#C9A84C; --gold-d:#b8932f; --gold-h:#E8CC7A;
+  --rot:#B8625C; --gruen:#3FA56C;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--grund);color:var(--text);
+     font:15px/1.6 Inter,system-ui,sans-serif}
+.h{max-width:1080px;margin:0 auto;padding:32px 20px 90px}
+h1{font:600 25px/1.25 'Space Grotesk',sans-serif;margin:0 0 8px;text-wrap:balance}
+.unter{color:var(--leise);font-size:14px;margin:0 0 8px;max-width:70ch}
+h2{font:600 17px/1.3 'Space Grotesk',sans-serif;margin:34px 0 4px}
+.h2sub{color:var(--leise);font-size:13px;margin:0 0 14px;max-width:76ch}
+
+/* ── Papierbogen wie eine PDF-Inhaltsseite ─────────────────────────── */
+.blatt{background:var(--papier);border:1px solid var(--linie);border-radius:6px;
+  padding:26px 30px 30px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:12px}
+.sekt{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--linie);
+  padding-bottom:7px;margin-bottom:20px}
+.sekt .nr{font:600 10px 'JetBrains Mono',monospace;color:var(--gold-d);letter-spacing:.14em}
+.sekt .ti{font:600 13.5px 'Space Grotesk',sans-serif;letter-spacing:.02em;text-transform:uppercase}
+.seitenzahl{text-align:right;font:500 10px 'JetBrains Mono',monospace;color:var(--leise);
+  margin:-4px 0 16px}
+
+/* ── Bandanzeige (das ist die Darstellung aus 04) ───────────────────── */
+.kopf3{display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:14px}
+.kopf3 .lab{font:500 8.5px 'JetBrains Mono',monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--leise);margin-bottom:5px}
+.kopf3 .val{font:700 16px 'Space Grotesk',sans-serif;color:var(--text)}
+.kopf3 .val.gross{font-size:25px;color:var(--gold-d)}
+.kopf3 .sub{font:500 10px 'JetBrains Mono',monospace;color:var(--leise);margin-top:3px}
+.band{position:relative;height:9px;margin:8px 0 6px}
+.band .seg{position:absolute;top:0;height:9px;border-radius:3px}
+.band .aussen{background:#D6D4CE}
+.band .kern{background:var(--ink)}
+.band .marker{position:absolute;top:-5px;width:3px;height:19px;border-radius:2px;
+  background:var(--gold);box-shadow:0 0 0 2px rgba(255,255,255,.9)}
+.bandfuss{display:flex;justify-content:space-between;
+  font:500 9.5px 'JetBrains Mono',monospace;color:var(--leise)}
+
+/* kleinere Variante fuer die Miete */
+.band.klein{height:6px;margin:6px 0 5px}
+.band.klein .seg{height:6px}
+.band.klein .marker{top:-4px;height:14px;width:2.5px}
+.kopf3.klein .val{font-size:13px}
+.kopf3.klein .val.gross{font-size:19px}
+
+/* ── Karten-Darstellung (das ist 03, zum Vergleich) ─────────────────── */
+.karten{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.karte{border:1px solid var(--linie);border-radius:5px;padding:15px 16px}
+.karte .kl{font:500 8.5px 'JetBrains Mono',monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--leise);margin-bottom:9px}
+.karte .kv{font:700 22px 'Space Grotesk',sans-serif;color:var(--gold-d)}
+.karte .ks{font:500 10px 'JetBrains Mono',monospace;color:var(--leise);margin-top:4px}
+.gauge{margin:12px 0 4px}
+
+.bewert{margin-top:14px;font-size:13px;line-height:1.7}
+.bewert .p::before{content:'+ ';color:var(--gruen);font-weight:700}
+.bewert .c::before{content:'− ';color:var(--rot);font-weight:700}
+.zaehler{display:inline-block;font:600 10.5px 'JetBrains Mono',monospace;
+  background:rgba(184,98,92,.13);color:var(--rot);border-radius:999px;padding:2px 9px;margin-left:6px}
+.zaehler.gut{background:rgba(63,165,108,.14);color:var(--gruen)}
+
+.empf{margin-top:28px;background:var(--papier);border:1px solid var(--linie);
+  border-left:4px solid var(--gold);border-radius:11px;padding:19px 22px}
+.empf h3{font:600 15.5px 'Space Grotesk',sans-serif;margin:0 0 9px}
+code{font:500 12px 'JetBrains Mono',monospace;background:rgba(0,0,0,.05);
+  padding:1px 5px;border-radius:4px}
+.fuss{margin-top:22px;font-size:12.5px;color:var(--leise);line-height:1.65;max-width:78ch}
+</style>
+</head>
+<body>
+<div class="h">
+
+<h1>Marktwert und Miete auf einer Seite</h1>
+<p class="unter">
+  Marcels Vorschlag vom 02.09.2026: <b>„könnte man Punkt 03 und 04 zusammenfügen und die
+  Anzeige aus 04 übernehmen."</b> Alle Zahlen unten stammen aus seinem Bericht
+  (Hermannstraße 9, 32609 Hüllhorst, ETW, 100 m², Bj 1962) — nichts ist erfunden.
+</p>
+<p class="unter">
+  <b>Der Anlass ist gezählt:</b> die Zahl <b>195.000 €</b> steht rund <b>zehnmal</b> im
+  Dokument — in 01 Kennzahlen, in 03 als Kartenwert, in 04 als Bandmitte, dazu im Fließtext.
+  <code>sectionTitle('Preisstrategie', 999)</code> zwingt 04 außerdem auf eine <b>eigene Seite</b>.
+</p>
+
+<!-- ────────────────────────────────────────────────────────── -->
+<h2>Heute: zwei Abschnitte, zwei Seiten, derselbe Wert</h2>
+<p class="h2sub">Schematisch nachgebaut, mit den echten Werten.</p>
+
+<div class="blatt">
+  <div class="sekt"><span class="nr">03</span><span class="ti">Marktwert &amp; Marktmiete</span></div>
+  <div class="karten">
+    <div class="karte">
+      <div class="kl">Marktwert (Indikation)</div>
+      <div class="kv">195.000 €</div>
+      <div class="gauge">
+        <div class="band">
+          <div class="seg aussen" style="left:0;width:11%"></div>
+          <div class="seg kern" style="left:12%;width:76%"></div>
+          <div class="seg aussen" style="left:89%;width:11%"></div>
+          <div class="marker" style="left:43%"></div>
+        </div>
+        <div class="bandfuss"><span>159.000 €</span><span>243.000 €</span></div>
+      </div>
+      <div class="ks">1.695 €/m² · Median · Spanne 1.357–2.138 €/m²</div>
+    </div>
+    <div class="karte">
+      <div class="kl">Marktmiete kalt (Monat)</div>
+      <div class="kv">767 €</div>
+      <div class="gauge">
+        <div class="band">
+          <div class="seg aussen" style="left:0;width:11%"></div>
+          <div class="seg kern" style="left:12%;width:76%"></div>
+          <div class="seg aussen" style="left:89%;width:11%"></div>
+          <div class="marker" style="left:62%"></div>
+        </div>
+        <div class="bandfuss"><span>666 €</span><span>830 €</span></div>
+      </div>
+      <div class="ks">7,67 €/m² · Median · Spanne 6,66–8,30 €/m²</div>
+    </div>
+  </div>
+  <div class="seitenzahl">Seite 3</div>
+</div>
+
+<div class="blatt">
+  <div class="sekt"><span class="nr">04</span><span class="ti">Preisstrategie</span></div>
+  <div class="kopf3">
+    <div><div class="lab">Mindestpreis</div><div class="val">159.000 €</div><div class="sub">1.590 €/m²</div></div>
+    <div><div class="lab">Marktwert (Indikation)</div><div class="val gross">195.000 €</div><div class="sub">1.950 €/m²</div></div>
+    <div><div class="lab">Maximalpreis</div><div class="val">243.000 €</div><div class="sub">2.430 €/m²</div></div>
+  </div>
+  <div class="band">
+    <div class="seg aussen" style="left:0;width:11%"></div>
+    <div class="seg kern" style="left:12%;width:76%"></div>
+    <div class="seg aussen" style="left:89%;width:11%"></div>
+    <div class="marker" style="left:43%"></div>
+  </div>
+  <div class="bandfuss"><span>159.000 €</span><span>243.000 €</span></div>
+  <div class="seitenzahl">Seite 4 — durch <code>999</code> erzwungen</div>
+</div>
+
+<div class="bewert">
+  <div class="c">Der Marktwert steht zweimal groß, im Abstand einer Seite<span class="zaehler">195.000 € · 10×</span></div>
+  <div class="c">Zwei Darstellungen derselben Spanne: einmal als Kartengauge, einmal als Band.</div>
+  <div class="c">Eine ganze Seite für ein Band, das zehn Millimeter hoch ist.</div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────── -->
+<h2>Vorschlag: eine Sektion, die Anzeige aus 04</h2>
+<p class="h2sub">Der Preis bekommt das Band aus 04, die Miete bekommt dasselbe Band eine Nummer
+   kleiner. Gleiche Sprache für zwei Größen, eine Seite weniger.</p>
+
+<div class="blatt">
+  <div class="sekt"><span class="nr">03</span><span class="ti">Marktwert &amp; Marktmiete</span></div>
+
+  <div class="kopf3">
+    <div><div class="lab">Mindestpreis</div><div class="val">159.000 €</div><div class="sub">1.590 €/m²</div></div>
+    <div><div class="lab">Marktwert (Indikation)</div><div class="val gross">195.000 €</div><div class="sub">1.950 €/m²</div></div>
+    <div><div class="lab">Maximalpreis</div><div class="val">243.000 €</div><div class="sub">2.430 €/m²</div></div>
+  </div>
+  <div class="band">
+    <div class="seg aussen" style="left:0;width:11%"></div>
+    <div class="seg kern" style="left:12%;width:76%"></div>
+    <div class="seg aussen" style="left:89%;width:11%"></div>
+    <div class="marker" style="left:43%"></div>
+  </div>
+  <div class="bandfuss"><span>1.357 €/m²</span><span>Median 1.695 €/m²</span><span>2.138 €/m²</span></div>
+
+  <div style="height:26px"></div>
+
+  <div class="kopf3 klein">
+    <div><div class="lab">Untere Miete</div><div class="val">666 €</div><div class="sub">6,66 €/m²</div></div>
+    <div><div class="lab">Marktmiete kalt (Monat)</div><div class="val gross">767 €</div><div class="sub">7,67 €/m²</div></div>
+    <div><div class="lab">Obere Miete</div><div class="val">830 €</div><div class="sub">8,30 €/m²</div></div>
+  </div>
+  <div class="band klein">
+    <div class="seg aussen" style="left:0;width:11%"></div>
+    <div class="seg kern" style="left:12%;width:76%"></div>
+    <div class="seg aussen" style="left:89%;width:11%"></div>
+    <div class="marker" style="left:62%"></div>
+  </div>
+  <div class="bandfuss"><span>6,66 €/m²</span><span>Median 7,67 €/m²</span><span>8,30 €/m²</span></div>
+
+  <div class="seitenzahl">Seite 3 — Seite 4 entfällt</div>
+</div>
+
+<div class="bewert">
+  <div class="p">Der Marktwert steht <b>einmal</b> groß statt zweimal<span class="zaehler gut">195.000 € · 8×</span></div>
+  <div class="p">Preis und Miete lesen sich in derselben Form — wer die eine Zeile verstanden hat, versteht die andere.</div>
+  <div class="p">Die Spanne steht in €/m² <i>unter</i> dem Band, wo sie hingehört: dieselbe Einheit wie die Kopfwerte darüber.</div>
+  <div class="p"><b>Eine Seite weniger</b> im PDF; <code>sectionTitle(…, 999)</code> fällt weg.</div>
+  <div class="c">Der Kartengauge aus 03 verschwindet — er war der eigenständigere Blickfang.</div>
+</div>
+
+<div class="empf">
+  <h3>Was ich dabei zu bedenken gebe</h3>
+  <p style="margin:0 0 10px">
+    <b>Der Titel bleibt „Marktwert &amp; Marktmiete", nicht „Preisstrategie".</b> Was dort steht,
+    ist eine Wertaussage mit Spanne — keine Strategie. Das Wort „Preisstrategie" verspricht eine
+    Empfehlung („so gehst du in die Verhandlung"), die der Abschnitt nicht einlöst.
+  </p>
+  <p style="margin:0 0 10px">
+    <b>Die Zahl steht danach noch achtmal im Dokument.</b> Das Zusammenlegen nimmt zwei Nennungen
+    weg, nicht acht. Wenn dir das zu oft bleibt, ist der nächste Kandidat der Fließtext des
+    KI-Berichts — der wiederholt den Marktwert in fast jedem Absatz. Das wäre eine Änderung an der
+    Textvorgabe, kein Layout.
+  </p>
+  <p style="margin:0">
+    <b>Die Mietspanne ist hier die aus Vergleichsangeboten</b> (6,66–8,30 €/m²). Der Ertragswert
+    rechnet daneben mit <b>4,89 €/m²</b> aus der amtlichen Mietpreisübersicht — <b>unterhalb dieser
+    ganzen Spanne.</b> Solange das so steht, zeigt derselbe Bericht zwei Mieten, die nicht
+    zusammenpassen. <b>Das ist die wichtigere Baustelle als das Layout</b> und wartet auf deine
+    Entscheidung (A / B / C im Backlog).
+  </p>
+</div>
+
+<p class="fuss">
+  <b>Umsetzung:</b> die Bandanzeige existiert bereits als Block in <code>app.js</code> ab
+  Zeile 3410. Sie würde in die Sektion 03 wandern und ein zweites Mal — kleiner — für die Miete
+  gezeichnet. Der Kartenblock ab Zeile 3232 entfällt. Kein neuer Rechenweg, keine neue Datenquelle:
+  <code>mv.low/estimated/high</code> und <code>d.rent.q25/median/q75</code> stehen beide schon bereit.
+</p>
+
+</div>
+</body>
+</html>
