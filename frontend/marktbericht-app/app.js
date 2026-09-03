@@ -4384,18 +4384,70 @@ async function exportPdf(out) {
   // ---------- Vergleichsobjekte ----------
   const comps = (d.sale && d.sale.comparables) || [];
   if (comps.length) {
-    sectionTitle('Vergleichsobjekte (' + comps.length + ')');
+    /* v1212-vergleiche · DIE TABELLE ZEIGTE EINE AUSWAHL UND NANNTE SIE NICHT.
+     *
+     * Gemessen am Bericht 85 (Huellhorst, 03.09.2026), drei Befunde derselben
+     * Klasse:
+     *
+     * 1. Die Ueberschrift sagte "Vergleichsobjekte (10)", der Median daneben
+     *    stammt aus sample_size = 42. Der Median der zehn GEZEIGTEN ist 1.888
+     *    EUR/m2, ausgewiesen sind 1.695. Wer nachrechnet, kommt nicht hin.
+     * 2. Es gab keine Ortsspalte. ACHT der zehn Vergleiche liegen in
+     *    32312 Luebbecke, das Objekt in 32609 Huellhorst — ein anderer Ort.
+     *    Das ist keine Regelverletzung (5 km Radius, derselbe Kreis), aber es
+     *    gehoert in die Wertaussage: nach ImmoWertV muss die Vergleichbarkeit
+     *    begruendet sein, und "acht von zehn aus dem Nachbarort" ist eine
+     *    Begruendungspflicht.
+     * 3. Die Spalte "Entf." zeigte fuer acht Objekte identisch 3.526 m und
+     *    fuer zwei 2.046 m. Gemessen: zehn Objekte, ZWEI verschiedene
+     *    Koordinatenpaare — die Standorte sind je Ort zusammengefasst. Die
+     *    Zahl ist eine ORTS-, keine Objektentfernung, und sah wie eine
+     *    gemessene aus.
+     *
+     * Der Typ steht weiter in der Tabelle, weil er bei gemischten Bestaenden
+     * traegt; der Ort kommt daneben. */
+    const _cN = comps.length;
+    const _cGes = (d.sale && d.sale.sample_size) || _cN;
+    sectionTitle('Vergleichsobjekte (' + _cN + (_cGes > _cN ? ' von ' + _cGes : '') + ')');
     doc.autoTable({
       startY: y, margin: { left: M, right: M },
-      head: [['Typ', 'Fläche', 'Baujahr', 'Preis', '€/m²', 'Entf.']],
-      body: comps.map((c) => [c.property_type || '–', c.living_area ? c.living_area + ' m²' : '–',
+      head: [['Typ', 'Ort', 'Fläche', 'Baujahr', 'Preis', '€/m²', 'Entf.']],
+      body: comps.map((c) => [c.property_type || '–',
+        [c.postcode, c.city].filter(Boolean).join(' ') || '–',
+        c.living_area ? c.living_area + ' m²' : '–',
         c.build_year || '–', euro(c.price), c.price_per_sqm ? Math.round(c.price_per_sqm).toLocaleString('de-DE') : '–',
         c.distance_m != null ? c.distance_m + ' m' : '–']),
-      headStyles: { fillColor: INK, textColor: 255, fontSize: 8.5 },
-      styles: { fontSize: 8.5, cellPadding: 2, textColor: TXT },
+      headStyles: { fillColor: INK, textColor: 255, fontSize: 8 },
+      styles: { fontSize: 8, cellPadding: 1.8, textColor: TXT },
       alternateRowStyles: { fillColor: [245, 244, 240] },
     });
-    y = doc.lastAutoTable.finalY + 6;
+    y = doc.lastAutoTable.finalY + 4;
+    /* Was die Tabelle NICHT zeigt, gehoert unter die Tabelle. Beide Saetze
+     * entstehen nur, wenn der Befund wirklich vorliegt — gezaehlt, nicht
+     * behauptet. */
+    {
+      const _hin = [];
+      if (_cGes > _cN) {
+        _hin.push(_cN + ' von ' + _cGes + ' Vergleichen gezeigt; Median, Quartile und '
+          + 'Gesamtspanne oben stammen aus allen ' + _cGes + '.');
+      }
+      const _koord = new Set(comps.map((c) => (c.lat != null && c.lon != null)
+        ? c.lat + ',' + c.lon : null).filter(Boolean));
+      if (_koord.size > 0 && _koord.size < _cN) {
+        _hin.push('Die Standorte sind je Ort zusammengefasst (' + _koord.size
+          + ' Standorte für ' + _cN + ' Objekte) — die Entfernung ist eine Orts-, '
+          + 'keine Objektentfernung.');
+      }
+      if (_hin.length) {
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(...MUT);
+        const _hl = doc.splitTextToSize(_hin.join(' '), W - 2 * M);
+        need(_hl.length * 3 + 4);
+        doc.text(_hl, M, y + 2);
+        y += _hl.length * 3 + 3;
+        doc.setTextColor(...TXT);
+      }
+    }
+    y += 2;
   }
 
   // ---------- Bericht (Fließtext) ----------
