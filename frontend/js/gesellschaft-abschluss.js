@@ -622,7 +622,12 @@ function _gaGuvSeite(doc, jahr, name, rech, W, H, M, CW) {
           : ', einschließlich Gewerbesteuer')
       + '. Ein Verlustvortrag aus Vorjahren ist nicht berücksichtigt.' });
   strich(true);
-  pos('', 'Jahresüberschuss', g.jahresueberschuss, { fett: true, rot: g.jahresueberschuss < 0 });
+  /* v1227c: bei negativem Ergebnis heisst die Zeile handelsrechtlich
+     JahresFEHLBETRAG. "Jahresueberschuss: -21.078 EUR" ist kein Schoenheitsfehler,
+     sondern eine falsche Bezeichnung - und die faellt jedem Steuerberater
+     im ersten Blick auf. */
+  pos('', g.jahresueberschuss < 0 ? 'Jahresfehlbetrag' : 'Jahresüberschuss',
+    g.jahresueberschuss, { fett: true, rot: g.jahresueberschuss < 0 });
 
   /* Die Kosten der Gesellschaft — und was es heisst, wenn sie fehlen. */
   cy += 8;
@@ -745,7 +750,8 @@ function _gaBilanzSeite(doc, jahr, name, rech, W, H, M, CW) {
   ry = zeile(rx, ry, 'I. Gezeichnetes Kapital', b.stammkapital);
   ry = zeile(rx, ry, 'II. Gewinnvortrag', b.gewinnvortrag);
   ry = unter(rx, ry, 'Anfangsbestand aus den Stammdaten');
-  ry = zeile(rx, ry, 'III. Jahresüberschuss', b.jahresueberschuss);
+  ry = zeile(rx, ry, b.jahresueberschuss < 0 ? 'III. Jahresfehlbetrag' : 'III. Jahresüberschuss',
+    b.jahresueberschuss);
   ry += 2;
   ry = zeile(rx, ry, 'B. Rückstellungen', null, { fett: true });
   ry = zeile(rx, ry, 'Steuerrückstellung', b.steuerrueckstellung);
@@ -779,15 +785,34 @@ function _gaBilanzSeite(doc, jahr, name, rech, W, H, M, CW) {
   doc.setFillColor(ist ? 246 : 250, ist ? 240 : 240, ist ? 220 : 236);
   doc.setDrawColor.apply(doc, ist ? [176, 140, 90] : [176, 98, 92]);
   doc.setLineWidth(0.4);
-  var et = doc.splitTextToSize('Die Bilanz geht auf, weil die Differenz zwischen dem, was '
+  /* v1227c · DER KASTEN SAGT JETZT DIE URSACHE, NICHT NUR DIE REGEL.
+     Gemessen an der Testgesellschaft: ohne Stammkapital, Bankbestand und
+     Gesellschafterdarlehen stand das Verrechnungskonto bei 363.180 EUR;
+     mit diesen drei Angaben fiel es auf 77.180 EUR. Der Posten ist also
+     ein MESSGERAET fuer fehlende Stammdaten — dann soll er auch sagen,
+     welche fehlen, statt den Leser raten zu lassen. */
+  var _fehlt = [];
+  if (!(b.stammkapital > 0)) _fehlt.push('das gezeichnete Kapital');
+  if (!(b.bank > 0)) _fehlt.push('der Eröffnungsbestand der Bank');
+  if (!(b.gesdar > 0)) _fehlt.push('ein etwaiges Gesellschafterdarlehen');
+  var _basis = 'Die Bilanz geht auf, weil die Differenz zwischen dem, was '
     + 'DealPilot kennt, und dem, was tatsächlich über das Konto der Gesellschaft lief, '
     + 'als eigene Zeile ausgewiesen wird — nicht, weil sie null wäre. In diesem Posten '
     + 'stecken alle Vorgänge, die DealPilot nicht führt: Einlagen und Entnahmen, private '
     + 'Zahlungen für die Gesellschaft, Mietkautionen, der Zeitpunkt von Steuerzahlungen, '
     + 'sowie die laufenden Bankbewegungen des Jahres. Bei kleinen Immobiliengesellschaften '
-    + 'läuft vieles davon ohnehin über das Verrechnungskonto des Gesellschafters. '
-    + 'Ein Betrag in ungewöhnlicher Höhe ist ein Hinweis darauf, dass Angaben fehlen — '
-    + 'zuerst die Kosten der Gesellschaft und der Eröffnungsbestand der Bank prüfen.', CW - 8);
+    + 'läuft vieles davon ohnehin über das Verrechnungskonto des Gesellschafters.';
+  if (_fehlt.length) {
+    _basis += '  IN DIESEM ABSCHLUSS FEHLT: ' + _fehlt.join(', ') + '. '
+      + 'Solange diese Angaben in den Stammdaten der Gesellschaft auf null stehen, '
+      + 'trägt der Ausgleichsposten sie mit — er ist dann zwangsläufig zu hoch. '
+      + 'Nachzutragen unter Einstellungen / Mandanten.';
+  } else {
+    _basis += '  Die Stammdaten der Gesellschaft sind vollständig hinterlegt. '
+      + 'Ein Betrag in ungewöhnlicher Höhe deutet dann auf Zahlungen hin, die außerhalb '
+      + 'von DealPilot gelaufen sind.';
+  }
+  var et = doc.splitTextToSize(_basis, CW - 8);
   var eh = et.length * 3.6 + 11;
   doc.rect(M, cy, CW, eh, 'FD');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(8);

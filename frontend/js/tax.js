@@ -626,6 +626,56 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
                  + (_sum < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Gesellschaft im Verlust</div><div class="tax-val" style="color:var(--green)">keine KSt &middot; Verlustvortrag</div></div>' : '');
           } catch(_e) { return ''; }
         })() +
+        /* ═══════════════════════════════════════════════════════════════
+           v1228 · DIE ZWEITE STEUEREBENE.
+           ───────────────────────────────────────────────────────────────
+           Marcel hat sie ausdruecklich gewollt: "Ja, als eigene Zeile."
+
+           Bis hierher endet die Rechnung beim Gewinn der Gesellschaft —
+           15,825 % gegen einen persoenlichen Satz von vielleicht 42 %.
+           So verglichen gewinnt die GmbH immer, und der Vergleich ist
+           falsch: was ENTNOMMEN wird, kostet beim Gesellschafter noch
+           einmal. 25 % Kapitalertragsteuer plus Soli auf die
+           Ausschuettung, also 26,375 %, oder auf Antrag das
+           Teileinkuenfteverfahren.
+
+           Gerechnet wird die volle Ausschuettung des Jahresergebnisses,
+           weil das der Fall ist, in dem der Vergleich mit dem privaten
+           Halten ueberhaupt Sinn ergibt. Bleibt der Gewinn in der
+           Gesellschaft, gilt weiter der niedrige Satz — beide Wege stehen
+           deshalb nebeneinander, statt dass einer behauptet wird.
+           ═══════════════════════════════════════════════════════════════ */
+        (function () {
+          try {
+            if (!(_erg > 0)) return '';
+            var _nachKSt = _erg - _kst;
+            var _kap = _nachKSt * 0.26375;          /* 25 % KapESt + 5,5 % Soli darauf */
+            var _beim = _nachKSt - _kap;
+            var _gesamt = _erg > 0 ? (1 - _beim / _erg) : 0;
+            return '<div class="tax-item" style="grid-column:1/-1;background:transparent;border-color:rgba(201,168,76,.22)">'
+                 +   '<div class="tax-label" style="color:var(--gold-h)">Wenn ausgesch&uuml;ttet wird &middot; zweite Steuerebene</div>'
+                 +   '<div class="tax-val" style="font-size:13px;color:var(--muted);line-height:1.5">'
+                 +     'Nach K&ouml;rperschaftsteuer ' + fE(_nachKSt, 0)
+                 +     ' &middot; abz&uuml;glich Kapitalertragsteuer 26,375 % ' + fE(_kap, 0)
+                 +   '</div>'
+                 + '</div>'
+                 + '<div class="tax-item tax-result" style="grid-column:1/-1">'
+                 +   '<div class="tax-label">Beim Gesellschafter angekommen (' + displayYear + ')</div>'
+                 +   '<div class="tax-val" style="color:var(--gold-h);font-size:20px">' + fE(_beim, 0)
+                 +     ' <span style="font-size:12px;color:var(--muted);font-weight:400">von ' + fE(_erg, 0)
+                 +     ' &middot; Gesamtbelastung ' + (_gesamt * 100).toFixed(1).replace('.', ',') + ' %</span></div>'
+                 + '</div>'
+                 + '<div class="tax-item" style="grid-column:1/-1;background:transparent;border:0;padding-top:0">'
+                 +   '<div class="tax-val" style="font-size:11.5px;color:var(--muted);line-height:1.5;font-weight:400">'
+                 +     'Gerechnet ist die <b>volle Aussch&uuml;ttung</b> &mdash; nur so ist der Vergleich mit dem '
+                 +     'privaten Halten ehrlich. Bleibt der Gewinn in der Gesellschaft und wird weiter '
+                 +     'investiert, gilt weiterhin ' + _rateTxt + '. Auf Antrag kann statt der '
+                 +     'Abgeltungsteuer das Teileinkünfteverfahren g&uuml;nstiger sein (&sect; 32d Abs. 2 Nr. 3 EStG) &mdash; '
+                 +     'das h&auml;ngt am pers&ouml;nlichen Satz und geh&ouml;rt zum Steuerberater.'
+                 +   '</div>'
+                 + '</div>';
+          } catch (_eA) { return ''; }
+        })() +
       '</div>';
   }
 
