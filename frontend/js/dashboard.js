@@ -1124,6 +1124,7 @@
       +   '<div class="dp-mappe-r">'
       +     '<label class="dp-mappe-l">Veranlagungsjahr</label>'
       +     '<select id="dp-mappe-jahr" class="dp-mappe-sel"></select>'
+      +     '<label class="dp-mappe-cb"><input type="checkbox" id="dp-mappe-av" checked> Anlage-V-Zuordnung anhängen</label>'
       +     '<button class="dp-mappe-btn" onclick="DealPilotDashboard.steuerMappe()">Steuer-Mappe erstellen</button>'
       +   '</div>'
       +   '<div class="dp-mappe-h">Die Zuordnung zu den Zeilennummern der amtlichen Anlage V ist <b>nicht</b> enthalten — sie ändern sich je Veranlagungsjahr und werden nicht geraten.</div>'
@@ -1392,7 +1393,8 @@
     var btn = document.querySelector('.dp-mappe-btn');
     var alt = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = 'erstelle…'; }
-    try { await exportSteuerMappePDF(jahr); }
+    var avEl = document.getElementById("dp-mappe-av");
+    try { await exportSteuerMappePDF(jahr, { anlageV: !!(avEl && avEl.checked) }); }
     catch (e) { if (typeof toast === 'function') toast('✗ ' + (e.message || e)); }
     finally { if (btn) { btn.disabled = false; btn.textContent = alt; } }
   }
@@ -1411,6 +1413,8 @@
     + '.dp-mappe-btn{padding:8px 16px;border-radius:6px;border:0;cursor:pointer;font-size:13px;font-weight:600;'
     +   'background:var(--wl-c9a84c,#C9A84C);color:#141417}'
     + '.dp-mappe-btn:hover{filter:brightness(1.06)}'
+    + '.dp-mappe-cb{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;cursor:pointer;opacity:.9}'
+    + '.dp-mappe-cb input{accent-color:var(--wl-c9a84c,#C9A84C);cursor:pointer}'
     + '.dp-mappe-h{margin-top:11px;font-size:11.5px;line-height:1.5;opacity:.65}';
     document.head.appendChild(s);
   }
