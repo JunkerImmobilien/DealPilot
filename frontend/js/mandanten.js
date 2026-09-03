@@ -511,6 +511,121 @@
 
   function _fGrid() { return 'display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin:14px 0'; }
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     v1226 · KOSTEN DER GESELLSCHAFT — Erfassung je Jahr
+     ───────────────────────────────────────────────────────────────────────
+     Fünf Arten, weil die GuV sie getrennt braucht und weil eine einzige
+     Summe niemandem sagt, was drinsteckt. Bearbeitet wird immer EIN Jahr;
+     der Entwurf hält alle Jahre, bis gespeichert wird — sonst verliert ein
+     Jahreswechsel im Formular die Eingaben des vorigen.
+     ═══════════════════════════════════════════════════════════════════════ */
+  var KOSTENARTEN = [
+    { f: 'steuerber', t: 'Steuerberatung / Jahresabschluss',
+      h: 'Honorar für Buchführung, Jahresabschluss und Erklärungen der Gesellschaft. Nicht die Steuerberatung, die ein einzelnes Objekt betrifft — die steht im Objekt.' },
+    { f: 'kammer', t: 'IHK, Handelsregister, Notar',
+      h: 'Kammerbeitrag, Eintragungen im Handelsregister, Notarkosten für Gesellschafterbeschlüsse.' },
+    { f: 'bank', t: 'Kontoführung der Gesellschaft',
+      h: 'Gebühren des Geschäftskontos. Kontoführung, die zu einem Objektdarlehen gehört, steht beim Objekt.' },
+    { f: 'gf', t: 'Geschäftsführergehalt',
+      h: 'Bruttogehalt einschließlich Arbeitgeberanteil. Bei 0 wird unentgeltlich geführt — dann bitte mit dem Steuerberater klären, ob das so gewollt ist.' },
+    { f: 'sonst', t: 'Sonstiges',
+      h: 'Versicherungen der Gesellschaft, Software, Porto, Beiträge — alles ohne Objektbezug.' }
+  ];
+
+  var _kDraft = {};    /* Jahr -> { steuerber, kammer, bank, gf, sonst } */
+  var _kJahr = null;
+
+  function _kJahre() {
+    var j = {}, nun = new Date().getFullYear();
+    Object.keys(_kDraft).forEach(function (y) { j[y] = 1; });
+    [nun - 1, nun, nun + 1].forEach(function (y) { j[y] = 1; });
+    return Object.keys(j).map(Number).sort(function (a, b) { return a - b; });
+  }
+  function _kInit(m) {
+    _kDraft = {};
+    var src = (m && m.kosten) || {};
+    Object.keys(src).forEach(function (y) { _kDraft[y] = _kObj(src[y]); });
+    var nun = String(new Date().getFullYear());
+    _kJahr = (_kDraft[nun] ? nun : (_kJahre().indexOf(Number(nun)) >= 0 ? nun : String(_kJahre()[0])));
+  }
+  function _kObj(o) {
+    var r = {}; o = o || {};
+    KOSTENARTEN.forEach(function (k) { r[k.f] = Number(o[k.f]) || 0; });
+    return r;
+  }
+  function _kSumme(o) {
+    var s = 0; o = o || {};
+    KOSTENARTEN.forEach(function (k) { s += Number(o[k.f]) || 0; });
+    return s;
+  }
+  function _kjOpts() {
+    return _kJahre().map(function (y) {
+      var s = _kSumme(_kDraft[y]);
+      return '<option value="' + y + '"' + (String(y) === String(_kJahr) ? ' selected' : '') + '>'
+        + y + (s ? '  ·  ' + s.toLocaleString('de-DE') + ' \u20ac' : '') + '</option>';
+    }).join('');
+  }
+  function _kUebersicht() {
+    var mit = Object.keys(_kDraft).filter(function (y) { return _kSumme(_kDraft[y]) > 0; }).sort();
+    if (!mit.length) return 'Noch kein Jahr erfasst.';
+    return 'Erfasst: ' + mit.map(function (y) {
+      return y + ' (' + _kSumme(_kDraft[y]).toLocaleString('de-DE') + ' \u20ac)';
+    }).join(' \u00b7 ');
+  }
+  function _kFelder() {
+    var w = _kObj(_kDraft[_kJahr]);
+    return KOSTENARTEN.map(function (k) {
+      return '<div class="f"><label>' + k.t + ' (\u20ac)</label>'
+        + '<input id="mand-k-' + k.f + '" type="text" value="' + esc(w[k.f] || 0) + '">'
+        + '<div class="mand-fhint" style="margin-top:5px;font-size:11.5px;color:#7A7370;line-height:1.45">' + k.h + '</div>'
+        + '</div>';
+    }).join('');
+  }
+  function _kSync() {
+    if (_kJahr == null) return;
+    var o = {};
+    KOSTENARTEN.forEach(function (k) { o[k.f] = _toN(_val('mand-k-' + k.f)); });
+    _kDraft[_kJahr] = o;
+  }
+  function kostenJahr(j) {
+    _kSync();
+    _kJahr = String(j);
+    var host = document.getElementById('mand-kosten-felder');
+    if (host) host.innerHTML = _kFelder();
+    var ue = document.getElementById('mand-kosten-uebersicht');
+    if (ue) ue.innerHTML = _kUebersicht();
+    var sel = document.getElementById('mand-f-kjahr');
+    if (sel) sel.innerHTML = _kjOpts();
+  }
+  /* Beim Speichern: leere Jahre fliegen raus, damit die Auswahl nicht mit
+     Nullzeilen zuwaechst. */
+  function _kErnte() {
+    _kSync();
+    var out = {};
+    Object.keys(_kDraft).forEach(function (y) {
+      if (_kSumme(_kDraft[y]) > 0) out[y] = _kDraft[y];
+    });
+    return out;
+  }
+
+  /* v1226 · Auskunft nach aussen: was hat die Gesellschaft in diesem Jahr
+     gekostet, aufgeschluesselt und als Summe. Die GuV braucht die
+     Aufschluesselung, die Bilanz nur die Summe. Kein Jahr erfasst heisst
+     `erfasst: false` — und NICHT eine Null, die wie ein gemessener Wert
+     aussieht. */
+  function kostenFuer(halterId, jahr) {
+    var m = get(halterId);
+    var src = (m && m.kosten) || {};
+    var o = src[String(jahr)];
+    var werte = _kObj(o);
+    return {
+      erfasst: !!o,
+      werte: werte,
+      summe: _kSumme(werte),
+      arten: KOSTENARTEN.map(function (k) { return { f: k.f, t: k.t, betrag: werte[k.f] || 0 }; })
+    };
+  }
+
   function _renderForm() {
     var isNew = _editing === 'NEW';
     var m = isNew ? { rechtsform: 'gmbh', regime: {}, bh: {} } : (get(_editing) || { regime: {}, bh: {} });
@@ -518,6 +633,7 @@
     var locked = !!m._locked;
     var rf = m.rechtsform || 'gmbh';
     var corp = isCorp(rf);
+    _kInit(m);   /* v1226: Kosten-Entwurf aus dem Mandanten laden */
 
     function rfOpts() {
       var src = locked ? RF : RF.filter(function (r) { return RF_NEW.indexOf(r.v) >= 0; });
@@ -586,6 +702,28 @@
       +     fldH('Er\u00f6ffnung Gesellschafterdarlehen (\u20ac)', inp('mand-f-gesdar', bh.eb_gesdar || 0), 'Stand der Darlehen, die du der Gesellschaft als Gesellschafter gegeben hast \u2014 Fremdkapital der GmbH (deine Forderung). Tilgung mindert den Gewinn nicht, nur die Zinsen.')
       +     fldH('Gewinnvortrag (\u20ac)', inp('mand-f-gv', bh.eb_gewinnvortrag || 0), 'Aufgelaufener, noch nicht ausgesch\u00fctteter Gewinn aus Vorjahren (Anfangsbestand). Bei einer neu gegr\u00fcndeten Gesellschaft 0.')
       +   '</div>'
+      /* ═══════════════════════════════════════════════════════════════════
+         v1226 · DER AUFWAND, DER KEINEM OBJEKT GEHÖRT.
+         ───────────────────────────────────────────────────────────────────
+         Gemessen am 03.09.2026: in der ganzen App hängt JEDE Zahl an einem
+         Objekt. Eine Gesellschaft hat aber Kosten, die keinem gehören —
+         Jahresabschluss, IHK, Kontoführung, Geschäftsführergehalt. Solange
+         die fehlen, ist der Jahresüberschuss zu hoch UND die Bilanz geht
+         nicht auf: sie ist die Ursache hinter der Bankzeile, die als erste
+         bricht.
+
+         Erfasst wird je Jahr, weil sich diese Beträge jedes Jahr ändern und
+         die GuV ein Jahresdokument ist. Gespeichert als m.kosten[<Jahr>].
+         ═══════════════════════════════════════════════════════════════════ */
+      +   '<hr class="dvd" style="margin:18px 0 6px">'
+      +   '<h3 class="set-section-h">Kosten der Gesellschaft <span style="font-weight:400;color:#7A7370;font-size:12px">· je Jahr, ohne Objektbezug</span></h3>'
+      +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Aufwand, der <b>keinem einzelnen Objekt</b> zuzuordnen ist. Die Kosten der Objekte stehen im jeweiligen Objekt unter Steuer — hier steht nur, was die Gesellschaft als solche kostet. <b>Ohne diese Beträge ist der Jahresüberschuss zu hoch und die Bilanz geht nicht auf.</b></div>'
+      +   '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 2px">'
+      +     '<label style="font-size:12px;color:#7A7370;font-weight:600">Jahr</label>'
+      +     '<select id="mand-f-kjahr" onchange="DealPilotMandanten.kostenJahr(this.value)" style="padding:7px 10px;border:1px solid #e6e0d3;border-radius:8px;font-family:inherit;font-size:13px">' + _kjOpts() + '</select>'
+      +     '<span id="mand-kosten-uebersicht" style="font-size:11.5px;color:#7A7370">' + _kUebersicht() + '</span>'
+      +   '</div>'
+      +   '<div id="mand-kosten-felder" style="' + _fGrid() + '">' + _kFelder() + '</div>'
       + '</div>';
 
     /* v841-zve-host: Privat -> echte INLINE-Steuerzeitraeume-Verwaltung (DB-gebunden). */
@@ -658,8 +796,9 @@
         eb_gesdar: _toN(_val('mand-f-gesdar')),
         eb_gewinnvortrag: _toN(_val('mand-f-gv'))
       };
+      m.kosten = _kErnte();   /* v1226: Kosten der Gesellschaft, je Jahr */
     } else {
-      m.regime = {}; m.bh = {};
+      m.regime = {}; m.bh = {}; m.kosten = {};
     }
     if (locked) m._locked = true;
     upsert(m); _editing = null; _rerender();
@@ -795,6 +934,8 @@
     renderSidebarChips: renderSidebarChips, _toggleMandMenu: _toggleMandMenu, onUeberfToggle: onUeberfToggle, undoUeberfuehrung: undoUeberfuehrung, undoUeberfuehrungFromPrivat: undoUeberfuehrungFromPrivat,  syncAfterLoad: syncAfterLoad,  /* v816d-export */
     renderSettingsTab: renderSettingsTab,
     uiSaveIfOpen: uiSaveIfOpen,   /* v826 (dedup) */
+    kostenJahr: kostenJahr,        /* v1226: Jahreswechsel im Kostenblock */
+    kostenFuer: kostenFuer,        /* v1226: Auskunft fuer GuV und Bilanz */
     uiNew: uiNew, uiEdit: uiEdit, uiCancel: uiCancel, uiSave: uiSave, uiDelete: uiDelete, uiToggleRf: uiToggleRf
   };
 })();
