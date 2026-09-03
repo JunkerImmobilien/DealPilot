@@ -156,6 +156,33 @@ Umgebung blockiert.**
 
 ### Der oberste offene Punkt: 1 · Marktbericht neu gestalten
 
+> ### ABGESCHLOSSEN am 03.09.2026 — bis auf eine Entscheidung
+>
+> **a)** Feldmarkierung: gebaut (`v1199`/`v1201`/`v1202`), im laufenden
+> System nachgewiesen — sechs markierte Felder, Marken für alle drei Stufen,
+> Randfarbe `rgb(201,168,76)`. Der Backlog-Eintrag war veraltet und hat den
+> Punkt offen gehalten; die tote rote CSS-Regel dahinter ist mit `v1213` weg.
+> **b)** Score-Konvention für fehlende Teilwerte: **liegt bei Marcel** —
+> eine Bewertungsfrage, siehe unten.
+> **c)** Ergebnis-Teil: vollständig geprüft. Bodenwert, beide Rechenwege,
+> Vergleichspreise und Verfahrenswahl Zeile für Zeile nachgerechnet
+> (`v1210`, `v1212`).
+> **d)** PDF-Bericht: durchgesehen und umgebaut — `v1206` bis `v1213`.
+>
+> **Was dabei herauskam, in einem Satz:** von den elf Befunden dieser Runde
+> war **kein einziger ein Rechenfehler**. Alle elf waren Fälle derselben
+> Art — eine Zahl stand da und rechnete nicht (4,89 €/m²), oder sie rechnete
+> und stand nicht da (828 m² Hinterland), oder eine Auswahl gab sich als
+> Gesamtheit aus (10 von 42 Vergleichen), oder eine Warnung wurde erkannt
+> und nicht weitergereicht (Kaltmiete 1,00 €/m²).
+> **Die Maschine rechnet richtig. Sie hat nur nicht immer gesagt, was sie
+> tut.**
+>
+> **Nicht umnummeriert.** Aus 1–8 wird nicht 1–7: die Historie unten zeigt,
+> dass jede Umnummerierung eine eigene Erklärung gebraucht hat. Punkt 1
+> bleibt Punkt 1 und trägt diesen Vermerk.
+
+
 **Der Wizard ist jetzt strukturell UND inhaltlich durchgegangen, und der
 Ergebnis-Teil ist erstmals angesehen.** Was dabei herauskam, steht unter
 Fertig (`v1196`, `v1196b`, `v1197`). Kurzfassung:
@@ -206,33 +233,32 @@ Verfahrenswahl ist fachlich sauber — nicht gemittelt, führendes Verfahren
 mit Begründung und Quelle. Bei den Vergleichspreisen fielen drei Befunde an,
 alle behoben.
 
-**d) Der PDF-Bericht ist durchgesehen und zweimal umgebaut.** Marcel hat den
-eigenen Export gelesen. Gebaut sind: 03 und 04 zu einer Sektion mit der
-Bandanzeige (`v1206`), Sektion 01 entschlackt, zwei Waisen-Umbrüche behoben
-und der Kasten „Welche Miete der Ertragswert rechnet" (`v1207`, beide unter
-Fertig). „195.000" steht jetzt 4× im Dokument statt 10×.
+**d) Der PDF-Bericht ist durchgesehen und mehrfach umgebaut — erledigt.**
+Marcel hat den eigenen Export zweimal gelesen, ich ihn zweimal ausgelesen.
+Gebaut: 03 und 04 zu einer Sektion (`v1206`) · 01 entschlackt und ein
+Waisen-Umbruch behoben (`v1207`) · die Lage zu einem Kapitel gebündelt
+(`v1208`) · die Textvorgabe „jede Zahl genau einmal" (`v1209`, an einem
+echten Bericht abgenommen) · Hinterlandfläche in den Stammdaten (`v1210`) ·
+die Plausibilitätswarnungen erreichen Bericht und PDF (`v1211`) · die
+Vergleichstabelle nennt ihre Auswahl (`v1212`). **„195.000" steht 4× im
+Dokument statt 10×**, das Inhaltsverzeichnis führt 10 Abschnitte statt 13.
 
-**Offen und bei Marcel:**
+**Offen und bei Marcel — nur noch eines:**
 
-1. **Die Gliederung.** Demo liegt:
-   `design/Vorschläge/marktbericht-struktur.html`, drei Stufen. Gemessener
-   Befund: `08 Lage- & Potenzialbewertung`, `09 Makrolage & Sozioökonomie`
-   und `10 Lage & Infrastruktur` beginnen **alle drei auf Seite 7** — dieselbe
-   Zersplitterung wie vorher bei 03/04. Empfohlen ist Stufe 1: nur die Lage
-   bündeln, 12 → 10 Abschnitte. **Spart keine Seite**, macht die Seite ruhig.
-2. **Der Fließtext des KI-Berichts** wiederholt den Marktwert in fast jedem
-   Absatz. Das wäre eine Änderung an der Textvorgabe, kein Layout — und es
-   ist die letzte verbliebene Quelle der Wiederholung.
-3. **„Aussagekraft: Mittel · 59 %"** steht weiterhin in 01 unter dem
-   Score-Ring **und** vollständig in 03. Die kurze Zeile in 01 bezieht sich
-   auf den Score, der Block in 03 auf den Marktwert — es sind zwei Aussagen
-   mit demselben Wortlaut und derselben Zahl. Ob das eine Dopplung ist oder
-   zwei richtige Angaben, ist eine Produktfrage.
+1. **„Aussagekraft: Mittel · 59 %"** steht in 01 unter dem Score-Ring **und**
+   vollständig als Block in 03. Die kurze Zeile in 01 bezieht sich auf den
+   Score, der Block in 03 auf den Marktwert — zwei Aussagen mit demselben
+   Wortlaut und derselben Zahl. Ob das eine Dopplung ist oder zwei richtige
+   Angaben, ist eine Produktfrage.
 
-> **Die Mietfrage ist erledigt und war eine falsche Prämisse — meine.**
-> Der Ertragswert rechnet längst mit 7,67 €/m², nicht mit 4,89. Die
-> A/B/C-Frage, die ich gestellt hatte, ist zurückgenommen; siehe Fertig
-> und das Journal zu `v1207`.
+> **Zwei Punkte, die hier standen, sind erledigt:** die **Gliederung**
+> (Marcel wählte Stufe 1, gebaut als `v1208`) und der **Fließtext des
+> KI-Berichts** (`v1209`, am echten Bericht 85 abgenommen: Abschnitt C nennt
+> keine Zahl aus A mehr).
+>
+> **Die Mietfrage war eine falsche Prämisse — meine.** Der Ertragswert
+> rechnet längst mit 7,67 €/m², nicht mit 4,89. Die A/B/C-Frage ist
+> zurückgenommen; siehe Journal zu `v1207`.
 
 **Positiv aufgefallen und nicht angetastet:** die Verfahren kennzeichnen
 sich selbst — „SACHWERT 268.172 € · **vorläufig · ohne Sachwertfaktor,

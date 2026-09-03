@@ -5778,6 +5778,58 @@ Konsole ohne Fehler.
 **Rest.** `v1212` liegt auf **Staging**, nicht auf Prod. Damit ist
 Backlog-Punkt **1c vollständig abgearbeitet**.
 
+### v1213 (03.09.2026, `37185cc`) — die tote Regel, die einen Backlog-Punkt offen hielt
+
+**Was.** Backlog-Punkt **1a** sagte seit Wochen: *„Pflichtangaben sind in den
+Reitern 2–5 nicht erkennbar … die CSS-Regel `.wm-f.fehlt` existiert, aber die
+Klasse `fehlt` wird nirgends gesetzt — gebaut und nie verdrahtet. Vorschlag,
+noch nicht gebaut."*
+
+**Das beschreibt den Stand vor `v1199`.** Gemessen: `mb-stufen.js` markiert
+seit `v1199`/`v1201`/`v1202` jedes offene Feld **aller** Stufen bis zur
+gewählten mit `mbst-fehltfeld` und hängt eine Zeile „fehlt für <Stufe>" ans
+Feld. Der Punkt war längst gebaut — nur der Backlog wusste es nicht.
+
+**Woran das lag: die tote Regel.** `.wm-f.fehlt` wird im ganzen `frontend/`
+von keiner Zeile gesetzt — nachgewiesen, kein `classList.add('fehlt')`, kein
+`class="… fehlt"`. Und sie ist **rot** (`#B8625C`), die Farbe der Variante,
+die Marcel am 02.09. **nicht** gewählt hat („b ist super" = Goldschiene). Die
+gebaute Markierung ist Gold.
+
+> **Eine tote Regel in der Farbe der verworfenen Variante ist die schlechteste
+> Sorte Leiche: sie sieht aus, als müsste man sie nur noch anschließen.**
+> Genau so hat sie den Backlog-Punkt offen gehalten, obwohl die Funktion
+> stand — und beim nächsten Durchgang hätte jemand die Markierung ein zweites
+> Mal gebaut.
+
+Sie ist entfernt, aber **nicht kommentarlos**: an ihrer Stelle steht, was dort
+war, warum es weg ist und wo die echte Markierung sitzt. Die Lehre aus
+`js/bmf-modal-v292.js`, das einmal fälschlich als Leiche verschwand.
+
+**Commit.** `37185cc` — `wertermittlung.js`, `BACKLOG.md`, Cache-Buster.
+**`wertermittlung.js` hing seit `v1201` auf `?v=1201`** und wurde mitgezogen;
+ohne das käme die Änderung im Browser nicht an.
+
+**Nachweis im laufenden System.** Stufe 3 ohne geladenes Objekt gewählt:
+**6 markierte Felder**, Marken für alle drei Stufen („fehlt für
+Marktpreisindikation" / „… Erweiterte Marktpreisindikation" / „… Wertermittlung
+nach ImmoWertV"), Randfarbe `rgb(201, 168, 76)` = `#C9A84C`. Die tote Regel ist
+in keinem Stylesheet mehr auffindbar. Konsole ohne Fehler.
+
+**Damit ist Backlog-Punkt 1 abgeschlossen** — bis auf die Score-Konvention
+(1b), die eine Bewertungsfrage und damit Marcels ist.
+
+> **Der Befund der ganzen Runde, in einem Satz.** Von den elf Befunden aus
+> `v1206`–`v1213` war **kein einziger ein Rechenfehler**. Alle elf waren
+> Fälle derselben Art: eine Zahl stand da und rechnete nicht (4,89 €/m²) ·
+> eine rechnete und stand nicht da (828 m² Hinterland) · eine Auswahl gab
+> sich als Gesamtheit aus (10 von 42 Vergleichen) · eine Warnung wurde
+> erkannt und nicht weitergereicht (Kaltmiete 1,00 €/m²) · eine Kennzahl kam
+> aus dem falschen Feld (2,56 % als „Bruttorendite") · eine tote Regel gab
+> vor, eine Funktion fehle.
+> **Die Maschine rechnet richtig. Sie hat nur nicht immer gesagt, was sie
+> tut.**
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im
