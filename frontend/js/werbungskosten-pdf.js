@@ -1237,7 +1237,7 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
      wichtiger als die Zuordnung selbst — ein Leser muss unterscheiden können,
      was aus dem Formular abgeschrieben ist und was aus der Art des Aufwands
      folgt. Ohne diese Unterscheidung sieht beides gleich sicher aus. */
-  var ohne = [], zugeordnetSumme = 0, sachlogik = [], afaHinweis = null;
+  var ohne = [], zugeordnetSumme = 0, sachlogik = [], afaHinweis = null, gedruckt = {};
   Object.keys(T.felder).forEach(function (f) {
     if (f === 'einnahmen_km' || f === 'einnahmen_nk') return;
     var z = T.felder[f];
@@ -1259,6 +1259,7 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
         var zSon = T.zeilen[38] || {};
         zeile('Zeile ' + z.zeile, zz.kz, 'AfA Gebäude (linear, ohne § 7b)', lin);
         zeile('Zeile 38', zSon.kz, 'Sonderabschreibung § 7b EStG', son);
+        gedruckt[38] = 1;
         afaHinweis = 'Die Gebäude-AfA von ' + eur(betrag) + ' enthält eine Sonderabschreibung '
           + 'nach § 7b EStG. Zeile 35 nimmt laut Formular nur den Betrag „ohne die Zeilen 36 bis 41" '
           + 'auf, deshalb steht der § 7b-Anteil hier getrennt in Zeile 38.';
@@ -1366,10 +1367,18 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   cy += 11;
 
   /* ── 5 · nicht erfasst ── */
-  if (T.nicht_erfasst && T.nicht_erfasst.length) {
+  /* v1225b · WAS OBEN STEHT, DARF UNTEN NICHT ALS FEHLEND GELTEN. Wurde die
+     § 7b-Sonderabschreibung in Zeile 38 gedruckt, ist sie erfasst — dann
+     gehoert sie nicht mehr in die Liste der Zeilen, die DealPilot nicht
+     fuehrt. Ein Blatt, das sich selbst widerspricht, ist schlimmer als eins,
+     das eine Luecke laesst. */
+  var _ne = (T.nicht_erfasst || []).filter(function (n) {
+    return !gedruckt[n.zeile];
+  });
+  if (_ne.length) {
     kopf('FORMULARZEILEN, DIE DEALPILOT NICHT FÜHRT');
     doc.setFontSize(6.8); doc.setTextColor(140, 134, 128);
-    T.nicht_erfasst.forEach(function (n) {
+    _ne.forEach(function (n) {
       var t = doc.splitTextToSize('Zeile ' + n.zeile + ' — ' + n.text, CW);
       _need(t.length * 3.1 + 1.5);
       doc.text(t, M, cy);
