@@ -1006,6 +1006,13 @@ function _computeAutoForYear(yearIdx, year) {
 
     // 5.0 AfA Gebäude — V112 reine Gebäude-AfA (ohne Küche)
     // V227: + § 7b Sonder-AfA (wirkt nur in den ersten 4 Jahren)
+    /* v1225 · die beiden Summanden bleiben getrennt VERFUEGBAR. Der Unterstrich
+       sagt: kein Formularfeld, sondern eine Auskunft ueber die Zusammensetzung
+       von `afa`. _computeYearTotal reicht sie weiter, die Anlage-V-Seite
+       braucht sie fuer Zeile 35 gegen Zeile 38. Die Summe oben bleibt exakt
+       dieselbe — hier wird nichts umgerechnet. */
+    _afaLinear: afaGebaeude,
+    _afaSonder7b: afaSonder7bJahr,
     afa: afaGebaeude + afaSonder7bJahr,
 
     // 6.0 AfA bewegliche Wirtschaftsgüter
@@ -1113,8 +1120,8 @@ function _computeYearTotal(year, yearIdx, vorgabe) {
        Objekt (Steuer-Mappe), und State._afaSeries* gehoert zum geoeffneten.
        Ein Wert aus dem falschen Objekt waere schlimmer als keiner — deshalb
        dann null, was „nicht bekannt" heisst und auf dem Blatt auch so steht. */
-    afaLinear:    vorgabe ? null : afaGebaeude,
-    afaSonder7b:  vorgabe ? null : afaSonder7bJahr,
+    afaLinear:    vorgabe ? null : (auto._afaLinear != null ? auto._afaLinear : null),
+    afaSonder7b:  vorgabe ? null : (auto._afaSonder7b != null ? auto._afaSonder7b : null),
     refund: impact.refund,
     taxDelta: impact.taxDelta,
     /* v1133-steuerwirkung: calcImmoTaxImpact rechnet ESt vorher/nachher und
