@@ -6353,14 +6353,87 @@ schaltet den ganzen String auf eine andere Kodierung um. Im Code sieht es
 richtig aus, im PDF steht Buchstabensalat. Gehört zur `CLAUDE.md`-Reihe über
 jsPDF: kein `var()`, kein Canvas — **und keine Zeichen außerhalb WinAnsi**.
 
-**Noch offen aus Marcels Paket:**
+**Marcels Paket ist abgearbeitet** — siehe den Journal-Eintrag unten.
 
-1. **Zeilennummern im Steuer-Tab (Detail-Modus)**, hinter den Info-Punkten.
-2. **Anlage-V-Auswahl auch beim Einzel-PDF** im Objekt-Tab — bisher nur in
-   der Mappe.
-3. **Die Mappe für überführte Objekte** — DealPilot führt `obj_herkunft`,
-   `verkehrswert_ueberf`, `halter_seit`; die Mappe kennt das noch nicht.
-4. **Eigene Spalte für die § 7b-Sonder-AfA** im Steuersatz (Backend).
+---
+
+## Rollout-Journal · 03.09.2026 — Steuer-Mappe, Anlage V, § 7b
+
+**Was:** Marcels Paket vom 03.09. in seiner Reihenfolge („mach der Reihe
+nach"). Vier Punkte, fünf Versionen, alles Frontend.
+
+**Commits:** `9bd6730` (v1222b) · `0117954` (v1223) · `a0bc788` (v1224) ·
+`4f479e7` (v1224b) · `9b1c953` + `95c6f4b` + `952c601` (v1225…c).
+**Staging steht auf `952c601`. Prod steht auf `6047036` — v1215…v1225c
+fehlen dort.** Kein Rebuild, keine Migration.
+
+**Nachweis (alles auf Staging gemessen, nicht behauptet):**
+
+- **v1222b** — alle 25 Info-Zeichen im Steuer-Tab tragen den Anlage-V-Block
+  **unter** der vorhandenen Erklärung. Null Konsolenfehler.
+- **v1223** — Einzel-PDF mit Haken: 2 Seiten statt 1. „Alle Jahre": 31 statt
+  16 (15 Jahre × 2 + Summenseite). Ohne Haken unverändert 1.
+- **v1224/b** — gemischte Mappe aus 6 privaten Objekten, einem in eine UG
+  überführten und zweien mit Halterwechsel in 2026: 17 Seiten, fehlerfrei.
+  Kopf „Vermietung · Anlage V § 21 EStG **und** Gewerbebetrieb § 8 Abs. 2
+  KStG", UG-Blatt ohne Anlage-V-Seite mit Begründung, Wechseljahr-Warnung
+  auf Blatt und Schlussseite. **Reine Privatmappe im selben Lauf
+  unverändert** — die Änderung greift nur, wo sie soll.
+- **v1225…c** — mit § 7b: Zeile 35 = 6.000 €, Zeile 38 = 5.000 €,
+  Summe 11.000 € unverändert; ohne § 7b eine Zeile. Zeile 38 steht in der
+  Fehlliste **nur**, wenn sie nicht gedruckt wurde (beide Richtungen
+  geprüft).
+
+**Rest:**
+
+1. **Prod-Rollout** von v1215…v1225c — wartet auf Marcels „ja".
+2. **Eigene Spalte für die § 7b-Sonder-AfA** in `tax_records`. Für das
+   geöffnete Objekt ist die Aufteilung jetzt bekannt, für einen gespeicherten
+   Satz nicht — dort steht der Hinweis statt einer geratenen Zahl.
+   **Datenbankeingriff, wartet auf Freigabe.**
+
+### Der Befund dieser Runde
+
+**Vier von sechs Fehlern waren Widersprüche, keine Rechenfehler.** Zwei
+Aussagen über dieselbe Sache auf demselben Blatt: „zu jedem Objekt liegt eine
+Zuordnung bei" über der Liste der Objekte, für die keine beiliegt; Zeile 38
+gedruckt und darunter als „nicht geführt" gemeldet; „§ 21 EStG" im Kopf über
+Zahlen einer GmbH; die Halterzählung aus einer anderen Quelle als die
+Gliederung. **Ein Dokument, das sich selbst widerspricht, ist schlimmer als
+eins mit einer Lücke — die Lücke sieht man.**
+
+Dazu zwei Regeln, die **richtig gebaut waren und nichts geliefert haben**:
+„keine Zeilennummer ohne Abschrift für genau dieses Jahr" heißt gemessen
+„nie eine Zeilennummer", weil das Formular ab dem Kaufjahr rechnet (2026)
+und die Abschrift von 2025 ist. Der Einwand galt dem **fehlenden Vorbehalt**,
+nicht dem Rückfall aufs Vorjahr — jetzt steht der Vorbehalt auf dem Blatt.
+
+### Fachlich neu: `_steuerRegime()`
+
+| Rechtsform | Anlage V? | warum |
+|---|---|---|
+| privat | ja | § 21 EStG |
+| GbR | ja | zur gesonderten und einheitlichen Feststellung |
+| GmbH / UG | **nein** | § 8 Abs. 2 KStG — nur Einkünfte aus Gewerbebetrieb |
+
+Eine Anlage-V-Seite über Zahlen einer GmbH war nicht ein Formfehler, sondern
+**die falsche Einkunftsart**.
+
+### Zurückgenommen: „jsPDF druckt kein € und keine Gedankenstriche"
+
+**Das war falsch.** Ich hatte es mit einem Auszug aus dem Seitenstrom belegt,
+in dem „17.957 €" als „17.957 " ankam. Dort steht Byte `128` — das € in
+WinAnsi; `—` ist 151, `–` ist 150. **Mein Extraktor stellte 0x80–0x9F als
+unsichtbar dar.** Das Werkzeug hat gelogen, nicht das PDF.
+
+Echt bleibt nur der Befund aus `v1221b`: Zeichen **außerhalb** WinAnsi
+(`→ ≥ ✓`) kippen die ganze Zeichenkette nach UTF-16. Geprüft — in keinem
+PDF-Erzeuger steht so ein Zeichen in Nutztext.
+
+> **Beim Messen an einem PDF-Seitenstrom immer WinAnsi 0x80–0x9F
+> zurückübersetzen.** Sonst misst man sein eigenes Werkzeug. Vierter Fall
+> dieser Art in dieser Sitzung.
+
 
 
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026

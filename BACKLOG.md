@@ -36,7 +36,109 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-## → HIER WEITERMACHEN (Übergabe 02.09.2026, nach dem Prod-Rollout)
+## → HIER WEITERMACHEN (Übergabe 03.09.2026, Steuer-Mappe und Anlage V)
+
+**Stand:** lokal = GitHub = Staging auf `952c601`.
+**Produktion steht auf `6047036`** — **`v1215` bis `v1225c` sind NICHT auf
+Prod.** Reines Frontend, kein Rebuild, keine Migration. Ein Prod-Rollout
+braucht nur Marcels „ja".
+
+**Marcels Paket vom 03.09. ist abgearbeitet — alle vier Punkte, in seiner
+Reihenfolge.** Jeder auf Staging gemessen, nicht behauptet.
+
+| | was | Version | Nachweis auf Staging |
+|---|---|---|---|
+| 1 | Anlage-V-Zeilennummern im Steuer-Tab, **unter** dem Info-Feld | `v1222`/`v1222b` | alle 25 Info-Zeichen tragen den Block, null Konsolenfehler |
+| 2 | Anlage V beim **Einzel**-PDF zuwählbar | `v1223` | Haken an: 2 Seiten statt 1; „Alle Jahre": 31 statt 16 |
+| 3 | Steuer-Mappe für **privat und überführt** | `v1224`/`v1224b` | gemischte Mappe (6 privat, 1 in eine UG überführt, 2 mit Halterwechsel) läuft fehlerfrei; reine Privatmappe unverändert |
+| 4 | **§ 7b** getrennt von der linearen AfA | `v1225`…`v1225c` | mit § 7b: Zeile 35 = 6.000, Zeile 38 = 5.000, Summe 11.000 unverändert; ohne: eine Zeile |
+
+### Der Befund, der sich durch alle vier zieht
+
+**Vier von sechs Fehlern in dieser Runde waren Widersprüche, keine
+Rechenfehler** — zwei Aussagen über dieselbe Sache auf demselben Blatt:
+
+- Die Schlussseite sagte „Zu **jedem** Objekt liegt eine Anlage-V-Zuordnung
+  bei" und zwei Zeilen darunter, für welches Objekt bewusst keine beiliegt.
+- Zeile 38 wurde oben gedruckt und stand unten unter „Formularzeilen, die
+  DealPilot **nicht** führt".
+- Der Kopf trug „Anlage V · § 21 EStG", während auf demselben Blatt Zahlen
+  einer GmbH standen.
+- `_mappeHalter()` zählte die Halter über **alle** Objekte des Kontos aus
+  der Listenantwort, während Sortierung, Gliederung und Regime aus `stamm`
+  lasen. **Eine Angabe aus zwei Quellen** — das Deckblatt konnte einen Halter
+  melden, der in der Mappe nicht vorkommt.
+
+Ein Dokument, das sich selbst widerspricht, ist schlimmer als eins mit einer
+Lücke: die Lücke sieht man.
+
+### Zwei Regeln, die richtig waren und trotzdem nichts geliefert haben
+
+**`v1222b` und `v1223`.** Die Regel „gibt es für das Jahr keine abgeschriebene
+Zuordnung, erscheint keine Zeilennummer" ist fachlich richtig. Gemessen
+heißt sie: **es erscheint nie eine.** Das Steuerformular rechnet ab dem
+Kaufjahr — bei allen Testobjekten 2026 aufwärts —, abgeschrieben ist die
+Anlage V **2025**, und die Anlage V 2026 ist im September 2026 noch gar
+nicht veröffentlicht. Marcel kann sie nicht nachliefern.
+
+Der Einwand gegen einen Rückfall auf das Vorjahr war der **fehlende
+Vorbehalt**, nicht der Rückfall. Also steht der Vorbehalt jetzt auf dem Blatt
+selbst: rotes Band über der ersten Zahl, Formularjahr im Kopf, Wiederholung
+im Fuß. Im Tooltip dasselbe als ACHTUNG-Zeile.
+
+### Was dabei fachlich neu ist
+
+**`_steuerRegime(halterId)`** trennt die drei Fälle, die DealPilot kennt:
+
+| Rechtsform | Anlage V? | warum |
+|---|---|---|
+| privat | ja | § 21 EStG |
+| GbR | ja | zur gesonderten und einheitlichen Feststellung |
+| GmbH / UG | **nein** | § 8 Abs. 2 KStG — nur Einkünfte aus Gewerbebetrieb |
+
+Für ein Objekt der GmbH war die alte Anlage-V-Seite nicht ein Formfehler,
+sondern **die falsche Einkunftsart**. Die Seite entfällt jetzt nicht
+stillschweigend: die Schlussseite sagt, für welche Objekte und warum.
+
+**`_ueberfVermerk()`** bringt die Überführung aufs Blatt: Stichtag, und dass
+die AfA-Bemessungsgrundlage der **Verkehrswert zum Stichtag** ist, nicht der
+Kaufpreis. Im Jahr des Wechsels sind beide Seiten Rumpfjahre — das sagt das
+Blatt, weil die Summe sonst wie eine Jahressumme aussieht und keine ist.
+
+### Der eine Punkt, der Freigabe braucht
+
+**Eine eigene Spalte für die § 7b-Sonder-AfA in `tax_records`.** `tax.js`
+addiert lineare AfA und § 7b zu einem Feld, der gespeicherte Satz hat nur
+eine Spalte. Für das **geöffnete** Objekt ist die Aufteilung seit `v1225`
+bekannt und wird getrennt gedruckt; für einen **gespeicherten** Satz in der
+Mappe nicht — dort steht stattdessen der ausdrückliche Hinweis, dass ein
+§ 7b-Anteil aus Zeile 35 abzuziehen und in Zeile 38 einzutragen wäre.
+**Das ist ehrlich, aber nicht vollständig.** Die vollständige Lösung ist ein
+Datenbankeingriff (Migration + Rebuild) und wartet auf Marcels Freigabe.
+
+### Eine Falschdiagnose, die hier stehen bleiben soll
+
+Ich habe während dieser Runde behauptet, **jsPDF drucke weder das
+Euro-Zeichen noch Gedankenstriche** — belegt mit einem Auszug aus dem
+Seitenstrom, in dem „17.957 €" als „17.957 " ankam. **Falsch.** Dort steht
+Byte `128`, das € in WinAnsi; mein Extraktor stellte 0x80–0x9F als
+unsichtbar dar. Dasselbe für `—` (151) und `–` (150). **Mein Werkzeug hat
+gelogen, nicht das PDF.**
+
+Echt ist nur der schon bekannte Befund aus `v1221b`: Zeichen **außerhalb**
+WinAnsi (`→ ≥ ✓`) kippen die ganze Zeichenkette nach UTF-16 und machen sie
+unlesbar. Geprüft: **in keinem PDF-Erzeuger steht so ein Zeichen in
+Nutztext** — die Treffer in `pdf.js` sind Kommentare und eine
+`console.log`-Zeile.
+
+> Beim Messen an einem PDF-Seitenstrom **immer WinAnsi 0x80–0x9F
+> zurückübersetzen**, sonst misst man sein eigenes Werkzeug. Das ist in
+> dieser Sitzung das vierte Mal, dass ein Prüfwerkzeug einen Fehler
+> erfunden hat.
+
+---
+
+## → ARCHIV: Übergabe 02.09.2026, nach dem Prod-Rollout
 
 **Stand:** lokal = GitHub = Staging auf `3d334e9`. **Produktion auf `39aa598`** — es fehlt `v1205` (Backend, braucht `mb-backend`-Rebuild).
 
