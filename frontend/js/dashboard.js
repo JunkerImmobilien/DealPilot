@@ -1358,10 +1358,19 @@
         sel.dataset.gefuellt = '1';
         return;
       }
+      /* v1215c · Vorausgewählt ist das VERANLAGUNGSJAHR, nicht das jüngste.
+         Die gespeicherten Sätze reichen bis 2040, weil sie auch die Projektion
+         tragen — im Feld stand deshalb "2040 · 4 Objekte". Für eine
+         Steuermappe will das niemand. Genommen wird das letzte abgeschlossene
+         Jahr, wenn es dafür Sätze gibt, sonst das nächstkleinere vorhandene. */
+      var _ziel = new Date().getFullYear() - 1;
+      var _vor = (jahre.indexOf(_ziel) >= 0) ? _ziel
+               : (jahre.filter(function (j) { return j <= _ziel; })[0] || jahre[0]);
       sel.innerHTML = jahre.map(function (j) {
         return '<option value="' + j + '">' + j + '  ·  ' + _mappeJahre[j]
              + ' Objekt' + (_mappeJahre[j] === 1 ? '' : 'e') + '</option>';
       }).join('');
+      sel.value = String(_vor);
       sel.disabled = false;
       sel.dataset.gefuellt = '1';
     } catch (e) {
@@ -1398,7 +1407,7 @@
     + '.dp-mappe-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}'
     + '.dp-mappe-l{font:600 10px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;opacity:.7}'
     + '.dp-mappe-sel{padding:7px 10px;border-radius:6px;border:1px solid rgba(128,128,128,.35);'
-    +   'background:transparent;color:inherit;font-size:13px;min-width:190px}'
+    +   'background:transparent;color:inherit;font-size:13px;width:auto;min-width:200px;max-width:270px}'
     + '.dp-mappe-btn{padding:8px 16px;border-radius:6px;border:0;cursor:pointer;font-size:13px;font-weight:600;'
     +   'background:var(--wl-c9a84c,#C9A84C);color:#141417}'
     + '.dp-mappe-btn:hover{filter:brightness(1.06)}'
