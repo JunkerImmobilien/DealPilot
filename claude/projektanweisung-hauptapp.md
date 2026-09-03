@@ -5675,6 +5675,49 @@ Mietstruktur oder eine deutliche Kaufpreisreduzierung."*
 fehlt die Freigabe. Marcels Export ist als
 `design/mockups/Marktbericht_32609_Ahlsen_Reineberg-v1208.pdf` abgelegt.
 
+### Prod-Rollout 03.09.2026, zweiter — v1210 und v1211 sind live (`b0dcfc1`)
+
+**Freigabe.** Marcel: *„ja zieh es nach und mach weiter."*
+
+**Gesichert vor dem Eingriff**, beide Datenbanken:
+`/root/backups/haupt-20260903-0627.sql.gz` (9.281 Zeilen) und
+`mb-20260903-0627.sql.gz` (35.275 Zeilen).
+
+**Weg.** `git push origin staging:main` (Fast-Forward, 9 Commits, vorher
+`merge-base --is-ancestor` geprüft) · `git pull --ff-only` von `1f06705` auf
+`b0dcfc1` · `mb-backend` neu gebaut (Orchestrator und `report_prompt.txt`
+sind ins Image gebacken).
+
+**Was live geht.** `v1210` (Hinterlandfläche in den Stammdaten) · `v1211`
+(die Plausibilitätswarnungen erreichen Bericht und PDF) · `v1211b` (jede
+Kennzahl nur aus ihrem eigenen Feld) · `v1211c` (temporale Todeszone) ·
+`v1211d` (Umlaute im Kundentext).
+
+**Auslieferung nachgewiesen, im Container und im Volume gelesen:**
+
+| | |
+|---|---|
+| `report_prompt.txt` · „NUR AUS IHREM EIGENEN FELD" | 1 Treffer |
+| `report_prompt.txt` · „VERERBT SICH" | 1 Treffer |
+| `ReportOrchestrator.js` · `plausibilitaet` | 2 Treffer |
+| `app.js` · `ref.hinterland_qm` | 2 Treffer |
+| `app.js` · „GEPRÜFT GEHÖREN" | 1 Treffer |
+| Cache-Buster-Kette, alle drei Glieder | `1211d` |
+
+Alle fünf Container laufen, `mb-backend` ohne Fehler im Log.
+
+> **Die Funktionsabnahme auf Prod steht aus, und der Grund ist banal: die
+> Prod-App hat die Sitzung beendet.** Der Anmeldedialog stand mit
+> vorausgefüllten Feldern da; `/reports/replay` antwortete mit
+> *„Missing or invalid Authorization header"*. **Anmelden ist mir untersagt**,
+> also endet die Prüfung dort. Der Tab wurde unangetastet gelassen.
+>
+> Was das relativiert: **derselbe Code ist auf Staging vollständig am echten
+> PDF geprüft** — Warnkasten auf Seite 3, Hinterland-Zeile in den Stammdaten,
+> Abschnitt C ohne erfundene Kennzahl. Auf Prod ist bewiesen, dass die
+> Dateien ankommen; nicht bewiesen ist, dass ein **dort** erzeugter Bericht
+> es zeigt. Das ist ein Abnahmepunkt, kein Verdacht.
+
 ## ⚠ DIESE DATEI WURDE EINMAL ÜBERSCHRIEBEN — 14.08.2026
 
 **Marcels Marktbericht-Fassung lag als `PROJEKTANWEISUNG.md` im

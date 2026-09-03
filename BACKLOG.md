@@ -263,6 +263,15 @@ Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
 
 **Beweise, die noch fehlen**
 
+- **Funktionsabnahme von `v1210`/`v1211` auf Prod.** Die Auslieferung ist
+  bewiesen (Dateien im Container und Volume gelesen, Cache-Buster `1211d`,
+  Container ohne Fehler). Der Bericht **dort** wurde nicht erzeugt: die
+  Prod-App hatte die Sitzung beendet und `/reports/replay` antwortete mit
+  „Missing or invalid Authorization header" — anmelden darf ich nicht.
+  Derselbe Code ist auf Staging am echten PDF vollständig geprüft.
+  **Wenn Marcel angemeldet ist: einmal einen Bericht anzeigen und den
+  Warnkasten auf Seite 3 suchen.**
+
 
 - **Der `402`-Pfad ist nicht end-to-end bewiesen.** Serverseitig gelesen,
   frontendseitig gemessen; der Beweis unter echten Bedingungen braucht einen
