@@ -729,6 +729,14 @@ export const ReportOrchestrator = {
 
     // 8) Payload für KI / JSON-Ausgabe
     const payload = {
+      /* v1211-plausi · Die Plausibilitaetspruefung des Formulars (_mbCheckup)
+       * erkannte am 03.09.2026 "Kaltmiete 1,00 EUR/m2 — ungewoehnlich niedrig",
+       * zeigte es im Dialog, und danach war der Befund weg. Das Modell bekam
+       * monthly_net_rent: 100 ohne Vorbehalt und baute daraus eine
+       * Renditeaussage. Die Warnungen gehen jetzt DURCH — in den Prompt und
+       * ins PDF. Kein Array, kein Feld: ein sauberer Datensatz bleibt sauber. */
+      plausibilitaet: (Array.isArray(input.plausibilitaet) && input.plausibilitaet.length)
+        ? input.plausibilitaet.map(String).slice(0, 12) : undefined,
       ref,
       address: { ...(geo?.components || {}), formatted: geo?.formatted, lat, lon,
                  city: geo?.components?.city, postcode: geo?.components?.postcode },

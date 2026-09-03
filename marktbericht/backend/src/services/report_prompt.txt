@@ -14,6 +14,7 @@ DATENEHRLICHKEIT (NICHT VERHANDELBAR):
 - Weise Datenkonfidenz (confidence) und Stichprobengroesse (sample_size) dort aus, wo sie die Aussagekraft betreffen.
 - Mache Annahmen explizit ("Annahme: ...").
 - Unterscheide klar zwischen gemessenen Marktdaten, berechneten Groessen (Marktwert, Rendite, Score), amtlichen Daten und Einschaetzungen – OHNE Anbieternamen zu nennen.
+- ZWEIFELHAFTE ANGABEN (Feld `plausibilitaet`): Ist dieses Feld vorhanden, hat die Eingabepruefung die dort genannten Angaben als unplausibel markiert. Behandle sie NICHT als belastbar. Ziehe daraus KEINE Rendite-, Faktor- oder Wirtschaftlichkeitsaussage, auch keine relativierende ("ueberschaubare Rendite"). Benenne die Angabe stattdessen EINMAL als pruefbeduerftig und sage, was sich aendert, wenn sie korrigiert wird. Eine Zahl, die die Maschine selbst angezweifelt hat, darf im Text nicht wie eine gesicherte auftreten.
 
 JEDE ZAHL GENAU EINMAL (NICHT VERHANDELBAR):
 - Der MARKTWERT und seine SPANNE stehen als Zahl AUSSCHLIESSLICH in Abschnitt A. In B und C wird sprachlich darauf Bezug genommen ("die genannte Wertindikation", "innerhalb der oben genannten Spanne", "rund ein Zehntel unter dem angesetzten Kaufpreis") - OHNE die Zahl zu wiederholen.

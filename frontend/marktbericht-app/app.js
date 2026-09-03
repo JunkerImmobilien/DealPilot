@@ -383,6 +383,18 @@ async function generate() {
   btn.innerHTML = '<span class="spin"></span> erstelle…';
 
   const body = {
+    /* v1211-plausi · DIE WARNUNG MUSS MIT.
+     * Gemessen am Bericht 83 (03.09.2026): _mbCheckup() erkannte "Kaltmiete
+     * 1,00 EUR/m2 — ungewoehnlich niedrig", zeigte es im Dialog — und danach
+     * war der Befund weg. Das Modell bekam monthly_net_rent: 100 ohne jeden
+     * Vorbehalt und schrieb daraus: "mit einem geschaetzten Wert von 195.000
+     * Euro, was bei einer monatlichen Kaltmiete von 100 Euro eine
+     * ueberschaubare Nettojahresrendite ermoeglicht". 0,6 % brutto, als
+     * Bewertung ausgegeben.
+     * Die Pruefung war da, sie hat funktioniert, und niemand hat ihr zugehoert.
+     * `undefined` statt `[]`, damit ein sauberer Datensatz den Payload nicht
+     * mit einem leeren Feld belastet. */
+    plausibilitaet: (Array.isArray(_w) && _w.length) ? _w : undefined,
     external_ref: (function(){ return _mbRef() || undefined; })(), /* v942-mbrep: Dropdown schlaegt URL */
     object_label: (function(){ return window._mbwLabel || undefined; })(),
     address: $('address').value,
@@ -3278,6 +3290,33 @@ async function exportPdf(out) {
       doc.setFont('helvetica', 'normal');
       y = sy + segH + 6;
     }
+  }
+
+  /* v1211-plausi · EINE ZWEIFELHAFTE ANGABE GEHOERT INS DOKUMENT.
+   * Gemessen am Bericht 83: die Kaltmiete stand mit 100 EUR/Monat auf 100 m2
+   * in den Stammdaten, und der Fliesstext machte daraus eine Renditeaussage.
+   * Die Pruefung hatte den Fehler VOR dem Lauf erkannt und im Dialog gezeigt —
+   * danach war der Befund weg. Ein Bericht, der eine unplausible Zahl
+   * kommentarlos weiterreicht, sieht genauso aus wie einer mit sauberen Daten.
+   * Der Kasten steht direkt unter den Stammdaten, weil dort die Zahlen stehen,
+   * um die es geht. Keine Warnungen, kein Kasten. */
+  const _plausi = Array.isArray(d.plausibilitaet) ? d.plausibilitaet.filter(Boolean) : [];
+  if (_plausi.length) {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setCharSpace(0);
+    const _zl = _plausi.map((t, i) => doc.splitTextToSize((i + 1) + '. ' + String(t), blockW - 12));
+    const _ph = 9.5 + _zl.reduce((s, z) => s + z.length * 3, 0) + (_plausi.length - 1) * 1.2;
+    need(_ph + 4);
+    doc.setFillColor(252, 246, 244); doc.roundedRect(M, y, blockW, _ph, 2, 2, 'F');
+    doc.setFillColor(184, 98, 92); doc.roundedRect(M, y, 1.6, _ph, 0.8, 0.8, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(6.9); doc.setTextColor(184, 98, 92);
+    doc.setCharSpace(0.3);
+    doc.text('ANGABEN, DIE GEPRUEFT GEHOEREN', M + 5, y + 5.5);
+    doc.setCharSpace(0);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(...MUT);
+    let _yy = y + 10;
+    _zl.forEach((z) => { doc.text(z, M + 5, _yy); _yy += z.length * 3 + 1.2; });
+    y += _ph + 4;
+    doc.setTextColor(...TXT);
   }
 
   // ---------- Marktwert & Marktmiete (v1206: eine Sektion, Bandanzeige) ----------
