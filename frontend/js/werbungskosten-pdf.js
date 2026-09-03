@@ -628,14 +628,39 @@ async function exportSteuerMappePDF(jahr, opts) {
     return;
   }
 
-  /* Objektangaben je id — aus /objects, nicht aus dem Satz. */
+  /* v1215b · GEMESSEN: GET /objects liefert nur eine ZUSAMMENFASSUNG.
+     Die Liste trägt name, ort, kaufpreis, dscr … — aber KEIN `data` und damit
+     weder Straße noch Hausnummer noch Wohnfläche. Im ersten Lauf stand auf
+     Seite 1 deshalb ",  Kabelsketal" und "ETW ·  m²": eine Adresse ohne
+     Straße und eine Fläche ohne Zahl.
+
+     Die Details liegen in GET /objects/:id. Das ist KEIN „Nachladen der
+     Objekte" im Sinne des Backlog-Eintrags — der meinte das Laden in den
+     Editor, das den Arbeitsstand überschreibt. Ein reiner Abruf tut das nicht.
+
+     Nur für die Objekte geholt, die wirklich im PDF landen, und parallel.
+     Schlägt einer fehl, wird das Objekt NICHT übersprungen: es bekommt seine
+     Seite mit dem Namen aus dem Satz, und die Schlussseite nennt es. */
   var stamm = {};
+  var brauchtDetails = {};
+  saetze.forEach(function (s) { if (s.object_id) brauchtDetails[s.object_id] = 1; });
+  var ids = Object.keys(brauchtDetails);
+  var details = await Promise.all(ids.map(function (id) {
+    return Auth.apiCall('/objects/' + id).catch(function () { return null; });
+  }));
   objekte.forEach(function (o) {
-    var d = o.data || o;
-    var ortTeil = (d.plz || d.ort) ? ', ' + (d.plz || '') + ' ' + (d.ort || '') : '';
-    stamm[o.id] = {
-      name: o.name || d.objname || '',
-      addr: ((d.str || '') + ' ' + (d.hnr || '')).trim() + ortTeil,
+    stamm[o.id] = { name: o.name || '', addr: o.ort || '', qm: '', art: '' };
+  });
+  details.forEach(function (res, i) {
+    if (!res) return;
+    var o = res.object || res;
+    var d = o.data || {};
+    var id = ids[i];
+    var strTeil = ((d.str || '') + ' ' + (d.hnr || '')).trim();
+    var ortTeil = (d.plz || d.ort) ? ((d.plz || '') + ' ' + (d.ort || '')).trim() : '';
+    stamm[id] = {
+      name: o.name || (stamm[id] && stamm[id].name) || '',
+      addr: [strTeil, ortTeil].filter(Boolean).join(', '),
       qm: d.wfl || '',
       art: d.objart || ''
     };
