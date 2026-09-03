@@ -324,6 +324,22 @@ eine selbst ausgerechnete Zahl.
 - **Löhner Str. 278**, 32120 Hiddenhausen, ZFH 233 m², Bj 1964 —
   Verkehrswert 350.094,36 €, BGF 346,62 m², Bodenwert 144.840 €
 
+> **Der Prüfmaßstab ist der DATENSATZ, nicht die Adresse.** Das Objekt
+> `2026-001` in der App trägt dieselbe Anschrift wie das Testobjekt Hüllhorst,
+> aber **andere Werte**: ETW **100 m²**, Bj **1962**, Grundstück 950 m² plus
+> 828 m² Hinterland, MEA 50 %. Gemessen am 03.09.2026 rechnet es Sachwert
+> **242.274 €** und amtliche Miete **4,89 €/m²** — beides korrekt für *diese*
+> Angaben, beides weit weg von den Zahlen oben. Wer `2026-001` lädt und gegen
+> die Zeile darüber prüft, findet eine Abweichung, die keine ist. **Die
+> Mietpreisübersicht staffelt nach Fläche und Baujahr** — 4,83 gegen 4,89 ist
+> genau dieser Effekt, kein Fehler.
+>
+> Nachgerechnet und in Ordnung (Bericht 83, Stufe 3): der Ertragswert-
+> Rechenweg Zeile für Zeile bis 193.940 €, der Sachwert-Rechenweg bis
+> 242.274 €, der Bodenwert 950 × 90 + 828 × 5, −10 % Lärm, × 50 % MEA
+> = 40.338 €. Die BWK-Quote steht auf dem **gesamten** Rohertrag inklusive
+> Stellplätzen, wie es sein muss.
+
 ---
 
 ## Auslieferung von Paketen

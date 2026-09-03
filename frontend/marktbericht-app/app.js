@@ -3210,6 +3210,25 @@ async function exportPdf(out) {
   if (ref.balcony_area) rows.push(['Balkon/Terrasse', ref.balcony_area + ' m²']);
   if (ref.garden_area) rows.push(['Garten', ref.garden_area + ' m²']);
   if (ref.plot_area) rows.push(['Grundstück', Math.round(ref.plot_area).toLocaleString('de-DE') + ' m²']);
+  /* v1210-zusatzflaeche · EINE ZAHL, DIE RECHNET, MUSS AUCH DASTEHEN.
+   * Gemessen am Bericht 83 (Huellhorst, 03.09.2026): die Stammdaten sagten
+   * "Grundstueck 950 m2", die Bodenwertrechnung darunter rechnete
+   * "950 m2 x 90 EUR/m2" PLUS "828 m2 x 5 EUR/m2" — also 1.778 m2. Die 828 m2
+   * kamen im ganzen Dokument nicht vor, und die 4.140 EUR dafuer waren fuer
+   * einen Leser nicht herleitbar.
+   * KEIN Rechenfehler: das Eingabefeld heisst ausdruecklich "ZUSAETZLICHE
+   * Grundstuecksflaeche / Hinterland", die Flaeche kommt also zu Recht obendrauf.
+   * Es ist dasselbe Problem wie bei den 4,89 EUR/m2 in v1207, nur andersherum:
+   * dort stand eine Zahl da, die nicht rechnete — hier rechnete eine, die
+   * nicht dastand.
+   * Der Wertansatz steht mit dabei, weil er eine eigene Angabe ist und keine
+   * amtliche: Paragraf 41 verlangt fuer selbstaendig nutzbare Teilflaechen
+   * ohnehin die getrennte Bewertung, und die traegt hier der Nutzer. */
+  if (ref.hinterland_qm) {
+    rows.push(['Hinterland', Math.round(ref.hinterland_qm).toLocaleString('de-DE') + ' m²'
+      + (ref.hinterland_eur_qm != null
+          ? '  ·  ' + String(ref.hinterland_eur_qm).replace('.', ',') + ' €/m²' : '')]);
+  }
   if (ref.units) rows.push(['Wohneinheiten', ref.units]);
   const stell = [ref.garages ? ref.garages + ' Garage/TG' : null, ref.outdoor_parking ? ref.outdoor_parking + ' außen' : null].filter(Boolean).join(' · ');
   if (stell) rows.push(['Stellplätze', stell]);
