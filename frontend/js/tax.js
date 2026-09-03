@@ -1346,7 +1346,28 @@ function _renderDetailForm(years) {
          der Abschrift des Formulars für genau dieses Jahr. Gibt es dafür keine
          Datei, steht keine Zeile dort: lieber keine Nummer als die eines
          anderen Jahres. */
-      var _avT = window['AnlageV' + y.year];
+      /* v1222b · RÜCKFALL AUF DAS JÜNGSTE VERFÜGBARE JAHR — nur hier, nicht im PDF.
+         Gemessen: das Steuerformular rendert die Jahre ab 2026 (State.cfRows),
+         die Abschrift gibt es für 2025. Nach der strengen Regel erschien
+         deshalb NIE eine Zeilennummer — richtig gebaut und trotzdem nutzlos.
+         Die Anlage V 2026 ist Anfang September 2026 noch nicht veröffentlicht;
+         Marcel kann sie also gar nicht liefern.
+
+         Der Tooltip ist eine ARBEITSHILFE IM PROGRAMM, das PDF eine Unterlage,
+         die jemand weiterreicht. Deshalb hier der Rückfall mit deutlichem
+         Hinweis, im PDF weiterhin die strenge Regel: dort erscheint ohne
+         passende Abschrift gar keine Anlage-V-Seite. Eine Orientierung mit
+         Vorbehalt hilft beim Arbeiten; eine Zahl ohne Vorbehalt in einem
+         Dokument, das ans Finanzamt geht, hilft niemandem. */
+      var _avT = window['AnlageV' + y.year], _avAlt = null;
+      if (!_avT) {
+        var _avJahre = Object.keys(window)
+          .filter(function (k) { return /^AnlageV\d{4}$/.test(k); })
+          .map(function (k) { return parseInt(k.slice(7), 10); })
+          .filter(function (j) { return j < y.year; })
+          .sort(function (a, b) { return b - a; });
+        if (_avJahre.length) { _avAlt = _avJahre[0]; _avT = window['AnlageV' + _avAlt]; }
+      }
       var _avF = (_avT && _avT.felder) ? _avT.felder[r.f] : null;
       if (_avF && _avF.zeile != null) {
         var _avZ = (_avT.zeilen && _avT.zeilen[_avF.zeile]) || {};
@@ -1358,11 +1379,14 @@ function _renderDetailForm(years) {
               ? 'Zuordnung aus der Art des Aufwands, nicht aus dem Formulartext — bitte prüfen.'
               : '';
         help += (help ? '\n\n' : '')
-          + '── ANLAGE V ' + y.year + ' ──\n'
+          + '── ANLAGE V ' + (_avAlt || y.year) + ' ──\n'
           + 'Zeile ' + _avF.zeile + (_avZ.kz ? '  ·  Kennzahl ' + _avZ.kz : '') + '\n'
           + (_avZ.text ? _avZ.text + '\n' : '')
           + (_avF.grund ? '\n' + _avF.grund + '\n' : '')
-          + (_herkunft ? '\n' + _herkunft : '');
+          + (_herkunft ? '\n' + _herkunft : '')
+          + (_avAlt ? '\n\nACHTUNG: Für ' + y.year + ' liegt noch keine Abschrift vor. '
+                    + 'Angezeigt ist der Stand ' + _avAlt + '. Zeilennummern ändern sich je '
+                    + 'Veranlagungsjahr — am aktuellen Formular prüfen.' : '');
       }
       var labelHtml = r.l;
       if (help) {
